@@ -19,16 +19,16 @@ AC_EGREP_CPP(yes,
   AC_DEFINE(DOS32, 1,
             [ Define if this system uses a 32-bit DOS extender (djgpp/emx). ])
   with_linux_vga=no
-  AC_CHECK_LIB(grx20,GrLine,dnl
+  AC_CHECK_LIB(grx20,GrLine,
     LIBS="-lgrx20 $LIBS"
     CFLAGS="$CFLAGS -fno-inline-functions"
     AC_DEFINE(DJSVGA, 1,
               [ Define if you want to use libgrx20 with MSDOS/djgpp. ])
-    AC_CHECK_LIB(grx20,GrCustomLine,dnl
+    AC_CHECK_LIB(grx20,GrCustomLine,
       AC_DEFINE(GRX21, 1,
                 [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
     )dnl
-  ),dnl
+  ),
   AC_MSG_RESULT(no)
   )dnl 
 ])
