@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl configure.in for gnuplot 3.7 on Unix.
+dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.105 2002/01/22 17:43:18 lhecking Exp $
+dnl $Id: configure.in,v 1.106 2002/01/26 00:16:23 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -375,29 +375,33 @@ AC_ARG_WITH(png,dnl
      if test -d $withval/lib; then
        LDFLAGS="$LDFLAGS -L$withval/lib"
      fi
-     AC_CHECK_LIB(png,png_init_io,
-       [TERMLIBS="-lpng -lz $TERMLIBS"
-        AC_CHECK_HEADER(png.h,
-        [AC_CHECK_HEADER(zlib.h,,
-         AC_MSG_WARN([found z library but not zlib.h
+     with_png=yes
+   fi],with_png=yes)
+
+if test "$with_png" = yes; then
+  AC_CHECK_LIB(png,png_init_io,
+    [TERMLIBS="-lpng -lz $TERMLIBS"
+     AC_CHECK_HEADER(png.h,
+     [AC_CHECK_HEADER(zlib.h,,
+      AC_MSG_WARN([found z library but not zlib.h
 please add path to zlib.h to CPPFLAGS in Makefile]))
-         AC_EGREP_CPP([You lose], [#include "png.h"
+      AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
 ],
-           AC_MSG_WARN([- libpng too old - not including png driver])
-           ac_cv_header_png_h=no)],
-        AC_MSG_WARN([found png library but not png.h
+        AC_MSG_WARN([- libpng too old - not including png driver])
+        ac_cv_header_png_h=no)],
+     AC_MSG_WARN([found png library but not png.h
 please add path to png.h to CPPFLAGS in Makefile]))],
-       AC_MSG_RESULT([  PNG library not found.
-       See term/png.trm for download details]),
-       [-lz])
-   fi])
+    AC_MSG_RESULT([  PNG library not found.
+    See term/png.trm for download details]),
+    [-lz])
 
-if test "$ac_cv_header_png_h" = yes; then
-  AC_DEFINE(HAVE_LIBPNG, 1,
-            [ Define if you have the png library. ])
+  if test "$ac_cv_header_png_h" = yes; then
+    AC_DEFINE(HAVE_LIBPNG, 1,
+              [ Define if you have the png library. ])
+  fi
 fi
 dnl end png and z
 
@@ -412,23 +416,27 @@ AC_ARG_WITH(pdf,dnl
      if test -d $withval/lib; then
        LDFLAGS="$LDFLAGS -L$withval/lib"
      fi
-     AC_CHECK_LIB(pdf,PDF_get_majorversion,
-       [TERMLIBS="-lpdf $TERMLIBS"
-        AC_DEFINE(HAVE_LIBPDF,1,
-                  [ Define if you have the pdf library. ])
-        AC_CHECK_HEADERS(pdflib.h,,
-          AC_MSG_WARN([found pdf library but not pdflib.h
-please add path to pdflib.h to CPPFLAGS in Makefile]))
-        AC_CHECK_HEADERS(zlib.h,,
-          AC_MSG_WARN([found z library but not zlib.h
-please add path to zlib.h to CPPFLAGS in Makefile]))],
-       AC_MSG_RESULT([  PDF library not found.
-  See term/pdf.trm for download details]))
-  fi])
+     with_pdf=yes
+   fi],with_pdf=no)
 
-if test "$ac_cv_header_pdflib_h" = yes; then
-  AC_DEFINE(HAVE_LIBPDF, 1,
-            [ Define if you have the pdf library. ])
+if test "$with_pdf" = yes; then
+  AC_CHECK_LIB(pdf,PDF_get_majorversion,
+    [TERMLIBS="-lpdf $TERMLIBS"
+     AC_DEFINE(HAVE_LIBPDF,1,
+               [ Define if you have the pdf library. ])
+     AC_CHECK_HEADERS(pdflib.h,,
+       AC_MSG_WARN([found pdf library but not pdflib.h
+please add path to pdflib.h to CPPFLAGS in Makefile]))
+     AC_CHECK_HEADERS(zlib.h,,
+       AC_MSG_WARN([found z library but not zlib.h
+please add path to zlib.h to CPPFLAGS in Makefile]))],
+    AC_MSG_RESULT([  PDF library not found.
+  See term/pdf.trm for download details]))
+
+  if test "$ac_cv_header_pdflib_h" = yes; then
+    AC_DEFINE(HAVE_LIBPDF, 1,
+              [ Define if you have the pdf library. ])
+  fi
 fi
 dnl end pdf
 
@@ -710,7 +718,7 @@ test "$ac_cv_header_png_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PNG files])
 
 test "$ac_cv_header_pdflib_h" = yes && \
-  AC_MSG_RESULT([  Enable generation of PDF files (EXPERIMENTAL)])
+  AC_MSG_RESULT([  Enable generation of PDF files])
 
 test "$with_cwdrc" = yes && \
   AC_MSG_RESULT([  Check current directory for .gnuplot file])
@@ -750,10 +758,9 @@ test "$enable_iris" = yes && \
 test "$enable_mgr" = yes && \
   AC_MSG_RESULT([  Enable MGR terminal])
 
-test "$enable_rgip" = yes && \
+if test "$enable_rgip" = yes ; then
   AC_MSG_RESULT([  Enable RGIP terminal])
+fi
 dnl end config report
-
-exit 0
 
 dnl end configure.in
