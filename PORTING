@@ -224,7 +224,7 @@ incomplete.
 
 define        note
 ------        --------
-ANSI_C        if the compiler can handle ANSI prototypes
+ANSI_C        defined by ansichek.h if the compiler can handle ANSI prototypes
 AMIGA_AC_5    defined for Manx Aztec C 5.2a on the Amiga.
 AMIGA_SC_6_1  defined for SAS/C 6.1 or later versions on the Amiga.
 __amigaos__   defined by gcc on AmigaOS.
@@ -239,7 +239,7 @@ __ZTC__       Zortech C compiler under MSDOS.
 _Windows      defined by Borland C++ 3.0 compiling for MS-Windows.
 __WATCOMC__   defined automatically by  Watcom C
 __EMX__       defined by EMX gcc (available on DOS & OS/2).
-OS2           defined by compilers under OS/2.
+OS2           to be defined by compilers under OS/2.
 
 Defines Used in Gnuplot
 =======================

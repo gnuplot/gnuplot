@@ -25,11 +25,7 @@ longer term
 Lars' list
 
 - much-requested feature: read text/commands from data files
-- new directory structure: eg. docs lib lisp m4 man src term
-  [DONE] need to split src/stdfn.h into single files and move
-  to new lib/ directory
 - provide library of replacement functions instead of stdfn.c
-  [see above]
 - possibly switch to automake
   [PARTIALLY DONE] not done yet: docs lisp src tutorial
 - completely rewrite the parser. Use yacc/bison if possible.
@@ -37,22 +33,21 @@ Lars' list
   because the current scanner is extremely simple. This is probably
   only worthwhile if the parser is rewritten at the same time.
 - use PD hash code for table-lookup (SNIPPETS code). Tables for
-  builtin and user functions, variables, commands. What else?
+  builtin and user functions, variables, commands. What else? aliases
 - [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
 - [HBB] rewrite hidden3d code
 - for post-3.7 release: integrate new feature patches (M. Koga's
   polygon patch, various postscript driver patches by Dick, T. Walter's
-  gnuplot command line history save file, etc)?
+  gnuplot command line history save file, etc)? pm3d?
   [PARTIALLY DONE]
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
 - autogenerate term.h from config file in text format and/or configure?
-- add load path for files/GNUPLOT_LIBRARY env var
-- (should gnuplot_x11 be in prefix/libexec???)
+- should gnuplot_x11 be in prefix/libexec???
 - parse "~" in filenames as $HOME
   [PARTIALLY DONE] does not work for cd, set output
-  [PARTIALLY DONE] works for all cmds no; plot key shows "~" instead
+  [PARTIALLY DONE] works for all cmds now; plot key shows "~" instead
   of path (-> fix); does not accept "~" and "~user". Maybe implement
   former, latter requires reading passwd file (-> not!)
 - general expansion of user defined and environment vars in
@@ -65,20 +60,18 @@ Lars' list
   comes with png 0.88/zlib 1.0)
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL) (Apache?)
-- use varargs functions for error reporting
-  [configure and header files are prepared]
 - gnuplot often doesn't free() memory; rearrange code to do this
-- add Amiga WinGnuplot driver and related files
+  [memdump() function, command; mem_cleanup(), to be called on
+   exit and reset; check existing code]
+- add Amiga WinGnuplot driver and related files (difficult; cannot get
+  it to run successfully when compiled with gcc)
 - add more maintainer checks (eg. file permissions)
 - better lisp/ files integration (Makefile target to import Bruce's
   latest version). How to handle duplicates?
-- build/install info only if emacs found (independent of alldoc target)
-- build tutorial conditionally?
 - better documentation format; get rid of the doc2xxx utils
-- add pgnuplot.c for Win
 - move src/* subdirs to toplevel?
 - update the FAQ!!!!
-- update NEWS
-- make dist-something: put current date into version.c
 - non-integer time value in 'pause' command
+- tilde and variable expansion to be done by 
+  gp_fopen() - to be implemented
 

@@ -1,3 +1,53 @@
+1999-06-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/alloc.c: Indentation.
+
+	* src/command.c, src/datafile.c, src/plot.c, src/protos.h, src/set.c:
+	Pass only one arg to gp_expand_tilde.
+
+	* src/datafile.c(df_open): More efficient code to allocate memory
+	for data file name.
+
+	* src/time.c: Fix int_* calls.
+
+	* src/variable.c: In ACTION_GET, handle loadpath == NULL case.
+
+	* term/tkcanvas.trm: Remove "nested extern" declarations.
+
+1999-06-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: 'make check' now passes GNUTERM from
+	the command line to gnuplot.
+
+	* src/eval.c, src/fit.c, src/plot.h: Remove static limit for name
+	of user defined functions and variables.
+
+1999-06-04  Allin Cottrell  <cottrell@ricardo.ecn.wfu.edu>
+
+	* term/latex.trm: Changed to make embedding document font
+	the default font.
+
+1999-06-03  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* PORTING: More descriptive entries for ANSI_C, OS/2.
+
+	* config/makefile.os2, src/command.c, src/stdfn.h, src/term.c:
+	Patches for OS/2.
+
+	* src/util.c: Another typo fixed.
+
+1999-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: Remove comment.
+
+	* src/os2/gnupmdrv.rc: Add define and include file.
+
+	* src/readline.c: Two minor changes in the USE_MOUSE code.
+
+1999-06-03  David Dyck  <dcd@tc.fluke.com>
+
+	* src/util.c: Fix VPRINTF/VFPRINTF typos.
+
 1999-06-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/command.c(command,do_system): Shell commands '!cmd' are now
@@ -45,8 +95,6 @@
 
 	* src/protos.h: New prototype declarations for os_error(), int_error()
 	and int_warn().
-
-	* src/util.c(is_notempty): Return FALSE if token is not a string.
 
 	* src/util.c: Error and warning functions os_error(), int_error()
 	and int_warn() are now variadic if supported by the runtime. This
@@ -187,8 +235,6 @@
 
 	* src/datafile.c(df_open): Storage for data file name is now fully
 	dynamic. Remove temporary static array.
-
-	* src/protos.h, src/util.c: New function is_notempty().
 
 	* src/set.c, src/setshow.h, src/show.c: Turn identical setmess/showmess
 	string into #define'd symbol.
