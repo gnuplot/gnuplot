@@ -1,36 +1,40 @@
 #ifndef lint
-static char    *RCSid = "$Id: parse.c,v 1.59 1997/07/22 23:20:46 drd Exp $";
+static char    *RCSid = "$Id: parse.c,v 1.60 1998/03/22 22:31:55 drd Exp $";
 #endif
 
-
 /* GNUPLOT - parse.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley 
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
- * Permission to use, copy, and distribute this software and its documentation
- * for any purpose with or without fee is hereby granted, provided that the
- * above copyright notice appear in all copies and that both that copyright
- * notice and this permission notice appear in supporting documentation. 
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
  *
- * Permission to modify the software is granted, but not the right to distribute
- * the modified code.  Modifications are to be distributed as patches to
- * released version. 
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * This software is provided "as is" without express or implied warranty. 
- *
- *
- * AUTHORS 
- *
- * Original Software: Thomas Williams,  Colin Kelley. 
- *
- * Gnuplot 2.0 additions: Russell Lang, Dave Kotz, John Campbell. 
- *
- * Gnuplot 3.0 additions: Gershon Elber and many others. 
- *
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 #include <signal.h>
-#include <math.h>
 #include "plot.h"
 #include "help.h"
 #include <setjmp.h>
@@ -214,24 +218,8 @@ static void extend_at()
 
   at=gp_realloc(at, newsize, "extend_at");
   at_size+=MAX_AT_LEN;
-#ifdef DEBUG_STR
-  fprintf(stderr, "Extending at size to %d\n", at_size);
-#endif
+  FPRINTF((stderr, "Extending at size to %d\n", at_size));
 }
-
-#ifdef NOCOPY
-/*
- * cheap and slow version of memcpy() in case you don't have one 
- */
-memcpy(dest, src, len)
-	char           *dest, *src;
-	unsigned int    len;
-{
-	while (len--)
-		*dest++ = *src++;
-}
-#endif				/* NOCOPY */
-
 
 /* moved from eval.c, the function is only called from this module */
 static union argument *
@@ -332,7 +320,13 @@ static void factor()
 			int_error("Positive integer expected", c_token);
 		add_action(DOLLARS)->v_arg = a;
 	} else if (isanumber(c_token)) {
+	        /* work around HP-UX 9.10 cc limitation ... */
+#if defined(__hpux) && !defined(__GCC__)
+	        struct value foo = add_action(PUSHC)->v_arg;
+		convert (&foo, c_token);
+#else
 		convert(&(add_action(PUSHC)->v_arg), c_token);
+#endif
 		c_token++;
 	} else if (isletter(c_token)) {
 		if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {
