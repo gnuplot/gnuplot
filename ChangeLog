@@ -48,6 +48,11 @@
 	* docs/gnuplot.doc: Fix inconsistency in the document: many examples
 	use the 'set no...' syntax instead of the 3.8-new syntax 'unset'.
 
+2001-11-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/specfun.c: Remove "non-commercial" clause for ibeta() and
+	igamma() by permission of the original author, Jos van der Woude.
+
 2001-11-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c: Fix  splot 'a.dat' with ... palette  crash if
