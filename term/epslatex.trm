@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.1.2.1 2000/05/07 16:37:22 lhecking Exp $
+ * $Id: epslatex.trm,v 1.1.2.2 2000/10/20 19:05:11 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -794,7 +794,7 @@ unsigned int xstart, ystart, xend, yend;
 TBOOLEAN head;
 {
     fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend,
-	    head ? "Arrow" : "Gpstroke");
+	    head ? "Arrow" : "L Gpstroke");
 }
 
 TERM_PUBLIC void
