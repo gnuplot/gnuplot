@@ -1,5 +1,9 @@
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
+	* pm3d/demo/pm3dColumn.gpi: quick demo for the new pm3d features
+
+2002-01-26  Johannes Zellner  <johannes@zellner.org>
+
 	* src/plot3d.c src/plot3d.h src/pm3d.c:
 	some bug fixes and improvements for the new pm3d functionality
 
