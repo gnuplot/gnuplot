@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.8 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.9 2000/11/07 14:37:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -900,43 +900,34 @@ static double lambertw(x)
     double p,e,t,w,eps;
     int i;
 
-    
-	
     eps = MACHEPS;
 
-    if (x>=-exp(-1))
-    {
-        if (x==0) 
-	{
-	    return 0.0;
-	} else
-	{
-	    if (x < 1)
-	    {
-	       	p=sqrt(2.0*(exp(1.0)*x+1.0)); 
-	      	w=-1.0+p-p*p/3.0+11.0/72.0*p*p*p;
-	    } else
-	    {
-	        w = log(x);
-	    }
+    if (x<-exp(-1))
+	return -1;		/* error, value undefined */
 
-	    if (x > 3)
-	    {
-	 	w = w-log(w);
-	    }
+    if (fabs(x) <= eps) 
+	return x;
 
-	    for (i=0;i<20;i++)
-	    {
-		e=exp(w);
-		t=w*e-x;
-		t=t/(e*(w+1.0)-0.5*(w+2.0)*t/(w+1.0));
-		w=w-t;
-		if (fabs(t)<eps*(1.0+fabs(w))) return w;
-	    } 
-	    return -1;
-       } 
-       return -1;
+    if (x < 1) {
+	p=sqrt(2.0 * (exp(1.0) * x + 1.0)); 
+	w=-1.0 + p - p * p / 3.0 + 11.0 / 72.0 *  p  * p * p;
+    } else {
+	w = log(x);
     }
+	
+    if (x > 3) {
+	w = w - log(w);
+    }
+
+    for (i = 0; i < 20; i++) {
+	e = exp(w);
+	t = w * e - x;
+	t = t / (e * (w + 1.0) - 0.5 * (w + 2.0) * t/(w + 1.0));
+	w = w - t;
+	if (fabs(t) < eps*(1.0 + fabs(w)))
+	    return w;
+    } 
+    return -1;			/* error: iteration didn't converge */
 }
 
 void f_lambertw()
@@ -946,5 +937,10 @@ void f_lambertw()
 
     x=real(pop(&a));
 
-    push(Gcomplex(&a,lambertw(x),0.0));
+    x = lambertw(x);
+    if (x <= -1)
+	/* Error return from lambertw --> flag 'undefined' */
+	undefined = TRUE;
+    
+    push(Gcomplex(&a,x,0.0));
 }

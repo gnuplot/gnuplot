@@ -1,5 +1,13 @@
 2000-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/specfun.c (f_lambertw): set 'undefined' to TRUE
+	if lambertw returns error condition.
+
+	* src/specfun.c (lambertw): restructured a bit, removed fall-off
+ 	without a return value, avoided FP equality comparison.
+
+2000-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	From Gunter Kuhnle <gunter@tux.biow.uni-leipzig.de>:
 
 	* src/specfun.c (f_lambertw): new function.
