@@ -12,25 +12,21 @@ dnl
 AC_PREREQ(2.1)
 AC_REVISION($Revision: 1.90 $)
 AC_INIT(graphics.c)
+VERSION=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
+AM_INIT_AUTOMAKE(gnuplot, "$VERSION")
 AC_CONFIG_HEADER(config.h:config.hin)
 
 
-dnl Programs.
-missing_dir=.
-AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
-AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
-AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
-AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
+dnl Programs. Most of this is
+dnl now done by AM_INIT_AUTOMAKE
 AC_PROG_CC
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 
 
 dnl Optional features.
 
 dnl Do not use the included readline function
 AC_ARG_WITH(readline,dnl
-[  --without-readline      do not use the included readline function],,
+[  --without-readline      do not use the included readline function],
   AC_DEFINE(READLINE)
 )dnl
 
@@ -210,10 +206,13 @@ dnl Cached variables - required for the library checks below
 if test ."$gp_cv_prog_make_cppflags" != "."; then
   CPPFLAGS="$gp_cv_prog_make_cppflags"
 fi
-dnl Need two pairs of square brackets because m4 strips out one pair.
+dnl Temporarily change the quoting character because autoconf
+dnl is using brackets internally.
 dnl There is a space and a tab between the square brackets.
 if test ."$gp_cv_prog_make_termlibs" != "."; then
-  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[[^ 	]]*//g'`"
+  changequote(<<, >>)dnl
+  TERMLIBS="`echo $gp_cv_prog_make_termlibs | sed 's/-l[^ 	]*//g'`"
+  changequote([, ])dnl
 fi
 
 dnl check for installed linux vgalib
@@ -222,7 +221,7 @@ if test "$with_linux_vga" = yes; then
   AC_CHECK_LIB(vga, vga_init,
     AC_DEFINE(LINUXVGA)
     LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
-    TERMLIBS="$TERMLIBS -lvga")
+    TERMLIBS="$TERMLIBS -lvga",with_linux_vga=no)
 fi
 
 dnl This will work only with gnu readline installed in a standard library path
@@ -300,6 +299,8 @@ AC_CACHE_CHECK(CPPFLAGS variable,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppfla
 AC_CACHE_CHECK(TERMLIBS variable,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
 
 dnl Substitute variables
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
 AC_SUBST(TERMFLAGS)
@@ -325,6 +326,26 @@ if test ! -f docs/latextut/makefile.dst && \
   echo moving docs/latextut/makefile out of the way
   mv docs/latextut/makefile docs/latextut/makefile.dst
 fi
+
+dnl Report configuration
+echo "
+
+Configuration summary for $PACKAGE $VERSION
+
+  Where is the help file?                    $datadir/gnuplot.gih"
+test "$with_gd" != no             && echo "  Enable generation of GIF files."
+test "$with_png" != no            && echo "  Enable generation of PNG files."
+test "$with_cwdrc" = yes && echo "  Check current directory for .gnuplot file."
+if test -f "$with_gnu_readline"; then
+                                     echo "  Use GNU readline library."
+else
+  test "$with_readline" != no     && echo "  Use included readline."
+fi
+test "$with_lasergnu" = yes       && echo "  Install lasergnu printer script."
+test "$with_linux_vga" = yes      && echo "  Use the Linux console driver."
+test "$GNUPLOT_X11" = gnuplot_x11 && echo "  Use the X Window System."
+echo
+dnl end config report
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile docs/Makefile docs/latextut/Makefile], \
