@@ -1,3 +1,24 @@
+2002-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0FAQ: Update to current version.
+
+	* 0INSTALL: Fix some typos.
+
+	* 0README: Update version and ftp locations.
+
+	* Makefile.in, configure.in: Rename X_LIBRARIES to LIBRARIES_FOR_X,
+	following the main branch.
+
+	* configure.in: Bugfixes and more cleaning up.
+
+	* specfun.c: Remove all code that was labeled for non-commercial use
+	only (lgamneg, lgampos, lngamma, inverse_normal_func,
+	inverse_error_func). This means that the gamma, inverse normal, and
+	inverse error function are not available anymore on platforms that
+	don't have native implementations.
+
+	* syscfg.h: Update FAQ location.
+
 2002-01-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Remove references to the GP_PATH_* macros.
