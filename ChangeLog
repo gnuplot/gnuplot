@@ -1,3 +1,12 @@
+2004-05-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c, term/x11.trm:  Move handling of mouse click after
+	'pause mouse' from mouse.c to x11.trm.  This removes an otherwise
+	unnecessary do_string("replot") from mouse.c, and instead adds an
+	explicit check for mouse button release in X11_waitforinput().
+
+	* demo/mousevariables.dem: Add a comment after final pause command.
+
 2004-04-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gpcard.tex: Remove duplicated X11 terminal entry.

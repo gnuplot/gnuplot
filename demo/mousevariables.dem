@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: mousevariables.dem,v 1.4 2003/10/17 15:02:21 mikulik Exp $
 #
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
@@ -65,7 +65,7 @@ replot
 print "Zoomed to xrange ",BOT_X," ",TOP_X
 print "Zoomed to yrange ",BOT_Y," ",TOP_Y
 #
-pause -1
+pause -1 "Type <cr> to continue"
 
 reset
 
