@@ -1,3 +1,7 @@
+2002-08-27  Volker Dobler <v.dobler@web.de>
+
+	* src/color.c: Use signed int for cblabel positioning.
+
 2002-08-25  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm: Add support for selecting x11 fonts.
@@ -985,7 +989,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/25 16:13:37 $).
+	last modification date (from the tag $Date: 2002/08/26 05:34:34 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.34 2002/08/22 07:25:56 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.35 2002/08/25 15:18:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -435,8 +435,9 @@ cbtick_callback(axis, place, text, grid)
     /* draw label */
     if (text) {
 	if (color_box.rotation == 'h') {
-	    unsigned int y3 = cb_y_from - (term->v_char);
+	    int y3 = cb_y_from - (term->v_char);
 	    if (len > 0) y3 -= len; /* add outer tics len */
+	    if (y3<0) y3 = 0;
 #if 1
 	    if (term->justify_text)
 		term->justify_text(CENTRE);
@@ -575,7 +576,7 @@ draw_color_smooth_box()
 
     /* write the colour box label */
     if (*CB_AXIS.label.text) {
-	unsigned int x, y;
+	int x, y;
 	apply_textcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
 	    int len = ticscale * (tic_in ? 1 : -1) * (term->v_tic);
@@ -584,6 +585,8 @@ draw_color_smooth_box()
 	    y = cb_y_from + (CB_AXIS.label.yoffset - DEFAULT_Y_DISTANCE - 1.7) * term->v_char;
 #undef DEFAULT_Y_DISTANCE
 	    if (len < 0) y += len;
+	    if (x<0) x = 0;
+	    if (y<0) y = 0;
 	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_CENTRE, 0,
 			    CB_AXIS.label.font);
 	} else {
@@ -599,6 +602,8 @@ draw_color_smooth_box()
 #undef DEFAULT_X_DISTANCE
 	    if (len > 0) x += len;
 	    y = (cb_y_from + cb_y_to) / 2 + CB_AXIS.label.yoffset * term->v_char;
+	    if (x<0) x = 0;
+	    if (y<0) y = 0;
 	    if ((*term->text_angle)(TEXT_VERTICAL)) {
 		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 
 				TEXT_VERTICAL, CB_AXIS.label.font);
