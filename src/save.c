@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.42 2002/04/21 13:50:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.43 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -414,9 +414,10 @@ set y2data%s\n",
 	save_position(fp, &this_arrow->start);
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
-	fprintf(fp, " %s %s linetype %d linewidth %.3f\n",
+	fprintf(fp, " %s %s %sfilled linetype %d linewidth %.3f\n",
 		this_arrow->head ? "" : " nohead",
 		(this_arrow->layer==0) ? "back" : "front",
+		this_arrow->filled ? "" : "no",
 		this_arrow->lp_properties.l_type + 1,
 		this_arrow->lp_properties.l_width);
     }
