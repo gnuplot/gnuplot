@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.33 2001/12/13 17:31:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.34 2002/01/06 16:31:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -448,9 +448,9 @@ get_filledcurves_style_options( filledcurves_opts *fco )
     int p;
     struct value a;
     p = lookup_table(&filledcurves_opts_tbl[0], c_token);
-    c_token++;
     fco->opt_given = (p != -1);
     if (p==-1) return; /* no option given */
+    c_token++;
     fco->closeto = p;
     if (!equals(c_token,"=")) return;
     /* parameter required for filledcurves x1=... and friends */
