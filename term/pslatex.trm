@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.27.2.3 2000/10/31 14:48:19 joze Exp $
+ * $Id: pslatex.trm,v 1.29 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -144,7 +144,6 @@ TERM_PUBLIC void
 PSLATEX_options()
 {
     struct value a;
-    int ps_fontsize;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PSLATEX_opts[0],c_token)) {

@@ -1,3 +1,12 @@
+2000-11-01 Johannes Zellner <johannes@zellner.org>
+
+	a few changes after merging the axis branch
+	* src/mouse.[ch]: made event_plotdone() non-static
+	* src/show.c: included plot.h where gnuplot_history_file is declared
+	* src/pm3d.h: included graph3d.h where
+	struct surface_points is declared
+	* term/pslatex.trm: remove an unused variable
+
 2000-10-31 Johannes Zellner <johannes@zellner.org>
 
 	* src/gplt_x11.c: moved current_gc outside the #ifdef PM3D

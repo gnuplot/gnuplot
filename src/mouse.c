@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.7 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.8 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -170,7 +170,6 @@ static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
 static void event_motion __PROTO((struct gp_event_t * ge));
 static void event_modifier __PROTO((struct gp_event_t * ge));
-static void event_plotdone __PROTO((void));
 static void event_print __PROTO((FILE * fp, char *s));
 static void do_save_3dplot __PROTO((struct surface_points *, int, int));
 

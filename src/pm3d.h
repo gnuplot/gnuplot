@@ -22,6 +22,7 @@
 #ifndef PM3D_H
 #define PM3D_H
 
+#include "graph3d.h" /* struct surface_points */
 
 #define PM3D_VERSION "gp38c-pm3d"
 
