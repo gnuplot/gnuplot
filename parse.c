@@ -93,10 +93,10 @@ int an_int;
 }
 
 
-#ifdef apollo
-#include <apollo/base.h>
-#include <apollo/pfm.h>
-#include <apollo/fault.h>
+#ifdef APOLLO
+# include <apollo/base.h>
+# include <apollo/pfm.h>
+# include <apollo/fault.h>
 
 /*
  * On an Apollo, the OS can signal a couple errors that are not mapped into
@@ -121,7 +121,7 @@ apollo_pfm_catch()
     pfm_$establish_fault_handler(fault_$fp_sig_nan, pfm_$fh_backstop,
 				 apollo_sigfpe, &status);
 }
-#endif
+#endif /* APOLLO */
 
 
 void evaluate_at(at_ptr, val_ptr)
