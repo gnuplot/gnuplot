@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    September 18, 2002
-;; Version:    0.5t
+;; Updated:    December 13, 2002
+;; Version:    0.6.0
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -276,6 +276,8 @@
 ;;        comint gets stuck in an infinate loop.
 ;;  0.5t  Sep 16 2002 <BR> Fixed a problem with C-c C-v jumping
 ;;        forward 2 lines at a time
+;;  0.6.0 Dec 13 2002 <BR> Changed numbering scheme to accommodate
+;;        gnuplot packaging requirements
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty       <DB> (numerous corrections)
@@ -375,7 +377,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/")
-(defconst gnuplot-version "0.5s")
+(defconst gnuplot-version "0.6.0")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
