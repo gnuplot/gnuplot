@@ -1,5 +1,9 @@
 2002-01-17  Johannes Zellner  <johannes@zellner.org>
 
+	* term/x11.trm term/emf.trm: removed unsued variables
+
+2002-01-17  Johannes Zellner  <johannes@zellner.org>
+
 	* term/x11.trm src/unset.c src/gplt_x11.c: removed the
 	X11_unset_pm3d() function which made multiplot not working
 	on X11. Introduced a variable plot->release_cmap in gplt_x11.c

@@ -1,5 +1,5 @@
 		    /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.8 2001/02/28 16:43:38 broeker Exp $
+ * $Id: emf.trm,v 1.9 2001/08/22 14:16:34 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -507,7 +507,7 @@ EMF_graphics()
 TERM_PUBLIC int 
 EMF_set_font(const char *font)
 {
-    int sep, i;			/* hope this function exist everywhere... */
+    int sep;			/* hope this function exist everywhere... */
 
     if (font && *font) {
 	char *comma = strchr(font, ',');
