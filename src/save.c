@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.1 1999/07/30 19:35:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.2 1999/08/07 17:21:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -148,7 +148,8 @@ static void
 save_variables__sub(fp)
 FILE *fp;
 {
-    register struct udvt_entry *udv = first_udv->next_udv;	/* always skip pi */
+    /* always skip pi */
+    register struct udvt_entry *udv = first_udv->next_udv;
 
     while (udv) {
 	if (!udv->udv_undef) {
@@ -159,6 +160,40 @@ FILE *fp;
 	udv = udv->next_udv;
     }
 }
+
+/* HBB 19990823: new function 'save term'. This will be mainly useful
+ * for the typical 'set term post ... plot ... set term <normal term>
+ * sequence. It's the only 'save' function that will write the
+ * current term setting to a file uncommentedly. */
+void
+save_term(fp)
+FILE *fp;
+{
+    if (fp) {
+	show_version(fp);
+
+	/* A possible gotcha: the default initialization often doesn't set
+	 * term_options, but a 'set term <type>' without options doesn't
+	 * reset the options to startup defaults. This may have to be
+	 * changed on a per-terminal driver basis... */
+	if (term)
+	    fprintf(fp, "set terminal %s %s\n", term->name, term_options);
+	else
+	    fputs("set terminal unknown\n", fp);
+
+	/* output will still be written in commented form.  Otherwise, the
+	 * risk of overwriting files is just too high */
+	if (outstr)
+	    fprintf(fp, "# set output '%s'\n", outstr);
+	else
+	    fputs("# set output\n", fp);
+		
+	fputs("#    EOF\n", fp);
+	(void) fclose(fp);
+    } else
+	os_error(c_token, "Cannot open save file");
+}
+
 
 void
 save_set_all(fp)

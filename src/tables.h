@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.4 1999/08/11 18:08:23 lhecking Exp $ */
+/* $Id: tables.h,v 1.5 1999/08/17 15:52:44 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -30,7 +30,7 @@ enum plot_id {
 };
 
 /* options for 'save' command */
-enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_SET, SAVE_VARS };
+enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_TERMINAL, SAVE_SET, SAVE_VARS };
 
 /* options for 'show' and 'set' commands
  * this is rather big, we might be better off with a hash table */
@@ -47,9 +47,9 @@ enum set_id {
     S_MY2TICS, S_NOMY2TICS, S_MYTICS, S_NOMYTICS,
     S_MZTICS, S_NOMZTICS,
     S_OFFSETS, S_ORIGIN, S_OUTPUT, S_PARAMETRIC, S_PLOT, S_POINTSIZE, S_POLAR,
-    S_RRANGE, S_SAMPLES, S_SIZE, S_SURFACE, S_STYLE, S_TERMINAL, S_TICS,
-    S_TICSCALE, S_TICSLEVEL, S_TIMEFMT, S_TIMESTAMP, S_TITLE, S_TRANGE,
-    S_URANGE, S_VARIABLES, S_VERSION, S_VIEW, S_VRANGE,
+    S_RRANGE, S_SAMPLES, S_SIZE, S_SURFACE, S_STYLE, S_TERMINAL, S_TERMOPTIONS,
+    S_TICS, S_TICSCALE, S_TICSLEVEL, S_TIMEFMT, S_TIMESTAMP, S_TITLE,
+    S_TRANGE, S_URANGE, S_VARIABLES, S_VERSION, S_VIEW, S_VRANGE,
 
     S_X2DATA, S_X2DTICS, S_NOX2DTICS, S_X2LABEL, S_X2MTICS, S_NOX2MTICS,
     S_X2RANGE, S_X2TICS, S_NOX2TICS,

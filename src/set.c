@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.22 1999/08/17 15:48:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.23 1999/08/24 11:23:13 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -369,6 +369,7 @@ static void set_size __PROTO((void));
 static void set_style __PROTO((void));
 static void set_surface __PROTO((void));
 static void set_terminal __PROTO((void));
+static void set_termoptions __PROTO((void));
 static void set_tics __PROTO((void));
 static void set_ticscale __PROTO((void));
 static void set_ticslevel __PROTO((void));
@@ -792,6 +793,9 @@ set_command()
 	break;
     case S_TERMINAL:
 	set_terminal();
+	break;
+    case S_TERMOPTIONS:
+	set_termoptions();
 	break;
     case S_TICS:
 	set_tics();
@@ -2514,6 +2518,11 @@ set_terminal()
 	term = set_term(c_token);
 	c_token++;
 
+	/* FIXME
+	 * handling of common terminal options before term specific options
+	 * as per HBB's suggestion
+	 * new `set termoptions' command
+	 */
 	/* get optional mode parameters
 	 * not all drivers reset the option string before
 	 * strcat-ing to it, so we reset it for them
@@ -2524,6 +2533,20 @@ set_terminal()
 	if (interactive && *term_options)
 	    fprintf(stderr,"Options are '%s'\n",term_options);
     }
+}
+
+/* process 'set termoptions' command */
+static void
+set_termoptions()
+{
+    int_error(c_token,"Command not yet supported");
+
+    /* if called from term.c:
+     * scan input_line for common options
+     * filter out common options
+     * reset input_line (num_tokens = scanner(&input_line, &input_line_len);
+     * c_token=0 (1? 2)
+     */
 }
 
 

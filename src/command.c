@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.25 1999/08/08 17:02:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.26 1999/08/17 15:42:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -213,9 +213,12 @@ extend_token_table()
 	/* first time */
 	token = (struct lexical_unit *) gp_alloc(MAX_TOKENS * sizeof(struct lexical_unit), "token table");
 	token_table_size = MAX_TOKENS;
+	/* HBB: for checker-runs: */
+	memset(token, 0, MAX_TOKENS * sizeof(*token));
     } else {
 	token = gp_realloc(token, (token_table_size + MAX_TOKENS) * sizeof(struct lexical_unit), "extend token table");
 	token_table_size += MAX_TOKENS;
+	memset(token+token_table_size, 0, MAX_TOKENS * sizeof(*token));
 	FPRINTF((stderr, "extending token table to %d elements\n", token_table_size));
     }
 }
@@ -798,6 +801,14 @@ save_command()
 	    save_set(fp);
 	}
 	break;
+    case SAVE_TERMINAL:
+	if (!isstring(++c_token))
+	int_error(c_token, "expecting filename");
+	else {
+	    CAPTURE_FILENAME_AND_FOPEN("w");
+	    save_term(fp);
+	}
+	break;
     case SAVE_VARS:
 	if (!isstring(++c_token))
 	    int_error(c_token, "expecting filename");
@@ -811,7 +822,7 @@ save_command()
 	    CAPTURE_FILENAME_AND_FOPEN("w");
 	    save_all(fp);
 	} else
-	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
+	    int_error(c_token, "filename or keyword 'functions', 'variables', 'terminal' or 'set' expected");
 	break;
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.17 1999/07/30 19:35:30 lhecking Exp $
+ * $Id: protos.h,v 1.18 1999/08/07 17:21:09 lhecking Exp $
  *
  */
 
@@ -189,6 +189,7 @@ char tos_getch();
 void save_functions __PROTO((FILE *fp));
 void save_variables __PROTO((FILE *fp));
 void save_set __PROTO((FILE *fp));
+void save_term __PROTO((FILE *fp));
 void save_all __PROTO((FILE *fp));
 void save_set_all __PROTO((FILE *fp));
  

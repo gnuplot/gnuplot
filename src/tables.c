@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.4 1999/08/11 18:08:23 lhecking Exp $ */
+/* $Id: tables.c,v 1.5 1999/08/17 15:52:43 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -67,6 +67,7 @@ struct gen_table save_tbl[] =
 {
     { "f$unctions", SAVE_FUNCS },
     { "s$et", SAVE_SET },
+    { "t$erminal", SAVE_TERMINAL },
     { "v$ariables", SAVE_VARS },
     { NULL, SAVE_INVALID }
 };
@@ -140,6 +141,7 @@ struct gen_table set_tbl[] =
     { "st$yle", S_STYLE },
     { "su$rface", S_SURFACE },
     { "t$erminal", S_TERMINAL },
+    { "termo$ptions", S_TERMOPTIONS },
     { "ti$cs", S_TICS },
     { "ticsc$ale", S_TICSCALE },
     { "ticsl$evel", S_TICSLEVEL },
