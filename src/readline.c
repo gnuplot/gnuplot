@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.29 2002/03/10 18:54:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.30 2002/06/03 23:06:07 joze Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -78,7 +78,7 @@ LineCompleteHandler(char* ptr)
 }
 
 #if defined (SIGWINCH) && defined(PIPE_IPC) && defined(HAVE_LIBREADLINE)
-static RETSIGTYPE gnuplot_sigwinch_handler __PROTO((sig));
+static RETSIGTYPE gnuplot_sigwinch_handler __PROTO((int sig));
 
 static RETSIGTYPE
 gnuplot_sigwinch_handler(sig)
