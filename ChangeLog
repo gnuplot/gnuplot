@@ -1,10 +1,31 @@
+1998-10-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add ChangeLog to ETC variable.
+
+	* acconfig.h: Add MGR and RGIP.
+
+	* acinclude.m4: Minor changes.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Add options for MGR and RGIP. Define APOLLO if MGR
+ 	is defined. Add IRIS to configuration report.
+
+	* graphics.c(boundary): Another margin calculation bug fix by HBB.
+
+	* parse.c: Change #ifdef statement.
+
+	* term.h: Cleaning up, better readability.
+
+	* term/driver.h: Remove nested comment.
+
+	* version.c: Patchlevel pl5.
+
 1998-10-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* contour.c, term.c: Fix FPRINTF calls.
 
 	* graphics.c: Fix comments.
-
-	* makefile.os2: Final fixes to reflect changes in docs/Makefile.in.
 
 	* misc.c(save_tics): Rename time variable to flag_time to prevent
 	global variable shadowing.
@@ -21,9 +42,9 @@
 
 	* docs/README: Cleanup and fixes.
 
-	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2info.c,
-	docs/doc2ipf.c, docs/doc2ms.c: Final fixes to reflect changes in
-	Makefile.in.
+	* makefile.os2, docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c: Final fixes to
+	remove .c file inclusion.
 
 	* term/mif.trm, term/png.trm, term/post.trm: Make references to
 	version and patchlevel global to eliminate "nested extern declaration"
@@ -47,8 +68,8 @@
 	* makefile.286, makefile.amg, makefile.dj2, makefile.djg, makefile.emx,
 	makefile.g, makefile.msc, makefile.msw,makefile.mto, makefile,nt,
 	makefile,os2, makefile.os9, makefile.st, makefile.tc, makefile.vms,
-	makefile.wc, makefile.win, makefile.ztc: Update to reflect changes
-	in docs/Makefile.in.
+	makefile.wc, makefile.win, makefile.ztc: Add termdoc.o and xref.o
+	where required. No more inclusion of .c files.
 
 	* plot.c: Fix indentation.
 
@@ -69,8 +90,6 @@
 	inclusion of .c files. Indentation, small changes.
 
 	* docs/xref.h: New file for definitions from docs/xref.c.
-
-	* version.c: Patchlevel pl5.
 
 1998-10-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
