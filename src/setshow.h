@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.19 1999/10/01 14:54:36 lhecking Exp $
+ * $Id: setshow.h,v 1.20 1999/11/08 19:24:17 lhecking Exp $
  *
  */
 
@@ -242,7 +242,7 @@ void reset_command __PROTO((void));
 void show_command __PROTO((void));
 /* and some accessible support functions */
 enum PLOT_STYLE get_style __PROTO((void));
-TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
+TBOOLEAN load_range __PROTO((int axis, double *a, double *b, TBOOLEAN autosc));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));

@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.8 1999/06/22 11:54:15 lhecking Exp $
+ * $Id: dumb.trm,v 1.9 1999/08/24 11:24:53 lhecking Exp $
  *
  */
 
@@ -69,7 +69,7 @@ TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y,
 					const char *str));
 TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
-				     int head));
+				     TBOOLEAN head));
 
 #define DUMB_XMAX 79
 #define DUMB_YMAX 24
@@ -351,7 +351,7 @@ const char *str;
 TERM_PUBLIC void
 DUMB_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
-int head;			/* ignored */
+TBOOLEAN head;			/* ignored */
 {
     char saved_pen;
     char saved_x;
