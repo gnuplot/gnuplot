@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.102 2004/06/21 03:58:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.103 2004/07/01 17:10:04 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -482,6 +482,7 @@ static GC gc = (GC) 0;
 static GC *current_gc = (GC *) 0;
 static GC gc_xor = (GC) 0;
 static GC gc_xor_dashed = (GC) 0;
+static GC fill_gc = (GC) 0;
 static XFontStruct *font;
 /* must match the definition in term/x11.trm: */
 /* FIXME HBB 20020225: that really should be ensured by sharing a common
@@ -2251,10 +2252,57 @@ exec_cmd(plot_struct *plot, char *command)
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
 	    static int saved_npoints = -1, saved_i = -1;	/* HBB 20010919 */
-	    int i, npoints;
+	    int i, npoints, style;
 	    char *ptr = buffer + 1;
 
 	    sscanf(ptr, "%4d", &npoints);
+
+#if USE_ULIG_FILLEDBOXES
+	    if (npoints > 0) {
+		int fillpar, idx;
+
+		/* Load selected pattern or fill into a separate gc */
+		if (!fill_gc)
+		    fill_gc = XCreateGC(dpy,plot->window,0,0);
+		XCopyGC(dpy, *current_gc, ~0, fill_gc);
+		current_gc = &fill_gc;
+
+		ptr += 4;
+		sscanf(ptr, "%4d", &style);
+		fillpar = style >> 4;
+		switch (style & 0xf) {
+		case FS_SOLID:
+		    /* use halftone fill pattern according to filldensity */
+		    /* filldensity is from 0..100 percent */
+		    idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
+		    if (idx < 0)
+			idx = 0;
+		    if (idx >= stipple_halftone_num)
+			idx = stipple_halftone_num - 1;
+		    XSetStipple(dpy, *current_gc, stipple_halftone[idx]);
+		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    break;
+		case FS_PATTERN:
+		    /* use fill pattern according to fillpattern */
+		    idx = (int) fillpar;	/* fillpattern is enumerated */
+		    if (idx < 0)
+			idx = 0;
+		    idx = idx % stipple_pattern_num;
+		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
+		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    break;
+		case FS_EMPTY:
+		    /* fill with background color */
+		    XSetFillStyle(dpy, *current_gc, FillSolid);
+		    XSetForeground(dpy, *current_gc, plot->cmap->colors[0]);
+		    break;
+		default:
+		    /* fill with current color */
+		    XSetFillStyle(dpy, *current_gc, FillSolid);
+		    break;
+		}
+	    }
+#endif /* USE_ULIG_FILLEDBOXES */
 
 	    /* HBB 20010919: Implement buffer overflow protection by
 	     * breaking up long lines */

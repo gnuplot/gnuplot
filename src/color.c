@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.45 2004/06/20 05:53:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.46 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -191,30 +191,6 @@ set_color(double gray)
 }
 
 
-#if 0
-/*
-   Makes mapping from real 3D coordinates to 2D terminal coordinates,
-   then draws filled polygon
- */
-static void
-filled_polygon(int points, gpdPoint * corners)
-{
-    int i;
-    gpiPoint *icorners;
-    icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon corners");
-    for (i = 0; i < points; i++)
-	map3d_xy(corners[i].x, corners[i].y, corners[i].z, &icorners[i].x, &icorners[i].y);
-#ifdef EXTENDED_COLOR_SPECS
-    if (supply_extended_color_specs) {
-	icorners[0].spec.gray = -1;	/* force solid color */
-    }
-#endif
-    term->filled_polygon(points, icorners);
-    free(icorners);
-}
-#endif
-
-
 /* The routine above for 4 points explicitly.
  * This is the only routine which supportes extended
  * color specs currently.
@@ -235,6 +211,7 @@ filled_quadrangle(gpdPoint * corners)
 	map3d_xy(corners[i].x, corners[i].y, corners[i].z, &icorners[i].x, &icorners[i].y);
     }
 
+    icorners->style = FS_OPAQUE;
     term->filled_polygon(4, icorners);
 
     if (pm3d.hidden3d_tag) {
@@ -271,6 +248,7 @@ filled_polygon_3dcoords(int points, struct coordinate GPHUGE * coords)
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
+    icorners->style = FS_OPAQUE;
     term->filled_polygon(points, icorners);
     free(icorners);
 }
@@ -293,6 +271,7 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
 	icorners[0].spec.gray = -1;	/* force solid color */
     }
 #endif
+    icorners->style = FS_OPAQUE;
     term->filled_polygon(points, icorners);
     free(icorners);
 }
@@ -388,6 +367,7 @@ draw_inside_color_smooth_box_bitmap(FILE * out)
 	}
 #endif
 	/* print the rectangle with the given colour */
+	corners->style = FS_OPAQUE;
 	term->filled_polygon(4, corners);
     }
 }

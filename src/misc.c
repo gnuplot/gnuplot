@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.50 2004/04/13 17:23:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.51 2004/07/01 17:10:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -622,10 +622,24 @@ get_filledcurves_style_options(filledcurves_opts *fco)
     int p;
     struct value a;
     p = lookup_table(&filledcurves_opts_tbl[0], c_token);
-    fco->opt_given = (p != -1);
-    if (p == -1)
+
+    if (p == FILLEDCURVES_ABOVE) {
+	fco->oneside = 1;
+	p = lookup_table(&filledcurves_opts_tbl[0], ++c_token);
+    } else if (p == FILLEDCURVES_BELOW) {
+	fco->oneside = -1;
+	p = lookup_table(&filledcurves_opts_tbl[0], ++c_token);
+    } else
+	fco->oneside = 0;
+
+    if (p == -1) {
+	fco->opt_given = 0;
 	return;			/* no option given */
+    } else
+	fco->opt_given = 1;
+
     c_token++;
+
     fco->closeto = p;
     if (!equals(c_token, "="))
 	return;
@@ -652,6 +666,8 @@ filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 {
     if (!fco->opt_given)
 	return;
+    if (fco->oneside)
+	fputs(fco->oneside > 0 ? "above " : "below ", fp);
     if (fco->closeto == FILLEDCURVES_CLOSED) {
 	fputs("closed", fp);
 	return;

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.30 2004/05/26 11:17:42 mikulik Exp $
+ * $Id: pdf.trm,v 1.31 2004/07/01 17:10:33 broeker Exp $
  */
 
 /*------------------------------
@@ -1040,69 +1040,15 @@ TERM_PUBLIC void
 PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	    unsigned int width, unsigned int height)
 {
-#if USE_ULIG_FILLEDBOXES
-    /* fillpar:
-     * - solid   : 0 - 100
-     * - pattern : 0 - 100
-     */
-    int fillpar = style >> 4;
+    gpiPoint corner[4];
 
-    style &= 0xf;
-#else
-    (void) style;		/* unused */
-#endif
+	corner[0].x = x1;        corner[0].y = y1;
+	corner[1].x = x1+width;  corner[1].y = y1;
+	corner[2].x = x1+width;  corner[2].y = y1+height;
+	corner[3].x = x1;        corner[3].y = y1+height;
 
-    PDF_PathClose();
-    PDF_save(myPDF);
-
-#if USE_ULIG_FILLEDBOXES
-    switch (style) {
-	case FS_EMPTY: /* fill with white */
-#endif
-	    PDF_setgray(myPDF, 1);
-#if USE_ULIG_FILLEDBOXES
-	    break;
-	case FS_SOLID:
-	    {
-		struct rgb *this_color = web_color_rgbs + 1 + PDF_LineType;
-
-		double fact = (100 - fillpar) * 0.01;
-		double fact_ = (1.0 - fact) / 255.0;
-
-		double red = (double)this_color->r   * fact_ + fact;
-		double green = (double)this_color->g * fact_ + fact;
-		double blue = (double)this_color->b  * fact_ + fact;
-
-		PDF_setrgbcolor_fill(myPDF, red, green, blue);
-	    }
-	    break;
-#ifndef HAVE_OLD_LIBPDF
-	case FS_PATTERN:
-	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
-	    switch (fillpar) {
-		case 0:
-		    /* fill with white */
-		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
-		    break;
-		default:
-		    /* fill with solid white then overlay pattern */
-		    PDF_save(myPDF);
-		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
-		    PDF_rect(myPDF, x1, y1, width, height);
-		    PDF_fill(myPDF);
-		    PDF_restore(myPDF);
-		    PDF_setcolor(myPDF, "fill", "pattern", PDF_patternHandles[fillpar - 1], 0, 0, 0);
-	    }
-	    break;
-#endif
-	default:
-	    break;
-    }
-#endif
-
-    PDF_rect(myPDF, x1, y1, width, height);
-    PDF_fill(myPDF);
-    PDF_restore(myPDF);
+	corner->style = style;
+	PDF_filled_polygon(4, corner);
 }
 
 #ifdef PM3D
@@ -1140,12 +1086,64 @@ TERM_PUBLIC void
 PDF_filled_polygon(int points, gpiPoint* corners)
 {
     int i;
+    int fillpar = corners->style >> 4;
+    int style = corners->style &= 0xf;
+
     PDF_PathClose();
+    PDF_save(myPDF);
+
+    /* If PM3D code has already set the color, then use it. */
+    /* Otherwise find it using the requested style parameter. */
+    if (PDF_LineType != LT_UNDEFINED)
+    switch (style) {
+	case FS_EMPTY: /* fill with white */
+	    PDF_setgray(myPDF, 1);
+	    break;
+	case FS_SOLID:
+	    {
+		struct rgb *this_color = web_color_rgbs + 1 + PDF_LineType;
+
+		double fact = (100 - fillpar) * 0.01;
+		double fact_ = (1.0 - fact) / 255.0;
+
+		double red = (double)this_color->r   * fact_ + fact;
+		double green = (double)this_color->g * fact_ + fact;
+		double blue = (double)this_color->b  * fact_ + fact;
+
+		PDF_setrgbcolor_fill(myPDF, red, green, blue);
+	    }
+	    break;
+#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
+	case FS_PATTERN:
+	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
+	    switch (fillpar) {
+		case 0:
+		    /* fill with white */
+		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
+		    break;
+		default:
+#if (0)		    /* EAM - I broke it, but is it needed at all? */
+		    /* fill with solid white then overlay pattern */
+		    PDF_save(myPDF);
+		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
+		    PDF_rect(myPDF, x1, y1, width, height);
+		    PDF_fill(myPDF);
+		    PDF_restore(myPDF);
+#endif
+		    PDF_setcolor(myPDF, "fill", "pattern", PDF_patternHandles[fillpar - 1], 0, 0, 0);
+	    }
+	    break;
+#endif
+	default:
+	    break;
+    }
+
     PDF_moveto(myPDF, corners[0].x, corners[0].y);
     for (i=1; i<points; i++)
 	PDF_lineto(myPDF, corners[i].x, corners[i].y);
     PDF_lineto(myPDF, corners[0].x, corners[0].y);
     PDF_fill(myPDF);
+    PDF_restore(myPDF);
 }
 
 TERM_PUBLIC void

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.113 2004/06/07 05:33:00 sfeam Exp $
+ * $Id: x11.trm,v 1.114 2004/07/01 17:10:35 broeker Exp $
  *
  */
 
@@ -1366,7 +1366,7 @@ X11_filled_polygon(int points, gpiPoint *corners)
     fputc(X11_GR_FILLED_POLYGON, X11_ipc);
     /* FIXME HBB 20010919: this %04d format somewhat arbitrarily
      * limits us to 10000 vertices in the polygon */
-    PRINT1("%04d", points);
+    PRINT2("%04d%04d", points, corners->style);
     for (i = 0; i < points; i++) {
 	PRINT2("%04d%04d", corners[i].x, corners[i].y);
 	/* HBB 20010919: fix for buffer overflow problem: start

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.131 2004/05/04 16:58:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.132 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4183,7 +4183,6 @@ fill_numbers_into_string(char *pattern)
 }
 
 /*
- * EAM - July 2002
  * Parse the sub-options of text color specification
  *   { def$ault | lt <linetype> | pal$ette { cb <val> | frac$tion <val> | z }
  * The ordering of alternatives shown in the line above is kept in the symbol definitions

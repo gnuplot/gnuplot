@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.46 2004/06/19 07:52:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.47 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -550,7 +550,6 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 	    }
 	    filled_quadrangle(corners, icorners);
 #else
-	    /* filled_polygon( 4, corners ); */
 	    filled_quadrangle(corners);
 #endif
 	} /* loop quadrangles over points of two subsequent scans */

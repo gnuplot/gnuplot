@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.14 2003/12/14 22:07:33 vanzandt Exp $
+ * $Id: color.h,v 1.15 2004/07/01 17:10:04 broeker Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -76,6 +76,7 @@ typedef struct {
     double z;
     colorspec_t spec;
 #endif
+    int style;
 } gpiPoint;
 
 
@@ -251,15 +252,6 @@ int make_palette __PROTO((void));
    according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
 */
 void set_color __PROTO(( double gray ));
-
-#if 0
-/*
-   Makes mapping from real 3D coordinates to 2D terminal coordinates,
-   then draws filled polygon
-*/
-/* HBB 20001109: removed 'static' --- doesn't make sense in headers */
-void filled_polygon __PROTO((int points, gpdPoint *corners));
-#endif
 
 /*
    The routine above for 4 points explicitly

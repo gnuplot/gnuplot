@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.57 2004/04/13 17:24:16 broeker Exp $
+ * $Id: cgm.trm,v 1.58 2004/07/01 17:10:12 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -958,6 +958,7 @@ CGM_fillbox(
 	cgm_next.fill_color = 0; /* index 0 is always the background color */
 	cgm_next.interior_style = 1; /* solid */
 	cgm_next.hatch_index = hatch_index[(style >> 4) % 7];
+	corner->style = style;
 	if (cgm_next.hatch_index) {
 	     CGM_filled_polygon(5, corner);
 	     cgm_next.fill_color = saved_fill_color;
@@ -967,8 +968,10 @@ CGM_fillbox(
     default: /* style == 0 or unknown --> fill with background color */
 	cgm_next.fill_color = 0; /* index 0 is always the background color */
 	cgm_next.interior_style = 1; /* solid */
+	corner->style = style;
 	CGM_filled_polygon(5, corner);
     }
+    corner->style = style;
     CGM_filled_polygon(5, corner);
     cgm_next.interior_style = 1; /* solid */
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.29 2004/05/09 14:35:03 mikulik Exp $
+ * $Id: term_api.h,v 1.30 2004/07/01 17:10:08 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -116,13 +116,9 @@ typedef struct fill_style_type {
     int border_linetype;
 } fill_style_type;
 
-#ifdef USE_ULIG_FILLEDBOXES
-typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN }
+typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT }
 	     t_fillstyle;
-#else
-typedef enum t_fillstyle { FS_EMPTY }
-	     t_fillstyle;
-#endif
+#define FS_OPAQUE (FS_SOLID + (100<<4))
 
 /* values for the optional flags field - choose sensible defaults
  * these aren't really very sensible names - multiplot attributes

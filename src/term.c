@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.75 2004/05/24 15:44:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.76 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -934,6 +934,7 @@ do_arrow(
 	    filledhead[3].y = ey + y2;
 	    filledhead[4].x = ex + xm;
 	    filledhead[4].y = ey + ym;
+	    filledhead->style = FS_DEFAULT;
 	    (*t->filled_polygon) (5, filledhead);
 	}
 #endif
@@ -963,6 +964,7 @@ do_arrow(
 		filledhead[3].y = sy - y2;
 		filledhead[4].x = sx - xm;
 		filledhead[4].y = sy - ym;
+		filledhead->style = FS_DEFAULT;
 		(*t->filled_polygon) (5, filledhead);
 	    }
 #endif
@@ -1708,7 +1710,6 @@ test_term()
 	int cen_y = (int)(0.83 * ymax_t);
 	int radius = xmax_t / 20;
 
-	(*t->linetype)(2);
 	/* test pm3d -- filled_polygon(), but not set_color() */
 	if (t->filled_polygon) {
 #define NUMBER_OF_VERTICES 6
@@ -1727,6 +1728,7 @@ test_term()
 	    str = "(color) filled polygon:";
 	} else
 	    str = "filled polygons not supported";
+	(*t->linetype)(LT_BLACK);
 	i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
 	(*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
 	(*t->linetype)(LT_BLACK);

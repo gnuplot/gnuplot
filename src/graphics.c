@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.107 2004/06/30 20:01:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.108 2004/07/01 17:10:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -112,7 +112,9 @@ static void plot_bars __PROTO((struct curve_points * plot));
 static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 #ifdef PM3D
 static void plot_filledcurves __PROTO((struct curve_points * plot));
-static void finish_filled_curve __PROTO((int, gpiPoint *, filledcurves_opts *));
+static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
+static void plot_betweencurves __PROTO((struct curve_points * plot));
+static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
 #endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
@@ -125,6 +127,7 @@ static void place_grid __PROTO((void));
 static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
+static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
@@ -151,6 +154,8 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 
 static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key,
 				   char *title,  struct termentry *t, int xl, int yl));
+
+static int style_from_fill __PROTO((struct fill_style_type *));
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -1444,7 +1449,10 @@ do_plot(struct curve_points *plots, int pcount)
 	    break;
 #ifdef PM3D
 	case FILLEDCURVES:
-	    plot_filledcurves(this_plot);
+	    if (this_plot->filledcurves_options.closeto == FILLEDCURVES_BETWEEN)
+		plot_betweencurves(this_plot);
+	    else
+		plot_filledcurves(this_plot);
 	    break;
 #endif
 	case VECTOR:
@@ -1616,8 +1624,12 @@ static void
 finish_filled_curve(
     int points,
     gpiPoint *corners,
-    filledcurves_opts *filledcurves_options)
+    struct curve_points *plot)
 {
+    filledcurves_opts *filledcurves_options = &plot->filledcurves_options;
+    long side = 0;
+    int i;
+
     if (points <= 0) return;
     /* add side (closing) points */
     switch (filledcurves_options->closeto) {
@@ -1657,6 +1669,8 @@ finish_filled_curve(
 		    /* should be mapping real x1axis/graph/screen => screen */
 		corners[points].y   = corners[points-1].y;
 		corners[points+1].y = corners[0].y;
+		for (i=0; i<points; i++)
+		    side += corners[i].x - corners[points].x;
 		points += 2;
 		break;
 	case FILLEDCURVES_ATX2:
@@ -1665,6 +1679,8 @@ finish_filled_curve(
 		    /* should be mapping real x2axis/graph/screen => screen */
 		corners[points].y   = corners[points-1].y;
 		corners[points+1].y = corners[0].y;
+		for (i=0; i<points; i++)
+		    side += corners[i].x - corners[points].x;
 		points += 2;
 		break;
 	case FILLEDCURVES_ATY1:
@@ -1673,6 +1689,8 @@ finish_filled_curve(
 		    /* should be mapping real y1axis/graph/screen => screen */
 		corners[points].x   = corners[points-1].x;
 		corners[points+1].x = corners[0].x;
+		for (i=0; i<points; i++)
+		    side += corners[i].y - corners[points].y;
 		points += 2;
 		break;
 	case FILLEDCURVES_ATY2:
@@ -1681,6 +1699,8 @@ finish_filled_curve(
 		    /* should be mapping real y2axis/graph/screen => screen */
 		corners[points].x   = corners[points-1].x;
 		corners[points+1].x = corners[0].x;
+		for (i=0; i<points; i++)
+		    side += corners[i].y - corners[points].y;
 		points += 2;
 		break;
 	case FILLEDCURVES_ATXY:
@@ -1690,20 +1710,33 @@ finish_filled_curve(
 		    /* should be mapping real y1axis/graph/screen => screen */
 		points++;
 		break;
+	case FILLEDCURVES_BETWEEN:
+		side = (corners[points].x > 0) ? 1 : -1;
+		break;
 	default: /* the polygon is closed by default */
 		break;
     }
-    /* now plot the filled polygon */
-    term->filled_polygon(points, corners);
+
 #if 0
     { /* for debugging purposes */
     int i;
     fprintf(stderr, "List of %i corners:\n", points);
     for (i=0; i<points; i++)
 	fprintf(stderr, "%2i: %3i,%3i | ", i, corners[i].x, corners[i].y);
+    fprintf(stderr, " side = %ld",side); 
     fprintf(stderr, "\n");
     }
 #endif
+
+    /* Check for request to fill only on one side of a bounding line */
+    if (filledcurves_options->oneside > 0 && side < 0)
+	return;
+    if (filledcurves_options->oneside < 0 && side > 0)
+	return;
+
+    /* EAM Mar 2004 - Apply fill style to filled curves */
+    corners->style = style_from_fill(&plot->fill_properties);
+    term->filled_polygon(points, corners);
 }
 
 
@@ -1777,19 +1810,31 @@ plot_filledcurves(struct curve_points *plot)
 		y = map_y(plot->points[i].y);
 
 		if (prev == INRANGE) {
+		    /* Split this segment if it crosses a bounding line */
+		    if (bound_intersect(plot->points, i, &ex, &ey, 
+		 			&plot->filledcurves_options)) {
+			corners[points].x = map_x(ex);
+			corners[points++].y = map_y(ey);
+			FPRINTF((stderr,"Breaking line segment at %d,%d = %g,%g\n",
+				corners[points-1].x,corners[points-1].y,ex,ey));
+			finish_filled_curve(points, corners, plot);
+			points = 0;
+			corners[points].x = map_x(ex);
+			corners[points++].y = map_y(ey);
+		    }
 		    /* vector(x,y) */
 		    corners[points].x = x;
 		    corners[points++].y = y;
 		} else if (prev == OUTRANGE) {
 		    /* from outrange to inrange */
 		    if (!clip_lines1) {
-			finish_filled_curve(points, corners, &plot->filledcurves_options);
+			finish_filled_curve(points, corners, plot);
 			points = 0;
 			/* move(x,y) */
 			corners[points].x = x;
 			corners[points++].y = y;
 		    } else {
-			finish_filled_curve(points, corners, &plot->filledcurves_options);
+			finish_filled_curve(points, corners, plot);
 			points = 0;
 			edge_intersect(plot->points, i, &ex, &ey);
 			/* move(map_x(ex),map_y(ey)); */
@@ -1801,7 +1846,7 @@ plot_filledcurves(struct curve_points *plot)
 
 		    }
 		} else {	/* prev == UNDEFINED */
-		    finish_filled_curve(points, corners, &plot->filledcurves_options);
+		    finish_filled_curve(points, corners, plot);
 		    points = 0;
 		    /* move(x,y) */
 		    corners[points].x = x;
@@ -1825,7 +1870,7 @@ plot_filledcurves(struct curve_points *plot)
 		    /* from outrange to outrange */
 		    if (clip_lines2) {
 			if (two_edge_intersect(plot->points, i, lx, ly)) {
-			    finish_filled_curve(points, corners, &plot->filledcurves_options);
+			    finish_filled_curve(points, corners, plot);
 			    points = 0;
 			    /* move(map_x(lx[0]),map_y(ly[0])); */
 			    corners[points].x = map_x(lx[0]);
@@ -1845,8 +1890,135 @@ plot_filledcurves(struct curve_points *plot)
 	}
 	prev = plot->points[i].type;
     }
-    finish_filled_curve(points, corners, &plot->filledcurves_options);
+    finish_filled_curve(points, corners, plot);
 }
+
+/*
+ * Fill the area between two curves
+ */
+static void
+plot_betweencurves(plot)
+struct curve_points *plot;
+{
+    double x1, x2, yl1, yu1, yl2, yu2;
+    double xmid, ymid;
+    int i;
+
+    /*
+     * Fill the region one quadrilateral at a time.
+     * Check each interval to see if the curves cross.
+     * If so, split the interval into two parts.
+     */
+    for (i = 0; i < plot->p_count-1; i++) {
+
+	x1  = plot->points[i].x;
+	yl1 = plot->points[i].y;
+	yu1 = plot->points[i].yhigh;
+	x2  = plot->points[i+1].x;
+	yl2 = plot->points[i+1].y;
+	yu2 = plot->points[i+1].yhigh;
+
+	if ((yu1-yl1)*(yu2-yl2) < 0) {
+	    xmid = (x1*(yl2-yu2) + x2*(yu1-yl1))
+	         / ((yu1-yl1) + (yl2-yu2));
+	    ymid = yu1 + (yu2-yu1)*(xmid-x1)/(x2-x1);
+	    fill_between(x1,yl1,yu1,xmid,ymid,ymid,plot);
+	    fill_between(xmid,ymid,ymid,x2,yl2,yu2,plot);
+	} else
+	    fill_between(x1,yl1,yu1,x2,yl2,yu2,plot);
+
+    }
+}
+
+static void
+fill_between(x1,yl1,yu1,x2,yl2,yu2,plot)
+double x1,yl1,yu1,x2,yl2,yu2;
+struct curve_points *plot;
+{
+    double xmin, xmax, ymin, ymax, dx, dy1, dy2;
+    int axis;
+    int ic, iy;
+    gpiPoint box[8];
+    struct { double x,y; } corners[8];
+
+    /* Clip against x-axis range */
+	axis = FIRST_X_AXIS; /* FIXME: but it might be SECOND_X_AXIS */
+	xmin = axis_array[axis].min;
+	xmax = axis_array[axis].max;
+	if (x1<xmin && x2<xmin)
+	    return;
+	if (x1>xmax && x2>xmax)
+	    return;
+
+    /* Clip end segments. It would be nice to use edge_intersect() here, */
+    /* but as currently written it cannot handle the second curve.       */
+	dx = x2 - x1;
+	if (x1<xmin) {
+	    yl1 += (yl2-yl1) * (xmin - x1) / dx;
+	    yu1 += (yu2-yu1) * (xmin - x1) / dx;
+	    x1 = xmin;
+	}
+	if (x2>xmax) {
+	    yl2 += (yl2-yl1) * (xmax - x2) / dx;
+	    yu2 += (yu2-yu1) * (xmax - x2) / dx;
+	    x2 = xmax;
+	}
+
+    /* Clip against y-axis range */
+	axis = FIRST_Y_AXIS; /* FIXME: but it might be SECOND_Y_AXIS */
+	ymin = axis_array[axis].min;
+	ymax = axis_array[axis].max;
+	if (yl1<ymin && yu1<ymin && yl2<ymin && yu2<ymin)
+	    return;
+	if (yl1>ymax && yu1>ymax && yl2>ymax && yu2>ymax)
+	    return;
+
+	ic = 0;
+	corners[ic].x   = map_x(x1);
+	corners[ic++].y = map_y(yl1);
+	corners[ic].x   = map_x(x1);
+	corners[ic++].y = map_y(yu1);
+
+#define INTERPOLATE(Y1,Y2,YBOUND) do { \
+	dy1 = YBOUND - Y1; \
+	dy2 = YBOUND - Y2; \
+	if (dy1 != dy2 && dy1*dy2 < 0) { \
+	    corners[ic].y = map_y(YBOUND); \
+	    corners[ic++].x = map_x(x1 + dx * dy1 / (dy1-dy2)); \
+	} \
+	} while (0)
+
+	INTERPOLATE( yu1, yu2, ymin );
+	INTERPOLATE( yu1, yu2, ymax );
+	
+	corners[ic].x   = map_x(x2);
+	corners[ic++].y = map_y(yu2);
+	corners[ic].x   = map_x(x2);
+	corners[ic++].y = map_y(yl2);
+
+	INTERPOLATE( yl1, yl2, ymin );
+	INTERPOLATE( yl1, yl2, ymax );
+
+#undef INTERPOLATE
+
+    /* Copy the polygon vertices into a gpiPoints structure */
+	for (iy=0; iy<ic; iy++) {
+	    box[iy].x = corners[iy].x;
+	    if (corners[iy].y < map_y(ymin))
+		box[iy].y = map_y(ymin);
+	    else if (corners[iy].y > map_y(ymax))
+		box[iy].y = map_y(ymax);
+	    else
+		box[iy].y = corners[iy].y;
+	}
+	
+    /* finish_filled_curve() will handle   */
+    /* current fill style (stored in plot) */
+    /* above/below (stored in box[ic].x)   */
+	box[ic].x = ((yu1-yl1) + (yu2-yl2) < 0) ? 1 : 0;
+	finish_filled_curve(ic, box, plot);
+}
+
 #endif /* plot_filledcurves() only ifdef PM3D */
 
 /* XXX - JG  */
@@ -2518,7 +2690,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 #if USE_ULIG_FILLEDBOXES
 		if ((plot->fill_properties.fillstyle != FS_EMPTY) && t->fillbox) {
                     int x, y, w, h;
-                    int fillpar, style;
+                    int style;
 
                     x = xl;
                     y = xaxis_y;
@@ -2534,30 +2706,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			h = xaxis_y - yt + 1;
 		    }
 
-                    /* squeeze all fill information into the old style
-                     * parameter.  The terminal driver knows how to
-                     * extract the information.  We assume that the
-                     * style (int) has only 16 bit, therefore we take
-                     * 4 bits for the style and allow 12 bits for the
-                     * corresponding fill parameter.  This limits the
-                     * number of styles to 16 and the fill parameter's
-                     * values to the range 0...4095, which seems
-                     * acceptable. */
-                    switch( plot->fill_properties.fillstyle ) {
-                    case FS_SOLID:
-			fillpar = plot->fill_properties.filldensity;
-			style = ((fillpar & 0xfff) << 4) + FS_SOLID;
-                        break;
-                    case FS_PATTERN:
-			fillpar = plot->fill_properties.fillpattern;
-			style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
-                        break;
-                    default:
-			/* style == 0 or unknown --> solid fill with
-                         * background color */
-			fillpar = 0;
-			style = FS_EMPTY;
-                    }
+		    style = style_from_fill(&plot->fill_properties);
 
                     (*t->fillbox) (style, x, y, w, h);
 
@@ -2889,22 +3038,9 @@ plot_c_bars(struct curve_points *plot)
 #ifdef USE_ULIG_FILLEDBOXES
 	/* EAM Sep 2001 use term->fillbox() code if present */
 	if (term->fillbox) {
-	    int ymin, ymax, fillpar, style;
-	    /* This code duplicated in plot_boxes() */
-                    switch( plot->fill_properties.fillstyle ) {
-                    case FS_SOLID:
-                        fillpar = plot->fill_properties.filldensity;
-                        break;
-                    case FS_PATTERN:
-                        fillpar = plot->fill_properties.fillpattern;
-                        break;
-		    case FS_EMPTY:
-                    default:
-                        fillpar = 0;
-                    }
-	    /* Set style parameter (horrible bit-packing hack) */
-	    style = ((fillpar & 0xfff) << 4)
-		  + (plot->fill_properties.fillstyle & 0xf);
+	    int ymin, ymax;
+	    int style = style_from_fill(&plot->fill_properties);
+
 	    if (map_y(yopen) < map_y(yclose)) {
 		ymin = map_y(yopen); ymax = map_y(yclose);
 	    } else {
@@ -3535,6 +3671,54 @@ two_edge_intersect(
     return (FALSE);
 }
 
+/* EAM April 2004 - If the line segment crosses a bounding line we will
+ * interpolate an extra corner and split the filled polygon into two.
+ */
+static TBOOLEAN
+bound_intersect(points, i, ex, ey, filledcurves_options)
+struct coordinate GPHUGE *points;
+int i;				/* line segment from point i-1 to point i */
+double *ex, *ey;		/* the point where it crosses a boundary */
+filledcurves_opts *filledcurves_options;
+{
+    double dx1, dx2, dy1, dy2;
+
+    /* If there are no bounding lines in effect, don't bother */
+    if (!filledcurves_options->oneside)
+	return FALSE;
+
+    switch (filledcurves_options->closeto) {
+	case FILLEDCURVES_ATX1:
+	case FILLEDCURVES_ATX2:
+	    dx1 = filledcurves_options->at - points[i-1].x;
+	    dx2 = filledcurves_options->at - points[i].x;
+	    dy1 = points[i].y - points[i-1].y;
+	    if (dx1*dx2 <= 0) {
+		*ex = filledcurves_options->at;
+		*ey = points[i-1].y + dy1 * dx1 / (dx1-dx2);
+		return TRUE;
+	    }
+	    break;
+	case FILLEDCURVES_ATY1:
+	case FILLEDCURVES_ATY2:
+	    dy1 = filledcurves_options->at - points[i-1].y;
+	    dy2 = filledcurves_options->at - points[i].y;
+	    dx1 = points[i].x - points[i-1].x;
+	    if (dy1*dy2 <= 0) {
+		*ex = points[i-1].x + dx1 * dy1 / (dy1-dy2);
+		*ey = filledcurves_options->at;
+		return TRUE;
+	    }
+	    break;
+	case FILLEDCURVES_ATXY:
+	default:
+	    break;
+    }
+
+    return FALSE;
+}
+
+
 /* HBB 20010118: all the *_callback() functions made non-static. This
  * is necessary to work around a bug in HP's assembler shipped with
  * HP-UX 10 and higher, if GCC tries to use it */
@@ -3936,21 +4120,9 @@ do_key_sample(
 #if USE_ULIG_FILLEDBOXES
     if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES
 	&& t->fillbox) {
-	int style;
 	struct fill_style_type *fs = &this_plot->fill_properties;
 
-	switch(fs->fillstyle) {
-	case FS_SOLID:
-	    style = (fs->filldensity << 4) + FS_SOLID;
-	    break;
-	case FS_PATTERN:
-	    style = (fs->fillpattern << 4) + FS_PATTERN;
-	    break;
-	default:
-	    style = FS_EMPTY;
-	}
-
-	(*t->fillbox)(style,
+	(*t->fillbox)(style_from_fill(fs),
 		      xl + key_sample_left, yl - key_entry_height/4,
 		      key_sample_right - key_sample_left,
 		      key_entry_height/2);
@@ -3994,4 +4166,38 @@ do_key_sample(
      * when drawing a point, but does not restore it.
      * We must wait, then draw the point sample after plotting
      */
+}
+
+/* Squeeze all fill information into the old style parameter.
+ * The terminal drivers know how to extract the information.
+ * We assume that the style (int) has only 16 bit, therefore we take
+ * 4 bits for the style and allow 12 bits for the corresponding fill parameter.
+ * This limits the number of styles to 16 and the fill parameter's
+ * values to the range 0...4095, which seems acceptable.
+ */
+int
+style_from_fill(struct fill_style_type *fs)
+{
+#ifdef USE_ULIG_FILLEDBOXES
+    int fillpar, style;
+
+	switch( fs->fillstyle ) {
+	case FS_SOLID:
+		fillpar = fs->filldensity;
+		style = ((fillpar & 0xfff) << 4) + FS_SOLID;
+		break;
+	case FS_PATTERN:
+		fillpar = fs->fillpattern;
+		style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
+		break;
+	default:
+		/* solid fill with background color */
+		style = FS_EMPTY;
+		break;
+	}
+#else
+    int style = FS_EMPTY;
+#endif
+
+    return style;
 }

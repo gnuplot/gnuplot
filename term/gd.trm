@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.41 2004/06/21 05:46:31 sfeam Exp $
+ * $Id: gd.trm,v 1.42 2004/07/01 17:10:14 broeker Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -870,6 +870,9 @@ TERM_PUBLIC
 void PNG_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
+    int fillpar = corners->style >> 4;
+    int color = png_state.color;
+    
     /* since gpiPoint carries more than just x and y if
      * we have EXTENDED_COLOR_SPECS defined, we need to
      * copy it to the gdPointPtr struct; make it static
@@ -885,7 +888,26 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
 	gd_corners[i].x = corners[i].x;
 	gd_corners[i].y = Y(corners[i].y);
     }
-    gdImageFilledPolygon(png_state.image, gd_corners, points, png_state.color);
+
+#if USE_ULIG_FILLEDBOXES
+    switch (corners->style & 0xf) {
+	case FS_EMPTY: /* fill with background color */
+	    color = png_state.color_table[0];
+	    break;
+	case FS_SOLID: /* solid fill */
+	    color = PNG_FillSolid(fillpar);
+	    break;
+	case FS_PATTERN: /* pattern fill */
+	    color = PNG_FillPattern(fillpar);
+	    break;
+	default:
+	    color = png_state.color;
+	    break;
+    }
+#endif
+
+    gdImageFilledPolygon(png_state.image, gd_corners, points, color);
+
     /* easy, since gdPointPtr is the same as (gdiPoint*) */
     /* if someone someday needs this routine to be NON-DESTRUCTIVE, then change
        the following line to #if 1 */

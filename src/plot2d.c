@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.67 2004/06/13 00:34:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.68 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -299,6 +299,11 @@ get_data(struct curve_points *current_plot)
 	/* current_plot->z_axis = current_plot->x_axis; */
 	break;
 
+    case FILLEDCURVES:
+	min_cols = 1;
+	max_cols = 3;
+	break;
+
     default:
 	min_cols = 1;
 	max_cols = 2;
@@ -412,6 +417,12 @@ get_data(struct curve_points *current_plot)
 		    int_warn(storetoken, "This plot style does not work with 3 cols. Setting to yerrorbars");
 		    current_plot->plot_style = YERRORBARS;
 		    /* fall through */
+
+		case FILLEDCURVES:
+		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+					v[1], v[2], -1.0);
+		    break;
 
 		case YERRORLINES:
 		case YERRORBARS:
@@ -1089,9 +1100,10 @@ eval_plots()
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
 #ifdef PM3D
-		    if (this_plot->plot_style == FILLEDCURVES)
+		    if (this_plot->plot_style == FILLEDCURVES) {
 			/* read a possible option for 'with filledcurves' */
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
+		    }
 #endif
 		    if ((this_plot->plot_type == FUNC)
 			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
@@ -1150,6 +1162,9 @@ eval_plots()
 				default_fillstyle.filldensity,
 				pattern_num,
 				default_fillstyle.border_linetype);
+			if (this_plot->plot_style == FILLEDCURVES 
+			&& this_plot->fill_properties.fillstyle == FS_EMPTY)
+			    this_plot->fill_properties.fillstyle = FS_SOLID;
 			set_fillstyle = TRUE;
 			if (stored_token != c_token)
 			    continue;
@@ -1206,7 +1221,7 @@ eval_plots()
 
 #ifdef USE_ULIG_FILLEDBOXES
 	    /* Similar argument for check that all fill styles were set */
-	    if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES){
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES) {
 		if (! set_fillstyle)
 		    parse_fillstyle(&this_plot->fill_properties,
 				default_fillstyle.fillstyle,
@@ -1215,6 +1230,9 @@ eval_plots()
 				default_fillstyle.border_linetype);
 		if (this_plot->fill_properties.fillstyle == FS_PATTERN)
 		    pattern_num = this_plot->fill_properties.fillpattern + 1;
+		if (this_plot->plot_style == FILLEDCURVES
+		&& this_plot->fill_properties.fillstyle == FS_EMPTY)
+		    this_plot->fill_properties.fillstyle = FS_SOLID;
 	    }
 #endif
 

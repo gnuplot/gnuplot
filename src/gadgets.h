@@ -173,8 +173,9 @@ typedef struct {
     int closeto;   /* from list FILLEDCURVES_CLOSED, ... */
     double at;	   /* value for FILLEDCURVES_AT... */
     double aty;	   /* the other value for FILLEDCURVES_ATXY */
+    int oneside;   /* -1 if fill below bound only; +1 if fill above bound only */
 } filledcurves_opts;
-#define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0 }
+#define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0, 0 }
 #endif
 
 

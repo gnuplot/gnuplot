@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.226 2004/06/30 20:01:52 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.227 2004/07/02 22:19:13 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7114,10 +7114,12 @@ C ... and restart the table:
 ?plotting styles filledcurves
 ?style filledcurves
 ?filledcurves
- The `filledcurves` style is only relevant to 2-d plotting. It draws either
- the current curve closed and filled, or the region between the current curve
- and a given axis, horizontal or vertical line, or a point, filled with the
- current drawing color.
+ The `filledcurves` style is only relevant to 2-d plotting. Three variants
+ are possible. The default is `closed`, which treats the curve itself as a
+ closed polygon. The second option is to fill the area between the curve and
+ a given axis, horizontal or vertical line, or a point.
+ The third option requires three columns of input data: the x coordinate and
+ two corresponding y coordinates; the area between the two curves is filled.
 
  Syntax:
 
@@ -7126,7 +7128,7 @@ C ... and restart the table:
 
  where the option can be
 
-     [closed | {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
+     [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
 
  The area is filled between the current curve and
      filledcurves closed   ... just filled closed curve,
@@ -7135,6 +7137,10 @@ C ... and restart the table:
      filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
      filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+
+ The `above` and `below` options apply only to commands of the form
+     ... filledcurves above {x1|x2|y1|y2}=<val>
+ and limit the filled area to one side of the bounding line.
 
  Note: filling is supported on filled-polygon capable terminals, see help of
  `set pm3d` for their list.

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.36 2004/05/26 11:17:42 mikulik Exp $
+ * $Id: svg.trm,v 1.37 2004/07/01 17:10:34 broeker Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -699,49 +699,15 @@ SVG_linetype (int linetype)
 TERM_PUBLIC void
 SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
-#if USE_ULIG_FILLEDBOXES
-    /* fillpar:
-     * - solid   : 0 - 100
-     * - pattern : 0 - 100
-     */
-    int fillpar = style >> 4;
+    gpiPoint corner[4];
 
-    style &= 0xf;
+	corner[0].x = x1;        corner[0].y = y1;
+	corner[1].x = x1+width;  corner[1].y = y1;
+	corner[2].x = x1+width;  corner[2].y = y1+height;
+	corner[3].x = x1;        corner[3].y = y1+height;
+	corner->style = style;
 
-    if (style == FS_PATTERN) {
-	/* make sure the pattern is defined (with the current stroke color)
-	 * must be defined AFTER the current group is opened with the color
-	 * attribue set, as the patterns use 'currentColor' */
-	SVG_DefineFillPattern(fillpar);
-    }
-
-#endif
-    SVG_GroupFilledOpen();
-    fputs("\t\t<rect " , gpoutfile);
-#if USE_ULIG_FILLEDBOXES
-
-    switch (style) {
-	case 0: /* fill with background color */
-#endif
-	    /* TODO: and what if the background color is not white ? */
-	    fputs(" fill = 'white'", gpoutfile);
-#if USE_ULIG_FILLEDBOXES
-	    break;
-	case FS_SOLID: /* solid fill */
-	    SVG_StyleFillColor();
-	    if (fillpar >= 0 && fillpar < 100)
-		fprintf(gpoutfile, " style = 'fill-opacity:%f'", ((double)fillpar * 0.01));
-	    break;
-	case FS_PATTERN: /* pattern fill */
-	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'", SVG_fillPatternIndex);
-	    break;
-	default:
-	    break;
-    }
-#endif
-
-    fprintf(gpoutfile, " x='%d' y='%d' width='%d' height='%d'/>\n",
-	    x1, (term->ymax - y1 - height), width, height);
+	SVG_filled_polygon(4, corner);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1026,9 +992,39 @@ TERM_PUBLIC void
 SVG_filled_polygon(int points, gpiPoint* corners)
 {
     int i;
+    int fillpar = corners->style >> 4;
+    int style = corners->style &= 0xf;
+
+#if USE_ULIG_FILLEDBOXES
+    if (style == FS_PATTERN) {
+	/* make sure the pattern is defined (with the current stroke color)
+	 * must be defined AFTER the current group is opened with the color
+	 * attribue set, as the patterns use 'currentColor' */
+	SVG_DefineFillPattern(fillpar);
+    }
+#endif
+
     SVG_GroupFilledOpen();
     fputs("\t\t<polygon ", gpoutfile);
-    SVG_StyleFillColor();
+
+    switch (style) {
+	case FS_EMPTY: /* fill with background color */
+	    /* TODO: and what if the background color is not white ? */
+	    fputs(" fill = 'white'", gpoutfile);
+	    break;
+	case FS_SOLID: /* solid fill */
+	    SVG_StyleFillColor();
+	    if (fillpar >= 0 && fillpar < 100)
+		fprintf(gpoutfile, " style = 'fill-opacity:%f'", ((double)fillpar * 0.01));
+	    break;
+	case FS_PATTERN: /* pattern fill */
+	    fprintf(gpoutfile, " fill = 'url(#gpPat%d)'", SVG_fillPatternIndex);
+	    break;
+	default:
+	    SVG_StyleFillColor();
+	    break;
+    }
+
     fputs(" points = '", gpoutfile);
     for (i = 0; i < points; i++)
         fprintf(gpoutfile, "%d,%d%s",
