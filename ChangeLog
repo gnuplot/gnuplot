@@ -1,3 +1,10 @@
+2002-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c src/unset.c: Commands '(un)set log ...' now correctly
+	parse the argument.
+
+	* src/tables.h src/tables.c: New routine lookup_table_nth_reverse.
+
 2002-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* NEWS: Mention changes to X11 outboard driver path and removal of

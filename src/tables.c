@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.28 2002/02/02 12:03:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.29 2002/02/13 17:59:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -453,4 +453,25 @@ lookup_ftable(ftbl, find_token)
 	ftbl++;
     }
     return ftbl->value;
+}
+
+/* Returns index of the table tbl whose key matches the beginning of the 
+ * search string search_str. The table_len is necessary because the table
+ * is searched in the reversed order. The routine is used in parsing commands
+ * '(un)set log x2zcb', for instance.
+ * It returns index into the table or -1 if there is no match.
+ */ 
+int
+lookup_table_nth_reverse(tbl, table_len, search_str)
+    const struct gen_table *tbl;
+    int table_len;
+    const char *search_str;
+{
+    int i = table_len;
+    while (i >= 0) {
+	if (tbl[i].key && !strncmp(search_str, tbl[i].key, strlen(tbl[i].key)))
+	    return i;
+	i--;
+    }
+    return -1; /* not found */
 }
