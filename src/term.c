@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.102 2005/02/14 10:19:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.103 2005/03/03 04:09:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2547,7 +2547,7 @@ mp_layout_size_and_offset(void)
 /*
  * Text strings containing control information for enhanced text mode
  * contain more characters than will actually appear in the output.
- * This makes is hard to estimate how much horizontal space on the plot
+ * This makes it hard to estimate how much horizontal space on the plot
  * (e.g. in the key box) must be reserved to hold them.  To approximate
  * the eventually length we switch briefly to the dummy terminal driver
  * "estimate.trm" and then switch back to the current terminal.
