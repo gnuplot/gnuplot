@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.241 2004/09/17 10:47:56 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.242 2004/09/19 23:42:24 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2683,8 +2683,8 @@ C ... and restart the table:
 
  General binary format is activated by keywords in <binary list> pertaining
  to information about file structure, i.e., `array`, `record`, `format` or
- `filetype`.  Otherwise, matrix binary format is assumed.  (See `binary
- matrix` for more details.)
+ `filetype`.  Otherwise, matrix binary format is assumed.  (See `binary matrix`
+ for more details.)
 
  There are some standard file types that may be read for which details about
  the binary format may be extracted automatically.  (Type `show datafile
@@ -4854,7 +4854,7 @@ C ... and restart the table:
 ?set datafile binary
  The `set datafile binary` command is used to set the defaults when reading
  binary data files.  The syntax matches precisely that used for commands
- `plot` and `splot`.  See `help binary` for details about <binary list>.
+ `plot` and `splot`.  See `binary` for details about <binary list>.
 
  Syntax:
        set datafile binary <binary list>
@@ -8017,7 +8017,7 @@ C ... and restart the table:
 ?style rgbimage
 ?rgbimage
  The `rgbimage` style is intended for plotting 2D images and is similar
- in concept to `image`.  See `help image` for details.  The difference is
+ in concept to `image`.  See `image` for details.  The difference is
  that 5D data (x,y,r,g,b) for `plot` and 6D data (x,y,z,r,g,b) for `splot`
  describe the coordinates and color components of an image.  Currently,
  color images are only possible when the sampling grid is rectangular and

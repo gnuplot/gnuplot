@@ -1,7 +1,12 @@
+2004-09-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Fix some minor errors that interfered with 
+	latex processing.
+
 2004-09-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (do_3dplot plot3d_vectors) src/graph3d.h 
-	src/plot3d.c (get_3ddata eval_3dplots):  Extand the plotting style
+	src/plot3d.c (get_3ddata eval_3dplots):  Extend the plotting style
 	"with vectors" to apply to 3D plots as well.
 	    splot 'data' using <x>:<y>:<z>:<delx>:<dely>:<delz> with vectors \
 	          <arrowstyle>
