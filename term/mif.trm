@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.17 1999/10/01 15:09:12 lhecking Exp $
+ * $Id: mif.trm,v 1.18 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -48,7 +48,7 @@
  *      colour /        Draw primitives with line types >= 0 in colour (sep. 2-7)
  *      monochrome      Draw primitives in black (sep. 0)
  *
- *      polyline /      Draw lines as continous curves
+ *      polyline /      Draw lines as continuous curves
  *      vectors         Draw lines as collections of vectors
  *
  *      help / ?        Print short usage description on stderr
@@ -61,7 +61,7 @@
  *     -Plot primitives with line types >= 0
  *      will as default be drawn in colour.
  *     -Lines are plotted as collections of
- *      vectors, or as continous lines (default)
+ *      vectors, or as continuous lines (default)
  *     -Plot primitives in a plot will be in a
  *      Frame in MIF. Several plot Frames will
  *      be collected in one large Frame.
@@ -198,7 +198,7 @@ static int mif_initialized = 0;	/* != 0 when output is active */
 static int mif_in_frame = 0;	/* != 0 when inside a plot frame */
 static int mif_frameno = -1;	/* Current frame number */
 static int mif_colour = TRUE;	/* == TRUE when colour should be used */
-static int mif_polyline = TRUE;	/* == TRUE when lines are drawn as continous curves */
+static int mif_polyline = TRUE;	/* == TRUE when lines are drawn as continuous curves */
 
 struct mpt {			/* point definition structure */
     int chr;			/* character for point */
@@ -289,7 +289,7 @@ Usage: set terminal mif [options]\n\
 \toptions:\n\
 \t\tcolour /        Draw primitives with line types >= 0 in colour (sep. 2-7)\n\
 \t\tmonochrome      Draw primitives in black (sep. 0)\n\n\
-\t\tpolyline /      Draw lines as continous curves\n\
+\t\tpolyline /      Draw lines as continuous curves\n\
 \t\tvectors         Draw lines as collections of vectors\n\n\
 \t\thelp / ?        Print short usage description on stderr\n");
 	    c_token++;
