@@ -176,9 +176,6 @@ static double getdvar __PROTO((char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
-#if defined(MSDOS) || defined(DOS386)
-static void subst __PROTO((char *s, char from, char to));
-#endif
 static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN is_empty __PROTO((char *s));
 
@@ -1001,28 +998,6 @@ char *f;
     safe_strncpy(p, s, (size_t) (tmp - s + 1));
     p[tmp - s + 1] = NUL;
 }
-
-
-#if defined(MSDOS) || defined(DOS386)
-/*****************************************************************
-    Character substitution
-*****************************************************************/
-#ifdef PROTOTYPES
-static void subst(char *s, char from, char to)
-#else
-static void subst(s, from, to)
-char *s;
-char from;
-char to;
-#endif
-{
-    while (*s) {
-	if (*s == from)
-	    *s = to;
-	s++;
-    }
-}
-#endif
 
 
 /*****************************************************************
