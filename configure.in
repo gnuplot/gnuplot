@@ -1,15 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl Where possible, please adopt a convention that the absense of
-dnl a macro is the usual case : this saves having to update
-dnl countless makefiles when new tests are added. By usual case
-dnl I guess ansi compiler on posix system or something like that
-dnl
-dnl [Lars: this is no longer necessary. I have cut this stuff out
-dnl  of configure.in and added the necessery definitions to syscfg.h.
-dnl  This reduced the size of configure by 30k!
-dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
 AC_PREREQ(2.13)
@@ -137,7 +128,7 @@ AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  X_LIBRARIES="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
+  X_LIBRARIES="$X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
   AC_DEFINE(X11)
 fi
@@ -164,13 +155,12 @@ AC_HEADER_STDC
 
 dnl Header files
 dnl ANSI/ISO C, POSIX, others
-AC_CHECK_HEADERS([
-  errno.h float.h limits.h locale.h math.h stdlib.h string.h \
+AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
   time.h sys/time.h sys/timeb.h sys/types.h \
   sys/bsdtypes.h sys/ioctl.h sys/select.h sys/socket.h \
   sys/stat.h sys/systeminfo.h sys/utsname.h \
-  libc.h malloc.h sgtty.h termios.h values.h
-])
+  libc.h malloc.h poll.h sgtty.h termios.h values.h
+)
 
 test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 
@@ -205,15 +195,14 @@ dnl sunos 4 has on_exit() in place of atexit()
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
 dnl math lib is already available, see operating systems part
-AC_CHECK_FUNCS([
-  atexit memcpy memmove memset \
+AC_CHECK_FUNCS(atexit memcpy memmove memset \
   on_exit bcopy bzero \
   setvbuf strerror strchr strrchr strstr \
   index rindex \
   erf erfc gamma lgamma \
-  getcwd pclose popen sleep snprintf \
+  getcwd poll pclose popen select sleep snprintf \
   strncasecmp strnicmp sysinfo tcgetattr
-])
+)
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES)
@@ -439,6 +428,13 @@ AC_SUBST(NEXTOBJS)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
+ac_subdir_list=lisp
+
+AC_CONFIG_SUBDIRS([$ac_subdir_list])
+
+dnl Write Makefiles and configuration header
+AC_OUTPUT([Makefile beos/Makefile docs/Makefile docs/latextut/Makefile], \
+[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h ; rm -f termlist])
 
 dnl Report configuration
 eval gp_datadir=$datadir
@@ -495,9 +491,5 @@ test "$no_x" != yes && \
   AC_MSG_RESULT([  Use the X Window System
 ])
 dnl end config report
-
-dnl Write Makefiles and configuration header
-AC_OUTPUT([Makefile docs/Makefile docs/latextut/Makefile], \
-[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h ; rm -f termlist])
 
 dnl end configure.in
