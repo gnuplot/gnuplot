@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.90 2004/01/11 20:06:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.91 2004/04/12 19:53:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2445,12 +2445,12 @@ read_line(prompt)
 	/* grab some input */
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
-	     ? rlgets(&(input_line[start]), input_line_len - start,
+	     ? rlgets(input_line + start, input_line_len - start,
 		     ((more) ? "> " : prompt)) 
-	     : fgets_ipc(&(input_line[start]), input_line_len - start)
+	     : fgets_ipc(input_line + start, input_line_len - start)
 	    ) == (char *) NULL)
 # else /* !(READLINE || HAVE_LIBREADLINE) */
-	if (GET_STRING(&(input_line[start]), input_line_len - start)
+	if (GET_STRING(input_line + start, input_line_len - start)
 	    == (char *) NULL)
 # endif /* !(READLINE || HAVE_LIBREADLINE) */
 	{
@@ -2474,11 +2474,16 @@ read_line(prompt)
 			--last;
 		} else if (last + 2 >= input_line_len) {
 		    extend_input_line();
-		    start = last + 1;
-		    more = TRUE;
-		    continue;	/* read rest of line, don't print "> " */
-		}
-		if (input_line[last] == '\\') {		/* line continuation */
+		    if (input_line[last] != '\\') {
+			/* read rest of line, don't print "> " */
+			start = last + 1;
+			more = TRUE;
+			continue;
+		    }
+		    /* else fall through to continuation handling */
+		} /* if(grow buffer?) */
+		if (input_line[last] == '\\') {
+		    /* line continuation */
 		    start = last;
 		    more = TRUE;
 		} else

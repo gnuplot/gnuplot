@@ -1,8 +1,13 @@
+2004-04-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c (read_line): Fix bug where growing the line buffer
+	interfered with handling of backslash-newline continuations.
+
 2004-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/Makefile.am.in (check-noninteractive, check-interactive):
 	keep the previous $PATH at the end of the one set for running the
-	newly built, not yet installed gnuplot.  Needed to Cygwin binaries
+	newly built, not yet installed gnuplot.  Needed so Cygwin binaries
 	can find Cygwin1.dll, even if it's not installed in the Windows
 	DLL path.
 
