@@ -572,18 +572,19 @@ void
 set_command()
 {
 static char GPFAR setmess[] ="\
-valid set options:  [] = choose one, {} means optional\n\
-\t'angles' '{no}arrow', {no}autoscale', 'bars', '{no}border',\n\
+valid set options:  [] = choose one, {} means optional\n\n\
+\t'angles',  '{no}arrow',  '{no}autoscale',  'bars',  '{no}border',\n\
 \t'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', '{no}contour',\n\
-\t'data style', '{no}dgrid3d', 'dummy', 'encoding', 'format',\n\
-\t'function style', '{no}grid', '{no}hidden3d', 'isosamples', '{no}key',\n\
-\t'keytitle','{no}label', '{no}linestyle', 'locale', '{no}logscale', '[blrt]margin',\n\
-\t'mapping', 'missing', 'offsets', 'origin', 'output', '{no}parametric',\n\
-\t'pointsize', '{no}polar', '[rtuv]range', 'samples', 'size',\n\
-\t'{no}surface', 'terminal', 'tics', 'ticscale', 'ticslevel',\n\
-\t'{no}time', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
-\t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
-\t'[xyz]{2}[md]tics', \t'{no}{[xyz]{2}}zeroaxis', 'zero'";
+\t'data style',  '{no}dgrid3d',  'dummy',  'encoding',  'format',\n\
+\t'function style',   '{no}grid',   '{no}hidden3d',   'isosamples',\n\
+\t'{no}key', '{no}label', '{no}linestyle', 'locale', '{no}logscale',\n\
+\t'[blrt]margin', 'mapping', 'missing', '{no}multiplot', 'offsets',\n\
+\t'origin', 'output', '{no}parametric', 'pointsize', '{no}polar',\n\
+\t'[rtuv]range',  'samples',  'size',  '{no}surface',  'terminal',\n\
+\t'tics',  'ticscale',  'ticslevel',  '{no}timestamp',  'timefmt',\n\
+\t'title', 'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
+\t'{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{no}{[xyz]{2}}zeroaxis',\n\
+\t'zero'";
 
 
     c_token++;
