@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.23 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.24 2000/11/01 18:57:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -681,8 +681,8 @@ graph_error(const char *fmt, ...)
 #else
 void
 graph_error(fmt, va_alist)
-const char *fmt;
-va_dcl
+    const char *fmt;
+    va_dcl
 #endif
 {
 #ifdef VA_START
@@ -694,7 +694,27 @@ va_dcl
 
 #ifdef VA_START
     VA_START(args, fmt);
+#if 0 
+    /* HBB 20001120: this seems not to work at all. Probably because a
+     * va_list argument, is, after all, something else than a varargs
+     * list (i.e. a '...') */
     int_error(NO_CARET, fmt, args);
+#else
+    /* HBB 20001120: instead, copy the core code from int_error() to
+     * here: */
+    PRINT_SPACES_UNDER_PROMPT;
+    PRINT_FILE_AND_LINE;
+
+# if defined(HAVE_VFPRINTF) || _LIBC
+    vfprintf(stderr, fmt, args);
+# else
+    _doprnt(fmt, args, stderr);
+# endif
+    va_end(args);
+    fputs("\n\n", stderr);
+
+    bail_to_command_line();
+#endif /* 1/0 */
     va_end(args);
 #else
     int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);

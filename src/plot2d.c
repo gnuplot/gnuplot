@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.29.2.8 2000/10/31 18:13:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.34 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -242,14 +242,12 @@ plotrequest()
  * We store -1 in point->z as a marker to mean width needs to be
  * calculated, or 0 to mean that xmin/xmax are set correctly
  */
-
-
-static int
-get_data(current_plot)
-struct curve_points *current_plot;
 /* current_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
  */
+static int
+get_data(current_plot)
+    struct curve_points *current_plot;
 {
     int i /* num. points ! */ , j;
     int max_cols, min_cols;    /* allowed range of column numbers */
@@ -299,6 +297,7 @@ struct curve_points *current_plot;
     case BOXES:
 	min_cols = 2;
 	max_cols = 4;
+	current_plot->z_axis = current_plot->x_axis;
 	break;
 
     default:

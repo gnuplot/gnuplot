@@ -1,3 +1,10 @@
+2000-11-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.c (graph_error): don't call int_error(). Can't do that
+ 	from one variadic function to the other.
+
+	* src/plot2d.c (get_data): fix bug in datafile plots 'with boxes'.
+
 2000-11-22  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
         * src/gplt_x11.c: fix two crashes (segmentation fault
 	  and floating exception)
