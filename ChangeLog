@@ -1,3 +1,12 @@
+2002-12-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Completely rewritten and simplified checks for png,
+	gd, and the required support libraries. Other minor cleanups.
+
+	* config/config.amg, config/makefile.cyg, config/makefile.mgw,
+	config/makefile.os2, src/show.c, src/term.h, term/gd.trm, term/png.trm:
+	Update all preprocessor symbols related to new gd/png/jpeg checks.
+
 2002-12-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Initialize gcCurrentFunction because gcc is too
@@ -6,6 +15,10 @@
 	* src/misc.c: Do not allow input of negative pointsize or linewidth.
 
 	* term/gd.trm: Check for valid linetype (Mike Kay <kay@fsl.noaa.gov>).
+
+2002-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Fix typo in allterm.h generation.
 
 2002-12-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1657,7 +1670,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/17 15:38:58 $).
+	last modification date (from the tag $Date: 2002/12/18 00:56:58 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
