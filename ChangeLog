@@ -1,6 +1,16 @@
+1999-09-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* misc.c, show.c: In the SAVE/SHOW_NUM_OR_TIME macro, add a '#'
+	to the format specifier in the fprintf() call. This adds a decimal
+	point to the saved 'set ?range' commands to prevent integer
+	overflow on 16 bit platforms when the saved commands are loaded.
+
 1999-09-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* bitmap.c, bitmap.h: RGB colour table moved from term/gif.trm.
+
+	* docs/Makefile.in: Add rules to generate gnuplot.pdf. Requires
+	pdflatex.
 
 	* term/driver.h: Fix typo.
 
