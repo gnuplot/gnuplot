@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.3.2.1 1999/09/21 18:48:28 lhecking Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.3.2.2 2002/03/11 12:27:57 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -164,13 +164,18 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR tail;
 	
 #ifdef __MSC__  /* MSC doesn't give us _argc and _argv[] so ...   */
-#define MAXCMDTOKENS 128
+# ifdef WIN32    /* WIN32 has __argc and __argv */
+#  define _argv __argv
+#  define _argc __argc
+# else
+#  define MAXCMDTOKENS 128
 	int     _argc=0;
 	LPSTR   _argv[MAXCMDTOKENS];
 	_argv[_argc] = "wgnuplot.exe";
 	_argv[++_argc] = _fstrtok( lpszCmdLine, " ");
 	while (_argv[_argc] != NULL)
 		_argv[++_argc] = _fstrtok( NULL, " ");
+# endif /* WIN32 */
 #endif /* __MSC__ */
 
 	szModuleName = (LPSTR)farmalloc(MAXSTR+1);

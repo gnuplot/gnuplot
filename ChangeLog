@@ -1,3 +1,9 @@
+2002-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* win/winmain.c (WinMain) [MSC, WIN32]: Use predefined __argc and
+ 	__argv instead of old hack to generate them from scratch, which
+ 	couldn't cope with blanks in file names or quoted arguments.
+
 2002-11-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graphics.c (do_plot): Get rid of old xtic and ytic #defines.
