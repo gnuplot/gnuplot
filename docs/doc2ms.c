@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.10 1999/06/14 19:17:08 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ms.c,v 1.11 1999/07/09 20:59:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ms.c */
@@ -275,7 +275,7 @@ putms(s, file)
 char *s;
 FILE *file;
 {
-    static boolean inquote = FALSE;
+    static TBOOLEAN inquote = FALSE;
 
     while (*s != NUL) {
 	switch (*s) {
