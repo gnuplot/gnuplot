@@ -96,6 +96,9 @@ extern double          log_base_array[AXIS_ARRAY_SIZE];
 static int x_axis, y_axis, z_axis;
 
 
+/* Deleted from setshow.h and renamed */
+extern FILE *gpoutfile;
+
 /* info from datafile module */
 extern int df_datum;
 extern int df_line_number;
@@ -697,16 +700,16 @@ int pcount;
 
     for (surface = 0, this_plot = first_3dplot ; surface < pcount; 
 		this_plot = this_plot->next_sp, surface++){
-		fprintf(outfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
+		fprintf(gpoutfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
 		icrvs = this_plot->iso_crvs;
 		curve = 0;
 
 		if (draw_surface) {
 		    /* only the curves in one direction */
 		    while(icrvs && curve < this_plot->num_iso_read){
-			fprintf(outfile, "\n#IsoCurve %d, %d points\n#x y z type\n", curve, icrvs->p_count);
+			fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n", curve, icrvs->p_count);
 			for(i = 0, points = icrvs->points; i < icrvs->p_count; i++){
-	    		fprintf(outfile, "%g %g %g %c\n",
+	    		fprintf(gpoutfile, "%g %g %g %c\n",
 		    	points[i].x,
 		    	points[i].y,
 		    	points[i].z,
@@ -717,7 +720,7 @@ int pcount;
 			icrvs = icrvs->next;
 			curve++;
 		    }
-		    putc('\n', outfile);
+		    putc('\n', gpoutfile);
 		}
 
 		if (draw_contour) {
@@ -730,15 +733,15 @@ int pcount;
 					/* dont display count - contour split across chunks */
 					/* put # in case user wants to use it for a plot */
 					/* double blank line to allow plot ... index ... */
-					fprintf(outfile, "\n# Contour %d, label:%s\n", number++, c->label);
+					fprintf(gpoutfile, "\n# Contour %d, label:%s\n", number++, c->label);
 				for ( ; --count >= 0 ; ++p)
-					fprintf(outfile, "%g %g %g\n", p->x, p->y, p->z);
-				putc('\n', outfile);  /* blank line between segments of same contour */
+					fprintf(gpoutfile, "%g %g %g\n", p->x, p->y, p->z);
+				putc('\n', gpoutfile);  /* blank line between segments of same contour */
 				c = c->next;
 			}
 		}			
 	}
-    fflush(outfile);
+    fflush(gpoutfile);
 }
 
 

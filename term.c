@@ -109,7 +109,7 @@ static TBOOLEAN term_graphics=FALSE;    /* true if terminal is in graphics mode 
 static TBOOLEAN term_suspended=FALSE;   /* we have suspended the driver, in multiplot mode */
 static TBOOLEAN opened_binary=FALSE;
 static TBOOLEAN term_force_init=FALSE;	/* true if require terminal to be initialized */
-extern FILE *outfile;
+extern FILE *gpoutfile;
 extern char *outstr;
 extern float xsize, ysize;
 
@@ -190,18 +190,18 @@ static void term_close_output()
 
 #if defined(PIPES)
 	if ( pipe_open ) {
-		(void) pclose(outfile);
+		(void) pclose(gpoutfile);
 		pipe_open = FALSE;
 	} else
 #endif /* PIPES */
 #ifdef _Windows
 		if ( stricmp(outstr,"PRN") == 0 )
-			close_printer(outfile);
+			close_printer(gpoutfile);
 		else
 #endif
-			(void) fclose(outfile);
+			(void) fclose(gpoutfile);
 
-	outfile = stdout; /* Don't dup... */
+	gpoutfile = stdout; /* Don't dup... */
 	free(outstr);
 	outstr = NULL;
 }
@@ -248,8 +248,8 @@ char *dest;
 #ifdef _Windows
 			if ( outstr && stricmp(outstr,"PRN") == 0) {
 				/* we can't call open_printer() while printer is open, so */
-				close_printer(outfile);	/* close printer immediately if open */
-			    outfile = stdout;	/* and reset output to stdout */
+				close_printer(gpoutfile);	/* close printer immediately if open */
+			    gpoutfile = stdout;	/* and reset output to stdout */
 			    free(outstr);
 			    outstr = NULL;
 			}
@@ -271,7 +271,7 @@ char *dest;
 			    os_error("cannot open file; output not changed",c_token);
 		}
 		term_close_output();
-		outfile = f;
+		gpoutfile = f;
 		outstr = dest;
 		opened_binary = (term && (term->flags & TERM_BINARY));
  		UP_redirect (1);
@@ -367,7 +367,7 @@ void term_end_plot()
 	else
 #endif /* VMS */
 
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 void term_start_multiplot()
@@ -487,7 +487,7 @@ TBOOLEAN interactive;
   	 *   we are not writing to stdout and terminal doesn't refuse multiplot outright
   	 */
   	if ( !interactive || (term->flags & TERM_CAN_MULTIPLOT) ||
-  	          ((outfile!=stdout) && !(term->flags & TERM_CANNOT_MULTIPLOT) )
+  	          ((gpoutfile!=stdout) && !(term->flags & TERM_CANNOT_MULTIPLOT) )
       )
    {
    	/* it's okay to use multiplot here, but suspend first */
@@ -996,11 +996,13 @@ void init_terminal()
 #endif /* _Windows */
 
 #ifdef GPR
-   if (gpr_isa_pad()) term_name = "gpr";       /* find out whether stdout is a DM pad. See term/gpr.trm */
+   /* find out whether stdout is a DM pad. See term/gpr.trm */
+   if (gpr_isa_pad()) term_name = "gpr";
 #else
-#ifdef APOLLO
-   if (apollo_isa_pad()) term_name = "apollo"; /* find out whether stdout is a DM pad. See term/apollo.trm */
-#endif /* APOLLO */
+# ifdef APOLLO
+   /* find out whether stdout is a DM pad. See term/apollo.trm */
+   if (apollo_isa_pad()) term_name = "apollo";
+# endif /* APOLLO */
 #endif /* GPR    */
 
 #ifdef X11
@@ -1120,7 +1122,7 @@ void UP_redirect(caller) int caller;
 void UP_redirect (caller)
 int caller;
 /*
-	Unixplot can't really write to outfile--it wants to write to stdout.
+	Unixplot can't really write to gpoutfile--it wants to write to stdout.
 	This is normally ok, but the original design of gnuplot gives us
 	little choice.  Originally users of unixplot had to anticipate
 	their needs and redirect all I/O to a file...  Not very gnuplot-like.
@@ -1133,15 +1135,15 @@ int caller;
 {
 	switch (caller) {
 	case 1:
-	/* Don't save, just replace stdout w/outfile (save was already done). */
+	/* Don't save, just replace stdout w/gpoutfile (save was already done). */
 		if (unixplot)
-			*(stdout) = *(outfile);  /* Copy FILE structure */
+			*(stdout) = *(gpoutfile);  /* Copy FILE structure */
 	break;
 	case 2:
 		if (!unixplot) {
 			fflush(stdout);
 			save_stdout = *(stdout);
-			*(stdout) = *(outfile);  /* Copy FILE structure */
+			*(stdout) = *(gpoutfile);  /* Copy FILE structure */
 			unixplot = 1;
 		}
 	break;
@@ -1292,21 +1294,21 @@ void test_term()
 # if defined(MSDOS)||defined(g)||defined(MTOS)||defined(OS2)||defined(_Windows)||defined(DOS386)
 /* output for some terminal types must be binary to stop non Unix computers
    changing \n to \r\n. 
-   If the output is not STDOUT, the following code reopens outfile 
+   If the output is not STDOUT, the following code reopens gpoutfile 
    with binary mode. */
 void
 reopen_binary()
 {
 	if (outstr) {
-		(void) fclose(outfile);
+		(void) fclose(gpoutfile);
 #  ifdef _Windows
 		if ( !stricmp(outstr,"PRN") ) {
 		        /* use temp file for windows */
 			(void) strcpy(filename,win_prntmp);
 		}
 #  endif
-		if ( (outfile = fopen(filename,"wb")) == (FILE *)NULL ) {
-			if ( (outfile = fopen(filename,"w")) == (FILE *)NULL ) {
+		if ( (gpoutfile = fopen(filename,"wb")) == (FILE *)NULL ) {
+			if ( (gpoutfile = fopen(filename,"w")) == (FILE *)NULL ) {
 				os_error("cannot reopen file with binary type; output unknown",
 					NO_CARET);
 			} 
@@ -1323,7 +1325,7 @@ reopen_binary()
 		union REGS regs;
 			regs.h.ah = 0x44;	/* ioctl */
 			regs.h.al = 0;		/* get device info */
-			regs.x.bx = fileno(outfile);
+			regs.x.bx = fileno(gpoutfile);
 			intdos(&regs, &regs);
 			regs.h.dl |= 0x20;	/* binary (no ^Z intervention) */
 			regs.h.dh = 0;
@@ -1395,7 +1397,7 @@ term_mode_tek()
 /* set terminal mode to tektronix */
 {
    long status;
-   if (outfile != stdout) return; /* don't modify if not stdout */
+   if (gpoutfile != stdout) return; /* don't modify if not stdout */
    sys$assign(&sysoutput_desc,&chan,0,0);
    cur_char_buf[0] = 0x004A0000 | DC$_TERM | (TT$_TEK401X<<8);
    cur_char_buf[1] = (cur_char_buf[1] & 0x00FFFFFF) | 0x18000000;
@@ -1454,7 +1456,7 @@ term_mode_native()
 /* set terminal mode back to native */
 {
    int i;
-   if (outfile != stdout) return; /* don't modify if not stdout */
+   if (gpoutfile != stdout) return; /* don't modify if not stdout */
    sys$assign(&sysoutput_desc,&chan,0,0);
    sys$qiow(0,chan,IO$_SETMODE,0,0,0,old_char_buf,12,0,0,0,0);
    for (i = 0 ; i < 3 ; ++i) cur_char_buf[i] = old_char_buf[i];
@@ -1465,7 +1467,7 @@ void
 term_pasthru()
 /* set terminal mode pasthru */
 {
-   if (outfile != stdout) return; /* don't modify if not stdout */
+   if (gpoutfile != stdout) return; /* don't modify if not stdout */
    sys$assign(&sysoutput_desc,&chan,0,0);
    cur_char_buf[2] |= TT2$M_PASTHRU;
    sys$qiow(0,chan,IO$_SETMODE,0,0,0,cur_char_buf,12,0,0,0,0);
@@ -1476,7 +1478,7 @@ void
 term_nopasthru()
 /* set terminal mode nopasthru */
 {
-   if (outfile != stdout) return; /* don't modify if not stdout */
+   if (gpoutfile != stdout) return; /* don't modify if not stdout */
    sys$assign(&sysoutput_desc,&chan,0,0);
    cur_char_buf[2] &= ~TT2$M_PASTHRU;
    sys$qiow(0,chan,IO$_SETMODE,0,0,0,cur_char_buf,12,0,0,0,0);
@@ -1488,13 +1490,13 @@ fflush_binary()
 {
    typedef short int INT16;     /* signed 16-bit integers */
    register INT16 k;            /* loop index */
-   if (outfile != stdout) {
+   if (gpoutfile != stdout) {
        /* Stupid VMS fflush() raises error and loses last data block
           unless it is full for a fixed-length record binary file.
           Pad it here with NULL characters. */
-       for (k = (INT16)((*outfile)->_cnt); k > 0; --k)
-          putc('\0',outfile);
-       fflush(outfile);
+       for (k = (INT16)((*gpoutfile)->_cnt); k > 0; --k)
+          putc('\0',gpoutfile);
+       fflush(gpoutfile);
    }
 }
 #endif /* VMS */

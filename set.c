@@ -127,7 +127,7 @@ double			log_base_log_y	= 0.0;
 double			log_base_log_z	= 0.0;
 double			log_base_log_x2	= 0.0;
 double			log_base_log_y2	= 0.0;
-FILE*			outfile;
+FILE*			gpoutfile;
 char			*outstr = NULL; /* means "STDOUT" */
 TBOOLEAN		parametric	= FALSE;
 double			pointsize	= 1.0;

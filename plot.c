@@ -73,7 +73,7 @@ extern smg$create_key_table();
 # endif
 #endif /* _Windows */
 
-extern FILE *outfile;
+extern FILE *gpoutfile;
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
@@ -330,7 +330,7 @@ rl_complete_with_tilde_expansion = 1;
 	    fprintf (stderr, "Could not linebuffer stdout\n");
 #endif
 
-	outfile = stdout;
+	gpoutfile = stdout;
 	(void) Gcomplex(&udv_pi.udv_value, Pi, 0.0);
 
      init_memory();
@@ -355,7 +355,7 @@ rl_complete_with_tilde_expansion = 1;
 	  noinputfiles = TRUE;
 
      if (interactive)
-	  show_version();
+	  show_version(stderr);
 #ifdef VMS   /* initialise screen management routines for command recall */
           if (status[1] = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
                done(status[1]);
@@ -386,7 +386,7 @@ rl_complete_with_tilde_expansion = 1;
 	    /* after catching interrupt */
 	    /* VAX stuffs up stdout on SIGINT while writing to stdout,
 		  so reopen stdout. */
-	    if (outfile == stdout) {
+	    if (gpoutfile == stdout) {
 		   if ( (stdout = freopen("SYS$OUTPUT","w",stdout))  == NULL) {
 			  /* couldn't reopen it so try opening it instead */
 			  if ( (stdout = fopen("SYS$OUTPUT","w"))  == NULL) {
@@ -394,7 +394,7 @@ rl_complete_with_tilde_expansion = 1;
 				 fprintf(stderr,"Error opening SYS$OUTPUT as stdout\n");
 			  }
 		   }
-		   outfile = stdout;
+		   gpoutfile = stdout;
 	    }
 #endif /* VMS */
 	    if (!interactive && !noinputfiles) {

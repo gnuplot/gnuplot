@@ -123,6 +123,9 @@ extern TBOOLEAN        log_array[AXIS_ARRAY_SIZE];
 extern double          base_array[AXIS_ARRAY_SIZE];
 extern double          log_base_array[AXIS_ARRAY_SIZE];
 
+/* Deleted from setshow.h and renamed */
+extern FILE *gpoutfile;
+
 /* if user specifies [10:-10] we use [-10:10] internally, and swap at end */
 int reverse_range[AXIS_ARRAY_SIZE];
 
@@ -741,19 +744,19 @@ int plot_num;
 
     for (curve = 0; curve < plot_num;
 	 curve++, this_plot = this_plot->next_cp) {
-	fprintf(outfile, "#Curve %d, %d points\n#x y type\n", curve, this_plot->p_count);
+	fprintf(gpoutfile, "#Curve %d, %d points\n#x y type\n", curve, this_plot->p_count);
 	for (i = 0; i < this_plot->p_count; i++) {
-	    fprintf(outfile, "%g %g %c\n",
+	    fprintf(gpoutfile, "%g %g %c\n",
 		    this_plot->points[i].x,
 		    this_plot->points[i].y,
 		    this_plot->points[i].type == INRANGE ? 'i'
 		    : this_plot->points[i].type == OUTRANGE ? 'o'
 		    : 'u');
 	}
-	fprintf(outfile, "\n");
+	fprintf(gpoutfile, "\n");
     }
-    fprintf(outfile, "\n"); /* two blank lines between plots in table output */
-    fflush(outfile);
+    fprintf(gpoutfile, "\n"); /* two blank lines between plots in table output */
+    fflush(gpoutfile);
 }
 
 /*
