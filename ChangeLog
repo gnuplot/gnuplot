@@ -1,3 +1,8 @@
+2004-09-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (eval_3dplots): Fix logic of default arrow style in the
+	case of splot with vectors.
+
 2004-09-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util3d.c src/util3d.h: Add a text_label pointer to the p_vertex
