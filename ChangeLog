@@ -1,3 +1,27 @@
+1999-04-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: Change examples in test section.
+
+	* NEWS: Minor change.
+
+	* README.exp: New file to explain experimental features.
+
+	* demo/Makefile.am, demo/Makefile.in, lisp/aclocal.m4, lisp/configure:
+	Regenerated.
+
+	* demo/Makefile.am.in: Add check-interactive and check-noninteractive
+	targets.
+
+	* lisp/acinclude.m4: New file, improved AM_PATH_LISPDIR macro.
+
+	* src/Makefile.in: Add empty check target.
+
+1999-04-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/dialogs.h, src/os2/gclient.c, src/os2/gnupmdrv.h,
+	src/os2/gnupmdrv.ipf, src/os2/gnupmdrv.rc, src/os2/ptrcross.ptr,
+	term/pm.trm: Add mouse capabilities to pm driver for OS/2.
+
 1999-04-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/version.c: Patchlevel 3.7.0.5.
