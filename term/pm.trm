@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.41 2005/03/09 18:26:45 sfeam Exp $
+ * $Id: pm.trm,v 1.42 2005/05/24 20:54:03 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -562,22 +562,24 @@ PM_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC int
 PM_set_font(const char *font)
 {
-    int len, fontsize;
-    char *p;
-    p = strchr(font, ',');
-    if (p == NULL || *p == NUL)
-	fontsize = 14;
-    else
-	fontsize = strtol(p + 1, NULL, 10);
-    if (fontsize <= 0)
-	fontsize = 14;
+    int len;
+
     putc(SET_FONT, PM_pipe);
-    len = strlen(font) + 1;
-    fwrite(&len, sizeof(int), 1, PM_pipe);
-    fwrite(font, 1, len, PM_pipe);
-    for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
+    if (font == NULL)
+        len = 0;
+    else
+        len = strlen(font);
+
+    if (len==0) {
+        fwrite(&len, sizeof(int), 1, PM_pipe);
+    } else {
+        len += 1;
+        fwrite(&len, sizeof(int), 1, PM_pipe);
+        fwrite(font, 1, len, PM_pipe);
+        for (len = sizeof(int) - len % sizeof(int); len > 0; len--) {
 	/* pad rest of int with zeros */
-	putc(NUL, PM_pipe);
+            putc(NUL, PM_pipe);
+        }
     }
     return TRUE;
 }

@@ -1,5 +1,8 @@
 2005-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/pm.trm (PM_set_font): Fix font selection for pm terminal in case
+	of empty font string.
+
 	* src/plot.c (RexxInterface): Replace input_line[] by gp_input_line[]
 	in code sections which are only compiled on OS/2.
 
