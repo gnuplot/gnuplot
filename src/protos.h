@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.15 1999/07/13 19:53:19 lhecking Exp $
+ * $Id: protos.h,v 1.16 1999/07/27 19:43:33 lhecking Exp $
  *
  */
 
@@ -148,21 +148,12 @@ void iso_free __PROTO((struct iso_curve *ip));
 struct surface_points * sp_alloc __PROTO((int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
 void sp_replace __PROTO((struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
 void sp_free __PROTO((struct surface_points *sp));
-void save_functions __PROTO((FILE *fp));
-void save_variables __PROTO((FILE *fp));
-void save_all __PROTO((FILE *fp));
-void save_set __PROTO((FILE *fp));
-void save_set_all __PROTO((FILE *fp));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
 size_t gp_strcspn __PROTO((const char *, const char *));
-void show_functions __PROTO((void));
-void show_at __PROTO((void));
-void disp_at __PROTO((struct at_type *curr_at, int level));
 int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
-TBOOLEAN valid_format __PROTO((const char *format));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
 
 
@@ -192,6 +183,14 @@ void add_history __PROTO((char *line));
 char tos_getch();
 #endif
 
+
+/* Prototypes from file "save.c" */
+
+void save_functions __PROTO((FILE *fp));
+void save_variables __PROTO((FILE *fp));
+void save_set __PROTO((FILE *fp));
+void save_all __PROTO((FILE *fp));
+void save_set_all __PROTO((FILE *fp));
 
 /* Prototypes from file "scanner.c" */
 
