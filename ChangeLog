@@ -1,3 +1,8 @@
+2003-04-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: If gnuplot_x11 dies, or fails to start, then make
+	sure all locks on the [now defunct] pipe are cleared.
+
 2004-04-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL: Reset to zero.

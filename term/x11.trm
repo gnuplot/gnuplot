@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.104 2004/03/25 20:45:15 sfeam Exp $
+ * $Id: x11.trm,v 1.105 2004/04/13 17:24:39 broeker Exp $
  *
  */
 
@@ -602,6 +602,7 @@ AGAIN:
 		    ipc_back_fd = -1;
 		    /* don't close X11_ipc, otherwise later writes
 		     * to it will cause a segfault */
+		    IPC_LOCK = FALSE;
 		    break;	/* outboard driver has stopped */
 		}
 		l += n;
