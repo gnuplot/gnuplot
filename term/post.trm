@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.131 2004/09/15 11:13:04 mikulik Exp $
+ * $Id: post.trm,v 1.132 2004/09/16 15:02:47 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1397,7 +1397,7 @@ PS_common_init(
 %%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
 %%\n\
-%% The following 5 true/false flags may be edited by hand if required\n\
+%% The following 6 true/false flags may be edited by hand if required\n\
 %% The unit line width may also be changed\n\
 %%\n\
 /Color %s def\n\
@@ -1405,6 +1405,7 @@ PS_common_init(
 /Solid %s def\n\
 /Landscape %s def\n\
 /Level1 %s def\n\
+/Rounded %s def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 %%\n\
@@ -1413,8 +1414,7 @@ PS_common_init(
 /hpt_ %.1f def\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
-/vpt vpt_ def\n\
-/Rounded %s def\n";
+/vpt vpt_ def\n";
 
     static const char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
@@ -1867,12 +1867,12 @@ NULL };
 	    ps_solid ? "true" : "false",
 	    ps_portrait ? "false" : "true",
 	    ps_level1 ? "true" : "false",
+	    ps_rounded ? "true" : "false",
 	    PS_LW*ps_linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*ps_dash_length,	/* dash length */
 	    PS_HTIC/2.0,		/* half point width */
-	    PS_VTIC/2.0,		/* half point height */
-	    ps_rounded ? "true" : "false");
+	    PS_VTIC/2.0);		/* half point height */
 
     /* insert font encoding vector */
     if (uses_fonts) {
