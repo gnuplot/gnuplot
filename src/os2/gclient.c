@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.17 2002/03/18 18:19:10 broeker Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.18 2002/03/21 15:11:49 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -2082,7 +2082,7 @@ server:
 	if (DosGetNamedSharedMem(&input_from_PM_Terminal,
 		mouseShareMemName,
 		PAG_WRITE)) {
-	   /*now: gray menu items; old code: DosBeep(1440L,1000L); /* indicates error */ */
+	   /*now: gray menu items; old code: DosBeep(1440L,1000L); // indicates error */
 	   input_from_PM_Terminal = 0;
 	   }
 
@@ -2090,13 +2090,13 @@ server:
 	  /* semaphore 'semInputReady' must be open later in order to avoid problems */
 	  /* with the server mode; also 'bhave_*' init here because of server */
 
-/*        DosPostEventSem( semStartSeq ) ;         /* once we've got pidGnu */ */
+/*        DosPostEventSem( semStartSeq ) ;         // once we've got pidGnu */
 	WinPostMsg( hApp, WM_GPSTART, 0, 0 ) ;
 
 
 	hps = hpsScreen ;
-   InitScreenPS() ;
-        while (1) {
+	InitScreenPS() ;
+      while (1) {
         
             usErr=BufRead(hRead,buff, 1, &cbR) ;
             if( usErr != 0 ) break ;

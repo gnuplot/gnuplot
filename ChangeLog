@@ -1,3 +1,7 @@
+2002-03-21  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* config/makefile.os2 src/os2/gclient.c: Get it to build again.
+
 2002-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gclient.c: Remove my "//PM" tags. Remove encapsulated
@@ -131,7 +135,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/18 18:19:10 $).
+	last modification date (from the tag $Date: 2002/03/21 15:12:55 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
