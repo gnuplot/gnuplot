@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.224 2004/06/07 05:33:00 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.225 2004/06/21 03:54:49 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -510,7 +510,7 @@ C
        Ctrl Home       - same as ^E.
        Esc             - same as ^U.
        Help            - `help` plus return.
-       Ctrl Help       - `help `.
+       Ctrl Help       - `help`.
 #\begin{tabular}{|cl|} \hline
 #Key & Function \\ \hline
 #Undo      & same as \verb~^L~. \\

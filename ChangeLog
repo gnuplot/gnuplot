@@ -1,32 +1,70 @@
+2004-06-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL: Raised to 1 in preparation of ANSI-fication.
+
+	* src/version.c (gnuplot_patchlevel, gnuplot_date): Updated.
+	(RELEASE_VERSION): Turn off.
+
+	* INSTALL: removed pointless copy of startup banner screen.
+
+	* docs/gnuplot.texi: Regenerated.
+	
+	* term/post.trm (PS_linewidth_last): New variable.
+	(PS_graphics, PS_point, PS_fillbox): Initialize it.
+	(PS_linetype): Call PS_FLUSH_PATH here, too.
+	(PS_linewidth): Don't break the path if the new linewidth is the
+	same as the cached value PS_linewidth_last.  Do a PS_FLUSH_PATH
+	here, too.
+
+	* term/debug.trm (DEBUG_arrow): Fix type of 'head' argument.
+
+	* src/hidden3d.c (in_front): Slight change to handling of points
+	falling onto edges of triangles in 2D.  Reindentations.
+
+	* src/fit.c (log_axis_restriction): New function to output the
+	actual state of the axis ranges, as optionally modified by range
+	specified in the fit command line.
+	(fit_command): Use it.
+
+	* src/graphics.c (plot_bars): Reindentation.
+
+	* src/util.c (mant_exp): Reindentation.
+
+	* src/plot3d.c (print_3dtable): #undef OUTPUT_NUMBER earlier.
+
 2004-06-24  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/mouse.c (event_reset): If 'pause mouse' terminates because the
-	plot window is closed, insert an extra '\n' into the input stream so
-	that the first character of the subsequent command is not swallowed.
+	* src/mouse.c (event_reset): If 'pause mouse' terminates because
+	the plot window is closed, insert an extra '\n' into the input
+	stream so that the first character of the subsequent command is
+	not swallowed.
 
 2004-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_reset), src/command.c (pause_command),
-	docs/gnuplot.doc: Set MOUSE_KEY to -1 when the "pause mouse {key}" 
-	command is issued; if it is still -1 when checked later, then the 
-	calling program may assume that no mouse input was successfully given.
+	docs/gnuplot.doc: Set MOUSE_KEY to -1 when the "pause mouse {key}"
+	command is issued; if it is still -1 when checked later, then the
+	calling program may assume that no mouse input was successfully
+	given.
 
 	* src/command.c (pause_command): Change the test for legality of
-	"pause mouse" command from "if (term_initialised)" to
-	"if (mouse_setting.on)". Really it should test whether the current
-	terminal supports mousing at all, but we don't yet have such a flag.
+	"pause mouse" command from "if (term_initialised)" to "if
+	(mouse_setting.on)". Really it should test whether the current
+	terminal supports mousing at all, but we don't yet have such a
+	flag.
 
 	* src/gplt_x11.c (process_event): Translate keystrokes using
-	XLookupString() rather than XKeycodeToKeysym(). This method handles
-	characters produced using shift, alt, or other multi-key sequences.
+	XLookupString() rather than XKeycodeToKeysym(). This method
+	handles characters produced using shift, alt, or other multi-key
+	sequences.
 
-	* src/graphics.c (plot_f_bars plot_c_bars), term/gd.trm PNG_options):
-	Make sure that the tic size is greater than zero.
+	* src/graphics.c (plot_f_bars plot_c_bars), term/gd.trm
+	PNG_options): Make sure that the tic size is greater than zero.
 
 2004-06-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): Fixed
-	wrong step for negative palette.
+	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d):
+	Fixed wrong step for negative palette.
 
 	* src/color.c (set_color) src/command.c (test_palette_subcommand)
 	src/show.c (show_palette_palette): Removed useless comments.
@@ -34,15 +72,15 @@
 2004-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c (set_color, draw_inside_color_smooth_box_bitmap)
-	src/pm3d.c (cb2gray): Invert gray in routine pm3d.c:cb2gray(cb), instead
-	of color.c:set_color(gray). The latter is now just setting
+	src/pm3d.c (cb2gray): Invert gray in routine pm3d.c:cb2gray(cb),
+	instead of color.c:set_color(gray). The latter is now just setting
 	term->set_color(gray) if the terminal supports set_color() API.
 
-	* graph3d.c (do_3dplot): Fixed set_color(z2cb( cb2gray(cntrs->z)) to 
-	set_color(cb2gray( z2cb(cntrs->z) )).
+	* graph3d.c (do_3dplot): Fixed set_color(z2cb( cb2gray(cntrs->z))
+	to set_color(cb2gray( z2cb(cntrs->z) )).
 
-	* gadgets.c (apply_textcolor): Take care of positive/negative palette
-	for 'set label ... textcolor frac ...'.
+	* gadgets.c (apply_textcolor): Take care of positive/negative
+	palette for 'set label ... textcolor frac ...'.
 
 2004-06-17  Ethan Merritt  <merritt@u.washington.edu>
 

@@ -731,20 +731,6 @@ gnuplot> load 'all.dem'
    To test the capabilities of the terminal you are using, there is the
 'test' command:
 
-$ gnuplot
-
-        G N U P L O T
-        Unix version 4.0
-        patchlevel 0
-        last modified Tue Apr 13 13:13:13 GMT 2004
-
-        Copyright(C) 1986 - 1993, 1998, 2004
-        Thomas Williams, Colin Kelley and many others
-
-        Send comments and requests for help to gnuplot-info@lists.sf.net
-        Send bugs, suggestions and mods to gnuplot-bugs@lists.sf.net
-
-Terminal type set to 'x11'
 gnuplot> test
 
    `test` creates a display of line and point styles and other useful things

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.66 2004/04/13 17:23:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.67 2004/06/13 00:34:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -961,6 +961,7 @@ print_3dtable(pcount)
 		/* blank line between segments of same contour */
 		putc('\n', gpoutfile);
 		c = c->next;
+#undef OUTPUT_NUMBER
 	    } /* while (contour) */
 	} /* if (draw_contour) */
     } /* for(surface) */
@@ -968,7 +969,6 @@ print_3dtable(pcount)
 
     free(buffer);
 }
-#undef OUTPUT_NUMBER
 
 /* HBB 20000501: code isolated from eval_3dplots(), where practically
  * identical code occured twice, for direct and crossing isolines,

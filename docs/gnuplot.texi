@@ -1985,7 +1985,9 @@ code.
 
 If 'pause mouse keypress' is terminated by a mouse click rather than by a
 keypress, then MOUSE_KEY will contain the button number, otherwise it will
-contain the ascii character value of the key that was pressed.
+contain the ascii character value of the key that was pressed. If the
+pause command is terminated abnormally (e.g. by ctrl-C or by externally
+closing the plot window) then MOUSE_KEY will equal -1.
 
 
 @node Plotting, Start-up, mouse_input, gnuplot
@@ -3185,6 +3187,7 @@ then `gnuplot` exits.
 @cmindex pause
 
 
+@c ?pause mouse
 The @ref{pause} command displays any text associated with the command and then
 waits a specified amount of time or until the carriage return is pressed.
 @ref{pause} is especially useful in conjunction with `load` files.

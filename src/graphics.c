@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.105 2004/06/21 05:46:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.106 2004/06/21 05:51:08 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2232,7 +2232,7 @@ histeps_horizontal(cur_x, cur_y, x1, x2, y)
  */
 static void
 plot_bars(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int i;			/* point index */
     struct termentry *t = term;
@@ -2245,12 +2245,14 @@ struct curve_points *plot;
     TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
 
-/* Limitation: no boxes with x errorbars */
+    /* Limitation: no boxes with x errorbars */
 
-    if ((plot->plot_style == YERRORBARS) ||
-	(plot->plot_style == XYERRORBARS) ||
-	(plot->plot_style == BOXERROR) || (plot->plot_style == YERRORLINES) || (plot->plot_style == XYERRORLINES)) {
-/* Draw the vertical part of the bar */
+    if ((plot->plot_style == YERRORBARS) 
+	|| (plot->plot_style == XYERRORBARS) 
+	|| (plot->plot_style == BOXERROR) 
+	|| (plot->plot_style == YERRORLINES)
+	|| (plot->plot_style == XYERRORLINES)) {
+	/* Draw the vertical part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
 	    if (plot->points[i].type == UNDEFINED)
