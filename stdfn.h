@@ -263,17 +263,21 @@ int strnicmp __PROTO((char *, char *, int));
 # define gp_nfds_t SELECT_ARGTYPE_1
 #else
 # define gp_nfds_t int
-#endif
+#endif /* 1 */
 #ifdef SELECT_ARGTYPE_234
 # define gp_fd_set_p SELECT_ARGTYPE_234
 #else
-# define gp_fd_set_p (int *)
-#endif
+# ifndef __EMX__
+#  define gp_fd_set_p (int *)
+# else
+#  define gp_fd_set_p (fd_set *)
+# endif
+#endif /* 234 */
 #ifdef SELECT_ARGTYPE_5
 # define gp_timeval_p SELECT_ARGTYPE_5
 #else
 # define gp_timeval_p (struct timeval *)
-#endif
+#endif /* 5 */
 
 #ifdef __WATCOMC__
 # include <direct.h>
