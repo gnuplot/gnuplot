@@ -7284,14 +7284,14 @@ points, thus it produces no artefacts.  Currently supported terminals are:
   Files:
     PostScript
     pslatex, pstex, epslatex
-    GIF
+    gif, png, jpeg
     Xfig
     tgif
     cgm
 
 @end example
 
-(You are welcome to implement the support for other terminals, e.g. png.)
+You are welcome to implement the support for other terminals.
 
 The pm3d algorithm fills the region between two neighbouring points in one 
 scan with another two points in the next scan by a gray (or color) according 

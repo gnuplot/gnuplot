@@ -249,6 +249,9 @@
 /* Define if you have the <zlib.h> header file.  */
 #undef HAVE_ZLIB_H
 
+/* Define if you have the gd library (-lgd).  */
+#undef HAVE_LIBGD
+
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
 
