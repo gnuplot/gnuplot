@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.3 1999/06/10 19:53:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.4 1999/06/11 11:18:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1222,8 +1222,11 @@ char *argv[];
 
     while (++Argv, --Argc > 0) {
 	if (!strcmp(*Argv, "-name") && Argc > 1) {
-	    safe_strncpy(Name, Argv[1], sizeof(Name));
-	    safe_strncpy(Class, Argv[1], sizeof(Class));
+	    strncpy(Name, Argv[1], sizeof(Name) - 1);
+	    strncpy(Class, Argv[1], sizeof(Class) - 1);
+	    /* just in case */
+	    Name[sizeof(Name)-1] = NUL;
+	    Class[sizeof(Class)-1] = NUL;
 	    if (Class[0] >= 'a' && Class[0] <= 'z')
 		Class[0] -= 0x20;
 	}
