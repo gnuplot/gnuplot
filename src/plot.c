@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.25 1999/10/29 18:51:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.26 1999/11/08 19:24:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -47,6 +47,11 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.25 1999/10/29 18:51:45 lhec
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+
+/* Used nowhere else */
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h>
+#endif
 
 #if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
 # include <io.h>
@@ -111,8 +116,6 @@ static void wrapper_for_write_history __PROTO((void));
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
 static TBOOLEAN noinputfiles = TRUE; /* FALSE if there are script files */
-
-/* HBB 990826: moved 2 globals back to misc.c */
 
 /* user home directory */
 static const char *user_homedir = NULL;
@@ -398,6 +401,33 @@ char **argv;
     else
 	noinputfiles = TRUE;
 
+    /* Need this before show_version is called for the first time */
+
+#ifdef HAVE_SYS_UTSNAME_H
+    {
+	struct utsname uts;
+
+	/* something is fundamentally wrong if this fails ... */
+	if (uname(&uts) > -1) {
+# ifdef _AIX
+	    strcpy(os_name, uts.sysname);
+	    sprintf(os_name, "%s.%s", uts.version, uts.release);
+# elif defined(SCO)
+	    strcpy(os_name, "SCO");
+	    strcpy(os_rel, uts.release);
+# else
+	    strcpy(os_name, uts.sysname);
+	    strcpy(os_rel, uts.release);
+# endif
+	}
+    }
+#else /* ! HAVE_SYS_UTSNAME_H */
+
+    strcpy(os_name, OS);
+    strcpy(os_rel, "");
+
+#endif /* HAVE_SYS_UTSNAME_H */
+
     if (interactive)
 	show_version(stderr);
 
@@ -521,8 +551,8 @@ char **argv;
 
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
-/* You should be here if you neither have 'atexit()' nor 'on_exit()' */
-    wrapper_for_write_history();
+    /* You should be here if you neither have 'atexit()' nor 'on_exit()' */
+    * wrapper_for_write_history();
 #endif /* !HAVE_ATEXIT && !HAVE_ON_EXIT */
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
 
@@ -689,7 +719,7 @@ char **pathp;
 	    size_t n = strlen(*pathp);
 
 	    *pathp = gp_realloc(*pathp, n + strlen(user_homedir), "tilde expansion");
-	    /* include null at end ... */
+	    /* include null at the end ... */
 	    memmove(*pathp + strlen(user_homedir) - 1, *pathp, n + 1);
 	    strncpy(*pathp, user_homedir, strlen(user_homedir));
 	} else
