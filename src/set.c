@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.124 2003/12/15 07:52:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.125 2003/12/22 05:13:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -147,7 +147,8 @@ static void set_allzeroaxis __PROTO((void));
 static void set_xyzlabel __PROTO((label_struct * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
-static void add_tic_user __PROTO((AXIS_INDEX, char * label, double position)); 
+static void add_tic_user __PROTO((AXIS_INDEX, char * label, double position,
+				  int level)); 
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
@@ -3874,7 +3875,7 @@ load_tics(axis)
 
 /* load TIC_USER definition */
 /* (tic[,tic]...)
- * where tic is ["string"] value
+ * where tic is ["string"] value [level]
  * Left paren is already scanned off before entry.
  */
 static void
@@ -3893,7 +3894,8 @@ load_tic_user(axis)
     axis_array[axis].ticdef.def.user = NULL;
 
     while (!END_OF_COMMAND) {
-	/* syntax is  (  ['format'] value[, ...] )
+      int ticlevel=0;
+	/* syntax is  (  ['format'] value [level] [, ...] )
 	 * but for timedata, the value itself is a string, which
 	 * complicates things somewhat
 	 */
@@ -3910,8 +3912,15 @@ load_tic_user(axis)
 	/* in any case get the value */
 	GET_NUM_OR_TIME(ticposition, axis);
 
+	if (!END_OF_COMMAND && 
+	    !equals(c_token, ",") && 
+	    !equals(c_token, ")")) {
+	  struct value value;
+	  ticlevel = (int) real(const_express(&value)); /* tic level */
+	}
+
 	/* add to list */
-	add_tic_user(axis, ticlabel, ticposition);
+	add_tic_user(axis, ticlabel, ticposition, ticlevel);
 
 	/* expect "," or ")" here */
 	if (!END_OF_COMMAND && equals(c_token, ","))
@@ -3933,10 +3942,11 @@ load_tic_user(axis)
  */
 /* HBB 20020911: added 'static' */
 static void
-add_tic_user(axis,label,position)
+add_tic_user(axis,label,position,level)
     AXIS_INDEX axis;
     double position;
     char *label;
+    int level;
 {
     struct ticmark *tic;		/* new ticmark */
 
@@ -3948,6 +3958,7 @@ add_tic_user(axis,label,position)
     } else
 	tic->label = NULL;
     tic->position = position;
+    tic->level = level;
 
     /* Insert this tic at head of tic list for this axis */
     tic->next = axis_array[axis].ticdef.def.user;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.36 2003/01/27 20:39:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.37 2003/11/13 08:37:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -563,12 +563,16 @@ quantize_normal_tics(arg, guide)
     /* order of magnitude of argument: */
     double power = dbl_raise(10.0, floor(log10(arg))); 
     double xnorm = arg / power;	/* approx number of decades */
+    /* we expect 1 <= xnorm <= 10 */
     double posns = guide / xnorm; /* approx number of tic posns per decade */
+    /* with guide=20, we expect 2 <= posns <= 20 */
     double tics;
 
     /* FIXME HBB 20020220: Looking at these, I would normally expect
      * to see posns*tics to be always about the same size. But we
      * rather suddenly drop from 2.0 to 1.0 at tic step 0.5. Why? */
+    /* JRV 20021117: fixed this by changing next to last threshold
+       from 1 to 2.  However, with guide=20, this doesn't matter. */
     if (posns > 40)
 	tics = 0.05;		/* eg 0, .05, .10, ... */
     else if (posns > 20)
@@ -577,7 +581,7 @@ quantize_normal_tics(arg, guide)
 	tics = 0.2;		/* eg 0,0.2,0.4,... */
     else if (posns > 4)
 	tics = 0.5;		/* 0,0.5,1, */
-    else if (posns > 1)
+    else if (posns > 2)
 	tics = 1;		/* 0,1,2,.... */
     else if (posns > 0.5)
 	tics = 2;		/* 0, 2, 4, 6 */
@@ -613,7 +617,7 @@ make_tics(axis, guide)
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */
     if (axis_array[axis].log && tic < 1.0)
-	tic = 1.0;
+	  tic = 1.0;
 
     if (axis_array[axis].is_timedata)
 	return quantize_time_tics(axis, tic, xr, guide);
@@ -889,11 +893,11 @@ gen_tics(axis, callback)
 		gstrftime(label, 24, mark->label ? mark->label : ticfmt[axis], mark->position);
 	    else
 		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log10_base, mark->position);
-
-	    (*callback) (axis, internal, label, lgrd);
+	    /* use NULL instead of label for minitic */
+	    (*callback) (axis, internal, mark->level?NULL:label, lgrd);
 	}
 
-	return;			/* NO MINITICS FOR USER-DEF TICS */
+	return;
 	/*}}} */
     }
 

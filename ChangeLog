@@ -1,3 +1,14 @@
+2003-12-26  Jim Van Zandt  <jrv@debian.org>
+
+	* src/set.c (load_tic_user): user tic definition can have 3rd
+	token specifying minitic 
+
+	* src/axis.h: ticmark.level specifies major or minitic
+
+	* src/axis.c (gen_tics): Request user-supplied minitics
+
+	* docs/gnuplot.doc: document user-supplied minitics
+
 2003-12-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c: Fix buffer overflow in conv_text() if the text contains

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.197 2003/12/16 10:04:36 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.198 2003/12/22 05:13:18 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -8049,7 +8049,7 @@ C ... and restart the table:
                  {  autofreq
                   | <incr>
                   | <start>, <incr> {,<end>}
-                  | ({"<label>"} <pos> {,{"<label>"} <pos>}...) }
+                  | ({"<label>"} <pos> {<level>} {,{"<label>"}...) }
                  { font "name{,<size>}" }
                  { textcolor <colorspec> }
        unset xtics
@@ -8103,22 +8103,28 @@ C ... and restart the table:
  Make tics at 1, 100, 1e4, 1e6, 1e8.
        set logscale x; set xtics 1,100,1e8
 
- The explicit ("<label>" <pos>, ...) form allows arbitrary tic positions or
- non-numeric tic labels.  A set of tics is a set of positions, each with its
- own optional label.  Note that the label is a string enclosed by quotes.  It
- may be a constant string, such as "hello", may contain formatting information
- for converting the position into its label, such as "%3f clients", or may be
- empty, "".  See `set format` for more information.  If no string is given,
- the default label (numerical) is used.  In this form, the tics do not need to
- be listed in numerical order.
+ The explicit ("<label>" <pos> <level>, ...) form allows arbitrary tic
+ positions or non-numeric tic labels.  In this form, the tics do not
+ need to be listed in numerical order.  Each tic has a 
+ position, optionally with a label.  Note that the label is
+ a string enclosed by quotes.  It may be a constant string, such as
+ "hello", may contain formatting information for converting the
+ position into its label, such as "%3f clients", or may be empty, "".
+ See `set format` for more information.  If no string is given, the
+ default label (numerical) is used.
+
+ An explicit tic mark has a third parameter, the "level".  The default
+ is level 0, a major tic.  A level of 1 generates a minor tic.  If the
+ level is specified, then the label must also be supplied.
 
  Examples:
        set xtics ("low" 0, "medium" 50, "high" 100)
        set xtics (1,2,4,8,16,32,64,128,256,512,1024)
        set ytics ("bottom" 0, "" 10, "top" 20)
+       set ytics ("bottom" 0, "" 10 1, "top" 20)
 
  In the second example, all tics are labelled.  In the third, only the end
- tics are labelled.
+ tics are labelled.  In the fourth, the unlabeled tic is a minor tic.
 
  However they are specified, tics will only be plotted when in range.
 

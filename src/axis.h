@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.32 2003/11/13 08:37:57 mikulik Exp $
+ * $Id: axis.h,v 1.33 2003/12/09 02:49:23 vanzandt Exp $
  *
  */
 
@@ -96,6 +96,7 @@ typedef enum en_ticseries_type {
 typedef struct ticmark {
     double position;		/* where on axis is this */
     char *label;		/* optional (format) string label */
+    int level;			/* 0=major tic, 1=minor tic */
     struct ticmark *next;	/* linked list */
 } ticmark;
 
