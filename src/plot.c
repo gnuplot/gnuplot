@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.10 1999/06/11 11:18:56 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.11 1999/06/11 18:54:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -419,7 +419,7 @@ char **argv;
 	    if (*s == DIRSEP1)
 		*s = DIRSEP2;	/* '\\' to '/' */
 	strcpy(strrchr(HelpFile, DIRSEP2), "/gnuplot.gih");
-    }				/* Add also some "paranoid" tests for '\\':  AP */
+    }			/* Add also some "paranoid" tests for '\\':  AP */
 #endif /* DJGPP */
 
 #ifdef VMS
