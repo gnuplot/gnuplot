@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epslatex.trm,v 1.29 2005/01/08 15:37:23 mikulik Exp $
+ * $Id: epslatex.trm,v 1.30 2005/01/08 16:09:00 mikulik Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -695,7 +695,7 @@ Gpdict begin\n\
 	}
     }
 
-    fputs("%%!PS-Adobe-3.0 EPSF-3.0\n", gpoutfile);
+    fputs("%!PS-Adobe-3.0 EPSF-3.0\n", gpoutfile);
     if (outstr)
 	fprintf(gpoutfile, "%%%%Title: (%s)\n", outstr);
     time(&now);
@@ -713,7 +713,7 @@ Gpdict begin\n\
     for (i = 0; EPSL_header[i] != NULL; i++)
 	fprintf(gpoutfile, "%s", EPSL_header[i]);
 
-    fputs("end\n%%%%EndProlog\n", gpoutfile);
+    fputs("end\n%%EndProlog\n", gpoutfile);
 
 
     if (outstr && !EPSL_texfile) {
@@ -779,7 +779,7 @@ TERM_PUBLIC void
 EPSL_text()
 {
     EPSL_FLUSH_PATH;
-    fputs("grestore\nend\nshowpage\n%%%%EOF\n", gpoutfile);
+    fputs("grestore\nend\nshowpage\n%%EOF\n", gpoutfile);
     if (EPSL_texfile) {
 	fputs("\\end{picture}%\n\\endgroup\n\\endinput\n", EPSL_texfile);
     }
