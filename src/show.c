@@ -1507,13 +1507,13 @@ FILE *fp;
 	/* No hash mark - let p point to the trailing '\0' */
 	p += sizeof(prefix) - 1;
     } else {
-#ifdef GNUPLOT_BINDIR
+#ifdef BINDIR
 # ifdef X11
-	fprintf(fp, "#!%s/gnuplot -persist\n#\n", GNUPLOT_BINDIR);
+	fprintf(fp, "#!%s/gnuplot -persist\n#\n", BINDIR);
 #  else
-	fprintf(fp, "#!%s/gnuplot\n#\n", GNUPLOT_BINDIR);
+	fprintf(fp, "#!%s/gnuplot\n#\n", BINDIR);
 # endif				/* not X11 */
-#endif /* GNUPLOT_BINDIR */
+#endif /* BINDIR */
     }
     fprintf(fp, "%s\n\
 %s\t%s\n\

@@ -813,7 +813,7 @@ command.o: command.c binary.h fit.h plot.h
 	$(CC) $(CFLAGS) -c command.c -DHELPFILE=\"$(HELPDEST)/gnuplot.gih\"
 
 show.o: show.c plot.h setshow.h
-	$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(DEST)\" -c $<
+	$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(DEST)\" -c $<
 
 
 command.o help.o misc.o parse.o: help.h

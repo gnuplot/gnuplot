@@ -79,7 +79,7 @@ ways:
    gnuplot will be installed as /gnuplot/bin/gnuplot.
 
  o at make time, eg.
-   make GNUPLOT_BINDIR='/gnuplot/bin'
+   make BINDIR='/gnuplot/bin'
    gnuplot will be installed as /gnuplot/bin/gnuplot.
 
    If the executables are not installed in the default location, files

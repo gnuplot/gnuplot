@@ -84,7 +84,7 @@ wgnuplot_res.o :  win/wgnuplot.rc win/wgnuplib.rc win/wresourc.h texticon.ico gr
 	$(RC) -i win/wgnuplot.rc -o wgnuplot_res.o $(RCFLAGS)
 
 show.o: show.c plot.h setshow.h
-	$(CC) -c $(WINCFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
+	$(CC) -c $(WINCFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(WINCFLAGS) $(TERMFLAGS) term.c

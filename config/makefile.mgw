@@ -127,7 +127,7 @@ wgplt_res.o :  win/wgnuplot.rc win/wgnuplib.rc win/wresourc.h texticon.ico grpic
 	$(RES2COFF)
 
 show.o: show.c plot.h setshow.h
-	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
+	$(CC) -c $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
 
 term.$(O): term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) -c $(CFLAGS) $(TERMFLAGS) term.c
