@@ -7,6 +7,9 @@ EMAIL = bug-gnuplot@dartmouth.edu
 # Default help file location
 HELPFILE=$(datadir)/gnuplot.gih
 
+# Default X11 driver location
+X11_DRIVER_DIR=$(pkglibdir)/$(PKG_MAJOR)
+
 # There is probably no need to edit anything below this line
 
 CLEANFILES = getcolor_x11.c
@@ -17,7 +20,7 @@ bin_PROGRAMS = gnuplot
 noinst_PROGRAMS = bf_test $(GNUPLOT_X11)
 
 XLIBS = @LIBRARIES_FOR_X@
-AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(pkglibdir)/$(PKG_MAJOR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
+AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
