@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.13 1999/06/11 18:53:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.14 1999/06/14 19:19:46 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -39,8 +39,8 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.13 1999/06/11 18:53:16 lhec
 
 extern int key_vpos, key_hpos, key_just;
 
-static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, char *text));
-static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef * tdef, TBOOLEAN rotate, char *text));
+static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, const char *text));
+static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef * tdef, TBOOLEAN rotate, const char *text));
 static void save_position __PROTO((FILE * fp, struct position * pos));
 static void save_functions__sub __PROTO((FILE * fp));
 static void save_variables__sub __PROTO((FILE * fp));
@@ -963,7 +963,7 @@ int where;
 int axis;
 struct ticdef *tdef;
 TBOOLEAN rotate;
-char *text;
+const char *text;
 {
     char str[MAX_LINE_LEN + 1];
 
@@ -1145,9 +1145,9 @@ TBOOLEAN can_do_args;
 		if (can_do_args) {
 		    register int il = 0;
 		    register char *rl;
-		    char *raw_line = rl = gp_alloc((unsigned long) strlen(input_line) + 1, "string");
+		    char *raw_line = gp_strdup(input_line);
 
-		    strcpy(raw_line, input_line);
+		    rl = raw_line;
 		    *input_line = '\0';
 		    while (*rl) {
 			register int aix;
@@ -1477,7 +1477,7 @@ FILE *fp;
 int axis;
 double min, max;
 TBOOLEAN autosc;
-char *text;
+const char *text;
 {
     int i;
 
