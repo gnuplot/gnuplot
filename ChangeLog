@@ -1,3 +1,24 @@
+1999-02-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c, fit.h, matrix.c, matrix.h: Change of copyright status.
+	See files for details.
+
+	* version.c: Copyright date.
+
+1999-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* interpol.c: Recode eval_bezier to compute in 'logarithmic space'
+	to avoid numerical under/overflow for large datafiles.
+
+	* win/wgnuplib.h, win/wgraph.c: Fix feature where point symbols would
+	be drawn in another colour than the corresponing sample lines on the
+	"test" page if the width of linestyle 1 was changed.
+
+1999-02-14  "Pepin, Joseph D (Joe), GOVMK"  <joepepin@att.com>
+
+	* term/x11.trm: Patch to exit the bin/sh process after it has parsed
+	the command line.
+
 1999-02-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acconfig.h, configure.in, gplt_x11.c, stdfn.h, m4/select.m4:
@@ -10,7 +31,11 @@
 	* term.h: Reintroduce long-lost EEPIC define. Spotted by
 	Aaron Naiman <naiman@gematria.jct.ac.il>
 
+	* term/latex.trm: Function prototypes if EEPIC is defined.
+
 1999-02-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* command.c, plot.c: REXX interface on OS/2 related changes.
 
 	* makefile.os2: Patch, fixes.
 
@@ -23,7 +48,7 @@
 	* docs/gnuplot.doc: Adds a few specific comments to the effect that
 	commands pertaining to the x2 and y2 axes are not applicable to
 	"splot"s.
- 
+   
 1999-02-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all, docs/Makefile.in: Add and use fixinfo.el
