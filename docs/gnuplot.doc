@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.78 2001/09/08 00:50:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.79 2001/09/19 09:53:20 amai Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -7649,8 +7649,23 @@ C  The `lines` style connects adjacent points with straight line segments.
 ^<a href="ftp://ftp.ee.gatech.edu/pub/mac/gnuplot">
         ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
 ^</a>
- and several X11 interfaces include three Tcl/Tk located at the usual Tcl/Tk
- repositories.
+ 
+ 
+ Also several X11 interfaces exist.
+ One of them is called xgfe (
+^<a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
+ http://www.flash.net/~dmishee/xgfe/xgfe.html </a> ) 
+ which uses the Qt library.
+ In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
+ 
+ Bruce Ravel (ravel@phys.washington.edu) has written a new version of
+ gnuplot-mode for GNU emacs and XEmacs. This version is based on
+ the gnuplot.el file by Gershon Elber.
+ While the gnuplot CVS repository has its own copy the most recent
+ version of this package is available from
+^ <a href="http://feff.phys.washington.edu/~ravel/gnuplot/">http://feff.phys.washington.edu/~ravel/gnuplot </a>
+
+ 
 1 Bugs
 ?bugs
  Floating point exceptions (floating point number too large/small, divide by
@@ -7671,7 +7686,6 @@ C  The `lines` style connects adjacent points with straight line segments.
 
  Bugs reported since the current release as well as older ones
  may be located via the official distribution site:
-^ <a href="ftp://ftp.gnuplot.org">ftp://ftp.gnuplot.org </a>
 
 ^ <a href="http://www.gnuplot.org">http://www.gnuplot.org </a>
 

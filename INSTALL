@@ -653,20 +653,3 @@ gnuplot> test
 
    `test` creates a display of line and point styles and other useful things
 appropriate for the terminal you are using.
-
-Front Ends for gnuplot
-======================
-
- o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
-   http://von-mises.home.ml.org/xgfe/xgfe.html
-   To compile from source, you need Qt library from
-   http://www.troll.no/.
-
- o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
-   gnuplot-mode for GNU emacs and XEmacs. This version is based on
-   the gnuplot.el file by Gershon Elber which is included with this
-   distribution. The package is available from
-   http://feff.phys.washington.edu/~ravel/gnuplot/.
-   Future distributions of gnuplot will hopefully include Bruce's
-   version.
-

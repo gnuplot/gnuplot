@@ -1,7 +1,7 @@
 2001-09-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* docs/gnuplot.doc: Fix old URLs (use gnuplot.org now);
-	add hyperlinks
+	* INSTALL docs/gnuplot.doc: Fix old URLs (use gnuplot.org now);
+	add hyperlinks. Move pointers to frontends for gnuplot
 
 	* configure configure.in docs/Makefile.in: Let configure 
 	check for even more utils which we use. Always check for emacs
