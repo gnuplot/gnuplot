@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.31 2002/08/14 18:43:42 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.32 2003/05/11 00:29:10 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -77,18 +77,6 @@ LineCompleteHandler(char* ptr)
     line_complete = 1;
 }
 
-#if defined (SIGWINCH) && defined(PIPE_IPC) && defined(HAVE_LIBREADLINE)
-static RETSIGTYPE gnuplot_sigwinch_handler __PROTO((int sig));
-
-static RETSIGTYPE
-gnuplot_sigwinch_handler(sig)
-    int sig;
-{
-    (void)signal(SIGWINCH, (sigfunc)gnuplot_sigwinch_handler);
-    rl_resize_terminal();
-}
-#endif  /* SIGWINCH && PIPE_IPC && HAVE_LIBREADLINE */
-
 static int
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 {
@@ -116,15 +104,6 @@ readline_ipc(const char* prompt)
      * this requires rl_library_version > 2.2
      * TODO: make a check in configure.in */
 
-#   if defined(SIGWINCH)
-    /* For some strange reason readline's internal sigwinch handler will
-     * stuff -1 (EOF) into the input stream. This will finish gnuplot
-     * immediatly as reported by <martin_horvat@users.sourceforge.net>.
-     * Installing an own signal handler solves the problem, although I
-     * don't understand why. 04 Jun 2002 (joze) */
-    rl_catch_sigwinch = 0; /* inhibit readline's internal sigwinch handler */
-    (void)signal(SIGWINCH, (sigfunc)gnuplot_sigwinch_handler);
-#   endif
     rl_callback_handler_install((char*) prompt, LineCompleteHandler);
     rl_getc_function = getc_wrapper;
 
