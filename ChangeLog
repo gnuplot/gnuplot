@@ -1,3 +1,24 @@
+1998-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/amiga.trm, term/post.trm: Indentation.
+
+	* term/x11.trm: Fix VMS include statement.
+
+1998-12-17  Andris Pavenis  <pavenis@lanet.lv>
+
+	* syscfg.h: Undef HELPFILE for MSDOS before #define'ing it.
+
+1998-12-17  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* term/djsvga.trm: Resolve conflict between user defined screen text
+	mode, and the default text mode.
+
+1998-12-17  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* os2/gclient.c, os2/print.c: Patches from Robert Lalla that fix 
+	paint problems if full window drag is enabled, and crash if printing
+	to non-existing printer queue.
+
 1998-12-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure: Regenerated.
