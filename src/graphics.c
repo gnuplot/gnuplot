@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.60 2002/01/06 16:31:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.61 2002/01/22 15:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1721,7 +1721,7 @@ struct curve_points *plot;
 #ifdef PM3D
 
 /* finalize and draw the filled curve */
-void
+static void
 finish_filled_curve(points, corners, filledcurves_options)
 int points;
 gpiPoint *corners;
