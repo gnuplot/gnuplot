@@ -51,26 +51,28 @@ LDFLAGS = @LDFLAGS@
 COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
+# This stuff is obsolete now. Use the appropriate configure options!
+#
 # Additional devices you can add.
 # -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
 # -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
 # -DCGI         SCO CGI
-# -DIRIS4D      IRIS4D series computer
+# -DIRIS        IRIS4D series computer
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
 # -DUNIXPLOT    unixplot
 # -DGNUGRAPH    use GNU graphics version of UNIX plot library
 #               This can only be used in combination with -DUNIXPLOT
-TERMFLAGS = @TERMFLAGS@
+# TERMFLAGS = @TERMFLAGS@
 
 #  -lplot if you have -DUNIXPLOT in TERMFLAGS
 #  -lsuntool -lsunwindow -lpixrect  if you have -DSUN in TERMFLAGS
-#  -lgl_s if -DIRIS4D in TERMFLAGS
+#  -lgl_s if -DIRIS in TERMFLAGS
 #  -lccgi if -DCGI in TERMFLAGS
 #  -lvga if -DLINUXVGA in TERMFLAGS
-#  -L/usr/somewhere/gd -lgd  if gif driver used
 TERMLIBS = @TERMLIBS@
+TERMXLIBS = @TERMXLIBS@
 
 LIBS = @LIBS@
 XLIBS = @X_LIBRARIES@
@@ -369,7 +371,7 @@ uninstall:
 	$(COMPILE) -c $<
 
 gnuplot: $(OBJS) version.o
-	$(LINK) $(OBJS) version.o $(TERMLIBS) $(LIBS)
+	$(LINK) $(OBJS) version.o $(TERMLIBS) $(TERMXLIBS) $(LIBS)
 
 gnuplot_x11: gplt_x11.o
 	$(LINK) gplt_x11.o $(XLIBS) $(LIBS)
@@ -393,14 +395,11 @@ errorfix: $(srcdir)/errorfix.sh
 command.o: command.c fit.h help.h setshow.h
 	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
 
-misc.o:misc.c plot.h setshow.h
-	$(COMPILE) -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
-
 show.o: show.c plot.h setshow.h
 	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
 
 term.o: term.c term.h $(CORETERM)
-	$(COMPILE) $(TERMFLAGS) -I./term -I$(top_srcdir)/term -c $<
+	$(COMPILE) -I./term -I$(top_srcdir)/term -c $<
 
 version.o: version.c
 	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
@@ -420,14 +419,12 @@ $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= \
-	  CPPFLAGS="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
 	  $(SHELL) ./config.status
 
 $(ACLOCAL_M4): configure.in
 	cd $(srcdir) && $(ACLOCAL)
 
 config.status: $(srcdir)/configure
-	CPPFLAGS="@CPPFLAGS@" TERMLIBS="@TERMLIBS@" \
 	$(SHELL) ./config.status --recheck
 
 $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
@@ -440,7 +437,7 @@ stamp-h: $(top_builddir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	   $(SHELL) ./config.status
 	@echo timestamp > stamp-h
 
-$(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
+$(top_builddir)/$(CONFIG_HEADER_IN): stamp-h.in
 $(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG)
 	cd $(top_srcdir) && $(AUTOHEADER)
 	@echo timestamp > $(srcdir)/stamp-h.in
