@@ -224,14 +224,15 @@ OS/2
 ----
 
 To compile under OS/2 (2.x and above) you need the development
-suite EMX 0.9 (including a gcc port). To build you should also
-have NMake (version 4.xx) and IPFC (Information Presentation
-Facility Compiler), both available from the Developer's Toolkit
-(nowadays they are accessible through IBM's website).
+suite EMX 0.9 (including gcc). To build the complete set
+of files you should also have GNUMake and IPFC (Information Presentation
+Facility Compiler (available from the Developer's Toolkit; nowadays it's
+accessible through IBM's website for free).
 
-    nmake -f makefile.os2
-will show you all options which the makefile.os2 understands.
-You can choose between different compiling options and specify
+    make -f makefile.os2
+
+will show you all options which the makefile.os2 can handle.
+You may choose between different compiling options and specify
 some additional terminals to include. You can create a version offering
 PM graphics as well as a X11 version (to use with XFree86 for OS/2).
 
