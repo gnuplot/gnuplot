@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.92 2004/07/03 06:08:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.93 2004/07/05 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -158,7 +158,7 @@ static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, 
 #endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
-static void get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned int*, unsigned int*, unsigned int*));
+static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned int*, unsigned int*, unsigned int*));
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
@@ -440,13 +440,20 @@ boundary3d(struct surface_points *plots, int count)
     }
 }
 
-static void
+static TBOOLEAN
 get_arrow3d(
     struct arrow_def* arrow,
     unsigned int* sx, unsigned int* sy,
     unsigned int* ex, unsigned int* ey)
 {
     map3d_position(&(arrow->start), sx, sy, "arrow");
+
+    /* EAM  FIXME - This should really be a general test for out-of-bounds */
+    /* but at least we can catch the sometimes fatal case of negative ints */
+    /* wrapping around to huge positive unsigned ints.                     */
+    if (*sx > 0x7fffffff || *sy > 0x7fffffff)
+	return FALSE;
+
     if (arrow->relative) {
 	if (arrow->start.scalex == arrow->end.scalex &&
 	    arrow->start.scaley == arrow->end.scaley &&
@@ -467,6 +474,8 @@ get_arrow3d(
     } else {
 	map3d_position(&(arrow->end), ex, ey, "arrow");
     }
+
+    return TRUE;
 }
 
 static void
@@ -489,6 +498,14 @@ place_labels3d(struct text_label *listhead, int layer)
 	if (this_label->layer != layer)
 	    continue;
 	map3d_position(&this_label->place, &x, &y, "label");
+
+	/* EAM  FIXME - This should really be a general test for out-of-bounds */
+	/* but at least we can catch the sometimes fatal case of negative ints */
+	/* wrapping around to huge positive unsigned ints.                     */
+	if (x > 0x7fffffff || y > 0x7fffffff) {
+	    FPRINTF((stderr,"place_labels3d: skipping out-of-bounds label\n"));
+	    continue;
+	}
 
 	apply_textcolor(&(this_label->textcolor),t);
 
@@ -522,10 +539,13 @@ place_arrows3d(int layer)
 
 	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
-	get_arrow3d(this_arrow, &sx, &sy, &ex, &ey);
-	term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
-	apply_head_properties(&(this_arrow->arrow_properties));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	if (get_arrow3d(this_arrow, &sx, &sy, &ex, &ey)) {
+	    term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
+	    apply_head_properties(&(this_arrow->arrow_properties));
+	    (*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
+	} else {
+	    FPRINTF((stderr,"place_arrows3d: skipping out-of-bounds arrow\n"));
+	}
     }
 }
 

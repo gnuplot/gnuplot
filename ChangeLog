@@ -1,5 +1,14 @@
 2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/graph3d.c (place_labels3d place_arrows3d get_arrow3d): Test for
+	wrap-around of negative coordinates when converted to unsigned screen
+	coordinates by map3d_position. If wrap-around has occurred, then skip
+	this label or arrow when drawing the 3D plot. This really should be a
+	general test for out-of-bounds, but the simple test at least catches
+	some potentially fatal errors that have already happened.
+
+2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
+
 	* configure.in: --enable-histograms
 
 	* demo/histograms.dem demo/histograms2.dem demo/immigration.dat:
