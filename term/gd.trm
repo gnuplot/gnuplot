@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.4 2002/06/05 20:23:43 joze Exp $
+ * $Id: gd.trm,v 1.5 2002/06/07 22:52:37 joze Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -382,8 +382,8 @@ PNG_Triangle(x, y, direction, draw_func)
     int direction;
     void (*draw_func)(gdImagePtr, gdPointPtr, int, int);
 {
-    int delta  = rint(1.33 * (double)PNG_ps);
-    int delta_ = rint(0.67 * (double)PNG_ps);
+    int delta  = (int)((1.33 * (double)PNG_ps) + 0.5);
+    int delta_ = (int)((0.67 * (double)PNG_ps) + 0.5);
     gdPoint points[4];
     points[0].x = x;
     points[0].y = y - direction * delta;
@@ -1175,7 +1175,7 @@ TERM_PUBLIC void
 PNG_pointsize(ptsize)
     double ptsize;
 {
-    PNG_ps = rint((double)PNG_POINT_SCALE * ptsize);
+    PNG_ps = (int)(((double)PNG_POINT_SCALE * ptsize) + 0.5);
 }
 
 #endif /* TERM_BODY */

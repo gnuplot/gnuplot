@@ -1,3 +1,7 @@
+2002-06-09  Johannes Zellner  <johannes@zellner.org>
+
+	* term/gd.trm: replaced (int)rint(x) --> (int)(x + 0.5)
+
 2002-06-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/README src/color.c: Routine  void set_color(double gray)  which
@@ -613,7 +617,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/08 16:16:49 $).
+	last modification date (from the tag $Date: 2002/06/08 19:40:46 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
