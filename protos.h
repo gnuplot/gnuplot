@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.13.2.2 1999/10/01 10:37:23 lhecking Exp $
+ * $Id: protos.h,v 1.13.2.3 1999/12/09 18:42:41 lhecking Exp $
  *
  */
 
@@ -334,5 +334,13 @@ int clip_point __PROTO((unsigned int x, unsigned int y));
 void clip_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 void clip_put_text_just __PROTO((unsigned int x, unsigned int y, char *str, enum JUSTIFY just));
 
-#include "alloc.h"
 
+/* Prototypes from file "set.c" */
+
+double get_writeback_min __PROTO((int axis));
+double get_writeback_max __PROTO((int axis));
+void set_writeback_min __PROTO((int axis, double val));
+void set_writeback_max __PROTO((int axis, double val));
+
+
+#include "alloc.h"

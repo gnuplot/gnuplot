@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21.2.2 1999/11/18 20:42:53 lhecking Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.3 1999/12/09 18:43:40 lhecking Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -185,6 +185,9 @@ double x2min = -10.0;
 double x2max = 10.0;
 double y2min = -10.0;
 double y2max = 10.0;
+/* ULIG                  from plot.h:    z      y      x      t     z2     y2     x2     r     u     v  */
+double writeback_min[AXIS_ARRAY_SIZE] = {-10.0, -10.0, -10.0, -5.0, -10.0, -10.0, -10.0, -0.0, -5.0, -5.0};
+double writeback_max[AXIS_ARRAY_SIZE] = {+10.0, +10.0, +10.0, +5.0, +10.0, +10.0, +10.0, 10.0, +5.0, +5.0};
 double loff = 0.0;
 double roff = 0.0;
 double toff = 0.0;
@@ -502,6 +505,26 @@ void reset_command()
     x2max = 10.0;
     y2min = -10.0;
     y2max = 10.0;
+    writeback_min[FIRST_Z_AXIS] = zmin; /* ULIG */
+    writeback_max[FIRST_Z_AXIS] = zmax;
+    writeback_min[FIRST_Y_AXIS] = ymin;
+    writeback_max[FIRST_Y_AXIS] = ymax;
+    writeback_min[FIRST_X_AXIS] = xmin;
+    writeback_max[FIRST_X_AXIS] = xmax;
+    writeback_min[SECOND_Z_AXIS] = zmin; /* no z2min (see plot.h) */
+    writeback_max[SECOND_Z_AXIS] = zmax; /* no z2max */
+    writeback_min[SECOND_Y_AXIS] = y2min;
+    writeback_max[SECOND_Y_AXIS] = y2max;
+    writeback_min[SECOND_X_AXIS] = x2min;
+    writeback_max[SECOND_X_AXIS] = x2max;
+    writeback_min[T_AXIS] = tmin;
+    writeback_max[T_AXIS] = tmax;
+    writeback_min[R_AXIS] = rmin;
+    writeback_max[R_AXIS] = rmax;
+    writeback_min[U_AXIS] = umin;
+    writeback_max[U_AXIS] = umax;
+    writeback_min[V_AXIS] = vmin;
+    writeback_max[V_AXIS] = vmax;
     memset(range_flags, 0, sizeof(range_flags));	/* all = 0 */
 
     loff = 0.0;
@@ -1919,19 +1942,26 @@ set_three()
 /* to save replicated code, define a macro */
 #define PROCESS_RANGE(AXIS,STRING, MIN, MAX, AUTO) \
 else if (almost_equals(c_token, STRING)) { \
- if (!equals(++c_token,"[")) int_error("expecting '['",c_token); \
- c_token++; \
- AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
- if (!equals(c_token,"]")) int_error("expecting ']'",c_token); \
- c_token++; \
- if (almost_equals(c_token, "rev$erse")) { \
-   ++c_token; range_flags[AXIS] |= RANGE_REVERSE;\
- } else if (almost_equals(c_token, "norev$erse")) { \
-   ++c_token; range_flags[AXIS] &= ~RANGE_REVERSE;\
- } if (almost_equals(c_token, "wr$iteback")) { \
-   ++c_token; range_flags[AXIS] |= RANGE_WRITEBACK;\
- } else if (almost_equals(c_token, "nowri$teback")) { \
-   ++c_token; range_flags[AXIS] &= ~RANGE_WRITEBACK;\
+  if(almost_equals(++c_token,"re$store")) { /* ULIG */ \
+    c_token++; \
+    MIN = get_writeback_min(AXIS); \
+    MAX = get_writeback_max(AXIS); \
+    AUTO = 0; \
+  } else { \
+    if (!equals(c_token,"[")) int_error("expecting '[' or 'restore'",c_token); \
+    c_token++; \
+    AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
+    if (!equals(c_token,"]")) int_error("expecting ']'",c_token); \
+    c_token++; \
+    if (almost_equals(c_token, "rev$erse")) { \
+      ++c_token; range_flags[AXIS] |= RANGE_REVERSE;\
+    } else if (almost_equals(c_token, "norev$erse")) { \
+      ++c_token; range_flags[AXIS] &= ~RANGE_REVERSE;\
+    } if (almost_equals(c_token, "wr$iteback")) { \
+      ++c_token; range_flags[AXIS] |= RANGE_WRITEBACK;\
+    } else if (almost_equals(c_token, "nowri$teback")) { \
+      ++c_token; range_flags[AXIS] &= ~RANGE_WRITEBACK;\
+  } \
 }}
 
     PROCESS_RANGE(R_AXIS, "rr$ange", rmin, rmax, autoscale_r)
@@ -3006,6 +3036,10 @@ TBOOLEAN autosc;
 	if (equals(c_token, "*")) {
 	    autosc |= 1;
 	    c_token++;
+        } else if (equals(c_token, "?")) { /* ULIG */
+            *a = get_writeback_min(axis);
+            autosc &= 2;
+            c_token++;
 	} else {
 	    GET_NUM_OR_TIME(*a, axis);
 	    autosc &= 2;
@@ -3018,6 +3052,10 @@ TBOOLEAN autosc;
 	if (equals(c_token, "*")) {
 	    autosc |= 2;
 	    c_token++;
+        } else if (equals(c_token, "?")) { /* ULIG */
+            *b = get_writeback_max(axis);
+            autosc &= 1;
+            c_token++;
 	} else {
 	    GET_NUM_OR_TIME(*b, axis);
 	    autosc &= 1;
@@ -3174,4 +3212,85 @@ char *lcl;
 #else
     safe_strncpy(cur_locale, lcl, sizeof(cur_locale));
 #endif /* NO_LOCALE_H */
+}
+
+
+/*
+ * get and set routines for range writeback
+ * ULIG *
+ */
+
+double rm_log(int axis, double val);
+
+
+double get_writeback_min(axis)
+int axis;
+{
+  /* printf("get min(%d)=%g\n",axis,writeback_min[axis]); */
+  return writeback_min[axis];
+}
+
+double get_writeback_max(axis)
+int axis;
+{
+  /* printf("get max(%d)=%g\n",axis,writeback_min[axis]); */
+  return writeback_max[axis];
+}
+
+
+void set_writeback_min(axis, val)
+int axis;
+double val;
+{
+  val = rm_log(axis,val);
+  /* printf("set min(%d)=%g\n",axis,val); */
+  writeback_min[axis] = val;
+}
+
+void set_writeback_max(axis, val)
+int axis;
+double val;
+{
+  val = rm_log(axis,val);
+  /* printf("set max(%d)=%g\n",axis,val); */
+  writeback_max[axis] = val;
+}
+
+double rm_log(axis, val)
+int axis;
+double val;
+{
+  TBOOLEAN islog;
+  double logbase;
+
+  /* check whether value is in logscale */
+  switch( axis ) {
+  case FIRST_X_AXIS:
+    logbase = base_log_x;
+    islog = is_log_x;
+    break;
+  case FIRST_Y_AXIS:
+    logbase = base_log_y;
+    islog = is_log_y;
+    break;
+  case FIRST_Z_AXIS:
+    logbase = base_log_z;
+    islog = is_log_z;
+    break;
+  case SECOND_X_AXIS:
+    logbase = base_log_x2;
+    islog = is_log_x2;
+    break;
+  case SECOND_Y_AXIS:
+    logbase = base_log_y2;
+    islog = is_log_y2;
+    break;
+  default:
+    islog = FALSE;
+  }
+  
+  if( ! islog ) return val;
+
+  /* remove logscale from value */
+  return pow(logbase,val);
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.6 1999/11/18 20:42:15 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.7 1999/12/17 21:04:04 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1296,17 +1296,6 @@ do{ assert(!polar && !parametric); \
 	    max_array[FIRST_Y_AXIS] = max_array[SECOND_Y_AXIS];
     }
 
-#define WRITEBACK(axis,min,max) \
-if(range_flags[axis]&RANGE_WRITEBACK) \
-  {if (auto_array[axis]&1) min = min_array[axis]; \
-   if (auto_array[axis]&2) max = max_array[axis]; \
-  }
-
-    WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
-
     if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
     else {
@@ -1316,6 +1305,27 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	do_plot(first_plot, plot_num);
 
 	END_LEAK_CHECK();
+
+        /* after do_plot(), min_array[] and max_array[]
+           contain the plotting range actually used (rounded
+           to tic marks, not only the min/max data values)
+           --> save them now for writeback if requested */
+
+#define SAVE_WRITEBACK(axis) /* ULIG */ \
+  if(range_flags[axis]&RANGE_WRITEBACK) { \
+    set_writeback_min(axis,min_array[axis]); \
+    set_writeback_max(axis,max_array[axis]); \
+  }
+        SAVE_WRITEBACK(FIRST_X_AXIS) 
+        SAVE_WRITEBACK(FIRST_Y_AXIS) 
+        SAVE_WRITEBACK(FIRST_Z_AXIS)
+        SAVE_WRITEBACK(SECOND_X_AXIS)
+        SAVE_WRITEBACK(SECOND_Y_AXIS)
+        SAVE_WRITEBACK(SECOND_Z_AXIS)
+        SAVE_WRITEBACK(T_AXIS)
+        SAVE_WRITEBACK(R_AXIS)
+        SAVE_WRITEBACK(U_AXIS)
+        SAVE_WRITEBACK(V_AXIS)
     }
 
     /* if we get here, all went well, so record this line for replot */

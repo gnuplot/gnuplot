@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot3d.c,v 1.16.2.1 1999/11/17 19:55:44 lhecking Exp $";
+static char *RCSid = "$Id: plot3d.c,v 1.16.2.2 1999/11/18 20:42:25 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1456,7 +1456,28 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
     else {
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */
 	do_3dplot(first_3dplot, plot_num);
-	END_LEAK_CHECK();
+        END_LEAK_CHECK();
+
+        /* after do_3dplot(), min_array[] and max_array[]
+           contain the plotting range actually used (rounded
+           to tic marks, not only the min/max data values)
+           --> save them now for writeback if requested */
+
+#define SAVE_WRITEBACK(axis) \
+  if(range_flags[axis]&RANGE_WRITEBACK) { \
+    set_writeback_min(axis,min_array[axis]); \
+    set_writeback_max(axis,max_array[axis]); \
+  }
+        SAVE_WRITEBACK(FIRST_X_AXIS) 
+        SAVE_WRITEBACK(FIRST_Y_AXIS) 
+        SAVE_WRITEBACK(FIRST_Z_AXIS) 
+        SAVE_WRITEBACK(SECOND_X_AXIS)
+        SAVE_WRITEBACK(SECOND_Y_AXIS)
+        SAVE_WRITEBACK(SECOND_Z_AXIS)
+        SAVE_WRITEBACK(T_AXIS)
+        SAVE_WRITEBACK(R_AXIS)
+        SAVE_WRITEBACK(U_AXIS)
+        SAVE_WRITEBACK(V_AXIS)
     }
 
     /* if we get here, all went well, so record the line for replot */

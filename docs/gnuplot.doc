@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.20.2.3 1999/10/27 10:10:16 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.20.2.4 1999/12/09 18:42:41 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -215,7 +215,8 @@ C
 
  14. The `call` command: `load` with arguments.
 
- 15. More flexible `range` commands with `reverse` and `writeback` keywords.
+ 15. More flexible `range` commands with `reverse`, `writeback` and 'restore'
+ keywords.
 
  16. `set encoding` for multi-lingual encoding.
 
@@ -5219,8 +5220,8 @@ C ... and restart the table:
  it requires four columns of data.  It also draws a small arrowhead at the
  end of the vector.
 
- The `vector` style is still experimental: it doesn't get clipped properly
- and other things may also be wrong with it.  Use it at your own risk.
+ `set clip one` and `set clip two` affect drawing vectors.
+ Please see `set clip`.
 4 xerrorbars
 ?commands set style xerrorbars
 ?set style xerrorbars
@@ -5826,13 +5827,16 @@ C ... and restart the table:
 ?commands show xrange
 ?set xrange
 ?show xrange
+?writeback
+?restore
 ?xrange
  The `set xrange` command sets the horizontal range that will be displayed.
  A similar command exists for each of the other axes, as well as for the
  polar radius r and the parametric variables t, u, and v.
 
  Syntax:
-       set xrange [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback}
+       set xrange { [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback} }
+                  | restore
        show xrange
 
  where <min> and <max> terms are constants, expressions or an asterisk to set
@@ -5852,12 +5856,13 @@ C ... and restart the table:
  the buffers that would be filled by `set xrange`.  This is useful if you wish
  to plot several functions together but have the range determined by only
  some of them.  The `writeback` operation is performed during the `plot`
- execution, so it must be specified before that command.  For example,
+ execution, so it must be specified before that command.  To restore
+ the last saved horizontal range use `set xrange restore`. For example,
 
        set xrange [-10:10]
        set yrange [] writeback
        plot sin(x)
-       set noautoscale y
+       set yrange restore
        replot x/2
 
  results in a yrange of [-1:1] as found only from the range of sin(x); the
