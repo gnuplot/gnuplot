@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.115 2003/04/29 07:04:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.116 2003/05/17 05:59:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1294,6 +1294,7 @@ set_format()
 static void
 set_grid()
 {
+    TBOOLEAN explicit_change = FALSE;
     c_token++;
 #define	GRID_MATCH(axis, string)				\
 	    if (almost_equals(c_token, string+2)) {		\
@@ -1301,12 +1302,14 @@ set_grid()
 		    axis_array[axis].gridminor = TRUE;		\
 		else						\
 		    axis_array[axis].gridmajor = TRUE;		\
+		explicit_change = TRUE;				\
 		++c_token;					\
 	    } else if (almost_equals(c_token, string)) {	\
 		if (string[2] == 'm')				\
 		    axis_array[axis].gridminor = FALSE;		\
 		else						\
 		    axis_array[axis].gridmajor = FALSE;		\
+		explicit_change = TRUE;				\
 		++c_token;					\
 	    }
     while (!END_OF_COMMAND) {
@@ -1377,7 +1380,7 @@ set_grid()
 	}
     }
 
-    if (! some_grid_selected()) {
+    if (!explicit_change && !some_grid_selected()) {
 	/* no axis specified, thus select default grid */
 	axis_array[FIRST_X_AXIS].gridmajor = TRUE;
 	axis_array[FIRST_Y_AXIS].gridmajor = TRUE;

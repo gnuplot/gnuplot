@@ -1,3 +1,8 @@
+2003-06-27  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/set.c: Fix unexpected behaviour that 'set grid nox noy'
+	turned the x and y grids ON rather than off.
+
 2003-06-26  Hans-Bernhard Broeker <broeker@physi.rwth-aachen.de>
 
 	* term/dxf.trm (DXF_HTIC, DXF_VTIC):  Fixed definitions so 'set
