@@ -1,4 +1,4 @@
-$!         
+$!
 $! GNUPLOT make program for VMS, Vers. 1.2, 1996/07/03
 $! (Rolf Niepraschk, niepraschk@ptb.de)
 $!
@@ -11,53 +11,55 @@ $!         default is "DECC"
 $!    P2 = special make file (eg. for testing), default is "DESCRIP.MMS"
 $!
 $ SAY = "WRITE SYS$OUTPUT"
-$ IF F$GETSYI("ARCH_TYPE") .NE. 1
+$ AXP = 0
+$ IF F$GETSYI("ARCH_TYPE") .NE. 1 THEN AXP = 1
+$!
+$ P1 = F$EDIT(P1,"UPCASE")
+$ IF P2 .NES. ""
+$ THEN D_FILE = P2
+$ ELSE D_FILE = "MAKEFILE.VMS"
+$ ENDIF
+$!
+$ COMPILER = ""
+$ IF P1 .EQS. "DECC" .OR. P1 .EQS. ""
 $ THEN
-$   AXP = 1 
-$ ENDIF
-$!
-$ P1 = F$EDIT(P1,"UPCASE") 
-$ IF P2 .NES. "" 
-$ THEN D_FILE = P2 
-$ ELSE D_FILE := DESCRIP.MMS
-$ ENDIF
-$!
-$ COMPILER := DECC
-$!
-$ IF (P1 .EQS. "DECC") .OR. (P1 .EQS. "") 
-$ THEN 
 $   DECC = 1
-$   COMPILER := DECC
+$   COMPILER = "DECC"
 $ ELSE
-$   IF P1 .EQS. "VAXC" 
-$   THEN 
+$   IF P1 .EQS. "VAXC"
+$   THEN
 $     VAXC = 1
-$     COMPILER := VAXC
+$     COMPILER = "VAXC"
+$   ELSE
+$     IF P1 .EQS. "GNUC"
+$     THEN
+$       GNUC = 1
+$       COMPILER = "GNUC"
+$     ENDIF
 $   ENDIF
-$ ELSE
-$   IF P1 .EQS. "GNUC"
-$   THEN 
-$     GNUC = 1
-$     COMPILER := VAXC 
-$   ENDIF
-$ ELSE
-$   D_FILE = P1
+$ ENDIF
+$ IF COMPILER .EQS. ""
+$ THEN
 $   DECC = 1
+$   COMPILER = "DECC"
+$   D_FILE = P1
 $ ENDIF
 $!
 $ DCL_PROC = "BUILDVMS.COM"
-$ COMMAND = "" 
+$ COMMAND = ""
 $ IF F$TYPE(MMK) .NES. ""
-$   THEN COMMAND = "MMS"
+$   THEN COMMAND = "MMK"
 $ ELSE
 $   IF F$SEARCH("SYS$SYSTEM:MMS.EXE") .NES. "" THEN COMMAND = "MMS"
 $ ENDIF
 $!
-$ IF COMMAND .NES. "" 
-$ THEN 
-$   SAY "Make Gnuplot with ''COMMAND' and ''COMPILER'." 
+$ MACRO = ""
+$ IF AXP THEN MACRO = "/MACRO=__ALPHA__=1"
+$ IF COMMAND .NES. ""
+$ THEN
+$   SAY "Make Gnuplot with ''COMMAND' and ''COMPILER'."
 $   SAY ""
-$   'COMMAND' /DESCRIPTION='D_FILE' /IGNORE=WARNING
+$   'COMMAND' /DESCRIPTION='D_FILE' 'MACRO' /IGNORE=WARNING
 $ ELSE
 $   SAY "Make Gnuplot with DCL procedure ''DCL_PROC'."
 $   SAY ""
