@@ -1,8 +1,8 @@
 
-%% Time-stamp: <99/03/20 19:47:50 bruce>
+%% Time-stamp: <99/04/11 20:04:48 bruce>
 
 %% This document is copyright (C) 1998 Bruce Ravel <ravel@phys.washington.edu>
-%% This page covers version 0.5d of gnuplot-mode.
+%% This page covers version 0.5e of gnuplot-mode.
 
 %% This document is distributed in the hope that it will be useful,
 %% but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,7 @@
 {\begin{Sbox}\begin{minipage}}%
   {\end{minipage}\end{Sbox}\fbox{\TheSbox}}
 
-\def\version{{0.5d}}
+\def\version{{0.5e}}
 \def\revised{{January 2, 1999}}
 \def\file#1{{\texttt{`#1'}}}
 \def\key#1{{\textrm \leavevmode\hbox{%
@@ -209,13 +209,14 @@ gnuplot-mode.
 \item[Using the gnuplot-process buffer] \hfill \\
   The process buffer contains an active \textsc{gnuplot} command line
   for interacting with \textsc{gnuplot} directly.  The \texttt{M-C-p}
-  key sequence inports lines from the gnuplot buffer.
+  and \texttt{M-C-f} key sequences will plot using the contents of
+  the gnuplot script buffer.
 \item[Using the GUI to set command arguments] \hfill \\
   \texttt{C-c C-c} and \texttt{S-mouse-2} are used to invoke the
   graphical tool for setting command arguments.  Use text fields and
   option menus to choose appropriate values.  Menus and buttons are
-  activated with the middle mouse button.  Certain argument types and
-  certain commands (including `plot' and `fit') are not yet supported.
+  activated with the middle mouse button.  A few plot options may not
+  be fully supported.
 \item[Customizing variables] \hfill \\
   The graphical customization tool for variables can be invoked using
   \texttt{C-c C-z}.  Descriptions of the variables relevant to gnuplot
@@ -263,9 +264,6 @@ gnuplot-mode.
 \variable{gnuplot-info-display}{'window}{Determines how
   `gnuplot-get-help' displays the info file, either 'frame, 'window,
   or nil}
-%
-\variable{gnuplot-which-highlight}{'font-lock}{Determines which syntax
-  highlighting scheme to use, font-lock or hilit19.}
 %
 \variable{gnuplot-echo-command-line-flag}{nil}{If lines that you send to
   gnuplot from the gnuplot mode buffer are not appearing at the
@@ -416,6 +414,10 @@ and \key{ret} to push the buttons.
 \variable{gnuplot-gui-popup-flag}{nil}{When non-nil an argument
 setting frame will pop open whenever the \texttt{Insertions} menu is
 used.}
+%
+\variable{gnuplot-gui-plot-splot-fit-style}{'simple}{\texttt{'simple}
+  or \texttt{'complete} -- describes the extent of the list of
+  properties of for plot, splot, and fit in the GUI.}
 %
 \variable{gnuplot-gui-frame-plist}{\Star}{Property list of parameters
   controlling the argument setting frame.  Used by XEmacs.}

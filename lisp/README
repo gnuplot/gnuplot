@@ -35,7 +35,8 @@ been modified to be consistent with that.
 
 1.  Unpack the gnuplot.tar.gz and cd to the gnuplot directory.  
 
-2.  Type "configure".
+2.  Type "configure".  If configure doesn't work for you, see note 7
+    below. 
 
 3.  Run "make".  If you use XEmacs, run "make EMACS=xemacs" (or change
     the EMACS variable to "xemacs" in the Makefile, the run "make").
@@ -109,13 +110,16 @@ installing facility?  I think so, too!  Oh well....
    arguments contained in gnuplot-gui.el is experimental.  It is
    incomplete and may make mistakes.  Specifically, it does not
    support arguments for "plot" (a huge shortcoming!), "splot", "fit",
-   "cntrparam", or "hidden3d" and it does not know how to parse or set
-   comma separated position arguments such as those used to specify
-   arrow or label locations.  It handles all other commands and knows
-   about many terminal types.  Hopefully, you will find it useful.  It
+   or "cntrparam", and it does not know how to parse or set comma
+   separated position arguments such as those used to specify arrow or
+   label locations.  It handles all other commands and knows about
+   many terminal types.  Hopefully, you will find it useful.  It
    *requires* that you are using a version of emacs with the widget
    library installed or that you have installed it yourself.  Version
    numbers in the 20's of Emacs and XEmacs ship with the widget
    library.  For version numbers in the 19's, it can be obtained at
    http://www.dina.kvl.dk/~abraham/custom/
 
+7. If "configure" doesn't work for you, the file "Makefile.dst" can be
+   used.  In that case do, "make -f Makefile.dst" and carry on from
+   there. 

@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    March 20 1999
-;; Version:    0.5d
+;; Updated:    April 11 1999
+;; Version:    0.5e
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -70,7 +70,7 @@
 ;;
 ;; Other lisp files used by gnuplot.el
 ;;
-;; info-look.el:
+;; info-look.el (comes with GNU Emacs 20):
 ;;   This provides the interface to the gnuplot-info file and provides
 ;;   on-line help and keyword completion functionality.  The version
 ;;   of info-look.el that comes with version 20.2 of Emacs contains a
@@ -79,19 +79,20 @@
 ;;   instead.  info-look is not distributed with XEmacs and so should
 ;;   be installed along with gnuplot-mode when using XEmacs.
 ;;
-;; gnuplot-gui.el
-;;   Defines the GUI interface for setting up the graphical interface
-;;   for setting arguments.
+;; gnuplot-gui.el (written by Bruce):
+;;   Defines the GUI interface for setting setting arguments to
+;;   gnuplot options.  This uses the widget package extensively.
 ;;
 ;; ---------------------------------------------------------------------
 ;;
-;; This mode was inspired by the original gnu-plot mode by Gershon
+;; This mode was inspired by the original gnu-plot-mode by Gershon
 ;; Elber, which is distributed with gnuplot itself and which dates
 ;; back to the early 90's.  Although this mode encompasses the
 ;; functionality of the original, the two share no code and the
 ;; current implementation takes advantage of many features of modern
-;; versions of emacs and adheres (I hope) to modern major mode
-;; conventions in emacs.
+;; versions of emacs and adheres (or so I intend) to the major mode
+;; conventions described in the emacs-lisp reference for version 19
+;; and later.
 ;;
 ;; ---------------------------------------------------------------------
 ;;
@@ -105,8 +106,12 @@
 ;; your .emacs file
 ;;   (autoload 'gnuplot-mode "gnuplot" "gnuplot major mode" t)
 ;;   (autoload 'gnuplot-make-buffer "gnuplot" "open a buffer in gnuplot-mode" t)
+;;
+;; Something like
 ;;   (setq auto-mode-alist (append '(("\\.gp$" . gnuplot-mode))
 ;;			           auto-mode-alist))
+;; is useful for having files ending in .gp start up in gnuplot-mode.
+;;
 ;; Something like
 ;;   (global-set-key [(f9)] 'gnuplot-make-buffer)
 ;; may be useful.  This binds f9 to the function that opens a scratch
@@ -144,7 +149,6 @@
 ;;        clause, Added (kill-all-local-variables) to `gnuplot-mode',
 ;;        altered order of:-
 ;;            (provide 'gnuplot)
-;;            ;; any final chores before leaving
 ;;            (run-hooks 'gnuplot-load-hook)
 ;;        at the end of the file in case something in the load hook
 ;;        requires gnuplot (oh not that old one again...), added
@@ -202,6 +206,14 @@
 ;;  0.5d  Mar 20 1999 <BR> adopt installation materials from <LH>.  Add
 ;;        some support for hidden3d.  Use constants in types alists in
 ;;        gui.  Various other minor improvements to the types alists.
+;;  0.5e  Apr 6 1999 <BR> at the suggestion of <SE> I did away with the
+;;        gnuplot-which-highlight variable and revamped how
+;;        colorization gets turned on.  This is a bit tricky since I
+;;        want it to work with font-lock under emacs and xemacs and
+;;        with hilit19.  Apr 11 1999 <BR> insert space at end of
+;;        unique completion.  add a few GUI types, rewrite some stuff
+;;        in the GUI interface.  primitive support for plot, splot,
+;;        and fit.  Fixed completion in file widget.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty <DB> (numerous corrections)
@@ -209,11 +221,11 @@
 ;;    Markus Dickebohm <MD> (suggested `gnuplot-send-line-and-forward')
 ;;    Stephen Eglan <SE> (suggested the use of info-look)
 ;;    Hrvoje Niksic (help with defcustom arguments for insertions)
-;;    John Palmieri (help with installation instructions)
 ;;    Michael Sanders <MS> (help with the info-look interface)
 ;;    Jinwei Shen <JS> (suggested functionality in comint buffer)
-;;  and to Lars Hecking for distributing gnuplot-mode with gnuplot
-;;  and providing me with installation materials
+;;  and especially to Lars Hecking <LH> for including gnuplot-mode
+;;  with the gnuplot 3.7-beta distribution and for providing me with
+;;  installation materials
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; To Do:
 ;;
@@ -222,8 +234,7 @@
 ;;    `gnuplot-after-plot-buffer-hook' to check and see if the script
 ;;    executed properly.  Alas I am not sure how gnuplot signals its
 ;;    errors.
-;; 2. plot, splot, fit, cntrparam, in gnuplot-gui
-;;
+;; 2. improve plot, splot, fit,
 ;;; Bugs:
 ;;
 ;; -- indentation is not quite right (but close)
@@ -276,9 +287,9 @@
       (require 'info-look)
     (error nil)))
 ;; this just gets rid of an annoying compile time error message
-(eval-when-compile
-  (defun gnuplot-dummy ())
-  (defalias 'hilit-set-mode-patterns 'gnuplot-dummy))
+;; (eval-when-compile
+;;   (defun gnuplot-dummy ())
+;;   (defalias 'hilit-set-mode-patterns 'gnuplot-dummy))
 
 
 (defconst gnuplot-xemacs-p (string-match "XEmacs" (emacs-version)))
@@ -287,7 +298,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5d")
+(defconst gnuplot-version "0.5e")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -310,7 +321,7 @@
   :group 'gnuplot)
 
 (defcustom gnuplot-mode-hook nil
-  "*Hook run when gnuplot minor mode is entered."
+  "*Hook run when `gnuplot-mode' is entered."
   :group 'gnuplot-hooks
   :type 'hook)
 (defcustom gnuplot-load-hook nil
@@ -392,8 +403,12 @@ useful for functions included in `gnuplot-after-plot-hook'.")
   "Variable holding the process handle.")
 (defvar gnuplot-process-frame nil
   "The frame for displaying the gnuplot process.
-This is used when gnuplot-display-process is equal to 'frame.")
-(defvar gnuplot-comint-recent-buffer nil)
+This is used when `gnuplot-display-process' is equal to 'frame.")
+(defvar gnuplot-comint-recent-buffer nil
+  "The most recently plotted gnuplot script buffer.
+This is used by the function that plot from the comint buffer.  It is
+reset every time something is plotted from a script buffer.")
+
 (defcustom gnuplot-gnuplot-buffer "plot.gp"
   "*The name of the gnuplot scratch buffer opened by 'gnuplot-make-buffer'."
   :group 'gnuplot
@@ -404,7 +419,7 @@ This is used when gnuplot-display-process is equal to 'frame.")
 The values are
    'frame    display gnuplot process in a separate frame
    'window   display gnuplot process in this frame but in another window
-   nil       gnuplot-process is in the current frame but not displayed"
+   nil       `gnuplot-process' is in the current frame but not displayed"
   :group 'gnuplot
   :type '(radio (const :tag "Separate frame"  frame)
 		(const :tag "Separate window" window)
@@ -420,21 +435,10 @@ The values are
 		(const :tag "Separate window" window)
 		(const :tag "This window"     nil)))
 
-(defcustom gnuplot-which-highlight (cond ((featurep 'font-lock) 'font-lock)
-					 ((featurep 'hilit19)   'hilit19)
-					 (t                     'font-lock))
-  "*Determines which syntax highlighting scheme to use.
-Options are 'font-lock, 'hilit19, and nil for no syntax colorization.
-By default this is set to whichever is found in the features list with
-font-lock taking priority."
-  :group 'gnuplot
-  :type '(radio (const :tag "Use font-lock"         font-lock)
-		(const :tag "Use hilit19"           hilit19)
-		(const :tag "Don't do colorization" nil)))
 (defcustom gnuplot-echo-command-line-flag nil
   "*Non-nil means to echo the gnuplot command line in the gnuplot buffer.
 The need for this varies from setup to setup.  If lines that you send
-to gnuplot from the gnuplot-mode buffer are not appearing at the
+to gnuplot from the `gnuplot-mode' buffer are not appearing at the
 gnuplot prompt in the process buffer, set this to nil.  Changing this
 will not change the echoing in a currently existing comint buffer, but
 it will take effect the next time you use gnuplot within emacs."
@@ -500,18 +504,19 @@ These are set by `gnuplot-set-keywords-list' from the values in
 (if gnuplot-mode-map
     ()
   (setq gnuplot-mode-map (make-sparse-keymap))
-  (define-key gnuplot-mode-map "\C-c\C-u" 'gnuplot-bug-report)
-  (define-key gnuplot-mode-map "\C-c\C-r" 'gnuplot-send-region-to-gnuplot)
-  (define-key gnuplot-mode-map "\C-c\C-l" 'gnuplot-send-line-to-gnuplot)
-  (define-key gnuplot-mode-map "\C-c\C-v" 'gnuplot-send-line-and-forward)
-  (define-key gnuplot-mode-map "\C-c\C-k" 'gnuplot-kill-gnuplot-buffer)
-  (define-key gnuplot-mode-map "\C-c\C-h" 'gnuplot-info-lookup-symbol)
-  (define-key gnuplot-mode-map "\C-c\C-c" 'gnuplot-gui-set-options-and-insert)
-  (define-key gnuplot-mode-map "\C-c\C-i" 'gnuplot-insert-filename)
-  (define-key gnuplot-mode-map "\C-c\C-n" 'gnuplot-negate-option)
-  (define-key gnuplot-mode-map "\C-c\C-f" 'gnuplot-send-file-to-gnuplot)
-  (define-key gnuplot-mode-map "\C-c\C-e" 'gnuplot-show-gnuplot-buffer)
   (define-key gnuplot-mode-map "\C-c\C-b" 'gnuplot-send-buffer-to-gnuplot)
+  (define-key gnuplot-mode-map "\C-c\C-c" 'gnuplot-gui-set-options-and-insert)
+  (define-key gnuplot-mode-map "\C-c\C-e" 'gnuplot-show-gnuplot-buffer)
+  (define-key gnuplot-mode-map "\C-c\C-f" 'gnuplot-send-file-to-gnuplot)
+  (define-key gnuplot-mode-map "\C-c\C-h" 'gnuplot-info-lookup-symbol)
+  (define-key gnuplot-mode-map "\C-c\C-i" 'gnuplot-insert-filename)
+  (define-key gnuplot-mode-map "\C-c\C-k" 'gnuplot-kill-gnuplot-buffer)
+  (define-key gnuplot-mode-map "\C-c\C-l" 'gnuplot-send-line-to-gnuplot)
+  (define-key gnuplot-mode-map "\C-c\C-n" 'gnuplot-negate-option)
+  (define-key gnuplot-mode-map "\C-c\C-r" 'gnuplot-send-region-to-gnuplot)
+  ;;(define-key gnuplot-mode-map "\C-c\C-t" 'gnuplot-gui-swap-simple-complete)
+  (define-key gnuplot-mode-map "\C-c\C-u" 'gnuplot-bug-report)
+  (define-key gnuplot-mode-map "\C-c\C-v" 'gnuplot-send-line-and-forward)
   (define-key gnuplot-mode-map "\C-c\C-z" 'gnuplot-customize)
   (define-key gnuplot-mode-map "\M-\r"    'gnuplot-complete-keyword)
   (define-key gnuplot-mode-map "\M-\t"    'gnuplot-complete-keyword)
@@ -529,7 +534,7 @@ These are set by `gnuplot-set-keywords-list' from the values in
 
 (defvar gnuplot-mode-menu nil)
 (defvar gnuplot-menu nil
-  "Menu for gnuplot-mode.")
+  "Menu for `gnuplot-mode'.")
 (setq gnuplot-menu
       '("Gnuplot"
 	["Send line to gnuplot"     gnuplot-send-line-to-gnuplot   t]
@@ -543,7 +548,9 @@ These are set by `gnuplot-set-keywords-list' from the values in
 	["Keyword help"             gnuplot-info-lookup-symbol gnuplot-keywords]
 	["Set arguments at point"   gnuplot-gui-set-options-and-insert
 	 (fboundp 'gnuplot-gui-set-options-and-insert)]
-	["Show gnuplot"             gnuplot-show-gnuplot-buffer t]
+	["Show gnuplot process buffer"      gnuplot-show-gnuplot-buffer t]
+	["Swap plot/splot/fit lists in GUI" gnuplot-gui-swap-simple-complete
+	 (fboundp 'gnuplot-gui-swap-simple-complete)]
 	"---"
 	["Customize gnuplot"        gnuplot-customize t]
 	["Kill gnuplot"             gnuplot-kill-gnuplot-buffer t]
@@ -556,7 +563,7 @@ These are set by `gnuplot-set-keywords-list' from the values in
 ;;(load-library "gnuplot-insertions")
 (defvar gnuplot-mode-insertions-menu nil)
 (defvar gnuplot-insertions-menu nil
-  "Menu for insertions in gnuplot-mode.
+  "Menu for insertions in `gnuplot-mode'.
 
 The insertions menu is composed of several sub-menus.  The variables
 describing the sub-menus are:
@@ -621,7 +628,7 @@ create a `gnuplot-mode' buffer."
     ["grid"	       (gnuplot-insert "set grid")	      t]
     ["key"	       (gnuplot-insert "set key ")	      t]
     ["label"	       (gnuplot-insert "set label ")	      t]
-    ["pointsize"       (gnuplot-insert "set pointsize 1.0")   t]
+    ["pointsize"       (gnuplot-insert "set pointsize ")   t]
     ["samples"	       (gnuplot-insert "set samples ")	      t]
     ["size"            (gnuplot-insert "set size ")	      t]
     ["tics"            (gnuplot-insert "set tics ")	      t]
@@ -1374,83 +1381,70 @@ operators are punctuation characters.")
 ;; 		    "sgn" "sin" "sinh" "sqrt" "tan" "tanh" "column"
 ;; 		    "tm_hour" "tm_mday" "tm_min" "tm_mon" "tm_sec"
 ;; 		    "tm_wday" "tm_yday" "tm_year" "valid")))))
-(defun gnuplot-set-hilit ()
-  "Set up colorization for gnuplot.
-Use font-lock or hilit19 as determined by `gnuplot-which-highlight'.
-These regular expressions treat the gnuplot vocabulary as complete
-words.  Although gnuplot will recognise unique abbreviations, these
-regular expressions will not."
-  (interactive)
-  (cond ((equal gnuplot-which-highlight 'font-lock)
-	 (condition-case ()
-	     (require 'font-lock)
-	   (error nil))
-	 (if (featurep 'font-lock)
-	     (setq gnuplot-font-lock-keywords
-		   (list		; comments
-		    '("#.*$" . font-lock-comment-face)
+
+;; Set up colorization for gnuplot.
+;; This handles font-lock for emacs and xemacs.
+;; hilit19 is handled in `gnuplot-mode'.
+;; These regular expressions treat the gnuplot vocabulary as complete
+;; words.  Although gnuplot will recognise unique abbreviations, these
+;; regular expressions will not."
+(if (not (fboundp 'hilit-set-mode-patterns))
+    (setq gnuplot-font-lock-keywords
+	  (list				; comments
+	   '("#.*$" . font-lock-comment-face)
 					; titles and file names
-		    '("['\"][^'\"\n]*['\"]"
-		      . font-lock-string-face)
+	   '("['\"][^'\"\n]*['\"]"
+	     . font-lock-string-face)
 					; stuff in brackets, sugg. by <LB>
-		    '("\\[\\([^]]+\\)\\]"
-		      1 font-lock-reference-face)
+	   '("\\[\\([^]]+\\)\\]"
+	     1 font-lock-reference-face)
 					; variable/function definitions
-		     '("\\(\\<[a-z]+[a-z_0-9()]*\\)[ \t]*="
-		      1 font-lock-variable-name-face)
+	   '("\\(\\<[a-z]+[a-z_0-9()]*\\)[ \t]*="
+	     1 font-lock-variable-name-face)
 					; built-in function names
-		     (cons (concat
-			    "\\<\\("
-			    "a\\(bs\\|cosh\?\\|rg\\|sinh\?\\|"
-			      "tan\\(\\|\[2h\]\\)\\)\\|"
-			    "bes\\(j\[01\]\\|y\[01\]\\)\\|"
-			    "c\\(eil\\|o\\(lumn\\|sh\?\\)\\)\\|"
-			    "e\\(rfc\?\\|xp\\)\\|floor\\|gamma\\|"
-			    "i\\(beta\\|gamma\\|mag\\|"
-			    "n\\(t\\|v\\(erf\\|norm\\)\\)\\)\\|"
-			    "l\\(gamma\\|og\\(\\|10\\)\\)\\|"
-			    "norm\\|r\\(and\\|eal\\)\\|"
-			    "s\\(gn\\|inh\?\\|qrt\\)\\|"
-			    "t\\(anh\?\\|m_\\(hour\\|m\\(day\\|in\\|on\\)\\|"
-			      "sec\\|wday\\|y\\(day\\|ear\\)\\)\\)\\|"
-			    "valid"
-			    "\\)\\>")
-			   font-lock-function-name-face)
+	   (cons (concat
+		  "\\<\\("
+		  "a\\(bs\\|cosh\?\\|rg\\|sinh\?\\|"
+		  "tan\\(\\|\[2h\]\\)\\)\\|"
+		  "bes\\(j\[01\]\\|y\[01\]\\)\\|"
+		  "c\\(eil\\|o\\(lumn\\|sh\?\\)\\)\\|"
+		  "e\\(rfc\?\\|xp\\)\\|floor\\|gamma\\|"
+		  "i\\(beta\\|gamma\\|mag\\|"
+		  "n\\(t\\|v\\(erf\\|norm\\)\\)\\)\\|"
+		  "l\\(gamma\\|og\\(\\|10\\)\\)\\|"
+		  "norm\\|r\\(and\\|eal\\)\\|"
+		  "s\\(gn\\|inh\?\\|qrt\\)\\|"
+		  "t\\(anh\?\\|m_\\(hour\\|m\\(day\\|in\\|on\\)\\|"
+		  "sec\\|wday\\|y\\(day\\|ear\\)\\)\\)\\|"
+		  "valid"
+		  "\\)\\>")
+		 font-lock-function-name-face)
 					; plot -- also highlight thing plotted
-		     '("\\<\\(s?plot\\).+['\"]\\([^'\"\n]*\\)['\"]"
-		       (1 font-lock-keyword-face)
-		       (2 font-lock-string-face nil t))
-		     '("\\<\\(s?plot\\)\\s-+\\([^'\" ]+\\)[) \n,\\\\]"
-		       (1 font-lock-keyword-face)
-		       (2 font-lock-variable-name-face nil t))
+	   '("\\<\\(s?plot\\).+['\"]\\([^'\"\n]*\\)['\"]"
+	     (1 font-lock-keyword-face)
+	     (2 font-lock-string-face nil t))
+	   '("\\<\\(s?plot\\)\\s-+\\([^'\" ]+\\)[) \n,\\\\]"
+	     (1 font-lock-keyword-face)
+	     (2 font-lock-variable-name-face nil t))
 					; other common commands
 					; miscellaneous commands
-		     (cons (concat "\\<\\("
-				   "c\\(d\\|lear\\)\\|exit\\|help\\|load\\|"
-				   "p\\(ause\\|rint\\|wd\\)\\|quit\\|replot\\|"
-				   "s\\(ave\\|et\\|how\\)"
-				   "\\)\\>\\|!.*$")
-		      font-lock-reference-face))
-		   gnuplot-font-lock-keywords-1 gnuplot-font-lock-keywords
-		   gnuplot-font-lock-keywords-2 gnuplot-font-lock-keywords))
-	 )
-	((equal gnuplot-which-highlight 'hilit19)
-	 (condition-case ()
-	     (or (require 'hilit19) (require 'hl319))
-	   (error nil))
-	 (if (fboundp 'hilit-set-mode-patterns)
-	     (let ((keywords (concat "\\b\\("
-				     (mapconcat 'identity
-						gnuplot-keywords "\\|")
-				     "\\)\\b")))
-	       (hilit-set-mode-patterns
-		'gnuplot-mode
-		`(("#.*$" nil comment)
-		  ("\\([a-zA-Z0-9_-]+\\)\\(([^)]*)\\)?\\s *=" nil define)
-		  ,(list keywords 'nil 'keyword)
-		  (hilit-string-find ?\\ string)
-		  ))) )	 )))
+	   (cons (concat "\\<\\("
+			 "c\\(d\\|lear\\)\\|exit\\|fit\\|help\\|load\\|"
+			 "p\\(ause\\|rint\\|wd\\)\\|quit\\|replot\\|"
+			 "s\\(ave\\|et\\|how\\)"
+			 "\\)\\>\\|!.*$")
+		 font-lock-reference-face))
+	  gnuplot-font-lock-keywords-1 gnuplot-font-lock-keywords
+	  gnuplot-font-lock-keywords-2 gnuplot-font-lock-keywords) )
 
+(if gnuplot-xemacs-p
+    (put 'gnuplot-mode 'font-lock-defaults
+	 '((gnuplot-font-lock-keywords
+	    gnuplot-font-lock-keywords-1
+	    gnuplot-font-lock-keywords-2)
+	   nil nil
+	   ((?_ . "w"))
+	   beginning-of-defun)))
 
 ;; these two lines get rid of an annoying compile time error
 ;; message.  that function gets non-trivially defalias-ed in
@@ -1641,11 +1635,11 @@ file visited by the script buffer."
 This sets font-lock and keyword completion in the comint/gnuplot
 buffer.  Further customization is possible via
 `gnuplot-comint-setup-hook'."
-  (if (equal gnuplot-which-highlight 'font-lock)
+  (if (not (fboundp 'hilit-set-mode-patterns))
       (progn
 	(make-variable-buffer-local 'font-lock-defaults)
 	(setq font-lock-defaults '(gnuplot-font-lock-keywords t t))
-	(turn-on-font-lock)))
+	(if gnuplot-xemacs-p (turn-on-font-lock))))
   ;;(if (featurep 'kw-compl)
   ;;    (progn
   ;;	(setq kw-compl-list gnuplot-keywords
@@ -1836,7 +1830,7 @@ This checks if the set option is one which has a negated form."
 	(message "There is not a set option on this line")) )))
 
 (defun gnuplot-customize ()
-  "Customize gnuplot-mode."
+  "Customize `gnuplot-mode'."
   (interactive)
   (if (fboundp 'customize-group)
       (customize-group "gnuplot")
@@ -1851,7 +1845,7 @@ This checks if the set option is one which has a negated form."
 ;; modified with suggestion from <MS>
 (defun gnuplot-setup-info-look ()
   "Setup info-look in the gnuplot buffer.
-Also set the variable gnuplot-keywords and do something sensible if
+Also set the variable `gnuplot-keywords' and do something sensible if
 info-look was not available.
 See the comments in `gnuplot-info-hook'."
   (interactive)
@@ -1946,7 +1940,8 @@ adapted from `lisp-complete-symbol'."
 	   (let* ((list (all-completions pattern alist))
 		  (mess (format "%S could be one of %S" pattern list))
 		  (orig (current-buffer))
-		  (buff (get-buffer-create "*gnuplot-completions*")))
+		  (buff (get-buffer-create " *gnuplot-completions*")))
+	     (if (= (length list) 1) (insert " "))
 	     (if (< (length mess) (frame-width))
 		 (if (> (length list) 1) (message mess))
 	       (switch-to-buffer-other-window buff)
@@ -2036,7 +2031,7 @@ shown."
 (defun gnuplot-bug-report ()
   "Submit a bug report about `gnuplot-mode' by email.
 Please do not send any bug reports about gnuplot itself to the
-maintainer of gnuplot-mode."
+maintainer of `gnuplot-mode'."
   (interactive)
   (let ((line (make-string 62 ?-)))
     (require 'reporter)
@@ -2059,7 +2054,6 @@ maintainer of gnuplot-mode."
 	     gnuplot-gnuplot-buffer
 	     gnuplot-display-process
 	     gnuplot-info-display
-	     gnuplot-which-highlight
 	     gnuplot-echo-command-line-flag
 	     gnuplot-insertions-show-help-flag
 	     gnuplot-delay
@@ -2082,6 +2076,9 @@ maintainer of gnuplot-mode."
 	     gnuplot-gui-frame-plist
 	     gnuplot-gui-frame-parameters
 	     gnuplot-gui-fontname-list
+	     gnuplot-gui-plot-splot-fit-style
+	     ;; plus a few more...
+	     gnuplot-comint-recent-buffer
 	     Info-directory-list
 	     exec-path
 	     features ))
@@ -2114,44 +2111,48 @@ maintainer of gnuplot-mode."
 This was written with version 3.7 of gnuplot in mind but it should
 work fine with version 3.5 and the various 3.6 beta versions.
 
-Report bugs in gnuplot-mode using \\[gnuplot-bug-report].
+Report bugs in `gnuplot-mode' using \\[gnuplot-bug-report].
 
- The help functions, keyword completion, and several other features
- depend upon having the info file properly installed.  The info file
- can be made in the document directory of the gnuplot distribution or
- is available at the gnuplot-mode web page:
+			    ------O------
+
+The help functions, keyword completion, and several other features
+depend upon having the info file properly installed.  The info file
+can be made in the document directory of the gnuplot distribution or
+is available at the `gnuplot-mode' web page:
       http://feff.phys.washington.edu/~ravel/gnuplot/
 
- If the help function does not work properly, you may have an older
- version of the gnuplot info file.  Try the suggestion in the document
- string for the variable `gnuplot-info-hook'.  See the gnuplot-mode
- web page for more details.
+If the help function does not work properly, you may have an older
+version of the gnuplot info file.  Try the suggestion in the document
+string for the variable `gnuplot-info-hook'.  See the `gnuplot-mode'
+web page for more details.
 
-There are several known shortcomings of gnuplot-mode, version 0.5d.
+			    ------O------
+
+There are several known shortcomings of `gnuplot-mode', version 0.5e.
 Many of the shortcomings involve the graphical interface (refered to
 as the GUI) to setting arguments to plot options.  Here is a list:
 
- 1.  Currently there is no way for gnuplot-mode to know if information
+ 1.  Currently there is no way for `gnuplot-mode' to know if information
      sent to gnuplot was correctly plotted.
- 2.  Indentation is a bit flaky, particularly after a plot or splot
-     line.
+ 2.  Indentation is sometimes a bit flaky.
  3.  Command line echoing in the comint buffer should sometimes be on
      and sometimes off, but I don't quite understand how to determine
-     this.
- 4.  plot, splot, fit, and cntrparam are unsupported in the GUI.
-     cntrparam is no huge loss, but the other three would benefit
-     greatly by having a GUI.
+     this.  I think setting `gnuplot-echo-command-line-flag' to nil is
+     better, but try setting it to t and see which works better.
+ 4.  \"plot\", \"splot\", and \"fit\" are handled in the GUI, but are
+     a bit flaky.  Their arguments may not be read correctly from
+     existing text, and continuation lines (common for plot and splot)
+     are not supported.
  5.  The GUI does not know how to read from continuation lines.
  6.  Comma separated position arguments to plot options are
-     unsupported in the GUI.  Examples of options that take this kind
-     of argument are \"arrow\", \"key\", \"label\" and others.  A
-     message about this is printed to the GUI frame.
- 7.  The directory browsing properties of the file field are not
-     working correctly.  The \"Browse\" button does work correctly,
-     however.
- 8.  Information is missing from the GUI frames for several plot
-     options, for instance the linetype data for the box around the
-     key and position and font string data for \"label\".
+     unsupported in the GUI.  Colon separated datafile modifiers (used
+     for plot, splot, and fit) are not supported either.  Arguments
+     not yet supported by the GUI generate messages printed in grey
+     text.
+ 7.  The GUI handling of \"hidden3d\" is flaky and \"cntrparam\" is
+     unsupported.
+
+			    ------O------
 
  Key bindings:
  \\{gnuplot-mode-map}"
@@ -2168,36 +2169,53 @@ as the GUI) to setting arguments to plot options.  Here is a list:
   (set (make-local-variable 'indent-line-function) 'gnuplot-indent-line)
   (set-syntax-table gnuplot-mode-syntax-table)
   (gnuplot-setup-info-look) ;; <SE>
-  (gnuplot-set-hilit)
-  ;;(if (featurep 'kw-compl)
+  (if (fboundp 'hilit-set-mode-patterns) ; deal with hilit19 (ho hum!)
+      (let ((keywords (concat "\\b\\(" (mapconcat 'identity
+						  gnuplot-keywords "\\|")
+			      "\\)\\b")))
+	(hilit-set-mode-patterns
+	 'gnuplot-mode
+	 `(("#.*$" nil comment)
+	   ("\\([a-zA-Z0-9_-]+\\)\\(([^)]*)\\)?\\s *=" nil define)
+	   ,(list keywords 'nil 'keyword)
+	   (hilit-string-find ?\\ string)
+	   ))) )
+  ;;(if (featurep 'kw-compl)		; old-style keyword completion
   ;;    (setq kw-compl-list gnuplot-keywords
   ;;	    kw-compl-upper-case nil)) ; gnuplot keywords must be lower case
-  (if (equal gnuplot-which-highlight 'font-lock)
-      (progn
-	(make-variable-buffer-local 'font-lock-defaults)
-	(setq font-lock-defaults '(gnuplot-font-lock-keywords t t))
-	(turn-on-font-lock)))
+  (if gnuplot-xemacs-p			; deal with font-lock
+      (if (fboundp 'turn-on-font-lock) (turn-on-font-lock))
+    (progn
+      (make-variable-buffer-local 'font-lock-defaults)
+      (setq font-lock-defaults '(gnuplot-font-lock-keywords t t))))
   (if (and gnuplot-xemacs-p gnuplot-toolbar-display-flag)
-      (condition-case ()
+      (condition-case ()		; deal with the toolbar
 	  (and (require 'toolbar)
 	       (require 'xpm)
-	       ;;(require 'gnuplot-toolbar)
 	       (gnuplot-make-toolbar-function))
 	(error nil)))
-  (if (fboundp 'widget-create)
+  (if (fboundp 'widget-create)		; gunplot-gui
       (condition-case ()
   	  (require 'gnuplot-gui)
   	(error nil)))
-  (setq gnuplot-first-call nil)
+  (setq gnuplot-first-call nil		; a few more details ...
+	gnuplot-comint-recent-buffer (current-buffer))
   (run-hooks 'gnuplot-mode-hook)
   (message "gnuplot-mode %s -- report bugs with %S" gnuplot-version
 	   (substitute-command-keys "\\[gnuplot-bug-report]")))
 
 ;;;###autoload
 (defun gnuplot-make-buffer ()
-  "This function is a generic interface to `gnuplot-mode'.
+  "Open a new buffer in `gnuplot-mode'.
 When invoked, it switches to a new, empty buffer visiting no file
-and then starts gnuplot-mode."
+and then starts `gnuplot-mode'.
+
+It is convenient to bind this function to a global key sequence.  For
+example, to make the F10 key open a gnuplot script buffer, put the
+following in your .emacs file:
+     (autoload 'gnuplot-make-buffer \"gnuplot\"
+               \"open a buffer in gnuplot mode\" t)
+     (global-set-key [(f10)] 'gnuplot-make-buffer)"
   (interactive)
   (switch-to-buffer gnuplot-gnuplot-buffer)
   (gnuplot-mode))

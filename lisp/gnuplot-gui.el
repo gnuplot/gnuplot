@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu>
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    19 December 1998
-;; Updated:    20 March 1999
-;; Version:    (see gnuplot.el)
+;; Updated:    11 April 1999
+;; Version:    (same as gnuplot.el)
 ;; Keywords:   gnuplot, plotting, interactive, GUI
 
 ;; This file is not part of GNU Emacs.
@@ -47,19 +47,20 @@
 ;;
 ;;; To do:
 ;;
-;; Widgets:
+;; Widgets I need:
 ;; -- 'position: two or three comma separated numbers used to denote a
 ;;               position or a tic start/end/increment (see arrow,
 ;;               need a prefix)
-;; -- 'file:     field is not behaving properly -- M-tab and ret
+;; -- 'modifier: colon separated fields used for datafile modifiers
 ;;
 ;; command types which are currently unsupported or contain mistakes
-;; -- unsupported: plot, splot, fit, cntrparam
+;; -- unsupported: cntrparam
+;; -- plot, splot, fit: rather lame
 ;; -- style: does `set style' mean anything?  Should I prompt for
 ;;           function or data?
-;; -- key:   box linetype information missing
 ;; -- label: position information missing
 ;; -- label: font string handled in overly simple manner
+;; -- hidden3d: not really suited to 'list, but all options are exclusive...
 ;;
 ;; overall:
 ;; -- continuation lines (ugh!)
@@ -85,7 +86,7 @@
 ;; (eval-when-compile
 ;;   (require 'wid-edit))
 
-(eval-and-compile
+(eval-and-compile			; I need this!
   (if (fboundp 'split-string)
       ()
     (defun split-string (string &optional pattern)
@@ -147,7 +148,8 @@ This would be done after menu insertion of Gnuplot commands."
   "List of known font names.
 These *must* be quoted, like so \"\\\"Helvetica\\\"\".  This allows
 for fonts with names like \"\\\"Arial Bold Italic\\\"\" to be treated
-as single entries in the menu-buttons."
+as single entries in the menu-buttons.  And it is really important that
+the first entry in the list be a blank string."
   :group 'gnuplot-gui
   :type '(repeat (string :tag "Font name:")))
 
@@ -401,23 +403,23 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("MINOR LINETYPE" 'number " ")))
 	    (cons "hidden3d"
 		  '(("ALGORITHM" 'list " " "defaults"
-                    "offset           # linetype offset"
+                    "offset"
 		    "nooffset"
-                    "trianglepattern  # bitpattern between 0 and 7"
-		    ;;"trianglepattern 1"
-                    ;;"trianglepattern 2" "trianglepattern 3"
-                    ;;"trianglepattern 4" "trianglepattern 5"
-                    ;;"trianglepattern 6" "trianglepattern 7"
-                    "undefined        # level between 0 and 3"
-		    ;;"undefined 1" "undefined 2" "undefined 3"
+                    ;;"trianglepattern  # bitpattern between 0 and 7"
+		    "trianglepattern 0" "trianglepattern 1"
+                    "trianglepattern 2" "trianglepattern 3"
+                    "trianglepattern 4" "trianglepattern 5"
+                    "trianglepattern 6" "trianglepattern 7"
+                    ;;"undefined        # level between 0 and 3"
+		    "undefined 0" "undefined 1" "undefined 2" "undefined 3"
 		    "noundefined" "altdiagonal" "noaltdiagonal"
 		    "bentover" "nobentover")))
 	    (cons "isosamples"
 		  '(("ISO_U LINES" 'number " ")
 		    ("ISO_V LINES" 'number " " ",")))
 	    (cons "key"
-		  '(("LOCATION" 'list " " "left" "right" "top" "bottom"
-		                          "outside" "below")
+		  '(("LOCATION"      'list " " "left" "right" "top" "bottom"
+		                           "outside" "below")
 		    ("POSITION"      'position  " " "" 3)
 		    ("JUSTIFICATION" 'list " " "Left" "Right")
 		    ("REVERSE"       'list " " "reverse" "noreverse")
@@ -426,18 +428,19 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("WIDTH"         'number " " "width")
 		    ("TITLE"         'string " " "title ")
 		    ("BOX LINETYPE"  'number " " "box") ;; linetype data
-		    ("NOBOX"         'list " " "nobox")))
+		    ("NOBOX"         'list   " " "nobox")))
 	    (cons "label"
 		  '(("TAG" 'tag " ")
 		    ("LABEL TEXT" 'string " ")
-		    ("POSITION" 'position " " "at" 3) ;; first, second, graph, screen
+		    ("POSITION"   'position " " "at" 3)
+		    ;; first, second, graph, screen
 		    ("JUSTIFICATION" 'list " " "left" "right" "center")
-		    ("ROTATE" 'list " " "rotate" "norotate")
-		    ("FONT" 'string " "))) ;; font "name,size"
+		    ("ROTATE"        'list " " "rotate" "norotate")
+		    ("FONT"          'string " " "font"))) ;; font "name,size"
 	    (cons "nolabel"
-		  '(("TAG" 'tag " ")))
+		  '(("TAG"        'tag " ")))
 	    (cons "linestyle"
-		  '(("INDEX    " 'number " ")
+		  '(("TAG      "  'tag " ")
 		    ("LINE STYLE" 'list " " "boxerrorbars" "boxes"
 		     "boxxyerrorbars" "candlesticks" "dots"
 		     "financebars" "fsteps" "histeps" "impulses"
@@ -594,6 +597,156 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		  '(("INITIAL FILE"   'file   " " t)
 		    ("UPDATED FILE"   'file   " " t))) ))
 
+
+(defcustom gnuplot-gui-plot-splot-fit-style 'simple
+  "Control the complexity of the GUI display for plot, splot, and fit.
+The values are 'simple, which causes a limited set of plot, splot, or
+fit options to be displayed, and 'complete, which attempts to display
+all options.  The 'complete setting is prone to making errors when
+parsing values already in the script buffer."
+  :group 'gnuplot-gui
+  :type '(radio (const :tag "Simple listing"   simple)
+		(const :tag "Complete listing" complete)))
+
+
+(defconst gnuplot-gui-plot-simple-list
+  '(("X RANGE"     'range (" " . " ") ":")
+    ("Y RANGE"     'range (" " . " ") ":")
+    ("DATA FILE"   'file   " ")
+    ("THRU"        'string* " " "thru")
+    ("USING"       'modifier " ")
+    ("TITLE"       'string " ")
+    ("WITH"        'list* " " "boxerrorbars" "boxes"
+     "boxxyerrorbars" "candlesticks" "dots" "financebars"
+     "fsteps" "histeps" "impulses" "lines" "linespoints"
+     "points" "steps" "vector" "xerrorbars" "xyerrorbars"
+     "yerrorbars")))
+(defconst gnuplot-gui-plot-full-list
+  '(;;("T RANGE"     'range (" " . " ") ":")
+    ("X RANGE"     'range (" " . " ") ":")
+    ("Y RANGE"     'range (" " . " ") ":")
+    ("xa"          'text   "\t---------------------")
+    ("FUNCTION"    'string " ")
+    ("xc"          'text   "   or")
+    ("DATA FILE"   'file   " ")
+    ("INDEX"       'modifier " ")
+    ("EVERY"       'modifier " ")
+    ("THRU"        'string* " " "thru")
+    ("USING"       'modifier " ")
+    ("SMOOTH"      'list* " " "unique" "csplines" "acsplines"
+     "bezier" "sbezier")
+    ;; datafile modifiers
+    ("AXES"        'list* " " "x1y1" "x2y2" "x1y2" "x2y1")
+    ("TITLE"       'string " ")
+    ("NOTITLE"     'list   " " "notitle")
+    ("xf"          'text   "\t---------------------")
+    ("xi"          'text   "Select a standard plotting style")
+    ("WITH"        'list* " " "boxerrorbars" "boxes"
+     "boxxyerrorbars" "candlesticks" "dots" "financebars"
+     "fsteps" "histeps" "impulses" "lines" "linespoints"
+     "points" "steps" "vector" "xerrorbars" "xyerrorbars"
+     "yerrorbars")
+    ("xo"          'text   "     or a previously defined style")
+    ("LINE STYLE " 'number " " "ls")
+    ("xr"          'text   "     or specify a style in-line")
+    ("LINE TYPE  " 'number " " "lt")
+    ("LINE WIDTH " 'number " " "lw")
+    ("POINT TYPE " 'number " " "pt")
+    ("POINT STYLE" 'number " " "ps")
+    ))
+(defconst gnuplot-gui-splot-simple-list
+  '(("DATA FILE"   'file   " ")
+    ("TITLE"       'string " ")
+    ("WITH"        'list* " " "lines" "linespoints" "points" "dots" "impulses")))
+(defconst gnuplot-gui-splot-full-list
+  '(;;("U RANGE"     'range (" " . " ") ":")
+    ;;("V RANGE"     'range (" " . " ") ":")
+    ("X RANGE"     'range (" " . " ") ":")
+    ("Y RANGE"     'range (" " . " ") ":")
+    ("Z RANGE"     'range (" " . " ") ":")
+    ("xa"          'text   "\t---------------------")
+    ("FUNCTION"    'string " ")
+    ("xc"          'text   "   or")
+    ("DATA FILE"   'file   " ")
+    ("INDEX"       'modifier " ")
+    ("EVERY"       'modifier " ")
+    ("THRU"        'string* " " "thru")
+    ("USING"       'modifier " ")
+    ("SMOOTH"      'list* " " "unique" "csplines" "acsplines"
+     "bezier" "sbezier")
+    ("TITLE"       'string " ")
+    ("NOTITLE"     'list   " " "notitle")
+    ("WITH"        'list* " " "lines" "linespoints" "points" "dots" "impulses")))
+(defconst gnuplot-gui-fit-simple-list
+  '(("FUNCTION"     'string* " " "")
+    ("DATA FILE"    'file    " ")
+    ("VIA (params)" 'string* " " "via") ))
+(defconst gnuplot-gui-fit-full-list
+  '(("X RANGE"      'range  (" " . " ") ":")
+    ("Y RANGE"      'range  (" " . " ") ":")
+    ("xa"           'text    "----- fitting functionn and file --------")
+    ("FUNCTION"     'string* " " "")
+    ("DATA FILE"    'file    " ")
+    ("xb"           'text    "----- datafile modifiers ----------------")
+    ("INDEX"        'modifier " ")
+    ("EVERY"        'modifier " ")
+    ("THRU"         'string* " " "thru")
+    ("USING"        'modifier " ")
+    ("SMOOTH"       'list* " " "unique" "csplines" "acsplines"
+     "bezier" "sbezier")
+    ("xc"           'text    "----- parameters (file or parameters) ---")
+    ("VIA (file)"   'string  " " "via")
+    ("VIA (params)" 'string* " " "via") ))
+
+(defvar gnuplot-gui-plot-splot-fit nil
+  "Associated list of plot, splot, and fit descriptions.
+See the doc-string for `gnuplot-gui-all-types'.")
+(setq gnuplot-gui-plot-splot-fit
+      (list (cons "plot"  (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+			      gnuplot-gui-plot-full-list
+			    gnuplot-gui-plot-simple-list))
+	    (cons "splot" (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+			      gnuplot-gui-splot-full-list
+			    gnuplot-gui-splot-simple-list))
+	    (cons "fit"   (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+			      gnuplot-gui-fit-full-list
+			    gnuplot-gui-fit-simple-list))) )
+
+(defun gnuplot-gui-swap-simple-complete ()
+  (interactive)
+  (setq gnuplot-gui-plot-splot-fit-style
+	(if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+	    'simple 'complete))
+  (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+      (progn
+	(setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-full-list)
+	(setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-full-list)
+	(setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-full-list))
+    (setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-simple-list)
+    (setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-simple-list)
+    (setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-simple-list))
+  (message "Using %s lists for plot, splot, and fit."
+	   gnuplot-gui-plot-splot-fit-style) )
+
+
+(defvar gnuplot-gui-test-type nil)
+(setq gnuplot-gui-test-type
+      (list (cons "test"
+		  '(("TAG"      'tag      " ")
+		    ("LIST"     'list     " " "1" "2" "3")
+		    ("LIST*"    'list*    " " "1" "2" "3")
+		    ("NUMBER"   'number   " " "number")
+		    ("RANGE"    'range   (" " . " ") ":")
+		    ("PAIR"     'pair    (" " . " ") "pair")
+		    ("LABELS"   'labels   ())
+		    ("FILE"     'file     " ")
+		    ("TEXT"     'text     "this is text")
+		    ("STRING"   'string   " ")
+		    ("STRING*"  'string*  " " "string*")
+		    ("FORMAT"   'format   " ")
+		    ("POSITION" 'position " " "at" 3)
+		    ("FONTSIZE" 'fontsize " ") ))))
+
 (defvar gnuplot-gui-all-types nil
     "Associated list of terminal, set option, and command arguments.
 
@@ -613,6 +766,7 @@ for this command, set option, or terminal type.
 
 TYPE is one of
      'list       a menu-list of strings
+     'list*      a menu-list of strings with a prefix
      'number     a number with an optional prefix
      'tag        like number but must be the first argument
      'fontsize   like number but must be the last argument
@@ -620,6 +774,7 @@ TYPE is one of
      'pair       a pair of numbers with no punctuation and a prefix
      'file       a quoted string and a file browser
      'string     a quoted string with an optional prefix
+     'string*    an unquoted string with a prefix
      'format     a quoted string and an info-link to (gnuplot)format
      'labels     an array as needed for xtics, ytics, etc
      'position   2 or 3 comma separated numbers with an optional prefix
@@ -632,8 +787,8 @@ white space are better defaults than empty strings or nil.
 
 The value of REST depends upon TYPE:
 
-  For 'list      REST is the list of options that will go into the
-                   menu-button.  This can also be a symbol which
+  For 'list &    REST is the list of options that will go into the
+      'list*       menu-button.  This can also be a symbol which
                    evaluates to a list containing the options to go into
                    the menu-button.  This list variable must contain the
                    DEFAULT.
@@ -641,8 +796,8 @@ The value of REST depends upon TYPE:
   For 'range     REST is the separator, \":\" for plot ranges and
                    \",\" for plot dimensions (see for example the tgif
                    terminal type)
-  For 'string    REST may a number denoting the width of the editable-text
-                   field or it may be a string denoting a prefix.  By
+  For 'string &  REST may a number denoting the width of the editable-text
+      'string*     field or it may be a string denoting a prefix.  By
                    default, the width is half the width of the frame
                    and there is no prefix.  It may be useful to
                    specify \"1\" when the input is a single character
@@ -665,7 +820,10 @@ This alist is formed at load time by appending together
 
 (setq gnuplot-gui-all-types (append gnuplot-gui-terminal-types
 				    gnuplot-gui-set-types
-				    gnuplot-gui-command-types ))
+				    gnuplot-gui-command-types
+				    gnuplot-gui-plot-splot-fit
+				    gnuplot-gui-test-type
+				    ))
 
 
 ;;; user interface to the widget-y stuff
@@ -681,24 +839,33 @@ currently supported."
       (mouse-set-point event)
       (gnuplot-gui-set-options-and-insert))))
 
+(defun gnuplot-gui-get-frame-param (param)
+  (if gnuplot-xemacs-p
+      (plist-get gnuplot-gui-frame-plist param)
+    (cdr (assoc param gnuplot-gui-frame-parameters))))
+(defun gnuplot-gui-set-frame-param (param value)
+  (if gnuplot-xemacs-p
+      (plist-put gnuplot-gui-frame-plist param value)
+    (setcdr (assoc param gnuplot-gui-frame-parameters) value)))
 
 (defun gnuplot-gui-set-options-and-insert ()
   "Insert arguments using a GUI interface.
-Determine contents of current line and set up the appropriate GUI frame.
-Bound to \\[gnuplot-gui-set-options-and-insert]
-Note that \"plot\", \"splot\", \"fit\", and \"cntrparam\" are not
-currently supported."
+Determine contents of current line and set up the appropriate GUI
+frame.  Bound to \\[gnuplot-gui-set-options-and-insert]
+Note that \"cntrparam\" is not currently supported."
   (interactive)
   (when (fboundp 'widget-create)
-    (let ((begin (save-excursion (beginning-of-line) (point-marker)))
-	  (end   (save-excursion (end-of-line)       (point-marker)))
+    (let ((begin  (save-excursion (beginning-of-line) (point-marker)))
+	  (end    (save-excursion (end-of-line)       (point-marker)))
+	  (termin (concat "\\(,\\s-*" (regexp-quote "\\") "\\|;\\)"))
 	  (set nil) (term nil))
       (save-excursion
 	;; there can be more then one command per line
-	(if (search-backward ";" begin t)
+	(if (search-backward ";" begin "to_limit")
 	    (progn (forward-char  1) (setq begin (point-marker))))
-	(if (search-forward  ";" end   t)
-	    (progn (forward-char -1) (setq end   (point-marker))))
+	(if (re-search-forward termin end "to_limit")
+	    (progn (backward-char (length (match-string 1)))
+		   (setq end (point-marker))))
 	(goto-char begin)
 	(skip-syntax-forward "-" end)
 	;; various constructions are recognized here. at the end of this
@@ -738,9 +905,24 @@ currently supported."
 		       gnuplot-gui-current-string
 		       (buffer-substring-no-properties (point) end))
 		 (gnuplot-gui-set-alist word gnuplot-gui-current-string)
-		 (gnuplot-gui-prompt-for-frame word))
-		((setq wrd (car (all-completions
-				 w '(("plot") ("splot") ("fit") ("cntrparam")))))
+		 (let* ((old-height (gnuplot-gui-get-frame-param 'height))
+			(old-top    (gnuplot-gui-get-frame-param 'top)))
+		   (when (or
+			  (and (equal gnuplot-gui-plot-splot-fit-style 'complete)
+			       (member* word '("plot" "splot" "fit")
+					:test 'string=))
+			  (equal word "test"))
+		     (gnuplot-gui-set-frame-param 'height 32)
+		     (gnuplot-gui-set-frame-param 'top    50))
+		   (gnuplot-gui-prompt-for-frame word)
+		   (when (or
+			  (and (equal gnuplot-gui-plot-splot-fit-style 'complete)
+			       (member* word '("plot" "splot" "fit")
+					:test 'string=))
+			  (equal word "test"))
+		     (gnuplot-gui-set-frame-param 'height old-height)
+		     (gnuplot-gui-set-frame-param 'top    old-top)) ))
+		((setq wrd (car (all-completions w '(("cntrparam")))))
 		 (message
 		  "Setting arguments for %S is currently unsuported in gnuplot-mode"
 		  wrd))
@@ -758,7 +940,7 @@ currently supported."
 	     "Argument popup will no longer appear after insertions.")))
 
 
-(defun gnuplot-gui-y-n ())
+(defun gnuplot-gui-y-n (foo))
 (if gnuplot-xemacs-p
     (defalias 'gnuplot-gui-y-n 'y-or-n-p-maybe-dialog-box)
   (defalias 'gnuplot-gui-y-n 'y-or-n-p))
@@ -858,7 +1040,7 @@ arguments."
 	(while temp-list
 	  (cond
 	   ;; ---------------------------- list
-	   ((equal symbol 'list)
+	   ((member* symbol '(list list*) :test 'equal)
 	    (let* ((case-fold-search nil)
 		   (match-cons (member* (concat "^" (car temp-list))
 					values :test 'string-match)))
@@ -943,9 +1125,11 @@ arguments."
 		      (setq return (append return (list "" (car list)))))
 		    (setq list (cdr list)) )
 		  (setq this-cons (cons tag return)
+			arg-list (remove* (car temp-list) arg-list
+					  :test 'string= :count 1)
 			temp-list nil))
 	      (setq temp-list (cdr temp-list))) )
-	    ;; ---------------------------- string, file, format
+	   ;; ---------------------------- string, file, format
 	   ((member* symbol '(string file format) :test 'equal)
 	    (if (string-match (concat "['\"]" ; opening quote
 				      "\\([^'\"]*\\)" ; string
@@ -956,6 +1140,16 @@ arguments."
 					:test 'string= :count 1)
 		      temp-list nil)
 	      (setq temp-list (cdr temp-list)) ))
+	   ;; ---------------------------- string*
+	   ((equal symbol 'string*)
+	    (if (string= prefix (car temp-list))
+		(setq this-cons (cons tag (cadr temp-list))
+		      arg-list (remove* (car temp-list) arg-list
+					:test 'string= :count 1)
+		      arg-list (remove* (cadr temp-list) arg-list
+					:test 'string= :count 1)
+		      temp-list nil)
+	      (setq temp-list (cdr temp-list)) ) )
 	   ;; ---------------------------- other or unknown
 	   (t
 	    (setq temp-list nil))
@@ -966,58 +1160,47 @@ arguments."
 
 
 (defun gnuplot-gui-post-process-alist (type)
-  "Add prefixes to numeric arguments and check that they are numeric.
-This is called right before inserting the arguments into the buffer.
-TYPE is the object whose arguments are being set."
-  ;; This is a mess of slinging through associated lists.  Here is a
-  ;; road map: loop through gnuplot-gui-alist, which was set with the
-  ;; argument values just prior to calling this.  For entries check
-  ;; the type and convert its content to an appropriate string
+  "A few types need some additional processing.
+'range, 'pair, and 'labels are cons or list valued and need to b made
+into strings.  This is called right before inserting the arguments
+into the buffer.  TYPE is the object whose arguments are being set."
   (let ((alist gnuplot-gui-alist)
 	(types (cdr (assoc type gnuplot-gui-all-types))) )
-    (while alist
+    (while alist  ;; loop thru alist looking for tyeps needing post-processing
       (let* ((list   (assoc (caar alist) types))
 	     (value  (cdr (assoc (caar alist) gnuplot-gui-alist)))
 	     (prefix (gnuplot-gui-type-prefix list))
 	     (symb   (gnuplot-gui-type-symbol list)) )
 	(cond
-	 ;;-------------------------- numbers with prefixes
-	 ((and (equal (eval symb) 'number)
-	       (length prefix)
-	       (string-match "^\\s-*[-0-9.*]+\\s-*$" value))
-	  (setcdr (assoc (caar alist) gnuplot-gui-alist)
-		  (concat prefix " " value)) )
-	 ;;-------------------------- numbers without prefixes +tags & fontsize
-	 ((and (or (equal (eval symb) 'number)
-		   (equal (eval symb) 'tag)
-		   (equal (eval symb) 'fontsize))
-	       (not (string-match "^\\s-*[-0-9.*]+\\s-*$" value)))
-	  (setcdr (assoc (caar alist) gnuplot-gui-alist) " ") )
+	 ;;-------------------------- flat text
+	 ((equal (eval symb) 'text)
+	  (setcdr (assoc (caar alist) gnuplot-gui-alist) ""))
 	 ;;-------------------------- range [#:#] or [#,#]
 	 ((equal (eval symb) 'range)
 	  (if (and (string-match "^\\s-*$" (car value))
 		   (string-match "^\\s-*$" (cdr value)))
-	      (setcdr (assoc (caar alist) gnuplot-gui-alist) " ")
+	      (setcdr (assoc (caar alist) gnuplot-gui-alist) "")
 	    (setcdr (assoc (caar alist) gnuplot-gui-alist)
 		    (concat "[" (car value) prefix (cdr value) "]")) ) )
 	 ;;-------------------------- pair
 	 ((equal (eval symb) 'pair)
 	  (if (and (string-match "^\\s-*$" (car value))
 		   (string-match "^\\s-*$" (cdr value)))
-	      (setcdr (assoc (caar alist) gnuplot-gui-alist) " ")
+	      (setcdr (assoc (caar alist) gnuplot-gui-alist) "")
 	    (setcdr (assoc (caar alist) gnuplot-gui-alist)
 		    (concat prefix " " (car value) " " (cdr value) )) ) )
 	 ;;-------------------------- labels
 	 ((equal (eval symb) 'labels)
-	  (when (consp value)
-	    (let ((word "") (list value))
-	      (while list
-		(if (string-match "^\\s-*$" (car list))
-		    (setq word (concat word (format "%s, " (cadr list))))
-		  (setq word (concat word (format "%S %s, " (car list)
-						  (cadr list)))))
-		(setq list (cddr list)) )
-	      (setq value (concat "(" (substring word 0 -2) ")"))))
+	  (if (consp value)
+	      (let ((word "") (list value))
+		(while list
+		  (if (string-match "^\\s-*$" (car list))
+		      (setq word (concat word (format "%s, " (cadr list))))
+		    (setq word (concat word (format "%S %s, " (car list)
+						    (cadr list)))))
+		  (setq list (cddr list)) )
+		(setq value (concat "(" (substring word 0 -2) ")")))
+	    (setq value "") )
 	  (setcdr (assoc (caar alist) gnuplot-gui-alist) value) ))
 
 	(setq alist (cdr alist))) )))
@@ -1025,22 +1208,29 @@ TYPE is the object whose arguments are being set."
 
 ;;; GUI frames
 
-(defun gnuplot-gui-prompt-for-frame (&optional term save-frame)
-  (setq term (or term (completing-read "Terminal-type: " gnuplot-gui-all-types
-				       nil t nil t)))
+(defun gnuplot-gui-prompt-for-frame (&optional option save-frame)
+  (setq option (or option (completing-read "Option: " gnuplot-gui-all-types
+					   nil t nil t)))
   (gnuplot-gui-make-frame
-   term (cdr (assoc term gnuplot-gui-all-types)) save-frame) )
+   option (cdr (assoc option gnuplot-gui-all-types)) save-frame) )
 
 
 (defface gnuplot-gui-error-face '((((class color) (background light))
-				  (:foreground "red"))
+				  (:foreground "grey30"))
 				 (((class color) (background dark))
-				  (:foreground "pink")))
+				  (:foreground "gery70")))
+  "Face used to display message about unknown widget types."
+  :group 'gnuplot-faces)
+
+(defface gnuplot-gui-flat-text-face '((((class color) (background light))
+				       (:foreground "MediumBlue"))
+				      (((class color) (background dark))
+				       (:foreground "LightSteelBlue")))
   "Face used to display message about unknown widget types."
   :group 'gnuplot-faces)
 
 (defun gnuplot-gui-make-frame (item alist &optional save-frame)
-  "Open the frame, populate it with widgets.
+  "Open the frame and populate it with widgets.
 ITEM is the object for which arguments are being set.  ALIST is
 the alist of arguments for ITEM taken from `gnuplot-gui-all-types'.
 SAVE-FRAME is non-nil when the widgets are being reset."
@@ -1069,27 +1259,23 @@ SAVE-FRAME is non-nil when the widgets are being reset."
     (modify-frame-parameters (selected-frame)
 			     '((title . "Set Gnuplot Options"))) )
   (widget-insert "\nSet options for \"" item "\"  ")
-  (cond ((string-match "^[xyz]2?tics" item) ; only __tics need the 'labels type
-	 (widget-create 'gnuplot-gui-info-link
-			:tag (concat "info on tic labels")
-			:help-echo
-			"Open a frame displaying the info entry for tic labels"
-			:value "xtics"))
-	((string-match "^no" item)
-	 (let ((it (substring item 2)))
-	   (widget-create 'gnuplot-gui-info-link
-			  :tag (concat "info on " it)
-			  :help-echo
-			  (format "Open a frame displaying the info entry for %S"
-				  item)
-			  :value item) ))
-	(t
-	 (widget-create 'gnuplot-gui-info-link
-			:tag (concat "info on " item)
-			:help-echo
-			(format "Open a frame displaying the info entry for %S"
-				item)
-			:value item)))
+  (let (tag help val)
+    (cond ((string-match "^[xyz]2?tics" item)
+	   (setq tag  "info on tic labels"
+		 help "Open a frame displaying the info entry for tic labels"
+		 val  "xtics"))
+	  ((string-match "^no" item)
+	   (setq tag  (concat "info on " (substring item 2))
+		 help (format "Open a frame displaying the info entry for %S"
+			      item)
+		 val  item))
+	  (t
+	   (setq tag  (concat "info on " item)
+		 help (format "Open a frame displaying the info entry for %S"
+			      item)
+		 val  item)))
+    (widget-create 'gnuplot-gui-info-link :tag tag :help-echo help :value val))
+
   (widget-insert "\n\n")
   (while alist
     (let* ((this    (car   alist))
@@ -1102,41 +1288,37 @@ SAVE-FRAME is non-nil when the widgets are being reset."
 	  (setq list (symbol-value (cadr list))))
       (widget-insert "\t")		; insert the appropriate widget
       (cond
-       ;;------------------------------ list -------------------
-       ((equal (eval wtype) 'list)
-	(gnuplot-gui-menu-choice tag default list))
+       ;;------------------------------ list, list* ------------
+       ((member* (eval wtype) '(list list*) :test 'equal)
+	(let ((starred (if (equal (eval wtype) 'list*) t nil)))
+	  (gnuplot-gui-menu-choice tag default list starred)))
        ;;------------------------------ number, tag, fontsize --
        ((member* (eval wtype) '(number tag fontsize) :test 'equal)
-	(widget-insert (capitalize tag) ": ")
-	(gnuplot-gui-number tag default prefix)
-	(widget-insert " " (make-string (- 40 (current-column)) ?.)
-		       " (numeric value)\n"))
+	(gnuplot-gui-number tag default prefix))
        ;;------------------------------ position ---------------
        ;;------------------------------ range, pair ------------
        ((member* (eval wtype) '(range pair) :test 'equal)
 	(let ((is-range (equal (eval wtype) 'range)))
-	  (widget-insert (capitalize tag) ": ")
-	  (gnuplot-gui-range tag default prefix is-range)
-	  (widget-insert " " (make-string (- 39 (current-column)) ?.)
-			 " (numeric values)\n")))
-       ;;------------------------------ string -----------------
-       ((equal (eval wtype) 'string)
-	(widget-insert (capitalize tag) ": ")
-	(gnuplot-gui-string tag default prefix)
-	(widget-insert "\n"))
+	  (gnuplot-gui-range tag default prefix is-range)))
+       ;;------------------------------ string, string* --------
+       ((member* (eval wtype) '(string string*) :test 'equal)
+	(let ((starred (if (equal (eval wtype) 'string) nil t)))
+	  (gnuplot-gui-string tag default prefix starred)))
        ;;------------------------------ format -----------------
        ((equal (eval wtype) 'format)
-	(widget-insert (capitalize tag) ": ")
-	(gnuplot-gui-format tag default)
-	(widget-insert "\n"))
+	(gnuplot-gui-format tag default))
        ;;------------------------------ file -------------------
        ((equal (eval wtype) 'file)
-	(gnuplot-gui-file tag default prefix)
-	(widget-insert "\n"))
+	(gnuplot-gui-file tag default prefix))
        ;;------------------------------ labels -----------------
        ((equal (eval wtype) 'labels)
 	(gnuplot-gui-labels tag default))
-       ;;------------------------------ huh? -------------------
+       ;;------------------------------ text -------------------
+       ((equal (eval wtype) 'text)
+	(let ((str (gnuplot-gui-type-default this)))
+	  (put-text-property 0 (length str) 'face 'gnuplot-gui-flat-text-face str)
+	  (widget-insert str "\n")))
+       ;;------------------------------ unknown ----------------
        (t
 	(let ((str (concat "<" (downcase tag) "> ('"
 			   (symbol-name (eval wtype))
@@ -1151,60 +1333,66 @@ SAVE-FRAME is non-nil when the widgets are being reset."
 		 :doc item
 		 :button-face 'gnuplot-gui-button-face
 		 :help-echo "Push this button to set options"
-		 :notify (lambda (widget &rest ignore)
-			   (kill-buffer (get-buffer-create "*Gnuplot GUI*"))
-			   (delete-frame)
-			   (select-frame gnuplot-current-frame)
-			   (switch-to-buffer gnuplot-current-buffer)
-			   (goto-char gnuplot-current-buffer-point)
-			   (gnuplot-gui-post-process-alist
-			    (widget-get widget :doc))
-			   (let ((alist gnuplot-gui-alist)
-				 (eol (save-excursion (end-of-line)
-						      (point-marker) )) )
-			     (if (re-search-forward ";" eol "to_limit")
-				 (backward-char 1))
-			     (delete-region gnuplot-current-buffer-point
-					    (point-marker))
-			     (delete-horizontal-space)
-			     (while alist
-			       (let ((val (cdar alist)))
-				 (if (string-match "^\\s-+$" val) ()
-				   (if (string-match "^['\"]\\(.*\\)['\"]$"
-						     val)
-				       (setq val
-					     (concat gnuplot-quote-character
-						     (match-string 1 val)
-						     gnuplot-quote-character)))
-				   (insert (format " %s" val))))
-			       (setq alist (cdr alist))))
-			   (if (string= "terminal" (widget-get widget :doc))
-			       (gnuplot-gui-set-options-and-insert)) ))
+		 :notify
+		 (lambda (widget &rest ignore)
+		   (kill-buffer (get-buffer-create "*Gnuplot GUI*"))
+		   (delete-frame)
+		   (select-frame gnuplot-current-frame)
+		   (switch-to-buffer gnuplot-current-buffer)
+		   (goto-char gnuplot-current-buffer-point)
+		   (gnuplot-gui-post-process-alist
+		    (widget-get widget :doc))
+		   (let ((alist gnuplot-gui-alist) marker
+			 (eol (save-excursion (end-of-line) (point-marker) )) )
+		     (if (re-search-forward ";" eol "to_limit")
+			 (backward-char 1))
+		     (delete-region gnuplot-current-buffer-point (point-marker))
+		     (delete-horizontal-space)
+		     (setq marker (point-marker))
+		     (while alist
+		       (let ((val (cdar alist)))
+			 (if (string-match "^\\s-+$" val) ()
+			   (if (string-match "^['\"]\\(.*\\)['\"]$" val)
+			       (setq val (concat gnuplot-quote-character
+						 (match-string 1 val)
+						 gnuplot-quote-character)))
+			   (insert (format " %s" val))))
+		       (setq alist (cdr alist)))
+		     (setq eol (point-marker))
+		     (goto-char marker)
+		     (while (< (point) eol) ; a few odd cases
+		       (unless (looking-at (concat "[" (regexp-quote "(")
+						   (regexp-quote "*") ",]"))
+			 (just-one-space))
+		       (forward-sexp)))
+		   (delete-horizontal-space)
+		   (if (string= "terminal" (widget-get widget :doc))
+		       (gnuplot-gui-set-options-and-insert)) ))
   (widget-insert "   ")
   (widget-create 'push-button :value "Reset"
 		 :help-echo "Push this button to reset all values"
 		 :button-face 'gnuplot-gui-button-face
 		 :doc item
-		 :notify (lambda (widget &rest ignore)
-			   (let ((word (widget-get widget :doc)))
-			     (gnuplot-gui-set-alist
-			      word gnuplot-gui-current-string)
-			     (gnuplot-gui-prompt-for-frame word t))))
+		 :notify
+		 (lambda (widget &rest ignore)
+		   (let ((word (widget-get widget :doc)))
+		     (gnuplot-gui-set-alist word gnuplot-gui-current-string)
+		     (gnuplot-gui-prompt-for-frame word t))))
   (widget-insert "   ")
   (widget-create 'push-button :value "Clear"
 		 :help-echo "Push this button to clear all values"
 		 :button-face 'gnuplot-gui-button-face
 		 :doc item
-		 :notify (lambda (widget &rest ignore)
-			   (let* ((word (widget-get widget :doc))
-				  (alist (cdr (assoc word
-						     gnuplot-gui-all-types))))
-			     (while alist
-			       (setcdr (assoc (gnuplot-gui-type-tag (car alist))
-					      gnuplot-gui-alist)
-				       (gnuplot-gui-type-default (car alist)))
-			       (setq alist (cdr alist)))
-			     (gnuplot-gui-prompt-for-frame word t))) )
+		 :notify
+		 (lambda (widget &rest ignore)
+		   (let* ((word (widget-get widget :doc))
+			  (alist (cdr (assoc word gnuplot-gui-all-types))))
+		     (while alist
+		       (setcdr (assoc (gnuplot-gui-type-tag (car alist))
+				      gnuplot-gui-alist)
+			       (gnuplot-gui-type-default (car alist)))
+		       (setq alist (cdr alist)))
+		     (gnuplot-gui-prompt-for-frame word t))) )
   (widget-insert "   ")
   (widget-create 'push-button :value "Cancel"
 		 :help-echo "Quit setting options and dismiss frame"
@@ -1248,50 +1436,67 @@ Only used in Emacs.  XEmacs displays push-buttons with a pixmap."
   "Face used for insert and delete button in the labels widget."
   :group 'gnuplot-faces)
 
-(defun gnuplot-gui-menu-choice (item default list)
-  "Return a menu widget for the Gnuplot GUI.
+(defun gnuplot-gui-menu-choice (item default list &optional starred)
+  "Create a menu widget for the Gnuplot GUI.
 ITEM is the object whose arguments are set by this widget, DEFAULT
 is the default argument value, LIST contains the items for the pop-up
-menu."
-  (let ((widget (apply 'widget-create
-		       'menu-choice :value default :tag item
-		       :button-face 'gnuplot-gui-menu-face
-		       :button-prefix "[" :button-suffix "]"
-		       :help-echo (format "Mouse-2 to change %S" (downcase item))
-		       :notify (lambda (widget &rest ignore)
-				 (setcdr (assoc
-					  (widget-get widget :tag)
-					  gnuplot-gui-alist)
-					 (format "%s" (widget-value widget))))
-		       (mapcar (lambda (x) (list 'item :value x))
-			       list))))
+menu.  STARRED is true if this a 'list* widget."
+  (let ((widget
+	 (apply 'widget-create
+		'menu-choice :value default :tag item :doc starred
+		:button-face 'gnuplot-gui-menu-face
+		:button-prefix "[" :button-suffix "]"
+		:help-echo (format "Mouse-2 to view the %S menu" (downcase item))
+		:notify
+		(lambda (widget &rest ignore)
+		  (let ((lab (if (widget-get widget :doc)
+				 (concat (downcase (widget-get widget :tag)) " ")
+			       "" )))
+		    (setcdr (assoc (widget-get widget :tag) gnuplot-gui-alist)
+			    (if (string= (widget-value widget) " ") ""
+			      (format "%s%s" lab (widget-value widget))) )))
+		(mapcar (lambda (x) (list 'item :value x))
+			list))))
     (widget-value-set widget default)
+    (unless (string-match "^\\s-*$" default)
+      (setcdr (assoc item gnuplot-gui-alist)
+	      (format "%s %s" (downcase item) default)))
     widget))
 
 (defun gnuplot-gui-number (item default &optional prefix)
-  "Return a number widget for the Gnuplot GUI.
+  "Create a number widget for the Gnuplot GUI.
 ITEM is the object whose arguments are set by this widget, DEFAULT
 is the default value for the widget, PREFIX is a text string preceding
 the numerical argument."
   (let ((help-label (or prefix (downcase item))))
+    (widget-insert (capitalize item) ": ")
     (widget-create 'editable-field
-		   :size 2 :tag item :value default
+		   :size 2 :tag item :value default :doc prefix
 		   :help-echo (format "Insert new value of %S here" help-label)
 		   :notify (lambda (widget &rest ignore)
-			     (setcdr (assoc
-				      (widget-get widget :tag)
-				      gnuplot-gui-alist)
-				     (format "%s" (widget-value widget)))))))
+			     (let ((val (widget-value widget))
+				   (pre (concat (widget-get widget :doc) " ")))
+			       (setcdr (assoc (widget-get widget :tag)
+					      gnuplot-gui-alist)
+				       (if (string-match
+					    "^\\s-*[-0-9.*]+\\s-*$" val)
+					   (format "%s%s" pre val) "") )))))
+  (unless (string-match "^\\s-*$" default)
+    (setcdr (assoc item gnuplot-gui-alist) (format "%s %s" prefix default)))
+  (widget-insert " " (make-string (- 40 (current-column)) ?.)
+		 " (numeric value)\n"))
 
-(defun gnuplot-gui-string (item default &optional width_or_prefix)
-  "Return a string widget for the Gnuplot GUI.
+(defun gnuplot-gui-string (item default &optional width_or_prefix starred)
+  "Create a string widget for the Gnuplot GUI.
 ITEM is the object whose arguments are set by this widget, DEFAULT is
 the default value for the widget, and WIDTH_OR_PREFIX is the width of
 the text entry field (which defaults to half the frame width) or the
-prefix for the string."
-  (let ((help-label (downcase item)) width (prefix ""))
+prefix for the string.  STARRED is t if quotes are not to be used."
+  (let ((help-label (downcase item)) width (prefix "") (pp ""))
     (cond ((stringp width_or_prefix)
-	   (setq prefix width_or_prefix))
+	   (setq prefix width_or_prefix
+		 pp prefix)
+	   (if starred (setq prefix (concat prefix "_star"))) )
 	  ((numberp width_or_prefix)
 	   (setq width width_or_prefix)))
     (setq width (or width (/ (frame-width) 2)))
@@ -1299,24 +1504,33 @@ prefix for the string."
 	(setq default (replace-match "" nil nil default)))
     (if (string-match "['\"]$" default)
 	(setq default (replace-match "" nil nil default)))
-    (widget-create 'editable-field
-		   :size width :tag item :doc prefix :value default
-		   :help-echo (format "Insert new value of %S here" help-label)
-		   :notify (lambda (widget &rest ignore)
-			     (let ((val (widget-value widget))
-				   (q gnuplot-quote-character))
-			       (if (string-match "^\\s-+" val)
-				   (setq val (replace-match "" nil nil val)))
-			       (if (string-match "\\s-+$" val)
-				   (setq val (replace-match "" nil nil val)))
-			       (setcdr (assoc (widget-get widget :tag)
-					      gnuplot-gui-alist)
-				       (format "%s%s%s%s"
-					       (widget-get widget :doc)
-					       q val q)))))))
+    (widget-insert (capitalize item) ": ")
+    (widget-create
+     'editable-field
+     :size width :tag item :doc prefix :value default
+     :help-echo (format "Insert new value of %S here" help-label)
+     :notify (lambda (widget &rest ignore)
+	       (let ((val (widget-value widget))
+		     (q gnuplot-quote-character)
+		     (p (widget-get widget :doc)) )
+		 (setcdr (assoc (widget-get widget :tag) gnuplot-gui-alist)
+			 (if (string-match "^\\s-*$" val)
+			     ""
+			   (progn
+			     (if (string-match "_star$" p)
+				 (setq p (concat (substring p 0 -5) " ")
+				       q ""))
+			     (if (string-match "^\\s-+" val)
+				 (setq val (replace-match "" nil nil val)))
+			     (if (string-match "\\s-+$" val)
+				 (setq val (replace-match "" nil nil val)))
+			     (format "%s%s%s%s" p q val q)))))))
+    (unless (string-match "^\\s-*$" default)
+      (setcdr (assoc item gnuplot-gui-alist) (format "%s %s" pp default)))
+    (widget-insert "\n")))
 
 (defun gnuplot-gui-format (item default)
-  "Return a string widget for the Gnuplot GUI.
+  "Create a string widget for the Gnuplot GUI.
 ITEM is the object whose arguments are set by this widget, DEFAULT is
 the default value for the widget, and WIDTH_OR_PREFIX is the width of
 the text entry field (which defaults to half the frame width) or the
@@ -1325,6 +1539,7 @@ prefix for the string."
       (setq default (replace-match "" nil nil default)))
   (if (string-match "['\"]$" default)
       (setq default (replace-match "" nil nil default)))
+  (widget-insert (capitalize item) ": ")
   (widget-create 'editable-field
 		 :size (/ (frame-width) 3) :tag item :value default
 		 :help-echo (format "Insert new format string here")
@@ -1340,10 +1555,33 @@ prefix for the string."
   (widget-create 'gnuplot-gui-info-link
 		 :tag (concat "info on format")
 		 :help-echo "Open a frame displaying the info entry for format"
-		 :value "format") )
+		 :value "format")
+  (widget-insert "\n"))
+
+
+;; swiped from widget-color-complete
+(defun gnuplot-gui-file-completion (widget)
+  "Complete the filename in WIDGET."
+  (let* ((str (buffer-substring-no-properties (widget-field-start widget)
+					      (point)))
+	 (file (or (file-name-nondirectory str) ""))
+ 	 (dir  (or (file-name-directory str) "./"))
+ 	 (val  (file-name-completion file dir)) )
+    (cond ((eq val t)
+	   (message "Exact match"))
+	  ((null val)
+	   (error "Can't find completion for \"%s\"" str))
+	  ((not (string-equal str val))
+	   (insert (substring val (length file))))
+	  (t
+	   (message "Making completion list...")
+	   (let ((list (file-name-all-completions file dir)))
+	     (with-output-to-temp-buffer "*Completions*"
+	       (display-completion-list list)))
+	   (message "Making completion list...done")))))
 
 (defun gnuplot-gui-file (item default &optional tag)
-  "Return a file widget for the Gnuplot GUI.
+  "Create a file widget for the Gnuplot GUI.
 ITEM is the object whose arguments is set by this widget, DEFAULT is
 the default value for the argument.  TAG is non-nil if ITEM rather than
 \"File:\" is to be used as the tag."
@@ -1357,31 +1595,30 @@ the default value for the argument.  TAG is non-nil if ITEM rather than
 	       :value default :tag tag
 	       :size (- (/ (frame-width) 2) 3)
 	       :doc item :help-echo "Insert a filename here"
-	       :notify (lambda (widget &rest ignore)
-			 (setcdr (assoc (widget-get widget :doc)
-					gnuplot-gui-alist)
-				 (format "%s%s%s"
-					 gnuplot-quote-character
-					 (widget-value widget)
-					 gnuplot-quote-character )) )) ))
+	       :complete 'gnuplot-gui-file-completion
+	       :notify
+	       (lambda (widget &rest ignore)
+		 (setcdr (assoc (widget-get widget :doc) gnuplot-gui-alist)
+			 (format "%s%s%s" gnuplot-quote-character
+				 (widget-value widget)
+				 gnuplot-quote-character)) )) ))
     (widget-insert " ")
-    (widget-create 'push-button :value "Browse"
-		   :doc item :help-echo "Browse for a file."
-		   :parent widg
-		   :notify (lambda (widget &rest ignore)
-			     (let ((fname (file-relative-name
-					   (read-file-name "File: ")
-					   default-directory))
-				   (q gnuplot-quote-character))
-			       (widget-value-set
-				(widget-get widget :parent) fname)
-			       (setcdr (assoc (widget-get widget :doc)
-					      gnuplot-gui-alist)
-				       (format "%s%s%s" q fname q ))
-			       (widget-setup)))) ))
+    (widget-create
+     'push-button :value "Browse"
+     :doc item :help-echo "Browse directories for a filename."
+     :parent widg
+     :notify (lambda (widget &rest ignore)
+	       (let ((fname (file-relative-name (read-file-name "File: ")
+						default-directory))
+		     (q gnuplot-quote-character))
+		 (widget-value-set (widget-get widget :parent) fname)
+		 (setcdr (assoc (widget-get widget :doc) gnuplot-gui-alist)
+			 (format "%s%s%s" q fname q))
+		 (widget-setup))))
+    (widget-insert "\n")))
 
 (defun gnuplot-gui-labels (item default)
-  "Return a labels widget for the Gnuplot GUI.
+  "Create a labels widget for the Gnuplot GUI.
 ITEM is the object whose arguments is set by this widget, DEFAULT is
 the default value for the argument."
   (widget-create
@@ -1402,11 +1639,12 @@ the default value for the argument."
 				   (widget-value widget)))))
 
 (defun gnuplot-gui-range (item default separator is-range)
-  "Return a range or pair widget for the Gnuplot GUI.
+  "Create a range or pair widget for the Gnuplot GUI.
 ITEM is the object whose arguments are set by this widget, DEFAULT is
 the default value for the widget, SEPARATOR is a text string preceding
-the numerical argument, or the prefix for a pair operator.  IS_RANGE
+the numerical argument, or the prefix for a pair operator.  IS-RANGE
 is non-nil if this is a 'range widget."
+  (widget-insert (capitalize item) ": ")
   (if is-range (widget-insert "["))
   (widget-create 'editable-field
 		 :size 4 :tag item :value (car default)
@@ -1425,7 +1663,9 @@ is non-nil if this is a 'range widget."
 			   (setcdr (cdr (assoc (widget-get widget :tag)
 					       gnuplot-gui-alist))
 				   (format "%s" (widget-value widget)))))
-  (if is-range (widget-insert "]")) )
+  (if is-range (widget-insert "]"))
+  (widget-insert " " (make-string (- 39 (current-column)) ?.)
+		 " (numeric values)\n"))
 
 
 ;; suppress compiler warning

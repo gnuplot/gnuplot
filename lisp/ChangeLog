@@ -1,9 +1,19 @@
 
+Apr  6 1999  Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5e
+	* drop gnuplot-which-highlight variable but still make sure
+	         colorization works under emacs, xemacs, font-lock,
+	         and hilit19
+	* insert a space at the end of a unique completion
+	* fixed completion in file widget in GUI
+	* primitive support for plot, splot, fit in gui.
+	* rewrote a lot of GUI code
+
 Mar 21 1999  Bruce Ravel  <ravel@phys.washington.edu>
 	* gnuplot.el: Version 0.5d
 	* use installation materials provided by Lars Hecking,
 	        maintainer of gnuplot itself
-	* add GUI support for hidden3d
+	* added some GUI support for hidden3d
 	* various improvements to the types alists used by the GUI
 	* improved various document strings and the bug reporter function
 
