@@ -1,3 +1,8 @@
+2002-08-24  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/post.trm: stricter parsing of font names to insure that
+	legal PostScript is generated and that font size is correct.
+
 2002-08-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/fig.trm: Don't reset terminal options. Improved documentation.
@@ -943,7 +948,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/23 20:56:55 $).
+	last modification date (from the tag $Date: 2002/08/24 16:20:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

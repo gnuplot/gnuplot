@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.70 2002/08/15 17:56:46 mikulik Exp $
+ * $Id: post.trm,v 1.71 2002/08/15 20:33:56 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1426,14 +1426,17 @@ PS_set_font(font)  /* Entry font added by DJL */
     const char *font;
 {
     char name[32];
-    int  size;
+    int  i,size;
     size_t sep;
 
     sep = strcspn(font,",");
     strncpy(name,font,sep);
     name[sep] = NUL;
+    for (i=0; i<sep; i++)
+	if (name[i] == ' ') name[i] = '-';
     size = ps_fontsize;
-    sscanf (&(font[sep+1]),"%d",&size);
+    if (font[sep] == ',')
+	sscanf (&(font[sep+1]),"%d",&size);
     PS_RememberFont(name,1 );
     fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     return TRUE;
