@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.86 2002/08/25 16:13:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.87 2002/08/30 18:45:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1133,18 +1133,21 @@ show_fillstyle()
 
     switch(fillstyle) {
     case 1:
+    case 3:
         fprintf(stderr,
-		"\tFilling is active and uses solid colour with density %f\n",
-		filldensity / 100.0);
+	    "\tFill style is solid colour with density %f", filldensity/100.0);
         break;
     case 2:
+    case 4:
         fprintf(stderr,
-		"\tFilling is active and uses pattern number %d\n",
-		fillpattern);
+	    "\tFill style uses pattern number %d", fillpattern);
         break;
     default:
-        fprintf(stderr, "\tFilling is deactivated\n");
+        fprintf(stderr, "\tFilling is deactivated");
     }
+    if (fillstyle == 3 || fillstyle == 4)
+	fprintf(stderr," with border");
+    fprintf(stderr,"\n");
 }
 #endif /* USE_ULIG_FILLEDBOXES */
 

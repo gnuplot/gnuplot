@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.130 2002/08/29 04:10:08 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.131 2002/08/30 18:45:44 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3753,7 +3753,7 @@ C ... and restart the table:
  `filledboxes` style.
 
  Syntax: 
-       set style filling {empty | solid {<density>} | pattern {<number>}}
+       set style filling {empty | {b}solid {<density>} | {b}pattern {<number>}}
 
  The default fillstyle is `solid 1.0`.
 
@@ -3766,10 +3766,16 @@ C ... and restart the table:
  the terminal driver. If no <density> parameter is given, a default of
  1.0 is used, automatically.
 
+ The `bsolid` option is identical to `solid` except that the box border is
+ drawn in black.
+
  The `pattern` option causes filling to be done with a fill pattern supplied
  by the terminal driver. <pattern> is the pattern number, starting at 0. 
  The kind and number of available fill patterns depend on the terminal driver. 
  If no <pattern> number is given, a default of 0 is assumed.
+
+ The `bpattern` option is identical to `pattern` except that the box border is
+ drawn in black.
 
  The `empty` option causes filled boxes not to be filled, after all. This
  makes the `filledboxes` style equivalent to simple `boxes`. It is equivalent

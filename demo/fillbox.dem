@@ -9,6 +9,11 @@ set style filling solid 1.0
 set title "A demonstration of filled boxes with default widths"
 plot [-10:10] 100/(1.0+x*x) title 'distribution' with filledboxes
 
+pause -1 "Now draw the boxes with a black border"
+
+set title "Filled boxes with the bsolid style"
+set style filling bsolid
+replot
 
 pause -1 "Now make the boxes a little less wide (-> return)"
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.71 2002/08/24 22:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.72 2002/08/25 15:13:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2687,29 +2687,35 @@ plot_boxes(plot, xaxis_y)
                      * acceptable. */
                     switch( fillstyle ) {
                     case 1:
+                    case 3:
 			/* style == 1 --> solid fill with 'filldensity' */
-                        fillpar = filldensity;
+			fillpar = filldensity;
+			style = ((fillpar & 0xfff) << 4) + (1 & 0xf);
                         break;
                     case 2:  
+                    case 4:  
 			/* style == 2 --> pattern fill with 'fillpattern' */
-                        fillpar = fillpattern;
+			fillpar = fillpattern;
+			style = ((fillpar & 0xfff) << 4) + (2 & 0xf);
                         break;
                     default:
 			/* style == 0 or unknown --> solid fill with
                          * background color */
-                        fillpar = 0;
+			fillpar = 0;
+			style = 0;
                     }
 
-                    style = ((fillpar & 0xfff) << 4) + (fillstyle & 0xf);
                     (*t->fillbox) (style, x, y, w, h);
 
                     /* break here, if we don't need the box frame
                      * around, i.e. fillstyle is "solid" and
                      * filldensity is 100%, or if we are using the fig
                      * driver (frame and fill are one object) */
-                    if((fillstyle == 1 && filldensity == 100)
+                    if ((fillstyle == 1 && filldensity == 100)
 		        || (strcmp(t->name, "fig") == 0))
 			break;
+		    if (fillstyle == 3 || fillstyle == 4)
+			(*t->linetype)(LT_BLACK);
                 }
 #endif /* USE_ULIG_FILLEDBOXES */
 
@@ -2718,6 +2724,10 @@ plot_boxes(plot, xaxis_y)
 		(*t->vector) (xr, yt);
 		(*t->vector) (xr, xaxis_y);
 		(*t->vector) (xl, xaxis_y);
+#if USE_ULIG_FILLEDBOXES
+                if( fill && t->fillbox && (fillstyle == 3 || fillstyle == 4))
+		    (*t->linetype)(plot->lp_properties.l_type);
+#endif
 		break;
 	    }			/* case OUTRANGE, INRANGE */
 
@@ -2989,10 +2999,12 @@ plot_c_bars(plot)
 	    /* This code copied from filledboxes below         */
                     switch( fillstyle ) {
                     case 1:
+                    case 3:
 			/* style == 1 --> solid fill with 'filldensity' */
                         fillpar = filldensity;
                         break;
                     case 2:  
+                    case 4:  
 			/* style == 2 --> pattern fill with 'fillpattern' */
                         fillpar = fillpattern;
                         break;

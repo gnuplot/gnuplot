@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.90 2002/08/24 22:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.91 2002/08/30 18:45:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1024,6 +1024,19 @@ set_fillstyle()
     } else if (almost_equals(c_token, "s$olid")) {
 	fillstyle = 1;
 	c_token++;
+    } else if (almost_equals(c_token, "bs$olid")) {
+	fillstyle = 3;
+	c_token++;
+    } else if (almost_equals(c_token, "p$attern")) {
+	fillstyle = 2;
+	c_token++;
+    } else if (almost_equals(c_token, "bp$attern")) {
+	fillstyle = 4;
+	c_token++;
+    } else
+	int_error(c_token, "expecting 'empty' 'solid' 'pattern' 'bsolid' 'bpattern'");
+
+    if (fillstyle == 1 || fillstyle == 3) {
 	if (END_OF_COMMAND)
 	    filldensity = 100;
 	else {
@@ -1034,9 +1047,7 @@ set_fillstyle()
 	    if( filldensity > 100 )
 		filldensity = 100;
 	}
-    } else if (almost_equals(c_token, "p$attern")) {
-	fillstyle = 2;
-	c_token++;
+    } else if (fillstyle == 2 || fillstyle == 4) {
 	if (END_OF_COMMAND)
 	    fillpattern = 0;
 	else {
@@ -1044,8 +1055,7 @@ set_fillstyle()
 	    if( fillpattern < 0 )
 		fillpattern = 0;
 	}
-    } else
-	int_error(c_token, "expecting 'empty', 'solid' or 'pattern'");
+    }
     
 }
 #endif /* USE_ULIG_FILLEDBOXES */
