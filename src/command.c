@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.84 2003/11/25 18:13:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.85 2003/11/28 08:06:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1318,7 +1318,7 @@ test_palette_subcommand()
     int_error(c_token, "'test palette' requires pm3d support built-in");
 #else
     const int colors = 256;
-    double z[colors];
+    double gray, z[colors];
     rgb_color rgb1[colors];
     int i;
     const char pre1[] = "\
@@ -1361,12 +1361,12 @@ se tit'R,G,B profiles of the current color palette';";
 	/* colours equidistantly from [0,1] */
 	z[i] = (double)i / (colors - 1); 
 	/* needed, since printing without call to set_color()*/
-	double gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
+	gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
 	rgb1_from_gray(gray, &rgb1[i]);
     }
     /* commands to setup the test palette plot */
     fputs(pre1, f);
-    fputs(pre2, f);
+    if (can_pm3d) fputs(pre2, f);
     fputs(pre3, f);
     /* put inline data of the r,g,b curves */
     fputs("p", f);
