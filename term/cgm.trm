@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.46 2002/08/30 20:18:24 sfeam Exp $
+ * $Id: cgm.trm,v 1.47 2002/09/27 18:00:39 joze Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -204,13 +204,13 @@ static int GPFAR cgm_default_color_table[] =
      0,0,0,			/* black -2,  lt = -1 */
      160,160,160,		/* gray -1,   lt = 0 */
      255,0,0,			/* red 0,     lt = 1 */
-     0,255,0,			/* green,     lt = 2 */
+     0,221,0,			/* green,     lt = 2 */
      0,0,255,			/* blue,      lt = 3 */
-     255,0,255,			/* magenta,   lt = 4 */
-     0,255,255,			/* cyan,      lt = 5 */
-     255,255,0,			/* yellow,    lt = 6 */
+     221,0,221,			/* magenta,   lt = 4 */
+     0,221,221,			/* cyan,      lt = 5 */
+     160,82,45,			/* sienna,    lt = 6 */
      0,0,0,			/* black,     lt = 7 */
-     255,77,0,			/* orange,    lt = 8 */
+     255,165,0,			/* orange,    lt = 8 */
      128,128,128,		/* gray,      lt = 9 */
 };
 
