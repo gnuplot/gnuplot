@@ -125,7 +125,7 @@ static char *RCSid = "$Id: interpol.c,v 1.29 1998/04/14 00:15:45 drd Exp $";
  */
 
 extern double min_array[AXIS_ARRAY_SIZE];
-extern double  max_array[AXIS_ARRAY_SIZE];
+extern double max_array[AXIS_ARRAY_SIZE];
 extern int auto_array[AXIS_ARRAY_SIZE];
 extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
 extern double base_array[AXIS_ARRAY_SIZE];
@@ -178,16 +178,16 @@ do { if (TEST) { \
 typedef double spline_coeff[spline_coeff_size];
 typedef double five_diag[5];
 
-static int next_curve __PROTO((struct curve_points * plot, int * curve_start));
+static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
 static double *cp_binomial __PROTO((int points));
 GP_INLINE static double s_pow __PROTO((double base, unsigned int exponent));
 static void eval_bezier __PROTO((struct curve_points * cp, int first_point, int num_points, double sr, coordval * px, coordval * py, double *c));
-static void do_bezier __PROTO((struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate *dest));
+static void do_bezier __PROTO((struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest));
 static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n));
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
-static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate *dest));
+static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
 static int compare_points __PROTO((struct coordinate * p1, struct coordinate * p2));
 
 
@@ -206,17 +206,17 @@ int *curve_start;
     int curve_length;
 
     /* Skip undefined points */
-    while( *curve_start < plot->p_count 
-	   && plot->points[*curve_start].type == UNDEFINED ) {
+    while (*curve_start < plot->p_count
+	   && plot->points[*curve_start].type == UNDEFINED) {
 	(*curve_start)++;
     };
     curve_length = 0;
     /* curve_length is first used as an offset, then the correkt # points */
-    while( (*curve_start)+curve_length < plot->p_count
-	   && plot->points[(*curve_start)+curve_length].type != UNDEFINED ) {
+    while ((*curve_start) + curve_length < plot->p_count
+      && plot->points[(*curve_start) + curve_length].type != UNDEFINED) {
 	curve_length++;
     };
-    return(curve_length);
+    return (curve_length);
 }
 
 
@@ -234,11 +234,11 @@ struct curve_points *plot;
 
     first_point = 0;
     curves = 0;
-    while((num_points=next_curve(plot, &first_point)) > 0) {
+    while ((num_points = next_curve(plot, &first_point)) > 0) {
 	curves++;
 	first_point += num_points;
     }
-    return(curves);
+    return (curves);
 }
 
 
@@ -263,7 +263,7 @@ int points;
     register int n, k;
     int e;
 
-    e = points;		/* well we're going from k=0 to k=p_count-1 */
+    e = points;			/* well we're going from k=0 to k=p_count-1 */
     coeff = (double *) gp_alloc(e * sizeof(double), "bezier coefficients");
 
     n = points - 1;
@@ -315,7 +315,8 @@ unsigned int exponent;
 	if (exponent & 1)
 	    y *= base;
 	base *= base;
-	exponent >>= 1;		/* if exponent was signed, this could be trouble ! */
+	/* if exponent was signed, this could be trouble ! */
+	exponent >>= 1;
     }
 
     return (y);
@@ -323,17 +324,18 @@ unsigned int exponent;
 
 static void eval_bezier(cp, first_point, num_points, sr, px, py, c)
 struct curve_points *cp;
-int first_point;		/* where to start in plot->points (to find x-range) */
-int num_points;			/* to determine end in plot->points */
+int first_point;	/* where to start in plot->points (to find x-range) */
+int num_points;		/* to determine end in plot->points */
 double sr;
 coordval *px;
 coordval *py;
 double *c;
 {
     unsigned int n = num_points - 1;
-    struct coordinate GPHUGE *this_points; /* HBB 980308: added 'GPHUGE' tag for DOS */
+    /* HBB 980308: added 'GPHUGE' tag for DOS */
+    struct coordinate GPHUGE *this_points;
 
-    this_points = (cp->points)+first_point;
+    this_points = (cp->points) + first_point;
 
     if (sr == 0.0) {
 	*px = this_points[0].x;
@@ -522,16 +524,17 @@ int num_points;			/* to determine end in plot->points */
     spline_coeff *sc;
     five_diag *m;
     double *r, *x, *h;
-    struct coordinate GPHUGE *this_points; /* HBB 980308: added 'GPHUGE' tag */
+    /* HBB 980308: added 'GPHUGE' tag */
+    struct coordinate GPHUGE *this_points;
     int i;
 
     sc = (spline_coeff *) gp_alloc((num_points) * sizeof(spline_coeff),
-				"spline matrix");
+				   "spline matrix");
 
     if (num_points < 4)
 	int_error("Can't calculate approximation splines, need at least 4 points", NO_CARET);
 
-    this_points = (plot->points)+first_point;
+    this_points = (plot->points) + first_point;
 
     for (i = 0; i <= num_points - 1; i++)
 	if (this_points[i].z <= 0)
@@ -633,13 +636,14 @@ int first_point, num_points;
     spline_coeff *sc;
     tri_diag *m;
     double *r, *x, *h;
-    struct coordinate GPHUGE *this_points;  /* HBB 980308: added 'GPHUGE' tag */ 	 
+    /* HBB 980308: added 'GPHUGE' tag */
+    struct coordinate GPHUGE *this_points;
     int i;
 
     if (num_points < 3)
 	int_error("Can't calculate splines, need at least 3 points", NO_CARET);
 
-    this_points = (plot->points)+first_point;
+    this_points = (plot->points) + first_point;
 
     sc = (spline_coeff *) gp_alloc((num_points) * sizeof(spline_coeff), "spline matrix");
     m = (tri_diag *) gp_alloc((num_points - 2) * sizeof(tri_diag), "spline help matrix");
@@ -711,7 +715,8 @@ struct coordinate *dest;	/* where to put the interpolated data */
     int i, l;
     int xaxis = plot->x_axis;
     int yaxis = plot->y_axis;
-    struct coordinate GPHUGE *this_points;  /* HBB 980308: added 'GPHUGE' tag */
+    /* HBB 980308: added 'GPHUGE' tag */
+    struct coordinate GPHUGE *this_points;
 
     /* min and max in internal (eg logged) co-ordinates. We update
      * these, then update the external extrema in user co-ordinates
@@ -738,7 +743,7 @@ struct coordinate *dest;	/* where to put the interpolated data */
     }
 
 
-    this_points = (plot->points)+first_point;
+    this_points = (plot->points) + first_point;
 
     l = 0;
 
@@ -788,23 +793,22 @@ struct curve_points *plot;
     int first_point, num_points;
 
     curves = num_curves(plot);
-    new_points = (struct coordinate *) gp_alloc(
-       (samples+1) * curves * sizeof(struct coordinate),"interpolation table");
+    new_points = (struct coordinate *) gp_alloc((samples + 1) * curves * sizeof(struct coordinate), "interpolation table");
 
     first_point = 0;
-    for(i=0; i<curves; i++) {
+    for (i = 0; i < curves; i++) {
 	num_points = next_curve(plot, &first_point);
 	switch (plot->plot_smooth) {
 	case CSPLINES:
 	    sc = cp_tridiag(plot, first_point, num_points);
 	    do_cubic(plot, sc, first_point, num_points,
-		     new_points+i*(samples+1));
+		     new_points + i * (samples + 1));
 	    free(sc);
 	    break;
 	case ACSPLINES:
 	    sc = cp_approx_spline(plot, first_point, num_points);
 	    do_cubic(plot, sc, first_point, num_points,
-		     new_points+i*(samples+1));
+		     new_points + i * (samples + 1));
 	    free(sc);
 	    break;
 
@@ -812,19 +816,19 @@ struct curve_points *plot;
 	case SBEZIER:
 	    bc = cp_binomial(num_points);
 	    do_bezier(plot, bc, first_point, num_points,
-		      new_points+i*(samples+1));
+		      new_points + i * (samples + 1));
 	    free((char *) bc);
 	    break;
-	default:			/* keep gcc -Wall quiet */
+	default:		/* keep gcc -Wall quiet */
 	    ;
 	}
-	new_points[(i+1)*(samples+1)-1].type = UNDEFINED;
+	new_points[(i + 1) * (samples + 1) - 1].type = UNDEFINED;
 	first_point += num_points;
     }
 
     free(plot->points);
     plot->points = new_points;
-    plot->p_max = curves*(samples+1);
+    plot->p_max = curves * (samples + 1);
     plot->p_count = plot->p_max - 1;
 
     return;
@@ -857,7 +861,7 @@ struct curve_points *plot;
     int first_point, num_points;
 
     first_point = 0;
-    while((num_points=next_curve(plot, &first_point)) > 0) {
+    while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
 	qsort((char *) (plot->points + first_point), num_points,
 	      sizeof(struct coordinate), (sortfunc) compare_points);
@@ -882,12 +886,12 @@ struct curve_points *cp;
     double x, y, sux, slx, suy, sly;
     enum coord_type dot;
 
-    
+
     j = 0;
     first_point = 0;
-    while((num_points=next_curve(cp, &first_point)) > 0) {
+    while ((num_points = next_curve(cp, &first_point)) > 0) {
 	k = 0;
-	for (i = first_point; i < first_point+num_points; i++) {
+	for (i = first_point; i < first_point + num_points; i++) {
 	    if (!k) {
 		x = cp->points[i].x;
 		y = cp->points[i].y;
@@ -897,7 +901,7 @@ struct curve_points *cp;
 		sly = cp->points[i].ylow;
 		dot = INRANGE;
 		if (cp->points[i].type != INRANGE)
-		    dot = UNDEFINED; /* This means somthing other than usual */			                    /* just signal to check if INRANGE */
+		    dot = UNDEFINED;	/* This means somthing other than usual *//* just signal to check if INRANGE */
 		k = 1;
 	    } else if (cp->points[i].x == x) {
 		y += cp->points[i].y;
@@ -947,16 +951,15 @@ struct curve_points *cp;
 		} else
 		    cp->points[j].type = INRANGE;
 	    }
-	    j++;			/* next valid entry */
+	    j++;		/* next valid entry */
 	}
 	/* insert invalid point to separate curves */
-	if(j<cp->p_count) {
+	if (j < cp->p_count) {
 	    cp->points[j].type = UNDEFINED;
 	    j++;
 	}
 	first_point += num_points;
-    } /* end while */
+    }				/* end while */
     cp->p_count = j;
     cp_extend(cp, j);
 }
-
