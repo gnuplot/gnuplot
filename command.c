@@ -644,7 +644,7 @@ int status;
 static int changedir(path)
 char *path;
 {
-#if defined(MSDOS) || defined(_Windows) || defined(ATARI) || defined(DOS386)
+#if defined(MSDOS) || defined(WIN16) || defined(ATARI) || defined(DOS386)
 # if defined(__ZTC__)
     unsigned dummy;		/* it's a parameter needed for dos_setdrive */
 # endif
@@ -681,7 +681,9 @@ char *path;
 
     return 0;			/* should report error with setdrive also */
 
-#else /* MSDOS, ATARI etc. */
+#elif defined(WIN32)
+    return !(SetCurrentDirectory(path));
+#else
     return chdir(path);
 #endif /* MSDOS, ATARI etc. */
 }
