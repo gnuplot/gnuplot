@@ -1,3 +1,48 @@
+1999-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Add contents of new lisp subdir.
+
+	* gnuplot.el: Move to lisp/old.
+
+	* lisp/*: New subdir. Added new gnuplot-mode for X/Emacs by
+	Bruce Ravel <ravel@phys.washington.edu>.
+
+	* term/png.trm: Reorder switch statements, add default case,
+	initialise variables to remove compiler warnings.
+
+1999-01-26  Thomas Walter  <twalter@pc2-69.chemie.uni-erlangen.de>
+
+	* command.c, plot.c, protos.h, syscfg.h: Avoid duplicate history
+	entries with GNU readline.
+
+1999-01-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0README: Take out part about now defunct ftpmail service.
+
+1999-01-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* PGPKEYS: Add Roger Fearick's public key.
+
+	* configure: Regenerated.
+
+	* configure.in: New way to create VERSION.
+
+	* install-sh, missing, mkinstalldirs: Updated from current
+	automake release.
+
+	* version.c: New beta patchlevel.
+
+	* term/gif.trm: Add new options to terminal help.
+
+1999-01-19  Ben Laurie  <ben@algroup.co.uk>
+
+	* term/gif.trm: New 'tiny', 'giant' font options.
+
+1999-01-19  Andris Pavenis  <pavenis@lanet.lv>
+
+	* term/png.trm(PNGtext): Fix SIGSEGV in DJGPP v2 binaries if no
+	output file name is set.
+
 1999-01-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Add PGPKEYS to ETC.
