@@ -4,6 +4,11 @@
 	* term/post.trm: Make dash styles 6 and 7 a bit more distinctive
 	* term/emf.trm:  Add option 'set term emf {linewidth <factor>}'
 
+	* src/graphics.c (label_width): When estimating the length and height
+	of labels, increase the number of lines by one if we're in enhanced text
+	mode and there seems to be a subscript. This test can be fooled if the
+	label has disabled enhanced text processing.
+
 2005-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c src/tables.c src/set.c src/unset.c docs/gnuplot.doc: Let

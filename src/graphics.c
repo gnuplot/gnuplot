@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.147 2005/02/09 11:43:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.148 2005/02/11 11:37:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4256,6 +4256,12 @@ label_width(const char *str, int *lines)
 	    l++;
 	s = ++e;
     }
+#ifdef GP_ENH_EST
+    /* Imperfect check for subscripts */
+    if (term->flags & TERM_ENHANCED_TEXT)
+	if (strchr(str,'_'))
+	    l++;
+#endif
     /* lines = NULL => not interested - div */
     if (lines)
 	*lines = l;
