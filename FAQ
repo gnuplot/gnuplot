@@ -102,12 +102,12 @@ Meta - Questions
 
 This document is posted about once every two weeks to the newsgroups
  ~comp.graphics.apps.gnuplot. Its newest (plaintext) version is available
-via anonymous ftp from ftp.gnuplot.org in /pub/gnuplot/faq/gnuplot-faq.txt.
+via anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/gnuplot-faq.txt.
 
 If you have access to the WWW, you can get the newest version of this
 document from http://www.ucc.ie/gnuplot/gnuplot-faq.html.
 
-Today's version is version $Revision: 1.7 $, dated $Date: 2000/10/25
+Today's version is version $Revision: 1.8 $, dated $Date: 2000/10/25
 08:31:23 $
 
 0.2 Where do I send comments about this document?
@@ -312,13 +312,13 @@ The current version of gnuplot is 3.7, which has many improvements over 3.5.
 
 2.2 Where can I get gnuplot?
 
-The best place if definitly http://www.gnuplot.org. From there you find
+The best place if definitly http://www.gnuplot.info. From there you find
 various pointers to other sites.
 
 The source distribution ("gnuplot-3.7.tar.gz" or a similar name) is
 available from the official distribution site and its mirrors.
 
-The main server is ftp.gnuplot.org in /pub/gnuplot/. This server is mirrored
+The main server is ftp.gnuplot.info in /pub/gnuplot/. This server is mirrored
 by several others, among those are
 
    * mirror.aarnet.edu.au in /pub/gnuplot/

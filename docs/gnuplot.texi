@@ -296,11 +296,11 @@ The list of those interested in beta-test versions is:
 
 There is also a World Wide Web page with up-to-date information, including
 known bugs:
-@uref{http://www.gnuplot.org,http://www.gnuplot.org
+@uref{http://www.gnuplot.info,http://www.gnuplot.info
 }
 
 Before seeking help, please check the
-@uref{http://www.gnuplot.org/faq/,FAQ (Frequently Asked Questions) list.
+@uref{http://www.gnuplot.info/faq/,FAQ (Frequently Asked Questions) list.
 }
 
 When posting a question, please include full details of the version of
@@ -13265,7 +13265,7 @@ no longer be relevant.
 Bugs reported since the current release as well as older ones
 may be located via the official distribution site:
 
-@uref{http://www.gnuplot.org,http://www.gnuplot.org }
+@uref{http://www.gnuplot.info,http://www.gnuplot.info }
 
 Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.89 2001/12/19 09:14:55 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.90 2002/01/06 16:31:12 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -158,13 +158,13 @@ C
  There is also a World Wide Web page with up-to-date information, including
  known bugs:
 
-^ <a href="http://www.gnuplot.org">
-           http://www.gnuplot.org
+^ <a href="http://www.gnuplot.info">
+           http://www.gnuplot.info
 ^ </a>
 
  Before seeking help, please check the
 
-^ <a href="http://www.gnuplot.org/faq/">
+^ <a href="http://www.gnuplot.info/faq/">
            FAQ (Frequently Asked Questions)list.
 ^ </a>
 
@@ -7731,8 +7731,8 @@ C ... and restart the table:
 
  Bugs reported since the current release as well as older ones
  may be located via the official distribution site:
-^ <a href="http://www.gnuplot.org">
-           http://www.gnuplot.org
+^ <a href="http://www.gnuplot.info">
+           http://www.gnuplot.info
 ^ </a>
 
  Please e-mail any bugs to bug-gnuplot mailinglist (see `Seeking-assistance`)
