@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.30 2000/07/25 13:12:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.31 2000/09/22 14:17:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -764,12 +764,61 @@ int plot_num;
 
     for (curve = 0; curve < plot_num;
 	 curve++, current_plot = current_plot->next) {
-	fprintf(gpoutfile, "#Curve %d, %d points\n#x y type\n", curve,
-		current_plot->p_count);
+	fprintf(gpoutfile, "#Curve %d, %d points\n#x y",
+		curve, current_plot->p_count);
+	switch (current_plot->plot_style) {
+	case BOXES:
+	case XERRORBARS:
+	    fprintf(gpoutfile, " xlow xhigh");
+	    break;
+	case BOXERROR:
+	case YERRORBARS:
+	    fprintf(gpoutfile, " ylow yhigh");
+	    break;
+	case BOXXYERROR:
+	case XYERRORBARS:
+	    fprintf(gpoutfile, " xlow xhigh ylow yhigh");
+	    break;
+	case FINANCEBARS:
+	case CANDLESTICKS:
+	default:
+	    /* ? */
+	    break;
+	}
+
+	fprintf(gpoutfile, " type\n");
 	for (i = 0; i < current_plot->p_count; i++) {
-	    fprintf(gpoutfile, table_format,
+	    fprintf(gpoutfile, "%g %g",
 		    current_plot->points[i].x,
-		    current_plot->points[i].y,
+		    current_plot->points[i].y);
+	    switch (current_plot->plot_style) {
+	    case BOXES:
+	    case XERRORBARS:
+		fprintf(gpoutfile, " %g %g",
+			current_plot->points[i].xlow,
+			current_plot->points[i].xhigh);
+		break;
+	    case BOXERROR:
+	    case YERRORBARS:
+		fprintf(gpoutfile, " %g %g",
+			current_plot->points[i].ylow,
+			current_plot->points[i].yhigh);
+		break;
+	    case BOXXYERROR:
+	    case XYERRORBARS:
+		fprintf(gpoutfile, " %g %g %g %g",
+			current_plot->points[i].xlow,
+			current_plot->points[i].xhigh,
+			current_plot->points[i].ylow,
+			current_plot->points[i].yhigh);
+		break;
+	    case FINANCEBARS:
+	    case CANDLESTICKS:
+	    default:
+		/* ? */
+		break;
+	    }
+	    fprintf(gpoutfile, " %c\n",
 		    current_plot->points[i].type == INRANGE ? 'i'
 		    : current_plot->points[i].type == OUTRANGE ? 'o'
 		    : 'u');
