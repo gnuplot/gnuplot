@@ -228,7 +228,7 @@ static unsigned int palette[] =
  * the above palette. The values stored in this table are pen numbers;
  * e.g clut[2] is the pen which represents the color "red".
  */
-static unsigned int clut[10];
+static unsigned int clut[PALETTE_SIZE];
 
 
 /* Colors */
@@ -324,7 +324,7 @@ TERM_PUBLIC void AMIGA_init()
       /* Initialize the clut */
       while (i < PALETTE_SIZE)
 	clut[i++] = -1;
-  }
+    }
 
   if (LIB_VERSION(IntuitionBase) <= 34)
     {
@@ -334,37 +334,37 @@ TERM_PUBLIC void AMIGA_init()
       else
 	AMIGA_ymax = 400;
 
-    AMIGA_xmax = 640;
-    AMIGA_NewScreen.Width = AMIGA_xmax;
-    AMIGA_NewScreen.Height = AMIGA_ymax;
+      AMIGA_xmax = 640;
+      AMIGA_NewScreen.Width = AMIGA_xmax;
+      AMIGA_NewScreen.Height = AMIGA_ymax;
 
-    AMIGA_Screen = OpenScreen(&AMIGA_NewScreen);
+      AMIGA_Screen = OpenScreen(&AMIGA_NewScreen);
 
       if (AMIGA_Screen == NULL)
-	AMIGA_ERROR("No Screen", RETURN_FAIL)
+	AMIGA_ERROR("No Screen", RETURN_FAIL);
 
       AMIGA_RastPort = &AMIGA_Screen->RastPort;
 
     }
   else /* Intuition version > 34 */
     {
-    /* Kickstart 2.0 support */
-    AMIGA_NewScreen.Width = STDSCREENWIDTH;
-    AMIGA_NewScreen.Height = STDSCREENHEIGHT;
+      /* Kickstart 2.0 support */
+      AMIGA_NewScreen.Width = STDSCREENWIDTH;
+      AMIGA_NewScreen.Height = STDSCREENHEIGHT;
 
       if (AMIGA_window_mode != TRUE)
 	{
 
-    AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen,AMIGA_ScrTagList);
+          AMIGA_Screen = OpenScreenTagList(&AMIGA_NewScreen,AMIGA_ScrTagList);
 
 	  if (AMIGA_Screen == NULL)
-	    AMIGA_ERROR("No Screen", RETURN_FAIL)
+	    AMIGA_ERROR("No Screen", RETURN_FAIL);
 
 	  AMIGA_RastPort = &AMIGA_Screen->RastPort;
 
-    AMIGA_xmax = AMIGA_Screen->Width;
-    AMIGA_ymax = AMIGA_Screen->Height;
-  }
+          AMIGA_xmax = AMIGA_Screen->Width;
+	  AMIGA_ymax = AMIGA_Screen->Height;
+        }
       else /* AMIGA_window_mode == TRUE */
 	if (LIB_VERSION(GfxBase) >= 39)
 	  {
@@ -392,13 +392,13 @@ TERM_PUBLIC void AMIGA_init()
 
   if (AMIGA_window_mode != TRUE)
     {
-  sprintf(name,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
-  AMIGA_set_font(name);
+      sprintf(name,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
+      AMIGA_set_font(name);
 
-  LoadRGB4(&AMIGA_Screen->ViewPort,AMIGA_Colors,16);
-  RemakeDisplay();
-  AMIGA_slinetype = 1;
-  SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
+      LoadRGB4(&AMIGA_Screen->ViewPort,AMIGA_Colors,16);
+      RemakeDisplay();
+      AMIGA_slinetype = 1;
+      SetAPen(&AMIGA_Screen->RastPort,AMIGA_slinetype);
     }
   else
     {
@@ -409,12 +409,12 @@ TERM_PUBLIC void AMIGA_init()
 
       /* Allocate pens */
       for (i = 0; i < PALETTE_SIZE; i++)
-       {
-	 r = (palette[i] << 8 ) & 0xFF000000;
-	 g = (palette[i] << 16) & 0xFF000000;
-	 b = (palette[i] << 24) & 0xFF000000;
-	 clut[i] = ObtainBestPenA (AMIGA_Window->WScreen->ViewPort.ColorMap,r,g,b,NULL);
-}
+	{
+	  r = (palette[i] << 8 ) & 0xFF000000;
+	  g = (palette[i] << 16) & 0xFF000000;
+	  b = (palette[i] << 24) & 0xFF000000;
+	  clut[i] = ObtainBestPenA (AMIGA_Window->WScreen->ViewPort.ColorMap,r,g,b,NULL);
+	}
 
     }
 
@@ -448,17 +448,17 @@ TERM_PUBLIC void AMIGA_options()
   /* Font name */
   if (!END_OF_COMMAND && isstring(c_token))
     {
-    quote_str(AMIGA_FontName,c_token, MAX_ID_LEN);
-    c_token++;
-  }
+      quote_str(AMIGA_FontName,c_token, MAX_ID_LEN);
+      c_token++;
+    }
 
   /* Font size */
   if (!END_OF_COMMAND)
     {
-    /* We have font size specified */
-    struct value a;
-    AMIGA_FontSize = (int)real(const_express(&a));
-  }
+      /* We have font size specified */
+      struct value a;
+      AMIGA_FontSize = (int)real(const_express(&a));
+    }
   
   if (strcmp(AMIGA_FontName,"") == 0 && AMIGA_FontSize != 0)
     strcpy(AMIGA_FontName,"topaz");
@@ -468,13 +468,13 @@ TERM_PUBLIC void AMIGA_options()
 
   if (strcmp(AMIGA_FontName,"") != 0 && AMIGA_FontSize != 0)
     {
-    sprintf(default_font,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
-      sprintf (term_options,"%s \"%s\" %d",\
-	       (AMIGA_window_mode != TRUE ? "screen" : "window"),\
-	       AMIGA_FontName, AMIGA_FontSize);
-  }
+      sprintf(default_font,"%s,%d",AMIGA_FontName,AMIGA_FontSize);
+      sprintf(term_options,"%s \"%s\" %d",\
+	      (AMIGA_window_mode != TRUE ? "screen" : "window"),\
+	      AMIGA_FontName, AMIGA_FontSize);
+    }
   else
-    sprintf (term_options,"%s",(AMIGA_window_mode != TRUE ? "screen" : "window"));
+    sprintf(term_options,"%s",(AMIGA_window_mode != TRUE ? "screen" : "window"));
 }
 
 
@@ -487,17 +487,17 @@ TERM_PUBLIC void AMIGA_text()
     {
       if (interactive == TRUE)
 	{
-  FILE *fp;
+          FILE *fp;
 
 	  if ((fp = fopen("*","r")) != NULL)
 	    {
 	      int c = getc(fp);
-
-    ungetc(c,stdin);
-  fclose(fp);
+	      
+              ungetc(c,stdin);
+              fclose(fp);
 	    }
-  ScreenToBack(AMIGA_Screen);
-}
+          ScreenToBack(AMIGA_Screen);
+        }
     }
 }
 
@@ -563,7 +563,7 @@ int linetype;
       if (linetype < -2)
 	linetype = -2;
 
-  AMIGA_slinetype = linetype+3;
+      AMIGA_slinetype = linetype+3;
     }
   else
     {
@@ -646,67 +646,67 @@ char *font;
   char name[MAX_ID_LEN+1];
   int  size,sep;
   
-  /* Disable for window */
-if (AMIGA_window_mode != TRUE)
-  {
-  sep = strcspn(font,",");
-  strncpy(name,font,sep);
-  name[sep] = '\0';
-  size = AMIGA_FontSize;
-  sscanf(&(font[sep+1]),"%d",&size);
-
-  if (strcmp(name,"") != 0)
+  /* Disable for window mode */
+  if (AMIGA_window_mode != TRUE)
     {
-    strncat(name,".font",MAX_ID_LEN+1);
+      sep = strcspn(font,",");
+      strncpy(name,font,sep);
+      name[sep] = '\0';
+      size = AMIGA_FontSize;
+      sscanf(&(font[sep+1]),"%d",&size);
 
-    /* Avoid opening "diskfont.library" if a built-in font is desired */
-    if ((strcmp("topaz.font",name) == 0) &&
-	  ((size == TOPAZ_EIGHTY) || (size == TOPAZ_SIXTY)))
-	{
-      AMIGA_Font.ta_Name = name;
-      AMIGA_Font.ta_YSize = size;
-      AMIGA_Font.ta_Style = FS_NORMAL;
-      AMIGA_Font.ta_Flags = FPF_ROMFONT;
-      AMIGA_TextFont = OpenFont(&AMIGA_Font);
+      if (strcmp(name,"") != 0)
+        {
+          strncat(name,".font",MAX_ID_LEN+1);
 
-      if (AMIGA_TextFont != NULL) 
-        SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+          /* Avoid opening "diskfont.library" if a built-in font is desired */
+          if ((strcmp("topaz.font",name) == 0) &&
+              ((size == TOPAZ_EIGHTY) || (size == TOPAZ_SIXTY)))
+            {
+              AMIGA_Font.ta_Name = name;
+              AMIGA_Font.ta_YSize = size;
+              AMIGA_Font.ta_Style = FS_NORMAL;
+              AMIGA_Font.ta_Flags = FPF_ROMFONT;
+              AMIGA_TextFont = OpenFont(&AMIGA_Font);
 
+              if (AMIGA_TextFont != NULL) 
+                SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+
+            }
+          else
+            {
+	      DiskfontBase = OpenLibrary("diskfont.library",0);
+
+	      if (DiskfontBase != NULL)
+		{
+		  AMIGA_Font.ta_Name = name;
+		  AMIGA_Font.ta_YSize = size;
+		  AMIGA_Font.ta_Style = FS_NORMAL;
+		  AMIGA_Font.ta_Flags = FPF_ROMFONT|FPF_DISKFONT;
+		  AMIGA_TextFont = OpenDiskFont(&AMIGA_Font);
+
+		  if (AMIGA_TextFont != NULL)
+		    SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
+		}
+            }
 	}
-      else
-	{
-      DiskfontBase = OpenLibrary("diskfont.library",0);
 
-	  if (DiskfontBase != NULL)
-	    {
-        AMIGA_Font.ta_Name = name;
-        AMIGA_Font.ta_YSize = size;
-        AMIGA_Font.ta_Style = FS_NORMAL;
-        AMIGA_Font.ta_Flags = FPF_ROMFONT|FPF_DISKFONT;
-        AMIGA_TextFont = OpenDiskFont(&AMIGA_Font);
+      /* Width of characters: This works better for proportional fonts than */
+      /* AMIGA_Screen->RastPort.TxWidth + AMIGA_Screen->RastPort.TxSpacing */
+      test_len = strlen(test_str);
+      test_pxl = TextLength(&AMIGA_Screen->RastPort,test_str,test_len);
 
-        if (AMIGA_TextFont != NULL)
-          SetFont(&AMIGA_Screen->RastPort,AMIGA_TextFont);
-      }
-    }
-  }
+      AMIGA_cwd = test_pxl / test_len;
+      AMIGA_cht = AMIGA_Screen->RastPort.TxHeight; /* Height of characters */
+      AMIGA_bsl = AMIGA_Screen->RastPort.TxBaseline; /* Reference line */
 
-  /* Width of characters: This works better for proportional fonts than */
-  /* AMIGA_Screen->RastPort.TxWidth + AMIGA_Screen->RastPort.TxSpacing */
-  test_len = strlen(test_str);
-  test_pxl = TextLength(&AMIGA_Screen->RastPort,test_str,test_len);
+      /* Amount by which characters have to be shifted upwards to be */
+      /* vertically justified: */
+      AMIGA_vadj = AMIGA_bsl / 2;
+      term->v_char = AMIGA_cht + 4; /* So lines won't be too close */
+      term->h_char = AMIGA_cwd;
 
-  AMIGA_cwd = test_pxl / test_len;
-  AMIGA_cht = AMIGA_Screen->RastPort.TxHeight; /* Height of characters */
-  AMIGA_bsl = AMIGA_Screen->RastPort.TxBaseline; /* Reference line */
-
-  /* Amount by which characters have to be shifted upwards to be */
-  /* vertically justified: */
-  AMIGA_vadj = AMIGA_bsl / 2;
-  term->v_char = AMIGA_cht + 4; /* So lines won't be too close */
-  term->h_char = AMIGA_cwd;
-
-  } /* !window_mode */
+    } /* !window_mode */
   return TRUE;
 }
 
@@ -720,17 +720,17 @@ TERM_PUBLIC void AMIGA_suspend()
     {
       if (interactive == TRUE)
 	{
-  FILE *fp;
+	  FILE *fp;
 
 	  if ((fp = fopen("*","r")) != NULL)
 	    {
 	      int c = getc(fp);
 
-    ungetc(c,stdin);
-  fclose(fp);
+	      ungetc(c,stdin);
+	      fclose(fp);
 	    }
-  ScreenToBack(AMIGA_Screen);
-}
+	  ScreenToBack(AMIGA_Screen);
+	}
     }
 }
 
@@ -741,7 +741,7 @@ TERM_PUBLIC void AMIGA_suspend()
 TERM_PUBLIC void AMIGA_resume()
 {
   if (AMIGA_window_mode != TRUE)
-  ScreenToFront(AMIGA_Screen);
+    ScreenToFront(AMIGA_Screen);
   else
     WindowToFront (AMIGA_Window);
 }
