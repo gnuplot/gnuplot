@@ -46,7 +46,6 @@ RSRCS= gnuplot_be.rsrc
 #	name: my_library.so or my_lib.a
 #	libroot.so never needs to be specified here, although libbe.so does
 LIBS= be tracker
-		
 
 #	specify the paths to directories where additional
 # 	libraries are to be found.  /boot/develop/lib/PLATFORM/ is
@@ -140,15 +139,13 @@ ifeq ($(CPU), x86)
 	endif
 	endif
 	endif
-		
 
-	
 #	SETTING: set proper debugger flags
 	ifeq ($(DEBUGGER), TRUE)
 		DEBUG = -gdwarf-2
 		OPTIMIZER = -O0
 	endif	
-	
+
 	CFLAGS += $(OPTIMIZER) $(DEBUG)
 
 #	SETTING: set warning level
@@ -182,7 +179,6 @@ ifeq ($(CPU), x86)
 		CFLAGS += -g
 	endif
 
-	
 else
 
 #	ppc Settings
@@ -206,7 +202,6 @@ ifeq ($(CPU), ppc)
 	endif
 	endif
 	endif
-	
 
 	CFLAGS += $(OPTIMIZER)
 
@@ -250,8 +245,7 @@ ifeq ($(CPU), ppc)
 					/boot/develop/lib/ppc/init_term_dyn.o \
 					/boot/develop/lib/ppc/start_dyn.o 
 	endif			
-	
-	
+
 #	SETTING: output symbols in an xMAP file
 	ifeq ($(SYMBOLS), TRUE)
 		LDFLAGS += -map $(TARGET).xMAP
