@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.29 2004/12/05 08:04:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.30 2004/12/06 06:46:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -119,17 +119,19 @@ temp_at()
     /* build a static action table and return its pointer */
 
     if (at != NULL) {
+#ifdef GP_STRING_VARS
 	/* EAM - Dec 2004
 	 * Garbage collection of dynamically allocated strings that may
 	 * have been created during evaluation of the previous action table.
 	 * WARNING: This is an empirical fix to a memory leak found by valgrind;
 	 * I do not truly understand why these are guaranteed to be orphan
-	 * strings, but testing has so far not produced double-free errors.
+	 * strings, but testing has so far not produced any double-free errors.
 	 */
 	int i;
 	for (i=0; i<at->a_count; i++)
 	    if (at->actions[i].arg.v_arg.type == STRING)
 		free(at->actions[i].arg.v_arg.v.string_val);
+#endif
 	free(at);
     }
     
