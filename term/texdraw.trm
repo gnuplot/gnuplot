@@ -372,6 +372,11 @@ START_HELP(texdraw)
 " The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
 " intended for use with \"texdraw.sty\" and \"texdraw.tex\" in the texdraw package.",
 "",
+" Points, among other things, are drawn using the LaTeX commands \"\\Diamond\" and",
+" \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
+" in the latexsym package, which is part of the base distribution and thus part",
+" of any LaTeX implementation.  Please do not forget to use this package.",
+"",
 " It has no options."
 END_HELP(texdraw)
 #endif /* TERM_HELP */
