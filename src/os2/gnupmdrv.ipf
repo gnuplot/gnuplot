@@ -177,12 +177,8 @@ mouse buttons have the following functions:
 :p.:hp2.MB2:ehp2. presents the zoom rectangle. Press :hp2.MB1:ehp2. to force 
 zoom, or :hp2.Esc:ehp2. to cancel zooming. Zooming can be canceled if 
 pressed <Esc> or at least one of the chosen sizes is smaller than 8 pixels.
-FULL FUNCTIONALITY IN FUTURE: The chosen rectangle is automatically zoomed.
 You can return to the original values of ranges by choosing the 
 :hp2.Unzoom:ehp2. menu option.
-CURRENT STATUS: the pipe gnupmdrv->gnuplot is not implemented (programmers
-welcome!). Thus the desired range is just put as xrange; yrange; replot 
-command into clipboard, from which you have to paste it to gnuplot window. 
 :p.:hp2.Double click of MB1:ehp2. writes the current pointer position to
 clipbord according to the format chosen in :hp2.sprintf format:ehp2. menu.
 :p.:hp2.MB3:ehp2. annotates temporarily the graph.
@@ -214,9 +210,8 @@ replot command into clipboard, or press ESC to cancel the command.
 
 :h1 res=605. Unzoom Menu Help
 :i2 refid=mmouse. Unzoom
-:p.This choise returns back the x and y ranges of the last plot. 
-CURRENT STATUS: puts the required command to clipboard. 
-Waiting till the pipe gnupmdrv->gnuplot is implemented! 
+:p.This choise returns back the x and y ranges of the plot before
+the first mouse zoom. 
 
 :h1 res=606. Ruler Menu Help
 :i2 refid=mmouse. Ruler
@@ -230,13 +225,14 @@ pointer position, and show their distance (for linear scale) or ratio
 :i2 refid=mmouse. Grid on/off
 :p.Switches quickly on or off grid of the graph. Equivalent to the command 
 :hp2.set grid; replot:ehp2. or :hp2.set nogrid; replot:ehp2. typed in the 
-gnuplot window.
+gnuplot window. (Actually, gnupmdrv can be compiled with this grid command 
+or with grid at minor tics.)
 
 :h1 res=608. Lin/Log Y Axis Menu Help
 :i2 refid=mmouse. lin/log y axis
 :p.Switches quickly between linear and logarithmic y axis. 
 Equivalent to the command :hp2.set log y; replot:ehp2. or 
-:hp2.set nolog y; replot:ehp2. types in the gnuplot window.
+:hp2.set nolog y; replot:ehp2. Beeps for log of negative y range.
 
 
 

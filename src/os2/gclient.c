@@ -1,6 +1,3 @@
-// For mousing: changed by Petr Mikulik, last change 26. 9. 1998
-// See  //PM  labels
-
 #ifdef INCRCSDATA
 static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
 #endif
@@ -52,6 +49,18 @@ static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
  * 
  *   Gnuplot driver for OS/2:  Roger Fearick
  * 
+ *
+ * CONTRIBUTIONS:
+ *
+ *   Petr Mikulik  (see  //PM  labels)
+ *       - keep aspect ration on/off
+ *       - mouse support (1998, 1999; last change 28. 4. 1999)
+ *   For mousing: changed by Petr Mikulik, last change 28. 4. 1999
+ *
+ *   Franz Bakan  (see  //fraba  labels)
+ *       - communication gnupmdrv -> gnuplot (April 1999)
+ *
+ *
  * Send your comments or suggestions to 
  *  info-gnuplot@dartmouth.edu.
  * This is a mailing list; to join it send a note to 
@@ -166,6 +175,10 @@ const  char  *( MouseSprintfFormats[ /*nMouseSprintfFormats*/ ] ) = {
 		"set label \"\" at %g,%g"
 		 };
 
+//fraba:
+static BOOL bhave_grid = FALSE ; // for toggling grid by mouse
+static BOOL bhave_log = FALSE ;  // for toggling lin/log by mouse
+
 static ULONG    ulPlotPos[4] ;
 static ULONG    ulShellPos[4] ;
 static PAUSEDATA pausedata = {sizeof(PAUSEDATA), NULL, NULL} ;
@@ -240,7 +253,7 @@ static struct {
     } gp4mouse;
 
 static double unzoom_xmin, unzoom_xmax, unzoom_ymin, unzoom_ymax;
-static char zooming = 0; // set to 1 if zooming by mouse
+static int zooming = 0; // set to 1 if zooming by mouse
 
 /* Structure for the ruler: on/off, position,... */
 static struct {
@@ -257,6 +270,8 @@ HWND hptrDefault, hptrCrossHair;
 #define COLOR_ANNOTATE CLR_DEFAULT  // annotating strings (MB3)
 #define COLOR_RULER    CLR_DARKPINK // colour of the ruler
 
+//fraba:
+PVOID input_from_PM_Terminal;
 
 /*==== f u n c t i o n s =====================================================*/
 
@@ -345,13 +360,17 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 		// initialize pointers
 	    hptrDefault = WinQuerySysPointer( HWND_DESKTOP, SPTR_ARROW, FALSE );
 	    hptrCrossHair = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_CROSSHAIR );
+	    if (DosGetNamedSharedMem(&input_from_PM_Terminal, //fraba
+		"\\SHAREMEM\\PMouse_Input",
+		PAG_WRITE))
+	      DosBeep(1440L,1000L); /* indicates error */
             }
             break ;
             
         case WM_GPSTART:
 
 		//PM: show the Mouse menu if connected to mouseable PM terminal
-	   if (1 || mouseTerminal)
+	   if (1 || mouseTerminal) //PM workaround for a bug---SEE "BUGS 2" IN README!!!
 //	   if (mouseTerminal)
 	     WinEnableMenuItem(
 	       WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
@@ -481,14 +500,14 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 
         case WM_GNUPLOT:
                 // display the plot         
-	    lock_mouse=1; //PM
+	    lock_mouse = 1; //PM
             if( bPopFront )
                 WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER ) ;
             if( iPaintCount > 0 ) { /* if outstanding paint messages, repaint */
                 WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
                 iPaintCount = 0 ;
                 }
-	    lock_mouse=0; //PM
+	    lock_mouse = 0; //PM
             return 0L ;
 
         case WM_PAUSEPLOT:
@@ -661,29 +680,21 @@ case WM_BUTTON2CLICK: // WM_BUTTON2UP:
   MousePosToGraphPos( &x1, &y1, hWnd, ti.rclTrack.xLeft,ti.rclTrack.yBottom, MOUSE_COORDINATES_REAL );
   MousePosToGraphPos( &x2, &y2, hWnd, ti.rclTrack.xRight,ti.rclTrack.yTop, MOUSE_COORDINATES_REAL );
 
-  // Make an action with the resulting [x1,y1]..[x2,y1] zoom box.
-
   // Just for testing: write it to clipboard
   // sprintf(s,"zoom from [%li,%li]..[%li,%li] => [%g,%g]..[%g,%g]",ti.rclTrack.xLeft,ti.rclTrack.yBottom,ti.rclTrack.xRight,ti.rclTrack.yTop,x1,y1,x2,y2);
   // TextToClipboard ( s );
 
-  sprintf(s,"set xrange [%g:%g]; set yrange [%g:%g]; replot\n",x1,x2,y1,y2);
-  TextToClipboard ( s );
+  // Make an action with the resulting [x1,y1]..[x2,y1] zoom box.
 
-  zooming = 1; // the 'G' thread does not remember the next xmin, xmax,... values
   WinEnableMenuItem( // this situation can be unzoomed
     WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
     IDM_MOUSE_UNZOOM, TRUE ) ;
 
-  /*
-  True action: connect to gnuplot and ask him for executing this command:
-  "set xrange [x1:y1]; set yrange [x2,y2]; replot"
-  Thus: send x1,y1,x2 and y2 through pipe. gnuplots fills xmin,ymin,xmax,ymax
-  and then executes replot.
-
-TODO THIS!!!
-
-  */
+  sprintf(s,"set xr[%g:%g];set yr[%g:%g];rep",x1,x2,y1,y2);
+    // make the command as short as possible so that it prints on one line
+  TextToClipboard ( s );
+  zooming = 1; // so that 'G' thread does not remember the next xmin, xmax,... values
+  sprintf(input_from_PM_Terminal,"%s",s); //fraba: send the command to gnuplot
 
   }
   return 0; // return from: case WM_BUTTON3DOWN (zoom)
@@ -705,7 +716,7 @@ case WM_BUTTON3UP: // WM_BUTTON3DBLCLK:
 
   GpiSetColor( hps, COLOR_ANNOTATE );    // set color of the text
   GpiSetCharMode(hps,CM_MODE1);
-  pt.x=mx; pt.y=my;
+  pt.x = mx; pt.y = my;
   GpiCharStringAt(hps,&pt,(long)strlen(s),s);
   WinReleasePS(hps);
   }
@@ -726,8 +737,8 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 */
     {
     extern HWND hApp ;
-    static ulPauseItem = IDM_PAUSEDLG ;
-    static ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
+    static int ulPauseItem = IDM_PAUSEDLG ;
+    static int ulMouseCoordItem = IDM_MOUSE_COORDINATES_REAL ;
 
     switch( (USHORT) SHORT1FROMMP( mp1 ) ) {
                 
@@ -947,11 +958,13 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case IDM_MOUSE_UNZOOM:
 	    {
 	    char s[255];
-	    sprintf(s,"set xrange [%g:%g]; set yrange [%g:%g]; replot\n",unzoom_xmin,unzoom_xmax,unzoom_ymin,unzoom_ymax);
-	    TextToClipboard ( s );
 	    WinEnableMenuItem( // this situation cannot be unzoomed
 	      WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
 	      IDM_MOUSE_UNZOOM, FALSE ) ;
+	    sprintf(s,"set xr[%g:%g];set yr[%g:%g];rep",unzoom_xmin,unzoom_xmax,unzoom_ymin,unzoom_ymax);
+	      // make the command as short as possible so that it prints on one line
+	    TextToClipboard ( s );
+	    sprintf(input_from_PM_Terminal,"%s",s); //fraba: send the command to gnuplot
 	    }
 	    return 0L;
 
@@ -980,14 +993,33 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    return 0L;
 
 	case IDM_MOUSE_GRID:
-	    // NOT IMPLEMENTED; WAITING TO gnupmdrv->gnuplot PIPE
-	    { TextToClipboard( "set grid; replot #set nogrid" ); }
+            if (bhave_grid) { //fraba
+		bhave_grid = FALSE;
+		sprintf(input_from_PM_Terminal,"set nogrid; replot");
+            } else {
+		bhave_grid = TRUE;
+		#if 0 /* 0 ... main grid, 1 ... fine grid */
+		sprintf(input_from_PM_Terminal,"set grid; replot");
+		#else
+		sprintf(input_from_PM_Terminal,"set mxtics 2; set mytics 2; set grid x y mx my; replot");
+		#endif
+            }
 	    return 0L;
 
 	case IDM_MOUSE_LINLOGY:
-	    // NOT IMPLEMENTED; WAITING TO gnupmdrv->gnuplot PIPE
 	    // NOTE: if log, then take care of positive y min!
-	    { TextToClipboard( "set log y; replot #set nolog y" ); }
+	    if (bhave_log) { //fraba
+	       bhave_log = FALSE;
+	       sprintf(input_from_PM_Terminal, "set nolog y; replot" );
+	    } else {
+	       if (gp4mouse.ymin <= 0 || gp4mouse.ymax <= 0) {
+		 sprintf(input_from_PM_Terminal, "# Hey! y range must be greater than 0 for log scale.");
+		 DosBeep(300,10);
+		 return 0L;
+	       }
+	       bhave_log = TRUE;
+	       sprintf(input_from_PM_Terminal, "set log y; replot" );
+            } /* endif */
 	    return 0L;
 
         default : 
@@ -1688,14 +1720,14 @@ server:
                     GpiSetLineEnd( hps, LINEEND_ROUND ) ;
                     GpiSetLineWidthGeom( hps, linewidth ) ;
                     GpiSetCharBox (hps, &sizBaseFont) ;
-		    //PM beg: get some other information about real plot coord.:
-		    if (mouseTerminal) { //we are connected to mouseable terminal
+		    //PM get some other information about real plot coord.:
+		    if (mouseTerminal) { // we are connected to mouseable terminal
 		      BufRead(hRead,&gp4mouse, sizeof(gp4mouse), &cbR);
 		      if (!zooming) { // remember these values if this isn't zoom
-			unzoom_xmin=gp4mouse.xmin;
-			unzoom_ymin=gp4mouse.ymin;
-			unzoom_xmax=gp4mouse.xmax;
-			unzoom_ymax=gp4mouse.ymax;
+			unzoom_xmin = gp4mouse.xmin;
+			unzoom_ymin = gp4mouse.ymin;
+			unzoom_xmax = gp4mouse.xmax;
+			unzoom_ymax = gp4mouse.ymax;
 			if  (gp4mouse.is_log_x) {
 			  unzoom_xmin = exp( unzoom_xmin * gp4mouse.log_base_log_x );
 			  unzoom_xmax = exp( unzoom_xmax * gp4mouse.log_base_log_x );
@@ -1708,7 +1740,7 @@ server:
 			  WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
 			  IDM_MOUSE_UNZOOM, FALSE ) ;
 			}
-		      zooming=0;
+		      zooming = 0;
 		      if (ruler.on) {
 			// ruler is on, thus recalc its (px,py) from (x,y) for
 			// the current zoom and log axes
@@ -2035,7 +2067,7 @@ lOldLine=lt ;
                 
 		case 'm' :
 		    //PM notification of being connected to a mouse-enabled terminal
-		    mouseTerminal=1;
+		    mouseTerminal = 1;
 		    break ;
 
                  default :  /* should handle error */
@@ -2657,17 +2689,17 @@ void MousePosToGraphPos ( double *x, double *y,
 RECTL rc;
 
 if (mouse_mode==MOUSE_COORDINATES_PIXELS) {
-  *x=mx; *y=my;
+  *x = mx; *y = my;
   return;
   }
 
 // Rectangle where we are moving: viewport, not the full window!
 GpiQueryPageViewport(hpsScreen,&rc);
 
-rc.xRight-=rc.xLeft; rc.yTop-=rc.yBottom; // only distance is important
+rc.xRight -= rc.xLeft; rc.yTop -= rc.yBottom; // only distance is important
 
 if (mouse_mode==MOUSE_COORDINATES_SCREEN) {
-  *x=(double)mx/rc.xRight; *y=(double)my/rc.yTop;
+  *x = (double)mx/rc.xRight; *y = (double)my/rc.yTop;
   return;
   }
 

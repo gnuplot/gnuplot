@@ -46,11 +46,26 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
  *
  *   In add_history(), do not store duplicated entries:
  *     Petr Mikulik
+ *
+ *   added some changes to support mouse input from OS/2 PM window
+ *   changes marked by USE_MOUSE and fraba
+ *     Franz Bakan
+ *
  */
 
 #include <signal.h>
 /* get prototype for alloc and gpfaralloc */
 #include "plot.h"
+
+#if defined(USE_MOUSE) && defined(OS2)  /* fraba */
+#define INCL_DOSMEMMGR
+#define INCL_DOSPROCESS
+#include <io.h>
+#include <sys/termio.h>
+#include <termios.h>
+#include <os2.h>
+#include <sys/ioctl.h>
+#endif /* USE_MOUSE in OS/2 PM */
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 
@@ -165,7 +180,9 @@ static struct termios orig_termio, rl_termio;
 #   include <termio.h>
 static struct termio orig_termio, rl_termio;
 /* termio defines NCC instead of NCCS */
+#if !( defined(USE_MOUSE) && defined(OS2) ) /* fraba */
 #   define NCCS    NCC
+#endif
 #  endif			/* not SIGTSTP || TERMIOS */
 # endif				/* SGTTY */
 
@@ -279,7 +296,12 @@ static char *cur_line;		/* current contents of the line */
 static int line_len = 0;
 static int cur_pos = 0;		/* current position of the cursor */
 static int max_pos = 0;		/* maximum character position */
-
+#ifdef USE_MOUSE
+static int insert_to_history_disable  = 0;
+				/* //PM 28.4.1999: flag to disable adding
+				 *  commands forced by mouse to the history
+				 */ 
+#endif
 
 static void fix_line __PROTO((void));
 static void redraw_line __PROTO((char *prompt));
@@ -293,6 +315,10 @@ static int user_putc __PROTO((int ch));
 static int user_puts __PROTO((char *str));
 static void backspace __PROTO((void));
 static void extend_cur_line __PROTO((void));
+
+#if defined(USE_MOUSE) /* fraba */
+char *input_line_Pointer = NULL;
+#endif
 
 /* user_putc and user_puts should be used in the place of
  * fputc(ch,stderr) and fputs(str,stderr) for all output
@@ -358,6 +384,17 @@ char *prompt;
     int cur_char;
     char *new_line;
 
+    #if defined(USE_MOUSE) && defined(OS2) /* fraba */
+    char rbuf[1]; /* buffer for read() */
+    struct termios tios; /* terminal parameter */
+    if (DosGetNamedSharedMem((PVOID) &input_line_Pointer,
+                        "\\SHAREMEM\\PMouse_Input",
+                        PAG_WRITE | PAG_READ))
+        fprintf(stderr,"DosGetNamedShareMem_ERROR in readline\n");
+    else
+        strcpy(input_line_Pointer,"\0");
+    #endif /* USE_MOUSE */
+
     /* start with a string of MAXBUF chars */
 
     if (line_len != 0) {
@@ -370,6 +407,20 @@ char *prompt;
     /* set the termio so we can do our own input processing */
     set_termio();
 
+    #if defined(USE_MOUSE) && defined(OS2) /* fraba */
+    if (tcgetattr (0, &tios)) fprintf(stderr,"tcgeterror\n");
+    tcgetattr (0, &tios);
+    tios.c_iflag = (TCSANOW | BRKINT | ICRNL | IXON | IXANY);
+    tios.c_oflag = (NL0 | CR0 | TAB0 | BS0 | VT0 | FF0);
+    tios.c_cflag = (B9600 | CS8 | CREAD | HUPCL);
+    tios.c_lflag = (ISIG | ECHOE | ECHOK);
+    tios.c_cc[VMIN] = 0;
+    tios.c_cc[VTIME] = 1;
+    if (tcsetattr (0, TCSANOW, &tios)) fprintf(stderr,"tcseterror\n");
+    /* Set parameters for read() not to wait endless for keyboard-input, */
+    /* so we can check for input from PM terminal. */
+    #endif
+
     /* print the prompt */
     fputs(prompt, stderr);
     cur_line[0] = '\0';
@@ -379,7 +430,44 @@ char *prompt;
 
     /* get characters */
     for (;;) {
+
+#if !( defined(USE_MOUSE) && defined(OS2) )
 	cur_char = special_getc();
+#else /* USE_MOUSE look at inputs from keyboard and from PM window */
+ waitforinput:
+        if (read(0,rbuf,1)) {
+           if (rbuf[0]==0) {
+              read(0,rbuf,1);
+ 	        switch (rbuf[0]) {
+		case 75: cur_char = 002; break;	/* Left Arrow */
+		case 77: cur_char = 006; break; /* Right Arrow */
+		case 72: cur_char = 020; break; /* Up Arrow */
+		case 80: cur_char = 016; break;	/* Down Arrow */
+		case 115:		/* Ctrl Left Arrow */
+		case 71: cur_char = 001; break;	/* Home */
+		case 116:		/* Ctrl Right Arrow */
+		case 79: cur_char = 005; break;	/* End */
+		case 83: cur_char = 004; break;	/* Delete */
+		default: cur_char = 0; break;
+                } /* end switch */
+           } else {
+	      if (rbuf[0] == 033) cur_char = 025; /* ESC */
+		else cur_char = rbuf[0];
+           } /* endif */
+        } else {
+           if (strlen(input_line_Pointer)) {
+		strcpy(cur_line,input_line_Pointer);
+		strcpy(input_line_Pointer,"\0");
+		line_len = 0;
+		fputs("#mouse: ", stderr); /* write the command on screen as a comment, */
+		fputs(cur_line, stderr);   /* thus it does not go to the history */
+		fputs("\n", stderr);
+		insert_to_history_disable = 1;
+                return(cur_line);
+		}
+           else goto waitforinput;
+            } /* endif */
+#endif /* USE_MOUSE */
 
 /*
  * The #define CHARSET7BIT should be used when one encounters problems with
@@ -466,6 +554,7 @@ char *prompt;
 	    putc(NEWLINE, stderr);	/* go to a fresh line */
 	    redraw_line(prompt);
 #endif /* VREPRINT */
+#ifndef USE_MOUSE /* fraba */
 #ifdef VSUSP
 	} else if (cur_char == term_chars[VSUSP]) {
 	    reset_termio();
@@ -477,6 +566,7 @@ char *prompt;
 	    /* print the prompt */
 	    redraw_line(prompt);
 #endif /* VSUSP */
+#endif /* USE_MOUSE */ 
 	} else {
 	    /* do normal editing commands */
 	    /* some of these are also done above */
@@ -700,6 +790,14 @@ void add_history(line)
 char *line;
 {
     struct hist *entry;
+
+    #ifdef USE_MOUSE
+    /* //PM 28.4.1999: don't add commands forced by mouse */ 
+    if (insert_to_history_disable) {
+	insert_to_history_disable  = 0;
+	return; 
+    }
+    #endif
 
     entry = history;
     while (entry != NULL) {

@@ -48,6 +48,12 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
  * 
  * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
  * Added user-specified bases for log scaling.
+ *
+ * April 1999 Franz Bakan (bakan@ukezyk.desy.de)
+ * Added code to support mouse-input from OS/2 PM window
+ * Works with gnuplot's readline routine, it does not work with GNU readline
+ * Changes marked by USE_MOUSE and fraba
+ *
  */
 
 #include "plot.h"
@@ -63,6 +69,11 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
 # include <readline/readline.h>
 # include <readline/history.h>
 #endif
+
+#if defined(USE_MOUSE) && defined(OS2)
+#define INCL_DOSMEMMGR
+#include <os2.h>
+#endif /* USE_MOUSE in OS/2 PM */
 
 #if defined(MSDOS) || defined(DOS386)
 # ifdef DJGPP
@@ -155,6 +166,10 @@ char *input_line;
 int input_line_len;
 int inline_num;			/* input line number */
 
+#if defined(USE_MOUSE) && defined(OS2) /* fraba */
+PVOID input_from_PM_Terminal = NULL;
+#endif /* USE_MOUSE in OS/2 PM */
+
 struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
 
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* current dummy vars */
@@ -178,6 +193,15 @@ void extend_input_line()
 	input_line = gp_alloc(MAX_LINE_LEN, "input_line");
 	input_line_len = MAX_LINE_LEN;
 	input_line[0] = NUL;
+
+	#if defined(USE_MOUSE) && defined(OS2) /* fraba  */
+	if (DosAllocSharedMem((PVOID) &input_from_PM_Terminal,
+		"\\SHAREMEM\\PMouse_Input",
+		MAX_LINE_LEN,
+		PAG_WRITE | PAG_COMMIT))
+	  fprintf(stderr,"DosAllocSharedMem_ERROR\n");
+	#endif /* USE_MOUSE in OS/2 PM */
+
     } else {
 	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN, "extend input line");
 	input_line_len += MAX_LINE_LEN;

@@ -415,10 +415,10 @@ TERM_PUBLIC void PM_graphics()
     */
     {
     // what the mouse is going over? 2d, 3d graph... disable mouse for multiplot
-    int graph_mouse=0;
+    int graph_mouse = 0;
     if (!multiplot) {
       if (is_3d_plot==TRUE)
-	  graph_mouse = 0; // for future: graph_mouse=3;
+	  graph_mouse = 0; // for future: graph_mouse = 3;
 	else // 2d plot
 	  graph_mouse = (polar) ? 1 : 2;
       }

@@ -34,7 +34,7 @@ VESA=1
 
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
-GNU_RL=1
+# GNU_RL=1
 
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
@@ -43,7 +43,7 @@ GNU_RL=1
 
 # MOUSE support for PM terminal
 # (not yet supported in official release)
-# MOUSE=1
+MOUSE=1
 
 #
 # ****************** End of Configuration section ****************************
