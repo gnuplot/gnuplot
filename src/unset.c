@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.56 2003/05/17 05:59:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.57 2003/11/18 09:38:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1540,6 +1540,9 @@ reset_command()
     unset_loadpath();
 #endif
     unset_fit();
+
+    /* garbage collection on space allocated for user variables */
+    cleanup_udvlist();
 
     /* HBB 20000506: set 'interactive' back to its real value: */
     interactive = save_interactive;
