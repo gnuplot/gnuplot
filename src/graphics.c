@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.76 2002/09/27 00:12:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.77 2002/10/21 10:24:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1121,7 +1121,6 @@ do_plot(plots, pcount)
     register struct curve_points *this_plot = NULL;
     register int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
     register int key_count = 0;
-    /* only a Pyramid would have this many registers! */
     char *s, *e;
 
     x_axis = FIRST_X_AXIS;
@@ -1418,7 +1417,7 @@ do_plot(plots, pcount)
 			case FS_PATTERN:
 			    style = (fs->fillpattern << 4) + FS_PATTERN;
 			    break;
-			default: style = 0;
+			default: style = FS_EMPTY;
 		    }
 		    (*t->fillbox)( style,
 				  xl + key_sample_left, yl - key_entry_height/4, 
@@ -2693,17 +2692,17 @@ plot_boxes(plot, xaxis_y)
                     switch( plot->fill_properties.fillstyle ) {
                     case FS_SOLID:
 			fillpar = plot->fill_properties.filldensity;
-			style = ((fillpar & 0xfff) << 4) + (1 & 0xf);
+			style = ((fillpar & 0xfff) << 4) + FS_SOLID;
                         break;
                     case FS_PATTERN:
 			fillpar = plot->fill_properties.fillpattern;
-			style = ((fillpar & 0xfff) << 4) + (2 & 0xf);
+			style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
                         break;
                     default:
 			/* style == 0 or unknown --> solid fill with
                          * background color */
 			fillpar = 0;
-			style = 0;
+			style = FS_EMPTY;
                     }
 
                     (*t->fillbox) (style, x, y, w, h);

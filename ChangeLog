@@ -1,3 +1,9 @@
+2002-10-25  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/graphics.c src/win/wgraph.c term/fig.trm term/pdf.trm:
+	Replace tests on fillstyle parameter to use enums FS_* instead of pure
+	constants.
+
 2002-10-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* win/winmain.h win/winmain.c(kill_pending_Pause_dialog(void)): New
@@ -1387,7 +1393,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/22 01:30:04 $).
+	last modification date (from the tag $Date: 2002/10/25 10:06:49 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

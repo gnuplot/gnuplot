@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.12 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: pdf.trm,v 1.13 2002/08/30 18:45:46 mikulik Exp $
  */
 
 /*------------------------------
@@ -988,7 +988,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	    PDF_setgray(myPDF, 1);
 #if USE_ULIG_FILLEDBOXES
 	    break;
-	case 1: /* solid fill */
+	case FS_SOLID:
 	    {
 		int real_linetype = PDF_Pen_RealID(PDF_LineType);
 		struct rgb *this_color = web_color_rgbs + 1 + real_linetype;
@@ -1003,7 +1003,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 		PDF_setcolor(myPDF, "fill", "rgb", red, green, blue, 0 /* unused */);
 	    }
 	    break;
-	case 2: /* pattern fill */
+	case FS_PATTERN:
 	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
 	    switch (fillpar) {
 		case 0:

@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.33 2002/08/24 16:49:49 mikulik Exp $
+ * $Id: fig.trm,v 1.34 2002/10/21 10:24:19 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1014,7 +1014,8 @@ FIG_boxfill(style, x, y, w, h)   /* ULIG */
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
-    case 1: /* style == 1 --> filled with intensity according to filldensity */
+    case FS_SOLID: 
+	/* style == 1 --> filled with intensity according to filldensity */
         pen_color = FIG_line.pen_color;
         fill_color = FIG_line.pen_color;
         fill_dens = style >> 4;
@@ -1027,12 +1028,15 @@ FIG_boxfill(style, x, y, w, h)   /* ULIG */
             /* all other colors: solid 0%...100% -> 40...20 */
             fill_style = 40 - fill_dens / 5;
         break;
-    case 2: /* style == 2 --> filled with pattern according to fillpattern */
+    case FS_PATTERN:
+	/* style == 2 --> filled with pattern according to fillpattern */
         pen_color = FIG_line.pen_color;
         fill_color = WHITE;
         fill_style = 41 + ( ( (style>>4) < 0 ) ? 0 : style>>4 );
         break;
-    default: /* style == 0 or unknown --> filled with background color */
+    case FS_EMPTY:
+    default:
+	/* style == 0 or unknown --> filled with background color */
         pen_color = FIG_line.pen_color;
         fill_color = WHITE;
         fill_style = 20;

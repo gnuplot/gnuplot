@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.28 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.29 2002/08/30 18:45:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -923,7 +923,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * ppt[0] by a preceding W_move, and the style was memorized
 	     * by a W_fillstyle call. */
 	    switch(fillstyle & 0x0f) {
-		case 1: 
+		case FS_SOLID: 
 		    /* style == 1 --> use halftone fill pattern
 		     * according to filldensity. Density is from
 		     * 0..100 percent: */
@@ -934,7 +934,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			idx = halftone_num - 1;
 		    SelectObject(hdc, halftone_brush[idx]);
 		    break;
-		case 2: 
+		case FS_PATTERN: 
 		    /* style == 2 --> use fill pattern according to
                      * fillpattern. Pattern number is enumerated */
 		    idx = fillstyle >> 4;  
@@ -944,6 +944,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			idx = 0;
 		    SelectObject(hdc, pattern_brush[idx]);
 		    break;
+		case FS_EMPTY:
 		default:
 		    /* style == 0 or unknown --> fill with background color */
 		    SelectObject(hdc, halftone_brush[0]);
