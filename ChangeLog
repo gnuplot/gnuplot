@@ -1,9 +1,32 @@
+1999-07-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/command.c: Pass command string to be executed by system() to
+	do_system() as argument.
+
+	* src/command.c(command): Use dynamic memory to hold string for
+	`pause' command.
+
+	* src/command.c(command), src/command.h: Add modified version of
+	Petr Mikulik's `system' patch (new command).
+
+	* src/plot.h: Reference extern constants from version.c.
+
+	* src/plot2d.c: Reformatting. Add missing cases in switch statements.
+
+	* src/setshow.h, src/show.c: Restructure `show' command parser to
+	use table lookup.
+
+	* term/Makefile.am.in: Add post.h to EXTRA_DIST.
+
+	* term/ai.trm, term/mif.trm, term/png.trm, term/post.trm: Remove
+	declarations vor version.c constants (now in plot.h).
+
 1999-07-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/Makefile.am: Add new file parse.h.
 
-	* src/command.c: Restructure command parser in command.c. New
-	function lookup_command().
+	* src/command.c(command): Restructure command parser in command.c
+	to use command table. New function lookup_command().
 
 	* src/command.h: Add new enum type for gnuplot commands.
 
