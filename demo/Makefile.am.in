@@ -12,10 +12,11 @@ binary1 binary2 binary3: ../src/bf_test
 check-local: check-noninteractive
 
 check-interactive:
-	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem )
+	@( bdir=`pwd` ; cd $(srcdir) && PATH=$$bdir/../src gnuplot all.dem )
 
 check-noninteractive:
-	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem </dev/null )
+	@( bdir=`pwd` ; cd $(srcdir) && \
+	  PATH=$$bdir/../src gnuplot all.dem </dev/null )
 
 ##m4-files-begin
 ##m4-files-end
@@ -24,7 +25,7 @@ Makefile.am: Makefile.am.in
 	rm -f $@ $@t
 	sed -n '1,/^##m4-files-begin/p' $< > $@t
 	echo EXTRA_DIST = Makefile.am.in *.bor *.cor *.dat *.dem *.fnc *.inc \
-	  *.par *.rot |fmt | (tr '\012' @; echo) \
+	  sound.par sound2.par start.par *.rot |fmt | (tr '\012' @; echo) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' |tr @% '\012 ' \
 	  >> $@t
 	sed -n '/^##m4-files-end/,$$p' $< >> $@t
