@@ -318,3 +318,6 @@
 /*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
 #undef USE_EMF_DRIVER
 
+/*  Define if you want to use the experimental epslatex driver.  */
+#undef USE_EPSLATEX_DRIVER
+
