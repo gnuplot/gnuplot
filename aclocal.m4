@@ -258,7 +258,7 @@ esac
 
 # serial 1
 
-AC_DEFUN(gp_MSDOS,
+AC_DEFUN(GP_MSDOS,
 [AC_MSG_CHECKING(for MS-DOS/djgpp/libGRX)
 AC_EGREP_CPP(yes,
 [#if __DJGPP__ && __DJGPP__ == 2
@@ -289,7 +289,7 @@ AC_EGREP_CPP(yes,
 
 # serial 1
 
-AC_DEFUN(gp_NEXT,
+AC_DEFUN(GP_NEXT,
 [AC_MSG_CHECKING(for NeXT)
 AC_EGREP_CPP(yes,
 [#if __NeXT__
@@ -307,7 +307,7 @@ AC_EGREP_CPP(yes,
 
 # serial 1
 
-AC_DEFUN(gp_APPLE,
+AC_DEFUN(GP_APPLE,
 [AC_MSG_CHECKING(for Apple MacOS X)
 AC_EGREP_CPP(yes,
 [#if defined(__APPLE__) && defined(__MACH__)
@@ -323,7 +323,7 @@ AC_EGREP_CPP(yes,
 
 # serial 1
 
-AC_DEFUN(gp_BEOS,
+AC_DEFUN(GP_BEOS,
 [AC_MSG_CHECKING(for BeOS)
 AC_EGREP_CPP(yes,
 [#if __BEOS__
@@ -432,7 +432,7 @@ fi
 
 # serial 1
 
-AC_DEFUN(gp_CHECK_LIB_QUIET,
+AC_DEFUN(GP_CHECK_LIB_QUIET,
 [ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
 LIBS="$TERMLIBS $TERMXLIBS -l$1 $5 $LIBS"
@@ -468,8 +468,8 @@ fi
 
 # serial 1
 
-dnl gp_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
-AC_DEFUN(gp_SEARCH_LIBDIRS,
+dnl GP_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
+AC_DEFUN(GP_SEARCH_LIBDIRS,
 [AC_MSG_CHECKING([for $2 in -l$1])
 gp_save_TERMLIBS="$TERMLIBS"
 changequote(, )dnl
@@ -487,7 +487,7 @@ case "$with_$1" in
 esac
 for ac_dir in '' /usr/local/lib $gp_lib_list ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
-  gp_CHECK_LIB_QUIET($1,$2,dnl
+  GP_CHECK_LIB_QUIET($1,$2,dnl
     TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
     TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
     $3)                               dnl OTHER-LIBRARIES
@@ -501,30 +501,39 @@ fi
 
 
 
-# serial 1
+# serial 2
 
-dnl gp_SEARCH_HEADERDIRS(HEADER-FILE [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
-AC_DEFUN(gp_SEARCH_HEADERDIRS,
-[AC_REQUIRE([gp_SEARCH_LIBDIRS])
+dnl GP_PATH_HEADER(HEADER-FILE, SEARCH-DIRS [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]])
+AC_DEFUN(GP_PATH_HEADER,
+[ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
+changequote(, )dnl
+  ac_tr_hdr=HAVE_`echo $1 | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
+changequote([, ])dnl
 AC_MSG_CHECKING([for $1])
-ac_safe=`echo "$1" | sed 'y%./+-%__p_%'`
-gp_save_CPPFLAGS="$CPPFLAGS"
-for ac_dir in '' /usr/local/include $gp_lib_prefix $gp_lib_prefix/include ; do
+AC_CACHE_VAL(ac_cv_header_$ac_safe,
+[gp_save_CPPFLAGS="$CPPFLAGS"
+gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
+gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
+for ac_dir in '' /usr/local/include $gp_h_prfx $gp_h_prfx/include $gp_h_path ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
-  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=yes",
+  AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")
-  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+  CPPFLAGS="$gp_save_CPPFLAGS"
+  if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
     break
-  else
-    CPPFLAGS="$ac_save_CPPFLAGS"
   fi
 done
-if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
+])
+if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" != no"; then
+  if eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != x" && eval "test \"`echo x'$ac_cv_header_'$ac_safe`\" != xyes"; then
+    eval "CPPFLAGS=\"$gp_save_CPPFLAGS -I`echo '$ac_cv_header_'$ac_safe`\""
+  fi
+  AC_DEFINE_UNQUOTED($ac_tr_hdr)
   AC_MSG_RESULT(yes)
-  ifelse([$2], , :, [$2])
+  ifelse([$3], , :, [$3])
 else
   AC_MSG_RESULT(no)
-ifelse([$3], , , [$3
+ifelse([$4], , , [$4
 ])dnl
 fi
 ])

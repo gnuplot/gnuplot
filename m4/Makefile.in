@@ -81,7 +81,7 @@ install_sh = @install_sh@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 EXTRA_DIST = README Makefile.am.in apple.m4 beos.m4 msdos.m4 next.m4 \
-search-hdr.m4 search-lib.m4 select.m4 
+path-hdr.m4 search-lib.m4 select.m4 
 
 subdir = m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
