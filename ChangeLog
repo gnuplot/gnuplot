@@ -1,3 +1,22 @@
+1999-03-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* aclocal.m4: Regenerated.
+
+1999-03-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all, docs/Makefile.in, docs/psdoc/Makefile,
+	lisp/Makefile.in: Cleaning up, configure related changes.
+
+	* alloc.c(checked_free): Fix core dump in TRACE_ALLOC call.
+
+	* command.c(command): Don't allocate memory for sv_file directly.
+	Replace calls to quote_str() with m_quote_capture() and free sv_file
+	before returning.
+
+	* configure: Regenerated.
+
+	* configure.in: Rearrange AC_OUTPUT().
+
 1999-03-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Rename docs/ps docs/psdoc. Old directory
