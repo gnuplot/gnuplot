@@ -1,4 +1,4 @@
-/* $Id: ansichek.h,v 1.14 1998/06/18 14:55:01 ddenholm Exp $ */
+/* $Id: ansichek.h,v 1.1 1999/03/26 21:47:23 lhecking Exp $ */
 
 /* GNUPLOT - ansichek.h */
 
@@ -44,14 +44,14 @@
 #ifndef ANSI_CHECK_H
 # define ANSI_CHECK_H
 
+# if defined(__STDC__) && __STDC__
+#  ifndef ANSI_C
+#   define ANSI_C
+#  endif
+# endif /* __STDC__ */
+
 # ifndef HAVE_CONFIG_H
 /* Only relevant for systems which don't run configure */
-
-#  if defined(__STDC__) && __STDC__
-#   ifndef ANSI_C
-#    define ANSI_C
-#   endif
-#  endif /* __STDC__ */
 
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
