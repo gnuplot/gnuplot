@@ -9186,7 +9186,10 @@ The command `set term push` remembers the current terminal including its
 settings while `set term pop` restores it. This is equivalent to `save term`
 and `load term`, but without accessing the filesystem. Therefore they can be
 used to achieve platform independent restoring of the terminal after printing,
-for instance.
+for instance. After gnuplot's startup, the default terminal or that from
+`startup` file is pushed automatically. Therefore portable scripts can rely
+that `set term pop` restores the default terminal on a given platform unless
+another terminal has been pushed explicitly.
 
 This document may describe drivers that are not available to you because they
 were not installed, or it may not describe all the drivers that are available
@@ -12686,7 +12689,7 @@ You need "pstricks.sty", and, of course, a printer that understands
 PostScript, or a converter such as Ghostscript.
 
 PSTricks is available via anonymous ftp from the /pub directory at
-Princeton.EDU.  This driver definitely does not come close to using the full
+Princeton.edu.  This driver definitely does not come close to using the full
 capability of the PSTricks package.
 
 Syntax:
@@ -15223,6 +15226,8 @@ Syntax:
                  | <incr>
                  | <start>, <incr> @{,<end>@}
                  | (@{"<label>"@} <pos> @{,@{"<label>"@} <pos>@}...) @}
+                @{ font "name@{,<size>@}" @}
+                @{ textcolor <colorspec> @}
       unset xtics
       show xtics
 
