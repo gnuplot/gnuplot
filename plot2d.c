@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16 1998/12/09 15:24:20 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.1 1999/08/19 14:36:49 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -288,7 +288,8 @@ struct curve_points *this_plot;
  * it will later be moved passed title/with/linetype/pointtype
  */
 {
-    register int i /* num. points ! */ , j, col;
+    int i /* num. points ! */ , j;
+    int max_cols, min_cols;	/* allowed range of column numbers */
     double v[NCOL];
     int storetoken = this_plot->token;
 
@@ -297,38 +298,51 @@ struct curve_points *this_plot;
     switch (this_plot->plot_style) {	/* set maximum columns to scan */
     case XYERRORBARS:
     case BOXXYERROR:
-	col = 7;
+	max_cols = 7;
+	min_cols = 4;
+	break;
+
+    case FINANCEBARS:
+    case CANDLESTICKS:
+	min_cols = max_cols = 5;
 	break;
 
     case BOXERROR:
-    case FINANCEBARS:
-    case CANDLESTICKS:
-	col = 5;
+	max_cols = 5;
+	min_cols = 4;
+	break;
+
+    case VECTOR:
+	min_cols = max_cols = 4;
 	break;
 
     case XERRORBARS:
     case YERRORBARS:
-    case VECTOR:
-	col = 4;
+	max_cols = 4;
+	min_cols = 3;
 	break;
 
     case BOXES:
-	col = 4;
-	break;
+	min_cols = 2;
+	max_cols = 4;
 
     default:
-	col = 2;
+	min_cols = 1;
+	max_cols = 2;
     }
 
     if (this_plot->plot_smooth == ACSPLINES)
-	col = 3;
+	max_cols = 3;
 
-    if (df_no_use_specs > col)
+    if (df_no_use_specs > max_cols)
 	fputs("warning : too many using specs for this style\n", stderr);
 
+    if (df_no_use_specs >0 && df_no_use_specs < min_cols)
+	fputs("warning : not enough columns for this style\n", stderr);
+
     i = 0;
-    while ((j = df_readline(v, col)) != DF_EOF) {
-	/* j <= col */
+    while ((j = df_readline(v, max_cols)) != DF_EOF) {
+	/* j <= max_cols */
 
 	if (i >= this_plot->p_max) {
 	    /*
