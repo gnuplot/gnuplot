@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.93 2004/04/13 17:23:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.94 2004/04/25 00:08:52 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -765,6 +765,10 @@ mainloop()
 	    /* check, if stdout becomes writable */
 	    FD_SET(out, &tset);
 	}
+#ifdef HAVE_USLEEP
+	/* Make sure this loop does not monopolize CPU if the pipe is jammed */
+	usleep(100);
+#endif
 #endif
 
 	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, SELECT_TYPE_ARG5 timer);

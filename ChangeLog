@@ -1,3 +1,10 @@
+2004-05-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (mainloop): Add a 100 usec delay to the event flush 
+	loop, so that if the other end of the pipe is jammed (gnuplot STOPPED)
+	it doesn't monopolize CPU cycles. Fixes user-triggered error condition 
+	reported in bug #930426.
+
 2004-05-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (plot_boxes): Clip lower border of
