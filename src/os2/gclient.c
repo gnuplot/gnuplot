@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.20 2002/03/29 21:44:23 amai Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.21 2002/09/26 19:19:28 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -2293,7 +2293,15 @@ server:
                     DosExitCritSec() ;
                     BufRead(hRead, str, len*sizeof(int), &cbR) ;
                     lCurCol = GpiQueryColor( hps ) ;
+#ifdef PM3D
+		    if (pm3d_color>=0)
+			GpiSetColor( hps, pm3d_color);
+		    /*
+		    else
                     GpiSetColor( hps, CLR_BLACK ) ;
+			GpiSetColor( hps, curr_color);
+		    */
+#endif
                     sw = QueryTextBox( hps, strlen(str), str ) ; 
                     switch(jmode) {
 	                case LEFT:   sw = 0;     break;

@@ -1,3 +1,7 @@
+2002-09-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/os2/gclient.c: Support for textcolors.
+
 2002-09-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Improve vertical placement of rotated text.
@@ -1193,7 +1197,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/28 02:01:43 $).
+	last modification date (from the tag $Date: 2002/09/30 00:52:21 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
