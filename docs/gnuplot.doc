@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.37 1999/10/17 19:15:33 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.19 2000/01/26 10:22:53 joze Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -247,6 +247,69 @@ C
 
  26. Text (labels, tic labels, and the time stamp) can be written vertically
  by those terminals capable of doing so.
+2 bind
+?commands bind
+?bind
+ The `bind` command allows to (re-)define a sequence of gnuplot commands
+ which will be executed when a certain key or key sequence is pressed
+ while the driver's window has the input focus.
+ Note that `bind` is only available if gnuplot was compiled with mouse
+ support and it is used by all mouse-capable terminals.
+ Bindings overwrite the builtin bindings (like in every real editor),
+ except <space> and 'q' which cannot be rebound.
+ Mouse Buttons cannot be rebound.
+
+ Note that multikey-bindings with modifiers have to be quoted.
+
+ Syntax:
+       bind [<key-sequence>] ["<gnuplot commands>"]
+       bind!
+
+ Examples:
+
+ - set bindings:
+
+     bind a "replot"
+     bind "ctrl-a" "plot x*x"
+     bind "ctrl-alt-a" 'print "great"'
+     bind Home "set view 60,30; replot"
+
+ - show bindings:
+     bind "ctrl-a"          # shows the binding for ctrl-a
+     bind                   # shows all bindings
+
+ - remove bindings:
+     bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
+                              (note that builtins cannot be removed)
+     bind!                  # installs default (builtin) bindings
+
+ - bind a key to toggle something:
+   v=0
+   bind "ctrl-r" "v=v+1;if(v%2)set term x11 noraise; else set term x11 raise"
+
+ Modifiers (ctrl / alt) are case insensitive, keys not:
+     ctrl-alt-a == CtRl-alT-a
+     ctrl-alt-a != ctrl-alt-A
+
+ List of modifiers (alt == meta):
+     ctrl, alt
+
+ List of supported special keys:
+
+    "BackSpace", "Tab", "Linefeed", "Clear", "Return", "Pause", "Scroll_Lock",
+    "Sys_Req", "Escape", "Delete", "Home", "Left", "Up", "Right", "Down",
+    "PageUp", "PageDown", "End", "Begin",
+
+    "KP_Space", "KP_Tab", "KP_Enter", "KP_F1", "KP_F2", "KP_F3", "KP_F4",
+    "KP_Home", "KP_Left", "KP_Up", "KP_Right", "KP_Down", "KP_PageUp",
+    "KP_PageDown", "KP_End", "KP_Begin", "KP_Insert", "KP_Delete", "KP_Equal",
+    "KP_Multiply", "KP_Add", "KP_Separator", "KP_Subtract", "KP_Decimal",
+    "KP_Divide",
+
+    "KP_1" - "KP_9", "F1" - "F12"
+
+ see also `help mouse` and `help if`.
+
 2 Batch/Interactive Operation
 ?batch/interactive
  `gnuplot` may be executed in either batch or interactive modes, and the two
@@ -2018,12 +2081,13 @@ C ... and restart the table:
  The `if` command allows commands to be executed conditionally.
 
  Syntax:
-       if (<condition>) <command-line>
+       if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
 
  <condition> will be evaluated.  If it is true (non-zero), then the command(s)
  of the <command-line> will be executed.  If <condition> is false (zero), then
- the entire <command-line> is ignored.  Note that use of `;` to allow multiple
- commands on the same line will _not_ end the conditionalized commands.
+ the entire <command-line> is ignored until the next occurence of `else`.
+ Note that use of `;` to allow multiple commands on the same line will
+ _not_ end the conditionalized commands.
 
  Examples:
        pi=3
@@ -2034,6 +2098,11 @@ C ... and restart the table:
  but
        if (1==2) print "Never see this"; print "Or this either"
  will not display anything.
+
+ else:
+       v=0
+       v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
+ (repeat the last line repeatedly!)
 
  See `reread` for an example of how `if` and `reread` can be used together to
  perform a loop.
@@ -4252,6 +4321,25 @@ C ... and restart the table:
  want that, you may choose `nobentover` instead.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html"> Hidden Line Removal Demo</a> and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html"> Complex Hidden Line Demo. </a>
+3 historysize
+?commands set historysize
+?set historysize
+?set nohistorysize
+?historysize
+?nohistorysize
+ Note: the command `set historysize` is only available when
+ compiled with the gnu readline.
+
+ Syntax:
+       set historysize <int>
+       unset historysize
+
+ When leaving gnuplot, the value of historysize is used for
+ truncating the history to at most that much lines. The default
+ is 500.
+ "unset historysize" will disable history truncation and thus
+ allow an infinite number of lines to be written to the history
+ file.
 3 isosamples
 ?commands set isosamples
 ?commands show isosamples
@@ -4419,7 +4507,7 @@ C ... and restart the table:
  Syntax:
        set label {<tag>} {"<label_text>"} {at <position>}
                  {<justification>} {{no}rotate} {font "<name>{,<size>}"}
-                 {front | back}
+                 {front | back} {pointstyle <style> | nopointstyle}
        set nolabel {<tag>}
        show label
 
@@ -4446,6 +4534,13 @@ C ... and restart the table:
  If `front` is given, the label is written on top of the graphed data. If
  `back` is given (the default), the label is written underneath the graphed
  data.  Using `front` will prevent a label from being obscured by dense data.
+
+ If `pointstyle` is given, a point with the given style is plotted at
+ the label position and the text of the label is displaced slightly.
+ The size of the point depends on the setting of `pointsize`. This
+ option is used by default for placing labels in mouse enhanced terminals.
+ Use `nopointstyle` to turn off the drawing of a point near the label
+ (this is the default).
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
  given as a quoted time string according to the `timefmt` format string.  See
@@ -4741,6 +4836,107 @@ C ... and restart the table:
  line will not connect the points at (2,20) and (4,40).
 
  There is no default character for `missing`.
+
+3 mouse
+?commands set nomouse
+?set mouse
+?set nomouse
+?mouse
+?nomouse
+ The command `set mouse` enables mouse actions. Currently only the
+ X11 and pm driver are mouse enhanced. There are two mouse modes.
+ The 2d-graph mode works for 2d graphs and for maps (i.e. splots with 
+ `set view` having z-rotation 0, 90, 180, 270 or 360 degrees) and it
+ allows tracing the position over graph, zooming, annotating graph etc.
+ For 3d graphs `splot`, the view and scaling of the graph can be changed
+ with mouse buttons 1 and 2. If additionally to these buttons the modifier
+ <ctrl> is hold down, the coordinate system only is rotated which is
+ useful for large data sets. A vertical motion of Button 2 with the
+ shift key hold down changes the ticslevel.
+ Mousing is not available in multiplot mode.  If multiplot is disabled
+ using `unset multiplot` though,  the mouse will be turned on again and
+ acts on the last plot (like replot do).
+
+ Syntax:
+       set mouse [doubleclick <ms>] [nodoubleclick] \
+                 [[no]zoomcoordinates] \
+                 [[no]polarcoordinates] \
+                 [format <string>] \
+                 [clipboardformat <int>/<string>] \
+                 [mouseformat <int>/<string>] \
+                 [[no]labels] [labeloptions <string>] \
+                 [[no]zoomjump] [[no]verbose]
+       unset mouse
+
+ The doubleclick resolution is given in millieseconds and used
+ for Button 1 which copies the current mouse position to the
+ `clipboard`. If you want that to be done by single clicking
+ a value of 0 ms can be used. The default value is 300 ms.
+
+ The option zoomcoordinates determines if the coordinates of
+ the zoom box are drawn at the edges while zooming. (on by default)
+
+ The option polarcoordinates determines if the distance to the
+ ruler is also shown in polar coordinates. This corresponds to
+ the default key binding '5'.
+
+ The `format` option takes a fprintf like format string which
+ determines how floating point numbers are printed to the drivers
+ window and the clipboard. The default is "% #g".
+
+ `clipboardformat` and `mouseformat` are used for formatting the text
+ on Button1 and Button2 actions -- copying the coordinates to the
+ clipboard and temporaryly annotating the mouse position. This
+ corresponds to the key bindings '1', '2', '3', '4' (see the
+ drivers's help window). If the argument is a string this string
+ is used as c format specifier and should contain two float
+ specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`.
+ Use `set mouseformat ""` to turn this string off again.
+
+ The following formats are available (format 5 may only be selected
+ if the format string was specified already):
+
+  0   real coordinates in  brackets e.g. [1.23, 2.45]
+  1   real coordinates w/o brackets e.g.  1.23, 2.45
+  2   x == timefmt                       [(as set by `set timefmt`), 2.45]
+  3   x == date                          [31. 12. 1999, 2.45]
+  4   x == time                          [23:59, 2.45]
+  5   x == date / time                   [31. 12. 1999 23:59, 2.45]
+  6   alt. format, specified as string   ""
+
+ Choose the option `labels` to get real gnuplot labels on Button 2.
+ (The default is `nolabels` which makes Button 2 drawing only
+  temporary annotations at the mouse positions). The labes are
+ drawn with the current setting of `mouseformat`. `labeloptions`
+ controls which options are passed to the `set label` command.
+ The default is "pointstyle 1" which will plot a small plus at
+ the label position.  Note that the pointsize is taken from the
+ `set pointsize` command.
+ Labels can be removed by holding the Ctrl-Key down while clicking
+ with Button 2 on the label's point. The threshold for how close
+ you must be to the label is also determined by the `pointsize`.
+
+ If the option `zoomjump` is on, the mouse pointer will be automatically
+ offset a small distance after starting a zoom region with button 3.
+ This can be useful to avoid a tiny (or even empty) zoom region.
+ `zoomjump` is off by default.
+
+ If the option `verbose` is turned on the communication commands are 
+ shown during execution. This option can also be toggled by hitting `6`
+ in the driver's window. `verbose` is off by default.
+
+ Press 'h' in the driver's window for a short summary of the
+ mouse and key bindings.  This will also display user defined
+ bindings (see `help bind`).
+
+ Press 'q' in the driver's window to close the window. This key
+ cannot be overridden with the `bind` command.
+
+ User defined `hotkeys` can be defined using the `bind` command.
+ (see `help bind`).  Note, that user defined `hotkeys` may override
+ the default bindings.
+
+ see also `help bind` and `help label`.
 3 multiplot
 
 ?commands set nomultiplot
