@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: internal.c,v 1.23 1998/04/14 00:15:44 drd Exp $";
+static char *RCSid = "$Id: internal.c,v 1.7 1998/12/07 22:10:32 lhecking Exp $";
 #endif
 
 /* GNUPLOT - internal.c */
@@ -99,7 +99,7 @@ warning:  internal error--stack not empty!\n\
           (function called with too many parameters?)\n");
 }
 
-#define BAD_DEFAULT default: int_error("interal error : type neither INT or CMPLX", NO_CARET); return;
+#define BAD_DEFAULT default: int_error("internal error : type neither INT or CMPLX", NO_CARET); return;
 
 struct value *pop(x)
 struct value *x;
