@@ -5154,8 +5154,12 @@ Syntax:
 
 @end example
 
-Three clip types are supported by `gnuplot`: `points`, `one`, and `two`.
-One, two, or all three clip types may be active for a single graph.
+Three clip types for points and lines are supported by `gnuplot`: `points`, 
+`one`, and `two`. One, two, or all three clip types may be active for a 
+single graph.
+Note that clipping of color filled quadrangles drawn by @ref{pm3d} maps and 
+surfaces is not controlled by this command, but by `set pm3d clip1in` and
+`set pm3d clip4in`.
 
 The `points` clip type forces `gnuplot` to clip (actually, not plot at all)
 data points that fall within but too close to the boundaries.  This is done
@@ -5192,10 +5196,6 @@ permitted:
 
 @ref{clip} is synonymous with `set clip points`; @ref{clip} turns off all
 three types of clipping.
-
-This setting does not apply for clipping of the color filled quadrangles which
-draw @ref{pm3d} maps and surfaces. There, you can choose between the options
-`clip1in` and `clip4in`.
 
 @node cntrparam, contour, clip, set-show
 @subsection cntrparam
@@ -7026,10 +7026,7 @@ at the mouse positions). The labels are drawn with the current setting of
 @ref{label} command. The default is "pointstyle 1" which will plot a small
 plus at the label position.  Note that the pointsize is taken from the
 @ref{pointsize} command.
-@example
-  Labels can be removed by holding the Ctrl-Key down while clicking with
-@end example
-
+Labels can be removed by holding the Ctrl-Key down while clicking with
 Button 2 on the label's point. The threshold for how close you must be to the
 label is also determined by the @ref{pointsize}.
 
@@ -7447,6 +7444,8 @@ more curves to the current plot and you want to edit the whole command now.
 
 
 @c ?help pm3d
+@c ?set pm3d clip1in
+@c ?set pm3d clip4in
 pm3d is a [new] type of `splot` mode for drawing color/gray maps and
 surfaces.  It can be used for plotting gridded as well as non-gridded data.
 The main power of the pm3d algorithm (see also my program pm3d) is that it
