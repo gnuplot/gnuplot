@@ -425,7 +425,7 @@ TERM_PUBLIC void GIF_graphics()
     gif_state.color = 0;
     gif_state.image = gdImageCreate((int) (xsize * GIF_XMAX),
 				    (int) (ysize * GIF_YMAX));
-    gif_state.height = (int) (ysize * GIF_YMAX);
+    gif_state.height = (int) (ysize * GIF_YMAX - 1);
     gif_state.charw = term->h_char;	/* gif_state.font->w; */
     gif_state.charh = term->v_char;	/* gif_state.font->h; */
     for (i = gif_state.n_colors; i < GIF_N_DEFAULT_COLORS; i++)
