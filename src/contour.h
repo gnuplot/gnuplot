@@ -1,5 +1,5 @@
 /*
- * $Id: contour.h,v 1.4 2000/10/31 19:59:30 joze Exp $
+ * $Id: contour.h,v 1.5 2000/11/01 18:57:27 broeker Exp $
  */
 
 /* GNUPLOT - contour.h */
@@ -56,14 +56,14 @@ typedef enum en_contour_kind {
     /* Method of drawing the contour lines found */
     CONTOUR_KIND_LINEAR,
     CONTOUR_KIND_CUBIC_SPL,
-    CONTOUR_KIND_BSPLINE,
+    CONTOUR_KIND_BSPLINE
 } t_contour_kind;
 
 typedef enum en_contour_levels_kind {
     /* How contour levels are set */
     LEVELS_AUTO,		/* automatically selected */
     LEVELS_INCREMENTAL,		/* user specified start & incremnet */
-    LEVELS_DISCRETE,		/* user specified discrete levels */
+    LEVELS_DISCRETE		/* user specified discrete levels */
 } t_contour_levels_kind;
 
 

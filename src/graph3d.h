@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.7 2000/10/31 19:59:31 joze Exp $
+ * $Id: graph3d.h,v 1.8 2000/11/01 18:57:28 broeker Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -57,7 +57,7 @@ typedef enum en_contour_placement {
     CONTOUR_NONE,
     CONTOUR_BASE,
     CONTOUR_SRF,
-    CONTOUR_BOTH,
+    CONTOUR_BOTH
 } t_contour_placement;
 
 typedef double transform_matrix[4][4]; /* HBB 990826: added */
