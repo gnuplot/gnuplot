@@ -76,6 +76,9 @@ LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 # The makeinfo command from GNU texinfo
 MAKEINFO = makeinfo
 
+# If you want to try doc2texi.el
+# EMACS = emacs
+
 # substitute your troff command (and any flags) for this one
 TROFF = troff
 
@@ -282,6 +285,16 @@ gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 
 doc2info: doc2info.o termdoc.o xref.o
 	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
+
+## An alternative to doc2info.c, Thanks to Bruce Ravel
+#gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+#	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+#gnuplot.texi: $(srcdir)/doc2info.el $(srcdir)/gnuplot.doc
+#	@if test "$(EMACS)" != no; then \
+#	  $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
+#	else \
+#	  @echo No emacs found - cannot create texinfo file; \
+#	fi
 
 # this is how to make OS/2 ipfc documentation
 ipf: gnuplot.ipf
