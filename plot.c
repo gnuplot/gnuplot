@@ -73,6 +73,12 @@ extern smg$create_key_table();
 # endif
 #endif /* _Windows */
 
+/* GNU readline stuff */
+#ifdef GNU_READLINE
+# include <readline/readline.h>
+# include <readline/history.h>
+#endif
+
 extern FILE *gpoutfile;
 
 TBOOLEAN interactive = TRUE;	/* FALSE if stdin not a terminal */
@@ -343,7 +349,7 @@ char **argv;
     }
 #endif
 
-#ifdef apollo
+#ifdef APOLLO
     apollo_pfm_catch();
 #endif
 
