@@ -1,5 +1,5 @@
 /*
- * $Id: table.trm,v 1.5 1998/06/18 14:59:25 ddenholm Exp $
+ * $Id: table.trm,v 1.7 1998/11/25 21:08:17 lhecking Exp $
  *
  */
 
@@ -60,7 +60,8 @@ START_HELP(table)
 " `splot` command, in a multicolumn ASCII table of X Y {Z} R values.  The",
 " character R takes on one of three values: \"i\" if the point is in the active",
 " range, \"o\" if it is out-of-range, or \"u\" if it is undefined.  The data",
-" format is determined by the format of the axis labels (see `set format`).",
+" format is determined by the format of the axis labels (see `set format`),",
+" and the columns are separated by single spaces.",
 "",
 " For those times when you want the numbers, you can display them on the",
 " screen or save them to a file.  This can be useful if you want to generate",
