@@ -1,3 +1,8 @@
+2004-10-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): Allow explicit pm3d palette colors for line
+	and point styles in non-Cartesian mapping modes. (bug #1005775)
+
 2004-09-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Change #ifdef GD2_VERS to #if (GD2_VERS >= 2) everywhere.

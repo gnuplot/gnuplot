@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.80 2004/09/27 04:20:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.81 2004/09/28 06:05:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -869,6 +869,15 @@ get_3ddata(struct surface_points *this_plot)
 		y = v[2] * sin(v[0]) * cos(v[1]);
 		z = v[2] * sin(v[1]);
 
+		if (j==4 && this_plot->plot_style != LABELPOINTS) {
+		    if (df_no_use_specs!=4)
+			goto error_in_number_of_columns;
+		    color = v[3];
+#ifdef PM3D
+		    pm3d_color_from_column = TRUE;
+#endif
+		}
+
 #ifdef EAM_DATASTRINGS
 		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
 		    /* text = df_tokens[3]; */
@@ -894,6 +903,15 @@ get_3ddata(struct surface_points *this_plot)
 		x = v[2] * cos(v[0]);
 		y = v[2] * sin(v[0]);
 		z = v[1];
+
+		if (j==4 && this_plot->plot_style != LABELPOINTS) {
+		    if (df_no_use_specs!=4)
+			goto error_in_number_of_columns;
+		    color = v[3];
+#ifdef PM3D
+		    pm3d_color_from_column = TRUE;
+#endif
+		}
 
 #ifdef EAM_DATASTRINGS
 		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
