@@ -1,3 +1,19 @@
+2005-02-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* configure.in: New configuration option --enable-x11-mbfonts
+	(enabled by default).  Interpretation of character encodings
+	is determined at run time by the LC_CTYPE locale setting.
+	
+	* src/gplt_x11.c: All calls to x11 font handling routines are
+	conditionally substituted by the equivalent calls to multi-byte
+	routines if --enable-x11-mbfonts is configured, and a multi-byte
+	font has in fact been selected.
+
+	* NEWS term/x11.trm: Add documentation that describes the specification
+	of multi-byte fonts:
+	    set term x11 font "mbfont:<primary font>;<secondary font>"
+	    set label "foo" font "mbfont:<primary font>;<secondary font>"
+
 2005-02-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graph3d.c (plot3d_lines_pm3d key_sample_line_pm3d): 

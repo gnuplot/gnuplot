@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.129 2005/01/02 07:47:36 sfeam Exp $
+ * $Id: x11.trm,v 1.130 2005/01/26 16:14:54 broeker Exp $
  *
  */
 
@@ -136,7 +136,7 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON) || defined(PM3D)
 #include "gplt_x11.h"
 #endif
-#ifdef WITH_IMAGE
+#ifdef WITH_IMAGE_BUG
 #include "graphics.h"
 #endif
 
@@ -2057,6 +2057,31 @@ START_HELP(x11)
 " The driver also recognizes some common PostScript font names and",
 " replaces them with possible X11 or TrueType equivalents.",
 " This same sequence is used to process font requests from `set label`.",
+"",
+" If your gnuplot was built with configuration option --enable-x11-mbfonts,",
+" you can specify multi-byte fonts by using the prefix \"mbfont:\" on the font",
+" name. An additional font may be given, separated by a semicolon.",
+" Since multi-byte font encodings are interpreted according to the locale",
+" setting, you must make sure that the environmental variable LC_CTYPE is set",
+" to some appropriate locale value such as ja_JP.eucJP, ko_KR.EUC, or zh_CN.EUC.",
+"",
+" Example:",
+"       set term x11 font 'mbfont:kana14;k14'",
+"             # 'kana14' and 'k14' are Japanese X11 font aliases, and ';'",
+"             # is the separator of font names.",
+"       set term x11 font 'mbfont:fixed,16,r,medium'",
+"             # <font>,<size>,<slant>,<weight> form is also usable.",
+"       set title '(mb strings)' font 'mbfont:*-fixed-medium-r-normal--14-*'",
+"",
+" The same syntax applies to the default font in Xresources settings,",
+" for example,", 
+"       gnuplot*font: \\",
+"           mbfont:-misc-fixed-medium-r-normal--14-*-*-*-c-*-jisx0208.1983-0",
+"",
+" If gnuplot is built with --enable-x11-mbfonts, you can use two special",
+" PostScript font names 'Ryumin-Light-*' and 'GothicBBB-Medium-*' (standard",
+" Japanese PS fonts) without the prefix \"mbfont:\".",
+"", 
 "2 command-line_options",
 "?commands set terminal x11 command-line-options",
 "?set terminal x11 command-line-options",

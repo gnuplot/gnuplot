@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.124 2004/11/28 02:02:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.125 2005/02/03 05:25:45 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -99,6 +99,11 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.124 2004/11/28 02:02:51
 /* Daniel Sebald: added X11 support for images. (27 February 2003)
  */
 
+/* Shigeharu Takeno <shige@iee.niit.ac.jp> February 2005
+ * Support for multi-byte fonts based, with permission, on the "gnuplot+"
+ * patches by Masahito Yamaga <ma@yama-ga.com> 
+ */
+
 #include "syscfg.h"
 #include "stdfn.h"
 #include "gp_types.h"
@@ -130,6 +135,9 @@ Error. Incompatible options.
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+#ifdef USE_X11_MULTIBYTE
+# include <X11/Xlocale.h>
+#endif
 
 #ifdef PM3D
 # include <math.h>		/* pow() */
@@ -461,6 +469,23 @@ static double mouse_to_axis __PROTO((int, axis_scale_t *));
 #endif
 
 static char *FallbackFont = "fixed";
+#ifdef USE_X11_MULTIBYTE
+static char *FallbackFontMB = "mbfont:*-medium-r-normal--14-*;*-medium-r-normal--16-*";
+# define FontSetSep ';'
+static int usemultibyte = 0;
+static int usablemb=1;
+static int fontset_transsep __PROTO((char *,char *,int));
+#endif /* USE_X11_MULTIBYTE */
+static int gpXTextWidth __PROTO((XFontStruct *,const char *,int));
+static int gpXTextHeight __PROTO((XFontStruct *));
+static void gpXSetFont __PROTO((Display *,GC,Font));
+static void gpXDrawImageString __PROTO((Display *,Drawable,GC,int,int,const char *,int));
+static void gpXDrawString __PROTO((Display *,Drawable,GC,int,int,const char *,int));
+static void gpXFreeFont __PROTO((Display *,XFontStruct *));
+static XFontStruct *gpXLoadQueryFont __PROTO((Display *,char *));
+static char *gpFallbackFont __PROTO((void));
+static int gpXGetFontascent __PROTO((XFontStruct *cfont));
+
 enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
 static char default_font[64] = { '\0' };
 
@@ -519,7 +544,10 @@ static GC *current_gc = (GC *) 0;
 static GC gc_xor = (GC) 0;
 static GC gc_xor_dashed = (GC) 0;
 static GC fill_gc = (GC) 0;
-static XFontStruct *font;
+static XFontStruct *font = NULL;
+#ifdef USE_X11_MULTIBYTE
+static XFontSet mbfont = NULL;
+#endif
 /* must match the definition in term/x11.trm: */
 /* FIXME HBB 20020225: that really should be ensured by sharing a common
  * header file between this file and term/x11.trm! */
@@ -662,6 +690,10 @@ main(int argc, char *argv[])
     fcloseall();
 #endif
 
+#ifdef USE_X11_MULTIBYTE
+    if (setlocale(LC_ALL, "")==NULL || XSupportsLocale()==False)
+      usablemb=0;
+#endif /* USE_X11_MULTIBYTE */
     preset(argc, argv);
 
 /* set up the alternative cursor */
@@ -1730,7 +1762,7 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     int x, y;
     double src_x, src_y;
     double dest_x, dest_y;
-    int width = XTextWidth(font, str, len);
+    int width = gpXTextWidth(font, str, len);
     int height = vchar;
     double src_cen_x = (double)width * 0.5;
     double src_cen_y = (double)height * 0.5;
@@ -1776,10 +1808,11 @@ DrawRotated(plot_struct *plot, Display *dpy, GC gc, int xdest, int ydest,
     }
 
     /* set font for the bitmap GC */
-    XSetFont(dpy, bitmapGC, font->fid);
+    if (font)
+      gpXSetFont(dpy, bitmapGC, font->fid);
 
     /* draw string to the source bitmap */
-    XDrawImageString(dpy, pixmap_src, bitmapGC, 0, font->ascent, str, len);
+    gpXDrawImageString(dpy, pixmap_src, bitmapGC, 0, gpXGetFontascent(font), str, len);
 
     /* create XImage's of depth 1 */
     /* source from pixmap */
@@ -1938,7 +1971,8 @@ exec_cmd(plot_struct *plot, char *command)
 		c = &(buffer[strlen(buffer)-1]);
 		while (*c <= ' ') *c-- = '\0';
 	    	pr_font(&buffer[2]);
-		XSetFont(dpy,gc,font->fid);
+		if (font)
+		  gpXSetFont(dpy,gc,font->fid);
 		break;
 	case 'E':
 		/* Save the requested font encoding */
@@ -2012,7 +2046,7 @@ exec_cmd(plot_struct *plot, char *command)
 	}
 
 	sl = strlen(str) - 1;
-	sw = XTextWidth(font, str, sl);
+	sw = gpXTextWidth(font, str, sl);
 
 /*	EAM - May 2002 	Modify to allow colored text.
  *	1) do not force foreground of gc to be black
@@ -2042,7 +2076,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    DrawRotated(plot, dpy, *current_gc, X(x), Y(y), str, sl);
 	} else {
 	    /* horizontal text */
-	    XDrawString(dpy, plot->pixmap, *current_gc,
+	    gpXDrawString(dpy, plot->pixmap, *current_gc,
 		    X(x) + sj, Y(y) + v_offset, str, sl);
 	}
 
@@ -3089,7 +3123,8 @@ display(plot_struct *plot)
 
     gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 
-    XSetFont(dpy, gc, font->fid);
+    if (font)
+      gpXSetFont(dpy, gc, font->fid);
 
 #if USE_ULIG_FILLEDBOXES
     XSetFillStyle(dpy, gc, FillSolid);
@@ -3178,7 +3213,8 @@ UpdateWindow(plot_struct * plot)
 	if (gc)
 	    XFreeGC(dpy, gc);
 	gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
-	XSetFont(dpy, gc, font->fid);
+	if (font)
+	  gpXSetFont(dpy, gc, font->fid);
 	/* set pixmap background */
 	XSetForeground(dpy, gc, plot->cmap->colors[0]);
 	XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot) + vchar);
@@ -3657,18 +3693,18 @@ AnnotatePoint(plot_struct * plot, int x, int y, const char xstr[], const char ys
     int xwidth, ywidth;
 
     xlen = strlen(xstr);
-    xwidth = XTextWidth(font, xstr, xlen);
+    xwidth = gpXTextWidth(font, xstr, xlen);
 
     ylen = strlen(ystr);
-    ywidth = XTextWidth(font, ystr, ylen);
+    ywidth = gpXTextWidth(font, ystr, ylen);
 
     /* horizontal centering disabled (joze) */
 
     if (!gc_xor) {
 	GetGCXor(plot, &gc_xor);
     }
-    XDrawString(dpy, plot->window, gc_xor, x, y - 3, xstr, xlen);
-    XDrawString(dpy, plot->window, gc_xor, x, y + vchar, ystr, ylen);
+    gpXDrawString(dpy, plot->window, gc_xor, x, y - 3, xstr, xlen);
+    gpXDrawString(dpy, plot->window, gc_xor, x, y + vchar, ystr, ylen);
 }
 
 /* returns the time difference to the last click in milliseconds */
@@ -3728,9 +3764,17 @@ GetGCXor(plot_struct * plot, GC * ret)
 
     values.foreground = AllocateXorPixel(plot->cmap);
 
-    mask = GCForeground | GCFunction | GCFont;
-    values.function = GXxor;
-    values.font = font->fid;
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte) { 
+	mask = GCForeground | GCFunction;
+	values.function = GXxor;
+    } else
+#endif
+    {
+	mask = GCForeground | GCFunction | GCFont;
+	values.function = GXxor;
+	values.font = font->fid;
+    }
 
     *ret = XCreateGC(dpy, plot->window, mask, &values);
 }
@@ -3842,7 +3886,7 @@ DrawCoords(plot_struct * plot, const char *str)
     }
 
     if (str[0] != 0)
-	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
+	gpXDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
 }
 
 
@@ -5100,6 +5144,149 @@ pr_dashes()
  *   pr_font - determine font
  *---------------------------------------------------------------------------*/
 
+/* wrapper functions */
+int gpXTextWidth (XFontStruct *cfont,const char *str,int count)
+{
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte)
+	return XmbTextEscapement(mbfont,str,count);
+    else
+#endif
+	return XTextWidth(cfont,str,count);
+}
+
+int gpXTextHeight (XFontStruct *cfont)
+{
+#ifdef USE_X11_MULTIBYTE
+    static XFontSetExtents *extents;
+    if (usemultibyte) {
+	extents = XExtentsOfFontSet(mbfont);
+	return extents->max_logical_extent.height;
+    } else
+#endif
+	return cfont->ascent + cfont->descent;
+}
+
+void gpXSetFont (Display *disp,GC gc,Font fontid)
+{
+#ifdef USE_X11_MULTIBYTE
+    if (!usemultibyte)
+#endif
+	XSetFont(disp,gc,fontid);
+}
+
+void gpXDrawImageString (Display *disp,Drawable d,GC gc,int x,int y,
+			 const char *str,int len)
+{
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte)
+	XmbDrawImageString(disp,d,mbfont,gc,x,y,str,len);
+    else
+#endif
+	XDrawImageString(disp,d,gc,x,y,str,len);
+}
+
+void gpXDrawString (Display *disp,Drawable d,GC gc,int x,int y,
+		    const char *str,int len)
+{
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte)
+	XmbDrawString(disp,d,mbfont,gc,x,y,str,len);
+    else
+#endif
+	XDrawString(disp,d,gc,x,y,str,len);
+}
+
+void gpXFreeFont(Display *disp,XFontStruct *cfont)
+{
+#ifndef USE_X11_MULTIBYTE
+    if (cfont) 
+      XFreeFont(disp,cfont);
+#else
+    if (font) {
+	XFreeFont(disp, font);
+	font=NULL;
+    }
+    if (mbfont) {
+	XFreeFontSet(disp, mbfont);
+	mbfont=NULL;
+    }
+#endif
+}
+
+XFontStruct *gpXLoadQueryFont (Display *disp,char *fontname)
+{
+#ifndef USE_X11_MULTIBYTE
+    return XLoadQueryFont(disp,fontname);
+#else
+    static char **miss, *def;
+    int n_miss;
+    char tmpfname[256];
+    
+    if (!usemultibyte)
+      return XLoadQueryFont(disp, fontname);
+    else {
+	fontset_transsep(tmpfname,fontname,256-1);
+	mbfont = XCreateFontSet(disp, tmpfname, &miss, &n_miss, &def);
+	if (n_miss>0) {
+	    if (mbfont) {
+		XFreeFontSet(disp, mbfont);
+		mbfont=NULL;
+	    }
+	    XFreeStringList(miss);
+	}
+	return NULL;
+    }
+#endif
+}
+
+char *gpFallbackFont(void)
+{
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte) 
+	return FallbackFontMB;
+    else
+#endif
+	return FallbackFont;
+}
+
+int gpXGetFontascent(XFontStruct *cfont)
+{
+#ifndef USE_X11_MULTIBYTE
+    return cfont->ascent;
+#else
+    static XFontStruct **eachfonts;
+    char **fontnames;
+    int max_ascent = 0;
+    int i, n_fonts;
+
+    if(!usemultibyte) return font->ascent;
+    n_fonts = XFontsOfFontSet(mbfont, &eachfonts, &fontnames);
+    for (i = 0; i < n_fonts; i++) {
+	if (eachfonts[i]->ascent > max_ascent)
+	  max_ascent = eachfonts[i]->ascent;
+    }
+    return max_ascent;
+#endif
+}
+
+#ifdef USE_X11_MULTIBYTE
+int fontset_transsep(char *nfname,char *ofname,int n)
+{
+    char *s;
+
+    strncpy(nfname,ofname,n);
+    if(nfname[n-1]!='\0') nfname[n]='\0';
+    if (strchr(nfname,',')) return 1;
+    s = nfname;
+    while ((s = strchr(nfname,FontSetSep)) != NULL){
+	*s = ',';
+	nfname = s;
+    }
+    return 0;
+}
+#endif
+
 static void
 pr_font( fontname )
 char *fontname;
@@ -5107,6 +5294,9 @@ char *fontname;
     static char previous_font_name[128];
     char fontspec[128];
     int  fontsize = 0;
+#ifdef USE_X11_MULTIBYTE
+    char *orgfontname = NULL;
+#endif
 
     if (!fontname || !(*fontname))
 	fontname = default_font;
@@ -5118,22 +5308,40 @@ char *fontname;
 		    fontname));
     }
 
+#ifdef USE_X11_MULTIBYTE
+    if (fontname && strncmp(fontname,"mbfont:",7) == 0) {
+	if (usablemb) {
+	    usemultibyte = 1;
+	    orgfontname = fontname;
+	    fontname = &fontname[7];
+	} else {
+	    usemultibyte=0;
+	    fontname=NULL;
+	}
+    } else usemultibyte=0;
+#endif
     if (!fontname)
-	fontname = FallbackFont;
+      fontname = gpFallbackFont();
 
     /* EAM DEBUG - Free previous font before searching for a new one. */
     /* This doesn't seem right, since we will probably need it again  */
     /* very soon. But if we don't free it, we gradually leak memory.  */
-    if (font)
-	XFreeFont(dpy, font);
-	
-    font = XLoadQueryFont(dpy, fontname);
+    gpXFreeFont(dpy,font);
 
+    font = gpXLoadQueryFont(dpy,fontname);
+
+#ifndef USE_X11_MULTIBYTE
     if (!font) {
+#else
+    if (!font && !mbfont && !strchr(fontname,FontSetSep)) {
+#endif
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
 	/* We are passed "font<,size><,slant>"                             */
 	char shortname[64], *fontencoding, slant, *weight;
 	int  sep;
+#ifdef USE_X11_MULTIBYTE
+	int backfont = 0;
+#endif
 
 	/* Enhanced font processing wants a method of requesting a new size  */
 	/* for whatever the previously selected font was, so we have to save */
@@ -5141,10 +5349,24 @@ char *fontname;
 	if (!strncmp(fontname,"DEFAULT",7)) {
 	    sscanf(&fontname[8],"%d",&fontsize);
 	    fontname = default_font;
+#ifdef USE_X11_MULTIBYTE
+	    backfont = 1;
+#endif
 	} else if (*fontname == ',') {
 	    sscanf(&fontname[1],"%d",&fontsize);
 	    fontname = previous_font_name;
+#ifdef USE_X11_MULTIBYTE
+	    backfont = 1;
+#endif
 	}
+#ifdef USE_X11_MULTIBYTE
+	if (backfont && fontname && strncmp(fontname,"mbfont:",7) == 0
+	    && usablemb) {
+	    usemultibyte = 1;
+	    orgfontname = fontname;
+	    fontname = &fontname[7];
+	}
+#endif
 
 	sep = strcspn(fontname,",");
 	if (sep >= sizeof(shortname))
@@ -5166,6 +5388,10 @@ char *fontname;
 
 	if (!strncmp("Symbol",shortname,6) || !strncmp("symbol",shortname,6))
 	    fontencoding = "*-*";
+#ifdef USE_X11_MULTIBYTE
+	else if (usemultibyte)
+	    fontencoding = "*-*";
+#endif
 	else
 	    fontencoding = (
 		encoding == S_ENC_CP437     ? "dosencoding-cp437" :
@@ -5180,9 +5406,13 @@ char *fontname;
 	sprintf(fontspec, "-*-%s-%s-%c-*-*-%d-*-*-*-*-*-%s",
 		shortname, weight, slant, fontsize, fontencoding
 		);
-	font = XLoadQueryFont(dpy, fontspec);
+	font = gpXLoadQueryFont(dpy, fontspec);
 
+#ifndef USE_X11_MULTIBYTE
 	if (!font) {
+#else
+	if (!font && !mbfont) {
+#endif
 	    /* Try to decode some common PostScript font names */
 	    if (!strcmp("Times-Bold",shortname) || !strcmp("times-bold",shortname)) {
 		sprintf(fontspec,
@@ -5209,12 +5439,53 @@ char *fontname;
 		sprintf(fontspec,
 			"-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
 	    }
-	    font = XLoadQueryFont(dpy, fontspec);
+#ifdef USE_X11_MULTIBYTE
+	    /* Japanese standard PostScript font names 
+	     * (adviced from N.Matsuda).
+	     */
+	    else if (usablemb 
+	      && (!strncmp("Ryumin-Light",shortname,strlen("Ryumin-Light")) 
+	       || !strncmp("ryumin-light",shortname,strlen("ryumin-light")))) {
+		if (!usemultibyte) {
+		    usemultibyte = 1;
+		    orgfontname = fontname;
+		}
+		sprintf(fontspec,"-*-mincho-medium-%c-*--%d-*", slant,fontsize);
+	    } 
+	    else if (usablemb 
+	      && (!strncmp("GothicBBB-Medium",shortname,strlen("GothicBBB-Medium")) 
+	       || !strncmp("gothicbbb-medium",shortname,strlen("gothicbbb-medium")))) {
+		if (!usemultibyte) {
+		    usemultibyte = 1;
+		    orgfontname = fontname;
+		}
+	    /* FIXME: Doesn't work on most non-japanese setups, because */
+	    /* many purely Western fonts are gothic-bold.               */
+		sprintf(fontspec,"-*-gothic-bold-%c-*--%d-*", slant,fontsize);
+	    }
+#endif
+	    font = gpXLoadQueryFont(dpy, fontspec);
+
+#ifdef USE_X11_MULTIBYTE
+	    if (usemultibyte && !mbfont) {
+		/* But (mincho|gothic) X fonts are not provided 
+		 * on some X servers even in Japan
+		 */
+		sprintf(fontspec,"*-%s-%c-*--%d-*", weight,slant,fontsize);
+		font = gpXLoadQueryFont(dpy,fontspec);
+	    }
+#endif
 	}
 
     }
 
+#ifndef USE_X11_MULTIBYTE
     if (font) {
+#else
+    if (font || mbfont) {
+	if (usemultibyte && orgfontname)
+	  fontname = orgfontname;
+#endif
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
         FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
     }
@@ -5222,21 +5493,25 @@ char *fontname;
     /* By now we have tried everything we can to honor the specific request. */
     /* Try some common scaleable fonts before falling back to a last resort  */
     /* fixed font.                                                           */
+#ifndef USE_X11_MULTIBYTE
     if (!font) {
+#else
+    if (!usemultibyte && !font) {
+#endif
 	sprintf(fontspec, "-*-bitstream vera sans-bold-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
-	font = XLoadQueryFont(dpy, fontspec);
+	font = gpXLoadQueryFont(dpy, fontspec);
 	fontname = fontspec;
 	if (!font) {
 	    sprintf(fontspec, "-*-arial-medium-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
-	    font = XLoadQueryFont(dpy, fontspec);
+	    font = gpXLoadQueryFont(dpy, fontspec);
 	}
 	if (!font) {
 	    sprintf(fontspec, "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*", fontsize);
-	    font = XLoadQueryFont(dpy, fontspec);
+	    font = gpXLoadQueryFont(dpy, fontspec);
 	}
 	if (!font) {
-	    font = XLoadQueryFont(dpy, FallbackFont);
-	    fontname = FallbackFont;
+	    font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	    fontname = gpFallbackFont();
 	}
 	if (!font) {
 	    fprintf(stderr, "\ngnuplot_x11: can't find usable font - X11 aborted.\n");
@@ -5244,9 +5519,23 @@ char *fontname;
 	}
 	FPRINTF((stderr, "\ngnuplot_x11: requested font not found, using '%s' instead.\n", fontname));
     }
+#ifdef USE_X11_MULTIBYTE
+    if (usemultibyte && !mbfont) { /* multibyte font setting */
+	font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	if (!mbfont) {
+	    usemultibyte=0;
+	    font = gpXLoadQueryFont(dpy, gpFallbackFont());
+	    if (!font) {
+		fprintf(stderr, "\ngnuplot_x11: can't find usable font - X11 aborted.\n");
+		EXIT(1);
+	    }
+	}
+	fontname = gpFallbackFont();
+    }
+#endif /* USE_X11_MULTIBYTE */
 
-    vchar = font->ascent + font->descent;
-    hchar = XTextWidth(font, "0123456789", 10) / 10;
+    vchar = gpXTextHeight(font);
+    hchar = gpXTextWidth(font, "0123456789", 10) / 10;
 
     FPRINTF((stderr,"gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
 		fontname,vchar,hchar));
