@@ -7,6 +7,13 @@
 
 	* demo/mousevariables.dem: Add a comment after final pause command.
 
+	* src/set.c src/unset.c: Call gp_strdup() rather than strdup() as
+	otherwise the test in ./configure is pointless, and gnuplot fails
+	to link.
+
+	* term/x11.trm: Redefine VMS-only macro to allow if/then/else
+	constructs: GO(x) = do {} while (0)
+
 2004-04-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gpcard.tex: Remove duplicated X11 terminal entry.
