@@ -23,20 +23,25 @@ AC_DEFUN(AM_PATH_LISPDIR,
     dnl Set default value
     lispdir="\$(datadir)/emacs/site-lisp"
     emacs_flavor=`echo "$EMACS" | sed -e 's,^.*/,,'`
-    if test "x$prefix" = "xNONE"; then
-      if test -d $ac_default_prefix/share/$emacs_flavor/site-lisp; then
-	lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
-      else
-	if test -d $ac_default_prefix/lib/$emacs_flavor/site-lisp; then
-	  lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
-	fi
-      fi
+    emacs_prefix=`echo "$EMACS" | sed -e 's,/bin/.*$,,'`
+    if test -d $emacs_prefix/share/$emacs_flavor/site-lisp; then
+      lispdir="$emacs_prefix/share/$emacs_flavor/site-lisp"
     else
-      if test -d $prefix/share/$emacs_flavor/site-lisp; then
-	lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+      if test -d $emacs_prefix/lib/$emacs_flavor/site-lisp; then
+	lispdir="$emacs_prefix/lib/$emacs_flavor/site-lisp"
       else
-	if test -d $prefix/lib/$emacs_flavor/site-lisp; then
-	  lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	if test "x$prefix" = "xNONE"; then
+	  if test -d $ac_default_prefix/share/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+	  elif test -d $ac_default_prefix/lib/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	  fi
+	else
+	  if test -d $prefix/share/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+	  elif test -d $prefix/lib/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	  fi
 	fi
       fi
     fi

@@ -130,6 +130,7 @@ info: info-am
 dvi-am:
 dvi: dvi-am
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) check-local
 check: check-am
 installcheck-am:
 installcheck: installcheck-am
@@ -179,13 +180,21 @@ maintainer-clean-am:  maintainer-clean-generic distclean-am
 
 maintainer-clean: maintainer-clean-am
 
-.PHONY: tags distdir info-am info dvi-am dvi check check-am \
+.PHONY: tags distdir info-am info dvi-am dvi check-local check check-am \
 installcheck-am installcheck install-exec-am install-exec \
 install-data-am install-data install-am install uninstall-am uninstall \
 all-redirect all-am all installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
+
+check-local: check-noninteractive
+
+check-interactive:
+	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem )
+
+check-noninteractive:
+	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem </dev/null )
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t

@@ -680,20 +680,25 @@ test -n "$EMACS" || EMACS="no"
 echo "configure:681: checking where .elc files should go" >&5
         lispdir="\$(datadir)/emacs/site-lisp"
     emacs_flavor=`echo "$EMACS" | sed -e 's,^.*/,,'`
-    if test "x$prefix" = "xNONE"; then
-      if test -d $ac_default_prefix/share/$emacs_flavor/site-lisp; then
-	lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
-      else
-	if test -d $ac_default_prefix/lib/$emacs_flavor/site-lisp; then
-	  lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
-	fi
-      fi
+    emacs_prefix=`echo "$EMACS" | sed -e 's,/bin/.*$,,'`
+    if test -d $emacs_prefix/share/$emacs_flavor/site-lisp; then
+      lispdir="$emacs_prefix/share/$emacs_flavor/site-lisp"
     else
-      if test -d $prefix/share/$emacs_flavor/site-lisp; then
-	lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+      if test -d $emacs_prefix/lib/$emacs_flavor/site-lisp; then
+	lispdir="$emacs_prefix/lib/$emacs_flavor/site-lisp"
       else
-	if test -d $prefix/lib/$emacs_flavor/site-lisp; then
-	  lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	if test "x$prefix" = "xNONE"; then
+	  if test -d $ac_default_prefix/share/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+	  elif test -d $ac_default_prefix/lib/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	  fi
+	else
+	  if test -d $prefix/share/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/share/$emacs_flavor/site-lisp"
+	  elif test -d $prefix/lib/$emacs_flavor/site-lisp; then
+	    lispdir="\$(prefix)/lib/$emacs_flavor/site-lisp"
+	  fi
 	fi
       fi
     fi
@@ -704,7 +709,7 @@ EMACS=`basename $EMACS`
 # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:708: checking for $ac_word" >&5
+echo "configure:713: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else

@@ -3,6 +3,14 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par temp.set
 
+check-local: check-noninteractive
+
+check-interactive:
+	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem )
+
+check-noninteractive:
+	@( cd $(srcdir) && PATH=../src:$PATH gnuplot all.dem </dev/null )
+
 ##m4-files-begin
 EXTRA_DIST = Makefile.am.in reread.bor world.cor 1.dat 2.dat 3.dat \
 battery.dat big_peak.dat glass.dat hemisphr.dat klein.dat lcdemo.dat \
