@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.64 2004/10/28 16:21:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.65 2004/11/01 00:06:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4790,13 +4790,13 @@ df_readbinary(double v[], int max)
 
 		x = v[0] - c[0];
 		y = v[1] - c[1];
-		z = v[2] - c[2];
 
 		v[0] = R[0][0] * x + R[0][1] * y;
 		v[1] = R[1][0] * x + R[1][1] * y;
 		if (df_plot_mode == MODE_SPLOT) {
 		    x = v[0];
 		    y = v[1];
+		    z = v[2] - c[2];
 		    v[0] = P[0][0] * x + P[0][1] * y + P[0][2] * z;
 		    v[1] = P[1][0] * x + P[1][1] * y + P[1][2] * z;
 		    v[2] = P[2][0] * x + P[2][1] * y + P[2][2] * z;
