@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.5 1999/07/20 15:34:26 lhecking Exp $ */
+/* $Id: command.h,v 1.6 1999/07/27 19:44:20 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -48,9 +48,6 @@
 extern struct udft_entry ydata_func;
 extern struct udft_entry *dummy_func;
 extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-
-/* Formerly in plot.h */
-#define AXIS_ARRAY_SIZE 10
 
 #ifndef STDOUT
 # define STDOUT 1

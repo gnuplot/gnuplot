@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.3 1999/06/17 14:21:44 lhecking Exp $ */
+/* $Id: graphics.h,v 1.4 1999/06/22 12:01:15 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -35,6 +35,8 @@
 #ifndef GNUPLOT_GRAPHICS_H
 # define GNUPLOT_GRAPHICS_H
 
+#include "setshow.h"
+
 /* Collect all global vars in one file.
  * The comments may go at a later date,
  * but are needed for reference now
@@ -45,9 +47,6 @@
  * The ultimate target is of course to eliminate global vars.
  * If possible. Over time. Maybe.
  */
-
-/* Formerly in plot.h */
-#define AXIS_ARRAY_SIZE 10
 
 extern int xleft, xright, ybot, ytop;
 
@@ -87,7 +86,7 @@ extern double time_tic_just __PROTO((int, double));
 extern double make_ltic __PROTO((int, double));
 extern int label_width __PROTO((const char *, int *));
 extern double set_tic __PROTO((double, int));
-extern void setup_tics __PROTO((int, struct ticdef *, char *, int));
+extern void setup_tics __PROTO((int, struct axis_properties *, int));
 void gprintf __PROTO((char *, size_t, char *, double, double));
 /* is this valid use of __P ? */
 typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));
