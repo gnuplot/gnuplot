@@ -337,8 +337,8 @@ typedef struct f_linkinfo {
 #define		O_ELLIPSE	1
 #define		O_POLYLINE	2
 #define		O_SPLINE	3
-/* HBB 990329: quick hack: 'O_TEXT' is in use by POSIX header
- * <fcntl.h>. Renamed to OBJ_TEXT */
+/* HBB 990329: quick hack: 'O_TEXT' is in use by <fcntl.h> header
+ * on DOS/Windows platforms. Renamed to OBJ_TEXT */
 #define         OBJ_TEXT          4
 #define		O_ARC		5
 #define		O_COMPOUND	6
