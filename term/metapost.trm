@@ -1,0 +1,761 @@
+/*
+ * $Id: $
+ */
+
+/* GNUPLOT - metapost.trm */
+
+/*[
+ * Copyright 1990 - 1993, 1998
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/* 1999/04/22
+ *			GNUPLOT -- metapost.trm
+ *
+ *			This terminal driver supports:
+ *		    		Metapost Commands
+ *
+ * Based on metafont.trm, written by
+ *		Pl Hedne
+ *		Trondheim, Norway
+ *		Pal.Hedne@termo.unit.no;
+ *		with improvements by Carsten Steger
+ *
+ * and pstricks.trm, written by
+ *		David Kotz and Raymond Toy
+ *
+ * Adapted to metapost by:
+ * 		Daniel H. Luecking <luecking@comp.uark.edu> and
+ * 	 	L Srinivasa Mohan <mohan@chemeng.iisc.ernet.in>
+ */
+
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term(mp)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void MP_options __PROTO((void));
+TERM_PUBLIC void MP_init __PROTO((void));
+TERM_PUBLIC void MP_graphics __PROTO((void));
+TERM_PUBLIC void MP_text __PROTO((void));
+TERM_PUBLIC void MP_linetype __PROTO((int linetype));
+TERM_PUBLIC void MP_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void MP_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void MP_pointsize __PROTO((double size));
+TERM_PUBLIC void MP_linewidth __PROTO((double width));
+TERM_PUBLIC void MP_vector __PROTO((unsigned int ux, unsigned int uy));
+TERM_PUBLIC void MP_arrow __PROTO((unsigned int sx, unsigned int sy,
+				   unsigned int ex, unsigned int ey,
+				   TBOOLEAN head));
+TERM_PUBLIC void MP_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
+TERM_PUBLIC int MP_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int MP_text_angle __PROTO((int ang));
+TERM_PUBLIC void MP_reset __PROTO((void));
+TERM_PUBLIC int MP_set_font __PROTO((char *font));
+TERM_PUBLIC void MP_boxfill __PROTO((int style,
+				     unsigned int x1, unsigned int y1,
+				     unsigned int width, unsigned int height));
+
+/* 5 inches wide by 3 inches high (default) */
+#define MP_XSIZE 5.0
+#define MP_YSIZE 3.0
+
+/* gnuplot units will be one pixel if printing device has this
+   resolution */
+#define MP_DPI (300)
+
+#define MP_XMAX (MP_XSIZE*MP_DPI)
+#define MP_YMAX (MP_YSIZE*MP_DPI)
+
+#define MP_HTIC (5*MP_DPI/72)	/* nominally 5pt   */
+#define MP_VTIC (5*MP_DPI/72)	/*    "      5pt   */
+#define MP_HCHAR (MP_DPI*53/10/72)	/*    "      5.3pt */
+#define MP_VCHAR (MP_DPI*11/72)	/*    "      11pt  */
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+static double MP_xsize = MP_XSIZE;
+static double MP_ysize = MP_YSIZE;
+static double MP_xmax = MP_XMAX;
+static double MP_ymax = MP_YMAX;
+static int MP_posx;
+static int MP_posy;
+static char MP_fontname[MAX_ID_LEN + 1];
+static double MP_fontsize;
+static double MP_textmag;
+enum JUSTIFY MP_justify = LEFT;
+static int MP_ang = 0;
+static int MP_char_code = 0;
+
+/* number of nodes in an output line so far */
+static int MP_linecount = 1;
+
+/* Number of points */
+#define MP_POINT_TYPES 10
+
+/* Number of lines */
+#define MP_LINE_TYPES 8
+
+/* are we in the middle of a MP path? */
+static TBOOLEAN MP_inline = FALSE;
+/* colored or dashed lines? */
+static TBOOLEAN MP_color = FALSE;
+static TBOOLEAN MP_solid = FALSE;
+
+/* compatability mode*/
+static TBOOLEAN MP_notex = FALSE;
+
+/* has a font change taken place? */
+static TBOOLEAN MP_fontchanged = FALSE;
+
+/* The old types */
+static int MP_oldline = -2;
+
+/* The old sizes */
+static double MP_oldptsize = 1.0;
+static double MP_oldpen = 1.0;
+
+/* terminate any path in progress */
+static void MP_endline __PROTO((void));
+
+/* max number of path nodes before a newline */
+#define MP_LINEMAX 5
+
+TERM_PUBLIC void MP_options()
+{
+    MP_color = FALSE;
+    MP_solid = FALSE;
+    MP_notex = FALSE;
+    MP_fontsize = 10.0;
+    MP_textmag = 1.0;
+    strcpy(MP_fontname, "cmr10");
+    strcpy(default_font, "");	/* output file will store default font info */
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "m$onochrome")) {
+	    MP_color = FALSE;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "c$olor") || almost_equals(c_token, "c$olour")) {
+	    MP_color = TRUE;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "s$olid")) {
+	    MP_solid = TRUE;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "da$shed")) {
+	    MP_solid = FALSE;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "n$otex")) {
+	    MP_notex = TRUE;
+	    strcpy(MP_fontname, "pcrr8r");
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "t$ex")) {
+	    MP_notex = FALSE;
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "de$fault")) {
+	    c_token++;
+	    continue;
+	}
+	if (almost_equals(c_token, "m$agnification")) {
+	    c_token++;
+	    if (!END_OF_COMMAND) {	/* global text scaling */
+		struct value a;
+		MP_textmag = (double) real(const_express(&a));
+	    }
+	    c_token++;
+	    continue;
+	}
+	break;
+    }
+    if (!END_OF_COMMAND && isstring(c_token)) {		/* font name */
+	quote_str(MP_fontname, c_token, MAX_ID_LEN);
+	c_token++;
+    }
+    if (!END_OF_COMMAND) {	/*font size */
+	struct value a;
+	MP_fontsize = (double) real(const_express(&a));
+	c_token++;
+    }
+    /* minimal error recovery: */
+    if (MP_fontsize < 5.0)
+	MP_fontsize = 5.0;
+    if (MP_fontsize > 99.99)
+	MP_fontsize = 99.99;
+
+    term->v_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 11 / 720);
+    if (MP_notex) {		/* Courier is a little wider than cmtt */
+	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 6.0 / 720 + 0.5);
+    } else {
+	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.25 / 720 + 0.5);
+    }
+    sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f",
+	    MP_color ? "color " : "", MP_solid ? "solid " : "",
+	    MP_notex ? "notex " : "", "mag ",
+	    MP_textmag, MP_fontname, MP_fontsize);
+}
+
+TERM_PUBLIC void MP_init()
+{
+    time_t now;
+    time(&now);
+    MP_posx = MP_posy = 0;
+    fprintf(gpoutfile, "%%GNUPLOT Metapost output: %s\n", asctime(localtime(&now)));
+    fputs("\n\
+defaultmpt:=mpt:=4;\
+th:=.6;\
+\n\
+def pen expr n = pickup pencircle scaled (n*th) enddef;\
+def ptsize expr n = mpt:=n*defaultmpt enddef;\n",
+	  gpoutfile);
+
+    fprintf(gpoutfile, "\ntextmag:=%6.3f;\n", MP_textmag);
+
+    fputs("\
+vardef makepic(expr str) =\n\
+  if picture str : str scaled textmag\n\
+  % otherwise a string\n\
+  else: str infont defaultfont scaled (defaultscale*textmag)\n\
+  fi\n\
+enddef;\n\
+\n\
+def	infontsize(expr str, size) =\n\
+  infont str scaled (size /	fontsize str)\n\
+enddef;\n",
+	  gpoutfile);
+
+    if (MP_notex) {
+	fprintf(gpoutfile, "\n\
+defaultfont:= \"%s\";\n\
+defaultscale := %6.3f/fontsize defaultfont;\n",
+		MP_fontname, MP_fontsize);
+    } else {
+	fputs("\n\
+%font changes\n\
+verbatimtex\n\
+  \\def\\setfont#1#2{%.\n\
+    \\font\\gpfont=#1 at #2pt\n\
+    \\gpfont}\n",
+	      gpoutfile);
+
+	fprintf(gpoutfile, "\\setfont{%s}{%5.2f}\netex\n",
+		MP_fontname, MP_fontsize);
+    }
+    fputs("\n\
+color currentcolor; currentcolor=black;\n\
+boolean colorlines,dashedlines;\n",
+	  gpoutfile);
+    if (MP_color) {
+	fputs("colorlines:=true;\n", gpoutfile);
+    } else {
+	fputs("colorlines:=false;\n", gpoutfile);
+    }
+    if (MP_solid) {
+	fputs("dashedlines:=false;\n", gpoutfile);
+    } else {
+	fputs("dashedlines:=true;\n", gpoutfile);
+    }
+    fputs("\n\
+def _wc = withpen currentpen if colorlines: withcolor currentcolor fi enddef;\n\
+def _ac = addto currentpicture enddef;\n\
+def _sms = scaled mpt shifted enddef;\n\
+% drawing point-types\n\
+def gpdraw (expr n, x, y) =\n\
+  if n<0: _ac contour fullcircle _sms (x,y)\n\
+  elseif (n=1) or (n=3):\n\
+    _ac doublepath ptpath[n] _sms (x,y) _wc;\n\
+    _ac doublepath ptpath[n] rotated 90 _sms (x,y) _wc\n\
+  elseif n<6: _ac doublepath ptpath[n] _sms (x,y) _wc\n\
+  else: _ac contour ptpath[n] _sms (x,y) _wc\n\
+  fi\n\
+enddef;\n\
+\n\
+% the point shapes\n\
+path ptpath[];\n\
+%diamond\n\
+ptpath0 = ptpath6 = (-1/2,0)--(0,-1/2)--(1/2,0)--(0,1/2)--cycle;\n\
+% plus sign\n\
+ptpath1 = (-1/2,0)--(1/2,0);\n\
+% square\n\
+ptpath2 = ptpath7 = (-1/2,-1/2)--(1/2,-1/2)--(1/2,1/2)--(-1/2,1/2)--cycle;\n\
+% cross\n\
+ptpath3 := (-1/2,-1/2)--(1/2,1/2);\n\
+% circle:\n\
+ptpath4 = ptpath8:= fullcircle;\n\
+% triangle\n\
+ptpath5 = ptpath9 := (0,1/2)--(-1/2,-1/2)--(1/2,-1/2)--cycle;\n\
+\n\
+def linetype expr n =\n\
+  if n < 1 : currentcolor:=black;\n\
+    if n = -1 : drawoptions(withpen (currentpen scaled .6667));\n\
+      else : drawoptions();\n\
+    fi\n\
+  else: if colorlines: currentcolor:=col[n]; fi\n\
+    drawoptions( if dashedlines: dashed lt[n] fi\n\
+      if colorlines: withcolor col[n] fi  withpen currentpen);\n\
+  fi\n\
+enddef;\n\
+\n\
+% dash patterns\n\
+picture lt[];\n\
+lt1=dashpattern(on 2 off 2); % dashes\n\
+lt2=dashpattern(on 2 off 2 on 0.2 off 2); %dash-dot\n\
+lt3=lt1 scaled 1.414;\n\
+lt4=lt2 scaled 1.414;\n\
+lt5=lt3 scaled 1.414;\n\
+lt6:=lt4 scaled 1.414;\n\
+lt7=dashpattern(on 0.2 off 2); %dots\n\
+\n\
+color col[],cyan, magenta, yellow;\n\
+cyan=blue+green; magenta=red+blue;yellow=green+red;\n\
+col[-2]:=col[-1]:=col0:=black;\n\
+col1:=red;\n\
+col2:=(.2,.2,1); %blue\n\
+col3:=(1,.66,0); %orange\n\
+col4:=.85*green;\n\
+col5:=.9magenta;\n\
+col6:=0.85*cyan;\n\
+col7:=.85*yellow;\n\
+\n\
+%placing text\n\
+picture GPtext;\n\
+def put_text(expr pic, x, y, r, j) =\n\
+  GPtext:=makepic(pic);\n\
+  GPtext:=GPtext shifted\n\
+    if j = 1: (-(ulcorner GPtext + llcorner GPtext)/2)\n\
+    elseif j = 2: (-center GPtext)\n\
+    else: (-(urcorner GPtext + lrcorner GPtext)/2)\n\
+    fi\n\
+    rotated if r > 0: 90 else: 0 fi;\n\
+  draw GPtext shifted (x,y)\n\
+enddef;\n",
+	  gpoutfile);
+}
+
+TERM_PUBLIC void MP_graphics()
+{
+    /* initialize "remembered" drawing parameters */
+    MP_oldline = -2;
+    MP_oldpen = 1.0;
+    MP_oldptsize = pointsize;
+    fprintf(gpoutfile, "\nbeginfig(%d);\nw:=%gin;h:=%gin;\n",
+	    MP_char_code, MP_xsize, MP_ysize);
+    fprintf(gpoutfile, "a:=w/%d;b:=h/%d;\n", term->xmax, term->ymax);
+    fprintf(gpoutfile, "pen 1; ptsize %g;linetype -2;\n", pointsize);
+    MP_char_code++;
+}
+
+TERM_PUBLIC void MP_text()
+{
+    if (MP_inline)
+	MP_endline();
+    fputs("endfig;\n", gpoutfile);
+}
+
+TERM_PUBLIC void MP_linetype(lt)
+int lt;
+{
+    int linetype = lt;
+    if (linetype >= MP_LINE_TYPES)
+	linetype %= MP_LINE_TYPES;
+    if (MP_inline)
+	MP_endline();
+    if (MP_oldline != linetype) {
+	fprintf(gpoutfile, "linetype %d;\n", linetype);
+	MP_oldline = linetype;
+    }
+}
+
+TERM_PUBLIC void MP_move(x, y)
+unsigned int x;
+unsigned int y;
+{
+    if ((x != MP_posx) || (y != MP_posy)) {
+	if (MP_inline)
+	    MP_endline();
+	MP_posx = x;
+	MP_posy = y;
+    }				/* else we seem to be there already */
+}
+
+TERM_PUBLIC void MP_point(x, y, pt)
+unsigned int x;
+unsigned int y;
+int pt;
+{
+    int pointtype = pt;
+    if (MP_inline)
+	MP_endline();
+
+    /* Print the shape defined by 'number'; number < 0 means
+       to use a dot, otherwise one of the defined points. */
+
+    if (pointtype >= MP_POINT_TYPES)
+	pointtype %= MP_POINT_TYPES;
+    fprintf(gpoutfile, "gpdraw(%d,%da,%db);\n", pointtype, x, y);
+}
+
+TERM_PUBLIC void MP_pointsize(ps)
+double ps;
+{
+    if (MP_oldptsize != ps) {
+	if (MP_inline)
+	    MP_endline();
+	fprintf(gpoutfile, "ptsize %g;\n", ps);
+	MP_oldptsize = ps;
+    }
+}
+
+
+TERM_PUBLIC void MP_linewidth(lw)
+double lw;
+{
+    if (MP_oldpen != lw) {
+	if (MP_inline)
+	    MP_endline();
+	fprintf(gpoutfile, "pen %g;\n", lw);
+	MP_oldpen = lw;
+    }
+}
+
+
+TERM_PUBLIC void MP_vector(ux, uy)
+unsigned int ux;
+unsigned int uy;
+{
+    if ((ux == MP_posx) && (uy == MP_posy))
+	return;			/* Zero length line */
+
+    if (MP_inline) {
+	if (MP_linecount++ >= MP_LINEMAX) {
+	    fputs("\n", gpoutfile);
+	    MP_linecount = 1;
+	}
+    } else {
+	MP_inline = TRUE;
+	fprintf(gpoutfile, "draw (%da,%db)", MP_posx, MP_posy);
+	MP_linecount = 2;
+    }
+    MP_posx = ux;
+    MP_posy = uy;
+    fprintf(gpoutfile, "--(%da,%db)", MP_posx, MP_posy);
+}
+
+static void MP_endline()
+{
+    MP_inline = FALSE;
+    fprintf(gpoutfile, ";\n");
+}
+
+TERM_PUBLIC void MP_arrow(sx, sy, ex, ey, head)
+unsigned int sx;
+unsigned int sy;
+unsigned int ex;
+unsigned int ey;
+TBOOLEAN head;
+{
+    MP_move(sx, sy);
+    if (head) {
+	fprintf(gpoutfile, "drawarrow (%da,%db)--(%da,%db);\n",
+		sx, sy, ex, ey);
+    } else if ((sx != ex) || (sy != ey)) {
+	fprintf(gpoutfile, "draw (%da,%db)--(%da,%db);\n",
+		sx, sy, ex, ey);
+    }				/* else: arrow with no length and no head = sound of one hand clapping? */
+    MP_posx = ex;
+    MP_posy = ey;
+
+}
+
+TERM_PUBLIC void MP_put_text(x, y, str)
+unsigned int x, y;
+char str[];
+{
+    int i, j = 0;
+
+    /* ignore empty strings */
+    if (str[0] == NUL)
+	return;
+    if (MP_inline)
+	MP_endline();
+
+
+    switch (MP_justify) {
+    case LEFT:
+	j = 1;
+	break;
+    case CENTRE:
+	j = 2;
+	break;
+    case RIGHT:
+	j = 3;
+	break;
+    }
+    if (MP_notex) {
+	for (i = 0; i < strlen(str); i++)
+	    if (str[i] == '"')
+		str[i] = '\'';	/* Replace " with ' */
+	if (MP_fontchanged) {
+	    fprintf(gpoutfile, "\
+put_text(\"%s\" infontsize(\"%s\",%5.2f), %da, %db, %d, %d);\n",
+		    str, MP_fontname, MP_fontsize, x, y, MP_ang, j);
+	} else {
+	    fprintf(gpoutfile, "put_text(\"%s\", %da, %db, %d, %d);\n",
+		    str, x, y, MP_ang, j);
+	}
+    } else if (MP_fontchanged) {
+	fprintf(gpoutfile, "\
+put_text( btex \\setfont{%s}{%5.2f} %s etex, %da, %db, %d, %d);\n",
+		MP_fontname, MP_fontsize, str, x, y, MP_ang, j);
+    } else {
+	fprintf(gpoutfile, "put_text( btex %s etex, %da, %db, %d, %d);\n",
+		str, x, y, MP_ang, j);
+    }
+}
+
+TERM_PUBLIC int MP_justify_text(mode)
+enum JUSTIFY mode;
+{
+    MP_justify = mode;
+    return (TRUE);
+}
+
+TERM_PUBLIC int MP_text_angle(ang)
+int ang;
+{
+    /* Metapost code does the conversion */
+    MP_ang = ang;
+    return (TRUE);
+}
+
+TERM_PUBLIC int MP_set_font(font)
+char *font;
+{
+    if (*font) {
+	int sep = strcspn(font, ",");
+	strncpy(MP_fontname, font, sep);
+	MP_fontname[sep] = NUL;
+	sscanf(&(font[sep + 1]), "%lf", &MP_fontsize);
+	if (MP_fontsize < 5)
+	    MP_fontsize = 5.0;
+	if (MP_fontsize >= 100)
+	    MP_fontsize = 99.99;
+	/*  */
+	MP_fontchanged = TRUE;
+    } else {
+	MP_fontchanged = FALSE;
+    }
+    return TRUE;
+}
+
+
+TERM_PUBLIC void MP_reset()
+{
+    fputs("end.\n", gpoutfile);
+}
+
+TERM_PUBLIC void MP_boxfill(sty, x1, y1, wd, ht)
+int sty;
+unsigned int x1, y1, wd, ht;
+{
+    /* for now simply clear box if sty <= 0, do nothing otherwise */
+    if (MP_inline)
+	MP_endline();
+    if (sty <= 0)
+	fprintf(gpoutfile, "\
+fill (%da,%db)--(%da,%db)--(%da,%db)--(%da,%db)--cycle withcolor background;\n",
+		x1, y1, x1 + wd, y1, x1 + wd, y1 + ht, x1, y1 + ht);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(mp_driver)
+    "mp", "MetaPost plotting standard",
+    MP_XMAX, MP_YMAX, MP_VCHAR, MP_HCHAR,
+    MP_VTIC, MP_HTIC, MP_options, MP_init, MP_reset,
+    MP_text, null_scale, MP_graphics, MP_move, MP_vector,
+    MP_linetype, MP_put_text, MP_text_angle,
+    MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
+    0, 0, 0, MP_boxfill, MP_linewidth
+    TERM_TABLE_END(mp_driver)
+#undef LAST_TERM
+#define LAST_TERM mp_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(mp)
+"1 mp",
+"?commands set terminal mpost",
+"?set terminal mp",
+"?set term mp",
+"?terminal mp",
+"?term mp",
+"?mp",
+"?metapost",
+"",
+" The `mp` driver produces output intended to be input to the Metapost program.",
+" Running Metapost on the file creates EPS files containing the plots. By",
+" default, Metapost passes all text through TeX.  This has the advantage of",
+" allowing essentially  any TeX symbols in titles and labels.",
+"",
+" The `mp` terminal is selected with a command of the form",
+"    set term mp {color} {solid} {notex} {mag <magsize>} {\"<name>\"} {<size>}",
+" The option `color` causes lines to be drawn in color (on a printer or display",
+" that supports it), `monochrome` (or nothing) selects black lines.  The option",
+" `solid` draws solid lines, while `dashed` (or nothing) selects lines with",
+" different patterns of dashes.  If `solid` is selected but `color` is not,",
+" nearly all lines will be identical.  This may occasionally be useful, so it is",
+" allowed.",
+"",
+" The option `notex` bypasses TeX entirely, therefore no TeX code can be used in",
+" labels under this option.  This is intended for use on old plot files or files",
+" that make frequent use of common characters like `$` and `%` that require",
+" special handling in TeX.",
+"",
+" Changing font sizes in TeX has no effect on the size of mathematics, and there",
+" is no foolproof way to make such a change, except by globally  setting a",
+" magnification factor. This is the purpose of the `magnification` option. It",
+" must be followed by a scaling factor. All text (NOT the graphs) will be scaled",
+" by this factor. Use this if you have math that you want at some size other",
+" than the default 10pt. Unfortunately, all math will be the same size, but see",
+" the discussion below on editing the MP output. `mag` will also work under",
+" `notex` but there seems no point in using it as the font size option (below)",
+" works as well.",
+"",
+" A name in quotes selects the font that will be used when no explicit font is",
+" given in a `set label` or `set title`.  A name recognized by TeX (a TFM file",
+" exists) must be used.  The default is \"cmr10\" unless `notex` is selected,",
+" then it is \"pcrr8r\" (Courier).  Even under `notex`, a TFM file is needed by",
+" Metapost. The file `pcrr8r.tfm` is the name given to Courier in LaTeX's psnfss",
+" package.  If you change the font from the `notex` default, choose a font that",
+" matches the ASCII encoding at least in the range 32-126.  `cmtt10` almost",
+" works, but it has a nonblank character in position 32 (space).",
+"",
+" The size can be any number between 5.0 and 99.99.  If it is omitted, 10.0 is",
+" used.  It is advisable to use `magstep` sizes: 10 times an integer or",
+" half-integer power of 1.2, rounded to two decimals, because those are the most",
+" available sizes of fonts in TeX systems.",
+"",
+" All the options are optional.  If font information is given, it must be at the",
+" end, with size (if present) last.  The size is needed to select a size for the",
+" font, even if the font name includes size information.  For example,",
+" `set term mp \"cmtt12\"` selects cmtt12 shrunk to the default size 10.  This",
+" is probably not what you want or you would have used cmtt10.",
+"",
+" The following common ascii characters need special treatment in TeX:",
+"    $, &, #, %, _;  |, <, >;  ^, ~,  \\, {, and }",
+" The five characters $, #, &, _, and % can simply be escaped, e.g., `\\$`.",
+" The three characters <, >, and | can be wrapped in math mode, e.g., `$<$`.",
+" The remainder require some TeX work-arounds.  Any good book on TeX will give",
+" some guidance.",
+"",
+" If you type your labels inside double quotes, backslashes in TeX code need to",
+" be escaped (doubled). Using single quotes will avoid having to do this, but",
+" then you cannot use `\\n` for line breaks.  As of this writing, version 3.7 of",
+" gnuplot processess titles given in a `plot` command differently than in other",
+" places, and backslashes in TeX commands need to be doubled regardless of the",
+" style of quotes.",
+"",
+" Metapost pictures are typically used in TeX documents.  Metapost deals with",
+" fonts pretty much the same way TeX does, which is different from most other",
+" document preparation programs.  If the picture is included in a LaTeX document",
+" using the graphics package, or in a plainTeX document via epsf.tex, and then",
+" converted to PostScript with dvips (or other dvi-to-ps converter), the text in",
+" the plot will usually be handled correctly.  However, the text may not appear",
+" if you send the Metapost output as-is to a PostScript interpreter.",
+"",
+"2 Metapost Instructions",
+"?commands set terminal mp detailed",
+"?set terminal mp detailed",
+"?set term mp detailed",
+"?mp detailed",
+"?metapost detailed",
+"",
+" - Set your terminal to Metapost, e.g.:",
+"    set terminal mp mono \"cmtt12\" 12",
+"",
+" - Select an output-file, e.g.:",
+"    set output \"figure.mp\"",
+"",
+" - Create your pictures.  Each plot (or multiplot group) will generate a",
+" separate Metapost beginfig...endfig group.  Its default size will be 5 by 3",
+" inches.  You can change the size by saying `set size 0.5,0.5` or whatever",
+" fraction of the default size you want to have.",
+"",
+" - Quit gnuplot.",
+"",
+" - Generate EPS files by running Metapost on the output of gnuplot:",
+"    mpost figure.mp  OR  mp figure.mp",
+" The name of the Metapost program depends on the system, typically `mpost` for",
+" a Unix machine and `mp` on many others.  Metapost will generate one EPS file",
+" for each picture.",
+"",
+" - To include your pictures in your document you can use the graphics package",
+" in LaTeX or epsf.tex in plainTeX:",
+"    \\usepackage{graphics} % LaTeX",
+"    \\input epsf.tex       % plainTeX",
+" If you use a driver other than dvips for converting TeX DVI output to PS, you",
+" may need to add the following line in your LaTeX document:",
+"    \\DeclareGraphicsRule{*}{eps}{*}{}",
+" Each picture you made is in a separate file.  The first picture is in, e.g.,",
+" figure.0, the second in figure.1, and so on....  To place the third picture in",
+" your document, for example, all you have to do is:",
+"    \\includegraphics{figure.2} % LaTeX",
+"    \\epsfbox{figure.2}         % plainTeX",
+"",
+" The advantage, if any, of the mp terminal over a postscript terminal is",
+" editable output.  Considerable effort went into making this output as clean as",
+" possible.  For those knowledgeable in the Metapost language, the default line",
+" types and colors can be changed by editing the arrays `lt[]` and `col[]`.",
+" The choice of solid vs dashed lines, and color vs black lines can be change by",
+" changing the values assigned to the booleans `dashedlines` and `colorlines`.",
+" If the default `tex` option was in effect, global changes to the text of",
+" labels can be achieved by editing the `vebatimtex...etex` block.  In",
+" particular, a LaTeX preamble can be added if desired, and then LaTeX's",
+" built-in size changing commands can be used for maximum flexibility. Be sure",
+" to set the appropriate MP configuration variable to force Metapost to run",
+" LaTeX instead of plainTeX."
+END_HELP(mp)
+#endif /* TERM_HELP */
