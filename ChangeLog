@@ -1,3 +1,33 @@
+1999-10-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Latest version.
+
+	* configure.in: Better test for whether math library is needed.
+
+	* src/plot2d.c: Rename variables, move some code into different places.
+
+	* src/tables.c, src/tables.h: Add table for plot axes/axis option.
+
+1999-10-20  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/buildvms.com, config/makefile.vms: Update VMS build
+	procedures.
+
+1999-10-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.win, src/plot.h: Updated for newer Borland compilers.
+
+	* src/graph3d.c: Fix for 'set key below' bug.
+
+	* src/win/pgnuplot.c: Updated.
+
+	* src/win/wgnuplot.def: Reduce stacksize to avoid 'DGROUP exceeds 64K'
+	problem.
+
+1999-10-19  Thomas Sefzick  <t.sefzick@fz-juelich.de>, Matt Willis <mattbwillis@my-deja.com>
+
+	* term/tkcanvas.trm: Some updates and bug fixes.
+
 1999-10-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/plot.c: Rename GNUPLOT_HISTORY_FILE to "~/.gnuplot_history".
