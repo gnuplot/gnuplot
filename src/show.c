@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.119 2004/01/18 01:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.120 2004/03/11 18:28:44 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -923,33 +923,36 @@ show_version(fp)
 
 	c_token++;
 
-	fputs("Compile options:\n", stderr);
-
 	{
 	    /* The following code could be a lot simpler if
 	     * it wasn't for Borland's broken compiler ...
 	     */
-	    const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga,
-			*nocwdrc, *x11, *use_mouse, *unixplot, *gnugraph;
-
-	    rdline =
+	    const char * rdline =
 #ifdef READLINE
-		"+READLINE  "
+		"+"
 #else
-		"-READLINE  "
+		"-"
 #endif
-		, gnu_rdline =
+		"READLINE  ";
+
+	    const char *gnu_rdline =
 #ifdef HAVE_LIBREADLINE
-		"+LIBREADLINE  "
-# ifdef GNUPLOT_HISTORY
-		"+HISTORY  "
-# else
-		"-HISTORY  "
-# endif
+		"+"
 #else
-		"-LIBREADLINE  "
+		"-"
 #endif
-		, libgd =
+		"LIBREADLINE  "
+#ifdef HAVE_LIBREADLINE
+# ifdef GNUPLOT_HISTORY
+		"+"
+# else
+		"-"
+# endif
+		"HISTORY  "
+#endif
+		"";
+
+	    const char *libgd =
 #ifdef HAVE_LIBGD
 # ifdef HAVE_GD_PNG
 		"+GD_PNG  "
@@ -963,58 +966,73 @@ show_version(fp)
 # ifdef HAVE_GD_TTF
 		"+GD_TTF  "
 # endif
-		""
 #else
 		"-LIBGD  "
 #endif
-		, libpng =
+		"";
+
+	    const char *libpng =
 #if defined(HAVE_LIBPNG) && !(defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG))
-		"+PNG  "
+		"+"
 #else
-		"-PNG  "
+		"-"
 #endif
-		, linuxvga =
+		"PNG  ";
+
+	    const char *linuxvga =
 #ifdef LINUXVGA
 		"+LINUXVGA  "
-#else
-		""
 #endif
-		, nocwdrc =
-#ifdef NOCWDRC
-		"+NOCWDRC  "
-#else
-		"-NOCWDRC  "
-#endif
-		, x11 =
+		"";
 
+	    const char *nocwdrc =
+#ifdef NOCWDRC
+		"+"
+#else
+		"-"
+#endif
+		"NOCWDRC  ";
+
+	    const char *x11 =
 #ifdef X11
 		"+X11  "
-#else
-		""
 #endif
-		, use_mouse =
+		"";
 
+	    const char *use_mouse =
 #ifdef USE_MOUSE
 		"+USE_MOUSE  "
-#else
-		""
 #endif
-		, unixplot =
+		"";
+
+	    const char *unixplot =
 #ifdef UNIXPLOT
 		"+UNIXPLOT  "
-#else
-		""
 #endif
-		, gnugraph =
+		"";
+
+	    const char *gnugraph =
 #ifdef GNUGRAPH
 		"+GNUGRAPH  "
-#else
-		""
 #endif
-		;
-	    fprintf(stderr, "%s%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
-		    libgd, libpng, linuxvga, nocwdrc, x11, use_mouse,
-		    unixplot, gnugraph);
+		"";
+
+	    const char *hiddenline =
+#ifdef HIDDEN3D_QUADTREE
+		"+HIDDEN3D_QUADTREE   "
+#else
+# ifdef HIDDEN3D_GRIDBOX
+		"+HIDDEN3D_GRDBOX   "
+# endif
+#endif
+		"";
+
+	    fprintf(stderr, "\
+Compile options:\n\
+%s%s%s%s%s\n\
+%s%s%s%s%s%s\n\n",
+		    rdline, gnu_rdline, libgd, libpng, linuxvga,
+		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline);
 	}
 
 	if ((helpfile = getenv("GNUHELP")) == NULL) {

@@ -1,6 +1,26 @@
+2004-03-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.in: New options --enable-h3d-quadtree and
+	--enable-h3d-gridbox to control compile-time flags of hidden3d
+	code.
+
+	* src/show.c (show_version): Lots of mostly stylistic changes to
+	"show version long" part.  Replaced long comma-separated chain of
+	assignment statements by individual initialized variable
+	definitions.  Added printouts for new feature macros
+	HIDDEN3D_GRIDBOX and HIDDEN3D_QUADTREE.  Joined string output by
+	fputs into the fprintf() format string.  Broke the list of
+	compiler flags into two lines.
+
+	* src/hidden3d.c (HIDDEN3D_GRIDBOX, HIDDEN3D_QUADTREE): Renamed to
+	avoid namespace collisions since these are now globally visible.
+	Used to be called TEST_GRIDBOX and TEST_QUADTREE.  Changes all
+	occur all over hidden3d.c.
+
 2004-03-30  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/axis.c: Fix another case of arithmetic assignment to a boolean.
+	* src/axis.c: Fix another case of arithmetic assignment to a
+	boolean.
 
 2004-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

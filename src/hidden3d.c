@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.38 2004/03/29 18:31:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.39 2004/03/30 11:49:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -64,14 +64,14 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.38 2004/03/29 18:31:31 
 /* Configuration section */
 /*************************/
 
-/* If this module is compiled with TEST_GRIDBOX = 1 defined, it
+/* If this module is compiled with HIDDEN3D_GRIDBOX = 1 defined, it
  * will store the information about {x|y}{min|max} in an other
  * (additional!) form: a bit mask, with each bit representing one
  * horizontal or vertical strip of the screen. The bits for strips a
  * polygon spans are set to one. This allows to test for xy overlap
  * of an edge with a polygon simply by comparing bit patterns.  */
-#ifndef TEST_GRIDBOX
-#define TEST_GRIDBOX 0
+#ifndef HIDDEN3D_GRIDBOX
+#define HIDDEN3D_GRIDBOX 0
 #endif
 
 /* HBB 19991204: new code started to finally implement a spatially
@@ -83,11 +83,11 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.38 2004/03/29 18:31:31 
  * first place. Instead, store the polygons in an xy grid of lists,
  * so we can select a sample of these lists to test a given edge
  * against. */
-#ifndef TEST_QUADTREE
-#define TEST_QUADTREE 0
+#ifndef HIDDEN3D_QUADTREE
+#define HIDDEN3D_QUADTREE 0
 #endif
-#if TEST_QUADTREE && TEST_GRIDBOX
-# warning TEST_QUADTREE & TEST_GRIDBOX do not work together, sensibly!
+#if HIDDEN3D_QUADTREE && HIDDEN3D_GRIDBOX
+# warning HIDDEN3D_QUADTREE & HIDDEN3D_GRIDBOX do not work together, sensibly!
 #endif
 
 /* If you don't want the color-distinction between the
@@ -188,17 +188,17 @@ typedef struct polygon {
     coordval xmin, xmax, ymin, ymax, zmin, zmax; 
     t_plane plane;		/* the plane coefficients */
     TBOOLEAN frontfacing;	/* is polygon facing front- or backwards? */
-#if ! TEST_QUADTREE
+#if ! HIDDEN3D_QUADTREE
     long next;			/* index of next polygon in z-sorted list */
 #endif
-#if TEST_GRIDBOX
+#if HIDDEN3D_GRIDBOX
     unsigned long xbits;	/* x coverage mask of bounding box */
     unsigned long ybits;	/* y coverage mask of bounding box */
 #endif
 } polygon;
 typedef polygon GPHUGE *p_polygon;
 
-#if TEST_GRIDBOX
+#if HIDDEN3D_GRIDBOX
 # define UINT_BITS (CHAR_BIT * sizeof(unsigned int))
 # define COORD_TO_BITMASK(x,shift)					\
     (~0U << (unsigned int) (((x) + 1.0) / 2.0 * UINT_BITS + (shift)))
@@ -239,7 +239,7 @@ static dynarray vertices, edges, polygons;
 static long pfirst;		/* first polygon in zsorted chain*/
 static long efirst;		/* first edges in zsorted chain */
 
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
 /* HBB 20000716: spatially oriented hierarchical data structure to
  * store polygons in. For now, it's a simple xy grid of z-sorted
  * lists. A single polygon can appear in several lists, if it spans
@@ -263,7 +263,7 @@ static long quadtree[QUADTREE_GRANULARITY][QUADTREE_GRANULARITY];
 /* the dynarray to actually store all that stuff in: */
 static dynarray qtree;
 #define qlist ((p_qtreelist) qtree.v)
-#endif /* TEST_QUADTREE*/
+#endif /* HIDDEN3D_QUADTREE*/
 
 /* Prototypes for internal functions of this module. */
 static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
@@ -442,7 +442,7 @@ init_hidden_line_removal()
     init_dynarray(&vertices, sizeof(vertex), 100, 100);
     init_dynarray(&edges, sizeof(edge), 100, 100);
     init_dynarray(&polygons, sizeof(polygon), 100, 100);
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     init_dynarray(&qtree, sizeof(qtreelist), 100, 100);
 #endif
 
@@ -455,7 +455,7 @@ reset_hidden_line_removal()
     vertices.end = 0;
     edges.end = 0;
     polygons.end = 0;
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     qtree.end = 0;
 #endif
 }
@@ -469,7 +469,7 @@ term_hidden_line_removal()
     free_dynarray(&polygons);
     free_dynarray(&edges);
     free_dynarray(&vertices);
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     free_dynarray(&qtree);
 #endif
 }
@@ -763,7 +763,7 @@ store_polygon(vnum1, direction, crvlen)
     p = nextfrom_dynarray(&polygons);
 
     memcpy (p->vertex, v, sizeof(v));
-#if ! TEST_QUADTREE
+#if ! HIDDEN3D_QUADTREE
     p->next = -1;
 #endif
     GET_MIN(p, x, p->xmin);
@@ -773,7 +773,7 @@ store_polygon(vnum1, direction, crvlen)
     GET_MAX(p, y, p->ymax);
     GET_MAX(p, z, p->zmax);
 
-#if TEST_GRIDBOX
+#if HIDDEN3D_GRIDBOX
     p->xbits = CALC_BITRANGE(p->xmin, p->xmax);
     p->ybits = CALC_BITRANGE(p->ymin, p->ymax);
 #endif
@@ -1372,7 +1372,7 @@ sort_polys_by_z()
 
     /* traverse plist in the order given by sortarray, and set the
      * 'next' pointers */
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     /* HBB 20000716: Loop backwards, to ease construction of
      * linked lists from the head: */
     {
@@ -1406,7 +1406,7 @@ sort_polys_by_z()
 	}
     }
 	    
-#else /* TEST_QUADTREE */
+#else /* HIDDEN3D_QUADTREE */
     this = plist + sortarray[0];
     for (i = 1; i < polygons.end; i++) {
 	this->next = sortarray[i];
@@ -1414,7 +1414,7 @@ sort_polys_by_z()
     }
     this->next = -1L;
     /* 'pfirst' is the index of the leading element of plist */
-#endif /* TEST_QUADTREE */
+#endif /* HIDDEN3D_QUADTREE */
     pfirst = sortarray[0];
 	
     free(sortarray);
@@ -1549,7 +1549,7 @@ handle_edge_fragment(edgenum, vnum1, vnum2, firstpoly)
     long int vnum1, vnum2;
     long int firstpoly;
 {
-#if !TEST_QUADTREE
+#if !HIDDEN3D_QUADTREE
     /* Avoid checking against the same polygon again. */
     firstpoly = plist[firstpoly].next;
 #endif
@@ -1586,7 +1586,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
     coordval xmin, xmax;	/* all of these are for the edge */
     coordval ymin, ymax;
     coordval zmin, zmax;
-#if TEST_GRIDBOX
+#if HIDDEN3D_GRIDBOX
     unsigned int xextent;	/* extent bitmask in x direction */
     unsigned int yextent;	/* same, in y direction */
 
@@ -1598,7 +1598,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 # define SET_XEXTENT /* nothing */
 # define SET_YEXTENT /* nothing */
 #endif
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     unsigned int grid_x, grid_y;
     unsigned int grid_x_low, grid_x_high;
     unsigned int grid_y_low, grid_y_high;
@@ -1649,7 +1649,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	
     first_zmin = zmin;
 
-#if TEST_QUADTREE
+#if HIDDEN3D_QUADTREE
     grid_x_low = COORD_TO_TREECELL(xmin);
     grid_x_high = COORD_TO_TREECELL(xmax);
     grid_y_low = COORD_TO_TREECELL(ymin);
@@ -1662,14 +1662,14 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 		 listhead >= 0;
 		 listhead = qlist[listhead].next,
 		     polynum = qlist[listhead].p, p = plist + polynum)
-#else /* TEST_QUADTREE */
+#else /* HIDDEN3D_QUADTREE */
     /* loop over all the polygons in the sorted list, starting at the
      * currently first (i.e. furthest, from the viewer) polgon. */
     for (polynum = *firstpoly, p = plist + polynum;
 	 polynum >=0;
 	 polynum = p->next, p = plist + polynum
 	)
-#endif /* TEST_QUADTREE */
+#endif /* HIDDEN3D_QUADTREE */
 	{
 	    /* shortcut variables for the three vertices of 'p':*/
 	    p_vertex w1, w2, w3;
@@ -1705,7 +1705,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	    /* Test 1 (2D): minimax tests. Do x/y ranges of polygon
 	     * and edge have any overlap? */
 	    if (0
-#if TEST_GRIDBOX
+#if HIDDEN3D_GRIDBOX
 		/* First, check by comparing the extent bit patterns: */
 		|| (!(xextent & p->xbits))
 		|| (!(yextent & p->ybits))
