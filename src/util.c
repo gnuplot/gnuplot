@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.46 1998/06/18 14:55:20 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: util.c,v 1.46 1998/06/18 14:55:20 ddenholm Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -285,7 +285,7 @@ int start, end;
 
 /*
  * m_quote_capture() is similar to m_capture(), but it removes
- * quotes from either end if the string.
+ * quotes from either end of the string.
  */
 void m_quote_capture(str, start, end)
 char **str;

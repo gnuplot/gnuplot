@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: parse.c,v 1.62 1998/06/18 14:55:13 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.62 1998/06/18 14:55:13 ddenholm Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */

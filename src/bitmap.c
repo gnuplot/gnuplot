@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: bitmap.c,v 1.16 1998/03/22 22:31:19 drd Exp $";
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.16 1998/03/22 22:31:19 drd Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */

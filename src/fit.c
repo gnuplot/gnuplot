@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status

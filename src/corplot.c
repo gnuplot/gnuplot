@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: corplot.c,v 1.8 1998/03/22 22:31:27 drd Exp $";
+static char *RCSid() { return RCSid("$Id: corplot.c,v 1.8 1998/03/22 22:31:27 drd Exp $"); }
 #endif
 
 /* GNUPLOT - corplot.c */
