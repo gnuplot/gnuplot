@@ -137,6 +137,10 @@
 # include "next.trm"
 #endif
 
+/* Apple MacOs X Server (Openstep Unix) */
+#if defined(__APPLE__) && defined(__MACH__)
+# include "openstep.trm"
+#endif 
 
 /* OS/2 */
 #ifdef OS2
