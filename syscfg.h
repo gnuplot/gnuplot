@@ -325,111 +325,75 @@ extern unsigned int lib$spawn();
  */
 #ifdef HAVE_CONFIG_H
 
-# ifdef HAVE_ERRNO_H
-#  undef NO_ERRNO_H
-# else
+# ifndef HAVE_ERRNO_H
 #  define NO_ERRNO_H
 # endif
 
-# ifdef HAVE_FLOAT_H
-#  undef NO_FLOAT_H
-# else
+# ifndef HAVE_FLOAT_H
 #  define NO_FLOAT_H
 # endif
 
-# ifdef HAVE_LIMITS_H
-#  undef NO_LIMITS_H
-# else
+# ifndef HAVE_LIMITS_H
 #  define NO_LIMITS_H 
 # endif
 
-# ifdef HAVE_LOCALE_H
-#  undef NO_LOCALE_H
-# else
+# ifndef HAVE_LOCALE_H
 #  define NO_LOCALE_H 
 # endif
 
-# ifdef HAVE_MATH_H
-#  undef NO_MATH_H
-# else
+# ifndef HAVE_MATH_H
 #  define NO_MATH_H 
 # endif
 
-# ifdef HAVE_STDLIB_H
-#  undef NO_STDLIB_H
-# else
+# ifndef HAVE_STDLIB_H
 #  define NO_STDLIB_H 
 # endif
 
-# ifdef HAVE_STRING_H
-#  undef NO_STRING_H
-# else
+# ifndef HAVE_STRING_H
 #  define NO_STRING_H 
 # endif
 
-# ifdef HAVE_TIME_H
-#  undef NO_TIME_H
-# else
+# ifndef HAVE_TIME_H
 #  define NO_TIME_H 
 # endif
 
-# ifdef HAVE_SYS_TIME_H
-#  undef NO_SYS_TIME_H
-# else
+# ifndef HAVE_SYS_TIME_H
 #  define NO_SYS_TIME_H 
 # endif
 
-# ifdef HAVE_SYS_TYPES_H
-#  undef NO_SYS_TYPES_H
-# else
+# ifndef HAVE_SYS_TYPES_H
 #  define NO_SYS_TYPES_H 
 # endif
 
-# ifdef HAVE_ATEXIT
-#  undef NO_ATEXIT
-# else
+# ifndef HAVE_ATEXIT
 #  define NO_ATEXIT
 # endif
 
-# ifdef HAVE_MEMCPY
-#  undef NO_MEMCPY
-# else
+# ifndef HAVE_MEMCPY
 #  define NO_MEMCPY
 # endif
 
-# ifdef HAVE_MEMSET
-#  undef NO_MEMSET
-# else
+# ifndef HAVE_MEMSET
 #  define NO_MEMSET
 # endif
 
-# ifdef HAVE_SETVBUF
-#  undef NO_SETVBUF
-# else
+# ifndef HAVE_SETVBUF
 #  define NO_SETVBUF
 # endif
 
-# ifdef HAVE_STRERROR
-#  undef NO_STRERROR
-# else
+# ifndef HAVE_STRERROR
 #  define NO_STRERROR
 # endif
 
-# ifdef HAVE_STRCHR
-#  undef NO_STRCHR
-# else
+# ifndef HAVE_STRCHR
 #  define NO_STRCHR
 # endif
 
-# ifdef HAVE_STRRCHR
-#  undef NO_STRRCHR
-# else
+# ifndef HAVE_STRRCHR
 #  define NO_STRRCHR
 # endif
 
-# ifdef HAVE_STRSTR
-#  undef NO_STRSTR
-# else
+# ifndef HAVE_STRSTR
 #  define NO_STRSTR
 # endif
 
