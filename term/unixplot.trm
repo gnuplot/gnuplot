@@ -1,5 +1,5 @@
 /*
- * $Id: unixplot.trm,v 1.9 1999/06/22 11:54:24 lhecking Exp $
+ * $Id: unixplot.trm,v 1.10 2001/12/19 09:14:55 mikulik Exp $
  *
  */
 
@@ -176,20 +176,20 @@ TERM_TABLE_END(unixplot_driver)
 
 
 #ifdef TERM_HELP
+#ifndef TERM_HELP_GNUGRAPH
 START_HELP(unixplot)
 "1 unixplot",
-#ifndef TERM_HELP_GNUGRAPH
-"?comands set terminal unixplot",
+"?commands set terminal unixplot",
 "?set terminal unixplot",
 "?set term unixplot",
 "?terminal unixplot",
 "?term unixplot",
 "?unixplot",
-#endif
 " The `unixplot` terminal driver generates output in the Unix \"plot\" graphics",
 " language.  It has no options.",
 "",
 " This terminal cannot be compiled if the GNU version of plot is to be used;",
 " in that case, use the `gnugraph` terminal instead."
 END_HELP(unixplot)
+#endif
 #endif
