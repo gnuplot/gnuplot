@@ -9,8 +9,12 @@ News, changes and fixes since gnuplot version 4.0
 * NEW using options {x|y|z}ticlabels(<col>)
 * NEW option to read plot title from datafile: set key autotitle columnheader
 * NEW command 'set termoption <foo>' changes single property of current terminal
+* NEW png driver supports antialiasing and TrueColor images
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
-
+* CHANGE remove old (non-libgd) GIF and PNG drivers
+* FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
+* FIXED PostScript output can be restricted to Level 1 compatible features
+* FIXED emf output is compatible with MSWin XP SP 2
 
 
 Changes between gnuplot versions 3.7.2 and 4.0
