@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.8 1999/10/17 19:11:55 lhecking Exp $ */
+/* $Id: graphics.h,v 1.9 1999/11/08 19:24:15 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -85,7 +85,7 @@ void gprintf __PROTO((char *, size_t, char *, double, double));
 typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));
 extern void gen_tics __PROTO((int, struct ticdef *, int, int, double, tic_callback));
 extern void write_multiline __PROTO((unsigned int, unsigned int, char *, enum JUSTIFY, int, int, const char *));
-extern double LogScale __PROTO((double, int, double, const char *, const char *));
+extern double LogScale __PROTO((double, TBOOLEAN, double, const char *, const char *));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 extern double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif

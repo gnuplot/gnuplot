@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.20 1999/10/29 18:47:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.21 1999/11/08 19:24:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -44,7 +44,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.20 1999/10/29 18:47:19 lhec
 /* name of command file; NULL if terminal */
 char *infile_name = NULL;
 
-static int lf_pop __PROTO((void));
+static TBOOLEAN lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE * fp));
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
 
@@ -84,7 +84,7 @@ int num;
 	    gp_alloc(num * sizeof(struct coordinate), "curve points");
     } else
 	cp->points = (struct coordinate GPHUGE *) NULL;
-    cp->next_cp = NULL;
+    cp->next = NULL;
     cp->title = NULL;
     return (cp);
 }
@@ -138,7 +138,7 @@ cp_free(cp)
 struct curve_points *cp;
 {
     if (cp) {
-	cp_free(cp->next_cp);
+	cp_free(cp->next);
 	if (cp->title)
 	    free((char *) cp->title);
 	if (cp->points)
@@ -561,7 +561,7 @@ int count, *kcnt;
 
     mlen = cnt = 0;
     this_plot = plots;
-    for (curve = 0; curve < count; this_plot = this_plot->next_cp, curve++)
+    for (curve = 0; curve < count; this_plot = this_plot->next, curve++)
 	if (this_plot->title
 	    && ((len = /*assign */ strlen(this_plot->title)) != 0)	/* HBB 980308: quiet BCC warning */
 	    ) {

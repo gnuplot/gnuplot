@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.22 1999/10/29 18:47:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.23 1999/11/08 19:24:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -134,7 +134,7 @@ static void plot_c_bars __PROTO((struct curve_points * plot));
 
 static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i,
 				    double *ex, double *ey));
-static int two_edge_intersect __PROTO((struct coordinate GPHUGE * points,
+static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points,
 				       int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
@@ -153,7 +153,7 @@ static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * poi
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 static double dbl_raise __PROTO((double x, int y));
-static void boundary __PROTO((int scaling, struct curve_points * plots,
+static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots,
 			      int count));
 static double make_tics __PROTO((int axis, int guide));
 
@@ -1821,7 +1821,7 @@ int pcount;			/* count of plots in linked list */
     }				/* lkey */
     /* DRAW CURVES */
     this_plot = plots;
-    for (curve = 0; curve < pcount; this_plot = this_plot->next_cp, curve++) {
+    for (curve = 0; curve < pcount; this_plot = this_plot->next, curve++) {
 	int localkey = lkey;	/* a local copy */
 
 	/* set scaling for this plot's axes */
