@@ -38,17 +38,7 @@
 #ifndef DOCS_DOC2X_H
 # define DOCS_DOC2X_H
 
-/* Types */
 typedef int boolean;
-
-/* Various defines and macros */
-#ifndef MAX_LINE_LEN
-# define MAX_LINE_LEN 1023
-#endif
-
-#ifndef MAX_NAME_LEN
-# define MAX_NAME_LEN 255
-#endif
 
 #ifdef TRUE
 # undef TRUE
@@ -59,6 +49,15 @@ typedef int boolean;
 # undef FALSE
 #endif
 #define FALSE 0
+
+/* Various defines and macros */
+#ifndef MAX_LINE_LEN
+# define MAX_LINE_LEN 1023
+#endif
+
+#ifndef MAX_NAME_LEN
+# define MAX_NAME_LEN 255
+#endif
 
 #ifdef HAVE_STRINGIZE
 # define START_HELP(driver) "C#" #driver ,
@@ -97,5 +96,7 @@ extern char termdoc_filename[];
 extern
 #endif
        char *get_line __PROTO((char *, int, FILE *));
+
+char *safe_strncpy __PROTO((char *, char *, size_t));
 
 #endif /* DOCS_DOC2X_H */
