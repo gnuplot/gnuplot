@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.180 2003/07/27 22:28:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.181 2003/07/28 22:57:48 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -203,16 +203,16 @@ C
  `set cbrange`, `set view map` and `set colorbox`.
 
  Sample script: pm3d.dem
- 
+
 3 New terminal types
 
-  epslatex -	prepares eps figures for inclusion in latex documents
-  ggi      -	interface to the General Graphics Interface Library
-  pdf      -	Adobe Portable Document Format, requires libpdf 
-  png/jpeg -	Support for both PNG and JPEG image output is provided by a
-            	a new driver via libgd. The new driver supports many more features
-            	than the old png driver, including TrueType fonts. Requires libgd.
-  svg      -	Scalable Vector Graphics
+  epslatex - prepares eps figures for inclusion in latex documents
+  ggi      - interface to the General Graphics Interface Library
+  pdf      - Adobe Portable Document Format, requires libpdf 
+  png/jpeg - Support for both PNG and JPEG image output is provided by a
+             a new driver via libgd. The new driver supports many more features
+             than the old png driver, including TrueType fonts. Requires libgd.
+  svg      - Scalable Vector Graphics
 
 3 New plot style `filledcurves`
 
