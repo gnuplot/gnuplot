@@ -1,3 +1,8 @@
+2001-06-28  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* term/x11.trm: More verbose error message if X11 driver
+	can't be started
+
 Mon Jun 25 17:22:21 2001  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (histeps_current_plot, histeps_compare): New
