@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.3 1998/10/03 20:17:47 lhecking Exp $
+ * $Id: setshow.h,v 1.3.2.1 1999/11/18 20:43:05 lhecking Exp $
  *
  */
 
@@ -35,11 +35,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-
-/* for show_version_long() */
-#ifdef HAVE_SYS_UTSNAME_H
-#include <sys/utsname.h>
-#endif
 
 #ifndef DEFAULT_TIMESTAMP_FORMAT
 #define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
