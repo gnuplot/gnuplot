@@ -324,7 +324,7 @@ TERM_PUBLIC void GIF_options()
       } else { /* not "size" */
 	char *string = input_line + token[c_token].start_index;
 	unsigned long color;
-	if (sscanf(string, "x%x", &color) != 1) {
+	if (sscanf(string, "x%lx", &color) != 1) {
 	  int_error("invalid color spec, must be xRRGGBB", c_token);
 	} else if (gif_state.n_colors == GIF_MAX_COLORS) {
 	  int_warn("too many colors, ingoring", c_token);

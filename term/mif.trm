@@ -127,9 +127,12 @@ static void put_mif_line __PROTO((void));
 static void MIF_set_font __PROTO((char *));
 static void mif_put_point __PROTO((unsigned int x, unsigned int y, int np));
 
-#if !defined(cfree)
-#define cfree free
+#ifndef cfree
+# define cfree free
 #endif
+
+/* Declared in ../setshow.c */
+extern char term_options[];
 
 /* From version.c */
 extern char version[];
@@ -238,8 +241,6 @@ static int proc_group_id __PROTO((int group_id));
 /* Called when this terminal type is set in order to parse options */
 TERM_PUBLIC void MIF_options()
 {
-	extern char term_options[];     /* Declared in ../setshow.c */
-
 	if (!END_OF_COMMAND) {
 		/* Colour options */
 		if (!END_OF_COMMAND && almost_equals(c_token, "m$onochrome")) {    /* Compare up to $ */
