@@ -1,3 +1,8 @@
+2003-05-10  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/x11.trm: Expand documentation of font handling.
+	* src/readline.c: Allow <tab> characters in input stream.
+
 2003-05-09  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/cgm.trm: Add missing prototype for CGM_fillbox().
@@ -68,6 +73,7 @@
 		windows
 		x11
 	Not implemented but probably should be
+		aifm
 		eepic
 		emf
 
