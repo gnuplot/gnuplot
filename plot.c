@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.18.2.3 1999/11/20 17:56:58 lhecking Exp $";
+static char *RCSid = "$Id: plot.c,v 1.18.2.4 2000/05/07 16:48:37 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -40,14 +40,6 @@ static char *RCSid = "$Id: plot.c,v 1.18.2.3 1999/11/20 17:56:58 lhecking Exp $"
 
 #include <signal.h>
 #include <setjmp.h>
-
-#ifdef HAVE_SIGSETJMP
-# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
-# define LONGJMP(env, retval) siglongjmp(env, retval)
-#else
-# define SETJMP(env, save_signals) setjmp(env)
-# define LONGJMP(env, retval) longjmp(env, retval)
-#endif
 
 #include "plot.h"
 #include "fit.h"
@@ -122,9 +114,9 @@ char HelpFile[MAXPATH];
 
 /* a longjmp buffer to get back to the command line */
 #ifdef _Windows
-static jmp_buf far command_line_env;
+static JMP_BUF far command_line_env;
 #else
-static jmp_buf command_line_env;
+static JMP_BUF command_line_env;
 #endif
 
 static void load_rcfile __PROTO((void));
@@ -439,7 +431,7 @@ char **argv;
 #endif
 
     gpoutfile = stdout;
-    (void) Gcomplex(&udv_pi.udv_value, Pi, 0.0);
+    (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
 
     init_memory();
 
@@ -746,10 +738,10 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
  */
 {
     int rc;
-    static jmp_buf keepenv;
+    static JMP_BUF keepenv;
     int cmdlen;
 
-    memcpy(keepenv, command_line_env, sizeof(jmp_buf));
+    memcpy(keepenv, command_line_env, sizeof(JMP_BUF));
     if (!SETJMP(command_line_env, 1)) {
 	/* set variable input_line.
 	 * Watch out for line length of NOT_ZERO_TERMINATED strings ! */
@@ -766,7 +758,7 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 	*pusErr = RXSUBCOM_ERROR;
 	RexxSetHalt(getpid(), 1);
     }
-    memcpy(command_line_env, keepenv, sizeof(jmp_buf));
+    memcpy(command_line_env, keepenv, sizeof(JMP_BUF));
     return 0;
 }
 #endif
