@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.20 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.21 2001/07/20 14:04:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -225,7 +225,7 @@ int *curve_start;
 	(*curve_start)++;
     };
     curve_length = 0;
-    /* curve_length is first used as an offset, then the correkt # points */
+    /* curve_length is first used as an offset, then the correct # points */
     while ((*curve_start) + curve_length < plot->p_count
 	   && plot->points[(*curve_start) + curve_length].type != UNDEFINED) {
 	curve_length++;
@@ -282,14 +282,14 @@ struct curve_points *plot;
  */
 static double *
 cp_binomial(points)
-int points;
+    int points;
 {
     register double *coeff;
     register int n, k;
     int e;
 
     e = points;			/* well we're going from k=0 to k=p_count-1 */
-    coeff = (double *) gp_alloc(e * sizeof(double), "bezier coefficients");
+    coeff = gp_alloc(e * sizeof(double), "bezier coefficients");
 
     n = points - 1;
     e = n / 2;
@@ -446,14 +446,14 @@ struct coordinate *dest;	/* where to put the interpolated data */
  */
 static int
 solve_five_diag(m, r, x, n)
-five_diag m[];
-double r[], x[];
-int n;
+    five_diag m[];
+    double r[], x[];
+    int n;
 {
     int i;
     five_diag *hv;
 
-    hv = (five_diag *) gp_alloc((n + 1) * sizeof(five_diag), "five_diag help vars");
+    hv = gp_alloc((n + 1) * sizeof(five_diag), "five_diag help vars");
 
     hv[0][0] = m[0][2];
     if (hv[0][0] == 0) {
@@ -472,7 +472,7 @@ int n;
     hv[1][1] = (m[1][3] - hv[1][3] * hv[0][2]) / hv[1][0];
     hv[1][2] = m[1][4] / hv[1][0];
 
-    for (i = 2; i <= n - 1; i++) {
+    for (i = 2; i < n; i++) {
 	hv[i][3] = m[i][1] - m[i][0] * hv[i - 2][1];
 	hv[i][0] = m[i][2] - m[i][0] * hv[i - 2][2] - hv[i][3] * hv[i - 1][1];
 	if (hv[i][0] == 0) {
@@ -485,7 +485,7 @@ int n;
 
     hv[0][4] = 0;
     hv[1][4] = r[0] / hv[0][0];
-    for (i = 1; i <= n - 1; i++) {
+    for (i = 1; i < n; i++) {
 	hv[i + 1][4] = (r[i] - m[i][0] * hv[i - 1][4] - hv[i][3] * hv[i][4]) / hv[i][0];
     }
 
@@ -520,7 +520,7 @@ cp_approx_spline(plot, first_point, num_points)
     x_axis = plot->x_axis;
     y_axis = plot->y_axis;
 
-    sc = (spline_coeff *) gp_alloc((num_points) * sizeof(spline_coeff),
+    sc = gp_alloc((num_points) * sizeof(spline_coeff),
 				   "spline matrix");
 
     if (num_points < 4)
@@ -528,29 +528,28 @@ cp_approx_spline(plot, first_point, num_points)
 
     this_points = (plot->points) + first_point;
 
-    for (i = 0; i <= num_points - 1; i++)
+    for (i = 0; i < num_points; i++)
 	if (this_points[i].z <= 0)
 	    int_error(NO_CARET, "Can't calculate approximation splines, all weights have to be > 0");
 
-    m = (five_diag *) gp_alloc((num_points - 2) * sizeof(five_diag), "spline help matrix");
+    m = gp_alloc((num_points - 2) * sizeof(five_diag), "spline help matrix");
 
-    r = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline right side");
-    x = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
-    h = (double *) gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
+    r = gp_alloc((num_points - 2) * sizeof(double), "spline right side");
+    x = gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
+    h = gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
 
-    xp = (double *) gp_alloc((num_points) * sizeof(double), "x pos");
-    yp = (double *) gp_alloc((num_points) * sizeof(double), "y pos");
+    xp = gp_alloc((num_points) * sizeof(double), "x pos");
+    yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
     /* KB 981107: With logarithmic axis first convert back to linear scale */
 
-    for (i = 0; i <= num_points - 1; i++)
-	xp[i] = AXIS_DE_LOG_VALUE(x_axis,this_points[i].x);
-
-    for (i = 0; i <= num_points - 1; i++)
-	yp[i] = AXIS_DE_LOG_VALUE(y_axis,this_points[i].y);
-
-    for (i = 0; i <= num_points - 2; i++)
-	h[i] = xp[i + 1] - xp[i];
+    xp[0] = AXIS_DE_LOG_VALUE(x_axis, this_points[0].x);
+    yp[0] = AXIS_DE_LOG_VALUE(y_axis, this_points[0].y);
+    for (i = 1; i < num_points; i++) {
+	xp[i] = AXIS_DE_LOG_VALUE(x_axis, this_points[i].x);
+	yp[i] = AXIS_DE_LOG_VALUE(y_axis, this_points[i].y);
+	h[i - 1] = xp[i] - xp[i - 1];
+    }
 
     /* set up the matrix and the vector */
 
@@ -654,26 +653,25 @@ cp_tridiag(plot, first_point, num_points)
 
     this_points = (plot->points) + first_point;
 
-    sc = (spline_coeff *) gp_alloc((num_points) * sizeof(spline_coeff), "spline matrix");
-    m = (tri_diag *) gp_alloc((num_points - 2) * sizeof(tri_diag), "spline help matrix");
+    sc = gp_alloc((num_points) * sizeof(spline_coeff), "spline matrix");
+    m = gp_alloc((num_points - 2) * sizeof(tri_diag), "spline help matrix");
 
-    r = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline right side");
-    x = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
-    h = (double *) gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
+    r = gp_alloc((num_points - 2) * sizeof(double), "spline right side");
+    x = gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
+    h = gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
 
-    xp = (double *) gp_alloc((num_points) * sizeof(double), "x pos");
-    yp = (double *) gp_alloc((num_points) * sizeof(double), "y pos");
+    xp = gp_alloc((num_points) * sizeof(double), "x pos");
+    yp = gp_alloc((num_points) * sizeof(double), "y pos");
 
     /* KB 981107: With logarithmic axis first convert back to linear scale */
 
-    for (i = 0; i <= num_points - 1; i++)
+    xp[0] = AXIS_DE_LOG_VALUE(x_axis,this_points[0].x);
+    yp[0] = AXIS_DE_LOG_VALUE(y_axis,this_points[0].y);
+    for (i = 1; i < num_points; i++) {
 	xp[i] = AXIS_DE_LOG_VALUE(x_axis,this_points[i].x);
-
-    for (i = 0; i <= num_points - 1; i++)
 	yp[i] = AXIS_DE_LOG_VALUE(y_axis,this_points[i].y);
-
-    for (i = 0; i <= num_points - 2; i++)
-	h[i] = xp[i + 1] - xp[i];
+	h[i - 1] = xp[i] - xp[i - 1];
+    }
 
     /* set up the matrix and the vector */
 
@@ -809,7 +807,7 @@ do_cubic(plot, sc, first_point, num_points, dest)
 
 void
 gen_interp(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
 
     spline_coeff *sc;
@@ -819,7 +817,8 @@ struct curve_points *plot;
     int first_point, num_points;
 
     curves = num_curves(plot);
-    new_points = (struct coordinate *) gp_alloc((samples_1 + 1) * curves * sizeof(struct coordinate), "interpolation table");
+    new_points = gp_alloc((samples_1 + 1) * curves * sizeof(struct coordinate),
+			  "interpolation table");
 
     first_point = 0;
     for (i = 0; i < curves; i++) {
@@ -917,7 +916,7 @@ sort_points(plot)
 
 void
 cp_implode(cp)
-struct curve_points *cp;
+    struct curve_points *cp;
 {
     int first_point, num_points;
     int i, j, k;
@@ -997,7 +996,7 @@ struct curve_points *cp;
 		    || ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX)))
 		    cp->points[j].type = OUTRANGE;
 		else {
-		    x = AXIS_DE_LOG_VALUE(y_axis, y);
+		    y = AXIS_DE_LOG_VALUE(y_axis, y);
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
