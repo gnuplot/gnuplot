@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.14 2002/01/23 11:17:56 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.15 2002/01/26 18:55:01 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -166,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.14 2002/01/23 11:17:56 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.15 2002/01/26 18:55:01 lhecking Exp $
 #
 ########################################################
 #
@@ -359,27 +359,25 @@ OBJS = $(COREOBJS)
 ################################################################
 
 install: all $(LASERGNU)
-	$(srcdir)/mkinstalldirs $(bindir)
-	$(srcdir)/mkinstalldirs $(datadir)
-	$(srcdir)/mkinstalldirs $(mandir)/man1
-	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
-	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
-	-$(INSTALL_DATA) $(srcdir)/docs/gnuplot.1 $(mandir)/man1/gnuplot.1
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(datadir)
+	$(INSTALL_PROGRAM) gnuplot $(DESTDIR)$(bindir)/gnuplot
+	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(DESTDIR)$(bindir)/gnuplot_x11
 	-cd docs && $(MAKE) $(MFLAGS) install
 	@LINUXSUID@
 
 lasergnu_install: lasergnu docs/lasergnu.1
-	$(srcdir)/mkinstalldirs $(bindir)
-	$(srcdir)/mkinstalldirs $(mandir)/man1
-	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
-	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/man1/lasergnu.1
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(mandir)/man1
+	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(DESTDIR)$(bindir)/lasergnu
+	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(DESTDIR)$(mandir)/man1/lasergnu.1
 
 lasergnu_noinstall:
 
 uninstall:
-	rm -f $(bindir)/gnuplot $(bindir)/gnuplot_x11
-	rm -f $(mandir)/man1/gnuplot.1 $(mandir)/man1/lasergnu.1
-	cd docs && $(MAKE) $(MFLAGS)
+	rm -f $(DESTDIR)$(bindir)/gnuplot $(DESTDIR)$(bindir)/gnuplot_x11
+	rm -f $(DESTDIR)$(mandir)/man1/gnuplot.1 $(DESTDIR)$(mandir)/man1/lasergnu.1
+	cd docs && $(MAKE) $(MFLAGS) uninstall
 
 ################################################################
 # Dependencies
@@ -394,7 +392,7 @@ gnuplot_x11: gplt_x11.o stdfn.o
 	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
 
 doc:
-	cd docs && $(MAKE) $(MFLAGS) gnuplot.gih
+	cd docs && $(MAKE) $(MFLAGS)
 
 demo/binary1 demo/binary2 demo/binary3: bf_test
 	wd=`pwd` && cd $(srcdir)/demo && $$wd/bf_test
