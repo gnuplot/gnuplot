@@ -2,6 +2,10 @@
 
 	* term/pdf.trm term/svg.trm: Support for 'set palette maxcolors <n>'.
 
+	* term/win.trm: Better document the meaning of 256 levels in
+	WIN_make_palette(). Remove the previous change on limiting the gray
+	into [0;255] as this is actually done in wgraph.c.
+
 2002-06-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pdf.trm term/svg.trm: Don't use GetColorValueFromFormula()
@@ -643,7 +647,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/10 18:53:13 $).
+	last modification date (from the tag $Date: 2002/06/10 21:11:16 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

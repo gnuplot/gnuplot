@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.26 2002/03/01 20:46:17 mikulik Exp $
+ * $Id: win.trm,v 1.27 2002/06/10 18:53:01 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -403,19 +403,20 @@ TERM_PUBLIC int
 WIN_make_palette(palette)
     t_sm_palette *palette;
 {	
-    /* Nothing much to do */
-    return(256);
+    /* Win can do continuous colors. However, we round them only to 256 levels
+     * in order to pass an integer to GraphOp; it also reasonably limits
+     * the number of colors if "copy to clipboard" is used. Don't change this
+     * number unless you change it also in WIN_set_color() and in wgraph.c.
+     */
+    return 256;
 }
 
 TERM_PUBLIC void
 WIN_set_color(gray)
     double gray;
 {
-    int color = (color <= 0) ? 0 : (int)(256 * gray);
-    if (color >= 256)
-	color = 255;
     WIN_last_linetype = -3;      /* invalidate cached linetype */
-    GraphOp(&graphwin, W_pm3d_setcolor, color, 0, NULL);
+    GraphOp(&graphwin, W_pm3d_setcolor, (int)(256*gray), 0, NULL);
 }
 
 TERM_PUBLIC void
