@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.42 2003/11/18 09:36:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.43 2003/12/14 23:23:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -180,7 +180,7 @@ make_palette(void)
 /*
    Set the colour on the terminal
    Currently, each terminal takes care of remembering the current colour,
-   so there is not much to do here---well, except for reversing the gray
+   so there is not much to do here.
    according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
  */
 void
@@ -188,8 +188,6 @@ set_color(double gray)
 {
     if (!(term->set_color))
 	return;
-    if (sm_palette.positive == SMPAL_NEGATIVE)
-	gray = 1 - gray;
     term->set_color(gray);
 }
 
@@ -374,6 +372,8 @@ FILE * out;
 
     for (i = 0; i < steps; i++) {
 	gray = (double) i / steps;	/* colours equidistantly from [0,1] */
+	if (sm_palette.positive == SMPAL_NEGATIVE)
+	    gray = 1 - gray;
 	/* Set the colour (also for terminals which support extended specs). */
 	set_color(gray);
 	xy = xy_from + (int) (xy_step * i);

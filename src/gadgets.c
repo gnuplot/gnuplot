@@ -395,9 +395,11 @@ apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
 	return;
     }
     switch (tc->type) {
-	case TC_Z:    (*t->set_color)(cb2gray(z2cb(tc->value))); break;
-	case TC_CB:   (*t->set_color)(cb2gray(tc->value));       break;
-	case TC_FRAC: (*t->set_color)(tc->value);                break;
+	case TC_Z:    set_color(cb2gray(z2cb(tc->value))); break;
+	case TC_CB:   set_color(cb2gray(tc->value));       break;
+	case TC_FRAC: set_color(sm_palette.positive == SMPAL_POSITIVE ?
+				tc->value : 1-tc->value);
+		      break;
     }
 #endif
 }

@@ -1,3 +1,16 @@
+2004-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c (set_color, draw_inside_color_smooth_box_bitmap)
+	src/pm3d.c (cb2gray): Invert gray in routine pm3d.c:cb2gray(cb), instead
+	of color.c:set_color(gray). The latter is now just setting
+	term->set_color(gray) if the terminal supports set_color() API.
+
+	* graph3d.c (do_3dplot): Fixed set_color(z2cb( cb2gray(cntrs->z)) to 
+	set_color(cb2gray( z2cb(cntrs->z) )).
+
+	* gadgets.c (apply_textcolor): Take care of positive/negative palette
+	for 'set label ... textcolor frac ...'.
+
 2004-06-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (process_event): Send a GE_reset event back to gnuplot

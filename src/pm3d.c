@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.44 2004/03/30 11:49:30 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.45 2004/05/24 15:43:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -140,19 +140,20 @@ z2cb(double z)
 
 
 /*
- * Rescale cb value into the interval [0,1].
+ * Rescale cb (color) value into the interval of grays [0,1], taking care
+ * of palette being positive or negative.
  * Note that it is OK for logarithmic cb-axis too.
  */
 double
 cb2gray(double cb)
 {
     if (cb <= CB_AXIS.min)
-	return 0;
+	return (sm_palette.positive == SMPAL_POSITIVE) ? 0 : 1;
     if (cb >= CB_AXIS.max)
-	return 1;
+	return (sm_palette.positive == SMPAL_POSITIVE) ? 1 : 0;
     cb = (cb - CB_AXIS.min)
       / (CB_AXIS.max - CB_AXIS.min);
-    return cb;
+    return (sm_palette.positive == SMPAL_POSITIVE) ? cb : 1-cb;
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.87 2004/03/31 17:05:29 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.88 2004/04/13 17:23:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1146,7 +1146,7 @@ do_3dplot(plots, pcount, quick)
 			}
 #ifdef PM3D
 			if (use_palette)
-			    set_color( z2cb( cb2gray(cntrs->z) ) );
+			    set_color( cb2gray( z2cb(cntrs->z) ) );
 			else
 #endif
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
