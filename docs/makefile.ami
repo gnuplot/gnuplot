@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.2 1993/09/27 17:13:14 alex Exp $
+# $Id: makefile.ami,v 1.2 1998/10/09 14:25:35 lhecking Exp $
 #
 # Makefile for GNUPLOT documentation (Aztec C v5.xx Version)
 #
@@ -14,8 +14,6 @@
 #    (print or view gnuplot.nroff)
 #   or
 #    make "TROFF=itroff" troff    (for troff; use your troff for itroff here)
-#
-# $Id: makefile.ami,v 1.2 1993/09/27 17:13:14 alex Exp $
 
 # usually overridden by ../Makefile
 HELPDEST = /usr/local/lib/
