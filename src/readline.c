@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.34 2004/02/18 21:40:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.35 2004/04/08 23:45:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -461,7 +461,7 @@ const char *prompt;
 	if (isprint(cur_char)) {
 #else /* CHARSET7BIT */
 	if (isprint(cur_char) 
-/*	|| ((unsigned char) cur_char == 011)	/* EAM allow <tab> (breaks auto-completion!) */
+/*	|| ((unsigned char) cur_char == 011)	EAM allowing <tab> breaks auto-completion! */
 	|| (((unsigned char) cur_char > 0x7f) && cur_char != EOF)) {
 #endif /* CHARSET7BIT */
 	    size_t i;
