@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.34 1999/11/24 13:01:15 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.35 1999/12/01 22:09:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -496,6 +496,7 @@ exit_command()
 void
 history_command()
 {
+#if defined(READLINE) && !defined(HAVE_LIBREADLINE)
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
@@ -556,6 +557,10 @@ history_command()
 	}
 	write_history_n(n, name);
     }
+#else
+    c_token++;
+    int_warn(NO_CARET, "history command requires some form of readline support");
+#endif /* READLINE && !HAVE_LIBREADLINE */
 }
 
 
