@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.7.2.1 1999/12/03 18:31:25 lhecking Exp $
+ * $Id: hpgl.trm,v 1.7.2.2 1999/12/06 18:35:58 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -275,8 +275,8 @@ static struct PCL_mode_str *PCL_mode = &PCL_mode_table[0];
  * Various line types and widths to distinguish data sets in monochrome
  */
 
-static char *HPGL2_lt[] = { "", ",2", ",2", ",2", ",2", ",2", ",2", ",2" },
-	    *HPGL2_pw[] = { ".24", ".16", ".08"};
+static char * GPFAR HPGL2_lt[] = { "", ",2", ",2", ",2", ",2", ",2", ",2", ",2" },
+            * GPFAR HPGL2_pw[] = { ".24", ".16", ".08"};
 
 #define HPGL2_LINETYPES (sizeof(HPGL2_lt) / sizeof(char *))
 #define HPGL2_PENWIDTHS (sizeof(HPGL2_pw) / sizeof(char *))

@@ -1,3 +1,57 @@
+2002-03-11 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	A whole bout of DOS/Windows specific fixes found in release 3.7.2.
+	
+	* win/winmain.c (version, patchlevel, data): Renamed to have the
+ 	"gnuplot_" prefix now used in version.c.
+	(WinMain): Changed usage to the new names.
+
+	* term/hpgl.trm (HPGL2_lt, HPGL2_pw): Flagged GPFAR.
+
+	* term/cgm.trm (struct fontdata, cgm_basic_font_data): Separate
+ 	type definition from variable definition.  Flagged variable GPFAR
+ 	to ease moving it into a separate data segment.
+	(CGM_find_font): Replace usage of strncasecmp with strnicmp, as
+ 	only the latter is guaranteed to be present by stdfn.[ch].
+
+	* scanner.c (substitute): Fixed argument list of dummy
+ 	implementation to match the real one.
+
+	* graphics.c (plot_vectors): Removed erroneous GPHUGE flag.
+	
+	* hidden3d.c (update_hl_buffer_column): Likewise.  And got rid of
+	pointless old #if 0'ed part.
+
+	* makefile.win (LINK32): New variable, to cope with different
+ 	compilers in the Borland C++ product line using different names
+ 	for their linker.
+	(wgnupl32.exe): Use new LINK32 instead of hardcoded tlink32.
+	(CFLAGS) [WIN32]: Added -DHAVE_SLEEP, but commented it out. The
+ 	free BC++5.5 needs the switch, others need it off.
+	(CFLAGS) [!WIN32]: Change switches to manoeuver gnuplot through
+ 	the various 64K barriers once again.  -O1 to optimize for size,
+ 	-Ff=8 to move more data into separate data segments, and -Dlint to
+ 	remove all the RCSId strings and thus save some space.
+
+	* makefile.tc (CFLAGS3): Added -DHAVE_STRICMP.
+
+	* makefile.dj2: Updated last-modified comments.
+	(EXENAME): Changed to gp37.
+	(TERMFLAGS): Commented out forced -fno-inline-functions flag,
+ 	which is no longer necessary --- GCC was fixed in the meantime.
+	(CFLAGS): Changed default options from -O to -O2 -g.
+	($(EXENAME).exe, .\docs\doc2gih.exe, bf_test.exe): Adapted
+ 	conversion from raw COFF to MS-DOS stubbed exe files to DJGPP v2
+	standards.
+	(demo\binary?.): Add a ./ in front of the executable's name.
+
+	* makefile.cyg (WINCFLAGS): Moved defines for PNG and GD to the
+ 	end of the list and commented them out by default.
+	(WINLDLIBS): Likewise for the -l flags for png and gd libs.
+
+	* makefile.mgw (CFLAGS): Added -DNO_SETVBUF.  This patch from Petr
+	Mikulik.
+
 2002-01-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	Tag and release gnuplot 3.7.2.

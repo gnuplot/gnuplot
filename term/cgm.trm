@@ -1,5 +1,5 @@
 /*
- * $Id: cgm.trm,v 1.16.2.3 2000/10/20 19:03:57 lhecking Exp $
+ * $Id: cgm.trm,v 1.16.2.4 2000/10/24 20:12:35 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -209,8 +209,9 @@ struct fontdata {
                                    monospaced. Also, metrics of the
                                    same font from different foundaries
                                    are sometimes different.  */
-}  
-  cgm_basic_font_data[]={
+};
+
+struct fontdata GPFAR cgm_basic_font_data[]={
 
     /* these are WebCGM recommended fonts */
     {"Helvetica",1.039},
@@ -719,16 +720,16 @@ Gnuplot version %s patchlevel %s,\
    set *relwidth to 1.0 and return 0. */
 TERM_PUBLIC int
 CGM_find_font(name, numchar, relwidth)
-char *name;
-int numchar;
-double *relwidth;
+    char *name;
+    int numchar;
+    double *relwidth;
 {
     int i;
     *relwidth = 1.;
     for (i=0; cgm_font_data[i].name; i++)
-      /* strncasecmp is not standard, but defined by stdfn.c if not available */
+      /* strnicmp is not standard, but defined by stdfn.c if not available */
       if (strlen(cgm_font_data[i].name) == numchar &&
-	  strncasecmp(name, cgm_font_data[i].name, numchar) == 0)
+          strnicmp(name, cgm_font_data[i].name, numchar) == 0)
 	{
 	  *relwidth = cgm_font_data[i].width;
 	  return i+1;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.13.2.4 2002/01/31 21:18:22 lhecking Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13.2.5 2002/02/01 18:41:05 broeker Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2266,14 +2266,10 @@ static int hl_buff_xmin, hl_buff_xmax;
 /* Store a line crossing the x interval around xv between y = ya and
  * y = yb in the hl_buffer */
 static GP_INLINE void update_hl_buffer_column(xv, ya, yb)
-int xv, ya, yb;
+    int xv, ya, yb;
 {
-#if 0 /* HBB 20000608 */
-    struct Cross GPHUGE *GPHUGE * cross, GPHUGE * cross2;
-#else
-    unsigned int GPHUGE cross, cross2;
+    unsigned int cross, cross2;
     TBOOLEAN still_in_hl_buffer = TRUE;
-#endif
 
     /* First, ensure that ya <= yb */
     if (ya > yb) {

@@ -19,7 +19,7 @@ CPU=i586
 
 CC = gcc
 LD = gcc
-WINCFLAGS = -O2 -mno-cygwin $(WIN32FLAGS) -I$(TOP) -I$(WIN32INC) -D_Windows -D__WIN32__ -DWIN32 -DHAVE_STRNICMP -DREADLINE=1 -DNO_GIH -DGP_INLINE=inline -DHAVE_SLEEP -DANSI_C -DHAVE_GETCWD -DNEAR= -DHAVE_LIBPNG -DHAVE_LIBGD -DNO_SETVBUF -DCYGWIN
+WINCFLAGS = -O2 -mno-cygwin $(WIN32FLAGS) -I$(TOP) -I$(WIN32INC) -D_Windows -D__WIN32__ -DWIN32 -DHAVE_STRNICMP -DREADLINE=1 -DNO_GIH -DGP_INLINE=inline -DHAVE_SLEEP -DANSI_C -DHAVE_GETCWD -DNEAR= -DNO_SETVBUF -DCYGWIN # -DHAVE_LIBPNG # -DHAVE_LIBGD 
 WINLDFLAGS = -s -mwindows -mno-cygwin -L/usr/local/lib  # -v # -Wl,--verbose
 CFLAGS = -g -O2 -I$(TOP) -DNO_GIH -DHAVE_STRNICMP -DREADLINE -DHAVE_SLEEP -DHAVE_GETCWD -DNEAR= -DWIN32
 LDFLAGS = -g #-v # -Wl,--verbose
@@ -70,7 +70,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 .c.o:
 	$(CC) -c $(WINCFLAGS) $*.c
 
-WINLDLIBS = -lkernel32 -lgdi32 -lpng -lz -lgd
+WINLDLIBS = -lkernel32 -lgdi32 # -lpng -lz # -lgd
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgnuplot_res.o texticon.ico grpicon.ico 
 	$(LD) $(WINLDFLAGS) -o $@ $(OBJS) $(WINOBJS) wgnuplot_res.o $(WINLDLIBS)

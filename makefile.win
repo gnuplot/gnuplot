@@ -1,6 +1,6 @@
 # make file for Borland C++ 3.1 Windows version
-# and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
-# or Borland C++ Builder 1 (newer versions may work as well)
+# and Win32 using Borland C++ 4.52, or 5.5 (the free download version)
+#           and Borland C++ Builder 1 (newer versions may work as well)
 #
 # This makefile may need some editing before it can be used. Check
 # BCC installation path, the WIN32 and RUNTIME_LIB flags, in particular.
@@ -11,6 +11,10 @@
 # New 991003: WIN32=1 build makes the helpers (doc2rtf, bf_test) as Win32
 #             console applications, instead of plain DOS programs. This
 #             way, it also works with those compilers missing a DOS option.
+# New 20020311: Now also works with the free BC++ 5.5 command line tools.
+#               Un-comment the -DHAVE_SLEEP flag at the end of CFLAGS,
+#               choose the non-multithreading RUNTIME_LIB, and make with
+#               -DWIN32=1
 
 # where to place wgnuplot.hlp helpfile
 HELPFILE = wgnuplot.hlp
@@ -42,6 +46,10 @@ RUNTIME_LIBRARY=cw32.lib
 # properly multithreading one:
 #RUNTIME_LIBRARY=cw32mt.lib
 
+# Choose which linker to use: traditional TurboLink or the newer Incremental
+# linker.
+LINK32=tlink32  # used by older compilers
+#LINK32=ilink32   # this may be the only one you have...
 !if $(WIN32)
 
 # 32bit Windows compilation.
@@ -76,10 +84,10 @@ DEFINE_HELPFILE = -DHELPFILE="$(HELPFILE)"
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD # -DHAVE_SLEEP
 CAUXFLAGS = -tWC -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DWIN32 -DWINDOWS_NO_GUI -DHAVE_STRNICMP -DANSI_C
 !else
-CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
+CFLAGS = -c -O1 -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=8 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG -Dlint
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
@@ -139,8 +147,8 @@ win\wgnuplot.def
 # any use...
 
 wgnupl32.exe: $(OBJS) $(DLLOBJS) win\wgnupl32.def wgnupl32.res winmain.obj
-#	$(BIN)tlink32 /Tpe /c @&&!
-	$(BIN)tlink32 /Tpe /c /m /s /v @&&!
+#	$(BIN)$(LINK32) /Tpe /c @&&!
+	$(BIN)$(LINK32) /Tpe /c /m /s /v @&&!
 $(TC)\lib\C0W32 +
 bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
@@ -268,22 +276,22 @@ win\wgnuplib.def
 
 wgnuplib.obj: win/wgnuplib.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgnuplib.c
-	
+
 wmenu.obj: win/wmenu.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wmenu.c
 
 wtext.obj: win/wtext.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wtext.c
-	
+
 wpause.obj: win/wpause.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wpause.c
-	
+
 wprinter.obj: win/wprinter.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wprinter.c
-	
+
 wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgraph.c
-	
+
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): win\gnuplot.rtf
 	$(HC) win\wgnuplot.hpj
@@ -336,7 +344,7 @@ clean:
 	del bf_test.map
 	del demo\bf_test.map
 	del demo\bf_test.exe
-	
+
 realclean: veryclean
 
 veryclean: clean

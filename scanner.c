@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: scanner.c,v 1.10 1998/11/04 14:49:57 lhecking Exp $";
+static char *RCSid = "$Id: scanner.c,v 1.10.2.1 1999/12/09 18:42:41 lhecking Exp $";
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -295,9 +295,9 @@ char str[];
 * is called to extend *strp array if needed.
  */
 static void substitute(strp, str_lenp, current)        
-char **strp;
-int *str_lenp;
-int current;
+    char **strp;
+    int *str_lenp;
+    int current;
 {
     register char *last;
     register int c;
@@ -399,9 +399,10 @@ int current;
 
 #else /* VMS || PIPES || ATARI && PUREC */
 
-static void substitute(str, max)
-char *str;
-int max;
+static void substitute(strp, str_lenp, current)
+    char **strp;
+    int *str_lenp;
+    int current;
 {
     char line[100];
 
