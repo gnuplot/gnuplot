@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.24 2001/12/09 19:04:06 lhecking Exp $
+# $Id: makefile.os2,v 1.25 2002/01/24 13:56:29 amai Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
@@ -47,7 +47,7 @@ SHELL=cmd.exe
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
-# DEBUG=1
+DEBUG=1
 
 # MOUSE support for PM and X11 terminals
 MOUSE=1
@@ -175,7 +175,7 @@ endif
 # PDF-support
 ifdef PDF
 TERMFLAGS += -DHAVE_LIBPDF
-# amai: don't ask me... My libpdf demand all those additional libs
+# amai: don't ask me... My libpdf requires all those additional libs
 TERMLIBS  += -lpdf -ltiff -ljpeg -lz
 endif
 # PNG-support
@@ -190,24 +190,24 @@ TERMLIBS  += -ljmgraph -lvesa
 endif
 # X11 support
 ifdef X11
-TERMFLAGS += -DX11
+TERMFLAGS += -DX11 -DX11_DRIVER_DIR=\".\"
 endif
 # MOUSE support for PM terminal
 ifdef MOUSE
 TERMFLAGS += -DUSE_MOUSE
 # currently, there is no choice in interprocess communication
-CFLAGS += -DOS2_IPC=1
+CFLAGS  += -DOS2_IPC=1
 CFLAGS2 += -DOS2_IPC=1
 endif
 # PM3D support
 ifdef PM3D
-CFLAGS += -DPM3D
+CFLAGS  += -DPM3D
 CFLAGS2 += -DPM3D
 endif
 
 # TOOLS
 CPP = cpp
-# Don't name this variable "IPFC"!!
+# Don not name this variable "IPFC"!! This won't work out...
 IPF_C = ipfc.exe
 
 # Tools for buildings the docs

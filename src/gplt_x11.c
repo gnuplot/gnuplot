@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.36 2002/01/31 17:14:26 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.37 2002/01/31 17:26:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -147,11 +147,6 @@ Error. Incompatible options.
 # include <sys/bsdtypes.h>
 #endif
 
-#ifdef __EMX__
-/* for gethostname ... */
-# include <netdb.h>
-#endif
-
 #if defined(HAVE_SYS_SELECT_H) && !defined(VMS)
 # include <sys/select.h>
 #endif
@@ -189,6 +184,14 @@ Error. Incompatible options.
 unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
 
 #endif /* USE_MOUSE */
+
+#ifdef __EMX__
+/* for gethostname ... */
+# include <netdb.h>
+/* for __XOS2RedirRoot */
+#include <X11/Xlibint.h>
+#endif
+
 
 #ifdef VMS
 # ifdef __DECC
@@ -3182,11 +3185,13 @@ gnuplot: X11 aborted.\n", ldisplay);
 #ifdef VMS
     strcpy(buffer, "DECW$USER_DEFAULTS:GNUPLOT_X11.INI");
 #elif defined OS2
-/* for Xfree86 ... */
+/* for XFree86 ... */
     {
-	char *appdefdir = "XFree86/lib/X11/app-defaults";
-	char *xroot = getenv("X11ROOT");
-	sprintf(buffer, "%s/%s/%s", xroot, appdefdir, "Gnuplot");
+	char appdefdir[MAXPATHLEN];
+	strncpy(appdefdir, 
+	        __XOS2RedirRoot("/XFree86/lib/X11/app-defaults"),
+	        sizeof(appdefdir));
+	sprintf(buffer, "%s/%s", appdefdir, "Gnuplot");
     }
 # else /* !OS/2 */
     strcpy(buffer, AppDefDir);

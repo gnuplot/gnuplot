@@ -1,3 +1,9 @@
+2002-02-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* config/makefile.os2 src/gplt_x11.c term/x11.trm:
+	Some fixes for X11 stuff on OS/2 (make it build again
+	and fix search for application defaults)
+
 2002-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/fillbox.dem: Changed style of 'pause' messages in demo, and
