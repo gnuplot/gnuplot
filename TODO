@@ -76,12 +76,15 @@ Lars' list
   [Being worked on bei Juergen]
   updated version now in archive
 - non-integer time value in 'pause' command
+  implement using select() where available, or usleep(); round off
+  on systems without
 - tilde and variable expansion to be done by 
   gp_fopen() - to be implemented
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
   in pcl5 mode and printing to an HP Laserjet 4+ (J. Breeding, bug-gnuplot)
 - integrate gpltconv into gnuplot (convert command?), configure option
 - make history size configurable (set historysize)
+- port writeback fix to 3.8
 
 HBB:
 WIN16 compile (BC++3.1):
@@ -91,3 +94,9 @@ WIN16 compile (BC++3.1):
 WIN32 compile (BC++4.52):
 -- problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
 -- test run fails: script execution stops as soon as first plot is done.
+
+Petr Mikulik (info-gnuplot-beta Thu, 02 Mar 2000)
+it would be very convenient to set the values/formulae for columns in 
+advance, before "plot" --- something like
+        set data using 3:($8/$9+1)
+

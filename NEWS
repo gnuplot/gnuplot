@@ -7,10 +7,20 @@ Changes in release 4.0:
     and "set label [no]pointstyle".
 * NEW configure.vms script for VMS
 * NEW oblique symbol font for ps driver
+* NEW introduce pipe for load command gnuplot> load "< ...".
+* FIXED typo in save xrange
+* FIXED defunct 'unset [xyz]tics' commands
 * FIXED segfault in pslatex driver
+* FIXED crash in OS/2 REXX code
 * FIXED crash in fit code
 * FIXED bug in 3d plot size after setting nokey
 * FIXED bug in postscript epsf option
+* don't put pslatex's postscript code into preamble, as this will
+  only use the settings for the last picture if several pictures
+  are present
+* the results of unset border and unset clabel are different
+  from reset
+
 [3.8b]
 * retain backwards compatibility for old syntax
 * ongoing work: modularisation
