@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.9 1999/06/17 14:25:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.10 1999/06/22 12:00:48 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -433,7 +433,7 @@ int pcount;			/* count of plots in linked list */
     struct surface_points *this_plot = NULL;
     unsigned int xl, yl;
     int linetypeOffset = 0;
-    double ztemp, temp;
+    /* double ztemp, temp; unused */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     TBOOLEAN scaling;
