@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.24 2002/02/18 10:38:07 broeker Exp $";
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.25 2002/03/09 11:33:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1307,8 +1307,10 @@ CopyPrint(LPGW lpgw)
 
 #if WINVER >= 0x030a	/* If Win 3.0, this whole function does nothing at all ... */
 	HDC printer;
+#ifndef WIN32
 	DLGPROC lpfnAbortProc;
 	DLGPROC lpfnPrintDlgProc;
+#endif
 	PRINTDLG pd;
 	HWND hwnd;
 	RECT rect;
@@ -1349,8 +1351,8 @@ CopyPrint(LPGW lpgw)
 	docInfo.lpszDocName = lpgw->Title;
 
 	if (StartDoc(printer, &docInfo) > 0) {
-# else /* WIN32 */
-#ifdef __DLL__
+#else /* not WIN32 */
+#  ifdef __DLL__
 	lpfnPrintDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintDlgProc");
 	lpfnAbortProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintAbortProc");
 #  else /* __DLL__ */
@@ -1494,11 +1496,12 @@ ReadGraphIni(LPGW lpgw)
 		_fstrcpy(lpgw->fontname, profile);
 		if (lpgw->fontsize == 0)
 			lpgw->fontsize = WINFONTSIZE;
-		if (!(*lpgw->fontname))
+		if (!(*lpgw->fontname)) {
 			if (LOWORD(GetVersion()) == 3)
 				_fstrcpy(lpgw->fontname,WIN30FONT);
 			else
 				_fstrcpy(lpgw->fontname,WINFONT);
+		}
 	}
 
 	if (bOKINI)
@@ -1804,9 +1807,11 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 static BOOL
 LineStyle(LPGW lpgw)
 {
-	DLGPROC lpfnLineStyleDlgProc ;
 	BOOL status = FALSE;
 	LS ls;
+#ifndef WIN32
+	DLGPROC lpfnLineStyleDlgProc;
+#endif
 	
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)((LPLS)&ls));
 	_fmemcpy(&ls.colorpen, &lpgw->colorpen, (WGNUMPENS + 2) * sizeof(LOGPEN));
@@ -1815,11 +1820,11 @@ LineStyle(LPGW lpgw)
 #ifdef WIN32
 	if (DialogBox (hdllInstance, "LineStyleDlgBox", lpgw->hWndGraph, LineStyleDlgProc)
 #else
-#ifdef __DLL__
+# ifdef __DLL__
 	lpfnLineStyleDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "LineStyleDlgProc");
-#else
+# else
 	lpfnLineStyleDlgProc = (DLGPROC)MakeProcInstance((FARPROC)LineStyleDlgProc, hdllInstance);
-#endif
+# endif
 	if (DialogBox (hdllInstance, "LineStyleDlgBox", lpgw->hWndGraph, lpfnLineStyleDlgProc)
 #endif
 		== IDOK) {
@@ -1828,9 +1833,9 @@ LineStyle(LPGW lpgw)
 		status = TRUE;
 	}
 #ifndef WIN32
-#ifndef __DLL__
+# ifndef __DLL__
 	FreeProcInstance((FARPROC)lpfnLineStyleDlgProc);
-#endif
+# endif
 #endif
 	SetWindowLong(lpgw->hWndGraph, 4, (LONG)(0L));
 	return status;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.8 2001/02/08 16:44:36 broeker Exp $";
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.9 2002/03/09 11:33:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -49,13 +49,13 @@ static char *RCSid = "$Id: winmain.c,v 1.8 2001/02/08 16:44:36 broeker Exp $";
 
 /* This file implements the initialization code for running gnuplot   */
 /* under Microsoft Windows. The code currently compiles only with the */
-/* Borland C++ 3.1 compiler. 
-/*                                                                    */
+/* Borland C++ 3.1 compiler.					      */
+/* 								      */
 /* The modifications to allow Gnuplot to run under Windows were made  */
 /* by Maurice Castro. (maurice@bruce.cs.monash.edu.au)  3 Jul 1992    */
 /* and Russell Lang (rjl@monu1.cc.monash.edu.au) 30 Nov 1992          */
-/*                                                                    */
- 
+/*								      */
+
 #define STRICT
 #include <windows.h>
 #include <windowsx.h>

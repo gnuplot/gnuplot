@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgnuplib.c,v 1.2 2001/02/01 17:56:05 broeker Exp $";
+static char *RCSid() { return RCSid("$Id: wgnuplib.c,v 1.3 2001/09/19 14:47:02 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgnuplib.c */

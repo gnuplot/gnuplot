@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.27 2002/01/24 10:55:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.28 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -344,7 +344,6 @@ static void clear_eoline __PROTO((void));
 static void copy_line __PROTO((char *line));
 static void set_termio __PROTO((void));
 static void reset_termio __PROTO((void));
-static int ansi_getc __PROTO((void));
 static int user_putc __PROTO((int ch));
 static int user_puts __PROTO((char *str));
 static void backspace __PROTO((void));
@@ -764,6 +763,7 @@ char *line;
     cur_pos = max_pos = strlen(cur_line);
 }
 
+#if !defined(MSDOS) && !defined(ATARI) && !defined(MTOS) && !defined(_Windows) && !defined(DOS386) && !defined(OSK)
 /* Convert ANSI arrow keys to control characters */
 static int
 ansi_getc()
@@ -799,6 +799,7 @@ ansi_getc()
     }
     return c;
 }
+#endif
 
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
 

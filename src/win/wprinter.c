@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wprinter.c,v 1.11 1998/03/22 23:32:02 drd Exp $";
+static char *RCSid() { return RCSid("$Id: wprinter.c,v 1.1 1999/03/26 22:11:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - win/wprinter.c */
@@ -145,7 +145,9 @@ BOOL
 PrintSize(HDC printer, HWND hwnd, LPRECT lprect)
 {
 HDC hdc;
-DLGPROC lpfnPrintSizeDlgProc ;
+#ifndef WIN32
+DLGPROC lpfnPrintSizeDlgProc;
+#endif
 BOOL status = FALSE;
 PRINT pr;
 
@@ -162,11 +164,11 @@ PRINT pr;
 #ifdef WIN32
 	if (DialogBox (hdllInstance, "PrintSizeDlgBox", hwnd, PrintSizeDlgProc)
 #else
-#ifdef __DLL__
+# ifdef __DLL__
 	lpfnPrintSizeDlgProc = (DLGPROC)GetProcAddress(hdllInstance, "PrintSizeDlgProc");
-#else
+# else
 	lpfnPrintSizeDlgProc = (DLGPROC)MakeProcInstance((FARPROC)PrintSizeDlgProc, hdllInstance);
-#endif
+# endif
 	if (DialogBox (hdllInstance, "PrintSizeDlgBox", hwnd, lpfnPrintSizeDlgProc)
 #endif
 		== IDOK) {
@@ -177,9 +179,9 @@ PRINT pr;
 		status = TRUE;
 	}
 #ifndef WIN32
-#ifndef __DLL__
+# ifndef __DLL__
 	FreeProcInstance((FARPROC)lpfnPrintSizeDlgProc);
-#endif
+# endif
 #endif
 	SetWindowLong(hwnd, 4, (LONG)(0L));
 

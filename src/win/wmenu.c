@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wmenu.c,v 1.8 1998/03/22 22:35:29 drd Exp $";
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.1 1999/03/26 22:11:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
