@@ -148,7 +148,6 @@ AC_C_INLINE
 AC_C_STRINGIZE
 
 AC_MSG_CHECKING(if compiler handles warn and error directives correctly)
-dnl this used to test #warning, but that is not currently used
 AC_TRY_CPP([#if 0
 #error "error"
 #warning "warning"
@@ -275,12 +274,17 @@ if test "$with_gnu_readline" != no; then
      ${gp_tcap})dnl readline
   else
     if test ! -f $with_gnu_readline ; then
-      AC_MSG_ERROR([No such file $with_gnu_readline])
+      if test ! -f ${with_gnu_readline}/libreadline.a ; then
+        AC_MSG_ERROR([No such file $with_gnu_readline])
+      else
+        AC_MSG_RESULT([using ${with_gnu_readline}/libreadline.a])
+        LIBS="$LIBS ${with_gnu_readline}/libreadline.a $gp_tcap"
+      fi
     else
       AC_MSG_RESULT([using ${with_gnu_readline}])
+      LIBS="$LIBS $with_gnu_readline $gp_tcap"
     fi
 
-    LIBS="$LIBS $with_gnu_readline $gp_tcap"
     AC_DEFINE(GNU_READLINE)
     with_readline=no
   fi
@@ -325,8 +329,8 @@ if test "$with_gd" != no; then
   gp_SEARCH_LIBDIRS(gd,gdImageCreate)
   if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
     gp_SEARCH_HEADERDIRS(gd.h,,
-     AC_MSG_WARN([found gd library but not header file])
-     AC_MSG_WARN([please add path to gd.h to INCLUDES in Makefile])
+     AC_MSG_WARN([found gd library but not gd.h])
+     AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
     )dnl gp_SEARCH_HEADERDIRS
     AC_DEFINE(HAVE_LIBGD)
   else
@@ -341,12 +345,12 @@ if test "$with_png" != no; then
   if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
     gp_SEARCH_HEADERDIRS(png.h,,
-     AC_MSG_WARN([found png library but not header file])
-     AC_MSG_WARN([please add path to png.h to INCLUDES in Makefile])
+     AC_MSG_WARN([found png library but not png.h])
+     AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
     )dnl gp_SEARCH_HEADERIRS
     gp_SEARCH_HEADERDIRS(zlib.h,,
-     AC_MSG_WARN([found z library but not header file])
-     AC_MSG_WARN([please add path to zlib.h to INCLUDES in Makefile])
+     AC_MSG_WARN([found z library but not zlib.h])
+     AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
     )dnl gp_SEARCH_HEADERDIRS
     if test "$ac_cv_header_png_h" = yes; then
       AC_EGREP_CPP([You lose], [#include "png.h"
