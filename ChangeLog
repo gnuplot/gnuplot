@@ -1,3 +1,54 @@
+1999-03-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config, src: New directories.
+
+	* buildvms.com, descrip.mms, make_vms.com, makefile.286, makefile.amg,
+	makefile.ami, makefile.cyg, makefile.dj2, makefile.djg,	makefile.emx,
+ 	makefile.g, makefile.mgw, makefile.msc, makefile.msw, makefile.mto,
+ 	makefile.nt, makefile.os2, makefile.os9, makefile.st, makefile.tc,
+	makefile.unx, makefile.vms, makefile.wc, makefile.win, makefile.ztc:
+	Moved to new config directory.
+
+	* Makefile.in, alloc.c, alloc.h, amiga.c, ansichek.h, bf_test.c,
+	binary.c, binary.h, bitmap.c, bitmap.h, command.c, commitvers,
+	contour.c, corgraph.asm, corplot.c, ctrl87.c, ctrl87.h, datafile.c,
+	errorfix.sh, eval.c, fit.c, fit.h, fnproto.h, genopt.com, gnuplot.def,
+	gnuplot.opt, gnuplot.prj, gplt_x11.c, graph3d.c, graphics.c,
+	header.mac, help.c, help.h, hidden3d.c, hrcgraph.asm, intergra.x11,
+	internal.c, interpol.c, lasergnu, lineproc.mac, linkopt.vms,
+	linkopt.ztc, makefile.all, matrix.c, matrix.h, misc.c, national.h,
+	os9.c, parse.c, pcgraph.asm, plot.c, plot.h, plot2d.c, plot3d.c,
+	protos.h, readline.c, rgipgnu, scanner.c, set.c, setshow.h, show.c,
+	specfun.c, standard.c, stdfn.c, stdfn.h, strftime.c, syscfg.h, term.c,
+	term.h, time.c, util.c, util3d.c, version.c, vms.c: Moved to new
+	src directory.
+
+	* os2/*: Moved to src/os2.
+
+	* win/*: Moved to src/win.
+
+1999-03-26  Remko Scharroo  <remko@deos.tudelft.nl>, Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Add fitting of data in time format.
+
+1999-03-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* NEWS: Fix typo.
+
+	* datafile.c(df_open): Only read from stdin if the complete filename
+	given is '-'.
+
+	* docs/latextut/Makefile.in: Use new gnuplot executable to create
+	.tex files, if available.
+
+1999-03-26  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* term/png.trm: Don't call obsolete png_write_init() function.
+
+1999-03-26  Thomas Sefzick  <t.sefzick@fz-juelich.de>
+
+	* term/tkcanvas.trm: Extended interactive Tk/Tcl capabilities.
+
 1999-03-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Add pgnuplot.c to WINDOWS variable.
