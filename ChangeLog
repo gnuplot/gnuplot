@@ -1,3 +1,52 @@
+1998-08-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Unconditional test for <sgtty.h>.
+
+	* plot.h, readline.c: Indentation, comments for readability.
+
+1998-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/hpljii.trm: Output file is opened in ASCII mode under DJGPP,
+	Windows. Fix by	Andris Pavenis <pavenis@lanet.lv>.
+
+	* hidden3d.c, makefile.dj2, makefile.tc, makefile.win, plot.h,
+	show.c, term/pc.trm, term/post.trm, win/wgnuplot.def, win/wtext.c:
+	hbbmisc.diffs.980813 patch set by HBB.
+
+	* Makefile.in: Forgot to add docs/ps to SUBDIRS. Remove duplicate
+	DOCS variable.
+
+	* Makefile.in, makefile.all: Remove $(S)ps_symbols.ps from DOCS4.
+
+1998-08-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc: Fix hierarchical structure of 'format',
+	'format_specifiers' and 'data/time_specifiers'. By HBB.
+
+	* Makefile.in, makefile.all: remove docs/ps_guide.ps from DOCS1.
+
+	* install-sh, missing, mkinstalldirs: Update from automake-1.3b.
+	
+1998-07-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/ps_guide.ps: Removed. Newer version now in docs/ps.
+
+	* fit.h: Add parentheses around macro args.
+
+	* version.c: Fix some typos.
+
+1998-07-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/amiga.trm: Fix indentation.
+
+	* docs/ps/: New subdir for PostScript docs.
+
+	* docs/ps/Makefile, docs/ps/README, docs/ps/ps_file.doc,
+	docs/ps/ps_guide.ps, docs/ps/ps_symbols.gpi: New files, from
+	Dick Crawford's gp-ps.tar.
+	
+	* Makefile.in, makefile.all: Add PostScript docs to DOCS variable.
+
 1998-07-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL, 0README, configure.in: Fix typos, small changes.
@@ -295,7 +344,7 @@
 
 	* gplt_x11.c: Use HAVE_SYS_SELECT_H instead of OLD_SELECT. Use
 	memset() instead of bzero(). In mainloop(), use ANSI_C instead
-	of __STDC__
+	of __STDC__.
 
 	* bf_test.c, binary.c, command.c, contour.c, datafile.c, fit.c,
 	gplt_x11.c, graph3d.c, graphics.c, hidden3d.c, internal.c, interpol.c,
@@ -337,7 +386,7 @@
 	* set.c (set_arrow, set_linestyle): Replace aggregate initialisation
 	for non-ANSI compilers.
 
-	* Makefile.in: General cleanup. Add full supprt for GNU auto* tools.
+	* Makefile.in: General cleanup. Add full support for GNU auto* tools.
 
 	* missing: New file required for full GNU auto* tools support. Taken
 	from automake 1.3 distribution.
