@@ -1,12 +1,60 @@
+2004-02-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (bind, mouse variables, if, using, label,
+	mouse, x11 mouse, pm3d, palette, style arrow, style line): Removed
+	help entries that would go directly under 'help'.
+	(pm3d): Remove help entries that suggest 'set pm3d' has sub-nodes:
+	it doesn't.
+	
+	* term/vgagl.trm [TERM_HELP]: Removed help entries that would go
+	directly under 'help'.
+
+	* term/x11.trm: Likewise.
+
+	* term/pc.trm (PC_move, PC_vector, PC_put_text): Change coordinate
+	arguments to unsigned int to match terminal API.
+
+	* src/term.h [DOS386]: Allow DOS386 platforms to load the
+	PC-specific driver section, too (--> Watcom).
+
+	* src/plot3d.h: Prepend 'extern' to turn erroneous definition into
+	a declaration.
+
+	* src/plot3d.c (plot_has_palette): Moved definition here, from
+	src/plot3d.h.
+
+	* src/plot.c (main): Leave at end of main using return statement,
+	not the exit() system call.  Exit() confuses compilers that expect
+	main to return an int.
+
+	* src/bf_test.c (main): Likewise.
+
+	* docs/doc2tex.c docs/doc2rnh.c docs/doc2ms.c docs/doc2ipf.c
+	docs/doc2hlp.c docs/doc2gih.c docs/checkdoc.c (main): Likewise.
+
+	* docs/doc2rnh.c (main): Replace one EXIT_SUCCESS returned on
+	error condition by EXIT_FAILURE.
+
+	* config/makefile.wc: Lots of changes to make this ancient
+	orphaned file workable with current releases of the Watcom
+	compiler.  Will need further files config/config.wc
+	src/makefile.awc and to actually work, though.  Converted to Unix
+	text file format in CVS.
+
+	* config/README: Converted to Unix text file format.
+
+	* config/config.cyg (HAVE_TIME_T_IN_TIME_H): Add this missing
+	configuration item.
+
 2004-02-22  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/gplt_x11.c: When drawing rotated text, only modify pixels
-	that actually contain part of the text. Fixes bug #668782.
-	Patch originally submitted by Mike Sutton 
-	<suttonm@users.sourceforge.net>, lightly modified by me.
-	NB: This code makes refreshing the plot window very slow
-	if rotated text is present.  It is particularly noticeable when 
-	the window is resized.
+	that actually contain part of the text. Fixes bug #668782.  Patch
+	originally submitted by Mike Sutton
+	<suttonm@users.sourceforge.net>, lightly modified by me.  NB: This
+	code makes refreshing the plot window very slow if rotated text is
+	present.  It is particularly noticeable when the window is
+	resized.
 
 2004-02-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

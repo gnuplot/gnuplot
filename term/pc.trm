@@ -1,5 +1,5 @@
 /*
- * $Id: pc.trm,v 1.15 2000/02/11 19:21:47 lhecking Exp $
+ * $Id: pc.trm,v 1.16 2002/07/26 16:42:29 mikulik Exp $
  *
  */
 
@@ -78,9 +78,9 @@ TERM_PUBLIC void PC_reset __PROTO((void));
 TERM_PUBLIC void PC_init __PROTO((void));
 TERM_PUBLIC void PC_graphics __PROTO((void));
 TERM_PUBLIC void PC_linetype __PROTO((int linetype));
-TERM_PUBLIC void PC_move __PROTO((int x, int y));
-TERM_PUBLIC void PC_vector __PROTO((int x, int y));
-TERM_PUBLIC void PC_put_text __PROTO((int x, int y, const char *str));
+TERM_PUBLIC void PC_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PC_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PC_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int PC_text_angle __PROTO((int ang));
 TERM_PUBLIC int PC_justify_text __PROTO((enum JUSTIFY ang));
 
@@ -378,7 +378,7 @@ PC_linetype(linetype)
 
 TERM_PUBLIC void
 PC_move(x, y)
-int x, y;
+    unsigned int x, y;
 {
 #ifdef __TURBOC__
     moveto(x, pc_lasty - y);
@@ -394,7 +394,7 @@ int x, y;
 
 TERM_PUBLIC void
 PC_vector(x, y)
-int x, y;
+    unsigned int x, y;
 {
 #ifdef __TURBOC__
     lineto(x, pc_lasty - y);
@@ -451,7 +451,7 @@ PC_text()
 
 TERM_PUBLIC int
 PC_text_angle(ang)
-int ang;
+    int ang;
 {
     switch (ang) {
     case 0:
@@ -467,7 +467,7 @@ int ang;
 
 TERM_PUBLIC int
 PC_justify_text(just)
-enum JUSTIFY just;
+    enum JUSTIFY just;
 {
 #if defined(__TURBOC__)
     switch (just) {
@@ -510,8 +510,8 @@ enum JUSTIFY just;
 
 TERM_PUBLIC void
 PC_put_text(x, y, str)
-int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
 #ifdef __TURBOC__
     settextstyle(DEFAULT_FONT, pc_text_dir, pc_text_size);
