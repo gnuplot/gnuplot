@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.47 2002/01/07 08:18:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.48 2002/01/07 09:03:13 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -509,7 +509,7 @@ char **argv;
 #if defined (HAVE_ATEXIT)
 	    atexit(wrapper_for_write_history);
 #elif defined (HAVE_ON_EXIT)
-	    on_exit(wrapper_for_write_history);
+	    on_exit(wrapper_for_write_history, 0);
 #endif /* !HAVE_ATEXIT */
 
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
@@ -593,7 +593,7 @@ char **argv;
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 #if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
     /* You should be here if you neither have 'atexit()' nor 'on_exit()' */
-    * wrapper_for_write_history();
+    wrapper_for_write_history();
 #endif /* !HAVE_ATEXIT && !HAVE_ON_EXIT */
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
 
