@@ -117,7 +117,7 @@ double strtod();
 # endif
 #endif /* HAVE_UNISTD_H */
 
-#if VMS
+#ifdef VMS
 # ifndef HAVE_SLEEP
 #  define HAVE_SLEEP
 # endif

@@ -69,15 +69,15 @@
 /****************************************************************************/
 
 /* Amiga */
-#if AMIGA
+#ifdef AMIGA
 # include "amiga.trm"
 #endif
 
 
 /* Atari ST and MTOS */
-#if ATARI || MTOS
+#if defined(ATARI) || defined(MTOS)
 # include "atarivdi.trm"
-# if MTOS
+# ifdef MTOS
 #  include "multitos.trm"
 # endif
 # include "atariaes.trm"
@@ -85,35 +85,35 @@
 
 
 /* Apple Macintosh */
-#if _Macintosh
+#ifdef _Macintosh
 # include "mac.trm"
 #endif
 
 
 /****************************************************************************/
 /* MS-DOS and Windows */
-#if MSDOS || _Windows
+#if defined(MSDOS) || defined(_Windows)
 
 /* MSDOS with emx-gcc compiler */
-# if MSDOS && __EMX__
+# if defined(MSDOS) && defined(__EMX__)
    /* Vesa-Cards */
 #  define EMXVESA
 #  include "emxvga.trm"
 # endif				/* MSDOS && EMX */
 
 /* MSDOS with djgpp compiler */
-# if DJGPP
+# ifdef DJGPP
 #  include "djsvga.trm"
 # endif
 
 /* MSDOS with Zortech-C++ Compiler */
-# if __ZTC__
+# ifdef __ZTC__
 #  include "fg.trm"
 # endif
 
 /* All other Compilers */
 # ifndef _Windows
-#  if PC
+#  ifdef PC
 /* uncomment the next line to include SuperVGA support */
 #   define BGI_NAME "svga256"	/* the name of the SVGA.BGI for Borland C */
 /* this also triggers the inclusion of Super VGA support */
@@ -127,13 +127,13 @@
 
 
 /* NeXT */
-#if NEXT
+#ifdef NEXT
 # include "next.trm"
 #endif
 
 
 /* OS/2 */
-#if OS2
+#ifdef OS2
 /* presentation manager */
 # include "pm.trm"
 # ifdef EMXVESA
@@ -148,10 +148,10 @@
 /***************************************************************************/
 
 /* Apollo Graphics Primitive Resource */
-#if APOLLO
+#ifdef APOLLO
 /* with resizeable windows */
 # include "apollo.trm"
-#  if GPR
+#  ifdef GPR
 /* with fixed windows */
 #   include "gpr.h"
 #  endif
@@ -164,13 +164,13 @@
 
 
 /* Linux VGA */
-#if LINUXVGA
+#ifdef LINUXVGA
 # include "linux.trm"
 #endif
 
 
 /* MGR Window system */
-#if MGR
+#ifdef MGR
 # include "mgr.trm"
 #endif
 
@@ -182,12 +182,12 @@
 
 
 /* SCO CGI drivers */
-#if SCO
+#ifdef SCO
 # include "cgi.trm"
 #endif
 
 /* SunView */
-#if SUN
+#ifdef SUN
 # include "sun.trm"
 #endif
 
@@ -204,13 +204,13 @@
 
 /****************************************************************************/
 /* Terminals not relevant for MSDOS, OS2, MS-Windows, ATARI or Amiga        */
-#if !MSDOS && !OS2 && !_Windows && !ATARI && !MTOS && !AMIGA
+#if !(defined(MSDOS) || defined(OS2) || defined(_Windows) || defined(ATARI) || defined(MTOS) || defined(AMIGA))
 
 /* AED 512 and AED 767 graphics terminals */
 # include "aed.trm"
 
-# if UNIXPLOT || GNUGRAPH
-#  if GNUGRAPH
+# if defined(UNIXPLOT) || defined(GNUGRAPH)
+#  ifdef GNUGRAPH
 #   include "gnugraph.trm"
 #  else
 #   include "unixplot.trm"
