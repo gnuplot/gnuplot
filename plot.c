@@ -124,6 +124,10 @@ const char *user_homedir = NULL;
 /* user shell */
 const char *user_shell = NULL;
 
+#if defined(ATARI) || defined(MTOS)
+const char *user_gnuplotpath = NULL;
+#endif
+
 #ifdef X11
 extern int X11_args __PROTO((int, char **));
 #endif
@@ -146,8 +150,7 @@ static jmp_buf command_line_env;
 #endif
 
 static void load_rcfile __PROTO((void));
-static void getenv_user_homedir __PROTO((void));
-static void getenv_user_shell __PROTO((void));
+static void get_user_env __PROTO((void));
 RETSIGTYPE inter __PROTO((int anint));
 
 /* built-in function table */
@@ -495,8 +498,7 @@ char **argv;
     if (!setjmp(command_line_env)) {
 	/* first time */
 	interrupt_setup();
-	getenv_user_homedir();
-	getenv_user_shell();
+	get_user_env();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 
@@ -697,7 +699,7 @@ static void load_rcfile()
 #if defined(ATARI) || defined(MTOS)
 	    if (plotrc == NULL) {
 		char const *const ext[] = { NULL };
-		char *ini_ptr = findfile(PLOTRC, getenv("GNUPLOTPATH"), ext);
+		char *ini_ptr = findfile(PLOTRC, user_gnuplotpath, ext);
 
 		if (ini_ptr)
 		    plotrc = fopen(ini_ptr, "r");
@@ -711,15 +713,16 @@ static void load_rcfile()
     free(plotrc);
 }
 
-#ifdef VMS
-# define getenv(name) name
-#endif
-static void getenv_user_homedir ()
+static void get_user_env ()
 {
     if (user_homedir == NULL) {
 	char *env_home;
 
+#ifndef VMS
 	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME"))) {
+#else
+	if (env_home = HOME) {
+#endif
 	    size_t homelen = strlen(env_home) + 1;
 
 	    assert(homelen <= PATH_MAX);
@@ -728,11 +731,8 @@ static void getenv_user_homedir ()
 	} else
 	    int_warn("no HOME found", NO_CARET);
     }
-}
 
-/* Hhm ... what about VMS? */
-static void getenv_user_shell ()
-{
+    /* Hhm ... what about VMS? */
     if (user_shell == NULL) {
 	char *env_shell;
 	size_t shell_len = 1;
@@ -747,6 +747,19 @@ static void getenv_user_shell ()
 	user_shell = (const char *) gp_alloc(shell_len, "user shell");
 	safe_strncpy((char *)user_shell, env_shell, shell_len);
     }
+
+#if defined(ATARI) || defined(MTOS)
+    if (user_gnuplotpath == NULL) {
+	char *env_gpp;
+
+	if (env_gpp = getenv("GNUPLOTPATH")) {
+	    size_t gpplen = strlen(env_gpp) + 1;
+
+	    user_gnuplotpath = (const char *) gp_alloc(gpplen, "user gnuplotpath");
+	    safe_strncpy((char *)user_gnuplotpath, env_gpp, gpplen);
+	}
+    }
+#endif
 }
 
 /* expand tilde in path
