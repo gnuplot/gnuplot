@@ -55,9 +55,9 @@ EXT void    do_fit __PROTO((void));
 
 /********* Macros *********/
 
-#define Eex(a)	    {sprintf (fitbuf+9, a);	error_ex ();}
-#define Eex2(a,b)   {sprintf (fitbuf+9, a,b);	error_ex ();}
-#define Eex3(a,b,c) {sprintf (fitbuf+9, a,b,c); error_ex ();}
+#define Eex(a)	    {sprintf (fitbuf+9, (a));         error_ex ();}
+#define Eex2(a,b)   {sprintf (fitbuf+9, (a),(b));     error_ex ();}
+#define Eex3(a,b,c) {sprintf (fitbuf+9, (a),(b),(c)); error_ex ();}
 
 EXT void error_ex __PROTO((void));
 
