@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.17 2001/02/21 18:50:16 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.18 2001/02/28 16:37:08 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -752,7 +752,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					Polyline(hdc, ppt, polyi);
 					ppt[0].x = xdash;
 					ppt[0].y = ydash;
-					polyi = 1;;
+					polyi = 1;
 				}
 				break;
                         case W_filledbox:
@@ -878,25 +878,24 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					    CreatePen(PS_SOLID, 1, c)));
                                 }
                         	break;
-			case W_pm3d_filled_polygon:
+			case W_pm3d_filled_polygon_pt:
                         	{
-#define MAX_POLYGON_CORNERS 10
-                                	char *str;
-
-                                 	str = LocalLock(curptr->htext);
-                                 	if (str[0] == 'p') {
-                                    		/* a *point* is coming */
-                                                assert(polyi<polymax);
-                                        	ppt[polyi].x = xdash;
-                                                ppt[polyi].y = ydash;
-                                                polyi++;
-                                 	} else if (str[0] == 'n') {
-                                    		/* end of point series --> draw  polygon now */
-                                        	Polygon(hdc, ppt, polyi);
-                                                polyi = 0;
-                                        }
+					/* a point of the polygon is coming.
+					   note: if a polygon with larger nb of pts is needed, then reallocated
+					   ppt for an increased number polymax
+					*/
+					assert(polyi<polymax);
+					ppt[polyi].x = xdash;
+					ppt[polyi].y = ydash;
+					polyi++;
                                 }
-
+				break;
+			case W_pm3d_filled_polygon_draw:
+                        	{
+					/* end of point series --> draw polygon now */
+					Polygon(hdc, ppt, polyi);
+					polyi = 0;
+                                }
 				break;
 #endif /* PM3D */
 			default:	/* A plot mark */

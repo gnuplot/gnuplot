@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.9 2001/02/09 15:06:11 broeker Exp $
+ * $Id: wgnuplib.h,v 1.10 2001/02/19 17:08:24 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -293,8 +293,9 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_pointsize 36
 #define W_line_width 37
 #define W_pm3d_setcolor 38
-#define W_pm3d_filled_polygon 39
-#define W_filledbox 40
+#define W_pm3d_filled_polygon_pt   39
+#define W_pm3d_filled_polygon_draw 40
+#define W_filledbox 41
 
 typedef struct tagGW {
 	LPPRINT	lpr;		/* must be first */

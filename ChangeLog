@@ -1,3 +1,8 @@
+2001-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/win.trm src/win/wgnuplib.h src/win/wgraph.c: bugfix for windows
+	terminal crash on NT if there were too many colour polygons.
+
 2001-03-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/Makefile.am.in, demo/Makefile.am.in, tutorial/Makefile.am.in:

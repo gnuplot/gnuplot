@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.21 2001/02/08 16:44:36 broeker Exp $
+ * $Id: win.trm,v 1.22 2001/02/09 15:06:11 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -421,9 +421,9 @@ WIN_filled_polygon(points, corners)
     
     /* Notice HBB 20010208: --> WIN_move() */
     for (i=0; i<points; i++)
-    	GraphOp(&graphwin, W_pm3d_filled_polygon, corners[i].x, corners[i].y, "p");
+    	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);
     /* finish series: */
-    GraphOp(&graphwin, W_pm3d_filled_polygon, points, 0, "n");
+    GraphOp(&graphwin, W_pm3d_filled_polygon_draw, points, 0, NULL);
 }
 
 #endif /* PM3D */
