@@ -1,3 +1,8 @@
+1999-09-29  "Eric S. Raymond"  <esr@thyrsus.com>
+
+	* term/png.trm: Add transparency support for color images. Update
+	for pnglib-1.0.3.
+
 1999-09-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/gif.trm: Backport from -current. New "tiny" and "giant"
