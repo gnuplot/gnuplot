@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.7 2000/11/09 01:35:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.8 2000/11/20 08:07:40 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -148,7 +148,7 @@ pm3d_rearrange_part(struct iso_curve* src, const int len, struct iso_curve*** de
 	    /* find last scan */
 	    if (scanB) 
 		for (i = len - 2; i; i--)
-		scanB = scanB->next;
+		    scanB = scanB->next;
 	    if (scanB && scanB->p_count) {
 		vertex vB;
 		map3d_xyz(scanB->points[0].x, scanB->points[0].y, scanB->points[0].z, &vB);
@@ -474,16 +474,8 @@ void pm3d_draw_all(struct surface_points* plots, int pcount)
     struct surface_points *this_plot = NULL;
 
     /* for pm3dCompress.awk */
-#ifndef GOT_PSLATEX_PROTO
-    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex")) 
+    if (postscript_gpoutfile) 
 	fprintf(gpoutfile,"%%pm3d_map_begin\n");
-#else
-    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex") ||
-	!strcmp(term->name,"pslatex")) {
-	extern FILE *PSLATEX_auxfile;
-	fprintf(PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile,"%%pm3d_map_begin\n");
-    }
-#endif
 
     for ( ; pm3d.where[i]; i++ ) {
 	this_plot = plots;
@@ -505,16 +497,8 @@ void pm3d_draw_all(struct surface_points* plots, int pcount)
 	}
 
     /* for pm3dCompress.awk */
-#ifndef GOT_PSLATEX_PROTO
-    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"tex")) 
-	fprintf(gpoutfile,"%%pm3d_map_end\n");
-#else
-    if (!strcmp(term->name,"postscript") || !strcmp(term->name,"pstex") ||
-	!strcmp(term->name,"pslatex")) {
-	extern FILE *PSLATEX_auxfile;
-	fprintf(PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile,"%%pm3d_map_end\n");
-    }
-#endif
+    if (postscript_gpoutfile) 
+	fprintf(postscript_gpoutfile,"%%pm3d_map_end\n");
 
     /* release the palette we have made use of (some terminals may need this)
        ...no, remove this, also remove it from plot.h !!!!

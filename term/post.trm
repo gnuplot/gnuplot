@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.44 2000/11/04 11:24:14 mikulik Exp $
+ * $Id: post.trm,v 1.45 2000/11/15 15:51:06 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1007,6 +1007,10 @@ PS_init()
     PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
+#ifdef PM3D
+    /* to optimize output for postscript terminals family */
+    postscript_gpoutfile = gpoutfile;
+#endif
 }
 
 

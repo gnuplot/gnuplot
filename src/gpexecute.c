@@ -42,6 +42,7 @@
 # define INCL_DOSPROCESS
 # define INCL_DOSSEMAPHORES
 # include <os2.h>
+# include <stdio.h>
 #endif
 
 #include "gpexecute.h"

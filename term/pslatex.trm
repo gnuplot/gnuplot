@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.29 2000/10/31 19:59:32 joze Exp $
+ * $Id: pslatex.trm,v 1.30 2000/11/01 20:37:48 joze Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -291,6 +291,11 @@ Turning off auxfile option\n", outstr);
 \\fi\n\
 \\GNUPLOTunit=0.1bp\n", gpoutfile);
     }
+
+#ifdef PM3D
+    /* to optimize output for postscript terminals family */
+    postscript_gpoutfile = (PSLATEX_auxfile == NULL) ? gpoutfile : PSLATEX_auxfile;
+#endif
 
     PSLATEX_angle = 0;
     PSLATEX_justify = 0;

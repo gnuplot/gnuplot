@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.27 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.28 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -119,6 +119,13 @@ char term_options[MAX_LINE_LEN+1] = "";
 /* the 'output' file name and handle */
 char *outstr = NULL;		/* means "STDOUT" */
 FILE *gpoutfile;
+
+#ifdef PM3D
+/* Output file where the PostScript output goes to. See term_api.h for more
+   details.
+*/
+FILE *postscript_gpoutfile = 0;
+#endif
 
 /* true if terminal has been initialized */
 TBOOLEAN term_initialised;
@@ -534,6 +541,10 @@ term_reset()
     if (term_initialised) {
 	(*term->reset) ();
 	term_initialised = FALSE;
+#ifdef PM3D
+	/* switch off output to special postscript file (if used) */
+	postscript_gpoutfile = 0;
+#endif
     }
 }
 

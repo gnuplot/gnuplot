@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.6 2000/11/10 12:48:52 lhecking Exp $
+ * $Id: epslatex.trm,v 1.7 2000/11/15 15:51:06 mikulik Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -652,6 +652,10 @@ Gpdict begin\n\
 \\end{picture}%%\n\
 \\setlength{\\unitlength}{%.4fbp}%%\n", name, 1.0 / EPSL_SC);
     }
+#ifdef PM3D
+    /* to optimize output for postscript terminals family */
+    postscript_gpoutfile = gpoutfile;
+#endif
 }
 
 

@@ -1,5 +1,14 @@
 2000-11-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/: color.c pm3d.c term.c term_api.h
+	  term/: epslatex.trm pslatex.trm post.trm
+	  pm3d: added 'FILE *postscript_gpoutfile' which is set to 
+	  'PSLATEX_auxfile' or 'gpoutfile' or '0' according to 'set term',
+	  i.e. to the file where the postscript code goes to (if outputted).
+	  Condition 'if (!postscript_gpoutfile)' can be used to distinguish 
+	  postscript terminals family (used in postscript optimized output
+	  in pm3d).
+
 	* src/pm3d.c: bugfix crash when plotting surface with 1 scan only
 
 	* src/mouse.c: disable changing 3D view and scale during 'set pm3d map'

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.7 2000/11/09 01:35:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.8 2000/11/15 15:51:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -410,12 +410,7 @@ void draw_color_smooth_box ()
   double tmp;
   char s[64];
   extern double base_z, ceiling_z; /* defined in graph3d.c */
-#ifdef GOT_PSLATEX_PROTO
-  extern FILE *PSLATEX_auxfile; /* defined in pslatex.trm */
-  FILE *out = PSLATEX_auxfile ? PSLATEX_auxfile : gpoutfile;
-#else
-  FILE *out = gpoutfile;
-#endif
+  FILE *out = postscript_gpoutfile; /* either gpoutfile or PSLATEX_auxfile */
 
   if (color_box.where == SMCOLOR_BOX_NO)
       return;
@@ -457,15 +452,10 @@ void draw_color_smooth_box ()
     y_from = tmp;
   }
   
-  /* optimized version of the smooth colour box in postscript. Advantage:
+  /* Optimized version of the smooth colour box in postscript. Advantage:
      only few lines of code is written into the output file.
   */
-  if (!strcmp(term->name,"postscript") ||
-      !strcmp(term->name,"pslatex") || !strcmp(term->name,"pstex")
-#ifdef GOT_PSLATEX_PROTO
-      || !strcmp(term->name, "epslatex")
-#endif
-      )
+  if (postscript_gpoutfile)
     draw_inside_color_smooth_box_postscript( out, x_from, y_from, x_to, y_to);
   /* color_box.border , color_box.border_lt_tag); */
   else
