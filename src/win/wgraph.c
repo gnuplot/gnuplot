@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.34 2003/11/13 08:18:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.35 2003/11/20 11:19:35 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -421,8 +421,19 @@ GraphStart(LPGW lpgw, double pointsize)
 		GraphInit(lpgw);
 	if (IsIconic(lpgw->hWndGraph))
 		ShowWindow(lpgw->hWndGraph, SW_SHOWNORMAL);
-	if (lpgw->graphtotop)
-		BringWindowToTop(lpgw->hWndGraph);
+	if (lpgw->graphtotop) {
+		/* HBB NEW 20040221: avoid grabbing the keyboard focus
+		 * unless mouse mode is on */
+#ifdef USE_MOUSE
+		if (mouse_setting.on) {
+			BringWindowToTop(lpgw->hWndGraph);
+			return; 
+		}
+#endif /* USE_MOUSE */		
+		SetWindowPos(lpgw->hWndGraph, 
+			     HWND_TOP, 0,0,0,0,
+			     SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE);
+	}
 }
 		
 void WDPROC
