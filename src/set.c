@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.165 2005/01/11 17:37:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.166 2005/02/01 11:28:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3777,9 +3777,9 @@ set_xyzlabel(label_struct *label)
 	    }
 #endif
 
-	/* EAM - allow to set textcolor lt <n>, but not cb frac or z */
+	/* EAM - allow set textcolor lt {<n> | rgb <foo>}, but not cb frac or z */
 	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
-	    parse_colorspec( &(label->textcolor), TC_LT );
+	    parse_colorspec( &(label->textcolor), TC_RGB );
 	    continue;
 	}
 
