@@ -1,5 +1,11 @@
 2004-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* demo/electron.dem (3rd plot): Use "set key default" to 
+	get a sensible position of the key.  Without it, it's outside
+	the page and you get terminal driver errors.
+
+2004-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	Tagged and released version 3.8k.0, which also serves
 	as release candidate #1 for release as version 4.0.
 	
