@@ -76,7 +76,7 @@ static double largest_polar_circle;
  * index with FIRST_X_AXIS etc
  * global because used in gen_tics, which graph3d also uses
  */
-char ticfmt[8][25];
+char ticfmt[8][MAX_ID_LEN+1]; /* HBB 990106: fix buffer overrun */
 int timelevel[8];
 double ticstep[8];
 
