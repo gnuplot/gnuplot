@@ -1,3 +1,7 @@
+2001-04-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Enable mouse and pm3d by default.
+
 2001-04-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/win.trm (WIN_POINT_TYPES): Raised number: now 15 different

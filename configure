@@ -60,9 +60,9 @@ ac_help="$ac_help
 ac_help="$ac_help
   --enable-rgip           enable Redwood Graphics Interface Protocol"
 ac_help="$ac_help
-  --enable-mouse          enable mouse for the x11 terminal (EXPERIMENTAL)"
+  --enable-mouse          enable mouse for the x11 terminal"
 ac_help="$ac_help
-  --enable-pm3d           enable pm3d (EXPERIMENTAL)"
+  --enable-pm3d           enable pm3d"
 ac_help="$ac_help
   --with-ggi              enable the ggi driver (EXPERIMENTAL)
   --with-ggi=PATH                 Specify the location of libggi"
@@ -1045,7 +1045,7 @@ if test "${enable_mouse+set}" = set; then
   enableval="$enable_mouse"
   :
 else
-  test -z "$enable_mouse" && enable_mouse=no
+  test -z "$enable_mouse" && enable_mouse=yes
 
 fi
 
@@ -1054,7 +1054,7 @@ if test "${enable_pm3d+set}" = set; then
   enableval="$enable_pm3d"
   :
 else
-  test -z "$enable_pm3d" && enable_pm3d=no
+  test -z "$enable_pm3d" && enable_pm3d=yes
 
 fi
 
@@ -6384,11 +6384,11 @@ if test "$no_x" != yes; then
     echo "$ac_t""  X11 driver name: $GNUPLOT_X11" 1>&6
   fi
   if test "$enable_mouse" = yes; then
-    echo "$ac_t""  Enable MOUSE for X11 (EXPERIMENTAL)" 1>&6
+    echo "$ac_t""  Enable MOUSE for X11" 1>&6
   fi
 fi
 
 if test "$enable_pm3d" = yes; then
-  echo "$ac_t""  Enable pm3d (EXPERIMENTAL)" 1>&6
+  echo "$ac_t""  Enable pm3d" 1>&6
 fi
 
