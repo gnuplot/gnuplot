@@ -1,3 +1,19 @@
+2005-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c: Contains my attempt to implement pattern filling
+	for the pm terminal. I gave this a bit of testing, but I have to admit
+	that the result looks ugly together with the widelines option. But
+	here you go anyway as 'widelines' has to be improved later anyway. It
+	should work fine without 'widelines'...
+
+	* src/os2/gnupmdrv.c: Newer versions of gcc on OS/2 no longer have
+	fcloseall(), but _fcloseall().
+
+	* src/os2/gclient.c src/os2/dialogs.c src/os2/print.c: Clean up by
+	removing some unused variables and code (some put into #if 0/#endif);
+	some minor  changes to  layout - this basically removes anoying warning
+	messages during compilation.
+
 2004-12-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/estimate.trm src/term.h: New pseudo-terminal driver whose sole
