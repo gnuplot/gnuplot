@@ -44,217 +44,15 @@
 #endif
 
 #include "ansichek.h"
+/* syscfg.h is included by stdfn.h */
 #include "stdfn.h"
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/*
- * Define operating system dependent constants [default value]:
- *
- * OS:       [" "] Name of OS plus trailing space
- * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overriden by Makefile
- * HOME:     ["HOME"] Name of environment variable which points to
- *           the directory where gnuplot's config file is found.
- * PLOTRC:   [".gnuplot"] Name of the gnuplot startup file.
- * SHELL:    ["/bin/sh"] Name, and in some cases, full path to the shell
- *           that is used to run external commands.
- * DIRSEP1:  ['/'] Primary character which separates path components.
- * DIRSEP2:  ['\0'] Secondary character which separates path components.
- *        
+/* The part for OS dependent defines
+ * has been moved to a new file.
  */
-
-#if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-# define OS "Amiga "
-# ifndef __amigaos__
-#  define HELPFILE "S:gnuplot.gih"
-#  define HOME     "GNUPLOT"
-#  define SHELL    "NewShell"
-#  define DIRSEP2  ':'
-# endif
-# ifndef AMIGA
-#  define AMIGA
-# endif
-#endif /* Amiga */
-
-#ifdef ATARI
-# define OS "TOS "
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "gulam.prg"
-# define DIRSEP1 '\\'
-# ifdef MTOS
-#  define DIRSEP2 '/'
-# endif
-#endif /* Atari */
-
-#ifdef DOS386
-# define OS "DOS 386 "
-# define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define DIRSEP1 '\\'
-#endif /* DOS386 */
-
-#ifdef linux
-# define OS "Linux "
-#endif /* Linux */
-
-#if defined(__NeXT__) && !defined(NEXT)
-# define NEXT
-#endif /* NeXT */
-
-#ifdef OS2
-# define OS "OS/2 "
-# define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "c:\\os2\\cmd.exe"
-# define DIRSEP1 '\\'
-#endif /* OS/2 */
-
-#ifdef OSK
-# define OS "OS-9 "
-# define SHELL "/dd/cmds/shell"
-#endif /* OS-9 */
-
-#if defined(vms) || defined(VMS)
-# ifndef VMS
-#  define VMS
-# endif
-# define OS "VMS "
-# define HOME "sys$login:"
-# define PLOTRC "gnuplot.ini"
-# if !defined(VAXCRTL) && !defined(DECCRTL)
-#  error Please /define either VAXCRTL or DECCRTL
-# endif
-/* avoid some IMPLICITFUNC warnings */
-# ifdef __DECC
-#  include <starlet.h>
-# endif  /* __DECC */
-#endif /* VMS */
-
-#if defined(_WINDOWS) || defined(_Windows)
-# ifndef _Windows
-#  define _Windows
-# endif
-# ifdef WIN32
-#  define OS "MS-Windows 32 bit "
-# else
-#  ifndef WIN16
-#   define WIN16
-#  endif
-#  define OS "MS-Windows "
-# endif /* WIN32 */
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define DIRSEP1 '\\'
-#endif /* _WINDOWS */
-
-#if defined(MSDOS) && !defined(_Windows)
-# if !defined(DOS32) && !defined(DOS16)
-#  define DOS16
-# endif
-# ifdef MTOS
-#  define OS "TOS & MiNT & MULTITOS & Magic - "
-# endif /* MTOS */
-# define HELPFILE "gnuplot.gih"
-# define HOME "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define OS "MS-DOS "
-# define DIRSEP1 '\\'
-# ifdef __DJGPP__
-#  define DIRSEP2 '/'
-# endif
-#endif /* MSDOS */
-
-/* Note: may not catch all IBM AIX compilers or SCO compilers */
-#if __unix__ || unix || _AIX || SCO
-# ifndef unix
-#  define unix
-# endif
-# ifndef OS
-#  define OS "Unix "
-# endif
-#endif /* Unix */
-
-/* End OS dependent constants; fall-through defaults
- * for the constants defined above are following.
- */
-
-#ifndef OS
-# define OS " "
-#endif
-
-#ifndef HELPFILE
-# define HELPFILE "docs/gnuplot.gih"
-#endif /* !HELPFILE */
-
-#ifndef HOME
-# define HOME "HOME"
-#endif
-
-#ifndef PLOTRC
-# define PLOTRC ".gnuplot"
-#endif
-
-#ifndef SHELL
-# define SHELL "/bin/sh"    /* used if SHELL env variable not set */
-#endif
-
-#ifndef DIRSEP1
-# define DIRSEP1 '/'
-#endif
-
-#ifndef DIRSEP2
-# define DIRSEP2 NUL
-#endif
-
-#ifndef FAQ_LOCATION
-# define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/"
-#endif
-
-#ifndef CONTACT
-# define CONTACT "bug-gnuplot@dartmouth.edu"
-#endif
-
-#ifndef HELPMAIL
-# define HELPMAIL "info-gnuplot@dartmouth.edu"
-#endif
-/* End fall-through defaults */
-
-/* DOS/Windows stuff. Moved here from command.c */
-#if defined(MSDOS) || defined(DOS386)
-# ifdef DJGPP
-#  include <dos.h>
-#  include <dir.h>              /* HBB: for setdisk() */
-# else
-#  include <process.h>
-# endif                         /* DJGPP */
-
-# ifdef __ZTC__
-#  define HAVE_SLEEP 1
-#  define P_WAIT 0
-# else
-
-#  ifdef __TURBOC__
-#   ifndef _Windows
-#    define HAVE_SLEEP 1
-#    include <conio.h>
-#    include <dir.h>            /* setdisk() */
-#   endif                       /* _Windows */
-
-#  else                         /* must be MSC */
-#   if !defined(__EMX__) && !defined(DJGPP)
-#    ifdef __MSC__
-#     include <direct.h>        /* for _chdrive() */
-#    endif                      /* __MSC__ */
-
-#   endif                       /* !__EMX__ && !DJGPP */
-#  endif                        /* TURBOC */
-# endif                         /* ZTC */
-#endif /* MSDOS */
-/**/
 
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
@@ -273,14 +71,17 @@
 # define FALSE 0
 #endif
 
-#define DTRUE 3 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
+/* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
+#define DTRUE 3
 
 #define Pi 3.141592653589793
 #define DEG2RAD (Pi / 180.0)
 
 
-#define MIN_CRV_POINTS 100		/* minimum size of points[] in curve_points */
-#define MIN_SRF_POINTS 1000		/* minimum size of points[] in surface_points */
+/* minimum size of points[] in curve_points */
+#define MIN_CRV_POINTS 100
+/* minimum size of points[] in surface_points */
+#define MIN_SRF_POINTS 1000
 
 
 /* note that MAX_LINE_LEN, MAX_TOKENS and MAX_AT_LEN do no longer limit the
@@ -297,9 +98,9 @@
 #define NO_CARET (-1)
 
 #ifdef DOS16
-# define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
+# define MAX_NUM_VAR	3	/* Plotting projection of func. of max. five vars. */
 #else /* not DOS16 */
-# define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
+# define MAX_NUM_VAR	5	/* Plotting projection of func. of max. five vars. */
 #endif /* not DOS16 */
 
 #define MAP3D_CARTESIAN		0	/* 3D Data mapping. */
@@ -407,11 +208,6 @@ typedef float coordval;		/* memory is tight on PCs! */
 # define COORDVAL_FLOAT 1
 #else
 typedef double coordval;
-#endif
-
-/* introduced by Pedro Mendes, prm@aber.ac.uk */
-#ifdef WIN32
-#define far 
 #endif
 
 /*

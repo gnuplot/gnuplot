@@ -48,18 +48,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#ifdef __PUREC__
-# define sscanf purec_sscanf
-#endif
-
-#if defined(apollo) || defined(alliant)
-#define NO_LIMITS_H
-#endif
-
-#ifdef sequent
-#define NO_LIMITS_H
-#define NO_STRCHR
-#endif
+#include "syscfg.h"
 
 #ifndef NO_STRING_H
 #include <string.h>
@@ -187,16 +176,6 @@ extern int errno;
 # undef S_ISSOCK
 #endif /* STAT_MACROS_BROKEN.  */
 
-#ifdef WIN32
-/* Broken compiler headers ... */
-# define S_IFIFO  _S_IFIFO
-#endif
-
-#ifdef AMIGA_SC_6_1
-/* Fake S_IFIFO for SAS/C */
-# define S_IFIFO S_IREAD
-#endif
-
 #if !defined(S_ISBLK) && defined(S_IFBLK)
 # define S_ISBLK(m) (((m) & S_IFMT) == S_IFBLK)
 #endif
@@ -290,25 +269,12 @@ int strnicmp __PROTO((char *, char *, int));
 # define gp_timeval_p (struct timeval *)
 #endif /* 5 */
 
-#ifdef __WATCOMC__
-# include <direct.h>
-# define HAVE_GETCWD 1
-#endif
-
 #ifndef GP_GETCWD
-# ifdef OS2
-#  define GP_GETCWD(path,len) _getcwd2 (path, len)
+# if defined(HAVE_GETCWD)
+#  define GP_GETCWD(path,len) getcwd (path, len)
 # else
-#  if defined(HAVE_GETCWD)
-#   define GP_GETCWD(path,len) getcwd (path, len)
-#  else
-#   define GP_GETCWD(path,len) getwd (path)
-#  endif
+#  define GP_GETCWD(path,len) getwd (path)
 # endif
-#endif
-
-#ifdef __TURBOC__ /* HBB 980324: for sleep() prototype */
-# include <dos.h>
 #endif
 
 #ifndef GP_SLEEP
@@ -320,6 +286,7 @@ int strnicmp __PROTO((char *, char *, int));
 #endif
 
 /* Misc. defines */
+
 /* Null character */
 #define NUL ('\0')
 
