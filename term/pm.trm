@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.20 2000/02/11 19:21:11 lhecking Exp $
+ * $Id: pm.trm,v 1.21 2000/03/28 21:28:46 lhecking Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -119,6 +119,7 @@ TERM_PUBLIC void PM_set_clipboard __PROTO((const char[]));
 #define SET_POINTMODE   'D'
 #define SET_FONT        'F'
 #define SET_OPTIONS     'O'
+#define SET_SPECIAL     'o'  /* used for special options */
 #define SET_MENU	'#'
 #define GR_QUERY        'Q'
 #define GR_SUSPEND      'E'	/*'s' */
@@ -480,6 +481,11 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
     int len;
     if (PM_must_abort)
 	PM_abortplot();
+    if (ignore_enhanced_text) {
+	putc(SET_SPECIAL, PM_pipe);
+	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc('0', PM_pipe);
+    }
     putc(GR_TEXT, PM_pipe);
     fwrite(&x, sizeof(int), 1, PM_pipe);
     fwrite(&y, sizeof(int), 1, PM_pipe);
@@ -490,14 +496,29 @@ PM_put_text(unsigned int x, unsigned int y, const char *str)
 	/* pad rest of int with zeros */
 	putc(NUL, PM_pipe);
     }
+    if (ignore_enhanced_text) {
+	putc(SET_SPECIAL, PM_pipe);
+	putc('e', PM_pipe); /* restore the enhanced mode */
+	putc('2', PM_pipe);
+    }
 }
 
 TERM_PUBLIC int
 PM_justify_text(enum JUSTIFY mode)
 {
+    if (ignore_enhanced_text) {
+	putc(SET_SPECIAL, PM_pipe);
+	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc('0', PM_pipe);
+    }
     putc(SET_JUSTIFY, PM_pipe);
     fwrite(&mode, sizeof(int), 1, PM_pipe);
     return (TRUE);
+    if (ignore_enhanced_text) {
+	putc(SET_SPECIAL, PM_pipe);
+	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc('2', PM_pipe);
+    }
 }
 
 TERM_PUBLIC int

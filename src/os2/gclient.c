@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.7 2000/02/11 19:12:49 lhecking Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.8 2000/03/28 21:28:36 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -2433,6 +2433,29 @@ lOldLine=lt ;
 			    }
 			free( str ) ;
 			}
+		    }
+		    break ;
+
+                case 'o' :   /* set special options */
+                    {
+                    char opt, param;
+                    static int prev_bEnhanced = 0;
+                    BufRead(hRead,&opt, 1, &cbR) ;
+		    switch (opt) {
+		        case 'e': BufRead(hRead,&param, 1, &cbR) ;
+				  /* enhanced mode on, off and restore */
+				  switch (param) {
+				    case '0': prev_bEnhanced = bEnhanced;
+					      bEnhanced = 0;
+					      break;
+				    case '1': prev_bEnhanced = bEnhanced;
+					      bEnhanced = 1;
+					      break;
+				    case '2': bEnhanced = prev_bEnhanced;
+					      break;
+				  }
+				  break;
+		    }
 		    }
 		    break ;
 

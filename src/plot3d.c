@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.18 2000/05/02 18:21:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.20 2000/05/02 20:56:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1145,6 +1145,7 @@ eval_3dplots()
 		this_plot->title = NULL;
 	    }
 	    if (almost_equals(c_token, "t$itle")) {
+		this_plot->title_no_enhanced = 0; /* can be enhanced */
 		if (parametric) {
 		    if (crnt_param != 0)
 			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
@@ -1169,6 +1170,7 @@ eval_3dplots()
 		/*   this_plot->title = NULL;   */
 		++c_token;
 	    } else {
+		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
 		m_capture(&(this_plot->title), start_token, end_token);
 		if (crnt_param == 2)
 		    xtitle = this_plot->title;

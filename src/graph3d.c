@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.24 2000/05/02 18:38:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.26 2000/05/02 20:56:26 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -769,7 +769,9 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
 	    if (lkey) {
+		ignore_enhanced_text = this_plot->title_no_enhanced == 1;
 		key_text(xl, yl, this_plot->title);
+		ignore_enhanced_text = 0;
 	    }
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
@@ -866,7 +868,9 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 	    if (key != 0 && this_plot->title && this_plot->title[0]
 		&& !draw_surface && !label_contours) {
 		/* unlabelled contours but no surface : put key entry in now */
+		ignore_enhanced_text = this_plot->title_no_enhanced == 1;
 		key_text(xl, yl, this_plot->title);
+		ignore_enhanced_text = 0;
 
 		switch (this_plot->plot_style) {
 		case IMPULSES:

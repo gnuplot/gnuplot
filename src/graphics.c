@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.29 2000/05/02 18:41:08 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.31 2000/05/02 20:56:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1856,6 +1856,8 @@ int pcount;			/* count of plots in linked list */
 	if (this_plot->title && !*this_plot->title) {
 	    localkey = 0;
 	} else {
+	    ignore_enhanced_text = this_plot->title_no_enhanced == 1;
+		/* don't write filename or function enhanced */
 	    if (localkey != 0 && this_plot->title) {
 		key_count++;
 		if (key_just == JLEFT) {
@@ -1891,6 +1893,7 @@ int pcount;			/* count of plots in linked list */
 		    (*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
 		}
 	    }
+	ignore_enhanced_text = 0;
 	}
 
 	/* and now the curves, plus any special key requirements */
