@@ -14,6 +14,9 @@
 
 2004-01-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/x11.trm (X11_args) [!USE_MOUSE]: Don't try to parse
+	"-nofeedback" option if mousing disabled.
+
 	* src/command.c (test_palette_subcommand, test_time_subcommand):
 	Made static; added missing local prototype.
 	(test_palette_subcommand): Changed static const int "colors" to an

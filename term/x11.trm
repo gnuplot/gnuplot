@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.91 2003/12/21 20:20:13 mikulik Exp $
+ * $Id: x11.trm,v 1.92 2004/01/07 14:45:22 lhecking Exp $
  *
  */
 
@@ -300,8 +300,10 @@ X11_args(int argc, char *argv[])
 	for (n = 0; n < X11_nopts; n++) {
 	    if (strcmp(*argv, X11_cmdopts[n].option) == 0) {
 		optvec[i++] = *xargv;
+#ifdef USE_MOUSE
 		if (strcmp(*argv, "-nofeedback") == 0)
 		    X11_MOUSE_FEEDBACK = FALSE;
+#endif
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
 		if (X11_cmdopts[n].arg == hasArg) {
