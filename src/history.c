@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: history.c,v 1.10 2003/11/13 18:05:14 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.11 2003/11/24 16:22:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -114,6 +114,7 @@ char *line;
  * Input parameters:
  *    n > 0 ... write only <n> last entries; otherwise all entries
  *    filename == NULL ... write to stdout; otherwise to the filename
+ *    filename == "" ... write to stdout, but without entry numbers
  *    mode ... should be "w" or "a" to select write or append for file,
  *	       ignored if history is written to a pipe
 */
@@ -144,7 +145,7 @@ const char *mode;
 	hist_index = hist_entries - n + 1;
     }
     /* now write the history */
-    if (filename != NULL) {
+    if (filename != NULL && filename[0]) {
 #ifdef PIPES
 	if (filename[0]=='|') {
 	    out = popen(filename+1, "w");
@@ -158,13 +159,14 @@ const char *mode;
     while (entry != NULL) {
 	/* don't add line numbers when writing to file
 	 * to make file loadable */
-	if (filename)
+	if (filename) {
+	    if (filename[0]==0) fputs(" ", out);
 	    fprintf(out, "%s\n", entry->line);
-	else
+	} else
 	    fprintf(out, "%5i  %s\n", hist_index++, entry->line);
 	entry = entry->next;
     }
-    if (filename != NULL) {
+    if (filename != NULL && filename[0]) {
 #ifdef PIPES
 	if (is_pipe)
 	    pclose(out);

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.191 2003/11/24 16:22:30 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.192 2003/11/30 11:20:35 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2207,9 +2207,11 @@ C ... and restart the table:
 
        history               # show the complete history
        history 5             # show last 5 entries in the history
+       history quiet 5       # show last 5 entries without entry numbers
        history "hist.gp"     # write the complete history to file hist.gp
        history "hist.gp" append # append the complete history to file hist.gp
        history 10 "hist.gp"  # write last 10 commands to file hist.gp
+       history 10 "|head -5 >>diary.gp" # write 5 history commands using pipe
        history ?load         # show all history entries starting with "load"
        history ?"set c"      # like above, several words enclosed in quotes
        hi !reread            # execute last entry starting with "reread"
@@ -2217,7 +2219,8 @@ C ... and restart the table:
        hi !hi                # guess yourself :-))
 
  On systems which support a popen function (Unix), the output of history can be
- piped through an external program by starting the file name with a '|'.
+ piped through an external program by starting the file name with a '|', as one
+ of the above examples demonstrates.
 2 if
 ?commands if
 ?if

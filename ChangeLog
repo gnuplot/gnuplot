@@ -1,3 +1,8 @@
+2003-12-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c src/history.c docs/gnuplot.doc: New option "history
+	quiet" to suppress enumeration of history entries (helps cut&paste).
+
 2003-11-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm src/term_api.h src/term.c:

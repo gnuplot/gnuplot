@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.86 2003/11/28 15:21:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.87 2003/11/30 11:19:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -738,6 +738,12 @@ history_command()
 	}
 	c_token++;
     } else {
+	char zerofile[] = "";
+	if (!END_OF_COMMAND && almost_equals(c_token,"q$uiet")) {
+	    /* option quiet to suppress history entry numbers */
+	    name = &zerofile[0];
+	    c_token++;
+	}
 	/* show history entries */
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = (int)real(const_express(&a));
