@@ -1,3 +1,12 @@
+1999-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, configure.in, m4/next.m4: Remove references to NEXTOBJS.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* win/wgnuplib.h, win/wgnuplot.def, win/winmain.c, win/wtext.c:
+	Update from gnuplot-current.
+
 1999-09-16  "Daniel H. Luecking"  <luecking@comp.uark.edu>
 
 	* term/metapost.trm: Minor updates.
