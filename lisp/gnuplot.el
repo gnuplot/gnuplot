@@ -1,12 +1,12 @@
 ;;;; gnuplot.el -- drive gnuplot from within emacs
 
-;; Copyright (C) 1998 Phil Type and Bruce Ravel
+;; Copyright (C) 1998 Phil Type and Bruce Ravel, 1999-2001 Bruce Ravel
 
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    January 10 2000
-;; Version:    0.5k
+;; Updated:    May 30, 2001
+;; Version:    0.5q
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -110,7 +110,7 @@
 ;;                         ============
 ;;
 ;; A recent version of this file can be found at
-;;   http://feff.phys.washington.edu/~ravel/gnuplot/
+;;   http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
 ;;
 ;; To autoload gnuplot-mode on any file with gp extension, put this in
 ;; your .emacs file
@@ -250,20 +250,38 @@
 ;;  0.5k  Sep 22 1999 <BR> make `gnuplot-send-line-and-forward' skip
 ;;        over blank and comment lines as suggested by <SE>.  Jan 10
 ;;        2000 Bound C-c C-j to `gnuplot-forward-script-line'.
+;;  0.5l  Nov 16 2000 <BR> support for pm3d in gnuplot-gui and in plot
+;;        options insertions menu.  mentioned pm3d in gpelcard. gui
+;;        support for x11 pm3d and vgagl terms.
+;;        `gnuplot-negate-option' works with new syntax.
+;;  0.5m  Nov 17 2000 <BR> add colorization and gui support for new
+;;        commands in 3.8.  gui support for emf term. gui support for
+;;        new "set style" syntax.  much better scheme for determining
+;;        gnuplot version number + make better use of it.
+;;  0.5n  Jan 4 2001 <BR> corrected a serious problem interacting with
+;;        speedbar
+;;  0.5o  skipped
+;;  0.5p  Mar 14 2001 <BR> fixed problem with toolbar creation and
+;;        speedbar clicking
+;;  0.5q  May 30 2001 <BR> added font-lock bindings for words associated
+;;        with plotting
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
-;;    David Batty      <DB> (numerous corrections)
-;;    Laurent Bonnaud  <LB> (suggestions regarding font-lock rules)
-;;    Markus Dickebohm <MD> (suggested `gnuplot-send-line-and-forward')
-;;    Stephen Eglan    <SE> (suggested the use of info-look,
-;;                           contributed a bug fix regarding shutting
-;;                           down the gnuplot process, improvement to
-;;                           `gnuplot-send-line-and-forward')
-;;    Kuang-Yu Liu     <KL> (pointed out buggy dependence on font-lock)
-;;    Hrvoje Niksic    <HN> (help with defcustom arguments for insertions)
-;;    Michael Sanders  <MS> (help with the info-look interface)
-;;    Jinwei Shen      <JS> (suggested functionality in comint buffer)
-;;    Holger Wenzel    <HW> (suggested using `gnuplot-keywords-when')
+;;    David Batty       <DB> (numerous corrections)
+;;    Laurent Bonnaud   <LB> (suggestions regarding font-lock rules)
+;;    Markus Dickebohm  <MD> (suggested `gnuplot-send-line-and-forward')
+;;    Stephen Eglan     <SE> (suggested the use of info-look,
+;;                            contributed a bug fix regarding shutting
+;;                            down the gnuplot process, improvement to
+;;                            `gnuplot-send-line-and-forward')
+;;    Alex Chan Libchen <AL> (suggested font-lock for plotting words)
+;;    Kuang-Yu Liu      <KL> (pointed out buggy dependence on font-lock)
+;;    Hrvoje Niksic     <HN> (help with defcustom arguments for insertions)
+;;    Michael Sanders   <MS> (help with the info-look interface)
+;;    Jinwei Shen       <JS> (suggested functionality in comint buffer)
+;;    Michael M. Tung   <MT> (prompted me to add pm3d support)
+;;    Holger Wenzel     <HW> (suggested using `gnuplot-keywords-when')
+;;    Wolfgang Zocher   <WZ> (pointed out problem with gnuplot-mode + speedbar)
 ;;  and especially to Lars Hecking <LH> for including gnuplot-mode
 ;;  with the gnuplot 3.7-beta distribution and for providing me with
 ;;  installation materials
@@ -276,6 +294,9 @@
 ;;    executed properly.  Alas I am not sure how gnuplot signals its
 ;;    errors.
 ;; 2. improve plot, splot, fit in GUI
+;; 3. interface to setting bind command using `read-key-sequence'.
+;;    this is a pain because the nomenclature is really different in
+;;    gnuplot than in `read-key-sequence'
 ;;
 ;;; Bugs:
 ;;
@@ -333,12 +354,13 @@
 
 
 (defconst gnuplot-xemacs-p (string-match "XEmacs" (emacs-version)))
+(defvar   gnuplot-three-eight-p "")
 
 (defconst gnuplot-maintainer "Bruce Ravel")
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
-  "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5k")
+  "http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/")
+(defconst gnuplot-version "0.5q")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -348,7 +370,7 @@
   :group 'local
   :link '(emacs-library-link :tag "Lisp File" "gnuplot.el")
   :link '(url-link :tag "Homepage"
-		   "http://feff.phys.washington.edu/~ravel/gnuplot/")
+		   "http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/")
   :link '(custom-manual "(gnuplot)Top")
   :link '(emacs-commentary-link :tag "Commentary" "gnuplot.el") )
 (defgroup gnuplot-insertions nil
@@ -434,7 +456,8 @@ useful for functions included in `gnuplot-after-plot-hook'.")
   :group 'gnuplot
   :type 'string)
 (defvar gnuplot-program-version nil
-  "This is gnuplot-mode's stab at determining gnuplot's version number.")
+  "Version number of gnuplot.
+This is found using `gnuplot-determine-gnuplot-version")
 (defcustom gnuplot-process-name "gnuplot"
   "Name given to the gnuplot buffer and process."
   :group 'gnuplot
@@ -511,6 +534,12 @@ to the empty string."
   :type '(radio (const :tag "double quote"  "\"")
 		(const :tag "single quote"  "\'")
 		(const :tag "none"          ""  )))
+;; (defcustom gnuplot-gnuplot-version nil
+;;   "*Force gnuplot-mode to behave for this version of gnuplot."
+;;   :group 'gnuplot
+;;   :type '(radio (const :tag "unspecified"   nil)
+;; 		(const :tag "3.8 or newer" "3.8")
+;; 		(const :tag "3.7 or older" "3.7")))
 
 (defvar gnuplot-info-frame nil)
 (defvar gnuplot-info-nodes '())
@@ -571,6 +600,7 @@ you're not using that musty old thing, are you..."
   (define-key gnuplot-mode-map "\C-c\C-k" 'gnuplot-kill-gnuplot-buffer)
   (define-key gnuplot-mode-map "\C-c\C-l" 'gnuplot-send-line-to-gnuplot)
   (define-key gnuplot-mode-map "\C-c\C-n" 'gnuplot-negate-option)
+  (define-key gnuplot-mode-map "\C-c\C-p" 'gnuplot-show-gnuplot-version)
   (define-key gnuplot-mode-map "\C-c\C-r" 'gnuplot-send-region-to-gnuplot)
   ;;(define-key gnuplot-mode-map "\C-c\C-t" 'gnuplot-gui-swap-simple-complete)
   (define-key gnuplot-mode-map "\C-c\C-u" 'gnuplot-bug-report)
@@ -595,27 +625,30 @@ you're not using that musty old thing, are you..."
   "Menu for `gnuplot-mode'.")
 (setq gnuplot-menu
       '("Gnuplot"
-	["Send line to gnuplot"     gnuplot-send-line-to-gnuplot   t]
-	["Send line & move forward" gnuplot-send-line-and-forward (not (eobp))]
-	["Send region to gnuplot"   gnuplot-send-region-to-gnuplot
+	["Send line to gnuplot"             gnuplot-send-line-to-gnuplot   t]
+	["Send line & move forward"         gnuplot-send-line-and-forward (not (eobp))]
+	["Send region to gnuplot"           gnuplot-send-region-to-gnuplot
 	 (gnuplot-mark-active)]
-	["Send buffer to gnuplot"   gnuplot-send-buffer-to-gnuplot t]
-	["Send file to gnuplot"     gnuplot-send-file-to-gnuplot t]
+	["Send buffer to gnuplot"           gnuplot-send-buffer-to-gnuplot t]
+	["Send file to gnuplot"             gnuplot-send-file-to-gnuplot t]
 	"---"
-	["Insert filename at point" gnuplot-insert-filename t]
-	["Negate set option"        gnuplot-negate-option t]
-	["Keyword help"             gnuplot-info-lookup-symbol
+	["Insert filename at point"         gnuplot-insert-filename t]
+	["Negate set option"                gnuplot-negate-option t]
+	;;["Set key binding"             gnuplot-set-binding gnuplot-three-eight-p]
+	["Keyword help"                     gnuplot-info-lookup-symbol
 	 (or gnuplot-keywords gnuplot-keywords-pending)]
-	["Set arguments at point"   gnuplot-gui-set-options-and-insert
-	 (fboundp 'gnuplot-gui-set-options-and-insert)]
 	["Show gnuplot process buffer"      gnuplot-show-gnuplot-buffer t]
+	["Set arguments at point"           gnuplot-gui-set-options-and-insert
+	 (fboundp 'gnuplot-gui-set-options-and-insert)]
 	["Swap plot/splot/fit lists in GUI" gnuplot-gui-swap-simple-complete
 	 (fboundp 'gnuplot-gui-swap-simple-complete)]
 	"---"
-	["Customize gnuplot"         gnuplot-customize t]
-	["Kill gnuplot"              gnuplot-kill-gnuplot-buffer t]
-	["Show gnuplot-mode version" gnuplot-show-version t]
-	;;["Submit bug report"        gnuplot-bug-report t]
+	["Customize gnuplot"                gnuplot-customize t]
+	["Submit bug report"                gnuplot-bug-report t]
+	["Show gnuplot-mode version"        gnuplot-show-version t]
+	["Show gnuplot version"             gnuplot-show-gnuplot-version t]
+	"---"
+	["Kill gnuplot"                     gnuplot-kill-gnuplot-buffer t]
 	))
 
 
@@ -640,7 +673,8 @@ describing the sub-menus are:
   `gnuplot-insertions-polar-plots'
   `gnuplot-insertions-surface-plots'
 These variables can be customized by the user.  For example, there are
-many terminal types which are not in the terminal submenu.
+many terminal types which are not in the terminal submenu but which
+may be compiled into a user's copy of gnuplot.
 
 Each of these variables is a list whose first element is a string and
 all the rest are vectors as described in the document string for
@@ -677,26 +711,45 @@ create a `gnuplot-mode' buffer."
   :group 'gnuplot-insertions
   :type 'boolean)
 
-(defcustom gnuplot-insertions-adornments
-  '("adornments"
-    ["data style"      (gnuplot-insert "set data style ")     t]
-    ["function style"  (gnuplot-insert "set function style ") t]
-    ["arrow"	       (gnuplot-insert "set arrow ")	      t]
-    ["bar"	       (gnuplot-insert "set bar")	      t]
-    ["border"	       (gnuplot-insert "set border")	      t]
-    ["boxwidth"	       (gnuplot-insert "set boxwidth ")	      t]
-    ["format"	       (gnuplot-insert "set format ")	      t]
-    ["grid"	       (gnuplot-insert "set grid")	      t]
-    ["key"	       (gnuplot-insert "set key ")	      t]
-    ["label"	       (gnuplot-insert "set label ")	      t]
-    ["pointsize"       (gnuplot-insert "set pointsize ")   t]
-    ["samples"	       (gnuplot-insert "set samples ")	      t]
-    ["size"            (gnuplot-insert "set size ")	      t]
-    ["tics"            (gnuplot-insert "set tics ")	      t]
-    ["timefmt"         (gnuplot-insert "set timefmt ")        t]
-    ["timestamp"       (gnuplot-insert "set timestamp ")      t]
-    ["title"	       (gnuplot-insert "set title ")	      t]
-    ["zeroaxis"	       (gnuplot-insert "set zeroaxis")        t] )
+(defcustom gnuplot-insertions-adornments ; this is icky...
+  (if gnuplot-three-eight-p
+      '("adornments"
+	["arrow"       (gnuplot-insert "set arrow ")	      t]
+	["bar"	       (gnuplot-insert "set bar")	      t]
+	["border"      (gnuplot-insert "set border")	      t]
+	["boxwidth"    (gnuplot-insert "set boxwidth ")	      t]
+	["format"      (gnuplot-insert "set format ")	      t]
+	["grid"	       (gnuplot-insert "set grid")	      t]
+	["key"	       (gnuplot-insert "set key ")	      t]
+	["label"       (gnuplot-insert "set label ")	      t]
+	["pointsize"   (gnuplot-insert "set pointsize ")      t]
+	["samples"     (gnuplot-insert "set samples ")	      t]
+	["size"        (gnuplot-insert "set size ")	      t]
+	["style"       (gnuplot-insert "set style ")          t]
+	["tics"        (gnuplot-insert "set tics ")	      t]
+	["timefmt"     (gnuplot-insert "set timefmt ")        t]
+	["timestamp"   (gnuplot-insert "set timestamp ")      t]
+	["title"       (gnuplot-insert "set title ")	      t]
+	["zeroaxis"    (gnuplot-insert "set zeroaxis")        t] )
+    '("adornments"
+      ["data style"     (gnuplot-insert "set data style ")     t]
+      ["function style" (gnuplot-insert "set function style ") t]
+      ["arrow"          (gnuplot-insert "set arrow ")	       t]
+      ["bar"	        (gnuplot-insert "set bar")	       t]
+      ["border"         (gnuplot-insert "set border")	       t]
+      ["boxwidth"       (gnuplot-insert "set boxwidth ")       t]
+      ["format"         (gnuplot-insert "set format ")	       t]
+      ["grid"	        (gnuplot-insert "set grid")	       t]
+      ["key"	        (gnuplot-insert "set key ")	       t]
+      ["label"          (gnuplot-insert "set label ")	       t]
+      ["pointsize"      (gnuplot-insert "set pointsize ")      t]
+      ["samples"        (gnuplot-insert "set samples ")	       t]
+      ["size"           (gnuplot-insert "set size ")	       t]
+      ["tics"           (gnuplot-insert "set tics ")	       t]
+      ["timefmt"        (gnuplot-insert "set timefmt ")        t]
+      ["timestamp"      (gnuplot-insert "set timestamp ")      t]
+      ["title"          (gnuplot-insert "set title ")	       t]
+      ["zeroaxis"       (gnuplot-insert "set zeroaxis")        t] ))
   "Adornments submenu in the insertions menu.
 See the document string for `gnuplot-insertions-menu'
 Changing this will not effect a change in any currently existing
@@ -720,6 +773,8 @@ create a `gnuplot-mode' buffer."
     ["logscale"	  (gnuplot-insert "set logscale ")	     t]
     ["multiplot"  (gnuplot-insert "set multiplot")	     t]
     ["missing"	  (gnuplot-insert "set missing \"\"")	     t]
+    ["palette"    (gnuplot-insert "set palette ")            t]	; <MT>
+    ["pm3d"       (gnuplot-insert "set pm3d ")               t]
     ["offsets"	  (gnuplot-insert "set offsets ")	     t]
     ["output"     (gnuplot-insert "set output ")	     t]
     ["zero"	  (gnuplot-insert "set zero ")		     t] )
@@ -751,6 +806,7 @@ create a `gnuplot-mode' buffer."
     ["tek40xx"    (gnuplot-insert "set terminal tek40xx")    t]
     ["tkcanvas"   (gnuplot-insert "set terminal tkcanvas")   t]
     ["tpic"       (gnuplot-insert "set terminal tpic")       t]
+    ["vgagl"      (gnuplot-insert "set terminal vgagl")      t]	; for pm3d patch
     ["vttek"      (gnuplot-insert "set terminal vttek")      t]
     ["x11"        (gnuplot-insert "set terminal x11")        t] )
   "Terminal submenu in the insertions menu.
@@ -1061,8 +1117,8 @@ XEmacs and ignored in FSF Emacs."
 TOOLBAR contains the toolbar specification.
 This is basically swiped from VM."
   (let ((width 46) (height 46)
-	(frame (selected-frame))
 	(buffer (current-buffer))
+	(frame (selected-frame))
 	(tag-set '(win)))
     (cond
      ((eq (symbol-value gnuplot-toolbar-use-toolbar) right-toolbar)
@@ -1386,6 +1442,11 @@ static char *help_btn[] = {
        (listp gnuplot-buffer-xpm) (listp gnuplot-doc-xpm)
        (listp gnuplot-help-xpm)))
 
+(defun foo ()
+  (interactive)
+  (message "%S" (selected-frame)))
+
+
 (defun gnuplot-make-toolbar-function ()
   (if (and gnuplot-xemacs-p gnuplot-all-buttons-defined)
       (progn
@@ -1393,7 +1454,7 @@ static char *help_btn[] = {
 	(gnuplot-toolbar-setup-toolbar gnuplot-toolbar)
 	(add-spec-to-specifier (symbol-value gnuplot-toolbar-use-toolbar)
 			       gnuplot-toolbar
-			       (current-buffer)))))
+			       (current-buffer) ))))
 
 ;;(defalias 'gnuplot-make-toolbar 'gnuplot-make-toolbar-function)
 
@@ -1417,8 +1478,8 @@ operators are punctuation characters.")
   ;;(modify-syntax-entry ?& "."  gnuplot-mode-syntax-table) ; rarely used
   ;;(modify-syntax-entry ?^ "."  gnuplot-mode-syntax-table) ; operators
   ;;(modify-syntax-entry ?| "."  gnuplot-mode-syntax-table) ; in gnuplot,
-  ;;(modify-syntax-entry ?& "."  gnuplot-mode-syntax-table) ; (I think...)
-  ;;(modify-syntax-entry ?? "."  gnuplot-mode-syntax-table) ;
+  ;;(modify-syntax-entry ?& "."  gnuplot-mode-syntax-table) ; (by me,
+  ;;(modify-syntax-entry ?? "."  gnuplot-mode-syntax-table) ;  anyway...)
   ;;(modify-syntax-entry ?~ "."  gnuplot-mode-syntax-table) ;
   (modify-syntax-entry ?' "\"" gnuplot-mode-syntax-table)
   (modify-syntax-entry ?` "w"  gnuplot-mode-syntax-table)
@@ -1482,6 +1543,10 @@ operators are punctuation characters.")
 		  "valid"
 		  "\\)\\>")
 		 font-lock-function-name-face)
+					; reserved words associated with
+					; plotting <AL>
+	   '("\\<\\(axes\\|every\\|index\\|l\\(\[stw\]\\|ine\\(style\\|type\\|width\\)\\)\\|notitle\\|p\\(\[st\]\\|oint\\(size\\|type\\)\\)\\|smooth\\|t\\(hru\\|itle\\)\\|using\\|with\\)\\>" . font-lock-type-face)
+	   '("\\<\\(box\\(e\\(rrorbars\\|s\\)\\|xyerrorbars\\)\\|candlesticks\\|dots\\|errorbars\\|f\\(inancebars\\|steps\\)\\|histeps\\|impulses\\|lines\\(\\|points\\)\\|points\\|steps\\|vector\\|x\\(errorbars\\|yerrorbars\\)\\|yerrorbars\\)\\>" . font-lock-function-name-face)
 					; (s)plot -- also thing (s)plotted
 	   '("\\<s?plot\\>" . font-lock-keyword-face)
 	   '("\\<s?plot\\s-+\\([^'\" ]+\\)[) \n,\\\\]"
@@ -1489,9 +1554,10 @@ operators are punctuation characters.")
 					; other common commands
 					; miscellaneous commands
 	   (cons (concat "\\<\\("
-			 "c\\(d\\|lear\\)\\|exit\\|fit\\|help\\|load\\|"
+			 "bind\\|"
+			 "c\\(d\\|lear\\)\\|exit\\|fit\\|h\\(elp\\|istory\\)\\|load\\|"
 			 "p\\(ause\\|rint\\|wd\\)\\|quit\\|replot\\|"
-			 "s\\(ave\\|et\\|how\\)"
+			 "s\\(ave\\|et\\|how\\)\\|unset"
 			 "\\)\\>\\|!.*$")
 		 font-lock-reference-face))
 	  gnuplot-font-lock-keywords-1 gnuplot-font-lock-keywords
@@ -1537,8 +1603,11 @@ nil, 'line, 'region, 'buffer, or 'file.  TEXT may be useful for
 functions in `gnuplot-after-plot-hook'.  `gnuplot-after-plot-hook' is
 called by this function after all of STRING is sent to gnuplot."
   (gnuplot-make-gnuplot-buffer)	; make sure a gnuplot buffer exists
-  (if gnuplot-program-version ()
-    (gnuplot-determine-gnuplot-version))
+  (or gnuplot-program-version
+      (progn
+	(message "Determining gnuplot version number (sitting for 2 seconds)")
+	(gnuplot-fetch-version-number)
+	(sit-for 2)))
   (setq gnuplot-comint-recent-buffer (current-buffer))
   (if (equal gnuplot-display-process 'frame)
       (or (and gnuplot-process-frame
@@ -1748,30 +1817,88 @@ buffer.  Further customization is possible via
                 (append comint-output-filter-functions
                         '(comint-postoutput-scroll-to-bottom
                           gnuplot-protect-prompt-fn)))
-	(message "Starting gnuplot plotting program...Done")))))
+	  (message "Starting gnuplot plotting program...Done")))))
 
-(defun gnuplot-determine-gnuplot-version ()
-  "Figure out which version of gnuplot we are running."
-  (let ((counter 0))
-    (save-excursion
-      (set-buffer gnuplot-buffer)
+
+(defun gnuplot-fetch-version-number ()
+  ;;(interactive)
+  (message "gnuplot-mode %s -- determining gnuplot version ......"
+	   gnuplot-version)
+  (let* ((command (concat "echo \"show version\" | " gnuplot-program))
+	 (process (start-process-shell-command "gnuplot-version"
+					       "*gnuplot-version*"
+					       command)))
+    (set-process-sentinel process 'gnuplot-determine-version-number)))
+
+(defun gnuplot-determine-version-number (process event)
+  (save-excursion
+    (let (version)
+      (if (string-match "SPEEDBAR" (format "%S" (current-buffer))) ;; <WZ>
+	  (if (fboundp 'speedbar-switch-buffer-attached-frame)
+	      (speedbar-switch-buffer-attached-frame "*gnuplot-version*")
+	    (progn
+	      (speedbar-select-attached-frame)
+	      (switch-to-buffer "*gnuplot-version*")))
+	(switch-to-buffer "*gnuplot-version*"))
       (goto-char (point-min))
-      ;; it may take a while for emacs to display the gnuplot start-up
-      ;; message.  since we need this to determine the version number
-      ;; and hence the value of `comint-process-echoes', we must wait
-      ;; for this to happen.
-      (while (and (equal (point-max) (point-min)) (< 10 counter))
-	(1+ counter)
-	(sleep-for 0.1))
-      (if (search-forward "version" (point-max) t)
-	  (progn
-	    (cond ((looking-at "\\s-*3.7")
-		   (setq comint-process-echoes nil          ;; t
-			 gnuplot-program-version "3.7"))
-		  (t
-		   (setq comint-process-echoes nil
-			 gnuplot-program-version "3.5") )))
-	(setq comint-process-echoes gnuplot-echo-command-line-flag)))))
+      (re-search-forward "[Vv]ersion\\s-+" (point-max) t)
+      (if (looking-at "[0-9]\\.[0-9]+")
+	  (setq version (match-string 0))
+	(setq version "3.7"))
+      (kill-buffer (get-buffer "*gnuplot-version*"))
+      ;;(and (interactive-p) (message "You are using gnuplot version %s" version))
+      (setq gnuplot-program-version version
+	    gnuplot-three-eight-p (>= (string-to-number gnuplot-program-version) 3.8))
+      (gnuplot-setup-menu-and-toolbar)
+      )))
+
+(defun gnuplot-setup-menu-and-toolbar ()
+  ;; set up the menubar (possibly dependent on version number)
+  (gnuplot-setup-menubar)
+  ;; set up the toolbar (possibly dependent on version number)
+  (if (and gnuplot-xemacs-p gnuplot-toolbar-display-flag)
+      (condition-case ()		; deal with the toolbar
+	  (and (require 'toolbar)
+	       (require 'xpm)
+	       (gnuplot-make-toolbar-function))
+	(error nil)))
+  (message "gnuplot-mode %s (gnuplot %s) -- report bugs with %S"
+	   gnuplot-version gnuplot-program-version
+	   (substitute-command-keys "\\[gnuplot-bug-report]"))
+  )
+
+
+
+;; (defun gnuplot-determine-gnuplot-version ()
+;;   "Figure out which version of gnuplot we are running."
+;;   (interactive)
+;;   (cond (gnuplot-gnuplot-version
+;; 	 (setq comint-process-echoes nil          ;; t
+;; 	       gnuplot-program-version gnuplot-gnuplot-version))
+;; 	(t
+;; 	 (let ((counter 0))
+;; 	   (save-excursion
+;; 	     (set-buffer gnuplot-buffer)
+;; 	     (goto-char (point-min))
+;; 	     ;; it may take a while for emacs to display the gnuplot start-up
+;; 	     ;; message.  since we need this to determine the version number
+;; 	     ;; and hence the value of `comint-process-echoes', we must wait
+;; 	     ;; for this to happen.
+;; 	     (while (and (equal (point-max) (point-min)) (< 10 counter))
+;; 	       (1+ counter)
+;; 	       (sleep-for 0.1))
+;; 	     (if (re-search-forward "[Vv]ersion" (point-max) t)
+;; 		 (progn
+;; 		   (cond ((or (looking-at "\\s-*3.8") (looking-at "\\s-*4"))
+;; 			  (setq comint-process-echoes nil          ;; t
+;; 				gnuplot-program-version "3.8"))
+;; 			 ((looking-at "\\s-*3.7")
+;; 			  (setq comint-process-echoes nil          ;; t
+;; 				gnuplot-program-version "3.7"))
+;; 			 (t
+;; 			  (setq comint-process-echoes nil
+;; 				gnuplot-program-version "3.5") )))
+;; 	       (setq comint-process-echoes gnuplot-echo-command-line-flag)))))))
 
 (defun gnuplot-protect-prompt-fn (string)
   "Prevent the Gnuplot prompt from being deleted or overwritten.
@@ -1910,7 +2037,7 @@ This checks if the set option is one which has a negated form."
   (interactive)
   (let ((begin (save-excursion (beginning-of-line) (point-marker)))
 	(end   (save-excursion (end-of-line)       (point-marker)))
-	(regex "a\\(rrow\\|utoscale\\)\\|border\\|c\\(l\\(abel\\|ip\\)\\|ontour\\)\\|dgrid3d\\|grid\\|hidden3d\\|key\\|l\\(abel\\|inestyle\\|ogscale\\)\\|m\\(ultiplot\\|x\\(2tics\\|tics\\)\\|y\\(2tics\\|tics\\)\\|ztics\\)\\|offsets\\|polar\\|surface\\|ti\\(mestamp\\|tle\\)\\|x\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|y\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|z\\(dtics\\|mtics\\|tics\\|zeroaxis\\)"))
+	(regex "a\\(rrow\\|utoscale\\)\\|border\\|c\\(l\\(abel\\|ip\\)\\|ontour\\)\\|dgrid3d\\|grid\\|hi\\(dden3d\\|storysize\\)\\|key\\|l\\(abel\\|inestyle\\|ogscale\\)\\|m\\(ouse\\|ultiplot\\|x\\(2tics\\|tics\\)\\|y\\(2tics\\|tics\\)\\|ztics\\)\\|offsets\\|polar\\|surface\\|ti\\(mestamp\\|tle\\)\\|x\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|y\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|z\\(dtics\\|mtics\\|tics\\|zeroaxis\\)"))
     (save-excursion
       (if (search-backward ";" begin t)
 	  (progn (forward-char  1) (setq begin (point-marker))))
@@ -1918,17 +2045,49 @@ This checks if the set option is one which has a negated form."
 	  (progn (forward-char -1) (setq end   (point-marker))))
       (goto-char begin)
       (skip-syntax-forward "-" end)
-      (if (looking-at "set\\s-+")
-	  (progn
-	    (goto-char (match-end 0))
-	    (if (> (point) end) (goto-char end))
-	    (cond ((looking-at "no")
-		   (delete-char 2))
-		  ((looking-at regex)
-		   (insert "no"))
-		  (t
-		   (message "There is not a negatable set option on this line"))))
+      (if (looking-at "\\(un\\)?set\\s-+")
+	  (cond ((and gnuplot-program-version
+		      (> (string-to-number gnuplot-program-version) 3.7))
+		 (cond ((looking-at "unset")
+			(delete-char 2))
+		       ((looking-at (concat "set\\s-+\\(" regex "\\)"))
+			(insert "un"))
+		       (t
+			(message "There is not a negatable set option on this line"))))
+		(t
+		 (goto-char (match-end 0))
+		 (if (> (point) end) (goto-char end))
+		 (cond ((looking-at "no")
+			(delete-char 2))
+		       ((looking-at regex)
+			(insert "no"))
+		       (t
+			(message "There is not a negatable set option on this line")))))
 	(message "There is not a set option on this line")) )))
+
+;; (defun gnuplot-set-binding ()
+;;   "Interactively select a key sequence for binding to a plot function.
+;; This is only useful in gnuplot 3.8 and for plot terminals which support
+;; key bindings (i.e. those covered by pm3d)."
+;;   (interactive)
+;;   (let ((keyseq (read-key-sequence "Choose a key sequence now"))
+;; 	(command (read-string "Bind to this command > ")))
+;;     (setq keyseq (format "%S" keyseq))
+;;     (string-match "keypress-event\\s-+" keyseq)
+;;     (setq keyseq (substring keyseq (match-end 0) -2))
+;;     ;; need to convert from emacs nomenclature to gnuplot.  what a pain.
+;;     (let* ((alist '(("backspace" . "Backspace") ("tab" . "Tab") ("linefeed" . "Linefeed")
+;; 		    ("clear" . "Clear") ("return" . "Return") ("pause" . "Pause")
+;; 		    ("scroll-lock" . "Scroll_Lock") ("SysReq" . "sys-req")
+;; 		    ("escape" . "Escape") ("delete" . "Delete") ("home" . "Home")
+;; 		    ("left" . "Left") ("right" . "Right") ("up" . "Up") ("down" . "Down")
+;; 		    ("prior" . "PageUp") ("next" . "PageDown") ("end" . "End")
+;; 		    ("begin". "Begin")))
+;; 	   (match (assoc keyseq alist)))
+;;       (if match (setq keyseq (cdr match)))
+;;
+;;     (insert (format "bind \"%s\" \"%s\"" keyseq command)))))
+
 
 (defun gnuplot-customize ()
   "Customize `gnuplot-mode'."
@@ -2111,22 +2270,27 @@ help shown is for STRING unless STRING begins with the word \"set\" or
 \"show\", in which case help is shown for the thing being set or
 shown."
   (interactive)
-  (insert string)
-  (let ((topic string) term)
-    (if (string-match
-	 "\\(set\\|show\\)[ \t]+\\([^ \t]+\\)\\(\\s-+\\([^ \t]+\\)\\)?"
-	 string)
-	(progn
-	  (setq topic (downcase (match-string 2 string))
-		term            (match-string 4 string))
-	  (if (string= topic "terminal") (setq topic (downcase term)))))
-    (cond ((and (fboundp 'gnuplot-gui-set-options-and-insert)
-		gnuplot-gui-popup-flag)
-	   (gnuplot-gui-set-options-and-insert))
-	  (gnuplot-insertions-show-help-flag
-	   (if gnuplot-keywords-pending		; <HW>
-	       (gnuplot-setup-info-look))
-	   (gnuplot-info-lookup-symbol topic)) ) ))
+  (cond ((and (not gnuplot-three-eight-p)
+	      (string-match "\\(emf\\|p\\(alette\\|m3d\\)\\|vgagl\\)" string))
+	 (message "%S is an option introduced in gnuplot 3.8 (You are using %s)"
+		  string gnuplot-program-version) )
+	(t
+	 (insert string)
+	 (let ((topic string) term)
+	   (if (string-match
+		"\\(set\\|show\\)[ \t]+\\([^ \t]+\\)\\(\\s-+\\([^ \t]+\\)\\)?"
+		string)
+	       (progn
+		 (setq topic (downcase (match-string 2 string))
+		       term            (match-string 4 string))
+		 (if (string= topic "terminal") (setq topic (downcase term)))))
+	   (cond ((and (fboundp 'gnuplot-gui-set-options-and-insert)
+		       gnuplot-gui-popup-flag)
+		  (gnuplot-gui-set-options-and-insert))
+		 (gnuplot-insertions-show-help-flag
+		  (if gnuplot-keywords-pending		; <HW>
+		      (gnuplot-setup-info-look))
+		  (gnuplot-info-lookup-symbol topic)) ) )) ) )
 
 (defun gnuplot-toggle-info-display ()
   (interactive)
@@ -2160,6 +2324,7 @@ maintainer of `gnuplot-mode'."
 	     gnuplot-info-hook
 	     gnuplot-comint-setup-hook
 	     gnuplot-program
+	     gnuplot-program-version
 	     gnuplot-process-name
 	     gnuplot-gnuplot-buffer
 	     gnuplot-display-process
@@ -2231,7 +2396,7 @@ The help functions, keyword completion, and several other features
 depend upon having the info file properly installed.  The info file
 can be made in the document directory of the gnuplot distribution or
 is available at the `gnuplot-mode' web page:
-      http://feff.phys.washington.edu/~ravel/gnuplot/
+    http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
 
 If the help function does not work properly, you may have an older
 version of the gnuplot info file.  Try the suggestion in the document
@@ -2240,9 +2405,10 @@ web page for more details.
 
 			    ------O------
 
-There are several known shortcomings of `gnuplot-mode', version 0.5g.
-Many of the shortcomings involve the graphical interface (refered to
-as the GUI) to setting arguments to plot options.  Here is a list:
+There are several known shortcomings of `gnuplot-mode', version 0.5g
+and up.  Many of the shortcomings involve the graphical interface
+(refered to as the GUI) to setting arguments to plot options.  Here is
+a list:
 
  1.  Currently there is no way for `gnuplot-mode' to know if information
      sent to gnuplot was correctly plotted.
@@ -2267,7 +2433,6 @@ as the GUI) to setting arguments to plot options.  Here is a list:
   (interactive)
   (kill-all-local-variables)
   (use-local-map gnuplot-mode-map)
-  (gnuplot-setup-menubar)
   (setq major-mode 'gnuplot-mode
 	mode-name "Gnuplot")
   (set (make-local-variable 'comment-start) "# ")
@@ -2298,12 +2463,12 @@ as the GUI) to setting arguments to plot options.  Here is a list:
     (progn
       (make-variable-buffer-local 'font-lock-defaults)
       (setq font-lock-defaults '(gnuplot-font-lock-keywords t t))))
-  (if (and gnuplot-xemacs-p gnuplot-toolbar-display-flag)
-      (condition-case ()		; deal with the toolbar
-	  (and (require 'toolbar)
-	       (require 'xpm)
-	       (gnuplot-make-toolbar-function))
-	(error nil)))
+;;   (if (and gnuplot-xemacs-p gnuplot-toolbar-display-flag)
+;;       (condition-case ()		; deal with the toolbar
+;; 	  (and (require 'toolbar)
+;; 	       (require 'xpm)
+;; 	       (gnuplot-make-toolbar-function))
+;; 	(error nil)))
   (if (fboundp 'widget-create)		; gunplot-gui
       (condition-case ()
   	  (require 'gnuplot-gui)
@@ -2311,8 +2476,10 @@ as the GUI) to setting arguments to plot options.  Here is a list:
   (setq gnuplot-first-call nil		; a few more details ...
 	gnuplot-comint-recent-buffer (current-buffer))
   (run-hooks 'gnuplot-mode-hook)
-  (message "gnuplot-mode %s -- report bugs with %S" gnuplot-version
-	   (substitute-command-keys "\\[gnuplot-bug-report]")))
+  ;; the first time we need to figure out which gnuplot we are running
+  (if gnuplot-program-version
+      (gnuplot-setup-menu-and-toolbar)
+    (gnuplot-fetch-version-number)))
 
 ;;;###autoload
 (defun gnuplot-make-buffer ()
@@ -2334,6 +2501,11 @@ following in your .emacs file:
   "Show version number in echo area"
   (interactive)
   (message "gnuplot-mode %s -- URL: %s" gnuplot-version gnuplot-maintainer-url))
+
+(defun gnuplot-show-gnuplot-version ()
+  "Show gnuplot program and version number in echo area"
+  (interactive)
+  (message "You are calling gnuplot %s as %s" gnuplot-program-version gnuplot-program))
 
 
 ;;; That's it! ----------------------------------------------------------------

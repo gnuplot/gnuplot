@@ -1,4 +1,56 @@
 
+Apr 15 2001 Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5p
+	* fixed the fix for the serious bug in how speedbar and
+	  gnuplot-mode interact.  In the words of Bullwinkle, "This
+	  time for sure!"
+
+Jan  4 2001 Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5n
+	* fixed a serious bug in how speedbar and gnuplot-mode
+	  interact 
+
+Nov 29 2000 Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5m
+	* much better algorithm for determining gnuplot version number
+	* add colorization and gui support for new commands in 3.8.
+	* gui support for emf term.
+	* gui support for new "set style" syntax.
+
+Nov 16 2000 Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5l
+	* support for pm3d in gnuplot-gui and in plot options
+	  insertions menu.
+        * mentioned pm3d in gpelcard.
+        * `gnuplot-negate-option' works with new syntax
+
+Sep 22 1999  Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5k
+        * make `gnuplot-send-line-and-forward' skip over blank and
+          comment lines as suggested by <SE>.
+        * Jan 10 2000 Bound C-c C-j to `gnuplot-forward-script-line'.
+
+Sep  9 1999  Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5j
+        * Do a more robust check for the gnuplot process before
+          killing the gnuplot buffer, as suggested by <SE>.
+
+Sep  2 1999  Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5i
+        * Once again changed how `comint-process-echos' gets set.
+          Maybe I got it right this time?
+        * Also fixed certain situations where the info file did not
+          get properly loaded (insertion with info toggle on and info
+          button in GUI).
+
+Aug 15 1999  Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5h
+        * Added `gnuplot-determine-gnuplot-version' so that the
+          gnuplot version number and `comint-process-echos' actually
+          get set correctly.  Actually, the first time something is
+          plotted, the echoing might not work, but the second time it
+          will.
+
 May 27 1999  Bruce Ravel  <ravel@phys.washington.edu>
         * gnuplot.el: Version 0.5g
 	* fixed a bug in XEmacs in the font-locking rules for comments

@@ -1,5 +1,5 @@
 
-%% Time-stamp: <2000/01/10 09:52:11 bruce>
+%% Time-stamp: <2000/11/29 18:46:58 bruce>
 
 %% This document is copyright (C) 1998 Bruce Ravel <ravel@phys.washington.edu>
 %% This page covers version 0.5g of gnuplot-mode.
@@ -36,8 +36,8 @@
 {\begin{Sbox}\begin{minipage}}%
   {\end{minipage}\end{Sbox}\fbox{\TheSbox}}
 
-\def\version{{0.5g}}
-\def\revised{{June 2, 1999}}
+\def\version{{0.5m}}
+\def\revised{{29 November, 2000}}
 \def\file#1{{\texttt{`#1'}}}
 \def\key#1{{\textrm \leavevmode\hbox{%
   \raise0.4pt\hbox{$\langle$}\kern-.08em\vtop{%
@@ -102,7 +102,8 @@ This card describes the features of gnuplot mode for Emacs.  Gnuplot
 mode is intended for composing scripts for the \textsc{gnuplot}
 plotting program.  It offers functions for sending commands or entire
 scripts to the \textsc{gnuplot} program as well as various functions
-to aid in composing scripts.  See the comments in the file
+to aid in composing scripts.  It works with any version of
+\textsc{gnuplot} from 3.5 to 3.8.  See the comments in the file
 \file{gnuplot.el} for instructions on installing gnuplot mode.
 
 \vspace{2ex}
@@ -162,9 +163,9 @@ to aid in composing scripts.  See the comments in the file
 
 \begin{Boxedminipage}{0.98\linewidth}
   \begin{center}
-    \footnotesize{
-      Gnuplot-mode homepage \\
-      \texttt{http://feff.phys.washington.edu/\char126ravel/gnuplot/}}
+    \footnotesize{Gnuplot-mode homepage} \\
+    \scriptsize{%%
+      \texttt{http://feff.phys.washington.edu/\char126ravel/software/gnuplot/}}
   \end{center}
 \end{Boxedminipage}
 \begin{flushleft}
@@ -231,6 +232,13 @@ gnuplot-mode.
   the info-look package is a standard part of Emacs 20.  Users of
   XEmacs or Emacs 19 should download \file{info-look.el} from the
   gnuplot-mode homepage.
+\item[Using pm3d] \hfill \\
+  All features of the pm3d patch to \textsc{gnuplot} should be
+  available when using gnuplot-mode.  One particularly useful feature
+  of pm3d is the ability to push a cursor position into the
+  clipboard.  This is done by double-clicking \texttt{mouse-1} in the
+  plot window, then doing \texttt{M-x yank-clipboard-selection}
+  (usually bound to \texttt{mouse-2}) in the gnuplot script buffer.
 \end{description}
 
 

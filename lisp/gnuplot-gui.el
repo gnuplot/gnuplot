@@ -1,11 +1,11 @@
 ;;;; gnuplot-gui.el -- GUI interface to setting options in gnuplot-mode
 
-;; Copyright (C) 1998 Bruce Ravel
+;; Copyright (C) 1998-2000 Bruce Ravel
 
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu>
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    19 December 1998
-;; Updated:    11 April 1999
+;; Updated:    16 November 2000
 ;; Version:    (same as gnuplot.el)
 ;; Keywords:   gnuplot, plotting, interactive, GUI
 
@@ -66,11 +66,10 @@
 ;; command types which are currently unsupported or contain mistakes
 ;; -- unsupported: cntrparam
 ;; -- plot, splot, fit: rather lame
-;; -- style: does `set style' mean anything?  Should I prompt for
-;;           function or data?
 ;; -- label: position information missing
 ;; -- label: font string handled in overly simple manner
 ;; -- hidden3d: not really suited to 'list, but all options are exclusive...
+;; -- pointstyle argument to "set label"
 ;;
 ;; overall:
 ;; -- continuation lines (ugh!)
@@ -252,6 +251,11 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		  '(("LINEFEED"         'list   " " "feed" "nofeed")
 		    ("X-SIZE"           'number " ")
 		    ("Y-SIZE"           'number " ")))
+	    (cons "emf"
+		  '(("COLOR"            'list " " "color" "monochrome")
+		    ("LINE"             'list " " "solid" "dashed")
+		    ("FONTNAME"         'string " ")
+		    ("FONTSIZE"         'number " ")))
 	    (cons "emtex"
 		  '(("FONTNAME"         'list     " " "courier" "roman")
 		    ("FONTSIZE"         'fontsize " ")))
@@ -293,12 +297,12 @@ See the doc-string for `gnuplot-gui-all-types'.")
 	    (cons "nec-cp6"
 		  '(("MODE"             'list " " "monochrome" "colour" "draft")))
 	    (cons "pbm"
-		  '(("SIZE"             'list " " "small" "medium" "large")
-		    ("COLOR"            'list " " "monochrome" "gray" "color")))
+		  '(("SIZE"      'list " " "small" "medium" "large")
+		    ("COLOR"     'list " " "monochrome" "gray" "color")))
 	    (cons "pcl5L"
-		  '(("MODE"             'list " " "landscape" "portrait")
-		    ("FONTNAME"         'list " " "stick" "univers" "cg_times")
-		    ("FONTSIZE"         'fontsize " ")))
+		  '(("MODE"      'list " " "landscape" "portrait")
+		    ("FONTNAME"  'list " " "stick" "univers" "cg_times")
+		    ("FONTSIZE"  'fontsize " ")))
 	    (cons "png"
 		  '(("SIZE"      'list " " "small" "medium" "large")
 		    ("COLOR"     'list " " "monochrome" "gray" "color")))
@@ -335,9 +339,16 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		  '(("POINTSIZE"        'number " ")
 		    ("LINEWIDTH"        'number " ")
 		    ("INTERVAL "        'number " ")))
+	    (cons "vgagl"		; for pm3d patch (also persist, raise in x11) <MT>
+		  '(("BACKGROUND"       'position  " " "background" 3)
+		    ("INTERPOLATION"    'list " " "uniform" "interpolate")
+		    ("DUMP"             'file " ")
+		    ("MODE"             'string  " " "")))
 	    (cons "x11"
 		  '(("RESET"            'list " " "reset")
-		    ("TERMINAL NUMBER"  'number " "))) ))
+		    ("TERMINAL NUMBER"  'number " ")
+		    ("PERSIST"          'list " " "persist" "nopersist")
+		    ("RAISE"            'list " " "raise" "noraise"))) ))
 
 (defvar gnuplot-gui-terminal-list nil)
 (setq gnuplot-gui-terminal-list
@@ -395,7 +406,7 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		   '(("ROW,COLUMN,NORM" 'position " " "" 3)))
 	    (cons "encoding"
 		  '(("ENCODING" 'list " " "default" "iso_8859_1"
-		     "iso_8859_2" "cp850" "cp852" "cp437")))
+		     "cp850" "cp437")))
 	    (cons "format"
 		  '(("AXIS"   'list " " "x" "y" "z" "xy" "x2" "y2")
 		    ("FORMAT" 'format  " ")))
@@ -424,6 +435,8 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    "undefined 0" "undefined 1" "undefined 2" "undefined 3"
 		    "noundefined" "altdiagonal" "noaltdiagonal"
 		    "bentover" "nobentover")))
+	    (cons "historysize"
+		  '(("SIZE" 'number " ")))
 	    (cons "isosamples"
 		  '(("ISO_U LINES" 'number " ")
 		    ("ISO_V LINES" 'number " " ",")))
@@ -491,6 +504,41 @@ See the doc-string for `gnuplot-gui-all-types'.")
 	    (cons "mx2tics" gnuplot-gui-mtics-list)
 	    (cons "my2tics" gnuplot-gui-mtics-list)
 
+					; pm3d additions <MT>
+	    (cons "mouse"
+		  '(("DOUBLECLICK"     'number " " "doubleclick")
+		    ("ZOOM"            'list   " " "zoomcoordinates" "nozoomcoordinates")
+		    ("POLAR"           'list   " " "polarcoordinates" "nopolarcoordinates")
+		    ("FORMAT"          'string " " "format")
+		    ("CLIPBOARDFORMAT" 'string " " "clipboardformat")
+		    ("MOUSEFORMAT"     'string " " "mouseformat")
+		    ("LABELS"          'list   " " "labels" "nolabels")
+		    ("LABELOPTIONS"    'string " " "labeloptions")
+		    ("ZOOMJUMP"        'list   " " "zoomjump" "nozoomjump")
+		    ("VERBOSE"         'list   " " "verbose" "noverbose")))
+	    (cons "palette"
+		  '(("COLOR"       'list     " " "gray" "color")
+		    ("RGBFORMULAE" 'position " " "rgbformulae" 3)
+		    ("PARITY"      'list     " " "positive" "negative")
+		    ("FORMULAE"    'list     " " "nops_allcF" "ps_allcF")
+		    ("MAXCOLORS"   'number   " ")
+		    ("COLOR_BOX"   'list     " " "nocb" "cbdefault" "cbuser")
+		    ("ORIENTATION" 'list     " " "cbvertical" "cbhorizontal")
+		    ("ORIGIN"      'position " " "origin" 2)
+		    ("SIZE"        'position " " "size" 2)
+		    ("BORDER"      'number   " ")
+		    ("NOBORDER"    'list     " " "bdefault" "noborder")))
+	    (cons "pm3d"
+		  '(("AT"         'list*  " " "b" "s" "t" "bs" "bt" "st" "bst")
+		    ("SCANS"      'list   " " "scansautomatic" "scansforward" "scansbackward")
+		    ("FLUSH"      'list*  " " "begin" "center" "end")
+		    ("CLIP"       'list   " " "clip1in" "clip4in")
+		    ("ZRANGE"     'range (" " . " ") ":")
+		    ("HIDDEN3D"   'number " ")
+		    ("NOHIDDEN3D" 'list   " " "nohidden3d")
+		    ("FILLING"    'list   " " "transparent" "solid")
+		    ("MAP"        'list   " " "map")))
+
 	    (cons "offsets"
 		  '(("LEFT  " 'number " ")
 		    ("RIGHT " 'number " " ",")
@@ -512,7 +560,8 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("X-SCALE OR RATIO" 'number " ")
 		    ("Y-SCALE"          'number " " ",")))
 	    (cons "style"
-		  '(("PLOT STYLE" 'list " " "boxerrorbars" "boxes"
+		  '(("DATA TYPE"  'list " " "data" "function")
+		    ("PLOT STYLE" 'list " " "boxerrorbars" "boxes"
 		     "boxxyerrorbars" "candlesticks" "dots"
 		     "financebars" "fsteps" "histeps" "impulses"
 		     "lines" "linespoints" "points" "steps" "vector"
@@ -722,22 +771,6 @@ See the doc-string for `gnuplot-gui-all-types'.")
 			      gnuplot-gui-fit-full-list
 			    gnuplot-gui-fit-simple-list))) )
 
-(defun gnuplot-gui-swap-simple-complete ()
-  (interactive)
-  (setq gnuplot-gui-plot-splot-fit-style
-	(if (equal gnuplot-gui-plot-splot-fit-style 'complete)
-	    'simple 'complete))
-  (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
-      (progn
-	(setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-full-list)
-	(setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-full-list)
-	(setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-full-list))
-    (setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-simple-list)
-    (setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-simple-list)
-    (setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-simple-list))
-  (message "Using %s lists for plot, splot, and fit."
-	   gnuplot-gui-plot-splot-fit-style) )
-
 
 (defvar gnuplot-gui-test-type nil)
 (setq gnuplot-gui-test-type
@@ -834,6 +867,25 @@ This alist is formed at load time by appending together
 				    gnuplot-gui-plot-splot-fit
 				    gnuplot-gui-test-type
 				    ))
+
+
+(defun gnuplot-gui-swap-simple-complete ()
+  (interactive)
+  (setq gnuplot-gui-plot-splot-fit-style
+	(if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+	    'simple 'complete))
+  (if (equal gnuplot-gui-plot-splot-fit-style 'complete)
+      (progn
+	(setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-full-list)
+	(setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-full-list)
+	(setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-full-list))
+    (setcdr (assoc "plot"  gnuplot-gui-all-types) gnuplot-gui-plot-simple-list)
+    (setcdr (assoc "splot" gnuplot-gui-all-types) gnuplot-gui-splot-simple-list)
+    (setcdr (assoc "fit"   gnuplot-gui-all-types) gnuplot-gui-fit-simple-list))
+  (message "Using %s lists for plot, splot, and fit."
+	   gnuplot-gui-plot-splot-fit-style) )
+
+
 
 
 ;;; user interface to the widget-y stuff
