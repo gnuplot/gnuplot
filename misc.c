@@ -913,13 +913,13 @@ char *text;
 
     case TIC_USER:{
 	    register struct ticmark *t;
-	    int time;
-	    time = (datatype[axis] == TIME);
+	    int flag_time;
+	    flag_time = (datatype[axis] == TIME);
 	    fprintf(fp, " (");
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label)
 		    fprintf(fp, "\"%s\" ", conv_text(str, t->label));
-		if (time) {
+		if (flag_time) {
 		    char td[26];
 		    gstrftime(td, 24, timefmt, (double) t->position);
 		    fprintf(fp, "\"%s\"", conv_text(str, td));
