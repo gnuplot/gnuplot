@@ -1,3 +1,36 @@
+1999-08-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Updated to latest version from Juergen.
+
+	* demo/airfoil.dem: Use 'set nozeroaxis' instead of 'set nozero'.
+
+	* docs/gnuplot.doc, set.c, show.c: Remove 'set data', 'set function',
+	'set linestyle' commands (but keep 'set nolinestyle' for now). Replace
+	with 'set style data|function|line'.
+
+	* src/hidden3d.c(set_hidden3doptions): Rewrite to use
+	table-oriented parser.
+
+	* src/plot.h, src/plot2d.c, src/plot3d.c, src/setshow.h: Remove
+	LP_PARSE macro. Now a function in set.c.
+
+	* src/plot2d.c: Rearrange some code.
+
+	* src/set.c: Extensive 'set' command parser restructuring.
+
+	* src/syscfg.h: New FAQ location.
+
+	* src/tables.c, src/tables.h: New table for 'plot', 'set hidden3d',
+	'set key', plot style options.
+
+	* src/term.c(term_start_multiplot,term_end_multiplot): Increment
+	c_token (was previously done in set.c).
+
+	* src/variable.h: Rename set_loadpath to set_var_loadpath and
+	set_locale to set_var_locale.
+
+	* tutorial/Makefile.am.in: Use TEXINPUTS variable from environment.
+	
 1999-08-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/gnuplot.doc: Fix inconsistencies (command is set/show bars,
@@ -9,7 +42,7 @@
 	* src/setshow.h: Remove show_version_long() prototype and
 	SETSHOWMSG define.
 
-	* src/show.c: Extensive show command parser restructuring.
+	* src/show.c: Extensive 'show' command parser restructuring.
 
 	* src/tables.c(set_tbl): Add "no" variables.
 
@@ -1438,7 +1471,7 @@
 
 	* demo/contours.dem, demo/fit.dem: Small patches, axis ranges etc.
 
-	* docs/gnuplot.doc: FIx some backquotes.
+	* docs/gnuplot.doc: Fix some backquotes.
 
 	* docs/latextut/Makefile.in: Use @prefix@ instead of /usr/local.
 
