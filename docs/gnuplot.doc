@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.53 2000/11/23 08:35:38 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.54 2000/11/24 17:08:15 amai Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3941,7 +3941,8 @@ C ... and restart the table:
  The `set encoding` command selects a character encoding.  Valid values are
  `default`, which tells a terminal to use its default; `iso_8859_1` (known in
  the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
- and with MS-Windows; `cp850`, for OS/2; and `cp437`, for MS-DOS.
+ and with MS-Windows; `iso_8859_2`, used in Central and Eastern Europe; `cp850`,
+ for OS/2; and `cp437`, for MS-DOS.
 
  Syntax:
        set encoding {<value>}

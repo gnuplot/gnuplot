@@ -395,7 +395,7 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		   '(("ROW,COLUMN,NORM" 'position " " "" 3)))
 	    (cons "encoding"
 		  '(("ENCODING" 'list " " "default" "iso_8859_1"
-		     "cp850" "cp437")))
+		     "iso_8859_2" "cp850" "cp437")))
 	    (cons "format"
 		  '(("AXIS"   'list " " "x" "y" "z" "xy" "x2" "y2")
 		    ("FORMAT" 'format  " ")))

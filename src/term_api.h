@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.8 2000/11/20 09:47:07 mikulik Exp $
+ * $Id: term_api.h,v 1.9 2000/11/23 18:25:48 lhecking Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -169,7 +169,7 @@ typedef struct TERMENTRY {
 #endif
 
 enum set_encoding_id {
-   S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_CP437, S_ENC_CP850,
+   S_ENC_DEFAULT, S_ENC_ISO8859_1, S_ENC_ISO8859_2, S_ENC_CP437, S_ENC_CP850,
    S_ENC_INVALID
 };
 

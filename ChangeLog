@@ -1,3 +1,10 @@
+2000-11-29  Levente Novak  <novak@jaguar.dote.hu>
+
+        * docs/gnuplot.doc docs/gnuplot.texi docs/psdoc/README
+	docs/psdoc/ps_guide.ps lisp/gnuplot-gui.el src/set.c src/term.c
+	src/term_api.h term/post.trm: a patch enabling the PostScript
+	terminal to use ISO-8859-2 encoding. 
+
 2000-11-27  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
         * src/readline.c: readline.c did not built with HAVE_LIBREADLINE.

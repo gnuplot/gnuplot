@@ -5307,7 +5307,8 @@ The second example sets the second variable to s.
 The @ref{encoding} command selects a character encoding.  Valid values are
 `default`, which tells a terminal to use its default; `iso_8859_1` (known in
 the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
-and with MS-Windows; `cp850`, for OS/2; and `cp437`, for MS-DOS.
+and with MS-Windows; `iso_8859_2`, used in Central and Eastern Europe; `cp850`,
+for OS/2; and `cp437`, for MS-DOS.
 
 Syntax:
 @example

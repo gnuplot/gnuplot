@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.45 2000/11/15 15:51:06 mikulik Exp $
+ * $Id: post.trm,v 1.46 2000/11/20 09:47:08 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -522,6 +522,9 @@ int can_reencode;
     case S_ENC_ISO8859_1:
 	recode = "reencodeISO def\n";
 	break;
+    case S_ENC_ISO8859_2:
+	recode = "reencodeISO2 def\n";
+	break;
     case S_ENC_CP437:
 	recode = "reencodeCP437 def\n";
 	break;
@@ -796,6 +799,53 @@ const char **dict; /* extra entries for the dictionary */
 "] def\n",
 NULL };
 
+/* Encoding for ISO-8859-2 (also called as Latin-2), with   */
+/* minor differences to "true" ISO-8859-2 (*commaaccent     */
+/* instead of *cedilla for sStT -> incorrect in ISO-8859-2, */
+/* the standard will probably be modified in this respect)  */
+/*      Levente NOVÁK <novak@jaguar.dote.hu>                */
+
+    static const char GPFAR * GPFAR PS_iso_8859_2_encoding[] = {
+"/reencodeISO2 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding ISOLatin2Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/ISOLatin2Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M\n",
+"/N/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/nbspace/Aogonek/breve/Lslash/currency/Lcaron/Sacute/section\n",
+"/dieresis/Scaron/Scommaaccent/Tcaron/Zacute/hyphen/Zcaron/Zdotaccent\n",
+"/degree/aogonek/ogonek/lslash/acute/lcaron/sacute/caron/cedilla\n",
+"/scaron/scommaaccent/tcaron/zacute/hungarumlaut/zcaron/zdotaccent\n",
+"/Racute/Aacute/Acircumflex/Abreve/Adieresis/Lacute/Cacute/Ccedilla\n",
+"/Ccaron/Eacute/Eogonek/Edieresis/Ecaron/Iacute/Icircumflex/Dcaron\n",
+"/Dcroat/Nacute/Ncaron/Oacute/Ocircumflex/Ohungarumlaut/Odieresis\n",
+"/multiply/Rcaron/Uring/Uacute/Uhungarumlaut/Udieresis/Yacute\n",
+"/Tcommaaccent/germandbls/racute/aacute/acircumflex/abreve/adieresis\n",
+"/lacute/cacute/ccedilla/ccaron/eacute/eogonek/edieresis/ecaron\n",
+"/iacute/icircumflex/dcaron/dcroat/nacute/ncaron/oacute/ocircumflex\n",
+"/ohungarumlaut/odieresis/divide/rcaron/uring/uacute/uhungarumlaut\n",
+"/udieresis/yacute/tcommaaccent/dotaccent\n",
+"] def\n",
+NULL };
+
 /*   encoding for code page 437                                            */
 /*                                                                         */
 /*   version 1.0:  - Mainly letters are mapped. The following positions    */
@@ -843,7 +893,7 @@ NULL };
 "/.notdef/germandbls/.notdef/.notdef/.notdef/.notdef/mu/.notdef\n",
 "/.notdef/.notdef/.notdef/.notdef/infinity/.notdef/.notdef/.notdef\n",
 "/.notdef/plusminus/greaterequal/lessequal/.notdef/.notdef/divide/.notdef\n",
-"/degree/bullet/periodcentered/.notdef/nsuperior/twosuperior/.notdef\n",
+"/degree/bullet/periodcentered/.notdef/nsuperior/twosuperior/.notdef/.notdef\n",
 "] def\n",
 NULL };
 
@@ -891,7 +941,7 @@ NULL };
 "/Oacute/germandbls/Ocircumflex/Ograve/otilde/Otilde/mu/thorn\n",
 "/Thorn/Uacute/Ucircumflex/Ugrave/yacute/Yacute/macron/acute\n",
 "/hyphen/plusminus/equal/threequarters/paragraph/section/divide/.notdef\n",
-"/degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef\n",
+"/degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef/.notdef\n",
 "] def\n",
 NULL };
 
@@ -937,6 +987,11 @@ NULL };
     if (uses_fonts && (encoding == S_ENC_ISO8859_1)) {
 	for (i = 0; PS_iso_8859_1_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
+	}
+    }
+    if (uses_fonts && (encoding == S_ENC_ISO8859_2)) {
+	for (i = 0; PS_iso_8859_2_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_iso_8859_2_encoding[i]);
 	}
     }
     if (uses_fonts && (encoding == S_ENC_CP437)) {       /* JFi */

@@ -10,8 +10,9 @@ gnudict begin
 % the variable "LastColumn" determines which encoding vector is used for
 % the last (right-most) column in the display
 %    1 = ISO-Latin1 (also known as ISO-8859-1) for Unix
-%    2 = CP 437 for MS-DOS
-%    3 = CP 850 for OS/2
+%    2 = ISO-Latin2 (also known as ISO-8859-2) for Unix (Central Europe)
+%    3 = CP 437 for MS-DOS
+%    4 = CP 850 for OS/2
 /LastColumn 1 def
 
 /reEncode { findfont dup length dict begin
@@ -22,6 +23,41 @@ gnudict begin
             currentdict end definefont pop } def
 
 /ISOLatin1 { /EncodingCheck /ydieresis def /EncodingVector ISOLatin1Encoding def } def
+
+% Encoding for ISO-8859-2 (also called as Latin-2), with corrections
+%      Levente NOVÁK <novak@jaguar.dote.hu>
+
+/ISOLatin2 { /EncodingCheck /ydieresis def /EncodingVector [
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright
+/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash
+/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon
+/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M
+/N/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright
+/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m
+/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/nbspace/Aogonek/breve/Lslash/currency/Lcaron/Sacute/section
+/dieresis/Scaron/Scommaaccent/Tcaron/Zacute/hyphen/Zcaron/Zdotaccent
+/degree/aogonek/ogonek/lslash/acute/lcaron/sacute/caron/cedilla
+/scaron/scommaaccent/tcaron/zacute/hungarumlaut/zcaron/zdotaccent
+/Racute/Aacute/Acircumflex/Abreve/Adieresis/Lacute/Cacute/Ccedilla
+/Ccaron/Eacute/Eogonek/Edieresis/Ecaron/Iacute/Icircumflex/Dcaron
+/Dcroat/Nacute/Ncaron/Oacute/Ocircumflex/Ohungarumlaut/Odieresis
+/multiply/Rcaron/Uring/Uacute/Uhungarumlaut/Udieresis/Yacute
+/Tcommaaccent/germandbls/racute/aacute/acircumflex/abreve/adieresis
+/lacute/cacute/ccedilla/ccaron/eacute/eogonek/edieresis/ecaron
+/iacute/icircumflex/dcaron/dcroat/nacute/ncaron/oacute/ocircumflex
+/ohungarumlaut/odieresis/divide/rcaron/uring/uacute/uhungarumlaut
+/udieresis/yacute/tcommaaccent/dotaccent
+] def } def
+
 
 /CP437 { /EncodingCheck /ydieresis def /EncodingVector [
 /.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
@@ -50,7 +86,7 @@ gnudict begin
 /.notdef/germandbls/.notdef/.notdef/.notdef/.notdef/mu/.notdef
 /.notdef/.notdef/.notdef/.notdef/infinity/.notdef/.notdef/.notdef
 /.notdef/plusminus/greaterequal/lessequal/.notdef/.notdef/divide/.notdef
-/degree/bullet/periodcentered/.notdef/nsuperior/twosuperior/.notdef
+/degree/bullet/periodcentered/.notdef/nsuperior/twosuperior/.notdef/.notdef
 ] def } def
 
 /CP850 { /EncodingCheck /ydieresis def /EncodingVector [
@@ -80,7 +116,7 @@ gnudict begin
 /Oacute/germandbls/Ocircumflex/Ograve/otilde/Otilde/mu/thorn
 /Thorn/Uacute/Ucircumflex/Ugrave/yacute/Yacute/macron/acute
 /hyphen/plusminus/equal/threequarters/paragraph/section/divide/.notdef
-/degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef
+/degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef/.notdef
 ] def } def
 
 /Numbs [ (040) (041) (042) (043) (044) (045) (046) (047)
@@ -425,8 +461,9 @@ Title stringwidth pop -2 div
 /Times-Roman findfont .20 scalefont setfont
 0 -.25 translate 0 0 moveto
 /Extra LastColumn 1 eq {(ISO Latin-1)} if
-       LastColumn 2 eq {(CP437)} if
-       LastColumn 3 eq {(CP850)} if def
+       LastColumn 2 eq {(ISO Latin-2)} if
+       LastColumn 3 eq {(CP437)} if
+       LastColumn 4 eq {(CP850)} if def
 /H (T = text (here Times-Roman)    S = Symbol    Z = ZapfDingbats    E = ) def
 H stringwidth pop Extra stringwidth pop add
 ( encoding) stringwidth pop add -2 div
@@ -462,10 +499,13 @@ Doit
 LastColumn 1 eq { % Times-Roman with ISO Latin-1 encoding
                   /TRISOL1 ISOLatin1 /Times-Roman reEncode
                   /TRISOL1 findfont .175 scalefont setfont } if
-LastColumn 2 eq { % subcolumn: Times-Roman with CP 437 encoding
+LastColumn 2 eq { % Times-Roman with ISO Latin-2 encoding
+                  /TRISOL2 ISOLatin2 /Times-Roman reEncode
+                  /TRISOL2 findfont .175 scalefont setfont } if
+LastColumn 3 eq { % subcolumn: Times-Roman with CP 437 encoding
                   /TRCP437 CP437 /Times-Roman reEncode
                   /TRCP437 findfont .175 scalefont setfont } if
-LastColumn 3 eq { % Times-Roman with CP 850 encoding
+LastColumn 4 eq { % Times-Roman with CP 850 encoding
                   /TRCP850 CP850 /Times-Roman reEncode
                   /TRCP850 findfont .175 scalefont setfont } if
 /dX 1.125 def      % subcolumn offset
