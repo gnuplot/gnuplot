@@ -18,8 +18,9 @@ gnuplot.doc -> gnuplot.gih
             -> gnuplot.hlp
             -> gnuplot.html
             -> gnuplot.info
-            -> gnuplot.itl
+            -> gnuplot.ipf
             -> gnuplot.ms
+            -> gnuplot.rnh
             -> gnuplot.rtf
             -> gnuplot.tex
     	   	  	 	    		
@@ -39,7 +40,8 @@ plots; the links for these are included in the file "gnuplot.html"
 
 Under EMACS, interactive help uses the file "gnuplot.info" ('make info').
 
-On OS/2, the interactive help uses the file "gnuplot.itl".
+On OS/2, the Information Presentation Facility Compiler converts the
+file "gnuplot.ipf" to a "gnuplot.inf" file.
 
 The printed document is available in troff/nroff (ms) format, using
 the file "gnuplot.ms".  For nroff, use 'make nroff'. For troff, type
@@ -69,11 +71,11 @@ The printed manual generators and the html generator contain information
 about all terminals.  This is accomplished by concatenating all of the
 ".trm" files into a single one, "allterm.h".
 
-The routine "termdoc.c" is #included by each of the eight processing
-programs ("doc2gih.c", etc.); it in turn #includes either "term.h" or
-"allterm.h", as is appropriate.  If you wish to override the default
-decision about which terminals are to appear in the documentation, edit
-the appropriate "doc2" program to either #define or #undefine ALL_TERM.
+The file "termdoc.c" is used by each of the eight processing programs
+("doc2gih.c", etc.); it #includes either "term.h" or "allterm.h", as is
+appropriate.  If you wish to override the default decision about which
+terminals are to appear in the documentation, edit the appropriate target
+in the Makefile and add/remove -DALL_TERM_DOC to/from the compiler flags.
 
 
 Description of the gnuplot.doc format:
