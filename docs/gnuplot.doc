@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.131 2002/08/30 18:45:44 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.132 2002/08/30 20:18:40 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -554,6 +554,10 @@ C
  Several gnuplot terminal drivers access TrueType fonts via the gd library.
  For these drivers the font search path is controlled by the environmental
  variable GDFONTPATH.
+ The postscript terminal uses its own font search path. It is controlled by
+ the environmental variable GNUPLOT_FONTPATH. The format is the same as for 
+ GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`
+ variable, but not saved with the `save` and `save set` commands.
 2 Expressions
 ?expressions
  In general, any mathematical expression accepted by C, FORTRAN, Pascal, or
@@ -4182,6 +4186,48 @@ C ... and restart the table:
  the device must be able to produce the desired non-standard characters.
  The PostScript and X11 terminals support all encodings. OS/2 Presentation
  Manager switches automatically to codepage 912 for `iso_8859_2`.
+3 fontpath
+?commands set fontpath
+?commands show fontpath
+?set fontpath
+?show fontpath
+?fontpath
+ The `fontpath` setting defines additional locations for font files
+ files searched when including font files. Yet, only the postscript terminal 
+ supports `fontpath`. If a file cannot be found in the current directory, 
+ the directories in `fontpath` are tried. Further documentation concerning
+ the supported file formats is included in the `terminal postscript` section
+ of the documentation.
+
+ Syntax:
+       set fontpath {"pathlist1" {"pathlist2"...}}
+       show fontpath
+
+ Path names may be entered as single directory names, or as a list of
+ path names separated by a platform-specific path separator, eg. colon
+ (':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+ The `show fontpath`, `save` and `save set` commands replace the
+ platform-specific separator with a space character (' ') for maximum
+ portability. If a directory name ends with an exclamation mark ('!') also
+ the subdirectories of this directory are searched for font files.
+
+ If the environmental variable GNUPLOT_FONTPATH is set, its contents are
+ appended to `fontpath`.  If it is not set, a system dependent default value
+ is used. It is set by testing several directories for existence when using
+ the fontpath the first time. Thus, the first call of `set fontpath`,
+ `show fontpath`, `save fontpath`, `plot`, or `splot` with embedded font
+ files takes a little more time. If you want to save this time you may
+ set the environmental variable GNUPLOT_FONTPATH since probing is switched
+ off, then. You can find out which is the default fontpath by using 
+ `show fontpath`.
+
+ However, `show fontpath` prints the contents of user defined fontpath and 
+ system fontpath separately.  Also, the `save` and `save set` commands save
+ only the user specified parts of `fontpath`, for portability reasons.
+
+ Many other terminal drivers access TrueType fonts via the gd library.
+ For these drivers the font search path is controlled by the environmental
+ variable GDFONTPATH.
 3 format
 ?commands set format
 ?commands show format

@@ -1,0 +1,130 @@
+\documentclass[a4paper,10pt]{article}
+%\usepackage[width=18cm,height=24cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+
+\font\cmmi=cmmi10
+\font\cmr=cmr10
+\font\cmti=cmti10
+\font\cmtt=cmtt10
+\font\cmu=cmu10
+\font\cmsy=cmsy10
+\font\cmex=cmex10
+\font\cmss=cmss10
+\font\cmff=cmff10
+\font\cmtex=cmtex10
+\font\lasy=lasy10
+
+\newcount\rownum
+
+\newcommand*\row[1]{%
+  \textbackslash #1 & 
+  {\cmr\char'#1} & 
+  {\cmti\char'#1} & 
+  {\cmtt\char'#1} & 
+  {\cmmi\char'#1} &
+  {\cmu\char'#1} &
+  {\cmss\char'#1} &
+  {\cmtex\char'#1} &
+  {\cmff\char'#1} &
+  {\cmsy\char'#1} &
+  {\lasy\char'#1} &
+  \ifodd\rownum \else\qquad\fi
+  \global\advance\rownum 1
+  {\raisebox{1.7ex}[0mm][1ex]{\cmex\char'#1}} &
+  \textbackslash #1 \\
+}
+
+\begin{document}
+\title{Using \TeX\ Fonts in the Gnuplot Postscript Terminal}
+\author{Harald Harders}
+\date{2002-08-30}
+\maketitle
+
+The Postscript terminal can embed Postscript Type\,1 fonts (with
+extensions \verb|.pfa| and \verb|.pfb|) and TrueType fonts (extension
+\verb|.ttf|) using the command
+\begin{verbatim}
+set terminal postscript fontfile '<filename>'
+\end{verbatim}
+The \verb|fontfile| option can be used multiple times.
+See the sections \emph{set terminal postscript} and \emph{set
+  fontpath} in the Gnuplot documentation for further description.
+
+The embedded font can be used by 
+\begin{verbatim}
+set terminal postscript '<fontname>' <size>
+\end{verbatim}
+or in postscript enhanced terminal as following example:
+\begin{verbatim}
+set xlabel '{/CMMI10 x}'
+\end{verbatim}
+
+The font embedding is useful for generating plots to be included in
+\LaTeX\ documents. 
+For normal text, the \emph{cm-super} Postscript Type\,1 fonts are a
+good choice. 
+They are available from CTAN servers, e.g.
+\begin{verbatim}
+ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/
+\end{verbatim}
+The normal upright font with serifes is defined in
+\verb|sfrm1000.pfb|, and the font name is \verb|sfrm1000| (The
+\verb|1000| means that this font is designed for 10\,pt).
+Replace the \verb|rm| by \verb|it|, \verb|bx| or other combinations in
+both the file name and the font name in order to get other font
+shapes.
+The encoding of these fonts is ordinary and thus is not described here.
+
+For mathematics the Type\,1 versions of the Computer Modern fonts are
+useful.
+They should be installed in most \TeX\ implementations and are also
+available from CTAN servers, e.g.
+\begin{verbatim}
+ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky/pfb/
+\end{verbatim}
+Here, the font name is the base of the file name in uppercase letters,
+e.g. the file \verb|cmmi10.pfb| contains the font \verb|CMMI10|.
+Since the encoding of these fonts is strange, a table containing all
+characters for some fonts follows.
+The font \verb|CMEX10| contains large symbols for mathematics. They
+overlap sometimes in the table. Since the baseline of the
+\verb|CMEX10| font is at the top of the signs, Gnuplot defines a font
+\verb|CMEX10-Baseline| with a different baseline if \verb|CMEX10| is
+embedded (normaly by using \verb|fontfile 'cmex10.pfb'|.
+
+\begin{longtable}{lllllllllllll}
+  \toprule
+  Oct& \rotatebox{90}{CMR10}& \rotatebox{90}{CMTI10}&
+  \rotatebox{90}{CMTT10}& \rotatebox{90}{CMMI10}&
+  \rotatebox{90}{CMU10}& \rotatebox{90}{CMSS10}&
+  \rotatebox{90}{CMTEX10}& \rotatebox{90}{CMFF10}&
+  \rotatebox{90}{CMSY10}& \rotatebox{90}{LASY10}&
+  \rotatebox{90}{CMEX10}& Oct\\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  \row{001}\row{002}\row{003}\row{004}\row{005}\row{006}\row{007}
+  \row{011}\row{012}\row{013}\row{014}\row{015}\row{016}\row{017}
+  \row{021}\row{022}\row{023}\row{024}\row{025}\row{026}\row{027}
+  \row{031}\row{032}\row{033}\row{034}\row{035}\row{036}\row{037}
+  \row{041}\row{042}\row{043}\row{044}\row{045}\row{046}\row{047}
+  \row{051}\row{052}\row{053}\row{054}\row{055}\row{056}\row{057}
+  \row{061}\row{062}\row{063}\row{064}\row{065}\row{066}\row{067}
+  \row{071}\row{072}\row{073}\row{074}\row{075}\row{076}\row{077}
+  %
+  \row{101}\row{102}\row{103}\row{104}\row{105}\row{106}\row{107}
+  \row{111}\row{112}\row{113}\row{114}\row{115}\row{116}\row{117}
+  \row{121}\row{122}\row{123}\row{124}\row{125}\row{126}\row{127}
+  \row{131}\row{132}\row{133}\row{134}\row{135}\row{136}\row{137}
+  \row{141}\row{142}\row{143}\row{144}\row{145}\row{146}\row{147}
+  \row{151}\row{152}\row{153}\row{154}\row{155}\row{156}\row{157}
+  \row{161}\row{162}\row{163}\row{164}\row{165}\row{166}\row{167}
+  \row{171}\row{172}\row{173}\row{174}\row{175}\row{176}\row{177}
+  %
+\end{longtable}
+
+\end{document}

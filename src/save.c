@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.48 2002/08/30 18:45:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.49 2002/08/30 20:18:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -943,6 +943,14 @@ set ticscale %g %g\n",
     {
 	char *s;
 	while ((s = save_loadpath()) != NULL)
+	    fprintf(fp, "\"%s\" ", s);
+	fputc('\n', fp);
+    }
+
+    fputs("set fontpath ", fp);
+    {
+	char *s;
+	while ((s = save_fontpath()) != NULL)
 	    fprintf(fp, "\"%s\" ", s);
 	fputc('\n', fp);
     }

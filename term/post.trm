@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.73 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: post.trm,v 1.74 2002/08/30 20:18:26 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -152,6 +152,16 @@ static TBOOLEAN ps_duplex_option = FALSE;
 
 /* added by Harald Harders <h.harders@tu-bs.de> */
 static TBOOLEAN ps_rounded = FALSE;	/* rounded linecaps and linejoins */
+
+/* Datastructure implementing inclusion of font files */
+struct ps_fontfile_def {
+    struct ps_fontfile_def *next;/* pointer to next fontfile in linked list */
+    char *fontfile_name;
+};
+struct ps_fontfile_def *first_ps_fontfile = NULL;
+static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
+
+
 
 static const char GPFAR * GPFAR PS_header[] = {
 "/M {moveto} bind def\n",
@@ -598,7 +608,7 @@ enum PS_id {
     PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
-    PS_ROUNDED, PS_NOROUNDED,
+    PS_ROUNDED, PS_NOROUNDED, PS_FONTFILE,
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
@@ -629,6 +639,7 @@ static struct gen_table PS_opts[] =
     { "defaultp$lex", PS_DEFAULTPLEX },
     { "butt", PS_NOROUNDED },
     { "rou$nded", PS_ROUNDED },
+    { "fontf$ile", PS_FONTFILE },
 #ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
@@ -640,6 +651,7 @@ TERM_PUBLIC void
 PS_options()
 {
     struct value a;
+    char *ps_fontfile_char = NULL;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PS_opts[0],c_token)) {
@@ -668,6 +680,8 @@ PS_options()
 	    ps_linewidth_factor = 1.0;
 	    ps_duplex_option = FALSE;
 	    ps_rounded = FALSE;
+	    while (first_ps_fontfile != NULL)
+		delete_ps_fontfile((struct ps_fontfile_def *) NULL, first_ps_fontfile);
 	    strcpy(ps_font,"Helvetica");
 	    ps_fontsize = 14;
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
@@ -747,6 +761,73 @@ PS_options()
 	    ps_rounded = FALSE;
 	    c_token++;
 	    break;
+        case PS_FONTFILE: {
+            TBOOLEAN deleteentry = FALSE;
+            c_token++;
+           
+            if (!isstring(c_token)) {
+                if (equals(c_token, "add"))
+                    c_token++;
+                else if (almost_equals(c_token, "del$ete")) {
+                    deleteentry = TRUE;
+                    c_token++;
+                } else
+                    int_error(c_token, "Font filename expected");
+            }
+            if (isstring(c_token)) {
+                TBOOLEAN filename_doubled = FALSE;
+                struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
+                struct ps_fontfile_def *prev_ps_fontfile = NULL;
+                struct ps_fontfile_def *new_ps_fontfile = 
+                     gp_alloc(sizeof(struct ps_fontfile_def), 
+                             "new_ps_fontfile");
+ 
+                new_ps_fontfile->fontfile_name = 
+                    gp_alloc (token_len(c_token), 
+                              "new_ps_fontfile->fontfile_name");
+                quote_str(new_ps_fontfile->fontfile_name, 
+                          c_token, token_len(c_token));
+                gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
+                new_ps_fontfile->next = NULL;
+  
+                if (first_ps_fontfile) {
+                    while (curr_ps_fontfile) {
+                        if (strcmp(curr_ps_fontfile->fontfile_name,
+                                   new_ps_fontfile->fontfile_name) == 0) {
+                            filename_doubled = TRUE;
+                            if (deleteentry) {
+                                if (prev_ps_fontfile)
+                                    prev_ps_fontfile->next = 
+                                        curr_ps_fontfile->next;
+                                else
+                                    first_ps_fontfile = curr_ps_fontfile->next;
+                                free(curr_ps_fontfile);
+                                curr_ps_fontfile = NULL;
+                                break;
+                            }
+                        }
+                        prev_ps_fontfile = curr_ps_fontfile;
+                        curr_ps_fontfile = curr_ps_fontfile->next;
+                    }
+                    if (!filename_doubled) {
+                        if (!deleteentry)
+                            prev_ps_fontfile->next = new_ps_fontfile;
+                        else
+                            int_warn(c_token,"Can't delete Font filename '%s'",
+                                     new_ps_fontfile->fontfile_name);
+                    }
+                } else {
+                    if (!deleteentry)
+                        first_ps_fontfile = new_ps_fontfile;
+                    else
+                        int_warn(c_token, "Can't delete Font filename '%s'",
+                                 new_ps_fontfile->fontfile_name);
+                }
+                c_token++;
+            } else
+                int_error(c_token, "Font filename expected");
+            break;
+        }
 #ifdef PM3D
 	case PS_PALFUNCPARAM:
 	    ++c_token;
@@ -780,6 +861,28 @@ PS_options()
 	ps_blacktext = TRUE;
 
     sprintf(PS_default_font,"%s,%d",ps_font,ps_fontsize);
+  
+    if (first_ps_fontfile) {
+	struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
+	unsigned int totlength = 0;
+	char *running;
+	
+	while (curr_ps_fontfile) {
+	    totlength += strlen(curr_ps_fontfile->fontfile_name) + 
+		strlen(" fontfile \"\"");
+	    curr_ps_fontfile = curr_ps_fontfile->next;
+	}
+	curr_ps_fontfile = first_ps_fontfile;
+	ps_fontfile_char = gp_alloc (totlength+1,"ps_fontfile_char");
+	running = ps_fontfile_char;
+	while (curr_ps_fontfile) {
+	    sprintf(running," fontfile \"%s\"",
+		    curr_ps_fontfile->fontfile_name);
+	    running += strlen(running);
+	    curr_ps_fontfile = curr_ps_fontfile->next;
+	}
+    }
+  
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
     sprintf(term_options,"%s %senhanced %s %s \\\n"
@@ -787,7 +890,7 @@ PS_options()
 #ifdef PM3D
 	                 "   palfuncparam %d,%g \\\n"
 #endif /* PM3D */
-	                 "   %s \"%s\" %d",
+	                 "   %s \"%s\" %d%s",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
@@ -801,7 +904,8 @@ PS_options()
 	    ps_palfunc_samples, ps_palfunc_deviation,
 #endif /* PM3D */
 	    ps_rounded ? "rounded" : "butt",
-	    ps_font,ps_fontsize);
+	    ps_font,ps_fontsize,
+	    ps_fontfile_char ? ps_fontfile_char : "");
 }
 
 /* store settings passed to common_init() for use in PS_graphics()
@@ -811,6 +915,188 @@ static int ps_common_encap;
 static int ps_common_portrait;
 static int ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
+
+
+TERM_PUBLIC void
+PS_load_fontfiles()
+{
+    struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
+    while (current_ps_fontfile) {
+	unsigned int linesread = 0;
+	FILE *ffont;
+	char line[256];
+	char ext[4];
+	char *fullname = NULL;
+	char cmd[256];
+	char *fontname = NULL;
+#if defined(PIPES)
+	char *envcmd = NULL;
+	TBOOLEAN ispipe = FALSE;
+#endif
+	ext[0] = '\0';
+	cmd[0] = '\0';
+
+	fprintf(gpoutfile,"%%BeginProcSet: %s\n",
+		current_ps_fontfile->fontfile_name);
+	/* get filename extension if no pipe (if pipe *ext=='\0') */
+#if defined(PIPES)
+	if ( *(current_ps_fontfile->fontfile_name) != '<' ) {
+	    /* Filename is given */
+#endif
+	    if ( strlen(current_ps_fontfile->fontfile_name) > 3 )
+		strcpy(ext, current_ps_fontfile->fontfile_name + 
+		       strlen(current_ps_fontfile->fontfile_name) - 3);
+	    else
+		strcpy(ext, current_ps_fontfile->fontfile_name);
+
+	    /* make extension lowercase for comparison */
+	    lower_case(ext);
+	    
+	    /* get fullname of fontfile */
+	    fullname = fontpath_fullname(current_ps_fontfile->fontfile_name);
+	    if (!fullname)
+		int_error(NO_CARET, "Font file '%s' not found",
+			  current_ps_fontfile->fontfile_name);
+#if defined(PIPES)
+	}
+#endif
+	if ( strlen(ext) == 0 ) {
+#if defined(PIPES)
+	    /* Pipe is given */
+	    ispipe = TRUE;
+	    ffont = popen( current_ps_fontfile->fontfile_name + 1, "r" );
+	    if ( !ffont )
+		int_error(NO_CARET, "Could not execute pipe '%s'",
+			  current_ps_fontfile->fontfile_name + 1 );
+#endif
+	}
+	else if ( strcmp(ext,"ttf") == 0 ) {
+	    /* TrueType */
+#if defined(PIPES)
+	    ispipe = TRUE;
+	    envcmd = getenv("GNUPLOT_TTFTOPFA");
+	    if (envcmd != NULL)
+		sprintf(cmd,envcmd,fullname);
+	    else
+		sprintf(cmd,"ttftopfa -a -e %s - 2>/dev/null",fullname);
+	    if (strlen(cmd) == 0)
+		int_error(NO_CARET, 
+			  "No command for automatic font conversion ttf->pfa defined");
+	    else {
+		ffont = popen(cmd,"r");
+		if ( !ffont )
+		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
+	    }
+#else
+	    os_error(NO_CARET, 
+		     "Automatic font conversion ttf->pfa not supported");
+#endif
+	} else if ( strcmp(ext,"pfb") == 0 ) {
+	    /* PFB */
+#if defined(PIPES)
+	    ispipe = TRUE;
+	    envcmd = getenv("GNUPLOT_PFBTOPFA");
+	    if (envcmd != NULL)
+		sprintf(cmd,envcmd,fullname);
+	    else
+		sprintf(cmd,"pfbtops %s 2>/dev/null",fullname);
+	    if (strlen(cmd) == 0)
+		int_error(NO_CARET, 
+			  "No command for automatic font conversion pfb->pfa defined");
+	    else {
+		ffont = popen(cmd,"r");
+		if ( !ffont )
+		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
+	    }
+#else
+	    os_error(NO_CARET, 
+		     "Automatic font conversion pfb->pfa not supported");
+#endif
+	} else {
+	    /* PFA */
+	    if ( strcmp(ext,"pfa") != 0 )
+		int_warn(NO_CARET, 
+			 "Font file '%s' has unknown extension. Assume it is a pfa file", 
+			 current_ps_fontfile->fontfile_name);
+	    ffont = fopen(fullname, "r");
+	}
+	/* read the file */
+	while (fgets(line,255,ffont)) {
+	    /* test file format */
+	    if ( (linesread == 0) && 
+		 (strstr(line,"%!PS-AdobeFont") != line) &&
+		 (strstr(line,"%!FontType1") != line) ) {
+		printf("%s\n",line);
+#if defined(PIPES)
+		if ( ispipe )
+		    int_warn(NO_CARET,
+			     "Command '%s' seems not to generate PFA data",
+			     cmd);
+		else
+#endif
+		    int_warn(NO_CARET, 
+			     "Font file '%s' seems not to be a PFA file",
+			     current_ps_fontfile->fontfile_name);
+	    }
+	    /* get fontname */
+	    if (strstr(line,"/FontName") == line) {
+		char *fnende = NULL;
+		fontname = gp_alloc(strlen(line)-9,"load_fontfiles");
+		strcpy(fontname,strstr(line+1,"/")+1);
+		fnende = strstr(fontname," ");
+		*fnende = '\0';
+	    }
+
+	    fputs(line,gpoutfile);
+	    ++linesread;
+	}
+#if defined(PIPES)
+	if ( ispipe ) {
+	    int exitcode;
+	    if ( (exitcode = pclose(ffont)) != 0 )
+		int_error(NO_CARET,
+			  "Command '%s' generated error, exitcode is %d",
+			  cmd, exitcode);
+	}
+	else
+#endif
+	    fclose(ffont);
+
+	if (linesread == 0) {
+#if defined(PIPES)
+	    if ( ispipe )
+		int_error(NO_CARET,
+			  "Command '%s' generates empty output",
+			  cmd);
+	    else
+#endif
+		int_error(NO_CARET, "Font file '%s' is empty",
+			  current_ps_fontfile->fontfile_name);
+	}
+	fputs("%%EndProcSet\n",gpoutfile);
+	if (fullname) {
+	    free(fullname);
+	    fullname = NULL;
+	}
+	/* Computer Modern Symbol font with corrected baseline if the
+	 * font CMEX10 is embedded */
+	if ( fontname && (strcmp(fontname,"CMEX10") == 0) ) {
+	    fputs("%%BeginProcSet: CMEX10-Baseline\n",gpoutfile);
+	    fputs("/CMEX10-Baseline /CMEX10 findfont [1 0 0 1 0 1] makefont\n",
+		  gpoutfile);
+	    fputs("dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n", gpoutfile);
+	    fputs("currentdict end definefont pop\n", gpoutfile);
+	    fputs("%%EndProcSet\n",gpoutfile);
+	}
+
+	if (fontname) {
+	    free(fontname);
+	    fontname = NULL;
+	}
+
+	current_ps_fontfile = current_ps_fontfile->next;
+    }
+}
 
 
 TERM_PUBLIC void
@@ -1149,12 +1435,15 @@ NULL };
     if (ps_duplex_option)
 	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
 		ps_duplex_state ? "true" : "false");
-    if (uses_fonts)
-	PS_RememberFont(ps_font, 1);
 
     if (dict)
 	while (*dict)
 	    fputs(*(dict++), gpoutfile);	
+
+    PS_load_fontfiles();
+
+    if (uses_fonts)
+	PS_RememberFont(ps_font, 1);
 
     fputs("end\n%%EndProlog\n", gpoutfile);
 }
@@ -2366,6 +2655,21 @@ TERM_PUBLIC void PS_previous_palette(void)
     fprintf(gpoutfile, "grestore %% colour palette end\n");
 }
 
+static void
+delete_ps_fontfile(prev, this)
+struct ps_fontfile_def *prev, *this;
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (prev != NULL)	/* there is a previous ps_fontfile */
+	    prev->next = this->next;
+	else			/* this = first_ps_fontfile so change first_ps_fontfile */
+	    first_ps_fontfile = this->next;
+	free(this->fontfile_name);
+	free(this);
+    }
+}
+
+
 #endif /* PM3D */
 
 #endif /* TERM_BODY */
@@ -2418,6 +2722,7 @@ START_HELP(post)
 "                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
 "                               {rounded | butt}",
+"                               {fontfile [add | delete] \"<filename>\"}",
 "                               {palfuncparam <samples>{,<maxdeviation>}}",
 "                               {\"<fontname>\"} {<fontsize>}",
 "",
@@ -2463,6 +2768,14 @@ START_HELP(post)
 " mode the whole plot, including the fonts, is reduced to half of the default",
 " size.",
 "",
+" Fonts listed by `fontfile` or `fontfile add` encapsulate the font",
+" definitions of the listed font from a postscript Type 1 or TrueType font",
+" file directly into the gnuplot output postscript file. Thus, the enclosed",
+" font can be used in labels, titles, etc. See the section `postscript",
+" fontfile` for more details.",
+" With `fontfile delete` a fontfile is deleted from the list of embedded",
+" files.",
+"",
 " Examples:",
 "       set terminal postscript default       # old postscript",
 "       set terminal postscript enhanced      # old enhpost",
@@ -2470,6 +2783,7 @@ START_HELP(post)
 "       set terminal postscript eps 14        # old epsf1",
 "       set terminal postscript eps 22        # old epsf2",
 "       set size 0.7,1.4; set term post portrait color \"Times-Roman\" 14",
+"       set term post \"VAGRoundedBT_Regular\" 14 fontfile \"bvrr8a.pfa\"",
 "",
 " Linewidths and pointsizes may be changed with `set style line`.",
 "",
@@ -2477,14 +2791,16 @@ START_HELP(post)
 " through the `pointtype` option on `plot` and `set style line`.",
 "",
 " Several possibly useful files about `gnuplot`'s PostScript are included",
-" in the /docs/ps subdirectory of the `gnuplot` distribution and at the",
+" in the /docs/psdoc subdirectory of the `gnuplot` distribution and at the",
 " distribution sites.  These are \"ps_symbols.gpi\" (a `gnuplot` command file",
 " that, when executed, creates the file \"ps_symbols.ps\" which shows all the",
 " symbols available through the `postscript` terminal), \"ps_guide.ps\" (a",
 " PostScript file that contains a summary of the enhanced syntax and a page",
-" showing what the octal codes produce with text and symbol fonts) and",
+" showing what the octal codes produce with text and symbol fonts),",
 " \"ps_file.doc\" (a text file that contains a discussion of the organization",
-" of a PostScript file written by `gnuplot`).",
+" of a PostScript file written by `gnuplot`), and \"ps_fontfile_doc.tex\"",
+" (a LaTeX file which contains a short documentation concerning the",
+" encapsulation of LaTeX fonts with a glyph table of the math fonts).",
 "", 
 " A PostScript file is editable, so once `gnuplot` has created one, you are",
 " free to modify it to your heart's desire.  See the `editing postscript`",
@@ -2587,7 +2903,7 @@ START_HELP(post)
 "       set title '{/Symbol=18 \\362@_{/=9.6 0}^{/=12 x}} \\",
 "                  {/Helvetica e^{-{/Symbol m}^2/2} d}{/Symbol m}'",
 "",
-" The file \"ps_guide.ps\" in the /docs/ps subdirectory of the `gnuplot` source",
+" The file \"ps_guide.ps\" in the /docs/psdoc subdirectory of the `gnuplot` source",
 " distribution contains more examples of the enhanced syntax.",
 "2 editing postscript",
 "?commands set terminal postscript editing",
@@ -2613,6 +2929,103 @@ START_HELP(post)
 "",
 " The organization of a PostScript file written by `gnuplot` is discussed in",
 " the text file \"ps_file.doc\" in the docs/ps subdirectory of the gnuplot",
-" source distribution."
+" source distribution.",
+"2 postscript fontfile",
+"?commands set terminal postscript fontfile",
+"?set terminal postscript fontfile",
+"?set term postscript fontfile",
+"?terminal postscript fontfile",
+"?term postscript fontfile",
+"?fontfile",
+"?fontfile",
+" The `fontfile` or `fontfile add` option takes one file name as argument",
+" and encapsulates this file into the postscript output in order to make",
+" this font available for text elements (labels, tic marks, titles, etc.).",
+" The `fontfile delete` option also takes one file name as argument. It",
+" deletes this file name from the list of encapsulated files.",
+"",
+" The postscript terminal understands some",
+" font file formats: Type 1 fonts in ASCII file format (extension \".pfa\"),",
+" Type 1 fonts in binary file format (extension \".pfb\"), and TrueType",
+" fonts (extension \".ttf\"). Pfa files are understood directly, pfb and ttf",
+" files are converted on the fly if appropriate conversion tools are",
+" installed (see below). You have to specify the full filename with the",
+" extension. Each `fontfile` option takes exact one font file name. This",
+" option can be used multiple times in order to include more than one font",
+" file.",
+"",
+" The font file is searched in the working directory and in all directories",
+" listed in the fontpath which is determined by `set fontpath`.",
+" In addition, the fontpath can be set using the environment variable",
+" GNUPLOT_FONTPATH. If this is not set a system dependent default search",
+" list is used. See `set fontpath` for more details.",
+"",
+" For using the encapsulated font file you have to specify the font name",
+" (which normally is not the same as the file name). When using pfa or pfb",
+" fonts, you can find it out by looking into the font file. There is a line",
+" similar to \"/FontName /CMR8 def\". The middle string without the slash",
+" is the fontname, here \"CMR8\".",
+"",
+" For converting font files to pfa format the conversion tool has to read",
+" the font from a file and write it to standard output.",
+" For pfb files \"pfbtops\" is a tool which can do this. If this program",
+" is installed on your system the on the fly conversion should work.",
+" Just try to encapsulate a pfb file. If the compiled in program call does",
+" not work correctly you can specify how this program is called by",
+" defining the environment variable GNUPLOT_PFBTOPFA e.g. to",
+" \"pfbtops %s\". The `%s` will be repeated by the font file name and thus",
+" has to exist in the string.",
+" If you don't want to do the conversion on the fly but get a pfa file of",
+" the font you can use the tool \"pfb2pfa\" which is written in simple c",
+" and should compile with any c compiler.",
+" It is available from many ftp servers, e.g.",
+"^ <a href=\"ftp://ftp.dante.de/tex-archive/fonts/utilities/ps2mf/\">",
+"           ftp://ftp.dante.de/tex-archive/fonts/utilities/ps2mf/",
+"^ </a>",
+" In fact, \"pfbtopfa\" and \"pfb2ps\" do the same job. \"pfbtopfa\" puts",
+" the resulting pfa code into a file, whereas \"pfbtops\" writes it to",
+" standard output.",
+"",
+" TrueType fonts are converted into Type 1 pfa format, e.g.",
+" by using the tool \"ttf2pt1\" which is available from",
+"^ <a href=\"http://ttf2pt1.sourceforge.net/\">",
+"           http://ttf2pt1.sourceforge.net/",
+"^ </a>",
+" If the build in conversion does not",
+" work, the conversion command can be changed by the environment variable",
+" GNUPLOT_TTFTOPFA. For usage with ttf2pt1 it may be set to",
+" \"ttf2pt1 -a -e %s - 2>/dev/null\". Here again, `%s` stands for the",
+" file name.",
+"",
+" For special purposes you also can use a pipe (if available for your",
+" operating system). Therefore you start the file name definition with ",
+" the character \"<\" and append a program call. This program has ",
+" to write pfa data to standard output. Thus, a pfa file may be accessed",
+" by `set fontfile \"< cat garamond.pfa\"`.",
+"",
+" For example, including Type 1 font files can be used for including the",
+" postscript output in LaTeX documents. The \"european computer modern\"",
+" font (which is a variant of the \"computer modern\" font) is available",
+" in pfb format from any CTAN server, e.g.",
+"^ <a href=\"ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/\">",
+"           ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/",
+"^ </a>",
+" For example, the file \"sfrm1000.pfb\" contains the normal upright fonts",
+" with serifs in the design size 10pt.",
+" The computer modern fonts, which are still necessary for mathematics,",
+" are available from `ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky`.",
+" With these you can use any character available in TeX. However, the",
+" computer modern fonts have a strange encoding. (This is why you should not",
+" use cmr10.pfb for text, but sfrm1000.pfb instead.)",
+" The usage of TeX fonts is shown in one of the demos.",
+"",
+" If the font \"CMEX10\" is embedded (file \"cmex10.pfb\") Gnuplot defines",
+" the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
+" to fit better to the other glyphs (CMEX10 has its baseline at the top of",
+" the symbols).",
+"",
+" The file \"ps_fontfile_doc.tex\" in the /docs/psdoc subdirectory of the",
+" `gnuplot` source distribution contains a table with glyphs of the TeX",
+" mathematics fonts."
 END_HELP(post)
 #endif /* TERM_HELP */

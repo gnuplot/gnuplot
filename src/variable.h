@@ -1,5 +1,5 @@
 /*
- * $Id: variable.h,v 1.10 2000/11/01 18:57:34 broeker Exp $
+ * $Id: variable.h,v 1.11 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - variable.h */
@@ -89,6 +89,16 @@ char *loadpath_handler __PROTO((int, char *));
 #define get_loadpath()     loadpath_handler(ACTION_GET,NULL)
 #define save_loadpath()    loadpath_handler(ACTION_SAVE,NULL)
 #define clear_loadpath()   loadpath_handler(ACTION_CLEAR,NULL)
+
+/* Fontpath related */
+
+char *fontpath_handler __PROTO((int, char *));
+
+#define init_fontpath()    fontpath_handler(ACTION_INIT,NULL)
+#define set_var_fontpath(path) fontpath_handler(ACTION_SET,(path))
+#define get_fontpath()     fontpath_handler(ACTION_GET,NULL)
+#define save_fontpath()    fontpath_handler(ACTION_SAVE,NULL)
+#define clear_fontpath()   fontpath_handler(ACTION_CLEAR,NULL)
 
 /* Locale related */
 

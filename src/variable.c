@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.13 2000/11/01 18:57:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.14 2002/02/21 12:27:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -35,6 +35,8 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.13 2000/11/01 18:57:34 
 ]*/
 
 /* The Death of Global Variables - part one. */
+
+#include <string.h>
 
 #include "variable.h"
 
@@ -187,6 +189,344 @@ char *path;
     /* should always be ignored - points to the
      * first path in the list */
     return loadpath;
+
+}
+
+
+
+struct path_table {
+    const char *dir;
+};
+
+/* Yet, no special font paths for these operating systems:
+ * MSDOS, ATARI, AMIGA, MTOS, NeXT, ultrix, VMS, _IBMR2, alliant
+ *
+ * Environmental variables are written as $(name).
+ * Commands are written as $`command`.
+ */
+
+#if defined(OS2) && !defined(FONTPATHSET)
+#  define FONTPATHSET
+const struct path_table fontpath_tbl[] =
+{
+    { "$(BOOTDIR)/PSFONTS" },
+    /* X11 */
+    { "$(X11ROOT)/X11R6/lib/X11/fonts/Type1" },
+    { NULL }
+};
+#endif
+
+#if defined(_Windows) && !defined(FONTPATHSET)
+#  define FONTPATHSET
+const struct path_table fontpath_tbl[] =
+{
+    { "$(windir)/fonts" },
+    /* Ghostscript */
+    { "c:/gs/fonts" },
+    /* X11 */
+    { "$(CYGWIN_ROOT)/usr/X11R6/lib/X11/fonts/Type1" },
+    /* fpTeX */
+    { "$`kpsewhich -expand-path=$TEXMFMAIN`/fonts/type1!" },
+    { "$`kpsewhich -expand-path=$TEXMFLOCAL`/fonts/type1!" },
+    { NULL }
+};
+#endif
+
+#if defined(_Macintosh) && !defined(FONTPATHSET)
+#  define FONTPATHSET
+const struct path_table fontpath_tbl[] =
+{
+    { "/System/Library/Fonts!" },
+    { "/Library/Fonts!" },
+    { "$(HOME)/Library/Fonts!" },
+    { NULL }
+};
+#endif
+
+#if defined(VMS) && !defined(FONTPATHSET)
+#  define FONTPATHSET
+const struct path_table fontpath_tbl[] =
+{
+    { "SYS$COMMON:[SYSFONT]!" },
+    { NULL }
+};
+#endif
+
+/* Fallback: Should work for unix */
+#ifndef FONTPATHSET
+const struct path_table fontpath_tbl[] =
+{
+    /* Linux paths */
+    { "/usr/X11R6/lib/X11/fonts/Type1" },
+    { "/usr/X11R6/lib/X11/fonts/truetype" },
+    /* HP-UX */
+    { "/usr/lib/X11/fonts!"},
+    /* Ghostscript */
+    { "/usr/share/ghostscript/fonts" },
+    { "/usr/local/share/ghostscript/fonts" },
+    /* teTeX */
+    { "$`kpsexpand '$TEXMFMAIN'`/fonts/type1!" },
+    { "$`kpsexpand '$TEXMFLOCAL'`/fonts/type1!" },
+    { NULL }
+};
+#endif
+
+#undef FONTPATHSET
+
+static TBOOLEAN fontpath_init_done = FALSE;
+
+/*
+ * char *fontpath_handler (int, char *)
+ *
+ */
+char *
+fontpath_handler(action, path)
+     int action;
+     char *path;
+{
+    /* fontpath variable
+     * the path elements are '\0' separated (!)
+     * this way, reading out fontpath is very
+     * easy to implement */
+    static char *fontpath;
+    /* index pointer, end of fontpath,
+     * env section of fontpath, current limit, in that order */
+    static char *p, *last, *envptr, *limit;
+    static int beenhere;
+
+    if (!fontpath_init_done) {
+	fontpath_init_done = TRUE;
+	init_fontpath();
+    }
+
+    switch (action) {
+    case ACTION_CLEAR:
+	/* Clear fontpath, fall through to init */
+	FPRINTF((stderr, "Clear fontpath\n"));
+	free(fontpath);
+	fontpath = p = last = NULL;
+	/* HBB 20000726: 'limit' has to be initialized to NULL, too! */
+	limit = NULL;
+    case ACTION_INIT:
+	/* Init fontpath from environment */
+	FPRINTF((stderr, "Init fontpath from environment\n"));
+	assert(fontpath == NULL);
+	if (!fontpath)
+	{
+	    char *envlib = getenv("GNUPLOT_FONTPATH");
+	    if (envlib) {
+		/* get paths from environment */
+		int len = strlen(envlib);
+		fontpath = gp_strdup(envlib);
+		/* point to end of fontpath */
+		last = fontpath + len;
+		/* convert all PATHSEPs to \0 */
+		PATHSEP_TO_NUL(fontpath);
+	    } else {
+		/* set hardcoded paths */
+		const struct path_table *curr_fontpath = fontpath_tbl;
+
+		while (curr_fontpath->dir) {
+		    char *currdir = NULL;
+		    char *envbeg = NULL;
+#if defined(PIPES)
+		    char *cmdbeg = NULL;
+#endif
+		    TBOOLEAN subdirs = FALSE;
+
+		    currdir = gp_strdup( curr_fontpath->dir );
+
+		    while ( (envbeg=strstr(currdir, "$(")) 
+#if defined(PIPES)
+			    || (cmdbeg=strstr( currdir, "$`" ))
+#endif 
+			    ) {
+			/* Read environment variables */
+			if (envbeg) {
+			    char *tmpdir = NULL;
+			    char *envend = NULL, *envval = NULL;
+			    unsigned int envlen;
+			    envend = strchr(envbeg+2,')');
+			    envend[0] = '\0';
+			    envval = getenv(envbeg+2);
+			    envend[0] = ')';
+			    envlen = envval ? strlen(envval) : 0;
+			    tmpdir = gp_alloc(strlen(currdir)+envlen
+					      +envbeg-envend+1,
+					      "expand fontpath");
+			    strncpy(tmpdir,currdir,envbeg-currdir);
+			    if (envval)
+				strcpy(tmpdir+(envbeg-currdir),envval);
+			    strcpy(tmpdir+(envbeg-currdir+envlen), envend+1);
+
+			    free(currdir);
+			    currdir = tmpdir;
+			}
+#if defined(PIPES)
+			/* Read environment variables */
+			else if (cmdbeg) {
+			    char *tmpdir = NULL;
+			    char *envend = NULL;
+			    char envval[256];
+			    unsigned int envlen;
+			    FILE *fcmd;
+			    envend = strchr(cmdbeg+2,'`');
+			    envend[0] = '\0';
+			    fcmd = popen(cmdbeg+2,"r");
+			    if (fcmd) {
+				fgets(envval,255,fcmd);
+				if (envval[strlen(envval)-1]=='\n')
+				    envval[strlen(envval)-1]='\0';
+				pclose(fcmd);
+			    }
+			    envend[0] = '`';
+			    envlen = strlen(envval);
+			    tmpdir = gp_alloc(strlen(currdir)+envlen
+					      +cmdbeg-envend+1,
+					      "expand fontpath");
+			    strncpy(tmpdir,currdir,cmdbeg-currdir);
+			    if (envval)
+				strcpy(tmpdir+(cmdbeg-currdir),envval);
+			    strcpy(tmpdir+(cmdbeg-currdir+envlen), envend+1);
+
+			    free(currdir);
+			    currdir = tmpdir;
+			}
+#endif
+		    }
+
+		    if ( currdir[strlen(currdir)-1] == '!' ) {
+			/* search subdirectories */
+			/* delete ! from directory name */
+			currdir[strlen(currdir)-1] = '\0';
+			subdirs = TRUE;
+		    }
+
+		    if ( existdir( currdir ) ) {
+			size_t plen;
+			if ( subdirs )
+			    /* add ! to directory name again */
+			    currdir[strlen(currdir)] = '!';
+			plen = strlen(currdir);
+			if (fontpath) {
+			    size_t elen = strlen(fontpath);
+			    fontpath = gp_realloc(fontpath, 
+						  elen + 1 + plen + 1, 
+						  "expand fontpath");
+			    last = fontpath+elen;
+			    *last = PATHSEP;
+			    ++last;
+			    *last = '\0';
+			} else {
+			    fontpath = gp_alloc(plen + 1, 
+						"expand fontpath");
+			    last = fontpath;
+			}
+		    
+			strcpy(last, currdir );
+			last += plen;
+		    }
+		    curr_fontpath++;
+		    if (currdir) {
+			free(currdir);
+			currdir = NULL;
+		    }
+		}
+		/* convert all PATHSEPs to \0 */
+		if (fontpath)
+		    PATHSEP_TO_NUL(fontpath);
+	    }
+		
+	}			/* else: already initialised; int_warn (?) */
+	/* point to env portion of fontpath */
+	envptr = fontpath;
+	break;
+    case ACTION_SET:
+	/* set the fontpath */
+	FPRINTF((stderr, "Set fontpath\n"));
+	if (path && *path != NUL) {
+	    /* length of env portion */
+	    size_t elen = last - envptr;
+	    size_t plen = strlen(path);
+	    if (fontpath && envptr) {
+		/* we are prepending a path name; because
+		 * realloc() preserves only the contents up
+		 * to the minimum of old and new size, we move
+		 * the part to be preserved to the beginning
+		 * of the string; use memmove() because strings
+		 * may overlap */
+		memmove(fontpath, envptr, elen + 1);
+	    }
+	    fontpath = gp_realloc(fontpath, elen + 1 + plen + 1, "expand fontpath");
+	    /* now move env part back to the end to make space for
+	     * the new path */
+	    memmove(fontpath + plen + 1, fontpath, elen + 1);
+	    strcpy(fontpath, path);
+	    /* separate new path(s) and env path(s) */
+	    fontpath[plen] = PATHSEP;
+	    /* adjust pointer to env part and last */
+	    envptr = &fontpath[plen+1];
+	    last = envptr + elen;
+	    PATHSEP_TO_NUL(fontpath);
+	}			/* else: NULL = empty */
+	break;
+    case ACTION_SHOW:
+	/* print the current, full fontpath */
+	FPRINTF((stderr, "Show fontpath\n"));
+	if (fontpath) {
+	    p = fontpath;
+	    fputs("\tfontpath is ", stderr);
+	    PRINT_LOADPATH(envptr);
+	    if (envptr) {
+		/* env part */
+		p = envptr;
+		fputs("\tsystem fontpath is ", stderr);
+		PRINT_LOADPATH(last);
+	    }
+	} else
+	    fputs("\tfontpath is empty\n", stderr);
+	break;
+    case ACTION_SAVE:
+	/* we don't save the font path taken from the
+	 * environment, so don't go beyond envptr when
+	 * extracting the path elements
+	 */
+	limit = envptr;
+    case ACTION_GET:
+	/* subsequent calls to get_fontpath() return all
+	 * elements of the fontpath until exhausted
+	 */
+	FPRINTF((stderr, "Get fontpath\n"));
+	if (!fontpath)
+	    return NULL;
+	if (!beenhere) {
+	    /* init section */
+	    beenhere = 1;
+	    p = fontpath;
+	    if (!limit)
+		limit = last;
+	    return p;
+	} else {
+	    p += strlen(p);
+	    /* skip over '\0' */
+	    p++;
+	    if (p < limit)
+		return p;
+	    else {
+		beenhere = 0;
+		return NULL;
+	    }
+	}
+	break;
+    case ACTION_NULL:
+	/* just return */
+    default:
+	break;
+    }
+
+    /* should always be ignored - points to the
+     * first path in the list */
+    return fontpath;
 
 }
 

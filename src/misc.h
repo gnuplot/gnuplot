@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.8 2001/06/22 15:44:58 broeker Exp $
+ * $Id: misc.h,v 1.9 2002/01/06 16:31:12 mikulik Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -57,6 +57,7 @@ void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
+char *fontpath_fullname __PROTO((const char *));
 
 /* moved here, from setshow */
 enum PLOT_STYLE get_style __PROTO((void));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.36 2002/01/25 18:02:09 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.37 2002/08/19 16:21:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -33,6 +33,8 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.36 2002/01/25 18:02:09 joze
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
+
+#include <dirent.h>
 
 #include "misc.h"
 
@@ -401,6 +403,107 @@ const char *filename, *mode;
 
     return fp;
 }
+
+
+char *
+recursivefullname(path, filename, recursive)
+     const char *path;
+     const char *filename;
+     TBOOLEAN recursive;
+{
+    char *fullname = NULL;
+    struct dirent *direntry;
+    struct stat buf;
+    DIR *dir;
+    FILE *fp;
+
+    /* length of path, dir separator, filename, \0 */
+    fullname = gp_alloc(strlen(path) + 1 + strlen(filename) + 1, 
+			"recursivefullname");
+    strcpy(fullname, path);
+    PATH_CONCAT(fullname, filename);
+    if ((fp = fopen(fullname, "r")) != NULL) {
+	fclose(fp);
+	return fullname;
+    } /* if */
+    else {
+	free(fullname);
+	fullname = NULL;
+    } /* else */
+
+    if (recursive) {
+	dir = opendir(path);
+	if (dir) {
+	    while ((direntry=readdir(dir))!=NULL) {
+		char *fulldir = gp_alloc(strlen(path) + 1 + 
+					 strlen(direntry->d_name) + 1, 
+					 "fontpath_fullname");
+		strcpy(fulldir,path);
+#if defined(VMS)
+		if (fulldir[strlen(fulldir)-1]==']')
+		    fulldir[strlen(fulldir)-1]='\0';
+		strcpy(&(fulldir[strlen(fulldir)]),".");
+		strcpy(&(fulldir[strlen(fulldir)]),direntry->d_name);
+		strcpy(&(fulldir[strlen(fulldir)]),"]");
+#else
+		PATH_CONCAT(fulldir,direntry->d_name);
+#endif
+		stat(fulldir,&buf);
+		if ( (S_ISDIR(buf.st_mode)) && 
+		     (strcmp(direntry->d_name,".")!=0) &&
+		     (strcmp(direntry->d_name,"..")!=0) ) {
+		    fullname = recursivefullname(fulldir,filename);
+		    if (fullname != NULL)
+			break;
+		} /* if */
+	    } /* while */
+	    closedir(dir);
+	} /* if */
+    } /* if */
+
+    return fullname;
+}/* recursivefullname */
+
+
+/* may return NULL */
+char *
+fontpath_fullname(filename)
+     const char *filename;
+{
+    FILE *fp;
+    char *fullname = NULL;
+
+#if defined(PIPES)
+    if (*filename == '<') {
+       os_error(NO_CARET, "fontpath_fullname: No Pipe allowed");
+    } else
+#endif /* PIPES */
+    if ((fp = fopen(filename, "r")) == (FILE *) NULL) {
+       /* try 'fontpath' variable */
+       char *tmppath, *path = NULL;
+
+       while ((tmppath = get_fontpath()) != NULL) {
+	   TBOOLEAN subdirs = FALSE;
+	   path = gp_strdup(tmppath);
+	   if ( path[strlen(path)-1] == '!' ) {
+	       path[strlen(path)-1] = '\0';
+	       subdirs = TRUE;
+	   } /* if */
+	   fullname = recursivefullname(path, filename, subdirs);
+	   if (fullname != NULL) {
+	       while (get_fontpath());
+	       free(path);
+	       break;
+	   } /* if */
+	   free(path);
+       } /* while */
+
+    } else
+	fullname = gp_strdup(filename);
+
+    return fullname;
+}/* fontpath_fullname */
+
 
 /* Parse a plot style. Used by 'set style {data|function}' and by
  * (s)plot.  */

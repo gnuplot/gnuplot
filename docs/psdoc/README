@@ -19,3 +19,7 @@ ps_symbols.gpi
   available to the "postscript" terminal and selectable via the "pt" option
   on the "plot" command.
 
+ps_fontfile_doc.tex
+  is a LaTeX file that generates the file ps_fontfile_doc.ps. It contains
+  a table containing the glyphs of the most important TeX math fonts
+  (Computer Modern Fonts).

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.92 2002/08/30 20:18:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.93 2002/09/02 18:15:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -101,6 +101,7 @@ static void set_keytitle __PROTO((void));
 static void set_label __PROTO((void));
 static int assign_label_tag __PROTO((void));
 static void set_loadpath __PROTO((void));
+static void set_fontpath __PROTO((void));
 static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
 static void set_mapping __PROTO((void));
@@ -277,6 +278,9 @@ set_command()
 	    break;
 	case S_ENCODING:
 	    set_encoding();
+	    break;
+	case S_FONTPATH:
+	    set_fontpath();
 	    break;
 	case S_FORMAT:
 	    set_format();
@@ -2005,6 +2009,44 @@ set_loadpath()
     }
     if (collect) {
 	set_var_loadpath(collect);
+	free(collect);
+    }
+}
+
+
+/* process 'set fontpath' command */
+static void
+set_fontpath()
+{
+    /* We pick up all fontpath elements here before passing
+     * them on to set_var_fontpath()
+     */
+    char *collect = NULL;
+
+    c_token++;
+    if (END_OF_COMMAND) {
+	clear_fontpath();
+    } else while (!END_OF_COMMAND) {
+	if (isstring(c_token)) {
+	    int len;
+	    char *ss = gp_alloc(token_len(c_token), "tmp storage");
+	    len = (collect? strlen(collect) : 0);
+	    quote_str(ss,c_token,token_len(c_token));
+	    collect = gp_realloc(collect, len+1+strlen(ss)+1, "tmp fontpath");
+	    if (len != 0) {
+		strcpy(collect+len+1,ss);
+		*(collect+len) = PATHSEP;
+	    }
+	    else
+		strcpy(collect,ss);
+	    free(ss);
+	    ++c_token;
+	} else {
+	    int_error(c_token, "expected string");
+	}
+    }
+    if (collect) {
+	set_var_fontpath(collect);
 	free(collect);
     }
 }

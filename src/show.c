@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.87 2002/08/30 18:45:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.88 2002/08/30 20:18:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -145,6 +145,7 @@ static void show_data_is_timedate __PROTO((AXIS_INDEX));
 static void show_timefmt __PROTO((void));
 static void show_locale __PROTO((void));
 static void show_loadpath __PROTO((void));
+static void show_fontpath __PROTO((void));
 static void show_zero __PROTO((void));
 static void show_missing __PROTO((void));
 #ifdef USE_MOUSE
@@ -178,7 +179,7 @@ show_command()
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign', 'dgrid3d',\n\
-\t'dummy', 'encoding', 'format', 'functions', 'grid', 'hidden',\n\
+\t'dummy', 'encoding', 'fontpath', 'format', 'functions', 'grid', 'hidden',\n\
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
 \t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
@@ -333,6 +334,9 @@ show_command()
 	break;
     case S_ENCODING:
 	show_encoding();
+	break;
+    case S_FONTPATH:
+	show_fontpath();
 	break;
     case S_POLAR:
 	show_polar();
@@ -820,6 +824,7 @@ show_all()
     show_data_is_timedate(FIRST_Z_AXIS);
     show_timefmt();
     show_loadpath();
+    show_fontpath();
     show_locale();
     show_zero();
     show_missing();
@@ -2513,6 +2518,15 @@ show_loadpath()
 {
     SHOW_ALL_NL;
     loadpath_handler(ACTION_SHOW,NULL);
+}
+
+
+/* process 'show fontpath' command */
+static void
+show_fontpath()
+{
+    SHOW_ALL_NL;
+    fontpath_handler(ACTION_SHOW,NULL);
 }
 
 

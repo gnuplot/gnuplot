@@ -1,4 +1,15 @@
-2002-09-03  Ethan Merritt <merritt@u.washington.edu>
+2002-09-02  Harald Harders  <h.harders@tu-bs.de>
+
+	* NEWS demo/fontfile.dem docs/gnuplot.doc docs/psdoc/Makefile
+	docs/psdoc/README docs/psdoc/ps_fontfile_doc.tex src/misc.c src/misc.h
+	src/plot.c src/save.c src/set.c src/show.c src/tables.c src/tables.h
+	src/term.c src/util.c src/util.h src/variable.c src/variable.h
+	term/post.trm: Implementation of PFA, PFB and TTF font support in
+	postscript: encapsulate the font definitions directly into the gnuplot
+	output postscript file. New command 'set fontfile'. New option 'set
+	term postscript ... fontfile'.
+
+2002-09-02  Ethan Merritt <merritt@u.washington.edu>
 
         * src/axis.h src/graph3d.c src/graphics.c src/set.c:
 	Modularize the routines for label and tic-label handling.
@@ -1040,7 +1051,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/31 00:28:12 $).
+	last modification date (from the tag $Date: 2002/09/02 18:15:30 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

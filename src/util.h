@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.12 2002/03/07 16:22:37 lhecking Exp $
+ * $Id: util.h,v 1.13 2002/04/05 17:15:51 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -99,5 +99,7 @@ void graph_error __PROTO(());
  * move to help.c, instead. */
 void lower_case __PROTO((char *));
 void squash_spaces __PROTO((char *));
+
+TBOOLEAN existdir __PROTO((const char *));
 
 #endif /* GNUPLOT_UTIL_H */
