@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.153 2004/10/27 21:54:48 sfeam Exp $
+dnl $Id: configure.in,v 1.154 2004/11/06 21:18:44 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -972,12 +972,6 @@ fi
 
 if test "$with_png" != no; then
   AC_MSG_RESULT([  Enable generation of PNG files])
-fi
-
-if test "$have_gd_png" = yes; then
-  AC_MSG_RESULT([    using gd driver])
-else
-  AC_MSG_RESULT([    using old driver])
 fi
 
 if test "$have_ttf" = yes; then
