@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.79 2001/09/19 09:53:20 amai Exp $
+C RCS $Id: gnuplot.doc,v 1.80 2001/09/19 11:08:39 amai Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -7647,15 +7647,16 @@ C  The `lines` style connects adjacent points with straight line segments.
  win32 is included in this distribution.  In addition, there is a Macintosh
  interface at
 ^<a href="ftp://ftp.ee.gatech.edu/pub/mac/gnuplot">
-        ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
+          ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
 ^</a>
  
  
  Also several X11 interfaces exist.
- One of them is called xgfe (
+ One of them is called xgfe. It uses the Qt library and can be found on
 ^<a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
- http://www.flash.net/~dmishee/xgfe/xgfe.html </a> ) 
- which uses the Qt library.
+          http://www.flash.net/~dmishee/xgfe/xgfe.html
+^</a> 
+
  In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
  
  Bruce Ravel (ravel@phys.washington.edu) has written a new version of
@@ -7663,7 +7664,9 @@ C  The `lines` style connects adjacent points with straight line segments.
  the gnuplot.el file by Gershon Elber.
  While the gnuplot CVS repository has its own copy the most recent
  version of this package is available from
-^ <a href="http://feff.phys.washington.edu/~ravel/gnuplot/">http://feff.phys.washington.edu/~ravel/gnuplot </a>
+^<a href="http://feff.phys.washington.edu/~ravel/gnuplot/">
+           http://feff.phys.washington.edu/~ravel/gnuplot
+^</a>
 
  
 1 Bugs
