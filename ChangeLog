@@ -1,5 +1,24 @@
 2005-01-11  Harald Harders  <h.harders@tu-bs.de>
 
+	Apply updated SourceForge patch #1023783
+ 
+	* configure.in: Check for which libpdf version is present; check
+	whether <pwd.h> is present.
+
+	* src/util.c src/util.h: New routine (char *) getusername() gets
+	user name from environment or from passwd file.
+
+	* term/pdf.trm (PDF_init) term/post.trm (PS_init): Store username
+	and other envelope information in the PDF dictionary structure of
+	the output file.  New routine PS_escape_string() to ensure that 
+	character strings entered in the PDF dictionary are legal strings.
+
+	* term/pdf.trm (PDF_init PDF_reset): Use either PDF_begin_document
+	or PDF_open_file depending on which version of libpdf is available.
+	Ditro for PDF_end_document or PDF_close.
+
+2005-01-11  Harald Harders  <h.harders@tu-bs.de>
+
 	* src/src/set.c src/term.c src/unset.c term/post.h term/post.trm
 	term/pslatex.trm: SF patch # 1098256 "Introduce struct that takes all
 	postscript terminal options". This patch introduces the struct

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.41 2004/11/28 02:02:52 sfeam Exp $
+ * $Id: pdf.trm,v 1.42 2004/12/31 06:12:56 sfeam Exp $
  */
 
 /*------------------------------
@@ -354,6 +354,10 @@ TERM_PUBLIC void
 PDF_init ()
 {
     static TBOOLEAN PDFlib_booted = FALSE;
+    char *gpversionstring;
+    char *username;
+    char *timedate;
+    time_t now;
 
     if (!PDFlib_booted) {
 	PDF_boot();
@@ -364,9 +368,12 @@ PDF_init ()
 	myPDF = PDF_new();
 
     /*open new PDF file */
-    /* HBB FIXME 20040708: PDF_open_file is deprecated, will have to
-     * be re-done again soon. */
+#ifdef HAVE_LIBPDF_OPEN_FILE
     if (PDF_open_file(myPDF, outstr) == -1)
+#else
+    if (PDF_begin_document(myPDF, outstr?outstr:"-", 0,
+			   "compatibility=1.4") == -1)
+#endif /* HAVE_LIBPDF_OPEN_FILE */
 	int_error(NO_CARET, "Error:cannot open PDF file .\n");
 
 #ifdef PDF_DONT_COMPRESS
@@ -375,9 +382,29 @@ PDF_init ()
     PDF_set_value(myPDF, "compress", 0);
 #endif
 
-    PDF_set_info(myPDF,"Creator","gnuplot-4.1pre");
-    PDF_set_info(myPDF,"Author","Hans-Bernhard Broeker"); /* FIXME: put in username? */
-    PDF_set_info(myPDF,"Title","gnuplot diagram"); /* FIXME: use 'set title', if any ? */
+    gpversionstring = gp_alloc(20 + strlen(gnuplot_version) + 
+			       strlen(gnuplot_patchlevel) + 1, "PDF_init");
+    sprintf(gpversionstring,"gnuplot %s patchlevel %s",
+	    gnuplot_version, gnuplot_patchlevel);
+
+    time(&now);
+    timedate=asctime(localtime(&now));
+    timedate[strlen(timedate)-1]='\0';
+
+    PDF_set_info(myPDF,"Creator",gpversionstring);
+
+    username=getusername();
+    if (username) {
+	PDF_set_info(myPDF,"Author",username);
+	free(username);
+    }
+
+    if (outstr)
+	PDF_set_info(myPDF,"Title",outstr); /* FIXME: use 'set title', if any? */
+    PDF_set_info(myPDF,"Subject","gnuplot plot");
+
+    if (gpversionstring)
+	free(gpversionstring);
 
     PDF_LineType = LT_UNDEFINED;
 
@@ -443,7 +470,11 @@ TERM_PUBLIC void
 PDF_reset ()
 {
     assert(PDF_pageIsOpen == FALSE);
+#ifdef HAVE_LIBPDF_OPEN_FILE
     PDF_close(myPDF);
+#else
+    PDF_end_document(myPDF, "");
+#endif /* HAVE_LIBPDF_OPEN_FILE */
     PDF_delete(myPDF);
     myPDF = NULL;
 }

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.140 2005/01/08 16:09:01 mikulik Exp $
+ * $Id: post.trm,v 1.141 2005/01/11 17:37:16 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -110,6 +110,8 @@ TERM_PUBLIC void ENHPS_OPEN __PROTO((char * fontname, double fontsize,
 TERM_PUBLIC void ENHPS_FLUSH __PROTO((void));
 TERM_PUBLIC void ENHPS_WRITEC __PROTO((int c));
 TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
+
+TERM_PUBLIC char *PS_escape_string __PROTO((char *origstr, char *escapelist));
 
 #endif /* TERM_PROTO */
 
@@ -804,6 +806,25 @@ PS_RememberFont(char *fname, int can_reencode)
 	return recode;
 }
 
+char *
+PS_escape_string(char *origstr, char *escapelist)
+{
+    char *newstr;
+    char *n;
+
+    if (!origstr || !*origstr)
+	return NULL;
+
+    newstr = gp_alloc(2*strlen(origstr)+1,"PS_escape_string");
+    for (n=newstr; *origstr; *n++ = *origstr++) {
+	if (strchr(escapelist,*origstr))
+	    *n++ = '\\';
+    }
+    *n = '\0';
+
+    return newstr;
+}
+
 static int PS_pen_x, PS_pen_y;
 static int PS_taken;
 static int PS_linetype_last;
@@ -1402,7 +1423,7 @@ PS_common_init(
 {
     static const char GPFAR psi1[] = "\
 %%%%Creator: gnuplot %s patchlevel %s\n\
-%%%%CreationDate: %s\
+%%%%CreationDate: %s\n\
 %%%%DocumentFonts: %s\n";
 
     static const char GPFAR psi2[] = "\
@@ -1427,6 +1448,25 @@ PS_common_init(
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
+
+    static const char GPFAR psi3[] = "\
+Level1 {} {\n\
+/SDict 10 dict def\n\
+systemdict /pdfmark known not {\n\
+  userdict /pdfmark systemdict /cleartomark get put\n\
+} if\n\
+SDict begin [\n\
+  /Title (%s)\n\
+  /Subject (gnuplot plot)\n\
+  /Creator (gnuplot %s patchlevel %s)\n\
+  /Author (%s)\n\
+%%  /Producer (gnuplot)\n\
+%%  /Keywords ()\n\
+  /CreationDate (%s)\n\
+  /DOCINFO pdfmark\n\
+end\n\
+} ifelse\n";
+
 
     static const char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
@@ -1846,12 +1886,17 @@ NULL };
     struct termentry *t = term;
     int i;
     time_t now;
+    char *timedate;
 
     ps_common_uses_fonts = uses_fonts;
     ps_common_xoff = xoff;
     ps_common_yoff = yoff;
 
     ps_page = 0;
+
+    time(&now);
+    timedate=asctime(localtime(&now));
+    timedate[strlen(timedate)-1]='\0';
 
     if (ps_params->psformat == PSTERM_EPS)
 	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gppsfile);
@@ -1860,9 +1905,8 @@ NULL };
 
     if (outstr)
 	fprintf(gppsfile, "%%%%Title: %s\n", outstr);   /*  JFi  */
-    time(&now);
     fprintf(gppsfile, psi1, gnuplot_version, gnuplot_patchlevel,
-	    asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+	    timedate, uses_fonts ? "(atend)" : "");
 
     fprintf(gppsfile,"%%%%BoundingBox: %d %d %d %d\n",
 	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
@@ -1886,6 +1930,24 @@ NULL };
 	    PS_HTIC/2.0,		/* half point width */
 	    PS_VTIC/2.0);		/* half point height */
 
+    /* HH: print pdf information interpreted by ghostscript/acrobat */
+    {
+	char *username=getusername();
+	char *username2=PS_escape_string(username,"()\\");
+	char *outstr2=PS_escape_string(outstr,"()\\");
+	fprintf(gppsfile, psi3,
+		outstr2?outstr2:"",
+		gnuplot_version, gnuplot_patchlevel,
+		username2?username2:"", 
+		timedate);
+	if (username)
+	    free(username);
+	if (username2)
+	    free(username2);
+	if (outstr2)
+	    free(outstr2);
+    }
+
     /* insert font encoding vector */
     if (uses_fonts) {
 	const char GPFAR * GPFAR *e = NULL;
@@ -1903,9 +1965,8 @@ NULL };
 	    default:		    break;
 	}
 	if (e) {
-	    for (i = 0; e[i] != NULL; i++) {
+	    for (i = 0; e[i] != NULL; i++)
 		fprintf(gppsfile, "%s", e[i]);
-    }
 	}
     }
 
