@@ -1,12 +1,12 @@
 /*
- * $Id: gd.trm,v 1.37 2004/03/23 05:40:48 sfeam Exp $
+ * $Id: gd.trm,v 1.38 2004/03/24 19:28:33 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
 /* GNUPLOT -- gd.trm */
 
 /*[
- * Copyright 1998,2001
+ * Copyright 1998, 2001, 2004
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted,
@@ -75,9 +75,6 @@
  * CONTRIBUTORS
  *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
  *  Ben Laurie <ben@algroup.co.uk>
- *
- * send your comments or suggestions to:
- *  info-gnuplot@cs.dartmouth.edu
  *
  * This version outputs either color or monochrome PNGs.  
  * The default is 640x480 pixels.  
@@ -505,30 +502,42 @@ PNG_options()
 	    ++c_token;
 	    break;
 	case PNG_TINY:
+#ifdef HAVE_GD_TTF
+# define UNSET_TTF_FONT \
+	    png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
+#else
+# define UNSET_TTF_FONT \
+	    ; /* nothing to do */
+#endif
+	    UNSET_TTF_FONT;
 	    png_state.default_font=gdFontTiny;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_SMALL:
+	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontSmall;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_MEDIUM:
+	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontMediumBold;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_LARGE:
+	    UNSET_TTF_FONT;
 	    png_state.default_font = gdFontLarge;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_GIANT:
+	    UNSET_TTF_FONT;
 	    png_state.default_font=gdFontGiant;
 	    term->v_char = png_state.default_font->h;
 	    term->h_char = png_state.default_font->w;
@@ -542,10 +551,13 @@ PNG_options()
 	    } else {
 		int brect[8];
 		char *err;
+
 		if (isstring(c_token))
-		    quote_str(png_state.ttffont, c_token, sizeof(png_state.ttffont));
+		    quote_str(png_state.ttffont, c_token,
+			      sizeof(png_state.ttffont));
 	        else
-		    copy_str(png_state.ttffont, c_token, sizeof(png_state.ttffont));
+		    copy_str(png_state.ttffont, c_token,
+			     sizeof(png_state.ttffont));
 		c_token++;
 		strcpy(png_state.default_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 2 * term->h_char - 2;
@@ -553,9 +565,11 @@ PNG_options()
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
 		if (err) {
-			fprintf(stderr,"%s when opening font %s, using default\n",
+			fprintf(stderr,
+				"%s when opening font %s, using default\n",
 				err, png_state.ttffont);
-			png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
+			png_state.ttffont[0] = png_state.default_ttffont[0]
+			    = '\0';
 		}
 	    }
 #else
@@ -684,7 +698,7 @@ PNG_options()
 	strcat(term_options, "enhanced ");
     }
 
-    if (*png_state.ttffont) {
+    if (png_state.ttffont[0]) {
     	sprintf(term_options + strlen(term_options),
 		"font %s %d ", png_state.ttffont, png_state.ttfsize);
     } else switch (term->h_char) {
@@ -1294,13 +1308,12 @@ PNG_set_font(const char *fontname)
 	font = gdFontGiant;
     else if (!strcmp(name,"tiny"))
 	font = gdFontTiny;
-    /* New ttf font */
     else if (*name) {
+	/* New ttf font */
 	strncpy(png_state.ttffont, name, sizeof(png_state.ttffont));
 	png_state.ttfsize = size;
-    }
-    /* Restore initial default font */
-    else  {
+    } else {
+	/* Restore initial default font */
 	strcpy(png_state.ttffont,png_state.default_ttffont);
 	png_state.ttfsize = png_state.default_ttfsize;
     }
