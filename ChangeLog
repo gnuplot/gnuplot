@@ -1,9 +1,17 @@
+2002-02-12  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* term/post.trm (PS_encode_image PS_image): Bug fix for the PostScript
+	image using the five operand form (i.e., no palette). The bug was
+	that the max colors was not set to 2^N, where N is 1, 2, 4, 8, or 12.
+	So if the gray scale max was 128 (2^7) the brightness was lower than
+	it should have been.
+
 2006-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c (do_3dplot): Fixed the condition for which the message
 	of missing blank lines in a datafile for pm3d plot is displayed.
 
-2006-02-11  Timothée Lecomte <timothee.lecomte@ens.fr>
+2006-02-11  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
 	* src/gplt_x11.c (handle_selection_event): Export a timestamp for each
 	selection request, as per the X11 clipboard handling standard.

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.168 2005/10/31 23:41:33 sfeam Exp $
+ * $Id: post.trm,v 1.169 2006/01/29 04:55:41 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3662,7 +3662,7 @@ enum PS_ENCODING {
  * routine.
  */
 static char *
-PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, int bits_per_component, enum PS_ENCODING encoding, int *return_num_bytes)
+PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode, int bits_per_component, int max_colors, enum PS_ENCODING encoding, int *return_num_bytes)
 {
     unsigned coord_remaining;
     coordval *coord_ptr;
@@ -3676,17 +3676,8 @@ PS_encode_image(unsigned M, unsigned N, coordval *image, t_imagecolor color_mode
     int max_encoded_bytes;
     char *encoded_image, *encoded_image_ptr;
     unsigned long total_bits;
-    int max_colors;
 
 #define ASCII_PER_LINE 78
-
-#define DEFAULT_BITS_PER_COMPONENT 8
-#define DEFAULT_COMPONENT_MAX (1<<DEFAULT_BITS_PER_COMPONENT)
-
-    if (sm_palette.use_maxcolors > 0)
-	max_colors = sm_palette.use_maxcolors;
-    else
-	max_colors = DEFAULT_COMPONENT_MAX;
 
     total_bits = bits_per_component*M*N*((color_mode == IC_RGB && ps_params->color) ? 3 : 1);
 
@@ -3862,6 +3853,10 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     int num_encoded_bytes;
     unsigned short bits_per_component = 0;
     int max_colors, i_tmp;
+    bool five_operand_image;
+
+#define DEFAULT_BITS_PER_COMPONENT 8
+#define DEFAULT_COMPONENT_MAX (1<<DEFAULT_BITS_PER_COMPONENT)
 
     if (sm_palette.use_maxcolors > 0)
 	max_colors = sm_palette.use_maxcolors;
@@ -3886,7 +3881,24 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     else if (bits_per_component > 2)
         bits_per_component = 4;
 
-    encoded_image = PS_encode_image(M, N, image, color_mode, bits_per_component, (ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
+    /* Color and gray scale images do not need a palette and can use
+     * the 5 operand form of the image routine.
+     */
+    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color)
+        five_operand_image = TRUE;
+    else
+        five_operand_image = FALSE;
+
+    /* The five operand image doesn't have a palette and the values are
+     * such that 0 maps to 0.0 and 2^bits_per_component - 1 maps to 1.0
+     * in the PostScript driver.  Without any other knowledge, we scale
+     * things so that our max colors corresponds to 1.0.  I.e., we are
+     * translating so that the new max colors is 2^bits_per_component.
+     */
+    if (five_operand_image)
+        max_colors = (1 << bits_per_component);
+
+    encoded_image = PS_encode_image(M, N, image, color_mode, bits_per_component, max_colors, (ps_params->level1 ? PS_ASCII_HEX : PS_ASCII85), &num_encoded_bytes);
 
     fputs("%%%%BeginImage\n", gppsfile);
 
@@ -3895,7 +3907,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
      * palettes, the 1 operand form of the image routine must be used
      * and an indexed palette needs to be constructed.
      */
-    if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) || !ps_params->color) {
+    if (five_operand_image) {
 
 	if (ps_params->level1) {
 	    fputs("gsave\n", gppsfile);
