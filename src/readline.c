@@ -394,7 +394,7 @@ char *prompt;
 			     mouseShareMemName, PAG_WRITE | PAG_READ))
 	fputs("readline.c: DosGetNamedShareMem ERROR\n",stderr);
     else
-	strcpy(input_line_Pointer, NUL);
+	*input_line_Pointer = NUL;
     }
 #endif /* USE_MOUSE */
 
@@ -480,7 +480,7 @@ char *prompt;
 	} else {
 	    if (input_line_Pointer != NULL && strlen(input_line_Pointer)) {
 		strcpy(cur_line, input_line_Pointer);
-		strcpy(input_line_Pointer, "\0");
+		*input_line_Pointer = NUL;
 		line_len = 0;
 		fputs("#mouse: ", stderr);	/* write the command on screen as a comment, */
 		fputs(cur_line, stderr);	/* thus it does not go to the history */
