@@ -1,3 +1,9 @@
+2002-10-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in, config/config.amg, src/stdfn.h: Change test for time_t
+	in <time.h> to not require time_t define in config.h. This removes the
+	need for acconfig.h.
+
 2002-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/specfun.c: Error codes DOMAIN, SING etc. are not available on
@@ -1221,7 +1227,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/05 15:08:42 $).
+	last modification date (from the tag $Date: 2002/10/05 15:18:57 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
