@@ -1,3 +1,10 @@
+2001-08-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/png.trm (PNG_text): Corrected size parameters of two
+ 	memset() calls. Simplified from png_write_rows() for 1 row to the
+ 	simpler png_write_row() call. Removed old code that had long since
+ 	been #if'ed out in favour of calling b_getpixel().
+
 2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util3d.c (draw3d_point) [PM3D] : Implement "linetype palette"
