@@ -1,6 +1,7 @@
 ; Menu file for Windows gnuplot
 ; Roger Hadgraft, 26-5-92
 ; Russell Lang, 30 Nov 1992
+; Modified for 4.0, John Bollinger, 31 Dec 2002
 
 [Menu]
 &File
@@ -95,7 +96,7 @@
 		using [INPUT]X column?[EOS]:[INPUT]Y column?[EOS]:[INPUT]Ylow column?[EOS]:[INPUT]Yhigh column?[EOS] [EOS]
 	--
 	[Menu]
-	with Style
+	with Style (simple)
 		Lines
 			with lines
 		Points
@@ -104,18 +105,45 @@
 			with linespoints
 		Impulses
 			with impulses
-		Steps
-			with steps
 		Dots
 			with dots
+		Steps
+			with steps
+		Fsteps
+			with fsteps
+		Histeps
+			with histeps		
+	[EndMenu]
+	[Menu]
+	with Style (compound)
 		Error Bars
 			with errorbars
+		X Error Bars
+			with xerrorbars
+		Y Error Bars
+			with yerrorbars
+		XY Error Bars
+			with xyerrorbars
+		Error Lines
+			with errorlines
+		X Error Lines
+			with xerrorlines
+		Y Error Lines
+			with yerrorlines
+		XY Error Lines
+			with xyerrorlines
 		Boxes
 			with boxes
-		FilledBoxes
-			with filledboxes
+		Filled Curves
+			with filledcurves
 		Box Error Bars
 			with boxerrorbars
+		Box XY Error Bars
+			with boxxyerrorbars
+		Finance Bars
+			with financebars
+		Candlesticks
+			with candlesticks
 	[EndMenu]
 [EndMenu]
 
@@ -125,109 +153,163 @@
 		print 
 	Complex number ...
 		{[INPUT]Real part?[EOS],[INPUT]Imaginary part?[EOS]}
-	--
-	Exponentiation	**
-		**
-;	Multiply	*
-;		*
-;	Divide	/
-;		/
-;	Add	+
-;		+
-;	Subtract	-
-;		-
-	--
-	Modulo	%
-		%
-	Equality	==
-		==
-	Inequality	!=
-		!=
-	--
-	Bitwise AND	&
-		&
-	Bitwise exclusive OR	^
-		^
-	Bitwise inclusive OR	|
-		|
-	--
-	Logical AND	&&
-		&&
-	Logical OR	||
-		||
-;	--
-;	Ternary operator 1	?
-;		?
-;	Ternary operator 2	:
-;		:
+	[Menu]
+	Unary
+		Minus	-a
+			-[INPUT]Arg
+		Plus	+a
+			+[INPUT]Arg
+		One's compliment	~a
+			~[INPUT]Arg
+		Logcial negation	!a
+			![INPUT]Arg
+		Factorial	a!
+			[INPUT]Arg[EOS]!
+	[EndMenu]
+	[Menu]
+	Binary
+		Exponentiation	**
+			**
+		Multiply	*
+			*
+		Divide	/
+			/
+		Add	+
+			+
+		Subtract	-
+			-
+		--
+		Modulo	%
+			%
+	[EndMenu]
+	[Menu]
+	Logical
+		Equality	==
+			==
+		Inequality	!=
+			!=
+		--
+		less than	<
+			<
+		less than or equal	<=
+			<=
+		greater than	>
+			>
+		greater than or equal	>=
+			>=
+		--
+		Bitwise AND	&
+			&
+		Bitwise exclusive OR	^
+			^
+		Bitwise inclusive OR	|
+			|
+		--
+		Logical AND	&&
+			&&
+		Logical OR	||
+			||
+		--
+		Ternary operator	a?b:c
+			[INPUT]First arg[EOS]?[INPUT]Second arg[EOS]:[INPUT]Third arg[EOS]
+	[EndMenu]
 [EndMenu]
-
 [Menu]
 Fu&nctions
-	abs
-		abs
-	arg
-		arg
-	imag
-		imag
-	real
-		real
-	sgn
-		sgn
-	--
-	ceil
-		ceil
-	floor
+	[Menu]
+	Elementary
+		random number
+			rand([INPUT]Argument[EOS])
+		absolute value
+			abs([INPUT]Argument[EOS])
+		sign
+			sgn([INPUT]Argument[EOS])
+		--
+		ceiling
+			ceil([INPUT]Argument[EOS])
 		floor
-	int
-		int
-	--
-	sqrt
-		sqrt
-	exp
-		exp
-	log
-		log
-	log10
-		log10
-	|
-	acos
-		acos
-	asin
-		asin
-	atan
-		atan
-	--
-	cos
-		cos
-	sin
-		sin
-	tan
-		tan
-	--
-	cosh
-		cosh
-	sinh
-		sinh
-	tanh
-		tanh
-	--
-	pi
-		pi
-	gamma
+			floor([INPUT]Argument[EOS])
+		integer
+			int([INPUT]Argument[EOS])
+		--
+		square root
+			sqrt([INPUT]Argument[EOS])
+		exponent
+			exp([INPUT]Argument[EOS])
+		logarithm (e)
+			log([INPUT]Argument[EOS])
+		logarithm (10)
+			log10([INPUT]Argument[EOS])
+		--
+		cosine
+			cos([INPUT]Argument[EOS])
+		sine
+			sin([INPUT]Argument[EOS])
+		tangent
+			tan([INPUT]Argument[EOS])
+		--
+		arc cosine
+			acos([INPUT]Argument[EOS])
+		arc sine
+			asin([INPUT]Argument[EOS])
+		arc tangent
+			atan([INPUT]Argument[EOS])
+		arc tangent 2
+			atan2([INPUT]Argument[EOS])
+		--
+		hyperbolic cosine
+			cosh([INPUT]Argument[EOS])
+		hyperbolic sine
+			sinh([INPUT]Argument[EOS])
+		hyperbolic tangent
+			tanh([INPUT]Argument[EOS])
+		--
+		imaginary
+			imag([INPUT]Argument[EOS])
+		real
+			real([INPUT]Argument[EOS])
+		arg
+			arg([INPUT]Argument[EOS])
+	[EndMenu]
+	[Menu]
+	Special
+		error 
+			erf([INPUT]Argument[EOS])
+		error c
+			erfc([INPUT]Argument[EOS])
+		inv error
+			inverf([INPUT]Argument[EOS])
+		--
 		gamma
-	(x)
-		(x)
-	|
-	besj0
-		besj0
-	besj1
-		besj1
-	--
-	besy0
-		besy0
-	besy1
-		besy1
+			gamma([INPUT]Argument[EOS])
+		igamma
+			igamma([INPUT]First argument[EOS],[INPUT]Second argument[EOS])
+		lgamma
+			lgamma([INPUT]Argument[EOS])
+		--
+		ibeta
+			ibeta([INPUT]First argument[EOS],[INPUT]Second argument[EOS],[INPUT]Third argument[EOS])
+		--
+		bessel j0
+			besj0([INPUT]Argument[EOS])
+		bessel j1
+			besj1([INPUT]Argument[EOS])
+		bessel y0
+			besy0([INPUT]Argument[EOS])
+		bessel y1
+			besy1([INPUT]Argument[EOS])
+		--
+		lambertw
+			lambertw([INPUT]Argument[EOS])
+
+	[EndMenu]
+	[Menu]
+	Statistical
+		normal
+			norm([INPUT]Argument[EOS])
+		inverse normal
+			invnorm([INPUT]Argument[EOS])
+	[EndMenu]
 	--
 	Define User Function ...
 		[INPUT]Name for function?[EOS][INPUT]Variable/s, eg. (a,b) ?[EOS]=
@@ -252,7 +334,7 @@ Fu&nctions
 	Border on
 		set border{ENTER}
 	Border off
-		set noborder{ENTER}
+		unset border{ENTER}
 	Show Border
 		show border{ENTER}
 	--
@@ -271,7 +353,7 @@ Fu&nctions
 		Set Parametric
 			set parametric{ENTER}
 		Not Parametric
-			set noparametric{ENTER}
+			unset parametric{ENTER}
 		Show Parametric
 			show parametric{ENTER}
 		--
@@ -292,7 +374,7 @@ Fu&nctions
 	Clip two points
 		set clip two{ENTER}
 	No Clipping
-		set noclip{ENTER}
+		unset clip{ENTER}
 	Show Clip type
 		show clip{ENTER}
 	[EndMenu]
@@ -302,7 +384,7 @@ Fu&nctions
 	Polar
 		set polar{ENTER}
 	Not Polar
-		set nopolar{ENTER}
+		unset polar{ENTER}
 	Show Polar
 		show polar{ENTER}
 	Radial Range
@@ -331,14 +413,14 @@ Fu&nctions
 	Autoscale xy
 		set autoscale [INPUT]Which axes (eg. xy)?{ENTER}
 	No Autoscale xy
-		set noautoscale [INPUT]Which axes (eg. xy)?{ENTER}
+		unset autoscale [INPUT]Which axes (eg. xy)?{ENTER}
 	Show Autoscale
 		show autoscale{ENTER}
 	--
 	Logscale xyz
 		set logscale [INPUT]Which axes (eg. xy)?{ENTER}
 	No Logscale xyz
-		set nologscale [INPUT]Which axes (eg. xy)?{ENTER}
+		unset logscale [INPUT]Which axes (eg. xy)?{ENTER}
 	Show Logscale
 		show logscale{ENTER}
 	--
@@ -387,9 +469,9 @@ Fu&nctions
 		show xlabel{ENTER}show ylabel{ENTER}show zlabel{ENTER}
 	--
 	No X zero axis
-		set noxzeroaxis{ENTER}
+		unset xzeroaxis{ENTER}
 	No Y zero axis
-		set noyzeroaxis{ENTER}
+		unset yzeroaxis{ENTER}
 	X,Y zero axes on
 		set zeroaxis{ENTER}
 	Show zero axis status
@@ -401,21 +483,21 @@ Fu&nctions
 	Grid on
 		set grid{ENTER}
 	Grid off
-		set nogrid{ENTER}
+		unset grid{ENTER}
 	Show Grid
 		show grid{ENTER}
 	--
 	Add Arrow
 		set arrow [INPUT]Tag (1-99)?[EOS] from [INPUT]From coordinate?[EOS] to [INPUT]To coordinate?{ENTER}
 	Remove arrow
-		set noarrow [INPUT]Tag (1-99)?{ENTER}
+		unset arrow [INPUT]Tag (1-99)?{ENTER}
 	Show Arrows
 		show arrow{ENTER}
 	--
 	Add Label
 		set label [INPUT]Tag?[EOS] "[INPUT]Label?[EOS]" at [INPUT]Coordinate?[EOS] [INPUT]Justification (l,c,r)?{ENTER}
 	Remove Label
-		set nolabel [INPUT]Tag?{ENTER}
+		unset label [INPUT]Tag?{ENTER}
 	Show Labels
 		show label{ENTER}
 	--
@@ -423,13 +505,13 @@ Fu&nctions
 		set title "[INPUT]Title text?[EOS]" [INPUT]X position, Y position (eg. 2,4)?{ENTER}
 	Show Title
 		show title{ENTER}
-	|
+	--
 	Key (legend) position
 		set key [INPUT]Key position?{ENTER}
 	Default Key position
 		set key{ENTER}
 	No Key
-		set nokey{ENTER}
+		unset key{ENTER}
 	Show Key position
 		show key{ENTER}
 	--
@@ -441,7 +523,7 @@ Fu&nctions
 	Time location
 		set time [INPUT]Location (eg. 1,1)?{ENTER}
 	No Time
-		set notime{ENTER}
+		unset time{ENTER}
 	Show Time Location
 		show time{ENTER}
 [EndMenu]
@@ -451,48 +533,112 @@ Fu&nctions
 	[Menu]
 	Data Style
 	Lines
-		set data style lines{ENTER}
+		set style data lines{ENTER}
 	Points
-		set data style points{ENTER}
+		set style data points{ENTER}
 	Lines + Points
-		set data style linespoints{ENTER}
+		set style data linespoints{ENTER}
 	Dots
-		set data style dots{ENTER}
+		set style data dots{ENTER}
 	Impulses
-		set data style impulses{ENTER}
+		set style data impulses{ENTER}
 	--
 	Error Bars
-		set data style errorbars{ENTER}
+		set style data errorbars{ENTER}
 	Boxes
-		set data style boxes{ENTER}
+		set style data boxes{ENTER}
 	Box Error Bars
-		set data style boxerrorbars{ENTER}
+		set style data boxerrorbars{ENTER}
+	--
+	Candlesticks
+		set style data candlesticks{ENTER}
+	Finance Bars
+		set style data financebars{ENTER}
 	[EndMenu]
 	Show Data Style
-		show data style{ENTER}
+		show style data{ENTER}
+	Clear Data Style
+		unset style data{ENTER}
 	--
 	[Menu]
 	Function Style
 	Lines
-		set function style lines{ENTER}
+		set style function lines{ENTER}
 	Points
-		set function style points{ENTER}
+		set style function points{ENTER}
 	Lines + Points
-		set function style linespoints{ENTER}
+		set style function linespoints{ENTER}
 	Dots
-		set function style dots{ENTER}
+		set style function dots{ENTER}
 	Impulses
-		set function style impulses{ENTER}
+		set style function impulses{ENTER}
 	--
 	Error Bars
-		set function style errorbars{ENTER}
+		set style function errorbars{ENTER}
 	Boxes
-		set function style boxes{ENTER}
+		set style function boxes{ENTER}
 	Box Error Bars
-		set function style boxerrorbars{ENTER}
+		set style function boxerrorbars{ENTER}
+	--
+	Candlesticks
+		set style function candlesticks{ENTER}
+	Finance Bars
+		set style function financebars{ENTER}
 	[EndMenu]
-	Show Function style
-		show function style{ENTER}
+	Show Function Style
+		show style function{ENTER}
+	Clear Function Style
+		unset style function{ENTER}
+	--
+	[Menu]
+	Arrow Style
+	Head
+		set style arrow [INPUT]Arrow number?[EOS] head{ENTER}
+	Heads
+		set style arrow [INPUT]Arrow number?[EOS] heads{ENTER}
+	No Heads
+		set style arrow [INPUT]Arrow number?[EOS] nohead{ENTER}
+	[EndMenu]
+	Show Arrow Style
+		show style arrow [INPUT]Arrow number? {ENTER}
+	Clear Arrow Style
+		unset style arrow [INPUT]Arrow number? {ENTER}
+	--
+	[Menu]
+	Fill Style
+	Empty
+		set style fill empty{ENTER}
+	Solid
+		set style fill solid [INPUT]Density?{ENTER}
+	Pattern
+		set style fill pattern [INPUT]Pattern number?{ENTER}
+	Border
+		set style fill border [INPUT]Line Type?{ENTER}
+	No Border
+		set style fill noborder{ENTER}
+	[EndMenu]
+	Show Fill Style
+		show style fill{ENTER}
+	Clear Fill Style
+		unset style fill{ENTER}
+	--
+	[Menu]
+	Line Style
+	Line Type
+		set style linetype [INPUT]Line Type?{ENTER}
+	Line Width
+		set style linewidth [INPUT]Line Width?{ENTER}
+	Point Type
+		set style pointtype [INPUT]Point Type?{ENTER}
+	Point Size
+		set style pointsize [INPUT]Point Size?{ENTER}
+;	Palette
+;		set style line{ENTER}
+	[EndMenu]
+	Show Line Style
+		show style line{ENTER}
+	Clear Line Style
+		unset style line{ENTER}
 [EndMenu]
 
 [Menu]
@@ -519,7 +665,7 @@ Fu&nctions
 		Contours on Both
 			set contour both{ENTER}
 		No Contours
-			set nocontour{ENTER}
+			unset contour{ENTER}
 		Show Contour
 			show contour{ENTER}
 		--
@@ -541,14 +687,14 @@ Fu&nctions
 	Hidden line removal
 		set hidden3d{ENTER}
 	No Hidden line removal
-		set nohidden3d{ENTER}
+		unset hidden3d{ENTER}
 	Show Hidden line removal
 		show hidden3d{ENTER}
 	--
 	Display Surface mesh
 		set surface{ENTER}
 	No Surface mesh
-		set nosurface{ENTER}
+		unset surface{ENTER}
 	Show Surface status
 		show surface{ENTER}
 	--
@@ -597,4 +743,3 @@ Fu&nctions
 [Button]
 	Next
 		{^N}
-

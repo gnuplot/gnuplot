@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.2 2001/02/09 15:06:11 broeker Exp $
+ * $Id: wresourc.h,v 1.3 2001/02/28 16:37:08 broeker Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -58,7 +58,7 @@
 /* wmenu.c */
 #define ID_PROMPT 300
 #define ID_ANSWER 302
-#define NUMMENU 256
+#define NUMMENU 512
 
 /* wpause.c */
 

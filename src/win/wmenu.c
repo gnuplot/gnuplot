@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.2 2002/03/10 18:54:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wmenu.c,v 1.3 2002/03/11 08:43:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/wmenu.c */
@@ -63,7 +63,7 @@ LRESULT CALLBACK WINEXPORT MenuButtonProc(HWND, UINT, WPARAM, LPARAM);
 
 /* limits */
 #define MAXSTR 255
-#define MACROLEN 5000
+#define MACROLEN 10000
 /* #define NUMMENU 256  defined in wresourc.h */
 #define MENUDEPTH 3
 
@@ -474,7 +474,7 @@ char FAR *ButtonText[BUTTONMAX];
 		}
 		LeftJustify(buf,buf);
 		TranslateMacro(buf);
-		if (lstrlen(buf)+1 < MACROLEN - (macroptr-lpmw->macrobuf))
+		if (lstrlen(buf)+1 < MACROLEN - (macroptr - lpmw->macrobuf))
 			lstrcpy((char FAR *)macroptr,buf);
 		else {
 			wsprintf(buf,"Out of space for storing menu macros\n at line %d of \n",nLine,lpmw->szMenuName);
@@ -519,7 +519,7 @@ char FAR *ButtonText[BUTTONMAX];
 			}
 			LeftJustify(buf,buf);
 			TranslateMacro(buf);
-			if (lstrlen(buf)+1 < MACROLEN - (macroptr-lpmw->macrobuf))
+			if (lstrlen(buf)+1 < MACROLEN - (macroptr - lpmw->macrobuf))
 				lstrcpy((char FAR *)macroptr,buf);
 			else {
 				wsprintf(buf,"Out of space for storing menu macros\n at line %d of %s\n",nLine,lpmw->szMenuName);

@@ -1,3 +1,18 @@
+2003-01-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	New Windows menu contributed by John Bollinger <bbands@yahoo.com>:
+	
+	* src/win/wgnuplot.mnu: The new menu definition itself.
+
+	* src/win/wmenu.c (MACROLEN): Increased to 10000 to accomodate
+ 	larger menu.
+
+	* src/win/wresourc.h (NUMMENU): Increased to 512 to accomodate
+ 	larger menu.
+
+	* src/win/wgnuplib.h (WGNUPLOTVERSION): Bumped up because NUMMENU
+ 	change makes DLL API incompatible.
+
 2003-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ, src/syscfg.h: Update FAQ location.
@@ -1740,7 +1755,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/22 15:08:36 $).
+	last modification date (from the tag $Date: 2003/01/22 15:43:27 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
