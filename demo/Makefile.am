@@ -47,7 +47,7 @@ reflect.fnc stat.inc sound.par sound2.par start.par gnuplot.rot
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##m4-files-begin/p' $< > $@t
+	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = Makefile.am.in *.bor *.cor *.dat *.dem *.fnc *.inc \
 	  sound.par sound2.par start.par *.rot |fmt | (tr '\012' @; echo) \
 	  |sed 's/@$$/%/;s/@/ \\@/g' |tr @% '\012 ' \

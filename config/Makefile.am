@@ -14,7 +14,7 @@ makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc
 
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
-	sed -n '1,/^##m4-files-begin/p' $< > $@t
+	sed -n '1,/^##m4-files-begin/p' Makefile.am.in > $@t
 	echo EXTRA_DIST = README Makefile.am.in buildvms.com djconfig.sh \
 	  make_vms.com term_pc.h makefile.* | fmt | \
 	  (tr '\012' @; echo) |sed 's/@$$/%/;s/@/ \\@/g' |tr @% '\012 ' >> $@t
