@@ -163,7 +163,7 @@
 # ifndef X11
 #  define X11
 # endif
-# include "x11.trm"     /* x windows */
+# include "x11.trm"     /* X Window System */
 #endif
 
 /* These terminals can be used on any system */
