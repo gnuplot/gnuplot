@@ -253,6 +253,7 @@ or just @ref{help} or `?` to get a menu of available topics.
 The new `gnuplot` user should begin by reading about `plotting` (if on-line,
 type `help plotting`).
 
+See the simple.dem demo, also available together with other demos on the web page
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html
 }
 
@@ -304,7 +305,7 @@ known bugs:
 
 Before seeking help, please check the
 
-@uref{http://www.gnuplot.info/faq/,FAQ (Frequently Asked Questions)list.
+@uref{http://www.gnuplot.info/faq/,FAQ (Frequently Asked Questions) list.
 }
 
 When posting a question, please include full details of the version of
@@ -330,7 +331,8 @@ list and links to the new items in no particular order.
 
 3. @ref{timefmt} allows for the use of dates as input and output for time
 series plots.  See `Time/Date data` and  
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html,timedat.dem.}
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html,timedat.dem demo.
+}
 
 4. Multiline labels and font selection in some drivers.
 
@@ -1422,7 +1424,9 @@ The @ref{tm_year} function interprets its argument as a time, in seconds from
 `valid(x)` may be used only in expressions as part of @ref{using} manipulations
 to fits or datafile plots.  See @ref{using}.
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,Use of functions and complex variables for airfoils }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
+}
 
 @node Operators, User-defined, Functions, Expressions
 @subsection Operators
@@ -2746,6 +2750,7 @@ Here you find 'usage by examples':
 @cmindex if
 
 
+@c ?help if
 The @ref{if} command allows commands to be executed conditionally.
 
 Syntax:
@@ -2856,7 +2861,7 @@ Syntax:
 carriage return is hit, zero (0) won't pause at all, and a positive number
 will wait the specified number of seconds.  The time is rounded to an integer
 number of seconds if subsecond time resolution is not supported by the given
-platform.  `pause 0` is synonymous with @ref{print}. 
+platform.  `pause 0` is synonymous with `print`. 
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -3074,12 +3079,13 @@ Examples:
 
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,Simple Plot Demos }
-,
+@c ^ See
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,simple plot demos (simple.dem) }
+@c ^ ,
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html,Non-parametric splot demos }
-, and
+@c ^ , and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html,Parametric splot demos}
-.
+@c ^ .
 
 @node example_datafile, index, every, data-file
 @subsubsection example datafile
@@ -3146,6 +3152,7 @@ Example:
 
 @end example
 
+@c ^ See also web page
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/multimsh/multimsh.html,splot with indices demo. }
 
 @node smooth, special-filenames, index, data-file
@@ -3291,7 +3298,9 @@ applies the `bezier` algorithm.
 The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,See demos. }
+@c ^ See this
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,demos }
+@c ^ web page.
 
 
 @noindent --- FREQUENCY ---
@@ -3580,6 +3589,7 @@ the top simply by specifying
 
 However, if you want to leave text in your data files, it is safer to put the
 comment character (#) in the first column of the text lines.
+@c ^ See also the web page
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/using/using.html,Feeble using demos. }
 
 @node errorbars, errorlines, data-file, plot
@@ -3637,7 +3647,9 @@ The error bars have crossbars at each end unless @ref{bars} is used
 (see @ref{bars} for details).
 
 If autoscaling is on, the ranges will be adjusted to include the error bars.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,Errorbar demos. }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demos.
+}
 
 See @ref{using}, @ref{with}, and @ref{style} for more information.
 
@@ -3727,7 +3739,9 @@ parametric function has been completed:
 
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/param/param.html,Parametric Mode Demos. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/param/param.html,Parametric Mode Demos.
+}
 
 @node ranges, title, parametric, plot
 @subsection ranges
@@ -3829,7 +3843,9 @@ This sets the x range for a timeseries:
 
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html,See Demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html,ranges demo.
+}
 
 @node title, with, ranges, plot
 @subsection title
@@ -4058,8 +4074,9 @@ This plots two color surfaces at different altitudes:
 
 @end example
 
-See @ref{style} to change the default styles.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html,Styles demos. }
+See @ref{style} to change the default styles. See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html,styles demos.
+}
 
 @node print, pwd, plot, Commands
 @section print
@@ -4069,7 +4086,7 @@ See @ref{style} to change the default styles.
 @cmindex print
 
 
-The @ref{print} command prints the value of <expression> to the screen.  It is
+The `print` command prints the value of <expression> to the screen.  It is
 synonymous with `pause 0`.  <expression> may be anything that `gnuplot` can
 evaluate that produces a number, or it can be a string.
 
@@ -4079,7 +4096,7 @@ Syntax:
 
 @end example
 
-See `expressions`.
+See `expressions`.  The output file can be set with `set print`.
 
 @node pwd, quit, print, Commands
 @section pwd
@@ -4199,7 +4216,9 @@ The result is a single graph consisting of five plots.  The yrange must be
 set explicitly to guarantee that the five separate graphs (drawn on top of
 each other in multiplot mode) will have exactly the same axes.  The linetype
 must be specified; otherwise all the plots would be drawn with the same type.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/animate/animate.html,Reread Animation Demo}
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/animate/animate.html,Reread Animation Demo (animate.dem).
+}
 
 @node reset, save, reread, Commands
 @section reset
@@ -4343,6 +4362,7 @@ when the variable was initially defined.
 * color_box::                   
 * pointsize::                   
 * polar::                       
+* print_::                      
 * rmargin::                     
 * rrange::                      
 * samples::                     
@@ -4463,7 +4483,9 @@ but
       print asinh(y)  #prints @{57.29578, 5.729578@}
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,Polar plot using @ref{angles}. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,poldat.dem: polar plot using @ref{angles} demo.
+}
 
 @node arrow, autoscale, angles, set-show
 @subsection arrow
@@ -4595,7 +4617,7 @@ To show all arrows (in tag order), use:
       show arrow
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html,Arrows Demos. }
+@c ^ See also <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> arrows demos. </a>
 
 @node autoscale, bars, arrow, set-show
 @subsection autoscale
@@ -4763,7 +4785,9 @@ a polar plot of only that single quadrant.
 
 Explicitly setting one or two ranges but not others may lead to unexpected
 results.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,See polar demos }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,polar demos.
+}
 
 @node bars, bmargin, autoscale, set-show
 @subsection bars
@@ -4909,7 +4933,9 @@ Draw only the top and right borders for a @ref{plot} and label them as axes:
 
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,Borders Demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,borders demo.
+}
 
 @node boxwidth, fillstyle, border, set-show
 @subsection boxwidth
@@ -5123,6 +5149,10 @@ permitted:
 @ref{clip} is synonymous with `set clip points`; @ref{clip} turns off all
 three types of clipping.
 
+This setting does not apply for clipping of the color filled quadrangles which
+draw @ref{pm3d} maps and surfaces. There, you can choose between the options 
+`clip1in` and `clip4in`.
+
 @node cntrparam, contour, clip, set-show
 @subsection cntrparam
 
@@ -5247,9 +5277,12 @@ To set the start and increment while retaining the number of levels:
 See also @ref{contour} for control of where the contours are drawn, and 
 @ref{clabel} for control of the format of the contour labels and linetypes.
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,Contours Demo}
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,contours demo (contours.dem)
+}
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with User Defined Levels.}
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
+}
 
 @node contour, data_style, cntrparam, set-show
 @subsection contour
@@ -5314,9 +5347,12 @@ See also `splot datafile`.
 
 If contours are desired from non-grid data, @ref{dgrid3d} can be used to
 create an appropriate grid.  See @ref{dgrid3d} for more information.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,Contours Demo}
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html,contours demo (contours.dem)
+}
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with User Defined Levels.}
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
+}
 
 @node data_style, decimalsign, contour, set-show
 @subsection data style
@@ -5450,7 +5486,9 @@ Examples:
 The first specifies that a grid of size 10 by 10 is to be constructed using
 a norm value of 1 in the weight computation.  The second only modifies the
 norm, changing it to 4.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html,Dgrid3d Demo.}
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/scatter/scatter.html,scatter.dem: dgrid3d demo.
+}
 
 
 @node dummy, encoding, dgrid3d, set-show
@@ -5576,7 +5614,9 @@ after each number.  If you want "%" itself, double it: "%g %%".
 See also @ref{xtics} for more information about tic labels, and 
 @ref{decimalsign} for how to use non-default decimal separators in numbers
 printed this way.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html,See demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html,electron demo (electron.dem).
+}
 
 @menu
 * format_specifiers::           
@@ -5761,8 +5801,12 @@ Syntax:
 
 For information about the definition and usage of functions in `gnuplot`,
 please see `expressions`.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html,Splines as User Defined Functions.}
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,Use of functions and complex variables for airfoils }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/spline/spline.html,splines as user defined functions (spline.dem)
+}
+and
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,use of functions and complex variables for airfoils (airfoil.dem).
+}
 
 @node grid, hidden3d, functions, set-show
 @subsection grid
@@ -5943,9 +5987,12 @@ bit 2 of the <bitpattern> there, the edge CB above wouldn't be drawn at all,
 normally, making the resulting display hard to understand.  Therefore, the
 default option of `bentover` will turn it visible in this case.  If you don't
 want that, you may choose `nobentover` instead.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html,Hidden Line Removal Demo} 
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html,hidden line removal demo (hidden.dem)
+} 
 and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html,Complex Hidden Line Demo. }
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html,complex hidden line demo (singulr.dem).
+}
 
 @node historysize, isosamples, hidden3d, set-show
 @subsection historysize
@@ -6356,7 +6403,7 @@ Syntax:
                              @{pointtype | pt <point_type>@}
                              @{pointsize | ps <point_size>@}
                              @{palette@}
-      unset linestyle
+      unset style line
       show style line
 
 @end example
@@ -6614,7 +6661,9 @@ to be processed.  However even if @ref{mapping} is used, @ref{using} may still b
 necessary if the data in the file are not in the required order.
 
 @ref{mapping} has no effect on @ref{plot}.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/world/world.html,Mapping Demos.}
+@c ^ See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/world/world.html,world.dem: mapping demos.
+}
 
 @node margin, missing, mapping, set-show
 @subsection margin
@@ -6641,7 +6690,8 @@ Syntax:
 
 The units of <margin> are character heights or widths, as appropriate.  A
 positive value defines the absolute size of the margin.  A negative value
-(or none) causes `gnuplot` to revert to the computed value.
+(or none) causes `gnuplot` to revert to the computed value.  For 3D plots,
+only the left margin setting has any effect so far.
 
 Normally the margins of a plot are automatically calculated based on tics,
 tic labels, axis labels, the plot title, the timestamp and the size of the
@@ -6902,7 +6952,9 @@ See @ref{margin} for their use.  Note that the margin settings are absolute,
 in character units, so the appearance of the graph in the remaining space
 will depend on the screen size of the display device, e.g., perhaps quite
 different on a video display and a printer.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html,See demo. }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/multiplot/multiplt.html,multiplot demo (multiplt.dem).
+}
 
 @node mx2tics, mxtics, multiplot, set-show
 @subsection mx2tics
@@ -6949,7 +7001,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{mytics}, @ref{mztics}, @ref{mx2tics} and @ref{my2tics}.
+The same syntax applies to @ref{mytics}, @ref{mztics}, @ref{mx2tics}, @ref{my2tics} and
+`mcbtics`.
 
 <freq> is the number of sub-intervals (NOT the number of minor tics) between
 major tics (the default for a linear axis is either two or five
@@ -7102,6 +7155,7 @@ Syntax:
 @opindex output
 
 
+@c ?output file
 By default, screens are displayed to the standard output. The @ref{output}
 command redirects the display to the specified file or device.
 
@@ -7286,6 +7340,7 @@ Syntax:
                  @{ at <bst combination> @}
                  @{ scansautomatic | scansforward | scansbackward @}
                  @{ flush @{ begin | center | end @} @}
+                 @{ ftriangles | noftriangles @}
                  @{ clip1in | clip4in @}
                  @{ hidden3d <linestyle> | nohidden3d @}
                  @{ transparent | solid @}
@@ -7318,6 +7373,11 @@ them (`flush center`). Note, that `flush (center|end)` are incompatible with
 `scansautomatic`: if you specify `flush center` or `flush end` and
 `scansautomatic` is set, it is silently switched to `scansforward`.
 
+If two subsequent scans do not have the same number of points, the option
+`ftriangles` specifies whether color triangles are drawn at the scan tail(s)
+where there are not enough points in either of the scan. This can be used to
+draw a smooth map boundary.
+
 Clipping with respect to the x,y coordinates can be done in two ways.
 `clip1in`:  all 4 points of the quadrangle must be defined and at least 1
 point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
@@ -7337,7 +7397,7 @@ The option @ref{hidden3d} takes as the argument a linestyle which must be create
 by `set style line ...`. (The style need not to be present when setting pm3d,
 but it must be present when plotting).  If set, lines are drawn using the
 specified line style, taking into account hidden line removal.  This is by
-far more efficient then using the command @ref{hidden3d} as it doesn't really
+far more efficient than using the command @ref{hidden3d} as it doesn't really
 calculate hidden line removal, but just draws the filled polygons in the
 correct order. So the recommended choice when using pm3d is
 @example
@@ -7537,8 +7597,10 @@ mapping to RGB.
 
 @c ?commands set colorbox
 @c ?commands show colorbox
+@c ?commands unset colorbox
 @c ?set colorbox
 @c ?show colorbox
+@c ?unset colorbox
 @cindex colorbox
 
 
@@ -7592,6 +7654,10 @@ usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
 `format cb`, `grid [m]cb`, @ref{cblabel}, and perhaps even @ref{cbdata}, `[no]cbdtics`,
 `[no]cbmtics`.
 
+`set colorbox` without any parameter switches the position to default.
+`unset colorbox` resets the default parameters for the colorbox and switches
+the colorbox off.
+
 See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`, 
 `help set style line`.
 
@@ -7625,7 +7691,7 @@ See @ref{with} for details.
 Please note that the pointsize setting is not supported by all terminal
 types.
 
-@node polar, rmargin, pointsize, set-show
+@node polar, print_, pointsize, set-show
 @subsection polar
 
 @c ?commands set polar
@@ -7694,10 +7760,38 @@ directions.
 
 You may want to `set size square` to have `gnuplot` try to make the aspect
 ratio equal to unity, so that circles look circular.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/polar/polar.html,Polar demos }
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,Polar Data Plot. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/polar/polar.html,polar demos (polar.dem)
+}
+and
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html,polar data plot (poldat.dem).
+}
 
-@node rmargin, rrange, polar, set-show
+@node print_, rmargin, polar, set-show
+@subsection print
+
+@c ?commands set print
+@c ?commands show print
+@c ?set print
+@c ?show print
+The `set print` command redirects the output of the `print` command to a file.
+
+Syntax:o
+@example
+      set print
+      set print "-"
+      set print "<filename>"
+      set print "<filename>" append
+      set print "|<shell_command>"
+
+@end example
+
+Without "<filename>", the output file is restored to <STDERR>.  The <filename>
+"-" means <STDOUT>. The `append` flag causes the file to be opened in append
+mode.  A <filename> starting with "|" is opened as a pipe to the 
+<shell_command> on platforms that support piping.
+
+@node rmargin, rrange, print_, set-show
 @subsection rmargin
 
 @c ?commands set rmargin
@@ -7833,7 +7927,9 @@ To make the graph twice as high as wide use:
 
 @end example
 
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,See demo. }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html,airfoil demo.
+}
 
 @node style, surface, size, set-show
 @subsection style
@@ -7941,7 +8037,9 @@ where three-column data are used.
 The box height is determined from the y error in the same way as it is for
 the @ref{yerrorbars} style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,See Demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+}
 
 @node boxes, filledboxes, boxerrorbars, style
 @subsubsection boxes
@@ -8101,7 +8199,10 @@ rectangle may be changed by @ref{bars}.  The symbol will be unchanged
 if the low and high prices are interchanged.  The rectangle is pseudo-filled 
 by three vertical lines inside it, if the open value is larger than
 the close. Otherwise it's left empty. See @ref{bars} and @ref{financebars}.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,See demos.}
+
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demos.
+}
 
 @node dots, financebars, candlesticks, style
 @subsubsection dots
@@ -8130,8 +8231,9 @@ coordinate and limited vertically by the high and low prices.  A horizontal
 tic on the left marks the opening price and one on the right marks the
 closing price.  The length of these tics may be changed by @ref{bars}.  The
 symbol will be unchanged if the high and low prices are interchanged.  
-See @ref{bars} and @ref{candlesticks}.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,See demos.}
+See @ref{bars} and @ref{candlesticks}, and also the
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demo.
+}
 
 @node fsteps, histeps, financebars, style
 @subsubsection fsteps
@@ -8144,7 +8246,9 @@ See @ref{bars} and @ref{candlesticks}.
 The @ref{fsteps} style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x1,y2) and the
 second from (x1,y2) to (x2,y2).
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,See demo. }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+}
 
 @node histeps, impulses, fsteps, style
 @subsubsection histeps
@@ -8163,7 +8267,9 @@ line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
 
 If @ref{autoscale} is in effect, it selects the xrange from the data rather than
 the steps, so the end points will appear only half as wide as the others.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,See demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+}
 
 @ref{histeps} is only a plotting style; `gnuplot` does not have the ability to
 create bins and determine their population from some data set.
@@ -8232,7 +8338,9 @@ for its usage.
 The @ref{steps} style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x2,y1) and the
 second from (x2,y1) to (x2,y2).
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,See demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
+}
 
 @node vector, xerrorbars, steps, style
 @subsubsection vector
@@ -8306,7 +8414,9 @@ At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
 from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
 used---see @ref{bars} for details).
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,See demo. }
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+}
 
 @node xerrorlines, xyerrorlines, yerrorbars, style
 @subsubsection xerrorlines
@@ -8367,7 +8477,9 @@ error line is also drawn. At each point (x,y), a line is drawn from
 on how many data columns are provided. A tic mark is placed at the
 ends of the error bar (unless @ref{bars} is used---see @ref{bars} for
 details).
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,See demo. }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
+}
 
 @node surface, terminal, style, set-show
 @subsection surface
@@ -9220,7 +9332,7 @@ Syntax:
 which defaults to monochrome.
 
 With each of these drivers, a binary copy is required on a PC to print.  Do
-not use @ref{print}---use instead `copy file /b lpt1:`."
+not use `print`---use instead `copy file /b lpt1:`."
 
 @node excl, fig, epson-180dpi, terminal
 @subsubsection excl
@@ -9358,6 +9470,9 @@ To plot the error bars on top of the circles use
 
 The `gif` terminal driver generates output in GIF format.  It uses Thomas
 Boutell's gd library, which is available from http://www.boutell.com/gd/
+
+>>> This copy of gnuplot was configured to produce PNG images <<<
+>>> instead of GIF images when 'set term gif' is selected.    <<<
 
 By default, the `gif` terminal driver uses a shared Web-friendy palette.
 
@@ -10601,8 +10716,8 @@ in any plain-based format (including LaTeX).
 
 Syntax:
 @example
-      set terminal pslatex | pstex @{<color>@} @{<dashed>@} @{<rotate>@}
-                                    @{auxfile@} @{<font_size>@}
+      set terminal [pslatex | pstex] @{<color>@} @{<dashed>@} @{<rotate>@}
+                                     @{auxfile@} @{<font_size>@}
 
 @end example
 
@@ -10618,12 +10733,15 @@ them.  The name of the auxiliary PostScript file is derived from the name of
 the TeX file given on the @ref{output} command; it is determined by replacing
 the trailing `.tex` (actually just the final extent in the file name) with
 `.ps` in the output file name, or, if the TeX file has no extension, `.ps`
-is appended.  Remember to close the file before leaving `gnuplot`.
+is appended.  Remember to close the `output file` before leaving `gnuplot`.
+The `.ps` is included into the `.tex` file by a \\special@{psfile=...@} command.
+If you would rather prefer \\includegraphics@{...@}, then use the `epslatex`
+terminal.
 
-All drivers for LaTeX offer a special way of controlling text positioning:
-If any text string begins with '@{', you also need to include a '@}' at the
+All drivers for LaTeX offer a special way of controlling text positioning: 
+(a) If any text string begins with '@{', you also need to include a '@}' at the
 end of the text, and the whole text will be centered both horizontally
-and vertically by LaTeX. --- If the text string begins with '[', you need
+and vertically by LaTeX.  (b) If the text string begins with '[', you need
 to continue it with: a position specification (up to two out of t,b,l,r),
 ']@{', the text itself, and finally, '@}'. The text itself may be anything
 LaTeX can typeset as an LR-box. \\rule@{@}@{@}'s may help for best positioning.
@@ -10636,7 +10754,7 @@ Examples:
 To write the PostScript commands into the file "foo.ps":
 @example
       set term pslatex auxfile
-      set output "foo.tex"; plot ...: set output
+      set output "foo.tex"; plot ...; set output
 @end example
 
 About label positioning:
@@ -10661,7 +10779,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-Linewidths and pointsizes may be changed with @ref{linestyle}."
+Linewidths and pointsizes may be changed with `set style line`."
 
 @node pstricks, qms, pslatex_and_pstex, terminal
 @subsubsection pstricks
@@ -11675,6 +11793,7 @@ The valid formats are:
       %j           day of the year, 1--365
       %H           hour, 0--24
       %M           minute, 0--60
+      %s           seconds since the Unix epoch (1970-01-01, 00:00 UTC)
       %S           second, 0--60
       %b           three-character abbreviation of the name of the month
       %B           name of the month
@@ -11713,7 +11832,9 @@ Example:
 tells `gnuplot` to read date and time separated by tab.  (But look closely at
 your data---what began as a tab may have been converted to spaces somewhere
 along the line; the format string must match what is actually in the file.)
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/timedat/timedat.html,Time Data Demo }
+See also
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/timedat/timedat.html,time data demo.
+}
 
 @node title_, tmargin, timefmt, set-show
 @subsection title
@@ -12022,7 +12143,7 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ydata}, @ref{zdata}, @ref{x2data} and @ref{y2data}.
+The same syntax applies to @ref{ydata}, @ref{zdata}, @ref{x2data}, @ref{y2data} and `mcbtics`.
 
 The `time` option signals that the datatype is indeed time/date.  If the
 option is not specified, the datatype reverts to normal.
@@ -12069,7 +12190,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ydtics}, @ref{zdtics}, @ref{x2dtics} and @ref{y2dtics}.
+The same syntax applies to @ref{ydtics}, @ref{zdtics}, @ref{x2dtics}, @ref{y2dtics} and
+@ref{cbdtics}.
 
 See also the `set format` command.
 
@@ -12184,7 +12306,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{x2mtics}, @ref{ymtics}, @ref{y2mtics}, and @ref{zmtics}.
+The same syntax applies to @ref{x2mtics}, @ref{ymtics}, @ref{y2mtics}, @ref{zmtics} and
+@ref{cbmtics}.
 
 See also the `set format` command.
 
@@ -12220,7 +12343,7 @@ autoscaling.  If the data are time/date, you must give the range as a quoted
 string according to the @ref{timefmt} format.  Any value omitted will not be
 changed.
 
-The same syntax applies to @ref{yrange}, @ref{zrange}, @ref{x2range}, @ref{y2range},
+The same syntax applies to @ref{yrange}, @ref{zrange}, @ref{x2range}, @ref{y2range}, @ref{cbrange},
 @ref{rrange}, @ref{trange}, @ref{urange} and @ref{vrange}.
 
 The `reverse` option reverses the direction of the axis, e.g., `set xrange
@@ -12806,8 +12929,24 @@ by the terminal driver currently in use), or a user-defined style
 If no linetype is specified, any zero axes selected will be drawn
 using the axis linetype (linetype 0).
 
-`set zeroaxis l` is equivalent to `set xzeroaxis l; set yzeroaxis l`. `set
-nozeroaxis` is equivalent to @ref{yzeroaxis}.
+@ref{zeroaxis} is equivalent to @ref{yzeroaxis}.
+`set nozeroaxis` is equivalent to @ref{yzeroaxis}.
+
+Examples:
+
+To simply have the y=0 axis drawn visibly:
+
+@example
+       set xzeroaxis
+
+@end example
+
+If you want a thick line in a different color or pattern, instead:
+
+@example
+       set xzeroaxis linetype 3 linewidth 2.5
+
+@end example
 
 @node zlabel, zmtics, zeroaxis, set-show
 @subsection zlabel
@@ -13156,7 +13295,9 @@ generates binary files for the demo file `demo/binary.dem`.
 The @ref{index} keyword is not supported, since the file format allows only one
 surface per file.  The @ref{every} and @ref{using} filters are supported.  @ref{using}
 operates as if the data were read in the above triplet form.
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html,Binary File Splot Demo.}
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/binary/binary.html,Binary File Splot Demo.
+}
 
 @node example_datafile_, matrix, binary, data-file_
 @subsubsection example datafile
