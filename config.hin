@@ -96,6 +96,9 @@
 /* Define if you have the snprintf function.  */
 #undef HAVE_SNPRINTF
 
+/* Define if you have the stpcpy function.  */
+#undef HAVE_STPCPY
+
 /* Define if you have the strcasecmp function.  */
 #undef HAVE_STRCASECMP
 

@@ -2778,10 +2778,14 @@ The special filename "-" may be used to `load` commands from standard input.
 This allows a `gnuplot` command file to accept some commands from standard
 input.  Please see "help batch/interactive" for more details.
 
+On some systems which support a popen function (Unix), the load file can be
+read from a pipe by starting the file name with a '<'.
+
 Examples:
 @example
       load 'work.gnu'
       load "func.dat"
+      load "< loadfile_generator.sh"
 
 @end example
 
@@ -6373,9 +6377,20 @@ with mouse buttons 1 and 2. If additionally to these buttons the modifier
 <ctrl> is hold down, the coordinate system only is rotated which is
 useful for large data sets. A vertical motion of Button 2 with the
 shift key hold down changes the ticslevel.
+
 Mousing is not available in multiplot mode.  If multiplot is disabled
 using @ref{multiplot} though,  the mouse will be turned on again and
 acts on the last plot (like replot do).
+
+X11 specific implementation details:
+Mouse support is turned on by default if standard input comes from
+a terminal (tty). Mouse support is turned off, if standard input
+does not come from a tty e.g. a pipe.  If you want to use mouse support
+while writing to gnuplot from a pipe, the mouse must be turned on *before*
+starting the x11 driver, e.g. immediately after startup with the explicit
+command @ref{mouse}.  Beware: on some UNIX flavours, special input devices
+as /dev/null might not be `select-able`; turning on the mouse when using
+such devices will hang gnuplot.
 
 Syntax:
 @example
