@@ -901,7 +901,7 @@ C
 #tm\_mon(x) & int & the month \\
 %tm_mon(x)@int@the month
  The `tm_mon` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the month (an integer in the range 1--12) as a real.
+ 1 Jan 2000.  It returns the month (an integer in the range 0--11) as a real.
 4 tm_sec
 ?expressions tm_sec
 ?functions tm_sec
@@ -915,7 +915,7 @@ C
 #tm\_wday(x) & int & the day of the week \\
 %tm_wday(x)@int@the day of the week
  The `tm_wday` function interprets its argument as a time, in seconds from
- 1 Jan 2000.  It returns the day of the week (an integer in the range 1--7) as
+ 1 Jan 2000.  It returns the day of the week (an integer in the range 0--6) as
  a real.
 4 tm_yday
 ?expressions tm_yday
@@ -3270,7 +3270,9 @@ C ... and restart the table:
 ?border
 ?noborder
  The `set border` and `set noborder` commands control the display of the graph
- borders for the `plot` and `splot` commands.
+ borders for the `plot` and `splot` commands.  Note that the borders do not
+ necessarily coincide with the axes; with `plot` they often do, but with
+ `splot` they usually do not.
 
  Syntax:
        set border {<integer> { {linestyle | ls <line_style>}
@@ -3279,65 +3281,98 @@ C ... and restart the table:
        set noborder
        show border
 
+ With a `splot` displayed in an arbitrary orientation, like `set view 56,103`,
+ the four corners of the x-y plane can be referred to as "front", "back",
+ "left" and "right".  A similar set of four corners exist for the top surface,
+ of course.  Thus the border connecting, say, the back and right corners of the
+ x-y plane is the "bottom right back" border, and the border connecting the top
+ and bottom front corners is the "front vertical".  (This nomenclature is
+ defined solely to allow the reader to figure out the table that follows.)
+
  The borders are encoded in a 12-bit integer: the bottom four bits control the
- border for `plot` and the sides of the base for `splot`; The next four bits
+ border for `plot` and the sides of the base for `splot`; the next four bits
  control the verticals in `splot`; the top four bits control the edges on top
- of the `splot`.  In detail, the `<integer>` should be the sum of the
- appropriate entries from the following table:
+ of the `splot`.  In detail, `<integer>` should be the sum of the appropriate
+ entries from the following table:
 
 @start table - first is interactive cleartext form
-                         plot border     splot         splot
-           Side          splot base    verticals        top
-       bottom (south)         1            16           256
-       left   (west)          2            32           512
-       top    (north)         4            64          1024
-       right  (east)          8           128          2048
-#\begin{tabular}{|cc|ccc|} \hline
-#\multicolumn{5}{|c|}{Graph Border Encoding} \\ \hline \hline
-# & & \multicolumn{3}{|c|}{Integer value of selection bit} \\ \cline{3-5}
-# & & plot border & splot & splot \\
-#\multicolumn{2}{|c|}{Side}& splot base & verticals & top \\ \hline
-#bottom & (south) & 1 & 16 & 256 \\
-#left   & (west)  & 2 & 32 & 512 \\
-#top    & (north) & 4 & 64 & 1024 \\
-#right  & (east)  & 8 & 128 & 2048 \\
-%c c c c c .
-%@plot border@splot@splot
-%@splot base@verticals@top
+             Bit     plot        splot
+               1   bottom      bottom left front
+               2   left        bottom left back
+               4   top         bottom right front
+               8   right       bottom right back
+              16   no effect   left vertical
+              32   no effect   back vertical
+              64   no effect   right vertical
+             128   no effect   front vertical
+             256   no effect   top left back
+             512   no effect   top right back
+            1024   no effect   top left front
+            2048   no effect   top right front
+#\begin{tabular}{|c|c|c|} \hline
+#\multicolumn{3}{|c|}{Graph Border Encoding} \\ \hline \hline
+#Bit & plot & splot \\ \hline
+#1 & bottom & bottom left front \\
+#2 & left & bottom left back \\
+#4 & top & bottom right front \\
+#8 & right & bottom right back \\
+#16 & no effect & left vertical \\
+#32 & no effect & back vertical \\
+#64 & no effect & right vertical \\
+#128 & no effect & front vertical \\
+#256 & no effect & top left back \\
+#512 & no effect & top right back \\
+#1024 & no effect & top left front \\
+#2048 & no effect & top right front \\
+%c c c .
+%Bit@plot@splot
 %_
-%bottom (south)@1@16@256
-%left   (west)@2@32@512
-%top    (north)@4@64@1024
-%right  (east)@8@128@2048
+%1@bottom@bottom left front
+%2@left@bottom left back
+%4@top@bottom right front
+%8@right@bottom right back
+%16@no effect@left vertical
+%32@no effect@back vertical
+%64@no effect@right vertical
+%128@no effect@front vertical
+%256@no effect@top left back
+%512@no effect@top right back
+%1024@no effect@top left front
+%2048@no effect@top right front
 @end table
+
+ Various bits or combinations of bits may be added together in the command.
 
  The default is 31, which is all four sides for `plot`, and base and z axis
  for `splot`.
 
- Using the optional <line_style>, <line_type> and <line_width>
- specifiers, the way the border lines are drawn can be influenced
- (limited by what the current terminal driver supports).
+ Using the optional <line_style>, <line_type> and <line_width> specifiers, the
+ way the border lines are drawn can be influenced (limited by what the current
+ terminal driver supports).
 
- Various axes or combinations of axes may be added together in the command.
+ For `plot`, tics may be drawn on edges other than bottom and left by enabling
+ the second axes -- see `set xtics` for details..
 
- To have tics on edges other than bottom and left, disable the usual tics and
- enable the second axes.
+ If a `splot` draws only on the base, as is the case with "`set nosurface; set
+ contour base`", then the verticals and the top are not drawn even if they are
+ specified.
 
  Examples:
 
- Draw all borders:
+ Draw default borders:
        set border
 
- Draw only the SOUTHWEST borders:
+ Draw only the left and bottom (`plot`) or both front and back bottom left
+ (`splot`) borders:
        set border 3
 
  Draw a complete box around a `splot`:
        set border 4095
 
- Draw a partial box, omitting the front vertical:
-       set border 127+256+512
+ Draw a topless box around a `splot`, omitting the front vertical:
+       set border 127+256+512 # or set border 1023-128
 
- Draw only the NORTHEAST borders:
+ Draw only the top and right borders for a `plot` and label them as axes:
        set noxtics; set noytics; set x2tics; set y2tics; set border 12
 
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html"> Borders Demo. </a>
@@ -4292,7 +4327,7 @@ C ... and restart the table:
 
  Syntax:
        set label {<tag>} {"<label_text>"} {at <position>}
-                 {<justification>} {{no}rotate} {font "<name><,size>"}
+                 {<justification>} {{no}rotate} {font "<name>{,<size>}"}
                  {front | back}
        set nolabel {<tag>}
        show label
