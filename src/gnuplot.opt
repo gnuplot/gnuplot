@@ -1,12 +1,16 @@
 alloc.obj
+axis.obj
 binary.obj
 bitmap.obj
+color.obj
 command.obj
 contour.obj
 datafile.obj
 dynarray.obj
 eval.obj
 fit.obj
+gadgets.obj
+getcolor.obj
 graphics.obj
 graph3d.obj
 help.obj
@@ -20,6 +24,7 @@ parse.obj
 plot.obj
 plot2d.obj
 plot3d.obj
+pm3d.obj
 save.obj
 scanner.obj
 set.obj

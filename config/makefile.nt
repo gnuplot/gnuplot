@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.nt,v 1.1 1999/03/26 21:32:36 lhecking Exp $
 #
 # GNUPLOT Makefile to compile gnuplot for WinNT and Win95/98
 #
@@ -24,7 +24,7 @@ TOP = .
 
 CC = cl /c
 LD = link
-CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DHAVE_SYS_STAT_H
+CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /DPM3D /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DHAVE_SYS_STAT_H
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = ALPHA
 !ELSEIF "$(PROCESSOR_ARCHITECTURE)" == "x86"
@@ -34,15 +34,15 @@ MACHINE = IX86
 LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT
 
 # see other terminal defines in term.h
-TERMFLAGS = /I$(TOP)\\term
+TERMFLAGS = /I..\\term
 
 
 # macros for makefile.all
 O=obj
-T=term\\
-D=docs\\
-L=docs\\latex\\
-M=demo\\
+T=..\\term\\
+D=..\\docs\\
+L=..\\docs\\latex\\
+M=..\\demo\\
 
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
@@ -58,7 +58,7 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgraph.c \
 	win\winmain.c win\wmenu.c win\wpause.c win\wprinter.c \
 	win\wresourc.h win\wtext.c win\wtext.h win\geticon.c \
-	docs\doc2rtf.c term\win.trm win\grpicon.ico win\texticon.ico
+	$(D)doc2rtf.c $(T)win.trm win\grpicon.ico win\texticon.ico
 
 
 # default rules
@@ -82,7 +82,6 @@ linkopt1.msw: makefile.nt
 	echo comdlg32.lib >> linkopt1.msw
 	echo advapi32.lib >> linkopt1.msw
 	echo shell32.lib >> linkopt1.msw
-	echo advapi32.lib >> linkopt1.msw
 	echo wgnuplot.res >> linkopt1.msw
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win\wgnuplot.def wgnuplot.res linkopt1.msw texticon.ico grpicon.ico
@@ -132,41 +131,42 @@ geticon.exe: win\geticon.c
 	cl /DMSDOS /F 5000 /W1 win\geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
-	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
+	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
 	hcw /c /e win\wgnuplot.hpj
 	if exist win\wgnuplot.hlp copy win\wgnuplot.hlp .
 
-doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
-	cl $(CFLAGS) /F 5000 /W1 /I. /Idocs /Iterm -Fedoc2rtf.exe docs\doc2rtf.c docs\termdoc.c docs\xref.c
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+	cl $(CFLAGS) /F 5000 /W1 /I. /DWINDOWS_NO_GUI /I$(D) /I$(T) -Fedoc2rtf.exe $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.obj alloc.obj
-        cl $(CFLAGS) /F 5000 /W1 /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
-	cd demo
+		cl $(CFLAGS) /F 5000 /W1 /DWINDOWS_NO_GUI /Fe$(M)bf_test.exe bf_test.c dbinary.obj alloc.obj
+	cd $(M)
 	bf_test
-	cd ..
+	cd ..\src
 
 # _Windows causes wtext.h to define fread() etc
 dbinary.obj: binary.c
-        $(CC) $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj binary.c
+		$(CC) $(CFLAGS) /U_Windows /F 5000 /W1 /Fodbinary.obj binary.c
 
 # clean up temporary files
 clean:
 	del *.obj
-        del *.ico
+		del *.ico
 	del wgnuplot.res
 	del win\gnuplot.rtf
-	del demo\bf_test.exe
+	del $(D)bf_test.exe
 	del linkopt1.msw
 	del doc2rtf.exe
-        del geticon.exe
+		del geticon.exe
 	
 veryclean: clean
 	del wgnuplot.exe
 	del wgnuplot.hlp
 	del wgnuplot.mnu
-	del demo\binary1
-	del demo\binary2
-	del demo\binary3
-
+	del $(m)binary1
+	del $(m)binary2
+	del $(m)binary3
+	del $(m)fit.log
+	del $(m)soundfit.par
