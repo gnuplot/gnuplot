@@ -9,8 +9,9 @@ HELPFILE=$(datadir)/gnuplot.gih
 
 # There is probably no need to edit anything below this line
 
+GNUPLOT_X11 = @GNUPLOT_X11@
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot @GNUPLOT_X11@
+bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
 noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
@@ -21,17 +22,22 @@ bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h \
 dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_hist.h gp_time.h graph3d.c \
 graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c \
 internal.c internal.h interpol.c interpol.h matrix.c matrix.h misc.c misc.h \
-national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h \
-readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h \
-show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h \
-tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c \
-util.h util3d.c util3d.h variable.c variable.h version.c
+mouse.c mouse.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
+plot3d.c plot3d.h readline.c readline.h save.c save.h scanner.c scanner.h \
+set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c \
+stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c \
+unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
 gnuplot_x11_SOURCES = gplt_x11.c
 
 gnuplot_x11_LDADD = $(XLIBS)
+
+if ALT_X11_DRIVER
+$(GNUPLOT_X11): gnuplot_x11
+	cp gnuplot_x11 $(GNUPLOT_X11)
+endif
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 
