@@ -1,5 +1,5 @@
-/* 
- * $Id: $
+/* Hey Emacs this is -*- C -*-
+ * $Id: emf.trm,v 1.0.3 2000/03/29 14:02:00 CompoData Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,11 @@
  *
  * HISTORY
  *
+ * 1.0.5 2000/07/20
+ * - Handles were not freed at all, resulting to resource leaks when viewing on Windows 9x (not on NT4/W2000!!!)
+ * 1.0.4 2000/06/28
+ * - Emulated dashed vectors are now looking better
+ * - 15 colors * 8 pointstyles = 120 pointtypes
  * 1.0.3 2000/03/29
  * - default font is now Arial 12
  * - implemented options (color/mono,dashed/solid,font)
@@ -70,13 +75,14 @@
  *   Some code based on cgm.trm
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
-*/
+ */
 
 #include "driver.h"
 
 #ifdef TERM_REGISTER
 register_term(emf)
 #endif
+
 #ifdef TERM_PROTO
 TERM_PUBLIC void EMF_options __PROTO((void));
 TERM_PUBLIC void EMF_init __PROTO((void));
@@ -100,8 +106,7 @@ TERM_PUBLIC int EMF_set_font __PROTO((const char *));
 #ifdef RGB
 #undef RGB
 #endif
-#define RGB(r,g,b) \
-  ((long)(((unsigned char)(r)|((short)((unsigned char)(g))<<8))|(((long)(unsigned char)(b))<<16)))
+#define RGB(r,g,b) ((long)(((unsigned char)(r)|((short)((unsigned char)(g))<<8))|(((long)(unsigned char)(b))<<16)))
 
 #ifndef min
 #define min(a,b) (a<b?a:b)
@@ -218,7 +223,7 @@ static void EMF_write_long __PROTO((long));
 static void EMF_write_float __PROTO((float));
 static void EMF_setfont __PROTO((void));
 
-static void
+static void 
 EMF_setfont()
 {
     int i, count;
@@ -249,6 +254,9 @@ EMF_setfont()
     }
     strncpy(font, emf_fontname, count);
 
+    EMF_SelectObject(0x8000000A);
+    EMF_DeleteObject(EMF_HANDLE_FONT);
+
     EMF_write_emr(82, 104);
     EMF_write_long(EMF_HANDLE_FONT);
     EMF_write_long((long) (emf_fontsize * EMF_PT2HM));	/* height */
@@ -271,7 +279,7 @@ EMF_setfont()
     EMF_SelectObject(EMF_HANDLE_FONT);
 }
 
-static void
+static void 
 EMF_flush_polygon()
 {
     if (emf_coords == 0)
@@ -279,12 +287,12 @@ EMF_flush_polygon()
     else {
 	int i = 0;
 	/* Polygon works for NT4 but not on W9x */
-/*		EMF_write_emr(3,(7+emf_coords*2)*4);
-		EMF_write_rectl(0,0,0,0);
-		EMF_write_long(emf_coords);
-		while(i < emf_coords*2)
-			EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
-*/
+/*              EMF_write_emr(3,(7+emf_coords*2)*4);
+   EMF_write_rectl(0,0,0,0);
+   EMF_write_long(emf_coords);
+   while(i < emf_coords*2)
+   EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
+ */
 	EMF_MoveToEx(emf_polyline[i++], term->ymax - emf_polyline[i++]);
 	while (i < emf_coords * 2)
 	    EMF_LineTo(emf_polyline[i++], term->ymax - emf_polyline[i++]);
@@ -293,7 +301,7 @@ EMF_flush_polygon()
     emf_coords = 0;
 }
 
-static void
+static void 
 EMF_flush_polyline()
 {
     if (emf_coords == 0)
@@ -304,12 +312,12 @@ EMF_flush_polyline()
     } else {
 	int i = 0;
 	/* Polyline works for NT4 but not on W9x */
-/*		EMF_write_emr(4,(7+emf_coords*2)*4);
-		EMF_write_rectl(0,0,0,0);
-		EMF_write_long(emf_coords);
-		while(i < emf_coords*2)
-			EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
-*/
+/*              EMF_write_emr(4,(7+emf_coords*2)*4);
+   EMF_write_rectl(0,0,0,0);
+   EMF_write_long(emf_coords);
+   while(i < emf_coords*2)
+   EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
+ */
 	EMF_MoveToEx(emf_polyline[i++], term->ymax - emf_polyline[i++]);
 	while (i < emf_coords * 2)
 	    EMF_LineTo(emf_polyline[i++], term->ymax - emf_polyline[i++]);
@@ -317,14 +325,14 @@ EMF_flush_polyline()
     emf_coords = 0;
 }
 
-static void
+static void 
 EMF_write_byte(value)
 char value;
 {
     fwrite(&value, 1, 1, gpoutfile);
 }
 
-static void
+static void 
 EMF_write_short(value)
 short int value;
 {
@@ -339,7 +347,7 @@ short int value;
     fwrite(&u.s, 1, 2, gpoutfile);
 }
 
-static void
+static void 
 EMF_write_long(value)
 long value;
 {
@@ -356,7 +364,7 @@ long value;
     fwrite(&u.l, 1, 4, gpoutfile);
 }
 
-static void
+static void 
 EMF_write_float(value)
 float value;
 {
@@ -380,7 +388,7 @@ float value;
     fwrite(&u.l, 1, 4, gpoutfile);
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_options()
 {
     term->xmax = EMF_XMAX;
@@ -422,19 +430,20 @@ EMF_options()
 	quote_str(emf_defaultfontname, c_token, MAX_ID_LEN);
 	c_token++;
     }
-
     if (!END_OF_COMMAND) {
 	/* We have font size specified */
 	struct value a;
 	emf_defaultfontsize = (int) real(const_express(&a));
     }
-    EMF_set_font(NULL);		/* set default font */
+    EMF_set_font(NULL);		// set default font
 
     sprintf(term_options, "%s %s \"%s\" %d",
-	    emf_monochrome ? "monochrome" : "color", emf_dashed ? "dashed" : "solid", emf_defaultfontname, emf_defaultfontsize);
+	    emf_monochrome ? "monochrome" : "color",
+	    emf_dashed ? "dashed" : "solid",
+	    emf_defaultfontname, emf_defaultfontsize);
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_init()
 {
     emf_posx = emf_posy = 0;
@@ -443,7 +452,7 @@ EMF_init()
     emf_graphics = FALSE;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_graphics()
 {
     /* header start */
@@ -477,19 +486,18 @@ EMF_graphics()
     /* header end */
 
     EMF_SetMapMode(8);		/* forcing anisotropic mode */
-    EMF_SetWindowExtEx(term->xmax, term->ymax);	/* setting logical (himetric) size      */
+    EMF_SetWindowExtEx(term->xmax, term->ymax);		/* setting logical (himetric) size      */
     EMF_SetViewportExtEx(term->xmax / 20, term->ymax / 20);	/* setting device (pixel) size */
     EMF_CreatePen(EMF_HANDLE_PEN, 0, 1, 0x000000);	/* init default pen */
     EMF_SelectObject(EMF_HANDLE_PEN);
     EMF_SetBkMode(1);		/* transparent background for text */
-    EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);	/* transparent brush for polygons */
+    EMF_CreateBrush(EMF_HANDLE_BRUSH, 1, 0, 0);		/* transparent brush for polygons */
     EMF_SelectObject(EMF_HANDLE_BRUSH);
     EMF_set_font(NULL);		/* init default font */
 }
 
-TERM_PUBLIC int
-EMF_set_font(font)
-const char *font;
+TERM_PUBLIC int 
+EMF_set_font(const char *font)
 {
     int sep, i;			/* hope this function exist everywhere... */
 
@@ -512,13 +520,19 @@ const char *font;
     return TRUE;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_text()
 {
     fpos_t pos;
     EMF_flush_polyline();
 
     /* writing end of metafile */
+    EMF_SelectObject(0x8000000A);
+    EMF_DeleteObject(EMF_HANDLE_FONT);
+    EMF_SelectObject(0x80000007);
+    EMF_DeleteObject(EMF_HANDLE_PEN);
+    EMF_SelectObject(0x80000000);
+    EMF_DeleteObject(EMF_HANDLE_BRUSH);
     EMF_EOF();
 
     /* updating header */
@@ -528,7 +542,7 @@ EMF_text()
     EMF_write_long(emf_record_count);
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_linetype(linetype)
 int linetype;
 {
@@ -543,11 +557,12 @@ int linetype;
     EMF_dashtype(linetype);
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_linecolor(linecolor)
 int linecolor;
 {
-    static long GPFAR color_table_data[] = {
+    static long GPFAR color_table_data[] =
+    {
 	RGB(255, 0, 0),		/* red */
 	RGB(0, 255, 0),		/* green */
 	RGB(0, 0, 255),		/* blue */
@@ -574,7 +589,7 @@ int linecolor;
     EMF_flush_polyline();
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_linewidth(width)
 double width;
 {
@@ -586,7 +601,7 @@ double width;
     EMF_dashtype(emf_dashtype);	/* have dash lengths recalculated */
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_dashtype(dashtype)
 int dashtype;
 {
@@ -595,11 +610,12 @@ int dashtype;
        pattern.  Entries in each group are alternately length of
        whitespace and length of line, in units of 2/3 of the
        linewidth. */
-    static int dot_length[EMF_LINE_TYPES * 8] = {	/* 0 - solid             */
+    static int dot_length[EMF_LINE_TYPES * 8] =
+    {				/* 0 - solid             */
 	5, 8, 5, 8, 5, 8, 5, 8,	/* 1 - dashes            */
-	4, 1, 4, 1, 4, 1, 4, 1,	/* 2 - dotted            */
-	4, 8, 4, 1, 4, 8, 4, 1,	/* 3 - dash-dot          */
-	4, 9, 4, 1, 4, 1, 0, 0,	/* 4 - dash-dot-dot      */
+	4, 2, 4, 2, 4, 2, 4, 2,	/* 2 - dotted            */
+	4, 8, 4, 2, 4, 8, 4, 2,	/* 3 - dash-dot          */
+	4, 9, 4, 2, 4, 2, 0, 0,	/* 4 - dash-dot-dot      */
     };
 
 
@@ -615,12 +631,15 @@ int dashtype;
 	dashtype = (dashtype / EMF_COLORS) % EMF_LINE_TYPES;
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
+	EMF_SelectObject(0x80000007);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_solid_vector;
     } else {			/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
-
+	EMF_SelectObject(0x80000007);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
@@ -640,7 +659,7 @@ int dashtype;
     }
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_move(x, y)
 unsigned int x, y;
 {
@@ -652,7 +671,7 @@ unsigned int x, y;
     emf_posy = y;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_dashed_vector(ux, uy)
 unsigned int ux, uy;
 {
@@ -700,7 +719,7 @@ unsigned int ux, uy;
     emf_step -= (int) remain;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_solid_vector(ux, uy)
 unsigned int ux, uy;
 {
@@ -719,13 +738,12 @@ unsigned int ux, uy;
     emf_coords++;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_put_text(x, y, str)
 unsigned int x, y;
 const char str[];
 {
     int i, len = strlen(str);
-
     if (len % 2)		/* Must be long aligned! */
 	len++;
     EMF_flush_polyline();
@@ -735,8 +753,7 @@ const char str[];
     EMF_write_long(1);		/* GM_Compatible mode for advanced scaling */
     EMF_write_float(EMF_PX2HM);	/* x scale */
     EMF_write_float(EMF_PX2HM);	/* y scale */
-    EMF_write_pointl(x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)),
-		     term->ymax - y + (long) ((EMF_VCHAR / 2) * cos(emf_vert_text * EMF_10THDEG2RAD)));	/* positioning... y is recentered from bottom reference set in text align */
+    EMF_write_pointl(x + (long) ((EMF_VCHAR / 2) * sin(emf_vert_text * EMF_10THDEG2RAD)), term->ymax - y + (long) ((EMF_VCHAR / 2) * cos(emf_vert_text * EMF_10THDEG2RAD)));	/* positioning... y is recentered from bottom reference set in text align */
     EMF_write_long(strlen(str));	/* real char size */
     EMF_write_long(76);		/* offset to text */
     EMF_write_long(0);		/* options, none */
@@ -751,7 +768,7 @@ const char str[];
     emf_posx = emf_posy = -2000;
 }
 
-TERM_PUBLIC int
+TERM_PUBLIC int 
 EMF_text_angle(ang)
 int ang;
 {
@@ -774,12 +791,11 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC int
+TERM_PUBLIC int 
 EMF_justify_text(mode)
 enum JUSTIFY mode;
 {
     int align = 8;		/* y referenced to bottom */
-
     switch (mode) {
     case LEFT:
 	align |= 0;
@@ -795,29 +811,32 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_reset()
 {
     emf_posx = emf_posy = 0;
 }
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_point(x, y, number)
 unsigned int x, y;
 int number;
 {
     int old_dashtype;
+    unsigned long old_linecolor;
+
+    EMF_flush_polyline();
+    old_dashtype = emf_dashtype;
+    old_linecolor = emf_color;
+    EMF_linecolor(number);
+    EMF_dashtype(number % EMF_COLORS);
 
     if (number < 0) {		/* draw dot */
 	EMF_move(x, y);
 	EMF_solid_vector(x + 1, y);
-	return;
+	goto end_points;
     }
-    number %= EMF_POINTS;
-
-    EMF_flush_polyline();
-    old_dashtype = emf_dashtype;
-    EMF_dashtype(0);
+    number = (number / EMF_COLORS) % EMF_POINTS;
 
     switch (number) {
     case 0:			/* draw diamond */
@@ -885,11 +904,13 @@ int number;
 	EMF_flush_polygon();
 	break;
     }
+  end_points:
+    emf_color = old_linecolor;
     EMF_dashtype(old_dashtype);
 }
 
 
-TERM_PUBLIC void
+TERM_PUBLIC void 
 EMF_set_pointsize(size)
 double size;
 {
@@ -917,20 +938,25 @@ double size;
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(emf_driver)
-    "emf", "Enhanced Metafile format",
-    EMF_XMAX, EMF_YMAX, EMF_VCHAR, EMF_HCHAR,
-    EMF_VTIC, EMF_HTIC, EMF_options, EMF_init, EMF_reset,
-    EMF_text, null_scale, EMF_graphics, EMF_move, EMF_solid_vector,
-    EMF_linetype, EMF_put_text, EMF_text_angle, EMF_justify_text, EMF_point,
-    do_arrow, EMF_set_font, EMF_set_pointsize, TERM_BINARY,  /* various flags */
-    NULL,			/* after one plot of multiplot */
-    NULL,			/* before subsequent plot of multiplot */
-    NULL,			/* clear part of multiplot */
-    EMF_linewidth TERM_TABLE_END(emf_driver)
+"emf", "Enhanced Metafile format",
+EMF_XMAX, EMF_YMAX, EMF_VCHAR, EMF_HCHAR,
+EMF_VTIC, EMF_HTIC, EMF_options, EMF_init, EMF_reset,
+EMF_text, null_scale, EMF_graphics, EMF_move, EMF_solid_vector,
+EMF_linetype, EMF_put_text, EMF_text_angle,
+EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
+EMF_set_pointsize,
+TERM_BINARY,			/* various flags */
+NULL,				/* after one plot of multiplot */
+NULL,				/* before subsequent plot of multiplot */
+NULL,				/* clear part of multiplot */
+EMF_linewidth
+TERM_TABLE_END(emf_driver)
 #undef LAST_TERM
 #define LAST_TERM emf_driver
+
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
+
 #ifdef TERM_HELP
 START_HELP(emf)
 "1 emf",
