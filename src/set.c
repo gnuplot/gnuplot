@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.98 2002/09/27 12:17:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.99 2002/10/05 00:12:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -161,10 +161,12 @@ static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
 
+#ifdef PM3D
 static void check_palette_grayscale __PROTO((void));
 static int set_palette_defined __PROTO((void));
 static void set_palette_file __PROTO((void));
 static void set_palette_function __PROTO((void));
+#endif
 
 /* Backwards compatibility ... */
 static void set_nolinestyle __PROTO((void));
