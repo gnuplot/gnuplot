@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot3d.c,v 1.16.2.3 2000/05/07 16:46:56 lhecking Exp $";
+static char *RCSid = "$Id: plot3d.c,v 1.16.2.4 2002/01/31 21:18:22 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -114,16 +114,22 @@ extern int reverse_range[];
  * dont know we have to support ranges [10:-10] - lets reverse
  * it for now, then fix it at the end.
  */
-#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
-do{if ((auto_array[axis] = auto) == 0 && max<min) {\
-	min_array[axis] = max;\
-   max_array[axis] = min; /* we will fix later */ \
- } else { \
-	min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
-	max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
- } \
- log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
-}while(0)
+/* HBB 20021103: try to work around bug in BC3.1: */
+static GP_INLINE void
+init_3darrays(int axis, double min, double max, int autosc, int is_log, double base, double log_base, TBOOLEAN infinite)
+{
+    if ((auto_array[axis] = autosc) == 0 && max < min) {
+	min_array[axis] = max;
+	max_array[axis] = min; /* we will fix later */
+    } else {
+	min_array[axis] = (infinite && (autosc & 1)) ? VERYLARGE : min;
+	max_array[axis] = (infinite && (autosc & 2)) ? -VERYLARGE : max;
+    }
+    log_array[axis] = is_log;
+    base_array[axis] = base;
+    log_base_array[axis] = log_base;
+}
+#define INIT_ARRAYS init_3darrays
 
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \

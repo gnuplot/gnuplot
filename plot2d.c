@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.11 2001/03/03 17:32:42 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.12 2002/01/31 21:18:22 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -120,12 +120,21 @@ extern TBOOLEAN df_binary;
  * dont know we have to support ranges [10:-10] - lets reverse
  * it for now, then fix it at the end.
  */
-#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
-do{auto_array[axis] = auto; \
-   min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
-   max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
-   log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
-}while(0)
+
+/* HBB 20021103: try to circumvent BC31 bug by turning this macro into
+ * a function... */
+static GP_INLINE void
+init_arrays(int axis, double min, double max, int autosc, int is_log, double base, double log_base, TBOOLEAN infinite)
+{
+   auto_array[axis] = autosc;
+   min_array[axis] = (infinite && (autosc & 1)) ? VERYLARGE : min;
+   max_array[axis] = (infinite && (autosc & 2)) ? -VERYLARGE : max;
+   log_array[axis] = is_log;
+   base_array[axis] = base;
+   log_base_array[axis] = log_base;
+}
+#define INIT_ARRAYS init_arrays
+
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
 do{\

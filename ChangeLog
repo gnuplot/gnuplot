@@ -1,3 +1,13 @@
+2002-11-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.dj2, makefile.tc: Update CFLAGS.
+
+	* plot2d.c, plot3d.c: Convert INIT_ARRAYS() macros to functions to
+	fix build for 16-bit Windows.
+
+	* specfun.c: Add missing preprocessor symbols to fix build under
+	DJGPP V2.
+
 2002-11-05  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix more misprints.

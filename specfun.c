@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.8.2.5 2002/02/04 11:49:25 lhecking Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.8.2.6 2002/05/16 13:42:28 lhecking Exp $";
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -171,6 +171,17 @@ static char    *ermsg[7] = {
     "partial loss of precision"
 };
 
+#ifndef DOMAIN
+/* HBB 20021103: copied this from Cephes mconf.h */
+# define DOMAIN		1	/* argument domain error */
+# define SING		2	/* argument singularity */
+# define OVERFLOW	3	/* overflow range error */
+# define UNDERFLOW	4	/* underflow range error */
+# define TLOSS		5	/* total loss of precision */
+# define PLOSS		6	/* partial loss of precision */
+#endif
+
+	
 
 static int mtherr(char *name, int code)
 {
