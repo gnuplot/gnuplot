@@ -243,15 +243,25 @@ Major contributors (alphabetic order):
 
 (defvar d2t-terminal-list ())
 (setq d2t-terminal-list
-      '("ai"
+      '("aed"
+	"ai"
+	"apollo"
+	"apollo"
 	"cgm"
 	"corel"
+	"debug"
 	"dumb"
 	"dxf"
+	"dxy"
 	"eepic"
+	"emf"
 	"epson"
+	"excl"
 	"fig"
 	"gif"
+	"gnugraph"
+	"gpr"
+	"grass"
 	"hp26"
 	"hp2648"
 	"hp500c"
@@ -259,8 +269,11 @@ Major contributors (alphabetic order):
 	"hpljii"
 	"hppj"
 	"imagen"
+	"kyo"
 	"latex"
 	"metafont"
+	"metapost"
+	"mgr"
 	"mif"
 	"pbm"
 	"png"
@@ -268,11 +281,15 @@ Major contributors (alphabetic order):
 	"pslatex"
 	"pstricks"
 	"qms"
+	"rgip"
 	"table"
 	"tek"
 	"texdraw"
 	"tkcanvas"
-	"tpic"))
+	"tpic"
+	"unixpc"
+	"unixplot"
+	"v384"))
 
 (defun d2t-doc-to-texi-verbosely ()
   "Run `d2t-doc-to-texi' noisily"
@@ -368,7 +385,7 @@ particular conversion chore."
 					'("atarivdi" "multitos" "atariaes"))))
     (if (string-match "mac" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
-					'("mac"))))
+					'("mac" "openstep"))))
     (if (string-match "beos" system-configuration)
 	(setq d2t-terminal-list (append d2t-terminal-list
 					'("be"))))
