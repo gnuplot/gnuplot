@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.21 2004/07/01 17:10:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.22 2004/07/13 14:11:25 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -171,8 +171,8 @@ loadpath_handler(int action, char *path)
 	    /* skip over '\0' */
 	    p += strlen(p) + 1;
 	}
-	if (p >= limit)
-	    p = NULL;
+	if (p >= limit) 
+	    limit = p = NULL;
 	return p;
 	break;
     case ACTION_NULL:
@@ -502,7 +502,7 @@ fontpath_handler(int action, char *path)
 	    p += strlen(p) + 1;
 	}
 	if (p >= limit)
-	    p = NULL;
+	    limit = p = NULL;
 	return p;
     case ACTION_NULL:
 	/* just return */

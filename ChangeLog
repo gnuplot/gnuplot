@@ -1,3 +1,8 @@
+2005-02-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/variable.c (loadpath_handler, fontpath_handler):
+	Re-initialize limit to NULL, too, as p reaches it.
+
 2005-02-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/save.h: New routine save_fillstyle consolidates
