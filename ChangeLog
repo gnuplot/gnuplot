@@ -1,3 +1,14 @@
+2002-03-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Remove ANNOUNCE-MOUSE from EXTRA_DIST. Don't include
+	.cvsignore files in make dist.
+
+	* config/Makefile.am.in: Add config.* files to EXTRA_DIST.
+
+	* src/Makefile.am: Remove ipc.h from gnuplot_SOURCES.
+
+	* term/x11.trm: Remove reference to ipc.h.
+
 2002-03-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 	* config/makefile.os2 config/makefile.os2: Some fixes to
 	get it build again (#define PROTOTYPES, TERMFLAGS updated)
