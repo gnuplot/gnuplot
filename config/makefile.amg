@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.8 2001/12/09 19:04:06 lhecking Exp $
+# $Id: makefile.amg,v 1.9 2002/03/07 16:13:03 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -118,12 +118,12 @@ set.o: set.c plot.h setshow.h
 term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) $(CFLAGS) IDIR=$(TERMDIR) code=f $(GD_INCLUDE) $(PNG_INCLUDE) $(Z_INCLUDE) objname=$@ $<
 
-OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
-       dynarray.o eval.o fit.o graph3d.o graphics.o help.o hidden3d.o \
-       history.o internal.o interpol.o matrix.o misc.o parse.o plot.o \
-       plot2d.o plot3d.o save.o scanner.o set.o show.o specfun.o standard.o \
-       stdfn.o tables.o term.o time.o unset.o util.o util3d.o variable.o \
-       version.o
+OBJS = alloc.o amiga.o axis.o binary.o bitmap.o color.o command.o contour.o \
+       datafile.o dynarray.o eval.o fit.o gadgets.o getcolor.o graph3d.o \
+       graphics.o help.o hidden3d.o history.o internal.o interpol.o matrix.o \
+       misc.o mouse.o parse.o plot.o plot2d.o plot3d.o pm3d.o save.o scanner.o \
+       set.o show.o specfun.o standard.o stdfn.o tables.o term.o time.o \
+       unset.o util.o util3d.o variable.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.o internal.c history.c
@@ -159,7 +159,9 @@ CSOURCE8 = contour.c specfun.c amiga.c dynarray.c
 CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 
 gnuplot: $(OBJS)
-	$(CC) $(CFLAGS) LINK TO $@ $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
+	$(CC) $(CFLAGS) LINK TO $@ $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG) WITH <<
+$(OBJS)
+<
 
 $(DEMODIR)/bf_test: bf_test.o binary.o alloc.o
 	$(CC) $(CFLAGS) LINK TO $@ bf_test.o binary.o alloc.o
@@ -217,39 +219,107 @@ debug:
 #
 # Dependencies; do not edit!
 #
-alloc.o: alloc.c plot.h
+alloc.o: alloc.c alloc.h util.h stdfn.h gp_types.h syscfg.h 
 amiga.o: amiga.c
-bf_test.o: bf_test.c
-binary.o: binary.c plot.h
-bitmap.o: bitmap.c bitmap.h plot.h
-command.o: command.c plot.h setshow.h help.h
-contour.o: contour.c plot.h
-datafile.o: datafile.c plot.h fnproto.h binary.h setshow.h
-dynarray.o: dynarray.c dynarray.h alloc.h graphics.h plot.h
-eval.o: eval.c plot.h
-fit.o: fit.c fit.h matrix.h plot.h
-graph3d.o: graph3d.c plot.h setshow.h
-help.o: help.c plot.h help.h
-hidden3d.o: hidden3d.c plot.h setshow.h
-history.o: history.c gp_hist.h plot.h
-internal.o: internal.c plot.h
-interpol.o: interpol.c plot.h setshow.h
-matrix.o: matrix.c matrix.h fit.h
-misc.o: misc.c plot.h setshow.h help.h
-parse.o: parse.c plot.h help.h
-plot.o: plot.c plot.h setshow.h
-plot2d.o: plot2d.c plot.h setshow.h fit.h binary.h help.h
-plot3d.o: plot3d.c plot.h setshow.h binary.h help.h
-save.o: save.c plot.h setshow.h
-scanner.o: scanner.c plot.h
-show.o: show.c plot.h setshow.h
-specfun.o: specfun.c plot.h
-standard.o: standard.c plot.h
-stdfn.o: stdfn.c stdfn.h
-tables.o: tables.c plot.h tables.h
-time.o: time.c plot.h setshow.h
-unset.o: unset.c plot.h setshow.h tables.h
-util.o: util.c plot.h
-util3d.o: util3d.c plot.h setshow.h
-variable.o: variable.c plot.h variable.h
-version.o: version.c
+axis.o: axis.c axis.h stdfn.h command.h gadgets.h gp_time.h term_api.h \
+	variable.h gp_types.h parse.h tables.h util.h syscfg.h color.h \
+	national.h eval.h 
+bf_test.o: bf_test.c config.h syscfg.h stdfn.h binary.h 
+binary.o: binary.c binary.h alloc.h util.h syscfg.h stdfn.h gp_types.h 
+bitmap.o: bitmap.c bitmap.h alloc.h util.h syscfg.h stdfn.h gp_types.h 
+color.o: color.c config.h color.h get axis.h gadgets.h graphics.h plot.h \
+	graph3d.h pm3d.h term_api.h util3d.h alloc.h gp_types.h syscfg.h \
+	parse.h tables.h util.h stdfn.h eval.h 
+command.o: command.c command.h alloc.h eval.h fit.h binary.h datafile.h \
+	gp_hist.h gp_time.h misc.h parse.h plot.h plot2d.h plot3d.h \
+	readline.h save.h scanner.h setshow.h tables.h term_api.h util.h \
+	gp_types.h stdfn.h syscfg.h axis.h graph3d.h graphics.h gadgets.h \
+	color.h 
+contour.o: contour.c contour.h alloc.h axis.h syscfg.h gp_types.h dynarray.h \
+	graph3d.h stdfn.h gadgets.h parse.h tables.h term_api.h util.h eval.h \
+	color.h 
+datafile.o: datafile.c datafile.h alloc.h axis.h binary.h command.h eval.h \
+	gp_time.h graphics.h misc.h parse.h plot.h util.h graph3d.h stdfn.h \
+	gp_types.h gadgets.h tables.h term_api.h syscfg.h color.h 
+dynarray.o: dynarray.c dynarray.h alloc.h util.h stdfn.h gp_types.h syscfg.h
+eval.o: eval.c eval.h syscfg.h alloc.h datafile.h internal.h specfun.h \
+	standard.h util.h gp_types.h stdfn.h axis.h graph3d.h graphics.h \
+	gadgets.h parse.h tables.h term_api.h color.h 
+fit.o: fit.c fit.h alloc.h axis.h command.h datafile.h eval.h matrix.h plot.h \
+	misc.h util.h syscfg.h stdfn.h gp_types.h gadgets.h parse.h tables.h \
+	term_api.h graph3d.h graphics.h color.h
+gadgets.o: gadgets.c gadgets.h syscfg.h term_api.h stdfn.h gp_types.h color.h \
+	tables.h 
+getcolor.o: getcolor.c syscfg.h stdfn.h color.h get gp_types.h 
+graph3d.o: graph3d.c graph3d.h alloc.h axis.h gadgets.h hidden3d.h misc.h \
+	term_api.h util3d.h util.h syscfg.h gp_types.h stdfn.h parse.h \
+	tables.h graphics.h color.h eval.h 
+graphics.o: graphics.c graphics.h alloc.h axis.h command.h gp_time.h gadgets.h \
+	plot2d.h term_api.h util.h syscfg.h gp_types.h stdfn.h parse.h \
+	tables.h color.h eval.h 
+help.o: help.c help.h alloc.h util.h gp_types.h stdfn.h syscfg.h 
+hidden3d.o: hidden3d.c hidden3d.h alloc.h axis.h command.h dynarray.h \
+	graph3d.h tables.h term_api.h util.h util3d.h syscfg.h stdfn.h \
+	gp_types.h gadgets.h parse.h color.h eval.h 
+history.o: history.c gp_hist.h alloc.h util.h syscfg.h stdfn.h gp_types.h 
+internal.o: internal.c internal.h stdfn.h util.h syscfg.h gp_types.h eval.h 
+interpol.o: interpol.c interpol.h alloc.h axis.h contour.h graphics.h misc.h \
+	plot2d.h util.h syscfg.h stdfn.h gp_types.h gadgets.h parse.h \
+	tables.h term_api.h dynarray.h graph3d.h eval.h color.h 
+matrix.o: matrix.c matrix.h alloc.h fit.h util.h syscfg.h stdfn.h gp_types.h 
+misc.o: misc.c misc.h alloc.h command.h graphics.h parse.h plot.h tables.h \
+	util.h variable.h syscfg.h gp_types.h stdfn.h graph3d.h gadgets.h \
+	term_api.h eval.h national.h color.h 
+mouse.o: mouse.c syscfg.h stdfn.h gp_types.h mouse.h pm3d.h alloc.h axis.h \
+	command.h datafile.h gadgets.h gp_time.h graphics.h graph3d.h plot3d.h \
+	readline.h term_api.h mousecmn.h parse.h tables.h util.h color.h eval.h 
+parse.o: parse.c parse.h alloc.h command.h eval.h help.h util.h stdfn.h \
+	gp_types.h syscfg.h 
+plot.o: plot.c syscfg.h plot.h alloc.h command.h eval.h fit.h gp_hist.h misc.h \
+	readline.h setshow.h term_api.h util.h variable.h version.h gp_types.h \
+	stdfn.h graphics.h graph3d.h gadgets.h color.h tables.h national.h 
+plot2d.o: plot2d.c plot2d.h gp_types.h alloc.h axis.h binary.h command.h \
+	datafile.h eval.h fit.h graphics.h interpol.h misc.h parse.h tables.h \
+	term_api.h util.h syscfg.h stdfn.h gadgets.h graph3d.h color.h 
+plot3d.o: plot3d.c plot3d.h gp_types.h alloc.h axis.h binary.h command.h \
+	contour.h datafile.h eval.h graph3d.h misc.h parse.h term_api.h util.h \
+	syscfg.h stdfn.h gadgets.h tables.h dynarray.h graphics.h color.h 
+pm3d.o: pm3d.c pm3d.h alloc.h axis.h graph3d.h hidden3d.h plot3d.h setshow.h \
+	term_api.h command.h stdfn.h gp_types.h gadgets.h parse.h tables.h \
+	util.h syscfg.h util3d.h color.h eval.h 
+save.o: save.c save.h axis.h command.h contour.h datafile.h eval.h fit.h \
+	gp_time.h graphics.h hidden3d.h misc.h plot2d.h plot3d.h setshow.h \
+	term_api.h util.h variable.h syscfg.h stdfn.h gp_types.h gadgets.h \
+	parse.h tables.h dynarray.h graph3d.h util3d.h color.h national.h 
+scanner.o: scanner.c scanner.h alloc.h command.h util.h syscfg.h stdfn.h \
+	gp_types.h 
+set.o: set.c setshow.h alloc.h axis.h command.h contour.h datafile.h gp_time.h \
+	hidden3d.h misc.h plot.h plot2d.h plot3d.h tables.h term_api.h util.h \
+	variable.h pm3d.h stdfn.h gadgets.h gp_types.h parse.h syscfg.h \
+	dynarray.h graph3d.h graphics.h util3d.h color.h national.h eval.h 
+show.o: show.c setshow.h alloc.h axis.h command.h contour.h datafile.h eval.h \
+	gp_time.h graphics.h hidden3d.h misc.h plot.h plot2d.h plot3d.h \
+	tables.h util.h term_api.h variable.h version.h stdfn.h gadgets.h \
+	gp_types.h parse.h syscfg.h dynarray.h graph3d.h util3d.h color.h \
+	national.h 
+specfun.o: specfun.c specfun.h stdfn.h syscfg.h eval.h gp_types.h 
+standard.o: standard.c standard.h gadgets.h gp_time.h util.h syscfg.h eval.h \
+	term_api.h stdfn.h gp_types.h color.h tables.h 
+stdfn.o: stdfn.c stdfn.h syscfg.h 
+tables.o: tables.c tables.h command.h fit.h setshow.h term_api.h util.h \
+	syscfg.h gp_types.h stdfn.h gadgets.h color.h 
+time.o: time.c gp_time.h util.h variable.h syscfg.h stdfn.h gp_types.h \
+	national.h 
+unset.o: unset.c setshow.h axis.h command.h contour.h datafile.h misc.h plot.h \
+	plot2d.h plot3d.h tables.h term_api.h util.h variable.h pm3d.h stdfn.h \
+	gadgets.h gp_types.h parse.h syscfg.h dynarray.h graph3d.h graphics.h \
+	color.h national.h eval.h 
+util.o: util.c util.h alloc.h command.h datafile.h misc.h plot.h term_api.h \
+	gp_types.h stdfn.h axis.h graph3d.h graphics.h syscfg.h color.h \
+	tables.h gadgets.h parse.h eval.h 
+util3d.o: util3d.c util3d.h axis.h hidden3d.h pm3d.h term_api.h graph3d.h \
+	gp_types.h gadgets.h parse.h tables.h util.h syscfg.h stdfn.h color.h \
+	eval.h 
+variable.o: variable.c variable.h alloc.h command.h util.h syscfg.h national.h \
+	stdfn.h gp_types.h 
+version.o: version.c version.h syscfg.h 
