@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.39 2004/04/13 17:23:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.40 2004/06/13 00:34:32 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1211,6 +1211,41 @@ backup_file(tofile, fromfile)
     Eex3("Could not rename file %s to %s", fromfile, tofile);
 }
 
+/* A modified copy of save.c:save_range(), but this one reports
+ * _current_ values, not the 'set' ones, by default */
+static void 
+log_axis_restriction(log_f, axis)
+    FILE *log_f;
+    AXIS_INDEX axis;
+{
+    char s[80];
+    AXIS *this_axis = axis_array + axis;
+
+    fprintf(log_f, "\t%s range restricted to [", axis_defaults[axis].name);
+    if (this_axis->autoscale & AUTOSCALE_MIN) {
+	putc('*', log_f);
+    } else if (this_axis->is_timedata) {
+	putc('"', log_f);
+	gstrftime(s, 80, this_axis->timefmt, this_axis->min);
+	fputs(s, log_f);
+	putc('"', log_f);
+    } else {
+	fprintf(log_f, "%#g", this_axis->min);
+    }
+    
+    fputs(" : ", log_f);
+    if (this_axis->autoscale & AUTOSCALE_MAX) {
+	putc('*', log_f);
+    } else if (this_axis->is_timedata) {
+	putc('"', log_f);
+	gstrftime(s, 80, this_axis->timefmt, this_axis->max);
+	fputs(s, log_f);
+	putc('"', log_f);
+    } else {
+	fprintf(log_f, "%#g", this_axis->max);
+    }
+    fputs("]\n", log_f);
+}
 
 /*****************************************************************
     Interface to the classic gnuplot-software
@@ -1384,6 +1419,12 @@ fit_command()
 	fprintf(log_f, "FIT:    data read from %s\n", line);
 	free(line);
     }
+
+    /* HBB 20040201: somebody insisted they need this ... */
+    if (AUTOSCALE_BOTH != (X_AXIS.autoscale & AUTOSCALE_BOTH)) 
+	log_axis_restriction(log_f, x_axis);
+    if (AUTOSCALE_BOTH != (Y_AXIS.autoscale & AUTOSCALE_BOTH))
+	log_axis_restriction(log_f, y_axis);
 
     max_data = MAX_DATA;
     fit_x = vec(max_data);	/* start with max. value */
