@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.33 2000/11/01 18:57:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.34 2000/11/02 17:52:16 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -554,6 +554,9 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
+    /* must come before using draw_3d_graphbox() the first time */
+    setup_3d_box_corners();
+
 #ifdef PM3D
     /* DRAW PM3D ALL COLOUR SURFACES */
     can_pm3d = 0;
@@ -575,7 +578,7 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 	if (pm3d.where[0] && can_pm3d) {
 	    if (pm3d.solid) {
 		whichgrid = BACKGRID;
-		/* draw_bottom_grid(plots, pcount); -- FIXME HBB 20001031: broken in merge: function no longer exists */
+		draw_3d_graphbox(plots, pcount);
 	    }
 	    pm3d_draw_all(plots, pcount);
 	}
@@ -1070,8 +1073,6 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 	whichgrid = ALLGRID;
     }
 #endif
-
-    setup_3d_box_corners();
 
     draw_3d_graphbox(plots, pcount);
     
@@ -1959,10 +1960,13 @@ draw_3d_graphbox(plot, plot_num)
 			     &fr, &tr);
 #ifdef PM3D
 		}
-		if (BACKGRID != whichgrid) 
+		if (BACKGRID != whichgrid) {
 #endif
 		    VERTICAL(128, front_x, front_y, 1 - back_i, 1 - back_j,
 			     &ff, &tf);
+#ifdef PM3D
+		}
+#endif
 #undef VERTICAL
 	    } /* else (all 4 verticals drawn?) */
 

@@ -1,3 +1,7 @@
+2000-11-03  Johannes Zellner  <johannes@zellner.org>
+
+	* src/graph3d.c: made `pm3d solid' working again.
+
 2000-11-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Remove --enable-emf and --enable-epslatex options.

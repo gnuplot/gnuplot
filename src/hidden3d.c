@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.20.2.4 2000/07/26 18:52:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.22 2000/11/01 18:57:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1023,7 +1023,6 @@ build_networks(plots, pcount)
 
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
-		    long int edge;
 		    
 		    thisvertex = store_vertex(points+i, pointtype);
 		

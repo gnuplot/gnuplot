@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.5 2000/11/02 19:07:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -28,6 +28,7 @@ static char *RCSid() { return RCSid("$Id: $"); }
 #include "term_api.h" /* for lp_use_properties() */
 
 #include "hidden3d.h" /* p_vertex & map3d_xyz() */
+#include "alloc.h"
 
 
 /********************************************************************/
