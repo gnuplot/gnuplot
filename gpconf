@@ -1,0 +1,20 @@
+#!/bin/sh
+# FILE: "/disk01/home/joze/pub/gnuplot/gpconf"
+# LAST MODIFICATION: "Wed Jan 26 12:32:19 2000 (joze)"
+# (C) 1999 by Johannes Zellner, <johannes@zellner.org>
+# $Id: gpconf,v 1.5 2000/01/26 01:08:21 joze Exp $
+
+export CFLAGS="-Wall -g"
+export CPPFLAGS=-I${HOME}/pub/gd1.3
+export LDFLAGS=-L${HOME}/pub/gd1.3
+
+./configure \
+  --with-readline=gnu \
+  --with-plot \
+  --with-gd=${HOME}/pub/gd1.3/ \
+  --with-png \
+  --with-cwdrc \
+  --enable-history-file \
+  --enable-thin-splines \
+  --with-linux-vga \
+  --enable-mouse "$@"

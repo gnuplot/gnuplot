@@ -1,0 +1,17 @@
+#!/bin/sh
+# FILE: "/disk01/home/joze/pub/gnuplot/gpconfopt"
+# LAST MODIFICATION: "Fri Jan 21 13:11:52 2000 (joze)"
+# (C) 1999 by Johannes Zellner, <johannes@zellner.org>
+# $Id: gpconf,v 1.3 1999/12/12 01:14:20 joze Exp $
+
+export CPPFLAGS=-I${HOME}/pub/gd1.3
+
+./configure \
+  --with-readline=gnu \
+  --with-plot \
+  --with-gd=${HOME}/pub/gd1.3/ \
+  --with-png \
+  --with-cwdrc \
+  --enable-history-file \
+  --enable-thin-splines \
+  --enable-mouse "$@"
