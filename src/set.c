@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.81 2002/03/12 10:23:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.82 2002/03/21 15:11:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2782,6 +2782,9 @@ set_surface()
 static void
 set_terminal()
 {
+    static char *push_term_name = NULL;
+    static char *push_term_opts = NULL;
+
     c_token++;
 
     if (multiplot)
@@ -2790,71 +2793,79 @@ set_terminal()
     if (END_OF_COMMAND) {
 	list_terms();
 	screen_ok = FALSE;
-    } else {
-	static struct termentry *push_term = NULL;
-	static char *push_term_opts = NULL;
-	/* `set term push' ? */
-	if (equals(c_token,"push")) {
-	    if (term) {
-		if (push_term == NULL) push_term = gp_alloc(sizeof(struct termentry),"push_term");
-		if (push_term_opts != NULL) free(push_term_opts);
-		if (push_term) {
-		    memcpy((void*)&push_term[0], (void*)term, sizeof(struct termentry));
-		    push_term_opts = gp_strdup(term_options);
-		    fprintf(stderr, "\tpushed terminal %s %s\n", term->name, push_term_opts);
-		}
-	    } else
-		fputs("\tcurrent terminal type is unknown\n", stderr);
-	    c_token++;
-	} /* set term push */
-	else {
+	return;
+    }
+
+    /* `set term push' */
+    if (equals(c_token,"push")) {
+	if (term) {
+	    free(push_term_name);
+	    free(push_term_opts);
+	    push_term_name = gp_strdup(term->name);
+	    push_term_opts = gp_strdup(term_options);
+	    fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
+	} else
+	    fputs("\tcurrent terminal type is unknown\n", stderr);
+	c_token++;
+	return;
+    } /* set term push */
+
 #ifdef EXTENDED_COLOR_SPECS
-	/* each terminal is supposed to turn this on, probably
-	 * somewhere when the graphics is initialized */
-	supply_extended_color_specs = 0;
+    /* each terminal is supposed to turn this on, probably
+     * somewhere when the graphics is initialized */
+    supply_extended_color_specs = 0;
 #endif
 #ifdef USE_MOUSE
-        event_reset((void *)1);   /* cancel zoombox etc. */
+    event_reset((void *)1);   /* cancel zoombox etc. */
 #endif
-	term_reset();
-	/* `set term pop' ? */
-	if (equals(c_token,"pop")) {
-	    if (push_term != NULL) {
-		int it = interactive;
-		interactive = 0;
-		change_term(push_term->name, strlen(push_term->name));
-		interactive = it;
-		memcpy((void*)term, (void*)&push_term[0], sizeof(struct termentry));
-		if (push_term_opts != NULL)
-		    strcpy(term_options, push_term_opts);
-		if (interactive)
-		    fprintf(stderr,"\trestored terminal is %s %s\n", term->name, (*term_options) ? term_options : "");
-	     } else
-		 fprintf(stderr,"No terminal has been pushed yet\n");
-	    c_token++;
-	} /* set term pop */
-	else { /* `set term <normal terminal>' */
-	term = 0; /* in case set_term() fails */
-	term = set_term(c_token);
+    term_reset();
+
+    /* `set term pop' */
+    if (equals(c_token,"pop")) {
+	if (push_term_name != NULL) {
+	    char *s;
+	    int i = strlen(push_term_name) + 11;
+	    if (push_term_opts) {
+		/* do_string() does not like backslashes -- thus remove them */
+		for (s=push_term_opts; *s; s++)
+		    if (*s=='\\' || *s=='\n') *s=' ';
+		i += strlen(push_term_opts);
+	    }
+	    s = gp_alloc(i, "pop");
+	    i = interactive;
+	    interactive = 0;
+	    sprintf(s,"set term %s %s", push_term_name, (push_term_opts ? push_term_opts : ""));
+	    do_string(s);
+	    free(s);
+	    interactive = i;
+	    if (interactive)
+		fprintf(stderr,"   restored terminal is %s %s\n", term->name, ((*term_options) ? term_options : ""));
+	} else
+	    fprintf(stderr,"No terminal has been pushed yet\n");
 	c_token++;
-	/* FIXME
-	 * handling of common terminal options before term specific options
-	 * as per HBB's suggestion
-	 * new `set termoptions' command
-	 */
-	/* get optional mode parameters
-	 * not all drivers reset the option string before
-	 * strcat-ing to it, so we reset it for them
-	 */
-	*term_options = 0;
-	if (term)
-	    (*term->options)();
-	if (interactive && *term_options)
-	    fprintf(stderr,"Options are '%s'\n",term_options);
-		} /* set term <normal terminal> */
-	    } /* if / else of 'set term push' */
-    }
+	return;
+    } /* set term pop */
+    
+    /* `set term <normal terminal>' */
+    term = 0; /* in case set_term() fails */
+    term = set_term(c_token);
+    c_token++;
+    /* FIXME
+     * handling of common terminal options before term specific options
+     * as per HBB's suggestion
+     * new `set termoptions' command
+     */
+    /* get optional mode parameters
+     * not all drivers reset the option string before
+     * strcat-ing to it, so we reset it for them
+     */
+    *term_options = 0;
+    if (term)
+	(*term->options)();
+    if (interactive && *term_options)
+	fprintf(stderr,"Options are '%s'\n",term_options);
 }
+
 
 /* process 'set termoptions' command */
 static void
@@ -2865,8 +2876,13 @@ set_termoptions()
     /* if called from term.c:
      * scan input_line for common options
      * filter out common options
-     * reset input_line (num_tokens = scanner(&input_line, &input_line_len);
-     * c_token=0 (1? 2)
+     * Then either
+     * 1. reset input_line (num_tokens = scanner(&input_line, &input_line_len);
+     *    c_token=0 (1 ? 2)
+     * or
+     * 2. grab the current term->name and use do_string() as in 'set term pop'
+     *    above ... this can be joint into a new routine
+     *    set_term_opts(char *term_name, char *term_opts)
      */
 }
 
