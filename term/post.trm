@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.21.2.5 2002/01/31 21:28:21 lhecking Exp $
+ * $Id: post.trm,v 1.21.2.6 2002/02/04 11:48:59 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -444,7 +444,7 @@ static char GPFAR * GPFAR PS_header[] = {
    gives an oblique (slanted) beta character */
 "/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n",
 "dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n",
-"currentdict end definefont\n",
+"currentdict end definefont pop\n",
 
 NULL
 };

@@ -1,3 +1,18 @@
+2002-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/gpic.trm (GPIC_linetype): Fix signed conversion problems
+ 	between size_t GPIC_NUMLINES and int linetype.  NOTE: this will
+ 	change linetypes for numbers abve 4, because the border and axis
+ 	linetypes will no longer be re-used.  Add offset here already,
+ 	instead of doing it later.
+	(GPIC_vector): Removed addition of offset from here.
+
+	* graphics.c (boundary): Backport of div-by-zero fix for
+ 	key_entry_height from 3.8.
+
+	* term/post.trm: Backport of Symbol-Oblique operand stacking bug
+ 	fix from 3.8.
+
 2002-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/cgm.trm: Fixed option parsing bugs.

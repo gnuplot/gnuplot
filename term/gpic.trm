@@ -1,5 +1,5 @@
 /*
- * $Id: gpic.trm,v 1.16 1998/04/14 00:17:46 drd Exp $
+ * $Id: gpic.trm,v 1.7 1998/12/14 18:39:28 lhecking Exp $
  */
 
 /* GNUPLOT - gpic.trm -*-C-*- */
@@ -164,11 +164,11 @@ TERM_PUBLIC void GPIC_text()
 }
 
 TERM_PUBLIC void GPIC_linetype(linetype)
-int linetype;
+    int linetype;
 {
-    if (linetype >= GPIC_NUMLINES - 2)
+    if (linetype > 0)
 	linetype %= (GPIC_NUMLINES - 2);
-    GPIC_ltype = linetype;
+    GPIC_ltype = linetype + 2;
 }
 
 void GPIC_close_line()
@@ -189,11 +189,11 @@ unsigned int x, y;
 
 
 TERM_PUBLIC void GPIC_vector(ux, uy)
-unsigned int ux, uy;
+    unsigned int ux, uy;
 {
     if (GPIC_linecount == 1) {
 	fprintf(gpoutfile, "line %s to (x+%f,y+%f)",
-		GPIC_lines[GPIC_ltype + 2],
+		GPIC_lines[GPIC_ltype],
 		GPIC_coord(ux), GPIC_coord(uy));
     } else {
 	fprintf(gpoutfile, "\
