@@ -1,3 +1,13 @@
+2004-08-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/eval.c (real imag magnitude angle):  Move error message handling
+	into default case of switch statements (prevents compiler warnings).
+
+	* src/plot2d.c (eval_plots) src/graphics.c (init_histogram):
+	Replace instance of isstring + quote_str with try_to_get_string().
+	Make histogram_title a dynamically allocated string rather than a fixed
+	length char constant. 
+
 2004-08-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/histograms.dem: Revise bmargin settings to work with the revised

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.76 2004/08/10 03:55:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.77 2004/08/16 04:13:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -87,7 +87,7 @@ TBOOLEAN boxwidth_is_absolute  = TRUE;
 
 #ifdef EAM_HISTOGRAMS
 static double histogram_rightmost = 0.0;	/* Highest x-coord of histogram so far */
-static char histogram_title[64] = { '\0' };	/* Subtitle for this histogram */
+static char *histogram_title = NULL;		/* Subtitle for this histogram */
 static struct coordinate GPHUGE *stackheight = NULL; /* Scratch space for y autoscale */
 static int stack_count = 0;			/* counter for stackheight */
 #endif
@@ -1120,9 +1120,8 @@ eval_plots()
     int newhist_color = LT_UNDEFINED;
     int newhist_pattern = LT_UNDEFINED;
     histogram_rightmost = 0.0;
-    *histogram_title = '\0';
     free_histlist(&histogram_opts);
-    init_histogram(NULL,"");
+    init_histogram(NULL,NULL);
 #endif
 
     uses_axis[FIRST_X_AXIS] =
@@ -1160,7 +1159,8 @@ eval_plots()
 	    int previous_token;
 	    c_token++;
 	    histogram_sequence = -1;
-	    histogram_title[0] = '\0';
+	    free(histogram_title);
+	    histogram_title = NULL;
 
 	    if (histogram_rightmost > 0)
 		newhist_start = histogram_rightmost + 2;
@@ -1173,8 +1173,8 @@ eval_plots()
 
 		/* Store title in temporary variable and then copy into the */
 		/* new histogram structure when it is allocated.            */
-		if (isstring(c_token) && !(histogram_title[0]))
-		    quote_str(&histogram_title[0], c_token++, sizeof(histogram_title));
+		if (!histogram_title)
+		    histogram_title = try_to_get_string();
 
 		/* Allow explicit starting color or pattern for this histogram */
 		lp_parse(&lp, TRUE, FALSE, lp.l_type, 0);
@@ -1561,6 +1561,7 @@ eval_plots()
 		if (this_plot->histogram_sequence == 0) {
 		    this_plot->histogram = gp_alloc(sizeof(struct histogram_style), "New histogram");
 		    init_histogram(this_plot->histogram,histogram_title);
+		    histogram_title = NULL;
 		    this_plot->histogram->start = newhist_start;
 		    this_plot->histogram->startcolor = newhist_color;
 		    this_plot->histogram->startpattern = newhist_pattern;

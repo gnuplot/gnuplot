@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.17 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -304,8 +304,9 @@ real(struct value *val)
 	return ((double) val->v.int_val);
     case CMPLX:
 	return (val->v.cmplx_val.real);
+    default:
+	int_error(NO_CARET, "unknown type in real()");
     }
-    int_error(NO_CARET, "unknown type in real()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -320,8 +321,9 @@ imag(struct value *val)
 	return (0.0);
     case CMPLX:
 	return (val->v.cmplx_val.imag);
+    default:
+	int_error(NO_CARET, "unknown type in imag()");
     }
-    int_error(NO_CARET, "unknown type in imag()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -340,8 +342,9 @@ magnitude(struct value *val)
 		     val->v.cmplx_val.real +
 		     val->v.cmplx_val.imag *
 		     val->v.cmplx_val.imag));
+    default:
+	int_error(NO_CARET, "unknown type in magnitude()");
     }
-    int_error(NO_CARET, "unknown type in magnitude()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
@@ -364,8 +367,9 @@ angle(struct value *val)
 	}
 	return (atan2(val->v.cmplx_val.imag,
 		      val->v.cmplx_val.real));
+    default:
+	int_error(NO_CARET, "unknown type in angle()");
     }
-    int_error(NO_CARET, "unknown type in angle()");
     /* NOTREACHED */
     return ((double) 0.0);
 }
