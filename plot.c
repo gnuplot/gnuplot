@@ -330,6 +330,7 @@ char **argv;
 #endif
 
 #ifdef GNU_READLINE
+    using_history();
     rl_readline_name = argv[0];
     rl_complete_with_tilde_expansion = 1;
 #endif

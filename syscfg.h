@@ -400,4 +400,10 @@
 #endif /* HAVE_CONFIG_H */
 /* End autoconf related stuff */
 
+/* GNU readline stuff */
+#ifdef GNU_READLINE
+# include <readline/readline.h>
+# include <readline/history.h>
+#endif
+
 #endif /* !SYSCFG_H */

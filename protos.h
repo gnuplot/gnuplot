@@ -212,9 +212,6 @@ void plot3drequest __PROTO((void));
 #ifndef GNU_READLINE
 char *readline __PROTO((char *prompt));
 void add_history __PROTO((char *line));
-#else
-extern char *readline();
-extern void add_history();
 #endif /* GNU_READLINE */
 
 #if defined(ATARI) || defined(MTOS)
