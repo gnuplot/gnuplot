@@ -1,3 +1,19 @@
+2004-08-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c (main): Call term->options() on entry if the default
+	terminal type is png, jpeg, or tgif.  Without this, setting GNUTERM
+	to this driver type causes a segfault due to incomplete initialization
+	of the driver data structures.  I believe this call to term->options()
+	would be OK for all other drivers as well, but to be on the safe side
+	I added it only for the drivers I know will segfault without it.
+
+	* term/gd.trm: New option to generate truecolor png images.
+	    set term png .. {{no}truecolor} ..
+
+	* term/gd.trm (PNG_vector): Use anti-aliasing for vectors if possible.
+	This does not affect palette-based PNG images, so far as I can tell,
+	but does work for both JPEG and TrueColor PNG images.
+
 2004-08-25  Per Persson <persquare@mac.com>
 
 	* term/aquaterm.trm (AQUA_options): make options order-independent;
