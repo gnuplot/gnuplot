@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.18 1999/08/24 11:24:53 lhecking Exp $
+ * $Id: fig.trm,v 1.19 2000/03/28 21:19:57 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -672,6 +672,7 @@ unsigned int x, y;
 const char *str;
 {
     char *s1, *s2, *output_string;
+    int has_latex_command = 0;
 
     if (strlen(str) == 0)
 	return;
@@ -685,6 +686,15 @@ const char *str;
     } while ( *(s1++) );
     FIG_poly_clean(FIG_polyvec_stat);
     y -= term->v_char / 2;	/* assuming vertical center justified */
+    /*
+     * gnuplot used to create SPECIAL_TEXT for all text strings, but this
+     * is really only needed if str contains LaTeX commands. we assume that
+     * a string contains LaTeX commands if it contains a backslash (may not
+     * be true in all cases, but it's probably a good enough first-order
+     * approximation :-)
+     */
+    if (strchr(output_string,'\\'))
+	has_latex_command = SPECIAL_TEXT;
 
     /* HBB 990329: quick hack: 'O_TEXT' is in use by POSIX header
      * <fcntl.h>. Renamed to OBJ_TEXT */
@@ -692,7 +702,7 @@ const char *str;
 %d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
 	    OBJ_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
 	    FIG_ROMAN_FONT, (float) FIG_font_s,
-	    FIG_angle, SPECIAL_TEXT, (float) term->v_char,
+	    FIG_angle, has_latex_command, (float) term->v_char,
 	    (float) term->h_char * strlen(str),
 	    FIG_xoff + x, term->ymax + FIG_yoff - y, output_string);
 
