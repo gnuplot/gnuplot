@@ -181,6 +181,8 @@ static int PNG_ps = 3;
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+static int PNG_initialized;	/* Set when terminal first initialized */
+
 static struct {
     gdImagePtr image;
     gdFontPtr font;
@@ -437,20 +439,22 @@ PNG_options()
     char *string;
     unsigned long color;
 
-#if (0) /* 24-Aug-2002 The old behaviour was to re-initialize all settings */
-    term_options[0] = NUL;
-    png_state.n_colors = 0;
-    png_state.flags = 0;
-    png_font = 2;
-    png_state.default_font = gdfont;
-    png_state.ttffont[0] = '\0';
-    png_state.default_ttffont[0] = '\0';
-    png_state.default_ttfsize = 0;
-#else   /* The new behaviour is to keep previous term options, if any */
-    if (!png_font) png_font = 2;
-    if (!png_state.default_font) png_state.default_font = gdfont;
-#endif
-    png_state.justify = CENTRE;
+    if (!PNG_initialized) {
+	PNG_initialized = 1;
+	term_options[0] = '\0';
+	png_state.n_colors = 0;
+	png_state.flags = 0;
+	png_font = 2;
+	png_state.default_font = gdfont;
+	png_state.ttffont[0] = '\0';
+	png_state.default_ttffont[0] = '\0';
+	png_state.default_ttfsize = 0;
+	png_state.justify = CENTRE;
+    } else {
+	/* FIXME EAM - these should never happen */
+	if (!png_font) png_font = 2;
+	if (!png_state.default_font) png_state.default_font = gdfont;
+    }
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PNG_opts[0],c_token)) {
@@ -1225,7 +1229,7 @@ PNG_set_font(const char *fontname)
 
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
-    name[sep] = NUL;
+    name[sep] = '\0';
     size = png_state.default_ttfsize;
     sscanf (&(fontname[sep+1]),"%d",&size);
 
@@ -1330,9 +1334,10 @@ START_HELP(png)
 " fonts via libfreetype. Version 1.8 or greater of libgd is required.",
 "",
 " `transparent` instructs the driver to generate transparent PNGs.  The first",
-" color will be the transparent one.",
+" color will be the transparent one. Default is `notransparent`.",
 "",
 " `interlace` instructs the driver to generate interlaced PNGs.",
+" Default is `nointerlace`.",
 "",
 " Five basic fonts are supported directly by the gd library. These are",
 " `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
@@ -1340,7 +1345,7 @@ START_HELP(png)
 " or rotated (pure horizontal or vertical text only).",
 "",
 " If gnuplot was built with support for TrueType fonts, they may be",
-" selected using the `font <face> {<pointsize}` option. <face> is either ",
+" selected using the `font <face> {<pointsize>}` option. <face> is either ",
 " the full pathname to a TrueType font file, or a font face name searched",
 " for using the GDFONTPATH environmental variable. TrueType fonts are fully",
 " scalable and may be rotated through any angle.",
@@ -1462,6 +1467,7 @@ START_HELP(jpeg)
 "",
 " Syntax:",
 "       set terminal jpeg ",
+"                        {{no}interlace}",
 "                        {tiny | small | medium | large | giant}",
 "                        {font <face> {<pointsize>}}",
 "                        {size <x>,<y>} {{no}crop}",
@@ -1470,13 +1476,16 @@ START_HELP(jpeg)
 " JPEG images are created using libgd, with optional support for TrueType",
 " fonts via libfreetype.",
 "",
+" The `interlace` option creates a progressive JPEG image.",
+" Default is `nointerlace`.",
+"",
 " Five basic fonts are supported directly by the gd library. These are",
 " `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
 " `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
 " or rotated (pure horizontal or vertical text only).",
 "",
 " If gnuplot was built with support for TrueType fonts, they may be",
-" selected using the `font <face> {<pointsize}` option. <face> is either ",
+" selected using the `font <face> {<pointsize>}` option. <face> is either ",
 " the full pathname to a TrueType font file, or a font face name searched",
 " for using the GDFONTPATH environmental variable. TrueType fonts are fully",
 " scalable and may be rotated through any angle.",
