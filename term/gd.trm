@@ -181,7 +181,7 @@ static int PNG_ps = 3;
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-static int PNG_initialized;	/* Set when terminal first initialized */
+static TBOOLEAN PNG_initialized = FALSE;	/* Set when terminal first initialized */
 
 static struct {
     gdImagePtr image;
@@ -435,25 +435,27 @@ TERM_PUBLIC void
 PNG_options()
 {
     struct value s;
-    int png_font, i;
+    int i;
     char *string;
     unsigned long color;
 
     if (!PNG_initialized) {
-	PNG_initialized = 1;
+	PNG_initialized = TRUE;
 	term_options[0] = '\0';
+	term->h_char = 7; /* Medium font */
+	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
 	png_state.flags = 0;
-	png_font = 2;
-	png_state.default_font = gdfont;
 	png_state.ttffont[0] = '\0';
 	png_state.default_ttffont[0] = '\0';
 	png_state.default_ttfsize = 0;
 	png_state.justify = CENTRE;
     } else {
-	/* FIXME EAM - these should never happen */
-	if (!png_font) png_font = 2;
-	if (!png_state.default_font) png_state.default_font = gdfont;
+	/* FIXME EAM - these should never happen! */
+	if (!png_state.default_font) {
+	    fprintf(stderr,"gd.trm: caught initialization error\n");
+	    png_state.default_font = gdfont;
+	}
     }
 
     while (!END_OF_COMMAND) {
@@ -484,35 +486,30 @@ PNG_options()
 	    break;
 	case PNG_TINY:
 	    png_state.default_font=gdFontTiny;
-	    png_font = 0;
 	    term->v_char = (unsigned int)(8);
 	    term->h_char = (unsigned int)(5);
 	    ++c_token;
 	    break;
 	case PNG_SMALL:
 	    png_state.default_font = gdFontSmall;
-	    png_font = 1;
 	    term->v_char = (unsigned int)(12);
 	    term->h_char = (unsigned int)(6);
 	    ++c_token;
 	    break;
 	case PNG_MEDIUM:
 	    png_state.default_font = gdFontMediumBold;
-	    png_font = 2;
 	    term->v_char = (unsigned int)(13);
 	    term->h_char = (unsigned int)(7);
 	    ++c_token;
 	    break;
 	case PNG_LARGE:
 	    png_state.default_font = gdFontLarge;
-	    png_font = 3;
 	    term->v_char = (unsigned int)(16);
 	    term->h_char = (unsigned int)(8);
 	    ++c_token;
 	    break;
 	case PNG_GIANT:
 	    png_state.default_font=gdFontGiant;
-	    png_font = 4;
 	    term->v_char = (unsigned int)(15);
 	    term->h_char = (unsigned int)(9);
 	    ++c_token;
@@ -531,7 +528,7 @@ PNG_options()
 		    copy_str(png_state.ttffont, c_token, MAX_LINE_LEN);
 		c_token++;
 		strcpy(png_state.default_ttffont, png_state.ttffont);
-	        png_state.ttfsize = 8 + 2*png_font;
+	        png_state.ttfsize = 2 * term->h_char - 2;
 		err = gdImageStringFT(NULL, &brect[0], 0, 
 			png_state.ttffont, (double)png_state.ttfsize,
 			0.0, 0, 0, "test");
@@ -572,8 +569,11 @@ PNG_options()
 
 #ifdef HAVE_TTF
 	    /* Check for explicit TTF font size */
-	    if (sscanf(string, "%d", &i) == 1 && i > 0 && i < 999) {
-		png_state.default_ttfsize = i;
+	    if (sscanf(string, "%d", &i) == 1) {
+		if (i > 0 && i < 999)
+		    png_state.default_ttfsize = i;
+		else
+		    int_warn(c_token,"illegal font size");
 		++c_token;
 	        break;
 	    }
@@ -595,7 +595,7 @@ PNG_options()
 #ifdef HAVE_TTF
     /* If no explicit TTF font size found, generate default */
     if (png_state.default_ttfsize == 0) 
-	png_state.default_ttfsize = 8 + 2*png_font;
+	png_state.default_ttfsize = 2 * term->h_char - 2;
     png_state.ttfsize = png_state.default_ttfsize;
 
     /* Find approximate character width of selected TTF font   */
@@ -625,29 +625,29 @@ PNG_options()
 	strcat(term_options, "no");
     }
     strcat(term_options, "crop ");
-    switch (png_font) {
-    case 0:
+    
+    if (*png_state.ttffont) {
+    	sprintf(term_options + strlen(term_options),
+		"font %s %d ", png_state.ttffont, png_state.ttfsize);
+    } else switch (term->h_char) {
+    case 5:
 	strcat(term_options,"tiny ");
 	break;
-    case 1:
+    case 6:
 	strcat(term_options, "small ");
 	break;
-    case 2:
+    case 7:
+    default:
 	strcat(term_options, "medium ");
 	break;
-    case 3:
+    case 8:
 	strcat(term_options, "large ");
 	break;
-    case 4:
+    case 9:
 	strcat(term_options,"giant ");
 	break;
     }
 
-    if (*png_state.ttffont) {
-    	sprintf(term_options + strlen(term_options),
-		"font %s %d ", png_state.ttffont, png_state.ttfsize);
-    }
-    
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
