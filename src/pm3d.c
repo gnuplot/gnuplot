@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.43 2004/03/11 18:28:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.44 2004/03/30 11:49:30 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -53,7 +53,7 @@ pm3d_struct pm3d = {
 /* Internal prototypes for this module */
 static double geomean4 __PROTO((double, double, double, double));
 static double median4 __PROTO((double, double, double, double));
-static void pm3d_plot __PROTO((struct surface_points *, char));
+static void pm3d_plot __PROTO((struct surface_points *, int));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
 static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
@@ -300,11 +300,14 @@ pm3d_rearrange_scan_array(struct surface_points *this_plot,
 
 /*
  * Now the implementation of the pm3d (s)plotting mode
+ *
+ * Note: the input parameter at_which_z is char, but an old HP cc requires
+ * ANSI C K&R routines with int only.
  */
 static void
 pm3d_plot(this_plot, at_which_z)
     struct surface_points *this_plot;
-    char at_which_z;
+    int at_which_z;
 {
     int j, i, i1, ii, ii1, from, curve, scan, up_to, up_to_minus, invert = 0;
     int go_over_pts, max_pts;

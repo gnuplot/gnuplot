@@ -1,3 +1,9 @@
+2004-05-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c src/term.c term/hpljii.trm: SF bug #953887 non-portable C
+	code (prototypes & TBOOLEAN): input parameter for routines cannot be
+	char, they must be int.
+
 2004-05-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (mainloop): Add a 100 usec delay to the event flush 

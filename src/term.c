@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.73 2004/04/13 17:24:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.74 2004/05/09 14:35:03 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -219,7 +219,9 @@ char * enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
 	     char *fontname, double fontsize, double base, 
 	     TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
 static void enh_err_check __PROTO((const char *str));
-static void do_enh_writec __PROTO((char c));
+static void do_enh_writec __PROTO((int c));
+  /* note: c is char, but must be declared int due to an old K&R ANSI-C strict HP cc */
+
 
 #ifdef __ZTC__
 char *ztc_init();
@@ -2025,7 +2027,7 @@ fflush_binary()
 
 static void
 do_enh_writec(c)
-    char c;
+    int c; /* note: c is char */
 {
     *enhanced_cur_text++ = c;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.19 2002/02/25 03:10:42 broeker Exp $
+ * $Id: hpljii.trm,v 1.20 2004/04/13 17:24:33 broeker Exp $
  *
  */
 
@@ -117,7 +117,8 @@ TERM_PUBLIC void HPDJ_text __PROTO((void));
 #define HPLJII_COURIER fputs("\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D",gpoutfile)
 
 
-static void HPLJII_putc __PROTO((unsigned int x, unsigned int y, char c, int ang));
+static void HPLJII_putc __PROTO((unsigned int x, unsigned int y, int c, int ang));
+    /* note: c is char, but must be declared int due to an old K&R ANSI-C strict HP cc */
 static int hplj_dpp = 4;
 /* bm_pattern not appropriate for 300ppi graphics */
 #ifndef GOT_300_PATTERN
@@ -284,7 +285,7 @@ const char *str;
 static void
 HPLJII_putc(x, y, c, ang)
     unsigned int x, y;
-    char c;
+    int c; /* note: c is char */
     int ang;
 {
     HPLJII_POP_CURSOR;
