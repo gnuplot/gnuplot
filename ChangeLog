@@ -1,3 +1,13 @@
+2004-04-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* docs/gnuplot.doc: Fixed missing leading blanks broken during URL
+	updates.
+
+	* docs/Makefile.in ($(srcdir)/gnuplot.texi): Fix missing blank in
+	file copying rule.
+
 2004-04-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Clear all I/O locks when X11_reset is called.

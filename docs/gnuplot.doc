@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.217 2004/04/18 02:32:56 cgaylord Exp $
+C RCS $Id: gnuplot.doc,v 1.218 2004/04/18 02:57:24 cgaylord Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2567,15 +2567,15 @@ C ... and restart the table:
 ^ <a href="http://www.gnuplot.info/demo/simple.html">
  simple plot demos (simple.dem)
 ^ </a>
-,
+ ,
 ^ <a href="http://www.gnuplot.info/demo/surface1.html">
  Non-parametric splot demos
 ^ </a>
-, and 
+ , and 
 ^ <a href="http://gnuplot.sourceforge.net/demo/surface2.html">
  Parametric splot demos
 ^ </a>
-.
+ .
 
 4 example datafile
 ?commands plot datafile example
@@ -3019,7 +3019,7 @@ C ... and restart the table:
 
  See also
 ^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
-errorbar demos.
+ errorbar demos.
 ^ </a>
 
  See `plot using`, `plot with`, and `set style` for more information.
@@ -3656,7 +3656,7 @@ errorbar demos.
        show arrow
 
 ^ <a href="http://gnuplot.sourceforge.net/demo/arrowstyle.html">
-arrows demos.
+ arrows demos.
 ^ </a>
 
 3 autoscale
@@ -5704,7 +5704,7 @@ arrows demos.
 
  See also
 ^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">multiplot demo (multiplt.dem)</a>
-.
+ .
 
 3 mx2tics
 ?commands set mx2tics
@@ -7137,7 +7137,7 @@ arrows demos.
 ^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
  finance demos
 ^ </a>
-.
+ .
 
  Note: To place additional symbols, such as the median value, on a
  box-and-whisker plot requires additional plot commands as in this example:

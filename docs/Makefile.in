@@ -327,13 +327,16 @@ gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 # Thanks to Bruce Ravel for doc2texi.el!
+# FIXME: this rule still breaks in out-of-source-tree builds: it forgets
+#  to copy a modified gnuplot.doc again, and it never copies the 
+#  generated gnuplot.texi back to $(srcdir).
 $(srcdir)/gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo"
 	@if test ! -f gnuplot.doc ; then \
-	  cp $(srcdir)/gnuplot.doc. ; \
+	  cp $(srcdir)/gnuplot.doc . ; \
 	fi
 	@if test "$(EMACS)" != no; then \
-	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
+	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi ; \
 	else \
 	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
