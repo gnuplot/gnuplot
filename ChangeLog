@@ -1,3 +1,8 @@
+2002-03-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/contrib/pm3dCompress.awk: Fixed "N g" to "2 index g N" in the
+	compressed map.
+
 2002-03-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Add test for struct exception in math, take from

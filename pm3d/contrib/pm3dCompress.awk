@@ -1,24 +1,46 @@
+# pm3dCompress.awk - (c) Petr Mikulik; 1996/1997/1999/2002
+#
 # This awk script tries to compress a postscript file created by pm3d or
 # gnuplot with pm3d splotting mode (limits: compresses only the first pm3d
-# splot there if in multiplot mode)
+# splot map there if in multiplot mode).
+#
+#
+# Installation:
+#	Copy this file into a directory listed in your AWKPATH 
+# Running:
+#	awk -f pm3dCompress.awk _original_.ps >reduced.ps
+#
+# Hint: make a script file/abbreviation/alias, e.g. under VMS
+#	pm3dcompress:=="$disk:[dir]gawk.exe -f disk:[dir]pm3dCompress.awk"
+#
+# Note: use GNU awk whenever possible (HP awk does not have /dev/stderr, for
+# instance).
+#
 #
 # Strategy: this program browses the given .ps file and makes a list of all
 # frequently used chains of postscript commands. If this list is not too large,
 # then it replaces these chains by abbreviated commands.
-#   This may reduce the size of the postscript file about 50%, which is not so
-# bad if you want to store these files for a later use (and with the same 
+#   This may reduce the size of the postscript file about 50 %, which is not
+# so bad if you want to store these files for a later use (and with the same 
 # functionality, of course). 
-
-# c Petr Mikulik, 1996/1997/1999;  http://www.sci.muni.cz/~mikulik/
+#
+#
+# (c) Petr Mikulik, mikulik@physics.muni.cz, http://www.sci.muni.cz/~mikulik/
+#
 # Distribution policy: this file must be distributed together with the 
-# whole stuff of pm3d or gnuplot program
-# This is version: 15. 1. 1999 -- reflects new staff in pm3d and gnuplot/pm3d
-#    Previous versions (just for pm3d): 9. 7. 1997 (update of 16. 3. 1997)
+# whole stuff of pm3d or gnuplot program.
+#
+# This is version: 2. 3. 2002
+#     2. 3. 2002 - updated because of stroke in /g definition
+#    15. 1. 1999 - new staff in pm3d and gnuplot/pm3d
+#     9. 7. 1997 - update
+#    16. 3. 1997 - first (?) version
+#
 
 BEGIN {
 err = "/dev/stderr"
 if (ARGC!=2) {
-  print "pm3dCompress.awk --- c Petr Mikulik, Brno. Version 15. 1. 1999" >err
+  print "pm3dCompress.awk --- (c) Petr Mikulik, Brno. Version 2. 3. 2002" >err
   print "Compression of pm3d .ps files. See the header of this file for more info." >err
   print "Usage:  awk -f pm3dCompress.awk inp_file.ps >out_file.ps" >err
   exit(1)
@@ -69,7 +91,7 @@ for (i=0; i<nList; i++)
   print "/X"i" {"List[i]"} def"
 for (i=0; i<nList; i++) {
   S=List[i]
-  sub("N ","N g ",S)
+  sub("N ","2 index g N ",S)
   print "/x"i" {"S"} def"
   }
 print "\n"PrintMapping"\n"
@@ -98,3 +120,4 @@ while (flag>0) { print; flag = (getline <ARGV[1] ); }
 close(ARGV[1])
 }
 
+# eof pm3dCompress.awk
