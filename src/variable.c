@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.6 1999/06/14 19:22:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.7 1999/06/17 14:16:09 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -102,8 +102,8 @@ char *path;
 	FPRINTF((stderr, "Set loadpath\n"));
 	if (path && *path != NUL) {
 	    /* length of env portion */
-	    int elen = last - envptr;
-	    int plen = strlen(path);
+	    size_t elen = last - envptr;
+	    size_t plen = strlen(path);
 	    if (loadpath && envptr) {
 		/* we are prepending a path name; because
 		 * realloc() preserves only the contents up
