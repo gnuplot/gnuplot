@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.13 1999/06/19 20:52:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.14 1999/06/22 12:01:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1580,44 +1580,45 @@ int pcount;			/* count of plots in linked list */
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;	/* chose scaling */
-    axis_zero[FIRST_X_AXIS] = map_y(0.0);
-    axis_zero[FIRST_Y_AXIS] = map_x(0.0);
+    axis_zero[FIRST_Y_AXIS] = map_y(0.0);
+    axis_zero[FIRST_X_AXIS] = map_x(0.0);
 
-    if (axis_zero[FIRST_X_AXIS] < ybot || is_log_y)
-	axis_zero[FIRST_X_AXIS] = ybot;		/* save for impulse plotting */
-    else if (axis_zero[FIRST_X_AXIS] >= ytop)
-	axis_zero[FIRST_X_AXIS] = ytop;
+    if (axis_zero[FIRST_Y_AXIS] < ybot || is_log_y)
+	axis_zero[FIRST_Y_AXIS] = ybot;		/* save for impulse plotting */
+    else if (axis_zero[FIRST_Y_AXIS] >= ytop)
+	axis_zero[FIRST_Y_AXIS] = ytop;
     else if (xzeroaxis.l_type > -3) {
 	term_apply_lp_properties(&xzeroaxis);
-	(*t->move) (xleft, axis_zero[FIRST_X_AXIS]);
-	(*t->vector) (xright, axis_zero[FIRST_X_AXIS]);
+	(*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[FIRST_Y_AXIS]);
     }
     if ((yzeroaxis.l_type > -3) && !is_log_x
-	&& axis_zero[FIRST_Y_AXIS] >= xleft
-	&& axis_zero[FIRST_Y_AXIS] < xright) {
+	&& axis_zero[FIRST_X_AXIS] >= xleft
+	&& axis_zero[FIRST_X_AXIS] < xright) {
 	term_apply_lp_properties(&yzeroaxis);
-	(*t->move) (axis_zero[FIRST_Y_AXIS], ybot);
-	(*t->vector) (axis_zero[FIRST_Y_AXIS], ytop);
+	(*t->move) (axis_zero[FIRST_X_AXIS], ybot);
+	(*t->vector) (axis_zero[FIRST_X_AXIS], ytop);
     }
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;	/* chose scaling */
-    axis_zero[SECOND_X_AXIS] = map_y(0.0);
-    axis_zero[SECOND_Y_AXIS] = map_x(0.0);
+    axis_zero[SECOND_Y_AXIS] = map_y(0.0);
+    axis_zero[SECOND_X_AXIS] = map_x(0.0);
 
-    if (axis_zero[SECOND_X_AXIS] < ybot || is_log_y2)
-	axis_zero[SECOND_X_AXIS] = ybot;	/* save for impulse plotting */
-    else if (axis_zero[SECOND_X_AXIS] >= ytop)
-	axis_zero[SECOND_X_AXIS] = ytop;
+    if (axis_zero[SECOND_Y_AXIS] < ybot || is_log_y2)
+	axis_zero[SECOND_Y_AXIS] = ybot;	/* save for impulse plotting */
+    else if (axis_zero[SECOND_Y_AXIS] >= ytop)
+	axis_zero[SECOND_Y_AXIS] = ytop;
     else if (x2zeroaxis.l_type > -3) {
 	term_apply_lp_properties(&x2zeroaxis);
-	(*t->move) (xleft, axis_zero[SECOND_X_AXIS]);
-	(*t->vector) (xright, axis_zero[SECOND_X_AXIS]);
+	(*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[SECOND_Y_AXIS]);
     }
-    if ((y2zeroaxis.l_type > -3) && !is_log_x2 && axis_zero[SECOND_Y_AXIS] >= xleft &&
-	axis_zero[SECOND_Y_AXIS] < xright) {
+    if ((y2zeroaxis.l_type > -3) && !is_log_x2
+	&& axis_zero[SECOND_X_AXIS] >= xleft
+	&& axis_zero[SECOND_X_AXIS] < xright) {
 	term_apply_lp_properties(&y2zeroaxis);
-	(*t->move) (axis_zero[SECOND_Y_AXIS], ybot);
-	(*t->vector) (axis_zero[SECOND_Y_AXIS], ytop);
+	(*t->move) (axis_zero[SECOND_X_AXIS], ybot);
+	(*t->vector) (axis_zero[SECOND_X_AXIS], ytop);
     }
     /* DRAW PLOT BORDER */
     if (draw_border) {
@@ -1871,7 +1872,7 @@ int pcount;			/* count of plots in linked list */
 	switch (this_plot->plot_style) {
 	    /*{{{  IMPULSE */
 	case IMPULSES:
-	    plot_impulses(this_plot, axis_zero[y_axis], axis_zero[x_axis]);
+	    plot_impulses(this_plot, axis_zero[x_axis], axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  LINES */
@@ -1959,7 +1960,7 @@ int pcount;			/* count of plots in linked list */
 	    /*}}} */
 	    /*{{{  BOXXYERROR */
 	case BOXXYERROR:
-	    plot_boxes(this_plot, axis_zero[x_axis]);
+	    plot_boxes(this_plot, axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  BOXERROR (falls through to) */
@@ -1970,7 +1971,7 @@ int pcount;			/* count of plots in linked list */
 	    /*}}} */
 	    /*{{{  BOXES */
 	case BOXES:
-	    plot_boxes(this_plot, axis_zero[x_axis]);
+	    plot_boxes(this_plot, axis_zero[y_axis]);
 	    break;
 	    /*}}} */
 	    /*{{{  VECTOR */
