@@ -92,7 +92,8 @@ EMAIL = bug-gnuplot@dartmouth.edu
 HELPFILE = $(datadir)/gnuplot.gih
 
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot @GNUPLOT_X11@ bf_test gpltconv
+bin_PROGRAMS = gnuplot @GNUPLOT_X11@
+noinst_PROGRAMS = bf_test gpltconv
 
 # There is probably no need to edit anything below this line
 XLIBS = @LIBRARIES_FOR_X@
@@ -163,7 +164,7 @@ subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
-PROGRAMS =  $(bin_PROGRAMS)
+PROGRAMS =  $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
 
 DEFS = @DEFS@ -I. -I$(srcdir) -I..
@@ -263,6 +264,15 @@ uninstall-binPROGRAMS:
 	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
 	  rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
+
+mostlyclean-noinstPROGRAMS:
+
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+
+distclean-noinstPROGRAMS:
+
+maintainer-clean-noinstPROGRAMS:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
@@ -584,24 +594,27 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
-		mostlyclean-krextra mostlyclean-kr mostlyclean-tags \
-		mostlyclean-depend mostlyclean-generic
+mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
+		mostlyclean-compile mostlyclean-krextra mostlyclean-kr \
+		mostlyclean-tags mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-binPROGRAMS clean-compile clean-krextra clean-kr \
-		clean-tags clean-depend clean-generic mostlyclean-am
+clean-am:  clean-binPROGRAMS clean-noinstPROGRAMS clean-compile \
+		clean-krextra clean-kr clean-tags clean-depend \
+		clean-generic mostlyclean-am
 
 clean: clean-recursive
 
-distclean-am:  distclean-binPROGRAMS distclean-compile distclean-krextra \
-		distclean-kr distclean-tags distclean-depend \
-		distclean-generic clean-am
+distclean-am:  distclean-binPROGRAMS distclean-noinstPROGRAMS \
+		distclean-compile distclean-krextra distclean-kr \
+		distclean-tags distclean-depend distclean-generic \
+		clean-am
 
 distclean: distclean-recursive
 
 maintainer-clean-am:  maintainer-clean-binPROGRAMS \
+		maintainer-clean-noinstPROGRAMS \
 		maintainer-clean-compile maintainer-clean-krextra \
 		maintainer-clean-kr maintainer-clean-tags \
 		maintainer-clean-depend maintainer-clean-generic \
@@ -613,6 +626,8 @@ maintainer-clean: maintainer-clean-recursive
 
 .PHONY: mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
 maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
+mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
+clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
 mostlyclean-compile distclean-compile clean-compile \
 maintainer-clean-compile mostlyclean-krextra distclean-krextra \
 clean-krextra maintainer-clean-krextra mostlyclean-kr distclean-kr \
