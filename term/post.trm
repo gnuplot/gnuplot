@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.79 2002/10/09 14:20:19 mikulik Exp $
+ * $Id: post.trm,v 1.80 2002/10/09 14:52:54 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3081,7 +3081,7 @@ START_HELP(post)
 "^ <a href=\"http://ttf2pt1.sourceforge.net/\">",
 "           http://ttf2pt1.sourceforge.net/",
 "^ </a>",
-" If the build in conversion does not",
+" If the builtin conversion does not",
 " work, the conversion command can be changed by the environment variable",
 " GNUPLOT_TTFTOPFA. For usage with ttf2pt1 it may be set to",
 " \"ttf2pt1 -a -e -W 0 %s - \". Here again, `%s` stands for the",
