@@ -1,3 +1,8 @@
+2004-05-07  Franz Bakan  <fbakan@users.sourceforge.net>
+
+	* src/os2/gclient.c: SF bug #940596. Match menu items "GnuplotPM ->
+	Mouse -> Coords format -> ..." to the text actually printed.
+
 2004-05-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.c (WndTextProc): Fix unbelievably old

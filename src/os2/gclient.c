@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.25 2004/02/12 17:31:52 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.26 2004/04/13 17:24:04 broeker Exp $" ;
 #endif
 
 /****************************************************************************
@@ -1293,22 +1293,22 @@ GetMousePosViewport(hWnd,&mx,&my);
 	    return 0L ;
 
 	case IDM_MOUSE_FORMAT_pXcYp:
-	    SetMouseCoords(hWnd, mp1, 0, NULL);
+	    SetMouseCoords(hWnd, mp1, -1, "[%g, %g]");
 	    return 0L ;
 	case IDM_MOUSE_FORMAT_XcY:
 	    SetMouseCoords(hWnd, mp1, 1, NULL);
 	    return 0L ;
 	case IDM_MOUSE_FORMAT_TIMEFMT:
-	    SetMouseCoords(hWnd, mp1, 2, NULL);
-	    return 0L ;
-	case IDM_MOUSE_FORMAT_DATE:
 	    SetMouseCoords(hWnd, mp1, 3, NULL);
 	    return 0L ;
-	case IDM_MOUSE_FORMAT_TIME:
+	case IDM_MOUSE_FORMAT_DATE:
 	    SetMouseCoords(hWnd, mp1, 4, NULL);
 	    return 0L ;
-	case IDM_MOUSE_FORMAT_DATETIME:
+	case IDM_MOUSE_FORMAT_TIME:
 	    SetMouseCoords(hWnd, mp1, 5, NULL);
+	    return 0L ;
+	case IDM_MOUSE_FORMAT_DATETIME:
+	    SetMouseCoords(hWnd, mp1, 6, NULL);
 	    return 0L ;
 	case IDM_MOUSE_FORMAT_X_Y:
 	    SetMouseCoords(hWnd, mp1, -1, "%g %g");
