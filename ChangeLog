@@ -1,3 +1,21 @@
+2004-01-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Remove superfluous files from LISP_DISTCLEANFILES.
+
+	* docs/Makefile.in: Add $(top_srcdir) to TEXINPUTS. Add installcheck
+	target. Fix uninstall-gih and uninstall-info targets.
+
+	* docs/titlepag.tex: Remove path to VERSION file, this is now taken
+	care of by TEXINPUTS.
+
+	* lisp/Makefile.am: Remove superfluous files from DISTCLEANFILES.
+	Remove dist-hook.
+
+	* src/Makefile.am: Include PKG_MAJOR in pkglibexecdir. Adjust
+	X11_DRIVER_DIR accordingly. New variable pkglibexec_PROGRAMS for
+	gnuplot_x11, remove install-exec-local and uninstall-local targets
+	as automake creates them for pkglibexec_PROGRAMS.
+
 2004-01-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c: The color axis format was not being saved; now it is.
