@@ -1,3 +1,13 @@
+2002-08-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/gnuplot.doc: Added documentation that 'set term <term>' does not
+	reset (previous) options.
+
+2002-08-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c docs/gnuplot.doc: Parsing datafile lines that contain
+	quoted strings: "hello world" is now accepted as a single column.
+
 2002-08-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/svg.trm: Support arbitrary text rotations.
@@ -925,7 +935,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/22 14:27:29 $).
+	last modification date (from the tag $Date: 2002/08/22 20:36:48 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
