@@ -135,6 +135,9 @@
 /* Define if you have the tcgetattr function.  */
 #undef HAVE_TCGETATTR
 
+/* Define if you have the usleep function.  */
+#undef HAVE_USLEEP
+
 /* Define if you have the vfprintf function.  */
 #undef HAVE_VFPRINTF
 

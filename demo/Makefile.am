@@ -19,30 +19,35 @@ check-local: check-noninteractive
 
 check-interactive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	fi
 
 check-noninteractive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	fi
 
 
 ##m4-files-begin
 EXTRA_DIST = Makefile.am.in reread.bor world.cor 1.dat 2.dat 3.dat \
-battery.dat big_peak.dat glass.dat hemisphr.dat klein.dat lcdemo.dat \
-moli3.dat scatter2.dat silver.dat soundvel.dat steps.dat timedat.dat \
-using.dat whale.dat world.dat airfoil.dem all.dem animate.dem binary.dem \
-bivariat.dem borders.dem contours.dem controls.dem discrete.dem \
-electron.dem fit.dem hidden.dem mgr.dem multimsh.dem multiplt.dem \
-param.dem polar.dem poldat.dem prob.dem prob2.dem random.dem scatter.dem \
-simple.dem singulr.dem spline.dem steps.dem surface1.dem surface2.dem \
-timedat.dem using.dem vector.dem world.dem density.fnc hexa.fnc line.fnc \
-reflect.fnc stat.inc sound.par sound2.par start.par gnuplot.rot 
+battery.dat big_peak.dat clip14in.dat glass.dat hemisphr.dat klein.dat \
+lcdemo.dat moli3.dat scatter2.dat silver.dat soundvel.dat steps.dat \
+timedat.dat triangle.dat using.dat whale.dat world.dat airfoil.dem all.dem \
+animate.dem binary.dem bivariat.dem borders.dem contours.dem controls.dem \
+discrete.dem electron.dem fit.dem hidden.dem mgr.dem multimsh.dem \
+multiplt.dem param.dem pm3d.dem polar.dem poldat.dem prob.dem prob2.dem \
+random.dem scatter.dem simple.dem singulr.dem spline.dem steps.dem \
+surface1.dem surface2.dem timedat.dem using.dem vector.dem world.dem \
+density.fnc hexa.fnc line.fnc reflect.fnc stat.inc sound.par sound2.par \
+start.par gnuplot.rot 
 ##m4-files-end
 
 Makefile.am: Makefile.am.in

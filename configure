@@ -3574,7 +3574,7 @@ for ac_func in atexit memcpy memmove memset \
   erf erfc gamma lgamma \
   getcwd poll pclose popen select sleep snprintf stpcpy \
   strcspn strdup strcasecmp stricmp strncasecmp strnicmp \
-  sysinfo tcgetattr vfprintf doprnt
+  sysinfo tcgetattr vfprintf doprnt usleep
 
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
