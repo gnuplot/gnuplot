@@ -1,5 +1,10 @@
 2002-07-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/plot3d.c: Fallback to PM3DSURFACE style for 2 or 4 columns is no
+	more required.
+
+2002-07-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/plot3d.c: Error message for "using 1:2:3:4" when neither pm3d
 	nor `using ... palette` is specified.
 
@@ -688,7 +693,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/02 19:36:44 $).
+	last modification date (from the tag $Date: 2002/07/03 08:44:01 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.51 2002/07/02 17:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.52 2002/07/03 08:44:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1110,10 +1110,13 @@ eval_3dplots()
 
 #ifdef PM3D
 		specs = df_open(4);
+#if 0
+		/* PM 3.7.2002: this fallback is no more necessary */
 		if ((2 == specs || 4 == specs) && MAP3D_CARTESIAN == mapping3d) {
 		    /* switch default to pm3d */
 		    this_plot->plot_style = PM3DSURFACE;
 		}
+#endif
 #else
 		specs = df_open(3);
 #endif
