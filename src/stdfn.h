@@ -79,7 +79,6 @@
 # endif
 #endif
 #ifndef HAVE_STRCSPN
-size_t gp_strcspn __PROTO((const char *, const char *));
 # define strcspn gp_strcspn
 #endif
 
@@ -255,11 +254,6 @@ int pclose __PROTO((FILE *));
 # include <float.h>
 #endif
 
-/* Some older platforms, namely SunOS 4.x, don't define this. */
-#ifndef DBL_EPSILON
-# define DBL_EPSILON     2.2204460492503131E-16
-#endif
-
 #ifndef NO_LOCALE_H
 # include <locale.h>
 #endif
@@ -267,15 +261,6 @@ int pclose __PROTO((FILE *));
 #ifndef NO_MATH_H
 # include <math.h>
 #endif
-
-/* Normally in <math.h> */
-#ifndef M_PI
-# define M_PI 3.14159265358979323846
-#endif
-#ifndef M_PI_2
-# define M_PI_2 1.57079632679489661923
-#endif
-
 
 #ifndef HAVE_STRCASECMP
 # ifdef HAVE_STRICMP
@@ -340,23 +325,6 @@ int pclose __PROTO((FILE *));
 #endif /* DEBUG */
 
 #include "plot.h"
-
-/* The XOPEN ln(10) macro */
-#ifndef M_LN10
-#  define M_LN10    2.3025850929940456840e0 
-#endif
-
-/* _POSIX_PATH_MAX is too small for practical purposes */
-#ifndef PATH_MAX
-# ifdef HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-# endif
-# ifndef MAXPATHLEN
-#  define PATH_MAX 1024
-# else
-#  define PATH_MAX MAXPATHLEN
-# endif
-#endif
 
 /* Prototypes from "stdfn.c" */
 

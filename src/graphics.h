@@ -47,6 +47,15 @@
  * If possible. Over time. Maybe.
  */
 
+extern int xleft, xright, ybot, ytop;
+extern double xscale3d, yscale3d, zscale3d;
+
+/* Formerly in plot2d.c; where they don't belong */
+extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
+extern int auto_array[AXIS_ARRAY_SIZE];
+extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
+extern double base_array[AXIS_ARRAY_SIZE];
+extern double log_base_array[AXIS_ARRAY_SIZE];
 extern char   default_font[];	/* Entry font added by DJL */
 
 /* From ESR's "Actual code patch" :) */
@@ -63,12 +72,23 @@ struct clipbox {
 
 /* function prototypes */
 
+extern void graph_error __PROTO((const char *));
+extern void fixup_range __PROTO((int, const char *));
+int nearest_label_tag(int x, int y, struct termentry* t,
+    void (*map_func)(struct position * pos, unsigned int *x,
+	unsigned int *y, const char *what));
 void get_offsets __PROTO((struct text_label* this_label,
 	struct termentry* t, int* htic, int* vtic));
 extern void do_plot __PROTO((struct curve_points *, int));
 extern int label_width __PROTO((const char *, int *));
+extern double set_tic __PROTO((double, int));
+extern void setup_tics __PROTO((int, struct ticdef *, char *, int));
+void gprintf __PROTO((char *, size_t, char *, double, double));
 /* is this valid use of __P ? */
+typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));
+extern void gen_tics __PROTO((int, struct ticdef *, int, int, double, tic_callback));
 extern void write_multiline __PROTO((unsigned int, unsigned int, char *, enum JUSTIFY, int, int, const char *));
+extern double LogScale __PROTO((double, TBOOLEAN, double, const char *, const char *));
 void map_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
@@ -76,5 +96,3 @@ extern double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif
 
 #endif /* GNUPLOT_GRAPHICS_H */
-
-

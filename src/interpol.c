@@ -73,7 +73,7 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.14 2000/05/02 18:18:31 
  *    - structs: curve_points, coordval, coordinate
  *
  *  setshow.h
- *    - samples, axis array[] variables 
+ *    - samples, is_log_x, base_log_x, xmin, xmax, autoscale_lx
  *    - plottypes
  *
  *  proto.h
@@ -117,7 +117,6 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.14 2000/05/02 18:18:31 
 #include "interpol.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "contour.h"
 #include "graphics.h"
 #include "misc.h"
@@ -159,10 +158,10 @@ do { STORE=VALUE; \
     } \
 } while(0)
 
-#define UPDATE_RANGE(TEST,OLD,NEW,AXIS)		\
-do {						\
-    if (TEST)					\
-	(OLD) = AXIS_DE_LOG_VALUE(AXIS,NEW);	\
+#define UPDATE_RANGE(TEST,OLD,NEW,AXIS) \
+do { if (TEST) { \
+     if (log_array[AXIS]) OLD = pow(base_array[AXIS], NEW); else OLD = NEW; \
+     } \
 } while(0)
 
 /* use this instead empty macro arguments to work around NeXT cpp bug */
@@ -368,10 +367,21 @@ struct coordinate *dest;	/* where to put the interpolated data */
     double ixmin, ixmax, iymin, iymax;
     double sxmin, sxmax, symin, symax;	/* starting values of above */
 
-    ixmin = sxmin = AXIS_LOG_VALUE(xaxis, min_array[xaxis]);
-    ixmax = sxmax = AXIS_LOG_VALUE(xaxis, max_array[xaxis]);
-    iymin = symin = AXIS_LOG_VALUE(yaxis, min_array[yaxis]);
-    iymax = symax = AXIS_LOG_VALUE(yaxis, max_array[yaxis]);
+    if (log_array[xaxis]) {
+	ixmin = sxmin = log(min_array[xaxis]) / log_base_array[xaxis];
+	ixmax = sxmax = log(max_array[xaxis]) / log_base_array[xaxis];
+    } else {
+	ixmin = sxmin = min_array[xaxis];
+	ixmax = sxmax = max_array[xaxis];
+    }
+
+    if (log_array[yaxis]) {
+	iymin = symin = log(min_array[yaxis]) / log_base_array[yaxis];
+	iymax = symax = log(max_array[yaxis]) / log_base_array[yaxis];
+    } else {
+	iymin = symin = min_array[yaxis];
+	iymax = symax = max_array[yaxis];
+    }
 
     for (i = 0; i < samples; i++) {
 	eval_bezier(cp, first_point, num_points, (double) i / (double) (samples - 1), &x, &y, bc);
@@ -526,14 +536,14 @@ int num_points;			/* to determine end in plot->points */
 
     if (log_array[xaxis]) {
 	for (i = 0; i <= num_points - 1; i++)
-	    xp[i] = AXIS_UNDO_LOG(xaxis,this_points[i].x);
+	    xp[i] = exp(this_points[i].x * log_base_array[xaxis]);
     } else {
 	for (i = 0; i <= num_points - 1; i++)
 	    xp[i] = this_points[i].x;
     }
     if (log_array[yaxis]) {
 	for (i = 0; i <= num_points - 1; i++)
-	    yp[i] = AXIS_UNDO_LOG(yaxis,this_points[i].y);
+	    yp[i] = exp(this_points[i].y * log_base_array[yaxis]);
     } else {
 	for (i = 0; i <= num_points - 1; i++)
 	    yp[i] = this_points[i].y;
@@ -659,14 +669,14 @@ int first_point, num_points;
 
     if (log_array[xaxis]) {
 	for (i = 0; i <= num_points - 1; i++)
-	    xp[i] = AXIS_UNDO_LOG(xaxis,this_points[i].x);
+	    xp[i] = exp(this_points[i].x * log_base_array[xaxis]);
     } else {
 	for (i = 0; i <= num_points - 1; i++)
 	    xp[i] = this_points[i].x;
     }
     if (log_array[yaxis]) {
 	for (i = 0; i <= num_points - 1; i++)
-	    yp[i] = AXIS_UNDO_LOG(yaxis,this_points[i].y);
+	    yp[i] = exp(this_points[i].y * log_base_array[yaxis]);
     } else {
 	for (i = 0; i <= num_points - 1; i++)
 	    yp[i] = this_points[i].y;
@@ -751,10 +761,22 @@ struct coordinate *dest;	/* where to put the interpolated data */
     double ixmin, ixmax, iymin, iymax;
     double sxmin, sxmax, symin, symax;	/* starting values of above */
 
-    ixmin = sxmin = AXIS_LOG_VALUE(xaxis, min_array[xaxis]);
-    ixmax = sxmax = AXIS_LOG_VALUE(xaxis, max_array[xaxis]);
-    iymin = symin = AXIS_LOG_VALUE(yaxis, min_array[yaxis]);
-    iymax = symax = AXIS_LOG_VALUE(yaxis, max_array[yaxis]);
+    if (log_array[xaxis]) {
+	ixmin = sxmin = log(min_array[xaxis]) / log_base_array[xaxis];
+	ixmax = sxmax = log(max_array[xaxis]) / log_base_array[xaxis];
+    } else {
+	ixmin = sxmin = min_array[xaxis];
+	ixmax = sxmax = max_array[xaxis];
+    }
+
+    if (log_array[yaxis]) {
+	iymin = symin = log(min_array[yaxis]) / log_base_array[yaxis];
+	iymax = symax = log(max_array[yaxis]) / log_base_array[yaxis];
+    } else {
+	iymin = symin = min_array[yaxis];
+	iymax = symax = max_array[yaxis];
+    }
+
 
     this_points = (plot->points) + first_point;
 
@@ -772,17 +794,16 @@ struct coordinate *dest;	/* where to put the interpolated data */
 	/* scale before calculating the coefficients. Use exponential for log x values. */
 
 	if (log_array[xaxis]) {
-	    temp = AXIS_UNDO_LOG(xaxis, x)
-		- AXIS_UNDO_LOG(xaxis, this_points[l].x);
+	    temp = exp(x * log_base_array[xaxis]) - exp(this_points[l].x * log_base_array[xaxis]);
+	    y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 	} else {
 	    temp = x - this_points[l].x;
+	    y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 	}
-	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
-
 	/* With logarithmic y axis, we need to convert from linear to log scale now. */
 	if (log_array[yaxis]) {
 	    if (y > 0.)
-		y = AXIS_DO_LOG(yaxis, y);
+		y = log(y) / log_base_array[yaxis];
 	    else
 		y = symin - (symax - symin);
 	}
@@ -958,12 +979,14 @@ struct curve_points *cp;
 		 * */
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
-		    x = AXIS_DE_LOG_VALUE(xaxis, x);
+		    if (log_array[xaxis])
+		    	x = exp(x * log_base_array[xaxis]);
 		    if (((x < min_array[xaxis]) && !(auto_array[xaxis] & 1))
 			|| ((x > max_array[xaxis]) && !(auto_array[xaxis] & 2)))
 			cp->points[j].type = OUTRANGE;
 		    else {
-			y = AXIS_DE_LOG_VALUE(yaxis, y);
+			if (log_array[yaxis])
+		    	    y = exp(y * log_base_array[yaxis]);
 			if (((y < min_array[yaxis]) && !(auto_array[yaxis] & 1))
 			    || ((y > max_array[yaxis]) && !(auto_array[yaxis] & 2)))
 			    cp->points[j].type = OUTRANGE;
@@ -983,12 +1006,14 @@ struct curve_points *cp;
 	    cp->points[j].ylow = sly / (double) k;
 	    cp->points[j].type = INRANGE;
 	    if (! all_inrange) {
-		x = AXIS_DE_LOG_VALUE(xaxis, x);
+		if (log_array[xaxis])
+		    x = exp(x * log_base_array[xaxis]);
 		if (((x < min_array[xaxis]) && !(auto_array[xaxis] & 1))
 		    || ((x > max_array[xaxis]) && !(auto_array[xaxis] & 2)))
 		    cp->points[j].type = OUTRANGE;
 		else {
-		    x = AXIS_DE_LOG_VALUE(yaxis, y);
+		    if (log_array[yaxis])
+			y = exp(y * log_base_array[yaxis]);
 		    if (((y < min_array[yaxis]) && !(auto_array[yaxis] & 1))
 			|| ((y > max_array[yaxis]) && !(auto_array[yaxis] & 2)))
 			cp->points[j].type = OUTRANGE;

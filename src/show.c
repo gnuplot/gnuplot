@@ -43,7 +43,6 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.37 2000/05/02 19:00:41 lhec
 #include "setshow.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "command.h"
 #include "eval.h"
 #include "gp_time.h"
@@ -102,7 +101,7 @@ static void show_term __PROTO((void));
 static void show_tics __PROTO((TBOOLEAN showx, TBOOLEAN showy, TBOOLEAN showz, TBOOLEAN showx2, TBOOLEAN showy2));
 static void show_mtics __PROTO((int mini, double freq, const char *name));
 static void show_timestamp __PROTO((void));
-static void show_range __PROTO((AXIS_INDEX axis, double min, double max, TBOOLEAN autosc, const char *text));
+static void show_range __PROTO((int axis, double min, double max, TBOOLEAN autosc, const char *text));
 static void show_xyzlabel __PROTO((const char *name, label_struct * label));
 static void show_title __PROTO((void));
 static void show_xlabel __PROTO((void));
@@ -110,7 +109,7 @@ static void show_ylabel __PROTO((void));
 static void show_zlabel __PROTO((void));
 static void show_x2label __PROTO((void));
 static void show_y2label __PROTO((void));
-static void show_data_is_timedate __PROTO((const char *, AXIS_INDEX));
+static void show_datatype __PROTO((const char *, int));
 static void show_xdata __PROTO((void));
 static void show_ydata __PROTO((void));
 static void show_zdata __PROTO((void));
@@ -130,7 +129,7 @@ static void show_variables __PROTO((void));
 static void show_linestyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
-static void show_ticdef __PROTO((int tics, AXIS_INDEX axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
+static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
 static void show_position __PROTO((struct position * pos));
 static void show_functions __PROTO((void));
 
@@ -141,7 +140,7 @@ static int var_show_all = 0;
 
 #define SHOW_NUM_OR_TIME(x, axis) \
  do { \
-  if (axis_is_timedata[axis]) { \
+  if (datatype[axis]==TIME) { \
    char s[80]; char *p; \
    putc('"', stderr); \
    gstrftime(s,80,timefmt,(double)(x)); \
@@ -687,11 +686,11 @@ show_all()
     show_xyzlabel("zlabel", &zlabel);
     show_xyzlabel("x2label", &x2label);
     show_xyzlabel("y2label", &y2label);
-    show_data_is_timedate("xdata", FIRST_X_AXIS);
-    show_data_is_timedate("ydata", FIRST_Y_AXIS);
-    show_data_is_timedate("x2data", SECOND_X_AXIS);
-    show_data_is_timedate("y2data", SECOND_Y_AXIS);
-    show_data_is_timedate("zdata", FIRST_Z_AXIS);
+    show_datatype("xdata", FIRST_X_AXIS);
+    show_datatype("ydata", FIRST_Y_AXIS);
+    show_datatype("x2data", SECOND_X_AXIS);
+    show_datatype("y2data", SECOND_Y_AXIS);
+    show_datatype("zdata", FIRST_Z_AXIS);
     show_timefmt();
     show_loadpath();
     show_locale();
@@ -1851,7 +1850,7 @@ show_timestamp()
 /* process 'show [xyzx2y2rtuv]range' commands */
 static void
 show_range(axis, min, max, autosc, text)
-AXIS_INDEX axis;
+int axis;
 double min, max;
 TBOOLEAN autosc;
 const char *text;
@@ -1862,7 +1861,7 @@ const char *text;
     c_token++;
     SHOW_ALL_NL;
 
-    if (axis_is_timedata[axis])
+    if (datatype[axis] == TIME)
 	fprintf(stderr, "\tset %sdata time\n", text);
     fprintf(stderr, "\tset %srange [", text);
     if (autosc & 1) {
@@ -1974,14 +1973,14 @@ show_y2label()
 
 /* process 'show [xyzx2y2]data' commands */
 static void
-show_data_is_timedate(name, axis)
+show_datatype(name, axis)
 const char *name;
-AXIS_INDEX axis;
+int axis;
 {
     c_token++;
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", name,
-	    axis_is_timedata[axis] ? "time" : "numerical");
+	    datatype[axis] == TIME ? "time" : "numerical");
 }
 
 
@@ -1991,7 +1990,7 @@ show_xdata()
 {
     c_token++;
     SHOW_ALL_NL;
-    show_data_is_timedate("xdata", FIRST_X_AXIS);
+    show_datatype("xdata", FIRST_X_AXIS);
 }
 
 
@@ -2001,7 +2000,7 @@ show_ydata()
 {
     c_token++;
     SHOW_ALL_NL;
-    show_data_is_timedate("ydata", FIRST_X_AXIS);
+    show_datatype("ydata", FIRST_X_AXIS);
 }
 
 
@@ -2011,7 +2010,7 @@ show_zdata()
 {
     c_token++;
     SHOW_ALL_NL;
-    show_data_is_timedate("zdata", FIRST_X_AXIS);
+    show_datatype("zdata", FIRST_X_AXIS);
 }
 
 
@@ -2021,7 +2020,7 @@ show_x2data()
 {
     c_token++;
     SHOW_ALL_NL;
-    show_data_is_timedate("x2data", FIRST_X_AXIS);
+    show_datatype("x2data", FIRST_X_AXIS);
 }
 
 
@@ -2031,7 +2030,7 @@ show_y2data()
 {
     c_token++;
     SHOW_ALL_NL;
-    show_data_is_timedate("y2data", FIRST_X_AXIS);
+    show_datatype("y2data", FIRST_X_AXIS);
 }
 
 /* process 'show timefmt' command */
@@ -2205,7 +2204,7 @@ int tag;			/* 0 means show all */
 static void
 show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
 int tics;			/* xtics ytics or ztics */
-AXIS_INDEX axis;
+int axis;
 struct ticdef *tdef;		/* xticdef yticdef or zticdef */
 const char *text;		/* "x", ..., "x2", "y2" */
 const char *ticfmt;
@@ -2255,7 +2254,7 @@ int rotate_tics;
 		fputs(" from ", stderr);
 		SHOW_NUM_OR_TIME(tdef->def.series.start, axis);
 	    }
-	    fprintf(stderr, " by %g%s", tdef->def.series.incr, axis_is_timedata[axis] ? " secs" : "");
+	    fprintf(stderr, " by %g%s", tdef->def.series.incr, datatype[axis] == TIME ? " secs" : "");
 	    if (tdef->def.series.end != VERYLARGE) {
 		fputs(" until ", stderr);
 		SHOW_NUM_OR_TIME(tdef->def.series.end, axis);
@@ -2266,7 +2265,7 @@ int rotate_tics;
     case TIC_USER:{
 /* this appears to be unused? lh
 	    int time;
-	    time = (axis_is_timedata[axis]);
+	    time = (datatype[axis] == TIME);
  */
 	    fputs("  list (", stderr);
 	    for (t = tdef->def.user; t != NULL; t = t->next) {

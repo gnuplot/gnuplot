@@ -43,8 +43,6 @@
 #ifndef _IPC_H
 # define _IPC_H
 
-#include "syscfg.h"
-
 char* readline_ipc __PROTO((const char*));
 /*
  * special readline_ipc routine for IPC communication, usual readline 

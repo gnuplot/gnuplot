@@ -57,6 +57,7 @@ void sp_free __PROTO((struct surface_points *sp));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
+size_t gp_strcspn __PROTO((const char *, const char *));
 int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
 FILE *loadpath_fopen __PROTO((const char *, const char *));

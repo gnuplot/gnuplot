@@ -53,7 +53,7 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.24 2000/05/02 18:38:33 l
 #include "graph3d.h"
 
 #include "alloc.h"
-#include "axis.h"
+#include "graphics.h"
 #include "hidden3d.h"
 #include "misc.h"
 #include "setshow.h"
@@ -71,7 +71,6 @@ int suppressMove = 0;		/* to prevent moveto while drawing contours */
  * hidden_no_update - if TRUE lines will be hidden line removed but they
  *   are not assumed to be part of the surface (i.e. grid) and therefore
  *   do not influence the hidings.
- * NOTE HBB 20000430: this has _no_ effect on the new hidden3d code.
  * hidden_active - TRUE if hidden lines are to be removed.
  */
 int hidden_active = FALSE;
@@ -80,6 +79,8 @@ int hidden_no_update;
 /* LITE defines a restricted memory version for MS-DOS, which doesn't
  * use the routines in hidden3d.c
  */
+
+/* HBB 990826: hidden_line_type\(above|below\) were unused --> purged */
 
 double xscale3d, yscale3d, zscale3d;
 
@@ -100,16 +101,19 @@ static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void draw_bottom_grid __PROTO((struct surface_points * plot,
 				      int plot_count));
-static void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
+static void xtick_callback __PROTO((int axis, double place, char *text,
 				    struct lp_style_type grid));
-static void ytick_callback __PROTO((AXIS_INDEX, double place, char *text,
+static void ytick_callback __PROTO((int axis, double place, char *text,
 				    struct lp_style_type grid));
-static void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
+static void ztick_callback __PROTO((int axis, double place, char *text,
 				    struct lp_style_type grid));
 static void setlinestyle __PROTO((struct lp_style_type style));
 
 static void boundary3d __PROTO((TBOOLEAN scaling, struct surface_points * plots,
 				int count));
+#if 0				/* not used */
+static double dbl_raise __PROTO((double x, int y));
+#endif
 
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
@@ -185,6 +189,9 @@ static int ktitle_lines = 0;
 double floor_z;
 static double ceiling_z, base_z;
 
+/* HBB 990826: {min|max}3d_z #defines, and transform_matrix typedef
+ * moved to grahp3d.h */
+
 transform_matrix trans_mat;
 
 static double xaxis_y, yaxis_x, zaxis_x, zaxis_y;
@@ -207,6 +214,17 @@ static double tic_unitx, tic_unity;
 /* (DFK) Watch for cancellation error near zero on axes labels */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
+
+/* And the functions to map from user to terminal coordinates */
+#define map_x(x) (int)(x+0.5)	/* maps floating point x to screen */
+#define map_y(y) (int)(y+0.5)	/* same for y */
+
+/* And the functions to map from user 3D space into normalized -1..1 */
+#define map_x3d(x) ((x-x_min3d)*xscale3d-1.0)
+#define map_y3d(y) ((y-y_min3d)*yscale3d-1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
+
+
 
 /* Initialize the line style using the current device and set hidden styles
  * to it as well if hidden line removal is enabled */
@@ -247,8 +265,9 @@ unsigned int *xt, *yt;
     *yt = (unsigned int) ((res[1] * yscaler / w) + ymiddle);
 }
 
+/* HBB 991021: moved to here, from hidden3d.c */
 /* Two routines to emulate move/vector sequence using line drawing routine. */
-static unsigned int move_pos_x, move_pos_y;
+unsigned int move_pos_x, move_pos_y;
 
 void
 clip_move(x, y)
@@ -391,6 +410,25 @@ int count;
     yscaler = ((ytop - ybot) * 4L) / 7L;
 }
 
+#if 0
+/* not used ; anyway, should be done using bitshifts and squares,
+ * rather than iteratively
+ */
+static double
+dbl_raise(x, y)
+double x;
+int y;
+{
+    register int i = ABS(y);
+    double val = 1.0;
+    while (--i >= 0)
+	val *= x;
+    if (y < 0)
+	return (1.0 / val);
+    return (val);
+}
+#endif
+
 /* we precalculate features of the key, to save lots of nested
  * ifs in code - x,y = user supplied or computed position of key
  * taken to be inner edge of a line sample
@@ -407,7 +445,7 @@ void
 do_3dplot(plots, pcount, quick)
 struct surface_points *plots;
 int pcount;			/* count of plots in linked list */
-int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
+int quick;			/* !=0 means plot only axes etc., for quick rotation */
 {
     struct termentry *t = term;
     int surface;
@@ -432,10 +470,10 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 #if 0
     /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
     /* modify min_z/max_z so it will zscale properly. */
-    ztemp = (max_array[FIRST_Z_AXIS] - min_array[FIRST_Z_AXIS]) / (2.0 * surface_zscale);
-    temp = (max_array[FIRST_Z_AXIS] + min_array[FIRST_Z_AXIS]) / 2.0;
-    min_array[FIRST_Z_AXIS] = temp - ztemp;
-    max_array[FIRST_Z_AXIS] = temp + ztemp;
+    ztemp = (z_max3d - z_min3d) / (2.0 * surface_zscale);
+    temp = (z_max3d + z_min3d) / 2.0;
+    z_min3d = temp - ztemp;
+    z_max3d = temp + ztemp;
 #endif /* 0 */
 
     /* The extrema need to be set even when a surface is not being
@@ -455,28 +493,28 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
     if (xtics || ytics || work_grid.l_type) {
-	base_z = min_array[FIRST_Z_AXIS] - (max_array[FIRST_Z_AXIS] - min_array[FIRST_Z_AXIS]) * ticslevel;
+	base_z = z_min3d - (z_max3d - z_min3d) * ticslevel;
 	if (ticslevel >= 0)
 	    floor_z = base_z;
 	else
-	    floor_z = min_array[FIRST_Z_AXIS];
+	    floor_z = z_min3d;
 
 	if (ticslevel < -1)
 	    ceiling_z = base_z;
 	else
-	    ceiling_z = max_array[FIRST_Z_AXIS];
+	    ceiling_z = z_max3d;
     } else {
-	floor_z = base_z = min_array[FIRST_Z_AXIS];
-	ceiling_z = max_array[FIRST_Z_AXIS];
+	floor_z = base_z = z_min3d;
+	ceiling_z = z_max3d;
     }
 
     /*  see comment accompanying similar tests of x_min/x_max and y_min/y_max
      *  in graphics.c:do_plot(), for history/rationale of these tests */
-    if (min_array[FIRST_X_AXIS] == max_array[FIRST_X_AXIS])
+    if (x_min3d == x_max3d)
 	graph_error("x_min3d should not equal x_max3d!");
-    if (min_array[FIRST_Y_AXIS] == max_array[FIRST_Y_AXIS])
+    if (y_min3d == y_max3d)
 	graph_error("y_min3d should not equal y_max3d!");
-    if (min_array[FIRST_Z_AXIS] == max_array[FIRST_Z_AXIS])
+    if (z_min3d == z_max3d)
 	graph_error("z_min3d should not equal z_max3d!");
 
 #ifndef LITE
@@ -501,14 +539,10 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
     /* now compute boundary for plot (xleft, xright, ytop, ybot) */
     boundary3d(scaling, plots, pcount);
 
-    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
-    axis_set_graphical_range(FIRST_Z_AXIS, floor_z, ceiling_z);
-
     /* SCALE FACTORS */
     zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
-    yscale3d = 2.0 / (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
-    xscale3d = 2.0 / (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
+    yscale3d = 2.0 / (y_max3d - y_min3d);
+    xscale3d = 2.0 / (x_max3d - x_min3d);
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
@@ -993,13 +1027,13 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */
     {
 	unsigned int o_x, o_y, x, y;
-	map3d_xy(min_array[FIRST_X_AXIS], min_array[FIRST_Y_AXIS], base_z, &o_x, &o_y);
+	map3d_xy(x_min3d, y_min3d, base_z, &o_x, &o_y);
 	axis3d_o_x = (int)o_x;
 	axis3d_o_y = (int)o_y;
-	map3d_xy(max_array[FIRST_X_AXIS], min_array[FIRST_Y_AXIS], base_z, &x, &y);
+	map3d_xy(x_max3d, y_min3d, base_z, &x, &y);
 	axis3d_x_dx = (int)x - axis3d_o_x;
 	axis3d_x_dy = (int)y - axis3d_o_y;
-	map3d_xy(min_array[FIRST_X_AXIS], max_array[FIRST_Y_AXIS], base_z, &x, &y);
+	map3d_xy(x_min3d, y_max3d, base_z, &x, &y);
 	axis3d_y_dx = (int)x - axis3d_o_x;
 	axis3d_y_dy = (int)y - axis3d_o_y;
     }
@@ -1036,12 +1070,12 @@ struct surface_points *plot;
 		{
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
-		    if (inrange(0.0, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+		    if (inrange(0.0, min3d_z, max3d_z)) {
 			map3d_xy(points[i].x, points[i].y, 0.0, &xx0, &yy0);
-		    } else if (inrange(min_array[FIRST_Z_AXIS], 0.0, points[i].z)) {
-			map3d_xy(points[i].x, points[i].y, min_array[FIRST_Z_AXIS], &xx0, &yy0);
+		    } else if (inrange(min3d_z, 0.0, points[i].z)) {
+			map3d_xy(points[i].x, points[i].y, min3d_z, &xx0, &yy0);
 		    } else {
-			map3d_xy(points[i].x, points[i].y, max_array[FIRST_Z_AXIS], &xx0, &yy0);
+			map3d_xy(points[i].x, points[i].y, max3d_z, &xx0, &yy0);
 		    }
 
 		    clip_move(xx0, yy0);
@@ -1051,30 +1085,30 @@ struct surface_points *plot;
 		}
 	    case OUTRANGE:
 		{
-		    if (!inrange(points[i].x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) ||
-			!inrange(points[i].y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]))
+		    if (!inrange(points[i].x, x_min3d, x_max3d) ||
+			!inrange(points[i].y, y_min3d, y_max3d))
 			break;
 
-		    if (inrange(0.0, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+		    if (inrange(0.0, min3d_z, max3d_z)) {
 			/* zero point is INRANGE */
 			map3d_xy(points[i].x, points[i].y, 0.0, &xx0, &yy0);
 
-			/* must cross z = min_array[FIRST_Z_AXIS] or max_array[FIRST_Z_AXIS] limits */
-			if (inrange(min_array[FIRST_Z_AXIS], 0.0, points[i].z) &&
-			    min_array[FIRST_Z_AXIS] != 0.0 && min_array[FIRST_Z_AXIS] != points[i].z) {
-			    map3d_xy(points[i].x, points[i].y, min_array[FIRST_Z_AXIS], &x, &y);
+			/* must cross z = min3d_z or max3d_z limits */
+			if (inrange(min3d_z, 0.0, points[i].z) &&
+			    min3d_z != 0.0 && min3d_z != points[i].z) {
+			    map3d_xy(points[i].x, points[i].y, min3d_z, &x, &y);
 			} else {
-			    map3d_xy(points[i].x, points[i].y, max_array[FIRST_Z_AXIS], &x, &y);
+			    map3d_xy(points[i].x, points[i].y, max3d_z, &x, &y);
 			}
 		    } else {
 			/* zero point is also OUTRANGE */
-			if (inrange(min_array[FIRST_Z_AXIS], 0.0, points[i].z) &&
-			    inrange(max_array[FIRST_Z_AXIS], 0.0, points[i].z)) {
-			    /* crosses z = min_array[FIRST_Z_AXIS] or max_array[FIRST_Z_AXIS] limits */
-			    map3d_xy(points[i].x, points[i].y, max_array[FIRST_Z_AXIS], &x, &y);
-			    map3d_xy(points[i].x, points[i].y, min_array[FIRST_Z_AXIS], &xx0, &yy0);
+			if (inrange(min3d_z, 0.0, points[i].z) &&
+			    inrange(max3d_z, 0.0, points[i].z)) {
+			    /* crosses z = min3d_z or max3d_z limits */
+			    map3d_xy(points[i].x, points[i].y, max3d_z, &x, &y);
+			    map3d_xy(points[i].x, points[i].y, min3d_z, &xx0, &yy0);
 			} else {
-			    /* doesn't cross z = min_array[FIRST_Z_AXIS] or max_array[FIRST_Z_AXIS] limits */
+			    /* doesn't cross z = min3d_z or max3d_z limits */
 			    break;
 			}
 		    }
@@ -1397,8 +1431,8 @@ struct gnuplot_contours *cntr;
 /* map xmin | xmax to 0 | 1 and same for y
  * 0.1 avoids any rounding errors
  */
-#define MAP_HEIGHT_X(x) ( (int) (((x)-min_array[FIRST_X_AXIS])/(max_array[FIRST_X_AXIS]-min_array[FIRST_X_AXIS])+0.1) )
-#define MAP_HEIGHT_Y(y) ( (int) (((y)-min_array[FIRST_Y_AXIS])/(max_array[FIRST_Y_AXIS]-min_array[FIRST_Y_AXIS])+0.1) )
+#define MAP_HEIGHT_X(x) ( (int) (((x)-x_min3d)/(x_max3d-x_min3d)+0.1) )
+#define MAP_HEIGHT_Y(y) ( (int) (((y)-y_min3d)/(y_max3d-y_min3d)+0.1) )
 
 /* if point is at corner, update height[][] and depth[][]
  * we are still assuming that extremes of surfaces are at corners,
@@ -1412,8 +1446,8 @@ double depth[2][2];
 {
     if (p->type != INRANGE)
 	return;
-    if ((fabs(p->x - min_array[FIRST_X_AXIS]) < zero || fabs(p->x - max_array[FIRST_X_AXIS]) < zero) &&
-	(fabs(p->y - min_array[FIRST_Y_AXIS]) < zero || fabs(p->y - max_array[FIRST_Y_AXIS]) < zero)) {
+    if ((fabs(p->x - x_min3d) < zero || fabs(p->x - x_max3d) < zero) &&
+	(fabs(p->y - y_min3d) < zero || fabs(p->y - y_max3d) < zero)) {
 	unsigned int x = MAP_HEIGHT_X(p->x);
 	unsigned int y = MAP_HEIGHT_Y(p->y);
 	if (height[x][y] < p->z)
@@ -1438,28 +1472,28 @@ int plot_num;
     {
 	int quadrant = surface_rot_z / 90;
 	if ((quadrant + 1) & 2) {
-	    zaxis_x = max_array[FIRST_X_AXIS];
-	    xaxis_y = max_array[FIRST_Y_AXIS];
+	    zaxis_x = x_max3d;
+	    xaxis_y = y_max3d;
 	} else {
-	    zaxis_x = min_array[FIRST_X_AXIS];
-	    xaxis_y = min_array[FIRST_Y_AXIS];
+	    zaxis_x = x_min3d;
+	    xaxis_y = y_min3d;
 	}
 
 	if (quadrant & 2) {
-	    zaxis_y = max_array[FIRST_Y_AXIS];
-	    yaxis_x = min_array[FIRST_X_AXIS];
+	    zaxis_y = y_max3d;
+	    yaxis_x = x_min3d;
 	} else {
-	    zaxis_y = min_array[FIRST_Y_AXIS];
-	    yaxis_x = max_array[FIRST_X_AXIS];
+	    zaxis_y = y_min3d;
+	    yaxis_x = x_max3d;
 	}
 
 	if (surface_rot_x > 90) {
 	    /* labels on the back axes */
-	    back_x = yaxis_x = min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - yaxis_x;
-	    back_y = xaxis_y = min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - xaxis_y;
+	    back_x = yaxis_x = x_min3d + x_max3d - yaxis_x;
+	    back_y = xaxis_y = y_min3d + y_max3d - xaxis_y;
 	} else {
-	    back_x = min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - yaxis_x;
-	    back_y = min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - xaxis_y;
+	    back_x = x_min3d + x_max3d - yaxis_x;
+	    back_y = y_min3d + y_max3d - xaxis_y;
 	}
     }
 
@@ -1479,8 +1513,8 @@ int plot_num;
 
 	map3d_xy(zaxis_x, zaxis_y, base_z, &bl_x, &bl_y);
 	map3d_xy(back_x, back_y, base_z, &bb_x, &bb_y);
-	map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y, base_z, &br_x, &br_y);
-	map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - back_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - back_y, base_z, &bf_x, &bf_y);
+	map3d_xy(x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, base_z, &br_x, &br_y);
+	map3d_xy(x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, base_z, &bf_x, &bf_y);
 
 	/* border around base */
 	{
@@ -1512,13 +1546,13 @@ int plot_num;
 
 	    map3d_xy(zaxis_x, zaxis_y, floor_z, &fl_x, &fl_y);
 	    map3d_xy(back_x, back_y, floor_z, &fb_x, &fb_y);
-	    map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y, floor_z, &fr_x, &fr_y);
-	    map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - back_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - back_y, floor_z, &ff_x, &ff_y);
+	    map3d_xy(x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, floor_z, &fr_x, &fr_y);
+	    map3d_xy(x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, floor_z, &ff_x, &ff_y);
 
 	    map3d_xy(zaxis_x, zaxis_y, ceiling_z, &tl_x, &tl_y);
 	    map3d_xy(back_x, back_y, ceiling_z, &tb_x, &tb_y);
-	    map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y, ceiling_z, &tr_x, &tr_y);
-	    map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - back_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - back_y, ceiling_z, &tf_x, &tf_y);
+	    map3d_xy(x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, ceiling_z, &tr_x, &tr_y);
+	    map3d_xy(x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, ceiling_z, &tf_x, &tf_y);
 
 	    /* vertical lines, to surface or to very top */
 	    if ((draw_border & 0xf0) == 0xf0) {
@@ -1573,10 +1607,10 @@ else if (height[i][j] != depth[i][j]) \
 
 		VERTICAL(16, zaxis_x, zaxis_y, zaxis_i, zaxis_j, fl_x, fl_y, tl_x, tl_y);
 		VERTICAL(32, back_x, back_y, back_i, back_j, fb_x, fb_y, tb_x, tb_y);
-		VERTICAL(64, min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y, 1 -
+		VERTICAL(64, x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, 1 -
 			 zaxis_i, 1 - zaxis_j, fr_x, fr_y, tr_x, tr_y);
 		hidden_active = FALSE;
-		VERTICAL(128, min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - back_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - back_y, 1 - back_i,
+		VERTICAL(128, x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, 1 - back_i,
 			 1 - back_j, ff_x, ff_y, tf_x, tf_y);
 		hidden_active = save;
 	    }
@@ -1601,10 +1635,10 @@ else if (height[i][j] != depth[i][j]) \
     }
     if (xtics || *xlabel.text) {
 	unsigned int x0, y0, x1, y1;
-	double mid_x = (max_array[FIRST_X_AXIS] + min_array[FIRST_X_AXIS]) / 2;
+	double mid_x = (x_max3d + x_min3d) / 2;
 	double len;
 	map3d_xy(mid_x, xaxis_y, base_z, &x0, &y0);
-	map3d_xy(mid_x, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - xaxis_y, base_z, &x1, &y1);
+	map3d_xy(mid_x, y_min3d + y_max3d - xaxis_y, base_z, &x1, &y1);
 	{			/* take care over unsigned quantities */
 	    int dx = x1 - x0;
 	    int dy = y1 - y0;
@@ -1625,7 +1659,7 @@ else if (height[i][j] != depth[i][j]) \
 	}
 	if (*xlabel.text) {
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
-	    double step = (2 * xaxis_y - max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]) / 4;
+	    double step = (2 * xaxis_y - y_max3d - y_min3d) / 4;
 	    map3d_xy(mid_x, xaxis_y + step, base_z, &x1, &y1);
 	    x1 += xlabel.xoffset * t->h_char;
 	    y1 += xlabel.yoffset * t->v_char;
@@ -1639,10 +1673,10 @@ else if (height[i][j] != depth[i][j]) \
     }
     if (ytics || *ylabel.text) {
 	unsigned int x0, y0, x1, y1;
-	double mid_y = (max_array[FIRST_Y_AXIS] + min_array[FIRST_Y_AXIS]) / 2;
+	double mid_y = (y_max3d + y_min3d) / 2;
 	double len;
 	map3d_xy(yaxis_x, mid_y, base_z, &x0, &y0);
-	map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - yaxis_x, mid_y, base_z, &x1, &y1);
+	map3d_xy(x_min3d + x_max3d - yaxis_x, mid_y, base_z, &x1, &y1);
 	{			/* take care over unsigned quantities */
 	    int dx = x1 - x0;
 	    int dy = y1 - y0;
@@ -1661,7 +1695,7 @@ else if (height[i][j] != depth[i][j]) \
 		     mytics, mytfreq, ytick_callback);
 	}
 	if (*ylabel.text) {
-	    double step = (max_array[FIRST_X_AXIS] + min_array[FIRST_X_AXIS] - 2 * yaxis_x) / 4;
+	    double step = (x_max3d + x_min3d - 2 * yaxis_x) / 4;
 	    map3d_xy(yaxis_x - step, mid_y, base_z, &x1, &y1);
 	    x1 += ylabel.xoffset * t->h_char;
 	    y1 += ylabel.yoffset * t->v_char;
@@ -1679,23 +1713,23 @@ else if (height[i][j] != depth[i][j]) \
 	gen_tics(FIRST_Z_AXIS, &zticdef, work_grid.l_type & (GRID_Z | GRID_MZ),
 		 mztics, mztfreq, ztick_callback);
     }
-    if ((yzeroaxis.l_type >= -2) && !log_array[FIRST_X_AXIS] && inrange(0, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS])) {
+    if ((yzeroaxis.l_type >= -2) && !is_log_x && inrange(0, x_min3d, x_max3d)) {
 	unsigned int x, y, x1, y1;
 	term_apply_lp_properties(&yzeroaxis);
-	map3d_xy(0.0, min_array[FIRST_Y_AXIS], base_z, &x, &y);		/* line through x=0 */
-	map3d_xy(0.0, max_array[FIRST_Y_AXIS], base_z, &x1, &y1);
+	map3d_xy(0.0, y_min3d, base_z, &x, &y);		/* line through x=0 */
+	map3d_xy(0.0, y_max3d, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
     }
-    if ((xzeroaxis.l_type >= -2) && !log_array[FIRST_Y_AXIS] && inrange(0, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
+    if ((xzeroaxis.l_type >= -2) && !is_log_y && inrange(0, y_min3d, y_max3d)) {
 	unsigned int x, y, x1, y1;
 	term_apply_lp_properties(&xzeroaxis);
-	map3d_xy(min_array[FIRST_X_AXIS], 0.0, base_z, &x, &y);		/* line through y=0 */
-	map3d_xy(max_array[FIRST_X_AXIS], 0.0, base_z, &x1, &y1);
+	map3d_xy(x_min3d, 0.0, base_z, &x, &y);		/* line through y=0 */
+	map3d_xy(x_max3d, 0.0, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
     }
     /* PLACE ZLABEL - along the middle grid Z axis - eh ? */
     if (*zlabel.text && (draw_surface || (draw_contour & CONTOUR_SRF))) {
-	map3d_xy(zaxis_x, zaxis_y, max_array[FIRST_Z_AXIS] + (max_array[FIRST_Z_AXIS] - base_z) / 4, &x, &y);
+	map3d_xy(zaxis_x, zaxis_y, z_max3d + (z_max3d - base_z) / 4, &x, &y);
 
 	x += zlabel.xoffset * t->h_char;
 	y += zlabel.yoffset * t->v_char;
@@ -1708,7 +1742,7 @@ else if (height[i][j] != depth[i][j]) \
 
 static void
 xtick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
+int axis;
 double place;
 char *text;
 struct lp_style_type grid;	/* linetype or -2 for none */
@@ -1722,12 +1756,12 @@ struct lp_style_type grid;	/* linetype or -2 for none */
     if (grid.l_type > -2) {
 	term_apply_lp_properties(&grid);
 	/* to save mapping twice, map non-axis y */
-	map3d_xy(place, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - xaxis_y, base_z, &x1, &y1);
+	map3d_xy(place, y_min3d + y_max3d - xaxis_y, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
 	term_apply_lp_properties(&border_lp);
     }
     if (xtics & TICS_ON_AXIS) {
-	map3d_xy(place, (min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS]) / 2, base_z, &x, &y);
+	map3d_xy(place, (y_min3d + y_max3d) / 2, base_z, &x, &y);
     }
     x1 = x + tic_unitx * scale * (t->h_tic) * dirn;
     y1 = y + tic_unity * scale * (t->v_tic) * dirn;
@@ -1756,7 +1790,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
 	clip_put_text_just(x1, y1, text, just);
     }
     if (xtics & TICS_MIRROR) {
-	map3d_xy(place, min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - xaxis_y, base_z, &x, &y);
+	map3d_xy(place, y_min3d + y_max3d - xaxis_y, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
 	draw_clip_line(x, y, x1, y1);
@@ -1765,7 +1799,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
 
 static void
 ytick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
+int axis;
 double place;
 char *text;
 struct lp_style_type grid;
@@ -1778,12 +1812,12 @@ struct lp_style_type grid;
     map3d_xy(yaxis_x, place, base_z, &x, &y);
     if (grid.l_type > -2) {
 	term_apply_lp_properties(&grid);
-	map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - yaxis_x, place, base_z, &x1, &y1);
+	map3d_xy(x_min3d + x_max3d - yaxis_x, place, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
 	term_apply_lp_properties(&border_lp);
     }
     if (ytics & TICS_ON_AXIS) {
-	map3d_xy((min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS]) / 2, place, base_z, &x, &y);
+	map3d_xy((x_min3d + x_max3d) / 2, place, base_z, &x, &y);
     }
     x1 = x + tic_unitx * scale * dirn * (t->h_tic);
     y1 = y + tic_unity * scale * dirn * (t->v_tic);
@@ -1811,7 +1845,7 @@ struct lp_style_type grid;
 	clip_put_text_just(x1, y1, text, just);
     }
     if (ytics & TICS_MIRROR) {
-	map3d_xy(min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - yaxis_x, place, base_z, &x, &y);
+	map3d_xy(x_min3d + x_max3d - yaxis_x, place, base_z, &x, &y);
 	x1 = x - tic_unitx * scale * (t->h_tic) * dirn;
 	y1 = y - tic_unity * scale * (t->v_tic) * dirn;
 	draw_clip_line(x, y, x1, y1);
@@ -1820,7 +1854,7 @@ struct lp_style_type grid;
 
 static void
 ztick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
+int axis;
 double place;
 char *text;
 struct lp_style_type grid;
@@ -1831,8 +1865,8 @@ struct lp_style_type grid;
 
     if (grid.l_type > -2) {
 	unsigned int x1, y1, x2, y2, x3, y3;
-	double other_x = min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x;
-	double other_y = min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y;
+	double other_x = x_min3d + x_max3d - zaxis_x;
+	double other_y = y_min3d + y_max3d - zaxis_y;
 	term_apply_lp_properties(&grid);
 	map3d_xy(zaxis_x, zaxis_y, place, &x1, &y1);
 	map3d_xy(back_x, back_y, place, &x2, &y2);
@@ -1850,8 +1884,8 @@ struct lp_style_type grid;
 	clip_put_text_just(x1, y, text, RIGHT);
     }
     if (ztics & TICS_MIRROR) {
-	double other_x = min_array[FIRST_X_AXIS] + max_array[FIRST_X_AXIS] - zaxis_x;
-	double other_y = min_array[FIRST_Y_AXIS] + max_array[FIRST_Y_AXIS] - zaxis_y;
+	double other_x = x_min3d + x_max3d - zaxis_x;
+	double other_y = y_min3d + y_max3d - zaxis_y;
 	map3d_xy(other_x, other_y, place, &x, &y);
 	draw_clip_line(x, y, x - len, y);
     }
@@ -1872,7 +1906,7 @@ const char *what;
     switch (pos->scalex) {
     case first_axes:
     case second_axes:
-	xpos = axis_log_value_checked(FIRST_X_AXIS, xpos, what);
+	xpos = LogScale(xpos, is_log_x, log_base_log_x, what, "x");
 	break;
     case graph:
 	xpos = min_array[FIRST_X_AXIS] +
@@ -1885,7 +1919,7 @@ const char *what;
     switch (pos->scaley) {
     case first_axes:
     case second_axes:
-	ypos = axis_log_value_checked(FIRST_Y_AXIS, ypos, what);
+	ypos = LogScale(ypos, is_log_y, log_base_log_y, what, "y");
 	break;
     case graph:
 	ypos = min_array[FIRST_Y_AXIS] +
@@ -1898,7 +1932,7 @@ const char *what;
     switch (pos->scalez) {
     case first_axes:
     case second_axes:
-	zpos = axis_log_value_checked(FIRST_Z_AXIS, zpos, what);
+	zpos = LogScale(zpos, is_log_z, log_base_log_z, what, "z");
 	break;
     case graph:
 	zpos = min_array[FIRST_Z_AXIS] +

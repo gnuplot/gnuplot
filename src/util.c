@@ -667,39 +667,6 @@ va_dcl
     putc('\n', stderr);
 }				/* int_warn */
 
-/*{{{  graph_error() */
-/* handle errors during graph-plot in a consistent way */
-/* HBB 20000430: move here, from graphics.c */
-#if defined(VA_START) && defined(ANSI_C)
-void
-graph_error(const char *fmt, ...)
-#else
-void
-graph_error(fmt, va_alist)
-const char *fmt;
-va_dcl
-#endif
-{
-#ifdef VA_START
-    va_list args;
-#endif
-
-    multiplot = FALSE;
-    term_end_plot();
-
-#ifdef VA_START
-    VA_START(args, fmt);
-    int_error(NO_CARET, fmt, args);
-    va_end(args);
-#else
-    int_error(fmt, a1, a2, a3, a4, a5, a6, a7, a8);
-#endif
-
-}
-
-/*}}} */
-
-
 /* Lower-case the given string (DFK) */
 /* Done in place. */
 void

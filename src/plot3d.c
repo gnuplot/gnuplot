@@ -35,17 +35,17 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.18 2000/05/02 18:21:37 lh
 ]*/
 
 #include "plot3d.h"
-#include "gp_types.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "binary.h"
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
+#include "graphics.h"
 #include "graph3d.h"
 #include "misc.h"
 #include "parse.h"
+#include "plot2d.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
@@ -60,9 +60,6 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.18 2000/05/02 18:21:37 lh
 
 /* static prototypes */
 
-static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
-					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
-					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use));
 static void get_3ddata __PROTO((struct surface_points * this_plot));
 static void print_3dtable __PROTO((int pcount));
 static void eval_3dplots __PROTO((void));
@@ -84,7 +81,104 @@ static struct udft_entry plot_func;
 /* some file-wide variables to store which axis we are using */
 static int x_axis, y_axis, z_axis;
 
-int plot3d_num=0;
+/*
+ * IMHO, code is getting too cluttered with repeated chunks of
+ * code. Some macros to simplify, I hope.
+ *
+ * do { } while(0) is comp.lang.c recommendation for complex macros
+ * also means that break can be specified as an action, and it will
+ * 
+ */
+
+/*  copy scalar data to arrays
+ * optimiser should optimise infinite away
+ * dont know we have to support ranges [10:-10] - lets reverse
+ * it for now, then fix it at the end.
+ */
+#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
+do{if ((auto_array[axis] = auto) == 0 && max<min) {\
+	min_array[axis] = max;\
+   max_array[axis] = min; /* we will fix later */ \
+ } else { \
+	min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
+	max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
+ } \
+ log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
+}while(0)
+
+/* handle reversed ranges */
+#define CHECK_REVERSE(axis) \
+do{\
+ if (auto_array[axis] == 0 && max_array[axis] < min_array[axis]) {\
+  double temp = min_array[axis]; min_array[axis] = max_array[axis]; max_array[axis] = temp;\
+  reverse_range[axis] = 1; \
+ } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
+}while(0)
+
+int plot3d_num = 0;
+
+
+/* get optional [min:max] */
+#define LOAD_RANGE(axis) \
+do {\
+ if (equals(c_token, "[")) { \
+  c_token++; \
+  auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]);\
+  if (!equals(c_token, "]"))\
+   int_error(c_token, "']' expected");\
+  c_token++;\
+ }\
+} while (0)
+
+
+/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
+ * Do OUT_ACTION or UNDEF_ACTION as appropriate
+ * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
+ * VALUE must not be same as STORE
+ */
+
+#define STORE_WITH_LOG_AND_FIXUP_RANGE(STORE, VALUE, TYPE, AXIS, OUT_ACTION, UNDEF_ACTION)\
+do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; break;} \
+              else if (VALUE == 0.0){STORE = -VERYLARGE; TYPE = OUTRANGE; OUT_ACTION; break;} \
+              else { STORE = log(VALUE)/log_base_array[AXIS]; } \
+     } else STORE = VALUE; \
+     if (TYPE != INRANGE) break;  /* dont set y range if x is outrange, for example */ \
+     if ( VALUE<min_array[AXIS] ) { \
+      if (auto_array[AXIS] & 1) min_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; break; }  \
+     } \
+     if ( VALUE>max_array[AXIS] ) { \
+      if (auto_array[AXIS] & 2) max_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; }   \
+     } \
+} while(0)
+
+/* use this instead empty macro arguments to work around NeXT cpp bug */
+/* if this fails on any system, we might use ((void)0) */
+#define NOOP			/* */
+
+/* check range and take logs of min and max if logscale
+ * this also restores min and max for ranges like [10:-10]
+ */
+
+#ifdef HAVE_STRINGIZE
+# define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
+#else
+# define RANGE_MSG(x) "x range is less than threshold : see `set zero`"
+#endif
+
+#define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
+do { if (reverse_range[AXIS]) { \
+      double temp = min_array[AXIS]; \
+      min_array[AXIS] = max_array[AXIS]; \
+      max_array[AXIS] = temp; \
+     }\
+     if (log_array[AXIS]) { \
+      if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
+       int_error(NO_CARET, RANGE_MSG(WHICH)); \
+      min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
+      max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
+    } \
+} while(0)
+
 
 
 /* support for dynamic size of input line */
@@ -100,7 +194,6 @@ plot3drequest()
 {
     TBOOLEAN changed;
     int dummy_token0 = -1, dummy_token1 = -1;
-    int u_axis, v_axis;
 
     is_3d_plot = TRUE;
 
@@ -108,28 +201,88 @@ plot3drequest()
 	strcpy(dummy_var[0], "u");
 	strcpy(dummy_var[1], "v");
     }
-
-    /* put stuff into arrays to simplify access */
-    AXIS_INIT3D(FIRST_X_AXIS, xmin, xmax, autoscale_x, is_log_x, base_log_x, 0);
-    AXIS_INIT3D(FIRST_Y_AXIS, ymin, ymax, autoscale_y, is_log_y, base_log_y, 0);
-    AXIS_INIT3D(FIRST_Z_AXIS, zmin, zmax, autoscale_z, is_log_z, base_log_z, 1);
-    AXIS_INIT3D(U_AXIS, umin, umax, autoscale_u, 0, 1, 0);
-    AXIS_INIT3D(V_AXIS, vmin, vmax, autoscale_v, 0, 1, 0);
+    autoscale_lx = autoscale_x;
+    autoscale_ly = autoscale_y;
+    autoscale_lz = autoscale_z;
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
 
-    u_axis = (parametric ? U_AXIS : FIRST_X_AXIS);
-    v_axis = (parametric ? V_AXIS : FIRST_Y_AXIS);
-
-    PARSE_NAMED_RANGE(u_axis, dummy_token0);
-    PARSE_NAMED_RANGE(v_axis, dummy_token1);
-
+    if (equals(c_token, "[")) {
+	c_token++;
+	if (isletter(c_token)) {
+	    if (equals(c_token + 1, "=")) {
+		dummy_token0 = c_token;
+		c_token += 2;
+	    } else {
+		/* oops; probably an expression with a variable. */
+		/* Parse it as an xmin expression. */
+		/* used to be: int_error("'=' expected",c_token); */
+	    }
+	}
+	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) :
+	    load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+	/* if (changed) */
+	if (parametric)
+	    /* autoscale_lu = FALSE; */
+	    autoscale_lu = changed;
+	else
+	    /* autoscale_lx = FALSE; */
+	    autoscale_lx = changed;
+    }
+    if (equals(c_token, "[")) {
+	c_token++;
+	if (isletter(c_token)) {
+	    if (equals(c_token + 1, "=")) {
+		dummy_token1 = c_token;
+		c_token += 2;
+	    } else {
+		/* oops; probably an expression with a variable. */
+		/* Parse it as an xmin expression. */
+		/* used to be: int_error("'=' expected",c_token); */
+	    }
+	}
+	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) :
+	    load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+	/* if (changed) */
+	if (parametric)
+	    /* autoscale_lv = FALSE; */
+	    autoscale_lv = changed;
+	else
+	    /* autoscale_ly = FALSE; */
+	    autoscale_ly = changed;
+    }
     if (parametric) {
-	PARSE_RANGE(FIRST_X_AXIS);
-	PARSE_RANGE(FIRST_Y_AXIS);
+	/* set optional x (parametric) or z ranges */
+	if (equals(c_token, "[")) {
+	    c_token++;
+	    autoscale_lx = load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	    if (!equals(c_token, "]"))
+		int_error(c_token, "']' expected");
+	    c_token++;
+	}
+	/* set optional y ranges */
+	if (equals(c_token, "[")) {
+	    c_token++;
+	    autoscale_ly = load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	    if (!equals(c_token, "]"))
+		int_error(c_token, "']' expected");
+	    c_token++;
+	}
     }				/* parametric */
-    PARSE_RANGE(FIRST_Z_AXIS);
+    if (equals(c_token, "[")) {	/* set optional z ranges */
+	c_token++;
+	autoscale_lz = load_range(FIRST_Z_AXIS, &zmin, &zmax, autoscale_lz);
+	if (!equals(c_token, "]"))
+	    int_error(c_token, "']' expected");
+	c_token++;
+    }
     CHECK_REVERSE(FIRST_X_AXIS);
     CHECK_REVERSE(FIRST_Y_AXIS);
     CHECK_REVERSE(FIRST_Z_AXIS);
@@ -478,12 +631,12 @@ struct surface_points *this_plot;
 	     * if nothing had happened at all. Nice, isn't it? */
 	    points->type = INRANGE;
 
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->x, x, points->type, x_axis, NOOP, continue);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->y, y, points->type, y_axis, NOOP, continue);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->x, x, points->type, x_axis, NOOP, continue);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->y, y, points->type, y_axis, NOOP, continue);
 #ifndef THIN_PLATE_SPLINES_GRID
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z / w, points->type, z_axis, NOOP, continue);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z / w, points->type, z_axis, NOOP, continue);
 #else
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
 #endif
 #else
 	    /* HBB 981026: original, short version of this code */
@@ -661,9 +814,9 @@ struct surface_points *this_plot;
 	    /* cannot use continue, as macro is wrapped in a loop.
 	     * I regard this as correct goto use
 	     */
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
+	    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 
 	    /* some may complain, but I regard this as the correct use
 	     * of goto
@@ -798,65 +951,21 @@ int pcount;
     free(table_format);
 }
 
-/* HBB 20000501: code isolated from eval_3dplots(), where practically
- * identical code occured twice, for direct and crossing isolines,
- * respectively.  The latter only are done for in non-hidden3d
- * mode. */
-static void
-calculate_set_of_isolines(value_axis, cross, this_iso,
-			  iso_axis, iso_min, iso_step, num_iso_to_use,
-			  sam_axis, sam_min, sam_step, num_sam_to_use
-			  )
-    AXIS_INDEX iso_axis, sam_axis, value_axis;
-    struct iso_curve **this_iso;
-    TBOOLEAN cross;
-    double iso_min, iso_step, sam_min, sam_step;
-    int num_iso_to_use, num_sam_to_use;
-{
-    int i, j;
-    struct coordinate GPHUGE *points = (*this_iso)->points;
-    
-    for (j = 0; j < num_iso_to_use; j++) {
-	double iso = iso_min + j * iso_step;
-	/* HBB 20000501: with the new code, it should
-	 * be safe to rely on the actual 'v' axis not
-	 * to be improperly logscaled... */
-	(void) Gcomplex(&plot_func.dummy_values[cross ? 0 : 1],
-			AXIS_DE_LOG_VALUE(iso_axis, iso), 0.0);
 
-	for (i = 0; i < num_sam_to_use; i++) {
-	    double sam = sam_min + i * sam_step;
-	    struct value a;
-	    double temp;
 
-	    (void) Gcomplex(&plot_func.dummy_values[cross ? 1 : 0],
-			    AXIS_DE_LOG_VALUE(sam_axis, sam), 0.0);
-
-	    if (cross) {
-		points[i].x = iso;
-		points[i].y = sam;
-	    } else {
-		points[i].x = sam;
-		points[i].y = iso;
-	    }
-
-	    evaluate_at(plot_func.at, &a);
-
-	    if (undefined || (fabs(imag(&a)) > zero)) {
-		points[i].type = UNDEFINED;
-		continue;
-	    }
-
-	    temp = real(&a);
-	    points[i].type = INRANGE;
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
-					    value_axis, NOOP, NOOP);
-	}
-	(*this_iso)->p_count = num_sam_to_use;
-	*this_iso = (*this_iso)->next;
-	points = (*this_iso) ? (*this_iso)->points : NULL;
-    }
-}
+#define SET_DUMMY_RANGE(AXIS) \
+do{\
+ if (parametric || polar) { \
+  t_min = tmin; t_max = tmax;\
+ } else if (log_array[AXIS]) {\
+  if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0)\
+   int_error(NO_CARET, "x/x2 range must be greater than 0 for log scale!");\
+  t_min = log(min_array[AXIS])/log_base_array[AXIS]; t_max = log(max_array[AXIS])/log_base_array[AXIS];\
+ } else {\
+  t_min = min_array[AXIS]; t_max = max_array[AXIS];\
+ }\
+ t_step = (t_max - t_min) / (samples - 1); \
+}while(0)
 
 
 /*
@@ -877,9 +986,7 @@ eval_3dplots()
     int start_token, end_token;
     int begin_token;
     TBOOLEAN some_data_files = FALSE, some_functions = FALSE;
-    int plot_num, line_num, point_num;
-    /* part number of parametric function triplet: 0 = z, 1 = y, 2 = x */
-    int crnt_param = 0;
+    int plot_num, line_num, point_num, crnt_param = 0;	/* 0 = z, 1 = y, 2 = x */
     char *xtitle;
     char *ytitle;
 
@@ -888,10 +995,14 @@ eval_3dplots()
      * If there is an error within this function, the memory is left allocated,
      * since we cannot call sp_free if the list is incomplete
      */
-    if (first_3dplot && plot3d_num>0)
-      sp_free(first_3dplot);
+    if (first_3dplot && plot3d_num>0) sp_free(first_3dplot);
     plot3d_num=0;
     first_3dplot = NULL;
+
+    /* put stuff into arrays to simplify access */
+    INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_lx, is_log_x, base_log_x, log_base_log_x, 0);
+    INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_ly, is_log_y, base_log_y, log_base_log_y, 0);
+    INIT_ARRAYS(FIRST_Z_AXIS, zmin, zmax, autoscale_lz, is_log_z, base_log_z, log_base_log_z, 1);
 
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
@@ -932,16 +1043,16 @@ eval_3dplots()
 		    int_error(c_token, "previous parametric function not fully specified");
 
 		if (!some_data_files) {
-		    if (auto_array[FIRST_X_AXIS] & 1) {
+		    if (autoscale_lx & 1) {
 			min_array[FIRST_X_AXIS] = VERYLARGE;
 		    }
-		    if (auto_array[FIRST_X_AXIS] & 2) {
+		    if (autoscale_lx & 2) {
 			max_array[FIRST_X_AXIS] = -VERYLARGE;
 		    }
-		    if (auto_array[FIRST_Y_AXIS] & 1) {
+		    if (autoscale_ly & 1) {
 			min_array[FIRST_Y_AXIS] = VERYLARGE;
 		    }
-		    if (auto_array[FIRST_Y_AXIS] & 2) {
+		    if (autoscale_ly & 2) {
 			max_array[FIRST_Y_AXIS] = -VERYLARGE;
 		    }
 		    some_data_files = TRUE;
@@ -966,17 +1077,17 @@ eval_3dplots()
 
 		/* this_plot->token is temporary, for errors in get_3ddata() */
 
-		if (axis_is_timedata[FIRST_X_AXIS]) {
+		if (datatype[FIRST_X_AXIS] == TIME) {
 		    if (specs < 3)
 			int_error(c_token, "Need full using spec for x time data");
 		    df_timecol[0] = 1;
 		}
-		if (axis_is_timedata[FIRST_Y_AXIS]) {
+		if (datatype[FIRST_Y_AXIS] == TIME) {
 		    if (specs < 3)
 			int_error(c_token, "Need full using spec for y time data");
 		    df_timecol[1] = 1;
 		}
-		if (axis_is_timedata[FIRST_Z_AXIS]) {
+		if (datatype[FIRST_Z_AXIS] == TIME) {
 		    if (specs < 3)
 			df_timecol[0] = 1;
 		    else
@@ -1202,7 +1313,7 @@ eval_3dplots()
     /*
      * Everything is defined now, except the function data. We expect no
      * syntax errors, etc, since the above parsed it all. This makes the code
-     * below simpler. If auto_array[FIRST_Y_AXIS], the yrange may still change.
+     * below simpler. If autoscale_ly, the yrange may still change.
      * - eh ?  - z can still change.  x/y/z can change if we are parametric ??
      */
 
@@ -1213,16 +1324,11 @@ eval_3dplots()
 	 * a special case. I was confused about x_min being both minimum of
 	 * x values found, and starting value for fn plots.
 	 */
-	register double u_min, u_max, u_step, v_min, v_max, v_step; 
-	double u_isostep, v_isostep;
-	AXIS_INDEX u_axis, v_axis;
+	register double u_min, u_max, u_step, v_min, v_max, v_step;
+	double uisodiff, visodiff;
 	struct surface_points *this_plot;
 
-	/* Make these point out the right 'u' and 'v' axis. In
-	 * non-parametric mode, x is used as u, and y as v */
-	u_axis = parametric ? U_AXIS : FIRST_X_AXIS;
-	v_axis = parametric ? V_AXIS : FIRST_Y_AXIS;
-	
+
 	if (!parametric) {
 	    /*{{{  check ranges */
 	    /* give error if xrange badly set from missing datafile error
@@ -1230,49 +1336,76 @@ eval_3dplots()
 	     * if there are no fns, we'll report it later as 'nothing to plot'
 	     */
 
+	    if (min_array[FIRST_X_AXIS] == VERYLARGE ||
+		max_array[FIRST_X_AXIS] == -VERYLARGE) {
+		int_error(c_token, "x range is invalid");
+	    }
+	    if (min_array[FIRST_Y_AXIS] == VERYLARGE ||
+		max_array[FIRST_Y_AXIS] == -VERYLARGE) {
+		int_error(c_token, "y range is invalid");
+	    }
 	    /* check that xmin -> xmax is not too small */
-	    axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
-	    axis_checked_extend_empty_range(FIRST_Y_AXIS, "y range is invalid");
+	    fixup_range(FIRST_X_AXIS, "x");
+	    fixup_range(FIRST_Y_AXIS, "y");
 	    /*}}} */
 	}
 	if (parametric && !some_data_files) {
 	    /*{{{  set ranges */
 	    /* parametric fn can still change x/y range */
-	    if (auto_array[FIRST_X_AXIS] & 1)
+	    if (autoscale_lx & 1)
 		min_array[FIRST_X_AXIS] = VERYLARGE;
-	    if (auto_array[FIRST_X_AXIS] & 2)
+	    if (autoscale_lx & 2)
 		max_array[FIRST_X_AXIS] = -VERYLARGE;
-	    if (auto_array[FIRST_Y_AXIS] & 1)
+	    if (autoscale_ly & 1)
 		min_array[FIRST_Y_AXIS] = VERYLARGE;
-	    if (auto_array[FIRST_Y_AXIS] & 2)
+	    if (autoscale_ly & 2)
 		max_array[FIRST_Y_AXIS] = -VERYLARGE;
 	    /*}}} */
 	}
-	
-	/*{{{  figure ranges, taking logs etc into account */
-	u_min = axis_log_value_checked(u_axis, min_array[u_axis], "x range");
-	u_max = axis_log_value_checked(u_axis, max_array[u_axis], "x range");
-	v_min = axis_log_value_checked(v_axis, min_array[v_axis], "y range");
-	v_max = axis_log_value_checked(v_axis, max_array[v_axis], "y range");
-	/*}}} */
+	if (parametric) {
+	    u_min = umin;
+	    u_max = umax;
+	    v_min = vmin;
+	    v_max = vmax;
+	} else {
+	    /*{{{  figure ranges, taking logs etc into account */
+	    if (is_log_x) {
+		if (min_array[FIRST_X_AXIS] <= 0.0 ||
+		    max_array[FIRST_X_AXIS] <= 0.0)
+		    int_error(NO_CARET, "x range must be greater than 0 for log scale!");
+		u_min = log(min_array[FIRST_X_AXIS]) / log_base_log_x;
+		u_max = log(max_array[FIRST_X_AXIS]) / log_base_log_x;
+	    } else {
+		u_min = min_array[FIRST_X_AXIS];
+		u_max = max_array[FIRST_X_AXIS];
+	    }
+
+	    if (is_log_y) {
+		if (min_array[FIRST_Y_AXIS] <= 0.0 ||
+		    max_array[FIRST_Y_AXIS] <= 0.0) {
+		    int_error(NO_CARET, "y range must be greater than 0 for log scale!");
+		}
+		v_min = log(min_array[FIRST_Y_AXIS]) / log_base_log_y;
+		v_max = log(max_array[FIRST_Y_AXIS]) / log_base_log_y;
+	    } else {
+		v_min = min_array[FIRST_Y_AXIS];
+		v_max = max_array[FIRST_Y_AXIS];
+	    }
+	    /*}}} */
+	}
 
 
 	if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 ||
 	    iso_samples_2 < 2) {
 	    int_error(NO_CARET, "samples or iso_samples < 2. Must be at least 2.");
 	}
-
 	/* start over */
 	this_plot = first_3dplot;
 	c_token = begin_token;
 
 	/* why do attributes of this_plot matter ? */
-	/* FIXME HBB 20000501: I think they don't, actually. I'm
-	 * taking out references to has_grid_topology in this part of
-	 * the code.  It only deals with function, which always is
-	 * gridded */
 
-	if (hidden3d) {
+	if (this_plot && this_plot->has_grid_topology && hidden3d) {
 	    u_step = (u_max - u_min) / (iso_samples_1 - 1);
 	    v_step = (v_max - v_min) / (iso_samples_2 - 1);
 	} else {
@@ -1280,8 +1413,8 @@ eval_3dplots()
 	    v_step = (v_max - v_min) / (samples_2 - 1);
 	}
 
-	u_isostep = (u_max - u_min) / (iso_samples_1 - 1);
-	v_isostep = (v_max - v_min) / (iso_samples_2 - 1);
+	uisodiff = (u_max - u_min) / (iso_samples_1 - 1);
+	visodiff = (v_max - v_min) / (iso_samples_2 - 1);
 
 
 	/* Read through functions */
@@ -1296,36 +1429,100 @@ eval_3dplots()
 		    struct coordinate GPHUGE *points = this_iso->points;
 		    int num_sam_to_use, num_iso_to_use;
 
-		    /* crnt_param is used as the axis number.  As the
-		     * axis array indices are ordered z, y, x, we have
-		     * to count *backwards*, starting starting at 2,
-		     * to properly store away contents to x, y and
-		     * z. The following little gimmick does that. */
 		    if (parametric)
 			crnt_param = (crnt_param + 2) % 3;
 
 		    dummy_func = &plot_func;
 		    plot_func.at = temp_at();	/* reparse function */
 		    dummy_func = NULL;
-
 		    num_iso_to_use = iso_samples_2;
-		    num_sam_to_use = hidden3d ? iso_samples_1 : samples_1;
 
-		    calculate_set_of_isolines(crnt_param, FALSE, &this_iso,
-					      v_axis, v_min, v_isostep,
-					      num_iso_to_use,
-					      u_axis, u_min, u_step,
-					      num_sam_to_use);
+		    if (!(this_plot->has_grid_topology && hidden3d))
+			num_sam_to_use = samples_1;
+		    else
+			num_sam_to_use = iso_samples_1;
 
-		    if (!hidden3d) {
+		    for (j = 0; j < num_iso_to_use; j++) {
+			double y = v_min + j * visodiff;
+			/* if (is_log_y) PEM fix logscale y axis */
+			/* y = pow(log_base_log_y,y); 26-Sep-89 */
+			/* parametric => NOT a log quantity (?) */
+			(void) Gcomplex(&plot_func.dummy_values[1],
+					!parametric && is_log_y ? pow(base_log_y, y) : y,
+					0.0);
+
+			for (i = 0; i < num_sam_to_use; i++) {
+			    double x = u_min + i * u_step;
+			    struct value a;
+			    double temp;
+
+			    /* if (is_log_x) PEM fix logscale x axis */
+			    /* x = pow(base_log_x,x); 26-Sep-89 */
+			    /* parametric => NOT a log quantity (?) */
+			    (void) Gcomplex(&plot_func.dummy_values[0],
+					    !parametric && is_log_x ? pow(base_log_x, x) : x, 0.0);
+
+			    points[i].x = x;
+			    points[i].y = y;
+
+			    evaluate_at(plot_func.at, &a);
+
+			    if (undefined || (fabs(imag(&a)) > zero)) {
+				points[i].type = UNDEFINED;
+				continue;
+			    }
+			    temp = real(&a);
+
+			    points[i].type = INRANGE;
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(points[i].z, temp, points[i].type,
+							   crnt_param, NOOP, NOOP);
+
+			}
+			this_iso->p_count = num_sam_to_use;
+			this_iso = this_iso->next;
+			points = this_iso ? this_iso->points : NULL;
+		    }
+
+		    if (!(this_plot->has_grid_topology && hidden3d)) {
 			num_iso_to_use = iso_samples_1;
 			num_sam_to_use = samples_2;
+			for (i = 0; i < num_iso_to_use; i++) {
+			    double x = u_min + i * uisodiff;
+			    /* if (is_log_x) PEM fix logscale x axis */
+			    /* x = pow(base_log_x,x); 26-Sep-89 */
+			    /* if parametric, no logs involved - 3.6 */
+			    (void) Gcomplex(&plot_func.dummy_values[0],
+					    (!parametric && is_log_x) ? pow(base_log_x, x) : x, 0.0);
 
-			calculate_set_of_isolines(crnt_param, TRUE, &this_iso,
-						  u_axis, u_min, u_isostep,
-						  num_iso_to_use,
-						  v_axis, v_min, v_step,
-						  num_sam_to_use);
+			    for (j = 0; j < num_sam_to_use; j++) {
+				double y = v_min + j * v_step;
+				struct value a;
+				double temp;
+				/* if (is_log_y) PEM fix logscale y axis */
+				/* y = pow(base_log_y,y); 26-Sep-89 */
+				(void) Gcomplex(&plot_func.dummy_values[1],
+						(!parametric && is_log_y) ? pow(base_log_y, y) :
+						y, 0.0);
+
+				points[j].x = x;
+				points[j].y = y;
+
+				evaluate_at(plot_func.at, &a);
+
+				if (undefined || (fabs(imag(&a)) > zero)) {
+				    points[j].type = UNDEFINED;
+				    continue;
+				}
+				temp = real(&a);
+
+				points[j].type = INRANGE;
+				STORE_WITH_LOG_AND_FIXUP_RANGE(points[j].z, temp, points[j].type,
+							       crnt_param, NOOP, NOOP);
+			    }
+			    this_iso->p_count = num_sam_to_use;
+			    this_iso = this_iso->next;
+			    points = this_iso ? this_iso->points : NULL;
+			}
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */
@@ -1352,7 +1549,6 @@ eval_3dplots()
 	    parametric_3dfixup(first_3dplot, &plot_num);
 	}
     }				/* some functions */
-
     /* if first_3dplot is NULL, we have no functions or data at all.
        * This can happen, if you type "splot x=5", since x=5 is a
        * variable assignment
@@ -1360,14 +1556,21 @@ eval_3dplots()
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
     }
+    if (min_array[FIRST_X_AXIS] == VERYLARGE ||
+	max_array[FIRST_X_AXIS] == -VERYLARGE ||
+	min_array[FIRST_Y_AXIS] == VERYLARGE ||
+	max_array[FIRST_Y_AXIS] == -VERYLARGE ||
+	min_array[FIRST_Z_AXIS] == VERYLARGE ||
+	max_array[FIRST_Z_AXIS] == -VERYLARGE)
+	int_error(NO_CARET, "All points undefined");
 
-    axis_checked_extend_empty_range(FIRST_X_AXIS, "All points x value undefined");
-    axis_checked_extend_empty_range(FIRST_Y_AXIS, "All points y value undefined");
-    axis_checked_extend_empty_range(FIRST_Z_AXIS, "All points z value undefined");
+    fixup_range(FIRST_X_AXIS, "x");
+    fixup_range(FIRST_Y_AXIS, "y");
+    fixup_range(FIRST_Z_AXIS, "z");
 
-    axis_revert_and_unlog_range(FIRST_X_AXIS);
-    axis_revert_and_unlog_range(FIRST_Y_AXIS);
-    axis_revert_and_unlog_range(FIRST_Z_AXIS);
+    FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
+    FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
+    FIXUP_RANGE_FOR_LOG(FIRST_Z_AXIS, z);
 
     /* last parameter should take plot size into effect...
      * probably needs to be moved to graph3d.c
@@ -1382,9 +1585,15 @@ eval_3dplots()
     if (ztics)
 	setup_tics(FIRST_Z_AXIS, &zticdef, zformat, 20);
 
-    AXIS_WRITEBACK(FIRST_X_AXIS, xmin, xmax);
-    AXIS_WRITEBACK(FIRST_Y_AXIS, ymin, ymax);
-    AXIS_WRITEBACK(FIRST_Z_AXIS, zmin, zmax);
+#define WRITEBACK(axis,min,max) \
+if(range_flags[axis]&RANGE_WRITEBACK) \
+  {if (auto_array[axis]&1) min = min_array[axis]; \
+   if (auto_array[axis]&2) max = max_array[axis]; \
+  }
+
+    WRITEBACK(FIRST_X_AXIS, xmin, xmax);
+    WRITEBACK(FIRST_Y_AXIS, ymin, ymax);
+    WRITEBACK(FIRST_Z_AXIS, zmin, zmax);
 
     if (plot_num == 0 || first_3dplot == NULL) {
 	int_error(c_token, "no functions or data to plot");
@@ -1467,9 +1676,6 @@ eval_3dplots()
 	m_capture(&replot_line, plot_token, c_token - 1);
 	plot_token = -1;
     }
-    if (first_3dplot)
-      sp_free(first_3dplot);
-    first_3dplot = NULL;
 
     /* record that all went well */
     plot3d_num=plot_num;

@@ -36,7 +36,6 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.11 2000/02/11 19:14:32 lhec
 
 #include "save.h"
 
-#include "axis.h"
 #include "command.h"
 #include "eval.h"
 #include "fit.h"
@@ -52,13 +51,13 @@ const char *encoding_names[] = {
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
-static void save_tics __PROTO((FILE *, int, AXIS_INDEX, struct ticdef *, TBOOLEAN, const char *));
+static void save_tics __PROTO((FILE *, int, int, struct ticdef *, TBOOLEAN, const char *));
 static void save_position __PROTO((FILE *, struct position *));
-static void save_range __PROTO((FILE *, AXIS_INDEX, double, double, TBOOLEAN, const char *));
+static void save_range __PROTO((FILE *, int, double, double, TBOOLEAN, const char *));
 static void save_set_all __PROTO((FILE *));
 
 #define SAVE_NUM_OR_TIME(fp, x, axis) \
-do{if (axis_is_timedata[axis]) { \
+do{if (datatype[axis]==TIME) { \
   char s[80]; char *p; \
   putc('"', fp);   \
   gstrftime(s,80,timefmt,(double)(x)); \
@@ -253,11 +252,11 @@ set ydata%s\n\
 set zdata%s\n\
 set x2data%s\n\
 set y2data%s\n",
-	    axis_is_timedata[FIRST_X_AXIS] ? " time" : "",
-	    axis_is_timedata[FIRST_Y_AXIS] ? " time" : "",
-	    axis_is_timedata[FIRST_Z_AXIS] ? " time" : "",
-	    axis_is_timedata[SECOND_X_AXIS] ? " time" : "",
-	    axis_is_timedata[SECOND_Y_AXIS] ? " time" : "");
+	    datatype[FIRST_X_AXIS] == TIME ? " time" : "",
+	    datatype[FIRST_Y_AXIS] == TIME ? " time" : "",
+	    datatype[FIRST_Z_AXIS] == TIME ? " time" : "",
+	    datatype[SECOND_X_AXIS] == TIME ? " time" : "",
+	    datatype[SECOND_Y_AXIS] == TIME ? " time" : "");
 
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
@@ -729,7 +728,7 @@ static void
 save_tics(fp, where, axis, tdef, rotate, text)
 FILE *fp;
 int where;
-AXIS_INDEX axis;
+int axis;
 struct ticdef *tdef;
 TBOOLEAN rotate;
 const char *text;
@@ -756,7 +755,7 @@ const char *text;
 	    break;
 	}
     case TIC_SERIES:
-	if (axis_is_timedata[axis]) {
+	if (datatype[axis] == TIME) {
 	    if (tdef->def.series.start != -VERYLARGE) {
 		char fd[26];
 		gstrftime(fd, 24, timefmt, (double) tdef->def.series.start);
@@ -782,11 +781,13 @@ const char *text;
 
     case TIC_USER:{
 	    register struct ticmark *t;
+	    int flag_time;
+	    flag_time = (datatype[axis] == TIME);
 	    fputs(" (", fp);
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label)
 		    fprintf(fp, "\"%s\" ", conv_text(t->label));
-		if (axis_is_timedata[axis]) {
+		if (flag_time) {
 		    char td[26];
 		    gstrftime(td, 24, timefmt, (double) t->position);
 		    fprintf(fp, "\"%s\"", conv_text(td));
@@ -823,7 +824,7 @@ struct position *pos;
 static void
 save_range(fp, axis, min, max, autosc, text)
 FILE *fp;
-AXIS_INDEX axis;
+int axis;
 double min, max;
 TBOOLEAN autosc;
 const char *text;

@@ -71,12 +71,10 @@ extern struct value * Ginteger __PROTO((struct value *, int));
 extern void os_error __PROTO((int, const char *, ...));
 extern void int_error __PROTO((int, const char *, ...));
 extern void int_warn __PROTO((int, const char *, ...));
-extern void graph_error __PROTO((const char *, ...));
 #else
 extern void os_error __PROTO(());
 extern void int_error __PROTO(());
 extern void int_warn __PROTO(());
-extern void graph_error __PROTO(());
 #endif
 extern void lower_case __PROTO((char *));
 extern void squash_spaces __PROTO((char *));

@@ -35,10 +35,8 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.27 2000/05/02 18:21:36 lh
 ]*/
 
 #include "plot2d.h"
-#include "gp_types.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "binary.h"
 #include "command.h"
 #include "datafile.h"
@@ -78,6 +76,9 @@ static struct udft_entry plot_func;
  * these are given symbolic names in plot.h
  */
 
+/* if user specifies [10:-10] we use [-10:10] internally, and swap at end */
+int reverse_range[AXIS_ARRAY_SIZE];
+
 /*
  * IMHO, code is getting too cluttered with repeated chunks of
  * code. Some macros to simplify, I hope.
@@ -87,10 +88,114 @@ static struct udft_entry plot_func;
  * 
  */
 
+/*  copy scalar data to arrays
+ * optimiser should optimise infinite away
+ * dont know we have to support ranges [10:-10] - lets reverse
+ * it for now, then fix it at the end.
+ */
+#define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
+do{auto_array[axis] = auto; \
+  min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
+  max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
+  log_array[axis] = is_log; base_array[axis] = base; \
+  log_base_array[axis] = log_base; \
+}while(0)
+
+/* handle reversed ranges */
+#define CHECK_REVERSE(axis) \
+do{ \
+ if (auto_array[axis] == 0 && max_array[axis] < min_array[axis]) { \
+  double temp = min_array[axis]; \
+  min_array[axis] = max_array[axis]; \
+  max_array[axis] = temp; \
+  reverse_range[axis] = 1; \
+ } else \
+  reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
+}while(0)
+
+/* get optional [min:max] */
+#define LOAD_RANGE(axis) \
+do { \
+ if (equals(c_token, "[")) { \
+  c_token++; \
+  auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]); \
+  if (!equals(c_token, "]")) \
+   int_error(c_token, "']' expected"); \
+  c_token++; \
+ } \
+} while (0)
+
+
+/* store VALUE or log(VALUE) in STORE, set TYPE as appropriate
+ * Do OUT_ACTION or UNDEF_ACTION as appropriate
+ * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
+ * VALUE must not be same as STORE
+ */
+
+#define STORE_WITH_LOG_AND_FIXUP_RANGE(STORE, VALUE, TYPE, AXIS, OUT_ACTION, UNDEF_ACTION)\
+do { \
+  if (log_array[AXIS]) { \
+    if (VALUE<0.0) { \
+      TYPE = UNDEFINED; \
+      UNDEF_ACTION; \
+      break; \
+    } else if (VALUE == 0.0) { \
+      STORE = -VERYLARGE; \
+      TYPE = OUTRANGE; \
+      OUT_ACTION; \
+      break; \
+    } else { \
+      STORE = log(VALUE)/log_base_array[AXIS]; \
+    } \
+  } else \
+    STORE = VALUE; \
+    if (TYPE != INRANGE) \
+      break;  /* dont set y range if x is outrange, for example */ \
+    if ( VALUE<min_array[AXIS] ) { \
+      if (auto_array[AXIS] & 1) \
+        min_array[AXIS] = VALUE; \
+      else { \
+        TYPE = OUTRANGE; \
+        OUT_ACTION; break; \
+      } \
+    } \
+    if ( VALUE>max_array[AXIS] ) { \
+      if (auto_array[AXIS] & 2) \
+        max_array[AXIS] = VALUE; \
+      else { \
+        TYPE = OUTRANGE; \
+        OUT_ACTION; \
+      } \
+    } \
+} while(0)
+
 /* use this instead empty macro arguments to work around NeXT cpp bug */
 /* if this fails on any system, we might use ((void)0) */
 #define NOOP			/* */
 
+/* check range and take logs of min and max if logscale
+ * this also restores min and max for ranges like [10:-10]
+ */
+#ifdef HAVE_STRINGIZE
+# define LOG_MSG(x) #x " range must be greater than 0 for log scale!"
+#else
+# define LOG_MSG(x) "x range must be greater than 0 for log scale!"
+#endif
+
+#define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
+do { \
+  if (reverse_range[AXIS]) { \
+    double temp = min_array[AXIS]; \
+    min_array[AXIS] = max_array[AXIS]; \
+    max_array[AXIS] = temp; \
+  } \
+  if (log_array[AXIS]) { \
+    if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
+      int_error(NO_CARET, LOG_MSG(WHICH)); \
+    min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
+    max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
+  } \
+} while(0)
 
 
 /*
@@ -102,7 +207,6 @@ void
 plotrequest()
 {
     int dummy_token = -1;
-    int t_axis;
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -114,26 +218,47 @@ plotrequest()
 
     /* initialise the arrays from the 'set' scalars */
 
-    AXIS_INIT2D(FIRST_X_AXIS, xmin, xmax, autoscale_x, is_log_x, base_log_x, 0);
-    AXIS_INIT2D(FIRST_Y_AXIS, ymin, ymax, autoscale_y, is_log_y, base_log_y, 1);
-    AXIS_INIT2D(SECOND_X_AXIS, x2min, x2max, autoscale_x2, is_log_x2, base_log_x2, 0);
-    AXIS_INIT2D(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, is_log_y2, base_log_y2, 1);
-    AXIS_INIT2D(T_AXIS, tmin, tmax, autoscale_t, 0, 1, 0);
-    
-    t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
+    INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_x, is_log_x, base_log_x, log_base_log_x, 0);
+    INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_y, is_log_y, base_log_y, log_base_log_y, 1);
+    INIT_ARRAYS(SECOND_X_AXIS, x2min, x2max, autoscale_x2, is_log_x2, base_log_x2, log_base_log_x2, 0);
+    INIT_ARRAYS(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, is_log_y2, base_log_y2, log_base_log_y2, 1);
 
-    PARSE_NAMED_RANGE(t_axis, dummy_token);
+    min_array[T_AXIS] = tmin;
+    max_array[T_AXIS] = tmax;
+
+    if (equals(c_token, "[")) {
+	c_token++;
+	if (isletter(c_token)) {
+	    if (equals(c_token + 1, "=")) {
+		dummy_token = c_token;
+		c_token += 2;
+	    } else {
+		/* oops; probably an expression with a variable. */
+		/* Parse it as an xmin expression. */
+		/* used to be: int_error("'=' expected",c_token); */
+	    }
+	} {
+	    int axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
+
+
+	    auto_array[axis] = load_range(axis, &min_array[axis], &max_array[axis], auto_array[axis]);
+	    if (!equals(c_token, "]"))
+		int_error(c_token, "']' expected");
+	    c_token++;
+	}			/* end of scope of 'axis' */
+    }				/* first '[' */
     if (parametric || polar)	/* set optional x ranges */
-	PARSE_RANGE(FIRST_X_AXIS);
+	LOAD_RANGE(FIRST_X_AXIS);
     else {
 	/* order of t doesn't matter, but x does */
 	CHECK_REVERSE(FIRST_X_AXIS);
     }
-    PARSE_RANGE(FIRST_Y_AXIS);
+
+    LOAD_RANGE(FIRST_Y_AXIS);
     CHECK_REVERSE(FIRST_Y_AXIS);
-    PARSE_RANGE(SECOND_X_AXIS);
+    LOAD_RANGE(SECOND_X_AXIS);
     CHECK_REVERSE(SECOND_X_AXIS);
-    PARSE_RANGE(SECOND_Y_AXIS);
+    LOAD_RANGE(SECOND_Y_AXIS);
     CHECK_REVERSE(SECOND_Y_AXIS);
 
     /* use the default dummy variable unless changed */
@@ -522,12 +647,12 @@ double width;			/* -1 means autocalc, 0 means use xmin/xmax */
      * but graphics.c doesn't know.
      * explicitly store -VERYLARGE;
      */
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, current_plot->x_axis, NOOP, return);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, current_plot->x_axis, NOOP, return);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
     cp->z = width;
 }				/* store2d_point */
 
@@ -675,11 +800,13 @@ eval_plots()
 {
     register int i;
     register struct curve_points *this_plot, **tp_ptr;
-    int uses_axis[AXIS_ARRAY_SIZE];
+
     int some_functions = 0;
     int plot_num, line_num, point_num, xparam = 0;
     char *xtitle = NULL;
     int begin_token = c_token;	/* so we can rewind for second pass */
+
+    int uses_axis[AXIS_ARRAY_SIZE];
 
     uses_axis[FIRST_X_AXIS] =
 	uses_axis[FIRST_Y_AXIS] =
@@ -697,9 +824,7 @@ eval_plots()
     line_num = 0;		/* default line type */
     point_num = 0;		/* default point type */
 
-    xtitle = NULL;
-
-    /* ** First Pass: Read through data files ***
+    /*** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
      * as filling in every thing except the function data. That is done after
      * the xrange is defined.
@@ -886,18 +1011,18 @@ eval_plots()
 	    /* we can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
-		if (!(uses_axis[x_axis] & 1) && auto_array[x_axis]) {
+		if (!(uses_axis[x_axis] & 1) && autoscale_lx) {
 		    if (auto_array[x_axis] & 1)
 			min_array[x_axis] = VERYLARGE;
 		    if (auto_array[x_axis] & 2)
 			max_array[x_axis] = -VERYLARGE;
 		}
-		if (axis_is_timedata[x_axis]) {
+		if (datatype[x_axis] == TIME) {
 		    if (specs < 2)
 			int_error(c_token, "Need full using spec for x time data");
 		    df_timecol[0] = 1;
 		}
-		if (axis_is_timedata[y_axis]) {
+		if (datatype[y_axis] == TIME) {
 		    if (specs < 1)
 			int_error(c_token, "Need using spec for y time data");
 		    /* need other cols, but I'm lazy */
@@ -978,22 +1103,30 @@ eval_plots()
 /*** Second Pass: Evaluate the functions ***/
     /*
      * Everything is defined now, except the function data. We expect
-     * no syntax errors, etc, since the above parsed it all. This
-     * makes the code below simpler. If y is autoscaled, the yrange
-     * may still change.  we stored last token of each plot, so we
-     * dont need to do everything again */
+     * no syntax errors, etc, since the above parsed it all. This makes
+     * the code below simpler. If autoscale_ly, the yrange may still change.
+     * we stored last token of each plot, so we dont need to do everything
+     * again
+     */
 
     /* give error if xrange badly set from missing datafile error
      * parametric or polar fns can still affect x ranges
      */
 
     if (!parametric && !polar) {
+	if (min_array[FIRST_X_AXIS] == VERYLARGE ||
+	    max_array[FIRST_X_AXIS] == -VERYLARGE)
+	    int_error(c_token, "x range is invalid");
 	/* check that xmin -> xmax is not too small */
-	axis_checked_extend_empty_range(FIRST_X_AXIS, "x range is invalid");
+	fixup_range(FIRST_X_AXIS, "x");
 
 	if (uses_axis[SECOND_X_AXIS] & 1) {
+	    /* some data plots with x2 */
+	    if (min_array[SECOND_X_AXIS] == VERYLARGE ||
+		max_array[SECOND_X_AXIS] == -VERYLARGE)
+		int_error(c_token, "x2 range is invalid");
 	    /* check that x2min -> x2max is not too small */
-	    axis_checked_extend_empty_range(SECOND_X_AXIS, "x2 range is invalid");
+	    fixup_range(SECOND_X_AXIS, "x2");
 	} else if (auto_array[SECOND_X_AXIS]) {
 	    /* copy x1's range */
 	    if (auto_array[SECOND_X_AXIS] & 1)
@@ -1023,17 +1156,25 @@ eval_plots()
 		    max_array[SECOND_X_AXIS] = -VERYLARGE;
 	    }
 	}
+#define SET_DUMMY_RANGE(AXIS) \
+do{ assert(!polar && !parametric); \
+ if (log_array[AXIS]) {\
+  if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0)\
+   int_error(NO_CARET, "x/x2 range must be greater than 0 for log scale!");\
+  t_min = log(min_array[AXIS])/log_base_array[AXIS];\
+  t_max = log(max_array[AXIS])/log_base_array[AXIS];\
+ } else {\
+  t_min = min_array[AXIS]; t_max = max_array[AXIS];\
+ }\
+ t_step = (t_max - t_min) / (samples - 1); \
+}while(0)
 
-	/* FIXME HBB 20000430: here and elsewhere, the code explicitly
-	 * assumes that the dummy variables (t, u, v) cannot possibly
-	 * be logscaled in parametric or polar mode. Does this
-	 * *really* hold? */
 	if (parametric || polar) {
 	    t_min = min_array[T_AXIS];
 	    t_max = max_array[T_AXIS];
 	    t_step = (t_max - t_min) / (samples - 1);
 	}
-	/* else we'll do it on each plot (see below) */
+	/* else we'll do it on each plot */
 
 	tp_ptr = &(first_plot);
 	plot_num = 0;
@@ -1057,10 +1198,7 @@ eval_plots()
 		    plot_func.at = temp_at();	/* reparse function */
 
 		    if (!parametric && !polar) {
-			t_min = min_array[x_axis];
-			t_max = max_array[x_axis];
-			axis_unlog_interval(x_axis, &t_min, &t_max, 1);
-			t_step = (t_max - t_min) / (samples - 1);
+			SET_DUMMY_RANGE(x_axis);
 		    }
 		    for (i = 0; i < samples; i++) {
 			double temp;
@@ -1102,14 +1240,14 @@ eval_plots()
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
 			    temp = y;
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis, NOOP, goto come_here_if_undefined);
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis, NOOP, goto come_here_if_undefined);
 			} else {	/* neither parametric or polar */
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
 
-			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
 
 			    /* could not use a continue in this case */
 			  come_here_if_undefined:
@@ -1139,9 +1277,9 @@ eval_plots()
 	     * also fixes up polar&&parametric fn plots */
 	    parametric_fixup(first_plot, &plot_num);
 	    /* we omitted earlier check for range too small */
-	    axis_checked_extend_empty_range(FIRST_X_AXIS, NULL);
+	    fixup_range(FIRST_X_AXIS, "x");
 	    if (uses_axis[SECOND_X_AXIS]) {
-		axis_checked_extend_empty_range(SECOND_X_AXIS, NULL);
+		fixup_range(SECOND_X_AXIS, "x2");
 	    }
 	}
     }	/* some_functions */
@@ -1162,13 +1300,13 @@ eval_plots()
 	if (max_array[FIRST_X_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_X_AXIS] == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(FIRST_X_AXIS);
+	FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
     }
     if (uses_axis[SECOND_X_AXIS]) {
 	if (max_array[SECOND_X_AXIS] == -VERYLARGE ||
 	    min_array[SECOND_X_AXIS] == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
-	axis_revert_and_unlog_range(SECOND_X_AXIS);
+	FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
 	if (auto_array[SECOND_X_AXIS] & 1)
@@ -1176,7 +1314,7 @@ eval_plots()
 	if (auto_array[SECOND_X_AXIS] & 2)
 	    max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
 	if (! auto_array[SECOND_X_AXIS])
-	    axis_revert_and_unlog_range(SECOND_X_AXIS);
+	    FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     }
     if (!uses_axis[FIRST_X_AXIS]) {
 	assert(uses_axis[SECOND_X_AXIS]);
@@ -1188,12 +1326,18 @@ eval_plots()
 
 
     if (uses_axis[FIRST_Y_AXIS]) {
-	axis_checked_extend_empty_range(FIRST_Y_AXIS, "all points y value undefined!");
-	axis_revert_and_unlog_range(FIRST_Y_AXIS);
+	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
+	    min_array[FIRST_Y_AXIS] == VERYLARGE)
+	    int_error(NO_CARET, "all points undefined!");
+	fixup_range(FIRST_Y_AXIS, "y");
+	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
     }
     if (uses_axis[SECOND_Y_AXIS]) {
-	axis_checked_extend_empty_range(SECOND_Y_AXIS, "all points y2 value undefined!");
-	axis_revert_and_unlog_range(SECOND_Y_AXIS);
+	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
+	    min_array[SECOND_Y_AXIS] == VERYLARGE)
+	    int_error(NO_CARET, "all points undefined!");
+	fixup_range(SECOND_Y_AXIS, "y2");
+	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {
         /* else we want to copy y2 range */
         assert(uses_axis[FIRST_Y_AXIS]);
@@ -1204,7 +1348,7 @@ eval_plots()
 	/* Log() fixup is only necessary if the range was *not* copied from
 	 * the (already logarithmized) yrange */
 	if (! auto_array[SECOND_Y_AXIS])
-	    axis_revert_and_unlog_range(SECOND_Y_AXIS);
+	    FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     }
     if (!uses_axis[FIRST_Y_AXIS]) {
 	assert(uses_axis[SECOND_Y_AXIS]);
@@ -1213,15 +1357,6 @@ eval_plots()
 	if (auto_array[FIRST_Y_AXIS] & 2)
 	    max_array[FIRST_Y_AXIS] = max_array[SECOND_Y_AXIS];
     }
-
-#if 0
-    /* HBB 20000502: this seems to have been replaced by newer code,
-     * in the meantime --> disable it */
-    AXIS_WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-    AXIS_WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-    AXIS_WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-    AXIS_WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
-#endif
 
     if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
@@ -1338,13 +1473,13 @@ int *plot_num;
 		    x = r * cos(t);
 		    y = r * sin(t);
 		    /* we hadn't done logs when we stored earlier */
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis, NOOP, NOOP);
 		} else {
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis, NOOP, NOOP);
-		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis, NOOP, NOOP);
 		}
 	    }
 

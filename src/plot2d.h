@@ -41,6 +41,7 @@
 
 /* Variables of plot2d.c needed by other modules: */
 
+extern int reverse_range[];
 extern struct curve_points *first_plot;
 
 /* prototypes from plot2d.c */

@@ -142,7 +142,6 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.16 1999/11/24 13:02:38 
 #include "datafile.h"
 
 #include "alloc.h"
-#include "axis.h"
 #include "command.h"
 #include "binary.h"
 #include "gp_time.h"
@@ -204,7 +203,7 @@ static size_t max_line_len = 0;
 #define DATA_LINE_BUFSIZ 160
 
 static FILE *data_fp = NULL;
-static TBOOLEAN df_pipe_open = FALSE;
+static TBOOLEAN pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE;
 
 #ifndef MAXINT			/* should there be one already defined ? */
@@ -627,7 +626,7 @@ int max_using;
 	if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
 	    os_error(name_token, "cannot create pipe for data");
 	else
-	    df_pipe_open = TRUE;
+	    pipe_open = TRUE;
     } else
 #endif /* PIPES */
 	/* I don't want to call strcmp(). Does it make a difference? */
@@ -681,9 +680,9 @@ df_close()
 
     if (!mixed_data_fp) {
 #if defined(PIPES)
-	if (df_pipe_open) {
+	if (pipe_open) {
 	    (void) pclose(data_fp);
-	    df_pipe_open = FALSE;
+	    pipe_open = FALSE;
 	} else
 #endif /* PIPES */
 	    (void) fclose(data_fp);
@@ -1134,11 +1133,16 @@ struct curve_points *this_plot;
  * y1<y2, y2<y3... .
  * Actually, I think the assumption is less strong than that--it looks like
  * the direction just has to be the same.
+ * This routine expects the following to be properly initialized:
+ * is_log_x, is_log_y, and is_log_z 
+ * base_log_x, base_log_y, and base_log_z 
+ * log_base_log_x, log_base_log_y, and log_base_log_z 
+ * xmin,ymin, and zmin
+ * xmax,ymax, and zmax
+ * autoscale_lx, autoscale_ly, and autoscale_lz
  *
- * This routine expects all the 'axis array' variables (now gathered
- * in axis.h) to be properly initialized
- *
- * does the autoscaling into the array versions (min_array[], max_array[]) */
+ * does the autoscaling into the array versions (min_array[], max_array[])
+ */
 
 int
 df_3dmatrix(this_plot)
@@ -1234,63 +1238,103 @@ struct surface_points *this_plot;
 
 	    point->type = INRANGE;	/* so far */
 
-#if 0 
-/* HBB 20000501: I just noticed that we can use STORE_WITH_LOG...
- * here, too. Funny how things have a way of falling into place
- * automatically, once you really make some effort at proper design
- * :-) */
 	    /*{{{  autoscaling/clipping */
-	    /* HBB 20000430: thrice the same code --> macro! */
-#define AUTOSCALE_RANGECHECK(axis,use_index)			\
-	    do {						\
-		if (used[use_index] > 0 || !log_array[axis]) {	\
-		    if (used[use_index] < min_array[axis]) {	\
-			if (auto_array[axis] & 1)		\
-			    min_array[axis] = used[use_index];	\
-			else					\
-			    point->type = OUTRANGE;		\
-		    }						\
-		    if (used[use_index] > max_array[axis]) {	\
-			if (auto_array[axis] & 2)		\
-			    max_array[axis] = used[use_index];	\
-			else					\
-			    point->type = OUTRANGE;		\
-		    }						\
-		}						\
-	    } while(0)
-	    AUTOSCALE_RANGECHECK(FIRST_X_AXIS, 0);
-	    AUTOSCALE_RANGECHECK(FIRST_Y_AXIS, 1);
-	    AUTOSCALE_RANGECHECK(FIRST_Z_AXIS, 2);
-#undef AUTOSCALE_RANGECHECK
+	    /*{{{  autoscale/range-check x */
+	    if (used[0] > 0 || !is_log_x) {
+		if (used[0] < min_array[FIRST_X_AXIS]) {
+		    if (autoscale_lx & 1)
+			min_array[FIRST_X_AXIS] = used[0];
+		    else
+			point->type = OUTRANGE;
+		}
+		if (used[0] > max_array[FIRST_X_AXIS]) {
+		    if (autoscale_lx & 2)
+			max_array[FIRST_X_AXIS] = used[0];
+		    else
+			point->type = OUTRANGE;
+		}
+	    }
+	    /*}}} */
 
-	    /* HBB 20000430: again, thrice the same thing: */
-#define CHECKED_LOG_VALUE(axis,used_index)				\
-	    do {							\
-		if (log_array[axis]) {					\
-		    if (used[used_index] < 0.0) {			\
-			point->type = UNDEFINED;			\
-			goto skip;					\
-		    } else if (used[used_index] == 0.0) {		\
-			point->type = OUTRANGE;				\
-			used[used_index] = -VERYLARGE;			\
-		    } else						\
-			used[used_index] =				\
-			  AXIS_UNDO_LOG(axis, used[used_index]);	\
-		}							\
-	    } while (0)
-	    CHECKED_LOG_VALUE(FIRST_X_AXIS, 0);
-	    CHECKED_LOG_VALUE(FIRST_Y_AXIS, 1);
-	    CHECKED_LOG_VALUE(FIRST_Z_AXIS, 2);
-#undef CHECKED_LOG_VALUE
+	    /*{{{  autoscale/range-check y */
+	    if (used[1] > 0 || !is_log_y) {
+		if (used[1] < min_array[FIRST_Y_AXIS]) {
+		    if (autoscale_ly & 1)
+			min_array[FIRST_Y_AXIS] = used[1];
+		    else
+			point->type = OUTRANGE;
+		}
+		if (used[1] > max_array[FIRST_Y_AXIS]) {
+		    if (autoscale_ly & 2)
+			max_array[FIRST_Y_AXIS] = used[1];
+		    else
+			point->type = OUTRANGE;
+		}
+	    }
+	    /*}}} */
+
+	    /*{{{  autoscale/range-check z */
+	    if (used[2] > 0 || !is_log_z) {
+		if (used[2] < min_array[FIRST_Z_AXIS]) {
+		    if (autoscale_lz & 1)
+			min_array[FIRST_Z_AXIS] = used[2];
+		    else
+			point->type = OUTRANGE;
+		}
+		if (used[2] > max_array[FIRST_Z_AXIS]) {
+		    if (autoscale_lz & 2)
+			max_array[FIRST_Z_AXIS] = used[2];
+		    else
+			point->type = OUTRANGE;
+		}
+	    }
+	    /*}}} */
+	    /*}}} */
+
+	    /*{{{  log x */
+	    if (is_log_x) {
+		if (used[0] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[0] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[0] = -VERYLARGE;
+		} else
+		    used[0] = log(used[0]) / log_base_log_x;
+	    }
+	    /*}}} */
+
+	    /*{{{  log y */
+	    if (is_log_y) {
+		if (used[1] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[1] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[1] = -VERYLARGE;
+		} else
+		    used[1] = log(used[1]) / log_base_log_y;
+	    }
+	    /*}}} */
+
+	    /*{{{  log z */
+	    if (is_log_z) {
+		if (used[2] < 0.0) {
+		    point->type = UNDEFINED;
+		    goto skip;
+		} else if (used[2] == 0.0) {
+		    point->type = OUTRANGE;
+		    used[2] = -VERYLARGE;
+		} else
+		    used[2] = log(used[2]) / log_base_log_z;
+	    }
+	    /*}}} */
 
 	    point->x = used[0];
 	    point->y = used[1];
 	    point->z = used[2];
-#else /* 0 */
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->x, used[0], point->type, FIRST_X_AXIS, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
-#endif
+
+
 	    /* some of you wont like this, but I say goto is for this */
 
 	  skip:
