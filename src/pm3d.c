@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.53 2005/02/01 11:28:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.54 2005/02/11 11:37:07 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -765,7 +765,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
     if (plot_mode == MODE_PLOT) {
 	while (this_2dplot) {
 	    if (this_2dplot->lp_properties.use_palette) {
-		if (this_2dplot->lp_properties.pm3d_color.type == TC_RGB)
+		if (this_2dplot->lp_properties.pm3d_color.type <= TC_RGB)
 		    want_palette_but_not_colorbox = TRUE;
 		    /* don't return yet -- decide later whether showing color box is desirable */
 		else
@@ -785,7 +785,7 @@ set_plot_with_palette(int plot_num, int plot_mode)
     /* Any surface 'with pm3d' or 'with line|dot palette'? */
 	while (surface++ < plot_num) {
 	    if (this_3dplot->lp_properties.use_palette) {
-		if (this_3dplot->lp_properties.pm3d_color.type == TC_RGB)
+		if (this_3dplot->lp_properties.pm3d_color.type <= TC_RGB)
 		    want_palette_but_not_colorbox = TRUE;
 		    /* don't return yet -- decide later whether showing color box is desirable */
 		else
