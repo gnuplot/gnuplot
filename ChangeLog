@@ -1,8 +1,15 @@
+2004-12-22  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c: Remove unused routine event_print().
+
+	* src/mousecmn.h: Remove unused event types GE_stderr, GE_stdout,
+	GE_cmd, and unused field text[100] in struct gp_event_t.
+
 2004-12-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/ggi.trm (GGI_replot) src/mousecmn.h src/mouse.c (do_event):
 	Remove the one and only instance of GE_cmd as an event type, used
-	by ggi.trm to trigger a replot.
+	by ggi.trm to trigger a replot. Create new type GE_replot instead.
 
 	* term/ggi.trm (GGI_set_color): Convert to newer API for set_color.
 

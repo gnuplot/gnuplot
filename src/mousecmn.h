@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.10 2004/11/01 01:17:59 sfeam Exp $
+ * $Id: mousecmn.h,v 1.11 2004/12/21 19:59:24 sfeam Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -62,9 +62,6 @@ enum {
     GE_keypress,        /* keypress; par1 = keycode (either ASCII, or one of the GP_ enums defined below); par2 = ( |1 .. don't pass through bindings )*/
     GE_modifier,        /* shift/ctrl/alt key pressed or released; par1 = is new mask, see Mod_ enums below */
     GE_plotdone,        /* acknowledgement of plot completion (for synchronization) */
-    GE_stdout,          /* print text to stdout */
-    GE_stderr,          /* print text to stderr */
-    GE_cmd,             /* text = literal command string */
     GE_replot,          /* used only by ggi.trm */
     GE_reset            /* reset to a well-defined state
 			   (e.g.  after an X11 error occured) */

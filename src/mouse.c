@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.65 2004/11/01 01:17:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.66 2004/12/21 19:59:24 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -200,7 +200,6 @@ static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
 static void event_motion __PROTO((struct gp_event_t * ge));
 static void event_modifier __PROTO((struct gp_event_t * ge));
-static void event_print __PROTO((FILE * fp, char *s));
 static void do_save_3dplot __PROTO((struct surface_points *, int, int));
 static void load_mouse_variables __PROTO((double, double, TBOOLEAN, int));
 
@@ -1742,13 +1741,6 @@ event_plotdone()
 }
 
 
-static void
-event_print(FILE * fp, char *s)
-{
-    fputs(s, fp);
-    fflush(fp);
-}
-
 void
 event_reset(struct gp_event_t *ge)
 {
@@ -1796,12 +1788,6 @@ do_event(struct gp_event_t *ge)
     }
 
     switch (ge->type) {
-    case GE_stdout:
-	event_print(stdout, ge->text);
-	break;
-    case GE_stderr:
-	event_print(stderr, ge->text);
-	break;
     case GE_plotdone:
 	event_plotdone();
 	break;
@@ -1825,9 +1811,6 @@ do_event(struct gp_event_t *ge)
 	if (!mouse_setting.on)
 	    break;
 	event_buttonrelease(ge);
-	break;
-    case GE_cmd:
-	do_string(ge->text);
 	break;
     case GE_replot:
 	/* used only by ggi.trm */
