@@ -57,7 +57,6 @@
 #include "ansichek.h"
 #include "stdfn.h"
 
-#undef MAX_LINE_LEN
 #define MAX_LINE_LEN	255
 #ifdef TRUE
 # undef TRUE
