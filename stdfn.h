@@ -175,6 +175,11 @@ int strnicmp __PROTO((char *, char *, int));
 #  endif
 #endif
 
+#ifdef __WATCOMC__
+#include <direct.h>
+#define HAVE_GETCWD 1
+#endif
+
 #ifndef GP_GETCWD
 # ifdef OS2
 #  define GP_GETCWD(path,len) _getcwd2 (path, len)

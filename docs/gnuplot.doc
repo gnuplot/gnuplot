@@ -416,14 +416,12 @@ C
  On Unix, AtariTOS and AmigaOS, SHELL is used for the `shell` command.  On
  MS-DOS and OS/2, COMSPEC is used for the `shell` command.
 
- On MS-DOS, if the BGI interface is used, BGI is used to point to the full
- path of the BGI drivers directory.  Furthermore, SVGA is used to name the
- Super VGA BGI driver in 800x600 resolution and its mode of operation is
- Name.Mode.  E.g., if the Super VGA driver is
-       C:\TC\BGI\SVGADRV.BGI
- and mode 3 is used for 800x600 resolution, then use the following:
-       set BGI=C:\TC\BGI
-       set SVGA=SVGADRV.3
+ On MS-DOS, if the BGI or Watcom interface is used, PCTRM is used to tell
+ the maximum resolution supported by your monitor by setting it to
+ S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
+ 800x600, then use:
+       set PCTRM=S800
+ If PCTRM is not set, standard VGA is used.
 
  FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
  fit is interrupted---see `fit`.  FIT_LOG specifies the filename of the

@@ -222,6 +222,7 @@ unix          defined by most unix C compilers.
 vms           (and VMS) defined by VMS C compilers.
 __ZTC__       Zortech C compiler under MSDOS.
 _Windows      defined by Borland C++ 3.0 compiling for MS-Windows.
+__WATCOMC__   defined automatically by  Watcom C
 __EMX__       defined by EMX gcc (available on DOS & OS/2).
 OS2           defined by compilers under OS/2.
 
