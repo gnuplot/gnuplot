@@ -2,6 +2,10 @@
 
 	* 0FAQ: Updated.
 
+	* gplt_x11.c(record): read_input() takes no arguments.
+
+	* plot.c: Remove nested comment.
+
 1999-09-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Fix compile/link on NeXT.
