@@ -184,11 +184,12 @@ Also, comp.sources.misc is usually a month or so behind us.
 Date: Fri Aug 27 05:21:33 GMT 1993
 
 
-Version: 3.5
+Version: 3.7
 
-In general, GNUPLOT 3.5 is available as the file gnuplot3.5.tar.Z.
-There will be patches to bring 3.4 to 3.5 as well called gp34to35.shar.Z.
-(Version 3.3 was skipped because of possible confusion
+In general, GNUPLOT 3.7 is available as the file gnuplot-3.7.tar.Z.
+Because of the numerous changes since version 3.5, no patch files
+will be available to bring 3.5 to 3.7.
+(Version 3.6 was skipped because of possible confusion
 with the numerous BETA releases.)  It will be made available to simtel20 
 and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1 and
 OS/2 2.0 executables.
@@ -201,14 +202,14 @@ nearest you.
 
 USENET users:
 
-    GNUPLOT 3.5 will posted to comp.sources.misc.
+    GNUPLOT 3.7 will posted to comp.sources.misc.
 
 
 NORTH AMERICA:
 
      Anonymous ftp to ftp.dartmouth.edu (129.170.16.4)
      Fetch
-        pub/gnuplot/gnuplot3.5.tar.Z
+        pub/gnuplot/gnuplot-3.7.tar.Z
      in binary mode.
 
      Users without ftp capability can obtain it through a mail ftp
@@ -218,7 +219,7 @@ NORTH AMERICA:
         open
         cd pub/gnuplot
         mode binary
-        get gnuplot3.5.tar.Z
+        get gnuplot-3.7.tar.Z
         quit
 
      If you have some problem, you might need to stick 
@@ -231,13 +232,13 @@ NORTH AMERICA:
 AUSTRALIA:
 
      Anonymous ftp to monu1.cc.monash.edu.au (130.194.1.101).
-     Fetch pub/gnuplot3.5.tar.Z in binary mode.
+     Fetch pub/gnuplot-3.7.tar.Z in binary mode.
 
 
 EUROPE:
 
-     Anonymous ftp to irisa.irisa.fr (131.254.2.3).
-     Fetch pub/gnuplot3.5.tar.Z in binary mode.
+     Anonymous ftp to ftp.irisa.fr (131.254.254.10).
+     Fetch /pub/gnuplot/gnuplot-3.7.tar.Z in binary mode.
 
 ----
 

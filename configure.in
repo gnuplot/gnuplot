@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl configure.in for gnuplot 3.5 (pre-3.6) on Unix.
+dnl configure.in for gnuplot 3.7 on Unix.
 dnl
 dnl Where possible, please adopt a convention that the absense of
 dnl a macro is the usual case : this saves having to update

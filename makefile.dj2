@@ -1,4 +1,4 @@
-# make file for gnuplot 3.6 / DOS / DJGPP version 2
+# make file for gnuplot 3.7 / DOS / DJGPP version 2
 #
 # compile it by   make -f makefile.dj2 in the main gnuplot directory
 #
@@ -210,5 +210,5 @@ realclean: clean
 	del .\demo\fit.log
 	del .\demo\soundfit.par
 #####
-##     END OF GNUPLOT 3.6 MAKEFILE FOR DJGPP V2
+##     END OF GNUPLOT 3.7 MAKEFILE FOR DJGPP V2
 #####
