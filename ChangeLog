@@ -1,3 +1,9 @@
+2000-10-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c (WndGraphProc): ported X11/OS2 feature that
+ 	pressing SPC in graph window transfers the focus to the gnuplot
+ 	text window.
+
 2000-10-24 Johannes Zellner <johannes@zellner.org>
 
 	* term/ggi.trm: increased the speed of ggi command line
