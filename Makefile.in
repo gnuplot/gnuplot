@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.49 1998/04/14 00:14:43 drd Exp $
+# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -155,7 +155,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.49 1998/04/14 00:14:43 drd Exp $
+# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
 #
 ########################################################
 #
@@ -308,7 +308,7 @@ $(COREOBJS) : plot.h protos.h stdfn.h
 
 help.$(O) misc.$(O) : help.h
 
-protos.h : alloc.h
+protos.h: alloc.h
 
 graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
 
