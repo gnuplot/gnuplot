@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.15 1998/12/10 18:33:22 lhecking Exp $";
+static char *RCSid = "$Id: misc.c,v 1.15.2.1 1999/08/19 14:38:30 lhecking Exp $";
 #endif
 
 /* GNUPLOT - misc.c */
@@ -68,7 +68,7 @@ do{if (datatype[axis]==TIME) { \
   }\
   putc('"', fp);\
  } else {\
-  fprintf(fp,"%g",x);\
+  fprintf(fp,"%#g",x);\
 }} while(0)
 
 
