@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.13 2002/07/26 16:42:28 mikulik Exp $
+ * $Id: emf.trm,v 1.14 2003/01/24 17:45:13 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -105,17 +105,15 @@ TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number))
 TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
 TERM_PUBLIC int EMF_set_font __PROTO((const char *));
 
-#ifdef RGB
 #undef RGB
-#endif
 #define RGB(r,g,b) ((long)(((unsigned char)(r)|((short)((unsigned char)(g))<<8))|(((long)(unsigned char)(b))<<16)))
 
-#ifndef min
-#define min(a,b) (a<b?a:b)
+#ifndef GPMIN
+# define GPMIN(a,b) (a<b?a:b)
 #endif
 
-#ifndef max
-#define max(a,b) (a>b?a:b)
+#ifndef GPMAX
+# define GPMAX(a,b) (a>b?a:b)
 #endif
 
 #define EMF_PX2HM 20
@@ -242,28 +240,28 @@ EMF_setfont()
     if (!emf_graphics)
 	return;
 
-    count = min (strlen(emf_fontname), 31);
+    count = GPMIN (strlen(emf_fontname), 31);
     if (((sub = strstr(emf_fontname, " bold")) != NULL)
 	|| ((sub = strstr(emf_fontname, " Bold")) != NULL)) {
 	bold = 700;
-	count = min(sub - emf_fontname, count);
+	count = GPMIN(sub - emf_fontname, count);
     }
     if (((sub = strstr(emf_fontname, " italic")) != NULL)
 	|| ((sub = strstr(emf_fontname, " Italic")) != NULL)) {
 	italic = 1;
-	count = min(sub - emf_fontname, count);
+	count = GPMIN(sub - emf_fontname, count);
     }
     if (((sub = strstr(emf_fontname, " underline")) != NULL)
 	|| ((sub = strstr(emf_fontname, " Underline")) != NULL)) {
 	underline = 1;
-	count = min(sub - emf_fontname, count);
+	count = GPMIN(sub - emf_fontname, count);
     }
     if (((sub = strstr(emf_fontname, " strikeout")) != NULL)
 	|| ((sub = strstr(emf_fontname, " Strikeout")) != NULL)
 	|| ((sub = strstr(emf_fontname, " StrikeOut")) != NULL)
 	) {
 	strikeout = 1;
-	count = min(sub - emf_fontname, count);
+	count = GPMIN(sub - emf_fontname, count);
     }
 
     safe_strncpy(font, emf_fontname, count + 1);
@@ -518,7 +516,7 @@ EMF_set_font(const char *font)
 	if (comma == NULL)
 	    return FALSE;	/* bad format */
 	sep = comma - font;
-	safe_strncpy(emf_fontname, font, min(sep + 1, 32));
+	safe_strncpy(emf_fontname, font, GPMIN(sep + 1, 32));
 	emf_fontsize = atoi(&font[sep + 1]);
     } else {
 	strcpy(emf_fontname, emf_defaultfontname);
