@@ -4,7 +4,7 @@ C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>   Version 3.6 organized by: David Denholm </h2><p>
+^ <h2>   Version 3.7 organized by: David Denholm </h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
@@ -171,9 +171,9 @@ C
  datafile plots.  If email-ing to info-gnuplot, please state whether or not
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
-2 What's New in version 3.6
+2 What's New in version 3.7
 ?new-features
- Gnuplot version 3.6 contains many new features.  This section gives a partial
+ Gnuplot version 3.7 contains many new features.  This section gives a partial
  list and links to the new items in no particular order.
 
  1. `fit f(x) 'file' via` uses the Marquardt-Levenberg method to fit data.
@@ -4823,7 +4823,7 @@ C ... and restart the table:
        set nopolar
        show polar
 
- There have been changes made to polar mode in version 3.6, so that scripts
+ There have been changes made to polar mode in version 3.7, so that scripts
  for `gnuplot` versions 3.5 and earlier will require modification.  The main
  change is that the dummy variable t is used for the angle so that the x and
  y ranges can be controlled independently.  Other changes are:
@@ -6532,7 +6532,7 @@ C ... and restart the table:
 
  The gamma function does not work for complex arguments.
 
- As of `gnuplot` version 3.6, all development has been done using ANSI C.
+ As of `gnuplot` version 3.7, all development has been done using ANSI C.
  With current operating system, compiler, and library releases, the OS
  specific bugs documented in release 3.5, now relegated to `old_bugs`, may
  no longer be relevant.

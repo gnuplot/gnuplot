@@ -7,7 +7,7 @@ An Interactive Plotting Program
 .AU
 Thomas Williams & Colin Kelley
 .br
-   Version 3.6 organized by: David Denholm
+   Version 3.7 organized by: David Denholm
 .br
    Major contributors (alphabetic order):
 .br
@@ -71,7 +71,7 @@ This manual was prepared by Dick Crawford.
 .LP
 .nr HM 1.2i
 .ds CH
-.ds LH GNUPLOT 3.6
+.ds LH GNUPLOT 3.7
 .ds RH %
 .\".nr PS 12
 .\".nr VS 13
