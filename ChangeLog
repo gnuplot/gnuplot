@@ -1,3 +1,44 @@
+2000-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: New configure option for ggi driver.
+
+	* missing: Update from automake-cvs.
+
+	* term.h: Add GGI driver.
+
+2000-10-20  Andreas Czechanowski  <dl4sdc@dl4sdc.ampr.org>
+
+	* term/fig.trm: Update to fig file format version 3.2. Fix scaling
+	in metric mode. Change upper left corner offset to be at an integer
+	centimeter position in metric mode. Output sizes for metrix are now
+	12x8cm and 12x15cm.
+
+2000-10-20  Cesar Crusius  <crusius@leland.stanford.edu>
+
+	* term/ggi.trm: Add new driver for General Graphics Interface (GGI).
+
+2000-10-20  Alan Braslau  <braslau@drecam.saclay.cea.fr>
+
+	* plot2d.c(print_table): Table terminal driver now produces
+	x y [xlow xhigh] [ylow yhigh] type as per errorbar mode. The
+	financebars and candlesticks types are not covered.
+
+2000-10-20  David Mussomeli  <dado.sere@libero.it>
+
+	* term/eepic.trm(EEPIC_graphics): Picture environment is now scaleable
+	by the "set size" command.
+
+2000-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term.h: Add emf and epslatex drivers.
+
+	* term/cgm.trm: Backported latest version from main branch.
+
+	* term/emf.trm, term/epslatex.trm: Update to latest version.
+
+	* term/gif.trm. term/png.trm: JvZ's patch from main branch to avoid
+	buffer overflow in term_options array.
+
 2000-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* misc.c (save_position): keywords saved for 'first' and 'second'
@@ -11,6 +52,16 @@
 	* graphics.c (map_position), graph3d.c (map_position): Fix
  	off-by-one bug in treatment of term->{x,y}max when translating
  	'screen' coordinates.
+
+2000-09-13  Daniel Luecking  <luecking@uark.edu>
+
+	* term/metapost.trm: Disambiguated options m$onochrome and
+	m$agnification. Changed %g to %f in output format (MPt doesn't know
+	exponential notation). Changed MP_DPI from 300 to 2400.
+
+2000-06-20  Juha Takala  <juha.takala@vtt.fi>
+
+	* gplt_x11.c: Add missing forward slash to path for .Xdefaults.
 
 2000-06-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
