@@ -642,7 +642,7 @@ char *s;
 
     while (*p != NUL) {
 	if (isupper((int)*p))
-	    *p = tolower(*p);
+	    *p = tolower((int)*p);
 	p++;
     }
 }
