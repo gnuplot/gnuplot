@@ -1,3 +1,7 @@
+2003-03-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/contrib/colorpts-demo.gp: Removed explicit 'set term'.
+
 2003-03-03  Ethan Merritt <merritt@u.washington.edu>
 	
 	* demo/candlesticks.dem docs/gnuplot.doc src/graphics.c:
