@@ -1,3 +1,65 @@
+2000-05-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, Makefile.in, makefile.all: Updated.
+
+	* beos/*: New files, imported from devel version. BeOS support
+	should be complete now.
+
+	* configure.in: Added options for emf and epslatex driver. Other
+	updates backported from development version.
+
+	* m4/*.m4: Imported and updated versions from development version.
+
+	* term/emf.trm, term/epslatex.trm: New drivers.
+
+	* term/gnugraph.trm: Require GNU plotutils v2.2 or newer. Backported
+	from development version.
+
+2000-05-05  Lars Hecking <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc, graphics.c: Bugfix for Shusuke Nisiyama's
+	vector clipping patch.
+
+	* term/gif.trm: The "giant" font option was not recognised.
+
+	* term/fig.trm(FIG_put_text): Don't create xfig SPECIAL_TEXT for
+	non-LaTeX strings. See Debian bug#61972.
+
+2000-05-05  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+	* term/pslatex.trm: Fix segfault.
+
+2000-05-05  Ulrich_Gruenebaum  <grueneba@luzi.e-technik.uni-dortmund.de>
+
+	* docs/gnuplot.doc, plot2d.c, plot3d.c, set.c, setshow.h: Bug fix
+	for broken autoscale writeback, see 0BUGS entry 3.
+
+2000-05-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c(do_3dplot): Key sample was clipped to graph box
+	(2D rectangle around the 3D plotting area), even if the key had
+	explicitly been requested to be outside that area by `set key below'
+	or `set key outside'.
+
+	* standard.c: Fix for incorrectly calculated acosh for complex
+	argument with a negative imaginary part.
+
+2000-05-04  Jeff Spirko  <spirko@lehigh.edu>
+
+	* plot.c(main): Allow configuration of GNU readline to use
+	different settings for different terminals. Noted by Peter Maunz
+	<Peter.Maunz@mpq.mpg.de>.
+
+2000-05-04  Johannes Zellner <johannes@zellner.org>
+
+	* configure.in, plot.c, parse.c: replace setjmp by
+	sigsetjmp and longjmp by siglongjmp if these functions
+	(or macros) are available.
+
+2000-03-31  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* configure.vms: New file, configure script for VMS.
+
 2000-02-04  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
 
 	* term/post.trm: Provides an oblique symbol font, e.g.

@@ -106,8 +106,7 @@ used through the CC environment variable:
 $ CC=c89 ./configure
 
 (C shell)
-$ setenv CC c89
-$ ./configure
+$ env CC=c89 ./configure
  
    Any environment settings for CFLAGS are included into the Makefile,
 so please make sure that these are really needed.
@@ -116,6 +115,8 @@ so please make sure that these are really needed.
 to change.  A complete list of options is available through
 
 $ ./configure --help
+
+   The options relevant to gnuplot are listed below:
 
   --prefix=PREFIX         Install architecture-independent files in PREFIX
                           [/usr/local]. The gnuplot (and gnuplot_x11) binary
@@ -133,10 +134,10 @@ $ ./configure --help
   --with-readline=PATH            Specify the location of GNU readline
   --with-plot             use the Unix plot library
   --with-plot=PATH                Specify the location of GNU libplot
-  --with-gd (*)           Enable gif terminal with Tom Boutell's gd library
+  --with-gd (*)           enable gif terminal with Tom Boutell's gd library
                           (requires GD library)
   --with-gd=PATH                  Specify the location of libgd
-  --with-png (*)          Enable png terminal
+  --with-png (*)          enable png terminal
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng
   --with-cwdrc            check current directory for .gnuplot file,
@@ -153,15 +154,15 @@ $ ./configure --help
   --enable-system-time    use the system time routines in time.c
   --with-x (*)            Use the X Window System
 
- Options marked with (*) are on by default, ie. these features or packages
-will be used if configure can detect them, even if the corresponding option
-is not specified.  Please note that the `--with-PACKAGE' options can have
-additional arguments:
+ Options marked with (*) are enabled by default, ie. these features or
+packages are used if configure detects them even if the corresponding
+option is not specified.  Please note that the `--with-PACKAGE' options
+can have additional arguments:
 
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
- o `--with-PACKAGE=no' will disable checking for PACKAGE. It has the same
+ o `--with-PACKAGE=no' disables checking for PACKAGE. It has the same
    effect as `--without-PACKAGE'.
- o `--with-PACKAGE=PATH' will check for PACKAGE in PATH
+ o `--with-PACKAGE=PATH' checks for PACKAGE in PATH
 
 Unix, no configure
 ------------------
@@ -185,6 +186,12 @@ Unix, no configure
 
 VMS
 ---
+
+   John Hasstedt <John.Hasstedt@sunysb.edu> has written configure.vms,
+a command file that creates the necessary make and option files to build
+gnuplot.  See the file for instructions on using it.  If you have problems
+with it, the old build files are still included; instructions for using
+them follow.
 
    On VMS, you can use MMS, MMK, or another make utility, or you can
 use BUILDVMS.COM.  The supplied files work with Alpha/VMS V6.2 and
@@ -450,12 +457,6 @@ directories, depending on the PATH specified with `--with-PACKAGE=PATH':
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/include' added
 
- Caveat: the `gp_SEARCH_HEADERDIRS' macro should only be used after the
-corresponding `gp_SEARCH_LIBDIRS' macro to take full advantage of the
-search algorithm.  This is a reasonable assumption nevertheless, because
-it allows for structuring configure.in so that the test for a header file
-is skipped if the corresponding library is not found.
-
  Here are some more examples:
 
  o the gd and png libraries are in /usr/local/gnu/lib, which is
@@ -475,10 +476,10 @@ is skipped if the corresponding library is not found.
 
    $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
 
-[I would like to implement the more generic `--site-includes' and
-`--site-libraries' options for additional flexibility, but this is
-painfully difficult with the current autoconf.  It also seems that such
-a feature would not comply with GNU coding standards.]
+ o the gd and png libraries are in /usr/local/gnu, the GNU plotutils
+   stuff is in /opt/plotutils
+
+   $ ./configure --with-gd=/usr/local/gnu --with-plot=/opt/plotutils
 
 Platform problems and testing
 *****************************
@@ -486,8 +487,8 @@ Platform problems and testing
    This section addresses trouble shooting and testing issues. Userland
 questions are answered in the FAQ.
 
-Platform notes
-==============
+Platform and compiler notes
+===========================
 
    Generally, if you think that configure has made a mistake in detecting
 platform features, there are two ways to switch these off. 
@@ -509,6 +510,14 @@ and rerun configure, or, edit config.h and change
 'make DEFS=-DHAVE_MEMSET' is wrong, because the DEFS variable in Makefile
 may contain other defines (make DEFS='-DHAVE_CONFIG_H -DHAVE_MEMSET'
 should work, though).
+
+ - gcc -ansi
+   If you wish to compile with gcc -ansi (CC='gcc -ansi -pedantic'
+  ./configure), additional platform specific defines may be necessary
+  to include non-ANSI function prototypes. E.g. on Solaris, -D__EXTENSIONS__
+  is needed. Otherwise, non-declared functions not returning int will be
+  assumed to return int, with possibly dangerous consequences. Especially
+  scpecfun.c is vulnerable here.
 
  - HP-UX 9.x
    It is recommended to use gcc, although the native compiler cc may
@@ -552,14 +561,13 @@ should work, though).
 
   (Bourne shell syntax)
 
-  $ cd gnuplot
+  $ cd gnuplot-3.7.2
   $ CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   or (C shell syntax)
 
-  prompt (41) cd gnuplot
-  prompt (42) setenv CC 'cc -B/full/path/to/unproto/dir/ -tp'
-  prompt (43) ./configure <options>
+  $ cd gnuplot-3.7.2
+  $ env CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   The required compiler options shown here are for System V.2.  For other
   platforms, consult the unproto documentation. `/full/path/to/unproto/dir'
@@ -626,12 +634,14 @@ Front Ends for gnuplot
 
  o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
    http://von-mises.home.ml.org/xgfe/xgfe.html
-   If you download the source, you need Qt library from
-   http://www.troll.no/
+   To compile from source, you need Qt library from
+   http://www.troll.no/.
 
  o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
    gnuplot-mode for GNU emacs and XEmacs. This version is based on
    the gnuplot.el file by Gershon Elber which is included with this
    distribution. The package is available from
-   http://feff.phys.washington.edu/~ravel/gnuplot/
+   http://feff.phys.washington.edu/~ravel/gnuplot/.
+   Future distributions of gnuplot will hopefully include Bruce's
+   version.
 
