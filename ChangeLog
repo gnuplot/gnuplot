@@ -1,3 +1,7 @@
+1999-04-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/version.c: Patchlevel 3.7.0.5.
+
 1999-04-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.am: Add conditional building of lisp files. Remove
