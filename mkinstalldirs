@@ -1,10 +1,15 @@
 #! /bin/sh
 # mkinstalldirs --- make directory hierarchy
+
+scriptversion=2003-11-08.23
+
 # Original author: Noah Friedman <friedman@prep.ai.mit.edu>
 # Created: 1993-05-16
 # Public domain.
-
-scriptversion=2003-06-14.23
+#
+# This file is maintained in Automake, please report
+# bugs to <bug-automake@gnu.org> or send patches to
+# <automake-patches@gnu.org>.
 
 errstatus=0
 dirmode=""
@@ -14,7 +19,8 @@ Usage: mkinstalldirs [-h] [--help] [--version] [-m MODE] DIR ...
 
 Create each directory DIR (with mode MODE, if specified), including all
 leading file name components.
-"
+
+Report bugs to <bug-automake@gnu.org>."
 
 # process command line arguments
 while test $# -gt 0 ; do
@@ -65,12 +71,25 @@ case $dirmode in
     if mkdir -p -- . 2>/dev/null; then
       echo "mkdir -p -- $*"
       exec mkdir -p -- "$@"
+    else
+      # On NextStep and OpenStep, the `mkdir' command does not
+      # recognize any option.  It will interpret all options as
+      # directories to create, and then abort because `.' already
+      # exists.
+      test -d ./-p && rmdir ./-p
+      test -d ./-- && rmdir ./--
     fi
     ;;
   *)
     if mkdir -m "$dirmode" -p -- . 2>/dev/null; then
       echo "mkdir -m $dirmode -p -- $*"
       exec mkdir -m "$dirmode" -p -- "$@"
+    else
+      # Clean up after NextStep and OpenStep mkdir.
+      for d in ./-m ./-p ./-- "./$dirmode";
+      do
+        test -d $d && rmdir $d
+      done
     fi
     ;;
 esac
