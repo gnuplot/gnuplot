@@ -1074,7 +1074,13 @@ PDF_set_color(double gray)
 	    return;
     }
 
-    PDF_setcolor(myPDF, "fill", "rgb", red, green, blue, 0 /* unused */);
+    /* make sure that the path is stroked with the current color
+     * before changing the color */
+    PDF_PathClose();
+    PDF_setcolor(myPDF, "both", "rgb", red, green, blue, 0 /* unused */);
+    /* mark linetype invalid so that the color will be
+     * set, when PDF_linetype() is called */
+    PDF_LineType = -3;
 }
 
 TERM_PUBLIC void
