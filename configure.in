@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.77 1999/10/21 21:12:18 lhecking Exp $
+dnl $Id: configure.in,v 1.78 1999/11/03 16:04:29 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.77 $)
+AC_REVISION($Revision: 1.78 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -81,9 +81,9 @@ test -z "$with_tutorial" && with_tutorial=yes
 )dnl
 
 dnl Gnuplot history, needs GNU readline
-AC_ARG_ENABLE(history,dnl
-[  --enable-history        enable history (requires GNU readline)],,
-test -z "$enable_history" && enable_history=no
+AC_ARG_ENABLE(history-file,dnl
+[  --enable-history-file   use history file (requires GNU readline)],,
+test -z "$enable_history_file" && enable_history_file=no
 )dnl
 
 dnl thin plate splines patch
@@ -133,6 +133,14 @@ dnl X Window System files.
 AC_SUBST(LIBRARIES_FOR_X)
 AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
+
+dnl Needed for LynxOS until AC_PATH_XTRA is fixed
+if test "$ac_cv_func_gethostbyname" = no; then
+  if test "$ac_cv_lib_nsl_gethostbyname" = no; then
+    AC_CHECK_LIB(bsd, gethostbyname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lbsd")
+  fi
+fi
+
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
@@ -190,7 +198,7 @@ AC_TRY_COMPILE(
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif],
-  errno=0,AC_MSG_RESULT(yes),dnl
+  errno=0,AC_MSG_RESULT(yes),
   AC_DEFINE(EXTERN_ERRNO, 1,
             [ Define if <errno.h> declares errno. ])
   AC_MSG_RESULT(no)
@@ -200,8 +208,8 @@ AC_TRY_COMPILE(
 dnl Types.
 AC_TYPE_SIZE_T
 AC_MSG_CHECKING(for time_t in time.h)
-AC_EGREP_HEADER(time_t,time.h,dnl
-  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],dnl
+AC_EGREP_HEADER(time_t,time.h,
+  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],
   AC_MSG_RESULT(no)
   AC_CHECK_TYPE(time_t, long))
 AC_TYPE_SIGNAL
@@ -241,7 +249,7 @@ if test "$with_linux_vga" = yes; then
     [AC_DEFINE(LINUXVGA, 1,
                [ Define if this is a Linux system with SuperVGA library. ])
      LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
-     TERMLIBS="$TERMLIBS -lvga"],dnl
+     TERMLIBS="$TERMLIBS -lvga"],
     with_linux_vga=no)
 fi
 
@@ -261,7 +269,7 @@ if test "$with_readline" != no; then
     done
 
     if test "$with_readline" = gnu; then
-      AC_CHECK_LIB(readline, readline,dnl
+      AC_CHECK_LIB(readline, readline,
        TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
       GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
@@ -276,20 +284,20 @@ if test "$with_readline" != no; then
     else
       AC_DEFINE(HAVE_LIBREADLINE, 1,
                 [ Define if you are using the GNU readline library. ])
-      GP_PATH_HEADER(readline/readline.h,[$with_readline],,dnl
+      GP_PATH_HEADER(readline/readline.h,[$with_readline],,
         AC_MSG_WARN([found GNU readline library but not readline.h])
         AC_MSG_WARN([please add path to readline.h to CPPFLAGS in Makefile])
       )
-      GP_PATH_HEADER(readline/history.h,[$with_readline],,dnl
+      GP_PATH_HEADER(readline/history.h,[$with_readline],,
         AC_MSG_WARN([found GNU readline library but not history.h])
         AC_MSG_WARN([please add path to history.h to CPPFLAGS in Makefile])
       )
 
       dnl check if history feature is desired
-      if test "$enable_history" = yes; then
-        GP_PATH_HEADER(readline/tilde.h,[$with_readline],dnl
+      if test "$enable_history_file" = yes; then
+        GP_PATH_HEADER(readline/tilde.h,[$with_readline],
           AC_DEFINE(GNUPLOT_HISTORY, 1,
-                    [ Define if you want to use the history feature with GNU readline. ]))
+                    [ Define if you want to use a gnuplot history file with GNU readline. ]))
       fi
 
     fi # ! ac_cv_lib_readline_readline = no
@@ -308,10 +316,10 @@ dnl libplot
 if test "$with_plot" != no; then
   if test "$with_plot" = yes; then
     dnl Unix plot library
-    AC_CHECK_LIB(plot,openpl,dnl
+    AC_CHECK_LIB(plot,openpl,
      AC_DEFINE(UNIXPLOT, 1,
                [ Define if you want to use the standard Unix plot library. ])
-     TERMLIBS="$TERMLIBS -lplot",dnl
+     TERMLIBS="$TERMLIBS -lplot",
      with_plot=no)
   else
     dnl GNU plot library - test for new version first
@@ -332,7 +340,7 @@ if test "$with_plot" != no; then
         AC_MSG_RESULT([ - using GNU plotutils library])
       fi # GNU plotlib pre-2.2
     else
-      GP_PATH_HEADER(plotcompat.h,[$with_plot],dnl
+      GP_PATH_HEADER(plotcompat.h,[$with_plot],
         AC_DEFINE(HAVE_PLOTCOMPAT_H, 1,
                   [ Define if you have the <plotcompat.h> header file. ]),
         AC_MSG_WARN([found GNU plotutils 2.2+ library but not plotcompat.h])
@@ -356,10 +364,10 @@ dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
   GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
   if test "$ac_cv_lib_gd_gdImageCreate" != no; then
-    GP_PATH_HEADER(gd.h,[$with_gd],dnl
+    GP_PATH_HEADER(gd.h,[$with_gd],
       dnl ACTION-IF-FOUND
       AC_DEFINE(HAVE_LIBGD, 1,
-                [ Define if you have Thomas Boutell's gd library. ]),dnl
+                [ Define if you have Thomas Boutell's gd library. ]),
       dnl ACTION-IF-NOT-FOUND
       AC_MSG_WARN([found gd library but not gd.h])
       AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile]))
@@ -374,11 +382,11 @@ if test "$with_png" != no; then
   GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
   if test "$ac_cv_lib_png_png_info_init" != no; then
     TERMLIBS="$TERMLIBS -lz"
-    GP_PATH_HEADER(png.h,[$with_png],,dnl
+    GP_PATH_HEADER(png.h,[$with_png],,
      AC_MSG_WARN([found png library but not png.h])
      AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
     )
-    GP_PATH_HEADER(zlib.h,[$with_png],,dnl
+    GP_PATH_HEADER(zlib.h,[$with_png],,
      AC_MSG_WARN([found z library but not zlib.h])
      AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
     )
@@ -387,7 +395,7 @@ if test "$with_png" != no; then
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
-],dnl
+],
        AC_MSG_WARN([- libpng too old - not including png driver])
        with_png=no)
     else
@@ -417,9 +425,9 @@ AC_EGREP_CPP(yes,
 [#ifdef SCO
 yes
 #endif
-],AC_CHECK_LIB(ccgi, v_opnwk,dnl
+],AC_CHECK_LIB(ccgi, v_opnwk,
     AC_DEFINE(CGI, 1,
-              [ Define if you want to use the CGI terminal under SCO. ])dnl
+              [ Define if you want to use the CGI terminal under SCO. ])
               TERMLIBS="$TERMLIBS -lccgi"))
 
 dnl Sun sunview
@@ -427,11 +435,11 @@ AC_EGREP_CPP(yes,
 [#ifdef sun
 yes
 #endif
-], AC_CHECK_LIB(suntool, window_create,dnl
-    AC_CHECK_HEADER(suntool/sunview.h,dnl
+], AC_CHECK_LIB(suntool, window_create,
+    AC_CHECK_HEADER(suntool/sunview.h,
     AC_DEFINE(SUN, 1,
-              [ Define if you want to use the sunview terminal (sun). ])dnl
-    TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect"),,dnl
+              [ Define if you want to use the sunview terminal (sun). ])
+    TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect"),,
     [-lsunwindow -lpixrect]))
 
 dnl Process with and enable options
@@ -452,18 +460,18 @@ if test "$with_row_help" = no; then
 fi
 
 if test "$enable_iris" = yes; then
-  AC_CHECK_LIB(gl_s,winopen,dnl
+  AC_CHECK_LIB(gl_s,winopen,
    AC_DEFINE(IRIS, 1,
              [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
-   TERMLIBS="$TERMLIBS -lgl_s",dnl
+   TERMLIBS="$TERMLIBS -lgl_s",
    enable_iris=no)
 fi
 
 if test "$enable_mgr" = yes; then
-  AC_CHECK_LIB(mgr,m_getinfo,dnl
+  AC_CHECK_LIB(mgr,m_getinfo,
    AC_DEFINE(MGR, 1,
              [ Define if you want to use the MGR Window system. ])
-   TERMLIBS="$TERMLIBS -lmgr -lpixrect",dnl
+   TERMLIBS="$TERMLIBS -lmgr -lpixrect",
    enable_mgr=no,[-lpixrect])
 fi
 
@@ -543,7 +551,8 @@ if test "$with_readline" != no; then
   if test "$with_readline" != yes; then
     AC_MSG_RESULT([  Use GNU readline library])
       test -n "$gp_tcap" && AC_MSG_RESULT([    with ${gp_tcap}])
-      test "$enable_history" = yes && AC_MSG_RESULT([    enable history])
+      test "$enable_history_file" = yes && \
+        AC_MSG_RESULT([    enable history file])
   else
     AC_MSG_RESULT([  Use builtin minimal readline])
   fi
