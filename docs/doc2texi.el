@@ -133,10 +133,10 @@
 * GNUPLOT: (gnuplot).             An Interactive Plotting Program
 @end direntry
 
-@ifinfo
+@ifnottex
 @node Top, Introduction, (dir), (dir)
 @top Master Menu
-@end ifinfo
+@end ifnottex
 
 @example
                        GNUPLOT
