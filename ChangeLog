@@ -1,3 +1,7 @@
+2004-01-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c: The color axis format was not being saved; now it is.
+
 2004-01-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/webify.pl demo/mgr.pl demo/polar.dem demo/random:
