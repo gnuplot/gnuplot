@@ -1,3 +1,42 @@
+1998-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add makefile.mgw to ETC.
+
+	* TODO: New entry.
+
+1998-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* command.c: On Win32 platforms, allow 'cd "d:\path"' to also change
+	the drive.
+
+	* graphics.c: Fix bug in the new polar errorbar support (non-polar
+	yerrorbars had become diagonals).
+
+	* makefile.dj2, makefile.tc: Update realclean target.
+
+	* makefile.mgw: New makefile for MinGW32.
+
+	* makefile.win: Add 'help' to the list of objects to be compiled
+	into gnuplot (for Don Taber's new version of list_terms() sitting
+	in help.c)
+
+	* syscfg.h: Add HAVE_SLEEP for Win32.
+
+	* term/win.trm: Add more stuff in terminal help.
+
+	* win/geticon.c, win/wgnuplib.h, win/wgraph.c, win/winmain.c,
+	win/wmenu.c, win/wpause.c, win/wtext.c: Changes to allow building
+	under MinGW32.
+
+1998-12-01  Hartmut Niemann  <niemann@cip.e-technik.uni-erlangen.de>
+
+	* term/pslatex.trm: Patch to avoid problems with active characters
+	in \special commands, and line-end characters.
+
+1998-12-01  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* 0INSTALL: Upgrade OS/2 related docs.
+
 1998-11-30  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* makefile.os2: Update various compiler flags.
