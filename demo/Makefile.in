@@ -100,13 +100,13 @@ DEMO = all.dem
 
 GNUPLOT = gnuplot
 
-EXTRA_DIST = Makefile.am.in reread.bor world.cor 1.dat 2.dat \
-3.dat battery.dat big_peak.dat candlesticks.dat clip14in.dat \
-glass.dat hemisphr.dat klein.dat lcdemo.dat moli3.dat scatter2.dat \
-silver.dat soundvel.dat steps.dat timedat.dat triangle.dat using.dat \
-whale.dat world.dat airfoil.dem all.dem animate.dem binary.dem \
-bivariat.dem borders.dem candlesticks.dem contours.dem controls.dem \
-discrete.dem electron.dem fillbox.dem fillcrvs.dem fit.dem fontfile.dem \
+EXTRA_DIST = Makefile.am.in reread.bor world.cor 1.dat 2.dat 3.dat \
+battery.dat big_peak.dat candlesticks.dat clip14in.dat glass.dat \
+hemisphr.dat klein.dat lcdemo.dat moli3.dat scatter2.dat silver.dat \
+soundvel.dat steps.dat timedat.dat triangle.dat using.dat whale.dat \
+world.dat airfoil.dem all.dem animate.dem binary.dem bivariat.dem \
+borders.dem candlesticks.dem contours.dem controls.dem discrete.dem \
+electron.dem fillbox.dem fillcrvs.dem fillstyle.dem fit.dem fontfile.dem \
 fontfile_latex.dem hidden.dem mgr.dem multimsh.dem multiplt.dem param.dem \
 pm3d.dem pm3dcolors.dem pm3dgamma.dem polar.dem poldat.dem prob.dem \
 prob2.dem random.dem scatter.dem simple.dem singulr.dem spline.dem \
