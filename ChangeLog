@@ -1,3 +1,7 @@
+2002-09-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Improve vertical placement of rotated text.
+
 2002-09-27  James R. Van Zandt  <jrv@debian.org>
 
 	* term/cgm.trm (cgm_default_color_table): adjust default colors
@@ -1189,7 +1193,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/27 18:00:37 $).
+	last modification date (from the tag $Date: 2002/09/28 02:01:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
