@@ -1,3 +1,31 @@
+2002-03-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* PORTING, config/buildvms.com, config/config.cyg, config/config.mgw,
+	config/config.nt, config/makefile.dj2, config/makefile.emx,
+	config/makefile.g, config/makefile.tc, config/makefile.win: Remove
+	ANSI_C symbol. Add PROTOTYPES and HAVE_STRINGIZE where appropriate.
+
+	* config/config.amg, config/makefile.amg: Config file support for
+	Amiga SAS/C.
+
+	* configure.in: Add test for struct exception in <math.h>. Remove
+	duplicate definition of HAVE_LIBPDF.
+	
+	* docs/Makefile.in, docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c,
+	docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c, docs/doc2rtf.c,
+	docs/doc2tex.c, docs/xref.c, src/bf_test.c: Include syscfg.h instead
+	of ansichek.h.
+
+	* src/fit.c, src/stdfn.h, src/util.c, src/util.h: Use STDC_HEADERS
+	instead of ANSI_C.
+
+	* src/internal.c(matherr): Cleaner implementation using autoconf and
+	config file based symbols.
+
+	* src/syscfg.h: Don't include ansichek.h. Move __PROTO and generic
+	declarations here from ansichek.h. Define fallbacks for
+	GP_EXCEPTION_NAME and GP_MATHERR.
+
 2002-03-06  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Finally get it to build again.
