@@ -31,5 +31,6 @@
 
  REFERENCE: http://www.sci.muni.cz/~mikulik/gnuplot.html#mouseOS2
 
- USAGE:     Add  -DUSE_MOUSE=1  to CFLAGS in makefile.os2
+ USAGE:     Uncomment  USE_MOUSE=1  in the configuration section of
+            makefile.os2
 
