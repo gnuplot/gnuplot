@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.5 1999/06/14 19:19:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.6 1999/06/19 20:52:04 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -1067,7 +1067,7 @@ unsigned int x, y;
 void
 b_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     if (b_angle == 1)
 	x += b_vchar / 2;

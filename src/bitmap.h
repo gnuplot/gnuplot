@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.2 1999/06/09 12:07:18 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.3 1999/06/14 19:19:45 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -100,7 +100,7 @@ void b_setvalue __PROTO((unsigned int));
 void b_setlinetype __PROTO((int));
 void b_move __PROTO((unsigned int, unsigned int));
 void b_vector __PROTO((unsigned int, unsigned int));
-void b_put_text __PROTO((unsigned int, unsigned int, char *));
+void b_put_text __PROTO((unsigned int, unsigned int, const char *));
 int b_text_angle __PROTO((int));
 
 #endif /* GNUPLOT_BITMAP_H */

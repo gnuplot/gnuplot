@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.8 1999/06/11 11:18:57 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.9 1999/06/19 20:52:07 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -307,8 +307,8 @@ static int insert_to_history_disable = 0;
 #endif /* USE_MOUSE */
 
 static void fix_line __PROTO((void));
-static void redraw_line __PROTO((char *prompt));
-static void clear_line __PROTO((char *prompt));
+static void redraw_line __PROTO((const char *prompt));
+static void clear_line __PROTO((const char *prompt));
 static void clear_eoline __PROTO((void));
 static void copy_line __PROTO((char *line));
 static void set_termio __PROTO((void));
@@ -386,7 +386,7 @@ extend_cur_line()
 
 char *
 readline(prompt)
-char *prompt;
+const char *prompt;
 {
 
     int cur_char;
@@ -759,7 +759,7 @@ fix_line()
 /* redraw the entire line, putting the cursor where it belongs */
 static void
 redraw_line(prompt)
-char *prompt;
+const char *prompt;
 {
     size_t i;
 
@@ -774,7 +774,7 @@ char *prompt;
 /* clear cur_line and the screen line */
 static void
 clear_line(prompt)
-char *prompt;
+const char *prompt;
 {
     size_t i;
     for (i = 0; i < max_pos; i++)

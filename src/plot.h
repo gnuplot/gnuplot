@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.10 1999/06/17 14:19:42 lhecking Exp $
+ * $Id: plot.h,v 1.11 1999/06/19 20:54:20 lhecking Exp $
  *
  */
 
@@ -632,11 +632,11 @@ struct surface_points {
 #define TERM_BINARY           4  /* open output file with "b"       */
 
 struct TERMENTRY {
-	char *name;
+	const char *name;
 #ifdef WIN16
-	char GPFAR description[80];	/* to make text go in FAR segment */
+	const char GPFAR description[80];  /* to make text go in FAR segment */
 #else
-	char *description;
+	const char *description;
 #endif
 	unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
