@@ -234,16 +234,16 @@ typedef int TBOOLEAN;
  * These are bitmasks
  */
 #define GRID_OFF    0
-#define GRID_X      1
-#define GRID_Y      2
-#define GRID_Z      4
-#define GRID_X2     8
-#define GRID_Y2     16
-#define GRID_MX     32
-#define GRID_MY     64
-#define GRID_MZ     128
-#define GRID_MX2    256
-#define GRID_MY2    512
+#define GRID_X      (1<<0)
+#define GRID_Y      (1<<1)
+#define GRID_Z      (1<<2)
+#define GRID_X2     (1<<3)
+#define GRID_Y2     (1<<4)
+#define GRID_MX     (1<<5)
+#define GRID_MY     (1<<6)
+#define GRID_MZ     (1<<7)
+#define GRID_MX2    (1<<8)
+#define GRID_MY2    (1<<9)
 
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
 #if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
@@ -421,24 +421,23 @@ enum PLOT_TYPE {
  * for example.
  */
 enum PLOT_STYLE {
-	LINES      = 0*8 + 1,
-	POINTSTYLE = 1*8 + 2,
-	IMPULSES   = 2*8 + 1,
-	LINESPOINTS= 3*8 + 3,
-	DOTS       = 4*8 + 0,
-	XERRORBARS = 5*8 + 6,
-	YERRORBARS = 6*8 + 6,
-	XYERRORBARS= 7*8 + 6,
-	BOXXYERROR = 8*8 + 1,
-	BOXES      = 9*8 + 1,
-	BOXERROR   =10*8 + 1,
-	STEPS      =11*8 + 1,
-	FSTEPS     =12*8 + 1,
-	HISTEPS    =13*8 + 1,
-	VECTOR     =14*8 + 1,
-	CANDLESTICKS=15*8 + 4,
-	FINANCEBARS=16*8 + 1,
-
+	LINES        =  0*8 + 1,
+	POINTSTYLE   =  1*8 + 2,
+	IMPULSES     =  2*8 + 1,
+	LINESPOINTS  =  3*8 + 3,
+	DOTS         =  4*8 + 0,
+	XERRORBARS   =  5*8 + 6,
+	YERRORBARS   =  6*8 + 6,
+	XYERRORBARS  =  7*8 + 6,
+	BOXXYERROR   =  8*8 + 1,
+	BOXES        =  9*8 + 1,
+	BOXERROR     = 10*8 + 1,
+	STEPS        = 11*8 + 1,
+	FSTEPS       = 12*8 + 1,
+	HISTEPS      = 13*8 + 1,
+	VECTOR       = 14*8 + 1,
+	CANDLESTICKS = 15*8 + 4,
+	FINANCEBARS  = 16*8 + 1,
 	XERRORLINES  = 17*8 + 7,
 	YERRORLINES  = 18*8 + 7,
 	XYERRORLINES = 19*8 + 7
@@ -487,7 +486,8 @@ struct lexical_unit {	/* produced by scanner */
 
 struct udft_entry {				/* user-defined function table entry */
 	struct udft_entry *next_udf; 		/* pointer to next udf in linked list */
-	char udf_name[MAX_ID_LEN+1]; 		/* name of this function entry */
+/*	char udf_name[MAX_ID_LEN+1]; */		/* name of this function entry */
+	char *udf_name;
 	struct at_type *at;			/* pointer to action table to execute */
 	char *definition; 			/* definition of function as typed */
 	struct value dummy_values[MAX_NUM_VAR];	/* current value of dummy variables */
@@ -496,7 +496,8 @@ struct udft_entry {				/* user-defined function table entry */
 
 struct udvt_entry {			/* user-defined value table entry */
 	struct udvt_entry *next_udv; /* pointer to next value in linked list */
-	char udv_name[MAX_ID_LEN+1]; /* name of this value entry */
+/*	char udv_name[MAX_ID_LEN+1]; *//* name of this value entry */
+	char *udv_name;
 	TBOOLEAN udv_undef;		/* true if not defined yet */
 	struct value udv_value;	/* value it has */
 };
