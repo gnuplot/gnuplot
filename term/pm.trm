@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: pm.trm,v 1.16 1999/05/20 18:35:27 lhecking Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -239,12 +239,12 @@ TERM_PUBLIC void PM_init()
 	if (PM_must_reset_opts)
 	    PM_reset_opts();
     }
-    #ifdef USE_MOUSE
+#ifdef USE_MOUSE
     //PM: notify gnupmdrv that this is mouse-enhanced terminal
     putc( GR_MOUSECAPABLE, PM_pipe ) ;
     fflush( PM_pipe ) ;
-    //we catch mouseable gnupmdrv's answer in PM_query by 0xABCD
-    #endif
+    /* we catch mouseable gnupmdrv's answer in PM_query by 0xABCD */
+#endif
     PM_query();
 }
 
@@ -391,13 +391,13 @@ TERM_PUBLIC void PM_text()
 
 TERM_PUBLIC void PM_graphics()
 {
-    #ifdef USE_MOUSE //PM
+#ifdef USE_MOUSE
     extern int xleft, xright, ybot, ytop;
     extern double min_array[], max_array[];
     extern int /*TBOOLEAN*/ is_3d_plot;
-    #endif
+#endif
     putc(SET_GRAPHICS, PM_pipe);
-    #ifdef USE_MOUSE //PM
+#ifdef USE_MOUSE
     if (mouseGnupmdrv) { // we are connected to mouseable gnupmdrv
     /*
     For mouse: propagate plot information to gclient.c. This must correspond
@@ -456,12 +456,12 @@ TERM_PUBLIC void PM_graphics()
     fwrite(&log_base_log_x,sizeof(double),1,PM_pipe);
     fwrite(&log_base_log_y,sizeof(double),1,PM_pipe);
     } // of mouseGnupmdrv
-    #endif //PM end for mouse
+#endif
     fflush(PM_pipe);
     PM_mode = SET_GRAPHICS;
 }
 
-#ifdef USE_MOUSE //PM 14.5.1999
+#ifdef USE_MOUSE
 /* Called from graph3d.c: boundary3d after [xleft,xbot] [xright,ytop] has
  * been calculated for a 3d graph. This is much later than call to
  * TERM_graphics, contrary to 2d plots, when these coordinates are already
