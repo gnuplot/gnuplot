@@ -315,8 +315,12 @@ TERM_PUBLIC void PC_put_text(x,y,str)
   char *str;
 {
 #ifdef __TURBOC__
+  if (pc_text_dir)
+    settextjustify(CENTER_TEXT, LEFT_TEXT);
+  else
+    settextjustify(LEFT_TEXT, CENTER_TEXT);
   settextstyle(DEFAULT_FONT,pc_text_dir,pc_text_size);
-  outtextxy(x,pc_lasty-y-(pc_text_dir?textwidth(str):(textheight(str)/2)),str);
+  outtextxy(x,pc_lasty-y, str);
 #endif /* __TURBOC__ */
 #ifdef MSC
 #endif /* MSC */

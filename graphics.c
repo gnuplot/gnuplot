@@ -412,7 +412,7 @@ static void boundary(scaling,plots,count)
 		x2tic_textheight = 0;
 
 	/* tics */
-	if (!tic_in && (x2tics || xtics&TICS_MIRROR) && TICS_ON_BORDER )
+	if (!tic_in && ((x2tics&TICS_ON_BORDER) || ((xtics&TICS_MIRROR) && (xtics&TICS_ON_BORDER))))
 		x2tic_height = (int)((t->v_tic)*ticscale);
 	else
 		x2tic_height = 0;
@@ -448,6 +448,7 @@ static void boundary(scaling,plots,count)
 			top_margin = y2label_textheight;
 
 		top_margin += x2tic_height + x2tic_textheight;
+/* FIXME: what is this additional space reservation for??? */
 		if (top_margin > x2tic_height) top_margin += (int)(t->v_char);
 
 		ytop -= top_margin;
@@ -492,7 +493,7 @@ static void boundary(scaling,plots,count)
 		xtic_textheight = 0;
 
 	/* tics */
-	if (!tic_in && (xtics || x2tics&TICS_MIRROR) && TICS_ON_BORDER) 
+	if (!tic_in && ((xtics&TICS_ON_BORDER) || ((x2tics&TICS_MIRROR) && (x2tics&TICS_ON_BORDER))))
 		xtic_height = (int)((t->v_tic)*ticscale);
 	else
 		xtic_height = 0;
@@ -640,7 +641,10 @@ static void boundary(scaling,plots,count)
 	/* tic labels */
 	if ( ytics&TICS_ON_BORDER ) {
 		if (vertical_ytics)
-			ytic_textwidth = (int)((t->v_char)*yticlin);
+			/* HBB: we will later add some white space as part of this, so
+			 * reserve two more rows (one above, one below the text ...).
+			 * Same will be done to similar calc.'s elsewhere */
+			ytic_textwidth = (int)((t->v_char)*(yticlin+2));
 		else {
 			widest_tic=0; /* reset the global variable ... */
 			/* get gen_tics to call widest2d_callback with all labels
@@ -656,7 +660,7 @@ static void boundary(scaling,plots,count)
 	}
 
 	/* tics */
-	if (!tic_in && (ytics || y2tics&TICS_MIRROR) && TICS_ON_BORDER) 
+	if (!tic_in && ((ytics&TICS_ON_BORDER) || ((y2tics&TICS_MIRROR) && (y2tics&TICS_ON_BORDER))))
 		ytic_width = (int)((t->h_tic)*ticscale);
 	else
 		ytic_width = 0;
@@ -679,7 +683,8 @@ static void boundary(scaling,plots,count)
 	xleft = (int)((t->xmax) * xoffset);
  
 	if (lmargin < 0) {
-		xleft += (timelabel_textwidth > ylabel_textwidth ? timelabel_textwidth : ylabel_textwidth) + ytic_width + ytic_textwidth;
+		xleft += (timelabel_textwidth > ylabel_textwidth ? timelabel_textwidth : ylabel_textwidth)
+		         + ytic_width + ytic_textwidth;
 
 		if (xleft == (t->xmax) * xoffset) {
 			/* make room for end of xtic or x2tic label */
@@ -697,7 +702,7 @@ static void boundary(scaling,plots,count)
 	/* tic labels */
 	if ( y2tics&TICS_ON_BORDER ) {
 		if ( vertical_y2tics )
-			y2tic_textwidth = (int)((t->v_char)*y2ticlin);
+			y2tic_textwidth = (int)((t->v_char)*(y2ticlin+2));
 		else {
 			widest_tic=0; /* reset the global variable ... */
 			/* get gen_tics to call widest2d_callback with all labels
@@ -713,15 +718,16 @@ static void boundary(scaling,plots,count)
 	}
 
 	/* tics */
-	if (!tic_in && (y2tics || ytics&TICS_MIRROR) && TICS_ON_BORDER) 
+	if (!tic_in && ((y2tics&TICS_ON_BORDER) || ((ytics&TICS_MIRROR) && (ytics&TICS_ON_BORDER))))
 		y2tic_width = (int)((t->h_tic)*ticscale);
 	else
 		y2tic_width = 0;
  
 	/* y2label */
 	if (can_rotate && *y2label.text)
-		/* offset is subtracted because if . 0, the margin is smaller */
-		y2label_textwidth = (int)((y2lablin + 1 - y2label.yoffset)*(t->v_char));
+		/* offset is subtracted because if > 0, the margin is smaller */
+/* HBB: removed the (superfluous?) the '+1' */
+		y2label_textwidth = (int)((y2lablin - y2label.yoffset)*(t->v_char));
 	else
 		y2label_textwidth = 0;
 
@@ -770,9 +776,8 @@ static void boundary(scaling,plots,count)
 				/* too tall */
 				ytop = ybot + required * (xright-xleft);
 			} else {
-		 		int y2 = y2label_x - xright;
+/* HBB: y2label_x wasn't defined yet, and would be overwritten later */
 				xright = xleft + (ytop-ybot)/required;
-				y2label_x = xright + y2;
 			}
 		}
 		/*}}}*/
@@ -797,18 +802,25 @@ static void boundary(scaling,plots,count)
 
 	/*  adjust top and bottom margins for tic label rotation */
 
-	if (tmargin < 0 && x2tics&TICS_ON_BORDER && can_rotate && rotate_x2tics) {
+	if (tmargin < 0 && x2tics&TICS_ON_BORDER && vertical_x2tics) {
 		widest_tic=0; /* reset the global variable ... */
 		gen_tics(SECOND_X_AXIS, &x2ticdef, 0, 0, 0.0, widest2d_callback);
-		x2tic_textheight += (int)((t->h_char)*(widest_tic-4));
-		ytop -= (int)((t->h_char)*(widest_tic-4));
+/* HBB: redid this: remove rough guess value first. Among other reasons,
+ * I suspected the '-4 lines' of the original code to be in error, as the
+ * original calc. of x2tic_textheight uses *5* lines */
+		ytop += x2tic_textheight;
+/* Now compute a new one and use that instead: */
+		x2tic_textheight = (int)((t->h_char)*(widest_tic));
+		ytop -= x2tic_textheight;
 	}
 
 	if (bmargin < 0 && xtics&TICS_ON_BORDER && vertical_xtics) {
 		widest_tic=0; /* reset the global variable ... */
 		gen_tics(FIRST_X_AXIS, &xticdef, 0, 0, 0.0, widest2d_callback);
-			xtic_textheight += (int)((t->h_char)*(widest_tic-4));
-			ybot += (int)((t->h_char)*(widest_tic-4));
+/* HBB: same changes as for tmargin/ytop above */
+		ybot -= xtic_textheight;
+		xtic_textheight = (int)((t->h_char)*widest_tic);
+		ybot += xtic_textheight;
 	}
 
 	/*  compute coordinates for axis labels, title et al
@@ -827,15 +839,33 @@ static void boundary(scaling,plots,count)
 	ylabel_x = xleft - ytic_width - ytic_textwidth;
 	if (can_rotate && *ylabel.text) {
 		ylabel_x -= ylabel_textwidth + (int)((ylabel.xoffset)*(t->h_char));
+#if 0
+/* HBB: iff the calc. of xleft and friends is correct, this *must*
+ * be wrong: at this point, xleft would be exactly zero (if origin x is
+ * zero and lmargin unset). Subtracting something from it thus ends up with
+ * a *negative* x, which is, simply put, rubbish. Actually, I think this
+ * originally was a kludge for the (non-functional, anyway) vertical ytic
+ * labelling code, as the width of that 'box' was calculated wrongly.
+ * But moving the ylabel out of the way is the wrong way to fix that. */
 		if (vertical_ytics)
-			ylabel_x -= (int)(t->h_char);
+			ylabel_x -= (int)(t->v_char);
+#endif
 	}
 
 	y2label_x = xright + y2tic_width + y2tic_textwidth;
 	if (can_rotate && *y2label.text) {
-		y2label_x += y2label_textwidth + (int)((y2label.xoffset-2)*(t->h_char));
+#if 1
+/* HBB: my version of this */
+		y2label_x += (int)((y2label.xoffset)*(t->h_char));
+#else
+/* HBB: this one's even worse: text will be printed *top_justified*,
+ * so y2label_x should be the *top* of the text box. This calculation
+ * would give the bottom, instead: */
+		y2label_x += y2label_textwidth + (int)((y2label.xoffset)*(t->h_char));
+/* HBB: see above for this... */
 		if (vertical_y2tics)
-			y2label_x += (int)(t->h_char);
+			y2label_x += (int)(t->v_char);
+#endif
 	}
 
 	if (vertical_timelabel) {
@@ -853,16 +883,22 @@ static void boundary(scaling,plots,count)
 	}
 	time_x = xleft - ytic_width - ytic_textwidth;
 	if (vertical_timelabel) {
+/* HBB: do we really want to move the timelabel to the right by
+ * one line, so that it will fall in what was intended to be blank
+ * space (between the ytic labels and the rotated ylabel/timestamp)?
+ * If not so, the '-(t->h_char)' part should be deleted. */
 		time_x -= timelabel_textwidth - (int)(t->h_char);
+#if 0 /* HBB: don't see any reason for this... */
 		if (vertical_ytics)
 			time_x -= (int)(t->h_char);
+#endif
 	}
 
 	xtic_y = ybot - xtic_height - ( vertical_xtics? (int)(t->h_char) : (int)(t->v_char) );
 
 	x2tic_y = ytop + x2tic_height + ( vertical_x2tics? (int)(t->h_char) : x2tic_textheight );
 
-	ytic_x = xleft - ytic_width - ( vertical_ytics? ytic_textwidth : (int)(t->h_char) );
+	ytic_x = xleft - ytic_width - ( vertical_ytics? (ytic_textwidth - (int)t->v_char): (int)(t->h_char) );
 
 	y2tic_x = xright + y2tic_width + ( vertical_y2tics? (int)(t->v_char) : (int)(t->h_char) );
 
@@ -1194,9 +1230,12 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		if (rotate_ytics && (*t->text_angle)(1)) {
 			tic_hjust=CENTRE;
 			tic_vjust=JUST_BOT;
+			rotate_tics = 1; /* HBB 980629 */
+			ytic_x += t->v_char / 2;
 		} else {
 			tic_hjust=RIGHT;
 			tic_vjust=JUST_CENTRE;
+			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (ytics&TICS_MIRROR)
@@ -1230,9 +1269,11 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		if (rotate_xtics && (*t->text_angle)(1)) {
 			tic_hjust=RIGHT;
 			tic_vjust=JUST_CENTRE;
+			rotate_tics = 1; /* HBB 980629 */
 		} else {
 			tic_hjust=CENTRE;
 			tic_vjust=JUST_TOP;
+			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (xtics&TICS_MIRROR)
@@ -1270,9 +1311,11 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		if (rotate_y2tics && (*t->text_angle)(1)) {
 			tic_hjust=CENTRE;
 			tic_vjust=JUST_TOP;
+			rotate_tics = 1; /* HBB 980629 */
 		} else {
 			tic_hjust=LEFT;
 			tic_vjust=JUST_CENTRE;
+			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (y2tics&TICS_MIRROR)
@@ -1304,9 +1347,11 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		if (rotate_x2tics && (*t->text_angle)(1)) {
 			tic_hjust=LEFT;
 			tic_vjust=JUST_CENTRE;
+			rotate_tics = 1; /* HBB 980629 */
 		} else {
 			tic_hjust=CENTRE;
 			tic_vjust=JUST_BOT;
+			rotate_tics = 0; /* HBB 980629 */
 		}
 
 		if (x2tics&TICS_MIRROR)
@@ -1409,8 +1454,9 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 
 
 /* DRAW PLOT BORDER */
-	term_apply_lp_properties(&border_lp); /* border linetype */
 	if (draw_border) {
+		/* HBB 980609: just in case: move over to border linestyle only if border is to be drawn */
+		term_apply_lp_properties(&border_lp); /* border linetype */
 		(*t->move)(xleft,ybot);
 		if(border_south){
 			(*t->vector)(xright,ybot);
@@ -1439,7 +1485,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	strcpy(ss, ylabel.text);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle)(1)) {
-		unsigned int x=ylabel_x;
+		unsigned int x=ylabel_x + (t->v_char / 2);
 		unsigned int y=(ytop+ybot)/2 + ylabel.yoffset*(t->h_char);
 		write_multiline(x,y,ss,CENTRE, JUST_TOP, 1, ylabel.font);
 		(*t->text_angle)(0);
@@ -1457,7 +1503,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	strcpy(ss, y2label.text);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle)(1)) {
-		unsigned int x=y2label_x;
+		unsigned int x=y2label_x + (t->v_char / 2) - 1;
 		unsigned int y=(ytop+ybot)/2 + y2label.yoffset*(t->h_char);
 		write_multiline(x,y,ss,CENTRE, JUST_TOP, 1, y2label.font);
 		(*t->text_angle)(0);
@@ -1472,7 +1518,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 /* XLABEL */
     if (*xlabel.text) {
 	unsigned int x=(xright+xleft)/2 + xlabel.xoffset*(t->h_char);
-	unsigned int y=xlabel_y;
+	unsigned int y=xlabel_y - t->v_char/2; /* HBB */
 	strcpy(ss, xlabel.text);
 	write_multiline(x,y,ss,CENTRE,JUST_TOP, 0, xlabel.font);
     }
@@ -1481,7 +1527,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
     if (*title.text) {
 	        /* we worked out y-coordinate in boundary() */
 		unsigned int x = (xleft+xright)/2 + title.xoffset * t->h_char;
-		unsigned int y = title_y;
+		unsigned int y = title_y - t->v_char/2;
 		strcpy(ss, title.text);
 		write_multiline(x,y,ss,CENTRE, JUST_TOP, 0, title.font);
     }
@@ -1490,7 +1536,7 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	if (*x2label.text) {
 	        /* we worked out y-coordinate in boundary() */
 		unsigned int x=(xright+xleft)/2 + x2label.xoffset*(t->h_char);
-		unsigned int y=  x2label_y;
+		unsigned int y=  x2label_y - t->v_char/2 - 1;
 		strcpy(ss, x2label.text);
 		write_multiline(x,y,ss,CENTRE,JUST_TOP, 0, x2label.font);
 	}
@@ -1507,12 +1553,14 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 		strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
 		if (timelabel_rotate && (*t->text_angle)(1)) {
+			x += t->v_char/2; /* HBB */
                         if(timelabel_bottom)
 				write_multiline(x,y,str,LEFT, JUST_TOP, 1, timelabel.font);
                         else
 				write_multiline(x,y,str,RIGHT, JUST_TOP, 1, timelabel.font);
 			(*t->text_angle)(0);
 		} else {
+			y -= t->v_char/2; /* HBB */
                         if(timelabel_bottom)
 				write_multiline(x,y,str,LEFT, JUST_BOT, 0, timelabel.font);
 			else
