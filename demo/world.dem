@@ -1,5 +1,5 @@
 #
-# $Id: world.dem,v 1.3 1995/04/21 12:49:16 drd Exp $
+# $Id: world.dem,v 1.1.1.1 1998/04/15 19:16:43 lhecking Exp $
 #
 #
 set title "Gnuplot Correspondences"
@@ -22,7 +22,8 @@ pause -1 "Hit return to continue"
 # plot a '3D version using spherical coordinate system' of the world.
 set angles degrees
 set title "3D version using spherical coordinate system"
-set view 70,40,,2.0
+set ticslevel 0
+set view 70,40,0.8,1.2	# HBB: ,,2.0
 set mapping spherical
 set parametric
 set samples 32
@@ -35,7 +36,8 @@ pause -1 "Hit return to continue"
 #
 # plot a '3D version using cylindrical coordinate system' of the world.
 set title "3D version using cylindrical coordinate system"
-set view 70,40,,2.0
+set ticslevel 0.0
+set view 70,40,0.8,1.2	#HBB: ,,2.0
 set mapping cylindrical
 set parametric
 set samples 32
@@ -50,14 +52,4 @@ pause -1 "Hit return to continue"
 #
 # Clean up:
 #
-set noparametric
-set mapping cartesian
-set angles radians
-set samples 100
-set isosamples 10
-set view 60,30,1,1
-set xrange [-10:10]
-set yrange [-10:10]
-set zrange [-10:10]
-set auto
-set title "" 0,0
+reset
