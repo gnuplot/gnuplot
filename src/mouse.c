@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.34 2002/10/20 21:19:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.35 2003/04/14 20:59:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2096,6 +2096,16 @@ static void
 recalc_ruler_pos(void)
 {
     double P, dummy;
+    if (is_3d_plot) {
+	/* To be exact, it is 'set view map' splot. */
+	unsigned int ppx, ppy;
+	dummy = 1.0; /* dummy value, but not 0.0 for the fear of log z-axis */
+	map3d_xy(ruler.x, ruler.y, dummy, &ppx, &ppy);
+	ruler.px = ppx;
+	ruler.py = ppy;
+	return;
+    }
+    /* It is 2D plot. */
     if (axis_array[FIRST_X_AXIS].log && ruler.x < 0)
 	ruler.px = -1;
     else {

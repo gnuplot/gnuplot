@@ -1,3 +1,8 @@
+2003-05-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (recalc_ruler_pos): Take care of ruler in 'set view map'
+	splot.
+
 2003-05-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c: Fixed #define is_comment(c): strchr(s,c) returns
