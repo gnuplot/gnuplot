@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.19 2000/10/31 19:59:32 joze Exp $
+ * $Id: pstricks.trm,v 1.20 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -75,6 +75,8 @@
  */
 /*
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
+ *
+ * adapted to support pm3d by Tim Piessens and Petr Mikulik (Jan. 2003)
  */
 
 #include "driver.h"
@@ -97,6 +99,12 @@ TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, cons
 TERM_PUBLIC int PSTRICKS_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
+#ifdef PM3D
+TERM_PUBLIC int PSTRICKS_make_palette __PROTO((t_sm_palette *));
+TERM_PUBLIC void PSTRICKS_previous_palette __PROTO((void));
+TERM_PUBLIC void PSTRICKS_set_color __PROTO((double));
+TERM_PUBLIC void PSTRICKS_filled_polygon __PROTO((int, gpiPoint *));
+#endif
 
 #define PSTRICKS_XMAX 10000.0
 #define PSTRICKS_YMAX 10000.0
@@ -116,6 +124,20 @@ static float PSTRICKS_posx;
 static float PSTRICKS_posy;
 static enum JUSTIFY PSTRICKS_justify = LEFT;
 static int PSTRICKS_angle = 0;
+
+#ifdef PM3D
+
+/* if 1 below, then the file size is shorter thanks to a macro for polygon */
+#define PSTRICKS_SHORTER_FILE 1
+
+#ifdef PSTRICKS_SHORTER_FILE
+static int PSTRICKS_color = 0;
+#else
+static char PSTRICKS_color_str[16] = "";
+#endif
+static int PSTRICKS_palette_set = FALSE;
+static int PSTRICKS_palette_size = 128;
+#endif
 
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
 
@@ -190,7 +212,11 @@ PSTRICKS_init()
 {
     PSTRICKS_posx = PSTRICKS_posy = 0;
     PSTRICKS_linetype(-1);
+    fseek(gpoutfile,0,SEEK_SET);
     fputs("% GNUPLOT: LaTeX picture using PSTRICKS macros\n", gpoutfile);
+#ifdef PM3D
+    PSTRICKS_palette_set = FALSE;    /* PM3D palette set? */
+#endif /* PM3D */
 }
 
 
@@ -560,7 +586,91 @@ PSTRICKS_reset()
     PSTRICKS_posx = PSTRICKS_posy = 0;
 }
 
+
+#ifdef PM3D
+
+TERM_PUBLIC int
+PSTRICKS_make_palette (t_sm_palette *palette)
+{
+    /* Query to determine palette size */
+    if (palette==NULL) {
+	return PSTRICKS_palette_size;
+    }
+	
+    if (PSTRICKS_palette_set == FALSE) {
+	int i;
+	/* Create new palette */
+	PSTRICKS_palette_set = TRUE;
+	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+	    /* Grey palette */
+	    for (i=0; i < sm_palette.colors; i++) {
+		double g = i * 1.0 / (sm_palette.colors - 1);
+		g = 1e-3 * (int)(g * 1000); /* round to 3 digits to use %g below */
+		fprintf(gpoutfile, "\\newgray{PST@COLOR%d}{%g}\n", i, g);
+	    }
+	} else
+	    if (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) {
+		/* Color palette */
+		double r, g, b;
+		for (i=0; i < sm_palette.colors; i++) {
+		    /* round to 3 digits to avoid sth like 1e-7 in %g below */
+		    r = 1e-3 * (int)(palette->color[i].r * 1000);
+		    g = 1e-3 * (int)(palette->color[i].g * 1000);
+		    b = 1e-3 * (int)(palette->color[i].b * 1000);
+		    fprintf(gpoutfile, "\\newrgbcolor{PST@COLOR%d}{%g %g %g}\n", i, r, g, b);
+		}
+	    }
+    }
+    /* use the following macro to shorten the file size */
+    fprintf(gpoutfile, "\\def\\polypmIIId#1{\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=PST@COLOR#1]}\n\n");
+    return 0;
+}
+
+
+TERM_PUBLIC void
+PSTRICKS_set_color (double gray)
+{
+    int new_color = (gray <=0) ? 0 : (int)(gray*sm_palette.colors);
+    if (new_color >= PSTRICKS_palette_size)
+	new_color = PSTRICKS_palette_size - 1;
+    if (PSTRICKS_palette_set == FALSE) {
+	fprintf(stderr, "pstricks: Palette used before set!\n");
+    }
+#ifdef PSTRICKS_SHORTER_FILE
+    PSTRICKS_color = new_color;
+#else
+    sprintf(PSTRICKS_color_str, "PST@COLOR%d", new_color);
+#endif
+}
+
+
+TERM_PUBLIC void
+PSTRICKS_filled_polygon (int points, gpiPoint *corners)
+{
+    int i, j;
+
+    if (PSTRICKS_palette_set == FALSE) {
+	 fprintf(stderr, "pstricks: Palette used before set!\n");
+    }
+
+#ifdef PSTRICKS_SHORTER_FILE
+    /* using a macro for an abbreviation */
+    fprintf(gpoutfile, "\\polypmIIId{%d}", PSTRICKS_color);
+#else
+    fprintf(gpoutfile, "\\pspolygon[linestyle=none,fillstyle=solid,fillcolor=%s]", PSTRICKS_color_str);
+#endif
+    for (i=0; i < points; i++) {
+	if (i % 8 == 7) /* up to 8 corners per line */
+	    fprintf(gpoutfile, "\n");
+	fprintf(gpoutfile,"(%.4g,%.4g)", corners[i].x/PSTRICKS_XMAX, corners[i].y/PSTRICKS_YMAX);
+    }
+    fprintf(gpoutfile, "\n");
+}
+	 
+#endif /*PM3D*/
+
 #endif /* TERM_BODY */
+
 
 #ifdef TERM_TABLE
 
@@ -570,7 +680,14 @@ TERM_TABLE_START(pstricks_driver)
     PSTRICKS_VTIC, PSTRICKS_HTIC, PSTRICKS_options, PSTRICKS_init, PSTRICKS_reset,
     PSTRICKS_text, null_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector,
     PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
-    PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null
+    PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null, 0,
+    TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/, 0 , 0
+#ifdef PM3D
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+     , PSTRICKS_make_palette, 0,  PSTRICKS_set_color, PSTRICKS_filled_polygon
+#endif /*PM3D*/
 TERM_TABLE_END(pstricks_driver)
 
 #undef LAST_TERM
@@ -594,7 +711,7 @@ START_HELP(pstricks)
 " PostScript, or a converter such as Ghostscript.",
 "",
 " PSTricks is available via anonymous ftp from the /pub directory at",
-" Princeton.EDU.  This driver definitely does not come close to using the full",
+" Princeton.edu.  This driver definitely does not come close to using the full",
 " capability of the PSTricks package.",
 "",
 " Syntax:",

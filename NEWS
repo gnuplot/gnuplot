@@ -39,6 +39,9 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 =============================================================================
 
 
+[3.8j]
+* NEW PM3D support for pstricks terminal
+
 [3.8i]
 * NEW 'set style arrow' and back angles for arrow heads.
 * NEW option 'set view map'

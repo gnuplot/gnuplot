@@ -1,5 +1,10 @@
 2003-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/pstricks.trm: Support for PM3D. Thanks to Tim Piessens for
+	contribution.
+
+2003-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/README src/color.c term/post.trm: Changed "continous" to
 	"continuous".
 
@@ -1720,7 +1725,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/13 13:22:10 $).
+	last modification date (from the tag $Date: 2003/01/22 08:47:53 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
