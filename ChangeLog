@@ -1,3 +1,8 @@
+2000-12-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc: small change to docs about EEPIC driver
+ 	behaviour.
+
 2000-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/eepic.trm: cleaned up some warnings and 'checkdoc' problems.
