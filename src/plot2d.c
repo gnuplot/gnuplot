@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.80 2004/09/12 01:12:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.81 2004/09/28 06:05:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -741,12 +741,6 @@ get_data(struct curve_points *current_plot)
 
     current_plot->p_count = i;
     cp_extend(current_plot, i);	/* shrink to fit */
-
-#ifdef EAM_HISTOGRAMS
-    /* Fiddle the auto-scaling data for histograms */
-    if (current_plot->plot_style == HISTOGRAMS)
-	histogram_range_fiddling(current_plot);
-#endif
 
     df_close();
 
@@ -1744,8 +1738,15 @@ eval_plots()
 		     * has been found. So don't issue a misleading warning like
 		     * "x range is invalid" but stop here!
 		     */
-		    int_error(c_token, "no data point found in specified file");
+		    int_error(c_token, "no valid data points found in specified file");
 		}
+
+#ifdef EAM_HISTOGRAMS
+		/* Fiddle the auto-scaling data for histograms */
+		if (this_plot->plot_style == HISTOGRAMS)
+		    histogram_range_fiddling(this_plot);
+#endif
+
 		/* sort */
 		switch (this_plot->plot_smooth) {
 		/* sort and average, if the style requires */
