@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.8 1999/06/11 18:55:09 lhecking Exp $
+ * $Id: protos.h,v 1.9 1999/06/14 19:23:54 lhecking Exp $
  *
  */
 
@@ -63,13 +63,6 @@ typedef double tri_diag[3];         /* Used to allocate the tri-diag matrix. */
 struct gnuplot_contours *contour __PROTO((int num_isolines, struct iso_curve *iso_lines, int ZLevels, int approx_pts, int int_kind, int order1, int levels_kind, double *levels_list));
 int solve_tri_diag __PROTO((tri_diag m[], double r[], double x[], int n));
 
-/* Prototypes from file "datafile.c" */
-int df_open __PROTO((int max_using));
-int df_readline __PROTO((double v[], int max));
-void df_close __PROTO((void));
-int df_2dbinary __PROTO((struct curve_points *this_plot));
-int df_3dmatrix __PROTO((struct surface_points *this_plot));
-
 /* Prototypes from file "eval.c" */
 
 struct udvt_entry * add_udv __PROTO((int t_num));
@@ -83,27 +76,11 @@ void execute_at __PROTO((struct at_type *at_ptr));
 char *get_next_word __PROTO((char **s, char *subst)); 
 void init_fit __PROTO((void));
 void setvar __PROTO((char *varname, struct value data));
-int getivar __PROTO((char *varname));
+int getivar __PROTO((const char *varname));
 void update __PROTO((char *pfile, char *npfile));
 void do_fit __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 
-
-/* Prototypes from file "graphics.c" */
-
-void graph_error __PROTO((char *text));
-void fixup_range __PROTO((int axis, char *axis_name));
-void timetic_format __PROTO((int axis, double amin, double amax));
-void do_plot __PROTO((struct curve_points *plots, int pcount));
-double time_tic_just __PROTO((int level, double ticplace));
-double make_ltic __PROTO((int tlevel, double incr));
-int label_width __PROTO((char *str, int *lines));
-double set_tic __PROTO((double l10, int guide));
-void setup_tics __PROTO((int axis, struct ticdef *def, char *format, int max));
-/* is this valid use of __P ? */
-typedef void (*tic_callback) __PROTO((int axis, double place, char *text, struct lp_style_type grid));
-void gen_tics __PROTO((int axis, struct ticdef *def, int grid, int minitic, double minifreq, tic_callback callback));
-void write_multiline __PROTO((unsigned int x, unsigned int y, char *text_will_be_mangled, enum JUSTIFY hor, int vert, int angle, char *font));
 
 /* Prototypes from file "graph3d.c" */
 
