@@ -56,9 +56,14 @@ Emx:
 GIF:
   -- Patch 400540 Export scale information for a GIF output.
 	Any sense to add this patch, or close it without adding?
+	EAM - Drop it.
 
 (g)pic:
   -- update its docs from docs/old/README.pic, then delete this file
+
+{eps|ps}latex:
+  -- none of the latex terminal variants support pattern-fill, but
+	they return no error if you try it.
 
 Metafont:
   -- update its docs from docs/old/README.mf, then delete this file
@@ -69,6 +74,12 @@ NeXTstep:
 PBM:
   -- Patch 592230 Better colors for PBM.
 	Can somebody comment on this?
+	EAM - Yes. The PBM uses only 4 bits of color info, which doesn't
+	      leave much space for nice colors.  Re-writing it to use 
+	      the web_color_rgb colors as a palette instead would be nice,
+	      but non-trivial.  Better just to use the PNG driver.
+	      As to the patch - there is none, just a comment that two
+	      of the colors are hard to see.
   
 Postscript:
   -- Patch 400372 Enables LaTeX psfrag labels in the postscript terminal
