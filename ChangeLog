@@ -1,5 +1,10 @@
 2000-10-31 Johannes Zellner <johannes@zellner.org>
 
+	* merged the pm3d branch to MAIN
+	* docs/gnuplot.doc: added GGI/win to the list of pm3d capable terminals
+
+2000-10-31 Johannes Zellner <johannes@zellner.org>
+
 	* src/save.c: set linestyle --> set style line
 
 2000-10-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
