@@ -1,3 +1,26 @@
+2000-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_write_byte): change argument to type
+ 	'int'. Necessary if the function definitions are to be
+ 	K&R-compatible.
+	(EMF_write_short): dito.
+	(EMF_write_float): dito.
+	(EMF_write_long): Remove unneeded union. A char-array is enough to
+ 	guarantee correct output of binaries.
+	(EMF_write_float): dito.
+	(EMF_write_short): dito.
+	(EMF_set_font): add missing cast to unsigned char for <ctype.h>
+ 	function argument.
+
+	* src/axis.h: Remove trailing commas in enums.
+
+	* src/term_api.h: dito.
+
+	* src/gadgets.h: dito.
+
+	* src/mouse.c (MousePosToGraphPosReal): don't try to un-log values
+ 	for secondary axes in a 3D plot.
+
 2000-11-01  Johannes Zellner  <johannes@zellner.org>
 
 	a few changes after merging the axis branch

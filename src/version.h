@@ -1,5 +1,5 @@
 /*
- * $Id: version.h,v 1.1.2.1 2000/06/22 12:57:39 broeker Exp $
+ * $Id: version.h,v 1.2 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - version.h */

@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.2.2.6 2000/10/24 18:58:12 broeker Exp $
+ * $Id: axis.h,v 1.3 2000/11/01 18:57:27 broeker Exp $
  *
  */
 
@@ -69,7 +69,7 @@ typedef enum AXIS_INDEX {
     SECOND_X_AXIS,
     R_AXIS,			/* never used ? */
     U_AXIS,			/* dito */
-    V_AXIS,			/* dito */
+    V_AXIS			/* dito */
 #define AXIS_ARRAY_SIZE 10
 } AXIS_INDEX;
 
@@ -79,7 +79,7 @@ typedef enum en_ticseries_type {
     TIC_SERIES,			/* user-defined series */
     TIC_USER,			/* user-defined points */
     TIC_MONTH,   		/* print out month names ((mo-1)%12)+1 */
-    TIC_DAY,      		/* print out day of week */
+    TIC_DAY      		/* print out day of week */
 } t_ticseries_type;
 
 /* Defines one ticmark for TIC_USER style.
@@ -115,7 +115,7 @@ enum en_minitics_status {
     MINI_OFF,
     MINI_DEFAULT,
     MINI_USER,
-    MINI_AUTO,
+    MINI_AUTO
 };
 
 /* Function pointer type for callback functions doing operations for a

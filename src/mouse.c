@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.8 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.9 2000/11/01 20:37:47 joze Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -322,9 +322,11 @@ MousePosToGraphPosReal(int xx, int yy, double *x, double *y, double *x2, double 
 
     /* Now take into account possible log scales of x and y axes */
     *x = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, *x);
-    *x2 = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, *x2);
     *y = AXIS_DE_LOG_VALUE(FIRST_X_AXIS, *y);
-    *y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
+    if (!is_3d_plot) {
+	*x2 = AXIS_DE_LOG_VALUE(SECOND_X_AXIS, *x2);
+	*y2 = AXIS_DE_LOG_VALUE(SECOND_Y_AXIS, *y2);
+    }
 }
 
 static char *

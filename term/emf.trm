@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.1.4.2 2000/10/24 13:37:52 joze Exp $
+ * $Id: emf.trm,v 1.4 2000/10/31 20:26:03 joze Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -217,10 +217,10 @@ static int emf_tic, emf_tic707, emf_tic866, emf_tic500, emf_tic1241, emf_tic1077
 
 static void EMF_flush_polyline __PROTO((void));
 static void EMF_flush_polygon __PROTO((void));
-static void EMF_write_byte __PROTO((char));
-static void EMF_write_short __PROTO((short int));
+static void EMF_write_byte __PROTO((int)); /* HBB 20001102: was 'char'... */
+static void EMF_write_short __PROTO((int)); /* HBB 20001102: was 'short' */
 static void EMF_write_long __PROTO((long));
-static void EMF_write_float __PROTO((float));
+static void EMF_write_float __PROTO((double)); /* HBB 20001102: was 'float' */
 static void EMF_setfont __PROTO((void));
 
 static void 
@@ -325,67 +325,63 @@ EMF_flush_polyline()
     emf_coords = 0;
 }
 
+/* HBB 20001103: K&R'ized these 4 functions a bit better. */
 static void 
 EMF_write_byte(value)
-char value;
+    int value;
 {
-    fwrite(&value, 1, 1, gpoutfile);
+    char c = value;
+    fwrite(&c, 1, 1, gpoutfile);
 }
 
 static void 
 EMF_write_short(value)
-short int value;
+    int value;
 {
-    union {
-	short int s;
-	char c[2];
-    } u;
+    short int actual_value = value;
+    char c[2];
 
-    u.c[1] = (value >> 8) & 255;	/* convert to x86 order */
-    u.c[0] = value & 255;
+    c[1] = (actual_value >> 8) & 255;	/* convert to x86 order */
+    c[0] = actual_value & 255;
 
-    fwrite(&u.s, 1, 2, gpoutfile);
+    fwrite(c, 1, 2, gpoutfile);
 }
 
 static void 
 EMF_write_long(value)
-long value;
+    long value;
 {
-    union {
-	long l;
-	char c[4];
-    } u;
+    char c[4];
 
-    u.c[3] = (value >> 24) & 0xFFL;	/* convert to x86 order */
-    u.c[2] = (value >> 16) & 0xFFL;
-    u.c[1] = (value >> 8) & 0xFFL;
-    u.c[0] = value & 0xFFL;
+    c[3] = (value >> 24) & 0xFFL;	/* convert to x86 order */
+    c[2] = (value >> 16) & 0xFFL;
+    c[1] = (value >> 8) & 0xFFL;
+    c[0] = value & 0xFFL;
 
-    fwrite(&u.l, 1, 4, gpoutfile);
+    fwrite(c, 1, 4, gpoutfile);
 }
 
+/* FIXME HBB 20001103: this only works as given iff 'float' is the
+ * same format as on x86's, i.e. IEEE 4-byte floating point format */
 static void 
 EMF_write_float(value)
-float value;
+    double value;
 {
-    union {
-	long l;
-	char c[4];
-    } u;
+    char c[4];
 
     union {
 	long l;
 	float f;
-    } c;
+    } u;
 
-    c.f = value;
+    u.f = value;
 
-    u.c[3] = (c.l >> 24) & 0xFFL;	/* convert to x86 order */
-    u.c[2] = (c.l >> 16) & 0xFFL;
-    u.c[1] = (c.l >> 8) & 0xFFL;
-    u.c[0] = c.l & 0xFFL;
+    c[3] = (u.l >> 24) & 0xFFL;	/* convert to x86 order */
+    c[2] = (u.l >> 16) & 0xFFL;
+    c[1] = (u.l >> 8) & 0xFFL;
+    c[0] = u.l & 0xFFL;
 
-    fwrite(&u.l, 1, 4, gpoutfile);
+    fwrite(c, 1, 4, gpoutfile);
 }
 
 TERM_PUBLIC void 
@@ -513,7 +509,7 @@ EMF_set_font(const char *font)
 	emf_fontsize = emf_defaultfontsize;
     }
     for (i = 0; i < strlen(emf_fontname); i++)
-	emf_fontname[i] = tolower(emf_fontname[i]);
+	emf_fontname[i] = tolower((unsigned char)emf_fontname[i]);
     term->h_char = (emf_fontsize * EMF_PT2HM);
     term->v_char = (emf_fontsize * EMF_PT2HM);
     EMF_setfont();

@@ -107,20 +107,20 @@ struct linestyle_def {
 typedef enum en_key_vertical_position {
     TTOP,
     TBOTTOM,
-    TUNDER,
+    TUNDER
 } t_key_vertical_position;
 
 /* Horizontal positions of the key box: (left, right, outside right */
 typedef enum en_key_horizontal_position {
     TLEFT,
     TRIGHT,
-    TOUT,
+    TOUT
 } t_key_horizontal_position;
 
 /* Key sample to the left or the right of the plot title? */
 typedef enum en_key_sample_positioning {
     JLEFT,
-    JRIGHT,
+    JRIGHT
 } t_key_sample_positioning;
 
 typedef enum key_type {
