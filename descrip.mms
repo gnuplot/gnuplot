@@ -104,7 +104,7 @@ gnuplot.$(X) : $(OBJS) $(OPT_FILE)
 	@ $(SAY) ""
 
 gnuplot_X11.$(X) : gplt_x11.$(O) stdfn.$(O) $(X11OPT_FILE) 
-	LINK /EXE=$@ GPLT_X11.$(O) STDFN.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
+	LINK /EXE=$@ GPLT_X11.$(O), STDFN.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
 	@ $(SAY) ""
 	@ $(SAY) "Your gnuplot_x11 executable is $@"
 	@ $(SAY) ""
@@ -148,12 +148,13 @@ gnuplot.dvi : $(D)gnuplot.tex $(D)titlepag.tex $(D)toc_entr.sty
 	$(CD) 'MAKEDIR'
         
 doc2rnh.$(X) : doc2rnh.$(O)    	
-doc2hlp.$(X) : doc2hlp.$(O)    	
+doc2hlp.$(X) : doc2hlp.$(O) termdoc.$(O)
+	LINK /EXE=$@ doc2hlp.$(O),termdoc.$(O)
 doc2html.$(X) : doc2html.$(O)          
 doc2tex.$(X) : doc2tex.$(O)  
 
-!doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
-!	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
+doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) termdoc.$(O) : $(D)termdoc.c $(D)allterm.h
+	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
 doc2rnh.$(O) doc2hlp.$(O) doc2html.$(O) doc2tex.$(O) : $(D)termdoc.c $(D)allterm.h
 	$(CC) /OBJ=$@ $(CFLAGS) $(TERMFLAGS) $(D)$*.c
 		  		
