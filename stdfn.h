@@ -57,7 +57,6 @@
 #endif
 
 #ifdef HAVE_BCOPY
-void bcopy ();
 # ifdef NO_MEMCPY
 #  define memcpy(d,s,n) bcopy((s),(d),(n))
 # endif
