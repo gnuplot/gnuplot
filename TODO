@@ -46,4 +46,6 @@ Lars' list
   must be backwards compatible (do we want to require png >=0.95? We
   already require >=0.89; possible compile problems under Irix 6.x which
   comes with png 0.88/zlib 1.0)
+- write or organise a portable version of snprintf(3) with a copyright
+  compatible with the gnuplot copyright
 
