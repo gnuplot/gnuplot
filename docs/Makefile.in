@@ -318,6 +318,13 @@ gnuplot.rnh: doc2rnh $(srcdir)/gnuplot.doc
 doc2rnh: doc2rnh.o termdoc.o
 	$(LINK) doc2rnh.o termdoc.o $(LIBS)
 
+### AmigaGuide(R) format
+## requires the GG version of makeinfo
+#guide: gnuplot.guide
+#
+#gnuplot.guide: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+#	$(MAKEINFO) --amiga -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+#
 # end doc2xxx section
 
 # this is how to check the gnuplot.doc file
