@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.53 2002/12/16 14:18:34 lhecking Exp $
+ * $Id: cgm.trm,v 1.54 2003/05/07 01:15:27 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -99,6 +99,10 @@ TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
+#ifdef USE_ULIG_FILLEDBOXES
+TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, 
+				unsigned int width, unsigned int height));
+#endif
 #ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CGM_set_color __PROTO((double gray));
@@ -914,7 +918,7 @@ CGM_fillbox(style, x1,y1,width,height)
     int style;
     unsigned int x1,y1,width,height;
 {
-    int new_linewidth, saved_fill_color = cgm_next.fill_color;
+    int saved_fill_color = cgm_next.fill_color;
     /* CGM defines six hatch patterns.  For pattern 0 we want solid
        fill.  Otherwise, we offset by 2 to use the better patterns
        first (so the first pattern has slanted lines). */
@@ -931,7 +935,6 @@ CGM_fillbox(style, x1,y1,width,height)
     switch( style & 0xf ) {
     case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
-/*
         filldens = (style >> 4) / 100.0;
         if( filldens < 0.0 )
 	    filldens = 0.0;
