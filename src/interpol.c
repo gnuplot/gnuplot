@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.23 2001/07/27 14:47:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.24 2001/08/09 15:03:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -829,8 +829,8 @@ do_freq(plot, first_point, num_points)
     int first_point;		/* where to start in plot->points */
     int num_points;		/* to determine end in plot->points */
 {
-    double xdiff, temp, x, y;
-    int i, l;
+    double x, y;
+    int i;
     int x_axis = plot->x_axis;
     int y_axis = plot->y_axis;
     struct coordinate GPHUGE *this;
