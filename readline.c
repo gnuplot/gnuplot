@@ -241,7 +241,6 @@ FILE *fp;
 
 # if defined(ATARI) || defined(MTOS)
 #  define special_getc() tos_getch()
-char tos_getch();
 # endif				/* ATARI || MTOS */
 
 #endif /* MSDOS or ATARI or MTOS or _Windows or DOS386 or OSK */
