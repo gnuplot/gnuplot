@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.17 1999/06/19 20:30:49 lhecking Exp $
+ * $Id: gif.trm,v 1.18 1999/06/22 11:54:17 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -535,12 +535,12 @@ GIF_put_text(unsigned int x, unsigned int y, const char *string)
 	x -= gif_state.charh / 2;
 	gdImageStringUp(gif_state.image, gif_state.font,
 			x, gif_state.height - y,
-			string, gif_state.color);
+			(char *)string, gif_state.color);
     } else {
 	y += gif_state.charh / 2;
 	gdImageString(gif_state.image, gif_state.font,
 		      x, gif_state.height - y,
-		      string, gif_state.color);
+		      (char *)string, gif_state.color);
     }
 }
 

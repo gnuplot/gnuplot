@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.26 1999/06/19 20:30:54 lhecking Exp $
+ * $Id: post.trm,v 1.27 1999/06/22 11:52:32 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -65,7 +65,7 @@ register_term(post)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void PS_options __PROTO((void));
-TERM_PUBLIC void PS_common_init __PROTO((int encap, int portrait, int uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, char **dict));
+TERM_PUBLIC void PS_common_init __PROTO((int encap, int portrait, int uses_fonts, unsigned int xoff, unsigned int yoff, unsigned int bb_xmin, unsigned int bb_ymin, unsigned int bb_xmax, unsigned int bb_ymax, const char **dict));
 TERM_PUBLIC void PS_init __PROTO((void));
 TERM_PUBLIC void PS_graphics __PROTO((void));
 TERM_PUBLIC void PS_text __PROTO((void));
@@ -449,7 +449,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 NULL
 };
 
-static char const GPFAR * GPFAR ENHPS_header[] = {
+static const char GPFAR * GPFAR ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <text string>]  */
 
@@ -691,7 +691,7 @@ int portrait; /* 1 for pslatex */
 int uses_fonts; /* 0 for ps(la)tex */
 unsigned int xoff, yoff; /* how much to translate by */
 unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
-char **dict; /* extra entries for the dictionary */
+const char **dict; /* extra entries for the dictionary */
 {
     static const char GPFAR psi1[] = "\
 %%%%Creator: gnuplot %s patchlevel %s\n\

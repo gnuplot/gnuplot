@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.12 1999/06/19 20:30:52 lhecking Exp $
+ * $Id: mif.trm,v 1.13 1999/06/22 11:54:20 lhecking Exp $
  */
 /* GNUPLOT -- mif.trm */
 
@@ -215,7 +215,7 @@ struct mpt {			/* point definition structure */
 char zgnuplot[] = "ZGnuplot";	/* character formats */
 char zgnuplotp[] = "ZGnuplotP";
 char zgnuplotd[] = "ZGnuplotD";
-char *mif_font = NULL;		/* actual character format */
+const char *mif_font = NULL;		/* actual character format */
 
 struct mpt mpt[POINT_TYPES + 1] =
 {				/* point definition data */

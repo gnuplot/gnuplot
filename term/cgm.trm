@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.21 1999/06/19 20:30:46 lhecking Exp $
+ * $Id: cgm.trm,v 1.22 1999/06/22 11:54:14 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -76,7 +76,7 @@ TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
-TERM_PUBLIC int CGM_find_font __PROTO((char *font, int numchar));
+TERM_PUBLIC int CGM_find_font __PROTO((const char *font, int numchar));
 TERM_PUBLIC int CGM_set_font __PROTO((const char *font));
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
@@ -183,7 +183,7 @@ static void CGM_write_int_record __PROTO((int class, int cgm_id, int length,
 					  int *data));
 static void CGM_write_mixed_record __PROTO((int class, int cgm_id,
 					    int numint, int *int_data,
-					    int numchar, char *char_data));
+					    int numchar, const char *char_data));
 static void CGM_write_byte_record __PROTO((int class, int cgm_id, int length,
 					   char *data));
 
@@ -356,7 +356,7 @@ CGM_graphics()
 
 TERM_PUBLIC int
 CGM_find_font(font, numchar)
-char *font;
+const char *font;
 int numchar;
 {
     int font_index = 1;
@@ -597,7 +597,7 @@ int class, cgm_id, numbytes, *data;
 static void
 CGM_write_mixed_record(class, cgm_id, numint, int_data, numchar, char_data)
 int class, cgm_id, numint, *int_data, numchar;
-char *char_data;
+const char *char_data;
 {
     int i, pad, length;
     static unsigned char paddata = 0;

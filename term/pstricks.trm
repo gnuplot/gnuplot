@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.14 1999/06/19 20:30:55 lhecking Exp $
+ * $Id: pstricks.trm,v 1.15 1999/06/22 11:54:22 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -110,7 +110,7 @@ TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 static void PSTRICKS_endline __PROTO((void));
-static char *PSTRICKS_hack_text __PROTO((char s[]));
+static char *PSTRICKS_hack_text __PROTO((const char *s));
 
 static float PSTRICKS_xscale = 1.0;
 static float PSTRICKS_yscale = 1.0;
@@ -404,7 +404,7 @@ TBOOLEAN head;
 
 static char *
 PSTRICKS_hack_text(s)
-char s[];
+const char *s;
 {
     double value;
     char *ends;

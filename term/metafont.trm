@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.10 1999/06/19 20:30:52 lhecking Exp $
+ * $Id: metafont.trm,v 1.11 1999/06/22 11:54:20 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -486,6 +486,9 @@ unsigned int x, y;
 const char *str;
 {
     int i, j = 0;
+
+    if (!str || !*str)
+	return;
 
     for (i = 0; i < strlen(str); i++)
 	if (str[i] == '"')
