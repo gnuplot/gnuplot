@@ -1,3 +1,12 @@
+2002-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.nt
+	config/makefile.os2: Moved HAVE_ and other #defines to config.xxx
+	files. Compile with -DHAVE_CONFIG_H.
+
+	* config/config.cyg config/config.mgw config/config.nt 
+	config/config.os2: New files, with HAVE_ #defines and more.
+
 2002-03-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/win.trm: Removed unused WIN_scale(). Terminals are not allowed

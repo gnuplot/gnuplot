@@ -1,16 +1,17 @@
 #
-# $Id: makefile.nt,v 1.5 2002/02/20 12:01:49 broeker Exp $
+# $Id: makefile.nt,v 1.6 2002/02/27 17:05:53 broeker Exp $
 #
-# GNUPLOT Makefile to compile gnuplot for WinNT and Win95/98
+# GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
+
 #
-# Make file for microsoft nmake with visual c++ on NT
-# run this on the command line with "nmake -f makefile.nt"
+# To compile gnuplot, run the following command in directory gnuplot\src:
+#	nmake -f ..\config\makefile.nt
 #
 
 #
-# Updated 2/26/2002 by John Bollinger to reflect Lars Heckling's changes to sysconf.h
-# Added png support with zlib and libpng as subs of .\src
-# libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png
+# Added png support with zlib and libpng as subs of .\src;
+# libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png.
+#
 # To compile with Visual C: 
 #	Download zlib to ..\src\zlib and compile it 
 #	Copy zlib.dll to \winnt\system32 or anywhere else in the path
@@ -19,6 +20,7 @@
 # 	Find and run VCVARS32.BAT
 # 	Then from ..\src nmake -f makefile.nt
 #
+
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
@@ -38,8 +40,8 @@ TOP = .
 CC = cl /c
 LD = link
 
-#compiler flags
-CFLAGS = /G5 /O2 /I$(TOP) /nologo /D_Windows /DWIN_IPC /D__MSC__ /DWIN32 /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DNO_GIH /DPM3D /DUSE_MOUSE /DUSE_ULIG_FILLEDBOXES /DHAVE_STRING_H /DHAVE_STDLIB_H /DHAVE_ERRNO_H /DHAVE_LIMITS_H /DHAVE_LOCALE_H /DHAVE_TIME_H /DHAVE_FLOAT_H /DHAVE_MATH_H /DHAVE_ATEXIT /DHAVE_MEMCPY /DHAVE_MEMSET /DHAVE_MEMMOVE /DHAVE_SETVBUF /DHAVE_STRCHR /DHAVE_STRERROR /DHAVE_STRSTR /DHAVE_TEMPNAM /DHAVE_LIBPNG 
+# compiler flags
+CFLAGS = /G5 /O2 /I$(TOP) /nologo /D_Windows /DHAVE_CONFIG_H /D__MSC__ /DUSE_MOUSE /DPM3D /DHELPFILE=\"$(HELPFILE)\" /DHAVE_LIBPNG
 
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = ALPHA
