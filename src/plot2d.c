@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.78 2004/08/17 21:21:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.79 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -580,7 +580,8 @@ get_data(struct curve_points *current_plot)
 		    /* Allocate and fill in a text_label structure to match it */
 		    if (df_tokens[2])
 			store_label(current_plot->labels,
-				  &(current_plot->points[i]), i, df_tokens[2]);
+				  &(current_plot->points[i]), i, df_tokens[2],
+				  0.0);
 		    else
 			current_plot->points[i].type = UNDEFINED;
 		    i++;
@@ -929,7 +930,8 @@ store_label(
     struct text_label *listhead,
     struct coordinate *cp,
     int i,			/* point number */
-    char *string)		/* start of label string */
+    char *string,		/* start of label string */
+    double colorval)		/* used if text color derived from palette */
 {
     struct text_label *tl = listhead;
     int textlen;
@@ -948,6 +950,10 @@ store_label(
     tl->place.x = cp->x;
     tl->place.y = cp->y;
     tl->place.z = cp->z;
+
+    /* Check for optional (textcolor palette ...) */
+    if (tl->textcolor.type == TC_Z)
+	tl->textcolor.value = colorval;
 
     textlen = 0;
     /* FIXME EAM - this code is ugly but seems to work */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.147 2004/09/01 15:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.148 2004/09/11 17:44:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -4221,9 +4221,16 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	int_error(c_token, "only tc lt <n> possible here");
     } else if (almost_equals(c_token,"pal$ette")) {
     	c_token++;
-    	if (END_OF_COMMAND)
-    	    int_error(c_token, "expected colorspec");
-	if (equals(c_token,"cb")) {
+	if (END_OF_COMMAND || equals(c_token,"z")) {
+	    /* The actual z value is not yet known, fill it in later */
+	    if (options >= TC_Z) {
+		tc->type = TC_Z;
+	    } else {
+		tc->type = TC_DEFAULT;
+		int_error(c_token, "palette z not possible here");
+	    }
+    	    c_token++;
+	} else if (equals(c_token,"cb")) {
 	    tc->type = TC_CB;
     	    c_token++;
     	    if (END_OF_COMMAND)
@@ -4237,15 +4244,6 @@ parse_colorspec(struct t_colorspec *tc, int options)
     	    tc->value = real(const_express(&a));
 	    if (tc->value < 0. || tc->value > 1.0)
     		int_error(c_token, "palette fraction out of range");
-	} else if (equals(c_token,"z")) {
-	    /* The actual z value is not yet known, fill it in later */
-	    if (options >= TC_Z) {
-		tc->type = TC_Z;
-	    } else {
-		tc->type = TC_DEFAULT;
-		int_error(c_token, "palette z not possible here");
-	    }
-    	    c_token++;
 	}
     } else {
     	int_error(c_token, "textcolor colorspec not recognized");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.74 2004/09/01 15:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.75 2004/09/11 17:52:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -337,6 +337,11 @@ set_plot_with_palette(int plot_num)
     while (surface < plot_num) {
 	if (this_plot->lp_properties.use_palette)
 	    return;
+#ifdef EAM_DATASTRINGS
+	if (this_plot->labels &&
+	    this_plot->labels->textcolor.type >= TC_CB)
+	    return;
+#endif
 	this_plot = this_plot->next_sp;
 	surface++;
     }
@@ -735,6 +740,7 @@ get_3ddata(struct surface_points *this_plot)
 	    cp->type = INRANGE;	/* unless we find out different */
 
 	    switch (mapping3d) {
+
 	    case MAP3D_CARTESIAN:
 		switch (j) {
 #ifdef PM3D
@@ -755,49 +761,68 @@ get_3ddata(struct surface_points *this_plot)
 		    y = ydatum;
 		    z = v[0];
 		    break;
-		case 4:
-#ifdef EAM_DATASTRINGS
-		    if (this_plot->plot_style == LABELPOINTS) {
-#ifdef PM3D
-		    /* FIXME EAM - as it stands we cannot have LABELPOINTS   */
-		    /* with pm3d colors, because they don't agree on columns */
-			pm3d_color_from_column = FALSE;
-#endif
-			x = v[0];
-			y = v[1];
-			z = v[2];
-			/* 4th column holds label text */
-			/* text = df_tokens[3]; */
-			break;
-		    }
-#endif
-#ifdef PM3D
-		    if (df_no_use_specs==4) {
-			/* getting color from an explicitly given 4th column */
-			pm3d_color_from_column = TRUE;
-			x = v[0];
-			y = v[1];
-			z = v[2];
-			color = v[3];
-			break;
-		    }
-		    /* else FALLTHRU into the error message in default: */
-#endif /* PM3D */
+
 		case 3:
+		    if (df_no_use_specs!=0 && df_no_use_specs!=3)
+			goto error_in_number_of_columns;
 		    x = v[0];
 		    y = v[1];
 		    z = v[2];
-		    if (df_no_use_specs==0 || df_no_use_specs==3) /* because of FALLTHRU from case 4 */
-			break;
+		    break;
+
+		case 4:
+		    if (df_no_use_specs!=4)
+			goto error_in_number_of_columns;
+		    
+		    /* getting color from an explicitly given 4th column */
+		    x = v[0];
+		    y = v[1];
+		    z = v[2];
+		    color = v[3];
+#ifdef PM3D
+		    pm3d_color_from_column = TRUE;
+#endif
+#ifdef EAM_DATASTRINGS
+		    /* 4th column holds label text rather than color */
+		    /* text = df_tokens[3]; */
+		    if (this_plot->plot_style == LABELPOINTS) {
+			color = z;
+#ifdef PM3D
+			pm3d_color_from_column = FALSE;
+#endif
+		    }
+#endif
+		    break;
+
+		case 5:
+		    if (df_no_use_specs!=5)
+			goto error_in_number_of_columns;
+		    
+		    x = v[0];
+		    y = v[1];
+		    z = v[2];
+#ifdef EAM_DATASTRINGS
+		    if (this_plot->plot_style == LABELPOINTS) {
+		        /* text = df_tokens[3]; */
+			/* getting color from an explicitly given 5th column */
+			color = v[4];
+#ifdef PM3D
+			pm3d_color_from_column = TRUE;
+#endif
+		    }
+#endif
+		    break;
+
 		default:
-		    {
-			int_error(this_plot->token,
+		error_in_number_of_columns:
+		    int_error(this_plot->token,
 				  "Wrong number of columns in input data - line %d",
 				  df_line_number);
-			return;	/* avoid gcc -Wuninitialised for x,y,z */
-		    }
+		    return;	/* avoid gcc -Wuninitialised for x,y,z */
+
 		}
 		break;
+
 	    case MAP3D_SPHERICAL:
 		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
@@ -812,6 +837,7 @@ get_3ddata(struct surface_points *this_plot)
 		y = v[2] * sin(v[0]) * cos(v[1]);
 		z = v[2] * sin(v[1]);
 		break;
+
 	    case MAP3D_CYLINDRICAL:
 		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
@@ -825,6 +851,7 @@ get_3ddata(struct surface_points *this_plot)
 		y = v[2] * sin(v[0]);
 		z = v[1];
 		break;
+
 	    default:
 		int_error(NO_CARET, "Internal error: Unknown mapping type");
 		return;
@@ -863,7 +890,7 @@ get_3ddata(struct surface_points *this_plot)
 	    /* x,y,z into the text_label structure and add the actual text string.     */
 	    if (this_plot->plot_style == LABELPOINTS) {
 		if (df_tokens[3])
-		    store_label(this_plot->labels, cp, xdatum, df_tokens[3]);
+		    store_label(this_plot->labels, cp, xdatum, df_tokens[3], color);
 		else
 		    this_plot->iso_crvs->points[xdatum].type = UNDEFINED;
 	    }

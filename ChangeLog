@@ -12,6 +12,13 @@
 	plot style that can use four 'using' specs; remove the error check 
 	that incorrectly prevents this.
 
+	* src/plot3d.c (get_3ddata set_plot_with_palette) 
+	src/plot2d.h src/plot2d.c (store_label): Allow palette color options
+	for text in "{s}plot with labels textcolor palette ...".
+	
+	* src/set.c (parse_colorspec): If "tc palette" is specified with no
+	further suboptions, default to "tc palette z".
+
 2004-09-09  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Update the comment on plot-time evaluation of 
