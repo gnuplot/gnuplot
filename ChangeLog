@@ -1,3 +1,8 @@
+2004-08-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_termoptions):  Quietly ignore the command if there
+	is no current terminal.
+
 2004-08-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_termoptions):  Fill in basic implementation of this
@@ -6,7 +11,9 @@
 	{no}enhanced text mode.
 
 	* demo/enhancedtext.dem:  Use 'set termoption enhanced' (new command)
-	to force enhanced text mode sregardless of current terminal type.
+	to force enhanced text mode regardless of current terminal type.
+
+	* docs/gnuplot.doc:  Document 'set termoption <foo>'.
 
 	* NEWS:  Update NEWS file to cover post-4.0 development work.
 

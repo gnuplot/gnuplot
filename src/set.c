@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.143 2004/08/10 20:03:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.144 2004/08/20 05:59:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3163,7 +3163,7 @@ set_termoptions()
      *    set_term_opts(char *term_name, char *term_opts)
      */
 
-    if (END_OF_COMMAND) {
+    if (END_OF_COMMAND || !term) {
 	return;
     } else if (almost_equals(c_token,"enh$anced")
            ||  almost_equals(c_token,"noenh$anced")) {
@@ -3174,7 +3174,7 @@ set_termoptions()
 	num_tokens = GPMIN(num_tokens,c_token+2);
 	(term->options)();
     } else {
-	int_error(c_token,"This option can only be changed using 'set term'");
+	int_error(c_token,"This option cannot be changed using 'set termoption'");
     }
     num_tokens = save_end_of_line;
 }
