@@ -1,3 +1,23 @@
+Changes in release 3.7.2:
+* Major: we have removed code that was labeled with a non-commercial use
+  clause. The effect is that this removes the gamma, inverse normal, and
+  inverse error function from platforms that have no native implementation.
+* Support for BeOS
+* New terminal drivers: emf (Enhanced Metafile Format), epslatex,
+  ggi (General Graphics Interface)
+* Updated png driver: web-friendly palette, transparent images,
+  explicit colour specification
+* Updated HPGL driver: optional multi-pen support, alternative plot sizes,
+  variable font sizes
+* Updated gnugraph driver: now requires GNU plotutils 2.2 or better
+* Updated eepic driver: picture environment now scales with "set size"
+* Updated fig driver to fig file format 3.2
+* Updated tkcanvas driver
+* Fix font size option in pslatex driver
+* configure-alike script for VMS
+* Command substitution in double-quoted strings
+* Vector clipping style for 2D plots
+* Numerous bugfixes
 Changes in release 3.7.1:
 * Updated makefiles and autoconf files
 * Updated documentation and FAQ
