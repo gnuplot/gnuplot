@@ -1,3 +1,14 @@
+2000-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	From Gunter Kuhnle <gunter@tux.biow.uni-leipzig.de>:
+
+	* src/specfun.c (f_lambertw): new function.
+	(lambertw): new function.
+
+	* src/eval.c (ft): added entry for lambertw
+
+	* docs/gnuplot.doc: document new function lambertw
+
 2000-11-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Use variables in place of "gnuplot" (GNUPLOT)

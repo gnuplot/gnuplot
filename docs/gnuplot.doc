@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.48 2000/10/31 21:53:09 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.49 2000/11/01 18:57:24 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -828,6 +828,15 @@ C
 %int(x)@real@integer part of $x$, truncated toward zero
  The `int(x)` function returns the integer part of its argument, truncated
  toward zero.
+4 lambertw
+?expressions functions lambertw
+?functions lambertw
+?lambertw
+#lambertw(x) & real & Lambert W function \\
+%lambertw(x)@real@Lambert W function
+ The lambertw function returns the value of the principal branch of
+ Lambert's W function, which is defined by the equation (W(z)*exp(W(z))=z. 
+ z must be a real number with z >= -exp(-1).
 4 lgamma
 ?expressions functions lgamma
 ?functions lgamma

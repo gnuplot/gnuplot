@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.7.4.1 2000/06/22 12:57:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.8 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -106,6 +106,8 @@ static double igamma __PROTO((double a, double x));
 static double ranf __PROTO((double init));
 static double inverse_normal_func __PROTO((double p));
 static double inverse_error_func __PROTO((double p));
+/* added by defining lambertw */
+static double lambertw __PROTO((double x));
 
 #ifndef GAMMA
 /* Provide GAMMA function for those who do not already have one */
@@ -880,4 +882,69 @@ double p;
     }
     y = sigma * f;
     return (y);
+}
+
+/* Implementation of Lamberts W-function which is defined as
+ * w(x)*e^(w(x))=x
+ * Implementation by Gunter Kuhnle, gk@uni-leipzig.de 
+ * Algorith originally developed by
+ * KEITH BRIGGS, DEPARTMENT OF PLANT SCIENCES,
+ * e-mail:kmb28@cam.ac.uk
+ * http://epidem13.plantsci.cam.ac.uk/~kbriggs/W-ology.html */
+
+
+
+static double lambertw(x)
+    double x;
+{
+    double p,e,t,w,eps;
+    int i;
+
+    
+	
+    eps = MACHEPS;
+
+    if (x>=-exp(-1))
+    {
+        if (x==0) 
+	{
+	    return 0.0;
+	} else
+	{
+	    if (x < 1)
+	    {
+	       	p=sqrt(2.0*(exp(1.0)*x+1.0)); 
+	      	w=-1.0+p-p*p/3.0+11.0/72.0*p*p*p;
+	    } else
+	    {
+	        w = log(x);
+	    }
+
+	    if (x > 3)
+	    {
+	 	w = w-log(w);
+	    }
+
+	    for (i=0;i<20;i++)
+	    {
+		e=exp(w);
+		t=w*e-x;
+		t=t/(e*(w+1.0)-0.5*(w+2.0)*t/(w+1.0));
+		w=w-t;
+		if (fabs(t)<eps*(1.0+fabs(w))) return w;
+	    } 
+	    return -1;
+       } 
+       return -1;
+    }
+}
+
+void f_lambertw()
+{
+    struct value a;
+    double x;
+
+    x=real(pop(&a));
+
+    push(Gcomplex(&a,lambertw(x),0.0));
 }
