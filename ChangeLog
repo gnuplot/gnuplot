@@ -1,3 +1,10 @@
+2003-07-10  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/x11.trm: Gnuplot disables mousing if it thinks the 
+	controlling terminal is not interactive. In this case X11_graphics()
+	must not attempt to wait for a mouse event during initialization
+	[Fixes reported bug that first character of input line can be lost].
+
 2003-07-07  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Detect request for illegal window number and

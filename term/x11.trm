@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.75 2003/07/05 02:51:23 sfeam Exp $
+ * $Id: x11.trm,v 1.76 2003/07/07 20:48:59 sfeam Exp $
  *
  */
 
@@ -922,7 +922,8 @@ X11_graphics()
     if (!default_font_size_known) {
 	X11_set_default_font(); 
 	FFLUSH();
-	X11_waitforinput();
+	if (ipc_back_fd >= 0)
+	    X11_waitforinput();
 	default_font_size_known = TRUE;
     }
 #else
