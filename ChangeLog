@@ -3,6 +3,9 @@
 	* src/mouse.c: DU4.0 cc compiler does not automatically promote
 	argument of sqrt to (double), so change it to double explicitly.
 
+	* demos/arrowstyle.dem, demos/vector.dem: Show more of what the
+	`plot with vectors <arrowstyle>` option can do.
+
 2003-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (pm3d_reset): Forgotten change of the default value from

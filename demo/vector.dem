@@ -78,6 +78,7 @@ set noautoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31
+set key under Left reverse
 plot "field2xy.dat" u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
 "equipo2.dat" w l
 pause -1 "<CR> to exit"
