@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.120 2002/12/15 20:12:39 sfeam Exp $
+dnl $Id: configure.in,v 1.121 2002/12/18 17:39:22 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -359,7 +359,7 @@ if test "$with_png" != no; then
   if test -n "$LIBPNG_CONFIG"; then
     libpng_CPPFLAGS=`libpng-config --cflags`
     # should be --ldopts, but it's currently broken
-    libpng_LDFLAGS=`libpng-config --ldflags | sed 's/-l[[^ ]][[^ ]]*//g'`
+    libpng_LDFLAGS=`libpng-config --ldflags | sed 's/ -l[[^ ]][[^ ]]*//g'`
   elif test -d "$with_png"; then
     libpng_CPPFLAGS="-I$with_png/include"
     libpng_LDFLAGS="-L$with_png/lib"
@@ -650,6 +650,8 @@ if test "$with_linux_vga" = yes -a "$enable_pm3d" = yes; then
   )
   dnl restore LIBS
   LIBS="$gp_save_LIBS"
+else
+  with_vgagl=no
 fi
 
 TERMLIBS="$VGAGLLIB $TERMLIBS"
@@ -749,10 +751,11 @@ test "$with_lasergnu" = yes && \
 if test "$with_linux_vga" = yes; then
   AC_MSG_RESULT([  Use the Linux SVGA console driver
     SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
-fi
 
-test "$with_vgagl" = yes && \
-  AC_MSG_RESULT([  Enable vgagl terminal with mouse and pm3d support])
+  if test "$with_vgagl" = yes; then
+    AC_MSG_RESULT([  Enable vgagl terminal with mouse and pm3d support])
+  fi
+fi
 
 test "$GGI_SUPPORT" = yes && \
   AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
