@@ -272,6 +272,11 @@ char *missing_val = NULL;
 
 extern TBOOLEAN is_3d_plot;
 
+/* From plot2d.c */
+extern struct curve_points *first_plot;
+/* From plot3d.c */
+extern struct surface_points *first_3dplot;
+
 int key_hpos = TRIGHT;  /* place for curve-labels, corner or outside */
 int key_vpos = TTOP; /* place for curve-labels, corner or below */
 int key_just = JRIGHT;  /* alignment of key labels, left or right */
@@ -346,8 +351,6 @@ do{if ( datatype[axis] == TIME && isstring(c_token) ) { \
 void
 reset_command()
 {
-  extern struct curve_points *first_plot;
-  extern struct surface_points *first_3dplot;
   register struct curve_points *f_p = first_plot;
   register struct surface_points *f_3dp = first_3dplot;
 
@@ -1826,7 +1829,6 @@ set_three()
 		if (tsamp1 < 2 || tsamp2 < 2)
 			int_error("sampling rate must be > 1; sampling unchanged",c_token);
 		else {
-		        extern struct surface_points *first_3dplot;
 			register struct surface_points *f_3dp = first_3dplot;
 
 			first_3dplot = NULL;
@@ -1853,8 +1855,6 @@ set_three()
 		if (tsamp1 < 2 || tsamp2 < 2)
 			int_error("sampling rate must be > 1; sampling unchanged",c_token);
 		else {
-		        extern struct curve_points *first_plot;
-		        extern struct surface_points *first_3dplot;
 			register struct curve_points *f_p = first_plot;
 			register struct surface_points *f_3dp = first_3dplot;
 
