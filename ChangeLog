@@ -1,9 +1,15 @@
 2004-04-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/mouse.c: On OS/2, don't start with mouse on by default. For some
+	unknown reason, it clashes with arrow keys and even palette color
+	allocation in multiplot mode... I guess these strange features are in
+	gnuplot for ages, as it was always recommended to put "unset mouse"
+	into gnuplot.ini.
+
 	* FAQ: Updated to current version.
-	  Technote: not used "lynx -dump" from its Makefile (spurious
-	  references left) but from menu "Save formatted document" in links
-	  in xterm with 80 columns.
+	Technote: not used "lynx -dump" from its Makefile (spurious references
+	left) but from menu "Save formatted document" in links in xterm with
+	80 columns.
 
 2004-03-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

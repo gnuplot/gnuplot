@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.44 2003/07/27 22:28:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.45 2003/12/16 10:03:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -72,7 +72,15 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.44 2003/07/27 22:28:36 sfe
 /********************** variables ***********************************************************/
 
 mouse_setting_t mouse_setting = {
-    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "point pt 1"
+#ifdef OS2
+    0 /* don't start with mouse on default -- clashes with arrow keys on command line */,
+#else
+    1 /* start with mouse on by default */,
+#endif
+    300 /* ms */,
+    1, 0, 0, 0, 0,
+    "% #g",
+    "point pt 1"
 };
 
 /* the status of the shift, ctrl and alt keys
