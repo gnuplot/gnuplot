@@ -3,9 +3,9 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 ELS = gnuplot-gui.el gnuplot.el info-look.20.2.el info-look.20.3.el
 ELCS = gnuplot.elc gnuplot-gui.elc @INFO_LOOK_ELC@
-EXTRA_DIST = dot.el dotemacs gnuplot.el.old gnuplot.info gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
+EXTRA_DIST = dot.el dotemacs gnuplot.el.old gpelcard.dvi gpelcard.pdf gpelcard.ps gpelcard.tex $(ELS)
 
-CLEANFILES = $(ELCS) gnuplot.info gpelcard.pdf gpelcard.ps gpelcard.dvi gpelcard.log gpelcard.aux
+CLEANFILES = $(ELCS) gpelcard.pdf gpelcard.ps gpelcard.dvi gpelcard.log gpelcard.aux
 DISTCLEANFILES = info-look.el install-sh missing mkinstalldirs
 
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
@@ -22,7 +22,7 @@ BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compi
 .tex.pdf:
 	$(PDFLATEX) $<
 
-all: @LISPFILES@ gnuplot.info
+all: @LISPFILES@
 
 elcs: $(ELCS)
 
@@ -30,9 +30,6 @@ noelcs:
 
 pdf: gpelcard.pdf
 ps: gpelcard.ps
-
-gnuplot.info: ../docs/gnuplot.texi
-	$(MAKEINFO) -I$(srcdir) ../docs/gnuplot.texi --no-split --output=$@
 
 install: install-els install-elcs
 
