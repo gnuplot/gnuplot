@@ -1,3 +1,30 @@
+1999-11-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Also check whether gethostbyname() was found in
+	the C library ($ac_cv_func_gethostbyname).
+
+	* datafile.c: Fix indentation and compiler warnings.
+
+	* plot.c: Include <sys/utsname.h>, add initialisation of OS related
+	variables to main.
+
+	* plot.h: Add external references to variables from version.c.
+
+	* setshow.h: Include <sys/utsname.h> moved to plot.c.
+
+	* show.c, term/ai.trm, term/mif.trm, term/png.trm, term/post.trm:
+	Remove references to version.c variables, use variables under their
+	new names.
+
+	* show.c: Edit banner, call show_version_long() in show_version,
+	move initialisation of OS related variables to plot.c.
+
+	* syscfg.h: Remove trailing space from OS define. Don't define OS
+	for systems which have uname(2).
+
+	* version.c: Prefix variable names with gnuplot_. Add OS related
+	variables.
+	
 1999-11-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graph3d.c, graphics.c, set.c, show.c: Remove DEF_FORMAT and SIGNIF
