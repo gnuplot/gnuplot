@@ -1,3 +1,38 @@
+#ifndef lint
+static char *RCSid() { return RCSid("$Id: $"); }
+#endif
+
+/* GNUPLOT - variable.c */
+
+/*[
+ * Copyright 1999   Lars Hecking
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 /* The Death of global variables - part one. */
 
@@ -46,10 +81,10 @@ char *path;
 	/* Init loadpath from environment */
 	FPRINTF((stderr, "Init loadpath from environment\n"));
 	assert(loadpath==NULL);
-	if (loadpath == NULL);
+	if (!loadpath);
 	{
 	    char *envlib = getenv("GNUPLOT_LIB");
-	    if (envlib != NULL) {
+	    if (envlib) {
 		int len = strlen(envlib);
 		loadpath = gp_alloc(len+1, "init loadpath");
 		safe_strncpy(loadpath,envlib,len+1);
@@ -65,11 +100,11 @@ char *path;
     case ACTION_SET:
 	/* set the loadpath */
 	FPRINTF((stderr, "Set loadpath\n"));
-	if (path != NULL && *path != NUL) {
+	if (path && *path != NUL) {
 	    /* length of env portion */
 	    int elen = last - envptr;
 	    int plen = strlen(path);
-	    if (loadpath != NULL && envptr != NULL) {
+	    if (loadpath && envptr) {
 		/* we are prepending a path name; because
 		 * realloc() preserves only the contents up
 		 * to the minimum of old and new size, we move
@@ -94,11 +129,11 @@ char *path;
     case ACTION_SHOW:
 	/* print the current, full loadpath */
 	FPRINTF((stderr, "Show loadpath\n"));
-	if (loadpath != NULL) {
+	if (loadpath) {
 	    p = loadpath;
 	    fputs("\tloadpath is ",stderr);
 	    PRINT_LOADPATH(envptr);
-	    if (envptr != NULL) {
+	    if (envptr) {
 		/* env part */
 		p = envptr;
 		fputs("\tsystem loadpath is ",stderr);
@@ -124,7 +159,7 @@ char *path;
 	    /* init section */
 	    beenhere = 1;
 	    p = loadpath;
-	    if (limit == NULL)
+	    if (!limit)
 		limit = last;
 	    return p;
 	} else {
