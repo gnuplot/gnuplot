@@ -638,17 +638,18 @@ set offsets %g, %g, %g, %g\n\
 set pointsize %g\n\
 set encoding %s\n\
 set %spolar\n\
-set %sparametric\n\
+set %sparametric\n",
+	    loff, roff, toff, boff,
+	    pointsize,
+	    encoding_names[encoding],
+	    (polar) ? "" : "no",
+	    (parametric) ? "" : "no");
+    fprintf(fp, "\
 set view %g, %g, %g, %g\n\
 set samples %d, %d\n\
 set isosamples %d, %d\n\
 set %ssurface\n\
 set %scontour",
-	    loff, roff, toff, boff,
-	    pointsize,
-	    encoding_names[encoding],
-	    (polar) ? "" : "no",
-	    (parametric) ? "" : "no",
 	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale,
 	    samples_1, samples_2,
 	    iso_samples_1, iso_samples_2,
