@@ -140,6 +140,9 @@ $ ./configure --help
   --with-png (*)          enable png terminal
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng
+  --with-pdf (*)          enable pdf terminal 
+                          (requires PDFLib, libz and maybe libtiff)
+  --with-pdf=PATH                 Specify the location of libpdf
   --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons
   --with-lasergnu         install lasergnu printer script
@@ -154,6 +157,13 @@ $ ./configure --help
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
+  --enable-mouse (*)      enable mouse for the x11 terminal
+  --enable-pm3d  (*)      enable pm3d
+  --with-ggi              enable the ggi driver (EXPERIMENTAL)
+  --with-ggi=PATH                 Specify the location of libggi
+  --with-xmi              ggi's xmi support for pm3d (EXPERIMENTAL)
+  --with-xmi=PATH                 Specify the location of libxmi
+  --with-x11-driver       specify an alternative X11 driver name (gnuplot_x11)
   --with-x (*)            Use the X Window System
 
  Options marked with (*) are enabled by default, ie. these features or
