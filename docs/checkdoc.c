@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.9 2002/03/07 16:11:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: checkdoc.c,v 1.10 2002/12/16 14:16:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - checkdoc.c */
@@ -77,7 +77,7 @@ main (int argc, char **argv)
 	    exit(EXIT_FAILURE);
 	}
     convert(infile, stdout);
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 void

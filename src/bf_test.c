@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.6 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.7 2002/03/07 16:11:25 lhecking Exp $"); }
 #endif
 
 
@@ -167,5 +167,5 @@ main()
     free_vector(ct, 0);
     free_matrix(m, 0, xsize - 1, 0);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
