@@ -1,3 +1,7 @@
+2001-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c: remove duplicated show for historysize.
+
 2001-06-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c: implemented show for historysize, multiplot and
