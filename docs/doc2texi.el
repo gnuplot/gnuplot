@@ -31,7 +31,7 @@
 ;; three passes.  Specifically, getting all of the cross references
 ;; made correctly is a lot of work.  Fortunately, texinfo-mode has
 ;; functions for building menus and updating nodes.  This saves a lot
-;; of sweat and is the principle reason why I decided to write this is
+;; of sweat and is the principle reason why I decided to write this in
 ;; emacs lisp.
 ;;
 ;; Everything else in gnuplot is written in C for the sake of
