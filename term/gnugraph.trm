@@ -144,6 +144,12 @@ int up_fontsize = 10;
 
 enum JUSTIFY up_justify=LEFT;
 
+#ifdef GNU_PLOTUTILS
+# define ROTATE(angle) textangle(90*angle)
+#else
+# define ROTATE(angle) rotate(0,0,90*angle)
+#endif
+
 TERM_PUBLIC void UP_options()
 {
 	if(!END_OF_COMMAND) {
@@ -177,11 +183,15 @@ TERM_PUBLIC void UP_init()
 	openpl();
 	space(0,0,UP_SCREENX-1,UP_SCREENY-1);
 	fontname(up_font);
+/*
 #ifdef GNU_PLOTUTILS
 	fontsize((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
 #else
+*/
 	fontsize(up_fontsize);
+/*
 #endif
+*/
 }
 
 
@@ -246,11 +256,7 @@ char str[];
 TERM_PUBLIC int UP_text_angle(ang)
 int ang;
 {
-#ifdef GNU_PLOTUTILS
-	textangle(90*ang);
-#else
-	rotate(0,0,90*ang);
-#endif
+	ROTATE(ang);
 	return TRUE;
 }
 
