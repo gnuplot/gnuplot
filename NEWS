@@ -3,8 +3,6 @@ Changes in release 3.7.1:
 * Updated documentation and FAQ
 * Added Windows stdin wrapper
 * New drivers for Be, metapost, MacOS X Server
-* Added support for transparent png's
-* Share web216-subset palette between gif and png
 * Improved configuration of GNU readline support
 * Security: the Linux SVGAlib driver is now disabled by default
 * Support for GNU plotutils 2.2
