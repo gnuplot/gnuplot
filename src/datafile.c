@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $";
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -524,8 +524,8 @@ int max_using;
 	if (!filename[0])
 	    int_error(c_token, "No previous filename");
     } else {
-	filename = gp_realloc(filename, token_len(c_token)-1, "datafile name");
-	quote_str(filename, c_token, token_len(c_token)-1);
+	filename = gp_realloc(filename, token_len(c_token), "datafile name");
+	quote_str(filename, c_token, token_len(c_token));
     }
 
     name_token = c_token++;

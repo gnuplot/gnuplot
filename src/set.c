@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.68 1998/06/22 12:24:54 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: set.c,v 1.68 1998/06/22 12:24:54 ddenholm Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1246,7 +1246,7 @@ set_two()
 	if (END_OF_COMMAND) {
 	    set_locale("C");
 	} else if (isstring(c_token)) {
-	    char *ss = gp_alloc (token_len(c_token)+1, "tmp locale");
+	    char *ss = gp_alloc (token_len(c_token), "tmp locale");
 	    quote_str(ss,c_token,token_len(c_token));
 	    set_locale(ss);
 	    free(ss);
@@ -1262,7 +1262,7 @@ set_two()
 	} else while (!END_OF_COMMAND) {
 	    if (isstring(c_token)) {
 		int len;
-		char *ss = gp_alloc(token_len(c_token)+1, "tmp storage");
+		char *ss = gp_alloc(token_len(c_token), "tmp storage");
 		len = (assemble? strlen(assemble) : 0);
 		quote_str(ss,c_token,token_len(c_token));
 		assemble = gp_realloc(assemble,len+1+strlen(ss)+1, "tmp loadpath");
@@ -2240,7 +2240,7 @@ static void set_label()
     /* get text */
     if (!END_OF_COMMAND && isstring(c_token)) {
 	/* get text */
-	text = gp_alloc (token_len(c_token)+1, "text_label->text");
+	text = gp_alloc (token_len(c_token), "text_label->text");
 	quote_str(text, c_token, token_len(c_token));
 	c_token++;
 	set_text = TRUE;
@@ -2316,7 +2316,7 @@ static void set_label()
 	if (END_OF_COMMAND)
 	    int_error(c_token, "font name and size expected");
 	if (isstring(c_token)) {
-	    font = gp_alloc (token_len(c_token)+1, "text_label->font");
+	    font = gp_alloc (token_len(c_token), "text_label->font");
 	    quote_str(font, c_token, token_len(c_token));
 	    /* get 'name,size', no further check */
 	    set_font = TRUE;
@@ -2828,7 +2828,8 @@ int tag, pointflag;
 
 enum PLOT_STYLE /* not static; used by command.c */ get_style()
 {
-    register enum PLOT_STYLE ps = LINES;	/* HBB: initial value, for 'gcc -W} */
+    /* HBB: initial value, for 'gcc -Wall */
+    register enum PLOT_STYLE ps = LINES;
 
     c_token++;
     if (almost_equals(c_token, "l$ines"))
@@ -2881,7 +2882,8 @@ enum PLOT_STYLE /* not static; used by command.c */ get_style()
 	int_error(c_token, "expecting 'lines', 'points', 'linespoints', \
 'dots', 'impulses',\n'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', \
 'fsteps', 'histeps',\n'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector', \
-'financebars', 'candlesticks'");
+'financebars', 'candlesticks', 'errorlines', 'xerrorlines', 'yerrorlines', \
+'xyerrorlines' ");
 	return LINES;		/* keep gcc -Wuninitialised happy */
     }
     c_token++;
