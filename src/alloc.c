@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.12 1998/03/22 22:31:16 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.4 1999/06/09 12:13:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -102,7 +102,8 @@ static long bytes_allocated = 0;
 #define CHECKSUM_FREE 0xf3eed222
 #define CHECKSUM_CHAR 0xc5
 
-static void mark(p, size, usage)
+static void
+mark(p, size, usage)
 struct frame_struct *p;
 unsigned long size;
 char *usage;
@@ -115,7 +116,8 @@ char *usage;
 
 #define mark_free(p) ( ((struct frame_struct *)p)[-1].checksum = CHECKSUM_FREE)
 
-static void validate(x)
+static void
+validate(x)
 void *x;
 {
     struct frame_struct *p = (struct frame_struct *) x - 1;
@@ -139,7 +141,8 @@ void *x;
  * macros which expand to nothing, until we need to re-enable them)
  */
 
-void check_pointer_in_block(void *block, void *p, int size, char *file, int line)
+void
+check_pointer_in_block(void *block, void *p, int size, char *file, int line)
 {
     struct frame_struct *f = (struct frame_struct *) block - 1;
     validate(block);
@@ -150,7 +153,8 @@ void check_pointer_in_block(void *block, void *p, int size, char *file, int line
     }
 }
 
-char *gp_alloc(size, usage)
+char *
+gp_alloc(size, usage)
 unsigned long size;
 char *usage;
 {
@@ -170,7 +174,8 @@ char *usage;
     return (char *) (p + 1);
 }
 
-generic *gp_realloc(old, size, usage)
+generic *
+gp_realloc(old, size, usage)
 generic *old;
 unsigned long size;
 char *usage;
@@ -204,7 +209,8 @@ char *usage;
 
 #undef free
 
-void checked_free(p)
+void
+checked_free(p)
 void *p;
 {
     validate(p);
@@ -220,7 +226,8 @@ void *p;
 
 /* this leak checking stuff will be broken by first int_error or interrupt */
 
-void start_leak_check(char *file, int line)
+void
+start_leak_check(char *file, int line)
 {
     if (leak_frame >= leak_stack + 40) {
 	fprintf(stderr, "too many nested memory-leak checks - %s:%d\n", file, line);
@@ -233,7 +240,8 @@ void start_leak_check(char *file, int line)
     ++leak_frame;
 }
 
-void end_leak_check(char *file, int line)
+void
+end_leak_check(char *file, int line)
 {
     if (--leak_frame < leak_stack) {
 	fprintf(stderr, "memory-leak stack underflow at %s:%d\n", file, line);
@@ -258,7 +266,8 @@ void end_leak_check(char *file, int line)
  * so it depends on this using malloc().
  */
 
-char *gp_alloc(size, message)
+char *
+gp_alloc(size, message)
 unsigned long size;		/* # of bytes */
 char *message;			/* description of what is being allocated */
 {
@@ -290,7 +299,8 @@ char *message;			/* description of what is being allocated */
  * realloc function has to be used.
  */
 
-generic *gp_realloc(p, size, message)
+generic *
+gp_realloc(p, size, message)
 generic *p;			/* old mem block */
 unsigned long size;		/* # of bytes */
 char *message;			/* description of what is being allocated */
@@ -324,7 +334,8 @@ char *message;			/* description of what is being allocated */
 #endif /* CHECK_HEAP_USE */
 
 #ifdef FARALLOC
-void gpfree(p)
+void
+gpfree(p)
 generic *p;
 {
 #ifdef _Windows

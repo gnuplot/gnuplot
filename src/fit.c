@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.6 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -100,7 +100,7 @@ extern int c_token;
 extern int df_datum, df_line_number;
 
 /* following 2 external arrays are needed to use time data */
-  
+
 extern int datatype[];
 extern int df_timecol[];
 
@@ -171,8 +171,7 @@ typedef char fixstr[MAX_ID_LEN+1];
 
 static fixstr *par_name;
 
-static double startup_lambda = 0, lambda_down_factor = LAMBDA_DOWN_FACTOR,
- lambda_up_factor = LAMBDA_UP_FACTOR;
+static double startup_lambda = 0, lambda_down_factor = LAMBDA_DOWN_FACTOR, lambda_up_factor = LAMBDA_UP_FACTOR;
 
 /*****************************************************************
 			 internal Prototypes
@@ -206,7 +205,8 @@ static void backup_file __PROTO((char *, const char *));
          but only the size of the string is returned.
 *****************************************************************/
 
-size_t wri_to_fil_last_fit_cmd(fp)
+size_t
+wri_to_fil_last_fit_cmd(fp)
 FILE *fp;
 {
     if (fp == NULL)
@@ -220,7 +220,8 @@ FILE *fp;
     This is called when a SIGINT occurs during fit
 *****************************************************************/
 
-static RETSIGTYPE ctrlc_handle(an_int)
+static RETSIGTYPE
+ctrlc_handle(an_int)
 int an_int;
 {
 #ifdef OS2
@@ -236,7 +237,8 @@ int an_int;
 /*****************************************************************
     setup the ctrl_c signal handler
 *****************************************************************/
-static void ctrlc_setup()
+static void
+ctrlc_setup()
 {
 /*
  *  MSDOS defines signal(SIGINT) but doesn't handle it through
@@ -261,7 +263,8 @@ static void ctrlc_setup()
 /* HBB 980317: added a prototype... */
 int getchx __PROTO((void));
 
-int getchx()
+int
+getchx()
 {
     register int c = getch();
     if (!c || c == 0xE0) {
@@ -275,14 +278,14 @@ int getchx()
 /*****************************************************************
     in case of fatal errors
 *****************************************************************/
-void error_ex()
+void
+error_ex()
 {
     char *sp;
 
-    strncpy(fitbuf, "         ", 9);		/* start after GNUPLOT> */
+    strncpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
     sp = strchr(fitbuf, NUL);
-    while (*--sp == '\n')
-	;
+    while (*--sp == '\n');
     strcpy(sp + 1, "\n\n");	/* terminate with exactly 2 newlines */
     fputs(fitbuf, STANDARD);
     if (log_f) {
@@ -306,7 +309,8 @@ void error_ex()
 /*****************************************************************
     New utility routine: print a matrix (for debugging the alg.)
 *****************************************************************/
-static void printmatrix(C, m, n)
+static void
+printmatrix(C, m, n)
 double **C;
 int m, n;
 {
@@ -323,7 +327,8 @@ int m, n;
 /**************************************************************************
     Yet another debugging aid: print matrix, with diff. and residue vector
 **************************************************************************/
-static void print_matrix_and_vectors(C, d, r, m, n)
+static void
+print_matrix_and_vectors(C, d, r, m, n)
 double **C;
 double *d, *r;
 int m, n;
@@ -342,7 +347,8 @@ int m, n;
 /*****************************************************************
     Marquardt's nonlinear least squares fit
 *****************************************************************/
-static marq_res_t marquardt(a, C, chisq, lambda)
+static marq_res_t
+marquardt(a, C, chisq, lambda)
 double a[];
 double **C;
 double *chisq;
@@ -430,7 +436,6 @@ double *lambda;
 	/* FIXME: will never be reached: always returns TRUE */
 	return ERROR;
     }
-
     if (tmp_chisq < *chisq) {	/* Success, accept new solution */
 	if (*lambda > MIN_LAMBDA) {
 	    (void) putc('/', stderr);
@@ -459,7 +464,8 @@ double *lambda;
 /*****************************************************************
     compute chi-square and numeric derivations
 *****************************************************************/
-static TBOOLEAN analyze(a, C, d, chisq)
+static TBOOLEAN
+analyze(a, C, d, chisq)
 double a[];
 double **C;
 double d[];
@@ -494,7 +500,8 @@ double *chisq;
 /*****************************************************************
     compute function values and partial derivatives of chi-square
 *****************************************************************/
-static void calculate(zfunc, dzda, a)
+static void
+calculate(zfunc, dzda, a)
 double *zfunc;
 double **dzda;
 double a[];
@@ -548,7 +555,8 @@ double a[];
 /*****************************************************************
     call internal gnuplot functions
 *****************************************************************/
-static void call_gnuplot(par, data)
+static void
+call_gnuplot(par, data)
 double *par;
 double *data;
 {
@@ -576,7 +584,8 @@ double *data;
 /*****************************************************************
     handle user interrupts during fit
 *****************************************************************/
-static TBOOLEAN fit_interrupt()
+static TBOOLEAN
+fit_interrupt()
 {
     while (TRUE) {
 	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
@@ -619,7 +628,8 @@ static TBOOLEAN fit_interrupt()
 /*****************************************************************
     frame routine for the marquardt-fit
 *****************************************************************/
-static TBOOLEAN regress(a)
+static TBOOLEAN
+regress(a)
 double a[];
 {
     double **covar, *dpar, **C, chisq, last_chisq, lambda;
@@ -738,10 +748,11 @@ double a[];
 	for (i = 0; i < num_params; i++)
 	    Dblf3("%-15.15s = %-15g\n", par_name[i], a[i]);
     } else {
-	    Dblf2("degrees of freedom (ndf) : %d\n",  num_data - num_params);
-	    Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq / (num_data - num_params)));
- 	    Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
- 
+	Dblf2("degrees of freedom (ndf) : %d\n", num_data - num_params);
+	Dblf2("rms of residuals      (stdfit) = sqrt(WSSR/ndf)      : %g\n", sqrt(chisq /
+										  (num_data - num_params)));
+	Dblf2("variance of residuals (reduced chisquare) = WSSR/ndf : %g\n\n", chisq / (num_data - num_params));
+
 	/* get covariance-, Korrelations- and Kurvature-Matrix */
 	/* and errors in the parameters                     */
 
@@ -813,8 +824,8 @@ double a[];
     /* restore last parameter's value (not done by calculate) */
     {
 	struct value val;
-	Gcomplex (&val, a[num_params-1], 0.0);
-	setvar (par_name[num_params-1], val);
+	Gcomplex(&val, a[num_params - 1], 0.0);
+	setvar(par_name[num_params - 1], val);
     }
 
     /* call destructor for allocated vars */
@@ -829,7 +840,8 @@ double a[];
 /*****************************************************************
     display actual state of the fit
 *****************************************************************/
-static void show_fit(i, chisq, last_chisq, a, lambda, device)
+static void
+show_fit(i, chisq, last_chisq, a, lambda, device)
 int i;
 double chisq;
 double last_chisq;
@@ -844,7 +856,7 @@ Iteration %d\n\
 WSSR        : %-15g   delta(WSSR)/WSSR   : %g\n\
 delta(WSSR) : %-15g   limit for stopping : %g\n\
 lambda	  : %g\n\n%s parameter values\n\n",
-      i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
+	    i, chisq, chisq > NEARLY_ZERO ? (chisq - last_chisq) / chisq : 0.0,
 	    chisq - last_chisq, epsilon, lambda,
 	    (i > 0 ? "resultant" : "initial set of free"));
     for (k = 0; k < num_params; k++)
@@ -856,7 +868,8 @@ lambda	  : %g\n\n%s parameter values\n\n",
 /*****************************************************************
     is_empty: check for valid string entries
 *****************************************************************/
-static TBOOLEAN is_empty(s)
+static TBOOLEAN
+is_empty(s)
 char *s;
 {
     while (*s == ' ' || *s == '\t' || *s == '\n')
@@ -868,7 +881,8 @@ char *s;
 /*****************************************************************
     get next word of a multi-word string, advance pointer
 *****************************************************************/
-char *get_next_word(s, subst)
+char *
+get_next_word(s, subst)
 char **s;
 char *subst;
 {
@@ -889,7 +903,8 @@ char *subst;
 /*****************************************************************
     check for variable identifiers
 *****************************************************************/
-static TBOOLEAN is_variable(s)
+static TBOOLEAN
+is_variable(s)
 char *s;
 {
     while (*s != '\0') {
@@ -903,7 +918,8 @@ char *s;
 /*****************************************************************
     first time settings
 *****************************************************************/
-void init_fit()
+void
+init_fit()
 {
     func.at = (struct at_type *) NULL;	/* need to parse 1 time */
 }
@@ -913,7 +929,8 @@ void init_fit()
 	    Set a GNUPLOT user-defined variable
 ******************************************************************/
 
-void setvar(varname, data)
+void
+setvar(varname, data)
 char *varname;
 struct value data;
 {
@@ -933,8 +950,8 @@ struct value data;
 	    gp_alloc((unsigned int) sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
-    udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname)+1, "user var");
-    safe_strncpy(udv_ptr->udv_name, varname, strlen(varname)+1);
+    udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname) + 1, "user var");
+    safe_strncpy(udv_ptr->udv_name, varname, strlen(varname) + 1);
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
 }
@@ -944,7 +961,8 @@ struct value data;
 /*****************************************************************
     Read INTGR Variable value, return 0 if undefined or wrong type
 *****************************************************************/
-int getivar(varname)
+int
+getivar(varname)
 char *varname;
 {
     register struct udvt_entry *udv_ptr = first_udv;
@@ -964,7 +982,8 @@ char *varname;
     Read DOUBLE Variable value, return 0 if undefined or wrong type
    I dont think it's a problem that it's an integer - div
 *****************************************************************/
-static double getdvar(varname)
+static double
+getdvar(varname)
 char *varname;
 {
     register struct udvt_entry *udv_ptr = first_udv;
@@ -982,7 +1001,8 @@ char *varname;
    - convert it from integer to real if necessary
    - create it with value INITIAL_VALUE if not found or undefined
 *****************************************************************/
-static double createdvar(varname, value)
+static double
+createdvar(varname, value)
 char *varname;
 double value;
 {
@@ -1013,7 +1033,8 @@ double value;
 /*****************************************************************
     Split Identifier into path and filename
 *****************************************************************/
-static void splitpath(s, p, f)
+static void
+splitpath(s, p, f)
 char *s;
 char *p;
 char *f;
@@ -1031,11 +1052,11 @@ char *f;
 /*****************************************************************
     write the actual parameters to start parameter file
 *****************************************************************/
-void update(pfile, npfile)
+void
+update(pfile, npfile)
 char *pfile, *npfile;
 {
-    char fnam[256], path[256], sstr[256], pname[64], tail[127], *s = sstr,
-    *tmp, c;
+    char fnam[256], path[256], sstr[256], pname[64], tail[127], *s = sstr, *tmp, c;
     char ifilename[256], *ofilename;
     FILE *of, *nf;
     double pval;
@@ -1129,7 +1150,8 @@ char *pfile, *npfile;
     Backup a file by renaming it to something useful. Return
     the new name in tofile
 *****************************************************************/
-static void backup_file(tofile, fromfile)
+static void
+backup_file(tofile, fromfile)
 char *tofile;
 const char *fromfile;
 /* tofile must point to a char array[] or allocated data. See update() */
@@ -1195,7 +1217,8 @@ const char *fromfile;
     Interface to the classic gnuplot-software
 *****************************************************************/
 
-void do_fit()
+void
+do_fit()
 {
     TBOOLEAN autorange_x = 3, autorange_y = 3;	/* yes */
     /* HBB 980401: new: z range specification */
@@ -1259,7 +1282,7 @@ void do_fit()
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
-#if 0 /* HBB 981210: move this to a later point */
+#if 0				/* HBB 981210: move this to a later point */
     } else {
 	/* Just in case I muck up things below: make sure that the z
 	 * range is the same as the y range, if it didn't get specified
@@ -1310,22 +1333,22 @@ void do_fit()
      * in plot2d and plot3d */
 
     if (datatype[FIRST_X_AXIS] == TIME) {
-        if (columns < 2)
-            int_error(c_token, "Need full using spec for x time data");
-        df_timecol[0] = 1;
+	if (columns < 2)
+	    int_error(c_token, "Need full using spec for x time data");
+	df_timecol[0] = 1;
     }
     if (datatype[FIRST_Y_AXIS] == TIME) {
-        if (columns < 1)
-            int_error(c_token, "Need using spec for y time data");
-        df_timecol[1] = 1;
+	if (columns < 1)
+	    int_error(c_token, "Need using spec for y time data");
+	df_timecol[1] = 1;
     }
     /* HBB 990326: added this check. Just in case some wants to fit
      * time/date data depending on two other variables ... */
     if (datatype[FIRST_Z_AXIS] == TIME) {
-      if (columns < 4)
-	int_error(c_token, "Need full using spec for z time data");
-      else
-	df_timecol[2] = 1;
+	if (columns < 4)
+	    int_error(c_token, "Need full using spec for z time data");
+	else
+	    df_timecol[2] = 1;
     }
     /* End of patch by Remko Scharroo */
 
@@ -1337,17 +1360,16 @@ void do_fit()
 
     /* HBB 981210: two range specs mean different things, depending
      * on wether this is a 2D or 3D fit */
-    if (columns<4) {
-      if (zrange_token != -1)
-	int_error(zrange_token, "Three range-specs not allowed in on-variable fit");
-      else {
-	/* 2D fit, 2 ranges: second range is for *z*, not y: */
-	autorange_z = autorange_y;
-	min_z = min_y;
-	max_z = max_y;
-      }
+    if (columns < 4) {
+	if (zrange_token != -1)
+	    int_error(zrange_token, "Three range-specs not allowed in on-variable fit");
+	else {
+	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
+	    autorange_z = autorange_y;
+	    min_z = min_y;
+	    max_z = max_y;
+	}
     }
-
     /* defer actually reading the data until we have parsed the rest
      * of the line */
 
@@ -1367,7 +1389,6 @@ void do_fit()
 	startup_lambda = tmpd;
 	printf("Lambda Start value set: %g\n", startup_lambda);
     }
-
     /* get lambda up/down factor, if given */
     tmpd = getdvar(FITLAMBDAFACTOR);
 
@@ -1526,7 +1547,7 @@ void do_fit()
 	TBOOLEAN fixed;
 	double tmp_par;
 	char c, *s;
-	char sstr[MAX_LINE_LEN+1];
+	char sstr[MAX_LINE_LEN + 1];
 	FILE *f;
 
 	quote_str(sstr, c_token++, MAX_LINE_LEN);
@@ -1580,7 +1601,8 @@ void do_fit()
 		    max_params = (max_params * 3) / 2;
 		    if (0
 			|| !redim_vec(&a, max_params)
-			|| !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
+			|| !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr),
+						   "fit param resize"))
 			) {
 			(void) fclose(f);
 			Eex("Out of memory in fit: too many parameters?");
@@ -1608,7 +1630,8 @@ void do_fit()
 		max_params = (max_params * 3) / 2;
 		if (0
 		    || !redim_vec(&a, max_params)
-		    || !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
+		    || !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr),
+					       "fit param resize"))
 		    ) {
 		    Eex("Out of memory in fit: too many parameters?");
 		}
@@ -1648,7 +1671,8 @@ void do_fit()
 }
 
 #if defined(ATARI) || defined(MTOS)
-static int kbhit()
+static int
+kbhit()
 {
     fd_set rfds;
     struct timeval timeout;

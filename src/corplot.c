@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: corplot.c,v 1.8 1998/03/22 22:31:27 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: corplot.c,v 1.2 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - corplot.c */
@@ -46,36 +46,35 @@ static char *RCSid() { return RCSid("$Id: corplot.c,v 1.8 1998/03/22 22:31:27 dr
 #define segment(addr) (FP_SEG(m) + ((FP_OFF(m)+15) >> 4));
 #define round(value,boundary) (((value) + (boundary) - 1) & ~((boundary) - 1))
 
-char *malloc(),*realloc();
+char *malloc(), *realloc();
 
 char prog[] = "gnuplot";
 char corscreen[] = "CORSCREEN=0";
 
+int
 main()
 {
-register unsigned int segm,start;
-char *m;
-	if (!(m = malloc(BOUNDARY))) {
-		printf("malloc() failed\n");
-		exit(1);
-	}
-	segm = segment(m);
-	start = round(segm,BOUNDARY/16);
+    register unsigned int segm, start;
+    char *m;
+    if (!(m = malloc(BOUNDARY))) {
+	printf("malloc() failed\n");
+	exit(1);
+    }
+    segm = segment(m);
+    start = round(segm, BOUNDARY / 16);
 
-	if (realloc(m,BOUNDARY+(start-segm)*16) != m) {
-		printf("can't realloc() memory\n");
-		exit(2);
-	}
+    if (realloc(m, BOUNDARY + (start - segm) * 16) != m) {
+	printf("can't realloc() memory\n");
+	exit(2);
+    }
+    if ((segm = start >> 11) >= 8) {
+	printf("not enough room in first 256K\n");
+	exit(3);
+    }
+    corscreen[sizeof(corscreen) - 2] = '0' + segm;
+    if (putenv(corscreen))
+	perror("putenv");
 
-	if ((segm = start >> 11) >= 8) {
-		printf("not enough room in first 256K\n");
-		exit(3);
-	}
-
-	corscreen[sizeof(corscreen)-2] = '0' + segm;
-	if (putenv(corscreen))
-		perror("putenv");
-
-	if (spawnlp(P_WAIT,prog,prog,NULL))
-		perror("spawnlp");
+    if (spawnlp(P_WAIT, prog, prog, NULL))
+	perror("spawnlp");
 }

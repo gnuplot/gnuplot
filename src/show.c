@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.50 1998/06/18 14:55:18 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.10 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -148,7 +148,8 @@ do{if (datatype[axis]==TIME) { \
 
 
 /******* The 'show' command *******/
-void show_command()
+void
+show_command()
 {
     /* show at is undocumented/hidden... */
     static char GPFAR showmess[] = SETSHOWMSG;
@@ -163,7 +164,7 @@ void show_command()
 
 /* return TRUE if a command match, FALSE if not */
 static TBOOLEAN
- show_one()
+show_one()
 {
     if (almost_equals(c_token, "ac$tion_table") ||
 	equals(c_token, "at")) {
@@ -389,7 +390,7 @@ static TBOOLEAN
 
 /* return TRUE if a command match, FALSE if not */
 static TBOOLEAN
- show_two()
+show_two()
 {
     if (almost_equals(c_token, "p$lot")) {
 	(void) putc('\n', stderr);
@@ -650,7 +651,8 @@ static TBOOLEAN
 
 /*********** support functions for 'show'  **********/
 /* perhaps these need to be put into a constant array ? */
-static void show_style(name, style)
+static void
+show_style(name, style)
 char name[];
 enum PLOT_STYLE style;
 {
@@ -721,7 +723,8 @@ enum PLOT_STYLE style;
     }
 }
 
-static void show_bars()
+static void
+show_bars()
 {
     /* I really like this: "terrorbars" ;-) */
     if (bar_size > 0.0)
@@ -731,14 +734,16 @@ static void show_bars()
 	fputs("\terrors are plotted without bars\n", stderr);
 }
 
-static void show_boxwidth()
+static void
+show_boxwidth()
 {
     if (boxwidth < 0.0)
 	fputs("\tboxwidth is auto\n", stderr);
     else
 	fprintf(stderr, "\tboxwidth is %g\n", boxwidth);
 }
-static void show_dgrid3d()
+static void
+show_dgrid3d()
 {
     if (dgrid3d)
 	fprintf(stderr, "\
@@ -750,7 +755,8 @@ static void show_dgrid3d()
 	fputs("\tdata grid3d is disabled\n", stderr);
 }
 
-static void show_range(axis, min, max, autosc, text)
+static void
+show_range(axis, min, max, autosc, text)
 int axis;
 double min, max;
 TBOOLEAN autosc;
@@ -794,17 +800,20 @@ char *text;
     }
 }
 
-static void show_zero()
+static void
+show_zero()
 {
     fprintf(stderr, "\tzero is %g\n", zero);
 }
 
-static void show_offsets()
+static void
+show_offsets()
 {
     fprintf(stderr, "\toffsets are %g, %g, %g, %g\n", loff, roff, toff, boff);
 }
 
-static void show_border()
+static void
+show_border()
 {
     fprintf(stderr, "\tborder is %sdrawn %d\n", draw_border ? "" : "not ",
 	    draw_border);
@@ -813,7 +822,8 @@ static void show_border()
 	    border_lp.l_type + 1, border_lp.l_width);
 }
 
-static void show_output()
+static void
+show_output()
 {
     if (outstr)
 	fprintf(stderr, "\toutput is sent to '%s'\n", outstr);
@@ -821,23 +831,27 @@ static void show_output()
 	fputs("\toutput is sent to STDOUT\n", stderr);
 }
 
-static void show_samples()
+static void
+show_samples()
 {
     fprintf(stderr, "\tsampling rate is %d, %d\n", samples_1, samples_2);
 }
 
-static void show_isosamples()
+static void
+show_isosamples()
 {
     fprintf(stderr, "\tiso sampling rate is %d, %d\n",
 	    iso_samples_1, iso_samples_2);
 }
 
-static void show_surface()
+static void
+show_surface()
 {
     fprintf(stderr, "\tsurface is %sdrawn\n", draw_surface ? "" : "not ");
 }
 
-static void show_hidden3d()
+static void
+show_hidden3d()
 {
 #ifdef LITE
     printf(" Hidden Line Removal Not Supported in LITE version\n");
@@ -847,7 +861,8 @@ static void show_hidden3d()
 #endif /* LITE */
 }
 
-static void show_label_contours()
+static void
+show_label_contours()
 {
     if (label_contours)
 	fprintf(stderr, "\tcontour line types are varied & labeled with format '%s'\n", contour_format);
@@ -855,13 +870,15 @@ static void show_label_contours()
 	fputs("\tcontour line types are all the same\n", stderr);
 }
 
-static void show_view()
+static void
+show_view()
 {
     fprintf(stderr, "\tview is %g rot_x, %g rot_z, %g scale, %g scale_z\n",
 	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
 }
 
-static void show_size()
+static void
+show_size()
 {
     fprintf(stderr, "\tsize is scaled by %g,%g\n", xsize, ysize);
     if (aspect_ratio > 0)
@@ -873,43 +890,49 @@ static void show_size()
 		-aspect_ratio);
 }
 
-static void show_origin()
+static void
+show_origin()
 {
     fprintf(stderr, "\torigin is set to %g,%g\n", xoffset, yoffset);
 }
 
-static void show_xyzlabel(name, label)
+static void
+show_xyzlabel(name, label)
 char *name;
 label_struct *label;
 {
-    char str[MAX_LINE_LEN+1];
+    char str[MAX_LINE_LEN + 1];
     fprintf(stderr, "\t%s is \"%s\", offset at %f, %f",
-      name, conv_text(str, label->text), label->xoffset, label->yoffset);
+	    name, conv_text(str, label->text), label->xoffset, label->yoffset);
     if (*label->font)
 	fprintf(stderr, ", using font \"%s\"", conv_text(str, label->font));
     putc('\n', stderr);
 }
 
-static void show_keytitle()
+static void
+show_keytitle()
 {
-    char str[MAX_LINE_LEN+1];
+    char str[MAX_LINE_LEN + 1];
     fprintf(stderr, "\tkeytitle is \"%s\"\n",
 	    conv_text(str, key_title));
 }
 
-static void show_timefmt()
+static void
+show_timefmt()
 {
-    char str[MAX_LINE_LEN+1];
+    char str[MAX_LINE_LEN + 1];
     fprintf(stderr, "\tread format for time is \"%s\"\n",
 	    conv_text(str, timefmt));
 }
 
-static void show_locale()
+static void
+show_locale()
 {
     fprintf(stderr, "\tlocale is \"%s\"\n", cur_locale);
 }
 
-static void show_xzeroaxis()
+static void
+show_xzeroaxis()
 {
     if (xzeroaxis.l_type > -3)
 	fprintf(stderr, "\txzeroaxis is drawn with linestyle %d, linewidth %.3f\n", xzeroaxis.l_type + 1, xzeroaxis.l_width);
@@ -921,7 +944,8 @@ static void show_xzeroaxis()
 	fputs("\tx2zeroaxis is OFF\n", stderr);
 }
 
-static void show_yzeroaxis()
+static void
+show_yzeroaxis()
 {
     if (yzeroaxis.l_type > -3)
 	fprintf(stderr, "\tyzeroaxis is drawn with linestyle %d, linewidth %.3f\n", yzeroaxis.l_type + 1, yzeroaxis.l_width);
@@ -933,7 +957,8 @@ static void show_yzeroaxis()
 	fputs("\ty2zeroaxis is OFF\n", stderr);
 }
 
-static void show_label(tag)
+static void
+show_label(tag)
 int tag;			/* 0 means show all */
 {
     struct text_label *this_label;
@@ -973,7 +998,8 @@ int tag;			/* 0 means show all */
 	int_error(c_token, "label not found");
 }
 
-static void show_arrow(tag)
+static void
+show_arrow(tag)
 int tag;			/* 0 means show all */
 {
     struct arrow_def *this_arrow;
@@ -999,7 +1025,8 @@ int tag;			/* 0 means show all */
 	int_error(c_token, "arrow not found");
 }
 
-static void show_linestyle(tag)
+static void
+show_linestyle(tag)
 int tag;			/* 0 means show all */
 {
     struct linestyle_def *this_linestyle;
@@ -1021,7 +1048,8 @@ int tag;			/* 0 means show all */
 	int_error(c_token, "linestyle not found");
 }
 
-static void show_grid()
+static void
+show_grid()
 {
     if (!work_grid.l_type) {
 	fputs("\tgrid is OFF\n", stderr);
@@ -1051,7 +1079,8 @@ static void show_grid()
 		angles_format == ANGLES_DEGREES ? "degrees" : "radians");
 }
 
-static void show_mtics(minitic, minifreq, name)
+static void
+show_mtics(minitic, minifreq, name)
 int minitic;
 double minifreq;
 char *name;
@@ -1074,7 +1103,8 @@ char *name;
     }
 }
 
-static void show_key()
+static void
+show_key()
 {
     char str[80];
     *str = '\0';
@@ -1121,34 +1151,39 @@ static void show_key()
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \tkey title is \"%s\"\n",
-	key_swidth,
-	key_vert_factor,
-	key_width_fix,
-	key_title);
+		    key_swidth,
+		    key_vert_factor,
+		    key_width_fix,
+		    key_title);
     }
 }
 
-static void show_parametric()
+static void
+show_parametric()
 {
     fprintf(stderr, "\tparametric is %s\n", (parametric) ? "ON" : "OFF");
 }
 
-static void show_pointsize()
+static void
+show_pointsize()
 {
     fprintf(stderr, "\tpointsize is %g\n", pointsize);
 }
 
-static void show_encoding()
+static void
+show_encoding()
 {
     fprintf(stderr, "\tencoding is %s\n", encoding_names[encoding]);
 }
 
-static void show_polar()
+static void
+show_polar()
 {
     fprintf(stderr, "\tpolar is %s\n", (polar) ? "ON" : "OFF");
 }
 
-static void show_angles()
+static void
+show_angles()
 {
     fputs("\tAngles are in ", stderr);
     switch (angles_format) {
@@ -1162,10 +1197,12 @@ static void show_angles()
 }
 
 
-static void show_tics(showx, showy, showz, showx2, showy2)
+static void
+show_tics(showx, showy, showz, showx2, showy2)
 TBOOLEAN showx, showy, showz, showx2, showy2;
 {
     char str[MAX_LINE_LEN+1];
+
     fprintf(stderr, "\ttics are %s, \
 \tticslevel is %g\n\
 \tmajor ticscale is %g and minor ticscale is %g\n",
@@ -1175,24 +1212,25 @@ TBOOLEAN showx, showy, showz, showx2, showy2;
 
     if (showx)
 	show_ticdef(xtics, FIRST_X_AXIS, &xticdef, "x", rotate_xtics,
-        conv_text(str, xformat));
+		    conv_text(str, xformat));
     if (showx2)
 	show_ticdef(x2tics, SECOND_X_AXIS, &x2ticdef, "x2", rotate_x2tics,
-        conv_text(str, x2format));
+		    conv_text(str, x2format));
     if (showy)
 	show_ticdef(ytics, FIRST_Y_AXIS, &yticdef, "y", rotate_ytics,
-        conv_text(str, yformat));
+		    conv_text(str, yformat));
     if (showy2)
 	show_ticdef(y2tics, SECOND_Y_AXIS, &y2ticdef, "y2", rotate_y2tics,
-        conv_text(str, y2format));
+		    conv_text(str, y2format));
     if (showz)
 	show_ticdef(ztics, FIRST_Z_AXIS, &zticdef, "z", rotate_ztics,
-        conv_text(str, zformat));
+		    conv_text(str, zformat));
     screen_ok = FALSE;
 }
 
 /* called by show_tics */
-static void show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
+static void
+show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
 int tics;			/* xtics ytics or ztics */
 int axis;
 struct ticdef *tdef;		/* xticdef yticdef or zticdef */
@@ -1209,17 +1247,17 @@ int rotate_tics;
 	return;
     case TICS_ON_AXIS:
 	fputs("on axis", stderr);
-        if (tics & TICS_MIRROR)
-            fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
+	if (tics & TICS_MIRROR)
+	    fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
 	fputs("on border", stderr);
-        if (tics & TICS_MIRROR)
-            fputs(" and mirrored on opposite border", stderr);
+	if (tics & TICS_MIRROR)
+	    fputs(" and mirrored on opposite border", stderr);
 	break;
     }
 
-    fprintf(stderr,"\n\t  labels are format \"%s\"", ticfmt);
+    fprintf(stderr, "\n\t  labels are format \"%s\"", ticfmt);
     if (rotate_tics)
 	fputs(", rotated in 2D mode, terminal permitting.\n\t", stderr);
     else
@@ -1278,7 +1316,8 @@ int rotate_tics;
 }
 
 
-static void show_margin()
+static void
+show_margin()
 {
     if (lmargin >= 0)
 	fprintf(stderr, "\tlmargin is set to %d\n", lmargin);
@@ -1298,7 +1337,8 @@ static void show_margin()
 	fputs("\ttmargin is computed automatically\n", stderr);
 }
 
-static void show_term()
+static void
+show_term()
 {
     if (term)
 	fprintf(stderr, "\tterminal type is %s %s\n",
@@ -1307,12 +1347,14 @@ static void show_term()
 	fputs("\tterminal type is unknown\n", stderr);
 }
 
-static void show_plot()
+static void
+show_plot()
 {
     fprintf(stderr, "\tlast plot command was: %s\n", replot_line);
 }
 
-static void show_autoscale()
+static void
+show_autoscale()
 {
     fputs("\tautoscaling is ", stderr);
     if (parametric) {
@@ -1356,7 +1398,8 @@ static void show_autoscale()
 	    (autoscale_z == 2) ? " (max)" : "");
 }
 
-static void show_clip()
+static void
+show_clip()
 {
     fprintf(stderr, "\tpoint clip is %s\n", (clip_points) ? "ON" : "OFF");
 
@@ -1371,7 +1414,8 @@ static void show_clip()
 	fputs("\tnot drawing lines between two outrange points\n", stderr);
 }
 
-static void show_mapping()
+static void
+show_mapping()
 {
     fputs("\tmapping for 3-d data is ", stderr);
 
@@ -1388,7 +1432,8 @@ static void show_mapping()
     }
 }
 
-static void show_contour()
+static void
+show_contour()
 {
     fprintf(stderr, "\tcontour for surfaces are %s",
 	    (draw_contour) ? "drawn" : "not drawn\n");
@@ -1432,8 +1477,9 @@ static void show_contour()
 		break;
 	    }
 	case LEVELS_INCREMENTAL:
-	    fprintf(stderr, "\t\t%d incremental levels starting at %g, step %g, end %g\n", contour_levels, levels_list[0], levels_list[1],
-		 levels_list[0] + (contour_levels - 1) * levels_list[1]);
+	    fprintf(stderr, "\t\t%d incremental levels starting at %g, step %g, end %g\n", contour_levels, levels_list[0],
+		    levels_list[1],
+		    levels_list[0] + (contour_levels - 1) * levels_list[1]);
 	    /* contour-levels counts both ends */
 	    break;
 	}
@@ -1442,7 +1488,8 @@ static void show_contour()
     }
 }
 
-static void show_format()
+static void
+show_format()
 {
     char str[MAX_LINE_LEN+1];
 
@@ -1456,7 +1503,8 @@ static void show_format()
 #define SHOW_LOG(FLAG, BASE, TEXT) \
 if (FLAG) fprintf(stderr, "%s %s (base %g)", !count++ ? "\tlogscaling" : " and", TEXT,BASE)
 
-static void show_logscale()
+static void
+show_logscale()
 {
     int count = 0;
 
@@ -1474,7 +1522,8 @@ static void show_logscale()
 	putc('\n', stderr);
 }
 
-static void show_variables()
+static void
+show_variables()
 {
     register struct udvt_entry *udv = first_udv;
     int len;
@@ -1499,7 +1548,8 @@ static void show_variables()
  * By adding FILE *fp, we can now use show_version()
  * to save version information to a file.
  */
-void show_version(fp)
+void
+show_version(fp)
 FILE *fp;
 {
     /* If printed to a file, we prefix everything with
@@ -1558,7 +1608,8 @@ FILE *fp;
 	    p);			/* empty line */
 }
 
-void show_version_long()
+void
+show_version_long()
 {
     char *helpfile = NULL;
 #ifdef HAVE_SYS_UTSNAME_H
@@ -1589,8 +1640,7 @@ void show_version_long()
 	/* The following code could be a lot simpler if
 	 * it wasn't for Borland's broken compiler ...
 	 */
-	const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga,
-	*nocwdrc, *x11, *unixplot, *gnugraph;
+	const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga, *nocwdrc, *x11, *unixplot, *gnugraph;
 
 	rdline =
 #ifdef READLINE
@@ -1654,7 +1704,7 @@ void show_version_long()
 #endif
 	    ;
 	fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
-	      libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
+		libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
     }
 
     if ((helpfile = getenv("GNUHELP")) == NULL) {
@@ -1671,7 +1721,8 @@ CONTACT      = <%s>\n\
 HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 }
 
-static void show_datatype(name, axis)
+static void
+show_datatype(name, axis)
 char *name;
 int axis;
 {
@@ -1680,7 +1731,7 @@ int axis;
 }
 
 char *
- conv_text(s, t)
+conv_text(s, t)
 char *s, *t;
 {
     /* convert unprintable characters as \okt, tab as \t, newline \n .. */
@@ -1726,7 +1777,8 @@ char *s, *t;
 }
 
 
-static void show_position(pos)
+static void
+show_position(pos)
 struct position *pos;
 {
     static char *msg[] =
@@ -1741,7 +1793,8 @@ struct position *pos;
 
 }
 
-static void show_missing()
+static void
+show_missing()
 {
     if (missing_val == NULL)
 	fputs("\tNo string is interpreted as missing data\n", stderr);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.31 1998/04/14 00:15:15 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.2 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -121,14 +121,16 @@ static double x_max, y_max, z_max;	/* Maximum values of x, y, and z */
 static void add_cntr_point __PROTO((double x, double y));
 static void end_crnt_cntr __PROTO((void));
 static void gen_contours __PROTO((struct edge_struct * p_edges, double z_level,
-	    double xx_min, double xx_max, double yy_min, double yy_max));
+				  double xx_min, double xx_max, double yy_min, double yy_max));
 static int update_all_edges __PROTO((struct edge_struct * p_edges,
 				     double z_level));
 static struct cntr_struct *gen_one_contour __PROTO((
-	   struct edge_struct * p_edges, double z_level, int *contr_kind,
+						       struct edge_struct * p_edges, double
+						       z_level, int *contr_kind,
 						       int *num_active));
 static struct cntr_struct *trace_contour __PROTO((
-	  struct edge_struct * pe_start, double z_level, int *num_active,
+						     struct edge_struct * pe_start, double
+						     z_level, int *num_active,
 						     int contr_kind));
 static struct cntr_struct *update_cntr_pt __PROTO((struct edge_struct * p_edge,
 						   double z_level));
@@ -137,38 +139,42 @@ static int fuzzy_equal __PROTO((struct cntr_struct * p_cntr1,
 
 
 static void gen_triangle __PROTO((int num_isolines,
-	     struct iso_curve * iso_lines, struct poly_struct ** p_polys,
+				  struct iso_curve * iso_lines, struct poly_struct ** p_polys,
 				  struct edge_struct ** p_edges));
 static void calc_min_max __PROTO((int num_isolines,
-				  struct iso_curve * iso_lines, double *xx_min, double *yy_min, double *zz_min,
-			double *xx_max, double *yy_max, double *zz_max));
+				  struct iso_curve * iso_lines, double *xx_min, double *yy_min,
+				  double *zz_min,
+				  double *xx_max, double *yy_max, double *zz_max));
 static struct edge_struct *add_edge __PROTO((struct coordinate GPHUGE * point0,
-	 struct coordinate GPHUGE * point1, struct edge_struct ** p_edge,
-					 struct edge_struct ** pe_tail));
+					     struct coordinate GPHUGE * point1, struct edge_struct
+					     ** p_edge,
+					     struct edge_struct ** pe_tail));
 static struct poly_struct *add_poly __PROTO((struct edge_struct * edge0,
-		  struct edge_struct * edge1, struct edge_struct * edge2,
-	   struct poly_struct ** p_poly, struct poly_struct ** pp_tail));
+					     struct edge_struct * edge1, struct edge_struct * edge2,
+					     struct poly_struct ** p_poly, struct poly_struct ** pp_tail));
 
 
 static void put_contour __PROTO((struct cntr_struct * p_cntr, double z_level,
-	      double xx_min, double xx_max, double yy_min, double yy_max,
+				 double xx_min, double xx_max, double yy_min, double yy_max,
 				 int contr_kind));
 static void put_contour_nothing __PROTO((struct cntr_struct * p_cntr));
 static int chk_contour_kind __PROTO((struct cntr_struct * p_cntr,
 				     int contr_kind));
 static void put_contour_cubic __PROTO((struct cntr_struct * p_cntr,
-				       double z_level, double xx_min, double xx_max, double yy_min, double yy_max,
+				       double z_level, double xx_min, double xx_max, double
+				       yy_min, double yy_max,
 				       int contr_kind));
 static void put_contour_bspline __PROTO((struct cntr_struct * p_cntr,
-					 double z_level, double xx_min, double xx_max, double yy_min, double yy_max,
+					 double z_level, double xx_min, double xx_max, double
+					 yy_min, double yy_max,
 					 int contr_kind));
 static void free_contour __PROTO((struct cntr_struct * p_cntr));
 static int count_contour __PROTO((struct cntr_struct * p_cntr));
 static int gen_cubic_spline __PROTO((int num_pts, struct cntr_struct * p_cntr,
-	    double d2x[], double d2y[], double delta_t[], int contr_kind,
+				     double d2x[], double d2y[], double delta_t[], int contr_kind,
 				     double unit_x, double unit_y));
 static void intp_cubic_spline __PROTO((int n, struct cntr_struct * p_cntr,
-	    double d2x[], double d2y[], double delta_t[], int n_intpol));
+				       double d2x[], double d2y[], double delta_t[], int n_intpol));
 static int solve_cubic_1 __PROTO((tri_diag m[], int n));
 static void solve_cubic_2 __PROTO((tri_diag m[], double x[], int n));
 /* 
@@ -176,9 +182,9 @@ static void solve_cubic_2 __PROTO((tri_diag m[], double x[], int n));
  * int n));  see "protos.h"
  */
 static void gen_bspline_approx __PROTO((struct cntr_struct * p_cntr,
-			  int num_of_points, int order, int contr_kind));
+					int num_of_points, int order, int contr_kind));
 static void eval_bspline __PROTO((double t, struct cntr_struct * p_cntr,
-	  int num_of_points, int order, int j, int contr_kind, double *x,
+				  int num_of_points, int order, int j, int contr_kind, double *x,
 				  double *y));
 static double fetch_knot __PROTO((int contr_kind, int num_of_points,
 				  int order, int i));
@@ -186,7 +192,8 @@ static double fetch_knot __PROTO((int contr_kind, int num_of_points,
 /*
  * Entry routine to this whole set of contouring module.
  */
-struct gnuplot_contours *contour(num_isolines, iso_lines, ZLevels, approx_pts, int_kind, order1, contour_levels_kind, cont_levels_list)
+struct gnuplot_contours *
+contour(num_isolines, iso_lines, ZLevels, approx_pts, int_kind, order1, contour_levels_kind, cont_levels_list)
 int num_isolines;
 struct iso_curve *iso_lines;
 int ZLevels, approx_pts, int_kind, order1, contour_levels_kind;
@@ -265,7 +272,8 @@ double *cont_levels_list;
 /*
  * Adds another point to the currently build contour.
  */
-static void add_cntr_point(x, y)
+static void
+add_cntr_point(x, y)
 double x, y;
 {
     int index;
@@ -285,7 +293,8 @@ double x, y;
 /*
  * Done with current contour - create gnuplot data structure for it.
  */
-static void end_crnt_cntr()
+static void
+end_crnt_cntr()
 {
     int i;
     struct gnuplot_contours *cntr = (struct gnuplot_contours *)
@@ -311,7 +320,8 @@ static void end_crnt_cntr()
 /*
  * Generates all contours by tracing the intersecting triangles.
  */
-static void gen_contours(p_edges, z_level, xx_min, xx_max, yy_min, yy_max)
+static void
+gen_contours(p_edges, z_level, xx_min, xx_max, yy_min, yy_max)
 struct edge_struct *p_edges;
 double z_level, xx_min, xx_max, yy_min, yy_max;
 {
@@ -336,7 +346,8 @@ double z_level, xx_min, xx_max, yy_min, yy_max;
  * as ACTIVE, and the others as INACTIVE:
  * Returns number of active edges (marked ACTIVE).
  */
-static int update_all_edges(p_edges, z_level)
+static int
+update_all_edges(p_edges, z_level)
 struct edge_struct *p_edges;
 double z_level;
 {
@@ -362,11 +373,12 @@ double z_level;
  * Returns a pointer to the contour (as linked list), contr_kind is set to
  * one of OPEN_CONTOUR, CLOSED_CONTOUR, and num_active is updated.
  */
-static struct cntr_struct *gen_one_contour(p_edges, z_level, contr_kind, num_active)
+static struct cntr_struct *
+gen_one_contour(p_edges, z_level, contr_kind, num_active)
 struct edge_struct *p_edges;	/* list of edges input */
-double z_level;	/* Z level of contour input */
-int *contr_kind;	/* OPEN_ or CLOESED_CONTOUR  in/out */
-int *num_active; /* number of active edges     in/out */
+double z_level;			/* Z level of contour input */
+int *contr_kind;		/* OPEN_ or CLOESED_CONTOUR  in/out */
+int *num_active;		/* number of active edges     in/out */
 {
     struct edge_struct *pe_temp;
 
@@ -410,11 +422,12 @@ int *num_active; /* number of active edges     in/out */
  * Returns a linked list of all the points on the contour
  * Also decreases num_active by the number of points on contour.
  */
-static struct cntr_struct *trace_contour(pe_start, z_level, num_active, contr_kind)
+static struct cntr_struct *
+trace_contour(pe_start, z_level, num_active, contr_kind)
 struct edge_struct *pe_start;	/* edge to start contour input */
-double z_level;	/* Z level of contour input */
-int *num_active;	/* number of active edges in/out */
-int contr_kind;		/* OPEN_ or CLOESED_CONTOUR    input */
+double z_level;			/* Z level of contour input */
+int *num_active;		/* number of active edges in/out */
+int contr_kind;			/* OPEN_ or CLOESED_CONTOUR    input */
 {
     struct cntr_struct *p_cntr, *pc_tail;
     struct edge_struct *p_edge, *p_next_edge;
@@ -486,7 +499,8 @@ int contr_kind;		/* OPEN_ or CLOESED_CONTOUR    input */
  * Allocates one contour location and update it to to correct position
  * according to z_level and edge p_edge.
  */
-static struct cntr_struct *update_cntr_pt(p_edge, z_level)
+static struct cntr_struct *
+update_cntr_pt(p_edge, z_level)
 struct edge_struct *p_edge;
 double z_level;
 {
@@ -514,7 +528,8 @@ double z_level;
  * Simple routine to decide if two contour points are equal by
  * calculating the relative error (< EPSILON).
  */
-static int fuzzy_equal(p_cntr1, p_cntr2)
+static int
+fuzzy_equal(p_cntr1, p_cntr2)
 struct cntr_struct *p_cntr1, *p_cntr2;
 {
     double unit_x, unit_y;
@@ -529,15 +544,15 @@ struct cntr_struct *p_cntr1, *p_cntr2;
  * Generate the triangles.
  * Returns the lists (edges & polys) via pointers to their heads.
  */
-static void gen_triangle(num_isolines, iso_lines, p_polys, p_edges)
-int num_isolines;	/* number of iso-lines input */
+static void
+gen_triangle(num_isolines, iso_lines, p_polys, p_edges)
+int num_isolines;		/* number of iso-lines input */
 struct iso_curve *iso_lines;	/* iso-lines input */
 struct poly_struct **p_polys;	/* list of polygons output */
-struct edge_struct **p_edges; /* list of edges output */
+struct edge_struct **p_edges;	/* list of edges output */
 {
     int i, j, grid_x_max = iso_lines->p_count;
-    struct edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail,
-    *pe_tail1, *pe_tail2, *pe_temp;
+    struct edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail, *pe_tail1, *pe_tail2, *pe_temp;
     struct poly_struct *pp_tail, *lower_tri, *upper_tri;
     struct coordinate GPHUGE *p_vrtx1, GPHUGE * p_vrtx2;	/* HBB 980308: need to tag *each* of them as GPHUGE! */
 
@@ -659,17 +674,18 @@ struct edge_struct **p_edges; /* list of edges output */
 /*
  * Calculate minimum and maximum values
  */
-static void calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz_max)
-int num_isolines;	/* number of iso-lines input */
+static void
+calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz_max)
+int num_isolines;		/* number of iso-lines input */
 struct iso_curve *iso_lines;	/* iso-lines input */
-double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;  /* min/max values in/out */
+double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;	/* min/max values in/out */
 {
     int i, j, grid_x_max;
     struct coordinate GPHUGE *vertex;
 
     grid_x_max = iso_lines->p_count;	/* number of vertices per iso_line */
 
-    (*xx_min) = (*yy_min) = (*zz_min) = VERYLARGE; /* clear min/max values */
+    (*xx_min) = (*yy_min) = (*zz_min) = VERYLARGE;	/* clear min/max values */
     (*xx_max) = (*yy_max) = (*zz_max) = -VERYLARGE;
 
     for (j = 0; j < num_isolines; j++) {
@@ -707,10 +723,11 @@ double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;  /* min/max values 
  * first edge and pe_tail on last one).
  * Note, the list may be empty (pe_edge==pe_tail==NULL) on entry and exit.
  */
-static struct edge_struct *add_edge(point0, point1, p_edge, pe_tail)
-struct coordinate GPHUGE * point0;	/* 2 vertices input */
-struct coordinate GPHUGE * point1;
-struct edge_struct **p_edge, **pe_tail;  /* pointers to edge list in/out */
+static struct edge_struct *
+add_edge(point0, point1, p_edge, pe_tail)
+struct coordinate GPHUGE *point0;	/* 2 vertices input */
+struct coordinate GPHUGE *point1;
+struct edge_struct **p_edge, **pe_tail;		/* pointers to edge list in/out */
 {
     struct edge_struct *pe_temp = NULL;
 
@@ -743,9 +760,10 @@ struct edge_struct **p_edge, **pe_tail;  /* pointers to edge list in/out */
  * and pp_tail on last one).
  * Note, the list may be empty (pe_ploy==pp_tail==NULL) on entry and exit.
  */
-static struct poly_struct *add_poly(edge0, edge1, edge2, p_poly, pp_tail)
+static struct poly_struct *
+add_poly(edge0, edge1, edge2, p_poly, pp_tail)
 struct edge_struct *edge0, *edge1, *edge2;	/* 3 edges input */
-struct poly_struct **p_poly, **pp_tail;	/* pointers to polygon list in/out */
+struct poly_struct **p_poly, **pp_tail;		/* pointers to polygon list in/out */
 {
     struct poly_struct *pp_temp = NULL;
 
@@ -790,10 +808,11 @@ struct poly_struct **p_poly, **pp_tail;	/* pointers to polygon list in/out */
 /*
  * Calls the (hopefully) desired interpolation/approximation routine.
  */
-static void put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
+static void
+put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
 struct cntr_struct *p_cntr;	/* contour structure input */
-double z_level,	/* Z level of contour input */
-  xx_min, xx_max, yy_min, yy_max; /* minimum/maximum values input */
+double z_level,			/* Z level of contour input */
+ xx_min, xx_max, yy_min, yy_max;	/* minimum/maximum values input */
 int contr_kind;			/* OPEN_ or CLOESED_CONTOUR input */
 {
 
@@ -821,7 +840,8 @@ int contr_kind;			/* OPEN_ or CLOESED_CONTOUR input */
  * Simply puts contour coordinates in order with no interpolation or
  * approximation.
  */
-static void put_contour_nothing(p_cntr)
+static void
+put_contour_nothing(p_cntr)
 struct cntr_struct *p_cntr;
 {
     while (p_cntr) {
@@ -837,7 +857,8 @@ struct cntr_struct *p_cntr;
  *
  */
 
-static int chk_contour_kind(p_cntr, contr_kind)
+static int
+chk_contour_kind(p_cntr, contr_kind)
 struct cntr_struct *p_cntr;
 int contr_kind;
 {
@@ -868,7 +889,8 @@ int contr_kind;
  * The spline is defined as a 2d-function s(t) = (x(t),y(t)), where the
  * parameter t is the length of the linear stroke.
  */
-static void put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
+static void
+put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
 struct cntr_struct *p_cntr;
 double z_level, xx_min, xx_max, yy_min, yy_max;
 int contr_kind;
@@ -957,7 +979,8 @@ int contr_kind;
  * interval, where the knot vector intervals are assumed to be uniform, and
  * Global variable bspline_order for the order of Bspline to use.
  */
-static void put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
+static void
+put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_kind)
 struct cntr_struct *p_cntr;
 double z_level, xx_min, xx_max, yy_min, yy_max;
 int contr_kind;
@@ -978,7 +1001,8 @@ int contr_kind;
 /*
  * Free all elements in the contour list.
  */
-static void free_contour(p_cntr)
+static void
+free_contour(p_cntr)
 struct cntr_struct *p_cntr;
 {
     struct cntr_struct *pc_temp;
@@ -993,7 +1017,8 @@ struct cntr_struct *p_cntr;
 /*
  * Counts number of points in contour.
  */
-static int count_contour(p_cntr)
+static int
+count_contour(p_cntr)
 struct cntr_struct *p_cntr;
 {
     int count = 0;
@@ -1011,13 +1036,14 @@ struct cntr_struct *p_cntr;
  * length of the linear stroke. The number of points must be at least 3.
  * Note: For CLOSED_CONTOURs the first and last point must be equal.
  */
-static int gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, contr_kind, unit_x, unit_y)
-int num_pts;	/* Number of points (num_pts>=3), input */
+static int
+gen_cubic_spline(num_pts, p_cntr, d2x, d2y, delta_t, contr_kind, unit_x, unit_y)
+int num_pts;			/* Number of points (num_pts>=3), input */
 struct cntr_struct *p_cntr;	/* List of points (x(t_i),y(t_i)), input */
-double d2x[], d2y[],	/* Second derivatives (x''(t_i),y''(t_i)), output */
-  delta_t[];	/* List of interval lengths t_{i+1}-t_{i}, output */
-int contr_kind;	/* CLOSED_CONTOUR or OPEN_CONTOUR, input  */
-double unit_x, unit_y;	/* Unit length in x and y (norm=1), input */
+double d2x[], d2y[],		/* Second derivatives (x''(t_i),y''(t_i)), output */
+ delta_t[];			/* List of interval lengths t_{i+1}-t_{i}, output */
+int contr_kind;			/* CLOSED_CONTOUR or OPEN_CONTOUR, input  */
+double unit_x, unit_y;		/* Unit length in x and y (norm=1), input */
 {
     int n, i;
     double norm;
@@ -1124,7 +1150,8 @@ double unit_x, unit_y;	/* Unit length in x and y (norm=1), input */
  * and the second derivatives d2x[] and d2y[]). The number of tabulated
  * values is n. On an equidistant grid n_intpol values are calculated.
  */
-static void intp_cubic_spline(n, p_cntr, d2x, d2y, delta_t, n_intpol)
+static void
+intp_cubic_spline(n, p_cntr, d2x, d2y, delta_t, n_intpol)
 int n;
 struct cntr_struct *p_cntr;
 double d2x[], d2y[], delta_t[];
@@ -1190,7 +1217,8 @@ int n_intpol;
  * (C is upper triangle with unit diagonal, D is diagonal) is calculated.
  * Return TRUE if decomposition exist.
  */
-static int solve_cubic_1(m, n)
+static int
+solve_cubic_1(m, n)
 tri_diag m[];
 int n;
 {
@@ -1231,7 +1259,8 @@ int n;
  * decomposition calculated above (in m[][]) and the right side b given
  * in x[]. The solution x overwrites the right side in x[].
  */
-static void solve_cubic_2(m, x, n)
+static void
+solve_cubic_2(m, x, n)
 tri_diag m[];
 double x[];
 int n;
@@ -1270,7 +1299,8 @@ int n;
  */
 /* not used any more in "contour.c", but in "spline.c" (21. Dec. 1995) ! */
 
-int solve_tri_diag(m, r, x, n)
+int
+solve_tri_diag(m, r, x, n)
 tri_diag m[];
 double r[], x[];
 int n;
@@ -1307,7 +1337,8 @@ int n;
  * It is assumed that num_of_points is at least 2, and order of Bspline is less
  * than num_of_points!
  */
-static void gen_bspline_approx(p_cntr, num_of_points, order, contr_kind)
+static void
+gen_bspline_approx(p_cntr, num_of_points, order, contr_kind)
 struct cntr_struct *p_cntr;
 int num_of_points, order, contr_kind;
 {
@@ -1375,7 +1406,8 @@ int num_of_points, order, contr_kind;
  * Returns (x, y) of approximated B-spline. Note that p_cntr points on the
  * first control point to blend with. The B-spline is of order order.
  */
-static void eval_bspline(t, p_cntr, num_of_points, order, j, contr_kind, x, y)
+static void
+eval_bspline(t, p_cntr, num_of_points, order, j, contr_kind, x, y)
 double t;
 struct cntr_struct *p_cntr;
 int num_of_points, order, j, contr_kind;
@@ -1423,7 +1455,8 @@ double *x, *y;
  * Note the knot vector is not exist and this routine simulates it existance
  * Also note the indexes for the knot vector starts from 0.
  */
-static double fetch_knot(contr_kind, num_of_points, order, i)
+static double
+fetch_knot(contr_kind, num_of_points, order, i)
 int contr_kind, num_of_points, order, i;
 {
     switch (contr_kind) {

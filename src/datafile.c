@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.42 1998/04/14 00:15:17 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.6 1999/06/09 12:10:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -249,7 +249,8 @@ extern double min_array[], max_array[];
 
 
 /*{{{  static char *df_gets() */
-static char *df_gets()
+static char *
+df_gets()
 {
     int len = 0;
 
@@ -288,7 +289,8 @@ static char *df_gets()
 /*}}} */
 
 /*{{{  static int df_tokenise(s) */
-static int df_tokenise(s)
+static int
+df_tokenise(s)
 char *s;
 {
     /* implement our own sscanf that takes 'missing' into account,
@@ -301,7 +303,10 @@ char *s;
 
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
-	    df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols)) * sizeof(df_column_struct), "datafile column");
+	    df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols += (df_max_cols <
+										    20 ? 20 :
+							df_max_cols)) * sizeof(df_column_struct),
+							"datafile column");
 
 	/* have always skipped spaces at this point */
 	df_column[df_no_cols].position = s;
@@ -331,11 +336,14 @@ char *s;
  */
 	    if (fast_columns == 0 ||
 		df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
-		  df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
-		  df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
-		  df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
-		  df_no_use_specs > 4 && (use_spec[4].column == dfncp1 ||
-					  df_no_use_specs > 5))))) ||
+					df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
+								df_no_use_specs > 2 &&
+								(use_spec[2].column == dfncp1 ||
+								 df_no_use_specs > 3 &&
+								 (use_spec[3].column == dfncp1 ||
+								  df_no_use_specs > 4 &&
+								  (use_spec[4].column == dfncp1 ||
+								   df_no_use_specs > 5))))) ||
 		df_no_use_specs == 0) {
 
 #ifndef NO_FORTRAN_NUMS
@@ -350,12 +358,12 @@ char *s;
 		/* skip any space at start of column */
 		/* HBB tells me that the cast must be to
 		 * unsigned char instead of int. */
-		while (isspace((unsigned char)*s))
+		while (isspace((unsigned char) *s))
 		    ++s;
 		count = *s ? 1 : 0;
 		/* skip chars to end of column */
 		used = 0;
-		while (!isspace((unsigned char)*s) && (*s != NUL))
+		while (!isspace((unsigned char) *s) && (*s != NUL))
 		    ++s;
 	    }
 
@@ -379,11 +387,11 @@ char *s;
 
 	++df_no_cols;
 	/*{{{  skip chars to end of column */
-	while ((!isspace((int)*s)) && (*s != '\0'))
+	while ((!isspace((int) *s)) && (*s != '\0'))
 	    ++s;
 	/*}}} */
 	/*{{{  skip spaces to start of next column */
-	while (isspace((int)*s))
+	while (isspace((int) *s))
 	    ++s;
 	/*}}} */
     }
@@ -397,7 +405,8 @@ char *s;
  * stores in same storage format as fread_matrix
  */
 
-static float **df_read_matrix(rows, cols)
+static float **
+df_read_matrix(rows, cols)
 int *rows, *cols;
 {
     int max_rows = 0;
@@ -414,7 +423,7 @@ int *rows, *cols;
 	    df_eof = 1;
 	    return rmatrix;	/* NULL if we have not read anything yet */
 	}
-	while (isspace((int)*s))
+	while (isspace((int) *s))
 	    ++s;
 
 	if (!*s || is_comment(*s)) {
@@ -462,7 +471,8 @@ int *rows, *cols;
 
 
 /*{{{  int df_open(max_using) */
-int df_open(max_using)
+int
+df_open(max_using)
 int max_using;
 
 /* open file, parsing using/thru/index stuff
@@ -483,7 +493,7 @@ int max_using;
     /*}}} */
 
     /*{{{  initialise static variables */
-    df_format[0] = NUL;	/* no format string */
+    df_format[0] = NUL;		/* no format string */
 
     df_no_use_specs = 0;
 
@@ -693,7 +703,7 @@ int max_using;
     /*}}} */
 
     /* filename cannot be static array! */
-    gp_expand_tilde (&filename);
+    gp_expand_tilde(&filename);
 
 /*{{{  open file */
 #if defined(PIPES)
@@ -704,7 +714,7 @@ int max_using;
 	    pipe_open = TRUE;
     } else
 #endif /* PIPES */
-    /* I don't want to call strcmp(). Does it make a difference? */
+	/* I don't want to call strcmp(). Does it make a difference? */
     if (*filename == '-' && strlen(filename) == 1) {
 	data_fp = lf_top();
 	if (!data_fp)
@@ -730,7 +740,8 @@ int max_using;
 /*}}} */
 
 /*{{{  void df_close() */
-void df_close()
+void
+df_close()
 {
     int i;
     /* paranoid - mark $n and column(n) as invalid */
@@ -773,7 +784,8 @@ void df_close()
  * - fill v[] based on using spec if given
  */
 
-int df_readline(v, max)
+int
+df_readline(v, max)
 double v[];
 int max;
 {
@@ -799,7 +811,7 @@ int max;
 
 	/*{{{  check for blank lines, and reject by index/every */
 	/*{{{  skip leading spaces */
-	while (isspace((int)*s))
+	while (isspace((int) *s))
 	    ++s;		/* will skip the \n too, to point at \0  */
 	/*}}} */
 
@@ -832,7 +844,6 @@ int max;
 		/* first blank line */
 		++line_count;
 	    }
-
 	    /* just reached end of a group/surface */
 	    if (blank_count == 2) {
 		++df_current_index;
@@ -905,14 +916,16 @@ int max;
 	++df_datum;
 
 	/*{{{  do a sscanf */
-	if (*df_format)	{
+	if (*df_format) {
 	    int i;
 
 	    assert(NCOL == 7);
 
 	    /* check we have room for at least 7 columns */
 	    if (df_max_cols < 7)
-		df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 7) * sizeof(df_column_struct), "datafile columns");
+		df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 7) *
+							    sizeof(df_column_struct),
+							    "datafile columns");
 
 	    df_no_cols = sscanf(line, df_format,
 				&df_column[0].datum,
@@ -1015,7 +1028,8 @@ int max;
 /*}}} */
 
 /*{{{  int df_2dbinary(this_plot) */
-int df_2dbinary(this_plot)
+int
+df_2dbinary(this_plot)
 struct curve_points *this_plot;
 {
     int_error(NO_CARET, "Binary file format for 2d data not yet defined");
@@ -1079,7 +1093,8 @@ struct curve_points *this_plot;
    does the autoscaling into the array versions (min_array[], max_array[])
  */
 
-int df_3dmatrix(this_plot)
+int
+df_3dmatrix(this_plot)
 struct surface_points *this_plot;
 {
     float GPFAR *GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
@@ -1119,7 +1134,8 @@ struct surface_points *this_plot;
 	int_error(NO_CARET, "Current implementation requires full using spec");
 
     if (df_max_cols < 3 &&
-	!(df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 3) * sizeof(df_column_struct), "datafile columns"))
+	!(df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 3) *
+						      sizeof(df_column_struct), "datafile columns"))
 	)
 	int_error(c_token, "Out of store in binary read");
 
@@ -1294,7 +1310,8 @@ struct surface_points *this_plot;
  */
 
 /*{{{  void f_dollars(x) */
-void f_dollars(x)
+void
+f_dollars(x)
 union argument *x;
 {
     int column = x->v_arg.v.int_val - 1;
@@ -1312,7 +1329,8 @@ union argument *x;
 /*}}} */
 
 /*{{{  void f_column() */
-void f_column()
+void
+f_column()
 {
     struct value a;
     int column;
@@ -1331,7 +1349,8 @@ void f_column()
 /*}}} */
 
 /*{{{  void f_valid() */
-void f_valid()
+void
+f_valid()
 {
     struct value a;
     int column, good;
@@ -1344,7 +1363,8 @@ void f_valid()
 /*}}} */
 
 /*{{{  void f_timecolumn() */
-void f_timecolumn()
+void
+f_timecolumn()
 {
     struct value a;
     int column;
@@ -1365,7 +1385,8 @@ void f_timecolumn()
 #if 0				/* not used */
 /* count columns in timefmt */
 /*{{{  static int get_time_cols(fmt) */
-static int get_time_cols(fmt)
+static int
+get_time_cols(fmt)
 char *fmt;			/* format string */
 {
     int cnt, i;
@@ -1388,7 +1409,8 @@ char *fmt;			/* format string */
 
 /* modify default use_spec, applies for no user spec and time datacolumns */
 /*{{{  static void mod_def_usespec(specno,jump) */
-static void mod_def_usespec(specno, jump)
+static void
+mod_def_usespec(specno, jump)
 int specno;			/* which spec in ?:?:? */
 int jump;			/* no of columns in timefmt (time data) */
 {
@@ -1402,13 +1424,14 @@ int jump;			/* no of columns in timefmt (time data) */
 #endif /* not used */
 
 /*{{{  static int check_missing(s) */
-static int check_missing(s)
+static int
+check_missing(s)
 char *s;
 {
     if (missing_val != NULL) {
 	int len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
-	    (isspace((int)s[len]) || !s[len])) {
+	    (isspace((int) s[len]) || !s[len])) {
 	    return (1);;	/* store undefined point in plot */
 	}
     }

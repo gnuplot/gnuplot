@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.11 1999/06/09 12:05:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -186,7 +186,8 @@ TBOOLEAN is_3d_plot = FALSE;
                         int_error (c_token, "Syntax error");
 
 /* support for dynamic size of input line */
-void extend_input_line()
+void
+extend_input_line()
 {
     if (input_line_len == 0) {
 	/* first time */
@@ -211,7 +212,8 @@ void extend_input_line()
 }
 
 
-void extend_token_table()
+void
+extend_token_table()
 {
     if (token_table_size == 0) {
 	/* first time */
@@ -225,7 +227,8 @@ void extend_token_table()
 }
 
 
-void init_memory()
+void
+init_memory()
 {
     extend_input_line();
     extend_token_table();
@@ -234,7 +237,8 @@ void init_memory()
 }
 
 
-int com_line()
+int
+com_line()
 {
     if (multiplot) {
 	/* calls int_error() if it is not happy */
@@ -262,7 +266,8 @@ int com_line()
 }
 
 
-int do_line()
+int
+do_line()
 {
     /* Line continuation has already been handled
      * by read_line() */
@@ -306,7 +311,8 @@ int do_line()
 }
 
 
-void define()
+void
+define()
 {
     register int start_token;	/* the 1st token in the function definition */
     register struct udvt_entry *udv;
@@ -348,7 +354,8 @@ void define()
 }
 
 
-static int command()
+static int
+command()
 {
     FILE *fp;
     int i;
@@ -698,14 +705,16 @@ static int command()
 }
 
 
-void done(status)
+void
+done(status)
 int status;
 {
     term_reset();
     exit(status);
 }
 
-static int changedir(path)
+static int
+changedir(path)
 char *path;
 {
 #if defined(MSDOS) || defined(WIN16) || defined(ATARI) || defined(DOS386)
@@ -755,7 +764,8 @@ char *path;
 }
 
 
-void replotrequest()
+void
+replotrequest()
 {
     if (equals(c_token, "["))
 	int_error(c_token, "cannot set range with replot");
@@ -843,7 +853,8 @@ $DESCRIPTOR(helpfile_desc, "GNUPLOT$HELP");
 /* please note that the vms version of read_line doesn't support variable line
    length (yet) */
 
-static int read_line(prompt)
+static int
+read_line(prompt)
 char *prompt;
 {
     int more, start = 0;
@@ -893,7 +904,8 @@ char *prompt;
 
 
 # ifdef NO_GIH
-static void do_help(toplevel)
+static void
+do_help(toplevel)
 int toplevel;			/* not used for VMS version */
 {
     int first = c_token;
@@ -910,14 +922,16 @@ int toplevel;			/* not used for VMS version */
 
 # endif				/* NO_GIH */
 
-static void do_shell()
+static void
+do_shell()
 {
     if ((vaxc$errno = lib$spawn()) != SS$_NORMAL) {
 	os_error(NO_CARET, "spawn error");
     }
 }
 
-static void do_system()
+static void
+do_system()
 {
     /* input_line[0] = ' ';     an embarrassment, but... */
 
@@ -940,7 +954,8 @@ static void do_system()
 #ifdef _Windows
 
 # ifdef NO_GIH
-static void do_help(toplevel)
+static void
+do_help(toplevel)
 int toplevel;			/* not used for windows */
 {
     if (END_OF_COMMAND)
@@ -972,7 +987,8 @@ int toplevel;			/* not used for windows */
  */
 
 #ifndef NO_GIH
-static void do_help(toplevel)
+static void
+do_help(toplevel)
 int toplevel;
 {
     static char *helpbuf = NULL;
@@ -1120,7 +1136,8 @@ static char strg0[256];
 static void getparms __PROTO((char *, char **));
 # endif
 
-static void do_system()
+static void
+do_system()
 {
 # ifdef AMIGA_AC_5
     getparms(input_line + 1, parms);
@@ -1159,7 +1176,8 @@ static void do_system()
  * Parses the command string (for fexecv use) and  converts the first token
  * to lower case                                                 
  *****************************************************************************/
-static void getparms(command, parms)
+static void
+getparms(command, parms)
 char *command;
 char **parms;
 {
@@ -1193,7 +1211,8 @@ char **parms;
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, int n, char *prompt));
 
-static char *rlgets(s, n, prompt)
+static char *
+rlgets(s, n, prompt)
 char *s;
 int n;
 char *prompt;
@@ -1242,7 +1261,8 @@ char *prompt;
 
 
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
-static void do_shell()
+static void
+do_shell()
 {
     if (user_shell) {
 #  if defined(_Windows)
@@ -1258,7 +1278,8 @@ static void do_shell()
 
 # elif defined(AMIGA_SC_6_1)
 
-static void do_shell()
+static void
+do_shell()
 {
     if (user_shell) {
 	if (system(user_shell))
@@ -1269,7 +1290,8 @@ static void do_shell()
 
 #  elif defined(OS2)
 
-static void do_shell()
+static void
+do_shell()
 {
     if (user_shell) {
 	if (system(user_shell) == -1)
@@ -1284,7 +1306,8 @@ static void do_shell()
 /* plain old Unix */
 
 #define EXEC "exec "
-static void do_shell()
+static void
+do_shell()
 {
     static char exec[100] = EXEC;
 
@@ -1313,7 +1336,8 @@ static void do_shell()
 /* Maurice Castro 22/5/91 */
 static char *doscgets __PROTO((char *));
 
-static char *doscgets(s)
+static char *
+doscgets(s)
 char *s;
 {
     long datseg;
@@ -1337,14 +1361,16 @@ char *s;
 #   endif			/* __TURBOC__ */
 
 #   ifdef __ZTC__
-void cputs(char *s)
+void
+cputs(char *s)
 {
     register int i = 0;
     while (s[i] != NUL)
 	bdos(0x02, s[i++], NULL);
 }
 
-char *cgets(char *s)
+char *
+cgets(char *s)
 {
     bdosx(0x0A, s, NULL);
 
@@ -1357,7 +1383,8 @@ char *cgets(char *s)
 #   endif			/* __ZTC__ */
 
 /* emulate a fgets like input function with DOS cgets */
-char *cgets_emu(str, len)
+char *
+cgets_emu(str, len)
 char *str;
 int len;
 {
@@ -1389,7 +1416,8 @@ int len;
 # endif				/* !READLINE && !HAVE_LIBREADLINE) */
 
 /* Non-VMS version */
-static int read_line(prompt)
+static int
+read_line(prompt)
 char *prompt;
 {
     int start = 0;
@@ -1458,7 +1486,8 @@ char *prompt;
 /* there is a system like call on MS Windows but it is a bit difficult to 
    use, so we will invoke the command interpreter and use it to execute the 
    commands */
-static int winsystem(char *s)
+static int
+winsystem(char *s)
 {
     LPSTR comspec;
     LPSTR execstr;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.5 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.6 1999/06/10 19:54:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -184,7 +184,8 @@ int aesid = -1;
 static TBOOLEAN pipe_open = FALSE;
 #endif /* PIPES */
 
-static void term_close_output()
+static void
+term_close_output()
 {
     FPRINTF((stderr, "term_close_output\n"));
 
@@ -220,7 +221,8 @@ static void term_close_output()
 /* assigns dest to outstr, so it must be allocated or NULL
  * and it must not be outstr itself !
  */
-void term_set_output(dest)
+void
+term_set_output(dest)
 char *dest;
 {
     FILE *f = NULL;
@@ -244,9 +246,9 @@ char *dest;
 #if defined(PIPES)
 	if (*dest == '|') {
 	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
-		    os_error(c_token, "cannot create pipe; output not changed");
-		else
-		    pipe_open = TRUE;
+		os_error(c_token, "cannot create pipe; output not changed");
+	    else
+		pipe_open = TRUE;
 	} else
 #endif /* PIPES */
 
@@ -281,7 +283,8 @@ char *dest;
     }
 }
 
-void term_init()
+void
+term_init()
 {
     FPRINTF((stderr, "term_init()\n"));
 
@@ -312,18 +315,17 @@ void term_init()
 	    fputs("Cannot reopen output file in binary", stderr);
 	/* and carry on, hoping for the best ! */
     }
-
 #if defined(MSDOS) || defined (_Windows) || defined(OS2)
 # ifdef _Windows
     else if (!outstr && (term->flags & TERM_BINARY))
 # else
     else if (!outstr && !interactive && (term->flags & TERM_BINARY))
 # endif
-    {
-        /* binary to stdout in non-interactive session... */
-        fflush(stdout);
-        setmode(fileno(stdout), O_BINARY);
-    }
+	{
+	    /* binary to stdout in non-interactive session... */
+	    fflush(stdout);
+	    setmode(fileno(stdout), O_BINARY);
+	}
 #endif
 
 
@@ -335,7 +337,8 @@ void term_init()
 }
 
 
-void term_start_plot()
+void
+term_start_plot()
 {
     FPRINTF((stderr, "term_start_plot()\n"));
 
@@ -355,7 +358,8 @@ void term_start_plot()
     }
 }
 
-void term_end_plot()
+void
+term_end_plot()
 {
     FPRINTF((stderr, "term_end_plot()\n"));
 
@@ -376,7 +380,8 @@ void term_end_plot()
 	(void) fflush(gpoutfile);
 }
 
-void term_start_multiplot()
+void
+term_start_multiplot()
 {
     FPRINTF((stderr, "term_start_multiplot()\n"));
     if (multiplot)
@@ -386,7 +391,8 @@ void term_start_multiplot()
     term_start_plot();
 }
 
-void term_end_multiplot()
+void
+term_end_multiplot()
 {
     FPRINTF((stderr, "term_end_multiplot()\n"));
     if (!multiplot)
@@ -404,7 +410,8 @@ void term_end_multiplot()
 
 
 
-static void term_suspend()
+static void
+term_suspend()
 {
     FPRINTF((stderr, "term_suspend()\n"));
     if (term_initialised && !term_suspended && term->suspend) {
@@ -414,7 +421,8 @@ static void term_suspend()
     }
 }
 
-void term_reset()
+void
+term_reset()
 {
     FPRINTF((stderr, "term_reset()\n"));
 
@@ -438,7 +446,8 @@ void term_reset()
     }
 }
 
-void term_apply_lp_properties(lp)
+void
+term_apply_lp_properties(lp)
 struct lp_style_type *lp;
 {
     /*  This function passes all the line and point properties to the
@@ -467,7 +476,8 @@ struct lp_style_type *lp;
 
 
 
-void term_check_multiplot_okay(f_interactive)
+void
+term_check_multiplot_okay(f_interactive)
 TBOOLEAN f_interactive;
 {
     FPRINTF((stderr, "term_multiplot_okay(%d)\n", f_interactive));
@@ -504,7 +514,8 @@ TBOOLEAN f_interactive;
 	int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
 }
 
-void do_point(x, y, number)
+void
+do_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -582,7 +593,8 @@ int number;
     }
 }
 
-void do_pointsize(size)
+void
+do_pointsize(size)
 double size;
 {
     term_pointsize = (size >= 0 ? size : 1);
@@ -592,7 +604,8 @@ double size;
 /*
  * general point routine
  */
-void line_and_point(x, y, number)
+void
+line_and_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -624,7 +637,8 @@ int number;
 
 #define HEAD_COEFF  (0.3)	/* default value of head/line length ratio */
 
-void do_arrow(sx, sy, ex, ey, head)
+void
+do_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy;		/* start point */
 unsigned int ex, ey;		/* end point (point of arrowhead) */
 TBOOLEAN head;
@@ -669,7 +683,8 @@ TBOOLEAN head;
 #if 0				/* oiginal routine */
 #define ROOT2 (1.41421)		/* sqrt of 2 */
 
-void org_do_arrow(sx, sy, ex, ey, head)
+void
+org_do_arrow(sx, sy, ex, ey, head)
 int sx, sy;			/* start point */
 int ex, ey;			/* end point (point of arrowhead) */
 TBOOLEAN head;
@@ -734,7 +749,8 @@ TBOOLEAN head;
 /* change angle of text.  0 is horizontal left to right.
    * 1 is vertical bottom to top (90 deg rotate)  
  */
-int null_text_angle(ang)
+int
+null_text_angle(ang)
 int ang;
 {
     return (ang == 0);
@@ -743,7 +759,8 @@ int ang;
 /* change justification of text.  
  * modes are LEFT (flush left), CENTRE (centred), RIGHT (flush right)
  */
-int null_justify_text(just)
+int
+null_justify_text(just)
 enum JUSTIFY just;
 {
     return (just == LEFT);
@@ -754,53 +771,62 @@ enum JUSTIFY just;
  * Parameters are x,y scaling factors for this plot.
  * Some terminals (eg latex) need to do scaling themselves.
  */
-int null_scale(x, y)
+int
+null_scale(x, y)
 double x;
 double y;
 {
     return FALSE;		/* can't be done */
 }
 
-int do_scale(x, y)
+int
+do_scale(x, y)
 double x;
 double y;
 {
     return TRUE;		/* can be done */
 }
 
-void options_null()
+void
+options_null()
 {
     term_options[0] = '\0';	/* we have no options */
 }
 
-void UNKNOWN_null()
+void
+UNKNOWN_null()
 {
 }
 
-void MOVE_null(x, y)
+void
+MOVE_null(x, y)
 unsigned int x, y;
 {
 }
 
-void LINETYPE_null(t)
+void
+LINETYPE_null(t)
 int t;
 {
 }
 
-void PUTTEXT_null(x, y, s)
+void
+PUTTEXT_null(x, y, s)
 unsigned int x, y;
 char *s;
 {
 }
 
 
-int set_font_null(s)
+int
+set_font_null(s)
 char *s;
 {
     return FALSE;
 }
 
-static void null_linewidth(s)
+static void
+null_linewidth(s)
 double s;
 {
 }
@@ -842,17 +868,18 @@ struct termentry term_tbl[] =
 
 #define TERMCOUNT (sizeof(term_tbl)/sizeof(struct termentry))
 
-void list_terms()
+void
+list_terms()
 {
     register int i;
     char line_buffer[BUFSIZ];
 
     StartOutput();
-    sprintf(line_buffer,"\nAvailable terminal types:\n");
+    sprintf(line_buffer, "\nAvailable terminal types:\n");
     OutLine(line_buffer);
 
     for (i = 0; i < TERMCOUNT; i++) {
-	sprintf(line_buffer,"  %15s  %s\n",
+	sprintf(line_buffer, "  %15s  %s\n",
 		term_tbl[i].name, term_tbl[i].description);
 	OutLine(line_buffer);
     }
@@ -865,7 +892,7 @@ void list_terms()
  * will change 'term' variable if successful
  */
 struct termentry *
- set_term(c_token_arg)
+set_term(c_token_arg)
 int c_token_arg;
 {
     register struct termentry *t = NULL;
@@ -889,7 +916,7 @@ int c_token_arg;
  * driver pointer
  */
 struct termentry *
- change_term(name, length)
+change_term(name, length)
 char *name;
 int length;
 {
@@ -955,7 +982,8 @@ int length;
  * or #define DEFAULTTERM myterm in term.h
  */
 /* thanks to osupyr!alden (Dave Alden) for the original GNUTERM code */
-void init_terminal()
+void
+init_terminal()
 {
     char *term_name = DEFAULTTERM;
 #if (defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
@@ -1088,7 +1116,8 @@ void init_terminal()
 
 
 #ifdef __ZTC__
-char *ztc_init()
+char *
+ztc_init()
 {
     int g_mode;
     char *term_name = NULL;
@@ -1132,7 +1161,8 @@ char *ztc_init()
    is there or not.
  */
 #if !(defined(UNIXPLOT) || defined(GNUGRAPH))
-void UP_redirect(caller)
+void
+UP_redirect(caller)
 int caller;
 {
     caller = caller;		/* to stop Turbo C complaining 
@@ -1140,7 +1170,8 @@ int caller;
 }
 
 #else /* UNIXPLOT || GNUGRAPH */
-void UP_redirect(caller)
+void
+UP_redirect(caller)
 int caller;
 /*
    Unixplot can't really write to gpoutfile--it wants to write to stdout.
@@ -1189,7 +1220,8 @@ int caller;
 
 /* test terminal by drawing border and text */
 /* called from command test */
-void test_term()
+void
+test_term()
 {
     register struct termentry *t = term;
     char *str;
@@ -1320,7 +1352,8 @@ void test_term()
    changing \n to \r\n. 
    If the output is not STDOUT, the following code reopens gpoutfile 
    with binary mode. */
-void reopen_binary()
+void
+reopen_binary()
 {
     if (outstr) {
 	(void) fclose(gpoutfile);
@@ -1366,7 +1399,7 @@ void reopen_binary()
    /* avoid duplicate warning; VWS includes these */
 #  include <descrip.h>
 #  include <ssdef.h>
-# endif /* !VWS_MAX */
+# endif				/* !VWS_MAX */
 # include <iodef.h>
 # include <ttdef.h>
 # include <tt2def.h>
@@ -1382,7 +1415,8 @@ static unsigned short chan;
 static int old_char_buf[3], cur_char_buf[3];
 $DESCRIPTOR(sysoutput_desc, "SYS$OUTPUT");
 
-char *vms_init()
+char *
+vms_init()
 /*
  *  Look first for decw$display (decterms do regis)
  *  Determine if we have a regis terminal
@@ -1407,7 +1441,8 @@ char *vms_init()
     return (NULL);
 }
 
-void vms_reset()
+void
+vms_reset()
 /* set terminal to original state */
 {
     int i;
@@ -1418,7 +1453,8 @@ void vms_reset()
     sys$dassgn(chan);
 }
 
-void term_mode_tek()
+void
+term_mode_tek()
 /* set terminal mode to tektronix */
 {
     long status;
@@ -1476,7 +1512,8 @@ void term_mode_tek()
     sys$dassgn(chan);
 }
 
-void term_mode_native()
+void
+term_mode_native()
 /* set terminal mode back to native */
 {
     int i;
@@ -1489,7 +1526,8 @@ void term_mode_native()
     sys$dassgn(chan);
 }
 
-void term_pasthru()
+void
+term_pasthru()
 /* set terminal mode pasthru */
 {
     if (gpoutfile != stdout)
@@ -1500,7 +1538,8 @@ void term_pasthru()
     sys$dassgn(chan);
 }
 
-void term_nopasthru()
+void
+term_nopasthru()
 /* set terminal mode nopasthru */
 {
     if (gpoutfile != stdout)
@@ -1511,7 +1550,8 @@ void term_nopasthru()
     sys$dassgn(chan);
 }
 
-void fflush_binary()
+void
+fflush_binary()
 {
     typedef short int INT16;	/* signed 16-bit integers */
     register INT16 k;		/* loop index */

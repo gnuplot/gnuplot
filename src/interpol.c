@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.29 1998/04/14 00:15:45 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.3 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -182,7 +182,9 @@ static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
 static double *cp_binomial __PROTO((int points));
 GP_INLINE static double s_pow __PROTO((double base, unsigned int exponent));
-static void eval_bezier __PROTO((struct curve_points * cp, int first_point, int num_points, double sr, coordval * px, coordval * py, double *c));
+static void eval_bezier __PROTO((struct curve_points * cp, int first_point,
+				 int num_points, double sr, coordval * px,
+				 coordval *py, double *c));
 static void do_bezier __PROTO((struct curve_points * cp, double *bc, int first_point, int num_points, struct coordinate * dest));
 static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n));
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
@@ -199,7 +201,8 @@ static int compare_points __PROTO((struct coordinate * p1, struct coordinate * p
  * to plot->p_count and 0 is returned
  */
 
-static int next_curve(plot, curve_start)
+static int
+next_curve(plot, curve_start)
 struct curve_points *plot;
 int *curve_start;
 {
@@ -213,7 +216,7 @@ int *curve_start;
     curve_length = 0;
     /* curve_length is first used as an offset, then the correkt # points */
     while ((*curve_start) + curve_length < plot->p_count
-      && plot->points[(*curve_start) + curve_length].type != UNDEFINED) {
+	   && plot->points[(*curve_start) + curve_length].type != UNDEFINED) {
 	curve_length++;
     };
     return (curve_length);
@@ -225,7 +228,8 @@ int *curve_start;
  * UNDEFINED points
  */
 
-static int num_curves(plot)
+static int
+num_curves(plot)
 struct curve_points *plot;
 {
     int curves;
@@ -265,7 +269,8 @@ struct curve_points *plot;
  *   and stores them into an array which is hooked to sdat.
  * (MGR 1992)
  */
-static double *cp_binomial(points)
+static double *
+cp_binomial(points)
 int points;
 {
     register double *coeff;
@@ -282,7 +287,7 @@ int points;
     coeff[0] = 0.0;
 
     for (k = 0; k < e; k++) {
-	coeff[k + 1] = coeff[k] + log(((double) (n-k)) / ((double) (k+1)));
+	coeff[k + 1] = coeff[k] + log(((double) (n - k)) / ((double) (k + 1)));
     }
 
     for (k = n; k >= e; k--)
@@ -303,7 +308,8 @@ int points;
  * and it handles zeroes correctly - there had been some trouble with TC
  */
 
-GP_INLINE static double s_pow(base, exponent)
+GP_INLINE static double
+s_pow(base, exponent)
 double base;
 unsigned int exponent;
 {
@@ -334,7 +340,8 @@ unsigned int exponent;
 }
 
 
-static void eval_bezier(cp, first_point, num_points, sr, px, py, c)
+static void
+eval_bezier(cp, first_point, num_points, sr, px, py, c)
 struct curve_points *cp;
 int first_point;		/* where to start in plot->points (to find x-range) */
 int num_points;			/* to determine end in plot->points */
@@ -356,17 +363,17 @@ double *c;
 	*px = this_points[n].x;
 	*py = this_points[n].y;
     } else {
-        /* HBB 990205: do calculation in 'logarithmic space',
-         * to avoid over/underflow errors, which would exactly cancel
-         * out each other, anyway, in an exact calculation
-         */
+	/* HBB 990205: do calculation in 'logarithmic space',
+	 * to avoid over/underflow errors, which would exactly cancel
+	 * out each other, anyway, in an exact calculation
+	 */
 	unsigned int i;
 	double lx = 0.0, ly = 0.0;
-	double log_dsr_to_the_n = n * log(1 -sr);
+	double log_dsr_to_the_n = n * log(1 - sr);
 	double log_sr_over_dsr = log(sr) - log(1 - sr);
 
 	for (i = 0; i <= n; i++) {
-            double u = exp(c[i] + log_dsr_to_the_n + i * log_sr_over_dsr);
+	    double u = exp(c[i] + log_dsr_to_the_n + i * log_sr_over_dsr);
 
 	    lx += this_points[i].x * u;
 	    ly += this_points[i].y * u;
@@ -382,7 +389,8 @@ double *c;
  * set it to the plot
  */
 
-static void do_bezier(cp, bc, first_point, num_points, dest)
+static void
+do_bezier(cp, bc, first_point, num_points, dest)
 struct curve_points *cp;
 double *bc;
 int first_point;		/* where to start in plot->points */
@@ -470,7 +478,8 @@ struct coordinate *dest;	/* where to put the interpolated data */
  * \                           m(n-3)0 m(n-2)1 m(n-1)2 /   \x(n-1)/   \r(n-1)/
  * 
  */
-static int solve_five_diag(m, r, x, n)
+static int
+solve_five_diag(m, r, x, n)
 five_diag m[];
 double r[], x[];
 int n;
@@ -530,7 +539,8 @@ int n;
  *         
  * Returns matrix of spline coefficients
  */
-static spline_coeff *cp_approx_spline(plot, first_point, num_points)
+static spline_coeff *
+cp_approx_spline(plot, first_point, num_points)
 struct curve_points *plot;
 int first_point;		/* where to start in plot->points */
 int num_points;			/* to determine end in plot->points */
@@ -669,7 +679,8 @@ int num_points;			/* to determine end in plot->points */
  *         
  * Returns matrix of spline coefficients
  */
-static spline_coeff *cp_tridiag(plot, first_point, num_points)
+static spline_coeff *
+cp_tridiag(plot, first_point, num_points)
 struct curve_points *plot;
 int first_point, num_points;
 {
@@ -770,7 +781,8 @@ int first_point, num_points;
     return (sc);
 }
 
-static void do_cubic(plot, sc, first_point, num_points, dest)
+static void
+do_cubic(plot, sc, first_point, num_points, dest)
 struct curve_points *plot;	/* still containes old plot->points */
 spline_coeff *sc;		/* generated by cp_tridiag */
 int first_point;		/* where to start in plot->points */
@@ -861,7 +873,8 @@ struct coordinate *dest;	/* where to put the interpolated data */
  * but I'm not too happy with it.
  */
 
-void gen_interp(plot)
+void
+gen_interp(plot)
 struct curve_points *plot;
 {
 
@@ -923,7 +936,8 @@ struct curve_points *plot;
  * (MGR 1992)
  */
 
-static int compare_points(p1, p2)
+static int
+compare_points(p1, p2)
 struct coordinate *p1;
 struct coordinate *p2;
 {
@@ -934,7 +948,8 @@ struct coordinate *p2;
     return (0);
 }
 
-void sort_points(plot)
+void
+sort_points(plot)
 struct curve_points *plot;
 {
     int first_point, num_points;
@@ -957,7 +972,8 @@ struct curve_points *plot;
  * MGR Addendum
  */
 
-void cp_implode(cp)
+void
+cp_implode(cp)
 struct curve_points *cp;
 {
     int first_point, num_points;

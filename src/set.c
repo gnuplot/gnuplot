@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.11 1999/06/09 12:10:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.12 1999/06/10 19:54:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -258,16 +258,20 @@ struct text_label *first_label = NULL;
 struct arrow_def *first_arrow = NULL;
 struct linestyle_def *first_linestyle = NULL;
 
-int lmargin = -1;		/* space between left edge and xleft in chars (-1: computed) */
-int bmargin = -1;		/* space between bottom and ybot in chars (-1: computed) */
-int rmargin = -1;		/* space between right egde and xright in chars (-1: computed) */
-int tmargin = -1;		/* space between top egde and ytop in chars (-1: computed) */
+/* space between left edge and xleft in chars (-1: computed) */
+int lmargin = -1;
+/* space between bottom and ybot in chars (-1: computed) */
+int bmargin = -1;
+/* space between right egde and xright in chars (-1: computed) */
+int rmargin = -1;
+/* space between top egde and ytop in chars (-1: computed) */
+int tmargin = -1;
 
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
 
 /* date&time language conversions */
-				 /* extern struct dtconv *dtc; *//* HBB 980317: unused and not defined anywhere !? */
+/* extern struct dtconv *dtc; *//* HBB 980317: unused and not defined anywhere !? */
 
 /*** other things we need *****/
 
@@ -359,7 +363,8 @@ do{if ( datatype[axis] == TIME && isstring(c_token) ) { \
   }}while(0)
 
 /******** The 'reset' command ********/
-void reset_command()
+void
+reset_command()
 {
     register struct curve_points *f_p = first_plot;
     register struct surface_points *f_3dp = first_3dplot;
@@ -583,7 +588,8 @@ void reset_command()
 }
 
 /******** The 'set' command ********/
-void set_command()
+void
+set_command()
 {
     static char GPFAR setmess[] = SETSHOWMSG;
 
@@ -2017,19 +2023,18 @@ else if (almost_equals(c_token, STRING)) { \
  *  in other code ( e.g. for  'if (xtics)', use 'if (xtics > 0)'
  */
 
-static int set_tic_prop(TICS, MTICS, FREQ, tdef, AXIS, ROTATE, tic_side)
 /*    generates PROCESS_TIC_PROP strings from tic_side, e.g. "x2" 
-   STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI
-   "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics" 
+ *  STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI
+ *  "nox2t$ics"     "nox2m$tics"  "nox2d$tics"    "nomx2t$ics" 
  */
 
+static int
+set_tic_prop(TICS, MTICS, FREQ, tdef, AXIS, ROTATE, tic_side)
 int *TICS, *MTICS, AXIS;
 double *FREQ;
 struct ticdef *tdef;
 TBOOLEAN *ROTATE;
 char *tic_side;
-
-
 {
     int match = 0;		/* flag, set by matching a tic command */
     char nocmd[12];		/* fill w/ "no"+'tic_side'+suffix */
@@ -2154,7 +2159,8 @@ char *tic_side;
 
 /* process a 'set {x/y/z}label command */
 /* set {x/y/z}label {label_text} {x}{,y} */
-static void set_xyzlabel(label)
+static void
+set_xyzlabel(label)
 label_struct *label;
 {
     c_token++;
@@ -2202,7 +2208,8 @@ label_struct *label;
 /* process a 'set label' command */
 /* set label {tag} {label_text} {at x,y} {pos} {font name,size} */
 /* Entry font added by DJL */
-static void set_label()
+static void
+set_label()
 {
     struct value a;
     struct text_label *this_label = NULL;
@@ -2387,7 +2394,8 @@ static void set_label()
 
 /* process 'set nolabel' command */
 /* set nolabel {tag} */
-static void set_nolabel()
+static void
+set_nolabel()
 {
     struct value a;
     struct text_label *this_label;
@@ -2419,7 +2427,8 @@ static void set_nolabel()
  * labels are kept sorted by tag number, so this is easy
  * returns the lowest unassigned tag number
  */
-static int assign_label_tag()
+static int
+assign_label_tag()
 {
     struct text_label *this_label;
     int last = 0;		/* previous tag value */
@@ -2440,7 +2449,8 @@ static int assign_label_tag()
  * If there is no previous label (the label to delete is
  * first_label) then call with prev = NULL.
  */
-static void delete_label(prev, this)
+static void
+delete_label(prev, this)
 struct text_label *prev, *this;
 {
     if (this != NULL) {		/* there really is something to delete */
@@ -2457,7 +2467,8 @@ struct text_label *prev, *this;
 
 /* process a 'set arrow' command */
 /* set arrow {tag} {from x,y} {to x,y} {{no}head} */
-static void set_arrow()
+static void
+set_arrow()
 {
     struct value a;
     struct arrow_def *this_arrow = NULL;
@@ -2605,7 +2616,8 @@ static void set_arrow()
 
 /* process 'set noarrow' command */
 /* set noarrow {tag} */
-static void set_noarrow()
+static void
+set_noarrow()
 {
     struct value a;
     struct arrow_def *this_arrow;
@@ -2637,7 +2649,8 @@ static void set_noarrow()
  * arrows are kept sorted by tag number, so this is easy
  * returns the lowest unassigned tag number
  */
-static int assign_arrow_tag()
+static int
+assign_arrow_tag()
 {
     struct arrow_def *this_arrow;
     int last = 0;		/* previous tag value */
@@ -2658,7 +2671,8 @@ static int assign_arrow_tag()
  * If there is no previous arrow (the arrow to delete is
  * first_arrow) then call with prev = NULL.
  */
-static void delete_arrow(prev, this)
+static void
+delete_arrow(prev, this)
 struct arrow_def *prev, *this;
 {
     if (this != NULL) {		/* there really is something to delete */
@@ -2673,7 +2687,8 @@ struct arrow_def *prev, *this;
 /* ======================================================== */
 /* process a 'set linestyle' command */
 /* set linestyle {tag} {linetype n} {linewidth x} {pointtype n} {pointsize x} */
-static void set_linestyle()
+static void
+set_linestyle()
 {
     struct value a;
     struct linestyle_def *this_linestyle = NULL;
@@ -2729,7 +2744,8 @@ static void set_linestyle()
 
 /* process 'set nolinestyle' command */
 /* set nolinestyle {tag} */
-static void set_nolinestyle()
+static void
+set_nolinestyle()
 {
     struct value a;
     struct linestyle_def *this, *prev;
@@ -2760,7 +2776,8 @@ static void set_nolinestyle()
  * linestyles are kept sorted by tag number, so this is easy
  * returns the lowest unassigned tag number
  */
-static int assign_linestyle_tag()
+static int
+assign_linestyle_tag()
 {
     struct linestyle_def *this;
     int last = 0;		/* previous tag value */
@@ -2780,7 +2797,8 @@ static int assign_linestyle_tag()
  * If there is no previous linestyle (the linestyle to delete is
  * first_linestyle) then call with prev = NULL.
  */
-static void delete_linestyle(prev, this)
+static void
+delete_linestyle(prev, this)
 struct linestyle_def *prev, *this;
 {
     if (this != NULL) {		/* there really is something to delete */
@@ -2796,7 +2814,8 @@ struct linestyle_def *prev, *this;
  * auxiliary functions for the `set linestyle` command
  */
 
-void lp_use_properties(lp, tag, pointflag)
+void
+lp_use_properties(lp, tag, pointflag)
 struct lp_style_type *lp;
 int tag, pointflag;
 {
@@ -2825,9 +2844,10 @@ int tag, pointflag;
     int_error(NO_CARET,"linestyle not found", NO_CARET);
 }
 
-/* ======================================================== */
 
-enum PLOT_STYLE /* not static; used by command.c */ get_style()
+/* not static; used by command.c */
+enum PLOT_STYLE
+get_style()
 {
     /* HBB: initial value, for 'gcc -Wall */
     register enum PLOT_STYLE ps = LINES;
@@ -2892,7 +2912,8 @@ enum PLOT_STYLE /* not static; used by command.c */ get_style()
 }
 
 /* For set [xy]tics... command */
-static void load_tics(axis, tdef)
+static void
+load_tics(axis, tdef)
 int axis;
 struct ticdef *tdef;		/* change this ticdef */
 {
@@ -2909,7 +2930,8 @@ struct ticdef *tdef;		/* change this ticdef */
  * where tic is ["string"] value
  * Left paren is already scanned off before entry.
  */
-static void load_tic_user(axis, tdef)
+static void
+load_tic_user(axis, tdef)
 int axis;
 struct ticdef *tdef;
 {
@@ -2976,7 +2998,8 @@ struct ticdef *tdef;
     tdef->def.user = list;
 }
 
-static void free_marklist(list)
+static void
+free_marklist(list)
 struct ticmark *list;
 {
     register struct ticmark *freeable;
@@ -2992,7 +3015,8 @@ struct ticmark *list;
 
 /* load TIC_SERIES definition */
 /* [start,]incr[,end] */
-static void load_tic_series(axis, tdef)
+static void
+load_tic_series(axis, tdef)
 int axis;
 struct ticdef *tdef;
 {
@@ -3056,7 +3080,8 @@ struct ticdef *tdef;
     tdef->def.series.end = end;
 }
 
-static void load_offsets(a, b, c, d)
+static void
+load_offsets(a, b, c, d)
 double *a, *b, *c, *d;
 {
     struct value t;
@@ -3117,7 +3142,8 @@ TBOOLEAN autosc;
  * ie more than one %{efg}, or %something-else
  */
 
-static int looks_like_numeric(format)
+static int
+looks_like_numeric(format)
 char *format;
 {
     if (!(format = strchr(format, '%')))
@@ -3152,7 +3178,8 @@ do{if (axes >= 0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
  * parses first/second/graph/screen keyword
  */
 
-static void get_position_type(type, axes)
+static void
+get_position_type(type, axes)
 enum position_type *type;
 int *axes;
 {
@@ -3184,7 +3211,8 @@ int *axes;
 
 /* get_position() - reads a position for label,arrow,key,... */
 
-static void get_position(pos)
+static void
+get_position(pos)
 struct position *pos;
 {
     int axes;
@@ -3212,7 +3240,8 @@ struct position *pos;
     }
 }
 
-static void set_lp_properties(arg, allow_points, lt, pt, lw, ps)
+static void
+set_lp_properties(arg, allow_points, lt, pt, lw, ps)
 struct lp_style_type *arg;
 int allow_points, lt, pt;
 double lw, ps;
@@ -3224,7 +3253,8 @@ double lw, ps;
     arg->p_size = ps;
 }
 
-static void reset_lp_properties(arg)
+static void
+reset_lp_properties(arg)
 struct lp_style_type *arg;
 {
     /* See plot.h for struct lp_style_type */
@@ -3232,7 +3262,8 @@ struct lp_style_type *arg;
     arg->l_width = arg->p_size = 1.0;
 }
 
-static void set_locale(lcl)
+static void
+set_locale(lcl)
 char *lcl;
 {
 #ifndef NO_LOCALE_H

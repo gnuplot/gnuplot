@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.24 1998/04/14 00:16:21 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.3 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -482,601 +482,649 @@ static double GPFAR qyone[] = {
 
 #endif /* (ATARI || MTOS) && __PUREC__ */
 
-void f_real()
+void
+f_real()
 {
-struct value a;
-	push( Gcomplex(&a,real(pop(&a)), 0.0) );
+    struct value a;
+    push(Gcomplex(&a, real(pop(&a)), 0.0));
 }
 
-void f_imag()
+void
+f_imag()
 {
-struct value a;
-	push( Gcomplex(&a,imag(pop(&a)), 0.0) );
+    struct value a;
+    push(Gcomplex(&a, imag(pop(&a)), 0.0));
 }
 
 
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
 
-void f_arg()
+void
+f_arg()
 {
-struct value a;
-	push( Gcomplex(&a,angle(pop(&a))/ang2rad, 0.0) );
+    struct value a;
+    push(Gcomplex(&a, angle(pop(&a)) / ang2rad, 0.0));
 }
 
-void f_conjg()
+void
+f_conjg()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,real(&a),-imag(&a) ));
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, real(&a), -imag(&a)));
 }
 
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
 
-void f_sin()
+void
+f_sin()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,sin(ang2rad*real(&a))*cosh(ang2rad*imag(&a)), cos(ang2rad*real(&a))*sinh(ang2rad*imag(&a))) );
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, sin(ang2rad * real(&a)) * cosh(ang2rad * imag(&a)), cos(ang2rad * real(&a)) * sinh(ang2rad * imag(&a))));
 }
 
-void f_cos()
+void
+f_cos()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,cos(ang2rad*real(&a))*cosh(ang2rad*imag(&a)), -sin(ang2rad*real(&a))*sinh(ang2rad*imag(&a))));
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, cos(ang2rad * real(&a)) * cosh(ang2rad * imag(&a)), -sin(ang2rad * real(&a)) * sinh(ang2rad * imag(&a))));
 }
 
-void f_tan()
+void
+f_tan()
 {
-struct value a;
-register double den;
-	(void) pop(&a);
-	if (imag(&a) == 0.0)
-		push( Gcomplex(&a,tan(ang2rad*real(&a)),0.0) );
-	else {
-		den = cos(2*ang2rad*real(&a))+cosh(2*ang2rad*imag(&a));
-		if (den == 0.0) {
-			undefined = TRUE;
-			push( &a );
-		}
-		else
-			push( Gcomplex(&a,sin(2*ang2rad*real(&a))/den, sinh(2*ang2rad*imag(&a))/den) );
-	}
+    struct value a;
+    register double den;
+    (void) pop(&a);
+    if (imag(&a) == 0.0)
+	push(Gcomplex(&a, tan(ang2rad * real(&a)), 0.0));
+    else {
+	den = cos(2 * ang2rad * real(&a)) + cosh(2 * ang2rad * imag(&a));
+	if (den == 0.0) {
+	    undefined = TRUE;
+	    push(&a);
+	} else
+	    push(Gcomplex(&a, sin(2 * ang2rad * real(&a)) / den, sinh(2 * ang2rad * imag(&a)) / den));
+    }
 }
 
-void f_asin()
+void
+f_asin()
 {
-struct value a;
-register double alpha, beta, x, y;
-	(void) pop(&a);
-	x = real(&a); y = imag(&a);
-	if (y == 0.0 && fabs(x) <= 1.0) {
-		push( Gcomplex(&a,asin(x)/ang2rad,0.0) );
-	} else if (x == 0.0) {
-		push( Gcomplex(&a, 0.0, -log(-y+sqrt(y*y+1))/ang2rad) );
+    struct value a;
+    register double alpha, beta, x, y;
+    (void) pop(&a);
+    x = real(&a);
+    y = imag(&a);
+    if (y == 0.0 && fabs(x) <= 1.0) {
+	push(Gcomplex(&a, asin(x) / ang2rad, 0.0));
+    } else if (x == 0.0) {
+	push(Gcomplex(&a, 0.0, -log(-y + sqrt(y * y + 1)) / ang2rad));
+    } else {
+	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	if (beta > 1)
+	    beta = 1;		/* Avoid rounding error problems */
+	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	push(Gcomplex(&a, asin(beta) / ang2rad, -log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+    }
+}
+
+void
+f_acos()
+{
+    struct value a;
+    register double x, y;
+    (void) pop(&a);
+    x = real(&a);
+    y = imag(&a);
+    if (y == 0.0 && fabs(x) <= 1.0) {
+	/* real result */
+	push(Gcomplex(&a, acos(x) / ang2rad, 0.0));
+    } else {
+	double alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	double beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	if (beta > 1)
+	    beta = 1;		/* Avoid rounding error problems */
+	else if (beta < -1)
+	    beta = -1;
+	push(Gcomplex(&a, acos(beta) / ang2rad, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+    }
+}
+
+void
+f_atan()
+{
+    struct value a;
+    register double x, y, u, v, w, z;
+    (void) pop(&a);
+    x = real(&a);
+    y = imag(&a);
+    if (y == 0.0)
+	push(Gcomplex(&a, atan(x) / ang2rad, 0.0));
+    else if (x == 0.0 && fabs(y) >= 1.0) {
+	undefined = TRUE;
+	push(Gcomplex(&a, 0.0, 0.0));
+    } else {
+	if (x >= 0) {
+	    u = x;
+	    v = y;
 	} else {
-		beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
-		if (beta > 1) beta = 1;	/* Avoid rounding error problems */
-		alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
-		push( Gcomplex(&a,asin(beta)/ang2rad, -log(alpha + sqrt(alpha*alpha-1))/ang2rad) );
+	    u = -x;
+	    v = -y;
 	}
-}
 
-void f_acos()
-{
-struct value a;
-register double x, y;
-	(void) pop(&a);
-	x = real(&a); y = imag(&a);
-	if (y == 0.0 && fabs(x) <= 1.0) {
-			/* real result */
-			push( Gcomplex(&a,acos(x)/ang2rad,0.0) );
-	} else { 
-		double alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
-		double beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
-		if (beta > 1)
-			beta = 1;	/* Avoid rounding error problems */
-		else if (beta < -1)
-			beta = -1;
-		push( Gcomplex(&a,acos(beta)/ang2rad, log(alpha + sqrt(alpha*alpha-1))/ang2rad));
+	z = atan(2 * u / (1 - u * u - v * v));
+	w = log((u * u + (v + 1) * (v + 1)) / (u * u + (v - 1) * (v - 1))) / 4;
+	if (z < 0)
+	    z = z + 2 * PI_ON_TWO;
+	if (x < 0) {
+	    z = -z;
+	    w = -w;
 	}
-}
-
-void f_atan()
-{
-struct value a;
-register double x, y, u, v, w, z;
-	(void) pop(&a);
-	x = real(&a); y = imag(&a);
-	if (y == 0.0)
-		push( Gcomplex(&a,atan(x)/ang2rad, 0.0) );
-	else if (x == 0.0 && fabs(y) >= 1.0) {
-		undefined = TRUE;
-		push(Gcomplex(&a,0.0, 0.0));
-	} else {
-	        if (x >= 0) {
-		        u = x;
-			v = y;
-		} else {
-		        u = -x;
-			v = -y;
-		}
-		
-	        z = atan(2*u/(1-u*u-v*v));
-		w = log((u*u+(v+1)*(v+1))/(u*u+(v-1)*(v-1)))/4;
-		if (z < 0)
-		        z = z + 2*PI_ON_TWO;
-		if (x < 0) {
-		        z = -z;
-			w = -w;
-		}
-		push( Gcomplex(&a,0.5*z/ang2rad, w) );
-	}
+	push(Gcomplex(&a, 0.5 * z / ang2rad, w));
+    }
 }
 
 /* real parts only */
-void f_atan2()
+void
+f_atan2()
 {
-  struct value a;
-  double x;
-  double y;
+    struct value a;
+    double x;
+    double y;
 
-  x = real(pop(&a));
-  y = real(pop(&a));
+    x = real(pop(&a));
+    y = real(pop(&a));
 
-  if (x == 0.0 && y == 0.0) {
-    undefined = TRUE;
-    push(Ginteger(&a,0));
-  }
-  push(Gcomplex(&a,atan2(y,x)/ang2rad,0.0));
+    if (x == 0.0 && y == 0.0) {
+	undefined = TRUE;
+	push(Ginteger(&a, 0));
+    }
+    push(Gcomplex(&a, atan2(y, x) / ang2rad, 0.0));
 }
 
 
-void f_sinh()
+void
+f_sinh()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,sinh(real(&a))*cos(imag(&a)), cosh(real(&a))*sin(imag(&a))) );
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, sinh(real(&a)) * cos(imag(&a)), cosh(real(&a)) * sin(imag(&a))));
 }
 
-void f_cosh()
+void
+f_cosh()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,cosh(real(&a))*cos(imag(&a)), sinh(real(&a))*sin(imag(&a))) );
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, cosh(real(&a)) * cos(imag(&a)), sinh(real(&a)) * sin(imag(&a))));
 }
 
-void f_tanh()
+void
+f_tanh()
 {
-struct value a;
-register double den;
-	(void) pop(&a);
-	den = cosh(2*real(&a)) + cos(2*imag(&a));
-	push( Gcomplex(&a,sinh(2*real(&a))/den, sin(2*imag(&a))/den) );
+    struct value a;
+    register double den;
+    (void) pop(&a);
+    den = cosh(2 * real(&a)) + cos(2 * imag(&a));
+    push(Gcomplex(&a, sinh(2 * real(&a)) / den, sin(2 * imag(&a)) / den));
 }
 
-void f_asinh()
+void
+f_asinh()
 {
-struct value a;                          /* asinh(z) = -I*asin(I*z) */
-register double alpha, beta, x, y;
-	(void) pop(&a);
-	x = -imag(&a); y = real(&a);
-	if (y == 0.0 && fabs(x) <= 1.0) {
-	        push( Gcomplex(&a, 0.0, -asin(x)/ang2rad) );
-	} else if (y == 0.0) {
-	        push( Gcomplex(&a, 0.0, 0.0) );
-		undefined = TRUE;
-	} else if (x == 0.0) {
-	        push( Gcomplex(&a, log(y+sqrt(y*y+1))/ang2rad, 0.0) );
+    struct value a;		/* asinh(z) = -I*asin(I*z) */
+    register double alpha, beta, x, y;
+    (void) pop(&a);
+    x = -imag(&a);
+    y = real(&a);
+    if (y == 0.0 && fabs(x) <= 1.0) {
+	push(Gcomplex(&a, 0.0, -asin(x) / ang2rad));
+    } else if (y == 0.0) {
+	push(Gcomplex(&a, 0.0, 0.0));
+	undefined = TRUE;
+    } else if (x == 0.0) {
+	push(Gcomplex(&a, log(y + sqrt(y * y + 1)) / ang2rad, 0.0));
+    } else {
+	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, -asin(beta) / ang2rad));
+    }
+}
+
+void
+f_acosh()
+{
+    struct value a;
+    register double alpha, beta, x, y;	/* acosh(z) = I*acos(z) */
+    (void) pop(&a);
+    x = real(&a);
+    y = imag(&a);
+    if (y == 0.0 && fabs(x) <= 1.0) {
+	push(Gcomplex(&a, 0.0, acos(x) / ang2rad));
+    } else if (y == 0) {
+	push(Gcomplex(&a, log(x + sqrt(x * x - 1)) / ang2rad, 0.0));
+    } else {
+	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, acos(beta) / ang2rad));
+    }
+}
+
+void
+f_atanh()
+{
+    struct value a;
+    register double x, y, u, v, w, z;	/* atanh(z) = -I*atan(I*z) */
+    (void) pop(&a);
+    x = -imag(&a);
+    y = real(&a);
+    if (y == 0.0)
+	push(Gcomplex(&a, 0.0, -atan(x) / ang2rad));
+    else if (x == 0.0 && fabs(y) >= 1.0) {
+	undefined = TRUE;
+	push(Gcomplex(&a, 0.0, 0.0));
+    } else {
+	if (x >= 0) {
+	    u = x;
+	    v = y;
 	} else {
-		beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
-		alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
-		push( Gcomplex(&a, log(alpha + sqrt(alpha*alpha-1))/ang2rad, -asin(beta)/ang2rad) );
+	    u = -x;
+	    v = -y;
 	}
-}
 
-void f_acosh()
-{
-struct value a;
-register double alpha, beta, x, y;        /* acosh(z) = I*acos(z) */
-	(void) pop(&a);
-	x = real(&a); y = imag(&a);
-	if (y == 0.0 && fabs(x) <= 1.0) {
-		push( Gcomplex(&a, 0.0, acos(x)/ang2rad) );
-	} else if (y == 0) {
-	        push( Gcomplex(&a, log(x+sqrt(x*x-1))/ang2rad, 0.0) );
-	} else {
-		alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
-		beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
-		push( Gcomplex(&a, log(alpha + sqrt(alpha*alpha-1))/ang2rad, acos(beta)/ang2rad));
+	z = atan(2 * u / (1 - u * u - v * v));
+	w = log((u * u + (v + 1) * (v + 1)) / (u * u + (v - 1) * (v - 1))) / 4;
+	if (z < 0)
+	    z = z + 2 * PI_ON_TWO;
+	if (x < 0) {
+	    z = -z;
+	    w = -w;
 	}
+	push(Gcomplex(&a, w, -0.5 * z / ang2rad));
+    }
 }
 
-void f_atanh()
+void
+f_int()
 {
-struct value a;
-register double x, y, u, v, w, z;        /* atanh(z) = -I*atan(I*z) */
-	(void) pop(&a);
-	x = -imag(&a); y = real(&a);
-	if (y == 0.0)
-		push( Gcomplex(&a, 0.0, -atan(x)/ang2rad) );
-	else if (x == 0.0 && fabs(y) >= 1.0) {
-		undefined = TRUE;
-		push(Gcomplex(&a,0.0, 0.0));
-	} else {
-	        if (x >= 0) {
-		        u = x;
-			v = y;
-		} else {
-		        u = -x;
-			v = -y;
-		}
-		
-	        z = atan(2*u/(1-u*u-v*v));
-		w = log((u*u+(v+1)*(v+1))/(u*u+(v-1)*(v-1)))/4;
-		if (z < 0)
-		        z = z + 2*PI_ON_TWO;
-		if (x < 0) {
-		        z = -z;
-			w = -w;
-		}
-		push( Gcomplex(&a, w, -0.5*z/ang2rad) );
-	}
-}
-
-void f_int()
-{
-struct value a;
-	push( Ginteger(&a,(int)real(pop(&a))) );
+    struct value a;
+    push(Ginteger(&a, (int) real(pop(&a))));
 }
 
 
-void f_abs()
+void
+f_abs()
 {
-struct value a;
-	(void) pop(&a);
-	switch (a.type) {
-		case INTGR:
-			push( Ginteger(&a,abs(a.v.int_val)) );			
-			break;
-		case CMPLX:
-			push( Gcomplex(&a,magnitude(&a), 0.0) );
-	}
+    struct value a;
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	push(Ginteger(&a, abs(a.v.int_val)));
+	break;
+    case CMPLX:
+	push(Gcomplex(&a, magnitude(&a), 0.0));
+    }
 }
 
-void f_sgn()
+void
+f_sgn()
 {
-struct value a;
-	(void) pop(&a);
-	switch(a.type) {
-		case INTGR:
-			push( Ginteger(&a,(a.v.int_val > 0) ? 1 : 
-					(a.v.int_val < 0) ? -1 : 0) );
-			break;
-		case CMPLX:
-			push( Ginteger(&a,(a.v.cmplx_val.real > 0.0) ? 1 : 
-					(a.v.cmplx_val.real < 0.0) ? -1 : 0) );
-			break;
-	}
-}
-
-
-void f_sqrt()
-{
-struct value a;
-register double mag;
-	(void) pop(&a);
-	mag = sqrt(magnitude(&a));
-	if (imag(&a) == 0.0) {
-		if (real(&a) < 0.0)
-			push( Gcomplex(&a,0.0,mag) );
-		else
-			push( Gcomplex(&a,mag, 0.0) );
-	} else {
-		/* -pi < ang < pi, so real(sqrt(z)) >= 0 */
-		double ang = angle(&a) / 2.0;
-		push( Gcomplex(&a,mag*cos(ang), mag*sin(ang)) );
-	}
+    struct value a;
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	push(Ginteger(&a, (a.v.int_val > 0) ? 1 :
+		      (a.v.int_val < 0) ? -1 : 0));
+	break;
+    case CMPLX:
+	push(Ginteger(&a, (a.v.cmplx_val.real > 0.0) ? 1 :
+		      (a.v.cmplx_val.real < 0.0) ? -1 : 0));
+	break;
+    }
 }
 
 
-void f_exp()
+void
+f_sqrt()
 {
-struct value a;
-register double mag, ang;
-	(void) pop(&a);
-	mag = gp_exp(real(&a));
-	ang = imag(&a);
-	push( Gcomplex(&a,mag*cos(ang), mag*sin(ang)) );
+    struct value a;
+    register double mag;
+    (void) pop(&a);
+    mag = sqrt(magnitude(&a));
+    if (imag(&a) == 0.0) {
+	if (real(&a) < 0.0)
+	    push(Gcomplex(&a, 0.0, mag));
+	else
+	    push(Gcomplex(&a, mag, 0.0));
+    } else {
+	/* -pi < ang < pi, so real(sqrt(z)) >= 0 */
+	double ang = angle(&a) / 2.0;
+	push(Gcomplex(&a, mag * cos(ang), mag * sin(ang)));
+    }
 }
 
 
-void f_log10()
+void
+f_exp()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,log(magnitude(&a))/M_LN10, angle(&a)/M_LN10) );
+    struct value a;
+    register double mag, ang;
+    (void) pop(&a);
+    mag = gp_exp(real(&a));
+    ang = imag(&a);
+    push(Gcomplex(&a, mag * cos(ang), mag * sin(ang)));
 }
 
 
-void f_log()
+void
+f_log10()
 {
-struct value a;
-	(void) pop(&a);
-	push( Gcomplex(&a,log(magnitude(&a)), angle(&a)) );
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, log(magnitude(&a)) / M_LN10, angle(&a) / M_LN10));
 }
 
 
-void f_floor()
+void
+f_log()
 {
-struct value a;
-
-	(void) pop(&a);
-	switch (a.type) {
-		case INTGR:
-			push( Ginteger(&a,(int)floor((double)a.v.int_val)));			
-			break;
-		case CMPLX:
-			push( Ginteger(&a,(int)floor(a.v.cmplx_val.real)));
-	}
+    struct value a;
+    (void) pop(&a);
+    push(Gcomplex(&a, log(magnitude(&a)), angle(&a)));
 }
 
 
-void f_ceil()
+void
+f_floor()
 {
-struct value a;
+    struct value a;
 
-	(void) pop(&a);
-	switch (a.type) {
-		case INTGR:
-			push( Ginteger(&a,(int)ceil((double)a.v.int_val)));			
-			break;
-		case CMPLX:
-			push( Ginteger(&a,(int)ceil(a.v.cmplx_val.real)));
-	}
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	push(Ginteger(&a, (int) floor((double) a.v.int_val)));
+	break;
+    case CMPLX:
+	push(Ginteger(&a, (int) floor(a.v.cmplx_val.real)));
+    }
+}
+
+
+void
+f_ceil()
+{
+    struct value a;
+
+    (void) pop(&a);
+    switch (a.type) {
+    case INTGR:
+	push(Ginteger(&a, (int) ceil((double) a.v.int_val)));
+	break;
+    case CMPLX:
+	push(Ginteger(&a, (int) ceil(a.v.cmplx_val.real)));
+    }
 }
 
 /* bessel function approximations */
-static double jzero(x)
+static double
+jzero(x)
 double x;
 {
-double p, q, x2;
-int n;
+    double p, q, x2;
+    int n;
 
-	x2 = x * x;
-	p = pjzero[8];
-	q = qjzero[8];
-	for (n=7; n>=0; n--) {
-		p = p*x2 + pjzero[n];
-		q = q*x2 + qjzero[n];
-	}
-	return(p/q);
+    x2 = x * x;
+    p = pjzero[8];
+    q = qjzero[8];
+    for (n = 7; n >= 0; n--) {
+	p = p * x2 + pjzero[n];
+	q = q * x2 + qjzero[n];
+    }
+    return (p / q);
 }
 
-static double pzero(x)
+static double
+pzero(x)
 double x;
 {
-double p, q, z, z2;
-int n;
+    double p, q, z, z2;
+    int n;
 
-	z = 8.0 / x;
-	z2 = z * z;
-	p = ppzero[5];
-	q = qpzero[5];
-	for (n=4; n>=0; n--) {
-		p = p*z2 + ppzero[n];
-		q = q*z2 + qpzero[n];
-	}
-	return(p/q);
+    z = 8.0 / x;
+    z2 = z * z;
+    p = ppzero[5];
+    q = qpzero[5];
+    for (n = 4; n >= 0; n--) {
+	p = p * z2 + ppzero[n];
+	q = q * z2 + qpzero[n];
+    }
+    return (p / q);
 }
 
-static double qzero(x)
+static double
+qzero(x)
 double x;
 {
-double p, q, z, z2;
-int n;
+    double p, q, z, z2;
+    int n;
 
-	z = 8.0 / x;
-	z2 = z * z;
-	p = pqzero[5];
-	q = qqzero[5];
-	for (n=4; n>=0; n--) {
-		p = p*z2 + pqzero[n];
-		q = q*z2 + qqzero[n];
-	}
-	return(p/q);
+    z = 8.0 / x;
+    z2 = z * z;
+    p = pqzero[5];
+    q = qqzero[5];
+    for (n = 4; n >= 0; n--) {
+	p = p * z2 + pqzero[n];
+	q = q * z2 + qqzero[n];
+    }
+    return (p / q);
 }
 
-static double yzero(x)
+static double
+yzero(x)
 double x;
 {
-double p, q, x2;
-int n;
+    double p, q, x2;
+    int n;
 
-	x2 = x * x;
-	p = pyzero[8];
-	q = qyzero[8];
-	for (n=7; n>=0; n--) {
-		p = p*x2 + pyzero[n];
-		q = q*x2 + qyzero[n];
-	}
-	return(p/q);
+    x2 = x * x;
+    p = pyzero[8];
+    q = qyzero[8];
+    for (n = 7; n >= 0; n--) {
+	p = p * x2 + pyzero[n];
+	q = q * x2 + qyzero[n];
+    }
+    return (p / q);
 }
 
-static double rj0(x)
+static double
+rj0(x)
 double x;
 {
-	if ( x <= 0.0 )
-		x = -x;
-	if ( x < 8.0 )
-		return(jzero(x));
-	else
-		return( sqrt(TWO_ON_PI/x) *
-			(pzero(x)*cos(x-PI_ON_FOUR) - 8.0/x*qzero(x)*sin(x-PI_ON_FOUR)) );
+    if (x <= 0.0)
+	x = -x;
+    if (x < 8.0)
+	return (jzero(x));
+    else
+	return (sqrt(TWO_ON_PI / x) *
+		(pzero(x) * cos(x - PI_ON_FOUR) - 8.0 / x * qzero(x) * sin(x - PI_ON_FOUR)));
 
 }
 
-static double ry0(x)
+static double
+ry0(x)
 double x;
 {
-	if ( x < 0.0 )
-		return(dzero/dzero); /* error */
-	if ( x < 8.0 )
-		return( yzero(x) + TWO_ON_PI*rj0(x)*log(x) );
-	else
-		return( sqrt(TWO_ON_PI/x) *
-			(pzero(x)*sin(x-PI_ON_FOUR) + 
-			(8.0/x)*qzero(x)*cos(x-PI_ON_FOUR)) );
+    if (x < 0.0)
+	return (dzero / dzero);	/* error */
+    if (x < 8.0)
+	return (yzero(x) + TWO_ON_PI * rj0(x) * log(x));
+    else
+	return (sqrt(TWO_ON_PI / x) *
+		(pzero(x) * sin(x - PI_ON_FOUR) +
+		 (8.0 / x) * qzero(x) * cos(x - PI_ON_FOUR)));
 
 }
 
 
-static double jone(x)
+static double
+jone(x)
 double x;
 {
-double p, q, x2;
-int n;
+    double p, q, x2;
+    int n;
 
-	x2 = x * x;
-	p = pjone[8];
-	q = qjone[8];
-	for (n=7; n>=0; n--) {
-		p = p*x2 + pjone[n];
-		q = q*x2 + qjone[n];
-	}
-	return(p/q);
+    x2 = x * x;
+    p = pjone[8];
+    q = qjone[8];
+    for (n = 7; n >= 0; n--) {
+	p = p * x2 + pjone[n];
+	q = q * x2 + qjone[n];
+    }
+    return (p / q);
 }
 
-static double pone(x)
+static double
+pone(x)
 double x;
 {
-double p, q, z, z2;
-int n;
+    double p, q, z, z2;
+    int n;
 
-	z = 8.0 / x;
-	z2 = z * z;
-	p = ppone[5];
-	q = qpone[5];
-	for (n=4; n>=0; n--) {
-		p = p*z2 + ppone[n];
-		q = q*z2 + qpone[n];
-	}
-	return(p/q);
+    z = 8.0 / x;
+    z2 = z * z;
+    p = ppone[5];
+    q = qpone[5];
+    for (n = 4; n >= 0; n--) {
+	p = p * z2 + ppone[n];
+	q = q * z2 + qpone[n];
+    }
+    return (p / q);
 }
 
-static double qone(x)
+static double
+qone(x)
 double x;
 {
-double p, q, z, z2;
-int n;
+    double p, q, z, z2;
+    int n;
 
-	z = 8.0 / x;
-	z2 = z * z;
-	p = pqone[5];
-	q = qqone[5];
-	for (n=4; n>=0; n--) {
-		p = p*z2 + pqone[n];
-		q = q*z2 + qqone[n];
-	}
-	return(p/q);
+    z = 8.0 / x;
+    z2 = z * z;
+    p = pqone[5];
+    q = qqone[5];
+    for (n = 4; n >= 0; n--) {
+	p = p * z2 + pqone[n];
+	q = q * z2 + qqone[n];
+    }
+    return (p / q);
 }
 
-static double yone(x)
+static double
+yone(x)
 double x;
 {
-double p, q, x2;
-int n;
+    double p, q, x2;
+    int n;
 
-	x2 = x * x;
-	p = 0.0;
-	q = qyone[8];
-	for (n=7; n>=0; n--) {
-		p = p*x2 + pyone[n];
-		q = q*x2 + qyone[n];
-	}
-	return(p/q);
+    x2 = x * x;
+    p = 0.0;
+    q = qyone[8];
+    for (n = 7; n >= 0; n--) {
+	p = p * x2 + pyone[n];
+	q = q * x2 + qyone[n];
+    }
+    return (p / q);
 }
 
-static double rj1(x)
+static double
+rj1(x)
 double x;
 {
-double v,w;
-	v = x;
-	if ( x < 0.0 )
-		x = -x;
-	if ( x < 8.0 )
-		return(v*jone(x));
-	else {
-		w = sqrt(TWO_ON_PI/x) *
-			(pone(x)*cos(x-THREE_PI_ON_FOUR) - 
-			   8.0/x*qone(x)*sin(x-THREE_PI_ON_FOUR)) ;
-		if (v < 0.0)
-			w = -w;
-		return( w );
-	}
+    double v, w;
+    v = x;
+    if (x < 0.0)
+	x = -x;
+    if (x < 8.0)
+	return (v * jone(x));
+    else {
+	w = sqrt(TWO_ON_PI / x) *
+	    (pone(x) * cos(x - THREE_PI_ON_FOUR) -
+	     8.0 / x * qone(x) * sin(x - THREE_PI_ON_FOUR));
+	if (v < 0.0)
+	    w = -w;
+	return (w);
+    }
 }
 
-static double ry1(x)
+static double
+ry1(x)
 double x;
 {
-	if ( x <= 0.0 )
-		return(dzero/dzero); /* error */
-	if ( x < 8.0 )
-		return( x*yone(x) + TWO_ON_PI*(rj1(x)*log(x) - 1.0/x) );
-	else
-		return( sqrt(TWO_ON_PI/x) *
-			(pone(x)*sin(x-THREE_PI_ON_FOUR) + 
-			(8.0/x)*qone(x)*cos(x-THREE_PI_ON_FOUR)) );
+    if (x <= 0.0)
+	return (dzero / dzero);	/* error */
+    if (x < 8.0)
+	return (x * yone(x) + TWO_ON_PI * (rj1(x) * log(x) - 1.0 / x));
+    else
+	return (sqrt(TWO_ON_PI / x) *
+		(pone(x) * sin(x - THREE_PI_ON_FOUR) +
+		 (8.0 / x) * qone(x) * cos(x - THREE_PI_ON_FOUR)));
 }
 
 
-void f_besj0()	
+void
+f_besj0()
 {
-struct value a;
-	(void) pop(&a);
-	if (fabs(imag(&a)) > zero)
-		int_error(NO_CARET, "can only do bessel functions of reals");
-	push( Gcomplex(&a,rj0(real(&a)),0.0) );
+    struct value a;
+    (void) pop(&a);
+    if (fabs(imag(&a)) > zero)
+	int_error(NO_CARET, "can only do bessel functions of reals");
+    push(Gcomplex(&a, rj0(real(&a)), 0.0));
 }
 
 
-void f_besj1()	
+void
+f_besj1()
 {
-struct value a;
-	(void) pop(&a);
-	if (fabs(imag(&a)) > zero)
-		int_error(NO_CARET, "can only do bessel functions of reals");
-	push( Gcomplex(&a,rj1(real(&a)),0.0) );
+    struct value a;
+    (void) pop(&a);
+    if (fabs(imag(&a)) > zero)
+	int_error(NO_CARET, "can only do bessel functions of reals");
+    push(Gcomplex(&a, rj1(real(&a)), 0.0));
 }
 
 
-void f_besy0()	
+void
+f_besy0()
 {
-struct value a;
-	(void) pop(&a);
-	if (fabs(imag(&a)) > zero)
-		int_error(NO_CARET, "can only do bessel functions of reals");
-	if (real(&a) > 0.0)
-		push( Gcomplex(&a,ry0(real(&a)),0.0) );
-	else {
-		push( Gcomplex(&a,0.0,0.0) );
-		undefined = TRUE ;
-	}
+    struct value a;
+    (void) pop(&a);
+    if (fabs(imag(&a)) > zero)
+	int_error(NO_CARET, "can only do bessel functions of reals");
+    if (real(&a) > 0.0)
+	push(Gcomplex(&a, ry0(real(&a)), 0.0));
+    else {
+	push(Gcomplex(&a, 0.0, 0.0));
+	undefined = TRUE;
+    }
 }
 
 
-void f_besy1()	
+void
+f_besy1()
 {
-struct value a;
-	(void) pop(&a);
-	if (fabs(imag(&a)) > zero)
-		int_error(NO_CARET, "can only do bessel functions of reals");
-	if (real(&a) > 0.0)
-		push( Gcomplex(&a,ry1(real(&a)),0.0) );
-	else {
-		push( Gcomplex(&a,0.0,0.0) );
-		undefined = TRUE ;
-	}
+    struct value a;
+    (void) pop(&a);
+    if (fabs(imag(&a)) > zero)
+	int_error(NO_CARET, "can only do bessel functions of reals");
+    if (real(&a) > 0.0)
+	push(Gcomplex(&a, ry1(real(&a)), 0.0));
+    else {
+	push(Gcomplex(&a, 0.0, 0.0));
+	undefined = TRUE;
+    }
 }
 
 
@@ -1099,4 +1147,3 @@ TIMEFUNC(f_tmmon, tm_mon)
 TIMEFUNC(f_tmyear, tm_year)
 TIMEFUNC(f_tmwday, tm_wday)
 TIMEFUNC(f_tmyday, tm_yday)
-

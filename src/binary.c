@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.10 1998/04/14 00:14:49 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.3 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /*
@@ -32,7 +32,8 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.10 1998/04/14 00:14:49 dr
  * are not in the ascii character set. (values < 128), or if a NUL is found.
  * I hope this doesn't break when used on the bizzare PC's.
  */
-int is_binary_file(fp)
+int
+is_binary_file(fp)
 register FILE *fp;
 {
     register int i, len;
@@ -92,10 +93,10 @@ register FILE *fp;
  */
 #define START_ROWS 100		/* Each of these must be at least 1 */
 #define ADD_ROWS 50
-int fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
+int
+fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
 FILE *fin;
-float GPFAR *GPFAR * GPFAR * ret_matrix, GPFAR * GPFAR * row_title,
- GPFAR * GPFAR * column_title;
+float GPFAR *GPFAR * GPFAR * ret_matrix, GPFAR * GPFAR * row_title, GPFAR * GPFAR * column_title;
 int *nr, *nc;
 {
     float GPFAR *GPFAR * m, GPFAR * rt, GPFAR * ct;
@@ -129,7 +130,7 @@ int *nr, *nc;
 	current_row++;
 	if (current_row >= num_rows) {	/* We've got to make a bigger rowsize */
 	    temp_array = extend_matrix(m, 0, num_rows - 1, 0, num_cols - 1,
-				  num_rows + ADD_ROWS - 1, num_cols - 1);
+				       num_rows + ADD_ROWS - 1, num_cols - 1);
 	    rt = extend_vector(rt, 0, num_rows - 1, num_rows + ADD_ROWS - 1);
 
 	    num_rows += ADD_ROWS;
@@ -154,7 +155,8 @@ int *nr, *nc;
    This behaves similarly to the xrange and yrange operators in gnuplot
    that we all are familiar with.
  */
-int fwrite_matrix(fout, m, nrl, nrh, ncl, nch, row_title, column_title)
+int
+fwrite_matrix(fout, m, nrl, nrh, ncl, nch, row_title, column_title)
 register FILE *fout;
 register float GPFAR *GPFAR * m, GPFAR * row_title, GPFAR * column_title;
 register int nrl, nrh, ncl, nch;
@@ -207,7 +209,8 @@ register int nrl, nrh, ncl, nch;
  *   by Press, Flannery, Teukoilsky and Vetterling (1988).
  *
  */
-float GPFAR *vector(nl, nh)
+float GPFAR *
+vector(nl, nh)
 register int nl, nh;
 {
     register float GPFAR *vec;
@@ -227,7 +230,8 @@ register int nl, nh;
  *   by Press, Flannery, Teukoilsky and Vetterling (1988).
  *
  */
-void free_vector(vec, nl, nh)
+void
+free_vector(vec, nl, nh)
 float GPFAR *vec;
 int nl, nh;
 {
@@ -236,25 +240,26 @@ int nl, nh;
 
 /************ Routines to modify the length of a vector ****************/
 float GPFAR *
- extend_vector(vec, old_nl, old_nh, new_nh)
+extend_vector(vec, old_nl, old_nh, new_nh)
 float GPFAR *vec;
 register int old_nl, old_nh, new_nh;
 {
     register float GPFAR *new_v;
     new_v = (float GPFAR *) gp_realloc((void *) (vec + old_nl),
-		   (unsigned long) (new_nh - old_nl + 1) * sizeof(float),
+				       (unsigned long) (new_nh - old_nl + 1) * sizeof(float),
 				       "extend vector");
     return new_v - old_nl;
 }
 
 float GPFAR *
- retract_vector(v, old_nl, old_nh, new_nh)
+retract_vector(v, old_nl, old_nh, new_nh)
 float GPFAR *v;
 register int old_nl, old_nh, new_nh;
 {
     register float GPFAR *new_v;
     new_v = (float GPFAR *) gp_realloc((void *) (v + old_nl),
-				       (unsigned long) (new_nh - old_nl + 1) * sizeof(float), "retract vector");
+				       (unsigned long) (new_nh - old_nl + 1) * sizeof(float),
+				       "retract vector");
     return new_v - old_nl;
 }
 
@@ -280,13 +285,15 @@ register int old_nl, old_nh, new_nh;
  *
  */
 float
-GPFAR *GPFAR * matrix(nrl, nrh, ncl, nch)
+GPFAR *GPFAR *
+matrix(nrl, nrh, ncl, nch)
 register int nrl, nrh, ncl, nch;
 {
     register int i;
     register float GPFAR *GPFAR * m;
 
-    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *), "matrix");
+    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *),
+					 "matrix");
     m -= nrl;
 
     for (i = nrl; i <= nrh; i++) {
@@ -307,7 +314,8 @@ register int nrl, nrh, ncl, nch;
  *   by Press, Flannery, Teukoilsky and Vetterling (1988).
  *
  */
-void free_matrix(m, nrl, nrh, ncl, nch)
+void
+free_matrix(m, nrl, nrh, ncl, nch)
 float GPFAR *GPFAR * m;
 unsigned nrl, nrh, ncl, nch;
 {
@@ -322,7 +330,8 @@ unsigned nrl, nrh, ncl, nch;
    This routine takes a sub matrix and extends the number of rows and 
    columns for a new matrix
  */
-float GPFAR *GPFAR * extend_matrix(a, nrl, nrh, ncl, nch, srh, sch)
+float GPFAR *GPFAR *
+extend_matrix(a, nrl, nrh, ncl, nch, srh, sch)
 register float GPFAR *GPFAR * a;
 register int nrl, nrh, ncl, nch;
 register int srh, sch;
@@ -330,7 +339,9 @@ register int srh, sch;
     register int i;
     register float GPFAR *GPFAR * m;
 
-    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl), (unsigned long) (srh - nrl + 1) * sizeof(float GPFAR *), "extend matrix");
+    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl),
+					   (unsigned long) (srh - nrl + 1) * sizeof(float GPFAR *),
+					   "extend matrix");
 
     m -= nrl;
 
@@ -356,7 +367,8 @@ register int srh, sch;
 /*
    this routine carves a large matrix down to size
  */
-float GPFAR *GPFAR * retract_matrix(a, nrl, nrh, ncl, nch, srh, sch)
+float GPFAR *GPFAR *
+retract_matrix(a, nrl, nrh, ncl, nch, srh, sch)
 register float GPFAR *GPFAR * a;
 register int nrl, nrh, ncl, nch;
 register int srh, sch;
@@ -368,7 +380,9 @@ register int srh, sch;
 	free_vector(a[i], ncl, nch);
     }
 
-    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl), (unsigned long) (srh - nrl + 1) * sizeof(float GPFAR *), "retract matrix");
+    m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl),
+					   (unsigned long) (srh - nrl + 1) * sizeof(float GPFAR *),
+					   "retract matrix");
 
     m -= nrl;
 
@@ -385,7 +399,8 @@ register int srh, sch;
 }
 
 float
-GPFAR *GPFAR * convert_matrix(a, nrl, nrh, ncl, nch)
+GPFAR *GPFAR *
+convert_matrix(a, nrl, nrh, ncl, nch)
 float GPFAR *a;
 register int nrl, nrh, ncl, nch;
 
@@ -402,7 +417,8 @@ register int nrl, nrh, ncl, nch;
 
     nrow = nrh - nrl + 1;
     ncol = nch - ncl + 1;
-    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *), "convert_matrix");
+    m = (float GPFAR * GPFAR *) gp_alloc((unsigned long) (nrh - nrl + 1) * sizeof(float GPFAR *),
+					 "convert_matrix");
     m -= nrl;
 
     m[nrl] = a - ncl;
@@ -412,7 +428,8 @@ register int nrl, nrh, ncl, nch;
 }
 
 
-void free_convert_matrix(b, nrl, nrh, ncl, nch)
+void
+free_convert_matrix(b, nrl, nrh, ncl, nch)
 float GPFAR *GPFAR * b;
 register int nrl, nrh, ncl, nch;
 {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.79 1998/04/14 00:16:02 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.11 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -95,7 +95,7 @@ extern char *call_args[10];
  * points.
  */
 struct curve_points *
- cp_alloc(num)
+cp_alloc(num)
 int num;
 {
     struct curve_points *cp;
@@ -118,7 +118,8 @@ int num;
  * cp_extend() reallocates a curve_points structure to hold "num"
  * points. This will either expand or shrink the storage.
  */
-void cp_extend(cp, num)
+void
+cp_extend(cp, num)
 struct curve_points *cp;
 int num;
 {
@@ -156,7 +157,8 @@ int num;
  * cp_free() releases any memory which was previously malloc()'d to hold
  *   curve points (and recursively down the linked list).
  */
-void cp_free(cp)
+void
+cp_free(cp)
 struct curve_points *cp;
 {
     if (cp) {
@@ -174,7 +176,7 @@ struct curve_points *cp;
  * points.
  */
 struct iso_curve *
- iso_alloc(num)
+iso_alloc(num)
 int num;
 {
     struct iso_curve *ip;
@@ -193,7 +195,8 @@ int num;
  * iso_extend() reallocates a iso_curve structure to hold "num"
  * points. This will either expand or shrink the storage.
  */
-void iso_extend(ip, num)
+void
+iso_extend(ip, num)
 struct iso_curve *ip;
 int num;
 {
@@ -230,7 +233,8 @@ int num;
  * iso_free() releases any memory which was previously malloc()'d to hold
  *   iso curve points.
  */
-void iso_free(ip)
+void
+iso_free(ip)
 struct iso_curve *ip;
 {
     if (ip) {
@@ -247,7 +251,7 @@ struct iso_curve *ip;
  * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
 struct surface_points *
- sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
+sp_alloc(num_samp_1, num_iso_1, num_samp_2, num_iso_2)
 int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 {
     struct surface_points *sp;
@@ -285,7 +289,8 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
  * 'num_samp_1' samples.
  * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
-void sp_replace(sp, num_samp_1, num_iso_1, num_samp_2, num_iso_2)
+void
+sp_replace(sp, num_samp_1, num_iso_1, num_samp_2, num_iso_2)
 struct surface_points *sp;
 int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 {
@@ -318,7 +323,8 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
  * sp_free() releases any memory which was previously malloc()'d to hold
  *   surface points.
  */
-void sp_free(sp)
+void
+sp_free(sp)
 struct surface_points *sp;
 {
     if (sp) {
@@ -352,11 +358,12 @@ struct surface_points *sp;
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
  */
-void save_functions(fp)
+void
+save_functions(fp)
 FILE *fp;
 {
     if (fp) {
-	show_version(fp);		/* I _love_ information written */
+	show_version(fp);	/* I _love_ information written */
 	save_functions__sub(fp);	/* at the top and the end of an */
 	fputs("#    EOF\n", fp);	/* human readable ASCII file.   */
 	(void) fclose(fp);	/*                        (JFi) */
@@ -365,7 +372,8 @@ FILE *fp;
 }
 
 
-void save_variables(fp)
+void
+save_variables(fp)
 FILE *fp;
 {
     if (fp) {
@@ -378,7 +386,8 @@ FILE *fp;
 }
 
 
-void save_set(fp)
+void
+save_set(fp)
 FILE *fp;
 {
     if (fp) {
@@ -391,7 +400,8 @@ FILE *fp;
 }
 
 
-void save_all(fp)
+void
+save_all(fp)
 FILE *fp;
 {
     if (fp) {
@@ -400,11 +410,11 @@ FILE *fp;
 	save_functions__sub(fp);
 	save_variables__sub(fp);
 	fprintf(fp, "%s\n", replot_line);
-        if (wri_to_fil_last_fit_cmd(NULL)) {
-           fputs("## ", fp);
-           wri_to_fil_last_fit_cmd(fp);
-           putc('\n', fp);
-        }
+	if (wri_to_fil_last_fit_cmd(NULL)) {
+	    fputs("## ", fp);
+	    wri_to_fil_last_fit_cmd(fp);
+	    putc('\n', fp);
+	}
 	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
@@ -415,7 +425,8 @@ FILE *fp;
  *  auxiliary functions
  */
 
-static void save_functions__sub(fp)
+static void
+save_functions__sub(fp)
 FILE *fp;
 {
     register struct udft_entry *udf = first_udf;
@@ -428,7 +439,8 @@ FILE *fp;
     }
 }
 
-static void save_variables__sub(fp)
+static void
+save_variables__sub(fp)
 FILE *fp;
 {
     register struct udvt_entry *udv = first_udv->next_udv;	/* always skip pi */
@@ -443,13 +455,14 @@ FILE *fp;
     }
 }
 
-void save_set_all(fp)
+void
+save_set_all(fp)
 FILE *fp;
 {
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
-    char str[MAX_LINE_LEN+1];
+    char str[MAX_LINE_LEN + 1];
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -502,7 +515,7 @@ set y2data%s\n",
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value);
 
-    fprintf(fp, "set dummy %s,%s\n",dummy_var[0], dummy_var[1]);
+    fprintf(fp, "set dummy %s,%s\n", dummy_var[0], dummy_var[1]);
     fprintf(fp, "set format x \"%s\"\n", conv_text(str, xformat));
     fprintf(fp, "set format y \"%s\"\n", conv_text(str, yformat));
     fprintf(fp, "set format x2 \"%s\"\n", conv_text(str, x2format));
@@ -518,7 +531,8 @@ set y2data%s\n",
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
 	else
 	    fputs("set grid nopolar\n", fp);
-	fprintf(fp, "set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
+	fprintf(fp,
+		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
 		work_grid.l_type & GRID_X ? "" : "no",
 		work_grid.l_type & GRID_Y ? "" : "no",
 		work_grid.l_type & GRID_Z ? "" : "no",
@@ -676,7 +690,7 @@ set %scontour",
 	fputs("set noclabel\n", fp);
 
     fputs("set mapping ", fp);
-    switch(mapping3d) {
+    switch (mapping3d) {
     case MAP3D_SPHERICAL:
 	fputs("spherical\n", fp);
 	break;
@@ -859,7 +873,7 @@ set data style ",
 	fputs("candlesticks\n", fp);
 	break;
     default:
-        /* HBB: default case demanded by gcc, still needed ?? */
+	/* HBB: default case demanded by gcc, still needed ?? */
 	fputs("---error!---\n", fp);
     }
 
@@ -939,16 +953,17 @@ set ticscale %g %g\n",
 
     fprintf(fp, "set locale \"%s\"\n", cur_locale);
 
-    fputs("set loadpath ",fp);
+    fputs("set loadpath ", fp);
     {
 	char *s;
-	while ((s=save_loadpath()) != NULL)
-	    fprintf(fp, "\"%s\" ",s);
-	fputc('\n',fp);
+	while ((s = save_loadpath()) != NULL)
+	    fprintf(fp, "\"%s\" ", s);
+	fputc('\n', fp);
     }
 }
 
-static void save_tics(fp, where, axis, tdef, rotate, text)
+static void
+save_tics(fp, where, axis, tdef, rotate, text)
 FILE *fp;
 int where;
 int axis;
@@ -1029,7 +1044,8 @@ char *text;
     putc('\n', fp);
 }
 
-static void save_position(fp, pos)
+static void
+save_position(fp, pos)
 FILE *fp;
 struct position *pos;
 {
@@ -1044,7 +1060,8 @@ struct position *pos;
 	    pos->scalez == pos->scaley ? "" : msg[pos->scalez], pos->z);
 }
 
-void load_file(fp, name, can_do_args)
+void
+load_file(fp, name, can_do_args)
 FILE *fp;
 char *name;
 TBOOLEAN can_do_args;
@@ -1063,9 +1080,8 @@ TBOOLEAN can_do_args;
 		 can_do_args ? "call" : "load", name);
     } else if (fp == stdin) {
 	/* DBT 10-6-98  go interactive if "-" named as load file */
-	interactive = TRUE; 
-	while(!com_line())
-	    ;
+	interactive = TRUE;
+	while (!com_line());
     } else {
 	/* go into non-interactive mode during load */
 	/* will be undone below, or in load_file_error */
@@ -1116,8 +1132,7 @@ TBOOLEAN can_do_args;
 			    if (len > 0)
 				--len;
 			}
-		    }
-		     else if (len + 2 >= left) {
+		    } else if (len + 2 >= left) {
 			extend_input_line();
 			left = input_line_len - len - 1;
 			start = len + 1;
@@ -1171,7 +1186,7 @@ TBOOLEAN can_do_args;
 		screen_ok = FALSE;	/* make sure command line is
 					   echoed on error */
 		if (do_line())
-		    stop=TRUE;
+		    stop = TRUE;
 	    }
 	}
     }
@@ -1182,7 +1197,7 @@ TBOOLEAN can_do_args;
 
 /* pop from load_file state stack */
 static TBOOLEAN			/* FALSE if stack was empty */
- lf_pop()
+lf_pop()
 {				/* called by load_file and load_file_error */
     LFS *lf;
 
@@ -1191,7 +1206,7 @@ static TBOOLEAN			/* FALSE if stack was empty */
     else {
 	int argindex;
 	lf = lf_head;
-	if (lf->fp != (FILE *)NULL && lf->fp != stdin) {
+	if (lf->fp != (FILE *) NULL && lf->fp != stdin) {
 	    /* DBT 10-6-98  do not close stdin in the case
 	     * that "-" is named as a load file
 	     */
@@ -1215,7 +1230,8 @@ static TBOOLEAN			/* FALSE if stack was empty */
 
 /* push onto load_file state stack */
 /* essentially, we save information needed to undo the load_file changes */
-static void lf_push(fp)		/* called by load_file */
+static void
+lf_push(fp)			/* called by load_file */
 FILE *fp;
 {
     LFS *lf;
@@ -1241,7 +1257,8 @@ FILE *fp;
 }
 
 /* used for reread  vsnyder@math.jpl.nasa.gov */
-FILE *lf_top()
+FILE *
+lf_top()
 {
     if (lf_head == (LFS *) NULL)
 	return ((FILE *) NULL);
@@ -1249,7 +1266,8 @@ FILE *lf_top()
 }
 
 /* called from main */
-void load_file_error()
+void
+load_file_error()
 {
     /* clean up from error in load_file */
     /* pop off everything on stack */
@@ -1259,7 +1277,8 @@ void load_file_error()
 /* find char c in string str; return p such that str[p]==c;
  * if c not in str then p=strlen(str)
  */
-int instring(str, c)
+int
+instring(str, c)
 char *str;
 int c;
 {
@@ -1272,7 +1291,8 @@ int c;
     return (pos);
 }
 
-void show_functions()
+void
+show_functions()
 {
     register struct udft_entry *udf = first_udf;
 
@@ -1288,14 +1308,16 @@ void show_functions()
 }
 
 
-void show_at()
+void
+show_at()
 {
     (void) putc('\n', stderr);
     disp_at(temp_at(), 0);
 }
 
 
-void disp_at(curr_at, level)
+void
+disp_at(curr_at, level)
 struct at_type *curr_at;
 int level;
 {
@@ -1370,7 +1392,8 @@ int level;
 
 /* find max len of keys and count keys with len > 0 */
 
-int find_maxl_keys(plots, count, kcnt)
+int
+find_maxl_keys(plots, count, kcnt)
 struct curve_points *plots;
 int count, *kcnt;
 {
@@ -1396,7 +1419,8 @@ int count, *kcnt;
 /* calculate the number and max-width of the keys for an splot.
  * Note that a blank line is issued after each set of contours
  */
-int find_maxl_keys3d(plots, count, kcnt)
+int
+find_maxl_keys3d(plots, count, kcnt)
 struct surface_points *plots;
 int count, *kcnt;
 {
@@ -1429,7 +1453,8 @@ int count, *kcnt;
     return (mlen);
 }
 
-static int find_maxl_cntr(contours, count)
+static int
+find_maxl_cntr(contours, count)
 struct gnuplot_contours *contours;
 int *count;
 {
@@ -1452,7 +1477,8 @@ int *count;
     return (mlen);
 }
 
-static void save_range(fp, axis, min, max, autosc, text)
+static void
+save_range(fp, axis, min, max, autosc, text)
 FILE *fp;
 int axis;
 double min, max;
@@ -1495,7 +1521,8 @@ char *text;
 }
 
 /* check user defined format strings for valid double conversions */
-TBOOLEAN valid_format(format)
+TBOOLEAN
+valid_format(format)
 const char *format;
 {
     for (;;) {
@@ -1522,28 +1549,28 @@ const char *format;
 }
 
 /* may return NULL */
-FILE *loadpath_fopen(filename, mode)
+FILE *
+loadpath_fopen(filename, mode)
 const char *filename, *mode;
 {
     FILE *fp;
 
-    if ((fp = fopen(filename,mode)) == (FILE *) NULL) {
+    if ((fp = fopen(filename, mode)) == (FILE *) NULL) {
 	/* try 'loadpath' variable */
 	char *fullname = NULL, *path;
 
 	while ((path = get_loadpath()) != NULL) {
 	    /* length of path, dir separator, filename, \0 */
-	    fullname = gp_realloc(fullname,strlen(path)+1+strlen(filename)+1, "loadpath_fopen");
-	    strcpy(fullname,path);
-	    PATH_CONCAT(fullname,filename);
-	    if ((fp = fopen(fullname,mode)) != NULL) {
+	    fullname = gp_realloc(fullname, strlen(path) + 1 + strlen(filename) + 1, "loadpath_fopen");
+	    strcpy(fullname, path);
+	    PATH_CONCAT(fullname, filename);
+	    if ((fp = fopen(fullname, mode)) != NULL) {
 		free(fullname);
 		fullname = NULL;
 		/* reset loadpath internals!
 		 * maybe this can be replaced by calling get_loadpath with
 		 * a NULL argument and some loadpath_handler internal logic */
-		while(get_loadpath())
-		    ;
+		while (get_loadpath());
 		break;
 	    }
 	}
@@ -1554,4 +1581,3 @@ const char *filename, *mode;
     }
     return fp;
 }
-

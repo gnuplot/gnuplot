@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.7 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -245,7 +245,8 @@ static int ansi_getc __PROTO((void));
  */
 #  undef putc			/* Undefine the macro for putc */
 
-static int putc(c, fp)
+static int
+putc(c, fp)
 char c;
 FILE *fp;
 {
@@ -328,7 +329,8 @@ extern char mouseShareMemName[];
  * of user typed characters.  This allows MS-Windows to 
  * display user input in a different color.
  */
-static int user_putc(ch)
+static int
+user_putc(ch)
 int ch;
 {
     int rv;
@@ -342,7 +344,8 @@ int ch;
     return rv;
 }
 
-static int user_puts(str)
+static int
+user_puts(str)
 char *str;
 {
     int rv;
@@ -359,12 +362,14 @@ char *str;
 /* This function provides a centralized non-destructive backspace capability
  * M. Castro
  */
-static void backspace()
+static void
+backspace()
 {
     user_putc(BACKSPACE);
 }
 
-static void extend_cur_line()
+static void
+extend_cur_line()
 {
     char *new_line;
 
@@ -379,7 +384,8 @@ static void extend_cur_line()
     FPRINTF((stderr, "\nextending readline length to %d chars\n", line_len));
 }
 
-char *readline(prompt)
+char *
+readline(prompt)
 char *prompt;
 {
 
@@ -389,12 +395,12 @@ char *prompt;
 #if defined(USE_MOUSE) && defined(OS2)
     char rbuf[1];		/* buffer for read() */
     struct termios tios;	/* terminal parameter */
-    if (input_line_Pointer == NULL) { /* PM get shared mem only once */
-    if (DosGetNamedSharedMem((PVOID) & input_line_Pointer,
-			     mouseShareMemName, PAG_WRITE | PAG_READ))
-	fputs("readline.c: DosGetNamedShareMem ERROR\n",stderr);
-    else
-	*input_line_Pointer = NUL;
+    if (input_line_Pointer == NULL) {	/* PM get shared mem only once */
+	if (DosGetNamedSharedMem((PVOID) & input_line_Pointer,
+				 mouseShareMemName, PAG_WRITE | PAG_READ))
+	    fputs("readline.c: DosGetNamedShareMem ERROR\n", stderr);
+	else
+	    *input_line_Pointer = NUL;
     }
 #endif /* USE_MOUSE */
 
@@ -732,7 +738,8 @@ char *prompt;
  * do not need any terminal capabilities except backspace,
  * and space overwrites a character
  */
-static void fix_line()
+static void
+fix_line()
 {
     int i;
 
@@ -750,7 +757,8 @@ static void fix_line()
 }
 
 /* redraw the entire line, putting the cursor where it belongs */
-static void redraw_line(prompt)
+static void
+redraw_line(prompt)
 char *prompt;
 {
     int i;
@@ -764,7 +772,8 @@ char *prompt;
 }
 
 /* clear cur_line and the screen line */
-static void clear_line(prompt)
+static void
+clear_line(prompt)
 char *prompt;
 {
     int i;
@@ -785,7 +794,8 @@ char *prompt;
 }
 
 /* clear to end of line and the screen end of line */
-static void clear_eoline()
+static void
+clear_eoline()
 {
     int i;
     for (i = cur_pos; i < max_pos; i++)
@@ -798,7 +808,8 @@ static void clear_eoline()
 }
 
 /* copy line to cur_line, draw it and set cur_pos and max_pos */
-static void copy_line(line)
+static void
+copy_line(line)
 char *line;
 {
     while (strlen(line) + 1 > line_len) {
@@ -810,7 +821,8 @@ char *line;
 }
 
 /* add line to the history */
-void add_history(line)
+void
+add_history(line)
 char *line;
 {
     struct hist *entry;
@@ -867,7 +879,8 @@ char *line;
 
 
 /* Convert ANSI arrow keys to control characters */
-static int ansi_getc()
+static int
+ansi_getc()
 {
     int c = getc(stdin);
     if (c == 033) {
@@ -896,7 +909,8 @@ static int ansi_getc()
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
 
 /* Convert Arrow keystrokes to Control characters: */
-static char msdos_getch()
+static char
+msdos_getch()
 {
 #ifdef DJGPP
     char c;
@@ -967,7 +981,8 @@ long poll_events(int);		/* from term/atariaes.trm */
  * program doesn't work without -DREADLINE (which would be the case
  * if help.c didn't use it as well, since no events would be processed)
  */
-char tos_getch()
+char
+tos_getch()
 {
     long rawkey;
     char c;
@@ -1059,7 +1074,8 @@ char tos_getch()
 #endif /* ATARI || MTOS */
 
   /* set termio so we can do our own input processing */
-static void set_termio()
+static void
+set_termio()
 {
 #if !defined(MSDOS) && !defined(ATARI) && !defined(MTOS) && !defined(_Windows) && !defined(DOS386)
 /* set termio so we can do our own input processing */
@@ -1190,7 +1206,8 @@ static void set_termio()
 #endif /* not MSDOS && not ATARI && not MTOS && not _Windows && not DOS386 */
 }
 
-static void reset_termio()
+static void
+reset_termio()
 {
 #if !defined(MSDOS) && !defined(ATARI) && !defined(MTOS) && !defined(_Windows) && !defined(DOS386)
 /* reset saved terminal modes */

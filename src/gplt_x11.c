@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.2 1999/06/09 12:13:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.3 1999/06/10 19:53:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -279,7 +279,8 @@ XSegment Plus[2], Cross[2], Star[4];
  *   main program 
  *---------------------------------------------------------------------------*/
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -342,20 +343,21 @@ char *argv[];
  *    DEFAULT_X11 mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop()
+void
+mainloop()
 {
 #if defined(HAVE_POLL) && defined(HAVE_POLL_H) && !defined(HAVE_SELECT)
     int cn, in, retval, timeout;
     struct pollfd poll_list[2];
 
-    cn = ConnectionNumber (dpy);
+    cn = ConnectionNumber(dpy);
     X11_ipc = stdin;
-    in = fileno (X11_ipc);
+    in = fileno(X11_ipc);
 
     poll_list[0].fd = cn;
     poll_list[1].fd = in;
-    poll_list[0].events = POLLIN|POLLOUT;
-    poll_list[1].events = POLLIN|POLLOUT;
+    poll_list[0].events = POLLIN | POLLOUT;
+    poll_list[1].events = POLLIN | POLLOUT;
 /* FIXME */
 #else
     int nf, cn = ConnectionNumber(dpy), in;
@@ -423,7 +425,7 @@ void mainloop()
 	    } while (XPending(dpy));
 	}
 	if (FD_ISSET(in, &tset)) {
-	    if (!record())      /* end of input */
+	    if (!record())	/* end of input */
 		return;
 	}
     }
@@ -436,7 +438,8 @@ void mainloop()
  *    CRIPPLED_SELECT mainloop
  *---------------------------------------------------------------------------*/
 
-void mainloop()
+void
+mainloop()
 {
     fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
     struct timeval timeout, *timer;
@@ -497,21 +500,25 @@ void mainloop()
 #include <iodef.h>
 char STDIIN[] = "SYS$INPUT:";
 short STDIINchannel, STDIINiosb[4];
-struct { short size, type; char *address; } STDIINdesc;
+struct {
+    short size, type;
+    char *address;
+} STDIINdesc;
 char STDIINbuffer[64];
 int status;
 
 ast()
 {
     int status = sys$qio(0, STDIINchannel, IO$_READVBLK, STDIINiosb, record,
-		  0, STDIINbuffer, sizeof(STDIINbuffer) - 1, 0, 0, 0, 0);
+			 0, STDIINbuffer, sizeof(STDIINbuffer) - 1, 0, 0, 0, 0);
     if ((status & 0x1) == 0)
 	EXIT(status);
 }
 
 Window message_window;
 
-void mainloop()
+void
+mainloop()
 {
     /* dummy unmapped window for receiving internally-generated terminate
      * messages
@@ -544,11 +551,12 @@ void mainloop()
 }
 #else /* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
 You lose. No mainloop.
-#endif /* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
+#endif				/* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
 
 /* delete a window / plot */
 
-void delete_plot(plot)
+void
+delete_plot(plot)
 plot_struct *plot;
 {
     int i;
@@ -575,7 +583,8 @@ plot_struct *plot;
 
 /* prepare the plot structure */
 
-void prepare_plot(plot, term_number)
+void
+prepare_plot(plot, term_number)
 plot_struct *plot;
 int term_number;
 {
@@ -596,7 +605,6 @@ int term_number;
 	plot->width = gW;
 	plot->height = gH;
     }
-
     if (!plot->window) {
 	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
 	++windows_open;
@@ -628,7 +636,8 @@ int term_number;
 
 /* store a command in a plot structure */
 
-void store_command(buffer, plot)
+void
+store_command(buffer, plot)
 char *buffer;
 plot_struct *plot;
 {
@@ -655,7 +664,8 @@ plot_struct *plot;
  *   record - record new plot from gnuplot inboard X11 driver (Unix)
  *---------------------------------------------------------------------------*/
 
-int record()
+int
+record()
 {
     static plot_struct *plot = plot_array;
 
@@ -765,7 +775,8 @@ record()
  *   display - display a stored plot
  *---------------------------------------------------------------------------*/
 
-void display(plot)
+void
+display(plot)
 plot_struct *plot;
 {
     int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
@@ -791,10 +802,10 @@ plot_struct *plot;
 	XFreeGC(dpy, gc);
 
     if (!plot->pixmap) {
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, plot->height, D));
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width,
+		 plot->height, D));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
     }
-
     gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 
     XSetFont(dpy, gc, font->fid);
@@ -862,7 +873,7 @@ plot_struct *plot;
 		 * There may be an off-by-one (or more) error here.
 		 * style ignored here for the moment
 		 */
-		ytmp += h;		/* top left corner of rectangle to be filled */
+		ytmp += h;	/* top left corner of rectangle to be filled */
 		w *= xscale;
 		h *= yscale;
 		XSetForeground(dpy, gc, colors[0]);
@@ -1022,7 +1033,8 @@ plot_struct *plot;
  *  reset all cursors (since we dont have a record of the previous terminal #)
  *---------------------------------------------------------------------------*/
 
-void reset_cursor()
+void
+reset_cursor()
 {
     int plot_number;
     plot_struct *plot = plot_array;
@@ -1044,7 +1056,8 @@ void reset_cursor()
  *   resize - rescale last plot if window resized
  *---------------------------------------------------------------------------*/
 
-plot_struct *find_plot(window)
+plot_struct *
+find_plot(window)
 Window window;
 {
     int plot_number;
@@ -1063,7 +1076,8 @@ Window window;
     return NULL;
 }
 
-void process_event(event)
+void
+process_event(event)
 XEvent *event;
 {
     FPRINTF((stderr, "Event 0x%x\n", event->type));
@@ -1175,7 +1189,8 @@ static XrmOptionDescRec options[] = {
 
 #define Nopt (sizeof(options) / sizeof(options[0]))
 
-void preset(argc, argv)
+void
+preset(argc, argv)
 int argc;
 char *argv[];
 {
@@ -1268,7 +1283,7 @@ gnuplot: X11 aborted.\n", ldisplay);
     }
 # else
     sprintf(buffer, "%s/%s", AppDefDir, "Gnuplot");
-# endif /* !OS2 */
+# endif				/* !OS2 */
 #endif /* !VMS */
 
     dbApp = XrmGetFileDatabase(buffer);
@@ -1329,7 +1344,7 @@ gnuplot: X11 aborted.\n", ldisplay);
  *---------------------------------------------------------------------------*/
 
 char *
- pr_GetR(xrdb, resource)
+pr_GetR(xrdb, resource)
 XrmDatabase xrdb;
 char *resource;
 {
@@ -1340,8 +1355,8 @@ char *resource;
     strcpy(class, Class);
     strcat(class, resource);
     rc = XrmGetResource(xrdb, name, class, type, &value)
-	? (char *) value.addr
-	: (char *) 0;
+    ? (char *) value.addr
+    : (char *) 0;
     return (rc);
 }
 
@@ -1365,7 +1380,8 @@ char gray_values[Ncolors][30] = {
     "gray90", "gray50", "gray70", "gray30"
 };
 
-void pr_color()
+void
+pr_color()
 {
     unsigned long black = BlackPixel(dpy, scr), white = WhitePixel(dpy, scr);
     char option[20], color[30], *v, *ctype;
@@ -1447,7 +1463,8 @@ char dash_color[Ndashes][10] = {
     "0", "0", "0", "0", "0", "0", "0", "0"
 };
 
-void pr_dashes()
+void
+pr_dashes()
 {
     int n, j, l, ok;
     char option[20], *v;
@@ -1483,7 +1500,8 @@ void pr_dashes()
  *   pr_font - determine font          
  *---------------------------------------------------------------------------*/
 
-void pr_font()
+void
+pr_font()
 {
     char *fontname = pr_GetR(db, ".font");
 
@@ -1508,7 +1526,8 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
  *   pr_geometry - determine window geometry      
  *---------------------------------------------------------------------------*/
 
-void pr_geometry()
+void
+pr_geometry()
 {
     char *geometry = pr_GetR(db, ".geometry");
     int x, y, flags;
@@ -1538,7 +1557,8 @@ void pr_geometry()
  *   pr_pointsize - determine size of points for 'points' plotting style
  *---------------------------------------------------------------------------*/
 
-void pr_pointsize()
+void
+pr_pointsize()
 {
     if (pr_GetR(db, ".pointsize")) {
 	if (sscanf((char *) value.addr, "%lf", &pointsize) == 1) {
@@ -1564,7 +1584,8 @@ char width_keys[Nwidths][30] = {
     "line1", "line2", "line3", "line4", "line5", "line6", "line7", "line8"
 };
 
-void pr_width()
+void
+pr_width()
 {
     int n;
     char option[20], *v;
@@ -1586,7 +1607,8 @@ void pr_width()
  *   pr_window - create window 
  *---------------------------------------------------------------------------*/
 
-Window pr_window(flags, x, y, width, height)
+Window
+pr_window(flags, x, y, width, height)
 unsigned int flags;
 int x, y;
 unsigned int width, height;
@@ -1637,14 +1659,16 @@ unsigned int width, height;
 
 
 /***** pr_raise ***/
-void pr_raise()
+void
+pr_raise()
 {
     if (pr_GetR(db, ".raise"))
 	do_raise = (On(value.addr));
 }
 
 
-void pr_persist()
+void
+pr_persist()
 {
     if (pr_GetR(db, ".persist"))
 	persist = (On(value.addr));
@@ -1657,7 +1681,8 @@ void pr_persist()
 /* bit of a bodge, but ... */
 static struct plot_struct *exported_plot;
 
-void export_graph(plot)
+void
+export_graph(plot)
 struct plot_struct *plot;
 {
     FPRINTF((stderr, "export_graph(0x%x)\n", plot));
@@ -1669,7 +1694,8 @@ struct plot_struct *plot;
     exported_plot = plot;
 }
 
-void handle_selection_event(event)
+void
+handle_selection_event(event)
 XEvent *event;
 {
     switch (event->type) {
@@ -1693,7 +1719,7 @@ XEvent *event;
 	    FPRINTF((stderr, "selection request\n"));
 
 	    if (reply.xselection.target == XA_TARGETS) {
-		static Atom targets[] =	{XA_PIXMAP, XA_COLORMAP};
+		static Atom targets[] = { XA_PIXMAP, XA_COLORMAP };
 
 		FPRINTF((stderr, "Targets request from %d\n", reply.xselection.requestor));
 
@@ -1714,7 +1740,7 @@ XEvent *event;
 
 		XChangeProperty(dpy, reply.xselection.requestor,
 				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-			  (unsigned char *) &(exported_plot->pixmap), 1);
+				(unsigned char *) &(exported_plot->pixmap), 1);
 	    } else {
 		reply.xselection.property = None;
 	    }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.21 1998/04/14 00:16:20 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.2 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 
@@ -63,7 +63,7 @@ extern double zero;
 #define MINEXP  -88.0
 
 #ifdef FLT_MAX
-# define OFLOW   FLT_MAX		/* 1.0E+37 */
+# define OFLOW   FLT_MAX	/* 1.0E+37 */
 #else
 # define OFLOW   1.0E+37
 #endif
@@ -178,7 +178,8 @@ static double GPFAR a[] =
     .00000015056327351493115583383579667028994545044040,
 };
 
-static double lgamneg(z)
+static double
+lgamneg(z)
 double z;
 {
     double tmp;
@@ -196,7 +197,8 @@ double z;
 
 }
 
-static double lgampos(z)
+static double
+lgampos(z)
 double z;
 {
     double sum;
@@ -212,7 +214,8 @@ double z;
     return log(sum) + LNSQRT2PI - z - 6.5 + (z - 0.5) * log(z + 6.5);
 }
 
-static double lngamma(z)
+static double
+lngamma(z)
 double z;
 {
     signgam = 1;
@@ -226,7 +229,8 @@ double z;
 # define GAMMA(x) lngamma ((x))
 #endif /* !GAMMA */
 
-void f_erf()
+void
+f_erf()
 {
     struct value a;
     double x;
@@ -239,7 +243,7 @@ void f_erf()
     {
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
-	x = igamma(0.5, (x)*(x));
+	x = igamma(0.5, (x) * (x));
 	if (x == -1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
@@ -252,7 +256,8 @@ void f_erf()
     push(Gcomplex(&a, x, 0.0));
 }
 
-void f_erfc()
+void
+f_erfc()
 {
     struct value a;
     double x;
@@ -264,19 +269,20 @@ void f_erfc()
     {
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
-	x = igamma(0.5, (x)*(x));
+	x = igamma(0.5, (x) * (x));
 	if (x == 1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
-	} else { 
-	    x = fsign > 0 ? 1.0 - x : 1.0 + x ;
+	} else {
+	    x = fsign > 0 ? 1.0 - x : 1.0 + x;
 	}
     }
 #endif
     push(Gcomplex(&a, x, 0.0));
 }
 
-void f_ibeta()
+void
+f_ibeta()
 {
     struct value a;
     double x;
@@ -295,7 +301,8 @@ void f_ibeta()
 	push(Gcomplex(&a, x, 0.0));
 }
 
-void f_igamma()
+void
+f_igamma()
 {
     struct value a;
     double x;
@@ -312,7 +319,8 @@ void f_igamma()
 	push(Gcomplex(&a, x, 0.0));
 }
 
-void f_gamma()
+void
+f_gamma()
 {
     register double y;
     struct value a;
@@ -325,7 +333,8 @@ void f_gamma()
 	push(Gcomplex(&a, signgam * gp_exp(y), 0.0));
 }
 
-void f_lgamma()
+void
+f_lgamma()
 {
     struct value a;
 
@@ -334,7 +343,8 @@ void f_lgamma()
 
 #ifndef BADRAND
 
-void f_rand()
+void
+f_rand()
 {
     struct value a;
 
@@ -344,7 +354,8 @@ void f_rand()
 #else /* BADRAND */
 
 /* Use only to observe the effect of a "bad" random number generator. */
-void f_rand()
+void
+f_rand()
 {
     struct value a;
 
@@ -392,7 +403,8 @@ void f_rand()
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
  */
 
-static double ibeta(a, b, x)
+static double
+ibeta(a, b, x)
 double a, b, x;
 {
     /* Test for admissibility of arguments */
@@ -409,7 +421,8 @@ double a, b, x;
     return a < x * (a + b) ? 1.0 - confrac(b, a, 1.0 - x) : confrac(a, b, x);
 }
 
-static double confrac(a, b, x)
+static double
+confrac(a, b, x)
 double a, b, x;
 {
     double Alo = 0.0;
@@ -489,7 +502,8 @@ double a, b, x;
 /* Global variables, not visible outside this file */
 static double pn1, pn2, pn3, pn4, pn5, pn6;
 
-static double igamma(a, x)
+static double
+igamma(a, x)
 double a, x;
 {
     double arg;
@@ -597,7 +611,8 @@ double a, x;
      with Splitting Facilities." ACM Transactions on Mathematical
      Software, 17:98-111 (1991)
 ***********************************************************************/
-static double ranf(init)
+static double
+ranf(init)
 double init;
 {
 
@@ -636,7 +651,8 @@ double init;
    on 28 OCT 1992.
    ---------------------------------------------------------------- */
 
-void f_normal()
+void
+f_normal()
 {				/* Normal or Gaussian Probability Function */
     struct value a;
     double x;
@@ -655,11 +671,11 @@ void f_normal()
     {
 	int fsign;
 	fsign = x >= 0 ? 1 : 0;
-	x = igamma(0.5, (x)*(x));
+	x = igamma(0.5, (x) * (x));
 	if (x == 1.0) {
 	    undefined = TRUE;
 	    x = 0.0;
-	} else { 
+	} else {
 	    if (fsign == 0)
 		x = -(x);
 	    x = 0.5 * (1.0 + x);
@@ -669,7 +685,8 @@ void f_normal()
     push(Gcomplex(&a, x, 0.0));
 }
 
-void f_inverse_normal()
+void
+f_inverse_normal()
 {				/* Inverse normal distribution function */
     struct value a;
     double x;
@@ -685,7 +702,8 @@ void f_inverse_normal()
 }
 
 
-void f_inverse_erf()
+void
+f_inverse_erf()
 {				/* Inverse error function */
     struct value a;
     double x;
@@ -700,7 +718,8 @@ void f_inverse_erf()
     }
 }
 
-static double inverse_normal_func(p)
+static double
+inverse_normal_func(p)
 double p;
 {
     /* 
@@ -754,7 +773,8 @@ double p;
 }
 
 
-static double inverse_error_func(p)
+static double
+inverse_error_func(p)
 double p;
 {
     /* 

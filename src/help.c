@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.3 1999/06/09 12:13:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.4 1999/06/10 19:54:10 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -158,7 +158,8 @@ static int pagelines;		/* count for builtin pager */
  * print a help message 
  * also print available subtopics, if subtopics is TRUE
  */
-int help(keyword, path, subtopics)
+int
+help(keyword, path, subtopics)
 char *keyword;			/* on this topic */
 char *path;			/* from this file */
 TBOOLEAN *subtopics;		/* (in) - subtopics only? */
@@ -202,7 +203,8 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
  * except for DOS16 when we don't read all the file -
  * just the keys and location of the text
  */
-static int LoadHelp(path)
+static int
+LoadHelp(path)
 char *path;
 {
     LINKEY *key;		/* this key */
@@ -272,7 +274,8 @@ char *path;
 }
 
 /* make a new line buffer and save this string there */
-static LINEBUF *storeline(text)
+static LINEBUF *
+storeline(text)
 char *text;
 {
     LINEBUF *new;
@@ -290,7 +293,8 @@ char *text;
 }
 
 /* Add this keyword to the keys list, with the given text */
-static LINKEY *storekey(key)
+static LINKEY *
+storekey(key)
 char *key;
 {
     LINKEY *new;
@@ -314,7 +318,8 @@ char *key;
  * to sort them we need an array, so we reform them into an array,
  * and then throw away the list.
  */
-static void sortkeys()
+static void
+sortkeys()
 {
     LINKEY *p, *n;		/* pointers to linked list */
     int i;			/* index into key array */
@@ -343,7 +348,8 @@ static void sortkeys()
     qsort((char *) keys, keycount, sizeof(KEY), (sortfunc) keycomp);
 }
 
-static int keycomp(a, b)
+static int
+keycomp(a, b)
 KEY *a, *b;
 {
     return (strcmp(a->key, b->key));
@@ -351,7 +357,8 @@ KEY *a, *b;
 
 /* Free the help file from memory. */
 /* May be called externally if space is needed */
-void FreeHelp()
+void
+FreeHelp()
 {
     int i;			/* index into keys[] */
     LINEBUF *t, *next;
@@ -386,7 +393,8 @@ void FreeHelp()
  *  matches -- for if there are, the abbreviation is ambiguous. 
  *  We print the ambiguous matches in that case, and return not found.
  */
-static KEY * /* NULL if not found */ FindHelp(keyword)
+static KEY * /* NULL if not found */
+FindHelp(keyword)
 char *keyword;			/* string we look for */
 {
     KEY *key;
@@ -412,7 +420,8 @@ char *keyword;			/* string we look for */
  * It is ambiguous if it is not a complete string and there are other
  * keys following it with the same leading substring.
  */
-static TBOOLEAN Ambiguous(key, len)
+static TBOOLEAN
+Ambiguous(key, len)
 KEY *key;
 int len;
 {
@@ -456,7 +465,8 @@ int len;
 /* PrintHelp:
  * print the text for key
  */
-static void PrintHelp(key, subtopics)
+static void
+PrintHelp(key, subtopics)
 KEY *key;
 TBOOLEAN *subtopics;		/* (in) - subtopics only? */
 				/* (out) - are there subtopics? */
@@ -492,7 +502,8 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
  */
 #define PER_LINE 4
 
-static void ShowSubtopics(key, subtopics)
+static void
+ShowSubtopics(key, subtopics)
 KEY *key;			/* the topic */
 TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 {
@@ -625,7 +636,8 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
  * Open a file pointer to a pipe to user's $PAGER, if there is one,
  * otherwise use our own pager.
  */
-void StartOutput()
+void
+StartOutput()
 {
 #if defined(PIPES)
     char *pager_name = getenv("PAGER");
@@ -644,7 +656,8 @@ void StartOutput()
 
 /* write a line of help output  */
 /* line should contain only one \n, at the end */
-void OutLine(line)
+void
+OutLine(line)
 char *line;
 {
     int c;			/* dummy input char */
@@ -674,7 +687,8 @@ char *line;
     pagelines++;
 }
 
-void EndOutput()
+void
+EndOutput()
 {
 #if defined(PIPES)
     if (outfile != stderr)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.9 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -103,7 +103,7 @@ char *expanded_history_filename;
 
 static void wrapper_for_write_history __PROTO((void));
 
-# endif /* GNUPLOT_HISTORY */
+# endif				/* GNUPLOT_HISTORY */
 #endif /* HAVE_LIBREADLINE */
 
 extern FILE *gpoutfile;
@@ -276,7 +276,8 @@ void MTOS_open_pipe(void);
 extern int aesid;
 #endif
 
-RETSIGTYPE inter(anint)
+RETSIGTYPE
+inter(anint)
 int anint;
 {
 #ifdef OS2
@@ -308,7 +309,8 @@ static uid_t euid, ruid;
 static gid_t egid, rgid;
 static int asked_privi = 0;
 
-void drop_privilege()
+void
+drop_privilege()
 {
     if (!asked_privi) {
 	euid = geteuid();
@@ -319,13 +321,14 @@ void drop_privilege()
     }
     if (setegid(rgid) == -1)
 	(void) fprintf(stderr, "setegid(%d): %s\n",
-			(int) rgid, strerror(errno));
+		       (int) rgid, strerror(errno));
     if (seteuid(ruid) == -1)
 	(void) fprintf(stderr, "seteuid(%d): %s\n",
-			(int) ruid, strerror(errno));
+		       (int) ruid, strerror(errno));
 }
 
-void take_privilege()
+void
+take_privilege()
 {
     if (!asked_privi) {
 	euid = geteuid();
@@ -336,29 +339,33 @@ void take_privilege()
     }
     if (setegid(egid) == -1)
 	(void) fprintf(stderr, "setegid(%d): %s\n",
-			(int) egid, strerror(errno));
+		       (int) egid, strerror(errno));
     if (seteuid(euid) == -1)
 	(void) fprintf(stderr, "seteuid(%d): %s\n",
-			(int) euid, strerror(errno));
+		       (int) euid, strerror(errno));
 }
+
 #endif /* LINUXVGA */
 
 /* a wrapper for longjmp so we can keep everything local */
-void bail_to_command_line()
+void
+bail_to_command_line()
 {
     longjmp(command_line_env, TRUE);
 }
 
 #if defined(_Windows) || defined(_Macintosh)
-int gnu_main(argc, argv)
+int
+gnu_main(argc, argv)
 #else
-int main(argc, argv)
+int
+main(argc, argv)
 #endif
 int argc;
 char **argv;
 {
 #ifdef LINUXVGA
-    LINUX_setup();      /* setup VGA before dropping privilege DBT 4/5/99 */
+    LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
     drop_privilege();
 #endif
 /* make sure that we really have revoked root access, this might happen if
@@ -409,7 +416,7 @@ char **argv;
 	    if (*s == DIRSEP1)
 		*s = DIRSEP2;	/* '\\' to '/' */
 	strcpy(strrchr(HelpFile, DIRSEP2), "/gnuplot.gih");
-    }		/* Add also some "paranoid" tests for '\\':  AP */
+    }				/* Add also some "paranoid" tests for '\\':  AP */
 #endif /* DJGPP */
 
 #ifdef VMS
@@ -503,31 +510,31 @@ char **argv;
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 
-	if (interactive && term != 0) {  /* not unknown */
+	if (interactive && term != 0) {		/* not unknown */
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 	    FPRINTF((stderr, "Before read_history\n"));
-	    expanded_history_filename = tilde_expand (GNUPLOT_HISTORY_FILE);
+	    expanded_history_filename = tilde_expand(GNUPLOT_HISTORY_FILE);
 	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
-	    read_history (expanded_history_filename);
-           /* 
-            * It is safe to ignore the return values of 'atexit()' and
-	    * 'on_exit()'. In the worst case, there is no history of your
-	    * currrent session and you have to type all again in your next
-	    * session.
-            * This is the default behaviour (traditional reasons), too.
-            * In case you don't have one of these functions, or you don't
-	    * want to use them, 'write_history()' is called directly.
-            */
+	    read_history(expanded_history_filename);
+	    /* 
+	     * It is safe to ignore the return values of 'atexit()' and
+	     * 'on_exit()'. In the worst case, there is no history of your
+	     * currrent session and you have to type all again in your next
+	     * session.
+	     * This is the default behaviour (traditional reasons), too.
+	     * In case you don't have one of these functions, or you don't
+	     * want to use them, 'write_history()' is called directly.
+	     */
 #if defined (HAVE_ATEXIT)
-	    atexit (wrapper_for_write_history);
+	    atexit(wrapper_for_write_history);
 #elif defined (HAVE_ON_EXIT)
-	    on_exit (wrapper_for_write_history);
+	    on_exit(wrapper_for_write_history);
 #endif /* !HAVE_ATEXIT */
 
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
 
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
-	} /* if (interactive && term != 0) */
+	}			/* if (interactive && term != 0) */
     } else {
 	/* come back here from int_error() */
 #ifdef AMIGA_SC_6_1
@@ -585,7 +592,7 @@ char **argv;
 
 		while (!com_line());
 
-		/* interactive = FALSE; */ /* should this be here? */
+/* interactive = FALSE; *//* should this be here? */
 
 	    } else
 		load_file(loadpath_fopen(*argv, "r"), *argv, FALSE);
@@ -623,7 +630,8 @@ char **argv;
 }
 
 #if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
-int purec_matherr(struct exception *e)
+int
+purec_matherr(struct exception *e)
 {
     char *c;
     switch (e->type) {
@@ -661,7 +669,8 @@ math exception : %s\n\
 
 
 /* Set up to catch interrupts */
-void interrupt_setup()
+void
+interrupt_setup()
 {
 #ifdef __PUREC__
     setmatherr(purec_matherr);
@@ -677,24 +686,25 @@ void interrupt_setup()
 
 
 /* Look for a gnuplot init file in current or home directory */
-static void load_rcfile()
+static void
+load_rcfile()
 {
     FILE *plotrc = NULL;
     char *rcfile = NULL;
 
     /* len of homedir + directory separator + len of file name + \0 */
-    rcfile = (char *) gp_alloc (( user_homedir ? strlen(user_homedir) : 0 )+1+strlen(PLOTRC)+1, "rcfile");
+    rcfile = (char *) gp_alloc((user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1, "rcfile");
 
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
 #else
-    plotrc = fopen (PLOTRC, "r");
+    plotrc = fopen(PLOTRC, "r");
 #endif /* !NOCWDRC */
 
     if (plotrc == NULL) {
 	if (user_homedir) {
-	    strcpy (rcfile, user_homedir);
-	    PATH_CONCAT(rcfile,PLOTRC);
+	    strcpy(rcfile, user_homedir);
+	    PATH_CONCAT(rcfile, PLOTRC);
 	    plotrc = fopen(rcfile, "r");
 
 #if defined(ATARI) || defined(MTOS)
@@ -714,7 +724,8 @@ static void load_rcfile()
     free(rcfile);
 }
 
-static void get_user_env ()
+static void
+get_user_env()
 {
     if (user_homedir == NULL) {
 	char *env_home;
@@ -728,11 +739,10 @@ static void get_user_env ()
 
 	    assert(homelen <= PATH_MAX);
 	    user_homedir = (const char *) gp_alloc(homelen, "user homedir");
-	    strcpy((char *)user_homedir, env_home);
+	    strcpy((char *) user_homedir, env_home);
 	} else
 	    int_warn(NO_CARET, "no HOME found");
     }
-
     /* Hhm ... what about VMS? */
     if (user_shell == NULL) {
 	char *env_shell;
@@ -742,13 +752,12 @@ static void get_user_env ()
 #if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(OS2)
 	    if ((env_shell = getenv("COMSPEC")) == NULL)
 #endif
-	    env_shell = SHELL;
+		env_shell = SHELL;
 
 	shell_len += strlen(env_shell);
 	user_shell = (const char *) gp_alloc(shell_len, "user shell");
-	strcpy((char *)user_shell, env_shell);
+	strcpy((char *) user_shell, env_shell);
     }
-
 #if defined(ATARI) || defined(MTOS)
     if (user_gnuplotpath == NULL) {
 	char *env_gpp;
@@ -757,7 +766,7 @@ static void get_user_env ()
 	    size_t gpplen = strlen(env_gpp) + 1;
 
 	    user_gnuplotpath = (const char *) gp_alloc(gpplen, "user gnuplotpath");
-	    strcpy((char *)user_gnuplotpath, env_gpp);
+	    strcpy((char *) user_gnuplotpath, env_gpp);
 	}
     }
 #endif
@@ -766,43 +775,44 @@ static void get_user_env ()
 /* expand tilde in path
  * path cannot be a static array!
  */
-void gp_expand_tilde (pathp)
+void
+gp_expand_tilde(pathp)
 char **pathp;
 {
     if (!*pathp)
-	int_error (NO_CARET, "Cannot expand empty path");
+	int_error(NO_CARET, "Cannot expand empty path");
 
     if ((*pathp)[0] == '~' && (*pathp)[1] == DIRSEP1) {
 
 	if (user_homedir) {
 	    size_t n = strlen(*pathp);
 
-	    *pathp = gp_realloc (*pathp, n - 1 + strlen(user_homedir), "tilde expansion");
+	    *pathp = gp_realloc(*pathp, n - 1 + strlen(user_homedir), "tilde expansion");
 
 	    /* include null at end ... */
-	    memmove (*pathp + strlen(user_homedir) - 1, *pathp, n+1);
-	    strncpy (*pathp, user_homedir, strlen(user_homedir));
-        }
-        else
-	    int_warn (NO_CARET, "HOME not set - cannot expand tilde");
+	    memmove(*pathp + strlen(user_homedir) - 1, *pathp, n + 1);
+	    strncpy(*pathp, user_homedir, strlen(user_homedir));
+	} else
+	    int_warn(NO_CARET, "HOME not set - cannot expand tilde");
     }
 }
 
 #ifdef OS2
 
-int ExecuteMacro(char *argv, int namelength)
+int
+ExecuteMacro(char *argv, int namelength)
 {
     RXSTRING rxRc;
     RXSTRING rxArg[2];
-    int rxArgCount=0;
+    int rxArgCount = 0;
     char pszName[CCHMAXPATH];
     char *rxArgStr;
     short sRc;
     int rc;
 
     if (namelength >= sizeof(pszName))
-      return 1;
-    safe_strncpy(pszName, argv, namelength+1);
+	return 1;
+    safe_strncpy(pszName, argv, namelength + 1);
     rxArgStr = &argv[namelength];
 
 #if 0
@@ -810,49 +820,49 @@ int ExecuteMacro(char *argv, int namelength)
        C-like calling of function: program name is first
        parameter.
        In REXX you would have to use
-          Parse Arg param0, param1
+       Parse Arg param0, param1
        to get the program name in param0 and the arguments in param1.
 
        Some versions before gnuplot 3.7pl1 used a similar approach but
        passed program name and arguments in a single string:
-         (==> Parse Arg param0 param1)
-    */
+       (==> Parse Arg param0 param1)
+     */
 
     MAKERXSTRING(rxArg[0], pszName, strlen(pszName));
     rxArgCount++;
     if (*rxArgStr) {
-      MAKERXSTRING(rxArg[1], rxArgStr, strlen(rxArgStr));
-      rxArgCount++;
+	MAKERXSTRING(rxArg[1], rxArgStr, strlen(rxArgStr));
+	rxArgCount++;
     }
 #else
     /*
        REXX standard calling (gnuplot 3.7pl1 and above):
        The program name is not supplied and so all actual arguments
        are in a single string:
-           Parse Arg param
+       Parse Arg param
        We even handle blanks like cmd.exe when calling REXX programs.
-    */
+     */
 
     if (*rxArgStr) {
-      MAKERXSTRING(rxArg[0], rxArgStr, strlen(rxArgStr));
-      rxArgCount++;
+	MAKERXSTRING(rxArg[0], rxArgStr, strlen(rxArgStr));
+	rxArgCount++;
     }
 #endif
 
     CallFromRexx = TRUE;
     rc = RexxStart(
-           rxArgCount,
-		   rxArg,
-		   pszName,
-		   NULL,
-		   "GNUPLOT",
-		   RXCOMMAND,
-		   NULL,
-		   &sRc,
-		   &rxRc);
+		      rxArgCount,
+		      rxArg,
+		      pszName,
+		      NULL,
+		      "GNUPLOT",
+		      RXCOMMAND,
+		      NULL,
+		      &sRc,
+		      &rxRc);
     CallFromRexx = FALSE;
     if (rc == -4)
-      rc = 0;       /* run was cancelled-don't give error message */
+	rc = 0;			/* run was cancelled-don't give error message */
 
 /* We don't we try to use rxRc ?
    BTW, don't use free() instead since it's allocated inside RexxStart()
@@ -861,7 +871,8 @@ int ExecuteMacro(char *argv, int namelength)
     return rc;
 }
 
-ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
+ULONG
+RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 /*
    ** Rexx command line interface
  */
@@ -872,16 +883,16 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 
     memcpy(keepenv, command_line_env, sizeof(jmp_buf));
     if (!setjmp(command_line_env)) {
-      /* Set variable input_line.
-         Watch out for line length of NOT_ZERO_TERMINATED strings ! */
-       cmdlen = rxCmd->strlength + 1;
-       safe_strncpy(input_line, rxCmd->strptr, cmdlen);
-       input_line[cmdlen] = NUL;
-       rc = do_line();
-       *pusErr = RXSUBCOM_OK;
-       rxRc->strptr[0] = rc + '0';
-       rxRc->strptr[1] = NUL;
-       rxRc->strlength = strlen(rxRc->strptr);
+	/* Set variable input_line.
+	   Watch out for line length of NOT_ZERO_TERMINATED strings ! */
+	cmdlen = rxCmd->strlength + 1;
+	safe_strncpy(input_line, rxCmd->strptr, cmdlen);
+	input_line[cmdlen] = NUL;
+	rc = do_line();
+	*pusErr = RXSUBCOM_OK;
+	rxRc->strptr[0] = rc + '0';
+	rxRc->strptr[1] = NUL;
+	rxRc->strlength = strlen(rxRc->strptr);
     } else {
 /*
    We end up here when bail_to_command_line() is called.
@@ -889,8 +900,8 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
    executing a REXX program (e.g. 'Cancel' from
    PM GUI after a 'pause -1' command)
 */
-       *pusErr = RXSUBCOM_ERROR;
-       RexxSetHalt(getpid(), 1);
+	*pusErr = RXSUBCOM_ERROR;
+	RexxSetHalt(getpid(), 1);
     }
     memcpy(command_line_env, keepenv, sizeof(jmp_buf));
     return 0;
@@ -899,13 +910,12 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
 static void
-wrapper_for_write_history ()
+wrapper_for_write_history()
 {
-    if (!write_history (expanded_history_filename)) {
+    if (!write_history(expanded_history_filename)) {
 	/* if writing was successful, truncate history
 	 *  to HOSTORY_SIZE lines. */
-          history_truncate_file (expanded_history_filename, HISTORY_SIZE);
+	history_truncate_file(expanded_history_filename, HISTORY_SIZE);
     }
 }
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
-

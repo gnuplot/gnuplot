@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.16 1998/03/22 22:31:19 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.3 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -703,7 +703,8 @@ char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
 /*
  * set pixel (x, y, value) to value value (this can be 1/0 or a color number).
  */
-void b_setpixel(x, y, value)
+void
+b_setpixel(x, y, value)
 unsigned int x, y, value;
 {
     register unsigned int row;
@@ -792,7 +793,8 @@ unsigned int x, y;
 /*
  * allocate the bitmap
  */
-void b_makebitmap(x, y, planes)
+void
+b_makebitmap(x, y, planes)
 unsigned int x, y, planes;
 {
     register unsigned j;
@@ -827,7 +829,8 @@ unsigned int x, y, planes;
 /*
  * free the allocated bitmap
  */
-void b_freebitmap()
+void
+b_freebitmap()
 {
     unsigned int j, rows;
 
@@ -843,7 +846,8 @@ void b_freebitmap()
 /*
  * set pixel at (x,y) with color b_value and dotted mask b_linemask.
  */
-void b_setmaskpixel(x, y, value)
+void
+b_setmaskpixel(x, y, value)
 unsigned int x, y, value;
 {
     /* dotted line generator */
@@ -860,7 +864,8 @@ unsigned int x, y, value;
  * draw a line from (x1,y1) to (x2,y2)
  * with color b_value and dotted mask b_linemask.
  */
-void b_line(x1, y1, x2, y2)
+void
+b_line(x1, y1, x2, y2)
 unsigned int x1, y1, x2, y2;
 {
     int runcount;
@@ -920,7 +925,8 @@ unsigned int x1, y1, x2, y2;
 /*
  * set character size
  */
-void b_charsize(size)
+void
+b_charsize(size)
 unsigned int size;
 {
     int j;
@@ -958,7 +964,8 @@ unsigned int size;
 /*
  * put characater c at (x,y) rotated by angle with color b_value.
  */
-static void b_putc(x, y, c, c_angle)
+static
+void b_putc(x, y, c, c_angle)
 unsigned int x, y;
 int c;
 unsigned int c_angle;
@@ -1010,7 +1017,8 @@ unsigned int c_angle;
 /*
    ** set b_linemask to b_pattern[linetype]
  */
-void b_setlinetype(linetype)
+void
+b_setlinetype(linetype)
 int linetype;
 {
     if (linetype >= 7)
@@ -1023,7 +1031,8 @@ int linetype;
 /*
  * set b_value to value
  */
-void b_setvalue(value)
+void
+b_setvalue(value)
 unsigned int value;
 {
     b_value = value;
@@ -1033,7 +1042,8 @@ unsigned int value;
 /*
  * move to (x,y)
  */
-void b_move(x, y)
+void
+b_move(x, y)
 unsigned int x, y;
 {
     b_currx = x;
@@ -1044,7 +1054,8 @@ unsigned int x, y;
 /*
  * draw to (x,y) with color b_value
  */
-void b_vector(x, y)
+void
+b_vector(x, y)
 unsigned int x, y;
 {
     b_line(b_currx, b_curry, x, y);
@@ -1056,7 +1067,8 @@ unsigned int x, y;
 /*
  * put text str at (x,y) with color b_value and rotation b_angle
  */
-void b_put_text(x, y, str)
+void
+b_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -1077,7 +1089,8 @@ char *str;
 }
 
 
-int b_text_angle(ang)
+int
+b_text_angle(ang)
 int ang;
 {
     b_angle = (unsigned int) ang;

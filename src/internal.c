@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.23 1998/04/14 00:15:44 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.3 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -45,7 +45,8 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.23 1998/04/14 00:15:44 
  */
 
 #ifdef MINEXP
-double gp_exp(x)
+double
+gp_exp(x)
 double x;
 {
     return (x < (MINEXP)) ? 0.0 : exp(x);
@@ -74,9 +75,11 @@ int s_p = -1;			/* stack pointer */
 #  define matherr _matherr
 # endif				/* __BORLANDC__ >= 0x450 */
 # if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) || defined(VMS)
-int matherr()
+int
+matherr()
 #else
-int matherr(x)
+int
+matherr(x)
 struct exception *x;
 # endif				/* (MSDOS || DOS386) && __TURBOC__ */
 {
@@ -85,13 +88,15 @@ struct exception *x;
 #endif /* not _CRAY */
 
 
-void reset_stack()
+void
+reset_stack()
 {
     s_p = -1;
 }
 
 
-void check_stack()
+void
+check_stack()
 {				/* make sure stack's empty */
     if (s_p != -1)
 	fprintf(stderr, "\n\
@@ -101,7 +106,8 @@ warning:  internal error--stack not empty!\n\
 
 #define BAD_DEFAULT default: int_error(NO_CARET, "interal error : type neither INT or CMPLX"); return;
 
-struct value *pop(x)
+struct value *
+pop(x)
 struct value *x;
 {
     if (s_p < 0)
@@ -111,7 +117,8 @@ struct value *x;
 }
 
 
-void push(x)
+void
+push(x)
 struct value *x;
 {
     if (s_p == STACK_DEPTH - 1)
@@ -120,7 +127,8 @@ struct value *x;
 }
 
 
-void f_push(x)
+void
+f_push(x)
 union argument *x;		/* contains pointer to value to push; */
 {
     struct udvt_entry *udv;
@@ -133,28 +141,32 @@ union argument *x;		/* contains pointer to value to push; */
 }
 
 
-void f_pushc(x)
+void
+f_pushc(x)
 union argument *x;
 {
     push(&(x->v_arg));
 }
 
 
-void f_pushd1(x)
+void
+f_pushd1(x)
 union argument *x;
 {
     push(&(x->udf_arg->dummy_values[0]));
 }
 
 
-void f_pushd2(x)
+void
+f_pushd2(x)
 union argument *x;
 {
     push(&(x->udf_arg->dummy_values[1]));
 }
 
 
-void f_pushd(x)
+void
+f_pushd(x)
 union argument *x;
 {
     struct value param;
@@ -163,7 +175,8 @@ union argument *x;
 }
 
 
-void f_call(x)			/* execute a udf */
+void
+f_call(x)			/* execute a udf */
 union argument *x;
 {
     register struct udft_entry *udf;
@@ -181,7 +194,8 @@ union argument *x;
 }
 
 
-void f_calln(x)			/* execute a udf of n variables */
+void
+f_calln(x)			/* execute a udf of n variables */
 union argument *x;
 {
     register struct udft_entry *udf;
@@ -223,7 +237,8 @@ union argument *x;
 }
 
 
-static void int_check(v)
+static void
+int_check(v)
 struct value *v;
 {
     if (v->type != INTGR)
@@ -231,7 +246,8 @@ struct value *v;
 }
 
 
-void f_lnot()
+void
+f_lnot()
 {
     struct value a;
     int_check(pop(&a));
@@ -239,7 +255,8 @@ void f_lnot()
 }
 
 
-void f_bnot()
+void
+f_bnot()
 {
     struct value a;
     int_check(pop(&a));
@@ -247,14 +264,16 @@ void f_bnot()
 }
 
 
-void f_bool()
+void
+f_bool()
 {				/* converts top-of-stack to boolean */
     int_check(&top_of_stack);
     top_of_stack.v.int_val = !!top_of_stack.v.int_val;
 }
 
 
-void f_lor()
+void
+f_lor()
 {
     struct value a, b;
     int_check(pop(&b));
@@ -262,7 +281,8 @@ void f_lor()
     push(Ginteger(&a, a.v.int_val || b.v.int_val));
 }
 
-void f_land()
+void
+f_land()
 {
     struct value a, b;
     int_check(pop(&b));
@@ -271,7 +291,8 @@ void f_land()
 }
 
 
-void f_bor()
+void
+f_bor()
 {
     struct value a, b;
     int_check(pop(&b));
@@ -280,7 +301,8 @@ void f_bor()
 }
 
 
-void f_xor()
+void
+f_xor()
 {
     struct value a, b;
     int_check(pop(&b));
@@ -289,7 +311,8 @@ void f_xor()
 }
 
 
-void f_band()
+void
+f_band()
 {
     struct value a, b;
     int_check(pop(&b));
@@ -298,7 +321,8 @@ void f_band()
 }
 
 
-void f_uminus()
+void
+f_uminus()
 {
     struct value a;
     (void) pop(&a);
@@ -318,7 +342,8 @@ void f_uminus()
 }
 
 
-void f_eq()
+void
+f_eq()
 {
     /* note: floating point equality is rare because of roundoff error! */
     struct value a, b;
@@ -361,7 +386,8 @@ void f_eq()
 }
 
 
-void f_ne()
+void
+f_ne()
 {
     struct value a, b;
     register int result = 0;
@@ -404,7 +430,8 @@ void f_ne()
 }
 
 
-void f_gt()
+void
+f_gt()
 {
     struct value a, b;
     register int result = 0;
@@ -443,7 +470,8 @@ void f_gt()
 }
 
 
-void f_lt()
+void
+f_lt()
 {
     struct value a, b;
     register int result = 0;
@@ -482,7 +510,8 @@ void f_lt()
 }
 
 
-void f_ge()
+void
+f_ge()
 {
     struct value a, b;
     register int result = 0;
@@ -521,7 +550,8 @@ void f_ge()
 }
 
 
-void f_le()
+void
+f_le()
 {
     struct value a, b;
     register int result = 0;
@@ -560,7 +590,8 @@ void f_le()
 }
 
 
-void f_plus()
+void
+f_plus()
 {
     struct value a, b, result;
     (void) pop(&b);
@@ -602,7 +633,8 @@ void f_plus()
 }
 
 
-void f_minus()
+void
+f_minus()
 {
     struct value a, b, result;
     (void) pop(&b);
@@ -644,7 +676,8 @@ void f_minus()
 }
 
 
-void f_mult()
+void
+f_mult()
 {
     struct value a, b, result;
     (void) pop(&b);
@@ -693,7 +726,8 @@ void f_mult()
 }
 
 
-void f_div()
+void
+f_div()
 {
     struct value a, b, result;
     register double square;
@@ -772,7 +806,8 @@ void f_div()
 }
 
 
-void f_mod()
+void
+f_mod()
 {
     struct value a, b;
     (void) pop(&b);
@@ -789,7 +824,8 @@ void f_mod()
 }
 
 
-void f_power()
+void
+f_power()
 {
     struct value a, b, result;
     register int i, t, count;
@@ -898,7 +934,8 @@ void f_power()
 }
 
 
-void f_factorial()
+void
+f_factorial()
 {
     struct value a;
     register int i;
@@ -909,7 +946,7 @@ void f_factorial()
     switch (a.type) {
     case INTGR:
 	val = 1.0;
-	for (i = a.v.int_val; i > 1; i--)    /*fpe's should catch overflows */
+	for (i = a.v.int_val; i > 1; i--)	/*fpe's should catch overflows */
 	    val *= i;
 	break;
     default:
@@ -922,14 +959,16 @@ void f_factorial()
 }
 
 
-int f_jump(x)
+int
+f_jump(x)
 union argument *x;
 {
     return (x->j_arg);
 }
 
 
-int f_jumpz(x)
+int
+f_jumpz(x)
 union argument *x;
 {
     struct value a;
@@ -942,7 +981,8 @@ union argument *x;
 }
 
 
-int f_jumpnz(x)
+int
+f_jumpnz(x)
 union argument *x;
 {
     struct value a;
@@ -956,7 +996,8 @@ union argument *x;
 }
 
 
-int f_jtern(x)
+int
+f_jtern(x)
 union argument *x;
 {
     struct value a;

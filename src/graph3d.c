@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.4 1999/06/09 12:05:43 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.5 1999/06/10 20:00:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -128,17 +128,20 @@ static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
  * (MGR, 1993)
  */
 #ifdef AMIGA_SC_6_1
-GP_INLINE static TBOOLEAN i_inrange(int z, int min, int max)
+GP_INLINE static TBOOLEAN
+i_inrange(int z, int min, int max)
 {
     return ((min < max) ? ((z >= min) && (z <= max)) : ((z >= max) && (z <= min)));
 }
 
-GP_INLINE static double f_max(double a, double b)
+GP_INLINE static double
+f_max(double a, double b)
 {
     return (max(a, b));
 }
 
-GP_INLINE static double f_min(double a, double b)
+GP_INLINE static double
+f_min(double a, double b)
 {
     return (min(a, b));
 }
@@ -248,7 +251,8 @@ static double tic_unitx, tic_unity;
 
 /* Initialize the line style using the current device and set hidden styles
  * to it as well if hidden line removal is enabled */
-static void setlinestyle(style)
+static void
+setlinestyle(style)
 struct lp_style_type style;
 {
     term_apply_lp_properties(&style);
@@ -268,7 +272,8 @@ struct lp_style_type style;
  * macro arguments twice, thus I inline theese functions. (MGR, 1993)
  */
 #if defined(sun386) || defined(AMIGA_SC_6_1)
-GP_INLINE static double CheckLog(is_log, base_log, x)
+GP_INLINE static double
+CheckLog(is_log, base_log, x)
 TBOOLEAN is_log;
 double base_log;
 double x;
@@ -283,7 +288,8 @@ double x;
 # define CheckLog(is_log, base_log, x) ((is_log) ? pow(base_log, (x)) : (x))
 #endif /* sun386 || SAS/C */
 
-static double LogScale(coord, is_log, log_base_log, what, axis)
+static double
+LogScale(coord, is_log, log_base_log, what, axis)
 double coord;			/* the value */
 TBOOLEAN is_log;		/* is this axis in logscale? */
 double log_base_log;		/* if so, the log of its base */
@@ -303,13 +309,14 @@ char *axis;			/* which axis is this for ("x" or "y")? */
 }
 
 /* And the functions to map from user 3D space to terminal coordinates */
-void map3d_xy(x, y, z, xt, yt)
+void
+map3d_xy(x, y, z, xt, yt)
 double x, y, z;
 unsigned int *xt, *yt;
 {
     int i, j;
-    double v[4], res[4], /* Homogeneous coords. vectors. */
-	w = trans_mat[3][3];
+    double v[4], res[4],	/* Homogeneous coords. vectors. */
+     w = trans_mat[3][3];
 
     v[0] = map_x3d(x);		/* Normalize object space to -1..1 */
     v[1] = map_y3d(y);
@@ -334,12 +341,13 @@ unsigned int *xt, *yt;
 
 
 /* And the functions to map from user 3D space to terminal z coordinate */
-int map3d_z(x, y, z)
+int
+map3d_z(x, y, z)
 double x, y, z;
 {
     int i, zt;
-    double v[4], res, /* Homogeneous coords. vectors. */
-	w = trans_mat[3][3];
+    double v[4], res,		/* Homogeneous coords. vectors. */
+     w = trans_mat[3][3];
 
     v[0] = map_x3d(x);		/* Normalize object space to -1..1 */
     v[1] = map_y3d(y);
@@ -359,7 +367,8 @@ double x, y, z;
 
 /* borders of plotting area */
 /* computed once on every call to do_plot */
-static void boundary3d(scaling, plots, count)
+static void
+boundary3d(scaling, plots, count)
 TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
 struct surface_points *plots;
 int count;
@@ -380,7 +389,6 @@ int count;
 	/* is this reasonable ? */
 	key_entry_height = (t->v_char) * key_vert_factor;
     }
-
     /* count max_len key and number keys (plot-titles and contour labels) with len > 0 */
     max_ptitl_len = find_maxl_keys3d(plots, count, &ptitl_cnt);
     if ((ytlen = label_width(key_title, &ktitle_lines)) > max_ptitl_len)
@@ -397,17 +405,17 @@ int count;
     key_rows = ptitl_cnt;
     key_cols = 1;
     if (key == -1 && key_vpos == TUNDER) {
-      if (ptitl_cnt > 0) {
-	/* calculate max no cols, limited by label-length */
-	key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
-	key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
-	/* now calculate actual no cols depending on no rows */
-	key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
-	key_col_wth = (int) (xright - xleft) / key_cols;
-	/* key_rows += ktitle_lines; - messes up key - div */
-      } else {
-	key_rows = key_cols = key_col_wth = 0;
-      }
+	if (ptitl_cnt > 0) {
+	    /* calculate max no cols, limited by label-length */
+	    key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
+	    key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
+	    /* now calculate actual no cols depending on no rows */
+	    key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
+	    key_col_wth = (int) (xright - xleft) / key_cols;
+	    /* key_rows += ktitle_lines; - messes up key - div */
+	} else {
+	    key_rows = key_cols = key_col_wth = 0;
+	}
     }
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
@@ -447,7 +455,7 @@ int count;
     /* HBB 980308: sigh... another 16bit glitch: on term's with more than
      * 8000 pixels in either direction, these calculations produce garbage
      * results if done in (16bit) ints */
-    xscaler = ((xright - xleft) * 4L) / 7L;              /* HBB: Magic number alert! */
+    xscaler = ((xright - xleft) * 4L) / 7L;	/* HBB: Magic number alert! */
     yscaler = ((ytop - ybot) * 4L) / 7L;
 }
 
@@ -455,7 +463,8 @@ int count;
 /* not used ; anyway, should be done using bitshifts and squares,
  * rather than iteratively
  */
-static double dbl_raise(x, y)
+static double
+dbl_raise(x, y)
 double x;
 int y;
 {
@@ -481,7 +490,8 @@ static int key_text_right;	/* offset from x for right-justified text */
 static int key_size_left;	/* distance from x to left edge of box */
 static int key_size_right;	/* distance from x to right edge of box */
 
-void do_3dplot(plots, pcount)
+void
+do_3dplot(plots, pcount)
 struct surface_points *plots;
 int pcount;			/* count of plots in linked list */
 {
@@ -505,13 +515,14 @@ int pcount;			/* count of plots in linked list */
     mat_scale(surface_scale / 2.0, surface_scale / 2.0, surface_scale / 2.0, mat);
     mat_mult(trans_mat, trans_mat, mat);
 
-#if 0 /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
+#if 0
+    /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
     /* modify min_z/max_z so it will zscale properly. */
     ztemp = (z_max3d - z_min3d) / (2.0 * surface_zscale);
     temp = (z_max3d + z_min3d) / 2.0;
     z_min3d = temp - ztemp;
     z_max3d = temp + ztemp;
-#endif
+#endif /* 0 */
 
     /* The extrema need to be set even when a surface is not being
      * drawn.   Without this, gnuplot used to assume that the X and
@@ -582,9 +593,9 @@ int pcount;			/* count of plots in linked list */
     xscale3d = 2.0 / (x_max3d - x_min3d);
 
 #if defined(USE_MOUSE) && defined(OS2)
-    if (strcmp(term->name, "pm") == 0) { /* PM 14.5.1999 tell gnupmdrv about new [xleft..ybot] values */
-      extern void PM_write_xleft_ytop();
-      PM_write_xleft_ytop();
+    if (strcmp(term->name, "pm") == 0) {	/* PM 14.5.1999 tell gnupmdrv about new [xleft..ybot] values */
+	extern void PM_write_xleft_ytop();
+	PM_write_xleft_ytop();
     }
 #endif
 
@@ -646,7 +657,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer)
-		continue;
+	    continue;
 	map_position(&this_arrow->start, &sx, &sy, "arrow");
 	map_position(&this_arrow->end, &ex, &ey, "arrow");
 	term_apply_lp_properties(&(this_arrow->lp_properties));
@@ -692,20 +703,20 @@ int pcount;			/* count of plots in linked list */
 	    /* HBB 19990608: why calculate these again? boundary3d has already 
 	     * done it... */
 	    if (ptitl_cnt > 0) {
-	    /* maximise no cols, limited by label-length */
-	    key_cols = (int) (xright - xleft) / key_col_wth;
-	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
-	    /* now calculate actual no cols depending on no rows */
-	    key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
-	    key_col_wth = (int) (xright - xleft) / key_cols;
-	    /* we divide into columns, then centre in column by considering
-	     * ratio of key_left_size to key_right_size
-	     * key_size_left/(key_size_left+key_size_right) * (xright-xleft)/key_cols
-	     * do one integer division to maximise accuracy (hope we dont
-	     * overflow !)
-	     */
-	    xl = xleft + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
-	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
+		/* maximise no cols, limited by label-length */
+		key_cols = (int) (xright - xleft) / key_col_wth;
+		key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
+		/* now calculate actual no cols depending on no rows */
+		key_cols = (int) (ptitl_cnt + key_rows - 1) / key_rows;
+		key_col_wth = (int) (xright - xleft) / key_cols;
+		/* we divide into columns, then centre in column by considering
+		 * ratio of key_left_size to key_right_size
+		 * key_size_left/(key_size_left+key_size_right) * (xright-xleft)/key_cols
+		 * do one integer division to maximise accuracy (hope we dont
+		 * overflow !)
+		 */
+		xl = xleft + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
+		yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
 	    }
 #endif
 	} else {
@@ -832,7 +843,7 @@ int pcount;			/* count of plots in linked list */
 		}
 	    case YERRORLINES:	/* ignored; treat like points */
 	    case XERRORLINES:	/* ignored; treat like points */
-	    case XYERRORLINES:/* ignored; treat like points */
+	    case XYERRORLINES:	/* ignored; treat like points */
 	    case YERRORBARS:	/* ignored; treat like points */
 	    case XERRORBARS:	/* ignored; treat like points */
 	    case XYERRORBARS:	/* ignored; treat like points */
@@ -889,8 +900,7 @@ int pcount;			/* count of plots in linked list */
 		NEXT_KEY_LINE();
 	    }
 	}			/* draw_surface */
-
-#ifndef LITE 
+#ifndef LITE
 	if (hidden3d) {
 	    hidden_no_update = TRUE;
 	    hidden_line_type_above = this_plot->lp_properties.l_type + (hidden3d ? 2 : 1);
@@ -920,7 +930,7 @@ int pcount;			/* count of plots in linked list */
 		    break;
 		case YERRORLINES:	/* ignored; treat like points */
 		case XERRORLINES:	/* ignored; treat like points */
-		case XYERRORLINES:/* ignored; treat like points */
+		case XYERRORLINES:	/* ignored; treat like points */
 		case YERRORBARS:	/* ignored; treat like points */
 		case XERRORBARS:	/* ignored; treat like points */
 		case XYERRORBARS:	/* ignored; treat like points */
@@ -966,7 +976,7 @@ int pcount;			/* count of plots in linked list */
 			    break;
 			case YERRORLINES:	/* ignored; treat like points */
 			case XERRORLINES:	/* ignored; treat like points */
-			case XYERRORLINES:/* ignored; treat like points */
+			case XYERRORLINES:	/* ignored; treat like points */
 			case YERRORBARS:	/* ignored; treat like points */
 			case XERRORBARS:	/* ignored; treat like points */
 			case XYERRORBARS:	/* ignored; treat like points */
@@ -1001,7 +1011,7 @@ int pcount;			/* count of plots in linked list */
 		    break;
 		case YERRORLINES:	/* ignored; treat like points */
 		case XERRORLINES:	/* ignored; treat like points */
-		case XYERRORLINES:/* ignored; treat like points */
+		case XYERRORLINES:	/* ignored; treat like points */
 		case YERRORBARS:	/* ignored; treat like points */
 		case XERRORBARS:	/* ignored; treat like points */
 		case XYERRORBARS:	/* ignored; treat like points */
@@ -1035,7 +1045,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int x, y;
 
 	if (this_label->layer == 0)
-		continue;
+	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	safe_strncpy(ss, this_label->text, sizeof(ss));
 	if (this_label->rotate && (*t->text_angle) (1)) {
@@ -1052,7 +1062,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer == 0)
-		continue;
+	    continue;
 	map_position(&this_arrow->start, &sx, &sy, "arrow");
 	map_position(&this_arrow->end, &ex, &ey, "arrow");
 	term_apply_lp_properties(&(this_arrow->lp_properties));
@@ -1072,7 +1082,8 @@ int pcount;			/* count of plots in linked list */
 /* plot3d_impulses:
  * Plot the surfaces in IMPULSES style
  */
-static void plot3d_impulses(plot)
+static void
+plot3d_impulses(plot)
 struct surface_points *plot;
 {
     int i;			/* point index */
@@ -1154,7 +1165,8 @@ struct surface_points *plot;
    we draw an adjacent box we might get the line drawn a little differently
    and we get splotches.  */
 
-static void plot3d_lines(plot)
+static void
+plot3d_lines(plot)
 struct surface_points *plot;
 {
     int i;
@@ -1257,7 +1269,8 @@ struct surface_points *plot;
 /* plot3d_points:
  * Plot the surfaces in POINTSTYLE style
  */
-static void plot3d_points(plot)
+static void
+plot3d_points(plot)
 struct surface_points *plot;
 {
     int i;
@@ -1284,7 +1297,8 @@ struct surface_points *plot;
 /* plot3d_dots:
  * Plot the surfaces in DOTS style
  */
-static void plot3d_dots(plot)
+static void
+plot3d_dots(plot)
 struct surface_points *plot;
 {
     int i;
@@ -1311,7 +1325,8 @@ struct surface_points *plot;
 /* cntr3d_impulses:
  * Plot a surface contour in IMPULSES style
  */
-static void cntr3d_impulses(cntr, plot)
+static void
+cntr3d_impulses(cntr, plot)
 struct gnuplot_contours *cntr;
 struct surface_points *plot;
 {
@@ -1337,7 +1352,8 @@ struct surface_points *plot;
 /* cntr3d_lines:
  * Plot a surface contour in LINES style
  */
-static void cntr3d_lines(cntr)
+static void
+cntr3d_lines(cntr)
 struct gnuplot_contours *cntr;
 {
     int i;			/* point index */
@@ -1381,7 +1397,8 @@ struct gnuplot_contours *cntr;
 /* cntr3d_points:
  * Plot a surface contour in POINTSTYLE style
  */
-static void cntr3d_points(cntr, plot)
+static void
+cntr3d_points(cntr, plot)
 struct gnuplot_contours *cntr;
 struct surface_points *plot;
 {
@@ -1411,7 +1428,8 @@ struct surface_points *plot;
 /* cntr3d_dots:
  * Plot a surface contour in DOTS style
  */
-static void cntr3d_dots(cntr)
+static void
+cntr3d_dots(cntr)
 struct gnuplot_contours *cntr;
 {
     int i;
@@ -1449,7 +1467,8 @@ struct gnuplot_contours *cntr;
  * we are still assuming that extremes of surfaces are at corners,
  * but we are not assuming order of corners
  */
-static void check_corner_height(p, height, depth)
+static void
+check_corner_height(p, height, depth)
 struct coordinate GPHUGE *p;
 double height[2][2];
 double depth[2][2];
@@ -1469,13 +1488,14 @@ double depth[2][2];
 
 
 /* Draw the bottom grid that hold the tic marks for 3d surface. */
-static void draw_bottom_grid(plot, plot_num)
+static void
+draw_bottom_grid(plot, plot_num)
 struct surface_points *plot;
 int plot_num;
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
-    char ss[MAX_LINE_LEN+1];
+    char ss[MAX_LINE_LEN + 1];
 
     /* work out where the axes and tics are drawn */
 
@@ -1580,7 +1600,7 @@ int plot_num;
 		unsigned int zaxis_i = MAP_HEIGHT_X(zaxis_x);
 		unsigned int zaxis_j = MAP_HEIGHT_Y(zaxis_y);
 		unsigned int back_i = MAP_HEIGHT_X(back_x);
-	/* HBB: why isn't back_j unsigned ??? */
+		/* HBB: why isn't back_j unsigned ??? */
 		int back_j = MAP_HEIGHT_Y(back_y);
 
 		height[0][0] = height[0][1] = height[1][0] = height[1][1] = base_z;
@@ -1615,12 +1635,14 @@ else if (height[i][j] != depth[i][j]) \
   draw_clip_line(a0,b0,a1,b1); \
 }
 
-		VERTICAL(16,zaxis_x,zaxis_y,zaxis_i,zaxis_j,fl_x,fl_y,tl_x,tl_y);
-		VERTICAL(32,back_x,back_y,back_i,back_j,fb_x,fb_y,tb_x,tb_y);
-		VERTICAL(64,x_min3d+x_max3d-zaxis_x,y_min3d+y_max3d-zaxis_y,1-zaxis_i,1-zaxis_j,fr_x,fr_y,tr_x,tr_y);
+		VERTICAL(16, zaxis_x, zaxis_y, zaxis_i, zaxis_j, fl_x, fl_y, tl_x, tl_y);
+		VERTICAL(32, back_x, back_y, back_i, back_j, fb_x, fb_y, tb_x, tb_y);
+		VERTICAL(64, x_min3d + x_max3d - zaxis_x, y_min3d + y_max3d - zaxis_y, 1 -
+			 zaxis_i, 1 - zaxis_j, fr_x, fr_y, tr_x, tr_y);
 		hidden_active = FALSE;
-		VERTICAL(128,x_min3d+x_max3d-back_x,y_min3d+y_max3d-back_y,1-back_i,1-back_j,ff_x,ff_y,tf_x,tf_y);
-		    hidden_active = save;
+		VERTICAL(128, x_min3d + x_max3d - back_x, y_min3d + y_max3d - back_y, 1 - back_i,
+			 1 - back_j, ff_x, ff_y, tf_x, tf_y);
+		hidden_active = save;
 	    }
 
 	    /* now border lines on top */
@@ -1636,7 +1658,6 @@ else if (height[i][j] != depth[i][j]) \
 		draw_clip_line(tr_x, tr_y, tf_x, tf_y);
 	    hidden_active = save;
 	}
-
 #ifndef LITE
 	hidden_no_update = save_update;
 #endif /* LITE */
@@ -1752,7 +1773,8 @@ else if (height[i][j] != depth[i][j]) \
 }
 
 
-static void xtick_callback(axis, place, text, grid)
+static void
+xtick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -1808,7 +1830,8 @@ struct lp_style_type grid;	/* linetype or -2 for none */
     }
 }
 
-static void ytick_callback(axis, place, text, grid)
+static void
+ytick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -1862,7 +1885,8 @@ struct lp_style_type grid;
     }
 }
 
-static void ztick_callback(axis, place, text, grid)
+static void
+ztick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -1901,7 +1925,8 @@ struct lp_style_type grid;
 }
 
 
-static void map_position(pos, x, y, what)
+static void
+map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
 char *what;
@@ -1918,7 +1943,7 @@ char *what;
 	break;
     case graph:
 	xpos = min_array[FIRST_X_AXIS] +
-		xpos * (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
+	    xpos * (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
 	break;
     case screen:
 	++screens;
@@ -1931,7 +1956,7 @@ char *what;
 	break;
     case graph:
 	ypos = min_array[FIRST_Y_AXIS] +
-		ypos * (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
+	    ypos * (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
 	break;
     case screen:
 	++screens;
@@ -1944,7 +1969,7 @@ char *what;
 	break;
     case graph:
 	zpos = min_array[FIRST_Z_AXIS] +
-		zpos * (max_array[FIRST_Z_AXIS] - min_array[FIRST_Z_AXIS]);
+	    zpos * (max_array[FIRST_Z_AXIS] - min_array[FIRST_Z_AXIS]);
 	break;
     case screen:
 	++screens;
@@ -1970,7 +1995,8 @@ char *what;
  * these code blocks were moved to functions, to make the code simpler
  */
 
-static void key_text(xl, yl, text)
+static void
+key_text(xl, yl, text)
 int xl, yl;
 char *text;
 {
@@ -1995,7 +2021,8 @@ char *text;
     }
 }
 
-static void key_sample_line(xl, yl)
+static void
+key_sample_line(xl, yl)
 int xl, yl;
 {
     if (key == -1) {
@@ -2013,7 +2040,8 @@ int xl, yl;
     }
 }
 
-static void key_sample_point(xl, yl, pointtype)
+static void
+key_sample_point(xl, yl, pointtype)
 int xl, yl;
 int pointtype;
 {

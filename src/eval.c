@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.15 1998/03/22 22:31:30 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.4 1999/06/09 12:13:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.15 1998/03/22 22:31:30 drd 
 
 
 struct udvt_entry *
- add_udv(t_num)			/* find or add value and return pointer */
+add_udv(t_num)			/* find or add value and return pointer */
 int t_num;
 {
     register struct udvt_entry **udv_ptr = &first_udv;
@@ -64,7 +64,7 @@ int t_num;
 
 
 struct udft_entry *
- add_udf(t_num)			/* find or add function and return pointer */
+add_udf(t_num)			/* find or add function and return pointer */
 int t_num;			/* index to token[] */
 {
     register struct udft_entry **udf_ptr = &first_udf;
@@ -98,7 +98,8 @@ int t_num;			/* index to token[] */
 }
 
 
-int standard(t_num)		/* return standard function index or 0 */
+int
+standard(t_num)		/* return standard function index or 0 */
 int t_num;
 {
     register int i;
@@ -111,7 +112,8 @@ int t_num;
 
 
 
-void execute_at(at_ptr)
+void
+execute_at(at_ptr)
 struct at_type *at_ptr;
 {
     register int i, index, count, offset;

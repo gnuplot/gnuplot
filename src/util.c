@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.46 1998/06/18 14:55:20 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.8 1999/06/09 12:13:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -52,7 +52,8 @@ static void parse_esc __PROTO((char *instr));
  * chr_in_str() compares the characters in the string of token number t_num
  * with c, and returns TRUE if a match was found.
  */
-int chr_in_str(t_num, c)
+int
+chr_in_str(t_num, c)
 int t_num;
 int c;
 {
@@ -72,7 +73,8 @@ int c;
  * equals() compares string value of token number t_num with str[], and
  *   returns TRUE if they are identical.
  */
-int equals(t_num, str)
+int
+equals(t_num, str)
 int t_num;
 char *str;
 {
@@ -94,7 +96,8 @@ char *str;
  * almost_equals() compares string value of token number t_num with str[], and
  *   returns TRUE if they are identical up to the first $ in str[].
  */
-int almost_equals(t_num, str)
+int
+almost_equals(t_num, str)
 int t_num;
 char *str;
 {
@@ -123,7 +126,8 @@ char *str;
 
 
 
-int isstring(t_num)
+int
+isstring(t_num)
 int t_num;
 {
 
@@ -133,18 +137,20 @@ int t_num;
 }
 
 
-int isanumber(t_num)
+int
+isanumber(t_num)
 int t_num;
 {
     return (!token[t_num].is_token);
 }
 
 
-int isletter(t_num)
+int
+isletter(t_num)
 int t_num;
 {
     return (token[t_num].is_token &&
-	    ((isalpha((int)input_line[token[t_num].start_index])) ||
+	    ((isalpha((int) input_line[token[t_num].start_index])) ||
 	     (input_line[token[t_num].start_index] == '_')));
 }
 
@@ -155,7 +161,8 @@ int t_num;
  *              -or-
  *   identifier ( identifer {,identifier} ) =
  */
-int is_definition(t_num)
+int
+is_definition(t_num)
 int t_num;
 {
     /* variable? */
@@ -183,7 +190,8 @@ int t_num;
  * copy_str() copies the string in token number t_num into str, appending
  *   a null.  No more than max chars are copied (including \0).
  */
-void copy_str(str, t_num, max)
+void
+copy_str(str, t_num, max)
 char str[];
 int t_num;
 int max;
@@ -203,7 +211,8 @@ int max;
 }
 
 /* length of token string */
-int token_len(t_num)
+int
+token_len(t_num)
 int t_num;
 {
     return (token[t_num].length);
@@ -214,7 +223,8 @@ int t_num;
  *   quotes at both ends.  This seems redundant, but is done for
  *   efficency.
  */
-void quote_str(str, t_num, max)
+void
+quote_str(str, t_num, max)
 char str[];
 int t_num;
 int max;
@@ -243,7 +253,8 @@ int max;
  * capture() copies into str[] the part of input_line[] which lies between
  * the begining of token[start] and end of token[end].
  */
-void capture(str, start, end, max)
+void
+capture(str, start, end, max)
 char str[];
 int start, end;
 int max;
@@ -265,7 +276,8 @@ int max;
  * m_capture() is similar to capture(), but it mallocs storage for the
  * string.
  */
-void m_capture(str, start, end)
+void
+m_capture(str, start, end)
 char **str;
 int start, end;
 {
@@ -287,7 +299,8 @@ int start, end;
  * m_quote_capture() is similar to m_capture(), but it removes
  * quotes from either end of the string.
  */
-void m_quote_capture(str, start, end)
+void
+m_quote_capture(str, start, end)
 char **str;
 int start, end;
 {
@@ -309,14 +322,16 @@ int start, end;
 }
 
 
-void convert(val_ptr, t_num)
+void
+convert(val_ptr, t_num)
 struct value *val_ptr;
 int t_num;
 {
     *val_ptr = token[t_num].l_val;
 }
 
-static char *num_to_str(r)
+static char *
+num_to_str(r)
 double r;
 {
     static int i = 0;
@@ -335,7 +350,8 @@ double r;
     return s[j];
 }
 
-void disp_value(fp, val)
+void
+disp_value(fp, val)
 FILE *fp;
 struct value *val;
 {
@@ -358,7 +374,8 @@ struct value *val;
 }
 
 
-double real(val)		/* returns the real part of val */
+double
+real(val)			/* returns the real part of val */
 struct value *val;
 {
     switch (val->type) {
@@ -373,7 +390,8 @@ struct value *val;
 }
 
 
-double imag(val)		/* returns the imag part of val */
+double
+imag(val)			/* returns the imag part of val */
 struct value *val;
 {
     switch (val->type) {
@@ -389,7 +407,8 @@ struct value *val;
 
 
 
-double magnitude(val)		/* returns the magnitude of val */
+double
+magnitude(val)			/* returns the magnitude of val */
 struct value *val;
 {
     switch (val->type) {
@@ -408,7 +427,8 @@ struct value *val;
 
 
 
-double angle(val)		/* returns the angle of val */
+double
+angle(val)			/* returns the angle of val */
 struct value *val;
 {
     switch (val->type) {
@@ -431,7 +451,7 @@ struct value *val;
 
 
 struct value *
- Gcomplex(a, realpart, imagpart)
+Gcomplex(a, realpart, imagpart)
 struct value *a;
 double realpart, imagpart;
 {
@@ -443,7 +463,7 @@ double realpart, imagpart;
 
 
 struct value *
- Ginteger(a, i)
+Ginteger(a, i)
 struct value *a;
 int i;
 {
@@ -478,9 +498,11 @@ int i;
  }
 
 #if defined(VA_START) && defined(ANSI_C)
-void os_error (int t_num, char *str, ...)
+void
+os_error(int t_num, char *str,...)
 #else
-void os_error (t_num, str, va_alist)
+void
+os_error(t_num, str, va_alist)
 int t_num;
 char *str;
 va_dcl
@@ -490,7 +512,7 @@ va_dcl
     va_list args;
 #endif
 #ifdef VMS
-    static status[2] = {1, 0};			/* 1 is count of error msgs */
+    static status[2] = { 1, 0 };		/* 1 is count of error msgs */
 #endif /* VMS */
 
     /* reprint line if screen has been written to */
@@ -503,19 +525,18 @@ va_dcl
 	PRINT_SPACES_UPTO_TOKEN;
 	PRINT_CARET;
     }
-
     PRINT_SPACES_UNDER_PROMPT;
 
 #ifdef VA_START
-    VA_START (args, str);
+    VA_START(args, str);
 # if HAVE_VFPRINTF || _LIBC
-    vfprintf (stderr, str, args);
+    vfprintf(stderr, str, args);
 # else
-    _doprnt (str, args, stderr);
+    _doprnt(str, args, stderr);
 # endif
-    va_end (args);
+    va_end(args);
 #else
-    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+    fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     putc('\n', stderr);
 
@@ -535,9 +556,11 @@ va_dcl
 
 
 #if defined(VA_START) && defined(ANSI_C)
-void int_error (int t_num, char *str, ...)
+void
+int_error(int t_num, char *str,...)
 #else
-void int_error (t_num, str, va_alist)
+void
+int_error(t_num, str, va_alist)
 int t_num;
 char str[];
 va_dcl
@@ -557,20 +580,19 @@ va_dcl
 	PRINT_SPACES_UPTO_TOKEN;
 	PRINT_CARET;
     }
-
     PRINT_SPACES_UNDER_PROMPT;
     PRINT_FILE_AND_LINE;
 
 #ifdef VA_START
-    VA_START (args, str);
+    VA_START(args, str);
 # if HAVE_VFPRINTF || _LIBC
-    vfprintf (stderr, str, args);
+    vfprintf(stderr, str, args);
 # else
-    _doprnt (str, args, stderr);
+    _doprnt(str, args, stderr);
 # endif
-    va_end (args);
+    va_end(args);
 #else
-    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+    fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     fputs("\n\n", stderr);
 
@@ -579,9 +601,11 @@ va_dcl
 
 /* Warn without bailing out to command line. Not a user error */
 #if defined(VA_START) && defined(ANSI_C)
-void int_warn (int t_num, char *str, ...)
+void
+int_warn(int t_num, char *str,...)
 #else
-void int_warn (t_num, str, va_alist)
+void
+int_warn(t_num, str, va_alist)
 int t_num;
 char str[];
 va_dcl
@@ -601,28 +625,28 @@ va_dcl
 	PRINT_SPACES_UPTO_TOKEN;
 	PRINT_CARET;
     }
-
     PRINT_SPACES_UNDER_PROMPT;
     PRINT_FILE_AND_LINE;
 
     fputs("warning: ", stderr);
 #ifdef VA_START
-    VA_START (args, str);
+    VA_START(args, str);
 # if HAVE_VFPRINTF || _LIBC
-    vfprintf (stderr, str, args);
+    vfprintf(stderr, str, args);
 # else
-    _doprnt (str, args, stderr);
+    _doprnt(str, args, stderr);
 # endif
-    va_end (args);
+    va_end(args);
 #else
-    fprintf (stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
+    fprintf(stderr, str, a1, a2, a3, a4, a5, a6, a7, a8);
 #endif
     putc('\n', stderr);
 }				/* int_warn */
 
 /* Lower-case the given string (DFK) */
 /* Done in place. */
-void lower_case(s)
+void
+lower_case(s)
 char *s;
 {
     register unsigned char *p = s;
@@ -637,7 +661,8 @@ char *s;
 /* Squash spaces in the given string (DFK) */
 /* That is, reduce all multiple white-space chars to single spaces */
 /* Done in place. */
-void squash_spaces(s)
+void
+squash_spaces(s)
 char *s;
 {
     register char *r = s;	/* reading point */
@@ -645,7 +670,7 @@ char *s;
     TBOOLEAN space = FALSE;	/* TRUE if we've already copied a space */
 
     for (w = r = s; *r != NUL; r++) {
-	if (isspace((int)*r)) {
+	if (isspace((int) *r)) {
 	    /* white space; only copy if we haven't just copied a space */
 	    if (!space) {
 		space = TRUE;
@@ -661,7 +686,8 @@ char *s;
 }
 
 
-static void parse_esc(instr)
+static void
+parse_esc(instr)
 char *instr;
 {
     char *s = instr, *t = instr;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.62 1998/06/18 14:55:13 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.3 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -75,7 +75,8 @@ static jmp_buf fpe_env;
 
 #define dummy (struct value *) 0
 
-RETSIGTYPE fpe(an_int)
+RETSIGTYPE
+fpe(an_int)
 int an_int;
 {
 #if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_Windows) || defined(DOS386)
@@ -107,7 +108,8 @@ int an_int;
  * Anyway, we need to catch these faults and signal SIGFPE. 
  */
 
-pfm_$fh_func_val_t apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
+pfm_$fh_func_val_t
+apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
 {
     kill(getpid(), SIGFPE);
     return pfm_$continue_fault_handling;
@@ -124,7 +126,8 @@ apollo_pfm_catch()
 #endif /* APOLLO */
 
 
-void evaluate_at(at_ptr, val_ptr)
+void
+evaluate_at(at_ptr, val_ptr)
 struct at_type *at_ptr;
 struct value *val_ptr;
 {
@@ -173,7 +176,7 @@ struct value *val_ptr;
 
 
 struct value *
- const_express(valptr)
+const_express(valptr)
 struct value *valptr;
 {
     register int tkn = c_token;
@@ -196,7 +199,7 @@ struct value *valptr;
  * - div
  */
 struct at_type *
- temp_at()
+temp_at()
 {
     /* build a static action table and return its
      * pointer */
@@ -217,7 +220,7 @@ struct at_type *
 /* build an action table, put it in dynamic memory, and return its pointer */
 
 struct at_type *
- perm_at()
+perm_at()
 {
     register struct at_type *at_ptr;
     unsigned int len;
@@ -230,7 +233,8 @@ struct at_type *
     return (at_ptr);
 }
 
-static void extend_at()
+static void
+extend_at()
 {
     int newsize = sizeof(struct at_type) + at_size * sizeof(struct at_entry);
 
@@ -241,7 +245,7 @@ static void extend_at()
 
 /* moved from eval.c, the function is only called from this module */
 static union argument *
- add_action(sf_index)
+add_action(sf_index)
 enum operators sf_index;	/* index of p-code function */
 {
     if (at->a_count >= at_size) {
@@ -252,76 +256,87 @@ enum operators sf_index;	/* index of p-code function */
 }
 
 
-static void express()
+static void
+express()
 {				/* full expressions */
     xterm();
     xterms();
 }
 
-static void xterm()
+static void
+xterm()
 {				/* ? : expressions */
     aterm();
     aterms();
 }
 
 
-static void aterm()
+static void
+aterm()
 {
     bterm();
     bterms();
 }
 
 
-static void bterm()
+static void
+bterm()
 {
     cterm();
     cterms();
 }
 
 
-static void cterm()
+static void
+cterm()
 {
     dterm();
     dterms();
 }
 
 
-static void dterm()
+static void
+dterm()
 {
     eterm();
     eterms();
 }
 
 
-static void eterm()
+static void
+eterm()
 {
     fterm();
     fterms();
 }
 
 
-static void fterm()
+static void
+fterm()
 {
     gterm();
     gterms();
 }
 
 
-static void gterm()
+static void
+gterm()
 {
     hterm();
     hterms();
 }
 
 
-static void hterm()
+static void
+hterm()
 {
     unary();			/* - things */
     iterms();			/* * / % */
 }
 
 
-static void factor()
+static void
+factor()
 {
     if (equals(c_token, "(")) {
 	c_token++;
@@ -436,7 +451,8 @@ static void factor()
 
 
 
-static void xterms()
+static void
+xterms()
 {
     /* create action code for ? : expressions */
 
@@ -459,7 +475,8 @@ static void xterms()
 }
 
 
-static void aterms()
+static void
+aterms()
 {
     /* create action codes for || operator */
 
@@ -477,7 +494,8 @@ static void aterms()
 }
 
 
-static void bterms()
+static void
+bterms()
 {
     /* create action code for && operator */
 
@@ -495,7 +513,8 @@ static void bterms()
 }
 
 
-static void cterms()
+static void
+cterms()
 {
     /* create action code for | operator */
 
@@ -507,7 +526,8 @@ static void cterms()
 }
 
 
-static void dterms()
+static void
+dterms()
 {
     /* create action code for ^ operator */
 
@@ -519,7 +539,8 @@ static void dterms()
 }
 
 
-static void eterms()
+static void
+eterms()
 {
     /* create action code for & operator */
 
@@ -531,7 +552,8 @@ static void eterms()
 }
 
 
-static void fterms()
+static void
+fterms()
 {
     /* create action codes for == and !=
      * operators */
@@ -551,7 +573,8 @@ static void fterms()
 }
 
 
-static void gterms()
+static void
+gterms()
 {
     /* create action code for < > >= or <=
      * operators */
@@ -582,7 +605,8 @@ static void gterms()
 
 
 
-static void hterms()
+static void
+hterms()
 {
     /* create action codes for + and - operators */
 
@@ -601,7 +625,8 @@ static void hterms()
 }
 
 
-static void iterms()
+static void
+iterms()
 {
     /* add action code for * / and % operators */
 
@@ -624,7 +649,8 @@ static void iterms()
 }
 
 
-static void unary()
+static void
+unary()
 {
     /* add code for unary operators */
 

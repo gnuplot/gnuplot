@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.138 1998/06/18 14:55:08 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.8 1999/06/09 12:13:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -76,7 +76,7 @@ static double largest_polar_circle;
  * index with FIRST_X_AXIS etc
  * global because used in gen_tics, which graph3d also uses
  */
-char ticfmt[8][MAX_ID_LEN+1]; /* HBB 990106: fix buffer overrun */
+char ticfmt[8][MAX_ID_LEN+1];	/* HBB 990106: fix buffer overrun */
 int timelevel[8];
 double ticstep[8];
 
@@ -110,45 +110,48 @@ static void plot_c_bars __PROTO((struct curve_points * plot));
 static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i,
 				    double *ex, double *ey));
 static int two_edge_intersect __PROTO((struct coordinate GPHUGE * points,
-					int i, double *lx, double *ly));
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
+				       int i, double *lx, double *ly));
+static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double
+						  *lx, double *ly));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
-static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
+static void plot_histeps __PROTO((struct curve_points * plot));		/* CAC */
 static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2,
-					double y));             /* CAC */
+					double y));	/* CAC */
 static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1,
-					double y2));		/* CAC */
+				      double y2));	/* CAC */
 static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points,
-				int i, double *ex, double *ey)); /* JG */
+					  int i, double *ex, double *ey));	/* JG */
 static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points,
-				int i, double *ex, double *ey)); /* HOE */
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));				/* JG */
-static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
+					   int i, double *ex, double *ey));	/* HOE */
+static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double
+						  *lx, double *ly));	/* JG */
+static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i,
+						   double *lx, double *ly));
 
 static double LogScale __PROTO((double coord, int is_log, double log_base_log,
 				char *what, char *axis));
 static double dbl_raise __PROTO((double x, int y));
 static void boundary __PROTO((int scaling, struct curve_points * plots,
-				int count));
+			      int count));
 static double make_tics __PROTO((int axis, int guide));
 
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
 
 static void widest2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
+				       struct lp_style_type grid));
 static void ytick2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
+				      struct lp_style_type grid));
 static void xtick2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
+				      struct lp_style_type grid));
 static void map_position __PROTO((struct position * pos, unsigned int *x,
-					unsigned int *y, char *what));
+				  unsigned int *y, char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
-				double *m, int *p));
+			      double *m, int *p));
 static void gprintf __PROTO((char *dest, size_t count, char *format,
-				double log_base, double x));
+			     double log_base, double x));
 
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
@@ -169,17 +172,20 @@ static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
  */
 
 #ifdef AMIGA_SC_6_1
-GP_INLINE static TBOOLEAN i_inrange(int z, int min, int max)
+GP_INLINE static TBOOLEAN
+i_inrange(int z, int min, int max)
 {
     return ((min < max) ? ((z >= min) && (z <= max)) : ((z >= max) && (z <= min)));
 }
 
-GP_INLINE static double f_max(double a, double b)
+GP_INLINE static double
+f_max(double a, double b)
 {
     return (GPMAX(a, b));
 }
 
-GP_INLINE static double f_min(double a, double b)
+GP_INLINE static double
+f_min(double a, double b)
 {
     return (GPMIN(a, b));
 }
@@ -259,7 +265,8 @@ static double scale[AXIS_ARRAY_SIZE];	/* scale factors for mapping for each axis
  * also subscribe here. Even without inlining you gain speed with log plots
  */
 #if defined(sun386) || defined(AMIGA_SC_6_1)
-GP_INLINE static double CheckLog(is_log, base_log, x)
+GP_INLINE static double
+CheckLog(is_log, base_log, x)
 TBOOLEAN is_log;
 double base_log;
 double x;
@@ -276,7 +283,8 @@ double x;
 /*}}} */
 
 /*{{{  LogScale() */
-static double LogScale(coord, is_log, log_base_log, what, axis)
+static double
+LogScale(coord, is_log, log_base_log, what, axis)
 double coord;			/* the value */
 TBOOLEAN is_log;		/* is this axis in logscale? */
 double log_base_log;		/* if so, the log of its base */
@@ -298,7 +306,8 @@ char *axis;			/* which axis is this for ("x" or "y")? */
 
 /*{{{  graph_error() */
 /* handle errors during graph-plot in a consistent way */
-void graph_error(text)
+void
+graph_error(text)
 char *text;
 {
     multiplot = FALSE;
@@ -379,7 +388,8 @@ char *text;
  * - If  strlen(axis_name) > strlen("%s") , we may overflow an
  *   error-message buffer, which would be A Bad Thing.  Caveat caller...
  */
-void fixup_range(axis, axis_name)
+void
+fixup_range(axis, axis_name)
 int axis;
 char *axis_name;
 {
@@ -426,7 +436,8 @@ char *axis_name;
  * routine with every label
  */
 
-static void widest2d_callback(axis, place, text, grid)
+static void
+widest2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -460,7 +471,8 @@ struct lp_style_type grid;
  * Margin computation redone by Dick Crawford (rccrawford@lanl.gov) 4/98
  */
 
-static void boundary(scaling, plots, count)
+static void
+boundary(scaling, plots, count)
 TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
 struct curve_points *plots;
 int count;
@@ -662,8 +674,7 @@ int count;
 	 */
 	/* offset is subtracted because if . 0, the margin is smaller */
 	timebot_textheight = (int) ((timelin - timelabel.yoffset) * (t->v_char));
-    }
-    else
+    } else
 	timebot_textheight = 0;
 
     /* compute ybot from the various components
@@ -673,8 +684,10 @@ int count;
 
     if (bmargin < 0) {
 	ybot += xtic_height + xtic_textheight;
-	if (xlabel_textheight > 0) ybot += xlabel_textheight;
-	if (timebot_textheight > 0) ybot += timebot_textheight;
+	if (xlabel_textheight > 0)
+	    ybot += xlabel_textheight;
+	if (timebot_textheight > 0)
+	    ybot += timebot_textheight;
 	if (ybot == (t->ymax) * yoffset) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
@@ -753,7 +766,9 @@ int count;
 		 * do one integer division to maximise accuracy (hope we
 		 * don't overflow !)
 		 */
-		key_xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
+		key_xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols *
+										       (key_size_left
+											+ key_size_right));
 		key_xr = key_xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
 		key_yb = t->ymax * yoffset;
 		key_yt = key_yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
@@ -850,8 +865,9 @@ int count;
 	/* make sure xleft is wide enough for a negatively
 	 * x-offset horizontal timestamp
 	 */
-	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
-	xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
+	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset
+										 * (t->h_char)))
+	    xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
 	if (xleft == (t->xmax) * xoffset) {
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
@@ -931,7 +947,8 @@ int count;
 	double current_aspect_ratio;
 
 	if (aspect_ratio < 0 && (max_array[x_axis] - min_array[x_axis]) != 0.0) {
-	    current_aspect_ratio = -aspect_ratio * fabs((max_array[y_axis] - min_array[y_axis]) / (max_array[x_axis] - min_array[x_axis]));
+	    current_aspect_ratio = -aspect_ratio * fabs((max_array[y_axis] - min_array[y_axis]) /
+							(max_array[x_axis] - min_array[x_axis]));
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
@@ -1015,7 +1032,8 @@ int count;
 	}
     } else {
 	if (timelabel_bottom)
-	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight + t->v_char; 
+	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight
+		+ t->v_char;
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
@@ -1086,7 +1104,8 @@ int count;
 /*}}} */
 
 /*{{{  dbl_raise() */
-static double dbl_raise(x, y)
+static double
+dbl_raise(x, y)
 double x;
 int y;
 {
@@ -1103,7 +1122,8 @@ int y;
 /*}}} */
 
 /*{{{  timetic_fmt() */
-void timetic_format(axis, amin, amax)
+void
+timetic_format(axis, amin, amax)
 int axis;
 double amin, amax;
 {
@@ -1171,7 +1191,8 @@ double amin, amax;
  * to the automatic calculation one day
  */
 
-double set_tic(l10, guide)
+double
+set_tic(l10, guide)
 double l10;
 int guide;
 {
@@ -1210,7 +1231,8 @@ int guide;
 /*}}} */
 
 /*{{{  make_tics() */
-static double make_tics(axis, guide)
+static double
+make_tics(axis, guide)
 int axis, guide;
 {
     register double xr, tic, l10;
@@ -1281,7 +1303,8 @@ int axis, guide;
 /*}}} */
 
 
-void do_plot(plots, pcount)
+void
+do_plot(plots, pcount)
 struct curve_points *plots;
 int pcount;			/* count of plots in linked list */
 {
@@ -1570,8 +1593,8 @@ int pcount;			/* count of plots in linked list */
 	(*t->vector) (xright, axis_zero[FIRST_X_AXIS]);
     }
     if ((yzeroaxis.l_type > -3) && !is_log_x
-				&& axis_zero[FIRST_Y_AXIS] >= xleft
-				&& axis_zero[FIRST_Y_AXIS] < xright) {
+	&& axis_zero[FIRST_Y_AXIS] >= xleft
+	&& axis_zero[FIRST_Y_AXIS] < xright) {
 	term_apply_lp_properties(&yzeroaxis);
 	(*t->move) (axis_zero[FIRST_Y_AXIS], ybot);
 	(*t->vector) (axis_zero[FIRST_Y_AXIS], ytop);
@@ -1710,7 +1733,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int x, y;
 
 	if (this_label->layer)
-		continue;
+	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	strcpy(ss, this_label->text);
 	if (this_label->rotate && (*t->text_angle) (1)) {
@@ -1727,7 +1750,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer)
-		continue;
+	    continue;
 	map_position(&this_arrow->start, &sx, &sy, "arrow");
 	map_position(&this_arrow->end, &ex, &ey, "arrow");
 
@@ -1758,7 +1781,7 @@ int pcount;			/* count of plots in linked list */
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(s);
 			if (key_hpos == TOUT ||
-			    key_vpos == TUNDER || /* HBB 990327 */
+			    key_vpos == TUNDER ||	/* HBB 990327 */
 			    inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, s);
 		    }
@@ -1811,7 +1834,7 @@ int pcount;			/* count of plots in linked list */
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
 			if (key_hpos == TOUT ||
-			    key_vpos == TUNDER || /* HBB 990327 */
+			    key_vpos == TUNDER ||	/* HBB 990327 */
 			    i_inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }
@@ -1988,7 +2011,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int x, y;
 
 	if (this_label->layer == 0)
-		continue;
+	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	strcpy(ss, this_label->text);
 	if (this_label->rotate && (*t->text_angle) (1)) {
@@ -2005,7 +2028,7 @@ int pcount;			/* count of plots in linked list */
 	unsigned int sx, sy, ex, ey;
 
 	if (this_arrow->layer == 0)
-		continue;
+	    continue;
 	map_position(&this_arrow->start, &sx, &sy, "arrow");
 	map_position(&this_arrow->end, &ex, &ey, "arrow");
 
@@ -2025,7 +2048,8 @@ int pcount;			/* count of plots in linked list */
  * Plot the curves in IMPULSES style
  */
 
-static void plot_impulses(plot, yaxis_x, xaxis_y)
+static void
+plot_impulses(plot, yaxis_x, xaxis_y)
 struct curve_points *plot;
 int yaxis_x, xaxis_y;
 {
@@ -2072,7 +2096,8 @@ int yaxis_x, xaxis_y;
 /* plot_lines:
  * Plot the curves in LINES style
  */
-static void plot_lines(plot)
+static void
+plot_lines(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2137,7 +2162,8 @@ struct curve_points *plot;
 /* plot_steps:                          
  * Plot the curves in STEPS style
  */
-static void plot_steps(plot)
+static void
+plot_steps(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2206,7 +2232,8 @@ struct curve_points *plot;
 /* plot_fsteps:                         
  * Plot the curves in STEPS style by step on forward yvalue
  */
-static void plot_fsteps(plot)
+static void
+plot_fsteps(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2276,7 +2303,8 @@ struct curve_points *plot;
 /* plot_histeps:                                
  * Plot the curves in HISTEPS style
  */
-static void plot_histeps(plot)
+static void
+plot_histeps(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2351,7 +2379,8 @@ struct curve_points *plot;
  * Draw vertical line for the histeps routine.
  * Performs clipping.
  */
-static void histeps_vertical(xl, yl, x, y1, y2)
+static void
+histeps_vertical(xl, yl, x, y1, y2)
 int *xl, *yl;			/* keeps track of "cursor" position */
 double x, y1, y2;		/* coordinates of vertical line */
 {
@@ -2390,7 +2419,8 @@ double x, y1, y2;		/* coordinates of vertical line */
  * Draw horizontal line for the histeps routine.
  * Performs clipping.
  */
-static void histeps_horizontal(xl, yl, x1, x2, y)
+static void
+histeps_horizontal(xl, yl, x1, x2, y)
 int *xl, *yl;			/* keeps track of "cursor" position */
 double x1, x2, y;		/* coordinates of vertical line */
 {
@@ -2431,7 +2461,8 @@ double x1, x2, y;		/* coordinates of vertical line */
  * Plot the curves in ERRORBARS style
  *  we just plot the bars; the points are plotted in plot_points
  */
-static void plot_bars(plot)
+static void
+plot_bars(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2447,11 +2478,11 @@ struct curve_points *plot;
 
 /* Limitation: no boxes with x errorbars */
 
-    if ((plot->plot_style == YERRORBARS) || 
-				(plot->plot_style == XYERRORBARS) || 
-				(plot->plot_style == BOXERROR) ||
-				(plot->plot_style == YERRORLINES) || 
-				(plot->plot_style == XYERRORLINES)) {
+    if ((plot->plot_style == YERRORBARS) ||
+	(plot->plot_style == XYERRORBARS) ||
+	(plot->plot_style == BOXERROR) ||
+	(plot->plot_style == YERRORLINES) ||
+	(plot->plot_style == XYERRORLINES)) {
 /* Draw the vertical part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
@@ -2593,10 +2624,10 @@ struct curve_points *plot;
 	    }			/* HBB 981130: see above */
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
-    if ((plot->plot_style == XERRORBARS)  || 
-				(plot->plot_style == XYERRORBARS) ||
-				(plot->plot_style == XERRORLINES) ||
-				(plot->plot_style == XYERRORLINES)) {
+    if ((plot->plot_style == XERRORBARS) ||
+	(plot->plot_style == XYERRORBARS) ||
+	(plot->plot_style == XERRORLINES) ||
+	(plot->plot_style == XYERRORLINES)) {
 
 /* Draw the horizontal part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
@@ -2653,7 +2684,8 @@ struct curve_points *plot;
 /* plot_boxes:
  * Plot the curves in BOXES style
  */
-static void plot_boxes(plot, xaxis_y)
+static void
+plot_boxes(plot, xaxis_y)
 struct curve_points *plot;
 int xaxis_y;
 {
@@ -2755,7 +2787,8 @@ int xaxis_y;
 /* plot_points:
  * Plot the curves in POINTSTYLE style
  */
-static void plot_points(plot)
+static void
+plot_points(plot)
 struct curve_points *plot;
 {
     int i;
@@ -2778,7 +2811,8 @@ struct curve_points *plot;
 /* plot_dots:
  * Plot the curves in DOTS style
  */
-static void plot_dots(plot)
+static void
+plot_dots(plot)
 struct curve_points *plot;
 {
     int i;
@@ -2798,7 +2832,8 @@ struct curve_points *plot;
 /* plot_vectors:
  * Plot the curves in VECTORS style
  */
-static void plot_vectors(plot)
+static void
+plot_vectors(plot)
 struct curve_points *plot;
 {
     int i;
@@ -2818,7 +2853,8 @@ struct curve_points *plot;
 
 
 /* plot_f_bars() - finance bars */
-static void plot_f_bars(plot)
+static void
+plot_f_bars(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2886,7 +2922,8 @@ struct curve_points *plot;
  * Plot the curves in CANDLESTICSK style
  *  we just plot the bars; the points are not plotted 
  */
-static void plot_c_bars(plot)
+static void
+plot_c_bars(plot)
 struct curve_points *plot;
 {
     int i;			/* point index */
@@ -2980,7 +3017,8 @@ struct curve_points *plot;
  * the point where an edge of the plot intersects the line segment defined 
  * by the two points.
  */
-static void edge_intersect(points, i, ex, ey)
+static void
+edge_intersect(points, i, ex, ey)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
@@ -3118,7 +3156,8 @@ double *ex, *ey;		/* the point where it crosses an edge */
  * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
  * (x2,y1)->(x2,y2). 
  */
-static void edge_intersect_steps(points, i, ex, ey)
+static void
+edge_intersect_steps(points, i, ex, ey)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
@@ -3172,7 +3211,8 @@ double *ex, *ey;		/* the point where it crosses an edge */
  * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and 
  * (x1,y2)->(x2,y2). 
  */
-static void edge_intersect_fsteps(points, i, ex, ey)
+static void
+edge_intersect_fsteps(points, i, ex, ey)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
@@ -3230,8 +3270,8 @@ double *ex, *ey;		/* the point where it crosses an edge */
  * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
  * (x2,y1)->(x2,y2). 
  */
-static TBOOLEAN /* any intersection? */
- two_edge_intersect_steps(points, i, lx, ly)
+static TBOOLEAN			/* any intersection? */
+two_edge_intersect_steps(points, i, lx, ly)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
@@ -3292,8 +3332,8 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
  * P1 to P2 is drawn as two line segments: (x1,y1)->(x1,y2) and 
  * (x1,y2)->(x2,y2). 
  */
-static TBOOLEAN /* any intersection? */
- two_edge_intersect_fsteps(points, i, lx, ly)
+static TBOOLEAN			/* any intersection? */
+two_edge_intersect_fsteps(points, i, lx, ly)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
@@ -3349,8 +3389,8 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
  * draw (the one-point case is a degenerate of the two-point case and we do 
  * not distinguish it - we draw it anyway).
  */
-static TBOOLEAN /* any intersection? */
-							   two_edge_intersect(points, i, lx, ly)
+static TBOOLEAN			/* any intersection? */
+two_edge_intersect(points, i, lx, ly)
 struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
@@ -3570,7 +3610,8 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 }
 
 /* justify ticplace to a proper date-time value */
-double time_tic_just(level, ticplace)
+double
+time_tic_just(level, ticplace)
 int level;
 double ticplace;
 {
@@ -3626,7 +3667,8 @@ double ticplace;
 }
 
 /* make smalltics for time-axis */
-double make_ltic(tlevel, incr)
+double
+make_ltic(tlevel, incr)
 int tlevel;
 double incr;
 {
@@ -3725,7 +3767,8 @@ double incr;
 }
 
 
-void write_multiline(x, y, text, hor, vert, angle, font)
+void
+write_multiline(x, y, text, hor, vert, angle, font)
 unsigned int x, y;
 char *text;
 enum JUSTIFY hor;		/* horizontal ... */
@@ -3782,7 +3825,8 @@ char *font;			/* NULL or "" means use default */
 
 /* display a x-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void xtick2d_callback(axis, place, text, grid)
+static void
+xtick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -3855,7 +3899,8 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 
 /* display a y-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void ytick2d_callback(axis, place, text, grid)
+static void
+ytick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -3915,7 +3960,8 @@ struct lp_style_type grid;	/* linetype or -2 */
 	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics, NULL);
 }
 
-int label_width(str, lines)
+int
+label_width(str, lines)
 char *str;
 int *lines;
 {
@@ -3941,7 +3987,8 @@ int *lines;
 }
 
 
-void setup_tics(axis, ticdef, format, max)
+void
+setup_tics(axis, ticdef, format, max)
 int axis;
 struct ticdef *ticdef;
 char *format;
@@ -3982,7 +4029,8 @@ int max;			/* approx max number of slots available */
 }
 
 /*{{{  mant_exp - split into mantissa and/or exponent */
-static void mant_exp(log_base, x, scientific, m, p)
+static void
+mant_exp(log_base, x, scientific, m, p)
 double log_base, x;
 int scientific;			/* round to power of 3 */
 double *m;
@@ -4033,7 +4081,8 @@ int *p;				/* results */
 
 /*{{{  gprintf */
 /* extended snprintf */
-static void gprintf(dest, count, format, log_base, x)
+static void
+gprintf(dest, count, format, log_base, x)
 char *dest, *format;
 size_t count;
 double log_base, x;		/* we print one number in a number of different formats */
@@ -4229,7 +4278,8 @@ double log_base, x;		/* we print one number in a number of different formats */
  * note this is also called from graph3d, so we need GRID_Z too
  */
 
-void gen_tics(axis, def, grid, minitics, minifreq, callback)
+void
+gen_tics(axis, def, grid, minitics, minifreq, callback)
 int axis;			/* FIRST_X_AXIS, etc */
 struct ticdef *def;		/* tic defn */
 int grid;			/* GRID_X | GRID_MX etc */
@@ -4477,7 +4527,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 			    gstrftime(label, 24, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
-			  /* HBB 990327: reverted to 'pre-Igor' version... */
+			    /* HBB 990327: reverted to 'pre-Igor' version... */
 #if 1				/* Igor's polar-grid patch */
 			    double r = fabs(user) + (autoscale_r & 1 ? 0 : rmin);
 #else
@@ -4501,7 +4551,8 @@ tic_callback callback;		/* fn to call to actually do the work */
 		    if (datatype[axis] == TIME)
 			mtic = time_tic_just(timelevel[axis] - 1, internal + mplace);
 		    else
-			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) / log_base_array[axis] : mplace);
+			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) /
+					   log_base_array[axis] : mplace);
 		    if (inrange(mtic, internal_min, internal_max) &&
 			inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
 			(*callback) (axis, mtic, NULL, mgrd);
@@ -4514,7 +4565,8 @@ tic_callback callback;		/* fn to call to actually do the work */
 /*}}} */
 
 /*{{{  map_position */
-static void map_position(pos, x, y, what)
+static void
+map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
 char *what;
@@ -4522,13 +4574,15 @@ char *what;
     switch (pos->scalex) {
     case first_axes:
 	{
-	    double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS], what, "x");
+	    double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS],
+				 what, "x");
 	    *x = xleft + (xx - min_array[FIRST_X_AXIS]) * scale[FIRST_X_AXIS] + 0.5;
 	    break;
 	}
     case second_axes:
 	{
-	    double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS], what, "x");
+	    double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS],
+				 what, "x");
 	    *x = xleft + (xx - min_array[SECOND_X_AXIS]) * scale[SECOND_X_AXIS] + 0.5;
 	    break;
 	}
@@ -4547,13 +4601,15 @@ char *what;
     switch (pos->scaley) {
     case first_axes:
 	{
-	    double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS], what, "y");
+	    double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS],
+				 what, "y");
 	    *y = ybot + (yy - min_array[FIRST_Y_AXIS]) * scale[FIRST_Y_AXIS] + 0.5;
 	    return;
 	}
     case second_axes:
 	{
-	    double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS], what, "y");
+	    double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS],
+				 what, "y");
 	    *y = ybot + (yy - min_array[SECOND_Y_AXIS]) * scale[SECOND_Y_AXIS] + 0.5;
 	    return;
 	}

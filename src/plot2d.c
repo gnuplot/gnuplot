@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.7 1999/06/09 12:13:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -198,7 +198,8 @@ do { if (reverse_range[AXIS]) { \
 
 
 
-void plotrequest()
+void
+plotrequest()
 /*
  * In the parametric case we can say plot [a= -4:4] [-2:2] [-1:1] sin(a),a**2
  * while in the non-parametric case we would say only plot [b= -2:2] [-1:1]
@@ -282,7 +283,8 @@ void plotrequest()
  */
 
 
-static int get_data(this_plot)
+static int
+get_data(this_plot)
 struct curve_points *this_plot;
 /* this_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
@@ -484,7 +486,8 @@ struct curve_points *this_plot;
 	    {			/* x, y, ylow, yhigh, width  or  x open low high close */
 		switch (this_plot->plot_style) {
 		default:
-		    int_warn(storetoken, "Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars");
+		    int_warn(storetoken,
+			     "Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars");
 		    this_plot->plot_style = BOXERROR;
 		    /*fall through */
 
@@ -525,12 +528,13 @@ struct curve_points *this_plot;
     cp_extend(this_plot, i);	/* shrink to fit */
 
     df_close();
-    
-    return i; /* i==0 indicates an 'empty' file */
+
+    return i;			/* i==0 indicates an 'empty' file */
 }
 
 /* called by get_data for each point */
-static void store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
+static void
+store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
 struct curve_points *this_plot;
 int i;				/* point number */
 double x, y;
@@ -575,11 +579,11 @@ double width;			/* -1 means autocalc, 0 means use xmin/xmax */
 	}
 	newx = y * cos(x * ang2rad);
 	newy = y * sin(x * ang2rad);
-#if 0 /* HBB 981118: added polar errorbars */
+#if 0				/* HBB 981118: added polar errorbars */
 	/* only lines and points supported with polar */
 	y = ylow = yhigh = newy;
 	x = xlow = xhigh = newx;
-#else 
+#else
 	y = newy;
 	x = newx;
 
@@ -638,16 +642,17 @@ static char *plot_type_names[4] =
 static char *plot_style_names[14] =
 {
     "Lines", "Points", "Impulses", "LinesPoints", "Dots", "XErrorbars",
- "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
+    "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
     "FSteps", "Vector",
- "XErrorlines", "YErrorlines", "XYErrorlines"
+    "XErrorlines", "YErrorlines", "XYErrorlines"
 };
 static char *plot_smooth_names[5] =
 {
     "None", "Unique", "CSplines", "ACSplines", "Bezier", "SBezier"
 };
 
-static void print_points(curve)
+static void
+print_points(curve)
 int curve;			/* which curve to print */
 {
     register struct curve_points *this_plot;
@@ -707,7 +712,8 @@ int curve;			/* which curve to print */
 }
 #endif /* not used */
 
-static void print_table(this_plot, plot_num)
+static void
+print_table(this_plot, plot_num)
 struct curve_points *this_plot;
 int plot_num;
 {
@@ -741,7 +747,8 @@ int plot_num;
  * datafiles, code to parse it has to be added here. Change so that
  * we store starting-token in the plot structure.
  */
-static void eval_plots()
+static void
+eval_plots()
 {
     register int i;
     register struct curve_points *this_plot, **tp_ptr;
@@ -973,13 +980,12 @@ static void eval_plots()
 	    }
 	    if (this_plot->plot_type == DATA) {
 		/* actually get the data now */
-		if ( get_data(this_plot) == 0) {
-			/* am: not a single line of data (point to be more precise)
-			   has been found. So don't issue a misleading warning like
-			   "x range is invalid" but stop here! */
-			int_error(c_token, "no data point found in specified file");
+		if (get_data(this_plot) == 0) {
+		    /* am: not a single line of data (point to be more precise)
+		       has been found. So don't issue a misleading warning like
+		       "x range is invalid" but stop here! */
+		    int_error(c_token, "no data point found in specified file");
 		}
-
 		/* sort */
 		switch (this_plot->plot_smooth) {	/* sort and average, if */
 		case UNIQUE:	/* the style requires   */
@@ -1156,9 +1162,9 @@ do{ assert(!polar && !parametric); \
 			    x = temp * cos(x * ang2rad);
 			    temp = y;
 			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].x, x, this_plot->points[i].type,
-			      x_axis, NOOP, goto come_here_if_undefined);
+							   x_axis, NOOP, goto come_here_if_undefined);
 			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, y, this_plot->points[i].type,
-			      y_axis, NOOP, goto come_here_if_undefined);
+							   y_axis, NOOP, goto come_here_if_undefined);
 			} else {	/* neither parametric or polar */
 			    /* If non-para, it must be INRANGE */
 			    this_plot->points[i].x = t;		/* logscale ? log(x) : x */
@@ -1270,10 +1276,10 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
   }
 
     WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-    WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-    WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-    WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
-    if (strcmp(term->name, "table") == 0)
+	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
+	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
+	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
+	if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
     else {
 	START_LEAK_CHECK();	/* check for memory leaks in this routine */
@@ -1298,7 +1304,8 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 
 
 
-static void parametric_fixup(start_plot, plot_num)
+static void
+parametric_fixup(start_plot, plot_num)
 struct curve_points *start_plot;
 int *plot_num;
 /*
@@ -1364,16 +1371,16 @@ int *plot_num;
 		    y = r * sin(t);
 		    /* we hadn't done logs when we stored earlier */
 		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x, yp->points[i].type,
-						 xp->x_axis, NOOP, NOOP);
+						   xp->x_axis, NOOP, NOOP);
 		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y, yp->points[i].type,
-						 xp->y_axis, NOOP, NOOP);
+						   xp->y_axis, NOOP, NOOP);
 		} else {
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
 		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x,
-			     yp->points[i].type, yp->x_axis, NOOP, NOOP);
+						   yp->points[i].type, yp->x_axis, NOOP, NOOP);
 		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y,
-			     yp->points[i].type, yp->y_axis, NOOP, NOOP);
+						   yp->points[i].type, yp->y_axis, NOOP, NOOP);
 		}
 	    }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.56 1998/06/18 14:55:16 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.5 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -102,7 +102,8 @@ static int t_num;		/* number of token I'm working on */
  *
  *                      white space between tokens is ignored
  */
-int scanner(expressionp, expressionlenp)
+int
+scanner(expressionp, expressionlenp)
 char **expressionp;
 int *expressionlenp;
 {
@@ -125,7 +126,7 @@ int *expressionlenp;
 
 	if (expression[current] == '`') {
 	    substitute(expressionp, expressionlenp, current);
-	    expression = *expressionp; /* expression might have moved */
+	    expression = *expressionp;	/* expression might have moved */
 	    goto again;
 	}
 	/* allow _ to be the first character of an identifier */
@@ -157,7 +158,7 @@ int *expressionlenp;
 	    token[t_num].length += 2;
 	    while (expression[++current] != RBRACE) {
 		token[t_num].length++;
-		if (expression[current] == NUL)	/* { for vi % */
+		if (expression[current] == NUL)		/* { for vi % */
 		    int_error(t_num, "no matching '}'");
 	    }
 	} else if (expression[current] == '\'' ||
@@ -175,7 +176,7 @@ int *expressionlenp;
 		    token[t_num].length += 2;
 		} else if (quote == '\"' && expression[current] == '`') {
 		    substitute(expressionp, expressionlenp, current);
-		    expression = *expressionp; /* it might have moved */
+		    expression = *expressionp;	/* it might have moved */
 		    current--;
 		} else
 		    token[t_num].length++;
@@ -236,7 +237,8 @@ int *expressionlenp;
 }
 
 
-static int get_num(str)
+static int
+get_num(str)
 char str[];
 {
     register int count = 0;
@@ -249,8 +251,7 @@ char str[];
     if (str[count] == '.') {
 	token[t_num].l_val.type = CMPLX;
 	/* swallow up digits until non-digit */
-	while (isdigit((int) str[++count]))
-	    ;
+	while (isdigit((int) str[++count]));
 	/* now str[count] is other than a digit */
     }
     if (str[count] == 'e' || str[count] == 'E') {
@@ -284,7 +285,7 @@ char str[];
 #  define CLOSE_FILE_OR_PIPE ((void) close(fd))
 # elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 #  define CLOSE_FILE_OR_PIPE ((void) fclose(f); (void) unlink(atari_tmpfile))
-# else /* Rest of the world */
+# else				/* Rest of the world */
 #  define CLOSE_FILE_OR_PIPE ((void) pclose(f))
 # endif
 
@@ -294,7 +295,8 @@ char str[];
  * are replaced by the output of the command.  extend_input_line()
  * is called to extend *strp array if needed.
  */
-static void substitute(strp, str_lenp, current)	
+static void
+substitute(strp, str_lenp, current)
 char **strp;
 int *str_lenp;
 int current;
@@ -306,7 +308,7 @@ int current;
     int fd;
 # elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
     char *atari_tmpfile;
-# endif /* !AMIGA_AC_5 */
+# endif				/* !AMIGA_AC_5 */
     char *str, *pgm, *rest = NULL;
     int pgm_len, rest_len;
 
@@ -314,7 +316,7 @@ int current;
     int chan, one = 1;
     static $DESCRIPTOR(pgmdsc, pgm);
     static $DESCRIPTOR(lognamedsc, MAILBOX);
-# endif /* VMS */
+# endif				/* VMS */
 
     /* forgive missing closing backquote at end of line */
     str = *strp + current;
@@ -325,7 +327,7 @@ int current;
     }
     pgm_len = last - str;
     pgm = gp_alloc(pgm_len, "command string");
-    safe_strncpy(pgm, str + 1, pgm_len); /* omit ` to leave room for NUL */
+    safe_strncpy(pgm, str + 1, pgm_len);	/* omit ` to leave room for NUL */
 
     /* save rest of line, if any */
     if (*last) {
@@ -336,7 +338,6 @@ int current;
 	    strcpy(rest, last);
 	}
     }
-
 # ifdef VMS
     pgmdsc.dsc$w_length = i;
     if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
@@ -357,11 +358,11 @@ int current;
     system(pgm);
     if ((f = fopen(atari_tmpfile, "r")) == NULL)
 # elif defined(AMIGA_AC_5)
-    if ((fd = open(pgm, "O_RDONLY")) == -1)
-# else /* everyone else */
-    if ((f = popen(pgm, "r")) == NULL)
-	os_error(NO_CARET, "popen failed");
-# endif /* !VMS */
+	if ((fd = open(pgm, "O_RDONLY")) == -1)
+# else				/* everyone else */
+	    if ((f = popen(pgm, "r")) == NULL)
+		os_error(NO_CARET, "popen failed");
+# endif				/* !VMS */
 
     free(pgm);
 
@@ -375,7 +376,7 @@ int current;
 # else
 	if ((c = getc(f)) == EOF)
 	    break;
-# endif /* !AMIGA_AC_5 */
+# endif				/* !AMIGA_AC_5 */
 	if (c != '\n' && c != '\r')
 	    (*strp)[current++] = c;
 	if (current == *str_lenp)
@@ -387,18 +388,18 @@ int current;
 
     /* tack on rest of line to output */
     if (rest) {
-        while (current + rest_len > *str_lenp)
+	while (current + rest_len > *str_lenp)
 	    extend_input_line();
-	strcpy(*strp+current, rest);
+	strcpy(*strp + current, rest);
 	free(rest);
     }
-
     screen_ok = FALSE;
 }
 
 #else /* VMS || PIPES || ATARI && PUREC */
 
-static void substitute(str, max)
+static void
+substitute(str, max)
 char *str;
 int max;
 {

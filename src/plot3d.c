@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.3 1999/06/09 12:13:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -201,7 +201,8 @@ do { if (reverse_range[AXIS]) { \
 
 /* support for dynamic size of input line */
 
-void plot3drequest()
+void
+plot3drequest()
 /*
  * in the parametric case we would say splot [u= -Pi:Pi] [v= 0:2*Pi] [-1:1]
  * [-1:1] [-1:1] sin(v)*cos(u),sin(v)*cos(u),sin(u) in the non-parametric
@@ -238,7 +239,7 @@ void plot3drequest()
 	    }
 	}
 	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) :
-			load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
+	    load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
@@ -263,7 +264,7 @@ void plot3drequest()
 	    }
 	}
 	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) :
-			load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
+	    load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
 	if (!equals(c_token, "]"))
 	    int_error(c_token, "']' expected");
 	c_token++;
@@ -319,7 +320,8 @@ void plot3drequest()
 }
 
 #ifdef THIN_PLATE_SPLINES_GRID
-static double splines_kernel(h)
+static double
+splines_kernel(h)
 double h;
 {
     /* this is normaly not usefull ... */
@@ -334,7 +336,8 @@ double h;
 
 #define Swap(a,b) {double tmp; tmp=a; a=b; b=tmp;}
 
-static void lu_decomp(a, n, indx, d)
+static void
+lu_decomp(a, n, indx, d)
 double **a;
 int n;
 int *indx;
@@ -394,7 +397,8 @@ double *d;
     free(vscal);
 }
 
-static void lu_backsubst(a, n, indx, b)
+static void
+lu_backsubst(a, n, indx, b)
 double **a;
 int n;
 int *indx;
@@ -431,7 +435,8 @@ double *b;
 }
 #endif
 
-static void grid_nongrid_data(this_plot)
+static void
+grid_nongrid_data(this_plot)
 struct surface_points *this_plot;
 {
     int i, j, k;
@@ -670,7 +675,8 @@ struct surface_points *this_plot;
     }
 }
 
-static void get_3ddata(this_plot)
+static void
+get_3ddata(this_plot)
 struct surface_points *this_plot;
 /* this_plot->token is end of datafile spec, before title etc
  * will be moved passed title etc after we return
@@ -886,7 +892,8 @@ struct surface_points *this_plot;
 
 
 
-static void print_3dtable(pcount)
+static void
+print_3dtable(pcount)
 int pcount;
 {
     register struct surface_points *this_plot;
@@ -968,7 +975,8 @@ do{\
  * datafiles, code to parse it has to be added here. Change so that
  * we store starting-token in the plot structure.
  */
-static void eval_3dplots()
+static void
+eval_3dplots()
 {
     int i, j;
     struct surface_points **tp_3d_ptr;
@@ -1652,7 +1660,8 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 
 
 
-static void parametric_3dfixup(start_plot, plot_num)
+static void
+parametric_3dfixup(start_plot, plot_num)
 struct surface_points *start_plot;
 int *plot_num;
 /*

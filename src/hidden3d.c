@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.33 1998/06/18 14:55:10 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.4 1999/06/09 12:13:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -388,7 +388,8 @@ static long pfirst;		/* Index on the first polygon */
 static void print_polygon __PROTO((struct Polygon GPHUGE * p, const char *pname));
 
 /* HBB: new routine, to help debug 'Logic errors', mainly */
-static void print_polygon(p, pname)
+static void
+print_polygon(p, pname)
 struct Polygon GPHUGE *p;
 const char *pname;
 {
@@ -437,11 +438,12 @@ static void map3d_xyz __PROTO((double x, double y, double z,
 			       struct Vertex GPHUGE * v));
 static int reduce_polygon __PROTO((int *n, long **v, long *line, int nmin));
 static void build_polygon __PROTO((struct Polygon GPHUGE * p, int n,
-		long *v, long line, int style, struct lp_style_type * lp,
-	       long next, long next_frag, int id, t_poly_tested tested));
+				   long *v, long line, int style, struct lp_style_type * lp,
+				   long next, long next_frag, int id, t_poly_tested tested));
 static GP_INLINE int maybe_build_polygon __PROTO((struct Polygon GPHUGE * p,
-	 int n, long *v, long line, int style, struct lp_style_type * lp,
-	       long next, long next_frag, int id, t_poly_tested tested));
+						  int n, long *v, long line, int style, struct
+						  lp_style_type * lp,
+						  long next, long next_frag, int id, t_poly_tested tested));
 static void init_polygons __PROTO((struct surface_points * plots, int pcount));
 static int compare_by_zmax __PROTO((const void *p1, const void *p2));
 static void sort_by_zmax __PROTO((void));
@@ -449,16 +451,21 @@ static int obscured __PROTO((struct Polygon GPHUGE * p));
 static GP_INLINE int xy_overlap __PROTO((struct Polygon GPHUGE * a, struct Polygon GPHUGE * b));
 static void get_plane __PROTO((struct Polygon GPHUGE * p, double *a, double *b,
 			       double *c, double *d));
-static t_poly_plane_intersect polygon_plane_intersection __PROTO((struct Polygon GPHUGE * p, double a, double b, double c, double d));
+static t_poly_plane_intersect polygon_plane_intersection __PROTO((struct Polygon GPHUGE * p,
+								  double a, double b, double c,
+								  double d));
 static int intersect __PROTO((struct Vertex GPHUGE * v1,
-			      struct Vertex GPHUGE * v2, struct Vertex GPHUGE * v3, struct Vertex GPHUGE * v4));
+			      struct Vertex GPHUGE * v2, struct Vertex GPHUGE * v3, struct Vertex
+			      GPHUGE * v4));
 static int v_intersect __PROTO((struct Vertex GPHUGE * v1,
-				struct Vertex GPHUGE * v2, struct Vertex GPHUGE * v3, struct Vertex GPHUGE * v4));
-static int intersect_polygon __PROTO((struct Vertex GPHUGE * v1, struct Vertex GPHUGE * v2, struct Polygon GPHUGE * p));
+				struct Vertex GPHUGE * v2, struct Vertex GPHUGE * v3, struct
+				Vertex GPHUGE * v4));
+static int intersect_polygon __PROTO((struct Vertex GPHUGE * v1, struct Vertex GPHUGE * v2, struct
+				      Polygon GPHUGE * p));
 static int full_xy_overlap __PROTO((struct Polygon GPHUGE * a, struct Polygon GPHUGE * b));
 static long build_new_vertex __PROTO((long V1, long V2, double w));
 static long split_polygon_by_plane __PROTO((long P, double a, double b,
-					double c, double d, TBOOLEAN f));
+					    double c, double d, TBOOLEAN f));
 static int in_front __PROTO((long Last, long Test));
 
 /* HBB 980303: new, for the new back-buffer for *Cross structures: */
@@ -479,7 +486,8 @@ static void draw __PROTO((struct Polygon GPHUGE * p));
 /* Set the options for hidden3d. To be called from set.c, when the
  * user has begun a command with 'set hidden3d', to parse the rest of
  * that command */
-void set_hidden3doptions()
+void
+set_hidden3doptions()
 {
     struct value t;
 
@@ -555,9 +563,10 @@ void set_hidden3doptions()
 }
 
 /* HBB 970619: new routine for displaying the option settings */
-void show_hidden3doptions()
+void
+show_hidden3doptions()
 {
-    fprintf(stderr,"\
+    fprintf(stderr, "\
 \t  Back side of surfaces has linestyle offset of %d\n\
 \t  Bit-Mask of Lines to draw in each triangle is %ld\n\
 \t  %d: ",
@@ -578,7 +587,7 @@ void show_hidden3doptions()
 	fputs("This value is illegal!!!\n", stderr);
 	break;
     }
-    fprintf(stderr,"\
+    fprintf(stderr, "\
 \t  Will %suse other diagonal if it gives a less jaggy outline\n\
 \t  Will %sdraw diagonal visibly if quadrangle is 'bent over'\n",
 	    hiddenShowAlternativeDiagonal ? "" : "not ",
@@ -587,14 +596,16 @@ void show_hidden3doptions()
 
 /* HBB 971117: new function. */
 /* Implements proper 'save'ing of the new hidden3d options... */
-void save_hidden3doptions(fp)
+void
+save_hidden3doptions(fp)
 FILE *fp;
 {
     if (!hidden3d) {
 	fputs("set nohidden3d\n", fp);
 	return;
     }
-    fprintf(fp, "set hidden3d offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
+    fprintf(fp,
+	    "set hidden3d offset %d trianglepattern %ld undefined %d %saltdiagonal %sbentover\n",
 	    hiddenBacksideLinetypeOffset,
 	    hiddenTriangleLinesdrawnPattern,
 	    hiddenHandleUndefinedPoints,
@@ -604,7 +615,8 @@ FILE *fp;
 
 /* Initialize the necessary steps for hidden line removal and
    initialize global variables. */
-void init_hidden_line_removal()
+void
+init_hidden_line_removal()
 {
     int i;
 
@@ -634,14 +646,15 @@ void init_hidden_line_removal()
     if (pnt == 0) {
 	i = XREDUCE(xright) - XREDUCE(xleft) + 1;
 	pnt = (tp_pnt *) gp_alloc(
-		     (unsigned long) (i * sizeof(tp_pnt)), "hidden pnt");
+				     (unsigned long) (i * sizeof(tp_pnt)), "hidden pnt");
 	while (--i >= 0)
 	    pnt[i] = (tp_pnt) 0;
     }
 }
 
 /* Reset the hidden line data to a fresh start.                              */
-void reset_hidden_line_removal()
+void
+reset_hidden_line_removal()
 {
     int i;
     if (pnt) {
@@ -657,7 +670,8 @@ void reset_hidden_line_removal()
 
 /* Terminates the hidden line removal process.                  */
 /* Free any memory allocated by init_hidden_line_removal above. */
-void term_hidden_line_removal()
+void
+term_hidden_line_removal()
 {
     if (pnt) {
 	int j;
@@ -682,7 +696,8 @@ void term_hidden_line_removal()
 			 y = ((int)((v)->y * yscaler)) + ymiddle;
 
 
-static void map3d_xyz(x, y, z, v)
+static void
+map3d_xyz(x, y, z, v)
 double x, y, z;			/* user coordinates */
 struct Vertex GPHUGE *v;	/* the point in normalized space */
 {
@@ -711,7 +726,8 @@ struct Vertex GPHUGE *v;	/* the point in normalized space */
 
 
 /* remove unnecessary Vertices from a polygon: */
-static int reduce_polygon(n, v, line, nmin)
+static int
+reduce_polygon(n, v, line, nmin)
 int *n;				/* number of vertices */
 long **v;			/* the vertices */
 long *line;			/* information which line should be drawn */
@@ -728,7 +744,7 @@ int nmin;			/* if the number reduces under nmin, forget polygon */
 	    && ((w[i] == w[i + 1])
 		|| !GETBIT(*line, i)
 		|| GETBIT(*line, i + 1)
-	    || ((i > 0) ? GETBIT(*line, i - 1) : GETBIT(*line, *n - 1))))
+		|| ((i > 0) ? GETBIT(*line, i - 1) : GETBIT(*line, *n - 1))))
 	    less++;
 	else if (less) {
 	    w[i - less] = w[i];
@@ -767,7 +783,8 @@ int nmin;			/* if the number reduces under nmin, forget polygon */
 /*
  * HBB: changed this to precalculate {x|y}{min|max}
  */
-static void build_polygon(p, n, v, line, style, lp, next, next_frag, id, tested)
+static void
+build_polygon(p, n, v, line, style, lp, next, next_frag, id, tested)
 struct Polygon GPHUGE *p;	/* this should point at a free entry in plist */
 int n;				/* number of vertices */
 long *v;			/* array of indices on the vertices (in vlist) */
@@ -853,8 +870,8 @@ t_poly_tested tested;		/* Is polygon already on the right place of list? */
 /* HBB 970131: new function, to allow handling of undefined datapoints
  * by leaving out the corresponding polygons from the list.
  * Return Value: 1 if polygon was built, 0 otherwise */
-static GP_INLINE int maybe_build_polygon(p, n, v, line, style, lp,
-					 next, next_frag, id, tested)
+static GP_INLINE int
+maybe_build_polygon(p, n, v, line, style, lp, next, next_frag, id, tested)
 struct Polygon GPHUGE *p;
 struct lp_style_type *lp;
 int n, style, id;
@@ -904,7 +921,8 @@ long *v, line, next, next_frag;
   (style) = ((c) >= 0) ? above : below;\
 } while (0)
 
-static void init_polygons(plots, pcount)
+static void
+init_polygons(plots, pcount)
 struct surface_points *plots;
 int pcount;
      /* Initialize vlist, plist */
@@ -1087,7 +1105,7 @@ int pcount;
 			    && reduce_polygon(&n1, &v1, &line1, 3)) {
 			    CHECK_PLIST();
 			    pfree += maybe_build_polygon(plist + pfree, n1, v1, line1,
-					      style1, lp, -1L, -1L, id++,
+							 style1, lp, -1L, -1L, id++,
 							 is_untested);
 			    inc_id = TRUE;
 			}
@@ -1097,18 +1115,18 @@ int pcount;
 			    && reduce_polygon(&n2, &v2, &line2, 3)) {
 			    CHECK_PLIST();
 			    pfree += maybe_build_polygon(plist + pfree, n2, v2, line2,
-					      style2, lp, -1L, -1L, id++,
+							 style2, lp, -1L, -1L, id++,
 							 is_untested);
 			    inc_id = TRUE;
 			}
 			PREPARE_POLYGON(n3, v3, 2 * row_offset - 1, 2 * row_offset + 1, 1,
-			      line3, c3, border3, icrvs->p_count - 2, -1,
+					line3, c3, border3, icrvs->p_count - 2, -1,
 					style3);
 			if ((c3 || border3)
 			    && reduce_polygon(&n3, &v3, &line3, 3)) {
 			    CHECK_PLIST();
 			    pfree += maybe_build_polygon(plist + pfree, n3, v3, line3,
-					      style3, lp, -1L, -1L, id++,
+							 style3, lp, -1L, -1L, id++,
 							 is_untested);
 			    inc_id = TRUE;
 			}
@@ -1118,7 +1136,7 @@ int pcount;
 			    && reduce_polygon(&n4, &v4, &line4, 3)) {
 			    CHECK_PLIST();
 			    pfree += maybe_build_polygon(plist + pfree, n4, v4, line4,
-					      style4, lp, -1L, -1L, id++,
+							 style4, lp, -1L, -1L, id++,
 							 is_untested);
 			    inc_id = TRUE;
 			}
@@ -1131,7 +1149,7 @@ int pcount;
 			PREPARE_POLYGON(n1, v1, row_offset, 0, 1, line1, c1,
 					border1, 0, 0, style1);
 			PREPARE_POLYGON(n2, v2, 1, row_offset + 1, row_offset, line2,
-			      c2, border2, icrvs->p_count - 2, ncrv1 - 2,
+					c2, border2, icrvs->p_count - 2, ncrv1 - 2,
 					style2);
 
 			/* if this makes at least one of the two triangles
@@ -1142,11 +1160,11 @@ int pcount;
 			    ) {
 			    if (VERTEX_IS_UNDEFINED(vlist[vert_free + 1])) {
 				PREPARE_POLYGON(n1, v1, row_offset + 1, row_offset, 0,
-					line1, c1, border1, 0, ncrv1 - 2,
+						line1, c1, border1, 0, ncrv1 - 2,
 						style1);
 			    } else if (VERTEX_IS_UNDEFINED(vlist[vert_free + row_offset])) {
 				PREPARE_POLYGON(n1, v1, 0, 1, row_offset + 1, line1,
-				      c1, border1, icrvs->p_count - 2, 0,
+						c1, border1, icrvs->p_count - 2, 0,
 						style1);
 			    }
 			}
@@ -1174,11 +1192,11 @@ int pcount;
 
 				CHECK_PLIST_2();
 				r1 = maybe_build_polygon(plist + pfree, n1, v1,
-						  line1, style1, lp, -1L,
-						   -1L, id, is_untested);
+							 line1, style1, lp, -1L,
+							 -1L, id, is_untested);
 				r2 = maybe_build_polygon(plist + pfree + r1, n2, v2,
-						  line2, style2, lp, -1L,
-						 -1L, id++, is_untested);
+							 line2, style2, lp, -1L,
+							 -1L, id++, is_untested);
 				if (r1 && r2) {
 				    plist[pfree].next_frag = pfree + 1;
 				    plist[pfree + 1].next_frag = pfree;
@@ -1196,7 +1214,7 @@ int pcount;
 				SETBIT(line1, n1 - 1, 1);
 				CHECK_PLIST();
 				pfree += maybe_build_polygon(plist + pfree, n1, v1, line1,
-					      style1, lp, -1L, -1L, id++,
+							     style1, lp, -1L, -1L, id++,
 							     is_untested);
 			    }
 			} else {	/* P1 was not ok */
@@ -1215,14 +1233,14 @@ int pcount;
 			    if (0
 				|| (1
 				    && (c2 || border2)
-				  && reduce_polygon(&n2, &v2, &line2, 2))
+				    && reduce_polygon(&n2, &v2, &line2, 2))
 				|| (1
 /* HBB 980213: reduce_... above might have zeroed v... */
 				    && (v2)
 				    && (c1 || border1))) {
 				CHECK_PLIST();
 				pfree += maybe_build_polygon(plist + pfree, n2, v2, line2,
-					      style2, lp, -1L, -1L, id++,
+							     style2, lp, -1L, -1L, id++,
 							     is_untested);
 			    } else {
 				/* HBB 980213: sigh... both P1 and P2 were invisible, but
@@ -1243,7 +1261,7 @@ int pcount;
 		    v1[0] = vert_free++;
 		    CHECK_PLIST();
 		    pfree += maybe_build_polygon(plist + pfree, 1, v1, 1L, above,
-					lp, -1L, -1L, id++, is_untested);
+						 lp, -1L, -1L, id++, is_untested);
 		    break;
 		case BOXERROR:	/* handle as POINTSTYLE */
 		case BOXXYERROR:
@@ -1262,7 +1280,7 @@ int pcount;
 		    v1[0] = vert_free++;
 		    CHECK_PLIST();
 		    pfree += maybe_build_polygon(plist + pfree, 1, v1, 0L, above,
-					lp, -1L, -1L, id++, is_untested);
+						 lp, -1L, -1L, id++, is_untested);
 		    break;
 		case BOXES:	/* handle as IMPULSES */
 		case IMPULSES:
@@ -1275,19 +1293,21 @@ int pcount;
 		    (void) reduce_polygon(&n1, &v1, &line1, 1);
 		    CHECK_PLIST();
 		    pfree += maybe_build_polygon(plist + pfree, n1, v1, line1, above,
-					lp, -1L, -1L, id++, is_untested);
+						 lp, -1L, -1L, id++, is_untested);
 		    break;
 		}
     }
 }
 
-static int compare_by_zmax(p1, p2)
+static int
+compare_by_zmax(p1, p2)
 const void *p1, *p2;
 {
     return (SIGNOF(plist[*(const long *) p2].zmax - plist[*(const long *) p1].zmax));
 }
 
-static void sort_by_zmax()
+static void
+sort_by_zmax()
      /* and build the list (return_value = start of list) */
 {
     long *sortarray, i;
@@ -1312,7 +1332,8 @@ static void sort_by_zmax()
  *  hardcoded sizeof(short) = 2 (09.10.1996) */
 
 #define LASTBITS (USHRT_BITS -1)	/* ????? */
-static int obscured(p)
+static int
+obscured(p)
      /* is p obscured by already drawn polygons? (only a simple minimax-test) */
 struct Polygon GPHUGE *p;
 {
@@ -1367,7 +1388,8 @@ struct Polygon GPHUGE *p;
 }
 
 
-void draw_line_hidden(x1, y1, x2, y2)
+void
+draw_line_hidden(x1, y1, x2, y2)
 unsigned int x1, y1, x2, y2;
 {
     register struct termentry *t = term;
@@ -1464,7 +1486,8 @@ unsigned int x1, y1, x2, y2;
 }
 
 
-static GP_INLINE int xy_overlap(a, b)
+static GP_INLINE int
+xy_overlap(a, b)
      /* Do a and b overlap in x or y (minimax test) */
 struct Polygon GPHUGE *a, GPHUGE * b;
 {
@@ -1478,7 +1501,8 @@ struct Polygon GPHUGE *a, GPHUGE * b;
 }
 
 
-static void get_plane(p, a, b, c, d)
+static void
+get_plane(p, a, b, c, d)
 struct Polygon GPHUGE *p;
 double *a, *b, *c, *d;
 {
@@ -1537,7 +1561,7 @@ double *a, *b, *c, *d;
 
 
 static t_poly_plane_intersect
- polygon_plane_intersection(p, a, b, c, d)
+polygon_plane_intersection(p, a, b, c, d)
 struct Polygon GPHUGE *p;
 double a, b, c, d;
 {
@@ -1598,7 +1622,8 @@ static double m1x, M1x, m1y, M1y, m2x, M2x, m2y, M2y;
 /* Does the edge [v1,v2] intersect edge [v3, v4] ?
  * This is for non-vertical [v1,v2]
  */
-static int intersect(v1, v2, v3, v4)
+static int
+intersect(v1, v2, v3, v4)
 struct Vertex GPHUGE *v1, GPHUGE * v2, GPHUGE * v3, GPHUGE * v4;
 {
     double m1, m2, t1, t2, x, y, minx, maxx;
@@ -1649,7 +1674,8 @@ struct Vertex GPHUGE *v1, GPHUGE * v2, GPHUGE * v3, GPHUGE * v4;
 /* Does the edge [v1,v2] intersect edge [v3, v4] ?
  * This is for vertical [v1,v2]
  */
-static int v_intersect(v1, v2, v3, v4)
+static int
+v_intersect(v1, v2, v3, v4)
 struct Vertex GPHUGE *v1, GPHUGE * v2, GPHUGE * v3, GPHUGE * v4;
 {
     double y;
@@ -1693,7 +1719,8 @@ struct Vertex GPHUGE *v1, GPHUGE * v2, GPHUGE * v3, GPHUGE * v4;
 } while (0)
 
 /* does the edge [v1,v2] intersect polygon p? */
-static int intersect_polygon(v1, v2, p)
+static int
+intersect_polygon(v1, v2, p)
 struct Vertex GPHUGE *v1, GPHUGE * v2;
 struct Polygon GPHUGE *p;
 {
@@ -1741,7 +1768,8 @@ struct Polygon GPHUGE *p;
  * Do edges intersect, do the polygons touch in two points,
  * or is a vertex of one polygon inside the other polygon? */
 
-static int full_xy_overlap(a, b)
+static int
+full_xy_overlap(a, b)
 struct Polygon GPHUGE *a, GPHUGE * b;
 {
     struct Vertex GPHUGE *v1, GPHUGE * v2, v;
@@ -1801,9 +1829,10 @@ struct Polygon GPHUGE *a, GPHUGE * b;
 
 
 /* Helper routine for split_polygon_by_plane */
-static long build_new_vertex(V1, V2, w)
-long V1, V2;	/* the vertices, between which a new vertex is demanded */
-double w;	/* information about where between V1 and V2 it should be */
+static long
+build_new_vertex(V1, V2, w)
+long V1, V2;			/* the vertices, between which a new vertex is demanded */
+double w;			/* information about where between V1 and V2 it should be */
 {
     long V;
     struct Vertex GPHUGE *v, GPHUGE * v1, GPHUGE * v2;
@@ -1816,7 +1845,8 @@ double w;	/* information about where between V1 and V2 it should be */
     /* We need a new Vertex */
     if (vert_free == nvert)	/* Extend vlist, if necessary */
 	vlist = (struct Vertex GPHUGE *)
-	    gp_realloc(vlist, (unsigned long) sizeof(struct Vertex) * (nvert += 10L), "hidden vlist");
+	    gp_realloc(vlist, (unsigned long) sizeof(struct Vertex) * (nvert += 10L),
+		       "hidden vlist");
     V = vert_free++;
     v = vlist + V;
     v1 = vlist + V1;
@@ -1851,7 +1881,8 @@ double w;	/* information about where between V1 and V2 it should be */
  * mechanisms heavily)
  */
 
-static long split_polygon_by_plane(P, a, b, c, d, f)
+static long
+split_polygon_by_plane(P, a, b, c, d, f)
 long P;				/* Polygon as index on plist */
 double a, b, c, d;
 TBOOLEAN f;			/* return value = Front(1) or Back(0) */
@@ -1945,7 +1976,7 @@ TBOOLEAN f;			/* return value = Front(1) or Back(0) */
 #endif
     v1[0] = v2[n2 - 1] =
 	build_new_vertex(p->vertex[cross2 - 1],
-		p->vertex[(cross2 < p->n) ? cross2 : 0], a2 / (a2 - b2));
+			 p->vertex[(cross2 < p->n) ? cross2 : 0], a2 / (a2 - b2));
     v2[0] = v1[n1 - 1] =
 	build_new_vertex(p->vertex[cross1 - 1],
 			 p->vertex[cross1], a1 / (a1 - b1));
@@ -2073,7 +2104,8 @@ TBOOLEAN f;			/* return value = Front(1) or Back(0) */
  * If not, polygons which are in front of test come between
  * Last and Test (I.e. to the 'front' of the plist)
  */
-static int in_front(Last, Test)
+static int
+in_front(Last, Test)
 long Last, Test;
 {
     struct Polygon GPHUGE *test = plist + Test, GPHUGE * p;
@@ -2167,7 +2199,8 @@ long Last, Test;
 		SPLIT_P_BY_TEST;
 
 	    /* HBB: if we ever come through here, something went severely wrong */
-	    fprintf(stderr, "Failed: polygon %ld vs. %ld, relations are %d, %d\n", P, Test, p_rel_tplane, t_rel_pplane);
+	    fprintf(stderr, "Failed: polygon %ld vs. %ld, relations are %d, %d\n", P, Test,
+		    p_rel_tplane, t_rel_pplane);
 	    print_polygon(test, "test");
 	    print_polygon(p, "p");
 	    fputc('\n', stderr);
@@ -2202,7 +2235,8 @@ long Last, Test;
 /* HBB 980303: new functions to handle Cross back-buffer (saves
  * gp_alloc()'s) */
 
-static GP_INLINE void init_Cross_store()
+static GP_INLINE void
+init_Cross_store()
 {
     assert(!Cross_store && !last_Cross_store);
     last_Cross_store = CROSS_STORE_INCREASE;
@@ -2212,20 +2246,21 @@ static GP_INLINE void init_Cross_store()
 		 "hidden cross store");
 }
 
-static GP_INLINE struct Cross *get_Cross_from_store()
+static GP_INLINE struct Cross *
+get_Cross_from_store()
 {
     while (last_Cross_store <= free_Cross_store) {
 	last_Cross_store += CROSS_STORE_INCREASE;
 	Cross_store = (struct Cross *)
 	    gp_realloc(Cross_store,
-		 (unsigned long) last_Cross_store * sizeof(struct Cross),
+		       (unsigned long) last_Cross_store * sizeof(struct Cross),
 		       "hidden cross store");
     }
     return Cross_store + (free_Cross_store++);
 }
 
 static GP_INLINE TBOOLEAN
- hl_buffer_set(xv, yv)
+hl_buffer_set(xv, yv)
 int xv, yv;
 {
     struct Cross GPHUGE *c;
@@ -2245,7 +2280,8 @@ static int hl_buff_xmin, hl_buff_xmax;
  * draw_clip_line_buffer */
 /* Store a line crossing the x interval around xv between y = ya and
  * y = yb in the hl_buffer */
-static GP_INLINE void update_hl_buffer_column(xv, ya, yb)
+static GP_INLINE void
+update_hl_buffer_column(xv, ya, yb)
 int xv, ya, yb;
 {
     struct Cross GPHUGE *GPHUGE * cross, GPHUGE * cross2;
@@ -2304,7 +2340,8 @@ int xv, ya, yb;
 }
 
 
-static void draw_clip_line_buffer(x1, y1, x2, y2)
+static void
+draw_clip_line_buffer(x1, y1, x2, y2)
 int x1, y1, x2, y2;
      /* Draw a line in the hl_buffer */
 {
@@ -2368,7 +2405,8 @@ int x1, y1, x2, y2;
  * Draw a line into the bitmap (**cpnt), and optionally also to the
  * terminal
  */
-static void draw_clip_line_update(x1, y1, x2, y2, do_draw)
+static void
+draw_clip_line_update(x1, y1, x2, y2, do_draw)
 int x1, y1, x2, y2;
 TBOOLEAN do_draw;
 {
@@ -2496,14 +2534,16 @@ TBOOLEAN do_draw;
 /* Two routines to emulate move/vector sequence using line drawing routine. */
 static unsigned int move_pos_x, move_pos_y;
 
-void clip_move(x, y)
+void
+clip_move(x, y)
 unsigned int x, y;
 {
     move_pos_x = x;
     move_pos_y = y;
 }
 
-void clip_vector(x, y)
+void
+clip_vector(x, y)
 unsigned int x, y;
 {
     draw_clip_line(move_pos_x, move_pos_y, x, y);
@@ -2511,7 +2551,8 @@ unsigned int x, y;
     move_pos_y = y;
 }
 
-static GP_INLINE void clip_vector_h(x, y)
+static GP_INLINE void
+clip_vector_h(x, y)
 int x, y;
      /* Draw a line on terminal and update bitmap */
 {
@@ -2521,7 +2562,8 @@ int x, y;
 }
 
 
-static GP_INLINE void clip_vector_virtual(x, y)
+static GP_INLINE void
+clip_vector_virtual(x, y)
 int x, y;
      /* update bitmap, do not really draw the line */
 {
@@ -2530,7 +2572,8 @@ int x, y;
     move_pos_y = y;
 }
 
-static GP_INLINE void clip_vector_buffer(x, y)
+static GP_INLINE void
+clip_vector_buffer(x, y)
      /* draw a line in the hl_buffer */
 int x, y;
 {
@@ -2539,7 +2582,8 @@ int x, y;
     move_pos_y = y;
 }
 
-static void draw(p)
+static void
+draw(p)
 struct Polygon GPHUGE *p;
 {
     struct Vertex GPHUGE *v;
@@ -2669,7 +2713,8 @@ struct Polygon GPHUGE *p;
 }
 
 
-void plot3d_hidden(plots, pcount)
+void
+plot3d_hidden(plots, pcount)
 struct surface_points *plots;
 int pcount;
 {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.3 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.4 1999/06/10 19:53:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -59,7 +59,7 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.3 1999/06/09 12:13:32 lheck
 # else
 /* declare struct timeb */
 extern int ftime(struct timeb *);
-# endif /* !HAVE_SYS_TIMEB_H */
+# endif				/* !HAVE_SYS_TIMEB_H */
 
 # define int_error(x,y) fprintf(stderr, "Error: " y "\n")
 # define int_warn(x,y) fprintf(stderr, "Warn: " y "\n")
@@ -98,7 +98,7 @@ static int gdysize __PROTO((int yr));
 
 
 static char *
- read_int(s, nr, d)
+read_int(s, nr, d)
 char *s;
 int nr, *d;
 {
@@ -125,7 +125,8 @@ static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 static int xstrftime __PROTO((char *buf, int bufsz, char *fmt, struct tm * tm));
 
 /* days in year */
-static int gdysize(yr)
+static int
+gdysize(yr)
 int yr;
 {
 
@@ -143,7 +144,7 @@ int yr;
  * year 2000.... */
 
 char *
- gstrptime(s, fmt, tm)
+gstrptime(s, fmt, tm)
 char *s;
 char *fmt;
 struct tm *tm;
@@ -331,7 +332,8 @@ struct tm *tm;
     return (s);
 }
 
-int gstrftime(s, bsz, fmt, l_clock)
+int
+gstrftime(s, bsz, fmt, l_clock)
 char *s;
 int bsz;
 char *fmt;
@@ -370,7 +372,8 @@ double l_clock;
   CHECK_SPACE(w);                          \
   sprintf(s, z ? "%0*d" : "%*d", w, (x) )
 
-static int xstrftime(str, bsz, fmt, tm)
+static int
+xstrftime(str, bsz, fmt, tm)
 char *str;			/* output buffer */
 int bsz;			/* space available */
 char *fmt;
@@ -427,7 +430,7 @@ struct tm *tm;
 
 
 #if 0
-	    /* %x not currently supported, so neither is c */
+		/* %x not currently supported, so neither is c */
 	    case 'c':
 		if (!xstrftime(s, bsz - l, "%x %X", tm))
 		    return (0);
@@ -579,7 +582,8 @@ struct tm *tm;
 
 
 /* time_t  */
-double gtimegm(tm)
+double
+gtimegm(tm)
 struct tm *tm;
 {
     register int i;
@@ -612,12 +616,14 @@ struct tm *tm;
     dsec *= 60.0;
     dsec += tm->tm_sec;
 
-    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, dsec));
+    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
+	     tm->tm_min, tm->tm_sec, dsec));
 
     return (dsec);
 }
 
-int ggmtime(tm, l_clock)
+int
+ggmtime(tm, l_clock)
 struct tm *tm;
 /* time_t l_clock; */
 double l_clock;
@@ -682,7 +688,8 @@ double l_clock;
 
 /* define gnu time routines in terms of system time routines */
 
-int gstrftime(buf, bufsz, fmt, l_clock)
+int
+gstrftime(buf, bufsz, fmt, l_clock)
 char *buf;
 int bufsz;
 char *fmt;
@@ -692,13 +699,15 @@ double l_clock;
     return strftime(buf, bufsz, fmt, gmtime(&t));
 }
 
-double gtimegm(tm)
+double
+gtimegm(tm)
 struct tm *tm;
 {
     return (double) mktime(tm);
 }
 
-int ggmtime(tm, l_clock)
+int
+ggmtime(tm, l_clock)
 struct tm *tm;
 double l_clock;
 {
@@ -714,7 +723,7 @@ double l_clock;
 /* supplemental routine gstrptime() to read a formatted time */
 
 char *
- gstrptime(s, fmt, tm)
+gstrptime(s, fmt, tm)
 char *s;
 char *fmt;
 struct tm *tm;
@@ -783,22 +792,23 @@ struct tm *tm;
 #ifdef TEST_TIME
 
 char *abbrev_month_names[] =
- { "jan", "feb", "mar", "apr", "may", "jun", "jul",
-   "aug", "sep", "oct", "nov", "dec"
- };
+{ "jan", "feb", "mar", "apr", "may", "jun", "jul",
+  "aug", "sep", "oct", "nov", "dec"
+};
 
 char *full_month_names[] =
- { "January", "February", "March", "April", "May",
-   "June", "July", "August", "September", "October",
-   "November", "December"
- };
+{ "January", "February", "March", "April", "May",
+  "June", "July", "August", "September", "October",
+  "November", "December"
+};
 
-char *abbrev_day_names[] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+char *abbrev_day_names[] =
+{ "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
 
 char *full_day_names[] =
- { "Sunday", "Monday", "Tuesday", "Wednesday",
-   "Thursday", "Friday", "Saturday"
- };
+{ "Sunday", "Monday", "Tuesday", "Wednesday",
+  "Thursday", "Friday", "Saturday"
+};
 
 
 /* either print current time using supplied format, or read
@@ -806,7 +816,8 @@ char *full_day_names[] =
  */
 
 
-int main(argc,argv)
+int
+main(argc, argv)
 int argc;
 char *argv[];
 {
