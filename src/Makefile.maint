@@ -2,8 +2,8 @@
 # Makefile fragment to generate makefile.all and update version.c
 
 # Non-core sources and version.c
-noncoresrc = amiga.c ansi2knr.c bf_test.c corplot.c ctrl87.c gplt_x11.c \
-os9.c strftime.c version.c vms.c
+noncoresrc = amiga.c ansi2knr.c bf_test.c corplot.c gplt_x11.c os9.c \
+strftime.c version.c vms.c
 
 coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))
 
@@ -36,9 +36,9 @@ version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	if [ "$(version)" != $$vn -o \
 	     "$(patchlevel)" != $$pl -o \
 	     "$$date" != "$$dt" ]; then \
-	  sed -e '/^char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
-	      -e '/^char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
-	      -e '/^char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
+	  sed -e '/^const char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
+	      -e '/^const char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
+	      -e '/^const char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
 	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
 	      -e "s/@DATE@/$(date)/" $@ >$@t; \
 	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \

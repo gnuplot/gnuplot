@@ -38,7 +38,7 @@ endif
 
 SUBDIRS = $(d_beos)
 
-OTHER_SOURCES = amiga.c corplot.c ctrl87.c ctrl87.h os9.c strftime.c vms.c
+OTHER_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com \
 gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm intergra.x11 \
