@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.4 1999/06/22 12:02:42 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.5 1999/10/01 14:50:07 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -92,6 +92,7 @@ extern struct rgb web_color_rgbs[];
 
 /* Prototypes from file "bitmap.c" */
 
+unsigned int b_getpixel __PROTO((unsigned int, unsigned int));
 void b_makebitmap __PROTO((unsigned int, unsigned int, unsigned int));
 void b_freebitmap __PROTO((void));
 void b_charsize __PROTO((unsigned int));

@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.10 1999/09/24 15:35:59 lhecking Exp $ */
+/* $Id: command.h,v 1.11 1999/10/01 14:54:30 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -90,7 +90,6 @@ extern int num_tokens, c_token;
   gp_expand_tilde(&save_file); \
   fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, (mode)) : stdout;
 
-/**/
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
 void clear_command __PROTO((void));
@@ -114,11 +113,6 @@ void system_command __PROTO((void));
 void testtime_command __PROTO((void));
 void update_command __PROTO((void));
 void do_shell __PROTO((void));
-
-void reset_command __PROTO((void));
-void set_command __PROTO((void));
-void show_command __PROTO((void));
-void unset_command __PROTO((void));
 
 /* Prototypes for functions exported by command.c */
 void extend_input_line __PROTO((void));

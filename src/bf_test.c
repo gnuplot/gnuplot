@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.3 1999/06/17 14:29:03 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.4 1999/10/01 14:54:29 lhecking Exp $"); }
 #endif
 
 
@@ -20,14 +20,17 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.3 1999/06/17 14:29:03 lh
 #include "config.h"
 #endif
 
+#define GPFAR /**/
+
 #include "ansichek.h"
 #include "stdfn.h"
-#define GPFAR /**/
 #include "binary.h"
-#include "alloc.h"
-#include "help.h"		/* HBB 990828: FreeHelp() prototype */
-#include "util.h"		/* HBB 990828: int_error() prototype */
 
+/* we declare these here instead of including more header files */
+void int_error __PROTO((int, const char *));
+void FreeHelp __PROTO((void));
+
+/* static functions */
 static float function __PROTO((int p, double x, double y));
 
 
@@ -61,7 +64,7 @@ FreeHelp()
 /*---- End of stubs ----*/
 
 
-float
+static float
 function(p, x, y)
 int p;
 double x, y;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.17 1999/09/21 18:29:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.18 1999/10/01 14:50:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -75,12 +75,17 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.17 1999/09/21 18:29:20 lhec
   */
 
 #include "plot.h"
-#include "term_api.h"
-#include "tables.h"
+#include "alloc.h"
 #include "bitmap.h"
-#include "setshow.h"
+#include "command.h"
 #include "driver.h"
-#include "help.h"		/* HBB 990828: 'help term' support */
+#include "graphics.h"
+#include "help.h"
+#include "parse.h"
+#include "tables.h"
+#include "term_api.h"
+#include "setshow.h"
+#include "util.h"
 
 #ifdef _Windows
 FILE *open_printer __PROTO((void));	/* in wprinter.c */
@@ -942,7 +947,7 @@ int c_token_arg;
  * returns NULL for unknown or ambiguous, otherwise is terminal
  * driver pointer
  */
-struct termentry *
+static struct termentry *
 change_term(name, length)
 const char *name;
 int length;

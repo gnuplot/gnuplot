@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.7 1999/07/09 21:05:12 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.8 1999/09/24 15:36:12 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1210,7 +1210,7 @@ XEvent *event;
 
 static XrmDatabase dbCmd, dbApp, dbDef, dbEnv, db = (XrmDatabase) 0;
 
-char *pr_GetR(), *getenv(), *type[20];
+char *getenv(), *type[20];
 XrmValue value;
 
 static XrmOptionDescRec options[] = {
