@@ -3,6 +3,10 @@
 	* src/datafile.c (df_readline): Allow for embedded whitespace in the
 	output of a string-valued expression inside a "using" spec.
 
+	* src/plot3d.c (plot3d_points_pm3d plot3d_points): Remove routine
+	plot3d_points_pm3d, and handle pm3d-colored points in plot3d_points
+	instead. This removes any special drawing order for the points.
+
 2005-03-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.h (AXIS_ACTUAL_MAX, AXIS_ACTUAL_MIN): New macros to

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.112 2005/02/11 11:37:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.114 2005/02/12 05:51:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -122,7 +122,6 @@ static void plot3d_vectors __PROTO((struct surface_points * plot));
 #ifdef PM3D
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
-static void plot3d_points_pm3d __PROTO((struct surface_points * plot, int p_type));
 static void get_surface_cbminmax __PROTO((struct surface_points *plot, double *cbmin, double *cbmax));
 #endif
 static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
@@ -159,6 +158,7 @@ static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 #ifdef PM3D
 static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
 static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
+static TBOOLEAN can_pm3d = FALSE;
 #endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
@@ -546,9 +546,6 @@ do_3dplot(
     int key_count;
     legend_key *key = &keyT;
     char *s, *e;
-#ifdef PM3D
-    TBOOLEAN can_pm3d = 0;
-#endif
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -970,11 +967,6 @@ do_3dplot(
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 		}
 		if (!(hidden3d && draw_surface)) {
-#ifdef PM3D
-		    if (use_palette)
-			plot3d_points_pm3d(this_plot, this_plot->lp_properties.p_type);
-		    else
-#endif
 			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 		break;
@@ -1010,11 +1002,6 @@ do_3dplot(
 		}
 
 		if (!(hidden3d && draw_surface)) {
-#ifdef PM3D
-		    if (use_palette)
-			plot3d_points_pm3d(this_plot, this_plot->lp_properties.p_type);
-		    else
-#endif
 			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 
@@ -1031,11 +1018,6 @@ do_3dplot(
 		}
 
 		if (!(hidden3d && draw_surface)) {
-#ifdef PM3D
-		    if (use_palette)
-			plot3d_points_pm3d(this_plot, -1);
-		    else
-#endif
 			plot3d_points(this_plot, -1);
 		}
 
@@ -1746,6 +1728,14 @@ plot3d_points(struct surface_points *plot, int p_type)
 		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		if (!clip_point(x, y)) {
+#ifdef PM3D
+		    if (can_pm3d && plot->lp_properties.use_palette) {
+			if (plot->pm3d_color_from_column)
+			    set_color( cb2gray(points[i].CRD_COLOR) );
+			else
+			    set_color( cb2gray( z2cb(points[i].z) ) );
+		    }
+#endif
 		    if (plot->plot_style == POINTSTYLE
 		    &&  plot->lp_properties.p_size < 0)
 			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
@@ -1757,72 +1747,6 @@ plot3d_points(struct surface_points *plot, int p_type)
 	icrvs = icrvs->next;
     }
 }
-
-#ifdef PM3D
-static void
-plot3d_points_pm3d(struct surface_points *plot, int p_type)
-{
-    struct iso_curve** icrvs_pair[2];
-    int invert[2];
-    int n[2];
-
-    int i, set, scan;
-    unsigned int x, y;
-    struct termentry *t = term;
-
-    /* just a shortcut */
-    TBOOLEAN color_from_column = plot->pm3d_color_from_column;
-
-    /* split the bunch of scans in two sets in
-     * which the scans are already depth ordered */
-    pm3d_rearrange_scan_array(plot,
-	icrvs_pair, n, invert,
-	icrvs_pair + 1, n + 1, invert + 1);
-
-    for (set = 0; set < 2; set++) {
-
-	int begin = 0;
-	int step;
-
-	if (invert[set]) {
-	    /* begin is set below to the length of the scan - 1 */
-	    step = -1;
-	} else {
-	    step = 1;
-	}
-
-	for (scan = 0; scan < n[set] && icrvs_pair[set]; scan++) {
-
-	    int cnt;
-	    struct iso_curve *icrvs = icrvs_pair[set][scan];
-	    struct coordinate GPHUGE *points;
-
-	    if (invert[set]) {
-		begin = icrvs->p_count - 1;
-	    }
-
-	    for (cnt = 0, i = begin, points = icrvs->points; cnt < icrvs->p_count; cnt++, i += step) {
-
-		if (points[i].type == INRANGE) {
-		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
-
-		    if (!clip_point(x, y)) {
-			if (color_from_column)
-			    set_color( cb2gray(points[i].CRD_COLOR) );
-			else
-			    set_color( cb2gray( z2cb(points[i].z) ) );
-			if (plot->plot_style == POINTSTYLE
-			&&  plot->lp_properties.p_size < 0)
-			    (*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
-			(*t->point) (x, y, p_type);
-		    }
-		}
-	    }
-	} /* scan */
-    } /* set */
-}
-#endif
-
 
 /* cntr3d_impulses:
  * Plot a surface contour in IMPULSES style
