@@ -1,3 +1,9 @@
+2002-11-27  Johannes Zellner  <johannes@zellner.org>
+
+	* src/gplt_x11.c: subtract 1 from plot->cmap->allocated
+	in PaletteSetColor so that the resulting color index is
+	always valid
+
 2002-12-04  Ethan Merritt  <merritt@u.washington.edu>
 
         * docs/gnuplot.doc: Alphabetize and re-organize 'set style' options.
@@ -1504,7 +1510,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/03 19:38:12 $).
+	last modification date (from the tag $Date: 2002/12/05 01:46:45 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
