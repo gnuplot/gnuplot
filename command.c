@@ -397,7 +397,7 @@ static int command()
 		bail_to_command_line();
 #else
 # ifdef OS2
-	    if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
+	    if (STREQ(term->name, "pm") && sleep_time < 0) {
 		int rc;
 		if ((rc = PM_pause(buf)) == 0) {
 /*           if (!CallFromRexx)
@@ -412,11 +412,11 @@ static int command()
 	    }
 # else				/* !OS2 */
 #  ifdef _Macintosh
-	    if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
+	    if (STREQ(term->name, "macintosh") && sleep_time < 0)
 		Pause(sleep_time);
 #  else				/* !_Macintosh */
 #   ifdef MTOS
-	    if (strcmp(term->name, "mtos") == 0) {
+	    if (STREQ(term->name, "mtos")) {
 		int MTOS_pause(char *buf);
 		int rc;
 		if ((rc = MTOS_pause(buf)) == 0)
@@ -426,7 +426,7 @@ static int command()
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 		}
-	    } else if (strcmp(term->name, "atari") == 0) {
+	    } else if (STREQ(term->name, "atari")) {
 		char *readline(char *);
 		char *line = readline("");
 		if (line)
@@ -435,7 +435,7 @@ static int command()
 		(void) fgets(buf, MAX_LINE_LEN, stdin);
 #   else			/* !MTOS */
 #    ifdef ATARI
-	    if (strcmp(term->name, "atari") == 0) {
+	    if (STREQ(term->name, "atari")) {
 		char *readline(char *);
 		char *line = readline("");
 		if (line)
@@ -994,7 +994,7 @@ int toplevel;
     len = strlen(helpbuf);
 
     /* now, a lone ? will print subtopics only */
-    if (strcmp(helpbuf + (base ? base + 1 : 0), "?") == 0) {
+    if (STREQ(helpbuf + (base ? base + 1 : 0), "?") == 0) {
 	/* subtopics only */
 	subtopics = 1;
 	only = TRUE;
@@ -1152,9 +1152,6 @@ char *prompt;
 	/* If it's not an EOF */
 	if (line && *line) {
 #ifdef HAVE_LIBREADLINE
-#define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
-#define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
-
 	    HIST_ENTRY *temp;
 
 	    /* Must always be called at this point or
@@ -1165,8 +1162,6 @@ char *prompt;
 	    if (temp == 0 || STREQ (temp->line, line) == 0)
 		add_history(line);
 
-#undef STREQN
-#undef STREQ
 #else /* !HAVE_LIBREADLINE */
 	    add_history(line);
 #endif
