@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.1 1999/08/19 14:36:49 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.2 1999/09/24 11:02:49 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -335,10 +335,10 @@ struct curve_points *this_plot;
 	max_cols = 3;
 
     if (df_no_use_specs > max_cols)
-	fputs("warning : too many using specs for this style\n", stderr);
+	int_error("Too many using specs for this style", NO_CARET);
 
     if (df_no_use_specs >0 && df_no_use_specs < min_cols)
-	fputs("warning : not enough columns for this style\n", stderr);
+	int_error("Not enough columns for this style", NO_CARET);
 
     i = 0;
     while ((j = df_readline(v, max_cols)) != DF_EOF) {
