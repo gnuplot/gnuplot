@@ -8,6 +8,9 @@
 #   For LaTeX
 #       make gnuplot.dvi
 #       (print or view gnuplot.dvi)
+#     or (requires pdflatex)
+#       make pdf
+#       (print or view gnuplot.pdf)
 #     or
 #       make ps
 #       (print or view gnuplot.ps)
@@ -82,6 +85,9 @@ TROFF = troff
 # LaTeX command, either latex or latex2e or no
 LATEX = @LATEX@
 
+# PDFLaTeX command
+PDFLATEX = pdflatex
+
 # substitute your DVI to PostScript conversion program here
 DVIPS = dvips
 
@@ -122,7 +128,7 @@ allterm.h : $(CORETERM)
 	@rm -f allterm.c
 
 # for debugging
-alldoc: check dvi gih hlp html info ipf ms nroff ps rnh rtf
+alldoc: check dvi gih hlp html info ipf ms nroff pdf ps rnh rtf
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
@@ -194,6 +200,13 @@ doc2html : doc2html.o termdoc.o xref.o
 
 doc2html.o: doc2html.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2html.c
+
+### PDF documentation
+pdf: gnuplot.pdf
+
+gnuplot.pdf: gnuplot.tex
+	$(PDFLATEX) gnuplot.tex
+	$(PDFLATEX) gnuplot.tex
 
 ### LaTeX documentation
 tex: gnuplot.tex
@@ -364,7 +377,7 @@ distdir: $(DISTFILES)
 
 clean:
 	-rm -f doc2tex gnuplot.tex gnuplot.dvi \
-	  gnuplot.aux gnuplot.log gnuplot.toc \
+	  gnuplot.aux gnuplot.log gnuplot.toc gnuplot.pdf \
 	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
 	  alldoc2gih doc2gih gnuplot.gih \
 	  doc2hlp gnuplot.hlp \
