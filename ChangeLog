@@ -1,12 +1,17 @@
+2002-07-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_style): Add missing c_token++. Patch by Harald
+ 	Harders, SF #586987.
+
 2002-07-25  Harald Harders  <h.harders@tu-bs.de>
 
-	* term/post.trm: New options 'butt' and 'round' for line caps and line
-	joins.
+	* term/post.trm: New options 'butt' and 'round' for line caps and
+ 	line joins.
 
 2002-07-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/post.trm: Better patch to stroke pending graphic element, needed
-	in PS_filled_polygon() and PS_previous_palette().
+	* term/post.trm: Better patch to stroke pending graphic element,
+ 	needed in PS_filled_polygon() and PS_previous_palette().
 
 2002-07-24  Harald Harders  <h.harders@tu-bs.de>
 
@@ -14,7 +19,8 @@
 
 2002-07-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/post.trm: In PS_filled_polygon(), stroke pending graphic element.
+	* term/post.trm: In PS_filled_polygon(), stroke pending graphic
+ 	element.
 
 2002-07-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -31,13 +37,14 @@
 2002-07-23  Harald Harders  <h.harders@tu-bs.de>
 
 	* NEWS docs/gnuplot.doc src/gadgets.h src/graph3d.c src/graphics.c
-	src/graphics.h src/set.c src/show.c src/term.c src/term_api.h:
-	New option 'set arrow ... filled | nofilled' for filled arrow heads.
+ 	src/graphics.h src/set.c src/show.c src/term.c src/term_api.h: New
+ 	option 'set arrow ... filled | nofilled' for filled arrow heads.
 
 2002-07-23  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graphics.c docs/gnuplot.doc: Allow filled boxes in candlestick
-	plots, under control of the "set style fill ..." command. 
+	* src/graphics.c docs/gnuplot.doc: Allow filled boxes in
+ 	candlestick plots, under control of the "set style fill ..."
+  	command.
 
 2002-07-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -819,7 +826,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/24 14:32:11 $).
+	last modification date (from the tag $Date: 2002/07/25 12:25:07 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

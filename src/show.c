@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.80 2002/07/21 12:32:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.81 2002/07/23 18:53:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1329,6 +1329,7 @@ show_style()
 	c_token++;
 	break;
     case SHOW_STYLE_LINE:
+	c_token++;
 	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
 	break;
@@ -2301,7 +2302,7 @@ show_range(axis)
 static void
 show_xyzlabel(name, suffix, label)
     const char *name, *suffix;
-label_struct *label;
+    label_struct *label;
 {
     fprintf(stderr, "\t%s%s is \"%s\", offset at %f, %f",
 	    name, suffix, conv_text(label->text),
@@ -2339,7 +2340,7 @@ show_axislabel(axis)
 /* process 'show [xyzx2y2]data' commands */
 static void
 show_data_is_timedate(axis)
-AXIS_INDEX axis;
+    AXIS_INDEX axis;
 {
     SHOW_ALL_NL;
     fprintf(stderr, "\t%s is set to %s\n", axis_defaults[axis].name,
