@@ -122,6 +122,13 @@
 #include <stdlib.h>
 #include <windows.h>
 
+#ifndef _O_BINARY
+# define _O_BINARY O_BINARY
+#endif
+#if (__BORLANDC__ >= 0x450) /* about BCBuilder 1.0 */
+# define _setmode setmode
+#endif
+
 /* Customize this path if needed */
 #define PROGNAME "wgnuplot.exe"
 /* CRS: The value given above will work correctly as long as pgnuplot.exe
@@ -190,8 +197,8 @@ int main (int argc, char *argv[])
 {
 	char    psBuffer[BUFFER_SIZE];
 	char    psGnuplotCommandLine[MAX_PATH] = PROGNAME;
-	LPTSTR  psCmdLine = NULL;
-	BOOL    bSuccess = FALSE;
+	LPTSTR  psCmdLine;
+	BOOL    bSuccess;
 	
 	/* HBB 19990325, to allow pgnuplot < script > output.gif */
 	_setmode(fileno(stdout), _O_BINARY);
