@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.12 1999/06/19 20:30:54 lhecking Exp $
+ * $Id: pbm.trm,v 1.13 1999/07/09 21:07:23 lhecking Exp $
  *
  */
 
@@ -222,8 +222,8 @@ PBMgraphics()
     /* PBMsetfont(); */
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
        setting b_rastermode to TRUE */
-    b_makebitmap((unsigned int) (PBM_YMAX * ysize),
-		 (unsigned int) (PBM_XMAX * xsize), numplanes);
+    b_makebitmap((unsigned int) (PBM_YMAX * y_props.size),
+		 (unsigned int) (PBM_XMAX * x_props.size), numplanes);
     b_rastermode = TRUE;
 
     if (pbm_mode != 0)

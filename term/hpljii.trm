@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.11 1999/06/19 20:30:51 lhecking Exp $
+ * $Id: hpljii.trm,v 1.12 1999/06/22 11:54:18 lhecking Exp $
  *
  */
 
@@ -105,8 +105,8 @@ TERM_PUBLIC void HPDJtext __PROTO((void));
 #define HPLJII_DPP (hplj_dpp)	/* dots per pixel */
 #define HPLJII_PPI (300/HPLJII_DPP)	/* pixel per inch */
 /* make XMAX and YMAX a multiple of 8 */
-#define HPLJII_XMAX (8*(unsigned int)(xsize*1920/HPLJII_DPP/8.0+0.9))
-#define HPLJII_YMAX (8*(unsigned int)(ysize*1920/HPLJII_DPP/8.0+0.9))
+#define HPLJII_XMAX (8*(unsigned int)(x_props.size*1920/HPLJII_DPP/8.0+0.9))
+#define HPLJII_YMAX (8*(unsigned int)(y_props.size*1920/HPLJII_DPP/8.0+0.9))
 
 /* Courier font with 6 lines per inch */
 #define HPLJII_VCHAR (HPLJII_PPI/6)

@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.2 1999/06/19 20:30:53 lhecking Exp $
+ * $Id: openstep.trm,v 1.3 1999/06/22 11:54:21 lhecking Exp $
  *
  */
 
@@ -615,8 +615,8 @@ char **dict;			/* extra entries for the dictionary */
     NEXTPrintf(NEXTi1, uses_fonts ? "(atend)" : "");
 
     NEXTPrintf("%%%%BoundingBox: %d %d %d %d\n", xoff, yoff,
-	       (int) (xsize * width / NEXT_SC + 0.5 + xoff),
-	       (int) (ysize * height / NEXT_SC + 0.5 + yoff));
+	       (int) (x_props.size * width / NEXT_SC + 0.5 + xoff),
+	       (int) (y_props.size * height / NEXT_SC + 0.5 + yoff));
 
     NEXTPrintf(NEXTi2,
 	       NEXT_color ? "true" : "false",
