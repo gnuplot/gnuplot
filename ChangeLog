@@ -1,3 +1,7 @@
+2004-03-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/hiddden3d.c: Must not do arithmetic using TBOOLEANs!!!
+
 2004-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* PATCHLEVEL: Increased for yet another release candidate tarball.

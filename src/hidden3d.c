@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.36 2002/04/08 15:04:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.37 2002/09/27 00:12:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -631,7 +631,7 @@ get_plane(poly, plane)
     int i;
     p_vertex v1, v2;
     double x, y, z, s;
-    TBOOLEAN frontfacing=1;
+    TBOOLEAN frontfacing=TRUE;
 	
     /* calculate the signed areas of the polygon projected onto the
      * planes x=0, y=0 and z=0, respectively. The three areas form
@@ -681,7 +681,7 @@ get_plane(poly, plane)
     /* ensure that normalized c is > 0 */
     if (plane[2] < 0.0) {
 	s *= -1.0;
-	frontfacing = 0;
+	frontfacing = FALSE;
     }
 	
     plane[0] /= s;
@@ -808,8 +808,8 @@ color_edges(new_edge, old_edge, new_poly, old_poly, above, below)
 	    old_poly = new_poly;
 			
 	casenumber =
-	    (plist[new_poly].frontfacing != 0)
-	    + 2 * (plist[old_poly].frontfacing != 0);
+	    (plist[new_poly].frontfacing ? 1 : 0)
+	    + 2 * (plist[old_poly].frontfacing ? 1 : 0);
 	switch (casenumber) {
 	case 0:
 	    /* both backfacing */
@@ -1687,7 +1687,7 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	     * interpolation. */
 	    double v1_rel_pplane, v2_rel_pplane;
 	    /* Flags: are edge vertices found inside the triangle? */
-	    TBOOLEAN v1_inside_p, v2_inside_p;
+	    unsigned int v1_inside_p, v2_inside_p;
 	    /* Orientation of polygon wrt. to the eye: front or back side
 	     * visible? */
 	    coordval polyfacing;
