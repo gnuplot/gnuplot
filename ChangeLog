@@ -1,7 +1,8 @@
 2004-10-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Fix indentation level of terminal types when
-	converted to pdf.
+	converted to pdf.  Add mention of string variables in the documentation
+	for 'set label'.
 
 	* src/gplt_x11.c (pr_exportselection) term/x11.trm:
 	Add a test for X resource gnuplot*exportselection and disable exporting
