@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.20 2002/12/13 14:58:38 lhecking Exp $
+ * $Id: eepic.trm,v 1.21 2002/12/16 14:18:36 lhecking Exp $
  *
  */
 
@@ -492,7 +492,7 @@ EEPIC_options()
 	if (almost_equals(c_token, "de$fault"))
 	{
 	    fontsize_set = FALSE;
-	    eepic_color_on =
+	    eepic_color_on = FALSE;
 	    eepic_true_rotate = FALSE;
 	    eepic_lineset = 0;
 	    eepic_pointsize = 0;
@@ -531,25 +531,23 @@ EEPIC_options()
 	    eepic_pointsize = 2;
 	    c_token++;
 	}
+	else
 	if ( isdigit((unsigned char)
 		     input_line[token[c_token].start_index]) )
 	{
-	    /* stolen from pslatex.trm */
 	    struct value a;
 	    fontsize = real(const_express(&a));
 	    if ( fontsize < 1 || fontsize > 100 )
-	    {
 		int_error(c_token, "font size out of bounds [1..100]");
-		fontsize_set = FALSE;
-	    }
 	    else
 	    {
 		fontsize_set = TRUE;
 		term->v_char = (unsigned int)(fontsize/EEPIC_UNIT);
 		term->h_char = (unsigned int)((fontsize/EEPIC_UNIT)/2);
 	    }
-	    c_token++;
 	}
+	else
+	    int_error(c_token, "unrecognized option");
     }
 
     sprintf(term_options, "default%s%s%s%s",
@@ -574,7 +572,12 @@ TERM_TABLE_START(eepic_driver)
     EEPIC_VTIC, EEPIC_HTIC, EEPIC_options, EEPIC_init, EEPIC_reset,
     EEPIC_text, null_scale, EEPIC_graphics, EEPIC_move, EEPIC_vector,
     EEPIC_linetype, EEPIC_put_text, EEPIC_text_angle,
-    EEPIC_justify_text, EEPIC_point, EEPIC_arrow, set_font_null
+    EEPIC_justify_text, EEPIC_point, EEPIC_arrow, set_font_null,
+    0, /* pointsize */
+    0, /* flags */
+    0, 0, /* suspend, resume */
+    0, /* fillbox */
+    0  /* linewidth */
 TERM_TABLE_END(eepic_driver)
 
 #undef LAST_TERM
