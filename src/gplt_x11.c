@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.56 2003/04/18 11:41:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.57 2003/04/25 03:23:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -594,6 +594,17 @@ main(int argc, char *argv[])
 
     if (persist) {
 	FPRINTF((stderr, "waiting for %d windows\n", windows_open));
+
+#ifndef DEBUG	
+	/* HBB 20030519: Some programs executing gnuplot -persist may
+	 * be waiting for all default handles to be closed before they
+	 * consider the sub-process finished.  Emacs, e.g., does.  So,
+	 * unless this is a DEBUG build, drop our connection to stderr
+	 * now.  Using Freopen() ensures that debug fprintf()s won't
+	 * crash. */
+	freopen("/dev/null", "w", stderr);
+#endif
+
 	/* read x events until all windows have been quit */
 	while (windows_open > 0) {
 	    XEvent event;
