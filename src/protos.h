@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.10 1999/06/17 14:18:14 lhecking Exp $
+ * $Id: protos.h,v 1.11 1999/06/19 20:54:35 lhecking Exp $
  *
  */
 
@@ -94,7 +94,7 @@ void do_3dplot __PROTO((struct surface_points *plots, int pcount));
 int  help __PROTO((char *keyword, char *path, TBOOLEAN *subtopics));
 void FreeHelp __PROTO((void));
 void StartOutput __PROTO((void));
-void OutLine __PROTO((char *line));
+void OutLine __PROTO((const char *line));
 void EndOutput __PROTO((void));
 
 
@@ -194,7 +194,7 @@ void plot3drequest __PROTO((void));
 /* Prototypes from file "readline.c" */
 
 #ifndef HAVE_LIBREADLINE
-char *readline __PROTO((char *prompt));
+char *readline __PROTO((const char *prompt));
 void add_history __PROTO((char *line));
 #endif /* HAVE_LIBREADLINE */
 
@@ -252,13 +252,13 @@ void options_null __PROTO((void));
 void UNKNOWN_null __PROTO((void));
 void MOVE_null __PROTO((unsigned int, unsigned int));
 void LINETYPE_null __PROTO((int));
-void PUTTEXT_null __PROTO((unsigned int, unsigned int, char *));
+void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 
 
 /* prototypes for functions from time.c */
 
 char * gstrptime __PROTO((char *, char *, struct tm *)); /* string to *tm */
-int gstrftime __PROTO((char *, int, char *, double)); /* *tm to string */
+int gstrftime __PROTO((char *, size_t, const char *, double)); /* *tm to string */
 double gtimegm __PROTO((struct tm *)); /* *tm to seconds */
 int ggmtime __PROTO((struct tm *, double)); /* seconds to *tm */
 
