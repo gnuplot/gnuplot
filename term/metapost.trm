@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: metapost.trm,v 1.1 1999/05/19 11:00:51 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -105,8 +105,10 @@ TERM_PUBLIC void MP_boxfill __PROTO((int style,
 
 static double MP_xsize = MP_XSIZE;
 static double MP_ysize = MP_YSIZE;
-static double MP_xmax = MP_XMAX;
-static double MP_ymax = MP_YMAX;
+/* static double MP_xmax = MP_XMAX;
+   static double MP_ymax = MP_YMAX;
+ * unused, for now
+ */
 static int MP_posx;
 static int MP_posy;
 static char MP_fontname[MAX_ID_LEN + 1];

@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.7 1998/04/14 00:18:11 drd Exp $
+ * $Id: tkcanvas.trm,v 1.12 1999/06/06 18:16:58 lhecking Exp $
  *
  */
 
@@ -108,7 +108,7 @@ extern TBOOLEAN log_array[];
 extern int xleft, xright, ybot, ytop;
 extern TBOOLEAN is_3d_plot;
 
-static int tk_angle = 0;
+/* static int tk_angle = 0; unused, for now */
 static int tk_lastx;
 static int tk_lasty;
 static int tk_color = 0;
