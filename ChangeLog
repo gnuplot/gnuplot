@@ -1,3 +1,11 @@
+2003-04-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* gnuplot.doc unset.c(reset_command): Remove "unset_loadpath()" from
+	reset command. After discussion on gnuplot-beta list, the "reset"
+	command should reset only graphics settings, while it should let
+	unchanged non-graphics settings (like set term, out, loadpath and
+	fontpath).
+
 2003-04-13  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/term.c src/graphics.c: Correct a syntax error in test for terminal
