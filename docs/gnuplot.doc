@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.87 2001/11/24 11:30:32 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.88 2001/11/29 13:35:01 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -111,8 +111,8 @@ C
  with a backslash (\).  The backslash must be the _last_ character on each
  line.  The effect is as if the backslash and newline were not there.  That
  is, no white space is implied, nor is a comment terminated.  Therefore,
- commenting out a continued line comments out the entire command (see
- `comment`).  But note that if an error occurs somewhere on a multi-line
+ commenting out a continued line comments out the entire command 
+ (see `comments`).  But note that if an error occurs somewhere on a multi-line
  command, the parser may not be able to locate precisely where the error is
  and in that case will not necessarily point to the correct line.
 
@@ -129,8 +129,12 @@ C
 
  The new `gnuplot` user should begin by reading about `plotting` (if on-line,
  type `help plotting`).
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html"> Simple Plots Demo </a>
+
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html">
+           http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html
+^ </a>
 2 Seeking-assistance
+^ <a name="Seeking-assistance"></a>
 ?seeking-assistance
  There is a mailing list for `gnuplot` users.  Note, however, that the
  newsgroup
@@ -153,13 +157,15 @@ C
 
  There is also a World Wide Web page with up-to-date information, including
  known bugs:
+
 ^ <a href="http://www.gnuplot.org">
-       http://www.gnuplot.org
+           http://www.gnuplot.org
 ^ </a>
 
  Before seeking help, please check the
+
 ^ <a href="http://www.gnuplot.org/faq/">
- FAQ (Frequently Asked Questions) list.
+           FAQ (Frequently Asked Questions)list.
 ^ </a>
 
  When posting a question, please include full details of the version of
@@ -180,10 +186,8 @@ C
  2. Greatly expanded `using` command.  See `plot using`.
 
  3. `set timefmt` allows for the use of dates as input and output for time
- series plots.  See `Time/Date data` and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html">
- timedat.dem.
-^ </a>
+ series plots.  See `Time/Date data` and  
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html">timedat.dem.</a>
 
  4. Multiline labels and font selection in some drivers.
 
@@ -244,7 +248,7 @@ C
 
  26. Text (labels, tic labels, and the time stamp) can be written vertically
  by those terminals capable of doing so.
-2 bind
+3 bind
 ?commands bind
 ?bind
  The `bind` command allows to (re-)define a sequence of gnuplot commands
@@ -305,7 +309,7 @@ C
 
     "KP_1" - "KP_9", "F1" - "F12"
 
- see also `help mouse` and `help if`.
+ type also `help mouse` and `help if`.
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -505,8 +509,8 @@ C
 
  If GNUTERM is defined, it is used as the name of the terminal type to be
  used.  This overrides any terminal type sensed by `gnuplot` on start-up, but
- is itself overridden by the .gnuplot (or equivalent) start-up file (see
- `start-up`) and, of course, by later explicit changes.
+ is itself overridden by the .gnuplot (or equivalent) start-up file 
+ (see `start-up`) and, of course, by later explicit changes.
 
  On Unix, AmigaOS, AtariTOS, MS-DOS and OS/2, GNUHELP may be defined to be the
  pathname of the HELP file (gnuplot.gih).
@@ -518,7 +522,7 @@ C
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
  file if none is found in the current directory.  On AmigaOS, AtariTOS,
- MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. See `help
+ MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. Type `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
@@ -1086,7 +1090,6 @@ C ... and restart the table:
 4 Binary
 ?expressions operators binary
 ?operators binary
-?binary
  The following is a list of all the binary operators and their usages:
 
 @start table - first is interactive cleartext form
@@ -1201,7 +1204,7 @@ C ... and restart the table:
 
        plot 'file' using 1:( $4<0 ? 1/0 : ($2+$3)/2 )
 
- Please see `plot data-file using` for an explanation of the `using` syntax.
+ Please see `plot datafile using` for an explanation of the `using` syntax.
 3 User-defined
 ?expressions user-defined
 ?user-defined
@@ -1240,8 +1243,8 @@ C ... and restart the table:
  however, is one that you may wish to redefine. See the documentation
  on `fit` for details.
 
-
  See `show functions`, `show variables`, and `fit`.
+
 2 Glossary
 ?glossary
  Throughout this document an attempt has been made to maintain consistency of
@@ -1316,8 +1319,8 @@ C ... and restart the table:
  `splot` can plot surfaces and contours in addition to points and/or lines.
  In addition to `splot`, see `set isosamples` for information about defining
  the grid for a 3-d function;  `splot datafile` for information about the
- requisite file structure for 3-d data values; and `set contour` and `set
- cntrparam` for information about contours.
+ requisite file structure for 3-d data values; and `set contour` and 
+ `set cntrparam` for information about contours.
 
  In `splot`, control over the scales and labels of the axes are the same as
  with `plot`, except that commands and options controlling the x2 and y2 axes
@@ -1326,6 +1329,7 @@ C ... and restart the table:
  `splot` allows plotting of binary and matrix data, but only for specific
  data formats.  See `splot` for details.
 2 Start-up
+^ <a name="start-up"></a>
 ?startup
 ?start
 ?.gnuplot
@@ -1345,7 +1349,7 @@ C ... and restart the table:
  Command-line substitution is specified by a system command enclosed in
  backquotes.  This command is spawned and the output it produces replaces
  the name of the command (and backquotes) on the command line.  Some
- implementations also support pipes;  see `plot data-file special-filenames`.
+ implementations also support pipes;  see `plot datafile special-filenames`.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
  line, except inside strings delimited by single quotes.
@@ -1431,6 +1435,8 @@ C ... and restart the table:
 
  Back-quotes are used to enclose system commands for substitution.
 2 Time/Date data
+^ <a name="Time/Date data">
+^ <a name="Time/date">
 ?time/date
  `gnuplot` supports the use of time and/or date information as input data.
  This feature is activated by the commands `set xdata time`, `set ydata time`,
@@ -1632,7 +1638,7 @@ C ... and restart the table:
 
  Multiple datasets may be simultaneously fit with functions of one
  independent variable by making y a 'pseudo-variable', e.g., the dataline
- number, and fitting as two independent variables.  See `fit multibranch`.
+ number, and fitting as two independent variables.  See `fit multi-branch`.
 
  The `via` qualifier specifies which parameters are to be adjusted, either
  directly, or by referencing a parameter file.
@@ -1704,8 +1710,8 @@ C ... and restart the table:
  the function values, evaluated at the same places.  This quantity is often
  called 'chisquare' (i.e., the Greek letter chi, to the power of 2).  The
  algorithm attempts to minimize SSR, or more precisely, WSSR, as the residuals
- are 'weighted' by the input data errors (or 1.0) before being squared; see
- `fit error_estimates` for details.
+ are 'weighted' by the input data errors (or 1.0) before being squared; 
+ see `fit error_estimates` for details.
 
  That's why it is called 'least-squares fitting'.  Let's look at an example
  to see what is meant by 'non-linear', but first we had better go over some
@@ -1758,8 +1764,8 @@ C ... and restart the table:
  the `smooth` option to `plot` may be what you've been looking for rather
  than `fit`.
 3 error estimates
-?commands fit error_estimate
-?fit error_estimate
+?commands fit error_estimates
+?fit error_estimates
 ?fit errors
  In `fit`, the term "error" is used in two different contexts, data error
  estimates and parameter error estimates.
@@ -2133,7 +2139,7 @@ C ... and restart the table:
  had been typed in interactively.  Files created by the `save` command can
  later be `load`ed.  Any text file containing valid commands can be created
  and then executed by the `load` command.  Files being `load`ed may themselves
- contain `load` or `call` commands.  See `comment` for information about
+ contain `load` or `call` commands.  See `comments` for information about
  comments in commands.  To `load` with arguments, see `call`.
 
  The `load` command _must_ be the last command on a multi-command line.
@@ -2248,13 +2254,13 @@ C ... and restart the table:
  Data files should contain at least one data point per record (`using`
  can select one data point from the record). Records beginning with `#`
  (and also with `!` on VMS) will be treated as comments and ignored.
- Each data point represents an (x,y) pair. For `plot`s with error bars
- or error bars with lines (see `set style errorbars` or `set style
- errorlines`), each data point is (x,y,ydelta), (x,y,ylow,yhigh),
+ Each data point represents an (x,y) pair. For `plot`s with error bars or
+ error bars with lines (see `set style errorbars` or `set style errorlines`),
+ each data point is (x,y,ydelta), (x,y,ylow,yhigh),
  (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). In all
  cases, the numbers on each record of a data file must be separated by
  white space (one or more blanks or tabs), unless a format specifier is
- provided by the `using` option. This white space divides each record
+ provided by the `using` option. This white space divides each record 
  into columns.
 
  Data may be written in exponential format with the exponent preceded by the
@@ -2331,9 +2337,13 @@ C ... and restart the table:
        every :::::9     # selects the first 10 blocks
        every 2:2        # selects every other point in every other block
        every ::5::15    # selects points 5 through 15 in each block
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html">Simple Plot Demos </a>,
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html">Non-parametric splot demos </a>, and
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html">Parametric splot demos.</a>
+
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html">Simple Plot Demos </a>
+ ,
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html">Non-parametric splot demos </a>
+ , and
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html">Parametric splot demos</a>
+ .
 4 example datafile
 ?commands plot datafile example
 ?plot datafile example
@@ -2379,6 +2389,7 @@ C ... and restart the table:
 
  Example:
        plot 'file' index 4:5
+
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/multimsh/multimsh.html"> splot with indices demo. </a>
 4 smooth
 ?commands plot datafile smooth
@@ -2759,8 +2770,8 @@ C ... and restart the table:
  option on one to avoid two entries in the key). Alternately, use the
  errorlines command (see `errorlines`).
 
- The error bars have crossbars at each end unless `set bars` is used (see `set
- bars` for details).
+ The error bars have crossbars at each end unless `set bars` is used 
+ (see `set bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> Errorbar demos. </a>
@@ -2815,7 +2826,6 @@ C ... and restart the table:
 ?commands splot parametric
 ?plot parametric
 ?splot parametric
-?parametric
  When in parametric mode (`set parametric`) mathematical expressions must be
  given in pairs for `plot` and in triplets for `splot`.
 
@@ -2834,6 +2844,7 @@ C ... and restart the table:
  parametric function has been completed:
 
        plot sin(t),t**2 title 'Parametric example' with linespoints
+
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/param/param.html"> Parametric Mode Demos. </a>
 3 ranges
 ?commands plot ranges
@@ -2872,6 +2883,7 @@ C ... and restart the table:
 
  `*` can be used to allow autoscaling of either of min and max.  See also
  `set autoscale`.
+ .
 
  Ranges specified on the `plot` or `splot` command line affect only that
  graph; use the `set xrange`, `set yrange`, etc., commands to change the
@@ -2905,7 +2917,7 @@ C ... and restart the table:
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html"> See Demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/ranges/ranges.html"> See Demo. </a>
 3 title
 ?commands plot title
 ?commands splot title
@@ -2996,11 +3008,11 @@ C ... and restart the table:
 
  You may also scale the line width and point size for a plot by using
  <line_width> and <point_size>, which are specified relative to the default
- values for each terminal.  The pointsize may also be altered globally---see
- `set pointsize` for details.  But note that both <point_size> as set here and
- as set by `set pointsize` multiply the default point size---their effects are
- not cumulative.  That is, `set pointsize 2; plot x w p ps 3` will use points
- three times default size, not six.
+ values for each terminal.  The pointsize may also be altered globally---
+ see `set pointsize` for details.  But note that both <point_size> as set 
+ here and  as set by `set pointsize` multiply the default point size---their
+ effects are  not cumulative.  That is, `set pointsize 2; plot x w p ps 3`
+ will use points three times default size, not six.
 
  If you have defined specific line type/width and point type/size combinations
  with `set style line`, one of these may be selected by setting <line_style> to
@@ -3160,6 +3172,7 @@ C ... and restart the table:
  lots of settings have been changed within a command file.  Please refer to
  the `set` command to see the default values that the various options take.
 2 save
+^ <a name="save set"></a>
 ?commands save
 ?save
  The `save` command saves user-defined functions, variables, the `set
@@ -3304,13 +3317,13 @@ C ... and restart the table:
  Head size can be controlled by `size <length>,<angle>`, where <length> 
  defines length of each branch of the arrow head and <angle> the angle (in 
  degrees) they make with the arrow. <Length> is in x-axis units; this can be
- changed by `first`, `second`, `graph` or `screen` before the <length>; see
- `coordinates` for details.
+ changed by `first`, `second`, `graph` or `screen` before the <length>; 
+ see `coordinates` for details.
 
- The line style may be selected from a user-defined list of line styles (see
- `set style line`) or may be defined here by providing values for <line_type>
- (an index from the default list of styles) and/or <line_width> (which is a
- multiplier for the default width).
+ The line style may be selected from a user-defined list of line styles 
+ (see `set style line`) or may be defined here by providing values for 
+ <line_type> (an index from the default list of styles) and/or <line_width>
+ (which is a  multiplier for the default width).
 
  Note, however, that if a user-defined line style has been selected, its
  properties (type and width) cannot be altered merely by issuing another
@@ -3356,10 +3369,8 @@ C ... and restart the table:
 3 autoscale
 ?commands set autoscale
 ?commands unset autoscale
-?commands unset autoscale
 ?commands show autoscale
 ?set autoscale
-?unset autoscale
 ?unset autoscale
 ?show autoscale
 ?autoscale
@@ -3398,8 +3409,8 @@ C ... and restart the table:
 
  Please see `set xrange` for additional information about ranges.
 
- The behavior of autoscaling remains consistent in parametric mode, (see `set
- parametric`).  However, there are more dependent variables and hence more
+ The behavior of autoscaling remains consistent in parametric mode, (see 
+ `set parametric`).  However, there are more dependent variables and hence more
  control over x, y, and z axis scales.  In parametric mode, the independent or
  dummy variable is t for `plot`s and u,v for `splot`s.  `autoscale` in
  parametric mode, then, controls all ranges (t, u, v, x, y, and z) and allows
@@ -3468,7 +3479,6 @@ C ... and restart the table:
 4 polar mode
 ?commands set autoscale polar
 ?set autoscale polar
-?set autoscale t
  When in polar mode (`set polar`), the xrange and the yrange are both found
  from the polar coordinates, and thus they can both be automatically scaled.
  In other words, in polar mode both the x and y axes can be automatically
@@ -3500,8 +3510,8 @@ C ... and restart the table:
 ?commands set bmargin
 ?set bmargin
 ?bmargin
- The command `set bmargin` sets the size of the bottom margin.  Please see
- `set margin` for details.
+ The command `set bmargin` sets the size of the bottom margin.  
+ Please see `set margin` for details.
 3 border
 ?commands set border
 ?commands unset border
@@ -3641,8 +3651,8 @@ C ... and restart the table:
  the automatically calculated boxwidth, otherwise the boxwidth is taken as an
  `absolute` value (which is the default). In a four-column data set, the fourth
  column will be interpreted as the box width unless the width is set to -2.0,
- in which case the width will be calculated automatically.  See `set style
- boxerrorbars` for more details.
+ in which case the width will be calculated automatically.  See 
+ `set style boxerrorbars` for more details.
 
  To set the box width to automatic use the command
        set boxwidth
@@ -3860,9 +3870,11 @@ C ... and restart the table:
  To set the start and increment while retaining the number of levels:
        set cntrparam levels incremental 100,50
 
- See also `set contour` for control of where the contours are drawn, and `set
- clabel` for control of the format of the contour labels and linetypes.
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">Contours Demo</a> and
+ See also `set contour` for control of where the contours are drawn, and 
+ `set clabel` for control of the format of the contour labels and linetypes.
+
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">Contours Demo</a>
+ and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">contours with User Defined Levels.</a>
 3 contour
 ?commands set contour
@@ -3909,11 +3921,14 @@ C ... and restart the table:
  such a file all the points for a single y-isoline are listed, then all the
  points for the next y-isoline, and so on.  A single blank line (a line
  containing no characters other than blank spaces and a carriage return and/or
- a line feed) separates one y-isoline from the next.  See also `splot datafile`.
+ a line feed) separates one y-isoline from the next.  
+ See also `splot datafile`.
+ 
 
  If contours are desired from non-grid data, `set dgrid3d` can be used to
  create an appropriate grid.  See `set dgrid3d` for more information.
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">Contours Demo</a> and
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/contours/contours.html">Contours Demo</a>
+ and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">contours with User Defined Levels.</a>
 3 data style
 ?commands set style data
@@ -4398,8 +4413,8 @@ C ... and restart the table:
  linearly between function points or data points when determining the visible
  line segments.  This means that the appearance of a function may be different
  when plotted with `hidden3d` than when plotted with `nohidden3d` because in
- the latter case functions are evaluated at each sample.  Please see `set
- samples` and `set isosamples` for discussion of the difference.
+ the latter case functions are evaluated at each sample.  Please see 
+ `set samples` and `set isosamples` for discussion of the difference.
 
  The algorithm used to remove the hidden parts of the surfaces has some
  additional features controllable by this command.  Specifying `defaults` will
@@ -4463,7 +4478,8 @@ C ... and restart the table:
  normally, making the resulting display hard to understand.  Therefore, the
  default option of `bentover` will turn it visible in this case.  If you don't
  want that, you may choose `nobentover` instead.
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html"> Hidden Line Removal Demo</a> and
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html"> Hidden Line Removal Demo</a> 
+ and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html"> Complex Hidden Line Demo. </a>
 3 historysize
 ?commands set historysize
@@ -4511,7 +4527,7 @@ C ... and restart the table:
 
  When a function surface plot is being done without the removal of hidden
  lines, `set samples`  controls the number of points sampled along each
- isoline;  see `set samples` and `set hidden3d`.  The contour algorithm
+ isoline;  see `set samples` and `set hidden3d`. The contour algorithm
  assumes that a function sample occurs at each isoline intersection, so
  change in `samples` as well as `isosamples` may be desired when changing
  the resolution of a function surface/contour.
@@ -4584,8 +4600,8 @@ C ... and restart the table:
 
  The <position> can be a simple x,y,z as in previous versions, but these can
  be preceded by one of four keywords (`first`, `second`, `graph`, `screen`)
- which selects the coordinate system in which the position is specified.  See
- `coordinates` for more details.
+ which selects the coordinate system in which the position is specified.  
+ See `coordinates` for more details.
 
  The key is drawn as a sequence of lines, with one plot described on each
  line.  On the right-hand side (or the left-hand side, if `reverse` is
@@ -4616,8 +4632,8 @@ C ... and restart the table:
 
  If `splot` is being used to draw contours, the contour labels will be listed
  in the key.  If the alignment of these labels is poor or a different number
- of decimal places is desired, the label format can be specified.  See `set
- clabel` for details.
+ of decimal places is desired, the label format can be specified.  See 
+ `set clabel` for details.
 
  Examples:
 
@@ -4706,8 +4722,8 @@ C ... and restart the table:
  the label (this is the default).
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
- given as a quoted time string according to the `timefmt` format string.  See
- `set xdata` and `set timefmt`.
+ given as a quoted time string according to the `timefmt` format string.  
+ See `set xdata` and `set timefmt`.
 
  The EEPIC, Imagen, LaTeX, and TPIC drivers allow \\ in a string to specify
  a newline.
@@ -4757,6 +4773,8 @@ C ... and restart the table:
 ?unset style line
 ?show style line
 ?linestyle
+^ <a name="linetype">
+^ <a name="linewidth">
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by
@@ -4823,14 +4841,14 @@ C ... and restart the table:
  creates a surface plot using smooth colors according to `palette`. Note,
  that this works only on some terminals.
 
- See also `help palette`, `help pm3d`.
+ Type also `help palette`, `help pm3d`.
 
 3 lmargin
 ?commands set lmargin
 ?set lmargin
 ?lmargin
- The command `set lmargin` sets the size of the left margin.  Please see
- `set margin` for details.
+ The command `set lmargin` sets the size of the left margin.  
+ Please see `set margin` for details.
 3 loadpath
 ?commands set loadpath
 ?commands show loadpath
@@ -4860,9 +4878,7 @@ C ... and restart the table:
  `loadpath`, for portability reasons.
 3 locale
 ?commands set locale
-?commands show logscale
 ?set locale
-?show logscale
 ?locale
  The `locale` setting determines the language with which `{x,y,z}{d,m}tics`
  will write the days and months.
@@ -5127,16 +5143,16 @@ C ... and restart the table:
 
  Press 'h' in the driver's window for a short summary of the
  mouse and key bindings.  This will also display user defined
- bindings (see `help bind`).
+ bindings (type `help bind`).
 
  Press 'q' in the driver's window to close the window. This key
  cannot be overridden with the `bind` command.
 
  User defined `hotkeys` can be defined using the `bind` command.
- (see `help bind`).  Note, that user defined `hotkeys` may override
+ (type `help bind`).  Note, that user defined `hotkeys` may override
  the default bindings.
 
- See also `help bind` and `help label`.
+ Type also `help bind` and `help label`.
 3 multiplot
 
 ?commands unset multiplot
@@ -5188,8 +5204,8 @@ C ... and restart the table:
 
  `set size` and `set origin` refer to the entire plotting area used for each
  plot.  If you want to have the axes themselves line up, you can guarantee
- that the margins are the same size with the `set margin` commands.  See
- `set margin` for their use.  Note that the margin settings are absolute,
+ that the margins are the same size with the `set margin` commands.  
+ See `set margin` for their use.  Note that the margin settings are absolute,
  in character units, so the appearance of the graph in the remaining space
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
@@ -5475,7 +5491,11 @@ C ... and restart the table:
 
  Please read the READMEs enclosed with the pm3d patch distribution.  
  You may find snapshots at my web page:
-         http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d
+
+^ <a href="http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d">
+       http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d
+^ </a>
+
  and you should also run pm3d/demo/Demo.gp.
 
  Syntax:
@@ -5567,7 +5587,7 @@ C ... and restart the table:
  palette`. Maybe in future there could be a possibility of using more palettes, 
  which will add new option `set pm3d palette <n>`.
 
- See also `help palette`, `help colorbox`, `help x11 pm3d`, `help vgagl`.
+ Type also `help palette`, `help colorbox`, `help x11 pm3d`, `help vgagl`.
 
 3 palette
 ?commands set palette
@@ -5625,6 +5645,8 @@ C ... and restart the table:
     34,35,36 ... AFM hot (black-red-yellow-white)
 
  Use `positive` and `negative` to invert the figure colours.
+^ <a name="positive"></a>
+^ <a name="negative"></a>
 
  In order to reduce the size of postscript files, the gray value is written
  there and not all three calculated r,g,b values.  Therefore the analytical
@@ -5636,7 +5658,7 @@ C ... and restart the table:
  writes down definitions of all formulae.  It was like that I have got the
  Rosenbrock multiplot figure on my gnuplot.html#pm3d demo page.  The default 
  is `nops_allcF`.
-   If a postscript file has been produced for grided (or mostly regular) data,
+ If a postscript file has been produced for grided (or mostly regular) data,
  then it is possible to reduce the size of that postscript file up to at about
  50% by the enclosed awk script `pm3dCompress.awk`.  This you may find
  interesting if you intend to keep the file for including it into your
@@ -5649,7 +5671,7 @@ C ... and restart the table:
  colour positions available.  You should use `set palette maxcolors <maxcolors>`
  with a reasonably small value. This option can also be used to separate levels
  of z=constant in discrete steps, thus to emulate filled contours.
-   Default value is 0 for allocating all remaining entries or for to use 
+ Default value is 0 for allocating all remaining entries or for to use 
  exact mapping to RGB.
 
 3 color box
@@ -5699,9 +5721,8 @@ C ... and restart the table:
  `format cb`, `grid [m]cb`, `cblabel`, and perhaps even `cbdata`, `[no]cbdtics`,
  `[no]cbmtics`.
 
- See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
+ Type also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
  `help set style line`.
-
 
 3 pointsize
 ?commands set pointsize
@@ -5718,8 +5739,8 @@ C ... and restart the table:
  The default is a multiplier of 1.0.  Larger pointsizes may be useful to
  make points more visible in bitmapped graphics.
 
- The pointsize of a single plot may be changed on the `plot` command.  See
- `plot with` for details.
+ The pointsize of a single plot may be changed on the `plot` command.  
+ See `plot with` for details.
 
  Please note that the pointsize setting is not supported by all terminal
  types.
@@ -5766,7 +5787,7 @@ C ... and restart the table:
  (the angle) of the function, and the x and y ranges control the range of the
  graph in the x and y directions.  Each of these ranges, as well as the
  rrange, may be autoscaled or set explicitly.  See `set xrange` for details
- of all the `set range` commands.
+ of all the `ranges` commands.
 
  Example:
        set polar
@@ -5786,8 +5807,8 @@ C ... and restart the table:
 ?commands set rmargin
 ?set rmargin
 ?rmargin
- The command `set rmargin` sets the size of the right margin.  Please see
- `set margin` for details.
+ The command `set rmargin` sets the size of the right margin.  
+ Please see `set margin` for details.
 3 rrange
 ?commands set rrange
 ?commands show rrange
@@ -5821,8 +5842,8 @@ C ... and restart the table:
  value of samples specifies the number of samples that are to be evaluated for
  the isolines.  Each iso-v line will have <sample_1> samples and each iso-u
  line will have <sample_2> samples.  If you only specify <samples_1>,
- <samples_2> will be set to the same value as <samples_1>.  See also `set
- isosamples`.
+ <samples_2> will be set to the same value as <samples_1>.  See also
+ `set isosamples`.
 3 size
 ?aspect ratio
 ?commands set size
@@ -5880,18 +5901,11 @@ C ... and restart the table:
  To make the graph twice as high as wide use:
        set size ratio 2
 
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/airfoil/airfoil.html"> See demo. </a>
 3 style
-?commands set style function
-?commands show style function
-?commands set style data
-?commands show style data
-?set style function
-?show style function
-?set style data
-?show style data
 ?set style
 ?show style
+^ <a name="set style <style>">
  Default styles are chosen with the `set style function` and `set style data`
  commands.  See `plot with` for information about how to override the default
  plotting style for individual functions and data sets.
@@ -5940,8 +5954,8 @@ C ... and restart the table:
  `xyerrorlines`, and `boxxyerrorbars` styles. Illegal styles will be
  changed to `xyerrorbars` before plotting.
 
- For more information about error bars with and without lines, please see 
- `plot errorlines` and `plot errorbars`.
+ For more information about error bars with and without lines, 
+ please see `plot errorlines` and `plot errorbars`.
 4 boxerrorbars
 ?commands set style boxerrorbars
 ?set style boxerrorbars
@@ -5960,7 +5974,7 @@ C ... and restart the table:
  The box height is determined from the y error in the same way as it is for
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See Demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See Demo. </a>
 4 boxes
 ?commands set style boxes
 ?set style boxes
@@ -6049,7 +6063,7 @@ C ... and restart the table:
      filledcurves y2=42    ... line y=42 (at y2 axis) parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
 
- Note: filling is supported on filled-polygon capable terminals, see `help
+ Note: filling is supported on filled-polygon capable terminals, type `help
  pm3d` for their list.
 
  Currently implemented syntax (demo-like switching between the first five
@@ -6089,7 +6103,7 @@ C ... and restart the table:
  if the low and high prices are interchanged.  The rectangle is pseudo-filled 
  by three vertical lines inside it, if the open value is larger than
  the close. Otherwise it's left empty. See `set bars` and `financebars`.
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
 4 dots
 ?commands set style dots
 ?set style dots
@@ -6109,9 +6123,9 @@ C ... and restart the table:
  coordinate and limited vertically by the high and low prices.  A horizontal
  tic on the left marks the opening price and one on the right marks the
  closing price.  The length of these tics may be changed by `set bars`.  The
- symbol will be unchanged if the high and low prices are interchanged.  See
- `set bars` and `candlesticks`.
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
+ symbol will be unchanged if the high and low prices are interchanged.  
+ See `set bars` and `candlesticks`.
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
 4 fsteps
 ?commands set style fsteps
 ?set style fsteps
@@ -6120,7 +6134,7 @@ C ... and restart the table:
  The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
  second from (x1,y2) to (x2,y2).
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
 4 histeps
 ?commands set style histeps
 ?set style histeps
@@ -6135,7 +6149,7 @@ C ... and restart the table:
 
  If `autoscale` is in effect, it selects the xrange from the data rather than
  the steps, so the end points will appear only half as wide as the others.
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
 
  `histeps` is only a plotting style; `gnuplot` does not have the ability to
  create bins and determine their population from some data set.
@@ -6184,7 +6198,7 @@ C ... and restart the table:
  The `steps` style is only relevant to 2-d plotting.  It connects consecutive
  points with two line segments: the first from (x1,y1) to (x2,y1) and the
  second from (x2,y1) to (x2,y2).
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html"> See demo. </a>
 4 vector
 ?commands set style vector
 ?set style vector
@@ -6205,8 +6219,8 @@ C ... and restart the table:
  like `dots`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
  (x+xdelta,y), depending on how many data columns are provided.  A tic mark
- is placed at the ends of the error bar (unless `set bars` is used---see `set
- bars` for details).
+ is placed at the ends of the error bar (unless `set bars` is used---see 
+ `set bars` for details).
 4 xyerrorbars
 ?commands set style xyerrorbars
 ?set style xyerrorbars
@@ -6233,14 +6247,13 @@ C ... and restart the table:
 ?style yerrorbars
 ?style errorbars
 ?yerrorbars
-?errorbars
  The `yerrorbars` (or `errorbars`) style is only relevant to 2-d data plots.
  `yerrorbars` is like `points`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
  A tic mark is placed at the ends of the error bar (unless `set bars` is
  used---see `set bars` for details).
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 4 xerrorlines
 ?commands set style xerrorlines
 ?set style xerrorlines
@@ -6279,7 +6292,6 @@ C ... and restart the table:
 ?style yerrorlines
 ?style errorlines
 ?yerrorlines
-?errorlines
  The `yerrorlines` (or `errorlines`) style is only relevant to 2-d data
  plots. `yerrorlines` is like `linespoints`, except that a vertical
  error line is also drawn. At each point (x,y), a line is drawn from
@@ -6287,7 +6299,7 @@ C ... and restart the table:
  on how many data columns are provided. A tic mark is placed at the
  ends of the error bar (unless `set bars` is used---see `set bars` for
  details).
-^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 3 surface
 ?commands set surface
 ?commands unset surface
@@ -6363,8 +6375,8 @@ C ... and restart the table:
 
  where <direction> may be `in` (the default) or `out`.
 
- See also `set xtics` for more control of major (labelled) tic marks and `set
- mxtics` for control of minor tic marks.
+ See also `set xtics` for more control of major (labelled) tic marks and 
+ `set mxtics` for control of minor tic marks.
 3 ticslevel
 ?commands set ticslevel
 ?commands show ticslevel
@@ -6510,8 +6522,8 @@ C ... and restart the table:
 
  Since `gnuplot` cannot read non-numerical text, if the date format includes
  the day or month in words, the format string must exclude this text.  But
- it can still be printed with the "%a", "%A", "%b", or "%B" specifier: see
- `set format` for more details about these and other options for printing
+ it can still be printed with the "%a", "%A", "%b", or "%B" specifier: 
+ see `set format` for more details about these and other options for printing
  timedata.  (`gnuplot` will determine the proper month and weekday from the
  numerical values.)
 
@@ -6552,8 +6564,8 @@ C ... and restart the table:
 ?commands set tmargin
 ?set tmargin
 ?tmargin
- The command `set tmargin` sets the size of the top margin.  Please see
- `set margin` for details.
+ The command `set tmargin` sets the size of the top margin.  
+ Please see `set margin` for details.
 3 trange
 ?commands set trange
 ?commands show trange
@@ -6570,8 +6582,8 @@ C ... and restart the table:
 ?show urange
 ?urange
  The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.  Please see
- `set xrange` for details.
+ to compute x, y, and z values when in `splot` parametric mode.  
+ Please see `set xrange` for details.
 3 variables
 ?commands show variables
 ?show variables
@@ -6628,6 +6640,7 @@ C ... and restart the table:
  to 0.5.
 
  See also `set ticslevel`.
+ .
 3 vrange
 ?commands set vrange
 ?commands show vrange
@@ -6635,8 +6648,8 @@ C ... and restart the table:
 ?show vrange
 ?vrange
  The `set urange` and `set vrange` commands set the parametric ranges used
- to compute x, y, and z values when in `splot` parametric mode.  Please see
- `set xrange` for details.
+ to compute x, y, and z values when in `splot` parametric mode.  
+ Please see `set xrange` for details.
 3 x2data
 ?commands set x2data
 ?commands show x2data
@@ -6662,8 +6675,8 @@ C ... and restart the table:
 ?set x2label
 ?show x2label
 ?x2label
- The `set x2label` command sets the label for the x2 (top) axis.  Please see
- `set xlabel`.
+ The `set x2label` command sets the label for the x2 (top) axis.  
+ Please see `set xlabel`.
 3 x2mtics
 ?commands set x2mtics
 ?commands unset x2mtics
@@ -6704,8 +6717,7 @@ C ... and restart the table:
 ?x2zeroaxis
 ?nox2zeroaxis
  The `set x2zeroaxis` command draws a line at the origin of the x2 (top) axis
- (y2 = 0).  For details, please see
- `set zeroaxis`.
+ (y2 = 0).  For details, please see `set zeroaxis`.
 3 xdata
 ?commands set xdata
 ?commands show xdata
@@ -6724,7 +6736,7 @@ C ... and restart the table:
  The `time` option signals that the datatype is indeed time/date.  If the
  option is not specified, the datatype reverts to normal.
 
- See `set timefmt` to tell `gnuplot` how to read date or time data.  The
+ See `set timefmt` to tell gnuplot how to read date or time data.  The
  time/date is converted to seconds from start of the century.  There is
  currently only one timefmt, which implies that all the time/date columns must
  confirm to this format.  Specification of ranges should be supplied as quoted
@@ -6829,7 +6841,7 @@ C ... and restart the table:
  label` instead--that command gives you much more control over where text is
  placed.
 
- Please see `set syntax` for further information about backslash processing
+ Please see `syntax` for further information about backslash processing
  and the difference between single- and double-quoted strings.
 3 xmtics
 ?commands set xmtics
@@ -7057,8 +7069,8 @@ C ... and restart the table:
 ?show xzeroaxis
 ?xzeroaxis
 ?noxzeroaxis
- The `set xzeroaxis` command draws a line at y = 0.  For details, please see
- `set zeroaxis`.
+ The `set xzeroaxis` command draws a line at y = 0.  For details, 
+ please see `set zeroaxis`.
 3 y2data
 ?commands set y2data
 ?commands show y2data
@@ -7190,8 +7202,8 @@ C ... and restart the table:
 ?show yzeroaxis
 ?yzeroaxis
 ?noyzeroaxis
- The `set yzeroaxis` command draws a line at x = 0.  For details, please see
- `set zeroaxis`.
+ The `set yzeroaxis` command draws a line at x = 0.  For details, 
+ please see `set zeroaxis`.
 3 zdata
 ?commands set zdata
 ?commands show zdata
@@ -7301,8 +7313,8 @@ C ... and restart the table:
 ?show zrange
 ?zrange
  The `set zrange` command sets the range that will be displayed on the z axis.
- The zrange is used only by `splot` and is ignored by `plot`.  Please see `set
- xrange` for details.
+ The zrange is used only by `splot` and is ignored by `plot`.  Please see 
+ `set xrange` for details.
 3 ztics
 ?commands set ztics
 ?commands unset ztics
@@ -7464,7 +7476,7 @@ C ... and restart the table:
  number of points, `gnuplot` will draw cross-isolines between datablocks,
  connecting corresponding points.  This is termed "grid data", and is required
  for drawing a surface, for contouring (`set contour`) and hidden-line removal
- (`set hidden3d`). See also `splot grid data`
+ (`set hidden3d`). See also `splot grid_data`.
 
  It is no longer necessary to specify `parametric` mode for three-column
  `splot`s.
@@ -7613,8 +7625,8 @@ C ... and restart the table:
 ?splot_overview
  `splot` can display a surface as a collection of points, or by connecting
  those points.  As with `plot`, the points may be read from a data file or
- result from evaluation of a function at specified intervals, see `set
- isosamples`.  The surface may be approximated by connecting the points
+ result from evaluation of a function at specified intervals, see 
+ `set isosamples`.  The surface may be approximated by connecting the points
  with straight line segments, see `set surface`, in which case the surface
  can be made opaque with `set hidden3d.`  The orientation from which the 3d
  surface is viewed can be changed with `set view`.
@@ -7634,7 +7646,7 @@ C ... and restart the table:
 2 system
 ?commands system
 ?system
- `system` spawns shell to execute a command. Please see `help shell` for
+ `system` spawns shell to execute a command. Please type `help shell` for
  more details.
 2 test
 ?commands test
@@ -7673,16 +7685,16 @@ C ... and restart the table:
  Several graphical user interfaces have been written for `gnuplot` and one for
  win32 is included in this distribution.  In addition, there is a Macintosh
  interface at
-^<a href="ftp://ftp.ee.gatech.edu/pub/mac/gnuplot">
+^ <a href="ftp://ftp.ee.gatech.edu/pub/mac/gnuplot">
           ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
-^</a>
+^ </a>
 
 
  Also several X11 interfaces exist.
  One of them is called xgfe. It uses the Qt library and can be found on
-^<a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
+^ <a href="http://www.flash.net/~dmishee/xgfe/xgfe.html">
           http://www.flash.net/~dmishee/xgfe/xgfe.html
-^</a> 
+^ </a> 
 
  In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
 
@@ -7691,9 +7703,9 @@ C ... and restart the table:
  the gnuplot.el file by Gershon Elber.
  While the gnuplot CVS repository has its own copy the most recent
  version of this package is available from
-^<a href="http://feff.phys.washington.edu/~ravel/gnuplot/">
+^ <a href="http://feff.phys.washington.edu/~ravel/gnuplot/">
            http://feff.phys.washington.edu/~ravel/gnuplot
-^</a>
+^ </a>
 
 1 Bugs
 ?bugs
@@ -7715,8 +7727,9 @@ C ... and restart the table:
 
  Bugs reported since the current release as well as older ones
  may be located via the official distribution site:
-
-^ <a href="http://www.gnuplot.org">http://www.gnuplot.org </a>
+^ <a href="http://www.gnuplot.org">
+           http://www.gnuplot.org
+^ </a>
 
  Please e-mail any bugs to bug-gnuplot mailinglist (see `Seeking-assistance`)
 

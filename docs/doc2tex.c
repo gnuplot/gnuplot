@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.9 1999/06/14 19:17:09 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2tex.c,v 1.10 1999/07/09 20:59:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - doc2tex.c */
@@ -71,6 +71,8 @@ void finish __PROTO((FILE *));
 
 static TBOOLEAN intable = FALSE;
 static TBOOLEAN verb = FALSE;
+static TBOOLEAN see = FALSE;
+static TBOOLEAN inhref = FALSE;
 
 int
 main(argc, argv)
@@ -132,9 +134,19 @@ process_line(line, b)
 char *line;
 FILE *b;
 {
+    char string[MAX_LINE_LEN+1], c;
+    int i, initlen;
+    static TBOOLEAN parsed = FALSE;
+
+    initlen = strlen(line);
     switch (line[0]) {		/* control character */
     case '?':{			/* interactive help entry */
-	    break;		/* ignore */
+                                /* convert '?xxx' to '\label{xxx}' */
+	    line[strlen(line)-1]=NUL;
+            (void) fputs("\\label{",b);
+	    fputs(line+1, b);
+            (void) fputs("}\n",b);
+	    break;		/* ignore */ /* <- don't ignore */
 	}
     case '@':{			/* start/end table */
 	    if (intable) {
@@ -161,14 +173,88 @@ FILE *b;
 		(void) fputs(line + 1, b);	/* copy directly */
 	    else {
 		fprintf(stderr, "warning: # line found outside of table\n");
-		fprintf(stderr, "%s\n", line + 1);
+		fprintf(stderr, "%s\n", line + 11);
 	    }
 
 	    break;
 	}
     case '^':{			/* external link escape */
-	    break;		/* ignore */
-	}
+                                /* internal link escape */
+             /* convert '^ <a href="xxx">yyy</a>' to '\href{xxx}{yyy}' */
+	     /* convert '^ <a href="#xxx"></a> to '\ref{xxx}' */
+	     /* convert '^ <a name="xxx"></a> to '\label{xxx}' */
+            switch (line[3]) {
+            case 'a':{ 
+                    switch (line[5]) {
+                    case 'h':{ 
+	                    if (line[11] == '#') {
+                                fputs("{\\bf ",b);
+                                parsed = 0;    
+		                for (i = 12; (c = line[i]) != '"'; i++) {
+                                    string[i-12] = c;
+                                } 
+                                string[i-12]= NUL;
+                                i++;i++;
+                                for ( ; i < initlen-5; i++) {
+                                     fputc(line[i],b);
+                                }
+                                fputs(" (p.~\\pageref{",b); 
+                                fputs(string,b);
+                                fputs("})}} ",b);
+                                inhref = FALSE;
+                            } else {          
+	                        inhref = TRUE;
+                                if (strstr(line,"</a>") == NULL){
+                                   fputs("\\par\\hskip2.7em\\href{",b);
+                                } else {
+                                   fputs("\\href{",b);
+                                }
+	                        parsed = 0; 
+                                for (i = 11; i < initlen-1 ; i++){
+                                    c = line[i];
+                                    if (c == '"') {
+                                         ;
+                                    } else if ( c == '>' && parsed == 0) {
+                                        fputs("}{\\tt ",b); parsed = 1;
+                                    } else if ( c == '~') {
+                                        fputs("\\~",b);
+                                    } else if ( c == '_' && parsed == 1) {
+                                        fputs("\\_",b);
+                                    } else if ( c == '<' && parsed == 1) {
+		                        fputs("}{\n",b);
+                                        i += 5;
+                                        inhref = FALSE;
+                                    } else {
+                                        fputc(c,b);
+                                    } 
+                                }
+		            } 
+                            break;
+		    }
+                    case 'n': { 
+                            fputs("\\label{",b);
+		            for (i = 11; (c = *(line +i)) != '"'; i++) {
+                                 fputc(c,b);
+                            }
+                            fputs("}\n",b);
+	                    break;
+		       }
+	            default: 
+                            break;
+		    }       
+                    break;
+    	       }
+            case '/':
+		    if ( line[4] == 'a') {
+		        fputs("}\n\n",b);
+                        inhref = FALSE;
+                    }
+		    break;
+            default:
+   	            break;		/* ignore */
+	    }
+            break;
+        }
     case '%':{			/* troff table entry */
 	    break;		/* ignore */
 	}
@@ -176,6 +262,10 @@ FILE *b;
     case ' ':{			/* normal text line */
 	    if (intable)
 		break;		/* ignore while in table */
+            if ( inhref == TRUE){
+                 puttex(line+1,b);
+                 break;
+            }
 	    if (line[1] == ' ') {
 		/* verbatim mode */
 		if (!verb) {
@@ -242,10 +332,12 @@ FILE *b;
     case 5:
 	(void) fprintf(b, "\\subsubsubsection{");
 	break;
-    default:
     case 6:
 	(void) fprintf(b, "\\paragraph{");
-	break;
+	break; 
+    default:
+        break;
+
     }
     if (islower((int) string[0]))
 	string[0] = toupper(string[0]);
@@ -260,6 +352,7 @@ FILE *file;
 register char *str;
 {
     register char ch;
+    char string[MAX_LINE_LEN+1], c;
     static TBOOLEAN inquote = FALSE;
     int i;
 
@@ -283,8 +376,8 @@ register char *str;
 	case '^':
 	    (void) fputs("\\verb+^+", file);
 	    break;
-	case '>':
-	case '<':
+    	case '>':
+    	case '<':
 	case '|':
 	    (void) fputc('$', file);
 	    (void) fputc(ch, file);
@@ -309,13 +402,23 @@ register char *str;
 		(void) fputc(ch, file);
 	    }
 	    break;
-	case '`':		/* backquotes mean boldface */
+	case '`':    /* backquotes mean boldface */
 	    if (inquote) {
-		(void) fputs("}", file);
+                if (see){
+                    (void) fputs(" (p.~\\pageref{", file);
+                    (void) fputs(string, file);
+		    (void) fputs("})", file);
+                    /* see = FALSE; */ 
+                }
+                (void) fputs("}", file);
 		inquote = FALSE;
 	    } else {
 		(void) fputs("{\\bf ", file);
-		inquote = TRUE;
+		for (i=0; i<MAX_LINE_LEN && ((c=str[i]) != '`') ; i++){
+                    string[i] = c;
+                }
+		string[i] = NUL;
+		inquote = TRUE; 
 	    }
 	    break;
 	case '_':		/* emphasised text ? */
@@ -332,6 +435,16 @@ register char *str;
 		(void) fputs("{\\tt\\_}", file);
 	    }
 	    break;
+        case 's':    /* find backquote after 'see' {see `} */
+        case 'S':
+            (void) fputc(ch, file);
+	    if ( str[0] == 'e' && str[1] == 'e' && isspace(str[2])){  
+                see = TRUE;
+            }
+            break;
+        case ')':
+        case '.':
+            see = FALSE;
 	default:
 	    (void) fputc(ch, file);
 	    break;
@@ -345,3 +458,17 @@ FILE *b;
 {
     (void) fputs("\\end{document}\n", b);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 /*
- * $Id: tek.trm,v 1.10 1999/06/22 11:54:23 lhecking Exp $
+ * $Id: tek.trm,v 1.11 2001/08/22 14:16:34 broeker Exp $
  *
  */
 
@@ -747,7 +747,7 @@ START_HELP(tek40)
 "?set terminal tek40xx",
 "?set term tek40xx",
 "?terminal tek40xx",
-"?terminal tek40xx",
+"?term tek40xx",
 "?tek40",
 "?commands set terminal vttek",
 "?set terminal vttek",

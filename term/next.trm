@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.16 1999/08/24 11:24:55 lhecking Exp $
+ * $Id: next.trm,v 1.17 1999/12/10 17:01:44 lhecking Exp $
  *
  */
 
@@ -1501,6 +1501,7 @@ TERM_TABLE_END(next_driver)
 #endif /* TERM_PROTO_ONLY */
 
 
+#define TERM_HELP_NEXT
 
 #ifdef TERM_HELP
 START_HELP(next)
@@ -1537,3 +1538,4 @@ START_HELP(next)
 " Pointsizes may be changed with `set linestyle`."
 END_HELP(next)
 #endif /* TERM_HELP */
+

@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.6 1999/08/24 11:24:55 lhecking Exp $
+ * $Id: openstep.trm,v 1.7 1999/12/10 17:01:44 lhecking Exp $
  *
  */
 
@@ -1370,8 +1370,9 @@ TERM_TABLE_END(next_driver)
 
 
 #ifdef TERM_HELP
-START_HELP(next)
-"1 next",
+START_HELP(openstep)
+"1 Openstep (next)",
+#ifndef TERM_HELP_NEXT
 "?commands set terminal next",
 "?set terminal next",
 "?set term next",
@@ -1379,7 +1380,8 @@ START_HELP(next)
 "?term next",
 "?next",
 "?NeXT",
-" Several options may be set in the next driver.",
+#endif
+" Several options may be set in the openstep (next) driver.",
 "",
 " Syntax:",
 "       set terminal next {<mode>} {<type> } {<color>} {<dashed>}",
@@ -1402,5 +1404,8 @@ START_HELP(next)
 "       set term next old",
 "",
 " Pointsizes may be changed with `set linestyle`."
-END_HELP(next)
+END_HELP(openstep)
 #endif /* TERM_HELP */
+
+
+

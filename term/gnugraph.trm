@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.15 1999/12/01 22:09:52 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.16 1999/12/10 17:06:15 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -434,9 +434,10 @@ TERM_TABLE_END(unixplot_driver)
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
+#define TERM_HELP_GNUGRAPH
 #ifdef TERM_HELP
-START_HELP(unixplot)
-"1 unixplot",
+START_HELP(gnugraph)
+"1 Gnugraph(GNU plotutils)",
 "?commands set terminal unixplot",
 "?set terminal unixplot",
 "?set term unixplot",
@@ -466,5 +467,5 @@ START_HELP(unixplot)
 "",
 " There is a non-GNU version of the `unixplot` driver which cannot be compiled",
 " unless this version is left out."
-END_HELP(unixplot)
+END_HELP(gnugraph)
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: be.trm,v 1.7 1999/08/24 11:24:52 lhecking Exp $
+ * $Id: be.trm,v 1.8 2001/09/22 15:58:43 amai Exp $
  *
  */
 
@@ -451,7 +451,6 @@ START_HELP(be)
 "?set terminal be command-line-options",
 "?set term be command-line-options",
 "?be command-line-options",
-"?command-line-options",
 " In addition to the X Toolkit options, the following options may be specified",
 " on the command line when starting `gnuplot` or as resources in your",
 " \".Xdefaults\" file:",
@@ -509,7 +508,6 @@ START_HELP(be)
 "?set terminal be monochrome_options",
 "?set term be monochrome_options",
 "?be monochrome_options",
-"?monochrome_options",
 " For monochrome displays, `gnuplot` does not honor foreground or background",
 " colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`",
 " requests white-on-black.",
@@ -519,7 +517,6 @@ START_HELP(be)
 "?set terminal be color_resources",
 "?set term be color_resources",
 "?be color_resources",
-"?color_resources",
 " For color displays, `gnuplot` honors the following resources (shown here",
 " with their default values) or the greyscale resources.  The values may be",
 " color names as listed in the BE rgb.txt file on your system, hexadecimal",
@@ -577,7 +574,6 @@ START_HELP(be)
 "?set terminal be grayscale_resources",
 "?set term be grayscale_resources",
 "?be grayscale_resources",
-"?grayscale_resources",
 " When `-gray` is selected, `gnuplot` honors the following resources for",
 " grayscale or color displays (shown here with their default values).  Note",
 " that the default background is black.",
@@ -627,7 +623,6 @@ START_HELP(be)
 "?set terminal be line_resources",
 "?set term be line_resources",
 "?be line_resources",
-"?line_resources",
 " `gnuplot` honors the following resources for setting the width (in pixels) of",
 " plot lines (shown here with their default values.)  0 or 1 means a minimal",
 " width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of",
