@@ -1,4 +1,31 @@
 2003-04-24  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/post.trm: The postscript terminal driver now implements
+	pattern-fill via a (Level 1) PostScript subroutine rather than via
+	a loop in the driver-level C code. Thanks to Dick Crawford.
+
+	* src/bitmap.c src/gplt_x11.c src/win/wgraph.c 
+	term/emf.trm term/gd.trm term/pdf.trm:
+	Bring all terminal types that support pattern-fill into agreement
+	about the order of patterns. The patterns have been chosen for
+	maximum contrast in mono plots, and to favor symmetric patterns
+	over diagonal lines that are hard to describe in figure captions.
+
+	Pattern fill support is now uniform for the following terminals
+		epslatex
+		gd (png jpeg)
+    		bitmap (pbm epson hp500c hpljii hppj)
+    		pdf
+		postscript
+		pslatex
+		windows
+		x11
+	Not implemented but probably should be
+		eepic
+		emf
+
+2003-04-24  Ethan Merritt <merritt@u.washington.edu>
+
 	* src/win/wgraph.c: Tweak previous correction to saved pen color
 	so that it applies cleanly to box fill as well.
 

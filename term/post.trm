@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.91 2003/02/23 22:46:17 mikulik Exp $
+ * $Id: post.trm,v 1.92 2003/03/22 19:39:25 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -496,6 +496,33 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  /ColB ColB Fillden mul Fillden sub 1 add def\n",
 "  ColR ColG ColB setrgbcolor\n",
 "  fill grestore } def\n",
+
+"%\n",
+"% PostScript Level 1 Pattern Fill routine\n",
+/* original code: Dick Crawford <crawford@arete.com> */
+/* modified by: Ethan A Merritt <merritt@u.washington.edu> */
+"% Usage: x y w h s a XX PatternFill\n",
+"%	x,y = lower left corner of box to be filled\n",
+"%	w,h = width and height of box\n",
+"%	  a = angle in degrees between lines and x-axis\n",
+"%	 XX = 0/1 for no/yes cross-hatch\n",
+"%\n",
+"/PatternFill { gsave /PFa [ 9 2 roll ] def\n",
+"    PFa 0 get PFa 2 get 2 div add PFa 1 get PFa 3 get 2 div add translate\n",
+"    PFa 2 get -2 div PFa 3 get -2 div PFa 2 get PFa 3 get Rec\n",
+"    gsave 1 setgray fill grestore clip\n",
+"    currentlinewidth 0.5 mul setlinewidth\n",
+"    /PFs PFa 2 get dup mul PFa 3 get dup mul add sqrt def\n",
+"    0 0 M PFa 5 get rotate PFs -2 div dup translate\n",
+"	0 1 PFs PFa 4 get div 1 add floor cvi\n",
+"	{ PFa 4 get mul 0 M 0 PFs V } for\n",
+"    0 PFa 6 get ne {\n",
+"	0 1 PFs PFa 4 get div 1 add floor cvi\n",
+"	{ PFa 4 get mul 0 2 1 roll M PFs 0 V } for\n",
+"    } if\n",
+"    stroke grestore } def\n",
+"%\n",
+
 #endif /* USE_ULIG_FILLEDBOXES */
 
 /* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
@@ -1945,6 +1972,7 @@ PS_fillbox(style, x1,y1,width,height)
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
+    
     case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
@@ -1955,55 +1983,44 @@ PS_fillbox(style, x1,y1,width,height)
         fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
         break;
+	
     case FS_PATTERN: 
 	/* style == 2 --> fill with pattern according to fillpattern */
-        /* 20020302 Lutz Maibaum: Added basic support for filling
-	 * patterns 6 patterns are available, which are similar to
-	 * those in gplt_x11.c. */
-	
 	/* the upper 3 nibbles of 'style' contain pattern number */
-	pattern = (style >> 4) % 7;
+	pattern = (style >> 4) % 8;
 	switch (pattern) {
-	    int h;		/* loop variable for pattern lines */
-	    /* HBB 20020330: 6 times essentially the same code -->
-	     * turned into a macro. */
-	    /* FIXME: should probably be turned into a tricky
-	     * PostScript macro, instead... */
-#define PS_PATTERNFILL(hoffset, hincrement, xoffset1, xoffset2, yoffset1, yoffset2)	     \
-	    h = y1 - (hoffset);								     \
-	    fprintf(gpoutfile, "gsave %d %d %d %d Rec gsave 1 setgray fill grestore clip\n", \
-		    x1, y1, width, height);						     \
-	    while ((h < 0) || (h < y1 + height)) {					     \
-		/* the h < 0 test has to be performed seperately			     \
-		 * because y1 and height are unsigned int */				     \
-		fprintf(gpoutfile, "%d %d M %d %d L stroke\n",				     \
-			x1 + (xoffset1), h + (yoffset1),				     \
-			x1 + (xoffset2), h + (yoffset2));				     \
-		h += (hincrement);							     \
-	    }										     \
-	    fprintf(gpoutfile,"grestore\n");
 
-	case 1:                     /* pattern 1 */
-	    PS_PATTERNFILL(width, 71, width, 0, 0, width);
-	    break;
-	case 2:                     /* pattern 2 */
-	    PS_PATTERNFILL(width, 71, 0, width, 0, width);
-	    break;
-	case 3:                     /* pattern 3 */
-	    PS_PATTERNFILL(2 * width, 112, width, 0, 0, 2 * width);
-	    break;
-	case 4:                     /* pattern 4 */
-	    PS_PATTERNFILL(2 * width, 112, 0, width, 0, 2 * width);
-	    break;
-	case 5:                     /* pattern 5 */
-	    PS_PATTERNFILL(width / 2, 56, width, 0, 0, width / 2);
-	    break;
-	case 6:                     /* pattern 6 */
-	    PS_PATTERNFILL(width / 2, 56, 0, width, 0, width / 2);
-	    break;
-	default:                    /* default: fill with background color */
-	    fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, width,height);
-#undef PS_PATTERNFILL
+	default:
+	case 0:
+		fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+		break;
+	case 1:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 1 PatternFill\n",
+			x1, y1, width, height, 80, -45);
+		break;
+	case 2:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 2 PatternFill\n",
+			x1, y1, width, height, 40,  45);
+		break;
+	case 3:
+		fprintf(gpoutfile, "1 %d %d %d %d BoxColFill\n", x1, y1, width, height);
+		break;
+	case 4:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+			x1, y1, width, height, 80,  45);
+		break;
+	case 5:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+			x1, y1, width, height, 80, -45);
+		break;
+	case 6:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+			x1, y1, width, height, 40,  30);
+		break;
+	case 7:
+		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+			x1, y1, width, height, 40, -30);
+		break;
 	}
         break; /* end of pattern filling part */ 
 	
