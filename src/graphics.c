@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.93 2003/06/20 04:54:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.94 2003/07/01 23:50:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -157,7 +157,7 @@ static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *k
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
  * multiple calls to functions. I converted these macros to inline
- * functions coping with the problem without loosing speed.
+ * functions coping with the problem without losing speed.
  * If your compiler supports __inline, you should add it to the
  * #ifdef directive
  * (MGR, 1993)
@@ -284,7 +284,6 @@ boundary(plots, count)
     int xtic_height;
     int ytic_width;
     int y2tic_width;
-    int old_xleft;		/* Allow iterative approach to boundary definition */
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
@@ -653,7 +652,6 @@ boundary(plots, count)
 
     /* compute xleft from the various components
      *     unless lmargin is explicitly specified  */
-    old_xleft = xleft;
     xleft = (int) (0.5 + (t->xmax) * xoffset);
 
     if (lmargin < 0) {
@@ -676,9 +674,12 @@ boundary(plots, count)
 
     /*  end of xleft calculation }}} */
 
-    /* EAM Feb 2003 - Revisit key placement */
-    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER)
-	keybox.xl += xleft - old_xleft;
+    /* EAM Jul 2003 - Revisit key placement */
+    if (key->flag == KEY_AUTO_PLACEMENT && key->vpos == TUNDER) {
+	int key_half = (keybox.xr - keybox.xl)/2;
+	keybox.xl = (xright+xleft)/2 - key_half;
+	keybox.xr = (xright+xleft)/2 + key_half;
+    }
 
     /*{{{  recompute xright based on widest y2tic. y2labels, key TOUT
        unless it has been explicitly set by rmargin */
