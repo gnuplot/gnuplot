@@ -1,3 +1,7 @@
+2002-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp: gnuplot-mode updated to 0.5t.
+
 2002-11-27  Johannes Zellner  <johannes@zellner.org>
 
 	* src/gplt_x11.c: subtract 1 from plot->cmap->allocated
@@ -1510,7 +1514,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/05 01:46:45 $).
+	last modification date (from the tag $Date: 2002/12/06 23:55:17 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -5043,6 +5047,8 @@
 
 	* term/emf.trm: Update to latest version.
 
+	* term/ggi.trm: Delete empty line at end of termdocs section.
+
 2000-10-24  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm: increased the speed of ggi command line
@@ -5053,21 +5059,6 @@
 
 	* term/ggi.trm: 'q' closes the terminal, so it's
 	compatible with X11 and vgagl.
-
-2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
-
-	* missing: Update from automake-cvs.
-
-	* src/depcomp: Add from automake-cvs.
-
-	* term/cgm.trm: Use gnuplot_version and gnuplot_patchlevel instead of
-	VERSION. Escape underscores in font names for TeX/LaTeX.
-
-	* term/cgm.trm(CGM_set_font): Eliminate compiler warning.
-
-	* term/emf.trm: Update to latest version.
-
-	* term/ggi.trm: Delete empty line at end of termdocs section.
 
 2000-10-24  Brendt Wohlberg  <brendt@cnls.lanl.gov>
 
