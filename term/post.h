@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: post.h,v 1.2 1999/10/01 15:09:12 lhecking Exp $
  */
 
 /* GNUPLOT - post.h */
@@ -73,4 +73,4 @@ static TBOOLEAN ps_solid;
 #define PS_VCHAR (14*PS_SC)
 #define PS_HCHAR (14*PS_SC*6/10)
 
-#endif TERM_POST_H
+#endif /* TERM_POST_H */
