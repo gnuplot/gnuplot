@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.17 1999/08/07 17:21:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.18 1999/09/14 15:25:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -770,9 +770,7 @@ int count;
 		 * do one integer division to maximise accuracy (hope we
 		 * don't overflow !)
 		 */
-		key_xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols *
-										       (key_size_left
-											+ key_size_right));
+		key_xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
 		key_xr = key_xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
 		key_yb = t->ymax * yoffset;
 		key_yt = key_yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
@@ -869,8 +867,7 @@ int count;
 	/* make sure xleft is wide enough for a negatively
 	 * x-offset horizontal timestamp
 	 */
-	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset
-										 * (t->h_char)))
+	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
 	    xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
 	if (xleft == (int)(0.5 + (t->xmax) * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
