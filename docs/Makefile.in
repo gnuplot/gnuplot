@@ -56,6 +56,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
 CC     = @CC@
+CPP    = @CPP@
 DEFS   = @DEFS@
 CFLAGS = @CFLAGS@
 INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/term -I.
@@ -114,7 +115,10 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
 allterm.h : $(CORETERM)
 	@echo Building allterm.h
-	cat $(srcdir)/../term/*.trm > allterm.h
+	@cat $(top_srcdir)/term/*.trm > allterm.c
+	$(CPP) -I$(top_srcdir)/term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
+	  sed '/^ *$$/d;/^#/d' > allterm.h
+	@rm -f allterm.c
 
 # for debugging
 alldoc: check dvi gih hlp html info ipf ms nroff ps rnh rtf
@@ -206,8 +210,12 @@ doc2tex.o: doc2tex.c allterm.h
 dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
-	TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot
-	TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot
+	@if test $(LATEX) != no ; then \
+	  TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot ; \
+	else \
+	  echo latex not found - cannot build dvi file ; \
+	fi
 
 gpcard.dvi: gpcard.tex
 	TEXINPUTS=.:$(srcdir): tex gpcard
@@ -262,7 +270,7 @@ gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 	@if test "$(EMACS)" != no; then \
 	  $(EMACS) --batch -l $(srcdir)/fixinfo.el; \
 	else \
-	  @echo No emacs found - cannot fix info file; \
+	  echo No emacs found - cannot fix info file; \
 	fi
 
 doc2info: doc2info.o termdoc.o xref.o
