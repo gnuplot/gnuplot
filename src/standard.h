@@ -1,5 +1,5 @@
 /*
- * $Id: standard.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
+ * $Id: standard.h,v 1.6 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - standard.h */
@@ -80,6 +80,9 @@ void f_besj0 __PROTO((union argument *x));
 void f_besj1 __PROTO((union argument *x));
 void f_besy0 __PROTO((union argument *x));
 void f_besy1 __PROTO((union argument *x));
+#ifdef GP_ISVAR
+void f_isvar __PROTO((union argument *x));   /* isvar function */
+#endif  /*GP_ISVAR*/
 
 void f_tmsec __PROTO((union argument *x));
 void f_tmmin __PROTO((union argument *x));

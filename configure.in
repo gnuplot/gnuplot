@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.129 2003/02/18 16:19:47 broeker Exp $
+dnl $Id: configure.in,v 1.130 2003/06/09 13:21:42 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -701,6 +701,14 @@ if test "$enable_relative_boxwidth" = yes; then
             [ Define if you want to have Uli Gruenebaum's relative boxwidth. ])
 fi
 
+dnl isvar function patch
+AC_ARG_ENABLE(isvar,dnl
+[  --enable-isvar          enable defined(var) function (EXPERIMENTAL)],
+  [if test "$enableval" = yes; then
+     AC_DEFINE(GP_ISVAR, 1,
+               [ Define to enable variable definition tests. EXPERIMENTAL ])
+   fi])
+
 dnl thin plate splines patch
 AC_ARG_ENABLE(thin-splines,dnl
 [  --enable-thin-splines   enable thin plate splines],
@@ -897,6 +905,10 @@ fi
 
 if test "$enable_relative_boxwidth" = yes; then
   AC_MSG_RESULT([  Enable relative boxwidths])
+fi
+
+if test "$enable_isvar" = yes; then
+  AC_MSG_RESULT([  Enable isvar (EXPERIMENTAL)])
 fi
 
 if test "$enable_thin_splines" = yes; then

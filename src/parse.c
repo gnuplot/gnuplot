@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.15 2001/03/09 18:10:32 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.16 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -286,6 +286,16 @@ parse_primary_expression()
 	    enum operators whichfunc = is_builtin_function(c_token);
 
 	    if (whichfunc) {
+
+#ifdef GP_ISVAR
+		/* Check to see if it is isvar */
+		/* Is so then turn off normal variable pushing */
+                /* Push variable definition state instead */
+		if (strcmp(ft[whichfunc].f_name,"defined")==0) {
+			push_vars=FALSE;
+		}
+#endif  /*GP_ISVAR*/
+
 		/* it's a standard function */
 		c_token += 2;	/* skip fnc name and '(' */
 		parse_expression(); /* parse fnc argument */
@@ -298,6 +308,11 @@ parse_primary_expression()
 		    int_error(c_token, "')' expected");
 		c_token++;
 		(void) add_action(whichfunc);
+
+#ifdef GP_ISVAR
+		 /* Turn normal variable pushing back on */
+		push_vars=TRUE;
+#endif  /*GP_ISVAR*/
 	    } else {
 		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
@@ -353,7 +368,13 @@ parse_primary_expression()
 	    }
 	    /* its a variable, with no dummies active - div */
 	} else {
-	    add_action(PUSH)->udv_arg = add_udv(c_token);
+#ifdef GP_ISVAR
+            if (push_vars==FALSE)
+		add_action(PUSHV)->udv_arg = add_udv(c_token);
+	    else
+#endif  /* GP_ISVAR */
+		add_action(PUSH)->udv_arg = add_udv(c_token);
+
 	    c_token++;
 	}
     }

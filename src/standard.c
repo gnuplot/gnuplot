@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.12 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.13 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -953,6 +953,28 @@ f_ceil(arg)
 	push(Ginteger(&a, (int) ceil(a.v.cmplx_val.real)));
     }
 }
+
+
+#ifdef GP_ISVAR
+/* JSR - Check to see if a variable is defined */
+/* Returns 1 if the varibale is defined, 0 if not */
+/* If a constant is passed then returns the constant, i.e. isvar(10)=10 */
+void
+f_isvar(arg)
+    union argument *arg;
+{
+    struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&a);
+
+    /* The actual work of this function is done in the PUSHV internal function
+       which should have checked the variable and pushed a value onto the stack */
+
+    push(Ginteger(&a, a.v.int_val));
+    
+}
+#endif  /*GP_ISVAR*/
 
 /* bessel function approximations */
 static double

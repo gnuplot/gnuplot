@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.6 2001/08/22 14:15:33 broeker Exp $
+ * $Id: eval.h,v 1.7 2003/03/20 14:36:59 broeker Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -52,7 +52,11 @@
 /* HBB 20010725: Moved here, from parse.h */
 enum operators {
     /* keep this in line with table in eval.c */
-    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, CALL, CALLN, LNOT, BNOT, UMINUS,
+    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, 
+#ifdef GP_ISVAR
+    PUSHV, 
+#endif  /*GP_ISVAR*/
+    CALL, CALLN, LNOT, BNOT, UMINUS, 
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
     DOLLARS, /* for using extension - div */
@@ -123,6 +127,14 @@ extern struct udft_entry *first_udf; /* user-def'd functions */
 extern struct udvt_entry *first_udv; /* user-def'd variables */
 extern struct udvt_entry udv_pi; /* 'pi' variable */
 extern TBOOLEAN undefined;
+
+#ifdef GP_ISVAR
+/* isvar - When this variable is true PUSH operations become PUSHV */
+/* So the variable's definition state get's pushed */
+/* instead of the actual value */
+extern TBOOLEAN push_vars;
+#endif  /*GP_ISVAR*/
+
 
 /* Prototypes of functions exported by eval.c */
 

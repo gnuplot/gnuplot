@@ -1,3 +1,11 @@
+2003-07-22  Jaime Reed <jaime2003@users.sourceforge.net>
+
+	* src/parse.c src/eval.h src/eval.c src/standard.c src/standard.h
+	src/internal.c src/internal.h configure.in:  Create a new builtin
+	function "defined(<uservar>)" that returns 1 if the user variable
+	is defined and returns 0 if undefined. This was patch #714750 on
+	SourceForge.  Select at build time by ./configure --enable-isvar
+
 2003-07-15  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gp_types.h src/graphics.c src/plot2d.c: Create a new flag

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.12 2001/12/01 13:08:59 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.13 2003/03/20 14:36:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -67,6 +67,11 @@ struct udft_entry *first_udf = NULL;
 
 TBOOLEAN undefined;
 
+#ifdef GP_ISVAR
+/* Do we want to push variables or their defined state? */
+TBOOLEAN push_vars=TRUE;
+#endif  /*GP_ISVAR*/
+
 /* The stack this operates on */
 static struct value stack[STACK_DEPTH];
 static int s_p = -1;		/* stack pointer */
@@ -89,6 +94,9 @@ const struct ft_entry GPFAR ft[] =
     {"pushd1",  f_pushd1},
     {"pushd2",  f_pushd2},
     {"pushd",  f_pushd},
+#ifdef GP_ISVAR
+    {"pushv", f_pushv},
+#endif  /*GP_ISVAR*/
     {"call",  f_call},
     {"calln",  f_calln},
     {"lnot",  f_lnot},
@@ -154,6 +162,9 @@ const struct ft_entry GPFAR ft[] =
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
+#ifdef GP_ISVAR
+    {"defined",  f_isvar},       /* isvar function */
+#endif  /*GP_ISVAR*/
 
     {"norm",  f_normal},	/* XXX-JG */
     {"inverf",  f_inverse_erf},	/* XXX-JG */
@@ -613,6 +624,7 @@ evaluate_at(at_ptr, val_ptr)
 	Gcomplex(val_ptr, 0.0 / 0.0, 0.0 / 0.0);
     }
 #endif /* NeXT || ultrix */
+
 }
 
 
