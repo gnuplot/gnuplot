@@ -140,6 +140,19 @@ void fflush_binary();
 # define FOPEN_BINARY(file) fopen(file, "wb")
 #endif /* !VMS */
 
+#if defined(MSDOS) || defined(WIN32) || defined(WIN16)
+# if defined(__DJGPP__) || defined (__TURBOC__)
+#  include <io.h>
+# endif
+# include <fcntl.h>
+# ifndef O_BINARY
+#  ifdef _O_BINARY
+#   define O_BINARY _O_BINARY
+#  else
+#   error O_BINARY still undefined!
+#  endif
+# endif
+#endif
 
 /* This is needed because the unixplot library only writes to stdout. */
 #if defined(UNIXPLOT) || defined(GNUGRAPH)
@@ -300,6 +313,17 @@ void term_init()
 	fflush(stdout);		// _fsetmode requires an empty buffer
 
 	_fsetmode(stdout, "b");
+    }
+#elif defined(MSDOS) || defined (_Windows)
+# if defined(MSDOS)
+    else if (!outstr && !interactive && (term->flags & TERM_BINARY))
+# elif defined(_Windows)
+    else if (!outstr && (term->flags & TERM_BINARY))
+# endif
+    {
+        /* binary to stdout in non-interactive session... */
+        fflush(stdout);
+        setmode(fileno(stdout), O_BINARY);
     }
 #endif
 
