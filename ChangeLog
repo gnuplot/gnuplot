@@ -1,5 +1,17 @@
 2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/util3d.c (draw3d_point) [PM3D] : Implement "linetype palette"
+ 	option for pointsymbols by calling set_color() if the use_palette
+ 	flag is set.
+
+	* src/graph3d.c (cntr3d_impulses, cntr3d_lines,
+ 	cntr3d_linespoints, cntr3d_points) [PM3D]: Ensure that points on
+ 	base contours have the actual contour z value for the real_z
+ 	element of struct vertex.  This is needed to make contour lines
+ 	have the right colours in "linetype palette" mode.
+
+2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/stdfn.c: Move gp_stricmp and gp_strnicmp prototypes from
  	here to src/stdfn.h where they belong.
 	(gp_strnicmp): Made third argument type size_t, to more closely
@@ -64,6 +76,125 @@
 	* demo/steps.dem: Added demonstration plot to show typical use of
  	'smooth frequency' to collect a histogram from unsorted data.
 
+2001-08-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_arrow): Avoid overwriting linetype or
+ 	{nohead|head|heads} status of an existing arrow if it's redefined
+ 	without repeating this part of the spec.
+
+	* src/axis.c (grid_selection): Global variable removed.
+	(axis_output_tics): Removed grid bit pattern argument; don't pass
+ 	it on to gen_tics().
+	(gen_tics): Removed grid bit pattern argument. Use new axis struct
+ 	fields to set up grid drawing information for callback functions.
+	(some_grid_selected): New function. Needed to replace cases where
+ 	all grid bits were tested simultaneously by comparing
+ 	'grid_selection == GRID_OFF'.
+
+	* src/axis.h (struct axis): Two new fields 'gridmajor' and
+ 	'gridminor' to replace `grid_selection'.
+	
+	* src/color.c (draw_color_smooth_box): Removed grid bits from
+ 	argument list of gen_tics() call.
+
+	* src/graph3d.c (do_3dplot): Check axis fields instead of global
+ 	variable.
+	(draw_3d_graphbox): Remove grid bit patterns from calls to
+ 	gen_tics().
+
+	* src/graphics.c (boundary): Removed dummy zero argument in calls
+ 	to gen_tics().
+	(do_plot): Removed GRID_* arguments from calls to
+ 	axis_output_tics().
+
+	* src/mouse.c (builtin_toggle_grid): Call some_grid_selected() to
+ 	decide about toggling off or on.
+	
+	* src/save.c (save_set_all): Reimplemented saving of 'set grid'
+ 	specifications to use new axis fields.
+
+	* src/set.c (set_grid): Dito, for 'set grid'.
+
+	* src/show.c (show_grid): Dito, for 'show grid'. And fixed display
+ 	of polar grid angular distance.
+
+	* src/unset.c (unset_grid): Dito, for 'unset grid'
+
+2001-08-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+	
+	* src/tables.c (command_ftbl, plot_tbl, plot_axes_tbl,
+ 	plot_smooth_tbl, save_tbl, set_tbl, set_hidden3d_tbl, set_key_tbl,
+ 	show_style_tbl, plotstyle_tbl, ): All turned 'const'ant.
+	(lookup_table): Argument tbl flagged 'const'ant.
+	(lookup_ftable): Argument ftbl flagged 'const'ant.
+
+	* src/axis.c (axis_defaults, axisname_tbl): Turned 'const'ant.
+
+	* src/bitmap.c (fnt5x9, fnt9x17, fnt13x25): Turned 'const'ant.
+	
+	* src/bitmap.h (typedef char_box): Added 'const' qualifier to
+ 	match fnt* arrays.
+
+	* src/eval.c (ft): Turned 'const'ant.
+
+	* src/getcolor.c (ps_math_color_formulae): Turned 'const'ant
+
+2001-08-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (copy_or_invent_formatstring): Renamed from
+ 	timetic_format(), two arguments removed. Does more than before,
+ 	now.  Returns pointer to the string it creates, so mouse.c doesn't
+ 	need access to axis.c internal variable ticfmt[].
+
+2001-08-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc: Document the change to the cubic spline
+ 	sampling range.
+
+	* src/interpol.c (do_cubic): Sample the generated cubic spline
+ 	only across the current xrange, instead of the whole range of
+ 	input datapoints.
+	(cp_approx_spline, cp_tridiag): Changed calls to int_error() to
+ 	report the position by the token saved in struct curve_points.
+
+	* term/emf.trm (EMF_STOCK_OBJECT_FLAG): To avoid possible
+ 	signed-ness issue if a K&R C compiler is used, construct 32-bit
+ 	numbers with bit 31 set by shifting, not as a manifest constant.
+
+	* term/tek.trm (CT_draw_vpoint, CT_lines): dito.
+
+	* src/term.c (null_linewidth, set_font_null, PUTTEXT_null,
+ 	LINETYPE_null, MOVE_null, null_scale): Added void-casts to avoid
+ 	warnings about unused parameters.
+
+	* src/plot.c (inter): Dito.
+
+	* src/graph3d.c (xtick_callback, ytick_callback, ztick_callback):
+ 	Dito.
+	
+	* src/gpexecute.c (pipe_died_handler): Dito.
+
+	* src/fit.c (ctrlc_handle): Dito.
+
+	* src/datafile.c (df_2dbinary): Dito.
+	
+	* src/binary.c (free_vector): Removed unused argument nh.
+	(extend_vector, retract_vector): Removed unused argument old_nh.
+	(free_matrix): Removed unused argument nch.
+	(free_convert_matrix): Removed unused arguments nrh, ncl and nch.
+	(all over the place): Fixed up calls to these functions.
+	
+	* src/contour.c (put_contour_cubic): Use arguments xx_min and
+ 	yy_min, not file-scope variables x_min and y_min.
+	(put_contour_bspline): Removed unused arguments z_level, xx_min,
+ 	xx_max, yy_min and yy_max.
+	(put_contour): Removed arguments in calls to put_contour_cubic and
+ 	put_contour_bspline. Removed now unused argument z_level.
+	(gen_contours): Removed argument z_level from call to put_contour.
+
+	* src/binary.h, src/contour.h: Updated prototypes of modified
+ 	functions.
+
 2001-07-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Release 3.8g snapshot
@@ -78,6 +209,31 @@
 	* m4/path-lib.m4: Do not automatically add found libraries to LIBS.
 	Instead, define a new variable gp_LIBRARY_libs that can be used in
 	configure.in.
+
+2001-07-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/eval.c, src/internal.c, src/standard.c, src/specfun.c,
+ 	src/parse.c: Large-scale renovation of the whole eval/parse stuff.
+  	Avoid (unsafe!) casting function pointers. Moved lots of code from
+ 	one module to another to improve coherency of modules.
+
+	* src/README: Describe the details of the above change, which
+ 	really are too long for a ChangeLog entry.
+
+	* src/*.[ch]: Don't #include "interpol.h", but rather "eval.h",
+ 	which is now the central interface header of all the eval/parse
+ 	stuff.
+	
+	* src/gp_types.h: Removed #ifdef'ed-out type definitions that had
+ 	long since been moved to eval.h and command.h
+
+	* src/parse.c (convert): Function moved here, from util.c, and
+ 	turned 'static'.
+	(factor): Make HP-UX bug workaround code the only version --- it
+ 	already was functionally identical to the generic one, anyway.
+
+	* src/util.c (convert): Deleted.
+	* src/util.h (convert): Prototype removed.
 
 2001-07-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
