@@ -33,6 +33,7 @@ News, changes and fixes since gnuplot version 4.0
 * FIXED emf output is compatible with MSWin XP SP 2
 * FIXED limit size of X11 requests to half the maximum allowed by the X display
 * FIXED arrowheads drawn in solid lines even if the shaft is dotted (PostScript)
+* FIXED estimate true effective length of strings in enhanced text mode
 
 
 Changes between gnuplot versions 3.7.2 and 4.0

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.138 2004/12/03 20:25:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.139 2004/12/05 08:04:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -234,12 +234,15 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     mlen = cnt = 0;
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
-	if (this_plot->title && !this_plot->title_is_suppressed
-	    && ((len = /*assign */ strlen(this_plot->title)) != 0)	/* HBB 980308: quiet BCC warning */
-	    ) {
-	    cnt++;
-	    if (len > mlen)
-		mlen = strlen(this_plot->title);
+	if (this_plot->title && !this_plot->title_is_suppressed) {
+	    ignore_enhanced_text = this_plot->title_no_enhanced;
+	    len = estimate_strlen(this_plot->title);
+	    if (len != 0) {
+		cnt++;
+		if (len > mlen)
+		    mlen = len;
+	    }
+	    ignore_enhanced_text = 0;
 	}
 #ifdef EAM_HISTOGRAMS
 	/* Check for new histogram here and save space for divider */
@@ -251,7 +254,7 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
 	    text_label *key_entry = this_plot->labels;
 	    for (; key_entry; key_entry=key_entry->next) {
 		cnt++;
-		len = key_entry->text ? strlen(key_entry->text) : 0;
+		len = key_entry->text ? estimate_strlen(key_entry->text) : 0;
 		if (len > mlen)
 		    mlen = len;
 	    }
@@ -1467,7 +1470,7 @@ do_plot(struct curve_points *plots, int pcount)
 		if ((*t->justify_text) (CENTRE)) {
 		    write_multiline(center, yl, s, CENTRE, JUST_TOP, 0, NULL);
 		} else {
-		    int x = center - t->h_char * strlen(s) / 2;
+		    int x = center - t->h_char * estimate_strlen(s) / 2;
 		    if (key->hpos == TOUT
 			|| key->vpos == TUNDER
 			|| inrange(x, xleft, xright))
@@ -4218,7 +4221,7 @@ label_width(const char *str, int *lines)
     s = lab;
     while ((e = (char *) strchr(s, '\n')) != NULL) {	/* HBB 980308: quiet BC-3.1 warning */
 	*e = '\0';
-	len = strlen(s);	/* = e-s ? */
+	len = estimate_strlen(s);	/* = e-s ? */
 	if (len > mlen)
 	    mlen = len;
 	if (len || l)
@@ -4508,7 +4511,7 @@ do_key_sample(
 	if ((*t->justify_text) (RIGHT)) {
 	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, NULL);
 	} else {
-	    int x = xl + key_text_right - t->h_char * strlen(title);
+	    int x = xl + key_text_right - t->h_char * estimate_strlen(title);
 	    if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
 		i_inrange(x, xleft, xright))
 		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);

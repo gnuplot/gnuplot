@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.91 2004/11/09 00:26:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.92 2004/12/01 21:10:38 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -213,7 +213,7 @@ static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 /* the terminal drivers are included into term.c at compile time.   */
 static char  enhanced_text[MAX_LINE_LEN];
 static char *enhanced_cur_text;
-static double enhanced_fontscale;
+static double enhanced_fontscale = 1.0;
 static char enhanced_escape_format[16];
 static double enhanced_max_height, enhanced_min_height;
 
@@ -2530,4 +2530,34 @@ mp_layout_size_and_offset(void)
     xoffset += mp_layout.xoffset;
     yoffset += mp_layout.yoffset;
     /* fprintf(stderr,"  xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
+}
+
+/*
+ * Text strings containing control information for enhanced text mode
+ * contain more characters than will actually appear in the output.
+ * This makes is hard to estimate how much horizontal space on the plot
+ * (e.g. in the key box) must be reserved to hold them.  To approximate
+ * the eventually length we switch briefly to the dummy terminal driver
+ * "estimate.trm" and then switch back to the current terminal.
+ * If better, perhaps terminal-specific methods of estimation are 
+ * developed later they can be slotted into this one call site.
+ */
+int
+estimate_strlen(char *text)
+{
+int len;
+
+#ifdef GP_ENH_EST
+    if (term->flags & TERM_ENHANCED_TEXT) {
+	struct termentry *tsave = term;
+	term = &ENHest;
+	term->put_text(0,0,text);
+	len = term->xmax;
+	term = tsave;
+	FPRINTF(("Estimating length %d for enhanced text string \"%s\"\n",len,text));
+    } else
+#endif
+	len = strlen(text);
+
+    return len;
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.106 2004/11/22 00:43:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.107 2004/11/22 01:38:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -279,7 +279,7 @@ find_maxl_keys3d(struct surface_points *plots, int count, int *kcnt)
 	if (this_plot->title && *this_plot->title &&
 	    (draw_surface || (draw_contour && !label_contours))) {
 	    ++cnt;
-	    len = strlen(this_plot->title);
+	    len = estimate_strlen(this_plot->title);
 	    if (len > mlen)
 		mlen = len;
 	}
@@ -305,7 +305,7 @@ find_maxl_cntr(struct gnuplot_contours *contours, int *count)
     mlen = cnt = 0;
     while (cntrs) {
 	if (label_contours && cntrs->isNewLevel) {
-	    len = strlen(cntrs->label);
+	    len = estimate_strlen(cntrs->label);
 	    if (len)
 		cnt++;
 	    if (len > mlen)
@@ -856,7 +856,7 @@ do_3dplot(
 		    (*t->put_text) (xl + key_text_right,
 				    yl, s);
 		} else {
-		    int x = xl + key_text_right - t->h_char * strlen(s);
+		    int x = xl + key_text_right - t->h_char * estimate_strlen(s);
 		    if (inrange(x, xleft, xright))
 			(*t->put_text) (x, yl, s);
 		}
@@ -2904,7 +2904,7 @@ key_text(int xl, int yl, char *text)
 	    else
 		(*term->put_text) (xl + key_text_right, yl, text);
 	} else {
-	    int x = xl + key_text_right - (term->h_char) * strlen(text);
+	    int x = xl + key_text_right - (term->h_char) * estimate_strlen(text);
 	    if (key->flag == KEY_USER_PLACEMENT) {
 		if (i_inrange(x, xleft, xright))
 		    clip_put_text(x, yl, text);

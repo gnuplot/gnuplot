@@ -1,5 +1,24 @@
-2004-12-30  Ethan Merritt  <merritt@u.washington.edu>
+2004-12-31  Ethan Merritt  <merritt@u.washington.edu>
 
+	* term/estimate.trm src/term.h: New pseudo-terminal driver whose sole
+	function is to parse a string in enhanced text mode and return the
+	number of character-widths in the resulting output text.
+
+	* configure.in NEWS src/term_api.h src/term.c (estimate_strlen):
+	New routine estimate_strlen(char *text). Its default behaviour is to
+	return strlen(text). But if the currently active terminal is in
+	enhanced text mode, and the current plotting context does not disable
+	enhanced text, then instead it calls the estimate.trm pseudo-terminal
+	term->put_text(text) in order to determine the approximate width of
+	the eventual output string.  This feature may be disabled using
+	./configure --disable-strlen_estimation
+
+	* src/graph3d.c src/graphics.c: Where strlen(text) is used to reserve
+	space on the plot (e.g. leaving room for tic labels or key box entries)
+	call the new routine estimate_strlen(text) instead.  This allows more
+	accurate plot layout in enhanced text mode. The improvement is 
+	particularly noticible if the y-axis tic format uses enhanced text mode.
+	
 	* term/x11.trm (X11_options ENHX11_put_text): Try harder to determine
 	what the default fontsize is so that string lengths can be estimated.
 
