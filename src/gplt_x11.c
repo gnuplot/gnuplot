@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.62 2003/06/25 18:01:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.63 2003/07/05 02:51:24 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE
@@ -1234,6 +1234,8 @@ record()
 		sscanf(buf, "G%d %lu", &plot_number, &gnuplotXID);
 #endif
 #endif
+		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
+		    plot_number = 0;
 		FPRINTF((stderr, "plot for window number %d\n", plot_number));
 		plot = plot_array + plot_number;
 		prepare_plot(plot, plot_number);
@@ -1274,8 +1276,11 @@ record()
 	case 'N':		/* just update the plot number */
 	    {
 		int itmp;
-		if (sscanf(buf, "N%d", &itmp))
+		if (sscanf(buf, "N%d", &itmp)) {
+		    if (itmp < 0 || itmp >= MAX_WINDOWS)
+			itmp = 0;
 		    current_plot = plot_array + itmp;
+		}
 	    }
 	    break;
 	case 'E':		/* leave graphics mode / suspend */
