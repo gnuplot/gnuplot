@@ -282,6 +282,17 @@
 /*  Define if color information should be passed for each vertex.  */
 #undef EXTENDED_COLOR_SPECS
 
+/*  Define if you want to use the experimental ggi driver.  */
+#undef USE_GGI_DRIVER
+
+/*  Define if ggi/wmh.h is there. 
+		     */
+#undef HAVE_GGI_WMH_H
+
+/*  Define if ggi/xmi.h is there. 
+		 */
+#undef HAVE_GGI_XMI_H
+
 /*  Define if you are using the GNU readline library.  */
 #undef HAVE_LIBREADLINE
 
@@ -302,6 +313,9 @@
 
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG
+
+/*  Define if you have the pdf library.  */
+#undef HAVE_LIBPDF
 
 /*  Define if you want to use the CGI terminal under SCO.  */
 #undef CGI
@@ -335,7 +349,4 @@
 
 /*  Define if you want to have Petr Mikulik's fancy pm3d.  */
 #undef PM3D
-
-/*  Define if you want to use the experimental ggi driver.  */
-#undef USE_GGI_DRIVER
 

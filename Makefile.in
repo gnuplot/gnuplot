@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4a from Makefile.am
+# Makefile.in generated automatically by automake 1.4c from Makefile.am
 
 # Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
 # Free Software Foundation, Inc.
@@ -192,7 +192,11 @@ mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
 	@set fnord $(MAKEFLAGS); amf=$$2; \
 	dot_seen=no; \
-	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	rev=''; for subdir in $$list; do \
 	  if test "$$subdir" = "."; then :; else \
 	    rev="$$subdir $$rev"; \
 	  fi; \
@@ -242,6 +246,11 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES) config.hin $(TAGS_DEPENDENCIES) \
 	       END { for (i in files) print i; }'`; \
 	test -z "$(ETAGS_ARGS)config.hin$$unique$(LISP)$$tags" \
 	  || etags $(ETAGS_ARGS) $$tags config.hin $$unique $(LISP)
+
+GTAGS:
+	here=`CDPATH=: && cd $(top_builddir) && pwd` \
+	  && cd $(top_srcdir) \
+	  && gtags -i $$here
 
 mostlyclean-tags:
 
