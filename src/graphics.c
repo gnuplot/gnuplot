@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.65 2002/02/15 15:40:58 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.66 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1122,6 +1122,10 @@ place_labels(layer)
 	if (this_label->layer != layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
+	
+	/* EAM - textcolor support in progress */
+	apply_textcolor(&(this_label->textcolor),t);
+	
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -1245,6 +1249,7 @@ do_plot(plots, pcount)
     }
 /* YLABEL */
     if (*axis_array[FIRST_Y_AXIS].label.text) {
+	apply_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = ylabel_x + (t->v_char / 2);
@@ -1258,9 +1263,11 @@ do_plot(plots, pcount)
 	    unsigned int y = ylabel_y;
 	    write_multiline(x, y, axis_array[FIRST_Y_AXIS].label.text, LEFT, JUST_TOP, 0, axis_array[FIRST_Y_AXIS].label.font);
 	}
+	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
     }
 /* Y2LABEL */
     if (*axis_array[SECOND_Y_AXIS].label.text) {
+	apply_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
@@ -1273,26 +1280,33 @@ do_plot(plots, pcount)
 	    unsigned int y = y2label_y;
 	    write_multiline(x, y, axis_array[SECOND_Y_AXIS].label.text, RIGHT, JUST_TOP, 0, axis_array[SECOND_Y_AXIS].label.font);
 	}
+	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
     }
 /* XLABEL */
     if (*axis_array[FIRST_X_AXIS].label.text) {
 	unsigned int x = (xright + xleft) / 2 + axis_array[FIRST_X_AXIS].label.xoffset * (t->h_char);
 	unsigned int y = xlabel_y - t->v_char / 2;	/* HBB */
+	apply_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor),t);
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text, CENTRE, JUST_TOP, 0, axis_array[FIRST_X_AXIS].label.font);
+	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor),t);
     }
 /* PLACE TITLE */
     if (*title.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xleft + xright) / 2 + title.xoffset * t->h_char;
 	unsigned int y = title_y - t->v_char / 2;
+	apply_textcolor(&(title.textcolor),t);
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
+	reset_textcolor(&(title.textcolor),t);
     }
 /* X2LABEL */
     if (*axis_array[SECOND_X_AXIS].label.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xright + xleft) / 2 + axis_array[SECOND_X_AXIS].label.xoffset * (t->h_char);
 	unsigned int y = x2label_y - t->v_char / 2 - 1;
+	apply_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
 	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE, JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
+	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
     }
 /* PLACE TIMEDATE */
     if (*timelabel.text) {
@@ -1400,6 +1414,10 @@ do_plot(plots, pcount)
 		/* don't write filename or function enhanced */
 	    if (localkey != 0 && this_plot->title) {
 		key_count++;
+
+		/* EAM - force key text to black, then restore */ 
+		    (*t->linetype)(LT_BLACK);
+
 		if (key_just == JLEFT) {
 		    (*t->justify_text) (LEFT);
 		    (*t->put_text) (xl + key_text_left, yl, this_plot->title);
@@ -1413,6 +1431,8 @@ do_plot(plots, pcount)
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }
 		}
+		/* EAM - restore plot line type */
+		    (*t->linetype)(this_plot->lp_properties.l_type); 
 
 		/* draw sample depending on bits set in plot_style */
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)

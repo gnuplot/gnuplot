@@ -36,6 +36,10 @@ static char *RCSid() { return RCSid("gadgets.c,v 1.1.3.1 2000/05/03 21:47:15 hbb
 
 #include "gadgets.h"
 
+#ifdef PM3D
+#include "pm3d.h"
+#endif
+
 /* This file contains mainly a collection of global variables that
  * used to be in 'set.c', where they didn't really belong. They
  * describe the status of several parts of the gnuplot plotting engine
@@ -395,3 +399,34 @@ unsigned int x, y;
     move_pos_x = x;
     move_pos_y = y;
 }
+
+/* Common routines for setting text color from t_colorspec */
+
+void
+apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
+{
+    if (tc->type == TC_DEFAULT) return;
+    if (tc->type == TC_LT) {
+	(*t->linetype)(tc->lt);
+       return;
+    }
+#ifdef PM3D
+    if (!is_plot_with_palette() || !(*t->set_color)) {
+	(*t->linetype)(LT_BLACK);
+	return;
+    }
+    switch (tc->type) {
+	case TC_Z:    (*t->set_color)(cb2gray(z2cb(tc->value))); break;
+	case TC_CB:   (*t->set_color)(cb2gray(tc->value));       break;
+	case TC_FRAC: (*t->set_color)(tc->value);                break;
+    }
+#endif
+}
+
+void
+reset_textcolor(const struct t_colorspec *tc, const struct termentry *t)
+{
+    if (tc->type != TC_DEFAULT)
+	(*t->linetype)(LT_BLACK);
+}
+

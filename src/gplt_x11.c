@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.41 2002/05/29 10:41:06 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.42 2002/06/07 22:52:37 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1460,9 +1460,15 @@ exec_cmd(plot_struct *plot, char *command)
 	sl = strlen(str) - 1;
 	sw = XTextWidth(font, str, sl);
 
-
+/*	EAM - May 2002 	Modify to allow colored text.
+ *	1) do not force foreground of gc to be black
+ *	2) write text to (*current_gc), rather than to gc, so that text color can be set
+ *	   using pm3d mappings.
+ */
+#ifdef EAM_OLD_CODE
 	/* switch to text color */
 	XSetForeground(dpy, gc, plot->cmap->colors[2]);
+#endif
 
 	if (1 == plot->angle) {
 	    switch (plot->jmode) {
@@ -1477,7 +1483,7 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	    }
 	    /* vertical text, center horizontally about x */
-	    DrawVerticalString(dpy, plot->pixmap, gc, X(x) - vchar / 2, Y(y) + sw, str, sl);
+	    DrawVerticalString(dpy, plot->pixmap, *current_gc, X(x) - vchar / 2, Y(y) + sw, str, sl);
 	} else {
 	    switch (plot->jmode) {
 	    case LEFT:
@@ -1491,11 +1497,13 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	    }
 	    /* horizontal text */
-	    XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
+	    XDrawString(dpy, plot->pixmap, *current_gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
 	}
 
+#ifdef EAM_OLD_CODE
 	/* restore line color */
 	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+#endif
     } else if (*buffer == 'F') {	/* fill box */
 	int style, xtmp, ytmp, w, h;
 

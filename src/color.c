@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.27 2002/02/25 03:10:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.29 2002/06/10 18:49:00 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -577,6 +577,7 @@ draw_color_smooth_box()
     /* write the colour box label */
     if (*CB_AXIS.label.text) {
 	unsigned int x, y;
+	apply_textcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
 	    x = (cb_x_from + cb_x_to) / 2 + CB_AXIS.label.xoffset * term->h_char;
 	    y = cb_y_from + (CB_AXIS.label.yoffset - 2.5) * term->v_char;
@@ -591,6 +592,7 @@ draw_color_smooth_box()
 	    } else {
 		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
 	    }
+	reset_textcolor(&(CB_AXIS.label.textcolor),term);
 	}
     }
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.116 2002/07/02 17:35:39 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.117 2002/07/20 14:56:29 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4796,7 +4796,8 @@ C ... and restart the table:
                  {at <position>}
                  {<justification>} {{no}rotate} {font "<name>{,<size>}"}
                  {front | back}
-                 {<pointstyle> {offset x, y}| nopoint}
+                 {textcolor <colorspec>}
+                 {point <pointstyle> {offset x, y} | nopoint}
        unset label {<tag>}
        show label
 
@@ -4836,9 +4837,20 @@ C ... and restart the table:
  `back` is given (the default), the label is written underneath the graphed
  data.  Using `front` will prevent a label from being obscured by dense data.
 
- If a style is given, using keywords `lw`, `pt` and `ps`, see `style`, a point
- with the given style and color of the given line type is plotted at the
- label position and the text of the label is displaced slightly.
+ `Textcolor <colorspec>` changes the color of the label text. `<colorspec>` is
+ either a linetype or a mapping onto the pm3d color palette (available only in
+ `splot`), see `help palette`.
+ `textcolor` may be abbreviated `tc`.
+ `tc default` resets the text color to its default state.
+ `tc lt <n>` sets the text color to that of line type <n>.
+ `tc palette z` selects a palette color corresponding to the label z position.
+ `tc palette cb <val>` selects a color corresponding to <val> on the colorbar axis.
+ `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
+ the mapping [0:1] to grays/colors of the `palette`.
+
+ If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see `style`, 
+ a point with the given style and color of the given line type is plotted at
+ the label position and the text of the label is displaced slightly.
  The displacement defaults to 1, 1 in `pointsize` units and can be
  controlled by the optional `offset x, y`. Example: `offset 2, -3` would
  displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
@@ -4890,7 +4902,11 @@ C ... and restart the table:
        set label 'b = %s*10^%S',par_b  at 30, 20
 
  To set a label displaced a little bit from a small point:
-       set label 'origin' at 0,0 lt 1 pt 2 ps 3 offset 1,-1
+       set label 'origin' at 0,0 point lt 1 pt 2 ps 3 offset 1,-1
+
+ To set a label whose color matches the z value (in this case 5.5) of some 
+ point on a 3D splot colored using pm3d:
+       set label 'text' at 0,0,5.5 tc palette z 
 
 3 linestyle
 ?commands set style line
@@ -6786,6 +6802,7 @@ C ... and restart the table:
 
  Syntax:
        set title {"<title-text>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
+                 {{textcolor | tc} {lt <line_type> | default}}
        show title
 
  Specifying constants <xoff> or <yoff> as optional offsets for the title will
@@ -6795,6 +6812,8 @@ C ... and restart the table:
 
  <font> is used to specify the font with which the title is to be written;
  the units of the font <size> depend upon which terminal is used.
+
+ `textcolor lt <n>` sets the text color to that of line type <n>.
 
  `set title` with no parameters clears the title.
 
@@ -7023,6 +7042,7 @@ C ... and restart the table:
 
  Syntax:
        set xlabel {"<label>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
+                  {{textcolor | tc} {lt <line_type> | default}}
        show xlabel
 
  The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
@@ -7036,6 +7056,8 @@ C ... and restart the table:
 
  <font> is used to specify the font in which the label is written; the units
  of the font <size> depend upon which terminal is used.
+
+ `textcolor lt <n>` sets the text color to that of line type <n>.
 
  To clear a label, put no options on the command line, e.g., "`set y2label`".
 

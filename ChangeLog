@@ -1,3 +1,11 @@
+2002-07-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* NEWS docs/gnuplot.doc src/color.c src/gadgets.c src/gadgets.h
+	src/gplt_x11.c src/graph3d.c src/graphics.c src/plot3d.c src/save.c
+	src/set.c src/show.c src/term.c src/win/wgraph.c term/cgm.trm
+	term/gd.trm term/mif.trm: Implementation of 'textcolor ...' for 
+	title, [x|y|z|cb|...]label and labels.
+
 2002-07-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS src/show.c docs/gnuplot.doc: New option 'add2history' for
@@ -745,7 +753,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/10 19:46:15 $).
+	last modification date (from the tag $Date: 2002/07/20 14:56:29 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

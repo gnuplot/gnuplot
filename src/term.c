@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.39 2002/02/15 17:15:12 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.40 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1515,7 +1515,7 @@ test_term()
 
     /* border linetype */
     (*t->linewidth) (1.0);
-    (*t->linetype) (-2);
+    (*t->linetype) (LT_BLACK);
     (*t->move) (0, 0);
     (*t->vector) (xmax_t - 1, 0);
     (*t->vector) (xmax_t - 1, ymax_t - 1);
@@ -1523,14 +1523,13 @@ test_term()
     (*t->vector) (0, 0);
     (void) (*t->justify_text) (LEFT);
     (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Terminal Test");
-    /* axis linetype */
-    (*t->linetype) (-1);
+    (*t->linetype) (LT_AXIS);
     (*t->move) (xmax_t / 2, 0);
     (*t->vector) (xmax_t / 2, ymax_t - 1);
     (*t->move) (0, ymax_t / 2);
     (*t->vector) (xmax_t - 1, ymax_t / 2);
     /* test width and height of characters */
-    (*t->linetype) (-2);
+    (*t->linetype) (LT_BLACK);
     (*t->move) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 - t->v_char / 2);

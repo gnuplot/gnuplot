@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.42 2002/06/10 18:53:00 mikulik Exp $
+ * $Id: cgm.trm,v 1.43 2002/06/16 12:07:40 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -862,6 +862,8 @@ CGM_linecolor(linecolor)
 
     CGM_flush_polyline();
     CGM_write_int_record(5, 4, 2, (int *) &cgm_color);
+    /* EAM - set text color to same as line color */
+    CGM_write_int_record(5, 14, 2, (int *) &cgm_color);
 }
 
 TERM_PUBLIC void
@@ -988,6 +990,14 @@ TERM_PUBLIC void CGM_set_color(gray)
     if (cgm_next.fill_color >= cgm_smooth_colors)
 	cgm_smooth_colors = cgm_smooth_colors - 1;
     cgm_next.fill_color += 1 + CGM_COLORS;
+    /* EAM - force color immediately so that lines and text can use it */
+    if (cgm_color != cgm_next.fill_color) {
+	cgm_color = cgm_next.fill_color;
+	cgm_linetype = cgm_color;
+    	CGM_flush_polyline();
+    	CGM_write_int_record(5,  4, 2, (int *) &cgm_color);
+    	CGM_write_int_record(5, 14, 2, (int *) &cgm_color);
+    }
 }
 
 TERM_PUBLIC void CGM_filled_polygon(points, corner)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.41 2002/03/09 22:41:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.42 2002/04/21 13:50:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -63,6 +63,7 @@ static void save_position __PROTO((FILE *, struct position *));
 static void save_range __PROTO((FILE *, AXIS_INDEX));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
+static void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
 
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
@@ -395,15 +396,15 @@ set y2data%s\n",
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	fprintf(fp, " %s", (this_label->layer==0) ? "back" : "front");
-	if (this_label->lp_properties.pointflag)
+	save_textcolor(fp, &(this_label->textcolor));
+	if (this_label->lp_properties.pointflag == 0)
 	    fprintf(fp, " nopoint");
 	else {
-	    fprintf(fp, " linetype %d pointtype %d offset %f,%f",
+	    fprintf(fp, " point with color of linetype %d pointtype %d offset %g,%g",
 		this_label->lp_properties.l_type+1,
 		this_label->lp_properties.p_type+1,
 		this_label->hoffset, this_label->voffset);
 	}
-	/* Entry font added by DJL */
 	fputc('\n', fp);
     }
     fputs("unset arrow\n", fp);
@@ -767,7 +768,9 @@ set ticscale %g %g\n",
 	fprintf(fp, "set %s%s \"%s\" %f,%f ",		\
 		name, suffix, conv_text(lab.text),	\
 		lab.xoffset, lab.yoffset);		\
-  fprintf(fp, " \"%s\"\n", conv_text(lab.font)); \
+	fprintf(fp, " font \"%s\"", conv_text(lab.font)); \
+	save_textcolor(fp, &(lab.textcolor)); \
+	fprintf(fp, "\n"); \
 }
 
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
@@ -1014,4 +1017,22 @@ save_zeroaxis(fp, axis)
 	    axis_array[axis].zeroaxis.l_type + 1,
 	    axis_array[axis].zeroaxis.l_width);
 
+}
+
+static void
+save_textcolor( FILE *fp, const struct t_colorspec *tc )
+{
+    if (tc->type) {
+    	fprintf(fp, " textcolor");
+	switch(tc->type) {
+	case TC_LT:   fprintf(fp," lt %d", tc->lt+1); 
+		      break;
+	case TC_Z:    fprintf(fp," palette z", tc->value);
+		      break;
+	case TC_CB:   fprintf(fp," palette cb %g", tc->value);
+		      break;
+	case TC_FRAC: fprintf(fp," palette fraction %4.2f", tc->value);
+		      break;
+	}
+    }
 }

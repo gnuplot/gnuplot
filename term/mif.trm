@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.18 2000/11/01 18:57:34 broeker Exp $
+ * $Id: mif.trm,v 1.19 2002/07/04 16:37:00 mikulik Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -85,6 +85,7 @@
  *      Changed mechanism for pen pattern selection.    kssingvo@immd4.informatik.uni-erlangen.de
  *      Support for vertical text.                      kssingvo@immd4.informatik.uni-erlangen.de
  *      Fixed plot bug for "set size XS,YS", XS/YS > 1. olof@fysik4.kth.se
+ *	Support colored text				merritt@u.washington.edu
  *
  */
 
@@ -161,6 +162,7 @@ static struct mif_line {	/* Line point structure specification */
 /** Drawing properties **/
 static char mif_justify[64];	/* How to justify the used text */
 static char mif_pen[64], mif_pen_width[64], mif_separation[64];		/* How to plot */
+static char mif_textcolor[64];	/* EAM parallels separation */
 
 #define MIF_TEXT_HOR  0
 #define MIF_TEXT_VER  1
@@ -393,8 +395,9 @@ int np;
 	MIF_justify_text(CENTRE);
 
 	/* Draw the point */
-	fprintf(gpoutfile, "\t<TextLine <GroupID %d>\n",
-		MIF_PEN_TO_GROUP(mif_pentype));
+	fprintf(gpoutfile, "\t<TextLine <GroupID %d> %s\n",
+		MIF_PEN_TO_GROUP(mif_pentype),
+		mif_textcolor);
 
 	MIF_set_font(mif_point[np].font);
 
@@ -628,11 +631,17 @@ int linetype;
 		    sprintf(mif_separation, " <Separation 0> ");
 	    }
 	    sprintf(mif_pen_width, " <PenWidth 1.0 pt> ");
+	    /* EAM - set text color to black */
+	    sprintf(mif_textcolor, " <Font <FSeparation 0>> ");
 	} else {		/* Normal lines */
 	    mif_pentype = (linetype) % MIF_NPENS;	/* 0-(MIF_NPENS-1) */
 	    sprintf(mif_pen_width, " <PenWidth 0.1 pt> ");
 	    if (mif_colour == TRUE)
 		sprintf(mif_separation, " <Separation %d> ",
+			2 + (mif_pentype % 6));	/* 2-7 */
+	    /* EAM - set text color also */
+	    if (mif_colour == TRUE)
+		sprintf(mif_textcolor, " <Font <FSeparation %d>> ",
 			2 + (mif_pentype % 6));	/* 2-7 */
 	}
 
@@ -762,9 +771,9 @@ const char str[];
 	if (strlen(str) > 0) {
 
 	    /* Draw the text */
-	    fprintf(gpoutfile, "\t<TextLine <GroupID %d> %s %s %s\n",
+	    fprintf(gpoutfile, "\t<TextLine <GroupID %d> %s %s %s %s\n",
 		    MIF_PEN_TO_GROUP(mif_pentype), mif_pen,
-		    mif_pen_width, mif_separation);
+		    mif_pen_width, mif_separation, mif_textcolor);
 
 	    MIF_set_font(zgnuplot);
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.83 2002/03/26 09:42:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.84 2002/03/30 13:15:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,6 +47,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.83 2002/03/26 09:42:43 mikul
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
+#include "gadgets.h"
 #include "gp_time.h"
 #include "hidden3d.h"
 #include "misc.h"
@@ -150,6 +151,7 @@ static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void free_marklist __PROTO((struct ticmark * list));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
+static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
 
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
@@ -1654,8 +1656,9 @@ set_label()
     int tag;
     TBOOLEAN set_text = FALSE, set_position = FALSE, set_just = FALSE,
 	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
-	set_layer = FALSE;
+	set_layer = FALSE, set_textcolor = FALSE;
     int layer = 0;
+    t_colorspec textcolor = {0,0,0.0};
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     float hoff = 1.0;
     float voff = 1.0;
@@ -1678,6 +1681,8 @@ set_label()
 	&& !almost_equals(c_token, "linet$ype")
 	&& !equals(c_token, "pt")
 	&& !almost_equals(c_token, "pointt$ype")
+	&& !equals(c_token, "tc")
+	&& !almost_equals(c_token, "text$color")
 	&& !equals(c_token, "font")) {
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
@@ -1780,11 +1785,8 @@ set_label()
 	}
     
 	if (loc_lp.pointflag == -2) {
-	    /* read point type */
-	    /* FIXME HBB 20011120: should probably have a keyword
-	     * "point" required before the actual lp-style spec, for
-	     * clarity and better parsing */
-	    int stored_token = c_token;
+	    if (almost_equals(c_token, "po$int")) {
+		int stored_token = ++c_token;
 	    struct lp_style_type tmp_lp;
 	    
 	    lp_parse(&tmp_lp, 0, 1, -2, -2);
@@ -1793,9 +1795,9 @@ set_label()
 		loc_lp.pointflag = 1;
 		if (loc_lp.p_type < -1)
 		    loc_lp.p_type = 0;
+		} 
 		continue;
 	    } else if (almost_equals(c_token, "nopo$int")) {
-		/* didn't look like a pointstyle... */
 		loc_lp.pointflag = 0;
 		c_token++;
 		continue;
@@ -1805,24 +1807,31 @@ set_label()
 	if (! set_offset && almost_equals(c_token, "of$fset")) {
 	    c_token++;
 	    if (END_OF_COMMAND)
-		int_error(c_token, "Expected horizontal offset");
+		int_error(c_token, "expected horizontal offset");
 	    hoff = real(const_express(&a));
 
 	    if (!equals(c_token, ","))
-		int_error(c_token, "Expected comma");
+		int_error(c_token, "expected comma");
 
 	    c_token++;
 	    if (END_OF_COMMAND)
-		int_error(c_token, "Expected vertical offset");
+		int_error(c_token, "expected vertical offset");
 	    voff = real(const_express(&a));
 	    set_offset = TRUE;
+	    continue;
+	}
+
+	if ((equals(c_token,"tc") || almost_equals(c_token,"text$color"))
+	    && ! set_textcolor ) {
+	    parse_colorspec( &textcolor, TC_Z );
+	    set_textcolor = TRUE;
 	    continue;
 	}
 
 	/* Coming here means that none of the previous 'if's struck
 	 * its "continue" statement, i.e.  whatever is in the command
 	 * line is forbidden by the command syntax. */
-	int_error(c_token, "extraenous or contradicting arguments in set label");
+	int_error(c_token, "extraneous or contradicting arguments in set label");
 
     } /* while(!END_OF_COMMAND) */
 
@@ -1857,6 +1866,9 @@ set_label()
 	    this_label->layer = layer;
 	if (set_font)
 	    this_label->font = font;
+	if (set_textcolor) {
+	    memcpy(&(this_label->textcolor), &textcolor, sizeof(t_colorspec));
+	}
 	if (loc_lp.pointflag >= 0)
 	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
 	if (set_offset) {
@@ -1878,12 +1890,17 @@ set_label()
 	new_label->rotate = rotate;
 	new_label->layer = layer;
 	new_label->font = font;
+	memcpy(&(new_label->textcolor), &textcolor, sizeof(t_colorspec));
 	if (loc_lp.pointflag == -2)
 	    loc_lp.pointflag = 0;
 	memcpy(&(new_label->lp_properties), &loc_lp, sizeof(loc_lp));
 	new_label->hoffset = hoff;
 	new_label->voffset = voff;
+	this_label = new_label;
     }
+    /* EAM - make sure the z coord and the z-coloring agree */
+    if (this_label->textcolor.type == TC_Z) 
+	this_label->textcolor.value = this_label->place.z;
 }
 
 
@@ -1936,7 +1953,7 @@ set_loadpath()
 	    free(ss);
 	    ++c_token;
 	} else {
-	    int_error(c_token, "Expected string");
+	    int_error(c_token, "expected string");
 	}
     }
     if (collect) {
@@ -1960,7 +1977,7 @@ set_locale()
 	free(ss);
 	++c_token;
     } else {
-	int_error(c_token, "Expected string");
+	int_error(c_token, "expected string");
     }
 }
 
@@ -2084,7 +2101,7 @@ set_missing()
 	missing_val = NULL;
     } else {
 	if (!isstring(c_token))
-	    int_error(c_token, "Expected missing-value string");
+	    int_error(c_token, "expected missing-value string");
 	m_quote_capture(&missing_val, c_token, c_token);
 	c_token++;
     }
@@ -3378,7 +3395,9 @@ label_struct *label;
     if (END_OF_COMMAND)
 	return;
 
-    if (!almost_equals(c_token, "font") && !isstring(c_token)) {
+    if (!almost_equals(c_token, "font") 
+    &&  !almost_equals(c_token, "text$color") && !equals(c_token,"tc")
+    &&  !isstring(c_token)) {
 	/* We have x,y offsets specified */
 	struct value a;
 	if (!equals(c_token, ","))
@@ -3399,12 +3418,20 @@ label_struct *label;
 
     if (almost_equals(c_token, "f$ont"))
 	++c_token;		/* skip it */
+    if (isstring(c_token)) {  
+	quote_str(label->font, c_token, MAX_LINE_LEN);
+	c_token++;
+    }
+    if (END_OF_COMMAND)
+	return;
 
-    if (!isstring(c_token))
-	int_error(c_token, "Expected font");
+    /* EAM - allow to set textcolor lt <n>, but not cb frac or z */
+    if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+	parse_colorspec( &(label->textcolor), TC_LT );
+    }
 
-    quote_str(label->font, c_token, MAX_LINE_LEN);
-    c_token++;
+    if (!END_OF_COMMAND) 
+    	int_error(c_token,"unexpected or unrecognized option");
 }
 
 
@@ -3764,7 +3791,7 @@ struct position *pos;
     pos->scalex = type;
     GET_NUMBER_OR_TIME(pos->x, axes, FIRST_X_AXIS);
     if (!equals(c_token, ","))
-	int_error(c_token, "Expected comma");
+	int_error(c_token, "expected comma");
     ++c_token;
     get_position_type(&type, &axes);
     pos->scaley = type;
@@ -3876,4 +3903,67 @@ fill_numbers_into_string(pattern)
     strcpy(output + output_end, pattern);
     free(pattern);
     return output;
+}
+
+/*
+ * EAM - July 2002
+ * Parse the sub-options of text color specification
+ *   { def$ault | lt <linetype> | pal$ette { cb <val> | frac$tion <val> | z }
+ * The ordering of alternatives shown in the line above is kept in the symbol definitions
+ * TC_DEFAULT TC_LT TC_CB TC_FRAC TC_Z  (0 1 2 3 4)
+ * and the "options" parameter to parse_colorspec limits legal input to the
+ * corresponding point in the series. So TC_LT allows only default or linetype
+ * coloring, while TC_Z allows all coloring options up to and including pal z
+ */
+static void
+parse_colorspec( struct t_colorspec *tc, int options )
+{
+    struct value a;
+
+    c_token++;
+    if (END_OF_COMMAND)
+    	int_error(c_token, "expected colorspec");
+    if (almost_equals(c_token,"def$ault")) {
+	c_token++;
+	tc->type = TC_DEFAULT;
+    } else if (equals(c_token,"lt")) {
+    	c_token++;
+    	if (END_OF_COMMAND)
+    	    int_error(c_token, "expected linetype");
+	tc->type = TC_LT;
+    	tc->lt = (int)real(const_express(&a))-1;
+    } else if (options <= TC_LT) {
+        tc->type = TC_DEFAULT;
+	int_error(c_token, "only tc lt <n> possible here");
+    } else if (almost_equals(c_token,"pal$ette")) {
+    	c_token++;
+    	if (END_OF_COMMAND)
+    	    int_error(c_token, "expected colorspec");
+	if (equals(c_token,"cb")) {
+	    tc->type = TC_CB;
+    	    c_token++;
+    	    if (END_OF_COMMAND)
+    		int_error(c_token, "expected cb value");
+    	    tc->value = real(const_express(&a));
+	} else if (almost_equals(c_token,"frac$tion")) {
+	    tc->type = TC_FRAC;
+    	    c_token++;
+    	    if (END_OF_COMMAND)
+    		int_error(c_token, "expected palette fraction");
+    	    tc->value = real(const_express(&a));
+	    if (tc->value < 0. || tc->value > 1.0) 
+    		int_error(c_token, "palette fraction out of range");
+	} else if (equals(c_token,"z")) {
+	    /* The actual z value is not yet known, fill it in later */
+	    if (options >= TC_Z) {
+		tc->type = TC_Z;
+	    } else {
+		tc->type = TC_DEFAULT;
+		int_error(c_token, "palette z not possible here");
+	    }
+    	    c_token++;
+	}
+    } else {
+    	int_error(c_token, "textcolor colorspec not recognized");
+    }
 }

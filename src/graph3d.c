@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.64 2002/03/26 20:31:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.65 2002/04/27 08:07:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -482,6 +482,10 @@ place_labels3d(layer)
 	if (this_label->layer != layer)
 	    continue;
 	map3d_position(&this_label->place, &x, &y, "label");
+
+	/* EAM - textcolor support in progress */
+	apply_textcolor(&(this_label->textcolor),t);
+
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x + htic, y + vtic, this_label->text,
 			    this_label->pos, CENTRE, 1, this_label->font);
@@ -666,9 +670,11 @@ do_3dplot(plots, pcount, quick)
 
     /* PLACE TITLE */
     if (*title.text != 0) {
+	apply_textcolor(&(title.textcolor),t);
 	write_multiline((unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char),
 			(unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char)),
 			title.text, CENTRE, JUST_TOP, 0, title.font);
+	reset_textcolor(&(title.textcolor),t);
     }
 
     /* PLACE TIMEDATE */
@@ -861,9 +867,12 @@ do_3dplot(plots, pcount, quick)
 
 
 	    if (lkey) {
+	    	/* EAM - force key text to black, then restore */
+		(*t->linetype)(LT_BLACK);
 		ignore_enhanced_text = this_plot->title_no_enhanced == 1;
 		key_text(xl, yl, this_plot->title);
 		ignore_enhanced_text = 0;
+		term_apply_lp_properties(&(this_plot->lp_properties));
 	    }
 
 	    switch (this_plot->plot_style) {
@@ -1026,7 +1035,10 @@ do_3dplot(plots, pcount, quick)
 		if (key != KEY_NONE && this_plot->title && this_plot->title[0]
 		    && !draw_surface && !label_contours) {
 		    /* unlabelled contours but no surface : put key entry in now */
+		    /* EAM - force key text to black, then restore */
+		    (*t->linetype)(LT_BLACK);
 		    key_text(xl, yl, this_plot->title);
+		    term_apply_lp_properties(&(thiscontour_lp_properties));
 
 		    switch (this_plot->plot_style) {
 		    case IMPULSES:
@@ -1087,6 +1099,11 @@ do_3dplot(plots, pcount, quick)
 		}
 		while (cntrs) {
 		    if (label_contours && cntrs->isNewLevel) {
+		    	if (key != KEY_NONE) {
+			    /* EAM - force key text to black */
+			    (*t->linetype)(LT_BLACK);
+			    key_text(xl, yl, cntrs->label);
+			}
 #ifdef PM3D
 			if (use_palette)
 			    set_color( z2cb( cb2gray(cntrs->z) ) );
@@ -1095,8 +1112,6 @@ do_3dplot(plots, pcount, quick)
 			    (*t->linetype) (++thiscontour_lp_properties.l_type);
 
 			if (key != KEY_NONE) {
-
-			    key_text(xl, yl, cntrs->label);
 
 			    switch (this_plot->plot_style) {
 			    case IMPULSES:
@@ -2199,10 +2214,12 @@ draw_3d_graphbox(plot, plot_num)
 	    TERMCOORD(&v1, x1, y1);
 	    x1 += X_AXIS.label.xoffset * t->h_char;
 	    y1 += X_AXIS.label.yoffset * t->v_char;
-	    /* write_multiline mods it */
+
+	    apply_textcolor(&(X_AXIS.label.textcolor),t);
 	    write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
 			    X_AXIS.label.font);
+	    reset_textcolor(&(X_AXIS.label.textcolor),t);
 #ifdef PM3D
 	    }
 #endif
@@ -2249,9 +2266,11 @@ draw_3d_graphbox(plot, plot_num)
 		if (pm3d.map)
 		    (*t->text_angle)(1);
 #endif
+		apply_textcolor(&(Y_AXIS.label.textcolor),t);
 		write_multiline(x1, y1, Y_AXIS.label.text,
 				CENTRE, JUST_TOP, 0,
 				Y_AXIS.label.font);
+		reset_textcolor(&(Y_AXIS.label.textcolor),t);
 #ifdef PM3D
 		if (pm3d.map)
 		    (*t->text_angle)(0);
@@ -2312,9 +2331,11 @@ draw_3d_graphbox(plot, plot_num)
 	x += Z_AXIS.label.xoffset * t->h_char;
 	y += Z_AXIS.label.yoffset * t->v_char;
 
+	apply_textcolor(&(Z_AXIS.label.textcolor),t);
 	write_multiline(x, y, Z_AXIS.label.text,
 			CENTRE, CENTRE, 0,
 			Z_AXIS.label.font);
+	reset_textcolor(&(Z_AXIS.label.textcolor),t);
     }
 }
 

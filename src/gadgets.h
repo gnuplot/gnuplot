@@ -49,6 +49,12 @@
 
 /* #if... / #include / #define collection: */
 
+/* Default line type is LT_BLACK; reset to this after changing colors */
+#define LT_AXIS       (-1)
+#define LT_BLACK      (-2)
+#define LT_BACKGROUND (-3)
+
+
 /* Type definitions */
 
 /* Coordinate system specifications: x1/y1, x2/y2, graph-box relative
@@ -67,6 +73,18 @@ typedef struct position {
     double x,y,z;
 } t_position;
 
+/* Generalized pm3d-compatible color specifier,
+ * currently used only for setting text color  */
+typedef struct t_colorspec {
+    int type;			/* TC_<type> definitions below */
+    int lt;			/* holds lt    if type==1 */
+    double value;		/* holds value if type>1  */
+} t_colorspec;
+#define	TC_DEFAULT	0
+#define	TC_LT		1
+#define	TC_CB		2
+#define	TC_FRAC		3
+#define	TC_Z		4
 
 /* Linked list of structures storing 'set label' information */
 typedef struct text_label {
@@ -78,6 +96,7 @@ typedef struct text_label {
     int layer;
     char *text;
     char *font;			/* Entry font added by DJL */
+    struct t_colorspec textcolor;
     struct lp_style_type lp_properties;
     double hoffset;
     double voffset;
@@ -134,8 +153,9 @@ typedef struct {
     char text[MAX_LINE_LEN+1];
     char font[MAX_LINE_LEN+1];
     double xoffset, yoffset;
+    struct t_colorspec textcolor;
 } label_struct;
-#define EMPTY_LABELSTRUCT {"", "", 0.0, 0.0}
+#define EMPTY_LABELSTRUCT {"", "", 0.0, 0.0,{0,0,0.0}}
 
 #ifdef PM3D
 typedef struct {

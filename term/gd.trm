@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.8 2002/07/09 07:31:33 mikulik Exp $
+ * $Id: gd.trm,v 1.9 2002/07/10 19:26:04 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -936,12 +936,12 @@ PNG_vector(unsigned int x, unsigned int y)
 	/* EAM - Implement linewidth by selecting a pre-defined brush */
 	/* The tricky bit is re-coloring the brush to the current color */
 	lw   = png_state.linewidth;
-	rgb  = png_state.rgb_table[png_state.linetype+3];
-	if (rgb != PNG_brush[lw].last_rgb) {
-	    PNG_brush[lw].fgnd = gdImageColorAllocate(PNG_brush[lw].im, 
-	    	(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
-	    PNG_brush[lw].last_rgb = rgb;
-	    /* EAM fprintf(stderr,"PNG driver - reset brush %d to color %d\n",lw,rgb); */
+	if (png_state.color != PNG_brush[lw].last_rgb) {
+	    PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
+	    	gdImageRed(png_state.image,png_state.color),
+	    	gdImageGreen(png_state.image,png_state.color),
+	    	gdImageBlue(png_state.image,png_state.color) );
+	    PNG_brush[lw].last_rgb = png_state.color;
 	}
     	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
 	gdImageSetBrush(png_state.image, PNG_brush[lw].im);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.78 2002/04/29 13:37:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.79 2002/07/20 14:56:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1587,10 +1587,23 @@ int tag;			/* 0 means show all */
 	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if (this_label->font != NULL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
+	    if (this_label->textcolor.type) {
+	    	fprintf(stderr, " textcolor");
+		switch(this_label->textcolor.type) {
+		case TC_LT:   fprintf(stderr," lt %d", this_label->textcolor.lt+1); 
+			      break;
+		case TC_Z:    fprintf(stderr," palette z", this_label->textcolor.value);
+			      break;
+		case TC_CB:   fprintf(stderr," palette cb %g", this_label->textcolor.value);
+			      break;
+		case TC_FRAC: fprintf(stderr," palette fraction %4.2f", this_label->textcolor.value);
+			      break;
+		}
+	    }
 	    if (this_label->lp_properties.pointflag == 0)
-		fprintf(stderr, "nopoint");
+		fprintf(stderr, " nopoint");
 	    else {
-		fprintf(stderr, "point with color of linetype %d pointtype %d offset %f,%f",
+		fprintf(stderr, " point with color of linetype %d pointtype %d offset %g,%g",
 		    this_label->lp_properties.l_type+1,
 		    this_label->lp_properties.p_type+1,
 		    this_label->hoffset, this_label->voffset);
@@ -2295,6 +2308,9 @@ label_struct *label;
 
     if (label->font[0])
 	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
+
+    if (label->textcolor.type == TC_LT)
+    	fprintf(stderr,", textcolor lt %d", label->textcolor.lt+1);
 
     putc('\n', stderr);
 }

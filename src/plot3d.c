@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.53 2002/07/03 08:47:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.54 2002/07/11 10:24:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -302,20 +302,42 @@ double h;
 
 #ifdef PM3D
 
+/* Set flag plot_has_palette to 1 if there is any element on the graph 
+ * which requires palette of continuous colors.
+ */
 static void
 set_plot_with_palette(int plot_num)
 {
     struct surface_points *this_plot = first_3dplot;
     int surface = 0;
+    struct text_label *this_label = first_label;
     plot_has_palette = 1;
+    /* Is pm3d switched on globally? */
     if (pm3d.where[0])
 	return;
+    /* Any surface 'with pm3d' or 'with line|dot palette'? */
     while (surface < plot_num) {
 	if (this_plot->lp_properties.use_palette)
 	    return;
 	this_plot = this_plot->next_sp;
 	surface++;
     }
+    /* Any label with 'textcolor palette'? */
+#define TC_USES_PALETTE(tctype) (tctype==TC_Z) || (tctype==TC_CB) || (tctype==TC_FRAC)
+    for (; this_label != NULL; this_label = this_label->next) {
+	if (TC_USES_PALETTE(this_label->textcolor.type))
+	    return;
+    }
+    /* Any of title, xlabel, ylabel, zlabel, ... with 'textcolor palette'? */
+    if (TC_USES_PALETTE(title.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[FIRST_X_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[FIRST_Y_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[FIRST_Z_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[COLOR_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[SECOND_X_AXIS].label.textcolor.type)) return;
+    if (TC_USES_PALETTE(axis_array[SECOND_Y_AXIS].label.textcolor.type)) return;
+#undef TC_USES_PALETTE
+    /* Palette with continuous colors is not used. */
     plot_has_palette = 0;
 }
 
