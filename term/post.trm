@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.135 2004/11/27 02:38:38 sfeam Exp $
+ * $Id: post.trm,v 1.136 2004/11/28 02:02:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2731,7 +2731,7 @@ write_color_space(t_sm_palette *palette)
 {
     /* write something like
      *   /ColorSpace (HSV) def
-     * depending on the selcted cmodel in palette */
+     * depending on the selected cmodel in palette */
     fputs("/ColorSpace ", gpoutfile);
     switch(palette->cmodel) {
     case C_MODEL_RGB:

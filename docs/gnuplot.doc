@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.263 2004/11/11 14:44:23 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.265 2004/11/28 05:56:42 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1739,7 +1739,7 @@ C ... and restart the table:
 ?substitution macros
 ?macros
  Substitution of command line macros is disabled by default, but may be
- enabled using the `set macros` command.  If macro substitution is enables,
+ enabled using the `set macros` command.  If macro substitution is enabled,
  the character @ is used to trigger substitution of the current value of a
  string variable into the command line. The text in the string variable may
  contain any number of lexical elements.  This allows string variables to be

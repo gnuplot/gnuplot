@@ -1,3 +1,7 @@
+2004-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm docs/Changes.doc: Typos.
+
 2004-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pm.trm src/os2/gclient.c: Changes for the new colorspec type
