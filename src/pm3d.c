@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.49 2004/11/22 00:43:05 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.50 2004/12/21 08:09:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -673,8 +673,8 @@ pm3d_draw_one(struct surface_points *plot)
     }
 
     /* for pm3dCompress.awk */
-    if (postscript_gpoutfile)
-	fprintf(gpoutfile, "%%pm3d_map_begin\n");
+    if (gppsfile)
+	fprintf(gppsfile, "%%pm3d_map_begin\n");
 
     for (; where[i]; i++) {
 	pm3d_plot(plot, where[i]);
@@ -695,8 +695,8 @@ pm3d_draw_one(struct surface_points *plot)
     }
 
     /* for pm3dCompress.awk */
-    if (postscript_gpoutfile)
-	fprintf(postscript_gpoutfile, "%%pm3d_map_end\n");
+    if (gppsfile)
+	fprintf(gppsfile, "%%pm3d_map_end\n");
 }
 
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.45 2004/09/16 00:22:30 sfeam Exp $
+ * $Id: pslatex.trm,v 1.46 2004/11/27 02:38:38 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -302,7 +302,7 @@ Turning off auxfile option\n", outstr);
 
 #ifdef PM3D
     /* to optimize output for postscript terminals family */
-    postscript_gpoutfile = (PSLATEX_auxfile == NULL) ? gpoutfile : PSLATEX_auxfile;
+    gppsfile = (PSLATEX_auxfile == NULL) ? gpoutfile : PSLATEX_auxfile;
 #endif
 
     PSLATEX_angle = 0;

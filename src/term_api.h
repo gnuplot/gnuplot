@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.39 2004/12/31 23:02:46 sfeam Exp $
+ * $Id: term_api.h,v 1.40 2005/01/04 19:45:00 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -292,20 +292,20 @@ extern int curr_arrow_headfilled;
 extern char *outstr;
 extern FILE *gpoutfile;
 
-#ifdef PM3D
+#if defined(PM3D) || defined(WITH_IMAGE)
 /* Output file where the PostScript output goes to.
    In particular:
-	postscript_gpoutfile == gpoutfile
+	gppsfile == gpoutfile
 		for 'set term': postscript, pstex
-	postscript_gpoutfile == PSLATEX_auxfile
+	gppsfile == PSLATEX_auxfile
 		for 'set term': pslatex
-	postscript_gpoutfile == 0
+	gppsfile == 0
 		for all other terminals
    It is non-zero for for the family of postscript terminals, thus making
    this a unique check for postscript output (pm3d has some code optimized
    for PS, for instance).
 */
-extern FILE *postscript_gpoutfile;
+extern FILE *gppsfile;
 #endif
 
 extern TBOOLEAN multiplot;

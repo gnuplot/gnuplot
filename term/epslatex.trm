@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epslatex.trm,v 1.27 2004/09/16 00:22:29 sfeam Exp $
+ * $Id: epslatex.trm,v 1.28 2004/10/19 00:24:08 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -741,14 +741,9 @@ Gpdict begin\n\
 \\begingroup\n\
 \\setlength{\\unitlength}{%.4fbp}%%\n", name, 1.0 / EPSL_SC);
     }
-#ifdef PM3D
+#if defined(PM3D) || defined(WITH_IMAGE)
     /* to optimize output for postscript terminals family */
-    postscript_gpoutfile = gpoutfile;
-#else
-#ifdef WITH_IMAGE
-    /* to optimize output for postscript terminals family */
-    postscript_gpoutfile = gpoutfile;
-#endif
+    gppsfile = gpoutfile;
 #endif
 }
 
