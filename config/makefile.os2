@@ -4,7 +4,7 @@
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
 #
-# last modification date: 19990312
+# last modification date: 19990510
 #
 
 # We depend on using cmd.exe (or a compatible one)
@@ -34,6 +34,7 @@ VESA=1
 
 # GNU_ReadLine support
 # requires GNU readline library (static or DLL; not part of gnuplot)
+# May fail in an xterm under XFree/2
 # GNU_RL=1
 
 # DEBUGging support
@@ -80,9 +81,9 @@ M=../demo/
 #
 
 OS2DIR  = os2
-DOCDIR  = ../docs
-DEMODIR = ../demo
-TERMDIR = ../term
+DOCDIR  = ..\docs
+DEMODIR = ..\demo
+TERMDIR = ..\term
 
 OS2TERMS= $(TERMDIR)\pm.trm
 ifdef X11
@@ -131,14 +132,14 @@ CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt
 LFLAGS  = -g -Zmt
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall              -O0 -Zmt -Zomf
 LFLAGS2 = -g -Zmt -Zsys -Zomf
-CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
+CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -I.
 LFLAGS3 = -g
 else
 CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O3 -m486 -Wall -Wno-unused -Wno-comment -Zmt
 LFLAGS  = -s -Zmt -Zcrtdll
 CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O3 -m486 -Wall -Wno-unused              -Zmt -Zomf
 LFLAGS2 = -s -Zmt -Zcrtdll -Zomf
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment -I.
 LFLAGS3 = -s
 endif
 
@@ -298,7 +299,7 @@ doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
 
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
-	cd $(TERMDIR) & type *.trm > ..\$@
+	cd $(TERMDIR) & type *.trm > $@
 doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERMS)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
 doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
@@ -342,16 +343,20 @@ clean:
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
-	IF EXIST *.exe.exe               DEL gnuplot.exe
+	IF EXIST *.exe                   DEL *.exe         
 	IF EXIST gnupmdrv.hlp            DEL gnupmdrv.hlp
 	IF EXIST gnuplot.gih             DEL gnuplot.gih
 	IF EXIST gnuplot.inf             DEL gnuplot.inf
 	IF EXIST gnuplot.dvi             DEL gnuplot.dvi
-	IF EXIST gnuplot.htm             DEL gnuplot.htm
+	IF EXIST gnuplot.html            DEL gnuplot.html
 	IF EXIST gnuplot.tex             DEL gnuplot.tex
-	IF EXIST gnuplot.texi            DEL gnuplot.texi
 	IF EXIST gnuplot.info            DEL gnuplot.info
 	IF EXIST gnuplot.ms              DEL gnuplot.ms
 	IF EXIST gnuplot.rtf             DEL gnuplot.rtf
 	IF EXIST gnuplot.ps              DEL gnuplot.ps
+	IF EXIST gpcard*.ps              DEL gpcard*.ps
+	cd $(DOCDIR)  & IF EXIST *.dvi   DEL *.dvi
+	cd $(DOCDIR)  & IF EXIST *.log   DEL *.log
+	cd $(DOCDIR)  & IF EXIST *.aux   DEL *.aux
+	cd $(DOCDIR)  & IF EXIST *.toc   DEL *.toc
 	cd $(DEMODIR) & IF EXIST binary? DEL binary?
