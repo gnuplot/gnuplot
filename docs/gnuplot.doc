@@ -4544,7 +4544,8 @@ C ... and restart the table:
 ?set missing
 ?missing
  The `set missing` command allows you to tell `gnuplot` what character is
- used in a data file to denote missing data.
+ used in a data file to denote missing data.  Exactly how this missing value
+ will be treated depends on the `using` specifier on the {`s`}`plot` command.
 
  Syntax:
        set missing {"<character>"}
@@ -4552,18 +4553,43 @@ C ... and restart the table:
 
  Example:
        set missing "?"
+       set data style lines
+       plot '-'
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
+       plot '-' using 1:2
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
+       plot '-' using 1:($2)
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
 
- would mean that, when plotting a file containing
+ The first `plot` will recognize only the first datum in the "3 ?" line.  It
+ will use the single-datum-on-a-line convention that the line number is "x"
+ and the datum is "y", so the point will be plotted (in this case erroneously)
+ at (2,3).
 
-          1 1
-          2 ?
-          3 2
+ The second `plot` will correctly ignore the middle line.  The plotted line
+ will connect the points at (2,20) and (4,40).
 
- the middle line would be ignored.
+ The third `plot` will also correctly ignore the middle line, but the plotted
+ line will not connect the points at (2,20) and (4,40).
 
  There is no default character for `missing`.
 3 multiplot
-?commands set multiplot
+
 ?commands set nomultiplot
 ?set multiplot
 ?set nomultiplot
