@@ -1,3 +1,7 @@
+2004-03-18  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* term/dumb.trm: Fix segfault on 'unset output' while in dumb terminal.
+
 2004-03-15  Hans-Bernhard Broeker  <broeker@ac3b07.physik.rwth-aachen.de>
 
 	* src/axis.c (load_range): Un-set 'reverse' option if fixed range
