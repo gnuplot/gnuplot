@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.17 1999/06/25 17:07:54 lhecking Exp $
+ * $Id: fig.trm,v 1.18 1999/08/24 11:24:53 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -696,7 +696,7 @@ const char *str;
 	    (float) term->h_char * strlen(str),
 	    FIG_xoff + x, term->ymax + FIG_yoff - y, output_string);
 
-    free(outstr);
+    free(output_string);
 }
 
 TERM_PUBLIC int
