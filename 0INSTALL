@@ -1,243 +1,132 @@
-For the impatient...
+Installation
+************
 
-first, tune term.h to choose which terminal drivers you wish to enable.
+   This document is divided into five parts: the first part (For the
+impatient) provides a quick overview of configuration and compilation
+instructions.  It also lists those options to the configure shell script
+which are unique to gnuplot.  Part two describes the environment variables
+used by gnuplot.  Part three (Basic Installation) describes generic
+installation instructions, which are common between most packages using
+GNU autoconf.  Part four explains in detail how --with-PACKAGE=PATH
+works, and how this option interacts with --libdir and --includedir.
+Part five address some platform specific problems and testing issues.
+
+ The description of preprocessor options previously found here has been
+moved to a new file called 0PORTING.
+
+For the impatient
+=================
+
+   First, tune term.h to choose which terminal drivers you wish to enable.
 If you want to support gif output, you need to download, compile and
 install the gd library : see term/gif.trm for details.
-If you want to support png output (free gif alternative), you need
-png and z libraries : see term/png.trm for details.
 
-on unix, use
-% ./configure
-% make
+   If you want to support png output (free gif alternative), you need
+png and z libraries : see term/png.trm for details.  Note that the
+png library might not compile without an ANSI/ISO C compiler.
 
-There are several options available for configure that you may want to change:
+   A complete overview of configure options are below in the Basic
+Installation section. On platforms which do not support GNU
+autoconf/configure, ie. most non-Unix platforms, look for a makefile
+that looks suitable, (makefile.emx for emx on dos, makefile.nt for
+MS VC++ 4.x on NT and probably win95, makefile.win for borland c on
+win95/nt, etc.)
 
---prefix=/top/level/dir Specifies where to install gnuplot.  Two binaries are
-			installed in prefix/bin and the gnuplot help is
-			installed in prefix/lib.
---with-gnu-readline	Use the gnu readline library.  If you don't use this,
-			you won't have file name completion.
---with-gnu-readline=/path/to/libreadline.a
-			Use this form if your libreadline is not installedn
-			where your linker can find it.
---with-cwdrc		When gnuplot starts up, check the current directory
-			for a .gnuplotrc file.  This is normally disabled
-			for security reasons.  (However, the home directory
-			is always checked for a .gnuplotrc file.)
-Do "configure --help" for more details.
+File location defaults
+----------------------
 
-On VMS, use buildvms.com if your make utility does not like makefile.vms
-or descrip.mms
+PREFIX				/usr/local
+gnuplot				PREFIX/bin
+gnuplot_x11			PREFIX/bin
+gnuplot.1			PREFIX/man/man1
+gnuplot.gih			PREFIX/share
 
-On other machines, look for a makefile that looks suitable,
-(makefile.emx for emx on dos, makefile.nt for MS VC++ 4.x on NT and
-probably win95, makefile.win for borland c on win95/nt, etc)
+   The only file where the runtime location is defined at compile time is
+gnuplot.gih. This is important if gnuplot is not installed by running
+'make install'. The default path for the help library, gnuplot.gih, can be
+controlled in several different ways:
 
+ o with configure's --prefix= option, eg.
+   ./configure --prefix=/gnuplot
+   Attention: This will affect *all* installed files!
 
-The GNUPLOT source code and executables may be copied and/or modified
-freely as long as the copyright messages are left intact.
+ o with configure's --datadir= option, eg.
+   ./configure --datadir='/gnuplot/docs'
 
-See the History file for changes to GNUPLOT.
+ o at make time, eg.
+   make HELPFILE='/gnuplot/docs/gnuplot.gih'
 
-Compilation instructions are near the end of this file.
+ o at execution time by specifying the helpfile with the environment
+   variable GNUHELP (see "Environment Variables" below).
 
-GNUPLOT has been tested on Sun3's and Sun4's (SunOS 4.0.3 and 4.1.1),
-a VAX 6410 (VMS 5.2), uVAX 3100 (5.4, 5.5, 6.0, 6.1) and AXP 3400 (1.5, 6.2)
-Commodore Amiga's (KS/WB 1.3 and 2.0, SAS/C 6.2
-and Aztec C beta 5.2a), IBM PC XT's and AT's (MS-DOS 3.3/5.0 BC++
-3.1/TC++ 1.0 MSC 7.0, os/2), IRIS 4D/70G and 4D/25G with MIPS C, NeXT with
-gnu C 1.34, DECStation 5000/200PXG (ULTRIX V4.1), AT&T 3B1 (version
-3.51m with cc and gcc 1.39), and Apollo's (DomainOS SR10.3 BSD4.3
-with C compiler 68K Rev 6.7(316)).  The code is written with
-portability in mind.  GNUPLOT has not been tested on Pyramid 90x.
+   The gnuplot demo files are not installed by default. If desired, they
+should be copied manually to a location of choice.
 
-There is a mailing list for gnuplot users. Note, however, that the
-newsgroup 
-	comp.graphics.apps.gnuplot 
-is identical to the mailing list (they both carry the same set of messages).
-We prefer that you read the messages through that newsgroup, to subscribing
-to the mailing list. (If you can read that newsgroup, and are already on the
-mailing list, please send a message to majordomo@dartmouth.edu, asking to be
-removed from the mailing list.)
+Unix, configure
+---------------
 
-The address for mailing to list members is
-	   info-gnuplot@dartmouth.edu
-and for mailing administrative requests is 
-	   majordomo@dartmouth.edu
-The mailing list for bug reports is 
-	   bug-gnuplot@dartmouth.edu
-The list of those interested in beta-test versions is
-	   info-gnuplot-beta@dartmouth.edu
+   On Unix, use
+$ ./configure
+$ make
 
-There is a daily digest of info-gnuplot available : ask majordomo
-to subscribe to info-gnuplot-digest
+   If gcc is installed, it is used by default. A different compiler can be
+used through the CC environment variable:
 
-Please tell us the version and machine on which your bug occurred.
+(Bourne shell)
+$ CC=c89 ./configure
 
- Also, please use meaningful email subjects, and particularly avoid
-using a subject of 'help' to info-gnuplot since majordomo bounces
-these to the list owner as suspected admin requests.
+(C shell)
+$ setenv CC c89
+$ ./configure
+ 
+   There are several options available for configure that you may want
+to change.  A complete list of options is available through
 
+$ ./configure --help
 
+  --prefix=PREFIX         Install architecture-independent files in PREFIX
+                          [/usr/local]. The gnuplot (and gnuplot_x11) binary
+                          is installed in PREFIX/bin.
+  --bindir=DIR            user executables in DIR [PREFIX/bin]
+  --datadir=DIR           Read-only architecture-independent data in DIR
+                          [PREFIX/share]. The gnuplot help file is installed
+                          in this directory.
+  --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
+  --includedir=DIR        C header files in DIR [PREFIX/include]
+  --mandir=DIR            Man documentation in DIR [PREFIX/man]
+  --without-readline      Do not use the included readline function
+  --with-gnu-readline     Use the GNU readline version  If you don't use this,
+                          you won't have file name completion.
+  --with-gnu-readline=PATH        Specify the location of libreadline.
+                          Use this form if your libreadline is not installed
+                          where your linker can find it.
+  --with-gd (*)           Enable gif terminal with Tom Boutell's gd library
+                          (requires GD library)
+  --with-gd=PATH                  Specify the location of libgd
+  --with-png (*)          Enable png terminal
+                          (requires libpng and libz)
+  --with-png=PATH                 Specify the location of libpng
+  --with-cwdrc            Check current directory for .gnuplotrc file,
+                          normally disabled for security reasons. However,
+                          the home directory is always checked for a
+                          .gnuplotrc file.
+  --with-lasergnu         Install lasergnu printer script
+  --without-linux-vga (*) Do not use the Linux console driver
+                          (requires Linux SVGAlib /usr/lib/libvga)
+  --with-x (*)            Use the X Window System
 
+ Options marked with (*) are on by default, ie. these features or packages
+will be used if configure can detect them, even if the corresponding option
+is not specified.  Please note that the `--with-PACKAGE' options can have
+additional arguments:
 
-                       PREPROCESSOR #DEFINES
+ o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
+ o `--with-PACKAGE=no' will disable checking for PACKAGE
+ o `--with-PACKAGE=PATH' will check for PACKAGE in PATH
 
-These #defines should be checked before compilation. There
-are many makefiles provided as templates. You probably need these
-only if porting to a new machine
+Unix, no configure
+------------------
 
-THIS LIST IS SOMEWHAT OUT OF DATE NOW - CHECK configure.in and config.hin
-
-define      file            note
-------      ----            --------
-HAVE_LGAMMA Makefile        define if you've got lgamma(3)
-HAVE_GAMMA  Makefile        define if you've got gamma(3)
-NO_MEMCPY   Makefile        define if your memcpy() is called bcopy()
-NO_MEMSET   Makefile        define if you have bzero() but not memset()
-NOCOPY      Makefile        define if you've don't have a memcpy() by any name
-bcopy()     plot.h          define if you've got a memcpy() by some OTHER name
-                              (see example in plot.h)
-PC          Makefile        define if compiling on a PClone
-MSDOS       Makefile        define if compiling under MSDOS;
-                              automatically defined by Microsoft C 5.10
-DOS32       Makefile        define for a 32-bit DOS extender (djgpp/emx)
-WIN32       Makefile        define for a 32-bit MS-Windows version
-HELPFILE    Makefile        name including path of gnuplot.gih file.
-VERYLARGE   plot.h          define to be largest coordinate number.
-SHELL       plot.h          default shell to spawn if SHELL environment
-                              variable not found at run-time
-NOCWDRC     Makefile        define to inhibit check of ./.gnuplot
-READLINE    Makefile        define if you want command-line editing
-GNU_READLINE Makefile       define if you are linking with gnu readline
-
-header file availability
-------------------------
-BSD_TYPES   sys/bsdtypes.h present
-OLD_SELECT  sys/select.h absent
-NO_STRING_H  string.h absent
-NO_STDLIB_H  stdlib.h absent
-NO_SYS_TYPES_H  sys/types.h absent
-NO_LIMITS_H
-HAVE_VALUES_H
-NO_LOCALE_H
-NO_ERRNO_H
-HAVE_UNISTD_H
-
-function availability
----------------------
-HAVE_GETCWD  - getcwd() available
-HAVE_GETWD   - getwd() available
-NO_MEMCPY   - memcpy() not available
-NO_MEMSET   - memset() not available
-NO_STRCHR
-HAVE_STRNCASECMP
-HAVE_STRNICMP
-NO_TEMPNAM
-
-Valid TERMFLAGS defines.  These defines are used to include the
-various plotting terminals, printers, and protocols that a given version
-of gnuplot can access:
-
-
-
-define      file            note
-------      ----            --------
-TERMFLAGS   Makefile        the set of terminals you want, from below
-            or term.h
-
-Out of date now - select terminals by uncommenting #include lines
-in term.h
-
-   AED         AED 512 and AED 767
-   AIFM        Adobe Illustrator Format
-   AMIGASCREEN Amiga custom screen
-   APOLLO      Apollo Graphics Primitive Resource (resizable window)
-   ATT6300     PC with AT&T 6300 graphics
-   BITGRAPH    BBN BitGraph
-   CGI         SCO CGI
-   COREL       COREL! Draw Format
-   CORONA      PC with Corona graphics 325
-   DXY800A     Roland DXY800A plotter
-   DUMB        Printer or glass dumb terminal
-   DXF         AutoCad (Release 10.x) dxf file format
-   EEPIC       EEPIC-extended LaTeX driver, for EEPIC users
-   EGALIB      PC with EGA/VGA graphics.
-   EMTEX       LaTeX picture environment with emTeX specials
-   EPS180      Epson-LQ style 24-pin 180-dot per inch printers
-   EPS60       Epson-style 60-dot per inch printers
-   EPSONP      Epson LX-800, Star NL-10, NX-1000 and lots of others
-   EXCL        Talaris EXCL laser printer format
-   FIG         Fig graphics language (requires object.h from TransFig)
-   GPR         Apollo Graphics Primitive Resource (fixed-size window)
-   HERCULES    IBM PC/Clone with Hercules graphics board
-   HP2648      HP2648, HP2647
-   HP26        HP2623A and maybe others
-   HP500C      HP Deskjet 500 C and maybe other Color Deskjets
-   HP75        HP7580, and probably other HPs
-   HPGL        HP7475 and (hopefully) lots of others
-   HPLJII      HP Laserjet II
-   HPPJ        HP PaintJet
-   IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
-   IRIS4D      IRIS4D series computer
-   KERMIT      MS-DOS Kermit Tektronix 4010 emulator
-   LATEX       LaTeX picture environment
-   MF          Metafont Format
-   MIF         FrameMaker MIF 3.00 Format
-   NEC         NEC CP6 pinwriter printer
-   NEXT        NeXTStep Window System (only grey scale)
-   OS2PM       OS/2 Presentation Manager
-   PBM         PBMPLUS pbm, pgm, ppm formats
-   PCL         HP PCL5 (actually  HPGL/2)
-   POSTSCRIPT  PostScript
-   PRESCRIBE   Kyocera Laser printer
-   PSLATEX     Postscript graphics, LaTeX labels and titles
-   PSTRICKS    PSTRICKS 0.91 format
-   QMS         QMS/QUIC laserprinter (Talaris 1200 and others)
-   REGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
-   RGIP        Redwood Graphics Interface Protocol
-   SELANAR     Selanar
-   STARC       Star Color Printer
-   SUN         Sun Microsystems Workstation
-   T410X       Tektronix 4106, 4107, 4109 and 420x terminals
-   TANDY60     Tandy DMP-130 series 60-dot per inch graphics
-   TEK         Tektronix 4010, and probably others
-   TEXDRAW     TeXDraw format (for LaTeX)
-   TGIF        TGIF X11 Drawing Tool
-   TPIC        Tpic specials for TeX
-   UNIXPC      unixpc (ATT 3b1 or ATT 7300)
-   UNIXPLOT    unixplot
-   V384        Vectrix 384 and tandy color printer
-   VTTEK       VT like Tektronix 4010 emulator
-   X11         X11R4 window system
-
-
-These #defines are defined automatically by various compilers, some
-gnuplot routines check these defines to implement features found in the
-various environments:
-
-define        note
-------        --------
-AMIGA_AC_5    defined for Manx Aztec C 5.2a on the Amiga
-AMIGA_SC_6_1  defined for SAS/C 6.1 or later versions on the Amiga
-apollo        defined by Apollo's C compilers.
-_CRAY         defined by CRAY's C compiler.
-__TURBOC__    defined automatically by  Borland C++ 3.x
-unix          defined by most unix C compilers.
-vms           (and VMS) defined by VAX-11 C under VMS.
-__ZTC__       Zortech C compiler under MSDOS.
-_Windows      defined by Borland C++ 3.0 compiling for MS-Windows
-
-
-                             TO COMPILE
-
-under UNIX:
-To compile do:
-
-  ./configure
-  make
-
-  
   The older, no-longer-preferred, way is to copy makefile.unx to Makefile
       cp makefile.unx Makefile
   Look through the Makefile to see if you need to make any changes.
@@ -245,10 +134,9 @@ To compile do:
   Alternatively, all these variables may be set as command line arguments to
   'make'. For example:
 
-        make <MACHINE> HELPDEST='/usr/um/misc/lib/gnuplot.gih' \
+        make <MACHINE> HELPDEST='/usr/um/misc/lib' \
                 DEST='/usr/um/misc/bin' READLINE=
 
-  Edit term.h, to include/exclude terminals
   Type
       make
   For further instructions.
@@ -256,11 +144,19 @@ To compile do:
       make install
   For further instructions.
 
-under VMS:
-  To compile using DEC MMS or PD clone (MMK ?),
+VMS
+---
+
+   On VMS, invoke MAKE_VMS.COM (or BUILDVMS.COM if you have MMS or MMK
+but don't want to use the supplied DESCRIP.MMS).  You may get warnings
+or more serious errors depending on the versions of the C compiler, the 
+C run-time libraries, and {Open}VMS on your system.  
+
+
+  To compile using DEC MMS or MMK (PD clone),
      invoke MMS or MMK with the supplied descrip.mms
   Or if you have a unix-like make utility
-     copy makefile.vms makefile.
+     copy makefile.vms makefile
      make
   Or if you don't have a suitable make:
      @buildvms
@@ -268,13 +164,18 @@ under VMS:
       $ define gnuplot$help disk:[directory]gnuplot.hlb
   Alternatively (and preferably) put the help in the main system help library.
 
-under AmigaDOS:
+AmigaOS
+-------
+
 Using Aztec C 5.2a
       make -f makefile.ami
 Using SAS/C 6.1 or later versions
       smake -f makefile.amg
+Using gcc: see Unix
 
-under TOS (Atari):
+Atari/TOS
+---------
+
 Using gcc 2.x as unix cross- or native compiler
 	make -f makefile.st
 (Edit top of makefile.st for name of crosscompiler or choose native setting)
@@ -284,16 +185,14 @@ Using TurboC
 	use gnuplot.prj
 (Edit gnuplot.prj according to notes at the beginning)
 
+MS-Windows
+----------
+
 Using Microsoft C 7.0 and compiling for MS-Windows
       copy makefile.msw makefile
       nmake
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
-
-under MSDOS:
-Using Microsoft C 7.0.
-      copy makefile.msc makefile
-      nmake 
 
 Using Borland C++ 3.1 and compiling for MS-Windows
       copy makefile.win makefile
@@ -302,19 +201,43 @@ Using Borland C++ 3.1 and compiling for MS-Windows
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
 
+MSDOS
+-----
+
+Using Microsoft C 7.0.
+      copy makefile.msc makefile
+      nmake 
+
 Using Borland C++ 3.0
       copy makefile.tc makefile
   Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
   off overlays (See manual for more on overlays).
       make
 
-
 The file gnuplot.gih is needed for help on the PC.
 If the file gnuplot.gih is not in the default directory, then use:
     set GNUHELP={full path name of gnuplot.gih}
 
+OS/2
+----
 
-                         ENVIRONMENT VARIABLES
+To compile under OS/2 (2.x and above) you need the development
+suite EMX 0.9 (including a gcc port). To build you should also
+have NMake (version 4.xx) and IPFC (Information Presentation
+Facility Compiler), both available from the Developer's Toolkit
+(nowadays they are accessible through IBM's website).
+
+    nmake -f makefile.os2
+will show you all options which the makefile.os2 understands.
+You can choose between different compiling options and specify
+some additional terminals to include. You can create a version offering
+PM graphics as well as a X11 version (to use with XFree86 for OS/2).
+
+See other sections of the manuals for more information about
+installing gnuplot on OS/2.
+
+Environment Variables
+=====================
 
 See 'help environment'.
 
@@ -331,18 +254,416 @@ found. See help on "start-up".
 
 If defined, the environment variable GNUHELP is used for the name
 of the .gih help file, otherwise HELPFILE (defined in makefile or
-plot.c) is used.
+command.c) is used.
 
 The VMS version looks for the logical name GNUPLOT$HELP to locate
 the help library.
 
 The CGI drivers need the CGIPATH environment variable to set the path
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment
-variables to set the output devices.
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
+to set the output devices.
 
-The CGI drivers need the CGIPATH environment variable to set the path
-to the CGI agents, and the CGIDISP and/or CGIPRNT environment
-variables to set the output devices.
+ If using dynamically linked executables with the X11 Window System, it
+may be necessary to define LD_LIBRARY_PATH - see man ld for details.
 
-On solaris, if ld fails to run gnuplot_x11, you may need to
-define LD_LIBRARY_PATH - see man ld for details.
+
+Basic Installation
+******************
+
+   These are generic installation instructions.
+
+   The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory of the package.
+It may also create one or more `.h' files containing system-dependent
+definitions.  Finally, it creates a shell script `config.status' that
+you can run in the future to recreate the current configuration, a file
+`config.cache' that saves the results of its tests to speed up
+reconfiguring, and a file `config.log' containing compiler output
+(useful mainly for debugging `configure').
+
+   If you need to do unusual things to compile the package, please try
+to figure out how `configure' could check whether to do them, and mail
+diffs or instructions to the address given in the `README' so they can
+be considered for the next release.  If at some point `config.cache'
+contains results you don't want to keep, you may remove or edit it.
+
+   The file `configure.in' is used to create `configure' by a program
+called `autoconf'.  You only need `configure.in' if you want to change
+it or regenerate `configure' using a newer version of `autoconf'.
+
+The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and type
+     `./configure' to configure the package for your system.  If you're
+     using `csh' on an old version of System V, you might need to type
+     `sh ./configure' instead to prevent `csh' from trying to execute
+     `configure' itself.
+
+     Running `configure' takes awhile.  While running, it prints some
+     messages telling which features it is checking for.
+
+  2. Type `make' to compile the package.
+
+  3. Optionally, type `make check' to run any self-tests that come with
+     the package.
+
+  4. Type `make install' to install the programs and any data files and
+     documentation.
+
+  5. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.  To also remove the
+     files that `configure' created (so you can compile the package for
+     a different kind of computer), type `make distclean'.  There is
+     also a `make maintainer-clean' target, but that is intended mainly
+     for the package's developers.  If you use it, you may have to get
+     all sorts of other programs in order to regenerate files that came
+     with the distribution.
+
+Compilers and Options
+=====================
+
+   Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  You can give `configure'
+initial values for variables by setting them in the environment.  Using
+a Bourne-compatible shell, you can do that on the command line like
+this:
+     CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+
+Or on systems that have the `env' program, you can do it like this:
+     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+
+Compiling For Multiple Architectures
+====================================
+
+   You can compile the package for more than one kind of computer at the
+same time, by placing the object files for each architecture in their
+own directory.  To do this, you must use a version of `make' that
+supports the `VPATH' variable, such as GNU `make'.  `cd' to the
+directory where you want the object files and executables to go and run
+the `configure' script.  `configure' automatically checks for the
+source code in the directory that `configure' is in and in `..'.
+
+   If you have to use a `make' that does not supports the `VPATH'
+variable, you have to compile the package for one architecture at a time
+in the source code directory.  After you have installed the package for
+one architecture, use `make distclean' before reconfiguring for another
+architecture.
+
+Installation Names
+==================
+
+   By default, `make install' will install the package's files in
+`/usr/local/bin', `/usr/local/man', etc.  You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PATH'.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+give `configure' the option `--exec-prefix=PATH', the package will use
+PATH as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=PATH' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.
+
+   If the package supports it, you can cause programs to be installed
+with an extra prefix or suffix on their names by giving `configure' the
+option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+
+Optional Features
+=================
+
+   Some packages pay attention to `--enable-FEATURE' options to
+`configure', where FEATURE indicates an optional part of the package.
+They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+is something like `gnu-as' or `x' (for the X Window System).  The
+`README' should mention any `--enable-' and `--with-' options that the
+package recognizes.
+
+   For packages that use the X Window System, `configure' can usually
+find the X include and library files automatically, but if it doesn't,
+you can use the `configure' options `--x-includes=DIR' and
+`--x-libraries=DIR' to specify their locations.
+
+Specifying the System Type
+==========================
+
+   There may be some features `configure' can not figure out
+automatically, but needs to determine by the type of host the package
+will run on.  Usually `configure' can figure that out, but if it prints
+a message saying it can not guess the host type, give it the
+`--host=TYPE' option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name with three fields:
+     CPU-COMPANY-SYSTEM
+
+See the file `config.sub' for the possible values of each field.  If
+`config.sub' isn't included in this package, then this package doesn't
+need to know the host type.
+
+   If you are building compiler tools for cross-compiling, you can also
+use the `--target=TYPE' option to select the type of system they will
+produce code for and the `--build=TYPE' option to select the type of
+system on which you are compiling the package.
+
+Sharing Defaults
+================
+
+   If you want to set default values for `configure' scripts to share,
+you can create a site shell script called `config.site' that gives
+default values for variables like `CC', `cache_file', and `prefix'.
+`configure' looks for `PREFIX/share/config.site' if it exists, then
+`PREFIX/etc/config.site' if it exists.  Or, you can set the
+`CONFIG_SITE' environment variable to the location of the site script.
+A warning: not all `configure' scripts look for a site script.
+
+Operation Controls
+==================
+
+   `configure' recognizes the following options to control how it
+operates.
+
+`--cache-file=FILE'
+     Use and save the results of the tests in FILE instead of
+     `./config.cache'.  Set FILE to `/dev/null' to disable caching, for
+     debugging `configure'.
+
+`--help'
+     Print a summary of the options to `configure', and exit.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.  To
+     suppress all normal output, redirect it to `/dev/null' (any error
+     messages will still be shown).
+
+`--srcdir=DIR'
+     Look for the package's source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`--version'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`configure' also accepts some other, not widely useful, options.
+
+About --with-PACKAGE[=PATH]
+***************************
+
+ The following decsription applies only to the gnuplot configure shell
+script.  It does not apply to any other package.
+
+ Every `--with-PACKAGE' option sets a `with_package' variable in
+configure.  Depending on how `--with-PACKAGE' was invoked, there are
+only a few possible values for the `with_package' variable:
+
+ Option                   $with_package
+----------------------------------------
+(not specified)           yes
+--with-package            yes
+--with-package=yes        yes
+--with-package=no         no
+--with-package=PATH       PATH
+
+ This means that configure will always (by default) try to locate PACKAGE
+unless `--with-package=no' was specified.  Examples for with-PACKAGE
+options used by gnuplot's configure are `--with-gd', `--with-png'. The
+corresponding package variables are `with_gd', and `with_png'.
+
+ For the gnuplot package, configure uses the macros `gp_CHECK_LIB_PATH'
+and `gp_CHECK_HEADER' to search for libraries and includes, resp.  These
+macros are different from the standard GNU autoconf macros for this
+purpose, `AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual).
+The gp_XXX macros are closely tied to the gnuplot package, and cannot
+be used for other packages without modification.
+
+ The difference between these package specific macros and standard
+autoconf macros is that they do search more than one (the default)
+directory to determine the location of the specified file.
+
+ Libraries will be searched in at least two, and up to five different
+directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+
+ o the default linker path (this is really more than one directory)
+ o the directory specified with the --libdir option ($libdir)
+ o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
+ o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
+   `/lib' added
+ o the PATH directory, trailing `/libPACKAGE.a' stripped off.
+
+ Using the default linker path as the first search directory has one
+big, but not so obvious advantage: if all libraries are in the same
+directory, the path to the first library specified with --with-PACKAGE
+is added to the linker path.  The library searched for with the next
+--with-PACKAGE option will now be found faster, because only one
+directory is checked.  This is also true for header files.
+
+ Example: the user has unpacked the gd library distribution into
+/home/user/source/gd:
+
+$ configure --with-gd=/home/user/source/gd
+
+will search the following directories for libgd.a:
+
+ o the default linker path
+ o /usr/local/lib (default $libdir)
+ o /home/user/source/gd
+ o /home/user/source/gd/lib
+ o /home/user/source/gd
+
+ Include files will be searched in at least two, and up to four different
+directories, depending on the PATH specified with `--with-PACKAGE=PATH':
+
+ o the default include path (can be more than one diretcory)
+ o the directory specified with --includedir ($includedir)
+ o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off
+ o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
+   `/include' added
+
+ Caveat: the `gp_CHECK_HEADER' macro should only be used after the
+`gp_CHECK_LIB_PATH' macro to take full advantage of the search algorithm.
+This is a reasonable assumption nevertheless, because it allows for
+structuring configure.in so that the test for a header file is skipped
+if the corresponding library is not found.
+
+ Here are some more examples:
+
+ o the gd and png libraries are in /usr/local/gnu/lib, which is
+   automatically searched by gcc.  The corresponding header files are
+   in /usr/local/gnu/include, which is not in gcc's include search path.
+   Solution:
+
+   $ ./configure --includedir=/usr/local/gnu/include
+
+ o the gd and png libraries are in /opt/gnu/lib, the header files are
+   in /opt/gnu/include.  Solution:
+ 
+   $ ./configure --with-gd=/opt/gnu
+
+ o the gd and png libraries and headers are all in different directories,
+   none of which is in the compilers search path:
+
+   $ ./configure --with-gd=/tmp/gd --with-png=/tmp/libpng
+
+ Caveat: the `--libdir' and `--includedir' configure options are used in
+slightly non-standard fashion: these options are normally used to
+specify directories to install libraries and headers into. [I would like
+to implement the more generic `--site-includes' and `--site-libraries'
+options, but this is painfully difficult with the current autoconf.  It
+also seems that the current autoconf maintainer and Stallman/FSF are
+opposed to adding such options to the FSF autoconf distribution.]
+
+Platform problems and testing
+*****************************
+
+   This section addresses trouble shooting and testing issues. Userland
+questions are answered in the FAQ.
+
+Platform notes
+==============
+
+   Generally, if you think that configure has made a mistake in detecting
+platform features, there are two ways to switch these off. 
+
+   Example:
+configure has detected the memset() function, but the implementation on
+your platform is buggy. Now you can either edit config.cache and change
+
+ ac_cv_func_memset=${ac_cv_func_memset='yes'}  to
+ ac_cv_func_memset=${ac_cv_func_memset='no'}  
+
+and rerun configure, or, edit config.h and change
+
+/* #undef NO_MEMSET */  to
+#define NO_MEMSET
+
+   Note the changing such defines at compile time, eg. via
+'make DEF=-DNO_MEMSET' is wrong, because the DEF variable in Makefile
+may contain other defines (make DEF='-DHAVE_CONFIG_H -DNO_MEMSET'
+may work, though).
+
+(incomplete)
+
+ - HP-UX 9.x
+   It is recommended to use gcc, although the native compiler may
+  work with warnings.
+
+ - IRIX 6.x
+   It may be necessary to remove '-lnsl -lsocket' from the LIBS line
+  in Makefile if these libraries are not installed.
+
+   If you want to use the png terminal, you must install your own
+  versions of libpng and zlib. The versions supplied with the OS
+  are too old.
+
+ - MS-DOS
+   If ports of common Unix utilities (bash, sed etc) are available,
+  gnuplot can be built with DJGPP. Install instructions are the same
+  as under Unix (with configure).
+
+ - SunOS 4.x
+   An ANSI/ISO C compiler is reqiured to compile gnuplot. It is
+  recommended to install gcc. If this is not an option, the system
+  compiler cc can be made to work with Wietse Venema's unproto tool (details).
+
+ - System V.2
+   (See SunOS 4.x)
+
+ - Ultrix 4.x
+   (See SunOS 4.x)
+
+How to test gnuplot
+===================
+
+   No comprehensive test suite for all of gnuplot's features has been
+written to date. However, the supplied demo files provide a good method
+of testing commonly used features. All command line examples below
+assume Unix Bourne shell syntax.
+
+   The demo files can be run by eg.
+
+$ cd gnuplot/demo
+$ ../gnuplot simple.dem
+
+and gnuplot prompts the user to "Hit return to continue" to cycle
+through all the plots.
+
+   To run the demos in a specified file without interaction, one
+can use
+
+$ ../gnuplot simple.dem </dev/null
+
+   To run all demos non-interactively, use
+
+$ ../gnuplot all.dem </dev/null
+
+   To use a different plotting device than the default (usually X11
+under Unix), use eg.
+
+$ GNUTERM=dumb ../gnuplot all.dem </dev/null
+
+   To test the capabilities of the terminal you are using, there is
+the 'test' command:
+
+$ gnuplot
+
+        G N U P L O T
+        Unix version 3.5 (pre 3.6)
+        patchlevel beta 347
+        last modified Mon Jun 22 13:22:33 BST 1998
+
+        Copyright(C) 1986 - 1993, 1998
+        Thomas Williams, Colin Kelley and many others
+
+        Send comments and requests for help to info-gnuplot@dartmouth.edu
+        Send bugs, suggestions and mods to bug-gnuplot@dartmouth.edu
+
+Terminal type set to 'x11'
+gnuplot> test
+
+   `test` creates a display of line and point styles and other useful things
+appropriate for the terminal you are using.
+
