@@ -1,11 +1,19 @@
+2000-05-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: In "Platform notes" section, add hint for using
+	'gcc -ansi'.
+
 2000-05-01  Johannes Zellner <johannes@zellner.org>
+
 	* removed a superfluous ifndef(OS2) in term/x11.trm
 	* added a SELECT_FD_SET_CAST in term/x11.trm
 
 2000-05-01  Johannes Zellner <johannes@zellner.org>
+
 	* corrected the number of format specifiers in a fprintf (src/show.c)
 
 2000-04-30  Johannes Zellner <johannes@zellner.org>
+
 	* small patch such that zooming of map views works again.
 	This patch apparently got lost during setup of the CVS repository.
 
