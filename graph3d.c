@@ -1257,11 +1257,13 @@ static void plot3d_dots(plot)
 	struct coordinate GPHUGE *points = icrvs->points;
 
 	for (i = 0; i < icrvs->p_count; i++) {
+          if (points[i].type == INRANGE) {
 	    unsigned int x,y;
 	    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
     	    if (!clip_point(x,y))
 		(*t->point)(x,y, -1);
+	  }
     	}
 
 	icrvs = icrvs->next;
