@@ -1,7 +1,18 @@
+2003-11-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/variable.c (PATHSEP_TO_NUL): Reindented.  Applied do {}
+	while(0) wrapper.
+	(PRINT_PATHLIST): Renamed from PRINT_LOADPATH.  Reindented.
+	Applied do {} while (0) wrapper.  Made pointer variable local to
+	the macro, initialize it from additional argument for clarity.
+	(loadpath_handler, fontpath_handler): Removed static local
+	'beenhere'.  Test directly for 'p != NULL' in ACTION_GET handler
+	instead.
+
 2003-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/command.c (test_palette_subcommand): Don't crash 'test palette'
-	in read-only directory.
+	* src/command.c (test_palette_subcommand): Don't crash 'test
+	palette' in read-only directory.
 
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -9,37 +20,37 @@
 
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* docs/gnuplot.doc src/gp_hist.h src/command.c src/history.c: Allow
-	'history "file"' be a pipe. New option 'history "file" append'.
+	* docs/gnuplot.doc src/gp_hist.h src/command.c src/history.c:
+	Allow 'history "file"' be a pipe. New option 'history "file"
+	append'.
 
 2003-11-24  Daniel J Sebald  <daniel.sebald@ieee.org>
 
 	* NEWS src/gplt_x11.c term/x11.trm: SourceForge patch #774822.
-	Organized x11 terminal windows into a linked list. Removed the limit
-	of max 16 enumerated terminal windows. New options 'set term x11
-	close' and 'set term x11 title "<title>"'.
+	Organized x11 terminal windows into a linked list. Removed the
+	limit of max 16 enumerated terminal windows. New options 'set term
+	x11 close' and 'set term x11 title "<title>"'.
 
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/command.h src/command.c src/tables.h
-	src/tables.c src/term.c:
-	New command 'test palette' for testing rgb profiles of the current
-	palette. 
-	Command 'test' gets an optional argument of what to test:
-	'test terminal' (default) is what 'test' currently does.
-	Undocumented command 'testime' changed to 'test time'.
+	src/tables.c src/term.c: New command 'test palette' for testing
+	rgb profiles of the current palette. Command 'test' gets an
+	optional argument of what to test: 'test terminal' (default) is
+	what 'test' currently does.  Undocumented command 'testime'
+	changed to 'test time'.
 
 2003-11-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c: Remove unused variables to quiet compiler warnings.
 
 	* src/parse.c src/unset.c: Add garbage collection of defunct
-	user-defined variables. This plugs a small memory leak that
-	would grow into a much larger one if/when we add string variables.
+	user-defined variables. This plugs a small memory leak that would
+	grow into a much larger one if/when we add string variables.
 
-	* src/graphics.c: Break out creation of key entries into a separate 
-	subroutine, with related code cleanup. This is more preparation for
-	support of multiple keys.
+	* src/graphics.c: Break out creation of key entries into a
+	separate subroutine, with related code cleanup. This is more
+	preparation for support of multiple keys.
 
 2003-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

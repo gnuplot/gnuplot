@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.17 2002/10/09 09:27:43 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.18 2002/10/11 16:26:49 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -45,17 +45,23 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.17 2002/10/09 09:27:43 
 #include "util.h"
 
 
-#define PATHSEP_TO_NUL(arg) \
-{ char *s = arg; \
-  while ((s=strchr(s,PATHSEP)) != NULL) \
-    *s++ = NUL; }
+#define PATHSEP_TO_NUL(arg)			\
+do {						\
+    char *s = arg;				\
+    while ((s = strchr(s, PATHSEP)) != NULL)	\
+	*s++ = NUL;				\
+} while (0)
 
-#define PRINT_LOADPATH(limit) \
-  while (p < limit) { \
-    fprintf(stderr, "\"%s\" ",p); \
-    p += strlen(p) + 1; \
-  } \
-  fputc('\n',stderr);
+#define PRINT_PATHLIST(start, limit)		\
+do {						\
+    char *s = start;				\
+						\
+    while (s < limit) {				\
+	fprintf(stderr, "\"%s\" ", s);		\
+	s += strlen(s) + 1;			\
+    }						\
+    fputc('\n',stderr);				\
+} while (0)
 
 /*
  * char *loadpath_handler (int, char *)
@@ -63,8 +69,8 @@ static char *RCSid() { return RCSid("$Id: variable.c,v 1.17 2002/10/09 09:27:43 
  */
 char *
 loadpath_handler(action, path)
-int action;
-char *path;
+    int action;
+    char *path;
 {
     /* loadpath variable
      * the path elements are '\0' separated (!)
@@ -74,7 +80,6 @@ char *path;
     /* index pointer, end of loadpath,
      * env section of loadpath, current limit, in that order */
     static char *p, *last, *envptr, *limit;
-    static int beenhere;
 
     switch (action) {
     case ACTION_CLEAR:
@@ -136,14 +141,12 @@ char *path;
 	/* print the current, full loadpath */
 	FPRINTF((stderr, "Show loadpath\n"));
 	if (loadpath) {
-	    p = loadpath;
 	    fputs("\tloadpath is ", stderr);
-	    PRINT_LOADPATH(envptr);
+	    PRINT_PATHLIST(loadpath, envptr);
 	    if (envptr) {
 		/* env part */
-		p = envptr;
 		fputs("\tsystem loadpath is ", stderr);
-		PRINT_LOADPATH(last);
+		PRINT_PATHLIST(envptr, last);
 	    }
 	} else
 	    fputs("\tloadpath is empty\n", stderr);
@@ -161,27 +164,18 @@ char *path;
 	FPRINTF((stderr, "Get loadpath\n"));
 	if (!loadpath)
 	    return NULL;
-	if (!beenhere) {
+	if (!p) {
 	    /* init section */
-	    beenhere = 1;
 	    p = loadpath;
 	    if (!limit)
 		limit = last;
-	    if (p < limit)
-		return p;
-	    else
-		return NULL;
 	} else {
-	    p += strlen(p);
 	    /* skip over '\0' */
-	    p++;
-	    if (p < limit)
-		return p;
-	    else {
-		beenhere = 0;
-		return NULL;
-	    }
+	    p += strlen(p) + 1;
 	}
+	if (p >= limit)
+	    p = NULL;
+	return p;
 	break;
     case ACTION_NULL:
 	/* just return */
@@ -284,8 +278,8 @@ static TBOOLEAN fontpath_init_done = FALSE;
  */
 char *
 fontpath_handler(action, path)
-     int action;
-     char *path;
+    int action;
+    char *path;
 {
     /* fontpath variable
      * the path elements are '\0' separated (!)
@@ -295,7 +289,6 @@ fontpath_handler(action, path)
     /* index pointer, end of fontpath,
      * env section of fontpath, current limit, in that order */
     static char *p, *last, *envptr, *limit;
-    static int beenhere;
 
     if (!fontpath_init_done) {
 	fontpath_init_done = TRUE;
@@ -480,14 +473,12 @@ fontpath_handler(action, path)
 	/* print the current, full fontpath */
 	FPRINTF((stderr, "Show fontpath\n"));
 	if (fontpath) {
-	    p = fontpath;
 	    fputs("\tfontpath is ", stderr);
-	    PRINT_LOADPATH(envptr);
+	    PRINT_PATHLIST(fontpath, envptr);
 	    if (envptr) {
 		/* env part */
-		p = envptr;
 		fputs("\tsystem fontpath is ", stderr);
-		PRINT_LOADPATH(last);
+		PRINT_PATHLIST(envptr, last);
 	    }
 	} else
 	    fputs("\tfontpath is empty\n", stderr);
@@ -505,28 +496,18 @@ fontpath_handler(action, path)
 	FPRINTF((stderr, "Get fontpath\n"));
 	if (!fontpath)
 	    return NULL;
-	if (!beenhere) {
+	if (!p) {
 	    /* init section */
-	    beenhere = 1;
 	    p = fontpath;
 	    if (!limit)
 		limit = last;
-	    if (p < limit)
-		return p;
-	    else
-		return NULL;
 	} else {
-	    p += strlen(p);
 	    /* skip over '\0' */
-	    p++;
-	    if (p < limit)
-		return p;
-	    else {
-		beenhere = 0;
-		return NULL;
-	    }
+	    p += strlen(p) + 1;
 	}
-	break;
+	if (p >= limit)
+	    p = NULL;
+	return p;
     case ACTION_NULL:
 	/* just return */
     default:
