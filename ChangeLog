@@ -1,3 +1,18 @@
+2001-07-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Release 3.8g snapshot
+
+2001-07-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/version.c: Version 3.8g, update date and copyright.
+
+	* configure.in: Streamlining, implement changes required by updated
+	GP_PATH_LIB macro.
+
+	* m4/path-lib.m4: Do not automatically add found libraries to LIBS.
+	Instead, define a new variable gp_LIBRARY_libs that can be used in
+	configure.in.
+
 2001-07-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.c (DragFunc): Changed argument of first
@@ -64,6 +79,11 @@
 	<shige@iee.niit.ac.jp>. Write simple \special command directly,
 	instead of using the \put{} method to move the coordinate
 	system.
+
+2001-07-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/ChangeLog, lisp/gnuplot-gui.el, lisp/gnuplot.el,
+	lisp/gpelcard.tex: Upgrade to gnuplot-mode version 0.5q.
 
 2001-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
