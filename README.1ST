@@ -1,5 +1,5 @@
- To install:
- ==========
+ To install from sources:
+ ========================
 
  Installation instructions are found in the file INSTALL in this
  directory after going through this file. In a very small nutshell:
@@ -105,7 +105,4 @@
  To convert from PNG to GIF, use the commands
         pngtorle -o temp.rle image.png
         rletogif -o image.gif temp.rle
-
- 
-
 

@@ -11,6 +11,8 @@
 	* docs/gnuplot.doc: Section "New features" reformatted to 80 chars
 	width.
 
+	* README.1ST: Updated.
+
 2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot.c (get_user_env): Check $USERPROFILE on Windows, before
