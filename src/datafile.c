@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.42 2002/07/23 19:45:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.43 2002/08/23 07:55:03 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1123,6 +1123,14 @@ int max;
 		} else {	/* column > 0 */
 		    if ((column <= df_no_cols) && df_column[column - 1].good == DF_GOOD)
 			v[output] = df_column[column - 1].datum;
+		    /* 
+		     * EAM - Oct 2002 Distinguish between DF_MISSING and DF_BAD.
+		     * Previous versions would never notify caller of either case.
+		     * Now missing data will be noted. Bad data should arguably be
+		     * noted also, but that would change existing default behavior.
+		     */
+		    else if ((column <= df_no_cols) && (df_column[column - 1].good == DF_MISSING))
+			return DF_UNDEFINED;
 		    else {
 			/* line bad only if user explicitly asked for this column */
 			if (df_no_use_specs)
