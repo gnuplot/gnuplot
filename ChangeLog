@@ -1,3 +1,40 @@
+2001-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	New PNG feature from <Juergen.vonHagen@etec.uni-karlsruhe.de>:
+	
+	* term/png.trm (PNG_id, PNG_opts): new option 'picsize' added to
+ 	table.
+	(PNG_options): handle new case PNG_PICSIZE by resizing the
+ 	drawable area handled by the 'bitmap' module.
+	(PNG_options): add output of option picsize.
+	(PNG_graphics): use new variable output sizes instead of fixed
+ 	constants.
+	(PNG terminal docs): document new option 'picsize'
+
+2001-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wpause.c (PauseBox): Change window style of Pause window
+ 	to make it show up in the taskbar and have it pop up on top of all
+ 	others.
+	(PauseBox): Insert WaitMessage() call to reduce CPU load while
+ 	gnuplot waits for the user to click away the pause window.
+
+	* term/win.trm (WIN_filledbox): New function, implements 'clear'
+ 	command for this terminal. Added entry to terminal API definition.
+
+	* src/win/wgnuplib.h (W_filledbox): define new message number.
+
+	* src/win/wgraph.c (drawgraph): handle new message W_filledbox to
+	draw blanked-out box.
+
+2001-01-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (apply_head_properties): make temps unsigned to
+ 	match arguments of map_position().
+
+	* term/svg.trm (SVG_point): add missing TERM_PUBLIC stamp to
+ 	definition.
+
 2001-01-03  Johannes Zellner  <johannes@zellner.org>
 
 	* term/post.trm:  PS_make_palette() made it working with
