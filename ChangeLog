@@ -1,5 +1,10 @@
 2002-08-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/color.h src/color.c: Removed unused field 'offset' from 'struct
+	t_sm_palette'.
+
+2002-08-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* docs/gnuplot.doc: Added documentation for 'set label ... font'.
 
 2002-08-19  Harald Harders  <h.harders@tu-bs.de>
@@ -907,7 +912,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/19 16:21:47 $).
+	last modification date (from the tag $Date: 2002/08/20 10:15:12 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

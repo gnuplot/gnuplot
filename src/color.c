@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.31 2002/07/22 11:28:07 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.32 2002/07/26 16:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -47,7 +47,6 @@ t_sm_palette sm_palette = {
     7, 5, 15,			/* formulaR, formulaG, formulaB */
     SMPAL_POSITIVE,		/* positive */
     0, 0, 0,			/* use_maxcolors, colors, rgb_table */
-    0,				/* offset */
     0				/* ps_allcF */
 };
 

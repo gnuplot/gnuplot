@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.9 2001/08/22 14:15:33 broeker Exp $
+ * $Id: color.h,v 1.10 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -115,33 +115,24 @@ typedef struct {
    * result from term->make_palette(NULL), or restricted by
    * use_maxcolor.  Used by: pm, gif. Unused by: PostScript */
   int colors;
-  /* table of RGB triplets resulted from applying the formulae. Used
+  /* Table of RGB triplets resulted from applying the formulae. Used
    * in the 2nd call to term->make_palette for a terminal with
-   * discrete colours. Unused by PostScript who has programmed them
-   * analytically */
+   * discrete colours. Unused by PostScript which has calculates them
+   * analytically. */
   rgb_color *color;
 
-  /** Variables used by some terminals (those with palette, not post.trm) **/
+  /** Variables used by some terminals **/
   
-  /* offset of the first smooth colour in the table (some first items
-   *   are usually occupied by the colours for linetypes) Used by: pm.
-   *   Unused by: gif (it uses its gif_smooth_color[0..colors]),
-   *   postscript (continous RGB values) */
-  int offset;
-
-  /* MAYBE: something like
-	int gif_smooth_color[ gdMaxColors ];  i.e.  int *itable;
-     could go here if there are at least two terminals using that;
-     currently only gif, so it's in his gif.trm
-  */
-
   /* Option unique for output to PostScript file.  By default,
    * ps_allcF=0 and only the 3 selected rgb color formulae are written
    * into the header preceding pm3d map in the file.  If ps_allcF is
    * non-zero, then print there all color formulae, so that it is easy
    * to play with choosing manually any color scheme in the PS file
    * (see the definition of "/g"). Like that you can get the
-   * Rosenbrock multiplot figure on my gnuplot.html#pm3d demo page. */
+   * Rosenbrock multiplot figure on my gnuplot.html#pm3d demo page.
+   * Note: this option is used by all terminals of the postscript
+   * family, i.e. postscript, pslatex, epslatex, so it will not be
+   * comfortable to move it to the particular .trm files. */
   char ps_allcF;
 
 } t_sm_palette;
