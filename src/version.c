@@ -37,8 +37,8 @@ static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $"
 #include "plot.h"
 
 char version[] = "3.7";
-char patchlevel[] = "0.7";
-char date[] = "Wed Jun  2 14:46:40 BST 1999";
+char patchlevel[] = "0.8";
+char date[] = "Sun Jun  6 15:33:17 BST 1999";
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1999";
 
 char faq_location[] = FAQ_LOCATION;
