@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.54 2003/05/07 01:15:27 vanzandt Exp $
+ * $Id: cgm.trm,v 1.55 2003/05/09 20:01:28 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -108,6 +108,15 @@ TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CGM_set_color __PROTO((double gray));
 TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
 #endif
+
+#ifdef USE_ULIG_FILLEDBOXES
+#ifndef PM3D
+    /* Normally defined in color.h, but without PM3D it is missing in action */
+    typedef struct { unsigned int x, y; } gpiPoint;
+    TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
+#endif
+#endif
+
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
 #define CGM_LARGE 32767
@@ -1106,7 +1115,9 @@ TERM_PUBLIC void CGM_set_color(gray)
     	CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
     }
 }
+#endif /* PM3D */
 
+#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 TERM_PUBLIC void CGM_filled_polygon(points, corner)
      int points;
      gpiPoint *corner;
@@ -1136,7 +1147,7 @@ TERM_PUBLIC void CGM_filled_polygon(points, corner)
     CGM_flush_polygon();
 }
 
-#endif /* PM3D */
+#endif /* PM3D || FILLEDBOXES */
 
 static void
 CGM_flush_polyline()

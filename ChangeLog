@@ -1,3 +1,8 @@
+2004-03-10  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* term/cgm.trm: Revise the conditional code sections so that it is
+	possible to select USE_ULIG_FILLEDBOXES without PM3D.
+
 2004-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gnupmdrv.rc: Renamed menu entry "~data style" to
