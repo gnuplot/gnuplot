@@ -1,3 +1,8 @@
+2004-10-29  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Fix indentation level of terminal types when
+	converted to pdf.
+
 2004-10-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c docs/gnuplot.doc: Reset values of 'set size' and

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.256 2004/10/27 21:54:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.257 2004/10/29 06:45:37 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -9819,7 +9819,7 @@ C ... and restart the table:
  because they were not configured or installed on your system. To see a list of
  terminals available on a particular gnuplot installation, type 'set terminal'
  with no modifiers.
-<4 -- all terminal stuff is pulled from the .trm files
+<3 -- all terminal stuff is pulled from the .trm files
 1 Graphical User Interfaces
 ?graphical user interfaces
 ?gui's
