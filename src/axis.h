@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.4 2000/11/02 15:13:38 broeker Exp $
+ * $Id: axis.h,v 1.5 2001/01/16 20:56:09 broeker Exp $
  *
  */
 
@@ -69,8 +69,17 @@ typedef enum AXIS_INDEX {
     SECOND_X_AXIS,
     R_AXIS,			/* never used ? */
     U_AXIS,			/* dito */
-    V_AXIS			/* dito */
+    V_AXIS,			/* dito */
+#ifdef PM3D
+    COLOR_AXIS
+#endif
+
+#ifdef PM3D
+ #define AXIS_ARRAY_SIZE 11
+#else
 #define AXIS_ARRAY_SIZE 10
+#endif
+
 } AXIS_INDEX;
 
 /* What kind of ticmarking is wanted? */
@@ -151,6 +160,9 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
 #define GRID_MZ     (1<<7)
 #define GRID_MX2    (1<<8)
 #define GRID_MY2    (1<<9)
+/* GRID_{M}CB only for PM3D, but defined always for source code readability */
+#define GRID_CB     (1<<10)
+#define GRID_MCB    (1<<11)
 
 /* HBB 20000725: gather all per-axis variables into a struct, and set up
  * a single large array of such structs */
@@ -286,6 +298,9 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define X_AXIS axis_array[x_axis]
 #define Y_AXIS axis_array[y_axis]
 #define Z_AXIS axis_array[z_axis]
+#ifdef PM3D
+#define CB_AXIS axis_array[COLOR_AXIS]
+#endif
 
 /* -------- macros using these variables: */
 
@@ -532,8 +547,13 @@ do {						\
 
 /* HBB 20000506: new macro to automatically build intializer lists
  * for arrays of AXIS_ARRAY_SIZE equal elements */
+#ifdef PM3D
+#define AXIS_ARRAY_INITIALIZER(value) 				\
+	{ value, value, value, value, value, value, value, value, value, value, value }
+#else
 #define AXIS_ARRAY_INITIALIZER(value) 					 \
 { value, value, value, value, value, value, value, value, value, value }
+#endif
 
 
 /* used by set.c */

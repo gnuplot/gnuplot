@@ -1,21 +1,16 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.11 2000/11/24 19:17:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.12 2000/12/06 12:38:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
 
 /*[
  *
- * Petr Mikulik, December 1998 -- June 2000
+ * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
  * 
- * The implementation for the drivers X11 and vgagl
- * was done by Johannes Zellner <johannes@zellner.org>
- * (Oct 1999 - Jan 2000)
- *
- * 
  * What is here: #defines, global variables and declaration of routines for 
- * colours---required by the pm3d splotting mode and coloured filled contours
+ * colours---required by the pm3d splotting mode and coloured filled contours.
  *
 ]*/
 
@@ -64,7 +59,7 @@ t_sm_palette sm_palette = {
 };
 
 
-/* SMOOTH COLOUR BOX - GLOBAL VARIABLE */
+/* SMOOTH COLOUR BOX - GLOBAL VARIABLES */
 
 color_box_struct color_box = {
     SMCOLOR_BOX_DEFAULT,	/* draw at default_pos */
@@ -72,13 +67,19 @@ color_box_struct color_box = {
     1,				/* border is on by default */
     -1,				/* use default border */
 
-    0, 0,			/* origin */
-    1, 1			/* size */
+    0.9, 0.2,			/* origin */
+    0.1, 0.63			/* size */
 };
 
 #ifdef EXTENDED_COLOR_SPECS
 int supply_extended_color_specs = 0;
 #endif
+
+/* Corners of the colour box. */
+unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
+
+/* #define PUT_ZMINMAX_AROUND - the old system of printing zmin,max labels around */
+
 
 /********************************************************************
   ROUTINES
@@ -235,7 +236,6 @@ filled_quadrangle(gpdPoint * corners)
 
     if (pm3d.hidden3d_tag) {
 
-
 	/* Colour has changed, thus must apply properties again. That's because
 	   gnuplot has no inner notion of color.
 	 */
@@ -304,17 +304,20 @@ filled_polygon_3dcoords_zfixed(int points, struct coordinate GPHUGE * coords, do
 
 
 /* plot the colour smooth box for from terminal's integer coordinates
-   [x_from,y_from] to [x_to,y_to].
+   [cb_x_from,cb_y_from] to [cb_x_to,cb_y_to].
    This routine is for postscript files --- actually, it writes a small
-   PS routine
+   PS routine.
  */
-static void draw_inside_color_smooth_box_postscript(FILE * out, int x_from, int y_from, int x_to, int y_to) {
-    int scale_x = (x_to - x_from), scale_y = (y_to - y_from);
+static void
+draw_inside_color_smooth_box_postscript(out)
+FILE * out;
+{
+    int scale_x = (cb_x_to - cb_x_from), scale_y = (cb_y_to - cb_y_from);
     fputs("stroke gsave\t%% draw gray scale smooth box\n"
 	  "maxcolors 0 gt {/imax maxcolors def} {/imax 1024 def} ifelse\n", out);
 
     /* nb. of discrete steps (counted in the loop) */
-    fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", x_from, y_from, scale_x, scale_y);
+    fprintf(out, "%i %i translate %i %i scale 0 setlinewidth\n", cb_x_from, cb_y_from, scale_x, scale_y);
     /* define left bottom corner and scale of the box so that all coordinates
        of the box are from [0,0] up to [1,1]. Further, this normalization
        makes it possible to pass y from [0,1] as parameter to setgray */
@@ -333,32 +336,36 @@ static void draw_inside_color_smooth_box_postscript(FILE * out, int x_from, int 
 	  "grestore 0 setgray\n", out);
 }				/* end of optimized PS output */
 
+
 /* plot the colour smooth box for from terminal's integer coordinates
    [x_from,y_from] to [x_to,y_to].
    This routine is for non-postscript files, as it does explicitly the loop
    over all thin rectangles
  */
-static void draw_inside_color_smooth_box_bitmap(FILE * out, int x_from, int y_from, int x_to, int y_to) {
-    int steps = 128;		/* I think that nobody can distinguish more colours from the palette */
+static void
+draw_inside_color_smooth_box_bitmap(out)
+FILE * out;
+{
+    int steps = 128; /* I think that nobody can distinguish more colours drawn in the palette */
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
     gpiPoint corners[4];
     if (color_box.rotation == 'v') {
-	corners[0].x = corners[3].x = x_from;
-	corners[1].x = corners[2].x = x_to;
-	xy_from = y_from;
-	xy_to = y_to;
+	corners[0].x = corners[3].x = cb_x_from;
+	corners[1].x = corners[2].x = cb_x_to;
+	xy_from = cb_y_from;
+	xy_to = cb_y_to;
     } else {
-	corners[0].y = corners[1].y = y_from;
-	corners[2].y = corners[3].y = y_to;
-	xy_from = x_from;
-	xy_to = x_to;
+	corners[0].y = corners[1].y = cb_y_from;
+	corners[2].y = corners[3].y = cb_y_to;
+	xy_from = cb_x_from;
+	xy_to = cb_x_to;
     }
-    xy_step = (color_box.rotation == 'h' ? x_to - x_from : y_to - y_from) / (double) steps;
+    xy_step = (color_box.rotation == 'h' ? cb_x_to - cb_x_from : cb_y_to - cb_y_from) / (double) steps;
 
     for (i = 0; i < steps; i++) {
 	gray = (double) i / (steps - 1);	/* colours equidistantly from [0,1] */
-	/* set the colour (also for terminals which support extended specs) */
+	/* Set the colour (also for terminals which support extended specs). */
 	set_color(gray);
 	xy = xy_from + (int) (xy_step * i);
 	xy2 = xy_from + (int) (xy_step * (i + 1));
@@ -379,6 +386,91 @@ static void draw_inside_color_smooth_box_bitmap(FILE * out, int x_from, int y_fr
     }
 }
 
+void
+cbtick_callback(axis, place, text, grid)
+AXIS_INDEX axis;
+double place;
+char *text;
+struct lp_style_type grid; /* linetype or -2 for no grid */
+{
+    int len = (text ? ticscale : miniticscale)
+	* (tic_in ? -1 : 1) * (term->h_tic);
+    double cb_place = (place - CB_AXIS.min) / (CB_AXIS.max - CB_AXIS.min);
+	/* relative z position along the colorbox axis */
+    unsigned int x1, y1, x2, y2;
+
+#if 0
+    printf("cbtick_callback:  place=%g\ttext=\"%s\"\tgrid.l_type=%i\n",place,text,grid.l_type);
+#endif
+
+    /* calculate tic position */
+    if (color_box.rotation == 'h') {
+	x1 = x2 = cb_x_from + cb_place * (cb_x_to - cb_x_from);
+	y1 = cb_y_to;
+	y2 = cb_y_to + len;
+    } else {
+	x1 = cb_x_to;
+	x2 = cb_x_to + len;
+	y1 = y2 = cb_y_from + cb_place * (cb_y_to - cb_y_from);
+    }
+
+    /* draw grid line */
+    if (grid.l_type > -2) {
+	term_apply_lp_properties(&grid);	/* grid linetype */
+	if (color_box.rotation == 'h') {
+	    (*term->move) (x1, cb_y_from);
+	    (*term->vector) (x1, cb_y_to);
+	} else {
+	    (*term->move) (cb_x_from, y1);
+	    (*term->vector) (cb_x_to, y1);
+	}
+	term_apply_lp_properties(&border_lp);	/* border linetype */
+    }
+
+    /* draw tic */
+    (*term->move) (x1, y1);
+    (*term->vector) (x2, y2);
+
+    /* draw label */
+    if (text) {
+	if (color_box.rotation == 'h') {
+	    unsigned int y3 = cb_y_from - (term->v_char);
+	    y3 -= (int)( (term->v_tic) * (ticscale >= 0 && !tic_in ? ticscale : 1) * (tic_in ? 0.3 : 1.3 ) );
+#if 1
+	    if (term->justify_text)
+		term->justify_text(CENTRE);
+	    (*term->put_text)(x2, y3, text);
+#else /* clipping does not work properly for text around 3d graph */
+	    clip_put_text_just(x2, y3, text, CENTRE);
+#endif
+	} else {
+	    unsigned int x3 = cb_x_to + (term->h_char);
+	    x3 += (int)( (term->h_tic) * (ticscale >= 0 && !tic_in ? ticscale : 1) * (tic_in ? 0.3 : 1.3) );
+#if 1
+	    if (term->justify_text)
+		term->justify_text(LEFT);
+	    (*term->put_text)(x3, y2, text);
+#else /* clipping does not work properly for text around 3d graph */
+	    clip_put_text_just(x3, y2, text, LEFT);
+#endif
+	}
+    }
+
+    /* draw tic on the mirror side */
+    if (CB_AXIS.ticmode & TICS_MIRROR) {
+	if (color_box.rotation == 'h') {
+	    y1 = cb_y_from;
+	    y2 = cb_y_from - len;
+	} else {
+	    x1 = cb_x_from;
+	    x2 = cb_x_from - len;
+	}
+	(*term->move) (x1, y1);
+	(*term->vector) (x2, y2);
+    }
+}
+
+#ifdef PUT_ZMINMAX_AROUND
 static float
 color_box_text_displacement(const char *str, int just)
 {
@@ -394,6 +486,7 @@ color_box_text_displacement(const char *str, int just)
 	    return 0.75;
     }
 }
+#endif
 
 /*
    Finally the main colour smooth box drawing routine
@@ -401,9 +494,10 @@ color_box_text_displacement(const char *str, int just)
 void
 draw_color_smooth_box()
 {
-    unsigned int x_from, x_to, y_from, y_to;
     double tmp;
+#ifdef PUT_ZMINMAX_AROUND
     char s[64];
+#endif
     FILE *out = postscript_gpoutfile;	/* either gpoutfile or PSLATEX_auxfile */
 
     if (color_box.where == SMCOLOR_BOX_NO)
@@ -421,38 +515,37 @@ draw_color_smooth_box()
        }
      */
     if (color_box.where == SMCOLOR_BOX_USER) {
-	x_from = color_box.xorigin * (term->xmax) + 0.5;
-	y_from = color_box.yorigin * (term->ymax) + 0.5;
-	x_to = color_box.xsize * (term->xmax) + 0.5;
-	y_to = color_box.ysize * (term->ymax) + 0.5;
-	x_to += x_from;
-	y_to += y_from;
+	cb_x_from = color_box.xorigin * (term->xmax) + 0.5;
+	cb_y_from = color_box.yorigin * (term->ymax) + 0.5;
+	cb_x_to = color_box.xsize * (term->xmax) + 0.5;
+	cb_y_to = color_box.ysize * (term->ymax) + 0.5;
+	cb_x_to += cb_x_from;
+	cb_y_to += cb_y_from;
     } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
 	double dx = (X_AXIS.max - X_AXIS.min);
-	double dz = (used_pm3d_zmax - used_pm3d_zmin);
-	map3d_xy(X_AXIS.max + dx * 0.05, Y_AXIS.max, base_z + dz * 0.35, &x_from, &y_from);
-	map3d_xy(X_AXIS.max + dx * 0.20, Y_AXIS.max, ceiling_z - dz * 0.0, &x_to, &y_to);
-	if (y_from == y_to || x_from == x_to) {	/* map, i.e. plot with "set view 0,0 or 180,0" */
+	double dz = CB_AXIS.max - CB_AXIS.min;
+	map3d_xy(X_AXIS.max + dx * 0.05, Y_AXIS.max, base_z + dz * 0.35, &cb_x_from, &cb_y_from);
+	map3d_xy(X_AXIS.max + dx * 0.20, Y_AXIS.max, ceiling_z - dz * 0.0, &cb_x_to, &cb_y_to);
+	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
 	    dz = Y_AXIS.max - Y_AXIS.min;
-	    map3d_xy(X_AXIS.max + dx * 0.04, Y_AXIS.min + dz * 0.25, base_z, &x_from, &y_from);
-	    map3d_xy(X_AXIS.max + dx * 0.18, Y_AXIS.max - dz * 0.25, ceiling_z, &x_to, &y_to);
+	    map3d_xy(X_AXIS.max + dx * 0.04, Y_AXIS.min + dz * 0.25, base_z, &cb_x_from, &cb_y_from);
+	    map3d_xy(X_AXIS.max + dx * 0.18, Y_AXIS.max - dz * 0.25, ceiling_z, &cb_x_to, &cb_y_to);
 	}
     }
 
-    if (y_from > y_to) {	/* switch them */
-	tmp = y_to;
-	y_to = y_from;
-	y_from = tmp;
+    if (cb_y_from > cb_y_to) { /* switch them */
+	tmp = cb_y_to;
+	cb_y_to = cb_y_from;
+	cb_y_from = tmp;
     }
 
     /* Optimized version of the smooth colour box in postscript. Advantage:
        only few lines of code is written into the output file.
      */
     if (postscript_gpoutfile)
-	draw_inside_color_smooth_box_postscript(out, x_from, y_from, x_to, y_to);
-    /* color_box.border , color_box.border_lt_tag); */
+	draw_inside_color_smooth_box_postscript(out);
     else
-	draw_inside_color_smooth_box_bitmap(out, x_from, y_from, x_to, y_to);
+	draw_inside_color_smooth_box_bitmap(out);
 
     if (color_box.border) {
 	/* now make boundary around the colour box */
@@ -465,25 +558,24 @@ draw_color_smooth_box()
 	    /* black solid colour should be chosen, so it's border linetype */
 	    term_apply_lp_properties(&border_lp);
 	}
-	(term->move) (x_from, y_from);
-	(term->vector) (x_to, y_from);
-	(term->vector) (x_to, y_to);
-	(term->vector) (x_from, y_to);
-	(term->vector) (x_from, y_from);
+	(term->move) (cb_x_from, cb_y_from);
+	(term->vector) (cb_x_to, cb_y_from);
+	(term->vector) (cb_x_to, cb_y_to);
+	(term->vector) (cb_x_from, cb_y_to);
+	(term->vector) (cb_x_from, cb_y_from);
 
-	/* Ugly */
-	/*Set line properties to some value, this also draws lines in postscript terminals! */
-	{
+	/* Set line properties to some value, this also draws lines in postscript terminals. */
 	    term_apply_lp_properties(&border_lp);
 	}
-    }
 
-
-    /* and finally place text of min z and max z below and above wrt
-       colour box, respectively
+#ifdef PUT_ZMINMAX_AROUND
+    /* And finally place text of min z and max z below and above wrt
+       colour box, respectively.
+       This is no more needed after the implementation of cbaxis, but we let it
+       here for studying purposes.
      */
 
-    tmp = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS, used_pm3d_zmin);
+    tmp = AXIS_DE_LOG_VALUE(COLOR_AXIS, CB_AXIS.min);
 #if 0
     sprintf(s, "%g", tmp);
 #else /* format the label using `set format z` */
@@ -493,22 +585,22 @@ draw_color_smooth_box()
 	if (term->justify_text)
 	    term->justify_text(LEFT);
 	tmp = color_box_text_displacement(s, JUST_TOP);
-	(term->put_text) (x_from, y_from - term->v_char * tmp, s);
+	(term->put_text) (cb_x_from, cb_y_from - term->v_char * tmp, s);
     } else {
 	if (term->justify_text)
 	    term->justify_text(CENTRE);
-	if (y_to > term->ymax / 2) {
+	if (cb_y_to > term->ymax / 2) {
 	    /* color box is somewhere at the top, draw the text below */
 	    tmp = color_box_text_displacement(s, JUST_TOP);
-	    (term->put_text) (x_from, y_from - term->v_char * tmp, s);
+	    (term->put_text) (cb_x_from, cb_y_from - term->v_char * tmp, s);
 	} else {
 	    /* color box is somewhere at the bottom, draw the text above */
 	    tmp = color_box_text_displacement(s, JUST_BOT);
-	    (term->put_text) (x_from, y_to + term->v_char * tmp, s);
+	    (term->put_text) (cb_x_from, cb_y_to + term->v_char * tmp, s);
 	}
     }
 
-    tmp = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS, used_pm3d_zmax);
+    tmp = AXIS_DE_LOG_VALUE(COLOR_AXIS, CB_AXIS.max);
 #if 0
     sprintf(s, "%g", tmp);
 #else
@@ -517,18 +609,51 @@ draw_color_smooth_box()
     if (color_box.rotation == 'v') {
 	/* text was eventually already left-justified above */
 	tmp = color_box_text_displacement(s, JUST_BOT);
-	(term->put_text) (x_from, y_to + term->v_char * tmp, s);
+	(term->put_text) (cb_x_from, cb_y_to + term->v_char * tmp, s);
     } else {
 	if (term->justify_text)
 	    term->justify_text(CENTRE);
-	if (y_to > term->ymax / 2) {
+	if (cb_y_to > term->ymax / 2) {
 	    tmp = color_box_text_displacement(s, JUST_TOP);
 	    /* color box is somewhere at the top, draw the text below */
-	    (term->put_text) (x_to, y_from - term->v_char * tmp, s);
+	    (term->put_text) (cb_x_to, cb_y_from - term->v_char * tmp, s);
 	} else {
 	    tmp = color_box_text_displacement(s, JUST_BOT);
 	    /* color box is somewhere at the top, draw the text below */
-	    (term->put_text) (x_to, y_to + term->v_char * tmp, s);
+	    (term->put_text) (cb_x_to, cb_y_to + term->v_char * tmp, s);
+	}
+    }
+#endif /* PUT_ZMINMAX_AROUND */
+
+    /* draw tics */
+    if (axis_array[COLOR_AXIS].ticmode) {
+	/* setup tics, but avoid changing CB_AXIS.min, max */
+	int i = CB_AXIS.autoscale;
+	CB_AXIS.autoscale = 0;
+	setup_tics(COLOR_AXIS, 20);
+	CB_AXIS.autoscale = i;
+	term_apply_lp_properties(&border_lp); /* border linetype */
+	gen_tics( COLOR_AXIS, grid_selection & (GRID_CB | GRID_MCB),
+		  cbtick_callback );
+    }
+
+    /* write the colour box label */
+    if (*CB_AXIS.label.text) {
+	unsigned int x, y;
+	if (color_box.rotation == 'h') {
+	    x = (cb_x_from + cb_x_to) / 2 + CB_AXIS.label.xoffset * term->h_char;
+	    y = cb_y_from + (CB_AXIS.label.yoffset - 2.5) * term->v_char;
+	    write_multiline(x, y, CB_AXIS.label.text, CENTRE, CENTRE, 0,
+			    CB_AXIS.label.font);
+	} else {
+	    x = cb_x_to + (CB_AXIS.label.xoffset + 6) * term->h_char;
+	    y = (cb_y_from + cb_y_to) / 2 + CB_AXIS.label.yoffset * term->v_char;
+	    if ((*term->text_angle)(1)) {
+		write_multiline(x, y, CB_AXIS.label.text, CENTRE, JUST_TOP, 1, CB_AXIS.label.font);
+		(*term->text_angle)(0);
+	    } else {
+		write_multiline(x, y, CB_AXIS.label.text, LEFT, JUST_TOP, 0, CB_AXIS.label.font);
+	    }
 	}
     }
 

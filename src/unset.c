@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.16 2000/11/23 18:26:23 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.17 2001/02/28 16:41:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -151,8 +151,8 @@ unset_command()
 \t'output', 'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
 \t'[rtuv]range',  'samples', 'size', 'style', 'surface', 'terminal',\n\
 \t'tics',  'ticscale', 'ticslevel', 'timestamp',  'timefmt', 'title',\n\
-\t'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
-\t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
+\t'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label', '[xyz,cb]{2}range',\n\
+\t'{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
     int found_token;
 
@@ -380,6 +380,17 @@ unset_command()
     case S_ZDTICS:
     case S_ZMTICS: 
 	break;
+#ifdef PM3D
+    case S_MCBTICS:
+	unset_mtics(COLOR_AXIS);
+	break;
+    case S_CBTICS:
+	unset_tics(COLOR_AXIS);
+	break;
+    case S_CBDTICS:
+    case S_CBMTICS: 
+	break;
+#endif
     case S_XDATA:
 	unset_timedata(FIRST_X_AXIS);
 	/* FIXME HBB 20000506: does unsetting these axes make *any*
@@ -396,6 +407,11 @@ unset_command()
     case S_ZDATA:
 	unset_timedata(FIRST_Z_AXIS);
 	break;
+#ifdef PM3D
+    case S_CBDATA:
+	unset_timedata(COLOR_AXIS);
+	break;
+#endif
     case S_X2DATA:
 	unset_timedata(SECOND_X_AXIS);
 	break;
@@ -411,6 +427,11 @@ unset_command()
     case S_ZLABEL:
 	unset_axislabel(FIRST_Z_AXIS);
 	break;
+#ifdef PM3D
+    case S_CBLABEL:
+	unset_axislabel(COLOR_AXIS);
+	break;
+#endif
     case S_X2LABEL:
 	unset_axislabel(SECOND_X_AXIS);
 	break;
@@ -432,6 +453,11 @@ unset_command()
     case S_ZRANGE:
 	unset_range(FIRST_Z_AXIS);
 	break;
+#ifdef PM3D
+    case S_CBRANGE:
+	unset_range(COLOR_AXIS);
+	break;
+#endif
     case S_RRANGE:
 	unset_range(R_AXIS);
 	break;
@@ -679,6 +705,9 @@ unset_format()
 	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
+#ifdef PM3D
+	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
+#endif
     }
 }
 

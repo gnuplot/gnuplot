@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.20 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.21 2000/12/20 19:49:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -763,11 +763,6 @@ set ticscale %g %g\n",
     case PM3D_FLUSH_BEGIN: fputs("begin", fp); break;
     case PM3D_FLUSH_END: fputs("end", fp); break;
     }
-    fputs(" zrange [", fp);
-    if (pm3d.pm3d_zmin) fprintf(fp,"%g:",pm3d.zmin);
-	else fputs("*:", fp);
-    if (pm3d.pm3d_zmax) fprintf(fp,"%g]",pm3d.zmax);
-	else fputs("*]", fp);
     if (pm3d.hidden3d_tag) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
 	else fputs(" nohidden3d", fp);
     fputs( (pm3d.solid ? " solid" : " transparent"), fp);

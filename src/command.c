@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.51 2001/02/19 17:10:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.52 2001/02/28 16:39:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1061,7 +1061,7 @@ reread_command()
 }
 
 
-/* reset_command() is in set.c */
+/* reset_command() is in unset.c */
 
 
 /* process the 'save' command */

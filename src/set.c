@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.53 2001/02/15 17:02:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.54 2001/02/28 16:41:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -162,15 +162,15 @@ set_command()
     static char GPFAR setmess[] = 
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles',  'arrow',  'autoscale',  'bars',  'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'data style',\n\
-\t'dgrid3d',  'dummy',  'encoding',  'format', 'function style', 'grid',\n\
-\t'hidden3d',  'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
+\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'style',\n\
+\t'dgrid3d',  'dummy',  'encoding',  'format', 'grid', 'hidden3d',\n\
+\t'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
 \t'locale',  'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
 \t'multiplot',  'offsets', 'origin', 'output', 'palette', 'parametric',\n\
 \t'pm3d', 'pointsize', 'polar', '[rtuv]range', 'samples', 'size',\n\
 \t'surface', 'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp',\n\
-\t'timefmt', 'title', 'view', '[xyz]{2}data', '[xyz]{2}label',\n\
-\t'[xyz]{2}range', '{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics',\n\
+\t'timefmt', 'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
+\t'[xyz,cb]{2}range', '{no}{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
 \t'{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
@@ -444,6 +444,18 @@ set_command()
 	case S_NOZMTICS:
 	    set_tic_prop(FIRST_Z_AXIS);
 	    break;
+#ifdef PM3D
+	case S_MCBTICS:
+	case S_NOMCBTICS:
+	case S_CBTICS:
+	case S_NOCBTICS:
+	case S_CBDTICS:
+	case S_NOCBDTICS:
+	case S_CBMTICS: 
+	case S_NOCBMTICS:
+	    set_tic_prop(COLOR_AXIS);
+	    break;
+#endif
 	case S_XDATA:
 	    set_timedata(FIRST_X_AXIS);
 	    /* HBB 20000506: the old cod this this, too, although it
@@ -463,6 +475,11 @@ set_command()
 	case S_ZDATA:
 	    set_timedata(FIRST_Z_AXIS);
 	    break;
+#ifdef PM3D
+	case S_CBDATA:
+	    set_timedata(COLOR_AXIS);
+	    break;
+#endif
 	case S_X2DATA:
 	    set_timedata(SECOND_X_AXIS);
 	    break;
@@ -478,6 +495,11 @@ set_command()
 	case S_ZLABEL:
 	    set_xyzlabel(&axis_array[FIRST_Z_AXIS].label);
 	    break;
+#ifdef PM3D
+	case S_CBLABEL:
+	    set_xyzlabel(&axis_array[COLOR_AXIS].label);
+	    break;
+#endif
 	case S_X2LABEL:
 	    set_xyzlabel(&axis_array[SECOND_X_AXIS].label);
 	    break;
@@ -499,6 +521,11 @@ set_command()
 	case S_ZRANGE:
 	    set_range(FIRST_Z_AXIS);
 	    break;
+#ifdef PM3D
+	case S_CBRANGE:
+	    set_range(COLOR_AXIS);
+	    break;
+#endif
 	case S_RRANGE:
 	    set_range(R_AXIS);
 	    break;
@@ -805,7 +832,9 @@ set_autoscale()
     PROCESS_AUTO_LETTER(FIRST_Z_AXIS);
     PROCESS_AUTO_LETTER(SECOND_X_AXIS);
     PROCESS_AUTO_LETTER(SECOND_Y_AXIS);
-
+#ifdef PM3D
+    PROCESS_AUTO_LETTER(COLOR_AXIS);
+#endif
     /* came here only if nothing found: */
 	int_error(c_token, "Invalid range");
 }
@@ -1136,6 +1165,9 @@ set_format()
 	SET_DEFFORMAT(FIRST_Z_AXIS , set_for_axis);
 	SET_DEFFORMAT(SECOND_X_AXIS, set_for_axis);
 	SET_DEFFORMAT(SECOND_Y_AXIS, set_for_axis);
+#ifdef PM3D
+	SET_DEFFORMAT(COLOR_AXIS   , set_for_axis);
+#endif
     } else {
 	if (!isstring(c_token))
 	    int_error(c_token, "expecting format string");
@@ -1152,6 +1184,9 @@ set_format()
 	    SET_FORMATSTRING(FIRST_Z_AXIS);
 	    SET_FORMATSTRING(SECOND_X_AXIS);
 	    SET_FORMATSTRING(SECOND_Y_AXIS);
+#ifdef PM3D
+	    SET_FORMATSTRING(COLOR_AXIS);
+#endif
 #undef SET_FORMATSTRING
 
 	    c_token++;
@@ -1189,6 +1224,10 @@ set_grid()
 	    else GRID_MATCH("mz$tics", "nomz$tics", GRID_MZ)
 	    else GRID_MATCH("mx2$tics", "nomx2$tics", GRID_MX2)
 	    else GRID_MATCH("my2$tics", "nomy2$tics", GRID_MY2)
+#ifdef PM3D
+	    else GRID_MATCH("cb$tics", "nocb$tics", GRID_CB)
+	    else GRID_MATCH("mcb$tics", "nomcb$tics", GRID_MCB)
+#endif
 	    else if (almost_equals(c_token,"po$lar")) {
 		if (!grid_selection)
 		    grid_selection = GRID_X;
@@ -1833,6 +1872,10 @@ set_logscale()
 	double newbase = 10;
 
 	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
+#ifdef PM3D
+	    if (axis == COLOR_AXIS) 
+		int_error(c_token,"cannot set independent log for cb-axis --- log setup of z-axis is used");
+#endif
 	    set_for_axis[axis] = TRUE;
 	} else { /* must not see x when x2, etc */
 	    if (chr_in_str(c_token, 'x'))
@@ -2423,37 +2466,6 @@ set_pm3d()
 	    }
 	    if (almost_equals(c_token, "clip4$in")) {
 		pm3d.clip = PM3D_CLIP_4IN;
-		continue;
-	    }
-	    /* zrange [{zmin|*}:{zmax|*}] */
-	    /* Note: here, we cannot use neither PROCESS_RANGE or load_range */
-	    if (almost_equals(c_token, "zr$ange")) {
-		struct value a;
-		if (!equals(++c_token,"[")) int_error(c_token,"expecting '['");
-		c_token++;
-		if (!equals(c_token,":")) { /* no change for zmin */
-		    if (equals(c_token,"*")) {
-			pm3d.pm3d_zmin = 0; /* from gnuplot's set zrange */
-			c_token++;
-		    }
-		    else {
-			pm3d.pm3d_zmin = 1; /* use pm3d's zmin */
-			pm3d.zmin = real(const_express(&a)); /* explicit value given */
-		    }
-		}
-		if (!equals(c_token,":")) int_error(c_token,"expecting ':'");
-		c_token++;
-		if (!equals(c_token,"]")) { /* no change for zmax */
-		    if (equals(c_token,"*")) {
-			pm3d.pm3d_zmax = 0; /* from gnuplot's set zrange */
-			c_token++;
-		    }
-		    else {
-			pm3d.pm3d_zmax = 1; /* use pm3d's zmin */
-			pm3d.zmax = real(const_express(&a)); /* explicit value given */
-		    }
-		}
-		if (!equals(c_token,"]")) int_error(c_token,"expecting ']'");
 		continue;
 	    }
 	    /* setup everything for plotting a map */

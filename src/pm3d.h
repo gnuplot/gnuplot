@@ -1,12 +1,12 @@
 /*
- * $Id: pm3d.h,v 1.5 2000/11/22 10:04:25 mikulik Exp $
+ * $Id: pm3d.h,v 1.6 2000/11/23 08:35:39 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
 
 /*[
  *
- * Petr Mikulik, December 1998 -- July 1999
+ * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
  *
  * 
@@ -82,8 +82,6 @@ typedef struct {
   char flush;   	/* left, right, center */
   char direction;	/* forward, backward */
   char clip;		/* 1in, 4in */
-  char pm3d_zmin, pm3d_zmax; /* use zmin,zmax of 0: 'set zrange'; 1: pm3d below */
-  double zmin, zmax;	/* pm3d's zmin, zmax */
   int hidden3d_tag;     /* if this is > 0, pm3d hidden lines are drawn with
 			   this linestyle (which must naturally present). */
   int solid;            /* if this is != 0, border tics and labels might be
@@ -93,11 +91,6 @@ typedef struct {
 
 extern pm3d_struct pm3d;
 
-
-/* global variables
-The following two are used in z2gray(), and for labeling draw_color_smooth_box()
-*/
-extern double used_pm3d_zmin, used_pm3d_zmax;
 
 /****
   Declaration of routines

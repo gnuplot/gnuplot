@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.39 2001/01/18 14:16:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.40 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -573,18 +573,20 @@ do_3dplot(plots, pcount, quick)
 	}
 	if (palette)
 	    can_pm3d = set_pm3d_zminmax() && !make_palette() && term->set_color;
-	if (pm3d.where[0] && can_pm3d) {
+	if (can_pm3d) {
+	    axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
+	    axis_revert_and_unlog_range(COLOR_AXIS);
+	    /* draw the colour surfaces */
+	    if (pm3d.where[0]) {
 	    if (pm3d.solid) {
 		whichgrid = BACKGRID;
 		draw_3d_graphbox(plots, pcount);
 	    }
 	    pm3d_draw_all(plots, pcount);
 	}
-
-	if (can_pm3d) {
 	    /* draw colour box */
 	    draw_color_smooth_box();
-	}
+	} /* can_pm3d */
     }
 #endif
 

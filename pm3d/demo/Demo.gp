@@ -7,13 +7,16 @@
 
 # Prepared by Petr Mikulik
 # History: 
+# 	- 18. 3. 2001: updated for cb-axis
 # 	- 18.11. 2000: updated for 'set colorbox'
 # 	- 03. 3. 2000: updated to show new pm3d features (Johannes Zellner)
 #	- 15. 6. 1999: update for `set pm3d`+`set palette`
-# 	- 29. 4. 1999: 1st version
+# 	- 29. 4. 1999: the 1st version
 
 
 print "Working..."
+
+set term push
 
 #BEGIN
 
@@ -37,6 +40,7 @@ pause -1 "Press Enter."
 set title "pm3d at s (surface) / ticslevel 0"
 set ticslevel 0
 set pm3d at s
+set cblabel "colour gradient" 2,0
 replot
 pause -1 "Press Enter."
 
@@ -56,6 +60,8 @@ unset surface
 set pm3d at st solid
 replot
 pause -1 "Press Enter."
+
+set nocblabel
 
 set title "set pm3d at bstbst (funny combination, only for screen or postscript)"
 set view 50,50
@@ -109,6 +115,8 @@ set yrange [*:*] noreverse
 
 
 reset
+set term pop
+
 set title "surface at view 130,10 (viewed from below)"
 set pm3d
 set palette
@@ -166,12 +174,13 @@ set pm3d at st
 splot log(x*x*y*y)
 pause -1 "Press Enter."
 
-set title "solution: use independent 'set zrange' and 'set pm3d zrange'"
+set title "solution: use independent 'set zrange' and 'set cbrange'"
 unset surf
-set pm3d zrange [-15:4]
+set cbrange [-15:4]
 set zrange [-15:60]
 splot log(x*x*y*y)
-pause -1 "Press Enter."
+pause -1 "Press Enter; I will continue by 'set autoscale cb' and much more..."
+set autoscale cb
 
 set title "color box is on by default at a certain position"
 set samples 20; set isosamples 20
@@ -184,9 +193,16 @@ splot y
 pause -1 "Press Enter."
 
 set title "color box is on again, now with horizontal gradient"
+set size 0.6,0.6; set origin 0.2,0.25
 set colorbox horizontal
+set colorbox user origin 0.1,0.15 size 0.8,0.1
+set mcbtics 2
+set grid cb
+set cblabel "see cblabel, grid cb, mcbtics, ..."
 replot 
 pause -1 "Press Enter."
+
+unset cblabel; unset mcbtics; set grid nocb; set colorbox default
 
 set title "color box is switched off"
 unset colorbox
@@ -203,8 +219,7 @@ set xlabel "X LABEL"
 set ylabel "Y LABEL" 7
 
 set sample 11; set isosamples 11
-unset surface
-set pm3d
+set pm3d map
 set palette
 set colorbox
 set lmargin 0
@@ -232,19 +247,24 @@ pause -1 "Press Enter."
 
 
 reset
-set title "only for enhanced terminals: 'set format z ...'"
+set term pop
+
+set title "only for enhanced terminals: 'set format cb ...'"
 set xlabel "X"
 set ylabel "Y"
 set sample 31; set isosamples 31
 set xrange [-185:185]
 set yrange [-185:185]
-set format z "%.01t*10^{%T}"
+set format cb "%.01t*10^{%T}"
 unset surface
 set border 4095
 set ticslevel 0
 set pm3d at s solid; set palette gray
+set cblabel "the colour gradient"
 splot abs(x)**3+abs(y)**3
 pause -1 "Press Enter."
+
+unset cblabel
 
 set pal color
 set xrange [*:*]; set yrange [*:*]
@@ -274,6 +294,8 @@ splot sin(y)/(y) w lp lt pal
 pause -1
 
 reset
+set term pop
+
 set title "Demo for clipping of 2 rectangles will come. Now xrange is [0:2]"
 set pm3d; set palette
 set pm3d map

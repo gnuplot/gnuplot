@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.17 2000/11/22 10:04:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.18 2000/12/12 13:25:27 joze Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -198,6 +198,10 @@ struct gen_table set_tbl[] =
     { "nomy2t$ics", S_NOMY2TICS },
     { "mzt$ics", S_MZTICS },
     { "nomzt$ics", S_NOMZTICS },
+#ifdef PM3D
+    { "mcbt$ics", S_MCBTICS },
+    { "nomcbt$ics", S_NOMCBTICS },
+#endif
 
     { "of$fsets", S_OFFSETS },
     { "or$igin", S_ORIGIN },
@@ -231,13 +235,19 @@ struct gen_table set_tbl[] =
     { "x2da$ta", S_X2DATA },
     { "yda$ta", S_YDATA },
     { "y2da$ta", S_Y2DATA },
-    { "zda$ta", S_YDATA },
+    { "zda$ta", S_ZDATA },
+#ifdef PM3D
+    { "cbda$ta", S_CBDATA },
+#endif
 
     { "xl$abel", S_XLABEL },
     { "x2l$abel", S_X2LABEL },
     { "yl$abel", S_YLABEL },
     { "y2l$abel", S_Y2LABEL },
     { "zl$abel", S_ZLABEL },
+#ifdef PM3D
+    { "cbl$abel", S_CBLABEL },
+#endif
 
     { "xti$cs", S_XTICS },
     { "noxti$cs", S_NOXTICS },
@@ -249,6 +259,10 @@ struct gen_table set_tbl[] =
     { "noy2ti$cs", S_NOY2TICS },
     { "zti$cs", S_ZTICS },
     { "nozti$cs", S_NOZTICS },
+#ifdef PM3D
+    { "cbti$cs", S_CBTICS },
+    { "nocbti$cs", S_NOCBTICS },
+#endif
 
     { "xdti$cs", S_XDTICS },
     { "noxdti$cs", S_NOXDTICS },
@@ -260,6 +274,10 @@ struct gen_table set_tbl[] =
     { "noy2dti$cs", S_NOY2DTICS },
     { "zdti$cs", S_ZDTICS },
     { "nozdti$cs", S_NOZDTICS },
+#ifdef PM3D
+    { "cbdti$cs", S_CBDTICS },
+    { "nocbdti$cs", S_NOCBDTICS },
+#endif
 
     { "xmti$cs", S_XMTICS },
     { "noxmti$cs", S_NOXMTICS },
@@ -271,12 +289,19 @@ struct gen_table set_tbl[] =
     { "noy2mti$cs", S_NOY2MTICS },
     { "zmti$cs", S_ZMTICS },
     { "nozmti$cs", S_NOZMTICS },
+#ifdef PM3D
+    { "cbmti$cs", S_CBMTICS },
+    { "nocbmti$cs", S_NOCBMTICS },
+#endif
 
     { "xr$ange", S_XRANGE },
     { "x2r$ange", S_X2RANGE },
     { "yr$ange", S_YRANGE },
     { "y2r$ange", S_Y2RANGE },
     { "zr$ange", S_ZRANGE },
+#ifdef PM3D
+    { "cbr$ange", S_CBRANGE },
+#endif
     { "rr$ange", S_RRANGE },
     { "tr$ange", S_TRANGE },
     { "ur$ange", S_URANGE },

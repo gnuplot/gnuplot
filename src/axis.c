@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.7 2001/02/01 17:56:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.8 2001/02/15 17:02:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -69,6 +69,9 @@ AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { - 0, 10, "r" , NO_TICS,                      }, 
     { - 5,  5, "u" , NO_TICS,                      }, 
     { - 5,  5, "v" , NO_TICS,                      }, 
+#ifdef PM3D
+    { -10, 10, "cb", TICS_ON_BORDER | TICS_MIRROR, }, 
+#endif
 };
 
 
@@ -94,6 +97,9 @@ struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
     { "r", R_AXIS},
     { "u", U_AXIS},
     { "v", V_AXIS},
+#ifdef PM3D
+    { "cb", COLOR_AXIS},
+#endif
     { NULL, -1}
 };
     
@@ -1012,8 +1018,8 @@ gen_tics(axis, grid, callback)
 
     memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
     memcpy(&mgrd, &mgrid_lp, sizeof(struct lp_style_type));
-    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 | GRID_Y2 | GRID_Z)) ? grid_lp.l_type : -2;
-    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 | GRID_MY2 | GRID_MZ)) ? mgrid_lp.l_type : -2;
+    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 | GRID_Y2 | GRID_Z | GRID_CB)) ? grid_lp.l_type : -2;
+    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 | GRID_MY2 | GRID_MZ | GRID_MCB)) ? mgrid_lp.l_type : -2;
 
     if (def->type == TIC_USER) {	/* special case */
 	/*{{{  do user tics then return */

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.61 2000/12/18 08:21:17 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.62 2000/12/19 14:26:40 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -4228,6 +4228,7 @@ C ... and restart the table:
  Syntax:
        set grid {{no}{m}xtics} {{no}{m}ytics} {{no}{m}ztics}
                 {{no}{m}x2tics} {{no}{m}y2tics}
+                {{no}{m}cbtics}
                 {polar {<angle>}}
                 { {linestyle <major_linestyle>}
                   | {linetype | lt <major_linetype>}
@@ -5342,9 +5343,10 @@ C ... and restart the table:
  anything outside of the input (measured or calculated) region.
 
  The gray is obtained by mapping the averaged z coordinate of the four corners
- of the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
- This value can be used directly as the gray for gray maps. The gray value can 
- be mapped into a colour. See `set palette` for the complete description. 
+ of the quadrangle into the range [min_color_z,max_color_z] providing range of
+ grays [0:1]. This value can be used directly as the gray for gray maps. The
+ normalized gray value can be further mapped into a colour. See `set palette`
+ for the complete description. 
 
  The pm3d mode requires a terminal supporting filled coloured polygons and
  palettes of smooth colours. See above for the list of currently available
@@ -5377,7 +5379,6 @@ C ... and restart the table:
                   { scansautomatic | scansforward | scansbackward }
                   { flush { begin | center | end } }
                   { clip1in | clip4in }
-                  { zrange [{<z_from>|*}:{<z_to>|*}] }
                   { hidden3d <linestyle> | nohidden3d }
                   { transparent | solid }
                   { map }
@@ -5415,9 +5416,10 @@ C ... and restart the table:
  respect to the z coordinate will be necessary.  Maybe in future...  (maybe
  something like "clipz1in" and "clipz4in").  Really needed?
 
- By default, the z range for colouring is the same as that from `set zrange`.
- That's OK for maps; for surfaces, however, using separate z ranges for 
- plotting and colouring can be of advantage.  Then use `set pm3d zrange`.
+ By default, the range of z-values for colouring is the same as that from 
+ `set zrange`. That's OK for maps; for surfaces, however, using separate 
+ z ranges for plotting and for colouring can be of advantage.  Then 
+ `set cbrange` should be used.
 
  The option `hidden3d` takes as the argument a linestyle which must be
  created by `set style line ...`. (The style need not to be present when
@@ -5452,7 +5454,7 @@ C ... and restart the table:
  Furthermore, the graph area is smaller than that of 2D graphs (some more 
  white space than I would expect like). Thus: 
  PLEASE IMPLEMENT A 2D LAYOUT FOR 3D MAPS!
- Please use 'unset pm3d' to correctly get rid of the pm3d setup, notably
+ Please use `unset pm3d` to correctly get rid of the pm3d setup, notably
  the reversed y axis and rotated ylabel.
 
  The colouring setup as well as the colour box drawing are determinated by `set
@@ -5586,13 +5588,14 @@ C ... and restart the table:
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
 
- Currently for horizontal color boxes (horizontal) the labels are drawn
- above the box, if the box is at the bottom of the graph, and below the
- box, if the box is at the top of the graph. If someone does not like this,
- he/she could yet add more options for controlling how the box is drawn!
+ The axis of the color box is called `cb` and it is controlled by means of the
+ usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
+ `format cb`, `grid [m]cb`, `cblabel`, and perhaps even `cbdata`, `[no]cbdtics`,
+ `[no]cbmtics`.
 
  See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
  `help set style line`.
+
 
 3 pointsize
 ?commands set pointsize
@@ -6578,7 +6581,8 @@ C  The `lines` style connects adjacent points with straight line segments.
        set xlabel {"<label>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
        show xlabel
 
- The same syntax applies to `x2label`, `ylabel`, `y2label` and `zlabel`.
+ The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
+ `cblabel`.
 
  Specifying the constants <xoff> or <yoff> as optional offsets for a label
  will move it <xoff> or <yoff> character widths or heights.  For example,
@@ -6614,6 +6618,9 @@ C  The `lines` style connects adjacent points with straight line segments.
 
  zlabel: The z-axis label is centered along the z axis and placed in the space
  above the grid level.
+
+ cblabel: The color box axis label is centered along the box and placed below 
+ or right according to horizontal or vertical color box gradient.
 
  y2label: The y2-axis label is placed to the right of the y2 axis.  The
  position is terminal-dependent in the same manner as is the y-axis label.
@@ -6758,7 +6765,7 @@ C  The `lines` style connects adjacent points with straight line segments.
        set noxtics
        show xtics
 
- The same syntax applies to `ytics`, `ztics`, `x2tics` and `y2tics`.
+ The same syntax applies to `ytics`, `ztics`, `x2tics`, `y2tics` and `cbtics`.
 
  `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
  and the accompanying labels) along the axis or the border, respectively.  If
@@ -7012,6 +7019,24 @@ C  The `lines` style connects adjacent points with straight line segments.
 ?nozdtics
  The `set zdtics` command changes tics on the z axis to days of the week.
  Please see `set xdtics` for details.
+3 cbdata
+?commands set cbdata
+?commands show cbdata
+?set cbdata
+?show cbdata
+?cbdata
+ Set color box axis date to timeseries (dates/times).  Please see `set xdata`.
+3 cbdtics
+?commands set cbdtics
+?commands set nocbdtics
+?commands show cbdtics
+?set cbdtics
+?set nocbdtics
+?show cbdtics
+?cbdtics
+?nocbdtics
+ The `set cbdtics` command changes tics on the color box axis to days of the
+ week. Please see `set cbdtics` for details.
 3 zero
 ?commands set zero
 ?commands show zero
@@ -7097,6 +7122,46 @@ C  The `lines` style connects adjacent points with straight line segments.
 ?ztics
 ?noztics
  The `set ztics` command controls major (labelled) tics on the z axis.
+ Please see `set xtics` for details.
+3 cblabel
+?commands set cblabel
+?commands show cblabel
+?set cblabel
+?show cblabel
+?cbabel
+ This command sets the label for the color box axis.  Please see `set xlabel`.
+3 cbmtics
+?commands set cbmtics
+?commands set nocbmtics
+?commands show cbmtics
+?set cbmtics
+?set nocbmtics
+?show cbmtics
+?cbmtics
+?nocbmtics
+ The `set cbmtics` command changes tics on the color box axis to months of the
+ year. Please see `set xmtics` for details.
+3 cbrange
+?commands set cbrange
+?commands show cbrange
+?set cbrange
+?show cbrange
+?cbrange
+ The `set cbrange` command sets the range of z-values which are colored by 
+ `pm3d` mode of `splot`. If the cb-axis is autoscaled, then the `pm3d` /
+ `palette` range is taken from `zrange`.
+
+ Please see `set xrange` for details on `set cbrange` syntax.
+3 cbtics
+?commands set cbtics
+?commands set nocbtics
+?commands show cbtics
+?set cbtics
+?set nocbtics
+?show cbtics
+?cbtics
+?nocbtics
+ The `set cbtics` command controls major (labelled) tics on the color box axis.
  Please see `set xtics` for details.
 2 shell
 ?commands shell

@@ -1,17 +1,16 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.13 2000/11/24 19:17:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.14 2000/12/05 11:29:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
 
 /*[
  *
- * Petr Mikulik, December 1998 -- November 1999
+ * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
  *
- * 
- * What is here: global variables and routines for the pm3d splotting mode
- * This file is included only if PM3D is defined
+ * What is here: global variables and routines for the pm3d splotting mode.
+ * This file is included only if PM3D is defined.
  *
 ]*/
 
@@ -36,7 +35,7 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.13 2000/11/24 19:17:22 lhec
 /********************************************************************/
 
 /*
-  Global options for pm3d algorithm (to be accessed by set / show)
+  Global options for pm3d algorithm (to be accessed by set / show).
 */
 
 pm3d_struct pm3d = {
@@ -45,65 +44,70 @@ pm3d_struct pm3d = {
     PM3D_FLUSH_BEGIN,		/* flush */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
     PM3D_CLIP_1IN,		/* clipping: at least 1 point in the ranges */
-    0, 0,			/* use zmin, zmax from `set zrange` */
-    0.0, 100.0,			/* pm3d's zmin, zmax */
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
 };
 
 
-
-/* global variables */
-double used_pm3d_zmin, used_pm3d_zmax;
-
 /****************************************************************/
-/* Now the routines which are really those exactly for pm3d.c
+/* Now the routines which are really just those for pm3d.c
 */
 
 /*
-   Check and set the z-range for use by pm3d
-   Return 0 on wrong range, otherwise 1
+   Check and set the z-range for use by pm3d.
+   Return 0 on wrong range, otherwise 1.
  */
 int
 set_pm3d_zminmax()
 {
-    if (!pm3d.pm3d_zmin)
-	used_pm3d_zmin = axis_array[FIRST_Z_AXIS].min;
+    if (CB_AXIS.set_autoscale & 0x1)
+	CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
     else {
 	/* FIXME 20001031 from merge: this will call graph_error() on
 	 * negative z, instead of just returning 0! */
-	used_pm3d_zmin = axis_log_value_checked(FIRST_Z_AXIS, pm3d.zmin, "pm3d z-min");
+	CB_AXIS.min = 
+	    axis_log_value_checked(FIRST_Z_AXIS,
+				   CB_AXIS.set_min, 
+				   "pm3d z-min");
     }
-    if (!pm3d.pm3d_zmax)
-	used_pm3d_zmax = axis_array[FIRST_Z_AXIS].max;
+    if (CB_AXIS.set_autoscale & 0x2)
+	CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
     else {
 	/* FIXME 20001031: see above */
-	used_pm3d_zmax = axis_log_value_checked(FIRST_Z_AXIS, pm3d.zmax, "pm3d z-max");
+	CB_AXIS.max = 
+	    axis_log_value_checked(FIRST_Z_AXIS,
+				   CB_AXIS.set_max,
+				   "pm3d z-max");
     }
-    if (used_pm3d_zmin == used_pm3d_zmax) {
-	fprintf(stderr, "pm3d: colouring requires not equal zmin and zmax\n");
+    if (CB_AXIS.min == CB_AXIS.max) {
+	fprintf(stderr, "pm3d: cannot display empty range");
 	return 0;
     }
-    if (used_pm3d_zmin > used_pm3d_zmax) {	/* exchange min and max values */
-	double tmp = used_pm3d_zmax;
-	used_pm3d_zmax = used_pm3d_zmin;
-	used_pm3d_zmin = tmp;
+    if (CB_AXIS.min > CB_AXIS.max) {
+	/* exchange min and max values */
+	double tmp = CB_AXIS.max;
+	CB_AXIS.max = CB_AXIS.min;
+	CB_AXIS.min = tmp;
     }
+#if 0
+    printf("set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
+#endif
     return 1;
 }
 
-
 /*
-   Rescale z into the interval [0,1]. It's OK also for logarithmic z axis too
+ * Rescale z into the interval [0,1].
+ * Note that it is OK for logarithmic z-axis too.
  */
 double
 z2gray(double z)
 {
-    if (z <= used_pm3d_zmin)
+    if (z <= CB_AXIS.min)
 	return 0;
-    if (z >= used_pm3d_zmax)
+    if (z >= CB_AXIS.max)
 	return 1;
-    z = (z - used_pm3d_zmin) / (used_pm3d_zmax - used_pm3d_zmin);
+    z = (z - CB_AXIS.min)
+      / (CB_AXIS.max - CB_AXIS.min);
     return z;
 }
 
@@ -469,10 +473,6 @@ pm3d_reset(void)
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_1IN;
-    pm3d.pm3d_zmin = 0;
-    pm3d.pm3d_zmax = 0;
-    pm3d.zmin = 0.0;
-    pm3d.zmax = 100.0;
     pm3d.hidden3d_tag = 0;
     pm3d.solid = 0;
 }
