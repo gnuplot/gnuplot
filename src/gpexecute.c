@@ -1,5 +1,4 @@
-/* GNUPLOT - gpexecute.inc */
-/* vim:set ft=c: */
+/* GNUPLOT - gpexecute.c */
 
 /*[
  * Permission to use, copy, and distribute this software and its
@@ -38,47 +37,26 @@
  *     Johannes Zellner <johannes@zellner.org>
  */
 
-#ifndef GPEXECUTE_INC
-#define GPEXECUTE_INC
+#include "gpexecute.h"
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-#include <stdlib.h>
-#include <assert.h>
-#include "mousecmn.h"
-typedef struct gpe_fifo_t {
-    struct gpe_fifo_t* prev;
-    struct gp_event_t ge;
-    struct gpe_fifo_t* next;
-} gpe_fifo_t;
-static int buffered_output_pending = 0;
-#endif
+#ifndef OS2
+# include <unistd.h> /* open(), write() */
+# include <stdlib.h>
+# include <assert.h>
+# include <errno.h>
+int pipe_died = 0;
 
-
-#if 0
-/* Structure for the ruler: on/off, position,...
-*/
-static struct {
-   int on;
-   int x, y;  /* ruler position in the viewport units */
-#if 0
-   int prev_x, prev_y;  /* previous ruler position */
-#endif
-} ruler = { 0, -1,-1 };
-#endif
-
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-static void pipe_died_handler __PROTO((int signum));
-static int pipe_died = 0;
-#endif
+static gpe_fifo_t* gpe_init __PROTO((void));
+static void gpe_push __PROTO((gpe_fifo_t** base, struct gp_event_t* ge));
+static struct gp_event_t* gpe_front __PROTO((gpe_fifo_t** base));
+static int gpe_pop __PROTO((gpe_fifo_t** base));
+#endif /* ! OS2 */
 
 /*
  * gp_execute functions
  */
 
 #ifdef OS2
-
-void gp_execute (char *command);
-
 char mouseShareMemName[40];
 PVOID input_from_PM_Terminal;
   /* pointer to shared memory for storing the command to be executed */
@@ -87,11 +65,8 @@ HEV semInputReady = 0;
      memory contains a command to be executed) */
 int pausing = 0;
   /* avoid passing data back to gnuplot in `pause' mode */
-#ifdef GNUPMDRV
-  extern ULONG ppidGnu;
-#else /* gplt_x11.c */
+  /* gplt_x11.c */
   ULONG ppidGnu = 0;
-#endif
 
 
 /*
@@ -146,11 +121,9 @@ void gp_execute(char *s)
     gp_post_shared_mem();
 }
 
-#endif
+#else /* !OS2 */
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-/* TODO: Prototypes */
-gpe_fifo_t*
+static gpe_fifo_t*
 gpe_init(void)
 {
     gpe_fifo_t* base = malloc (sizeof(gpe_fifo_t));
@@ -160,7 +133,8 @@ gpe_init(void)
     base->prev = (gpe_fifo_t*) 0;
     return base;
 }
-void
+
+static void
 gpe_push(gpe_fifo_t** base, struct gp_event_t* ge)
 {
     buffered_output_pending++;
@@ -179,12 +153,14 @@ gpe_push(gpe_fifo_t** base, struct gp_event_t* ge)
     }
     (*base)->prev->ge = *ge;
 }
-struct gp_event_t*
+
+static struct gp_event_t*
 gpe_front(gpe_fifo_t** base)
 {
     return &((*base)->ge);
 }
-int
+
+static int
 gpe_pop(gpe_fifo_t** base)
 {
     buffered_output_pending--;
@@ -200,13 +176,21 @@ gpe_pop(gpe_fifo_t** base)
 	return 1;
     }
 }
-#endif
+
+RETSIGTYPE
+pipe_died_handler(int signum)
+{
+    /* fprintf(stderr, "\n*******(pipe_died_handler)*******\n"); */
+    close(1);
+    pipe_died = 1;
+}
+#endif /* !OS2 */
 
 void
-gp_exec_event ( char type, int mx, int my, int par1, int par2 )
+gp_exec_event(char type, int mx, int my, int par1, int par2)
 {
     struct gp_event_t ge;
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
     static struct gpe_fifo_t* base = (gpe_fifo_t*) 0;
 #endif
 #if 0
@@ -222,9 +206,6 @@ gp_exec_event ( char type, int mx, int my, int par1, int par2 )
 #ifndef OS2
     if (pipe_died)
 	return;
-#ifndef USE_NONBLOCKING_STDOUT
-    write(1, &ge, sizeof(ge));
-#else
     if (!base) {
 	base = gpe_init();
     }
@@ -253,8 +234,6 @@ gp_exec_event ( char type, int mx, int my, int par1, int par2 )
 	}
     } while (gpe_pop(&base));
 
-#endif /* USE_NONBLOCKING_STDOUT */
-
 #else /* OS/2 communication via shared memory; coded according to gp_execute() */
     if (input_from_PM_Terminal==NULL)
 	return;
@@ -269,28 +248,3 @@ gp_exec_event ( char type, int mx, int my, int par1, int par2 )
 #endif
 }
 
-#if 0
-/*
- The following has been proposed for GE_cmd event with an optional text 
- parameter. This is not used at the moment; OS/2 PM terminal issues text 
- commands (which do not need mouse coords) using gp_execute(char*).
- */
-void
-gp_exec_event_text ( char type, int mx, int my, int par1, int par2, char *text )
-{
-}
-#endif
-
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-static RETSIGTYPE
-pipe_died_handler(int signum)
-{
-    /* fprintf(stderr, "\n*******(pipe_died_handler)*******\n"); */
-    close(1);
-    pipe_died = 1;
-}
-#endif
-
-
-
-#endif
