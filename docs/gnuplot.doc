@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.258 2004/10/29 19:20:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.259 2004/10/30 03:44:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1704,12 +1704,20 @@ C ... and restart the table:
       if ("A"."B" eq "AB") print "TRUE"
 
  See also the two string formatting functions `gprintf` and `sprintf`.
-2 Substitution
+2 Substitution and Command line macros
 ?substitution
+ When a command line to gnuplot is first read, i.e. before it is interpreted
+ or executed, two forms of lexical substitution are performed. These are
+ triggered by the presence of text in backquotes (ascii character 96) or
+ preceded by @ (ascii character 64).
+3 Substitution of system commands in backquotes
+?substitution backquotes
+?backquotes
+?system commands
  Command-line substitution is specified by a system command enclosed in
  backquotes.  This command is spawned and the output it produces replaces
- the name of the command (and backquotes) on the command line.  Some
- implementations also support pipes;  see `plot datafile special-filenames`.
+ the backquoted text on the command line.  Some implementations also support
+ pipes;  see `plot datafile special-filenames`.
 
  Command-line substitution can be used anywhere on the `gnuplot` command
  line, except inside strings delimited by single quotes.
@@ -1726,6 +1734,65 @@ C ... and restart the table:
  These will generate labels with the current time and userid:
        set label "generated on `date +%Y-%m-%d` by `whoami`" at 1,1
        set timestamp "generated on %Y-%m-%d by `whoami`"
+3 Substitution of string variables as macros
+?macros
+?substitution macros
+ Substitution of command line macros is disabled by default, but may be
+ enabled using the `set macros` command.  If macro substitution is enables,
+ the character @ is used to trigger substitution of the current value of a
+ string variable into the command line. The text in the string variable may
+ contain any number of lexical elements.  This allows string variables to be
+ used as command line macros.  Only string constants may be expanded using this
+ mechanism, not string-valued expressions.
+ For example:
+
+       set macros
+       style1 = "lines lt 4 lw 2"
+       style2 = "points lt 3 pt 5 ps 2"
+       range1 = "using 1:3"
+       range2 = "using 1:5"
+       plot "foo" @range1 with @style1, "bar" @range2 with @style2
+
+ The line containing @ symbols is expanded on input, so that by the time it is
+ executed the effect is identical to having typed in full
+
+       plot "foo" using 1:3 with lines lt 4 lw 2, \
+            "bar" using 1:5 with points lt 3 pt 5 ps 2
+
+ Macro expansion does not occur inside either single or double quotes.
+ However macro expansion does occur inside backquotes.
+3 String variables, macros, and command line substitution
+?mixing_macros_backquotes
+?substitution mixing_macros_backquotes
+ The interaction of string variables, backquotes and macro substitution is
+ somewhat complicated.  Backquotes do not block macro substitution, so
+
+       filename = "mydata.inp"
+       lines = ` wc --lines @filename | sed "s/ .*//" `
+
+ results in the number of lines in mydata.inp being stored in the integer
+ variable lines. And double quotes do not block backquote substitution, so
+
+       mycomputer = "`uname -n`"
+
+ results in the string returned by the system command `uname -n` being stored
+ in the string variable mycomputer.
+ 
+ However, macro substitution is not performed inside double quotes, so you
+ cannot define a system command as a macro and then use both macro and backquote
+ substitution at the same time.
+
+        machine_id = "uname -n"
+        mycomputer = "`@machine_id`"  # doesn't work!!
+
+ This fails because the double quotes prevent @machine_id from being interpreted
+ as a macro. To store a system command as a macro and execute it later you must
+ instead include the backquotes as part of the macro itself.  This is
+ accomplished by defining the macro as shown below.  Notice that the sprintf
+ format nests all three types of quotes.
+
+       machine_id = sprintf('"`uname -n`"')
+       mycomputer = @machine_id
 
 2 Syntax
 ?syntax
@@ -6095,6 +6162,19 @@ C ... and restart the table:
 
  To disable z axis log scaling:
        unset logscale z
+3 macros
+?commands set macros
+?commands show macros
+?set macros
+?show macros
+?macros
+ If command line macro substitution is enabled, then tokens in the command line
+ of the form @<stringvariablename> will be replaced by the text string contained
+ in <stringvariablename>. See `substitution`.
+
+ Syntax:
+      set macros
+
 3 mapping
 ?commands set mapping
 ?commands show mapping

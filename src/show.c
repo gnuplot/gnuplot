@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.138 2004/10/20 20:14:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.139 2004/10/22 01:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -91,6 +91,9 @@ static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
 static void show_dgrid3d __PROTO((void));
 static void show_label_contours __PROTO((void));
+#ifdef GP_MACROS
+static void show_macros __PROTO((void));
+#endif
 static void show_mapping __PROTO((void));
 static void show_dummy __PROTO((void));
 static void show_format __PROTO((void));
@@ -243,6 +246,11 @@ show_command()
     case S_DGRID3D:
 	show_dgrid3d();
 	break;
+#ifdef GP_MACROS
+    case S_MACROS:
+	show_macros();
+	break;
+#endif
     case S_MAPPING:
 	show_mapping();
 	break;
@@ -757,6 +765,9 @@ show_all()
     show_label_contours();
     show_contour();
     show_dgrid3d();
+#ifdef GP_MACROS
+    show_macros();
+#endif
     show_mapping();
     show_dummy();
     show_format();
@@ -1296,6 +1307,16 @@ show_dgrid3d()
 	fputs("\tdata grid3d is disabled\n", stderr);
 }
 
+#ifdef GP_MACROS
+/* process 'show macros' command */
+static void
+show_macros()
+{
+    SHOW_ALL_NL;
+    fprintf(stderr,"\tcommand line macros will %sbe expanded\n",
+	expand_macros ? "" : "not ");
+}
+#endif
 
 /* process 'show mapping' command */
 static void

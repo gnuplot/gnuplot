@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.154 2004/10/26 04:30:58 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.155 2004/11/03 06:59:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -103,6 +103,9 @@ static void set_loadpath __PROTO((void));
 static void set_fontpath __PROTO((void));
 static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
+#ifdef GP_MACROS
+static void set_macros __PROTO((void));
+#endif
 static void set_mapping __PROTO((void));
 static void set_margin __PROTO((int *));
 static void set_missing __PROTO((void));
@@ -184,7 +187,7 @@ set_command()
 \t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
 \t'dgrid3d', 'dummy', 'encoding', 'fit', 'format', 'grid',\n\
 \t'hidden3d', 'historysize', 'isosamples', 'key', 'label', 'locale',\n\
-\t'logscale', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
+\t'logscale', 'macros', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
 \t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
 \t'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
 \t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
@@ -332,6 +335,11 @@ set_command()
 	case S_LOGSCALE:
 	    set_logscale();
 	    break;
+#ifdef GP_MACROS
+	case S_MACROS:
+	    set_macros();
+	    break;
+#endif
 	case S_MAPPING:
 	    set_mapping();
 	    break;
@@ -1895,6 +1903,14 @@ set_logscale()
     }
 }
 
+#ifdef GP_MACROS
+static void
+set_macros()
+{
+   c_token++;
+   expand_macros = TRUE;
+}
+#endif
 
 /* process 'set mapping3d' command */
 static void

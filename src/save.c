@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.90 2004/10/22 01:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.91 2004/10/26 04:30:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -565,6 +565,11 @@ set isosamples %d, %d\n\
 	fprintf(fp, "set clabel '%s'\n", contour_format);
     else
 	fputs("unset clabel\n", fp);
+
+#ifdef GP_MACROS
+    if (expand_macros)
+	fputs("set macros\n", fp);
+#endif
 
     fputs("set mapping ", fp);
     switch (mapping3d) {

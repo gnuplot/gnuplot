@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.104 2004/09/01 15:53:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.105 2004/09/11 17:46:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -143,6 +143,10 @@ static void test_time_subcommand __PROTO((void));
 
 #ifdef AMIGA_AC_5
 static void getparms __PROTO((char *, char **));
+#endif
+#ifdef GP_MACROS
+static int string_expand __PROTO((void));
+TBOOLEAN expand_macros = FALSE;
 #endif
 
 struct lexical_unit *token;
@@ -359,6 +363,14 @@ do_line()
 	input_line[strlen(inlptr)] = NUL;
     }
     FPRINTF((stderr, "Input line: \"%s\"\n", input_line));
+
+#ifdef GP_MACROS
+    /* Expand any string variables in the current input line.
+     * Allow up to 4 levels of recursion */
+    if (expand_macros)
+    if (string_expand() && string_expand() && string_expand() && string_expand() && string_expand())
+	int_error(NO_CARET, "Too many levels of nested macros");
+#endif
 
     /* also used in load_file */
     if (is_system(input_line[0])) {
@@ -2561,3 +2573,83 @@ call_kill_pending_Pause_dialog()
     kill_pending_Pause_dialog();
 }
 #endif /* _Windows */
+
+#ifdef GP_MACROS
+/*
+ * Walk through the input line looking for string variables preceded by @.
+ * Replace the characters @<varname> with the contents of the string.
+ * Anything inside quotes is not expanded.
+ */
+static int
+string_expand()
+{
+    TBOOLEAN in_squote = FALSE;
+    TBOOLEAN in_dquote = FALSE;
+    TBOOLEAN in_comment= FALSE;
+    int   len;
+    int   o = 0;
+    int   nfound = 0;
+    char *c;
+    char *temp_string;
+    char  temp_char;
+    char *m;
+    struct udvt_entry *udv;
+
+    /* Most lines have no macros */
+    if (!strchr(input_line,'@'))
+	return(0);
+
+    temp_string = gp_alloc(input_line_len,"string variable");
+    len = strlen(input_line);
+    if (len >= input_line_len) len = input_line_len-1;
+    strncpy(temp_string,input_line,len);
+    temp_string[len] = '\0';
+
+    for (c=temp_string; len && c && *c; c++, len--) {
+	switch (*c) {
+	case '@':	/* The only tricky bit */
+		if (!in_squote && !in_dquote && !in_comment && isalpha(c[1])) {
+		    /* Isolate the udv key as a null-terminated substring */
+		    m = ++c;
+		    while (isalnum(*c) || (*c=='_')) c++;
+		    temp_char = *c; *c = '\0';
+		    /* Look up the key and restore the original following char */
+		    udv = add_udv_by_name(m);
+		    if (udv && udv->udv_value.type == STRING) {
+		    	nfound++;
+		    	m = udv->udv_value.v.string_val;
+			FPRINTF((stderr,"Replacing @%s with \"%s\"\n",udv->udv_name,m));
+			if (strlen(m) + o + len > input_line_len)
+			    extend_input_line();
+			while (*m)
+			    input_line[o++] = (*m++);
+		    } else {
+		    	int_warn( NO_CARET, "%s is not a string variable",m);
+		    }
+		    *c-- = temp_char;
+		} else
+		    input_line[o++] = *c;
+		break;
+
+	case '"':	
+		in_dquote = !in_dquote;
+		input_line[o++] = *c; break;
+	case '\'':	
+		in_squote = !in_squote;
+		input_line[o++] = *c; break;
+	case '#':
+		if (!in_squote && !in_dquote)
+		    in_comment = TRUE;
+	default :	
+		input_line[o++] = *c; break;
+	}	
+    }
+    input_line[o] = '\0';
+    free(temp_string);
+
+    if (nfound)
+	FPRINTF((stderr,"After string substitution command line is:\n\t%s\n",input_line));
+
+    return(nfound);
+}
+#endif

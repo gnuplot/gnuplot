@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.68 2004/10/17 04:52:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.69 2004/10/22 01:30:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -103,6 +103,9 @@ static void unset_loadpath __PROTO((void));
 static void unset_locale __PROTO((void));
 static void reset_logscale __PROTO((AXIS_INDEX));
 static void unset_logscale __PROTO((void));
+#ifdef GP_MACROS
+static void unset_macros __PROTO((void));
+#endif
 static void unset_mapping __PROTO((void));
 static void unset_margin __PROTO((int *));
 static void unset_missing __PROTO((void));
@@ -259,6 +262,11 @@ unset_command()
     case S_LOGSCALE:
 	unset_logscale();
 	break;
+#ifdef GP_MACROS
+    case S_MACROS:
+	unset_macros();
+	break;
+#endif
     case S_MAPPING:
 	unset_mapping();
 	break;
@@ -990,6 +998,14 @@ unset_logscale()
     }
 }
 
+#ifdef GP_MACROS
+/* process 'unset macros' command */
+static void
+unset_macros()
+{
+    expand_macros = FALSE;
+}
+#endif
 
 /* process 'unset mapping3d' command */
 static void
@@ -998,7 +1014,6 @@ unset_mapping()
     /* assuming same as points */
     mapping3d = MAP3D_CARTESIAN;
 }
-
 
 /* process 'unset {blrt}margin' command */
 static void
@@ -1535,6 +1550,10 @@ reset_command()
 
     unset_angles();
     unset_mapping();
+
+#ifdef GP_MACROS
+    unset_macros();
+#endif
 
     unset_size();
     aspect_ratio = 0.0;		/* don't force it */

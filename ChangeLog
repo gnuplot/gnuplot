@@ -1,3 +1,29 @@
+2004-11-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	String variables - command line macros
+	--------------------------------------
+	Command line macros are indicated by the character @ preceding a
+	string variable. When the command line is read in, these macros are
+	expanded by replacing the string @<varname> with the contents of the
+	string variable <varname>. Macros can be nest up to 4 levels deep.
+	Macros are not expanded inside single quotes or double quotes, but
+	they are expanded inside backquotes.
+
+	* configure.in: --enable-macros selects #define GP_MACROS
+
+	* demo/macros.dem docs/gnuplot.doc: Examples and documentation.
+
+	* src/command.c (do_line): Call new routine string_expand() that steps
+	through input_line, expanded macros as it goes. 
+
+	* src/save.c (save_variables__sub): Save STRING variables in single
+	quotes rather than in double quotes.  That way when the saved values
+	are loaded, no backquote substitution is triggered.
+
+	* src/save.c src/set.c src/show.c src/unset.c src/tables.h src/tables.c
+	src/command.c src/command.h: Global TBOOLEAN expand_macros to turn
+	expansion on or off via new commands '{un}set macros'.
+
 2004-11-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Use 0 rather than NULL in initializing a union, to make
