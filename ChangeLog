@@ -1,3 +1,18 @@
+2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Updated filename for gplotlib archive.
+
+	* config/config.amg: Make it a copy of config.hin with system-specific
+	changes.
+
+	* config/makefile.amg: Updated.
+
+	* src/amiga.c: Conditional inclusion of config.h.
+
+	* term/amiga.trm: Two bugfixes.
+
+	* term/cgm.trm: Use M_PI_2 instead of M_PI/2.
+
 2002-04-26  Ethan A Merritt  <merritt@u.washington.edu>
 
 	New term/gd.trm driver to support PNG and JPEG files by using
@@ -368,7 +383,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/27 08:07:35 $).
+	last modification date (from the tag $Date: 2002/04/29 13:37:00 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
