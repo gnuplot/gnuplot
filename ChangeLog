@@ -1,3 +1,8 @@
+2004-03-29  Per Persson  <persquare@users.sf.net>
+
+	* term/aquaterm.trm: Major update to driver.
+	Built if libaquaterm present, requires AquaTerm 1.0 or later.
+
 2004-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Fix up a blunder exposed by making TBOOLEAN an actual boolean
