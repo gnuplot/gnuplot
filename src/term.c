@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.15 1999/08/11 18:07:47 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.16 1999/08/24 11:24:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1247,6 +1247,7 @@ test_term()
 	key_entry_height = (t->v_char);
 
     /* border linetype */
+    (*t->linewidth) (1.0);
     (*t->linetype) (-2);
     (*t->move) (0, 0);
     (*t->vector) (xmax_t - 1, 0);
