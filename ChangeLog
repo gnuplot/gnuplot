@@ -1,3 +1,33 @@
+1999-03-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS, 0INSTALL, 0PORTING, 0README, TODO: Updated.
+
+	* Makefile.in, configure.in: Rename X_LIBRARIES variable to
+	LIBRARIES_FOR_X because _LIBRARIES suffix is reserved for automake.
+
+	* configure: Regenerated.
+
+	* makefile.amg, makefile.djg: Updated.
+
+1999-03-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure, lisp/aclocal.m4, lisp/configure: Regenerated.
+
+	* configure.in: Don't generate list of terminal drivers.
+
+	* makefile.cyg, makefile.mgw, makefile.nt: Use $(CORETERM) instead of
+	$(CSOURCE5) $(CSOURCE6) $(CSOURCE7).
+
+	* docs/Makefile.in: Hardwire terminal sources into Makefile.
+
+	* lisp/aclocal.m4: Deleted (regenerated version uses bugfixed
+	AM_PATH_LISPDIR macro from automake).
+
+1999-03-16  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* graphics.c(boundary): Fix to plot all lines in multiline labels
+	within plot borders.
+
 1999-03-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* makefile.286, makefile.amg, makefile.ami, makefile.cyg, makefile.dj2,
@@ -36,9 +66,6 @@
 	stdfn.h.
 
 	* version.c: New patchlevel and date.
-
-	* os2/gclient.c/, os2/gnupmdrv.c, os2/gnupmdrv.h: Use external
-	user_homedir variable instead of GNUPLOT.
 
 1999-03-11  Jon Garibaldi  <jong@rome.cis.plym.ac.uk>
 
