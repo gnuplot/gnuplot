@@ -1,3 +1,23 @@
+1998-12-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Amend entry about label and arrow clipping.
+
+	* configure: Regenerated.
+
+	* configure.in: Change readline test so that full path to
+	libreadline is not required anymore. Edit some warning messages.
+
+1998-12-21  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* descrip.mms: Updated. Fix sleep() problem.
+
+	* docs/README: VMS section updated.
+
+1998-12-18  Andris Pavenis  <pavenis@lanet.lv>
+
+	* term/djsvga.trm: Fix bug in W. Kirby's patch (rows and columns
+	swapped).
+
 1998-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/amiga.trm, term/post.trm: Indentation.

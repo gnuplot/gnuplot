@@ -43,7 +43,7 @@
 
  6. Error bars don't work in polar plots
 
- 7. clipping of arrrows and labels on 3D plots is broken
+ 7. arrows and labels are not clipped (2D and 3D)
 
  8. contour line clipping of 3D data plots
     The following tips for plotting contours were kindly supplied by Don Taber
