@@ -101,6 +101,9 @@
 /* Define if you do not have the <time.h> header file.  */
 #undef NO_TIME_H
 
+/* Define to the name of the distribution.  */
+#undef PACKAGE
+
 /* Define if you do have the popen and pclose functions.  */
 #undef PIPES
 
@@ -109,6 +112,9 @@
 
 /* Define if you want to use the included readline function.  */
 #undef READLINE
+
+/* Define to the version of the distribution.  */
+#undef VERSION
 
 /* Define if you are using the X11 window system.  */
 #undef X11
