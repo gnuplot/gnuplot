@@ -16,7 +16,7 @@ for an up-to-date bug tracking system.
     this shortly in gpcontrb.tar.z.
     [Status of this bug: unknown]
 
- *) arrows and labels are not clipped (2D and 3D)
+ *) Arrows and labels are not clipped (2D and 3D).
 
  *) (Not really a bug)
     Terminal drivers which are accompanied by external executables
@@ -28,8 +28,4 @@ for an up-to-date bug tracking system.
  *) In pcl5 mode, the hpgl driver prints a spurious "DI,1DI,0" string in the
     upper left corner of the plot. 
     [Source code suggests this is solved.  Needs confirmation.]
-
- *) Infinities and NaN binary data files may crash gnuplot. 
-    [Status unknown. Check later.]
-
 

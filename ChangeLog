@@ -13,6 +13,8 @@
 
 	* README.1ST: Updated.
 
+	* BUGS: Updated.
+
 2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot.c (get_user_env): Check $USERPROFILE on Windows, before
