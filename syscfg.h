@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.9.2.3 1999/10/16 15:09:54 lhecking Exp $
+ * $Id: syscfg.h,v 1.9.2.4 1999/11/20 17:58:27 lhecking Exp $
  *
  */
 
@@ -226,11 +226,7 @@
 #endif
 
 #ifndef FAQ_LOCATION
-/* # define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/" */
-/* #define FAQ_LOCATION "http://www-ihe.etec.uni-karlsruhe.de/mitarbeiter/vonhagen/gnuplot-faq.html" */
-#define FAQ_LOCATION "http://www.ucc.ie/gnuplot/gnuplot-faq.html"
-/* Prepare the transition! Yess! */
-/* #define FAQ_LOCATION "http://www.gnuplot.org/gnuplot-faq.html" */
+#define FAQ_LOCATION "http://www.gnuplot.info/gnuplot-faq.html" */
 #endif
 
 #ifndef CONTACT
