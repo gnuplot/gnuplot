@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.232 2004/07/29 21:03:10 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.233 2004/08/13 22:39:44 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -5803,7 +5803,9 @@ C ... and restart the table:
  several plots are placed on the same page, window, or screen.
 
  Syntax:
-       set multiplot
+       set multiplot { layout <cols>,<rows> {rowmajor|columnmajor}
+                       {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}} 
+                     }
        unset multiplot
 
  For some terminals, no plot is displayed until the command `unset multiplot`
@@ -5820,7 +5822,8 @@ C ... and restart the table:
  commands within the `set multiplot`/`unset multiplot` block.
 
  The commands `set origin` and `set size` must be used to correctly position
- each plot; see `set origin` and `set size` for details of their usage.
+ each plot if no `layout` is specified or if finetuning is desired.
+ See `set origin` and `set size` for details of their usage.
 
  Example:
        set size 0.7,0.7
@@ -5849,6 +5852,32 @@ C ... and restart the table:
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
 
+ With the `layout` option you can generate simple multiplots without having
+ to give the `set size` and `set origin` commands before each plot:  Those
+ are generated automatically, but can be overridden at any time.  With
+ `layout` the display will be devided by a grid with <cols> colums and 
+ <rows> rows.  This grid is filled rows first or colums first depending wether
+ `rowmajor` or `columnmajor` is given by the subsequent plot commands.  
+ Default is `rowmajor`.
+ Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
+ for shift or offset are ommited, the x-value will be used.
+ `unset multiplot` will turn off the automatic layout.  You should manually
+ `set size` and `set offset` to usefull values (i.e. 1,1 and 0,0) after
+ `unset multiplot` if you wish to make more plots in non-multiplot-mode
+ as `unset multiplot` will leave those values as they were in the automatic
+ layout mode.
+
+ Example:
+       set size 1,1
+       set origin 0,0
+       set multiplot layout 3,2 columnmajor scale 1.1,0.9
+       [ up to 6 plot commands here ]
+       unset multiplot
+
+ Above example will a produce 6 plots in 3 colmns filled top to bottom, left
+ to right.  Each plot will have a horizontal size of 1.1/3 and a vertical
+ size of 0.9/2. 
+   
  See also
 ^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">multiplot demo (multiplt.dem)</a>
  .

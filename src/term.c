@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.80 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.81 2004/08/14 04:41:57 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -225,6 +225,50 @@ static void enh_err_check __PROTO((const char *str));
 /* note: c is char, but must be declared int due to K&R compatibility. */
 static void do_enh_writec __PROTO((int c));
 
+
+/*
+ * Bookkeeping and support routine for 'set multiplot layout <rows>, <cols>'
+ * July 2004
+ * Volker Dobler <v.dobler@web.de>
+ */
+
+static void mp_layout_size_and_offset __PROTO((void));
+
+enum set_multiplot_id {
+    S_MULTIPLOT_ROWMAJOR, S_MULTIPLOT_COLUMNMAJOR, S_MULTIPLOT_SCALE,
+    S_MULTIPLOT_OFFSET, S_MULTIPLOT_INVALID
+};
+
+static const struct gen_table set_multiplot_tbl[] =
+{
+    { "row$major", S_MULTIPLOT_ROWMAJOR },
+    { "col$umnmajor", S_MULTIPLOT_COLUMNMAJOR },
+    { "sca$le", S_MULTIPLOT_SCALE },
+    { "off$set", S_MULTIPLOT_OFFSET },
+    { NULL, S_MULTIPLOT_INVALID }
+};
+
+# define MP_LAYOUT_DEFAULT {          \
+    FALSE,  /*  auto_layout */        \
+    0, 0,   /* num_rows, num_cols */  \
+    FALSE,  /* row_major */           \
+    0, 0,   /* act_row, act_col */    \
+    1, 1,   /* xscale, yscale */      \
+    0, 0    /* xoffset, yoffset */    \
+}
+
+static struct {
+    TBOOLEAN auto_layout;  /* automatic layout if true */
+    int num_rows;          /* number of rows in layout */
+    int num_cols;          /* number of columns in layout */
+    TBOOLEAN row_major;    /* row major mode if true, column major else */
+    int act_row;           /* actual row in layout */
+    int act_col;           /* actual column in layout */
+    double xscale;         /* factor for horizontal scaling */
+    double yscale;         /* factor for vertical scaling */
+    double xoffset;        /* horizontal shift */
+    double yoffset;        /* horizontal shift */
+} mp_layout = MP_LAYOUT_DEFAULT;
 
 
 #ifdef __ZTC__
@@ -496,6 +540,31 @@ term_end_plot()
 	FPRINTF((stderr, "- calling term->text()\n"));
 	(*term->text) ();
 	term_graphics = FALSE;
+    } else {
+	if (mp_layout.auto_layout) {
+	    if (mp_layout.row_major) {
+		mp_layout.act_row++;
+		if (mp_layout.act_row == mp_layout.num_rows ) {
+		    mp_layout.act_row = 0;
+		    mp_layout.act_col++;
+		    if (mp_layout.act_col == mp_layout.num_cols ) {
+			/* int_warn(NO_CARET,"will overplot first plot"); */
+			mp_layout.act_col = 0;
+		    }
+		}
+	    } else { /* column-major */ 
+		mp_layout.act_col++;
+		if (mp_layout.act_col == mp_layout.num_cols ) {
+		    mp_layout.act_col = 0;
+		    mp_layout.act_row++;
+		    if (mp_layout.act_row == mp_layout.num_rows ) {
+			/* int_warn(NO_CARET,"will overplot first plot"); */
+			mp_layout.act_col = 0;
+		    }
+		}
+	    }
+	    mp_layout_size_and_offset();
+	}
     }
 #ifdef VMS
     if (opened_binary)
@@ -514,14 +583,84 @@ term_end_plot()
 void
 term_start_multiplot()
 {
-
-    c_token++;
     FPRINTF((stderr, "term_start_multiplot()\n"));
+    
+    c_token++;
     if (multiplot)
 	term_end_multiplot();
 
-    multiplot = TRUE;
     term_start_plot();
+
+    multiplot = TRUE;
+    mp_layout.auto_layout = FALSE;
+    
+    /* check for optional multiplot layout */
+    if (!END_OF_COMMAND && almost_equals(c_token,"lay$out")) {
+	struct value a;
+
+	c_token++;
+	if (END_OF_COMMAND) {
+	    int_error(c_token,"expecting '<num_cols>,<num_rows>'");
+	}
+	
+	/* read row,col */
+	mp_layout.num_rows = (int) real(const_express(&a));
+	if (END_OF_COMMAND || !equals(c_token,",") ) {
+	    int_error(c_token, "expecting ', <num_cols>'");
+	}
+	c_token++;
+	if (END_OF_COMMAND) {
+	    int_error(c_token, "expecting <num_cols>");
+	}
+	mp_layout.num_cols = (int) real(const_express(&a));
+
+	mp_layout.auto_layout = TRUE;
+	mp_layout.act_row = 0;
+	mp_layout.act_col = 0;
+
+	while (!END_OF_COMMAND) {
+	    switch(lookup_table(&set_multiplot_tbl[0],c_token)) {
+		case S_MULTIPLOT_ROWMAJOR:
+		    mp_layout.row_major = TRUE;
+		    c_token++;
+		    break;
+		case S_MULTIPLOT_COLUMNMAJOR:
+		    mp_layout.row_major = FALSE;
+		    c_token++;
+		    break;
+		case S_MULTIPLOT_SCALE:
+		    c_token++;
+		    mp_layout.xscale = real(const_express(&a));
+		    mp_layout.yscale = mp_layout.xscale;
+		    if (!END_OF_COMMAND && equals(c_token,",") ) {
+			c_token++;
+			if (END_OF_COMMAND) {
+			    int_error(c_token, "expecting <yscale>");
+			}
+			mp_layout.yscale = real(const_express(&a));
+		    }
+		    break;
+		case S_MULTIPLOT_OFFSET:
+		    c_token++;
+		    mp_layout.xoffset = real(const_express(&a));
+		    mp_layout.yoffset = mp_layout.xoffset;
+		    if (!END_OF_COMMAND && equals(c_token,",") ) {
+			c_token++;
+			if (END_OF_COMMAND) {
+			    int_error(c_token, "expecting <yoffset>");
+			}
+			mp_layout.yoffset = real(const_express(&a));
+		    }
+		    break;
+		default:
+		    int_error(c_token,"did not expect anythig here");
+		    break;
+	    }
+	}
+	mp_layout_size_and_offset();
+    } else {
+	mp_layout.auto_layout = FALSE;
+    }
 
 #ifdef USE_MOUSE
     /* save the state of mouse_setting.on and
@@ -546,6 +685,10 @@ term_end_multiplot()
 	term_suspended = FALSE;
     }
     multiplot = FALSE;
+    /* reset automatic multiplot layout */
+    mp_layout.auto_layout = FALSE;
+    mp_layout.xscale = mp_layout.yscale = 1.0;
+    mp_layout.xoffset = mp_layout.yoffset = 0.0;
 
     term_end_plot();
 #ifdef USE_MOUSE
@@ -2308,4 +2451,29 @@ enh_err_check(const char *str)
     else
 	fprintf(stderr, "enhanced text mode parsing error - *str=0x%x\n",
 		*str);
+}
+
+/* Helper function for multiplot auto layout to issue size and offest cmds */
+static void 
+mp_layout_size_and_offset(void)
+{
+    if (!mp_layout.auto_layout) return;
+    
+    /* fprintf(stderr,"col==%d row==%d\n",mp_layout.act_col,mp_layout.act_row); */
+    /* the 'set size' command */
+    xsize = mp_layout.xscale / mp_layout.num_cols;
+    ysize = mp_layout.yscale / mp_layout.num_rows;
+
+    /* the 'set origin' command */
+    xoffset = (double)(mp_layout.act_col) / mp_layout.num_cols;
+    yoffset = 1.0 - (double)(mp_layout.act_row+1) / mp_layout.num_rows;
+    /* fprintf(stderr,"xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
+    
+    /* corrected for x/y-scaling factors and user defined offsets */
+    xoffset -= (mp_layout.xscale-1)/(2*mp_layout.num_cols);
+    yoffset -= (mp_layout.yscale-1)/(2*mp_layout.num_rows);
+    /* fprintf(stderr,"  xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
+    xoffset += mp_layout.xoffset;
+    yoffset += mp_layout.yoffset;
+    /* fprintf(stderr,"  xoffset==%g  yoffset==%g\n", xoffset,yoffset); */
 }
