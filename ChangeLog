@@ -1,3 +1,12 @@
+2001-02-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/syscfg.h: Removed section defining VERYLARGE.
+
+	* src/stdfn.h: Moved blurb to define VERYLARGE macro from syscfg.h
+ 	to here. It needs <float.h> to have been included before it can do
+ 	its own part. Fixes endless loop bug in timefmt axes with a "set
+ 	xtics <incr>" type of tic placement lacking fixed endpoints.
+
 2001-02-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wgraph.c: call GE_plotdone when graph drawn (otherwise

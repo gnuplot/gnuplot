@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.13 2000/10/31 19:59:31 joze Exp $
+ * $Id: stdfn.h,v 1.14 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -348,6 +348,79 @@ int pclose __PROTO((FILE *));
 #ifndef M_LN10
 #  define M_LN10    2.3025850929940456840e0 
 #endif
+
+/* HBB 20010223: moved this whole block from syscfg.h to here. It
+ * needs both "syscfg.h" and <float.h> to have been #include'd before
+ * this, since it relies on stuff like DBL_MAX */
+
+/* There is a bug in the NEXT OS. This is a workaround. Lookout for
+ * an OS correction to cancel the following dinosaur
+ *
+ * Hm, at least with my setup (compiler version 3.1, system 3.3p1),
+ * DBL_MAX is defined correctly and HUGE and HUGE_VAL are both defined
+ * as 1e999. I have no idea to which OS version the bugfix below
+ * applies, at least wrt. HUGE, it is inconsistent with the current
+ * version. Since we are using DBL_MAX anyway, most of this isn't
+ * really needed anymore.
+ */
+
+#if defined ( NEXT ) && NX_CURRENT_COMPILER_RELEASE<310
+# if defined ( DBL_MAX)
+#  undef DBL_MAX
+# endif
+# define DBL_MAX 1.7976931348623157e+308
+# undef HUGE
+# define HUGE    DBL_MAX
+# undef HUGE_VAL
+# define HUGE_VAL DBL_MAX
+#endif /* NEXT && NX_CURRENT_COMPILER_RELEASE<310 */
+
+/*
+ * Note about VERYLARGE:  This is the upper bound double (or float, if PC)
+ * numbers. This flag indicates very large numbers. It doesn't have to 
+ * be the absolutely biggest number on the machine.  
+ * If your machine doesn't have HUGE, or float.h,
+ * define VERYLARGE here. 
+ *
+ * example:
+#define VERYLARGE 1e37
+ *
+ * To get an appropriate value for VERYLARGE, we can use DBL_MAX (or
+ * FLT_MAX on PCs), HUGE or HUGE_VAL. DBL_MAX is usually defined in
+ * float.h and is the largest possible double value. HUGE and HUGE_VAL
+ * are either DBL_MAX or +Inf (IEEE special number), depending on the
+ * compiler. +Inf may cause problems with some buggy fp
+ * implementations, so we better avoid that. The following should work
+ * better than the previous setup (which used HUGE in preference to
+ * DBL_MAX).
+ */
+/* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
+ * we use floats for memory considerations and thus use FLT_MAX.
+ */
+
+#ifndef COORDVAL_FLOAT
+# ifdef DBL_MAX
+#  define VERYLARGE (DBL_MAX/2-1)
+# endif
+#else /* COORDVAL_FLOAT */
+# ifdef FLT_MAX
+#  define VERYLARGE (FLT_MAX/2-1)
+# endif
+#endif /* COORDVAL_FLOAT */
+
+                 
+#ifndef VERYLARGE
+# ifdef HUGE
+#  define VERYLARGE (HUGE/2-1)
+# elif defined(HUGE_VAL)
+#  define VERYLARGE (HUGE_VAL/2-1)
+# else
+/* as a last resort */
+#  define VERYLARGE (1e37)
+/* #  warning "using last resort 1e37 as VERYLARGE define, please check your headers" */
+/* Maybe add a note somewhere in the install docs instead */
+# endif /* HUGE */
+#endif /* VERYLARGE */
 
 /* _POSIX_PATH_MAX is too small for practical purposes */
 #ifndef PATH_MAX
