@@ -1,3 +1,11 @@
+2003-04-04  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/pslatex.trm term/epslatex.trm: Add filled box support.
+
+	* term/eepic.trm: Fix broken parsing of terminal options.
+
+	* term/pstricks.trm: Remove unused prototype PSTRICKS_previous_palette.
+
 2003-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.nt (winmain.obj): Don't repeat HELPFILE

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.53 2003/03/31 22:33:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.54 2003/04/03 17:22:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1691,16 +1691,17 @@ test_term()
 
     /* test line widths */
     (void) (*t->justify_text) (LEFT);
+    xl = xmax_t / 10;
+    yl = ymax_t / 25;
     x = xmax_t * .075;
-    y = t->v_tic * 5;
-    xl = t->h_tic * 15;
+    y = yl;
    
     for (i=1; i<7; i++) {
 	(*t->linewidth) ((float)(i)); (*t->linetype)(LT_BLACK);
 	(*t->move) (x, y); (*t->vector) (x+xl, y);
 	sprintf(label,"  lw %1d%c",i,0);
 	(*t->put_text) (x+xl, y, label);
-	y += t->v_tic * 5;
+	y += yl;
     }
     (*t->put_text) (x, y, "linewidth");
 
@@ -1708,8 +1709,8 @@ test_term()
     /* test fill patterns */
     x = xmax_t * 0.5;
     y = 0;
-    xl = t->h_tic * 3;
-    yl = t->v_tic * 12;
+    xl = xmax_t / 40;
+    yl = ymax_t / 8;
     (*t->linewidth) ((float)(1));
     (*t->linetype)(LT_BLACK);
     (*t->justify_text) (CENTRE);
