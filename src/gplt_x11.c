@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.20 2000/11/06 17:37:58 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.21 2000/11/14 15:35:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -132,6 +132,7 @@ Error. Incompatible options.
 
 #ifdef PM3D
 #   include <math.h> /* pow() */
+#   include "getcolor.h"
 #endif
 
 #ifdef USE_MOUSE
@@ -1102,9 +1103,10 @@ record()
 	    {
 		t_sm_palette tpal;
 		FPRINTF((stderr, "GR_MAKE_PALETTE\n"));
-		if (5 != sscanf(buf + 1, "%c %d %d %d %c\n",
+		if (6 != sscanf(buf + 1, "%c %d %d %d %c %d\n",
 			&(tpal.colorMode), &(tpal.formulaR), &(tpal.formulaG),
-			&(tpal.formulaB), &(tpal.positive))) {
+			&(tpal.formulaB), &(tpal.positive),
+			&(tpal.use_maxcolors))) {
 		    fprintf(stderr, "%s:%d error in setting palette.\n",
 			__FILE__, __LINE__);
 		} else {
@@ -1818,12 +1820,15 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 {
     static int virgin = yes;
     static int recursion = 0;
-    int max_colors = maximal_possible_colors;
-    int min_colors = minimal_possible_colors;
+    int max_colors = tpal->use_maxcolors > 0 ?
+	tpal->use_maxcolors : maximal_possible_colors;
+    int min_colors = minimal_possible_colors < max_colors ?
+	minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
     char* save_title = (char*) 0;
 
-    /**
-     * reallocate the palette
+    FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
+
+    /* reallocate the palette
      * only if it has changed.
      */
     if (no == virgin && tpal &&
@@ -1831,7 +1836,8 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 	tpal->formulaG == sm_palette.formulaG &&
 	tpal->formulaB == sm_palette.formulaB &&
 	tpal->colorMode == sm_palette.colorMode &&
-	tpal->positive == sm_palette.positive) {
+	tpal->positive == sm_palette.positive &&
+	tpal->use_maxcolors == sm_palette.use_maxcolors) {
 	FPRINTF((stderr, "(PaletteMake) palette didn't change.\n"));
 	return;
     } else if (tpal) {
@@ -1840,6 +1846,7 @@ PaletteMake(plot_struct* plot, t_sm_palette* tpal)
 	sm_palette.formulaB = tpal->formulaB;
 	sm_palette.colorMode = tpal->colorMode;
 	sm_palette.positive = tpal->positive;
+	sm_palette.use_maxcolors = tpal->use_maxcolors;
 	virgin = no;
     }
 

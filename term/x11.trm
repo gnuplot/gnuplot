@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.30 2000/10/31 19:59:32 joze Exp $
+ * $Id: x11.trm,v 1.31 2000/11/01 18:57:34 broeker Exp $
  *
  */
 
@@ -964,9 +964,10 @@ TERM_PUBLIC int X11_make_palette(t_sm_palette *palette)
      *       or is this /certainly/ done here ? */
     if (palette) {
 	if (X11_ipc) {
-	    fprintf(X11_ipc, "%c%c %d %d %d %c\n",
+	    fprintf(X11_ipc, "%c%c %d %d %d %c %d\n",
 		X11_GR_MAKE_PALETTE, palette->colorMode, palette->formulaR,
-		palette->formulaG, palette->formulaB, palette->positive);
+		palette->formulaG, palette->formulaB, palette->positive,
+		palette->use_maxcolors);
 	    /* we don't need the rest of the struct (joze) */
 	    fflush(X11_ipc);
 	} else {

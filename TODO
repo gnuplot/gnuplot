@@ -99,6 +99,20 @@ WIN32 compile (BC++4.52):
 DONE - problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
 -- test run fails: script execution stops as soon as first plot is done.
 
+joze's list:
+- (Petr Mikulik, 20. Nov. 2000): The following code is in unset.c:
+      extern void X11_unset_pm3d __PROTO((void)); /* defined in x11.trm */
+      X11_unset_pm3d();
+  Lars and HBB don't like externs, could you make X11_unset_pm3d() global 
+  somewhere else, in a .h file?
+- (Petr Mikulik, 20. Nov. 2000) I have disabled rotate-and-zoom-by-mouse
+  after  'set pm3d map'. I've noticed
+  some  '#if 0 ... #endif'  and  '(if abs(last X - previous X) < 3)'  code
+  in mouse.c.  It would be nice to switch this on, so that there is no 
+  rotation under effect just after a simple click on the graph window. 
+  Maybe it could go to the same  'if (is_3d_plot and ... !pm3d map) '
+  condition?
+
 Petr Mikulik (info-gnuplot-beta Thu, 02 Mar 2000)
 it would be very convenient to set the values/formulae for columns in 
 advance, before "plot" --- something like

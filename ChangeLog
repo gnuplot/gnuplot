@@ -1,3 +1,8 @@
+2000-11-20  Johannes Zellner  <johannes@zellner.org>
+
+	* term/x11.trm,src/gplt_x11.c: `set palette maxcolors' for x11
+	as requested by Petr.
+
 2000-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/mouse.c (MousePosToGraphPosReal): fix typo in treatment of
