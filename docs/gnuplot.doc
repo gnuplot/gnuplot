@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.102 2002/02/19 20:17:23 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.103 2002/03/09 22:41:45 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5295,7 +5295,8 @@ C ... and restart the table:
        unset mxtics
        show mxtics
 
- The same syntax applies to `mytics`, `mztics`, `mx2tics` and `my2tics`.
+ The same syntax applies to `mytics`, `mztics`, `mx2tics`, `my2tics` and
+ `mcbtics`.
 
  <freq> is the number of sub-intervals (NOT the number of minor tics) between
  major tics (the default for a linear axis is either two or five
@@ -5604,7 +5605,7 @@ C ... and restart the table:
  by `set style line ...`. (The style need not to be present when setting pm3d,
  but it must be present when plotting).  If set, lines are drawn using the
  specified line style, taking into account hidden line removal.  This is by
- far more efficient then using the command `set hidden3d` as it doesn't really
+ far more efficient than using the command `set hidden3d` as it doesn't really
  calculate hidden line removal, but just draws the filled polygons in the
  correct order. So the recommended choice when using pm3d is
        set pm3d at s hidden3d 100
@@ -6817,7 +6818,7 @@ C ... and restart the table:
        set xdata {time}
        show xdata
 
- The same syntax applies to `ydata`, `zdata`, `x2data` and `y2data`.
+ The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `mcbtics`.
 
  The `time` option signals that the datatype is indeed time/date.  If the
  option is not specified, the datatype reverts to normal.
@@ -6854,7 +6855,8 @@ C ... and restart the table:
        unset xdtics
        show xdtics
 
- The same syntax applies to `ydtics`, `zdtics`, `x2dtics` and `y2dtics`.
+ The same syntax applies to `ydtics`, `zdtics`, `x2dtics`, `y2dtics` and
+ `cbdtics`.
 
  See also the `set format` command.
 3 xlabel
@@ -6948,7 +6950,8 @@ C ... and restart the table:
        unset xmtics
        show xmtics
 
- The same syntax applies to `x2mtics`, `ymtics`, `y2mtics`, and `zmtics`.
+ The same syntax applies to `x2mtics`, `ymtics`, `y2mtics`, `zmtics` and
+ `cbmtics`.
 
  See also the `set format` command.
 3 xrange
@@ -6973,7 +6976,7 @@ C ... and restart the table:
  string according to the `set timefmt` format.  Any value omitted will not be
  changed.
 
- The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`,
+ The same syntax applies to `yrange`, `zrange`, `x2range`, `y2range`, `cbrange`,
  `rrange`, `trange`, `urange` and `vrange`.
 
  The `reverse` option reverses the direction of the axis, e.g., `set xrange
