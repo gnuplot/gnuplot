@@ -1,3 +1,8 @@
+1999-11-17  don taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* plot2d.c(print_table), plot3d.c(print_3dtable): Fix hardcoded
+	"%g" formats for table terminal.
+
 1999-11-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/png.trm: Clear allocated png structures and return if
