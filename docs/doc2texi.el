@@ -453,7 +453,7 @@ particular conversion chore."
   (setq d2t-terminal-list (sort d2t-terminal-list 'string<))
   (let ((list d2t-terminal-list) file node marker)
     (save-excursion
-      (when (re-search-forward "^<4" (point-max) t)
+      (when (re-search-forward "^<3" (point-max) t)
 	(beginning-of-line)
 	(insert "@c ")
 	(forward-line 1)
