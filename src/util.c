@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.14 1999/07/09 21:03:03 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.15 1999/07/18 17:36:57 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -281,10 +281,8 @@ int start, end;
     register int i, e;
     register char *s;
 
-    if (*str)			/* previous pointer to malloc'd memory there */
-	free(*str);
     e = token[end].start_index + token[end].length;
-    *str = gp_alloc((size_t)(e - token[start].start_index + 1), "string");
+    *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index; i < e && input_line[i] != NUL; i++)
 	*s++ = input_line[i];
@@ -304,10 +302,8 @@ int start, end;
     register int i, e;
     register char *s;
 
-    if (*str)			/* previous pointer to malloc'd memory there */
-	free(*str);
     e = token[end].start_index + token[end].length - 1;
-    *str = gp_alloc((size_t)(e - token[start].start_index + 1), "string");
+    *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index + 1; i < e && input_line[i] != NUL; i++)
 	*s++ = input_line[i];
