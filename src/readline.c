@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.10 1999/06/22 11:59:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.11 1999/09/21 18:24:39 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -1122,5 +1122,136 @@ reset_termio()
 #endif /* not MSDOS && not ATARI && not MTOS && not _Windows && not DOS386 */
 }
 
+
+/*
+ * New functions for browsing the history. They are called from command.c
+ * when the user runs the 'history' command
+ */
+
+/* write <n> last entries of the history to the file <filename>
+ * Input parameters:
+ *    n > 0 ... write only <n> last entries; otherwise all entries
+ *    filename == NUL ... write to stdout; otherwise to the filename
+*/
+void
+write_history_n(n, filename)
+int n;
+char *filename;
+{
+    struct hist *entry = history, *start = NULL;
+    FILE *out = stdout;
+    int hist_entries = 0;
+    int hist_index = 1;
+
+    if (entry == NULL) return; /* no history yet */
+    /* find the beginning of the history and count nb of entries */
+    while (entry->prev != NUL) {
+	hist_entries++;
+	if (n > 0 && n == hist_entries) /* listing will start from this entry */
+	    start = entry;
+	entry = entry->prev;
+    }
+    if (start != NULL) {
+	entry = start;
+	hist_index = hist_entries - n + 1;
+    }
+    /* now write the history */
+    if (filename != NULL) out = fopen( filename, "w" );
+    while (entry != NULL) {
+	fprintf(out,"%5i  %s\n",hist_index++,entry->line);
+	entry = entry->next;
+    }
+    if (filename != NULL) fclose(out);
+}
+
+
+/* obviously the same routine as in GNU readline, according to code from
+ * plot.c:#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+ */
+void
+write_history (filename)
+char *filename;
+{
+    write_history_n ( 0, filename );
+}
+
+
+/* finds and returns a command from the history which starts with <cmd>
+ * (ignores leading spaces in <cmd>)
+ * Returns NULL if nothing found
+ */
+char *
+history_find (cmd)
+char *cmd;
+{
+    struct hist *entry = history;
+    int len;
+    char *line;
+    if (entry == NULL)
+	return NULL; /* no history yet */
+    if (*cmd == '"')
+	cmd++; /* remove surrounding quotes */
+    if (!*cmd)
+	return NULL;
+    len = strlen(cmd);
+    if (cmd[len-1] == '"')
+	cmd[--len] = 0;
+    if (!*cmd)
+	return NULL;
+    /* search through the history */
+    while (entry->prev != NULL) {
+	line = entry->line;
+	while (isspace((int)*line)) line++; /* skip leading spaces */
+	if (!strncmp(cmd,line,len)) /* entry found */
+	    return line;
+	entry = entry->prev;
+    }
+    return NULL;
+}
+
+
+/* finds and print all occurencies of commands from the history which
+ * start with <cmd>
+ * (ignores leading spaces in <cmd>)
+ * Returns 1 on success, 0 if no such entry exists
+ */
+int
+history_find_all(cmd)
+char *cmd;
+{
+    struct hist *entry = history;
+    int hist_index = 1;
+    char res = 0;
+    int len;
+    char *line;
+
+    if (entry == NULL)
+	return 0; /* no history yet */
+    if (*cmd == '"')
+	cmd++; /* remove surrounding quotes */
+    if (!*cmd)
+	return 0;
+    len = strlen(cmd);
+    if (cmd[len-1] == '"') 
+	cmd[--len] = 0;
+    if (!*cmd)
+	return 0;
+    /* find the beginning of the history */
+    while (entry->prev != NULL)
+	entry = entry->prev;
+    /* search through the history */
+    while (entry != NULL) {
+	line = entry->line;
+	while (isspace((int)*line))
+	    line++; /* skip leading spaces */
+	if (!strncmp(cmd,line,len)) { /* entry found */
+	    printf("%5i  %s\n",hist_index,line);
+	    res = 1;
+	}
+	entry = entry->next;
+	hist_index++;
+    }
+    return res;
+}
 
 #endif /* READLINE && !HAVE_LIBREADLINE */
