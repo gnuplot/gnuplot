@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.37 2001/09/08 01:07:03 mikulik Exp $
+ * $Id: x11.trm,v 1.38 2001/09/08 01:24:46 mikulik Exp $
  *
  */
 
@@ -1005,7 +1005,7 @@ TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
     /* FIXME - volunteer? */
-    if (points > 101) {
+    if (points > 105) {
 	fprintf(stderr,
 	    "YOUR HOMEWORK: CANNOT PASS SO MUCH POLYGON POINTS THROUGH X11_IPC. "
 	    "YOU ARE WELCOME TO PROVIDE A PATCH. THE BEST WOULD BE A "
