@@ -1,3 +1,8 @@
+2002-12-11  Johannes Zellner  <johannes@zellner.org>
+
+	* docs/titlepag.ms docs/titlepag.tex docs/gnuplot.doc docs/gnuplot.texi:
+	added my name to the authors section
+
 2002-12-09  Ethan Merritt  <merritt@u.washington.edu>
 	* src/unset.c: Implement 'unset style arrow'
 	* src/set.c src/setshow.h: 
@@ -1519,7 +1524,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/07 19:08:59 $).
+	last modification date (from the tag $Date: 2002/12/11 01:31:09 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

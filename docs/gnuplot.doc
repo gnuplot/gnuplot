@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.146 2002/11/27 20:45:34 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.148 2002/12/05 05:12:33 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -25,8 +25,9 @@ C
 ^<li>  Carsten Steger
 ^<li>  Tom Tkacik
 ^<li>  Jos Van der Woude
-^<li>  James R. Van Zandt
 ^<li>  Alex Woo
+^<li>  James R. Van Zandt
+^<li>  Johannes Zellner
 ^</h3></ul> <p>
 ^<h2>  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley<p>
 ^   Mailing list for comments: info-gnuplot@dartmouth.edu <p>

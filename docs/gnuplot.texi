@@ -82,9 +82,11 @@ Tom Tkacik
 @item
 Jos Van der Woude
 @item
+Alex Woo
+@item
 James R. Van Zandt
 @item
-Alex Woo
+Johannes Zellner
 @end itemize
 
 @c ^<h2>  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley<p>
@@ -356,7 +358,7 @@ left, both for plotting and labels.  See `plot`.
 
 12. @ref{size} can try to plot with a specified aspect ratio.
 
-13. @ref{missing} now treats missing data correctly.
+13. `set missing` now treats missing data correctly.
 
 14. The @ref{call} command: `load` with arguments.
 
@@ -367,8 +369,8 @@ keywords.
 
 17. New `x11` driver with persistent and multiple windows.
 
-18. New plotting styles: @ref{xerrorbars}, @ref{errorlines}, @ref{yerrorlines},
-@ref{xerrorlines}, @ref{xyerrorlines}, @ref{histeps}, @ref{financebars} and more.
+18. New plotting styles: `xerrorbars`, @ref{errorlines}, `yerrorlines`,
+`xerrorlines`, `xyerrorlines`, `histeps`, `financebars` and more.
 See @ref{style}.
 
 19. New tic label formats, including `"%l %L"` which uses the mantissa and
@@ -616,7 +618,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -636,7 +638,7 @@ substitutions, etc.  In short, it works anywhere it makes sense to work.
 
 @cindex coordinates
 
-The commands `set arrow`, @ref{key}, and @ref{label} allow you to draw
+The commands @ref{arrow}, @ref{key}, and @ref{label} allow you to draw
 something at an arbitrary position on the graph.  This position is specified
 by the syntax:
 
@@ -1795,7 +1797,7 @@ Ranges are separated by colons and enclosed in brackets [], text and file
 names are enclosed in quotes, and a few miscellaneous things are enclosed
 in parentheses.  Braces @{@} are used for a few special purposes.
 
-Commas are used to separate coordinates on the `set` commands `arrow`,
+Commas are used to separate coordinates on the `set` commands @ref{arrow},
 @ref{key}, and @ref{label}; the list of variables being fitted (the list after the
 `via` keyword on the `fit` command); lists of discrete contours or the loop
 parameters which specify them on the @ref{cntrparam} command; the arguments
@@ -1867,8 +1869,8 @@ Back-quotes are used to enclose system commands for substitution.
 @node Time/Date_data,  , Syntax, gnuplot
 @section Time/Date data
 
-^ <a name="Time/Date data">
-^ <a name="Time/date">
+^ <a name="Time/Date data"></a>
+^ <a name="Time/date"></a>
 @cindex time/date
 
 `gnuplot` supports the use of time and/or date information as input data.
@@ -3097,13 +3099,13 @@ Examples:
 
 @end example
 
-@c ^ See
+See
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,simple plot demos (simple.dem) }
-@c ^ ,
+,
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html,Non-parametric splot demos }
-@c ^ , and
+, and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html,Parametric splot demos}
-@c ^ .
+.
 
 @node example_datafile, index, every, data-file
 @subsubsection example datafile
@@ -3317,7 +3319,8 @@ The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
 @c ^ See this
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,demos }
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,demos
+}
 @c ^ web page.
 
 
@@ -3608,7 +3611,8 @@ the top simply by specifying
 However, if you want to leave text in your data files, it is safer to put the
 comment character (#) in the first column of the text lines.
 @c ^ See also the web page
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/using/using.html,Feeble using demos. }
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/using/using.html,Feeble using demos.
+}
 
 @node errorbars, errorlines, data-file, plot
 @subsection errorbars
@@ -3955,14 +3959,14 @@ Syntax:
 
 @end example
 
-where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
-@ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{xerrorbars},
-@ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
-@ref{xyerrorlines}, @ref{boxes}, @ref{filledcurves}, @ref{boxerrorbars},
-@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vectors} or @ref{pm3d}. Some
-of these styles require additional information. See `set style <style>` for
+where <style> is either `lines`, `points`, `linespoints`, `impulses`,
+`dots`, `steps`, `fsteps`, `histeps`, @ref{errorbars}, `xerrorbars`,
+`yerrorbars`, `xyerrorbars`, @ref{errorlines}, `xerrorlines`, `yerrorlines`,
+`xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
+`boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or @ref{pm3d}. Some
+of these styles require additional information. See `plotting styles` for
 details of each style.  `fill` is relevant only to certain 2D plots
-(currently @ref{boxes} and @ref{candlesticks}).  Note that @ref{filledcurves} and @ref{pm3d} 
+(currently `boxes` and `candlesticks`).  Note that `filledcurves` and @ref{pm3d} 
 can take an additional option not listed above (the latter only when used in 
 the `splot` command)---see their help or examples below for more details.
 
@@ -4344,12 +4348,13 @@ when the variable was initially defined.
 * bmargin::                     
 * border::                      
 * boxwidth::                    
-* fill::                        
 * clabel::                      
 * clip::                        
 * cntrparam::                   
+* color_box::                   
 * contour::                     
 * data_style::                  
+* datafile_::                   
 * decimalsign::                 
 * dgrid3d::                     
 * dummy::                       
@@ -4365,15 +4370,12 @@ when the variable was initially defined.
 * isosamples::                  
 * key::                         
 * label::                       
-* linestyle::                   
-* arrowstyle::                  
 * lmargin::                     
 * loadpath::                    
 * locale::                      
 * logscale::                    
 * mapping::                     
 * margin::                      
-* missing::                     
 * mouse::                       
 * multiplot::                   
 * mx2tics::                     
@@ -4388,7 +4390,6 @@ when the variable was initially defined.
 * plot_::                       
 * pm3d::                        
 * palette::                     
-* color_box::                   
 * pointsize::                   
 * polar::                       
 * print_::                      
@@ -4531,7 +4532,7 @@ See also
 
 @cindex noarrow
 
-Arbitrary arrows can be placed on a plot using the `set arrow` command.
+Arbitrary arrows can be placed on a plot using the @ref{arrow} command.
 
 Syntax:
 @example
@@ -4552,7 +4553,7 @@ Syntax:
 <tag> is an integer that identifies the arrow.  If no tag is given, the
 lowest unused tag value is assigned automatically.  The tag can be used to
 delete or change a specific arrow.  To change any attribute of an existing
-arrow, use the `set arrow` command with the appropriate tag and specify the
+arrow, use the @ref{arrow} command with the appropriate tag and specify the
 parts of the arrow to be changed.
 
 The <position>s are specified by either x,y or x,y,z, and may be preceded by
@@ -4590,7 +4591,7 @@ The line style may be selected from a user-defined list of line styles
 
 Note, however, that if a user-defined line style has been selected, its
 properties (type and width) cannot be altered merely by issuing another
-`set arrow` command with the appropriate index and `lt` or `lw`.
+@ref{arrow} command with the appropriate index and `lt` or `lw`.
 
 If `front` is given, the arrow is written on top of the graphed data. If
 `back` is given (the default), the arrow is written underneath the graphed
@@ -4655,7 +4656,9 @@ To show all arrows (in tag order), use:
       show arrow
 @end example
 
-@c ^ See also <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> arrows demos. </a>
+See also 
+@uref{http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html,arrows demos.
+}
 
 @node autoscale, bars, arrow, set-show
 @subsection autoscale
@@ -4981,7 +4984,7 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,borders demo.
 }
 
-@node boxwidth, fill, border, set-show
+@node boxwidth, clabel, border, set-show
 @subsection boxwidth
 
 @c ?commands set boxwidth
@@ -4993,7 +4996,7 @@ See also
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-@ref{boxes} and @ref{boxerrorbars} styles.
+`boxes` and `boxerrorbars` styles.
 
 Syntax:
 @example
@@ -5013,7 +5016,7 @@ the automatically calculated boxwidth, otherwise the boxwidth is taken as an
 `absolute` value (which is the default). In a four-column data set, the fourth
 column will be interpreted as the box width unless the width is set to -2.0,
 in which case the width will be calculated automatically.  See
-@ref{boxerrorbars} for more details.
+`set style boxerrorbars` for more details.
 
 To set the box width to automatic use the command
 @example
@@ -5051,49 +5054,7 @@ or, if you didn't specify a relative boxwidth before,
 
 @end example
 
-@node fill, clabel, boxwidth, set-show
-@subsection fill
-
-@c ?commands set style fill
-@c ?commands show style fill
-@c ?set style fill
-@c ?show style fill
-@cindex fillstyle
-
-The `set style fill` command is used to set the style of boxes
-or candlesticks.
-
-Syntax:
-@example
-      set style fill @{empty | solid @{<density>@} | pattern @{<n>@}@}
-                     @{border @{<linetype>@} | noborder@}
-
-@end example
-
-The default fillstyle is `empty`.
-
-The `solid` option causes filling with a solid color, if the terminal
-supports that. The <density> parameter specifies the intensity of the 
-fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
-the inner area is of the same color as the border of the box. 
-Some terminal types can vary the density continuously; others implement 
-only a few levels of partial fill.  If no <density> parameter is given, 
-it defaults to 1.
-
-The `pattern` option causes filling to be done with a fill pattern supplied
-by the terminal driver.  The kind and number of available fill patterns 
-depend on the terminal driver.  If multiple datasets using filled boxes are 
-plotted, the pattern cycles through all available pattern types, starting
-from pattern <n>, much as the line type cycles for multiple line plots.
-
-The `empty` option causes filled boxes not to be filled. This is the default.
-It is equivalent to the `solid` option with a <density> parameter of zero.
-
-By default, @ref{border}, the box is bounded by a solid line of the current
-linetype. `border <lt>` specifies that a border is to be drawn using
-linetype <lt>. `noborder` specifies that no bounding lines are drawn.
-
-@node clabel, clip, fill, set-show
+@node clabel, clip, boxwidth, set-show
 @subsection clabel
 
 @c ?commands set clabel
@@ -5199,7 +5160,7 @@ permitted:
 @ref{clip} is synonymous with `set clip points`; @ref{clip} turns off all
 three types of clipping.
 
-@node cntrparam, contour, clip, set-show
+@node cntrparam, color_box, clip, set-show
 @subsection cntrparam
 
 @c ?commands set cntrparam
@@ -5330,7 +5291,77 @@ and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
-@node contour, data_style, cntrparam, set-show
+@node color_box, contour, cntrparam, set-show
+@subsection color box
+
+@c ?commands set colorbox
+@c ?commands show colorbox
+@c ?commands unset colorbox
+@c ?set colorbox
+@c ?show colorbox
+@c ?unset colorbox
+@cindex colorbox
+
+
+The color scheme, i.e. the gradient of the smooth color with min_z and
+max_z values of @ref{pm3d}'s @ref{palette}, is drawn in a color box unless `unset
+colorbox`.
+
+@example
+      set colorbox
+      set colorbox @{
+                 @{ vertical | horizontal @}
+                 @{ default | user @}
+                 @{ origin x, y @}
+                 @{ size x, y @}
+                 @{ noborder | bdefault | border [line style] @}
+               @}
+      show colorbox
+      unset colorbox
+
+@end example
+
+Colorbox position can be `default` or `user`.  If the latter is specified the
+values as given with the @ref{origin} and @ref{size} subcommands are used.
+
+`vertical` and `horizontal` switches the orientation of the color
+gradient.
+
+`origin x, y` and `size x, y` are used only in combination with the `user`
+option. The x and y values must be given in screen coordinates (as everything
+else did not seem to make sense) that is between [0 - 1]. Try for example:
+@example
+    set colorbox horiz user origin .1,.02 size .8,.04
+@end example
+
+which will draw a horizontal gradient somewhere at the bottom of the graph.
+
+@ref{border} turns the border on (this is the default). `noborder` turns the border
+off. If an positive integer argument is given after @ref{border}, it is used as a
+line style tag which is used for drawing the border, e.g.:
+@example
+    set style line 2604 linetype -1 linewidth .4
+    set colorbox border 2604
+@end example
+
+will use line style `2604`, a thin line with the default border color (-1)
+for drawing the border. `bdefault` (which is the default) will use the default
+border line style for drawing the border of the color box.
+
+The axis of the color box is called `cb` and it is controlled by means of the
+usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
+`format cb`, `grid [m]cb`, @ref{cblabel}, and perhaps even @ref{cbdata}, `[no]cbdtics`,
+`[no]cbmtics`.
+
+`set colorbox` without any parameter switches the position to default.
+`unset colorbox` resets the default parameters for the colorbox and switches
+the colorbox off.
+
+See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`,
+`help set style line`.
+
+
+@node contour, data_style, color_box, set-show
 @subsection contour
 
 @c ?commands set contour
@@ -5400,28 +5431,87 @@ and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with user defined levels demo (discrete.dem).
 }
 
-@node data_style, decimalsign, contour, set-show
+@node data_style, datafile_, contour, set-show
 @subsection data style
 
-@c ?commands set style data
-@c ?commands show style data
-@c ?set style data
-@c ?show style data
-@c ?data style
-The `set style data` command changes the default plotting style for data
-plots.
+This form of the command is deprecated. Please see `set style data`.
+
+@node datafile_, decimalsign, data_style, set-show
+@subsection datafile 
+
+@c ?set datafile
+The `set datafile` command options control interpretation of fields read from
+input data files by the `plot`, `splot`, and `fit` commands.  Only one such
+option is currently implemented.
+
+@menu
+* set_datafile_missing::        
+@end menu
+
+@node set_datafile_missing,  , datafile_, datafile_
+@subsubsection set datafile missing
+
+@c ?set datafile missing
+@c ?set missing
+@cindex missing
+
+The `set datafile missing` command allows you to tell `gnuplot` what character
+string is used in a data file to denote missing data.  Exactly how this missing
+value will be treated depends on the @ref{using} specifier on the @{`s`@}`plot` 
+command.
 
 Syntax:
 @example
-      set style data <style-choice>
-      show style data
+      set datafile missing @{"<string>"@}
+      show datafile missing
 
 @end example
 
-See @ref{style} for the choices.  If no choice is given, the choices are
-listed.  `show style data` shows the current default data plotting style.
+Example:
+@example
+      set datafile missing "?"
+      set style data lines
+      plot '-'
+         1 10
+         2 20
+         3 ?
+         4 40
+         5 50
+         e
+      plot '-' using 1:2
+         1 10
+         2 20
+         3 ?
+         4 40
+         5 50
+         e
+      plot '-' using 1:($2)
+         1 10
+         2 20
+         3 ?
+         4 40
+         5 50
+         e
 
-@node decimalsign, dgrid3d, data_style, set-show
+@end example
+
+The first `plot` will recognize only the first datum in the "3 ?" line.  It
+will use the single-datum-on-a-line convention that the line number is "x"
+and the datum is "y", so the point will be plotted (in this case erroneously)
+at (2,3).
+
+The second `plot` will correctly ignore the middle line.  The plotted line
+will connect the points at (2,20) and (4,40).
+
+The third `plot` will also correctly ignore the middle line, but the plotted
+line will not connect the points at (2,20) and (4,40).
+
+There is no default character for `missing`, but in many cases any
+non-parsible string of characters found where a numerical value is expected
+will be treated as missing data.
+
+
+@node decimalsign, dgrid3d, datafile_, set-show
 @subsection decimalsign
 
 @c ?commands set decimalsign
@@ -5587,6 +5677,7 @@ The second example sets the second variable to s.
 @node encoding, fitlogfile, dummy, set-show
 @subsection encoding
 
+^ <a name="set encoding"></a>
 @c ?commands set encoding
 @c ?commands show encoding
 @c ?set encoding
@@ -5663,7 +5754,7 @@ directory.
 
 
 The @ref{fontpath} setting defines additional locations for font files
-files searched when including font files. Yet, only the postscript terminal
+searched when including font files. Currently only the postscript terminal
 supports @ref{fontpath}. If a file cannot be found in the current directory,
 the directories in @ref{fontpath} are tried. Further documentation concerning
 the supported file formats is included in the @ref{postscript} section
@@ -5900,24 +5991,7 @@ Suppose the text is "98/07/06 05:04:03".  Then
 @node function_style, functions, format, set-show
 @subsection function style
 
-@c ?commands set style function
-@c ?commands show style function
-@c ?set style function
-@c ?show style function
-@c ?function style
-The `set style function` command changes the default plotting style for
-function plots.
-
-Syntax:
-@example
-      set style function <style-choice>
-      show style function
-
-@end example
-
-See @ref{style} for the choices.  If no choice is given, the choices are
-listed.  @ref{style} shows the current default function plotting
-style.
+This form of the command is deprecated. Please see `set style function`.
 
 @node functions, grid, function_style, set-show
 @subsection functions
@@ -6039,7 +6113,7 @@ In contrast to the usual display in gnuplot, hidden line removal actually
 treats the given function or data grids as real surfaces that can't be seen
 through, so parts behind the surface will be hidden by it.  For this to be
 possible, the surface needs to have 'grid structure' (see `splot datafile`
-about this), and it has to be drawn `with lines` or @ref{linespoints}.
+about this), and it has to be drawn `with lines` or `with linespoints`.
 
 When @ref{hidden3d} is set, both the hidden portion of the surface and possibly
 its contours drawn on the base (see @ref{contour}) as well as the grid will
@@ -6247,7 +6321,7 @@ to place the key in the other corners inside the graph or to the right
 Justification of the labels within the key is controlled by `Left` or `Right`
 (default is `Right`).  The text and sample can be reversed (`reverse`) and a
 box can be drawn around the key (`box @{...@}`) in a specified `linetype`
-and `linewidth`, or a user-defined @ref{linestyle}. Note that not all
+and `linewidth`, or a user-defined `linestyle`. Note that not all
 terminal drivers support linewidth selection, though.
 
 The length of the sample line can be controlled by `samplen`.  The sample
@@ -6361,7 +6435,7 @@ gives it a title, and draws a box around it in linetype 3:
 
 @end example
 
-@node label, linestyle, key, set-show
+@node label, lmargin, key, set-show
 @subsection label
 
 @c ?commands set label
@@ -6545,200 +6619,7 @@ point on a 3D splot colored using pm3d:
 @end example
 
 
-@node linestyle, arrowstyle, label, set-show
-@subsection linestyle
-
-@c ?commands set style line
-@c ?commands unset style line
-@c ?commands show style line
-@c ?set style line
-@c ?unset style line
-@c ?show style line
-@cindex linestyle
-@opindex linestyle
-
-
-@c ?help set style line
-^ <a name="linetype">
-^ <a name="linewidth">
-Each terminal has a default set of line and point types, which can be seen
-by using the command @ref{test}.  `set style line` defines a set of line types
-and widths and point types and sizes so that you can refer to them later by
-an index instead of repeating all the information at each invocation.
-
-Syntax:
-@example
-      set style line <index> @{linetype  | lt <line_type>@}
-                             @{linewidth | lw <line_width>@}
-                             @{pointtype | pt <point_type>@}
-                             @{pointsize | ps <point_size>@}
-                             @{palette@}
-      unset style line
-      show style line
-
-@end example
-
-The line and point types are taken from the default types for the terminal
-currently in use.  The line width and point size are multipliers for the
-default width and size (but note that <point_size> here is unaffected by
-the multiplier given on @ref{pointsize}).
-
-The defaults for the line and point types is the index.  The defaults for
-the width and size are both unity.
-
-Linestyles created by this mechanism do not replace the default styles;
-both may be used.
-
-Not all terminals support the `linewidth` and @ref{pointsize} features; if
-not supported, the option will be ignored.
-
-Note that this feature is not completely implemented; linestyles defined by
-this mechanism may be used with `plot`, `splot`, @ref{replot}, and `set arrow`,
-but not by other commands that allow the default index to be used, such as
-`set grid`.
-
-If gnuplot was built with pm3d support, the special keyword @ref{palette} is
-allowed as `linetype` for splots (the 2d `plot` command ignores @ref{palette}).
-In this case the line color is chosen from a smooth palette which was
-set previously with the command @ref{palette}.  The color value corresponds
-to the z-value (elevation) of the splot.
-
-Example:
-Suppose that the default lines for indices 1, 2, and 3 are red, green, and
-blue, respectively, and the default point shapes for the same indices are a
-square, a cross, and a triangle, respectively.  Then
-
-@example
-      set style line 1 lt 2 lw 2 pt 3 ps 0.5
-
-@end example
-
-defines a new linestyle that is green and twice the default width and a new
-pointstyle that is a half-sized triangle.  The commands
-
-@example
-      set style function lines
-      plot f(x) lt 3, g(x) ls 1
-
-@end example
-
-will create a plot of f(x) using the default blue line and a plot of g(x)
-using the user-defined wide green line.  Similarly the commands
-
-@example
-      set style function linespoints
-      plot p(x) lt 1 pt 3, q(x) ls 1
-
-@end example
-
-will create a plot of p(x) using the default triangles connected by a red
-line and q(x) using small triangles connected by a green line.
-
-@example
-      splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
-
-@end example
-
-creates a surface plot using smooth colors according to @ref{palette}. Note,
-that this works only on some terminals.
-
-See also @ref{palette}, @ref{pm3d}.
-
-
-@node arrowstyle, lmargin, linestyle, set-show
-@subsection arrowstyle
-
-@c ?commands set style arrow
-@c ?commands unset style arrow
-@c ?commands show style arrow
-@c ?set style arrow
-@c ?unset style arrow
-@c ?show style arrow
-@cindex arrowstyle
-@opindex arrowstyle
-
-
-@c ?help set style arrow
-^ <a name="arrowtype">
-^ <a name="arrowwidth">
-Each terminal has a default set of arrow and point types, which can be seen
-by using the command @ref{test}.  `set style arrow` defines a set of arrow types
-and widths and point types and sizes so that you can refer to them later by
-an index instead of repeating all the information at each invocation.
-
-Syntax:
-@example
-      set style arrow <index> @{nohead | head | heads@}
-                              @{size <length>,<angle>@{,<backangle>@}@}
-                              @{filled | empty | nofilled@}
-                              @{front | back@}
-                              @{ @{linestyle | ls <line_style>@}
-                                | @{linetype | lt <line_type>@}
-                                  @{linewidth | lw <line_width@} @}
-      unset style arrow
-      show style arrow
-
-@end example
-
-<index> is an integer that identifies the arrowstyle.
-
-Specifying `nohead` produces arrows drawn without a head---a line segment.
-This gives you yet another way to draw a line segment on the plot.  By
-default, arrows have one head. Specifying `heads` draws arrow heads on both
-ends of the line.
-
-Head size can be controlled by `size <length>,<angle>` or 
-`size <length>,<angle>,<backangle>` where `<length>` defines length of each 
-branch of the arrow head and `<angle>` the angle (in degrees) they make with 
-the arrow. `<Length>` is in x-axis units; this can be
-changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
-see `coordinates` for details.
-`<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
-`<backangle>` is the angle (in degrees) the back branches make with the 
-arrow (in the same direction as `<angle>`).
-The `fig` terminal has a restricted backangle function. It supports three
-different angles. There are two thresholds: Below 70 degrees, the arrow head
-gets an indented back angle. Above 110 degrees, the arrow head has an acute
-back angle. Between these thresholds, the back line is straight.
-
-Specifying `filled` produces filled arrow heads (if heads are used). 
-Filling is supported on filled-polygon capable terminals, see @ref{pm3d}
-for their list, otherwise the arrow heads are closed but not filled.
-The same result (closed but not filled arrow head) is reached by specifying
-`empty`.
-Further, filling and outline is obviously not supported on terminals drawing
-arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
-or `tgif`. 
-
-The line style may be selected from a user-defined list of line styles 
-(see `set style line`) or may be defined here by providing values for 
-`<line_type>` (an index from the default list of styles) and/or 
-`<line_width>` (which is a  multiplier for the default width).
-
-Note, however, that if a user-defined line style has been selected, its
-properties (type and width) cannot be altered merely by issuing another
-`set style arrow` command with the appropriate index and `lt` or `lw`.
-
-If `front` is given, the arrows are written on top of the graphed data. If
-`back` is given (the default), the arrow is written underneath the graphed
-data.  Using `front` will prevent a arrow from being obscured by dense data.
-
-Examples:
-
-To draw an arrow without an arrow head and double width, use:
-@example
-      set style arrow 1 nohead lw 2
-      set arrow arrowstyle 1
-
-@end example
-
-@example
- See also 'set arrow' for further examples.
-
-@end example
-
-
-@node lmargin, loadpath, arrowstyle, set-show
+@node lmargin, loadpath, label, set-show
 @subsection lmargin
 
 @c ?commands set lmargin
@@ -6928,7 +6809,7 @@ necessary if the data in the file are not in the required order.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/world/world.html,world.dem: mapping demos.
 }
 
-@node margin, missing, mapping, set-show
+@node margin, mouse, mapping, set-show
 @subsection margin
 
 @c ?commands set margin
@@ -6964,70 +6845,7 @@ labels will be included in either the margin calculation or the calculation
 of the positions of other text to be written in the margin.  This can lead
 to tic labels overwriting other text if the axis is very close to the border.
 
-@node missing, mouse, margin, set-show
-@subsection missing
-
-@c ?set datafile
-@c ?set datafile missing
-@cindex missing
-@opindex missing
-
-
-The @ref{missing} command allows you to tell `gnuplot` what character
-string is used in a data file to denote missing data.  Exactly how this missing
-value will be treated depends on the @ref{using} specifier on the @{`s`@}`plot` 
-command.
-
-Syntax:
-@example
-      set datafile missing @{"<string>"@}
-      show datafile missing
-
-@end example
-
-Example:
-@example
-      set datafile missing "?"
-      set style data lines
-      plot '-'
-         1 10
-         2 20
-         3 ?
-         4 40
-         5 50
-         e
-      plot '-' using 1:2
-         1 10
-         2 20
-         3 ?
-         4 40
-         5 50
-         e
-      plot '-' using 1:($2)
-         1 10
-         2 20
-         3 ?
-         4 40
-         5 50
-         e
-
-@end example
-
-The first `plot` will recognize only the first datum in the "3 ?" line.  It
-will use the single-datum-on-a-line convention that the line number is "x"
-and the datum is "y", so the point will be plotted (in this case erroneously)
-at (2,3).
-
-The second `plot` will correctly ignore the middle line.  The plotted line
-will connect the points at (2,20) and (4,40).
-
-The third `plot` will also correctly ignore the middle line, but the plotted
-line will not connect the points at (2,20) and (4,40).
-
-There is no default character for @ref{missing}.
-
-
-@node mouse, multiplot, missing, set-show
+@node mouse, multiplot, margin, set-show
 @subsection mouse
 
 @c ?commands unset mouse
@@ -7741,7 +7559,7 @@ altitudes:
 See also @ref{palette}, `set colorbox`, @ref{pm3d}, `help vgagl`.
 
 
-@node palette, color_box, pm3d, set-show
+@node palette, pointsize, pm3d, set-show
 @subsection palette
 
 @c ?commands set palette
@@ -8000,10 +7818,6 @@ To produce a palette with few colors only use:
 @c ?commands set palette functions
 @c ?set palette functions
 @c ?palette functions
-@cindex functions
-@opindex functions
-
-
 Use `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` to define three formulae
 for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
 on the variable `gray` which will take values in [0,1] and should also
@@ -8159,77 +7973,7 @@ You may manually change the postscript output from gray to color and vice
 versa and change the definition of <maxcolors>.
 
 
-@node color_box, pointsize, palette, set-show
-@subsection color box
-
-@c ?commands set colorbox
-@c ?commands show colorbox
-@c ?commands unset colorbox
-@c ?set colorbox
-@c ?show colorbox
-@c ?unset colorbox
-@cindex colorbox
-
-
-The color scheme, i.e. the gradient of the smooth color with min_z and
-max_z values of @ref{pm3d}'s @ref{palette}, is drawn in a color box unless `unset
-colorbox`.
-
-@example
-      set colorbox
-      set colorbox @{
-                 @{ vertical | horizontal @}
-                 @{ default | user @}
-                 @{ origin x, y @}
-                 @{ size x, y @}
-                 @{ noborder | bdefault | border [line style] @}
-               @}
-      show colorbox
-      unset colorbox
-
-@end example
-
-Colorbox position can be `default` or `user`.  If the latter is specified the
-values as given with the @ref{origin} and @ref{size} subcommands are used.
-
-`vertical` and `horizontal` switches the orientation of the color
-gradient.
-
-`origin x, y` and `size x, y` are used only in combination with the `user`
-option. The x and y values must be given in screen coordinates (as everything
-else did not seem to make sense) that is between [0 - 1]. Try for example:
-@example
-    set colorbox horiz user origin .1,.02 size .8,.04
-@end example
-
-which will draw a horizontal gradient somewhere at the bottom of the graph.
-
-@ref{border} turns the border on (this is the default). `noborder` turns the border
-off. If an positive integer argument is given after @ref{border}, it is used as a
-line style tag which is used for drawing the border, e.g.:
-@example
-    set style line 2604 linetype -1 linewidth .4
-    set colorbox border 2604
-@end example
-
-will use line style `2604`, a thin line with the default border color (-1)
-for drawing the border. `bdefault` (which is the default) will use the default
-border line style for drawing the border of the color box.
-
-The axis of the color box is called `cb` and it is controlled by means of the
-usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
-`format cb`, `grid [m]cb`, @ref{cblabel}, and perhaps even @ref{cbdata}, `[no]cbdtics`,
-`[no]cbmtics`.
-
-`set colorbox` without any parameter switches the position to default.
-`unset colorbox` resets the default parameters for the colorbox and switches
-the colorbox off.
-
-See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`,
-`help set style line`.
-
-
-@node pointsize, polar, color_box, set-show
+@node pointsize, polar, palette, set-show
 @subsection pointsize
 
 @c ?commands set pointsize
@@ -8503,10 +8247,11 @@ See also
 
 @c ?set style
 @c ?show style
-^ <a name="set style <style>">
-Default styles are chosen with the `set style function` and `set style data`
-commands.  See @ref{with} for information about how to override the default
-plotting style for individual functions and data sets.
+^ <a name="set style <style>"></a>
+Default plotting styles are chosen with the `set style data` and 
+`set style function` commands.  See @ref{with} for information about how to
+override the default plotting style for individual functions and data sets.
+See `plotting styles` for a complete list of styles.
 
 Syntax:
 @example
@@ -8517,12 +8262,308 @@ Syntax:
 
 @end example
 
+Default styles for specific plotting elements may also be set.
+
+Syntax:
 @example
       set style arrow <n> <arrowstyle>
       set style fill <fillstyle>
       set style line <n> <linestyle>
 
 @end example
+
+
+@menu
+* set_style_arrow::             
+* set_style_data::              
+* set_style_fill::              
+* set_style_function::          
+* set_style_line::              
+* plotting_styles::             
+@end menu
+
+@node set_style_arrow, set_style_data, style, style
+@subsubsection set style arrow
+
+@c ?commands set style arrow
+@c ?commands unset style arrow
+@c ?commands show style arrow
+@c ?set style arrow
+@c ?unset style arrow
+@c ?show style arrow
+@cindex arrowstyle
+
+@c ?help set style arrow
+^ <a name="arrowtype"></a>
+^ <a name="arrowwidth"></a>
+Each terminal has a default set of arrow and point types, which can be seen
+by using the command @ref{test}.  @ref{arrow} defines a set of arrow types
+and widths and point types and sizes so that you can refer to them later by
+an index instead of repeating all the information at each invocation.
+
+Syntax:
+@example
+      set style arrow <index> @{nohead | head | heads@}
+                              @{size <length>,<angle>@{,<backangle>@}@}
+                              @{filled | empty | nofilled@}
+                              @{front | back@}
+                              @{ @{linestyle | ls <line_style>@}
+                                | @{linetype | lt <line_type>@}
+                                  @{linewidth | lw <line_width@} @}
+      unset style arrow
+      show style arrow
+
+@end example
+
+<index> is an integer that identifies the arrowstyle.
+
+Specifying `nohead` produces arrows drawn without a head---a line segment.
+This gives you yet another way to draw a line segment on the plot.  By
+default, arrows have one head. Specifying `heads` draws arrow heads on both
+ends of the line.
+
+Head size can be controlled by `size <length>,<angle>` or 
+`size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+the arrow. `<Length>` is in x-axis units; this can be
+changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
+see `coordinates` for details.
+`<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
+`<backangle>` is the angle (in degrees) the back branches make with the 
+arrow (in the same direction as `<angle>`).
+The `fig` terminal has a restricted backangle function. It supports three
+different angles. There are two thresholds: Below 70 degrees, the arrow head
+gets an indented back angle. Above 110 degrees, the arrow head has an acute
+back angle. Between these thresholds, the back line is straight.
+
+Specifying `filled` produces filled arrow heads (if heads are used). 
+Filling is supported on filled-polygon capable terminals, see @ref{pm3d}
+for their list, otherwise the arrow heads are closed but not filled.
+The same result (closed but not filled arrow head) is reached by specifying
+`empty`.
+Further, filling and outline is obviously not supported on terminals drawing
+arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
+or `tgif`. 
+
+The line style may be selected from a user-defined list of line styles 
+(see `set style line`) or may be defined here by providing values for 
+`<line_type>` (an index from the default list of styles) and/or 
+`<line_width>` (which is a  multiplier for the default width).
+
+Note, however, that if a user-defined line style has been selected, its
+properties (type and width) cannot be altered merely by issuing another
+@ref{arrow} command with the appropriate index and `lt` or `lw`.
+
+If `front` is given, the arrows are written on top of the graphed data. If
+`back` is given (the default), the arrow is written underneath the graphed
+data.  Using `front` will prevent a arrow from being obscured by dense data.
+
+Examples:
+
+To draw an arrow without an arrow head and double width, use:
+@example
+      set style arrow 1 nohead lw 2
+      set arrow arrowstyle 1
+
+@end example
+
+@example
+ See also 'set arrow' for further examples.
+
+@end example
+
+
+@node set_style_data, set_style_fill, set_style_arrow, style
+@subsubsection set style data
+
+@c ?commands set style data
+@c ?commands show style data
+@c ?set style data
+@c ?show style data
+@c ?data style
+The `set style data` command changes the default plotting style for data
+plots.
+
+Syntax:
+@example
+      set style data <plotting-style>
+      show style data
+
+@end example
+
+See `plotting styles` for the choices.  If no choice is given, the choices are
+listed.  `show style data` shows the current default data plotting style.
+
+@node set_style_fill, set_style_function, set_style_data, style
+@subsubsection set style fill
+
+@c ?commands set style fill
+@c ?commands show style fill
+@c ?set style fill
+@c ?show style fill
+@cindex fillstyle
+
+The `set style fill` command is used to set the style of boxes
+or candlesticks.
+
+Syntax:
+@example
+      set style fill @{empty | solid @{<density>@} | pattern @{<n>@}@}
+                     @{border @{<linetype>@} | noborder@}
+
+@end example
+
+The default fillstyle is `empty`.
+
+The `solid` option causes filling with a solid color, if the terminal
+supports that. The <density> parameter specifies the intensity of the 
+fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
+the inner area is of the same color as the current linetype. 
+Some terminal types can vary the density continuously; others implement 
+only a few levels of partial fill.  If no <density> parameter is given, 
+it defaults to 1.
+
+The `pattern` option causes filling to be done with a fill pattern supplied
+by the terminal driver.  The kind and number of available fill patterns 
+depend on the terminal driver.  If multiple datasets using filled boxes are 
+plotted, the pattern cycles through all available pattern types, starting
+from pattern <n>, much as the line type cycles for multiple line plots.
+
+The `empty` option causes filled boxes not to be filled. This is the default.
+It is equivalent to the `solid` option with a <density> parameter of zero.
+
+By default, @ref{border}, the box is bounded by a solid line of the current
+linetype. `border <lt>` specifies that a border is to be drawn using
+linetype <lt>. `noborder` specifies that no bounding lines are drawn.
+
+@node set_style_function, set_style_line, set_style_fill, style
+@subsubsection set style function
+
+@c ?commands set style function
+@c ?commands show style function
+@c ?set style function
+@c ?show style function
+@c ?function style
+The `set style function` command changes the default plotting style for
+function plots.
+
+Syntax:
+@example
+      set style function <plotting-style>
+      show style function
+
+@end example
+
+See `plotting styles` for the choices.  If no choice is given, the choices are
+listed.  Show style function shows the current default function plotting
+style.
+
+@node set_style_line, plotting_styles, set_style_function, style
+@subsubsection set style line
+
+@c ?commands set style line
+@c ?commands unset style line
+@c ?commands show style line
+@c ?set style line
+@c ?unset style line
+@c ?show style line
+@cindex linestyle
+
+@c ?help set style line
+^ <a name="linetype"></a>
+^ <a name="linewidth"></a>
+Each terminal has a default set of line and point types, which can be seen
+by using the command @ref{test}.  `set style line` defines a set of line types
+and widths and point types and sizes so that you can refer to them later by
+an index instead of repeating all the information at each invocation.
+
+Syntax:
+@example
+      set style line <index> @{linetype  | lt <line_type>@}
+                             @{linewidth | lw <line_width>@}
+                             @{pointtype | pt <point_type>@}
+                             @{pointsize | ps <point_size>@}
+                             @{palette@}
+      unset style line
+      show style line
+
+@end example
+
+The line and point types are taken from the default types for the terminal
+currently in use.  The line width and point size are multipliers for the
+default width and size (but note that <point_size> here is unaffected by
+the multiplier given on @ref{pointsize}).
+
+The defaults for the line and point types is the index.  The defaults for
+the width and size are both unity.
+
+Linestyles created by this mechanism do not replace the default styles;
+both may be used.
+
+Not all terminals support the `linewidth` and @ref{pointsize} features; if
+not supported, the option will be ignored.
+
+Note that this feature is not completely implemented; linestyles defined by
+this mechanism may be used with `plot`, `splot`, @ref{replot}, and @ref{arrow},
+but not by other commands that allow the default index to be used, such as
+`set grid`.
+
+If gnuplot was built with pm3d support, the special keyword @ref{palette} is
+allowed as `linetype` for splots (the 2d `plot` command ignores @ref{palette}).
+In this case the line color is chosen from a smooth palette which was
+set previously with the command @ref{palette}.  The color value corresponds
+to the z-value (elevation) of the splot.
+
+Example:
+Suppose that the default lines for indices 1, 2, and 3 are red, green, and
+blue, respectively, and the default point shapes for the same indices are a
+square, a cross, and a triangle, respectively.  Then
+
+@example
+      set style line 1 lt 2 lw 2 pt 3 ps 0.5
+
+@end example
+
+defines a new linestyle that is green and twice the default width and a new
+pointstyle that is a half-sized triangle.  The commands
+
+@example
+      set style function lines
+      plot f(x) lt 3, g(x) ls 1
+
+@end example
+
+will create a plot of f(x) using the default blue line and a plot of g(x)
+using the user-defined wide green line.  Similarly the commands
+
+@example
+      set style function linespoints
+      plot p(x) lt 1 pt 3, q(x) ls 1
+
+@end example
+
+will create a plot of p(x) using the default triangles connected by a red
+line and q(x) using small triangles connected by a green line.
+
+@example
+      splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
+
+@end example
+
+creates a surface plot using smooth colors according to @ref{palette}. Note,
+that this works only on some terminals.
+
+See also @ref{palette}, @ref{pm3d}.
+
+
+@node plotting_styles,  , set_style_line, style
+@subsubsection plotting styles
+
+@c ?plotting styles
+^ <a name="plotting styles"></a>
+
+The commands `set style data` and `set style function` change the 
+default plotting style for subsequent `plot` and `splot` commands.
 
 The types used for all line and point styles (i.e., solid, dash-dot, color,
 etc. for lines; circles, squares, crosses, etc. for points) will be either
@@ -8532,8 +8573,8 @@ command @ref{test} to see what is available.
 
 None of the styles requiring more than two columns of information
 (e.g., @ref{errorbars} or @ref{errorlines}) can be used with `splot`s or
-function `plot`s. Neither @ref{boxes}, @ref{filledcurves} nor any
-of the @ref{steps} styles can be used with `splot`s. If an inappropriate style
+function `plot`s. Neither `boxes`, `filledcurves` nor any
+of the `steps` styles can be used with `splot`s. If an inappropriate style
 is specified, it will be changed to `points`.
 
 For 2-d data with more than two columns, `gnuplot` is picky about the
@@ -8542,63 +8583,41 @@ allowed `errorbar` and `errorline` styles. The @ref{using} option on the
 you want. (In this discussion, "column" will be used to refer both to
 a column in the data file and an entry in the @ref{using} list.)
 
-For three columns, only @ref{xerrorbars}, @ref{yerrorbars} (or @ref{errorbars}),
-@ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{boxes} 
-and @ref{boxerrorbars} are allowed. If another plot style is used, the style
-will be changed to @ref{yerrorbars}. The @ref{boxerrorbars} style will
+For three columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
+`xerrorlines`, `yerrorlines` (or @ref{errorlines}), `boxes` 
+and `boxerrorbars` are allowed. If another plot style is used, the style
+will be changed to `yerrorbars`. The `boxerrorbars` style will
 calculate the boxwidth automatically.
 
-For four columns, only @ref{xerrorbars}, @ref{yerrorbars} (or @ref{errorbars}),
-@ref{xyerrorbars}, @ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{xyerrorlines},
-@ref{boxxyerrorbars}, and @ref{boxerrorbars} are allowed.  An illegal
-style will be changed to @ref{yerrorbars}.
+For four columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
+`xyerrorbars`, `xerrorlines`, `yerrorlines` (or @ref{errorlines}), `xyerrorlines`,
+`boxxyerrorbars`, and `boxerrorbars` are allowed.  An illegal
+style will be changed to `yerrorbars`.
 
-Five-column data allow only the @ref{boxerrorbars}, @ref{financebars}, and
-@ref{candlesticks} styles.  (The last two of these are primarily used for plots
-of financial prices.)  An illegal style will be changed to @ref{boxerrorbars}
+Five-column data allow only the `boxerrorbars`, `financebars`, and
+`candlesticks` styles.  (The last two of these are primarily used for plots
+of financial prices.)  An illegal style will be changed to `boxerrorbars`
 before plotting.
 
-Six- and seven-column data only allow the @ref{xyerrorbars},
-@ref{xyerrorlines}, and @ref{boxxyerrorbars} styles. Illegal styles will be
-changed to @ref{xyerrorbars} before plotting.
+Six- and seven-column data only allow the `xyerrorbars`,
+`xyerrorlines`, and `boxxyerrorbars` styles. Illegal styles will be
+changed to `xyerrorbars` before plotting.
 
 For more information about error bars with and without lines,
 please see @ref{errorlines} and @ref{errorbars}.
 
-@menu
-* boxerrorbars::                
-* boxes::                       
-* filledcurves::                
-* boxxyerrorbars::              
-* candlesticks::                
-* dots::                        
-* financebars::                 
-* fsteps::                      
-* histeps::                     
-* impulses::                    
-* lines::                       
-* linespoints::                 
-* points::                      
-* steps::                       
-* vectors::                     
-* xerrorbars::                  
-* xyerrorbars::                 
-* yerrorbars::                  
-* xerrorlines::                 
-* xyerrorlines::                
-* yerrorlines::                 
-@end menu
 
-@node boxerrorbars, boxes, style, style
-@subsubsection boxerrorbars
+
+@noindent --- BOXERRORBARS ---
 
 @c ?commands set style boxerrorbars
 @c ?set style boxerrorbars
+@c ?plotting styles boxerrorbars
 @c ?style boxerrorbars
 @cindex boxerrorbars
 
-The @ref{boxerrorbars} style is only relevant to 2-d data plotting.  It is a
-combination of the @ref{boxes} and @ref{yerrorbars} styles.  The boxwidth will come
+The `boxerrorbars` style is only relevant to 2-d data plotting.  It is a
+combination of the `boxes` and `yerrorbars` styles.  The boxwidth will come
 from the fourth column if the y errors are in the form of "ydelta" and the
 boxwidth was not previously set equal to -2.0 (`set boxwidth -2.0`) or from
 the fifth column if the y errors are in the form of "ylow yhigh".  The
@@ -8608,21 +8627,22 @@ box touches the adjacent boxes.  The width will also be calculated in cases
 where three-column data are used.
 
 The box height is determined from the y error in the same way as it is for
-the @ref{yerrorbars} style---either from y-ydelta to y+ydelta or from ylow to
+the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
 See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
 }
 
-@node boxes, filledcurves, boxerrorbars, style
-@subsubsection boxes
+
+@noindent --- BOXES ---
 
 @c ?commands set style boxes
 @c ?set style boxes
+@c ?plotting styles boxes
 @c ?style boxes
 @cindex boxes
 
-The @ref{boxes} style is only relevant to 2-d plotting.  It draws a box centered
+The `boxes` style is only relevant to 2-d plotting.  It draws a box centered
 about the given x coordinate from the x axis (not the graph border) to the
 given y coordinate.  The width of the box is obtained in one of three ways.
 If it is a data plot and the data file has a third column, this will be used
@@ -8685,15 +8705,16 @@ x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
 jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
 tandy_60dpi. The BeOS driver (`be`) is untested.
 
-@node filledcurves, boxxyerrorbars, boxes, style
-@subsubsection filledcurves
+
+@noindent --- FILLEDCURVES ---
 
 @c ?commands set style filledcurves
 @c ?set style filledcurves
+@c ?plotting styles filledcurves
 @c ?style filledcurves
 @cindex filledcurves
 
-The @ref{filledcurves} style is only relevant to 2-d plotting. It draws either
+The `filledcurves` style is only relevant to 2-d plotting. It draws either
 the current curve closed and filled, or the region between the current curve
 and a given axis, horizontal or vertical line, or a point, filled with the
 current drawing color.
@@ -8734,31 +8755,33 @@ If the values of <a>, <x>, <y> are out of the drawing boundary, then they
 are moved to the graph boundary. Then the actually filled area in the case
 of option xy=<x>,<y> will depend on xrange and yrange.
 
-@node boxxyerrorbars, candlesticks, filledcurves, style
-@subsubsection boxxyerrorbars
+
+@noindent --- BOXXYERRORBARS ---
 
 @c ?commands set style boxxyerrorbars
 @c ?set style boxxyerrorbars
+@c ?plotting styles boxxyerrorbars
 @c ?style boxxyerrorbars
 @cindex boxxyerrorbars
 
-The @ref{boxxyerrorbars} style is only relevant to 2-d data plotting.  It is a
-combination of the @ref{boxes} and @ref{xyerrorbars} styles.
+The `boxxyerrorbars` style is only relevant to 2-d data plotting.  It is a
+combination of the `boxes` and `xyerrorbars` styles.
 
 The box width and height are determined from the x and y errors in the same
-way as they are for the @ref{xyerrorbars} style---either from xlow to xhigh and
+way as they are for the `xyerrorbars` style---either from xlow to xhigh and
 from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
 y+ydelta , depending on how many data columns are provided.
 
-@node candlesticks, dots, boxxyerrorbars, style
-@subsubsection candlesticks
+
+@noindent --- CANDLESTICKS ---
 
 @c ?commands set style candlesticks
 @c ?set style candlesticks
+@c ?plotting styles candlesticks
 @c ?style candlesticks
 @cindex candlesticks
 
-The @ref{candlesticks} style can be used for 2-d data plotting of financial
+The `candlesticks` style can be used for 2-d data plotting of financial
 data or for generating box-and-whisker plots of statistical data.
 Five columns of data are required; in order, these should be the x
 coordinate (most likely a date) and the opening, low, high, and closing
@@ -8771,7 +8794,7 @@ The width of the rectangle is controlled by `set bars <width>`.
 By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
-See @ref{bars} and @ref{financebars}.  See also
+See @ref{bars} and `financebars`.  See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demos.
 }
 
@@ -8792,26 +8815,27 @@ box-and-whisker plot requires additional plot commands as in this example:
 
 @end example
 
-@node dots, financebars, candlesticks, style
-@subsubsection dots
+
+@noindent --- DOTS ---
 
 @c ?commands set style dots
 @c ?set style dots
+@c ?plotting styles dots
 @c ?style dots
 @cindex dots
 
-The @ref{dots} style plots a tiny dot at each point; this is useful for scatter
+The `dots` style plots a tiny dot at each point; this is useful for scatter
 plots with many points.
 
-@node financebars, fsteps, dots, style
-@subsubsection financebars
+
+@noindent --- FINANCEBARS ---
 
 @c ?commands set style financebars
 @c ?set style financebars
 @c ?style financebars
 @cindex financebars
 
-The @ref{financebars} style is only relevant for 2-d data plotting of financial
+The `financebars` style is only relevant for 2-d data plotting of financial
 data.  Five columns of data are required; in order, these should be the x
 coordinate (most likely a date) and the opening, low, high, and closing
 prices.  The symbol is a vertical line segment, located horizontally at the x
@@ -8819,34 +8843,36 @@ coordinate and limited vertically by the high and low prices.  A horizontal
 tic on the left marks the opening price and one on the right marks the
 closing price.  The length of these tics may be changed by @ref{bars}.  The
 symbol will be unchanged if the high and low prices are interchanged.
-See @ref{bars} and @ref{candlesticks}, and also the
+See @ref{bars} and `candlesticks`, and also the
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html,finance demo.
 }
 
-@node fsteps, histeps, financebars, style
-@subsubsection fsteps
+
+@noindent --- FSTEPS ---
 
 @c ?commands set style fsteps
 @c ?set style fsteps
+@c ?plotting styles fsteps
 @c ?style fsteps
 @cindex fsteps
 
-The @ref{fsteps} style is only relevant to 2-d plotting.  It connects consecutive
+The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x1,y2) and the
 second from (x1,y2) to (x2,y2).
 See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
 }
 
-@node histeps, impulses, fsteps, style
-@subsubsection histeps
+
+@noindent --- HISTEPS ---
 
 @c ?commands set style histeps
 @c ?set style histeps
+@c ?plotting styles histeps
 @c ?style histeps
 @cindex histeps
 
-The @ref{histeps} style is only relevant to 2-d plotting.  It is intended for
+The `histeps` style is only relevant to 2-d plotting.  It is intended for
 plotting histograms.  Y-values are assumed to be centered at the x-values;
 the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
 ((x1+x2)/2,y1).  The lines representing the end points are extended so that
@@ -8859,37 +8885,40 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
 }
 
-@ref{histeps} is only a plotting style; `gnuplot` does not have the ability to
+`histeps` is only a plotting style; `gnuplot` does not have the ability to
 create bins and determine their population from some data set.
 
-@node impulses, lines, histeps, style
-@subsubsection impulses
+
+@noindent --- IMPULSES ---
 
 @c ?commands set style impulses
 @c ?set style impulses
+@c ?plotting styles impulses
 @c ?style impulses
 @cindex impulses
 
-The @ref{impulses} style displays a vertical line from the x axis (not the graph
+The `impulses` style displays a vertical line from the x axis (not the graph
 border), or from the grid base for `splot`, to each point.
 
-@node lines, linespoints, impulses, style
-@subsubsection lines
+
+@noindent --- LINES ---
 
 @c ?commands set style lines
 @c ?set style lines
+@c ?plotting styles lines
 @c ?style lines
 @cindex lines
 
 The `lines` style connects adjacent points with straight line segments.
-See also `linetype`, `linewidth`, and @ref{linestyle}.
+See also `linetype`, `linewidth`, and `linestyle`.
 
-@node linespoints, points, lines, style
-@subsubsection linespoints
+
+@noindent --- LINESPOINTS ---
 
 @c ?commands set style linespoints
 @c ?commands set style lp
 @c ?set style linespoints
+@c ?plotting styles linespoints
 @c ?set style lp
 @c ?style linespoints
 @c ?style lp
@@ -8897,79 +8926,84 @@ See also `linetype`, `linewidth`, and @ref{linestyle}.
 
 @cindex lp
 
-The @ref{linespoints} style does both `lines` and `points`, that is, it draws a
+The `linespoints` style does both `lines` and `points`, that is, it draws a
 small symbol at each point and then connects adjacent points with straight
 line segments.  The command @ref{pointsize} may be used to change the size of
 the points.  See @ref{pointsize} for its usage.
 
-@ref{linespoints} may be abbreviated `lp`.
+`linespoints` may be abbreviated `lp`.
 
-@node points, steps, linespoints, style
-@subsubsection points
+
+@noindent --- POINTS ---
 
 @c ?commands set style points
 @c ?set style points
+@c ?plotting styles points
 @c ?style points
 @cindex points
 
 The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the size of the points.  See @ref{pointsize}
 for its usage.
 
-@node steps, vectors, points, style
-@subsubsection steps
+
+@noindent --- STEPS ---
 
 @c ?commands set style steps
 @c ?set style steps
+@c ?plotting styles steps
 @c ?style steps
 @cindex steps
 
-The @ref{steps} style is only relevant to 2-d plotting.  It connects consecutive
+The `steps` style is only relevant to 2-d plotting.  It connects consecutive
 points with two line segments: the first from (x1,y1) to (x2,y1) and the
 second from (x2,y1) to (x2,y2).
 See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
 }
 
-@node vectors, xerrorbars, steps, style
-@subsubsection vectors
+
+@noindent --- VECTORS ---
 
 @c ?commands set style vectors
 @c ?set style vectors
+@c ?plotting styles vectors
 @c ?style vectors
 @cindex vectors
 
-The @ref{vectors} style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
+The `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
 it requires four columns of data.  It also draws a small arrowhead at the
 end of the vector.
 
 `set clip one` and `set clip two` affect drawing vectors.
 Please see @ref{clip}.
 
-@node xerrorbars, xyerrorbars, vectors, style
-@subsubsection xerrorbars
+
+@noindent --- XERRORBARS ---
 
 @c ?commands set style xerrorbars
 @c ?set style xerrorbars
+@c ?plotting styles xerrorbars
 @c ?style xerrorbars
 @cindex xerrorbars
 
-The @ref{xerrorbars} style is only relevant to 2-d data plots.  @ref{xerrorbars} is
-like @ref{dots}, except that a horizontal error bar is also drawn.  At each point
+The `xerrorbars` style is only relevant to 2-d data plots.  `xerrorbars` is
+like `dots`, except that a horizontal error bar is also drawn.  At each point
 (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
 (x+xdelta,y), depending on how many data columns are provided.  A tic mark
 is placed at the ends of the error bar (unless @ref{bars} is used---see
 @ref{bars} for details).
 
-@node xyerrorbars, yerrorbars, xerrorbars, style
-@subsubsection xyerrorbars
+
+@noindent --- XYERRORBARS ---
 
 @c ?commands set style xyerrorbars
 @c ?set style xyerrorbars
+@c ?plotting styles xyerrorbars
 @c ?style xyerrorbars
 @cindex xyerrorbars
 
-The @ref{xyerrorbars} style is only relevant to 2-d data plots.  @ref{xyerrorbars} is
-like @ref{dots}, except that horizontal and vertical error bars are also drawn.
+The `xyerrorbars` style is only relevant to 2-d data plots.  `xyerrorbars` is
+like `dots`, except that horizontal and vertical error bars are also drawn.
 At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
 from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
 (xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
@@ -8985,19 +9019,21 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @end example
 
-@node yerrorbars, xerrorlines, xyerrorbars, style
-@subsubsection yerrorbars
+
+@noindent --- YERRORBARS ---
 
 @c ?commands set style yerrorbars
 @c ?commands set style errorbars
+@c ?plotting styles yerrorbars
+@c ?plotting styles errorbars
 @c ?set style yerrorbars
 @c ?set style errorbars
 @c ?style yerrorbars
 @c ?style errorbars
 @cindex yerrorbars
 
-The @ref{yerrorbars} (or @ref{errorbars}) style is only relevant to 2-d data plots.
-@ref{yerrorbars} is like `points`, except that a vertical error bar is also drawn.
+The `yerrorbars` (or @ref{errorbars}) style is only relevant to 2-d data plots.
+`yerrorbars` is like `points`, except that a vertical error bar is also drawn.
 At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
 from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
@@ -9006,31 +9042,33 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
 }
 
-@node xerrorlines, xyerrorlines, yerrorbars, style
-@subsubsection xerrorlines
+
+@noindent --- XERRORLINES ---
 
 @c ?commands set style xerrorlines
 @c ?set style xerrorlines
+@c ?plotting styles xerrorlines
 @c ?style xerrorlines
 @cindex xerrorlines
 
-The @ref{xerrorlines} style is only relevant to 2-d data plots.
-@ref{xerrorlines} is like @ref{linespoints}, except that a horizontal error
+The `xerrorlines` style is only relevant to 2-d data plots.
+`xerrorlines` is like `linespoints`, except that a horizontal error
 line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
 to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
 many data columns are provided. A tic mark is placed at the ends of
 the error bar (unless @ref{bars} is used---see @ref{bars} for details).
 
-@node xyerrorlines, yerrorlines, xerrorlines, style
-@subsubsection xyerrorlines
+
+@noindent --- XYERRORLINES ---
 
 @c ?commands set style xyerrorlines
 @c ?set style xyerrorlines
+@c ?plotting styles xyerrorlines
 @c ?style xyerrorlines
 @cindex xyerrorlines
 
-The @ref{xyerrorlines} style is only relevant to 2-d data plots.
-@ref{xyerrorlines} is like @ref{linespoints}, except that horizontal and
+The `xyerrorlines` style is only relevant to 2-d data plots.
+`xyerrorlines` is like `linespoints`, except that horizontal and
 vertical error bars are also drawn. At each point (x,y), lines are
 drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
 (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
@@ -9047,19 +9085,21 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @end example
 
-@node yerrorlines,  , xyerrorlines, style
-@subsubsection yerrorlines
+
+@noindent --- YERRORLINES ---
 
 @c ?commands set style yerrorlines
 @c ?commands set style errorlines
+@c ?plotting styles yerrorlines
+@c ?plotting styles errorlines
 @c ?set style yerrorlines
 @c ?set style errorlines
 @c ?style yerrorlines
 @c ?style errorlines
 @cindex yerrorlines
 
-The @ref{yerrorlines} (or @ref{errorlines}) style is only relevant to 2-d data
-plots. @ref{yerrorlines} is like @ref{linespoints}, except that a vertical
+The `yerrorlines` (or @ref{errorlines}) style is only relevant to 2-d data
+plots. `yerrorlines` is like `linespoints`, except that a vertical
 error line is also drawn. At each point (x,y), a line is drawn from
 (x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
 on how many data columns are provided. A tic mark is placed at the
@@ -9170,6 +9210,7 @@ to you, depending on its output format.
 * epson-180dpi::                
 * excl::                        
 * fig::                         
+* png_(NEW)::                   
 * gif::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
@@ -9184,6 +9225,7 @@ to you, depending on its output format.
 * imagen::                      
 * kyo::                         
 * latex::                       
+* linux::                       
 * mf::                          
 * mp::                          
 * mgr::                         
@@ -9196,7 +9238,6 @@ to you, depending on its output format.
 * qms::                         
 * regis::                       
 * rgip::                        
-* sun::                         
 * tek410x::                     
 * table::                       
 * tek40::                       
@@ -9941,7 +9982,7 @@ not use `print`---use instead `copy file /b lpt1:`."
 The `excl` terminal driver supports Talaris printers such as the EXCL Laser
 printer and the 1590.  It has no options."
 
-@node fig, gif, excl, terminal
+@node fig, png_(NEW), excl, terminal
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -10055,7 +10096,92 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node gif, Gnugraph(GNU_plotutils), fig, terminal
+@node png_(NEW), gif, fig, terminal
+@subsubsection png (NEW)
+
+@c ?commands set terminal png
+@c ?set terminal png
+@c ?set term png
+@c ?terminal png
+@c ?term png
+@cindex png
+@tmindex png
+
+
+Syntax:
+@example
+      set terminal png 
+             @{@{no@}transparent@} @{@{no@}interlace@}
+             @{tiny | small | medium | large | giant@}
+             @{font <face> @{<pointsize>@}@}
+             @{size <x>,<y>@} @{@{no@}crop@}
+             @{<color0> <color1> <color2> ...@}
+
+@end example
+
+PNG images are created using libgd, with optional support for TrueType
+fonts via libfreetype. Version 1.8 or greater of libgd is required.
+
+`transparent` instructs the driver to generate transparent PNGs.  The first
+color will be the transparent one. Default is `notransparent`.
+
+`interlace` instructs the driver to generate interlaced PNGs.
+Default is `nointerlace`.
+
+Five basic fonts are supported directly by the gd library. These are
+`tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), 
+`large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled
+or rotated (pure horizontal or vertical text only).
+
+If gnuplot was built with support for TrueType fonts, they may be
+selected using the `font <face> @{<pointsize>@}` option. <face> is either 
+the full pathname to a TrueType font file, or a font face name searched
+for using the GDFONTPATH environmental variable. TrueType fonts are fully
+scalable and may be rotated through any angle.
+
+The size <x,y> is given in pixels---it defaults to 640x480.  The number of
+pixels can be also modified by scaling with the @ref{size} command.
+`crop` trims blank space from the edges of the completed plot, resulting
+in a smaller final image size. Default is `nocrop`.
+
+Each color must be of the form 'xrrggbb', where x is the literal character
+'x' and 'rrggbb' are the red, green and blue components in hex.  For example,
+'x00ff00' is green.  The background color is set first, then the border
+colors, then the X & Y axis colors, then the plotting colors.  The maximum
+number of colors that can be set is 256.
+
+Examples:
+@example
+      set terminal png medium size 640,480 \\
+                       xffffff x000000 x404040 \\
+                       xff0000 xffa500 x66cdaa xcdb5cd \\
+                       xadd8e6 x0000ff xdda0dd x9500d3    # defaults
+
+@end example
+
+which uses white for the non-transparent background, black for borders, gray
+for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,
+plum and dark violet for eight plotting colors.
+
+@example
+      set terminal png font arial 14 size 800,600
+
+@end example
+
+which searches for a TrueType font with face name 'arial' in the directory
+specified by the environment variable GDFONTPATH and 14pt font size.
+
+@example
+      set terminal png transparent xffffff \\
+                       x000000 x202020 x404040 x606060 \\
+                       x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\
+@end example
+
+which uses white for the transparent background, black for borders, dark
+gray for axes, and a gray-scale for the six plotting colors.
+
+
+@node gif, Gnugraph(GNU_plotutils), png_(NEW), terminal
 @subsubsection gif
 
 @c ?commands set terminal gif
@@ -10568,7 +10694,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, mf, kyo, terminal
+@node latex, linux, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -10646,7 +10772,24 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node mf, mp, latex, terminal
+@node linux, mf, latex, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node mf, mp, linux, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -11031,7 +11174,7 @@ Syntax:
 
 `colour` plots lines with line types >= 0 in colour (MIF sep. 2--7) and
 `monochrome` plots all line types in black (MIF sep. 0).
-`polyline` plots curves as continuous curves and @ref{vectors} plots curves as
+`polyline` plots curves as continuous curves and `vectors` plots curves as
 collections of vectors.
 @ref{help} and `?` print online help on standard error output---both print a
 short description of the usage; @ref{help} also lists the options;
@@ -11090,15 +11233,11 @@ Examples:
 @node png_(OLD), postscript_, pbm, terminal
 @subsubsection png (OLD)
 
-@c ?commands set terminal png
-@c ?set terminal png
-@c ?set term png
-@c ?terminal png
-@c ?term png
-@cindex png
-@tmindex png
-
-
+@c ?commands set terminal png (old)
+@c ?set terminal png (old)
+@c ?set term png (old)
+@c ?terminal png (old)
+@c ?term png (old)
 The `png` terminal driver supports Portable Network Graphics.  This old 
 version of the png driver requires the third-party libraries "libpng" 
 and "zlib".  There is a newer png driver, with many more features, that
@@ -11373,8 +11512,8 @@ source distribution.
 @c ?terminal postscript fontfile
 @c ?term postscript fontfile
 @cindex fontfile
+@tmindex fontfile
 
-@cindex fontfile
 
 The `fontfile` or `fontfile add` option takes one file name as argument
 and encapsulates this file into the postscript output in order to make
@@ -11638,7 +11777,7 @@ Syntax:
 
 @end example
 
-@node rgip, sun, regis, terminal
+@node rgip, tek410x, regis, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -11682,22 +11821,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, tek410x, rgip, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node tek410x, table, sun, terminal
+@node tek410x, table, rgip, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -12167,7 +12291,7 @@ The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
 
 Linewidths and pointsizes may be changed from within `gnuplot` with
-@ref{linestyle}.
+`set linestyle`.
 
 For terminal type `x11`, `gnuplot` accepts (when initialized) the standard
 X Toolkit options and resources such as geometry, font, and name from the
@@ -12206,7 +12330,7 @@ later by `set term x11 [no]raise [no]persist)`:
  `-raise`    raises plot window after each plot
  `-noraise`  does not raise plot window after each plot
  `-noevents` does not process mouse and key events
- `-persist`  plots windows survive after main gnuplot program exits
+ `-persist`  plot windows survive after main gnuplot program exits
 
 @end example
 
@@ -13993,7 +14117,7 @@ The syntax for setting ranges on the `splot` command is the same as for
 
 The `title` option is the same as in `plot`.  The operation of @ref{with} is also
 the same as in `plot`, except that the plotting styles available to `splot`
-are limited to `lines`, `points`, @ref{linespoints}, @ref{dots}, and @ref{impulses};  the
+are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
 error-bar capabilities of `plot` are not available for `splot`.
 
 The `datafile` options have more differences.

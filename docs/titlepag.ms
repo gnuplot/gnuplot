@@ -47,9 +47,11 @@ Thomas Williams & Colin Kelley
 .br
   Jos Van der Woude
 .br
+  Alex Woo
+.br
   James R. Van Zandt
 .br
-  Alex Woo
+  Johannes Zellner
 .br
   Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 .AI
