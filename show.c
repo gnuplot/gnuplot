@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: show.c,v 1.50 1998/06/18 14:55:18 ddenholm Exp $";
+static char *RCSid = "$Id: show.c,v 1.23 1998/12/16 19:49:18 lhecking Exp $";
 #endif
 
 /* GNUPLOT - show.c */
@@ -1337,6 +1337,12 @@ static void show_autoscale()
     fprintf(stderr, "y: %s%s%s, ", (autoscale_y) ? "ON" : "OFF",
 	    (autoscale_y == 1) ? " (min)" : "",
 	    (autoscale_y == 2) ? " (max)" : "");
+    fprintf(stderr, "x2: %s%s%s, ", (autoscale_x2) ? "ON" : "OFF",
+	    (autoscale_x2 == 1) ? " (min)" : "",
+	    (autoscale_x2 == 2) ? " (max)" : "");
+    fprintf(stderr, "y2: %s%s%s, ", (autoscale_y2) ? "ON" : "OFF",
+	    (autoscale_y2 == 1) ? " (min)" : "",
+	    (autoscale_y2 == 2) ? " (max)" : "");
     fprintf(stderr, "z: %s%s%s\n", (autoscale_z) ? "ON" : "OFF",
 	    (autoscale_z == 1) ? " (min)" : "",
 	    (autoscale_z == 2) ? " (max)" : "");
@@ -1430,18 +1436,13 @@ static void show_contour()
 
 static void show_format()
 {
-    char str[5][MAX_LINE_LEN + 1];
+    char str[MAX_LINE_LEN+1];
 
-    fprintf(stderr, "\ttic format is x-axis: \"%s\"\
-, y-axis: \"%s\"\
-, z-axis: \"%s\"\
-, x2-axis: \"%s\"\
-, y2-axis: \"%s\"\n",
-	    conv_text(str[0], xformat),
-	    conv_text(str[1], yformat),
-	    conv_text(str[2], zformat),
-	    conv_text(str[3], x2format),
-	    conv_text(str[4], y2format));
+    fprintf(stderr, "\ttic format is x-axis: \"%s\"", conv_text(str, xformat));
+    fprintf(stderr, ", y-axis: \"%s\"", conv_text(str, yformat));
+    fprintf(stderr, ", z-axis: \"%s\"", conv_text(str, zformat));
+    fprintf(stderr, ", x2-axis: \"%s\"", conv_text(str, x2format));
+    fprintf(stderr, ", y2-axis: \"%s\"\n", conv_text(str, y2format));
 }
 
 #define SHOW_LOG(FLAG, BASE, TEXT) \
@@ -1526,7 +1527,7 @@ FILE *fp;
 %s\n\
 %s\tType `help` to access the on-line reference manual\n\
 %s\tThe gnuplot FAQ is available from\n\
-%s\t\t<%s>\n\
+%s\t<%s>\n\
 %s\n\
 %s\tSend comments and requests for help to <%s>\n\
 %s\tSend bugs, suggestions and mods to <%s>\n\
@@ -1590,10 +1591,10 @@ void show_version_long()
 	    "-READLINE  "
 #endif
 	    ,gnu_rdline =
-#ifdef GNU_READLINE
-	    "+GNU_READLINE  "
+#ifdef HAVE_LIBREADLINE
+	    "+LIBREADLINE  "
 #else
-	    "-GNU_READLINE  "
+	    "-LIBREADLINE  "
 #endif
 	    ,libgd =
 #ifdef HAVE_LIBGD
