@@ -9,6 +9,8 @@
 	* demo/world2.dem demo/srl.dat: New demo to show use of labels with pm3d
 	colors and hidden3d mode.
 
+	* demo/all.dem demo/Makefile.am.in: Add vector.dem and world2.dem.
+
 2004-09-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (get_offsets place_labels) src/graphics.h:
