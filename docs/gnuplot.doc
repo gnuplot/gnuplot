@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.205 2004/02/27 06:39:43 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.206 2004/03/02 12:17:09 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1110,8 +1110,9 @@ C
 ^ </a>
 
 4 Random number generator
-?random
 ?expressions random
+?functions random
+?random
 
  The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
  Older scripts that expected rand(x>0) to produce sequential pseudo-random
@@ -6435,7 +6436,8 @@ C ... and restart the table:
  "gamma corrected" interpolation well enough.
 
 4 postscript
-?palette postscript
+?commands set palette postscript
+?set palette postscript
  In order to reduce the size of postscript files, the gray value and not all
  three calculated r,g,b values are written to the file.  Therefore the
  analytical formulae are coded directly in the postscript language as a header
