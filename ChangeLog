@@ -1,3 +1,37 @@
+2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (xtick2d_callback, ytick2d_callback): Cast arg
+ 	"axis" to void, once, to avoid warning about unused parameter.
+	(widest2d_callback): Use same trick for arguments axis, place and
+ 	grid, which are irrelevant to this function.
+
+	* src/color.c (cbtick_callback): Mark parameter "axis" as
+ 	intentionally unused, by cast to void.
+	
+	* src/syscfg.h (SORTFUNC_ARGS): If not #define'd, define it to be
+ 	"const generic *".
+	(sortfunc): Removed, as it's no longer used.
+
+	* src/interpol.c (compare_points): Changed arguments to type
+ 	SORTFUNC_ARGS. Made non-static to avoid bug in HP-UX gcc when
+ 	passing pointers to static functions.
+	(sort_points): Removed unneeded, potentially dangerous casts from
+ 	qsort() call.
+
+	* src/hidden3d.c (compare_polys_by_zmax, compare_edges_by_zmin):
+ 	Changed arguments to type SORTFUNC_ARGS. Made non-static, too.
+
+	* src/help.c (keycomp): Changed arguments to type SORTFUNC_ARGS.
+  	Made non-static, too.
+	(sortkeys): Removed unneeded, potentially dangerous casts from
+ 	qsort() call.
+
+	* src/graphics.c (histeps_compare): Changed arguments to
+ 	SORTFUNC_ARGS type.
+
+	* src/plot2d.c (eval_plots): Simplified parsing/handling of smooth
+ 	options.
+
 2001-07-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (xyerrorbars): Replaced commas by colons, in
