@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.24 1999/08/07 17:21:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.25 1999/08/08 17:02:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -427,6 +427,9 @@ command()
 	    break;
 	case CMD_TESTTIME:
 	    testtime_command();
+	    break;
+	case CMD_UNSET:
+	    unset_command();
 	    break;
 	case CMD_UPDATE:
 	    update_command();
