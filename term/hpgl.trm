@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.9 1999/06/19 20:30:50 lhecking Exp $
+ * $Id: hpgl.trm,v 1.10 1999/06/22 11:54:18 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -1018,16 +1018,13 @@ HPGL_text_angle(ang)
 int ang;
 {
     HPGL_ang = ang;
-    if (ang == 1)
-/*
- *  Vertical
- */
+    if (ang == 1) {
+	/* Vertical */
 	fputs("DI0,1;\n", gpoutfile);
-    else
-/*
- * Horizontal
- */
+    } else {
+	/* Horizontal */
 	fputs("DI1,0;\n", gpoutfile);
+    }
     return TRUE;
 }
 
@@ -1042,16 +1039,13 @@ int ang;
 	fputs(";", gpoutfile);
 	HPGL2_in_pe = 0;
     }
-    if (ang == 1)
-/*
- *  Vertical
- */
+    if (ang == 1) {
+	/* Vertical */
 	fputs("DI0,1", gpoutfile);
-    else
-/*
- * Horizontal
- */
+    } else {
+	/* Horizontal */
 	fputs("DI1,0", gpoutfile);
+    }
     HPGL_ang = ang;
     return TRUE;
 }
