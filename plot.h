@@ -513,8 +513,9 @@ struct lp_style_type {          /* contains all Line and Point properties */
                                 /* more to come ? */
 };
 
+/* Now unused; replaced with set.c(reset_lp_properties) */
 /* default values for the structure 'lp_style_type' */
-#define LP_DEFAULT {0,0,0,1.0,1.0}
+/* #define LP_DEFAULT {0,0,0,1.0,1.0} */
 
 
 struct curve_points {
@@ -780,7 +781,7 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
  * allow_point is whether we accept a point command
  * We assume compiler will optimise away if(0) or if(1)
  */
-#if defined(ANSI_C) && defined(DEBUG_LP)
+#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
 # define LP_DUMP(lp) \
  fprintf(stderr, \
   "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
