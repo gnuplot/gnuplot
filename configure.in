@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.131 2003/07/22 17:22:47 sfeam Exp $
+dnl $Id: configure.in,v 1.132 2003/07/23 23:58:52 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -528,11 +528,11 @@ if test "$with_pdf" != no; then
   LDFLAGS="$LDFLAGS $libpdf_LDFLAGS"
 
   AC_CHECK_LIB(pdf,PDF_get_majorversion,
-    AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ]),
-     with_pdf=no)
-
-  AC_CHECK_HEADERS(pdflib.h,,
-    AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile]))
+    [AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ]),
+     AC_CHECK_HEADERS(pdflib.h,,
+       AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile]))
+    ],
+    with_pdf=no)
 
   LIBS="$_libs"
   if test "$with_pdf" = no; then
