@@ -1,4 +1,6 @@
-1998-09-16  Lars Hecking  <lhecking+usenet@nmrc.ucc.ie>
+1998-09-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Updated.
 
 	* acconfig.h: Add NO_SYS_STAT_H, remove X11.
 
@@ -14,9 +16,15 @@
 
 	* plot.h: Define X11 in terms of X_DISPLAY_MISSING.
 
+	* show.c(show_version_long): Fix typo. Changes to make it compile
+	with pre-ANSI cc.
+
 	* stdfn.h: Add stat(2) related macros.
 
 	* term.h: Use X_DISPLAY_MISSING instead of X11.
+
+	* term/gif.h: Patch by REIBENSCHUH Alfred
+	<alfred.reibenschuh@cait.co.at>, more colours for gif terminal.
 	
 1998-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 

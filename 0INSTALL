@@ -10,6 +10,7 @@ installation instructions, which are common between most packages using
 GNU autoconf.  Part four explains in detail how --with-PACKAGE=PATH
 works, and how this option interacts with --libdir and --includedir.
 Part five addresses some platform specific problems and testing issues.
+There are also some hints how to build gnuplot with pre-ANSI C compilers.
 
  The description of preprocessor options previously found here has been
 moved to a new file called 0PORTING.
@@ -23,7 +24,7 @@ install the gd library : see term/gif.trm for details.
 
    If you want to support png output (free gif alternative), you need
 png and z libraries : see term/png.trm for details.  Note that the
-png library might not compile without an ANSI/ISO C compiler.
+png library will probably not compile without an ANSI/ISO C compiler.
 
    A complete overview of configure options is below in the Basic
 Installation section. On platforms which do not support GNU
@@ -48,7 +49,7 @@ controlled in several different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   Attention: This will affect *all* installed files!
+   Attention: This affects the location of *all* installed files!
 
  o with configure's --datadir= option, eg.
    ./configure --datadir='/gnuplot/docs'
@@ -121,7 +122,8 @@ is not specified.  Please note that the `--with-PACKAGE' options can have
 additional arguments:
 
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
- o `--with-PACKAGE=no' will disable checking for PACKAGE
+ o `--with-PACKAGE=no' will disable checking for PACKAGE. It has the same
+   effect as `--without-PACKAGE'.
  o `--with-PACKAGE=PATH' will check for PACKAGE in PATH
 
 Unix, no configure
@@ -453,8 +455,7 @@ operates.
 About --with-PACKAGE[=PATH]
 ***************************
 
- The following decsription applies only to the gnuplot configure shell
-script.  It does not apply to any other package.
+ The following description applies to gnuplot only.
 
  Every `--with-PACKAGE' option sets a `with_package' variable in
 configure.  Depending on how `--with-PACKAGE' was invoked, there are
@@ -475,12 +476,12 @@ for with-PACKAGE options used by gnuplot's configure are `--with-gd',
 `--with-png'. The corresponding package variables are `with_gd',
 and `with_png'.
 
- For the gnuplot package, configure uses the macros `gp_CHECK_LIB_PATH'
-and `gp_CHECK_HEADER' to search for libraries and includes, resp.  These
-macros are different from the standard GNU autoconf macros for this
-purpose, `AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual).
-The gp_XXX macros are closely tied to the gnuplot package, and cannot
-be used for other packages without modification.
+ For gnuplot, configure uses the macros `gp_CHECK_LIB_PATH' and
+`gp_CHECK_HEADER' to search for libraries and includes, resp.  These
+macros are different from the standard GNU autoconf macros for this purpose,
+`AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual). The
+gp_XXX macros are closely tied to gnuplot, and cannot be used for other
+packages without modification.
 
  The difference between these package specific macros and standard
 autoconf macros is that they do search more than one (the default)
@@ -582,12 +583,10 @@ and rerun configure, or, edit config.h and change
 /* #undef NO_MEMSET */  to
 #define NO_MEMSET
 
-   Note the changing such defines at compile time, eg. via
+   Note that changing such defines at compile time, eg. via
 'make DEFS=-DNO_MEMSET' is wrong, because the DEFS variable in Makefile
 may contain other defines (make DEFS='-DHAVE_CONFIG_H -DNO_MEMSET'
 may work, though).
-
-(incomplete)
 
  - HP-UX 9.x
    It is recommended to use gcc, although the native compiler may
@@ -606,16 +605,19 @@ may work, though).
   gnuplot can be built with DJGPP. Install instructions are the same
   as under Unix (with configure).
 
- - SunOS 4.x
+ - SunOS 4.x/System V.2/Ultrix 4.x
    An ANSI/ISO C compiler is reqiured to compile gnuplot. It is
   recommended to install gcc. If this is not an option, the system
-  compiler cc can be made to work with Wietse Venema's unproto tool (details).
+  compiler cc can be made to work with Wietse Venema's unproto tool.
 
- - System V.2
-   (See SunOS 4.x)
+  unproto is available from
+  ftp://ftp.win.tue.nl/pub/unix/unproto4.shar.Z
+  ftp://ftp.porcupine.org/pub/lang/unproto5.shar.Z
 
- - Ultrix 4.x
-   (See SunOS 4.x)
+  A patch to gnuplot [VERSION] complete with installation instructions is
+  available as ftp://cmpc1.phys.soton.ac.uk/incoming/[FILE]. The patch can
+  also be retrieved by sending email to Lars Hecking <lhecking@nmrc.ucc.ie>
+  with "send gnuplot unproto patch" in the Subject:
 
 How to test gnuplot
 ===================
