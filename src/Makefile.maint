@@ -30,15 +30,15 @@ makefile.all: Makefile.maint
 
 version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	@echo Making $@
-	@vn=`sed -n 's/.*version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	pl=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	dt=`sed -n 's/.*date.*"\(.*\)".*/\1/p' ./version.c`; \
+	@vn=`sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
+	pl=`sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
+	dt=`sed -n 's/.*gnuplot_date.*"\(.*\)".*/\1/p' ./version.c`; \
 	if [ "$(version)" != $$vn -o \
 	     "$(patchlevel)" != $$pl -o \
 	     "$$date" != "$$dt" ]; then \
-	  sed -e '/^char version/ s/"[^"]*"/"@VERS@"/' \
-	      -e '/^char patchlevel/ s/"[^"]*"/"@PLVL@"/' \
-	      -e '/^char date/ s/"[^"]*"/"@DATE@"/' \
+	  sed -e '/^char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
+	      -e '/^char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
+	      -e '/^char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
 	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
 	      -e "s/@DATE@/$(date)/" $@ >$@t; \
 	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
