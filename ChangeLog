@@ -1,3 +1,11 @@
+1999-03-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* NeXT: Move to src/NeXT.
+
+	* docs/latextut: Move to tutorial.
+
+	* 0BUGS, 0FAQ, 0INSTALL, 0PORTING, 0README: Renamed to BUGS ... etc.
+
 1999-03-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config, src: New directories.
@@ -7,7 +15,7 @@
  	makefile.g, makefile.mgw, makefile.msc, makefile.msw, makefile.mto,
  	makefile.nt, makefile.os2, makefile.os9, makefile.st, makefile.tc,
 	makefile.unx, makefile.vms, makefile.wc, makefile.win, makefile.ztc:
-	Moved to new config directory.
+	Move to new config directory.
 
 	* Makefile.in, alloc.c, alloc.h, amiga.c, ansichek.h, bf_test.c,
 	binary.c, binary.h, bitmap.c, bitmap.h, command.c, commitvers,
@@ -20,12 +28,12 @@
 	os9.c, parse.c, pcgraph.asm, plot.c, plot.h, plot2d.c, plot3d.c,
 	protos.h, readline.c, rgipgnu, scanner.c, set.c, setshow.h, show.c,
 	specfun.c, standard.c, stdfn.c, stdfn.h, strftime.c, syscfg.h, term.c,
-	term.h, time.c, util.c, util3d.c, version.c, vms.c: Moved to new
+	term.h, time.c, util.c, util3d.c, version.c, vms.c: Move to new
 	src directory.
 
-	* os2/*: Moved to src/os2.
+	* os2/*: Move to src/os2.
 
-	* win/*: Moved to src/win.
+	* win/*: Move to src/win.
 
 1999-03-26  Remko Scharroo  <remko@deos.tudelft.nl>, Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
