@@ -1,6 +1,7 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
+* NEW let the string in '{s}plot ... notitle "string"' be silently ignored
 * NEW multi-byte font support in x11, control by the locale setting LC_CTYPE
 * NEW pstex, pslatex and epslatex terminals share functionality with postscript
 * NEW suboptions "set pm3d corners2color min|max"

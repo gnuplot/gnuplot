@@ -1,3 +1,9 @@
+2005-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/plot2d.c src/plot3d.c docs/gnuplot.doc: SF patch # 1098256
+	"Ignore title string after notitle":
+	Let the string in '{s}plot ... notitle "string"' be silently ignored.
+
 2005-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/plot3d.c (eval_3dplots): Better fix for 'set pm3d at X;
