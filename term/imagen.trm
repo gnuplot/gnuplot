@@ -1,5 +1,5 @@
 /*
- * $Id: imagen.trm,v 1.10 1999/06/22 11:54:18 lhecking Exp $
+ * $Id: imagen.trm,v 1.11 1999/08/24 11:24:54 lhecking Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -97,9 +97,9 @@ static unsigned char *IMAGEN_cvts __PROTO((unsigned char *str, int *width, int *
 static void IMAGEN_putwd __PROTO((unsigned int w));
 static void IMAGEN_createfamily __PROTO((char *c, int sz));
 static void IMAGEN_setfont __PROTO((int sz));
-void IMP_set_draw_pattern __PROTO((int pattern, int sz));
-void IMAGEN_mapsinit __PROTO((void));
-void IMAGEN_createmap __PROTO((int name, unsigned short *map));
+static void IMP_set_draw_pattern __PROTO((int pattern, int sz));
+static void IMAGEN_mapsinit __PROTO((void));
+static void IMAGEN_createmap __PROTO((int name, unsigned short *map));
 
 
 /*
@@ -121,8 +121,8 @@ static int IMAGEN_Ymax = IMAGEN_YMAX;
 #define IMAGEN_FONT "cour"
 
 
-unsigned short IMP_gmap[128];
-unsigned char IMP_chmap[256];
+static unsigned short IMP_gmap[128];
+static unsigned char IMP_chmap[256];
 
 static int IMAGEN_page_h = IMAGEN_A4_H;
 static int IMAGEN_page_w = IMAGEN_A4_W;
@@ -151,17 +151,17 @@ static int IMAGEN_portrait;	/* 0 for landscape */
 static enum JUSTIFY IMAGEN_justify = LEFT;	/* left/center/right */
 
 #define STOREPATH 100
-unsigned int IM_xvector[STOREPATH];	/* draw path vector of x values */
-unsigned int IM_yvector[STOREPATH];	/* draw path vector of y values */
-unsigned int IM_veclen;		/* length of allocated path vector */
-unsigned int IM_vecpos = 0;	/* current pos in vector */
+static unsigned int IM_xvector[STOREPATH]; /* draw path vector of x values */
+static unsigned int IM_yvector[STOREPATH]; /* draw path vector of y values */
+static unsigned int IM_veclen;	/* length of allocated path vector */
+static unsigned int IM_vecpos = 0; /* current pos in vector */
 
 /* char IMPdrpattern[10][10] = { {0}, {30,10,0}, {0}, {10,30,0}, {2,20,0}, 
 	{20,10,0}, {30,20,10,20,0}, {30,20,4,10,10,10,4,20,0}, {40,20,0}, {30,15,4,15,0}
 };
 */
 
-char IMPdrpattern[10][10] =
+static char IMPdrpattern[10][10] =
 {
 /* -2 */ {0},
 /* -1 */ {1, 8, 0},

@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.10 1999/07/30 19:06:04 lhecking Exp $ */
+/* $Id: driver.h,v 1.11 1999/08/07 17:18:48 lhecking Exp $ */
 
 /* GNUPLOT - driver.h */
 
@@ -42,19 +42,19 @@
 #define fputc putc
 #endif
 
-/* functions provided by in term.c */
+/* functions provided by term.c */
 
-void do_point __PROTO((unsigned int x, unsigned int y, int number));
-void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-int null_text_angle __PROTO((int ang));
-int null_justify_text __PROTO((enum JUSTIFY just));
-int null_scale __PROTO((double x, double y));
-int do_scale __PROTO((double x, double y));
-void options_null __PROTO((void));
-void UNKNOWN_null __PROTO((void));
-int set_font_null __PROTO((const char *s));
-void null_set_pointsize __PROTO((double size));
+static void do_point __PROTO((unsigned int x, unsigned int y, int number));
+static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
+static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+static int null_text_angle __PROTO((int ang));
+static int null_justify_text __PROTO((enum JUSTIFY just));
+static int null_scale __PROTO((double x, double y));
+/* static int do_scale __PROTO((double x, double y)); */ /* unused */
+static void options_null __PROTO((void));
+static void UNKNOWN_null __PROTO((void));
+static int set_font_null __PROTO((const char *s));
+/* static void null_set_pointsize __PROTO((double size)); */ /* unused */
 
 extern FILE *gpoutfile;
 extern struct termentry *term;

@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.7 1999/06/19 20:30:50 lhecking Exp $
+ * $Id: hp26.trm,v 1.8 1999/06/22 11:54:18 lhecking Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -87,13 +87,12 @@ TERM_PUBLIC void HP26_line_and_point __PROTO((unsigned int x, unsigned int y, in
 #define HP26_XLAST (HP26_XMAX - 1)
 #define HP26_YLAST (HP26_XMAX - 1)
 
-void HP26_do_point __PROTO((unsigned int x, unsigned int y, int number));
-int compact_slope __PROTO((int xp[], int yp[], int isa_move[], int *sz, double delta));
-int compact_int __PROTO((int xp[], int yp[], int isa_move[], int *size));
-struct _HP26_Buffer_Node *BN_create __PROTO((int index, int size, int linetype));
-void BN_delete __PROTO((struct _HP26_Buffer_Node * the_node));
-int HP26_flush __PROTO((struct _HP26_Buffer_Node * the_buff));
-void HP26_handle_overflow __PROTO((void));
+static void HP26_do_point __PROTO((unsigned int x, unsigned int y, int number));
+static int compact_slope __PROTO((int xp[], int yp[], int isa_move[], int *sz, double delta));
+static struct _HP26_Buffer_Node *BN_create __PROTO((int index, int size, int linetype));
+static void BN_delete __PROTO((struct _HP26_Buffer_Node * the_node));
+static int HP26_flush __PROTO((struct _HP26_Buffer_Node * the_buff));
+static void HP26_handle_overflow __PROTO((void));
 
 #include "compact.c"
 
@@ -142,21 +141,21 @@ HP26_Buffer_Node *the_node;
 
 /* 2 for border and axes + 9 for plots + 1 for dots */
 #define HP26_gnu_map_size 12
-HP26_Buffer_Node *HP26_gnu_map[HP26_gnu_map_size];
-HP26_Buffer_Node *HP26_buff;
-int HP26_pen_x;
-int HP26_pen_y;
-int HP26_angle;
-int HP26_cursor_x;
-int HP26_cursor_y;
-TBOOLEAN HP26_in_text;
-int HP26_linetype_current;
-int HP26_reduction_int;
-int HP26_reduction_slope;
-int HP26_overflows;
-int HP26_nop_move;
-int HP26_nop_vect;
-int HP26_nop_line;
+static HP26_Buffer_Node *HP26_gnu_map[HP26_gnu_map_size];
+static HP26_Buffer_Node *HP26_buff;
+static int HP26_pen_x;
+static int HP26_pen_y;
+static int HP26_angle;
+static int HP26_cursor_x;
+static int HP26_cursor_y;
+static TBOOLEAN HP26_in_text;
+static int HP26_linetype_current;
+static int HP26_reduction_int;
+static int HP26_reduction_slope;
+static int HP26_overflows;
+static int HP26_nop_move;
+static int HP26_nop_vect;
+static int HP26_nop_line;
 
 /* linetype stuff */
 #define	SOLID	1
@@ -175,7 +174,7 @@ int HP26_nop_line;
 
 #define swap(a, b) a ^= b; b ^= a; a ^= b;
 
-char HP26_bin_short_table[32] =
+static char HP26_bin_short_table[32] =
 {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>',
     '?', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-',
@@ -190,7 +189,7 @@ char HP26_bin_short_table[32] =
 #define qualified(dx,dy) ((dx>-17)&&(dy>-17)&&(dx<16)&&(dy<16))
 
 
-char HP26_bin_table[32] =
+static char HP26_bin_table[32] =
 {
     ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-',
     '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<',
@@ -240,8 +239,7 @@ HP26_Buffer_Node *the_buff;
     }
     /* try to compress the stream */
     if (the_buff->next > 30 && the_buff->linetype != POINT) {
-/*		HP26_reduction_int += compact_int(buff_x,buff_y,isa_move, &(the_buff->next));	*/
-	HP26_reduction_slope += compact_slope(buff_x, buff_y, isa_move, &(the_buff->next), 0.1);
+    	HP26_reduction_slope += compact_slope(buff_x, buff_y, isa_move, &(the_buff->next), 0.1);
     }
     /* start escape sequence */
     fputs("\033*p", gpoutfile);

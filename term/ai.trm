@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.12 1999/07/18 17:35:32 lhecking Exp $
+ * $Id: ai.trm,v 1.13 1999/08/24 11:24:51 lhecking Exp $
  *
  */
 
@@ -79,8 +79,8 @@ TERM_PUBLIC int AI_text_angle __PROTO((int ang));
 TERM_PUBLIC void AI_reset __PROTO((void));
 TERM_PUBLIC void AI_options __PROTO((void));
 TERM_PUBLIC int AI_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC void AI_suspend __PROTO(());
-TERM_PUBLIC void AI_resume __PROTO(());
+TERM_PUBLIC void AI_suspend __PROTO((void));
+TERM_PUBLIC void AI_resume __PROTO((void));
 TERM_PUBLIC int AI_set_font __PROTO((const char *font));
 
 #define AI_XOFF	50		/* page offset in pts */
@@ -121,25 +121,25 @@ static struct gen_table AI_opts[] =
 #define DEFAULT_FONT "Times-Roman"
 
 /* name of font */
-char ai_font[MAX_ID_LEN + 1] = DEFAULT_FONT;
+static char ai_font[MAX_ID_LEN + 1] = DEFAULT_FONT;
 
 /* size of font in pts */
-int ai_fontsize = 14;
+static int ai_fontsize = 14;
 
 /* name of font */
-char ai_oldfont[MAX_ID_LEN + 1] = DEFAULT_FONT;
+static char ai_oldfont[MAX_ID_LEN + 1] = DEFAULT_FONT;
 
 /* size of font in pts */
-int ai_oldfontsize = 14;
+static int ai_oldfontsize = 14;
 
-TBOOLEAN ai_color = FALSE;
-TBOOLEAN ai_stroke = FALSE;
-int ai_page = 0;		/* page count */
-int ai_path_count = 0;		/* count of lines in path */
-int ai_ang = 0;			/* text angle */
-int ai_subgroup_level = 0;	/* depth of sub-groups */
-int ai_multiplot_group = 0;	/* group for multiplot */
-enum JUSTIFY ai_justify = LEFT;	/* text is flush left */
+static TBOOLEAN ai_color = FALSE;
+static TBOOLEAN ai_stroke = FALSE;
+static int ai_page = 0;		/* page count */
+static int ai_path_count = 0;		/* count of lines in path */
+static int ai_ang = 0;			/* text angle */
+static int ai_subgroup_level = 0;	/* depth of sub-groups */
+static int ai_multiplot_group = 0;	/* group for multiplot */
+static enum JUSTIFY ai_justify = LEFT;	/* text is flush left */
 
 
 TERM_PUBLIC void

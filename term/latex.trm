@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.18 1999/08/07 17:19:12 lhecking Exp $
+ * $Id: latex.trm,v 1.19 1999/08/24 11:24:54 lhecking Exp $
  *
  */
 
@@ -185,9 +185,8 @@ static float LATEX_dotsize;	/* size of LATEX_DOT in units */
 static TBOOLEAN LATEX_needsdot = FALSE;		/* does dotted line need termination? */
 
 #ifdef EMTEX
-TBOOLEAN emtex = FALSE;		/* not currently using emtex */
-static void
-EMTEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
+static TBOOLEAN emtex = FALSE;		/* not currently using emtex */
+static void EMTEX_solid_line __PROTO((int x1, int x2, int y1, int y2));
 #endif
 
 /* ARROWS */
@@ -213,7 +212,7 @@ static struct vslope {
 };
 
 /* figure out the best arrow */
-void best_latex_arrow __PROTO((int, int, int, int, int, TBOOLEAN));
+static void best_latex_arrow __PROTO((int, int, int, int, int, TBOOLEAN));
 
 enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_OTHER };
 

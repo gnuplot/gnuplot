@@ -1,5 +1,5 @@
 /*
- * $Id: t410x.trm,v 1.8 1999/06/19 20:30:56 lhecking Exp $
+ * $Id: t410x.trm,v 1.9 1999/06/22 11:54:23 lhecking Exp $
  *
  */
 
@@ -92,7 +92,7 @@ TERM_PUBLIC int T410X_text_angle __PROTO((int ang));
 
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
-void T410X_encode_x_y __PROTO((unsigned int x, unsigned int y));
+static void T410X_encode_x_y __PROTO((unsigned int x, unsigned int y));
 static void T410X_encode_int __PROTO((int number));
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gpic.trm,v 1.8 1999/06/19 20:30:49 lhecking Exp $
+ * $Id: gpic.trm,v 1.9 1999/06/22 11:54:17 lhecking Exp $
  */
 
 /* GNUPLOT - gpic.trm -*-C-*- */
@@ -95,10 +95,10 @@ TERM_PUBLIC void GPIC_reset __PROTO((void));
 #define GPIC_UNIT (GPIC_PTS_PER_INCH/GPIC_DOTS_PER_INCH)
 #define GPIC_coord(x) ((float)x)/((float)GPIC_DOTS_PER_INCH)
 
-void GPIC_close_line __PROTO((void));
+static void GPIC_close_line __PROTO((void));
 static float GPIC_x, GPIC_y;
 static unsigned int GPIC_ltype;
-enum JUSTIFY GPIC_justify = LEFT;
+static enum JUSTIFY GPIC_justify = LEFT;
 
 /* for DOTS point style */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.13 1999/07/30 19:06:45 lhecking Exp $
+ * $Id: hpljii.trm,v 1.14 1999/08/07 17:19:12 lhecking Exp $
  *
  */
 
@@ -120,7 +120,7 @@ TERM_PUBLIC void HPDJtext __PROTO((void));
 #define HPLJII_COURIER fputs("\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D",gpoutfile)
 
 
-void HPLJIIputc __PROTO((unsigned int x, unsigned int y, char c, int ang));
+static void HPLJIIputc __PROTO((unsigned int x, unsigned int y, char c, int ang));
 static int hplj_dpp = 4;
 /* bm_pattern not appropriate for 300ppi graphics */
 #ifndef GOT_300_PATTERN

@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.15 1999/06/22 11:54:22 lhecking Exp $
+ * $Id: pstricks.trm,v 1.16 1999/06/25 17:07:56 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -116,7 +116,7 @@ static float PSTRICKS_xscale = 1.0;
 static float PSTRICKS_yscale = 1.0;
 static float PSTRICKS_posx;
 static float PSTRICKS_posy;
-enum JUSTIFY PSTRICKS_justify = LEFT;
+static enum JUSTIFY PSTRICKS_justify = LEFT;
 static int PSTRICKS_angle = 0;
 
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */

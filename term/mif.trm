@@ -1,6 +1,7 @@
 /*
- * $Id: mif.trm,v 1.15 1999/07/18 17:35:32 lhecking Exp $
+ * $Id: mif.trm,v 1.16 1999/08/24 11:24:55 lhecking Exp $
  */
+
 /* GNUPLOT -- mif.trm */
 
 /*[
@@ -208,12 +209,12 @@ struct mpt {			/* point definition structure */
     char *font;			/* font */
 };
 
-char zgnuplot[] = "ZGnuplot";	/* character formats */
-char zgnuplotp[] = "ZGnuplotP";
-char zgnuplotd[] = "ZGnuplotD";
-const char *mif_font = NULL;		/* actual character format */
+static char zgnuplot[] = "ZGnuplot"; /* character formats */
+static char zgnuplotp[] = "ZGnuplotP";
+static char zgnuplotd[] = "ZGnuplotD";
+static const char *mif_font = NULL; /* actual character format */
 
-struct mpt mpt[POINT_TYPES + 1] =
+static struct mpt mpt[POINT_TYPES + 1] =
 {				/* point definition data */
     {'.', 0.000, 0.005, zgnuplotd, /* dot */ },
 
@@ -226,7 +227,7 @@ struct mpt mpt[POINT_TYPES + 1] =
 };
 
 /* diamond is offset 0, dot is offset -1 */
-struct mpt *mif_point = &(mpt[1]);
+static struct mpt *mif_point = &(mpt[1]);
 
 #endif
 

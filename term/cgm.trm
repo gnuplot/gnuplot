@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.23 1999/06/25 17:07:54 lhecking Exp $
+ * $Id: cgm.trm,v 1.24 1999/08/24 11:24:52 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -136,7 +136,7 @@ static unsigned int cgm_dashtype = 0;
 static unsigned int cgm_color = 0;
 static int cgm_polyline[CGM_MAX_SEGMENTS];	/* stored polyline coordinates */
 static int cgm_coords = 0;	/* # polyline coordinates saved */
-enum JUSTIFY cgm_justify = LEFT;
+/* static enum JUSTIFY cgm_justify = LEFT; */ /* unused */
 static int cgm_vert_text = 0;	/* text orientation -- nonzero for vertical */
 static int cgm_vert_text_requested = 0;
 static int cgm_step_sizes[8];	/* array of currently used dash

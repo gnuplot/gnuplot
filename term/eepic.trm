@@ -1,5 +1,5 @@
 /*
- * $Id: eepic.trm,v 1.10 1999/06/19 20:30:47 lhecking Exp $
+ * $Id: eepic.trm,v 1.11 1999/06/22 11:54:16 lhecking Exp $
  *
  */
 
@@ -111,7 +111,7 @@ TERM_PUBLIC void EEPIC_reset __PROTO((void));
 
 static unsigned int EEPIC_posx;
 static unsigned int EEPIC_posy;
-enum JUSTIFY eepic_justify = LEFT;
+static enum JUSTIFY eepic_justify = LEFT;
 static int eepic_angle = 0;
 
 /* for DOTS point style */
@@ -150,15 +150,14 @@ static const char GPFAR *GPFAR EEPIC_lines[] = {
 */
 static int EEPIC_type;		/* current line type */
 static TBOOLEAN EEPIC_inline = FALSE;	/* are we in the middle of a line */
-void EEPIC_endline __PROTO((void));	/* terminate any line in progress */
+static void EEPIC_endline __PROTO((void)); /* terminate any line in progress */
 static int EEPIC_linecount = 0;	/* number of points in line so far */
 #define EEPIC_LINEMAX 50	/* max value for linecount */
 
 /* ARROWS */
 /* we use the same code as for LATEX */
 /* figure out the best arrow */
-void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who,
-			       TBOOLEAN head));
+static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, TBOOLEAN head));
 
 TERM_PUBLIC void
 EEPIC_init()

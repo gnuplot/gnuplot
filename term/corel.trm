@@ -1,5 +1,5 @@
 /*
- * $Id: corel.trm,v 1.10 1999/06/22 11:54:15 lhecking Exp $
+ * $Id: corel.trm,v 1.11 1999/08/24 11:24:52 lhecking Exp $
  */
 
 /*
@@ -58,13 +58,13 @@ TERM_PUBLIC int COREL_justify_text __PROTO((enum JUSTIFY mode));
 #define DEFAULT_CORELFONT "SwitzerlandLight"
 
 /* plots for publication should be sans-serif (don't use TimesRoman) */
-char corel_font[MAX_ID_LEN + 1] = DEFAULT_CORELFONT;	/* name of font */
-int corel_fontsize = 22;	/* size of font in pts */
-TBOOLEAN corel_color = FALSE;
-TBOOLEAN corel_stroke = FALSE;
-int corel_path_count = 0;	/* count of lines in path */
-int corel_ang = 0;		/* text angle */
-enum JUSTIFY corel_justify = LEFT;	/* text is flush left */
+static char corel_font[MAX_ID_LEN + 1] = DEFAULT_CORELFONT;	/* name of font */
+static int corel_fontsize = 22;	/* size of font in pts */
+static TBOOLEAN corel_color = FALSE;
+static TBOOLEAN corel_stroke = FALSE;
+static int corel_path_count = 0;	/* count of lines in path */
+static int corel_ang = 0;		/* text angle */
+static enum JUSTIFY corel_justify = LEFT;	/* text is flush left */
 
 
 /* default mode constants */
@@ -73,9 +73,9 @@ enum JUSTIFY corel_justify = LEFT;	/* text is flush left */
 #define COREL_SC     (10.0)	/* scale is 1pt = 10 units */
 #define CORELD_LW    (1.2*COREL_SC)	/* linewidth = 1.2 pts */
 
-unsigned int corel_xmax = CORELD_XMAX;
-unsigned int corel_ymax = CORELD_YMAX;
-float corel_lw = CORELD_LW;
+static unsigned int corel_xmax = CORELD_XMAX;
+static unsigned int corel_ymax = CORELD_YMAX;
+static float corel_lw = CORELD_LW;
 
 enum COREL_id {COREL_DEFAULT, COREL_MONOCHROME, COREL_COLOR, COREL_OTHER };
 

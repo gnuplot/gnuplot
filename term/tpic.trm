@@ -1,5 +1,5 @@
 /*
- * $Id: tpic.trm,v 1.10 1999/06/19 20:30:58 lhecking Exp $
+ * $Id: tpic.trm,v 1.11 1999/06/22 11:52:33 lhecking Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -121,41 +121,41 @@ static double tpic_interval = 0.1;	/* min dot & dash intervals (in inches) */
 
 /* ARROWS: same code as for LATEX */
 /* figure out the best arrow. in latex.trm */
-void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, TBOOLEAN head));
+static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, TBOOLEAN head));
 
 /* all prototypes ... */
-static void tpic_startline __PROTO((void));	/* private */
-static void tpic_endline __PROTO((void));	/* private */
-static void tpic_pushpath __PROTO((unsigned int x, unsigned int y));	/* private */
+static void tpic_startline __PROTO((void));
+static void tpic_endline __PROTO((void));	
+static void tpic_pushpath __PROTO((unsigned int x, unsigned int y));
 static void tpic_scanpath __PROTO((void));
-void tpic_diamond __PROTO((int size));
-void tpic_plus __PROTO((int size));
-void tpic_box __PROTO((int size));
-void tpic_times __PROTO((int size));
-void tpic_triangle __PROTO((int size));
-void tpic_star __PROTO((int size));
-void tpic_hexagon __PROTO((int size));
-void tpic_circle __PROTO((int size));
-void tpic_doublecircle __PROTO((int size));
-void tpic_vercircle __PROTO((int size));	/* circle with | */
-void tpic_horcircle __PROTO((int size));	/* circle with - */
-void tpic_pluscircle __PROTO((int size));	/* circle with + */
-void tpic_timescircle __PROTO((int size));	/* circle with times */
-void tpic_starcircle __PROTO((int size));	/* circle with star */
-void tpic_dotcircle __PROTO((int size));	/* circle with dot (black circle) */
-void tpic_diamondcircle __PROTO((int size));	/* circle with black diamond */
-void tpic_boxcircle __PROTO((int size));	/* circle with black box */
-void tpic_trianglecircle __PROTO((int size));	/* circle with black triangle */
-void tpic_hexagoncircle __PROTO((int size));	/* circle with black hexagon */
-void tpic_plustimescircle __PROTO((int size));	/* no more idea ... with plus & times */
-void tpic_abspath __PROTO((unsigned int x, unsigned int y));	/* absolute coord */
-void tpic_path __PROTO((int x, int y));
-void tpic_flush __PROTO((void));
-void tpic_arc __PROTO((int radius));	/* actually, draw a full circle */
-void tpic_shade __PROTO((double grayscale));
-void tpic_pen __PROTO((int thickness));
-void tpic_dottedflush __PROTO((double interval));
-void tpic_dashedflush __PROTO((double interval));
+static void tpic_diamond __PROTO((int size));
+static void tpic_plus __PROTO((int size));
+static void tpic_box __PROTO((int size));
+static void tpic_times __PROTO((int size));
+static void tpic_triangle __PROTO((int size));
+static void tpic_star __PROTO((int size));
+static void tpic_hexagon __PROTO((int size));
+static void tpic_circle __PROTO((int size));
+static void tpic_doublecircle __PROTO((int size));
+static void tpic_vercircle __PROTO((int size));	/* circle with | */
+static void tpic_horcircle __PROTO((int size));	/* circle with - */
+static void tpic_pluscircle __PROTO((int size));	/* circle with + */
+static void tpic_timescircle __PROTO((int size));	/* circle with times */
+static void tpic_starcircle __PROTO((int size));	/* circle with star */
+static void tpic_dotcircle __PROTO((int size));	/* circle with dot (black circle) */
+static void tpic_diamondcircle __PROTO((int size)); /* circle with black diamond */
+static void tpic_boxcircle __PROTO((int size));	/* circle with black box */
+static void tpic_trianglecircle __PROTO((int size));	/* circle with black triangle */
+static void tpic_hexagoncircle __PROTO((int size));	/* circle with black hexagon */
+static void tpic_plustimescircle __PROTO((int size));	/* no more idea ... with plus & times */
+static void tpic_abspath __PROTO((unsigned int x, unsigned int y));	/* absolute coord */
+static void tpic_path __PROTO((int x, int y));
+static void tpic_flush __PROTO((void));
+static void tpic_arc __PROTO((int radius));	/* actually, draw a full circle */
+static void tpic_shade __PROTO((double grayscale));
+static void tpic_pen __PROTO((int thickness));
+static void tpic_dottedflush __PROTO((double interval));
+static void tpic_dashedflush __PROTO((double interval));
 
 typedef enum {
     tpic_none, tpic_white, tpic_gray, tpic_black
@@ -636,7 +636,7 @@ TBOOLEAN head;
 
 /* private: draw points with tpic commands */
 
-void
+static void
 tpic_diamond(size)
 int size;
 {
@@ -651,7 +651,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_plus(size)
 int size;
 {
@@ -664,7 +664,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_box(size)
 int size;
 {
@@ -677,7 +677,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_times(size)
 int size;
 {
@@ -692,7 +692,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_triangle(size)
 int size;
 {
@@ -709,7 +709,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_star(size)
 int size;
 {
@@ -730,7 +730,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_hexagon(size)
 int size;
 {
@@ -750,7 +750,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_circle(size)
 int size;
 {
@@ -758,7 +758,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_doublecircle(size)
 int size;
 {
@@ -768,7 +768,7 @@ int size;
     return;
 }
 
-void
+static void
 tpic_vercircle(size)
 int size;			/* circle with | */
 {
@@ -779,7 +779,7 @@ int size;			/* circle with | */
     return;
 }
 
-void
+static void
 tpic_horcircle(size)
 int size;			/* circle with - */
 {
@@ -790,7 +790,7 @@ int size;			/* circle with - */
     return;
 }
 
-void
+static void
 tpic_pluscircle(size)
 int size;			/* circle with + */
 {
@@ -799,7 +799,7 @@ int size;			/* circle with + */
     return;
 }
 
-void
+static void
 tpic_timescircle(size)
 int size;			/* circle with times */
 {
@@ -808,7 +808,7 @@ int size;			/* circle with times */
     return;
 }
 
-void
+static void
 tpic_starcircle(size)
 int size;			/* circle with star */
 {
@@ -817,7 +817,7 @@ int size;			/* circle with star */
     return;
 }
 
-void
+static void
 tpic_dotcircle(size)
 int size;			/* circle with dot (black circle) */
 {
@@ -827,7 +827,7 @@ int size;			/* circle with dot (black circle) */
     return;
 }
 
-void
+static void
 tpic_diamondcircle(size)
 int size;			/* not enough? circle with black diamond */
 {
@@ -837,7 +837,7 @@ int size;			/* not enough? circle with black diamond */
     return;
 }
 
-void
+static void
 tpic_boxcircle(size)
 int size;			/* need more? circle with black box */
 {
@@ -847,7 +847,7 @@ int size;			/* need more? circle with black box */
     return;
 }
 
-void
+static void
 tpic_trianglecircle(size)
 int size;			/* circle with black triangle */
 {
@@ -857,7 +857,7 @@ int size;			/* circle with black triangle */
     return;
 }
 
-void
+static void
 tpic_hexagoncircle(size)
 int size;			/* how about circle with black hexagon? */
 {
@@ -867,7 +867,7 @@ int size;			/* how about circle with black hexagon? */
     return;
 }
 
-void
+static void
 tpic_plustimescircle(size)
 int size;			/* no more idea ... with plus & times */
 {
@@ -879,7 +879,7 @@ int size;			/* no more idea ... with plus & times */
 
 /* private: draw lines */
 
-void
+static void
 tpic_abspath(x, y)
 unsigned int x;
 unsigned int y;			/* absolute coord */
@@ -892,7 +892,7 @@ unsigned int y;			/* absolute coord */
 
 /* private: tpic primitive functions */
 
-void
+static void
 tpic_path(x, y)
 int x;
 int y;
@@ -901,14 +901,14 @@ int y;
     return;
 }
 
-void
+static void
 tpic_flush()
 {
     fputs("\\special{fp}%\n", gpoutfile);
     return;
 }
 
-void
+static void
 tpic_arc(radius)
 int radius;			/* actually, draw a full circle */
 {
@@ -916,7 +916,7 @@ int radius;			/* actually, draw a full circle */
     return;
 }
 
-void
+static void
 tpic_shade(grayscale)
 double grayscale;
 {
@@ -924,7 +924,7 @@ double grayscale;
     return;
 }
 
-void
+static void
 tpic_pen(thickness)
 int thickness;
 {
@@ -932,7 +932,7 @@ int thickness;
     return;
 }
 
-void
+static void
 tpic_dottedflush(interval)
 double interval;
 {
@@ -940,7 +940,7 @@ double interval;
     return;
 }
 
-void
+static void
 tpic_dashedflush(interval)
 double interval;
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.12 1999/08/07 17:19:11 lhecking Exp $
+ * $Id: epson.trm,v 1.13 1999/08/24 11:24:53 lhecking Exp $
  *
  */
 
@@ -186,7 +186,7 @@ TERM_PUBLIC void STARCreset __PROTO((void));
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
 /* EPSON_init changes gpoutfile to binary mode on PC's */
 
-void epson_dump __PROTO((void));
+static void epson_dump __PROTO((void));
 
 #define EPSONXLAST (EPSONXMAX - 1)
 #define EPSONYLAST (EPSONYMAX - 1)
@@ -223,7 +223,7 @@ EPSONreset()
 
 
 /* output file must be binary mode for epson_dump */
-void
+static void
 epson_dump()
 {
     register unsigned int x;
@@ -256,8 +256,8 @@ epson_dump()
 
 #ifdef NEC
 
-void nec_dump __PROTO((void));
-void nec_draft_dump __PROTO((void));
+static void nec_dump __PROTO((void));
+static void nec_draft_dump __PROTO((void));
 
 #define NECXLAST (NECXMAX - 1)
 #define NECYLAST (NECYMAX - 1)
@@ -368,7 +368,7 @@ NECreset()
 
 
 /* output file must be binary mode for nec_dump */
-void
+static void
 nec_dump()
 {
     unsigned int x;
@@ -440,7 +440,7 @@ nec_dump()
 }
 
 /* output file must be binary mode for nec_dump */
-void
+static void
 nec_draft_dump()
 {
     unsigned int x;
@@ -486,7 +486,7 @@ nec_draft_dump()
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
 /* STARC_init changes gpoutfile to binary mode on PC's */
 
-void STARC_dump __PROTO((void));
+static void STARC_dump __PROTO((void));
 
 #define STARCXLAST (STARCXMAX - 1)
 #define STARCYLAST (STARCYMAX - 1)
@@ -538,7 +538,7 @@ STARCreset()
 
 
 /* output file must be binary mode for STARC_dump */
-void
+static void
 STARC_dump()
 {
     unsigned int x;
@@ -576,7 +576,7 @@ STARC_dump()
 
 #ifdef EPS180
 
-void eps180_dump __PROTO((void));
+static void eps180_dump __PROTO((void));
 
 #define EPS180XLAST (EPS180XMAX - 1)
 #define EPS180YLAST (EPS180YMAX - 1)
@@ -600,7 +600,7 @@ EPS180text()
 
 
 /* output file must be binary mode for eps180_dump */
-void
+static void
 eps180_dump()
 {
     register unsigned int x;
@@ -630,7 +630,7 @@ eps180_dump()
 
 #ifdef EPS60
 
-void eps60_dump __PROTO((void));
+static void eps60_dump __PROTO((void));
 
 #define EPS60XLAST (EPS60XMAX - 1)
 #define EPS60YLAST (EPS60YMAX - 1)
@@ -654,7 +654,7 @@ EPS60text()
 
 
 /* output file must be binary mode for eps60_dump */
-void
+static void
 eps60_dump()
 {
     register unsigned int x;
@@ -706,7 +706,7 @@ TANDY60text()
 
 #ifdef OKIDATA
 
-void okidata_dump __PROTO((void));
+static void okidata_dump __PROTO((void));
 
 TERM_PUBLIC void
 OKIDATAtext()
@@ -715,7 +715,7 @@ OKIDATAtext()
     b_freebitmap();
 }
 
-int bitrev_tbl[] =
+static int OKIDATAbitrev_tbl[] =
 {
     0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
     0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
@@ -752,7 +752,7 @@ int bitrev_tbl[] =
 };
 
 /* output file must be binary mode for okidata_dump */
-void
+static void
 okidata_dump()
 {
     register unsigned int x;
@@ -761,14 +761,16 @@ okidata_dump()
     int prev_char;
 
     prev_char = 0;
-    fprintf(gpoutfile, "\033%c%c\020\033*eP:\003", '%', '9');	/* set line spacing 16/144" = 8 dots :Turned on single density graphics mode */
+    /* set line spacing 16/144" = 8 dots, turn on single density
+     * graphics mode: */
+    fprintf(gpoutfile, "\033%c%c\020\033*eP:\003", '%', '9');
     for (j = (b_ysize / 8) - 1; j >= 0; j--) {
 	fputs("\003\016", gpoutfile);
 /*		(void) fputc((char)(b_xsize%256),gpoutfile); */
 /*		(void) fputc((char)(b_xsize/256),gpoutfile); */
 	for (x = 0; x < b_xsize; x++) {
 	    if ((cur_char = (char)
-		 (bitrev_tbl[(int) (*((*b_p)[j] + x))])) == '\003') {
+		 (OKIDATAbitrev_tbl[(int) (*((*b_p)[j] + x))])) == '\003') {
 		fputs("\003\003", gpoutfile);
 	    } else {
 		(void) fputc((char) cur_char, gpoutfile);

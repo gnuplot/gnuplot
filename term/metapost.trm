@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.7 1999/09/14 15:24:31 lhecking Exp $
+ * $Id: metapost.trm,v 1.8 1999/09/21 18:31:49 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -114,7 +114,7 @@ static int MP_posy;
 static char MP_fontname[MAX_ID_LEN + 1];
 static double MP_fontsize;
 static double MP_textmag;
-enum JUSTIFY MP_justify = LEFT;
+static enum JUSTIFY MP_justify = LEFT;
 static int MP_ang = 0;
 static int MP_char_code = 0;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.34 1999/08/24 11:24:56 lhecking Exp $
+ * $Id: post.trm,v 1.35 1999/09/14 15:24:04 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -110,9 +110,9 @@ static char ps_enh_font[MAX_ID_LEN+1];
 static int  ps_enh_fontsize;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
-/* static */ TBOOLEAN ps_color = FALSE;
+static TBOOLEAN ps_color = FALSE;
 static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
-/* static */ TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
+static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
 static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
 static float ps_linewidth_factor = 1.0;   /*  scale factor for linewidth  */
 static TBOOLEAN ps_eps = FALSE;	/* Is this for an eps file? */
@@ -517,11 +517,13 @@ static int PS_taken;
 static int PS_linetype_last;
 static TBOOLEAN PS_relative_ok;
 
+/* HBB 990914: PS_SOLID is already used by the WIN32 API headers.
+ * Renamed to PS_SOLIDE, therefore... */
 enum PS_id {
     PS_PORTRAIT, PS_LANDSCAPE,
     PS_EPSF, PS_DEFAULT, PS_ENHANCED, PS_NOENHANCED,
     PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
-    PS_SOLID, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
+    PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
     PS_OTHER
 };
@@ -539,7 +541,7 @@ static struct gen_table PS_opts[] =
     { "b$lacktext", PS_BLACKTEXT },
     { "color$text", PS_COLORTEXT },
     { "colour$text", PS_COLORTEXT },
-    { "so$lid", PS_SOLID },
+    { "so$lid", PS_SOLIDE },
     { "da$shed", PS_DASHED },
     { "dashl$ength", PS_DASHLENGTH },
     { "dl", PS_DASHLENGTH },
@@ -615,7 +617,7 @@ PS_options()
 	    ps_blacktext = FALSE;
 	    c_token++;
 	    break;
-	case PS_SOLID:
+        case PS_SOLIDE:
 	    ps_solid = TRUE;
 	    c_token++;
 	    break;
