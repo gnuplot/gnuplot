@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.42 2004/09/01 15:53:51 mikulik Exp $
+ * $Id: pslatex.trm,v 1.43 2004/09/15 04:43:09 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -73,6 +73,8 @@ TERM_PUBLIC void PSLATEX_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PSLATEX_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void PSLATEX_linetype __PROTO((int lt));
 TERM_PUBLIC void PSLATEX_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void PSLATEX_arrow __PROTO((unsigned int sx, unsigned int sy,
+              unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC void PSLATEX_pointsize __PROTO((double size));
 TERM_PUBLIC void PSLATEX_linewidth __PROTO((double width));
 TERM_PUBLIC void PSLATEX_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
