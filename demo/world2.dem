@@ -22,7 +22,7 @@ set cbrange [0:8]
 set colorb vert user size 0.02, 0.75
 splot cos(u)*cos(v),cos(u)*sin(v),sin(u) notitle with lines lt 5, \
       'world.dat' notitle with lines lt 2, \
-      'srl.dat' using 3:2:(1):1:4 with labels notitle point pt 6 lw .1 left offset 1,0 font ",7" tc pal
+      'srl.dat' using 3:2:(1):1:4 with labels notitle point pt 6 lw .1 left offset 1,0 font "Helvetica,7" tc pal
 pause -1 "Same plot with hidden line removal"
 set title "Labels with hidden line removal"
 set hidden nooffset

@@ -3,6 +3,9 @@
 	breaks for any terminal type whose default value of 'set output' is
 	not the current display.
 
+	* demo/world2.dem: Set font explicitly to "Helvetica,7", since some
+	terminal drivers do not like the partial font spec ",7".
+
 2004-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c (df_show_binary): In fprintf(), use "%f" not "%lf" for
