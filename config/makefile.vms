@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.9 1999/11/24 12:48:32 lhecking Exp $
+# $Id: makefile.vms,v 1.10 1999/12/01 22:07:58 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -84,7 +84,8 @@ CSOURCE7 = [-.term]post.trm [-.term]qms.trm [-.term]regis.trm [-.term]sun.trm \
 	[-.term]v384.trm [-.term]x11.trm gplt_x11.c
 CSOURCE8 = contour.c specfun.c interpol.c vms.c dynarray.c
 
-all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb
+all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb \
+	[-.demo]binary1. [-.demo]binary2. [-.demo]binary3.
 	@       ! a no-op to suppress a MMS warning
 
 gnuplot.$(X) : $(OBJS) $(EXTRAOBJ)
@@ -99,7 +100,7 @@ gplt_x11.o : gplt_x11.c
 [-.demo]binary1. [-.demo]binary2. [-.demo]binary3. : bf_test.$(X)
 	set default [-.demo]
 	run [-.src]bf_test.$(X)
-	set default [-]
+	set default [-.src]
 
 bf_test.$(X) : bf_test.$(O) binary.$(O) alloc.$(O)
 	link /exe=bf_test.exe bf_test.$(O),binary.$(O),alloc.$(O)
@@ -127,7 +128,7 @@ gnuplot.hlp : [-.docs]gnuplot.rnh
 	link /exe=$@  $+ $(CRTL_SHARE)
 
 [-.docs]doc2rnh.$(O) [-.docs]termdoc.$(O) : [-.docs]termdoc.c ![-.docs]allterm.h
-	$(CC) /OBJ=$@ $(CFLAGS) /INCLUDE=([],[.TERM]) $*.c
+	$(CC) /OBJ=$@ $(CFLAGS) /INCLUDE=([],[-.TERM]) $*.c
 .ENDIF
 
 term.$(O) : term.h term.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)

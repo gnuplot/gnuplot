@@ -88,7 +88,7 @@ $!
 $!-----------------------------------------------------------------
 $!-----------------------------------------------------------------
 $!
-$ TERMFLAGS = "/INCLUDE=([],[.term])"
+$ TERMFLAGS = "/INCLUDE=([],[.-term])"
 $
 $ EXTRALIB = ""
 $ if its_gnuc then cc := GCC/NOCASE
@@ -151,12 +151,14 @@ alloc.obj,binary.obj,bitmap.obj,command.obj,contour.obj,dynarray.obj,-
 datafile.obj,eval.obj,fit.obj,graphics.obj,graph3d.obj,help.obj,hidden3d.obj,-
 history.obj,internal.obj,interpol.obj,matrix.obj,misc.obj,parse.obj,plot.obj,-
 plot2d.obj,plot3d.obj,save.obj,scanner.obj,set.obj,show.obj,specfun.obj,-
-standard.obj,stdfn.obj,term.obj,time.obj,util.obj,util3d.obj,unset.obj,-
-version.obj,vms.obj'extralib''LINKOPT'
+standard.obj,stdfn.obj,tables.obj,term.obj,time.obj,util.obj,util3d.obj,-
+unset.obj,variable.obj,version.obj,vms.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c
 $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'
-$ ren bf_test.exe [.demo]
+$ cd [-.demo]
+$ run [-.src]bf_test.exe
+$ cd [-.src]
 $ if .NOT. its_decw  then goto do_docs 
 $!
 $ CC 'CFLAGS' GPLT_X11
@@ -165,19 +167,18 @@ $ LINK /exe=GNUPLOT_X11 gplt_x11 'extralib''LINKOPT',SYS$INPUT:/OPT
 SYS$SHARE:DECW$XLIBSHR/SHARE
 $!
 $DO_DOCS:
-$ SET DEF [.DOCS]
+$ SET DEF [-.DOCS]
 $ if f$locate("ALL_TERM_DOC",CFLAGS).ne.f$length(CFLAGS) then -
 	copy /concatenate [-.term]*.trm []allterm.h
-$ cc 'CFLAGS' /OBJ=doc2rnh.obj/include=([],[-],[-.term]) doc2rnh.c 
-$ cc 'CFLAGS' /OBJ=termdoc.obj/include=([],[-],[-.term]) termdoc.c 
-$ SET DEF [-]		! LINKOPT is defined as being in []
-$ link [.docs]doc2rnh.obj,termdoc.obj /exe=[.docs]doc2rnh 'extralib''LINKOPT'
-$ doc2rnh := $sys$disk:[.docs]doc2rnh
-$ doc2rnh [.docs]gnuplot.doc [.docs]gnuplot.rnh
-$ RUNOFF [.docs]gnuplot.rnh
+$ cc 'CFLAGS' /OBJ=doc2rnh.obj/include=([],[-],[-.term],[-.src]) doc2rnh.c 
+$ cc 'CFLAGS' /OBJ=termdoc.obj/include=([],[-],[-.term],[-.src]) termdoc.c 
+$ SET DEF [-.src]		! LINKOPT is defined as being in []
+$ link [-.docs]doc2rnh.obj,termdoc.obj /exe=[-.docs]doc2rnh 'extralib''LINKOPT'
+$ doc2rnh := $sys$disk:[-.docs]doc2rnh
+$ doc2rnh [-.docs]gnuplot.doc [-.docs]gnuplot.rnh
+$ RUNOFF [-.docs]gnuplot.rnh
 $ library/create/help sys$disk:[]gnuplot.hlb gnuplot.hlp
 $!
-$ run [.demo]bf_test
 $ if its_decw then -
   write sys$output "%define GNUPLOT_X11 :== $Disk:[directory]GNUPLOT_X11"
 $!
