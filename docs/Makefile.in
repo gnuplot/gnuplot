@@ -130,7 +130,7 @@ CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
 gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
 doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.html gnuplot.info* gnuplot.out \
 doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf \
-gnuplot.nroff checkdoc
+gnuplot.nroff checkdoc gnuplot.txt
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
@@ -138,7 +138,7 @@ allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
 	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
 	     sort -f -t':' -k2` ; do \
-	  f=`echo $$e |cut -d':' -f1` ; s=`echo $$e | cut -d':' -f2'` ;\
+	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
 	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
 	done >$@
 
