@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.125 2004/10/11 12:55:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.126 2004/10/12 18:10:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2115,14 +2115,13 @@ struct curve_points *plot)
     struct { double x,y; } corners[8];
 
     /* Clip against x-axis range */
-	axis = FIRST_X_AXIS; /* FIXME: but it might be SECOND_X_AXIS */
-	xmin = axis_array[axis].min;
-	xmax = axis_array[axis].max;
-	if (x1<xmin && x2<xmin)
+    /* It would be nice if we could trust xmin to be less than xmax */
+	axis = plot->x_axis;
+	xmin = GPMIN(axis_array[axis].min, axis_array[axis].max);
+	xmax = GPMAX(axis_array[axis].min, axis_array[axis].max);
+	if (!(inrange(x1, xmin, xmax)) && !(inrange(x2, xmin, xmax)))
 	    return;
-	if (x1>xmax && x2>xmax)
-	    return;
-
+	
     /* Clip end segments. It would be nice to use edge_intersect() here, */
     /* but as currently written it cannot handle the second curve.       */
 	dx = x2 - x1;
@@ -2138,9 +2137,9 @@ struct curve_points *plot)
 	}
 
     /* Clip against y-axis range */
-	axis = FIRST_Y_AXIS; /* FIXME: but it might be SECOND_Y_AXIS */
-	ymin = axis_array[axis].min;
-	ymax = axis_array[axis].max;
+	axis = plot->y_axis;
+	ymin = GPMIN(axis_array[axis].min, axis_array[axis].max);
+	ymax = GPMAX(axis_array[axis].min, axis_array[axis].max);
 	if (yl1<ymin && yu1<ymin && yl2<ymin && yu2<ymin)
 	    return;
 	if (yl1>ymax && yu1>ymax && yl2>ymax && yu2>ymax)
@@ -2177,14 +2176,10 @@ struct curve_points *plot)
     /* Copy the polygon vertices into a gpiPoints structure */
 	for (iy=0; iy<ic; iy++) {
 	    box[iy].x = corners[iy].x;
-	    if (corners[iy].y < map_y(ymin))
-		box[iy].y = map_y(ymin);
-	    else if (corners[iy].y > map_y(ymax))
-		box[iy].y = map_y(ymax);
-	    else
-		box[iy].y = corners[iy].y;
+	    cliptorange(corners[iy].y, map_y(ymin), map_y(ymax));
+	    box[iy].y = corners[iy].y;
 	}
-	
+
     /* finish_filled_curve() will handle   */
     /* current fill style (stored in plot) */
     /* above/below (stored in box[ic].x)   */
