@@ -18,6 +18,7 @@ $ !    get BUILD.COM in the [.SRC] directory.
 $ ! DECC$CRTL -- Use the DECC$CRTL backport library.  See
 $ !    SYS$LIBRARY:DECC$CRTL.README for information on it.
 $ ! READLINE -- Use the included readline function.
+$ ! USE_MOUSE -- Include the mouse code
 $ !
 $ ! For example,
 $ !     @CONFIGURE.VMS GNUC MAK
@@ -99,6 +100,7 @@ $ MAK = 0
 $ COM = 0
 $ DECC$CRTL = 0
 $ READLINE = 0
+$ USE_MOUSE = 0
 $ !
 $ IF (P1 .NES. "") THEN 'P1' = 1
 $ IF (P2 .NES. "") THEN 'P2' = 1
@@ -217,6 +219,7 @@ $ WRITE SYS$OUTPUT "Run time library: ", RTL
 $ IF (__CRTL_VER .NE. 0) THEN WRITE SYS$OUTPUT "CRTL version:     ", __CRTL_VER
 $ WRITE SYS$OUTPUT "Use DECC$CRTL:    ", DECC$CRTL
 $ WRITE SYS$OUTPUT "Use readline:     ", READLINE
+$ WRITE SYS$OUTPUT "Use mouse:        ", USE_MOUSE
 $ !
 $ ! Read in config.hin and write config.h.  Define DCL symbols for all the
 $ ! symbols in config.hin, then write config.h, replacing the #undef with
@@ -255,10 +258,13 @@ $ HAVE_SELECT = 0
 $ HAVE_SETVBUF = DECC
 $ HAVE_SLEEP = 1
 $ HAVE_SNPRINTF = 0
+$ HAVE_STPCPY = 0
+$ HAVE_STRCASECMP = __CRTL_VER .GE. 70000000
 $ HAVE_STRCHR = DECC
 $ HAVE_STRCSPN = DECC
 $ HAVE_STRDUP = __CRTL_VER .GE. 70000000
 $ HAVE_STRERROR = DECC
+$ HAVE_STRICMP = 0
 $ HAVE_STRNCASECMP = __CRTL_VER .GE. 70000000
 $ HAVE_STRNICMP = 0
 $ HAVE_STRRCHR = DECC
@@ -297,6 +303,7 @@ $ PACKAGE = 0
 $ VERSION = 0
 $ PROTOTYPES = DECC
 $ X11 = DECW
+$ GNUPLOT_X11 = 0
 $ MSDOS = 0
 $ DOS32 = 0
 $ DJSVGA = 0
@@ -311,7 +318,6 @@ $ HAVE_LIBREADLINE = 0
 $ GNUPLOT_HISTORY = 0
 $ ! READLINE = 0    ! READLINE is defined above
 $ UNIXPLOT = 0
-$ HAVE_PLOTCOMPAT_H = 0
 $ GNUGRAPH = 0
 $ GNU_PLOTUTILS = 0
 $ HAVE_LIBGD = 0
@@ -324,6 +330,7 @@ $ COLUMN_HELP = 0
 $ IRIS = 0
 $ MGR = 0
 $ RGIP = 0
+$ ! USE_MOUSE = 0   ! USE_MOUSE is defined above         
 $ !
 $ OPEN/READ IN CONFIG.HIN
 $ OPEN/WRITE OUT CONFIG.H
