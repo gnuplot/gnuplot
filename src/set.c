@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.146 2004/08/21 20:57:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.147 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3154,23 +3154,20 @@ set_terminal()
 }
 
 
-/* process 'set termoptions' command */
+/* 
+ * Accept a single terminal option to apply to the current terminal if
+ * possible.  The options are intended to be limited to those which apply
+ * to a large number of terminals.  It would be nice also to limit it to
+ * options for which we can test in advance to see if the terminal will
+ * support it; that allows us to silently ignore the command rather than
+ * issuing an error when the current terminal would not be affected anyhow.
+ */
+
 static void
 set_termoptions()
 {
     int save_end_of_line = num_tokens;
     c_token++;
-
-    /* What it really should do:
-     * scan input_line for allowed options
-     * Then either
-     * 1. reset input_line (num_tokens = scanner(&input_line, &input_line_len);
-     *    c_token=0 (1 ? 2)
-     * or
-     * 2. grab the current term->name and use do_string() as in 'set term pop'
-     *    above ... this can be joint into a new routine
-     *    set_term_opts(char *term_name, char *term_opts)
-     */
 
     if (END_OF_COMMAND || !term) {
 	return;
