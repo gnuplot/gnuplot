@@ -765,7 +765,8 @@ if desired.
 
 On Unix, HOME is used as the name of a directory to search for a .gnuplot
 file if none is found in the current directory.  On AmigaOS, AtariTOS,
-MS-DOS and OS/2, GNUPLOT is used.  On VMS, SYS$LOGIN: is used. Type `help
+MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
+variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
 start-up`.
 
 On Unix, PAGER is used as an output filter for help messages.
@@ -1990,13 +1991,15 @@ data formats.  See `splot` for details.
 
 @cindex .gnuplot
 
-When `gnuplot` is run, it looks for an initialization file to load.  This
-file is called `.gnuplot` on Unix and AmigaOS systems, and `GNUPLOT.INI` on
-other systems.  If this file is not found in the current directory, the
-program will look for it in the home directory (under AmigaOS,
-Atari(single)TOS, MS-DOS and OS/2, the environment variable `gnuplot` should
-contain the name of this directory).  Note: if NOCWDRC is defined during the
-installation, `gnuplot` will not read from the current directory.
+When `gnuplot` is run, it looks for an initialization file to load.
+This file is called `.gnuplot` on Unix and AmigaOS systems, and
+`GNUPLOT.INI` on other systems.  If this file is not found in the
+current directory, the program will look for it in the HOME directory
+(under AmigaOS, Atari(single)TOS, MS-DOS, Windows and OS/2, the
+environment variable `GNUPLOT` should contain the name of this
+directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
+defined).  Note: if NOCWDRC is defined during the installation,
+`gnuplot` will not read from the current directory.
 
 If the initialization file is found, `gnuplot` executes the commands in it.
 These may be any legal `gnuplot` commands, but typically they are limited to

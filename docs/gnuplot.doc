@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.211 2004/04/05 18:54:48 persquare Exp $
+C RCS $Id: gnuplot.doc,v 1.212 2004/04/13 17:23:31 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -583,7 +583,8 @@ C
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
  file if none is found in the current directory.  On AmigaOS, AtariTOS,
- MS-DOS and OS/2, GNUPLOT is used.  On VMS, SYS$LOGIN: is used. Type `help
+ MS-DOS, Windows and OS/2, GNUPLOT is used.  On Windows, the NT-specific
+ variable USERPROFILE is tried, too. VMS, SYS$LOGIN: is used. Type `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
@@ -1524,13 +1525,15 @@ C ... and restart the table:
 ?startup
 ?start
 ?.gnuplot
- When `gnuplot` is run, it looks for an initialization file to load.  This
- file is called `.gnuplot` on Unix and AmigaOS systems, and `GNUPLOT.INI` on
- other systems.  If this file is not found in the current directory, the
- program will look for it in the home directory (under AmigaOS,
- Atari(single)TOS, MS-DOS and OS/2, the environment variable `gnuplot` should
- contain the name of this directory).  Note: if NOCWDRC is defined during the
- installation, `gnuplot` will not read from the current directory.
+ When `gnuplot` is run, it looks for an initialization file to load.
+ This file is called `.gnuplot` on Unix and AmigaOS systems, and
+ `GNUPLOT.INI` on other systems.  If this file is not found in the
+ current directory, the program will look for it in the HOME directory
+ (under AmigaOS, Atari(single)TOS, MS-DOS, Windows and OS/2, the
+ environment variable `GNUPLOT` should contain the name of this
+ directory; on Windows NT, it will use `USERPROFILE` if GNUPLOT isn't
+ defined).  Note: if NOCWDRC is defined during the installation,
+ `gnuplot` will not read from the current directory.
 
  If the initialization file is found, `gnuplot` executes the commands in it.
  These may be any legal `gnuplot` commands, but typically they are limited to

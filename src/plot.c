@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.68 2004/04/01 16:41:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.69 2004/04/13 17:23:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -718,11 +718,14 @@ get_user_env()
     if (user_homedir == NULL) {
 	const char *env_home;
 
-#ifndef VMS
-	if ((env_home = getenv(HOME)) || (env_home = getenv("HOME")))
-#else
-	if (env_home = HOME)
+	if ((env_home = getenv(HOME)) 
+#ifdef WIN32
+	    || (env_home = getenv("USERPROFILE"))
 #endif
+#ifndef VMS
+	    || (env_home = getenv("HOME"))
+#endif
+	   )
 	    user_homedir = (const char *) gp_strdup(env_home);
 	else if (interactive)
 	    int_warn(NO_CARET, "no HOME found");
