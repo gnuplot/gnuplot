@@ -1,3 +1,9 @@
+2005-02-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm:  Allow "lw" as an abbreviation for "linewidth"
+	* term/post.trm: Make dash styles 6 and 7 a bit more distinctive
+	* term/emf.trm:  Add option 'set term emf {linewidth <factor>}'
+
 2005-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c src/tables.c src/set.c src/unset.c docs/gnuplot.doc: Let
