@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: datafile.c,v 1.11 1998/11/03 12:46:21 lhecking Exp $";
+static char *RCSid = "$Id: datafile.c,v 1.11.2.1 1999/08/19 14:41:09 lhecking Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -329,14 +329,28 @@ char *s;
 /*
  * optimizations by Corey Satten, corey@cac.washington.edu
  */
-	    if (fast_columns == 0 ||
-		df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
-		  df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
-		  df_no_use_specs > 2 && (use_spec[2].column == dfncp1 ||
-		  df_no_use_specs > 3 && (use_spec[3].column == dfncp1 ||
-		  df_no_use_specs > 4 && (use_spec[4].column == dfncp1 ||
-					  df_no_use_specs > 5))))) ||
-		df_no_use_specs == 0) {
+
+	    if ((fast_columns == 0)
+		|| (df_no_use_specs == 0)
+		|| ((df_no_use_specs > 0)
+		    && (use_spec[0].column == dfncp1
+			|| (df_no_use_specs > 1
+			    && (use_spec[1].column == dfncp1
+				|| (df_no_use_specs > 2
+				    && (use_spec[2].column == dfncp1
+					|| (df_no_use_specs > 3
+					    && (use_spec[3].column == dfncp1
+						|| (df_no_use_specs > 4 && (use_spec[4].column == dfncp1 || df_no_use_specs > 5)
+						)
+					    )
+					)
+				    )
+				)
+			    )
+			)
+		    )
+		)
+		) {
 
 #ifndef NO_FORTRAN_NUMS
 		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
