@@ -411,14 +411,10 @@ static int command()
 		++c_token;
 #ifdef _Windows
 		if (sleep_time >= 0)
-#else
-# ifdef OS2
+#elif defined(OS2)
 		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
-# else
-#  ifdef MTOS
+#elif defined(MTOS)
 		    if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
-#  endif			/* MTOS */
-# endif				/* OS2 */
 #endif /* _Windows */
 			fputs(buf, stderr);
 		text = 1;
@@ -428,14 +424,14 @@ static int command()
 #ifdef _Windows
 	    if (!Pause(buf))
 		bail_to_command_line();
-#else
-# ifdef OS2
+#elif defined(OS2)
 	    if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 		int rc;
 		if ((rc = PM_pause(buf)) == 0) {
-/*           if (!CallFromRexx)
-  would help to stop REXX programs w/o raising an error message
-  in RexxInterface() ... */
+		    /* if (!CallFromRexx)
+		     * would help to stop REXX programs w/o raising an error message
+		     * in RexxInterface() ...
+		     */
 		    bail_to_command_line();
 		} else if (rc == 2) {
 		    fputs(buf, stderr);
@@ -443,12 +439,10 @@ static int command()
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 		}
 	    }
-# else				/* !OS2 */
-#  ifdef _Macintosh
+#elif defined(_Macintosh)
 	    if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
 		Pause(sleep_time);
-#  else				/* !_Macintosh */
-#   ifdef MTOS
+#elif defined(MTOS)
 	    if (strcmp(term->name, "mtos") == 0) {
 		int MTOS_pause(char *buf);
 		int rc;
@@ -466,8 +460,7 @@ static int command()
 		    free(line);
 	    } else
 		(void) fgets(buf, MAX_LINE_LEN, stdin);
-#   else			/* !MTOS */
-#    ifdef ATARI
+#elif defined(ATARI)
 	    if (strcmp(term->name, "atari") == 0) {
 		char *readline(char *);
 		char *line = readline("");
@@ -475,13 +468,9 @@ static int command()
 		    free(line);
 	    } else
 		(void) fgets(buf, MAX_LINE_LEN, stdin);
-#    else			/* !ATARI */
+#else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
 	    (void) fgets(buf, MAX_LINE_LEN, stdin);
 	    /* Hold until CR hit. */
-#    endif			/* !ATARI */
-#   endif			/* !MTOS */
-#  endif			/* !_Macintosh */
-# endif				/* !OS2 */
 #endif
 	}
 	if (sleep_time > 0)
