@@ -74,7 +74,6 @@ TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
 U = @U@
 VERSION = @VERSION@
-lispdir = @lispdir@
 
 AUTOMAKE_OPTIONS = foreign 1.2h
 
