@@ -1,3 +1,8 @@
+2003-08-12  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Apply linewidth changes directly to pm3d mode (fixes
+	bug that linewidths in pm3d were one plot late in being applied).
+
 2003-08-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Add equipo2.dat, field2xy.dat to CLEANFILES.

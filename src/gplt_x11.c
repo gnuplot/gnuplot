@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.66 2003/07/31 15:45:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.67 2003/08/05 05:25:59 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1886,6 +1886,9 @@ exec_cmd(plot_struct *plot, char *command)
 	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	current_gc = &gc;
+	/* Set line width for pm3d mode also, but not dashes */
+	if (gc_pm3d)
+	    XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, LineSolid, CapButt, JoinBevel);
     }
     /*   X11_point(number) - draw a point */
     else if (*buffer == 'P') {
