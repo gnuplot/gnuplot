@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.10 2004/11/28 02:02:52 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.11 2004/11/28 22:32:13 persquare Exp $
  *
  */
 
@@ -215,12 +215,14 @@ AQUA_options()
     if (almost_equals(c_token, "enh$anced")) {
       term->put_text = ENHAQUA_put_text;
       c_token++;
+      term->flags |= TERM_ENHANCED_TEXT;
       continue;
     }
 
     if (almost_equals(c_token, "noenh$anced")) {
       term->put_text = AQUA_put_text;
       c_token++;
+      term->flags &= ~TERM_ENHANCED_TEXT;
       continue;
     }
 

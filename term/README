@@ -299,15 +299,14 @@ fonts are selected as strings "name,size"
 
 _pointsize() is used to set the pointsize for subsequent points
 
-_flags stores various flags describing driver capabilities. Currently
- three bits are allocated
+_flags stores various flags describing driver capabilities.
   - TERM_CAN_MULTIPLOT - driver can do multiplot
   fully-interactively when output is not redirected. I.e. text and graphics
   go to different places, or driver can flip using suspend.
   - TERM_CANT_MULTIPLOT - driver cannot multiplot, even if output
   is redirected.
   - TERM_BINARY - output file must be opened in binary mode
-  Another bit is earmarked for VMS_PASTHRU, but not yet implemented.
+  - TERM_ENHANCED_TEXT - terminal is currently in enhanced text mode
 
 _suspend() - called before gnuplot issues a prompt in multiplot mode
    linux VGA driver uses this entry point to flip from graphics to

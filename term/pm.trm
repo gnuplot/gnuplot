@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.38 2004/11/29 11:56:45 mikulik Exp $
+ * $Id: pm.trm,v 1.39 2004/12/20 16:49:17 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -342,6 +342,7 @@ PM_options()
 	} else if (almost_equals(c_token, "e$nhanced")) {
 	    strcat(PM_opts, "-e ");
 	    strcat(term_options, "enhanced ");
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    PM_optargs = 1;
 	} else if (isstring(c_token)) {
 	    copy_str(PM_term_title, c_token, 127);
@@ -553,7 +554,7 @@ PM_justify_text(enum JUSTIFY mode)
     return (TRUE);
     if (ignore_enhanced_text) {
 	putc(SET_SPECIAL, PM_pipe);
-	putc('e', PM_pipe); /* switch the enhanced mode off */
+	putc('e', PM_pipe); /* restore the enhanced mode */
 	putc('2', PM_pipe);
     }
 }

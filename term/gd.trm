@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.56 2004/12/03 05:52:22 sfeam Exp $
+ * $Id: gd.trm,v 1.57 2004/12/21 00:50:07 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -210,7 +210,6 @@ static struct {
 #define PNG_USE_TRANSPARENT 1
 #define PNG_USE_INTERLACE   2
 #define PNG_USE_CROP        4
-#define PNG_USE_ENHANCED    8
 
 enum PNG_id {
     PNG_TRANSPARENT, PNG_NOTRANSPARENT,
@@ -607,12 +606,12 @@ PNG_options()
 	    term->h_tic = term->v_tic;
 	    break;
 	case PNG_ENHANCED:
-	    png_state.flags |= PNG_USE_ENHANCED;
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    term->put_text = ENHGD_put_text;
 	    ++c_token;
 	    break;
 	case PNG_NOENHANCED:
-	    png_state.flags &= ~PNG_USE_ENHANCED;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    term->put_text = PNG_put_text;
 	    ++c_token;
 	    break;
@@ -723,7 +722,7 @@ PNG_options()
     }
     strcat(term_options, "crop ");
 
-    if (png_state.flags & PNG_USE_ENHANCED) {
+    if (term->flags & TERM_ENHANCED_TEXT) {
 	strcat(term_options, "enhanced ");
     }
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.46 2004/11/27 02:38:38 sfeam Exp $
+ * $Id: svg.trm,v 1.47 2004/11/28 02:02:54 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -436,12 +436,14 @@ SVG_options ()
 	if (almost_equals(c_token, "enh$anced")) {
 	    c_token++;
 	    term->put_text = ENHsvg_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    continue;
 	}
 
 	if (almost_equals(c_token, "noenh$anced")) {
 	    c_token++;
 	    term->put_text = SVG_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    continue;
 	}
 

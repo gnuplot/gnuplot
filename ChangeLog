@@ -1,3 +1,14 @@
+2004-12-30  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term_api.h term/README: Add a new terminal flag bit 
+	TERM_ENHANCED_TEXT that is set whenever the terminal is currently
+	operating in enhanced text mode. The will allow improved estimation of
+	text string length by the core code.
+
+	* aquaterm.term dumb.trm gd.trm pdf.trm pm.trm post.trm svg.trm x11.trm:
+	Set or clear TERM_ENHANCED_TEXT flag in term->options() code
+	that parses the "{no}enhanced" terminal option.
+
 2004-12-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (MKSTR): Do not allow embedded newlines in the format

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.125 2004/12/03 05:51:21 sfeam Exp $
+ * $Id: x11.trm,v 1.126 2004/12/06 06:46:27 sfeam Exp $
  *
  */
 
@@ -449,10 +449,12 @@ X11_options()
 	    break;
 	case X11_ENHANCED:
 	    term->put_text = ENHX11_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    c_token++;
 	    break;
 	case X11_NOENHANCED:
 	    term->put_text = X11_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    c_token++;
 	    break;
 	case X11_OTHER:

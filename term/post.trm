@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.136 2004/11/28 02:02:52 sfeam Exp $
+ * $Id: post.trm,v 1.137 2004/11/30 08:21:56 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -890,6 +890,7 @@ PS_options()
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
 	    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
 	    term->put_text = PS_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 #ifdef PM3D
 	    ps_palfunc_samples = 2000;
 	    ps_palfunc_deviation = 0.003;
@@ -899,11 +900,13 @@ PS_options()
 	case PS_ENHANCED:
 	    term->put_text = ENHPS_put_text;
 	    term->set_font = ENHPS_set_font;
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    ++c_token;
 	    break;
 	case PS_NOENHANCED:
 	    term->put_text = PS_put_text;
 	    term->set_font = PS_set_font;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    ++c_token;
 	    break;
 	case PS_MONOCHROME:

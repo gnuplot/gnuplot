@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.40 2004/11/27 02:38:37 sfeam Exp $
+ * $Id: pdf.trm,v 1.41 2004/11/28 02:02:52 sfeam Exp $
  */
 
 /*------------------------------
@@ -299,10 +299,12 @@ PDF_options ()
 	if (almost_equals(c_token, "enh$anced")) {
 	    c_token++;
 	    term->put_text = ENHPDF_put_text;
+	    term->flags |= TERM_ENHANCED_TEXT;
 	    continue;
 	} else if (almost_equals(c_token, "noenh$anced")) {
 	    c_token++;
 	    term->put_text = PDF_put_text;
+	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    continue;
 	}
 
