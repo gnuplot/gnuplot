@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.58 2002/08/22 14:27:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.59 2002/10/20 21:19:51 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -291,10 +291,14 @@ static double
 splines_kernel(h)
 double h;
 {
+#if 0
     /* this is normaly not useful ... */
     h = fabs(h);
 
     if (h != 0.0) {
+#else
+    if (h > 0) {
+#endif
 	return h * h * log(h);
     } else {
 	return 0;
@@ -844,10 +848,11 @@ get_3ddata(this_plot)
 	    iso_free(local_this_iso);	/* Free last allocation. */
 	}
 
-	if (dgrid3d && this_plot->num_iso_read > 0)
-	    grid_nongrid_data(this_plot);
 	/*}}} */
     }
+
+    if (dgrid3d && this_plot->num_iso_read > 0)
+        grid_nongrid_data(this_plot);
 
     if (this_plot->num_iso_read <= 1)
 	this_plot->has_grid_topology = FALSE;
@@ -1881,3 +1886,4 @@ int *plot_num;
     *last_pointer = free_list;
     first_3dplot = new_list;
 }
+

@@ -1,55 +1,65 @@
+2003-01-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot3d.c (get_3ddata): Move dgrid3d call outside if-else
+ 	block to have it work with binary and matrix data, too.
+
 2003-01-09  Ethan Merritt  <merritt@u.washington.edu>
 
-	* docs/gnuplot.doc: Document Mike Kay's addition of font and textcolor
-	to tick label settings.
+	* docs/gnuplot.doc: Document Mike Kay's addition of font and
+ 	textcolor to tick label settings.
 
 2003-01-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.mgw config/makefile.cyg config/makefile.os2: Sort
-	terminals in the docs alphabetically, i.e. generate allterm.h like in
-	docs/Makefile.in.
+	* config/makefile.mgw config/makefile.cyg config/makefile.os2:
+ 	Sort terminals in the docs alphabetically, i.e. generate allterm.h
+ 	like in docs/Makefile.in.
 
 2003-01-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* doc/gnuplot.doc: Remove duplication of hypertext labels "set encoding"
-	and "plotting styles".
+	* doc/gnuplot.doc: Remove duplication of hypertext labels "set
+ 	encoding" and "plotting styles".
 
 2003-01-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.mgw config/makefile.cyg config/makefile.os2: Update
-	-D... symbols for the changed syntax of gd/png/jpeg/gif checks.
+	* config/makefile.mgw config/makefile.cyg config/makefile.os2:
+ 	Update -D... symbols for the changed syntax of gd/png/jpeg/gif
+ 	checks.
 	
 2003-01-07  Mike Kay <Mike.Kay@noaa.gov>
 
 	* src/axis.h src/color.c src/gadgets.c src/gadgets.h src/graph3d.c
-	src/graphics.c src/save.c src/set.c src/show.c src/unset.c:
-	Allow user to specify textcolor and font for axis tick labels.
+ 	src/graphics.c src/save.c src/set.c src/show.c src/unset.c: Allow
+ 	user to specify textcolor and font for axis tick labels.
 
 2002-12-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/set.c: Check for legal value of linetype in parse_colorspec().
+	* src/set.c: Check for legal value of linetype in
+ 	parse_colorspec().
 
-	* src/unset.c: Invoke 'unset_missing' during a reset. Avoid calling
-	int_error() from inside a reset, because this prevents it from
-	restoring the interactive context on exit.
+	* src/unset.c: Invoke 'unset_missing' during a reset. Avoid
+ 	calling int_error() from inside a reset, because this prevents it
+ 	from restoring the interactive context on exit.
 
 2002-12-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* configure.in: Completely rewritten and simplified checks for png,
-	gd, and the required support libraries. Other minor cleanups.
+	* configure.in: Completely rewritten and simplified checks for
+ 	png, gd, and the required support libraries. Other minor cleanups.
 
 	* config/config.amg, config/makefile.cyg, config/makefile.mgw,
-	config/makefile.os2, src/show.c, src/term.h, term/gd.trm, term/png.trm:
-	Update all preprocessor symbols related to new gd/png/jpeg checks.
+ 	config/makefile.os2, src/show.c, src/term.h, term/gd.trm,
+ 	term/png.trm: Update all preprocessor symbols related to new
+ 	gd/png/jpeg checks.
 
 2002-12-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Initialize gcCurrentFunction because gcc is too
-	stupid to see that it can never be used before it is set.
+ 	stupid to see that it can never be used before it is set.
 
-	* src/misc.c: Do not allow input of negative pointsize or linewidth.
+	* src/misc.c: Do not allow input of negative pointsize or
+ 	linewidth.
 
-	* term/gd.trm: Check for valid linetype (Mike Kay <kay@fsl.noaa.gov>).
+	* term/gd.trm: Check for valid linetype (Mike Kay
+ 	<kay@fsl.noaa.gov>).
 
 2002-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1705,7 +1715,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/09 09:21:51 $).
+	last modification date (from the tag $Date: 2003/01/09 23:34:25 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
