@@ -1,5 +1,5 @@
 /*
- * $Id: emxvga.trm,v 1.16 1998/04/14 00:17:40 drd Exp $
+ * $Id: emxvga.trm,v 1.6 1998/12/14 18:38:51 lhecking Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -280,8 +280,8 @@ char *s;
     k = 0;
     x = 0.5 + x0;
     y = 0.5 + y0;
-    sa = sin(-Pi * angle / 180);
-    ca = cos(Pi * angle / 180);
+    sa = sin(- DEG2RAD * angle );
+    ca = cos(DEG2RAD * angle );
     while (s[k]) {
 	for (i = 0; i < 8; i++)
 	    for (j = 0; j < 8; j++)

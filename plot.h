@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.19.2.3 1999/12/09 18:43:40 lhecking Exp $
+ * $Id: plot.h,v 1.19.2.4 2002/02/01 18:41:05 broeker Exp $
  *
  */
 
@@ -83,8 +83,7 @@ typedef int TBOOLEAN;
 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
 #define DTRUE 3
 
-#define Pi 3.141592653589793
-#define DEG2RAD (Pi / 180.0)
+#define DEG2RAD (M_PI / 180.0)
 
 
 /* minimum size of points[] in curve_points */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util3d.c,v 1.17 1998/06/18 14:55:20 ddenholm Exp $";
+static char *RCSid = "$Id: util3d.c,v 1.7 1998/09/21 21:04:42 lhecking Exp $";
 #endif
 
 
@@ -114,7 +114,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= M_PI / 180.0;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 
@@ -131,7 +131,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= M_PI / 180.0;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 
@@ -148,7 +148,7 @@ transform_matrix mat;
 {
     double cos_teta, sin_teta;
 
-    teta *= Pi / 180.0;
+    teta *= M_PI / 180.0;
     cos_teta = cos(teta);
     sin_teta = sin(teta);
 

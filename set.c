@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21.2.5 2000/10/18 13:42:55 broeker Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.6 2002/01/31 21:18:22 lhecking Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -1357,7 +1357,7 @@ else if (almost_equals(c_token, string)) { \
 	    if (autoscale_t) {
 		/* only if user has not set a range manually */
 		tmin = 0.0;
-		tmax = 2*Pi / ang2rad;  /* 360 if degrees, 2pi if radians */
+		tmax = 2 * M_PI / ang2rad;  /* 360 if degrees, 2pi if radians */
 	    }
 	}
 	c_token++;
@@ -1396,7 +1396,7 @@ else if (almost_equals(c_token, string)) { \
 	if (polar && autoscale_t) {
 	    /* set trange if in polar mode and no explicit range */
 	    tmin = 0;
-	    tmax = 2*Pi/ang2rad;
+	    tmax = 2 * M_PI / ang2rad;
 	}
     }
 
