@@ -1,3 +1,11 @@
+1998-11-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c(do_system): No not check system() return value.
+
+	* configure.in: Edit comment.
+
+	* version.c: Patchlevel pl7.
+
 1998-11-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* CodeStyle: Updated.
