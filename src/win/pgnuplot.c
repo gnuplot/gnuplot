@@ -36,6 +36,7 @@
  */
 
 #include <io.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -59,6 +60,9 @@ int main (int argc, char *argv[])
   /* First, try to find if there is an instance of gnuplot
    * running, already. If so, use that. */
   hwnd_parent = FindWindow(PARENTCLASS, WINDOWNAME);
+
+  /* HBB 19990325, to allow pgnuplot < script > output.gif */
+  _setmode(fileno(stdout), _O_BINARY);
 
   if ( ! hwnd_parent) {
     /* None there, so start one: load gnuplot (minimized in order to
