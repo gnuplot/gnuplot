@@ -1,4 +1,4 @@
-/* $Id: tgif.trm,v 1.17 2000/11/20 20:31:37 joze Exp $ */
+/* $Id: tgif.trm,v 1.18 2001/06/11 12:20:13 broeker Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -390,7 +390,7 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.17 2000/11/20 20:31:37 joze Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.18 2001/06/11 12:20:13 broeker Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -1530,7 +1530,7 @@ TERM_PUBLIC void TGIF_set_color(double gray)
     if (TGIF_palette_set == FALSE) {
 	fprintf(stderr,"Palette used before set\n"); /* Error condition */
     }
-    sprintf(sActColor,"%s",TGIF_colours[(int)((gray*(TGIF_palette_size-1)) + 0.5)]);
+    sprintf(sActColor,"%s",TGIF_colours[(int)(gray*TGIF_palette_size)]);
 }
 
 TERM_PUBLIC void TGIF_filled_polygon(int points, gpiPoint *corners)

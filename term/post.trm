@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.56 2001/09/18 21:40:29 amai Exp $
+ * $Id: post.trm,v 1.57 2001/10/11 12:52:45 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1946,8 +1946,15 @@ if (palette == NULL)
 
 fputs("gsave %% colour palette begin\n", gpoutfile);
 fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+#if 0
 fputs("/pm3dround {maxcolors 0 gt {maxcolors mul floor maxcolors div} if} def\n", gpoutfile);
-
+#else
+/* 26.10.2001 PM set the colour of the last box to the terminating colour, as
+   all discrete palette devices are doing
+*/
+fputs("/maxcolorsLast {maxcolors 1 sub maxcolors div} def\n", gpoutfile);
+fputs("/pm3dround {maxcolors 0 gt {dup maxcolorsLast ge {pop 1} {maxcolors mul floor maxcolors div} ifelse} if} def\n", gpoutfile);
+#endif
 /* print the definition of R,G,B formulae */
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
     fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(R), ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);

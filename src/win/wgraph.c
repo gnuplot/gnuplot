@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.21 2001/09/18 17:46:33 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.22 2001/09/19 14:47:02 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1013,6 +1013,16 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 		static HBRUSH last_pm3d_brush = NULL;
 		HBRUSH this_brush;
 		COLORREF c;
+
+		if (sm_palette.use_maxcolors > 0 && sm_palette.use_maxcolors < 256) {
+		    /* number of palette colours is reduced */
+		    if (curptr->x >=255)
+			level = 1;
+		    else {
+			level = (int)(level * sm_palette.colors);
+			level = (level >= sm_palette.colors-1) ? 1 : level / sm_palette.colors;
+		    }
+		}
 
 		if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
 		    R = G = B = curptr->x;

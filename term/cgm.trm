@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.34 2000/11/23 18:26:44 lhecking Exp $
+ * $Id: cgm.trm,v 1.35 2001/02/01 17:56:05 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -974,7 +974,7 @@ TERM_PUBLIC void CGM_set_color(double gray)
     /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
        offset to get past the default colors */
     cgm_next.fill_color = 1 + CGM_COLORS + 
-	 (int)( gray * (cgm_smooth_colors-1) + 0.5 );
+	 (int)( gray * cgm_smooth_colors );
 }
 
 TERM_PUBLIC void CGM_filled_polygon(int points, gpiPoint *corner)

@@ -1,3 +1,21 @@
+2001-10-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c term/tgif.trm term/pm.trm term/gif.trm term/fig.trm
+	term/cgm.trm: The first and the last colour ranges in 'set palette
+	maxcolors' were different (half of the range) than the "inner"
+	colour ranges. I.e. now	the discrete palette drivers have the 
+	set_color(gray) routine coded like
+	    int gif_color = (int)( gray * sm_palette.colors );
+	instead of the previous
+	    int gif_color = (int)( gray * (sm_palette.colors-1) + 0.5 );
+	Some other drivers have already this code, so all is unified now.
+
+	* term/post.trm: If 'set palette maxcolors', then the colour for the
+	last colour box [(colors-1)/colors; 1.0] should equal the last colour
+	from the mapping formulae, as for the discrete palette drivers.
+
+	* src/win/wgraph.c: Support for 'set palette maxcolors'.
+
 2001-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
         * win/pgnuplot.c (cbGetTextWindow): Revert return value to behave
@@ -38,6 +56,7 @@
 	* src/set.c docs/gnuplot.doc: New autoscale option:
 	`set autoscale keepfix` autoscales all axes while keeping the fix
 	settings.
+
 	* src/mouse.c: Let hotkey 'a' do `set autoscale keepfix` instead
 	of `set autoscale`.
 

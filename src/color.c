@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.21 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.22 2001/10/10 14:27:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -374,7 +374,7 @@ FILE * out;
     xy_step = (color_box.rotation == 'h' ? cb_x_to - cb_x_from : cb_y_to - cb_y_from) / (double) steps;
 
     for (i = 0; i < steps; i++) {
-	gray = (double) i / (steps - 1);	/* colours equidistantly from [0,1] */
+	gray = (double) i / steps;	/* colours equidistantly from [0,1] */
 	/* Set the colour (also for terminals which support extended specs). */
 	set_color(gray);
 	xy = xy_from + (int) (xy_step * i);
