@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.4 1999/05/20 18:36:11 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -502,8 +502,12 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
         case WM_GNUPLOT:
                 // display the plot         
 	    lock_mouse = 1; //PM
-            if( bPopFront )
+	    if( bPopFront ) {
+		SWP swp; // pop to front only if the window is not minimized
+		if (  (WinQueryWindowPos( hwndFrame, (PSWP)&swp) == TRUE)
+		   && ((swp.fl & SWP_MINIMIZE) == 0) )
                 WinSetWindowPos( hwndFrame, HWND_TOP, 0,0,0,0, SWP_ACTIVATE|SWP_ZORDER ) ;
+	    }
             if( iPaintCount > 0 ) { /* if outstanding paint messages, repaint */
                 WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
                 iPaintCount = 0 ;
