@@ -345,6 +345,7 @@ in the gnuplot distribution, and are referred to here by name.
 * Data_file_format::            
 * Arrows::                      
 * PostScript_output_features::  
+* X11_output_features::         
 * Other_changes_and_additions::  
 @end menu
 
@@ -450,18 +451,27 @@ See @ref{arrow}, `plotting styles vectors`.
 Sample script: arrowstyle.dem
 
 
-@node PostScript_output_features, Other_changes_and_additions, Arrows, What_is_New_since_version_3.7
+@node PostScript_output_features, X11_output_features, Arrows, What_is_New_since_version_3.7
 @subsection PostScript output features
 
 
-The PostScript driver provides now an oblique symbol font, and allows run-time
+The PostScript driver now provides an oblique symbol font, and allows run-time
 inclusion of embedded PostScript fonts. It also supports ISO-8859-2 and 
 CP-852 character encodings. See `postscript fontfile`.
 
 Sample script: fontfile.dem
 
 
-@node Other_changes_and_additions,  , PostScript_output_features, What_is_New_since_version_3.7
+@node X11_output_features, Other_changes_and_additions, PostScript_output_features, What_is_New_since_version_3.7
+@subsection X11 output features
+
+
+The X-windows driver now allows you to specify fonts, text rotation, and text
+color.  It also allows interaction with the current plot using the mouse and 
+hotkeys. See `set term x11 x11_fonts`.
+
+
+@node Other_changes_and_additions,  , X11_output_features, What_is_New_since_version_3.7
 @subsection Other changes and additions
 
 
@@ -470,8 +480,8 @@ The preferred syntax to undue a command `set <something>` is now
 deprecated.  Version 3.8 continues to allow the older syntax, but such 
 backwards compatibility may be lost in future versions.
 
-Commands of the form `set data <style>` also are deprectated in favor of
-the more general form `set style <something> <options>`.  Many more plot
+Commands of the form `set <something> <style>` also are deprectated in favor
+of the more general form `set style <something> <options>`.  Many more plot
 elements now have style options of their own, including arrows, filled
 areas, lines, and points. There are also style settings for input data and
 formatting. Please see @ref{style}, @ref{decimalsign}, and `set datafile`.
@@ -482,12 +492,12 @@ More consistent point styles and other default formatting styles across
 all terminals. Please use the @ref{test} command to check default styles and
 plotting capabilities for the currently selected terminal type.
 
-The @ref{label} command supports associated points, and allow you to 
+The @ref{label} command supports associated points, and allows you to 
 specify point style and text style (font, rotation, etc). User variables
 can be included in labels via format specifiers in the label text.
 See @ref{label}.
 
-New command `set view map` to select 2D projection view of 3d surface plot.
+New command `set view map` to select 2D projection view of 3D surface plot.
 
 New commands `set term push` and `set term pop`.
 
@@ -6336,7 +6346,7 @@ major gridlines is used.  The default polar angle is 30 degrees.
 If `front` is given, the grid is drawn on top of the graphed data. If
 `back` is given, the grid is drawn underneath the graphed data. Using
 `front` will prevent the grid from being obscured by dense data. The default
-setup, `layerdefault`, is 'back' for 2d plots and 'front' for 3d plots.
+setup, `layerdefault`, is `back` for 2d plots and `front` for 3d plots.
 
 Z grid lines are drawn on the bottom of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
@@ -6792,7 +6802,7 @@ either a linetype or a mapping onto the pm3d color palette (available only in
 
 @end example
 
-If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see @ref{style},
+If a <pointstyle> is given, using keywords `lt`, `pt` and `ps`, see @ref{style},
 a point with the given style and color of the given line type is plotted at
 the label position and the text of the label is displaced slightly.
 The displacement defaults to 1, 1 in @ref{pointsize} units and can be
@@ -8991,7 +9001,7 @@ a pattern, if supported by the terminal driver.
 Examples:
 
 To plot a data file with solid filled boxes with a small vertical space
-seperating them (bargraph):
+separating them (bargraph):
 
 @example
       set boxwidth 0.9 relative
@@ -9004,7 +9014,7 @@ To plot a sine and a cosine curve in pattern-filled boxes style:
 
 @example
       set style fill pattern
-      plot sin(x), cos(x) with boxes
+      plot sin(x) with boxes, cos(x) with boxes
 
 @end example
 
@@ -9015,9 +9025,9 @@ terminal driver.
 To specify explicit fillstyles for each dataset:
 
 @example
-     plot 'file1' with boxes fs bsolid 0.25, \
-          'file2' with boxes fs bsolid 0.50, \
-          'file3' with boxes fs bsolid 0.75, \
+     plot 'file1' with boxes fs solid 0.25, \
+          'file2' with boxes fs solid 0.50, \
+          'file3' with boxes fs solid 0.75, \
           'file4' with boxes fill pattern 1, \
           'file5' with boxes fill empty
 
@@ -14105,18 +14115,26 @@ gnuplot using
 
 The driver first queries the X-server for a font of the exact name given,
 for example `set term x11 font "lucidasans-10"`. If this query fails, then
-the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+it tries to interpret <fontspec> as "<font>,<size>,<slant>,<weight>" 
 and to construct a full X11 font name of the form
 @example
-      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+      -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+
 @end example
 
-<font> is the base name of the font (e.g. Times or Symbol)
-<size> is the point size (defaults to 12 if not specified)
-<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
-<encoding> is set based on the current character set (help set encoding)
+@example
+ <font> is the base name of the font (e.g. Times or Symbol)
+ <size> is the point size (defaults to 12 if not specified)
+ <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+ <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
+ <encoding> is set based on the current character set (help set encoding).
+@end example
+
 So `set term x11 font "arial,15,italic"` will be translated to
 -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The <size>, <slant>, and <weight> specifications are all optional.
+If you do not specify <slant> or <weight> then you will get whatever font 
+variant the font server offers first.
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
@@ -14467,18 +14485,26 @@ gnuplot using
 
 The driver first queries the X-server for a font of the exact name given,
 for example `set term x11 font "lucidasans-10"`. If this query fails, then
-the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+it tries to interpret <fontspec> as "<font>,<size>,<slant>,<weight>" 
 and to construct a full X11 font name of the form
 @example
-      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+      -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+
 @end example
 
-<font> is the base name of the font (e.g. Times or Symbol)
-<size> is the point size (defaults to 12 if not specified)
-<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
-<encoding> is set based on the current character set (help set encoding)
+@example
+ <font> is the base name of the font (e.g. Times or Symbol)
+ <size> is the point size (defaults to 12 if not specified)
+ <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+ <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
+ <encoding> is set based on the current character set (help set encoding).
+@end example
+
 So `set term x11 font "arial,15,italic"` will be translated to
 -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The <size>, <slant>, and <weight> specifications are all optional.
+If you do not specify <slant> or <weight> then you will get whatever font 
+variant the font server offers first.
 The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
@@ -15998,7 +16024,7 @@ Please see @ref{xdtics} for details.
 @opindex cbdata
 
 
-Set color box axis date to timeseries (dates/times).  Please see @ref{xdata}.
+Set color box axis data to timeseries (dates/times).  Please see @ref{xdata}.
 
 @node cbdtics, zero, cbdata, set-show
 @subsection cbdtics
@@ -16016,7 +16042,7 @@ Set color box axis date to timeseries (dates/times).  Please see @ref{xdata}.
 @cindex nocbdtics
 
 The @ref{cbdtics} command changes tics on the color box axis to days of the
-week. Please see @ref{cbdtics} for details.
+week. Please see @ref{xdtics} for details.
 
 @node zero, zeroaxis, cbdtics, set-show
 @subsection zero
