@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.69 2003/07/02 07:45:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.70 2003/07/05 02:51:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -192,9 +192,11 @@ extend_input_line()
 #endif /* OS2_IPC */
 
     } else {
-	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN, "extend input line");
+	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN,
+				"extend input line");
 	input_line_len += MAX_LINE_LEN;
-	FPRINTF((stderr, "extending input line to %d chars\n", input_line_len));
+	FPRINTF((stderr, "extending input line to %d chars\n",
+		 input_line_len));
     }
 }
 
@@ -403,19 +405,21 @@ display_ipc_commands(void)
 
 void
 do_string_replot(s)
-char *s;
+    char *s;
 {
-    char *orig_input_line = gp_alloc(strlen(input_line)+1, "do_string_replot");
-    strcpy(orig_input_line, input_line);
-    while (input_line_len < strlen(s)+1)
+    char *orig_input_line = gp_strdup(input_line);
+
+    while (input_line_len < strlen(s) + 1)
 	extend_input_line();
-    strcpy(input_line,s);
+    strcpy(input_line, s);
     if (display_ipc_commands())
 	fprintf(stderr, "%s\n", s);
+
     do_line();
     if (!replot_disabled)
 	replotrequest();
-    strcpy(input_line,orig_input_line);
+
+    strcpy(input_line, orig_input_line);
     free(orig_input_line);
 }
 

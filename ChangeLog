@@ -1,43 +1,50 @@
+2003-07-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c (do_string_replot): Minor simplification: use
+ 	gp_strdup() to duplicate current input_line string.  Add some
+	blanks as per CodeStyle document.
+
 2003-07-04  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/command.c: Rewrite do_string() and do_string_replot() so
-	that no memory corruption occurs if extend_input_line() triggers
-	a realloc(<xxx>,input_line) during processing.
+ 	that no memory corruption occurs if extend_input_line() triggers a
+ 	realloc(<xxx>,input_line) during processing.
 
 	* term/x11.trm: Font requests to a remote X-server are very slow;
-	track font used for most recent text placement and only send a
-	font request if the current text font is different from the 
-	previous one.
+ 	track font used for most recent text placement and only send a
+ 	font request if the current text font is different from the
+ 	previous one.
 
 	* src/gplt_x11.c: Collect sequential vector draws into a single
-	polyline before sending it to the X-server. This makes wide lines
-	smoother, and gives a small speed improvement for remote displays.
+ 	polyline before sending it to the X-server. This makes wide lines
+ 	smoother, and gives a small speed improvement for remote displays.
 
 	* src/graphics.c: Replace problematic adjustment of key placement
-	below plot with a better one.
+ 	below plot with a better one.
 
 2003-07-02  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/mouse.c: DU4.0 cc compiler does not automatically promote
-	argument of sqrt to (double), so change it to double explicitly.
+ 	argument of sqrt to (double), so change it to double explicitly.
 
 	* demos/arrowstyle.dem, demos/vector.dem: Show more of what the
-	`plot with vectors <arrowstyle>` option can do.
+ 	`plot with vectors <arrowstyle>` option can do.
 
 2003-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/pm3d.c (pm3d_reset): Forgotten change of the default value from
-	'set pm3d clip1in' to 'set pm3d clip4in' in the patch from 2002-10-09.
+	* src/pm3d.c (pm3d_reset): Forgotten change of the default value
+ 	from 'set pm3d clip1in' to 'set pm3d clip4in' in the patch from
+ 	2002-10-09.
 
 2003-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/command.c (do_string_replot): Don't allocate so much of the
-	temporary buffer.
+ 	temporary buffer.
 
 2003-07-01  Ethan Merritt <merritt@u.washington.edu>
 
-	* src/graphics.c: Make sample arrow in plot key match the arrow 
-	style used by 'plot with vectors'.
+	* src/graphics.c: Make sample arrow in plot key match the arrow
+ 	style used by 'plot with vectors'.
 
 2003-06-30  Ethan Merritt <merritt@u.washington.edu>
 
