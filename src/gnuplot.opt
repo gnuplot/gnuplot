@@ -20,6 +20,7 @@ internal.obj
 interpol.obj
 matrix.obj
 misc.obj
+mouse.obj
 parse.obj
 plot.obj
 plot2d.obj
