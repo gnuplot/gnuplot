@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.56 2001/09/28 12:43:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.57 2001/10/11 15:46:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -992,6 +992,112 @@ apply_head_properties(struct position* headsize)
     }
 }
 
+static void
+place_grid()
+{
+    register struct termentry *t = term;
+    term_apply_lp_properties(&border_lp);	/* border linetype */
+    largest_polar_circle = 0;
+
+    /* select first mapping */
+    x_axis = FIRST_X_AXIS;
+    y_axis = FIRST_Y_AXIS;
+
+    /* label first y axis tics */
+    axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS,
+		     /* (GRID_Y | GRID_MY), */ ytick2d_callback);
+    /* label first x axis tics */
+    axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS,
+		     /* (GRID_X | GRID_MX), */ xtick2d_callback);
+
+    /* select second mapping */
+    x_axis = SECOND_X_AXIS;
+    y_axis = SECOND_Y_AXIS;
+
+    axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS,
+		     /* (GRID_Y2 | GRID_MY2), */ ytick2d_callback);
+    axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS,
+		     /* (GRID_X2 | GRID_MX2), */ xtick2d_callback);
+
+
+    /* select first mapping */
+    x_axis = FIRST_X_AXIS;
+    y_axis = FIRST_Y_AXIS;
+
+/* RADIAL LINES FOR POLAR GRID */
+
+    /* note that draw_clip_line takes unsigneds, but (fortunately)
+     * clip_line takes signeds
+     */
+    if (polar_grid_angle) {
+	double theta = 0;
+	int ox = map_x(0);
+	int oy = map_y(0);
+	term_apply_lp_properties(&grid_lp);
+	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
+	    /* copy ox in case it gets moved (but it shouldn't) */
+	    int oox = ox;
+	    int ooy = oy;
+	    int x = map_x(largest_polar_circle * cos(theta));
+	    int y = map_y(largest_polar_circle * sin(theta));
+	    if (clip_line(&oox, &ooy, &x, &y)) {
+		(*t->move) ((unsigned int) oox, (unsigned int) ooy);
+		(*t->vector) ((unsigned int) x, (unsigned int) y);
+	    }
+	}
+	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
+    }
+}
+
+static void
+place_arrows(int layer)
+{
+    struct arrow_def *this_arrow;
+    register struct termentry *t = term;
+    for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
+	unsigned int sx, sy, ex, ey;
+
+	if (this_arrow->layer != layer)
+	    continue;
+	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
+
+	term_apply_lp_properties(&(this_arrow->lp_properties));
+	apply_head_properties(&(this_arrow->headsize));
+	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
+    }
+}
+
+static void
+place_labels(int layer)
+{
+    struct text_label *this_label;
+    register struct termentry *t = term;
+    if ((t->pointsize)) {
+	(*t->pointsize) (pointsize);
+    }
+    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
+
+	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
+
+	if (this_label->layer != layer)
+	    continue;
+	map_position(&this_label->place, &x, &y, "label");
+	if (this_label->rotate && (*t->text_angle) (1)) {
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
+	    (*t->text_angle) (0);
+	} else {
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point) (x, y, this_label->pointstyle);
+	}
+    }
+}
+
 void
 do_plot(plots, pcount)
     struct curve_points *plots;
@@ -1003,8 +1109,6 @@ do_plot(plots, pcount)
     register int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
     register int key_count = 0;
     /* only a Pyramid would have this many registers! */
-    struct text_label *this_label;
-    struct arrow_def *this_arrow;
     char *s, *e;
 
     x_axis = FIRST_X_AXIS;
@@ -1061,57 +1165,8 @@ do_plot(plots, pcount)
     term_start_plot();
 
 /* DRAW TICS AND GRID */
-    term_apply_lp_properties(&border_lp);	/* border linetype */
-    largest_polar_circle = 0;
-
-    /* select first mapping */
-    x_axis = FIRST_X_AXIS;
-    y_axis = FIRST_Y_AXIS;
-
-    /* label first y axis tics */
-    axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS,
-		     /* (GRID_Y | GRID_MY), */ ytick2d_callback);
-    /* label first x axis tics */
-    axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS,
-		     /* (GRID_X | GRID_MX), */ xtick2d_callback);
-
-    /* select second mapping */
-    x_axis = SECOND_X_AXIS;
-    y_axis = SECOND_Y_AXIS;
-
-    axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS,
-		     /* (GRID_Y2 | GRID_MY2), */ ytick2d_callback);
-    axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS,
-		     /* (GRID_X2 | GRID_MX2), */ xtick2d_callback);
-
-
-    /* select first mapping */
-    x_axis = FIRST_X_AXIS;
-    y_axis = FIRST_Y_AXIS;
-
-/* RADIAL LINES FOR POLAR GRID */
-
-    /* note that draw_clip_line takes unsigneds, but (fortunately)
-     * clip_line takes signeds
-     */
-    if (polar_grid_angle) {
-	double theta = 0;
-	int ox = map_x(0);
-	int oy = map_y(0);
-	term_apply_lp_properties(&grid_lp);
-	for (theta = 0; theta < 6.29; theta += polar_grid_angle) {
-	    /* copy ox in case it gets moved (but it shouldn't) */
-	    int oox = ox;
-	    int ooy = oy;
-	    int x = map_x(largest_polar_circle * cos(theta));
-	    int y = map_y(largest_polar_circle * sin(theta));
-	    if (clip_line(&oox, &ooy, &x, &y)) {
-		(*t->move) ((unsigned int) oox, (unsigned int) ooy);
-		(*t->vector) ((unsigned int) x, (unsigned int) y);
-	    }
-	}
-	draw_clip_line(ox, oy, map_x(largest_polar_circle * cos(theta)), map_y(largest_polar_circle * sin(theta)));
-    }
+    if (grid_layer == 0 || grid_layer == -1)
+	place_grid();
 
 /* DRAW AXES */
     /* after grid so that axes linetypes are on top */
@@ -1235,44 +1290,12 @@ do_plot(plots, pcount)
 	}
 	free(str);
     }
+
 /* PLACE LABELS */
-    if ((t->pointsize)) {
-	(*t->pointsize) (pointsize);
-    }
-    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
-
-	unsigned int x, y;
-	int htic;
-	int vtic;
-
-	get_offsets(this_label, t, &htic, &vtic);
-
-	if (this_label->layer)
-	    continue;
-	map_position(&this_label->place, &x, &y, "label");
-	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
-	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point) (x, y, this_label->pointstyle);
-	}
-    }
+    place_labels( 0 );
 
 /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
-
-	if (this_arrow->layer)
-	    continue;
-	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
-
-	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
-    }
+    place_arrows( 0 );
 
 /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
@@ -1546,44 +1569,15 @@ do_plot(plots, pcount)
 	}
     }
 
+/* DRAW TICS AND GRID */
+    if (grid_layer == 1)
+	place_grid();
+
 /* PLACE LABELS */
-    if ((t->pointsize)) {
-	(*t->pointsize) (pointsize);
-    }
-    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
-
-	unsigned int x, y;
-	int htic;
-	int vtic;
-
-	get_offsets(this_label, t, &htic, &vtic);
-
-	if (this_label->layer == 0)
-	    continue;
-	map_position(&this_label->place, &x, &y, "label");
-	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
-	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point) (x, y, this_label->pointstyle);
-	}
-    }
+    place_labels( 1 );
 
 /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
-
-	if (this_arrow->layer == 0)
-	    continue;
-	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
-
-	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
-    }
+    place_arrows( 1 );
 
     term_end_plot();
 }

@@ -1,3 +1,12 @@
+2001-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/axis.h src/axis.c src/graphics.c src/save.c src/set.c
+	src/unset.c src/show.c src/graph3d.c docs/gnuplot.doc NEWS:
+	New options for 'set grid': {layerdefault | front | back}.
+
+	* src/save.c: Labels and arrows were not saving "back", "front"
+	option.
+
 2001-10-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (boundary3d): Fix computation of current aspect

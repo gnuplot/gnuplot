@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.83 2001/09/28 12:45:05 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.84 2001/10/06 10:33:52 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4311,6 +4311,7 @@ C ... and restart the table:
                 {{no}{m}x2tics} {{no}{m}y2tics}
                 {{no}{m}cbtics}
                 {polar {<angle>}}
+                {layerdefault | front | back}
                 { {linestyle <major_linestyle>}
                   | {linetype | lt <major_linetype>}
                     {linewidth | lw <major_linewidth>}
@@ -4327,7 +4328,7 @@ C ... and restart the table:
 
  Additionally, a polar grid can be selected for 2-d plots---circles are drawn
  to intersect the selected tics, and radial lines are drawn at definable
- intervals.  (The interval is given in degrees or radians ,depending on the
+ intervals.  (The interval is given in degrees or radians, depending on the
  `set angles` setting.)  Note that a polar grid is no longer automatically
  generated in polar mode.
 
@@ -4338,7 +4339,12 @@ C ... and restart the table:
  If no linetype is specified for the minor gridlines, the same linetype as the
  major gridlines is used.  The default polar angle is 30 degrees.
 
- Z grid lines are drawn on the back of the plot.  This looks better if a
+ If `front` is given, the grid is drawn on top of the graphed data. If
+ `back` is given, the grid is drawn underneath the graphed data. Using 
+ `front` will prevent the grid from being obscured by dense data. The default
+ setup, `layerdefault`, is 'back' for 2d plots and 'front' for 3d plots.
+
+ Z grid lines are drawn on the bottom of the plot.  This looks better if a
  partial box is drawn around the plot---see `set border`.
 3 hidden3d
 ?commands set hidden3d

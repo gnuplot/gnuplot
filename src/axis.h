@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.10 2001/08/22 14:15:33 broeker Exp $
+ * $Id: axis.h,v 1.11 2001/08/31 17:56:35 broeker Exp $
  *
  */
 
@@ -289,6 +289,9 @@ extern const lp_style_type default_axis_zeroaxis;
 
 /* default grid linetype, to be used by 'unset grid' and 'reset' */
 extern const struct lp_style_type default_grid_lp;
+
+/* grid layer: -1 default, 0 back, 1 front */
+extern int grid_layer;
 
 /* global variables for communication with the tic callback functions */
 /* FIXME HBB 20010806: had better be collected into a struct that's

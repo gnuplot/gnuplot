@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.28 2001/09/08 00:50:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.29 2001/09/17 12:04:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -323,6 +323,8 @@ set y2data%s\n",
 	SAVE_GRID(COLOR_AXIS);
 	fputs("\n", fp);
 #undef SAVE_GRID
+
+	fprintf(fp, "set grid %s\n", (grid_layer==-1) ? "layerdefault" : ((grid_layer==0) ? "back" : "front"));
     }	
 
     fprintf(fp, "set key title \"%s\"\n", conv_text(key_title));
@@ -389,6 +391,7 @@ set y2data%s\n",
 	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
 	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
+	fprintf(fp, " %s", (this_arrow->layer==0) ? "back" : "front");
 	if (-1 == this_label->pointstyle)
 	    fprintf(fp, " nopointstyle");
 	else {
@@ -405,8 +408,9 @@ set y2data%s\n",
 	save_position(fp, &this_arrow->start);
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
-	fprintf(fp, " %s linetype %d linewidth %.3f\n",
+	fprintf(fp, " %s %s linetype %d linewidth %.3f\n",
 		this_arrow->head ? "" : " nohead",
+		(this_arrow->layer==0) ? "back" : "front",
 		this_arrow->lp_properties.l_type + 1,
 		this_arrow->lp_properties.l_width);
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.47 2001/10/11 15:46:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.48 2001/10/31 15:32:38 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -453,6 +453,58 @@ get_arrow3d(arrow, sx, sy, ex, ey)
     }
 }
 
+static void
+place_labels(int layer)
+{
+    struct termentry *t = term;
+    struct text_label *this_label;
+    if ((t->pointsize)) {
+	(*t->pointsize)(pointsize);
+    }
+    for (this_label = first_label; this_label != NULL;
+	 this_label = this_label->next) {
+
+	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
+
+	if (this_label->layer != layer)
+	    continue;
+	map3d_position(&this_label->place, &x, &y, "label");
+	if (this_label->rotate && (*t->text_angle) (1)) {
+	    write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, CENTRE, 1, this_label->font);
+	    (*t->text_angle) (0);
+	} else {
+	    write_multiline(x + htic, y + vtic, this_label->text,
+			    this_label->pos, CENTRE, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point)(x, y, this_label->pointstyle);
+	}
+    }
+}
+
+static void
+place_arrows(int layer)
+{
+    struct termentry *t = term;
+    struct arrow_def *this_arrow;
+    for (this_arrow = first_arrow; this_arrow != NULL;
+	 this_arrow = this_arrow->next) {
+	unsigned int sx, sy, ex, ey;
+
+	if (this_arrow->layer != layer)
+	    continue;
+	get_arrow3d(this_arrow, &sx, &sy, &ex, &ey);
+	term_apply_lp_properties(&(this_arrow->lp_properties));
+	apply_head_properties(&(this_arrow->headsize));
+	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
+    }
+}
+
 /* we precalculate features of the key, to save lots of nested
  * ifs in code - x,y = user supplied or computed position of key
  * taken to be inner edge of a line sample
@@ -476,8 +528,6 @@ do_3dplot(plots, pcount, quick)
     struct surface_points *this_plot = NULL;
     unsigned int xl, yl;
     /* double ztemp, temp; unused */
-    struct text_label *this_label;
-    struct arrow_def *this_arrow;
     transform_matrix mat;
     int key_count;
     char *s, *e;
@@ -578,6 +628,10 @@ do_3dplot(plots, pcount, quick)
     /* must come before using draw_3d_graphbox() the first time */
     setup_3d_box_corners();
 
+    /* DRAW GRID AND BORDER */
+    if (grid_layer == 0)
+	draw_3d_graphbox(plots, pcount);
+
 #ifdef PM3D
     /* DRAW PM3D ALL COLOUR SURFACES */
     can_pm3d = 0;
@@ -648,46 +702,10 @@ do_3dplot(plots, pcount, quick)
     }
 
     /* PLACE LABELS */
-    if ((t->pointsize)) {
-	(*t->pointsize)(pointsize);
-    }
-    for (this_label = first_label; this_label != NULL;
-	 this_label = this_label->next) {
-
-	unsigned int x, y;
-	int htic;
-	int vtic;
-
-	get_offsets(this_label, t, &htic, &vtic);
-
-	if (this_label->layer)
-	    continue;
-	map3d_position(&this_label->place, &x, &y, "label");
-	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 1, this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 0, this_label->font);
-	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point)(x, y, this_label->pointstyle);
-	}
-    }
+    place_labels(0);
 
     /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL;
-	 this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
-
-	if (this_arrow->layer)
-	    continue;
-	get_arrow3d(this_arrow, &sx, &sy, &ex, &ey);
-	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
-    }
+    place_arrows(0);
 
 #ifndef LITE
     if (hidden3d && draw_surface && !quick) {
@@ -1114,49 +1132,15 @@ do_3dplot(plots, pcount, quick)
     }
 #endif
 
-    draw_3d_graphbox(plots, pcount);
-    
+    /* DRAW GRID AND BORDER */
+    if (grid_layer == 1 || grid_layer == -1)
+	draw_3d_graphbox(plots, pcount);
+
     /* PLACE LABELS */
-    if ((t->pointsize)) {
-	(*t->pointsize)(pointsize);
-    }
-    for (this_label = first_label; this_label != NULL;
-	 this_label = this_label->next) {
-
-	unsigned int x, y;
-	int htic;
-	int vtic;
-
-	get_offsets(this_label, t, &htic, &vtic);
-
-	if (this_label->layer == 0)
-	    continue;
-	map3d_position(&this_label->place, &x, &y, "label");
-	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 1, this_label->font);
-	    (*t->text_angle) (0);
-	} else {
-	    write_multiline(x + htic, y + vtic, this_label->text,
-			    this_label->pos, CENTRE, 0, this_label->font);
-	}
-	if (-1 != this_label->pointstyle) {
-	    (*t->point)(x, y, this_label->pointstyle);
-	}
-    }
+    place_labels(1);
 
     /* PLACE ARROWS */
-    for (this_arrow = first_arrow; this_arrow != NULL;
-	 this_arrow = this_arrow->next) {
-	unsigned int sx, sy, ex, ey;
-
-	if (this_arrow->layer == 0)
-	    continue;
-	get_arrow3d(this_arrow, &sx, &sy, &ex, &ey);
-	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize));
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
-    }
+    place_arrows(1);
 
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */

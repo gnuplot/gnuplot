@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.61 2001/09/08 00:50:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.62 2001/10/05 16:36:19 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1480,6 +1480,8 @@ show_grid()
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
 		polar_grid_angle / ang2rad,
 		(ang2rad == 1.0) ? "radians" : "degrees");
+
+    fprintf(stderr, "\tGrid drawn at %s\n", (grid_layer==-1) ? "default layer" : ((grid_layer==0) ? "back" : "front"));
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.63 2001/09/27 19:52:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.64 2001/10/06 10:33:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1384,6 +1384,15 @@ set_grid()
 		}
 	    } else if (almost_equals(c_token,"nopo$lar")) {
 		polar_grid_angle = 0; /* not polar grid */
+		c_token++;
+	    } else if (equals(c_token,"back")) {
+		grid_layer = 0;
+		c_token++;
+	    } else if (equals(c_token,"front")) {
+		grid_layer = 1;
+		c_token++;
+	    } else if (almost_equals(c_token,"layerd$efault")) {
+		grid_layer = -1;
 		c_token++;
 	    } else
 		break; /* might be a linetype */
