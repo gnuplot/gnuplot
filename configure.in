@@ -1,13 +1,15 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.123 2003/01/27 17:06:10 lhecking Exp $
+dnl $Id: configure.in,v 1.124 2003/01/28 21:22:15 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
 
 dnl this is actually major.minor ...
+dnl note that for a non-beta release, we need to
+dnl remove the letter from VERSION
 PKG_MAJOR="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $PKG_MAJOR.$PATCHLEVEL)
@@ -69,10 +71,7 @@ AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
 dnl Apparently, -lNeXT_s is needed on NeXT
 dnl _instead_ of -lm ...
-AC_CHECK_FUNC(sin)
-if test "$ac_cv_func_sin" = no ; then
-  AC_CHECK_LIB(m,sin)
-fi
+AC_CHECK_FUNC(sin,,[AC_CHECK_LIB(m,sin)])
 
 dnl Header files. ANSI first
 dnl We prefer that the absense of a macro is the norm, so in syscfg.h
@@ -99,7 +98,9 @@ if test "$ac_cv_header_math_h" = yes ; then
     AC_MSG_RESULT(no))
 fi
 
-test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
+if test "$ac_cv_header_sys_stat_h" = yes; then
+  AC_HEADER_STAT
+fi
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
@@ -158,7 +159,7 @@ AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
              [ Define if we have sigsetjmp(). ])],
   AC_MSG_RESULT(no))
 
-if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
+if test "$ac_cv_func_pclose" = yes -a "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES,1,[ Define if you do have the popen and pclose functions. ])
 fi
 
@@ -764,11 +765,12 @@ test "$gp_datadir" = NONE/share && gp_datadir=/usr/local/share
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-  Where is the help file?           $gp_datadir/gnuplot.gih
+  Where is the help file?           $gp_datadir/share/gnuplot/$VERSION/gnuplot.gih
 ])
 
-test "$with_lasergnu" = yes && \
+if test "$with_lasergnu" = yes; then
   AC_MSG_RESULT([  Install lasergnu printer script])
+fi
 
 if test "$with_linux_vga" = yes; then
   AC_MSG_RESULT([  Use the Linux SVGA console driver
@@ -779,18 +781,25 @@ if test "$with_linux_vga" = yes; then
   fi
 fi
 
-test "$GGI_SUPPORT" = yes && \
+if test "$GGI_SUPPORT" = yes; then
   AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
+fi
 
-test "$ac_cv_header_ggi_xmi_h" = yes && \
+if test "$ac_cv_header_ggi_xmi_h" = yes; then
   AC_MSG_RESULT([  Enable ggi's xmi support for pm3d (EXPERIMENTAL)])
+fi
 
 if test "$with_readline" != no; then
   if test "$with_readline" != yes; then
     AC_MSG_RESULT([  Use GNU readline library])
-      test -n "$gp_tcap" && AC_MSG_RESULT([    with $gp_tcap])
-      test "$enable_history_file" = yes && \
+
+    if test -n "$gp_tcap"; then
+      AC_MSG_RESULT([    with $gp_tcap])
+    fi
+    if test "$enable_history_file" = yes; then
         AC_MSG_RESULT([    enable history file])
+    fi
+
   else
     AC_MSG_RESULT([  Use builtin minimal readline])
   fi
@@ -804,14 +813,17 @@ if test x"$with_plot" != x; then
   fi
 fi
 
-test "$ac_cv_lib_gd_gdImageJpeg" = yes && \
+if test "$ac_cv_lib_gd_gdImageJpeg" = yes; then
   AC_MSG_RESULT([  Enable generation of JPEG files])
+fi
 
-test "$ac_cv_lib_gd_gdImageGif" = yes && \
+if test "$ac_cv_lib_gd_gdImageGif" = yes; then
   AC_MSG_RESULT([  Enable generation of GIF files])
+fi
 
-test "$with_png" != no && \
+if test "$with_png" != no; then
   AC_MSG_RESULT([  Enable generation of PNG files])
+fi
 
 if test "$have_gd_png" = yes; then
   AC_MSG_RESULT([    using gd driver])
@@ -819,50 +831,64 @@ else
   AC_MSG_RESULT([    using old driver])
 fi
 
-test "$have_ttf" = yes && \
+if test "$have_ttf" = yes; then
   AC_MSG_RESULT([  Enable TTF fonts with gd driver])
+fi
 
-#test "$with_gif" = png && \
-#  AC_MSG_RESULT([  Set term gif will produce PNG images instead ])
+if test "$with_gif" = png; then
+  AC_MSG_RESULT([  Set term gif will produce PNG images instead ])
+fi
 
-test "$ac_cv_header_pdflib_h" = yes && \
+if test "$ac_cv_header_pdflib_h" = yes; then
   AC_MSG_RESULT([  Enable generation of PDF files])
+fi
 
-test "$with_cwdrc" = yes && \
+if test "$with_cwdrc" = yes; then
   AC_MSG_RESULT([  Check current directory for .gnuplot file])
+fi
 
-test "$with_lisp_files" != no && \
+if test "$with_lisp_files" != no; then
   AC_MSG_RESULT([  Build gnuplot-mode for X/Emacs])
+fi
 
-test "$with_row_help" = no && \
+if test "$with_row_help" = no; then
   AC_MSG_RESULT([  Sort help/subtopic tables by column])
+fi
 
-test "$TUTORIAL" = tutorial && \
+if test "$TUTORIAL" = tutorial; then
   AC_MSG_RESULT([  Build LaTeX tutorial])
+fi
 
 if test "$no_x" != yes; then
   AC_MSG_RESULT([  Use the X Window System ])
-  test "$enable_mouse" = yes && \
+  if test "$enable_mouse" = yes; then
     AC_MSG_RESULT([  Enable mouse for X11])
+  fi
 fi
 
-test "$enable_pm3d" = yes && \
+if test "$enable_pm3d" = yes; then
   AC_MSG_RESULT([  Enable pm3d])
+fi
 
-test "$enable_filledboxes" = yes && \
+if test "$enable_filledboxes" = yes; then
   AC_MSG_RESULT([  Enable filledboxes])
+fi
 
-test "$enable_relative_boxwidth" = yes && \
+if test "$enable_relative_boxwidth" = yes; then
   AC_MSG_RESULT([  Enable relative boxwidths])
+fi
 
-test "$enable_thin_splines" = yes && \
+if test "$enable_thin_splines" = yes; then
   AC_MSG_RESULT([  Enable thin plate splines])
+fi
 
-test "$enable_iris" = yes && \
+if test "$enable_iris" = yes; then
   AC_MSG_RESULT([  Enable IRIS terminal])
+fi
 
-test "$enable_mgr" = yes && \
+if test "$enable_mgr" = yes; then
   AC_MSG_RESULT([  Enable MGR terminal])
+fi
 
 if test "$enable_rgip" = yes ; then
   AC_MSG_RESULT([  Enable RGIP terminal])
