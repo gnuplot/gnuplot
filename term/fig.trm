@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.42 2004/07/01 17:10:13 broeker Exp $
+ * $Id: fig.trm,v 1.43 2004/07/15 13:05:40 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -257,6 +257,7 @@ static struct gen_table FIG_opts[] =
     { "si$ze", FIG_SIZE },
     { "sm$all", FIG_SMALL },
     { "so$lid", FIG_SOLID },
+    { "linew$idth", FIG_THICKNESS },
     { "t$hickness", FIG_THICKNESS },
     { "texth$idden", FIG_HIDDENTEXT },
     { "textn$ormal", FIG_NORMALTEXT },
@@ -275,7 +276,7 @@ FIG_options()
     "expecting monochrome, color, small, big, portrait, landscape,\n\
  \t inches, metric, size <number> <number>,  fontsize <number>,\n\
  \t solid, dashed, textnormal, textspecial, texthidden, textrigid,\n\
- \t thickness <numer>, depth <number>, pointsmax <number> or\n\
+ \t thickness <number>, depth <number>, pointsmax <number> or\n\
  \t version <number>";
 
     int parse_error = FALSE;
@@ -475,7 +476,7 @@ FIG_options()
 	    text_flags,
 	    "fontsize", (FIG_font_s > 0 ? FIG_font_s :
 			 (FIG_is_big ? BFIG_FONT_S : FIG_FONT_S)),
-	    "thickness", FIG_default_thickness, "depth", FIG_depth,
+	    "linewidth", FIG_default_thickness, "depth", FIG_depth,
             "version", FIG_version );	/* JFS, KB, ULIG */
     if (xsize_t > 0. && ysize_t > 0.) {
 	if (xsize_t - (int) xsize_t == 0. && ysize_t - (int) ysize_t == 0.)
@@ -1201,7 +1202,7 @@ START_HELP(fig)
 "                        {solid | dashed}",
 "                        {fontsize <fsize>}",
 "                        {textnormal | {textspecial texthidden textrigid}}",
-"                        {thickness <units>}",
+"                        {{thickness|linewidth} <units>}",
 "                        {depth <layer>}",
 "                        {version <number>}",
 "",
@@ -1236,7 +1237,7 @@ START_HELP(fig)
 " of plot elements (with respect to the default depth) can be controlled by",
 " adding a multiple of 1000 to <linetype>.  The depth is then <layer> +",
 " <linetype>/1000 and the thickness is (<linetype>%1000)/100 or, if that is",
-" zero, the default line thickness.",
+" zero, the default line thickness. `linewidth` is a synonym for `thickness`.",
 "",
 " Additional point-plot symbols are also available with the `fig` driver. The",
 " symbols can be used through `pointtype` values % 100 above 50, with different",
