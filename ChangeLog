@@ -1,3 +1,20 @@
+2000-11-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Remove --enable-emf and --enable-epslatex options.
+
+	* src/color.c, src/color.h, src/getcolor.c, src/pm3d.c, src/pm3d.h:
+	Add RCS id tag, minor changes.
+
+	* src/contour.c, src/contour.h, src/graph3d.h, src/plot3d.h:
+	Remove trailing commas in enums.
+
+	* src/term.h: Include emf and epslatex driver unconditionally.
+
+	* term/emf.trm: Remove C++ comment.
+
+	* term/post.trm: Add missing backslashes in LaTeX part of terminal
+	documentation.
+
 2000-02-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/color.c (make_palette, filled_polygon)
