@@ -396,7 +396,7 @@ command.o: command.c fit.h help.h setshow.h
 	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
 
 show.o: show.c plot.h setshow.h
-	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
 
 term.o: term.c term.h $(CORETERM)
 	$(COMPILE) -I./term -I$(top_srcdir)/term -c $<
