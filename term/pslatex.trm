@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.51 2005/02/13 18:44:47 sfeam Exp $
+ * $Id: pslatex.trm,v 1.52 2005/02/14 09:36:48 mikulik Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -770,7 +770,7 @@ EPSLATEX_linetype(int linetype)
     }
 }
 
-
+#ifdef PM3D
 TERM_PUBLIC void
 EPSLATEX_set_color(t_colorspec *colorspec)
 {
@@ -798,6 +798,7 @@ EPSLATEX_set_color(t_colorspec *colorspec)
 	    fprintf(gpoutfile, "    \\color[gray]{%s}%%\n",save_space(gray));
     }
 }
+#endif
 
 
 #endif /* TERM_BODY */
