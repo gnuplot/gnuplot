@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.13 2000/11/20 08:07:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.14 2000/11/20 19:48:00 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -569,11 +569,12 @@ apply_zoom(struct t_zoom *z)
 	return;
     }
 
-    sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]", zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
-    do_string(s);
-
-    sprintf(s, "set x2r[% #g:% #g]; set y2r[% #g:% #g]",
-	    zoom_now->x2min, zoom_now->x2max, zoom_now->y2min, zoom_now->y2max);
+    sprintf(s, "set xr[% #g:% #g]; set yr[% #g:% #g]",
+		zoom_now->xmin, zoom_now->xmax, zoom_now->ymin, zoom_now->ymax);
+    if (!is_3d_plot) {
+	sprintf(s+strlen(s), "; set x2r[% #g:% #g]; set y2r[% #g:% #g]",
+		zoom_now->x2min, zoom_now->x2max, zoom_now->y2min, zoom_now->y2max);
+    }
     do_string_replot(s);
 }
 
