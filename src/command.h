@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.1 1999/06/11 18:55:51 lhecking Exp $ */
+/* $Id: command.h,v 1.2 1999/06/14 19:20:58 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -82,5 +82,14 @@ extern __far int num_tokens, c_token;
 #else
 extern int num_tokens, c_token;
 #endif
+
+enum command_id {
+    CMD_INVALID,        /* invalid command */
+    CMD_NULL,           /* null command */
+    CMD_CALL, CMD_CD, CMD_CLEAR, CMD_EXIT, CMD_FIT, CMD_HELP, CMD_IF,
+    CMD_LOAD, CMD_PAUSE, CMD_PLOT, CMD_PRINT, CMD_PWD, CMD_QUIT, CMD_REPLOT,
+    CMD_REREAD, CMD_RESET, CMD_SAVE, CMD_SCREENDUMP, CMD_SET, CMD_SHELL,
+    CMD_SHOW, CMD_SPLOT, CMD_TEST, CMD_TESTTIME, CMD_UPDATE
+};
 
 #endif /* GNUPLOT_COMMAND_H */
