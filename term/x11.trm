@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.107 2004/04/17 20:50:25 sfeam Exp $
+ * $Id: x11.trm,v 1.108 2004/05/03 18:22:59 sfeam Exp $
  *
  */
 
@@ -975,7 +975,7 @@ X11_init()
  */
 
 #define GO(x) \
-{ \
+do { \
    char buffer[512]; int status; struct iosb iosb;\
    sprintf x; \
    if (strlen(buffer) >= MBXMXMSG )  { \
@@ -987,7 +987,7 @@ X11_init()
    status = sys$qiow(0, X11_channel, IO$_WRITEVBLK, &iosb, 0, 0, buffer, strlen(buffer), 0, 0, 0, 0); \
    if ((status & SS$_NORMAL) == SS$_NORMAL) status = iosb.stat; \
    if((status & SS$_NORMAL) != SS$_NORMAL) exit(status); \
- }
+ } while (0)
 
 #define PRINT0(fmt)          GO( (buffer, fmt) )
 #define PRINT1(fmt,p1)       GO( (buffer, fmt,p1) )
