@@ -190,14 +190,14 @@ TERM_PUBLIC void PSTRICKS_init()
 {
     PSTRICKS_posx = PSTRICKS_posy = 0;
     PSTRICKS_linetype(-1);
-    fputs("%% GNUPLOT: LaTeX picture using PSTRICKS macros\n", gpoutfile);
+    fputs("% GNUPLOT: LaTeX picture using PSTRICKS macros\n", gpoutfile);
 }
 
 
 TERM_PUBLIC void PSTRICKS_graphics()
 {
     fputs("\
-%% Define new PST objects, if not already defined\n\
+% Define new PST objects, if not already defined\n\
 \\ifx\\PSTloaded\\undefined\n\
 \\def\\PSTloaded{t}\n\
 \\psset{arrowsize=.01 3.2 1.4 .3}\n\

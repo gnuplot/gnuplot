@@ -192,14 +192,16 @@ TERM_PUBLIC void PSLATEX_init()
 	    free(PSLATEX_psfile);
 	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 3, "pslatex aux filename");
 	if (PSLATEX_psfile) {
-            /* including . */
+	/* including . */
 	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex - outstr + 1);
 	    strcpy(PSLATEX_psfile + (dotIndex - outstr) + 1, "ps");
 	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile, "w")) == (FILE *) NULL) {
-		fprintf(stderr, "Cannot open aux file %s for output\n",	PSLATEX_psfile);
+		fprintf(stderr, "Cannot open aux file %s for output\n",
+			PSLATEX_psfile);
 	    }
 	} else {
-	    fprintf(stderr, "Cannot make PostScript file name from %s\n\
+	    fprintf(stderr, "\
+Cannot make PostScript file name from %s\n\
 Turning off auxfile option\n", outstr);
 	    PSLATEX_auxFile = NULL;
 	}
@@ -215,6 +217,7 @@ Turning off auxfile option\n", outstr);
     } else {
 
 	/* write plain TeX header */
+
 	fputs("\
 % GNUPLOT: plain TeX with Postscript\n\
 \\begingroup\n\
@@ -535,17 +538,16 @@ double ps;
 #endif
 
 TERM_TABLE_START(pslatex_driver)
-   "pslatex", "LaTeX picture environment with PostScript \\specials",
+    "pslatex", "LaTeX picture environment with PostScript \\specials",
     PSLATEX_XMAX, PSLATEX_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
     PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
     PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
     PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
     PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
-    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */,
-    0 /*resume */ , 0 /*fillbox */ ,
+    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
+    , 0 /*resume */ , 0 /*fillbox */ ,
     PSLATEX_linewidth
 TERM_TABLE_END(pslatex_driver)
-
 #undef LAST_TERM
 #define LAST_TERM pslatex_driver
 
@@ -556,11 +558,10 @@ TERM_TABLE_START(pstex_driver)
     PSLATEX_text, null_scale, PSLATEX_graphics, PSLATEX_move,
     PSLATEX_vector, PSLATEX_linetype, PSLATEX_put_text, PSLATEX_text_angle,
     PSLATEX_justify_text, PSLATEX_point, do_arrow, set_font_null,
-    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */, 
-    0 /*resume */ , 0 /*fillbox */ ,
+    PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
+    , 0 /*resume */ , 0 /*fillbox */ ,
     PSLATEX_linewidth
 TERM_TABLE_END(pstex_driver)
-
 #undef LAST_TERM
 #define LAST_TERM pstex_driver
 

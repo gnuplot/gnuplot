@@ -352,7 +352,7 @@ TERM_PUBLIC void TPIC_graphics()
     fprintf(gpoutfile, begin, "%% ", t->xmax, t->ymax - top - bottom, 0, bottom,
 	    "trim top & bottom margins");
 
-    fputs("\\footnotesize%%\n", gpoutfile);
+    fputs("\\footnotesize%\n", gpoutfile);
 }
 
 TERM_PUBLIC void TPIC_move(x, y)
@@ -851,7 +851,7 @@ unsigned int y;			/* absolute coord */
 {
     fprintf(gpoutfile, "\\put(%u,%u){", x, y);	/* start putting */
     tpic_path(0, 0);
-    fputs("}%%\n", gpoutfile);	/* end putting */
+    fputs("}%\n", gpoutfile);	/* end putting */
     return;
 }
 
@@ -867,7 +867,7 @@ int y;
 
 void tpic_flush()
 {
-    fputs("\\special{fp}%%\n", gpoutfile);
+    fputs("\\special{fp}%\n", gpoutfile);
     return;
 }
 
