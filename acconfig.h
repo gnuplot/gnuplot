@@ -33,10 +33,13 @@
 #undef fd_set_size_t
 
 /* Define if you are using the GNU readline library.  */
-#undef GNU_READLINE
+#undef HAVE_LIBREADLINE
 
 /* Define if your libplot.a is from GNU plotutils.  */
 #undef GNU_PLOTUTILS
+
+/* Define if you want to use the history feature with GNU readline.  */
+#undef GNUPLOT_HISTORY
 
 /* Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH

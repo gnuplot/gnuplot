@@ -73,11 +73,38 @@ extern smg$create_key_table();
 # endif
 #endif /* _Windows */
 
-/* GNU readline stuff */
-#ifdef GNU_READLINE
+/* GNU readline
+ * Only required by two files directly,
+ * so I don't put this into a header file. -lh
+ */
+#ifdef HAVE_LIBREADLINE
 # include <readline/readline.h>
 # include <readline/history.h>
-#endif
+extern int rl_complete_with_tilde_expansion;
+
+/* enable gnuplot history with readline */
+# ifdef GNUPLOT_HISTORY
+#  include <readline/tilde.h>
+#  ifndef GNUPLOT_HISTORY_FILE
+#   define GNUPLOT_HISTORY_FILE "~/gnuplot.history"
+#  endif
+#  ifndef HISTORY_SIZE
+/* Some more or less arbitrary value :) */
+#   define HISTORY_SIZE 42
+#  endif
+/* 
+ * The next variable is a pointer to the value returned from 'tilde_expand()'.
+ * This function expands '~' to the user's home directory, or $HOME,
+ * UN*X, AmigaOS, MSDOS.
+ * Depending on your OS you have to make sure that the "$HOME" environment
+ * variable exitsts.  You are responsible for valid values.
+ */
+char *expanded_history_filename;
+
+static void wrapper_for_write_history __PROTO((void));
+
+# endif /* GNUPLOT_HISTORY */
+#endif /* HAVE_LIBREADLINE */
 
 extern FILE *gpoutfile;
 
@@ -89,11 +116,6 @@ TBOOLEAN do_load_arg_substitution = FALSE;
 char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 char *infile_name = NULL;	/* name of command file; NULL if terminal */
-
-#ifdef GNU_READLINE
-extern char *rl_readline_name;
-extern int rl_complete_with_tilde_expansion;
-#endif
 
 #ifdef X11
 extern int X11_args __PROTO((int, char **));
@@ -335,7 +357,7 @@ char **argv;
     unsigned int status[2] = { 1, 0 };
 #endif
 
-#ifdef GNU_READLINE
+#ifdef HAVE_LIBREADLINE
     using_history();
     rl_readline_name = argv[0];
     rl_complete_with_tilde_expansion = 1;
@@ -420,8 +442,31 @@ char **argv;
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
 
-	if (interactive && term != 0)	/* not unknown */
+	if (interactive && term != 0) {  /* not unknown */
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+	    FPRINTF((stderr, "Before read_history\n));
+	    expanded_history_filename = tilde_expand (GNUPLOT_HISTORY_FILE);
+	    FPRINTF((stderr, "expanded_history_filename = %s\n", expanded_history_filename));
+	    read_history (expanded_history_filename);
+           /* 
+            * It is safe to ignore the return values of 'atexit()' and
+	    * 'on_exit()'. In the worst case, there is no history of your
+	    * currrent session and you have to type all again in your next
+	    * session.
+            * This is the default behaviour (traditional reasons), too.
+            * In case you don't have one of these functions, or you don't
+	    * want to use them, 'write_history()' is called directly.
+            */
+#if defined (HAVE_ATEXIT)
+	    atexit (wrapper_for_write_history);
+#elif defined (HAVE_ON_EXIT)
+	    on_exit (wrapper_for_write_history);
+#endif /* !HAVE_ATEXIT */
+
+#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
+
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
+	} /* if (interactive && term != 0) */
     } else {
 	/* come back here from int_error() */
 #ifdef AMIGA_SC_6_1
@@ -494,6 +539,13 @@ char **argv;
 	/* take commands from stdin */
 	while (!com_line());
     }
+
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+#if !defined(HAVE_ATEXIT) && !defined(HAVE_ON_EXIT)
+/* You should be here if you neither have 'atexit()' nor 'on_exit()' */
+    wrapper_for_write_history();
+#endif /* !HAVE_ATEXIT && !HAVE_ON_EXIT */
+#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
 
     term_reset();
 
@@ -679,3 +731,16 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
     return 0;
 }
 #endif
+
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
+static void
+wrapper_for_write_history ()
+{
+    if (!write_history (expanded_history_filename)) {
+	/* if writing was successful, truncate history
+	 *  to HOSTORY_SIZE lines. */
+          history_truncate_file (expanded_history_filename, HISTORY_SIZE);
+    }
+}
+#endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
+

@@ -63,9 +63,9 @@ INSTALL=install
 #   gnuplot prompts have been noted when this feature is selected
 #   on IBM RS/6000 AIX, and compile errors are encountered on
 #   Sequent Dynix 3 and Convex OS 9.0. If seems to work with ConvexOS 10.1.
-# GNU_READLINE
+# HAVE_LIBREADLINE
 #   If you want to use the more complex gnu version of readline, you can
-#   define GNU_READLINE as well as READLINE and add the appropriate library
+#   define HAVE_LIBREADLINE instead of READLINE and add the appropriate library
 #   file(s) to LIBS below.
 # NOCWDRC:
 #   If NOCWDRC is defined, then any .gnuplot in the current directory

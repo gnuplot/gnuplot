@@ -1590,10 +1590,15 @@ void show_version_long()
 	    "-READLINE  "
 #endif
 	    ,gnu_rdline =
-#ifdef GNU_READLINE
-	    "+GNU_READLINE  "
+#ifdef HAVE_LIBREADLINE
+	    "+LIBREADLINE  "
+# ifdef GNUPLOT_HISTORY
+            "+HISTORY  "
 #else
-	    "-GNU_READLINE  "
+            "-HISTORY  "
+# endif
+#else
+	    "-LIBREADLINE  "
 #endif
 	    ,libgd =
 #ifdef HAVE_LIBGD

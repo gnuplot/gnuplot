@@ -55,8 +55,11 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
 #include "fit.h"
 #include "binary.h"
 
-/* GNU readline stuff */
-#ifdef GNU_READLINE
+/* GNU readline
+ * Only required by two files directly,
+ * so I don't put this into a header file. -lh
+ */
+#ifdef HAVE_LIBREADLINE
 # include <readline/readline.h>
 # include <readline/history.h>
 #endif
@@ -1120,7 +1123,7 @@ char **parms;
 # endif /* AMIGA_AC_5 */
 
 
-# if defined(READLINE) || defined(GNU_READLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE)
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, int n, char *prompt));
 
@@ -1144,13 +1147,13 @@ char *prompt;
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
-#ifdef GNU_READLINE
+#ifdef HAVE_LIBREADLINE
 #define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
 #define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
 
 	    HIST_ENTRY *temp;
 
-	    /* Must be called always at this point or
+	    /* Must always be called at this point or
 	     * 'temp' has the wrong value. */
 	    using_history();   
 	    temp = previous_history ();
@@ -1160,7 +1163,7 @@ char *prompt;
 
 #undef STREQN
 #undef STREQ
-#else /* !GNU_READLINE */
+#else /* !HAVE_LIBREADLINE */
 	    add_history(line);
 #endif
 	}
@@ -1175,7 +1178,7 @@ char *prompt;
     }
     return NULL;
 }
-# endif /* READLINE || GNU_READLINE */
+# endif /* READLINE || HAVE_LIBREADLINE */
 
 
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
@@ -1250,7 +1253,7 @@ static void do_shell()
 
 /* read from stdin, everything except VMS */
 
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
 #  if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
@@ -1336,7 +1339,7 @@ int len;
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
 #  endif /* !plain DOS */
-# endif /* !READLINE && !GNU_READLINE) */
+# endif /* !READLINE && !HAVE_LIBREADLINE) */
 
 /* Non-VMS version */
 static int read_line(prompt)
@@ -1346,22 +1349,22 @@ char *prompt;
     TBOOLEAN more = FALSE;
     int last = 0;
 
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
     if (interactive)
 	PUT_STRING(prompt);
-# endif /* READLINE */
+# endif /* no READLINE */
     do {
 	/* grab some input */
-# if defined(READLINE) || defined(GNU_READLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
 	     ? rlgets(&(input_line[start]), input_line_len - start,
 		      ((more) ? "> " : prompt))
 	     : fgets(&(input_line[start]), input_line_len - start, stdin))
 	    == (char *) NULL) {
-# else /* !(READLINE || GNU_READLINE) */
+# else /* !(READLINE || HAVE_LIBREADLINE) */
 	if (GET_STRING(&(input_line[start]), input_line_len - start)
 	    == (char *) NULL) {
-# endif /* !(READLINE || GNU_READLINE) */
+# endif /* !(READLINE || HAVE_LIBREADLINE) */
 	    /* end-of-file */
 	    if (interactive)
 		(void) putc('\n', stderr);
@@ -1394,7 +1397,7 @@ char *prompt;
 	    } else
 		more = FALSE;
 	}
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
 	if (more && interactive)
 	    PUT_STRING("> ");
 # endif

@@ -209,10 +209,10 @@ void plot3drequest __PROTO((void));
 
 /* Prototypes from file "readline.c" */
 
-#ifndef GNU_READLINE
+#ifndef HAVE_LIBREADLINE
 char *readline __PROTO((char *prompt));
 void add_history __PROTO((char *line));
-#endif /* GNU_READLINE */
+#endif /* HAVE_LIBREADLINE */
 
 #if defined(ATARI) || defined(MTOS)
 char tos_getch();

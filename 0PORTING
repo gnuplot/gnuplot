@@ -38,7 +38,7 @@ SHELL       plot.h          default shell to spawn if SHELL environment
                               variable not found at run-time
 NOCWDRC     Makefile        define to inhibit check of ./.gnuplot
 READLINE    Makefile        define if you want command-line editing
-GNU_READLINE Makefile       define if you are linking with gnu readline
+HAVE_LIBREADLINE Makefile   define if you are linking with GNU readline
 
 Header File Availability
 ========================
