@@ -40,13 +40,21 @@ M=demo$(SL)
 #
 # directory where OS/2-driver is
 OS2 = os2
+# x11 in list of executables
+X11EXEC=
+! IFDEF X11
+X11EXEC = gnuplot_x11.exe
+! ENDIF
 # pre-defined sets of targets:
 all:         runtime demo docs
 docs:        gnuplot.gih gnuplot.inf gnuplot.html gnuplot.info gnuplot.dvi gnuplot.ps
 runtime:     executables infomin gnuplot.inf
-executables: gnuplot.exe gnupmdrv.exe
+executables: gnuplot.exe gnupmdrv.exe $(X11EXEC)
 infomin:     gnupmdrv.hlp gnuplot.gih
 demo:        $(M)binary1 $(M)binary2 $(M)binary3
+! IFDEF X11
+executables = $(executables) gnuplot_x11.exe
+! ENDIF
 #
 # 3 sets of variables are defined and used to create
 #  (1): files for gnuplot.exe
@@ -62,20 +70,20 @@ O3=o
 # generic flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2
 # flags for compiling with EMX/GCC
-EMXSPECIFIC = -DGETCWD -DREADLINE -DHAVE_STRNICMP -DPIPES
+EMXSPECIFIC = -DGETCWD -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DNOGAMMA
 ! IFDEF DEBUG
 CFLAGS  = $(OS2FLAGS) -g
-LFLAGS  = -Zstack 32768
+LFLAGS  = 
 CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -g
 LFLAGS2 = -Zomf -Zmt -Zsys -Zlinker /debug
 CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g
 LFLAGS3 = 
 ! ELSE
-CFLAGS  = $(OS2FLAGS) -O2
-LFLAGS  = -s -Zstack 32768 -Zcrtdll 
-CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -O2 
+CFLAGS  = $(OS2FLAGS) -O1
+LFLAGS  = -s -Zcrtdll 
+CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -O1 
 LFLAGS2 = -Zomf -Zmt -Zsys -s
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O1
 LFLAGS3 = -s
 ! ENDIF
 #
@@ -99,6 +107,16 @@ TERMLIBS = $(TERMLIBS) -lgd
 TERMFLAGS=$(TERMFLAGS) -DHAVE_LIBPNG
 TERMLIBS = $(TERMLIBS) -lpng -lz
 ! ENDIF
+! IFDEF X11
+TERMFLAGS = $(TERMFLAGS) -DX11
+! ENDIF
+#
+# X11 definitions for outboard driver
+#
+X11LIBS = -lX11 -lsocket
+# List where the X11 include directory is found (if other than /emx/include)
+X11INCLUDES = -Id:/xfree86/include
+X11FLAGS=
 #
 # default rules
 #
@@ -139,6 +157,12 @@ gnupmdrv.exe: $(OS2OBJ) $(OS2)\gnupmdrv.res $(OS2)\gnupmdrv.def
 gnupmdrv.hlp: $(OS2)\gnupmdrv.ipf
    ipfc $(OS2)\gnupmdrv.ipf
    move $(OS2)\gnupmdrv.hlp .
+#
+# Build the X11 outboard driver
+#
+gnuplot_x11.exe: gplt_x11.c
+  $(CC) -Zmtd $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -o gnuplot_x11.exe \
+  gplt_x11.c $(X11LIBS)
 #
 # create the documentation in various formats
 #

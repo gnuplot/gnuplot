@@ -132,7 +132,6 @@ TERM_PUBLIC void PM_init()
     char semname[32] ;
     char pipename[32] ;
     char tempname[32] ;
-    TRACE(( "pm init: %p\n", PM_pipe )) ;
 
     term_force_init = TRUE ;
     if( PM_savepipe != NULL && PM_termmode == 0 ) {
@@ -229,18 +228,11 @@ static void PM_make_servername( char *str ) {
         int hash=0 ;
         char *p = PM_term_title+1 ;
         int match = PM_term_title[0] ;
-FILE *fff;
-fff=fopen( "xxx.log", "a" ) ;
-fprintf( fff, "match:%c\n",match);
         while( *p != match ) {
-fprintf( fff, "*p:%c %d\n",*p,hash );
             hash = (hash<<1) + hash + *p++ ;
             }
-fprintf( fff, "x*p:%c %d\n",*p,hash );
         hash %= (256*256*256-1) ;
-fprintf( fff, "y*p:%c %d\n",*p,hash );
         sprintf( str, "gp%x", hash ) ;
-fclose(fff);
         }
     else
         sprintf( str, "gpServ%d", PM_plot_number ) ;
@@ -330,7 +322,6 @@ static void PM_query() {
     }
 
 TERM_PUBLIC void PM_reset() {
-    TRACE(( "pm2 reset: %p\n", PM_pipe )) ;
         putc( GR_RESET, PM_pipe); 
         fflush(PM_pipe);
         term_force_init = FALSE ;
@@ -352,7 +343,6 @@ TERM_PUBLIC void PM_resume() {
 
 TERM_PUBLIC void PM_text() 
     {
-    TRACE(( "pm2 text: %p\n", PM_pipe )) ;
     fflush(PM_pipe);
     if( PM_mode != SET_TEXT ) { 
         putc( SET_TEXT, PM_pipe); 
@@ -366,7 +356,6 @@ TERM_PUBLIC void PM_text()
 TERM_PUBLIC void PM_graphics() 
     { 
     int cbR, rc, iC[2] ;
-    TRACE(( "pm2 graphics: %p\n", PM_pipe )) ;
     putc( SET_GRAPHICS, PM_pipe); 
     fflush( PM_pipe ) ; 
     PM_mode = SET_GRAPHICS ;

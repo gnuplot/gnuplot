@@ -596,7 +596,7 @@ ULONG RexxInterface( PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc )
     int iCmd ;
     int rc ;
     static jmp_buf keepenv;
-    memcpy( keepenv, env, sizeof(jmp_buf)) ;
+    memcpy( keepenv, command_line_env, sizeof(jmp_buf)) ;
   if (!setjmp(command_line_env)) {
     set_input_line( rxCmd->strptr, rxCmd->strlength ) ;
     rc = do_line() ;
@@ -608,7 +608,7 @@ ULONG RexxInterface( PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc )
     *pusErr = RXSUBCOM_ERROR ;
     RexxSetHalt( getpid(), 1 ) ;
   }
-    memcpy( env, keepenv, sizeof(jmp_buf)) ;
+    memcpy( command_line_env, keepenv, sizeof(jmp_buf)) ;
     return 0 ;    
     }
 #endif
