@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.98 2004/05/27 16:35:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.99 2004/06/07 05:33:00 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -710,6 +710,7 @@ mainloop()
     fd_set tset;
 
 #ifdef PIPE_IPC
+    int usleep_count = 0;
     int out;
     out = fileno(stdout);
 #endif
@@ -765,7 +766,10 @@ mainloop()
 	}
 #ifdef HAVE_USLEEP
 	/* Make sure this loop does not monopolize CPU if the pipe is jammed */
-	usleep(100);
+	if (++usleep_count > 10) {
+	    usleep(100);
+	    usleep_count = 0;
+	}
 #endif
 #endif
 

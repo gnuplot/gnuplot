@@ -1,3 +1,9 @@
+2004-06-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (mainloop): Yet another tweak to the mouse timing code.
+	This one reduces mouse-tracking hysteresis on systems that claim to have
+	usleep() but in fact have much coarser timing.
+
 2004-06-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/save.c: Save log cb axis (bugfix).
