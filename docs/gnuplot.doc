@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.144 2002/11/05 16:47:38 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.145 2002/11/26 18:50:01 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -369,7 +369,7 @@ C
        ^K    deletes from current position to the end of line.
        ^L,^R redraws line in case it gets trashed.
        ^U    deletes the entire line.
-       ^W    delete from the current word to the end of line.
+       ^W    deletes from the current word to the end of line.
 
        `History`:
 
@@ -1948,7 +1948,7 @@ C ... and restart the table:
  Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
  10.0.
 
- Oher variables with the FIT_ prefix may be added to `fit`, so it is safer
+ Other variables with the FIT_ prefix may be added to `fit`, so it is safer
  not to use that prefix for user-defined variables.
 
  The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
@@ -7431,7 +7431,7 @@ C ... and restart the table:
  See `set timefmt` to tell gnuplot how to read date or time data.  The
  time/date is converted to seconds from start of the century.  There is
  currently only one timefmt, which implies that all the time/date columns must
- confirm to this format.  Specification of ranges should be supplied as quoted
+ conform to this format.  Specification of ranges should be supplied as quoted
  strings according to this format to avoid interpretation of the time/date as
  an expression.
 

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.49 2002/10/09 21:36:25 joze Exp $
+ * $Id: cgm.trm,v 1.50 2002/11/27 19:56:34 joze Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1656,7 +1656,7 @@ START_HELP(cgm)
 " Examples:",
 "       set terminal cgm landscape color rotate dashed width 432 \\",
 "                      linewidth 1  'Helvetica Bold' 12       # defaults",
-"       set terminal cgm 14 linewidth 2  14  # wider lines & larger font",
+"       set terminal cgm linewidth 2  14  # wider lines & larger font",
 "       set terminal cgm portrait \"Times Italic\" 12",
 "       set terminal cgm color solid      # no pesky dashes!",
 
@@ -1830,7 +1830,7 @@ START_HELP(cgm)
 "?cgm linewidth",
 " The `linewidth` option sets the width of lines in pt.  The default width",
 " is 1 pt.  Scaling is affected by the actual width of the page, as",
-" discussed under the `fontsize` and `width` options",
+" discussed under the `fontsize` and `width` options.",
 
 "2 rotate",
 "?commands set terminal cgm rotate",
