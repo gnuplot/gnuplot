@@ -1,3 +1,8 @@
+1998-04-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* parse.c (factor): Final, working workaround for HP 300 compiler
+	limitation.
+
 1998-04-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* atariaes.trm, atarivdi.trm, cgi.trm, cgm.trm, corel.trm, epson.trm,
