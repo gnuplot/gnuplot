@@ -1,3 +1,13 @@
+2004-12-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm: Keep track of current rgb values in parallel to the
+	current linetype, since we can no longer count on regenerating the
+	former from the latter.
+
+	* term/x11.trm: Add missing X resource to the table in the docs.
+
+	* configure.in: Remove obsolete messages relating to old png driver.
+
 2004-12-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	Add colorspec to linetype, and hence to all 2D and 3D plot elements.

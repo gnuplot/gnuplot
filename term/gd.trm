@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.54 2004/11/27 02:38:37 sfeam Exp $
+ * $Id: gd.trm,v 1.55 2004/11/28 02:02:52 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -189,7 +189,8 @@ static struct {
     unsigned int x, y;
     int height;
     int charh, charw;
-    int color;
+    int color;             /* Magic index returned by libgd */
+    int rgb;               /* Our guess at the corresponding rgb */
     int n_colors;
     int color_table[PNG_MAX_COLORS];
     int rgb_table[PNG_MAX_COLORS];
@@ -307,7 +308,7 @@ PNG_FillSolid(int fillpar)
 static int
 PNG_FillPattern(int fillpar)
 {
-    int rgb = png_state.rgb_table[png_state.linetype + 3];
+    int rgb = png_state.rgb;
     fillpar %= 8;
 
     if (!PNG_fill_tile.im || rgb != PNG_fill_tile.last_rgb || PNG_fill_tile.fillpar != fillpar) {
@@ -841,7 +842,16 @@ below palette.offset equals 0 since png_smooth_color[0..colors] are
 from ColorAllocate
 */
 static int png_smooth_color[gdMaxColors];
-  /* chooser from the colour palette */
+
+#if (0)
+/*
+ * This is only needed in order to maintain png_state_rgb for pattern-fill,
+ * and only for palette-based coloring. It doesn't seem worth the space or effort.
+ * EAM November 2004
+ */
+static int png_smooth_rgb[gdMaxColors];
+#endif
+
   /* TODO: how to recover from a multiplot with two colour pm3d maps?
      They must use the same palette! Or palette size must be
      restricted to certain number of colours---a new user's option
@@ -876,6 +886,11 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
+#if (0)
+	png_smooth_rgb[i] = (((int)(palette->color[i].r * 255.) & 0xff) << 16)
+	                  + (((int)(palette->color[i].g * 255.) & 0xff) << 8)
+			  +  ((int)(palette->color[i].b * 255.) & 0xff);
+#endif
 	if (png_smooth_color[i] < 0) { /* this should never happen! take away? */
 	    FPRINTF((stderr,"png_smooth_color[i]<0 cannot happen"));
 	    exit(1);
@@ -895,9 +910,11 @@ void PNG_set_color (t_colorspec *colorspec)
 {
     double gray = colorspec->value;
 
-    if (colorspec->type == TC_RGB)
+    if (colorspec->type == TC_RGB) {
+	png_state.rgb = colorspec->lt;
 	png_state.color = gdImageColorResolve(png_state.image,
 	    colorspec->lt >> 16, (colorspec->lt >> 8) & 0xff, colorspec->lt & 0xff);
+    }
 
     if (colorspec->type != TC_FRAC)
 	return;
@@ -907,6 +924,7 @@ void PNG_set_color (t_colorspec *colorspec)
 	rgb255maxcolors_from_gray(gray, &color);
 	png_state.color = gdImageColorResolve(png_state.image,
 	    (int)color.r, (int)color.g, (int)color.b);
+	png_state.rgb = (color.r << 16) + (color.g << 8) +color.b;
 	return;
     } else {
 	int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
@@ -914,6 +932,9 @@ void PNG_set_color (t_colorspec *colorspec)
 	    png_color = sm_palette.colors - 1;
 	/* map [0;1] to interval [0;png_smooth_colors-1] */
 	png_state.color = png_smooth_color[ png_color ];
+#if (0)
+	png_state.rgb = png_smooth_rgb[ png_color ];
+#endif
     }
 }
 
@@ -1199,6 +1220,7 @@ PNG_linetype(int type)
 	type = -3;	/* Draw in background color */
 
     png_state.color = png_state.color_table[type + 3];
+    png_state.rgb = png_state.rgb_table[type + 3];
     png_state.linetype = type;
 }
 
