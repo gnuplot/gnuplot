@@ -57,6 +57,7 @@ extern char version[];
 extern char patchlevel[];
 extern char date[];
 extern char gnuplot_copyright[];
+extern char faq_location[];
 extern char bug_email[];
 extern char help_email[];
 
@@ -580,7 +581,7 @@ show_two()
 		c_token++;
 	}
 	else if (almost_equals(c_token,"ve$rsion")) {
-		show_version();
+		show_version(stderr);
 		c_token++;
 		if (almost_equals(c_token,"l$ong")) {
 		       show_version_long();
@@ -619,7 +620,7 @@ show_two()
 	}
 	else if (almost_equals(c_token,"a$ll")) {
 		c_token++;
-		show_version();
+		show_version(stderr);
 		show_autoscale();
                 show_bars();
 		show_border();
@@ -667,13 +668,14 @@ show_two()
                 show_mtics(mx2tics, mx2tfreq, "x2");
                 show_mtics(my2tics, my2tfreq, "y2");
 		show_xyzlabel("time", &timelabel);
-		if (parametric || polar)
+		if (parametric || polar) {
 			if (!is_3d_plot)
 				show_range(T_AXIS,tmin,tmax,autoscale_t, "t");
 			else {
 				show_range(U_AXIS,umin,umax,autoscale_u, "u");
 				show_range(V_AXIS,vmin,vmax,autoscale_v, "v");
 			}
+		}
 		show_range(FIRST_X_AXIS,xmin,xmax,autoscale_x, "x");
 		show_range(FIRST_Y_AXIS,ymin,ymax,autoscale_y, "y");
 		show_range(SECOND_X_AXIS,x2min,x2max,autoscale_x2, "x2");
@@ -737,6 +739,7 @@ enum PLOT_STYLE style;
 static void
 show_bars()
 {
+  /* I really like this: "terrorbars" ;-) */
   if (bar_size > 0.0)
 	fprintf(stderr,"\terrorbars are plotted with bars of size %f\n", bar_size);
   else
@@ -1273,8 +1276,10 @@ show_ticdef(tics, axis, tdef, text, rotate_tics)
 		  break;
 	   }
 	   case TIC_USER: {
+/* this appears to be unused? lh
 		  int time;
 		  time = (datatype[axis] == TIME);
+*/
 		  fprintf(stderr, "list (");
 		  for (t = tdef->def.user; t != NULL; t=t->next) {
 			 if (t->label) {
@@ -1518,19 +1523,55 @@ int len;
 	}
 }
 
-void				/* used by plot.c */
-show_version()
+/*
+ * Used in plot.c and misc.c
+ * By adding FILE *fp, we can now use show_version()
+ * to save version information to a file.
+ */
+void
+show_version(fp)
+FILE *fp;
 {
+	char prefix[] = "#    ";
+	char *p = prefix;
 
-	fprintf(stderr, "\n\t%s\n\t%sversion %s\n",
-		PROGRAM, OS, version);
-	fprintf(stderr, "\tpatchlevel %s\n",patchlevel);
-	fprintf(stderr, "\tlast modified %s\n", date);
-	fprintf(stderr,"\n\t%s", gnuplot_copyright);
-	fprintf(stderr, "\n\tThomas Williams, Colin Kelley and many others");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "\n\tSend comments and requests for help to %s", help_email);
-	fprintf(stderr, "\n\tSend bugs, suggestions and mods to %s\n", bug_email);
+	/* If printed to a file, we add a hash mark to
+	 * comment out the version information.
+	 */
+	p += ( fp == stderr? sizeof(prefix) : 0);
+
+	fprintf(fp, "%s\n\
+%s\t%s\n\
+%s\t%sversion %s\n\
+%s\tpatchlevel %s\n\
+%s\tlast modified %s\n\
+%s\n\
+%s\t%s\n\
+%s\tThomas Williams, Colin Kelley and many others\n\
+%s\n\
+%s\tType `help` to access the on-line reference manual\n\
+%s\tThe gnuplot FAQ is available from\n\
+%s\t\t<%s>\n\
+%s\n\
+%s\tSend comments and requests for help to <%s>\n\
+%s\tSend bugs, suggestions and mods to <%s>\n\
+%s\n",
+		p,			/* empty line */
+		p, PROGRAM,
+		p, OS, version,
+		p, patchlevel,
+		p, date,
+		p,			/* empty line */
+		p, gnuplot_copyright,
+		p,			/* authors */
+		p,			/* empty line */
+		p,			/* Type help */
+		p,			/* FAQ is at */
+		p, faq_location,
+		p,			/* empty line */
+		p, help_email,
+		p, bug_email,
+		p);			/* empty line */
 }
 
 void
@@ -1542,35 +1583,32 @@ show_version_long ()
 
 	/* something is fundamentally wrong if this fails ... */
 	if (uname (&uts) > -1) {
-		puts ("");
 # ifdef _AIX
-		printf ("System: %s %s.%s", uts.sysname, uts.version, uts.release);
+		fprintf (stderr,"\nSystem: %s %s.%s", uts.sysname, uts.version, uts.release);
 # elif defined (SCO)
-		printf ("System: SCO %s", uts.release);
+		fprintf (stderr,"\nSystem: SCO %s", uts.release);
 # else
-		printf ("System: %s %s", uts.sysname, uts.release);
+		fprintf (stderr,"\nSystem: %s %s", uts.sysname, uts.release);
 # endif
 	}
 	else {
-		puts ("");
-		puts (OS);
+		fprintf(stderr,"\n%s\n",OS);
 	}
 
 #else /* ! HAVE_SYS_UTSNAME_H */
 
-	puts ("");
-	puts (OS);
+	fprintf(stderr,"\n%s\n",OS);
 
 #endif /* HAVE_SYS_UTSNAME_H */
 
-	puts ("\nCompile options:");
+	fprintf(stderr,"\nCompile options:\n");
 
 	{
 		/* The following code could be a lot simper if
 		 * it wasn't for Borland's broken compiler ...
 		 */
 		const char *readline, *gnu_readline, *libgd, *libpng,
-			*linuxvga, *nocwdrc, *x11;
+			*linuxvga, *nocwdrc, *x11, *unixplot, *gnugraph;
 
 		readline =
 #ifdef READLINE
@@ -1615,10 +1653,22 @@ show_version_long ()
 #else
 		""
 #endif
+		, unixplot =
+#ifdef UNIXPLOT
+		"+UNIXPLOT  "
+#else
+		""
+#endif
+		, gnugraph =
+#ifdef GNUGRAPH
+		"+GNUGRAPH  "
+#else
+		""
+#endif
 		;
-		printf("%s%s%s%s%s%s%s\n", readline, gnu_readline,
-			libgd, libpng, linuxvga, nocwdrc, x11);
-        }
+		fprintf(stderr,"%s%s%s%s%s%s%s%s%s\n",readline,gnu_readline,
+			libgd,libpng,linuxvga,nocwdrc,x11,unixplot,gnugraph);
+	}
 
 	if ((helpfile = getenv ("GNUHELP")) == NULL) {
 #if defined(ATARI) || defined(MTOS)
@@ -1630,9 +1680,10 @@ show_version_long ()
 #endif
 	}
 
-	printf ("HELPFILE=\"%s\"\n", helpfile);
-	printf ("CONTACT=<%s>\n", bug_email);
-	printf ("HELPMAIL=<%s>\n", help_email);
+	fprintf (stderr,"HELPFILE=\"%s\"\n\
+FAQ location=<%s>\n\
+CONTACT=<%s>\n\
+HELPMAIL=<%s>\n",helpfile,faq_location,bug_email,help_email);
 }
 
 static void
