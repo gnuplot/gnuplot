@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.82 2004/10/02 05:38:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.83 2004/10/05 16:37:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -678,9 +678,14 @@ get_3ddata(struct surface_points *this_plot)
 	double x, y, z;
 	double xtail, ytail, ztail;
 	double color = VERYLARGE;
+
 #ifdef PM3D
 	int pm3d_color_from_column = FALSE;
+#define color_from_column(x) pm3d_color_from_column = x
+#else
+#define color_from_column(x)
 #endif
+
 #ifdef EAM_DATASTRINGS
 	if (this_plot->plot_style == LABELPOINTS)
 	    expect_string( 4 );
@@ -761,106 +766,56 @@ get_3ddata(struct surface_points *this_plot)
 	    }
 	    cp->type = INRANGE;	/* unless we find out different */
 
+	    /* EAM Oct 2004 - Substantially rework this section */
+	    /* now that there are many more plot types.         */
+	    
+	    /* The x, y, z coordinates depend on the mapping type */
+
 	    switch (mapping3d) {
 
 	    case MAP3D_CARTESIAN:
-		switch (j) {
-#ifdef PM3D
-		case 2:
-		    if (PM3DSURFACE != this_plot->plot_style) {
-			int_error(this_plot->token,
-				  "2 columns only possible with explicit pm3d style (line %d)",
-				  df_line_number);
-			return;
-		    } else {
-			pm3d_color_from_column = TRUE;
-			color = v[1];
-		    }
-		    /* FALLTHRU */
-#endif
-		case 1:
+
+		if (j == 1) {
 		    x = xdatum;
 		    y = ydatum;
 		    z = v[0];
+		    j = 3;
 		    break;
-
-		case 3:
-		    if (df_no_use_specs!=0 && df_no_use_specs!=3)
-			goto error_in_number_of_columns;
-		    x = v[0];
-		    y = v[1];
-		    z = v[2];
-		    break;
-
-		case 4:
-		    if (df_no_use_specs!=4)
-			goto error_in_number_of_columns;
-		    
-		    /* getting color from an explicitly given 4th column */
-		    x = v[0];
-		    y = v[1];
-		    z = v[2];
-		    color = v[3];
-#ifdef PM3D
-		    pm3d_color_from_column = TRUE;
-#endif
-#ifdef EAM_DATASTRINGS
-		    /* 4th column holds label text rather than color */
-		    /* text = df_tokens[3]; */
-		    if (this_plot->plot_style == LABELPOINTS) {
-			color = z;
-#ifdef PM3D
-			pm3d_color_from_column = FALSE;
-#endif
-		    }
-#endif
-		    break;
-
-		case 5:
-		    if (df_no_use_specs!=5)
-			goto error_in_number_of_columns;
-		    
-		    x = v[0];
-		    y = v[1];
-		    z = v[2];
-#ifdef EAM_DATASTRINGS
-		    if (this_plot->plot_style == LABELPOINTS) {
-		        /* text = df_tokens[3]; */
-			/* getting color from an explicitly given 5th column */
-			color = v[4];
-#ifdef PM3D
-			pm3d_color_from_column = TRUE;
-#endif
-		    }
-#endif
-		    break;
-
-		case 6:
-		    x = v[0];
-		    y = v[1];
-		    z = v[2];
-		    xtail = x + v[3];
-		    ytail = y + v[4];
-		    ztail = z + v[5];
-		    if (this_plot->plot_style == VECTOR)
-			break;
-
-		default:
-		error_in_number_of_columns:
-		    int_error(this_plot->token,
-				  "Wrong number of columns in input data - line %d",
-				  df_line_number);
-		    return;	/* avoid gcc -Wuninitialised for x,y,z */
-
 		}
+#ifdef PM3D
+		if (j == 2) {
+		    if (PM3DSURFACE != this_plot->plot_style)
+			int_error(this_plot->token,
+				  "2 columns only possible with explicit pm3d style (line %d)",
+				  df_line_number);
+		    x = xdatum;
+		    y = ydatum;
+		    z = v[0];
+		    color_from_column(TRUE);
+		    color = v[1];
+		    j = 3;
+		    break;
+		}
+#endif
+
+		/* Assume everybody agrees that x,y,z are the first three specs */
+		if (j >= 3) {
+		    x = v[0];
+		    y = v[1];
+		    z = v[2];
+		    break;
+		}
+
 		break;
 
 	    case MAP3D_SPHERICAL:
-		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
 		    int_error(this_plot->token, "Need 2 or 3 columns");
-		if (j < 3)
+		if (j < 3) {
 		    v[2] = 1;	/* default radius */
+		    j = 3;
+		}
+
 		/* Convert to radians. */
 		v[0] *= ang2rad;
 		v[1] *= ang2rad;
@@ -869,38 +824,16 @@ get_3ddata(struct surface_points *this_plot)
 		y = v[2] * sin(v[0]) * cos(v[1]);
 		z = v[2] * sin(v[1]);
 
-		if (j==4 
-#ifdef EAM_DATASTRINGS
-		&& this_plot->plot_style != LABELPOINTS
-#endif
-		) {
-		    if (df_no_use_specs!=4)
-			goto error_in_number_of_columns;
-		    color = v[3];
-#ifdef PM3D
-		    pm3d_color_from_column = TRUE;
-#endif
-		}
-
-#ifdef EAM_DATASTRINGS
-		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
-		    /* text = df_tokens[3]; */
-		    /* getting color from an explicitly given 5th column */
-		    color = v[4];
-#ifdef PM3D
-		    pm3d_color_from_column = TRUE;
-#endif
-		}
-#endif
-
 		break;
 
 	    case MAP3D_CYLINDRICAL:
-		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
 		    int_error(this_plot->token, "Need 2 or 3 columns");
-		if (j < 3)
+		if (j < 3) {
 		    v[2] = 1;	/* default radius */
+		    j = 3;
+		}
+
 		/* Convert to radians. */
 		v[0] *= ang2rad;
 
@@ -908,36 +841,53 @@ get_3ddata(struct surface_points *this_plot)
 		y = v[2] * sin(v[0]);
 		z = v[1];
 
-		if (j==4 
-#ifdef EAM_DATASTRINGS
-		&& this_plot->plot_style != LABELPOINTS
-#endif
-		) {
-		    if (df_no_use_specs!=4)
-			goto error_in_number_of_columns;
-		    color = v[3];
-#ifdef PM3D
-		    pm3d_color_from_column = TRUE;
-#endif
-		}
-
-#ifdef EAM_DATASTRINGS
-		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
-		    /* text = df_tokens[3]; */
-		    /* getting color from an explicitly given 5th column */
-		    color = v[4];
-#ifdef PM3D
-		    pm3d_color_from_column = TRUE;
-#endif
-		}
-#endif
-
 		break;
 
 	    default:
 		int_error(NO_CARET, "Internal error: Unknown mapping type");
 		return;
 	    }
+
+	    if (j < df_no_use_specs)
+		int_error(this_plot->token,
+			"Wrong number of columns in input data - line %d",
+			df_line_number);
+
+	    /* After the first three columns it gets messy because */
+	    /* different plot styles assume different contents in the columns */
+	    if (j >= 4) {
+		color = v[3];
+		color_from_column(TRUE);
+#ifdef EAM_DATASTRINGS
+		if (this_plot->plot_style == LABELPOINTS) {
+		/* 4th column holds label text rather than color */
+		/* text = df_tokens[3]; */
+		    color = z;
+		    color_from_column(FALSE);
+		}
+#endif
+	    }
+
+	    if (j >= 5) {
+#ifdef EAM_DATASTRINGS
+		if (this_plot->plot_style == LABELPOINTS) {
+		    /* take color from an explicitly given 5th column */
+		    color = v[4];
+		    color_from_column(TRUE);
+		}
+#endif
+	    }
+
+	    if (j >= 6) {
+		if (this_plot->plot_style == VECTOR) {
+		    xtail = x + v[3];
+		    ytail = y + v[4];
+		    ztail = z + v[5];
+		    color_from_column(FALSE);
+		}
+	    }
+#undef color_from_column
+
 
 	    /* Adjust for logscales. Set min/max and point types. Store in cp.
 	     * The macro cannot use continue, as it is wrapped in a loop.
