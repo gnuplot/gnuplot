@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.37 2002/08/19 16:21:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.38 2002/09/02 21:03:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -56,16 +56,7 @@ static void lf_push __PROTO((FILE * fp));
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
  */
-typedef struct lf_state_struct {
-    FILE *fp;			/* file pointer for load file */
-    char *name;			/* name of file */
-    TBOOLEAN interactive;	/* value of interactive flag on entry */
-    TBOOLEAN do_load_arg_substitution;	/* likewise ... */
-    int inline_num;		/* inline_num on entry */
-    struct lf_state_struct *prev;			/* defines a stack */
-    char *call_args[10];	/* args when file is 'call'ed instead of 'load'ed */
-}  LFS;
-static LFS *lf_head = NULL;		/* NULL if not in load_file */
+LFS *lf_head = NULL;		/* NULL if not in load_file */
 
 /* these two could be in load_file, except for error recovery */
 static TBOOLEAN do_load_arg_substitution = FALSE;

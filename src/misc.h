@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.9 2002/01/06 16:31:12 mikulik Exp $
+ * $Id: misc.h,v 1.10 2002/09/02 21:03:20 mikulik Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -67,5 +67,19 @@ void filledcurves_options_tofile __PROTO((filledcurves_opts *, FILE *));
 #endif
 void lp_parse __PROTO((struct lp_style_type *, TBOOLEAN, TBOOLEAN, int, int));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
+
+/* State information for load_file(), to recover from errors
+ * and properly handle recursive load_file calls
+ */
+typedef struct lf_state_struct {
+    FILE *fp;			/* file pointer for load file */
+    char *name;			/* name of file */
+    TBOOLEAN interactive;	/* value of interactive flag on entry */
+    TBOOLEAN do_load_arg_substitution;	/* likewise ... */
+    int inline_num;		/* inline_num on entry */
+    struct lf_state_struct *prev;			/* defines a stack */
+    char *call_args[10];	/* args when file is 'call'ed instead of 'load'ed */
+}  LFS;
+extern LFS *lf_head;
 
 #endif /* GNUPLOT_MISC_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.75 2002/09/02 21:03:28 mikulik Exp $
+ * $Id: post.trm,v 1.76 2002/09/03 21:41:05 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -161,6 +161,7 @@ struct ps_fontfile_def {
 };
 struct ps_fontfile_def *first_ps_fontfile = NULL;
 static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
+TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 
 
@@ -610,7 +611,7 @@ enum PS_id {
     PS_MONOCHROME, PS_COLOR, PS_BLACKTEXT, PS_COLORTEXT,
     PS_SOLIDE, PS_DASHED, PS_DASHLENGTH, PS_LINEWIDTH,
     PS_SIMPLEX, PS_DUPLEX, PS_DEFAULTPLEX,
-    PS_ROUNDED, PS_NOROUNDED, PS_FONTFILE,
+    PS_ROUNDED, PS_NOROUNDED, PS_FONTFILE, PS_NOFONTFILES,
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
@@ -642,6 +643,7 @@ static struct gen_table PS_opts[] =
     { "butt", PS_NOROUNDED },
     { "rou$nded", PS_ROUNDED },
     { "fontf$ile", PS_FONTFILE },
+    { "nofontf$iles", PS_NOFONTFILES },
 #ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
@@ -682,8 +684,11 @@ PS_options()
 	    ps_linewidth_factor = 1.0;
 	    ps_duplex_option = FALSE;
 	    ps_rounded = FALSE;
-	    while (first_ps_fontfile != NULL)
-		delete_ps_fontfile((struct ps_fontfile_def *) NULL, first_ps_fontfile);
+	    while (first_ps_fontfile != NULL) {
+		delete_ps_fontfile((struct ps_fontfile_def *) NULL, 
+				   first_ps_fontfile);
+		first_ps_fontfile = NULL;
+	    }
 	    strcpy(ps_font,"Helvetica");
 	    ps_fontsize = 14;
 	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
@@ -806,19 +811,26 @@ PS_options()
 
 		}
                 new_ps_fontfile->next = NULL;
-  
+
+		if (!deleteentry) {
+		    LFS *lf=lf_head;
+		    if (lf) {
+			while (lf->prev)
+			    lf=lf->prev;
+		    }
+		    if ( (lf && lf->interactive) || interactive)
+			/* if (interactive) { */
+			PS_load_fontfile(new_ps_fontfile,FALSE);
+		}
+
                 if (first_ps_fontfile) {
                     while (curr_ps_fontfile) {
                         if (strcmp(curr_ps_fontfile->fontfile_name,
                                    new_ps_fontfile->fontfile_name) == 0) {
                             filename_doubled = TRUE;
                             if (deleteentry) {
-                                if (prev_ps_fontfile)
-                                    prev_ps_fontfile->next = 
-                                        curr_ps_fontfile->next;
-                                else
-                                    first_ps_fontfile = curr_ps_fontfile->next;
-                                free(curr_ps_fontfile);
+				delete_ps_fontfile(prev_ps_fontfile, 
+						   curr_ps_fontfile);
                                 curr_ps_fontfile = NULL;
                                 break;
                             }
@@ -845,6 +857,14 @@ PS_options()
                 int_error(c_token, "Font filename expected");
             break;
         }
+        case PS_NOFONTFILES:
+	    while (first_ps_fontfile != NULL) {
+		delete_ps_fontfile((struct ps_fontfile_def *) NULL, 
+				   first_ps_fontfile);
+		first_ps_fontfile = NULL;
+	    }
+	    ++c_token;
+	    break;
 #ifdef PM3D
 	case PS_PALFUNCPARAM:
 	    ++c_token;
@@ -884,12 +904,6 @@ PS_options()
 	unsigned int totlength = 0;
 	char *running;
 
-	if (interactive) {
-	    fprintf(stderr,"\n");
-	    PS_load_fontfiles(FALSE);
-	    fprintf(stderr,"\n");
-	}
-	
 	while (curr_ps_fontfile) {
 	    totlength += strlen(curr_ps_fontfile->fontfile_name) + 
 		strlen(" fontfile \"\"");
@@ -941,11 +955,11 @@ static unsigned int ps_common_xoff, ps_common_yoff;
 
 
 TERM_PUBLIC void
-PS_load_fontfiles(doload)
+PS_load_fontfile(current_ps_fontfile,doload)
+     struct ps_fontfile_def *current_ps_fontfile;
      TBOOLEAN doload;
 {
-    struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
-    while (current_ps_fontfile) {
+    if (current_ps_fontfile) {
 	unsigned int linesread = 0;
 	FILE *ffont;
 	char line[256];
@@ -1075,19 +1089,17 @@ PS_load_fontfiles(doload)
 		*fnende = '\0';
 		/* Print font name */
 		if (!doload) {
-		    if (interactive) {
-			if (current_ps_fontfile->fontfile_fullname)
-			    fprintf(stderr, 
-				    "Font file '%s' contains the font '%s'. Location:\n   %s\n",
-				    current_ps_fontfile->fontfile_name, 
-				    fontname,
-				    current_ps_fontfile->fontfile_fullname);
-			else
-			    fprintf(stderr, 
-				    "Pipe '%s' contains the font '%s'.\n",
-				    current_ps_fontfile->fontfile_name, 
-				    fontname);
-		    }
+		    if (current_ps_fontfile->fontfile_fullname)
+			fprintf(stderr, 
+				"Font file '%s' contains the font '%s'. Location:\n   %s\n",
+				current_ps_fontfile->fontfile_name, 
+				fontname,
+				current_ps_fontfile->fontfile_fullname);
+		    else
+			fprintf(stderr, 
+				"Pipe '%s' contains the font '%s'.\n",
+				current_ps_fontfile->fontfile_name, 
+				fontname);
 #if defined(PIPES)
 		    /* Stop reading font file in order to save time */
 		    /* This does not work for pipes because they give the */
@@ -1144,7 +1156,17 @@ PS_load_fontfiles(doload)
 	    free(fontname);
 	    fontname = NULL;
 	}
+    }
+}
 
+
+TERM_PUBLIC void
+PS_load_fontfiles(doload)
+     TBOOLEAN doload;
+{
+    struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
+    while (current_ps_fontfile) {
+	PS_load_fontfile(current_ps_fontfile,doload);
 	current_ps_fontfile = current_ps_fontfile->next;
     }
 }
@@ -2706,17 +2728,21 @@ TERM_PUBLIC void PS_previous_palette(void)
     fprintf(gpoutfile, "grestore %% colour palette end\n");
 }
 
+
 static void
 delete_ps_fontfile(prev, this)
 struct ps_fontfile_def *prev, *this;
 {
     if (this != NULL) {		/* there really is something to delete */
+	printf("hallo1\n");
 	if (prev != NULL)	/* there is a previous ps_fontfile */
 	    prev->next = this->next;
 	else			/* this = first_ps_fontfile so change first_ps_fontfile */
 	    first_ps_fontfile = this->next;
 	free(this->fontfile_name);
+	free(this->fontfile_fullname);
 	free(this);
+	this = NULL;
     }
 }
 
@@ -3075,21 +3101,23 @@ START_HELP(post)
 "           ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/",
 "^ </a>",
 " For example, the file \"sfrm1000.pfb\" contains the normal upright fonts",
-" with serifs in the design size 10pt.",
+" with serifs in the design size 10pt (font name \"SFRM1000\").",
 " The computer modern fonts, which are still necessary for mathematics,",
-" are available from `ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky`.",
+" are available from",
+"^ <a href=\"ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky\">",
+"           ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky",
+"^ </a>",
 " With these you can use any character available in TeX. However, the",
 " computer modern fonts have a strange encoding. (This is why you should not",
 " use cmr10.pfb for text, but sfrm1000.pfb instead.)",
 " The usage of TeX fonts is shown in one of the demos.",
+" The file \"ps_fontfile_doc.tex\" in the /docs/psdoc subdirectory of the",
+" `gnuplot` source distribution contains a table with glyphs of the TeX",
+" mathfonts.",
 "",
 " If the font \"CMEX10\" is embedded (file \"cmex10.pfb\") Gnuplot defines",
 " the additional font \"CMEX10-Baseline\". It is shifted vertically in order",
 " to fit better to the other glyphs (CMEX10 has its baseline at the top of",
-" the symbols).",
-"",
-" The file \"ps_fontfile_doc.tex\" in the /docs/psdoc subdirectory of the",
-" `gnuplot` source distribution contains a table with glyphs of the TeX",
-" mathematics fonts."
+" the symbols)."
 END_HELP(post)
 #endif /* TERM_HELP */
