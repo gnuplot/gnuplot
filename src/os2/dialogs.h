@@ -38,23 +38,58 @@
 #define IDM_MOUSE_COORDINATES_REAL    603
 #define IDM_MOUSE_COORDINATES_PIXELS  604
 #define IDM_MOUSE_COORDINATES_SCREEN  605
-#define IDM_MOUSE_UNZOOM      606
-#define IDM_MOUSE_UNZOOMPREV  607
-#define IDM_MOUSE_RULER               608
-#define IDM_MOUSE_RULERWINDOW 609
-#define IDM_MOUSE_FORMAT      610 // keep this order of *_FORMAT_* constants!
-#define IDM_MOUSE_FORMAT_X_Y  611
-#define IDM_MOUSE_FORMAT_XcY  612
-#define IDM_MOUSE_FORMAT_XsY  613
-#define IDM_MOUSE_FORMAT_XcYc 614
-#define IDM_MOUSE_FORMAT_XcYs 615
-#define IDM_MOUSE_FORMAT_pXdYp        616
-#define IDM_MOUSE_FORMAT_pXcYp        617
-#define IDM_MOUSE_FORMAT_pXsYp        618
-#define IDM_MOUSE_FORMAT_LABEL        619
-#define IDM_MOUSE_GRID                621
-#define IDM_MOUSE_LINLOGY     622
-#define IDM_MOUSE_POLAR_DISTANCE      623
+#define IDM_MOUSE_COORDINATES_XDATE   606
+#define IDM_MOUSE_COORDINATES_XTIME   607
+#define IDM_MOUSE_COORDINATES_XDATETIME       608
+#define IDM_MOUSE_UNZOOM              610
+#define IDM_MOUSE_UNZOOMALL           611
+#define IDM_MOUSE_ZOOMNEXT            612
+#define IDM_MOUSE_RULER                       613
+//#define IDM_MOUSE_RULERWINDOW               614
+#define IDM_MOUSE_POLAR_DISTANCE      615
+#define IDM_MOUSE_CMDS2CLIP           616
+#define IDM_MOUSE_FORMAT              620 // keep this order of *_FORMAT_* constants!
+#define IDM_MOUSE_FORMAT_X_Y          621
+#define IDM_MOUSE_FORMAT_XcY          622
+#define IDM_MOUSE_FORMAT_XsY          623
+#define IDM_MOUSE_FORMAT_XcYc         624
+#define IDM_MOUSE_FORMAT_XcYs         625
+#define IDM_MOUSE_FORMAT_pXdYp                626
+#define IDM_MOUSE_FORMAT_pXcYp                627
+#define IDM_MOUSE_FORMAT_pXsYp                628
+#define IDM_MOUSE_FORMAT_LABEL                629
+
+#define IDM_UTILS             650
+#define IDM_BREAK_DRAWING     651
+#define IDM_SET_GRID          652
+#define IDM_SET_LINLOGY               653
+#define IDM_SET_AUTOSCALE     655
+#define IDM_DO_REPLOT         656
+#define IDM_DO_RELOAD         657
+#define IDM_DO_SENDCOMMAND    658
+
+#define IDM_SET                       700
+#define IDM_SET_D_S           710 // 'set data style' options
+#define IDM_SET_D_S_BOXES     711 // must be the same order as SetDataStyles[]
+#define IDM_SET_D_S_DOTS      712
+#define IDM_SET_D_S_FSTEPS    713
+#define IDM_SET_D_S_HISTEPS   714
+#define IDM_SET_D_S_IMPULSES  715
+#define IDM_SET_D_S_LINES     716
+#define IDM_SET_D_S_LINESPOINTS       717
+#define IDM_SET_D_S_POINTS    718
+#define IDM_SET_D_S_POINTS    718
+#define IDM_SET_D_S_STEPS     719
+#define IDM_SET_F_S           730 // 'set function style' options
+#define IDM_SET_F_S_BOXES     731 // must be the same order as SetDataStyles[]
+#define IDM_SET_F_S_DOTS      732
+#define IDM_SET_F_S_FSTEPS    733
+#define IDM_SET_F_S_HISTEPS   734
+#define IDM_SET_F_S_IMPULSES  735
+#define IDM_SET_F_S_LINES     736
+#define IDM_SET_F_S_LINESPOINTS       737
+#define IDM_SET_F_S_POINTS    738
+#define IDM_SET_F_S_STEPS     739
 
 #define ID_ABOUT              10
 #define IDD_COLOURS           20

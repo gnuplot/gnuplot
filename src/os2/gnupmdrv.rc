@@ -38,15 +38,25 @@ BEGIN
 
     SUBMENU  "~Mouse" , IDM_MOUSE,,MIA_DISABLED
     BEGIN
-        MENUITEM    "~Use mouse\tCtrl/M", IDM_USEMOUSE,,MIA_CHECKED
-        SUBMENU    "~Coordinates", IDM_MOUSE_COORDINATES
+        MENUITEM    "~Use mouse\tCtrl-M", IDM_USEMOUSE,,MIA_CHECKED
+        SUBMENU    "Coordinates", IDM_MOUSE_COORDINATES
         BEGIN
             MENUITEM  "~real", IDM_MOUSE_COORDINATES_REAL,,MIA_CHECKED
             MENUITEM  "~screen", IDM_MOUSE_COORDINATES_SCREEN
-          MENUITEM  SEPARATOR
             MENUITEM  "~pixels", IDM_MOUSE_COORDINATES_PIXELS
+          MENUITEM  SEPARATOR
+            MENUITEM  "x ~date", IDM_MOUSE_COORDINATES_XDATE
+            MENUITEM  "x ~time", IDM_MOUSE_COORDINATES_XTIME
+            MENUITEM  "x date+time", IDM_MOUSE_COORDINATES_XDATETIME
         END
-        SUBMENU   "coords ~format", IDM_MOUSE_FORMAT
+        MENUITEM  SEPARATOR
+        SUBMENU   "By mouse...", -1
+        BEGIN
+            MENUITEM  "Pos2clip\t2x MB1", -2,,MIA_DISABLED
+            MENUITEM  "Zoom\tMB2 - MB1",-3,,MIA_DISABLED
+            MENUITEM  "Annotate\tMB3", -4,,MIA_DISABLED
+        END
+        SUBMENU   "Coords ~format", IDM_MOUSE_FORMAT
         BEGIN
             MENUITEM  "x y", IDM_MOUSE_FORMAT_X_Y
             MENUITEM  "x,y", IDM_MOUSE_FORMAT_XcY,,MIA_CHECKED
@@ -61,20 +71,55 @@ BEGIN
             MENUITEM  SEPARATOR
             MENUITEM  "set label...", IDM_MOUSE_FORMAT_LABEL
         END
+        MENUITEM  "Unzoom all\tF10", IDM_MOUSE_UNZOOMALL,,MIA_DISABLED
+        MENUITEM  "Unzoom back\tF11", IDM_MOUSE_UNZOOM,,MIA_DISABLED
+        MENUITEM  "Zoom next\tF12", IDM_MOUSE_ZOOMNEXT,,MIA_DISABLED
+        MENUITEM  SEPARATOR
+        MENUITEM  "~Ruler\tCtrl-R", IDM_MOUSE_RULER
+//        MENUITEM  "(todo?)Ruler ~window\tCtrl-F2", IDM_MOUSE_RULERWINDOW
         MENUITEM  "~Polar distance", IDM_MOUSE_POLAR_DISTANCE,,
+    END
+
+    SUBMENU "~Utilities" , IDM_UTILS
+    BEGIN
+	MENUITEM "~Break drawing\tCtrl-C" , IDM_BREAK_DRAWING
         MENUITEM  SEPARATOR
-        MENUITEM   "Zoom\tMB2-MB1",-1,,MIA_DISABLED
-        MENUITEM   "~Unzoom\tCtrl/U", IDM_MOUSE_UNZOOM,,MIA_DISABLED
-//        MENUITEM   "(todo)Unzoom to prev. level", IDM_MOUSE_UNZOOMPREV
-        MENUITEM   "Pos2clip\t2xMB1", -2,,MIA_DISABLED
-        MENUITEM   "Annotate\tMB3", -3,,MIA_DISABLED
+	MENUITEM  "~grid on/off\tCtrl-G", IDM_SET_GRID
+	MENUITEM  "~lin/log y\tCtrl-L", IDM_SET_LINLOGY
+	SUBMENU "~set",IDM_SET
+        BEGIN
+            SUBMENU "~data style",IDM_SET_D_S
+            BEGIN
+                MENUITEM  "~boxes", IDM_SET_D_S_BOXES
+                MENUITEM  "~dots", IDM_SET_D_S_DOTS
+                MENUITEM  "~fsteps", IDM_SET_D_S_FSTEPS
+                MENUITEM  "~histeps", IDM_SET_D_S_HISTEPS
+                MENUITEM  "~impulses", IDM_SET_D_S_IMPULSES
+                MENUITEM  "~lines", IDM_SET_D_S_LINES
+                MENUITEM  "li~nespoints", IDM_SET_D_S_LINESPOINTS
+                MENUITEM  "~points", IDM_SET_D_S_POINTS
+                MENUITEM  "~steps", IDM_SET_D_S_STEPS
+            END
+            SUBMENU "~function style",IDM_SET_F_S
+            BEGIN
+                MENUITEM  "~boxes", IDM_SET_F_S_BOXES
+                MENUITEM  "~dots", IDM_SET_F_S_DOTS
+                MENUITEM  "~fsteps", IDM_SET_F_S_FSTEPS
+                MENUITEM  "~histeps", IDM_SET_F_S_HISTEPS
+                MENUITEM  "~impulses", IDM_SET_F_S_IMPULSES
+                MENUITEM  "~lines", IDM_SET_F_S_LINES
+                MENUITEM  "li~nespoints", IDM_SET_F_S_LINESPOINTS
+                MENUITEM  "~points", IDM_SET_F_S_POINTS
+                MENUITEM  "~steps", IDM_SET_F_S_STEPS
+            END
+        END
+        MENUITEM   SEPARATOR
+        MENUITEM   "autoscale\tF3", IDM_SET_AUTOSCALE
+        MENUITEM   "replot\tF4", IDM_DO_REPLOT
+        MENUITEM   "reload\tF5", IDM_DO_RELOAD
         MENUITEM  SEPARATOR
-        MENUITEM   "~Ruler\tCtrl/R", IDM_MOUSE_RULER
-//        MENUITEM   "(todo?)Ruler ~window\tCtrl/F2", IDM_MOUSE_RULERWINDOW
-//        MENUITEM  SEPARATOR
-        MENUITEM   "~Grid on/off\tCtrl/G", IDM_MOUSE_GRID
-        MENUITEM   "~lin/log y\tCtrl/L", IDM_MOUSE_LINLOGY
-//  Some other setup?
+        MENUITEM   "~command...", IDM_DO_SENDCOMMAND
+        MENUITEM  "cmds2clip", IDM_MOUSE_CMDS2CLIP,,
     END
 
     MENUITEM "~Gnuplot" , IDM_COMMAND
@@ -98,16 +143,26 @@ BEGIN
     VK_DELETE, IDM_CLEARCLIP, VIRTUALKEY
     VK_INSERT, IDM_COPY, VIRTUALKEY, CONTROL
     VK_F1, IDM_GPLOTINF, VIRTUALKEY
-    "g", IDM_MOUSE_GRID, CONTROL
-    "G", IDM_MOUSE_GRID, CONTROL
-    "l", IDM_MOUSE_LINLOGY, CONTROL
-    "L", IDM_MOUSE_LINLOGY, CONTROL
+    "c", IDM_BREAK_DRAWING, CONTROL
+    "C", IDM_BREAK_DRAWING, CONTROL
+    "g", IDM_SET_GRID, CONTROL
+    "G", IDM_SET_GRID, CONTROL
+    "l", IDM_SET_LINLOGY, CONTROL
+    "L", IDM_SET_LINLOGY, CONTROL
     "M", IDM_USEMOUSE, CONTROL
     "m", IDM_USEMOUSE, CONTROL
     "r", IDM_MOUSE_RULER, CONTROL
     "R", IDM_MOUSE_RULER, CONTROL
-    "u", IDM_MOUSE_UNZOOM, CONTROL
-    "U", IDM_MOUSE_UNZOOM, CONTROL
+    "u", IDM_MOUSE_UNZOOMALL, CONTROL
+    "U", IDM_MOUSE_UNZOOMALL, CONTROL
+    "v", IDM_MOUSE_UNZOOM, CONTROL
+    "V", IDM_MOUSE_UNZOOM, CONTROL
+    VK_F3, IDM_SET_AUTOSCALE, VIRTUALKEY
+    VK_F4, IDM_DO_REPLOT, VIRTUALKEY
+    VK_F5, IDM_DO_RELOAD, VIRTUALKEY
+    VK_F10, IDM_MOUSE_UNZOOMALL, VIRTUALKEY
+    VK_F11, IDM_MOUSE_UNZOOM, VIRTUALKEY
+    VK_F12, IDM_MOUSE_ZOOMNEXT, VIRTUALKEY
 END
 
 HELPSUBTABLE 1
@@ -163,7 +218,7 @@ BEGIN
     BEGIN
         CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
         CTEXT           "Gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "$Revision: 1.6; mouse by PM $", -1, 8, 35, 128, 8
+        CTEXT           "$Revision: 1.6 $", -1, 8, 35, 128, 8
         DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
     END
 END
@@ -243,3 +298,13 @@ BEGIN
     END
 END
 
+DLGTEMPLATE IDM_DO_SENDCOMMAND
+BEGIN
+    DIALOG "Send a command to gnuplot", IDM_DO_SENDCOMMAND, 32, 32, 250, 56, , FCF_TITLEBAR | FCF_SYSMENU
+    BEGIN
+        CONTROL "~Command:",                       0,  10, 32,  50,  8, WC_STATIC, WS_VISIBLE | SS_TEXT | DT_LEFT | DT_MNEMONIC
+        CONTROL "",                      IDM_DO_SENDCOMMAND,  60, 32, 180,  8, WC_ENTRYFIELD, WS_VISIBLE | ES_AUTOSCROLL | ES_MARGIN | WS_TABSTOP | WS_GROUP
+        DEFPUSHBUTTON "~OK",               DID_OK,  10,  8,  38, 13, WS_TABSTOP | WS_GROUP
+        CONTROL       "~Cancel",       DID_CANCEL,  60,  8,  38, 13, WC_BUTTON, BS_PUSHBUTTON | WS_VISIBLE | WS_TABSTOP
+    END
+END

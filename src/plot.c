@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.19 1999/08/07 17:21:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.20 1999/08/24 11:22:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -252,6 +252,9 @@ static int exit_status = EXIT_SUCCESS;
 #ifdef OS2
 # define INCL_DOS
 # define INCL_REXXSAA
+# ifdef USE_MOUSE
+#  define INCL_DOSSEMAPHORES
+# endif
 # include <os2.h>
 # include <process.h>
 ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
@@ -378,6 +381,14 @@ char **argv;
 #if defined(OS2)
     int rc;
     if (_osmode == OS2_MODE) {
+#ifdef USE_MOUSE
+	extern HEV semInputReady;
+	char semInputReadyName[40];
+	sprintf( semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid() );
+	rc = DosCreateEventSem(semInputReadyName,&semInputReady,0,0);
+	if (rc != 0)
+	    fputs("DosCreateEventSem error\n",stderr);
+#endif
 	PM_setup();
 	rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
     }

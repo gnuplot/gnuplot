@@ -1,6 +1,6 @@
 /* gnushell header file */
 /*
-** static char RCSid[]="$Id: gnupmdrv.h,v 1.8 1998/03/22 22:34:23 drd Exp $" ;
+** static char RCSid[]="$Id: gnupmdrv.h,v 1.2 1999/04/04 17:29:52 lhecking Exp $" ;
 */
 
 /* PM driver for GNUPLOT */
@@ -154,6 +154,7 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND, ULONG, MPARAM, MPARAM);
 MRESULT EXPENTRY NewFrameWndProc(HWND, ULONG, MPARAM, MPARAM) ;
 MRESULT EXPENTRY About(HWND, ULONG, MPARAM, MPARAM);
 MRESULT EXPENTRY CancelPrintDlgProc ( HWND, ULONG, MPARAM, MPARAM ) ;
+MRESULT EXPENTRY SendCommandDlgProc( HWND, ULONG, MPARAM, MPARAM ) ;
 
         /* own window functions... */
 void WinSetDlgItemFloat( HWND, USHORT, float ) ;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.26 1999/08/17 15:42:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.27 1999/09/14 15:25:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -51,9 +51,15 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.26 1999/08/17 15:42:53 l
  *
  * April 1999 Franz Bakan (bakan@ukezyk.desy.de)
  * Added code to support mouse-input from OS/2 PM window
- * Works with gnuplot's readline routine, it does not work with GNU readline
  * Changes marked by USE_MOUSE
- * May 1999, update by Petr Mikulik: use gnuplot's pid in share mem name
+ *
+ * May 1999, update by Petr Mikulik
+ * Use gnuplot's pid in shared mem name
+ *
+ * August 1999 Franz Bakan and Petr Mikulik
+ * Encapsulating read_line into a thread, acting on input when thread or 
+ * gnupmdrv posts an event semaphore. Thus mousing works even when gnuplot
+ * is used as a plotting device (commands passed via pipe).
  *
  */
 
@@ -78,9 +84,14 @@ extern int ExecuteMacro(char *, int);   /* plot.c */
 extern TBOOLEAN CallFromRexx;           /* plot.c */
 # ifdef USE_MOUSE
 #  define INCL_DOSMEMMGR
+#  define INCL_DOSPROCESS
+#  define INCL_DOSSEMAPHORES
 #  include <os2.h>
 PVOID input_from_PM_Terminal = NULL;
-char mouseShareMemName[40] = "";
+char mouseSharedMemName[40] = "";
+HEV semInputReady = 0;      /* semaphore to be created in plot.c */
+int thread_rl_Running = 0;  /* running status */
+int thread_rl_RetCode = -1; /* return code from readline in a thread */
 # endif /* USE_MOUSE */
 #endif /* OS2 */
 
@@ -190,9 +201,9 @@ extend_input_line()
 	input_line[0] = NUL;
 
 #if defined(USE_MOUSE) && defined(OS2)
-	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
+	sprintf( mouseSharedMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
 	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
-			      mouseShareMemName,
+	    	mouseSharedMemName,
 			      MAX_LINE_LEN,
 			      PAG_WRITE | PAG_COMMIT))
 	    fputs("command.c: DosAllocSharedMem ERROR\n",stderr);
@@ -224,9 +235,31 @@ extend_token_table()
 }
 
 
+#if defined(USE_MOUSE) && defined(OS2)
+void thread_read_line()
+{
+   thread_rl_Running = 1;
+   thread_rl_RetCode = ( read_line(PROMPT) );
+   thread_rl_Running = 0;
+   DosPostEventSem(semInputReady);
+}
+#endif /* USE_MOUSE && OS2 */
+
+
 int
 com_line()
 {
+#if defined(USE_MOUSE) && defined(OS2)
+static char *input_line_SharedMem = NULL;
+    if (input_line_SharedMem == NULL) {  /* get shared mem only once */
+    if (DosGetNamedSharedMem((PVOID) &input_line_SharedMem,
+		mouseSharedMemName, PAG_WRITE | PAG_READ))
+	fputs("readline.c: DosGetNamedSharedMem ERROR\n", stderr);
+    else
+	*input_line_SharedMem = 0;
+    }
+#endif /* USE_MOUSE && OS2 */
+
     if (multiplot) {
 	/* calls int_error() if it is not happy */
 	term_check_multiplot_okay(interactive);
@@ -234,8 +267,38 @@ com_line()
 	if (read_line("multiplot> "))
 	    return (1);
     } else {
+
+#ifndef USE_MOUSE
 	if (read_line(PROMPT))
 	    return (1);
+#else
+#ifdef OS2
+	ULONG u;
+        if (thread_rl_Running == 0) {
+	    int res = _beginthread(thread_read_line,NULL,32768,NULL);
+	    if (res == -1)
+		fputs("error command.c could not begin thread\n",stderr);
+	}
+	/* wait until a line is read or gnupmdrv makes shared mem available */
+	DosWaitEventSem(semInputReady,SEM_INDEFINITE_WAIT);
+	DosResetEventSem(semInputReady,&u);
+	if (thread_rl_Running) {
+	    if (input_line_SharedMem != NULL && *input_line_SharedMem &&
+	        strstr(input_line_SharedMem,"plot") != NULL && strcmp(term->name,"pm")) {
+		/* avoid plotting if terminal is not Presentation Manager */
+		fprintf(stderr,"\n\tCommand(s) ignored for non-PM terminal\a\n");
+		if (interactive) fputs(PROMPT,stderr);
+		input_line_SharedMem[0] = 0; /* discard the whole command line */
+		return (0);
+	    }
+	    strcpy(input_line, input_line_SharedMem);
+	    input_line_SharedMem[0] = 0;
+	    thread_rl_RetCode = 0;
+	}
+    if (thread_rl_RetCode)
+	    return (1);
+#endif /* OS2 */
+#endif /* USE_MOUSE */
     }
 
     /* So we can flag any new output: if false at time of error,

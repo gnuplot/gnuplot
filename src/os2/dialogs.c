@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: dialogs.c,v 1.9 1998/03/22 22:34:20 drd Exp $" ;
+static char RCSid[]="$Id: dialogs.c,v 1.1 1999/03/26 22:15:38 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
@@ -446,3 +446,41 @@ void WinQueryDlgItemFloat( HWND hwnd, USHORT usID, float *pflValue )
     *pflValue = (float) atof( achBuffer ) ;
     }
 
+MRESULT EXPENTRY SendCommandDlgProc (HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2)
+/*
+**  Dialog for sending a command to gnuplot
+**  //PM Petr Mikulik, 17. 8. 1999
+*/
+{
+#define TEXT_LENGTH 80
+static char buf[TEXT_LENGTH+1];
+extern void gp_execute ();
+extern PVOID input_from_PM_Terminal;
+
+  switch (msg)
+    {
+    case WM_INITDLG:
+      WinSendDlgItemMsg( hwnd, IDM_DO_SENDCOMMAND, EM_SETTEXTLIMIT,
+                         MPFROMSHORT (TEXT_LENGTH), 0L );
+      WinSetDlgItemText( hwnd, IDM_DO_SENDCOMMAND, buf );
+      WinSendDlgItemMsg( hwnd, IDM_DO_SENDCOMMAND, EM_SETSEL,
+                         MPFROM2SHORT (0, strlen(buf)), 0L );
+      return (MRESULT)FALSE;
+
+    case WM_COMMAND:
+      switch (COMMANDMSG (&msg)->cmd)
+        {
+        case DID_OK:
+          WinQueryDlgItemText( hwnd, IDM_DO_SENDCOMMAND, sizeof(buf), buf );
+          WinDismissDlg( hwnd, TRUE );
+	  strcpy( input_from_PM_Terminal, buf);
+	  gp_execute();
+          break;
+        default:
+          WinDismissDlg( hwnd, FALSE );
+          break;
+        }
+      return 0;
+    }
+  return ( WinDefDlgProc( hwnd, msg, mp1, mp2 ) );
+}
