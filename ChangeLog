@@ -1,4 +1,4 @@
-2003-11-21  Ethan Merritt <merritt@u.washington.edu>
+2003-11-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/show.c: Remove unused variables to quiet compiler warnings.
 
@@ -15,7 +15,7 @@
 	* src/win/wgraph.c (drawgraph): Fix names of struct elements
 	changed on 2003-11-13.
 
-2003-11-18  Ethan Merritt <merritt@u.washington.edu>
+2003-11-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c: Add parens to make DEC cc compiler happy.
 
@@ -29,12 +29,12 @@
 	* src/color.c (cbtick_callback): Fixed position of nomirrored
 	horizontal color box tics.
 
-2003-11-17  Ethan Merritt <merritt@u.washington.edu>
+2003-11-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/xlib.trm src/term.h: Update xlib device to use the actual
 	x11 driver routines, so the output will be identical.
 
-2003-11-14  Ethan Merritt <merritt@u.washington.edu>
+2003-11-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Fix bug in enhanced text overprint mode; vertical
 	offset of overprinted text is now honored as specified in the
@@ -70,16 +70,16 @@
 	rgb_from_gray() to rgb255_from_gray(). New routine
 	rgb255_from_rgb1().
 
-2003-11-10  Ethan Merritt <merritt@u.washington.edu>
+2003-11-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/color.c: Don't try to set color of non-supporting terminals.
 
-2003-11-06  Ethan Merritt <merritt@u.washington.edu>
+2003-11-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in, term/pdf.trm:  Test for and accommodate older
 	versions of pdflib.
 
-2003-11-01  Ethan Merritt <merritt@u.washington.edu>
+2003-11-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Do not use %lg to printf doubles. Some compilers
 	complain because it is not strict ANSIC.
@@ -89,12 +89,17 @@
 	* term/x11.trm src/gplt_x11.c: Added  #ifdef PIPE_IPC  where missing
 	(fixes compiling X11 terminal on OS/2).
 
-2003-10-27  Ethan Merritt <merritt@u.washington.edu>
+2003-10-29  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/unixplot.trm: Fix misprints in gnuplot manual
+	(#13).
+
+2003-10-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/*.dem: Replace deprecated syntax in demos with current
 	preferred syntax.
 
-2003-10-23  Ethan Merritt <merritt@u.washington.edu>
+2003-10-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Add a soft lock on the mousing pipe so that input
 	from stdin is delayed until completion of a query/response operation
@@ -108,7 +113,7 @@
 	* src/set.c reset_palette(): Added missing reset of variable
 	pm3d_last_set_palette_mode. Bugfix by Daniel J Sebald.
 
-2003-10-21  Ethan Merritt <merritt@u.washington.edu>
+2003-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c: Fix reported bug #826811. The inverse_error_func()
 	code to perform Newton-Raphson improvement was incorrectly nested
@@ -159,7 +164,7 @@
 
 	* src/tables.h src/tables.c: New routine lookup_table_nth.
 
-2003-10-06  Ethan A Merritt <merritt@u.washington.edu>
+2003-10-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* axis.h: The recent (8 Sep) change to define NOOP as 0 caused
 	gcc 3.2 -Wall to emit dozens of warning messages. Change this to
@@ -259,7 +264,7 @@
 	* docs/gnuplot.doc, term/fig.trm, term/gd.trm, term/post.trm,
 	term/x11.trm: Fix misprints in gnuplot manual (#12).
 
-2003-08-20  Ethan Merritt <merritt@u.washington.edu>
+2003-08-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/save.c src/show.c: Fix incomplete/incorrect description of point
 	properties from 'set label' commands.
@@ -272,7 +277,7 @@
 	* src/parse.c (push_vars): Changed initialization to TRUE, as it
  	was before yesterday's patch.  Fixes SF bug #790489.
 
-2003-08-17  Ethan Merritt <merritt@u.washington.edu>
+2003-08-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/eval.h src/eval.c src/parse.c: There is no need to have
  	push_vars a global exported from eval.*; move it to parse.c, the
@@ -284,7 +289,7 @@
  	definition by macro to map from sgngam in fall-back implementation
  	to default name.  Fixes gamma(x)==0 bug on Cygwin/MinGW32 builds.
 
-2003-08-12  Ethan Merritt <merritt@u.washington.edu>
+2003-08-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Apply linewidth changes directly to pm3d mode (fixes
 	bug that linewidths in pm3d were one plot late in being applied).
@@ -306,30 +311,30 @@
 
 	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#11).
 
-2003-08-04  Ethan Merritt <merritt@u.washington.edu>
+2003-08-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm docs/gnuplot.doc:  Honor explicit request
 	for "bold" or "medium" font weight when parsing X11 font requests.
 
-2003-07-31  Ethan Merritt <merritt@u.washington.edu>
+2003-07-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Fix incorrect bracketing of switch statement entries
 	introduced way back in Dec 2000. This fixes the "x11 clipboard" bug.
 
-2003-07-27  Ethan Merritt <merritt@u.washington.edu>
+2003-07-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc docs/titlepag.tex: This is a first pass at updating
 	the "What is New" section to reflect changes since version 3.7. I also
 	slightly re-arranged the sections on mousing, and added my name to the
 	list of contributers.
 
-2003-07-27  Ethan Merritt <merritt@u.washington.edu>
+2003-07-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/mouse.c docs/gnuplot.doc: Report key modifiers
 	active at the time of a mouse click in variables MOUSE_SHIFT,
 	MOUSE_ALT, and MOUSE_CTRL.
 
-2003-07-23  Ethan Merritt <merritt@u.washington.edu>
+2003-07-23  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Rename the configuration option for Jaime Reed's
 	'defined(var)' code, and enable it by default.  The option is now
@@ -337,7 +342,7 @@
 
 	* show.c: Move listing of undefined variables to an FPRINTF.
 
-2003-07-22  Ethan Merritt <merritt@u.washington.edu>
+2003-07-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/command.h src/mouse.c:
 	Add a new user command 'pause mouse {"text"}'.  On mouse-capable
@@ -372,7 +377,7 @@
 	is defined and returns 0 if undefined. This was patch #714750 on
 	SourceForge.  Select at build time by ./configure --enable-isvar
 
-2003-07-15  Ethan Merritt <merritt@u.washington.edu>
+2003-07-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gp_types.h src/graphics.c src/plot2d.c: Create a new flag
 	PLOT_STYLE_HAS_BOXES and use this to trigger filled-box processing
@@ -380,14 +385,14 @@
 
 	* src/mouse.c: #include "util3d.h" to get prototype for map3d_xy().
 
-2003-07-10  Ethan Merritt <merritt@u.washington.edu>
+2003-07-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Gnuplot disables mousing if it thinks the 
 	controlling terminal is not interactive. In this case X11_graphics()
 	must not attempt to wait for a mouse event during initialization
 	[Fixes reported bug that first character of input line can be lost].
 
-2003-07-07  Ethan Merritt <merritt@u.washington.edu>
+2003-07-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Detect request for illegal window number and
 	treat it as window number 0.
@@ -404,7 +409,7 @@
 	blanks as per CodeStyle document.
 	(do_string): Likewise.
 
-2003-07-04  Ethan Merritt <merritt@u.washington.edu>
+2003-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c: Rewrite do_string() and do_string_replot() so
  	that no memory corruption occurs if extend_input_line() triggers a
@@ -422,7 +427,7 @@
 	* src/graphics.c: Replace problematic adjustment of key placement
  	below plot with a better one.
 
-2003-07-02  Ethan Merritt <merritt@u.washington.edu>
+2003-07-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c: DU4.0 cc compiler does not automatically promote
  	argument of sqrt to (double), so change it to double explicitly.
@@ -441,19 +446,19 @@
 	* src/command.c (do_string_replot): Don't allocate so much of the
  	temporary buffer.
 
-2003-07-01  Ethan Merritt <merritt@u.washington.edu>
+2003-07-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Make sample arrow in plot key match the arrow
  	style used by 'plot with vectors'.
 
-2003-06-30  Ethan Merritt <merritt@u.washington.edu>
+2003-06-30  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/misc.h src/misc.c src/plot2d.c src/set.c docs/gnuplot.doc: 
 	Vector plots are drawn using the linetype in a stored arrowstyle 
 	structure. Make sure this defaults to the linetype for the current
 	plot #, and that this and the overall plot linetype always agree.
 
-2003-06-27  Ethan Merritt <merritt@u.washington.edu>
+2003-06-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Fix unexpected behaviour that 'set grid nox noy'
 	turned the x and y grids ON rather than off.
@@ -463,7 +468,7 @@
 	* term/dxf.trm (DXF_HTIC, DXF_VTIC):  Fixed definitions so 'set
 	size ratio' can work.
 
-2003-06-25  Ethan Merritt <merritt@u.washington.edu>
+2003-06-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term_api.h src/command.c term/x11.trm: Define a flag
 	TERM_INIT_ON_REPLOT by which a terminal driver can request that
@@ -473,12 +478,12 @@
 	x11 display window back from gnuplot_x11 to x11.trm during
 	term->init(). Use this information to update the aspect ratio.
 
-2003-06-21  Ethan Merritt <merritt@u.washington.edu>
+2003-06-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: gnuplot_x11<->x11.trm font info exchange is now
 	working.
 
-2003-06-20  Ethan Merritt <merritt@u.washington.edu>
+2003-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:
 	It turns out that yesterday's patch breaks the "pause -1" command
@@ -491,7 +496,7 @@
 	is only performed once per splot, rather than every time the view is
 	changed using the mouse.
 
-2003-06-19  Ethan Merritt <merritt@u.washington.edu>
+2003-06-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c src/graphics.c src/mouse.c src/mousecmn.h term/x11.trm
 	Use existing mouse communication pipe to send X11 font characteristics 
@@ -505,7 +510,7 @@
 
 	* term/pslatex.trm: Escape % to %% inside printf() statement.
 
-2003-06-18  Ethan Merritt <merritt@u.washington.edu>
+2003-06-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.h: Fix FPRINTF typo.
 
@@ -515,12 +520,12 @@
 	line buffer instead of using a fix-size one. Fixes crash when replotting
 	a long plot command by mouse/hotkey.
 
-2003-06-15  Ethan Merritt <merritt@u.washington.edu>
+2003-06-15  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c: Center key title over entire key box rather than
 	cramming it into the first column only.
 
-2003-06-14  Ethan Merritt <merritt@u.washington.edu>
+2003-06-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/epslatex.trm: Clean up file name handling; now it is OK to give
 	either .eps or .tex in 'set output', or no file extension at all.
@@ -529,7 +534,7 @@
 
 	* docs/gnuplot.doc, term/epslatex.trm: Fix misprints in gnuplot manual.
 
-2003-06-11  Ethan Merritt <merritt@u.washington.edu>
+2003-06-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/epslatex.trm term/pslatex.trm: Add text rotation.
 
@@ -572,7 +577,7 @@
  	run "gnuplot -persist" via shell-command.  In DEBUG mode, leave it
  	alone.
 
-2003-05-19  Ethan Merritt <merritt@u.washington.edu>
+2003-05-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Make pattern fill sequence consistent with other
  	terminal types. Fix off-by-one y coordinate error in box fill
@@ -597,7 +602,7 @@
 	colornames': print color names and their rgb values (was printing
 	only names).
 
-2003-05-16  Ethan Merritt <merritt@u.washington.edu>
+2003-05-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graph3d.c src/graphics.c src/save.c src/set.c
 	src/show.c src/tables.c src/tables.h src/unset.c docs/gnuplot.doc:
@@ -609,17 +614,17 @@
 	* config/makefile.mgw config/makefile.cyg: New configuration define
 	GNUSORT.
 
-2003-05-13  Ethan Merritt <merritt@u.washington.edu>
+2003-05-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c docs/gnuplot.doc: Apply current fill style to boxes 
 	drawn for 'plot with boxxyerror'.
 
-2003-05-10  Ethan Merritt <merritt@u.washington.edu>
+2003-05-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: Expand documentation of font handling.
 	* src/readline.c: Allow <tab> characters in input stream.
 
-2003-05-09  Ethan Merritt <merritt@u.washington.edu>
+2003-05-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/cgm.trm: Add missing prototype for CGM_fillbox().
 	* src/term.c: Work around Microsoft compiler inadequacy.
@@ -646,12 +651,12 @@
 	* src/datafile.c: Fixed #define is_comment(c): strchr(s,c) returns
 	!NULL for c=0.
 
-2003-05-03  Ethan Merritt <merritt@u.washington.edu>
+2003-05-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/mif.trm: Implement support for filled boxes, pattern fill
 	and for PM3D filled polygons.
 
-2003-05-01  Ethan Merritt <merritt@u.washington.edu>
+2003-05-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Remove limit of 4 vertices in fill_polygon().
 
@@ -666,7 +671,7 @@
 	src/set.c src/show.c src/syscfg.h src/unset.c: New option 'set datafile
 	commentschars'.
 
-2003-04-24  Ethan Merritt <merritt@u.washington.edu>
+2003-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: The postscript terminal driver now implements
 	pattern-fill via a (Level 1) PostScript subroutine rather than via
@@ -693,7 +698,7 @@
 		eepic
 		emf
 
-2003-04-24  Ethan Merritt <merritt@u.washington.edu>
+2003-04-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/win/wgraph.c: Tweak previous correction to saved pen color
 	so that it applies cleanly to box fill as well.
@@ -729,7 +734,7 @@
 	should let unchanged non-graphics settings (like set term, out,
 	loadpath and fontpath).
 
-2003-04-13  Ethan Merritt <merritt@u.washington.edu>
+2003-04-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c src/graphics.c: Correct a syntax error in test for
 	terminal support of filled boxes.  This fixes reported crashes
@@ -738,14 +743,14 @@
 	* src/gadgets.c src/mouse.c: Fix the same syntax error in other
 	files also, although no crashes have been reported for these.
 
-2003-04-13  Ethan Merritt <merritt@u.washington.edu>
+2003-04-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Document that libgd will handle both TrueType and
 	Adobe Type 1 fonts.
 
 	* src/unset.c: Set tic label rotation to 0 on unset or reset.
 
-2003-04-04  Ethan Merritt <merritt@u.washington.edu>
+2003-04-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm term/epslatex.trm: Add filled box support.
 
@@ -764,21 +769,21 @@
 	* config/makefile.os2: Support for IPFC 2.1. Use temporary script file
 	when creating allterm.h.
 
-2003-04-03  Ethan Merritt <merritt@u.washington.edu>
+2003-04-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c: Only test fill patterns on terminals that support it.
 
-2003-04-01  Ethan Merritt <merritt@u.washington.edu>
+2003-04-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Fix bugs in parsing terminal size and setting tic size.
 
-2003-03-31  Ethan Merritt <merritt@u.washington.edu>
+2003-03-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/bitmap.c src/gplt_x11.c term/gd.trm term/pdf.trm:
 	Add a cross-hatch fill pattern. The change to bitmap.c affects the
 	epson, hpxx, and pbm terminal types.
 
-2003-03-31  Ethan Merritt <merritt@u.washington.edu>
+2003-03-31  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/bitmap.c term/pdf.trm: Revise the order of colors slightly
 	to maximize contrast between successive plots (affects gd.trm also).
@@ -843,7 +848,7 @@
  	instead of plain exp().
 	(lambertw): Likewise.
 
-2003-03-18  Ethan Merritt <merritt@u.washington.edu>
+2003-03-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Default to medium size font (7x13) as claimed
 	by the documentation and by the output of show term; fixes
@@ -878,7 +883,7 @@
  	src/set.c src/show.c demo/pm3d.dem docs/gnuplot.doc: New pm3d
  	option 'corners2color'.
 
-2003-03-13  Ethan Merritt <merritt@u.washington.edu>
+2003-03-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* set.c: Consolidate set_{blrt}margin into a single routine, break
  	out text_label creation and label option parsing into separate
@@ -887,7 +892,7 @@
 
 	* unset.c: Consolidate unset_{blrt}margin into a single routine.
 
-2003-03-07  Ethan Merritt <merritt@u.washington.edu>
+2003-03-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* graphics.c: Filled boxes can obscure the x-axis (see for example
  	fillstyle.dem); fix this by retracing the axes at the end of
@@ -906,13 +911,13 @@
 
 	* pm3d/contrib/colorpts-demo.gp: Removed explicit 'set term'.
 
-2003-03-03  Ethan Merritt <merritt@u.washington.edu>
+2003-03-03  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* demo/candlesticks.dem docs/gnuplot.doc src/graphics.c:
 	Allow 'set boxwidth' to control the box part of candlesticks.
 	If no boxwidth is set, then default to previous behavior.
 
-2003-03-02  Ethan Merritt <merritt@u.washington.edu>
+2003-03-02  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/graphics.c: The calculation of plot boundary size is a tangle of
 	interdependent size estimates. While not addressing the underlying
