@@ -295,7 +295,7 @@ moment.
       make install
 
 Using the Cygwin port of gcc, which includes MinGW32: you need the
-Micrsoft SDK for the moment.
+Microsoft SDK for the moment.
       copy makefile.cyg makefile
   Look through the Makefile to see if you need to make any changes.
       make
@@ -356,6 +356,7 @@ will show you all pre-defined targets.
 
 See other sections of the manuals for more information about
 installing/using gnuplot on OS/2.
+
 
 Environment Variables
 =====================
@@ -608,6 +609,40 @@ gnuplot> test
 
    `test` creates a display of line and point styles and other useful things
 appropriate for the terminal you are using.
+
+
+
+Running gnuplot on OS/2
+=======================
+
+GNUPLOT can be run from the command line of an OS/2 session, or can be set up
+as a program object in the WPS.
+
+GNUPLOT starts up as a command line session which accepts the usual GNUPLOT 
+input. The Presentation Manager (PM) window for graphics display is only opened
+when the first 'plot' or 'splot' command is entered.
+
+If GNUPLOT is set up as a program object, it can be configured for 'drag and 
+drop' in the usual way, by specifying '%*' as the program parameter.
+
+The PM window has facilities for printing the plot, for changing the fonts 
+used in the plot, and so on. These of course are handled through the usual 
+PM interface. In addition, you can 'drop' a font onto the window to change 
+the font.
+
+The usual GNUPLOT commands can also be used to produce output on supported
+devices.
+
+Settings and the positions and sizes of the windows can be saved in the file
+gnushell.ini. This file is saved in the program's working directory; several
+different directories can be set up (as program objects) with different 
+options, if you wish.
+
+PM terminal is fully mouse-capable. Type 'm' to switch the mouse on/off (see
+'help mouse' for more details), or 'h' for the full list of current hotkeys
+(see also 'help bind').
+
+
 
 Front Ends for gnuplot
 ======================
