@@ -1,5 +1,11 @@
 2001-02-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/term.c (term_set_output): add code to work around an MSDOS
+ 	bug: 'set output' to the already open file causes file system
+ 	corruption. Solved by closing the file before opening it again.
+	
+2001-02-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/win/wgraph.c (ruler, zoombox): struct element 'on' made
  	TBOOLEAN.
 	(hptrDefault and friends): Uncommented Petr's suggestion, changed

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.33 2000/12/18 08:21:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.34 2000/12/20 16:37:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -345,9 +345,22 @@ char *dest;
 #endif
 
 	{
-	    if (term && (term->flags & TERM_BINARY)) {
+#if defined (MSDOS)
+	    if (outstr && (0 == stricmp(outstr, dest))) {
+		/* On MSDOS, you cannot open the same file twice and
+		 * then close the first-opened one and keep the second
+		 * open, it seems. If you do, you get lost clusters
+		 * (connection to the first version of the file is
+		 * lost, it seems). */
+		/* FIXME: this is not yet safe enough. You can fool it by
+		 * specifying the same output file in two different ways
+		 * (relative vs. absolute path to file, e.g.) */
+		term_close_output();
+	    }
+#endif
+            if (term && (term->flags & TERM_BINARY))
 		f = FOPEN_BINARY(dest);
-	    } else
+            else
 		f = fopen(dest, "w");
 
 	    if (f == (FILE *) NULL)
