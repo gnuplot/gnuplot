@@ -96,6 +96,8 @@ double atof();
 int atoi();
 long atol();
 double strtod();
+#else /* !NO_STDLIB_H */
+# include <stdlib.h>
 /* need to find out about VMS */
 # ifndef VMS
 #  ifndef EXIT_FAILURE
@@ -104,38 +106,47 @@ double strtod();
 #  ifndef EXIT_SUCCESS
 #   define EXIT_SUCCESS (0)
 #  endif
+# else /* VMS */
+#  ifndef EXIT_FAILURE
+#   define  EXIT_FAILURE  0x10000002
+# endif
+#  ifndef EXIT_SUCCESS
+#   define  EXIT_SUCCESS  0
+#  endif
 # endif /* VMS */
-#else
-#include <stdlib.h>
-#endif /* NO_STDLIB_H */
+#endif /* !NO_STDLIB_H */
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #else
-#ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
-#include <libc.h>
-#endif
-#ifdef VMS
-#include <signal.h>
-#ifndef HAVE_SLEEP
-#define HAVE_SLEEP
-#endif /* HAVE_SLEEP */
-#endif /* VMS */
+# ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
+#  include <libc.h>
+# endif
+# ifdef VMS
+/* prototype for sleep() */
+#  include <signal.h>
+# endif
 #endif /* HAVE_UNISTD_H */
 
-#ifndef NO_ERRNO_H
-#include <errno.h>
+#if VMS
+# ifndef HAVE_SLEEP
+#  define HAVE_SLEEP
+# endif
 #endif
-#ifdef EXTERN_ERRNO
+
+#ifndef NO_ERRNO_H
+# include <errno.h>
+#endif
+# ifdef EXTERN_ERRNO
 extern int errno;
 #endif
 
 #ifndef NO_SYS_TYPES_H
-#include <sys/types.h>
+# include <sys/types.h>
 #endif
 
 #ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
+# include <sys/stat.h>
 
 /* This is all taken from GNU fileutils lib/filemode.h */
 
@@ -218,19 +229,19 @@ extern int errno;
 #endif /* HAVE_SYS_STAT_H */
 
 #ifndef NO_LIMITS_H
-#include <limits.h>
+# include <limits.h>
 #else
-#ifdef HAVE_VALUES_H
-#include <values.h>
-#endif
-#endif
+# ifdef HAVE_VALUES_H
+#  include <values.h>
+# endif /* HAVE_VALUES_H */
+#endif /* !NO_LIMITS_H */
 
 #ifdef NO_TIME_H
-#ifndef time_t /* should be #defined by config.h, then... */
-#define time_t long
-#endif
+# ifndef time_t /* should be #defined by config.h, then... */
+#  define time_t long
+# endif
 #else
-#include <time.h> /* ctime etc, should also define time_t and struct tm */
+# include <time.h> /* ctime etc, should also define time_t and struct tm */
 #endif
 
 #if defined(PIPES) && (defined(VMS) || (defined(OSK) && defined(_ANSI_EXT))) || defined(PIPES) && defined(AMIGA_SC_6_1)
@@ -239,23 +250,23 @@ int pclose __PROTO((FILE *));
 #endif
 
 #ifndef NO_FLOAT_H
-#include <float.h>
+# include <float.h>
 #endif
 
 #ifndef NO_LOCALE_H
-#include <locale.h>
+# include <locale.h>
 #endif
 
 #ifndef NO_MATH_H
-#include <math.h>
+# include <math.h>
 #endif
 
 #ifndef HAVE_STRNICMP
-#  ifdef HAVE_STRNCASECMP
-#    define strnicmp strncasecmp
-#  else
+# ifdef HAVE_STRNCASECMP
+#  define strnicmp strncasecmp
+# else
 int strnicmp __PROTO((char *, char *, int));
-#  endif
+# endif
 #endif
 
 /* Argument types for select() */
@@ -317,15 +328,11 @@ int strnicmp __PROTO((char *, char *, int));
 #include <assert.h>
 
 #ifdef DEBUG
-
-#define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
-#define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
-
+# define DEBUG_WHERE do { fprintf(stderr,"%s:%d ",__FILE__,__LINE__); } while (0)
+# define FPRINTF(a) do { DEBUG_WHERE; fprintf a; } while (0)
 #else
-
-#define DEBUG_WHERE     /* nought */
-#define FPRINTF(a)      /* nought */
-
+# define DEBUG_WHERE     /* nought */
+# define FPRINTF(a)      /* nought */
 #endif /* DEBUG */
 
 #endif /* STDFN_H */
