@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.75 1999/09/21 18:02:47 lhecking Exp $
+dnl $Id: configure.in,v 1.76 1999/09/24 15:41:31 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.75 $)
+AC_REVISION($Revision: 1.76 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -154,7 +154,10 @@ AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
 dnl Apparently, -lNeXT_s is needed on NeXT
 dnl _instead_ of -lm ...
-AC_CHECK_LIB(c,sin,,AC_CHECK_LIB(m,sin))
+AC_CHECK_FUNC(sin)
+if test "$ac_cv_func_sin" = no ; then
+  AC_CHECK_LIB(m,sin)
+fi
 dnl this has to be after -lsys_s on NeXT
 dnl AC_CHECK_LIB(m,sin)
 
