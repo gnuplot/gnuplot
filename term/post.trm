@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.58 2001/10/26 12:58:38 mikulik Exp $
+ * $Id: post.trm,v 1.59 2002/02/02 12:03:31 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1460,9 +1460,9 @@ int number;
 }
 
 TERM_PUBLIC void
-PS_fillbox(style, x1,y1,x2,y2)
+PS_fillbox(style, x1,y1,width,height)
     int style;
-    unsigned int x1,y1,x2,y2;
+    unsigned int x1,y1,width,height;
 {
 #if USE_ULIG_FILLEDBOXES
     double filldens;
@@ -1472,19 +1472,72 @@ PS_fillbox(style, x1,y1,x2,y2)
 
 #if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
-    case 1: /* style == 1 --> fill with intensity according to filldensity */
+    case 1:
+	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
-        if( filldens < 0.0 ) filldens = 0.0;
-        if( filldens > 1.0 ) filldens = 1.0;
-        fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n", filldens, x1,y1, x2,y2);
+        if( filldens < 0.0 )
+	    filldens = 0.0;
+        if( filldens > 1.0 )
+	    filldens = 1.0;
+        fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
+		filldens, x1,y1, width,height);
         break;
-    case 2: /* style == 2 --> fill with pattern according to fillpattern */
-        /* not implemented yet, so fall through ... */
+    case 2: 
+	/* style == 2 --> fill with pattern according to fillpattern */
+        /* 20020302 Lutz Maibaum: Added basic support for filling
+	 * patterns 6 patterns are available, which are similar to
+	 * those in gplt_x11.c. */
+	
+	/* the upper 3 nibbles of 'style' contain pattern number */
+	switch ((int) (style >> 4)) {
+	    int h;		/* loop variable for pattern lines */
+	    /* HBB 20020330: 6 times essentially the same code -->
+	     * turned into a macro. */
+	    /* FIXME: should probably be turned into a tricky
+	     * PostScript macro, instead... */
+#define PS_PATTERNFILL(hoffset, hincrement, xoffset1, xoffset2, yoffset1, yoffset2)	     \
+	    h = y1 - (hoffset);								     \
+	    fprintf(gpoutfile, "gsave %d %d %d %d Rec gsave 1 setgray fill grestore clip\n", \
+		    x1, y1, width, height);						     \
+	    while ((h < 0) || (h < y1 + height)) {					     \
+		/* the h < 0 test has to be performed seperately			     \
+		 * because y1 and height are unsigned int */				     \
+		fprintf(gpoutfile, "%d %d M %d %d L stroke\n",				     \
+			x1 + (xoffset1), h + (yoffset1),				     \
+			x1 + (xoffset2), h + (yoffset2));				     \
+		h += (hincrement);							     \
+	    }										     \
+	    fprintf(gpoutfile,"grestore\n");
+
+	case 1:                     /* pattern 1 */
+	    PS_PATTERNFILL(width, 71, width, 0, 0, width);
+	    break;
+	case 2:                     /* pattern 2 */
+	    PS_PATTERNFILL(width, 71, 0, width, 0, width);
+	    break;
+	case 3:                     /* pattern 3 */
+	    PS_PATTERNFILL(2 * width, 112, width, 0, 0, 2 * width);
+	    break;
+	case 4:                     /* pattern 4 */
+	    PS_PATTERNFILL(2 * width, 112, 0, width, 0, 2 * width);
+	    break;
+	case 5:                     /* pattern 5 */
+	    PS_PATTERNFILL(width / 2, 56, width, 0, 0, width / 2);
+	    break;
+	case 6:                     /* pattern 6 */
+	    PS_PATTERNFILL(width / 2, 56, 0, width, 0, width / 2);
+	    break;
+	default:                    /* default: fill with background color */
+	    fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, width,height);
+#undef PS_PATTERNFILL
+	}
+        break; /* end of pattern filling part */ 
+	
     default: /* style == 0 or unknown --> fill with background color */
-        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
 #else  /* USE_ULIG_FILLEDBOXES */
-        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
 #endif /* USE_ULIG_FILLEDBOXES */
 
     PS_relative_ok = 0;

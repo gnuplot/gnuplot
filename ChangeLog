@@ -1,5 +1,15 @@
 2002-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	Massively edited contribution from Lutz Maibaum:
+	
+	* term/post.trm (PS_fillbox) [USE_ULIG_FILLED_BOXES]: Implement
+	pattern-filling for postscript, too.  Currently produces a whole
+	line of postscript output per pattern line.  This is not very
+	elegant compared to a possible implementation as a (set of)
+	PostScript macro(s). 
+	
+2002-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	Brought in a patch from Stephan Boettcher to add a new command
 	"set print". SF Patch # 533094.
 	
@@ -247,7 +257,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/28 20:00:17 $).
+	last modification date (from the tag $Date: 2002/03/30 13:15:18 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
