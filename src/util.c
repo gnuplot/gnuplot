@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.10 1999/06/14 19:20:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.11 1999/06/17 14:17:13 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -197,18 +197,20 @@ int max;
 	count = max - 1;
 	FPRINTF((stderr, "str buffer overflow in copy_str"));
     }
+
     do {
 	str[i++] = input_line[start++];
     } while (i != count);
     str[i] = NUL;
+
 }
 
 /* length of token string */
-int
+size_t
 token_len(t_num)
 int t_num;
 {
-    return (token[t_num].length);
+    return (size_t)(token[t_num].length);
 }
 
 /*
@@ -280,7 +282,7 @@ int start, end;
     if (*str)			/* previous pointer to malloc'd memory there */
 	free(*str);
     e = token[end].start_index + token[end].length;
-    *str = gp_alloc((unsigned long) (e - token[start].start_index + 1), "string");
+    *str = gp_alloc((e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index; i < e && input_line[i] != NUL; i++)
 	*s++ = input_line[i];
@@ -303,7 +305,7 @@ int start, end;
     if (*str)			/* previous pointer to malloc'd memory there */
 	free(*str);
     e = token[end].start_index + token[end].length - 1;
-    *str = gp_alloc((unsigned long) (e - token[start].start_index + 1), "string");
+    *str = gp_alloc((e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index + 1; i < e && input_line[i] != NUL; i++)
 	*s++ = input_line[i];
@@ -329,12 +331,11 @@ const char *s;
 
 #ifndef HAVE_STRDUP
     d = gp_alloc(strlen(s) + 1, "gp_strdup");
-    memcpy (d, s, strlen(s) + 1);
+    if (d)
+	memcpy (d, s, strlen(s) + 1);
 #else
     d = strdup(s);
 #endif
-    if (!d)
-	int_error(NO_CARET, "Cannot strdup string");
     return d;
 }
 
@@ -494,7 +495,7 @@ int i;
  * may turn this into a utility function later
  */
 #define PRINT_SPACES_UNDER_PROMPT \
-{ register int i; \
+{ register size_t i; \
   for (i = 0; i < sizeof(PROMPT) - 1; i++) \
    (void) fputc(' ', stderr); \
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.1 1999/06/14 19:21:31 lhecking Exp $
+ * $Id: util.h,v 1.2 1999/06/17 14:16:44 lhecking Exp $
  *
  */
 
@@ -52,7 +52,7 @@ extern int isanumber __PROTO((int));
 extern int isletter __PROTO((int));
 extern int is_definition __PROTO((int));
 extern void copy_str __PROTO((char *, int, int));
-extern int token_len __PROTO((int));
+extern size_t token_len __PROTO((int));
 extern void quote_str __PROTO((char *, int, int));
 extern void capture __PROTO((char *, int, int, int));
 extern void m_capture __PROTO((char **, int, int));

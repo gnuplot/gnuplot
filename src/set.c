@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.14 1999/06/11 18:53:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.15 1999/06/14 19:23:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -135,7 +135,7 @@ char *outstr = NULL;		/* means "STDOUT" */
 TBOOLEAN parametric = FALSE;
 double pointsize = 1.0;
 int encoding;
-char *encoding_names[] = { "default", "iso_8859_1", "cp437", "cp850", NULL };
+const char *encoding_names[] = { "default", "iso_8859_1", "cp437", "cp850", NULL };
 TBOOLEAN polar = FALSE;
 TBOOLEAN hidden3d = FALSE;
 TBOOLEAN label_contours = TRUE;	/* different linestyles are used for contours when set */
@@ -345,7 +345,7 @@ static void set_lp_properties __PROTO((struct lp_style_type * arg, int allow_poi
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
-     struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, char *tic_side));
+     struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, const char *tic_side));
 
 
 /* following code segment appears over and over again */
@@ -1269,7 +1269,7 @@ set_two()
 		char *ss = gp_alloc(token_len(c_token), "tmp storage");
 		len = (assemble? strlen(assemble) : 0);
 		quote_str(ss,c_token,token_len(c_token));
-		assemble = gp_realloc(assemble,len+1+strlen(ss)+1, "tmp loadpath");
+		assemble = gp_realloc(assemble, len+1+strlen(ss)+1, "tmp loadpath");
 		if (len != 0) {
 		    strcpy(assemble+len+1,ss);
 		    *(assemble+len) = PATHSEP;
@@ -1678,32 +1678,22 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 	}
     }
 
-/* to save duplicating code for x/y/z/x2/y2, make a macro
- * (should perhaps be a function ?)
+/* to save duplicating code for x/y/z/x2/y2, make a function
  * unfortunately, string concatenation is not supported on all compilers,
  * so we have to explicitly include both 'on' and 'no' strings in
  * the args
  */
 
-/* change to a function: lph 25.09.1998 */
-
-#define PROCESS_TIC_COMMANDS  set_tic_prop
-
-    else if 
-	(PROCESS_TIC_COMMANDS(&x2tics, &mx2tics, &mx2tfreq, &x2ticdef, 
-	 SECOND_X_AXIS, &rotate_x2tics, "x2") );
-    else if 
-	(PROCESS_TIC_COMMANDS(&y2tics, &my2tics, &my2tfreq, &y2ticdef,
-	 SECOND_Y_AXIS, &rotate_y2tics, "y2") );
-    else if
-	(PROCESS_TIC_COMMANDS(&xtics,   &mxtics, &mxtfreq,  &xticdef,
-	 FIRST_X_AXIS, &rotate_xtics, "x") );
-    else if
-	(PROCESS_TIC_COMMANDS(&ytics,   &mytics, &mytfreq,  &yticdef, 
-	 FIRST_Y_AXIS, &rotate_ytics, "y") );
-    else if 
-	(PROCESS_TIC_COMMANDS(&ztics,   &mztics, &mztfreq,  &zticdef,
-	 FIRST_Z_AXIS, &rotate_ztics, "z") );
+    else if (set_tic_prop(&x2tics, &mx2tics, &mx2tfreq, &x2ticdef, 
+	 SECOND_X_AXIS, &rotate_x2tics, "x2"));
+    else if (set_tic_prop(&y2tics, &my2tics, &my2tfreq, &y2ticdef,
+	 SECOND_Y_AXIS, &rotate_y2tics, "y2"));
+    else if (set_tic_prop(&xtics,   &mxtics, &mxtfreq,  &xticdef,
+	 FIRST_X_AXIS, &rotate_xtics, "x"));
+    else if (set_tic_prop(&ytics,   &mytics, &mytfreq,  &yticdef, 
+	 FIRST_Y_AXIS, &rotate_ytics, "y"));
+    else if (set_tic_prop(&ztics,   &mztics, &mztfreq,  &zticdef,
+	 FIRST_Z_AXIS, &rotate_ztics, "z"));
 
     else if (almost_equals(c_token,"ticsl$evel")) {
 	double tlvl;
@@ -2031,7 +2021,7 @@ int *TICS, *MTICS, AXIS;
 double *FREQ;
 struct ticdef *tdef;
 TBOOLEAN *ROTATE;
-char *tic_side;
+const char *tic_side;
 {
     int match = 0;		/* flag, set by matching a tic command */
     char nocmd[12];		/* fill w/ "no"+'tic_side'+suffix */
@@ -2373,7 +2363,7 @@ set_label()
     } else {
 	/* adding the label */
 	new_label = (struct text_label *)
-	    gp_alloc((unsigned long) sizeof(struct text_label), "label");
+	    gp_alloc(sizeof(struct text_label), "label");
 	if (prev_label != NULL)
 	    prev_label->next = new_label;	/* add it to end of list */
 	else
@@ -2596,7 +2586,7 @@ set_arrow()
     } else {
 	/* adding the arrow */
 	new_arrow = (struct arrow_def *)
-	    gp_alloc((unsigned long) sizeof(struct arrow_def), "arrow");
+	    gp_alloc(sizeof(struct arrow_def), "arrow");
 	if (prev_arrow != NULL)
 	    prev_arrow->next = new_arrow;	/* add it to end of list */
 	else
@@ -2728,7 +2718,7 @@ set_linestyle()
     } else {
 	/* adding the linestyle */
 	new_linestyle = (struct linestyle_def *)
-	    gp_alloc((unsigned long) sizeof(struct linestyle_def), "linestyle");
+	    gp_alloc(sizeof(struct linestyle_def), "linestyle");
 	if (prev_linestyle != NULL)
 	    prev_linestyle->next = new_linestyle;	/* add it to end of list */
 	else
@@ -2939,7 +2929,7 @@ struct ticdef *tdef;
 
     while (!END_OF_COMMAND) {
 	/* parse a new ticmark */
-	tic = (struct ticmark *) gp_alloc((unsigned long) sizeof(struct ticmark), (char *) NULL);
+	tic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
 	if (tic == (struct ticmark *) NULL) {
 	    free_marklist(list);
 	    int_error(c_token, "out of memory for tic mark");
@@ -2953,7 +2943,7 @@ struct ticdef *tdef;
 	if (isstring(c_token) &&
 	    (datatype[axis] != TIME || isstring(c_token + 1))) {
 	    quote_str(temp_string, c_token, MAX_LINE_LEN);
-	    tic->label = gp_alloc((unsigned long) strlen(temp_string) + 1, "tic label");
+	    tic->label = gp_alloc(strlen(temp_string) + 1, "tic label");
 	    (void) strcpy(tic->label, temp_string);
 	    c_token++;
 	} else

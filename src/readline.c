@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.7 1999/06/09 12:13:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.8 1999/06/11 11:18:57 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -296,9 +296,9 @@ static struct hist *history = NULL;	/* no history yet */
 static struct hist *cur_entry = NULL;
 
 static char *cur_line;		/* current contents of the line */
-static int line_len = 0;
-static int cur_pos = 0;		/* current position of the cursor */
-static int max_pos = 0;		/* maximum character position */
+static size_t line_len = 0;
+static size_t cur_pos = 0;	/* current position of the cursor */
+static size_t max_pos = 0;	/* maximum character position */
 #ifdef USE_MOUSE
 static int insert_to_history_disable = 0;
 				/* //PM 28.4.1999: flag to disable adding
@@ -410,7 +410,7 @@ char *prompt;
 	free(cur_line);
 	line_len = 0;
     }
-    cur_line = gp_alloc((unsigned long) MAXBUF, "readline");
+    cur_line = gp_alloc(MAXBUF, "readline");
     line_len = MAXBUF;
 
     /* set the termio so we can do our own input processing */
@@ -516,7 +516,7 @@ char *prompt;
 	if (isprint(cur_char) || (((unsigned char) cur_char > 0x7f) &&
 				  cur_char != EOF)) {
 #endif /* CHARSET7BIT */
-	    int i;
+	    size_t i;
 
 	    if (max_pos + 1 >= line_len) {
 		extend_cur_line();
@@ -536,7 +536,7 @@ char *prompt;
 #ifdef VERASE
 	} else if (cur_char == term_chars[VERASE]) {	/* DEL? */
 	    if (cur_pos > 0) {
-		int i;
+		size_t i;
 		cur_pos -= 1;
 		backspace();
 		for (i = cur_pos; i < max_pos; i++)
@@ -552,7 +552,7 @@ char *prompt;
 		return ((char *) NULL);
 	    }
 	    if ((cur_pos < max_pos) && (cur_char == 004)) {	/* ^D */
-		int i;
+		size_t i;
 		for (i = cur_pos; i < max_pos; i++)
 		    cur_line[i] = cur_line[i + 1];
 		max_pos -= 1;
@@ -599,7 +599,7 @@ char *prompt;
 	} else {
 	    /* do normal editing commands */
 	    /* some of these are also done above */
-	    int i;
+	    size_t i;
 	    switch (cur_char) {
 	    case EOF:
 		reset_termio();
@@ -717,7 +717,7 @@ char *prompt;
 		 * if the alloc fails, we still own block at cur_line,
 		 * but this shouldn't really fail.
 		 */
-		new_line = (char *) gp_realloc(cur_line, (unsigned long) (strlen(cur_line) + 1),
+		new_line = (char *) gp_realloc(cur_line, strlen(cur_line) + 1,
 					       "line resize");
 		if (new_line)
 		    cur_line = new_line;
@@ -741,7 +741,7 @@ char *prompt;
 static void
 fix_line()
 {
-    int i;
+    size_t i;
 
     /* write tail of string */
     for (i = cur_pos; i < max_pos; i++)
@@ -761,7 +761,7 @@ static void
 redraw_line(prompt)
 char *prompt;
 {
-    int i;
+    size_t i;
 
     fputs(prompt, stderr);
     user_puts(cur_line);
@@ -776,7 +776,7 @@ static void
 clear_line(prompt)
 char *prompt;
 {
-    int i;
+    size_t i;
     for (i = 0; i < max_pos; i++)
 	cur_line[i] = '\0';
 
@@ -797,7 +797,7 @@ char *prompt;
 static void
 clear_eoline()
 {
-    int i;
+    size_t i;
     for (i = cur_pos; i < max_pos; i++)
 	cur_line[i] = '\0';
 
@@ -865,9 +865,10 @@ char *line;
 	entry = entry->prev;
     }				/* end of not-storing duplicated entries */
 
-    entry = (struct hist *) gp_alloc((unsigned long) sizeof(struct hist), "history");
-    entry->line = gp_alloc((unsigned long) (strlen(line) + 1), "history");
-    strcpy(entry->line, line);
+    entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
+/*    entry->line = gp_alloc(strlen(line) + 1, "history");
+      strcpy(entry->line, line); */
+    entry->line = gp_strdup(line);
 
     entry->prev = history;
     entry->next = NULL;

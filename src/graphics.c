@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.11 1999/06/14 19:20:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.12 1999/06/17 14:24:50 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2325,7 +2325,8 @@ struct curve_points *plot;
     if (goodcount < 2)
 	return;			/* cannot plot less than 2 points */
 
-    gl = (int *) gp_alloc(goodcount * sizeof(int), "histeps valid point mapping");
+    gl = (int *) gp_alloc(goodcount * sizeof(int),
+			  "histeps valid point mapping");
     if (gl == NULL)
 	return;
 
@@ -3781,19 +3782,18 @@ int vert;			/* ... and vertical just - text in hor direction despite angle */
 int angle;			/* assume term has already been set for this */
 const char *font;		/* NULL or "" means use default */
 {
-    /* assumes we are free to mangle the text */
-    /* FIXME no, not anymore! */
     register struct termentry *t = term;
     char *p = text;
+
+    if (!p)
+	return;
 
     if (vert != JUST_TOP) {
 	/* count lines and adjust y */
 	int lines = 0;		/* number of linefeeds - one fewer than lines */
-	if (p != NULL) {
-	    while (*p++) {
-		if (*p == '\n')
-		    ++lines;
-	    }
+	while (*p++) {
+	    if (*p == '\n')
+		++lines;
 	}
 	if (angle)
 	    x -= (vert * lines * t->v_char) / 2;

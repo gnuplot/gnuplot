@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.13 1999/06/11 18:53:13 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.14 1999/06/14 19:20:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -111,7 +111,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 /* static prototypes */
 static int command __PROTO((void));
-static int read_line __PROTO((char *prompt));
+static int read_line __PROTO((const char *prompt));
 static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
 static void do_system __PROTO((void));
@@ -130,7 +130,7 @@ int token_table_size;
 TBOOLEAN screen_ok;
 
 char *input_line;
-int input_line_len;
+size_t input_line_len;
 int inline_num;			/* input line number */
 
 /* jev -- for passing data thru user-defined function */
@@ -754,8 +754,8 @@ replotrequest()
      */
     if (END_OF_COMMAND) {
 	char *rest_args = &input_line[token[c_token].start_index];
-	int replot_len = strlen(replot_line);
-	int rest_len = strlen(rest_args);
+	size_t replot_len = strlen(replot_line);
+	size_t rest_len = strlen(rest_args);
 
 	/* preserve commands following 'replot ;' */
 	/* move rest of input line to the start
@@ -774,7 +774,7 @@ replotrequest()
 	int last_token = num_tokens - 1;
 
 	/* length = length of old part + length of new part + ',' + \0 */
-	int newlen = strlen(replot_line) + token[last_token].start_index +
+	size_t newlen = strlen(replot_line) + token[last_token].start_index +
 	token[last_token].length - token[c_token].start_index + 2;
 
 	m_capture(&replot_args, c_token, last_token);	/* might be empty */
@@ -831,7 +831,7 @@ $DESCRIPTOR(helpfile_desc, "GNUPLOT$HELP");
 
 static int
 read_line(prompt)
-char *prompt;
+const char *prompt;
 {
     int more, start = 0;
     char expand_prompt[40];
@@ -845,7 +845,7 @@ char *prompt;
 	line_desc.dsc$a_pointer = &input_line[start];
 	switch (status[1] = smg$read_composed_line(&vms_vkid, &vms_ktid, &line_desc, &prompt_desc, &vms_len)) {
 	case SMG$_EOF:
-	    done(IO_SUCCESS);	/* ^Z isn't really an error */
+	    done(EXIT_SUCCESS);	/* ^Z isn't really an error */
 	    break;
 	case RMS$_TNS:		/* didn't press return in time */
 	    vms_len--;		/* skip the last character */
@@ -1028,8 +1028,8 @@ int toplevel;
     /* huge static variables (1k each). Instead we dynamically allocate them */
     /* on the first call to this function...                                 */
     if (helpbuf == NULL) {
-	helpbuf = gp_alloc((unsigned long) MAX_LINE_LEN, "help buffer");
-	prompt = gp_alloc((unsigned long) MAX_LINE_LEN, "help prompt");
+	helpbuf = gp_alloc(MAX_LINE_LEN, "help buffer");
+	prompt = gp_alloc(MAX_LINE_LEN, "help prompt");
 	helpbuf[0] = prompt[0] = 0;
     }
     if (toplevel)
@@ -1178,12 +1178,12 @@ char **parms;
 
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 /* keep some compilers happy */
-static char *rlgets __PROTO((char *s, int n, char *prompt));
+static char *rlgets __PROTO((char *s, size_t n, char *prompt));
 
 static char *
 rlgets(s, n, prompt)
 char *s;
-int n;
+size_t n;
 char *prompt;
 {
     static char *line = (char *) NULL;
@@ -1387,7 +1387,7 @@ int len;
 /* Non-VMS version */
 static int
 read_line(prompt)
-char *prompt;
+const char *prompt;
 {
     int start = 0;
     TBOOLEAN more = FALSE;

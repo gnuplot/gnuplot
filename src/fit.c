@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.10 1999/06/17 14:26:09 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -59,8 +59,6 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.9 1999/06/14 19:19:45 lhecki
  */
 
 
-#define FIT_MAIN
-
 #include <signal.h>
 
 #include "plot.h"
@@ -68,6 +66,18 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.9 1999/06/14 19:19:45 lhecki
 #include "fit.h"
 #include "setshow.h"		/* for load_range */
 #include "alloc.h"
+
+/* Just temporary */
+#if defined(VA_START) && defined(ANSI_C)
+void Dblfn __PROTO((const char *fmt, ...));
+#else
+void Dblfn __PROTO(());
+#endif
+#define Dblf  Dblfn
+#define Dblf2 Dblfn
+#define Dblf3 Dblfn
+#define Dblf5 Dblfn
+#define Dblf6 Dblfn
 
 #if defined(MSDOS) || defined(DOS386)	/* non-blocking IO stuff */
 # include <io.h>
@@ -85,20 +95,6 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.9 1999/06/14 19:19:45 lhecki
 # define getchx() Crawcin()
 static int kbhit(void);
 #endif
-
-#define STANDARD    stderr	/* compatible with gnuplot philosophy */
-
-#define BACKUP_SUFFIX ".old"
-
-
-/* access external global variables  (ought to make a globals.h someday) */
-/* you name it, we deliver */
-
-extern int df_datum, df_line_number;
-
-/* following 2 external arrays are needed to use time data */
-
-extern int df_timecol[];
 
 enum marq_res {
     OK, ERROR, BETTER, WORSE
@@ -133,6 +129,8 @@ typedef enum marq_res marq_res_t;
 
 #define LASTFITCMDLENGTH 511
 
+char fitbuf[256];
+
 /* HBB 971023: new, allow for dynamic adjustment of these: */
 static int max_data;
 static int max_params;
@@ -151,7 +149,6 @@ static const char *FITMAXITER = "FIT_MAXITER";	/* HBB 970304: maxiter patch */
 static const char *FITSCRIPT = "FIT_SCRIPT";
 static const char *DEFAULT_CMD = "replot";	/* if no fitscript spec. */
 static char last_fit_command[LASTFITCMDLENGTH+1] = "";
-
 
 static FILE *log_f = NULL;
 
@@ -943,7 +940,7 @@ struct value data;
 
     if (!udv_ptr) {		/* generate new entry */
 	last->next_udv = udv_ptr = (struct udvt_entry *)
-	    gp_alloc((unsigned int) sizeof(struct udvt_entry), "fit setvar");
+	    gp_alloc(sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
     udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname) + 1, "user var");
@@ -1536,7 +1533,8 @@ do_fit()
 	int_error(c_token, "Need via and either parameter list or file");
 
     a = vec(max_params);
-    par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr), "fit param");
+    par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr),
+				   "fit param");
     num_params = 0;
 
     if (isstring(++c_token)) {	/* It's a parameter *file* */
@@ -1597,8 +1595,7 @@ do_fit()
 		    max_params = (max_params * 3) / 2;
 		    if (0
 			|| !redim_vec(&a, max_params)
-			|| !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr),
-						   "fit param resize"))
+			|| !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
 			) {
 			(void) fclose(f);
 			Eex("Out of memory in fit: too many parameters?");
@@ -1626,8 +1623,7 @@ do_fit()
 		max_params = (max_params * 3) / 2;
 		if (0
 		    || !redim_vec(&a, max_params)
-		    || !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr),
-					       "fit param resize"))
+		    || !(par_name = gp_realloc(par_name, (max_params + 1) * sizeof(fixstr), "fit param resize"))
 		    ) {
 		    Eex("Out of memory in fit: too many parameters?");
 		}
@@ -1679,3 +1675,36 @@ kbhit()
     return ((select(0, &rfds, NULL, NULL, &timeout) > 0) ? 1 : 0);
 }
 #endif
+
+/*
+ * Print msg to stderr and log file
+ */
+#if defined(VA_START) && defined(ANSI_C)
+void
+Dblfn(const char *fmt, ...)
+#else
+void
+Dblfn(fmt, va_alist)
+const char *fmt;
+va_dcl
+#endif
+{
+#ifdef VA_START
+    va_list args;
+
+    VA_START(args, fmt);
+# if HAVE_VFPRINTF || _LIBC
+    vfprintf(STANDARD, fmt, args);
+    vfprintf(log_f, fmt, args);
+# else
+    _doprnt(fmt, args, STANDARD);
+    _doprnt(fmt, args, log_f);
+# endif
+    va_end(args);
+#else
+    fprintf(STANDARD, str, a1, a2, a3, a4, a5, a6, a7, a8);
+    fprintf(log_f, str, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif /* VA_START */
+
+}
+

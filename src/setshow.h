@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.7 1999/06/11 18:53:17 lhecking Exp $
+ * $Id: setshow.h,v 1.8 1999/06/14 19:23:21 lhecking Exp $
  *
  */
 
@@ -186,7 +186,7 @@ extern TBOOLEAN			dgrid3d;
 #define ENCODING_CP_850		3   /* JFi */
 
 extern int			encoding;
-extern char			*encoding_names[];
+extern const char		*encoding_names[];
 
 /* -3 for no axis, or linetype */
 extern struct lp_style_type xzeroaxis;

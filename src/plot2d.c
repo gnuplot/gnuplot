@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.10 1999/06/14 19:22:02 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.11 1999/06/17 14:19:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1299,7 +1299,8 @@ int *plot_num;
 {
     struct curve_points *xp, *new_list = NULL, *free_list = NULL;
     struct curve_points **last_pointer = &new_list;
-    int i, tlen, curve;
+    size_t tlen;
+    int i, curve;
     char *new_title;
 
     /*
@@ -1366,10 +1367,8 @@ int *plot_num;
 	    /* Ok, fix up the title to include both the xp and yp plots. */
 	    if (xp->title && xp->title[0] != '\0' && yp->title) {
 		tlen = strlen(yp->title) + strlen(xp->title) + 3;
-		new_title = gp_alloc((unsigned long) tlen, "string");
-		strcpy(new_title, xp->title);
-		strcat(new_title, ", ");	/* + 2 */
-		strcat(new_title, yp->title);	/* + 1 = + 3 */
+		new_title = gp_alloc(tlen, "string");
+		sprintf(new_title, "%s, %s", xp->title, yp->title);
 		free(yp->title);
 		yp->title = new_title;
 	    }

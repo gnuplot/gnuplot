@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.6 1999/06/14 19:22:02 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.7 1999/06/17 14:18:50 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1670,8 +1670,8 @@ int *plot_num;
  */
     struct surface_points *xp, *new_list, *free_list = NULL;
     struct surface_points **last_pointer = &new_list;
-
-    int i, tlen, surface;
+    size_t tlen;
+    int i, surface;
     char *new_title;
 
     /*
@@ -1728,7 +1728,7 @@ int *plot_num;
 		tlen = (xp->title ? strlen(xp->title) : 0) +
 		    (yp->title ? strlen(yp->title) : 0) +
 		    (zp->title ? strlen(zp->title) : 0) + 5;
-		new_title = gp_alloc((unsigned long) tlen, "string");
+		new_title = gp_alloc(tlen, "string");
 		new_title[0] = 0;
 		if (xp->title && xp->title[0] != '\0') {
 		    strcat(new_title, xp->title);

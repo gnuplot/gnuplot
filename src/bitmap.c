@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.4 1999/06/11 11:18:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.5 1999/06/14 19:19:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -809,11 +809,11 @@ unsigned int x, y, planes;
     b_angle = 0;
     b_rastermode = 0;
     /* allocate row pointers */
-    b_p = (bitmap *) gp_alloc((unsigned long) rows * sizeof(pixels *), "bitmap row buffer");
+    b_p = (bitmap *) gp_alloc(rows * sizeof(pixels *), "bitmap row buffer");
     memset(b_p, 0, rows * sizeof(pixels *));
     for (j = 0; j < rows; j++) {
 	/* allocate bitmap buffers */
-	(*b_p)[j] = (pixels *) gp_alloc((unsigned long) x * sizeof(pixels), (char *) NULL);
+	(*b_p)[j] = (pixels *) gp_alloc(x * sizeof(pixels), (char *) NULL);
 	if ((*b_p)[j] == (pixels *) NULL) {
 	    b_freebitmap();	/* free what we have already allocated */
 	    int_error(NO_CARET, "out of memory for bitmap buffer");

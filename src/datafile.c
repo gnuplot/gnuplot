@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.8 1999/06/11 18:53:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -179,7 +179,8 @@ TBOOLEAN df_binary = FALSE;	/* this is a binary file */
  * might consider free-ing it in df_close, especially for small systems
  */
 static char *line = NULL;
-static int max_line_len = 0;
+static size_t max_line_len = 0;
+#define DATA_LINE_BUFSIZ 160
 
 static FILE *data_fp = NULL;
 static TBOOLEAN pipe_open = FALSE;
@@ -291,9 +292,8 @@ char *s;
 
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
-	    df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols += (df_max_cols <
-										    20 ? 20 :
-							df_max_cols)) * sizeof(df_column_struct),
+	    df_column = (df_column_struct *) gp_realloc(df_column,
+			(df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols)) * sizeof(df_column_struct),
 							"datafile column");
 
 	/* have always skipped spaces at this point */
@@ -441,7 +441,8 @@ int *rows, *cols;
 	/* allocate a row and store data */
 	{
 	    int i;
-	    float *row = rmatrix[*rows] = (float *) gp_alloc(c * sizeof(float), "df_matrix row");
+	    float *row = rmatrix[*rows] = (float *) gp_alloc(c * sizeof(float),
+							     "df_matrix row");
 
 	    for (i = 0; i < c; ++i) {
 		if (df_column[i].good != DF_GOOD)
@@ -684,8 +685,10 @@ int max_using;
     line_count = 0;
 
     /* here so it's not done for every line in df_readline */
-    if (max_line_len < 160)
-	line = (char *) gp_alloc(max_line_len = 160, "datafile line buffer");
+    if (max_line_len < DATA_LINE_BUFSIZ) {
+	max_line_len = DATA_LINE_BUFSIZ;
+	line = (char *) gp_alloc(max_line_len, "datafile line buffer");
+    }
 
 
     /*}}} */
@@ -702,7 +705,7 @@ int max_using;
 	    pipe_open = TRUE;
     } else
 #endif /* PIPES */
-	/* I don't want to call strcmp(). Does it make a difference? */
+    /* I don't want to call strcmp(). Does it make a difference? */
     if (*filename == '-' && strlen(filename) == 1) {
 	data_fp = lf_top();
 	if (!data_fp)
@@ -911,8 +914,8 @@ int max;
 
 	    /* check we have room for at least 7 columns */
 	    if (df_max_cols < 7)
-		df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 7) *
-							    sizeof(df_column_struct),
+		df_column = (df_column_struct *) gp_realloc(df_column,
+			(df_max_cols = 7) * sizeof(df_column_struct),
 							    "datafile columns");
 
 	    df_no_cols = sscanf(line, df_format,
@@ -1122,9 +1125,9 @@ struct surface_points *this_plot;
 	int_error(NO_CARET, "Current implementation requires full using spec");
 
     if (df_max_cols < 3 &&
-	!(df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 3) *
-						      sizeof(df_column_struct), "datafile columns"))
-	)
+	!(df_column = (df_column_struct *) gp_realloc(df_column,
+		(df_max_cols = 3) * sizeof(df_column_struct),
+						      "datafile columns")))
 	int_error(c_token, "Out of store in binary read");
 
     df_no_cols = 3;
@@ -1417,7 +1420,7 @@ check_missing(s)
 char *s;
 {
     if (missing_val != NULL) {
-	int len = strlen(missing_val);
+	 size_t len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
 	    (isspace((int) s[len]) || !s[len])) {
 	    return (1);;	/* store undefined point in plot */

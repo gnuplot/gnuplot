@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.5 1999/06/11 18:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.6 1999/06/14 19:19:46 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -223,12 +223,12 @@ struct at_type *
 perm_at()
 {
     register struct at_type *at_ptr;
-    unsigned int len;
+    size_t len;
 
     (void) temp_at();
     len = sizeof(struct at_type) +
-     (int) (at->a_count - MAX_AT_LEN) * (int) sizeof(struct at_entry);
-    at_ptr = (struct at_type *) gp_realloc(at, (unsigned long) len, "perm_at");
+     (at->a_count - MAX_AT_LEN) * sizeof(struct at_entry);
+    at_ptr = (struct at_type *) gp_realloc(at, len, "perm_at");
     at = NULL;			/* invalidate at pointer */
     return (at_ptr);
 }
@@ -236,7 +236,7 @@ perm_at()
 static void
 extend_at()
 {
-    int newsize = sizeof(struct at_type) + at_size * sizeof(struct at_entry);
+    size_t newsize = sizeof(struct at_type) + at_size * sizeof(struct at_entry);
 
     at = gp_realloc(at, newsize, "extend_at");
     at_size += MAX_AT_LEN;
