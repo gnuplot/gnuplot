@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.47 2002/09/27 18:00:39 joze Exp $
+ * $Id: cgm.trm,v 1.48 2002/09/28 02:01:42 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -112,7 +112,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 				/* convert from plot units to pt */
 #define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
 #define CGM_LINE_TYPES 9	/* number of line types we support */
-#define CGM_COLORS 11		/* number of line colors we support in
+#define CGM_COLORS 12		/* number of line colors we support in
                                    the default color table */
 #define CGM_POINTS 13		/* number of markers we support */
 #define CGM_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
@@ -191,12 +191,12 @@ static struct cgm_properties
     cgm_next={0,-2,-2,LEFT,-2,-2,-2}, /* needed for next text string/marker */
     cgm_reset={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}; /* invalid entries */
 
-static int cgm_user_color_count[] = { 0 };
+static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
 #ifdef PM3D
 static int cgm_smooth_colors = 0;
 #endif
-static int GPFAR *cgm_user_color_table;
+static int GPFAR *cgm_user_color_table = (int GPFAR*)0;
 static int GPFAR cgm_default_color_table[] =
 {
      0,				/* starting index */
@@ -426,7 +426,7 @@ CGM_options()
 	      
 		if (sscanf(string, "x%2hx%2hx%2hx", &red, &green, &blue ) != 3)
 		     int_error(c_token, "invalid color spec, must be xRRGGBB");
-		if (cgm_user_color_count[0] >= cgm_user_color_max) {
+		if (cgm_user_color_count >= cgm_user_color_max) {
 		     cgm_user_color_max = cgm_user_color_max*2 + 4;
 		     cgm_user_color_table = 
 			  gp_realloc(cgm_user_color_table, 
@@ -435,14 +435,14 @@ CGM_options()
 		     /* 1st table entry is the minimum color index value */
 		     cgm_user_color_table[0] = 0;
 		}
-		cgm_user_color_table[1 + 3*cgm_user_color_count[0]] = red;
-		cgm_user_color_table[2 + 3*cgm_user_color_count[0]] = green;
-		cgm_user_color_table[3 + 3*cgm_user_color_count[0]] = blue;
+		cgm_user_color_table[1 + 3*cgm_user_color_count] = red;
+		cgm_user_color_table[2 + 3*cgm_user_color_count] = green;
+		cgm_user_color_table[3 + 3*cgm_user_color_count] = blue;
 		/* usually, there is one more color than there are
                    linetypes (the extra color is for the background).
                    However, the smooth colors used for PM3D are not
                    used for lines. */
-		cgm_linetypes = cgm_user_color_count[0]++;
+		cgm_linetypes = cgm_user_color_count++;
 		++c_token;
 	    } else {
 		 if (isstring(c_token)) {
@@ -507,9 +507,9 @@ CGM_options()
 	    cgm_linewidth_pt,
 	    cgm_font, cgm_fontsize);
 
-    if (cgm_user_color_count[0]) {
+    if (cgm_user_color_count) {
 	 int i, red, green, blue;
-	 for (i = 0; i < cgm_user_color_count[0] && 
+	 for (i = 0; i < cgm_user_color_count && 
 		   (strlen(term_options) + 9 < MAX_LINE_LEN); i++) {
 	      red = cgm_user_color_table[1 + 3*i];
 	      green = cgm_user_color_table[2 + 3*i];
@@ -517,13 +517,26 @@ CGM_options()
 	      sprintf(term_options + strlen(term_options),
 		      " x%02x%02x%02x", red, green, blue);
 	 }
-	 if (cgm_user_color_count[0] == 1) {
-	      /* user only specified the background color */
-	      cgm_default_color_table[1] = cgm_user_color_table[1];
-	      cgm_default_color_table[2] = cgm_user_color_table[2];
-	      cgm_default_color_table[3] = cgm_user_color_table[3];
-	      cgm_user_color_count[0] = 0;
-	      cgm_linetypes = CGM_COLORS;
+	 if (cgm_user_color_count < CGM_COLORS) {
+
+	     int j;
+
+	     /* fill the colors which were not set by the user with
+	      * the default colors */
+
+	     /* 1st table entry is the minimum color index value */
+	     gp_realloc(cgm_user_color_table, 
+		     (CGM_COLORS * 3 + 1) * sizeof (int), "CGM color table");
+
+	     for (i = cgm_user_color_count, j = cgm_user_color_count * 3 + 1;
+		     i < CGM_COLORS; i++) {
+		 cgm_user_color_table[j] = cgm_default_color_table[j++];
+		 cgm_user_color_table[j] = cgm_default_color_table[j++];
+		 cgm_user_color_table[j] = cgm_default_color_table[j++];
+	     }
+
+	     cgm_user_color_count = CGM_COLORS;
+	     cgm_linetypes = CGM_COLORS;
 	 }
     }
 }
@@ -545,7 +558,7 @@ CGM_local_reset()
     cgm_dashed = TRUE;
     cgm_nofontlist_mode = FALSE;
     cgm_current = cgm_reset;
-    cgm_user_color_count[0] = 0;
+    cgm_user_color_count = 0;
 }
 
 TERM_PUBLIC void
@@ -727,8 +740,8 @@ Gnuplot version %s patchlevel %s,\
     }
 #endif
     if (!cgm_monochrome) {
-      if (cgm_user_color_count[0]) {
-	CGM_write_int_record(5, 34, (cgm_user_color_count[0]*3+1)*
+      if (cgm_user_color_count) {
+	CGM_write_int_record(5, 34, (cgm_user_color_count*3+1)*
 			     sizeof(cgm_user_color_table[0])/CGM_ADJ,
 			     cgm_user_color_table);
       } else
@@ -864,7 +877,10 @@ CGM_linecolor(linecolor)
     assert(linecolor > L_TYPE_NODRAW);
     if (linecolor >= 0) {
 	/* subtract 2 due to linetypes -2 / -1 */
-	linecolor %= (cgm_linetypes - 2);
+	if (cgm_linetypes > 3)
+	    linecolor %= (cgm_linetypes - 3);
+	else
+	    linecolor = 0;
     }
     linecolor += 3;
     if (cgm_monochrome || linecolor == cgm_color)
@@ -966,8 +982,8 @@ TERM_PUBLIC int CGM_make_palette(palette)
     if (palette) {
 	 int i, k;
 	 cgm_smooth_colors = palette->colors;
-	 if (1 + CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
-	      cgm_user_color_max = 1 + CGM_COLORS + cgm_smooth_colors;
+	 if (CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
+	      cgm_user_color_max = CGM_COLORS + cgm_smooth_colors;
 	      cgm_user_color_table =
 		   gp_realloc(cgm_user_color_table, 
 			      (cgm_user_color_max*3+1)*sizeof(int),
@@ -976,14 +992,14 @@ TERM_PUBLIC int CGM_make_palette(palette)
 	      memcpy(cgm_user_color_table, cgm_default_color_table,
 		     sizeof(cgm_default_color_table));
 	      }
-	 k = 1 + (1 + CGM_COLORS)*3;
+	 k = 1 + (CGM_COLORS)*3;
 	 for (i = 0; i < cgm_smooth_colors; i++) {
 	      cgm_user_color_table[k++] = palette->color[i].r*255.9;
 	      cgm_user_color_table[k++] = palette->color[i].g*255.9;
 	      cgm_user_color_table[k++] = palette->color[i].b*255.9;
-	      cgm_user_color_count[0] = 1 + CGM_COLORS + cgm_smooth_colors;
+	      cgm_user_color_count = CGM_COLORS + cgm_smooth_colors;
 	 }
-	 CGM_write_int_record(5, 34, (cgm_user_color_count[0]*3+1)*
+	 CGM_write_int_record(5, 34, (cgm_user_color_count*3+1)*
 			      sizeof(cgm_user_color_table[0])/CGM_ADJ,
 			      cgm_user_color_table);
 	 return 0;
@@ -1000,7 +1016,7 @@ TERM_PUBLIC void CGM_set_color(gray)
     cgm_next.fill_color = (gray <= 0) ? 0 : (int)(gray * cgm_smooth_colors);
     if (cgm_next.fill_color >= cgm_smooth_colors)
 	cgm_smooth_colors = cgm_smooth_colors - 1;
-    cgm_next.fill_color += 1 + CGM_COLORS;
+    cgm_next.fill_color += CGM_COLORS;
     /* EAM - force color immediately so that lines and text can use it */
     if (cgm_color != cgm_next.fill_color) {
 	cgm_color = cgm_next.fill_color;

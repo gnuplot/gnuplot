@@ -1,3 +1,7 @@
+2002-10-09  Johannes Zellner  <johannes@zellner.org>
+
+	* term/cgm.trm: fixed bug #616167 "cgm color problem"
+
 2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/plot.c(main) makefile.cyg makefile.mgw: Added --help and
@@ -10,7 +14,7 @@
 
 2002-10-09  Johannes Zellner  <johannes@zellner.org>
 
-	* TODO: Started a section for what has to be done before releasing 4.0.
+	* TODO: started a section for what has to be done before releasing 4.0
 
 2002-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1295,7 +1299,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 19:24:22 $).
+	last modification date (from the tag $Date: 2002/10/09 19:57:44 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
