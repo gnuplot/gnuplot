@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.7 1999/06/17 14:17:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.8 1999/06/19 20:55:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -395,9 +395,10 @@ int current;
 #else /* VMS || PIPES || ATARI && PUREC */
 
 static void
-substitute(str, max)
-char *str;
-int max;
+substitute(strp, str_lenp, current)
+char **strp;
+int *str_lenp;
+int current;
 {
     int_error(t_num, "substitution not supported by %s", OS);
 }
