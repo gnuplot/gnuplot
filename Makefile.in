@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
+# $Id: Makefile.in,v 1.14 1998/08/18 16:31:59 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -156,7 +156,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
+# $Id: Makefile.in,v 1.14 1998/08/18 16:31:59 lhecking Exp $
 #
 ########################################################
 #
@@ -299,7 +299,8 @@ DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
 	$(L)eg4.plt $(L)eg5.plt $(L)eg6.plt \
 	$(L)header.tex $(L)linepoin.plt $(L)makefile.dst $(L)tutorial.tex
-DOCS4 = $(S)README $(S)ps_file.doc $(S)ps_guide.ps $(S)ps_symbols.gpi
+DOCS4 = $(S)Makefile $(S)README $(S)ps_file.doc $(S)ps_guide.ps \
+	$(S)ps_symbols.gpi
 
 DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4)
 
