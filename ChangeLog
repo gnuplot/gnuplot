@@ -5,6 +5,9 @@
 
 	* term/x11.trm: Detect missing font name during "set term x11".
 
+	* src/command.c: Add missing line from what should have been a
+	patch too trivial for me to mess up (do_string).
+
 2003-07-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c (do_string_replot): Minor simplification: use
