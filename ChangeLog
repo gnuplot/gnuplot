@@ -1,3 +1,13 @@
+2004-07-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Code style changes: get rid of register keywords. Don't put
+	parens around simple variables or term->element names.
+	
+	* src/graphics.c (boundary): If bmargin was set by user, key below
+	should not modify ybot.  Reindented.
+	
+	(key_cols): Made local to boundary(), the only function using it.
+
 2004-07-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (cleanup_udvlist): Fix memory leak; if udv structure
