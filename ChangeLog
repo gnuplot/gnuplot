@@ -1,3 +1,8 @@
+2005-01-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Remove deprecated references to "set pm3d solid" and
+	"set pm3d transparent".
+
 2005-01-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/pgnuplot.c (PostString): Fix transmission of 8-bit

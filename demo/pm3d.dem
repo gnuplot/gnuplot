@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.12 2004/11/21 05:56:13 sfeam Exp $
+# $Id: pm3d.dem,v 1.13 2004/12/07 17:21:13 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -52,12 +52,6 @@ set cblabel "colour gradient"
 replot
 pause -1 "Hit return to continue"
 
-set title "set pm3d solid; the surface hides part of border, tics and labels"
-set pm3d solid
-replot
-pause -1 "Hit return to continue"
-set pm3d transparent
-
 set title "pm3d at b (bottom)"
 set pm3d at b
 replot
@@ -65,7 +59,7 @@ pause -1 "Hit return to continue"
 
 set title "unset surface; set pm3d at st (surface and top)"
 unset surface
-set pm3d at st solid
+set pm3d at st
 replot
 pause -1 "Hit return to continue"
 
@@ -76,7 +70,6 @@ set view 50,50
 set pm3d at bstbst
 replot
 pause -1 "Hit return to continue"
-set pm3d transparent
 
 set title "gray map"
 set pm3d map
@@ -161,7 +154,7 @@ set title "set pm3d hidden3d <linetype>: pm3d's much faster hidden3d variant"
 set samples 30; set isosamples 30
 set pm3d
 set style line 100 lt 5 lw 0.5
-set pm3d solid hidden3d 100
+set pm3d hidden3d 100
 set view 50,220
 set xrange [-2:2]
 set yrange [-2:2]
@@ -214,9 +207,9 @@ unset colorbox
 replot 
 pause -1 "Hit return to continue"
 
-set title 'using now "set pm3d solid; set grid back; unset colorbox"'
+set title 'using now "set grid back; unset colorbox"'
 unset colorbox
-set pm3d solid
+set pm3d
 set border 895
 set grid back
 replot 
@@ -282,7 +275,7 @@ set format cb "%.01t*10^{%T}"
 unset surface
 set border 4095
 set ticslevel 0
-set pm3d at s solid; set palette gray
+set pm3d at s; set palette gray
 set cblabel "the colour gradient"
 splot abs(x)**3+abs(y)**3
 pause -1 "Hit return to continue"
@@ -349,7 +342,7 @@ set iso 40
 set title "pm3d explicit mode --- coloring according to the 4th parameter of 'using'"
 set ticslevel 0
 
-set pm3d at s explicit solid
+set pm3d at s explicit
 
 #	'binary2' binary u 1:2:(column(3)+column(-1)/20.0):3 w pm3d, 
 
