@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.31 2002/03/21 15:12:56 mikulik Exp $
+# $Id: makefile.os2,v 1.32 2002/03/21 21:46:13 amai Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -24,13 +24,36 @@ SHELL=cmd.exe
 # requires installed XFree86
 X11=1
 
-# GD (GIF) device driver
-# requires GD library (not part of gnuplot)
+# GIF, PNG, JPEG device drivers
+# Requires gd library. There are two possibilities how to configure these
+# drivers for use in gnuplot, depending on the gd version. See README.1ST for
+# more details. 
+#
+# 1. You can use the following set of options for GD library v1.8 or newer. 
+# This library writes PNG and JPEG images, but not GIF. Therefore the option
+# PNG_FOR_GIF allows backwards compatibility with the old GIF driver, i.e.
+# 'set term gif ...' is still valid, but it actually writes out PNG files
+# instead of GIF.
+# If libgd has been compiled with TrueType font support, then you can use
+# scaled TrueType fonts in png images. If not, then uncomment FREETYPE.
+# Requires GD, PNG and Z libraries, optionally libfreetype.
+#
+NEWGD=1
 GD=1
-
-# PNG device driver
-# requires PNG and Z libraries (not part of gnuplot)
 PNG=1
+PNG_FOR_GIF=1
+#JPEG=1
+FREETYPE=1
+#
+# 2. You can use the following set of options for the old GD library
+# (v1.2 - v1.4), which supports GIF images only.
+# In this case the PNG driver is independent on GD driver, but there are
+# several functionality limitations of the old non-libgd png driver.
+# Required libraries: GD (GIF driver), PNG and Z (PNG driver).
+#
+#GD=1
+#GIF=1
+#PNG=1
 
 # PDF device driver
 # requires PDFlib (not part of gnuplot)
@@ -144,51 +167,69 @@ endif
 #
 TERMFLAGS = -I. -I.. -I$(T)
 
-# All terminals available via #defines should be listed below
-# Some terminals can be en/disabled in the configuration at the
-# beginning of this Makefile.os2 but others may still require
-# changes in term.h
-
-#
-# GIF-support
 ifdef GD
-TERMFLAGS += -DHAVE_LIBGD
-TERMLIBS  += -lgd
+  CFLAGS += -DHAVE_LIBGD
+  TERMLIBS += -lgd
 endif
-# PDF-support
+
+ifdef GIF
+  CFLAGS += -DHAVE_GIF
+endif
+
+ifdef LIBPNG
+  CFLAGS += -DHAVE_PNG
+  TERMLIBS += -lpng -lz
+endif
+
+ifdef NEWGD
+  CFLAGS += -DHAVE_NEWGD -DHAVE_PNG
+  TERMLIBS += -lpng -lz
+ifdef FREETYPE
+  CFLAGS += -DHAVE_TTF
+  TERMLIBS += -lfreetype
+endif
+ifdef JPEG
+  CFLAGS += -DHAVE_JPEG
+  TERMLIBS += -ljpeg
+endif
+ifdef PNG_FOR_GIF
+  CFLAGS += -DPNG_FOR_GIF
+  CFLAGS += -DHAVE_GIF
+endif
+endif
+
 ifdef PDF
-TERMFLAGS += -DHAVE_LIBPDF
-# amai: don't ask me... My libpdf requires all those additional libs
-TERMLIBS  += -lpdf -ltiff -ljpeg -lz
+  TERMFLAGS += -DHAVE_LIBPDF
+  # amai: don't ask me... My libpdf requires all those additional libs
+  TERMLIBS  += -lpdf -ltiff -ljpeg -lz
 endif
-# PNG-support
-ifdef PNG
-TERMFLAGS += -DHAVE_LIBPNG
-TERMLIBS  += -lpng -lz
-endif
+
 # SVGA-/VESAkit support
 ifdef VESA
-TERMFLAGS += -DEMXVESA
-TERMLIBS  += -ljmgraph -lvesa
+  TERMFLAGS += -DEMXVESA
+  TERMLIBS  += -ljmgraph -lvesa
 endif
+
 # X11 support
 ifdef X11
-TERMFLAGS += -DX11 -DX11_DRIVER_DIR=\".\"
+  TERMFLAGS += -DX11 -DX11_DRIVER_DIR=\".\"
 endif
-# MOUSE support for PM terminal
+
+# MOUSE support
 ifdef MOUSE
-TERMFLAGS += -DUSE_MOUSE
-# the interprocess communication flag OS2_IPC is #defined in config.(os2,h)
+  TERMFLAGS += -DUSE_MOUSE
+  # the interprocess communication flag OS2_IPC is #defined in config.(os2,h)
 endif
+
 # PM3D support
 ifdef PM3D
-CFLAGS  += -DPM3D
-CFLAGS2 += -DPM3D
+  CFLAGS  += -DPM3D
+  CFLAGS2 += -DPM3D
 endif
 
 # TOOLS
 CPP = cpp
-# Don not name this variable "IPFC"!! This won't work out...
+# Do not name this variable "IPFC"!! This won't work out...
 IPF_C = ipfc.exe
 
 # Tools for buildings the docs

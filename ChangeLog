@@ -1,3 +1,10 @@
+2002-05-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Support
+	all compile options for the new gd driver.
+
+	* config/makefile.mgw: Added compile options for the pdf driver.
+
 2002-05-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/Makefile.in: New install-els target to install the .el files.
@@ -34,28 +41,27 @@
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/gd.trm, term/linux.trm: added prototypes, removed unused
-	variable
+	* term/gd.trm, term/linux.trm: Added prototypes, removed unused
+	variable.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/svg.trm: added shape-rendering:crispEdges to render
-	surfaces correctly, changed color spec to rgb() which is
-	more readable
+	* term/svg.trm: Added shape-rendering:crispEdges to render surfaces
+	correctly, changed color spec to rgb() which is	more readable.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support
-	for the svg driver
+	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support for the svg
+	driver.
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
-	* term/pdf.trm: small changes for error messages
+	* term/pdf.trm: Small changes for error messages.
 
 2002-05-15  Johannes Zellner  <johannes@zellner.org>
 
-	* term/pdf.trm, docs/gnuplot.doc, pm3d/README: pm3d support
-	for the pdf driver
+	* term/pdf.trm, docs/gnuplot.doc, pm3d/README: pm3d support for the pdf
+	driver.
 
 2002-05-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -71,8 +77,7 @@
 
 2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* configure.in: Quoting and cleanup. Should now work with
-	autoconf 2.5x.
+	* configure.in: Quoting and cleanup. Should now work with autoconf 2.5x.
 
 2002-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -93,8 +98,7 @@
  	to make it freely scalable.  This is essentially the same as an
  	PostScript's %%BoundingBox.
 
-	* term/post.trm: Remove explict path from #include of
- 	"getcolor.h".
+	* term/post.trm: Remove explict path from #include of "getcolor.h".
 
 2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -481,7 +485,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/22 11:38:30 $).
+	last modification date (from the tag $Date: 2002/05/23 18:14:30 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
