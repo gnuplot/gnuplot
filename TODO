@@ -17,8 +17,6 @@ DOCUMENTATION:
 -- BUGS file should be updated.
 
 -- gnuplot.doc
-	- should have sections "new in 3.7.1, 2, 3" and "new in 4.0";
-	  the NEWS file could serve as a basis
 	- better document that you need a blank line in between scans
 	  for 3D (many people ask why pm3d plots nothing...)
 
@@ -27,7 +25,7 @@ DOCUMENTATION:
 	- update gnuplot version and the corresponding dates
 
 Recently I've moved importants things from README.os2 into gnuplot.doc and
-INSTALL; those other README.{x11, win, xli, nex} should be
+INSTALL; those other README.{win, xli, nex} should be
 dispersed similarly. Who can do it?
 
 -- docs/old/README.3d
@@ -50,17 +48,8 @@ Amiga:
 Emx:
   -- update its docs from docs/old/README.emx, then delete this file
 
-GIF:
-  -- Patch 400540 Export scale information for a GIF output.
-	Any sense to add this patch, or close it without adding?
-	EAM - Drop it.
-
 (g)pic:
   -- update its docs from docs/old/README.pic, then delete this file
-
-{eps|ps}latex:
-  -- none of the latex terminal variants support pattern-fill, but
-	they return no error if you try it.
 
 Metafont:
   -- update its docs from docs/old/README.mf, then delete this file
@@ -68,19 +57,13 @@ Metafont:
 NeXTstep:
   -- update its docs from docs/old/README.nex, then delete this file
 
-PBM:
-  -- Patch 592230 Better colors for PBM.
-	Can somebody comment on this?
-	EAM - Yes. The PBM uses only 4 bits of color info, which doesn't
-	      leave much space for nice colors.  Re-writing it to use 
-	      the web_color_rgb colors as a palette instead would be nice,
-	      but non-trivial.  Better just to use the PNG driver.
-	      As to the patch - there is none, just a comment that two
-	      of the colors are hard to see.
-  
 Pstricks:
   -- Patch 559611 color + variable pointsize in pstricks
 	Can somebody comment on this?
+
+{eps|ps}latex:
+  -- none of the latex terminal variants support pattern-fill, but
+	they return no error if you try it.
 
 Windows:
   -- update its docs from docs/old/README.win, then delete this file
@@ -106,12 +89,11 @@ Windows:
 	"(MS Windows) 100% CPU Usage during pause", and to HBB 20001217's note
 	about WaitMessage(); in wpause.c.
 
-X11:
-  -- update its docs from docs/old/README.x11, then delete this file
-  -- documentation for all X11 command line switches (joze)
-
 Xlib:
   -- update its docs from docs/old/README.xli, then delete this file
+  -- does the file gnuplib_x11.c still exist somewhere?  As I understand
+     the README, this file was intended as a GPL-compatible interface
+     to gnuplot.
 
 Mac, Apple, MacOS
    -- support to be added, or at least information to the AquaDriver
@@ -132,9 +114,6 @@ should be tested again)
 
 -- unify color and pointtype sequence, alias similar line and point type
 sequences for the main terminal drivers (joze)
-
--- Also unify fill color sequence and fill pattern sequence;
-   choose fill patterns to be optimal for monochrome output (EAM)
 
 
 GNUPLOT LIBRARY:

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.196 2003/12/15 07:52:14 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.197 2003/12/16 10:04:36 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -214,15 +214,15 @@ C
 
  Sample script: mousevariables.dem
 
-3 News in terminals
+3 New terminal features
 
  `aqua`: New terminal for Mac OS X.
  
  `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
 
  `gif`: Support for this terminal has been dropped in favour of the `png`
- format for legal reasons; under usual configure conditions, `png` file is
- written instead of `gif`.
+ format for legal reasons; under usual configure conditions, old scripts that
+ request gif will work but will produce a `png` file instead.
 
  `ggi`: New full-screen interactive terminal for Linux. Interface to the
  General Graphics Interface Library.
@@ -230,12 +230,12 @@ C
  `pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
 
  `png` and `jpeg`: Support for both PNG and JPEG image output is provided by a
- a new driver via libgd. The new driver supports many more features than the
+ new driver via libgd. The new driver supports many more features than the
  old png driver, including TrueType fonts. Requires libgd.
 
  `postscript`: The PostScript driver now provides an oblique symbol font, and
  allows run-time inclusion of embedded PostScript fonts. It also supports
- ISO-8859-2 and CP-852 character encodings. See `postscript fontfile`.
+ additional character encodings. See `postscript fontfile` and `set encoding`.
 
  Sample script: fontfile.dem
 
@@ -289,8 +289,9 @@ C
 
 3 More text encodings
 
- Several terminals, including `postscript`, `x11` and `pm`, support more text
- `encodings`: ISO Latin 1, ISO Latin 2, KOI8R (cyrillic), and miscellaneous
+ Several terminals, including `postscript`, `x11` and `pm`, support additional
+ text `encodings`: ISO 8859-1 (Latin 1), ISO 8859-2 (Latin 2), ISO 8859-15 
+ (variant of 8859-1 with Euro sign), KOI8-R (cyrillic), and miscellaneous
  codepages. See `encoding` for more details.
 
 3 Arrows
@@ -308,7 +309,7 @@ C
  to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
  to recognize text fields with embedded blanks as single entities based on the 
  datafile format settings.  This allows input from csv (comma-separated value)
- files. See `set datafile`.
+ files such as those exported by spreadsheet programs. See `set datafile`.
 
 3 Other changes and additions
 
@@ -344,9 +345,9 @@ C
  The `history` command (for gnuplot with its own readline, not with GNU
  readline) now includes several useful options.
 
- MS Windows package includes an additional executable `pgnuplot.exe` to support
- piping command through standard input pipe otherwise not available for graphical
- applications on this system.
+ The MS Windows package includes an additional executable `pgnuplot.exe` to
+ support piping command through standard input, which is otherwise not
+ available for graphical applications on this system.
 
 3 Accompanying documentation
 
@@ -358,7 +359,11 @@ C
  There are plenty of new demos *.dem in the demo/ directory. Please run them,
  for example by
        load "all.dem"
- before asking for help.
+ before asking for help.  Plots produced by the demo scripts can also be viewed
+ at 
+^ <a href="http://gnuplot.sourceforge.net/demo/">
+ http://gnuplot.sourceforge.net/demo/
+^ </a>
 
 2 Batch/Interactive Operation
 ?batch/interactive
@@ -4474,21 +4479,27 @@ C ... and restart the table:
 ?commands set encoding
 ?commands show encoding
 ?set encoding
-?set encoding iso_8859_1
 ?show encoding
 ?encoding
 ?encodings
- The `set encoding` command selects a character encoding.  Valid values are
- `default`, which tells a terminal to use its default; `iso_8859_1` (known in
- the PostScript world as `ISO-Latin1`), which is used on many Unix workstations
- and with MS-Windows; `iso_8859_2`, used in Central and Eastern Europe; `cp850`
- and `cp852` for OS/2; `cp437`, for MS-DOS; and `koi8r`, popular Unix cyrillic
- encoding.
-
+ The `set encoding` command selects a character encoding.
  Syntax:
        set encoding {<value>}
        show encoding
 
+ Valid values are
+    default     - tells a terminal to use its default encoding
+    iso_8859_1  - the most common Western European font used by many 
+                  Unix workstations and by MS-Windows. This encoding is
+                  known in the PostScript world as 'ISO-Latin1'.
+    iso_8859_2  - used in Central and Eastern Europe
+    iso_8859_15 - a variant of iso_8859_1 that includes the Euro symbol
+    cp850       - codepage for OS/2
+    cp852       - codepage for OS/2
+    cp437       - codepage for MS-DOS
+    koi8r       - popular Unix cyrillic encoding
+
+ Generally you must set the encoding before setting the terminal type.
  Note that encoding is not supported by all terminal drivers and that
  the device must be able to produce the desired non-standard characters.
  The PostScript and X11 terminals support all encodings. OS/2 Presentation

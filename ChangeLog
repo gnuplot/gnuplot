@@ -1,3 +1,10 @@
+2003-12-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm src/gplt_x11.c src/set.c src/term_api.h src/term.c: 
+	Add support for ISO-8859-15 character encoding.
+
+	* docs/gnuplot.doc: Minor changes to What's New.
+
 2003-12-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/x11.trm: Add missing #ifdef PIPE_IPC.

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.99 2003/12/16 00:25:24 sfeam Exp $
+ * $Id: post.trm,v 1.100 2003/12/16 10:49:49 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -614,6 +614,9 @@ int can_reencode;
 	break;
     case S_ENC_ISO8859_2:
 	recode = "reencodeISO2 def\n";
+	break;
+    case S_ENC_ISO8859_15:
+	recode = "reencodeISO15 def\n";
 	break;
     case S_ENC_CP437:
 	recode = "reencodeCP437 def\n";
@@ -1284,6 +1287,48 @@ const char **dict; /* extra entries for the dictionary */
 "] def\n",
 NULL };
 
+    static const char GPFAR * GPFAR PS_iso_8859_15_encoding[] = {
+"/reencodeISO15 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding ISOLatin15Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/ISOLatin15Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright\n",
+"/parenleft/parenright/asterisk/plus/comma/minus/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon\n",
+"/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N\n",
+"/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright\n",
+"/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m\n",
+"/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/dotlessi/grave/acute/circumflex/tilde/macron/breve\n",
+"/dotaccent/dieresis/.notdef/ring/cedilla/.notdef/hungarumlaut\n",
+"/ogonek/caron/space/exclamdown/cent/sterling/Euro/yen/Scaron\n",
+"/section/scaron/copyright/ordfeminine/guillemotleft/logicalnot\n",
+"/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior\n",
+"/Zcaron/mu/paragraph/periodcentered/zcaron/onesuperior/ordmasculine\n",
+"/guillemotright/OE/oe/Ydieresis/questiondown\n",
+"/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla\n",
+"/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex\n",
+"/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis\n",
+"/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute\n",
+"/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis\n",
+"/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave\n",
+"/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex\n",
+"/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis\n",
+"/yacute/thorn/ydieresis\n",
+"] def\n",
+NULL };
+
 /* Encoding for ISO-8859-2 (also called as Latin-2), with   */
 /* minor differences to "true" ISO-8859-2 (*commaaccent     */
 /* instead of *cedilla for sStT -> incorrect in ISO-8859-2, */
@@ -1570,6 +1615,11 @@ NULL };
     if (uses_fonts && (encoding == S_ENC_ISO8859_2)) {
 	for (i = 0; PS_iso_8859_2_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_iso_8859_2_encoding[i]);
+	}
+    }
+    if (uses_fonts && (encoding == S_ENC_ISO8859_15)) {
+	for (i = 0; PS_iso_8859_15_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_iso_8859_15_encoding[i]);
 	}
     }
     if (uses_fonts && (encoding == S_ENC_CP437)) {       /* JFi */
@@ -2802,7 +2852,7 @@ START_HELP(post)
 "",
 " The phantom box is useful for a@^b_c to align superscripts and subscripts",
 " but does not work well for overwriting an accent on a letter.  (To do the",
-" latter, it is much better to use `set encoding iso_8859_1` to change to the",
+" latter, it is much better to use 'set encoding iso_8859_1' to change to the",
 " ISO Latin-1 encoding vector, which contains a large variety of letters with",
 " accents or other diacritical marks.)  Since the box is non-spacing, it is",
 " sensible to put the shorter of the subscript or superscript in the box (that",

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.62 2003/12/01 03:31:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.63 2003/12/15 07:52:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -140,13 +140,15 @@ TBOOLEAN ignore_enhanced_text = FALSE;
 enum set_encoding_id encoding;
 /* table of encoding names, for output of the setting */
 const char *encoding_names[] = {
-    "default", "iso_8859_1", "iso_8859_2", "cp437", "cp850", "cp852", "koi8r", NULL };
+    "default", "iso_8859_1", "iso_8859_2", "iso_8859_15",
+    "cp437", "cp850", "cp852", "koi8r", NULL };
 /* 'set encoding' options */
 const struct gen_table set_encoding_tbl[] =
 {
     { "def$ault", S_ENC_DEFAULT },
     { "iso$_8859_1", S_ENC_ISO8859_1 },
     { "iso_8859_2", S_ENC_ISO8859_2 },
+    { "iso_8859_15", S_ENC_ISO8859_15 },
     { "cp4$37", S_ENC_CP437 },
     { "cp8$50", S_ENC_CP850 },
     { "cp8$52", S_ENC_CP852 },
