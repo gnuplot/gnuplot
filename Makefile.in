@@ -405,7 +405,7 @@ show.o: show.c plot.h setshow.h
 	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(bindir)\" -c $<
 
 term.o: term.c term.h $(CORETERM)
-	$(COMPILE) -I./term -I$(top_srcdir)/term -c $<
+	$(COMPILE) -I$(top_srcdir)/term -c $<
 
 version.o: version.c
 	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
