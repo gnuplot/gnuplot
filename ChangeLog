@@ -1,3 +1,9 @@
+2004-06-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm (EMF_linewidth): Force re-evaluation of line
+	characteristics when the linewidth changes; otherwise the new width
+	is ignored until some other property changes as well.
+
 2004-06-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/fillcrvs.dem: Add text to pause -1 prompts.

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.17 2003/04/25 03:23:01 sfeam Exp $
+ * $Id: emf.trm,v 1.18 2004/04/13 17:24:16 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -607,12 +607,15 @@ TERM_PUBLIC void
 EMF_linewidth(width)
 double width;
 {
+    int current_dashtype = emf_dashtype;
+
     assert(width >= 0);
     if (width == emf_linewidth)
 	return;
     emf_linewidth = width;
 
-    EMF_dashtype(emf_dashtype);	/* have dash lengths recalculated */
+    emf_dashtype = L_TYPE_NODRAW;	/* Invalidate current dash type     */
+    EMF_dashtype(current_dashtype);	/* Force re-evaluation of dash type */
 }
 
 TERM_PUBLIC void 
