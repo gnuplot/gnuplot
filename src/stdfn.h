@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.14 2000/11/01 18:57:33 broeker Exp $
+ * $Id: stdfn.h,v 1.15 2001/02/23 18:09:26 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -281,6 +281,7 @@ int pclose __PROTO((FILE *));
 # ifdef HAVE_STRICMP
 #  define strcasecmp stricmp
 # else
+int gp_stricmp __PROTO((const char *, const char *));
 #  define strcasecmp gp_stricmp
 # endif
 #endif
@@ -289,6 +290,7 @@ int pclose __PROTO((FILE *));
 # ifdef HAVE_STRNICMP
 #  define strncasecmp strnicmp
 # else
+int gp_strnicmp __PROTO((const char *, const char *, size_t));
 #  define strncasecmp gp_strnicmp
 # endif
 #endif

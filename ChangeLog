@@ -1,3 +1,11 @@
+2001-08-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/stdfn.c: Move gp_stricmp and gp_strnicmp prototypes from
+ 	here to src/stdfn.h where they belong.
+	(gp_strnicmp): Made third argument type size_t, to more closely
+ 	mimic the XPG4 Unix standard function strncasecmp() it will
+ 	replace.
+
 2001-08-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.c (list_terms): Sort terminals by name before
