@@ -64,8 +64,8 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
-	   $(T)linux.trm $(T)metafont.trm $(T)mgr.trm $(T)mif.trm \
-	   $(T)multitos.trm $(T)next.trm $(T)object.h \
+	   $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)mgr.trm \
+	   $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)object.h \
 	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
 	   $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
 	   $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
