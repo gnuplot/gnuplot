@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.27 1999/12/10 17:02:16 lhecking Exp $
+ * $Id: png.trm,v 1.28 2000/05/02 14:25:06 lhecking Exp $
  *
  */
 
@@ -253,7 +253,8 @@ PNG_options()
 	break;
     }
 
-    for (i = 0; i < n_colors ; i++ ) {
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+	i < n_colors ; i++ ) {
 	sprintf(term_options + strlen(term_options),
 		"x%02x%02x%02x ",
 		web_color_rgbs[i].r,
