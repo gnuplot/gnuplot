@@ -1,3 +1,22 @@
+1999-08-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc: Fix inconsistencies (command is set/show bars,
+	not bar).
+
+	* src/set.c(set_command), src/show.c(show_command): Re-import correct
+	message string.
+
+	* src/setshow.h: Remove show_version_long() prototype and
+	SETSHOWMSG define.
+
+	* src/show.c: Extensive show command parser restructuring.
+
+	* src/tables.c(set_tbl): Add "no" variables.
+
+	* src/tables.h(set_id): Add missing values.
+
+	* src/variable.h: Remove show_* defines, now functions in show.c.
+
 1999-08-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/command.c: Add missing parser functions and cases. Remove
