@@ -9,6 +9,7 @@ Changes in release 3.7.1:
   different colours for key text and sample (blacktext),
   linewidth, dashlength options
 * extensions to tkcanvas driver
+* fixes in fig and metafont drivers
 * bugfixes related to secondary axes (show/nologscale)
 * new '--without-lisp-files' and '--without-tutorial' configure options
 * new targets to build documentation with groff

@@ -1,3 +1,14 @@
+1999-05-05  Peter Hackenberg  <phackenberg@aip.de>
+
+	* term/fig.trm: Quote `\`, fix linestyle 201 to give a solid line,
+	draw dotted lines with CAP_ROUND.
+
+1999-05-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2, src/command.c, src/readline.c,
+	src/os2/dialogs.h, src/os2/gclient.c, src/os2/gnupmdrv.ipf,
+	src/os2/gnupmdrv.rc, term/pm.trm: Latest version of OS/2 mouse patch.
+
 1999-05-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/makefile.os2: Run latex2e three times to update the table of
@@ -29,7 +40,7 @@
 	* configure.in: Add switches to disable building of files in
 	the lisp subdir and LaTeX tutorial.
 
-	* docs/gnuplot.doc: Fix typo/
+	* docs/gnuplot.doc: Fix typo.
 
 	* src/Makefile.maint: Simplify generation of version.c.
 
