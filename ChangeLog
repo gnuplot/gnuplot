@@ -1,3 +1,7 @@
+2002-08-15  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm: Documentation about Symbol-Oblique.
+
 2002-08-14  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/readline.c: Remove compiler warning.
@@ -878,7 +882,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/14 18:38:09 $).
+	last modification date (from the tag $Date: 2002/08/14 18:43:42 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.68 2002/08/01 16:51:20 broeker Exp $
+ * $Id: post.trm,v 1.69 2002/08/14 18:38:10 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2218,6 +2218,9 @@ START_HELP(post)
 " default, butt caps and mitered joins;",
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
+" In addition to the standard postscript fonts, an oblique version of the",
+" Symbol font, useful for mathematics, is defined. It is called"
+" \"Symbol-Oblique\".",
 "",
 " `default` mode sets all options to their defaults: `landscape`, `monochrome`,",
 " `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, \"Helvetica\" and",
@@ -2239,10 +2242,10 @@ START_HELP(post)
 "       set terminal postscript eps 22        # old epsf2",
 "       set size 0.7,1.4; set term post portrait color \"Times-Roman\" 14",
 "",
-" Linewidths and pointsizes may be changed with `set linestyle`.",
+" Linewidths and pointsizes may be changed with `set style line`.",
 "",
 " The `postscript` driver supports about 70 distinct pointtypes, selectable",
-" through the `pointtype` option on `plot` and `set linestyle`.",
+" through the `pointtype` option on `plot` and `set style line`.",
 "",
 " Several possibly useful files about `gnuplot`'s PostScript are included",
 " in the /docs/ps subdirectory of the `gnuplot` distribution and at the",
@@ -2255,7 +2258,7 @@ START_HELP(post)
 " of a PostScript file written by `gnuplot`).",
 "", 
 " A PostScript file is editable, so once `gnuplot` has created one, you are",
-" free to modify it to your heart's desire.  See the \"editing postscript\"",
+" free to modify it to your heart's desire.  See the `editing postscript`",
 " section for some hints.",
 "2 enhanced postscript",
 "?commands set terminal postscript enhanced",
