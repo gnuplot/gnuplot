@@ -55,7 +55,8 @@ int t_num;
     *udv_ptr = (struct udvt_entry *)
 	gp_alloc((unsigned long) sizeof(struct udvt_entry), "value");
     (*udv_ptr)->next_udv = NULL;
-    copy_str((*udv_ptr)->udv_name, t_num, MAX_ID_LEN);
+    (*udv_ptr)->udv_name = gp_alloc (token_len(t_num)+1, "user var");
+    copy_str((*udv_ptr)->udv_name, t_num, token_len(t_num)+1);
     (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
     (*udv_ptr)->udv_undef = TRUE;
     return (*udv_ptr);
@@ -89,7 +90,8 @@ int t_num;			/* index to token[] */
     (*udf_ptr)->next_udf = (struct udft_entry *) NULL;
     (*udf_ptr)->definition = NULL;
     (*udf_ptr)->at = NULL;
-    copy_str((*udf_ptr)->udf_name, t_num, MAX_ID_LEN);
+    (*udf_ptr)->udf_name = gp_alloc (token_len(t_num)+1, "user func");
+    copy_str((*udf_ptr)->udf_name, t_num, token_len(t_num)+1);
     for (i = 0; i < MAX_NUM_VAR; i++)
 	(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
     return (*udf_ptr);
