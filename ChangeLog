@@ -1,3 +1,10 @@
+2002-01-23  Johannes Zellner  <johannes@zellner.org>
+
+	* term/x11.trm: split the driver path into words so that
+	something like
+	    set term x11 driver "strace -f -o strace.out ./gnuplot_x11"
+	can be used (nice for debugging for example).
+
 2002-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/history.c: Fix for "history !first_command_in_history".

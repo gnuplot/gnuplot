@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.42 2002/01/17 21:07:58 joze Exp $
+ * $Id: x11.trm,v 1.43 2002/01/17 21:19:59 joze Exp $
  *
  */
 
@@ -174,7 +174,7 @@ static FILE *X11_ipc = (FILE*) 0;
 #endif
 
 static char **xargv = (char **)NULL;
-static char *optvec[2*X11_nopts+1];
+static char *optvec[2*X11_nopts+1 + 10 /*reserve a minimum 10 driver opts*/];
 # ifdef OS2
 static char X11_default_command[] = "gnuplot_x11.exe";
 # else
@@ -185,9 +185,51 @@ static char X11_default_command[] = "gnuplot_x11.exe";
 # endif
 # endif /* !OS/2 */
 static char* X11_command = X11_default_command;
+static char* X11_command_parsed = (char*)0;
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
+
+static int parse_driver __PROTO((const char*));
+
+static int
+parse_driver(const char* cmd)
+{
+    int i;
+    int nr = 0;
+    char* ptr;
+
+    /* make a copy of cmd, as parsing will modify the string */
+    if (X11_command_parsed)
+	free(X11_command_parsed);
+    X11_command_parsed = gp_alloc(strlen(cmd) + 1, "x11->parse_driver");
+    strcpy(X11_command_parsed, X11_command),
+    
+    ptr = X11_command_parsed;
+
+    while (*ptr != '\0' && nr < sizeof (optvec) / sizeof (char)) {
+
+        /* Strip whitespace.  Use nulls, so that
+	 * the previous argument is terminated
+         * automatically.
+         */
+        while ((*ptr == ' ') || (*ptr == '\t') || (*ptr == '\n'))
+            *ptr++ = '\0';
+
+        if (!(*ptr)) /* don't count the terminating NULL */
+            break;
+
+        /* Save the argument. */
+	optvec[nr++] = ptr;
+
+        /* Skip over the argument. */
+	while ('\0' != *ptr && ' ' != *ptr && '\t' != *ptr && '\n' != *ptr) {
+	    ptr++;
+	}
+    }
+
+    return nr;
+}
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
@@ -210,7 +252,7 @@ char *argv[];
     /* We make a copy of the argument vector because
      * argv is modified later. */
     memcpy (xargv, argv, argc*sizeof(char *));
-    optvec[i++] = X11_command;
+    i += parse_driver(X11_command);
 
     while (++argv, ++xargv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
@@ -223,6 +265,10 @@ char *argv[];
 			return nx11;
 		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
+		}
+		if (i >= (sizeof (optvec) / sizeof (char))) {
+		    fprintf(stderr, "warning: X11 options will be truncated\n");
+		    return nx11; /* optvec is full */
 		}
 		nx11++;
 		break;
@@ -288,7 +334,7 @@ X11_options()
 		if (X11_command && X11_command != X11_default_command)
 		    free(X11_command);
 		X11_command = path;
-		optvec[0] = X11_command;
+		parse_driver(X11_command);
 		c_token++;
 	    }
 	    break;
@@ -501,7 +547,7 @@ X11_init()
 	    close(fdes[1]);
 
 	    dup2(fdes[0], 0);	/* stdin from pipe */
-	    execvp(X11_command, optvec);
+	    execvp(optvec[0], optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed (X11 driver)");
 	    exit(EXIT_FAILURE);
@@ -579,7 +625,7 @@ TERM_PUBLIC void
 X11_init()
 {
     if (!(X11_pid = fork())) {
-	execvp(X11_command, optvec);
+	execvp(optvec[0], optvec);
 	_exit(1);
     }
     sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
