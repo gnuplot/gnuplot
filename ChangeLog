@@ -1,3 +1,44 @@
+1998-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* binary.h, command.c, graph3d.c, graphics.c, interpol.c, plot2d.c,
+ 	plot3d.c, util3d.c: Move inrange macro to plot.h. 
+
+	* gplt_x11.c: Fix indentation. Add definition of fd_set_t. Use
+	fd_set_t to clean up select() call. Remove unused variable all
+	in DEFAULT_X11 mainloop(). Fix some compiler warnings.
+
+	* plot.c: Move defintion of HOME, PLOTRC to plot.h. Clean up
+	load_rcfile(). Use new symbols PATHSEP1, PATHSEP2, NUL.
+
+	* plot.h: Define HOME, PATHSEP1, PATHSEP2 in OS section. Define
+	PLOTRC.
+
+	* stdfn.h: Define NUL.
+	
+1998-09-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* CodeStyle: Amended.
+
+	* contour.c: Change some function signatures to avoid compiler
+	warnings. Add chk_contour_kind() by Lucas Hart <hartl@ucs.orst.edu>.
+
+	* datafile.c: Rename some vars to avoid compiler warnings.
+
+	* help.c(LoadHelp,ShowSubtopics): Initialize pos.
+
+	* docs/doc2rnh.c: Add new putrnh_ function. Lucas Hart.
+
+	* contour.c, datafile.c, fit.c, graph3d.c, graphics.c, hidden3d.c,
+	internal.c, interpol.c, matrix.c, plot2d.c, plot3d.c, set.c, stdfn.c,
+	strftime.c, util3d.c: Cleanups, VMS patches by Lucas Hart.
+
+1998-09-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c, plot.c, stdfn.h, os2/gclient.c: Patches to make 347pl2
+	compile under OS/2 by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
+
+	* version.c: Trim log entries for beta346.
+
 1998-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* command.c: Move HELPFILE definition to plot.h.
