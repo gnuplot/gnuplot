@@ -13,10 +13,10 @@ Preprocessor Defines
 
  These #defines should be checked before compilation. There are many
 makefiles provided as templates. You probably need these only if porting
-to a new machine. The HAVE_XXX and NO_XXX defines should be taken care
-of by configure if your platform supports GNU autoconf generated
-configure shell scripts. If your platform/environment does not support
-configure, see Codestyle and syscfg.h.
+to a new machine. The HAVE_XXX defines should be taken care of by configure
+if your platform supports GNU autoconf generated configure shell scripts.
+If your platform/environment does not support configure, see Codestyle and
+syscfg.h.
 
 THIS LIST IS SOMEWHAT OUT OF DATE NOW - CHECK configure.in and
 acconfig.h.
@@ -26,8 +26,6 @@ define      file            note
 HAVE_BCOPY  Makefile        define if you have bcopy() and no memcpy()
 HAVE_LGAMMA Makefile        define if you've got lgamma(3)
 HAVE_GAMMA  Makefile        define if you've got gamma(3)
-NO_MEMCPY   Makefile        define if your memcpy() is called bcopy()
-NO_MEMSET   Makefile        define if you have bzero() but not memset()
 PC          Makefile        define if compiling on a PClone
 MSDOS       Makefile        define if compiling under MSDOS;
                               automatically defined by Microsoft C 5.10
@@ -44,48 +42,12 @@ HAVE_LIBREADLINE Makefile   define if you are linking with GNU readline
 Header File Availability
 ========================
 
- Generally, it is assumed that standard ANSI/ISO header files are available.
-The code is protected against missing standard header files with
-NO_XXX_H defines:
-
-NO_STRING_H     string.h absent
-NO_STDLIB_H     stdlib.h absent
-NO_ERRNO_H      errno.h  absent
-NO_LIMITS_H     limits.h absent
-NO_LOCALE_H     locale.h absent
-NO_TIME_H       time.h   absent
-NO_SYS_TYPES_H  sys/types.h absent (not ANSI/ISO, but pretty standard)
-
- If non-standard header files are required, HAVE_XXX_H defines are used:
-
-HAVE_UNISTD_H
-HAVE_LIBC_H    (unistd.h alternative on NEXT)
-HAVE_SGTTY_H             needed if there is no termios.h
-HAVE_SYS_BSDTYPES_H
-HAVE_SYS_SELECT_H        (needed for FD_* macros)
-HAVE_SYS_STAT_H
-HAVE_SYS_SYSTEMINFO_H    (to use sysinfo() instead of gethostname())
-HAVE_TERMIOS_H
-HAVE_VALUES_H            needed if there is no limits.h
-
- Note that configure uses the HAVE_XXXX_H form, though. The transformation
-into NO_XXXX_H is done in syscfg.h. The same is true for function defines
-(see below).
+ It is generally assumed that standard ANSI/ISO header files are available.
 
 Function Availability
 =====================
 
  It is generally assumed that standard ANSI/ISO functions are available.
-The code is protected against missing standard functions with NO_XXX defines:
-
-NO_ATEXIT   - atexit() not available
-NO_MEMCPY   - memcpy() not available
-NO_MEMSET   - memset() not available
-NO_SETVBUF  - setvbuf() not available
-NO_STRCHR   - strchr() not available
-NO_STRERROR - strerror() not available
-NO_STRSTR   - strstr() not available
-NO_TEMPNAM  - tempnam() not available
 
  If certain standard ANSI/ISO C functions are not available, two alternatives
 come to mind: either try to achieve the same functionality without the

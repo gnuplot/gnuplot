@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os9,v 1.2 1999/07/09 20:58:21 lhecking Exp $
+# $Id: makefile.os9,v 1.3 1999/12/01 22:07:57 lhecking Exp $
 #
 # GNUPLOT Makefile for OS-9 and Ultra C, with X11 support
 #
@@ -45,8 +45,7 @@ M = ../DEMO/
 
 DEBUG = -g
 #DEBUG =
-CDFLAGS = -DOSK -DPIPES -DREADLINE -DNO_SYS_TYPES_H -DHAVE_LOCALE \
-		$(PLOTXFLAG)
+CDFLAGS = -DOSK -DPIPES -DREADLINE -DHAVE_LOCALE $(PLOTXFLAG)
 CFLAGS = $(DEBUG) -td=/h0 -tp=020ld $(CDFLAGS)
 CCFLAGS = -eas=$(RDIR)
 

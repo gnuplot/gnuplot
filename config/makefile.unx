@@ -1,5 +1,5 @@
 #
-# $Id: makefile.unx,v 1.92 1998/04/14 00:15:57 drd Exp $
+# $Id: makefile.unx,v 1.4 1999/05/31 18:38:58 lhecking Exp $
 #
 #
 ############################################################
@@ -123,12 +123,9 @@ MY_FLAGS  = CC="$(CC)" COPTS="$(COPTS)" DEST="$(DEST)" \
 # They are set correctly for each machine below. If your machine
 # doesn't fit the one of the patterns, override on the make command
 # line or make a new target for it and a new _FLAGS definition.
-#  -DNO_MEMSET if you need to use bzero() instead of memset()
-#  -DNO_MEMCPY if your memcpy() is called bcopy()
 #  -DHAVE_COPY if you have bcopy() and no memcpy()
 #  -DHAVE_STRNICMP if you have strnicmp()
 #  -DHAVE_STRNCASECMP if you have strncasecmp() (GNU Libc, bsd)
-#  -DNO_TEMPNAM if you don't have tempnam()
 #  -DGAMMA=foo if your gamma function is called foo(). Apollos and
 #    Linux have lgamma(3m). The default is -DGAMMA=gamma.
 #  -DHAVE_GETCWD if your unix uses getcwd() instead of getwd()
@@ -143,18 +140,12 @@ MY_FLAGS  = CC="$(CC)" COPTS="$(COPTS)" DEST="$(DEST)" \
 #    support foreign charactersets (currently only ISO8859-1).
 #  -Dunix is required to explicitly define "unix" for SCO and IBM
 #          RS/6000 running AIX 3.2
-#  -DNO_STDLIB_H if you are missing the stdlib.h header (old bsd systems)
-#  -DNO_SYS_TYPES_H if you don't have sys/types.h
-#  -DNO_STRCHR if you have index instead of strchr
-#  -DNO_STRIN_H if you have strings.h instead of string.h
 #  -DHAVE_UNISTD_H if you have unistd.h
 #  -DHAVE_LIBC_H if you have libc.h (NeXT)
-#  -DNO_ERRNO_H if you don't have errno.h
 #  -fswitch if you are compiling on a Sun3 (or even -f68881)
 #    (but -fswitch is buggy on some systems, so watch out)
 #  -DRETSIGTYPE=int if the argument to signal is an int function
 #  -DSIGFUNC_NO_INT_ARG if the signal function may not have an int argument
-#  -DNO_STRERROR if your library does not have strerror()
 
 # Defaults in case the user types 'make All' directly
 # Should match X11_FLAGS's CFLAGS definition
@@ -218,7 +209,7 @@ X11_FLAGS = \
            TERMFLAGS="$(TERMFLAGS)"
 
 DEC_OSF_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -I/usr/sys/include -I/usr/sys/BINARY -DANSI -DGAMMA=lgamma -D_XOPEN_SOURCE -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -I/usr/sys/include -I/usr/sys/BINARY -DANSI -DGAMMA=lgamma -D_XOPEN_SOURCE" \
            LIBS="$(LIBS) -ldnet_stub" \
            X11FLAGS="$(X11FLAGS) -DMOTIF -D_NO_PROTO -D_OSF_SOURCE" \
            X11INCLUDES="$(X11INCLUDES) -I/usr/include/Xm" \
@@ -228,7 +219,7 @@ DEC_OSF_FLAGS = \
            TERMFLAGS="$(TERMFLAGS) "
 
 DEC_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS)" \
            LIBS="-lplot $(LIBS)" X11FLAGS="$(X11FLAGS)" \
 	   X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="$(X11LIBS)" \
@@ -237,7 +228,7 @@ DEC_FLAGS = \
            TERMFLAGS="$(TERMFLAGS) -DULTRIX_KLUDGE"
 
 APOLLO_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DGAMMA=lgamma -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -DGAMMA=lgamma" \
            LIBS="$(LIBS)" X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="-L/usr/lib/X11 -lX11" \
@@ -246,7 +237,7 @@ APOLLO_FLAGS = \
            TERMFLAGS="$(TERMFLAGS) -DAPOLLO -DGPR"
 
 HP8_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DNO_ERRNO_H" \
+           CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
            LIBS=$(LIBS) X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES="-I/usr/include/X11R4" \
            X11LIBS="-L/usr/lib/X11R4 -lX11" \
@@ -255,7 +246,7 @@ HP8_FLAGS = \
            TERMFLAGS="-I. -Iterm -DX11"
 
 HP9_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -Ae -DHAVE_GETCWD -DNO_ERRNO_H" \
+           CFLAGS="$(COPTS) $(OPTIONS) -Ae -DHAVE_GETCWD" \
            LIBS=$(LIBS) X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES="-I/usr/include/X11R5" \
            X11LIBS="-L/usr/lib/X11R5 -lX11" \
@@ -301,14 +292,14 @@ SUN_X11_MGR_FLAGS = \
            TERMFLAGS="-I/usr/mgr/include -I. -Iterm -DMGR $(TERMFLAGS)"
 
 SGI_FLAGS = \
-           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
            LIBS="-lgl_s -lm -lX11_s $(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " \
            PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
            TERMFLAGS="-I. -Iterm -DIRIS4D -DANSI" INSTALL="cp"
 
 SGIX11_FLAGS = \
-           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="-xansi $(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
            LIBS="-lgl_s -lm -lc_s -lX11_s $(LIBS)" X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="-lX11_s" \
@@ -318,7 +309,7 @@ SGIX11_FLAGS = \
 #           TERMFLAGS="-I. -Iterm -DX11 -DIRIS4D -cckr" INSTALL="cp"
 
 CGI_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -Dunix -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -Dunix" \
            LIBS="-lccgi $(LIBS)" X11FLAGS=" " X11INCLUDES=" " \
            X11LIBS=" " PLOTXFLAG=" " GNUPLOT_X11=" " X11INSTALL=x11_noinstall \
            TERMFLAGS="-I. -Iterm -DUNIXPLOT -DCGI"
@@ -369,7 +360,7 @@ AIX_FLAGS = \
            TERMFLAGS="$(TERMFLAGS) -qmaxmem=9000"
 
 AIXO_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DGAMMA=gamma -DXPG3_LOCALE -Dunix -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -DGAMMA=gamma -DXPG3_LOCALE -Dunix" \
            LIBS="$(LIBS) -lbsd" X11FLAGS="$(X11FLAGS)" \
            X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="$(X11LIBS)" \
@@ -395,7 +386,7 @@ NEXT_X11_FLAGS = \
            TERMFLAGS="-I. -Iterm -DX11 -ObjC -DANSI" OBJS=" $(OBJS) $(NEXTOBJS)"
 
 CRAY_FLAGS = \
-       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DNO_MEMCPY -DNO_MEMSET" \
+       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
        LIBS="$(LIBS)" X11FLAGS=" " \
        X11INCLUDES=" " \
        X11LIBS=" " \
@@ -404,7 +395,7 @@ CRAY_FLAGS = \
        TERMFLAGS="-I. -Iterm"
 
 CRAY_X11_FLAGS = \
-       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD -DNO_MEMSET -DNO_MEMCPY" \
+       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_GETCWD" \
        LIBS="$(LIBS)" X11FLAGS="$(X11FLAGS)" \
        X11INCLUDES="$(X11INCLUDES)" \
        X11LIBS="$(X11LIBS)" \
@@ -422,7 +413,7 @@ PTX_X11_FLAGS = \
        TERMFLAGS="$(TERMFLAGS)"
 
 SEQUENT_X11_FLAGS = \
-       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_SGTTY_H -DCRIPPLED_SELECT -DNO_MEMSET -DNO_MEMCPY -DNO_STRCHR" \
+       CFLAGS="$(COPTS) $(OPTIONS) -DHAVE_SGTTY_H -DCRIPPLED_SELECT" \
        LIBS="$(LIBS) -lplot" X11FLAGS="$(X11FLAGS) -DX_WCHAR" \
        X11INCLUDES="$(X11INCLUDES)" \
        X11LIBS="-lX11 -lseq " \
@@ -433,7 +424,7 @@ SEQUENT_X11_FLAGS = \
 # Convex X11 uses -O1 for scalar optimization only
 
 CONVEX_X11_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -DHUGE=8.9e307 -O1 -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -DHUGE=8.9e307 -O1" \
            LIBS="$(LIBS)" X11FLAGS="$(X11FLAGS)" X11INCLUDES="$(X11INCLUDES)" \
            X11LIBS="$(X11LIBS)" \
            PLOTXFLAG="$(PLOTXFLAG)" GNUPLOT_X11=$(GNUPLOT_X11) \
@@ -441,7 +432,7 @@ CONVEX_X11_FLAGS = \
            TERMFLAGS="$(TERMFLAGS)"
 
 OSF_FLAGS = \
-           CFLAGS="$(COPTS) $(OPTIONS) -I/usr/sys/include -I/usr/sys/BINARY -DANSI -D_XOPEN_SOURCE -D__osf__ -DNO_MEMCPY -DNO_MEMSET" \
+           CFLAGS="$(COPTS) $(OPTIONS) -I/usr/sys/include -I/usr/sys/BINARY -DANSI -D_XOPEN_SOURCE -D__osf__" \
            LIBS="$(LIBS)" \
            X11FLAGS="$(X11FLAGS) -DMOTIF -D_NO_PROTO -D_OSF_SOURCE" \
            X11INCLUDES="$(X11INCLUDES) -I/usr/include/Xm" \

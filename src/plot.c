@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.51 2002/02/15 17:15:12 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.52 2002/02/15 20:17:35 amai Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -377,7 +377,7 @@ char **argv;
 
     setbuf(stderr, (char *) NULL);
 
-#ifndef NO_SETVBUF
+#ifdef HAVE_SETVBUF
     /* this was once setlinebuf(). Docs say this is
      * identical to setvbuf(,NULL,_IOLBF,0), but MS C
      * faults this (size out of range), so we try with

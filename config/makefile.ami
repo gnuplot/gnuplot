@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.4 1999/11/08 19:20:58 lhecking Exp $
+# $Id: makefile.ami,v 1.5 1999/12/01 22:07:56 lhecking Exp $
 #
 # GNUPLOT Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 # 
@@ -21,7 +21,7 @@ EMAIL="bug-gnuplot@dartmouth.edu"
 #
 #
 CC     = cc
-CFLAGS = -mcd -DAMIGA_AC_5 -DNO_FLOAT_H -fa -sab -wosw -MR
+CFLAGS = -mcd -DAMIGA_AC_5 -fa -sab -wosw -MR
 
 # note that current versions of Aztec may very well have float.h
 # if anyone can verify this, please fix it.

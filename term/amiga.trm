@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.10 1999/06/22 11:52:55 lhecking Exp $
+ * $Id: amiga.trm,v 1.11 1999/08/24 11:24:52 lhecking Exp $
  *
  */
 
@@ -129,7 +129,7 @@ TERM_PUBLIC void AMIGA_resume __PROTO((void));
 #include <proto/diskfont.h>
 #endif /* !AMIGA_AC_5 */
 
-#ifndef NO_ATEXIT
+#ifdef HAVE_ATEXIT
 void AMIGA_exit(void);
 # define ATEXIT(x) (atexit(x) != 0)
 # ifdef AMIGA_SC_6_1
@@ -140,7 +140,7 @@ void AMIGA_exit(void);
 # endif				/* SAS */
 #else
 # define ATEXIT(x) 0
-#endif /* NO_ATEXIT */
+#endif /* HAVE_ATEXIT */
 
 #ifndef RETURN_FAIL
 # define RETURN_FAIL 20
@@ -769,7 +769,7 @@ AMIGA_resume()
 }
 
 
-#ifndef NO_ATEXIT
+#ifdef HAVE_ATEXIT
 /* This function is mainly included if the program terminates abnormally
  * and the screen and libraries are still open. It closes down all opened
  * libraries and screens. This happens e.g. when loading "bivariat.demo"
@@ -782,7 +782,7 @@ AMIGA_exit(void)
     RAWCON(0);
 }
 
-#endif /* NO_ATEXIT */
+#endif /* HAVE_ATEXIT */
 
 
 #endif /* TERM_BODY */

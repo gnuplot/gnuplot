@@ -1,3 +1,12 @@
+2002-02-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* PORTING, configure.vms, config/buildvms.com, config/makefile.ami,
+	config/makefile.cyg, config/makefile.mgw, config/makefile.os9,
+	config/makefile.st, config/makefile.unx, config/makefile.win,
+	src/plot.c, src/stdfn.c, src/stdfn.h, src/syscfg.h, src/variable.c,
+	term/amiga.trm: Remove all header file and function related NO_*
+	preprocessor symbols and use HAVE_* instead.
+
 2002-02-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/README: Added documentation on mouse, hotkeys, terminal 

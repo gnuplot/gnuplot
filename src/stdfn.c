@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.12 2002/02/14 14:20:17 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.13 2002/02/14 16:42:08 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -55,7 +55,7 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.12 2002/02/14 14:20:17 bro
 
 /* memcpy() */
 
-#ifdef NO_MEMCPY
+#ifndef HAVE_MEMCPY
 # ifndef HAVE_BCOPY
 /*
  * cheap and slow version of memcpy() in case you don't have one 
@@ -72,13 +72,13 @@ memcpy(dest, src, len)
     return dest;
 }
 # endif				/* !HAVE_BCOPY */
-#endif /* NO_MEMCPY */
+#endif /* HAVE_MEMCPY */
 
 /* strchr()
  * Simple and portable version, conforming to Plauger.
  * Would this be more efficient as a macro?
  */
-#ifdef NO_STRCHR
+#ifndef HAVE_STRCHR
 # ifndef HAVE_INDEX
 
 char *
@@ -94,7 +94,7 @@ strchr(s, c)
     return NULL;
 }
 # endif				/* !HAVE_INDEX */
-#endif /* NO_STRCHR */
+#endif /* HAVE_STRCHR */
 
 
 /* memset () 
@@ -104,7 +104,7 @@ strchr(s, c)
  * think this is the only possible way.
  */
 
-#ifdef NO_MEMSET
+#ifndef HAVE_MEMSET
 # ifdef HAVE_BZERO
 #  define memset(s, b, l) \
 do {                      \
@@ -113,12 +113,12 @@ do {                      \
 } while(0)
 #  else
 #  define memset NO_MEMSET_OR_BZERO
-# endif				/* HAVE_BZERO */
-#endif /* NO_MEMSET */
+# endif /* HAVE_BZERO */
+#endif /* HAVE_MEMSET */
 
 
 /* strerror() */
-#ifdef NO_STRERROR
+#ifndef HAVE_STRERROR
 
 char *
 strerror(no)
@@ -133,11 +133,11 @@ strerror(no)
 	return sys_errlist[no];
     }
 }
-#endif /* NO_STRERROR */
+#endif /* HAVE_STRERROR */
 
 
 /* strstr() */
-#ifdef NO_STRSTR
+#ifndef HAVE_STRSTR
 
 char *
 strstr(cs, ct)
@@ -160,7 +160,7 @@ const char *cs, *ct;
 
     return NULL;
 }
-#endif /* NO_STRSTR */
+#endif /* HAVE_STRSTR */
 
 
 #ifdef __PUREC__

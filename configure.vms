@@ -65,8 +65,7 @@ $ !
 $ ! Note: VAX uses  D_FLOAT, maximum exponent ca 10e +/- 38;
 $ !       will cause problems with some of the demos
 $ !
-$ !$ CFLAGS    = "/NOOP/DEFINE=(NO_STRSTR, NO_SYS_TYPES_H, "-
-$ !               +"HAVE_GETCWD, HAVE_SLEEP, NO_LOCALE_H,"-
+$ !$ CFLAGS    = "/NOOP/DEFINE=(HAVE_GETCWD, HAVE_SLEEP, "-
 $ !               +"SHORT_TERMLIST, NO_GIH,PIPES, ''rtl')"
 $ !$ !
 $ !
@@ -87,8 +86,8 @@ $ !
 $ ! Note: _assert.c defines assert_gcc, if ndef NDEBUG, but
 $ !        cgm.trm undefines NDEBUG, so we always compile/link  _assert.c
 $ !
-$ !$ CFLAGS    = "/NOOP/DEFINE=(''x11'NO_STRSTR, HAVE_GETCWD,"-
-$ !		+" HAVE_SLEEP, NO_LOCALE_H, NO_GIH, PIPES, ''rtl')"
+$ !$ CFLAGS    = "/NOOP/DEFINE=(''x11', HAVE_GETCWD,"-
+$ !		+" HAVE_SLEEP, NO_GIH, PIPES, ''rtl')"
 $ !
 $ !-----------------------------------------------------------------
 $ VAXC = 0

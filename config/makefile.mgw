@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.14 2002/02/05 09:09:02 mikulik Exp $
+# $Id: makefile.mgw,v 1.15 2002/02/19 12:52:33 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -112,7 +112,7 @@ TERMLIBS =
 
 CFLAGS += -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
 	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DHAVE_ATEXIT -DNO_SETVBUF -DNEAR= \
+	-DHAVE_GETCWD -DHAVE_ATEXIT -DNEAR= \
 	$(OPTS)
 
 ifdef MOUSE

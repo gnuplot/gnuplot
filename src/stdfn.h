@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.18 2002/02/14 14:20:17 broeker Exp $
+ * $Id: stdfn.h,v 1.19 2002/02/14 16:42:08 mikulik Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -49,26 +49,26 @@
 
 #include "syscfg.h"
 
-#ifndef NO_STRING_H
+#ifdef HAVE_STRING_H
 # include <string.h>
 #else
 # include <strings.h>
 #endif
 
 #ifdef HAVE_BCOPY
-# ifdef NO_MEMCPY
+# ifndef HAVE_MEMCPY
 #  define memcpy(d,s,n) bcopy((s),(d),(n))
 # endif
-# ifdef NO_MEMMOVE
+# ifndef HAVE_MEMMOVE
 #  define memmove(d,s,n) bcopy((s),(d),(n))
 # endif
 #else
-# ifdef NO_MEMCPY
+# ifndef HAVE_MEMCPY
 char * memcpy __PROTO((char *, char *, size_t));
 # endif
 #endif /* HAVE_BCOPY */
 
-#ifdef NO_STRCHR
+#ifndef HAVE_STRCHR
 # ifdef strchr
 #  undef strchr
 # endif
@@ -89,11 +89,11 @@ size_t gp_strcspn __PROTO((const char *, const char *));
 # define strcspn gp_strcspn
 #endif
 
-#ifdef NO_STRSTR
+#ifndef HAVE_STRSTR
 char *strstr __PROTO((const char *, const char *));
 #endif
 
-#ifdef NO_STDLIB_H
+#ifndef HAVE_STDLIB_H
 # ifdef HAVE_MALLOC_H
 #  include <malloc.h>
 # else
@@ -107,7 +107,7 @@ double atof();
 int atoi();
 long atol();
 double strtod();
-#else /* !NO_STDLIB_H */
+#else /* HAVE_STDLIB_H */
 # include <stdlib.h>
 # ifndef VMS
 #  ifndef EXIT_FAILURE
@@ -132,7 +132,7 @@ double strtod();
 #   define EXIT_SUCCESS  1
 #  endif
 # endif /* VMS */
-#endif /* !NO_STDLIB_H */
+#endif /* HAVE_STDLIB_H */
 
 /* Deal with varargs functions */
 #if defined(HAVE_VFPRINTF) || defined(HAVE_DOPRNT)
@@ -156,19 +156,19 @@ double strtod();
 # endif
 #endif /* HAVE_UNISTD_H */
 
-#ifndef NO_ERRNO_H
+#ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif
 # ifdef EXTERN_ERRNO
 extern int errno;
 #endif
-#ifdef NO_STRERROR
+#ifndef HAVE_STRERROR
 char *strerror __PROTO((int));
 extern int sys_nerr;
 extern char *sys_errlist[];
 #endif
 
-#ifndef NO_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
 
@@ -245,15 +245,15 @@ extern char *sys_errlist[];
 
 #endif /* HAVE_SYS_STAT_H */
 
-#ifndef NO_LIMITS_H
+#ifdef HAVE_LIMITS_H
 # include <limits.h>
 #else
 # ifdef HAVE_VALUES_H
 #  include <values.h>
 # endif /* HAVE_VALUES_H */
-#endif /* !NO_LIMITS_H */
+#endif /* HAVE_LIMITS_H */
 
-#ifdef NO_TIME_H
+#ifndef HAVE_TIME_H
 # ifndef time_t /* should be #defined by config.h, then... */
 #  define time_t long
 # endif
@@ -266,7 +266,7 @@ FILE *popen __PROTO((char *, char *));
 int pclose __PROTO((FILE *));
 #endif
 
-#ifndef NO_FLOAT_H
+#ifdef HAVE_FLOAT_H
 # include <float.h>
 #endif
 
@@ -275,11 +275,11 @@ int pclose __PROTO((FILE *));
 # define DBL_EPSILON     2.2204460492503131E-16
 #endif
 
-#ifndef NO_LOCALE_H
+#ifdef HAVE_LOCALE_H
 # include <locale.h>
 #endif
 
-#ifndef NO_MATH_H
+#ifdef HAVE_MATH_H
 # include <math.h>
 #endif
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.st,v 1.4 1999/11/08 19:20:59 lhecking Exp $
+# $Id: makefile.st,v 1.5 1999/12/01 22:07:57 lhecking Exp $
 #
 # GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
@@ -57,7 +57,7 @@ OPTFLAGS = -O -fomit-frame-pointer -fstrength-reduce
 # note that current versions of gcc for Atari may very well have float.h
 # if anyone can verify this, please fix it.
 
-CFLAGS = -c -I. -I.. $(OPTFLAGS) -DATARI -DREADLINE -DPIPES -DHAVE_STRNICMP -DNO_FLOAT_H
+CFLAGS = -c -I. -I.. $(OPTFLAGS) -DATARI -DREADLINE -DPIPES -DHAVE_STRNICMP
 TERMFLAGS =
 
 # where to place gnuplot.gih helpfile

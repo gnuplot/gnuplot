@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.12.4.2 2000/07/26 20:35:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.13 2000/11/01 18:57:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -220,7 +220,8 @@ char *newlocale;
 	current_locale = gp_strdup(INITIAL_LOCALE);
 	break;
     case ACTION_SET:
-#ifndef NO_LOCALE_H
+/* FIXME: configure test for setlocale() */
+#ifdef HAVE_LOCALE_H
 	if (setlocale(LC_TIME, newlocale)) {
 	    current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
 	    strcpy(current_locale, newlocale);
@@ -245,7 +246,7 @@ char *newlocale;
 #else
 	current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
 	strcpy(current_locale, newlocale);
-#endif /* NO_LOCALE_H */
+#endif /* HAVE_LOCALE_H */
 	break;
     case ACTION_SHOW:
 	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);

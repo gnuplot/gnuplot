@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.19 2001/07/20 14:04:06 broeker Exp $
+ * $Id: syscfg.h,v 1.20 2002/01/18 15:07:11 cgaylord Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -312,12 +312,12 @@
 #endif
 
 #if defined(APOLLO) || defined(alliant)
-# define NO_LIMITS_H
+# undef HAVE_LIMITS_H
 #endif
 
 #ifdef sequent
-# define NO_LIMITS_H
-# define NO_STRCHR
+# undef HAVE_LIMITS_H
+# undef HAVE_STRCHR
 #endif
 
 #ifdef unixpc
@@ -325,91 +325,6 @@
 #  define UNIXPC
 # endif
 #endif
-
-/* Autoconf related stuff
- * Transform autoconf defines to gnuplot coding standards
- * This is only relevant for standard ANSI headers and functions
- */
-#ifdef HAVE_CONFIG_H
-
-# ifndef HAVE_ERRNO_H
-#  define NO_ERRNO_H
-# endif
-
-# ifndef HAVE_FLOAT_H
-#  define NO_FLOAT_H
-# endif
-
-# ifndef HAVE_LIMITS_H
-#  define NO_LIMITS_H 
-# endif
-
-# ifndef HAVE_LOCALE_H
-#  define NO_LOCALE_H 
-# endif
-
-# ifndef HAVE_MATH_H
-#  define NO_MATH_H 
-# endif
-
-# ifndef HAVE_STDLIB_H
-#  define NO_STDLIB_H 
-# endif
-
-# ifndef HAVE_STRING_H
-#  define NO_STRING_H 
-# endif
-
-# ifndef HAVE_TIME_H
-#  define NO_TIME_H 
-# endif
-
-# ifndef HAVE_SYS_TIME_H
-#  define NO_SYS_TIME_H 
-# endif
-
-# ifndef HAVE_SYS_TYPES_H
-#  define NO_SYS_TYPES_H 
-# endif
-
-# ifndef HAVE_ATEXIT
-#  define NO_ATEXIT
-# endif
-
-# ifndef HAVE_MEMCPY
-#  define NO_MEMCPY
-# endif
-
-# ifndef HAVE_MEMMOVE
-#  define NO_MEMMOVE
-# endif
-
-# ifndef HAVE_MEMSET
-#  define NO_MEMSET
-# endif
-
-# ifndef HAVE_SETVBUF
-#  define NO_SETVBUF
-# endif
-
-# ifndef HAVE_STRERROR
-#  define NO_STRERROR
-# endif
-
-# ifndef HAVE_STRCHR
-#  define NO_STRCHR
-# endif
-
-# ifndef HAVE_STRRCHR
-#  define NO_STRRCHR
-# endif
-
-# ifndef HAVE_STRSTR
-#  define NO_STRSTR
-# endif
-
-#endif /* HAVE_CONFIG_H */
-/* End autoconf related stuff */
 
 /* HBB 20000416: stuff moved from plot.h to here. It's system-dependent,
  * so it belongs here, IMHO */

@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.6 2002/02/01 13:32:52 broeker Exp $
+# $Id: makefile.cyg,v 1.7 2002/02/05 09:09:02 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -118,7 +118,7 @@ TERMLIBS =
 
 CFLAGS += -I. -D_Windows -D__WIN32__ -DWIN32 -mno-cygwin -DCYGWIN \
 	-DNO_GIH -DHAVE_STRNICMP -DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES \
-	-DANSI_C -DHAVE_ATEXIT -DHAVE_GETCWD -DHAVE_SLEEP -DNO_SETVBUF -DNEAR= \
+	-DANSI_C -DHAVE_ATEXIT -DHAVE_GETCWD -DHAVE_SLEEP -DNEAR= \
 	$(OPTS)
 # -I/usr/local/include
 
