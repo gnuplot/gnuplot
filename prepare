@@ -1,15 +1,21 @@
 #! /bin/sh --
+# $Id$
+# Small shell script to prepare the gnuplot sources when
+# checked out from CVS.
 
 exelist="configure configure.vms install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
 
 chmod 755 $exelist >/dev/null 2>&1
 
+# Clean up
+rm -f config.cache config.status
+
 if aclocal -I m4 && autoheader && (cd m4 && make -f Makefile.am.in ) \
-  && automake && autoconf && ./configure $@
+  && automake -i -a -c  && autoconf
 then
   echo
   echo "The gnuplot source code was successfully prepared."
-  echo "Type make && make install to build and install gnuplot."
+  echo "Run configure now, then make && make install to build and install gnuplot."
   echo
 else
   echo
