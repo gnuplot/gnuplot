@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.2 1999/08/07 17:21:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.3 1999/09/14 15:25:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -37,11 +37,17 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.2 1999/08/07 17:21:32 lheck
 #include "plot.h"
 #include "setshow.h"
 
+/* HBB 990825 FIXME: how come these strings are only used for
+ * _displaying_ encodings (-->no use in set.c) ? */
+const char *encoding_names[] = {
+  "default", "iso_8859_1", "cp437", "cp850", NULL };
+
 static void save_functions__sub __PROTO((FILE * fp));
 static void save_variables__sub __PROTO((FILE * fp));
 static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef *tdef, TBOOLEAN rotate, const char *text));
 static void save_position __PROTO((FILE * fp, struct position * pos));
 static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, const char *text));
+static void save_set_all __PROTO((FILE *fp));
 
 #define SAVE_NUM_OR_TIME(fp, x, axis) \
 do{if (datatype[axis]==TIME) { \
@@ -195,7 +201,7 @@ FILE *fp;
 }
 
 
-void
+static void
 save_set_all(fp)
 FILE *fp;
 {
@@ -216,6 +222,7 @@ FILE *fp;
     else
 	fputs("# set output\n", fp);
 
+/* FIXME */
     fprintf(fp, "\
 set %sclip points\n\
 set %sclip one\n\
@@ -231,7 +238,7 @@ set bar %f\n",
 	fprintf(fp, "set border %d lt %d lw %.3f\n",
 		draw_border, border_lp.l_type + 1, border_lp.l_width);
     else
-	fprintf(fp, "set noborder\n");
+	fputs("unset border\n", fp);
 
     fprintf(fp, "\
 set xdata%s\n\
@@ -265,8 +272,9 @@ set y2data%s\n",
 	    (angles_format == ANGLES_RADIANS) ? "radians" : "degrees");
 
     if (work_grid.l_type == 0)
-	fputs("set nogrid\n", fp);
+	fputs("unset grid\n", fp);
     else {
+	/* FIXME */
 	if (polar_grid_angle)	/* set angle already output */
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
 	else
@@ -315,7 +323,7 @@ set y2data%s\n",
 	    break;
 	}
     case 0:
-	fputs("set nokey\n", fp);
+	fputs("unset key\n", fp);
 	break;
     case 1:
 	fputs("set key ", fp);
@@ -328,7 +336,7 @@ set y2data%s\n",
 		key_reverse ? "" : "no",
 		key_box.l_type + 1, key_box.l_width, key_swidth, key_vert_factor, key_width_fix);
     }
-    fputs("set nolabel\n", fp);
+    fputs("unset label\n", fp);
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
 	fprintf(fp, "set label %d \"%s\" at ",
@@ -353,7 +361,7 @@ set y2data%s\n",
 	/* Entry font added by DJL */
 	fputc('\n', fp);
     }
-    fputs("set noarrow\n", fp);
+    fputs("unset arrow\n", fp);
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
@@ -365,7 +373,7 @@ set y2data%s\n",
 		this_arrow->lp_properties.l_type + 1,
 		this_arrow->lp_properties.l_width);
     }
-    fputs("set nolinestyle\n", fp);
+    fputs("unset linestyle\n", fp);
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
 	fprintf(fp, "set linestyle %d ", this_linestyle->tag);
@@ -375,7 +383,7 @@ set y2data%s\n",
 		this_linestyle->lp_properties.p_type + 1,
 		this_linestyle->lp_properties.p_size);
     }
-    fputs("set nologscale\n", fp);
+    fputs("unset logscale\n", fp);
     if (is_log_x)
 	fprintf(fp, "set logscale x %g\n", base_log_x);
     if (is_log_y)
@@ -387,6 +395,7 @@ set y2data%s\n",
     if (is_log_y2)
 	fprintf(fp, "set logscale y2 %g\n", base_log_y2);
 
+    /* FIXME */
     fprintf(fp, "\
 set offsets %g, %g, %g, %g\n\
 set pointsize %g\n\
@@ -427,7 +436,7 @@ set %scontour",
     if (label_contours)
 	fprintf(fp, "set clabel '%s'\n", contour_format);
     else
-	fputs("set noclabel\n", fp);
+	fputs("unset clabel\n", fp);
 
     fputs("set mapping ", fp);
     switch (mapping3d) {
@@ -659,6 +668,7 @@ set ticscale %g %g\n",
 
     SAVE_XYZLABEL("title", title);
 
+    /* FIXME */
     fprintf(fp, "set %s \"%s\" %s %srotate %f,%f ",
 	    "timestamp", conv_text(timelabel.text),
 	    (timelabel_bottom ? "bottom" : "top"),
