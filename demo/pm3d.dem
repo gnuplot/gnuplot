@@ -19,9 +19,9 @@
 # 	- 29. 4. 1999 pm: the 1st version, directory pm3d/demo
 
 
-print "WARNING:  This demo works only on terminals supporting pm3d, i.e. on "
-print "--------  OS/2 Presentation Manager, X11, Linux VGA, Windows. Please use"
-print "          output to a postscript file otherwise."
+# print "WARNING:  This demo works only on terminals supporting pm3d, i.e. on "
+# print "--------  OS/2 Presentation Manager, X11, Linux VGA, Windows. Please use"
+# print "          output to a postscript file otherwise."
 
 set xlabel "x"
 set ylabel "y"
