@@ -83,8 +83,9 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 SUBDIRS = config m4 term src docs man demo tutorial $(d_lisp)
 
-EXTRA_DIST = BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL INSTALL.gnu \
-Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST README.exp VERSION
+EXTRA_DIST = ANNOUNCE-MOUSE BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL \
+INSTALL.gnu Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST \
+README.exp VERSION configure.vms
 
 
 ACLOCAL_AMFLAGS = -I m4
