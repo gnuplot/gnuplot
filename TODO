@@ -14,15 +14,12 @@ COMMANDS:
 DOCUMENTATION:
 ==============
 
--- BUGS file should be updated.
-
 -- gnuplot.doc
 	- better document that you need a blank line in between scans
 	  for 3D (many people ask why pm3d plots nothing...)
 
 -- titlepage.sty:
-	- update people contributing to this gnuplot version,
-	- update gnuplot version and the corresponding dates
+	- update copyright dates
 
 Recently I've moved importants things from README.os2 into gnuplot.doc and
 INSTALL; those other README.{win, xli, nex} should be
@@ -31,12 +28,6 @@ dispersed similarly. Who can do it?
 -- docs/old/README.3d
 -- docs/old/README.fit
   These should be be edited and pasted into gnuplot.doc and then removed.
-
--- update tutorial/
-
--- FAQ should be updated
-   Where is the original source for this? It should be ready to add
-   mouse-, hotkey- and pm3d-related questions.
 
 
 TERMINALS:
@@ -95,10 +86,6 @@ Xlib:
      the README, this file was intended as a GPL-compatible interface
      to gnuplot.
 
-Mac, Apple, MacOS
-   -- support to be added, or at least information to the AquaDriver
-   et al?
-
 
 OTHER BUGS:
 ===========
@@ -112,8 +99,8 @@ TERMINALS, GENERAL COMMENTS:
 -- verify that terminals don't reset options (I've checked a lot, but 
 should be tested again)
 
--- unify color and pointtype sequence, alias similar line and point type
-sequences for the main terminal drivers (joze)
+-- verify that color and pointtype sequence is unified, alias similar line and
+point type sequences for the main terminal drivers
 
 
 GNUPLOT LIBRARY:
@@ -130,11 +117,7 @@ pm3d/contrib and pm3d/ from cvs
 
 I.e., the last point is the main question: where to put pm3d/contrib/* files?
 
-
-WEB:
-====
-
--- gnuplot needs a "professional" web page
+Or put them to gnuplot web page?
 
 
 INSTALLATION --- LINUX:
@@ -152,6 +135,10 @@ INSTALLATION --- VMS:
 [========================================================================]
 [========================================================================]
 [========================================================================]
+
+Note: use
+	www.sourceforge.net/projects/gnuplot
+=> "Feature request" for feature requests.
 
 
 Projects, in no particular order:
@@ -196,10 +183,6 @@ Lars' list
 - [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
 - [HBB] rewrite hidden3d code 
   [MAINLY DONE] needs fine-tuning to remove single-pixel errors
-- for post-3.7 release: integrate new feature patches (M. Koga's
-  polygon patch, various postscript driver patches by Dick, T. Walter's
-  gnuplot command line history save file, etc)? 
-  All done except polygon patch. Better to use pm3d.
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
@@ -230,12 +213,6 @@ Lars' list
   latest version). How to handle duplicates?
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
-- update the FAQ!!!!
-  [Being worked on by Juergen]
-  updated version now in archive
-- non-integer time value in 'pause' command
-  implement using select() where available, or usleep(); round off
-  on systems without
 - tilde and variable expansion to be done by 
   gp_fopen() - to be implemented
 - fix bug which prints "DI,1DI,0" in the upper left corner of the plot when
@@ -254,8 +231,8 @@ WIN32 compile (BC++4.52):
 DONE - problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
 -- test run fails: script execution stops as soon as first plot is done.
 
-Petr Mikulik (info-gnuplot-beta Thu, 02 Mar 2000)
-it would be very convenient to set the values/formulae for columns in 
-advance, before "plot" --- something like
+Petr:
+-- it would be very convenient to set values/formulae for columns in advance,
+   before "plot" --- something like
         set data using 3:($8/$9+1)
 

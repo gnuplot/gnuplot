@@ -1,3 +1,7 @@
+2004-04-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* TODO: Updated.
+
 2004-04-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (looks_like_numeric): Recognize blanks and other
