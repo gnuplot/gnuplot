@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.18 1999/07/09 21:05:56 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.19 1999/07/13 19:55:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -115,7 +115,7 @@ static enum command_id lookup_command __PROTO((int));
 static int read_line __PROTO((const char *prompt));
 static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
-static void do_system __PROTO((void));
+static void do_system __PROTO((const char *));
 static int changedir __PROTO((char *path));
 #ifdef AMIGA_AC_5
 static void getparms __PROTO((char *, char **));
@@ -157,9 +157,12 @@ __far int num_tokens, c_token;
 int num_tokens, c_token;
 #endif
 
-/* table of gnuplot commands */
+/* table of gnuplot commands
+ * should be kept in sync with enum command_id
+ * in command.h
+ */
 static struct cmd_entry {
-    const char *cmd_name;
+    const char *command_name;
     enum command_id id;
 } command_tbl[] =
 {
@@ -186,12 +189,13 @@ static struct cmd_entry {
     { "she$ll", CMD_SHELL },
     { "sh$ow", CMD_SHOW },
     { "sp$lot", CMD_SPLOT },
+    { "sy$stem", CMD_SYSTEM },
     { "test", CMD_TEST },
     { "testtime", CMD_TESTTIME },
     { "up$date", CMD_UPDATE }
 };
 
-#define NCMDS (sizeof(command_tbl) / sizeof (command_tbl[0]))
+#define NCMDS (sizeof(command_tbl) / sizeof(command_tbl[0]))
 
 /* support for dynamic size of input line */
 void
@@ -287,7 +291,7 @@ do_line()
 
     /* also used in load_file */
     if (is_system(input_line[0])) {
-	do_system();
+	do_system(input_line + 1);
 	if (interactive)	/* 3.5 did it unconditionally */
 	    (void) fputs("!\n", stderr);	/* why do we need this ? */
 	return (0);
@@ -417,16 +421,15 @@ command()
 	case CMD_PAUSE:	{
 	    struct value a;
 	    int sleep_time, text = 0;
-	    char buf[MAX_LINE_LEN+1];
+	    char *buf = NULL;
 
 	    c_token++;
 	    sleep_time = (int) real(const_express(&a));
-	    buf[0] = NUL;
 	    if (!(END_OF_COMMAND)) {
 		if (!isstring(c_token))
 		    int_error(c_token, "expecting string");
 		else {
-		    quote_str(buf, c_token, MAX_LINE_LEN);
+		    m_quote_capture(&buf, c_token, c_token);
 		    ++c_token;
 #ifdef _Windows
 		    if (sleep_time >= 0)
@@ -442,6 +445,7 @@ command()
 	    if (sleep_time < 0) {
 #ifdef _Windows
 		if (!Pause(buf))
+		    free(buf);
 		    bail_to_command_line();
 #elif defined(OS2)
 		if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
@@ -451,11 +455,12 @@ command()
 			 * would help to stop REXX programs w/o raising an error message
 			 * in RexxInterface() ...
 			 */
+			free(buf);
 			bail_to_command_line();
 		    } else if (rc == 2) {
 			fputs(buf, stderr);
 			text = 1;
-			(void) fgets(buf, MAX_LINE_LEN, stdin);
+			(void) fgets(buf, strlen(buf), stdin);
 		    }
 		}
 #elif defined(_Macintosh)
@@ -466,11 +471,12 @@ command()
 		    int MTOS_pause(char *buf);
 		    int rc;
 		    if ((rc = MTOS_pause(buf)) == 0)
+			free(buf);
 			bail_to_command_line();
 		    else if (rc == 2) {
 			fputs(buf, stderr);
 			text = 1;
-			(void) fgets(buf, MAX_LINE_LEN, stdin);
+			(void) fgets(buf, strlen(buf), stdin);
 		    }
 		} else if (strcmp(term->name, "atari") == 0) {
 		    char *readline(char *);
@@ -478,7 +484,7 @@ command()
 		    if (line)
 			free(line);
 		} else
-		    (void) fgets(buf, MAX_LINE_LEN, stdin);
+		    (void) fgets(buf, strlen(buf), stdin);
 #elif defined(ATARI)
 		if (strcmp(term->name, "atari") == 0) {
 		    char *readline(char *);
@@ -486,9 +492,9 @@ command()
 		    if (line)
 			free(line);
 		} else
-		    (void) fgets(buf, MAX_LINE_LEN, stdin);
+		    (void) fgets(buf, strlen(buf), stdin);
 #else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
-		(void) fgets(buf, MAX_LINE_LEN, stdin);
+		(void) fgets(buf, strlen(buf), stdin);
 		/* Hold until CR hit. */
 #endif
 	    }
@@ -498,6 +504,8 @@ command()
 	    if (text != 0 && sleep_time >= 0)
 		fputc('\n', stderr);
 	    screen_ok = FALSE;
+
+	    free(buf);
 
 	    break;
 	} /* CMD_PAUSE */
@@ -715,6 +723,19 @@ command()
 	    /* graphics will be tidied up in main */
 	    return (1);
 	    break;
+	case CMD_SYSTEM:
+	    if (!isstring(++c_token))
+		int_error("expecting command", c_token);
+	    else {
+		char *e = input_line + token[c_token].start_index + token[c_token].length - 1;
+		char c = *e;
+		*e = NUL;
+		do_system(input_line + token[c_token].start_index + 1);
+		*e = c;
+	    }
+	    c_token++;
+
+	    break;
 	case CMD_PWD:
 	    sv_file = (char *) gp_alloc(PATH_MAX, "print current dir");
 	    if (sv_file) {
@@ -759,21 +780,23 @@ int token;
 {
     int i = 0;
 
-    /* null statement */
-    if (equals(token, ";"))
-	return CMD_NULL;
-
     /* help */
     if (equals(token, "?"))
 	return CMD_HELP;
 
+    /* null statement */
+    if (equals(token, ";"))
+	return CMD_NULL;
+
     /* all others */
-    while (i++ < NCMDS) {
-	if (almost_equals(token, command_tbl[i].cmd_name))
+    while (i < NCMDS) {
+	if (almost_equals(token, command_tbl[i].command_name))
 	    return command_tbl[i].id;
+	i++;
     }
 
     return CMD_INVALID;
+
 }
 
 
@@ -1006,15 +1029,18 @@ do_shell()
 
 
 static void
-do_system()
+do_system(cmd)
+const char *cmd;
 {
-    /* input_line[0] = ' ';     an embarrassment, but... */
+
+     if (!cmd)
+	return;
 
     /* input_line is filled by read_line or load_file, but 
      * line_desc length is set only by read_line; adjust now
      */
-    line_desc.dsc$w_length = strlen(input_line) - 1;
-    line_desc.dsc$a_pointer = &input_line[1];
+    line_desc.dsc$w_length = strlen(cmd);
+    line_desc.dsc$a_pointer = cmd;
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
 	os_error(NO_CARET, "spawn error");
@@ -1206,10 +1232,13 @@ int toplevel;
 #ifndef VMS
 
 static void
-do_system()
+do_system(cmd)
+const char *cmd;
 {
 # ifdef AMIGA_AC_5
     static char *parms[80];
+    if (!cmd)
+	return;
     getparms(input_line + 1, parms);
     fexecv(parms[0], parms);
 # elif (defined(ATARI) && defined(__GNUC__))
@@ -1218,17 +1247,22 @@ do_system()
     short (*shell_p) (char *command);
     void *ssp;
 
+    if (!cmd)
+	return;
+
     ssp = (void *) Super(NULL);
     shell_p = *(short (**)(char *)) 0x4f6;
     Super(ssp);
 
     /* this is a bit strange, but we have to have a single if */
     if (shell_p)
-	(*shell_p) (input_line + 1);
+	(*shell_p) (cmd);
     else
-	system(input_line + 1);
+	system(cmd);
 # elif defined(_Windows)
-    winsystem(input_line + 1);
+    if (!cmd)
+	return;
+    winsystem(cmd);
 # else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
@@ -1236,7 +1270,9 @@ do_system()
  * A workaround has to include checking for EMX,OS/2, two environment
  *  variables,...
  */
-    system(input_line + 1);
+    if (!cmd)
+	return;
+    system(cmd);
 # endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
 }
 
