@@ -200,7 +200,7 @@ TERM_PUBLIC void PSLATEX_init()
 		free(PSLATEX_psfile);
 	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 3, "pslatex aux filename");
 	if (PSLATEX_psfile) {
-	    strncpy(PSLATEX_psfile, outstr, dotIndex-outstr+1); /* including . */
+	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex-outstr+1); /* including . */
 	    strcpy(PSLATEX_psfile + (dotIndex-outstr) + 1,"ps");
 	    if ((PSLATEX_auxFile = fopen(PSLATEX_psfile,"w")) == (FILE *)NULL){
 		fprintf(stderr,"Cannot open aux file %s for output\n",

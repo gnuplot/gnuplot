@@ -417,8 +417,8 @@ char s[];
 	 * is in scientific notation
 	 */
 
-	strncpy(hack, s, ends - s);
-	hack[ends - s] = '\0';
+	safe_strncpy(hack, s, ends - s);
+	/* hack[ends - s] = '\0'; */
 	
 	ptr = strchr(hack, 'e');
 	if (ptr == NULL) {

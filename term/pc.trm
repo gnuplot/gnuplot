@@ -157,7 +157,7 @@ void PC_setup() /* called from the beginning of main() */
 /* First link all BRI dribers, then detect the display card. */
 /* If environment PCTRM is set, try initiate the card/mode.  */
 
-  strncpy(pc_modename,getenv("PCTRM"),8); /* special instruction on mode */
+  safe_strncpy(pc_modename,getenv("PCTRM"),8); /* special instruction on mode */
 
 #ifdef __TURBOC__
 /* Some of this code including BGI drivers are copyright Borland Intl. */
