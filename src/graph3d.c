@@ -3023,6 +3023,13 @@ key_sample_line_pm3d(struct surface_points *plot, int xl, int yl)
     double cbmin, cbmax;
     double gray, gray_from, gray_to, gray_step;
 
+    /* If plot uses a constant color, set it here and then let simpler routine take over */
+    if (plot->lp_properties.use_palette && plot->lp_properties.pm3d_color.type == TC_RGB) {
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	key_sample_line(xl,yl);
+	return;
+    }
+
     /* color gradient only over the cb-values of the surface, if smaller than the
      * cb-axis range (the latter are gray values [0:1]) */
     get_surface_cbminmax(plot, &cbmin, &cbmax);

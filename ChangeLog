@@ -1,7 +1,8 @@
 2005-02-10  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/graph3d.c (plot3d_lines_pm3d): If the graph specifies a solid rgb
-	color, fall back to single-color routine plot3d_lines.
+	* src/graph3d.c (plot3d_lines_pm3d key_sample_line_pm3d): 
+	If the graph specifies a solid rgb color, fall back to equivalent
+	single-color routine.
 
 2005-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
