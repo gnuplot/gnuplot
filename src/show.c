@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.107 2003/05/17 19:13:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.108 2003/05/19 13:57:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -109,6 +109,7 @@ static void show_parametric __PROTO((void));
 static void show_pm3d __PROTO((void));
 static void show_palette __PROTO((void));
 static void show_palette_rgbformulae __PROTO((void));
+static void show_palette_fit2rgbformulae __PROTO((void));
 static void show_palette_palette __PROTO((void));
 static void show_palette_gradient __PROTO((void));
 static void show_palette_colornames __PROTO((void));
@@ -1896,7 +1897,8 @@ show_parametric()
 
 #ifdef PM3D
 
-static void show_palette_rgbformulae()
+static void
+show_palette_rgbformulae()
 {
 	int i;
 	fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
@@ -1918,8 +1920,78 @@ static void show_palette_rgbformulae()
     ++c_token;
     }
 
+static void
+show_palette_fit2rgbformulae()
+{
+#define rgb_distance(r,g,b) ((r)*(r) + (g)*(g) + (b)*(b))
+    int pts = 32; /* resolution: nb of points in the discrete raster for comparisons */
+    int i, p, r, g, b, ir, ig, ib, rMin, gMin, bMin;
+    int maxFormula = sm_palette.colorFormulae - 1; /* max formula number */
+    double gray, dist, distMin;
+    rgb_color *currRGB;
+    int *formulaeSeq;
+    double **formulae;
+    ++c_token;
+    if (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) {
+	fprintf(stderr, "\tCurrent palette is\n\t    set palette rgbformulae %i,%i,%i\n", sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
+	return;
+    }
+    /* allocate and fill R, G, B values rastered on pts points */
+    currRGB = (rgb_color*)gp_alloc(pts * sizeof(rgb_color), "RGB pts");
+    for (p = 0; p < pts; p++) {
+	gray = (double)p / (pts - 1);
+	color_components_from_gray(gray, &(currRGB[p]));
+    }
+    /* organize sequence of rgb formulae */
+    formulaeSeq = gp_alloc((2*maxFormula+1) * sizeof(int), "formulaeSeq");
+    for (i = 0; i <= maxFormula; i++)
+	formulaeSeq[i] = i;
+    for (i = 1; i <= maxFormula; i++)
+	formulaeSeq[maxFormula+i] = -i;
+    /* allocate and fill all +-formulae on the interval of given number of points */
+    formulae = gp_alloc((2*maxFormula+1) * sizeof(double*), "formulae");
+    for (i = 0; i < 2*maxFormula+1; i++) {
+	formulae[i] = gp_alloc(pts * sizeof(double), "formulae pts");
+	for (p = 0; p < pts; p++) {
+	    double gray = (double)p / (pts - 1);
+	    formulae[i][p] = GetColorValueFromFormula(formulaeSeq[i], gray);
+	}
+    }
+    /* Now go over all rastered formulae, compare them to the current one, and
+       find the minimal distance.
+     */
+    distMin = VERYLARGE;
+    for (ir = 0; ir <	 2*maxFormula+1; ir++) {
+	for (ig = 0; ig < 2*maxFormula+1; ig++) {
+	    for (ib = 0; ib < 2*maxFormula+1; ib++) {
+		dist = 0; /* calculate distance of the two rgb profiles */
+		for (p = 0; p < pts; p++) {
+		double tmp = rgb_distance(
+			    currRGB[p].r - formulae[ir][p], 
+			    currRGB[p].g - formulae[ig][p], 
+			    currRGB[p].b - formulae[ib][p] );
+		    dist += tmp;
+		}
+		if (dist < distMin) {
+		    distMin = dist;
+		    rMin = formulaeSeq[ir];
+		    gMin = formulaeSeq[ig];
+		    bMin = formulaeSeq[ib];
+		}
+	    }
+	}
+    }
+    fprintf(stderr, "\tThe best match of the current palette corresponds to\n\t    set palette rgbformulae %i,%i,%i\n", rMin, gMin, bMin);
+#undef rgb_distance
+    for (i = 0; i < 2*maxFormula+1; i++)
+	free(formulae[i]);
+    free(formulae);
+    free(formulaeSeq);
+    free(currRGB);
+}
 
-static void show_palette_palette()
+static void
+show_palette_palette()
 {
 	int colors, i;
 	struct value a;
@@ -1943,9 +2015,8 @@ static void show_palette_palette()
 	    /* needed, since printing without call to set_color()  */
 	    color_from_gray( 1 - gray , &color );
 	}
-	else {
+	else
 	    color_from_gray( gray , &color );
-	    }
 	r = color.r;  g = color.g;  b = color.b; 
 	
 	fprintf( stderr, 
@@ -1956,7 +2027,8 @@ static void show_palette_palette()
 	}
 	    }
 
-static void show_palette_gradient()
+static void
+show_palette_gradient()
 {
     int i;
     double gray,r,g,b;
@@ -2008,7 +2080,8 @@ static void show_palette_colornames()
 }
 
 
-static void show_palette()
+static void
+show_palette()
 {
     /* no option given, i.e. "show palette" */
     if (END_OF_COMMAND) {
@@ -2063,7 +2136,7 @@ static void show_palette()
 	  fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'.\n",
 		   __FILE__, __LINE__, (char)(sm_palette.cmodel) );
 	}
-	fprintf(stderr,"\tgamma == %.4g\n", sm_palette.gamma );
+	fprintf(stderr,"\tgamma is %.4g\n", sm_palette.gamma );
 	return;
     }
 
@@ -2087,13 +2160,19 @@ static void show_palette()
         show_palette_colornames();
 	return;
     }
+    else if (almost_equals(c_token, "fit2rgb$formulae" )) {
+        /* 'show palette fit2rgbformulae' */
+	show_palette_fit2rgbformulae();
+	return;
+    }
     else { /* wrong option to "show palette" */
         int_error( c_token, "Required 'show palette' or 'show palette gradient' or\n\t 'show palette palette <n>' or 'show palette rgbformulae' or\n\t 'show palette colornames'.");
     }
 }
 
 
-static void show_colorbox()
+static void
+show_colorbox()
 {
     c_token++;
     if (color_box.border) {
@@ -2125,7 +2204,8 @@ static void show_colorbox()
 }
 
 
-static void show_pm3d()
+static void
+show_pm3d()
 {
     c_token++;
     if (!pm3d.where[0]) {

@@ -1,3 +1,8 @@
+2003-06-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/show.c docs/gnuplot.doc: New command 'show palette
+	fit2rgbformulae'.
+
 2003-05-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gplt_x11.c (main) [!DEBUG]: Redirect stderr to /dev/null on

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.172 2003/05/14 19:03:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.173 2003/05/17 05:59:01 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5969,6 +5969,7 @@ C ... and restart the table:
        show palette
        show palette palette <n>
        show palette gradient
+       show palette fit2rgbformulae
        show palette rgbformulae
        show palette colornames
 
@@ -5994,6 +5995,12 @@ C ... and restart the table:
  `rgbformulae` and `functions` use analytic formulae whereas `defined` and
  `file` use interpolated tables.  `rgbformulae` reduces the size of postscript
  output to a minimum.
+
+ The command `show palette fit2rgbformulae` finds the best matching `set
+ palette rgbformulae` for the current `set palette`. Naturally, it makes sense
+ to use it for non-rgbformulae palettes. This command can be found useful
+ mainly for external programs using the same rgbformulae definition of palettes
+ as gnuplot, like zimg.
 
  `set palette gray` switches to a gray only palette.  `rgbformulae`, `defined`,
  `file` and `functions` switch to a color mapping.  `set palette color` is an
@@ -6067,6 +6074,9 @@ C ... and restart the table:
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
+ Note that it is possible to find a set of the best matching rgbformulae for any
+ other color scheme by the command
+    show palette fit2rgbformulae
 4 defined
 ?commands set palette defined
 ?set palette defined
