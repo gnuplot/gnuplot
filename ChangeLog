@@ -1,3 +1,61 @@
+1998-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add erfc() function check.
+
+1998-10-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* datafile.c, term/cgm.trm: Cast argument of is*() functions to int.
+
+	* eval.c, internal.c, interpol.c, plot3d.c, specfun.c: Fix indentation.
+
+	* graphics.c, set.c, docs/gnuplot.doc: set_tic_prop patch version b
+	by Lucas Hart <hartl@ucs.orst.edu>. Indentation.
+
+	* help.c: Some cleanups. Use TBOOLEAN instead of boolean type and
+	remove tboolean. Fix indentation. Move tos_getch() prototype to
+	protos.h.
+
+	* misc.c: Some cleanups.
+
+	* plot.h: Add TRUE and FALSE defines.
+
+	* protos.h: New prototype for misc.c(instring) and
+	readline.c(tos_getch).
+
+	* readline.c: Move tos_getch() prototype to protos.h.
+
+	* set.c: Fix indentation.
+
+	* term/gif.trm(GIF_options): Fix compiler warning (sscanf call).
+
+	* term/gnugraph.trm: Add prototypes for GNU plotutils functions.
+
+	* term/mif.trm: Fix compiler warning (nested extern decl).
+
+1998-10-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h, configure.in, stdfn.h, m4/select-types.m4: Replace
+	gp_FIND_SELECT_ARGTYPES with AC_FUNC_SELECT_ARGTYPES from upcoming
+	autoconf release, and related changes.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* fit.c, graphics.c, scanner.c, util.c: Cast argument of is*()
+	functions to int.
+
+	* syscfg.h: VMS prototypes, moved from term.c.
+
+	* term.c: Include header files moved from driver.h, indentation.
+
+	* docs/doc2x.h: Prototype for safe_strncpy().
+
+	* docs/termdoc.c: New function safe_strncpy() to avoid linking with
+	stdfn.c
+
+	* term/driver.h: Don't include header files.
+
 1998-10-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Reverse order of CPPFLAGS and INCLUDES in COMPILE.
