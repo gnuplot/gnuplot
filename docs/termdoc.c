@@ -119,8 +119,8 @@ char *buffer;
 int max;
 FILE *fp;
 {
-	static int line=-1;  /* not going yet */
-	static int level=0; /* terminals are at level 1 - we add this */
+	static int line = -1;  /* not going yet */
+	static int level = 0; /* terminals are at level 1 - we add this */
 
 	static int save_lineno; /* for saving lineno */
 
@@ -167,8 +167,8 @@ FILE *fp;
 		/* prepare to return text from the terminal drivers */
 		save_lineno = termdoc_lineno;
 		termdoc_lineno = -1; /* dont count the C# */
-		level=buffer[1]-'1';
-		line=0;
+		level = buffer[1]-'1';
+		line = 0;
 	}
 
 	/* we're sending lines from terminal help */
@@ -177,7 +177,7 @@ FILE *fp;
 	 * will invariably be a comment !
 	 */
 
-	while(termtext[line][0]=='C')
+	while(termtext[line][0] == 'C')
 	{
 		if (termtext[line][1] == '#') {
 			strcpy(termdoc_filename, termtext[line]+2);
@@ -191,7 +191,7 @@ FILE *fp;
 			 * the file. Recursive call is best way out
 			 */
 			termdoc_lineno = save_lineno;
-			line=(-1); /* we've done the last line, so get next line from file */
+			line = -1; /* we've done the last line, so get next line from file */
 			return get_line(buffer, max, fp);
 		}
 	}
@@ -213,7 +213,7 @@ FILE *fp;
 		 * so we shouldn't get here, but...
 		 */
 		termdoc_lineno = save_lineno;
-		line=(-1); /* we've done the last line, so get next line from file */
+		line = -1; /* we've done the last line, so get next line from file */
 	}
 
 	return buffer;
