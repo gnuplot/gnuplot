@@ -1,5 +1,16 @@
 2002-06-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/README src/color.c: Routine  void set_color(double gray)  which
+	calls term->set_term(gray): do not pass gray >= 1.0 to terminals
+	with discrete palette (applies also for postscript if 'set palette
+	maxcolors n'). Most terminals currently reference their discrete 
+	palette entries (elements in the palette array) by
+	   color_number = (int)(gray * sm_palette.colors)
+	which goes beyond the upper bounds for gray==1. From now,
+	term->set_color(g) will no more get value g>=1.0.
+
+2002-06-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/makefile.cyg config/makefile.mgw config/makefile.os2:
  	Minor changes relative to the new gd driver.
 
@@ -602,7 +613,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/07 23:03:05 $).
+	last modification date (from the tag $Date: 2002/06/08 16:16:49 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
