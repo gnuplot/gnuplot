@@ -159,15 +159,19 @@ static double startup_lambda = 0, lambda_down_factor = LAMBDA_DOWN_FACTOR,
 
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 static void ctrlc_setup __PROTO((void));
+static void printmatrix __PROTO((double **C, int m, int n));
+static void print_matrix_and_vectors __PROTO((double **C, double *d, double *r, int m, int n));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
 static TBOOLEAN analyze __PROTO((double a[], double **alpha, double beta[],
 				 double *chisq));
 static void calculate __PROTO((double *zfunc, double **dzda, double a[]));
 static void call_gnuplot __PROTO((double *par, double *data));
+static TBOOLEAN fit_interrupt __PROTO((void));
+static TBOOLEAN regress __PROTO((double a[]));
 static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
-static TBOOLEAN regress __PROTO((double a[]));
+static TBOOLEAN is_empty __PROTO((char *s));
 static TBOOLEAN is_variable __PROTO((char *s));
 #if 0
 static void copy_max __PROTO((char *d, char *s, unsigned int n));
@@ -176,8 +180,6 @@ static double getdvar __PROTO((char *varname));
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
-static TBOOLEAN fit_interrupt __PROTO((void));
-static TBOOLEAN is_empty __PROTO((char *s));
 
 
 /*****************************************************************
@@ -285,7 +287,9 @@ void error_ex()
 /*****************************************************************
     New utility routine: print a matrix (for debugging the alg.)
 *****************************************************************/
-static void printmatrix(double **C, int m, int n)
+static void printmatrix(C, m, n)
+double **C;
+int m, n;
 {
     int i, j;
 
@@ -300,8 +304,10 @@ static void printmatrix(double **C, int m, int n)
 /**************************************************************************
     Yet another debugging aid: print matrix, with diff. and residue vector
 **************************************************************************/
-static void print_matrix_and_vectors(double **C, double *d, double *r,
-				     int m, int n)
+static void print_matrix_and_vectors(C, d, r, m, n)
+double **C;
+double *d, *r;
+int m, n;
 {
     int i, j;
 
@@ -735,11 +741,13 @@ double a[];
 	    chisq = sqrt(chisq / (num_data));
 	else
 	    chisq = sqrt(chisq / (num_data - num_params));
-#if 1				/* HBB: For some I don't really understand yet, this seems to
-				   * be incorrect, at least for one demo case I know of
-				   * (thanks to clegelan@physik.uni-bielefeld.de)
-				   * OTOH, this makes most of the demo's results simply
-				   * ridiculous... :-( */
+#if 1
+	    /* HBB: For some I don't really understand yet, this seems to
+	     * be incorrect, at least for one demo case I know of
+	     * (thanks to clegelan@physik.uni-bielefeld.de)
+	     * OTOH, this makes most of the demo's results simply
+	     * ridiculous... :-(
+	     */
 	for (i = 0; i < num_params; i++)
 	    dpar[i] *= chisq;
 #endif
