@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.59 2002/02/13 22:58:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.60 2002/02/15 17:06:31 amai Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1423,9 +1423,9 @@ struct surface_points *plot;
 		}
 	    case UNDEFINED:{
 		    break;
+		}
 	    default:
 		    graph_error("Unknown point type in plot3d_lines");
-		}
 	    }
 
 	    prev = points[i].type;
