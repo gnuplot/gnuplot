@@ -166,7 +166,7 @@ C
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 2 What's New in version 3.6
-?what's-new
+?new-features
  Gnuplot version 3.6 contains many new features.  This section gives a partial
  list and links to the new items in no particular order.
 
@@ -5643,13 +5643,13 @@ C ... and restart the table:
        set xdata time
        set timefmt "%d/%m"
        set format x "%b %d"
-       set xrange ["00/12":"06/12"]
+       set xrange ["01/12":"06/12"]
        set xtics "01/12", 172800, "05/12"
 
        set xdata time
        set timefmt "%d/%m"
        set format x "%b %d"
-       set xrange ["00/12":"06/12"]
+       set xrange ["01/12":"06/12"]
        set xtics ("01/12", "" "03/12", "05/12")
  Both of these will produce tics "Dec 1", "Dec 3", and "Dec 5", but in the
  second example the tic at "Dec 3" will be unlabelled.
