@@ -4810,8 +4810,9 @@ C ... and restart the table:
        set label {<tag>} 
                  { {"<label text>"{,<value>}} {, ...}} }
                  {at <position>}
-                 {<justification>} {norotate | rotate {by <degrees>}} 
-		 {font "<name>{,<size>}"}
+                 {left | center | right}
+                 {norotate | rotate {by <degrees>}} 
+                 {font "<name>{,<size>}"}
                  {front | back}
                  {textcolor <colorspec>}
                  {point <pointstyle> {offset x, y} | nopoint}
@@ -4832,7 +4833,7 @@ C ... and restart the table:
  replacement of printf()-like format specifiers contained in <label
  text>.  The number to be used is given by the <value> following the
  text.  The same formatting capilities as for tic labels are
- available.  See the help on 'format specifiers' for details. To
+ available.  See the help on `format specifiers` for details. To
  display more than one distinct <value> with a single label, several
  pairs of <label text> and <value> may be given. Note that <value> is
  treated as a constant expression, i.e. if it contains variables, the
@@ -4842,7 +4843,7 @@ C ... and restart the table:
 
  By default, the text is placed flush left against the point x,y,z.  To adjust
  the way the label is positioned with respect to the point x,y,z, add the
- parameter <justification>, which may be `left`, `right` or `center`,
+ justification parameter, which may be `left`, `right` or `center`,
  indicating that the point is to be at the left, right or center of the text.
  Labels outside the plotted boundaries are permitted but may interfere with
  axis labels or other text.
@@ -4851,6 +4852,10 @@ C ... and restart the table:
  so, of course).  If `rotate by <degrees>` is given, conforming terminals will
  try to write the text at the specified angle; non-conforming terminals will
  treat this as vertical text.
+
+ Font and its size can be chosen explicitly by `font "<name>{,<size>}"` if the
+ terminal supports font settings.  Otherwise default font of the terminal will
+ be used.
 
  If `front` is given, the label is written on top of the graphed data. If
  `back` is given (the default), the label is written underneath the graphed
