@@ -114,7 +114,7 @@ TERM_PUBLIC void WIN_set_pointsize __PROTO((double));
 #ifdef TERM_BODY
 
 #include <windows.h>
-#include "../win/wgnuplib.h"
+#include "../src/win/wgnuplib.h"
 
 #ifdef __MSC__
 #include <io.h>			/* for mktemp() */
