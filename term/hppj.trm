@@ -1,5 +1,5 @@
 /*
- * $Id: hppj.trm,v 1.9 1999/06/19 20:30:51 lhecking Exp $
+ * $Id: hppj.trm,v 1.10 1999/12/10 16:59:48 lhecking Exp $
  *
  */
 
@@ -74,10 +74,6 @@ TERM_PUBLIC void HPPJ_reset __PROTO((void));
 TERM_PUBLIC void HPPJ_graphics __PROTO((void));
 TERM_PUBLIC void HPPJ_text __PROTO((void));
 TERM_PUBLIC void HPPJ_linetype __PROTO((int linetype));
-#define HPPJ_move       b_move
-#define HPPJ_vector     b_vector
-#define HPPJ_text_angle b_text_angle
-#define HPPJ_put_text   b_put_text
 
 /* We define 3 different font sizes: 5x9, 9x17, and 13x25 */
 
@@ -265,8 +261,9 @@ TERM_TABLE_START(hppj_driver)
     HPPJ_XMAX, HPPJ_YMAX,
     HPPJ_9x17_VCHAR, HPPJ_9x17_HCHAR, HPPJ_9x17_VTIC, HPPJ_9x17_HTIC,
     HPPJ_options, HPPJ_init, HPPJ_reset, HPPJ_text, null_scale, HPPJ_graphics,
-    HPPJ_move, HPPJ_vector, HPPJ_linetype, HPPJ_put_text, HPPJ_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    b_move, b_vector, HPPJ_linetype, b_put_text, b_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(hppj_driver)
 
 #undef LAST_TERM

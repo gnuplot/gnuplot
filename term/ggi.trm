@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.10 2000/12/05 23:23:15 joze Exp $
+ * $Id: ggi.trm,v 1.11 2000/12/26 19:54:09 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -617,6 +617,9 @@ int style;
 unsigned int x, y, w, h;
 {
     /* when is this called ? */
+    /* ULIG: the style parameter is now used for the fillboxes style
+     * (not implemented here), see the documentation */
+    
 #if 0
     fprintf(stderr, "(GGI_fillbox) style, x, y, w, y = %d, %d, %d, %d, %d\n",
 	style, x, y, w, h);

@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.18 2001/03/19 14:52:24 mikulik Exp $
+ * $Id: tables.h,v 1.19 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -131,6 +131,9 @@ enum set_key_id {
 enum show_style_id {
     SHOW_STYLE_INVALID,
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE
+#if USE_ULIG_FILLEDBOXES
+    , SHOW_STYLE_FILLING
+#endif
 };
 
 extern const struct gen_table command_tbl[];

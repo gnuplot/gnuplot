@@ -1,3 +1,220 @@
+2001-08-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	A monster patch by Ulrich Gruenebaum. Implements plotting of
+ 	filled boxes for some terminals, by exploiting the unused 'style'
+ 	parameter of the existing termentry function term->fillbox().
+  	Also adds unrelated enhancements to the FIG terminal driver.
+  	Heavily edited by me before checkin.
+	
+	* term/post.trm (PS_header) [USE_ULIG_FILLEDBOXES]: Add PostScript
+ 	macro for solid-filled boxes.
+	(PS_fillbox) [USE_ULIG_FILLEDBOXES]: Implement solid-filled boxes
+ 	by calling that macro.
+
+	* term/fig.trm: Added a set of new options: "solid", "dashed",
+ 	"textnormal", "textspecial", "texthidden", "textrigid" and
+ 	"version".
+	(FIG_DEFAULTVERSION): New macro.
+	(enum FIG_TEXT_STYLEBITS): New enum to give names to bits
+ 	controlling the text output style of the new fig driver:
+ 	FIG_TEXT_RIGID, FIG_TEXT_SPECIAL, FIG_TEXT_POSTSCRIPT and
+ 	FIG_TEXT_HIDDEN.
+	(FIG_TEXT_NORMAL): New macro. Equals FIG_TEXT_POSTSCRIPT.
+	(FIG_text_flags, FIG_version, FIG_solid): New status variables
+ 	storing added FIG terminal options.
+	(FIG_opts): Added lookup table entries for new options.
+	(enum FIG_id): Added tokens for new options.
+	(FIG_options): Mention new options in error message. Parse and
+ 	handle them.
+	(FIG_init): Output different file header, depending on the
+ 	"version" option active.
+	(FIG_linetype): Handle option "solid".
+	(FIG_put_text): Removed autodetection of suspected LaTeX input in
+ 	output string.  Replaced by FIG_text_flags, which is controlled by
+ 	the user.
+	(FIG_boxfill): New function. Optionally implements filled boxes if
+ 	USE_ULIG_FILLEDBOXES is set.
+	(fig_driver): Add boxfill entry. Document all the new options.
+
+	* term/epson.trm (EPSON_linetype, EPSON_move, EPSON_vector,
+ 	EPSON_put_text, EPSON_text_angle, NEC_move, NEC_vector,
+ 	NEC_put_text, NEC_text_angle, STARC_move, STARC_vector,
+ 	STARC_put_text, STARC_text_angle): Pointless macro renames of
+ 	bitmap module's functions removed. Use the original functions in
+ 	the termentry struct registrations instead.
+	(epson180_driver, epson60_driver, epsonlx_driver, nec_driver,
+ 	okidata_driver, starc_driver, tandy60_driver): Add termentry field
+ 	to call b_boxfill().
+	
+	* term/png.trm (png_driver): Termentry field to call b_boxfill
+ 	added.
+
+	* term/pbm.trm (PBM_move, PBM_vector, PBM_text_angle,
+ 	PBM_put_text): Pointless macro renames of bitmap module's
+ 	functions removed. Use the original functions in the termentry
+ 	struct registrations instead.
+	(pbm_driver): Termentry field to call b_boxfill added.
+
+	* term/hppj.trm (HPPJ_move, HPPJ_vector, HPPJ_text_angle,
+ 	HPPJ_put_text): Pointless macro renames of bitmap module's
+ 	functions removed. Use the original functions in the termentry
+ 	struct registrations instead.
+	(hppj_driver): Termentry field to call b_boxfill added.
+
+	* term/hpljii.trm (HPLJII_move, HPLJII_vector, HPLJII_text_angle,
+ 	HPDJ_text_angle, HPDJ_put_text): Pointless macro renames of bitmap
+ 	module's functions removed. Use the original functions in the
+ 	termentry struct registrations instead.
+	(hplj22_driver, hpdj_driver): Termentry field to call b_boxfill
+ 	added.
+
+	* term/hp500c.trm (HP500C_move, HP500C_vector, HP500C_text_angle,
+ 	HP500C_put_text): Pointless macro renames of bitmap module's
+ 	functions removed. Use the original functions in the termentry
+ 	struct registrations instead.
+	(hp500c_driver): Termentry field to call b_boxfill added.
+
+	* src/beos/GPBitmap.cpp (display): Add comment about style
+ 	parameter no longer being unused.
+
+	* term/epslatex.trm: Dito.
+
+	* term/djsvga.trm: Dito.
+
+	* term/ggi.trm: Dito.
+
+	* src/unset.c (unset_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Reset
+ 	boxwidth_is_absolute, too.
+	(unset_fillstyle) [USE_ULIG_FILLEDBOXES]: New Function. Resets
+ 	fillstyle to default status: enabled, solid fill, 100 percent
+ 	density.
+	(unset_style) [USE_ULIG_FILLEDBOXES]: Call unset_fillstyle for
+ 	commands "unset style" and "unset style filling". Change error
+ 	message text to mention "filling" option.
+	(unset_style): Use lookup table instead of individual calls to
+ 	almost_equals().
+
+	* src/tables.c (show_style_tbl) [USE_ULIG_FILLEDBOXES]: Add parse
+ 	entry for "{set|show|unset} style filling".
+	(plotstyle_tbl) [USE_ULIG_FILLEDBOXES]: Add parse entry for
+ 	plotstyle "filledboxes".
+
+	* src/tables.h (enum show_style_id) [USE_ULIG_FILLEDBOXES]: Add
+ 	token for SHOW_STYLE_FILLING.
+
+	* src/show.c (show_command, show_style): Capitalized first word of
+ 	message for "show data style" & friends.
+	(show_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Handle
+ 	relative/absolute option, too.
+	(show_fillstyle) [USE_ULIG_FILLEDBOXES]: New function.  Displays
+ 	state of "set style filling".
+	(show_style) [USE_ULIG_FILLEDBOXES]: Handle "show style filling",
+ 	too.  Show filling style if "show style" was given without
+ 	options.
+	(show_styles): Fix typo in name displayed for "candlesticks"
+ 	style.
+	(show_styles) [USE_ULIG_FILLEDBOXES]: Allow data/function style to
+ 	be "filledboxes", too.
+
+	* src/set.c (set_command): Fix position and mention of 'style' in
+ 	list of allowed "set" parameters displayed upon inputting of a
+ 	nonexistant one.
+	(set_boxwidth) [USE_ULIG_RELATIVE_BOXWIDTH]: Handle
+ 	relative/absolute option, too.
+	(set_fillstyle) [USE_ULIG_FILLEDBOXES]: New function.  Parses and
+ 	implements "set style filling" command options.
+	(set_style): Use lookup table instead of individual
+ 	almost_equals() calls.
+	(set_style) [USE_ULIG_FILLEDBOXES]: Handle "filling" style, too.
+  	Adapt error message if nonexistant style name given.
+
+	* src/save.c (save_set_all) [USE_ULIG_RELATIVE_BOXWIDTH]: Save
+ 	status of relative/absolut flag, too.
+	(save_set_all) [USE_ULIG_FILLEDBOXES]: Save "set style filling"
+ 	status. Allow "filledboxes" in "set style {data|function}".
+
+	* src/plot2d.h (boxwidth_is_absolute)
+ 	[USE_ULIG_RELATIVE_BOXWIDTH]: Add external declaration.
+
+	* src/plot2d.c (boxwidth_is_absolute)
+ 	[USE_ULIG_RELATIVE_BOXWIDTH]: New global status variable storing
+ 	relative/absolute bit.
+	(get_data, print_table) [USE_ULIG_FILLEDBOXES]: Treat FILLEDBOXES
+ 	just like BOXES.
+	(get_data) [USE_ULIG_RELATIVE_BOXWIDTH]: Don't calculate boxwidth
+ 	yet, if boxwidths are set to relative.
+	(eval_plots, parametric_fixup) [USE_ULIG_RELATIVE_BOXWIDTH]: Set
+ 	up xlow and xhigh if boxwidth set to absolute.
+
+	* src/misc.c (get_style) [USE_ULIG_FILLEDBOXES]: Add "filledboxes"
+ 	to message listing allowed plot style names.
+
+	* src/hidden3d.c (build_networks) [USE_ULIG_FILLEDBOXES]: Ignore
+ 	FILLEDBOXES just like BOXES and other non-3D styles.
+
+	* src/graphics.c: Add #include of plot2d.h (but see the FIXME
+ 	comment accompanying it!).
+	(do_plot) [USE_ULIG_FILLEDBOXES]: Add boolean "filling" arguments
+ 	to calls of plot_boxes(). Add code to handle "filledboxes".
+	(plot_boxes) [USE_ULIG_FILLEDBOXES]: New argument tells if boxes
+ 	are meant to be filled or not. Implement filling by calling
+ 	term->boxfill().
+	(plot_boxes) [USE_ULIG_RELATIVE_BOXWIDTH]: Optionally modify
+ 	boxwidth gnuplot would usually have chosen by the factor specifyed
+ 	by "set boxwidth <factor> relative".
+
+	* src/graph3d.c (do_3dplot) [USE_ULIG_FILLEDBOXES]: Add entries
+ 	for handling "filledboxes" the same as "boxes", i.e. map them over
+ 	to "impulses".
+	(xtick_callback, ytick_callback, ztick_callback): Added vertical
+ 	adjustment argument to call of clip_put_text_just.
+
+	* src/gplt_x11.c [USE_ULIG_FILLEDBOXES] (stipple_halftone_width,
+ 	stipple_halftone_height, stipple_halftone_num,
+ 	stipple_halftone_bits, stipple_pattern_width,
+ 	stipple_pattern_height, stipple_pattern_num, stipple_pattern_bits,
+ 	stipple_halftone, stipple_pattern, stipple_initialized): New
+ 	file-scope macros and variables.
+	(delete_plot): Delete pattern filling pixmaps.
+	(exec_cmd): Extend implementation of 'F'illbox command in gnuplot
+ 	command stream.
+	(display): Initialize pattern filling pixmaps.
+	(process_event): Release pixmaps on ConfigureNotify X11 event.
+
+	* src/gp_types.h [USE_ULIG_FILLEDBOXES] (enum PLOT_STYLE): Added
+ 	label for new plotstyle.
+
+	* src/gadgets.c (fillstyle, filldensity, fillpattern)
+ 	[USE_ULIG_FILLEDBOXES]: New global status variables controlling
+ 	how boxes are to be filled.
+	(clip_put_text_just): Added argument to specify vertical
+ 	adjustment. Use it to call write_multiline().
+
+	* src/gadgets.h (clip_put_text_just): Prototype adjusted.
+	(fillstyle, filldensity, fillpattern) [USE_ULIG_FILLEDBOXES]:
+ 	External declarations added.
+
+	* src/color.c (cbtick_callback): Add argument JUST_TOP or
+ 	JUST_CENTRE to calls of clip_put_text_just.
+
+	* src/bitmap.c (b_setpixel, b_setmaskpixel)
+ 	[USE_ULIG_FILLEDBOXES]: Flagged these GP_INLINE for better
+ 	optimization prospects.
+	(fill_bitmap_width, fill_bitmap_height, fill_halftone_num,
+ 	fill_halftone_bitmaps, fill_pattern_num, fill_pattern_bitmaps):
+ 	New file-global macros and variables to hold filling patterns.
+	(b_boxfill) [USE_ULIG_FILLEDBOXES]: New function. Was missing from
+ 	bitmap module, before.  Does all the actual work for filled boxes.
+	
+	* src/bitmap.h (b_boxfill): Prototype added.
+
+	* docs/gnuplot.doc: Document new options: "plot ... with
+ 	filledboxes", "set style filling", "set boxwidth <width>
+ 	{{relative|absolute}}"
+
+	* configure.in: Added --enable handlers for the new optional
+ 	extensions.
+
 2001-08-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/png.trm (PNG_text): Corrected size parameters of two

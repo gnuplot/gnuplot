@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.51 2001/01/03 19:51:37 joze Exp $
+ * $Id: post.trm,v 1.52 2001/04/04 19:54:26 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -442,6 +442,22 @@ static const char GPFAR * GPFAR PS_header[] = {
 
 /* filled box : usage   x1 y1 x2 y2 BoxFill */
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
+
+#if USE_ULIG_FILLEDBOXES
+/* filled box in current color,
+   but color lightened up as defined by filldensity (ULIG),
+   usage:   x1 y1 x2 y2 BoxColFill */
+"/BoxColFill {\n",
+"  gsave Rec\n",
+"  /Fillden exch def\n",
+"  currentrgbcolor\n",
+"  /ColB exch def /ColG exch def /ColR exch def\n",
+"  /ColR ColR Fillden mul Fillden sub 1 add def\n",
+"  /ColG ColG Fillden mul Fillden sub 1 add def\n",
+"  /ColB ColB Fillden mul Fillden sub 1 add def\n",
+"  ColR ColG ColB setrgbcolor\n",
+"  fill grestore } def\n",
+#endif /* USE_ULIG_FILLEDBOXES */
 
 /* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
    gives an oblique (slanted) beta character */
@@ -1443,12 +1459,31 @@ int number;
 
 TERM_PUBLIC void
 PS_fillbox(style, x1,y1,x2,y2)
-int style;
-unsigned int x1,y1,x2,y2;
+    int style;
+    unsigned int x1,y1,x2,y2;
 {
+#if USE_ULIG_FILLEDBOXES
+    double filldens;
+#endif /* USE_ULIG_FILLEDBOXES */
+
     PS_FLUSH_PATH;
 
-    fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+#if USE_ULIG_FILLEDBOXES
+    switch( style & 0xf ) {
+    case 1: /* style == 1 --> fill with intensity according to filldensity */
+        filldens = (style >> 4) / 100.0;
+        if( filldens < 0.0 ) filldens = 0.0;
+        if( filldens > 1.0 ) filldens = 1.0;
+        fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n", filldens, x1,y1, x2,y2);
+        break;
+    case 2: /* style == 2 --> fill with pattern according to fillpattern */
+        /* not implemented yet, so fall through ... */
+    default: /* style == 0 or unknown --> fill with background color */
+        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+    }
+#else  /* USE_ULIG_FILLEDBOXES */
+        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+#endif /* USE_ULIG_FILLEDBOXES */
 
     PS_relative_ok = 0;
     PS_linetype_last = -1;

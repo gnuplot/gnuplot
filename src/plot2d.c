@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.42 2001/08/09 15:03:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.43 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -75,8 +75,12 @@ static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plo
 struct curve_points *first_plot = NULL;
 static struct udft_entry plot_func;
 
-double boxwidth = -1.0;		/* box width (automatic) */
-
+/* box width (automatic) */
+double   boxwidth              = -1.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+/* whether box width is absolute (default) or relative (ULIG) */
+TBOOLEAN boxwidth_is_absolute  = TRUE;
+#endif
 
 
 /* function implementations */
@@ -114,8 +118,8 @@ int num;
  */
 void
 cp_extend(cp, num)
-struct curve_points *cp;
-int num;
+    struct curve_points *cp;
+    int num;
 {
 
 #if defined(DOS16) || defined(WIN16)
@@ -294,6 +298,9 @@ get_data(current_plot)
 	break;
 
     case BOXES:
+#if USE_ULIG_FILLEDBOXES
+    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 	min_cols = 2;
 	max_cols = 4;
 	/* HBB 20010214: commented out. z_axis is abused to store a
@@ -378,7 +385,16 @@ get_data(current_plot)
 	    /* x, y */
 	    /* ylow and yhigh are same as y */
 
-	    if (current_plot->plot_style == BOXES && boxwidth > 0) {
+	    if ( (current_plot->plot_style == BOXES
+#if USE_ULIG_FILLEDBOXES
+		  || current_plot->plot_style == FILLEDBOXES
+#endif /* USE_ULIG_FILLEDBOXES */
+		  )
+                 && boxwidth > 0
+#if USE_ULIG_RELATIVE_BOXWIDTH
+		 && boxwidth_is_absolute
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+		 ) {
 		/* calc width now */
 		store2d_point(current_plot, i++, v[0], v[1],
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
@@ -424,6 +440,9 @@ get_data(current_plot)
 		    break;
 
 		case BOXES:
+#if USE_ULIG_FILLEDBOXES
+		case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 		    /* calculate xmin and xmax here, so that logs are
 		     * taken if if necessary */
 		    store2d_point(current_plot, i++, v[0], v[1],
@@ -465,6 +484,9 @@ get_data(current_plot)
 
 
 	    case BOXES:	/* x, y, xmin, xmax */
+#if USE_ULIG_FILLEDBOXES
+	    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[1],
 			      v[1], 0.0);
 		break;
@@ -735,8 +757,8 @@ current points %d\n\n",
 
 static void
 print_table(current_plot, plot_num)
-struct curve_points *current_plot;
-int plot_num;
+    struct curve_points *current_plot;
+    int plot_num;
 {
     int i, curve;
     char *table_format = NULL;
@@ -758,6 +780,9 @@ int plot_num;
 		curve, current_plot->p_count);
 	switch (current_plot->plot_style) {
 	case BOXES:
+#if USE_ULIG_FILLEDBOXES
+	case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 	case XERRORBARS:
 	    fprintf(gpoutfile, " xlow xhigh");
 	    break;
@@ -783,6 +808,9 @@ int plot_num;
 		    current_plot->points[i].y);
 	    switch (current_plot->plot_style) {
 	    case BOXES:
+#if USE_ULIG_FILLEDBOXES
+	    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 	    case XERRORBARS:
 		fprintf(gpoutfile, " %g %g",
 			current_plot->points[i].xlow,
@@ -1273,6 +1301,12 @@ eval_plots()
 			    /* ignored, actually... */
 			    this_plot->points[i].x = t;
 			    this_plot->points[i].y = temp;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                            if( boxwidth >= 0 && boxwidth_is_absolute ) {  /* ULIG */
+                                this_plot->points[i].z = 0;
+                                /* xlow/xhigh are set in parametric_fixup */
+                            }
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 			} else if (polar) {
 			    double y;
 			    if (!(axis_array[R_AXIS].autoscale & AUTOSCALE_MAX) && temp > axis_array[R_AXIS].max)
@@ -1281,6 +1315,15 @@ eval_plots()
 				temp -= axis_array[R_AXIS].min;
 			    y = temp * sin(x * ang2rad);
 			    x = temp * cos(x * ang2rad);
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                            if( boxwidth >= 0 && boxwidth_is_absolute ) {  /* ULIG */
+                                int dmy_type = INRANGE;
+                                this_plot->points[i].z = 0;
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                                dmy_type = INRANGE;
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, x + boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                            }
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 			    temp = y;
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].x, x, this_plot->points[i].type, x_axis, NOOP, goto come_here_if_undefined);
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, y, this_plot->points[i].type, y_axis, NOOP, goto come_here_if_undefined);
@@ -1288,7 +1331,15 @@ eval_plots()
 			    /* If non-para, it must be INRANGE */
 			    /* logscale ? log(x) : x */
 			    this_plot->points[i].x = t;
-
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                            if( boxwidth >= 0 && boxwidth_is_absolute ) {  /* ULIG */
+                                int dmy_type = INRANGE;
+                                this_plot->points[i].z = 0;
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xlow, x - boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                                dmy_type = INRANGE;
+                                STORE_WITH_LOG_AND_UPDATE_RANGE( this_plot->points[i].xhigh, x + boxwidth/2, dmy_type, x_axis, NOOP, NOOP );
+                            }
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 			    STORE_WITH_LOG_AND_UPDATE_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type, y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
 
 			    /* could not use a continue in this case */
@@ -1440,10 +1491,6 @@ eval_plots()
 }				/* eval_plots */
 
 
-static void
-parametric_fixup(start_plot, plot_num)
-struct curve_points *start_plot;
-int *plot_num;
 /*
  * The hardest part of this routine is collapsing the FUNC plot types in the
  * list (which are garanteed to occur in (x,y) pairs while preserving the
@@ -1453,6 +1500,10 @@ int *plot_num;
  * start_plot:F1->F2->D1->D2->F3->F4->D3->NULL ==> F2->D1->D2->F4->D3->NULL
  * 
  */
+static void
+parametric_fixup(start_plot, plot_num)
+    struct curve_points *start_plot;
+    int *plot_num;
 {
     struct curve_points *xp, *new_list = NULL, *free_list = NULL;
     struct curve_points **last_pointer = &new_list;
@@ -1509,12 +1560,29 @@ int *plot_num;
 		    }
 		    x = r * cos(t);
 		    y = r * sin(t);
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                    if( boxwidth >= 0 && boxwidth_is_absolute ) {  /* ULIG */
+                        int dmy_type = INRANGE;
+                        STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, xp->x_axis, NOOP, NOOP );
+                        dmy_type = INRANGE;
+                        STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, xp->x_axis, NOOP, NOOP );
+                    }
+#endif	/* USE_ULIG_RELATIVE_BOXWIDTH */
 		    /* we hadn't done logs when we stored earlier */
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, xp->x_axis, NOOP, NOOP);
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, xp->y_axis, NOOP, NOOP);
 		} else {
 		    double x = xp->points[i].y;
 		    double y = yp->points[i].y;
+
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                    if( boxwidth >= 0 && boxwidth_is_absolute ) {  /* ULIG */
+                        int dmy_type = INRANGE;
+                        STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xlow, x - boxwidth/2, dmy_type, yp->x_axis, NOOP, NOOP );
+                        dmy_type = INRANGE;
+                        STORE_WITH_LOG_AND_UPDATE_RANGE( yp->points[i].xhigh, x + boxwidth/2, dmy_type, yp->x_axis, NOOP, NOOP );
+                    }
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].x, x, yp->points[i].type, yp->x_axis, NOOP, NOOP);
 		    STORE_WITH_LOG_AND_UPDATE_RANGE(yp->points[i].y, y, yp->points[i].type, yp->y_axis, NOOP, NOOP);
 		}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.58 2001/07/03 12:48:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.59 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -80,6 +80,9 @@ static void show_autoscale __PROTO((void));
 static void show_bars __PROTO((void));
 static void show_border __PROTO((void));
 static void show_boxwidth __PROTO((void));
+#if USE_ULIG_FILLEDBOXES
+static void show_fillstyle __PROTO((void));
+#endif /* USE_ULIG_FILLEDBOXES */
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
 static void show_dgrid3d __PROTO((void));
@@ -165,7 +168,7 @@ show_command()
     /* show at is undocumented/hidden... */
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all',  'angles',  'arrow',  'autoscale',  'bars', 'border',\n\
+\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border',\n\
 \t'boxwidth', 'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d',\n\
 \t'dummy', 'encoding', 'format', 'functions',  'grid',  'hidden',\n\
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
@@ -340,7 +343,7 @@ show_command()
 	/* HBB 20010525: re-implement old 'show data style' command */
 	/* FIXME: 'show function style' is gone completely */
 	if (almost_equals(c_token, "st$yle")) {
-	    show_styles("data", data_style);
+	    show_styles("Data", data_style);
 	    c_token++;
 	} else 
 	    int_error(c_token, "keyword 'style' expected after 'show data'");
@@ -721,10 +724,6 @@ show_all()
     show_dummy();
     show_format();
     show_style();
-/*
-    show_styles("data",data_style);
-    show_styles("functions",func_style);
-*/
     show_grid();
     show_zeroaxis(FIRST_X_AXIS);
     show_zeroaxis(FIRST_Y_AXIS);
@@ -1068,12 +1067,43 @@ show_boxwidth()
 
     if (boxwidth < 0.0)
 	fputs("\tboxwidth is auto\n", stderr);
-    else
+    else {
+#if USE_ULIG_RELATIVE_BOXWIDTH
+	fprintf(stderr, "\tboxwidth is %g %s\n", boxwidth,
+		(boxwidth_is_absolute) ? "absolute" : "relative");
+#else
 	fprintf(stderr, "\tboxwidth is %g\n", boxwidth);
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+    }
 }
 
 
-/* process 'show boxwidth' command */
+#if USE_ULIG_FILLEDBOXES
+/* process 'show fillstyle' command (ULIG) */
+static void
+show_fillstyle()
+{
+    SHOW_ALL_NL;
+
+    switch(fillstyle) {
+    case 1:
+        fprintf(stderr,
+		"\tFilling is active and uses solid colour with density %f\n",
+		filldensity / 100.0);
+        break;
+    case 2:
+        fprintf(stderr,
+		"\tFilling is active and uses pattern number %d\n",
+		fillpattern);
+        break;
+    default:
+        fprintf(stderr, "\tFilling is deactivated\n");
+    }
+}
+#endif /* USE_ULIG_FILLEDBOXES */
+
+
+/* process 'show clip' command */
 static void
 show_clip()
 {
@@ -1249,23 +1279,32 @@ show_style()
     switch(lookup_table(&show_style_tbl[0],c_token)){
     case SHOW_STYLE_DATA:
 	SHOW_ALL_NL;
-	show_styles("data",data_style);
+	show_styles("Data",data_style);
 	c_token++;
 	break;
     case SHOW_STYLE_FUNCTION:
 	SHOW_ALL_NL;
-	show_styles("functions", func_style);
+	show_styles("Functions", func_style);
 	c_token++;
 	break;
     case SHOW_STYLE_LINE:
 	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
 	break;
+#if USE_ULIG_FILLEDBOXES
+    case SHOW_STYLE_FILLING:
+	show_fillstyle();
+	c_token++;
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
     default:
 	/* show all styles */
-	show_styles("data",data_style);
-	show_styles("functions", func_style);
+	show_styles("Data",data_style);
+	show_styles("Functions", func_style);
 	show_linestyle(0);
+#if USE_ULIG_FILLEDBOXES
+	show_fillstyle();
+#endif /* USE_ULIG_FILLEDBOXES */
 	break;
     }
 }
@@ -1274,8 +1313,8 @@ show_style()
 /* called by show_data() and show_func() */
 static void
 show_styles(name, style)
-const char *name;
-enum PLOT_STYLE style;
+    const char *name;
+    enum PLOT_STYLE style;
 {
 
     fprintf(stderr, "\t%s are plotted with ", name);
@@ -1319,6 +1358,11 @@ enum PLOT_STYLE style;
     case BOXES:
 	fputs("boxes\n", stderr);
 	break;
+#if USE_ULIG_FILLEDBOXES
+    case FILLEDBOXES:
+	fputs("filledboxes\n", stderr);
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
     case BOXERROR:
 	fputs("boxerrorbars\n", stderr);
 	break;
@@ -1341,7 +1385,7 @@ enum PLOT_STYLE style;
 	fputs("financebars\n", stderr);
 	break;
     case CANDLESTICKS:
-	fputs("candlesticsks\n", stderr);
+	fputs("candlesticks\n", stderr);
 	break;
     }
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.50 2001/07/20 14:04:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.51 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -41,12 +41,11 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.50 2001/07/20 14:04:06 
 #include "command.h"
 #include "gp_time.h"
 #include "gadgets.h"
-/*  #include "graph3d.h" */		/* HBB 2000506: back in, for clip_vector() */
-/*  #include "misc.h" */
-/*  #include "setshow.h" */
+/* FIXME HBB 20010822: this breaks the plan of disentangling graphics
+ * and plot2d, because each #include's the other's header: */
+#include "plot2d.h"		/* for boxwidth */ 
 #include "term_api.h"
 #include "util.h"
-/*  #include "util3d.h" */		/* HBB 20000506: back in, for clip_line() */
 
 
 /* Externally visible/modifiable status variables */
@@ -109,7 +108,11 @@ static void plot_lines __PROTO((struct curve_points * plot));
 static void plot_points __PROTO((struct curve_points * plot));
 static void plot_dots __PROTO((struct curve_points * plot));
 static void plot_bars __PROTO((struct curve_points * plot));
+#if USE_ULIG_FILLEDBOXES
+static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y, TBOOLEAN fill));  /* ULIG */
+#else
 static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
+#endif /* USE_ULIG_FILLEDBOXES */
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -1476,7 +1479,11 @@ do_plot(plots, pcount)
 	    /*}}} */
 	    /*{{{  BOXXYERROR */
 	case BOXXYERROR:
-	    plot_boxes(this_plot, Y_AXIS.term_zero);
+#if USE_ULIG_FILLEDBOXES
+          plot_boxes(this_plot, Y_AXIS.term_zero, FALSE);
+#else
+	  plot_boxes(this_plot, Y_AXIS.term_zero);
+#endif /* USE_ULIG_FILLEDBOXES */
 	    break;
 	    /*}}} */
 	    /*{{{  BOXERROR (falls through to) */
@@ -1487,9 +1494,20 @@ do_plot(plots, pcount)
 	    /*}}} */
 	    /*{{{  BOXES */
 	case BOXES:
-	    plot_boxes(this_plot, Y_AXIS.term_zero);
+#if USE_ULIG_FILLEDBOXES
+          plot_boxes(this_plot, Y_AXIS.term_zero, FALSE);
+#else	
+          plot_boxes(this_plot, Y_AXIS.term_zero);
+#endif /* USE_ULIG_FILLEDBOXES */
 	    break;
 	    /*}}} */
+#if USE_ULIG_FILLEDBOXES
+	    /*{{{  FILLEDBOXES (ULIG) */
+	case FILLEDBOXES:
+	    plot_boxes(this_plot, Y_AXIS.term_zero, TRUE);
+	    break;
+	    /*}}} */
+#endif /* USE_ULIG_FILLEDBOXES */
 	    /*{{{  VECTOR */
 	case VECTOR:
 	    plot_vectors(this_plot);
@@ -1875,6 +1893,7 @@ plot_histeps(plot)
 	    gl[goodcount] = i;
 	    ++goodcount;
 	}
+
     /* sort the data --- tell histeps_compare about the plot
      * datastructure to look at, then call qsort() */
     histeps_current_plot = plot;
@@ -2266,12 +2285,20 @@ struct curve_points *plot;
 }
 
 /* plot_boxes:
- * Plot the curves in BOXES style
+ * Plot the curves in BOXES or FILLEDBOXES style
  */
+#if USE_ULIG_FILLEDBOXES
+static void
+plot_boxes(plot, xaxis_y, fill)
+    struct curve_points *plot;
+    int xaxis_y;
+    TBOOLEAN fill;		/* FALSE (boxes) or TRUE (filledboxes) */
+#else
 static void
 plot_boxes(plot, xaxis_y)
-struct curve_points *plot;
-int xaxis_y;
+    struct curve_points *plot;
+    int xaxis_y;
+#endif /* USE_ULIG_FILLEDBOXES */
 {
     int i;			/* point index */
     int xl, xr, yt;		/* point in terminal coordinates */
@@ -2292,13 +2319,23 @@ int xaxis_y;
 
 		    /* calculate width */
 		    if (prev != UNDEFINED)
-			dxl = (plot->points[i - 1].x - plot->points[i].x) / 2.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                        if (! boxwidth_is_absolute) /* consider relative boxwidth (ULIG) */
+			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
+                        else
+#endif /* USE_RELATIVE_BOXWIDTH */
+			    dxl = (plot->points[i-1].x - plot->points[i].x) / 2.0;
 		    else
 			dxl = 0.0;
 
 		    if (i < plot->p_count - 1) {
 			if (plot->points[i + 1].type != UNDEFINED)
-			    dxr = (plot->points[i + 1].x - plot->points[i].x) / 2.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+                            if (! boxwidth_is_absolute) /* consider relative boxwidth (ULIG) */
+			        dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
+                            else
+#endif /* USE_RELATIVE_BOXWIDTH */
+			        dxr = (plot->points[i+1].x - plot->points[i].x) / 2.0;
 			else
 			    dxr = -dxl;
 		    } else {
@@ -2345,6 +2382,44 @@ int xaxis_y;
 		xl = map_x(dxl);
 		xr = map_x(dxr);
 		yt = map_y(dyt);
+
+#if USE_ULIG_FILLEDBOXES
+                if( fill && t->fillbox ) { /* ULIG */
+                    /* filled boxes */
+                    int x, y, w, h;
+                    int fillpar, style;
+                    x = xl;
+                    y = xaxis_y;
+                    w = xr - xl + 1;
+                    h = yt - xaxis_y + 1;
+                    /* avoid negative width/height */
+                    if( w <= 0 ) { x = xr; w = xl - xr + 1; }
+                    if( h <= 0 ) { y = yt; h = xaxis_y - yt + 1; }
+                    /* squeeze all fill information into the old style parameter */
+                    /* The terminal driver knows how to extract the information. */
+                    /* We assume that the style (int) has only 16 bit, therefore we take */
+                    /* 4 bits for the style and allow 12 bits for the corresponding fill parameter. */
+                    /* This limits the number of styles to 16 and the fill parameter's values */
+                    /* to the range 0...4095, which seems acceptable. */
+                    switch( fillstyle ) {
+                    case 1:  /* style == 1 --> solid fill with 'filldensity' */
+                        fillpar = filldensity;
+                        break;
+                    case 2:  /* style == 2 --> pattern fill with 'fillpattern' */
+                        fillpar = fillpattern;
+                        break;
+                    default: /* style == 0 or unknown --> solid fill with background color */
+                        fillpar = 0;
+                    }
+                    style = ((fillpar & 0xfff) << 4) + (fillstyle & 0xf);
+                    (*t->fillbox) (style, x, y, w, h);
+                    /* break here, if we don't need the box frame around, */
+                    /* i.e. fillstyle is "solid" and filldensity is 100%, */
+                    /* or if we are using the fig driver (frame and fill are one object) */
+                    if( fillstyle == 1 && filldensity == 100 ) break;
+                    if( strcmp(t->name, "fig") == 0 ) break;
+                }
+#endif /* USE_ULIG_FILLEDBOXES */
 
 		(*t->move) (xl, xaxis_y);
 		(*t->vector) (xl, yt);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.20 2001/08/09 15:03:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.21 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -362,6 +362,9 @@ const struct gen_table show_style_tbl[] =
     { "d$ata", SHOW_STYLE_DATA },
     { "f$unction", SHOW_STYLE_FUNCTION },
     { "l$ine", SHOW_STYLE_LINE },
+#if USE_ULIG_FILLEDBOXES
+    { "fill$ing", SHOW_STYLE_FILLING },
+#endif
     { NULL, SHOW_STYLE_INVALID }
 };
 
@@ -382,6 +385,9 @@ const struct gen_table plotstyle_tbl[] =
     { "xe$rrorbars", XERRORBARS },
     { "xye$rrorbars", XYERRORBARS },
     { "boxes", BOXES },
+#if USE_ULIG_FILLEDBOXES
+    { "fill$edboxes", FILLEDBOXES },
+#endif /* USE_ULIG_FILLEDBOXES */
     { "boxer$rorbars", BOXERROR },
     { "boxx$yerrorbars", BOXXYERROR },
     { "st$eps", STEPS },

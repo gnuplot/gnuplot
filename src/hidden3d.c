@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.28 2001/07/20 14:04:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.29 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -959,6 +959,9 @@ build_networks(plots, pcount)
 	    }
 	    break;
 	case BOXES:		
+#if USE_ULIG_FILLEDBOXES
+	case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 	case IMPULSES:
 	    nv += 2 * nverts;
 	    ne += nverts;
@@ -1041,6 +1044,9 @@ build_networks(plots, pcount)
 			store_edge(thisvertex, edir_west, 0, lp, above);
 			break;
 		    case BOXES:		
+#if USE_ULIG_FILLEDBOXES
+		    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 		    case IMPULSES:
 			/* set second vertex to the low end of zrange */
 			{
@@ -1216,6 +1222,9 @@ build_networks(plots, pcount)
 		    break;
 
 		case BOXES:		
+#if USE_ULIG_FILLEDBOXES
+		case FILLEDBOXES:
+#endif	/* USE_ULIG_FILLEDBOXES */
 		case IMPULSES:
 		    if (thisvertex < 0)
 			break;

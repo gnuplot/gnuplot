@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.14 1999/10/01 15:09:10 lhecking Exp $
+ * $Id: epson.trm,v 1.15 1999/12/10 16:58:28 lhecking Exp $
  *
  */
 
@@ -86,11 +86,6 @@ register_term(tandy_60dpi)
 #if defined(EPS180) || defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
 TERM_PUBLIC void EPSON_init __PROTO((void));
 TERM_PUBLIC void EPSON_reset __PROTO((void));
-#define EPSON_linetype b_setlinetype
-#define EPSON_move b_move
-#define EPSON_vector b_vector
-#define EPSON_put_text b_put_text
-#define EPSON_text_angle b_text_angle
 
 #if defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
 #define EPSONVCHAR		FNT5X9_VCHAR
@@ -142,10 +137,6 @@ TERM_PUBLIC void NEC_graphics __PROTO((void));
 TERM_PUBLIC void NEC_text __PROTO((void));
 TERM_PUBLIC void NEC_linetype __PROTO((int linetype));
 TERM_PUBLIC void NEC_reset __PROTO((void));
-#define NEC_move b_move
-#define NEC_vector b_vector
-#define NEC_put_text b_put_text
-#define NEC_text_angle b_text_angle
 #define NECXMAX	400
 #define NECYMAX	320
 #define NECVCHAR		FNT5X9_VCHAR
@@ -160,10 +151,6 @@ TERM_PUBLIC void STARC_graphics __PROTO((void));
 TERM_PUBLIC void STARC_text __PROTO((void));
 TERM_PUBLIC void STARC_linetype __PROTO((int linetype));
 TERM_PUBLIC void STARC_reset __PROTO((void));
-#define STARC_move b_move
-#define STARC_vector b_vector
-#define STARC_put_text b_put_text
-#define STARC_text_angle b_text_angle
 #define STARCXMAX	512
 #define STARCYMAX	384
 #define STARCVCHAR		FNT5X9_VCHAR
@@ -794,9 +781,10 @@ TERM_TABLE_START(epson180_driver)
     "epson_180dpi", "Epson LQ-style 180-dot per inch (24 pin) printers",
     EPS180XMAX, EPS180YMAX, EPSON180VCHAR, EPSON180HCHAR,
     EPSON180VTIC, EPSON180HTIC, options_null, EPSON_init, EPSON_reset,
-    EPS180_text, null_scale, EPS180_graphics, EPSON_move, EPSON_vector,
-    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS180_text, null_scale, EPS180_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(epson180_driver)
 
 #undef LAST_TERM
@@ -808,9 +796,10 @@ TERM_TABLE_START(epson60_driver)
     "epson_60dpi", "Epson-style 60-dot per inch printers",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
-    EPS60_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
-    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPS60_text, null_scale, EPS60_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(epson60_driver)
 
 #undef LAST_TERM
@@ -822,9 +811,10 @@ TERM_TABLE_START(epsonlx_driver)
     "epson_lx800", "Epson LX-800, Star NL-10, NX-1000, PROPRINTER ...",
     EPSONXMAX, EPSONYMAX, EPSONVCHAR, EPSONHCHAR,
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
-    EPSON_text, null_scale, EPSON_graphics, EPSON_move, EPSON_vector,
-    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    EPSON_text, null_scale, EPSON_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(epsonlx_driver)
 
 #undef LAST_TERM
@@ -836,9 +826,10 @@ TERM_TABLE_END(epsonlx_driver)
     "nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
     NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
     NECVTIC, NECHTIC, NEC_options, NEC_init, NEC_reset,
-    NEC_text, null_scale, NEC_graphics, NEC_move, NEC_vector,
-    NEC_linetype, NEC_put_text, NEC_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    NEC_text, null_scale, NEC_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(nec_driver)
 
 #undef LAST_TERM
@@ -850,9 +841,10 @@ TERM_TABLE_START(okidata_driver)
     "okidata", "OKIDATA 320/321 Standard",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
-    OKIDATA_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
-    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    OKIDATA_text, null_scale, EPS60_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(okidata_driver)
 
 #undef LAST_TERM
@@ -864,9 +856,10 @@ TERM_TABLE_START(starc_driver)
     "starc", "Star Color Printer",
     STARCXMAX, STARCYMAX, STARCVCHAR, STARCHCHAR,
     STARCVTIC, STARCHTIC, options_null, STARC_init, STARC_reset,
-    STARC_text, null_scale, STARC_graphics, STARC_move, STARC_vector,
-    STARC_linetype, STARC_put_text, STARC_text_angle,
-    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
+    STARC_text, null_scale, STARC_graphics, b_move, b_vector,
+    STARC_linetype, b_put_text, b_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(starc_driver)
 
 #undef LAST_TERM
@@ -878,9 +871,10 @@ TERM_TABLE_START(tandy60_driver)
     "tandy_60dpi", "Tandy DMP-130 series 60-dot per inch graphics",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
     EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
-    TANDY60_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
-    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
+    TANDY60_text, null_scale, EPS60_graphics, b_move, b_vector,
+    b_setlinetype, b_put_text, b_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(tandy60_driver)
 
 #undef LAST_TERM

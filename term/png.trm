@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.31 2001/01/16 20:21:14 broeker Exp $
+ * $Id: png.trm,v 1.32 2001/08/24 15:39:50 broeker Exp $
  *
  */
 
@@ -566,7 +566,8 @@ TERM_TABLE_START(png_driver)
     b_put_text, b_text_angle, null_justify_text, PNG_point,
     do_arrow, set_font_null,
     0,				/* pointsize */
-    TERM_CAN_MULTIPLOT | TERM_BINARY
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(png_driver)
 
 #undef LAST_TERM

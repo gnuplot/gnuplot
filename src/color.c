@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.19 2001/07/20 14:04:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.20 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -454,7 +454,7 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(CENTRE);
 	    (*term->put_text)(x2, y3, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x2, y3, text, CENTRE);
+	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP);
 #endif
 	} else {
 	    unsigned int x3 = cb_x_to + (term->h_char);
@@ -464,7 +464,7 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(LEFT);
 	    (*term->put_text)(x3, y2, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x3, y2, text, LEFT);
+	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE);
 #endif
 	}
     }

@@ -1,5 +1,5 @@
 /*
- * $Id: djsvga.trm,v 1.12 1999/06/22 11:54:15 lhecking Exp $
+ * $Id: djsvga.trm,v 1.13 1999/08/24 11:24:53 lhecking Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -408,6 +408,9 @@ unsigned int left, bottom, width, height;
 	style %= 13;
     /* HBB: prize question: should it be 'width-1' instead? */
     /* HBB: fill with GRX Color '0', which *should* be black : */
+    /* ULIG: the style parameter is now used for the fillboxes style */
+    /* (not implemented here), see the documentation */
+
     GrFilledBox(left, dj_ylast - bottom, left + width, dj_ylast - bottom - height, 0);
 }
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.74 2001/08/13 09:34:40 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.75 2001/08/17 14:00:36 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2971,7 +2971,7 @@ C ... and restart the table:
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `boxerrorbars`, `boxxyerrorbars`,
+ `xyerrorlines`, `boxes`, `filledboxes`, `boxerrorbars`, `boxxyerrorbars`,
  `financebars`, `candlesticks` or `vector`. Some of these styles
  require additional information. See `set style <style>` for details of
  each style.
@@ -3610,10 +3610,10 @@ C ... and restart the table:
 ?show boxwidth
 ?boxwidth
  The `set boxwidth` command is used to set the default width of boxes in the
- `boxes` and `boxerrorbars` styles.
+ `boxes`, `filledboxes` and `boxerrorbars` styles.
 
  Syntax:
-       set boxwidth {<width>}
+       set boxwidth {<width>} {absolute|relative}
        show boxwidth
 
  If a data file is plotted without the width being specified in the third,
@@ -3622,17 +3622,61 @@ C ... and restart the table:
  both in the file and by the `set boxwidth` command, the one in the file is
  used.)  If the width is not specified in one of these ways, the width of each
  box will be calculated automatically so that it touches the adjacent boxes.
- In a four-column data set, the fourth column will be interpreted as the box
- width unless the width is set to -2.0, in which case the width will be
- calculated automatically.  See `set style boxerrorbars` for more details.
+ `relative` indicates, that the specified boxwidth is a scaling factor for
+ the automatically calculated boxwidth, otherwise the boxwidth is taken as an
+ `absolute` value (which is the default). In a four-column data set, the fourth
+ column will be interpreted as the box width unless the width is set to -2.0,
+ in which case the width will be calculated automatically.  See `set style
+ boxerrorbars` for more details.
 
  To set the box width to automatic use the command
        set boxwidth
+
  or, for four-column data,
        set boxwidth -2
 
  The same effect can be achieved with the `using` keyword in `plot`:
        plot 'file' using 1:2:3:4:(-2)
+
+ To set the box width to half of the automatic size use
+       set boxwidth 0.5 relative
+
+ To set the box width to an absolute value of 2 use
+       set boxwidth 2 absolute
+
+ or, if you didn't specify a relative boxwidth before,
+       set boxwidth 2
+3 fillstyle
+?commands set style filling
+?commands show style filling
+?set style filling
+?show style filling
+?fillstyle
+ The `set style filling` command is used to set the fillstyle of boxes in the
+ `filledboxes` style.
+
+ Syntax: 
+       set style filling {empty | solid {<density>} | pattern {<number>}}
+
+ The defaule fillstyle is `solid 1.0`.
+
+ The `solid` option causes filling with a solid color, if the terminal 
+ supports that. The <density> parameter specifies the intensity
+ of the filled colors. At a <density> of 0.0, the box is empty, at 
+ <density> of 1.0, the inner area is of the same color as the border of 
+ the box. Solid filling may be implemented either by modifying the
+ color of the box border continuously, or by dithering, depending on
+ the terminal driver. If no <density> parameter is given, a default of
+ 1.0 is used, automatically.
+
+ The `pattern` option causes filling to be done with a fill pattern supplied
+ by the terminal driver. <pattern> is the pattern number, starting at 0. 
+ The kind and number of available fill patterns depend on the terminal driver. 
+ If no <pattern> number is given, a default of 0 is assumed.
+
+ The `empty` option causes filled boxes not to be filled, after all. This
+ makes the `filledboxes` style equivalent to simple `boxes`. It is equivalent
+ to the `solid` option with a <density> parameter of zero.
 3 clabel
 ?commands set clabel
 ?commands set noclabel
@@ -5841,9 +5885,9 @@ C ... and restart the table:
 
  None of the styles requiring more than two columns of information
  (e.g., `errorbars` or `errorlines`) can be used with `splot`s or
- function `plot`s. Neither `boxes` nor any of the `steps` styles can be
- used with `splot`s. If an inappropriate style is specified, it will be
- changed to `points`.
+ function `plot`s. Neither `boxes` or `filledboxes` nor any of the `steps`
+ styles can be used with `splot`s. If an inappropriate style is specified,
+ it will be changed to `points`.
 
  For 2-d data with more than two columns, `gnuplot` is picky about the
  allowed `errorbar` and `errorline` styles. The `using` option on the
@@ -5852,8 +5896,8 @@ C ... and restart the table:
  a column in the data file and an entry in the `using` list.)
 
  For three columns, only `xerrorbars`, `yerrorbars` (or `errorbars`),
- `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes`, and
- `boxerrorbars` are allowed. If another plot style is used, the style
+ `xerrorlines`, `yerrorlines` (or `errorlines`), `boxes`, `filledboxes`
+ and `boxerrorbars` are allowed. If another plot style is used, the style
  will be changed to `yerrorbars`. The `boxerrorbars` style will
  calculate the boxwidth automatically.
 
@@ -5894,13 +5938,9 @@ C ... and restart the table:
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See Demo. </a>
 4 boxes
 ?commands set style boxes
-?commands set style bargraph
 ?set style boxes
-?set style bargraph
 ?style boxes
-?style bargraph
 ?boxes
-?bargraph
  The `boxes` style is only relevant to 2-d plotting.  It draws a box centered
  about the given x coordinate from the x axis (not the graph border) to the
  given y coordinate.  The width of the box is obtained in one of three ways.
@@ -5908,7 +5948,55 @@ C ... and restart the table:
  to set the width of the box.  If not, if a width has been set using the `set
  boxwidth` command, this will be used.  If neither of these is available, the
  width of each box will be calculated automatically so that it touches the
- adjacent boxes.
+ adjacent boxes. For filled boxes, see the `filledboxes` style.
+4 filledboxes
+?commands set style filledboxes
+?set style filledboxes
+?style filledboxes
+?filledboxes
+ The `filledboxes` style is only relevant to 2-d plotting.  Like `boxes`, it
+ draws a box centered about the given x coordinate from the x axis (not the
+ graph border) to the given y coordinate.  See the `boxes` style for how the
+ width of the box is obtained.  The `filledboxes` keyword may be abbreviated
+ to `fill`. The drawn box is filled with a color pattern according to a style
+ defined by the `set style filling` command.  The fillstyle may be one of `empty`,
+ `solid` and `pattern`.
+
+ For fillstyle `empty` the box is filled with the background color.
+
+ For fillstyle `solid` the box is filled with a solid pattern using the
+ current drawing color. The fill density is determined by `set filldensity`.
+ Values for `filldensity` are in the range from 0.0 (empty) to 1.0 (solid).
+ It depends on the terminal driver how many density steps between 0.0 and 1.0
+ are available (e.g. the bitmap drivers currently support only filldensities
+ 0.0, 0.25, 0.5, 0.75 and 1.0). Most drivers (e.g. x11, windows, bitmap
+ drivers) use halftone patterns to achieve several filldensities, others
+ (e.g. postscript) use true RGB colors.
+
+ For fillstyle `pattern` the box is filled in the current drawing color with
+ a pattern as selected by `set style filling pattern <number>`. 
+ `fillpattern` is a number starting at 0. The kind and number of the available fillpatterns depend on the
+ terminal driver.
+
+ Examples:
+
+ To plot a data file with solid filled boxes with a small vertical space
+ seperating them (bargraph):
+
+       set boxwidth 0.9 relative
+       plot 'file.dat' with filledboxes
+
+ To plot a sine and a cosine curve in filledboxes style with
+ filldensity 50 percent:
+       set style function filledboxes
+       set style filling solid 0.5
+       plot sin(x), cos(x)
+
+ Currently only the following terminal drivers support the `filledboxes` style:
+ x11, windows, postscript, fig, pbm, png, hpdj, hppj, hpljii, hp500c, nec_cp6,
+ epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and tandy_60dpi. The
+ BeOS driver (`be`) supports `filledboxes` too, but it is unknown whether it
+ works as intended.
 4 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars

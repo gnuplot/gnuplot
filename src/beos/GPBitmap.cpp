@@ -271,6 +271,8 @@ void GPBitmap::display(float v_width, float v_height)
 				 * There may be an off-by-one (or more) error here.
 				 * style ignored here for the moment
 				 */
+                                /* ULIG: the style parameter is now used for the fillboxes style
+                                 * (not implemented here), see the documentation */
 				m_view->SetHighColor(colors[0]);
 				m_view->FillRect(BRect(X(xtmp), Y(ytmp + h), w * xscale, h * yscale));
 				m_view->SetHighColor(colors[lt + 3]);

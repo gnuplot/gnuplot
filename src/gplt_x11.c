@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.30 2000/12/18 08:28:02 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.31 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -496,6 +496,41 @@ Atom WM_PROTOCOLS, WM_DELETE_WINDOW;
 XPoint Diamond[5], Triangle[4];
 XSegment Plus[2], Cross[2], Star[4];
 
+#if USE_ULIG_FILLEDBOXES
+/* pixmaps used for filled boxes (ULIG) */
+
+/* halftone stipples for solid fillstyle */
+#define stipple_halftone_width 8
+#define stipple_halftone_height 8
+#define stipple_halftone_num 5
+static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] ={
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
+  { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },   /* 25% pattern */
+  { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },   /* 50% pattern */
+  { 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd },   /* 75% pattern */
+  { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }    /* solid pattern */
+};
+
+/* pattern stipples for pattern fillstyle */
+#define stipple_pattern_width 8
+#define stipple_pattern_height 8
+#define stipple_pattern_num 7
+static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] ={
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
+  { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 },   /* diagonal stripes (1) */
+  { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 },   /* diagonal stripes (2) */
+  { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 },   /* diagonal stripes (3) */
+  { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 },   /* diagonal stripes (4) */
+  { 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 },   /* diagonal stripes (5) */
+  { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }    /* diagonal stripes (6) */
+};
+
+Pixmap stipple_halftone[stipple_halftone_num];
+Pixmap stipple_pattern[stipple_pattern_num];
+int stipple_initialized = 0;
+#endif /* USE_ULIG_FILLEDBOXES */
+
+
 /*-----------------------------------------------------------------------------
  *   main program 
  *---------------------------------------------------------------------------*/
@@ -835,7 +870,7 @@ You lose.No mainloop.
 /* delete a window / plot */
 void
 delete_plot(plot)
-plot_struct *plot;
+    plot_struct *plot;
 {
     int i;
 
@@ -851,6 +886,16 @@ plot_struct *plot;
 	plot->window = None;
 	--windows_open;
     }
+#if USE_ULIG_FILLEDBOXES
+    if( stipple_initialized ) {  /* ULIG */
+        int i;
+        for( i=0; i<stipple_halftone_num; i++ )
+            XFreePixmap( dpy, stipple_halftone[i] );
+        for( i=0; i<stipple_pattern_num; i++ )
+            XFreePixmap( dpy, stipple_pattern[i] );
+        stipple_initialized = 0;
+    }
+#endif /* USE_ULIG_FILLEDBOXES */
     if (plot->pixmap) {
 	XFreePixmap(dpy, plot->pixmap);
 	plot->pixmap = None;
@@ -1342,8 +1387,8 @@ record()
 
 void
 exec_cmd(plot, command)
-plot_struct *plot;
-char *command;
+    plot_struct *plot;
+    char *command;
 {
     int x, y, sw, sl;
     char *buffer, *str;
@@ -1388,16 +1433,50 @@ char *command;
 	int style, xtmp, ytmp, w, h;
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
-	    /* gnuplot has origin at bottom left, but X uses top left
-	     * There may be an off-by-one (or more) error here.
-	     * style ignored here for the moment
-	     */
-	    ytmp += h;		/* top left corner of rectangle to be filled */
-	    w *= xscale;
-	    h *= yscale;
-	    XSetForeground(dpy, gc, plot->cmap->colors[0]);
-	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
-	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+#if USE_ULIG_FILLEDBOXES
+		int fillpar, idx;
+
+                fillpar = style >> 4;  /* upper 3 nibbles contain fillparameter (ULIG) */
+                switch( style & 0xf ) {  /* lower nibble contains fillstyle */
+                case 1: /* style == 1 --> use halftone fill pattern according to filldensity */
+                    idx = (int) ( fillpar * (stipple_halftone_num-1) / 100 );  /* filldensity is from 0..100 percent */
+                    if( idx < 0 ) idx = 0;
+                    if( idx >= stipple_halftone_num ) idx = stipple_halftone_num-1;
+                    XSetStipple( dpy, gc, stipple_halftone[idx] );
+                    XSetFillStyle( dpy, gc, FillOpaqueStippled );
+                    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+                    break;
+                case 2: /* style == 2 --> use fill pattern according to fillpattern */
+                    idx = (int) fillpar;  /* fillpattern is enumerated */
+                    if( idx < 0 ) idx = 0;
+                    if( idx >= stipple_pattern_num ) idx = 0;
+                    XSetStipple( dpy, gc, stipple_pattern[idx] );
+                    XSetFillStyle( dpy, gc, FillOpaqueStippled );
+                    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+                    break;
+                default: /* style == 0 or unknown --> fill with background color */
+                    XSetFillStyle( dpy, gc, FillSolid );
+                    XSetForeground(dpy, gc, plot->cmap->colors[0]);
+                }
+#endif /* USE_ULIG_FILLEDBOXES */
+
+		/* gnuplot has origin at bottom left, but X uses top left
+		 * There may be an off-by-one (or more) error here.
+		 */
+		ytmp += h;	/* top left corner of rectangle to be filled */
+		w *= xscale;
+		h *= yscale;
+#if USE_ULIG_FILLEDBOXES
+		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w+1, h+1);
+                /* reset everything */
+		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+                XSetStipple( dpy, gc, stipple_halftone[0] );
+                XSetFillStyle( dpy, gc, FillSolid );
+#else  /* ! USE_ULIG_FILLEDBOXES */
+		XSetForeground(dpy, gc, plot->cmap->colors[0]);
+		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
+		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+#endif /* USE_ULIG_FILLEDBOXES */
 	}
     }
     /*   X11_justify_text(mode) - set text justification mode  */
@@ -1578,7 +1657,7 @@ char *command;
 
 void
 display(plot)
-plot_struct *plot;
+    plot_struct *plot;
 {
     int n;
 
@@ -1607,6 +1686,19 @@ plot_struct *plot;
     gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
 
     XSetFont(dpy, gc, font->fid);
+#if USE_ULIG_FILLEDBOXES
+    XSetFillStyle( dpy, gc, FillSolid );
+
+    /* initialize stipple for filled boxes (ULIG) */
+    if( !stipple_initialized ) {
+      int i;
+      for( i=0; i<stipple_halftone_num; i++ )
+        stipple_halftone[i] = XCreateBitmapFromData( dpy, plot->pixmap, stipple_halftone_bits[i], stipple_halftone_width, stipple_halftone_height );
+      for( i=0; i<stipple_pattern_num; i++ )
+        stipple_pattern[i] = XCreateBitmapFromData( dpy, plot->pixmap, stipple_pattern_bits[i], stipple_pattern_width, stipple_pattern_height );
+      stipple_initialized = 1;
+    }
+#endif /* USE_ULIG_FILLEDBOXES */
 
     /* set pixmap background */
     XSetForeground(dpy, gc, plot->cmap->colors[0]);
@@ -2412,7 +2504,7 @@ unsigned int state;
 
 void
 process_event(event)
-XEvent *event;
+    XEvent *event;
 {
 #if 0
     static char key_string[0xf];
@@ -2478,6 +2570,16 @@ XEvent *event;
 		plot->gheight = plot->height - (plot->str[0] ? vchar : 0);
 #endif
 		plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
+#if USE_ULIG_FILLEDBOXES
+                if( stipple_initialized ) {  /* ULIG */
+                    int i;
+                    for( i=0; i<stipple_halftone_num; i++ )
+                        XFreePixmap( dpy, stipple_halftone[i] );
+                    for( i=0; i<stipple_pattern_num; i++ )
+                        XFreePixmap( dpy, stipple_pattern[i] );
+                    stipple_initialized = 0;
+                }
+#endif /* USE_ULIG_FILLEDBOXES */
 		if (plot->pixmap) {
 		    /* it is the wrong size now */
 		    FPRINTF((stderr, "Free pixmap %d\n", 0));

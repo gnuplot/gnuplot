@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.7 2001/08/09 15:03:52 broeker Exp $
+ * $Id: gp_types.h,v 1.8 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -85,13 +85,16 @@ typedef enum PLOT_STYLE {
     HISTEPS      = 13*(1<<3) + PLOT_STYLE_HAS_LINE,
     VECTOR       = 14*(1<<3) + PLOT_STYLE_HAS_LINE,
     CANDLESTICKS = 15*(1<<3) + PLOT_STYLE_HAS_ERRORBAR,
-    /* FIXME HBB 20010214: shouldn't fincancebars have 4 or 5?
+    /* FIXME HBB 20010214: shouldn't fincancebars have ERRORBARS set?
      * They behave very much like errorbars, with the sole
      * exception of the key entry ... */
     FINANCEBARS  = 16*(1<<3) + PLOT_STYLE_HAS_LINE,
     XERRORLINES  = 17*(1<<3) + (PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR),
     YERRORLINES  = 18*(1<<3) + (PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR),
     XYERRORLINES = 19*(1<<3) + (PLOT_STYLE_HAS_LINE | PLOT_STYLE_HAS_POINT | PLOT_STYLE_HAS_ERRORBAR)
+#if USE_ULIG_FILLEDBOXES
+    , FILLEDBOXES  = 20*(1<<3) + PLOT_STYLE_HAS_LINE  /* like BOXES (ULIG) */
+#endif /* USE_ULIG_FILLEDBOXES */
 } PLOT_STYLE;
 
 typedef enum PLOT_SMOOTH { 

@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.16 1999/10/29 18:39:40 lhecking Exp $
+ * $Id: hpljii.trm,v 1.17 1999/12/10 16:59:48 lhecking Exp $
  *
  */
 
@@ -80,13 +80,10 @@ TERM_PUBLIC void HPLJII_text __PROTO((void));
 TERM_PUBLIC void HPLJII_linetype __PROTO((int linetype));
 TERM_PUBLIC void HPLJII_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void HPLJII_reset __PROTO((void));
-#define HPLJII_move b_move
-#define HPLJII_vector b_vector
-#define HPLJII_text_angle b_text_angle
+
 TERM_PUBLIC void HPDJ_graphics __PROTO((void));
 TERM_PUBLIC void HPDJ_text __PROTO((void));
-#define HPDJ_text_angle b_text_angle
-#define HPDJ_put_text b_put_text
+
 /* default values for term_tbl */
 #define HPLJII_75PPI_XMAX (1920/4)
 #define HPLJII_75PPI_YMAX (1920/4)
@@ -385,9 +382,10 @@ TERM_TABLE_START(hpljii_driver)
     HPLJII_75PPI_XMAX, HPLJII_75PPI_YMAX, HPLJII_75PPI_VCHAR,
     HPLJII_75PPI_HCHAR, HPLJII_75PPI_VTIC, HPLJII_75PPI_HTIC, HPLJII_options,
     HPLJII_init, HPLJII_reset, HPLJII_text, null_scale,
-    HPLJII_graphics, HPLJII_move, HPLJII_vector, HPLJII_linetype,
-    HPLJII_put_text, HPLJII_text_angle, null_justify_text, line_and_point,
-    do_arrow, set_font_null, 0, TERM_BINARY
+    HPLJII_graphics, b_move, b_vector, HPLJII_linetype,
+    HPLJII_put_text, b_text_angle, null_justify_text, line_and_point,
+    do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(hpljii_driver)
 
 #undef LAST_TERM
@@ -398,9 +396,10 @@ TERM_TABLE_START(hpdj_driver)
     HPLJII_75PPI_XMAX, HPLJII_75PPI_YMAX, HPLJII_75PPI_VCHAR,
     HPLJII_75PPI_HCHAR, HPLJII_75PPI_VTIC, HPLJII_75PPI_HTIC, HPLJII_options,
     HPLJII_init, HPLJII_reset, HPDJ_text, null_scale,
-    HPDJ_graphics, HPLJII_move, HPLJII_vector, HPLJII_linetype,
-    HPDJ_put_text, HPDJ_text_angle, null_justify_text, line_and_point,
-    do_arrow, set_font_null, 0, TERM_BINARY
+    HPDJ_graphics, b_move, b_vector, HPLJII_linetype,
+    b_put_text, b_text_angle, null_justify_text, line_and_point,
+    do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(hpdj_driver)
 
 #undef LAST_TERM

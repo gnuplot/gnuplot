@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.25 2001/07/03 12:48:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.26 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -257,7 +257,27 @@ set y2data%s\n",
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
     else
-	fprintf(fp, "set boxwidth %g\n", boxwidth);
+#if USE_ULIG_RELATIVE_BOXWIDTH
+	fprintf(fp, "set boxwidth %g %s\n", boxwidth,
+		(boxwidth_is_absolute) ? "absolute" : "relative");
+#else
+    fprintf(fp, "set boxwidth %g\n", boxwidth);
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+
+#if USE_ULIG_FILLEDBOXES
+    switch(fillstyle) {
+    case 1: 
+	fprintf(fp, "set style filling solid %f\n", filldensity / 100.0);
+	break;
+    case 2: 
+	fprintf(fp, "set style filling pattern %d\n", fillpattern);
+	break;
+    default: 
+	fprintf(fp, "set style filling empty\n");
+	break;
+    }
+#endif
+
     if (dgrid3d)
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
 		dgrid3d_row_fineness,
@@ -589,6 +609,11 @@ set style data ",
     case BOXES:
 	fputs("boxes\n", fp);
 	break;
+#if USE_ULIG_FILLEDBOXES
+    case FILLEDBOXES:
+	fputs("filledboxes\n", fp);
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
     case BOXERROR:
 	fputs("boxerrorbars\n", fp);
 	break;
@@ -614,7 +639,9 @@ set style data ",
 	fputs("candlesticks\n", fp);
 	break;
     }
-
+    
+    /* FIXME HBB 20010816: Useless code duplication. Outputting the
+     * plot style should be handled by a subroutine! */
     fputs("set style function ", fp);
     switch (func_style) {
     case LINES:
@@ -656,6 +683,11 @@ set style data ",
     case BOXES:
 	fputs("boxes\n", fp);
 	break;
+#if USE_ULIG_FILLEDBOXES
+    case FILLEDBOXES:
+	fputs("filledboxes\n", fp);
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
     case BOXERROR:
 	fputs("boxerrorbars\n", fp);
 	break;

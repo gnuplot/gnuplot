@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.13 1999/12/01 22:08:43 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.14 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -67,8 +67,8 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.13 1999/12/01 22:08:43 lh
 #include "util.h"
 
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
-static void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
-static void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static GP_INLINE void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static GP_INLINE void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
 static void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
 
 bitmap *b_p = (bitmap *) NULL;	/* global pointer to bitmap */
@@ -807,12 +807,39 @@ struct rgb web_color_rgbs[] =
  */
 
 
+#if USE_ULIG_FILLEDBOXES
+/* bitmaps used for filled boxes style (ULIG) */
+
+#define fill_bitmap_width 8
+#define fill_bitmap_height 8
+
+#define fill_halftone_num 5
+static unsigned char fill_halftone_bitmaps[fill_halftone_num][8] ={
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
+  { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },   /* 25% pattern */
+  { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },   /* 50% pattern */
+  { 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd },   /* 75% pattern */
+  { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }    /* solid pattern */
+};
+
+#define fill_pattern_num 7
+static unsigned char fill_pattern_bitmaps[fill_pattern_num][8] ={
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
+  { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 },   /* diagonal stripes (1) */
+  { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 },   /* diagonal stripes (2) */
+  { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 },   /* diagonal stripes (3) */
+  { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 },   /* diagonal stripes (4) */
+  { 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 },   /* diagonal stripes (5) */
+  { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }    /* diagonal stripes (6) */
+};
+#endif /* USE_ULIG_FILLEDBOXES */
+
 /*
  * set pixel (x, y, value) to value value (this can be 1/0 or a color number).
  */
-static void
+static GP_INLINE void
 b_setpixel(x, y, value)
-unsigned int x, y, value;
+    unsigned int x, y, value;
 {
     register unsigned int row;
     register unsigned char mask;
@@ -950,9 +977,9 @@ b_freebitmap()
 /*
  * set pixel at (x,y) with color b_value and dotted mask b_linemask.
  */
-static void
+static GP_INLINE void
 b_setmaskpixel(x, y, value)
-unsigned int x, y, value;
+    unsigned int x, y, value;
 {
     /* dotted line generator */
     if ((b_linemask >> b_maskcount) & (unsigned int) (1)) {
@@ -1200,3 +1227,83 @@ int ang;
     b_angle = (unsigned int) ang;
     return TRUE;
 }
+
+
+/* New function by ULIG */
+void 
+b_boxfill(style, x, y, w, h) 
+    int style;
+    unsigned int x, y, w, h;
+{
+    unsigned int ix, iy;
+
+#if USE_ULIG_FILLEDBOXES
+    int pixcolor, actpix, pat, mask, idx, bitoffs, shiftcnt;
+    unsigned char *fillbitmap;
+
+    switch( style & 0xf ) {
+    case 1:
+	/* style == 1 --> use halftone fill pattern according to filldensity */
+	/* filldensity is from 0..100 percent */
+	idx = (int) ((style >> 4) * (fill_halftone_num - 1) / 100 );
+	if( idx < 0 )
+	    idx = 0;
+	if( idx >= fill_halftone_num )
+	    idx = fill_halftone_num-1;
+	fillbitmap = fill_halftone_bitmaps[idx];
+	pixcolor = b_value;
+	break;
+    case 2:
+	/* style == 2 --> use fill pattern according to fillpattern */
+	idx = (style >> 4);  /* fillpattern is enumerated */
+	if( idx < 0 )
+	    idx = 0;
+	/* HBB 20010817: wrap around instead of forcing to zero, as in
+	 * Uli's original version. This is closer to the usual gnuplot
+	 * way of doing things. */
+	idx %= fill_pattern_num;
+	fillbitmap = fill_pattern_bitmaps[idx];
+	pixcolor = b_value;
+	break;
+    default:
+	/* style == 0 or unknown --> fill with background color */
+	fillbitmap = fill_halftone_bitmaps[0];
+	pixcolor = 0;
+    }
+
+    /* this implements a primitive raster generator, which plots the */
+    /* bitmaps point by point calling b_setpixel(). Perhaps someone */
+    /* will implement a more efficient solution */
+  
+    bitoffs=0;
+    for( iy = y; iy < y+h; iy ++ ) { /* box height */
+	pat = fillbitmap[bitoffs % fill_bitmap_width];
+	bitoffs++;
+	mask = 1 << (fill_bitmap_width - 1);
+	shiftcnt = 0;
+	for(ix = x; ix < x+w; ix ++) { /* box width */
+	    /* actual pixel = 0 or color, according to pattern */
+	    actpix = (pat & mask) ? pixcolor : 0; 
+	    mask >>= 1;
+	    if( mask == 0 ) {
+		mask = 1 << (fill_bitmap_width - 1);
+	    }
+	    b_setpixel(ix, iy, actpix);
+	}
+    }
+
+#else  /* ! USE_ULIG_FILLEDBOXES */
+
+    /* HBB 20010817: provide 'classical' implementation instead: */
+    (void) style;			/* unused */
+    for(iy = y + h - 1; iy >= y; iy-- ) { /* box height */
+	for(ix = x + w - 1; ix >= x; ix-- ) { /* box width */
+	    b_setpixel(ix, iy, 0);
+	}
+    }
+  
+#endif /* USE_ULIG_FILLEDBOXES */
+}
+
+
+

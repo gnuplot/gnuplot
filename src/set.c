@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.60 2001/08/13 14:04:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.61 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -75,6 +75,9 @@ static void set_autoscale __PROTO((void));
 static void set_bars __PROTO((void));
 static void set_border __PROTO((void));
 static void set_boxwidth __PROTO((void));
+#if USE_ULIG_FILLEDBOXES
+static void set_fillstyle __PROTO((void));
+#endif
 static void set_clabel __PROTO((void));
 static void set_clip __PROTO((void));
 static void set_cntrparam __PROTO((void));
@@ -161,17 +164,17 @@ set_command()
 {
     static char GPFAR setmess[] = 
     "valid set options:  [] = choose one, {} means optional\n\n\
-\t'angles',  'arrow',  'autoscale',  'bars',  'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'style',\n\
-\t'dgrid3d',  'dummy',  'encoding',  'format', 'grid', 'hidden3d',\n\
-\t'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
-\t'locale',  'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
-\t'multiplot',  'offsets', 'origin', 'output', 'palette', 'parametric',\n\
+\t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
+\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour',\n\
+\t'dgrid3d', 'dummy', 'encoding', 'format', 'grid',\n\
+\t'hidden3d', 'historysize', 'isosamples', 'key', 'label',  'locale',\n\
+\t'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
+\t'multiplot', 'offsets', 'origin', 'output', 'palette', 'parametric',\n\
 \t'pm3d', 'pointsize', 'polar', '[rtuv]range', 'samples', 'size',\n\
-\t'surface', 'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp',\n\
-\t'timefmt', 'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
-\t'[xyz,cb]{2}range', '{no}{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
-\t'{[xyz]{2}}zeroaxis', 'zero'";
+\t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
+\t'timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
+\t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
+\t'[xyz]{2}[md]tics', '{[xyz]{2}}zeroaxis', 'zero'";
 
     c_token++;
 
@@ -922,15 +925,70 @@ set_boxwidth()
     struct value a;
 
     c_token++;
-    if (END_OF_COMMAND)
+    if (END_OF_COMMAND) {
 	boxwidth = -1.0;
-    else {
-	/* if((boxwidth = real(const_express(&a))) != -2.0) */
-	/* boxwidth = magnitude(const_express(&a));*/
+#if USE_ULIG_RELATIVE_BOXWIDTH
+        boxwidth_is_absolute = TRUE;
+#endif /* USE_ULIG_RELATIVE_BOXWIDTH */
+    } else {
 	boxwidth = real(const_express(&a));
     }
+#if USE_ULIG_RELATIVE_BOXWIDTH
+    if (END_OF_COMMAND)
+        return;
+    else {
+	if (almost_equals(c_token, "a$bsolute"))
+	    boxwidth_is_absolute = TRUE;
+	else if (almost_equals(c_token, "r$elative"))
+	    boxwidth_is_absolute = FALSE;
+	else
+	    int_error(c_token, "expecting 'absolute' or 'relative' ");
+    }
+    c_token++;
+#endif  /* USE_ULIG_RELATIVE_BOXWIDTH */
 }
 
+#if USE_ULIG_FILLEDBOXES
+/* process 'set style filling' command (ULIG) */
+static void
+set_fillstyle()
+{
+    struct value a;
+
+    c_token++;
+    if (END_OF_COMMAND) {
+	fillstyle = 1;
+    } else if (almost_equals(c_token, "e$mpty")) {
+	fillstyle = 0;
+	c_token++;
+    } else if (almost_equals(c_token, "s$olid")) {
+	fillstyle = 1;
+	c_token++;
+	if (END_OF_COMMAND)
+	    filldensity = 100;
+	else {
+	    /* user sets 0...1, but is stored as an integer 0..100 */
+	    filldensity = 100.0 * real(const_express(&a)) + 0.5;
+	    if( filldensity < 0 )
+		filldensity = 0; 
+	    if( filldensity > 100 )
+		filldensity = 100;
+	}
+    } else if (almost_equals(c_token, "p$attern")) {
+	fillstyle = 2;
+	c_token++;
+	if (END_OF_COMMAND)
+	    fillpattern = 0;
+	else {
+	    fillpattern = real(const_express(&a));
+	    if( fillpattern < 0 )
+		fillpattern = 0;
+	}
+    } else
+	int_error(c_token, "expecting 'empty', 'solid' or 'pattern'");
+    
+}
+#endif /* USE_ULIG_FILLEDBOXES */
 
 /* process 'set clabel' command */
 static void
@@ -2647,19 +2705,37 @@ set_style()
 {
     c_token++;
 
-    if (almost_equals(c_token, "d$ata"))
+    switch(lookup_table(&show_style_tbl[0],c_token)){
+    case SHOW_STYLE_DATA:
 	data_style = get_style();
-    else if (almost_equals(c_token, "f$unction")) {
-	enum PLOT_STYLE temp_style = get_style();
+	break;
+    case SHOW_STYLE_FUNCTION:
+	{
+	    enum PLOT_STYLE temp_style = get_style();
 
-	if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
-	    int_error(c_token, "style not usable for function plots, left unchanged");
-	else 
-	    func_style = temp_style;
-    } else if (almost_equals(c_token, "l$ine")) {
+	    if (temp_style & PLOT_STYLE_HAS_ERRORBAR)
+		int_error(c_token, "style not usable for function plots, left unchanged");
+	    else 
+		func_style = temp_style;
+	    break;
+	}
+    case SHOW_STYLE_LINE:
 	set_linestyle();
-    } else
-	int_error(c_token, "expecting 'data', 'function', or 'line'");
+	break;
+#if USE_ULIG_FILLEDBOXES
+    case SHOW_STYLE_FILLING:
+	set_fillstyle();
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
+    default:
+	int_error(c_token,
+#if USE_ULIG_FILLEDBOXES
+		  "expecting 'data', 'function', 'line' or 'filling'"
+#else
+		  "expecting 'data', 'function' or 'line'"
+#endif /* USE_ULIG_FILLEDBOXES */
+		  );
+    }
 }
 
 

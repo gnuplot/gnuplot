@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.19 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.20 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -67,6 +67,9 @@ static void unset_bars __PROTO((void));
 static void unset_border __PROTO((void));
 
 static void unset_boxwidth __PROTO((void));
+#if USE_ULIG_FILLEDBOXES
+static void unset_fillstyle __PROTO((void));
+#endif /* USE_ULIG_FILLEDBOXES */
 static void unset_clabel __PROTO((void));
 static void unset_clip __PROTO((void));
 static void unset_cntrparam __PROTO((void));
@@ -596,7 +599,22 @@ static void
 unset_boxwidth()
 {
     boxwidth = -1.0;
+#if USE_ULIG_RELATIVE_BOXWIDTH
+    boxwidth_is_absolute = TRUE;
+#endif
 }
+
+
+#if USE_ULIG_FILLEDBOXES
+/* process 'unset fillstyle' command */
+static void
+unset_fillstyle()
+{
+    fillstyle = 1;
+    filldensity = 100;
+    fillpattern = 0;
+}
+#endif /* USE_ULIG_FILLEDBOXES */
 
 
 /* process 'unset clabel' command */
@@ -1129,18 +1147,41 @@ unset_style()
         func_style = LINES;
 	while (first_linestyle != NULL)
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
-    } else if (almost_equals(c_token, "d$ata"))
-        data_style = POINTSTYLE;
-    else if (almost_equals(c_token, "f$unction"))
-        func_style = LINES;
-    else if (almost_equals(c_token, "l$ine")) {
-	while (first_linestyle != NULL)
-	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
-    } else 
-        int_error(c_token, "expecting 'data', 'function', or 'line'");
+#if USE_ULIG_FILLEDBOXES
+	unset_fillstyle();
+#endif
+	c_token++;
+	return;
+    } 
 
     c_token++;
-
+    switch(lookup_table(show_style_tbl, c_token)){
+    case SHOW_STYLE_DATA:
+        data_style = POINTSTYLE;
+	c_token++;
+	break;
+    case SHOW_STYLE_FUNCTION:
+        func_style = LINES;
+	c_token++;
+	break;
+    case SHOW_STYLE_LINE:
+	while (first_linestyle != NULL)
+	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+#if USE_ULIG_FILLEDBOXES
+	c_token++;
+	break;
+    case SHOW_STYLE_FILLING:
+	unset_fillstyle();
+	c_token++;
+	    break;
+#endif /* USE_ULIG_FILLEDBOXES */
+    default:
+#if USE_ULIG_FILLEDBOXES
+        int_error(c_token, "expecting 'data', 'function', 'line' or 'filling'");
+#else
+        int_error(c_token, "expecting 'data', 'function', or 'line'");
+#endif /* USE_ULIG_FILLEDBOXES */
+    }
 }
 
 

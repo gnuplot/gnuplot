@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.44 2001/08/22 13:30:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.45 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -822,6 +822,9 @@ do_3dplot(plots, pcount, quick)
 	    }
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
+#if USE_ULIG_FILLEDBOXES
+	    case FILLEDBOXES:	/* can't do filledboxes in 3d yet so use impulses */
+#endif /* USE_ULIG_FILLEDBOXES */
 	    case IMPULSES:
 		{
 		    if (lkey) {
@@ -951,6 +954,9 @@ do_3dplot(plots, pcount, quick)
 		    case IMPULSES:
 		    case LINES:
 		    case BOXES:	/* HBB: I think these should be here... */
+#if USE_ULIG_FILLEDBOXES
+		    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 		    case STEPS:
 		    case FSTEPS:
 		    case HISTEPS:
@@ -997,6 +1003,9 @@ do_3dplot(plots, pcount, quick)
 			    case LINES:
 			    case LINESPOINTS:
 			    case BOXES:	/* HBB: these should be treated as well... */
+#if USE_ULIG_FILLEDBOXES
+			    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 			    case STEPS:
 			    case FSTEPS:
 			    case HISTEPS:
@@ -1029,6 +1038,9 @@ do_3dplot(plots, pcount, quick)
 		    /* now draw the contour */
 		    switch (this_plot->plot_style) {
 		    case BOXES:
+#if USE_ULIG_FILLEDBOXES
+		    case FILLEDBOXES:
+#endif /* USE_ULIG_FILLEDBOXES */
 			/* treat boxes like impulses: */
 		    case IMPULSES:
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);
@@ -2263,7 +2275,7 @@ xtick_callback(axis, place, text, grid)
 	    v2.y -= tic_unity * (t->v_tic) * ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2, y2, text, just);
+	clip_put_text_just(x2, y2, text, just, JUST_TOP);
     }
 
 #ifdef PM3D
@@ -2341,7 +2353,7 @@ ytick_callback(axis, place, text, grid)
 	    v2.y -= tic_unity * (t->v_tic) * ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2, y2, text, just);
+	clip_put_text_just(x2, y2, text, just, JUST_TOP);
     }
 
 #ifdef PM3D
@@ -2397,7 +2409,7 @@ ztick_callback(axis, place, text, grid)
 	x1 -= (term->h_tic) * 2;
 	if (!tic_in)
 	    x1 -= (term->h_tic) * ticscale;
-	clip_put_text_just(x1, y1, text, RIGHT);
+	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE);
     }
 
     if (Z_AXIS.ticmode & TICS_MIRROR) {

@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.23 2000/10/31 19:59:32 joze Exp $
+ * $Id: fig.trm,v 1.24 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -83,6 +83,7 @@ TERM_PUBLIC void FIG_pointsize __PROTO((double arg_pointsize));
 TERM_PUBLIC void FIG_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void FIG_reset __PROTO((void));
 TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void FIG_boxfill __PROTO((int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h));
 #ifdef PM3D
 TERM_PUBLIC int FIG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void FIG_previous_palette (void); */
@@ -127,8 +128,8 @@ TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
 /* none: -2; background: -1; 0..31: foreground colors */
 /* This could probably be dropped with the support of GIFs. */
 #define FIG_TRUERES (FIG_inches ? FIG_IRES : FIG_MRES) /* ACZ */
+#define FIG_DEFAULTVERSION "3.2"
 
-#define FIG_MAGIC       "#FIG 3.2" /* new file format - ACZ */
 #define FIG_HTIC(inch)  ((inch) ? (5*FIG_IRES)/80 : (15*FIG_MRES)/100)
 #define FIG_VTIC(inch)  ((inch) ? (5*FIG_IRES)/80 : (15*FIG_MRES)/100)
 #define FIG_FONT_S      (10)	/* size in points */
@@ -142,6 +143,15 @@ TERM_PUBLIC void FIG_filled_polygon (int, gpiPoint *);
 
 #define FIG_VCHAR       FIG_to_pixel_v(INCH,FIG_FONT_S)	/* just for default, */
 #define FIG_HCHAR       FIG_to_pixel_h(INCH,FIG_FONT_S)	/* not really used   */
+
+/* Text flags (ULIG) */
+enum FIG_TEXT_STYLEBITS {
+    FIG_TEXT_RIGID      = 1<<0, 
+    FIG_TEXT_SPECIAL    = 1<<1, 
+    FIG_TEXT_POSTSCRIPT = 1<<2,
+    FIG_TEXT_HIDDEN     = 1<<3
+};
+#define FIG_TEXT_NORMAL      FIG_TEXT_POSTSCRIPT
 
 enum FIG_poly_stat {
     FIG_poly_new, FIG_poly_part
@@ -201,6 +211,9 @@ static int FIG_yoff = FIG_YOFF(INCH);
 static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
 static int FIG_inches = INCH;
+static int FIG_text_flags = FIG_TEXT_NORMAL;    /* whether text is special or hidden etc. */
+static char FIG_version[MAX_ID_LEN+1] = FIG_DEFAULTVERSION;  /* file format version */
+static int FIG_solid = FALSE;                   /* dashed lines or not */
 #ifdef PM3D
 static int FIG_palette_set = FALSE;	/* PM3D Palette Set ? */
 static int FIG_palette_size = 128;	/* Number of colours in palette */
@@ -220,25 +233,34 @@ enum FIG_id {
     FIG_PORTRAIT, FIG_LANDSCAPE,
     FIG_SIZE, FIG_FONTSIZE,
     FIG_THICKNESS, FIG_DEPTH, FIG_POINTSMAX,
-    FIG_OTHER
+    FIG_SOLID, FIG_DASHED,
+    FIG_NORMALTEXT, FIG_SPECIALTEXT, FIG_HIDDENTEXT, FIG_RIGIDTEXT,
+    FIG_VERSION, FIG_OTHER
 };
 
 static struct gen_table FIG_opts[] =
 {
-    { "mo$nochrome", FIG_MONOCHROME },
+    { "b$ig", FIG_BIG },
     { "c$olor", FIG_COLOR },
     { "c$olour", FIG_COLOR },
-    { "sm$all", FIG_SMALL },
-    { "b$ig", FIG_BIG },
-    { "in$ches", FIG_INCHES },
-    { "me$tric", FIG_METRIC },
-    { "por$trait", FIG_PORTRAIT },
-    { "l$andscape", FIG_LANDSCAPE },
-    { "si$ze", FIG_SIZE },
+    { "da$shed", FIG_DASHED },
+    { "de$pth", FIG_DEPTH },
     { "f$ontsize", FIG_FONTSIZE },
-    { "t$hickness", FIG_THICKNESS },
-    { "d$epth", FIG_DEPTH },
+    { "in$ches", FIG_INCHES },
+    { "l$andscape", FIG_LANDSCAPE },
+    { "me$tric", FIG_METRIC },
+    { "mo$nochrome", FIG_MONOCHROME },
     { "poi$ntsmax", FIG_POINTSMAX },
+    { "por$trait", FIG_PORTRAIT },
+    { "si$ze", FIG_SIZE },
+    { "sm$all", FIG_SMALL },
+    { "so$lid", FIG_SOLID },
+    { "t$hickness", FIG_THICKNESS },
+    { "texth$idden", FIG_HIDDENTEXT },
+    { "textn$ormal", FIG_NORMALTEXT },
+    { "textr$igid", FIG_RIGIDTEXT },
+    { "texts$pecial", FIG_SPECIALTEXT },
+    { "v$ersion", FIG_VERSION },
     { NULL, FIG_OTHER }
 };
 
@@ -250,14 +272,17 @@ FIG_options()
     static const char *options_list =
     "expecting monochrome, color, small, big, portrait, landscape,\n\
  \t inches, metric, size <number> <number>,  fontsize <number>,\n\
- \t thickness <numer>, depth <number> or pointsmax <number>";
+ \t solid, dashed, textnormal, textspecial, texthidden, textrigid,\n\
+ \t thickness <numer>, depth <number>, pointsmax <number> or\n\
+ \t version <number>";
 
     int parse_error = FALSE;
     long temp_max;
     struct value a;
     unsigned int tmax_t;
     double xsize_t, ysize_t;
-
+    char text_flags[256]; /* for description only */
+ 
     FIG_use_color = FALSE;	/* default */
     FIG_is_big = FALSE;		/* default */
     FIG_portrait = FALSE;
@@ -265,6 +290,10 @@ FIG_options()
     FIG_default_thickness = 1;
     xsize_t = ysize_t = 0.;
     FIG_inches = INCH;
+    FIG_text_flags = FIG_TEXT_NORMAL;
+    FIG_solid = FALSE;
+    strcpy( FIG_version, FIG_DEFAULTVERSION );
+    
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&FIG_opts[0],c_token)) {
 	case FIG_MONOCHROME:
@@ -291,9 +320,32 @@ FIG_options()
 	    FIG_inches = FALSE;
 	    c_token++;
 	    break;
+	case FIG_SOLID:
+	    FIG_solid = TRUE;
+	    c_token++;
+	    break;
+	case FIG_DASHED:
+	    FIG_solid = FALSE;
+	    c_token++;
+	    break;
+	case FIG_NORMALTEXT:
+	    FIG_text_flags = FIG_TEXT_NORMAL;
+	    c_token++;
+	    break;
+	case FIG_SPECIALTEXT:
+	    FIG_text_flags |= FIG_TEXT_SPECIAL;
+            FIG_text_flags &= ~FIG_TEXT_POSTSCRIPT;
+	    c_token++;
+	    break;
+	case FIG_HIDDENTEXT:
+	    FIG_text_flags |= FIG_TEXT_HIDDEN;
+	    c_token++;
+	    break;
+	case FIG_RIGIDTEXT:
+	    FIG_text_flags |= FIG_TEXT_RIGID;
+	    c_token++;
+	    break;
 	case FIG_PORTRAIT:
-	    /* KB: Would have preferred "p$ortrait" but that would */
-	    /*     collide with "p$ointsmax" below. */
 	    FIG_portrait = TRUE;
 	    c_token++;
 	    break;
@@ -373,6 +425,19 @@ FIG_options()
 		}
 	    }
 	    break;
+	case FIG_VERSION:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		int_error(c_token, "version: 3.1 or 3.2 expected");
+	    } else {
+                copy_str( FIG_version, c_token, MAX_ID_LEN );
+                c_token++;
+                if( strcmp( FIG_version, "3.1" ) != 0 &&
+                    strcmp( FIG_version, "3.2" ) != 0 ) {
+                    int_error(c_token, "wrong version number, must be 3.1 or 3.2");
+                }
+	    }
+	    break;
 	case FIG_OTHER:
 	default:
 	    parse_error = TRUE;
@@ -381,16 +446,30 @@ FIG_options()
 	}
     }
 
-    sprintf(term_options, "%s %s %s %d %s %s %s %d %s %d %s %d",
+    if( FIG_text_flags == FIG_TEXT_NORMAL ) {
+        strcpy( text_flags, " textnormal" );
+    }
+    else {
+        sprintf( text_flags, "%s%s%s",
+                 (FIG_text_flags & FIG_TEXT_SPECIAL) ? " textspecial" : "",
+                 (FIG_text_flags & FIG_TEXT_HIDDEN) ? " texthidden" : "",
+                 (FIG_text_flags & FIG_TEXT_RIGID) ? " textrigid" : ""
+               );
+    }
+
+    sprintf(term_options, "%s %s %s %d %s %s %s%s %s %d %s %d %s %d %s %s",
 	    FIG_use_color ? "color" : "monochrome",
 	    FIG_is_big ? "big" : "small",
 	    "pointsmax",
 	    FIG_poly_vec_max + 1,
 	    FIG_portrait ? "portrait" : "landscape",
 	    FIG_inches ? "inches" : "metric",
+            FIG_solid ? "solid" : "dashed",
+	    text_flags,
 	    "fontsize", (FIG_font_s > 0 ? FIG_font_s :
 			 (FIG_is_big ? BFIG_FONT_S : FIG_FONT_S)),
-	    "thickness", FIG_default_thickness, "depth", FIG_depth);	/* JFS, KB */
+	    "thickness", FIG_default_thickness, "depth", FIG_depth,
+            "version", FIG_version );	/* JFS, KB, ULIG */
     if (xsize_t > 0. && ysize_t > 0.) {
 	if (xsize_t - (int) xsize_t == 0. && ysize_t - (int) ysize_t == 0.)
 	    sprintf(term_options + strlen(term_options),
@@ -502,17 +581,31 @@ FIG_init()
     FIG_line.pic = NULL;
     FIG_line.next = NULL;
 
-    fprintf(gpoutfile, "\
-%s\n\
-%s\n%s\n\
-%s\n%s\n\
-%.2f\n%s\n%d\n\
-%d %d\n",
-	    FIG_MAGIC,
-	    FIG_ORIENT, FIG_JUST,
-	    FIG_UNIT, FIG_PAPER,
-	    FIG_MAGNIFICATION, FIG_MULTIPAGE, FIG_TRANSCOLOR,
-	    FIG_IRES, FIG_COORD_SYS);
+    /* Add further versions headers below (ULIG). There is probably more work to be done */
+    /* than only changing the header in future xfig versions */
+
+    if( strcmp( FIG_version, "3.1" ) == 0 ) {
+        fprintf( gpoutfile,
+                 "#FIG 3.1\n%s\n%s\n%s\n%d %d\n",
+                 FIG_ORIENT,
+                 FIG_JUST,
+                 FIG_UNIT,
+                 FIG_IRES, FIG_COORD_SYS
+               );
+    }
+    else if( strcmp( FIG_version, "3.2" ) == 0 ) {
+        fprintf( gpoutfile,
+                 "#FIG 3.2\n%s\n%s\n%s\n%s\n%6.2f\n%s\n%d\n%d %d\n",
+                 FIG_ORIENT, 
+                 FIG_JUST,
+                 FIG_UNIT,
+                 FIG_PAPER,
+                 FIG_MAGNIFICATION, 
+                 FIG_MULTIPAGE,
+                 FIG_TRANSCOLOR,
+                 FIG_IRES, FIG_COORD_SYS
+               );
+    }
 }
 
 
@@ -552,7 +645,7 @@ FIG_text()
 
 TERM_PUBLIC void
 FIG_linetype(linetype)
-int linetype;			/* expect linetype >= -2 */
+    int linetype;		/* expect linetype >= -2 */
 {
     int last_FIG_type = FIG_type;
     int last_FIG_spacing = FIG_spacing;
@@ -580,13 +673,15 @@ int linetype;			/* expect linetype >= -2 */
 	}
     case -1:{
 	    FIG_type = DOTTED_LINE;
+            if( FIG_solid )
+                FIG_type = SOLID_LINE;
 	    FIG_spacing = 4.0;	/* gap */
 	    if (FIG_use_color)
 		FIG_color = BLACK;
 	    break;
 	}
     default:{
-/* now linetype >= 1 *//* shouldn't be negative anyway */
+	    /* now linetype >= 1 *//* shouldn't be negative anyway */
 	    FIG_linedepth = FIG_depth + linetype / 1000;
 	    linetype %= 1000;
 	    /* Thickness of lines is either included in the linetype */
@@ -605,6 +700,8 @@ int linetype;			/* expect linetype >= -2 */
 		FIG_type = (linetype)? linetype%2 + 1 : SOLID_LINE; /* dotted, dashed, ... */
 		FIG_spacing = (linetype + 1) / 2 * 3;
 	    }
+            if( FIG_solid )
+                FIG_type = SOLID_LINE;
 	    break;
 	}
     }
@@ -713,11 +810,10 @@ TBOOLEAN head;
 
 TERM_PUBLIC void
 FIG_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     char *s1, *s2, *output_string;
-    int has_latex_command = 0;
 
     if (strlen(str) == 0)
 	return;
@@ -731,15 +827,10 @@ const char *str;
     } while ( *(s1++) );
     FIG_poly_clean(FIG_polyvec_stat);
     y -= term->v_char / 2;	/* assuming vertical center justified */
-    /*
-     * gnuplot used to create SPECIAL_TEXT for all text strings, but this
-     * is really only needed if str contains LaTeX commands. we assume that
-     * a string contains LaTeX commands if it contains a backslash (may not
-     * be true in all cases, but it's probably a good enough first-order
-     * approximation :-)
-     */
-    if (strchr(output_string,'\\'))
-	has_latex_command = SPECIAL_TEXT;
+    
+    /* (old: we assume that a string contains LaTeX commands if it contains */
+    /* a backslash) --> obsoleted by 'textspecial' option (ULIG) */
+    /* (it is not nice to mix LaTeX and Postscript fonts) */
 
     /* HBB 990329: quick hack: 'O_TEXT' is in use by POSIX header
      * <fcntl.h>. Renamed to OBJ_TEXT */
@@ -747,7 +838,7 @@ const char *str;
 %d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
 	    OBJ_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
 	    FIG_ROMAN_FONT, (float) FIG_font_s,
-	    FIG_angle, has_latex_command, (float) term->v_char,
+	    FIG_angle, FIG_text_flags, (float) term->v_char,
 	    (float) term->h_char * strlen(str),
 	    FIG_xoff + x, term->ymax + FIG_yoff - y, output_string);
 
@@ -891,6 +982,54 @@ FIG_reset()
     fflush(gpoutfile);
 }
 
+TERM_PUBLIC void
+FIG_boxfill(style, x, y, w, h)   /* ULIG */
+    int style;
+    unsigned int x, y, w, h;
+{
+    int pen_color, fill_color, fill_style, fill_dens;
+    
+    FIG_poly_clean(FIG_polyvec_stat);
+
+#if USE_ULIG_FILLEDBOXES
+    switch( style & 0xf ) {
+    case 1: /* style == 1 --> filled with intensity according to filldensity */
+        pen_color = FIG_line.pen_color;
+        fill_color = FIG_line.pen_color;
+        fill_dens = style >> 4;
+        if( fill_dens < 0 ) fill_dens = 0;
+        if( fill_dens > 100 ) fill_dens = 100;
+        if( FIG_color == -1 || FIG_color == 0 )
+            /* default color or black: solid 0%...100% -> 0...20 */
+            fill_style = fill_dens / 5;
+        else
+            /* all other colors: solid 0%...100% -> 40...20 */
+            fill_style = 40 - fill_dens / 5;
+        break;
+    case 2: /* style == 2 --> filled with pattern according to fillpattern */
+        pen_color = FIG_line.pen_color;
+        fill_color = WHITE;
+        fill_style = 41 + ( ( (style>>4) < 0 ) ? 0 : style>>4 );
+        break;
+    default: /* style == 0 or unknown --> filled with background color */
+        pen_color = FIG_line.pen_color;
+        fill_color = WHITE;
+        fill_style = 20;
+    }
+
+    x = FIG_xoff + x;
+    y = term->ymax + FIG_yoff - y;
+
+    fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %6.3f %d %d %d %d %d %d\n"
+            "  %d %d %d %d %d %d %d %d %d %d\n",
+            O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
+            pen_color, fill_color, FIG_line.depth, FIG_line.pen_style,
+            fill_style, FIG_line.style_val, FIG_line.join_style,
+            FIG_line.cap_style, FIG_line.radius, 0, 0, 5,
+            x, y, x+w, y, x+w, y-h, x, y-h, x, y );
+#endif /* USE_ULIG_FILLEDBOXES */
+}
+
 #ifdef PM3D
 TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
 {
@@ -994,14 +1133,14 @@ TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(fig_driver)
-    "fig", "FIG 3.1 graphics language: X graphics editor",
+    "fig", "FIG graphics language for XFIG graphics editor",
     FIG_XMAX(INCH), FIG_YMAX(INCH), FIG_VCHAR, FIG_HCHAR,
     FIG_VTIC(INCH), FIG_HTIC(INCH), FIG_options, FIG_init, FIG_reset,
     FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
     FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
-    TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ , 0 /*fillbox */ ,
-    FIG_linewidth
+    TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ ,
+    FIG_boxfill, FIG_linewidth
 #ifdef PM3D
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */
@@ -1031,21 +1170,31 @@ START_HELP(fig)
 "                        {pointsmax <max_points>}",
 "                        {landscape | portrait}",
 "                        {metric | inches}",
+"                        {solid | dashed}",
 "                        {fontsize <fsize>}",
+"                        {textnormal | {textspecial texthidden textrigid} }",
 "                        {size <xsize> <ysize>}",
 "                        {thickness <units>}",
 "                        {depth <layer>}",
+"                        {version <number>}",
 "",
 " `monochrome` and `color` determine whether the picture is black-and-white or",
 " `color`.  `small` and `big` produce a 5x3 or 8x5 inch graph in the default",
 " `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.  <max_points>",
 " sets the maximum number of points per polyline.  Default units for editing",
-" with \"xfig\" may be `metric` or `inches`.  `fontsize` sets the size of the",
-" text font to <fsize> points.  `size` sets (overrides) the size of the drawing",
+" with \"xfig\" may be `metric` or `inches`. 'solid' inhibts automatic usage",
+" of dashed lines when solid linestyles are used up, which otherwise occurs.",
+"",
+" `fontsize` sets the size of the text font to <fsize> points.  `textnormal`",
+" resets the text flags and selects postscript fonts, `textspecial` sets the",
+" text flags for LaTeX specials, `texthidden` sets the hidden flag and",
+" `textrigid` the rigid flag.  `size` sets (overrides) the size of the drawing",
 " area to <xsize>*<ysize> in units of inches or centimeters depending on the",
-" `inches` or `metric` setting in effect.  `depth` sets the default depth layer",
-" for all lines and text.  The default depth is 10 to leave room for adding",
-" material with \"xfig\" on top of the plot.",
+" `inches` or `metric` setting in effect.  `depth` sets the default depth",
+" layer for all lines and text.  The default depth is 10 to leave room for",
+" adding material with \"xfig\" on top of the plot.  'version' sets the format",
+" version of the generated fig output. Currently only versions 3.1 and 3.2 are",
+" supported.",
 "",
 " `thickness` sets the default line thickness, which is 1 if not specified.",
 " Overriding the thickness can be achieved by adding a multiple of 100 to the",

@@ -1,5 +1,5 @@
 /*
- * $Id: bitmap.h,v 1.10 2000/11/01 18:57:27 broeker Exp $
+ * $Id: bitmap.h,v 1.11 2001/08/22 14:15:33 broeker Exp $
  */
 
 /* GNUPLOT - bitmap.h */
@@ -106,5 +106,6 @@ void b_move __PROTO((unsigned int, unsigned int));
 void b_vector __PROTO((unsigned int, unsigned int));
 void b_put_text __PROTO((unsigned int, unsigned int, const char *));
 int b_text_angle __PROTO((int));
+void b_boxfill __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 
 #endif /* GNUPLOT_BITMAP_H */

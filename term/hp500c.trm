@@ -1,5 +1,5 @@
 /*
- * $Id: hp500c.trm,v 1.11 1999/08/07 17:19:11 lhecking Exp $
+ * $Id: hp500c.trm,v 1.12 1999/12/10 16:59:48 lhecking Exp $
  *
  */
 
@@ -79,10 +79,6 @@ TERM_PUBLIC void HP500C_reset __PROTO((void));
 TERM_PUBLIC void HP500C_linetype __PROTO((int linetype));
 TERM_PUBLIC void HP500C_graphics __PROTO((void));
 TERM_PUBLIC void HP500C_text __PROTO((void));
-#define HP500C_text_angle b_text_angle
-#define HP500C_put_text b_put_text
-#define HP500C_move b_move
-#define HP500C_vector b_vector
 /* default values for term_tbl */
 #define HP500C_75PPI_XMAX (1920/4)
 #define HP500C_75PPI_YMAX (1920/4)
@@ -520,9 +516,10 @@ TERM_TABLE_START(hp500c_driver)
     HP500C_75PPI_XMAX, HP500C_75PPI_YMAX, HP500C_75PPI_VCHAR,
     HP500C_75PPI_HCHAR, HP500C_75PPI_VTIC, HP500C_75PPI_HTIC, HP500C_options,
     HP500C_init, HP500C_reset, HP500C_text, null_scale,
-    HP500C_graphics, HP500C_move, HP500C_vector, HP500C_linetype,
-    HP500C_put_text, HP500C_text_angle, null_justify_text, do_point,
-    do_arrow, set_font_null, 0, TERM_BINARY
+    HP500C_graphics, b_move, b_vector, HP500C_linetype,
+    b_put_text, b_text_angle, null_justify_text, do_point,
+    do_arrow, set_font_null, 0, TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(hp500c_driver)
 
 #undef LAST_TERM

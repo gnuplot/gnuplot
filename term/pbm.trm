@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.16 1999/08/24 11:24:56 lhecking Exp $
+ * $Id: pbm.trm,v 1.17 1999/12/10 16:59:48 lhecking Exp $
  *
  */
 
@@ -420,21 +420,17 @@ int point;
 
 #ifdef TERM_TABLE
 
-#define PBM_move b_move
-#define PBM_vector b_vector
-#define PBM_text_angle b_text_angle
-#define PBM_put_text b_put_text
-
 TERM_TABLE_START(pbm_driver)
     "pbm", "Portable bitmap [small medium large] [monochrome gray color]",
     PBM_XMAX, PBM_YMAX, PBM_VCHAR,
     PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBM_options,
     PBM_init, PBM_reset, PBM_text, null_scale,
-    PBM_graphics, PBM_move, PBM_vector, PBM_linetype,
-    PBM_put_text, PBM_text_angle, null_justify_text, PBM_point,
+    PBM_graphics, b_move, b_vector, PBM_linetype,
+    b_put_text, b_text_angle, null_justify_text, PBM_point,
     do_arrow, set_font_null,
     0,				/* pointsize */
-    TERM_CAN_MULTIPLOT | TERM_BINARY
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0, 0, b_boxfill
 TERM_TABLE_END(pbm_driver)
 
 #undef LAST_TERM

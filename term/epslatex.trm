@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.7 2000/11/15 15:51:06 mikulik Exp $
+ * $Id: epslatex.trm,v 1.8 2000/11/20 09:47:07 mikulik Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -896,6 +896,8 @@ EPSL_fillbox(style, x1, y1, x2, y2)
 int style;
 unsigned int x1, y1, x2, y2;
 {
+    /* ULIG: the style parameter is now used for the fillboxes style
+    * (not implemented here), see the documentation */
     EPSL_FLUSH_PATH fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, x2, y2);
 
     EPSL_relative_ok = 0;

@@ -150,6 +150,13 @@ TBOOLEAN parametric = FALSE;
 
 TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
 
+#if USE_ULIG_FILLEDBOXES
+/* filledboxes parameters (ULIG) */
+int fillstyle = 1;
+int filldensity = 100;
+int fillpattern = 0;
+#endif /* USE_ULIG_FILLEDBOXES */
+
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
 /*****************************************************************/
@@ -242,19 +249,18 @@ char *str;
 
 /* seems sensible to put the justification in here too..? */
 void
-clip_put_text_just(x, y, str, just)
-unsigned int x, y;
-char *str;
-enum JUSTIFY just;
+clip_put_text_just(x, y, str, just, vert_just)
+    unsigned int x, y;
+    char *str;
+    JUSTIFY just;
+    VERT_JUSTIFY vert_just;
 {
     register struct termentry *t = term;
+
     if (clip_point(x, y))
 	return;
-    if (!(*t->justify_text) (just)) {
-	assert(CENTRE == 1 && RIGHT == 2);
-	x -= (t->h_char * strlen(str) * just) / 2;
-    }
-    (*t->put_text) (x, y, str);
+    
+    write_multiline(x, y, str, just, vert_just, 0, NULL);
 }
 
 
