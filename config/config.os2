@@ -442,6 +442,20 @@
 /* Define if you want to have Uli Gruenebaum's relative boxwidth. */
 #define USE_ULIG_RELATIVE_BOXWIDTH 1
 
+/* Define if you want to support files in binary format. */
+#define BINARY_DATA_FILE 1
+
+/* Define if you want the x11 driver to transfer polygon information in binary
+   format. (pm3d must also be enabled for palette color fills.) */
+#define BINARY_X11_POLYGON 1
+ 
+/* Define if you want to have image plotting support. */
+#define WITH_IMAGE 1
+
+/* Define if you want the image routine to check all pixel locations, not just
+   corners. */
+#define WITH_IMAGE_VERIFY_ALL_PIXEL_LOCATIONS 1
+
 /* Version number of package */
 /* #undef VERSION */
 

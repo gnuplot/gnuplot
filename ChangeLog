@@ -1,3 +1,8 @@
+2004-09-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.cyg config/config.mgw config/config.os2: Added #defines
+	for "with image".
+
 2004-09-03  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/breaders.c src/datafile.c: Get rid of compiler warnings.
