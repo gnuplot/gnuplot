@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.17 1998/12/03 22:22:14 lhecking Exp $
+ * $Id: stdfn.h,v 1.17.2.1 1999/10/15 16:04:51 lhecking Exp $
  *
  */
 
@@ -244,6 +244,23 @@ int pclose __PROTO((FILE *));
 
 #ifndef NO_MATH_H
 # include <math.h>
+#endif
+
+/* Normally in <math.h> */
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+#ifndef M_PI_2
+# define M_PI_2 1.57079632679489661923
+#endif
+
+#ifndef HAVE_STRCASECMP
+# ifdef HAVE_STRICMP
+#  define strcasecmp stricmp
+# else
+int gp_stricmp __PROTO((const char *, const char *));
+#  define strcasecmp gp_stricmp
+# endif
 #endif
 
 #ifndef HAVE_STRNICMP
