@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.131 2005/03/09 18:26:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.132 2005/03/26 22:06:50 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -435,7 +435,7 @@ static void DisplayCoords __PROTO((plot_struct *, const char *));
 
 static TBOOLEAN is_meta __PROTO((KeySym));
 static char* getMultiTabConsoleSwitchCommand __PROTO((unsigned long *));
-#endif
+#endif /* USE_MOUSE */
 
 static void DrawRotated __PROTO((plot_struct *, Display *, GC,
 				 int, int, const char *, int));
@@ -4232,11 +4232,13 @@ process_event(XEvent *event)
 		break;
 #endif
 	    case 'q':
+#ifdef USE_MOUSE
 		/* If the "-ctrlq" resource is set, ignore q unless control key is also pressed */
 		if (ctrlq && !(modifier_mask & Mod_Ctrl)) {
 		    FPRINTF((stderr,"ignoring q, modifier_mask = %o\n",modifier_mask));
 		    break;
 		}
+#endif
 		/* close X window */
 		Remove_Plot_From_Linked_List(event->xkey.window);
 		return;
@@ -4432,7 +4434,6 @@ process_event(XEvent *event)
     case KeyRelease:
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
-#endif
 	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
 	if (is_meta(keysym)) {
 	    plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
@@ -4440,6 +4441,7 @@ process_event(XEvent *event)
 	    if (plot)
 		XDefineCursor(dpy, plot->window, cursor);
 	}
+#endif
 	break;
 
     case ClientMessage:

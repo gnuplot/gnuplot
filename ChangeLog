@@ -1,5 +1,8 @@
 2005-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/gplt_x11.c (process_event) [!USE_MOUSE]: don't refer to
+	objects and functions not defined in this case.
+
 	* src/plot3d.c (eval_3dplots) [!GP_STRING_VARS]: Don't call
 	isstringvar() if feature disabled.
 
