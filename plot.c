@@ -765,21 +765,21 @@ static void get_user_env ()
 /* expand tilde in path
  * path cannot be a static array!
  */
-void gp_expand_tilde (path, pathsize)
-char *path;
+void gp_expand_tilde (pathp, pathsize)
+char **pathp;
 size_t pathsize;
 {
-    if (path[0] == '~' && path[1] == DIRSEP1) {
+    if ((*pathp)[0] == '~' && (*pathp)[1] == DIRSEP1) {
 
 	if (user_homedir) {
-	    size_t n = strlen(path);
+	    size_t n = strlen(*pathp);
 
 	    if (n + strlen(user_homedir) >= pathsize)
-		path = gp_realloc (path, n - 1 + strlen(user_homedir), "tilde expanded path");
+		*pathp = gp_realloc (*pathp, n - 1 + strlen(user_homedir), "tilde expanded path");
 
 	    /* include null at end ... */
-	    memmove (path + strlen(user_homedir) - 1, path, n+1);
-	    strncpy (path, user_homedir, strlen(user_homedir));
+	    memmove (*pathp + strlen(user_homedir) - 1, *pathp, n+1);
+	    strncpy (*pathp, user_homedir, strlen(user_homedir));
         }
         else
 	    int_warn ("HOME not set - cannot expand tilde", NO_CARET);
