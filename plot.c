@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $";
+static char *RCSid = "$Id: plot.c,v 1.18 1998/12/09 15:24:14 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -84,7 +84,7 @@ char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NU
 
 char *infile_name = NULL;	/* name of command file; NULL if terminal */
 
-#ifdef GNU_READLINE
+#ifdef HAVE_LIBREADLINE
 extern char *rl_readline_name;
 extern int rl_complete_with_tilde_expansion;
 #endif
@@ -216,6 +216,8 @@ static struct udvt_entry udv_pi = { NULL, "pi", FALSE };
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
+static int exit_status = EXIT_SUCCESS;
+
 #ifdef OS2
 # define INCL_DOS
 # define INCL_REXXSAA
@@ -255,6 +257,54 @@ int anint;
     longjmp(command_line_env, TRUE);	/* return to prompt */
 #endif
 }
+
+#ifdef LINUXVGA
+/* utility functions to ensure that setuid gnuplot
+ * assumes root privileges only for those parts
+ * of the code which require root rights.
+ *
+ * By "Dr. Werner Fink" <werner@suse.de>
+ */
+static uid_t euid, ruid;
+static gid_t egid, rgid;
+static int asked_privi = 0;
+
+void
+drop_privilege()
+{
+    if (!asked_privi) {
+	euid = geteuid();
+	egid = getegid();
+	ruid = getuid();
+	rgid = getgid();
+	asked_privi = 1;
+    }
+    if (setegid(rgid) == -1)
+	(void) fprintf(stderr, "setegid(%d): %s\n",
+		       (int) rgid, strerror(errno));
+    if (seteuid(ruid) == -1)
+	(void) fprintf(stderr, "seteuid(%d): %s\n",
+		       (int) ruid, strerror(errno));
+}
+
+void
+take_privilege()
+{
+    if (!asked_privi) {
+	euid = geteuid();
+	egid = getegid();
+	ruid = getuid();
+	rgid = getgid();
+	asked_privi = 1;
+    }
+    if (setegid(egid) == -1)
+	(void) fprintf(stderr, "setegid(%d): %s\n",
+		       (int) egid, strerror(errno));
+    if (seteuid(euid) == -1)
+	(void) fprintf(stderr, "seteuid(%d): %s\n",
+		       (int) euid, strerror(errno));
+}
+#endif /* LINUXVGA */
 
 
 /* a wrapper for longjmp so we can keep everything local */
@@ -329,7 +379,7 @@ char **argv;
     unsigned int status[2] = { 1, 0 };
 #endif
 
-#ifdef GNU_READLINE
+#ifdef HAVE_LIBREADLINE
     rl_readline_name = argv[0];
     rl_complete_with_tilde_expansion = 1;
 #endif
@@ -417,6 +467,9 @@ char **argv;
 	    fprintf(stderr, "\nTerminal type set to '%s'\n", term->name);
     } else {
 	/* come back here from int_error() */
+	if (interactive == FALSE)
+	    exit_status = EXIT_FAILURE;
+
 #ifdef AMIGA_SC_6_1
 	(void) rawcon(0);
 #endif
@@ -499,7 +552,7 @@ char **argv;
     if (aesid > -1)
 	atexit(appl_exit);
 #endif
-    return (IO_SUCCESS);
+    return (exit_status);
 }
 
 #if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
