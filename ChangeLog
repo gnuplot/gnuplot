@@ -1,3 +1,14 @@
+2004-09-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_set_color PNG_image) term/pdf.trm (PDF_image)
+	term/post.trm (PS_image): Change call from rgb255_from_gray() to
+	rgb255maxcolors_from_gray(). Fixes color mapping with 'set palette
+	maxcolors'.
+
+	* src/getcolor.c: Remove unused routine rgb255_from_gray.
+
+	* term/gd.trm: Add WITH_IMAGE support for gif terminal also.
+
 2004-09-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Add new binary demo files to Makefile.am
@@ -187,7 +198,7 @@
 	altered to use the same scheme to reduce the amount of characters
 	inside the plot buffer.
 
-2004-08-25  Per Persson <persquare@mac.com>
+2004-08-27  Per Persson <persquare@mac.com>
 
 	* src/term.c (init_terminal): Make aqua the default terminal on
 	Mac OS X if AquaTerm is installed.

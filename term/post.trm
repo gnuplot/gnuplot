@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.123 2004/08/24 04:43:53 sfeam Exp $
+ * $Id: post.trm,v 1.124 2004/09/01 15:53:50 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3027,7 +3027,7 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	for (allocated = 0, i_tuple = 0; allocated < max_colors; allocated++, i_tuple--) {
 	    double gray = (double) allocated * fact;
 	    rgb255_color color;
-	    rgb255_from_gray( gray, &color );
+	    rgb255maxcolors_from_gray( gray, &color );
 	    if (!i_tuple) { fprintf(gpoutfile,"\n  "); i_tuple = TUPLES_PER_LINE; }
 	    fprintf(gpoutfile," %2.2x%2.2x%2.2x", (int)color.r, (int)color.g, (int)color.b);
 	}

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.19 2004/08/09 18:13:55 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.20 2004/09/01 15:53:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -366,20 +366,6 @@ rgb255_from_rgb1(rgb_color rgb1, rgb255_color *rgb255)
     rgb255->g = (unsigned char)(255 * rgb1.g + 0.5);
     rgb255->b = (unsigned char)(255 * rgb1.b + 0.5);
 }
-
-
-#ifdef WITH_IMAGE
-/*
- *  Convenience function to map gray values to R, G and B values in [0,255].
- */
-void
-rgb255_from_gray(double gray, rgb255_color *rgb255)
-{
-    rgb_color rgb1;
-    rgb1_from_gray(gray, &rgb1);
-    rgb255_from_rgb1(rgb1, rgb255);
-}
-#endif
 
 
 /*

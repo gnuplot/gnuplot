@@ -9,7 +9,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW variant of plot "with filledcurves" that fills the area between two curves
 * NEW variant of "with filledcurves" that fills only above or below the curve
 * NEW using options {x|y|z}ticlabels(<col>)
-* NEW option to read plot title from datafile: set key autotitle columnheader
+* NEW option to read plot title from data file: set key autotitle columnheader
 * NEW command 'set termoption <foo>' changes single property of current terminal
 * NEW png driver supports antialiasing and TrueColor images
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
@@ -17,6 +17,7 @@ News, changes and fixes since gnuplot version 4.0
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
 * FIXED emf output is compatible with MSWin XP SP 2
+* FIXED limit size of X11 requests to half the maximum allowed by the X display
 
 
 Changes between gnuplot versions 3.7.2 and 4.0

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.36 2004/08/24 05:02:54 sfeam Exp $
+ * $Id: pdf.trm,v 1.37 2004/09/01 15:53:50 mikulik Exp $
  */
 
 /*------------------------------
@@ -1198,7 +1198,7 @@ PDF_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
     } else {
         for (i=0, pixel=rawrgb; i< N*M; i++) {
 	    rgb255_color rgb;
-	    rgb255_from_gray(image[i], &rgb);
+	    rgb255maxcolors_from_gray(image[i], &rgb);
 	    *pixel++ = rgb.r;
 	    *pixel++ = rgb.g;
 	    *pixel++ = rgb.b;
