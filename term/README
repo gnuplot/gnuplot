@@ -29,7 +29,7 @@ with different sections selected by macros.
 
 Each driver provides all the functions it needs, and a table of
 function pointers and other data to interface to gnuplot.
-The table entry is currently defined as follows in plot.h:
+The table entry is currently defined as follows in term_api.h:
 
 struct TERMENTRY {
 
@@ -80,6 +80,12 @@ struct TERMENTRY {
 #ifdef IMAGE_DRIVER
     void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
+/* Enhanced text mode driver call-backs */
+    void (*enhanced_open) __PROTO((char * fontname, double fontsize,
+               double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+               int overprint));
+    void (*enhanced_flush) __PROTO((void));
+    void (*enhanced_writec) __PROTO((int c));
 };
 
 One consequence of (1) is that we would like drivers to be backwards

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: debug.trm,v 1.12 2004/06/30 19:57:06 broeker Exp $
+ * $Id: debug.trm,v 1.13 2004/07/01 17:10:12 broeker Exp $
  *
  */
 
@@ -227,7 +227,7 @@ DEBUG_text_angle(int ang)
 }
 
 TERM_PUBLIC void
-DEBUG_point((unsigned int x, unsigned int y, int pointstyle)
+DEBUG_point(unsigned int x, unsigned int y, int pointstyle)
 {
     fprintf(gpoutfile, "point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }

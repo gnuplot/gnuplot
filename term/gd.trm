@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.49 2004/09/01 15:53:50 mikulik Exp $
+ * $Id: gd.trm,v 1.50 2004/09/02 02:53:42 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1547,7 +1547,7 @@ ENHGD_FLUSH()
 		fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    	    err,enhanced_text,ENHgd_font);
 
-	    FPRINTF(("outputstring: %s boundingbox: %d %d %d %d\n",
+	    FPRINTF((stderr,"outputstring: %s boundingbox: %d %d %d %d\n",
 			enhanced_text, brect[6], brect[7], brect[2], brect[3]));
 	    if (ENHgd_overprint == 1) {
 		png_state.x += ((brect[2] - brect[0]))/2;

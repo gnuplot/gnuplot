@@ -1,3 +1,11 @@
+2004-09-17  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/README term/debug.trm term/gd.trm: Fix typos and add 
+	information about enhanced text mode callback entries in TERM_TABLE.
+
+	* term/post.trm:  Move definition of /Rounded to the top of the
+	prolog so that it is with the other user-editable definitions.
+
 2004-09-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/misc.c: New automatic variable $# gets
