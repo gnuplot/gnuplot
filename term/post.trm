@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.82 2002/12/05 01:46:39 sfeam Exp $
+ * $Id: post.trm,v 1.83 2002/12/13 14:58:55 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2848,8 +2848,8 @@ START_HELP(post)
 " Fonts listed by `fontfile` or `fontfile add` encapsulate the font",
 " definitions of the listed font from a postscript Type 1 or TrueType font",
 " file directly into the gnuplot output postscript file. Thus, the enclosed",
-" font can be used in labels, titles, etc. See the section `postscript",
-" fontfile` for more details.",
+" font can be used in labels, titles, etc. See the section",
+" `postscript fontfile` for more details.",
 " With `fontfile delete` a fontfile is deleted from the list of embedded",
 " files.",
 "",
