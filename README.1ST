@@ -4,7 +4,7 @@
  - Under Unix, use configure and make
  
  - Under DOS, if you are using bash and DJGPP,
-   you can just run djconfig.sh
+   you can just run config/djconfig.sh
 
  - Other platforms, copy the relevant makefile from config/
    to src, cd to src and make. Some makefiles have not yet
