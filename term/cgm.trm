@@ -160,7 +160,7 @@ static char GPFAR cgm_font_data[]={"\
 \005Roman\
 "};
 
-	/* variables to record the options */
+/* variables to record the options */
 static char cgm_font[32] = "Arial Bold";
 static unsigned int cgm_fontsize=10;
 static unsigned cgm_linewidth; /* line width in plot units */
@@ -169,6 +169,7 @@ static TBOOLEAN cgm_monochrome = FALSE; /* colors enabled? */
 static int cgm_plotwidth = 432;	/* assumed width of plot in pt. */
 static TBOOLEAN cgm_portrait = FALSE; /* portrait orientation? */
 static TBOOLEAN cgm_rotate = TRUE; /* text rotation enabled? */
+static TBOOLEAN cgm_dashed = TRUE; /* dashed linestyles enabled? */
 static TBOOLEAN cgm_winword6_mode = FALSE; /* workaround for WinWord bug? */
 
 /* prototypes for static functions */
@@ -405,7 +406,14 @@ TERM_PUBLIC void CGM_linetype(linetype)
   cgm_linetype = linetype;
 
   CGM_linecolor(linetype);
-  CGM_dashtype(linetype);
+  if (cgm_dashed) {
+    CGM_dashtype(linetype);    /* DBT 10-8-98    use dashes */
+  } else {
+    /* dashes for gridlines, solid for everything else */
+    CGM_dashtype(linetype == -1 ? 2 : 0);
+  }
+  /* CGM_dashtype(cgm_monochrome ? linetype : 0); first fix, color->no dashes*/
+  /* CGM_dashtype(linetype);  orig distribution              */
 }
 
 TERM_PUBLIC void CGM_linecolor(linecolor)
@@ -903,9 +911,10 @@ TERM_PUBLIC void CGM_options()
   cgm_linewidth_pt = 1;
   cgm_monochrome=FALSE;
   cgm_plotwidth = 6*72;
-  cgm_portrait=FALSE;
-  cgm_rotate=TRUE;
-  cgm_winword6_mode=FALSE;
+  cgm_portrait = FALSE;
+  cgm_rotate = TRUE;
+  cgm_dashed = TRUE;
+  cgm_winword6_mode = FALSE;
   while (!END_OF_COMMAND) 
     {
       if (almost_equals(c_token,"p$ortrait")) 
@@ -920,7 +929,7 @@ TERM_PUBLIC void CGM_options()
 	  c_token++;
 	  continue;
 	}
-      if (almost_equals(c_token,"d$efault"))
+      if (almost_equals(c_token,"de$fault"))  
 	{
 	  strcpy(cgm_font,"Arial Bold");
 	  cgm_fontsize = 10;
@@ -931,6 +940,7 @@ TERM_PUBLIC void CGM_options()
 	  cgm_plotwidth = 6*72;
 	  cgm_portrait=FALSE;
 	  cgm_rotate=TRUE;
+          cgm_dashed=TRUE;
 	  cgm_winword6_mode=FALSE;
 	  c_token++;
 	  continue;
@@ -963,6 +973,18 @@ TERM_PUBLIC void CGM_options()
       if (almost_equals(c_token,"nor$otate"))
 	{
 	  cgm_rotate=FALSE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"da$shed"))
+	{
+	  cgm_dashed=TRUE;
+	  c_token++;
+	  continue;
+	}
+      if (almost_equals(c_token,"s$olid"))
+	{
+	  cgm_dashed=FALSE;
 	  c_token++;
 	  continue;
 	}
@@ -1041,10 +1063,11 @@ TERM_PUBLIC void CGM_options()
 
   sprintf(default_font,"%s,%d",cgm_font,cgm_fontsize);
   /* default_font holds the font and size set at 'set term' */
-  sprintf(term_options,"%s %s %s %s width %d linewidth %d \"%s\" %d",
+  sprintf(term_options,"%s %s %s %s %s width %d linewidth %d \"%s\" %d",
 	  cgm_portrait ? "portrait" : "landscape",
 	  cgm_monochrome ? "monochrome" :"color",
 	  cgm_rotate ? "rotate" : "norotate",
+	  cgm_dashed ? "dashed" : "solid",
 	  cgm_winword6_mode ? "winword6" : "",
 	  cgm_plotwidth,
 	  cgm_linewidth_pt,
@@ -1066,7 +1089,7 @@ TERM_PUBLIC void CGM_options()
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(cgm_driver)
-   "cgm", "Computer Graphics Metafile",
+   "cgm", "Computer Graphics Metafile xxxxx",
      CGM_LARGE - CGM_MARGIN, CGM_SMALL - CGM_MARGIN, CGM_VCHAR, CGM_HCHAR,
      CGM_VTIC, CGM_HTIC, CGM_options, CGM_init, CGM_reset,
      CGM_text, null_scale, CGM_graphics, CGM_move, CGM_solid_vector,
@@ -1101,13 +1124,14 @@ START_HELP(cgm)
 " Several options may be set in `cgm`.",
 "",
 " Syntax:",
-"       set terminal cgm {<mode>} {<color>} {<rotation>}",
+"       set terminal cgm {<mode>} {<color>} {<rotation>} {solid | dashed}",
 "                        {width <plot_width>} {linewidth <line_width>}",
 "                        {\"<font>\"} {<fontsize>}",
 "",
 " where <mode> is `landscape`, `portrait`, or `default`;",
 " <color> is either `color` or `monochrome`; ",
 " <rotation> is either `rotate` or `norotate`;",
+" `solid` draws all curves with solid lines, overriding any dashed patterns;",
 " <plot_width> is the width of the page in points; ",
 " <line_width> is the line width in points; ",
 " <font> is the name of a font; and ",
@@ -1115,14 +1139,15 @@ START_HELP(cgm)
 "",
 " By default, `cgm` uses rotated text for the Y axis label.",
 "",
-" The first five options can be in any order.  Selecting `default` sets all",
+" The first six options can be in any order.  Selecting `default` sets all",
 " options to their default values.",
 "",
 " Examples:",
-"       set terminal cgm landscape color rotate width 432 linewidth 1 \\",
-"                      'Arial Bold' 12                  # defaults",
+"       set terminal cgm landscape color rotate dashed width 432 \\",
+"                      linewidth 1  'Arial Bold' 12       # defaults",
 "       set terminal cgm 14 linewidth 2  14  # wider lines & larger font",
 "       set terminal cgm portrait 'Times Roman Italic' 12",
+"       set terminal cgm color solid    # no pesky dashes!",
 "2 font",
 "?commands set terminal cgm font",
 "?set terminal cgm font",
@@ -1207,6 +1232,14 @@ START_HELP(cgm)
 " label will then extend beyond the clip boundary.  With `norotate`, the Y",
 " axis label starts in a less attractive location, but the page can be edited",
 " without damage.  The `rotate` option confirms the default behavior.",
+"2 solid",
+"?set terminal cgm solid",
+"?set term cgm solid",
+"?cgm solid",
+" The `solid` option may be used to disable dashed line styles in the",
+" plots.  This is useful when color is enabled and the dashing of the lines",
+" detracts from the appearance of the plot. The `dashed` option confirms the",
+" default behavior, which gives a different dash pattern to each curve.",
 "2 size",
 "?commands set terminal cgm size",
 "?set terminal cgm size",
