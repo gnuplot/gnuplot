@@ -1,3 +1,7 @@
+2002-06-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: config.h is in src/.
+
 2002-09-24  Hans Olav Eggestad <hans.olav.eggestad@jordforsk.no>
 
 	* src/save.c: Consolidate dump of data and function plot styles.
@@ -36,22 +40,24 @@
 2002-09-06  Harald Harders  <h.harders@tu-bs.de>
 
 	* demo/Makefile.am demo/Makefile.am.in docs/psdoc/ps_fontfile_doc.tex
-	demo/fontfile.dem demo/fontfile_latex.dem:
-	Redo fontfile demos to use commonly available fonts.
-	* term/post.trm src/misc.c src/misc.h: 
-	Add reset command 'set term post nofontfiles'
+	demo/fontfile.dem demo/fontfile_latex.dem: Redo fontfile demos to use
+	commonly available fonts.
+
+	* term/post.trm src/misc.c src/misc.h: Add reset command
+	'set term post nofontfiles'.
 
 2002-09-05  Johannes Zellner  <johannes@zellner.org>
 
-	* src/gplt_x11.c term/x11.trm: support for rotated text
+	* src/gplt_x11.c term/x11.trm: Support for rotated text.
 
 2002-09-03  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c: avoid use of snprintf()
+	* src/gplt_x11.c: Avoid use of snprintf().
 
 2002-09-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: (Harald Harders) Report FontName of embedded fonts.
+
 	* term/gd.trm: Do vertical justification based on full character cell.
 
 2002-09-02  Harald Harders  <h.harders@tu-bs.de>
@@ -1107,7 +1113,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/23 21:06:40 $).
+	last modification date (from the tag $Date: 2002/09/25 05:33:56 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
