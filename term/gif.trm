@@ -534,7 +534,7 @@ TERM_PUBLIC int GIF_text_angle(int ang)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(gif_driver)
-    "gif", "GIF format format [\042fontname]",
+    "gif", "GIF format [mode] [fontsize] [size] [colors]",
     GREG_XMAX, GREG_YMAX, GIF_VCHAR, GIF_HCHAR,
     GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
     GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
