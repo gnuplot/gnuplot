@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.23 1999/10/29 18:52:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.24 1999/11/08 19:24:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -95,30 +95,34 @@ int reverse_range[AXIS_ARRAY_SIZE];
  */
 #define INIT_ARRAYS(axis, min, max, auto, is_log, base, log_base, infinite) \
 do{auto_array[axis] = auto; \
-   min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
-   max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
-   log_array[axis] = is_log; base_array[axis] = base; log_base_array[axis] = log_base;\
+  min_array[axis] = (infinite && (auto&1)) ? VERYLARGE : min; \
+  max_array[axis] = (infinite && (auto&2)) ? -VERYLARGE : max; \
+  log_array[axis] = is_log; base_array[axis] = base; \
+  log_base_array[axis] = log_base; \
 }while(0)
 
 /* handle reversed ranges */
 #define CHECK_REVERSE(axis) \
-do{\
- if (auto_array[axis] == 0 && max_array[axis] < min_array[axis]) {\
-  double temp = min_array[axis]; min_array[axis] = max_array[axis]; max_array[axis] = temp;\
+do{ \
+ if (auto_array[axis] == 0 && max_array[axis] < min_array[axis]) { \
+  double temp = min_array[axis]; \
+  min_array[axis] = max_array[axis]; \
+  max_array[axis] = temp; \
   reverse_range[axis] = 1; \
- } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
+ } else \
+  reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
 }while(0)
 
 /* get optional [min:max] */
 #define LOAD_RANGE(axis) \
-do {\
+do { \
  if (equals(c_token, "[")) { \
   c_token++; \
-  auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]);\
-  if (!equals(c_token, "]"))\
-   int_error(c_token, "']' expected");\
-  c_token++;\
- }\
+  auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]); \
+  if (!equals(c_token, "]")) \
+   int_error(c_token, "']' expected"); \
+  c_token++; \
+ } \
 } while (0)
 
 
@@ -129,17 +133,40 @@ do {\
  */
 
 #define STORE_WITH_LOG_AND_FIXUP_RANGE(STORE, VALUE, TYPE, AXIS, OUT_ACTION, UNDEF_ACTION)\
-do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; break;} \
-              else if (VALUE == 0.0){STORE = -VERYLARGE; TYPE = OUTRANGE; OUT_ACTION; break;} \
-              else { STORE = log(VALUE)/log_base_array[AXIS]; } \
-     } else STORE = VALUE; \
-     if (TYPE != INRANGE) break;  /* dont set y range if x is outrange, for example */ \
-     if ( VALUE<min_array[AXIS] ) { \
-      if (auto_array[AXIS] & 1) min_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; break; }  \
-     } \
-     if ( VALUE>max_array[AXIS] ) { \
-      if (auto_array[AXIS] & 2) max_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; }   \
-     } \
+do { \
+  if (log_array[AXIS]) { \
+    if (VALUE<0.0) { \
+      TYPE = UNDEFINED; \
+      UNDEF_ACTION; \
+      break; \
+    } else if (VALUE == 0.0) { \
+      STORE = -VERYLARGE; \
+      TYPE = OUTRANGE; \
+      OUT_ACTION; \
+      break; \
+    } else { \
+      STORE = log(VALUE)/log_base_array[AXIS]; \
+    } \
+  } else \
+    STORE = VALUE; \
+    if (TYPE != INRANGE) \
+      break;  /* dont set y range if x is outrange, for example */ \
+    if ( VALUE<min_array[AXIS] ) { \
+      if (auto_array[AXIS] & 1) \
+        min_array[AXIS] = VALUE; \
+      else { \
+        TYPE = OUTRANGE; \
+        OUT_ACTION; break; \
+      } \
+    } \
+    if ( VALUE>max_array[AXIS] ) { \
+      if (auto_array[AXIS] & 2) \
+        max_array[AXIS] = VALUE; \
+      else { \
+        TYPE = OUTRANGE; \
+        OUT_ACTION; \
+      } \
+    } \
 } while(0)
 
 /* use this instead empty macro arguments to work around NeXT cpp bug */
@@ -156,17 +183,18 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
 #endif
 
 #define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
-do { if (reverse_range[AXIS]) { \
-      double temp = min_array[AXIS]; \
-      min_array[AXIS] = max_array[AXIS]; \
-      max_array[AXIS] = temp; \
-     }\
-     if (log_array[AXIS]) { \
-      if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
-       int_error(NO_CARET, LOG_MSG(WHICH)); \
-      min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
-      max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
-   } \
+do { \
+  if (reverse_range[AXIS]) { \
+    double temp = min_array[AXIS]; \
+    min_array[AXIS] = max_array[AXIS]; \
+    max_array[AXIS] = temp; \
+  } \
+  if (log_array[AXIS]) { \
+    if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
+      int_error(NO_CARET, LOG_MSG(WHICH)); \
+    min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
+    max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
+  } \
 } while(0)
 
 
@@ -662,7 +690,7 @@ int curve;			/* which curve to print */
     if (curve < 0) {
 	for (this_plot = first_plot, i = 0;
 	     this_plot != NULL;
-	     i++, this_plot = this_plot->next_cp) {
+	     i++, this_plot = this_plot->next) {
 	    printf("Curve %d:\n", i);
 	    if ((int) this_plot->plot_type >= 0 && (int) (this_plot->plot_type) < 4)
 		printf("Plot type %d: %s\n", (int) (this_plot->plot_type),
@@ -694,7 +722,7 @@ current points %d\n\n",
     } else {
 	for (this_plot = first_plot, i = 0;
 	     i < curve && this_plot != NULL;
-	     i++, this_plot = this_plot->next_cp);
+	     i++, this_plot = this_plot->next);
 	if (this_plot == NULL)
 	    printf("Curve %d does not exist; list has %d curves\n", curve, i);
 	else {
@@ -726,7 +754,7 @@ int plot_num;
     int i, curve;
 
     for (curve = 0; curve < plot_num;
-	 curve++, current_plot = current_plot->next_cp) {
+	 curve++, current_plot = current_plot->next) {
 	fprintf(gpoutfile, "#Curve %d, %d points\n#x y type\n", curve,
 		current_plot->p_count);
 	for (i = 0; i < current_plot->p_count; i++) {
@@ -762,7 +790,7 @@ eval_plots()
 
     int some_functions = 0;
     int plot_num, line_num, point_num, xparam = 0;
-    char *xtitle;
+    char *xtitle = NULL;
     int begin_token = c_token;	/* so we can rewind for second pass */
 
     int uses_axis[AXIS_ARRAY_SIZE];
@@ -782,8 +810,6 @@ eval_plots()
     plot_num = 0;
     line_num = 0;		/* default line type */
     point_num = 0;		/* default point type */
-
-    xtitle = NULL;
 
     /*** First Pass: Read through data files ***
      * This pass serves to set the xrange and to parse the command, as well
@@ -881,7 +907,7 @@ eval_plots()
 		    break;
 		}
 		this_plot->plot_style = LINES;
-		c_token++;	/* skip format */
+		c_token++;      /* skip format */
 	    }
 
 	    /* look for axes/axis */
@@ -923,7 +949,7 @@ eval_plots()
 		    if (xparam)
 			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
 		    else if (xtitle != NULL)
-			xtitle[0] = '\0';	/* Remove default title . */
+			xtitle[0] = '\0';       /* Remove default title . */
 		}
 		c_token++;
 		if (isstring(c_token)) {
@@ -952,7 +978,7 @@ eval_plots()
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
 	     */
-	    lp_parse(&this_plot->lp_properties, 1, this_plot->plot_style & 2,
+	    lp_parse(&(this_plot->lp_properties), 1, this_plot->plot_style & 2,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
@@ -1047,7 +1073,7 @@ eval_plots()
 	    }
 	    /* save end of plot for second pass */
 	    this_plot->token = c_token;
-	    tp_ptr = &(this_plot->next_cp);
+	    tp_ptr = &(this_plot->next);
 
 	} /* !is_defn */
 
@@ -1222,8 +1248,8 @@ do{ assert(!polar && !parametric); \
 		c_token = this_plot->token;
 
 		/* used below */
-		tp_ptr = &(this_plot->next_cp);
-		this_plot = this_plot->next_cp;
+		tp_ptr = &(this_plot->next);
+		this_plot = this_plot->next;
 	    }
 
 	    if (equals(c_token, ","))
@@ -1352,8 +1378,6 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 }				/* eval_plots */
 
 
-
-
 static void
 parametric_fixup(start_plot, plot_num)
 struct curve_points *start_plot;
@@ -1393,7 +1417,7 @@ int *plot_num;
     while (++curve <= *plot_num) {
 	if (xp->plot_type == FUNC) {
 	    /* Here's a FUNC parametric function defined as two parts. */
-	    struct curve_points *yp = xp->next_cp;
+	    struct curve_points *yp = xp->next;
 
 	    --(*plot_num);
 
@@ -1445,18 +1469,18 @@ int *plot_num;
 		yp->title = new_title;
 	    }
 	    /* move xp to head of free list */
-	    xp->next_cp = free_list;
+	    xp->next = free_list;
 	    free_list = xp;
 
 	    /* append yp to new_list */
 	    *last_pointer = yp;
-	    last_pointer = &(yp->next_cp);
-	    xp = yp->next_cp;
+	    last_pointer = &(yp->next);
+	    xp = yp->next;
 
 	} else {		/* data plot */
 	    assert(*last_pointer == xp);
-	    last_pointer = &(xp->next_cp);
-	    xp = xp->next_cp;
+	    last_pointer = &(xp->next);
+	    xp = xp->next;
 	}
     }				/* loop over plots */
 
