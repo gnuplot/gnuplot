@@ -1354,10 +1354,14 @@ C ... and restart the table:
  See the descriptions of each command for more details.
 1 Commands
 ?commands
- This section lists all commands acceptable to `gnuplot` in alphabetical
- order.  Note that in most cases unambiguous abbreviations for command names
- and their options are permissible, i.e., "`p f(x) w l`" instead of "`plot
- f(x) with lines`".
+ This section lists the commands acceptable to `gnuplot` in alphabetical
+ order.  Printed versions of this document contain all commands; on-line
+ versions may not be complete.  Indeed, on some systems there may be no
+ commands at all listed under this heading.
+
+ Note that in most cases unambiguous abbreviations for command names and their
+ options are permissible, i.e., "`p f(x) w l`" instead of "`plot f(x) with
+ lines`".
 
  In the syntax descriptions, braces ({}) denote optional arguments and a
  vertical bar (|) separates mutually exclusive choices.
@@ -5475,6 +5479,19 @@ C ... and restart the table:
 
  Syntax:
        show variables
+3 version
+?show version
+ The `show version` command lists the version of gnuplot being run, its last
+ modification date, the copyright holders, and email addresses for the FAQ,
+ the info-gnuplot mailing list, and reporting bugs--in short, the information
+ listed on the screen when the program is invoked interactively.
+
+ Syntax:
+       show version {long}
+
+ When the `long` option is given, it also lists the operating system, the
+ compilation options used when `gnuplot` was installed, the location of the
+ help file, and (again) the useful email addresses.
 3 view
 ?commands set view
 ?commands show view
