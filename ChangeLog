@@ -1,4 +1,15 @@
-2004-11-11  Ethan Merritt  <merritt@u.washington.edu>
+2004-11-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/specfun.c (f_erf f_erfc f_normal): Replace in-line rough
+	approximation for erf() and erfc() with calls to the internal
+	routines that compute these values more accurately. This is only
+	relevant to platforms that do not already provide math library
+	routines erf() and erfc(). Empirical tests show that this change
+	decreases the error relative to the double precision library
+	erf routine from O(10^-8) to O(10^-16).
+	Thanks to Dietmar Warning <warning@danalyse.de>
+
+2004-11-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm (ENHsvg_writec): Escape character & to be &amp; in
 	output stream. '<' and '&' are the only escaped characters so far,

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.31 2004/11/10 23:30:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.32 2004/11/12 18:12:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -563,25 +563,7 @@ f_erf(union argument *arg)
 
     (void) arg;				/* avoid -Wunused warning */
     x = real(pop(&a));
-
-#ifdef HAVE_ERF
     x = erf(x);
-#else
-    /* HBB 20031006 FIXME: why is this not using the erf()
-     * implementation found further down in this source file? */
-    {
-	int fsign = (x >= 0);
-
-	x = igamma(0.5, (x) * (x));
-	if (x == -1.0) {
-	    undefined = TRUE;
-	    x = 0.0;
-	} else {
-	    if (! fsign)
-		x = -x;
-	}
-    }
-#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
@@ -593,23 +575,7 @@ f_erfc(union argument *arg)
 
     (void) arg;				/* avoid -Wunused warning */
     x = real(pop(&a));
-#ifdef HAVE_ERFC
     x = erfc(x);
-#else
-    /* HBB 20031006 FIXME: why is this not using the erfc()
-     * implementation found further down in this source file? */
-    {
-	int fsign = (x >= 0);
-
-	x = igamma(0.5, (x) * (x));
-	if (x == -1.0) {
-	    undefined = TRUE;
-	    x = 0.0;
-	} else {
-	    x = fsign ? (1.0 - x) : (1.0 + x);
-	}
-    }
-#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
@@ -1016,23 +982,7 @@ f_normal(union argument *arg)
     x = real(pop(&a));
 
     x = 0.5 * SQRT_TWO * x;
-#ifdef HAVE_ERF
     x = 0.5 * (1.0 + erf(x));
-#else
-    {
-	int fsign;
-	fsign = x >= 0 ? 1 : 0;
-	x = igamma(0.5, (x) * (x));
-	if (x == 1.0) {
-	    undefined = TRUE;
-	    x = 0.0;
-	} else {
-	    if (fsign == 0)
-		x = -(x);
-	    x = 0.5 * (1.0 + x);
-	}
-    }
-#endif
     push(Gcomplex(&a, x, 0.0));
 }
 
