@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.33 2002/11/04 14:59:50 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.34 2002/12/17 15:38:05 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -142,6 +142,12 @@ char fitbuf[256];
 /* log-file for fit command */
 char *fitlogfile = NULL;
 
+#ifdef GP_FIT_ERRVARS
+/* NEW 20030131: should we place parameter errors into user-defined
+ * variables?  */
+TBOOLEAN fit_errorvariables = FALSE;
+#endif /* GP_FIT_ERRVARS */
+
 /* private variables: */
 
 static int max_data;
@@ -208,6 +214,9 @@ static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
 
+#ifdef GP_FIT_ERRVARS
+static void setvarerr __PROTO((char *varname, double value));
+#endif
 
 /*****************************************************************
     Small function to write the last fit command into a file
@@ -695,6 +704,14 @@ regress(a)
 
     /* compute errors in the parameters */
 
+#ifdef GP_FIT_ERRVARS
+    if (fit_errorvariables) 
+	/* Set error variable to zero before doing this */
+	/* Thus making sure they are created */
+	for (i = 0; i < num_params; i++) 
+	    setvarerr(par_name[i], 0.0);
+#endif
+
     if (num_data == num_params) {
 	int k;
 
@@ -753,10 +770,16 @@ regress(a)
 	Dblf("=======================            ==========================\n\n");
 
 	for (i = 0; i < num_params; i++) {
-	    double temp =
-	    (fabs(a[i]) < NEARLY_ZERO) ? 0.0 : fabs(100.0 * dpar[i] / a[i]);
+	    double temp = (fabs(a[i]) < NEARLY_ZERO)
+		? 0.0
+		: fabs(100.0 * dpar[i] / a[i]);
+
 	    Dblf6("%-15.15s = %-15g  %-3.3s %-12.4g (%.4g%%)\n",
 		  par_name[i], a[i], PLUSMINUS, dpar[i], temp);
+#ifdef GP_FIT_ERRVARS
+	    if (fit_errorvariables)
+		setvarerr(par_name[i], dpar[i]);
+#endif
 	}
 
 	Dblf("\n\ncorrelation matrix of the fit parameters:\n\n");
@@ -920,7 +943,30 @@ setvar(varname, data)
     udv_ptr->udv_undef = FALSE;
 }
 
+#ifdef GP_FIT_ERRVARS
+/*****************************************************************
+            Set a GNUPLOT user-defined variable for an error
+            variable: so take the parameter name, turn it
+            into an error parameter name (e.g. a to a_err)
+            and then set it.
+******************************************************************/
+static void
+setvarerr(varname, value)
+    char *varname;
+    double value;
+{
+	struct value errval;    /* This will hold the gnuplot value created from value*/
+	char* pErrValName;      /* The name of the (new) error variable */
 
+	/* Create the variable name by appending _err */
+	pErrValName = (char*)gp_alloc(strlen(varname)+sizeof(char)+4, "");
+
+	sprintf(pErrValName,"%s_err",varname);
+	Gcomplex(&errval, value, 0.0);
+	setvar(pErrValName, errval);
+	free(pErrValName);
+}
+#endif /* GP_FIT_ERRVARS */
 
 /*****************************************************************
     Read INTGR Variable value, return 0 if undefined or wrong type

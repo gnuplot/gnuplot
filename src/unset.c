@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.49 2003/02/05 00:01:07 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.50 2003/02/16 00:07:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -40,7 +40,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.49 2003/02/05 00:01:07 sfe
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
-#include "fit.h"		/* HBB 20020927: for fitlogfile */
+#include "fit.h"
 #include "misc.h"
 #include "plot.h"
 #include "plot2d.h"
@@ -78,7 +78,7 @@ static void unset_dgrid3d __PROTO((void));
 static void unset_dummy __PROTO((void));
 static void unset_encoding __PROTO((void));
 static void unset_decimalsign __PROTO((void));
-static void unset_fitlogfile __PROTO((void));
+static void unset_fit __PROTO((void));
 static void unset_format __PROTO((void));
 static void unset_grid __PROTO((void));
 static void unset_hidden3d __PROTO((void));
@@ -151,7 +151,7 @@ unset_command()
     "valid unset options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bar', 'border', 'boxwidth', 'clabel',\n\
 \t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d', 'decimalsign',\n\
-\t'dummy', 'encoding', 'fitlogfile', 'format', 'grid', 'hidden3d', 'historysize',\n\
+\t'dummy', 'encoding', 'fit', 'format', 'grid', 'hidden3d', 'historysize',\n\
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'[blrt]margin', 'mapping', 'missing', 'mouse', 'multiplot', 'offsets',\n\
 \t'origin', 'output', 'palette', 'parametric', 'pm3d', 'pointsize',\n\
@@ -214,8 +214,8 @@ unset_command()
     case S_DECIMALSIGN:
 	unset_decimalsign();
 	break;
-    case S_FITLOGFILE:
-	unset_fitlogfile();
+    case S_FIT:
+	unset_fit();
 	break;
     case S_FORMAT:
 	unset_format();
@@ -737,13 +737,16 @@ unset_decimalsign()
 }
 
 
-/* process 'unset fitlogfile' command */
+/* process 'unset fit' command */
 static void
-unset_fitlogfile()
+unset_fit()
 {
     if (fitlogfile != NULL)
         free(fitlogfile);
     fitlogfile = NULL;
+#if GP_FIT_ERRVARS
+    fit_errorvariables = FALSE;
+#endif /* GP_FIT_ERRVARS */
 }
 
 
@@ -1557,7 +1560,7 @@ reset_command()
 
     unset_locale();
     unset_loadpath();
-    unset_fitlogfile();
+    unset_fit();
 
     /* HBB 20000506: set 'interactive' back to its real value: */
     interactive = save_interactive;

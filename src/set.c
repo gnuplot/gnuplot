@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.110 2003/02/05 21:43:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.111 2003/02/16 00:07:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -47,7 +47,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.110 2003/02/05 21:43:39 sfea
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
-#include "fit.h"		/* HBB 20020927: for fitlogfile */
+#include "fit.h"	       
 #include "gadgets.h"
 #include "gp_time.h"
 #include "hidden3d.h"
@@ -87,7 +87,7 @@ static void set_dgrid3d __PROTO((void));
 static void set_decimalsign __PROTO((void));
 static void set_dummy __PROTO((void));
 static void set_encoding __PROTO((void));
-static void set_fitlogfile __PROTO((void));
+static void set_fit __PROTO((void));
 static void set_format __PROTO((void));
 static void set_grid __PROTO((void));
 static void set_hidden3d __PROTO((void));
@@ -180,7 +180,7 @@ set_command()
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
-\t'dgrid3d', 'dummy', 'encoding', 'fitlogfile', 'format', 'grid',\n\
+\t'dgrid3d', 'dummy', 'encoding', 'fit', 'format', 'grid',\n\
 \t'hidden3d', 'historysize', 'isosamples', 'key', 'label', 'locale',\n\
 \t'logscale', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
 \t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
@@ -285,8 +285,8 @@ set_command()
 	case S_ENCODING:
 	    set_encoding();
 	    break;
-	case S_FITLOGFILE:
-	    set_fitlogfile();
+	case S_FIT:
+	    set_fit();
 	    break;
 	case S_FONTPATH:
 	    set_fontpath();
@@ -686,13 +686,13 @@ set_arrow()
 	/* pick up a arrow spec - allow as. */
 	{
 	    int stored_token = c_token;
-	    //	    struct arrow_style_type loc_arrow;
+	    /* struct arrow_style_type loc_arrow; */
 
 	    arrow_parse(&loc_arrow, TRUE);
 	    if (stored_token != c_token) {
 		if (set_arrowstyle) { duplication = TRUE; break; }
 		set_arrowstyle = TRUE;
-		//		arrow->arrow_properties = loc_arrow;
+		/* arrow->arrow_properties = loc_arrow; */
 		continue;
 	    }
 	}
@@ -1194,22 +1194,38 @@ set_encoding()
 }
 
 
-/* process 'set fitlogfile' command */
+/* process 'set fit' command */
 static void
-set_fitlogfile()
+set_fit()
 {
     c_token++;
 
-    if (END_OF_COMMAND) {
-        if (fitlogfile != NULL)
-            free(fitlogfile);
-        fitlogfile=NULL;
-    } else if (!isstring(c_token)) {
-        int_error(c_token, "expecting string");
-    } else {
-        m_quote_capture(&fitlogfile, c_token, c_token); /* reallocs store */
-        c_token++;
-    }
+    while (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "log$file")) {
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		if (fitlogfile != NULL)
+		    free(fitlogfile);
+		fitlogfile=NULL;
+	    } else if (!isstring(c_token)) {
+		int_error(c_token, "expecting string");
+	    } else {
+		m_quote_capture(&fitlogfile, c_token, c_token); /* reallocs store */
+		c_token++;
+	    }
+#if GP_FIT_ERRVARS
+	} else if (almost_equals(c_token, "err$orvariables")) {
+	    fit_errorvariables = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token, "noerr$orvariables")) {
+	    fit_errorvariables = FALSE;
+	    c_token++;
+#endif /* GP_FIT_ERRVARS */
+	} else {
+	    int_error(c_token,
+		      "unknown --- expected 'logfile' or [no]errorvariables");
+	}
+    } /* while (!end) */
 }
 
 
@@ -4130,7 +4146,7 @@ free_marklist(list)
 /* [start,]incr[,end] */
 static void
 load_tic_series(axis)
-AXIS_INDEX axis;
+    AXIS_INDEX axis;
 {
     double start, incr, end;
     int incr_token;
@@ -4145,9 +4161,7 @@ AXIS_INDEX axis;
 	start = -VERYLARGE;
 	end = VERYLARGE;
     } else {
-
 	c_token++;
-
 	incr_token = c_token;
 	GET_NUM_OR_TIME(incr, axis);
 
@@ -4166,17 +4180,11 @@ AXIS_INDEX axis;
 	    int_error(incr_token, "increment must be negative");
 	if (start > end) {
 	    /* put in order */
-	    double numtics;
-	    numtics = floor((end * (1 + SIGNIF) - start) / incr);
+	    double numtics = floor((end * (1 + SIGNIF) - start) / incr);
+
 	    end = start;
 	    start = end + numtics * incr;
 	    incr = -incr;
-/*
-   double temp = start;
-   start = end;
-   end = temp;
-   incr = -incr;
- */
 	}
     }
 

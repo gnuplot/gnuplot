@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.161 2003/02/14 16:09:27 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.162 2003/02/16 23:51:35 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1673,8 +1673,12 @@ C ... and restart the table:
  initial and final states is written to a log file, "fit.log".  This file
  is always appended to, so as to not lose any previous fit history;  it
  should be deleted or renamed as desired. By using the command 
- `set fitlogfile`, the name of the log file can be changed.
+ `set fit logfile`, the name of the log file can be changed.
 
+ If gnuplot was built with this option, and you activated it using `set fit
+ errorvariables`, the error for each fitted parameter will be stored in
+ a variable named like the parameter, but with "_err" appended.  Thus the
+ errors can be used as input for further computations.
 
  The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
  MSDOS and Atari Multitasking Systems).  After the current iteration
@@ -4293,23 +4297,24 @@ C ... and restart the table:
  the device must be able to produce the desired non-standard characters.
  The PostScript and X11 terminals support all encodings. OS/2 Presentation
  Manager switches automatically to codepage 912 for `iso_8859_2`.
-3 fitlogfile
-?commands set fitlogfile
-?commands show fitlogfile
-?set fitlogfile
-?show fitlogfile
-?fitlogfile
- The `fitlogfile` setting defines where the `fit` command writes its output.
+3 fit
+?commands set fit
+?commands show fit
+?set fit
+?show fit
+ The `fit` setting defines where the `fit` command writes its output.
+ If this option was built into your version of gnuplot, it also controls
+ whether parameter errors from the fit will be written into variables.
 
  Syntax:
-       set fitlogfile {"<filename>"}
-       unset fitlogfile
-       show fitlogfile
+       set fit {logfile {"<filename>"}} {{no}errorvariables}
+       unset fit
+       show fit
 
- The filename must be enclosed in quotes.
+ The <filename> argument must be enclosed in single or double quotes.
 
- If no filename ist given or `unset fitlogfile` is used the log file is 
- resetted to its default value "fit.log" or the value of the environmental
+ If no filename ist given or `unset fit` is used the log file is 
+ reset to its default value "fit.log" or the value of the environmental
  variable `FIT_LOG`.
 
  Users of DOS-like platforms should note that the \ character has
@@ -4321,6 +4326,18 @@ C ... and restart the table:
  If the given logfile name ends with a / or \, it is interpreted to be
  a directory name, and the actual filename will be "fit.log" in that
  directory.
+
+ If the `errorvariables` option is turned on, the error of each fitted
+ parameter computed by `fit` will be copied to a user-defined variable
+ whose name is formed by appending "_err" to the name of the parameter
+ itself.  This is useful mainly to put the parameter and its error onto
+ a plot of the data and the fitted function, for reference, as in:
+
+        set fit errorvariables
+        fit f(x) 'datafile' using 1:2 via a, b
+        print "error of a is:", a_err
+        set label 'a=%6.2f', a, '+/- %6.2f', a_err
+        plot 'datafile' using 1:2, f(x)
 3 fontpath
 ?commands set fontpath
 ?commands show fontpath

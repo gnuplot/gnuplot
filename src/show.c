@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.100 2003/02/05 00:01:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.101 2003/02/16 00:08:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -48,7 +48,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.100 2003/02/05 00:01:01 sfe
 #include "contour.h"
 #include "datafile.h"
 #include "eval.h"
-#include "fit.h"		/* HBB 20020927: for fitlogfile */
+#include "fit.h"
 #include "gp_time.h"
 #include "graphics.h"
 #include "hidden3d.h"
@@ -117,7 +117,7 @@ static void show_colorbox __PROTO((void));
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
-static void show_fitlogfile __PROTO((void));
+static void show_fit __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_print __PROTO((void));
 static void show_angles __PROTO((void));
@@ -182,7 +182,7 @@ show_command()
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth', 'clip',\n\
 \t'cntrparam', 'colorbox', 'contour', 'datafile', 'decimalsign','dgrid3d',\n\
-\t'dummy', 'encoding', 'fitlogfile', 'fontpath', 'format', 'functions', 'grid',\n\
+\t'dummy', 'encoding', 'fit', 'fontpath', 'format', 'functions', 'grid',\n\
 \t'hidden', 'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'mapping', 'margin', 'offsets', 'origin', 'output', 'plot',\n\
 \t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
@@ -338,8 +338,8 @@ show_command()
     case S_ENCODING:
 	show_encoding();
 	break;
-    case S_FITLOGFILE:
-	show_fitlogfile();
+    case S_FIT:
+	show_fit();
 	break;
     case S_FONTPATH:
 	show_fontpath();
@@ -780,7 +780,7 @@ show_all()
     show_pointsize();
     show_encoding();
     show_decimalsign();
-    show_fitlogfile();
+    show_fit();
     show_polar();
     show_angles();
     show_samples();
@@ -2194,11 +2194,18 @@ show_decimalsign()
 }
 
 
-/* process 'show fitlogfile' command */
+/* process 'show fit' command */
 static void
-show_fitlogfile()
+show_fit()
 {
     SHOW_ALL_NL;
+
+#ifdef GP_FIT_ERRVARS
+    fprintf(stderr, "\
+\tfit will%s place parameter errors in variables\n",
+	    fit_errorvariables ? "" : " not");
+#endif /* GP_FIT_ERRVARS */
+
     if (fitlogfile != NULL) {
         fprintf(stderr, "\
 \tlog-file for fits is was set by the user to be \n\
