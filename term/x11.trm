@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.64 2002/10/18 10:03:00 lhecking Exp $
+ * $Id: x11.trm,v 1.65 2002/11/27 20:45:35 lhecking Exp $
  *
  */
 
@@ -1327,22 +1327,22 @@ START_HELP(x11)
 #ifdef USE_MOUSE
 "  `-noevents` does not process mouse and key events",
 #endif
-"  `-persist`  plots windows survive after main gnuplot program exits",
+"  `-persist`  plot windows survive after main gnuplot program exits",
 "#\\begin{tabular}{|cl|} \\hline",
-"#`-mono`    & forces monochrome rendering on color displays.\\\\",
-"#`-gray`    & requests grayscale rendering on grayscale or color displays.\\\\",
-"#           & (Grayscale displays receive monochrome rendering by default.) \\\\",
-"#`-clear`   & requests that the window be cleared momentarily before a\\\\",
-"#           & new plot is displayed. \\\\",
-"#`-tvtwm`   & requests that geometry specifications for position of the\\\\",
-"#           & window be made relative to the currently displayed portion\\\\",
-"#           & of the virtual root. \\\\",
-"#`-raise`   & raises plot window after each plot. \\\\",
-"#`-noraise` & does not raise plot window after each plot. \\\\",
+"#`-mono`     & forces monochrome rendering on color displays.\\\\",
+"#`-gray`     & requests grayscale rendering on grayscale or color displays.\\\\",
+"#            & (Grayscale displays receive monochrome rendering by default.) \\\\",
+"#`-clear`    & requests that the window be cleared momentarily before a\\\\",
+"#            & new plot is displayed. \\\\",
+"#`-tvtwm`    & requests that geometry specifications for position of the\\\\",
+"#            & window be made relative to the currently displayed portion\\\\",
+"#            & of the virtual root. \\\\",
+"#`-raise`    & raises plot window after each plot. \\\\",
+"#`-noraise`  & does not raise plot window after each plot. \\\\",
 #ifdef USE_MOUSE
 "#`-noevents` & does not process mouse and key events. \\\\",
 #endif
-"#`-persist`&plots windows survive after main gnuplot program exits. \\\\",
+"#`-persist`  & plot windows survive after main gnuplot program exits. \\\\",
 "%c l .",
 "%`-mono`@forces monochrome rendering on color displays.",
 "%`-gray`@requests grayscale rendering on grayscale or color displays.",
@@ -1357,7 +1357,7 @@ START_HELP(x11)
 #ifdef USE_MOUSE
 "%`-novevents`@does not process mouse and key events",
 #endif
-"%`-persist`@plots windows survive after main gnuplot program exits",
+"%`-persist`@plot windows survive after main gnuplot program exits",
 "@end table",
 " The options are shown above in their command-line syntax.  When entered as",
 " resources in \".Xdefaults\", they require a different syntax.",
