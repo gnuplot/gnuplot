@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.85 2003/11/24 15:48:18 mikulik Exp $
+ * $Id: x11.trm,v 1.86 2003/11/25 18:13:09 sfeam Exp $
  *
  */
 
@@ -46,6 +46,12 @@
 /* X11 support for Petr Mikulik's pm3d 
  * by Johannes Zellner <johannes@zellner.org>
  * (November 1999 - January 2000)
+ */
+
+/* Dynamic font support, enhanced text mode support,
+ * additional feedback from outboard driver
+ * Ethan A Merritt <merritt@u.washington.edu>
+ * 2003
  */
 
 #include "driver.h"
@@ -95,6 +101,13 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 #  define X11_GR_FILLED_POLYGON   'f'
 # endif
 
+/* To support "set term x11 enhanced" */
+TERM_PUBLIC void ENHX11_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void ENHX11_OPEN __PROTO((char * fontname, double fontsize,
+				double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+				int overprint));
+TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
+
 # define X11_XMAX 4096
 # define X11_YMAX 4096
 
@@ -120,6 +133,7 @@ static int X11_Display = 0;
 static char X11_default_font[MAX_ID_LEN+1] = {'\0'};
 static char X11_last_font_used[MAX_ID_LEN+1] = {'\01','\0'};
 static char X11_next_font_used[MAX_ID_LEN+1] = {'\0'};
+static enum JUSTIFY X11_last_justification = LEFT;
 
 static void X11_atexit __PROTO((void));
 static void X11_set_default_font __PROTO((void));
@@ -317,6 +331,7 @@ enum X11_id {
     X11_NORAISE,
     X11_FONT,
     X11_TITLE,
+    X11_ENHANCED,
     X11_OTHER
 };
 
@@ -330,6 +345,7 @@ static struct gen_table X11_opts[] = {
     {"font",   X11_FONT},
     {"fn$ame", X11_FONT},
     {"ti$tle", X11_TITLE},
+    {"enh$anced", X11_ENHANCED},
     {NULL, X11_OTHER}
 };
 
@@ -403,6 +419,10 @@ X11_options()
 	    if (set_title) duplication=TRUE;
 	    set_title = TRUE;
 	    break;
+	case X11_ENHANCED:
+	    term->put_text = ENHX11_put_text;
+	    c_token++;
+	    break;
 	case X11_OTHER:
 	default:
 	    /* let gnuplot_x11 check range */
@@ -438,6 +458,9 @@ X11_options()
     }
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
+    }
+    if (term->put_text == ENHX11_put_text) {
+	strcat(term_options, " enhanced");
     }
     if (*X11_default_font) {
 	strcat(term_options, " font \"");
@@ -1145,6 +1168,7 @@ TERM_PUBLIC int
 X11_justify_text(enum JUSTIFY mode)
 {
     PRINT1("J%04d\n", mode);
+    X11_last_justification = mode;
     return (TRUE);
 }
 
@@ -1314,6 +1338,168 @@ X11_filled_polygon(int points, gpiPoint *corners)
 
 #endif /* PM3D */
 
+/*
+ * Ethan A Merritt November 2003
+ *	- Support for enhanced text mode
+ *
+ * PROBLEMS:
+ *	- The default font must be scalable
+ *	- Without more feedback from the outboard driver (gnuplot_x11) it is
+ *	  hard to set up proper text rotation. The current approximation is so-so. 
+ *	- Right- and Center- justified text is problematic for the same reason.
+ *	- The default font size is not really known, and font scaling
+ *	  in general could be improved
+ */
+
+static TBOOLEAN ENHx11_opened_string;
+static TBOOLEAN ENHx11_sizeonly = FALSE;
+static TBOOLEAN ENHx11_show = TRUE;
+static TBOOLEAN ENHx11_overprint = FALSE;
+static TBOOLEAN ENHx11_widthflag = TRUE;
+static double ENHx11_base;
+static double ENHx11_fontsize;
+static char  *ENHx11_font;
+
+TERM_PUBLIC void
+ENHX11_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+    if (!ENHx11_opened_string) {
+	ENHx11_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	ENHx11_font = fontname;
+	ENHx11_fontsize = fontsize;
+	ENHx11_base = base * 10;	/* FIXME - should this be v_char? v_tic? */
+	ENHx11_show = showflag;
+	ENHx11_overprint = overprint;
+	ENHx11_widthflag = widthflag;
+    }
+}
+
+/*
+ * Write a string fragment and update current position.
+ * We leave the real work up to gnuplot_x11!
+ */
+TERM_PUBLIC void
+ENHX11_FLUSH()
+{
+    /* Send a command to print this string at current position */
+    if (ENHx11_opened_string) {
+
+	char tmpfont[128];	/* FIXME - there must be a better way! */
+	*enhanced_cur_text = '\0';
+	sprintf(tmpfont,"%s,%.1f", ENHx11_font, ENHx11_fontsize);
+	PRINT1("QF%s\n", tmpfont);
+	*X11_last_font_used = '\01';
+
+	if (!ENHx11_show || ENHx11_sizeonly)
+	    PRINT3("Ts%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	else if (ENHx11_overprint == 1)
+	    PRINT3("Tc%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	else if (!ENHx11_widthflag && !ENHx11_overprint)
+	    PRINT3("To%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+	else
+	    PRINT3("Tu%04d%04d%s\n", 0, (int)ENHx11_base, enhanced_text);
+
+	ENHx11_opened_string = FALSE;
+    }
+}
+
+TERM_PUBLIC void
+ENHX11_put_text(x, y, str)
+    unsigned int x, y;
+    const char *str;
+{
+    char *original_string = (char *)str;
+    int pass = 1;
+    
+    if (ignore_enhanced_text) {
+	X11_put_text(x,y,str);
+	return;
+    }
+
+    if (!strlen(str))
+	return;
+
+    /* if there are no magic characters, we should just be able
+     * punt the string to X11_put_text()
+     */
+    if (!strpbrk(str, "{}^_@&~")) {
+	X11_put_text(x,y,str);
+	return;
+    }
+
+    /* set up the global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.25;
+    ENHx11_opened_string = FALSE;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+
+
+    /* Tell gnuplot_x11 to set the current position to (x,y) */
+	PRINT2("T%04d%04d\n", x, y);
+
+    /* Text justification requires two passes. During the first pass we */
+    /* don't draw anything, we just measure the space it will take.     */
+    if (X11_last_justification != LEFT) {
+	PRINT1("J%04d\n", LEFT);
+	ENHx11_sizeonly = TRUE;
+    }
+PASS2:
+
+    /* Make sure that we start out using the default font.
+     * FIXME: Really we should get feedback from gnuplot_x11 as to what
+     *        the default font size is.
+     */
+	ENHx11_font = "DEFAULT";
+	ENHx11_fontsize = 12;		/* FIXME - are we going to need this? */
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    			ENHx11_font, ENHx11_fontsize, 
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    /* Restore text justification flag after 2nd pass */
+    if (pass > 1) {
+	PRINT1("J%04d\n", X11_last_justification);
+	return;
+    }
+
+    /* In order to do text justification we need to do a second pass that */
+    /* uses information stored by gnuplot_x11 during the first pass.      */
+    if (X11_last_justification != LEFT) {
+	ENHx11_sizeonly = FALSE;
+	
+	if (X11_last_justification == RIGHT) {
+		PRINT2("Tj%04d%04d\n", x, y);
+	} else if (X11_last_justification == CENTRE) {
+		PRINT2("Tk%04d%04d\n", x, y);
+	}
+	str = original_string;
+	pass = 2;
+	goto PASS2;
+	
+    }
+
+}
 
 #endif /* TERM_BODY */
 
@@ -1336,6 +1522,7 @@ TERM_TABLE_START(x11_driver)
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
 #endif
+    , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(x11_driver)
 
 #undef LAST_TERM
@@ -1358,6 +1545,7 @@ TERM_TABLE_START(X11_driver)
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
 #endif
+    , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(X11_driver)
 
 #undef LAST_TERM
@@ -1383,14 +1571,25 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-"    set terminal x11 [reset] [[no]persist] [[no]raise] [<n>] [close]",
-"                     [font <fontspec>] [title \"<title name>\"]",
+"    set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]",
+"                     [title \"<string>\"] [[no]persist] [[no]raise] [close]",
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
 " appended to the window title (unless a title has been supplied manually)",
 " and the icon will be labeled `gplt <n>`.  The active window may be",
 " distinguished by a change in cursor (from default to crosshair.)",
+"",
+" The x11 terminal support enhanced text mode (see `enhanced`), subject",
+" to the available fonts. In order for font size commands embedded in text",
+" to have any effect, the default x11 font must be scalable. Thus the first",
+" example below will work as expected, but the second will not.",
+"",
+"    set term x11 enhanced font \"arial,15\" ",
+"    set title '{\\=20 Big} Medium {\\=5 Small}' ",
+"",
+"    set term x11 enhanced font \"terminal-14\" ",
+"    set title '{\\=20 Big} Medium {\\=5 Small}' ",
 "",
 " Plot windows remain open even when the `gnuplot` driver is changed to a",
 " different device.  A plot window can be closed by pressing the letter q",

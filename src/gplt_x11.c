@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.72 2003/11/24 15:48:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.73 2003/11/25 18:13:09 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -302,6 +302,9 @@ typedef struct plot_struct {
     int axis_mask;		/* Bits set to show which axes are active */
     axis_scale_t axis_scale[2*SECOND_AXES];
 #endif
+    /* Last text position  - used by enhanced text mode */
+    int xLast, yLast;
+    
     struct plot_struct *prev_plot;  /* Linked list pointers and number */
     struct plot_struct *next_plot;
     int plot_number;
@@ -1768,7 +1771,7 @@ DrawRotated(Display *dpy, Drawable d, GC gc, int xdest, int ydest,
 static void
 exec_cmd(plot_struct *plot, char *command)
 {
-    int x, y, sw, sl;
+    int x, y, sw, sl, sj;
     char *buffer, *str;
 
     buffer = command;
@@ -1843,8 +1846,38 @@ exec_cmd(plot_struct *plot, char *command)
 
     /*   X11_put_text(x,y,str) - draw text   */
     else if (*buffer == 'T') {
-	sscanf(buffer, "T%4d%4d", &x, &y);
-	str = buffer + 9;
+	/* Enhanced text mode added November 2003 - Ethan A Merritt */
+	int x_offset=0, y_offset=0, v_offset=0;
+
+	switch (buffer[1]) {
+
+	case 'j':	/* Set start for right-justified enhanced text */
+		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    plot->xLast = x_offset - (plot->xLast - x_offset);
+		    plot->yLast = y_offset - (plot->yLast - y_offset);
+		    return;
+	case 'k':	/* Set start for center-justified enhanced text */
+		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    plot->xLast = x_offset - 0.5*(plot->xLast - x_offset);
+		    plot->yLast = y_offset - 0.5*(plot->yLast - y_offset);
+		    return;
+	case 'o':	/* Enhanced mode print with no update */
+	case 'c':	/* Enhanced mode print with update to center */
+	case 'u':	/* Enhanced mode print with update */
+	case 's':	/* Enhanced mode update with no print */
+		    sscanf(buffer+2, "%4d%4d", &x_offset, &y_offset);
+		    x = plot->xLast + x_offset;
+		    y = plot->yLast + y_offset;
+		    v_offset = 0;
+		    str = buffer + 10;
+		    break;
+	default:
+		    sscanf(buffer, "T%4d%4d", &x, &y);
+		    v_offset = vchar/3;		/* Why is this??? */
+		    str = buffer + 9;
+		    break;
+	}
+
 	sl = strlen(str) - 1;
 	sw = XTextWidth(font, str, sl);
 
@@ -1855,19 +1888,21 @@ exec_cmd(plot_struct *plot, char *command)
  */
 
 	switch (plot->jmode) {
+	    default:
 	    case LEFT:
-		sw = 0;
+		sj = 0;
 		break;
 	    case CENTRE:
-		sw = -sw / 2;
+		sj = -sw / 2;
 		break;
 	    case RIGHT:
-		sw = -sw;
+		sj = -sw;
 		break;
 	}
 
- 	/* EAM - empty string causes DrawRotated to crash, and is pointless anyhow */
-	if (sl == 0)
+	if (sl == 0) /* Pointless to draw empty string */
+	    ;
+	else if (buffer[1] == 's') /* Enhanced text mode reserve space only */
 	    ;
 	else if (plot->angle != 0) {
 	    /* rotated text */
@@ -1876,7 +1911,20 @@ exec_cmd(plot_struct *plot, char *command)
 	} else {
 	    /* horizontal text */
 	    XDrawString(dpy, plot->pixmap, *current_gc,
-		    X(x) + sw, Y(y) + vchar / 3, str, sl);
+		    X(x) + sj, Y(y) + v_offset, str, sl);
+	}
+
+	/* Update current text position */
+	if (buffer[1] == 'c') {
+	    plot->xLast = RevX(X(x) + sj + sw/2) - x_offset;
+	    plot->yLast = y - y_offset;
+	} else if (buffer[1] != 'o') {
+	    plot->xLast = RevX(X(x) + sj + sw) - x_offset;
+	    plot->yLast = y - y_offset;
+	    if (plot->angle != 0) { /* This correction is not perfect */
+		plot->yLast += RevX(sw) * sin((double)(plot->angle) * 0.01745);
+		plot->xLast -= RevX(sw) * (1.0 - cos((double)(plot->angle) * 0.01745));
+	    }
 	}
 
     } else if (*buffer == 'F') {	/* fill box */
@@ -4085,12 +4133,17 @@ pr_font( fontname )
 char *fontname;
 {
     XFontStruct *previous_font = font;
+    static char previous_font_name[128];
 
     if (!fontname || !(*fontname))
 	fontname = default_font;
 
-    if (!fontname || !(*fontname))
-	fontname = pr_GetR(db, ".font");
+    if (!fontname || !(*fontname)) {
+	if ((fontname = pr_GetR(db, ".font")))
+	    strncpy(default_font,fontname,sizeof(default_font)-1);
+	    FPRINTF(("gnuplot_x11: setting default font %s from Xresource\n",
+		    fontname));
+    }
 
     if (!fontname)
 	fontname = FallbackFont;
@@ -4100,14 +4153,27 @@ char *fontname;
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
 	/* We are passed "font<,size><,slant>"                             */
 	char fontspec[128], shortname[64], *fontencoding, slant, *weight;
-	int  fontsize, sep;
+	int  sep;
+	int  fontsize = 0;
+
+	/* Enhanced font processing wants a method of requesting a new size  */
+	/* for whatever the previously selected font was, so we have to save */
+	/* and reuse the previous font name to construct the new spec.       */
+	if (!strncmp(fontname,"DEFAULT",7)) {
+	    sscanf(&fontname[8],"%d",&fontsize);
+	    fontname = default_font;
+	} else if (*fontname == ',') {
+	    sscanf(&fontname[1],"%d",&fontsize);
+	    fontname = previous_font_name;
+	}
+
 	sep = strcspn(fontname,",");
 	if (sep >= sizeof(shortname))
 	    sep = sizeof(shortname) - 1;
 	strncpy(shortname,fontname,sep);
 	shortname[sep] = '\0';
-	fontsize = 12;		/* FIXME EAM - is there a better default? */
-	sscanf( &(fontname[sep+1]),"%d",&fontsize);
+	if (!fontsize)
+	    sscanf( &(fontname[sep+1]),"%d",&fontsize);
 	if (fontsize > 99 || fontsize < 1)
 	    fontsize = 12;
 	   
@@ -4166,12 +4232,15 @@ char *fontname;
 
     }
     
-    if (!font) {
-	fprintf(stderr, "\ngnuplot: can't load font '%s'\n", fontname);
-	font = previous_font;
+    if (font) {
+        strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
+        FPRINTF(("gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
+    } else {
+	if (!((font = XLoadQueryFont(dpy, default_font))))
+	    font = previous_font;
     }
     if (!font) {
-	fprintf(stderr, "gnuplot: using font '%s' instead.\n", FallbackFont);
+	fprintf(stderr, "gnuplot_x11: using font '%s' instead.\n", FallbackFont);
 	font = XLoadQueryFont(dpy, FallbackFont);
 	if (!font) {
 	    fprintf(stderr, "\
@@ -4187,6 +4256,7 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
 
     FPRINTF((stderr,"gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
 		fontname,vchar,hchar));
+
 }
 
 /*-----------------------------------------------------------------------------

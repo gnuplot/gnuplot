@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.24 2003/11/06 23:43:05 sfeam Exp $
+ * $Id: pdf.trm,v 1.25 2003/11/13 08:18:18 mikulik Exp $
  */
 
 /*------------------------------
@@ -29,6 +29,7 @@
 
 /* Text rotation 24-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> */
 /* Revised fill patterns 02-Apr-2003 Ethan A Merritt */
+/* Enhanced text mode support November 2003 Ethan A Merritt */
 
 #include "driver.h"
 
@@ -59,6 +60,13 @@ TERM_PUBLIC void PDF_previous_palette __PROTO((void));
 TERM_PUBLIC void PDF_set_color __PROTO((double));
 TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
 #endif /* PM3D */
+
+/* To support "set term png enhanced" */
+TERM_PUBLIC void ENHPDF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void ENHPDF_OPEN __PROTO((char * fontname, double fontsize,
+			double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void ENHPDF_FLUSH __PROTO((void));
 
 #define PDF_NUM_POINTTYPES 75	/* number of point symbol types not counting the dot */
 
@@ -102,6 +110,7 @@ static int PDF_fontAscent = 0;	/* estimated current font ascent*/
 static int PDF_fontDescent = 0;	/* estimated current font descent*/
 static int PDF_fontLeading = 0;	/* estimated current font leading*/
 static int PDF_fontAvWidth = 0;	/* estimated current font char average width*/
+static int PDF_currentFontHandle; /* Needed for exhanced text mode */
 
 static short PDF_Pen_RealID __PROTO ((int));
 static void PDF_PathOpen __PROTO ((void));
@@ -175,6 +184,8 @@ PDF_SetFont ()
 	(PDF_RESOLUTION * PDF_stringwidth(myPDF, "01234567890123456789",
 					  font_handle, PDF_fontSizeCur)
 	 / 20.0);
+    PDF_currentFontHandle = font_handle;
+
 }
 
 #if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
@@ -276,6 +287,16 @@ PDF_options ()
 {
     struct value a;
 
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "enh$anced")) {
+	    c_token++;
+	    term->put_text = ENHPDF_put_text;
+	} else if (almost_equals(c_token, "noenh$anced")) {
+	    c_token++;
+	    term->put_text = PDF_put_text;
+	}
+    }
+    
     if (!END_OF_COMMAND) {	/* get default font family name*/
 	if (almost_equals (c_token, "fn$ame"))  {
 	    c_token++;
@@ -302,7 +323,8 @@ PDF_options ()
 	 int_error(c_token, "unexpected text at end of command");
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "fname '%s'  fsize %g",
+    sprintf(term_options, "%s fname '%s'  fsize %g",
+	    term->put_text == ENHPDF_put_text ? "enhanced" : "noenhanced",
 	    PDF_fontNameDef, PDF_fontSizeDef);
 }
 
@@ -1145,7 +1167,200 @@ PDF_previous_palette(void)
 }
 
 #endif /* PM3D */
+
+/*
+ * Ethan A Merritt November 2003
+ *	- support for enhanced text mode
+ * BUGS:
+ *	- The baseline is not consistent if font size changes within a string.
+ *	- Placement of overprinted characters is not correct.
+ *	- libpdf exits if the requested font is not recognized.
+ *	- I implement text-rotation by hand, but it may be possible to use
+ *	  a gsave/translate/rotate/.../grestore sequence instead.
+ */
+
+static TBOOLEAN ENHpdf_opened_string;
+
+/* used in determining height of processed text */
+static float ENHpdf_base;
+
+/* use these so that we don't over-write the current font settings in pdf_state */
+static double  ENHpdf_fontsize;
+static char   *ENHpdf_font;
+
+/* A global flag that tells us this run is just to determine text size */
+static TBOOLEAN ENHpdf_sizeonly = FALSE;
+
+static TBOOLEAN ENHpdf_show = TRUE;
+static TBOOLEAN ENHpdf_overprint = FALSE;
+static TBOOLEAN ENHpdf_widthflag = FALSE;
+
+/* Start a new string fragment */
+TERM_PUBLIC void
+ENHPDF_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+    if (!ENHpdf_opened_string) {
+	ENHpdf_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	ENHpdf_font = fontname;
+	ENHpdf_fontsize = fontsize;
+	ENHpdf_base = base * PDF_RESOLUTION;
+	ENHpdf_show = showflag;
+	ENHpdf_overprint = overprint;
+	ENHpdf_widthflag = widthflag;
+    }
+}
+
+/* Write a string fragment and update the current position */
+TERM_PUBLIC void 
+ENHPDF_FLUSH()
+{
+    int x, y;
+    float stringlength;
+
+	if (ENHpdf_opened_string) {
+	    ENHpdf_opened_string = FALSE;
+	    *enhanced_cur_text = '\0';
+	    x = PDF_xLast;
+	    y = PDF_yLast;
+	    x -= sin((double)PDF_TextAngle * M_PI_2/90.) * ENHpdf_base;
+	    y += cos((double)PDF_TextAngle * M_PI_2/90.) * ENHpdf_base;
+	    x += sin((double)PDF_TextAngle * M_PI_2/90.) * (double)PDF_fontAvWidth/2.;
+	    y -= cos((double)PDF_TextAngle * M_PI_2/90.) * (double)PDF_fontAvWidth/2.;
+
+	    /* Select current font */
+	    PDF_fontSizeCur = ENHpdf_fontsize;
+	    PDF_set_font(ENHpdf_font);
+	    
+	    /* Find length of string in current font */
+	    stringlength = PDF_stringwidth(myPDF, enhanced_text,
+		PDF_currentFontHandle, ENHpdf_fontsize);
+	    stringlength *= PDF_RESOLUTION;
+
+	    if (ENHpdf_show && !ENHpdf_sizeonly) {
+		if (PDF_TextAngle == 0 ) {
+		    /* PDF_show(myPDF, enhanced_text); */
+		    PDF_show_boxed(myPDF, enhanced_text, x, y, 0, 0, "left", NULL);
+		} else {
+		    PDF_save(myPDF);
+		    PDF_translate(myPDF, x, y);
+		    PDF_rotate(myPDF, PDF_TextAngle);
+		    /* vertical justification*/
+		    PDF_translate(myPDF, 0, -(PDF_fontAscent-PDF_fontDescent)/2);
+		    PDF_show_boxed(myPDF, enhanced_text, 0, 0, 0, 0, "left", NULL);
+		    PDF_restore(myPDF);
+		}
+	    }
+	    if (ENHpdf_overprint == 1) {
+		PDF_xLast += stringlength * cos((double)PDF_TextAngle * M_PI_2/90.) / 2.;
+		PDF_yLast += stringlength * sin((double)PDF_TextAngle * M_PI_2/90.);
+	    } else if (ENHpdf_widthflag) {
+		PDF_xLast += stringlength * cos((double)PDF_TextAngle * M_PI_2/90.);
+		PDF_yLast += stringlength * sin((double)PDF_TextAngle * M_PI_2/90.);
+	    }
+	}
+}
+
+TERM_PUBLIC void
+ENHPDF_put_text(x, y, str)
+    unsigned int x, y;
+    const char *str;
+{
+    char *original_string = (char *)str;
     
+    if (ignore_enhanced_text || !PDF_fontNameCur) {
+	PDF_put_text(x,y,str);
+	return;
+    }
+
+    /* flush any pending graphics (all the XShow routines do this...) */
+
+    if (!str || !strlen(str))
+	return;
+
+    /* if there are no magic characters, we should just be able
+     * punt the string to PDF_put_text()
+     */
+    if (!strpbrk(str, "{}^_@&~")) {
+	/* do something to ensure default font is selected */
+	PDF_put_text(x,y,str);
+	return;
+    }
+
+    PDF_move(x, y);
+    PDF_PathClose();
+    PDF_save(myPDF);
+
+    /* FIXME - Is this the way to do it?????
+    if (PDF_TextAngle != 0)
+	ENHPDF_DEBUG(("currentpoint gsave translate %d rotate 0 0 moveto\n", PDF_TextAngle));
+     */
+
+    /* set up the global variables needed by enhanced_recursion() */
+    enhanced_max_height = -1000;
+    enhanced_min_height = 1000;
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+
+    ENHpdf_opened_string = FALSE;
+
+    /* EAM - Software text justification requires two passes */
+    if (PDF_TextJust == RIGHT || PDF_TextJust == CENTRE)
+	ENHpdf_sizeonly = TRUE;
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    			PDF_fontNameDef, PDF_fontSizeDef,
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    PDF_restore(myPDF);
+
+    enhanced_max_height += enhanced_min_height;
+
+    /* We can do text justification by running the entire top level string */
+    /* through 2 times, with the ENHpdf_sizeonly flag set the first time.   */
+    /* After seeing where the final position is, we then offset the start  */
+    /* point accordingly and run it again.                                 */
+    if (PDF_TextJust == RIGHT || PDF_TextJust == CENTRE) {
+	int justification = PDF_TextJust;
+	int x_offset = PDF_xLast - x;
+	int y_offset = 0;
+
+	if (PDF_TextAngle != 0)
+	    y_offset = x_offset * tan((double)PDF_TextAngle * M_PI_2/90.);
+	PDF_TextJust = LEFT;
+	ENHpdf_sizeonly = FALSE;
+	
+	if (justification == RIGHT) {
+	    ENHPDF_put_text(x - x_offset, y - y_offset, original_string);
+	} else if (justification == CENTRE) {
+	    ENHPDF_put_text(x - x_offset/2, y - yoffset/2, original_string);
+	}
+	PDF_TextJust = justification;
+    }
+
+}
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1158,15 +1373,16 @@ TERM_TABLE_START (pdf_driver)
     PDF_justify_text, PDF_point, do_arrow, PDF_set_font, do_pointsize,
     TERM_BINARY,
     0 /* suspend */, 0 /* resume */ , PDF_boxfill, PDF_linewidth
-#ifdef PM3D
 #   ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for pdf */
 #   endif
+#ifdef PM3D
    , PDF_make_palette,
    PDF_previous_palette,
    PDF_set_color,
    PDF_filled_polygon
 #endif /* PM3D */
+   , ENHPDF_OPEN, ENHPDF_FLUSH, do_enh_writec
 TERM_TABLE_END (pdf_driver)
 #undef LAST_TERM
 #define LAST_TERM pdf_driver
@@ -1188,8 +1404,13 @@ START_HELP(pdf)
 "",
 " Syntax:",
 "       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
+"                        {{no}enhanced}",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
-" and <fontsize> is the font size (in points, default 12)"
+" and <fontsize> is the font size (in points, default 12).",
+"",
+" The `enhanced` option enables enhanced text processing features",
+" (subscripts, superscripts and mixed fonts). See `enhanced` for more",
+" information. Only the core PDF fonts are supported."
 END_HELP(pdf)
 #endif

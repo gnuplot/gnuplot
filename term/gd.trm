@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.30 2003/06/19 03:07:06 sfeam Exp $
+ * $Id: gd.trm,v 1.31 2003/08/22 12:36:17 lhecking Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -134,6 +134,14 @@ TERM_PUBLIC void PNG_set_color (double);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
 #endif
 
+/* To support "set term png enhanced" */
+TERM_PUBLIC void ENHGD_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void ENHGD_OPEN __PROTO((char * fontname, double fontsize,
+	    		double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+			int overprint));
+TERM_PUBLIC void ENHGD_FLUSH __PROTO((void));
+
+
 #include "gd.h"
 
 static void PNG_PointX __PROTO((unsigned int, unsigned int));
@@ -200,6 +208,7 @@ static struct {
 #define PNG_USE_TRANSPARENT 1
 #define PNG_USE_INTERLACE   2
 #define PNG_USE_CROP        4
+#define PNG_USE_ENHANCED    8
 
 enum PNG_id {
     PNG_TRANSPARENT, PNG_NOTRANSPARENT,
@@ -209,6 +218,7 @@ enum PNG_id {
     PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
     PNG_FONT,
     PNG_SIZE,
+    PNG_ENHANCED, PNG_NOENHANCED,
     PNG_OTHER
 };
 
@@ -232,6 +242,8 @@ static struct gen_table PNG_opts[] =
     { "g$iant", PNG_GIANT },
     { "fo$nt", PNG_FONT },
     { "si$ze", PNG_SIZE },
+    { "enh$anced", PNG_ENHANCED },
+    { "noenh$anced", PNG_NOENHANCED },
     { NULL, PNG_OTHER }
 };
 
@@ -569,6 +581,16 @@ PNG_options()
 	    term->v_tic = (PNG_XMAX < PNG_YMAX) ? PNG_XMAX/100 : PNG_YMAX/100;
 	    term->h_tic = term->v_tic;
 	    break;
+	case PNG_ENHANCED:
+	    png_state.flags |= PNG_USE_ENHANCED;
+	    term->put_text = ENHGD_put_text;
+	    ++c_token;
+	    break;
+	case PNG_NOENHANCED:
+	    png_state.flags &= ~PNG_USE_ENHANCED;
+	    term->put_text = PNG_put_text;
+	    ++c_token;
+	    break;
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -637,6 +659,10 @@ PNG_options()
     }
     strcat(term_options, "crop ");
     
+    if (png_state.flags & PNG_USE_ENHANCED) {
+	strcat(term_options, "enhanced ");
+    }
+
     if (*png_state.ttffont) {
     	sprintf(term_options + strlen(term_options),
 		"font %s %d ", png_state.ttffont, png_state.ttfsize);
@@ -1290,6 +1316,185 @@ PNG_pointsize(ptsize)
     PNG_ps = (int)(((double)PNG_POINT_SCALE * ptsize) + 0.5);
 }
 
+/*
+ * Ethan A Merritt November 2003
+ *	- Support for enhanced text mode
+ * BUGS:
+ *	- placement of overprinted characters is not correct
+ * PROBLEMS:
+ *	- the Symbol font encoding doesn't work in libgd (up to 2.0.15), 
+ *	  which makes the whole thing considerably less useful than it 
+ *	  ought to be. On the bright side, when libgd is fixed then this
+ *	  code will work with no changes needed.
+ * 	- Placement of superscripts and subscripts relies on information
+ * 	  in the font description that is not always reliable
+ *	- the TTF character encoding for non-keyboard characters does
+ *	  not always match the PostScript standard.
+ *	- Spacing of rotated text is incorrect; I believe this is a due
+ *	  to a problem in the text rotation code (aspect ratio??).
+ */
+
+static TBOOLEAN ENHgd_opened_string;
+
+/* used in determining height of processed text */
+static float ENHgd_base;
+
+/* use these so that we don't over-write the current font settings in png_state */
+static double  ENHgd_fontsize;
+static char   *ENHgd_font;
+
+static TBOOLEAN ENHgd_show = TRUE;
+static TBOOLEAN ENHgd_sizeonly = FALSE;
+static TBOOLEAN ENHgd_overprint = FALSE;
+static TBOOLEAN ENHgd_widthflag = TRUE;
+
+TERM_PUBLIC void
+ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+    if (!ENHgd_opened_string) {
+	ENHgd_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	ENHgd_font = fontname;
+	ENHgd_fontsize = fontsize;
+	ENHgd_base = base;
+	ENHgd_show = showflag;
+	ENHgd_overprint = overprint;
+	ENHgd_widthflag = widthflag;
+    }
+}
+
+/* Write a string fragment and update the current position */
+TERM_PUBLIC void 
+ENHGD_FLUSH()
+{
+    int brect[8]; char *err;
+    unsigned int x, y;
+
+	if (ENHgd_opened_string) {
+	    ENHgd_opened_string = FALSE;
+	    *enhanced_cur_text = '\0';
+	    x = png_state.x;
+	    y = png_state.y;
+	    x -= sin((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
+	    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
+	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
+	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
+	    err = gdImageStringFT(
+			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL, 
+	    		brect, png_state.color,
+			ENHgd_font, ENHgd_fontsize,
+			(double)png_state.angle * M_PI_2/90.,
+			x, Y(y), enhanced_text);
+	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
+	    FPRINTF(("outputstring: %s boundingbox: %d %d %d %d\n",
+			enhanced_text, brect[6], brect[7], brect[2], brect[3]));
+	    if (ENHgd_overprint == 1) {
+		png_state.x += ((brect[2] - brect[0]))/2;
+		png_state.y -= (brect[3] - brect[1]);
+	    } else if (ENHgd_widthflag) {
+		png_state.x += (brect[2] - brect[0]);
+		png_state.y -= (brect[3] - brect[1]);
+	    }
+	}
+}
+
+TERM_PUBLIC void
+ENHGD_put_text(x, y, str)
+    unsigned int x, y;
+    const char *str;
+{
+    char *original_string = (char *)str;
+    
+    if (ignore_enhanced_text || !png_state.ttffont) {
+	PNG_put_text(x,y,str);
+	return;
+    }
+
+    /* flush any pending graphics (all the XShow routines do this...) */
+
+    if (!strlen(str))
+	return;
+
+    /* if there are no magic characters, we should just be able
+     * punt the string to PNG_put_text()
+     */
+    if (!strpbrk(str, "{}^_@&~")) {
+	/* do something to ensure default font is selected */
+	PNG_put_text(x,y,str);
+	return;
+    }
+
+    PNG_move(x,y);
+
+    /* set up the global variables needed by enhanced_recursion() */
+    enhanced_max_height = -1000;
+    enhanced_min_height = 1000;
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"&#%o;",sizeof(enhanced_escape_format));
+
+    ENHgd_opened_string = FALSE;
+    ENHgd_overprint = FALSE;
+    ENHgd_show      = TRUE;
+
+    /* EAM - post.trm wasn't doing this, but how else do they get initialized? */
+	ENHgd_font = png_state.ttffont;
+	ENHgd_fontsize = png_state.ttfsize;
+
+    /* EAM - Software text justification requires two passes */
+    if (png_state.justify == RIGHT || png_state.justify == CENTRE)
+	ENHgd_sizeonly = TRUE;
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    			ENHgd_font, ENHgd_fontsize, 
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    enhanced_max_height += enhanced_min_height;
+
+    /* We can do text justification by running the entire top level string */
+    /* through 2 times, with the ENHgd_sizeonly flag set the first time.   */
+    /* After seeing where the final position is, we then offset the start  */
+    /* point accordingly and run it again without the flag set.            */
+    if (png_state.justify == RIGHT || png_state.justify == CENTRE) {
+	int justification = png_state.justify;
+	int x_offset = png_state.x - x;
+	int y_offset = 0;
+
+	if (png_state.angle != 0)
+	    y_offset = x_offset * tan((double)png_state.angle * M_PI_2/90.);
+	png_state.justify = LEFT;
+	ENHgd_sizeonly = FALSE;
+	
+	if (justification == RIGHT) {
+	    ENHGD_put_text(x - x_offset, y - y_offset, original_string);
+	} else if (justification == CENTRE) {
+	    ENHGD_put_text(x - x_offset/2, y - yoffset/2, original_string);
+	}
+	png_state.justify = justification;
+    }
+
+}
+
 #undef gdfont
 
 #endif /* TERM_BODY */
@@ -1321,6 +1526,7 @@ TERM_TABLE_START(png_driver)
     PNG_set_color,
     PNG_filled_polygon
 #endif
+    , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(png_driver)
 
 #undef LAST_TERM
@@ -1345,6 +1551,7 @@ START_HELP(png)
 "              {tiny | small | medium | large | giant}",
 "              {font <face> {<pointsize>}}",
 "              {size <x>,<y>} {{no}crop}",
+"              {{no}enhanced}",
 "              {<color0> <color1> <color2> ...}",
 "",
 " PNG images are created using libgd, with optional support for TrueType",
@@ -1370,6 +1577,12 @@ START_HELP(png)
 " 'set term png font \"Face\"' will look for a font file named either ",
 " <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
+"",
+" `enhanced` enables the enhanced text processing features, (subscripts, ",
+" superscripts and mixed fonts). See `enhanced` for more information. ",
+" The full enhanced mode syntax is supported by the PNG/JPEG driver itself,",
+" but some of these features are dependent on which version of the ",
+" underlying libgd library is present, and which fonts are available.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
@@ -1468,6 +1681,7 @@ TERM_TABLE_START(jpeg_driver)
     PNG_set_color,
     PNG_filled_polygon
 #endif
+    , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(png_driver)
 
 #undef LAST_TERM
@@ -1493,6 +1707,7 @@ START_HELP(jpeg)
 "                        {tiny | small | medium | large | giant}",
 "                        {font <face> {<pointsize>}}",
 "                        {size <x>,<y>} {{no}crop}",
+"                        {{no}enhanced}",
 "                        {<color0> <color1> <color2> ...}",
 "",
 " JPEG images are created using libgd, with optional support for TrueType",
@@ -1514,6 +1729,12 @@ START_HELP(jpeg)
 " 'set term jpeg font \"Face\"' will look for a font file named either ",
 " <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
 " Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
+"",
+" `enhanced` enables the enhanced text processing features, (subscripts, ",
+" superscripts and mixed fonts). See `enhanced` for more information. ",
+" The full enhanced mode syntax is supported by the PNG/JPEG driver itself,",
+" but some of these features are dependent on which version of the ",
+" underlying libgd library is present, and which fonts are available.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",

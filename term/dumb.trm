@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.10 1999/11/15 21:57:04 lhecking Exp $
+ * $Id: dumb.trm,v 1.11 2002/02/25 03:10:41 broeker Exp $
  *
  */
 
@@ -45,6 +45,13 @@
  *   Francois Pinard, 91-04-03
  *           INTERNET: pinard@iro.umontreal.ca
  *
+ *   Ethan A Merritt Nov 2003
+ *	Added support for enhanced text mode.
+ *	Yes, this is frivolous, but it serves as an example for 
+ *	adding enhanced text to other terminals.  You can disable
+ *	it by adding a line
+ *	#define NO_DUMB_ENHANCED_SUPPORT
+ *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
  */
@@ -70,6 +77,18 @@ TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y,
 TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
 				     TBOOLEAN head));
+
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+/* To support "set term dumb enhanced" (don't ask why!) */
+TERM_PUBLIC void ENHdumb_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC void ENHdumb_OPEN __PROTO((char * fontname, double fontsize,
+	                            double base, TBOOLEAN widthflag, TBOOLEAN showflag,
+				    int overprint));
+TERM_PUBLIC void ENHdumb_FLUSH __PROTO((void));
+#else
+#define ENHdumb_put_text NULL
+#endif
+
 
 #define DUMB_XMAX 79
 #define DUMB_YMAX 24
@@ -99,12 +118,14 @@ static int dumb_feed = 1;
 
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
-enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_OTHER };
+enum DUMB_id { DUMB_FEED, DUMB_NOFEED, DUMB_ENH, DUMB_NOENH, DUMB_OTHER };
 
 static struct gen_table DUMB_opts[] =
 {
     { "f$eed", DUMB_FEED },
     { "nof$eed", DUMB_NOFEED },
+    { "enh$anced", DUMB_ENH },
+    { "noe$nhanced", DUMB_NOENH },
     { NULL, DUMB_OTHER }
 };
 
@@ -124,6 +145,16 @@ DUMB_options()
 	    c_token++;
 	    dumb_feed = 0;
 	    break;
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+	case DUMB_ENH:
+	    c_token++;
+	    term->put_text = ENHdumb_put_text;
+	    break;
+	case DUMB_NOENH:
+	    c_token++;
+	    term->put_text = DUMB_put_text;
+	    break;
+#endif
 	case DUMB_OTHER:
 	default:
 	    x = (int) real(const_express(&a));
@@ -136,8 +167,10 @@ DUMB_options()
 	}
     }
 
-    sprintf(term_options, "%sfeed %d %d",
-	    dumb_feed ? "" : "no", dumb_xmax, dumb_ymax);
+    sprintf(term_options, "%sfeed %s %d %d",
+	    dumb_feed ? "" : "no", 
+	    term->put_text == ENHdumb_put_text ? "enhanced" : "",
+	    dumb_xmax, dumb_ymax);
 }
 
 
@@ -372,6 +405,116 @@ DUMB_arrow(sx, sy, ex, ey, head)
     dumb_y = saved_y;
 }
 
+
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+/*
+ * The code from here on serves as an example of how to
+ * add enhanced text mode support to even a dumb driver.
+ */
+
+static TBOOLEAN ENHdumb_opened_string;
+static TBOOLEAN ENHdumb_show = TRUE;
+static TBOOLEAN ENHdumb_overprint = 0;
+static TBOOLEAN ENHdumb_widthflag = TRUE;
+#define ENHdumb_fontsize 1
+#define ENHdumb_font ""
+static double ENHdumb_base;
+
+TERM_PUBLIC void
+ENHdumb_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+    if (!ENHdumb_opened_string) {
+	ENHdumb_opened_string = TRUE;
+	/* Start new text fragment */
+	    enhanced_cur_text = &enhanced_text[0];
+	/* Scale fractional font height to vertical units of display */
+	    ENHdumb_base = base * 2;
+	/* Keep track of whether we are supposed to show this string */
+	    ENHdumb_show = showflag;
+	/* 0/1/2  no overprint / 1st pass / 2nd pass */
+	    ENHdumb_overprint = overprint;
+	/* widthflag FALSE means do not update text position after printing */
+	    ENHdumb_widthflag = widthflag;
+	/* Many drivers will need to do something about font selection here */
+	    /* but dumb is dumb */
+    }
+}
+
+TERM_PUBLIC void
+ENHdumb_FLUSH()
+{
+    char *str = enhanced_text;	/* The fragment to print */
+    int x = dumb_x;		/* The current position  */
+    int len;
+
+    if (ENHdumb_opened_string) {
+	*enhanced_cur_text = '\0';
+	len = strlen(str);
+
+	/* print the string fragment, perhaps invisibly */
+	/* NB: base expresses offset from current y pos */
+	for (; x < dumb_xmax && *str; x++, str++)
+	    if (ENHdumb_show)
+        	dumb_set_pixel(x, dumb_y+ENHdumb_base, *str, 5);
+
+	if (!ENHdumb_widthflag)
+	    /* don't update position */
+	    ;
+	else if (ENHdumb_overprint == 1)
+	    /* First pass of overprint, leave position in center of fragment */
+	    dumb_x += len / 2;
+	else
+	    /* Normal case is to update position to end of fragment */
+	    dumb_x += len;
+	    
+	ENHdumb_opened_string = FALSE;
+    }
+}
+
+TERM_PUBLIC void
+ENHdumb_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    /* If no enhanced text processing is needed, we can use the plain  */
+    /* vanilla put_text() routine instead of this fancy recursive one. */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~")) {
+	DUMB_put_text(x,y,str);
+	return;
+    }
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    ENHdumb_opened_string = FALSE;
+    strncpy(enhanced_escape_format,"%c",sizeof(enhanced_escape_format));
+
+    DUMB_move(x,y);
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    			ENHdumb_font, ENHdumb_fontsize, 
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+}
+#endif /* NO_DUMB_ENHANCED_SUPPORT */
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -383,7 +526,17 @@ TERM_TABLE_START(dumb_driver)
     DUMB_linetype, DUMB_put_text, null_text_angle,
     null_justify_text, DUMB_point, DUMB_arrow, set_font_null,
     0,				/* pointsize */
-    TERM_CAN_MULTIPLOT
+    TERM_CAN_MULTIPLOT,
+    NULL, NULL, NULL, NULL
+#ifdef USE_MOUSE
+    , NULL, NULL, NULL, NULL, NULL
+#endif
+#ifdef PM3D
+    , NULL, NULL, NULL, NULL
+#endif
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+    , ENHdumb_OPEN, ENHdumb_FLUSH, do_enh_writec
+#endif /* NO_DUMB_ENHANCED_SUPPORT */
 TERM_TABLE_END(dumb_driver)
 
 #undef LAST_TERM
@@ -405,6 +558,9 @@ START_HELP(dumb)
 "",
 " Syntax:",
 "       set terminal dumb {[no]feed} {<xsize> <ysize>}",
+#ifndef NO_DUMB_ENHANCED_SUPPORT
+"                         {[no]enhanced}",
+#endif
 "",
 " where <xsize> and <ysize> set the size of the dumb terminals. Default is",
 " 79 by 24. The last newline is printed only if `feed` is enabled.",
