@@ -1,3 +1,7 @@
+2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm: Remove compiler warning.
+
 2002-10-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/misc.c (parse_fillstyle): Make the bulk of this function
@@ -1273,7 +1277,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 12:40:56 $).
+	last modification date (from the tag $Date: 2002/10/09 14:13:10 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
