@@ -1,3 +1,30 @@
+2001-10-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot3d.c (grid_nongrid_data): Fix bug in code to handle the
+ 	case of a sampling point falling exactly onto one of the input
+ 	data points, by adding a break statement to bail out of the inner
+ 	loop.
+
+2001-10-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (SHOW_AUTOSCALE): Use new local variable to make code
+ 	more readable.  Only output " (min)" or " (max)" if they're not
+ 	both on.  Don't print an extra TAB if non-parametric. Start a new
+ 	line occasionally, to make avoid overly long output lines.
+
+	* src/mouse.c (apply_zoom): New static variable autoscale_copies
+ 	to remember the state of 'set autoscale'.  Zooming overwrites
+ 	this, so it has to be recovered at 'unzoom' time.  Fill
+ 	autoscale_copies upon the initial zoom that leaves 'un-zoomed'
+ 	state, and restore it whenever "previous zoom" or "unzoom"
+ 	builtins return to the original settings.  Resized internal string
+ 	buffer to allow for longer mouse-generated command.
+	(OUTPUT_AUTOSCALE): New macro to help with that task. Visible only
+ 	inside apply_zoom().
+	(apply_zoom): Save the `set_{min|max}' fields instead of
+ 	`{min|max}' for retrieval by "previous zoom" or "unzoom" builtins,
+ 	as those represent the user-serviceable parts of the status.
+
 2001-10-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/contrib/pm3dConvertToImage.awk: Fix for a too early "stroke"
