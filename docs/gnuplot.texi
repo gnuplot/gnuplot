@@ -539,6 +539,9 @@ The `load` and @ref{save} commands accept piped input and output, respectively.
 The `history` command (for gnuplot with its own readline, not with GNU
 readline) now includes several useful options.
 
+The built-in function `rand(x)` has been modified to allow explicit seeding
+of the pseudo-random number generator. See `random`.
+
 The MS Windows package includes an additional executable `pgnuplot.exe` to
 support piping command through standard input, which is otherwise not
 available for graphical applications on this system.
@@ -790,7 +793,9 @@ with the @ref{save} and `save set` commands.
 
 Several gnuplot terminal drivers access TrueType fonts via the gd library.
 For these drivers the font search path is controlled by the environmental
-variable GDFONTPATH.
+variable GDFONTPATH.  Furthermore, a default font for these drivers may be
+set via the environmental variable GNUPLOT_DEFAULT_GDFONT.
+
 The postscript terminal uses its own font search path. It is controlled by
 the environmental variable GNUPLOT_FONTPATH. The format is the same as for
 GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the @ref{fontpath}
@@ -903,6 +908,7 @@ defaults to radians.
 * tm_yday::                     
 * tm_year::                     
 * valid::                       
+* Random_number_generator::     
 @end menu
 
 @node abs, acos, Functions, Functions
@@ -1314,10 +1320,17 @@ of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
 @findex rand
 
 
-The `rand(x)` function returns a pseudo random number in the interval [0:1]
-using the real part of its argument as a seed.  If seed < 0, the sequence
-is (re)initialized.  If the argument is a complex value, the imaginary
-component is ignored.
+`rand(0)`  returns a pseudo random number in the interval [0:1] generated
+@example
+           from the current value of two internal 32-bit seeds. 
+@end example
+
+`rand(-1)` resets both seeds to a standard value. 
+`rand(x)`  for x>0 sets both seeds to a value based on the value of x.
+`rand(@{x,y@})` for x>0 sets seed1 to x and seed2 to y.
+Note: This behavior has changed starting with gnuplot version 3.8l. Older
+scripts that expected rand(x>0) to produce sequential pseudo-random numbers
+from the same seeded sequence must be changed to call rand(0) instead.
 
 @node real, sgn, rand, Functions
 @subsubsection real
@@ -1502,7 +1515,7 @@ as a real.
 The @ref{tm_year} function interprets its argument as a time, in seconds from
 1 Jan 2000.  It returns the year (an integer) as a real.
 
-@node valid,  , tm_year, Functions
+@node valid, Random_number_generator, tm_year, Functions
 @subsubsection valid
 
 @c ?expressions functions valid
@@ -1514,9 +1527,31 @@ The @ref{tm_year} function interprets its argument as a time, in seconds from
 `valid(x)` may be used only in expressions as part of @ref{using} manipulations
 to fits or datafile plots.  See @ref{using}.
 
-See also
+See also 
 @uref{http://gnuplot.sourceforge.net/demo/airfoil.html,airfoil.dem: use of functions and complex variables for airfoils demo.
 }
+
+
+@node Random_number_generator,  , valid, Functions
+@subsubsection Random number generator
+
+@cindex random
+
+@c ?expressions random
+
+The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
+Older scripts that expected rand(x>0) to produce sequential pseudo-random
+numbers from the same seeded sequence must be changed to call rand(0) instead.
+The current behavior is as follows:
+@example
+ `rand(0)`  returns a pseudo random number in the interval [0:1] generated
+            from the current value of two internal 32-bit seeds. 
+ `rand(-1)` resets both seeds to a standard value. 
+ `rand(x)`  for x>0 sets both seeds to a value based on the value of x.
+ `rand(@{x,y@})` for x>0 sets seed1 to x and seed2 to y.
+
+@end example
+
 
 @node Operators, User-defined, Functions, Expressions
 @subsection Operators
@@ -11172,6 +11207,8 @@ directories listed in the GDFONTPATH environmental variable. That is,
 'set term png font "Face"' will look for a font file named either 
 <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and 
 Adobe Type 1 fonts are fully scalable and may be rotated through any angle.
+If no font is specified, gnuplot checks the environmental variable 
+GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. 
 
 `enhanced` enables the enhanced text processing features, (subscripts, 
 superscripts and mixed fonts). See `enhanced` for more information. 
@@ -13932,9 +13969,12 @@ and `set linestyle`.
 
 The Windows version normally terminates immediately as soon as the end of
 any files given as command line arguments is reached (i.e. in non-interactive
-mode). It will also not show the text-window at all, in this mode, only
-the plot. By giving the optional argument
-`/noend` or `-noend`, you can disable this behaviour.
+mode), unless you specify `-` as the last command line option.
+It will also not show the text-window at all, in this mode, only the plot.
+By giving the optional argument `-persist` (same as for gnuplot under x11;
+former Windows-only options `/noend` or `-noend` are still accepted as well),
+will not close gnuplot. Contrary to gnuplot on other operating systems,
+gnuplot's interactive command line is accessible after the -persist option.
 
 
 @noindent --- GRAPH-MENU ---
