@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.2 1999/08/08 17:07:08 lhecking Exp $ */
+/* $Id: tables.c,v 1.3 1999/08/09 15:58:42 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -43,6 +43,24 @@ struct gen_table command_tbl[] =
     { NULL, CMD_INVALID }
 };
 
+/* 'plot' and 'splot' */
+struct gen_table plot_tbl[] =
+{
+    { "ax$es", P_AXES },
+    { "ax$is", P_AXES },
+    { "bin$ary", P_BINARY },
+    { "ev$ery", P_EVERY },
+    { "i$ndex", P_INDEX },
+    { "mat$rix", P_MATRIX },
+    { "s$mooth", P_SMOOTH },
+    { "thru$", P_THRU },
+    { "t$itle", P_TITLE },
+    { "not$itle", P_NOTITLE },
+    { "u$sing", P_USING },
+    { "w$ith", P_WITH },
+    { NULL, P_INVALID }
+};
+
 /* 'save' command */
 struct gen_table save_tbl[] =
 {
@@ -59,15 +77,15 @@ struct gen_table set_tbl[] =
     { "ac$tion_table", S_ACTIONTABLE },
     { "at", S_ACTIONTABLE },
     { "an$gles", S_ANGLES },
-    { "ar$row", S_ARROW },
-    { "noar$row", S_NOARROW },
-    { "au$toscale", S_AUTOSCALE },
+    { "ar$row", S_ARROW }, 
+    { "noar$row", S_NOARROW }, 
+    { "au$toscale", S_AUTOSCALE }, 
     { "noau$toscale", S_NOAUTOSCALE },
     { "b$ars", S_BARS },
     { "nob$ars", S_NOBARS },
     { "bor$der", S_BORDER },
     { "nobor$der", S_NOBORDER },
-    { "box$width", S_BOXWIDTH },
+    { "box$width", S_BOXWIDTH }, 
     { "cl$abel", S_CLABEL },
     { "nocl$abel", S_NOCLABEL },
     { "c$lip", S_CLIP },
@@ -114,6 +132,8 @@ struct gen_table set_tbl[] =
 
     { "mis$sing", S_MISSING },
     { "nomis$sing", S_NOMISSING },
+    { "multi$plot", S_MULTIPLOT },
+    { "nomulti$plot", S_MULTIPLOT },
 
     { "mxt$ics", S_MXTICS },
     { "nomxt$ics", S_NOMXTICS },
@@ -138,6 +158,7 @@ struct gen_table set_tbl[] =
     { "nopol$ar", S_NOPOLAR },
     { "sa$mples", S_SAMPLES },
     { "si$ze", S_SIZE },
+    { "st$yle", S_STYLE },
     { "su$rface", S_SURFACE },
     { "nosu$rface", S_NOSURFACE },
     { "t$erminal", S_TERMINAL },
@@ -220,6 +241,73 @@ struct gen_table set_tbl[] =
 
     { "z$ero", S_ZERO },
     { NULL, S_INVALID }
+};
+
+/* 'set hidden3d' options */
+struct gen_table set_hidden3d_tbl[] =
+{
+    { "def$aults", H_DEFAULTS },
+    { "off$set", H_OFFSET },
+    { "nooff$set", H_NOOFFSET },
+    { "tri$anglepattern", H_TRIANGLEPATTERN },
+    { "undef$ined", H_UNDEFINED },
+    { "nound$efined", H_NOUNDEFINED },
+    { "alt$diagonal", H_ALTDIAGONAL },
+    { "noalt$diagonal", H_NOALTDIAGONAL },
+    { "bent$over", H_BENTOVER },
+    { "nobent$over", H_NOBENTOVER },
+    { NULL, H_INVALID }
+};
+
+/* 'set key' options */
+struct gen_table set_key_tbl[] =
+{
+    { "t$op", KEY_TOP },
+    { "b$ottom", KEY_BOTTOM },
+    { "l$eft", KEY_LEFT },
+    { "r$ight", KEY_RIGHT },
+    { "u$nder", KEY_UNDER },
+    { "be$low", KEY_UNDER },
+    { "o$utside", KEY_OUTSIDE },
+    { "L$eft", KEY_LLEFT },
+    { "R$ight", KEY_RRIGHT },
+    { "rev$erse", KEY_REVERSE },
+    { "norev$erse", KEY_NOREVERSE },
+    { "b$ox", KEY_BOX },
+    { "nob$ox", KEY_NOBOX },
+    { "sa$mplen", KEY_SAMPLEN },
+    { "sp$acing", KEY_SPACING },
+    { "w$idth", KEY_WIDTH },
+    { "ti$tle", KEY_TITLE },
+    { NULL, KEY_INVALID }
+};
+
+struct gen_table plotstyle_tbl[] =
+{
+    { "l$ines", LINES },
+    { "i$mpulses", IMPULSES },
+    { "p$oints", POINTSTYLE },
+    { "linesp$oints", LINESPOINTS },
+    { "lp", LINESPOINTS },
+    { "d$ots", DOTS },
+    { "yerrorl$ines", YERRORLINES },
+    { "errorl$ines", YERRORLINES },
+    { "xerrorl$ines", XERRORLINES },
+    { "xyerrorl$ines", XYERRORLINES },
+    { "ye$rrorbars", YERRORBARS },
+    { "e$rrorbars", YERRORBARS },
+    { "xe$rrorbars", XERRORBARS },
+    { "xye$rrorbars", XYERRORBARS },
+    { "boxes", BOXES },
+    { "boxer$rorbars", BOXERROR },
+    { "boxx$yerrorbars", BOXXYERROR },
+    { "st$eps", STEPS },
+    { "fs$teps", FSTEPS },
+    { "his$teps", HISTEPS },
+    { "vec$tor", VECTOR },
+    { "fin$ancebars", FINANCEBARS },
+    { "can$dlesticks", CANDLESTICKS },
+    { NULL, -1 }
 };
 
 int

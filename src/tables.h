@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.2 1999/08/08 17:07:41 lhecking Exp $ */
+/* $Id: tables.h,v 1.3 1999/08/09 15:59:00 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -21,12 +21,18 @@ enum command_id {
     CMD_SHOW, CMD_SPLOT, CMD_SYSTEM, CMD_TEST, CMD_TESTTIME, CMD_UPDATE
 };
 
+/* options for plot/splot */
+enum plot_id {
+    P_INVALID,
+    P_AXES, P_BINARY, P_EVERY, P_INDEX, P_MATRIX, P_SMOOTH, P_THRU,
+    P_TITLE, P_NOTITLE, P_USING, P_WITH
+};
+
 /* options for 'save' command */
 enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_SET, SAVE_VARS };
 
 /* options for 'show' and 'set' commands
  * this is rather big, we might be better off with a hash table */
-
 enum set_id {
     S_INVALID,
     S_ACTIONTABLE, S_ALL, S_ANGLES,
@@ -36,13 +42,14 @@ enum set_id {
     S_CLABEL, S_NOCLABEL, S_CLIP, S_NOCLIP,
     S_CNTRPARAM,
     S_CONTOUR, S_NOCONTOUR,
-    S_DATA,
+    S_DATA, S_FUNCTIONS,
     S_DGRID3D, S_NODGRID3D,
-    S_DUMMY, S_ENCODING, S_FORMAT, S_FUNCTIONS,
+    S_DUMMY, S_ENCODING, S_FORMAT,
     S_GRID, S_NOGRID, S_HIDDEN3D, S_NOHIDDEN3D,
     S_ISOSAMPLES,
     S_KEY, S_NOKEY, S_KEYTITLE, S_NOKEYTITLE, S_LABEL, S_NOLABEL,
-    S_LINESTYLE, S_NOLINESTYLE, S_LOADPATH, S_NOLOADPATH,
+    S_LINESTYLE, S_NOLINESTYLE,
+    S_LOADPATH, S_NOLOADPATH,
     S_LOCALE,
     S_LOGSCALE, S_NOLOGSCALE,
     S_MAPPING, S_MARGIN, S_LMARGIN, S_RMARGIN, S_TMARGIN, S_BMARGIN,
@@ -57,7 +64,7 @@ enum set_id {
     S_POLAR, S_NOPOLAR,
     S_RRANGE, S_SAMPLES, S_SIZE,
     S_SURFACE, S_NOSURFACE,
-    S_TERMINAL, S_TICS, S_TICSCALE, S_TICSLEVEL, S_TIMEFMT,
+    S_STYLE, S_TERMINAL, S_TICS, S_TICSCALE, S_TICSLEVEL, S_TIMEFMT,
     S_TIMESTAMP, S_NOTIMESTAMP,
     S_TITLE, S_TRANGE, S_URANGE, S_VARIABLES, S_VERSION, S_VIEW, S_VRANGE,
 
@@ -79,9 +86,26 @@ enum set_id {
     S_YZEROAXIS, S_NOYZEROAXIS, S_Y2ZEROAXIS, S_NOY2ZEROAXIS
 };
 
+enum set_hidden3d_id {
+    H_INVALID,
+    H_DEFAULTS, H_OFFSET, H_NOOFFSET, H_TRIANGLEPATTERN,
+    H_UNDEFINED, H_NOUNDEFINED, H_ALTDIAGONAL, H_NOALTDIAGONAL,
+    H_BENTOVER, H_NOBENTOVER
+};
+
+enum set_key_id {
+    KEY_INVALID,
+    KEY_TOP, KEY_BOTTOM, KEY_LEFT, KEY_RIGHT, KEY_UNDER, KEY_OUTSIDE,
+    KEY_LLEFT, KEY_RRIGHT, KEY_REVERSE, KEY_NOREVERSE, KEY_BOX, KEY_NOBOX,
+    KEY_SAMPLEN, KEY_SPACING, KEY_WIDTH, KEY_TITLE
+};
+
 extern struct gen_table command_tbl[];
 extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];
+extern struct gen_table set_key_tbl[];
+extern struct gen_table set_hidden3d_tbl[];
+extern struct gen_table plotstyle_tbl[];
 
 /* Function prototypes */
 int lookup_table __PROTO((struct gen_table *, int));
