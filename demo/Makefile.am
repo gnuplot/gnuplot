@@ -3,22 +3,24 @@ AUTOMAKE_OPTIONS = foreign 1.2h
 
 CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par temp.set
 
-all: binary1 binary2 binary3
+BINARY_FILES = binary1 binary2 binary3
 
-binary1 binary2 binary3: ../src/bf_test
+all: $(BINARY_FILES)
+
+$(BINARY_FILES): ../src/bf_test
 	@echo Creating binary data files
 	@../src/bf_test
 
 check-local: check-noninteractive
 
-check-interactive:
+check-interactive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  @( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem )
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem ); \
 	else \
-	  @( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) gnuplot all.dem ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) gnuplot all.dem ); \
 	fi
 
-check-noninteractive:
+check-noninteractive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
 	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_LIB=$(srcdir) gnuplot all.dem </dev/null ); \
 	else \
