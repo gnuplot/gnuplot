@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.16 1998/06/18 14:59:18 ddenholm Exp $
+ * $Id: cgm.trm,v 1.16 1998/12/14 18:38:22 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -184,6 +184,8 @@ static void CGM_write_int_record __PROTO((int class, int cgm_id, int length,
 static void CGM_write_mixed_record __PROTO((int class, int cgm_id,
 					    int numint, int *int_data,
 					    int numchar, char *char_data));
+static void CGM_write_byte_record __PROTO((int class, int cgm_id, int length,
+					   char *data));
 
 
 
@@ -216,7 +218,8 @@ TERM_PUBLIC void CGM_graphics()
     };
 */
     {
-	CGM_COLORS,
+/*	CGM_COLORS,	*/
+	0, 255, 255, 255,
 	0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 0, 255, 0, 255, 0, 255, 255
 /*    black    red     green    blue      yellow    magenta     cyan  */
     };
@@ -226,7 +229,7 @@ TERM_PUBLIC void CGM_graphics()
     static int marker_size_specification_mode_data[] = { 0 };
     static int vdc_extent_data[] = { 0, 0, 0, 0 };
     static int vdc_integer_precision_data[] = { 16 };
-    static int transparency_data[] = { 0 }; /* text background: 1=transparent */
+    static int transparency_data[] = { 1 }; /* text background: 1=transparent */
     static int clip_indicator_data[] = { 0 };
 /*  static int line_color_data[] = { 1 }; */
     static int line_type_data[] = { 1 };
@@ -306,7 +309,7 @@ TERM_PUBLIC void CGM_graphics()
     CGM_write_int_record(1, 11, sizeof(elements_list_data) / CGM_ADJ,
 			 elements_list_data);
     if (cgm_winword6_mode == FALSE)
-	CGM_write_char_record(1, 13, strlen(cgm_font_data), cgm_font_data);
+	CGM_write_byte_record(1, 13, strlen(cgm_font_data), cgm_font_data);
 
     /* picture description (classes 2 and 3) */
     CGM_write_char_record(0, 3, 8, "PICTURE1");
@@ -440,7 +443,7 @@ double width;
 {
     int new_linewidth;
 
-    assert(width >= 1.);
+    assert(width >= 0);
     new_linewidth = width * cgm_linewidth_pt * CGM_PT;
     if (new_linewidth == cgm_linewidth)
 	return;
@@ -521,25 +524,49 @@ static void CGM_write_char_record(class, cgm_id, numbytes, data)
 int class, cgm_id, numbytes;
 char *data;
 {
-    int pad, padded_length;
+    int i, pad, length;
     static unsigned char flag = 0xff;
+    static unsigned char paddata = 0;
     char short_len;
 
     pad = 0;
-    padded_length = numbytes + 1;
+    length = numbytes + 1;
     if (numbytes >= 255)
-	padded_length += 2;	/* long string */
-    if (padded_length & 1)
-	padded_length += pad = 1;	/* needs pad */
-    CGM_write_code(class, cgm_id, padded_length);
-    short_len = numbytes;
+	length += 2;	/* long string */
+    if (length & 1)
+	pad = 1;	/* needs pad */
+    CGM_write_code(class, cgm_id, length);
     if (numbytes < 255)
+    {
+        short_len = (char)numbytes;
 	fwrite(&short_len, 1, 1, gpoutfile);	/* write true length */
-    else {
-	fwrite(&flag, 1, 1, gpoutfile);
+    } else {
+        fwrite(&flag, 1, 1, gpoutfile);
 	CGM_write_int(numbytes);
     }
-    fwrite(data, 1, numbytes + pad, gpoutfile);		/* write string */
+
+    if (data)
+        fwrite(data, 1, numbytes, gpoutfile);          /* write string */
+    else
+	for (i=0; i<numbytes+pad; i++)
+	    fputc('\0', gpoutfile);                     /* write null bytes */
+
+    if(pad)
+      fwrite(&paddata, 1, 1, gpoutfile);
+}
+
+static void CGM_write_byte_record(class, cgm_id, numbytes, data)
+int class, cgm_id, numbytes;
+char *data;
+{
+    int pad;
+    static unsigned char paddata = 0;
+
+    pad = numbytes & 1;
+    CGM_write_code(class, cgm_id, numbytes);
+    fwrite(data, 1, numbytes, gpoutfile);		/* write string */
+    if(pad)
+      fwrite(&paddata, 1, 1, gpoutfile);
 }
 
 static void CGM_write_int_record(class, cgm_id, numbytes, data)
@@ -558,30 +585,33 @@ static void CGM_write_mixed_record(class, cgm_id, numint, int_data,
 int class, cgm_id, numint, *int_data, numchar;
 char *char_data;
 {
-    int i, pad, padded_length;
+    int i, pad, length;
+    static unsigned char paddata = 0;
     static unsigned char flag = 0xff;
     char short_len;
 
     pad = 0;
-    padded_length = numchar + 1;
+    length = numchar + 1;
     if (numchar >= 255)
-	padded_length += 2;	/* long string */
-    if (padded_length & 1)
-	padded_length += pad = 1;	/* needs pad */
+	length += 2;	/* long string */
+    if (length & 1)
+	pad = 1;	/* needs pad */
 
-    CGM_write_code(class, cgm_id, numint * 2 + padded_length);
+    CGM_write_code(class, cgm_id, numint * 2 + length);
 
     for (i = 0; i < numint; i++)
 	CGM_write_int(int_data[i]);	/* write integers */
 
-    short_len = numchar;
-    if (numchar < 255)
+    if (numchar < 255) {
+        short_len = (char)numchar;
 	fwrite(&short_len, 1, 1, gpoutfile);	/* write string length */
-    else {
+    } else {
 	fwrite(&flag, 1, 1, gpoutfile);
 	CGM_write_int(numchar);
     }
-    fwrite(char_data, 1, numchar + pad, gpoutfile);	/* write string */
+    fwrite(char_data, 1, numchar, gpoutfile);	/* write string */
+    if(pad)
+      fwrite(&paddata, 1, 1, gpoutfile);
 }
 
 /*
