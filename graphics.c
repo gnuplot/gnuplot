@@ -513,9 +513,9 @@ int count;
 
     /*{{{  preliminary ytop  calculation */
 
-     /*     first compute heights of things to be written in the margin */
+    /*     first compute heights of things to be written in the margin */
 
-     /* title */
+    /* title */
     if (titlelin)
 	title_textheight = (int) ((titlelin + title.yoffset) * (t->v_char));
     else
@@ -523,7 +523,7 @@ int count;
 
     /* x2label */
     if (x2lablin)
-	x2label_textheight = (int) ((x2lablin + x2label.yoffset) * (t->v_char));
+	x2label_textheight = (int) ((x2lablin + x2label.yoffset + 0.5) * (t->v_char));
     else
 	x2label_textheight = 0;
 
@@ -546,8 +546,8 @@ int count;
 	x2tic_height = 0;
 
     /* timestamp */
-    if (*timelabel.text && !timelabel_bottom && !vertical_timelabel)
-	timetop_textheight = (int) ((timelin + timelabel.yoffset) * (t->v_char));
+    if (*timelabel.text && !timelabel_bottom)
+	timetop_textheight = (int) ((timelin + timelabel.yoffset + 2) * (t->v_char));
     else
 	timetop_textheight = 0;
 
@@ -635,9 +635,9 @@ int count;
 	xlabel_textheight = 0;
 
     /* timestamp */
-    if (*timelabel.text && timelabel_bottom && !vertical_timelabel)
+    if (*timelabel.text && timelabel_bottom)	/* && !vertical_timelabel) DBT 11-18-98 resize plot for vertical timelabels too ! */
 	/* offset is subtracted because if . 0, the margin is smaller */
-	timebot_textheight = (int) ((timelin - timelabel.yoffset) * (t->v_char));
+	timebot_textheight = (int) ((timelin - timelabel.yoffset + 1) * (t->v_char));
     else
 	timebot_textheight = 0;
 
@@ -647,8 +647,9 @@ int count;
     ybot = (int) ((t->ymax) * yoffset);
 
     if (bmargin < 0) {
-	ybot += (timebot_textheight > xlabel_textheight ? timebot_textheight : xlabel_textheight) + xtic_height + xtic_textheight;
-
+	ybot += xtic_height + xtic_textheight;
+	if (timebot_textheight > 0 || xlabel_textheight > 0)
+	    ybot += (timebot_textheight > xlabel_textheight) ? timebot_textheight : xlabel_textheight;
 	if (ybot == (t->ymax) * yoffset) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
@@ -796,13 +797,15 @@ int count;
 
     /* ylabel */
     if (*ylabel.text && can_rotate)
-	ylabel_textwidth = (int) ((ylablin + ylabel.xoffset) * (t->v_char));
+	/*ylabel_textwidth = (int) ((ylablin + ylabel.xoffset) * (t->v_char)); */
+	ylabel_textwidth = (int) ((ylablin - ylabel.xoffset) * (t->v_char));
+    /* this should get large for NEGATIVE ylabel.xoffsets  DBT 11-5-98 */
     else
 	ylabel_textwidth = 0;
 
     /* timestamp */
     if (*timelabel.text && vertical_timelabel)
-	timelabel_textwidth = (int) ((timelin + timelabel.xoffset) * (t->v_char));
+	timelabel_textwidth = (int) ((timelin - timelabel.xoffset + 1) * (t->v_char));
     else
 	timelabel_textwidth = 0;
 
@@ -857,9 +860,7 @@ int count;
 
     /* y2label */
     if (can_rotate && *y2label.text)
-	/* offset is subtracted because if > 0, the margin is smaller */
-/* HBB: removed the (superfluous?) the '+1' */
-	y2label_textwidth = (int) ((y2lablin - y2label.yoffset) * (t->v_char));
+	y2label_textwidth = (int) ((y2lablin + y2label.xoffset + 0.5) * (t->v_char));
     else
 	y2label_textwidth = 0;
 
@@ -869,7 +870,10 @@ int count;
     xright = (int) ((t->xmax) * (xsize + xoffset));
 
     if (rmargin < 0) {
-	xright -= y2label_textwidth + y2tic_width + y2tic_textwidth;
+	/* xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
+	xright -= y2tic_width + y2tic_textwidth;
+	if (y2label_textwidth > 0)
+	    xright -= y2label_textwidth;
 
 	/* adjust for outside key */
 	if (lkey == -1 && key_hpos == TOUT) {
@@ -953,6 +957,8 @@ int count;
      *     (some of these may not be used) */
 
     x2label_y = ytop + x2tic_height + x2tic_textheight + x2label_textheight;
+    if (x2tic_textheight && (title_textheight || x2label_textheight))
+	x2label_y += t->v_char;
 
     title_y = x2label_y + title_textheight;
 
@@ -963,60 +969,32 @@ int count;
     xlabel_y = ybot - xtic_height - xtic_textheight + (int) (xlabel.yoffset * (t->v_char));
 
     ylabel_x = xleft - ytic_width - ytic_textwidth;
-    if (can_rotate && *ylabel.text) {
-	ylabel_x -= ylabel_textwidth + (int) ((ylabel.xoffset) * (t->h_char));
-#if 0
-/* HBB: iff the calc. of xleft and friends is correct, this *must*
- * be wrong: at this point, xleft would be exactly zero (if origin x is
- * zero and lmargin unset). Subtracting something from it thus ends up with
- * a *negative* x, which is, simply put, rubbish. Actually, I think this
- * originally was a kludge for the (non-functional, anyway) vertical ytic
- * labelling code, as the width of that 'box' was calculated wrongly.
- * But moving the ylabel out of the way is the wrong way to fix that. */
-	if (vertical_ytics)
-	    ylabel_x -= (int) (t->v_char);
-#endif
-    }
+    if (*ylabel.text && can_rotate)
+	ylabel_x -= ylabel_textwidth;
+
     y2label_x = xright + y2tic_width + y2tic_textwidth;
-    if (can_rotate && *y2label.text) {
-#if 1
-/* HBB: my version of this */
-	y2label_x += (int) ((y2label.xoffset) * (t->h_char));
-#else
-/* HBB: this one's even worse: text will be printed *top_justified*,
- * so y2label_x should be the *top* of the text box. This calculation
- * would give the bottom, instead: */
-	y2label_x += y2label_textwidth + (int) ((y2label.xoffset) * (t->h_char));
-/* HBB: see above for this... */
-	if (vertical_y2tics)
-	    y2label_x += (int) (t->v_char);
-#endif
-    }
+    if (*y2label.text && can_rotate)
+	y2label_x += y2label_textwidth - t->v_char;
+
     if (vertical_timelabel) {
 	if (timelabel_bottom)
-	    time_y = xlabel_y;
-	else
-	    time_y = title_y;
+	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
+	else {
+	    time_y = title_y + timetop_textheight - title_textheight - x2label_textheight;
+	}
     } else {
 	if (timelabel_bottom)
-	    time_y = xlabel_y + (int) (timelabel.yoffset * (t->v_char));
+	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
-	    time_y = ytop + x2tic_height + x2tic_textheight + timetop_textheight;
+	    time_y = ytop + x2tic_height + x2tic_textheight + timetop_textheight + (int) (t->h_char);
     }
-    time_x = xleft - ytic_width - ytic_textwidth + (int) (timelabel.xoffset * (t->h_char));
-    if (vertical_timelabel) {
-/* HBB: do we really want to move the timelabel to the right by
- * one line, so that it will fall in what was intended to be blank
- * space (between the ytic labels and the rotated ylabel/timestamp)?
- * If not so, the '-(t->h_char)' part should be deleted. */
-	time_x -= timelabel_textwidth - (int) (t->h_char);
-#if 0				/* HBB: don't see any reason for this... */
-	if (vertical_ytics)
-	    time_x -= (int) (t->h_char);
-#endif
-    }
+    if (vertical_timelabel)
+	time_x = xleft - ytic_width - ytic_textwidth - timelabel_textwidth;
+    else
+	time_x = xleft - ytic_width - ytic_textwidth + (int) (timelabel.xoffset * (t->h_char));
+
     xtic_y = ybot - xtic_height - (vertical_xtics ? (int) (t->h_char) : (int) (t->v_char));
 
     x2tic_y = ytop + x2tic_height + (vertical_x2tics ? (int) (t->h_char) : x2tic_textheight);
@@ -2490,7 +2468,7 @@ struct curve_points *plot;
 		    (*t->vector) ((unsigned int) x2, (unsigned int) y2);
 		}		/* if error bar is bigger than symbol */
 	    }
-#endif				/* polar error bars? */
+#endif /* polar error bars? */
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars */
     if ((plot->plot_style == XERRORBARS) || (plot->plot_style == XYERRORBARS)) {
@@ -3954,7 +3932,7 @@ double log_base, x;		/* we print one number in a number of different formats */
 	t = temp;
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit((int)*format) ||
+	while (*++format == '.' || isdigit((int) *format) ||
 	       *format == '-' || *format == '+' || *format == ' ')
 	    *t++ = *format;
 	/*}}} */
@@ -4342,14 +4320,14 @@ tic_callback callback;		/* fn to call to actually do the work */
 		/*{{{  draw tick via callback */
 		switch (def->type) {
 		case TIC_DAY:{
-			int d = (long) floor(user+0.5) % 7;
+			int d = (long) floor(user + 0.5) % 7;
 			if (d < 0)
 			    d += 7;
 			(*callback) (axis, internal, abbrev_day_names[d], lgrd);
 			break;
 		    }
 		case TIC_MONTH:{
-			int m = (long) floor(user-1) % 12;
+			int m = (long) floor(user - 1) % 12;
 			if (m < 0)
 			    m += 12;
 			(*callback) (axis, internal, abbrev_month_names[m], lgrd);
