@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.17 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.18 2004/07/13 14:11:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -32,11 +32,12 @@ static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.17 2004/07/01 17:10:04 
  * into gnuplot_x11.  With GPLT_X11_MODE defined this file does not
  * contain code for calculating colors from gray by user defined functions.
  */
-
+#ifndef GPLT_X11_MODE
+static int calculate_color_from_formulae __PROTO((double, rgb_color *));
+#endif
 
 static char *dbl_to_str __PROTO((double val, char *dest));
 static double str_to_dbl __PROTO((char *s));
-static int calculate_color_from_formulae __PROTO((double, rgb_color *));
 static void color_components_from_gray __PROTO((double gray, rgb_color *color));
 static char *color_to_str __PROTO((rgb_color col, char *buf));
 static void str_to_color __PROTO((char *buf, rgb_color *col));
