@@ -20,10 +20,10 @@ AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
 binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
 contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c \
-eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c gp_hist.h gp_time.h \
-gp_types.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h \
-hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c \
-interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
+eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c \
+gp_hist.h gp_time.h gp_types.h graph3d.c graph3d.h graphics.c graphics.h \
+help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h \
+interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
 mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
 plot3d.c plot3d.h pm3d.c pm3d.h readline.c readline.h save.c \
 save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
@@ -33,7 +33,7 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c getcolor.c
+gnuplot_x11_SOURCES = gplt_x11.c getcolor.c gpexecute.c gpexecute.h mousecmn.h
 
 gnuplot_x11_LDADD = $(XLIBS)
 
@@ -53,7 +53,7 @@ SUBDIRS = $(d_beos)
 OTHER_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
 EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com \
-gnuplot.def gnuplot.opt gnuplot.prj gpexecute.inc header.mac hrcgraph.asm \
+gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm \
 intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 \
 pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
 

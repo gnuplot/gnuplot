@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.17 2000/10/31 22:14:19 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.18 2000/11/01 18:57:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -107,17 +107,6 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.17 2000/10/31 22:14:19 
 #include "gp_types.h"
 #include "term_api.h"
 
-#ifdef USE_MOUSE
-#define USE_NONBLOCKING_STDOUT
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#endif
-/* for mouse_setting_t mouse_setting in mouse.h */
-#   define _GPLT_X11
-#endif
-
 #ifdef EXPORT_SELECTION
 # undef EXPORT_SELECTION
 #endif /* EXPORT SELECTION */
@@ -182,6 +171,29 @@ Error. Incompatible options.
 # define GP_SYSTEMINFO(host) gethostname ((host), MAXHOSTNAMELEN)
 #endif /* HAVE_SYS_SYSTEMINFO_H && HAVE_SYSINFO */
 
+#ifdef USE_MOUSE
+
+# define _GPLT_X11 /* define before including mouse.h */
+# include "gpexecute.h"
+# include "mouse.h"
+
+# if defined(OS2) && !defined(GNUPMDRV)
+#  define INCL_DOSPROCESS
+#  define INCL_DOSSEMAPHORES
+#  include <os2.h>
+#  include "os2/dialogs.h"
+# endif
+
+# if !defined(OS2)
+#  include <unistd.h>
+#  include <fcntl.h>
+#  include <errno.h>
+# endif
+
+unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
+
+#endif /* USE_MOUSE */
+
 #ifdef VMS
 # ifdef __DECC
 #  include <starlet.h>
@@ -205,18 +217,6 @@ Error. Incompatible options.
 # define EINTR	E_ILLFNC
 #endif
 
-#ifdef USE_MOUSE
-# if defined(OS2) && !defined(GNUPMDRV)
-#  define INCL_DOSPROCESS
-#  define INCL_DOSSEMAPHORES
-#  include <os2.h>
-#  include "os2/dialogs.h"
-# endif
-unsigned long gnuplotXID = 0;	/* WINDOWID of gnuplot */
-# include "mouse.h"
-# include "mousecmn.h"
-# include "gpexecute.inc"
-#endif /* USE_MOUSE */
 
 #define Ncolors 13
 
@@ -503,7 +503,7 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
     int getfl;
 #endif
 
@@ -534,14 +534,12 @@ char *argv[];
 
 # if !defined(OS2)
 
-#  if defined(USE_NONBLOCKING_STDOUT)
     if (!pipe_died) {
 	/* set up nonblocking stdout */
 	getfl = fcntl(1, F_GETFL);	/* get current flags */
 	fcntl(1, F_SETFL, getfl | O_NONBLOCK);
 	signal(SIGPIPE, pipe_died_handler);
     }
-#  endif
 # endif
 #endif
 
@@ -594,7 +592,7 @@ mainloop()
     struct timeval timeout, *timer = (struct timeval *) 0;
     fd_set tset;
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
     int out;
     out = fileno(stdout);
 #endif
@@ -602,7 +600,7 @@ mainloop()
     X11_ipc = stdin;
     in = fileno(X11_ipc);
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
     if (out > in)
 	nfds = ((cn > out) ? cn : out) + 1;
     else
@@ -643,7 +641,7 @@ mainloop()
 	    FD_SET(in, &tset);
 	}
 
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
 	if (buffered_output_pending && !pipe_died) {
 	    /* check, if stdout becomes writable */
 	    FD_SET(out, &tset);
@@ -685,7 +683,7 @@ mainloop()
 	    if (!record())	/* end of input */
 		return;
 	}
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
 	if (!pipe_died && (FD_ISSET(out, &tset) || buffered_output_pending)) {
 	    gp_exec_event(GE_pending, 0, 0, 0, 0);
 	}

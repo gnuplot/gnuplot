@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.1.2.1 2000/05/03 21:26:11 joze Exp $
+ * $Id: mousecmn.h,v 1.3 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -67,7 +67,7 @@ enum {
     GE_cmd,             /* text = literal command string */
     GE_reset            /* reset to a well-defined state
 			   (e.g.  after an X11 error occured) */
-#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#if !defined(OS2)
     , GE_pending        /* signal gp_exec_event() to send pending events */
 #endif
 };

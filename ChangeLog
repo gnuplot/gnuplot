@@ -1,3 +1,12 @@
+2000-11-03  Johannes Zellner  <johannes@zellner.org>
+
+	* src/gpexecute.inc: splitted into src/gpexecute.c
+	/ src/gpexecute.h.  Updated src/Makefile.am so that
+	gnuplot_x11 uses also gpexecute.o. Removed the
+	USE_NONBLOCKING_STDOUT definition, it wasn't configurable
+	anyway (it was always on) and it made the code unreadable.
+	!!! The os2 part is broken !!!
+
 2000-11-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/README: new file. Describes the changes to the sourcecode
