@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.31 1999/05/30 17:12:54 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.32 1999/07/05 13:14:04 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2644,8 +2644,8 @@ C ... and restart the table:
  option on one to avoid two entries in the key). Alternately, use the
  errorlines command (see `errorlines`).
 
- The error bars have crossbars at each end unless `set bar` is used (see `set
- bar` for details).
+ The error bars have crossbars at each end unless `set bars` is used (see `set
+ bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> Errorbar demos. </a>
@@ -2689,8 +2689,8 @@ C ... and restart the table:
  numbers on the record, yhigh and ylow are both set to y. The x error
  bar is a horizontal line computed in the same fashion.
 
- The error bars have crossbars at each end unless `set bar` is used
- (see `set bar` for details).
+ The error bars have crossbars at each end unless `set bars` is used
+ (see `set bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
 
@@ -3310,16 +3310,17 @@ C ... and restart the table:
  Explicitly setting one or two ranges but not others may lead to unexpected
  results.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html"> See polar demos </a>
-3 bar
-?commands set bar
-?commands show bar
-?set bar
-?show bar
- The `set bar` command controls the tics at the ends of error bars.
+3 bars
+?commands set bars
+?commands show bars
+?set bars
+?show bars
+ The `set bars` command controls the tics at the ends of error bars.
 
  Syntax:
-       set bar {small | large | <size>}
-       show bar
+       set bars {small | large | <size>}
+       set nobars
+       show bars
 
  `small` is a synonym for 0.0, and `large` for 1.0.
  The default is 1.0 if no size is given.
@@ -5293,9 +5294,9 @@ C ... and restart the table:
  coordinate and limited vertically by the opening and closing prices.  A
  vertical line segment at the x coordinate extends up from the top of the
  rectangle to the high price and another down to the low.  The width of the
- rectangle may be changed by `set bar`.  The symbol will be unchanged if the
+ rectangle may be changed by `set bars`.  The symbol will be unchanged if the
  low and high prices are interchanged or if the opening and closing prices
- are interchanged.  See `set bar` and `financebars`.
+ are interchanged.  See `set bars` and `financebars`.
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
 4 dots
 ?commands set style dots
@@ -5315,9 +5316,9 @@ C ... and restart the table:
  prices.  The symbol is a vertical line segment, located horizontally at the x
  coordinate and limited vertically by the high and low prices.  A horizontal
  tic on the left marks the opening price and one on the right marks the
- closing price.  The length of these tics may be changed by `set bar`.  The
+ closing price.  The length of these tics may be changed by `set bars`.  The
  symbol will be unchanged if the high and low prices are interchanged.  See
- `set bar` and `candlesticks`.
+ `set bars` and `candlesticks`.
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html"> See demos.</a>
 4 fsteps
 ?commands set style fsteps
@@ -5411,8 +5412,8 @@ C ... and restart the table:
  like `dots`, except that a horizontal error bar is also drawn.  At each point
  (x,y), a line is drawn from (xlow,y) to (xhigh,y) or from (x-xdelta,y) to
  (x+xdelta,y), depending on how many data columns are provided.  A tic mark
- is placed at the ends of the error bar (unless `set bar` is used---see `set
- bar` for details).
+ is placed at the ends of the error bar (unless `set bars` is used---see `set
+ bars` for details).
 4 xyerrorbars
 ?commands set style xyerrorbars
 ?set style xyerrorbars
@@ -5423,8 +5424,8 @@ C ... and restart the table:
  At each point (x,y), lines are drawn from (x,y-ydelta) to (x,y+ydelta) and
  from (x-xdelta,y) to (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from
  (xlow,y) to (xhigh,y), depending upon the number of data columns provided.  A
- tic mark is placed at the ends of the error bar (unless `set bar` is
- used---see `set bar` for details).
+ tic mark is placed at the ends of the error bar (unless `set bars` is
+ used---see `set bars` for details).
 
  If data are provided in an unsupported mixed form, the `using` filter on the
  `plot` command should be used to set up the appropriate form.  For example,
@@ -5444,8 +5445,8 @@ C ... and restart the table:
  `yerrorbars` is like `dots`, except that a vertical error bar is also drawn.
  At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
  from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
- A tic mark is placed at the ends of the error bar (unless `set bar` is
- used---see `set bar` for details).
+ A tic mark is placed at the ends of the error bar (unless `set bars` is
+ used---see `set bars` for details).
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 4 xerrorlines
 ?commands set style xerrorlines
@@ -5457,7 +5458,7 @@ C ... and restart the table:
  line is also drawn. At each point (x,y), a line is drawn from (xlow,y)
  to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
  many data columns are provided. A tic mark is placed at the ends of
- the error bar (unless `set bar` is used---see `set bar` for details).
+ the error bar (unless `set bars` is used---see `set bars` for details).
 4 xyerrorlines
 ?commands set style xyerrorlines
 ?set style xyerrorlines
@@ -5469,8 +5470,8 @@ C ... and restart the table:
  drawn from (x,y-ydelta) to (x,y+ydelta) and from (x-xdelta,y) to
  (x+xdelta,y) or from (x,ylow) to (x,yhigh) and from (xlow,y) to
  (xhigh,y), depending upon the number of data columns provided. A tic
- mark is placed at the ends of the error bar (unless `set bar` is
- used---see `set bar` for details).
+ mark is placed at the ends of the error bar (unless `set bars` is
+ used---see `set bars` for details).
 
  If data are provided in an unsupported mixed form, the `using` filter on the
  `plot` command should be used to set up the appropriate form.  For example,
@@ -5491,7 +5492,7 @@ C ... and restart the table:
  error line is also drawn. At each point (x,y), a line is drawn from
  (x,y-ydelta) to (x,y+ydelta) or from (x,ylow) to (x,yhigh), depending
  on how many data columns are provided. A tic mark is placed at the
- ends of the error bar (unless `set bar` is used---see `set bar` for
+ ends of the error bar (unless `set bars` is used---see `set bars` for
  details).
 ^<a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html"> See demo. </a>
 3 surface
