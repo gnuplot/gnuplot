@@ -49,4 +49,10 @@
 #define HAVE_STRSTR		1
 #define HAVE_VFPRINTF		1
 
+/* Define to the types of args 1, 2-4, and 5 for function `select()'. */
+#define SELECT_TYPE_ARG1	int
+#define SELECT_TYPE_ARG234	(struct _fd_set *)
+#define SELECT_TYPE_ARG5	(struct timeval *)
+
 #define PROTOTYPES  1
+

@@ -1,3 +1,7 @@
+2004-02-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.os2: Add SELECT_TYPE_ARG* definitions.
+
 2004-02-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/specfun.c demo/random.dem docs/gnuplot.doc:
