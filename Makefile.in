@@ -269,10 +269,10 @@ OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
 	 $(P)gnupmdrv.rc $(P)print.c
 
-WINDOWS = $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def $(W)wgnuplib.c \
-	  $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc $(W)wgnuplot.def \
-	  $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc $(W)wgraph.c \
-	  $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
+WINDOWS = $(W)geticon.c $(W)pgnuplot.c $(W)wcommon.h $(W)wgnupl32.def \
+	  $(W)wgnuplib.c $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc \
+	  $(W)wgnuplot.def $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc \
+	  $(W)wgraph.c $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
 	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
 
 # not C code, but still needed
@@ -305,8 +305,9 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.msw makefile.mto makefile.nt makefile.os2 makefile.os9 \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
-	rgipgnu stamp-h.in strftime.c vms.c m4/beos.m4 m4/msdos.m4 m4/next.m4 \
-	m4/search-hdr.m4 m4/search-lib.m4 m4/select.m4 $(T)README
+	rgipgnu stamp-h.in strftime.c vms.c m4/Makefile.am.in m4/README \
+	m4/beos.m4 m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 m4/search-lib.m4 \
+	m4/select.m4 $(T)README
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
