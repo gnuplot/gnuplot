@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.20 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.21 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1154,7 +1154,6 @@ unset_style()
 	return;
     } 
 
-    c_token++;
     switch(lookup_table(show_style_tbl, c_token)){
     case SHOW_STYLE_DATA:
         data_style = POINTSTYLE;
@@ -1167,13 +1166,13 @@ unset_style()
     case SHOW_STYLE_LINE:
 	while (first_linestyle != NULL)
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
-#if USE_ULIG_FILLEDBOXES
 	c_token++;
 	break;
+#if USE_ULIG_FILLEDBOXES
     case SHOW_STYLE_FILLING:
 	unset_fillstyle();
 	c_token++;
-	    break;
+	break;
 #endif /* USE_ULIG_FILLEDBOXES */
     default:
 #if USE_ULIG_FILLEDBOXES
