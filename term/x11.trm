@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.73 2003/06/20 19:25:30 sfeam Exp $
+ * $Id: x11.trm,v 1.74 2003/06/25 18:01:24 sfeam Exp $
  *
  */
 
@@ -118,6 +118,8 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
 static char X11_default_font[MAX_ID_LEN+1] = {'\0'};
+static char X11_last_font_used[MAX_ID_LEN+1] = {'\01','\0'};
+static char X11_next_font_used[MAX_ID_LEN+1] = {'\0'};
 
 static void X11_atexit __PROTO((void));
 static void X11_set_default_font __PROTO((void));
@@ -974,6 +976,12 @@ X11_linetype(int lt)
 TERM_PUBLIC void
 X11_put_text(unsigned int x, unsigned int y, const char str[])
 {
+    /* Only send the font change request to X11 if it really is a change */
+    if (strcmp(X11_last_font_used,X11_next_font_used)) {
+	strcpy(X11_last_font_used,X11_next_font_used);
+	PRINT1("QF%s\n", X11_next_font_used);
+    }
+
     /* badly outrange labels can overflow into text field */
     if (x < 10000 && y < 10000) {
 	PRINT3("T%04d%04d%s\n", x, y, str);
@@ -1003,7 +1011,8 @@ X11_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC int
 X11_set_font(const char *fontname)
 {
-    PRINT1("QF%s\n", fontname?fontname:"");
+/*  PRINT1("QF%s\n", fontname?fontname:""); */
+    strncpy(X11_next_font_used,fontname?fontname:"",sizeof(X11_next_font_used)-1);
     return( TRUE );
 }
 
