@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.31 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: fig.trm,v 1.32 2002/08/24 16:20:43 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1192,7 +1192,7 @@ START_HELP(fig)
 "",
 " `pointsmax <max_points>` sets the maximum number of points per polyline.",
 "",
-" `solid` inhibts automatic usage of `dash`ed lines when solid linestyles are",
+" `solid` inhibits automatic usage of `dash`ed lines when solid linestyles are",
 " used up, which otherwise occurs.",
 "",
 " `fontsize` sets the size of the text font to <fsize> points.  `textnormal`",
