@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.12 1999/09/24 15:39:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.13 1999/10/01 14:50:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -1134,7 +1134,7 @@ reset_termio()
  *    filename == NUL ... write to stdout; otherwise to the filename
 */
 void
-write_history_n (n, filename)
+write_history_n(n, filename)
 int n;
 char *filename;
 {
@@ -1143,7 +1143,9 @@ char *filename;
     int hist_entries = 0;
     int hist_index = 1;
 
-    if (entry == NULL) return; /* no history yet */
+    if (entry == NULL)
+	return; /* no history yet */
+
     /* find the beginning of the history and count nb of entries */
     while (entry->prev != NUL) {
 	hist_entries++;
@@ -1156,12 +1158,19 @@ char *filename;
 	hist_index = hist_entries - n + 1;
     }
     /* now write the history */
-    if (filename != NULL) out = fopen( filename, "w" );
+    if (filename != NULL)
+	out = fopen(filename, "w");
     while (entry != NULL) {
-	fprintf(out,"%5i  %s\n",hist_index++,entry->line);
+	/* don't add line numbers when writing to file
+	 * to make file loadable */
+	if (filename)
+	    fprintf(out,"%s\n",entry->line);
+	else
+	    fprintf(out,"%5i  %s\n",hist_index++,entry->line);
 	entry = entry->next;
     }
-    if (filename != NULL) fclose(out);
+    if (filename != NULL)
+	fclose(out);
 }
 
 
@@ -1216,7 +1225,7 @@ char *cmd;
  * Returns 1 on success, 0 if no such entry exists
  */
 int
-history_find_all (cmd)
+history_find_all(cmd)
 char *cmd;
 {
     struct hist *entry = history;
