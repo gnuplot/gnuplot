@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.133 2004/07/02 23:58:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.134 2004/07/03 06:08:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -671,12 +671,12 @@ set_arrow()
 	/* get end or relative end position */
 	if (equals(c_token, "to") || equals(c_token,"rto")) {
 	    if (set_end) { duplication = TRUE; break; }
+	    relative = (equals(c_token,"rto")) ? TRUE : FALSE;
 	    c_token++;
 	    if (END_OF_COMMAND)
 		int_error(c_token, "end coordinates expected");
 	    /* get coordinates */
 	    get_position(&epos);
-	    relative = (equals(c_token,"rto")) ? TRUE : FALSE;
 	    set_end = TRUE;
 	    continue;
 	}
