@@ -1,0 +1,61 @@
+### Demo for 'with filledcurves'
+
+reset
+
+set title
+set key outside
+set title "plot with filledcurve [options]"
+plot [-10:10] [-5:3] \
+	1.5+sin(x)/x with filledcurve x2, \
+	sin(x)/x with filledcurve, \
+	1+sin(x)/x with lines, \
+	-1+sin(x)/x with filledcurve y1=-2, \
+	-2.5+sin(x)/x with filledcurve xy=-5,-4., \
+	-4.3+sin(x)/x with filledcurve x1, \
+	(x>3.5 ? x/3-3 : 1/0) with filledcurve y2
+pause -1
+
+set key
+set title "Intersection of two parabolas"
+plot x*x with filledcurves, 50-x*x with filledcurves, x*x with line 1
+pause -1
+
+set grid front
+set title "Filled sinus and cosinus curves"
+plot 2+sin(x)**2 with filledcurve x1, cos(x)**2 with filledcurve x1
+pause -1
+
+set title "The red bat: abs(x) with filledcurve xy=2,5"
+plot abs(x) with filledcurve xy=2,5
+pause -1
+
+set title "Some sqrt stripes on filled graph background"
+plot [0:10] [-8:6] \
+	-8 with filledcurve x2 lt 15, \
+	sqrt(x) with filledcurves y1=-0.5, \
+	sqrt(10-x)-4.5 with filledcurves y1=-5.5
+pause -1
+
+reset
+set title "Let's smile with parametric filled curves"
+set size square
+unset key
+unset border
+unset xtics
+unset ytics
+set grid
+set arrow 1 from -0.1,0.26 to 0.18,-0.17 front size 0.1,40 lt 5 lw 4
+set label 1 "gnuplot" at 0,1.2 center front
+set label 2 "gnuplot" at 0.02,-0.6 center front
+set parametric
+set xrange [-1:1]
+set yrange [-1:1.6]
+plot [t=-pi:pi] \
+	sin(t),cos(t) with filledcurve xy=0,0 15,	\
+	sin(t)/8-0.5,cos(t)/8+0.4 with filledcurve 3,	\
+	sin(t)/8+0.5,cos(t)/8+0.4 with filledcurve 3,	\
+	t/5,abs(t/5)-0.8 with filledcurve xy=0.1,-0.5 1, \
+	t/3,1.52-abs(t/pi) with filledcurve xy=0,1.8 -1
+pause -1
+
+reset

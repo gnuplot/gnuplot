@@ -1,5 +1,16 @@
 2002-02-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* demo/all.dem: Added fillcrvs.dem demo.
+
+	* demo/fillcrvs.dem: New demo for filled curves.
+
+	* demo/poldat.dem: Reduced file size.
+
+	* demo/mgr.dem: Typo fixed; replaced pause text "<CR>" by "(-> return)"
+	as in other demos.
+
+2002-02-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* pm3d/README: Updated.
 
 	* pm3d/old-docs/README: Completely new contents. This file contains 

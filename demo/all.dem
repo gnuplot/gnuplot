@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.2 1999/08/17 15:31:53 lhecking Exp $
+# $Id: all.dem,v 1.3 2002/01/31 21:06:07 uid26705 Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -38,6 +38,10 @@ reset
 
 print "******************** file poldat.dem ********************"
 load "poldat.dem"
+reset
+
+print "******************** file fillcvrs.dem ********************"
+load "fillcvrs.dem"
 reset
 
 print "******************** file surface1.dem ********************"
