@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.69 1999/06/19 20:32:34 lhecking Exp $
+dnl $Id: configure.in,v 1.70 1999/06/22 12:05:38 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.69 $)
+AC_REVISION($Revision: 1.70 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -146,10 +146,10 @@ dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, NeXT, Apple MacOsX (NeXT like), BeOS
-gp_MSDOS
-gp_NEXT
-gp_APPLE
-gp_BEOS
+GP_MSDOS
+GP_NEXT
+GP_APPLE
+GP_BEOS
 AM_CONDITIONAL(BUILD_SRC_BEOS_SUBDIR, test x$build_beos_subdir = xyes)
 
 dnl this has to be after -lsys_s on NeXT
@@ -260,7 +260,7 @@ if test "$with_readline" != no; then
       AC_CHECK_LIB(readline, readline,dnl
        TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
-      gp_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
+      GP_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
       if test "$ac_cv_lib_readline_readline" = yes; then
         TERMLIBS="$TERMLIBS $gp_tcap"
       fi
@@ -272,18 +272,18 @@ if test "$with_readline" != no; then
     else
       AC_DEFINE(HAVE_LIBREADLINE, 1,
                 [ Define if you are using the GNU readline library. ])
-      gp_SEARCH_HEADERDIRS(readline/readline.h,,
+      GP_PATH_HEADER(readline/readline.h,[$with_readline],,dnl
         AC_MSG_WARN([found GNU readline library but not readline.h])
         AC_MSG_WARN([please add path to readline.h to CPPFLAGS in Makefile])
-      )dnl readline.h
-      gp_SEARCH_HEADERDIRS(readline/history.h,,
+      )
+      GP_PATH_HEADER(readline/history.h,[$with_readline],,dnl
         AC_MSG_WARN([found GNU readline library but not history.h])
         AC_MSG_WARN([please add path to history.h to CPPFLAGS in Makefile])
-      )dnl history.h
+      )
 
       dnl check if history feature is desired
       if test "$enable_history" = yes; then
-        gp_SEARCH_HEADERDIRS(readline/tilde.h,dnl
+        GP_PATH_HEADER(readline/tilde.h,[$with_readline],dnl
           AC_DEFINE(GNUPLOT_HISTORY, 1,
                     [ Define if you want to use the history feature with GNU readline. ]))
       fi
@@ -312,12 +312,12 @@ if test "$with_plot" != no; then
   else
     dnl GNU plot library - test for new version first
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-    gp_SEARCH_LIBDIRS(plot,pl_textangle,[$TERMXLIBS])
+    GP_SEARCH_LIBDIRS(plot,pl_textangle,[$TERMXLIBS])
     if test "$ac_cv_lib_plot_pl_textangle" = no; then
-      gp_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
+      GP_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
       if test "$ac_cv_lib_plot_textangle" = no; then
         TERMXLIBS=
-        gp_SEARCH_LIBDIRS(plot,rotate)
+        GP_SEARCH_LIBDIRS(plot,rotate)
         if test "$ac_cv_lib_plot_rotate" = no; then
           AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
           with_plot=no
@@ -328,13 +328,12 @@ if test "$with_plot" != no; then
         AC_MSG_RESULT([ - using GNU plotutils library])
       fi # GNU plotlib pre-2.2
     else
-      gp_SEARCH_HEADERDIRS(plotcompat.h,
+      GP_PATH_HEADER(plotcompat.h,[$with_plot],dnl
         AC_DEFINE(HAVE_PLOTCOMPAT_H, 1,
                   [ Define if you have the <plotcompat.h> header file. ]),
         AC_MSG_WARN([found GNU GNU plotutils 2.2+ library but not plotcompat.h])
         AC_MSG_WARN([please add path to plotcompat.h to CPPFLAGS in Makefile])
       ) # plotcompat.h
-      AC_MSG_RESULT([ - using GNU plotutils 2.2+ library])
     fi # new GNU plotlib
 
     if test "$with_plot" != no; then
@@ -351,14 +350,14 @@ dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  gp_SEARCH_LIBDIRS(gd,gdImageCreate)
+  GP_SEARCH_LIBDIRS(gd,gdImageCreate)
   if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
-    gp_SEARCH_HEADERDIRS(gd.h,,
+    GP_PATH_HEADER(gd.h,[$with_gd],dnl
+     AC_DEFINE(HAVE_LIBGD, 1,
+               [ Define if you have Thomas Boutell's gd library. ]),dnl
      AC_MSG_WARN([found gd library but not gd.h])
      AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERDIRS
-    AC_DEFINE(HAVE_LIBGD, 1,
-              [ Define if you have Thomas Boutell's gd library. ])
+    )
   else
     AC_MSG_RESULT([- see term/gif.trm for download details])
   fi
@@ -367,18 +366,18 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  gp_SEARCH_LIBDIRS(png,png_info_init,[-lz])
+  GP_SEARCH_LIBDIRS(png,png_info_init,[-lz])
   if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
-    gp_SEARCH_HEADERDIRS(png.h,,
+    GP_PATH_HEADER(png.h,[$with_png],,dnl
      AC_MSG_WARN([found png library but not png.h])
      AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERIRS
-    gp_SEARCH_HEADERDIRS(zlib.h,,
+    )
+    GP_PATH_HEADER(zlib.h,[$with_png],,dnl
      AC_MSG_WARN([found z library but not zlib.h])
      AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERDIRS
-    if test "$ac_cv_header_png_h" = yes; then
+    )
+    if test "$ac_cv_header_png_h" != no; then
       AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
@@ -549,7 +548,12 @@ fi
 if test "$with_plot" = yes; then
   AC_MSG_RESULT([  Use the Unix plot library])
 elif test "$with_plot" != no; then
-  AC_MSG_RESULT([  Use the GNU plot library])
+  AC_MSG_RESULT([  Use the GNU plot library,])
+  if test "$ac_cv_header_plotcompat_h" = yes; then
+    AC_MSG_RESULT([    version 2.2 or newer])
+  else
+    AC_MSG_RESULT([    version 2.1 or older])
+  fi
 fi
 
 test "$with_lasergnu" = yes && \
