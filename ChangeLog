@@ -1,5 +1,10 @@
 2002-06-04  Johannes Zellner  <johannes@zellner.org>
 
+	* term/svg.trm: use USE_ULIG_FILLEDBOXES to allow building w/o
+	filledboxes support.
+
+2002-06-04  Johannes Zellner  <johannes@zellner.org>
+
 	* src/readline.c: install a SIGWINCH handler to solve BUG 533101
 	'gnuplot exits immediately when the terminal is resized'.
 
@@ -539,7 +544,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/03 21:43:48 $).
+	last modification date (from the tag $Date: 2002/06/03 23:06:07 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -602,6 +602,7 @@ SVG_linetype (int linetype)
 TERM_PUBLIC void
 SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
 {
+#if USE_ULIG_FILLEDBOXES
     /* fillpar:
      * - solid   : 0 - 100
      * - pattern : 0 - 100
@@ -622,13 +623,17 @@ SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 	SVG_DefineFillPattern(fillpar % 7);
     }
 
+#endif
     SVG_GroupFilledOpen();
-
     fputs("\t\t<rect " , gpoutfile);
+#if USE_ULIG_FILLEDBOXES
 
     switch (style) {
 	case 0: /* fill with background color */
-	    /* TODO */
+#endif
+	    /* TODO: and what if the background color is not white ? */
+	    fputs(" fill = 'white'", gpoutfile);
+#if USE_ULIG_FILLEDBOXES
 	    break;
 	case 1: /* solid fill */
 	    SVG_StyleFillColor();
@@ -641,6 +646,7 @@ SVG_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, uns
 	default:
 	    break;
     }
+#endif
 
     fprintf(gpoutfile, " x='%d' y='%d' width='%d' height='%d'/>\n", x1, (term->ymax - y1 - height + 1), width, height);
 }
