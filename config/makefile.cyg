@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.cyg,v 1.2 1999/04/22 16:32:23 lhecking Exp $
 #
 # GNUPLOT Makefile for Cygwin beta 20.1 on WinNT and Win95/98
 #
@@ -39,16 +39,15 @@ HCW = $(MSSDK)/bin/hcw
 RC  = windres.exe
 RCFLAGS=--define __WIN32__ --define __WIN95__ --define __GNUWIN32__ --define MSRC --define WIN32
 
-# see other terminal defines in term.h
-TERMFLAGS = -I$(TOP)/term
-
-
 # macros for makefile.all
 O=o
-T=term/
-D=docs/
-L=docs/latex/
-M=demo/
+T=../term/
+D=../docs/
+L=..$(D)latex/
+M=../demo/
+
+# see other terminal defines in term.h
+TERMFLAGS = -I$(T)
 
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
@@ -65,7 +64,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
-	docs/doc2rtf.c term/win.trm win/grpicon.ico win/texticon.ico
+	$(D)doc2rtf.c $(T)win.trm win/grpicon.ico win/texticon.ico
 
 
 # default rules
@@ -127,17 +126,17 @@ geticon.exe: win/geticon.c
 	$(LD) $(LDFLAGS) -o $@ win/geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe docs/gnuplot.doc win/wgnuplot.hpj
-	doc2rtf docs/gnuplot.doc win/gnuplot.rtf
+$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
+	doc2rtf $(D)gnuplot.doc win/gnuplot.rtf
 	$(HCW) -c -e win/wgnuplot.hpj
 
-doc2rtf.exe: docs/doc2rtf.c docs/termdoc.c docs/xref.c
-	$(LD) $(LDFLAGS) -o $@ $(CFLAGS) -I. -Idocs -Iterm $^
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+	$(LD) $(LDFLAGS) -o $@ $(CFLAGS) -I. -I$(D) -I$(T) $^
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.c 
 	$(LD) $(LDFLAGS) $(CFLAGS) -I. -o $@ $^
-	(cd demo ; ./bf_test.exe )
+	(cd $(M) ; ./bf_test.exe )
 #	cd ..
 
 # _Windows causes wtext.h to define fread() etc
@@ -154,10 +153,10 @@ dbinary.$(O): binary.c
 clean:
 	$(RM) *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
 	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
-	$(RM) demo/bf_test.exe *.ico geticon.exe
+	$(RM) $(M)bf_test.exe *.ico geticon.exe
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
-	$(RM) demo/binary[123] demo/fit.log demo/soundfit.par
+	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
