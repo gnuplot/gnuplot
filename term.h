@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.12.2.1 1999/08/19 14:35:44 lhecking Exp $
+ * $Id: term.h,v 1.12.2.2 1999/08/25 12:17:59 lhecking Exp $
  *
  */
 
@@ -179,6 +179,12 @@
 #endif
 
 
+/* GGI */
+#ifdef HAVE_GGI
+# include "ggi.trm"
+#endif
+
+
 /* MGR Window system */
 #ifdef MGR
 # include "mgr.trm"
@@ -272,6 +278,11 @@
 
 /* DXF format for use with AutoCad (Release 10.x) */
 #include "dxf.trm"
+
+/* Enhanced Metafile Format driver */
+#ifdef USE_EMF_DRIVER
+# include "emf.trm"
+#endif
 
 /* Roland DXY800A plotter */
 /* #include "dxy.trm" */
@@ -373,6 +384,11 @@
 
 /* latex/tex with picture in postscript */
 #include "pslatex.trm"
+
+#ifdef USE_EPSLATEX_DRIVER
+/* new epslatex driver */
+#include "epslatex.trm"
+#endif
 
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"
