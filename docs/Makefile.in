@@ -97,6 +97,7 @@ doc2rnh.o  : doc2rnh.c  $(TERM_H) termdoc.c
 doc2tex.o  : doc2tex.c  allterm.h termdoc.c
 checkdoc.o : checkdoc.c allterm.h termdoc.c
 
+
 # html
 html : gnuplot.html
 
@@ -115,6 +116,14 @@ gnuplot.tex: doc2tex $(srcdir)/gnuplot.doc
 doc2tex: doc2tex.o
 	$(CC) -o $@ doc2tex.o $(LDFLAGS) $(LIBS)
 
+titlepag.tex: $(srcdir)/titlepag.tex
+	$(CP) $< $@
+
+toc_entry.sty: $(srcdir)/toc-entr.sty
+	$(CP) $< $@
+
+gpcard.tex: $(srcdir)/gpcard.tex
+	$(CP) $< $@
 
 # this is how to make DVI files
 dvi: gnuplot.dvi gpcard.dvi

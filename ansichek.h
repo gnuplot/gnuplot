@@ -1,4 +1,4 @@
-/* $Id: ansichek.h,v 1.13 1998/04/14 00:14:48 drd Exp $ */
+/* $Id: ansichek.h,v 1.14 1998/06/18 14:55:01 ddenholm Exp $ */
 
 /* GNUPLOT - ansichek.h */
 
@@ -66,7 +66,7 @@
 # endif
 #endif /* ANSI_C ... */
 
-/* used to be __P be it was just too difficult to guess whether
+/* used to be __P but it was just too difficult to guess whether
  * standard headers define it. It's not as if the defn is
  * particularly difficult to do ourselves...
  */

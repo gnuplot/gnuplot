@@ -1,5 +1,5 @@
 /*
- * $Id: texdraw.trm,v 1.14 1998/04/14 00:18:08 drd Exp $
+ * $Id: texdraw.trm,v 1.15 1998/06/18 14:59:26 ddenholm Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -362,6 +362,7 @@ START_HELP(texdraw)
 "?texdraw",
 " The `texdraw` terminal driver supports the LaTeX texdraw environment.  It is",
 " intended for use with \"texdraw.sty\" and \"texdraw.tex\" in the texdraw package.",
-"  It has no options."
+"",
+" It has no options."
 END_HELP(texdraw)
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.34 1998/04/14 00:18:03 drd Exp $
+ * $Id: pslatex.trm,v 1.35 1998/06/18 14:59:24 ddenholm Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -595,7 +595,9 @@ START_HELP(pslatex)
 "       set term pslatex monochrome dashed rotate       # set to defaults",
 " To write the PostScript commands into the file \"foo.ps\":",
 "       set term pslatex auxfile",
-"       set output \"foo.tex\"; plot ...: set output"
+"       set output \"foo.tex\"; plot ...: set output",
+"",
+" Linewidths and pointsizes may be changed with `set linestyle`."
 END_HELP(pslatex)
 #endif
 

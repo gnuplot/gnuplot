@@ -584,6 +584,8 @@ START_HELP(pm)
 "",
 " If `title` is specified, it will be used as the title of the plot window.",
 " It will also be used as the name of the server instance, and will override",
-" the optional numerical argument."
+" the optional numerical argument.",
+"",
+" Linewidths may be changed with `set linestyle`." 
 END_HELP(pm)
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: plot3d.c,v 1.35 1998/04/14 00:16:10 drd Exp $";
+static char    *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -186,7 +186,7 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE=UNDEFINED; UNDEF_ACTION; break;
 /* check axis range is not too small -
  * extend if you can (autoscale), else report error
  */
-#ifdef ANSI_C
+#ifdef HAVE_CPP_STRINGIFY
 # define STRINGIFY(x) #x
 # define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
 #else
@@ -939,15 +939,39 @@ static void eval_3dplots()
 				
 				
 			if (almost_equals(c_token, "t$itle")) {
-				if (!isstring(++c_token))
+	/*			if (!isstring(++c_token))
 					int_error("Expected title", c_token);
 				m_quote_capture(&(this_plot->title), c_token, c_token);
+	*/
+				if (parametric) {
+					if (crnt_param != 0)
+						int_error("\"title\" allowed only after parametric function fully specified",c_token);
+					else {
+						if (xtitle != NULL)
+							xtitle[0] = '\0';       /* Remove default title . */
+						if (ytitle != NULL)
+							ytitle[0] = '\0';       /* Remove default title . */
+					}
+				}
+				if (isstring(++c_token))
+					m_quote_capture(&(this_plot->title), c_token, c_token);
+				else
+					int_error("expecting \"title\" for plot", c_token);
+				/* end of new method */
 				++c_token;
 			} else if (almost_equals(c_token,"not$itle")) {
-				this_plot->title=NULL;
+				if (xtitle != NULL)
+					xtitle[0] = '\0';
+				if (ytitle != NULL)
+					ytitle[0] = '\0';
+				/*   this_plot->title=NULL;   */
 				++c_token;
 			} else {
 				m_capture(&(this_plot->title), start_token, end_token);
+				if (crnt_param == 2)
+					xtitle = this_plot->title;
+				else if (crnt_param == 1)
+					ytitle = this_plot->title;
 			}
 			/*}}}*/
 	    
@@ -1521,24 +1545,22 @@ parametric_3dfixup(start_plot, plot_num)
 	}
 
 	/* Ok, fix up the title to include xp and yp plots. */
-	if ((xp->title && xp->title[0] != '\0') ||
-	    (yp->title && yp->title[0] != '\0')) {
+	if ( ( (xp->title && xp->title[0] != '\0') ||
+	       (yp->title && yp->title[0] != '\0') ) && zp->title ) {
 	    tlen = (xp->title ? strlen(xp->title) : 0) +
 		(yp->title ? strlen(yp->title) : 0) +
 		(zp->title ? strlen(zp->title) : 0) + 5;
 	    new_title = gp_alloc((unsigned long) tlen, "string");
 	    new_title[0] = 0;
-	    if (xp->title) {
+	    if (xp->title && xp->title[0] != '\0') {
 		strcat(new_title, xp->title);
 		strcat(new_title, ", ");	/* + 2 */
 	    }
-	    if (yp->title) {
+	    if (yp->title && yp->title[0] != '\0') {
 		strcat(new_title, yp->title);
 		strcat(new_title, ", ");	/* + 2 */
 	    }
-	    if (zp->title) {
-		strcat(new_title, zp->title);
-	    }
+	    strcat(new_title, zp->title);
 	    free(zp->title);
 	    zp->title = new_title;
 	}

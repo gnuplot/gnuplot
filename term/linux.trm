@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.20 1998/04/14 00:17:53 drd Exp $
+ * $Id: linux.trm,v 1.21 1998/06/18 14:59:20 ddenholm Exp $
  *
  */
 
@@ -149,7 +149,7 @@ TERM_PUBLIC void LINUX_options()
 TERM_PUBLIC void LINUX_init()
 {
 /* vga_init () has been moved to immediately after main () for security */
-	if (vga_getdefaultmode()!=-1) linux_vmode=vga_getdefaultmode();
+	if (vga_getdefaultmode()!= -1) linux_vmode=vga_getdefaultmode();
 	/* get the default mode from GSVGAMODE, if available */
 	if (!vga_hasmode(linux_vmode)) linux_vmode = G640x480x16;
 	/* test default mode first */

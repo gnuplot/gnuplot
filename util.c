@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.45 1998/04/14 00:16:28 drd Exp $";
+static char *RCSid = "$Id: util.c,v 1.46 1998/06/18 14:55:20 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - util.c */
@@ -643,6 +643,9 @@ char *instr;
 			} else if ( *s == 't' ) {
 				*t++ = '\t';
 				s++;
+                        } else if ( *s == '\"' ) {
+                                *t++ = '\"';
+                                s++;
 			} else if ( *s >= '0' && *s <= '7' ) {
 				int i,n;
 				if ( sscanf(s,"%o%n",&i, &n) > 0 ) {

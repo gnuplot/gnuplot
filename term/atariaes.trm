@@ -1,5 +1,5 @@
 /*
- * $Id: atariaes.trm,v 1.8 1998/04/14 00:17:31 drd Exp $
+ * $Id: atariaes.trm,v 1.9 1998/06/18 14:59:17 ddenholm Exp $
  *
  */
 
@@ -118,8 +118,8 @@ static void flush_line __PROTO((void));
 static void put_text __PROTO((int x, int y, int w, int h));
 
 static int multi_aes;
-static int window_id=-1;
-static int vdi_handle=-1;
+static int window_id= -1;
+static int vdi_handle= -1;
 static int win_xpos, win_ypos;
 static int win_xsize,win_ysize;
 
@@ -153,13 +153,13 @@ static void open_window(void)
 {
   int x,y,w,h;
 
-  if(window_id==-1) {
+  if(window_id== -1) {
     wind_calc(WC_BORDER, WINTYPE, win_xpos, win_ypos,
                 win_xsize, win_ysize, &x, &y, &w, &h);
     window_id=wind_create(WINTYPE, x, y, w, h);
 
     if(window_id<0) {
-        window_id=-1;
+        window_id= -1;
         int_error("Can't create window", NO_CARET);
     }
 
@@ -170,10 +170,10 @@ static void open_window(void)
 
 static void close_window(void)
 {
-  if(window_id!=-1) {
+  if(window_id!= -1) {
     wind_close(window_id);
     wind_delete(window_id);
-    window_id=-1;
+    window_id= -1;
   }
 }
 
@@ -204,7 +204,7 @@ static void application_exit(void)
 {
   close_window();
 
-  if (vdi_handle!=-1) {
+  if (vdi_handle!= -1) {
     v_clsvwk(vdi_handle);
   }
   mouse_mode();
@@ -307,7 +307,7 @@ static void process_message(int *msg)
   static int small_xpos, small_ypos, small_xsize, small_ysize;
   int x,y,w,h;
 
-  if(window_id==-1 || msg[3]!=window_id) return;
+  if(window_id== -1 || msg[3]!=window_id) return;
 
   switch(msg[0]) {
     case WM_REDRAW:
@@ -587,12 +587,12 @@ TERM_PUBLIC void ATARI_reset( )
     int i;
 
     close_window();
-    if( vdi_handle!=-1 ) {
+    if( vdi_handle!= -1 ) {
         for( i=0 ; i<ATARI_numpalette ; i++ ) {
             vs_color(vdi_handle, i, ATARI_savecolors[i] );
         }
         v_clsvwk( vdi_handle );
-        vdi_handle=-1;
+        vdi_handle= -1;
     }
 }
 
@@ -615,7 +615,7 @@ TERM_PUBLIC void ATARI_text( )
 {
     flush_line( );
     if(!multi_aes) {
-        while(window_id!=-1 && !poll_events(1));
+        while(window_id!= -1 && !poll_events(1));
         close_window();
     }
     text_mode();

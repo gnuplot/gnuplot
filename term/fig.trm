@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.56 1998/04/14 00:17:42 drd Exp $
+ * $Id: fig.trm,v 1.57 1998/06/18 14:59:20 ddenholm Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -741,6 +741,8 @@ TERM_PUBLIC void FIG_pointsize(pointsize)
 double pointsize;
 {
    FIG_current_pointsize = pointsize;
+   /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
+  do_pointsize(pointsize * FIG_font_s / (double) FIG_FONT_S );
 }
  
 TERM_PUBLIC void FIG_linewidth(linewidth)

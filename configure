@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Revision: 1.89 
+# From configure.in Revision: 1.90 
 
 
 
@@ -3969,7 +3969,7 @@ if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
 #define LINUXVGA 1
 EOF
 
-    LINUXSUID='chown root $(bindir)/gnuplot;chmod u+s $(bindir)/gnuplot'
+    LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
     TERMLIBS="$TERMLIBS -lvga"
 else
   echo "$ac_t""no" 1>&6

@@ -1,5 +1,5 @@
 /*
- * $Id: pc.trm,v 1.19 1998/04/14 00:18:00 drd Exp $
+ * $Id: pc.trm,v 1.20 1998/06/18 14:59:22 ddenholm Exp $
  *
  */
 
@@ -219,7 +219,7 @@ TERM_PUBLIC void PC_graphics()
   setgraphmode(pc_mode);
 #endif /* __TURBOC__ */
 #ifdef MSC
-  if (pc_corscreen==-1) Vmode(18); /* VGA */
+  if (pc_corscreen== -1) Vmode(18); /* VGA */
   else { grinit(corscreen); grandtx(); } /* corolla */
 #endif /* MSC */
 }
@@ -242,7 +242,7 @@ TERM_PUBLIC void PC_linetype(linetype)
       setlinestyle(4,pattern[linetype+2],1);
 #endif /* __TURBOC__ */
 #ifdef MSC
-  if (pc_corscreen!=-1) Cor_mask(pattern[linetype+2]);
+  if (pc_corscreen!= -1) Cor_mask(pattern[linetype+2]);
 #endif /* MSC */
     }
 }
@@ -266,7 +266,7 @@ TERM_PUBLIC void PC_vector(x,y)
   lineto(x,pc_lasty-y);
 #endif /* __TURBOC__ */
 #ifdef MSC
-  if (pc_corscreen!=-1) Cor_line(startx,COR_YLAST-starty,x,COR_YLAST-y);
+  if (pc_corscreen!= -1) Cor_line(startx,COR_YLAST-starty,x,COR_YLAST-y);
 #endif /* MSC */
   startx = x;
   starty = y;
@@ -294,7 +294,7 @@ TERM_PUBLIC void PC_text()
   clrscr();
 #endif /* __TURBOC__ */
 #ifdef MSC
-  if (pc_corscreen!=-1) { grreset(); txonly(); }
+  if (pc_corscreen!= -1) { grreset(); txonly(); }
   Vmode(3);
 #endif /* MSC */
   }

@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.21 1998/04/14 00:17:57 drd Exp $
+ * $Id: next.trm,v 1.22 1998/06/18 14:59:21 ddenholm Exp $
  *
  */
 
@@ -87,7 +87,7 @@ register_term(next)
 
 #ifdef TERM_PROTO
 
-/* wheter or not to compile support for the old (self-contained)
+/* whether or not to compile support for the old (self-contained)
    NeXT terminal */
 /* #define NEXT_OLDTERMINAL	1 */
 
@@ -922,7 +922,7 @@ static char *pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
 
 
 
-/* All lifted from the anced postscript driver */
+/* All lifted from the enhanced postscript driver */
 
 
 
@@ -1461,6 +1461,7 @@ START_HELP(next)
 "1 next",
 "?set terminal next",
 "?next",
+"?NeXT",
 " Several options may be set in the next driver.",
 "",
 " Syntax:",
@@ -1481,6 +1482,8 @@ START_HELP(next)
 "       set term next 22",
 "       set term next color \"Times-Roman\" 14",
 "       set term next color \"Helvetica\" 12 title \"MyPlot\"",
-"       set term next old"
+"       set term next old",
+"",
+" Pointsizes may be changed with `set linestyle`."
 END_HELP(next)
 #endif

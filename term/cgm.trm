@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.15 1998/04/14 00:17:34 drd Exp $
+ * $Id: cgm.trm,v 1.16 1998/06/18 14:59:18 ddenholm Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -338,7 +338,7 @@ TERM_PUBLIC void CGM_graphics()
   CGM_write_int_record(5, 15, 2, (int *)&t->v_char);
   CGM_write_int_record(5, 22, 2, interior_style_data);
   {
-    char buf[35];
+    char buf[45];
     sprintf(buf, "%.31s,%d", cgm_font, cgm_fontsize);
     CGM_set_font(buf);
   }
@@ -663,6 +663,8 @@ TERM_PUBLIC void CGM_dashed_vector(ux, uy)
     }
   if (cgm_step_index&1)
     CGM_solid_vector(ux, uy);
+  else
+    CGM_move(ux, uy);
   cgm_step -= (int)remain;
 }
 
@@ -891,6 +893,16 @@ static void CGM_flush_polygon()
 
 TERM_PUBLIC void CGM_options()
 {
+  strcpy(cgm_font,"Arial Bold");
+  cgm_fontsize = 10;
+  term->v_char = (unsigned int)(cgm_fontsize*CGM_PT);
+  term->h_char = (unsigned int)(cgm_fontsize*CGM_PT*5/9);
+  cgm_linewidth_pt = 1;
+  cgm_monochrome=FALSE;
+  cgm_plotwidth = 6*72;
+  cgm_portrait=FALSE;
+  cgm_rotate=TRUE;
+  cgm_winword6_mode=FALSE;
   while (!END_OF_COMMAND) 
     {
       if (almost_equals(c_token,"p$ortrait")) 
@@ -1125,6 +1137,8 @@ START_HELP(cgm)
 "       Times Roman Bold Italic",
 "       Helvetica",
 "       Roman",
+"#\\begin{tabular}{|ccl|} \\hline",
+"#\\multicolumn{2}{|c|}{CGM fonts}\\\\",
 "#&Arial&\\\\",
 "#&Arial Italic&\\\\",
 "#&Arial Bold&\\\\",
@@ -1135,6 +1149,9 @@ START_HELP(cgm)
 "#&Times Roman Bold Italic&\\\\",
 "#&Helvetica&\\\\",
 "#&Roman&\\\\",
+"%c c l .",
+"%@@CGM fonts",
+"%_",
 "%@@Arial",
 "%@@Arial Italic",
 "%@@Arial Bold",
@@ -1219,6 +1236,8 @@ START_HELP(cgm)
 " as the default.",
 "",
 " `winword6` disables the color tables for a similar reason---with the color",
-" table included, Microsoft Word displays black for color 7."
+" table included, Microsoft Word displays black for color 7.",
+"",
+" Linewidths and pointsizes may be changed with `set linestyle`."
 END_HELP(cgm)
 #endif  /* TERM_HELP */

@@ -1,5 +1,5 @@
 /*
- * $Id: doc2tex.c,v 1.20 1998/04/14 00:17:01 drd Exp $
+ * $Id: doc2tex.c,v 1.21 1998/06/18 14:59:12 ddenholm Exp $
  *
  */
 
@@ -141,7 +141,9 @@ void process_line(line, b)
 				verb=FALSE;
 			 } 
 			 (void) fputs("\n\\begin{center}\n", b);
-			 (void) fputs("\\begin{tabular}{|ccl|} \\hline\n", b);
+			 /* moved to gnuplot.doc by RCC
+                         (void) fputs("\\begin{tabular}{|ccl|} \\hline\n", b);
+                         */
 			 intable = TRUE;
 		  }
 		  /* ignore rest of line */
