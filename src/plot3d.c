@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.75 2004/09/11 17:52:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.76 2004/09/12 01:12:11 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -836,6 +836,18 @@ get_3ddata(struct surface_points *this_plot)
 		x = v[2] * cos(v[0]) * cos(v[1]);
 		y = v[2] * sin(v[0]) * cos(v[1]);
 		z = v[2] * sin(v[1]);
+
+#ifdef EAM_DATASTRINGS
+		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
+		    /* text = df_tokens[3]; */
+		    /* getting color from an explicitly given 5th column */
+		    color = v[4];
+#ifdef PM3D
+		    pm3d_color_from_column = TRUE;
+#endif
+		}
+#endif
+
 		break;
 
 	    case MAP3D_CYLINDRICAL:
@@ -850,6 +862,18 @@ get_3ddata(struct surface_points *this_plot)
 		x = v[2] * cos(v[0]);
 		y = v[2] * sin(v[0]);
 		z = v[1];
+
+#ifdef EAM_DATASTRINGS
+		if (j == 5 && this_plot->plot_style == LABELPOINTS) {
+		    /* text = df_tokens[3]; */
+		    /* getting color from an explicitly given 5th column */
+		    color = v[4];
+#ifdef PM3D
+		    pm3d_color_from_column = TRUE;
+#endif
+		}
+#endif
+
 		break;
 
 	    default:

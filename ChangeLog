@@ -19,6 +19,9 @@
 	* src/set.c (parse_colorspec): If "tc palette" is specified with no
 	further suboptions, default to "tc palette z".
 
+	* src/plot3d.c (get_3ddata): Allow palette color options in cylindrical
+	and spherical coordinate modes also.
+
 2004-09-09  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Update the comment on plot-time evaluation of 
