@@ -3000,6 +3000,10 @@ the problem:
 
 @end example
 
+To avoid this, you can use the `fixmin`/`fixmax` feature of the 
+@ref{autoscale} command, which turns off the automatic extension of the
+axis range upto the next tic mark.
+
 @menu
 * every::                       
 * example_datafile::            
@@ -4539,8 +4543,8 @@ axes. The default is to autoscale all axes.
 
 Syntax:
 @example
-      set autoscale @{<axes>@{min|max@}@}
-      set noautoscale @{<axes>@{min|max@}@}
+      set autoscale @{<axes>@{|min|max|fixmin|fixmax@}@}
+      set noautoscale @{<axes>@{|min|max|fixmin|fixmax@}@}
       show autoscale
 
 @end example
@@ -4548,7 +4552,11 @@ Syntax:
 where <axes> is either `x`, `y`, `z`, `x2`, `y2` or `xy`.  A keyword with
 `min` or `max` appended (this cannot be done with `xy`) tells `gnuplot` to
 autoscale just the minimum or maximum of that axis.  If no keyword is given,
-all axes are autoscaled.
+all axes are autoscaled. 
+
+A keyword with `fixmin` or `fixmax` appended tells gnuplot to disable
+extension the axis range to the next tic mark position, for autoscaled axes
+using equidistant tics.
 
 When autoscaling, the axis range is automatically computed and the dependent
 axis (y for a @ref{plot} and z for `splot`) is scaled to include the range of the
@@ -4579,7 +4587,8 @@ change the independent variable from t (see @ref{dummy}).
 When tics are displayed on second axes but no plot has been specified for
 those axes, x2range and y2range are inherited from xrange and yrange.  This
 is done _before_ xrange and yrange are autoextended to a whole number of
-tics, which can cause unexpected results.
+tics, which can cause unexpected results.  You can use the `fixmin`
+or `fixmax` options to avoid this.
 
 Examples:
 
@@ -4593,6 +4602,14 @@ This sets autoscaling only for the minimum of the y axis (the maximum of the
 y axis and the other axes are not affected):
 @example
       set autoscale ymin
+
+@end example
+
+This disables extension of the x2 axis tics to the next tic mark,
+thus keeping the exact range as found in the plotted data and functions:
+@example
+      set autoscale x2fixmin
+      set autoscale x2fixmax
 
 @end example
 
@@ -6339,11 +6356,12 @@ Syntax:
 
 A cartesian coordinate system is used by default.
 
-For a spherical coordinate system, the data occupy two or three columns (or
-@ref{using} entries).  The first two are interpreted as the polar and azimuthal
-angles theta and phi (in the units specified by @ref{angles}).  The radius r
-is taken from the third column if there is one, or is set to unity if there
-is no third column.  The mapping is:
+For a spherical coordinate system, the data occupy two or three columns
+(or @ref{using} entries).  The first two are interpreted as the polar and
+azimuthal angles theta and phi (or "longitude" and "latitude"), in the
+units specified by @ref{angles}.  The radius r is taken from the third
+column if there is one, or is set to unity if there is no third column.
+The mapping is:
 
 @example
       x = r * cos(theta) * cos(phi)
@@ -6352,7 +6370,8 @@ is no third column.  The mapping is:
 
 @end example
 
-Note that this is a "geographic" spherical system, rather than a "polar" one.
+Note that this is a "geographic" spherical system, rather than a "polar"
+one (that is, phi is measured from the equator, rather than the pole).
 
 For a cylindrical coordinate system, the data again occupy two or three
 columns.  The first two are interpreted as theta (in the units specified by
@@ -6713,7 +6732,8 @@ Syntax:
 The same syntax applies to @ref{mytics}, @ref{mztics}, @ref{mx2tics} and @ref{my2tics}.
 
 <freq> is the number of sub-intervals (NOT the number of minor tics) between
-major tics (ten is the default for a linear axis, so there are nine minor
+major tics (the default for a linear axis is either two or five
+depending on the major tics, so there are one or four minor
 tics between major tics). Selecting `default` will return the number of minor
 ticks to its default value.
 
@@ -6992,6 +7012,7 @@ points---thus it produces no artefacts.  Currently supported terminals are:
     GIF
     Xfig
     tgif
+    cgm
 
 @end example
 
@@ -7902,7 +7923,7 @@ if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 @cindex errorbars
 
 The @ref{yerrorbars} (or @ref{errorbars}) style is only relevant to 2-d data plots.
-@ref{yerrorbars} is like @ref{dots}, except that a vertical error bar is also drawn.
+@ref{yerrorbars} is like `points`, except that a vertical error bar is also drawn.
 At each point (x,y), a line is drawn from (x,y-ydelta) to (x,y+ydelta) or
 from (x,ylow) to (x,yhigh), depending on how many data columns are provided.
 A tic mark is placed at the ends of the error bar (unless @ref{bars} is
