@@ -1,0 +1,21 @@
+This file contains the PGP keys used to sign the various versions of
+gnuplot.  You can add them to your PGP keyring using:
+
+PGP 2.X:   pgp -ka PGPKEYS
+PGP 5.X:   pgpk -a PGPKEYS
+
+Type Bits/KeyID    Date       User ID
+pub  1024/FB6F7CC9 1998/02/27 Lars Hecking <lhecking@nmrc.ucc.ie>
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: 2.6.3ia
+
+mQCNAzT254oAAAEEAM4C8WfNuK9lEs4ZoyEwmVLQQ4UT9qxmpR4kuZTueoO0ng9/
+mu1MYWHOrOJDhnw0NSWEfVfW67sobank0weQQ14lzsiyo3QLf4jFwPMicCbXSz/5
+4TlgZBvEMwBxWp9cTcTIZ4ihYlqAkdvZALcBNUYY6pIU6y1FT1J8Bnz7b3zJAAUR
+tCNMYXJzIEhlY2tpbmcgPGxoZWNraW5nQG5tcmMudWNjLmllPokAlQMFEDT254pS
+fAZ8+298yQEBx+wD/1zjnZvBW4Jzsu1UlIK7KDVPV2bPhPICq/2BSPhg1jCHs2s3
+0kmh6PtD4gBeziIwfp6MdkaQ4+S1PHy3eIUc05/vgGzpIf7IYTdgOvVaZdIMjR9U
+DAdAsOv4X48PyP3kjWkweB5zm2Q7UovmgqoMZ6UWmxWfTjdapzr4GJloNgKK
+=Rbtn
+-----END PGP PUBLIC KEY BLOCK-----
