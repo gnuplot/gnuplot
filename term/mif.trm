@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.22 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: mif.trm,v 1.23 2002/12/13 14:58:51 lhecking Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -86,6 +86,7 @@
  *      Support for vertical text.                      kssingvo@immd4.informatik.uni-erlangen.de
  *      Fixed plot bug for "set size XS,YS", XS/YS > 1. olof@fysik4.kth.se
  *	Support colored text				merritt@u.washington.edu
+ *	Support box fill and pattern fill		merritt@u.washington.edu
  *
  */
 
@@ -110,6 +111,11 @@ TERM_PUBLIC void MIF_reset __PROTO((void));
 TERM_PUBLIC void MIF_options __PROTO((void));
 TERM_PUBLIC int MIF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void MIF_point __PROTO((unsigned int x, unsigned int y, int number));
+TERM_PUBLIC void MIF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1,
+	    unsigned int width, unsigned int height));
+#ifdef PM3D
+TERM_PUBLIC void MIF_filled_polygon __PROTO((int points, gpiPoint* corners));
+#endif
 
 /** Coordinates **/
 /* The cast to float is not necessary because we are dividing by a float */
@@ -165,6 +171,10 @@ static char mif_pen[64], mif_pen_width[64], mif_separation[64];		/* How to plot 
 static char mif_textcolor[64];	/* EAM parallels separation */
 
 static int mif_text_ang = 0;		/* Rotation angle of text */
+
+static int mif_fill_patterns[] = {7,12,3,0,9,8,14,13};
+#define MIF_FILL_SOLID  0
+#define MIF_FILL_NONE  15
 
 #define MIF_NPENS 16		/* Number of MIF pen types */
 static int mif_pentype = 0;	/* Pen type to use. Also used to create groups for graphics */
@@ -339,7 +349,7 @@ put_mif_line()
 	if (np >= 2) {
 
 	    /* Line preamble */
-	    fprintf(gpoutfile, "\t<PolyLine <GroupID %d> %s %s %s\n",
+	    fprintf(gpoutfile, "\t<PolyLine <GroupID %d> %s %s %s <Fill 15>\n",
 		    MIF_PEN_TO_GROUP(mif_pentype), mif_pen, mif_pen_width, mif_separation);
 
 	    /* Draw the line elements */
@@ -372,6 +382,80 @@ put_mif_line()
     }				/* Line processed */
 }
 
+/* Filled box support - Ethan Merritt <merritt@u.washington.edu> */
+TERM_PUBLIC void
+MIF_boxfill(int style, unsigned int x1, unsigned int y1,
+	    unsigned int width, unsigned int height)
+{
+    int fill_pattern;
+
+#if USE_ULIG_FILLEDBOXES
+    int fillpar = style >> 4;
+    style &= 0xf;
+#else
+    style = MIF_FILL_NONE;
+#endif
+
+    switch (style) {
+	default:
+	case FS_EMPTY:	fill_pattern = 7;
+			break;
+	case FS_SOLID:	fill_pattern = MIF_FILL_SOLID;
+			break;
+	case FS_PATTERN:fill_pattern = mif_fill_patterns[fillpar % 8];
+			break;
+    }
+
+    /* Object preamble */
+    fprintf(gpoutfile, "\t<Rectangle <GroupID %d> %s\n",
+	    MIF_PEN_TO_GROUP(mif_pentype), mif_separation);
+
+    /* Set fill type */
+    fprintf(gpoutfile, "\t\t<Fill %d>\n", fill_pattern);
+
+    /* Draw the box */
+    fprintf(gpoutfile, "\t\t<ShapeRect %.3f %.3f %.3f %.3f>\n",
+	GNP_TO_MIF(x1), GNP_TO_MIF(MIF_YLAST - (y1+height)),
+	GNP_TO_MIF(width), GNP_TO_MIF(height));
+
+    /* End of object */
+    fputs("\n\t>\n", gpoutfile);
+
+    /* Register the used group ID */
+    proc_group_id(MIF_PEN_TO_GROUP(mif_pentype));
+
+}
+
+#ifdef PM3D
+/* Filled polygon. Ethan Merritt <merritt@u.washington.edu> */
+TERM_PUBLIC void
+MIF_filled_polygon(int points, gpiPoint* corners)
+{
+    int i;
+
+    /* Object preamble */
+    fprintf(gpoutfile, "\t<Polygon <GroupID %d>\n",
+	    MIF_PEN_TO_GROUP(mif_pentype));
+
+    /* Set fill type */
+    fprintf(gpoutfile, "\t\t<Fill %d>\n", MIF_FILL_SOLID);
+
+    /* Draw the line elements */
+    fprintf(gpoutfile, "\t\t<NumPoints %d> ", points);
+    for (i=0; i<points; i++) {
+	fprintf(gpoutfile, "<Point  %.3f %.3f> ",
+		GNP_TO_MIF(corners[i].x), 
+		GNP_TO_MIF(MIF_YLAST - corners[i].y));
+    }
+
+    /* End of object */
+    fputs("\n\t>\n", gpoutfile);
+
+    /* Register the used group ID */
+    proc_group_id(MIF_PEN_TO_GROUP(mif_pentype));
+
+}
+#endif
 
 /* Draw a point */
 static void
@@ -882,7 +966,21 @@ TERM_TABLE_START(mif_driver)
     MIF_VTIC, MIF_HTIC, MIF_options, MIF_init, MIF_reset,
     MIF_text, null_scale, MIF_graphics, MIF_move, MIF_vector,
     MIF_linetype, MIF_put_text, MIF_text_angle,
-    MIF_justify_text, MIF_point, do_arrow, set_font_null
+    MIF_justify_text, MIF_point, do_arrow, set_font_null,
+    0, /* pointsize */
+    0, /* flags */
+    0, 0, /* suspend, resume */
+    MIF_boxfill,
+    0  /* linewidth */
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0
+#endif
+#ifdef PM3D
+    ,0 /* make_palette */
+    ,0 /* previous_palette */
+    ,0 /* set_color */
+    ,MIF_filled_polygon /* filled_polygon */
+#endif
 TERM_TABLE_END(mif_driver)
 
 #undef LAST_TERM
