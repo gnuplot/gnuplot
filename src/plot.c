@@ -588,7 +588,7 @@ char **argv;
 		/* interactive = FALSE; */ /* should this be here? */
 
 	    } else
-		load_file(fopen(*argv, "r"), *argv, FALSE);
+		load_file(loadpath_fopen(*argv, "r"), *argv, FALSE);
 	}
 #ifdef _Windows
 	if (noend) {

@@ -1060,7 +1060,7 @@ char *pfile, *npfile;
 
     /* split into path and filename */
     splitpath(ifilename, path, fnam);
-    if (!(of = fopen(ifilename, "r")))
+    if (!(of = loadpath_fopen(ifilename, "r")))
 	Eex2("parameter file %s could not be read", ifilename);
 
     if (!(nf = fopen(ofilename, "w")))
@@ -1533,7 +1533,7 @@ void do_fit()
 	/* get parameters and values out of file and ignore fixed ones */
 
 	fprintf(log_f, "fitted parameters and initial values from file: %s\n\n", sstr);
-	if (!(f = fopen(sstr, "r")))
+	if (!(f = loadpath_fopen(sstr, "r")))
 	    Eex2("could not read parameter-file %s", sstr);
 	while (TRUE) {
 	    if (!fgets(s = sstr, (int) sizeof(sstr), f))	/* EOF found */

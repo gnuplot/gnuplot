@@ -610,7 +610,7 @@ static int command()
 	     * passes it on to load_file() so that it gets
 	     * pushed on the stack and recusion will work, etc
 	     */
-	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "r") : stdin;
+	    fp = strcmp(sv_file, "-") ? loadpath_fopen(sv_file, "r") : stdin;
 	    load_file(fp, sv_file, FALSE);
 	    /* input_line[] and token[] now destroyed! */
 	    c_token = num_tokens = 0;
@@ -622,7 +622,7 @@ static int command()
 	    m_quote_capture(&sv_file, c_token, c_token);
 	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    /* Argument list follows filename */
-	    load_file(fopen(sv_file, "r"), sv_file, TRUE);
+	    load_file(loadpath_fopen(sv_file, "r"), sv_file, TRUE);
 	    /* input_line[] and token[] now destroyed! */
 	    c_token = num_tokens = 0;
 	}
