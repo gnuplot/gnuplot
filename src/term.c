@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.76 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.76.2.1 2004/09/20 19:36:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -934,7 +934,8 @@ do_arrow(
 	    filledhead[3].y = ey + y2;
 	    filledhead[4].x = ex + xm;
 	    filledhead[4].y = ey + ym;
-	    (*t->filled_polygon) (5, filledhead);
+	    if (t->filled_polygon)
+		(*t->filled_polygon) (5, filledhead);
 	}
 #endif
 	/* draw outline of forward arrow head */
@@ -963,7 +964,8 @@ do_arrow(
 		filledhead[3].y = sy - y2;
 		filledhead[4].x = sx - xm;
 		filledhead[4].y = sy - ym;
-		(*t->filled_polygon) (5, filledhead);
+		if (t->filled_polygon)
+		    (*t->filled_polygon) (5, filledhead);
 	    }
 #endif
 	    /* draw outline of backward arrow head */
@@ -2246,13 +2248,19 @@ enhanced_recursion(
 		}
 		break;
 	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
-		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS encoding to work */
-		/* If this change causes problems then we need a separate flag for shift-JIS   */
-		/* and certain other 8-bit character sets.                                     */
-		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
-		(term->enhanced_writec)('\\');
-		(term->enhanced_writec)('\\');
-		break;
+		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS */
+		/* encoding to work. If this change causes problems then we   */
+		/* need a separate flag for shift-JIS and certain other 8-bit */
+		/* character sets.                                            */
+		/* EAM Nov 2004 - Nevertheless we must allow \ to act as an   */
+		/* escape for the 5 enhanced mode formatting characters even  */
+		/* though it corrupts certain Shift-JIS character sequences.  */
+		if (strchr("^_@&~",p[1]) == NULL) {
+		    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		    (term->enhanced_writec)('\\');
+		    (term->enhanced_writec)('\\');
+		    break;
+		}
 	    }
 	    ++p;
 

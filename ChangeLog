@@ -1,3 +1,12 @@
+2004-11-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (do_arrow): Test for term->filled_polygon() before
+	trying to use it.
+
+	* src/term.c (enhanced_recursion): Modify Shift-JIS patch so that
+	backslash can always be used to escape the 5 special characters
+	&^_~& used in postscript enhanced text mode.
+
 2004-10-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (pr_font): Release current font before loading a new
