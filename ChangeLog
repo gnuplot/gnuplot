@@ -1,5 +1,9 @@
 2002-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Updates for color axis, pm3d, palette and colorbox.
+
+2002-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/makefile.mgw: Added -DNO_SETVBUF; removed backslashes.
 
 2002-02-19  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>

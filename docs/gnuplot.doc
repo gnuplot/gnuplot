@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.100 2002/02/14 16:42:07 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.101 2002/02/18 15:03:33 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -252,13 +252,13 @@ C
 ?commands bind
 ?bind
 ?help bind
- The `bind` command allows to (re-)define a sequence of gnuplot commands which
- will be executed when a certain key or key sequence is pressed while the
- driver's window has the input focus. Note that `bind` is only available if
- gnuplot was compiled with mouse support and it is used by all mouse-capable
- terminals. Bindings overwrite the builtin bindings (like in every real
- editor), except <space> and 'q' which cannot be rebound. Mouse buttons cannot
- be rebound.
+ The `bind` command allows to (re-)define a hotkey, i.e. a sequence of gnuplot
+ commands which will be executed when a certain key or key sequence is pressed
+ while the driver's window has the input focus. Note that `bind` is only
+ available if gnuplot was compiled with `mouse` support and it is used by all
+ mouse-capable terminals. Bindings overwrite the builtin bindings (like in 
+ every real editor), except <space> and 'q' which cannot be rebound. Mouse 
+ buttons cannot be rebound.
 
  Note that multikey-bindings with modifiers have to be quoted.
 
@@ -3396,7 +3396,7 @@ C ... and restart the table:
        unset autoscale {<axes>}
        show autoscale
 
- where <axes> is either `x`, `y`, `z`, `x2`, `y2` or `xy`.  A keyword with
+ where <axes> is either `x`, `y`, `z`, `cb`, `x2`, `y2` or `xy`.  A keyword with
  `min` or `max` appended (this cannot be done with `xy`) tells `gnuplot` to
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
  all axes are autoscaled. 
@@ -3983,7 +3983,7 @@ C ... and restart the table:
 
  Example:
 
- If you're in Germany, you probably want:
+ Correct typesetting in most European countries requires:
        set decimalsign ','
 3 dgrid3d
 ?commands set dgrid3d
@@ -4106,6 +4106,7 @@ C ... and restart the table:
 ?set format
 ?show format
 ?format
+?format cb
  The format of the tic-mark labels can be set with the `set format` command.
 
  Syntax:
@@ -4113,7 +4114,7 @@ C ... and restart the table:
        set format {<axes>} {'<format-string>'}
        show format
 
- where <axes> is either `x`, `y`, `z`, `xy`, `x2`, `y2` or nothing (which is
+ where <axes> is either `x`, `y`, `z`, `cb`, `xy`, `x2`, `y2` or nothing (which is
  the same as `xy`).  The length of the string representing a tic mark (after
  formatting with 'printf') is restricted to 100 characters.  If the format
  string is omitted, the format will be returned to the default "%g".  For
@@ -4714,6 +4715,7 @@ C ... and restart the table:
 ?unset label
 ?show label
 ?label
+?help label
 ?nolabel
  Arbitrary labels can be placed on the plot using the `set label` command.
 
@@ -4827,6 +4829,7 @@ C ... and restart the table:
 ?unset style line
 ?show style line
 ?linestyle
+?help set style line
 ^ <a name="linetype">
 ^ <a name="linewidth">
  Each terminal has a default set of line and point types, which can be seen
@@ -4950,6 +4953,8 @@ C ... and restart the table:
 ?set logscale
 ?unset logscale
 ?show logscale
+?set log
+?set log cb
 ?logscale
 ?nologscale
  Log scaling may be set on the x, y, z, x2 and/or y2 axes.
@@ -4959,8 +4964,8 @@ C ... and restart the table:
        unset logscale <axes>
        show logscale
 
- where <axes> may be any combinations of `x`, `y`, and `z`, in any order, or
- `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
+ where <axes> may be any combinations of `x`, `y`, `z`, and `cb` in any order,
+ or `x2` or `y2` and where <base> is the base of the log scaling.  If <base> is
  not given, then 10 is assumed.  If <axes> is not given, then all axes are
  assumed.  `unset logscale` turns off log scaling for the specified axes.
 
@@ -4971,6 +4976,9 @@ C ... and restart the table:
 
  To enable scaling log base 2 of the y axis:
        set logscale y 2
+
+ To enable z and color log axes for a pm3d plot:
+       set logscale zcb
 
  To disable z axis log scaling:
        unset logscale z
@@ -5554,7 +5562,7 @@ C ... and restart the table:
  Otherwise, the options can be given in any order.
 
  pm3d can be drawn at the base or top (color or gray map) or as surface
- (color or gray surface).  This is defined by the `at` option with a a string
+ (color or gray surface).  This is defined by the `at` option with a string
  of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b` plots at
  bottom only, `at st` plots firstly surface, then top, `at bstbst`...
 
@@ -5576,14 +5584,15 @@ C ... and restart the table:
  point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
  points of the quadrangle must be in the x and y ranges.
 
- The above clipping is OK for plotting maps.  For surfaces, clipping with
- respect to the z coordinate will be necessary.  Maybe in future... (maybe
- something like "clipz1in" and "clipz4in").  Really needed?
+ The above clipping works fine for plotting maps.  For surfaces, clipping with
+ respect to the z coordinate could find some use too (something like "clipz1in" 
+ and "clipz4in").  But nobody has needed this feature until now, so it's not
+ available.
 
- By default, the range of z-values for coloring is the same as that from 
- `set zrange`. That's OK for maps; for surfaces, however, using separate z
- ranges for plotting and for coloring can be of advantage.  Then 
- `set cbrange` should be used.
+ Notice that the ranges of z-values and color values for surfaces are 
+ adjustable independently by `set zrange`, `set cbrange`, and `set log` 
+ for z or cb.  Maps can be adjusted by the cb axis only; see also 
+ `set colorbox`.
 
  The option `hidden3d` takes as the argument a linestyle which must be created
  by `set style line ...`. (The style need not to be present when setting pm3d,
@@ -5620,7 +5629,9 @@ C ... and restart the table:
  reversed y axis and rotated ylabel.
 
  The coloring setup as well as the color box drawing are determinated by
- `set palette`. There can be only for palette for the given plot.
+ `set palette`.  There can be only one palette for the current plot.  Drawing
+ of several surfaces with different palettes can be achieved by `multiplot`
+ with fixed `origin` and `size`.
 
  If the option `implicit` is on (which is the default), all surface plots
  will be plotted additionally to the default type, e.g.
@@ -5638,8 +5649,9 @@ C ... and restart the table:
  on the command line. This can be of interest especially for pm3d surfaces
  which can overwrite and therefore hide part of earlier plots.
 
- If 'with pm3d' is specified in the `splot` command line, then it accepts the
- 'at' option.  The following plots three color surfaces at different altitudes:
+ If `with pm3d` is specified in the `splot` command line, then it accepts the
+ 'at' option.  The following plots draw three color surfaces at different 
+ altitudes:
        set border 4095
        set pm3d at s
        splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
@@ -5660,7 +5672,9 @@ C ... and restart the table:
 
  Color palettes, or requires terminal entries for filled color polygons and
  palettes of smooth colors, are currently available for terminals listed in
- `help pm3d`.
+ `help pm3d`. The range of color values are adjustable independently by 
+ `set cbrange` and `set log cb`. The whole color palette is 
+ visualized in the `colorbox`.
 
  Syntax:
        set palette
@@ -5706,31 +5720,41 @@ C ... and restart the table:
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
- In order to reduce the size of postscript files, the gray value is written
- there and not all three calculated r,g,b values.  Therefore the analytical
- formulae are coded in postscript in a header before the pm3d draw therein
- (see /g and /cF definitions).  Usually, it makes sense to write down 
- definitions of only those 3 formulae chosen.  But in the case of multiplot or
- some other reasons you may want to manually edit the transformations directly
- in the postscript file.  Then you may enjoy the option `ps_allcF` which
- writes down definitions of all formulae.  It was like that I have got the
- Rosenbrock multiplot figure on my gnuplot.html#pm3d demo page.  The default 
- is `nops_allcF`.
- If a postscript file has been produced for grided (or mostly regular) data,
- then it is possible to reduce the size of that postscript file up to at about
- 50% by the enclosed awk script `pm3dCompress.awk`.  This you may find
- interesting if you intend to keep the file for including it into your
- publication or before downloading a very large file into a slow printer.
- Usage: `awk -f pm3dCompress.awk thefile.ps >smallerfile.ps`.
+ In order to reduce the size of postscript files, the gray value and not all
+ three calculated r,g,b values is written in the file.  Therefore the 
+ analytical formulae are coded directly in the postscript language as a header
+ just before the pm3d drawing, see /g and /cF definitions.  Usually, it makes
+ sense to write therein definitions of only the 3 formulae used.  But for
+ multiplot or any other reason you may want to manually edit the 
+ transformations directly in the postscript file.  This is the default option
+ `nops_allcF`.  Using the option `ps_allcF` writes postscript definitions of
+ all formulae.  This you may find interesting if you want to edit the
+ postscript file in order to have different palettes for different surfaces
+ in one graph.  Well, you can achieve this functionality by `multiplot` with
+ fixed `origin` and `size`.
 
- Many terminals have discrete number of colors (e.g. 256 colors in gif). All
- entries of the palette remaining after linetype colors declaration are
- allocated for pm3d by default.  Then multiplot could fail if there are no
- more color positions available.  You should use `set palette maxcolors
- <maxcolors>` with a reasonably small value. This option can also be used to
- separate levels of z=constant in discrete steps, thus to emulate filled
- contours. Default value is 0 for allocating all remaining entries or for to
- use exact mapping to RGB.
+ If pm3d map has been plotted from gridded or almost regular data with an 
+ output to a postscript file, then it is possible to reduce the size of this
+ postscript file up to at about 50% by the enclosed awk script 
+ `pm3dCompress.awk`.  This you may find  interesting if you intend to keep the
+ file for including it into your publication or before downloading a very large
+ file into a slow printer. Usage:
+     awk -f pm3dCompress.awk thefile.ps >smallerfile.ps
+
+ If pm3d map has been plotted from rectangular gridded data with an output
+ to a postscript file, then it is possible to reduce the file size even more
+ by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
+     awk -f pm3dConvertToImage.awk <thefile.ps >smallerfile.ps
+
+ Most terminals support only discrete number of colors (e.g. 256 colors in 
+ gif).  All entries of the palette remaining after the default gnuplot linetype
+ colors declaration are allocated for pm3d by default.  Then `multiplot` could
+ fail if there are no more color positions in the terminal available.  Then you
+ should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
+ This option can also be used to separate levels of z=constant in discrete
+ steps, thus to emulate filled contours. Default value of 0 stays for
+ allocating all remaining entries in the terminal palette or for to use exact
+ mapping to RGB.
 
 3 color box
 ?commands set colorbox
