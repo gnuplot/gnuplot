@@ -1,3 +1,9 @@
+2004-09-06  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* configure.in: The --enable-image option requires general binary data
+	file code. Ensure --disable-binary-data-file is not in the option list
+	if only --enable-image is activated.
+
 2004-09-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines
