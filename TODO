@@ -24,6 +24,7 @@ longer term
 
 Lars' list
 
+- much-requested feature: read text/commands from data files
 - new directory structure: eg. docs lib lisp m4 man src term
   [DONE] need to split src/stdfn.h into single files and move
   to new lib/ directory
