@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.23 1999/07/30 19:33:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.24 1999/08/07 17:21:29 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -111,20 +111,25 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 #endif /* VMS */
 
 /* static prototypes */
-static int command __PROTO((void));
-static enum command_id lookup_command __PROTO((int));
+static void command __PROTO((void));
 static void call_command __PROTO((void));
 static void changedir_command __PROTO((void));
 static void clear_command __PROTO((void));
-static void help_command __PROTO((int toplevel));
+static void exit_command __PROTO((void));
+static void help_command __PROTO((void));
 static void history_command __PROTO((void));
+static void if_command __PROTO((void));
+static void invalid_command __PROTO((void));
 static void load_command __PROTO((void));
 static void pause_command __PROTO((void));
+static void plot_command __PROTO((void));
 static void print_command __PROTO((void));
 static void pwd_command __PROTO((void));
+static void replot_command __PROTO((void));
 static void reread_command __PROTO((void));
 static void save_command __PROTO((void));
 static void screendump_command __PROTO((void));
+static void splot_command __PROTO((void));
 static void system_command __PROTO((void));
 static void testtime_command __PROTO((void));
 static void update_command __PROTO((void));
@@ -172,45 +177,7 @@ __far int num_tokens, c_token;
 int num_tokens, c_token;
 #endif
 
-/* table of gnuplot commands
- * should be kept in sync with enum command_id
- * in command.h
- */
-static struct cmd_entry {
-    const char *command_name;
-    enum command_id id;
-} command_tbl[] =
-{
-    { "ca$ll", CMD_CALL },
-    { "cd", CMD_CD },
-    { "cl$ear", CMD_CLEAR },
-    { "ex$it", CMD_EXIT },
-    { "f$it", CMD_FIT },
-    { "h$elp", CMD_HELP },
-    { "hi$story", CMD_HISTORY },
-    { "if", CMD_IF },
-    { "l$oad", CMD_LOAD },
-    { "pa$use", CMD_PAUSE },
-    { "p$lot", CMD_PLOT },
-    { "pr$int", CMD_PRINT },
-    { "pwd", CMD_PWD },
-    { "q$uit", CMD_EXIT },
-    { "rep$lot", CMD_REPLOT },
-    { "re$read", CMD_REREAD },
-    { "res$et", CMD_RESET },
-    { "sa$ve", CMD_SAVE },
-    { "scr$eendump", CMD_SCREENDUMP },
-    { "se$t", CMD_SET },
-    { "she$ll", CMD_SHELL },
-    { "sh$ow", CMD_SHOW },
-    { "sp$lot", CMD_SPLOT },
-    { "sy$stem", CMD_SYSTEM },
-    { "test", CMD_TEST },
-    { "testt$ime", CMD_TESTTIME },
-    { "up$date", CMD_UPDATE }
-};
-
-#define NCMDS (sizeof(command_tbl) / sizeof(command_tbl[0]))
+static int command_exit_status = 0;
 
 /* support for dynamic size of input line */
 void
@@ -315,8 +282,11 @@ do_line()
     num_tokens = scanner(&input_line, &input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
-	if (command())
-	    return (1);
+	command();
+	if (command_exit_status) {
+	    command_exit_status = 0;
+	    return 1;
+	}
 	if (c_token < num_tokens) {	/* something after command */
 	    if (equals(c_token, ";"))
 		c_token++;
@@ -371,7 +341,7 @@ define()
 }
 
 
-static int
+static void
 command()
 {
     int i;
@@ -382,186 +352,102 @@ command()
     if (is_definition(c_token))
 	define();
     else {
-	switch(lookup_command(c_token)) {
-	case CMD_HELP:
-	    c_token++;
-	    help_command(1);
-	    break;
-	case CMD_TESTTIME:
-	    /* given a format and a time string, exercise the time code */
-	    testtime_command();
-	    break;
-	case CMD_TEST:
-	    test_term();
-	    break;
-	case CMD_SCREENDUMP:
-	    c_token++;
-#ifdef _Windows
-	    screen_dump();
-#else
-	    fputs("screendump not implemented\n", stderr);
-#endif
-	    break;
-	case CMD_PAUSE:
-	    pause_command();
-	    break;
-	case CMD_PRINT:
-	    print_command();
-	    break;
-	case CMD_FIT:
-	    fit_command();
-	    break;
-	case CMD_UPDATE:
-	    update_command();
-	    break;
-	case CMD_PLOT:
-	    plot_token = c_token++;
-	    SET_CURSOR_WAIT;
-	    plotrequest();
-	    SET_CURSOR_ARROW;
-	    break;
-	case CMD_SPLOT:
-	    plot_token = c_token++;
-	    SET_CURSOR_WAIT;
-	    plot3drequest();
-	    SET_CURSOR_ARROW;
-	    break;
-	case CMD_REPLOT:
-	    if (!*replot_line)
-		int_error(c_token, "no previous plot");
-	    c_token++;
-	    SET_CURSOR_WAIT;
-	    replotrequest();
-	    SET_CURSOR_ARROW;
-	    break;
-	case CMD_SET:
-	    set_command();
-	    break;
-	case CMD_RESET:
-	    reset_command();
-	    break;
-	case CMD_SHOW:
-	    show_command();
-	    break;
-	case CMD_CLEAR:
-	    clear_command();
-	    break;
-	case CMD_SHELL:
-	    do_shell();
-	    screen_ok = FALSE;
-	    c_token++;
-	    break;
-	case CMD_SAVE:
-	    save_command();
-	    break;
-	case CMD_LOAD:
-	    load_command();
-	    break;
+	switch(lookup_table(&command_tbl[0],c_token)) {
 	case CMD_CALL:
 	    call_command();
-	    break;
-	case CMD_IF: {
-	    double exprval;
-	    struct value t;
-	    if (!equals(++c_token, "("))	/* no expression */
-		int_error(c_token, "expecting (expression)");
-	    exprval = real(const_express(&t));
-	    if (exprval != 0.0) {
-		/* fake the condition of a ';' between commands */
-		int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
-		--c_token;
-		token[c_token].length = 1;
-		token[c_token].start_index = eolpos + 2;
-		input_line[eolpos + 2] = ';';
-		input_line[eolpos + 3] = NUL;
-	    } else
-		c_token = num_tokens = 0;
-
-	    break;
-	}
-	case CMD_REREAD:
-	    reread_command();
 	    break;
 	case CMD_CD:
 	    changedir_command();
 	    break;
+	case CMD_CLEAR:
+	    clear_command();
+	    break;
+	case CMD_EXIT:
+	    exit_command();
+	    break;
+	case CMD_FIT:
+	    fit_command();
+	    break;
+	case CMD_HELP:
+	    help_command();
+	    break;
 	case CMD_HISTORY:
 	    history_command();
 	    break;
-	case CMD_EXIT:
-	    /* graphics will be tidied up in main */
-	    return (1);
+	case CMD_IF:
+	    if_command();
 	    break;
-	case CMD_SYSTEM:
-	    system_command();
+	case CMD_LOAD:
+	    load_command();
+	    break;
+	case CMD_PAUSE:
+	    pause_command();
+	    break;
+	case CMD_PLOT:
+	    plot_command();
+	    break;
+	case CMD_PRINT:
+	    print_command();
 	    break;
 	case CMD_PWD:
 	    pwd_command();
 	    break;
+	case CMD_REPLOT:
+	    replot_command();
+	    break;
+	case CMD_REREAD:
+	    reread_command();
+	    break;
+	case CMD_RESET:
+	    reset_command();
+	    break;
+	case CMD_SAVE:
+	    save_command();
+	    break;
+	case CMD_SCREENDUMP:
+	    screendump_command();
+	    break;
+	case CMD_SET:
+	    set_command();
+	    break;
+	case CMD_SHELL:
+	    do_shell();
+	    break;
+	case CMD_SHOW:
+	    show_command();
+	    break;
+	case CMD_SPLOT:
+	    splot_command();
+	    break;
+	case CMD_SYSTEM:
+	    system_command();
+	    break;
+	case CMD_TEST:
+	    test_term();
+	    break;
+	case CMD_TESTTIME:
+	    testtime_command();
+	    break;
+	case CMD_UPDATE:
+	    update_command();
+	    break;
 	case CMD_INVALID:
-#ifdef OS2
-	    if (_osmode == OS2_MODE) {
-		if (token[c_token].is_token) {
-		    int rc;
-		    rc = ExecuteMacro(input_line + token[c_token].start_index,
-				      token[c_token].length);
-		    if (rc == 0) {
-			c_token = num_tokens = 0;
-			return (0);
-		    }
-		}
-	    }
-#endif
-	    int_error(c_token, "invalid command");
+	    invalid_command();
+	    break;
 	case CMD_NULL:
 	default:
 	    break;
 	}
     } /* else if(is_definition) */
 
-    return (0);
+    return;
 }
 
 
-static enum command_id
-lookup_command(token)
-int token;
-{
-    int i = 0;
-
-    /* help */
-    if (equals(token, "?"))
-	return CMD_HELP;
-
-    /* null command */
-    if (equals(token, ";"))
-	return CMD_NULL;
-
-    /* all others */
-    while (i < NCMDS) {
-	if (almost_equals(token, command_tbl[i].command_name))
-	    return command_tbl[i].id;
-	i++;
-    }
-
-    return CMD_INVALID;
-
-}
-
-
-void
-done(status)
-int status;
-{
-    term_reset();
-    exit(status);
-}
-
-
+/* process the 'call' command */
 static void
 call_command()
 {
-    FILE *fp;
     char *save_file = NULL;
 
     if (!isstring(++c_token))
@@ -578,10 +464,10 @@ call_command()
 }
 
 
+/* process the 'cd' command */
 static void
 changedir_command()
 {
-    FILE *fp;
     char *save_file = NULL;
 
     if (!isstring(++c_token))
@@ -598,6 +484,7 @@ changedir_command()
 }
 
 
+/* process the 'clear' command */
 static void
 clear_command()
 {
@@ -619,6 +506,23 @@ clear_command()
 }
 
 
+/* process the 'exit' and 'quit' commands */
+static void
+exit_command()
+{
+    /* graphics will be tidied up in main */
+    command_exit_status = 1;
+}
+
+
+/* fit_command() is in fit.c */
+
+/* help_command() is below */
+
+
+/* process the 'history' command
+ * not implemented yet
+ */
 static void
 history_command()
 {
@@ -626,53 +530,62 @@ history_command()
 }
 
 
+/* process the 'if' command */
 static void
-screendump_command()
+if_command()
 {
-    c_token++;
-#ifdef _Windows
-    screen_dump();
-#else
-    fputs("screendump not implemented\n", stderr);
-#endif
+    double exprval;
+    struct value t;
+
+    if (!equals(++c_token, "("))	/* no expression */
+	int_error(c_token, "expecting (expression)");
+    exprval = real(const_express(&t));
+    if (exprval != 0.0) {
+	/* fake the condition of a ';' between commands */
+	int eolpos = token[num_tokens - 1].start_index + token[num_tokens - 1].length;
+	--c_token;
+	token[c_token].length = 1;
+	token[c_token].start_index = eolpos + 2;
+	input_line[eolpos + 2] = ';';
+	input_line[eolpos + 3] = NUL;
+    } else
+	c_token = num_tokens = 0;
+    
 }
 
 
-/* given a format and a time string, exercise the time code */
+/* process the 'load' command */
 static void
-testtime_command()
+load_command()
 {
-    char *format = NULL;
-    char *string = NULL;
-    struct tm tm;
-    double secs;
+    FILE *fp;
+    char *save_file = NULL;
 
-    if (isstring(++c_token)) {
-	m_quote_capture(&format, c_token, c_token);
-	if (isstring(++c_token)) {
-	    m_quote_capture(&string, c_token, c_token);
-	    memset(&tm, 0, sizeof(tm));
-	    gstrptime(string, format, &tm);
-	    secs = gtimegm(&tm);
-	    fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-		    secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-		    tm.tm_yday);
-	    memset(&tm, 0, sizeof(tm));
-	    ggmtime(&tm, secs);
-	    gstrftime(string, strlen(string), format, secs);
-	    fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-		    string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
-		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
-		    tm.tm_yday);
-	    free(string);
-	    ++c_token;
-	} /* else: expecting time string */
-	free(format);
-    } /* else: expecting format string */
+    if (!isstring(++c_token))
+	int_error(c_token, "expecting filename");
+    else {
+	/* load_file(fp=fopen(save_file, "r"), save_file, FALSE); OLD
+	 * DBT 10/6/98 handle stdin as special case
+	 * passes it on to load_file() so that it gets
+	 * pushed on the stack and recursion will work, etc
+	 */
+	CAPTURE_FILENAME_AND_FOPEN("r");
+	load_file(fp, save_file, FALSE);
+	/* input_line[] and token[] now destroyed! */
+	c_token = num_tokens = 0;
+	free(save_file);
+    }
 }
 
 
+static void
+null_command()
+{
+    return;
+}
+
+
+/* process the 'pause' command */
 static void
 pause_command()
 {
@@ -768,6 +681,18 @@ pause_command()
 }
 
 
+/* process the 'plot' command */
+static void
+plot_command()
+{
+    plot_token = c_token++;
+    SET_CURSOR_WAIT;
+    plotrequest();
+    SET_CURSOR_ARROW;
+}
+
+
+/* process the 'print' command */
 static void
 print_command()
 {
@@ -800,6 +725,185 @@ print_command()
 }
 
 
+/* process the 'pwd' command */
+static void
+pwd_command()
+{
+    char *save_file = NULL;
+
+    save_file = (char *) gp_alloc(PATH_MAX, "print current dir");
+    if (save_file) {
+	GP_GETCWD(save_file, PATH_MAX);
+	fprintf(stderr, "%s\n", save_file);
+	free(save_file);
+    }
+    c_token++;
+}
+
+
+/* process the 'replot' command */
+static void
+replot_command()
+{
+    if (!*replot_line)
+	int_error(c_token, "no previous plot");
+    c_token++;
+    SET_CURSOR_WAIT;
+    replotrequest();
+    SET_CURSOR_ARROW;
+}
+
+
+/* process the 'reread' command */
+static void
+reread_command()
+{
+    FILE *fp = lf_top();
+
+    if (fp != (FILE *) NULL)
+	rewind(fp);
+    c_token++;
+}
+
+
+/* reset_command() is in set.c */
+
+
+/* process the 'save' command */
+static void
+save_command()
+{
+    FILE *fp;
+    char *save_file = NULL;
+
+    c_token++;
+
+    switch(lookup_table(&save_tbl[0],c_token)) {
+    case SAVE_FUNCS:
+	if (!isstring(++c_token))
+	    int_error(c_token, "expecting filename");
+	else {
+	    CAPTURE_FILENAME_AND_FOPEN("w");
+	    save_functions(fp);
+	}
+	break;
+    case SAVE_SET:
+	if (!isstring(++c_token))
+	    int_error(c_token, "expecting filename");
+	else {
+	    CAPTURE_FILENAME_AND_FOPEN("w");
+	    save_set(fp);
+	}
+	break;
+    case SAVE_VARS:
+	if (!isstring(++c_token))
+	    int_error(c_token, "expecting filename");
+	else {
+	    CAPTURE_FILENAME_AND_FOPEN("w");
+	    save_variables(fp);
+	}
+	break;
+    default:
+	if (isstring(c_token)) {
+	    CAPTURE_FILENAME_AND_FOPEN("w");
+	    save_all(fp);
+	} else
+	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
+	break;
+    }
+
+    c_token++;
+
+    free(save_file);
+}
+
+
+/* process the 'screendump' command */
+static void
+screendump_command()
+{
+    c_token++;
+#ifdef _Windows
+    screen_dump();
+#else
+    fputs("screendump not implemented\n", stderr);
+#endif
+}
+
+
+/* set_command() is in set.c */
+/* 'shell' command is processed by do_shell(), see below */
+/* show_command() is in show.c */
+
+
+/* process the 'splot' command */
+static void
+splot_command()
+{
+    plot_token = c_token++;
+    SET_CURSOR_WAIT;
+    plot3drequest();
+    SET_CURSOR_ARROW;
+}
+
+
+/* process the 'system' command */
+static void
+system_command()
+{
+    if (!isstring(++c_token))
+	int_error(c_token, "expecting command");
+    else {
+	char *e = input_line + token[c_token].start_index + token[c_token].length - 1;
+	char c = *e;
+	*e = NUL;
+	do_system(input_line + token[c_token].start_index + 1);
+	*e = c;
+    }
+    c_token++;
+}
+
+
+/* 'test' command is processed by test_term() in term.c */
+
+/* process the 'testtime' command */
+static void
+testtime_command()
+{
+    char *format = NULL;
+    char *string = NULL;
+    struct tm tm;
+    double secs;
+
+    /* given a format and a time string, exercise the time code */
+
+    if (isstring(++c_token)) {
+	m_quote_capture(&format, c_token, c_token);
+	if (isstring(++c_token)) {
+	    m_quote_capture(&string, c_token, c_token);
+	    memset(&tm, 0, sizeof(tm));
+	    gstrptime(string, format, &tm);
+	    secs = gtimegm(&tm);
+	    fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
+		    secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
+		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+		    tm.tm_yday);
+	    memset(&tm, 0, sizeof(tm));
+	    ggmtime(&tm, secs);
+	    gstrftime(string, strlen(string), format, secs);
+	    fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
+		    string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
+		    tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+		    tm.tm_yday);
+	    free(string);
+	    ++c_token;
+	} /* else: expecting time string */
+	free(format);
+    } /* else: expecting format string */
+}
+
+
+/* process the 'update' command */
 static void
 update_command()
 {
@@ -825,118 +929,31 @@ update_command()
     free(opfname);
 }
 
-/* Capture filename from unput_line and
- * fopen in `mode' ("r", "w" etc.)
- */
-#define CAPTURE_FILENAME_AND_FOPEN(mode) \
-  m_quote_capture(&save_file, c_token, c_token); \
-  gp_expand_tilde(&save_file); \
-  fp = strcmp(save_file, "-") ? fopen(save_file, (mode)) : stdout;
 
+/* process invalid commands and, on OS/2, REXX commands */
 static void
-save_command()
+invalid_command()
 {
-    FILE *fp;
-    char *save_file = NULL;
-
-    if (almost_equals(++c_token, "f$unctions")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
-	    save_functions(fp);
+#ifdef OS2
+    if (_osmode == OS2_MODE) {
+	if (token[c_token].is_token) {
+	    int rc;
+	    rc = ExecuteMacro(input_line + token[c_token].start_index,
+			      token[c_token].length);
+	    if (rc == 0) {
+		c_token = num_tokens = 0;
+		return (0);
+	    }
 	}
-    } else if (almost_equals(c_token, "v$ariables")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
-	    save_variables(fp);
-	}
-    } else if (almost_equals(c_token, "s$et")) {
-	if (!isstring(++c_token))
-	    int_error(c_token, "expecting filename");
-	else {
-	    CAPTURE_FILENAME_AND_FOPEN("w");
-	    save_set(fp);
-	}
-    } else if (isstring(c_token)) {
-	CAPTURE_FILENAME_AND_FOPEN("w");
-	save_all(fp);
-    } else
-	int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
-
-    c_token++;
-
-    free(save_file);
-}
-
-
-static void
-load_command()
-{
-    FILE *fp;
-    char *save_file = NULL;
-
-    if (!isstring(++c_token))
-	int_error(c_token, "expecting filename");
-    else {
-	/* load_file(fp=fopen(save_file, "r"), save_file, FALSE); OLD
-	 * DBT 10/6/98 handle stdin as special case
-	 * passes it on to load_file() so that it gets
-	 * pushed on the stack and recursion will work, etc
-	 */
-	CAPTURE_FILENAME_AND_FOPEN("r");
-	load_file(fp, save_file, FALSE);
-	/* input_line[] and token[] now destroyed! */
-	c_token = num_tokens = 0;
-	free(save_file);
     }
+#endif
+    int_error(c_token, "invalid command");
 }
 
 
-static void
-system_command()
-{
-    if (!isstring(++c_token))
-	int_error(c_token, "expecting command");
-    else {
-	char *e = input_line + token[c_token].start_index + token[c_token].length - 1;
-	char c = *e;
-	*e = NUL;
-	do_system(input_line + token[c_token].start_index + 1);
-	*e = c;
-    }
-    c_token++;
-}
+/* Auxiliary routines */
 
-
-static void
-pwd_command()
-{
-    FILE *fp;
-    char *save_file = NULL;
-
-    save_file = (char *) gp_alloc(PATH_MAX, "print current dir");
-    if (save_file) {
-	GP_GETCWD(save_file, PATH_MAX);
-	fprintf(stderr, "%s\n", save_file);
-	free(save_file);
-    }
-    c_token++;
-}
-
-static void
-reread_command()
-{
-    FILE *fp = lf_top();
-
-    if (fp != (FILE *) NULL)
-	rewind(fp);
-    c_token++;
-}
-
-
+/* used by changedir_command() */
 static int
 changedir(path)
 char *path;
@@ -1130,8 +1147,7 @@ const char *prompt;
 
 # ifdef NO_GIH
 static void
-help_command(toplevel)
-int toplevel;			/* not used for VMS version */
+help_command()
 {
     int first = c_token;
 
@@ -1151,6 +1167,9 @@ int toplevel;			/* not used for VMS version */
 static void
 do_shell()
 {
+    screen_ok = FALSE;
+    c_token++;
+ 
     if ((vaxc$errno = lib$spawn()) != SS$_NORMAL) {
 	os_error(NO_CARET, "spawn error");
     }
@@ -1183,8 +1202,7 @@ const char *cmd;
 #ifdef _Windows
 # ifdef NO_GIH
 static void
-help_command(toplevel)
-int toplevel;			/* not used for windows */
+help_command()
 {
 
     if (END_OF_COMMAND)
@@ -1214,15 +1232,19 @@ int toplevel;			/* not used for windows */
  * drd - The help buffer is first cleared when called with toplevel=1. 
  * This is to fix a bug where help is broken if ^C is pressed whilst in the 
  * help.
+ * Lars - The "int toplevel" argument is gone. I have converted it to a
+ * static variable.
+ *
+ * FIXME - helpbuf is never free()'d
  */
 
 #ifndef NO_GIH
 static void
-help_command(toplevel)
-int toplevel;
+help_command()
 {
     static char *helpbuf = NULL;
     static char *prompt = NULL;
+    static int toplevel = 1;
     int base;			/* index of first char AFTER help string */
     int len;			/* length of current help string */
     TBOOLEAN more_help;
@@ -1289,10 +1311,21 @@ int toplevel;
     if (toplevel)
 	helpbuf[0] = prompt[0] = 0;	/* in case user hit ^c last time */
 
+    /* if called recursively, toplevel == 0; toplevel must == 1 if called
+     * from command() to get the same behaviour as before when toplevel
+     * supplied as function argument
+     */
+    toplevel = 1;
+
     len = base = strlen(helpbuf);
 
+    start = ++c_token;
+
     /* find the end of the help command */
-    for (start = c_token; !(END_OF_COMMAND); c_token++);
+/*    for (start = c_token; !(END_OF_COMMAND); c_token++); */
+    while (!(END_OF_COMMAND))
+	c_token++;
+
     /* copy new help input into helpbuf */
     if (len > 0)
 	helpbuf[len++] = ' ';	/* add a space */
@@ -1332,27 +1365,27 @@ int toplevel;
 		    num_tokens = scanner(&input_line, &input_line_len);
 		    c_token = 0;
 		    more_help = !(END_OF_COMMAND);
-		    if (more_help)
+		    if (more_help) {
+			c_token--;
+			toplevel = 0;
 			/* base for next level is all of current helpbuf */
-			help_command(0);
+			help_command();
+		    }
 		} else
 		    more_help = FALSE;
 	    } while (more_help);
 
 	    break;
 	}
-    case H_NOTFOUND:{
-	    printf("Sorry, no help for '%s'\n", helpbuf);
-	    break;
-	}
-    case H_ERROR:{
-	    perror(help_ptr);
-	    break;
-	}
-    default:{			/* defensive programming */
-	    int_error(NO_CARET, "Impossible case in switch");
-	    /* NOTREACHED */
-	}
+    case H_NOTFOUND:
+	printf("Sorry, no help for '%s'\n", helpbuf);
+	break;
+    case H_ERROR:
+	perror(help_ptr);
+	break;
+    default:
+	int_error(NO_CARET, "Impossible case in switch");
+	break;
     }
 
     helpbuf[base] = NUL;	/* cut it off where we started */
@@ -1499,6 +1532,9 @@ const char *prompt;
 static void
 do_shell()
 {
+    screen_ok = FALSE;
+    c_token++;
+
     if (user_shell) {
 #  if defined(_Windows)
 	if (WinExec(user_shell, SW_SHOWNORMAL) <= 32)
@@ -1516,6 +1552,9 @@ do_shell()
 static void
 do_shell()
 {
+    screen_ok = FALSE;
+    c_token++;
+
     if (user_shell) {
 	if (system(user_shell))
 	    os_error(NO_CARET, "system() failed");
@@ -1528,6 +1567,9 @@ do_shell()
 static void
 do_shell()
 {
+    screen_ok = FALSE;
+    c_token++;
+
     if (user_shell) {
 	if (system(user_shell) == -1)
 	    os_error(NO_CARET, "system() failed");
@@ -1546,6 +1588,9 @@ do_shell()
 {
     static char exec[100] = EXEC;
 
+    screen_ok = FALSE;
+    c_token++;
+ 
     if (user_shell) {
 	if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], user_shell,
 				sizeof(exec) - sizeof(EXEC) - 1)))
@@ -1688,7 +1733,7 @@ const char *prompt;
 	    /* normal line input */
 	    last = strlen(input_line) - 1;
 	    if (last >= 0) {
-		if (input_line[last] == '\n') {		/* remove any newline */
+		if (input_line[last] == '\n') {	/* remove any newline */
 		    input_line[last] = NUL;
 		    /* Watch out that we don't backup beyond 0 (1-1-1) */
 		    if (last > 0)
@@ -1771,3 +1816,13 @@ winsystem(char *s)
     return (0);			/* success */
 }
 #endif /* _Windows */
+
+
+/* is this really only ever used on VMS ? */
+void
+done(status)
+int status;
+{
+    term_reset();
+    exit(status);
+}
