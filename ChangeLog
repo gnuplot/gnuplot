@@ -1,3 +1,8 @@
+2001-01-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_command): Fix broken 'show ticslevel' and 'show
+ 	ticscale' commands (from Pieter-Tjerk de Boer).
+
 2001-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	I had a look across all usages of [safe_]strncpy(), and patched
