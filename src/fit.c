@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.32 2002/09/27 12:17:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.33 2002/11/04 14:59:50 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1362,7 +1362,7 @@ fit_command()
     err_data = vec(max_data);
     num_data = 0;
 
-    while ((i = df_readline(v, 4)) != EOF) {
+    while ((i = df_readline(v, 4)) != DF_EOF) {
 	if (num_data >= max_data) {
 	    /* increase max_data by factor of 1.5 */
 	    max_data = (max_data * 3) / 2;
