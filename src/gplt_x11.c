@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.116 2004/10/04 06:37:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.117 2004/10/05 16:16:13 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -1241,6 +1241,7 @@ scan_palette_from_buf( plot_struct *plot )
     tpal.colorMode = cm;
     tpal.positive = pos;
     tpal.cmodel = mod;
+    tpal.gradient = NULL;
 
     /* function palettes are transmitted as approximated gradients: */
     if (tpal.colorMode == SMPAL_COLOR_MODE_FUNCTIONS)
@@ -3347,6 +3348,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 
     if (no == virgin && tpal && !palettes_differ(tpal, &sm_palette)) {
 	FPRINTF((stderr, "(PaletteMake) palette didn't change.\n"));
+	free(tpal->gradient);
 	return;
     } else if (tpal) {
         /*  free old gradient table  */

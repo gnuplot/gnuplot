@@ -4,6 +4,9 @@
 	is requested. This feels wrong to me since we know the old font will be
 	used again very soon, but otherwise there is a serious memory leak.
 
+	* src/gplt_x11.c (PaletteMake): (Daniel Sebald <daniel.sebald@ieee.org>)
+	Fix another tiny memory leak.
+
 2004-10-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines
