@@ -43,6 +43,11 @@ static char *RCSid = "$Id: fit.c,v 1.57 1998/03/22 23:31:07 drd Exp $";
  *
  * Lars Hecking : review update command, for VMS in particular, where
  * it is not necessary to rename the old file.
+ *
+ * HBB, 971023: lifted fixed limit on number of datapoints, and number
+ * of parameters. Also use m_capture() instead of capture() for some
+ * of the strings taken from the user's command line input, avoiding
+ * arbitrary fixed limits.
  */
 
 
@@ -101,12 +106,14 @@ typedef enum marq_res marq_res_t;
 #define INFINITY    1e30
 #define NEARLY_ZERO 1e-30
 #define INITIAL_VALUE 1.0  /* create new variables with this value (was NEARLY_ZERO) */
-#define DELTA	    0.001
+#define DELTA	    0.001  /* relative change for computing derivatives */
 #define MAX_DATA    2048
 #define MAX_PARAMS  32
 #define MAX_LAMBDA  1e20
-#define MAX_VALUES_PER_LINE	32
-#define MAX_VARLEN  32
+#if 0 /* HBB 971023: these are no longer used. */
+#define MAX_VALUES_PER_LINE	32 /* wasn't used at all */
+#define MAX_VARLEN  32             /* use MAX_ID_LEN instead */
+#endif /* HBB 971023 */
 #define START_LAMBDA 0.01
 #if defined(MSDOS) || defined(OS2) || defined(DOS386)
 #define PLUSMINUS   "\xF1"                      /* plusminus sign */
@@ -114,7 +121,11 @@ typedef enum marq_res marq_res_t;
 #define PLUSMINUS   "+/-"
 #endif
 
-static double epsilon	   = 1e-5;		/* convergence criteria */
+/* HBB 971023: new, allow for dynamic adjustment of these: */
+static int max_data;
+static int max_params;
+
+static double epsilon	   = 1e-5;		/* convergence limit */
 static int maxiter         = 0;	    /* HBB 970304: maxiter patch */
 
 static char fit_script[127];
@@ -141,7 +152,7 @@ static boolean	    ctrlc_flag = FALSE;
 
 static struct udft_entry func;
 
-typedef char fixstr[MAX_VARLEN+1];
+typedef char fixstr[MAX_ID_LEN+1]; /* HBB 971023: was MAX_VARLEN before */
 static fixstr	    *par_name;
 
 
@@ -448,7 +459,27 @@ double *varianz;
 	    alpha[k][j] = alpha [j][k];
     free (zfunc);
     free_matr (dzda, num_data);
+#if 1 
+    /* HBB 980304: to fix a SEGFAULT (later on) occuring if the
+     * function was undefined at some of the points, or some of the
+     * data errors was zero, return FALSE iff chisq is not a proper
+     * number */
+    if (*chisq < VERYLARGE) 
     return TRUE;
+    else {
+      /* this looks crazy, but it's a possibility to detect NaN's : */
+      if (!(*chisq == *chisq)) {
+        Dblf("\n\tError: chisq is undefined (NaN) --> Check function and data.\n");
+        return FALSE;
+      } else {
+        /* OK, chisq is a number, but infinite: */
+	Dblf("\n\tError: chisq is (almost) infinitely large. --> Check function and data.\n");
+	return FALSE;
+      }
+    }
+#else
+    return TRUE;
+#endif    
 }
 
 
@@ -863,9 +894,9 @@ char *d;
 char *s;
 int n;
 {
-    strncpy (d, s, n);
-    if ( strlen(s) >= n )
-	d[n-1] = '\0';
+	strncpy (d, s, n);
+	if ( strlen(s) >= (unsigned int) n )
+		d[n-1] = '\0';
 }
 
 
@@ -1077,8 +1108,9 @@ char *pfile, *npfile;
 	}
 	else
 	    strcpy (tail, "\n");
+
 	tmp = get_next_word (&s, &c);
-	if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_VARLEN ) {
+	if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_ID_LEN ) {
 	    fclose (nf);
 	    fclose (of);
 	    Eex2 ("syntax error in parameter file %s", fnam)
@@ -1278,9 +1310,11 @@ void do_fit ()
     columns = df_open(4);  /* up to 4 using specs allowed */
     if (columns==1)
 	int_error("Need 2 to 4 using specs", c_token);
-    /* defer actually reading the data until we have parsed the rest of the line */
+
+    /* defer actually reading the data until we have parsed the rest
+       of the line */
     
-	token3 = c_token;
+    token3 = c_token;
 
     tmpd = getdvar (FITLIMIT);		  /* get epsilon if given explicitly */
     if ( tmpd < 1.0  &&  tmpd > 0.0 )
@@ -1306,25 +1340,43 @@ void do_fit ()
     fprintf (log_f, "\n\n*******************************************************************************\n");
     time (&timer);
     fprintf (log_f, "%s\n\n", ctime (&timer));
-	{	char line[MAX_LINE_LEN];
-		capture(line, token2,token3-1,MAX_LINE_LEN);
-			fprintf (log_f, "FIT:    data read from %s\n", line);
-	}
+    {
+        char *line = NULL;
+      
+        m_capture(&line, token2,token3-1);
+        fprintf (log_f, "FIT:    data read from %s\n", line);
+        free(line);
+    }
 
-    fit_x = vec (MAX_DATA);		 /* start with max. value */
-    fit_y = vec (MAX_DATA);
-    fit_z = vec (MAX_DATA);
+    max_data = MAX_DATA;
+    fit_x = vec (max_data);		 /* start with max. value */
+    fit_y = vec (max_data);
+    fit_z = vec (max_data);
 
 /* first read in experimental data */
 
-    err_data = vec (MAX_DATA);
+    err_data = vec (max_data);
     num_data = 0;
 
 	while ( (i=df_readline(v, 4)) != EOF ) {
-
-		if ( num_data==MAX_DATA ) {
-			df_close();
-			Eex2 ("max. # of datapoints %d exceeded", MAX_DATA);
+		if ( num_data>=max_data ) {
+			/* increase max_data by factor of 1.5 */
+			max_data = (max_data * 3) / 2; 
+			/* and reallocate all the vectors accordingly */
+			if ( 0
+					 || !redim_vec (&fit_x, max_data)
+					 || !redim_vec (&fit_y, max_data)
+					 || !redim_vec (&fit_z, max_data)
+					 || !redim_vec (&err_data, max_data)
+					 ) {
+				/* Some of the reallocations went bad: */
+				df_close();
+				Eex2 ("Out of memory in fit: too many datapoints (%d)?", max_data);
+			} else {
+				/* Just so we know that the routine is at work: */
+				fprintf(STANDARD, "Max. number of data points scaled up to: %d\n",
+								max_data);
+			}
 		}
 
 		switch (i)
@@ -1334,7 +1386,7 @@ void do_fit ()
 			case DF_SECOND_BLANK:
 				continue;
 			case 0:
-				Eex2("bad data on line %d", df_line_number);
+				Eex2("bad data on line %d of datafile", df_line_number);
 				break;
 			case 1:  /* only z provided */
 				v[2] = v[0];
@@ -1384,7 +1436,7 @@ void do_fit ()
 	if (num_data <= 1)
 		Eex("No data to fit ");
 	
-    /* now resize fields */
+    /* now resize fields to the actual length*/
     redim_vec (&fit_x, num_data);
     redim_vec (&fit_y, num_data);
     redim_vec (&fit_z, num_data);
@@ -1395,18 +1447,23 @@ void do_fit ()
     if ( columns < 3 )
 	fprintf (log_f, "        y-errors assumed equally distributed\n\n");
 
-	{	char line[MAX_LINE_LEN];
-		capture(line, token1, token2-1,MAX_LINE_LEN);		
+	{
+		char *line=NULL;
+		
+		m_capture(&line, token1, token2-1);		
 		fprintf (log_f, "function used for fitting: %s\n", line);
+		free(line);
 	}
 
     /* read in parameters */
 
+	max_params = MAX_PARAMS;			/* HBB 971023: make this resizeable */
+
 	if (!equals(c_token, "via"))
 		int_error("Need via and either parameter list or file", c_token);
 
-    a = vec (MAX_PARAMS);
-    par_name = (fixstr *) gp_alloc ((MAX_PARAMS+1)*sizeof(fixstr), "fit param");
+    a = vec (max_params);
+    par_name = (fixstr *) gp_alloc ((max_params+1)*sizeof(fixstr), "fit param");
     num_params = 0;
 
 	if (isstring(++c_token)) {
@@ -1438,7 +1495,7 @@ void do_fit ()
 			if ( is_empty(s) )
 				continue;
 			tmp = get_next_word (&s, &c);
-			if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_VARLEN ) {
+			if ( !is_variable (tmp)  ||  strlen(tmp) > MAX_ID_LEN ) {
 				fclose (f);
 				Eex ("syntax error in parameter file");
 			}
@@ -1466,10 +1523,16 @@ void do_fit ()
 				setvar (par_name[num_params], val);   /* use parname as temp */
 			}
 			else {
-				if (num_params>=MAX_PARAMS) {
-/* HBB: maybe it would be better to realloc a and v instead ? */
-					fclose(f);
-					Eex("too many parameters to fit");
+				if (num_params>=max_params) {
+					/* scale up max_params by a factor of 1.5: */
+					max_params = (max_params * 3) / 2;
+					if (0
+							|| !redim_vec(&a, max_params)
+							|| !(par_name = gp_realloc (par_name, (max_params+1)*sizeof(fixstr), "fit param resize"))
+							) {
+						fclose(f); 
+						Eex("Out of memory in fit: too many parameters?");
+					}
 				}
 				a[num_params++] = tmp_par;
 			}
@@ -1486,8 +1549,15 @@ void do_fit ()
 			if (!isletter(c_token))
 				Eex ("no parameter specified");
 			capture(par_name[num_params], c_token, c_token, sizeof(par_name[0]));
-			if (num_params >= MAX_PARAMS) 
-				Eex ("too many parameters to fit");
+			if (num_params >= max_params) {
+				max_params = (max_params * 3) / 2;
+				if (0
+						|| !redim_vec(&a, max_params)
+						|| !(par_name = gp_realloc (par_name, (max_params+1)*sizeof(fixstr), "fit param resize"))
+						) {
+					Eex("Out of memory in fit: too many parameters?");
+				}
+			}
 			/* create variable if it doesn't exist */
 			a[num_params] = createdvar (par_name[num_params], INITIAL_VALUE);
 			++num_params;
