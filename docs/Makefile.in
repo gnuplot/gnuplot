@@ -344,11 +344,11 @@ checkdoc.o: checkdoc.c allterm.h
 
 # For Unix and MSDOS only
 install: gnuplot.gih
-	$(top_srcdir)/mkinstalldirs $(datadir)
-	$(INSTALL_DATA) gnuplot.gih $(datadir)/gnuplot.gih
+	$(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir)
+	$(INSTALL_DATA) gnuplot.gih $(DESTDIR)$(datadir)/gnuplot.gih
 
 uninstall:
-	rm -f $(datadir)/gnuplot.gih
+	rm -f $(DESTDIR)$(datadir)/gnuplot.gih
 
 # for VMS only
 install-vms: gnuplot.hlp
