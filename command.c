@@ -377,7 +377,7 @@ static int command()
 #  endif /* MTOS */
 # endif /* OS2 */
 #endif /* _Windows */
-			(void) fprintf(stderr, "%s", buf);
+			fputs(buf, stderr);
 		text = 1;
 	    }
 	}
@@ -392,7 +392,7 @@ static int command()
 		if ((rc = PM_pause(buf)) == 0)
 		    bail_to_command_line();
 		else if (rc == 2) {
-		    (void) fprintf(stderr, "%s", buf);
+		    fputs(buf, stderr);
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 		}
@@ -409,7 +409,7 @@ static int command()
 		if ((rc = MTOS_pause(buf)) == 0)
 		    bail_to_command_line();
 		else if (rc == 2) {
-		    (void) fprintf(stderr, "%s", buf);
+		    fputs(buf, stderr);
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
 		}
@@ -442,7 +442,7 @@ static int command()
 	    GP_SLEEP(sleep_time);
 
 	if (text != 0 && sleep_time >= 0)
-	    (void) fprintf(stderr, "\n");
+	    fputc('\n', stderr);
 	screen_ok = FALSE;
     } else if (almost_equals(c_token, "pr$int")) {
 	int need_space = 0;	/* space printed between two expressions only */

@@ -134,8 +134,8 @@ do{if (datatype[axis]==TIME) { \
   putc('"', stderr);   \
   gstrftime(s,80,timefmt,(double)(x)); \
   for(p=s; *p; ++p) {\
-   if ( *p == '\t' ) fprintf(stderr,"\\t");\
-   else if (*p == '\n') fprintf(stderr, "\\n"); \
+   if ( *p == '\t' ) fputs("\\t",stderr);\
+   else if (*p == '\n') fputs("\\n",stderr); \
    else if ( *p > 126 || *p < 32 ) fprintf(stderr,"\\%03o",*p);\
    else putc(*p, stderr);\
   }\
@@ -429,9 +429,9 @@ static TBOOLEAN
 	show_xyzlabel("time", &timelabel);
 	fprintf(stderr, "\twritten in %s corner\n", (timelabel_bottom ? "bottom" : "top"));
 	if (timelabel_rotate)
-	    fprintf(stderr, "\trotated if the terminal allows it\n\t");
+	    fputs("\trotated if the terminal allows it\n\t", stderr);
 	else
-	    fprintf(stderr, "\tnot rotated\n\t");
+	    fputs("\tnot rotated\n\t", stderr);
 	c_token++;
     } else if (almost_equals(c_token, "su$rface")) {
 	(void) putc('\n', stderr);
@@ -661,55 +661,55 @@ enum PLOT_STYLE style;
     fprintf(stderr, "\t%s are plotted with ", name);
     switch (style) {
     case LINES:
-	fprintf(stderr, "lines\n");
+	fputs("lines\n", stderr);
 	break;
     case POINTSTYLE:
-	fprintf(stderr, "points\n");
+	fputs("points\n", stderr);
 	break;
     case IMPULSES:
-	fprintf(stderr, "impulses\n");
+	fputs("impulses\n", stderr);
 	break;
     case LINESPOINTS:
-	fprintf(stderr, "linespoints\n");
+	fputs("linespoints\n", stderr);
 	break;
     case DOTS:
-	fprintf(stderr, "dots\n");
+	fputs("dots\n", stderr);
 	break;
     case YERRORBARS:
-	fprintf(stderr, "yerrorbars\n");
+	fputs("yerrorbars\n", stderr);
 	break;
     case XERRORBARS:
-	fprintf(stderr, "xerrorbars\n");
+	fputs("xerrorbars\n", stderr);
 	break;
     case XYERRORBARS:
-	fprintf(stderr, "xyerrorbars\n");
+	fputs("xyerrorbars\n", stderr);
 	break;
     case BOXES:
-	fprintf(stderr, "boxes\n");
+	fputs("boxes\n", stderr);
 	break;
     case BOXERROR:
-	fprintf(stderr, "boxerrorbars\n");
+	fputs("boxerrorbars\n", stderr);
 	break;
     case BOXXYERROR:
-	fprintf(stderr, "boxxyerrorbars\n");
+	fputs("boxxyerrorbars\n", stderr);
 	break;
     case STEPS:
-	fprintf(stderr, "steps\n");
+	fputs("steps\n", stderr);
 	break;
     case FSTEPS:
-	fprintf(stderr, "fsteps\n");
+	fputs("fsteps\n", stderr);
 	break;
     case HISTEPS:
-	fprintf(stderr, "histeps\n");
+	fputs("histeps\n", stderr);
 	break;
     case VECTOR:
-	fprintf(stderr, "vector\n");
+	fputs("vector\n", stderr);
 	break;
     case FINANCEBARS:
-	fprintf(stderr, "financebars\n");
+	fputs("financebars\n", stderr);
 	break;
     case CANDLESTICKS:
-	fprintf(stderr, "candlesticsks\n");
+	fputs("candlesticsks\n", stderr);
 	break;
     }
 }
@@ -721,25 +721,26 @@ static void show_bars()
 	fprintf(stderr, "\terrorbars are plotted with bars of size %f\n",
 		bar_size);
     else
-	fprintf(stderr, "\terrors are plotted without bars\n");
+	fputs("\terrors are plotted without bars\n", stderr);
 }
 
 static void show_boxwidth()
 {
     if (boxwidth < 0.0)
-	fprintf(stderr, "\tboxwidth is auto\n");
+	fputs("\tboxwidth is auto\n", stderr);
     else
 	fprintf(stderr, "\tboxwidth is %g\n", boxwidth);
 }
 static void show_dgrid3d()
 {
     if (dgrid3d)
-	fprintf(stderr, "\tdata grid3d is enabled for mesh of size %dx%d, norm=%d\n",
+	fprintf(stderr, "\
+\tdata grid3d is enabled for mesh of size %dx%d, norm=%d\n",
 		dgrid3d_row_fineness,
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value);
     else
-	fprintf(stderr, "\tdata grid3d is disabled\n");
+	fputs("\tdata grid3d is disabled\n", stderr);
 }
 
 static void show_range(axis, min, max, autosc, text)
@@ -756,13 +757,13 @@ char *text;
 	fprintf(stderr, "\tset %sdata time\n", text);
     fprintf(stderr, "\tset %srange [", text);
     if (autosc & 1) {
-	fprintf(stderr, "*");
+	fputc('*', stderr);
     } else {
 	SHOW_NUM_OR_TIME(min, axis);
     }
-    fprintf(stderr, " : ");
+    fputs(" : ", stderr);
     if (autosc & 2) {
-	fprintf(stderr, "*");
+	fputc('*', stderr);
     } else {
 	SHOW_NUM_OR_TIME(max, axis);
     }
@@ -772,7 +773,7 @@ char *text;
 
     if (autosc) {
 	/* add current (hidden) range as comments */
-	fprintf(stderr, "  # (currently [");
+	fputs("  # (currently [", stderr);
 	if (autosc & 1) {
 	    SHOW_NUM_OR_TIME(min, axis);
 	}
@@ -780,7 +781,7 @@ char *text;
 	if (autosc & 2) {
 	    SHOW_NUM_OR_TIME(max, axis);
 	}
-	fprintf(stderr, "] )\n");
+	fputs("] )\n", stderr);
     } else {
 	putc('\n', stderr);
     }
@@ -810,7 +811,7 @@ static void show_output()
     if (outstr)
 	fprintf(stderr, "\toutput is sent to '%s'\n", outstr);
     else
-	fprintf(stderr, "\toutput is sent to STDOUT\n");
+	fputs("\toutput is sent to STDOUT\n", stderr);
 }
 
 static void show_samples()
@@ -844,7 +845,7 @@ static void show_label_contours()
     if (label_contours)
 	fprintf(stderr, "\tcontour line types are varied & labeled with format '%s'\n", contour_format);
     else
-	fprintf(stderr, "\tcontour line types are all the same\n");
+	fputs("\tcontour line types are all the same\n", stderr);
 }
 
 static void show_view()
@@ -941,20 +942,20 @@ int tag;			/* 0 means show all */
 	    show_position(&this_label->place);
 	    switch (this_label->pos) {
 	    case LEFT:{
-		    fprintf(stderr, " left");
+		    fputs(" left", stderr);
 		    break;
 		}
 	    case CENTRE:{
-		    fprintf(stderr, " centre");
+		    fputs(" centre", stderr);
 		    break;
 		}
 	    case RIGHT:{
-		    fprintf(stderr, " right");
+		    fputs(" right", stderr);
 		    break;
 		}
 	    }
 	    fprintf(stderr, " %s ", this_label->rotate ? "rotated (if possible)" : "not rotated");
-	    if ((this_label->font)[0] != '\0')
+	    if ((this_label->font)[0] != NUL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
 	    /* Entry font added by DJL */
 	    fputc('\n', stderr);
@@ -1090,10 +1091,10 @@ static void show_key()
 	fprintf(stderr, "\tkey is ON, position: %s\n", str);
 	break;
     case 0:
-	fprintf(stderr, "\tkey is OFF\n");
+	fputs("\tkey is OFF\n", stderr);
 	break;
     case 1:
-	fprintf(stderr, "\tkey is at ");
+	fputs("\tkey is at ", stderr);
 	show_position(&key_user_pos);
 	putc('\n', stderr);
 	break;
@@ -1140,13 +1141,13 @@ static void show_polar()
 
 static void show_angles()
 {
-    fprintf(stderr, "\tAngles are in ");
+    fputs("\tAngles are in ", stderr);
     switch (angles_format) {
     case ANGLES_RADIANS:
-	fprintf(stderr, "radians\n");
+	fputs("radians\n", stderr);
 	break;
     case ANGLES_DEGREES:
-	fprintf(stderr, "degrees\n");
+	fputs("degrees\n", stderr);
 	break;
     }
 }
@@ -1195,48 +1196,48 @@ int rotate_tics;
     fprintf(stderr, "\t%s-axis tics:\t", text);
     switch (tics & TICS_MASK) {
     case NO_TICS:
-	fprintf(stderr, "OFF\n");
+	fputs("OFF\n", stderr);
 	return;
     case TICS_ON_AXIS:
-	fprintf(stderr, "on axis");
+	fputs("on axis", stderr);
         if (tics & TICS_MIRROR)
             fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
-	fprintf(stderr, "on border");
+	fputs("on border", stderr);
         if (tics & TICS_MIRROR)
-            fprintf(stderr, " and mirrored on opposite border");
+            fputs(" and mirrored on opposite border", stderr);
 	break;
     }
 
     fprintf(stderr,"\n\t  labels are format \"%s\"", ticfmt);
     if (rotate_tics)
-	fprintf(stderr, ", rotated in 2D mode, terminal permitting.\n\t");
+	fputs(", rotated in 2D mode, terminal permitting.\n\t", stderr);
     else
-	fprintf(stderr, " and are not rotated\n\t");
+	fputs(" and are not rotated\n\t", stderr);
 
     switch (tdef->type) {
     case TIC_COMPUTED:{
-	    fprintf(stderr, "  intervals computed automatically\n");
+	    fputs("  intervals computed automatically\n", stderr);
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(stderr, "  Months computed automatically\n");
+	    fputs("  Months computed automatically\n", stderr);
 	    break;
 	}
     case TIC_DAY:{
-	    fprintf(stderr, "  Days computed automatically\n");
+	    fputs("  Days computed automatically\n", stderr);
 	    break;
 	}
     case TIC_SERIES:{
-	    fprintf(stderr, "  series");
+	    fputs("  series", stderr);
 	    if (tdef->def.series.start != -VERYLARGE) {
-		fprintf(stderr, " from ");
+		fputs(" from ", stderr);
 		SHOW_NUM_OR_TIME(tdef->def.series.start, axis);
 	    }
 	    fprintf(stderr, " by %g%s", tdef->def.series.incr, datatype[axis] == TIME ? " secs" : "");
 	    if (tdef->def.series.end != VERYLARGE) {
-		fprintf(stderr, " until ");
+		fputs(" until ", stderr);
 		SHOW_NUM_OR_TIME(tdef->def.series.end, axis);
 	    }
 	    putc('\n', stderr);
@@ -1247,7 +1248,7 @@ int rotate_tics;
 	    int time;
 	    time = (datatype[axis] == TIME);
  */
-	    fprintf(stderr, "  list (");
+	    fputs("  list (", stderr);
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label) {
 		    char str[MAX_LINE_LEN+1];
@@ -1255,9 +1256,9 @@ int rotate_tics;
 		}
 		SHOW_NUM_OR_TIME(t->position, axis);
 		if (t->next)
-		    fprintf(stderr, ", ");
+		    fputs(", ", stderr);
 	    }
-	    fprintf(stderr, ")\n");
+	    fputs(")\n", stderr);
 	    break;
 	}
     default:{
@@ -1273,19 +1274,19 @@ static void show_margin()
     if (lmargin >= 0)
 	fprintf(stderr, "\tlmargin is set to %d\n", lmargin);
     else
-	fprintf(stderr, "\tlmargin is computed automatically\n");
+	fputs("\tlmargin is computed automatically\n", stderr);
     if (bmargin >= 0)
 	fprintf(stderr, "\tbmargin is set to %d\n", bmargin);
     else
-	fprintf(stderr, "\tbmargin is computed automatically\n");
+	fputs("\tbmargin is computed automatically\n", stderr);
     if (rmargin >= 0)
 	fprintf(stderr, "\trmargin is set to %d\n", rmargin);
     else
-	fprintf(stderr, "\trmargin is computed automatically\n");
+	fputs("\trmargin is computed automatically\n", stderr);
     if (tmargin >= 0)
 	fprintf(stderr, "\ttmargin is set to %d\n", tmargin);
     else
-	fprintf(stderr, "\ttmargin is computed automatically\n");
+	fputs("\ttmargin is computed automatically\n", stderr);
 }
 
 static void show_term()
@@ -1294,7 +1295,7 @@ static void show_term()
 	fprintf(stderr, "\tterminal type is %s %s\n",
 		term->name, term_options);
     else
-	fprintf(stderr, "\tterminal type is unknown\n");
+	fputs("\tterminal type is unknown\n", stderr);
 }
 
 static void show_plot()
@@ -1304,7 +1305,7 @@ static void show_plot()
 
 static void show_autoscale()
 {
-    fprintf(stderr, "\tautoscaling is ");
+    fputs("\tautoscaling is ", stderr);
     if (parametric) {
 	if (is_3d_plot) {
 	    fprintf(stderr, "\tt: %s%s%s, ",
@@ -1322,7 +1323,7 @@ static void show_autoscale()
 		    (autoscale_v == 2) ? " (max)" : "");
 	}
     } else
-	fprintf(stderr, "\t");
+	putc('\t', stderr);
 
     if (polar) {
 	fprintf(stderr, "r: %s%s%s, ", (autoscale_r) ? "ON" : "OFF",
@@ -1345,29 +1346,29 @@ static void show_clip()
     fprintf(stderr, "\tpoint clip is %s\n", (clip_points) ? "ON" : "OFF");
 
     if (clip_lines1)
-	fprintf(stderr, "\tdrawing and clipping lines between inrange and outrange points\n");
+	fputs("\tdrawing and clipping lines between inrange and outrange points\n", stderr);
     else
-	fprintf(stderr, "\tnot drawing lines between inrange and outrange points\n");
+	fputs("\tnot drawing lines between inrange and outrange points\n", stderr);
 
     if (clip_lines2)
-	fprintf(stderr, "\tdrawing and clipping lines between two outrange points\n");
+	fputs("\tdrawing and clipping lines between two outrange points\n", stderr);
     else
-	fprintf(stderr, "\tnot drawing lines between two outrange points\n");
+	fputs("\tnot drawing lines between two outrange points\n", stderr);
 }
 
 static void show_mapping()
 {
-    fprintf(stderr, "\tmapping for 3-d data is ");
+    fputs("\tmapping for 3-d data is ", stderr);
 
     switch (mapping3d) {
     case MAP3D_CARTESIAN:
-	fprintf(stderr, "cartesian\n");
+	fputs("cartesian\n", stderr);
 	break;
     case MAP3D_SPHERICAL:
-	fprintf(stderr, "spherical\n");
+	fputs("spherical\n", stderr);
 	break;
     case MAP3D_CYLINDRICAL:
-	fprintf(stderr, "cylindrical\n");
+	fputs("cylindrical\n", stderr);
 	break;
     }
 }
@@ -1381,18 +1382,18 @@ static void show_contour()
 	fprintf(stderr, " in %d levels on ", contour_levels);
 	switch (draw_contour) {
 	case CONTOUR_BASE:
-	    fprintf(stderr, "grid base\n");
+	    fputs("grid base\n", stderr);
 	    break;
 	case CONTOUR_SRF:
-	    fprintf(stderr, "surface\n");
+	    fputs("surface\n", stderr);
 	    break;
 	case CONTOUR_BOTH:
-	    fprintf(stderr, "grid base and surface\n");
+	    fputs("grid base and surface\n", stderr);
 	    break;
 	}
 	switch (contour_kind) {
 	case CONTOUR_KIND_LINEAR:
-	    fprintf(stderr, "\t\tas linear segments\n");
+	    fputs("\t\tas linear segments\n", stderr);
 	    break;
 	case CONTOUR_KIND_CUBIC_SPL:
 	    fprintf(stderr, "\t\tas cubic spline interpolation segments with %d pts\n", contour_pts);
@@ -1412,7 +1413,7 @@ static void show_contour()
 		fprintf(stderr, "%g", levels_list[0]);
 		for (i = 1; i < contour_levels; i++)
 		    fprintf(stderr, ",%g ", levels_list[i]);
-		fprintf(stderr, "\n");
+		putc('\n', stderr);
 		break;
 	    }
 	case LEVELS_INCREMENTAL:
@@ -1468,7 +1469,7 @@ static void show_variables()
     register struct udvt_entry *udv = first_udv;
     int len;
 
-    fprintf(stderr, "\n\tVariables:\n");
+    fputs("\n\tVariables:\n", stderr);
     while (udv) {
 	len = instring(udv->udv_name, ' ');
 	fprintf(stderr, "\t%-*s ", len, udv->udv_name);
@@ -1572,7 +1573,7 @@ void show_version_long()
 
 #endif /* HAVE_SYS_UTSNAME_H */
 
-    fprintf(stderr, "\nCompile options:\n");
+    fputs("\nCompile options:\n", stderr);
 
     {
 	/* The following code could be a lot simpler if
@@ -1729,7 +1730,7 @@ struct position *pos;
 static void show_missing()
 {
     if (missing_val == NULL)
-	fprintf(stderr, "\tNo string is interpreted as missing data\n");
+	fputs("\tNo string is interpreted as missing data\n", stderr);
     else
 	fprintf(stderr, "\t\"%s\" is interpreted as missing value\n", missing_val);
 }

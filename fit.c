@@ -198,7 +198,7 @@ FILE *fp;
     if (fp == NULL)
 	return strlen(last_fit_command);
     else
-	return fprintf(fp, "%s", last_fit_command);
+	return fputs(last_fit_command, fp);
 }
 
 
@@ -270,7 +270,7 @@ void error_ex()
     while (*--sp == '\n')
 	;
     strcpy(sp + 1, "\n\n");	/* terminate with exactly 2 newlines */
-    fprintf(STANDARD, fitbuf);
+    fputs(fitbuf, STANDARD);
     if (log_f) {
 	fprintf(log_f, "BREAK: %s", fitbuf);
 	(void) fclose(log_f);
@@ -565,19 +565,19 @@ double *data;
 static TBOOLEAN fit_interrupt()
 {
     while (TRUE) {
-	fprintf(STANDARD, "\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ");
+	fputs("\n\n(S)top fit, (C)ontinue, (E)xecute FIT_SCRIPT:  ", STANDARD);
 	switch (getc(stdin)) {
 
 	case EOF:
 	case 's':
 	case 'S':
-	    fprintf(STANDARD, "Stop.");
+	    fputs("Stop.", STANDARD);
 	    user_stop = TRUE;
 	    return FALSE;
 
 	case 'c':
 	case 'C':
-	    fprintf(STANDARD, "Continue.");
+	    fputs("Continue.", STANDARD);
 	    return TRUE;
 
 	case 'e':
@@ -1045,7 +1045,7 @@ char *pfile, *npfile;
     while (fgets(s = sstr, sizeof(sstr), of) != NULL) {
 
 	if (is_empty(s)) {
-	    fprintf(nf, s);	/* preserve comments */
+	    fputs(s, nf);	/* preserve comments */
 	    continue;
 	}
 	if ((tmp = strchr(s, '#')) != NULL) {
@@ -1322,7 +1322,7 @@ void do_fit()
     }
     if (!log_f && /* div */ !(log_f = fopen(logfile, "a")))
 	Eex2("could not open log-file %s", logfile);
-    fprintf(log_f, "\n\n*******************************************************************************\n");
+    fputs("\n\n*******************************************************************************\n", log_f);
     (void) time(&timer);
     fprintf(log_f, "%s\n\n", ctime(&timer));
     {
@@ -1434,7 +1434,7 @@ void do_fit()
     fprintf(log_f, "        #datapoints = %d\n", num_data);
 
     if (columns < 3)
-	fprintf(log_f, "        residuals are weighted equally (unit weight)\n\n");
+	fputs("        residuals are weighted equally (unit weight)\n\n", log_f);
 
     {
 	char *line = NULL;
@@ -1532,7 +1532,7 @@ void do_fit()
     } else {
 	/* not a string after via: it's a variable listing */
 
-	fprintf(log_f, "fitted parameters initiallized with current variable values\n\n");
+	fputs("fitted parameters initiallized with current variable values\n\n", log_f);
 	do {
 	    if (!isletter(c_token))
 		Eex("no parameter specified");

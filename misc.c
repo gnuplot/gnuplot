@@ -61,8 +61,8 @@ do{if (datatype[axis]==TIME) { \
   putc('"', fp);   \
   gstrftime(s,80,timefmt,(double)(x)); \
   for(p=s; *p; ++p) {\
-   if ( *p == '\t' ) fprintf(fp,"\\t");\
-   else if (*p == '\n') fprintf(fp, "\\n"); \
+   if ( *p == '\t' ) fputs("\\t",fp);\
+   else if (*p == '\n') fputs("\\n",fp); \
    else if ( *p > 126 || *p < 32 ) fprintf(fp,"\\%03o",*p);\
    else putc(*p, fp);\
   }\
@@ -358,7 +358,7 @@ FILE *fp;
     if (fp) {
 	show_version(fp);		/* I _love_ information written */
 	save_functions__sub(fp);	/* at the top and the end of an */
-	fprintf(fp, "#    EOF\n");	/* human readable ASCII file.   */
+	fputs("#    EOF\n", fp);	/* human readable ASCII file.   */
 	(void) fclose(fp);	/*                        (JFi) */
     } else
 	os_error("Cannot open save file", c_token);
@@ -371,7 +371,7 @@ FILE *fp;
     if (fp) {
 	show_version(fp);
 	save_variables__sub(fp);
-	fprintf(fp, "#    EOF\n");
+	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
 	os_error("Cannot open save file", c_token);
@@ -384,7 +384,7 @@ FILE *fp;
     if (fp) {
 	show_version(fp);
 	save_set_all(fp);
-	fprintf(fp, "#    EOF\n");
+	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
 	os_error("Cannot open save file", c_token);
@@ -405,7 +405,7 @@ FILE *fp;
            wri_to_fil_last_fit_cmd(fp);
            putc('\n', fp);
         }
-	fprintf(fp, "#    EOF\n");
+	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
 	os_error("Cannot open save file", c_token);
@@ -464,10 +464,15 @@ FILE *fp;
     else
 	fputs("# set output\n", fp);
 
-    fprintf(fp, "set %sclip points\n", (clip_points) ? "" : "no");
-    fprintf(fp, "set %sclip one\n", (clip_lines1) ? "" : "no");
-    fprintf(fp, "set %sclip two\n", (clip_lines2) ? "" : "no");
-    fprintf(fp, "set bar %f\n", bar_size);
+    fprintf(fp, "\
+set %sclip points\n\
+set %sclip one\n\
+set %sclip two\n\
+set bar %f\n",
+	    (clip_points) ? "" : "no",
+	    (clip_lines1) ? "" : "no",
+	    (clip_lines2) ? "" : "no",
+	    bar_size);
 
     if (draw_border)
 	/* HBB 980609: handle border linestyle, too */
@@ -475,13 +480,20 @@ FILE *fp;
     else
 	fprintf(fp, "set noborder\n");
 
-    fprintf(fp, "set xdata%s\n", datatype[FIRST_X_AXIS] == TIME ? " time" : "");
-    fprintf(fp, "set ydata%s\n", datatype[FIRST_Y_AXIS] == TIME ? " time" : "");
-    fprintf(fp, "set zdata%s\n", datatype[FIRST_Z_AXIS] == TIME ? " time" : "");
-    fprintf(fp, "set x2data%s\n", datatype[SECOND_X_AXIS] == TIME ? " time" : "");
-    fprintf(fp, "set y2data%s\n", datatype[SECOND_Y_AXIS] == TIME ? " time" : "");
+    fprintf(fp, "\
+set xdata%s\n\
+set ydata%s\n\
+set zdata%s\n\
+set x2data%s\n\
+set y2data%s\n",
+	    datatype[FIRST_X_AXIS] == TIME ? " time" : "",
+	    datatype[FIRST_Y_AXIS] == TIME ? " time" : "",
+	    datatype[FIRST_Z_AXIS] == TIME ? " time" : "",
+	    datatype[SECOND_X_AXIS] == TIME ? " time" : "",
+	    datatype[SECOND_Y_AXIS] == TIME ? " time" : "");
+
     if (boxwidth < 0.0)
-	fprintf(fp, "set boxwidth\n");
+	fputs("set boxwidth\n", fp);
     else
 	fprintf(fp, "set boxwidth %g\n", boxwidth);
     if (dgrid3d)
@@ -490,14 +502,22 @@ FILE *fp;
 		dgrid3d_col_fineness,
 		dgrid3d_norm_value);
 
-    fprintf(fp, "set dummy %s,%s\n", dummy_var[0], dummy_var[1]);
-    fprintf(fp, "set format x \"%s\"\n", conv_text(str, xformat));
-    fprintf(fp, "set format y \"%s\"\n", conv_text(str, yformat));
-    fprintf(fp, "set format x2 \"%s\"\n", conv_text(str, x2format));
-    fprintf(fp, "set format y2 \"%s\"\n", conv_text(str, y2format));
-    fprintf(fp, "set format z \"%s\"\n", conv_text(str, zformat));
-    fprintf(fp, "set angles %s\n", (angles_format == ANGLES_RADIANS) ?
-	    "radians" : "degrees");
+    fprintf(fp, "\
+set dummy %s,%s\n\
+set format x \"%s\"\n\
+set format y \"%s\"\n\
+set format x2 \"%s\"\n\
+set format y2 \"%s\"\n\
+set format z \"%s\"\n\
+set angles %s\n",
+	    dummy_var[0], dummy_var[1],
+	    conv_text(str, xformat),
+	    conv_text(str, yformat),
+	    conv_text(str, x2format),
+	    conv_text(str, y2format),
+	    conv_text(str, zformat),
+	    (angles_format == ANGLES_RADIANS) ? "radians" : "degrees");
+
     if (work_grid.l_type == 0)
 	fputs("set nogrid\n", fp);
     else {
@@ -522,36 +542,36 @@ FILE *fp;
     fprintf(fp, "set key title \"%s\"\n", conv_text(str, key_title));
     switch (key) {
     case -1:{
-	    fprintf(fp, "set key");
+	    fputs("set key", fp);
 	    switch (key_hpos) {
 	    case TRIGHT:
-		fprintf(fp, " right");
+		fputs(" right", fp);
 		break;
 	    case TLEFT:
-		fprintf(fp, " left");
+		fputs(" left", fp);
 		break;
 	    case TOUT:
-		fprintf(fp, " out");
+		fputs(" out", fp);
 		break;
 	    }
 	    switch (key_vpos) {
 	    case TTOP:
-		fprintf(fp, " top");
+		fputs(" top", fp);
 		break;
 	    case TBOTTOM:
-		fprintf(fp, " bottom");
+		fputs(" bottom", fp);
 		break;
 	    case TUNDER:
-		fprintf(fp, " below");
+		fputs(" below", fp);
 		break;
 	    }
 	    break;
 	}
     case 0:
-	fprintf(fp, "set nokey\n");
+	fputs("set nokey\n", fp);
 	break;
     case 1:
-	fprintf(fp, "set key ");
+	fputs("set key ", fp);
 	save_position(fp, &key_user_pos);
 	break;
     }
@@ -561,7 +581,7 @@ FILE *fp;
 		key_reverse ? "" : "no",
 		key_box.l_type + 1, key_box.l_width, key_swidth, key_vert_factor, key_width_fix);
     }
-    fprintf(fp, "set nolabel\n");
+    fputs("set nolabel\n", fp);
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
 	fprintf(fp, "set label %d \"%s\" at ",
@@ -571,22 +591,22 @@ FILE *fp;
 
 	switch (this_label->pos) {
 	case LEFT:
-	    fprintf(fp, " left");
+	    fputs(" left", fp);
 	    break;
 	case CENTRE:
-	    fprintf(fp, " centre");
+	    fputs(" centre", fp);
 	    break;
 	case RIGHT:
-	    fprintf(fp, " right");
+	    fputs(" right", fp);
 	    break;
 	}
 	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
-	if ((this_label->font)[0] != '\0')
+	if ((this_label->font)[0] != NUL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	/* Entry font added by DJL */
 	fputc('\n', fp);
     }
-    fprintf(fp, "set noarrow\n");
+    fputs("set noarrow\n", fp);
     for (this_arrow = first_arrow; this_arrow != NULL;
 	 this_arrow = this_arrow->next) {
 	fprintf(fp, "set arrow %d from ", this_arrow->tag);
@@ -598,7 +618,7 @@ FILE *fp;
 		this_arrow->lp_properties.l_type + 1,
 		this_arrow->lp_properties.l_width);
     }
-    fprintf(fp, "set nolinestyle\n");
+    fputs("set nolinestyle\n", fp);
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
 	fprintf(fp, "set linestyle %d ", this_linestyle->tag);
@@ -608,7 +628,7 @@ FILE *fp;
 		this_linestyle->lp_properties.p_type + 1,
 		this_linestyle->lp_properties.p_size);
     }
-    fprintf(fp, "set nologscale\n");
+    fputs("set nologscale\n", fp);
     if (is_log_x)
 	fprintf(fp, "set logscale x %g\n", base_log_x);
     if (is_log_y)
@@ -619,47 +639,59 @@ FILE *fp;
 	fprintf(fp, "set logscale x2 %g\n", base_log_x2);
     if (is_log_y2)
 	fprintf(fp, "set logscale y2 %g\n", base_log_y2);
-    fprintf(fp, "set offsets %g, %g, %g, %g\n", loff, roff, toff, boff);
-    fprintf(fp, "set pointsize %g\n", pointsize);
-    fprintf(fp, "set encoding %s\n", encoding_names[encoding]);
-    fprintf(fp, "set %spolar\n", (polar) ? "" : "no");
-    fprintf(fp, "set %sparametric\n", (parametric) ? "" : "no");
-    fprintf(fp, "set view %g, %g, %g, %g\n",
-	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
-    fprintf(fp, "set samples %d, %d\n", samples_1, samples_2);
-    fprintf(fp, "set isosamples %d, %d\n", iso_samples_1, iso_samples_2);
-    fprintf(fp, "set %ssurface\n", (draw_surface) ? "" : "no");
-    fprintf(fp, "set %scontour", (draw_contour) ? "" : "no");
+
+    fprintf(fp, "\
+set offsets %g, %g, %g, %g\n\
+set pointsize %g\n\
+set encoding %s\n\
+set %spolar\n\
+set %sparametric\n\
+set view %g, %g, %g, %g\n\
+set samples %d, %d\n\
+set isosamples %d, %d\n\
+set %ssurface\n\
+set %scontour",
+	    loff, roff, toff, boff,
+	    pointsize,
+	    encoding_names[encoding],
+	    (polar) ? "" : "no",
+	    (parametric) ? "" : "no",
+	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale,
+	    samples_1, samples_2,
+	    iso_samples_1, iso_samples_2,
+	    (draw_surface) ? "" : "no",
+	    (draw_contour) ? "" : "no");
+
     switch (draw_contour) {
     case CONTOUR_NONE:
-	fprintf(fp, "\n");
+	fputc('\n', fp);
 	break;
     case CONTOUR_BASE:
-	fprintf(fp, " base\n");
+	fputs(" base\n", fp);
 	break;
     case CONTOUR_SRF:
-	fprintf(fp, " surface\n");
+	fputs(" surface\n", fp);
 	break;
     case CONTOUR_BOTH:
-	fprintf(fp, " both\n");
+	fputs(" both\n", fp);
 	break;
     }
     if (label_contours)
 	fprintf(fp, "set clabel '%s'\n", contour_format);
     else
-	fprintf(fp, "set noclabel\n");
+	fputs("set noclabel\n", fp);
 
-    fprintf(fp, "set mapping ");
+    fputs("set mapping ", fp);
     switch(mapping3d) {
     case MAP3D_SPHERICAL:
-	fprintf(fp, "spherical\n");
+	fputs("spherical\n", fp);
 	break;
     case MAP3D_CYLINDRICAL:
-	fprintf(fp, "cylindrical\n");
+	fputs("cylindrical\n", fp);
 	break;
     case MAP3D_CARTESIAN:
     default:
-	fprintf(fp, "cartesian\n");
+	fputs("cartesian\n", fp);
 	break;
     }
 
@@ -668,19 +700,19 @@ FILE *fp;
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
-    fprintf(fp, "set cntrparam ");
+    fputs("set cntrparam ", fp);
     switch (contour_kind) {
     case CONTOUR_KIND_LINEAR:
-	fprintf(fp, "linear\n");
+	fputs("linear\n", fp);
 	break;
     case CONTOUR_KIND_CUBIC_SPL:
-	fprintf(fp, "cubicspline\n");
+	fputs("cubicspline\n", fp);
 	break;
     case CONTOUR_KIND_BSPLINE:
-	fprintf(fp, "bspline\n");
+	fputs("bspline\n", fp);
 	break;
     }
-    fprintf(fp, "set cntrparam levels ");
+    fputs("set cntrparam levels ", fp);
     switch (levels_kind) {
     case LEVELS_AUTO:
 	fprintf(fp, "auto %d\n", contour_levels);
@@ -696,129 +728,144 @@ FILE *fp;
 	    fprintf(fp, "discrete %g", levels_list[0]);
 	    for (i = 1; i < contour_levels; i++)
 		fprintf(fp, ",%g ", levels_list[i]);
-	    fprintf(fp, "\n");
+	    fputc('\n', fp);
 	}
     }
-    fprintf(fp, "set cntrparam points %d\n", contour_pts);
-    fprintf(fp, "set size ratio %g %g,%g\n", aspect_ratio, xsize, ysize);
-    fprintf(fp, "set origin %g,%g\n", xoffset, yoffset);
-    fprintf(fp, "set data style ");
+    fprintf(fp, "\
+set cntrparam points %d\n\
+set size ratio %g %g,%g\n\
+set origin %g,%g\n\
+set data style ",
+	    contour_pts,
+	    aspect_ratio, xsize, ysize,
+	    xoffset, yoffset);
+
     switch (data_style) {
     case LINES:
-	fprintf(fp, "lines\n");
+	fputs("lines\n", fp);
 	break;
     case POINTSTYLE:
-	fprintf(fp, "points\n");
+	fputs("points\n", fp);
 	break;
     case IMPULSES:
-	fprintf(fp, "impulses\n");
+	fputs("impulses\n", fp);
 	break;
     case LINESPOINTS:
-	fprintf(fp, "linespoints\n");
+	fputs("linespoints\n", fp);
 	break;
     case DOTS:
-	fprintf(fp, "dots\n");
+	fputs("dots\n", fp);
 	break;
     case YERRORBARS:
-	fprintf(fp, "yerrorbars\n");
+	fputs("yerrorbars\n", fp);
 	break;
     case XERRORBARS:
-	fprintf(fp, "xerrorbars\n");
+	fputs("xerrorbars\n", fp);
 	break;
     case XYERRORBARS:
-	fprintf(fp, "xyerrorbars\n");
+	fputs("xyerrorbars\n", fp);
 	break;
     case BOXES:
-	fprintf(fp, "boxes\n");
+	fputs("boxes\n", fp);
 	break;
     case BOXERROR:
-	fprintf(fp, "boxerrorbars\n");
+	fputs("boxerrorbars\n", fp);
 	break;
     case BOXXYERROR:
-	fprintf(fp, "boxxyerrorbars\n");
+	fputs("boxxyerrorbars\n", fp);
 	break;
     case STEPS:
-	fprintf(fp, "steps\n");
+	fputs("steps\n", fp);
 	break;			/* JG */
     case FSTEPS:
-	fprintf(fp, "fsteps\n");
+	fputs("fsteps\n", fp);
 	break;			/* HOE */
     case HISTEPS:
-	fprintf(fp, "histeps\n");
+	fputs("histeps\n", fp);
 	break;			/* CAC */
     case VECTOR:
-	fprintf(fp, "vector\n");
+	fputs("vector\n", fp);
 	break;
     case FINANCEBARS:
-	fprintf(fp, "financebars\n");
+	fputs("financebars\n", fp);
 	break;
     case CANDLESTICKS:
-	fprintf(fp, "candlesticks\n");
+	fputs("candlesticks\n", fp);
 	break;
     }
-    fprintf(fp, "set function style ");
+    fputs("set function style ", fp);
     switch (func_style) {
     case LINES:
-	fprintf(fp, "lines\n");
+	fputs("lines\n", fp);
 	break;
     case POINTSTYLE:
-	fprintf(fp, "points\n");
+	fputs("points\n", fp);
 	break;
     case IMPULSES:
-	fprintf(fp, "impulses\n");
+	fputs("impulses\n", fp);
 	break;
     case LINESPOINTS:
-	fprintf(fp, "linespoints\n");
+	fputs("linespoints\n", fp);
 	break;
     case DOTS:
-	fprintf(fp, "dots\n");
+	fputs("dots\n", fp);
 	break;
     case YERRORBARS:
-	fprintf(fp, "yerrorbars\n");
+	fputs("yerrorbars\n", fp);
 	break;
     case XERRORBARS:
-	fprintf(fp, "xerrorbars\n");
+	fputs("xerrorbars\n", fp);
 	break;
     case XYERRORBARS:
-	fprintf(fp, "xyerrorbars\n");
+	fputs("xyerrorbars\n", fp);
 	break;
     case BOXXYERROR:
-	fprintf(fp, "boxxyerrorbars\n");
+	fputs("boxxyerrorbars\n", fp);
 	break;
     case BOXES:
-	fprintf(fp, "boxes\n");
+	fputs("boxes\n", fp);
 	break;
     case BOXERROR:
-	fprintf(fp, "boxerrorbars\n");
+	fputs("boxerrorbars\n", fp);
 	break;
     case STEPS:
-	fprintf(fp, "steps\n");
+	fputs("steps\n", fp);
 	break;			/* JG */
     case FSTEPS:
-	fprintf(fp, "fsteps\n");
+	fputs("fsteps\n", fp);
 	break;			/* HOE */
     case HISTEPS:
-	fprintf(fp, "histeps\n");
+	fputs("histeps\n", fp);
 	break;			/* CAC */
     case VECTOR:
-	fprintf(fp, "vector\n");
+	fputs("vector\n", fp);
 	break;
     case FINANCEBARS:
-	fprintf(fp, "financebars\n");
+	fputs("financebars\n", fp);
 	break;
     case CANDLESTICKS:
-	fprintf(fp, "candlesticks\n");
+	fputs("candlesticks\n", fp);
 	break;
     default:
-	fprintf(fp, "---error!---\n");	/* HBB: default case demanded by gcc, still needed ?? */
+        /* HBB: default case demanded by gcc, still needed ?? */
+	fputs("---error!---\n", fp);
     }
-    fprintf(fp, "set xzeroaxis lt %d lw %.3f\n", xzeroaxis.l_type + 1, xzeroaxis.l_width);
-    fprintf(fp, "set x2zeroaxis lt %d lw %.3f\n", x2zeroaxis.l_type + 1, x2zeroaxis.l_width);
-    fprintf(fp, "set yzeroaxis lt %d lw %.3f\n", yzeroaxis.l_type + 1, yzeroaxis.l_width);
-    fprintf(fp, "set y2zeroaxis lt %d lw %.3f\n", y2zeroaxis.l_type + 1, y2zeroaxis.l_width);
-    fprintf(fp, "set tics %s\n", (tic_in) ? "in" : "out");
-    fprintf(fp, "set ticslevel %g\n", ticslevel);
-    fprintf(fp, "set ticscale %g %g\n", ticscale, miniticscale);
+
+    fprintf(fp, "\
+set xzeroaxis lt %d lw %.3f\n\
+set x2zeroaxis lt %d lw %.3f\n\
+set yzeroaxis lt %d lw %.3f\n\
+set y2zeroaxis lt %d lw %.3f\n\
+set tics %s\n\
+set ticslevel %g\n\
+set ticscale %g %g\n",
+	    xzeroaxis.l_type + 1, xzeroaxis.l_width,
+	    x2zeroaxis.l_type + 1, x2zeroaxis.l_width,
+	    yzeroaxis.l_type + 1, yzeroaxis.l_width,
+	    y2zeroaxis.l_type + 1, y2zeroaxis.l_width,
+	    (tic_in) ? "in" : "out",
+	    ticslevel,
+	    ticscale, miniticscale);
 
 #define SAVE_XYZLABEL(name,lab) { \
   fprintf(fp, "set %s \"%s\" %f,%f ", \
@@ -937,7 +984,7 @@ char *text;
 	    register struct ticmark *t;
 	    int flag_time;
 	    flag_time = (datatype[axis] == TIME);
-	    fprintf(fp, " (");
+	    fputs(" (", fp);
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label)
 		    fprintf(fp, "\"%s\" ", conv_text(str, t->label));
@@ -949,10 +996,10 @@ char *text;
 		    fprintf(fp, "%g", t->position);
 		}
 		if (t->next) {
-		    fprintf(fp, ", ");
+		    fputs(", ", fp);
 		}
 	    }
-	    fprintf(fp, ")");
+	    fputs(")", fp);
 	    break;
 	}
     }
@@ -1209,7 +1256,7 @@ void show_functions()
 {
     register struct udft_entry *udf = first_udf;
 
-    fprintf(stderr, "\n\tUser-Defined Functions:\n");
+    fputs("\n\tUser-Defined Functions:\n", stderr);
 
     while (udf) {
 	if (udf->definition)

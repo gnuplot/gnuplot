@@ -809,7 +809,7 @@ char *argv[];
     char output[80];
 
     if (argc < 2) {
-	fprintf(stderr, "usage : test 'format' ['time']\n");
+	fputs("usage : test 'format' ['time']\n", stderr);
 	exit(EXIT_FAILURE);
     }
     if (argc == 2) {

@@ -654,7 +654,7 @@ char *line;
     /* built-in dumb pager */
     /* leave room for prompt line */
     if (pagelines >= SCREENSIZE - 2) {
-	fprintf(stderr, "Press return for more: ");
+	fputs("Press return for more: ", stderr);
 #if defined(ATARI) || defined(MTOS)
 	do
 	    c = tos_getch();

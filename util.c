@@ -477,7 +477,8 @@ int t_num;
     }
     for (i = 0; i < sizeof(PROMPT) - 1; i++)
 	(void) putc(' ', stderr);
-    fprintf(stderr, "%s\n", str);
+    fputs(str, stderr);
+    putc('\n', stderr);
 
     for (i = 0; i < sizeof(PROMPT) - 1; i++)
 	(void) putc(' ', stderr);
@@ -529,7 +530,8 @@ int t_num;
 	else
 	    fprintf(stderr, "line %d: ", inline_num);
     }
-    fprintf(stderr, "%s\n\n", str);
+    fputs(str, stderr);
+    fputs("\n\n", stderr);
 
     bail_to_command_line();
 }

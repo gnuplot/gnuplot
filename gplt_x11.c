@@ -628,7 +628,7 @@ plot_struct *plot;
     }
     p = (char *) malloc((unsigned) strlen(buffer) + 1);
     if (!plot->commands || !p) {
-	fprintf(stderr, "gnuplot: can't get memory. X11 aborted.\n");
+	fputs("gnuplot: can't get memory. X11 aborted.\n", stderr);
 	EXIT(1);
     }
     plot->commands[plot->ncommands++] = strcpy(p, buffer);
@@ -1203,8 +1203,9 @@ char *argv[];
     XrmInitialize();
     XrmParseCommand(&dbCmd, options, Nopt, Name, &Argc, Argv);
     if (Argc > 1) {
-	fprintf(stderr, "\ngnuplot: bad option: %s\n", Argv[1]);
-	fprintf(stderr, "gnuplot: X11 aborted.\n");
+	fprintf(stderr, "\n\
+gnuplot: bad option: %s\n\
+gnuplot: X11 aborted.\n", Argv[1]);
 	EXIT(1);
     }
     if (pr_GetR(dbCmd, ".display"))
@@ -1214,8 +1215,9 @@ char *argv[];
 
     dpy = XOpenDisplay(ldisplay);
     if (!dpy) {
-	fprintf(stderr, "\ngnuplot: unable to open display '%s'\n", ldisplay);
-	fprintf(stderr, "gnuplot: X11 aborted.\n");
+	fprintf(stderr, "\n
+gnuplot: unable to open display '%s'\n\
+gnuplot: X11 aborted.\n", ldisplay);
 	EXIT(1);
     }
     scr = DefaultScreen(dpy);
@@ -1475,8 +1477,9 @@ void pr_font()
 	fprintf(stderr, "gnuplot: using font '%s' instead.\n", FallbackFont);
 	font = XLoadQueryFont(dpy, FallbackFont);
 	if (!font) {
-	    fprintf(stderr, "gnuplot: can't load font '%s'\n", FallbackFont);
-	    fprintf(stderr, "gnuplot: no useable font - X11 aborted.\n");
+	    fprintf(stderr, "\
+gnuplot: can't load font '%s'\n\
+gnuplot: no useable font - X11 aborted.\n", FallbackFont);
 	    EXIT(1);
 	}
     }

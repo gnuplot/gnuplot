@@ -418,7 +418,7 @@ const char *pname;
     v = vlist + p->vertex[0];
     fprintf(stderr, "%g %g %g \t%ld\n", v->x, v->y, v->z, p->vertex[0]);
     /*two blank lines, as a multimesh separator: */
-    fprintf(stderr, "\n\n");
+    fputs("\n\n", stderr);
 }
 
 /* Gets Minimum 'C' value of polygon, C is x, y, or z: */
@@ -577,7 +577,7 @@ void show_hidden3doptions()
 
     switch (hiddenHandleUndefinedPoints) {
     case OUTRANGE:
-	fprintf(stderr, "Outranged and undefined datapoints are omitted from the surface.\n");
+	fputs("Outranged and undefined datapoints are omitted from the surface.\n", stderr);
 	break;
     case UNDEFINED:
 	fputs("Only undefined datapoints are omitted from the surface.\n", stderr);
@@ -794,7 +794,7 @@ t_poly_tested tested;		/* Is polygon already on the right place of list? */
     struct Vertex vert;
 
     if (p >= plist + npoly)
-	fprintf(stderr, "uh oh !\n");
+	fputs("uh oh !\n", stderr);
 
     CHECK_POINTER(plist, p);
 
@@ -2065,7 +2065,7 @@ TBOOLEAN f;			/* return value = Front(1) or Back(0) */
     fprintf(stderr, "Failed to split p (%ld) by test(%ld), relations are %d, %d\n", P, Test, p_rel_tplane, t_rel_pplane);\
     print_polygon(test, "test");\
     print_polygon(p, "p");\
-    fprintf(stderr, "\n");\
+    fputc('\n', stderr);\
   }\
   continue; /* FIXME: should we continue nevertheless? */\
 }
@@ -2142,8 +2142,10 @@ long Last, Test;
 	} else {
 	    if (loop && (p->tested == is_tested)) {
 		/* Ouch, seems like we're in trouble, really */
-		fprintf(stderr, "#Failed: In loop, without intersections.\n");
-		fprintf(stderr, "#Relations are %d, %d\n", p_rel_tplane, t_rel_pplane);
+		fprintf(stderr, "\
+#Failed: In loop, without intersections.\n\
+#Relations are %d, %d\n",
+			p_rel_tplane, t_rel_pplane);
 		print_polygon(test, "test");
 		print_polygon(p, "p");
 		continue;	/* Keep quiet, maybe no-one will notice (;-) */
@@ -2170,7 +2172,7 @@ long Last, Test;
 	    fprintf(stderr, "Failed: polygon %ld vs. %ld, relations are %d, %d\n", P, Test, p_rel_tplane, t_rel_pplane);
 	    print_polygon(test, "test");
 	    print_polygon(p, "p");
-	    fprintf(stderr, "\n");
+	    fputc('\n', stderr);
 	    graph_error("Couldn't resolve a polygon overlapping pb. Go tell HBB...");
 	}
 	/* No loop: if it makes sense, put P in front of Test */

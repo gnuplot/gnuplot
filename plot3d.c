@@ -1394,7 +1394,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	    /* Make sure this one can be contoured. */
 	    if (!this_plot->has_grid_topology) {
 		this_plot->contours = NULL;
-		fprintf(stderr, "Notice: cannot contour non grid data!\n");
+		fputs("Notice: cannot contour non grid data!\n", stderr);
 		/* changed from int_error by recommendation of
 		 * rkc@xn.ll.mit.edu
 		 */
