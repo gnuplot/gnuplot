@@ -149,6 +149,16 @@ int t_num;
 }
 
 
+/* Returns TRUE if the string of token t_num is not empty
+ * If the length of a token is 2, it consists only of "" or ''
+ */
+int is_notempty(t_num)
+int t_num;
+{
+    return (token[t_num].is_token && token_len(t_num) > 2);
+}
+
+
 /*
  * is_definition() returns TRUE if the next tokens are of the form
  *   identifier =
