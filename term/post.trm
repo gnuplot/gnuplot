@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.138 2004/12/31 06:12:56 sfeam Exp $
+ * $Id: post.trm,v 1.139 2005/01/08 15:37:23 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -123,7 +123,7 @@ TERM_PUBLIC char *PS_RememberFont __PROTO((char *fname, int reencode));
 
 #define PS_FLUSH_PATH do {			\
     if (ps_path_count) {			\
-	fprintf(gpoutfile, "stroke\n");		\
+	fputs("stroke\n", gppsfile);		\
 	ps_path_count = 0;			\
 	PS_relative_ok = FALSE;			\
     }						\
@@ -777,7 +777,7 @@ PS_RememberFont(char *fname, int can_reencode)
     }
 
     if (can_reencode && recode) {
-	fprintf(gpoutfile,"/%s %s", myfname, recode);
+	fprintf(gppsfile,"/%s %s", myfname, recode);
 	return NULL;
     } else
 	return recode;
@@ -1183,7 +1183,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	cmd[0] = '\0';
 
 	if (doload)
-	    fprintf(gpoutfile,"%%BeginProcSet: %s\n",
+	    fprintf(gppsfile,"%%BeginProcSet: %s\n",
 		    current_ps_fontfile->fontfile_name);
 
 	/* get filename extension if no pipe (if pipe *ext=='\0') */
@@ -1320,7 +1320,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	    }
 
 	    if (doload)
-		fputs(line,gpoutfile);
+		fputs(line, gppsfile);
 
 	    ++linesread;
 	}
@@ -1348,17 +1348,17 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 			  current_ps_fontfile->fontfile_name);
 	}
 	if (doload)
-	    fputs("%%EndProcSet\n",gpoutfile);
+	    fputs("%%EndProcSet\n", gppsfile);
 
 	/* Computer Modern Symbol font with corrected baseline if the
 	 * font CMEX10 is embedded */
 	if (doload && fontname && (strcmp(fontname,"CMEX10") == 0)) {
-	    fputs("%%BeginProcSet: CMEX10-Baseline\n",gpoutfile);
+	    fputs("%%BeginProcSet: CMEX10-Baseline\n", gppsfile);
 	    fputs("/CMEX10-Baseline /CMEX10 findfont [1 0 0 1 0 1] makefont\n",
-		  gpoutfile);
-	    fputs("dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n", gpoutfile);
-	    fputs("currentdict end definefont pop\n", gpoutfile);
-	    fputs("%%EndProcSet\n",gpoutfile);
+		  gppsfile);
+	    fputs("dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n", gppsfile);
+	    fputs("currentdict end definefont pop\n", gppsfile);
+	    fputs("%%EndProcSet\n",gppsfile);
 	}
 
 	if (fontname) {
@@ -1847,24 +1847,25 @@ NULL };
     ps_page = 0;
 
     if (!encap)
-	fputs("%!PS-Adobe-2.0\n", gpoutfile);
+	fputs("%!PS-Adobe-2.0\n", gppsfile);
     else
-	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gpoutfile);
+	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gppsfile);
 
-    if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr);   /*  JFi  */
+    if (outstr)
+	fprintf(gppsfile, "%%%%Title: %s\n", outstr);   /*  JFi  */
     time(&now);
-    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel,
+    fprintf(gppsfile, psi1, gnuplot_version, gnuplot_patchlevel,
 	    asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
 
-    fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n",
+    fprintf(gppsfile,"%%%%BoundingBox: %d %d %d %d\n",
 	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-    fprintf(gpoutfile,"%%%%Orientation: %s\n",
+    fprintf(gppsfile,"%%%%Orientation: %s\n",
 	    ps_portrait ? "Portrait" : "Landscape");
 
     if (!encap)
-	fputs("%%Pages: (atend)\n", gpoutfile);
-    fprintf(gpoutfile, psi2,
+	fputs("%%Pages: (atend)\n", gppsfile);
+    fprintf(gppsfile, psi2,
 	    ps_color ? "true" : "false",
 	    ps_blacktext ? "true" : "false",
 	    ps_solid ? "true" : "false",
@@ -1895,27 +1896,27 @@ NULL };
 	}
 	if (e) {
 	    for (i = 0; e[i] != NULL; i++) {
-		fprintf(gpoutfile, "%s", e[i]);
+		fprintf(gppsfile, "%s", e[i]);
     }
 	}
     }
 
     for (i = 0; PS_header[i] != NULL; i++)
-	fprintf(gpoutfile,"%s",PS_header[i]);
+	fprintf(gppsfile,"%s",PS_header[i]);
     if (ps_duplex_option)
-	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
+	fprintf(gppsfile, "statusdict begin %s setduplexmode end\n",
 		ps_duplex_state ? "true" : "false");
 
     if (dict)
 	while (*dict)
-	    fputs(*(dict++), gpoutfile);
+	    fputs(*(dict++), gppsfile);
 
     PS_load_fontfiles(TRUE);
 
     if (uses_fonts)
 	PS_RememberFont(ps_font, 1);
 
-    fputs("end\n%%EndProlog\n", gpoutfile);
+    fputs("end\n%%EndProlog\n", gppsfile);
 }
 
 /* the init fn for the postscript driver */
@@ -1953,6 +1954,9 @@ PS_init()
     strcpy(ps_enh_font, ps_font);
     ps_enh_fontsize = ps_fontsize;
 
+    /* to optimize output for postscript terminals family */
+    gppsfile = gpoutfile;
+
     PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
@@ -1960,10 +1964,6 @@ PS_init()
     /* Keep track of whether we have written the enhanced text dictionary yet */
     ENHPS_initialized = (term->put_text == ENHPS_put_text) ? 2 : 1;
     
-#if defined(PM3D) || defined(WITH_IMAGE)
-    /* to optimize output for postscript terminals family */
-    gppsfile = gpoutfile;
-#endif
 }
 
 
@@ -1974,19 +1974,19 @@ PS_graphics()
     struct termentry *t = term;
     ps_page++;
     if (!ps_common_encap)
-	fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+	fprintf(gppsfile,"%%%%Page: %d %d\n",ps_page,ps_page);
 
     /* If we are about to use enhanced text mode for the first time in a plot that */
     /* was initialized previously without it, we need to write out the macros now */
     if (term->put_text == ENHPS_put_text && ENHPS_initialized == 1) {
 	const char **dict = ENHPS_header;
 	while (*dict)
-	    fputs(*(dict++), gpoutfile);
+	    fputs(*(dict++), gppsfile);
 	fprintf(stderr,"Writing out PostScript macros for enhanced text mode\n");
 	ENHPS_initialized = 2;
     }
 
-    fprintf(gpoutfile,"\
+    fprintf(gppsfile,"\
 gnudict begin\ngsave\n\
 %d %d translate\n\
 %.3f %.3f scale\n",
@@ -1994,11 +1994,11 @@ gnudict begin\ngsave\n\
 	    (ps_eps ? 0.5 : 1.0)/PS_SC,
 	    (ps_eps ? 0.5 : 1.0)/PS_SC);
     if (!ps_common_portrait) {
-	fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+	fprintf(gppsfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
     }
-    fprintf(gpoutfile, psg1);
+    fprintf(gppsfile, psg1);
     if (ps_common_uses_fonts)
-	fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n",
+	fprintf(gppsfile, "(%s) findfont %d scalefont setfont\n",
 		ps_font, (t->v_char));
     ps_path_count = 0;
     PS_relative_ok = FALSE;
@@ -2012,7 +2012,7 @@ TERM_PUBLIC void
 PS_text()
 {
     ps_path_count = 0;
-    fprintf(gpoutfile,"stroke\ngrestore\nend\nshowpage\n");
+    fputs("stroke\ngrestore\nend\nshowpage\n", gppsfile);
     /* fprintf(stderr,"taken %d times\n",PS_taken); */
     /* informational:  tells how many times it was "cheaper"
      * to do a relative moveto or lineto rather than an
@@ -2023,7 +2023,7 @@ PS_text()
 TERM_PUBLIC void
 PS_reset()
 {
-    fputs("%%Trailer\n", gpoutfile);
+    fputs("%%Trailer\n", gppsfile);
 
     /* I think the following commands should be executed
        `if (ps_common_uses_fonts)`. So I changed the next line.
@@ -2031,18 +2031,18 @@ PS_reset()
 
     /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
     if (ps_common_uses_fonts) {
-	fputs("%%DocumentFonts: ", gpoutfile);
+	fputs("%%DocumentFonts: ", gppsfile);
 	while (PS_DocFonts) {
 	    struct PS_FontName *fnp;
 	    fnp = PS_DocFonts->next;
-	    fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
+	    fprintf(gppsfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
 	    free(PS_DocFonts->name);
 	    free(PS_DocFonts);
 	    PS_DocFonts = fnp;
 	}
     }
     if (!ps_common_encap)
-	fprintf(gpoutfile,"%%%%Pages: %d\n",ps_page);
+	fprintf(gppsfile, "%%%%Pages: %d\n", ps_page);
 }
 
 
@@ -2068,7 +2068,7 @@ PS_linetype(int linetype)
     PS_FLUSH_PATH;
 
     PS_linetype_last = linetype;
-    fprintf(gpoutfile,"LT%c\n", "wba012345678"[linetype]);
+    fprintf(gppsfile, "LT%c\n", "wba012345678"[linetype]);
     ps_path_count = 0;
 }
 
@@ -2083,7 +2083,7 @@ PS_linewidth (double linewidth)
     PS_linetype_last = -1;	/* disable cache for next linetype change */
 
     PS_FLUSH_PATH;
-    fprintf(gpoutfile,"%.3f UL\n",linewidth);
+    fprintf(gppsfile, "%.3f UL\n", linewidth);
 
     /*
 	Documentation of the 'change linewidth' strategy of the postscript terminal:
@@ -2112,7 +2112,7 @@ PS_linewidth (double linewidth)
 TERM_PUBLIC void
 PS_pointsize (double ptsize)
 {
-    fprintf(gpoutfile,"%.3f UP\n",ptsize);
+    fprintf(gppsfile, "%.3f UP\n", ptsize);
 
 /*
  *  Documentation of the 'change pointsize' strategy of the postscript
@@ -2155,10 +2155,10 @@ PS_move(unsigned int x, unsigned int y)
     sprintf(rel, "%d %d R\n", dx, dy);
 
     if (strlen(rel) < strlen(abso) && PS_relative_ok) {
-	fputs(rel, gpoutfile);
+	fputs(rel, gppsfile);
 	PS_taken++;
     } else
-	fputs(abso, gpoutfile);
+	fputs(abso, gppsfile);
     PS_relative_ok = TRUE;
     ps_path_count += 1;
 
@@ -2186,10 +2186,10 @@ PS_vector(unsigned int x, unsigned int y)
 	PS_move(PS_pen_x, PS_pen_y);
 
     if (strlen(rel) < strlen(abso)) {
-	fputs(rel, gpoutfile);
+	fputs(rel, gppsfile);
 	PS_taken++;
     } else
-	fputs(abso, gpoutfile);
+	fputs(abso, gppsfile);
 
     PS_relative_ok = TRUE;
     ps_path_count += 1;
@@ -2204,7 +2204,7 @@ PS_vector(unsigned int x, unsigned int y)
     if (ps_path_count >= 105) {
 #if 0 /* Code up to February 2003: it uses the current position as calculated
        * by the RIP. */
-	fputs("currentpoint stroke M\n", gpoutfile);
+	fputs("currentpoint stroke M\n", gppsfile);
 	ps_path_count = 0;
 #else
 	/* Don't rely on RIP's value of the current position due to the
@@ -2226,33 +2226,33 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
     if (!str && !strlen(str))
 	return;
     PS_move(x,y);
-    fputs("Blacktext { gsave 0 setgray } if\n", gpoutfile);
+    fputs("Blacktext { gsave 0 setgray } if\n", gppsfile);
     if (ps_ang != 0)
-	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n",
+	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 M\n",
 		ps_ang);
-    putc('(',gpoutfile);
+    putc('(',gppsfile);
     ch = *str++;
     while(ch!='\0') {
 	if ((ch=='(') || (ch==')') || (ch=='\\'))
-	    putc('\\',gpoutfile);
-	putc(ch,gpoutfile);
+	    putc('\\', gppsfile);
+	putc(ch, gppsfile);
 	ch = *str++;
     }
 
     switch(ps_justify) {
     case LEFT :
-	fputs(") Lshow\n", gpoutfile);
+	fputs(") Lshow\n", gppsfile);
 	break;
     case CENTRE :
-	fputs(") Cshow\n", gpoutfile);
+	fputs(") Cshow\n", gppsfile);
 	break;
     case RIGHT :
-	fputs(") Rshow\n", gpoutfile);
+	fputs(") Rshow\n", gppsfile);
 	break;
     }
     if (ps_ang != 0)
-	fputs("grestore\n", gpoutfile);
-    fputs("Blacktext { grestore } if\n", gpoutfile);
+	fputs("grestore\n", gppsfile);
+    fputs("Blacktext { grestore } if\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
 }
@@ -2293,10 +2293,11 @@ PS_set_font(const char *font)
     if (font[sep] == ',')
 	sscanf (&(font[sep+1]),"%f",&size);
     if (sep == 0) {
-	fprintf(gpoutfile,"currentfont %d selectfont\n",(int)(size*PS_SC));
+	fprintf(gppsfile,"currentfont %d selectfont\n",(int)(size*PS_SC));
     } else {
 	PS_RememberFont(name,1);
-	fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,(int)(size*PS_SC));
+	fprintf(gppsfile, "/%s findfont %d scalefont setfont\n",
+		name, (int)(size*PS_SC));
     }
     term->v_char = (unsigned int)(size*PS_SC);
     term->h_char = (unsigned int)(size*PS_SC*6/10);
@@ -2335,7 +2336,7 @@ PS_point(unsigned int x, unsigned int y, int number)
 	number = -1;		/* negative types are all 'dot' */
     else
 	number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
-    fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
+    fprintf(gppsfile, "%d %d %s\n", x, y, pointFNS[number+1]);
 
     PS_relative_ok = FALSE;
     ps_path_count = 0;
@@ -2365,7 +2366,7 @@ PS_fillbox(
 	    filldens = 0.0;
         if(filldens > 1.0)
 	    filldens = 1.0;
-        fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
+        fprintf(gppsfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
         break;
 
@@ -2377,43 +2378,45 @@ PS_fillbox(
 
 	default:
 	case 0:
-		fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+		fprintf(gppsfile, "%d %d %d %d BoxFill\n",
+			x1, y1, width, height);
 		break;
 	case 1:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 1 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 1 PatternFill\n",
 			x1, y1, width, height, 80, -45);
 		break;
 	case 2:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 2 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 2 PatternFill\n",
 			x1, y1, width, height, 40,  45);
 		break;
 	case 3:
-		fprintf(gpoutfile, "1 %d %d %d %d BoxColFill\n", x1, y1, width, height);
+		fprintf(gppsfile, "1 %d %d %d %d BoxColFill\n",
+			x1, y1, width, height);
 		break;
 	case 4:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 0 PatternFill\n",
 			x1, y1, width, height, 80,  45);
 		break;
 	case 5:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 0 PatternFill\n",
 			x1, y1, width, height, 80, -45);
 		break;
 	case 6:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 0 PatternFill\n",
 			x1, y1, width, height, 40,  30);
 		break;
 	case 7:
-		fprintf(gpoutfile, "%d %d %d %d %d %d 0 PatternFill\n",
+		fprintf(gppsfile, "%d %d %d %d %d %d 0 PatternFill\n",
 			x1, y1, width, height, 40, -30);
 		break;
 	}
         break; /* end of pattern filling part */
 
     default: /* style == 0 or unknown --> fill with background color */
-        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+        fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
 #else  /* USE_ULIG_FILLEDBOXES */
-        fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
+        fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
 #endif /* USE_ULIG_FILLEDBOXES */
 
     PS_relative_ok = FALSE;
@@ -2432,7 +2435,7 @@ TERM_PUBLIC void
 ENHPS_FLUSH()
 {
     if (ENHps_opened_string) {
-	fputs(")]\n", gpoutfile);
+	fputs(")]\n", gppsfile);
 	ENHps_opened_string = FALSE;
     }
 }
@@ -2452,15 +2455,15 @@ ENHPS_OPEN(
     /* that the normal case macro wants. Somebody more familiar with PostScript*/
     /* than I am please clean it up!                                           */
     if (overprint == 3) {
-	fprintf(gpoutfile,"XYsave\n");
+	fputs("XYsave\n", gppsfile);
 	return;
     } else if (overprint == 4) {
-	fprintf(gpoutfile,"XYrestore\n");
+	fputs("XYrestore\n", gppsfile);
 	return;
     }
 
 	if (!ENHps_opened_string) {
-	    fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",
+	    fprintf(gppsfile, "[(%s) %.1f %.1f %s %s %d (",
 		    fontname, fontsize, base,
 		    widthflag ? "true" : "false",
 		    showflag ? "true" : "false",
@@ -2475,7 +2478,7 @@ ENHPS_OPEN(
 TERM_PUBLIC void
 ENHPS_WRITEC(int c)
 {
-    fputc(c, gpoutfile);
+    fputc(c, gppsfile);
 }
 
 /* a set-font routine for enhanced post : simply copies
@@ -2540,12 +2543,12 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     PS_move(x,y);
 
-    fputs("Blacktext { gsave 0 setgray } if\n", gpoutfile);
+    fputs("Blacktext { gsave 0 setgray } if\n", gppsfile);
     if (ps_ang != 0)
-	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
+	fprintf(gppsfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 		ps_ang);
 
-    fputs("[ ", gpoutfile);
+    fputs("[ ", gppsfile);
 
     /* set up the global variables needed by enhanced_recursion() */
     enhanced_max_height = -1000;
@@ -2582,23 +2585,23 @@ ENHPS_put_text(unsigned int x, unsigned int y, const char *str)
 
     enhanced_max_height += enhanced_min_height;
 
-    fprintf(gpoutfile, "] %.1f ", -enhanced_max_height/3);
+    fprintf(gppsfile, "] %.1f ", -enhanced_max_height/3);
 
     switch(ps_justify) {
     case LEFT :
-	fputs("MLshow\n", gpoutfile);
+	fputs("MLshow\n", gppsfile);
 	break;
     case CENTRE :
-	fputs("MCshow\n", gpoutfile);
+	fputs("MCshow\n", gppsfile);
 	break;
     case RIGHT :
-	fputs("MRshow\n", gpoutfile);
+	fputs("MRshow\n", gppsfile);
 	break;
     }
 
     if (ps_ang != 0)
-	fputs("grestore\n", gpoutfile);
-    fputs("Blacktext { grestore } if\n", gpoutfile);
+	fputs("grestore\n", gppsfile);
+    fputs("Blacktext { grestore } if\n", gppsfile);
     ps_path_count = 0;
     PS_relative_ok = FALSE;
 }
@@ -2613,24 +2616,24 @@ static void make_palette_formulae()
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
 /* print the definition of R,G,B formulae */
-  fputs("/InterpolatedColor false def\n",gpoutfile);
+  fputs("/InterpolatedColor false def\n", gppsfile);
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+    fprintf(gppsfile, "/cF%i {%s} bind def\t%% %s\n",
 	     abs(R), ps_math_color_formulae[ 2*abs(R) ],
 	     ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+      fprintf(gppsfile, "/cF%i {%s} bind def\t%% %s\n",
 	       abs(G), ps_math_color_formulae[ 2*abs(G) ],
 	       ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+      fprintf(gppsfile, "/cF%i {%s} bind def\t%% %s\n",
 	       abs(B), ps_math_color_formulae[ 2*abs(B) ],
 	       ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
     while (*(ps_math_color_formulae[2*i])) {
-      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+      fprintf(gppsfile, "/cF%i {%s} bind def\t%% %s\n",
 	       i, ps_math_color_formulae[ 2*i ],
 	       ps_math_color_formulae[ 2*i+1 ]);
       i++;
@@ -2666,7 +2669,7 @@ make_interpolation_code()
     int i;
 
     for(i=0; header[i]!=NULL; ++i) {
-	fputs(header[i], gpoutfile);
+	fputs(header[i], gppsfile);
     }
 }
 
@@ -2708,7 +2711,7 @@ make_color_model_code()
     int i;
 
     for(i=0; header[i]!=NULL; ++i) {
-        fputs(header[i], gpoutfile);
+        fputs(header[i], gppsfile);
     }
 }
 
@@ -2735,30 +2738,30 @@ write_color_space(t_sm_palette *palette)
     /* write something like
      *   /ColorSpace (HSV) def
      * depending on the selected cmodel in palette */
-    fputs("/ColorSpace ", gpoutfile);
+    fputs("/ColorSpace ", gppsfile);
     switch(palette->cmodel) {
     case C_MODEL_RGB:
-	fputs("(RGB)", gpoutfile);
+	fputs("(RGB)", gppsfile);
 	break;
     case C_MODEL_HSV:
-	fputs("(HSV)", gpoutfile);
+	fputs("(HSV)", gppsfile);
 	break;
     case C_MODEL_CMY:
-	fputs("(CMY)", gpoutfile);
+	fputs("(CMY)", gppsfile);
 	break;
     case C_MODEL_YIQ:
-	fputs("(YIQ)", gpoutfile);
+	fputs("(YIQ)", gppsfile);
 	break;
     case C_MODEL_XYZ:
-	fputs("(XYZ)", gpoutfile);
+	fputs("(XYZ)", gppsfile);
 	break;
     default:
 	fprintf(stderr,"%s:%d ooops: Unkown color model '%c'. Will be RGB\n",
 		__FILE__, __LINE__, (char)(palette->cmodel));
-	fputs("(RGB)", gpoutfile);
+	fputs("(RGB)", gppsfile);
 	break;
     }
-    fputs(" def\n", gpoutfile);
+    fputs(" def\n", gppsfile);
 }
 
 
@@ -2768,12 +2771,12 @@ write_component_array(const char *text, gradient_struct *grad,
 {
     /*  write someting like
      *     /RedA [ 0 .1 .2 .3 .35 .3 .2 .1 0 0 0 ] def
-     *  nicely formated to gpoutfile
+     *  nicely formated to gppsfile
      */
     int i=0, len=0;
     char *val;
 
-    fprintf(gpoutfile, "/%s [", text);
+    fprintf(gppsfile, "/%s [", text);
     len = strlen(text) + 4;
     for(i=0; i<cnt; ++i) {
         char *ref = (char*)(&(grad[i]));
@@ -2782,12 +2785,12 @@ write_component_array(const char *text, gradient_struct *grad,
         val = save_space(*((double*) (ref)));
 	len += strlen(val) + 1;
 	if(len > 77) {
-	    fputs("\n  ",gpoutfile);
+	    fputs("\n  ",gppsfile);
 	    len = strlen(val) + 3;
 	}
-	fprintf(gpoutfile, "%s ", val);
+	fprintf(gppsfile, "%s ", val);
     }
-    fputs("] def\n", gpoutfile);
+    fputs("] def\n", gppsfile);
 }
 
 
@@ -2812,8 +2815,8 @@ static void
 PS_make_header(t_sm_palette *palette)
 {
     /* write header for smooth colors */
-    fputs("gsave %% colour palette begin\n", gpoutfile);
-    fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
+    fputs("gsave % colour palette begin\n", gppsfile);
+    fprintf(gppsfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
     make_color_model_code();
 
     switch(sm_palette.colorMode) {
@@ -2826,7 +2829,7 @@ PS_make_header(t_sm_palette *palette)
 	int cnt=0;
 	gradient_struct *gradient;
 
-	fputs("/InterpolatedColor true def\n", gpoutfile);
+	fputs("/InterpolatedColor true def\n", gppsfile);
 	make_interpolation_code();
 	gradient = approximate_palette(palette, ps_palfunc_samples,
 				       ps_palfunc_deviation, &cnt);
@@ -2835,7 +2838,7 @@ PS_make_header(t_sm_palette *palette)
 	break;
     }
     case SMPAL_COLOR_MODE_GRADIENT:
-	fputs("/InterpolatedColor true def\n", gpoutfile);
+	fputs("/InterpolatedColor true def\n", gppsfile);
 	make_interpolation_code();
 	write_gradient_definition(palette->gradient, palette->gradient_num);
 	break;
@@ -2843,9 +2846,10 @@ PS_make_header(t_sm_palette *palette)
 	fprintf(stderr, "%s:%d ooops: Unknown color mode '%c'\n",
 		 __FILE__, __LINE__, (char)(sm_palette.colorMode));
     }
-    fputs("/pm3dround {maxcolors 0 gt {dup 1 ge\n", gpoutfile);
-    fputs("\t{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def\n", gpoutfile);
-    fprintf(gpoutfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma);
+    fputs("/pm3dround {maxcolors 0 gt {dup 1 ge\n", gppsfile);
+    fputs("\t{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def\n",
+	  gppsfile);
+    fprintf(gppsfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma);
     write_color_space(palette);
 
 /* Now print something like
@@ -2855,29 +2859,30 @@ PS_make_header(t_sm_palette *palette)
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
 
-    fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
+    fprintf(gppsfile, "Color %s and { %% COLOUR vs. GRAY map\n",
 	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false");
-    fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n", gpoutfile);
-    fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gpoutfile);
-    fputs("        SelectSpace setrgbcolor} bind def\n", gpoutfile);
-    fputs("  }{\n", gpoutfile);
-    fputs("  /g {stroke pm3dround dup ", gpoutfile);
+    fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n",
+	  gppsfile);
+    fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gppsfile);
+    fputs("        SelectSpace setrgbcolor} bind def\n", gppsfile);
+    fputs("  }{\n", gppsfile);
+    fputs("  /g {stroke pm3dround dup ", gppsfile);
     if (R < 0)
-	fputs("1 exch sub ", gpoutfile); /* negate */
-    fprintf(gpoutfile,"cF%i Constrain exch dup ", abs(R));
+	fputs("1 exch sub ", gppsfile); /* negate */
+    fprintf(gppsfile,"cF%i Constrain exch dup ", abs(R));
     if (G < 0)
-	fputs("1 exch sub ", gpoutfile); /* negate */
-    fprintf(gpoutfile,"cF%i Constrain exch ", abs(G));
+	fputs("1 exch sub ", gppsfile); /* negate */
+    fprintf(gppsfile,"cF%i Constrain exch ", abs(G));
     if (R<0 || G<0 || B<0)
-	fputs("\n\t", gpoutfile);
+	fputs("\n\t", gppsfile);
     if (B < 0)
-	fputs("1 exch sub ", gpoutfile); /* negate */
-    fprintf(gpoutfile,"cF%i Constrain ", abs(B));
-    fputs("\n       SelectSpace setrgbcolor} bind def\n", gpoutfile);
-    fputs("  } ifelse\n", gpoutfile);
-    fputs("}{\n", gpoutfile);
-    fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
-    fputs("} ifelse\n", gpoutfile);
+	fputs("1 exch sub ", gppsfile); /* negate */
+    fprintf(gppsfile,"cF%i Constrain ", abs(B));
+    fputs("\n       SelectSpace setrgbcolor} bind def\n", gppsfile);
+    fputs("  } ifelse\n", gppsfile);
+    fputs("}{\n", gppsfile);
+    fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gppsfile);
+    fputs("} ifelse\n", gppsfile);
 #undef R
 #undef G
 #undef B
@@ -2904,7 +2909,7 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	double b = (double)(colorspec->lt & 255) / 255.;
 	PS_FLUSH_PATH;
-	fprintf(gpoutfile, "%3.2f %3.2f %3.2f C ",r,g,b);
+	fprintf(gppsfile, "%3.2f %3.2f %3.2f C ",r,g,b);
     }
 
     if (colorspec->type != TC_FRAC)
@@ -2913,12 +2918,12 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 /* map [0;1] to gray/colors */
     gray = colorspec->value;
     if (gray <= 0)
-	fputs("0 g ", gpoutfile);
+	fputs("0 g ", gppsfile);
     else {
 	if (gray >= 1)
-	    fputs("1 g ", gpoutfile);
+	    fputs("1 g ", gppsfile);
 	else
-	    fprintf(gpoutfile, "%s g ", save_space(gray));
+	    fprintf(gppsfile, "%s g ", save_space(gray));
     }
     PS_relative_ok = FALSE; /* "M" required because "g" forces stroke (??) */
 }
@@ -2939,8 +2944,8 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	/* Special case for pm3d surface quadrangles
 	 *  <x0> <y0> ... <x4> <y4> h
 	 */
-	    fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
-	    fprintf(gpoutfile, " %i %i %i %i %i %i h\n",
+	    fprintf(gppsfile, "%i %i N", corners[0].x, corners[0].y);
+	    fprintf(gppsfile, " %i %i %i %i %i %i h\n",
 	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
 	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
 	    corners[1].x-corners[0].x, corners[1].y-corners[0].y);
@@ -2948,10 +2953,10 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	/* General case for solid or pattern-filled polygons
 	 * gsave <x0> <y0> N <x1> <y1> ... <xn> <yn> density PolyFill
 	 */
-	fprintf(gpoutfile, "gsave ");
-	fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
+	fprintf(gppsfile, "gsave ");
+	fprintf(gppsfile, "%i %i N", corners[0].x, corners[0].y);
 	for (i = 1; i < points; i++)
-	    fprintf(gpoutfile, " %i %i V",
+	    fprintf(gppsfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
 
 	switch(style & 0xf) {
@@ -2961,9 +2966,9 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	    if(filldens < 0.0)
 		filldens = 0.0;
 	    if(filldens >= 1.0)
-		fprintf(gpoutfile, " 1 PolyFill\n");
+		fprintf(gppsfile, " 1 PolyFill\n");
 	    else
-		fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
+		fprintf(gppsfile, " %.2f PolyFill\n", filldens);
 	    break;
 	    
 	case FS_PATTERN:
@@ -2971,20 +2976,20 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 	    pattern = (style >> 4) % 8;
 	    if (pattern == 0)  {
 		filldens = 0.5;
-		fprintf(gpoutfile, " %.1f PolyFill\n", filldens);
+		fprintf(gppsfile, " %.1f PolyFill\n", filldens);
 	    } else {
-		fprintf(gpoutfile," gsave 1 setgray fill grestore Pattern%d fill grestore\n", pattern);
+		fprintf(gppsfile," gsave 1 setgray fill grestore Pattern%d fill grestore\n", pattern);
 	    }
 	    break;
 #else
 	    filldens = (style >> 4) % 8;
 	    filldens = 0.125 * (filldens + 1);
-	    fprintf(gpoutfile, " %.2f PolyFill\n", filldens);
+	    fprintf(gppsfile, " %.2f PolyFill\n", filldens);
 	    break;
 #endif
 
 	default:
-	    fprintf(gpoutfile, " 1 PolyFill\n");
+	    fputs(" 1 PolyFill\n", gppsfile);
 	    break;
 
 	}
@@ -2997,7 +3002,7 @@ TERM_PUBLIC void PS_previous_palette()
 {
     /* Needed to stroke the previous graphic element. */
     PS_FLUSH_PATH;
-    fprintf(gpoutfile, "grestore %% colour palette end\n");
+    fputs("grestore % colour palette end\n", gppsfile);
 }
 
 #endif /* PM3D */
@@ -3015,10 +3020,10 @@ TERM_PUBLIC void PS_arrow (
 {
     do_arrow( sx, sy, ex, ey, head );
     if (!ps_solid && head != 0) {
-	fprintf(gpoutfile, "/SaveState Solid def /Solid true def\n");
+	fputs("/SaveState Solid def /Solid true def\n", gppsfile);
 	PS_linetype(PS_linetype_last-3);
 	do_arrow( sx, sy, ex, ey, -head );
-	fprintf(gpoutfile, "/Solid SaveState def\n");
+	fputs("/Solid SaveState def\n", gppsfile);
 	PS_linetype(PS_linetype_last-3);
     }
 }
@@ -3115,10 +3120,10 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
     else if (bits_per_component > 2)
         bits_per_component = 4;
 
-    fprintf(gpoutfile, "%%%%BeginImage\n");
-    fprintf(gpoutfile, "gsave\n");
-    fprintf(gpoutfile, "%d %d translate\n", corner[0].x, corner[0].y);
-    fprintf(gpoutfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
+    fputs("%%%%BeginImage\n", gppsfile);
+    fputs("gsave\n", gppsfile);
+    fprintf(gppsfile, "%d %d translate\n", corner[0].x, corner[0].y);
+    fprintf(gppsfile, "%d %d scale\n", (corner[1].x - corner[0].x), (corner[1].y - corner[0].y));
 
     /* Color and gray scale images do not need a palette and can use
      * the 5 operand form of the image routine.  For other types of
@@ -3127,10 +3132,10 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
      */
     if ((color_mode == IC_RGB) || (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)) {
 
-	fprintf(gpoutfile, "%d %d %d\n", M, N, bits_per_component);
-	fprintf(gpoutfile, "[ %d 0 0 %d 0 0 ]\n", M, N);
-	fprintf(gpoutfile, "currentfile /ASCII85Decode filter\n");
-	if (color_mode == IC_RGB) {fprintf(gpoutfile, "false 3\n");}
+	fprintf(gppsfile, "%d %d %d\n", M, N, bits_per_component);
+	fprintf(gppsfile, "[ %d 0 0 %d 0 0 ]\n", M, N);
+	fprintf(gppsfile, "currentfile /ASCII85Decode filter\n");
+	if (color_mode == IC_RGB) {fprintf(gppsfile, "false 3\n");}
 
     }
     else {
@@ -3139,8 +3144,8 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	unsigned short i_tuple;
 	double fact = 1.0 / (double)(max_colors-1);
 
-	fprintf(gpoutfile, "%%%%BeginPalette\n");
-	fprintf(gpoutfile, "[ /Indexed\n  /DeviceRGB %d\n  <", (max_colors-1));
+	fputs("%%%%BeginPalette\n", gppsfile);
+	fprintf(gppsfile, "[ /Indexed\n  /DeviceRGB %d\n  <", (max_colors-1));
 
 #define TUPLES_PER_LINE 8
 
@@ -3148,24 +3153,28 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	    double gray = (double) allocated * fact;
 	    rgb255_color color;
 	    rgb255maxcolors_from_gray( gray, &color );
-	    if (!i_tuple) { fprintf(gpoutfile,"\n  "); i_tuple = TUPLES_PER_LINE; }
-	    fprintf(gpoutfile," %2.2x%2.2x%2.2x", (int)color.r, (int)color.g, (int)color.b);
+	    if (!i_tuple) { fprintf(gppsfile,"\n  "); i_tuple = TUPLES_PER_LINE; }
+	    fprintf(gppsfile," %2.2x%2.2x%2.2x", (int)color.r, (int)color.g, (int)color.b);
 	}
 
-	fprintf(gpoutfile,"\n  >\n] setcolorspace\n");
-	fprintf(gpoutfile, "%%%%EndPalette\n");
-	fprintf(gpoutfile, "<<\n  /ImageType 1\n  /Width %d\n  /Height %d", M, N);
-	fprintf(gpoutfile, "\n  /BitsPerComponent %d\n  /ImageMatrix [ %d 0 0 %d 0 0 ]", bits_per_component, M, N);
-	fprintf(gpoutfile, "\n  /Decode [ 0 %d ]", ((1<<bits_per_component)-1));
-	fprintf(gpoutfile, "\n  /DataSource currentfile /ASCII85Decode filter");
-	fprintf(gpoutfile, "\n  /MultipleDataSources false");
-	fprintf(gpoutfile, "\n  /Interpolate false\n>>\n");
+	fputs("\n  >\n] setcolorspace\n", gppsfile);
+	fputs("%%%%EndPalette\n", gppsfile);
+	fprintf(gppsfile, "<<\n  /ImageType 1\n  /Width %d\n  /Height %d", M, N);
+	fprintf(gppsfile,
+		"\n  /BitsPerComponent %d\n  /ImageMatrix [ %d 0 0 %d 0 0 ]",
+		bits_per_component, M, N);
+	fprintf(gppsfile, "\n  /Decode [ 0 %d ]", ((1<<bits_per_component)-1));
+	fputs("\n  /DataSource currentfile /ASCII85Decode filter", gppsfile);
+	fputs("\n  /MultipleDataSources false", gppsfile);
+	fputs("\n  /Interpolate false\n>>\n", gppsfile);
 
     }
 
-    fprintf(gpoutfile, "%%%%BeginData\n");
-    if (color_mode == IC_RGB) {fprintf(gpoutfile, "colorimage\n");}
-    else {fprintf(gpoutfile, "image\n");}
+    fputs("%%%%BeginData\n", gppsfile);
+    if (color_mode == IC_RGB)
+	fputs("colorimage\n", gppsfile);
+    else
+	fputs("image\n", gppsfile);
 
 #define ASCII_PER_LINE 78
 
@@ -3209,14 +3218,20 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 		PS_encode85(tuple4, tuple5);
 		tuple4 = 0;
 		for (i=0; i < 5; i++) {
-		    fprintf(gpoutfile,"%c",tuple5[i]+'!');
+		    fprintf(gppsfile, "%c", tuple5[i]+'!');
 		    i_line--;
-		    if (!i_line) {i_line = ASCII_PER_LINE; fputc('\n',gpoutfile);}
+		    if (!i_line) {
+			i_line = ASCII_PER_LINE;
+			fputc('\n', gppsfile);
+		    }
 		}
 	    } else {
-		fputc('z',gpoutfile);
+		fputc('z',gppsfile);
 		i_line--;
-		if (!i_line) {i_line = ASCII_PER_LINE; fputc('\n',gpoutfile);}
+		if (!i_line) {
+		    i_line = ASCII_PER_LINE;
+		    fputc('\n', gppsfile);
+		}
 	    }
 
 	    /* Now pick up any bits that may have not made it into the 4-tuple. */
@@ -3241,15 +3256,18 @@ PS_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolo
 	PS_encode85(tuple4, tuple5);
 	/* Write first n+1 bytes. */
 	for (i=0; i <= n; i++) {
-	    fprintf(gpoutfile,"%c",tuple5[i]+'!');
+	    fprintf(gppsfile,"%c",tuple5[i]+'!');
 	    i_line--;
-	    if (!i_line) {i_line = ASCII_PER_LINE; fputc('\n',gpoutfile);}
+	    if (!i_line) {
+		i_line = ASCII_PER_LINE;
+		fputc('\n',gppsfile);
+	    }
 	}
     }
 
-    fprintf(gpoutfile, "~>\n%%%%EndData\n");
-    fprintf(gpoutfile, "grestore\n");
-    fprintf(gpoutfile, "%%%%EndImage\n");
+    fputs("~>\n%%%%EndData\n", gppsfile);
+    fputs("grestore\n", gppsfile);
+    fputs("%%%%EndImage\n", gppsfile);
 
     return;
 }

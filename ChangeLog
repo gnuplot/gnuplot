@@ -1,5 +1,12 @@
 2005-01-08  Harald Harders  <h.harders@tu-bs.de>
 
+	* src/pm3d.c src/term.c src/term_api.h term/epslatex.trm term/post.trm
+	term/pslatex.trm: SF patch #1098252 "Use variable gppsfile for
+	postscript output". This patch uses the variable gppsfile (formerly
+	postscript_gpoutfile) instead of gpoutfile for all PostScript output.
+	This is very useful for terminals that produce two files where one of
+	them is PostScript (for example pslatex and epslatex).
+	 
 	* src/color.c src/pm3d.c src/term.c src/term_api.h term/epslatex.trm
 	term/post.trm term/pslatex.trm: SF patch [ 1098249 ] "Rename
 	postscript_gpoutfile to gppsfile". This patch renames the handler
