@@ -382,10 +382,7 @@ gnuplot: $(OBJS) version.o
 gnuplot_x11: gplt_x11.o stdfn.o
 	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
 
-docs/allterm.h: $(CORETERM)
-	cat $(T)*.trm > docs/allterm.h
-
-doc: docs/allterm.h
+doc:
 	cd docs && $(MAKE) $(MFLAGS) gnuplot.gih
 
 demo/binary1 demo/binary2 demo/binary3: bf_test
