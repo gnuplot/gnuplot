@@ -1,4 +1,24 @@
+1999-01-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h: Remove APOLLO, GPR, UNIXPC.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Cleanup up --enable options.
+
+	* parse.c, plot.c: Use symbol APOLLO instead of apollo.
+
+	* syscfg.h: Define APOLLO and UNIXPC.
+
 1999-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, acconfig.h, configure.in, gplt_x11.c, makefile.all,
+	stdfn.h: Use improved AC_FUNC_SELECT by Steve Robbins
+	<steve@nyongwa.montreal.qc.ca> instead of AC_FUNC_SELECT_ARGTYPES.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* m4/select.m4: Bugfixed version of Steve Robbins' macro.
 
 	* Makefile.in: Add contents of new lisp subdir.
 
@@ -17,7 +37,7 @@
 
 1999-01-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* 0README: Take out part about now defunct ftpmail service.
+	* 0README: Remove entry about now defunct ftpmail service.
 
 1999-01-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
