@@ -122,11 +122,9 @@ extern int Pause(LPSTR mess);	/* in winmain.c */
 #endif
 
 #ifdef OS2
- /* emx has getcwd, chdir that can handle drive names */
-# define chdir  _chdir2
-extern int PM_pause(char *);	/* term/pm.trm */
-extern int ExecuteMacro(char *, int);	/* plot.c */
-extern TBOOLEAN CallFromRexx;	/* plot.c */
+extern int PM_pause(char *);            /* term/pm.trm */
+extern int ExecuteMacro(char *, int);   /* plot.c */
+extern TBOOLEAN CallFromRexx;           /* plot.c */
 #endif /* OS2 */
 
 #ifdef VMS
@@ -581,7 +579,7 @@ static int command()
 		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file, strlen(sv_file));
+		gp_expand_tilde(&sv_file);
 		save_functions(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
@@ -589,7 +587,7 @@ static int command()
 		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file, strlen(sv_file));
+		gp_expand_tilde(&sv_file);
 		save_variables(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
@@ -597,12 +595,12 @@ static int command()
 		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file, strlen(sv_file));
+		gp_expand_tilde(&sv_file);
 		save_set(fopen(sv_file, "w"));
 	    }
 	} else if (isstring(c_token)) {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file, strlen(sv_file));
+	    gp_expand_tilde(&sv_file);
 	    save_all(fopen(sv_file, "w"));
 	} else {
 	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
@@ -613,7 +611,7 @@ static int command()
 	    int_error(c_token, "expecting filename");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file, strlen(sv_file));
+	    gp_expand_tilde(&sv_file);
 	    /* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
 	     * DBT 10/6/98 handle stdin as special case
 	     * passes it on to load_file() so that it gets
@@ -629,7 +627,7 @@ static int command()
 	    int_error(c_token, "expecting filename");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file, strlen(sv_file));
+	    gp_expand_tilde(&sv_file);
 	    /* Argument list follows filename */
 	    load_file(loadpath_fopen(sv_file, "r"), sv_file, TRUE);
 	    /* input_line[] and token[] now destroyed! */
@@ -661,7 +659,7 @@ static int command()
 	    int_error(c_token, "expecting directory name");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file, strlen(sv_file));
+	    gp_expand_tilde(&sv_file);
 	    if (changedir(sv_file)) {
 		int_error(c_token, "Can't change to this directory");
 	    }
@@ -759,6 +757,8 @@ char *path;
 
 #elif defined(WIN32)
     return !(SetCurrentDirectory(path));
+#elif defined(__EMX__) && defined(OS2)
+    return _chdir2(path);
 #else
     return chdir(path);
 #endif /* MSDOS, ATARI etc. */
