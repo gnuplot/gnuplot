@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.86 2003/03/03 07:06:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.87 2003/03/04 05:18:23 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -103,6 +103,7 @@ static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
 /*}}} */
 
 /*{{{  static fns and local macros */
+static void plot_border __PROTO((void));
 static void plot_impulses __PROTO((struct curve_points * plot, int yaxis_x, int xaxis_y));
 static void plot_lines __PROTO((struct curve_points * plot));
 static void plot_points __PROTO((struct curve_points * plot));
@@ -1198,32 +1199,9 @@ do_plot(plots, pcount)
     axis_draw_2d_zeroaxis(SECOND_Y_AXIS,SECOND_X_AXIS);
 
 /* DRAW PLOT BORDER */
-    if (draw_border) {
-	/* HBB 980609: just in case: move over to border linestyle only
-	 * if border is to be drawn */
-	term_apply_lp_properties(&border_lp);	/* border linetype */
-	(*t->move) (xleft, ybot);
-	if (border_south) {
-	    (*t->vector) (xright, ybot);
-	} else {
-	    (*t->move) (xright, ybot);
-	}
-	if (border_east) {
-	    (*t->vector) (xright, ytop);
-	} else {
-	    (*t->move) (xright, ytop);
-	}
-	if (border_north) {
-	    (*t->vector) (xleft, ytop);
-	} else {
-	    (*t->move) (xleft, ytop);
-	}
-	if (border_west) {
-	    (*t->vector) (xleft, ybot);
-	} else {
-	    (*t->move) (xleft, ybot);
-	}
-    }
+    if (draw_border)
+	plot_border();
+
 /* YLABEL */
     if (*axis_array[FIRST_Y_AXIS].label.text) {
 	apply_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
@@ -1625,6 +1603,10 @@ do_plot(plots, pcount)
 /* DRAW TICS AND GRID */
     if (grid_layer == 1)
 	place_grid();
+
+/* REDRAW PLOT BORDER */
+    if (draw_border)
+	plot_border();
 
 /* PLACE LABELS */
     place_labels( first_label, 1 );
@@ -4018,8 +4000,29 @@ const char *what;
 }
 /*}}} */
 
-
-
-
-
-
+static void
+plot_border()
+{
+	term_apply_lp_properties(&border_lp);	/* border linetype */
+	(*term->move) (xleft, ybot);
+	if (border_south) {
+	    (*term->vector) (xright, ybot);
+	} else {
+	    (*term->move) (xright, ybot);
+	}
+	if (border_east) {
+	    (*term->vector) (xright, ytop);
+	} else {
+	    (*term->move) (xright, ytop);
+	}
+	if (border_north) {
+	    (*term->vector) (xleft, ytop);
+	} else {
+	    (*term->move) (xleft, ytop);
+	}
+	if (border_west) {
+	    (*term->vector) (xleft, ybot);
+	} else {
+	    (*term->move) (xleft, ybot);
+	}
+}

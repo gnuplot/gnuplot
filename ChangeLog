@@ -1,3 +1,9 @@
+2003-03-07  Ethan Merritt <merritt@u.washington.edu>
+
+	* graphics.c: Filled boxes can obscure the x-axis (see for
+	example fillstyle.dem); fix this by retracing the axes at
+	the end of plotting.
+
 2003-03-06  Wilhelm Braunschober  <Wilhelm.Braunschober@t-online.de>
 
 	* term/svg.trm (SVG_fixed_size): New configuration variable.
