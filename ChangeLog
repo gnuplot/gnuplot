@@ -11,9 +11,11 @@
 	* configure.in: Add options for MGR and RGIP. Define APOLLO if MGR
  	is defined. Add IRIS to configuration report.
 
+	* docs/gnuplot.doc: Small patch from Dick Crawford.
+
 	* graphics.c(boundary): Another margin calculation bug fix by HBB.
 
-	* parse.c: Change #ifdef statement.
+	* parse.c: Change #ifdef statement, remove __osf__.
 
 	* term.h: Cleaning up, better readability.
 
