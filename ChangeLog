@@ -1,3 +1,10 @@
+2005-03-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* config/makefile.amg config/term_pc.h docs/Makefile.in sec/makefile.all:
+	Remove dependencies involving table.trm.
+
+	* term/table.trm: Remove this file.
+
 2005-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot2d.c (eval_plots): Add a missing #ifdef EAM_DATASTRINGS

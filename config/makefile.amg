@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.9 2002/03/07 16:13:03 lhecking Exp $
+# $Id: makefile.amg,v 1.10 2002/04/30 13:40:18 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -150,7 +150,7 @@ CSOURCE6 = $(TERMDIR)/gpic.trm $(TERMDIR)/gpr.trm $(TERMDIR)/grass.trm \
 CSOURCE7 = $(TERMDIR)/pm.trm $(TERMDIR)/png.trm $(TERMDIR)/post.trm \
 	   $(TERMDIR)/pslatex.trm $(TERMDIR)/pstricks.trm $(TERMDIR)/qms.trm \
 	   $(TERMDIR)/regis.trm $(TERMDIR)/rgip.trm $(TERMDIR)/sun.trm \
-	   $(TERMDIR)/t410x.trm $(TERMDIR)/table.trm $(TERMDIR)/tek.trm \
+	   $(TERMDIR)/t410x.trm $(TERMDIR)/tek.trm \
 	   $(TERMDIR)/texdraw.trm $(TERMDIR)/tgif.trm $(TERMDIR)/tkcanvas.trm \
 	   $(TERMDIR)/tpic.trm $(TERMDIR)/unixpc.trm $(TERMDIR)/unixplot.trm \
 	   $(TERMDIR)/v384.trm $(TERMDIR)/vws.trm $(TERMDIR)/win.trm \

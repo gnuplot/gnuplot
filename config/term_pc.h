@@ -1,5 +1,5 @@
 /*
- * $Id: term_pc.h,v 1.3 2004/04/13 17:23:30 broeker Exp $
+ * $Id: term_pc.h,v 1.4 2004/07/01 17:10:02 broeker Exp $
  *
  */
 
@@ -60,7 +60,6 @@
 # include "dumb.trm"		/* dumb terminal */
 # include "post.trm"		/* postscript */
 # include "regis.trm"		/* regis graphics */
-# include "table.trm"		/* built-in, but used for the documentation */
 # include "tek.trm"		/* a Tek 4010 and others including VT-style */
 # ifdef X11
 #  include "x11.trm"		/* x Window system */
@@ -331,9 +330,6 @@
 
 /* QMS laser printers */
 /* #include "qms.trm" */
-
-/* built-in, but used for the documentation */
-#include "table.trm"
 
 /* x11 tgif tool */
 /* #include "tgif.trm" */
