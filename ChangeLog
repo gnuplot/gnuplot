@@ -1,25 +1,41 @@
+2003-12-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/tables.h (enum set_id): Renamed parser constant S_OUTPUT to
+	SET_OUTPUT, in order to avoid collision with MacOS X 10.3 system
+	headers.
+
+	* src/tables.c (set_tbl): Likewise.
+
+	* src/set.c (set_command): Likewise.
+
+	* src/unset.c (unset_command): Likewise.
+
+	* src/show.c (show_command): Likewise.
+
 2003-12-01  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/command.c src/history.c docs/gnuplot.doc: New option "history
-	quiet" to suppress enumeration of history entries (helps cut&paste).
+	* src/command.c src/history.c docs/gnuplot.doc: New option
+	"history quiet" to suppress enumeration of history entries (helps
+	cut&paste).
 
 2003-11-30  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/post.trm src/term_api.h src/term.c:
-	Move enhanced text mode parsing and processing from post.trm to the
-	gnuplot core. This requires 3 new entries in TERM_TABLE for any
-	terminal driver that wants to share the enhanced text code. The
-	behaviour of the postscript terminal is unaffected by this change.
+	* term/post.trm src/term_api.h src/term.c: Move enhanced text mode
+	parsing and processing from post.trm to the gnuplot core. This
+	requires 3 new entries in TERM_TABLE for any terminal driver that
+	wants to share the enhanced text code. The behaviour of the
+	postscript terminal is unaffected by this change.
 	
-	* src/gplt_x11.c term/dumb.trm term/gd.trm term/pdf.trm term/x11.trm
-	NEWS: Add enhanced text mode support to four additional drivers. The
-	implementation in dumb.trm is intended as sample code for extending
-	enhanced text mode support to other drivers.
+	* src/gplt_x11.c term/dumb.trm term/gd.trm term/pdf.trm
+	term/x11.trm NEWS: Add enhanced text mode support to four
+	additional drivers. The implementation in dumb.trm is intended as
+	sample code for extending enhanced text mode support to other
+	drivers.
 
 2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* docs/gnuplot.doc: Get documentation for 'palette gray' and 'palette
-	gamma' close together.
+	* docs/gnuplot.doc: Get documentation for 'palette gray' and
+	'palette gamma' close together.
 
 2003-11-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -31,22 +47,23 @@
 
 2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/os2/gclient.c: Fixed vertical and horizontal shifts associated
-	to text angles.
+	* src/os2/gclient.c: Fixed vertical and horizontal shifts
+	associated to text angles.
 
 2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* tables.c: Moved definition of test_tbl[] out of #ifdef PM3D.
 
-	* command.c (test_palette_subcommand): Reworked 'test palette' to use
-	only one temporary file.
+	* command.c (test_palette_subcommand): Reworked 'test palette' to
+	use only one temporary file.
 
 2003-11-25  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c term/x11.trm: Clean up code to remove compiler 
+	* src/gplt_x11.c term/x11.trm: Clean up code to remove compiler
 	warnings.
 
-	* src/parse.h src/unset.c: Export a prototype for cleanup_udvlist().
+	* src/parse.h src/unset.c: Export a prototype for
+	cleanup_udvlist().
 
 	* src/command.c: Include "getcolor.h" for rgb1_to_gray prototype.
 
