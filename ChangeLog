@@ -8,6 +8,7 @@
         * src/graphics.c src/save.c src/set.c src/show.c docs/gnuplot.doc
         demo/fillbox.dem demo/candlesticks.dem demo/candlesticks.dat:
         Add new filledbox style options 'bsolid' and 'bpattern'.
+	Draw filledbox style in key rather than a line.
 
 2002-08-30  Volker Dobler  <v.dobler@web.de>
 
@@ -1034,7 +1035,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/30 18:45:44 $).
+	last modification date (from the tag $Date: 2002/08/30 20:25:49 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

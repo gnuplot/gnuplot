@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.72 2002/08/25 15:13:53 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.73 2002/08/30 20:18:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1409,13 +1409,38 @@ do_plot(plots, pcount)
 		    (*t->linetype)(this_plot->lp_properties.l_type); 
 
 		/* draw sample depending on bits set in plot_style */
+#if USE_ULIG_FILLEDBOXES
+		if (this_plot->plot_style == FILLEDBOXES && *t->fillbox) {
+		    int style;
+		    switch(fillstyle) {
+		    	case 1:
+		    	case 3:  style = (filldensity << 4) + 1; break;
+		    	case 2:
+		    	case 4:  style = (fillpattern << 4) + 2; break;
+			default: style = 0;
+		    }
+		    (*t->fillbox)( style,
+		    		  xl + key_sample_left, yl - key_entry_height/4, 
+				  key_sample_right - key_sample_left,
+				  key_entry_height/2);
+		    if (fillstyle == 3 || fillstyle == 4)
+		    	(*t->linetype)(LT_BLACK);
+		    (*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
+		    (*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
+		    (*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
+		    (*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
+		    (*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
+		    if (fillstyle == 3 || fillstyle == 4)
+		    	(*t->linetype)(this_plot->lp_properties.l_type);
+		} else
+#endif
 		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
 		    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 			&& this_plot->plot_type == DATA)) {
 		    /* errors for data plots only */
 		    (*t->move) (xl + key_sample_left, yl);
 		    (*t->vector) (xl + key_sample_right, yl);
-		}
+		} 
 		/* oops - doing the point sample now breaks postscript
 		 * terminal for example, which changes current line style
 		 * when drawing a point, but does not restore it.
@@ -2686,15 +2711,13 @@ plot_boxes(plot, xaxis_y)
                      * values to the range 0...4095, which seems
                      * acceptable. */
                     switch( fillstyle ) {
-                    case 1:
-                    case 3:
-			/* style == 1 --> solid fill with 'filldensity' */
+                    case 1: /* solid fill */
+                    case 3: /* solid fill with border */
 			fillpar = filldensity;
 			style = ((fillpar & 0xfff) << 4) + (1 & 0xf);
                         break;
-                    case 2:  
-                    case 4:  
-			/* style == 2 --> pattern fill with 'fillpattern' */
+                    case 2: /* pattern fill */
+                    case 4: /* pattern fill with border */
 			fillpar = fillpattern;
 			style = ((fillpar & 0xfff) << 4) + (2 & 0xf);
                         break;
