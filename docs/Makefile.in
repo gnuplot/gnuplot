@@ -65,7 +65,7 @@ allterm.h :
 	cat $(srcdir)/../term/*.trm > allterm.h
 
 # for debugging
-alldoc: checkdoc dvi gnuplot.ps hlp html info ipf ms nroff rnh rtf
+alldoc: check dvi gih hlp html info ipf ms nroff ps rnh rtf
 
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
@@ -86,7 +86,7 @@ gnuplot.nroff: gnuplot.ms titlepag.ms
 	      tbl | neqn | nroff -ms | col > gnuplot.nroff ; \
 	fi
 
-### # doc2xxx dependencies
+### doc2xxx dependencies
 ms: gnuplot.ms
 
 gnuplot.ms: doc2ms $(srcdir)/gnuplot.doc
@@ -98,7 +98,7 @@ doc2ms: doc2ms.o termdoc.o
 doc2ms.o: doc2ms.c
 	$(COMPILE) -DALL_TERM_DOC -c $<
 
-# html
+### html
 html : gnuplot.html
 
 gnuplot.html : doc2html $(srcdir)/gnuplot.doc
@@ -106,6 +106,9 @@ gnuplot.html : doc2html $(srcdir)/gnuplot.doc
 
 doc2html : doc2html.o termdoc.o xref.o
 	$(LINK) doc2html.o termdoc.o xref.o $(LDFLAGS) $(LIBS)
+
+doc2html.o: doc2html.c
+	$(COMPILE) -DALL_TERM_DOC -c $<
 
 ### LaTeX documentation
 tex: gnuplot.tex
@@ -137,7 +140,7 @@ gnuplot.ps: gnuplot.dvi
 	$(DVIPS) gnuplot.dvi -o gnuplot.ps
 
 gpcard.ps: gpcard.dvi
-	$(DVIPS) gpcard
+	$(DVIPS) gpcard.dvi -o gpcard.ps
 
 
 # this is how to make gnuplot.hlp
@@ -171,7 +174,7 @@ doc2info: doc2info.o termdoc.o xref.o
 ipf: gnuplot.ipf
 
 gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
-	./doc2ipf $(srcdir)/gnuplot.doc gnulpot.ipf
+	./doc2ipf $(srcdir)/gnuplot.doc gnuplot.ipf
 
 doc2ipf: doc2ipf.o termdoc.o xref.o
 	$(LINK) doc2ipf.o termdoc.o xref.o $(LIBS)
@@ -209,29 +212,6 @@ checkdoc: checkdoc.o termdoc.o
 checkdoc.o: checkdoc.c
 	$(COMPILE) -DALL_TERM_DOC -c $<
 
-# Dependencies
-# solaris make seems to require explicit mention of the source .c file
-
-# all doc2somethings depend on termdoc and either ../term.h or
-# allterm.h, maybe this would be better as separate object file
-# (but then we have to change all the other makefiles). Plus then
-# we cannot make some doc2* filters use allterm.h and others use term.h
-
-TERM_H = $(srcdir)/../term.h
-
-doc2gih.o  : doc2gih.c  $(TERM_H)
-doc2hlp.o  : doc2hlp.c  $(TERM_H)
-doc2html.o : doc2html.c allterm.h
-doc2info.o : doc2info.c $(TERM_H)
-doc2ipf.o  : doc2ipf.c  $(TERM_H)
-doc2ms.o   : doc2ms.c   allterm.h
-doc2rtf.o  : doc2rtf.c  $(TERM_H)
-doc2rnh.o  : doc2rnh.c  $(TERM_H)
-doc2tex.o  : doc2tex.c  allterm.h
-checkdoc.o : checkdoc.c allterm.h
-termdoc.o  : termdoc.c  $(TERM_H)
-xref.o     : xref.c xref.h
-
 # For Unix and MSDOS only
 install: gnuplot.gih
 	$(INSTALL_DATA) gnuplot.gih $(datadir)/gnuplot.gih
@@ -243,20 +223,19 @@ uninstall:
 install-vms: gnuplot.hlp
 	$(INSTALL_DATA) gnuplot.hlp $(datadir)/gnuplot.hlp
 
-# remove all derived files
-# HBB: added allterm.h to the list:     
 clean:
-	rm -f doc2ms gnuplot.nroff gnuplot.ms \
-              doc2tex gnuplot.tex gnuplot.dvi \
-              gnuplot.aux gnuplot.log gnuplot.toc \
-              gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
-              doc2hlp gnuplot.hlp \
-              doc2html gnuplot.html \
-              doc2gih gnuplot.gih \
-              doc2rnh gnuplot.rnh \
-              doc2rtf gnuplot.rtf \
-              checkdoc *.o core a.out allterm.h \
-              doc2info gnuplot.info* gpltinfo.tex
+	rm -f doc2tex gnuplot.tex gnuplot.dvi \
+	  gnuplot.aux gnuplot.log gnuplot.toc \
+	  gnuplot.ps gpcard.dvi gpcard.log gpcard.ps \
+	  doc2gih gnuplot.gih \
+	  doc2hlp gnuplot.hlp \
+	  doc2html gnuplot.html \
+	  doc2info gnuplot.info* gpltinfo.tex \
+	  doc2ipf gnuplot.ipf \
+	  doc2ms gnuplot.ms \
+	  doc2rnh gnuplot.rnh \
+	  doc2rtf gnuplot.rtf \
+	  gnuplot.nroff checkdoc *.o core a.out allterm.h
 	( cd latextut; $(MAKE) clean )
 
 mostlyclean: clean
@@ -269,5 +248,39 @@ realclean: distclean
 
 .c.o:
 	$(COMPILE) -c $<
+
+### Dependencies - do not edit!
+
+# all doc2somethings depend on termdoc and either ../term.h or
+# allterm.h, maybe this would be better as separate object file
+# (but then we have to change all the other makefiles). Plus then
+# we cannot make some doc2* filters use allterm.h and others use term.h
+
+TERM_H = $(srcdir)/../term.h
+
+checkdoc.o: checkdoc.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h allterm.h
+doc2gih.o: doc2gih.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2hlp.o: doc2hlp.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2html.o: doc2html.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h allterm.h
+doc2info.o: doc2info.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2ipf.o: doc2ipf.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2ms.o: doc2ms.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h allterm.h
+doc2rnh.o: doc2rnh.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2rtf.o: doc2rtf.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
+doc2tex.o: doc2tex.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h allterm.h
+termdoc.o: termdoc.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h
+xref.o: xref.c $(srcdir)/../config.h $(srcdir)/../ansichek.h \
+		$(srcdir)/../stdfn.h doc2x.h xref.h
 
 #the end
