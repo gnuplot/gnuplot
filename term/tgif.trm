@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.25 2004/07/01 17:10:34 broeker Exp $ */
+/* $Id: tgif.trm,v 1.26 2004/09/16 00:22:31 sfeam Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -394,7 +394,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.25 2004/07/01 17:10:34 broeker Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.26 2004/09/16 00:22:31 sfeam Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -1486,16 +1486,12 @@ TGIF_set_pointsize(double size)
 TERM_PUBLIC int
 TGIF_set_font(const char *font)
 {
-    char name[32];
-    int size;
-    size_t sep;
-
-    sep = strcspn(font, ",");
-    strncpy(name, font, sep);
-    name[sep] = NUL;
-    size = uActFontSize;
-    sscanf(&(font[sep + 1]), "%d", &size);
-    uActFontSize = size;
+    int sep = strcspn(font, ",");
+    if (sep > 0) {
+	strncpy(sActFont, font, sep);
+	sActFont[sep] = NUL;
+    }
+    sscanf(&(font[sep + 1]), "%d", &uActFontSize);
     return TRUE;
 }
 

@@ -2,6 +2,11 @@
 
 	* term/gd.trm: Change #ifdef GD2_VERS to #if (GD2_VERS >= 2) everywhere.
 
+	* term/emf.trm (EMF_set_font) term/tgif.trm (TGIF_set_font):
+	Fix longstanding problems with the set_font routines;
+	interpret font requests of the form ",<size>" as a request to rescale
+	the current font to <size>.
+
 2004-09-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* demo/all.dem:  Remove vector.dem again, since it turns out that it

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.22 2004/09/09 12:13:05 lhecking Exp $
+ * $Id: emf.trm,v 1.23 2004/09/16 05:22:03 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -605,15 +605,11 @@ EMF_graphics()
 TERM_PUBLIC int 
 EMF_set_font(const char *font)
 {
-    int sep;			/* hope this function exist everywhere... */
-
     if (font && *font) {
-	char *comma = strchr(font, ',');
-	if (comma == NULL)
-	    return FALSE;	/* bad format */
-	sep = comma - font;
-	safe_strncpy(emf_fontname, font, GPMIN(sep + 1, 32));
-	emf_fontsize = atoi(&font[sep + 1]);
+	int sep = strcspn(font,",");
+	if (sep > 0)
+	    safe_strncpy(emf_fontname, font, GPMIN(sep + 1, 32));
+	sscanf(font+sep+1, "%d", &emf_fontsize);
     } else {
 	strcpy(emf_fontname, emf_defaultfontname);
 	emf_fontsize = emf_defaultfontsize;
