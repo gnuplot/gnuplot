@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.11 1999/08/24 11:24:52 lhecking Exp $
+ * $Id: amiga.trm,v 1.12 2002/02/21 12:27:37 lhecking Exp $
  *
  */
 
@@ -285,6 +285,7 @@ AMIGA_options()
 	case AMI_WINDOW:
 	    AMIGA_window_mode = TRUE;
 	    c_token++;
+	    break;
 	case AMI_OTHER:
 	default:
 	    /* Font name */
@@ -469,7 +470,7 @@ AMIGA_init()
 
     if (AMIGA_window_mode != TRUE) {
 	char *name =  NULL;
-	assert(AMIGA_FontName != NULL);
+/*	assert(AMIGA_FontName != NULL); */
 	/* should even do for ridiculously large FontSize :) */
 	name = AllocMem(AMIGA_FontNameLen + 1 + INT_STR_LEN + 1,0);
 	if (name == NULL)
