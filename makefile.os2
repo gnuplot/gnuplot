@@ -116,7 +116,7 @@ OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 # Special note: -ffloat-store is necessary to avoid some
 # strange behaviour (confirmed for gcc 2.7.x and graphics.c)
 EMXSPECIFIC = -ffloat-store \
-	      -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
+	      -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H -DHAVE_SLEEP
 LIBS = 
 ifdef GNU_RL
   EMXSPECIFIC += -DHAVE_LIBREADLINE
