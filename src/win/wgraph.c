@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.8 2001/01/16 20:19:36 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.9 2001/02/05 11:36:37 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -51,10 +51,10 @@ static char *RCSid = "$Id: wgraph.c,v 1.8 2001/01/16 20:19:36 broeker Exp $";
 #include <windows.h>
 #include <windowsx.h>
 #if WINVER >= 0x030a
-#include <commdlg.h>
+#  include <commdlg.h>
 #endif
 #ifndef __MSC__
-#include <mem.h>
+# include <mem.h>
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -63,16 +63,68 @@ static char *RCSid = "$Id: wgraph.c,v 1.8 2001/01/16 20:19:36 broeker Exp $";
 #include "wcommon.h"
 #include "term_api.h"         /* for enum JUSTIFY */
 #ifdef USE_MOUSE
-#include "gpexecute.h"
+# include "gpexecute.h"
+# include "mouse.h"
 #endif
 #ifdef PM3D
-#include "color.h"
-#include "getcolor.h"         /* HBB 20001204: use new header */
+# include "color.h"
+# include "getcolor.h"         /* HBB 20001204: use new header */
 #endif
 
 LRESULT CALLBACK WINEXPORT WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 void ReadGraphIni(LPGW lpgw);
+
+#ifdef USE_MOUSE
+
+/* Petr Mikulik, February 2001
+ * Declarations similar to src/os2/gclient.c -- see section
+ * "//PM: Now variables for mouse" there in.
+ */
+
+/* If wgnuplot crashes during redrawing and mouse on, then this could help:
+ */
+// static char lock_mouse = 1;
+
+// Do not react to mouse in the event handler, and avoid some crashes:
+#if 1
+# define IGNORE_MOUSE 0
+#else
+# define IGNORE_MOUSE (mouse_setting.on==0 || lock_mouse)
+#endif
+
+/* Structure for the ruler: on/off, position,...
+ */
+static struct {
+   int on;
+   int x, y;  /* ruler position */
+} ruler = {0,0,0,};
+
+/* Structure for zooming
+ */
+struct {
+	int on;  // set to 1 during zooming
+	POINTL from, to; // corners
+} zoombox = { 0 };
+
+/* Pointer definition --- NOT YET IMPLEMENTED IN WINDOWS */
+// HWND hptrDefault, hptrCrossHair, hptrScaling, hptrRotating, hptrZooming, hptrCurrent;
+
+/* Mouse support routines */
+
+/* New functions related to the mouse processing */
+static void     GetMousePosViewport ( HWND hwnd, int *mx, int *my, LPARAM lParam );
+static void     DisplayStatusLine ( void );
+static void     UpdateStatusLine ( const char text[] );
+static void	DrawRuler ( void );
+static void     DrawZoomBox ( void );
+
+void wgraph_set_ruler(int x, int y, char *s);
+
+// TO ACCESS THE SCREEN (???????)
+HDC mouse_hdc;
+
+#endif
 
 /* ================================== */
 
@@ -179,8 +231,8 @@ GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPSTR str)
 {
     struct GWOPBLK *this;
     struct GWOP FAR *gwop;
-	char *npstr;
-	
+    char *npstr;
+
 	this = lpgw->gwopblk_tail;
 	if ( (this==NULL) || (this->used >= GWOPMAX) ) {
 		/* not enough space so get new block */
@@ -608,6 +660,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	if (lpgw->locked) 
 		return;
 
+#ifdef USE_MOUSE
+	/* Petr: is this good place for this?????? OR ANOTHER SOLUTION? @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	 */
+	mouse_hdc = hdc;
+#endif
  	isColor= (GetDeviceCaps(hdc, PLANES)*GetDeviceCaps(hdc,BITSPIXEL)) > 2;
 	if (lpgw->background != RGB(255,255,255) && lpgw->color && isColor) {
 		SetBkColor(hdc,lpgw->background);
@@ -1605,7 +1662,91 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HMENU sysmenu;
 	int i;
 
+#ifdef USE_MOUSE
+	int mx, my;
+	GetMousePosViewport(hwnd,&mx,&my, lParam);
+#endif
+			
 	lpgw = (LPGW)GetWindowLong(hwnd, 0);
+
+	// mouse events first
+	if (mouse_setting.on /* AND NOT mouse_lock */ ) {
+		switch (message) {
+			case WM_MOUSEMOVE:
+#ifdef POINTERS_ie_ICONs_FOR_POINTERS__are_IMPLEMENTED //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#if 1
+				WinSetPointer( HWND_DESKTOP, hptrCurrent );
+#else
+				WinSetPointer( HWND_DESKTOP, hptrCrossHair );
+#endif
+#endif
+				if (zoombox.on) {
+					DrawZoomBox(); // erase current zoom box
+					zoombox.to.x = mx; zoombox.to.y = my;
+					DrawZoomBox(); // draw new zoom box
+				}
+				// track (show) mouse position -- send the event to gnuplot
+				gp_exec_event ( GE_motion, mx, my, 0, 0 );
+				return 0L; // end of WM_MOUSEMOVE
+
+			case WM_LBUTTONDOWN:
+				gp_exec_event ( GE_buttonpress, mx, my, 1, 0 );
+				return 0L;
+
+			case WM_RBUTTONDOWN:
+				gp_exec_event ( GE_buttonpress, mx, my, 3, 0 );
+				return 0L;
+
+			case WM_MBUTTONDOWN:
+				gp_exec_event ( GE_buttonpress, mx, my, 2, 0 );
+				return 0L;
+
+			case WM_LBUTTONDBLCLK:
+				gp_exec_event ( GE_buttonrelease, mx, my, 1, 0 ); // Note: 9999 should be replaced by time!
+				return 0L;
+
+			case WM_RBUTTONDBLCLK:
+				gp_exec_event ( GE_buttonrelease, mx, my, 3, 9999 );
+				return 0L;
+
+			case WM_MBUTTONDBLCLK:
+				gp_exec_event ( GE_buttonrelease, mx, my, 2, 9999 );
+				return 0L;
+
+#if 1
+			case WM_LBUTTONUP:
+#else
+			case WM_LBUTTONCLICK:
+#endif
+				gp_exec_event ( GE_buttonrelease, mx, my, 1, 9999 );
+				return 0L;
+
+#if 1
+			case WM_RBUTTONUP:
+#else
+			case WM_RBUTTONCLICK:
+#endif
+				gp_exec_event ( GE_buttonrelease, mx, my, 3, 9999 );
+				return 0L;
+
+#if 1
+			case WM_MBUTTONUP:
+#else
+			case WM_MBUTTONCLICK:
+#endif
+				gp_exec_event ( GE_buttonrelease, mx, my, 2, 9999 );
+				return 0L;
+
+		} // switch over mouse events
+	}
+
+
+/* @@@@@@@@@@@@@@@@ SHOUDL BE ADDED BELOW:
+ 
+WM_MOUSEMOVE: set default pointer, i.e.:
+	WinSetPointer( HWND_DESKTOP, hptrDefault ); // set default pointer
+	return 0L;
+*/
 
 	switch(message)
 	{
@@ -1646,7 +1787,7 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				BringWindowToTop(lpgw->lptw->hWndParent);
 #ifdef USE_MOUSE
 			} else {
-			    gp_exec_event ( GE_keypress, 0 /*mx*/, 0 /*my*/, wParam, 0);
+			    gp_exec_event ( GE_keypress, mx, my, wParam, 0);
 #endif
 			}
 			return 0;			
@@ -1788,3 +1929,242 @@ WndGraphProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+#ifdef USE_MOUSE
+/* Implemented by Petr Mikulik, February 2001 --- the best Windows solutions 
+ * come from OS/2 :-)) 
+ */
+
+/* Firstly: terminal calls from win.trm 
+ */
+
+/* set_cursor(int c, int x, int y) term API
+ */
+void WDPROC Graph_set_cursor ( int c, int x, int y )
+{
+    fprintf(stderr,"wgraph.c: Graph_set_cursor() NOT YET UNIMPLEMENTED\n");
+    switch (c) {
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+	    case -2: { // move mouse to the given point
+#if 0 // just copied from os2/gclient.c:
+			     RECTL rc;
+			     POINTL pt;
+			     GpiQueryPageViewport(hpsScreen,&rc);
+			     rc.xRight -= rc.xLeft; rc.yTop -= rc.yBottom; // only distance is important
+			     // window => pixels coordinates
+			     pt.x = (long int)((x*(double)rc.xRight) / 19500.0);
+			     pt.y = (long int)((x*(double)rc.yTop) / 12500.0);
+			     WinMapWindowPoints( hApp, HWND_DESKTOP, &pt, 1);
+			     WinSetPointerPos( HWND_DESKTOP, pt.x, pt.y);
+#endif
+		     }
+		     break;
+	    case -1: // start zooming; zooming cursor
+		     zoombox.on = 1;
+		     zoombox.from.x = zoombox.to.x = x;
+		     zoombox.from.y = zoombox.to.y = y;
+		     break;
+	    case 0:  // standard cross-hair cursor
+#if 0 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+		     WinSetPointer( HWND_DESKTOP, hptrCurrent = (mouse_setting.on ? hptrCrossHair : hptrDefault) );
+#endif
+		     break;
+	    case 1:  // cursor during rotation
+#if 0 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrRotating);
+#endif
+		     break;
+	    case 2:  // cursor during scaling
+#if 0 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrScaling );
+#endif
+		     break;
+	    case 3:  // cursor during zooming
+#if 0 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+		     WinSetPointer( HWND_DESKTOP, hptrCurrent = hptrZooming );
+#endif
+		     break;
+    }
+    if (c>=0 && zoombox.on) { /* erase zoom box */
+	    DrawZoomBox();
+	    zoombox.on = 0;
+    }
+}
+	
+/* set_ruler(int x, int y) term API: x<0 switches ruler off.
+ */
+void WDPROC Graph_set_ruler ( int x, int y )
+{
+	DrawRuler(); // remove previous drawing, if any
+	if (x < 0) {
+		ruler.on = 0;
+		return;
+	}
+	ruler.on = 1;
+	ruler.x = x; ruler.y = y;
+	DrawRuler(); // draw ruler at new positions
+}
+
+/* put_tmptext(int i, char c[]) term API 
+ * 	i: 0..at statusline
+ *	1, 2: at corners of zoom box with \r separating text
+ */
+void WDPROC Graph_put_tmptext ( int where, const char text[] )
+{
+    fprintf(stderr,"wgraph.c: Graph_put_tmptext() NOT YET UNIMPLEMENTED\n");
+    /* Position of the annotation string (mouse movement) or zoom box 
+     * text or whatever temporary text added...
+     */
+    switch (where) {
+	    case 0: UpdateStatusLine(text);
+		    break;
+	    case 1: // not implemented - see x11.trm how to do it
+		    break;
+	    case 2: // not implemented - see x11.trm how to do it
+		    break;
+    }
+}
+
+void WDPROC Graph_set_clipboard ( const char s[] )
+{
+    fprintf(stderr,"wgraph.c: Graph_set_clipboard() NOT YET UNIMPLEMENTED\n");
+    fprintf(stderr,"          If OK then text \"%s\" is now in clipboard\n",s);
+}
+
+/* Secondly, mouse-supporting routines.
+ */
+
+/*
+ * This routine gets the mouse/pointer position in the current window and
+ * recalculates it to the viewport coordinates.
+ */
+
+static void GetMousePosViewport ( HWND hwnd, int *mx, int *my, LPARAM lParam )
+{
+//!!!!!!! NOT FULLY IMPLEMENTED ---- SEE pm.trm HOW IT CAN BE DONE
+
+	// According to win.trm:
+	#define WIN_XMAX (24000)
+	#define WIN_YMAX (18000)
+	
+	POINT pt;
+	RECTL rc;
+
+	GetClientRect(hwnd,&rc);
+	rc.right -= rc.left; // only distance is important
+	rc.bottom -= rc.top; 
+
+// Choose a method where from to get the coordinates:
+#if 1
+	GetCursorPos(&pt);
+	ScreenToClient(hwnd,&pt);
+	*mx = pt.x;
+	*my = pt.y;
+#else
+	*mx = LOWORD(lParam);
+	*my = HIWORD(lParam);
+#endif
+	// px=px(mx); mouse=>gnuplot driver coordinates
+	*mx = (int)(*mx * (double)WIN_XMAX / rc.right + 0.5);
+	*my = (int)(*my * (double)WIN_YMAX / rc.bottom + 0.5);
+
+//!!! Write debug file to see the result...
+//!!! SEE THERE: BAD NUMBER IS IF MOUSE COMES OUT / COMES INSIDE THE VIEWPORT (WINDOWS) ?!!
+//!!! THUS WOULD IT BE BETTER TO USE  GetCursorPos + ScreenToClint instead of lParam?
+//!!! Well --- this is the way it is done in OS/2.
+//!!! ACTUALLY - we should not need cursor pos if mouse is outside viewport =>
+//!!! so we will seen when everything else works...
+{ FILE *f=fopen("deb","a");
+fprintf(f,"mx, my: %i %i\t", *mx, *my);
+fprintf(f,"viewport: %i %i\t", (int)LOWORD(lParam), (int)HIWORD(lParam));
+fprintf(f,"rect: %i %i\n", (int)rc.right, (int)rc.bottom);
+fclose(f);
+}
+
+}
+
+/* 
+ * Status line routines.
+ */
+
+/*
+ * Status line previous and current text:
+ */
+static char *sl_curr_text = NULL;
+
+/*
+ * Display the status line by the text
+ */
+static void DisplayStatusLine ( void /* HPS hps */ )
+{
+	if (!sl_curr_text) return; // no text to be displayed
+	fprintf(stderr, "DisplayStatusLine( at mouse_hps ) NOT YET IMPLEMENTED\n");
+#if 0 // from pm.trm
+	POINTL pt;
+	if (!sl_curr_text) return; // no text to be displayed
+	// GpiSetColor( hps, COLOR_MOUSE ); // set text color
+	// GpiSetCharMode(hps,CM_MODE1); // set char mode
+	pt.x = 2; // position the status line at coords (2,2) = lower left corner
+	pt.y = 2;
+	GpiSetMix(hps,FM_INVERT); // Set XOR = Invert pixels (i.e. no need to replot)
+	GpiCharStringAt(hps,&pt,(long)strlen(sl_curr_text),sl_curr_text);
+#endif
+}
+
+
+/*
+ * Update the status line by the text; firstly erase the previous text
+ */
+static void UpdateStatusLine ( const char text[] )
+{
+	DisplayStatusLine(); // erase previous text
+	free(sl_curr_text);
+	if (!text || !*text)
+		sl_curr_text = 0;
+	else { // display new text
+		sl_curr_text = strdup(text);
+		DisplayStatusLine();
+	}
+}
+
+/* Draw the ruler.
+ */
+static void DrawRuler (void)
+{
+	if (!ruler.on || ruler.x < 0) return;
+	fprintf(stderr,"DrawRuler(): trying to draw ruler at %i,%i - PLEASE REIMPLEMENT.\n",ruler.x,ruler.y);
+#if 0
+	// GpiSetColor( hpsScreen, COLOR_RULER );
+	GpiSetColor( hpsScreen, CLR_RED );
+	GpiSetLineWidth(hpsScreen, LINEWIDTH_THICK);
+	GpiSetMix(hpsScreen,FM_INVERT); // Draw it by inversion/XOR - no need for replot
+#endif
+	MoveTo(mouse_hdc, 0, ruler.y);
+	LineTo(mouse_hdc, 19500, ruler.y);
+	MoveTo(mouse_hdc, ruler.x, 0);
+	LineTo(mouse_hdc, ruler.x, 12500);
+	//GpiEndPath( hpsScreen ) ;
+	//GpiStrokePath( hpsScreen, 1, 0 ) ;
+}
+
+/* Draw the zoom box.
+ */
+static void DrawZoomBox ( void )
+{
+	if (!zoombox.on) return;
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2
+fprintf(stderr,"DrawZoomBox(): PLEASE IMPLEMENT.\n");
+#if 0
+// Copied from OS/2: draw a rectangle with short-dash linetype boundary in 
+// Invert/XOR mode.
+	GpiSetLineWidth(hpsScreen, LINEWIDTH_NORMAL);
+	GpiSetLineType(hpsScreen,LINETYPE_SHORTDASH);
+	GpiSetMix(hpsScreen,FM_INVERT);
+	GpiMove( hpsScreen, &zoombox.from) ;
+	GpiBox(hpsScreen, DRO_OUTLINE, &zoombox.to, 0,0 );
+	GpiSetLineType(hpsScreen,LINETYPE_DEFAULT);
+#endif
+}
+
+#endif /* USE_MOUSE */
+
+/* eof wgraph.c */

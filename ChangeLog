@@ -1,3 +1,9 @@
+2001-02-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/wgraph.c src/win/wgnuplib.h term/win.trm: partial
+	implementation of mouse support for Windows. It should be finished
+	according to my notes in the source code and on stderr.
+
 2001-02-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw, src/gpexecute.h, gpexecute.c, mousecmn.h,
