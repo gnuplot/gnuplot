@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.22 1999/08/24 11:24:56 lhecking Exp $
+ * $Id: png.trm,v 1.23 1999/10/01 15:12:19 lhecking Exp $
  *
  */
 
@@ -46,6 +46,7 @@
  *                      derived from pbm.trm by Russell Lang
  *
  *  Eric S. Raymond    update for pnglib-1.0.3; transparency.
+ *  H.-B. Broeker      fixes to Eric's changes
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
@@ -109,7 +110,7 @@ static int png_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 static png_color png_palette[WEB_N_COLORS];
 
 enum PNG_id {
-    PNG_TRANSPARENT,
+    PNG_TRANSPARENT, PNG_NOTRANSPARENT,
     PNG_SMALL, PNG_MEDIUM, PNG_LARGE,
     PNG_MONOCHROME, PNG_GRAY, PNG_COLOR,
     PNG_OTHER
@@ -118,6 +119,7 @@ enum PNG_id {
 static struct gen_table PNG_opts[] =
 {
     { "t$ransparent", PNG_TRANSPARENT },
+    { "not$ransparent", PNG_NOTRANSPARENT },
     { "s$mall", PNG_SMALL },
     { "me$dium", PNG_MEDIUM },
     { "l$arge", PNG_LARGE },
@@ -133,6 +135,7 @@ PNG_options()
 {
     png_font = 1; /* small */
     png_mode = 2; /* color */
+    png_transparent = 0;       /* use opaque image background */
 
     term_options[0] = NUL;
 
@@ -140,6 +143,8 @@ PNG_options()
 	switch(lookup_table(&PNG_opts[0],c_token)) {
 	case PNG_TRANSPARENT:
 	    png_transparent = 1;
+	case PNG_NOTRANSPARENT:
+	    png_transparent = 0;
 	case PNG_SMALL:
 	    png_font = 1;
 	    c_token++;
@@ -169,13 +174,20 @@ PNG_options()
 	    /* reset to default, since term is already set */
 	    png_font = 1;
 	    png_mode = 0;
-	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
+	    int_error(c_token, "expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color}");
 	    c_token++;
 	    break;
 	}
     }
 
     /* setup options string */
+
+    /* HBB 991008: moved this block to here, so 'transparent' gets
+     * printed out first. Don't print 'notransparent', for now, to
+     * protect older gnuplots. Scripts with 'transparent' in them
+     * won't work as wanted, with older versions, so put it here. */
+    if (png_transparent)
+	strcat(term_options, " transparent");
 
     switch (png_font) {
     case 3:
@@ -202,10 +214,6 @@ PNG_options()
 	strcat(term_options, " monochrome");
 	break;
     }
-
-    if (png_transparent)
-	strcat(term_options, " transparent");
-
 }
 
 
@@ -262,7 +270,7 @@ PNG_graphics()
 
     switch (png_mode) {
     case 2:
-	numplanes = 4;
+	numplanes = 8;
 	break;
     case 1:
 	numplanes = 3;
@@ -332,14 +340,13 @@ PNG_text()
     info_ptr->width = b_ysize;
     info_ptr->height = b_xsize;
 
-    info_ptr->bit_depth = png_mode == 0 ? 1 : 4;
+    info_ptr->bit_depth = png_mode == 0 ? 1 : 8;
     info_ptr->color_type = png_mode == 2 ? PNG_COLOR_TYPE_PALETTE :
 	PNG_COLOR_TYPE_GRAY;
     if (png_mode == 2) {
 	info_ptr->valid |= PNG_INFO_PLTE;
 	info_ptr->palette = png_palette;
 	info_ptr->num_palette = sizeof(png_palette)/sizeof(png_palette[0]);
-	fprintf (stderr, "DEBUG: no cols = %d\n", info_ptr->num_palette);
     }
     if (png_mode != 0) {
 	info_ptr->valid |= PNG_INFO_sBIT;
@@ -393,6 +400,7 @@ PNG_text()
 
     /* dump bitmap in raster mode */
     for (x = b_xsize - 1; x >= 0; x--) {
+#if 0
 	row = (b_ysize / 8) - 1;
 	for (j = row; j >= 0; j--) {
 	    mask = 0x80;
@@ -422,10 +430,14 @@ PNG_text()
 		if (png_mode == 1)
 		    value = 7 - value;
 
-		prow[(row - j) * 8 + i] = (png_byte) value;
+		prow[(row - j) * 8 + i] = (png_byte) (value & 0xFF) ;
 		mask >>= 1;
 	    }
 	}
+#else
+	for (j=b_ysize - 1; j>= 0; j--)
+	    prow[j] = (png_byte)b_getpixel(j, x);
+#endif                                                      
 	png_write_rows(png_ptr, &prow, 1);
     }
 
@@ -451,13 +463,27 @@ PNG_linetype(linetype)
 int linetype;
 {
     switch (png_mode) {
+    /* HBB 991008: this makes the grid lines and axes (-1) look the
+     * same as the borders (-2). That's ugly, IMHO. GIF uses a
+     * dashed line, for this, but libpng doesn't seem able to do
+     * that. But a look into the palette turns up that color 2
+     * is grey, and is currently unused... Let's see: */
     case 2:
+#if 0
 	if (linetype == -1 || linetype == -2)
 	    linetype = 1;
+#else
+	if (linetype == -2)
+	    linetype = 1;
+	else if (linetype == -1)
+	    linetype = 2;
+#endif
 	else {
+	    /* HBB 991008: moved the += 3 down, so colors 0, 1, 2 are
+	     * _not_ used by the regular plots, as it should be */
+	    if (linetype >= (WEB_N_COLORS - 3))
+		linetype %= (WEB_N_COLORS - 3);
 	    linetype += 3;
-	    if (linetype >= WEB_N_COLORS)
-		linetype %= WEB_N_COLORS;
 	}
 	b_setvalue(linetype);
 	break;
