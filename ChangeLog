@@ -1,4 +1,4 @@
-2003-04-13  Ethan Merritt  <merritt@u.washington.edu>
+2004-04-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm: If gnuplot_x11 dies, or fails to start, then make
 	sure all locks on the [now defunct] pipe are cleared.
@@ -53,7 +53,7 @@
 	to be C standard compliant and survive running on Linux/AMD64.
 	(Fixes SF bug #932162).
 	
-2003-04-08  Ethan Merritt  <merritt@u.washington.edu>
+2004-04-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c: Revert patch from 2003-05-10 "Allow <tab>
 	characters in input stream." This broke filename auto- completion
