@@ -1,3 +1,64 @@
+1998-11-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove entry for manual key placement in hidden3d splot.
+	Add open file handles inheritance entry as suggested by Alexander Mai.
+
+	* ChangeLog: Reorganised.
+
+	* command.c(do_line): Skip leading spaces in input. Change both
+	versions of read_line() to replace the continuation character
+	(backslash) with a space.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Add test for memmove().
+
+	* errorfix.sh: Simplified. Only creates temporary copies of files
+	to be fixed, not of all files.
+
+	* plot.c(main): Fix compiler warnings.
+
+	* stdfn.c: Move memcpy definition to stdfn.h.
+
+	* stdfn.h, syscfg.h: Add definitions for memcpy and memmove.
+
+	* term/ai.trm, term/regis.trm: Add missing TERM_TABLE_END.
+
+1998-11-19  Lucas Hart  <hartl@ucs.orst.edu> 
+
+	* ansichek.h: Undefine HAVE_STRINGIZE for VAXC.
+
+	* command.c: Fixes for VMS and !NO_GIH, do_system() line truncation
+	when called from load_file(), comments.
+
+	* syscfg.h: Remove declarations that cause duplicate warnings.
+
+	* term.c: Avoid duplicate warnings from VMS headers.
+
+	* vms.c: Remove some duplicate header file inclusions.
+
+	* docs/doc2rnh.c: Add single_top_level, convert '/' in topic to
+	'|' because VMS HELP uses '/' as a list separator.
+
+1998-11-19  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Extensive patches to fix minor misspellings,
+	makes all references "time/date" (instead of some being "date/time"),
+	removes some blanks from the ends of lines, add commands synonyms.
+
+	* term/*.trm: Add command synonyms to all terminals.
+
+1998-11-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Merge in patch from Lucas Hart <hartl@ucs.orst.edu>
+	to make fit.log and screen output match the documentation.
+	Cleaning up.
+
+	* graph3d.c(key_sample_line): Fix core dump if key is manually placed.
+
+	* graphics.c, plot2d.c: Merge in polar errorbars patch from
+	Igor Bray <I.Bray@flinders.edu.au>.
+
 1998-11-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Updated with latest awk script for contour line clipping
@@ -16,8 +77,7 @@
 
 	* gplt_x11.c: Re-add inclusion of config.h at top.
 
-	* parse.c, term/corel.trm, term/epson.trm, term/fig.trm, term/mif.trm,
-	term/next.trm, term/pbm.trm, term/png.trm, term/win.trm: Indentation.
+	* parse.c: Indentation.
 
 	* set.c: Fix typos.
 
@@ -31,8 +91,7 @@
 	* 0BUGS: Added description of m[]tics initialisation bug, from
 	Lucas Hart <hartl@ucs.orst.edu>. Changed hidden3d entry and line
 	clipping entry as suggested by HBB. Add error bars in polar plots
-	entry, from Stefan Deutscher <stefand@ibm.net>. Revised entry for
-	contour clipping by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+	entry, from Stefan Deutscher <stefand@ibm.net>.
 
 	* ansichek.h: Use #ifndef HAVE_CONFIG_H for systems which don't
 	run configure.
@@ -41,26 +100,28 @@
 
 	* configure.in: Add comment at top. Don't define ANSI_C.
 
-	* graph3d.c(do_3dplot): If "set contour; set nosurface; set noclabel"
-	is used, the items in the key will overwrite one another if more than
-	one function or file is plotted. Bugfix by Don Taber
-	<dtaber@blackrat.risc.rockwell.com>
-	
-	* help.c, term.c: Patch to pipe 'set terminal' output through pager
-	by Don Taber <dtaber@blackrat.risc.rockwell.com>.
-
 	* misc.c: Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 	to read DOS files under Unix.
 
 	* plot.h: Comment out LP_DEFAULT. Don't use ANSI_C.
 
-	* plot3d.c(printd_3dtable): Add space between "label:" and label in
-	output, patch by Don Taber <dtaber@blackrat.risc.rockwell.com>.
-
 	* protos.h: Updated prototypes for help.c and term.c
 
 	* set.c: New function reset_lp_properties. Replaces LP_DEFAULT
 	initialisation, get's rid of ANSI_C.
+
+1998-11-17  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* 0BUGS: Revised entry for contour lines clipping bug.
+
+	* graph3d.c(do_3dplot): If "set contour; set nosurface; set noclabel"
+	is used, the items in the key will overwrite one another if more than
+	one function or file is plotted.
+	
+	* help.c, term.c: Patch to pipe 'set terminal' output through pager.
+
+	* plot3d.c(printd_3dtable): Add space between "label:" and label in
+	output.
 
 1998-11-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -90,26 +151,31 @@
 
 	* 0BUGS: Add description and workaround for pslatex driver bug.
 
-	* interpol.c: Bugfix for 'smooth acsplines' option with logarithmic
-	x axis by Konrad Bernloehr <bernlohr@ik3.fzk.de>.
+1998-11-15  Konrad Bernloehr  <bernlohr@ik3.fzk.de>
 
-	* stdfn.c(safe_strncpy): Bugfix by Lucas Hart <hartl@ucs.orst.edu>.
+	* interpol.c: Bugfix for 'smooth acsplines' option with logarithmic
+	x axis.
+
+1998-11-15  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* stdfn.c(safe_strncpy): Bugfix.
 
 1998-11-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Document new `--enable-system-time' configure option
 	and fixes.
 
-	* gplt_x11.c: Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
-	for OS/2 to close open files on first initialisation.
-
-	* makefile.os2: Patches by Alexander Mai.
-
 	* set.c(set_two): Skip leading whitespace in argument to 'set output'.
 
 	* specfun.c: Fix #ifdef directive. Reported by Alexander Mai.
 
 	* docs/gnuplot.doc: Change 'set output' documentation accordingly.
+
+1998-11-09  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* gplt_x11.c: Close open files on first initialisation on OS/2.
+
+	* makefile.os2: Updated.
 
 1998-11-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -198,8 +264,7 @@
 
 	* eval.c, internal.c, interpol.c, plot3d.c, specfun.c: Fix indentation.
 
-	* graphics.c, set.c, docs/gnuplot.doc: set_tic_prop patch version b
-	by Lucas Hart <hartl@ucs.orst.edu>. Indentation.
+	* graphics.c, set.c: Indentation.
 
 	* help.c: Some cleanups. Use TBOOLEAN instead of boolean type and
 	remove tboolean. Fix indentation. Move tos_getch() prototype to
@@ -221,6 +286,10 @@
 	* term/gnugraph.trm: Add prototypes for GNU plotutils functions.
 
 	* term/mif.trm: Fix compiler warning (nested extern decl).
+
+1998-10-31  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* graphics.c, set.c, docs/gnuplot.doc: set_tic_prop patch version b.
 
 1998-10-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -265,9 +334,6 @@
 	Move Atari file inclusion to syscfg.h. Move Dblf* macros to fit.h.
 	Fix indentation.
 
-	* fit.c, fit.h, misc.c: Patch from Jochen Schuetze <jos@GBF.DE> to
-	save last fit command as comment.
-
 	* fit.h: Moved macros from fit.c. Move function prototypes to protos.h.
 
 	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
@@ -285,6 +351,10 @@
 	* term/amiga.trm, term/cgm.trm, term/djsvga.trm, term/grass.trm,
 	term/next.trm, term/post.trm, term/tgif.trm: Replace '\0' with NUL.
 
+1998-10-28  Jochen Schuetze  <jos@GBF.DE>
+
+	* fit.c, fit.h, misc.c: Save last fit command as comment.
+
 1998-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL, 0PORTING: Updated.
@@ -301,14 +371,17 @@
 
 	* configure.in: Move some tests, rewrite some header and library tests.
 
-	* fit.c: Fix bug in vector resizing of bigger than default data sets.
-	By Andris Pavenis <pavenis@lanet.lv>. Don't include config.h.
+	* fit.c: Don't include config.h.
 
 	* plot.h, stdfn.h: Move OS dependent defines to new file syscfg.h.
 
 	* plot2d.c: Fix typo in #define.
 
 	* syscfg.h: New file for OS dependencies.
+
+1998-10-20  Andris Pavenis  <pavenis@lanet.lv>
+
+	* fit.c: Fix bug in vector resizing of bigger than default data sets.
 
 1998-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -485,14 +558,12 @@
 
 	* docs/Makefile.in: Fix configuration variables.
 
+1998-10-08  Jochen Schuetze  <jos@GBF.DE>
+
 	* term/eepic.trm, term/latex.trm, term/pslatex.trm, term/tpic.trm:
-	Patch from Jochen Schuetze <jos@GBF.DE> to document free positioning
-	of labels feature.
+	Documentation for free positioning of labels feature.
 
 1998-10-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
-
-	* acinclude.m4: Use LIBS instead of LDFLAGS in gp_MSDOS. Patch by
-	Andris Pavenis <pavenis@lanet.lv>.
 
 	* aclocal.m4, configure: Regenerated.
 
@@ -505,21 +576,27 @@
 
 	* Makefile.in: Rename distdir.
 
+1998-10-07  Andris Pavenis  <pavenis@lanet.lv>
+
+	* acinclude.m4: Use LIBS instead of LDFLAGS in gp_MSDOS.
+
 1998-10-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Fix readline logic.
-
-	* makefile.os2: Patch from Alexander Mai
-	<st002279@hrzpub.tu-darmstadt.de>
 
 	* plot2d.c: Cleaning up, indentation.
 
 	* docs/gnuplot.doc: Corrections from Lucas Hart <hartl@ucs.orst.edu>.
 	Rename what's-new to new-features.
 
-	* term/eepic.trm, term/latex.trm, pslatex.trm, tpic.trm: Patch from
-	Jochen Schuetze <jos@GBF.DE> to support free positioning of labels
-	with LaTeX related terminals.
+1998-10-06  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* makefile.os2: Updated.
+
+1998-10-06  Jochen Schuetze  <jos@GBF.DE>
+
+	* term/eepic.trm, term/latex.trm, pslatex.trm, tpic.trm: Support
+	free positioning of labels with LaTeX related terminals.
 
 1998-10-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -664,8 +741,10 @@
 
 	* util.c: Indentation, add braces.
 
+1998-09-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* docs/ps/ps_guide.ps: Add page numbers to enable browsing with ps
-	viewers. Patch from Petr Mikulik <mikulik@physics.muni.cz>.
+	viewers.
 
 1998-09-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -675,13 +754,13 @@
 	* term/sun.trm(local_notice_destroy): Comment out assignment to
 	non-existent variable term_init.
 
-1998-09-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-09-25  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
-	* 0INSTALL, makefile.os2: Some patches from Alexander Mai
- 	<st002279@hrzpub.tu-darmstadt.de>.
+	* 0INSTALL, makefile.os2: OS/2 related patches.
 
-	* command.c, plot.c: DJGPP patches from Andris Pavenis
-	<pavenis@lanet.lv>.
+1998-09-25  Andris Pavenis  <pavenis@lanet.lv>
+	
+	* command.c, plot.c: Patches to compile with DJGPP.
 
 1998-09-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -708,7 +787,7 @@
 	
 	* stdfn.h: Add missing stat macros for WIN32 and AMIGA_SC_6_1.
 
-	* term/x11.trm: VMS diffs by Lucas Hart <hartl@ucs.orst.edu>.
+	* term/x11.trm: VMS patch by Lucas Hart <hartl@ucs.orst.edu>.
 
 	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
 
@@ -760,9 +839,6 @@
 
 	* os2/gclient.h: Move #include <math.h> to top.
 
-	* term/post.trm: Enhpost psfonts scale patch by Dick Crawford
-	<rccrawford@lanl.gov>.
-
 	* readline.c: Patch by Petr Mikulik to not store duplicated
 	history entries. Indentation and comments cleanup.
 
@@ -770,6 +846,10 @@
 	term/metafont.trm, term/mgr.trm, term/mif.trm, term/multitos.trm,
 	term/pm.trm, term/table.trm, term/win.trm, term/xlib.trm: Add
 	comments and RCS id.
+
+1998-09-22  Dick Crawford  <rccrawford@lanl.gov>
+
+	* term/post.trm: Enhpost psfonts scale patch.
 
 1998-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -793,24 +873,34 @@
 	* CodeStyle: Amended.
 
 	* contour.c: Change some function signatures to avoid compiler
-	warnings. Add chk_contour_kind() by Lucas Hart <hartl@ucs.orst.edu>.
+	warnings.
 
 	* datafile.c: Rename some vars to avoid compiler warnings.
 
 	* help.c(LoadHelp,ShowSubtopics): Initialize pos.
 
-	* docs/doc2rnh.c: Add new putrnh_ function. Lucas Hart.
+	* contour.c, datafile.c, fit.c, graph3d.c, graphics.c, hidden3d.c,
+	internal.c, interpol.c, matrix.c, plot2d.c, plot3d.c, set.c, stdfn.c,
+	strftime.c, util3d.c: Cleanups.
+
+1998-09-20  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* contour.c: Add chk_contour_kind() function.
+
+	* docs/doc2rnh.c: Add new putrnh_() function.
 
 	* contour.c, datafile.c, fit.c, graph3d.c, graphics.c, hidden3d.c,
 	internal.c, interpol.c, matrix.c, plot2d.c, plot3d.c, set.c, stdfn.c,
-	strftime.c, util3d.c: Cleanups, VMS patches by Lucas Hart.
-
+	strftime.c, util3d.c: VMS patches
+	
 1998-09-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* command.c, plot.c, stdfn.h, os2/gclient.c: Patches to make 347pl2
-	compile under OS/2 by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
-
 	* version.c: Trim log entries for beta346.
+
+1998-09-19  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* command.c, plot.c, stdfn.h, os2/gclient.c: Patches to make 347pl2
+	compile under OS/2.
 
 1998-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -853,43 +943,38 @@
 
 	* term.h: Use X_DISPLAY_MISSING instead of X11.
 
-	* term/gif.h: Patch by REIBENSCHUH Alfred
-	<alfred.reibenschuh@cait.co.at>, more colours for gif terminal
-	(web216 standard).
-	
-1998-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-09-16  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
 
-	* term/gif.term: Patch from REIBENSCHUH Alfred
-	<alfred.reibenschuh@cait.co.at> to draw grids with the gdStyled
-	functions.
+	* term/gif.trm: More colours for gif terminal (web216 standard).
+
+1998-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/cgm.trm(CGM_graphics): Fix core dump with strlen(NULL).
 
-1998-09-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-09-15  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
 
-	* term/gif.term: Patch from REIBENSCHUH Alfred
-	<alfred.reibenschuh@cait.co.at> to prevent rotated labels from
-	extending into graph area.
+	* term/gif.term: Draw grids with the gdStyled functions.
 
-1998-09-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-09-02  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
 
-	* graphics.c: Patch from Dick Crawford to fix timestamp positioning.
+	* term/gif.term: Prevent rotated labels from extending into graph area.
+
+1998-09-01  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* graphics.c: Fix timestamp positioning.
 	
-	* term/post.trm: Patch from Dick Crawford to update help section to
-	new directory structure for postscript docs.
+	* term/post.trm: Update help section to	new directory structure
+	for postscript docs.
 
-1998-08-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-08-28  Rolf Niepraschk  <niepraschk@ChbRB.berlin.ptb.de>
 
-	* descrip.mms: Patch by Rolf Niepraschk
-	<niepraschk@ChbRB.berlin.ptb.de>.
+	* descrip.mms: Updated version.
 
-	* term/post.trm: Patch by Joji Maeda <jiji@ee.noda.sut.ac.jp> to
-	increase the number of dictionaries to 256.
+1998-08-28  Joji Maeda  <jiji@ee.noda.sut.ac.jp>
+
+	* term/post.trm: Increase the number of dictionaries to 256.
 
 1998-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
-
-	* gplt_x11.c, makefile.os2, os2/gclient.c, os2/print.c, term/pm.trm:
-	OS/2 fixes from Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
 
 	* Makefile.in, misc.c: Modified set angle patch from Juergen von Hagen
 	<vonHagen@engr.psu.edu>.
@@ -915,11 +1000,15 @@
 	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c,
 	docs/doc2rtf.c, docs/doc2tex.c: #undef TRUE and FALSE before
 	redefining it.
-	
-1998-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* datafile.c (df_tokenise): Fix bug in datafile reading speedup
-	patch. By HBB.
+1998-08-24  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* gplt_x11.c, makefile.os2, os2/gclient.c, os2/print.c, term/pm.trm:
+	OS/2 fixes.
+
+1998-08-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de> 
+
+	* datafile.c (df_tokenise): Fix bug in datafile reading speedup	patch.
 
 1998-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -935,17 +1024,21 @@
 	
 1998-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* term/hpljii.trm: Output file is opened in ASCII mode under DJGPP,
-	Windows. Fix by	Andris Pavenis <pavenis@lanet.lv>.
-
-	* hidden3d.c, makefile.dj2, makefile.tc, makefile.win, plot.h,
-	show.c, term/pc.trm, term/post.trm, win/wgnuplot.def, win/wtext.c:
-	hbbmisc.diffs.980813 patch set by HBB.
-
 	* Makefile.in: Forgot to add docs/ps to SUBDIRS. Remove duplicate
 	DOCS variable.
 
 	* Makefile.in, makefile.all: Remove $(S)ps_symbols.ps from DOCS4.
+
+1998-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* hidden3d.c, makefile.dj2, makefile.tc, makefile.win, plot.h,
+	show.c, term/pc.trm, term/post.trm, win/wgnuplot.def, win/wtext.c:
+	hbbmisc.diffs.980813 patch set.
+
+1998-08-17  Andris Pavenis  <pavenis@lanet.lv>
+
+	* term/hpljii.trm: Output file is opened in ASCII mode under DJGPP,
+	Windows.
 
 1998-08-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -985,18 +1078,18 @@
 
 	* Makefile.in: In Makefile target, change INCLUDES= to CPPFLAGS=.
 
-	* scanner.c: Add include files for VMS. Old patch by Lucas Hart
-	<hartl@ucs.orst.edu>.
-
 	* docs/*.c, docs/gnuplot.doc: Update copyright statement.
 
-	* docs/doc2rnh.c: New file, help file format for VMS. Old patch by
-	Lucas Hart <hartl@ucs.orst.edu>. Target was already in Makefile.in.
-
-	* vms.c: Include plot.h, make mbxbname static. Old patch by
-	Lucas Hart <hartl@ucs.orst.edu>.
-
 	* Makefile.in, makefile.all: Add doc2rnh.c to DOCS1 variable.
+
+1998-07-15  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* scanner.c: Add include files for VMS. Old patch.
+
+	* docs/doc2rnh.c: New file, help file format for VMS. Old patch.
+ 	Target was already in Makefile.in.
+
+	* vms.c: Include plot.h, make mbxbname static. Old patch.
 
 1998-07-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1010,7 +1103,8 @@
 
 	* configure.in: Set CPPFLAGS and X_LIBRARIES in test for X Window
 	System files. Remove test for -lnsl/-lsocket. Add code to cache
-	and use CPPFLAGS and TERMLIBS. Bug fix in libreadline test error msg.
+	and use CPPFLAGS and TERMLIBS. Bug fix in libreadline test error msg,
+	reported by Thomas Walter <walter@pctc.chemie.uni-erlangen.de>.
 
 	* configure: Regenerated.
 
@@ -1019,17 +1113,11 @@
 
 	* makefile.all: Add makefile.wc to ETC variable.
 
-	* makefile.nt: Portability patch by Stefan Schroepfer <scr@iis.fhg.de>.
+1998-07-14  Stefan Schroepfer  <scr@iis.fhg.de>
+
+	* makefile.nt: Portability patch.
 
 1998-07-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
-
-	* graphics.c, util3d.c: Grid clipping patch by HBB.
-
-	* datafile.c: Fortran numbers patch by HBB.
-
-	* 0PORTING, doc/gnuplot.doc, makefile.wc, national.h, stdfn.h,
-	term/pc.trm, term.c: DOS Watcom C port by Aurel Gabris
-	<gabrisa@valerie.inf.elte.hu>.
 
 	* configure.in: Change AC_PATH_X to AC_PATH_XTRA, add check
 	for snprintf().
@@ -1039,10 +1127,20 @@
 	* 0INSTALL, 0README: Additions, inspired by Lucas Hart 
 	<hartl@ucs.orst.edu>.
 
-1998-07-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-07-08  Aurel Gabris  <gabrisa@valerie.inf.elte.hu>
+
+	* 0PORTING, doc/gnuplot.doc, makefile.wc, national.h, stdfn.h,
+	term/pc.trm, term.c: DOS Watcom C port.
+
+1998-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c, util3d.c: Grid clipping patch.
+
+	* datafile.c: Fortran numbers patch.
+
+1998-07-02  Markus Dickebohm  <m.dickebohm@uni-koeln.de>
 
 	* gplt_x11.c: Change 0xffffffff to (unsigned long)(-1L).
-	Patch by Markus Dickebohm <m.dickebohm@uni-koeln.de>.
 
 1998-07-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1065,13 +1163,13 @@
 	* show.c: Add show_version_long(), and add 'version long' option
 	to parser.
 
-1998-06-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-06-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* fit.c, fit.h, matrix.c, matrix.h: Updated from HBB's hbbmisc
-	patch from 29-06-1998.
+	* fit.c, fit.h, matrix.c, matrix.h: Updated to hbbmisc	patch
+	from 29-06-1998.
 
 	* makefile.tc, makefile.win, misc.c, set.c, show.c, docs/gnuplot.doc,
-	win/wtext.h: updated from hbbmisc patch from 29-06-1998.
+	win/wtext.h: Updated to hbbmisc patch from 29-06-1998.
 
 	* graphics.c: hbbmisc patch minus write_multiline() hunk.
 
@@ -1086,18 +1184,20 @@
 
 1998-06-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* makefile.os2, plot.c, os2/gclient.c, term/pm.trm: OS/2 patches
-	by Roger Fearick <FEARICK@physci.uct.ac.za>.
-
 	* docs/termdoc.c: Use HAVE_CPP_STRINGIFY for ANSI_C.
+
+1998-06-29  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* makefile.os2, plot.c, os2/gclient.c, term/pm.trm: OS/2 patches.
 
 1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Imported beta 347.
 
+1998-06-23  Berthold Hoellmann  <hoel@Hamburg.GermanLloyd.de>
+
 	* Makefile.in: In term.o target, reverse order of $(INCLUDES) and
-	$(CPPFLAGS) to avoid problems with GNU plotutils. Fix by
-	Berthold Hoellmann <hoel@Hamburg.GermanLloyd.de>.
+	$(CPPFLAGS) to avoid problems with GNU plotutils.
 
 1998-06-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1125,23 +1225,23 @@
 
 	* Imported beta 345.
 
+	* docs/gnuplot.doc, term/post.trm: Fix typos.
+
+1998-06-16  Dick Crawford  <rccrawford@lanl.gov>
+
 	* docs/README, docs/doc2ms.c, docs/doc2tex.c, docs/gnuplot.doc,
 	docs/ps_guide.ps, term/cgm.trm, term/post.trm,term/x11.trm:
- 	Cleanup patches by Dick Crawford <rccrawford@lanl.gov>.
-
-	* docs/gnuplot.doc, term/post.trm: Fix typos.
+ 	Cleaning up.
 
 1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
 
-1998-05-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+1998-05-08  Dick Crawford  <rccrawford@lanl.gov>
 
 	* plot3d.c: Fix "title" option for "splot" under parametric mode.
-	By Dick Crawford <rccrawford@lanl.gov>.
 
 	* graphics.c, set.c, show.c: Margin calculation correction patch.
-	By Dick Crawford <rccrawford@lanl.gov>.
 
 1998-04-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -1192,45 +1292,49 @@
 
 1998-04-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* post.trm: Fix typos in Dick's term-340 patch.
+
+1998-04-13  Dick Crawford  <u600256@gamma.lanl.gov>
+
 	* atariaes.trm, atarivdi.trm, cgi.trm, cgm.trm, corel.trm, epson.trm,
 	fig.trm, linux.trm, next.trm, pbm.trm, pc.trm, pm.trm, png.trm,
 	post.trm, pslatex.trm, pstricks.trm, table.trm, tek.trm, texdraw.trm,
-	unixplot.trm, vws.trm, win.trm, x11.trm:
-	term-340.patch from Richard Crawford <u600256@gamma.lanl.gov>.
+	unixplot.trm, vws.trm, win.trm, x11.trm: term-340.patch.
 
-	* post.trm: Fix typos in Dick's term-340 patch.
+1998-04-13  "Glenn A. Horton-Smith"  <gas@SLAC.Stanford.EDU>
 
-	* scanner.c, util.c: Escape quotes patch
-	from Glenn A. Horton-Smith <gas@SLAC.Stanford.EDU>.
+	* scanner.c, util.c: Escape quotes patch.
 
-	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch
-	from Stephen Eglen <stephen@cns.ed.ac.uk>.
+1998-04-13  Stephen Eglen  <stephen@cns.ed.ac.uk>
 
-	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105 from
-	Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch.
+
+1998-04-13  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
 
 	* cgm.trm: Updated version, fixes "plot size change" bug, and "ugly
-	dashed lines" bug. From "James R. Van Zandt" <jrv@vanzandt.mv.com>.
+	dashed lines" bug.
 
-	* term/README: Documentation fix from
-	"James R. Van Zandt" <jrv@vanzandt.mv.com>.
+	* term/README: Documentation fix.
 
-	* fig.trm: Fix pointsize in fig terminal, from
-	Hans-Martin Keller <hkeller@gwdg.de>, and
-	Konrad Bernloehr <bernlohr@ik3.fzk.de>.
-
-	* hp500c.trm, hppj.trm, pbm.trm, png.trm: Fix changing plot size bug.
-	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
-
-	* fit.c: Fix segfault in fit.c (fit_chisq_undef.diff.980304).
-	From Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
+1998-04-13  Konrad Bernloehr  <bernlohr@ik3.fzk.de>
 
 	* command.c (define): Fix segfault where allocated structure
 	(action table) is freed twice.
-	From Konrad Bernloehr <bernlohr@ik3.fzk.de>
+
+	* fig.trm: Fix pointsize in fig terminal, together with
+	Hans-Martin Keller <hkeller@gwdg.de>.
+
+1998-04-13  Kai Poitschke  <kai.poitschke@henkel.de> 
 
 	* term.c (term_init): Memory allocation error fix.
-	From Kai Poitschke <kai.poitschke@henkel.de>.
+
+1998-04-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105.
+
+	* fit.c: Fix segfault in fit.c (fit_chisq_undef.diff.980304).
+
+	* hp500c.trm, hppj.trm, pbm.trm, png.trm: Fix changing plot size bug.
 
 1998-04-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
