@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    May 17, 2002
-;; Version:    0.5r
+;; Updated:    September 18, 2002
+;; Version:    0.5t
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -30,7 +30,7 @@
 ;; program's maintainer or write to: The Free Software Foundation,
 ;; Inc.; 675 Massachusetts Avenue; Cambridge, MA 02139, USA.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; send bug reports to the authors (ravel@phys.washington.edu)
+;; send bug reports to the author (ravel@phys.washington.edu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Commentary:
 ;;
@@ -270,8 +270,12 @@
 ;;        C-c C-c to comment-region and C-c C-o to the GUI, also make
 ;;        C-c C-l respect continuation lines
 ;;        April 12, 2002 <BR> added feature to trim length of gnuplot
-;;        process buffer  May 17 2002 Altered Makefile.in to install
-;;        .el files along with .elc files as suggested by <KG>
+;;        process buffer
+;;  0.5s  Jun 7 2002 <BR> Yet again changed how `comint-process-echos'
+;;        gets set.  It really needs to be nil on NTEmacs 21.1 or
+;;        comint gets stuck in an infinate loop.
+;;  0.5t  Sep 16 2002 <BR> Fixed a problem with C-c C-v jumping
+;;        forward 2 lines at a time
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty       <DB> (numerous corrections)
@@ -282,11 +286,11 @@
 ;;                            down the gnuplot process, improvement to
 ;;                            `gnuplot-send-line-and-forward')
 ;;    Robert Fenk       <RF> (suggested respecting continuation lines)
-;;    Kai Groﬂjohann    <KG> (install .el's with .elc's in Makefile.in)
 ;;    Michael Karbach   <MK> (suggested trimming the gnuplot process buffer)
 ;;    Alex Chan Libchen <AL> (suggested font-lock for plotting words)
 ;;    Kuang-Yu Liu      <KL> (pointed out buggy dependence on font-lock)
 ;;    Hrvoje Niksic     <HN> (help with defcustom arguments for insertions)
+;;    Andreas Rechtsteiner <AR> (pointed out problem with C-c C-v)
 ;;    Michael Sanders   <MS> (help with the info-look interface)
 ;;    Jinwei Shen       <JS> (suggested functionality in comint buffer)
 ;;    Michael M. Tung   <MT> (prompted me to add pm3d support)
@@ -364,13 +368,14 @@
 
 
 (defconst gnuplot-xemacs-p (string-match "XEmacs" (emacs-version)))
+(defconst gnuplot-ntemacs-p (string-match "msvc" (emacs-version)))
 (defvar   gnuplot-three-eight-p "")
 
 (defconst gnuplot-maintainer "Bruce Ravel")
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/")
-(defconst gnuplot-version "0.5r")
+(defconst gnuplot-version "0.5s")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -510,7 +515,7 @@ The values are
 		(const :tag "Separate window" window)
 		(const :tag "This window"     nil)))
 
-(defcustom gnuplot-echo-command-line-flag t
+(defcustom gnuplot-echo-command-line-flag (not gnuplot-ntemacs-p)
   "*This sets the fall-back value of `comint-process-echos'.
 If `gnuplot-mode' cannot figure out what version number of gnuplot
 this is, then the value of this variable will be used for
@@ -1723,6 +1728,7 @@ lines with only comments are skipped when moving forward."
     (while (> num 0)
       (setq end (gnuplot-send-line-to-gnuplot))
       (goto-char end)
+      (backward-char 1)			; <AR>
       (gnuplot-forward-script-line 1)
       (setq num (1- num)))))
 
@@ -1734,7 +1740,8 @@ Blank lines and commented lines are not included in the NUM count."
   (while (> num 0)
     (and (not (eobp)) (forward-line 1))
     (while (and (not (eobp))
-		(looking-at "^\\s-*\\(#\\|$\\)"))
+		(or (looking-at "^\\s-*$")
+		    (looking-at "^\\s-*#")))
       (forward-line 1))
     (setq num (1- num))) )
 
