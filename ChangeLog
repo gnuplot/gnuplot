@@ -1,3 +1,8 @@
+2002-03-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (zeroaxis): Add some examples to make the
+ 	syntax more transparent for newbies.
+
 2002-03-21  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2 src/os2/gclient.c: Get it to build again.
@@ -135,7 +140,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/21 15:12:55 $).
+	last modification date (from the tag $Date: 2002/03/21 21:46:13 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
