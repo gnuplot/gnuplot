@@ -1,3 +1,8 @@
+2002-05-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Explicit linking with libfreetype does not add
+	-lfreetype to TERMLIBS if successful.
+
 2002-05-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/internal.c (BAD_DEFAULT): Fix typo in message text:
@@ -521,7 +526,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/29 10:41:05 $).
+	last modification date (from the tag $Date: 2002/05/29 16:39:50 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
