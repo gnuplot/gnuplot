@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.98 2002/02/02 12:03:31 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.99 2002/02/13 17:59:35 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2174,10 +2174,11 @@ C ... and restart the table:
  Syntax:
        pause <time> {"<string>"}
 
- <time> may be any integer constant or expression.  Choosing -1 will wait
- until a carriage return is hit, zero (0) won't pause at all, and a positive
- integer will wait the specified number of seconds.  `pause 0` is synonymous
- with `print`.
+ <time> may be any constant or expression.  Choosing -1 will wait until a 
+ carriage return is hit, zero (0) won't pause at all, and a positive number
+ will wait the specified number of seconds.  The time is rounded to an integer
+ number of seconds if subsecond time resolution is not supported by the given
+ platform.  `pause 0` is synonymous with `print`. 
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending

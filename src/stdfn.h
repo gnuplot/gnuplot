@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.17 2002/02/04 11:53:34 lhecking Exp $
+ * $Id: stdfn.h,v 1.18 2002/02/14 14:20:17 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -331,11 +331,29 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 # endif
 #endif
 
+/* sleep delay time, where delay is a double value */
+#if defined(HAVE_USLEEP)
+#  define GP_SLEEP(delay) usleep((unsigned int) ((delay)*1e6))
+#  ifndef HAVE_SLEEP
+#    define HAVE_SLEEP
+#  endif
+#elif defined(__EMX__)
+#  define GP_SLEEP(delay) _sleep2((unsigned int) ((delay)*1e3))
+#  ifndef HAVE_SLEEP
+#    define HAVE_SLEEP
+#  endif
+#elif defined(WIN32)
+#  define GP_SLEEP(delay) Sleep((DWORD) 1000*(delay))
+#  ifndef HAVE_SLEEP
+#    define HAVE_SLEEP
+#  endif
+#endif
+
 #ifndef GP_SLEEP
 # ifdef __ZTC__
-#  define GP_SLEEP(delay) usleep ((unsigned long) (delay))
+#    define GP_SLEEP(delay) usleep ((unsigned long) (delay+0.5))
 # else
-#  define GP_SLEEP(delay) sleep ((unsigned int) (delay))
+#    define GP_SLEEP(delay) sleep ((unsigned int) (delay+0.5))
 # endif
 #endif
 

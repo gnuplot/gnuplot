@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.11 2001/08/22 11:53:19 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.12 2002/02/14 14:20:17 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -42,6 +42,12 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.11 2001/08/22 11:53:19 bro
  */
 
 #include "stdfn.h"
+
+#ifdef WIN32
+/* the WIN32 API has a Sleep function that does not consume CPU cycles */
+#include <windows.h>
+#endif
+
 
 /*
  * ANSI C functions
@@ -301,11 +307,6 @@ purec_sscanf(const char *string, const char *format,...)
 
 #ifdef AMIGA_SC_6_1
 #include <proto/dos.h>
-#endif
-
-#ifdef WIN32
-/* the WIN32 API has a Sleep function that does not consume CPU cycles */
-#include <windows.h>
 #endif
 
 unsigned int

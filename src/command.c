@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.55 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.56 2002/01/22 18:51:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -858,14 +858,15 @@ void
 pause_command()
 {
     struct value a;
-    int sleep_time, text = 0;
+    int text = 0;
+    double sleep_time;
     char *buf = gp_alloc(MAX_LINE_LEN+1, "pause argument");
 
     c_token++;
 
     *buf = NUL;
 
-    sleep_time = (int) real(const_express(&a));
+    sleep_time = real(const_express(&a));
     if (!(END_OF_COMMAND)) {
 	if (!isstring(c_token))
 	    int_error(c_token, "expecting string");
@@ -907,7 +908,7 @@ pause_command()
 	}
 #elif defined(_Macintosh)
 	if (strcmp(term->name, "macintosh") == 0 && sleep_time < 0)
-	    Pause(sleep_time);
+	    Pause( (int)sleep_time );
 #elif defined(MTOS)
 	if (strcmp(term->name, "mtos") == 0) {
 	    int MTOS_pause(char *buf);

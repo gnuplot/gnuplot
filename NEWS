@@ -38,6 +38,7 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
+* CHANGE pause supports subsecond time resolution (on systems supporting it)
 * NEW set log cb - since now, z and cb axes are completely independent
 * NEW set decimalsign
 * NEW set key {no}enhanced
