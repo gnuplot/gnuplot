@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.5 1999/06/11 18:53:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.6 1999/06/14 19:22:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -41,10 +41,6 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.5 1999/06/11 18:53:16 lhe
 
 #ifndef _Windows
 # include "help.h"
-#endif
-
-#ifndef STDOUT
-#define STDOUT 1
 #endif
 
 /* static prototypes */
@@ -709,7 +705,7 @@ struct surface_points *this_plot;
 	xdatum = df_3dmatrix(this_plot);
     else {
 	/*{{{  read surface from text file */
-	struct iso_curve *this_iso = iso_alloc(samples);
+	struct iso_curve *local_this_iso = iso_alloc(samples);
 	struct coordinate GPHUGE *cp;
 	double x, y, z;
 
@@ -724,15 +720,15 @@ struct surface_points *this_plot;
 		    pt_in_iso_crv = xdatum;
 		}
 		if (xdatum > 0) {
-		    this_iso->p_count = xdatum;
-		    this_iso->next = this_plot->iso_crvs;
-		    this_plot->iso_crvs = this_iso;
+		    local_this_iso->p_count = xdatum;
+		    local_this_iso->next = this_plot->iso_crvs;
+		    this_plot->iso_crvs = local_this_iso;
 		    this_plot->num_iso_read++;
 
 		    if (xdatum != pt_in_iso_crv)
 			this_plot->has_grid_topology = FALSE;
 
-		    this_iso = iso_alloc(pt_in_iso_crv);
+		    local_this_iso = iso_alloc(pt_in_iso_crv);
 		    xdatum = 0;
 		    ydatum++;
 		}
@@ -740,16 +736,16 @@ struct surface_points *this_plot;
 	    }
 	    /* its a data point or undefined */
 
-	    if (xdatum >= this_iso->p_max) {
+	    if (xdatum >= local_this_iso->p_max) {
 		/*
 		 * overflow about to occur. Extend size of points[] array. We
 		 * either double the size, or add 1000 points, whichever is a
 		 * smaller increment. Note i = p_max.
 		 */
-		iso_extend(this_iso,
+		iso_extend(local_this_iso,
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
 	    }
-	    cp = this_iso->points + xdatum;
+	    cp = local_this_iso->points + xdatum;
 
 	    if (j == DF_UNDEFINED) {
 		cp->type = UNDEFINED;
@@ -829,16 +825,16 @@ struct surface_points *this_plot;
 
 	if (xdatum > 0) {
 	    this_plot->num_iso_read++;	/* Update last iso. */
-	    this_iso->p_count = xdatum;
+	    local_this_iso->p_count = xdatum;
 
-	    this_iso->next = this_plot->iso_crvs;
-	    this_plot->iso_crvs = this_iso;
+	    local_this_iso->next = this_plot->iso_crvs;
+	    this_plot->iso_crvs = local_this_iso;
 
 	    if (xdatum != pt_in_iso_crv)
 		this_plot->has_grid_topology = FALSE;
 
 	} else {
-	    iso_free(this_iso);	/* Free last allocation. */
+	    iso_free(local_this_iso);	/* Free last allocation. */
 	}
 
 	if (dgrid3d && this_plot->num_iso_read > 0)
