@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.9 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.10 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1216,6 +1216,7 @@ gen_tics(axis, grid, callback)
 
 	/* FIXME HBB 20010121: keeping adding 'step' to 'tic' is
 	 * begging for rounding errors to strike us. */
+	/* HBB 20010410: ... and strike they did :-( */
 	for (tic = start; tic <= end; tic += step) {
 	    if (anyticput == 2)	/* See below... */
 		break;
@@ -1224,7 +1225,11 @@ gen_tics(axis, grid, callback)
 	     * nonsense. It essentially disallowed series ticmarks for
 	     * all axes shorter than DBL_EPSILON in absolute figures.
 	     * */
-	    if (anyticput && NearlyEqual(tic, start, step)) {
+	    /* HBB 20010410: protect against cancellation at upper
+	     * end, too (can happen if |step/end| <= ~DBL_EPS). */
+	    if (anyticput &&
+		(NearlyEqual(tic, start, step)
+		 || NearlyEqual(tic, end, step))) {
 		/* step is too small.. */
 		anyticput = 2;	/* Don't try again. */
 		tic = end;	/* Put end tic. */

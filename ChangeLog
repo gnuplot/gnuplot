@@ -1,3 +1,9 @@
+2001-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (gen_tics): Additional numerical safeguard to prevent
+ 	endless loop. Axis ranges of a relative length below about DBL_EPS
+ 	wouldn't terminate because end+step = end, in limited precison.
+
 2001-04-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pdf.trm (PDF_vector, PDF_move): Don't try to avoid moving
