@@ -27,9 +27,6 @@
 /* Define if the X Window System is missing or not being used.  */
 #undef X_DISPLAY_MISSING
 
-/* Define to `long' if <sys/types.h> doesn't define.  */
-#undef time_t
-
 /* Define if you have the atexit function.  */
 #undef HAVE_ATEXIT
 
@@ -248,6 +245,9 @@
 
 /*  Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
+
+/*  Define if time_t is declared in time.h.  */
+#undef HAVE_TIME_T_IN_TIME_H
 
 /*  Define if we have sigsetjmp().  */
 #undef HAVE_SIGSETJMP
