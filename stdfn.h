@@ -51,24 +51,34 @@
 #include "syscfg.h"
 
 #ifndef NO_STRING_H
-#include <string.h>
+# include <string.h>
 #else
-#include <strings.h>
+# include <strings.h>
 #endif
 
+#ifdef HAVE_BCOPY
+void bcopy ();
+# ifdef NO_MEMCPY
+#  define memcpy(d,s,n) bcopy((s),(d),(n))
+# endif
+# ifdef NO_MEMMOVE
+#  define memmove(d,s,n) bcopy((s),(d),(n))
+# endif
+#endif /* HAVE_BCOPY */
+
 #ifdef NO_STRCHR
-#ifdef strchr
-#undef strchr
-#endif
+# ifdef strchr
+#  undef strchr
+# endif
 #ifdef HAVE_INDEX
-#define strchr index
+# define strchr index
 #endif
-#ifdef strrchr
-#undef strrchr
-#endif
-#ifdef HAVE_RINDEX
-#define strrchr rindex
-#endif
+# ifdef strrchr
+#  undef strrchr
+# endif
+# ifdef HAVE_RINDEX
+#  define strrchr rindex
+# endif
 #endif
 
 #ifdef NO_STDLIB_H
