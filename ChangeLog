@@ -1,3 +1,25 @@
+1999-11-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graph3d.c, graphics.c, set.c, show.c: Remove DEF_FORMAT and SIGNIF
+	#defines, now in setshow.h.
+
+	* plot2d.c(print_table): Revert to using spaces in table output,
+	as suggested by Lucas Hart.
+
+	* setshow.h: Add DEF_FORMAT and SIGNIF #defines. Change DEF_FORMAT to
+	"% g" for better readability.
+
+	* m4/msdos.m4, m4/next.m4, m4/path-hdr.m4, m4/path-lib.m4,
+	m4/select.m4: Import updated versions from development tree.
+
+1999-11-18  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* makefile.vms: Build fixes, make rnh docs.
+
+	* plot3d.c(print_3dtable): Some improvements to Don Taber's patch.
+
+	* term/table.trm: Add clarification to terminal docs.
+
 1999-11-17  don taber  <dtaber@blackrat.risc.rockwell.com>
 
 	* plot2d.c(print_table), plot3d.c(print_3dtable): Fix hardcoded
