@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.21 1999/08/08 17:05:38 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.22 1999/08/09 15:58:23 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -71,7 +71,8 @@ static void show_dummy __PROTO((void));
 static void show_format __PROTO((void));
 static void show_data __PROTO((void));
 static void show_func __PROTO((void));
-static void show_style __PROTO((const char *name, enum PLOT_STYLE style));
+static void show_styles __PROTO((const char *name, enum PLOT_STYLE style));
+static void show_style __PROTO((void));
 static void show_grid __PROTO((void));
 static void show_xzeroaxis __PROTO((void));
 static void show_yzeroaxis __PROTO((void));
@@ -167,15 +168,16 @@ show_command()
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all',  'angles',  'arrow',  'autoscale',  'bars', 'border',\n\
-\t'boxwidth', 'clip', 'cntrparam', 'contour',  'data',  'dgrid3d',\n\
-\t'dummy', 'encoding', 'format', 'function',  'grid',  'hidden',\n\
-\t'isosamples', 'key', 'label', 'linestyle', 'loadpath', 'locale',\n\
-\t'logscale', 'mapping', 'margin', 'missing', 'offsets', 'origin',\n\
-\t'output', 'plot', 'parametric', 'pointsize', 'polar', '[rtuv]range',\n\
-\t'samples', 'size', 'terminal', 'tics', 'timestamp', 'timefmt', 'title',\n\
+\t'boxwidth', 'clip', 'cntrparam', 'contour',  'dgrid3d', 'dummy',\n\
+\t'encoding', 'format', 'functions',  'grid',  'hidden', 'isosamples',\n\
+\t'key', 'label', 'loadpath', 'locale', 'logscale', 'mapping',\n\
+\t'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
+\t'parametric', 'pointsize', 'polar', '[rtuv]range', 'samples',\n\
+\t'size', 'style', 'terminal', 'tics', 'timestamp', 'timefmt', 'title',\n\
 \t'variables', 'version', 'view',  '[xyz]{2}label',   '[xyz]{2}range',\n\
 \t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz]data',\n\
 \t'zero', 'zeroaxis'";
+
 
     struct value a;
     int tag = 0, x_and_y_zeroax = 0;
@@ -211,6 +213,11 @@ show_command()
     case S_CNTRPARAM:
 	show_contour();
 	break;
+/*
+    case S_DATA:
+	show_data();
+	break;
+*/
     case S_DGRID3D:
 	show_dgrid3d();
 	break;
@@ -223,11 +230,8 @@ show_command()
     case S_FORMAT:
 	show_format();
 	break;
-    case S_DATA:
-	show_data();
-	break;
     case S_FUNCTIONS:
-	show_func();
+	show_functions();
 	break;
     case S_GRID:
 	show_grid();
@@ -263,6 +267,7 @@ show_command()
 	(void) putc('\n',stderr);
 	show_arrow(tag);
 	break;
+/*
     case S_LINESTYLE:
 	c_token++;
 	if (!END_OF_COMMAND) {
@@ -273,6 +278,7 @@ show_command()
 	(void) putc('\n',stderr);
 	show_linestyle(tag);
 	break;
+*/
     case S_KEYTITLE:
 	show_keytitle();
 	break;
@@ -314,6 +320,9 @@ show_command()
 	break;
     case S_VIEW:
 	show_view();
+	break;
+    case S_STYLE:
+	show_style();
 	break;
     case S_SURFACE:
 	show_surface();
@@ -601,14 +610,19 @@ show_all()
     show_mapping();
     show_dummy();
     show_format();
-    show_style("data",data_style);
-    show_style("functions",func_style);
+    show_style();
+/*
+    show_styles("data",data_style);
+    show_styles("functions",func_style);
+*/
     show_grid();
     show_xzeroaxis();
     show_yzeroaxis();
     show_label(0);
     show_arrow(0);
+/*
     show_linestyle(0);
+*/
     show_keytitle();
     show_key();
     show_logscale();
@@ -712,7 +726,7 @@ FILE *fp;
 %s\n\
 %s\tType `help` to access the on-line reference manual\n\
 %s\tThe gnuplot FAQ is available from\n\
-%s\t\t%s\n\
+%s\t%s\n\
 %s\n\
 %s\tSend comments and requests for help to <%s>\n\
 %s\tSend bugs, suggestions and mods to <%s>\n\
@@ -1100,6 +1114,40 @@ show_format()
 }
 
 
+/* process 'show style' sommand */
+static void
+show_style()
+{
+    struct value a;
+    int tag = 0;
+
+    c_token++;
+
+    if (almost_equals(c_token, "d$ata")) {
+	SHOW_ALL_NL;
+	show_styles("data",data_style);
+	c_token++;
+    } else if (almost_equals(c_token, "f$unction")) {
+	SHOW_ALL_NL;
+	show_styles("functions", func_style);
+	c_token++;
+    } else if (almost_equals(c_token, "l$ine")) {
+	c_token++;
+	if (!END_OF_COMMAND) {
+	    tag = (int)real(const_express(&a));
+	    if (tag <= 0)
+		int_error(c_token, "tag must be > zero");
+	}
+	(void) putc('\n',stderr);
+	show_linestyle(tag);
+    } else {
+	/* show all styles */
+	show_styles("data",data_style);
+	show_styles("functions", func_style);
+	show_linestyle(tag);
+    }
+}
+
 /* process 'show data style' command */
 static void
 show_data()
@@ -1108,7 +1156,7 @@ show_data()
     if (!almost_equals(c_token,"s$tyle"))
 	int_error(c_token,"expecting keyword 'style'");
     SHOW_ALL_NL;
-    show_style("data",data_style);
+    show_styles("data",data_style);
     c_token++;
 }
 
@@ -1120,7 +1168,7 @@ show_func()
     c_token++;
     if (almost_equals(c_token, "s$tyle")) {
 	SHOW_ALL_NL;
-	show_style("functions", func_style);
+	show_styles("functions", func_style);
 	c_token++;
     } else
 	show_functions();
@@ -1129,7 +1177,7 @@ show_func()
 
 /* called by show_data() and show_func() */
 static void
-show_style(name, style)
+show_styles(name, style)
 const char *name;
 enum PLOT_STYLE style;
 {

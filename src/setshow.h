@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.14 1999/08/08 17:05:12 lhecking Exp $
+ * $Id: setshow.h,v 1.15 1999/08/09 15:58:12 lhecking Exp $
  *
  */
 
@@ -248,7 +248,8 @@ enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
-void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
+void lp_use_properties __PROTO((struct lp_style_type *, int, int));
+void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
