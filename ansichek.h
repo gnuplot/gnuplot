@@ -46,25 +46,27 @@
 
 #if defined(__STDC__) && __STDC__
 # ifndef ANSI_C
-#define ANSI_C
+#  define ANSI_C
 # endif /* ANSI_C */
 #endif /* __STDC__ */
 
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
  */
+
+#ifndef HAVE_CONFIG_H
+# if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
+#  ifndef PROTOTYPES
+#   define PROTOTYPES
+#  endif
+#  ifndef HAVE_STRINGIZE
 /* must encapsulate HAVE_STRINGIZE to avoid having it defined
  * on autoconfiscated platforms where it's unavailable
  */ 
-
-#if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
-# ifndef PROTOTYPES
-#  define PROTOTYPES
-# endif /* PROTOTYPES */
-# ifndef HAVE_STRINGIZE
-#  define HAVE_STRINGIZE
-# endif
-#endif /* ANSI_C ... */
+#   define HAVE_STRINGIZE
+#  endif
+# endif /* ANSI_C ... */
+#endif /* !HAVE_CONFIG_H */
 
 /* used to be __P but it was just too difficult to guess whether
  * standard headers define it. It's not as if the defn is
@@ -83,12 +85,14 @@
 
 #define generic void
 
-/* undef const for old compilers
- * I think autoconf tests const : why don't we use its test ?
+/* undef const for old compilers */
+#ifndef HAVE_CONFIG_H
+/* Don't do this on autoconf'd platforms
+ * where ANSI_C is not defined anymore!
  */
-
-#ifndef ANSI_C
-# define const
-#endif
+# ifndef ANSI_C
+#  define const
+# endif
+#endif /* !HAVE_CONFIG_H */
 
 #endif /* ANSI_CHECK_H */
