@@ -219,6 +219,10 @@ NORTH AMERICA:
 
 AUSTRALIA:
 
+     From the AARNet Mirror Project:
+     ftp://mirror.aarnet.edu.au/pub/gnuplot/
+     http://mirror.aarnet.edu.au/pub/gnuplot/
+
      Anonymous ftp to ftp.cc.monash.edu.au:
      ftp://ftp.cc.monash.edu.au/pub/gnuplot/gnuplot-3.7.tar.gz
 
@@ -227,6 +231,17 @@ EUROPE:
 
      Anonymous ftp to ftp.irisa.fr:
      ftp://ftp.irisa.fr/pub/gnuplot/gnuplot-3.7.tar.gz
+
+     Anonymous ftp to ftp.ucc.ie:
+     ftp://ftp.ucc.ie/pub/gnuplot/gnuplot-3.7.tar.gz
+
+OTHER:
+
+     The Macintosh version will be available from
+     http://users.ece.gatech.edu/~schooley/gnuplot.html
+
+     Source and binary distributions for the Amiga are on Aminet in
+     <URL:http://ftp.wustl.edu/~aminet/gfx/misc/> and its mirrors.
 
 ----
 
