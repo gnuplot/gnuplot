@@ -643,6 +643,9 @@ char *instr;
 			} else if ( *s == 't' ) {
 				*t++ = '\t';
 				s++;
+                        } else if ( *s == '\"' ) {
+                                *t++ = '\"';
+                                s++;
 			} else if ( *s >= '0' && *s <= '7' ) {
 				int i,n;
 				if ( sscanf(s,"%o%n",&i, &n) > 0 ) {

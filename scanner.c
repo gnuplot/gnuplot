@@ -156,6 +156,10 @@ again:
 					expression[current] = quote;
 					expression[current+1] = '\0';
 					break;
+                                } else if (expression[current]=='\\'
+                                           && expression[current+1]) {
+                                        current++;
+                                        token[t_num].length+=2;
 				} else
 					token[t_num].length++;
 			}
