@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.4 1999/06/09 12:07:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -57,7 +57,8 @@ static char *RCSid() { return RCSid("$Id: $"); }
  * char *loadpath_handler (int, char *)
  *
  */
-char *loadpath_handler(action, path)
+char *
+loadpath_handler(action, path)
 int action;
 char *path;
 {
@@ -80,20 +81,20 @@ char *path;
     case ACTION_INIT:
 	/* Init loadpath from environment */
 	FPRINTF((stderr, "Init loadpath from environment\n"));
-	assert(loadpath==NULL);
+	assert(loadpath == NULL);
 	if (!loadpath);
 	{
 	    char *envlib = getenv("GNUPLOT_LIB");
 	    if (envlib) {
 		int len = strlen(envlib);
-		loadpath = gp_alloc(len+1, "init loadpath");
-		safe_strncpy(loadpath,envlib,len+1);
+		loadpath = gp_alloc(len + 1, "init loadpath");
+		safe_strncpy(loadpath, envlib, len + 1);
 		/* point to end of loadpath */
 		last = loadpath + len;
 		/* convert all PATHSEPs to \0 */
 		PATHSEP_TO_NUL(loadpath);
-	    } /* else: NULL = empty */
-	} /* else: already initialised; int_warn (?) */
+	    }			/* else: NULL = empty */
+	}			/* else: already initialised; int_warn (?) */
 	/* point to env portion of loadpath */
 	envptr = loadpath;
 	break;
@@ -111,36 +112,36 @@ char *path;
 		 * the part to be preserved to the beginning
 		 * of the string; use memmove() because strings
 		 * may overlap */
-		memmove(loadpath,envptr,elen+1);
+		memmove(loadpath, envptr, elen + 1);
 	    }
-	    loadpath = gp_realloc(loadpath,elen+1+plen+1, "expand loadpath");
+	    loadpath = gp_realloc(loadpath, elen + 1 + plen + 1, "expand loadpath");
 	    /* now move env part back to the end to make space for
 	     * the new path */
-	    memmove(loadpath+plen+1,loadpath,elen+1);
-	    strcpy(loadpath,path);
+	    memmove(loadpath + plen + 1, loadpath, elen + 1);
+	    strcpy(loadpath, path);
 	    /* separate new path(s) and env path(s) */
 	    loadpath[plen] = PATHSEP;
 	    /* adjust pointer to env part and last */
 	    envptr = &loadpath[plen+1];
 	    last = envptr + elen;
 	    PATHSEP_TO_NUL(loadpath);
-	} /* else: NULL = empty */
+	}			/* else: NULL = empty */
 	break;
     case ACTION_SHOW:
 	/* print the current, full loadpath */
 	FPRINTF((stderr, "Show loadpath\n"));
 	if (loadpath) {
 	    p = loadpath;
-	    fputs("\tloadpath is ",stderr);
+	    fputs("\tloadpath is ", stderr);
 	    PRINT_LOADPATH(envptr);
 	    if (envptr) {
 		/* env part */
 		p = envptr;
-		fputs("\tsystem loadpath is ",stderr);
+		fputs("\tsystem loadpath is ", stderr);
 		PRINT_LOADPATH(last);
 	    }
 	} else
-	    fputs("\tno loadpath\n",stderr);
+	    fputs("\tno loadpath\n", stderr);
 	break;
     case ACTION_SAVE:
 	/* we don't save the load path taken from the

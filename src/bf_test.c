@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: bf_test.c,v 1.11 1998/04/14 00:14:48 drd Exp $";
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.1 1999/03/26 21:47:25 lhecking Exp $"); }
 #endif
 
 
@@ -42,7 +42,8 @@ range TheRange[] = {{-3,3,-2,2},
                     {-3,3,-3,3}};/* Sampling rate causes this to go from -3:6*/
 
 /*---- Stubs to make this work without including huge libraries ----*/
-void int_error(error_text, dummy)
+void
+int_error(error_text, dummy)
 char *error_text;
 int dummy;
 {
@@ -52,13 +53,16 @@ int dummy;
 }
 
 
-void FreeHelp()
+void
+FreeHelp()
 {
 }
+
 /*---- End of stubs ----*/
 
 
-float function(p, x, y)
+float
+function(p, x, y)
 int p;
 double x, y;
 {
@@ -87,7 +91,8 @@ double x, y;
 }
 
 #define ISOSAMPLES (double)5
-int main()
+int
+main()
 {
     int plot;
     int i, j;
