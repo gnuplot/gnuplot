@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.8 2000/02/11 19:14:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.9 2001/02/01 17:56:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -355,12 +355,17 @@ unsigned int delay;
 # ifndef HAVE_STRICMP
 int gp_stricmp __PROTO((char *, char *));
 
+/* return (see MSVC documentation and strcasecmp()):
+ *  -1  if str1 < str2
+ *   0  if str1 == str2
+ *   1  if str1 > str2 
+ */
 int
 gp_stricmp(s1, s2)
-char *s1;
-char *s2;
+    const char *s1;
+    const char *s2;
 {
-    char c1, c2;
+    unsigned char c1, c2;
 
     do {
 	c1 = *s1++;
@@ -373,7 +378,7 @@ char *s2;
 
     if (c1 == c2)
 	return 0;
-    if (c1 == '\0' || c1 < c2)
+    if (c1 == '\0' || c1 > c2)
 	return 1;
     return -1;
 }
@@ -390,11 +395,11 @@ int gp_strnicmp __PROTO((char *, char *, int));
 
 int
 gp_strnicmp(s1, s2, n)
-char *s1;
-char *s2;
-int n;
+    const char *s1;
+    const char *s2;
+    int n;
 {
-    char c1, c2;
+    unsigned char c1, c2;
 
     if (n == 0)
 	return 0;
@@ -410,7 +415,7 @@ int n;
 
     if (n == 0 || c1 == c2)
 	return 0;
-    if (c1 == '\0' || c1 < c2)
+    if (c1 == '\0' || c1 > c2)
 	return 1;
     return -1;
 }
