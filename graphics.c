@@ -2423,7 +2423,7 @@ struct curve_points *plot;
 		continue;
 
 	    /* by here everything has been mapped */
-#if 0				/* HBB 981117: polar error bars? */
+          if (!polar) { /* HBB 981130: use Igor's routine *only* for polar errorbars */
 	    (*t->move) (xM, ylowM);
 	    (*t->vector) (xM, yhighM);	/* draw the main bar */
 	    if (bar_size > 0.0) {
@@ -2432,7 +2432,7 @@ struct curve_points *plot;
 		(*t->move) ((unsigned int) (xM - bar_size * tic), yhighM);	/* draw the top tic */
 		(*t->vector) ((unsigned int) (xM + bar_size * tic), yhighM);
 	    }
-#else
+          } else { /* HBB 981130: see above */
 	    /* The above has been replaced by Igor inorder to get errorbars
 	       coming out in polar mode AND to stop the bar from going
 	       through the symbol */
@@ -2468,7 +2468,7 @@ struct curve_points *plot;
 		    (*t->vector) ((unsigned int) x2, (unsigned int) y2);
 		}		/* if error bar is bigger than symbol */
 	    }
-#endif /* polar error bars? */
+          } /* HBB 981130: see above */
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars */
     if ((plot->plot_style == XERRORBARS) || (plot->plot_style == XYERRORBARS)) {
