@@ -1125,7 +1125,7 @@ char **parms;
 # endif /* AMIGA_AC_5 */
 
 
-# if (READLINE || GNU_READLINE)
+# if defined(READLINE) || defined(GNU_READLINE)
 /* keep some compilers happy */
 char *rlgets __PROTO((char *s, int n, char *prompt));
 
@@ -1236,7 +1236,7 @@ static void do_shell()
 
 /* read from stdin, everything except VMS */
 
-# if !(READLINE || GNU_READLINE)
+# if !defined(READLINE) && !defined(GNU_READLINE)
 #  if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
@@ -1321,7 +1321,7 @@ int len;
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
 #  endif /* !plain DOS */
-# endif /* !(READLINE || GNU_READLINE) */
+# endif /* !READLINE && !GNU_READLINE) */
 
 static int read_line(prompt)
 char *prompt;
@@ -1330,13 +1330,13 @@ char *prompt;
     TBOOLEAN more = FALSE;
     int last = 0;
 
-# if !(READLINE || GNU_READLINE)
+# if !defined(READLINE) && !defined(GNU_READLINE)
     if (interactive)
 	PUT_STRING(prompt);
 # endif /* READLINE */
     do {
 	/* grab some input */
-# if READLINE || GNU_READLINE
+# if defined(READLINE) || defined(GNU_READLINE)
 	if (((interactive)
 	     ? rlgets(&(input_line[start]), input_line_len - start,
 		      ((more) ? "> " : prompt))
@@ -1378,7 +1378,7 @@ char *prompt;
 	    } else
 		more = FALSE;
 	}
-# if !(READLINE || GNU_READLINE)
+# if !defined(READLINE) && !defined(GNU_READLINE)
 	if (more && interactive)
 	    PUT_STRING("> ");
 # endif
