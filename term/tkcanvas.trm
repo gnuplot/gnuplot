@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.16 1999/08/24 11:24:57 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.17 1999/10/17 19:07:07 lhecking Exp $
  *
  */
 
@@ -65,6 +65,10 @@
  * the variable 'tk_perl' switches between tcl/tk and perltk code.
  * 'linewidth' and 'justify text' added, ends of plotted lines are now rounded.
  * Thomas Sefzick, May 1999, t.sefzick@fz-juelich.de
+ *
+ * scale plot to fit into the actual size of the canvas as reported by
+ * the window manager (the canvas itself doesn't report its real size).
+ * Matt Willis, October 1999, mattbwillis@my-deja.com
  */
 
 #include "driver.h"
@@ -166,13 +170,13 @@ TERM_PUBLIC void
 TK_graphics()
 {
 	/*
-	* the resulting tcl or perl code takes the actual width and height
-	* of the defined canvas and scales the plot to fit.
-	* => NOTE: this makes 'set size' useless !!!
-	* unless the original width and height is taken into account
-	* by some tcl or perl code, that's why the 'gnuplot_plotarea' and
-	* 'gnuplot_axisranges' procedures are supplied.
-	*/
+	 * the resulting tcl or perl code takes the actual width and height
+	 * of the defined canvas and scales the plot to fit.
+	 * => NOTE: this makes 'set size' useless !!!
+	 * unless the original width and height is taken into account
+	 * by some tcl or perl code, that's why the 'gnuplot_plotarea' and
+	 * 'gnuplot_axisranges' procedures are supplied.
+	 */
     if (tk_perl) {
 	fputs("\
 sub gnuplot {\n\
@@ -180,15 +184,19 @@ my($can) = @_;\n\
 $can->delete('all');\n\
 my $cmx = ($can->configure(-width))[4];\n\
 my $cmy = ($can->configure(-height))[4];\n\
-my $font;\n\
-my $temp;\n",
+my $cmx = $can->width - 2 * $can->cget(-border);\n\
+if ($cmx <= 1) {\n$cmx = ($can->cget(-width));\n}\n\
+my $cmy = $can->height - 2 * $can->cget(-border);\n\
+if ($cmy <= 1) {\n$cmy = ($can->cget(-height));\n}\n",
 	      gpoutfile);
     } else {
 	fputs("\
 proc gnuplot can {\n\
 $can delete all\n\
-set cmx [lindex [$can configure -width] 4]\n\
-set cmy [lindex [$can configure -height] 4]\n",
+set cmx [expr [winfo width $can]-2*[$can cget -border]]\n\
+if {$cmx <= 1} {set cmx [$can cget -width]}\n\
+set cmy [expr [winfo height $can]-2*[$can cget -border]]\n\
+if {$cmy <= 1} {set cmy [$can cget -height]}\n",
 	      gpoutfile);
     }
     tk_lastx = tk_lasty = tk_color = 0;
@@ -237,12 +245,12 @@ TK_vector(x, y)
 unsigned int x, y;
 {
 	/*
-	* this is the 1st part of the wrapper around the 'create line' command
-	* used to bind some actions to a line segment:
-	* bind {
-	*      normal create line command
-	*      } gnuplot_xy(some coordinates)
-	*/
+	 * this is the 1st part of the wrapper around the 'create line' command
+	 * used to bind some actions to a line segment:
+	 * bind {
+	 *      normal create line command
+	 *      } gnuplot_xy(some coordinates)
+	 */
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl)
 	    fprintf(gpoutfile, "$can->bind(");
@@ -250,12 +258,12 @@ unsigned int x, y;
 	    fprintf(gpoutfile, "$can bind [\n");
     }
 	/*
-	* end of 1st part of wrapper
-	*/
+	 * end of 1st part of wrapper
+	 */
     y = 1000 - y;
 	/*
-	* here is the basic well-known command for plotting a line segment
-	*/
+	 * here is the basic well-known command for plotting a line segment
+	 */
     if (tk_perl) {
 	fprintf(gpoutfile,"\
 $can->createLine(\
@@ -275,10 +283,11 @@ $can create line \
     }
 
 	/*
-	* this is the 2nd part of the wrapper around the 'create line' command,
-	* it generates a mechanism which calls 'gnuplot_xy' for the line segment
-	* pointed to by the mouse cursor when a mouse button is pressed 
-	*/
+	 * this is the 2nd part of the wrapper around the 'create line'
+         * command it generates a mechanism which calls 'gnuplot_xy' for
+         * the line segment pointed to by the mouse cursor when a mouse
+         * button is pressed 
+	 */
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl) {
 	    /* Ev('W') not needed here, supplied anyhow, WHY ??? */
@@ -362,8 +371,8 @@ $can create line \
 	}
     }
 	/*
-	* end of the wrapper
-	*/
+	 * end of the wrapper
+	 */
     tk_lastx = x;
     tk_lasty = y;
 }
@@ -467,19 +476,19 @@ TERM_PUBLIC void
 TK_text()
 {
 	/*
-	* when switching back to text mode some procedures are generated which
-	* return important information about plotarea size and axis ranges:
-	* 'gnuplot_plotarea' returns the plotarea size in tkcanvas units
-	* 'gnuplot_axisranges' returns the min. and max. values of the axis
-	* these are essentially needed to set the size of the canvas when the
-	* axis scaling is important.
-	* moreover, a procedure 'gnuplot_xy' is created which contains the
-	* actions bound to line segments (see the above 'TK_vector' code):
-	* if the user has defined a procedure named 'user_gnuplot_coordinates'
-	* then 'gnuplot_xy' calls this procedure, otherwise is writes the
-	* coordinates of the line segment the mouse cursor is pointing to
-	* to standard output.
-	*/
+	 * when switching back to text mode some procedures are generated which
+	 * return important information about plotarea size and axis ranges:
+	 * 'gnuplot_plotarea' returns the plotarea size in tkcanvas units
+	 * 'gnuplot_axisranges' returns the min. and max. values of the axis
+	 * these are essentially needed to set the size of the canvas when the
+	 * axis scaling is important.
+	 * moreover, a procedure 'gnuplot_xy' is created which contains the
+	 * actions bound to line segments (see the above 'TK_vector' code):
+	 * if the user has defined a procedure named 'user_gnuplot_coordinates'
+	 * then 'gnuplot_xy' calls this procedure, otherwise is writes the
+	 * coordinates of the line segment the mouse cursor is pointing to
+	 * to standard output.
+	 */
     if (tk_perl) {
 	fputs("};\n", gpoutfile);
 	if (!is_3d_plot) {
