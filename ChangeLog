@@ -1,8 +1,13 @@
+2003-08-18 14:28:07 2003  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/parse.c (push_vars): Changed initialization to TRUE, as it
+ 	was before yesterday's patch.  Fixes SF bug #790489.
+
 2003-08-17  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/eval.h src/eval.c src/parse.c: There is no need to have
-	push_vars a global exported from eval.*; move it to parse.c,
-	the only user.
+ 	push_vars a global exported from eval.*; move it to parse.c, the
+ 	only user.
 
 2003-08-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 	
