@@ -1148,7 +1148,8 @@ TBOOLEAN can_do_args;
 		}
 		screen_ok = FALSE;	/* make sure command line is
 					   echoed on error */
-		do_line();
+		if (do_line())
+		    stop=TRUE;
 	    }
 	}
     }
