@@ -318,7 +318,7 @@ AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],[int empty_declaration;],
+extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],,
     [break 3])
    done
   done
