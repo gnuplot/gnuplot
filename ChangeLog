@@ -1,4 +1,4 @@
-2005-04-01  Jürgen Wieferink <wieferink@web.de>
+2005-04-01  Juergen Wieferink <wieferink@freenet.de>
 
 	* docs/doc2tex.c: Handle levels 5 and 6 of documentation text as
 	paragraph and subparagraph, respectively.
