@@ -1,5 +1,7 @@
 Changes in release 4.0:
 * CHANGE sample calculated "smooth csplines" only in actual xrange
+* CHANGE 'set term gif' compile-time option to write PNG format instead
+* NEW 'set term png' and 'set term jpeg' using modern GD library
 * NEW set size ratio now works for splots, too
 * NEW grid options: {layerdefault | front | back}
 * NEW plot option "smooth frequency"

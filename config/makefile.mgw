@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.17 2002/02/26 20:42:12 mikulik Exp $
+# $Id: makefile.mgw,v 1.18 2002/03/02 14:10:23 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 MinGW32 on WinNT and Win95/98/..
 #
@@ -21,13 +21,32 @@
 
 # Comment out the definition lines to disable the according features:
 
-# GD (GIF) device driver
-# requires GD library (not part of gnuplot)
+#####################################################################
+# Ethan A Merritt - Nov 2001
+# Licensing issues force a choice between libgd terminal support for
+# GIF or for PNG and JPEG. You can't choose both.
+# Please see README.1ST for details.
+#
+# Select only this set of options for the old (v1.2 - v1.4) 
+# GD library, which supports GIF images only.
+# In this case if you want PNG support also you are limited to the old
+# non-libgd png driver.
 GD=1
+  GIF=1
+# LIBPNG=1
 
-# PNG device driver
-# requires PNG and Z libraries (not part of gnuplot)
+
+# Add this set of options to the ones above if you have GD library
+# v1.8 or newer, which supports PNG and JPEG images but not GIF.
+# PNG_FOR_GIF allows backwards compatibility with the old GIF
+# driver 'set term gif ....' but actually writes out PNG files.
+GD=1
+NEWGD=1
 PNG=1
+  JPEG=1
+  PNG_FOR_GIF=1
+#
+#####################################################################
 
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
@@ -127,10 +146,28 @@ ifdef GD
   TERMLIBS += -lgd
 endif
 
-ifdef PNG
-  CFLAGS += -DHAVE_LIBPNG
+ifdef GIF
+  CFLAGS += -DHAVE_GIF
+endif
+
+ifdef LIBPNG
+  CFLAGS += -DHAVE_PNG
   TERMLIBS += -lpng -lz
 endif
+
+ifdef NEWGD
+  CFLAGS += -DHAVE_PNG
+  TERMLIBS += -lpng -lz
+ifdef JPEG
+  CFLAGS += -DHAVE_JPEG
+  TERMLIBS += -ljpeg
+endif
+ifdef PNG_FOR_GIF
+  CFLAGS += -DPNG_FOR_GIF
+  CFLAGS += -DHAVE_GIF
+endif
+endif
+
 
 ifdef GNU_RC
   # RC = d:/cygnus/cygwin-b20/H-i586-cygwin32/bin/windres

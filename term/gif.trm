@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.34 2001/10/02 17:21:42 broeker Exp $
+ * $Id: gif.trm,v 1.35 2001/10/26 12:58:38 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -94,6 +94,19 @@
  *
  * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
  */
+
+/*
+ * This definition is triggered by the configuration option --with-gif=png
+ * It provides backwards compatibility with existing scripts that used the
+ * old gif driver and libgd versions <1.6 by substituting creation of PNG 
+ * images in response to * 'set term gif' using the PNG support in libgd
+ * versions >= 1.8
+ * Ethan A Merritt - Nov 2001
+ */
+#ifdef PNG_FOR_GIF
+#define gdImageGif gdImagePng
+#endif
+
 
 #include "driver.h"
 
@@ -662,7 +675,12 @@ GIF_boxfill(style, x, y, w, h)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(gif_driver)
-    "gif", "GIF format [mode] [fontsize] [size] [colors]",
+    "gif", 
+#ifdef PNG_FOR_GIF
+    "GIF format [mode] [fontsize] [size] [colors] (will actually generate PNG images)",
+#else
+    "GIF format [mode] [fontsize] [size] [colors]",
+#endif
     GREG_XMAX, GREG_YMAX, GIF_VCHAR, GIF_HCHAR,
     GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
     GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
@@ -700,6 +718,11 @@ START_HELP(gif)
 "?gif",
 " The `gif` terminal driver generates output in GIF format.  It uses Thomas",
 " Boutell's gd library, which is available from http://www.boutell.com/gd/",
+#ifdef PNG_FOR_GIF
+"",
+" >>> This copy of gnuplot was configured to produce PNG images <<<",
+" >>> instead of GIF images when 'set term gif' is selected.    <<<",
+#endif
 "",
 " By default, the `gif` terminal driver uses a shared Web-friendy palette.",
 "",

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.110 2002/03/02 18:09:05 lhecking Exp $
+dnl $Id: configure.in,v 1.111 2002/03/07 16:14:28 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -311,29 +311,6 @@ please add path to history.h to CPPFLAGS in Makefile]))
 fi
 dnl end readline
 
-dnl The gif terminal with Tom Boutell's gd library
-AC_ARG_WITH(gd,dnl
-[  --with-gd[=PATH]        enable gif terminal with Tom Boutell's gd library
-                          (requires GD library)],
-  [if test "$withval" != no; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     AC_CHECK_LIB(gd,gdImageGif,
-       [TERMLIBS="-lgd $TERMLIBS"
-        AC_CHECK_HEADERS(gd.h,
-        AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have Thomas Boutell's gd library. ]),
-        AC_MSG_WARN([found gd library but not gd.h
-please add path to gd.h to CPPFLAGS in Makefile])
-        )],
-       AC_MSG_RESULT([  GD library not found or cannot create gif images.
-  See term/gif.trm for download details]))
-   fi])
-dnl end gd library
-
 dnl If no PATH argument given, use the Unix plot library
 dnl Else use either GNU libplot from plotutils,
 dnl or ancient GNU graphics libplot
@@ -366,11 +343,156 @@ AC_ARG_WITH(plot,dnl
    fi])
 dnl end libplot
 
-dnl The Portable Network Graphics (png) terminal
-AC_ARG_WITH(png,dnl
-[  --with-png[=PATH]       enable png terminal
-                          (requires libpng and libz)],
+dnl JPEG library
+AC_ARG_WITH(jpeg,dnl
+[  --with-jpeg[=PATH]      specify location of libjpeg if default is broken
+                           (no to turn off JPEG support in gd.trm) ],
+  [
+  if test "$withval" = no; then
+    with_jpeg=no
+  elif test -d $withval/lib; then
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+  elif test -d "$withval"; then
+    LDFLAGS="$LDFLAGS -L$withval"
+  fi
+  ]
+  )
+dnl end jpeg
+
+dnl PNG library path if required for *NEW* png driver gd.trm
+AC_ARG_WITH(libpng,dnl
+[  --with-libpng[=PATH]    specify location of libpng if default is broken
+			  (==>specify only if not found by default!) ], 
+  [
+  if test -d $withval/lib; then
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+  elif test -d "$withval"; then
+    LDFLAGS="$LDFLAGS -L$withval"
+  fi
+  ]
+  )
+dnl end png
+
+dnl The location of Tom Boutell's gd library
+AC_ARG_WITH(gd,dnl
+[  --with-gd[=PATH]        specify location of Tom Boutell's gd library
+                          (version >= 1.8 needed for new png/jpeg driver)
+                          (version 1.3 or 1.4 needed for gif driver) ], ,
+			  withval=yes)
+  
+  if test "$withval" != no; then
+     if test -d "$withval/include"; then
+       CPPFLAGS="$CPPFLAGS -I$withval/include"
+     else
+       test -d "$withval" && CPPFLAGS="$CPPFLAGS -I$withval"
+     fi 
+     if test -d "$withval/lib"; then
+       LDFLAGS="$LDFLAGS -L$withval/lib"
+     else
+       test -d "$withval" && LDFLAGS="$LDFLAGS -L$withval"
+     fi 
+
+     AC_CHECK_LIB(gd,gdImageCreate,
+       [TERMLIBS="-lgd $TERMLIBS"
+        AC_CHECK_HEADERS(gd.h,
+	dnl ACTION-IF-FOUND
+        AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have Thomas Boutell's gd library. ]),
+	dnl ACTION-IF-NOT-FOUND
+        AC_MSG_WARN([found gd library but not gd.h])
+	AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
+        )],
+       AC_MSG_RESULT([  GD library not found ]))
+
+     AC_CHECK_LIB(gd,gdImagePng,
+       [TERMLIBS="$TERMLIBS -lpng -lz"
+       AC_DEFINE(HAVE_NEWGD, 1, [ Define if you have libgd version >= 1.8 ])
+       AC_DEFINE(HAVE_PNG,   1, [ Define if you have want png support ])
+       with_png="yes"
+       with_newgd="yes"
+       ],
+       [
+       AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])
+       with_png="no"
+       ],
+       -lpng -lz
+       )
+
+     if test "$with_jpeg" != no; then
+     AC_CHECK_LIB(gd,gdImageJpeg,
+       [TERMLIBS="$TERMLIBS -ljpeg"
+       AC_DEFINE(HAVE_JPEG, 1, [ Define if you have libjpeg and libgd version >= 1.8 ])
+       with_jpeg="yes"
+       ],
+       [
+       AC_MSG_WARN([ No JPEG support found in libgd, or libjpeg not found  ])
+       with_jpeg="no"
+       ],
+       -ljpeg
+       )
+     fi
+
+     AC_CHECK_LIB(gd,gdImageGif,
+       AC_DEFINE(HAVE_GIF, 1, [ Define if you have libgd version 1.2 - 1.4 ]),
+       AC_MSG_WARN([ No GIF support found in libgd  ])
+       )
+
+   fi
+
+dnl end gd library
+
+dnl freetype library (may be required to specify along with gd)
+dnl There should really be a test on whether TTF support was built into libgd
+if test "$with_newgd" = yes; then
+AC_ARG_WITH(freetype,dnl
+[  --with-freetype[=PATH]  location of libfreetype (TrueType font support)
+                          (used via libgd by new png/jpeg driver) 
+			  (==>specify only if not found by default!) ], 
   [if test "$withval" != no; then
+     if test -d $withval/include; then
+       CPPFLAGS="$CPPFLAGS -I$withval/include"
+     else
+       CPPFLAGS="$CPPFLAGS -I$withval"
+     fi 
+     if test -d $withval/lib; then
+       LDFLAGS="$LDFLAGS -L$withval/lib"
+     else
+       LDFLAGS="$LDFLAGS -L$withval"
+     fi 
+     AC_CHECK_LIB(freetype, FT_Open_Face,
+       [TERMLIBS="-lfreetype $TERMLIBS"
+     	with_ttf="yes"
+       ],
+       AC_MSG_RESULT([  freetype library not found ]))
+   fi],
+   with_ttf="yes"
+  )
+  if test "$with_ttf" = yes; then
+    AC_DEFINE(HAVE_TTF, 1, [ Define if TrueType font support in libgd ])
+  fi
+fi
+dnl end freetype library
+
+dnl gif terminal support emulated using Tom Boutell's new gd library
+AC_ARG_WITH(gif,dnl
+[  --with-gif=png          'set term gif' produces png images instead
+                          (libgd version >= 1.8) ],,
+)
+if test "$with_gif" = png; then
+  if test "$with_newgd" = yes; then
+    AC_DEFINE(PNG_FOR_GIF, 1,
+      [ Define to have 'set term gif' produce PNG images instead ])
+  else
+    with_gif=
+  fi
+fi
+dnl
+
+dnl The *OLD* Portable Network Graphics (png) terminal
+if test "$with_newgd" != yes ; then
+AC_ARG_WITH(png,dnl
+[  --with-png[=PATH]       enable *old* png terminal (requires libpng and libz)
+                          (libgd versions 1.2 - 1.4) ],
+  [if test [-n] "$with_png" -a "$withval" != no; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
      fi
@@ -378,7 +500,7 @@ AC_ARG_WITH(png,dnl
        LDFLAGS="$LDFLAGS -L$withval/lib"
      fi
      with_png=yes
-   fi],with_png=yes)
+   fi],with_png=no)
 
 if test "$with_png" = yes; then
   AC_CHECK_LIB(png,png_init_io,
@@ -404,6 +526,7 @@ please add path to png.h to CPPFLAGS in Makefile]))],
     AC_DEFINE(HAVE_LIBPNG, 1,
               [ Define if you have the png library. ])
   fi
+fi
 fi
 dnl end png and z
 
@@ -701,9 +824,6 @@ if test "$with_readline" != no; then
   fi
 fi
 
-test "$ac_cv_header_gd_h" = yes && \
-  AC_MSG_RESULT([  Enable generation of GIF files])
-
 if test x"$with_plot" != x; then
   if test "$with_plot" = yes; then
     AC_MSG_RESULT([  Use the Unix plot library])
@@ -712,8 +832,23 @@ if test x"$with_plot" != x; then
   fi
 fi
 
+test "$ac_cv_lib_gd_gdImageGif" = yes && \
+  AC_MSG_RESULT([  Enable generation of GIF files])
+
+test "$ac_cv_lib_gd_gdImagePng" = yes && \
+  AC_MSG_RESULT([  Enable PNG files using new gd driver])
+
+test "$with_ttf" = yes && \
+  AC_MSG_RESULT([  Enable TTF fonts using new gd driver])
+
 test "$ac_cv_header_png_h" = yes && \
-  AC_MSG_RESULT([  Enable generation of PNG files])
+  AC_MSG_RESULT([  Enable PNG files using old driver])
+
+test "$with_gif" = png && \
+  AC_MSG_RESULT([  Set term gif will produce PNG images instead ])
+
+test "$ac_cv_lib_gd_gdImageJpeg" = yes && \
+  AC_MSG_RESULT([  Enable generation of JPEG files])
 
 test "$ac_cv_header_pdflib_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PDF files])
@@ -759,6 +894,7 @@ test "$enable_mgr" = yes && \
 if test "$enable_rgip" = yes ; then
   AC_MSG_RESULT([  Enable RGIP terminal])
 fi
+
 dnl end config report
 
 dnl end configure.in

@@ -1,20 +1,3 @@
-
- IMPORTANT NOTE FOR GIF SUPPORT
- ==============================
-
- Gnuplot requires the gd library from http://www.boutell.com/gd/ to
- create gif output. Note that the use of this code may subject your
- organisation to a charge of willful patent infringement (as stated
- by UNISYS) unless you are in possession of a UNISYS license.
-
- The UNISYS patent covers the LZW technology which is used to create
- gifs. To my knowledge, only gd library version 1.3, and possibly
- version 1.4 are free of LZW code and should therefore be used with
- gnuplot (unless you have a license from Unisys to use LZW code). The
- binaries provided here have been built with version 1.3. Versions 1.2
- and 1.5 should not be used. Version 1.6+ does not create gifs, but only
- png images.
-
  To install:
  ==========
 
@@ -28,10 +11,84 @@
    been updated to the new directory structure.
 
 
- NOTES:
- =====
+ IMPORTANT NOTE ON GIF, PNG and JPEG SUPPORT
+ ===========================================
 
- - some files from Bruce Ravel's gnuplot-mode distribution have
+ Previous versions of gnuplot (through 3.7.1) used the gd library
+ from http://www.boutell.com/gd/ to create GIF output. 
+ Because of patent concerns (see Note 1 below) GIF support was removed
+ from the gd library, and hence current versions of the gd library
+ cannot be used to make GIF images.  This means that gnuplot, when
+ linked against a current gd library, cannot produce GIF images either.
+
+ On the other hand, the gd library now supports PNG and JPEG 
+ image generation.  It also supports the use TrueType fonts,
+ line widths, and other features that were not possible in the 
+ older gnuplot terminal drivers for either GIF or PNG.
+
+ When you build gnuplot 3.8 you may choose between two options.
+ 
+ Option 1:
+ If you link against an old version of the Boutell gd library 
+ (versions 1.2 - 1.4) then you can enable the GIF terminal driver. 
+ In this case you cannot enable either PNG or JPEG support via
+ the gd library. You can still selection the old minimalistic
+ PNG driver by using ./configure --with-png .
+
+ Option 2:
+ If you link against gd library version 1.8 or newer then you 
+ get PNG and JPEG support.  In this case you cannot enable 
+ the generation of true GIF images.  For backwards compatibility 
+ with existing scripts, however, you can enable the 
+ --with-gif=png option. This will use the old GIF driver, 
+ accepting all the old 'set term gif' commands, but will actually 
+ produce a PNG image file.  By default gnuplot assumes that if you
+ have one of these newer versions of the gd library that it supports
+ the use of TrueType fonts via the freetype library.  If you need to
+ specify where this library lives, use --with-freetype=PATH.  If your
+ local installation of libgd was not built with TrueType font support
+ you can fall back to using generic fonts by using --with-freetype=no.
+
+ Several open source programs exist that will convert PNG images 
+ to GIF images. See Note 2 below.  If you need GIF images but want 
+ to use the newer, more feature-full, terminal drivers, then you 
+ may produce PNG images and convert them to GIF externally.  
+ On platforms that allow pipes in the "set output" command, you can
+ generate and convert the images at the same time, as in this example:
+ 	set terminal png medium font LucidaSansDemiBold
+	set output '| convert png:- image.gif'
+
+
+ Note 1 - UNISYS patent (why no more GIF images)
+ -----------------------------------------------
+ The UNISYS patent covers the LZW technology which is used to create
+ gifs. To my knowledge, only gd library version 1.3, and possibly
+ version 1.4 are free of LZW code and should therefore be used with
+ gnuplot.  Versions 1.2 and 1.5 should not be used unless you have a 
+ license from Unisys to use LZW code or are in a country where the
+ UNISYS patent does not apply.
+
+ Note 2 - Open source programs for PNG to GIF conversion
+ -------------------------------------------------------
+
+ ImageMagick ( www.ImageMagick.org ) 
+ This is an open source package for general image manipulation and file 
+ conversion, supported on a wide variety of platforms.  For example the 
+ command "convert file.png file.gif" will convert a PNG image file to an 
+ equivalent GIF image file.
+
+ Utah Raster Toolkit ( http://www.cs.utah.edu/gdc/projects/urt/ )
+ A general image file conversion library and associated file conversion
+ utilities. Distributed as C source code. 
+ To convert from PNG to GIF, use the commands
+        pngtorle -o temp.rle image.png
+        rletogif -o image.gif temp.rle
+
+ 
+
+ Note 3
+ ------
+ some files from Bruce Ravel's gnuplot-mode distribution have
    not been included here, namely
 
    o INSTALL              (covered by gnuplot install instructions)

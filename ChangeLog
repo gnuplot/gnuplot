@@ -1,3 +1,38 @@
+2002-04-26  Ethan A Merritt  <merritt@u.washington.edu>
+
+	New term/gd.trm driver to support PNG and JPEG files by using
+ 	libgd version 1.8 or greater. Includes support for TrueType fonts,
+ 	line width, and transparency. Back compatibility option
+ 	--with-gif=png uses the old gif.trm driver to produce a png image
+ 	instead.
+	
+	Files modified:
+	    README.1ST		explains choice of GIF or PNG/JPEG
+	    term/gd.trm		new file; contains both png and jpeg drivers
+	    term/gif.trm	allow PNG_FOR_GIF with new libgd
+	    src/term.h		check PNG_FOR_GIF, HAVE_GIF, HAVE_NEWGD flags
+	    src/show.c		report configuration options 
+	    configure.in	the messy part
+	    config/makefile.mgw	totally untested by me
+	
+	Symbols defined during configuration:
+	    HAVE_GIF	# will add gif.trm terminal driver
+	    HAVE_PNG	# will have png support (either old or new)
+	    HAVE_LIBPNG	# will add png.trm (*old*) terminal driver
+	    HAVE_JPEG	# will add jpeg support via gd.trm
+	    HAVE_LIBGD	# defined if either the old or new libgd is present
+	    HAVE_NEWGD	# defined if new libgd (contains PNG and JPEG support)
+	    HAVE_TTF	# support TrueType fonts via new libgd+libfreetype
+	    PNG_FOR_GIF	# will trigger dummy gdImageGif definition
+	
+	Relevant configuration options:
+	  --with-gd[=PATH]        specify location of Tom Boutell's gd library
+	  --with-jpeg[=PATH]      optionally override location of libjpeg
+	  --with-libpng[=PATH]    optionally override location of libpng 
+	  --with-freetype[=PATH]  optionally override location of libfreetype
+	  --with-gif=png          'set term gif' produces png images instead
+	  --with-png[=PATH]       enable *old* png terminal 
+
 2002-04-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c src/pm3d.c: Move term->previous_palette(); from
@@ -333,7 +368,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/21 13:50:28 $).
+	last modification date (from the tag $Date: 2002/04/27 08:07:35 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.76 2002/03/26 09:42:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.77 2002/03/30 13:15:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -926,15 +926,23 @@ show_version(fp)
 #endif
 		, libgd =
 #ifdef HAVE_LIBGD
-		"+LIBGD  "
+#ifdef PNG_FOR_GIF
+		"+NEWGD  +PNG_FOR_GIF  "
+#else
+#ifdef HAVE_NEWGD
+		"+NEWGD  "
+#else
+		"+GIF  "
+#endif
+#endif
 #else
 		"-LIBGD  "
 #endif
 		, libpng =
-#ifdef HAVE_LIBPNG
-		"+LIBPNG  "
+#ifdef HAVE_PNG
+		"+PNG  "
 #else
-		"-LIBPNG  "
+		"-PNG  "
 #endif
 		, linuxvga =
 #ifdef LINUXVGA

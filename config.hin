@@ -312,14 +312,32 @@
 /*  Define if you want to use the included readline function.  */
 #undef READLINE
 
-/*  Define if you have Thomas Boutell's gd library.  */
-#undef HAVE_LIBGD
-
 /*  Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
 
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
+
+/*  Define if you have Thomas Boutell's gd library.  */
+#undef HAVE_LIBGD
+
+/*  Define if you have libgd version >= 1.8  */
+#undef HAVE_NEWGD
+
+/*  Define if you have want png support  */
+#undef HAVE_PNG
+
+/*  Define if you have libjpeg and libgd version >= 1.8  */
+#undef HAVE_JPEG
+
+/*  Define if you have libgd version 1.2 - 1.4  */
+#undef HAVE_GIF
+
+/*  Define if TrueType font support in libgd  */
+#undef HAVE_TTF
+
+/*  Define to have 'set term gif' produce PNG images instead  */
+#undef PNG_FOR_GIF
 
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG

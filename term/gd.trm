@@ -1,0 +1,1131 @@
+/*
+ * $Id: gd.trm,v 1.1.2 2002/01/30 Ethan A Merritt Exp $
+ * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
+ */
+
+/* GNUPLOT -- gd.trm */
+
+/*[
+ * Copyright 1998,2001
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports PNG and JPEG output using
+ *  GD library 1.8, 2.0
+ *
+ * To Use:
+ *
+ * set terminal png ?options ...?
+ *
+ * Where an option is:
+ *
+ * transparent - generate transparent PNGs.  The first color will
+ * be the transparent one.
+ *
+ * interlace - generate interlaced PNGs.
+ *
+ * image size (in pixels)
+ *
+ * font size (tiny,small,medium,large,giant)
+ *
+ * font name (TrueType font name is passed to libgd)
+ *
+ * xrrggbb - sets the next color.  x is the literal character 'x',
+ * rrggbb are the red green and blue components in hex.  For example
+ * x00ff00 is green.  The background color is set first, then the
+ * color borders, then the X & Y axis, then the plotting colors.
+ * (The wierd color spec is in order to get around limitations
+ * in gnuplot's scanner.)
+ *
+ * This driver is modeled after the PBM driver pbm.trm.
+ *
+ * AUTHORS
+ *  Sam Shen <sls@mh1.lbl.gov>
+ *  Alex Woo <woo@playfair.stanford.edu>
+ *  Ethan A Merritt <merritt@u.washington.edu>
+ *
+ * CONTRIBUTORS
+ *  Alfred Reibenschuh <alfred.reibenschuh@it-austria.com> or <fredo@blackbox.at>
+ *  Ben Laurie <ben@algroup.co.uk>
+ *
+ * send your comments or suggestions to:
+ *  info-gnuplot@cs.dartmouth.edu
+ *
+ * This version outputs either color or monochrome PNGs.  
+ * The default is 640x480 pixels.  
+ *
+ ******************************************************************************
+ * PLEASE READ                                                                *
+ * This driver uses the gd library, available from http://www.boutell.com/gd/ *
+ * Earlier versions of the gd library produced GIF images, but starting with  *
+ * version 1.6 the gd library no longer supports creation of GIF images due   *
+ * to licensing issues. Hence this modified driver, which uses the old gd/gif *
+ * code to produce PNG images instead.                                        *
+ *                                                                            *
+ * requires:                                                                  *
+ *      libgd version 1.8 or greater     http://www.boutell.com/gd/           *
+ *      libfreetype version 2            http://www.freetype.org/             *
+ *                                                                            *
+ * This driver allows you to use TrueType fonts.  You can use this driver     *
+ * without having any TrueType fonts installed, but the default fonts are     *
+ * comparatively limited.                                                     *
+ ******************************************************************************
+ *
+ * Petr Mikulik, Jan 1999: terminal entries for PM3D functionality
+ * Ethan Merritt, May 2001: modified gd/gif driver to produce png instead;
+ *                          added support for line width and TrueType fonts
+ */
+
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term(png)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void PNG_options __PROTO((void));
+TERM_PUBLIC void PNG_init __PROTO((void));
+TERM_PUBLIC void PNG_graphics __PROTO((void));
+TERM_PUBLIC void PNG_text __PROTO((void));
+TERM_PUBLIC void PNG_linetype __PROTO((int linetype));
+TERM_PUBLIC void PNG_linewidth __PROTO((double linewidth));
+TERM_PUBLIC void PNG_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PNG_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void PNG_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
+TERM_PUBLIC int PNG_justify_text __PROTO((enum JUSTIFY mode));
+TERM_PUBLIC int PNG_text_angle __PROTO((int ang));
+TERM_PUBLIC void PNG_reset __PROTO((void));
+TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
+TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
+#ifdef PM3D
+TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
+/* TERM_PUBLIC void PNG_previous_palette (void); */
+TERM_PUBLIC void PNG_set_color (double);
+TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
+#endif
+
+#include "gd.h"
+
+extern gdFontPtr gdFontSmall;	/* 6x12 */
+extern gdFontPtr gdFontLarge;	/* 8x16 */
+extern gdFontPtr gdFontMediumBold;	/* 7x13 */
+extern gdFontPtr gdFontGiant;  /* 9x15 */
+extern gdFontPtr gdFontTiny;  /* 5x8 */
+
+
+#define GREG_XMAX 640
+#define GREG_YMAX 480
+
+
+static int PNG_XMAX = GREG_XMAX;
+static int PNG_YMAX = GREG_YMAX;
+
+
+#define PNG_FONT_SMALL 0
+#ifdef PNG_FONT_SMALL
+# define gdfont gdFontSmall
+# define PNG_VCHAR 12
+# define PNG_HCHAR 6
+#else
+# define gdfont gdFontMediumBold
+# define PNG_VCHAR 13
+# define PNG_HCHAR 7
+#endif
+
+static gdFontPtr PNG_font;
+static char      PNG_ttffont[64];
+
+#define PNG_VTIC (GREG_YMAX/100)
+#define PNG_HTIC (GREG_XMAX/150)
+
+#define PNG_MAX_COLORS 256
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+static struct {
+    gdImagePtr image;
+    gdFontPtr font;
+    unsigned int x, y;
+    int height;
+    int charh, charw;
+    int color;
+    int n_colors;
+    int color_table[PNG_MAX_COLORS];
+    int rgb_table[PNG_MAX_COLORS];
+    int angle;
+    enum JUSTIFY justify;
+    int flags;
+    int linetype;
+    int linewidth;
+    int ttfsize;
+    char ttffont[64];
+} png_state;
+
+#define PNG_USE_TRANSPARENT 1
+#define PNG_USE_INTERLACE   2
+
+enum PNG_id {
+    PNG_TRANSPARENT, PNG_INTERLACE,
+    /* Font size */
+    PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
+    PNG_FONT,
+    PNG_SIZE,
+    PNG_OTHER
+};
+
+static struct gen_table PNG_opts[] =
+{
+    { "tr$ansparent", PNG_TRANSPARENT },
+    { "i$nterlace", PNG_INTERLACE },
+    { "ti$ny", PNG_TINY },
+    { "s$mall", PNG_SMALL },
+    { "m$edium", PNG_MEDIUM },
+    { "l$arge", PNG_LARGE },
+    { "g$iant", PNG_GIANT },
+    { "fo$nt", PNG_FONT },
+    { "si$ze", PNG_SIZE },
+    { NULL, PNG_OTHER }
+};
+
+/* EAM - gdImage structure to hold brushes for linewidth */
+/* We only use brushes 2-6 (could expand later)          */
+typedef struct {
+    gdImagePtr im;
+    unsigned int last_rgb;
+    int bgnd;
+    int fgnd;
+}   PNG_BRUSH;
+
+static PNG_BRUSH PNG_brush[7];
+
+/*
+ * _options()  Called when terminal type is selected.  
+ * This procedure should parse options on the command line.  A list of the 
+ * currently selected options should be stored in term_options[] in a form 
+ * suitable for use with the set term command.  term_options[] is used by 
+ * the save command.  Use options_null() if no options are available. 
+ */
+TERM_PUBLIC void
+PNG_options()
+{
+    struct value s;
+    int png_font, i;
+    char *string;
+    unsigned long color;
+
+    term_options[0] = NUL;
+    png_state.n_colors = 0;
+    png_state.flags = 0;
+    png_font = 2;
+    PNG_font = gdfont;
+    png_state.ttffont[0] = '\0';
+    png_state.ttfsize = 8 + 2*png_font;
+    PNG_ttffont[0] = '\0';
+    png_state.justify = CENTRE;
+
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&PNG_opts[0],c_token)) {
+	case PNG_TRANSPARENT:
+	    png_state.flags |= PNG_USE_TRANSPARENT;
+	    ++c_token;
+	    break;
+	case PNG_INTERLACE:
+	    png_state.flags |= PNG_USE_INTERLACE;
+	    ++c_token;
+	    break;
+	case PNG_TINY:
+	    PNG_font=gdFontTiny;
+	    png_font = 0;
+	    term->v_char = (unsigned int)(8);
+	    term->h_char = (unsigned int)(5);
+	    ++c_token;
+	    break;
+	case PNG_SMALL:
+	    PNG_font = gdFontSmall;
+	    png_font = 1;
+	    term->v_char = (unsigned int) (12);
+	    term->h_char = (unsigned int) (6);
+	    ++c_token;
+	    break;
+	case PNG_MEDIUM:
+	    PNG_font = gdFontMediumBold;
+	    png_font = 2;
+	    term->v_char = (unsigned int) (13);
+	    term->h_char = (unsigned int) (7);
+	    ++c_token;
+	    break;
+	case PNG_LARGE:
+	    PNG_font = gdFontLarge;
+	    png_font = 3;
+	    term->v_char = (unsigned int) (16);
+	    term->h_char = (unsigned int) (8);
+	    ++c_token;
+	    break;
+	case PNG_GIANT:
+	    PNG_font=gdFontGiant;
+	    png_font = 4;
+	    term->v_char = (unsigned int)(15);
+	    term->h_char = (unsigned int)(9);
+	    ++c_token;
+	    break;
+	case PNG_FONT:
+	    c_token++;
+#ifdef HAVE_TTF
+	    if (END_OF_COMMAND) {
+	    	png_state.ttffont[0] = '\0';
+	    } else {
+	    	int brect[8];
+		char *err;
+	    	string = input_line + token[c_token++].start_index;
+		sscanf(string,"%63s",png_state.ttffont);
+		strcpy(PNG_ttffont,png_state.ttffont);
+	        png_state.ttfsize = 8 + 2*png_font;
+		err = gdImageStringFT(NULL, &brect[0], 0, 
+			png_state.ttffont, (double)png_state.ttfsize,
+			0.0, 0, 0, "test");
+		if (err) {
+			fprintf(stderr,"%s when opening font %s, using default\n",
+				err,png_state.ttffont);
+			png_state.ttffont[0] = PNG_ttffont[0] = '\0';
+		}
+	    }
+#else
+	    c_token++;
+	    fprintf(stderr,"No TTF font support, using default\n");
+#endif
+	    break;
+	case PNG_SIZE:
+	    c_token++;
+	    if (END_OF_COMMAND) {
+		PNG_XMAX = GREG_XMAX;
+		PNG_YMAX = GREG_YMAX;
+		term->v_tic = PNG_YMAX / 80;
+		term->h_tic = PNG_XMAX / 80;
+	    } else {
+		PNG_XMAX = real(const_express(&s));
+		if (equals(c_token, ",")) {
+	    c_token++;
+		    PNG_YMAX = real(const_express(&s));
+		    term->v_tic = PNG_YMAX / 80;
+		    term->h_tic = PNG_XMAX / 80;
+		    term->ymax = PNG_YMAX;
+		    term->xmax = PNG_XMAX;
+		}
+	    }
+	    break;
+	case PNG_OTHER:
+	default:
+	    /* not "size" */
+	    string = input_line + token[c_token].start_index;
+
+	    if (sscanf(string, "x%lx", &color) != 1) {
+		    int_error(c_token, "invalid color spec, must be xRRGGBB");
+	    } else if (png_state.n_colors == PNG_MAX_COLORS) {
+		int_warn(c_token, "too many colors, ingoring");
+		++c_token;
+	    } else {
+		png_state.rgb_table[png_state.n_colors++] = color;
+		++c_token;
+	    }
+	    break;
+	}
+    }
+
+
+    /* now generate options string */
+
+    if (png_state.flags & PNG_USE_TRANSPARENT) {
+	strcat(term_options, "transparent ");
+    }
+    if (png_state.flags & PNG_USE_INTERLACE) {
+	strcat(term_options, "interlace ");
+    }
+    switch (png_font) {
+    case 0:
+	strcat(term_options,"tiny ");
+	break;
+    case 1:
+	strcat(term_options, "small ");
+	break;
+    case 2:
+	strcat(term_options, "medium ");
+	break;
+    case 3:
+	strcat(term_options, "large ");
+	break;
+    case 4:
+	strcat(term_options,"giant ");
+	break;
+    }
+
+    if (*png_state.ttffont) {
+    	sprintf(term_options + strlen(term_options),
+		"font %s ",png_state.ttffont);
+    }
+    
+    sprintf(term_options + strlen(term_options),
+	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
+
+    for (i = 0; strlen(term_options) + 9 < MAX_LINE_LEN && 
+           i < png_state.n_colors; i++) {
+	sprintf(term_options + strlen(term_options),
+		"x%06x ", png_state.rgb_table[i]);
+    }
+}
+
+
+/*
+ * _init()  Called once, when the device is first selected.  This procedure
+ * should set up things that only need to be set once, like handshaking and
+ * character sets etc...
+ */
+TERM_PUBLIC void
+PNG_init()
+{
+int i;
+
+    png_state.linetype = 0;
+    png_state.linewidth = 1;
+    /* EAM - pre-define brushes to implement linewidth */
+    for (i=2; i<=6; i++) {
+    	PNG_brush[i].im = gdImageCreate(i,i);
+    	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 ); 
+    	gdImageColorTransparent( PNG_brush[i].im, PNG_brush[i].bgnd );
+    	PNG_brush[i].fgnd = gdImageColorAllocate( PNG_brush[i].im, 0, 0, 0 ); 
+	PNG_brush[i].last_rgb = 0;
+    }
+    /* EAM - quick and dirty is to fill the entire brush (square nib).    */
+    /*       might be better to approximate a circular nib by selectively */
+    /*       coloring the individual pixels of the brush image.           */
+    for (i=2; i<=6; i++) {
+    	gdImageFilledRectangle( PNG_brush[i].im, 1, 1, i, i, PNG_brush[i].fgnd );
+}
+
+}
+
+/*
+ * _reset()  Called when gnuplot is exited, the output device changed or
+ * the terminal type changed.  This procedure should reset the device, 
+ * possibly flushing a buffer somewhere or generating a form feed.
+ */
+TERM_PUBLIC void
+PNG_reset()
+{
+int i;
+    /* EAM - Clean up the brushes used for linewidth */
+    	for (i=2; i<=6; i++) {
+	    if (PNG_brush[i].im)
+		gdImageDestroy(PNG_brush[i].im);
+	    PNG_brush[i].im = 0;
+	}
+}
+
+#ifdef PM3D
+
+#if 0
+/* use  #if 1  that's just for debugging */
+void PNG_show_current_palette()
+{
+int i;
+fprintf(stderr,"*****\n SHOW THE PALETTE! total=%i\n",gdImageColorsTotal(png_state.image));
+for (i=0; i < gdImageColorsTotal(png_state.image); i++) {
+  /* Use access macros to learn colors. */
+  fprintf(stderr,"%i\tr=%d\t g=%d\tb=%d\n", i,
+    gdImageRed(png_state.image,i),
+    gdImageGreen(png_state.image,i),
+    gdImageBlue(png_state.image,i));
+    }
+}
+#endif
+
+/*
+How this works:
+Gray interval [0;1] will be mapped to interval [0;sm_palette.colors-1]
+those r,g,b components are mapped by the array below
+palette.offset equals 0 since png_smooth_color[0..colors] are from ColorAllocate
+*/
+int png_smooth_color[ gdMaxColors ];
+  /* chooser from the colour palette */
+  /* TODO: how to recover from a multiplot with two colour pm3d maps?
+     They must use the same palette! Or palette size must be
+     restricted to certain number of colours---a new user's option
+  */
+
+TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
+{
+    int i;
+    if (palette == NULL) {
+	/* return maximal number of colours in a PNG palette */
+	i = gdMaxColors /*256*/ - gdImageColorsTotal(png_state.image);
+	/* the latter is the number of currently allocated colours. We want
+	   to allocate the rest */
+	/*BACK PLEASE  fprintf(stderr,"colors in PNG palette=%i\n",(int)gdMaxColors); */
+	if (i == 0) {
+	    i = (sm_palette.colors <= 0) ? -1 : sm_palette.colors;
+	        /* (no more colorus) : (previous palette (obviously multiplot mode)) */
+#if 1
+	    if (i > 0) fprintf(stderr,"reusing it again\n");
+#endif
+	}
+	return i;
+    }
+    if (0 == gdMaxColors /*256*/ - gdImageColorsTotal(png_state.image))
+    	return 0; /* reuse previous palette (without warning) */
+    for (i = 0; i < sm_palette.colors; i++) {
+	png_smooth_color[i] = gdImageColorAllocate(png_state.image,
+	    (int)( palette->color[i].r * 255 + 0.5 ), /* r,g,b values for png */
+	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
+	    (int)( palette->color[i].b * 255 + 0.5 ) );
+	if (png_smooth_color[i] < 0) { /* this should never happen! take away? */
+	    FPRINTF("png_smooth_color[i]<0 cannot happen")
+		exit(1);
+	}
+#if 0
+	fprintf(stderr,"ALLOCATED: i=%i\t=> pal_index=%i\tr=%g g=%g b=%g\n",
+	    i, png_smooth_color[i],
+	    palette->color[i].r, palette->color[i].g, palette->color[i].b );
+#endif
+    }
+    return 0;
+    }
+
+
+TERM_PUBLIC 
+void PNG_set_color (double gray)
+{
+    int png_color = (int)( gray * sm_palette.colors );
+    /* map [0;1] to interval [0;png_smooth_colors-1] */
+    png_state.color = png_smooth_color[ png_color ]; /* index to the palette */
+    /*fprintf(stderr,"PNG terminal sets color png_color=%i\n",png_color); */
+}
+
+
+TERM_PUBLIC
+void PNG_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+    /* since gpiPoint carries more than just x and y if
+     * we have EXTENDED_COLOR_SPECS defined, we need to
+     * copy it to the gdPointPtr struct; make it static
+     * so that is faster (joze) */
+    static gdPointPtr gd_corners = (gdPointPtr) 0;
+    static unsigned int size = 0;
+    if (points > size) {
+	size = points;
+	gd_corners = gp_realloc(gd_corners, sizeof(gdPoint) * size,
+	    "PNG_filled_polygon->gd_corners");
+    }
+    for (i = 0; i < points; i++) {
+	gd_corners[i].x = corners[i].x;
+	gd_corners[i].y = png_state.height - corners[i].y;
+    }
+    gdImageFilledPolygon(png_state.image, gd_corners, points, png_state.color);
+    /* easy, since gdPointPtr is the same as (gdiPoint*) */
+    /* if someone someday needs this routine to be NON-DESTRUCTIVE, then change
+       the following line to #if 1 */
+#if 0
+    for (i = 0; i < points; i++)
+	corners[i].y = png_state.height - corners[i].y;
+#endif
+    }
+
+
+#endif
+
+/*
+ * This function is used for filledboxes
+ * style parameter is some garbled hash combining fillstyle and filldensity
+ */
+TERM_PUBLIC void
+PNG_boxfill( style, x, y, width, height )
+int style;
+unsigned int x, y, width, height;
+{
+unsigned int x1, y1, x2, y2;
+int          color;
+int          fillstyle = style & 0xf;
+
+    switch (fillstyle) {
+    case 0:	/* Empty */
+    	color = png_state.color_table[0];
+	break;
+    case 1:	/* Solid */
+    case 2:	/* Pattern */
+    default:	
+    	color = png_state.color;
+	break;
+	}
+    x1 = x;
+    x2 = x + width;
+    y1 = png_state.height - (y+height);
+    y2 = png_state.height - y;
+    gdImageFilledRectangle( png_state.image, x1, y1, x2, y2, color );
+    }
+
+/*
+ * _graphics()  Called just before a plot is going to be displayed.  This
+ * procedure should set the device into graphics mode.  Devices which can't
+ * be used as terminals (like plotters) will probably be in graphics mode 
+ * always and therefore won't need this.
+ */
+TERM_PUBLIC void
+PNG_graphics()
+{
+    int i;
+    unsigned int rgb;
+
+    png_state.font = PNG_font;
+    png_state.color = 0;
+    png_state.image = gdImageCreate((int) (xsize * PNG_XMAX),
+				    (int) (ysize * PNG_YMAX));
+    png_state.height = (int) (ysize * PNG_YMAX - 1);
+    png_state.charw = term->h_char;	/* png_state.font->w; */
+    png_state.charh = term->v_char;	/* png_state.font->h; */
+    for (i = png_state.n_colors; i < WEB_N_COLORS; i++)
+	png_state.rgb_table[i] = 
+	    (web_color_rgbs[i].r << 16) |
+	    (web_color_rgbs[i].g << 8) |
+	    web_color_rgbs[i].b;
+    if (png_state.n_colors < WEB_N_COLORS)
+	png_state.n_colors = WEB_N_COLORS;
+    for (i = 0; i < png_state.n_colors; i++) {
+	rgb = png_state.rgb_table[i];
+	png_state.color_table[i] =
+	    gdImageColorAllocate(png_state.image, (rgb >> 16) & 0xff,
+				 (rgb >> 8) & 0xff, rgb & 0xff);
+    }
+    if (png_state.flags & PNG_USE_TRANSPARENT)
+	gdImageColorTransparent(png_state.image,
+				png_state.color_table[0]);
+    else
+	gdImageColorTransparent(png_state.image, -1);
+    }
+
+/* 
+ * _text()  Called immediately after a plot is displayed.  This procedure 
+ * should set the device back into text mode if it is also a terminal, so
+ * that commands can be seen as they're typed.  Again, this will probably
+ * do nothing if the device can't be used as a terminal.
+ */
+TERM_PUBLIC void
+PNG_text()
+{
+int i;
+
+    if (png_state.flags & PNG_USE_INTERLACE)
+	gdImageInterlace(png_state.image, 1);
+    gdImagePng(png_state.image, gpoutfile);
+    gdImageDestroy(png_state.image);
+}
+
+/* _move(x,y)  Called at the start of a line.  The cursor should move to the
+ * (x,y) position without drawing.
+ */
+TERM_PUBLIC void
+PNG_move(unsigned int x, unsigned int y)
+{
+    png_state.x = x;
+    png_state.y = y;
+    }
+
+/* _vector(x,y)  Called when a line is to be drawn.  This should display a line
+ * from the last (x,y) position given by _move() or _vector() to this new (x,y)
+ * position.
+ */
+TERM_PUBLIC void
+PNG_vector(unsigned int x, unsigned int y)
+{
+    unsigned int rgb;
+    int lw;
+    int png_linetype_dotted[5];
+
+    if (png_state.linetype == -1) {
+	png_linetype_dotted[0] = png_state.color_table[2];
+	png_linetype_dotted[1] = png_state.color_table[2];
+	png_linetype_dotted[2] = png_state.color_table[0];
+	png_linetype_dotted[3] = png_state.color_table[0];
+	png_linetype_dotted[4] = png_state.color_table[0];
+
+	gdImageSetStyle(png_state.image, png_linetype_dotted, 5);
+	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
+		    x, png_state.height - y, gdStyled);
+    } else {
+    	if (png_state.linewidth == 1) {
+	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
+		    x, png_state.height - y, png_state.color);
+	} else {
+	/* EAM - Implement linewidth by selecting a pre-defined brush */
+	/* The tricky bit is re-coloring the brush to the current color */
+	lw   = png_state.linewidth;
+	rgb  = png_state.rgb_table[png_state.linetype+3];
+	if (rgb != PNG_brush[lw].last_rgb) {
+	    PNG_brush[lw].fgnd = gdImageColorAllocate(PNG_brush[lw].im, 
+	    	(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+	    PNG_brush[lw].last_rgb = rgb;
+	    /* EAM fprintf(stderr,"PNG driver - reset brush %d to color %d\n",lw,rgb); */
+	}
+    	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
+	gdImageLine(png_state.image, png_state.x, png_state.height - png_state.y,
+		    x, png_state.height - y, gdBrushed );
+	}
+    }
+    png_state.x = x;
+    png_state.y = y;
+}
+
+/* _linetype(lt)  Called to set the line type before text is displayed or
+ * line(s) plotted.  This procedure should select a pen color or line
+ * style if the device has these capabilities.  
+ * lt is an integer from -2 to 0 or greater.  
+ * An lt of -2 is used for the border of the plot.
+ * An lt of -1 is used for the X and Y axes.  
+ * lt 0 and upwards are used for plots 0 and upwards.
+ * If _linetype() is called with lt greater than the available line types, 
+ * it should map it to one of the available line types.
+ * Most drivers provide 9 different linetypes (lt is 0 to 8).
+ */
+TERM_PUBLIC void
+PNG_linetype(int type)
+{
+    if (type >= (png_state.n_colors - 3))
+	type %= (png_state.n_colors - 3);
+
+    png_state.color = png_state.color_table[type + 3];
+    png_state.linetype = type;
+}
+
+/* PNG_linewidth (EAM - May 2001)
+ * Use the "brush" tools in the gd library to control line width.
+ * Pre-define brushes for linewidths 2, 3, 4, 5, 6 (1 doesn't need a brush!).
+ * Here we just remember the state.
+ */
+TERM_PUBLIC void
+PNG_linewidth(double linewidth)
+{
+    png_state.linewidth = (int)(linewidth+0.49);
+    if (png_state.linewidth > 6) png_state.linewidth = 6;
+    if (png_state.linewidth < 1) png_state.linewidth = 1;
+    /* DEBUG
+    fprintf(stderr,"Setting PNG linewidth to %d\n",png_state.linewidth);
+       DEBUG */
+}
+
+/* _put_text(x,y,str)  Called to display text at the (x,y) position, 
+ * while in graphics mode.   The text should be vertically (with respect 
+ * to the text) justified about (x,y).  The text is rotated according 
+ * to _text_angle and then horizontally (with respect to the text)
+ * justified according to _justify_text.
+ */
+#ifdef HAVE_TTF
+TERM_PUBLIC void
+PNG_put_text(unsigned int x, unsigned int y, const char *string)
+{
+    if (*png_state.ttffont) {
+    	int brect[8]; char *err;
+	/* Draw once with a NULL image to get the bounding rectangle */
+	/* then draw it again, centered.                             */
+	err = gdImageStringFT(NULL, brect, png_state.color, 
+			png_state.ttffont, (double)png_state.ttfsize,
+			(png_state.angle == 1) ? M_PI_2 : 0.0,
+			x, png_state.height - y, (char *)string);
+	if (err) {
+	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
+	    	err,string,png_state.ttffont);
+	} else {
+	    if (png_state.angle == 0) { 
+		y += (brect[7]-brect[1]) / 2;
+	    	switch (png_state.justify) {
+		    case RIGHT:	x -= (brect[2]-brect[0]);     
+		    		break;
+		    case CENTRE:x -= (brect[2]-brect[0]) / 2;
+				break;
+		    case LEFT:
+		    default:	break;
+		}
+	    } else {
+		x -= (brect[6]-brect[0]) / 2; 
+	    	switch (png_state.justify) {
+		    case RIGHT:	y += (brect[3]-brect[1]);     
+		    		break;
+		    case CENTRE:y += (brect[3]-brect[1]) / 2;
+				break;
+		    case LEFT:
+		    default:	break;
+		}
+	    }
+	    err = gdImageStringFT(png_state.image, brect, png_state.color, 
+			png_state.ttffont, (double)png_state.ttfsize,
+			(png_state.angle == 1) ? M_PI_2 : 0.0,
+			x, png_state.height - y, (char *)string);
+	    if (err) fprintf(stderr,"gdImageStringFT: %s\n",err);
+	}
+    } else if (png_state.angle == 1) {
+	x -= png_state.charh / 2;
+	switch (png_state.justify) {
+	    case RIGHT:	y -= png_state.charw * strlen(string);
+	    		break;
+	    case CENTRE:y -= png_state.charw * strlen(string) / 2;
+			break;
+	    case LEFT:
+	    default:	break;
+	}
+	gdImageStringUp(png_state.image, png_state.font,
+			x, png_state.height - y,
+			(unsigned char *)string, png_state.color);
+    } else {
+	y += png_state.charh / 2;
+	switch (png_state.justify) {
+	    case RIGHT:	x -= png_state.charw * strlen(string);
+	    		break;
+	    case CENTRE:x -= png_state.charw * strlen(string) / 2;
+			break;
+	    case LEFT:
+	    default:	break;
+	}
+	gdImageString(png_state.image, png_state.font,
+		      x, png_state.height - y,
+		      (unsigned char *)string, png_state.color);
+    }
+}
+
+#else  /* not HAVE_TTF */
+
+TERM_PUBLIC void
+PNG_put_text(unsigned int x, unsigned int y, const char *string)
+{
+    if (png_state.angle == 1) {
+	x -= png_state.charh / 2;
+	gdImageStringUp(png_state.image, png_state.font,
+			x, png_state.height - y,
+			(unsigned char *)string, png_state.color);
+    } else {
+	y += png_state.charh / 2;
+	gdImageString(png_state.image, png_state.font,
+		      x, png_state.height - y,
+		      (unsigned char *)string, png_state.color);
+    }
+}
+
+#endif /* HAVE_TTF */
+
+
+/* _text_angle(ang)  Called to rotate the text angle when placing the y label.
+ * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
+ * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
+ */
+TERM_PUBLIC int
+PNG_text_angle(int ang)
+{
+    png_state.angle = ang;
+    return TRUE;
+}
+
+TERM_PUBLIC int
+PNG_justify_text(mode)
+enum JUSTIFY mode;
+{
+    png_state.justify = mode;
+    return TRUE;
+}
+
+TERM_PUBLIC int
+PNG_set_font(const char *fontname)
+{
+    char name[32];
+    int  sep;
+    gdFontPtr font = PNG_font;
+
+    sep = strcspn(fontname,",");
+    strncpy(name,fontname,sep);
+    name[sep] = NUL;
+
+    if (!strcmp(name,"small"))
+	font = gdFontSmall;
+    else if (!strcmp(name,"medium"))
+	font = gdFontMediumBold;
+    else if(!strcmp(name,"large"))
+	font = gdFontLarge;
+    else if(!strcmp(name,"giant"))
+	font = gdFontGiant;
+    else if(!strcmp(name,"tiny"))
+	font = gdFontTiny;
+    /* New ttf font */
+    else if(*name)
+    	strncpy(png_state.ttffont,name,63);
+    /* Restore initial default font */
+    else 
+	strcpy(png_state.ttffont,PNG_ttffont);
+
+    /* DEBUG
+    if (*png_state.ttffont)
+    	fprintf(stderr,"Selecting font %s\n",png_state.ttffont);
+    else
+    	fprintf(stderr,"Selecting font %s\n",name);
+    DEBUG */
+
+    png_state.font  = font;
+    png_state.charw = font->w;
+    png_state.charh = font->h;
+
+    return TRUE;
+}
+
+#endif /* TERM_BODY */
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(png_driver)
+    "png", "PNG format [mode] [fontsize] [font face] [size] [colors]",
+    GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
+    PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
+    PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
+    PNG_linetype, PNG_put_text, PNG_text_angle,
+#ifdef HAVE_TTF
+    PNG_justify_text, 
+#else
+    null_justify_text,
+#endif
+    do_point, do_arrow, PNG_set_font,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0 /*suspend*/, 0 /*resume*/, 
+    PNG_boxfill /*EAM - fillbox*/,   
+    PNG_linewidth /*EAM - linewidth*/
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0 /* no mouse support for png terminal */
+#endif
+#ifdef PM3D
+    , PNG_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for PNG */
+    PNG_set_color,
+    PNG_filled_polygon
+#endif
+TERM_TABLE_END(png_driver)
+
+#undef LAST_TERM
+#define LAST_TERM png_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+START_HELP(png)
+"1 png",
+"?commands set terminal png",
+"?set terminal png",
+"?set term png",
+"?terminal png",
+"?term png",
+"?png",
+" EAM May 2001 - This is not the gnuplot 3.7 PNG driver; it is based",
+" on the old GIF/GD driver to get a much wider range of user options.",
+" It uses Thomas Boutell's gd library ( http://www.boutell.com/gd/ )",
+"",
+" By default, the `png` terminal driver uses a shared Web-friendy palette.",
+"",
+" Syntax:",
+"       set terminal png {transparent} {interlace}",
+"                        {tiny | small | medium | large | giant}",
+"                        {font FACE}",
+"                        {size <x>,<y>}",
+"                        {<color0> <color1> <color2> ...}",
+"",
+" `transparent` instructs the driver to generate transparent PNGs.  The first",
+" color will be the transparent one.",
+    "",
+" `interlace` instructs the driver to generate interlaced PNGs.",
+"",
+" The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
+" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels)",
+"",
+" The font FACE is either the full pathname to a TrueType font file, or a",
+" font face name searched for using the GDFONTPATH environmental variable.",
+"",
+" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
+" pixels can be also modified by scaling with the `set size` command.",
+"",
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is 256.",
+"",
+" Examples:",
+"       set terminal png medium size 640,480 \\",
+"                        xffffff x000000 x404040 \\",
+"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
+"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"",
+" which uses white for the non-transparent background, black for borders, gray",
+" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
+" plum and dark violet for eight plotting colors.",
+"",
+"       set terminal png large font arial size 800,600",
+"",
+" which searches for a TrueType font with face name 'arial' in the directory",
+" specified by the environment variable GDFONTPATH and large (14pt) font size.",
+"",
+"       set terminal png transparent xffffff \\",
+"                        x000000 x202020 x404040 x606060 \\",
+"                        x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\",
+" which uses white for the transparent background, black for borders, dark",
+" gray for axes, and a gray-scale for the six plotting colors.",
+""
+END_HELP(png)
+#endif /* TERM_HELP */
+
+/*
+ * JPEG support comes almost for free.
+ * We just piggy-back on the PNG routines, since they both go via libgd
+ */
+#ifdef HAVE_JPEG
+
+#ifdef TERM_REGISTER
+register_term(jpeg)
+#endif
+
+#ifdef TERM_PROTO
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+#include "gd.h"
+/* 
+ * All functions except the final write to file 
+ * are actually performed by the PNG driver code
+ */
+TERM_PUBLIC void
+JPEG_text()
+{
+int quality = 90;
+
+    if (png_state.flags & PNG_USE_INTERLACE)
+	gdImageInterlace(png_state.image, 1);
+    gdImageJpeg(png_state.image, gpoutfile, quality);
+    gdImageDestroy(png_state.image);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(jpeg_driver)
+    "jpeg", "JPEG format [fontsize] [font face] [size] [colors]",
+    GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
+    PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
+    JPEG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
+    PNG_linetype, PNG_put_text, PNG_text_angle,
+    PNG_justify_text, do_point, do_arrow, PNG_set_font,
+    0,				/* pointsize */
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0 /*suspend*/, 0 /*resume*/, 
+    PNG_boxfill /*EAM - fillbox*/,   
+    PNG_linewidth /*EAM - linewidth*/
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0 /* no mouse support for png terminal */
+#endif
+#ifdef PM3D
+    , PNG_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for PNG */
+    PNG_set_color,
+    PNG_filled_polygon
+#endif
+TERM_TABLE_END(png_driver)
+
+#undef LAST_TERM
+#define LAST_TERM jpeg_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(jpeg)
+"1 jpeg",
+"?commands set terminal jpeg",
+"?set terminal jpeg",
+"?set term jpeg",
+"?terminal jpeg",
+"?term jpeg",
+"?jpeg",
+"",
+" Syntax:",
+"       set terminal jpeg ",
+"                        {tiny | small | medium | large | giant}",
+"                        {font FACE}",
+"                        {size <x>,<y>}",
+"                        {<color0> <color1> <color2> ...}",
+"",
+" The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
+" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels)",
+"",
+" The font FACE is either the full pathname to a TrueType font file, or a",
+" font face name searched for using the GDFONTPATH environmental variable.",
+"",
+" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
+" pixels can be also modified by scaling with the `set size` command.",
+"",
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is 256.",
+"",
+" Examples:",
+"       set terminal jpeg medium size 640,480 \\",
+"                        xffffff x000000 x404040 \\",
+"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
+"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"",
+" which uses white for the non-transparent background, black for borders, gray",
+" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
+" plum and dark violet for eight plotting colors.",
+"",
+"       set terminal jpeg large font arial size 800,600",
+"",
+" which searches for a TrueType font with face name 'arial' in the directory",
+" specified by the environment variable GDFONTPATH and large (14pt) font size.",
+""
+END_HELP(jpeg)
+#endif /* TERM_HELP */
+#endif /* HAVE_JPEG */
+
+/*
+ * Local Variables:
+ * mode:C
+ * End:
+ */
