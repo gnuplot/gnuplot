@@ -32,7 +32,7 @@ static char *RCSid = "$Id: misc.c,v 1.79 1998/04/14 00:16:02 drd Exp $";
  *
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
- ]*/
+]*/
 
 #ifdef AMIGA_AC_5
 # include <exec/types.h>
@@ -1158,16 +1158,17 @@ FILE *fp;
     lf_head = lf;
 }
 
+/* used for reread  vsnyder@math.jpl.nasa.gov */
 FILE *lf_top()
-{				/* used for reread  vsnyder@math.jpl.nasa.gov */
+{
     if (lf_head == (LFS *) NULL)
 	return ((FILE *) NULL);
     return (lf_head->fp);
 }
 
-
+/* called from main */
 void load_file_error()
-{				/* called from main */
+{
     /* clean up from error in load_file */
     /* pop off everything on stack */
     while (lf_pop());
@@ -1176,17 +1177,13 @@ void load_file_error()
 /* find char c in string str; return p such that str[p]==c;
  * if c not in str then p=strlen(str)
  */
-#ifdef PROTOTYPES
-int instring(char *str, char c)
-#else
 int instring(str, c)
 char *str;
-char c;
-#endif
+int c;
 {
     int pos = 0;
 
-    while (str != NULL && *str != '\0' && c != *str) {
+    while (str != NULL && *str != NUL && c != *str) {
 	str++;
 	pos++;
     }
