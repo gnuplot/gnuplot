@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.39 2004/07/04 23:58:47 sfeam Exp $
+ * $Id: svg.trm,v 1.40 2004/08/19 05:04:33 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -107,6 +107,7 @@ static unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
 
 static int SVG_LineType = -3;	/* current line type*/
 static double SVG_LineWidth = 1.0; /* current line width*/
+static double SVG_linewidth_factor = 1.0; /* Multiplier for linewidths */
 static int SVG_TextAngle = 0;	/* current text orientation*/
 static enum JUSTIFY SVG_TextJust = LEFT; /* current text justification*/
 
@@ -179,7 +180,7 @@ SVG_GroupOpen ()
 	fprintf (gpoutfile,
 		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
-		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width);
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width * SVG_linewidth_factor);
 
 	SVG_groupIsOpen = TRUE;
     }
@@ -382,7 +383,7 @@ SVG_options ()
     SVG_local_reset();
 
     while (!END_OF_COMMAND) {
-	if (almost_equals (c_token, "s$ize")) {
+	if (almost_equals(c_token, "s$ize")) {
 	    double value;
 
 	    c_token++;
@@ -427,18 +428,18 @@ SVG_options ()
 	    continue;
 	}
 
-	if (almost_equals (c_token, "fn$ame"))  {
+	if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
+	    char *s;
 	    c_token++;
 
-	    if (!END_OF_COMMAND && isstring (c_token)) {
-		quote_str (SVG_fontNameDef, c_token, MAX_ID_LEN);
-		c_token++;
-	    } else
+	    if (!(s = try_to_get_string()))
 		int_error(c_token,"fname: expecting font name");
+	    strncpy(SVG_fontNameDef, s, sizeof(SVG_fontNameDef));
+	    free(s);
 	    continue;
 	}
 
-	if (almost_equals (c_token, "fs$ize")) {
+	if (almost_equals(c_token, "fs$ize")) {
 	    c_token++;
 
 	    if (END_OF_COMMAND)
@@ -447,27 +448,34 @@ SVG_options ()
 	    continue;
 	}
 
-	if (almost_equals (c_token, "fontfile")) {
+	if (almost_equals(c_token, "fontfile")) {
 	    char *fontfile_name;
 	    c_token++;
-            if (isstring(c_token)) {
-                fontfile_name = gp_alloc (token_len(c_token), "fontfile_name");
-                quote_str(fontfile_name, c_token, token_len(c_token));
-                gp_expand_tilde(&fontfile_name);
-#if defined(PIPES)
-		if ( *fontfile_name == '<' ) {
-		    SVG_embedded_font = fontfile_name;
-		} else
-#endif
-		    SVG_embedded_font = fontpath_fullname(fontfile_name);
-		if (!SVG_embedded_font)
-		    int_error(c_token, "Font file '%s' not found", fontfile_name);
-                c_token++;
-            } else
+
+	    fontfile_name = try_to_get_string();
+	    if (!fontfile_name)
                 int_error(c_token, "Font filename expected");
+	    gp_expand_tilde(&fontfile_name);
+#if defined(PIPES)
+	    if ( *fontfile_name == '<' ) {
+		SVG_embedded_font = fontfile_name;
+	    } else
+#endif
+		SVG_embedded_font = fontpath_fullname(fontfile_name);
+	    if (!SVG_embedded_font)
+		int_error(c_token, "Font file '%s' not found", fontfile_name);
+
             continue;
 	}
 
+	if (almost_equals (c_token, "linew$idth")) {
+	    c_token++;
+	    SVG_linewidth_factor = real(const_express(&a));
+	    if (SVG_linewidth_factor <= 0.0)
+		SVG_linewidth_factor = 1.0;
+	    continue;
+	}
+									
 	int_error(c_token, "unrecognized terminal option");
     }
 
@@ -485,6 +493,12 @@ SVG_options ()
 	sprintf(&(term_options[strlen(term_options)]),
 	    "fontfile \"%s\" ", SVG_embedded_font);
     }
+
+    if (SVG_linewidth_factor != 1.0) {
+	sprintf(&(term_options[strlen(term_options)]),
+	    "linewidth %3.1f ", SVG_linewidth_factor);
+    }
+
 }
 
 static void
@@ -1303,12 +1317,16 @@ START_HELP(svg)
 "",
 " Syntax:",
 "       set terminal svg {size <x> <y> {|fixed|dynamic}}",
+"                        {linewidth <w>}",
 "                        {fname \"<font>\"} {fsize <fontsize>}",
 "                        {{no}enhanced} {fontfile <filename>}",
 "",
 " where <x> and <y> are the size of the SVG plot to generate,",
 " `dynamic` allows a svg-Viewer to resize plot, whereas the default",
 " setting, `fixed`, will request an absolute size.",
+"",
+" `linewidth <w>` increases the width of all lines used in the figure",
+" by a factor of <w>.",
 "",
 " <font> is the name of the default font to use (default Arial) and",
 " <fontsize> is the font size (in points, default 12). Gnuplot does not",

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.34 2004/07/08 12:44:44 broeker Exp $
+ * $Id: pdf.trm,v 1.35 2004/07/18 20:53:57 sfeam Exp $
  */
 
 /*------------------------------
@@ -98,6 +98,7 @@ static int PDF_LineType = LT_UNDEFINED;	/* current line type*/
 static double PDF_LineWidth = 1.0; /* current line width*/
 static int PDF_TextAngle = 0;		/* current text orientation*/
 static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
+static double PDF_linewidth_factor = 1.0;/* multiplier for line width */
 
 /* default text font family: */
 static char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica";
@@ -289,45 +290,57 @@ PDF_options ()
 {
     struct value a;
 
-    if (!END_OF_COMMAND) {
+    while (!END_OF_COMMAND) {
+
 	if (almost_equals(c_token, "enh$anced")) {
 	    c_token++;
 	    term->put_text = ENHPDF_put_text;
+	    continue;
 	} else if (almost_equals(c_token, "noenh$anced")) {
 	    c_token++;
 	    term->put_text = PDF_put_text;
+	    continue;
 	}
-    }
 
-    if (!END_OF_COMMAND) {	/* get default font family name*/
-	if (almost_equals (c_token, "fn$ame"))  {
+	if (almost_equals(c_token, "fn$ame") || almost_equals(c_token, "font"))  {
+	    char *s;
 	    c_token++;
 
-	    if (!END_OF_COMMAND && isstring (c_token)) {
-		quote_str (PDF_fontNameDef, c_token, MAX_ID_LEN);
-		c_token++;
-	    } else
+	    if (!(s = try_to_get_string()))
 		int_error(c_token,"fname: expecting font name");
+	    strncpy(PDF_fontNameDef, s, sizeof(PDF_fontNameDef));
+	    free(s);
+	    continue;
 	}
-    }
 
-    if (!END_OF_COMMAND) {	/* get default font size*/
-	if (almost_equals (c_token, "fs$ize")) {
+	if (almost_equals(c_token, "fs$ize")) {
 	    c_token++;
 
 	    if (END_OF_COMMAND)
 		int_error(c_token,"fsize: expecting font size");
 	    PDF_fontSizeDef = real (const_express (&a));
+	    continue;
 	}
+
+	if (almost_equals (c_token, "linew$idth")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting line width");
+	    PDF_linewidth_factor = real (const_express (&a));
+	    if (PDF_linewidth_factor < 0.0)
+		PDF_linewidth_factor = 1.0;
+	    continue;
+	}
+
+	int_error(c_token, "unexpected text at end of command");
+
     }
 
-    if (!END_OF_COMMAND)
-	 int_error(c_token, "unexpected text at end of command");
-
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "%s fname '%s'  fsize %g",
+    sprintf(term_options, "%s fname '%s'  fsize %g linewidth %3.1f ",
 	    term->put_text == ENHPDF_put_text ? "enhanced" : "noenhanced",
-	    PDF_fontNameDef, PDF_fontSizeDef);
+	    PDF_fontNameDef, PDF_fontSizeDef, PDF_linewidth_factor);
 }
 
 
@@ -450,7 +463,7 @@ TERM_PUBLIC void
 PDF_linewidth (double linewidth)
 {
     PDF_PathClose();
-    PDF_LineWidth = PDF_RESOLUTION * linewidth / 4.0;
+    PDF_LineWidth = PDF_RESOLUTION * PDF_linewidth_factor * linewidth / 4.0;
     PDF_setlinewidth(myPDF, PDF_LineWidth);
 }
 
@@ -1398,13 +1411,16 @@ START_HELP(pdf)
 "",
 " Syntax:",
 "       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
-"                        {{no}enhanced}",
+"                        {{no}enhanced} {linewidth <n>}",
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
 " and <fontsize> is the font size (in points, default 12).",
 "",
 " The `enhanced` option enables enhanced text processing features",
 " (subscripts, superscripts and mixed fonts). See `enhanced` for more",
-" information. Only the core PDF fonts are supported."
+" information. Only the core PDF fonts are supported.",
+"",
+" The width of all lines in the plot can be increased by the factor <n>",
+" specified in `linewidth`."
 END_HELP(pdf)
 #endif

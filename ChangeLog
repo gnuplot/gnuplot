@@ -3,6 +3,19 @@
 	* term/xlib.trm (Xlib_text): Leave output file open so that it is
 	possible to plot multiple frames without another 'set term xlib'.
 
+	* svg.trm (SVG_options): allow "font" as a synonym for "fname";
+	replace isstring+quote_str with try_to_get_string();
+	new option "linewidth <n>".
+
+	* pdf.trm (PDF_options): make options order-independent;
+	replace isstring+quote_str with try_to_get_string();
+	allow "font" as a synomym for "fname";
+	new option "linewidth <n>".
+
+	* post.trm (PS_options): allow "font" as a synonym for "fname"
+
+	* fig.trm (FIG_options): allow "linewidth" as a synonym for "thickness".
+
 2004-08-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#14).
