@@ -1,3 +1,14 @@
+2002-01-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* configure.in: Added 'exit 0' at end.  Without it make stops
+	after running "config.status --recheck".
+
+	* src/specfun.c: Removed prototypes of former static functions
+	lgampos, lgamneg.
+	(lngamma): Added missing return statement.
+	(lngamma, inverse_normal_func, inverse_error_func): Moved error
+	message to stderr.
+
 2002-01-25  Johannes Zellner  <johannes@zellner.org>
 
 	* src/plot3d.c: scaling for 'linetype palette' was broken after
@@ -7,14 +18,14 @@
 
 	* src/pm3d.h src/pm3d.c src/set.c src/show.c src/save.c
 	src/graph3d.c src/misc.c src/pm3d.c src/pm3d.h src/plot3d.c
-	src/gp_types.h src/graphics.c src/tables.c docs/gnuplot.doc:
-	pm3d option 'explicit / implicit' and related functionality
+	src/gp_types.h src/graphics.c src/tables.c docs/gnuplot.doc: pm3d
+	option 'explicit / implicit' and related functionality
 
 2002-01-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Removed unused variable. Fixed highly
- 	probable typo this_arrow->layer in the middle of 'set label'
- 	treatment.
+	probable typo this_arrow->layer in the middle of 'set label'
+	treatment.
 	
 2002-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
