@@ -1,3 +1,11 @@
+2004-10-18  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/be.trm term/cgm.trm term/emf.trm term/epslatex.trm term/fig.trm
+	term/gd.trm term/metapost.trm term/tgif.trm term/win.trm term/x11.trm:
+	Add a check in TERM_pointsize() so that negative point size is reset to
+	size 1.0.  This has always been the case for the generic do_pointsize()
+	routine in term.c, but not all of the individual terminals did likewise.
+
 2004-10-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots):

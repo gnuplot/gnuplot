@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.32 2004/04/13 17:24:39 broeker Exp $
+ * $Id: win.trm,v 1.33 2004/07/01 17:10:34 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -313,6 +313,9 @@ WIN_set_pointsize(double s)
 {
     /* Save new pointsize as string */
     char scale[30];
+
+    if (s < 0)
+	s = 1;
     sprintf(scale, "%.15g", s);
 #if 1
     /* HBB 980309: it seems passing it as a string is a bad idea

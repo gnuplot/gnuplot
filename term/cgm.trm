@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.60 2004/07/04 23:58:47 sfeam Exp $
+ * $Id: cgm.trm,v 1.61 2004/09/09 12:13:05 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1627,6 +1627,8 @@ CGM_set_pointsize(double size)
 
        The fractions are approximates of the equivalent
        continued fractions. */
+    if (size < 0)
+	size = 1;
     cgm_tic = (size * term->h_tic / 2);
     cgm_tic707 = cgm_tic * 12 / 17;
     cgm_tic866 = cgm_tic * 13 / 15;

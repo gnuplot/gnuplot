@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.44 2004/08/24 04:44:25 sfeam Exp $
+ * $Id: fig.trm,v 1.45 2004/09/16 00:22:29 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -984,7 +984,7 @@ FIG_lpoint(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC void
 FIG_pointsize(double arg_pointsize)
 {
-    FIG_current_pointsize = arg_pointsize;
+    FIG_current_pointsize = arg_pointsize < 0. ? 1. : arg_pointsize;
     /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
     do_pointsize(arg_pointsize * FIG_font_s / (double) FIG_FONT_S);
 }

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.51 2004/09/17 19:22:47 sfeam Exp $
+ * $Id: gd.trm,v 1.52 2004/09/30 16:43:38 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1457,6 +1457,8 @@ PNG_set_font(const char *fontname)
 TERM_PUBLIC void
 PNG_pointsize(double ptsize)
 {
+    if (ptsize < 0)
+	ptsize = 1;
     PNG_ps = (int)(((double)PNG_POINT_SCALE * ptsize) + 0.5);
 }
 

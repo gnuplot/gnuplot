@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.23 2004/09/16 05:22:03 sfeam Exp $
+ * $Id: emf.trm,v 1.24 2004/09/30 23:01:25 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -1018,6 +1018,8 @@ EMF_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC void 
 EMF_set_pointsize(double size)
 {
+    if (size < 0)
+	size = 1;
     emf_tic = (size * term->h_tic);
     emf_tic707 = emf_tic * 12 / 17;
     emf_tic866 = emf_tic * 13 / 15;

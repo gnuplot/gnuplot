@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.27 2004/09/16 00:22:30 sfeam Exp $
+ * $Id: metapost.trm,v 1.28 2004/10/09 06:13:27 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -623,6 +623,8 @@ MP_point(unsigned int x, unsigned int y, int pt)
 TERM_PUBLIC void
 MP_pointsize(double ps)
 {
+    if (ps < 0)
+	ps = 1;
     if (MP_oldptsize != ps) {
 	if (MP_inline)
 	    MP_endline();
