@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.43 2003/12/14 23:23:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.44 2004/06/19 07:52:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -181,7 +181,6 @@ make_palette(void)
    Set the colour on the terminal
    Currently, each terminal takes care of remembering the current colour,
    so there is not much to do here.
-   according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
  */
 void
 set_color(double gray)

@@ -1,3 +1,11 @@
+2004-06-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): Fixed
+	wrong step for negative palette.
+
+	* src/color.c (set_color) src/command.c (test_palette_subcommand)
+	src/show.c (show_palette_palette): Removed useless comments.
+
 2004-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c (set_color, draw_inside_color_smooth_box_bitmap)

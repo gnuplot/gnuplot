@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.92 2004/04/22 11:39:13 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.93 2004/06/07 05:33:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1384,7 +1384,6 @@ se tit'R,G,B profiles of the current color palette';";
     for (i = 0; i < test_palette_colors; i++) {
 	/* colours equidistantly from [0,1] */
 	z[i] = (double)i / (test_palette_colors - 1); 
-	/* needed, since printing without call to set_color()*/
 	gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
 	rgb1_from_gray(gray, &rgb1[i]);
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.88 2004/04/13 17:23:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.89 2004/06/19 07:52:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2932,7 +2932,7 @@ int xl, yl;
     double step = ((double)(key_sample_right - key_sample_left)) / steps;
     int i = 1, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
-    double gray_from, gray_to, gray_step;
+    double gray, gray_from, gray_to, gray_step;
 
     /* color gradient only over the cb-values of the surface, if smaller than the 
      * cb-axis range (the latter are gray values [0:1]) */
@@ -2942,17 +2942,17 @@ int xl, yl;
     cbmax = GPMIN(cbmax, CB_AXIS.max);
     gray_from = cb2gray(cbmin);
     gray_to = cb2gray(cbmax);
-    gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
+    gray_step = (gray_to - gray_from)/steps;
 
     if (key->flag == KEY_AUTO_PLACEMENT)
 	(*term->move) (x1, yl);
     else 
 	clip_move(x1, yl);
-    set_color(gray_from);
     x2 = x1;
     while (i <= steps) {
 	/* if (i>1) set_color( i==steps ? 1 : (i-0.5)/steps ); ... range [0:1] */
-	if (i>0) set_color( i==steps ? gray_to : gray_from+i*gray_step );
+	gray = (i==steps) ? gray_to : gray_from+i*gray_step;
+	set_color(gray);
 	(*term->move) (x2, yl);
 	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
 	if (key->flag == KEY_AUTO_PLACEMENT)
@@ -2978,7 +2978,7 @@ int pointtype;
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
     double cbmin, cbmax;
-    double gray_from, gray_to, gray_step;
+    double gray, gray_from, gray_to, gray_step;
     /* rule for number of steps: 3*char_width*pointsize or char_width for dots, 
      * but at least 3 points */
     double step = term->h_char * (pointtype == -1 ? 1 : 3*(1+(pointsize-1)/2));
@@ -2994,18 +2994,15 @@ int pointtype;
     cbmax = GPMIN(cbmax, CB_AXIS.max);
     gray_from = cb2gray(cbmin);
     gray_to = cb2gray(cbmax);
-    gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
+    gray_step = (gray_to - gray_from)/steps;
 #if 0
     fprintf(stderr,"POINT_pm3D: cbmin=%g  cbmax=%g\n",cbmin, cbmax);
     fprintf(stderr,"steps=%i gray_from=%g gray_to=%g gray_step=%g\n",steps,gray_from,gray_to,gray_step);
 #endif
-    set_color(gray_from);
     while (i <= steps) {
 	/* if (i>0) set_color( i==steps ? gray_to : (i-0.5)/steps ); ... range [0:1] */
-	if (i>0) set_color( i==steps ? gray_to : gray_from+i*gray_step );
-#if 0
-	fprintf(stderr,"  i=%i\t %g\n", i, (i==steps ? gray_to : gray_from+i*gray_step ));
-#endif
+	gray = (i==steps) ? gray_to : gray_from+i*gray_step;
+	set_color(gray);
 	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
 	/* x2 += key_point_offset; ... that's if there is only 1 point */
 	if (key->flag == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))

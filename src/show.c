@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.125 2004/05/04 02:56:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.126 2004/06/13 06:01:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1977,7 +1977,6 @@ show_palette_palette()
 	/* colours equidistantly from [0,1]  */
 	gray = (double)i / (colors - 1); 
 	if (sm_palette.positive == SMPAL_NEGATIVE)
-	    /* needed, since printing without call to set_color()  */
 	    gray = 1 - gray;
 	rgb1_from_gray(gray, &rgb1);
 	rgb255_from_rgb1(rgb1, &rgb255);
