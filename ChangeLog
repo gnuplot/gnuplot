@@ -1,3 +1,7 @@
+1999-11-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Bugfix in configuration summary.
+
 1999-11-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Also check whether gethostbyname() was found in
