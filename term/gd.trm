@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.12 2002/08/23 20:57:02 mikulik Exp $
+ * $Id: gd.trm,v 1.15 2002/08/28 20:49:35 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1078,8 +1078,8 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    	err,string,png_state.ttffont);
 	} else {
-	    x -= (brect[6]-brect[0]) / 2.;
-	    y += (brect[7]-brect[1]) / 2.;
+	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
+	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
 	    switch (png_state.justify) {
 		case RIGHT:	
 		    		x -= (brect[2]-brect[0]);
