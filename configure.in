@@ -1,11 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.41.2.3 1999/09/22 13:52:21 lhecking Exp $
+dnl $Id: configure.in,v 1.41.2.4 1999/10/15 16:00:49 lhecking Exp $
 dnl
 AC_INIT(graphics.c)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.41.2.3 $)
+AC_REVISION($Revision: 1.41.2.4 $)
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
@@ -112,6 +112,12 @@ dnl X Window System files.
 AC_SUBST(X_LIBRARIES)
 AC_SUBST(GNUPLOT_X11)
 AC_PATH_XTRA
+
+dnl Needed for LynxOS until AC_PATH_XTRA is fixed
+if test $ac_cv_lib_nsl_gethostbyname = no; then
+  AC_CHECK_LIB(bsd, gethostbyname, X_EXTRA_LIBS="$X_EXTRA_LIBS -lbsd")
+fi
+
 if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   X_LIBRARIES="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
