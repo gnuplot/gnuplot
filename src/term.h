@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.24 2004/04/13 17:24:02 broeker Exp $
+ * $Id: term.h,v 1.25 2004/07/01 17:10:08 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -306,12 +306,6 @@
 /* fig graphics */
 #include "fig.trm"
 
-/* NOTE THAT GIF REQUIRES A SEPARATE LIBRARY : see term/gif.trm */
-/* GIF format. */
-#if defined(PNG_FOR_GIF) || defined(HAVE_GD_GIF)
-# include "gif.trm"
-#endif
-
 /* geographical info system */
 /* #include "grass.trm" */
 
@@ -351,18 +345,8 @@
 # include "pdf.trm"
 #endif
 
-/* NOTE THAT PNG AND JPEG SUPPORT REQUIRE SEPARATE LIBRARIES */
-/* There are 2 flavors of PNG support                                        */
-/* If you are using an old version of libgd in order to get true GIF support */
-/* then the best we can do is use a separate poor-quality PNG driver png.trm */
-/* But if you are using a newer libgd then it provides full blown support    */
-/* for both PNG and JPEG in term/gd.trm                                      */
-#ifdef HAVE_LIBPNG
-# if defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG)
-#  include "gd.trm"
-# else
-#  include "png.trm"
-# endif
+#if defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG) || defined(HAVE_GD_GIF)
+# include "gd.trm"
 #endif
 
 /* postscript */

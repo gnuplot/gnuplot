@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.44 2004/07/08 19:26:13 sfeam Exp $
+ * $Id: gd.trm,v 1.45 2004/07/13 14:11:25 broeker Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -677,6 +677,10 @@ PNG_options()
 	}
     }
 #endif
+
+    /* This code is shared by png, gif, and jpeg terminal types */
+    if (!strcmp(term->name,"jpeg"))
+	png_state.flags &= ~PNG_USE_TRANSPARENT;
 
     /* now generate options string */
 
@@ -1858,3 +1862,148 @@ START_HELP(jpeg)
 END_HELP(jpeg)
 #endif /* TERM_HELP */
 #endif /* HAVE_GD_JPEG */
+
+#ifdef HAVE_GD_GIF
+/*
+ * GIF support comes almost for free.
+ * We just piggy-back on the PNG routines, since they both go via libgd.
+ * Required libgd version is 2.0.28 or newer.
+ */
+#ifdef HAVE_GD_GIF
+
+#ifdef TERM_REGISTER
+register_term(gif)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void GIF_text __PROTO((void));
+#define GOT_NEXT_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+
+#ifdef TERM_BODY
+
+#include "gd.h"
+/*
+ * All functions except the final write to file
+ * are actually performed by the PNG driver code
+ */
+TERM_PUBLIC void
+GIF_text()
+{
+    gdImageGif(png_state.image, gpoutfile);
+    gdImageDestroy(png_state.image);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+
+TERM_TABLE_START(gif_driver)
+    "gif", "GIF images using libgd and TrueType fonts",
+    GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
+    PNG_TICSIZE, PNG_TICSIZE, PNG_options, PNG_init, PNG_reset,
+    GIF_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
+    PNG_linetype, PNG_put_text, PNG_text_angle,
+    PNG_justify_text, PNG_point, do_arrow, PNG_set_font,
+    PNG_pointsize,
+    TERM_CAN_MULTIPLOT | TERM_BINARY,
+    0 /*suspend*/, 0 /*resume*/,
+    PNG_boxfill /*EAM - fillbox*/,
+    PNG_linewidth /*EAM - linewidth*/
+#ifdef USE_MOUSE
+    , 0, 0, 0, 0, 0 /* no mouse support */
+#endif
+#ifdef PM3D
+    , PNG_make_palette,
+    0, /* previous_palette() ... no, single array of 256 colours for PNG */
+    PNG_set_color,
+    PNG_filled_polygon
+#endif
+    , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
+TERM_TABLE_END(png_driver)
+
+#undef LAST_TERM
+#define LAST_TERM gif_driver
+
+#endif /* TERM_TABLE */
+#endif /* TERM_PROTO_ONLY */
+
+
+#ifdef TERM_HELP
+START_HELP(gif)
+"1 gif",
+"?commands set terminal gif",
+"?set terminal gif",
+"?set term gif",
+"?terminal gif",
+"?term gif",
+"?gif",
+"",
+" Syntax:",
+"       set terminal gif ",
+"                        {tiny | small | medium | large | giant}",
+"                        {{no}transparent} {{no}enhanced}",
+"                        {font <face> {<pointsize>}}",
+"                        {size <x>,<y>} {{no}crop}",
+"                        {<color0> <color1> <color2> ...}",
+"",
+" GIF images are created using libgd, with optional support for TrueType",
+" fonts via libfreetype.",
+"",
+" Five basic fonts are supported directly by the gd library. These are",
+" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
+" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
+" or rotated (pure horizontal or vertical text only).",
+"",
+" `transparent` instructs the driver to generate transparent GIFs.  The first",
+" color will be the transparent one. Default is `notransparent`.",
+"",
+" `enhanced` enables the enhanced text processing features, (subscripts, ",
+" superscripts and mixed fonts). See `enhanced` for more information. ",
+" The full enhanced mode syntax is supported by the PNG/GIF driver itself,",
+" but some of these features are dependent on which version of the ",
+" underlying libgd library is present, and which fonts are available.",
+"",
+" If your local gd library was built with support for TrueType  and Adobe",
+" Type 1 fonts, they may be selected using the 'font <face> {<pointsize>}' ",
+" option. <face> is either the full pathname to the font file, or a font ",
+" face name that is assumed to be the first part of a filename in one of the ",
+" directories listed in the GDFONTPATH environmental variable. That is, ",
+" 'set term gif font \"Face\"' will look for a font file named either ",
+" <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and ",
+" Adobe Type 1 fonts are fully scalable and may be rotated through any angle.",
+" If no font is specified, gnuplot checks the environmental variable ",
+" GNUPLOT_DEFAULT_GDFONT to see if there is a preferred default font. ",
+"",
+" The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
+" pixels can be also modified by scaling with the `set size` command.",
+" `crop` trims blank space from the edges of the completed plot, resulting",
+" in a smaller final image size. Default is `nocrop`.",
+"",
+" Each color must be of the form 'xrrggbb', where x is the literal character",
+" 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
+" 'x00ff00' is green.  The background color is set first, then the border",
+" colors, then the X & Y axis colors, then the plotting colors.  The maximum",
+" number of colors that can be set is 256.",
+"",
+" Examples:",
+"       set terminal gif medium size 640,480 \\",
+"                        xffffff x000000 x404040 \\",
+"                        xff0000 xffa500 x66cdaa xcdb5cd \\",
+"                        xadd8e6 x0000ff xdda0dd x9500d3    # defaults",
+"",
+" which uses white for the non-transparent background, black for borders, gray",
+" for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
+" plum and dark violet for eight plotting colors.",
+"",
+"       set terminal gif font 'arial' 14 size 800,600",
+"",
+" which searches for a TrueType font with face name 'arial' in the directory",
+" specified by the environment variable GDFONTPATH and 14pt font size.",
+""
+END_HELP(gif)
+#endif /* TERM_HELP */
+#endif /* HAVE_GD_GIF */
+#endif

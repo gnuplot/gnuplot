@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.132 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.133 2004/07/30 16:09:55 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -969,14 +969,6 @@ show_version(FILE *fp)
 #endif
 		"";
 
-	    const char *libpng =
-#if defined(HAVE_LIBPNG) && !(defined(HAVE_GD_PNG) || defined(HAVE_GD_JPEG))
-		"+"
-#else
-		"-"
-#endif
-		"PNG  ";
-
 	    const char *linuxvga =
 #ifdef LINUXVGA
 		"+LINUXVGA  "
@@ -1027,9 +1019,9 @@ show_version(FILE *fp)
 
 	    fprintf(stderr, "\
 Compile options:\n\
-%s%s%s%s%s\n\
+%s%s%s%s\n\
 %s%s%s%s%s%s\n\n",
-		    rdline, gnu_rdline, libgd, libpng, linuxvga,
+		    rdline, gnu_rdline, libgd, linuxvga,
 		    nocwdrc, x11, use_mouse, unixplot, gnugraph, hiddenline);
 	}
 
