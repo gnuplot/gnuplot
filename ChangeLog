@@ -1,3 +1,8 @@
+2002-09-09  Johannes Zellner  <johannes@zellner.org>
+
+	* term/cgm.trm: point types and line types (colors) similar
+	to the postscript driver
+
 2002-09-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Integrated SF Patch #606726 by Harald Harders. This implements a
@@ -1179,7 +1184,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/27 00:11:13 $).
+	last modification date (from the tag $Date: 2002/09/27 12:17:38 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

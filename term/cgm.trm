@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.45 2002/07/26 16:42:28 mikulik Exp $
+ * $Id: cgm.trm,v 1.46 2002/08/30 20:18:24 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -112,7 +112,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 				/* convert from plot units to pt */
 #define CGM_PT ((term->xmax + CGM_MARGIN)/cgm_plotwidth)
 #define CGM_LINE_TYPES 9	/* number of line types we support */
-#define CGM_COLORS 8		/* number of line colors we support in
+#define CGM_COLORS 11		/* number of line colors we support in
                                    the default color table */
 #define CGM_POINTS 13		/* number of markers we support */
 #define CGM_MAX_SEGMENTS 104	/* maximum # polyline coordinates */
@@ -201,14 +201,17 @@ static int GPFAR cgm_default_color_table[] =
 {
      0,				/* starting index */
      255,255,255,		/* white (the background color) */
-     0,0,0,			/* black */
-     255,0,0,			/* red */
-     0,255,0,			/* green */
-     0,0,255,			/* blue */
-     255,165,0,			/* orange */
-     255,0,255,			/* magenta */
-     0,255,255,			/* cyan */
-     190,190,190		/* gray75 (which Windows calls "gray 25%") */
+     0,0,0,			/* black -2,  lt = -1 */
+     160,160,160,		/* gray -1,   lt = 0 */
+     255,0,0,			/* red 0,     lt = 1 */
+     0,255,0,			/* green,     lt = 2 */
+     0,0,255,			/* blue,      lt = 3 */
+     255,0,255,			/* magenta,   lt = 4 */
+     0,255,255,			/* cyan,      lt = 5 */
+     255,255,0,			/* yellow,    lt = 6 */
+     0,0,0,			/* black,     lt = 7 */
+     255,77,0,			/* orange,    lt = 8 */
+     128,128,128,		/* gray,      lt = 9 */
 };
 
 struct fontdata {
@@ -859,8 +862,11 @@ CGM_linecolor(linecolor)
     int linecolor;
 {
     assert(linecolor > L_TYPE_NODRAW);
-    linecolor = (linecolor < 1) ? 1 : 
-      linecolor % cgm_linetypes + 1;
+    if (linecolor >= 0) {
+	/* subtract 2 due to linetypes -2 / -1 */
+	linecolor %= (cgm_linetypes - 2);
+    }
+    linecolor += 3;
     if (cgm_monochrome || linecolor == cgm_color)
 	return;
     cgm_color = linecolor;
@@ -962,7 +968,7 @@ TERM_PUBLIC int CGM_make_palette(palette)
 	 cgm_smooth_colors = palette->colors;
 	 if (1 + CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
 	      cgm_user_color_max = 1 + CGM_COLORS + cgm_smooth_colors;
-	      cgm_user_color_table = 
+	      cgm_user_color_table =
 		   gp_realloc(cgm_user_color_table, 
 			      (cgm_user_color_max*3+1)*sizeof(int),
 			      "CGM color table");
@@ -1395,10 +1401,13 @@ int number;
     CGM_flush_polyline();
     old_dashtype = cgm_dashtype;
     CGM_dashtype(0);
-    if (number <= 7) {
+    if (number == 4 || number == 6 || number == 8
+	    || number == 10 || number == 12) {
+	/* filled */
       cgm_next.edge_visibility = 0;
       cgm_next.fill_color = cgm_color;
     } else {
+	/* NOT filled */
       cgm_next.edge_visibility = 1;
       cgm_next.fill_color = 0;	/* index 0 is always the background color */
       cgm_next.edge_color = cgm_color;
@@ -1418,42 +1427,19 @@ int number;
     }
       
     switch (number) {
-    case 0:			/* draw diamond */
-    case 8:
-	CGM_move(x - cgm_tic, y);
-	CGM_solid_vector(x, y - cgm_tic);
-	CGM_solid_vector(x + cgm_tic, y);
-	CGM_solid_vector(x, y + cgm_tic);
-	CGM_flush_polygon();
-	break;
-    case 1:			/* draw plus */
+    case 0:			/* draw plus */
 	CGM_move(x - cgm_tic, y);
 	CGM_solid_vector(x + cgm_tic, y);
 	CGM_move(x, y - cgm_tic);
 	CGM_solid_vector(x, y + cgm_tic);
 	break;
-    case 2:			/* draw box */
-    case 9:
-	CGM_move(x - cgm_tic707, y - cgm_tic707);
-	CGM_solid_vector(x + cgm_tic707, y - cgm_tic707);
-	CGM_solid_vector(x + cgm_tic707, y + cgm_tic707);
-	CGM_solid_vector(x - cgm_tic707, y + cgm_tic707);
-	CGM_flush_polygon();
-	break;
-    case 3:			/* draw X */
+    case 1:			/* draw X */
 	CGM_move(x - cgm_tic707, y - cgm_tic707);
 	CGM_solid_vector(x + cgm_tic707, y + cgm_tic707);
 	CGM_move(x - cgm_tic707, y + cgm_tic707);
 	CGM_solid_vector(x + cgm_tic707, y - cgm_tic707);
 	break;
-    case 4:			/* draw triangle (point up) */
-    case 10:
-	CGM_move(x, y + cgm_tic1241);
-	CGM_solid_vector(x - cgm_tic1077, y - cgm_tic621);
-	CGM_solid_vector(x + cgm_tic1077, y - cgm_tic621);
-	CGM_flush_polygon();
-	break;
-    case 5:			/* draw star (asterisk) */
+    case 2:			/* draw star (asterisk) */
 	CGM_move(x, y - cgm_tic);
 	CGM_solid_vector(x, y + cgm_tic);
 	CGM_move(x + cgm_tic866, y - cgm_tic500);
@@ -1461,15 +1447,16 @@ int number;
 	CGM_move(x + cgm_tic866, y + cgm_tic500);
 	CGM_solid_vector(x - cgm_tic866, y - cgm_tic500);
 	break;
-    case 6:			/* draw triangle (point down) */
-    case 11:
-	CGM_move(x, y - cgm_tic1241);
-	CGM_solid_vector(x - cgm_tic1077, y + cgm_tic621);
-	CGM_solid_vector(x + cgm_tic1077, y + cgm_tic621);
+    case 3:			/* draw box */
+    case 4:
+	CGM_move(x - cgm_tic707, y - cgm_tic707);
+	CGM_solid_vector(x + cgm_tic707, y - cgm_tic707);
+	CGM_solid_vector(x + cgm_tic707, y + cgm_tic707);
+	CGM_solid_vector(x - cgm_tic707, y + cgm_tic707);
 	CGM_flush_polygon();
 	break;
-    case 7:
-    case 12:			/* draw circle (actually, dodecagon)
+    case 5:
+    case 6:			/* draw circle (actually, dodecagon)
 				   (WinWord 6 accepts the CGM "circle"
 				   element, but the resulting circle
 				   is not correctly centered!) */
@@ -1485,6 +1472,28 @@ int number;
 	CGM_solid_vector(x - cgm_tic, y);
 	CGM_solid_vector(x - cgm_tic866, y - cgm_tic500);
 	CGM_solid_vector(x - cgm_tic500, y - cgm_tic866);
+	CGM_flush_polygon();
+	break;
+    case 7:			/* draw triangle (point up) */
+    case 8:
+	CGM_move(x, y + cgm_tic1241);
+	CGM_solid_vector(x - cgm_tic1077, y - cgm_tic621);
+	CGM_solid_vector(x + cgm_tic1077, y - cgm_tic621);
+	CGM_flush_polygon();
+	break;
+    case 9:			/* draw triangle (point down) */
+    case 10:
+	CGM_move(x, y - cgm_tic1241);
+	CGM_solid_vector(x - cgm_tic1077, y + cgm_tic621);
+	CGM_solid_vector(x + cgm_tic1077, y + cgm_tic621);
+	CGM_flush_polygon();
+	break;
+    case 11:			/* draw diamond */
+    case 12:
+	CGM_move(x - cgm_tic, y);
+	CGM_solid_vector(x, y - cgm_tic);
+	CGM_solid_vector(x + cgm_tic, y);
+	CGM_solid_vector(x, y + cgm_tic);
 	CGM_flush_polygon();
 	break;
     }
