@@ -1,3 +1,158 @@
+2000-03-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Cleanup after merge with Johannes' sources.
+
+	* unset.c: Change borders and label contours as sugegsted by
+	Johannes.
+
+	* configure.in, docs/gnuplot.doc, src/command.c, src/gpexecute.inc,
+	src/gplt_x11.c, src/ipc.h, src/misc.c, src/mouse.c, src/mouse.h,
+	src/plot.c, src/readline.c, src/readline.h, src/set.c, src/show.c,
+	src/os2/glcient.c, term/pm.trm, term/x11.trm: Merged Johannes' changes.
+
+2000-03-28  Petr Mikulik <mikulik@physics.muni.cz>
+
+	* term/post.trm: Epsf option sets landscape mode instead of landscape.
+
+2000-03-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c(boundary3d): Change plot size if no key is set after
+	set key below (part one).
+
+2000-03-28  Jeff Spirko  <spirko@TopQuark.physics.lehigh.edu>
+
+	* src/graph3d.c(boundary3d): Change plot size if no key is set after
+	set key outside (part two).
+
+2000-03-18  Johannes Zellner <johannes@zellner.org>
+
+	* src/graph3d.c(do_3dplot): Fix bug which occured after having changed
+	some variables from unsigned int to int because	map3d_xy takes
+	unsigned.
+
+2000-03-17  Johannes Zellner <johannes@zellner.org>
+
+	* made quite a few of the mouse.c functions static and
+	removed prototypes for these from mouse.h.
+
+2000-03-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* fixed fit.c for the crash:
+	  f(x) = a*sin(x) + b*x+c; fit f(x) 'a' via a,b,c,d
+	udv_ptr->udv_name in setvar() is reallocated, but not initialised.
+
+2000-03-16  Johannes Zellner <johannes@zellner.org>
+
+	* merged minor changes from the pm3d branch.
+
+2000-03-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* REXX unknown command crash solved
+	* minor changes to avoid compiler warnings from command.c
+
+2000-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* let background the background of the PM window be white always
+	  (before: system background)
+
+2000-03-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/latex.trm: Avoid compiler warning about if - else - if - else
+	without {}.
+	* let 'show bind' print bindings for Space and q (mouse.c)
+
+2000-03-08  Johannes Zellner <johannes@zellner.org>
+
+	* term/fig.trm(FIG_put_text): Fix bug which caused a SEGFAULT.
+
+2000-03-08  Johannes Zellner <johannes@zellner.org>
+
+	* src/misc.c: Introduce pipe for load command gnuplot> load "< ...".
+
+2000-03-04  Johannes Zellner <johannes@zellner.org>
+
+	* changed the order of two lines in extend_token_table() so
+	that is does not segfault any more when reallocating the `token'.
+	(reported by Wolfgang Schadow <schadow@lin07.triumf.ca>).
+
+2000-03-03  Johannes Zellner <johannes@zellner.org>
+
+	* added a check for term in mouse.c:event_reset() to avoid
+	a segfault.
+
+2000-03-03  Johannes Zellner <johannes@zellner.org>
+
+	* added a check for stpcpy in configure.in
+
+2000-03-02  Johannes Zellner <johannes@zellner.org>
+
+	* removed the contents of `src/unused'
+
+2000-03-02  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+        * fixed updating of ruler position when autoscale is enabled:
+        use min_array[...] etc. instead of xmin etc. in recalc_ruler_pos().
+
+        * added updating of x2 and y2 coordinates of ruler position.
+
+2000-03-02  Johannes Zellner <johannes@zellner.org>
+
+        * added a few if (PM_pipe) to term/pm.trm to prevent segfaults
+	if the connection to the pm driver was not established yet.
+
+2000-03-02  Johannes Zellner <johannes@zellner.org>
+
+	* a really small fix in term/x11.trm: change the position of
+	a comma so that is included between #ifdef USE_MOUSE ...
+
+2000-03-01  Johannes Zellner <johannes@zellner.org>
+
+	* removed the message 'Using mouse-enhanced terminal ...'
+	from term/x11.trm, as it can be annoying when using gnuplot
+	in a pipe.
+
+2000-02-29  Johannes Zellner <johannes@zellner.org>
+
+        * added a few if (X11_ipc) to term/x11.trm to prevent segfaults
+	if the connection to the outboard driver was not established yet.
+
+2000-02-25  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+        * put #ifdef USE_MOUSE around use of EventHandler() in src/gplt_x11.c,
+        to make it compile without mouse again.
+
+2000-02-21  Johannes Zellner <johannes@zellner.org>
+
+        * changed ISATTY to isatty_state as requested by Lars.
+
+2000-02-19  Johannes Zellner <johannes@zellner.org>
+
+        * removed two unused functions in gplt_x11.c
+
+	* removed the `set mouse labeloptions' command. The label
+	option string can now passed as optional argument to the
+	`set mouse labels' command. (see help mouse)
+	(both changes were suggested by Pieter-Tjerk de Boer)
+
+2000-02-18 Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+        * gplt_x11 now catches the EnterWindow event, to immediately show
+        correct coordinates and zoombox when the mouse enters the window.
+
+        * 'set term ...' now cancels the zoom box.
+
+        * removed some unused code in gplt_x11.c
+
+2000-02-12  Johannes Zellner <johannes@zellner.org>
+
+        * changed the policy for allowing bidirectional ipc in X11:
+	if stdin comes from a terminal (tty) the mouse is on by default,
+	if stdin is not from a tty, events are not processed by default.
+	If someone wants event processing when writing from a pipe to
+	gnuplot she should turn on the mouse `set mouse` explicitely
+	*before* starting the x11 driver. This is also explained in
+	the docs.
+
 2000-02-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/pc.trm: Small change in the help section.
@@ -101,7 +256,7 @@
 
 1999-12-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/dynarray.c: FIx compile error.
+	* src/dynarray.c: Fix compile error.
 
 1999-12-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
