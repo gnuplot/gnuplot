@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.27 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.28 2001/09/08 00:50:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -299,40 +299,6 @@ set y2data%s\n",
     fprintf(fp, "set angles %s\n",
 	    (ang2rad == 1.0) ? "radians" : "degrees");
 
-#if 0
-    /* HBB 20010806: the previous method of accessing grid choices */
-    if (grid_selection == GRID_OFF)
-	fputs("unset grid\n", fp);
-    else {
-	/* FIXME */
-	if (polar_grid_angle)	/* set angle already output */
-	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
-	else
-	    fputs("set grid nopolar\n", fp);
-	fprintf(fp,
-#ifdef PM3D
-		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics %scbtics %smcbtics lt %d lw %.3f, lt %d lw %.3f\n",
-#else
-		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
-#endif
-		grid_selection & GRID_X ? "" : "no",
-		grid_selection & GRID_Y ? "" : "no",
-		grid_selection & GRID_Z ? "" : "no",
-		grid_selection & GRID_X2 ? "" : "no",
-		grid_selection & GRID_Y2 ? "" : "no",
-		grid_selection & GRID_MX ? "" : "no",
-		grid_selection & GRID_MY ? "" : "no",
-		grid_selection & GRID_MZ ? "" : "no",
-		grid_selection & GRID_MX2 ? "" : "no",
-		grid_selection & GRID_MY2 ? "" : "no",
-#ifdef PM3D
-		grid_selection & GRID_CB ? "" : "no",
-		grid_selection & GRID_MCB ? "" : "no",
-#endif
-		grid_lp.l_type + 1, grid_lp.l_width,
-		mgrid_lp.l_type + 1, mgrid_lp.l_width);
-    }
-#else
     if (! some_grid_selected())
 	fputs("unset grid\n", fp);
     else {
@@ -341,22 +307,23 @@ set y2data%s\n",
         else
 	    fputs("set grid nopolar\n", fp);
 	
-	
 #define SAVE_GRID(axis)					\
-	fprintf(fp, " %s%stics m%s%stics",		\
+	fprintf(fp, " %s%stics %sm%stics",		\
 		axis_array[axis].gridmajor ? "" : "no",	\
 		axis_defaults[axis].name,		\
 		axis_array[axis].gridminor ? "" : "no",	\
 		axis_defaults[axis].name);
+	fputs("set grid", fp);
 	SAVE_GRID(FIRST_X_AXIS);
 	SAVE_GRID(FIRST_Y_AXIS);
 	SAVE_GRID(FIRST_Z_AXIS);
+	fputs(" \\\n", fp);
 	SAVE_GRID(SECOND_X_AXIS);
 	SAVE_GRID(SECOND_Y_AXIS);
 	SAVE_GRID(COLOR_AXIS);
+	fputs("\n", fp);
 #undef SAVE_GRID
     }	
-#endif /* new grid variables */
 
     fprintf(fp, "set key title \"%s\"\n", conv_text(key_title));
     switch (key) {
