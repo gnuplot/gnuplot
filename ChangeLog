@@ -1,5 +1,16 @@
 2004-08-20  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/set.c (set_termoptions):  Only call term->options for
+	terminals that actually support the option in question.
+
+	* src/term.c (write_multiline) term/driver.h: Remove unused 
+	function set_font_null; instead mark lack of font support by 
+	initializing this TERM_TABLE entry to NULL.  Fixes segfault
+	if font is checked before terminal is initialized, and allows
+	non-destructive test of font support.
+
+2004-08-20  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/set.c (set_termoptions):  Quietly ignore the command if there
 	is no current terminal.
 
