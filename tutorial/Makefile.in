@@ -13,8 +13,6 @@
 
 @SET_MAKE@
 
-# $Header: /cvsroot/gnuplot/gnuplot/tutorial/Makefile.am,v 1.11 2001/10/09 12:23:59 amai Exp $
-
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -62,13 +60,11 @@ AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
 DEPDIR = @DEPDIR@
-DVIPS = @DVIPS@
 EMACS = @EMACS@
 EXEEXT = @EXEEXT@
 GNUPLOT_X11 = @GNUPLOT_X11@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LASERGNU = @LASERGNU@
-LATEX = @LATEX@
 LIBRARIES_FOR_X = @LIBRARIES_FOR_X@
 LINUXSUID = @LINUXSUID@
 OBJEXT = @OBJEXT@
@@ -89,19 +85,22 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
+DVIPS = dvips
+LATEX = @LATEX@
+
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-PLT_files = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
+PLT_FILES = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
 
-EXTRA_DIST = $(PLT_files) \
-              header.tex tutorial.tex eg3.dat
+EXTRA_DIST = Makefile.am.in $(PLT_FILES) \
+header.tex makefile.dst tutorial.tex eg3.dat
 
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
-             eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
+eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
 
 
-SUFFIXES = .dvi .pdf .plt .ps .tex
+SUFFIXES = .dvi .plt .pdf .tex .ps
 subdir = tutorial
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
@@ -116,7 +115,7 @@ DIST_COMMON = Makefile.am Makefile.in
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .dvi .pdf .plt .ps .tex
+.SUFFIXES: .dvi .plt .pdf .tex .ps
 $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --foreign  tutorial/Makefile
@@ -182,7 +181,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 
@@ -216,9 +215,9 @@ mostlyclean-am: mostlyclean-generic
 
 uninstall-am: uninstall-info-am
 
-.PHONY: all all-am check check-am clean clean-generic distclean \
-	distclean-generic distdir dvi dvi-am info info-am install \
-	install-am install-data install-data-am install-exec \
+.PHONY: all all-am check check-am clean clean-generic clean-local \
+	distclean distclean-generic distdir dvi dvi-am info info-am \
+	install install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
@@ -237,6 +236,8 @@ remake: tutorial.dvi
 
 tutorial.ps: tutorial.dvi
 
+pdf: tutorial.pdf
+
 tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
 	@echo Building LaTeX tutorial
@@ -245,7 +246,7 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 
 tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
-	@echo Building LaTeX tutorial
+	@echo "Building LaTeX tutorial (PDF version)"
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 
@@ -259,6 +260,18 @@ tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	else \
 	  gnuplot $< ; \
 	fi
+
+clean-local:
+	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f eg?.dat
+
+Makefile.am: Makefile.am.in
+	rm -f $@ $@t
+	sed -n '1,/^##plt-files-begin/p' Makefile.am.in > $@t
+	echo PLT_FILES = *.plt | fmt | (tr '\012' @; echo ) \
+	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
+	sed -n '/^##plt-files-end/,$$p' $< >> $@t
+	chmod a-w $@t
+	mv $@t $@
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -1,16 +1,20 @@
-# $Header$
-
+## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-PLT_files = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
+##plt-files-begin
+PLT_FILES = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
+##plt-files-end
 
-EXTRA_DIST =  $(PLT_files) \
-              header.tex tutorial.tex eg3.dat
+EXTRA_DIST = Makefile.am.in $(PLT_FILES) \
+header.tex makefile.dst tutorial.tex eg3.dat
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
-             eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
+eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
 
-SUFFIXES = .dvi .pdf .plt .ps .tex
+DVIPS = dvips
+LATEX = @LATEX@
+
+SUFFIXES = .dvi .plt .pdf .tex .ps
 
 # default target
 all: @TUTORIAL@
@@ -24,6 +28,8 @@ remake: tutorial.dvi
 
 tutorial.ps: tutorial.dvi
 
+pdf: tutorial.pdf
+
 tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
 	@echo Building LaTeX tutorial
@@ -32,7 +38,7 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 
 tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
-	@echo Building LaTeX tutorial
+	@echo "Building LaTeX tutorial (PDF version)"
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
 
@@ -46,3 +52,16 @@ tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	else \
 	  gnuplot $< ; \
 	fi
+
+clean-local:
+	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f eg?.dat
+
+Makefile.am: Makefile.am.in
+	rm -f $@ $@t
+	sed -n '1,/^##plt-files-begin/p' Makefile.am.in > $@t
+	echo PLT_FILES = *.plt | fmt | (tr '\012' @; echo ) \
+	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
+	sed -n '/^##plt-files-end/,$$p' $< >> $@t
+	chmod a-w $@t
+	mv $@t $@
+
