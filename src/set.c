@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.21 1999/08/11 18:08:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.22 1999/08/17 15:48:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -411,6 +411,7 @@ static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
+static void set_lp_properties __PROTO((struct lp_style_type *, int, int, int, double, double));
 static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
