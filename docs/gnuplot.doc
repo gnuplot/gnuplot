@@ -529,8 +529,8 @@ C
 #\mbox{imag}(x)^{2}}}$ \\
 %abs(x)@any@absolute value of $x$, $|x|$; same type
 %abs(x)@complex@length of $x$, $sqrt{roman real (x) sup 2 + roman imag (x) sup 2}$
- The `abs(x)` function returns the absolute value of its argument.  The returned
- value is of the same type as the argument.
+ The `abs(x)` function returns the absolute value of its argument.  The
+ returned value is of the same type as the argument.
 
  For complex arguments, abs(x) is defined as the length of x in the complex
  plane [i.e.,  sqrt(real(x)**2 + imag(x)**2) ].
@@ -540,9 +540,9 @@ C
 ?acos
 #acos(x) & any  & $\cos^{-1} x$ (inverse cosine) \\
 %acos(x)@any@$cos sup -1 x$ (inverse cosine)
- The `acos(x)` function returns the arc cosine (inverse cosine) of its argument.
- `acos` returns its argument in radians or degrees, as selected by `set
- angles`.
+ The `acos(x)` function returns the arc cosine (inverse cosine) of its
+ argument.  `acos` returns its argument in radians or degrees, as selected by
+ `set angles`.
 4 acosh
 ?expressions functions acosh
 ?functions acosh
@@ -600,8 +600,8 @@ C
 ?atanh
 #atanh(x) & any  & $\tanh^{-1} x$ (inverse hyperbolic tangent) in radians \\
 %atanh(x)@any@$tanh sup -1 x$ (inverse hyperbolic tangent) in radians
- The `atanh(x)` function returns the inverse hyperbolic tangent of its argument
- in radians.
+ The `atanh(x)` function returns the inverse hyperbolic tangent of its
+ argument in radians.
 4 besj0
 ?expressions functions besj0
 ?functions besj0
@@ -3047,6 +3047,7 @@ C ... and restart the table:
                  { {linestyle | ls <line_style>}
                    | {linetype | lt <line_type>}
                      {linewidth | lw <line_width} }
+                 {front | back}
        set noarrow {<tag>}
        show arrow
 
@@ -3076,6 +3077,10 @@ C ... and restart the table:
  Note, however, that if a user-defined line style has been selected, its
  properties (type and width) cannot be altered merely by issuing another
  `set arrow` command with the appropriate index and `lt` or `lw`.
+
+ If `front` is given, the arrow is written on top of the graphed data. If
+ `back` is given (the default), the arrow is written underneath the graphed
+ data.  Using `front` will prevent a arrow from being obscured by dense data.
 
  Examples:
 
@@ -4270,6 +4275,7 @@ C ... and restart the table:
  Syntax:
        set label {<tag>} {"<label_text>"} {at <position>}
                  {<justification>} {{no}rotate} {font "<name><,size>"}
+                 {front | back}
        set nolabel {<tag>}
        show label
 
@@ -4292,6 +4298,10 @@ C ... and restart the table:
 
  If `rotate` is given, the label is written vertically (if the terminal can do
  so, of course).
+
+ If `front` is given, the label is written on top of the graphed data. If
+ `back` is given (the default), the label is written underneath the graphed
+ data.  Using `front` will prevent a label from being obscured by dense data.
 
  If one (or more) axis is timeseries, the appropriate coordinate should be
  given as a quoted time string according to the `timefmt` format string.  See
@@ -4490,10 +4500,8 @@ C ... and restart the table:
 ?set margin
 ?show margin
 ?margin
- Normally the margins of a plot are automatically calculated based on tics
- and axis labels (and the size of the graph correspondingly adjusted.)  These
- computed values can be overridden by the `set margin` commands.  `show margin`
- shows the current settings.
+ The computed margins can be overridden by the `set margin` commands.  `show
+ margin` shows the current settings.
 
  Syntax:
        set bmargin {<margin>}
@@ -4505,6 +4513,14 @@ C ... and restart the table:
  The units of <margin> are character heights or widths, as appropriate.  A
  positive value defines the absolute size of the margin.  A negative value
  (or none) causes `gnuplot` to revert to the computed value.
+
+ Normally the margins of a plot are automatically calculated based on tics,
+ tic labels, axis labels, the plot title, the timestamp and the size of the
+ key if it is outside the borders.  If, however, tics are attached to the
+ axes (`set xtics axis`, for example), neither the tics themselves nor their
+ labels will be included in either the margin calculation or the calculation
+ of the positions of other text to be written in the margin.  This can lead
+ to tic labels overwriting other text if the axis is very close to the border.
 3 missing
 ?commands set missing
 ?set missing
@@ -5904,20 +5920,26 @@ C ... and restart the table:
  The same syntax applies to `ytics`, `ztics`, `x2tics` and `y2tics`.
 
  `axis` or `border` tells `gnuplot` to put the tics (both the tics themselves
- and the accompanying labels) along the axis or the border, respectively.
- `mirror` tells it to put unlabelled tics at the same positions on the
- opposite border.  `nomirror` does what you think it does.  `rotate` asks
- `gnuplot` to rotate the text through 90 degrees, if the underlying terminal
- driver supports text rotation.  `norotate` cancels this.  The defaults are
- `border mirror norotate` for tics on the x and y axes, and `border nomirror
- norotate` for tics on the x2 and y2 axes.  For the z axis, the the `{axis |
- border}` option is not available and the default is `nomirror`.  If you do
- want to mirror the z-axis tics, you might want to create a bit more room for
- them with `set border`.
+ and the accompanying labels) along the axis or the border, respectively.  If
+ the axis is very close to the border, the `axis` option can result in tic
+ labels overwriting other text written in the margin.
 
- `set xtics` with no options restores the default border if xtics are not
- being displayed;  otherwise it has no effect.  Any previously specified
- tic frequency or position {and labels} are retained.
+ `mirror` tells `gnuplot` to put unlabelled tics at the same positions on the
+ opposite border.  `nomirror` does what you think it does.
+
+ `rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
+ done if the terminal driver in use supports text rotation.  `norotate`
+ cancels this.
+
+ The defaults are `border mirror norotate` for tics on the x and y axes, and
+ `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
+ the the `{axis | border}` option is not available and the default is
+ `nomirror`.  If you do want to mirror the z-axis tics, you might want to
+ create a bit more room for them with `set border`.
+
+ `set xtics` with no options restores the default border or axis if xtics are
+ being displayed;  otherwise it has no effect.  Any previously specified tic
+ frequency or position {and labels} are retained.
 
  Positions of the tics are calculated automatically by default or if the
  `autofreq` option is given; otherwise they may be specified in either of
