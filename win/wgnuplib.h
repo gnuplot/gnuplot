@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.4 1998/12/10 18:30:13 lhecking Exp $
+ * $Id: wgnuplib.h,v 1.4.2.1 1999/08/19 14:13:09 lhecking Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -53,7 +53,11 @@
 #define _Windows
 #endif
 
-#ifdef __DLL__
+/* HBB 19990506: The following used to be #ifdef __DLL__.
+ * But  _export is needed outside the DLL, as well. The long-standing
+ * bug crashing 16bit wgnuplot on Alt-F4 or pressing the 'close' button
+ * stemmed here.  */
+#ifndef WIN32
 #define WINEXPORT _export
 #else
 #define WINEXPORT

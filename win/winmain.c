@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.15 1998/03/22 23:32:01 drd Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.3 1998/12/04 15:16:59 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -146,7 +146,13 @@ WinExit(void)
 int CALLBACK WINEXPORT
 ShutDown(void)
 {
+#if 0  /* HBB 19990505: try to avoid crash on clicking 'close' */
+       /* Problem was that WinExit was called *twice*, once directly,
+        * and again via 'atexit'. This caused problems by double-freeing
+        * of GlobalAlloc-ed memory inside TextClose() */
+       /* Caveat: relies on atexit() working properly */
 	WinExit();
+#endif
 	exit(0);
 	return 0;
 }
@@ -448,8 +454,6 @@ size_t MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 #define MAX_PRT_LEN 256
 static char win_prntmp[MAX_PRT_LEN+1];
 
-extern GW graphwin;
- 
 FILE *
 open_printer()
 {
