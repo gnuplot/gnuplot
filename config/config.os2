@@ -415,7 +415,7 @@
 /* #undef STAT_MACROS_BROKEN */
 
 /* Define to 1 if you have the ANSI C header files. */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Define if you want to use the sunview terminal (sun). */
 /* #undef SUN */
