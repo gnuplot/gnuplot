@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 1.104 1998/06/18 14:55:19 ddenholm Exp $";
+static char *RCSid = "$Id: term.c,v 1.19 1998/12/09 15:25:32 lhecking Exp $";
 #endif
 
 /* GNUPLOT - term.c */
@@ -961,7 +961,7 @@ void init_terminal()
 #ifdef NEXT
 	env_term = getenv("TERM");
 	if (term_name == (char *) NULL
-	    && env_term != (char *) NULL && strcmp(term, "next") == 0)
+	    && env_term != (char *) NULL && strcmp(env_term, "next") == 0)
 	    term_name = "next";
 #endif /* NeXT */
 
