@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.7 1999/09/21 18:25:53 lhecking Exp $ */
+/* $Id: tables.h,v 1.8 1999/09/24 15:38:18 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -53,6 +53,11 @@ enum plot_id {
     P_INVALID,
     P_AXES, P_BINARY, P_EVERY, P_INDEX, P_MATRIX, P_SMOOTH, P_THRU,
     P_TITLE, P_NOTITLE, P_USING, P_WITH
+};
+
+/* options for plot ax[ei]s */
+enum plot_axes_id {
+    AXES_X1Y1, AXES_X2Y2, AXES_X1Y2, AXES_X2Y1, AXES_NONE
 };
 
 /* plot smooth parameters in plot.h */
@@ -110,6 +115,8 @@ enum set_key_id {
 };
 
 extern struct gen_table command_tbl[];
+extern struct gen_table plot_tbl[];
+extern struct gen_table plot_axes_tbl[];
 extern struct gen_table plot_smooth_tbl[];
 extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];

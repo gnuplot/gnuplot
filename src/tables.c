@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.7 1999/09/21 18:25:53 lhecking Exp $ */
+/* $Id: tables.c,v 1.8 1999/09/24 15:38:17 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -90,6 +90,16 @@ struct gen_table plot_tbl[] =
     { "u$sing", P_USING },
     { "w$ith", P_WITH },
     { NULL, P_INVALID }
+};
+
+/* 'plot ax[ei]s' parameter */
+struct gen_table plot_axes_tbl[] =
+{
+    { "x1y1", AXES_X1Y1 },
+    { "x2y2", AXES_X2Y2 },
+    { "x1y2", AXES_X1Y2 },
+    { "x2y1", AXES_X2Y1 },
+    { NULL, AXES_NONE }
 };
 
 /* 'plot smooth' parameter */
