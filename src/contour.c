@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.19 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.20 2001/08/31 17:56:35 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -890,8 +890,6 @@ chk_contour_kind(p_cntr, contr_isclosed)
     struct cntr_struct *pc_tail = NULL;
     TBOOLEAN current_contr_isclosed;
 
-    FPRINTF((stderr, "check_contour_kind: current contr_kind value is %d\n", contr_kind));
-
     current_contr_isclosed = contr_isclosed;
 
     if (! contr_isclosed) {
@@ -900,10 +898,8 @@ chk_contour_kind(p_cntr, contr_isclosed)
 	    pc_tail = pc_tail->next;	/* Find last point. */
 
 	/* test if first and last point are equal */
-	if (fuzzy_equal(pc_tail, p_cntr)) {
+	if (fuzzy_equal(pc_tail, p_cntr))
 	    current_contr_isclosed = TRUE;
-	    FPRINTF((stderr, "check_contour_kind: contr_isclosed changed to %d\n", current_contr_isclosed));
-	}
     }
     return (current_contr_isclosed);
 }
