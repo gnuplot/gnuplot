@@ -727,9 +727,9 @@ gnuplot: $(OBJS) version.o
 doc:
 	( cd docs; $(MAKE) $(MFLAGS) $(MY_FLAGS) gnuplot.gih )
 
-gnuplot_x11: gplt_x11.c
+gnuplot_x11: gplt_x11.c stdfn.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $(X11INCLUDES) -o gnuplot_x11 \
-	gplt_x11.c $(X11LIBS)
+	stdfn.c gplt_x11.c $(X11LIBS)
 
 demo/binary1 demo/binary2 demo/binary3: bf_test
 	( cd demo; ../bf_test )

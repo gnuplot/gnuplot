@@ -242,8 +242,8 @@ X11LIBS = -lX11 -lsocket -Zcrtdll
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
 
-gnuplot_x11.exe: gplt_x11.o
-	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $< $(X11LIBS)
+gnuplot_x11.exe: gplt_x11.o stdfn.o
+	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ gplt_x11.o stdfn.o $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<

@@ -143,8 +143,8 @@ $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'
 $ ren bf_test.exe [.demo]
 $ if .NOT. its_decw  then goto do_docs 
 $!
-$ CC 'CFLAGS' GPLT_X11
-$ LINK /exe=GNUPLOT_X11 gplt_x11 'extralib''LINKOPT',SYS$INPUT:/OPT
+$ CC 'CFLAGS' GPLT_X11 stdfn.c
+$ LINK /exe=GNUPLOT_X11 gplt_x11,stdfn 'extralib''LINKOPT',SYS$INPUT:/OPT
 SYS$SHARE:DECW$XLIBSHR/SHARE
 $!
 $DO_DOCS:

@@ -103,9 +103,9 @@ $(RDIR)/termdoc.$(O): $(D)termdoc.c
 # I have only old X11 R4 libraries, that is the reason for using compatability
 # mode for compiling and linking gnuplot_x11
 #
-gnuplot_X11: $(RDIR)/gplt_x11.$(O)
+gnuplot_X11: $(RDIR)/gplt_x11.$(O) $(RDIR)/stdfn.$(O)
 	$(LC) -mode=compat $(DEBUG) -q -m=64 $(X11LIBS) $(RDIR)/gplt_x11.$(O) \
-	-n=$@ -f=$(ODIR)/$@
+	$(RDIR)/stdfn.$(O) -n=$@ -f=$(ODIR)/$@
 	attr -pepr $(ODIR)/$@
 
 $(RDIR)/gplt_x11.$(O): gplt_x11.c

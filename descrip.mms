@@ -103,8 +103,8 @@ gnuplot.$(X) : $(OBJS) $(OPT_FILE)
 	@ $(SAY) "Your gnuplot executable is $@"
 	@ $(SAY) ""
 
-gnuplot_X11.$(X) : gplt_x11.$(O) $(X11OPT_FILE) 
-	LINK /EXE=$@ GPLT_X11.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
+gnuplot_X11.$(X) : gplt_x11.$(O) stdfn.$(O) $(X11OPT_FILE) 
+	LINK /EXE=$@ GPLT_X11.$(O) STDFN.$(O), $(X11OPT_FILE)/opt $(CRTL_SHARE)
 	@ $(SAY) ""
 	@ $(SAY) "Your gnuplot_x11 executable is $@"
 	@ $(SAY) ""
