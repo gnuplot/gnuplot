@@ -25,44 +25,57 @@ longer term
 Lars' list
 
 - new directory structure: eg. docs lib lisp m4 man src term
+  [DONE] need to split src/stdfn.h into single files and move
+  to new lib/ directory
+- provide library of replacement functions instead of stdfn.c
+  [see above]
 - possibly switch to automake
+  [PARTIALLY DONE] not done yet: docs lisp src tutorial
 - completely rewrite the parser. Use yacc/bison if possible.
 - maybe rewrite the scanner in lex? The benefits are not so obvious,
   because the current scanner is extremely simple. This is probably
   only worthwhile if the parser is rewritten at the same time.
+- use PD hash code for table-lookup (SNIPPETS code). Tables for
+  builtin and user functions, variables, commands. What else?
 - [Robert S. Maier] rewrite term.c to provide an interface to GNU plotutils
 - [HBB] rewrite hidden3d code
 - for post-3.7 release: integrate new feature patches (M. Koga's
   polygon patch, various postscript driver patches by Dick, T. Walter's
   gnuplot command line history save file, etc)?
+  [PARTIALLY DONE]
 - standardise float/double comparisons around the suggestion in the
   comp.lang.c FAQ (What's a good way to check for "close enough"
   floating-point equality?) and symbolic constants from standard header files.
-- autogenerate term.h from config file in text format and/or configure
+- autogenerate term.h from config file in text format and/or configure?
 - add load path for files/GNUPLOT_LIBRARY env var
-- provide library of replacement functions instead of stdfn.c
+- (should gnuplot_x11 be in prefix/libexec???)
+- parse "~" in filenames as $HOME
+  [PARTIALLY DONE] does not work for cd, set output
+  [PARTIALLY DONE] works for all cmds no; plot key shows "~" instead
+  of path (-> fix); does not accept "~" and "~user". Maybe implement
+  former, latter requires reading passwd file (-> not!)
+- general expansion of user defined and environment vars in
+  labels?
 - [Lucas] fix axis ranges, overwritten labels in demos
 - png driver needs update for png versions >=0.95
   must be backwards compatible (do we want to require png >=0.95? We
   already require >=0.89; possible compile problems under Irix 6.x which
   comes with png 0.88/zlib 1.0)
 - write or organise a portable version of snprintf(3) with a copyright
-  compatible with the gnuplot copyright (ie. no GPL)
+  compatible with the gnuplot copyright (ie. no GPL) (Apache?)
+- use varargs functions for error reporting
+  [configure and header files are prepared]
+- gnuplot often doesn't free() memory; rearrange code to do this
+- add Amiga WinGnuplot driver and related files
+- add more maintainer checks (eg. file permissions)
+- better lisp/ files integration (Makefile target to import Bruce's
+  latest version). How to handle duplicates?
+- build/install info only if emacs found (independent of alldoc target)
+- build tutorial conditionally?
+- better documentation format; get rid of the doc2xxx utils
+- add pgnuplot.c for Win
+- move src/* subdirs to toplevel?
+- update the FAQ!!!!
+- update NEWS
+- make dist-something: put current date into version.c
 
-OTHER ISSUES (from old WhatsNew file)
-  set mapping spherical is not 'real' spherical polars
-  terminals are no longer allowed to do their own scaling
-  break up some of the drivers (eg epson and family) into their
-    own files. *maybe* we can provide libraries of generic routines
-    (particularly tex) which can be used by all interested drivers,
-    and because they are a library, they are linked only if
-    any relevant drivers are installed. bitmap.c could also be
-    linked in this way.
-  Now that all drivers are new format, do we need to explore separate
-    compilation of the drivers into their own .obj files for DOS ?
-  hidden line is still slower than in 3.5
-  have I got all os/2 and (in particular) mac changes ?
-  filled boxes ?
-  substitution using backquotes should not have a length limit
-  the source indentation stinks - may I pass it through gnu indent,
-     or will that mess up use of patches which did not make it into
