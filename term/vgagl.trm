@@ -1,5 +1,5 @@
 /*
- * $Id: vgagl.trm,v 1.6 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: vgagl.trm,v 1.7 2002/12/13 20:12:27 mikulik Exp $
  */
 
 #if defined(USE_MOUSE) && defined(PM3D)
@@ -1608,7 +1608,7 @@ START_HELP(vgagl)
 "  - G1152x864x256",
 "  - G1360x768x256",
 "  - G1600x1200x256",
-" "
+""
 END_HELP(vgagl)
 #endif
 #endif /* defined(USE_MOUSE) && defined(PM3D) */
