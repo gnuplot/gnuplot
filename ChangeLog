@@ -1,3 +1,68 @@
+2000-10-12  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* term/cgm.trm (general): Initialize font table with the standard
+	WebCGM fonts, plus the Hershey fonts, plus the other fonts
+	implemented by the Microsoft Office import filter, plus a few
+	variations (so "oblique" and "italic" are equivalent).  Default
+	font is now "Helvetica Bold".  Use a struct array to hold the
+	standard font names and their relative widths.  Add references
+        to CGM documents, especially those on-line.  Defeat assertions
+        by default.
+
+	* term/cgm.crm (CGM_put_text): Was using the same distance as
+	the the declared baseline-to-baseline text dimension (used by
+	gnuplot) and the baseline-to-capline height declared in the
+	output file.  Reducing the character height (by factor of 2/3)
+	in the output file.  Increase default font size from 10 to 12
+	pt to compensate.
+	
+	* term/cgm (CGM_set_font): Construct the CGM format font list on
+	the fly.  Adjust the declared text width according to the
+	dimensions of the chosen font. Handle the case where the input
+        string does not include the font height.
+
+	* term/cgm (CGM_options): If font isn't in table, add it
+	(retaining the existing fonts).  Add "nofontlist" option which
+	only omits the font list (no effect on color table).
+	"winword6" is now just a deprecated synonym for "nofontlist".
+	"solid" option was incorrectly setting cgm_dashed to TRUE.
+	Fixed.  In "linewidth" option, part of sanity check was on
+	cgm_linewidth instead of cgm_linewidth_pt.  Fixed.  User can
+	specify line colors with option like "xff00dd".  User colors
+	go into a separate table, which can grow automatically.
+
+	* term/cgm (CGM_point): Implement open markers.
+
+	* term/cgm (CGM_put_text): Eliminate duplicate elements in output
+	file: Write text characteristics only if they have changed: font
+	index, character height, justification mode.  Treat character
+	orientation the same way.  
+
+	* term/cgm (CGM_text_angle): generalize internal data
+        structures to allow for text oriented at other angles than
+        horizontal or vertical.
+
+	* term/cgm (CGM_linecolor): Eliminate yellow as a line color (too
+	hard to see against a white background).  Add orange and gray.
+
+	* term/cgm (CGM_graphics): For MIL-D-28003A compliance: add
+	gnuplot version and MIL-D-28003A reference to picture
+	description, and write element list as the third element.
+	Omit color table for monochrome file.  Add missing elements to
+	metafile elements list: Color Value Extent, Font List, Color
+	Table.  Add the new elements required for open markers: edge
+	type, edge width, edge color, and edge visibility.  Omit VDC
+	Integer Precision, Transparency, and Clip Indicator elements,
+	since some import filter cannot digest them and we are using
+	the defaults anyway.
+
+	* term/cgm (CGM_linewidth): Flush polylines before changing
+	linewidth.
+
+	* term/cgm (help text): Document above changes.  Add notes
+	about the Microsoft Office CGM input filter.  Rewrap some
+	paragraphs to stay within the specified 73 columns.
+
 2000-10-06  Johannes Zellner <johannes@zellner.org>
 
 	* implemented finally configurable offsets for

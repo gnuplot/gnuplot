@@ -1,3 +1,17 @@
+CGM terminal mods:
+* NEW: files are now compliant with MIL-D-28003A.
+* NEW: Standard font table now includes the standard WebCGM fonts and
+  the Hershey fonts.  Gnuplot knows the widths of the standard fonts.
+  Default font is now "Helvetica Bold".  New fonts can be added to the
+  table without deleting the standard ones.
+* NEW: open markers.  yellow removed due to poor visibility.  Orange
+  and gray added.  User can specify new line colors.
+* UPDATE: "winword6" option is now just a deprecated synonym for
+  "nofontlist".
+* FIXED: Font height handling (e.g. crowded keys)
+* FIXED: "solid" option.
+* FIXED: linewidth changes were sometimes applied to the wrong lines.
+
 Changes in release 4.0:
 * NEW experimental driver for Enhanced Metafile Format,
   configure with --enable-emf
