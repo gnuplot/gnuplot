@@ -1736,8 +1736,8 @@ C ... and restart the table:
        set label "generated on `date +%Y-%m-%d` by `whoami`" at 1,1
        set timestamp "generated on %Y-%m-%d by `whoami`"
 3 Substitution of string variables as macros
-?macros
 ?substitution macros
+?macros
  Substitution of command line macros is disabled by default, but may be
  enabled using the `set macros` command.  If macro substitution is enables,
  the character @ is used to trigger substitution of the current value of a
@@ -2970,9 +2970,6 @@ C ... and restart the table:
  Command line keywords may be used to override settings extracted from the file.
  The settings from the file override any defaults.  (See `set datafile binary`
  for details.)
-
- The following keywords apply only when generating coordinates.  That is, when
- the keyword `array` is used.
 6 edf
 ?binary general filetype edf
 ?filetype edf
@@ -2985,8 +2982,13 @@ C ... and restart the table:
    http://www.esrf.fr/computing/expg/subgroups/general/format/Format.html
 
  See also `binary`.
-5 scan
-?binary general scan
+5 keywords
+?binary general keywords
+?filetype keywords
+ The following keywords apply only when generating coordinates.  That is, when
+ the keyword `array` is used.
+6 scan
+?binary general keywords scan
  A great deal of confusion can arise concerning the relationship between how
  gnuplot scans a binary file and the dimensions seen on the plot.  To lessen
  the confusion, conceptually think of gnuplot _always_ scanning the binary file
@@ -3006,11 +3008,11 @@ C ... and restart the table:
  apply only to Cartesian coordinates.  For this reason there are cylindrical
  coordinate synonyms for the qualifier codes where t (theta), r and z are
  analogous to the x, y and z of Cartesian coordinates.
-5 transpose
-?binary general transpose
+6 transpose
+?binary general keywords transpose
  Shorthand notation for `scan=yx` or `scan=yxz`.
-5 dx, dy, dz
-?binary general dx
+6 dx, dy, dz
+?binary general keywords dx
  When gnuplot generates coordinates, it uses the spacing described by these
  keywords.  For example `dx=10 dy=20` would mean space samples along the
  x dimension by 10 and space samples along the y dimension by 20.  `dy` cannot
@@ -3022,13 +3024,13 @@ C ... and restart the table:
 
  The following keywords also apply only when generating coordinates.  However
  they may also be used with matrix binary files.
-5 flipx, flipy, flipz
-?binary general flipx
+6 flipx, flipy, flipz
+?binary general keywords flipx
  Sometimes the scanning directions in a binary datafile are not consistent with
  that assumed by gnuplot.  These keywords can flip the scanning direction along
  dimensions x, y, z.
-5 origin 
-?binary general origin
+6 origin 
+?binary general keywords origin
  When gnuplot generates coordinates based upon transposition and flip, it
  attempts to always position the lower left point in the array at the origin,
  i.e., the data lies in the first quadrant of a Cartesian system after transpose
@@ -3040,13 +3042,13 @@ C ... and restart the table:
  For example, `origin=(100,100),(100,200)` is for two records in the file and
  intended for plotting in two dimensions. A second example, `origin=(0,0,3.5)`,
  is for plotting in three dimensions.
-5 center
-?binary general center
+6 center
+?binary general keywords center
  Similar to `origin`, this keyword will position the array such that its center
  lies at the point given by the tuple.  For example, `center=(0,0)`.  Center
  does not apply when the size of the array is `Inf`.
-5 rotate
-?binary general rotate
+6 rotate
+?binary general keywords rotate
  The transpose and flip commands provide some flexibility in generating and
  orienting coordinates.  However, for full degrees of freedom, it is possible to
  apply a rotational vector described by a rotational angle in two dimensions.
@@ -3061,8 +3063,8 @@ C ... and restart the table:
  If `origin` is specified, the rotation is done about the lower left sample
  point before translation.  Otherwise, the rotation is done about the array
  `center`.
-5 perpendicular
-?binary general perpendicular
+6 perpendicular
+?binary general keywords perpendicular
  For `splot`, the concept of a rotational vector is implemented by a triple
  representing the vector to be oriented normal to the two-dimensional x-y plane.
  Naturally, the default is (0,0,1).  Thus specifying both rotate and
@@ -3077,7 +3079,10 @@ C ... and restart the table:
  data of the file is inherently not three-dimensional, logical rules are used to
  place the data in three-space.  (E.g., usually setting the z-dimension value to
  zero and placing 2D data in the x-y plane.)
-
+5 binary_examples
+?binary_examples
+?binary examples
+?binary general examples
  Examples:
 
        # Selects two float values (second one implicit) with a float value
@@ -3156,7 +3161,6 @@ C ... and restart the table:
  Parametric splot demos
 ^ </a>
  .
-
 4 example datafile
 ?commands plot datafile example
 ?plot datafile example
@@ -6145,7 +6149,6 @@ C ... and restart the table:
 ?commands show macros
 ?set macros
 ?show macros
-?macros
  If command line macro substitution is enabled, then tokens in the command line
  of the form @<stringvariablename> will be replaced by the text string contained
  in <stringvariablename>. See `substitution`.
