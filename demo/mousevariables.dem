@@ -50,14 +50,14 @@ pause 3
 set xrange [ BOT_X : TOP_X ]
 set yrange [ BOT_Y : TOP_Y ]
 set grid
-# There seems to be a bug in the parameter parsing for label strings
-#set label 1 "zoom x range %.3f to %.3f",BOT_X,TOP_X
-#set label 2 "zoom y range %.3f to %.3f",BOT_Y,TOP_Y
-#set label 1 at graph 0.1, graph 0.1
-#set label 2 at graph 0.1, graph 0.05
+#
 unset label 1
 unset label 2
 unset label 3
+set label 4 "zoom x range %.3f ",BOT_X," to %.3f",TOP_X
+set label 5 "zoom y range %.3f ",BOT_Y," to %.3f",TOP_Y
+set label 4 at graph 0.1, graph 0.95 tc lt 3
+set label 5 at graph 0.1, graph 0.90 tc lt 3
 replot
 #
 print "Zoomed to xrange ",BOT_X," ",TOP_X
