@@ -1,5 +1,11 @@
 2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
 
+	* gnuplot/src/gp_types.h gnuplot/src/graphics.c gnuplot/src/plot2d.c:
+	Rename PLOT_STYLE_HAS_BOXES to PLOT_STYLE_HAS_FILL since it now 
+	applies to objects other than boxes.
+
+2004-07-03  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/color.c src/color.h src/gadgets.h src/gp_types.h src/graphics.c 
 	src/misc.c src/plot2d.c src/pm3d.c src/set.c src/tables.c src/tables.h
 	src/term_api.h src/term.c:

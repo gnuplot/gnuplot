@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.108 2004/07/01 17:10:05 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.109 2004/07/02 23:58:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4118,7 +4118,7 @@ do_key_sample(
 
     /* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
-    if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES
+    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL
 	&& t->fillbox) {
 	struct fill_style_type *fs = &this_plot->fill_properties;
 
