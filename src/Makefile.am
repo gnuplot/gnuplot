@@ -17,12 +17,15 @@ XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
-bitmap.h command.c command.h contour.c datafile.c datafile.h eval.c fit.c \
-fit.h graph3d.c graphics.c graphics.h help.c help.h hidden3d.c internal.c \
-interpol.c matrix.c matrix.h misc.c national.h parse.c parse.h plot.c plot.h \
-plot2d.c plot3d.c protos.h readline.c save.c scanner.c set.c setshow.h show.c \
-specfun.c standard.c stdfn.c stdfn.h syscfg.h tables.c tables.h term.c term.h \
-time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
+bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h eval.c \
+eval.h fit.c fit.h gp_time.h graph3d.c graph3d.h graphics.c graphics.h help.c \
+help.h hidden3d.c hidden3d.h internal.c internal.h interpol.c interpol.h \
+matrix.c matrix.h misc.c misc.h national.h parse.c parse.h plot.c plot.h \
+plot2d.c plot2d.h plot3d.c plot3d.h protos.h readline.c readline.h save.c \
+save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
+standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h \
+term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h \
+variable.c variable.h version.c
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
