@@ -1,3 +1,8 @@
+2004-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* ChangeLog: Fixed typos and spaces in author names and their e-mails
+	in ChangeLog entries.
+
 2004-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/doc2texi.el: Add @dircategory Math to place the gnuplot
@@ -784,7 +789,7 @@
 	* term/x11.trm src/gplt_x11.c: Added  #ifdef PIPE_IPC  where missing
 	(fixes compiling X11 terminal on OS/2).
 
-2003-10-29  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2003-10-29  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/unixplot.trm: Fix misprints in gnuplot manual
 	(#13).
@@ -954,7 +959,7 @@
 
 	* src/beos/Makefile: Removed lots of spurious <TAB> characters.
 
-2003-08-22  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2003-08-22  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/fig.trm, term/gd.trm, term/post.trm,
 	term/x11.trm: Fix misprints in gnuplot manual (#12).
@@ -967,7 +972,7 @@
 	* src/set.c docs/gnuplot.doc: Remove order-dependence of options to
 	'set [xyz]label' command. Deprecate omission of 'font' keyword.
 
-2003-08-18 14:28:07 2003  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2003-08-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/parse.c (push_vars): Changed initialization to TRUE, as it
  	was before yesterday's patch.  Fixes SF bug #790489.
@@ -1002,7 +1007,7 @@
 
 	* demo/Makefile.am.in: Add equipo2.dat, field2xy.dat to CLEANFILES.
 
-2003-08-05  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2003-08-05  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#11).
 
@@ -1158,7 +1163,7 @@
 	* src/set.c: Fix unexpected behaviour that 'set grid nox noy'
 	turned the x and y grids ON rather than off.
 
-2003-06-26  Hans-Bernhard Broeker <broeker@physi.rwth-aachen.de>
+2003-06-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/dxf.trm (DXF_HTIC, DXF_VTIC):  Fixed definitions so 'set
 	size ratio' can work.
@@ -1225,7 +1230,7 @@
 	* term/epslatex.trm: Clean up file name handling; now it is OK to give
 	either .eps or .tex in 'set output', or no file extension at all.
 
-2003-06-13  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2003-06-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/epslatex.trm: Fix misprints in gnuplot manual.
 
@@ -2042,7 +2047,7 @@
 	* docs/psdoc/ps_fontfile_doc.tex: Harald Harders' patch to improve
 	ps fontfile documentation.
 
-2002-12-13  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2002-12-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/cgm.trm, term/eepic.trm, term/hpgl.trm: Another installment
 	of documentation fixes.
@@ -2117,7 +2122,7 @@
 	* term/gd.trm term/gif.trm term/png.trm: Replaced typo "ingoring"
  	by "ignoring".
 
-2002-12-11  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2002-12-11  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* term/djsvga.trm, term/eepic.trm, term/epson.trm, term/fig.trm,
 	term/gif.trm, term/latex.trm, term/mif.trm, term/post.trm,
@@ -2312,7 +2317,7 @@
 
         * src/gplt_x11.c: Fix crash if asked to draw rotated empty string.
 
-2002-10-18  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2002-10-18  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm, term/be.trm,
 	term/x11.trm: Fix a number of misprints.
@@ -3176,7 +3181,7 @@
 
 2002-05-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* docs/gnuplot.doc: Fix misc. typos, reported by Shigeharu TAKENO.
+	* docs/gnuplot.doc: Fix misc. typos, reported by Shigeharu Takeno.
 
 	* lisp/*: Update to gnuplot-mode 0.5r.
 
@@ -3233,7 +3238,7 @@
 
 	* configure.in: Fix for broken --without-tutorial option.
 
-2002-05-13  Ethan A Merritt  <merritt@u.washington.edu>
+2002-05-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* configure.in: Improved testing for libfreetype dependency in libgd.
 
@@ -3281,7 +3286,7 @@
 
 	* term/cgm.trm: Use M_PI_2 instead of M_PI/2.
 
-2002-04-26  Ethan A Merritt  <merritt@u.washington.edu>
+2002-04-26  Ethan Merritt  <merritt@u.washington.edu>
 
 	New term/gd.trm driver to support PNG and JPEG files by using
  	libgd version 1.8 or greater. Includes support for TrueType fonts,
@@ -5350,7 +5355,7 @@
 	long-commented-out checks, while at it, and fixed indentation.
 
 	* doc/gnuplot.doc: Lots of typos fixed.  Reported by Shigeharu
-	TAKENO <shige@iee.niit.ac.jp>.
+	Takeno <shige@iee.niit.ac.jp>.
 
 2001-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -5600,7 +5605,7 @@
 
 2001-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* term/tpic.trm (tpic_abspath): Fix by  Shigeharu TAKENO
+	* term/tpic.trm (tpic_abspath): Fix by  Shigeharu Takeno
 	<shige@iee.niit.ac.jp>. Write simple \special command directly,
 	instead of using the \put{} method to move the coordinate
 	system.
@@ -6930,7 +6935,7 @@
 	PostScriptColorFormulae from post.trm are the same. Remove the former
 	and reference the latter.
 
-2000-11-06  Ian MacPhedran  <Ian_MacPhedran@engr.USask.Ca>
+2000-11-06  Ian MacPhedran  <Ian_MacPhedran@engr.usask.ca>
 
 	* term/tgif.trm: Add PM3D support.
 
@@ -6958,7 +6963,7 @@
 	* term/cgm.trm: Correct LaTex table width in term doc section, patch
 	by Ralf Ahlbrink <ahlbrink@uos.de>.
 
-2000-11-03  "Bernardo A. Mello"  <bernardo@unb.br> 
+2000-11-03  Bernardo A. Mello  <bernardo@unb.br> 
 
 	* docs/psdoc/ps_symbols.gpi: Show not only the symbols, but also
 	the lines corresponding to each code.
@@ -7691,7 +7696,7 @@
 
 	* pm3d: unset.c: #ifdef X11 .. #endif missing in unset_pm3d().
 
-2000-05-24  Lars Hecking  <lhecking@nmrc.ie>
+2000-05-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: configure should always exit with an exit code
 	of zero.
@@ -7826,7 +7831,7 @@
 	Stephane Barbaray <stephane.barbaray@compodata.com>. Small
 	changes for 3.8.
 
-2000-04-06  Ulrich_Gruenebaum  <grueneba@luzi.e-technik.uni-dortmund.de>
+2000-04-06  Ulrich Gruenebaum  <grueneba@luzi.e-technik.uni-dortmund.de>
 
 	* docs/gnuplot.doc, src/plot2d.c, src/plot3d.c, src/set.c,
 	src/setshow.h: Bug fix for broken autoscale writeback, see BUGS
@@ -8562,7 +8567,7 @@
 	* term/pslatex.trm: Add some comments, streamline code, rename
 	variables. Fix segfault when `auxfile' option is unused.
 
-1999-10-11  "Eric S. Raymond"  <esr@thyrsus.com>
+1999-10-11  Eric S. Raymond  <esr@thyrsus.com>
 
 	* demo/airfoil.dem, demo/animate.dem, demo/binary.dem,
 	demo/controls.dem, demo/electron.dem, demo/fit.dem, demo/hidden.dem,
@@ -8607,7 +8612,7 @@
 	* tutorial/Makefile.am.in: Use the newly built gnuplot executable
 	in the .plt.tex rule.
 
-1999-10-01  "Eric S. Raymond"  <esr@thyrsus.com>
+1999-10-01  Eric S. Raymond  <esr@thyrsus.com>
 
         * term/gif.trm, term/png.trm: Remove RGB colour table from gif.trm,
         let both drivers share the table in bitmap.c.
@@ -8734,7 +8739,7 @@
 
 	* config/descrip.mms: Removed. See INSTALL.
 
-1999-09-21  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+1999-09-21  Daniel H. Luecking  <luecking@comp.uark.edu>
 
 	* term/metapost.trm: Updated.
 
@@ -9042,7 +9047,7 @@
 	* term/post.trm: Move defines and variable declarations to new
 	post.h header file.
 
-1999-07-09  "John W. Eaton" <jwe@bevo.che.wisc.edu>
+1999-07-09  John W. Eaton  <jwe@bevo.che.wisc.edu>
 
 	* src/gplt_x11.c: gnuplot_x11.c does not appear to read input
 	in some cases, possibly related to input buffering by fgets().
@@ -9329,7 +9334,7 @@
 	* term/pslatex.trm: Fix auxiliary ps filename creation, strip pathname
 	off filename written to LaTeX file.
 
-1999-06-12  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-06-12  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/png.trm: Add note about default output size to terminal help.
 	
@@ -9427,7 +9432,7 @@
 
 	* tutorial/header.tex: Add comment about LaTeX warning.
 
-1999-06-08  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-06-08  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* src/set.c(get_style): Add new errorlines styles to error message.
 
@@ -9464,7 +9469,7 @@
 	* term/latex.trm: Changed to make embedding document font
 	the default font.
 
-1999-06-03  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-06-03  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* PORTING: More descriptive entries for ANSI_C, OS/2.
 
@@ -9535,7 +9540,7 @@
 
 	* config.hin, configure: Regenerated.
 
-1999-05-30  "Mark K. Gardner"  <mkgardne@cs.uiuc.edu>
+1999-05-30  Mark K. Gardner  <mkgardne@cs.uiuc.edu>
 
 	* README.exp, configure.in, src/help.c: Format help and subtopic
 	tables by row or column.
@@ -9608,11 +9613,11 @@
 	* configure.in, src/Makefile.in, src/term.h: Patch for MacOS X
 	Server port.
 
-1999-05-26  "Jürgen v.Hagen"  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+1999-05-26  Juergen v. Hagen  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
 
 	* docs/gnuplot.doc: Minor correction for set arrow front/back.
 
-1999-05-20  "Mark K. Gardner"  <mkgardne@rtsl3.cs.uiuc.edu>
+1999-05-20  Mark K. Gardner  <mkgardne@cs.uiuc.edu>
 
 	* docs/gnuplot.doc, src/graph3d.c, src/graphics.c, src/hidden3d.c,
 	src/misc.c, src/plot.h, src/plot2d.c, src/set.c, src/show.c:
@@ -9654,7 +9659,7 @@
 
 	* term/Makefile.am, term/Makefile.in: Add metapost.trm.
 
-1999-05-15  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+1999-05-15  Daniel H. Luecking  <luecking@comp.uark.edu>
 
 	* term/metapost.trm: New gnuplot driver for metapost output.
 
@@ -9671,7 +9676,7 @@
 
 	* src/syscfg.h: Add PATHSEP symbol.
 
-1999-05-14  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-05-14  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* BUGS: Remove duplicate entry.
 
@@ -9688,7 +9693,7 @@
 	* src/misc.c(save_set_all), src/plot.h, src/set.c, src/show.c: Now
 	fully dynamic allocation of text and font members in struct text_label.
 
-1999-05-13  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+1999-05-13  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* term/cgm.trm(CGM_linewidth): Change assertion to more useful
 	value (0 instead of 1.0).
@@ -9716,14 +9721,14 @@
 
 	* src/graphics.c: Fix for y-position of the timestamp.
 
-1999-05-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-05-10  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Minor updates and corrections.
 
 	* src/misc.c(load_file): Fix for "gnuplot doesn't exit on
 	quit/exit in non-interactive mode".
 
-1999-05-09  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+1999-05-09  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* src/plot.h: MAX_DISCRETE_LEVELS removed.
 
@@ -9732,7 +9737,7 @@
 
 	* src/setshow.h: levels_list is now dynamic.
 
-1999-05-08  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+1999-05-08  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* docs/gnuplot.doc: Command substitution will not work within a
 	string surrounded by single quotes.  Show an example of command
@@ -9771,7 +9776,7 @@
 
 	* docs/gnuplot.doc: Updated.
 
-1999-04-29  "Daniel H. Luecking"  <luecking@comp.uark.edu>
+1999-04-29  Daniel H. Luecking  <luecking@comp.uark.edu>
 
 	* term/metafont.trm(MF_init): Fix typos (GPMAX->max). Better vertical
 	adjustment for text.
@@ -9861,7 +9866,7 @@
 	* src/misc.c(save_set_all): Split long fprintf() statement up to
 	work around possible egcs bug on LinuxPPC.
 
-1999-04-12  "Carlos A M dos Santos"  <casantos@inf.ufrgs.br>
+1999-04-12  Carlos A M dos Santos  <casantos@inf.ufrgs.br>
 
 	* docs/Makefile.in: Build documentation in text, dvi,and ps format
 	with groff.
@@ -9883,7 +9888,7 @@
 
 	* src/Makefile.in: move binary[123] targets to demo/Makefile.am.in.
 
-1999-04-07  "Jürgen v.Hagen"  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+1999-04-07  Juergen v. Hagen  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
 
 	* tutorial/header.tex: Change for LaTeX2e.
 
@@ -9961,7 +9966,7 @@
 
 	* tutorial/Makefile.am.in: Fix typo.
 
-1999-03-31  Berthold Höllmann  <se6y095@public.uni-hamburg.de>
+1999-03-31  Berthold Hoellmann  <se6y095@public.uni-hamburg.de>
 
 	* configure.in, term/gnugraph.trm: Patch to make things work
 	with GNU plotutils-2.2.
@@ -10094,7 +10099,7 @@
 	* docs/latextut/Makefile.in: Use new gnuplot executable to create
 	.tex files, if available.
 
-1999-03-26  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-03-26  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/png.trm: Don't call obsolete png_write_init() function.
 
@@ -10281,7 +10286,7 @@
 
 	* m4/dos.m4, m4/select.m4: Add description to AC_DEFINE() statements.
 
-1999-03-10  "Dr. Werner Fink"  <werner@suse.de>
+1999-03-10  Werner Fink  <werner@suse.de>
 
 	* plot.c, term/linux.trm: New functions to assume and drop root
 	privileges.
@@ -10500,11 +10505,11 @@
 	* term/x11.trm: Merge X11_opts[] and X11_optarg[] into one array.
 	Indentation.
 
-1999-02-16  "Jürgen v.Hagen" <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+1999-02-16  Juergen v. Hagen  <vonhagen@ihefiji.etec.uni-karlsruhe.de>
 
 	* term/latex.trm: Add explanation about point symbols in LaTeX2e.
 
-1999-02-14  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-02-14  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term.h: Include aed, unixplot and other drivers in OS/2 version.
 
@@ -10524,7 +10529,7 @@
 	be drawn in another colour than the corresponing sample lines on the
 	"test" page if the width of linestyle 1 was changed.
 
-1999-02-14  "Joseph D. Pepin"  <joepepin@att.com>
+1999-02-14  Joseph D. Pepin  <joepepin@att.com>
 
 	* term/x11.trm: Patch to exit the bin/sh process after it has parsed
 	the command line.
@@ -10543,7 +10548,7 @@
 
 	* term/latex.trm: Function prototypes if EEPIC is defined.
 
-1999-02-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1999-02-10  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* command.c, plot.c: REXX interface on OS/2 related changes.
 
@@ -10574,7 +10579,7 @@
 	"set margin" and "set xtic" writeups telling about the effects of
 	"set xtics axis" if the axis is too close to the border.
 
-1999-02-03  "Joseph D. Pepin"  <joepepin@att.com> 
+1999-02-03  Joseph D. Pepin  <joepepin@att.com> 
 
 	* graph3d.c, graphics.c, plot.h, set.c, show.c, docs/gnuplot.doc:
 	Patch to introduce layers (front, back) for labels and arrows.
@@ -10785,7 +10790,7 @@
 	* djconfig.sh: New file to make configuration under MSDOS/DJGPP
 	easier.
 
-1998-12-22  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1998-12-22  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* term/pm.trm: Small patch.
 
@@ -10803,7 +10808,7 @@
 	* plot.h, term/post.trm: Implement and use architecture-independent
 	INT_STR_LEN constant as suggested by Andris Pavenis <pavenis@lanet.lv>.
 
-1998-12-22  Dick Crawford  <u600256@gamma.lanl.gov>, Lucas Hart  <hartl@ucs.orst.edu 
+1998-12-22  Dick Crawford  <u600256@gamma.lanl.gov>, Lucas Hart  <hartl@ucs.orst.edu>
 
 	* docs/gnuplot.doc: Update fit documentation.
 
@@ -10842,7 +10847,7 @@
 	* term/djsvga.trm: Resolve conflict between user defined screen text
 	mode, and the default text mode.
 
-1998-12-17  Roger Fearick  <FEARICK@physci.uct.ac.za>
+1998-12-17  Roger Fearick  <fearick@physci.uct.ac.za>
 
 	* os2/gclient.c, os2/print.c: Patches from Robert Lalla that fix 
 	paint problems if full window drag is enabled, and crash if printing
@@ -11011,7 +11016,7 @@
 
 	* TODO: Add png driver entry.
 
-1998-12-05  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+1998-12-05  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
 	* makefile.os2: Fix OS/2 build (allterm.h related).
 
@@ -11019,7 +11024,7 @@
 
 	* descrip.mms: VMS build fixes.
 
-1998-12-05  Roger Fearick  <FEARICK@physci.uct.ac.za>
+1998-12-05  Roger Fearick  <fearick@physci.uct.ac.za>
 
 	* protos.h: Fix typo.
 
@@ -11252,7 +11257,7 @@
 
 1998-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* graphics.c(gen_tics) Modified patch from Jochen Schuetze <jos@GBF.DE>
+	* graphics.c(gen_tics) Modified patch from Jochen Schuetze <jos@gbf.de>
 	to avoid infinite loop during tic generation.
 
 	* term/aed.trm, term/ai.trm, term/apollo.trm, term/atariaes.trm,
@@ -11649,7 +11654,7 @@
 	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
 	patches.
 
-1998-10-28  Jochen Schuetze  <jos@GBF.DE>
+1998-10-28  Jochen Schuetze  <jos@gbf.de>
 
 	* fit.c, fit.h, misc.c: Save last fit command as comment.
 
@@ -11856,7 +11861,7 @@
 
 	* docs/Makefile.in: Fix configuration variables.
 
-1998-10-08  Jochen Schuetze  <jos@GBF.DE>
+1998-10-08  Jochen Schuetze  <jos@gbf.de>
 
 	* term/eepic.trm, term/latex.trm, term/pslatex.trm, term/tpic.trm:
 	Documentation for free positioning of labels feature.
@@ -11891,7 +11896,7 @@
 
 	* makefile.os2: Updated.
 
-1998-10-06  Jochen Schuetze  <jos@GBF.DE>
+1998-10-06  Jochen Schuetze  <jos@gbf.de>
 
 	* term/eepic.trm, term/latex.trm, pslatex.trm, tpic.trm: Support
 	free positioning of labels with LaTeX related terminals.
@@ -12009,7 +12014,7 @@
 
 	* term/gif.trm: Update help text.
 
-1998-10-01  Dick Crawford  <u600256@gamma.lanl.gov>.
+1998-10-01  Dick Crawford  <u600256@gamma.lanl.gov>
 
 	* docs/gnuplot.doc: Updates.
 
@@ -12250,7 +12255,7 @@
 
 	* term.h: Use X_DISPLAY_MISSING instead of X11.
 
-1998-09-16  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+1998-09-16  Alfred Reibenschuh  <alfred.reibenschuh@cait.co.at>
 
 	* term/gif.trm: More colours for gif terminal (web216 standard).
 
@@ -12258,11 +12263,11 @@
 
 	* term/cgm.trm(CGM_graphics): Fix core dump with strlen(NULL).
 
-1998-09-15  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+1998-09-15  Alfred Reibenschuh  <alfred.reibenschuh@cait.co.at>
 
 	* term/gif.term: Draw grids with the gdStyled functions.
 
-1998-09-02  REIBENSCHUH Alfred  <alfred.reibenschuh@cait.co.at>
+1998-09-02  Alfred Reibenschuh  <alfred.reibenschuh@cait.co.at>
 
 	* term/gif.term: Prevent rotated labels from extending into graph area.
 
@@ -12273,7 +12278,7 @@
 	* term/post.trm: Update help section to	new directory structure
 	for postscript docs.
 
-1998-08-28  Rolf Niepraschk  <niepraschk@ChbRB.berlin.ptb.de>
+1998-08-28  Rolf Niepraschk  <niepraschk@chbrb.berlin.ptb.de>
 
 	* descrip.mms: Updated version.
 
@@ -12495,7 +12500,7 @@
 
 	* docs/termdoc.c: Use HAVE_CPP_STRINGIFY for ANSI_C.
 
-1998-06-29  Roger Fearick  <FEARICK@physci.uct.ac.za>
+1998-06-29  Roger Fearick  <fearick@physci.uct.ac.za>
 
 	* makefile.os2, plot.c, os2/gclient.c, term/pm.trm: OS/2 patches.
 
@@ -12503,7 +12508,7 @@
 
 	* Imported beta 347.
 
-1998-06-23  Berthold Hoellmann  <hoel@Hamburg.GermanLloyd.de>
+1998-06-23  Berthold Hoellmann  <hoel@hamburg.germanlloyd.de>
 
 	* Makefile.in: In term.o target, reverse order of $(INCLUDES) and
 	$(CPPFLAGS) to avoid problems with GNU plotutils.
@@ -12612,7 +12617,7 @@
 	post.trm, pslatex.trm, pstricks.trm, table.trm, tek.trm, texdraw.trm,
 	unixplot.trm, vws.trm, win.trm, x11.trm: term-340.patch.
 
-1998-04-13  "Glenn A. Horton-Smith"  <gas@SLAC.Stanford.EDU>
+1998-04-13  Glenn A. Horton-Smith  <gas@slac.stanford.edu>
 
 	* scanner.c, util.c: Escape quotes patch.
 
@@ -12620,7 +12625,7 @@
 
 	* post.trm, pbm.trm: X11 vs. ps (and pbm) colour inconsistency patch.
 
-1998-04-13  "James R. Van Zandt"  <jrv@vanzandt.mv.com>
+1998-04-13  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* cgm.trm: Updated version, fixes "plot size change" bug, and "ugly
 	dashed lines" bug.
