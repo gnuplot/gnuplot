@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.32 2001/09/03 19:41:16 mikulik Exp $
+ * $Id: gif.trm,v 1.33 2001/09/11 12:12:48 amai Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -417,8 +417,8 @@ TERM_PUBLIC int GIF_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
 	if (gif_smooth_color[i] < 0) { /* this should never happen! take away? */
-	    FPRINTF("gif_smooth_color[i]<0 cannot happen")
-		exit(1);
+	    FPRINTF((stderr, "gif_smooth_color[i]<0 cannot happen"));
+	    exit(1);
 	}
 #if 0
 	fprintf(stderr,"ALLOCATED: i=%i\t=> pal_index=%i\tr=%g g=%g b=%g\n",
