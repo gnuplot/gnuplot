@@ -1,4 +1,6 @@
 #
+# $Id: $
+#
 # E A Merritt <merritt@u.washington.edu>          24-Sep-2002
 #
 # Demo for revised fillstyle code selected by 
@@ -56,3 +58,6 @@ plot [-2.5:4.5] 100/(1.0+x*x) title 'pattern 0' with boxes lt -1, \
                  20/(1.0+x*x) title 'pattern 3' with boxes lt -1
 
 pause -1 "Finished this demo"
+
+reset
+

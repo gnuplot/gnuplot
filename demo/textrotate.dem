@@ -1,4 +1,6 @@
 #
+# $Id: $
+#
 # Demonstrate rotation of label text
 #
 reset
@@ -29,3 +31,6 @@ set label 25 "  rotate by -90" at -3.0,0.0 rotate by -90 point ps 2
 plot 0
 #
 pause -1 "Hit return to continue"
+
+reset
+

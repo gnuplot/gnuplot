@@ -1,3 +1,6 @@
+#
+# $Id: $
+#
 # HBB: Demo animation, tumbling around 'glass.dat'
 # meant to replace the 'rotating whale' demo.
 set parametric

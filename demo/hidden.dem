@@ -1,5 +1,5 @@
 #
-# $Id: hidden.dem,v 1.4 1999/10/17 19:16:59 lhecking Exp $
+# $Id: hidden.dem,v 1.5 1999/11/08 19:19:13 lhecking Exp $
 #
 #
 set samples 20
@@ -56,16 +56,5 @@ set grid
 replot
 pause -1 "Hit return to continue (7)"
 
-set nocontour
-set nogrid
-set nohidden3d
-set samples 100
-set isosamples 10
-set view 60,30,1,1
-set xrange [-10:10]
-set yrange [-10:10]
-set zrange [-10:10]
-set auto
-set title "" 0,0
-
+reset
 

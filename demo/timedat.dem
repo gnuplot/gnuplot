@@ -1,3 +1,7 @@
+#
+# $Id: $
+#
+
 set title "Fsteps plot\nwith date and time as x-values"
 set data style fsteps
 set xlabel "Date\nTime"
@@ -9,9 +13,11 @@ set ylabel "Concentration\nmg/l"
 set format x "%d/%m\n%H:%M"
 set grid
 set key left
-plot 'timedat.dat' using 1:3 t '' \
-, 'timedat.dat' using 1:3 t 'Total P' with points \
-, 'timedat.dat' using 1:4 t '' \
-, 'timedat.dat' using 1:4 t 'PO4' with points 
-pause -1 'Test <Return> '
+plot 'timedat.dat' using 1:3 t '', \
+     'timedat.dat' using 1:3 t 'Total P' with points, \
+     'timedat.dat' using 1:4 t '', \
+     'timedat.dat' using 1:4 t 'PO4' with points 
+pause -1 "Hit return to continue"
+
 reset
+

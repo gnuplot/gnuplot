@@ -1,3 +1,12 @@
+2003-10-17  Petr Mikulik  <mikulik@physics.muni.cz> 
+
+	* demo/animate.dem bivariat.dem borders.dem candlestics.dem discrete.dem
+	fillcrvs.dem fillstyle.dem fontfile.dem fontfile_latex.dem hidden.dem
+	mousevariables.dem multimsh.dem param.dem pm3d.dem pm3dcolors.dem
+	pm3dgamma.dem poldat.dem random.dem scatter.dem steps.dem textcolor.dem
+	textrotate.dem timedat.dem vector.dem: Added Id: tags and trailing reset
+	command where missing.
+
 2003-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.h src/gp_types.h: Moved enum of MODE_QUERY, MODE_PLOT, and

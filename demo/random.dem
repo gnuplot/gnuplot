@@ -1,5 +1,5 @@
 #
-# $Id: random.dem,v 1.3 1999/11/08 19:19:14 lhecking Exp $
+# $Id: random.dem,v 1.4 2001/09/18 11:12:05 lhecking Exp $
 #
 # random.dem
 #
@@ -31,3 +31,6 @@ pause 0 "3D plot ahead, one moment please ..."
 set sample 50
 splot rand(1), rand(1), rand(1)
 pause -1 "Hit return to continue"
+
+reset
+

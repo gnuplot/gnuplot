@@ -1,4 +1,6 @@
 #
+# $Id: $
+#
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
 # and built-in function defined(<varname>)
@@ -64,4 +66,6 @@ print "Zoomed to xrange ",BOT_X," ",TOP_X
 print "Zoomed to yrange ",BOT_Y," ",TOP_Y
 #
 pause -1
+
+reset
 

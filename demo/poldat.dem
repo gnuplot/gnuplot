@@ -1,5 +1,5 @@
 #
-# $Id: poldat.dem,v 1.4 1999/11/08 19:19:13 lhecking Exp $
+# $Id: poldat.dem,v 1.5 2002/02/17 20:41:51 mikulik Exp $
 #
 #
 set size square
@@ -510,19 +510,6 @@ e
 	360	9.0007	-35.926	-71.297	9.0783
 e
 pause -1 "Hit return to continue"
-set noparam
-set key
-set size nosquare 1.0,1.0
-set notime
-set title "" 0,0
-set xlabel "" 0,0
-set ylabel "" 0,0
-set data style points
-set angles radians
-set nopolar
-set yrange [-10:10]
-set rrange [0:10]
-set auto
-set noparam
-set border
-set nogrid
+
+reset
+

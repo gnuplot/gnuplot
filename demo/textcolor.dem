@@ -1,4 +1,6 @@
 #
+# $Id: $
+#
 # Textcolor in 2D
 #
 reset
@@ -62,3 +64,6 @@ splot y
 #
 pause -1 "Hit return to continue"
 #
+
+reset
+

@@ -1,3 +1,6 @@
+#
+# $Id: $
+#
 set nogrid
 set xlab "Demonstration of different borders"
 bb=0

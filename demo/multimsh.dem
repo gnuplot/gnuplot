@@ -1,3 +1,6 @@
+#
+# $Id: $
+#
 set parametric
 set hidden3d
 set nokey
@@ -42,8 +45,5 @@ set xlabel "Mesh or Network 5"
 splot "whale.dat" i 5
 pause -1 "Press Return"
 
-set title ""
-set xlabel ""
-set nohidden3d
-set auto
-set noparametric
+reset
+

@@ -1,5 +1,7 @@
+#
+# $Id: pm3dcolors.dem,v 1.1 2002/08/30 18:45:44 mikulik Exp $
+#
 # Test of new color modes for pm3d palettes.
-# $Id$
 
 #
 #   Gradient Palettes
@@ -200,3 +202,6 @@ set palette model RGB functions r(gray),g(gray),b(gray)
 set title "set palette model RGB functions\n4*x*theta(0.25-x), 0.5*theta(x-0.25)*theta(0.5-x), x"
 splot x
 pause -1 "Hit return to continue"
+
+reset
+

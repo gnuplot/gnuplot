@@ -1,5 +1,5 @@
 #
-# $Id: fontfile_latex.dem,v 1.1 2002/09/02 21:03:15 mikulik Exp $
+# $Id: fontfile_latex.dem,v 1.1 2002/09/06 17:36:25 sfeam Exp $
 #
 # This file demonstrates new features in gnuplot 3.8i
 # -1- loading fontfiles for postscript output
@@ -52,3 +52,6 @@ print " of the cm-super fonts. Then you will have to use lowercase font names or
 print " download a new version."
 set output
 set terminal pop
+
+reset
+

@@ -1,8 +1,12 @@
-#This file will serve as the datafile used in demonstrating the 
-#"plot with steps" option.   Here is a gnuplot input file
-#which uses "plot with steps", inverse error function, normal
-#distribution function, and the inverse normal distribution
-#function.
+#
+# $Id: $
+#
+# This file will serve as the datafile used in demonstrating the 
+# "plot with steps" option.   Here is a gnuplot input file
+# which uses "plot with steps", inverse error function, normal
+# distribution function, and the inverse normal distribution
+# function.
+
 set title "Compare steps, fsteps and histeps"
 plot [0:12][0:13] "steps.dat" notitle with points,  \
  "steps.dat" title 'steps' with steps, \

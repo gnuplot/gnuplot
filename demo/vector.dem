@@ -1,10 +1,13 @@
 #
+# $Id: $
+#
 # This file demonstrates new features in gnuplot 3.6
 # -1- saving contour lines as a gnuplottable file
 # -2- plotting a vector field on the same graph
 # -3- manipulating columns using the '$1,$2' syntax.
 # the example is taken here from Physics is the display of equipotential
 # lines and electrostatic field for a dipole (+q,-q)
+
 print "\n This file demonstrates new features in gnuplot 3.6"
 print " -1- saving contour lines as a gnuplottable file"
 print " -2- plotting a vector field on the same graph"
@@ -55,7 +58,8 @@ set cntrparam points 5
 set label "-q" at -1,0 center
 set label "+q" at  1,0 center
 splot vtot(x,y) w l
-pause -1 "Now create a file with equipotential lines <CR> to continue"
+pause 0 "Now create a file with equipotential lines"
+pause -1 "Hit return to continue"
 set term push
 set term table
 set out "equipo2.dat"
@@ -65,8 +69,8 @@ set term pop
 reset
 plot "equipo2.dat" w l
 pause 0 "Now create a x/y datafile for plotting with vectors "
-pause 0"and display vectors parallel to the electrostatic field"
-pause -1 "<CR> to continue"
+pause 0 "and display vectors parallel to the electrostatic field"
+pause -1 "Hit return to continue"
 set isosam 31,31
 set term push
 set term table
@@ -80,5 +84,8 @@ set yr [ymin:ymax]
 set isosam 31,31
 set key under Left reverse
 plot "field2xy.dat" u 1:2:(coef*dx1($1,$2)):(coef*dy1($1,$2)) w vec, \
-"equipo2.dat" w l
-pause -1 "<CR> to exit"
+     "equipo2.dat" w l
+pause -1 "Hit return to continue"
+
+reset
+

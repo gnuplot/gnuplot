@@ -1,5 +1,5 @@
 #
-# $Id: param.dem,v 1.3 1999/10/17 19:16:59 lhecking Exp $
+# $Id: param.dem,v 1.4 1999/11/08 19:19:13 lhecking Exp $
 #
 # Show some of the new parametric capabilities.
 #
@@ -42,9 +42,5 @@ plot sin(t)/t,cos(t)/t
 pause -1 "Hit return to continue"
 
 # undo what we've done above
-set noparametric
-set samples 160
-set autoscale xy
-set title ""
-set offset 0,0,0,0
-set key
+reset
+
