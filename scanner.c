@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: scanner.c,v 1.10.2.1 1999/12/09 18:42:41 lhecking Exp $";
+static char *RCSid = "$Id: scanner.c,v 1.10.2.2 2002/03/11 12:27:57 broeker Exp $";
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -37,7 +37,7 @@ static char *RCSid = "$Id: scanner.c,v 1.10.2.1 1999/12/09 18:42:41 lhecking Exp
 #include "plot.h"
 
 static int get_num __PROTO((char str[]));
-static void substitute __PROTO((char **strp, int *str_lenp, int current));
+static void substitute __PROTO((char **, int *, int));
 
 #ifdef AMIGA_AC_5
 #define O_RDONLY	0
@@ -400,9 +400,9 @@ static void substitute(strp, str_lenp, current)
 #else /* VMS || PIPES || ATARI && PUREC */
 
 static void substitute(strp, str_lenp, current)
-    char **strp;
-    int *str_lenp;
-    int current;
+char **strp;
+int *str_lenp;
+int current;
 {
     char line[100];
 
