@@ -1,5 +1,9 @@
 2004-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/x11.trm [TERM_HELP]: Explain colour control via command
+	line options more clearly, including the -xrm for colors other
+	than the background.
+
 	* docs/gnuplot.doc (random, palette): Fixed entries showing up as
 	sub-topics in the wrong places of gnuplot.gih.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.99 2004/02/27 06:39:43 mikulik Exp $
+ * $Id: x11.trm,v 1.100 2004/03/02 12:17:10 mikulik Exp $
  *
  */
 
@@ -1826,10 +1826,18 @@ START_HELP(x11)
 "%@gnuplot*line8Color: coral",
 "@end table",
 "",
-" The command-line syntax for these is, for example,",
+" The command-line syntax for these is simple only for background,",
+" which maps directly to the usual X11 toolkit option \"-bg\".  All",
+" others can only be set on the command line by use of the generic",
+" \"-xrm\" resource override option",
 "",
-" Example:",
+" Examples:",
+"",
 "       gnuplot -background coral",
+" to change the background color.", 
+"",
+"       gnuplot -xrm 'gnuplot*line1Color:blue'",
+" to override the first linetype color.",
 "",
 "2 grayscale_resources",
 "?commands set terminal x11 grayscale_resources",
