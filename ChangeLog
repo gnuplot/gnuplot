@@ -1,3 +1,27 @@
+Thu Feb 14 14:49:28 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/x11.trm: #include <ctype.h>.  Some stylistic changes here
+ 	and there.
+	[USE_X11_DRIVER]: Conditionalized the existence of the 'driver'
+ 	option upon this macro. Turned off by default.
+	(X11_full_command_path): New variable, stores path-expanded name
+ 	of gnulot_x11 driver.
+	(parse_driver): Replaced free+alloc by a realloc, and individual
+ 	comparisons by isspace() calls.  Implemented expansion of
+ 	gnuplot_x11 driver command name by prepending the environment
+ 	variable $GNUPLOT_DRIVER_DIR if that is defined and valid, or the
+ 	default configure'd X11_DRIVER_DIR if not.
+	(X11_init): Use expanded pathname in execvp() calls.
+	(TERM_HELP): Documented $GNUPLOT_DRIVER_DIR override.
+
+2002-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/stdfn.c (strerror, strstr, strchr): Prototypes of fallback
+ 	implementations moved from here to src/stdfn.h.
+	(sleep) Duplicate prototype removed.
+	(memcpy): Return type of fallback implementation
+ 	corrected. Prototype moved to src/stdfn.h.
+
 2002-02-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS src/plot3d.h src/pm3d.h src/color.c src/graph3d.c src/mouse.c
