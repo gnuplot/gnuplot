@@ -1,3 +1,8 @@
+2003-08-22  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/fig.trm, term/gd.trm, term/post.trm,
+	term/x11.trm: Fix misprints in gnuplot manual (#12).
+
 2003-08-20  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/save.c src/show.c: Fix incomplete/incorrect description of point
@@ -27,6 +32,15 @@
 
 	* src/gplt_x11.c: Apply linewidth changes directly to pm3d mode (fixes
 	bug that linewidths in pm3d were one plot late in being applied).
+
+2003-08-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/aquaterm.trm: Updated from aquaterm cvs bugfix branch.
+	Thanks to Per Persson for the note.
+
+2003-08-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Tag and release 3.8j.0 snapshot.
 
 2003-08-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
