@@ -1,3 +1,9 @@
+2001-02-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/win/wgraph.c: call GE_plotdone when graph drawn (otherwise
+	rotate-and-scale-by-mouse was not working); fixed set cursor
+	positioning typo ('set mouse zoomjump').
+
 2001-02-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgraph.c (ruler, zoombox): Gave anonymous structs a

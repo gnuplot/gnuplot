@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.15 2001/02/15 18:13:23 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.16 2001/02/19 17:08:24 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -376,6 +376,9 @@ GraphEnd(LPGW lpgw)
 	InvalidateRect(lpgw->hWndGraph, (LPRECT) &rect, 1);
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
+#ifdef USE_MOUSE
+	gp_exec_event(GE_plotdone, 0, 0, 0, 0);	/* notify main program */
+#endif
 }
 
 void WDPROC
@@ -2124,7 +2127,7 @@ Graph_set_cursor (LPGW lpgw, int c, int x, int y )
 			pt.y = rc.bottom - MulDiv(y, rc.bottom - rc.top, lpgw->ymax);
 
 			MapWindowPoints(lpgw->hWndGraph, HWND_DESKTOP, &pt, 1);
-			SetCursorPos(x, y);
+			SetCursorPos(pt.x, pt.y);
 		}
 		break;
 	case -1: /* start zooming; zooming cursor */
