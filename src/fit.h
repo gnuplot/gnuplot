@@ -1,4 +1,4 @@
-/* $Id: fit.h,v 1.11 1998/04/14 00:15:21 drd Exp $ */
+/* $Id: fit.h,v 1.2 1999/06/09 12:08:44 lhecking Exp $ */
 
 /*  NOTICE: Change of Copyright Status
  *
@@ -32,42 +32,22 @@
 #ifndef FIT_H		/* avoid multiple inclusions */
 #define FIT_H
 
-#ifdef EXT
-#undef EXT
-#endif
+/* compatible with gnuplot philosophy */
+#define STANDARD stderr
 
-#ifdef FIT_MAIN
-#define EXT
-#else
-#define EXT extern
-#endif
+/* Suffix of a backup file */
+#define BACKUP_SUFFIX ".old"
 
-#include "plot.h"
+extern char fitbuf[];
 
-#include "ansichek.h"
-
-#define FIT_SKIP "FIT_SKIP"
-
-EXT char    *fit_index;
-EXT char    fitbuf[256];
+extern void error_ex __PROTO((void));
 
 /*****************************************************************
     Useful macros
     We avoid any use of varargs/stdargs (not good style but portable)
 *****************************************************************/
-
-#define Dblf(a)         {fprintf (STANDARD,a); fprintf (log_f,a);}
-#define Dblf2(a,b)      {fprintf (STANDARD,a,b); fprintf (log_f,a,b);}
-#define Dblf3(a,b,c)    {fprintf (STANDARD,a,b,c); fprintf (log_f,a,b,c);}
-#define Dblf5(a,b,c,d,e) \
-                {fprintf (STANDARD,a,b,c,d,e); fprintf (log_f,a,b,c,d,e);}
-#define Dblf6(a,b,c,d,e,f) \
-                {fprintf (STANDARD,a,b,c,d,e,f); fprintf (log_f,a,b,c,d,e,f);}
-
 #define Eex(a)	    {sprintf (fitbuf+9, (a));         error_ex ();}
 #define Eex2(a,b)   {sprintf (fitbuf+9, (a),(b));     error_ex ();}
 #define Eex3(a,b,c) {sprintf (fitbuf+9, (a),(b),(c)); error_ex ();}
-
-EXT void error_ex __PROTO((void));
 
 #endif /* FIT_H */
