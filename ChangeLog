@@ -1,3 +1,29 @@
+1999-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.dj2, src/Makefile.am: Remove references to protos.h.
+
+	* docs/doc2x.h: Remove #ifdef 0'd defines.
+
+	* src/contour.c: Remove commented declaration of solve_tri_diag().
+
+	* src/dynarray.c, src/dynarray.h, src/hidden3d.c, src/plot2d.c,
+	src/set.c,src/show.c: Formatting, indentation.
+
+	* src/graph3d.c, src/graphics.c, src/graphics.h, src/help.c,
+	src/misc.c, src/plot.h, src/setshow.h, src/show.c, src/term.c,
+	term/dumb.trm: Fix TBOOLEAN/int inconsistency.
+
+	* src/graphics.c, src/misc.c, src/plot.h, src/plot2d.c: Rename struct
+	curves_points member next_cp to next.
+
+	* src/parse.h: Fix comment.
+
+	* src/plot.h: Define TBOOLEAN differently.
+
+	* src/protos.h: Remove unnecessary file.
+
+	* term/driver.h: Remove prototype for do_arrow().
+
 1999-11-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/buildvms.com, config/makefile.286, config/makefile.amg,
