@@ -6736,6 +6736,7 @@ line will have <sample_2> samples.  If you only specify <samples_1>,
 @node size, style, samples, set-show
 @subsection size
 
+@c ?aspect ratio
 @c ?commands set size
 @c ?commands show size
 @c ?set size
@@ -8151,9 +8152,9 @@ large amount of memory."
 
 
 The `hpgl` driver produces HPGL output for devices like the HP7475A plotter.
-There are two options which can be set---the number of pens and "eject", which
-tells the plotter to eject a page when done.  The default is to use 6 pens
-and not to eject the page when done.
+There are two options which can be set: the number of pens and `eject`,
+which tells the plotter to eject a page when done.  The default is to use 6
+pens and not to eject the page when done.
 
 The international character sets ISO-8859-1 and CP850 are recognized via
 `set encoding iso_8859_1` or `set encoding cp850` (see @ref{encoding} for
@@ -8181,18 +8182,48 @@ is equivalent to the previous `hp7550` terminal, and the selection
 
 is equivalent to the previous `hp7580b` terminal.
 
-The `pcl5` driver supports the Hewlett-Packard Laserjet III.  It actually uses
-HPGL-2, but there is a name conflict among the terminal devices.  It has
-several options
+The `pcl5` driver supports plotters such as the Hewlett-Packard Designjet
+750C, the Hewlett-Packard Laserjet III, and the Hewlett-Packard Laserjet IV.
+It actually uses HPGL-2, but there is a name conflict among the terminal
+devices.  It has several options which must be specified in the order
+indicated below:
 
 Syntax:
 @example
-      set terminal pcl5 @{<mode>@} @{<font>@} @{<fontsize>@}
+      set terminal pcl5 @{mode <mode>@} @{<plotsize>@}
+          @{@{color @{<number_of_pens>@}@} | monochrome@} @{solid | dashed@}
+          @{font <font>@} @{size <fontsize>@} @{pspoints | nopspoints@}
 
 @end example
 
-where <mode> is `landscape`, or `portrait`, <font> is `stick`, `univers`, or
-`cg_times`, and <fontsize> is the size in points.
+<mode> is `landscape` or `portrait`. <plotsize> is the physical
+plotting size of the plot, which is one of the following: `letter` for
+standard (8 1/2" X 11") displays, `legal` for (8 1/2" X 14") displays,
+`noextended` for (36" X 48") displays (a letter size ratio) or,
+`extended` for (36" X 55") displays (almost a legal size ratio).
+`color` is for multi-pen (i.e. color) plots, and <number_of_pens> is
+the number of pens (i.e. colors) used in color plots. `monochrome` is for
+one (e.g. black) pen plots. `solid` draws all lines as solid lines, or
+'dashed' will draw lines with different dashed and dotted line patterns.
+<font> is `stick`, `univers`, `cg_times`, `zapf_dingbats`, `antique_olive`,
+`arial`, `courier`, `garamond_antigua`, `letter_gothic`, `cg_omega`,
+`albertus`, `times_new_roman`, `clarendon`, `coronet`, `marigold`,
+`truetype_symbols`, or `wingdings`. <fontsize> is the font size in points.
+The point type selection can be the standard default set by specifying
+nopspoints, or the same set of point types found in the postscript terminal
+by specifying pspoints.
+
+Note that built-in support of some of these options is printer device
+dependendent. For instance, all the fonts are supposedly supported by the HP
+Laserjet IV, but only a few (e.g. univers, stick) may be supported by the HP
+Laserjet III and the Designjet 750C. Also, color obviously won't work on the
+the laserjets since they are monochrome devices.
+
+Defaults: landscape, noextended, color (6 pens), solid, univers, 12 point,
+@example
+          and nopspoints.
+
+@end example
 
 With `pcl5` international characters are handled by the printer; you just put
 the appropriate 8-bit character codes into the text strings.  You don't need
@@ -8602,22 +8633,33 @@ Examples:
 
 The `png` terminal driver supports Portable Network Graphics.  To compile it,
 you will need  the third-party libraries "libpng" and "zlib"; both are
-available at ftp://ftp.uu.net/graphics/png.  `png` has two options.
+available at http://www.cdrom.com/pub/png/.  `png` has four options.
 
-By default, the `gif` terminal driver uses a shared Web-friendy palette.
+By default, the `png` terminal driver uses a shared Web-friendy palette.
+
 Syntax:
 @example
       set terminal png @{small | medium | large@}
-                       @{ transparent @}
+                       @{transparent|notransparent@}
                        @{monochrome | gray | color@}
+                       @{<color0> <color1> <color2> ...@}
 
+@end example
+
+`transparent` instructs the driver to generate transparent PNGs.  The first
+color will be the transparent one.
+@example
+   "
 @end example
 
 The defaults are small (fontsize) and color.  Default size of the output
 is 640*480 pixel. 
 
-`transparent` instructs the driver to generate transparent PNGs.  The first
-color will be the transparent one."
+Each color must be of the form 'xrrggbb', where x is the literal character
+'x' and 'rrggbb' are the red, green and blue components in hex.  For example,
+'x00ff00' is green.  The background color is set first, then the border
+colors, then the X & Y axis colors, then the plotting colors.  The maximum
+number of colors that can be set is currently 99."
 
 @node postscript, pslatex_and_pstex, png, terminal
 @subsubsection postscript
@@ -8801,7 +8843,8 @@ of course anything can be added or deleted, but modifications such as these
 may require deeper knowledge of the PostScript language.
 
 The organization of a PostScript file written by `gnuplot` is discussed in
-the text file "ps_file.doc" in the /docs/ps subdirectory."
+the text file "ps_file.doc" in the docs/ps subdirectory of the gnuplot
+source distribution."
 
 @node pslatex_and_pstex, pstricks, postscript, terminal
 @subsubsection pslatex and pstex
@@ -9004,7 +9047,8 @@ which a graph would be based, i.e., the results of processing the @ref{plot} or
 `splot` command, in a multicolumn ASCII table of X Y @{Z@} R values.  The
 character R takes on one of three values: "i" if the point is in the active
 range, "o" if it is out-of-range, or "u" if it is undefined.  The data
-format is determined by the format of the axis labels (see `set format`).
+format is determined by the format of the axis labels (see `set format`),
+and the columns are separated by single spaces.
 
 For those times when you want the numbers, you can display them on the
 screen or save them to a file.  This can be useful if you want to generate
