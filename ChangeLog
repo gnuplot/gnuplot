@@ -1,3 +1,62 @@
+1999-07-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.os9: Fix support for current directory structure.
+
+	* docs/doc2hlp.c, docs/doc2html.c, docs/doc2ipf.c, docs/doc2ms.c,
+	docs/doc2rnh.c, docs/doc2rtf.c, docs/doc2tex.c, docs/doc2x.h,
+	docs/termdoc.c: Use TBOOLEAN instead of boolean.
+
+	* src/gplt_x11.c: Remove disfunctional code using poll(2).
+
+	* src/hidden3d.c(plot3d_hidden): Revert to previous version of code.
+
+	* term/pbm.trm, term/png.trm: Move defines outside TERM_BODY
+	definition.
+
+	* term/pslatex.trm: Include post.h.
+
+	* term/post.h: New file.
+
+	* term/post.trm: Move defines and variable declarations to new
+	post.h header file.
+
+1999-07-09  "John W. Eaton" <jwe@bevo.che.wisc.edu>
+
+	* src/gplt_x11.c: gnuplot_x11.c does not appear to read input
+	in some cases, possibly related to input buffering by fgets().
+	See http://www.che.wisc.edu/octave/mailing-lists/help-octave/1998/88
+	for details.
+
+1999-07-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/pgnuplot.c: New, improved version by Craig R. Schardt.
+
+1999-07-08  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/makefile.vms: Add defines to compiler flags.
+
+	* src/command.c, src/plot.c: Add include statements for VMS.
+
+	* src/fit.c(Dblfn): Use the correct format strings for fprintf().
+
+	* src/protos.h, src/scanner.c: Fix scanner() prototype.
+
+	* src/util.c(lower_case): char *p now signed.
+
+1999-07-07  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: Add -DHAVE_STRCSPN to CFLAGS.
+
+	* src/command.c: Reorder some statements.
+
+1999-07-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/makefile.djg, src/ctrl87.c, src/ctrl87.h: Removed. Drop
+	support for obsolete DJGPP version 1.
+
+	* src/Makefile.am, src/Makefile.in, src/Makefile.maint, src/plot.c:
+	Remove suppor for DJGPP version 1.
+
 1999-07-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/gnuplot.doc, src/command.c: Allow "-" for stdout as filename
