@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.38 2002/09/27 00:12:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.39 2002/09/27 12:17:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1031,9 +1031,11 @@ static void
 unset_tics(axis)
     AXIS_INDEX axis;
 {
-    /* FIXME HBB 20000506: shouldn't we remove tic series settings,
-     * too? */
     axis_array[axis].ticmode = NO_TICS;
+    if (axis_array[axis].ticdef.def.user) {
+	free_marklist(axis_array[axis].ticdef.def.user);
+	axis_array[axis].ticdef.def.user = NULL;
+    }
 }
 
 
@@ -1459,6 +1461,7 @@ reset_command()
 	    = axis_defaults[axis].max;
 
 	/* 'tics' default is on for some, off for the other axes: */
+	unset_tics(axis);
 	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
 	unset_mtics(axis);
 	axis_array[axis].ticdef = default_axis_ticdef;

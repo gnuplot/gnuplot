@@ -1,3 +1,8 @@
+2002-10-04  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/set.c src/setshow.h src/unset.c: Free list of user ticmarks
+	on reset or unset [<axis>]tics. Failure to free was a memory leak.
+
 2002-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/os2/gnupmdrv.rc src/os2/dialogs.h src/os2/gclient.c: Update of
@@ -1203,7 +1208,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/30 15:15:19 $).
+	last modification date (from the tag $Date: 2002/10/04 08:56:01 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

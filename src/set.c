@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.97 2002/09/27 00:12:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.98 2002/09/27 12:17:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -151,7 +151,6 @@ static void set_xyzlabel __PROTO((label_struct * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
 static void add_tic_user __PROTO((AXIS_INDEX, char * label, double position)); 
-static void free_marklist __PROTO((struct ticmark * list));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
@@ -4065,7 +4064,7 @@ add_tic_user(axis,label,position)
     axis_array[axis].ticdef.def.user = tic;
 }
 
-static void
+void
 free_marklist(list)
     struct ticmark *list;
 {

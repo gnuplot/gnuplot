@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.30 2001/06/11 16:47:59 broeker Exp $
+ * $Id: setshow.h,v 1.31 2002/03/12 10:23:45 mikulik Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -40,6 +40,7 @@
 
 #include "stdfn.h"
 
+#include "axis.h"
 #include "gadgets.h"
 #include "term_api.h"
 
@@ -74,6 +75,7 @@ void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 void reset_key __PROTO((void));
+void free_marklist __PROTO((struct ticmark * list));
 #ifdef PM3D
 void reset_palette __PROTO((void));
 #endif
