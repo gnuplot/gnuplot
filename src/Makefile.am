@@ -12,8 +12,6 @@ X11_DRIVER_DIR=$(pkglibdir)/$(PKG_MAJOR)
 
 # There is probably no need to edit anything below this line
 
-CLEANFILES = getcolor_x11.c
-
 GNUPLOT_X11 = @GNUPLOT_X11@
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot
@@ -38,12 +36,12 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c getcolor_x11.c gpexecute.c gpexecute.h mousecmn.h
+gnuplot_x11_SOURCES = gplt_x11.c gpexecute.c gpexecute.h mousecmn.h
 
-getcolor_x11.c: getcolor.c 
-	 $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DGPLT_X11_MODE -o getcolor_x11.c $(srcdir)/getcolor.c 
+getcolor_x11.o: getcolor.c
+	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
 
-gnuplot_x11_LDADD = $(XLIBS)
+gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 
