@@ -282,6 +282,9 @@
 /*  Define to use thin plate spines. EXPERIMENTAL  */
 #undef THIN_PLATE_SPLINES_GRID
 
+/*  Define if you want online help and subtopic tables sorted by column.  */
+#undef COLUMN_HELP
+
 /*  Define if you want to use the IRIS terminal on IRIS4D series computers.  */
 #undef IRIS
 
