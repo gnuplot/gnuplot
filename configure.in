@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.104 2001/09/19 09:28:49 amai Exp $
+dnl $Id: configure.in,v 1.105 2002/01/22 17:43:18 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -753,5 +753,7 @@ test "$enable_mgr" = yes && \
 test "$enable_rgip" = yes && \
   AC_MSG_RESULT([  Enable RGIP terminal])
 dnl end config report
+
+exit 0
 
 dnl end configure.in
