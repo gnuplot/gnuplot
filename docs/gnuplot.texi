@@ -274,6 +274,8 @@ See the simple.dem demo, also available together with other demos on the web pag
 @section Seeking-assistance
 
 ^ <a name="Seeking-assistance"></a>
+@cindex help-desk
+
 @cindex seeking-assistance
 
 There is a mailing list for `gnuplot` users.  Note, however, that the
@@ -359,7 +361,7 @@ provided in the gnuplot distribution, and are referred to here by name.
 
 Interaction with the current plot via mouse and hotkeys is supported for
 the X11, OS/2 Presentation Manager, ggi and windows terminals. See
-`mouse input` for more information on mousing. See @ref{bind} for information
+`mouse input` for more information on mousing. See help for @ref{bind} for information
 on hotkeys. Also see the documentation for individual mousing terminals `ggi`,
 `pm`, `windows` and `x11`.
 
@@ -419,7 +421,7 @@ title. See `set term x11`.
 
 
 The `splot` command is now capable of plotting 2D maps and 3D surfaces 
-colored by greyscale or color palettes. See @ref{pm3d}, @ref{palette}, 
+colored by greyscale or color palettes. See help for @ref{pm3d}, @ref{palette}, 
 @ref{cbrange}, `set view map`, `set colorbox` and @ref{palette}.
 
 Sample scripts: pm3d.dem pm3dcolors.dem pm3dgamma.dem
@@ -1535,9 +1537,10 @@ See also
 @node Random_number_generator,  , valid, Functions
 @subsubsection Random number generator
 
+@c ?expressions random
+@c ?functions random
 @cindex random
 
-@c ?expressions random
 
 The behavior of the built-in function `rand(x)` has changed as of version 3.8l.
 Older scripts that expected rand(x>0) to produce sequential pseudo-random
@@ -1821,7 +1824,6 @@ See also the command `set mouse`.
 @c ?commands bind
 @cindex bind
 
-@c ?help bind
 The @ref{bind} allows defining or redefining a hotkey, i.e. a sequence of gnuplot
 commands which will be executed when a certain key or key sequence is pressed
 while the driver's window has the input focus. Note that @ref{bind} is only
@@ -1909,14 +1911,12 @@ List of supported special keys:
 
 @end example
 
-See also `help mouse` and @ref{if}.
+See also help for `mouse` and @ref{if}.
 
 
 @node mouse_variables,  , bind, mouse_input
 @subsection mouse_variables
 
-@c ?help mouse variables
-@c ?help mouse mouse_variables
 @c ?mouse variables
 When mousing is active, clicking in the active window will set several user
 variables that can be accessed from the gnuplot command line. The coordinates
@@ -2417,10 +2417,13 @@ are applicable to `fit`. See `plot datafile`.
 
 The default data formats for fitting functions with a single independent
 variable, y=f(x), are @{x:@}y or x:y:s; those formats can be changed with
-the datafile @ref{using} qualifier.  The third item, (a column number or an
+the datafile @ref{using} qualifier.  The third item (a column number or an
 expression), if present, is interpreted as the standard deviation of the
 corresponding y value and is used to compute a weight for the datum, 1/s**2.
 Otherwise, all data points are weighted equally, with a weight of one.
+Note that if you don't specify a @ref{using} option at all, no y deviations are
+read from the datafile even if it does have a third column, so you'll
+always get unit weights.
 
 To fit a function with two independent variables, z=f(x,y), the required
 format is @ref{using} with four items, x:y:z:s.  The complete format must be
@@ -2995,6 +2998,7 @@ available is printed on the screen.
 @node history, if, help, Commands
 @section history
 
+@c ?commands history
 @cindex history
 @cmindex history
 
@@ -3032,7 +3036,6 @@ of the above examples demonstrates.
 @cmindex if
 
 
-@c ?help if
 The @ref{if} command allows commands to be executed conditionally.
 
 Syntax:
@@ -3769,7 +3772,6 @@ also works (i.e. you can use y as the dummy variable).
 @c ?datafile using
 @cindex using
 
-@c ?help using
 The most common datafile modifier is @ref{using}.
 
 Syntax:
@@ -4865,7 +4867,7 @@ changed by `first`, `second`, `graph` or `screen` before the <length>;
 see `coordinates` for details.
 
 Specifying `filled` produces filled arrow heads (if heads are used).
-Filling is supported on filled-polygon capable terminals, see @ref{pm3d}
+Filling is supported on filled-polygon capable terminals, see help of @ref{pm3d}
 for their list, otherwise the arrow heads are closed but not filled.
 Further, filling is obviously not supported on terminals drawing arrows by
 their own specific routines, like `fig`, `metafont`, `metapost`, `latex` or
@@ -5642,7 +5644,7 @@ usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
 `unset colorbox` resets the default parameters for the colorbox and switches
 the colorbox off.
 
-See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help set style line`.
+See also help for @ref{pm3d}, @ref{palette}, @ref{pm3d}, and `set style line`.
 
 
 @node contour, data_style, color_box, set-show
@@ -6845,7 +6847,6 @@ gives it a title, and draws a box around it in linetype 3:
 @opindex label
 
 
-@c ?help label
 @cindex nolabel
 
 Arbitrary labels can be placed on the plot using the @ref{label} command.
@@ -6910,7 +6911,7 @@ data.  Using `front` will prevent a label from being obscured by dense data.
 
 `Textcolor <colorspec>` changes the color of the label text. `<colorspec>` is
 either a linetype or a mapping onto the pm3d color palette (available only in
-`splot`), see @ref{palette}.
+`splot`), see help for @ref{palette}.
 @example
    `textcolor` may be abbreviated `tc`.
    `tc default` resets the text color to its default state.
@@ -7245,10 +7246,10 @@ to tic labels overwriting other text if the axis is very close to the border.
 @node mouse, multiplot, margin, set-show
 @subsection mouse
 
+@c ?commands set mouse
 @c ?commands unset mouse
 @c ?set mouse
 @c ?unset mouse
-@c ?help mouse
 @cindex mouse
 @opindex mouse
 
@@ -7343,13 +7344,13 @@ driver's window. `verbose` is off by default.
 
 Press 'h' in the driver's window for a short summary of the mouse and key
 bindings.  This will also display user defined bindings or `hotkeys` which
-can be defined using the @ref{bind} command, see @ref{bind}.  Note, that user
+can be defined using the @ref{bind} command, see help for @ref{bind}.  Note, that user
 defined `hotkeys` may override the default bindings.
 
 Press 'q' in the driver's window to close the window. This key cannot be
 overridden with the @ref{bind} command.
 
-See also @ref{bind} and @ref{label}.
+See also help for @ref{bind} and @ref{label}.
 
 @menu
 * x11_mouse::                   
@@ -7358,10 +7359,9 @@ See also @ref{bind} and @ref{label}.
 @node x11_mouse,  , mouse, mouse
 @subsubsection x11_mouse
 
+@c ?mouse x11_mouse
 @cindex x11_mouse
 
-@c ?help x11_mouse
-@c ?mouse x11_mouse
 X11 mouse support is turned on by default if standard input comes from a 
 terminal (tty). Mouse support is turned off if standard input does not 
 come from a tty, e.g. a pipe. If you want to use mouse support while writing
@@ -7765,16 +7765,11 @@ more curves to the current plot and you want to edit the whole command now.
 @c ?commands set pm3d
 @c ?commands show pm3d
 @c ?set pm3d
-@c ?set pm3d at b
-@c ?set pm3d map
 @c ?show pm3d
 @cindex pm3d
 @opindex pm3d
 
 
-@c ?help pm3d
-@c ?set pm3d clip1in
-@c ?set pm3d clip4in
 pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
 color/gray maps and surfaces.  It uses a pm3d algorithm which allows plotting
 gridded as well as non-gridded data without preprocessing, even when the data
@@ -7808,7 +7803,7 @@ evaluated function or from an @ref{file}.  Each surface consists of a
 sequence of separate scans (isolines).  The pm3d algorithm fills the region
 between two neighbouring points in one scan with another two points in the
 next scan by a gray (or color) according to z-values (or according to an
-additional 'color' column, see @ref{using}) of these 4 corners; by default
+additional 'color' column, see help for @ref{using}) of these 4 corners; by default
 the 4 corner values are averaged, but this can be changed by the option 
 `corners2color`.  In order to get a reasonable surface, the neighbouring scans
 should not cross and the number of points in the neighbouring scans should not
@@ -7997,8 +7992,8 @@ altitudes:
 
 @end example
 
-See also @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}
-and definitely `demo/pm3d.dem`.
+See also help for @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}
+and definitely the demo file `demo/pm3d.dem`.
 
 
 @node palette, pointsize, pm3d, set-show
@@ -8012,7 +8007,6 @@ and definitely `demo/pm3d.dem`.
 @opindex palette
 
 
-@c ?help palette
 Palette is a color storage for use by @ref{pm3d}, filled color contours or
 polygons, color histograms, color gradient background, and whatever it is
 or it will be implemented...  Here it stands for a palette of smooth
@@ -8020,7 +8014,7 @@ or it will be implemented...  Here it stands for a palette of smooth
 
 Color palettes require terminal entries for filled color polygons and
 palettes of smooth colors, are currently available for terminals listed in
-@ref{pm3d}. The range of color values are adjustable independently by
+help for @ref{pm3d}. The range of color values are adjustable independently by
 @ref{cbrange} and `set log cb`. The whole color palette is
 visualized in the `colorbox`.
 
@@ -8403,7 +8397,8 @@ or even more intermediate points until the linear interpolation fits the
 @node postscript,  , gamma-correction, palette
 @subsubsection postscript
 
-@c ?palette postscript
+@c ?commands set palette postscript
+@c ?set palette postscript
 In order to reduce the size of postscript files, the gray value and not all
 three calculated r,g,b values are written to the file.  Therefore the
 analytical formulae are coded directly in the postscript language as a header
@@ -8634,7 +8629,6 @@ line will have <sample_2> samples.  If you only specify <samples_1>,
 @node size, style, samples, set-show
 @subsection size
 
-@c ?aspect ratio
 @c ?commands set size
 @c ?commands show size
 @c ?set size
@@ -8643,6 +8637,7 @@ line will have <sample_2> samples.  If you only specify <samples_1>,
 @opindex size
 
 
+@c ?aspect ratio
 The @ref{size} command scales the displayed size of the plot.
 
 Syntax:
@@ -8760,7 +8755,6 @@ Syntax:
 @c ?show style arrow
 @cindex arrowstyle
 
-@c ?help set style arrow
 ^ <a name="arrowtype"></a>
 ^ <a name="arrowwidth"></a>
 Each terminal has a default set of arrow and point types, which can be seen
@@ -8804,7 +8798,7 @@ gets an indented back angle. Above 110 degrees, the arrow head has an acute
 back angle. Between these thresholds, the back line is straight.
 
 Specifying `filled` produces filled arrow heads (if heads are used). 
-Filling is supported on filled-polygon capable terminals, see @ref{pm3d}
+Filling is supported on filled-polygon capable terminals, see help of @ref{pm3d}
 for their list, otherwise the arrow heads are closed but not filled.
 The same result (closed but not filled arrow head) is reached by specifying
 `empty`.
@@ -8936,7 +8930,6 @@ style.
 @c ?show style line
 @cindex linestyle
 
-@c ?help set style line
 ^ <a name="linetype"></a>
 ^ <a name="linewidth"></a>
 Each terminal has a default set of line and point types, which can be seen
@@ -9210,7 +9203,7 @@ The area is filled between the current curve and
 
 @end example
 
-Note: filling is supported on filled-polygon capable terminals, see
+Note: filling is supported on filled-polygon capable terminals, see help of
 @ref{pm3d} for their list.
 
 Zoom of a filled curve drawn from a datafile may produce empty or incorrect
@@ -13866,7 +13859,6 @@ printers.  It has no options."
 @c ?set term vgagl
 @c ?terminal vgagl
 @c ?term vgagl
-@c ?help vgagl
 @cindex vgagl
 @tmindex vgagl
 
@@ -14314,7 +14306,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (@ref{encoding}).
+ <encoding> is set based on the current character set (see help for @ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -14423,13 +14415,24 @@ means a half intensity blue.
 @end example
 
 
-The command-line syntax for these is, for example,
+The command-line syntax for these is simple only for background,
+which maps directly to the usual X11 toolkit option "-bg".  All
+others can only be set on the command line by use of the generic
+"-xrm" resource override option
 
-Example:
+Examples:
+
 @example
       gnuplot -background coral
-
 @end example
+
+to change the background color.
+
+@example
+      gnuplot -xrm 'gnuplot*line1Color:blue'
+@end example
+
+to override the first linetype color.
 
 
 
@@ -14528,8 +14531,7 @@ to a '16' dotted line.
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
-@c ?help x11 pm3d_resources
-@c ?help x11 pm3d
+@c ?x11 pm3d
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
@@ -14709,7 +14711,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (@ref{encoding}).
+ <encoding> is set based on the current character set (see help for @ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -14818,13 +14820,24 @@ means a half intensity blue.
 @end example
 
 
-The command-line syntax for these is, for example,
+The command-line syntax for these is simple only for background,
+which maps directly to the usual X11 toolkit option "-bg".  All
+others can only be set on the command line by use of the generic
+"-xrm" resource override option
 
-Example:
+Examples:
+
 @example
       gnuplot -background coral
-
 @end example
+
+to change the background color.
+
+@example
+      gnuplot -xrm 'gnuplot*line1Color:blue'
+@end example
+
+to override the first linetype color.
 
 
 
@@ -14923,8 +14936,7 @@ to a '16' dotted line.
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
-@c ?help x11 pm3d_resources
-@c ?help x11 pm3d
+@c ?x11 pm3d
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
