@@ -7,6 +7,8 @@
 	* src/datafile.c (df_parse_string_field): Handle missing field in 
 	input file more gracefully. (bug #1046894)
 
+	* src/graph3d.c (map3d_position_r): Remove unused variables.
+
 2004-10-13  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/graph3d.c (map3d_position_r get_arrow3d):

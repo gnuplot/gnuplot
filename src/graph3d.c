@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.98 2004/09/24 21:42:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.99 2004/10/13 22:23:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2809,7 +2809,6 @@ map3d_position_r(
 
     /* startpoint in graph coordinates */
     if (screens == 0) {
-	unsigned int xlocal, ylocal;
 	unsigned int xoriginlocal, yoriginlocal;
 	map3d_xy(xpos, ypos, zpos, x, y);
 	if (pos->scalex == graph)
