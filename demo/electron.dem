@@ -1,5 +1,5 @@
 #
-# $Id: electron.dem,v 1.4 1996/08/13 21:48:22 drd Exp $
+# $Id: electron.dem,v 1.1.1.1 1998/04/15 19:16:41 lhecking Exp $
 #
 # Electronics demo
 #
@@ -21,6 +21,7 @@ set xlabel "Vbe (base emmitter voltage)"
 set xrange [0 : 0.75]
 set ylabel "Ic (collector current)"
 set yrange [0 : 0.005]
+set key box
 set key .2,.0045
 set format y "%.4f"
 plot Ic(Vbe)

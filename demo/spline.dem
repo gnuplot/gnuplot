@@ -1,5 +1,5 @@
 #
-# $Id: spline.dem,v 1.3 1997/04/05 19:44:48 drd Exp $
+# $Id: spline.dem,v 1.1.1.1 1998/04/15 19:16:43 lhecking Exp $
 #
 # Some curve plotting using common cubic polynomial basis function for cagd.
 #
@@ -7,6 +7,7 @@
 #
 set xrang [0:1]
 set grid
+set key box
 
 set yrange[-0.2:1.4]
 m0(x) = 1
@@ -90,9 +91,4 @@ set title "The cubic Hermite basis functions in use"
 plot cub_hermit_x1(t), cub_hermit_y1(t) with lines 2,\
      cub_hermit_x2(t), cub_hermit_y2(t) with lines 3
 pause -1 "Press return to continue"
-
-set noparametric
-set noarrow
-set auto
-set nogrid
-set title ""
+reset

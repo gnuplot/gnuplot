@@ -13,4 +13,5 @@ plot 'timedat.dat' using 1:3 t '' \
 , 'timedat.dat' using 1:3 t 'Total P' with points \
 , 'timedat.dat' using 1:4 t '' \
 , 'timedat.dat' using 1:4 t 'PO4' with points 
-pause -1 'Tast <Return> '
+pause -1 'Test <Return> '
+reset

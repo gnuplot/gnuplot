@@ -1,5 +1,5 @@
 #
-# $Id: controls.dem,v 1.2 1993/09/27 17:11:18 alex Exp $
+# $Id: controls.dem,v 1.1.1.1 1998/04/15 19:16:41 lhecking Exp $
 #
 # warning:  this demo is SLOW on PCs without math coprocessors!
 #
@@ -17,15 +17,11 @@ wn = 1.0
 set xrange [0:13]
 set samples 50
 set dummy t
+set key box
 #
 # plot c(t) for several different damping factors s
 #
 plot s=.1,c(t),s=.3,c(t),s=.5,c(t),s=.7,c(t),s=.9,c(t),s=1.0,c(t),s=1.5,c(t),s=2.0,c(t)
 pause -1 "Hit return to continue"
-
-# undo what we have done
-set xrange [-10:10]
-set autoscale xy
-set samples 160
-set dummy x
+reset
 

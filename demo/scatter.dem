@@ -10,6 +10,7 @@ set autoscale
 set parametric
 set data style points
 set xlabel "data style point - no dgrid"
+set key box
 splot "hemisphr.dat"
 pause -1 "Hit return to continue (1)"
 
@@ -42,6 +43,7 @@ set xlabel "data style points, nodgrid3d"
 splot "scatter2.dat"
 pause -1 "Hit return to continue (6)"
 
+set key nobox
 set dgrid3d ,,1
 set xlabel "data style lines, dgrid3d ,,1"
 set data style lines
@@ -53,9 +55,5 @@ set xlabel "data style lines, dgrid3d ,,4"
 set data style lines
 splot "scatter2.dat"
 pause -1 "Hit return to continue (8)"
+reset
 
-set noparametric
-set nodgrid3d
-set nocontour
-set title ""
-set xlabel ""

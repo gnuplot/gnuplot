@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.5 1995/04/21 12:49:06 drd Exp $
+# $Id: surface1.dem,v 1.3 1998/12/09 15:26:57 lhecking Exp $
 #
 set samples 21
 set isosample 11
@@ -130,19 +130,6 @@ compl(a,b)=a*{1,0}+b*{0,1}
 mand(z,a,n) = n<=0 || abs(z)>100 ? 1:mand(z*z+a,a,n-1)+1
 splot [-2:1][-1.5:1.5] mand({0,0},compl(x,y),30)     
 pause -1 "Hit return to continue (21)"
+reset
 # TANAKA Masaki  (Tokyo Institute of technology)
 #                 masaki@isea.is.titech.ac.jp
-
-#
-# Clean up:
-#
-set samples 100
-set isosamples 10
-set xrange [-10:10]
-set yrange [-10:10]
-set zrange [-10:10]
-set auto
-set xlabel "" 0,0
-set ylabel "" 0,0
-set zlabel "" 0,0
-set nohidden

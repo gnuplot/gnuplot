@@ -1,9 +1,10 @@
 #
-# $Id: surface2.dem,v 1.2 1998/12/02 18:36:01 lhecking Exp $
+# $Id: surface2.dem,v 1.2.2.1 1999/08/19 14:34:41 lhecking Exp $
 #
 set parametric
 set isosamples 50,10
 set hidden
+set key below
 
 set title "Parametric Sphere"
 set urange [-pi/2:pi/2]

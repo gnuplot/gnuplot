@@ -1,5 +1,5 @@
 #
-# $Id: prob2.dem,v 1.3 1994/03/30 01:28:45 alex Exp $
+# $Id: prob2.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
 #
 # Demo Statistical Approximations version 1.1
 #
@@ -45,7 +45,7 @@ xmax = ceil(mu + 4.0 * sigma)
 ymax = 1.1 * binom(mu) #mode of binomial PDF used
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -77,7 +77,7 @@ xmax = ceil(mu + 4.0 * sigma)
 ymax = 1.1 * binom(mu) #mode of binomial PDF used
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -111,7 +111,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * p
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -143,7 +143,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * p
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -176,7 +176,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * hypgeo(mu) #mode of binom PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -209,7 +209,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * hypgeo(mu) #mode of binom PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -243,7 +243,7 @@ xmax = int(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * g((rho - 1) / lambda) #mode of gamma PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -275,7 +275,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * negbin(mu - 1/p) #mode of gamma PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -304,7 +304,7 @@ lambda = pi / (sqrt(3.0) * sigma)
 xmin = mu - 4.0 * sigma
 xmax = mu + 4.0 * sigma
 ymax = 1.1 * logistic(mu) #mode of logistic PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin: xmax]
 set yrange [0 : ymax]
@@ -335,7 +335,7 @@ xmax = ceil(mu + 4.0 * sigma)
 xinc = ceil((xmax - xmin) / 10)
 xinc = xinc > 1 ? xinc : 1
 ymax = 1.1 * poisson(mu) #mode of poisson PDF used
-set key
+set key box
 set nozeroaxis
 set xrange [xmin - 1 : xmax + 1]
 set yrange [0 : ymax]
@@ -353,5 +353,5 @@ set arrow from mu + 0.5, normal(mu + sigma) \
 set label "mu" at mu + 1, ymax / 10
 set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
 plot poisson(x), normal(x - 0.5)
-set noarrow
-set nolabel
+reset
+

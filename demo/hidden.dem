@@ -1,5 +1,5 @@
 #
-# $Id: hidden.dem,v 1.3 1995/03/27 18:07:39 drd Exp $
+# $Id: hidden.dem,v 1.2 1998/12/02 18:35:37 lhecking Exp $
 #
 #
 set samples 20
@@ -51,7 +51,7 @@ set yrange [0:15]
 splot "glass.dat" using 1
 pause -1 "Hit return to continue (6)"
 
-set view 50,
+set view 50
 set grid
 replot
 pause -1 "Hit return to continue (7)"
