@@ -480,8 +480,6 @@ distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 
 dist: distdir
-	-mv $(distdir)/docs/makefile.dst $(distdir)/docs/makefile
-	-mv $(distdir)/docs/latextut/makefile.dst $(distdir)/docs/latextut/makefile
 	-chmod -R a+r $(distdir)
 	$(TAR) chf - $(distdir) | gzip $(GZIP) > $(distdir).tar.gz
 	-rm -rf $(distdir)
