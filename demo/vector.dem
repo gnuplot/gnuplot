@@ -1,5 +1,5 @@
 #
-# $Id: vector.dem,v 1.6 2003/10/17 15:02:21 mikulik Exp $
+# $Id: vector.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
 #
 # This file demonstrates new features in gnuplot 3.6
 # -1- saving contour lines as a gnuplottable file
@@ -58,7 +58,7 @@ set cntrparam points 5
 set label "-q" at -1,0 center
 set label "+q" at  1,0 center
 splot vtot(x,y) w l
-pause 0 "Now create a file with equipotential lines"
+print "Now create a file with equipotential lines"
 pause -1 "Hit return to continue"
 set term push
 set term table
@@ -67,9 +67,10 @@ rep
 set out
 set term pop
 reset
+pause 0
 plot "equipo2.dat" w l
-pause 0 "Now create a x/y datafile for plotting with vectors "
-pause 0 "and display vectors parallel to the electrostatic field"
+print "Now create a x/y datafile for plotting with vectors "
+print "and display vectors parallel to the electrostatic field"
 pause -1 "Hit return to continue"
 set isosam 31,31
 set term push
@@ -78,6 +79,7 @@ set out "field2xy.dat"
 splot vtot(x,y) w l
 set out
 set term pop
+pause 0
 unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]

@@ -59,7 +59,7 @@ require "ctime.pl";
 	print OUT "<pre>\n";
 
 	while (<IN>) {
-		if (/^pause /) {
+		if (/^pause -1/) {
 			if ($savescripts) {
 			    print OUT "<br><p>Click <a href=$ARGV[0].$plot.gnu>here</a> ",
 				  "for minimal script to generate this plot</p>\n";
@@ -69,6 +69,8 @@ require "ctime.pl";
 			$plot++;
 			print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\" align=right>\n";
 			print OUT "<pre>\n";
+			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
+		} elsif (/^pause/) {
 			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 		} else {
 			print OUT HTML::Entities::encode($_);

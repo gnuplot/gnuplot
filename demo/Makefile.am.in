@@ -46,7 +46,7 @@ check-noninteractive: $(BINARY_FILES)
 # Several of the demos need manual intervention:
 #	fontfile vector multiplt
 #
-html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html discrete.html electron.html enhancedtext.html fillcrvs.html fillstyle.html fit.html fontfile.html hidden.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html polar.html poldat.html prob2.html prob.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html timedat.html using.html world.html
+html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html datastrings.html discrete.html electron.html enhancedtext.html fillbetween.html fillcrvs.html fillstyle.html fit.html hidden.html histograms.html histograms2.html layout.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html polar.html poldat.html prob2.html prob.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html timedat.html using.html vector.html world.html
 
 %.html: %.dem webify.pl
 	./webify.pl $*

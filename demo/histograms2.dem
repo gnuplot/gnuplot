@@ -21,6 +21,8 @@ set xlabel "Immigration from different regions" 0,-3
 set ytics
 set grid y
 set auto y
+set bmargin 10
+#
 plot \
 newhistogram "Northern Europe", \
 'immigration.dat' using 6:xtic(1) t 6, '' u 13 t 13, '' u 14 t 14, \

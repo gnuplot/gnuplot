@@ -1,5 +1,5 @@
 #
-# $Id: fit.dem,v 1.3 1999/10/17 19:16:59 lhecking Exp $
+# $Id: fit.dem,v 1.4 2000/11/23 18:19:12 lhecking Exp $
 #
 
 print "Some examples how data fitting using nonlinear least squares fit"
@@ -40,8 +40,8 @@ pause -1 "now look at the result (-> return)"
 set title 'bias to high-temperates'
 plot 'lcdemo.dat', l(x)
 
-pause  0 "now use real single-measurement errors to reach such a result (-> return)"
-pause  0 "(look at the file lcdemo.dat and compare the columns to see the difference)"
+print "now use real single-measurement errors to reach such a result (-> return)"
+print "(look at the file lcdemo.dat and compare the columns to see the difference)"
 pause -1 "(-> return)"
 set title 'data with experimental errors'
 plot 'lcdemo.dat' using 1:2:5 with errorbars
