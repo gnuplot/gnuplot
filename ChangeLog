@@ -1,3 +1,8 @@
+2003-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (fit): Mention that 'thru' doesn't apply to
+ 	'fit' datafile processing.
+
 2003-02-10  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/next.trm term/openstep.trm term/pdf.trm term/post.trm:
@@ -1917,7 +1922,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/10 04:28:08 $).
+	last modification date (from the tag $Date: 2003/02/11 06:08:00 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

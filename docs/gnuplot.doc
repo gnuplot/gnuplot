@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.159 2003/02/05 21:43:36 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.160 2003/02/05 21:47:28 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1635,8 +1635,8 @@ C ... and restart the table:
  previously user-defined function of the form f(x) or f(x,y).
 
  <datafile> is treated as in the `plot` command.  All the `plot datafile`
- modifiers (`using`, `every`,...) except `smooth` are applicable to `fit`.
- See `plot datafile`.
+ modifiers (`using`, `every`,...) except `smooth` and the deprecated `thru`
+ are applicable to `fit`. See `plot datafile`.
 
  The default data formats for fitting functions with a single independent
  variable, y=f(x), are {x:}y or x:y:s; those formats can be changed with
