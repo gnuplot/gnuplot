@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.143 2002/10/22 03:17:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.144 2002/11/05 16:47:38 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5341,19 +5341,20 @@ C ... and restart the table:
  of the positions of other text to be written in the margin.  This can lead
  to tic labels overwriting other text if the axis is very close to the border.
 3 missing
-?commands set missing
-?set missing
+?set datafile
+?set datafile missing
 ?missing
- The `set missing` command allows you to tell `gnuplot` what character is
- used in a data file to denote missing data.  Exactly how this missing value
- will be treated depends on the `using` specifier on the {`s`}`plot` command.
+ The `set datafile missing` command allows you to tell `gnuplot` what character
+ string is used in a data file to denote missing data.  Exactly how this missing
+ value will be treated depends on the `using` specifier on the {`s`}`plot` 
+ command.
 
  Syntax:
-       set missing {"<character>"}
-       show missing
+       set datafile missing {"<string>"}
+       show datafile missing
 
  Example:
-       set missing "?"
+       set datafile missing "?"
        set style data lines
        plot '-'
           1 10
@@ -8525,4 +8526,4 @@ C ... and restart the table:
 
  On AIX 4, the literal 'NaNq' in a datafile causes the special internal value
  'not-a-number' to be stored, rather than setting an internal 'undefined'
- flag.  A workaround is to use `set missing 'NaNq'`.
+ flag.  A workaround is to use `set datafile missing 'NaNq'`.

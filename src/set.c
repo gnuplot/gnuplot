@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.101 2002/10/20 21:19:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.102 2002/10/21 10:24:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -180,10 +180,10 @@ set_command()
 \t'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
 \t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign',\n\
 \t'dgrid3d', 'dummy', 'encoding', 'fitlogfile', 'format', 'grid',\n\
-\t'hidden3d', 'historysize', 'isosamples', 'key', 'label',  'locale',\n\
-\t'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
-\t'multiplot', 'offsets', 'origin', 'output', 'palette', 'parametric',\n\
-\t'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
+\t'hidden3d', 'historysize', 'isosamples', 'key', 'label', 'locale',\n\
+\t'logscale', '[blrt]margin', 'mapping', 'mouse', 'multiplot',\n\
+\t'offsets', 'origin', 'output', 'palette', 'parametric', 'pm3d',\n\
+\t'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
 \t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
 \t'timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
 \t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
@@ -233,6 +233,10 @@ set_command()
 	token[c_token].length -= 2;
 	c_token--;
 	unset_command();
+    } else if (almost_equals(c_token,"miss$ing")) {
+	if (interactive)
+	    int_warn(c_token, "deprecated syntax, use \"set datafile missing\"");
+	set_missing();
     } else {
 
 #endif /* BACKWARDS_COMPATIBLE */
@@ -336,8 +340,11 @@ set_command()
 	case S_TMARGIN:
 	    set_tmargin();
 	    break;
-	case S_MISSING:
-	    set_missing();
+	case S_DATAFILE:
+	    if (almost_equals(++c_token,"miss$ing"))
+		set_missing();
+	    else
+		int_error(c_token,"expecting `missing`");
 	    break;
 #ifdef USE_MOUSE
 	case S_MOUSE:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.40 2002/09/27 12:17:42 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.41 2002/10/21 10:24:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -165,6 +165,9 @@ const struct gen_table set_tbl[] =
     { "cn$trparam", S_CNTRPARAM },
     { "co$ntour", S_CONTOUR },
     { "da$ta", S_DATA },
+
+    { "data$file", S_DATAFILE },
+    
     { "dg$rid3d", S_DGRID3D },
     { "du$mmy", S_DUMMY },
     { "enc$oding", S_ENCODING },
@@ -197,7 +200,6 @@ const struct gen_table set_tbl[] =
     { "tmar$gin", S_TMARGIN },
     { "bmar$gin", S_BMARGIN },
 
-    { "mis$sing", S_MISSING },
 #ifdef USE_MOUSE
     { "mo$use", S_MOUSE },
 #endif

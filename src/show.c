@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.94 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.95 2002/11/16 04:23:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -180,11 +180,11 @@ show_command()
     /* show at is undocumented/hidden... */
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth',\n\
-\t'clip', 'cntrparam', 'colorbox', 'contour', 'decimalsign', 'dgrid3d',\n\
+\t'all', 'angles', 'arrow', 'autoscale', 'bars', 'border', 'boxwidth', 'clip',\n\
+\t'cntrparam', 'colorbox', 'contour', 'datafile', 'decimalsign','dgrid3d',\n\
 \t'dummy', 'encoding', 'fitlogfile', 'fontpath', 'format', 'functions', 'grid',\n\
 \t'hidden', 'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
-\t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
+\t'mapping', 'margin', 'offsets', 'origin', 'output', 'plot',\n\
 \t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
 \t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
 \t'timefmt', 'title', 'variables', 'version', 'view',\n\
@@ -515,7 +515,7 @@ show_command()
     case S_ZERO:
 	show_zero();
 	break;
-    case S_MISSING:
+    case S_DATAFILE:
 	show_missing();
 	break;
 #ifdef USE_MOUSE
@@ -2596,9 +2596,9 @@ show_missing()
     SHOW_ALL_NL;
 
     if (missing_val == NULL)
-	fputs("\tNo string is interpreted as missing data\n", stderr);
+	fputs("\tNo missing data string set for datafile\n", stderr);
     else
-	fprintf(stderr, "\t\"%s\" is interpreted as missing value\n",
+	fprintf(stderr, "\t\"%s\" in datafile is interpreted as missing value\n",
 		missing_val);
 }
 

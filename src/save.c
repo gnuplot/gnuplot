@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.56 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.57 2002/11/03 20:47:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -562,7 +562,7 @@ set isosamples %d, %d\n\
     }
 
     if (missing_val != NULL)
-	fprintf(fp, "set missing '%s'\n", missing_val);
+	fprintf(fp, "set datafile missing '%s'\n", missing_val);
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
