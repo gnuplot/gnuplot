@@ -21,6 +21,7 @@ Changes in release 3.7.1:
 * Bug fixed with exit/quit in batch mode
 * Return proper exit status
 * Buffering bug in X11 driver fixed
+* Added fitting of time series data
 * Embedding document font is now default font in latex output
 * Y2K: "%y" date format interpretation is now in line with
   Open Group recommendations

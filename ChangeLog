@@ -1,3 +1,12 @@
+1999-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* fit.c: Backported some fixes from -current, including the time
+	series fit code by Remko Scharroo.
+
+	* protos.h, term.c: Add new tewrm_count() function.
+
+	* syscfg.h: Update FAQ location.
+
 1999-09-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* misc.c, show.c: In the SAVE/SHOW_NUM_OR_TIME macro, add a '#'
