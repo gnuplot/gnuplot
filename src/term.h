@@ -273,8 +273,10 @@
 /* DXF format for use with AutoCad (Release 10.x) */
 #include "dxf.trm"
 
-/* #include "dxy.trm"		/* Roland DXY800A plotter */
-/* #include "excl.trm"		/* QMS/EXCL laserprinter (Talaris 1590 and others) */
+/* Roland DXY800A plotter */
+/* #include "dxy.trm" */
+/* QMS/EXCL laserprinter (Talaris 1590 and others) */
+/* #include "excl.trm" */
 
 /* fig graphics */
 #include "fig.trm"
@@ -285,50 +287,110 @@
 # include "gif.trm"
 #endif
 
-/* #include "grass.trm" /* geographical info system */
-#include "hp26.trm"		/* HP2623A and probably others */
-#include "hp2648.trm"		/* HP2647 and 2648 */
-#include "hp500c.trm"		/* HP DeskJet 500 C */
-#include "hpgl.trm"		/* HP7475, HP7220 plotters, and (hopefully) lots of others */
-#include "hpljii.trm"		/* HP Laserjet II */
-#include "hppj.trm"		/* HP PrintJet */
-#include "imagen.trm"		/* Imagen laser printers */
-/* #include "kyo.trm"		/* Kyocera Prescribe printer */
-#include "mif.trm"		/* Frame Maker MIF 3.00 format driver */
-#include "pbm.trm"		/* portable bit map */
+/* geographical info system */
+/* #include "grass.trm" */
+
+/* HP2623A and probably others */
+#include "hp26.trm"
+
+/* HP2647 and 2648 */
+#include "hp2648.trm"
+
+/* HP DeskJet 500 C */
+#include "hp500c.trm"
+
+/* HP7475, HP7220 plotters, and (hopefully) lots of others */
+#include "hpgl.trm"
+
+/* HP Laserjet II */
+#include "hpljii.trm"
+
+/* HP PrintJet */
+#include "hppj.trm"
+
+/* Imagen laser printers */
+#include "imagen.trm"
+
+/* Kyocera Prescribe printer */
+/* #include "kyo.trm" */
+
+/* Frame Maker MIF 3.00 format driver */
+#include "mif.trm"
+
+/* portable bit map */
+#include "pbm.trm"
 
 /* NOTE THAT PNG REQUIRES A SEPARATE LIBRARY : see term/png.trm */
 #ifdef HAVE_LIBPNG
 # include "png.trm"
 #endif
 
-#include "post.trm"		/* postscript */
-#include "qms.trm"		/* QMS laser printers */
-#include "table.trm"		/* built-in, but used for the documentation */
-#include "tgif.trm"		/* x11 tgif tool */
-#include "tkcanvas.trm"		/* tcl/tk */
-/* #include "v384.trm"		/* Vectrix 384 printer, also Tandy colour */
+/* postscript */
+#include "post.trm"
+
+/* QMS laser printers */
+#include "qms.trm"
+
+/* built-in, but used for the documentation */
+#include "table.trm"
+
+/* x11 tgif tool */
+#include "tgif.trm"
+
+/* tcl/tk with perl extensions */
+#include "tkcanvas.trm"
+
+/* Vectrix 384 printer, also Tandy colour */
+/* #include "v384.trm" */
 
 /* wire printers */
-#define EPSONP			/* Epson LX-800, Star NL-10, NX-1000 and lots of others */
-#define EPS60			/* Epson-style 60-dot per inch printers */
-#define EPS180			/* Epson-style 180-dot per inch (24 pin) printers */
+/* Epson LX-800, Star NL-10, NX-1000 and lots of others */
+#define EPSONP
+
+/* Epson-style 60-dot per inch printers */
+#define EPS60
+
+/* Epson-style 180-dot per inch (24 pin) printers */
+#define EPS180
+
 #define NEC
 #define OKIDATA
 #define STARC
-#define TANDY60			/* Tandy DMP-130 series 60-dot per inch graphics */
-#include "epson.trm"		/* the common driver file for all of these */
+
+/* Tandy DMP-130 series 60-dot per inch graphics */
+#define TANDY60
+
+/* the common driver file for all of these */
+#include "epson.trm"
+
 
 /* TeX related terminals */
 #define EMTEX
 #define EEPIC
-#include "latex.trm"		/* latex and emtex */
-#include "pslatex.trm"		/* latex/tex with picture in postscript */
-#include "eepic.trm"		/* EEPIC-extended LaTeX driver, for EEPIC users */
-#include "tpic.trm"		/* TPIC specials for TeX */
-#include "pstricks.trm"		/* LaTeX picture environment with PSTricks macros */
-#include "texdraw.trm"		/* TeXDraw drawing package for LaTeX */
-#include "metafont.trm"		/* METAFONT */
-#include "metapost.trm"		/* METAPOST */
+
+/* latex and emtex */
+#include "latex.trm"
+
+/* latex/tex with picture in postscript */
+#include "pslatex.trm"
+
+/* EEPIC-extended LaTeX driver, for EEPIC users */
+#include "eepic.trm"
+
+/* TPIC specials for TeX */
+#include "tpic.trm"
+
+/* LaTeX picture environment with PSTricks macros */
+#include "pstricks.trm"
+
+/* TeXDraw drawing package for LaTeX */
+#include "texdraw.trm"
+
+/* METAFONT */
+#include "metafont.trm"
+
+/* METAPOST */
+#include "metapost.trm"
+
 
 #endif /* !SHORT_TERMLIST */
