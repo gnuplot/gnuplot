@@ -1,3 +1,32 @@
+1999-07-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* README.1ST: Add note about gif support/gd library.
+
+	* m4/path-hdr.m4, m4/path-lib.m4: Change search order for directories.
+	--with-* options must have precedence.
+
+	* src/command.c: Split command() into smaller functions to prepare
+	for parser improvement.
+
+	* src/command.h: Remove CMD_QUIT (same as CMD_EXIT).
+
+	* src/fit.c, src/protos.h: Rename do_fit() to fit_command().
+
+	* src/show.c: Fix typos.
+
+	* src/term.c(test_term): Increment c_token (moved from command.c).
+
+	* term/gif.trm: Add further notes about gd library.
+
+1999-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/term.c(test_term): Right-justify the output of the 'test tics'
+	string.
+
+	* src/src/win/wgnuplib.h, src/win/winmain.c, src/win/wtext.c:
+	Fix crash that happens when 16bit wgnuplot is terminated via
+	Windows-close operations.
+
 1999-07-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/command.c: Add history command to table, remove duplicate
