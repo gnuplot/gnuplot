@@ -37,8 +37,6 @@ static char *RCSid = "$Id: help.c,v 1.29 1998/04/14 00:15:36 drd Exp $";
 #include "plot.h"
 #include "help.h"		/* values passed back */
 
-void int_error __PROTO((char str[], int t_num));
-
 /* 
  ** help -- help subsystem that understands defined keywords
  **
@@ -274,20 +272,15 @@ char *path;
 }
 
 /* make a new line buffer and save this string there */
-static LINEBUF *
- storeline(text)
+static LINEBUF *storeline(text)
 char *text;
 {
     LINEBUF *new;
 
-    new = (LINEBUF *) malloc(sizeof(LINEBUF));
-    if (new == NULL)
-	int_error("not enough memory to store help file", -1);
+    new = (LINEBUF *) gp_alloc(sizeof(LINEBUF), "new line buffer");
     if (text != NULL) {
-	new->line = (char *) malloc((unsigned int) (strlen(text) + 1));
-	if (new->line == NULL)
-	    int_error("not enough memory to store help file", -1);
-	(void) strcpy(new->line, text);
+	new->line = gp_alloc(strlen(text) + 1, "help file line");
+	strcpy(new->line, text);
     } else
 	new->line = NULL;
 
@@ -297,22 +290,18 @@ char *text;
 }
 
 /* Add this keyword to the keys list, with the given text */
-static LINKEY *
- storekey(key)
+static LINKEY *storekey(key)
 char *key;
 {
     LINKEY *new;
 
     key[strlen(key) - 1] = NUL;	/* cut off \n  */
 
-    new = (LINKEY *) malloc(sizeof(LINKEY));
-    if (new == NULL)
-	int_error("not enough memory to store help file", -1);
-    new->key = (char *) malloc((unsigned int) (strlen(key) + 1));
-    if (new->key == NULL)
-	int_error("not enough memory to store help file", -1);
-    (void) strcpy(new->key, key);
-
+    new = (LINKEY *) gp_alloc(sizeof(LINKEY), "new key list");
+    if (key != NULL) {
+	new->key = gp_alloc(strlen(key) + 1, "new key");
+	strcpy(new->key, key);
+    }
     /* add to front of list */
     new->next = keylist;
     keylist = new;
@@ -331,9 +320,7 @@ static void sortkeys()
     int i;			/* index into key array */
 
     /* allocate the array */
-    keys = (KEY *) malloc((unsigned int) ((keycount + 1) * sizeof(KEY)));
-    if (keys == NULL)
-	int_error("not enough memory to store help file", -1);
+    keys = (KEY *) gp_alloc((keycount + 1) * sizeof(KEY), "key array");
 
     /* copy info from list to array, freeing list */
     for (p = keylist, i = 0; p != NULL; p = n, i++) {
@@ -399,8 +386,7 @@ void FreeHelp()
  *  matches -- for if there are, the abbreviation is ambiguous. 
  *  We print the ambiguous matches in that case, and return not found.
  */
-static KEY *			/* NULL if not found */
- FindHelp(keyword)
+static KEY * /* NULL if not found */ FindHelp(keyword)
 char *keyword;			/* string we look for */
 {
     KEY *key;
@@ -426,8 +412,7 @@ char *keyword;			/* string we look for */
  * It is ambiguous if it is not a complete string and there are other
  * keys following it with the same leading substring.
  */
-static TBOOLEAN
- Ambiguous(key, len)
+static TBOOLEAN Ambiguous(key, len)
 KEY *key;
 int len;
 {
@@ -454,7 +439,7 @@ int len;
 		if (!status) {
 		    /* first one we have printed is special */
 		    fprintf(stderr,
-			 "Ambiguous request '%.*s'; possible matches:\n",
+			    "Ambiguous request '%.*s'; possible matches:\n",
 			    len, first);
 		    fprintf(stderr, "\t%s\n", prev);
 		    status = TRUE;
@@ -517,15 +502,16 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
     char line[BUFSIZ];		/* subtopic output line */
     char *start;		/* position of subname in key name */
     int sublen;			/* length of subname */
-    int pos = 0;
-    int spacelen = 0;		/* Moved from inside for() loop */
     char *prev = NULL;		/* the last thing we put on the list */
+
+#define MAXSTARTS 256
+    int stopics = 0;		/* count of (and index to next) subtopic name */
+    char *starts[MAXSTARTS];	/* saved positions of subnames */
 
     *line = NUL;
     len = strlen(key->key);
 
     for (subkey = key + 1; subkey->key != NULL; subkey++) {
-	int ispacelen = 0;
 	if (strncmp(subkey->key, key->key, len) == 0) {
 	    /* find this subtopic name */
 	    start = subkey->key + len;
@@ -550,33 +536,8 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 			(void) sprintf(line, "\nHelp topics available:\n");
 		    OutLine(line);
 		    *line = NUL;
-		    pos = 0;
 		}
-		if (pos == PER_LINE) {
-		    (void) strcat(line, "\n");
-		    OutLine(line);
-		    *line = NUL;
-		    pos = 0;
-		}
-		/* adapted by DvdSchaaf */
-		{
-#define FIRSTCOL	6
-#define COLLENGTH	15
-
-		    if (pos == 0)
-			spacelen = FIRSTCOL;
-		    for (ispacelen = 0;
-			 ispacelen < spacelen; ispacelen++)
-			(void) strcat(line, " ");
-		    /* commented out *
-		       (void) strcat(line, "\t");
-		     */
-		    (void) strncat(line, start, sublen);
-		    spacelen = COLLENGTH - sublen;
-		    if (spacelen <= 0)
-			spacelen = 1;
-		}
-		pos++;
+		starts[stopics++] = start;
 		prev = start;
 	    }
 	} else {
@@ -585,17 +546,75 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	}
     }
 
-    /* put out the last line */
-    if (subt > 0 && pos > 0) {
-	(void) strcat(line, "\n");
-	OutLine(line);
+#define FIRSTCOL	4
+#define COLLENGTH	18
+#ifndef COLUMN_HELP
+    {
+	/* sort subtopics by row - default */
+	int ispacelen;
+	int subtopic;
+	int spacelen = 0;
+	int pos = FIRSTCOL;
+	for (subtopic = 0; subtopic < stopics; subtopic++) {
+	    start = starts[subtopic];
+	    sublen = instring(start, ' ');
+	    /* adapted by DvdSchaaf */
+	    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
+		(void) strcat(line, " ");
+	    (void) strncat(line, start, sublen);
+	    spacelen = COLLENGTH - sublen;
+	    if (spacelen <= 0)
+		spacelen = 1;
+	    pos++;
+	    if (pos == PER_LINE) {
+		(void) strcat(line, "\n");
+		OutLine(line);
+		*line = NUL;
+		pos = FIRSTCOL;
+	    }
+	}
+	/* put out the last line */
+	if (subt > 0 && pos > 0) {
+	    (void) strcat(line, "\n");
+	    OutLine(line);
+	}
+	/*
+	   if (subt == 0) {
+	   OutLine("\n");
+	   OutLine("No subtopics available\n");
+	   }
+	 */
     }
-/*
-   if (subt == 0) {
-   OutLine("\n");
-   OutLine("No subtopics available\n");
-   }
- */
+#else /* COLUMN_HELP */
+    {
+	/* sort subtopics by column */
+	int subtopic;
+	int ispacelen;
+	int spacelen;
+	int row, col;
+	int rows = (int) (stopics / PER_LINE + 0.5);
+	for (row = 0; row < rows; row++) {
+	    line[0] = '\0';
+	    for (ispacelen = 0; ispacelen < FIRSTCOL; ispacelen++)
+		(void) strcat(line, " ");
+	    for (col = 0; col < PER_LINE; col++) {
+		subtopic = row + rows * col;
+		if (subtopic >= stopics) {
+		    break;
+		} else {
+		    start = starts[subtopic];
+		    sublen = instring(start, ' ');
+		    (void) strncat(line, start, sublen);
+		    spacelen = COLLENGTH - sublen;
+		    for (ispacelen = 0; ispacelen < spacelen; ispacelen++)
+			(void) strcat(line, " ");
+		}
+	    }
+	    (void) strcat(line, "\n");
+	    OutLine(line);
+	}
+    }
+#endif /* COLUMN_HELP */
 
     if (subtopics)
 	*subtopics = (subt != 0);
