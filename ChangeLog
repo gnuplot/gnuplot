@@ -1,3 +1,7 @@
+2004-07-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Update the "Creator: " tag to report version as 4.0
+
 2004-07-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Add a gsave/grestore pair to the fill operation
