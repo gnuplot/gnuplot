@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.6 1999/08/07 17:21:09 lhecking Exp $ */
+/* $Id: graphics.h,v 1.7 1999/10/01 14:54:32 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -65,6 +65,19 @@ extern char   default_font[];	/* Entry font added by DJL */
 /* format for date/time for reading time in datafile */
 extern char timefmt[];
 extern int datatype[];
+
+
+/* From ESR's "Actual code patch" :) */
+/* An exclusion box.  
+ * Right now, the only exclusion region is the key box, but that will
+ * change when we support boxed labels.
+ */
+struct clipbox {
+    int xl;
+    int xr;
+    int yt;
+    int yb;
+};
 
 /* function prototypes */
 

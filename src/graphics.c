@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.19 1999/09/21 18:25:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.20 1999/10/01 14:54:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -55,13 +55,12 @@ static int key_size_right;	/* size of right part of key (including padding) */
 
 /* I think the following should also be static ?? */
 
-static int key_xl, key_xr, key_yt, key_yb;	/* boundarys for key field */
 static int max_ptitl_len = 0;	/* max length of plot-titles (keys) */
 static int ktitl_lines = 0;	/* no lines in key_title (key header) */
 static int ptitl_cnt;		/* count keys with len > 0  */
 static int key_cols;		/* no cols of keys */
 static int key_rows, key_col_wth, yl_ref;
-
+static struct clipbox keybox;   /* boundaries for key field */
 
 /* penalty for doing tics by callback in gen_tics is need for
  * global variables to communicate with the tic routines
@@ -108,7 +107,7 @@ static int p_width, p_height;	/* pointsize * { t->h_tic | t->v_tic } */
 /* there are several things on right of plot - key, y2tics and y2label
  * when working out boundary, save posn of y2label for later...
  * Same goes for x2label.
- * key posn is also stored in key_xl, and tics go at xright
+ * key posn is also stored in keybox.xl, and tics go at xright
  */
 static int ylabel_x, y2label_x, xlabel_y, x2label_y, title_y, time_y, time_x;
 static int ylabel_y, y2label_y, xtic_y, x2tic_y, ytic_x, y2tic_x;
@@ -777,10 +776,10 @@ int count;
 		 * do one integer division to maximise accuracy (hope we
 		 * don't overflow !)
 		 */
-		key_xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
-		key_xr = key_xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
-		key_yb = t->ymax * yoffset;
-		key_yt = key_yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
+		keybox.xl = xleft - key_size_left + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
+		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
+		keybox.yb = t->ymax * yoffset;
+		keybox.yt = keybox.yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
 		ybot += key_entry_height * key_rows + (int) ((t->v_char) * (ktitl_lines + 1));
 	    } else {
 		/* maximise no rows, limited by ytop-ybot */
@@ -937,7 +936,7 @@ int count;
 	/* adjust for outside key */
 	if (lkey == -1 && key_hpos == TOUT) {
 	    xright -= key_col_wth * key_cols;
-	    key_xl = xright + (int) (t->h_tic);
+	    keybox.xl = xright + (int) (t->h_tic);
 	}
 	if (xright == (int)(0.5 + (t->xmax) * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
@@ -1078,31 +1077,31 @@ int count;
 	key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
 	if (lkey == -1) {
 	    if (key_vpos == TTOP) {
-		key_yt = (int) ytop - (t->v_tic);
-		key_yb = key_yt - key_h;
+		keybox.yt = (int) ytop - (t->v_tic);
+		keybox.yb = keybox.yt - key_h;
 	    } else {
-		key_yb = ybot + (t->v_tic);
-		key_yt = key_yb + key_h;
+		keybox.yb = ybot + (t->v_tic);
+		keybox.yt = keybox.yb + key_h;
 	    }
 	    if (key_hpos == TLEFT) {
-		key_xl = xleft + (t->h_char);	/* for Left just */
-		key_xr = key_xl + key_w;
+		keybox.xl = xleft + (t->h_char);        /* for Left just */
+		keybox.xr = keybox.xl + key_w;
 	    } else if (key_hpos == TRIGHT) {
-		key_xr = xright - (t->h_char);	/* for Right just */
-		key_xl = key_xr - key_w;
+		keybox.xr = xright - (t->h_char);       /* for Right just */
+		keybox.xl = keybox.xr - key_w;
 	    } else {		/* TOUT */
 		/* do this here for do_plot() */
 		/* align right first since rmargin may be manual */
-		key_xr = (xsize + xoffset) * (t->xmax) - (t->h_char);
-		key_xl = key_xr - key_w;
+		keybox.xr = (xsize + xoffset) * (t->xmax) - (t->h_char);
+		keybox.xl = keybox.xr - key_w;
 	    }
 	} else {
 	    unsigned int x, y;
 	    map_position(&key_user_pos, &x, &y, "key");
-	    key_xl = x - key_size_left;
-	    key_xr = key_xl + key_w;
-	    key_yt = y + (ktitl_lines ? t->v_char : key_entry_height) / 2;
-	    key_yb = key_yt - key_h;
+	    keybox.xl = x - key_size_left;
+	    keybox.xr = keybox.xl + key_w;
+	    keybox.yt = y + (ktitl_lines ? t->v_char : key_entry_height) / 2;
+	    keybox.yb = keybox.yt - key_h;
 	}
     }
     /*}}} */
@@ -1764,10 +1763,10 @@ int pcount;			/* count of plots in linked list */
 /* WORK OUT KEY SETTINGS AND DO KEY TITLE / BOX */
 
 
-    if (lkey) {			/* may have been cancelled if something went wrong */
-	/* just use key_xl etc worked out in boundary() */
-	xl = key_xl + key_size_left;
-	yl = key_yt;
+    if (lkey) {		/* may have been cancelled if something went wrong */
+	/* just use keybox.xl etc worked out in boundary() */
+	xl = keybox.xl + key_size_left;
+	yl = keybox.yt;
 
 	if (*key_title) {
 	    char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
@@ -1803,15 +1802,14 @@ int pcount;			/* count of plots in linked list */
 
 	if (key_box.l_type > -3) {
 	    term_apply_lp_properties(&key_box);
-	    (*t->move) (key_xl, key_yb);
-	    (*t->vector) (key_xl, key_yt);
-	    (*t->vector) (key_xr, key_yt);
-	    (*t->vector) (key_xr, key_yb);
-	    (*t->vector) (key_xl, key_yb);
-	    /* draw a horizontal line between key title
-   and first entry                          *//* JFi */
-	    (*t->move) (key_xl, key_yt - (ktitl_lines) * t->v_char);	/* JFi */
-	    (*t->vector) (key_xr, key_yt - (ktitl_lines) * t->v_char);	/* JFi */
+	    (*t->move) (keybox.xl, keybox.yb);
+	    (*t->vector) (keybox.xl, keybox.yt);
+	    (*t->vector) (keybox.xr, keybox.yt);
+	    (*t->vector) (keybox.xr, keybox.yb);
+	    (*t->vector) (keybox.xl, keybox.yb);
+	    /* draw a horizontal line between key title and first entry */
+	    (*t->move) (keybox.xl, keybox.yt - (ktitl_lines) * t->v_char);
+	    (*t->vector) (keybox.xr, keybox.yt - (ktitl_lines) * t->v_char);
 	}
     }				/* lkey */
     /* DRAW CURVES */
@@ -3896,13 +3894,13 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 		ogy = gy;
 	    }
 	} else {
-	    if (lkey && key_yt > ybot && x < key_xr && x > key_xl) {
-		if (key_yb > ybot) {
+	    if (lkey && keybox.yt > ybot && x < keybox.xr && x > keybox.xl) {
+		if (keybox.yb > ybot) {
 		    (*t->move) (x, ybot);
-		    (*t->vector) (x, key_yb);
+		    (*t->vector) (x, keybox.yb);
 		}
-		if (key_yt < ytop) {
-		    (*t->move) (x, key_yt);
+		if (keybox.yt < ytop) {
+		    (*t->move) (x, keybox.yt);
 		    (*t->vector) (x, ytop);
 		}
 	    } else {
@@ -3960,13 +3958,13 @@ struct lp_style_type grid;	/* linetype or -2 */
 		clip_vector(map_x(x), map_y(y));
 	    }
 	} else {
-	    if (lkey && y < key_yt && y > key_yb && key_xl < xright /* catch TOUT */ ) {
-		if (key_xl > xleft) {
+	    if (lkey && y < keybox.yt && y > keybox.yb && keybox.xl < xright /* catch TOUT */ ) {
+		if (keybox.xl > xleft) {
 		    (*t->move) (xleft, y);
-		    (*t->vector) (key_xl, y);
+		    (*t->vector) (keybox.xl, y);
 		}
-		if (key_xr < xright) {
-		    (*t->move) (key_xr, y);
+		if (keybox.xr < xright) {
+		    (*t->move) (keybox.xr, y);
 		    (*t->vector) (xright, y);
 		}
 	    } else {
@@ -4295,7 +4293,6 @@ double log_base, x;	/* we print one number in a number of different formats */
 	}
 	/*}}} */
     }
-fprintf(stderr, "DEBUG: strlen(temp) = %d\n", strlen(temp));
 }
 /*}}} */
 #ifdef HAVE_SNPRINTF
