@@ -11,8 +11,8 @@ HELPFILE=$(datadir)/gnuplot.gih
 
 GNUPLOT_X11 = @GNUPLOT_X11@
 EXTRA_PROGRAMS = gnuplot_x11
-bin_PROGRAMS = gnuplot $(GNUPLOT_X11)
-noinst_PROGRAMS = bf_test
+bin_PROGRAMS = gnuplot
+noinst_PROGRAMS = bf_test $(GNUPLOT_X11)
 
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(pkglibdir)/$(PKG_MAJOR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
@@ -60,3 +60,24 @@ T=$(top_srcdir)/term/
 include makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
+
+install-exec-local: $(EXTRA_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)
+	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	  ; then \
+	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f ; \
+	  else :; fi; \
+	done
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
+	  rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f; \
+	done
