@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13 1998/12/03 22:24:45 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.1 1999/08/19 14:39:48 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1674,16 +1674,16 @@ else if (height[i][j] != depth[i][j]) \
 	gen_tics(FIRST_Z_AXIS, &zticdef, work_grid.l_type & (GRID_Z | GRID_MZ),
 		 mztics, mztfreq, ztick_callback);
     }
-    if ((xzeroaxis.l_type >= -2) && !is_log_y && inrange(0, y_min3d, y_max3d)) {
+    if ((yzeroaxis.l_type >= -2) && !is_log_x && inrange(0, x_min3d, x_max3d)) {
 	unsigned int x, y, x1, y1;
-	term_apply_lp_properties(&xzeroaxis);
+	term_apply_lp_properties(&yzeroaxis);
 	map3d_xy(0.0, y_min3d, base_z, &x, &y);		/* line through x=0 */
 	map3d_xy(0.0, y_max3d, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
     }
-    if ((yzeroaxis.l_type >= -2) && !is_log_x && inrange(0, x_min3d, x_max3d)) {
+    if ((xzeroaxis.l_type >= -2) && !is_log_y && inrange(0, y_min3d, y_max3d)) {
 	unsigned int x, y, x1, y1;
-	term_apply_lp_properties(&yzeroaxis);
+	term_apply_lp_properties(&xzeroaxis);
 	map3d_xy(x_min3d, 0.0, base_z, &x, &y);		/* line through y=0 */
 	map3d_xy(x_max3d, 0.0, base_z, &x1, &y1);
 	draw_clip_line(x, y, x1, y1);
