@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.19 1998/12/22 19:42:28 lhecking Exp $
+ * $Id: plot.h,v 1.19.2.1 1999/10/19 13:32:17 lhecking Exp $
  *
  */
 
@@ -733,6 +733,17 @@ extern TBOOLEAN interactive;
 extern char *infile_name;
 extern struct udft_entry *dummy_func;
 extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
+
+/* From version.c */
+extern char gnuplot_version[];
+extern char gnuplot_patchlevel[];
+extern char gnuplot_date[];
+extern char gnuplot_copyright[];
+extern char faq_location[];
+extern char bug_email[];
+extern char help_email[];
+extern char os_name[];
+extern char os_rel[];
 
 /* Windows needs to redefine stdin/stdout functions */
 #if defined(_Windows) && !defined(WINDOWS_NO_GUI)
