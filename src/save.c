@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.50 2002/09/02 21:03:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.51 2002/09/11 20:52:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -65,6 +65,7 @@ static void save_range __PROTO((FILE *, AXIS_INDEX));
 static void save_zeroaxis __PROTO((FILE *,AXIS_INDEX));
 static void save_set_all __PROTO((FILE *));
 static void save_textcolor __PROTO((FILE *, const struct t_colorspec *));
+static void save_data_func_style __PROTO((FILE *, char *, enum PLOT_STYLE));
 
 /*
  *  functions corresponding to the arguments of the GNUPLOT `save` command
@@ -560,172 +561,13 @@ set isosamples %d, %d\n\
     fprintf(fp, "\
 set cntrparam points %d\n\
 set size ratio %g %g,%g\n\
-set origin %g,%g\n\
-set style data ",
+set origin %g,%g\n",
 	    contour_pts,
 	    aspect_ratio, xsize, ysize,
 	    xoffset, yoffset);
 
-    switch (data_style) {
-    case LINES:
-	fputs("lines\n", fp);
-	break;
-    case POINTSTYLE:
-	fputs("points\n", fp);
-	break;
-    case IMPULSES:
-	fputs("impulses\n", fp);
-	break;
-    case LINESPOINTS:
-	fputs("linespoints\n", fp);
-	break;
-    case DOTS:
-	fputs("dots\n", fp);
-	break;
-    case YERRORLINES:
-	fputs("yerrorlines\n", fp);
-	break;
-    case XERRORLINES:
-	fputs("xerrorlines\n", fp);
-	break;
-    case XYERRORLINES:
-	fputs("xyerrorlines\n", fp);
-	break;
-    case YERRORBARS:
-	fputs("yerrorbars\n", fp);
-	break;
-    case XERRORBARS:
-	fputs("xerrorbars\n", fp);
-	break;
-    case XYERRORBARS:
-	fputs("xyerrorbars\n", fp);
-	break;
-    case BOXES:
-	fputs("boxes\n", fp);
-	break;
-#if USE_ULIG_FILLEDBOXES
-    case FILLEDBOXES:
-	fputs("filledboxes\n", fp);
-	break;
-#endif /* USE_ULIG_FILLEDBOXES */
-#ifdef PM3D
-    case FILLEDCURVES:
-	fputs("filledcurves ", fp);
-	filledcurves_options_tofile(&filledcurves_opts_data, fp);
-	fputc('\n', fp);
-	break;
-#endif
-    case BOXERROR:
-	fputs("boxerrorbars\n", fp);
-	break;
-    case BOXXYERROR:
-	fputs("boxxyerrorbars\n", fp);
-	break;
-    case STEPS:
-	fputs("steps\n", fp);
-	break;			/* JG */
-    case FSTEPS:
-	fputs("fsteps\n", fp);
-	break;			/* HOE */
-    case HISTEPS:
-	fputs("histeps\n", fp);
-	break;			/* CAC */
-    case VECTOR:
-	fputs("vector\n", fp);
-	break;
-    case FINANCEBARS:
-	fputs("financebars\n", fp);
-	break;
-    case CANDLESTICKS:
-	fputs("candlesticks\n", fp);
-	break;
-#ifdef PM3D
-    case PM3DSURFACE:
-	fputs("pm3d\n", fp);
-	break;
-#endif
-    }
-    
-    /* FIXME HBB 20010816: Useless code duplication. Outputting the
-     * plot style should be handled by a subroutine! */
-    fputs("set style function ", fp);
-    switch (func_style) {
-    case LINES:
-	fputs("lines\n", fp);
-	break;
-    case POINTSTYLE:
-	fputs("points\n", fp);
-	break;
-    case IMPULSES:
-	fputs("impulses\n", fp);
-	break;
-    case LINESPOINTS:
-	fputs("linespoints\n", fp);
-	break;
-    case DOTS:
-	fputs("dots\n", fp);
-	break;
-    case YERRORLINES:
-	fputs("yerrorlines\n", fp);
-	break;
-    case XERRORLINES:
-	fputs("xerrorlines\n", fp);
-	break;
-    case XYERRORLINES:
-	fputs("xyerrorlines\n", fp);
-	break;
-    case YERRORBARS:
-	fputs("yerrorbars\n", fp);
-	break;
-    case XERRORBARS:
-	fputs("xerrorbars\n", fp);
-	break;
-    case XYERRORBARS:
-	fputs("xyerrorbars\n", fp);
-	break;
-    case BOXXYERROR:
-	fputs("boxxyerrorbars\n", fp);
-	break;
-    case BOXES:
-	fputs("boxes\n", fp);
-	break;
-#if USE_ULIG_FILLEDBOXES
-    case FILLEDBOXES:
-	fputs("filledboxes\n", fp);
-	break;
-#endif /* USE_ULIG_FILLEDBOXES */
-#ifdef PM3D
-    case FILLEDCURVES:
-	fputs("filledcurves ", fp);
-	filledcurves_options_tofile(&filledcurves_opts_func, fp);
-	fputc('\n', fp);
-	break;
-#endif
-    case BOXERROR:
-	fputs("boxerrorbars\n", fp);
-	break;
-    case STEPS:
-	fputs("steps\n", fp);
-	break;			/* JG */
-    case FSTEPS:
-	fputs("fsteps\n", fp);
-	break;			/* HOE */
-    case HISTEPS:
-	fputs("histeps\n", fp);
-	break;			/* CAC */
-    case VECTOR:
-	fputs("vector\n", fp);
-	break;
-    case FINANCEBARS:
-	fputs("financebars\n", fp);
-	break;
-    case CANDLESTICKS:
-	fputs("candlesticks\n", fp);
-	break;
-    default:
-	fputs("---error!---\n", fp);
-	break;
-    }
+    save_data_func_style(fp,"data",data_style);
+    save_data_func_style(fp,"function",func_style);
 
     save_zeroaxis(fp, FIRST_X_AXIS);
     save_zeroaxis(fp, FIRST_Y_AXIS);
@@ -1106,5 +948,95 @@ save_textcolor( FILE *fp, const struct t_colorspec *tc )
 	case TC_FRAC: fprintf(fp," palette fraction %4.2f", tc->value);
 		      break;
 	}
+    }
+}
+
+static void
+save_data_func_style( FILE *fp, char *which, enum PLOT_STYLE style)
+{
+    fprintf(fp, "set style %s ", which);
+    switch (style) {
+    case LINES:
+	fputs("lines\n", fp);
+	break;
+    case POINTSTYLE:
+	fputs("points\n", fp);
+	break;
+    case IMPULSES:
+	fputs("impulses\n", fp);
+	break;
+    case LINESPOINTS:
+	fputs("linespoints\n", fp);
+	break;
+    case DOTS:
+	fputs("dots\n", fp);
+	break;
+    case YERRORLINES:
+	fputs("yerrorlines\n", fp);
+	break;
+    case XERRORLINES:
+	fputs("xerrorlines\n", fp);
+	break;
+    case XYERRORLINES:
+	fputs("xyerrorlines\n", fp);
+	break;
+    case YERRORBARS:
+	fputs("yerrorbars\n", fp);
+	break;
+    case XERRORBARS:
+	fputs("xerrorbars\n", fp);
+	break;
+    case XYERRORBARS:
+	fputs("xyerrorbars\n", fp);
+	break;
+    case BOXES:
+	fputs("boxes\n", fp);
+	break;
+#if USE_ULIG_FILLEDBOXES
+    case FILLEDBOXES:
+	fputs("filledboxes\n", fp);
+	break;
+#endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+    case FILLEDCURVES:
+	fputs("filledcurves ", fp);
+	if (!strcmp(which,"data"))
+	    filledcurves_options_tofile(&filledcurves_opts_data, fp);
+	else
+	    filledcurves_options_tofile(&filledcurves_opts_func, fp);
+	fputc('\n', fp);
+	break;
+#endif
+    case BOXERROR:
+	fputs("boxerrorbars\n", fp);
+	break;
+    case BOXXYERROR:
+	fputs("boxxyerrorbars\n", fp);
+	break;
+    case STEPS:
+	fputs("steps\n", fp);
+	break;			/* JG */
+    case FSTEPS:
+	fputs("fsteps\n", fp);
+	break;			/* HOE */
+    case HISTEPS:
+	fputs("histeps\n", fp);
+	break;			/* CAC */
+    case VECTOR:
+	fputs("vector\n", fp);
+	break;
+    case FINANCEBARS:
+	fputs("financebars\n", fp);
+	break;
+    case CANDLESTICKS:
+	fputs("candlesticks\n", fp);
+	break;
+#ifdef PM3D
+    case PM3DSURFACE:
+	fputs("pm3d\n", fp);
+	break;
+#endif
+    default:
+	fputs("---error!---\n", fp);
     }
 }
