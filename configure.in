@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.88 2000/10/31 19:59:28 joze Exp $
+dnl $Id: configure.in,v 1.89 2000/11/01 20:42:27 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.88 $)
+AC_REVISION($Revision: 1.89 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -128,18 +128,6 @@ dnl pm3d
 AC_ARG_ENABLE(pm3d,dnl
 [  --enable-pm3d           enable pm3d (EXPERIMENTAL)],,
 test -z "$enable_pm3d" && enable_pm3d=no
-)dnl
-
-dnl new Enhanced Metafile Format driver
-AC_ARG_ENABLE(emf,dnl
-[  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)],,
-test -z "$enable_emf" && enable_emf=no
-)dnl
-
-dnl new epslatex driver
-AC_ARG_ENABLE(epslatex,dnl
-[  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)],,
-test -z "$enable_epslatex" && enable_epslatex=no
 )dnl
 
 dnl new ggi driver
@@ -581,16 +569,6 @@ if test "$enable_pm3d" = yes; then
             [ Define if you want to have Petr Mikulik's fancy pm3d. ])
 fi
 
-if test "$enable_emf" = yes; then
-  AC_DEFINE(USE_EMF_DRIVER, 1,
-            [ Define if you want to use the experimental Enhanced Metafile Format driver. ])
-fi
-
-if test "$enable_epslatex" = yes; then
-  AC_DEFINE(USE_EPSLATEX_DRIVER, 1,
-            [ Define if you want to use the experimental epslatex driver. ])
-fi
-
 dnl check for ggi lib
 GGI_SUPPORT=no
 if test "$enable_ggi" = yes; then
@@ -716,12 +694,6 @@ if test "$with_row_help" = yes; then
 else
   AC_MSG_RESULT([  Sort help/subtopic tables by column])
 fi
-
-test "$enable_emf" = yes && \
-  AC_MSG_RESULT([  Enable Enhanced Metafile Format terminal (EXPERIMENTAL)])
-
-test "$enable_epslatex" = yes && \
-  AC_MSG_RESULT([  Enable epslatex terminal (EXPERIMENTAL)])
 
 test "$GGI_SUPPORT" = yes && \
   AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
