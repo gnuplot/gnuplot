@@ -995,6 +995,11 @@ TBOOLEAN can_do_args;
 		       can_do_args ? "call" : "load", name);
 	os_error(errbuf, c_token);
 	free(errbuf);
+    } else if (fp == stdin) {
+	/* DBT 10-6-98  go interactive if "-" named as load file */
+	interactive = TRUE; 
+	while(!com_line())
+	    ;
     } else {
 	/* go into non-interactive mode during load */
 	/* will be undone below, or in load_file_error */
@@ -1119,8 +1124,12 @@ static TBOOLEAN			/* FALSE if stack was empty */
     else {
 	int argindex;
 	lf = lf_head;
-	if (lf->fp != (FILE *) NULL)
+	if (lf->fp != (FILE *)NULL && lf->fp != stdin) {
+	    /* DBT 10-6-98  do not close stdin in the case
+	     * that "-" is named as a load file
+	     */
 	    (void) fclose(lf->fp);
+	}
 	for (argindex = 0; argindex < 10; argindex++) {
 	    if (call_args[argindex]) {
 		free(call_args[argindex]);

@@ -80,7 +80,7 @@ TBOOLEAN noinputfiles = TRUE;	/* FALSE if there are script files */
 
 /*  these 2 could be in misc.c, but are here with all the other globals */
 TBOOLEAN do_load_arg_substitution = FALSE;
-char *call_args[10] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 char *infile_name = NULL;	/* name of command file; NULL if terminal */
 
@@ -211,7 +211,7 @@ struct ft_entry GPFAR ft[] =
     {NULL, NULL}
 };
 
-static struct udvt_entry udv_pi = {NULL, "pi", FALSE};
+static struct udvt_entry udv_pi = { NULL, "pi", FALSE };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
@@ -322,11 +322,11 @@ char **argv;
 	    if (*s == DIRSEP1)
 		*s = DIRSEP2;	/* '\\' to '/' */
 	strcpy(strrchr(HelpFile, DIRSEP2), "/gnuplot.gih");
-    }			/* Add also some "paranoid" tests for '\\':  AP */
+    }		/* Add also some "paranoid" tests for '\\':  AP */
 #endif /* DJGPP */
 
 #ifdef VMS
-    unsigned int status[2] = {1, 0};
+    unsigned int status[2] = { 1, 0 };
 #endif
 
 #ifdef GNU_READLINE
@@ -464,6 +464,17 @@ char **argv;
 		noend = 1;
 	    else
 #endif
+	    if (strcmp(*argv, "-") == 0) {
+		/* DBT 10-7-98  go interactive if "-" on command line */
+
+		interactive = TRUE;
+		/* will this work on all platforms? */
+
+		while (!com_line());
+
+		/* interactive = FALSE; /* should this be here? */
+
+	    } else
 		load_file(fopen(*argv, "r"), *argv, FALSE);
 	}
 #ifdef _Windows
@@ -519,7 +530,7 @@ math exception : %s\n\
     arg 2: %e\n\
     ret  : %e\n",
 	    c,
-	    e->name);
+	    e->name,
 	    e->arg1,
 	    e->arg2,
 	    e->retval);
@@ -623,10 +634,10 @@ int ExecuteMacro(char *argv, int namelength)
 		   &sRc,
 		   &rxRc);
     if (rc == -4)
-	  rc = 0;			/* run was cancelled-don't give error message */
+	rc = 0;			/* run was cancelled-don't give error message */
 
 /* We don't use this value ?
-   BTW, don't use free() instead since it's allocated inside RexxStart() */ 
+   BTW, don't use free() instead since it's allocated inside RexxStart() */
     DosFreeMem(rxRc.strptr);
     return rc;
 }
