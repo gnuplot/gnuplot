@@ -51,10 +51,6 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
 
 #if defined(READLINE) && !defined(GNU_READLINE)
 
-#ifdef _WINDOWS
-#define _Windows
-#endif
-
 /* a small portable version of GNU's readline */
 /* this is not the BASH or GNU EMACS version of READLINE due to Copyleft 
 	restrictions */
@@ -83,8 +79,9 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
 #include <signal.h>
 #include "plot.h" /* get prototype for alloc and gpfaralloc */
 #include "stdfn.h"
+
 #ifdef __linux__ /* HBB: to get prototype for ioctl() */
-#include <sys/ioctl.h>
+# include <sys/ioctl.h>
 #endif
 
 /* replaces the previous klugde in configure */
@@ -103,77 +100,77 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
 /*
  * Set up structures using the proper include file
  */
-#if defined(_IBMR2) || defined(alliant)
-#define SGTTY
-#endif
+# if defined(_IBMR2) || defined(alliant)
+#  define SGTTY
+# endif
 
 /*  submitted by Francois.Dagorn@cicb.fr */
-#ifdef SGTTY
-#include <sgtty.h>
+# ifdef SGTTY
+#  include <sgtty.h>
 static struct sgttyb orig_termio, rl_termio;
 /* define terminal control characters */
 static struct tchars s_tchars;
-#ifndef VERASE
-#define VERASE    0
-#endif
-#ifndef VEOF
-#define VEOF      1
-#endif
-#ifndef VKILL
-#define VKILL     2
-#endif
-#ifdef TIOCGLTC		 /* available only with the 'new' line discipline */
+#  ifndef VERASE
+#   define VERASE    0
+#  endif /* not VERASE */
+#  ifndef VEOF
+#   define VEOF      1
+#  endif /* not VEOF */
+#  ifndef VKILL
+#   define VKILL     2
+#  endif /* not VKILL */
+#  ifdef TIOCGLTC		 /* available only with the 'new' line discipline */
 static struct ltchars s_ltchars;
-#ifndef VWERASE
-#define VWERASE   3
-#endif
-#ifndef VREPRINT
-#define VREPRINT  4
-#endif
-#ifndef VSUSP
-#define VSUSP     5
-#endif
-#endif /* TIOCGLTC */
-#ifndef NCCS
-#define NCCS      6
-#endif
+#   ifndef VWERASE
+#    define VWERASE   3
+#   endif /* not VWERASE */
+#   ifndef VREPRINT
+#    define VREPRINT  4
+#   endif /* not VREPRINT */
+#   ifndef VSUSP
+#    define VSUSP     5
+#   endif /* not VSUP */
+#  endif /* TIOCGLTC */
+#  ifndef NCCS
+#   define NCCS      6
+#  endif /* not NCCS */
 
-#else /* SGTTY */
+# else /* not SGTTY */
 
 /* SIGTSTP defines job control */
 /* if there is job control then we need termios.h instead of termio.h */
 /* (Are there any systems with job control that use termio.h?  I hope not.) */
-#if defined(SIGTSTP) || defined(TERMIOS)
-#ifndef TERMIOS
-#define TERMIOS
-#endif
-#include <termios.h>
+#  if defined(SIGTSTP) || defined(TERMIOS)
+#   ifndef TERMIOS
+#    define TERMIOS
+#   endif /* not TERMIOS */
+#   include <termios.h>
 /* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
-#ifdef ISC22
-#ifndef ONOCR			/* taken from sys/termio.h */
-#define ONOCR 0000020	/* true at least for ISC 2.2 */
-#endif 
-#ifndef IUCLC
-#define IUCLC 0001000
-#endif
-#endif /* ISC22 */
-#if !defined(IUCLC)
-#define IUCLC 0 /* translate upper to lower case not supported */
-#endif
+#   ifdef ISC22
+#    ifndef ONOCR			/* taken from sys/termio.h */
+#     define ONOCR 0000020	/* true at least for ISC 2.2 */
+#    endif /* not ONOCR */
+#    ifndef IUCLC
+#     define IUCLC 0001000
+#    endif /* not IUCLC */
+#   endif /* ISC22 */
+#   if !defined(IUCLC)
+#    define IUCLC 0 /* translate upper to lower case not supported */
+#   endif /* not IUCLC */
 
 static struct termios orig_termio, rl_termio;
-#else
-#include <termio.h>
+#  else /* not SIGSTP || TERMIOS */
+#   include <termio.h>
 static struct termio orig_termio, rl_termio;
 /* termio defines NCC instead of NCCS */
-#define NCCS    NCC
-#endif /* SIGTSTP */
-#endif /* SGTTY */
+#   define NCCS    NCC
+#  endif /* not SIGTSTP || TERMIOS */
+# endif /* SGTTY */
 
 /* ULTRIX defines VRPRNT instead of VREPRINT */
-#if defined(VRPRNT) && !defined(VREPRINT)
-#define VREPRINT VRPRNT
-#endif
+# if defined(VRPRNT) && !defined(VREPRINT)
+#  define VREPRINT VRPRNT
+# endif /* VRPRNT */
 
 /* define characters to use with our input character handler */
 static char term_chars[NCCS];
@@ -183,49 +180,49 @@ static int term_set = 0;	/* =1 if rl_termio set */
 #define special_getc() ansi_getc()
 static int ansi_getc __PROTO((void));
 
-#else /* !MSDOS && !ATARI && !_Windows */
+#else /* MSDOS or ATARI or MTOS or _Windows or DOS386 or OSK */
 
-#ifdef _Windows
-#include <windows.h>
-#include "win/wtext.h"
-#include "win/wgnuplib.h"
+# ifdef _Windows
+#  include <windows.h>
+#  include "win/wtext.h"
+#  include "win/wgnuplib.h"
 extern TW textwin;
-#define TEXTUSER 0xf1
-#define TEXTGNUPLOT 0xf0
-#define special_getc() msdos_getch()
+#  define TEXTUSER 0xf1
+#  define TEXTGNUPLOT 0xf0
+#  define special_getc() msdos_getch()
 static char msdos_getch __PROTO((void));    /* HBB 980308: PROTO'ed it */
-#endif
+# endif /* _Windows */
 
-#if defined(MSDOS) || defined(DOS386)
+# if defined(MSDOS) || defined(DOS386)
 /* MSDOS specific stuff */
-#ifdef DJGPP
-#include <pc.h>
-#endif
-#ifdef __EMX__
-#include <conio.h>
-#endif
-#define special_getc() msdos_getch()
+#  ifdef DJGPP
+#   include <pc.h>
+#  endif /* DJGPP */
+#  ifdef __EMX__
+#   include <conio.h>
+#  endif /* __EMX__ */
+#  define special_getc() msdos_getch()
 static char msdos_getch();
-#endif /* MSDOS */
+# endif /* MSDOS || DOS386 */
 
-#ifdef OSK
-#include <sgstat.h>
-#include <modes.h>
+# ifdef OSK
+#  include <sgstat.h>
+#  include <modes.h>
 
-#define STDIN	0
+#  define STDIN	0
 static int term_set = 0;	/* =1 if new_settings is set */
 
 static struct _sgs old_settings;  /* old terminal settings        */
 static struct _sgs new_settings;  /* new terminal settings        */
 
-#define special_getc() ansi_getc()
+#  define special_getc() ansi_getc()
 static int ansi_getc __PROTO((void));
 
 /* On OS9 a '\n' is a character 13 and '\r' == '\n'. This gives troubles
    here, so we need a new putc wich handles this correctly and print a
    character 10 on each place we want a '\n'.
 */
-#undef putc		/* Undefine the macro for putc */
+#  undef putc		/* Undefine the macro for putc */
 
 static int putc (c,fp)
 	char c;
@@ -239,37 +236,38 @@ static int putc (c,fp)
 	}
 }
 
-#endif /* OSK */
+# endif /* OSK */
 
-#if defined(ATARI) || defined(MTOS)
-#ifdef __PUREC__
-#include <tos.h>
-#else
-#include <osbind.h>
-#endif
-#define special_getc() tos_getch()
+# if defined(ATARI) || defined(MTOS)
+#  ifdef __PUREC__
+#   include <tos.h>
+#  else /* not __PUREC__ */
+#   include <osbind.h>
+#  endif /* not __PUREC__ */
+#  define special_getc() tos_getch()
 char tos_getch();
-#endif
+# endif /* ATARI || MTOS */
 
-#endif /* !MSDOS && !ATARI && !MTOS && !_Windows && !OSK*/
+#endif /* MSDOS or ATARI or MTOS or _Windows or DOS386 or OSK */
 
 #ifdef OS2
-#if defined( special_getc )
-#undef special_getc() 
-#endif
-#define special_getc() msdos_getch()
+# if defined( special_getc )
+#  undef special_getc() 
+# endif /* special_getc */
+# define special_getc() msdos_getch()
 static char msdos_getch __PROTO((void));    /* HBB 980308: PROTO'ed it */
-#endif
+#endif /* OS2 */
 
 
 #define MAXBUF	1024	/* initial size and increment of input line length */
 #define BACKSPACE 0x08	/* ^H */
 #define SPACE	' '
+
 #ifdef OSK
-#define NEWLINE	'\012'
-#else
-#define NEWLINE	'\n'
-#endif
+# define NEWLINE	'\012'
+#else /* OSK */
+# define NEWLINE	'\n'
+#endif /* not OSK */
 
 struct hist {
 	char *line;
@@ -765,24 +763,24 @@ msdos_getch()
 	char c;
 	int ch = getkey();
 	c = (ch & 0xff00) ? 0 : ch & 0xff;
-#else
-#ifdef OS2
+#else /* not DJGPP */
+# ifdef OS2
     char c = getc(stdin);
-#else
+# else /* not OS2 */
     char c = getch();
-#endif
-#endif
+# endif /* not OS2 */
+#endif /* not DJGPP */
 
     if (c == 0) {
 #ifdef DJGPP
 	c = ch & 0xff;
-#else
-#ifdef OS2
+#else /* not DJGPP */
+# ifdef OS2
         c = getc(stdin);
-#else
+# else /* not OS2 */
   c = getch(); /* Get the extended code. */
-#endif
-#endif
+# endif /* not OS2 */
+#endif /* not DJGPP */
 	switch (c) {
 	    case 75: /* Left Arrow. */
 		c = 002;
@@ -820,7 +818,8 @@ msdos_getch()
     return c;
 }
 
-#endif /* MSDOS */
+#endif /* MSDOS || _Windows || DOS386 || OS2 */
+
 
 #if defined(ATARI) || defined(MTOS)
 
@@ -925,41 +924,41 @@ set_termio()
 		/*
 		 * Get terminal modes.
 		 */
-#ifndef OSK
-#ifdef SGTTY
+# ifndef OSK
+#  ifdef SGTTY
 		ioctl(0, TIOCGETP, &orig_termio);
-#else  /* SGTTY */
-#ifdef TERMIOS
-#ifdef TCGETS
+#  else /* not SGTTY */
+#   ifdef TERMIOS
+#    ifdef TCGETS
 		ioctl(0, TCGETS, &orig_termio);
-#else
+#    else /* not TCGETS */
 		tcgetattr(0, &orig_termio);
-#endif /* TCGETS */
-#else
+#    endif /* not TCGETS */
+#   else /* not TERMIOS */
 		ioctl(0, TCGETA, &orig_termio);
-#endif /* TERMIOS */
-#endif /* SGTTY */
-#else  /* OSK */
+#   endif /* TERMIOS */
+#  endif /* not SGTTY */
+# else  /* OSK */
 		setbuf(stdin, (char *)0);		/* Make stdin and stdout unbuffered */
 		setbuf(stderr, (char *)0);
 		_gs_opt (STDIN, &new_settings);
-#endif
+# endif /* OSK */
 
 		/*
 		 * Save terminal modes
 		 */
-#ifndef OSK
+# ifndef OSK
 		rl_termio = orig_termio;
-#else
+# else /* OSK */
 		_gs_opt (STDIN, &old_settings);
-#endif
+# endif /* OSK */
 
 		/*
 		 * Set the modes to the way we want them
 		 *  and save our input special characters
 		 */
-#ifndef OSK
-#ifdef SGTTY
+# ifndef OSK
+#  ifdef SGTTY
 		rl_termio.sg_flags |= CBREAK;
 		rl_termio.sg_flags &= ~(ECHO|XTABS);
 		ioctl(0, TIOCSETN, &rl_termio);
@@ -968,7 +967,7 @@ set_termio()
 		term_chars[VERASE]   = orig_termio.sg_erase;
 		term_chars[VEOF]     = s_tchars.t_eofc;
 		term_chars[VKILL]    = orig_termio.sg_kill;
-#ifdef TIOCGLTC
+#   ifdef TIOCGLTC
 		ioctl(0, TIOCGLTC, &s_ltchars);
 		term_chars[VWERASE]  = s_ltchars.t_werasc;
 		term_chars[VREPRINT] = s_ltchars.t_rprntc;
@@ -977,74 +976,74 @@ set_termio()
 		/* disable suspending process on ^Z */
 		s_ltchars.t_suspc = 0;
 		ioctl(0, TIOCSLTC, &s_ltchars);
-#endif /* TIOCGLTC */
-#else  /* SGTTY */
+#   endif /* TIOCGLTC */
+#  else  /* not SGTTY */
 		rl_termio.c_iflag &= ~(BRKINT|PARMRK|INPCK|IUCLC|IXON|IXOFF);
 		rl_termio.c_iflag |=  (IGNBRK|IGNPAR);
 
 		/* rl_termio.c_oflag &= ~(ONOCR); Costas Sphocleous Irvine,CA */
 
 		rl_termio.c_lflag &= ~(ICANON|ECHO|ECHOE|ECHOK|ECHONL|NOFLSH);
-#ifdef OS2
+#   ifdef OS2
  /* for emx: remove default terminal processing */
                 rl_termio.c_lflag &= ~(IDEFAULT);
-#endif /* OS2 */
+#   endif /* OS2 */
 		rl_termio.c_lflag |=  (ISIG);
 		rl_termio.c_cc[VMIN] = 1;
 		rl_termio.c_cc[VTIME] = 0;
 
-#ifndef VWERASE
-#define VWERASE 3
-#endif
+#   ifndef VWERASE
+#    define VWERASE 3
+#   endif /* VWERASE */
 		term_chars[VERASE]   = orig_termio.c_cc[VERASE];
 		term_chars[VEOF]     = orig_termio.c_cc[VEOF];
 		term_chars[VKILL]    = orig_termio.c_cc[VKILL];
-#ifdef TERMIOS
+#   ifdef TERMIOS
 		term_chars[VWERASE]  = orig_termio.c_cc[VWERASE];
-#ifdef VREPRINT
+#    ifdef VREPRINT
 		term_chars[VREPRINT] = orig_termio.c_cc[VREPRINT];
-#else
-#ifdef VRPRNT
+#    else /* not VREPRINT */
+#     ifdef VRPRNT
 		term_chars[VRPRNT] = orig_termio.c_cc[VRPRNT];
-#endif
-#endif
+#     endif /* VRPRNT */
+#    endif /* not VREPRINT */
 		term_chars[VSUSP]    = orig_termio.c_cc[VSUSP];
 
 		/* disable suspending process on ^Z */
 		rl_termio.c_cc[VSUSP] = 0;
-#endif /* TERMIOS */
-#endif /* SGTTY */
-#else  /* OSK */
+#   endif /* TERMIOS */
+#  endif /* not SGTTY */
+# else  /* OSK */
 		new_settings._sgs_echo = 0;		/* switch off terminal echo */
 		new_settings._sgs_pause = 0;	/* inhibit page pause */
 		new_settings._sgs_eofch = 0;	/* inhibit eof	*/
 		new_settings._sgs_kbich = 0;	/* inhibit ^C	*/
 		new_settings._sgs_kbach = 0;	/* inhibit ^E	*/
-#endif
+# endif /* OSK */
 
 		/*
 		 * Set the new terminal modes.
 		 */
-#ifndef OSK
-#ifdef SGTTY
+# ifndef OSK
+#  ifdef SGTTY
 		ioctl(0, TIOCSLTC, &s_ltchars);
-#else
-#ifdef TERMIOS
-#ifdef TCSETSW
+#  else /* not SGTTY */
+#   ifdef TERMIOS
+#    ifdef TCSETSW
 		ioctl(0, TCSETSW, &rl_termio);
-#else
+#    else /* not TCSETSW */
 		tcsetattr(0, TCSADRAIN, &rl_termio);
-#endif /* TCSETSW */
-#else
+#    endif /* not TCSETSW */
+#   else /* not TERMIOS */
 		ioctl(0, TCSETAW, &rl_termio);
-#endif /* TERMIOS */
-#endif /* SGTTY */
-#else  /* OSK */
+#   endif /* not TERMIOS */
+#  endif /* not SGTTY */
+# else  /* OSK */
 		_ss_opt (STDIN, &new_settings);
-#endif
+# endif /* OSK */
 		term_set = 1;
 	}
-#endif /* !MSDOS && !ATARI && !MTOS && !defined(_Windows) */
+#endif /* not MSDOS && not ATARI && not MTOS && not _Windows && not DOS386 */
 }
   
 static void
@@ -1053,30 +1052,32 @@ reset_termio()
 #if !defined(MSDOS) && !defined(ATARI) && !defined(MTOS) && !defined(_Windows) && !defined(DOS386)
 /* reset saved terminal modes */
 	if(term_set == 1) {
-#ifndef OSK
-#ifdef SGTTY
+# ifndef OSK
+#  ifdef SGTTY
 		ioctl(0, TIOCSETN, &orig_termio);
-#ifdef TIOCGLTC
+#   ifdef TIOCGLTC
 		/* enable suspending process on ^Z */
 		s_ltchars.t_suspc = term_chars[VSUSP];
 		ioctl(0, TIOCSLTC, &s_ltchars);
-#endif /* TIOCGLTC */
-#else  /* SGTTY */
-#ifdef TERMIOS
-#ifdef TCSETSW
+#   endif /* TIOCGLTC */
+#  else  /* not SGTTY */
+#   ifdef TERMIOS
+#    ifdef TCSETSW
 		ioctl(0, TCSETSW, &orig_termio);
-#else
+#    else /* not TCSETSW */
 		tcsetattr(0, TCSADRAIN, &orig_termio);
-#endif /* TCSETSW */
-#else
+#    endif /* not TCSETSW */
+#   else /* not TERMIOS */
 		ioctl(0, TCSETAW, &orig_termio);
-#endif /* TERMIOS */
-#endif /* SGTTY */
-#else  /* OSK */
+#   endif /* TERMIOS */
+#  endif /* not SGTTY */
+# else  /* OSK */
 		_ss_opt (STDIN, &old_settings);
-#endif
+# endif /* OSK */
 		term_set = 0;
 	}
-#endif /* !MSDOS && !ATARI && !MTOS && !_Windows */
+#endif /* not MSDOS && not ATARI && not MTOS && not _Windows && not DOS386 */
 }
-#endif /* READLINE */
+
+
+#endif /* READLINE && not GNU_READLINE */
