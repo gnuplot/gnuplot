@@ -1,3 +1,11 @@
+2002-12-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c: Check for legal value of linetype in parse_colorspec().
+
+	* src/unset.c: Invoke 'unset_missing' during a reset. Avoid calling
+	int_error() from inside a reset, because this prevents it from
+	restoring the interactive context on exit.
+
 2002-12-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Completely rewritten and simplified checks for png,
@@ -1670,7 +1678,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/18 00:56:58 $).
+	last modification date (from the tag $Date: 2002/12/18 17:40:28 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
