@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.71 2005/03/05 04:52:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.72 2005/03/05 04:58:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -315,6 +315,9 @@ static int fast_columns;	/* corey@cac optimization */
 
 #ifdef EAM_DATASTRINGS
 char *df_tokens[MAXDATACOLS];		/* filled in by df_tokenise */
+#ifdef GP_STRING_VARS
+static char *df_stringexpression[MAXDATACOLS] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+#endif
 #define NO_COLUMN_HEADER (-99)	/* some value that can never be a real column */
 static int column_for_key_title = NO_COLUMN_HEADER;
 static char df_key_title[MAX_TOKEN_LENGTH];	/* filled in from <col> in 1st row by df_tokenise */
@@ -656,7 +659,7 @@ df_tokenise(char *s)
     int i;
 
 	for (i=0; i<MAXDATACOLS; i++)
-		df_tokens[i] = NULL;
+	    df_tokens[i] = NULL;
 #endif
 
 
@@ -1884,9 +1887,8 @@ df_readline(double v[], int max)
 
 #if defined(GP_STRING_VARS) && defined(EAM_DATASTRINGS)
 		    if (use_spec[output].expected_type == CT_STRING && a.type == STRING) {
-			df_tokens[output] = a.v.string_val;
-			FPRINTF((stderr,"Copying %s into output column %d\n",
-				df_tokens[output],output));
+			free(df_stringexpression[output]);
+			df_tokens[output] = df_stringexpression[output] = a.v.string_val;
 		    } else
 #endif
 		    v[output] = real(&a);
