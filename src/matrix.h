@@ -1,5 +1,5 @@
 /*
- * $Id: matrix.h,v 1.6 2000/10/31 19:59:31 joze Exp $
+ * $Id: matrix.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - matrix.h */
@@ -38,27 +38,21 @@
 
 #include "syscfg.h"
 
-#ifdef EXT
-#undef EXT
-#endif
-
-#ifdef MATRIX_MAIN
-#define EXT
-#else
-#define EXT extern
-#endif
-
-
 /******* public functions ******/
 
-EXT double  *vec __PROTO((int n));
-EXT int     *ivec __PROTO((int n));
-EXT double  **matr __PROTO((int r, int c));
-EXT void    free_matr __PROTO((double **m));
-EXT double  *redim_vec __PROTO((double **v, int n));
-EXT void    solve __PROTO((double **a, int n, double **b, int m));
-EXT void    Givens __PROTO((double **C, double *d, double *x,
-			double *r, int N, int n, int want_r)); 
-EXT void    Invert_RtR __PROTO((double **R, double **I, int n));
+double  *vec __PROTO((int n));
+int     *ivec __PROTO((int n));
+double  **matr __PROTO((int r, int c));
+void    free_matr __PROTO((double **m));
+double  *redim_vec __PROTO((double **v, int n));
+void    solve __PROTO((double **a, int n, double **b, int m));
+void    Givens __PROTO((double **C, double *d, double *x,
+    		double *r, int N, int n, int want_r)); 
+void    Invert_RtR __PROTO((double **R, double **I, int n));
+
+/* Functions for use by THIN_PLATE_SPLINES_GRID method */
+void	lu_decomp __PROTO((double **, int, int *, double *));
+void	lu_backsubst __PROTO((double **, int n, int *, double *));
+
 
 #endif /* MATRIX_H */

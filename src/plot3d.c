@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.24 2001/02/15 17:02:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.25 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -82,6 +82,9 @@ static void grid_nongrid_data __PROTO((struct surface_points * this_plot));
 static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int *plot_num));
 static struct surface_points * sp_alloc __PROTO((int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
 static void sp_replace __PROTO((struct surface_points *sp, int num_samp_1, int num_iso_1, int num_samp_2, int num_iso_2));
+#ifdef THIN_PLATE_SPLINES_GRID
+static double splines_kernel __PROTO((double h));
+#endif
 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
@@ -266,11 +269,6 @@ plot3drequest()
 
 #ifdef THIN_PLATE_SPLINES_GRID
 
-static double splines_kernel __PROTO((double h));
-/* HBB 991025 FIXME: these don't belong in here --> move to 'matrix' */
-static void lu_decomp __PROTO((double **, int, int *, double *));
-static void lu_backsubst __PROTO((double **, int n, int *, double *));
-
 static double
 splines_kernel(h)
 double h;
@@ -285,109 +283,11 @@ double h;
     }
 }
 
-#define Swap(a,b) {double tmp; tmp=a; a=b; b=tmp;}
-
-static void
-lu_decomp(a, n, indx, d)
-double **a;
-int n;
-int *indx;
-double *d;
-{
-    int i, imax = -1, j, k;	/* HBB: added initial value, to shut up gcc -Wall */
-    double large, dummy, temp, **ar, **lim, *limc, *ac, *dp, *vscal;
-
-    dp = vscal = vec(n);
-    *d = 1.0;
-    for (ar = a, lim = &(a[n]); ar < lim; ar++) {
-	large = 0.0;
-	for (ac = *ar, limc = &(ac[n]); ac < limc;)
-	    if ((temp = fabs(*ac++)) > large)
-		large = temp;
-	if (large == 0.0)
-	    int_error(NO_CARET, "Singular matrix in LU-DECOMP");
-	*dp++ = 1 / large;
-    }
-    ar = a;
-    for (j = 0; j < n; j++, ar++) {
-	for (i = 0; i < j; i++) {
-	    ac = &(a[i][j]);
-	    for (k = 0; k < i; k++)
-		*ac -= a[i][k] * a[k][j];
-	}
-	large = 0.0;
-	dp = &(vscal[j]);
-	for (i = j; i < n; i++) {
-	    ac = &(a[i][j]);
-	    for (k = 0; k < j; k++)
-		*ac -= a[i][k] * a[k][j];
-	    if ((dummy = *dp++ * fabs(*ac)) >= large) {
-		large = dummy;
-		imax = i;
-	    }
-	}
-	if (j != imax) {
-	    ac = a[imax];
-	    dp = *ar;
-	    for (k = 0; k < n; k++, ac++, dp++)
-		Swap(*ac, *dp);
-	    *d = -(*d);
-	    vscal[imax] = vscal[j];
-	}
-	indx[j] = imax;
-	if (*(dp = &(*ar)[j]) == 0)
-	    *dp = 1e-30;
-
-	if (j != n - 1) {
-	    dummy = 1 / (*ar)[j];
-	    for (i = j + 1; i < n; i++)
-		a[i][j] *= dummy;
-	}
-    }
-    free(vscal);
-}
-
-static void
-lu_backsubst(a, n, indx, b)
-double **a;
-int n;
-int *indx;
-double *b;
-{
-    int i, memi = -1, ip, j;
-
-    double sum, *bp, *bip, **ar, *ac;
-
-    ar = a;
-
-    for (i = 0; i < n; i++, ar++) {
-	ip = indx[i];
-	sum = b[ip];
-	b[ip] = b[i];
-	if (memi >= 0) {
-	    ac = &((*ar)[memi]);
-	    bp = &(b[memi]);
-	    for (j = memi; j <= i - 1; j++)
-		sum -= *ac++ * *bp++;
-	} else if (sum)
-	    memi = i;
-	b[i] = sum;
-    }
-    ar--;
-    for (i = n - 1; i >= 0; i--) {
-	ac = &(*ar)[i + 1];
-	bp = &(b[i + 1]);
-	bip = &(b[i]);
-	for (j = i + 1; j < n; j++)
-	    *bip -= *ac++ * *bp++;
-	*bip /= (*ar--)[i];
-    }
-}
 #endif
 
 static void
 grid_nongrid_data(this_plot)
-struct surface_points *this_plot;
+    struct surface_points *this_plot;
 {
     int i, j, k;
     double x, y, z, w, dx, dy, xmin, xmax, ymin, ymax;
@@ -398,13 +298,23 @@ struct surface_points *this_plot;
     double *b, **K, *xx, *yy, *zz, d;
     int *indx, numpoints;
 #endif
+
     /* Compute XY bounding box on the original data. */
+    /* FIXME HBB 20010424: Does this make any sense? Shouldn't we just
+     * use whatever the x and y ranges have been found to be, and
+     * that's that? The largest difference this is going to make is if
+     * we plot a datafile that doesn't span the whole x/y range
+     * used. Do we want a dgrid3d over the actual data rectangle, or
+     * over the xrange/yrange area? */
     xmin = xmax = old_iso_crvs->points[0].x;
     ymin = ymax = old_iso_crvs->points[0].y;
     for (icrv = old_iso_crvs; icrv != NULL; icrv = icrv->next) {
 	struct coordinate GPHUGE *points = icrv->points;
 
 	for (i = 0; i < icrv->p_count; i++, points++) {
+	    /* HBB 20010424: avoid crashing for undefined input */
+	    if (points->type == UNDEFINED)
+		continue;
 	    if (xmin > points->x)
 		xmin = points->x;
 	    if (xmax < points->x)
@@ -440,16 +350,23 @@ struct surface_points *this_plot;
     yy = xx + numpoints;
     zz = yy + numpoints;
     b = zz + numpoints;
-    i = 0;
+
+    /* HBB 20010424: Count actual input points without the UNDEFINED
+     * ones, as we copy them */
+    numpoints = 0;
     for (oicrv = old_iso_crvs; oicrv != NULL; oicrv = oicrv->next) {
 	struct coordinate GPHUGE *opoints = oicrv->points;
 	for (k = 0; k < oicrv->p_count; k++, opoints++) {
-	    xx[i] = opoints->x;
-	    yy[i] = opoints->y;
-	    zz[i] = opoints->z;
-	    i++;
+	    /* HBB 20010424: avoid crashing for undefined input */
+	    if (points->type == UNDEFINED)
+		continue;
+	    xx[numpoints] = opoints->x;
+	    yy[numpoints] = opoints->y;
+	    zz[numpoints] = opoints->z;
+	    numpoints++;
 	}
     }
+    
     for (i = 0; i < numpoints + 3; i++) {
 	K[i] = b + (numpoints + 3) * (i + 1);
     }
@@ -499,11 +416,10 @@ struct surface_points *this_plot;
 	for (j = 0, y = ymin; j < dgrid3d_row_fineness; j++, y += dy, points++) {
 	    z = w = 0.0;
 
-#ifndef BUGGY_DGRID_RANGING	/* HBB 981209 */
 	    /* as soon as ->type is changed to UNDEFINED, break out of
 	     * two inner loops! */
 	    points->type = INRANGE;
-#endif
+
 #ifdef THIN_PLATE_SPLINES_GRID
 	    z = b[numpoints];
 	    for (k = 0; k < numpoints; k++) {
@@ -548,7 +464,6 @@ struct surface_points *this_plot;
 		     * to the distance.
 		     */
 		    if (dist == 0.0) {
-#ifndef BUGGY_DGRID_RANGING
 			/* HBB 981209: revised flagging as undefined */
 			/* Supporting all those infinities on various
 			 * platforms becomes tiresome, to say the least :-(
@@ -557,57 +472,32 @@ struct surface_points *this_plot;
 			points->type = UNDEFINED;
 			z = opoints->z;
 			w = 1.0;
-			break;	/* out of for (k...) loop */
-#else
-#if !defined(AMIGA_SC_6_1) && !defined(__PUREC__)
-			dist = VERYLARGE;
-#else /* !AMIGA_SC_6_1 && !__PUREC__ */
-			/* Multiplying VERYLARGE by opoints->z below
-			 * might yield Inf (i.e. a number that can't
-			 * be represented on the machine). This will
-			 * result in points->z being set to NaN. It's
-			 * better to have a pretty large number that is
-			 * also on the safe side... The numbers that are
-			 * read by gnuplot are float values anyway, so
-			 * they can't be bigger than FLT_MAX. So setting
-			 * dist to FLT_MAX^2 will make dist pretty large
-			 * with respect to any value that has been read. */
-			dist = ((double) FLT_MAX) * ((double) FLT_MAX);
-#endif /* !AMIGA_SC_6_1 && !__PUREC__ */
-#endif /* BUGGY_DGRID_RANGING */
-		    } else
+		    } else {
 			dist = 1.0 / dist;
-
-		    z += opoints->z * dist;
-		    w += dist;
+			z += opoints->z * dist;
+			w += dist;
+		    }
 		}
-#ifndef BUGGY_DGRID_RANGING
 		if (points->type != INRANGE)
 		    break;	/* out of the second-inner loop as well ... */
-#endif
 	    }
 #endif /* THIN_PLATE_SPLINES_GRID */
 
-#ifndef BUGGY_DGRID_RANGING
 	    /* Now that we've escaped the loops safely, we know that we
 	     * do have a good value in z and w, so we can proceed just as
 	     * if nothing had happened at all. Nice, isn't it? */
 	    points->type = INRANGE;
 
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->x, x, points->type, x_axis, NOOP, continue);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->y, y, points->type, y_axis, NOOP, continue);
-#ifndef THIN_PLATE_SPLINES_GRID
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z / w, points->type, z_axis, NOOP, continue);
-#else
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
-#endif
-#else
-	    /* HBB 981026: original, short version of this code */
+	    /* HBB 20010424: if log x or log y axis, we don't want to
+	     * log() the value again --> just store it, and trust that
+	     * it's always inrange */
 	    points->x = x;
 	    points->y = y;
-	    points->z = z / w;
-	    points->type = INRANGE;
+
+#ifndef THIN_PLATE_SPLINES_GRID
+	    z = z / w;
 #endif
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
 	}
     }
 
@@ -625,12 +515,14 @@ struct surface_points *this_plot;
     }
 }
 
+/* Get 3D data from file, and store into this_plot data
+ * structure. Takes care of 'set mapping' and 'set dgrid3d'.
+ * 
+ * Notice: this_plot->token is end of datafile spec, before title etc
+ * will be moved past title etc after we return */
 static void
 get_3ddata(this_plot)
-struct surface_points *this_plot;
-/* this_plot->token is end of datafile spec, before title etc
- * will be moved passed title etc after we return
- */
+    struct surface_points *this_plot;
 {
     int xdatum = 0;
     int ydatum = 0;
@@ -779,12 +671,20 @@ struct surface_points *this_plot;
 	     */
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
-	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+	    if (dgrid3d) {
+		/* HBB 20010424: in dgrid3d mode, delay log() taking
+		 * and scaling until after the dgrid process. Only for
+		 * z, not for x and y, so we can layout the newly
+		 * created created grid more easily. */
+		cp->z = z;
+	    } else {
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+	    }
 
 	    /* some may complain, but I regard this as the correct use
 	     * of goto
 	     */
-	  come_here_if_undefined:
+	come_here_if_undefined:
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
 

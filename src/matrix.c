@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: matrix.c,v 1.6 1999/10/29 18:47:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: matrix.c,v 1.7 1999/11/08 19:24:31 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -39,11 +39,13 @@ static char *RCSid() { return RCSid("$Id: matrix.c,v 1.6 1999/10/29 18:47:19 lhe
 
 #include "alloc.h"
 #include "fit.h"
+#include "util.h"
 
 /*****************************************************************/
 
 #define Swap(a,b)   {double temp = (a); (a) = (b); (b) = temp;}
-#define WINZIG	      1e-30
+/* HBB 20010424: unused: */
+/* #define WINZIG	      1e-30 */ 
 
 
 /*****************************************************************
@@ -275,5 +277,107 @@ int n;
 		s -= R[i][j] * I[j][k];
 	    I[i][k] = s / R[i][i];
 	}
+    }
+}
+
+/* HBB 20010424: Functions that used to be here in matrix.c, but were
+ * replaced by others and deleted, later.  But the
+ * THIN_PLATE_SPLINES_GRID needed them, later, so they appeared in
+ * plot3d.c, where they don't belong --> moved them back here. */
+
+void
+lu_decomp(a, n, indx, d)
+    double **a;
+    int n;
+    int *indx;
+    double *d;
+{
+    int i, imax = -1, j, k;	/* HBB: added initial value, to shut up gcc -Wall */
+    double large, dummy, temp, **ar, **lim, *limc, *ac, *dp, *vscal;
+
+    dp = vscal = vec(n);
+    *d = 1.0;
+    for (ar = a, lim = &(a[n]); ar < lim; ar++) {
+	large = 0.0;
+	for (ac = *ar, limc = &(ac[n]); ac < limc;)
+	    if ((temp = fabs(*ac++)) > large)
+		large = temp;
+	if (large == 0.0)
+	    int_error(NO_CARET, "Singular matrix in LU-DECOMP");
+	*dp++ = 1 / large;
+    }
+    ar = a;
+    for (j = 0; j < n; j++, ar++) {
+	for (i = 0; i < j; i++) {
+	    ac = &(a[i][j]);
+	    for (k = 0; k < i; k++)
+		*ac -= a[i][k] * a[k][j];
+	}
+	large = 0.0;
+	dp = &(vscal[j]);
+	for (i = j; i < n; i++) {
+	    ac = &(a[i][j]);
+	    for (k = 0; k < j; k++)
+		*ac -= a[i][k] * a[k][j];
+	    if ((dummy = *dp++ * fabs(*ac)) >= large) {
+		large = dummy;
+		imax = i;
+	    }
+	}
+	if (j != imax) {
+	    ac = a[imax];
+	    dp = *ar;
+	    for (k = 0; k < n; k++, ac++, dp++)
+		Swap(*ac, *dp);
+	    *d = -(*d);
+	    vscal[imax] = vscal[j];
+	}
+	indx[j] = imax;
+	if (*(dp = &(*ar)[j]) == 0)
+	    *dp = 1e-30;
+
+	if (j != n - 1) {
+	    dummy = 1 / (*ar)[j];
+	    for (i = j + 1; i < n; i++)
+		a[i][j] *= dummy;
+	}
+    }
+    free(vscal);
+}
+
+void
+lu_backsubst(a, n, indx, b)
+    double **a;
+    int n;
+    int *indx;
+    double *b;
+{
+    int i, memi = -1, ip, j;
+
+    double sum, *bp, *bip, **ar, *ac;
+
+    ar = a;
+
+    for (i = 0; i < n; i++, ar++) {
+	ip = indx[i];
+	sum = b[ip];
+	b[ip] = b[i];
+	if (memi >= 0) {
+	    ac = &((*ar)[memi]);
+	    bp = &(b[memi]);
+	    for (j = memi; j <= i - 1; j++)
+		sum -= *ac++ * *bp++;
+	} else if (sum)
+	    memi = i;
+	b[i] = sum;
+    }
+    ar--;
+    for (i = n - 1; i >= 0; i--) {
+	ac = &(*ar)[i + 1];
+	bp = &(b[i + 1]);
+	bip = &(b[i]);
+	for (j = i + 1; j < n; j++)
+	    *bip -= *ac++ * *bp++;
+	*bip /= (*ar--)[i];
     }
 }

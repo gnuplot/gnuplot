@@ -1,3 +1,29 @@
+2001-04-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot3d.c (splines_kernel): Prototype moved up to where the
+ 	other internal prototypes are.
+	(Swap): Macro no longer used, thus removed.
+	(lu_decomp, lu_backsubst): Prototypes and implementations moved
+ 	out of here.
+	(grid_nongrid_data): Take care of possibly UNDEFINED input
+ 	datapoints.
+	(grid_nongrid_data) [THIN_PLATE_SPLINES_GRID]: Count number of
+ 	points that are not UNDEFINED, while storing them.
+	(grid_nongrid_data) [BUGGY_DGRID_RANGING]: Removed all #if's
+ 	depending on this macro. This was old, now long unused code.
+	(grid_nongrid_data): Don't apply logscaling to x and y ---
+ 	get_3ddata() did that.
+	(get_3ddata): If dgrid3d mode is active, don't logscale the z
+ 	value, yet. Will be done by dgrid3d on averaged values, instead.
+
+	* src/matrix.h: Removed all that ruffle about EXT and MATRIX_MAIN.
+	(lu_decomp, lu_backsubst): Prototypes added.
+	
+	* src/matrix.c: Include "util.h" for NO_CARET.
+	(WINZIG): Comment out -- unused.
+	(lu_decomp, lu_backsubst): Moved here, from plot3d.c, and made
+ 	globally visible.
+
 2001-04-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Enable mouse and pm3d by default.
