@@ -161,7 +161,7 @@ void save_set_all __PROTO((FILE *fp));
 void load_file __PROTO((FILE *fp, char *name, TBOOLEAN subst_args));
 FILE *lf_top __PROTO((void));
 void load_file_error __PROTO((void));
-int instring __PROTO((char *str, char c));
+int instring __PROTO((char *str, int c));
 void show_functions __PROTO((void));
 void show_at __PROTO((void));
 void disp_at __PROTO((struct at_type *curr_at, int level));
@@ -192,8 +192,11 @@ void plot3drequest __PROTO((void));
 
 /* Prototypes from file "readline.c" */
 
-char * readline __PROTO((char *prompt));
+char *readline __PROTO((char *prompt));
 void add_history __PROTO((char *line));
+#if defined(ATARI) || defined(MTOS)
+char tos_getch();
+#endif
 
 /* Prototypes from file "scanner.c" */
 
