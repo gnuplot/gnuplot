@@ -1,3 +1,24 @@
+1998-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acinclude.m4: In gp_CHECK_LIB_QUIET, add TERMXLIBS to LIBS during
+	test. In gp_FIND_SELECT_ARGTYPES, rename loop variables and add
+	caching.
+
+	* aclocal.m4, configure: Regenerated.
+
+	* command.c: Fix preprocessor directives syntax for BC++ 4.5.
+
+1998-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* contour.c: Indentation, nested comments removed.
+
+	* misc.c(save_set_all): Add 3D mapping, missing, multiplot to
+	saved variables.
+
+	* show.c: Add 'bar' to showmess[].
+
+	* docs/*.c: Fix embarrassing typo in comment.
+
 1998-10-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Add ChangeLog to ETC variable.
@@ -114,8 +135,7 @@
 	* aclocal.m4, configure: Regenerated.
 
 	* configure.in: Rewrite tests for termcap and readline. Remove
-	obsolete AC_SUBST(TERMFLAGS). Add `-mieee' to CFLAGS for gcc
-	under OSF/1 Digital Unix to prevent core dump in demo files.
+	obsolete AC_SUBST(TERMFLAGS).
 
 	* command.c: Define some macros for Windows. Remove spurious else
 	in #ifdef'd code for Atari in command(). Additional #ifdef's for
