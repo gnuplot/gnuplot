@@ -705,7 +705,7 @@ S<max. horizontal resolution>. E.g. if your monitor's maximum resolution is
 If PCTRM is not set, standard VGA is used.
 
 FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
-fit is interrupted---see `fit`.  FIT_LOG specifies the filename of the
+fit is interrupted---see `fit`.  FIT_LOG specifies the default filename of the
 logfile maintained by fit.
 
 GNUPLOT_LIB may be used to define additional search directories for data
@@ -2193,7 +2193,9 @@ After each iteration step, detailed information about the current state
 of the fit is written to the display.  The same information about the
 initial and final states is written to a log file, "fit.log".  This file
 is always appended to, so as to not lose any previous fit history;  it
-should be deleted or renamed as desired.
+should be deleted or renamed as desired. By using the command 
+@ref{fitlogfile}, the name of the log file can be changed.
+
 
 The fit may be interrupted by pressing Ctrl-C (any key but Ctrl-C under
 MSDOS and Atari Multitasking Systems).  After the current iteration
@@ -2562,7 +2564,8 @@ to do so depends on your operating system.
 @end example
 
 changes the name (and/or path) of the file to which the fit log will be
-written from the default of "fit.log" in the working directory.
+written from the default of "fit.log" in the working directory. The default
+value can be overwritten using the command @ref{fitlogfile}.
 
 @example
       FIT_SCRIPT
@@ -3946,6 +3949,7 @@ Syntax:
                         @{linewidth | lw <line_width>@}
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
+                        @{fill | fs <fillstyle>@}
                         @{palette@}@}
                    @}
 
@@ -3954,12 +3958,13 @@ Syntax:
 where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
 @ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{xerrorbars},
 @ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
-@ref{xyerrorlines}, @ref{boxes}, @ref{filledboxes}, @ref{filledcurves}, @ref{boxerrorbars},
+@ref{xyerrorlines}, @ref{boxes}, @ref{filledcurves}, @ref{boxerrorbars},
 @ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vectors} or @ref{pm3d}. Some
 of these styles require additional information. See `set style <style>` for
-details of each style.  Note that @ref{filledcurves} and @ref{pm3d} can take an
-additional option not listed above (the latter only when used in the `splot`
-command)---see their help or examples below for more details.
+details of each style.  `fill` is relevant only to certain 2D plots
+(currently @ref{boxes} and @ref{candlesticks}).  Note that @ref{filledcurves} and @ref{pm3d} 
+can take an additional option not listed above (the latter only when used in 
+the `splot` command)---see their help or examples below for more details.
 
 Default styles are chosen with the `set style function` and `set style data`
 commands.
@@ -4339,7 +4344,7 @@ when the variable was initially defined.
 * bmargin::                     
 * border::                      
 * boxwidth::                    
-* fillstyle::                   
+* fill::                        
 * clabel::                      
 * clip::                        
 * cntrparam::                   
@@ -4349,6 +4354,7 @@ when the variable was initially defined.
 * dgrid3d::                     
 * dummy::                       
 * encoding::                    
+* fitlogfile::                  
 * fontpath::                    
 * format::                      
 * function_style::              
@@ -4973,7 +4979,7 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,borders demo.
 }
 
-@node boxwidth, fillstyle, border, set-show
+@node boxwidth, fill, border, set-show
 @subsection boxwidth
 
 @c ?commands set boxwidth
@@ -4985,7 +4991,7 @@ See also
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-@ref{boxes}, @ref{filledboxes} and @ref{boxerrorbars} styles.
+@ref{boxes} and @ref{boxerrorbars} styles.
 
 Syntax:
 @example
@@ -5043,53 +5049,49 @@ or, if you didn't specify a relative boxwidth before,
 
 @end example
 
-@node fillstyle, clabel, boxwidth, set-show
-@subsection fillstyle
+@node fill, clabel, boxwidth, set-show
+@subsection fill
 
-@c ?commands set style filling
-@c ?commands show style filling
-@c ?set style filling
-@c ?show style filling
+@c ?commands set style fill
+@c ?commands show style fill
+@c ?set style fill
+@c ?show style fill
 @cindex fillstyle
-@opindex fillstyle
 
-
-The `set style filling` command is used to set the fillstyle of boxes in the
-@ref{filledboxes} style.
+The `set style fill` command is used to set the style of boxes
+or candlesticks.
 
 Syntax:
 @example
-      set style filling @{empty | @{b@}solid @{<density>@} | @{b@}pattern @{<number>@}@}
+      set style fill @{empty | solid @{<density>@} | pattern @{<n>@}@}
+                     @{border @{<linetype>@} | noborder@}
 
 @end example
 
-The default fillstyle is `solid 1.0`.
+The default fillstyle is `empty`.
 
 The `solid` option causes filling with a solid color, if the terminal
-supports that. The <density> parameter specifies the intensity
-of the filled colors. At a <density> of 0.0, the box is empty, at
-<density> of 1.0, the inner area is of the same color as the border of
-the box. Solid filling may be implemented either by modifying the
-color of the box border continuously, or by dithering, depending on
-the terminal driver. If no <density> parameter is given, a default of
-1.0 is used, automatically.
-
-The `bsolid` option is identical to `solid` except that the box border is
-drawn in black.
+supports that. The <density> parameter specifies the intensity of the 
+fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
+the inner area is of the same color as the border of the box. 
+Some terminal types can vary the density continuously; others implement 
+only a few levels of partial fill.  If no <density> parameter is given, 
+it defaults to 1.
 
 The `pattern` option causes filling to be done with a fill pattern supplied
-by the terminal driver. <pattern> is the pattern number, starting at 0.
-The kind and number of available fill patterns depend on the terminal driver.
-If no <pattern> number is given, a default of 0 is assumed.
+by the terminal driver.  The kind and number of available fill patterns 
+depend on the terminal driver.  If multiple datasets using filled boxes are 
+plotted, the pattern cycles through all available pattern types, starting
+from pattern <n>, much as the line type cycles for multiple line plots.
 
-The `bpattern` option is identical to `pattern` except that the box border is
-drawn in black.
+The `empty` option causes filled boxes not to be filled. This is the default.
+It is equivalent to the `solid` option with a <density> parameter of zero.
 
-The `empty` option causes filled boxes not to be filled, after all. This
-makes the @ref{filledboxes} style equivalent to simple @ref{boxes}. It is equivalent
-to the `solid` option with a <density> parameter of zero.
+By default, @ref{border}, the box is bounded by a solid line of the current
+linetype. `border <lt>` specifies that a border is to be drawn using
+linetype <lt>. `noborder` specifies that no bounding lines are drawn.
 
-@node clabel, clip, fillstyle, set-show
+@node clabel, clip, fill, set-show
 @subsection clabel
 
 @c ?commands set clabel
@@ -5580,7 +5582,7 @@ Examples:
 
 The second example sets the second variable to s.
 
-@node encoding, fontpath, dummy, set-show
+@node encoding, fitlogfile, dummy, set-show
 @subsection encoding
 
 @c ?commands set encoding
@@ -5610,7 +5612,44 @@ the device must be able to produce the desired non-standard characters.
 The PostScript and X11 terminals support all encodings. OS/2 Presentation
 Manager switches automatically to codepage 912 for `iso_8859_2`.
 
-@node fontpath, format, encoding, set-show
+@node fitlogfile, fontpath, encoding, set-show
+@subsection fitlogfile
+
+@c ?commands set fitlogfile
+@c ?commands show fitlogfile
+@c ?set fitlogfile
+@c ?show fitlogfile
+@cindex fitlogfile
+@opindex fitlogfile
+
+
+The @ref{fitlogfile} setting defines where the `fit` command writes its output.
+
+Syntax:
+@example
+      set fitlogfile @{"<filename>"@}
+      unset fitlogfile
+      show fitlogfile
+
+@end example
+
+The filename must be enclosed in quotes.
+
+If no filename ist given or @ref{fitlogfile} is used the log file is 
+resetted to its default value "fit.log" or the value of the environmental
+variable `FIT_LOG`.
+
+Users of DOS-like platforms should note that the \ character has
+special significance in double-quoted strings, so single-quotes 
+should be used for filenames in different directories, or you have 
+to write \\ for each \.  Or you can just use forward slashes, 
+even though this is DOS.
+
+If the given logfile name ends with a / or \, it is interpreted to be
+a directory name, and the actual filename will be "fit.log" in that
+directory.
+
+@node fontpath, format, fitlogfile, set-show
 @subsection fontpath
 
 @c ?commands set fontpath
@@ -8403,7 +8442,7 @@ command @ref{test} to see what is available.
 
 None of the styles requiring more than two columns of information
 (e.g., @ref{errorbars} or @ref{errorlines}) can be used with `splot`s or
-function `plot`s. Neither @ref{boxes}, @ref{filledboxes}, @ref{filledcurves} nor any
+function `plot`s. Neither @ref{boxes}, @ref{filledcurves} nor any
 of the @ref{steps} styles can be used with `splot`s. If an inappropriate style
 is specified, it will be changed to `points`.
 
@@ -8414,7 +8453,7 @@ you want. (In this discussion, "column" will be used to refer both to
 a column in the data file and an entry in the @ref{using} list.)
 
 For three columns, only @ref{xerrorbars}, @ref{yerrorbars} (or @ref{errorbars}),
-@ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{boxes}, @ref{filledboxes}
+@ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{boxes} 
 and @ref{boxerrorbars} are allowed. If another plot style is used, the style
 will be changed to @ref{yerrorbars}. The @ref{boxerrorbars} style will
 calculate the boxwidth automatically.
@@ -8439,7 +8478,6 @@ please see @ref{errorlines} and @ref{errorbars}.
 @menu
 * boxerrorbars::                
 * boxes::                       
-* filledboxes::                 
 * filledcurves::                
 * boxxyerrorbars::              
 * candlesticks::                
@@ -8486,7 +8524,7 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,errorbar demo.
 }
 
-@node boxes, filledboxes, boxerrorbars, style
+@node boxes, filledcurves, boxerrorbars, style
 @subsubsection boxes
 
 @c ?commands set style boxes
@@ -8500,39 +8538,21 @@ given y coordinate.  The width of the box is obtained in one of three ways.
 If it is a data plot and the data file has a third column, this will be used
 to set the width of the box.  If not, if a width has been set using the @ref{boxwidth} command, this will be used.  If neither of these is available, the
 width of each box will be calculated automatically so that it touches the
-adjacent boxes. For filled boxes, see the @ref{filledboxes} style.
+adjacent boxes. 
 
-@node filledboxes, filledcurves, boxes, style
-@subsubsection filledboxes
-
-@c ?commands set style filledboxes
-@c ?set style filledboxes
-@c ?style filledboxes
-@cindex filledboxes
-
-The @ref{filledboxes} style is only relevant to 2-d plotting.  Like @ref{boxes}, it
-draws a box centered about the given x coordinate from the x axis (not the
-graph border) to the given y coordinate.  See the @ref{boxes} style for how the
-width of the box is obtained.  The @ref{filledboxes} keyword may be abbreviated
-to `fillb`. The drawn box is filled with a color pattern according to a style
-defined by the `set style filling` command.  The fillstyle may be one of
-`empty`, `solid` and `pattern`.
+The interior of the boxes is drawn according to the current fillstyle.
+See `set style fill` for details.  Alternatively a new fillstyle
+may be specified in the plot command.
 
 For fillstyle `empty` the box is filled with the background color.
 
-For fillstyle `solid` the box is filled with a solid pattern using the
-current drawing color. The fill density is determined by `set filldensity`.
-Values for `filldensity` are in the range from 0.0 (empty) to 1.0 (solid).
-It depends on the terminal driver how many density steps between 0.0 and 1.0
-are available (e.g. the bitmap drivers currently support only filldensities
-0.0, 0.25, 0.5, 0.75 and 1.0). Most drivers (e.g. x11, windows, bitmap
-drivers) use halftone patterns to achieve several filldensities, others
-(e.g. postscript) use true RGB colors.
+For fillstyle `solid` the box is filled with a solid rectangle of the
+current drawing color. There is an optional parameter <density> that
+controls the fill density; it runs from 0 (background color) to 1
+(current drawing color).
 
 For fillstyle `pattern` the box is filled in the current drawing color with
-a pattern as selected by `set style filling pattern <number>`.
-`fillpattern` is a number starting at 0. The kind and number of the available
-fillpatterns depend on the terminal driver.
+a pattern, if supported by the terminal driver.
 
 Examples:
 
@@ -8541,26 +8561,41 @@ seperating them (bargraph):
 
 @example
       set boxwidth 0.9 relative
-      plot 'file.dat' with filledboxes
+      set style fill solid 1.0
+      plot 'file.dat' with boxes
 
 @end example
 
-To plot a sine and a cosine curve in filledboxes style with
-filldensity 50 percent:
+To plot a sine and a cosine curve in pattern-filled boxes style:
+
 @example
-      set style function filledboxes
-      set style filling solid 0.5
-      plot sin(x), cos(x)
+      set style fill pattern
+      plot sin(x), cos(x) with boxes
 
 @end example
 
-Currently only the following terminal drivers support the @ref{filledboxes} style:
-x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
-nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
-tandy_60dpi. The BeOS driver (`be`) supports @ref{filledboxes} too, but it is
-unknown whether it works as intended.
+The sin plot will use pattern 0; the cos plot will use pattern 1.
+Any additional plots would cycle through the patterns supported by the
+terminal driver.
 
-@node filledcurves, boxxyerrorbars, filledboxes, style
+To specify explicit fillstyles for each dataset:
+
+@example
+     plot 'file1' with boxes fs bsolid 0.25, \
+          'file2' with boxes fs bsolid 0.50, \
+          'file3' with boxes fs bsolid 0.75, \
+          'file4' with boxes fill pattern 1, \
+          'file5' with boxes fill empty
+
+@end example
+
+Currently only the following terminal drivers support fillstyles other
+than `empty`:
+x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
+jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
+tandy_60dpi. The BeOS driver (`be`) is untested.
+
+@node filledcurves, boxxyerrorbars, boxes, style
 @subsubsection filledcurves
 
 @c ?commands set style filledcurves
@@ -8663,7 +8698,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 @end example
 
 @example
- See @ref{bars} and `set style filling`.
+ See @ref{bars} and `set style fill`.
 
 @end example
 
