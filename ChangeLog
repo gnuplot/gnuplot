@@ -1,3 +1,8 @@
+2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.texi: Regenerate to include new arrow heads options
+	and driver updates.
+
 2000-10-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wgraph.c (WndGraphProc): ported X11/OS2 feature that
@@ -16,12 +21,30 @@
 
 	* src/depcomp: Add from automake-cvs.
 
-	* term/cgm.trm(CGM_graphics): Use gnuplot_version instead of VERSION.
-	Add gnuplot_patchlevel to description string.
+	* term/cgm.trm: Use gnuplot_version and gnuplot_patchlevel instead of
+	VERSION. Escape underscores in font names for TeX/LaTeX.
 
 	* term/cgm.trm(CGM_set_font): Eliminate compiler warning.
 
 	* term/emf.trm: Update to latest version.
+
+	* term/ggi.trm: Delete empty line at end of termdocs section.
+
+2000-10-24  Brendt Wohlberg  <brendt@cnls.lanl.gov>
+
+	* term/pslatex.trm: The current pslatex term has an option for
+	modifying the text font size, but this option only changes text
+	positioning without actually changing the font size. This patch
+	changes the optional value from a scaling factor to a font size
+	(in points) and includes LaTeX commands to actually change the
+	font size. 
+
+2000-10-24  Andreas Czechanowski  <dl4sdc@dl4sdc.ampr.org>
+
+	* term/fig.trm: Update to fig file format version 3.2. Fix scaling
+	in metric mode. Change upper left corner offset to be at an integer
+	centimeter position in metric mode. Output sizes for metrix are now
+	12x8cm and 12x15cm.
 
 2000-10-22  Johannes Zellner <johannes@zellner.org>
 
