@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.71 2003/06/20 04:54:36 sfeam Exp $
+ * $Id: x11.trm,v 1.72 2003/06/20 17:24:40 sfeam Exp $
  *
  */
 
@@ -911,18 +911,20 @@ X11_graphics()
     }
 
     /* Force default font at start of plot */
-    X11_set_default_font(); 
-    X11_set_font("");
 #ifdef USE_MOUSE
     /* EAM June 2003 - Flush the set font command through the pipe */
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char).                  */
     if (!default_font_size_known) {
+	X11_set_default_font(); 
 	FFLUSH();
 	X11_waitforinput();
 	default_font_size_known = TRUE;
     }
+#else
+    X11_set_default_font(); 
 #endif
+    X11_set_font("");
 }
 
 TERM_PUBLIC void
