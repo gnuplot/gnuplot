@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.11 2000/11/23 18:23:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.12 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -410,8 +410,11 @@ f_rand(arg)
  *   REFERENCE The continued fraction expansion as given by
  *             Abramowitz and Stegun (1964) is used.
  *
- * Permission granted to distribute freely for non-commercial purposes only
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
+ *
+ * Note: this function was translated from the Public Domain Fortran
+ *       version available from http://lib.stat.cmu.edu/apstat/xxx
+ *
  */
 
 static double
@@ -506,8 +509,11 @@ double a, b, x;
  *
  *   REFERENCE ALGORITHM AS239  APPL. STATIST. (1988) VOL. 37, NO. 3
  *
- * Permission granted to distribute freely for non-commercial purposes only
  * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
+ *
+ * Note: this function was translated from the Public Domain Fortran
+ *       version available from http://lib.stat.cmu.edu/apstat/239
+ *
  */
 
 /* Global variables, not visible outside this file */
