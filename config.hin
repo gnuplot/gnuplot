@@ -207,8 +207,8 @@
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
 
-/* Define if you have the m library (-lm).  */
-#undef HAVE_LIBM
+/* Define if you have the c library (-lc).  */
+#undef HAVE_LIBC
 
 /* Name of package */
 #undef PACKAGE
