@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.21.2.1 1999/08/19 14:36:35 lhecking Exp $";
+static char *RCSid = "$Id: set.c,v 1.21.2.2 1999/11/18 20:42:53 lhecking Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -44,6 +44,7 @@ static char *RCSid = "$Id: set.c,v 1.21.2.1 1999/08/19 14:36:35 lhecking Exp $";
 #include "stdfn.h"
 #include "setshow.h"
 #include "national.h"
+#include "alloc.h"
 
 /*
  * global variables to hold status of 'set' options
@@ -195,7 +196,8 @@ int contour_order = 4;
 int contour_levels = 5;
 double zero = ZERO;		/* zero threshold, not 0! */
 int levels_kind = LEVELS_AUTO;
-double levels_list[MAX_DISCRETE_LEVELS];	/* storage for z levels to draw contours at */
+double *levels_list;	/* storage for z levels to draw contours at */
+int max_levels = 0;	/* contour level capacity, before enlarging */
 
 int dgrid3d_row_fineness = 10;
 int dgrid3d_col_fineness = 10;
@@ -608,6 +610,10 @@ else if (equals(c_token, STRING))       { AUTO = DTRUE; ++c_token; } \
 else if (almost_equals(c_token, MIN)) { AUTO |= 1;    ++c_token; } \
 else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 
+    if (max_levels == 0)
+	levels_list = (double *)gp_alloc((max_levels = 5)*sizeof(double), 
+					 "contour levels");
+
     if (almost_equals(c_token, "ar$row")) {
 	c_token++;
 	set_arrow();
@@ -810,6 +816,10 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		    if (!equals(c_token, ","))
 			int_error("expecting comma to separate discrete levels", c_token);
 		    c_token++;
+		    if (i == max_levels)
+			levels_list = gp_realloc(levels_list,
+					(max_levels += 10)*sizeof(double),
+					"contour levels");
 		    levels_list[i++] = real(const_express(&a));
 		}
 		contour_levels = i;

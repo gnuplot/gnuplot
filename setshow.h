@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.3.2.1 1999/11/18 20:43:05 lhecking Exp $
+ * $Id: setshow.h,v 1.3.2.2 1999/11/20 17:57:36 lhecking Exp $
  *
  */
 
@@ -170,7 +170,7 @@ extern int			contour_order;
 extern int			contour_levels;
 extern double			zero; /* zero threshold, not 0! */
 extern int			levels_kind;
-extern double		levels_list[MAX_DISCRETE_LEVELS];
+extern double			*levels_list;
 
 extern int			dgrid3d_row_fineness;
 extern int			dgrid3d_col_fineness;
