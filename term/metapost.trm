@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.26 2004/07/01 17:10:15 broeker Exp $
+ * $Id: metapost.trm,v 1.27 2004/09/16 00:22:30 sfeam Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -677,7 +677,8 @@ MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int
 {
     MP_move(sx, sy);
     if (head) {
-	fprintf(gpoutfile, "drawarrow (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+	fprintf(gpoutfile, "%s (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
+		head == 1 ? "drawarrow" : "drawdblarrow",
 		sx / 10.0, sy / 10.0, ex / 10.0, ey / 10.0);
     } else if ((sx != ex) || (sy != ey)) {
 	fprintf(gpoutfile, "draw (%.1fa,%.1fb)--(%.1fa,%.1fb);\n",
