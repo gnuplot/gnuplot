@@ -1,5 +1,5 @@
 C RCS $Id: gnuplot.doc,v 1.64 1998/06/18 14:59:14 ddenholm Exp $
-C 17 November 1998
+C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
@@ -7,20 +7,25 @@ C
 ^ <h2>   Version 3.6 organized by: David Denholm </h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
+^<li>  Hans-Bernhard Broeker
 ^<li>  John Campbell
 ^<li>  Robert Cunningham
 ^<li>  David Denholm
 ^<li>  Gershon Elber
 ^<li>  Roger Fearick
 ^<li>  Carsten Grammes
+^<li>  Lucas Hart
+^<li>  Lars Hecking
 ^<li>  Thomas Koenig
 ^<li>  David Kotz
 ^<li>  Ed Kubaitis
 ^<li>  Russell Lang
 ^<li>  Alexander Lehmann
+^<li>  Alexander Mai
 ^<li>  Carsten Steger
 ^<li>  Tom Tkacik
 ^<li>  Jos Van der Woude
+^<li>  James R. Van Zandt
 ^<li>  Alex Woo
 ^</h3></ul> <p>
 ^<h2>  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley<p>
@@ -28,7 +33,7 @@ C
 ^   Mailing list for bug reports: bug-gnuplot@dartmouth.edu<p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
-^<h3> 17 November 1998</h3><p>
+^<h3> 3 December 1998</h3><p>
 ^<hr>
 1 gnuplot
 2 Copyright
@@ -92,7 +97,9 @@ C
  `gnuplot` commands, with the exception of standard X11 arguments, which are
  processed first.  Each file is loaded with the `load` command, in the order
  specified.  `gnuplot` exits after the last file is processed.  When no load
- files are named, `gnuplot` enters into an interactive mode.
+ files are named, `gnuplot` enters into an interactive mode.  The special
+ filename "-" is used to denote standard input.  See "help batch/interactive"
+ for more details.
 
  Many `gnuplot` commands have multiple options.  These options must appear in
  the proper order, although unwanted ones may be omitted in most cases.  Thus
@@ -237,6 +244,32 @@ C
 
  26. Text (labels, tic labels, and the time stamp) can be written vertically
  by those terminals capable of doing so.
+2 Batch/Interactive Operation
+?batch/interactive
+ `gnuplot` may be executed in either batch or interactive modes, and the two
+ may even be mixed together on many systems.
+
+ Any command-line arguments are assumed to be names of files containing
+ `gnuplot` commands (with the exception of standard X11 arguments, which are
+ processed first).  Each file is loaded with the `load` command, in the order
+ specified.  `gnuplot` exits after the last file is processed.  When no load
+ files are named, `gnuplot` enters into an interactive mode.  The special
+ filename "-" is used to denote standard input.
+
+ Both the `exit` and `quit` commands terminate the current command file and
+ `load` the next one, until all have been processed.
+
+ Examples:
+
+ To launch an interactive session:
+       gnuplot
+
+ To launch a batch session using two command files "input1" and "input2":
+       gnuplot input1 input2
+
+ To launch an interactive session after an initialization file "header" and
+ followed by another command file "trailer":
+       gnuplot header - trailer
 2 Command-line-editing
 ?line-editing
 ?editing
@@ -1450,9 +1483,12 @@ C ... and restart the table:
 2 exit
 ?commands exit
 ?exit
- The commands `exit` and `quit` and the END-OF-FILE character will exit
- `gnuplot`.  Each of these commands will clear the output device (as does
- the `clear` command) before exiting.
+ The commands `exit` and `quit` and the END-OF-FILE character will exit the
+ current `gnuplot` command file and `load` the next one.  See "help
+ batch/interactive" for more details.
+
+ Each of these commands will clear the output device (as does the `clear`
+ command) before exiting.
 2 fit
 ?commands fit
 ?fit
@@ -1974,6 +2010,10 @@ C ... and restart the table:
        load "<input-file>"
 
  The name of the input file must be enclosed in quotes.
+
+ The special filename "-" may be used to `load` commands from standard input.
+ This allows a `gnuplot` command file to accept some commands from standard
+ input.  Please see "help batch/interactive" for more details.
 
  Examples:
        load 'work.gnu'
