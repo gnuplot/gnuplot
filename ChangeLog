@@ -1,3 +1,10 @@
+2004-07-19  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (do_plot): Write the key titles using 
+	write_multiline() rather than calling term->put_text() directly.
+
+	* src/set.c (set_key): Fix order-dependence of 'set key' command.
+
 2004-07-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm: Update "Creator: " field to report version 4.1

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.115 2004/07/05 03:49:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.116 2004/07/13 14:11:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1362,13 +1362,13 @@ do_plot(struct curve_points *plots, int pcount)
 		int center = (keybox.xl + keybox.xr) / 2;
 		*e = '\0';
 		if ((*t->justify_text) (CENTRE)) {
-		    (*t->put_text) (center, yl, s);
+		    write_multiline(center, yl, s, CENTRE, JUST_TOP, 0, NULL);
 		} else {
 		    int x = center - (t->h_char) * strlen(s) / 2;
 		    if (key->hpos == TOUT
 			|| key->vpos == TUNDER
 			|| inrange(x, xleft, xright))
-			(*t->put_text) (x, yl, s);
+			write_multiline(x, yl, s, LEFT, JUST_TOP, 0, NULL);
 		}
 		s = ++e;
 		yl -= t->v_char;
@@ -4320,16 +4320,15 @@ do_key_sample(
     (*t->linetype)(LT_BLACK);
 
     if (key->just == JLEFT) {
-	(*t->justify_text) (LEFT);
-	(*t->put_text) (xl + key_text_left, yl, title);
+	write_multiline(xl + key_text_left, yl, title, LEFT, JUST_TOP, 0, NULL);
     } else {
 	if ((*t->justify_text) (RIGHT)) {
-	    (*t->put_text) (xl + key_text_right, yl, title);
+	    write_multiline(xl + key_text_right, yl, title, RIGHT, JUST_TOP, 0, NULL);
 	} else {
 	    int x = xl + key_text_right - (t->h_char) * strlen(title);
 	    if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
 		i_inrange(x, xleft, xright))
-		(*t->put_text) (x, yl, title);
+		write_multiline(x, yl, title, LEFT, JUST_TOP, 0, NULL);
 	}
     }
     /* Draw sample in same color as the corresponding plot */
