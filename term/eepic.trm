@@ -1,5 +1,5 @@
 /*
- * $Id: eepic.trm,v 1.12 1999/10/01 15:09:10 lhecking Exp $
+ * $Id: eepic.trm,v 1.13 1999/10/29 18:39:39 lhecking Exp $
  *
  */
 
@@ -176,10 +176,13 @@ EEPIC_graphics()
 {
     register struct termentry *t = term;
 
+    int xscale = xsize * t->xmax;
+    int yscale = ysize * t->ymax;
+
     fprintf(gpoutfile, "\
 \\begin{picture}(%d,%d)(0,0)\n\
 \\footnotesize\n",
-	    t->xmax, t->ymax);
+	    xscale, yscale);
 
 }
 
