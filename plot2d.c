@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.8 2000/05/07 16:46:56 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.9 2000/09/22 14:23:49 broeker Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -727,13 +727,65 @@ int plot_num;
     strcat(table_format, yformat);
     strcat(table_format, " %c\n");
 
+    /* Not sure whether the missing plot styles require special treatment.
+     * They all fall under the "default" case right now. Lars
+     */
     for (curve = 0; curve < plot_num;
 	 curve++, this_plot = this_plot->next_cp) {
-	fprintf(gpoutfile, "#Curve %d, %d points\n#x y type\n", curve, this_plot->p_count);
+	fprintf(gpoutfile, "#Curve %d, %d points\n#x y", curve, this_plot->p_count);
+	switch (this_plot->plot_style) {
+	case BOXES:
+	case XERRORBARS:
+	    fprintf(gpoutfile, " xlow xhigh");
+	    break;
+	case BOXERROR:
+	case YERRORBARS:
+	    fprintf(gpoutfile, " ylow yhigh");
+	    break;
+	case BOXXYERROR:
+	case XYERRORBARS:
+	    fprintf(gpoutfile, " xlow xhigh ylow yhigh");
+	    break;
+	case FINANCEBARS:
+	case CANDLESTICKS:
+	default:
+	    /* ? */
+	    break;
+	}
+
+	fprintf(gpoutfile, " type\n");
 	for (i = 0; i < this_plot->p_count; i++) {
-	    fprintf(gpoutfile, table_format,
+	    fprintf(gpoutfile, "%g %g",
 		    this_plot->points[i].x,
-		    this_plot->points[i].y,
+		    this_plot->points[i].y);
+	    switch (this_plot->plot_style) {
+	    case BOXES:
+	    case XERRORBARS:
+		fprintf(gpoutfile, " %g %g",
+			this_plot->points[i].xlow,
+			this_plot->points[i].xhigh);
+		break;
+	    case BOXERROR:
+	    case YERRORBARS:
+		fprintf(gpoutfile, " %g %g",
+			this_plot->points[i].ylow,
+			this_plot->points[i].yhigh);
+		break;
+	    case BOXXYERROR:
+	    case XYERRORBARS:
+		fprintf(gpoutfile, " %g %g %g %g",
+			this_plot->points[i].xlow,
+			this_plot->points[i].xhigh,
+			this_plot->points[i].ylow,
+			this_plot->points[i].yhigh);
+		break;
+	    case FINANCEBARS:
+	    case CANDLESTICKS:
+	    default:
+		/* ? */
+                break;
+	    }
+	    fprintf(gpoutfile, " %c\n",
 		    this_plot->points[i].type == INRANGE ? 'i'
 		    : this_plot->points[i].type == OUTRANGE ? 'o'
 		    : 'u');
@@ -744,7 +796,7 @@ int plot_num;
     /* two blank lines between plots in table output */
     fputc('\n', gpoutfile);
     fflush(gpoutfile);
-
+    
     free(table_format);
 }
 
