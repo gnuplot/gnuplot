@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.19 2000/11/01 18:57:27 broeker Exp $
+ * $Id: command.h,v 1.20 2001/08/22 14:15:33 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -145,10 +145,10 @@ void extend_input_line __PROTO((void));
 void extend_token_table __PROTO((void));
 int com_line __PROTO((void));
 int do_line __PROTO((void));
+void do_string __PROTO((char* s));
 #ifdef USE_MOUSE
 void toggle_display_of_ipc_commands __PROTO((void));
 int display_ipc_commands __PROTO((void));
-void do_string __PROTO((char* s));
 void do_string_replot __PROTO((char* s));
 #endif
 #ifdef VMS                     /* HBB 990829: used only on VMS */

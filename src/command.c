@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.59 2002/02/15 20:17:35 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.60 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -367,6 +367,25 @@ do_line()
 }
 
 
+void
+do_string(s)
+char *s;
+{
+    char *orig_input_line;
+    static char buf[256];
+
+#ifdef USE_MOUSE
+    if (display_ipc_commands())
+	fprintf(stderr, "%s\n", s);
+#endif
+    orig_input_line = input_line;
+    input_line = buf;
+    strcpy(buf,s);
+    do_line();
+    input_line = orig_input_line;
+}
+
+
 #ifdef USE_MOUSE
 void
 toggle_display_of_ipc_commands(void)
@@ -381,22 +400,6 @@ int
 display_ipc_commands(void)
 {
     return mouse_setting.verbose;
-}
-
-void
-do_string(s)
-char *s;
-{
-    char *orig_input_line;
-    static char buf[256];
-
-    if (display_ipc_commands())
-	fprintf(stderr, "%s\n", s);
-    orig_input_line=input_line;
-    input_line=buf;
-    strcpy(buf,s);
-    do_line();
-    input_line=orig_input_line;
 }
 
 void
@@ -430,6 +433,7 @@ restore_prompt(void)
     }
 }
 #endif /* USE_MOUSE */
+
 
 void
 define()
