@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.12 1999/06/17 14:24:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.13 1999/06/19 20:52:05 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -161,8 +161,6 @@ static void map_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
 			      double *m, int *p));
-static void gprintf __PROTO((char *dest, size_t count, char *format,
-			     double log_base, double x));
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -1767,9 +1765,10 @@ int pcount;			/* count of plots in linked list */
 	yl = key_yt;
 
 	if (*key_title) {
-	    char *ss = gp_strdup(key_title);
+	    char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
+	    strcpy(ss, key_title);
+	    strcat(ss, "\n");
 
-	    sprintf(ss, "%s\n", key_title);
 	    s = ss;
 	    yl -= t->v_char / 2;
 	    while ((e = (char *) strchr(s, '\n')) != NULL) {
@@ -3776,7 +3775,7 @@ double incr;
 void
 write_multiline(x, y, text, hor, vert, angle, font)
 unsigned int x, y;
-const char *text;
+char *text;
 enum JUSTIFY hor;		/* horizontal ... */
 int vert;			/* ... and vertical just - text in hor direction despite angle */
 int angle;			/* assume term has already been set for this */
@@ -3985,8 +3984,9 @@ int *lines;
     int mlen, len, l;
 
     l = mlen = len = 0;
-    lab = gp_alloc(strlen(str)+1, "in label_width");
-    sprintf(lab, "%s\n", str);
+    lab = gp_alloc(strlen(str)+2, "in label_width");
+    strcpy(lab, str);
+    strcat(lab, "\n");
     s = lab;
     while ((e = (char *) strchr(s, '\n')) != NULL) {	/* HBB 980308: quiet BC-3.1 warning */
 	*e = '\0';
@@ -4099,12 +4099,12 @@ int *p;				/* results */
 #endif
 
 /*{{{  gprintf */
-/* extended snprintf */
-static void
+/* extended s(n)printf */
+void
 gprintf(dest, count, format, log_base, x)
 char *dest, *format;
 size_t count;
-double log_base, x;		/* we print one number in a number of different formats */
+double log_base, x;	/* we print one number in a number of different formats */
 {
     char temp[MAX_LINE_LEN + 1];
     char *t;
@@ -4281,6 +4281,7 @@ double log_base, x;		/* we print one number in a number of different formats */
 	}
 	/*}}} */
     }
+fprintf(stderr, "DEBUG: strlen(temp) = %d\n", strlen(temp));
 }
 /*}}} */
 #ifdef HAVE_SNPRINTF

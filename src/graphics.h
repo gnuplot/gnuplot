@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.2 1999/06/14 19:20:59 lhecking Exp $ */
+/* $Id: graphics.h,v 1.3 1999/06/17 14:21:44 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -88,10 +88,11 @@ extern double make_ltic __PROTO((int, double));
 extern int label_width __PROTO((const char *, int *));
 extern double set_tic __PROTO((double, int));
 extern void setup_tics __PROTO((int, struct ticdef *, char *, int));
+void gprintf __PROTO((char *, size_t, char *, double, double));
 /* is this valid use of __P ? */
 typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));
 extern void gen_tics __PROTO((int, struct ticdef *, int, int, double, tic_callback));
-extern void write_multiline __PROTO((unsigned int, unsigned int, const char *, enum JUSTIFY, int, int, const char *));
+extern void write_multiline __PROTO((unsigned int, unsigned int, char *, enum JUSTIFY, int, int, const char *));
 extern double LogScale __PROTO((double, int, double, const char *, const char *));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 extern double CheckLog __PROTO((TBOOLEAN, double, double));
