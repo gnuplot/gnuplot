@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.41 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.42 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2206,6 +2206,9 @@ xtick_callback(axis, place, text, grid)
     /* FIXME HBB 20000617: I have no real idea whether this z value is
      * correct... */
     v2.z = v1.z;
+#ifdef PM3D
+    v2.real_z = v1.real_z;
+#endif
     draw3d_line(&v1, &v2, &border_lp);
     term_apply_lp_properties(&border_lp);
 	
@@ -2239,6 +2242,9 @@ xtick_callback(axis, place, text, grid)
 	v2.x = v1.x - tic_unitx * scale * (t->h_tic) * dirn;
 	v2.y = v1.y - tic_unity * scale * (t->v_tic) * dirn;
 	v2.z = v1.z;
+#ifdef PM3D
+	v2.real_z = v1.real_z;
+#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
@@ -2277,6 +2283,9 @@ ytick_callback(axis, place, text, grid)
     v2.y = v1.y + tic_unity * scale * dirn * (t->v_tic);
     /* FIXME HBB 20000716: (see xtick_callback()) */
     v2.z = v1.z;
+#ifdef PM3D
+    v2.real_z = v1.real_z;
+#endif
     draw3d_line(&v1, &v2, &border_lp);
 
     if (text) {
@@ -2309,6 +2318,9 @@ ytick_callback(axis, place, text, grid)
 	v2.x = v1.x - tic_unitx * scale * (t->h_tic) * dirn;
 	v2.y = v1.y - tic_unity * scale * (t->v_tic) * dirn;
 	v2.z = v1.z;
+#ifdef PM3D
+	v2.real_z = v1.real_z;
+#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
@@ -2335,6 +2347,9 @@ ztick_callback(axis, place, text, grid)
     v2.x = v1.x + len / (double)xscaler;
     v2.y = v1.y;
     v2.z = v1.z;
+#ifdef PM3D
+    v2.real_z = v1.real_z;
+#endif
     draw3d_line(&v1, &v2, &border_lp);
 
     if (text) {
@@ -2352,6 +2367,9 @@ ztick_callback(axis, place, text, grid)
 	v2.x = v1.x - len / (double)xscaler;
 	v2.y = v1.y;
 	v2.z = v1.z;
+#ifdef PM3D
+	v2.real_z = v1.real_z;
+#endif
 	draw3d_line(&v1, &v2, &border_lp);
     }
 }
