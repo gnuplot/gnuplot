@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.83 2003/11/25 09:29:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.84 2003/11/25 18:13:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1308,20 +1308,19 @@ system_command()
 /* process the 'test palette' command
  *
  * note 1: it works on terminals supporting as well as not supporting pm3d
- * note 2: due to the call to do_command(), the rest of the current command
+ * note 2: due to the call to load_file(), the rest of the current command
  *	   line after 'test palette ;' is discarded
- * note 3: saving current gnuplot setup as of 'save set' to a temporary file
- *	   can be disabled by undefining TESTPAL_SAVEFILE
  */
-#define TESTPAL_SAVEFILE
 void
 test_palette_subcommand()
 {
 #ifndef PM3D
     int_error(c_token, "'test palette' requires pm3d support built-in");
 #else
-    int i, colors = 256;
-    rgb_color rgb1;
+    const int colors = 256;
+    double z[colors];
+    rgb_color rgb1[colors];
+    int i;
     const char pre1[] = "\
 reset;set multi;\
 uns border;uns key;uns xtics;uns ytics;\
@@ -1335,20 +1334,14 @@ se size 1,0.8;se orig 0,0.2;uns pm3d;\
 se key outside;se grid;se tics in;se xtics 0,0.1;se ytics 0,0.1;\
 se tit'R,G,B profiles of the current color palette';";
     const char post[] = "\
-;\n\n\nuns multi;se orig 0,0;se size 1,1;\n"; /* no final 'reset' in favour of mousing */
-    char *cmd;
-    char palFile[80]; /* must be enough for strcpy of a tmp file below */
-    FILE *f;
-#ifdef TESTPAL_SAVEFILE
-    char saveFile[80]; /* must be enough for strcpy of a tmp file below */
-    int fdSaveFile;
-    FILE *fSaveFile;
-#endif
+\n\n\nuns multi;se orig 0,0;se size 1,1;\n"; /* no final 'reset' in favour of mousing */
     int can_pm3d = (term->make_palette && term->set_color);
     char default_order[] = "rgb";
     char *order = default_order;
+    FILE *f = tmpfile();
 
     c_token++;
+    /* parse optional option */
     if (!END_OF_COMMAND) {
 	int err = (token[c_token].length != 3);
 	order = input_line + token[c_token].start_index;
@@ -1361,66 +1354,51 @@ se tit'R,G,B profiles of the current color palette';";
 	    int_error(c_token, "combination rgb or gbr or brg etc. expected");
 	c_token++;
     }
-    cmd = gp_alloc(strlen(pre1)+strlen(pre2)+strlen(pre3)+strlen(palFile)+128+strlen(post), "test rgb");
-    if (!cmd) return;
-#ifdef TESTPAL_SAVEFILE
-    /* save current gnuplot 'set' status because of the tricky set's for our temporary testing plot */
-    strcpy(saveFile, "gpSavXXXXXX");
-    fdSaveFile = mkstemp(&saveFile[0]);
-    if (NULL != (fSaveFile = fdopen(fdSaveFile, "w+"))) {
-	fputs("\n\n\n", fSaveFile); /* again, x11 blocked pipe */
-	save_set(fSaveFile);
-    }
-#endif
-    /* save current palette into a temporary file */
-    strcpy(palFile, "gpRgbXXXXXX");
-    i = mkstemp(&palFile[0]);
-    f = fdopen(i, "w");
-    if (!f) {
-	free(cmd);
-#ifdef TESTPAL_SAVEFILE
-	remove(saveFile);
-#endif
-	int_error(NO_CARET, "cannot write temporary file (read-only directory?)");
-    }
+    if (!f)
+	int_error(NO_CARET, "cannot write temporary file");
+    /* generate r,g,b curves */
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1] */
-	double z = (double)i / (colors - 1); 
+	z[i] = (double)i / (colors - 1); 
 	/* needed, since printing without call to set_color()*/
-	double gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z : z;
-	rgb1_from_gray(gray, &rgb1);
-	fprintf(f, "%0.4f\t%0.4f\t%0.4f\t%0.4f\n", z, rgb1.r, rgb1.g, rgb1.b);
+	double gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
+	rgb1_from_gray(gray, &rgb1[i]);
     }
-    fclose(f);
-    strcpy(cmd, pre1);
-    if (can_pm3d)
-	strcat(cmd, pre2);
-    strcat(cmd, pre3);
-    sprintf(cmd+strlen(cmd), "p'%s'", palFile);
+    /* commands to setup the test palette plot */
+    fputs(pre1, f);
+    fputs(pre2, f);
+    fputs(pre3, f);
+    /* put inline data of the r,g,b curves */
+    fputs("p", f);
     for (i=0; i<strlen(order); i++) {
-	if (i>0) strcat(cmd, ",''");
+	if (i > 0) fputs(",", f);
+	fputs("'-'tit'", f);
 	switch (order[i]) {
-	    case 'r': strcat(cmd, "tit'red'w l 1"); break;
-	    case 'g': strcat(cmd, "u 1:3 tit'green'w l 2"); break;
-	    case 'b': strcat(cmd, "u 1:4 tit'blue'w l 3"); break;
+	    case 'r': fputs("red'w l 1", f); break;
+	    case 'g': fputs("green'w l 2", f); break;
+	    case 'b': fputs("blue'w l 3", f); break;
 	}
     }
-    strcat(cmd, post);
-    do_string(cmd);
-    free(cmd);
-    remove(palFile);
-#ifdef TESTPAL_SAVEFILE
-    /* load previously saved gnuplot's set status */
-    if (fdSaveFile > 0) {
-	rewind(fSaveFile);
-	load_file(fSaveFile, saveFile, FALSE); /* note: it does fclose() */
-	/* input_line[] and token[] now destroyed! */
-	c_token = num_tokens = 0;
+    fputs("\n", f);
+    for (i = 0; i < 3; i++) {
+	int k, c = order[i];
+	for (k = 0; k < colors; k++) {
+	    double rgb = (c=='r') ? rgb1[k].r : ((c=='g') ? rgb1[k].g : rgb1[k].b);
+	    fprintf(f, "%0.4f\t%0.4f\n", z[k], rgb);
     }
-    remove(saveFile);
-#endif
+	fputs("e\n", f);
+    }
+    fputs(post, f);
+    /* save current gnuplot 'set' status because of the tricky set's for our temporary testing plot */
+    save_set(f);
+    /* execute all commands from the temporary file */
+    rewind(f);
+    load_file(f, NULL, FALSE); /* note: it does fclose(f) */
+    /* further, input_line[] and token[] now destroyed! */
+    c_token = num_tokens = 0;
 #endif /* PM3D */
 }
+
 
 /* process the undocumented 'test time' command
  *	test time 'format' 'string'
