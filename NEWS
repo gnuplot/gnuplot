@@ -17,10 +17,12 @@ News, changes and fixes since gnuplot version 4.0
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
 * CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window
+* CHANGE prefer use of offset keyword in 'set [xyz]label "foo" offset -1,-1'
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
 * FIXED emf output is compatible with MSWin XP SP 2
 * FIXED limit size of X11 requests to half the maximum allowed by the X display
+* FIXED arrowheads drawn in solid lines even if the shaft is dotted (PostScript)
 
 
 Changes between gnuplot versions 3.7.2 and 4.0
