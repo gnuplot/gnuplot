@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.72 2004/02/27 10:12:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.73 2004/03/11 18:28:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -233,6 +233,20 @@ set y2data%s\n",
 	    axis_array[SECOND_X_AXIS].is_timedata ? " time" : "",
 	    axis_array[SECOND_Y_AXIS].is_timedata ? " time" : "");
 
+#define SAVE_TIMEFMT(axis)						\
+    if (strlen(axis_array[axis].timefmt)) 						\
+	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,	\
+		conv_text(axis_array[axis].timefmt));
+    SAVE_TIMEFMT(FIRST_X_AXIS);
+    SAVE_TIMEFMT(FIRST_Y_AXIS);
+    SAVE_TIMEFMT(FIRST_Z_AXIS);
+    SAVE_TIMEFMT(SECOND_X_AXIS);
+    SAVE_TIMEFMT(SECOND_Y_AXIS);
+#ifdef PM3D
+    SAVE_TIMEFMT(COLOR_AXIS);
+#endif
+#undef SAVE_TIMEFMT
+    
     if (boxwidth < 0.0)
 	fputs("set boxwidth\n", fp);
     else
@@ -668,20 +682,6 @@ set ticscale %g %g\n",
     save_range(fp, U_AXIS);
     save_range(fp, V_AXIS);
 
-#define SAVE_TIMEFMT(axis)						\
-    if (strlen(axis_array[axis].timefmt)) 						\
-	fprintf(fp, "set timefmt %s \"%s\"\n", axis_defaults[axis].name,	\
-		conv_text(axis_array[axis].timefmt));
-    SAVE_TIMEFMT(FIRST_X_AXIS);
-    SAVE_TIMEFMT(FIRST_Y_AXIS);
-    SAVE_TIMEFMT(FIRST_Z_AXIS);
-    SAVE_TIMEFMT(SECOND_X_AXIS);
-    SAVE_TIMEFMT(SECOND_Y_AXIS);
-#ifdef PM3D
-    SAVE_TIMEFMT(COLOR_AXIS);
-#endif
-#undef SAVE_TIMEFMT
-    
 #define SAVE_AXISLABEL(axis)					\
     SAVE_AXISLABEL_OR_TITLE(axis_defaults[axis].name,"label",	\
 			    axis_array[axis].label)

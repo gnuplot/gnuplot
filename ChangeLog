@@ -1,3 +1,12 @@
+2004-04-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (looks_like_numeric): Recognize blanks and other
+	special formatting characters in floating point formats correctly.
+
+	* src/save.c (save_set_all): Moved writing of timefmt strings up
+	in the list of saved settings, so 'set xtics' can have time/date
+	strings as endpoints.
+
 2004-04-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* BUGS: Removed lots of long-since fixed bugs.  Updated
