@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.41 2000/10/31 19:59:32 joze Exp $
+ * $Id: post.trm,v 1.42 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2080,8 +2080,8 @@ START_HELP(post)
 "#\\verb~_~ & \\verb~a_x~ & subscript\\\\",
 "#\\verb~@~ & \\verb~@x or a@^b_c~ & phantom box (occupies no width)\\\\",
 "#\\verb~&~ & \\verb~&{space}~ & inserts space of specified length\\\\",
-"#\\verb*~* & \\verb*~a{.8-}* & overprints '-' on 'a', raised by .8",
-"#\\verb~ ~ & \\verb~ ~ & times the current fontsize",
+"#\\verb*~* & \\verb*~a{.8-}* & overprints '-' on 'a', raised by .8\\\\",
+"#\\verb~ ~ & \\verb~ ~ & times the current fontsize\\\\",
 "%c c l .",
 "%.TE", /* ugly - doc2ms uses @ for column separator, but here we */
 "%.TS", /* need @ in table, so end and restart the table ! */
