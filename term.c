@@ -827,7 +827,7 @@ struct termentry term_tbl[] =
 /* also make this be a function so we can get the number of
  *  terminals in help.c   DBT 10-7-98
  */
-int term_count(void)
+int term_count()
 {
     return TERMCOUNT;
 }
