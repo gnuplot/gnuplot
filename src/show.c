@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.33 2000/02/11 19:14:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.34 2000/03/28 21:28:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -790,7 +790,8 @@ FILE *fp;
 	    /* The following code could be a lot simpler if
 	     * it wasn't for Borland's broken compiler ...
 	     */
-	    const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga, *nocwdrc, *x11, *unixplot, *gnugraph;
+	    const char *rdline, *gnu_rdline, *libgd, *libpng, *linuxvga,
+			*nocwdrc, *x11, *use_mouse, *unixplot, *gnugraph;
 
 	    rdline =
 #ifdef READLINE
@@ -798,7 +799,7 @@ FILE *fp;
 #else
 		"-READLINE  "
 #endif
-		,gnu_rdline =
+		, gnu_rdline =
 #ifdef HAVE_LIBREADLINE
 		"+LIBREADLINE  "
 # ifdef GNUPLOT_HISTORY
@@ -809,44 +810,51 @@ FILE *fp;
 #else
 		"-LIBREADLINE  "
 #endif
-		,libgd =
+		, libgd =
 #ifdef HAVE_LIBGD
 		"+LIBGD  "
 #else
 		"-LIBGD  "
 #endif
-		,libpng =
+		, libpng =
 #ifdef HAVE_LIBPNG
 		"+LIBPNG  "
 #else
 		"-LIBPNG  "
 #endif
-		,linuxvga =
+		, linuxvga =
 #ifdef LINUXVGA
 		"+LINUXVGA  "
 #else
 		""
 #endif
-		,nocwdrc =
+		, nocwdrc =
 #ifdef NOCWDRC
 		"+NOCWDRC  "
 #else
 		"-NOCWDRC  "
 #endif
-		,x11 =
+		, x11 =
 
 #ifdef X11
 		"+X11  "
 #else
 		""
 #endif
-		,unixplot =
+		, use_mouse =
+
+#ifdef USE_MOUSE
+		"+USE_MOUSE  "
+#else
+		""
+#endif
+		, unixplot =
 #ifdef UNIXPLOT
 		"+UNIXPLOT  "
 #else
 		""
 #endif
-		,gnugraph =
+		, gnugraph =
 #ifdef GNUGRAPH
 		"+GNUGRAPH  "
 #else
@@ -854,7 +862,8 @@ FILE *fp;
 #endif
 		;
 	    fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
-		    libgd, libpng, linuxvga, nocwdrc, x11, unixplot, gnugraph);
+		    libgd, libpng, linuxvga, nocwdrc, x11, use_mouse,
+		    unixplot, gnugraph);
 	}
 
 	if ((helpfile = getenv("GNUHELP")) == NULL) {
