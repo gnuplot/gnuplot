@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.230 2004/07/05 03:48:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.231 2004/07/08 12:42:16 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7211,6 +7211,167 @@ C ... and restart the table:
  x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
  jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
  tandy_60dpi. The BeOS driver (`be`) is untested.
+5 boxxyerrorbars
+?commands set style boxxyerrorbars
+?set style boxxyerrorbars
+?plotting styles boxxyerrorbars
+?style boxxyerrorbars
+?boxxyerrorbars
+ The `boxxyerrorbars` style is only relevant to 2-d data plotting.  It is a
+ combination of the `boxes` and `xyerrorbars` styles.
+
+ The box width and height are determined from the x and y errors in the same
+ way as they are for the `xyerrorbars` style---either from xlow to xhigh and
+ from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
+ y+ydelta , depending on how many data columns are provided.
+
+ If filled-box support is present, then the interior of the boxes is drawn 
+ according to the current fillstyle.  See `set style fill` and `boxes` for 
+ details.  Alternatively a new fillstyle may be specified in the plot command.
+5 candlesticks
+?commands set style candlesticks
+?set style candlesticks
+?plotting styles candlesticks
+?style candlesticks
+?candlesticks
+ The `candlesticks` style can be used for 2-d data plotting of financial
+ data or for generating box-and-whisker plots of statistical data.
+ Five columns of data are required; in order, these should be the x
+ coordinate (most likely a date) and the opening, low, high, and closing
+ prices.  The symbol is a rectangular box, centered horizontally at the x
+ coordinate and limited vertically by the opening and closing prices.  A
+ vertical line segment at the x coordinate extends up from the top of the
+ rectangle to the high price and another down to the low.  The vertical line
+ will be unchanged if the low and high prices are interchanged.
+
+ The width of the rectangle can be controlled by the `set boxwidth` command.
+ For backwards compatibility with earlier gnuplot versions, when the 
+ boxwidth parameter has not been set then the width of the candlestick
+ rectangle is controlled by `set bars <width>`.
+
+ By default the rectangle is empty if (open > close), and filled with three
+ vertical bars if (close > open). If filled-boxes support is present, then
+ the rectangle is colored according to `set style fill <fillstyle>`.
+ See `set bars` and `financebars`.  See also
+^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
+ finance demos
+^ </a>
+ .
+
+ Note: To place additional symbols, such as the median value, on a
+ box-and-whisker plot requires additional plot commands as in this example:
+
+   # Data columns: X Min 1stQuartile Median 3rdQuartile Max
+   set bars 4.0
+   set style fill empty
+   plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
+        ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
+
+  See `set boxwidth`, `set bars` and `set style fill`.
+5 dots
+?commands set style dots
+?set style dots
+?plotting styles dots
+?style dots
+?dots
+ The `dots` style plots a tiny dot at each point; this is useful for scatter
+ plots with many points.
+5 filledcurves
+?commands set style filledcurves
+?set style filledcurves
+?plotting styles filledcurves
+?style filledcurves
+?filledcurves
+ The `filledcurves` style is only relevant to 2-d plotting. Three variants
+ are possible. The default is `closed`, which treats the curve itself as a
+ closed polygon. The second option is to fill the area between the curve and
+ a given axis, horizontal or vertical line, or a point.
+ The third option requires three columns of input data: the x coordinate and
+ two corresponding y coordinates; the area between the two curves is filled.
+
+ Syntax:
+
+     set style [data | function] filledcurves [option]
+     plot ... with filledcurves [option]
+
+ where the option can be
+
+     [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
+
+ The area is filled between the current curve and
+     filledcurves closed   ... just filled closed curve,
+     filledcurves x1       ... x1 axis,
+     filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
+     filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
+     filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
+     filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+
+ The `above` and `below` options apply only to commands of the form
+     ... filledcurves above {x1|x2|y1|y2}=<val>
+ and limit the filled area to one side of the bounding line.
+
+ Note: filling is supported on filled-polygon capable terminals, see help of
+ `set pm3d` for their list.
+
+ Zoom of a filled curve drawn from a datafile may produce empty or incorrect
+ area because gnuplot is clipping points and lines, and not areas.
+
+ If the values of <a>, <x>, <y> are out of the drawing boundary, then they
+ are moved to the graph boundary. Then the actually filled area in the case
+ of option xy=<x>,<y> will depend on xrange and yrange.
+5 financebars
+?commands set style financebars
+?set style financebars
+?plotting styles financebars
+?style financebars
+?financebars
+ The `financebars` style is only relevant for 2-d data plotting of financial
+ data.  Five columns of data are required; in order, these should be the x
+ coordinate (most likely a date) and the opening, low, high, and closing
+ prices.  The symbol is a vertical line segment, located horizontally at the x
+ coordinate and limited vertically by the high and low prices.  A horizontal
+ tic on the left marks the opening price and one on the right marks the
+ closing price.  The length of these tics may be changed by `set bars`.  The
+ symbol will be unchanged if the high and low prices are interchanged.
+ See `set bars` and `candlesticks`, and also the
+^ <a href="http://www.gnuplot.info/demo/finance.html">
+ finance demo.
+^ </a>
+5 fsteps
+?commands set style fsteps
+?set style fsteps
+?plotting styles fsteps
+?style fsteps
+?fsteps
+ The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
+ points with two line segments: the first from (x1,y1) to (x1,y2) and the
+ second from (x1,y2) to (x2,y2).
+ See also
+^ <a href="http://www.gnuplot.info/demo/steps.html">
+ steps demo.
+^ </a>
+5 histeps
+?commands set style histeps
+?set style histeps
+?plotting styles histeps
+?style histeps
+?histeps
+ The `histeps` style is only relevant to 2-d plotting.  It is intended for
+ plotting histograms.  Y-values are assumed to be centered at the x-values;
+ the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
+ ((x1+x2)/2,y1).  The lines representing the end points are extended so that
+ the step is centered on at x.  Adjacent points are connected by a vertical
+ line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
+
+ If `autoscale` is in effect, it selects the xrange from the data rather than
+ the steps, so the end points will appear only half as wide as the others.
+ See also
+^ <a href="http://www.gnuplot.info/demo/steps.html">
+ steps demo.
+^ </a>
+
+ `histeps` is only a plotting style; `gnuplot` does not have the ability to
+ create bins and determine their population from some data set.
 5 histograms
 ?commands set style histograms
 ?set style histograms
@@ -7319,167 +7480,6 @@ C ... and restart the table:
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
 
-5 filledcurves
-?commands set style filledcurves
-?set style filledcurves
-?plotting styles filledcurves
-?style filledcurves
-?filledcurves
- The `filledcurves` style is only relevant to 2-d plotting. Three variants
- are possible. The default is `closed`, which treats the curve itself as a
- closed polygon. The second option is to fill the area between the curve and
- a given axis, horizontal or vertical line, or a point.
- The third option requires three columns of input data: the x coordinate and
- two corresponding y coordinates; the area between the two curves is filled.
-
- Syntax:
-
-     set style [data | function] filledcurves [option]
-     plot ... with filledcurves [option]
-
- where the option can be
-
-     [closed | {above | below} {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
-
- The area is filled between the current curve and
-     filledcurves closed   ... just filled closed curve,
-     filledcurves x1       ... x1 axis,
-     filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
-     filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
-     filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
-     filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
-
- The `above` and `below` options apply only to commands of the form
-     ... filledcurves above {x1|x2|y1|y2}=<val>
- and limit the filled area to one side of the bounding line.
-
- Note: filling is supported on filled-polygon capable terminals, see help of
- `set pm3d` for their list.
-
- Zoom of a filled curve drawn from a datafile may produce empty or incorrect
- area because gnuplot is clipping points and lines, and not areas.
-
- If the values of <a>, <x>, <y> are out of the drawing boundary, then they
- are moved to the graph boundary. Then the actually filled area in the case
- of option xy=<x>,<y> will depend on xrange and yrange.
-5 boxxyerrorbars
-?commands set style boxxyerrorbars
-?set style boxxyerrorbars
-?plotting styles boxxyerrorbars
-?style boxxyerrorbars
-?boxxyerrorbars
- The `boxxyerrorbars` style is only relevant to 2-d data plotting.  It is a
- combination of the `boxes` and `xyerrorbars` styles.
-
- The box width and height are determined from the x and y errors in the same
- way as they are for the `xyerrorbars` style---either from xlow to xhigh and
- from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
- y+ydelta , depending on how many data columns are provided.
-
- If filled-box support is present, then the interior of the boxes is drawn 
- according to the current fillstyle.  See `set style fill` and `boxes` for 
- details.  Alternatively a new fillstyle may be specified in the plot command.
-5 candlesticks
-?commands set style candlesticks
-?set style candlesticks
-?plotting styles candlesticks
-?style candlesticks
-?candlesticks
- The `candlesticks` style can be used for 2-d data plotting of financial
- data or for generating box-and-whisker plots of statistical data.
- Five columns of data are required; in order, these should be the x
- coordinate (most likely a date) and the opening, low, high, and closing
- prices.  The symbol is a rectangular box, centered horizontally at the x
- coordinate and limited vertically by the opening and closing prices.  A
- vertical line segment at the x coordinate extends up from the top of the
- rectangle to the high price and another down to the low.  The vertical line
- will be unchanged if the low and high prices are interchanged.
-
- The width of the rectangle can be controlled by the `set boxwidth` command.
- For backwards compatibility with earlier gnuplot versions, when the 
- boxwidth parameter has not been set then the width of the candlestick
- rectangle is controlled by `set bars <width>`.
-
- By default the rectangle is empty if (open > close), and filled with three
- vertical bars if (close > open). If filled-boxes support is present, then
- the rectangle is colored according to `set style fill <fillstyle>`.
- See `set bars` and `financebars`.  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/candlesticks.html">
- finance demos
-^ </a>
- .
-
- Note: To place additional symbols, such as the median value, on a
- box-and-whisker plot requires additional plot commands as in this example:
-
-   # Data columns: X Min 1stQuartile Median 3rdQuartile Max
-   set bars 4.0
-   set style fill empty
-   plot 'stat.dat' using 1:3:2:6:5 with candlesticks title 'Quartiles', \
-        ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
-
-  See `set boxwidth`, `set bars` and `set style fill`.
-5 dots
-?commands set style dots
-?set style dots
-?plotting styles dots
-?style dots
-?dots
- The `dots` style plots a tiny dot at each point; this is useful for scatter
- plots with many points.
-5 financebars
-?commands set style financebars
-?set style financebars
-?plotting styles financebars
-?style financebars
-?financebars
- The `financebars` style is only relevant for 2-d data plotting of financial
- data.  Five columns of data are required; in order, these should be the x
- coordinate (most likely a date) and the opening, low, high, and closing
- prices.  The symbol is a vertical line segment, located horizontally at the x
- coordinate and limited vertically by the high and low prices.  A horizontal
- tic on the left marks the opening price and one on the right marks the
- closing price.  The length of these tics may be changed by `set bars`.  The
- symbol will be unchanged if the high and low prices are interchanged.
- See `set bars` and `candlesticks`, and also the
-^ <a href="http://www.gnuplot.info/demo/finance.html">
- finance demo.
-^ </a>
-5 fsteps
-?commands set style fsteps
-?set style fsteps
-?plotting styles fsteps
-?style fsteps
-?fsteps
- The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
- points with two line segments: the first from (x1,y1) to (x1,y2) and the
- second from (x1,y2) to (x2,y2).
- See also
-^ <a href="http://www.gnuplot.info/demo/steps.html">
- steps demo.
-^ </a>
-5 histeps
-?commands set style histeps
-?set style histeps
-?plotting styles histeps
-?style histeps
-?histeps
- The `histeps` style is only relevant to 2-d plotting.  It is intended for
- plotting histograms.  Y-values are assumed to be centered at the x-values;
- the point at x1 is represented as a horizontal line from ((x0+x1)/2,y1) to
- ((x1+x2)/2,y1).  The lines representing the end points are extended so that
- the step is centered on at x.  Adjacent points are connected by a vertical
- line at their average x, that is, from ((x1+x2)/2,y1) to ((x1+x2)/2,y2).
-
- If `autoscale` is in effect, it selects the xrange from the data rather than
- the steps, so the end points will appear only half as wide as the others.
- See also
-^ <a href="http://www.gnuplot.info/demo/steps.html">
- steps demo.
-^ </a>
-
- `histeps` is only a plotting style; `gnuplot` does not have the ability to
- create bins and determine their population from some data set.
 5 impulses
 ?commands set style impulses
 ?set style impulses
