@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.59 2003/03/18 12:36:48 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.60 2003/05/13 23:48:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1116,7 +1116,7 @@ eval_plots()
 		    int stored_token = c_token;
 		    struct arrow_style_type arrow;
 
-		    arrow_parse(&arrow, TRUE);
+		    arrow_parse(&arrow, line_num, TRUE);
 		    if (stored_token != c_token) {
 			if (set_lpstyle) {
 			    duplication=TRUE;
@@ -1181,13 +1181,18 @@ eval_plots()
 		    xtitle[0] = '\0';
 	    }
 
+	    /* Vectors will be drawn using linetype from arrow style, so we
+	     * copy this to overall plot linetype so that the key sample matches */
+	    if (this_plot->plot_style == VECTOR) {
+		if (!set_lpstyle)
+		    arrow_parse(&this_plot->arrow_properties, line_num, TRUE);
+		this_plot->lp_properties = this_plot->arrow_properties.lp_properties;
+		set_lpstyle = TRUE;
+	    }
 	    /* No line/point style given. As lp_parse also supplies
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
 	    if (! set_lpstyle) {
-		if (this_plot->plot_style == VECTOR) {
-		    arrow_parse(&this_plot->arrow_properties, TRUE);
-		} 
 		lp_parse(&this_plot->lp_properties, 1,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			 line_num, point_num);

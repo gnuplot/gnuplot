@@ -1,3 +1,10 @@
+2003-06-30  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/misc.h src/misc.c src/plot2d.c src/set.c docs/gnuplot.doc: 
+	Vector plots are drawn using the linetype in stored arrowstyle 
+	structure. Make sure this defaults to the linetype for the current
+	plot #, and that this the overall plot linetype always agree.
+
 2003-06-27  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/set.c: Fix unexpected behaviour that 'set grid nox noy'

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.116 2003/05/17 05:59:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.117 2003/06/28 05:47:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -690,7 +690,7 @@ set_arrow()
 	    int stored_token = c_token;
 	    /* struct arrow_style_type loc_arrow; */
 
-	    arrow_parse(&loc_arrow, TRUE);
+	    arrow_parse(&loc_arrow, 0, TRUE);
 	    if (stored_token != c_token) {
 		if (set_arrowstyle) { duplication = TRUE; break; }
 		set_arrowstyle = TRUE;
@@ -3797,7 +3797,7 @@ set_arrowstyle()
     /* pick up a arrow spec : dont allow ls, do allow point type
      * default to same arrow type = point type = tag
      */
-    arrow_parse(&loc_arrow, 0);
+    arrow_parse(&loc_arrow, 0, FALSE);
 
     if (!END_OF_COMMAND)
 	int_error(c_token, "extraneous or out-of-order arguments in set arrowstyle");
