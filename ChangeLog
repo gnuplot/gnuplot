@@ -1,3 +1,10 @@
+2003-02-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/emf.trm: Revise handling of text color and point style to
+ 	match other terminal types. NB: Justification of rotated text is 
+	still not correct.
+	* term/pstricks.trm: Remove unused variable.
+
 2003-02-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: New option --with-gihdir to specify location of
@@ -1880,7 +1887,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/31 15:30:12 $).
+	last modification date (from the tag $Date: 2003/02/03 15:50:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.14 2003/01/24 17:45:13 broeker Exp $
+ * $Id: emf.trm,v 1.15 2003/01/27 20:34:34 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,9 @@
  *
  * HISTORY
  *
+ * 3-Feb-2003 Ethan A Merritt 
+ * - modify text and point color handling to match other terminal types
+ * - FIXME! alignment of rotated text is not correct.
  * 1.0.6 25-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> 
  * - generalized text rotation and justification
  * 1.0.5 2000/07/20
@@ -838,20 +841,17 @@ EMF_point(x, y, number)
     int number;
 {
     int old_dashtype;
-    unsigned long old_linecolor;
 
     EMF_flush_polyline();
     old_dashtype = emf_dashtype;
-    old_linecolor = emf_color;
-    EMF_linecolor(number);
-    EMF_dashtype(number % emf_colors);
+    EMF_dashtype(0);
 
     if (number < 0) {		/* draw dot */
 	EMF_move(x, y);
 	EMF_solid_vector(x + 1, y);
 	goto end_points;
     }
-    number = (number / emf_colors) % EMF_POINTS;
+    number = number % EMF_POINTS;
 
     switch (number) {
     case 0:			/* draw diamond */
@@ -920,7 +920,6 @@ EMF_point(x, y, number)
 	break;
     }
   end_points:
-    emf_color = old_linecolor;
     EMF_dashtype(old_dashtype);
 }
 
