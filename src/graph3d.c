@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.20 1999/11/24 13:24:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.21 2000/02/11 19:17:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -373,7 +373,7 @@ int count;
 
     /* an absolute 1, with no terminal-dependent scaling ? */
     ybot = (t->v_char) * 2.5 + 1;
-    if (key_rows && key_vpos == TUNDER)
+    if (key_rows && key == -1 && key_vpos == TUNDER)
 	ybot += key_rows * key_entry_height + ktitle_lines * t->v_char;
 
     if (strlen(title.text)) {
@@ -394,7 +394,7 @@ int count;
 	}
 	key_rows += ktitle_lines;
     }
-    if (key_hpos == TOUT) {
+    if (key == -1 && key_hpos == TOUT) {
 	xright -= key_col_wth * (key_cols - 1) + key_col_wth - 2 * (t->h_char);
     }
     xleft += t->xmax * xoffset;
@@ -1033,11 +1033,16 @@ int quick;			/* !=0 means plot only axes etc., for quick rotation */
 
 #ifdef USE_MOUSE
     /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */
-    map3d_xy(x_min3d, y_min3d, base_z, &axis3d_o_x, &axis3d_o_y);
-    map3d_xy(x_max3d, y_min3d, base_z, &axis3d_x_dx, &axis3d_x_dy);
-    axis3d_x_dx -= axis3d_o_x;  axis3d_x_dy -= axis3d_o_y;
-    map3d_xy(x_min3d, y_max3d, base_z, &axis3d_y_dx, &axis3d_y_dy);
-    axis3d_y_dx -= axis3d_o_x;  axis3d_y_dy -= axis3d_o_y;
+    {
+	unsigned int o_x, o_y, x, y;
+	map3d_xy(x_min3d, y_min3d, base_z, &o_x, &o_y);
+	map3d_xy(x_max3d, y_min3d, base_z, &x, &y);
+	axis3d_x_dx = (int)x - (int)o_x;
+	axis3d_x_dy = (int)y - (int)o_y;
+	map3d_xy(x_min3d, y_max3d, base_z, &x, &y);
+	axis3d_y_dx = (int)x - (int)o_x;
+	axis3d_y_dy = (int)y - (int)o_y;
+    }
 #endif
 }
 
