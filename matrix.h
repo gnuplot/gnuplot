@@ -41,7 +41,7 @@ EXT double  *vec __PROTO((int n));
 EXT int     *ivec __PROTO((int n));
 EXT double  **matr __PROTO((int r, int c));
 EXT void    free_matr __PROTO((double **m, int r));
-EXT void    redim_vec __PROTO((double **v, int n));
+EXT double  *redim_vec __PROTO((double **v, int n));
 EXT void    redim_ivec __PROTO((int **v, int n));
 EXT void    solve __PROTO((double **a, int n, double **b, int m));
 EXT void    inverse __PROTO((double **src, double **dst, int n));

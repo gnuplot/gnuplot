@@ -104,15 +104,15 @@ int rows;
 }
 
 
-void redim_vec (v, n)
+double *redim_vec (v, n)
 double **v;
 int n;
 {
-    if ( n < 1 ) {
-	*v = NULL;
-	return;
-    }
-    *v = (double *) gp_realloc (*v, n * sizeof(double), "vec");
+    if ( n < 1 ) 
+      *v = NULL;
+    else
+      *v = (double *) gp_realloc (*v, n * sizeof(double), "vec");
+    return *v;
 }
 
 void redim_ivec (v, n)
