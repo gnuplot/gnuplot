@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: syscfg.h,v 1.9 1998/12/17 22:08:50 lhecking Exp $
  *
  */
 
@@ -47,13 +47,12 @@
 #endif
 
 #include "ansichek.h"
-#include "stdfn.h"
 
 /*
  * Define operating system dependent constants [default value]:
  *
  * OS:       [" "] Name of OS plus trailing space
- * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overriden by Makefile
+ * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overridden by Makefile
  * HOME:     ["HOME"] Name of environment variable which points to
  *           the directory where gnuplot's config file is found.
  * PLOTRC:   [".gnuplot"] Name of the gnuplot startup file.
@@ -84,11 +83,11 @@
 #endif /* Amiga */
 
 #ifdef ATARI
-# define OS "TOS "
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "gulam.prg"
-# define DIRSEP1 '\\'
+# define OS      "TOS "
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "gulam.prg"
+# define DIRSEP1  '\\'
 # ifdef MTOS
 #  define DIRSEP2 '/'
 # endif
@@ -99,49 +98,52 @@
 #endif /* Atari */
 
 #ifdef DOS386
-# define OS "DOS 386 "
+# define OS       "DOS 386 "
 # define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define DIRSEP1 '\\'
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "\\command.com"
+# define DIRSEP1  '\\'
 #endif /* DOS386 */
 
-#ifdef linux
+#if defined(linux) || defined(__linux)
 # define OS "Linux "
 #endif /* Linux */
 
-#if defined(__NeXT__) && !defined(NEXT)
-# define NEXT
+#if defined(__NeXT__) || defined(NEXT)
+# ifndef NEXT
+#  define NEXT
+# endif
 #endif /* NeXT */
 
 #ifdef OS2
-# define OS "OS/2 "
+# define OS       "OS/2 "
 # define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "c:\\os2\\cmd.exe"
-# define DIRSEP1 '\\'
-# define GP_GETCWD(path,len) _getcwd2 (path, len)
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "c:\\os2\\cmd.exe"
+# define DIRSEP1  '\\'
 #endif /* OS/2 */
 
 #ifdef OSK
-# define OS "OS-9 "
+# define OS    "OS-9 "
 # define SHELL "/dd/cmds/shell"
 #endif /* OS-9 */
 
 #if defined(vms) || defined(VMS)
+# define OS "VMS "
 # ifndef VMS
 #  define VMS
 # endif
-# define OS "VMS "
-# define HOME "sys$login:"
+# define HOME   "sys$login:"
 # define PLOTRC "gnuplot.ini"
 # ifdef NO_GIH
    /* for show version long */
 #  define HELPFILE "GNUPLOT$HELP"
 # endif
 # if !defined(VAXCRTL) && !defined(DECCRTL)
-#  error Please /define either VAXCRTL or DECCRTL
+#  define VAXCRTL VAXCRTL_AND_DECCRTL_UNDEFINED
+#  define DECCRTL VAXCRTL_AND_DECCRTL_UNDEFINED
 # endif
 /* avoid some IMPLICITFUNC warnings */
 # ifdef __DECC
@@ -162,13 +164,14 @@
  */
 #  define S_IFIFO  _S_IFIFO
 # else
+#  define OS "MS-Windows "
 #  ifndef WIN16
 #   define WIN16
 #  endif
-#  define OS "MS-Windows "
 # endif /* WIN32 */
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
+# define HOME    "GNUPLOT"
+# define PLOTRC  "gnuplot.ini"
+# define SHELL   "\\command.com"
 # define DIRSEP1 '\\'
 #endif /* _WINDOWS */
 
@@ -176,22 +179,24 @@
 # if !defined(DOS32) && !defined(DOS16)
 #  define DOS16
 # endif
+/* should this be here ? */
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
+# define OS       "MS-DOS "
 # undef HELPFILE
 # define HELPFILE "gnuplot.gih"
-# define HOME "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define OS "MS-DOS "
-# define DIRSEP1 '\\'
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "\\command.com"
+# define DIRSEP1  '\\'
 # ifdef __DJGPP__
 #  define DIRSEP2 '/'
 # endif
 #endif /* MSDOS */
 
 /* Note: may not catch all IBM AIX compilers or SCO compilers */
-#if defined(__unix__)|| defined(unix) || defined(_AIX) || defined(SCO)
+#if defined(unix)|| defined(__unix) || defined(_AIX) || defined(SCO)
 # ifndef unix
 #  define unix
 # endif
@@ -210,7 +215,7 @@
 
 #ifndef HELPFILE
 # define HELPFILE "docs/gnuplot.gih"
-#endif /* !HELPFILE */
+#endif
 
 #ifndef HOME
 # define HOME "HOME"
@@ -233,7 +238,8 @@
 #endif
 
 #ifndef FAQ_LOCATION
-# define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/"
+/* # define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/" */
+#define FAQ_LOCATION "http://www-ihe.etec.uni-karlsruhe.de/mitarbeiter/vonhagen/gnuplot-faq.html"
 #endif
 
 #ifndef CONTACT
@@ -305,7 +311,14 @@
 
 
 /* Misc platforms */
-#if defined(apollo) || defined(alliant)
+#ifdef apollo
+# ifndef APOLLO
+#  define APOLLO
+# endif
+# define GPR
+#endif
+
+#if defined(APOLLO) || defined(alliant)
 # define NO_LIMITS_H
 #endif
 
@@ -314,6 +327,11 @@
 # define NO_STRCHR
 #endif
 
+#ifdef unixpc
+# ifndef UNIXPC
+#  define UNIXPC
+# endif
+#endif
 
 /* Autoconf related stuff
  * Transform autoconf defines to gnuplot coding standards
