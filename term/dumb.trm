@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.12 2003/12/01 03:32:02 sfeam Exp $
+ * $Id: dumb.trm,v 1.14 2004/03/23 05:40:48 sfeam Exp $
  *
  */
 
@@ -76,7 +76,7 @@ TERM_PUBLIC void DUMB_put_text __PROTO((unsigned int x, unsigned int y,
 					const char *str));
 TERM_PUBLIC void DUMB_arrow __PROTO((unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
-				     TBOOLEAN head));
+				     int head));
 
 #ifndef NO_DUMB_ENHANCED_SUPPORT
 /* To support "set term dumb enhanced" (don't ask why!) */
@@ -385,7 +385,7 @@ const char *str;
 TERM_PUBLIC void
 DUMB_arrow(sx, sy, ex, ey, head)
     unsigned int sx, sy, ex, ey;
-    TBOOLEAN head;		/* ignored */
+    int head;		/* ignored */
 {
     char saved_pen;
     char saved_x;

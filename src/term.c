@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.70 2004/03/23 05:40:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.71 2004/03/25 12:36:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -193,7 +193,7 @@ static void null_linewidth __PROTO((double));
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
-static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 
 static void UP_redirect __PROTO((int called));
 
@@ -872,7 +872,7 @@ static void
 do_arrow(sx, sy, ex, ey, head)
     unsigned int sx, sy;	/* start point */
     unsigned int ex, ey;	/* end point (point of arrowhead) */
-    TBOOLEAN head;
+    int head;
 {
     register struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;

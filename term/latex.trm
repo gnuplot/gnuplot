@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.23 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: latex.trm,v 1.24 2002/12/13 14:58:49 lhecking Exp $
  *
  */
 
@@ -93,7 +93,7 @@ TERM_PUBLIC void LATEX_linetype __PROTO((int linetype));
 TERM_PUBLIC void LATEX_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void LATEX_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void LATEX_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void LATEX_reset __PROTO((void));
@@ -212,7 +212,7 @@ static struct vslope {
 };
 
 /* figure out the best arrow */
-static void best_latex_arrow __PROTO((int, int, int, int, int, TBOOLEAN));
+static void best_latex_arrow __PROTO((int, int, int, int, int, int));
 
 enum LATEX_id { LATEX_COURIER, LATEX_ROMAN, LATEX_DEFAULT, LATEX_OTHER };
 
@@ -637,8 +637,8 @@ LATEX_flushdot()
 
 TERM_PUBLIC void
 LATEX_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;
+    unsigned int sx, sy, ex, ey;
+    int head;
 {
     best_latex_arrow(sx, sy, ex, ey, 1, head);
 
@@ -648,9 +648,9 @@ TBOOLEAN head;
 
 static void
 best_latex_arrow(sx, sy, ex, ey, who, head)
-int sx, sy, ex, ey;		/* start and end points */
-int who;			/* 1=LATEX, 2=EEPIC */
-TBOOLEAN head;
+    int sx, sy, ex, ey;		/* start and end points */
+    int who;			/* 1=LATEX, 2=EEPIC */
+    int head;
 {
     int dx = ex - sx;
     int dy = ey - sy;

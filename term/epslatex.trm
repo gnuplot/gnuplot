@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.20 2003/06/13 10:44:10 lhecking Exp $
+ * $Id: epslatex.trm,v 1.21 2003/06/15 06:01:29 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -58,7 +58,7 @@ TERM_PUBLIC void EPSL_reset __PROTO((void));
 TERM_PUBLIC void EPSL_linetype __PROTO((int linetype));
 TERM_PUBLIC void EPSL_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void EPSL_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void EPSL_arrow __PROTO((unsigned int xstart, unsigned int ystart, unsigned int xend, unsigned int yend, TBOOLEAN head));
+TERM_PUBLIC void EPSL_arrow __PROTO((unsigned int xstart, unsigned int ystart, unsigned int xend, unsigned int yend, int head));
 TERM_PUBLIC void EPSL_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int EPSL_text_angle __PROTO((int ang));
 TERM_PUBLIC int EPSL_justify_text __PROTO((enum JUSTIFY mode));
@@ -890,10 +890,11 @@ unsigned int x, y;
 
 TERM_PUBLIC void
 EPSL_arrow(xstart, ystart, xend, yend, head)
-unsigned int xstart, ystart, xend, yend;
-TBOOLEAN head;
+    unsigned int xstart, ystart, xend, yend;
+    int head;
 {
-    fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend, head ? "Arrow" : "L Gpstroke");
+    fprintf(gpoutfile, "%d %d M\n%d %d %s\n",
+	    xstart, ystart, xend, yend, head ? "Arrow" : "L Gpstroke");
 }
 
 TERM_PUBLIC void

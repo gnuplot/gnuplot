@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.38 2003/02/18 16:38:12 broeker Exp $
+ * $Id: fig.trm,v 1.39 2003/08/22 12:36:17 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -77,7 +77,7 @@ TERM_PUBLIC void FIG_text __PROTO((void));
 TERM_PUBLIC void FIG_linetype __PROTO((int linetype));
 TERM_PUBLIC void FIG_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void FIG_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC void FIG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC void FIG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC void FIG_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int FIG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int FIG_text_angle __PROTO((int ang));
@@ -769,9 +769,9 @@ unsigned int ux, uy;
 
 TERM_PUBLIC void
 FIG_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy;		/* start coord */
-unsigned int ex, ey;		/* end coord */
-TBOOLEAN head;
+    unsigned int sx, sy;		/* start coord */
+    unsigned int ex, ey;		/* end coord */
+    int head;
 {
     int cap_style;
     double awidth, aheight;	/* arrow head sizes */

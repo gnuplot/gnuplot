@@ -1,4 +1,4 @@
-/* $Id: tgif.trm,v 1.21 2002/06/10 18:53:00 mikulik Exp $ */
+/* $Id: tgif.trm,v 1.22 2002/07/26 16:42:29 mikulik Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -86,7 +86,7 @@ TERM_PUBLIC void TGIF_put_text __PROTO((unsigned int ux, unsigned int uy, const 
 TERM_PUBLIC int TGIF_text_angle __PROTO((int ang));
 TERM_PUBLIC int TGIF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int number));
-TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
+TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
 TERM_PUBLIC int TGIF_set_font __PROTO((const char *font));
 TERM_PUBLIC void TGIF_set_pointsize __PROTO((double size));
 #ifdef PM3D
@@ -392,7 +392,7 @@ TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.21 2002/06/10 18:53:00 mikulik Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.22 2002/07/26 16:42:29 mikulik Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -567,8 +567,8 @@ unsigned int ux, uy;
 /***************************************************************************/
 TERM_PUBLIC void
 TGIF_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;
+    unsigned int sx, sy, ex, ey;
+    int head;
 {
 
     TGIF_flush_poly();

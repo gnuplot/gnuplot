@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.21 2002/12/16 14:18:36 lhecking Exp $
+ * $Id: eepic.trm,v 1.22 2003/04/04 21:19:06 sfeam Exp $
  *
  */
 
@@ -94,7 +94,7 @@ TERM_PUBLIC void EEPIC_point __PROTO((unsigned int x, unsigned int y,
 TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void EEPIC_arrow __PROTO((unsigned int sx, unsigned int sy,
 				      unsigned int ex, unsigned int ey,
-				      TBOOLEAN head));
+				      int head));
 TERM_PUBLIC void EEPIC_put_text __PROTO((unsigned int x, unsigned int y,
 					 const char str[]));
 TERM_PUBLIC int EEPIC_justify_text __PROTO((enum JUSTIFY mode));
@@ -224,7 +224,7 @@ static char GPFAR *GPFAR eepic_colors[EEPIC_NUM_COLORS] =
 /* ARROWS */
 /* we use the same code as for LATEX */
 /* figure out the best arrow */
-static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, TBOOLEAN head));
+static void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who, int head));
 
 TERM_PUBLIC void
 EEPIC_init()
@@ -364,8 +364,8 @@ EEPIC_endline()
 
 TERM_PUBLIC void
 EEPIC_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;
+    unsigned int sx, sy, ex, ey;
+    int head;
 {
     best_latex_arrow(sx, sy, ex, ey, 2, head);	/* call latex routine */
 

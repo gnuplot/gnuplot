@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.13 1999/07/05 13:10:38 lhecking Exp $
+ * $Id: metafont.trm,v 1.14 2002/01/26 19:12:04 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -101,7 +101,7 @@ TERM_PUBLIC void MF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void MF_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void MF_arrow __PROTO((unsigned int sx, unsigned int sy,
 				   unsigned int ex, unsigned int ey,
-				   TBOOLEAN head));
+				   int head));
 TERM_PUBLIC void MF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC void MF_reset __PROTO((void));
 
@@ -464,8 +464,8 @@ unsigned int x, y;
 
 TERM_PUBLIC void
 MF_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;
+    unsigned int sx, sy, ex, ey;
+    int head;
 {
     int delta_x, delta_y;
 

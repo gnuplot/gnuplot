@@ -1,5 +1,5 @@
 /*
- * $Id: gpic.trm,v 1.11 1999/10/29 18:39:39 lhecking Exp $
+ * $Id: gpic.trm,v 1.12 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - gpic.trm -*-C-*- */
@@ -69,7 +69,7 @@ TERM_PUBLIC void GPIC_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void GPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void GPIC_arrow __PROTO((unsigned int sx, unsigned int sy,
 				     unsigned int ex, unsigned int ey,
-				     TBOOLEAN head));
+				     int head));
 TERM_PUBLIC void GPIC_put_text __PROTO((unsigned int x, unsigned int y,
 					const char str[]));
 TERM_PUBLIC int GPIC_justify_text __PROTO((enum JUSTIFY mode));
@@ -215,8 +215,8 @@ unsigned int ux, uy;
 
 TERM_PUBLIC void
 GPIC_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-TBOOLEAN head;
+    unsigned int sx, sy, ex, ey;
+    int head;
 {
     GPIC_close_line();
     if (head) {

@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.22 2003/02/18 16:38:13 broeker Exp $
+ * $Id: metapost.trm,v 1.23 2003/11/13 08:18:18 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -73,7 +73,7 @@ TERM_PUBLIC void MP_linewidth __PROTO((double width));
 TERM_PUBLIC void MP_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void MP_arrow __PROTO((unsigned int sx, unsigned int sy,
 				   unsigned int ex, unsigned int ey,
-				   TBOOLEAN head));
+				   int head));
 TERM_PUBLIC void MP_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
 TERM_PUBLIC int MP_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int MP_text_angle __PROTO((int ang));
@@ -575,6 +575,7 @@ TERM_PUBLIC void
 MP_linetype(int lt)
 {
     int linetype = lt;
+
     if (linetype >= MP_LINE_TYPES)
 	linetype %= MP_LINE_TYPES;
     if (MP_inline)
@@ -672,7 +673,7 @@ MP_endline()
 }
 
 TERM_PUBLIC void
-MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head)
+MP_arrow(unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head)
 {
     MP_move(sx, sy);
     if (head) {

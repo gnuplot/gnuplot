@@ -1,3 +1,39 @@
+2004-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Fix up a blunder exposed by making TBOOLEAN an actual boolean
+	type: the TBOOLEAN argument "head" of term->arrow() was misused as
+	an integer.
+	
+	* src/term_api.h (TERMENTRY): Change type of argument "head" of
+	function pointer "arrow" to int.
+
+	* src/term.c (do_arrow): Changed type of argument 'head' to int.
+
+	* term/tpic.trm (TPIC_arrow): Likewise.
+
+	* term/tgif.trm (TGIF_arrow): Likewise.
+
+	* term/texdraw.trm (TEXDRAW_arrow): Likewise.
+
+	* term/pstricks.trm (PSTRICKS_arrow): Likewise.
+
+	* term/metapost.trm (MP_arrow): Likewise.
+
+	* term/metafont.trm (MF_arrow): Likewise.
+
+	* term/latex.trm (LATEX_arrow): Likewise.
+	(best_latex_arrow): Likewise.
+
+	* term/gpic.trm (GPIC_arrow): Likewise.
+
+	* term/fig.trm (FIG_arrow): Likewise.
+
+	* term/epslatex.trm (EPSL_arrow): Likewise.
+
+	* term/eepic.trm (EEPIC_arrow): Likewise.
+
+	* term/dumb.trm (DUMB_arrow): Likewise.
+
 2004-03-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Further fixes to enhanced text mode. Revise option
