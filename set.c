@@ -2403,7 +2403,7 @@ static void set_arrow()
     TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0;
 
     /* Init struct lp_style_type loc_lp */
-    reset_lp_properties (&arg);
+    reset_lp_properties (&loc_lp);
 
     /* get tag */
     if (!END_OF_COMMAND
@@ -2598,7 +2598,7 @@ static void set_linestyle()
     int tag;
 
     /* Init struct lp_style_type loc_lp */
-    reset_lp_properties (&arg);
+    reset_lp_properties (&loc_lp);
 
     /* get tag */
     if (!END_OF_COMMAND) {
