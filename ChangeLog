@@ -1,5 +1,8 @@
 2005-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* src/plot.c (RexxInterface): Replace input_line[] by gp_input_line[]
+	in code sections which are only compiled on OS/2.
+
 	* src/os2/gclient.c (ParseText): Fix super- and subscripts in enhanced
 	mode of the pm terminal.
 

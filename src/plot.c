@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.71 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.72 2004/08/25 22:33:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -439,7 +439,7 @@ main(int argc, char **argv)
     /* If the terminal was specified via GNUTERM, this is the only chance we */
     /* get to initialize things such as default fonts done in term->options. */
     /* Without this, the gd and tgif drivers (any others?) cause a segfault. */
-    /* Note that input_line[] is blank at this point.           EAM Aug 2004 */
+    /* Note that gp_input_line[] is blank at this point.           EAM Aug 2004 */
     if (!strcmp(term->name,"png") || !strcmp(term->name,"jpeg") || !strcmp(term->name,"tgif"))
 	(term->options)();
 
@@ -901,14 +901,14 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 
     memcpy(keepenv, command_line_env, sizeof(JMP_BUF));
     if (!SETJMP(command_line_env, 1)) {
-	/* Set variable input_line.
+	/* Set variable gp_input_line.
 	   Watch out for line length of NOT_ZERO_TERMINATED strings ! */
 	cmdlen = rxCmd->strlength + 1;
 	/* FIXME HBB 20010121: 3rd argument doesn't make sense. Either
-	 * this should be input_line_len, or it shouldn't use
+	 * this should be gp_input_line_len, or it shouldn't use
 	 * safe_strncpy(), here */
-	safe_strncpy(input_line, rxCmd->strptr, cmdlen);
-	input_line[cmdlen] = NUL;
+	safe_strncpy(gp_input_line, rxCmd->strptr, cmdlen);
+	gp_input_line[cmdlen] = NUL;
 	rc = do_line();
 	*pusErr = RXSUBCOM_OK;
 	rxRc->strptr[0] = rc + '0';
