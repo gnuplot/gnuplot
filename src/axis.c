@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.13 2001/05/25 13:56:25 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.14 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -611,7 +611,8 @@ gprintf(dest, count, format, log10_base, x)
 
 		t[0] = 'f';
 		t[1] = 0;
-		mant_exp(log10_base, x, FALSE, &mantissa, NULL, NULL);
+		mant_exp(log10_base, x, FALSE, &mantissa, &stored_power, temp);
+		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
 		break;
 	    }
@@ -649,7 +650,10 @@ gprintf(dest, count, format, log10_base, x)
 
 		t[0] = 'd';
 		t[1] = 0;
-		mant_exp(log10_base, x, FALSE, NULL, &power, NULL);
+		if (seen_mantissa)
+		    power = stored_power;
+		else
+		    mant_exp(log10_base, x, FALSE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
 		break;
 	    }

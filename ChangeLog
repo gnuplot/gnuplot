@@ -1,3 +1,10 @@
+2001-06-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (gprintf): Added code to make use of new features of
+ 	mant_exp() introduced Jan 21st this year, for %l and %L formats.
+  	Helps to avoid problems where people use %L even though the
+ 	logbase is 10.
+
 2001-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/x11.trm (X11_waitforinput): Call getc() instead of read(),
