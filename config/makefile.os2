@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.34 2002/06/08 16:16:49 mikulik Exp $
+# $Id: makefile.os2,v 1.35 2002/09/26 19:10:07 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -315,11 +315,14 @@ ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
 
-gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor.o
-	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
+gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor_x11.o
+	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ -DGPLT_X11_MODE $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c mouse.h gpexecute.h config.h
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<
+
+getcolor_x11.o: getcolor.c
+	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -DGPLT_X11_MODE -c -o $@ $<
 
 #
 # Create config.h

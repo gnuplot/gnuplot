@@ -1,3 +1,8 @@
+2002-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.os2: Use temporary getcolor_x11.c when compiling
+	gnuplot_x11.exe.
+
 2002-10-04  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/set.c src/setshow.h src/unset.c: 
@@ -1211,7 +1216,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/05 00:12:01 $).
+	last modification date (from the tag $Date: 2002/10/05 02:59:33 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
