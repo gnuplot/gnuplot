@@ -64,6 +64,7 @@ ERRORFIX = @ERRORFIX@
 GNUPLOT_BE = @GNUPLOT_BE@
 GNUPLOT_X11 = @GNUPLOT_X11@
 LASERGNU = @LASERGNU@
+LATEX = @LATEX@
 LIBRARIES_FOR_X = @LIBRARIES_FOR_X@
 LINUXSUID = @LINUXSUID@
 MAKEINFO = @MAKEINFO@
@@ -77,7 +78,7 @@ lispdir = @lispdir@
 
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-SUBDIRS = config demo docs lisp m4 man src term tutorial
+SUBDIRS = config demo m4 term src docs man tutorial lisp
 
 # Remove this file here (it is created via configure), not from within intl.
 # DISTCLEANFILES = intl/libintl.h
