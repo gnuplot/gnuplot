@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.173 2005/11/25 18:54:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.174 2006/01/03 20:18:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5081,13 +5081,13 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	return;
     }
 
-    view_port_x[0] = (X_AXIS.autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
-    view_port_x[1] = (X_AXIS.autoscale & AUTOSCALE_MAX) ? X_AXIS.max : X_AXIS.set_max;
-    view_port_y[0] = (Y_AXIS.autoscale & AUTOSCALE_MIN) ? Y_AXIS.min : Y_AXIS.set_min;
-    view_port_y[1] = (Y_AXIS.autoscale & AUTOSCALE_MAX) ? Y_AXIS.max : Y_AXIS.set_max;
+    view_port_x[0] = (X_AXIS.set_autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
+    view_port_x[1] = (X_AXIS.set_autoscale & AUTOSCALE_MAX) ? X_AXIS.max : X_AXIS.set_max;
+    view_port_y[0] = (Y_AXIS.set_autoscale & AUTOSCALE_MIN) ? Y_AXIS.min : Y_AXIS.set_min;
+    view_port_y[1] = (Y_AXIS.set_autoscale & AUTOSCALE_MAX) ? Y_AXIS.max : Y_AXIS.set_max;
     if (project_points) {
-	view_port_z[0] = (Z_AXIS.autoscale & AUTOSCALE_MIN) ? Z_AXIS.min : Z_AXIS.set_min;
-	view_port_z[1] = (Z_AXIS.autoscale & AUTOSCALE_MAX) ? Z_AXIS.max : Z_AXIS.set_max;
+	view_port_z[0] = (Z_AXIS.set_autoscale & AUTOSCALE_MIN) ? Z_AXIS.min : Z_AXIS.set_min;
+	view_port_z[1] = (Z_AXIS.set_autoscale & AUTOSCALE_MAX) ? Z_AXIS.max : Z_AXIS.set_max;
     }
 
     if (rectangular_image) {

@@ -1,3 +1,8 @@
+2005-01-23  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* src/graphics.c (plot_image_or_update_axes): Fix for
+	"plot [from:to] [from:to] ... with image".
+
 2006-01-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c (do_3dplot): The mistake of missing blank lines in a
