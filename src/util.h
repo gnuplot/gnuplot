@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.15 2004/04/13 17:24:02 broeker Exp $
+ * $Id: util.h,v 1.16 2004/07/01 17:10:09 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -56,6 +56,8 @@ extern TBOOLEAN screen_ok;
 
 /* decimal sign */
 extern char *decimalsign;
+
+extern const char *current_prompt; /* needed by is_error() and friends */
 
 /* Functions exported by util.c: */
 

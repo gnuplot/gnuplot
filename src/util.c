@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.42 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.42.2.1 2004/07/15 13:21:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -56,6 +56,7 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.42 2004/07/01 17:10:08 broe
 /* decimal sign */
 char *decimalsign = NULL;
 
+const char *current_prompt = NULL; /* to be set by read_line() */
 
 /* internal prototypes */
 
@@ -697,20 +698,20 @@ gprintf(
  * may turn this into a utility function later
  */
 #define PRINT_SPACES_UNDER_PROMPT		\
-{						\
-    size_t i;					\
+do {						\
+    const char *p;				\
 						\
-    for (i = 0; i < sizeof(PROMPT) - 1; i++)	\
+    for (p = current_prompt; *p != '\0'; p++)	\
 	(void) fputc(' ', stderr);		\
-}
+} while (0)
 
 #define PRINT_SPACES_UPTO_TOKEN						\
-{									\
+do {									\
     int i;								\
 									\
     for (i = 0; i < token[t_num].start_index; i++)			\
 	(void) fputc((input_line[i] == '\t') ? '\t' : ' ', stderr);	\
-}
+} while(0)
 
 #define PRINT_CARET fputs("^\n",stderr);
 
@@ -748,7 +749,7 @@ os_error(int t_num, const char *str, va_dcl)
 	df_showdata();
     } else if (t_num != NO_CARET) {	/* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -803,7 +804,7 @@ int_error(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
@@ -847,7 +848,7 @@ int_warn(int t_num, const char str[], va_dcl)
         df_showdata();
     } else if (t_num != NO_CARET) { /* put caret under error */
 	if (!screen_ok)
-	    fprintf(stderr, "\n%s%s\n", PROMPT, input_line);
+	    fprintf(stderr, "\n%s%s\n", current_prompt, input_line);
 
 	PRINT_SPACES_UNDER_PROMPT;
 	PRINT_SPACES_UPTO_TOKEN;
