@@ -1,3 +1,16 @@
+2002-01-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* FAQ: Updated to current version.
+
+	* tutorial/Makefile.am.in: Rename PLT_SOURCES to PLT_FILES and add
+	target for pdf.
+
+	* specfun.c: Remove all code that was labeled for non-commercial use
+	only (lgamneg, lgampos, lngamma, inverse_normal_func,
+	inverse_error_func). This means that the gamma, inverse normal, and
+	inverse error function are not available anymore on platforms that
+	don't have native implementations.
+
 2002-01-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/doc2tex.c: Replace typesetting of _ from "{\tt\_}" to "\_".
@@ -57,7 +70,8 @@
 
 	* src/graphics.c: Make finish_filled_curve() static.
 
-	* src/version.c: Increment version to 3.8i, update date and copyright.
+	* VERSION, src/version.c: Increment version to 3.8i, update date
+	and copyright.
 
 	* m4/path-hdr.m4, m4/path-lib.m4: Remove.
 
