@@ -1,12 +1,12 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gnupmdrv.c,v 1.10 1998/03/22 22:34:23 drd Exp $" ;
+static char RCSid[]="$Id: gnupmdrv.c,v 1.1 1999/03/26 22:15:46 lhecking Exp $" ;
 #endif
 
 /****************************************************************************
 
     PROGRAM: gnupmdrv
     
-    Outboard PM driver for GNUPLOT 3.3
+    Outboard PM driver for GNUPLOT 3.x
 
     MODULE:  gnupmdrv.c
         
@@ -86,8 +86,6 @@ int  bEnhanced=0 ;
 /*==== l o c a l    d a t a ==================================================*/
 
             /* class names for window registration */
-
-static char szChildName []     = "Gnuchild" ;
 
 static char szTitle[256] = "Gnuplot" ;
 
@@ -260,12 +258,15 @@ static HWND InitHelp( HAB hab, HWND hwnd )
     /* should be bigger or dynamic */
     static char helppath[256] ;
     char *p;
-    if( (p=getenv("GNUPLOT")) != NULL ) {
-	strcpy( helppath, p ) ;
-        strcat( helppath, "/" ) ;
-        strcat( helppath, helpinit.pszHelpLibraryName ) ;
-        helpinit.pszHelpLibraryName = helppath ;
-        }    
+    _execname(helppath, sizeof(helppath));
+    _fnslashify(helppath);
+    p=strrchr(helppath, '/');
+    if (p)
+       *p='\0';
+    strcat( helppath, "/" ) ;
+    strcat( helppath, helpinit.pszHelpLibraryName ) ;
+    helpinit.pszHelpLibraryName = helppath ;
+
     hwndHelp = WinCreateHelpInstance( hab, &helpinit ) ;
     WinAssociateHelpInstance( hwndHelp, hwnd ) ;
     return hwndHelp ;

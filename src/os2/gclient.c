@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.14 2001/09/03 19:41:16 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.15 2001/12/01 13:08:59 amai Exp $" ;
 #endif
 
 /****************************************************************************
@@ -161,7 +161,6 @@ static LONG alColourTable[ nColors+2  ] ;
 #define   GNUBUF    1024        /* buffer for gnuplot commands */
 #define   PIPEBUF   4096        /* size of pipe buffers */
 #define   CMDALLOC  4096        /* command buffer allocation increment (ints) */
-#define   ENVSIZE   2048        /* size of environment */ 
 
 #define   PAUSE_DLG 1           /* pause handled in dialog box */
 #define   PAUSE_BTN 2           /* pause handled by menu item */

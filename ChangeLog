@@ -1,3 +1,9 @@
+2002-02-15  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* src/command.c src/plot.c src/os2/dialogs.c src/os2/gclient.c
+	src/os2/gnupmdrv.c src/os2/gnupmdrv.h: Clean up procedure to find 
+	help files on OS/2. Convert //-style comments to /**/
+
 2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graphics.c src/mouse.c src/plot3d.c src/save.c src/show.c:

@@ -1,6 +1,5 @@
-/* gnushell header file */
 /*
-** static char RCSid[]="$Id: gnupmdrv.h,v 1.2 1999/04/04 17:29:52 lhecking Exp $" ;
+** static char RCSid[]="$Id: gnupmdrv.h,v 1.3 1999/09/21 18:24:40 lhecking Exp $" ;
 */
 
 /* PM driver for GNUPLOT */
@@ -78,8 +77,6 @@
 #define GNUQUEUE    "\\queues\\gnuplot"     /* queue for gnuplot termination */
 #define GNUSEM      "\\sem32\\gnuplot.sem"  /* synch gnuplot and gnupmdrv */
 #define GNUINI      "GNUPMDRV.INI"          /* ini filename */
-#define ENVGNUHELP  "GNUHELP"               /* gnuplot help envionment name */
-#define ENVGNUPLOT  "GNUPLOT"               /* general gnuplot environment */
 #define GNUEXEFILE  "gnuplot.exe"           /* exe file name */
 #define GNUHELPFILE "gnuplot.gih"           /* help file name */
 #define GNUTERMINIT "GNUTERM=pm"            /* terminal setup string */
@@ -87,7 +84,7 @@
 #define APP_NAME     "GnuplotPM"            /* application name */
 #define CHILD_NAME   "GnupltChild"          /* child window name */
 
-        // profile (ini file) names 
+        /* profile (ini file) names  */
 #define INISHELLPOS  "PosShell"
 #define INIPAUSEPOS  "PosPause"
 #define INIPLOTPOS   "PosPlot"
@@ -97,23 +94,23 @@
 #define INIPRPR      "Printer"  
 #define INIOPTS      "DefOpts"      
 #define INICHAR      "Fontdata"      
-#define INIKEEPRATIO "KeepRatio"	//PM      
-#define INIUSEMOUSE  "UseMouse"		//PM      
-#define INIMOUSECOORD "MouseCoord"	//PM      
+#define INIKEEPRATIO "KeepRatio"	/* PM */
+#define INIUSEMOUSE  "UseMouse"	/* PM */
+#define INIMOUSECOORD "MouseCoord"	/* PM */
 
 
 /*==== global data  ==========================================================*/
 
-HAB         hab ;                   // application anchor block handle 
-HWND   	    hApp ;                  // application window handle 
-HWND        hwndFrame ;             // frame window handle 
+HAB         hab ;               /* application anchor block handle */
+HWND   	    hApp ;          /* application window handle */
+HWND        hwndFrame ;         /* frame window handle */
 #define   FONTBUF   256         /* buffer for dropped font namesize */
-#define     GNUXPAGE  19500       /* width of plot area in 0.01 cm */
-#define     GNUYPAGE  12500       /* height of plot area in 0.01 cm */
+#define     GNUXPAGE  19500     /* width of plot area in 0.01 cm */
+#define     GNUYPAGE  12500     /* height of plot area in 0.01 cm */
 
 /*==== stuff for querying printer capability =================================*/
 
-typedef struct {  //query data for printer setup
+typedef struct {  /* query data for printer setup */
     int   cbStruct ;       /* size of struct */
     float xsize ;
     float ysize ;
@@ -132,7 +129,7 @@ typedef struct {  //query data for printer setup
 
 /*==== stuff for pause dialogs =================================*/
 
-typedef struct {  //pause data for dialog box
+typedef struct {  /* pause data for dialog box */
     int   cbStruct ;       /* size of struct */
     char  *pszMessage ;    /* pause message */
     PSWP  pswp ;           /* dialog box position */
@@ -160,5 +157,3 @@ MRESULT EXPENTRY SendCommandDlgProc( HWND, ULONG, MPARAM, MPARAM ) ;
 void WinSetDlgItemFloat( HWND, USHORT, float ) ;
 void WinSetDlgItemFloatF( HWND, USHORT, int, float ) ;
 void WinQueryDlgItemFloat( HWND, USHORT, float* ) ;
-
-

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.50 2002/02/04 11:53:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.51 2002/02/15 17:15:12 amai Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -178,7 +178,6 @@ static int exit_status = EXIT_SUCCESS;
 static ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 TBOOLEAN CallFromRexx = FALSE;
 void PM_intc_cleanup(void);
-void PM_setup(void);
 #endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
@@ -309,7 +308,6 @@ char **argv;
     if (rc != 0)
       fputs("DosCreateEventSem error\n",stderr);
 #endif
-    PM_setup();
     rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
 #endif
 

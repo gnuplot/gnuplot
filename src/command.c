@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.57 2002/02/14 16:42:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.58 2002/02/15 17:15:11 amai Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1604,6 +1604,24 @@ help_command()
     help_ptr = HELPFILE;
 #   endif			/* ATARI || MTOS */
 #  endif			/* __TURBOC__ */
+#ifdef OS2
+  {
+  /* look in the path where the executable lives */
+  static char buf[MAXPATHLEN]; 
+  char *ptr;
+  
+  _execname(buf, sizeof(buf));
+  _fnslashify(buf);
+  ptr=strrchr(buf, '/');
+  if (ptr) {
+     *(ptr+1)='\0';
+     strcat(buf, HELPFILE);
+     help_ptr=&buf[0];
+  }
+  else
+     help_ptr = HELPFILE;
+  }
+#endif
 /* end of patch  - DJL */
 
 # else				/* !SHELFIND */
