@@ -1,3 +1,7 @@
+2003-06-15  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/gd.h: Fix FPRINTF typo.
+
 2003-06-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* command.c do_string_replot(): Dynamically allocate temporary input

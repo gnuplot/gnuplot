@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.28 2003/04/13 20:22:45 sfeam Exp $
+ * $Id: gd.trm,v 1.29 2003/04/25 03:23:01 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -779,8 +779,8 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 	    (int)( palette->color[i].g * 255 + 0.5 ), /* terminal are [0;255] */
 	    (int)( palette->color[i].b * 255 + 0.5 ) );
 	if (png_smooth_color[i] < 0) { /* this should never happen! take away? */
-	    FPRINTF("png_smooth_color[i]<0 cannot happen")
-		exit(1);
+	    FPRINTF((stderr,"png_smooth_color[i]<0 cannot happen"));
+	    exit(1);
 	}
 #if 0
 	fprintf(stderr,"ALLOCATED: i=%i\t=> pal_index=%i\tr=%g g=%g b=%g\n",
