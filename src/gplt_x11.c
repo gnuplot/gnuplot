@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.70 2003/10/31 10:13:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.71 2003/11/13 08:18:15 mikulik Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -107,6 +107,11 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.70 2003/10/31 10:13:09 
 
 /* Polyline support May 2003 
  * Ethan Merritt <merritt@u.washington.edu>
+ */
+
+/* Dynamically created windows July 2003
+ * Across-pipe title text and close command October 2003
+ * Dan Sebald <daniel.sebald@ieee.org>
  */
 
 #include "syscfg.h"
@@ -262,7 +267,7 @@ typedef struct plot_struct {
     unsigned int px, py;
     int ncommands, max_commands;
     char **commands;
-    char titlestring[0x40];
+    char *titlestring;
 #ifdef USE_MOUSE
     int button;			/* buttons which are currently pressed */
     char str[0xff];		/* last displayed string */
@@ -297,7 +302,35 @@ typedef struct plot_struct {
     int axis_mask;		/* Bits set to show which axes are active */
     axis_scale_t axis_scale[2*SECOND_AXES];
 #endif
+    struct plot_struct *prev_plot;  /* Linked list pointers and number */
+    struct plot_struct *next_plot;
+    int plot_number;
 } plot_struct;
+
+static plot_struct *Add_Plot_To_Linked_List __PROTO((int plot_number));
+static void Remove_Plot_From_Linked_List __PROTO((Window plot_window));
+static plot_struct *Find_Plot_In_Linked_List_By_Number __PROTO((int plot_number));
+static plot_struct *Find_Plot_In_Linked_List_By_Window __PROTO((Window plot_window));
+
+static struct plot_struct *current_plot = NULL;
+static struct plot_struct *list_start = NULL;
+
+/* information about window/plot to be removed */
+typedef struct plot_remove_struct {
+    Window plot_window_to_remove;
+    struct plot_remove_struct *next_remove;
+    int processed;
+} plot_remove_struct;
+
+static void Add_Plot_To_Remove_FIFO_Queue __PROTO((Window plot_window));
+static void Process_Remove_FIFO_Queue __PROTO((void));
+
+static struct plot_remove_struct *remove_fifo_queue_start = NULL;
+static int process_remove_fifo_queue = 0;
+
+/* These might work better as fuctions, but defines will do for now. */
+#define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
+#define ERROR_NOTICE_NEWLINE(str) "\n                     " str
 
 #ifdef USE_MOUSE
 enum { NOT_AVAILABLE = -1 };
@@ -370,7 +403,6 @@ static void DrawRotated __PROTO((Display *dpy, Drawable d, GC gc, int xdest,
 	    int ydest, const char *str, int len, int angle, enum JUSTIFY just));
 static void exec_cmd __PROTO((plot_struct *, char *));
 
-static plot_struct *find_plot __PROTO((Window window));
 static void reset_cursor __PROTO((void));
 
 static void preset __PROTO((int argc, char *argv[]));
@@ -406,8 +438,6 @@ static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 #define Ndashes 10
 static char dashes[Ndashes][5];
-
-#define MAX_WINDOWS 16
 
 #ifdef PM3D
 /* these must match the definitions in x11.trm */
@@ -449,11 +479,6 @@ static char *visual_name[] = {
     (char *) 0
 };
 #endif /* PM3D */
-
-
-static struct plot_struct plot_array[MAX_WINDOWS];
-static struct plot_struct *current_plot = NULL;
-
 
 static Display *dpy;
 static int scr;
@@ -792,6 +817,14 @@ mainloop()
 	    gp_exec_event(GE_pending, 0, 0, 0, 0);
 	}
 #endif
+	/* A method in which the ErrorHandler can queue plots to be
+	   removed from the linked list.  This prevents the situation
+	   that could arise if the ErrorHandler directly removed
+	   plots and some other part of the program were utilizing
+	   a pointer to a plot that was destroyed. */
+	if (process_remove_fifo_queue) {
+	    Process_Remove_FIFO_Queue();
+	}
     }
 }
 
@@ -942,11 +975,17 @@ delete_plot(plot_struct *plot)
 {
     int i;
 
-    FPRINTF((stderr, "Delete plot %d\n", plot - plot_array));
+    FPRINTF((stderr, "Delete plot %d\n", plot->plot_number));
 
     for (i = 0; i < plot->ncommands; ++i)
 	free(plot->commands[i]);
     plot->ncommands = 0;
+
+    /* Free up memory for window title. */
+    if (plot->titlestring) {
+	free(plot->titlestring);
+	plot->titlestring = 0;
+    }
 
     if (plot->window) {
 	FPRINTF((stderr, "Destroy window 0x%x\n", plot->window));
@@ -1009,19 +1048,6 @@ prepare_plot(plot_struct *plot, int term_number)
     if (!plot->window) {
 	plot->cmap = &cmap;	/* default color space */
 	pr_window(plot);
-
-	/* append the X11 terminal number (if greater than zero) */
-
-	if (term_number) {
-	    char new_name[0xf];
-	    sprintf(plot->titlestring, "%.55s%3d", plot->titlestring, term_number);
-	    FPRINTF((stderr, "term_number  is %d\n", term_number));
-
-	    XStoreName(dpy, plot->window, plot->titlestring);
-
-	    sprintf(new_name, "gplt%3d", term_number);
-	    XSetIconName(dpy, plot->window, new_name);
-	}
 #ifdef USE_MOUSE
 	/*
 	 * set all mouse parameters
@@ -1059,7 +1085,7 @@ store_command(char *buffer, plot_struct *plot)
 {
     char *p;
 
-    FPRINTF((stderr, "Store in %d : %s", plot - plot_array, buffer));
+    FPRINTF((stderr, "Store in %d : %s", plot->plot_number, buffer));
 
     if (plot->ncommands >= plot->max_commands) {
 	plot->max_commands = plot->max_commands * 2 + 1;
@@ -1234,11 +1260,10 @@ scan_palette_from_buf( plot_struct *plot )
 /*
  * record - record new plot from gnuplot inboard X11 driver (Unix)
  */
+static struct plot_struct *plot = NULL;
 static int
 record()
 {
-    static plot_struct *plot = plot_array;
-
     while (1) {
 	int status = read_input();
 	if (status == -2)
@@ -1259,11 +1284,11 @@ record()
 		sscanf(buf, "G%d %lu", &plot_number, &gnuplotXID);
 #endif
 #endif
-		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
-		    plot_number = 0;
 		FPRINTF((stderr, "plot for window number %d\n", plot_number));
-		plot = plot_array + plot_number;
-		prepare_plot(plot, plot_number);
+		if (!(plot = Find_Plot_In_Linked_List_By_Number(plot_number)))
+		    plot = Add_Plot_To_Linked_List(plot_number);
+		if (plot)
+		    prepare_plot(plot, plot_number);
 		current_plot = plot;
 #ifdef OS2_IPC
 		if (!input_from_PM_Terminal) {	/* get shared memory */
@@ -1281,39 +1306,79 @@ record()
 		 * string is reset to the default at the end of
 		 * display(). We should make this configurable!
 		 */
-		if (plot->window) {
-		    char msg[0xff];
-		    strcpy(msg, plot->titlestring);
-		    strcat(msg, " drawing ...");
-		    XStoreName(dpy, plot->window, msg);
+		if (plot) {
+		    if (plot->window) {
+			char *msg;
+			char *added_text = " drawing ...";
+			int orig_len = (plot->titlestring ? strlen(plot->titlestring : 0);
+			if (msg = (char *) malloc(orig_len + strlen(added_text) + 1) {
+			    strcpy(msg, plot->titlestring);
+			    strcat(msg, added_text);
+			    XStoreName(dpy, plot->window, msg);
+			    free(msg);
+			} else
+			    XStoreName(dpy, plot->window, added_text + 1);
+		    }
 		}
 #else
 		if (!button_pressed) {
 		    cursor_save = cursor;
 		    cursor = cursor_waiting;
-		    XDefineCursor(dpy, plot->window, cursor);
+		    if (plot)
+			XDefineCursor(dpy, plot->window, cursor);
 		}
 #endif
 #endif
 		/* continue; */
+		/* return 1; To do: Should a "return" be here?  Gnuplot usually sends 'G' followed by other commands.  So perhaps not needed. DJS */
 	    }
 	    break;
 	case 'N':		/* just update the plot number */
 	    {
 		int itmp;
-		if (sscanf(buf, "N%d", &itmp)) {
-		    if (itmp < 0 || itmp >= MAX_WINDOWS)
-			itmp = 0;
-		    current_plot = plot_array + itmp;
+		if (strcspn(buf+1," \n") && sscanf(buf, "N%d", &itmp))
+		    current_plot = Add_Plot_To_Linked_List(itmp);
+		return 1;
+	    }
+	    break;
+	case 'C':		/* close the plot with given number */
+	    {
+		int itmp;
+		if (strcspn(buf+1," \n") && sscanf(buf, "C%d", &itmp)) {
+		  plot_struct *psp;
+		  if (psp = Find_Plot_In_Linked_List_By_Number(itmp))
+		    Remove_Plot_From_Linked_List(psp->window);
+		} else if (current_plot) {
+		  Remove_Plot_From_Linked_List(current_plot->window);
 		}
+		return 1;
+	    }
+	    break;
+	case 'n':		/* update the plot name (title) */
+	    {
+		if (!current_plot)
+		    current_plot = Add_Plot_To_Linked_List(0);
+		if (current_plot) {
+		    char *cp;
+		    if (current_plot->titlestring)
+			free(current_plot->titlestring);
+		    if (current_plot->titlestring = (char *) malloc(strlen(buf+1) + 1) ) {
+			strcpy(current_plot->titlestring, buf+1);
+			cp = current_plot->titlestring;
+		    } else
+			cp = "<lost name>";
+		    if (current_plot->window)
+			XStoreName(dpy, current_plot->window, cp);
+		}
+		return 1;
 	    }
 	    break;
 	case 'E':		/* leave graphics mode / suspend */
-	    display(plot);
+	    if (plot)
+		display(plot);
 #ifdef USE_MOUSE
-	    if (plot == current_plot) {
+	    if (plot == current_plot)
 		gp_exec_event(GE_plotdone, 0, 0, 0, 0);	/* notify main program */
-	    }
 #endif
 	    return 1;
 	case 'R':		/* leave x11 mode */
@@ -1322,13 +1387,15 @@ record()
 
 #ifdef PM3D
 	case X11_GR_MAKE_PALETTE:
-	    scan_palette_from_buf( plot );
+	    if (plot)
+		scan_palette_from_buf( plot );
 	    return 1;
 #if 0
 	case X11_GR_RELEASE_PALETTE:
 	    /* turn pm3d off */
 	    FPRINTF((stderr, "X11_GR_RELEASE_PALETTE\n"));
-	    ReleaseColormap(plot);
+	    if (plot)
+		ReleaseColormap(plot);
 	    sm_palette.colorMode = SMPAL_COLOR_MODE_NONE;
 	    free( sm_palette.gradient );
 	    return 1;
@@ -1358,37 +1425,39 @@ record()
 		/* `set cursor' */
 		int c, x, y;
 		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
-		switch (c) {
-		case -2:	/* warp pointer */
-		    XWarpPointer(dpy, None /* src_w */ ,
-				 plot->window /* dest_w */ , 0, 0, 0, 0, X(x), Y(y));
-		case -1:	/* zoombox */
-		    plot->zoombox_x1 = plot->zoombox_x2 = X(x);
-		    plot->zoombox_y1 = plot->zoombox_y2 = Y(y);
-		    plot->zoombox_on = TRUE;
-		    DrawBox(plot);
-		    break;
-		case 0:	/* standard cross-hair cursor */
-		    cursor = cursor_default;
-		    XDefineCursor(dpy, plot->window, cursor);
-		    break;
-		case 1:	/* cursor during rotation */
-		    cursor = cursor_exchange;
-		    XDefineCursor(dpy, plot->window, cursor);
-		    break;
-		case 2:	/* cursor during scaling */
-		    cursor = cursor_sizing;
-		    XDefineCursor(dpy, plot->window, cursor);
-		    break;
-		case 3:	/* cursor during zooming */
-		    cursor = cursor_zooming;
-		    XDefineCursor(dpy, plot->window, cursor);
-		    break;
-		}
-		if (c >= 0 && plot->zoombox_on) {
-		    /* erase zoom box */
-		    DrawBox(plot);
-		    plot->zoombox_on = FALSE;
+		if (plot) {
+		    switch (c) {
+		    case -2:	/* warp pointer */
+			XWarpPointer(dpy, None /* src_w */ ,
+				     plot->window /* dest_w */ , 0, 0, 0, 0, X(x), Y(y));
+		    case -1:	/* zoombox */
+			plot->zoombox_x1 = plot->zoombox_x2 = X(x);
+			plot->zoombox_y1 = plot->zoombox_y2 = Y(y);
+			plot->zoombox_on = TRUE;
+			DrawBox(plot);
+			break;
+		    case 0:	/* standard cross-hair cursor */
+			cursor = cursor_default;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 1:	/* cursor during rotation */
+			cursor = cursor_exchange;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 2:	/* cursor during scaling */
+			cursor = cursor_sizing;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 3:	/* cursor during zooming */
+			cursor = cursor_zooming;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    }
+		    if (c >= 0 && plot->zoombox_on) {
+			/* erase zoom box */
+			DrawBox(plot);
+			plot->zoombox_on = FALSE;
+		    }
 		}
 	    }
 	    return 1;
@@ -1403,42 +1472,44 @@ record()
 		if (sscanf(buf, "t%4d", &where) != 1)
 		    return 1;
 		buf[strlen(buf) - 1] = 0;	/* remove trailing \n */
-		switch (where) {
-		case 0:
-		    DisplayCoords(plot, buf + 5);
-		    break;
-		case 1:
-		    second = strchr(buf + 5, '\r');
-		    if (second == NULL) {
-			*(plot->zoombox_str1a) = '\0';
-			*(plot->zoombox_str1b) = '\0';
+		if (plot) {
+		    switch (where) {
+		    case 0:
+			DisplayCoords(plot, buf + 5);
+			break;
+		    case 1:
+			second = strchr(buf + 5, '\r');
+			if (second == NULL) {
+			    *(plot->zoombox_str1a) = '\0';
+			    *(plot->zoombox_str1b) = '\0';
+			    break;
+			}
+			*second = 0;
+			second++;
+			if (plot->zoombox_on)
+			    DrawBox(plot);
+			strcpy(plot->zoombox_str1a, buf + 5);
+			strcpy(plot->zoombox_str1b, second);
+			if (plot->zoombox_on)
+			    DrawBox(plot);
+			break;
+		    case 2:
+			second = strchr(buf + 5, '\r');
+			if (second == NULL) {
+			    *(plot->zoombox_str2a) = '\0';
+			    *(plot->zoombox_str2b) = '\0';
+			    break;
+			}
+			*second = 0;
+			second++;
+			if (plot->zoombox_on)
+			    DrawBox(plot);
+			strcpy(plot->zoombox_str2a, buf + 5);
+			strcpy(plot->zoombox_str2b, second);
+			if (plot->zoombox_on)
+			    DrawBox(plot);
 			break;
 		    }
-		    *second = 0;
-		    second++;
-		    if (plot->zoombox_on)
-			DrawBox(plot);
-		    strcpy(plot->zoombox_str1a, buf + 5);
-		    strcpy(plot->zoombox_str1b, second);
-		    if (plot->zoombox_on)
-			DrawBox(plot);
-		    break;
-		case 2:
-		    second = strchr(buf + 5, '\r');
-		    if (second == NULL) {
-			*(plot->zoombox_str2a) = '\0';
-			*(plot->zoombox_str2b) = '\0';
-			break;
-		    }
-		    *second = 0;
-		    second++;
-		    if (plot->zoombox_on)
-			DrawBox(plot);
-		    strcpy(plot->zoombox_str2a, buf + 5);
-		    strcpy(plot->zoombox_str2b, second);
-		    if (plot->zoombox_on)
-			DrawBox(plot);
-		    break;
 		}
 	    }
 	    return 1;
@@ -1448,17 +1519,19 @@ record()
 	    if (!pipe_died)
 #endif
 	    {
-		int x, y;
-		DrawRuler(plot);	/* erase previous ruler */
-		sscanf(buf, "r%4d%4d", &x, &y);
-		if (x < 0)
-		    plot->ruler_on = FALSE;
-		else {
-		    plot->ruler_on = TRUE;
-		    plot->ruler_x = x;
-		    plot->ruler_y = y;
+		if (plot) {
+		    int x, y;
+		    DrawRuler(plot);	/* erase previous ruler */
+		    sscanf(buf, "r%4d%4d", &x, &y);
+		    if (x < 0)
+			plot->ruler_on = FALSE;
+		    else {
+			plot->ruler_on = TRUE;
+			plot->ruler_x = x;
+			plot->ruler_y = y;
+		    }
+		    DrawRuler(plot);	/* draw new one */
 		}
-		DrawRuler(plot);	/* draw new one */
 	    }
 	    return 1;
 
@@ -1474,7 +1547,8 @@ record()
 		XStoreBytes(dpy, buf + 1, len);
 		XFlush(dpy);
 #ifdef EXPORT_SELECTION
-		export_graph(plot);
+		if (plot)
+		    export_graph(plot);
 #endif
 	    }
 	    return 1;
@@ -1488,22 +1562,25 @@ record()
 		while (*c <= ' ') *c-- = '\0';
 		strncpy(default_font,&buf[2],strlen(&buf[2])+1);
 		pr_font(NULL);
-		/* EAM FIXME - this is all out of order; initialization doesnt */
-		/*             happen until term->graphics() is called.        */
-		xscale = (plot->width > 0) ? plot->width / 4096. : gW / 4096.;
-		yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
-		scaled_hchar = (1.0/xscale) * hchar;
-		scaled_vchar = (1.0/yscale) * vchar;
-		FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
-			default_font, scaled_hchar, scaled_vchar));
-		gp_exec_event(GE_fontprops, plot->width, plot->height, 
-				scaled_hchar, scaled_vchar);
-	        continue;
+		if (plot) {
+		    /* EAM FIXME - this is all out of order; initialization doesnt */
+		    /*             happen until term->graphics() is called.        */
+		    xscale = (plot->width > 0) ? plot->width / 4096. : gW / 4096.;
+		    yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
+		    scaled_hchar = (1.0/xscale) * hchar;
+		    scaled_vchar = (1.0/yscale) * vchar;
+		    FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
+			     default_font, scaled_hchar, scaled_vchar));
+		    gp_exec_event(GE_fontprops, plot->width, plot->height, 
+				  scaled_hchar, scaled_vchar);
+		}
+		continue;
 	    }
 	    /* fall through */
 #endif
 	default:
-	    store_command(buf, plot);
+	    if (plot)
+		store_command(buf, plot);
 	    continue;
 	}
     }
@@ -1518,10 +1595,9 @@ record()
 /*
  *   record - record new plot from gnuplot inboard X11 driver (VMS)
  */
+static struct plot_struct *plot = NULL;
 record()
 {
-    static plot_struct *plot = plot_array;
-
     int status;
 
     if ((STDIINiosb[0] & 0x1) == 0)
@@ -1533,16 +1609,17 @@ record()
     case 'G':			/* enter graphics mode */
 	{
 	    int plot_number = atoi(buf + 1);	/* 0 if none specified */
-	    if (plot_number < 0 || plot_number >= MAX_WINDOWS)
-		plot_number = 0;
 	    FPRINTF((stderr, "plot for window number %d\n", plot_number));
-	    plot = plot_array + plot_number;
-	    prepare_plot(plot, plot_number);
+	    if (!(plot = Find_Plot_In_Linked_List_By_Number(plot_number)))
+		plot = Add_Plot_To_Linked_List(plot_number);
+	    if (plot)
+		prepare_plot(plot, plot_number);
 	    current_plot = plot;
 	    break;
 	}
     case 'E':			/* leave graphics mode */
-	display(plot);
+	if (plot) 
+	    display(plot);
 	break;
     case 'R':			/* exit x11 mode */
 	FPRINTF((stderr, "received R - sending ClientMessage\n"));
@@ -1567,7 +1644,8 @@ record()
 	}
 	return;			/* no ast */
     default:
-	store_command(buf, plot);
+	if (plot)
+	    store_command(buf, plot);
 	break;
     }
     ast();
@@ -2146,7 +2224,7 @@ display(plot_struct *plot)
     }
 #endif
 
-    FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
+    FPRINTF((stderr, "Display %d ; %d commands\n", plot->plot_number, plot->ncommands));
 
     if (plot->ncommands == 0)
 	return;
@@ -2161,7 +2239,7 @@ display(plot_struct *plot)
 
     /* create new pixmap & GC */
     if (!plot->pixmap) {
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot->plot_number, plot->width, PIXMAP_HEIGHT(plot), dep));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
     }
 
@@ -2218,7 +2296,9 @@ display(plot_struct *plot)
 #ifdef TITLE_BAR_DRAWING_MSG
     if (plot->window) {
 	/* restore default window title */
-	XStoreName(dpy, plot->window, plot->titlestring);
+	char *cp = plot->titlestring;
+	if (!cp) cp = "";
+	XStoreName(dpy, plot->window, cp);
     }
 #else
     if (!button_pressed) {
@@ -2242,7 +2322,7 @@ UpdateWindow(plot_struct * plot)
 
     if (!plot->pixmap) {
 	/* create a black background pixmap */
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), dep));
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot->plot_number, plot->width, PIXMAP_HEIGHT(plot), dep));
 	plot->pixmap = XCreatePixmap(dpy, root, plot->width, PIXMAP_HEIGHT(plot), dep);
 	if (gc)
 	    XFreeGC(dpy, gc);
@@ -2495,11 +2575,19 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 
 
     if (plot->window) {
-	char msg[0xff];
+	char *msg;
+	char *added_text = " allocating colors ...";
+	int orig_len = (plot->titlestring ? strlen(plot->titlestring) : 0);
 	XFetchName(dpy, plot->window, &save_title);
-	strcpy(msg, plot->titlestring);
-	strcat(msg, " allocating colors ...");
-	XStoreName(dpy, plot->window, msg);
+	if (msg = (char *) malloc(orig_len + strlen(added_text) + 1)) {
+	    if (plot->titlestring)
+		strcpy(msg, plot->titlestring);
+	    else
+		msg[0] = '\0';
+	    strcat(msg, added_text);
+	    XStoreName(dpy, plot->window, msg);
+	    free(msg);
+	}
     }
 
     if (!gc_pm3d) {
@@ -2619,13 +2707,10 @@ PaletteSetColor(plot_struct * plot, double gray)
 static int
 ErrorHandler(Display * display, XErrorEvent * error_event)
 {
-    plot_struct *plot = find_plot((Window) error_event->resourceid);
-
+    /* Don't remove directly.  Main program might be using the memory. */
     (void) display;		/* avoid -Wunused warnings */
+    Add_Plot_To_Remove_FIFO_Queue((Window) error_event->resourceid);
     gp_exec_event(GE_reset, 0, 0, 0, 0);
-    if (plot) {
-	delete_plot(plot);
-    }
     return 0;
 }
 
@@ -2975,14 +3060,14 @@ is_shift(KeySym mod)
 static void
 reset_cursor()
 {
-    int plot_number;
-    plot_struct *plot = plot_array;
+    plot_struct *plot = list_start;
 
-    for (plot_number = 0, plot = plot_array; plot_number < MAX_WINDOWS; ++plot_number, ++plot) {
+    while (plot) {
 	if (plot->window) {
-	    FPRINTF((stderr, "Window for plot %d exists\n", plot_number));
+	    FPRINTF((stderr, "Window for plot %d exists\n", plot->plot_number));
 	    XUndefineCursor(dpy, plot->window);
 	}
+	plot = plot->next_plot;
     }
 
     FPRINTF((stderr, "Cursors reset\n"));
@@ -2992,23 +3077,6 @@ reset_cursor()
 /*-----------------------------------------------------------------------------
  *   resize - rescale last plot if window resized
  *---------------------------------------------------------------------------*/
-
-static plot_struct *
-find_plot(Window window)
-{
-    int plot_number;
-    plot_struct *plot = plot_array;
-
-    for (plot_number = 0, plot = plot_array; plot_number < MAX_WINDOWS; ++plot_number, ++plot) {
-	if (plot->window == window) {
-	    FPRINTF((stderr, "Event for plot %d\n", plot_number));
-	    return plot;
-	}
-    }
-
-    FPRINTF((stderr, "Bogus window 0x%x in event !\n", window));
-    return NULL;
-}
 
 #ifdef USE_MOUSE
 
@@ -3054,7 +3122,7 @@ process_event(XEvent *event)
 
     switch (event->type) {
     case ConfigureNotify:
-	plot = find_plot(event->xconfigure.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xconfigure.window);
 	if (plot) {
 	    int w = event->xconfigure.width, h = event->xconfigure.height;
 
@@ -3127,7 +3195,7 @@ process_event(XEvent *event)
 	}
 	break;
     case KeyPress:
-	plot = find_plot(event->xkey.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
 #if 0
 	if (0 == XLookupString(&(event->xkey), key_string, sizeof(key_string), (KeySym *) NULL, (XComposeStatus *) NULL))
 	    key_string[0] = 0;
@@ -3154,8 +3222,7 @@ process_event(XEvent *event)
 #endif
 	    case 'q':
 		/* close X window */
-		if (plot)
-		    delete_plot(plot);
+		Remove_Plot_From_Linked_List(event->xkey.window);
 		return;
 	    default:
 		break;
@@ -3357,18 +3424,16 @@ process_event(XEvent *event)
 	case XK_Meta_R:
 	case XK_Alt_L:
 	case XK_Alt_R:
-	    plot = find_plot(event->xkey.window);
+	    plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
 	    cursor = cursor_default;
-	    XDefineCursor(dpy, plot->window, cursor);
+	    if (plot)
+		XDefineCursor(dpy, plot->window, cursor);
 	}
 	break;
     case ClientMessage:
 	if (event->xclient.message_type == WM_PROTOCOLS &&
 	    event->xclient.format == 32 && event->xclient.data.l[0] == WM_DELETE_WINDOW) {
-	    plot = find_plot(event->xclient.window);
-	    if (plot) {
-		delete_plot(plot);
-	    }
+	    Remove_Plot_From_Linked_List(event->xclient.window);
 	}
 	break;
 #ifdef USE_MOUSE
@@ -3382,7 +3447,7 @@ process_event(XEvent *event)
 	 * might be on another window which generates the
 	 * expose events. (joze)
 	 */
-	plot = find_plot(event->xexpose.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xexpose.window);
 	if (!plot)
 	    break;
 	if (!event->xexpose.count) {
@@ -3391,7 +3456,7 @@ process_event(XEvent *event)
 	}
 	break;
     case EnterNotify:
-	plot = find_plot(event->xcrossing.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xcrossing.window);
 	if (!plot)
 	    break;
 	if (plot == current_plot) {
@@ -3407,7 +3472,7 @@ process_event(XEvent *event)
 	break;
     case MotionNotify:
 	update_modifiers(event->xmotion.state);
-	plot = find_plot(event->xmotion.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xmotion.window);
 	if (!plot)
 	    break;
 	{
@@ -3461,7 +3526,7 @@ process_event(XEvent *event)
 #ifndef TITLE_BAR_DRAWING_MSG
 	button_pressed |= (1 << event->xbutton.button);
 #endif
-	plot = find_plot(event->xbutton.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xbutton.window);
 	if (!plot)
 	    break;
 	{
@@ -3475,7 +3540,7 @@ process_event(XEvent *event)
 #ifndef TITLE_BAR_DRAWING_MSG
 	button_pressed &= ~(1 << event->xbutton.button);
 #endif
-	plot = find_plot(event->xbutton.window);
+	plot = Find_Plot_In_Linked_List_By_Window(event->xbutton.window);
 	if (!plot)
 	    break;
 	if (plot == current_plot) {
@@ -3495,7 +3560,7 @@ process_event(XEvent *event)
 	    double x, y, x2, y2;
 	    mouse_to_coords(plot, event, &x, &y, &x2, &y2);
 	    fprintf(stderr, "gnuplot_x11 %d: mouse button %1d from window %d at %g %g\n",
-		    __LINE__, event->xbutton.button, (plot-plot_array), x, y);
+		    __LINE__, event->xbutton.button, (plot ? plot->plot_number : 0), x, y);
 	}
 #endif
 	break;
@@ -4244,6 +4309,10 @@ pr_window(plot_struct *plot)
 	plot->window = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
 					   plot->width, plot->height, BorderWidth, plot->cmap->colors[1], plot->cmap->colors[0]);
 
+    /* Return if something wrong. */
+    if (!plot->window)
+	return;
+
     /* ask ICCCM-compliant window manager to tell us when close window
      * has been chosen, rather than just killing us
      */
@@ -4274,10 +4343,49 @@ pr_window(plot_struct *plot)
 	wmh.initial_state = IconicState;
 	XSetWMHints(dpy, plot->window, &wmh);
     }
-    strcpy(plot->titlestring, (title ? title : Class));
-    XStoreName(dpy, plot->window, plot->titlestring);
+#if 0 /* 1 clear, 0 do not clear */
+    if (plot->titlestring) {
+	free(plot->titlestring);
+	plot->titlestring = 0;
+    }
+#endif
 
     ProcessEvents(plot->window);
+
+    /* If title doesn't exist, create one. */
+#if 1
+#define ICON_TEXT "gplt"
+#define TEMP_NUM_LEN 16
+    {
+    /* append the X11 terminal number (if greater than zero) */
+    char numstr[strlen(ICON_TEXT)+TEMP_NUM_LEN+1]; /* space for text, number and terminating \0 */
+    if (plot->plot_number)
+	sprintf(numstr, "%s%d%c", ICON_TEXT, plot->plot_number, '\0');
+    else
+	sprintf(numstr, "%s%c", ICON_TEXT, '\0');
+    FPRINTF((stderr, "term_number is %d", plot->plot_number));
+    XSetIconName(dpy, plot->window, numstr);
+#undef TEMP_NUM_LEN
+    if (!plot->titlestring) {
+	int orig_len;
+	if (!title) title = Class;
+	orig_len = strlen(title);
+	/* memory for text, white space, number and terminating \0 */
+	if (plot->titlestring = (char *) malloc(orig_len + ((orig_len && plot->plot_number) ? 1 : 0) + strlen(numstr) - strlen(ICON_TEXT) + 1)) {
+	    strcpy(plot->titlestring, title);
+	    if (orig_len && plot->plot_number)
+		plot->titlestring[orig_len++] = ' ';
+	    strcpy(plot->titlestring + orig_len, numstr + strlen(ICON_TEXT));
+	    XStoreName(dpy, plot->window, plot->titlestring);
+	} else
+	    XStoreName(dpy, plot->window, title);
+    } else {
+	XStoreName(dpy, plot->window, plot->titlestring);
+    }
+    }
+#undef ICON_TEXT
+#endif
+
     XMapWindow(dpy, plot->window);
 
     windows_open++;
@@ -4422,3 +4530,256 @@ mouse_to_axis(int mouse_coord, axis_scale_t *axis)
     return axis_coord;
 }
 #endif
+
+
+/*-----------------------------------------------------------------------------
+ *   Add_Plot_To_Linked_List - Create space for plot and put in linked list.
+ *---------------------------------------------------------------------------*/
+
+static plot_struct *
+Add_Plot_To_Linked_List(int plot_number)
+{
+    /* Make sure plot does not already exists in the list. */
+    plot_struct *psp = Find_Plot_In_Linked_List_By_Number(plot_number);
+
+    if (psp == NULL) {
+	psp = (plot_struct *) malloc(sizeof(plot_struct));
+	if (psp) {
+	    /* Initialize structure variables. */
+	    memset((void*)psp, 0, sizeof(plot_struct));
+	    psp->plot_number = plot_number;
+	    /* Add link to beginning of the list. */
+	    psp->prev_plot = NULL;
+	    if (list_start != NULL) {
+		list_start->prev_plot = psp;
+		psp->next_plot = list_start;
+	    } else
+		psp->next_plot = NULL;
+	    list_start = psp;
+	}
+	else {
+	    psp = NULL;
+	    fprintf(stderr, ERROR_NOTICE("Could not allocate memory for plot.\n\n"));
+	}
+    }
+
+    return psp;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Remove_Plot_From_Linked_List - Remove from linked list and free memory.
+ *---------------------------------------------------------------------------*/
+
+static void
+Remove_Plot_From_Linked_List(Window plot_window)
+{
+    /* Make sure plot exists in the list. */
+    plot_struct *psp = Find_Plot_In_Linked_List_By_Window(plot_window);
+
+    if (psp != NULL) {
+	/* Remove link from the list. */
+	if (psp->next_plot != NULL)
+	    psp->next_plot->prev_plot = psp->prev_plot;
+	if (psp->prev_plot != NULL) {
+	    psp->prev_plot->next_plot = psp->next_plot;
+	} else {
+	    list_start = psp->next_plot;
+	}
+	/* If global pointers point at this plot, reassign them. */
+	if (current_plot == psp) {
+#if 0 /* Make some other plot current. */
+	    if (psp->prev_plot != NULL)
+		current_plot = psp->prev_plot;
+	    else
+		current_plot = psp->next_plot;
+#else /* No current plot. */
+	    current_plot = NULL;
+#endif
+	}
+	if (plot == psp)
+	    plot = current_plot;
+	/* Deallocate memory. */
+	delete_plot(psp);
+	free(psp);
+    }
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Find_Plot_In_Linked_List_By_Number - Search for the plot in the linked list.
+ *---------------------------------------------------------------------------*/
+
+static plot_struct *
+Find_Plot_In_Linked_List_By_Number(int plot_number)
+{
+    plot_struct *psp = list_start;
+
+    while (psp != NULL) {
+	if (psp->plot_number == plot_number)
+	    break;
+	psp = psp->next_plot;
+    }
+
+    return psp;
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Find_Plot_In_Linked_List_By_Window - Search for the plot in the linked list.
+ *---------------------------------------------------------------------------*/
+
+static plot_struct *
+Find_Plot_In_Linked_List_By_Window(Window window)
+{
+    plot_struct *psp = list_start;
+
+    while (psp != NULL) {
+	if (psp->window == window)
+	    break;
+	psp = psp->next_plot;
+    }
+
+    return psp;
+}
+
+
+/* NOTE:  The removing of plots via the ErrorHandler routine is rather
+   tricky.  The error events can happen at any time during execution of
+   the program, very similar to an interrupt.  The consequence is that
+   the error handling routine can't remove plots from the linked list
+   directly.  Instead we use a queuing system in which the main code
+   eventually removes the plots.
+
+   Furthermore, to be safe, only the error handling routine should create
+   and delete elements in the FIFO.  Otherwise, the possibility of bogus
+   pointers can arise if error events happen at the exact wrong time.
+   (Requires a lot of thought.)
+
+   The scheme here is for the error handler to put elements in the
+   queue marked as "processed = 0" and then indicate that the main
+   code should process elements in the queue.  The main code then
+   copies the information about the plot to remove and sets the value
+   "processed = 1".  Afterward the main code removes the plot.
+*/
+
+/*-----------------------------------------------------------------------------
+ *   Add_Plot_To_Remove_FIFO_Queue - Method for error handler to destroy plot.
+ *---------------------------------------------------------------------------*/
+
+static void
+Add_Plot_To_Remove_FIFO_Queue(Window plot_window)
+{
+    /* Clean up any processed links. */
+    plot_remove_struct *prsp = remove_fifo_queue_start;
+    FPRINTF((stderr,"Add plot to remove FIFO queue called.\n"));
+    while (prsp != NULL) {
+	if (prsp->processed) {
+	    remove_fifo_queue_start = prsp->next_remove;
+	    free(prsp);
+	    prsp = remove_fifo_queue_start;
+	    FPRINTF((stderr,"  -> Removed a processed element from FIFO queue.\n"));
+	} else {
+	    break;
+	}
+    }
+
+    /* Go to end of list while checking if this window is already in list. */
+    while (prsp != NULL) {
+	if (prsp->plot_window_to_remove == plot_window) {
+	    /* Discard this request because the same window is yet to be processed.
+	       X11 could be stuck sending the same error message again and again
+	       while the main program is not responding for some reason.  This would
+	       lead to the FIFO queue growing indefinitely. */
+	    return;
+	}
+	if (prsp->next_remove == NULL)
+	    break;
+	else
+	    prsp = prsp->next_remove;
+    }
+
+    /* Create link and add to end of queue. */
+    {plot_remove_struct *prsp_new = (plot_remove_struct *) malloc(sizeof(plot_remove_struct));
+    if (prsp_new) {
+	/* Initialize structure variables. */
+	prsp_new->next_remove = NULL;
+	prsp_new->plot_window_to_remove = plot_window;
+	prsp_new->processed = 0;
+	if (remove_fifo_queue_start)
+	    prsp->next_remove = prsp_new;
+	else
+	    remove_fifo_queue_start = prsp_new;
+	process_remove_fifo_queue = 1; /* Indicate to main loop that there is a plot to remove. */
+	FPRINTF((stderr,"  -> Added an element to FIFO queue.\n"));
+    }
+    else {
+	fprintf(stderr, ERROR_NOTICE("Could not allocate memory for plot remove queue.\n\n"));
+    }}
+}
+
+
+/*-----------------------------------------------------------------------------
+ *   Process_Remove_FIFO_Queue - Remove plots queued by error handler.
+ *---------------------------------------------------------------------------*/
+
+static void
+Process_Remove_FIFO_Queue(void)
+{
+    plot_remove_struct *prsp = remove_fifo_queue_start;
+
+    /* Clear flag before processing so that if an ErrorHandler event
+     * comes along while running the remainder of this routine, any new
+     * error events that were missed because of timing issues will be
+     * processed next time through the main loop.
+     */
+    process_remove_fifo_queue = 0;
+
+    /* Go through the list and process any unprocessed queue request.
+     * No clean up is done here because having two asynchronous routines
+     * modifying the queue would be too dodgy.  The ErrorHandler creates
+     * and removes links in the queue based upon the processed flag.
+     */
+    while (prsp != NULL) {
+
+	/* Make a copy of the remove information structure before changing flag.
+	 * Otherwise, there would be the possibility of the error handler routine
+	 * removing the associated link upon seeing the "processed" flag set.  From
+	 * this side of things, the pointer becomes invalid once that flag is set.
+	 */
+	plot_remove_struct prs;
+	prs.plot_window_to_remove = prsp->plot_window_to_remove;
+	prs.next_remove = prsp->next_remove;
+	prs.processed = prsp->processed;
+
+	/* Set processed flag before processing the event.  This is so
+	 * that the FIFO queue does not have to repeat window entries.
+	 * If the error handler were to break in right before the
+	 * "processed" flag is set to 1 and not put another link in
+	 * the FIFO because it sees the window in question is already
+	 * in the FIFO, we're OK.  The reason is that the window in
+	 * question is still to be processed.  On the other hand, if
+	 * we were to process then set the flag, an entry in the queue
+	 * could potentially be lost.
+	 */
+	prsp->processed = 1;
+	FPRINTF((stderr, "Processed element in remove FIFO queue.\n"));
+
+	/* NOW process the plot to remove. */
+	if (!prs.processed)
+	    Remove_Plot_From_Linked_List(prs.plot_window_to_remove);
+
+	prsp = prs.next_remove;
+    }
+
+    /* Issue an X11 error so that error handler cleans up queue?
+     * Really, this isn't super important.  Without issuing a bogus
+     * error, the processed queue elements will be deleted the
+     * next time there is an error.  Until another error comes
+     * along it means there is maybe ten or so words of memory
+     * reserved on the heap for the FIFO queue.  In some sense,
+     * the extra code is hardly worth the effort, especially
+     * when X11 documentation is so sparse on the matter of errors.
+     */
+
+}

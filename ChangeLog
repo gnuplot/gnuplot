@@ -1,3 +1,10 @@
+2003-11-24  Daniel J Sebald  <daniel.sebald@ieee.org>
+
+	* NEWS src/gplt_x11.c term/x11.trm: SourceForge patch #774822.
+	Organized x11 terminal windows into a linked list. Removed the limit
+	of max 16 enumerated terminal windows. New options 'set term x11
+	close' and 'set term x11 title "<title>"'.
+
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc src/command.h src/command.c src/tables.h

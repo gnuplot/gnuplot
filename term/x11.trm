@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.83 2003/10/31 10:13:09 mikulik Exp $
+ * $Id: x11.trm,v 1.84 2003/11/02 05:19:47 sfeam Exp $
  *
  */
 
@@ -310,54 +310,77 @@ static unsigned int X11_plot_number;
 
 enum X11_id {
     X11_RESET,
+    X11_CLOSE,
     X11_PERSIST,
     X11_NOPERSIST,
     X11_RAISE,
     X11_NORAISE,
     X11_FONT,
+    X11_TITLE,
     X11_OTHER
 };
 
 static struct gen_table X11_opts[] = {
     {"res$et", X11_RESET},
+    {"cl$ose", X11_CLOSE},
     {"per$sist", X11_PERSIST},
     {"noper$sist", X11_NOPERSIST},
     {"rai$se", X11_RAISE},
     {"norai$se", X11_NORAISE},
     {"font",   X11_FONT},
     {"fn$ame", X11_FONT},
+    {"ti$tle", X11_TITLE},
     {NULL, X11_OTHER}
 };
+
 
 TERM_PUBLIC void
 X11_options()
 {
+
+#define NOT_PROCESS_IF_DUPLICATION 1
+
     struct value a;
-#ifdef USE_MOUSE
-    unsigned int old_plot_number = X11_plot_number;
-#endif
+    int c_title_token;
+    TBOOLEAN duplication = FALSE;
+    TBOOLEAN set_reset = FALSE, set_persist = FALSE, set_raise = FALSE, set_font = FALSE;
+    TBOOLEAN set_title = FALSE, set_number = FALSE, set_close = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&X11_opts[0], c_token)) {
 	case X11_RESET:
-	    X11_atexit();	/* tell gnuplot_x11 to shut down */
-	    ++c_token;
+	    c_token++;
+	    if (set_reset) duplication=TRUE;
+	    set_reset = TRUE;
+	    break;
+	case X11_CLOSE:
+	    c_token++;
+	    if (set_close) duplication=TRUE;
+	    set_close = TRUE;
 	    break;
 	case X11_PERSIST:
 	    persist = yes;
 	    c_token++;
+	    if (set_persist) duplication=TRUE;
+	    set_persist = TRUE;
 	    break;
 	case X11_NOPERSIST:
 	    persist = no;
 	    c_token++;
+	    if (set_persist) duplication=TRUE;
+	    set_persist = TRUE;
 	    break;
 	case X11_RAISE:
 	    do_raise = yes;
 	    c_token++;
+	    if (set_raise) duplication=TRUE;
+	    set_raise = TRUE;
 	    break;
 	case X11_NORAISE:
 	    do_raise = no;
 	    c_token++;
+	    if (set_raise) duplication=TRUE;
+	    set_raise = TRUE;
 	    break;
 	case X11_FONT:
 	    c_token++;
@@ -368,21 +391,46 @@ X11_options()
 	    else
  		copy_str( X11_default_font, c_token, sizeof(X11_default_font) );
 	    c_token++;
+	    if (set_font) duplication=TRUE;
+	    set_font = TRUE;
+	    break;
+	case X11_TITLE:
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expecting title text");
+	    c_title_token = c_token;
+	    c_token++;
+	    if (set_title) duplication=TRUE;
+	    set_title = TRUE;
 	    break;
 	case X11_OTHER:
 	default:
-	    X11_plot_number = (int) real(const_express(&a));
 	    /* let gnuplot_x11 check range */
-#ifdef USE_MOUSE
-	    /* eventually tell the driver that the
-	     * plot number has changed. */
-	    if (X11_plot_number != old_plot_number && X11_ipc) {
-		fprintf(X11_ipc, "N%d\n", X11_plot_number);
-		fflush(X11_ipc);
-	    }
-#endif
+	    X11_plot_number = (int) real(const_express(&a));
+	    if (set_number) duplication=TRUE;
+	    set_number = TRUE;
 	    break;
 	}
+
+	if (duplication) {
+	    int_error(c_token-1, "duplicated or contradicting arguments in X11 term options");
+	}
+
+    }
+
+    X11_init();
+
+    if (set_reset)
+	X11_atexit();	/* tell gnuplot_x11 to shut down */
+
+    /* eventually tell the driver that the
+     * plot number has changed. */
+    if (set_number && !set_close && X11_ipc) {
+	fprintf(X11_ipc, "N%d\n", X11_plot_number);
+	fflush(X11_ipc);
+    } else if (set_close && X11_ipc) {
+	fprintf(X11_ipc, (set_number ? "C%d\n" : "C\n"), X11_plot_number);
+	fflush(X11_ipc);
     }
     sprintf(term_options, "%d", X11_plot_number);
     if (UNSET != do_raise) {
@@ -396,10 +444,35 @@ X11_options()
 	strcat(term_options, X11_default_font);
 	strcat(term_options, "\"");
     }
+    if (set_title) {
+	char *title;
+	strncat(term_options, " title \"", MAX_LINE_LEN-strlen(term_options));
+	title = term_options + strlen(term_options);
+	if (isstring(c_title_token))
+	    quote_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
+	else
+ 	    copy_str(term_options+strlen(term_options), c_title_token, MAX_LINE_LEN-strlen(term_options));
+#define X11_COMMAND_BUFFER_LENGTH 1024
+/* #include "gplt_x11.h" X11_COMMAND_BUFFER_LENGTH defined in here in future */
+	if (X11_ipc) {
+	    /* Send up to maximum buffer length minus three characters of
+	     * title string to account for required 'n', '\0', '\n'.
+	     */
+	    int i;
+	    fputc('n', X11_ipc);
+	    for (i=0; i < X11_COMMAND_BUFFER_LENGTH-3, title[i] != '\0'; i++)
+		fputc(title[i], X11_ipc);
+	    fputc('\0', X11_ipc);
+	    fputc('\n', X11_ipc);
+	    fflush(X11_ipc);
+	}
+	strncat(term_options, "\"", MAX_LINE_LEN-strlen(term_options));
+    }
 #ifdef USE_MOUSE
     X11_update_opts();
 #endif
 }
+
 
 #ifdef USE_MOUSE
 TERM_PUBLIC void
@@ -1310,20 +1383,24 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
-"    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]",
+"    set terminal x11 [reset] [[no]persist] [[no]raise] [<n>] [close]",
+"                     [font <fontspec>] [title \"<title name>\"]",
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
-" appended to the window title and the icon will be labeled `gplt <n>`.",
-" The active window may distinguished by a change in cursor (from default",
-" to crosshair.)",
+" appended to the window title (unless a title has been supplied manually)",
+" and the icon will be labeled `gplt <n>`.  The active window may be",
+" distinguished by a change in cursor (from default to crosshair.)",
 "",
 " Plot windows remain open even when the `gnuplot` driver is changed to a",
 " different device.  A plot window can be closed by pressing the letter q",
 " while that window has input focus, or by choosing `close` from a window",
 " manager menu.  All plot windows can be closed by specifying `reset`, which",
 " actually terminates the subprocess which maintains the windows (unless",
-" `-persist` was specified).",
+" `-persist` was specified).  The `close` command can be used to close",
+" individual plot windows by number.  However, after a `reset`, those plot",
+" windows left due to persist cannot be closed with the command `close`.",
+" A `close` without a number closes the current active plot window.",
 "",
 " The gnuplot outboard driver, gnuplot_x11, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",
@@ -1339,6 +1416,9 @@ START_HELP(x11)
 " [no]raise are specified, they will override command line options and",
 " Xresources.  Setting one of these options takes place immediately, so",
 " the behaviour of an already running driver can be modified.",
+"",
+" The option `title \"<title name>\"` will supply the title name of the window",
+" for the current plot window or plot window <n> if a number is given.",
 "",
 " The size or aspect ratio of a plot may be changed by resizing the `gnuplot`",
 " window.",
