@@ -1,4 +1,4 @@
-% Quick Reference Card for GNUPLOT 1992
+% Quick Reference Card for gnuplot 2004
 % Format stolen shamelessly from the GNU Emacs reference card
 %**start of header
 \special{landscape}
@@ -6,14 +6,14 @@
 
 % This file can be printed with 1, 2, or 3 columns per page (see below).
 % Specify how many you want here.  Nothing else needs to be changed.
-% For GNUPLOT refcard, entries are too wide for 3 columns.  Print
+% For gnuplot refcard, entries are too wide for 3 columns.  Print
 % 2 columns landscape
 
 \columnsperpage=2
 
 % Copyright (c) 1987 Free Software Foundation, Inc.
 
-% This file is part of GNU Emacs, but was adapted for the GNUPLOT
+% This file is part of GNU Emacs, but was adapted for the gnuplot
 % reference card because it was so nicely set up.
 
 % This file is intended to be processed by plain TeX (TeX82).
@@ -79,7 +79,7 @@ trademarks of various companies.  We endorse none of them.
 
 % This multi-way format was designed by Stephen Gildea
 % October 1986.
-% modified for GNUPLOT refcard by Alex Woo
+% modified for gnuplot refcard by Alex Woo
 
 \if 1\ncolumns
 %  \hsize 4in
@@ -218,24 +218,25 @@ trademarks of various companies.  We endorse none of them.
 %**end of header
 
 
-\title{GNUPLOT Quick Reference}
+\title{gnuplot Quick Reference}
 
 \centerline{(Copyright(c) Alex Woo 1992 June 1)}
+\centerline{Updated by Hans-Bernhard Br\"o{}ker, April 2004}
 
-\section{Starting GNUPLOT}
+\section{Starting gnuplot}
 
-\key{to enter GNUPLOT}{gnuplot}
-\key{to enter batch GNUPLOT}{gnuplot macro_file}
-\key{to pipe commands to GNUPLOT}{application | gnuplot}
+\key{to enter gnuplot}{gnuplot}
+\key{to enter batch gnuplot}{gnuplot macro_file}
+\key{to pipe commands to gnuplot}{application | gnuplot}
 
 see below for  environment variables you might want to change
-before entering GNUPLOT.
+before entering gnuplot.
 
-\section{Exiting GNUPLOT}
+\section{Exiting gnuplot}
 
-\key{exit GNUPLOT}{quit}
+\key{exit gnuplot}{quit}
 
-All GNUPLOT commands can be abbreviated to the first few
+All gnuplot commands can be abbreviated to the first few
 unique letters, usually three characters.  This reference uses
 the complete name for clarity.
 
@@ -247,7 +248,7 @@ the complete name for clarity.
 \key{show current environment}{show all}
 \section{Command-line Editing}
 
-The UNIX, MS-DOS and VMS versions of GNUPLOT support command-line
+The UNIX, MS-DOS and VMS versions of gnuplot support command-line
 editing and a command history.  EMACS style editing is supported.
 
 \beginindentedkeys
@@ -273,8 +274,8 @@ History:
 \key{moves forward through history}{ ^ N }
 \endindentedkeys
 
-The following arrow keys may be used on the MS-DOS version if READLINE is
-used.
+The following arrow keys may be used on most PC versions if READLINE
+is used.
 
 \beginindentedkeys
 IBM PC Arrow Keys:
@@ -291,10 +292,11 @@ IBM PC Arrow Keys:
 
 \section{Graphics Devices}
 
-All screen graphics devices are specified by names and options.
-This information can be read from a startup file (.gnuplot in UNIX).
-If  you change the graphics device, you must replot with the
-\kbd{replot} command.
+All screen graphics devices are specified by names and options.  This
+information can be read from a startup file (.gnuplot in UNIX).  If
+you change the graphics device, you must replot with the \kbd{replot}
+command or recreate it repeating the \kbd{load} of the script that
+created it.
 
 \key{get a list of valid devices }{set terminal [options]}
 
@@ -472,26 +474,18 @@ is available for grid data only.) If all the isolines are not of the
 same length, no cross isolines will be drawn and contouring that data
 is impossible.
 
-For splot if 3-d datafile and using format (see {\bf splot datafile using})
-specify only z (height field), a non parametric mode must be specified.
-If, on the other hand, x, y, and z are all specified, a parametric
-mode should be selected (see {\bf set parametric}) since data is defining a
-parametric surface.
-
-\key{example of plotting a 3-d data}{set parametric;splot 'glass.dat'}
-\key{example of plotting explicit}{set noparametric;splot 'datafile.dat'}
-
 \section{Using Pipes}
 
-On some computer systems with a popen function (UNIX), the datafile
-can be piped through a shell command by starting the file name
-with a '$<$'.  For example:
+On some computer systems with a popen function (Unix, plus some
+others), the datafile can be piped through a shell command by starting
+the file name with a '$<$'.  For example:
 
         pop(x) = 103*exp(x/10)
         plot "$<$ awk '$\{$ print \$1-1965 \$2 $\}$' population.dat", pop(x)
 
 would plot the same information as the first population example
-but with years since 1965 as the x axis.
+but with years since 1965 as the x axis.  Simple manipulations
+of this kind can also be done using the extended capabilties of {\bf using}
 
 Similarly, output can be piped to another application, e.g.
 
@@ -519,40 +513,44 @@ choices can be made.
 {$\{$ using $\{ <$xcol$>:<$ycol$>:<$zcol$> \}$}
 \key{}{$\{"<$scanf string$>"\} \} ...$}
 
-$<$xcol$>$, $<$ycol$>$, and $<$zcol$>$ explicitly select the columns to plot from
-a space or tab separated multicolumn data file. If only $<$ycol$>$ is
-selected for {\bf plot}, $<$xcol$>$ defaults to 1. If only $<$zcol$>$ is selected
-for {\bf splot}, then only that column is read from the file. An $<$xcol$>$ of
-0 forces $<$ycol$>$ to be plotted versus its coordinate number. $<$xcol$>$,
-$<$ycol$>$, and $<$zcol$>$ can be entered as constants or expressions.
+$<$xcol$>$, $<$ycol$>$, and $<$zcol$>$ explicitly select the columns
+to plot from a space or tab separated multicolumn data file. If only
+$<$ycol$>$ is selected for {\bf plot}, $<$xcol$>$ defaults to 1. If
+only $<$zcol$>$ is selected for {\bf splot}, then only that column is
+read from the file. An $<$xcol$>$ of 0 forces $<$ycol$>$ to be plotted
+versus its coordinate number. $<$xcol$>$, $<$ycol$>$, and $<$zcol$>$
+can be entered as constants or expressions.  Expressions enclosed in
+parentheses can be used to compute a column data value from all
+numbers in the input record.
 
 If errorbars (see also {\bf plot errorbars}) are used for {\bf plot}s,
-xdelta or ydelta (for example, a +/- error) should be provided as the third
-column, or (x,y)low and (x,y)high as third and fourth columns.  These columns
-must follow the x and y columns. If errorbars in both directions are wanted
-then xdelta and ydelta should be in the third and fourth columns, respectively,
-or xlow, xhigh, ylow, yhigh should be in the third, fourth, fifth, and sixth
-columns, respectively.
+xdelta or ydelta (for example, a +/- error) should be provided as the
+third column, or (x,y)low and (x,y)high as third and fourth columns.
+These columns must follow the x and y columns. If errorbars in both
+directions are wanted then xdelta and ydelta should be in the third
+and fourth columns, respectively, or xlow, xhigh, ylow, yhigh should
+be in the third, fourth, fifth, and sixth columns, respectively.
 
-Scanf strings override any $<$xcol$>$:$<$ycol$>$(:$<$zcol$>$) choices, except for
-ordering of input, e.g.,
+Scanf strings override any $<$xcol$>$:$<$ycol$>$(:$<$zcol$>$) choices,
+except for ordering of input, e.g.,
 
 \key{plot "datafile"}{ using 2:1 "\%f\%*f\%f"}
 
 causes the first column to be y and the third column to be x.
 
 If the scanf string is omitted, the default is generated based on the
-$<$xcol$>$:$<$ycol$>$(:$<$zcol$>$) choices. If the {\bf using} option is omitted, ''\%f\%f''
-is used for {\bf plot} (''\%f\%f\%f\%f'' or ''\%f\%f\%f\%f\%f\%f'' for {\bf 
-errorbar} {\bf plot}s) and ''\%f\%f\%f'' is used for {\bf splot}.
+$<$xcol$>$:$<$ycol$>$(:$<$zcol$>$) choices. If the {\bf using} option
+is omitted, ''\%f\%f'' is used for {\bf plot} (''\%f\%f\%f\%f'' or
+''\%f\%f\%f\%f\%f\%f'' for {\bf errorbar} {\bf plot}s) and
+''\%f\%f\%f'' is used for {\bf splot}.
 
 \key{plot "MyData"} {using "\%*f\%f\%*20[^$\backslash$n]\%f" w lines}
 
 Data are read from the file ``MyData'' using the format
-''\%*f\%f\%*20[^$\backslash$n]\%f''. The meaning of this format is: ''\%*f'' ignore the
-first number, ''\%f'' then read in the second and assign to x,
-''\%*20[^$\backslash$n]'' then ignore 20 non-newline characters, ''\%f'' then read in
-the y value.
+''\%*f\%f\%*20[^$\backslash$n]\%f''. The meaning of this format is:
+''\%*f'' ignore the first number, ''\%f'' then read in the second and
+assign to x, ''\%*20[^$\backslash$n]'' then ignore 20 non-newline
+characters, ''\%f'' then read in the y value.
 
 \section{Plot With Errorbars}
 Error bars are supported for 2-d data file plots by reading one to
@@ -560,7 +558,7 @@ four additional columns specifying ydelta, ylow and yhigh, xdelta,
 xlow and xhigh, xdelta and ydelta, or xlow, xhigh, ylow, and yhigh
 respectively. No support exists for error bars for {\bf splot}s.
 
-In the default situation, GNUPLOT expects to see three to six
+In the default situation, gnuplot expects to see three to six
 numbers on each line of the data file, either (x, y, ydelta),
 (x, y, ylow, yhigh), (x, y, xdelta), (x, y, xlow, xhigh), 
 (x, y, xdelta, ydelta), or (x, y, xlow, xhigh, ylow, yhigh). The x 
@@ -730,43 +728,44 @@ quotes. The quotes will not be shown in the key.
 
 \section{Set-Show Commands}
 
+All commands below begin with either {\bf set} or {\bf unset}, and
+usually their state can be shown by passing their name to the {\bf
+  show} command.
+
 \beginindentedkeys
-\key{all commands below begin with set}{set}
-\key{set mapping of polar angles}{angles [degrees|radians]}
+\key{unit any angles are given in}{angles [degrees|radians]}
 \key{arrows from point to}{arrow [<tag>][from <sx>,<sy>,<sz>]}
-\key{}{ [to <ex>,<ey>,<ez>][nohead]}
+\key{}{ [to <ex>,<ey>,<ez>][head|nohead|heads]}
 \key{force autoscaling of an axis}{autoscale [<axes>]}
-\key{enter/exit parametric mode} {[no]parametric}
-\key{display border}{[no]border}
-\key{clip points/line near boundaries}{[no]clip <clip-type>}
+\key{enter/exit parametric mode} {parametric}
+\key{display border}{border [<choice>] [<style>]}
+\key{clip points/line near boundaries}{clip <clip-type>}
 \key{specify parameters for contour plots}{cntrparam
 [spline][points][order][levels]}
-\key{enable splot contour plots}{[no]contour [base|surface|both]}
+\key{enable splot contour plots}{contour [base|surface|both]}
 \key{default plotting style for data}{data style <style-choice>}
 \key{specify dummy variable}{dummy <dummy1>,<dummy2>...}
 \key{tic-mark label format specification}{format
 [<axes>]["format-string"]}
 \key{function plotting style}{function style <style-choice>}
-\key{draw a grid at major tick marks \& minor tics (optional)}{[no]grid [mxgrid 
-OR mygrid]}
-\key{enables hiddenline removal}{[no]hidden3d}
-\key{specify number of isolines}{isosamples <expression>}
-\key{enables key of curves in plot}{key <x>,<y>,<z>}
-\key{logscaling of an axes (optionally giving base)}{logscale <axes> [<base>]}
-\key{mapping 3D coordinates}{mapping
-[cartesian|spherical|cylindrical]}
-\key{offsets from center of graph}{offsets
-<left>,<right>,<top>,<bottom>}
-\key{mapping 2D coordinates}{[no]polar}
+\key{draw a grid at tick positions}{grid [<which tics>...] [<linestyle>]}
+\key{enables hiddenline removal}{hidden3d [\dots]}
+\key{specify number of isolines}{isosamples <n1>[,<n2>]}
+\key{enables key of curves in plot}{key [\dots]}
+\key{logscaling of axes (optionally giving base)}{logscale <axes> [<base>]}
+\key{mapping 3D coordinates}{mapping [cartesian|spherical|cylindrical]}
+\key{offsets from center of graph}{offsets <left>,<right>,<top>,<bottom>}
+\key{color-mapped plotting modes}{pm3d [\dots]}
+\key{mapping 2D coordinates}{polar}
 \key{set radial range}{rrange [<rmin>:<rmax>]}
 \key{set sampling rate of functions}{samples <expression>}
 \key{set scaling factors of plot}{size <xsize>,<ysize>}
-\key{control display of isolines of surface}{[no]surface}
+\key{control display of isolines of surface}{surface}
 \key{control graphics device}{terminal <device>}
 \key{change direction of tics}{tics <direction>}
 \key{adjust relative height of vertical axis}{ticslevel <level>}
 \key{adjust size of tick marks}{ticscale [<size>]}
-\key{turn on time/date stamp}{[no]time}
+\key{turn on time/date stamp}{time}
 \key{set centered plot title}{title "title-text" <xoff>,<yoff>}
 \key{set parametric range}{trange [<tmin>:<tmax>]}
 \key{set surface parametric ranges}{urange or vrange}
@@ -776,20 +775,20 @@ OR mygrid]}
 \key{set horizontal range}{xrange [<xmin>:<xmax>]}
 \key{change horizontal tics}{xtics <start>,<incr>,<end>,}
 \key{}{"<label>" <pos> }
-\key{adjust number of minor tick marks}{[no]mxtics OR [no]mytics [<freq>]}
-\key{draw x-axis}{[no]xzeroaxis}
+\key{adjust number of minor tick marks}{mxtics OR mytics [<freq>]}
+\key{draw x-axis}{xzeroaxis}
 \key{sets y-axis label}{ylabel "<label>" <xoff>,<yoff>}
 \key{set vertical range}{yrange [<ymin>:<ymax>]}
 \key{change vertical tics}{ytics <start>,<incr>,<end>,}
 \key{}{"<label>" <pos> }
-\key{draw y-axis}{[no]yzeroaxis}
+\key{draw y-axis}{yzeroaxis}
 \key{set default threshold for values near 0}{zero <expression>}
-\key{draw axes}{[no]zeroaxis}
+\key{draw axes}{zeroaxis}
 \key{sets z-axis label}{zlabel "<label>" <xoff>,<yoff>}
 \key{set vertical range}{zrange [<zmin>:<zmax>]}
 \key{change vertical tics}{ztics <start>,<incr>,<end>,}
 \key{}{"<label>" <pos> }
-\key{draw z-axis}{[no]zzeroaxis}
+\key{draw z-axis}{zzeroaxis}
 \endindentedkeys
 
 \section{Contour Plots}
@@ -798,7 +797,7 @@ only.
 
 Syntax:
         set contour $\{$ base $|$ surface $|$ both $\}$
-        set nocontour
+        unset contour
 
 If no option is provided to {\bf set contour}, the default is {\bf base}.
 The three options specify where to draw the contours: {\bf base} draws
@@ -870,7 +869,7 @@ it is missing on a {\bf splot} it is assumed to be 0.
 \key{set label $\{<$tag$>\} \{"<$label_text$>"\}$}
 {$\{$at $<$x$>,<$y$>\{,<$z$>\}\}$}
 \key{}{$\{<$justification$>\}$}
-\key{set nolabel $\{<$tag$>\}$}{}
+\key{unset label $\{<$tag$>\}$}{}
 \key{show label}{}
 
 The text defaults to '''', and the position to 0,0,0.  The $<$x$>$, $<$y$>$, and
@@ -893,8 +892,8 @@ permitted but may interfere with axes labels or other text.
 {set label 3 "y=x^2" at 2,3,4 right}
 \key{\& tag the label number 3 }{}
 \key{change preceding label to center justification}{set label 3 center}
-\key{delete label number 2 }{set nolabel 2}
-\key{delete all labels}{set nolabel}
+\key{delete label number 2 }{unset label 2}
+\key{delete all labels}{unset label}
 \key{show all labels (in tag order)}{show label}
 
 (The EEPIC, Imagen, LaTeX, and TPIC drivers allow $\backslash$$\backslash$
@@ -903,11 +902,11 @@ in a string to specify a newline.)
 \section{Miscellaneous Commands}
 
 For further information on these commands, print out a copy
-of the GNUPLOT manual.
+of the gnuplot manual.
 
 \key{change working directory}{cd}
 \key{erase current screen or device}{clear}
-\key{exit GNUPLOT}{exit or quit or EOF}
+\key{exit gnuplot}{exit or quit or EOF}
 \key{display text and wait}{pause <time> ["<string>"]}
 \key{print the value of $<$expression$>$}{print <expression>}
 \key{print working directory}{pwd}
@@ -916,31 +915,31 @@ of the GNUPLOT manual.
 
 \section{Environment Variables}
 
-A number of shell environment variables are understood by GNUPLOT.
+A number of shell environment variables are understood by gnuplot.
 None of these are required, but may be useful.
 
 If GNUTERM is defined, it is used as the name of the terminal type to
-be used. This overrides any terminal type sensed by GNUPLOT on start
+be used. This overrides any terminal type sensed by gnuplot on start
 up, but is itself overridden by the .gnuplot (or equivalent) start-up
 file (see {\bf start-up}), and of course by later explicit changes.
 
-On Unix, AmigaDOS, and MS-DOS, GNUHELP may be defined to be the pathname
+On Unix, AmigaOS, and MS-DOS, GNUHELP may be defined to be the pathname
 of the HELP file (gnuplot.gih).
 
 On VMS, the symbol GNUPLOT\$HELP should be defined as the name of
-the help library for GNUPLOT.
+the help library for gnuplot.
 
 On Unix, HOME is used as the name of a directory to search for
 a .gnuplot file if none is found in the current directory.
-On AmigaDOS and MS-DOS, GNUPLOT is used. On VMS, SYS\$LOGIN: is used.
+On AmigaOS and MS-DOS, GNUPLOT is used. On VMS, SYS\$LOGIN: is used.
 See help start-up.
 
 On Unix, PAGER is used as an output filter for help messages.
 
-On Unix and AmigaDOS, SHELL is used for the {\bf shell} command. On MS-DOS,
+On Unix and AmigaOS, SHELL is used for the {\bf shell} command. On MS-DOS,
 COMSPEC is used for the {\bf shell} command.
 
-On AmigaDOS, GNUFONT is used for the screen font.  For example:
+On AmigaOS, GNUFONT is used for the screen font.  For example:
 ``setenv GNUFONT sapphire/14''.
 
 On MS-DOS, if the BGI interface is used, the variable {\bf BGI} is used to point
@@ -962,7 +961,7 @@ $<$real$>$ and $<$imag$>$ must be numerical constants.  For example,
 $\{3,2\}$ represents 3 + 2{\bf i} and $\{0,1\}$ represents {\bf i}
 itself.  The curly braces are explicitly required here.
 \section{Functions}
-The functions in GNUPLOT are the same as the corresponding functions
+The functions in gnuplot are the same as the corresponding functions
 in the Unix math library, except that all functions accept integer,
 real, and complex arguments, unless otherwise noted. The {\bf sgn}
 function is also supported, as in BASIC.
@@ -1012,7 +1011,7 @@ than $x$ (real part) \cr
 %\end{tabular}
 %\end{center}
 \section{Operators}
-The operators in GNUPLOT are the same as the corresponding operators
+The operators in gnuplot are the same as the corresponding operators
 in the C programming language, except that all operators accept
 integer, real, and complex arguments, unless otherwise noted.
 The ** operator (exponentiation) is supported, as in FORTRAN.
