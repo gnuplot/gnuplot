@@ -1,3 +1,7 @@
+2002-06-05  Johannes Zellner  <johannes@zellner.org>
+
+	* term/gd.trm: filledboxes
+
 2002-06-04  Johannes Zellner  <johannes@zellner.org>
 
 	* term/svg.trm: removed SVG_StyleStrokeColor() which was unused
@@ -560,7 +564,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/04 20:42:14 $).
+	last modification date (from the tag $Date: 2002/06/04 20:52:36 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

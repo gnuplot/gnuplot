@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.1 2002/04/29 13:37:02 broeker Exp $
+ * $Id: gd.trm,v 1.2 2002/05/16 21:29:18 joze Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -230,6 +230,113 @@ typedef struct {
 
 static PNG_BRUSH PNG_brush[7];
 
+#if USE_ULIG_FILLEDBOXES
+typedef struct {
+    gdImagePtr im;
+    unsigned int last_rgb;
+    int fillpar;
+}   PNG_FILL_TILE;
+
+static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0 };
+
+static int PNG_FillSolid __PROTO((int fillpar));
+static int PNG_FillPattern __PROTO((int fillpar));
+
+static int
+PNG_FillSolid(int fillpar)
+{
+    int rgb = png_state.rgb_table[png_state.linetype + 3];
+    int red   = (rgb >> 16) & 0xff;
+    int green = (rgb >> 8) & 0xff;
+    int blue  = rgb & 0xff;
+
+    double fact = (double)(100 - fillpar) * 0.01;
+
+    int color;
+
+    if (fact <= 0 || fact >= 1.0)
+	return png_state.color;
+
+    red   += (0xff - red) * fact;
+    green += (0xff - green) * fact;
+    blue  += (0xff - blue) * fact;
+
+    color = gdImageColorExact(png_state.image, red, green, blue);
+    if (color < 0) {
+	color = gdImageColorAllocate(png_state.image, red, green, blue);
+    }
+    if (color < 0) {
+	color = gdImageColorClosest(png_state.image, red, green, blue);
+    }
+
+    return color;
+}
+
+static int
+PNG_FillPattern(int fillpar)
+{
+    int rgb = png_state.rgb_table[png_state.linetype + 3];
+    fillpar %= 7;
+
+    if (!PNG_fill_tile.im || rgb != PNG_fill_tile.last_rgb || PNG_fill_tile.fillpar != fillpar) {
+
+	int foreground, background;
+
+	if (PNG_fill_tile.im) {
+	    gdImageDestroy(PNG_fill_tile.im);
+	    PNG_fill_tile.im = (gdImagePtr)0;
+	}
+
+	/* save new values */
+	PNG_fill_tile.fillpar = fillpar;
+	PNG_fill_tile.last_rgb = rgb;
+
+	/* create new tile */
+	PNG_fill_tile.im = gdImageCreate(8, 8);
+
+	/* background */
+	background = gdImageColorAllocate(PNG_fill_tile.im, 255, 255, 255); 
+	gdImageColorTransparent(PNG_fill_tile.im, background);
+	gdImageFilledRectangle(PNG_fill_tile.im, 0, 0, 7, 7, background);
+
+	/* foreground */
+	foreground = gdImageColorAllocate(PNG_fill_tile.im,
+		(rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
+
+	switch (fillpar) {
+	    case 0: /* no fill */
+	    default:
+		break;
+	    case 1:
+		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 7, foreground);
+		break;
+	    case 2:
+		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 0, foreground);
+		break;
+	    case 3:
+		gdImageLine(PNG_fill_tile.im, 0, 0, 3, 7, foreground);
+		gdImageLine(PNG_fill_tile.im, 4, 0, 7, 7, foreground);
+		break;
+	    case 4:
+		gdImageLine(PNG_fill_tile.im, 0, 7, 3, 0, foreground);
+		gdImageLine(PNG_fill_tile.im, 4, 7, 7, 0, foreground);
+		break;
+	    case 5:
+		gdImageLine(PNG_fill_tile.im, 0, 0, 7, 3, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 4, 7, 7, foreground);
+		break;
+	    case 6:
+		gdImageLine(PNG_fill_tile.im, 0, 3, 7, 0, foreground);
+		gdImageLine(PNG_fill_tile.im, 0, 7, 7, 4, foreground);
+		break;
+	}
+    }
+
+    gdImageSetTile(png_state.image, PNG_fill_tile.im);
+    return (int)gdTiled;
+}
+#endif
+
 /*
  * _options()  Called when terminal type is selected.  
  * This procedure should parse options on the command line.  A list of the 
@@ -443,13 +550,19 @@ int i;
 TERM_PUBLIC void
 PNG_reset()
 {
-int i;
+    int i;
     /* EAM - Clean up the brushes used for linewidth */
-    	for (i=2; i<=6; i++) {
-	    if (PNG_brush[i].im)
-		gdImageDestroy(PNG_brush[i].im);
-	    PNG_brush[i].im = 0;
-	}
+    for (i=2; i<=6; i++) {
+	if (PNG_brush[i].im)
+	    gdImageDestroy(PNG_brush[i].im);
+	PNG_brush[i].im = 0;
+    }
+#if USE_ULIG_FILLEDBOXES
+    if (PNG_fill_tile.im) {
+	gdImageDestroy(PNG_fill_tile.im);
+	PNG_fill_tile.im = (gdImagePtr)0;
+    }
+#endif
 }
 
 #ifdef PM3D
@@ -569,30 +682,52 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
  * style parameter is some garbled hash combining fillstyle and filldensity
  */
 TERM_PUBLIC void
-PNG_boxfill( style, x, y, width, height )
+PNG_boxfill(style, x, y, width, height)
 int style;
 unsigned int x, y, width, height;
 {
-unsigned int x1, y1, x2, y2;
-int          color;
-int          fillstyle = style & 0xf;
+    unsigned int x1, y1, x2, y2;
+    int          color;
 
-    switch (fillstyle) {
-    case 0:	/* Empty */
-    	color = png_state.color_table[0];
-	break;
-    case 1:	/* Solid */
-    case 2:	/* Pattern */
-    default:	
-    	color = png_state.color;
-	break;
-	}
-    x1 = x;
-    x2 = x + width;
-    y1 = png_state.height - (y+height);
-    y2 = png_state.height - y;
-    gdImageFilledRectangle( png_state.image, x1, y1, x2, y2, color );
+#if USE_ULIG_FILLEDBOXES
+    /* fillpar:
+     * - solid   : 0 - 100
+     * - pattern : 0 - 100
+     */
+    int fillpar = style >> 4;
+
+    /* style:
+     *   0 == empty
+     *   1 == solid
+     *   2 == pattern
+     */
+    style &= 0xf;
+
+    switch (style) {
+	case 0: /* fill with background color */
+#endif
+	    color = png_state.color_table[0];
+#if USE_ULIG_FILLEDBOXES
+	    break;
+	case 1: /* solid fill */
+	    color = PNG_FillSolid(fillpar);
+	    break;
+	case 2: /* pattern fill */
+	    color = PNG_FillPattern(fillpar);
+	    break;
+	default:
+	    /* should never happen */
+	    color = png_state.color;
+	    break;
     }
+#endif
+
+    x1 = x;
+    x2 = x + width - 1;
+    y2 = png_state.height - y;
+    y1 = y2 - height + 1;
+    gdImageFilledRectangle(png_state.image, x1, y1, x2, y2, color);
+}
 
 /*
  * _graphics()  Called just before a plot is going to be displayed.  This
