@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.54 2002/02/25 03:10:42 broeker Exp $
+ * $Id: x11.trm,v 1.55 2002/03/04 16:23:40 lhecking Exp $
  *
  */
 
@@ -217,14 +217,16 @@ parse_driver(const char *cmd)
 	    dir = X11_DRIVER_DIR;
 #ifndef OS2
 	if (dir[0] != '/' && dir[0] != '.')
-	    int_error(NO_CARET, "Illegal X11 driver directory name !");
+	    int_error(NO_CARET, "Illegal X11 driver directory name!");
 #endif
 	X11_full_command_path = gp_realloc(X11_full_command_path,
 					   strlen(dir) + strlen(optvec[0]) + 2,
 					   "x11 driver pathname");
-	sprintf(X11_full_command_path, "%s/%s",
-		dir, optvec[0]);
 	/* optvec[0] = X11_full_command_path; */
+	if (*dir)
+	    sprintf(X11_full_command_path, "%s/%s", dir, optvec[0]);
+	else
+	    sprintf(X11_full_command_path, "%s", optvec[0]);
     }
 	       
     return nr;
@@ -565,7 +567,9 @@ X11_init()
 	    dup2(fdes[0], 0);	/* stdin from pipe */
 	    execvp(X11_full_command_path, optvec);
 	    /* if we get here, something went wrong */
-	    perror("exec failed (X11 driver)");
+	    fprintf(stderr,"Expected X11 driver: %s\n",X11_full_command_path);
+	    perror("Exec failed");
+	    fprintf(stderr,"See 'help x11' for more details\n");
 	    exit(EXIT_FAILURE);
 	}
 	/* parent */
