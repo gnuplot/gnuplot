@@ -644,6 +644,26 @@ FILE *fp;
     else
 	fprintf(fp, "set noclabel\n");
 
+    fprintf(fp, "set mapping ");
+    switch(mapping3d) {
+    case MAP3D_SPHERICAL:
+	fprintf(fp, "spherical\n");
+	break;
+    case MAP3D_CYLINDRICAL:
+	fprintf(fp, "cylindrical\n");
+	break;
+    case MAP3D_CARTESIAN:
+    default:
+	fprintf(fp, "cartesian\n");
+	break;
+    }
+
+    if (missing_val != NULL)
+	fprintf(fp, "set missing %s\n", missing_val);
+
+    if (multiplot = TRUE)
+	fprintf(fp, "set multiplot\n);
+
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
     fprintf(fp, "set cntrparam ");
