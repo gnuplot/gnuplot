@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.46 2000/11/20 09:47:08 mikulik Exp $
+ * $Id: post.trm,v 1.47 2000/11/29 10:20:32 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -531,6 +531,9 @@ int can_reencode;
     case S_ENC_CP850 : 
 	recode = "reencodeCP850 def\n";
 	break;
+    case S_ENC_CP852 :
+	recode = "reencodeCP852 def\n";
+	break;
     default:
 	/* do nothing */
 	break;
@@ -945,6 +948,50 @@ NULL };
 "] def\n",
 NULL };
 
+/*   encoding for code page 852             */
+/*   Petr Mikulik <mikulik@physics.muni.cz> */
+
+    static const char GPFAR * GPFAR PS_cp_852_encoding[] = {
+"/reencodeCP852 {\n",
+"dup dup findfont dup length dict begin\n",
+"{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
+"currentdict /CharStrings known {\n",
+"\tCharStrings /Idieresis known {\n",
+"\t\t/Encoding CP852Encoding def } if\n} if\n",
+"currentdict end definefont\n",
+"} def\n",
+"/CP852Encoding [\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/paragraph/.notdef/.notdef/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef\n",
+"/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle\n",
+"/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash\n",
+"/zero/one/two/three/four/five/six/seven/eight/nine\n",
+"/colon/semicolon/less/equal/greater/question\n",
+"/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z\n",
+"/bracketleft/backslash/bracketright/asciicircum/underscore\n",
+"/grave/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w\n",
+"/x/y/z/braceleft/bar/braceright/asciitilde/.notdef\n",
+"/Ccedilla/udieresis/eacute/acircumflex/adieresis/uring/cacute/ccedilla\n",
+"/lslash/edieresis/Ohungarumlaut/ohungarumlaut/icircumflex/Zacute/Adieresis\n",
+"/Cacute/Eacute/Lacute/lacute/ocircumflex/odieresis/Lcaron/lcaron/Sacute\n",
+"/sacute/Odieresis/Udieresis/Tcaron/tcaron/Lslash/multiply/ccaron\n",
+"/aacute/iacute/oacute/uacute/Aogonek/aogonek/Zcaron/zcaron\n",
+"/Eogonek/eogonek/.notdef/zacute/Ccaron/scedilla/guillemotleft/guillemotright\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/Aacute/Acircumflex/Ecaron\n",
+"/Scedilla/.notdef/.notdef/.notdef/.notdef/Zdotaccent/zdotaccent/.notdef\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/Abreve/abreve\n",
+"/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/currency\n",
+"/eth/Eth/Dcaron/Edieresis/dcaron/Ncaron/Iacute/Icircumflex\n",
+"/ecaron/.notdef/.notdef/.notdef/.notdef/Tcedilla/Uring/.notdef\n",
+"/Oacute/germandbls/Ocircumflex/Nacute/nacute/ncaron/Scaron/scaron\n",
+"/Racute/Uacute/racute/Uhungarumlaut/yacute/Yacute/tcedilla/acute\n",
+"/hyphen/hungarumlaut/ogonek/caron/breve/section/divide/cedilla\n",
+"/degree/dieresis/dotaccent/uhungarumlaut/Rcaron/rcaron/.notdef/.notdef\n",
+"] def\n",
+NULL };
+
     struct termentry *t = term;
     int i;
     time_t now;
@@ -1002,6 +1049,11 @@ NULL };
     if (uses_fonts && (encoding == S_ENC_CP850)) {       /* JFi */
 	for (i = 0; PS_cp_850_encoding[i] != NULL; i++) {
 	    fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
+	}
+    }
+    if (uses_fonts && (encoding == S_ENC_CP852)) {
+	for (i = 0; PS_cp_852_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_cp_852_encoding[i]);
 	}
     }
     /* Duplicate code! 

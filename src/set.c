@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.45 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.46 2000/11/29 10:20:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1095,7 +1095,7 @@ set_encoding()
 	temp = lookup_table(&set_encoding_tbl[0],c_token);
 
 	if (temp == S_ENC_INVALID)
-	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'iso_8859_2', 'cp437' or 'cp850'");
+	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'iso_8859_2', 'cp437', 'cp850' or 'cp852'");
 	c_token++;
     }
     encoding = temp;

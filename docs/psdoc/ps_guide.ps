@@ -13,6 +13,7 @@ gnudict begin
 %    2 = ISO-Latin2 (also known as ISO-8859-2) for Unix (Central Europe)
 %    3 = CP 437 for MS-DOS
 %    4 = CP 850 for OS/2
+%    5 = CP 852 for OS/2
 /LastColumn 1 def
 
 /reEncode { findfont dup length dict begin
@@ -117,6 +118,37 @@ gnudict begin
 /Thorn/Uacute/Ucircumflex/Ugrave/yacute/Yacute/macron/acute
 /hyphen/plusminus/equal/threequarters/paragraph/section/divide/.notdef
 /degree/.notdef/periodcentered/onesuperior/threesuperior/twosuperior/.notdef/.notdef
+] def } def
+
+/CP852 { /EncodingCheck /ydieresis def /EncodingVector [
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/paragraph/.notdef/.notdef/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef
+/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle
+/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash
+/zero/one/two/three/four/five/six/seven
+/eight/nine/colon/semicolon/less/equal/greater/question
+/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W
+/X/Y/Z/bracketleft/backslash/bracketright/asciicircum/underscore
+/grave/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w
+/x/y/z/braceleft/bar/braceright/asciitilde/.notdef
+/Ccedilla/udieresis/eacute/acircumflex/adieresis/uring/cacute/ccedilla
+/lslash/edieresis/Ohungarumlaut/ohungarumlaut/icircumflex/Zacute/Adieresis/Cacute
+/Eacute/Lacute/lacute/ocircumflex/odieresis/Lcaron/lcaron/Sacute
+/sacute/Odieresis/Udieresis/Tcaron/tcaron/Lslash/multiply/ccaron
+/aacute/iacute/oacute/uacute/Aogonek/aogonek/Zcaron/zcaron
+/Eogonek/eogonek/.notdef/zacute/Ccaron/scedilla/guillemotleft/guillemotright
+/.notdef/.notdef/.notdef/.notdef/.notdef/Aacute/Acircumflex/Ecaron
+/Scedilla/.notdef/.notdef/.notdef/.notdef/Zdotaccent/zdotaccent/.notdef
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/Abreve/abreve
+/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/.notdef/currency
+/eth/Eth/Dcaron/Edieresis/dcaron/Ncaron/Iacute/Icircumflex
+/ecaron/.notdef/.notdef/.notdef/.notdef/Tcedilla/Uring/.notdef
+/Oacute/germandbls/Ocircumflex/Nacute/nacute/ncaron/Scaron/scaron
+/Racute/Uacute/racute/Uhungarumlaut/yacute/Yacute/tcedilla/acute
+/hyphen/hungarumlaut/ogonek/caron/breve/section/divide/cedilla
+/degree/dieresis/dotaccent/uhungarumlaut/Rcaron/rcaron/.notdef/.notdef
 ] def } def
 
 /Numbs [ (040) (041) (042) (043) (044) (045) (046) (047)
@@ -463,7 +495,8 @@ Title stringwidth pop -2 div
 /Extra LastColumn 1 eq {(ISO Latin-1)} if
        LastColumn 2 eq {(ISO Latin-2)} if
        LastColumn 3 eq {(CP437)} if
-       LastColumn 4 eq {(CP850)} if def
+       LastColumn 4 eq {(CP850)} if
+       LastColumn 5 eq {(CP852)} if def
 /H (T = text (here Times-Roman)    S = Symbol    Z = ZapfDingbats    E = ) def
 H stringwidth pop Extra stringwidth pop add
 ( encoding) stringwidth pop add -2 div
@@ -508,6 +541,9 @@ LastColumn 3 eq { % subcolumn: Times-Roman with CP 437 encoding
 LastColumn 4 eq { % Times-Roman with CP 850 encoding
                   /TRCP850 CP850 /Times-Roman reEncode
                   /TRCP850 findfont .175 scalefont setfont } if
+LastColumn 5 eq { % Times-Roman with CP 852 encoding
+                  /TRCP852 CP852 /Times-Roman reEncode
+                  /TRCP852 findfont .175 scalefont setfont } if
 /dX 1.125 def      % subcolumn offset
 /Sym Codes def     % item to be printed
 Doit
