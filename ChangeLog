@@ -1,3 +1,12 @@
+2002-10-18  Shigeharu TAKENO  <shige@iee.niit.ac.jp
+
+	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm, term/be.trm,
+	term/x11.trm: Fix a number of misprints.
+
+2002-10-18  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* term/linux.trm(LINUX_setup): Make driver work with devfs.
+
 2002-10-17  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/epslatex.trm: Surround the graph by \begingroup ... \endgroup so
@@ -1328,7 +1337,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/12 15:21:21 $).
+	last modification date (from the tag $Date: 2002/10/17 19:06:16 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
