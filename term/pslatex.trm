@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.30 2000/11/01 20:37:48 joze Exp $
+ * $Id: pslatex.trm,v 1.31 2000/11/20 09:47:08 mikulik Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -322,8 +322,8 @@ PSLATEX_graphics()
 	FILE *tmp;
 	/* these are taken from the post.trm file computation
 	 * of the bounding box, but without the X_OFF and Y_OFF */
-	int urx = (int) (xsize * (PS_XMAX) / PS_SC + 0.5);
-	int ury = (int) (ysize * (PS_YMAX) / PS_SC + 0.5);
+	int urx = (int) (xsize * (PSLATEX_XMAX) / PS_SC + 0.5);
+	int ury = (int) (ysize * (PSLATEX_YMAX) / PS_SC + 0.5);
 	/* moved this code here from beginning of the function
 	 * PSLATEX_auxname is only != NULL with the `auxfile' option */
 	char *psfile_basename = strrchr(PSLATEX_auxname, DIRSEP1);
