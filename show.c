@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: show.c,v 1.23.2.3 1999/11/18 20:42:54 lhecking Exp $";
+static char *RCSid = "$Id: show.c,v 1.23.2.4 1999/11/20 17:58:03 lhecking Exp $";
 #endif
 
 /* GNUPLOT - show.c */
@@ -1499,7 +1499,7 @@ FILE *fp;
     }
     fprintf(fp, "%s\n\
 %s\t%s\n\
-%s\tVersion %s patchlevel %s\n\
+%s\tVersion %s patchlevel %s (PRE-RELEASE, FOR DEVELOPERS ONLY)\n\
 %s\tlast modified %s\n\
 %s\tSystem: %s %s\n\
 %s\n\
