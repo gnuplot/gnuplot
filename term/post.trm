@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.125 2004/09/02 02:53:42 sfeam Exp $
+ * $Id: post.trm,v 1.126 2004/09/09 12:13:05 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -550,13 +550,15 @@ static const char GPFAR * GPFAR PS_header[] = {
 
 #define EAM_PSLEVEL2
 /*
- * To select which code block at run-time rather than at plot time:
+ * If we can trust the PostScript interpreter to know its own language level
+ * support, the following code fragment can replace use of the 
+ * "set term post ... level1" option.
  *
  * /languagelevel where
  *   {pop languagelevel} {1} ifelse
  *   2 lt
- *      {/PSLevel1 true def}
- *      {/PSLevel1 false def}
+ *      {/Level1 true def}
+ *      {/Level1 false def}
  *   ifelse
  */
 #ifdef EAM_PSLEVEL2
@@ -3184,13 +3186,12 @@ START_HELP(post)
 " Several options may be set in the `postscript` driver.",
 "",
 " Syntax:",
-"       set terminal postscript {<mode>} {enhanced | noenhanced}",
+"       set terminal postscript {<mode>} {level1} {enhanced | noenhanced}",
 "                               {color | colour | monochrome}",
 "                               {blacktext | colortext | colourtext}",
 "                               {solid | dashed} {dashlength | dl <DL>}",
 "                               {linewidth | lw <LW>}",
 "                               {<duplexing>}",
-"                               {level1}",
 "                               {rounded | butt}",
 "                               {fontfile [add | delete] \"<filename>\"}",
 "                               {palfuncparam <samples>{,<maxdeviation>}}",
