@@ -52,7 +52,7 @@
  * Define operating system dependent constants [default value]:
  *
  * OS:       [" "] Name of OS plus trailing space
- * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overriden by Makefile
+ * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overridden by Makefile
  * HOME:     ["HOME"] Name of environment variable which points to
  *           the directory where gnuplot's config file is found.
  * PLOTRC:   [".gnuplot"] Name of the gnuplot startup file.
@@ -60,6 +60,7 @@
  *           that is used to run external commands.
  * DIRSEP1:  ['/'] Primary character which separates path components.
  * DIRSEP2:  ['\0'] Secondary character which separates path components.
+ * PATHSEP:  [':'] Character which separates path names
  *        
  */
 
@@ -70,6 +71,7 @@
 #  define HOME     "GNUPLOT"
 #  define SHELL    "NewShell"
 #  define DIRSEP2  ':'
+#  define PATHSEP  ';'
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -83,11 +85,11 @@
 #endif /* Amiga */
 
 #ifdef ATARI
-# define OS "TOS "
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "gulam.prg"
-# define DIRSEP1 '\\'
+# define OS      "TOS "
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "gulam.prg"
+# define DIRSEP1  '\\'
 # ifdef MTOS
 #  define DIRSEP2 '/'
 # endif
@@ -98,12 +100,13 @@
 #endif /* Atari */
 
 #ifdef DOS386
-# define OS "DOS 386 "
+# define OS       "DOS 386 "
 # define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "\\command.com"
-# define DIRSEP1 '\\'
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "\\command.com"
+# define DIRSEP1  '\\'
+# define PATHSEP  ';'
 #endif /* DOS386 */
 
 #if defined(linux) || defined(__linux)
@@ -115,16 +118,17 @@
 #endif /* NeXT */
 
 #ifdef OS2
-# define OS "OS/2 "
+# define OS       "OS/2 "
 # define HELPFILE "gnuplot.gih"
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "c:\\os2\\cmd.exe"
-# define DIRSEP1 '\\'
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "c:\\os2\\cmd.exe"
+# define DIRSEP1  '\\'
+# define PATHSEP  ';'
 #endif /* OS/2 */
 
 #ifdef OSK
-# define OS "OS-9 "
+# define OS    "OS-9 "
 # define SHELL "/dd/cmds/shell"
 #endif /* OS-9 */
 
@@ -133,7 +137,7 @@
 # ifndef VMS
 #  define VMS
 # endif
-# define HOME "sys$login:"
+# define HOME   "sys$login:"
 # define PLOTRC "gnuplot.ini"
 # ifdef NO_GIH
    /* for show version long */
@@ -166,10 +170,11 @@
 #   define WIN16
 #  endif
 # endif /* WIN32 */
-# define HOME  "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "\\command.com"
+# define HOME    "GNUPLOT"
+# define PLOTRC  "gnuplot.ini"
+# define SHELL   "\\command.com"
 # define DIRSEP1 '\\'
+# define PATHSEP ';'
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
@@ -180,13 +185,14 @@
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
-# define OS "MS-DOS "
+# define OS       "MS-DOS "
 # undef HELPFILE
 # define HELPFILE "gnuplot.gih"
-# define HOME "GNUPLOT"
-# define PLOTRC "gnuplot.ini"
-# define SHELL "\\command.com"
-# define DIRSEP1 '\\'
+# define HOME     "GNUPLOT"
+# define PLOTRC   "gnuplot.ini"
+# define SHELL    "\\command.com"
+# define DIRSEP1  '\\'
+# define PATHSEP  ';'
 # ifdef __DJGPP__
 #  define DIRSEP2 '/'
 # endif
@@ -232,6 +238,10 @@
 
 #ifndef DIRSEP2
 # define DIRSEP2 NUL
+#endif
+
+#ifndef PATHSEP
+# define PATHSEP ':'
 #endif
 
 #ifndef FAQ_LOCATION
