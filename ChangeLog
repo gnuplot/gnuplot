@@ -9,12 +9,12 @@
 	output postscript file. New command 'set fontfile'. New option 'set
 	term postscript ... fontfile'.
 
-2002-09-02  Ethan Merritt <merritt@u.washington.edu>
+2002-09-02  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/axis.h src/graph3d.c src/graphics.c src/set.c:
 	Modularize the routines for label and tic-label handling.
 
-2002-08-30  Ethan Merritt <merritt@u.washington.edu>
+2002-08-30  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/term.c term/amiga.trm term/cgm.trm term/epslatex.trm 
         term/metapost.trm term/next.trm term/openstep.trm term/post.trm
@@ -37,16 +37,16 @@
 	`gamma`. Additions to `show palette ...`. New option `set terminal
 	postscript ... palfuncparam`.
 
-2002-08-28  Ethan Merritt <merritt@u.washington.edu>
+2002-08-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc term/hpgl.trm term/epslatex.trm:
 	Spell-check and fix typos in documentation.
 
-2002-08-28  Ethan Merritt <merritt@u.washington.edu>
+2002-08-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Fix error in terminal initialization.
 
-2002-08-27  Ethan Merritt <merritt@u.washington.edu>
+2002-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gif.trm term/png.trm: Update TERM_HELP sections
 	so that auto-generation of documentation is consistent. 
@@ -55,16 +55,16 @@
 	and retain terminal options across calls to set term. Move
 	default font properties into the per-terminal data structure.
 
-2002-08-27  Ethan Merritt <merritt@u.washington.edu>
+2002-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/jpeg.trm: Add placeholder file so that auto-generation of
 	documentation includes a section on jpeg.
 
-2002-08-27  Volker Dobler <v.dobler@web.de>
+2002-08-27  Volker Dobler  <v.dobler@web.de>
 
 	* src/color.c: Use signed int for cblabel positioning.
 
-2002-08-25  Ethan Merritt <merritt@u.washington.edu>
+2002-08-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm: Add support for selecting x11 fonts.
 	The syntax is `set term x11 font "<fontspec>"` where <fontspec> is
@@ -95,13 +95,13 @@
 	* src/graph3d.c: Obvious typo "inrange (0.0, X_AXIS.min, Y_AXIS.max)"
 	corrected.
 
-2002-08-24  Ethan Merritt <merritt@u.washington.edu>
+2002-08-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
 	src/unset.c docs/gnuplot.doc: Allow text rotation by artibitrary angle
 	in tic labels `set xtics rotate by <ang>`.
 
-2002-08-24  Ethan Merritt <merritt@u.washington.edu>
+2002-08-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm: Detect and modify non-PostScript font names to insure 
 	that legal PostScript is generated and that font size is correct.
@@ -1051,7 +1051,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/02 18:15:30 $).
+	last modification date (from the tag $Date: 2002/09/02 21:03:13 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
