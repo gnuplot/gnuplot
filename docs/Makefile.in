@@ -14,7 +14,7 @@
 #
 
 # default is what is needed for interactive gnuplot
-all: gnuplot.hlp gnuplot.gih
+all: gnuplot.gih
 
 # this tells GNU make not to export variables into the environment
 # But other makes dont understand its significance, so it must
@@ -59,6 +59,9 @@ EMACS = @EMACS@
 
 # substitute your troff command (and any flags) for this one
 TROFF = troff
+
+# LaTeX command, either latex or latex2e or no
+LATEX = @LATEX@
 
 # substitute your DVI to PostScript conversion program here
 DVIPS = dvips
@@ -157,8 +160,8 @@ doc2tex.o: doc2tex.c allterm.h
 dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
-	TEXINPUTS=.:$(srcdir): latex gnuplot
-	TEXINPUTS=.:$(srcdir): latex gnuplot
+	TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot
+	TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot
 
 gpcard.dvi: gpcard.tex
 	TEXINPUTS=.:$(srcdir): tex gpcard
@@ -306,6 +309,7 @@ clean:
 	  doc2rnh gnuplot.rnh \
 	  doc2rtf gnuplot.rtf \
 	  gnuplot.nroff checkdoc *.o core a.out allterm.h
+	rm -f *.exe
 
 mostlyclean: clean
 
