@@ -216,7 +216,8 @@ static TBOOLEAN
 	(void) putc('\n', stderr);
 	show_mapping();
 	c_token++;
-    } else if (almost_equals(c_token, "co$ntour")) {
+    } else if (almost_equals(c_token, "co$ntour") ||
+	       almost_equals(c_token, "cntrp$aram")) {
 	(void) putc('\n', stderr);
 	show_contour();
 	c_token++;
