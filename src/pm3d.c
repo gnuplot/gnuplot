@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.39 2003/03/13 14:47:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.40 2003/07/02 16:03:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -66,15 +66,38 @@ static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
  */
 
 /* Geometrical mean = pow( prod(x_i > 0) x_i, 1/N )
+ * Sign of the result: result is positive if 3 or 4 x_i are positive,
+ * it is negative if 3 or all 4 x_i are negative. Helps to splot surface
+ * with all color coordinates negative.
  */
 static double
 geomean4 (double x1, double x2, double x3, double x4)
 {
+#if 0
+    /* return 0 if any of the number is negative */
     if (x1 <= 0) x1 = 1;
     if (x2 > 0) x1 *= x2;
     if (x3 > 0) x1 *= x3;
     if (x4 > 0) x1 *= x4;
     return pow(x1, 0.25);
+#else
+    /* honor signess, i.e. sign(geomean) = sign(prod(x_i)) */
+    int neg = (x1 < 0) + (x2 < 0) + (x3 < 0) + (x4 < 0);
+    x1 *= x2 * x3 * x4;
+    if (x1 == 0) return 0;
+    /* pow(x, 0.25) is slightly faster than sqrt(sqrt(x)) */
+    x1 = sqrt(sqrt(fabs(x1)));
+#if 0
+    /* such a warning could be helpful, but under normal usage it is just an overhead */
+    if (neg > 1 && interactive && notwarned) {
+	    int notwarned = 1;  ... to be set on every new splot
+	    if (notwarned)
+		int_warn(NO_CARET, "corners2color geomean with negative data points");
+	    notwarned = 0;
+    }
+#endif
+    return (neg <= 2) ? x1 : -x1;
+#endif
 }
 
 
