@@ -5,15 +5,22 @@
 # by Lars Hecking  <lhecking@nmrc.ucc.ie> 1999-02-25
 #
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
-prefix = @prefix@
-datadir = @datadir@
-lispdir = @lispdir@
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+datadir = @datadir@
+libdir = @libdir@
+lispdir = @lispdir@
+infodir = @infodir@
+mandir = @mandir@
+
 subdir = lisp
 top_builddir = .
-top_srcdir = @top_srcdir@
 
 @SET_MAKE@
 EMACS = @EMACS@
@@ -23,15 +30,14 @@ LATEX = @LATEX@
 DVIPS = dvips
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-VPATH = @srcdir@
 
 # Command to byte-compile
 BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
 
 ELCS = info-look.elc gnuplot.elc gnuplot-gui.elc
 
-DIST_COMMON = ChangeLog Makefile.dst Makefile.in README aclocal.m4 configure \
-configure.in
+DIST_COMMON = ChangeLog Makefile.dst Makefile.in README aclocal.m4 \
+acinclude.m4 configure configure.in
 
 EXTRA_DIST = dot.el dotemacs gnuplot-gui.el gnuplot.el gnuplot.el.old \
 gpelcard.tex info-look.20.2.el info-look.20.3.el

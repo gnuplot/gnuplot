@@ -1,3 +1,28 @@
+1999-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL, config/makefile.cyg, config/makefile.mgw,
+	config/makefile.unx, src/Makefile.in, src/show.c: Use BINDIR
+	instead of GNUPLOT_BINDIR.
+
+1999-04-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/Makefile.in: Updated.
+
+	* lisp/acinclude.m4: Macro updated to version from automake-cvs.
+
+	* lisp/aclocal.m4, lisp/configure: Regenerated.
+
+1999-04-19  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* term/post.trm: Old patch from 1998, implementing different colours
+	for key text and sample (blacktext), linewidth, and dashlength options.
+	See terminal help section for more info.
+
+1999-04-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/ChangeLog, lisp/README, lisp/gnuplot-gui.el, lisp/gnuplot.el,
+	lisp/gpelcard.tex: Update to gnuplot-mode version 0.5e.
+
 1999-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* djconfig.sh: Moved to config/.
@@ -2063,7 +2088,7 @@
 
 	* 0PORTING: Fix typo.
 
-	* Makefile.in: Add -DGNUPLOT_BINDIR to show.o target.
+	* Makefile.in: Add -DBINDIR to show.o target.
 
 	* acinclude.m4: Add /usr/local/lib to gp_CHECK_LIB_PATH and
 	/usr/local/include to gp_CHECK_HEADER.
