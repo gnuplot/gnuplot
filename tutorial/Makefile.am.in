@@ -46,8 +46,8 @@ tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 
 .plt.tex:
 	@test -f eg3.dat || cp $(srcdir)/*.dat .
-	@if test -x ../src/gnuplot ; then \
-	  ../src/gnuplot $< ; \
+	@if test -x $(top_srcdir)/src/gnuplot ; then \
+	  $(top_srcdir)/src/gnuplot $< ; \
 	else \
 	  gnuplot $< ; \
 	fi
