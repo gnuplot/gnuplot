@@ -67,9 +67,18 @@
 #ifdef NEXT
 # include <mach/boolean.h>
 #else
+/* Sheer, raging paranoia */
+# ifdef TRUE
+#  undef TRUE
+# endif
+# ifdef FALSE
+#  undef FALSE
+# endif
 # define TRUE 1
 # define FALSE 0
 #endif
+/* TRUE or FALSE */
+typedef int TBOOLEAN;
 
 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
 #define DTRUE 3
@@ -333,8 +342,6 @@ typedef int (*sortfunc) __PROTO((const generic *, const generic *));
 #else
 typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
 #endif
-
-typedef int TBOOLEAN;
 
 enum operators {
 	/* keep this in line with table in plot.c */
