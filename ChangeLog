@@ -1,3 +1,26 @@
+1998-09-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h: Remove HAVE_LGAMMA and HAVE_STRNCASECMP.
+
+	* config.hin, configure: Regenerated.
+
+	* configure.in: Streamline header and functions tests to reduce
+	configure script size. Use AC_MSG_RESULT for configuration report.
+	Cosmetic changes.
+
+	* os2/gclient.h: Move #include <math.h> to top.
+
+	* term/post.trm: Enhpost psfonts scale patch by Dick Crawford
+	<rccrawford@lanl.gov>.
+
+	* readline.c: Patch by Petr Mikulik to not store duplicated
+	history entries. Indentation and comments cleanup.
+
+	* term/excl.trm, term/fg.trm, term/gif.trm, term/gnugraph.trm,
+	term/metafont.trm, term/mgr.trm, term/mif.trm, term/multitos.trm,
+	term/pm.trm, term/table.trm, term/win.trm, term/xlib.trm: Add
+	comments and RCS id.
+
 1998-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* binary.h, command.c, graph3d.c, graphics.c, interpol.c, plot2d.c,
@@ -8,9 +31,9 @@
 	in DEFAULT_X11 mainloop(). Fix some compiler warnings.
 
 	* plot.c: Move defintion of HOME, PLOTRC to plot.h. Clean up
-	load_rcfile(). Use new symbols PATHSEP1, PATHSEP2, NUL.
+	load_rcfile(). Use new symbols DIRSEP1, DIRSEP2, NUL.
 
-	* plot.h: Define HOME, PATHSEP1, PATHSEP2 in OS section. Define
+	* plot.h: Define HOME, DIRSEP1, DIRSEP2 in OS section. Define
 	PLOTRC.
 
 	* stdfn.h: Define NUL.
