@@ -1,5 +1,5 @@
 /*
- * $Id: compact.c,v 1.2 1998/11/25 21:05:04 lhecking Exp $
+ * $Id: compact.c,v 1.3 1999/10/01 15:09:10 lhecking Exp $
  *
  */
 
@@ -40,7 +40,6 @@
 #ifndef COMPACT
 
 static int compact_slope __PROTO((int xp[], int yp[], int isa_move[], int *sz, double delta));
-static int compact_int __PROTO((int xp[], int yp[], int isa_move[], int *size));
 
 /* replaces runs of constant slope in the buffer with single vectors 
    returns the number of points eliminated */
@@ -92,6 +91,11 @@ double delta;
     return (old_size - *sz);
 }
 
+/* currently unused */
+# if 0
+
+static int compact_int __PROTO((int xp[], int yp[], int isa_move[], int *size));
+
 /* compacts the vector list by compressing runs of constant 
    dx&dy into one vector
    use this if floating point is too expensive!
@@ -135,6 +139,7 @@ int xp[], yp[], isa_move[], *size;
     *size = index;
     return (old_size - *size);
 }
+# endif /* unused */
 #endif
 
 #define COMPACT
