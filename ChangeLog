@@ -1,3 +1,10 @@
+2002-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc demo/pm3d.dem src/pm3d.h src/pm3d.c src/save.c
+	src/set.c src/show.c src/tables.h src/tables.c: New pm3d option 
+	{no}ftriangles to draw flushing color triangles at scan tails with
+	different number of points.
+
 2002-03-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/internal.c: Merge purec_matherr() into matherr().
@@ -19,7 +26,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/09 14:23:23 $).
+	last modification date (from the tag $Date: 2002/03/09 17:48:38 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

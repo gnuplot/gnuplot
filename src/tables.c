@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.31 2002/02/15 08:44:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.32 2002/03/09 14:23:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -406,6 +406,8 @@ const struct gen_table set_pm3d_tbl[] =
     { "scansback$ward", S_PM3D_SCANSBACKWARD },
     { "scansauto$matic",S_PM3D_SCANS_AUTOMATIC },
     { "fl$ush",		S_PM3D_FLUSH },
+    { "ftr$iangles",	S_PM3D_FTRIANGLES },
+    { "noftr$iangles",	S_PM3D_NOFTRIANGLES },
     { "clip1$in",	S_PM3D_CLIP_1IN },
     { "clip4$in",	S_PM3D_CLIP_4IN },
     { "map", 		S_PM3D_MAP },

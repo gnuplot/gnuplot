@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.101 2002/02/18 15:03:33 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.102 2002/02/19 20:17:23 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5549,6 +5549,7 @@ C ... and restart the table:
                   { at <bst combination> }
                   { scansautomatic | scansforward | scansbackward }
                   { flush { begin | center | end } }
+                  { ftriangles | noftriangles }
                   { clip1in | clip4in }
                   { hidden3d <linestyle> | nohidden3d }
                   { transparent | solid }
@@ -5578,6 +5579,11 @@ C ... and restart the table:
  them (`flush center`). Note, that `flush (center|end)` are incompatible with
  `scansautomatic`: if you specify `flush center` or `flush end` and
  `scansautomatic` is set, it is silently switched to `scansforward`.
+
+ If two subsequent scans do not have the same number of points, the option
+ `ftriangles` specifies whether color triangles are drawn at the scan tail(s)
+ where there are not enough points in either of the scan. This can be used to
+ draw a smooth map boundary.
 
  Clipping with respect to the x,y coordinates can be done in two ways.
  `clip1in`:  all 4 points of the quadrangle must be defined and at least 1

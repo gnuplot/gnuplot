@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.78 2002/02/18 15:03:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.79 2002/03/09 14:23:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2549,6 +2549,13 @@ set_pm3d()
 		axis_array[FIRST_Y_AXIS].range_flags |= RANGE_REVERSE; /* set yrange reverse */
 		pm3d.map = 1;  /* trick for rotating ylabel */
 		continue;
+	    /* flushing triangles */
+	    case S_PM3D_FTRIANGLES: /* "ftr$iangles" */
+		pm3d.ftriangles = 1;
+		continue;
+	    case S_PM3D_NOFTRIANGLES: /* "noftr$iangles" */
+		pm3d.ftriangles = 0;
+		continue;
 	    /* pm3d-specific hidden line overwrite */
 	    case S_PM3D_HIDDEN: { /* "hi$dden3d" */
 		struct value a;
@@ -2586,10 +2593,13 @@ set_pm3d()
 	if (PM3D_SCANS_AUTOMATIC == pm3d.direction
 	    && PM3D_FLUSH_BEGIN != pm3d.flush) {
 	    pm3d.direction = PM3D_SCANS_FORWARD;
-#if 1
+#if 0
+	    /* be silent, don't print this warning */
+	    /* Rather FIXME that this combination is supported? Shouldn't be
+	       so big problem, I guess, just it is not implemented. */
 	    fprintf(stderr, "pm3d: `scansautomatic' and `flush %s' are incompatible\n",
 		PM3D_FLUSH_END == pm3d.flush ? "end": "center");
-	    fprintf(stderr, "   => setting `scansforward'\n");
+	    fputs("   => setting `scansforward'\n", stderr);
 #endif
 	}
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.73 2002/02/15 13:23:45 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.74 2002/02/15 15:40:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1804,6 +1804,7 @@ show_parametric()
 }
 
 #ifdef PM3D
+
 static void show_palette()
 {
     /* no option given, i.e. "show palette" */
@@ -1818,23 +1819,26 @@ static void show_palette()
 	/* print the description of the color formulae */
 	i = 0;
 	    while ( *(ps_math_color_formulae[2*i]) ) {
-		if (i % 3 == 0) fprintf(stderr, "\n\t    ");
+		if (i % 3 == 0)
+		    fputs("\n\t    ", stderr);
 		fprintf(stderr, "%2i: %-15s",i,ps_math_color_formulae[2*i+1]);
 		i++;
 	    }
-	    fprintf(stderr, "\n");
-	fprintf(stderr,"\t  * negative numbers mean inverted=negative colour component\n");
+	    fputs("\n", stderr);
+	fputs("\t  * negative numbers mean inverted=negative colour component\n", stderr);
 	fprintf(stderr,"\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
 	    sm_palette.colorFormulae-1,sm_palette.colorFormulae-1);
-	fprintf(stderr,"\t  * use 'show palette palette <n>' to print the colormap\n");
+	fputs("\t  * use 'show palette palette <n>' to print the colormap\n", stderr);
 	fprintf(stderr,"\tfigure is %s\n",
 	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
 	fprintf(stderr,"\tall color formulae ARE%s written into output postscript file\n",
 	    sm_palette.ps_allcF == 0 ? " NOT" : "");
-	fprintf(stderr,"\tallocating ");
-	if (sm_palette.use_maxcolors) fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
-	else fprintf(stderr,"ALL remaining");
-	fprintf(stderr," color positions for discrete palette terminals\n");
+	fputs("\tallocating ", stderr);
+	if (sm_palette.use_maxcolors)
+	    fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
+	else
+	    fputs("ALL remaining", stderr);
+	fputs(" color positions for discrete palette terminals\n", stderr);
 	return;
     }
     /* option: "show palette palette <n>" */
@@ -1848,9 +1852,9 @@ static void show_palette()
 	colors = (int) real(const_express(&a));
 	if (colors<2) colors = 100;
 	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
-	    printf("Gray palette with %i discrete colors\n", colors);
+	    fprintf(stderr, "Gray palette with %i discrete colors\n", colors);
 	else
-	    printf("Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i:\n",
+	    fprintf(stderr, "Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i:\n",
 		colors, sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
 	for (i = 0; i < colors; i++) {
 	    gray = (double)i / (colors - 1); /* colours equidistantly from [0,1] */
@@ -1863,7 +1867,7 @@ static void show_palette()
 		g = GetColorValueFromFormula(sm_palette.formulaG, gray);
 		b = GetColorValueFromFormula(sm_palette.formulaB, gray);
 	    }
-	    printf("%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
+	    fprintf(stderr, "%3i. gray=%0.4f, (r,g,b)=(%0.4f,%0.4f,%0.4f), #%02x%02x%02x = %3i %3i %3i\n",
 		i, gray, r,g,b,
 		(int)(colors*r),(int)(colors*g),(int)(colors*b),
 		(int)(colors*r),(int)(colors*g),(int)(colors*b));
@@ -1879,25 +1883,28 @@ static void show_colorbox()
 {
     c_token++;
     if (color_box.border) {
-	fprintf(stderr,"\tcolor box with border, ");
+	fputs("\tcolor box with border, ", stderr);
 	if (color_box.border_lt_tag >= 0)
 	    fprintf(stderr,"line type %d is ", color_box.border_lt_tag);
 	else
-	    fprintf(stderr,"DEFAULT line type is ");
+	    fputs("DEFAULT line type is ", stderr);
     } else {
-	fprintf(stderr,"\tcolor box without border is ");
+	fputs("\tcolor box without border is ", stderr);
     }
-    if (color_box.where == SMCOLOR_BOX_NO ) {
-	fprintf(stderr,"NOT drawn\n");
-    } else if (color_box.where == SMCOLOR_BOX_DEFAULT ) {
-	fprintf(stderr,"drawn at DEFAULT position\n");
-    } else if (color_box.where == SMCOLOR_BOX_USER ) {
-	fprintf(stderr,"drawn at USER position:\n");
-	fprintf(stderr,"\t\torigin: %g, %g\n", color_box.xorigin, color_box.yorigin);
-	fprintf(stderr,"\t\tsize  : %g, %g\n", color_box.xsize  , color_box.ysize  );
-    } else {
-	/* should *never* happen */
-	fprintf(stderr, "%s:%d please report this bug to <johannes@zellner.org>\n", __FILE__, __LINE__);
+    switch (color_box.where) {
+	case SMCOLOR_BOX_NO:
+	    fputs("NOT drawn\n", stderr);
+	    break;
+	case SMCOLOR_BOX_DEFAULT:
+	    fputs("drawn at DEFAULT position\n", stderr);
+	    break;
+	case SMCOLOR_BOX_USER:
+	    fputs("drawn at USER position:\n", stderr);
+	    fprintf(stderr,"\t\torigin: %g, %g\n", color_box.xorigin, color_box.yorigin);
+	    fprintf(stderr,"\t\tsize  : %g, %g\n", color_box.xsize  , color_box.ysize  );
+	    break;
+	default: /* should *never* happen */
+	    int_error(NO_CARET, "Argh !");
     }
     fprintf(stderr,"\tcolor gradient is %s in the color box\n",
 	color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");
@@ -1908,46 +1915,48 @@ static void show_pm3d()
 {
     c_token++;
     if (!pm3d.where[0]) {
-	fprintf(stderr, "\tpm3d is OFF\n");
+	fputs("\tpm3d is OFF\n", stderr);
 	return;
     }
-    fprintf(stderr,"\tpm3d plotted at ");
+    fputs("\tpm3d plotted at ", stderr);
     { int i=0;
 	for ( ; pm3d.where[i]; i++ ) {
-	    if (i>0) fprintf(stderr,", then ");
+	    if (i>0) fputs(", then ", stderr);
 	    switch (pm3d.where[i]) {
-		case PM3D_AT_BASE: fprintf(stderr,"BOTTOM"); break;
-		case PM3D_AT_SURFACE: fprintf(stderr,"SURFACE"); break;
-		case PM3D_AT_TOP: fprintf(stderr,"TOP"); break;
+		case PM3D_AT_BASE: fputs("BOTTOM", stderr); break;
+		case PM3D_AT_SURFACE: fputs("SURFACE", stderr); break;
+		case PM3D_AT_TOP: fputs("TOP", stderr); break;
 	    }
 	}
-	fprintf(stderr,"\n");
+	fputs("\n", stderr);
     }
     if (pm3d.direction != PM3D_SCANS_AUTOMATIC) {
 	fprintf(stderr,"\ttaking scans in %s direction\n",
 	    pm3d.direction == PM3D_SCANS_FORWARD ? "FORWARD" : "BACKWARD");
     } else {
-	fprintf(stderr,"\ttaking scans direction automatically\n");
+	fputs("\ttaking scans direction automatically\n", stderr);
     }
-    fprintf(stderr,"\tsubsequent scans with different nb of pts are ");
-    if (pm3d.flush == PM3D_FLUSH_CENTER) fprintf(stderr,"CENTERED\n");
+    fputs("\tsubsequent scans with different nb of pts are ", stderr);
+    if (pm3d.flush == PM3D_FLUSH_CENTER) fputs("CENTERED\n", stderr);
     else fprintf(stderr,"flushed from %s\n",
 	pm3d.flush == PM3D_FLUSH_BEGIN ? "BEGIN" : "END");
-    fprintf(stderr,"\tclipping: ");
+    fprintf(stderr,"\tflushing triangles are %sdrawn\n",
+	pm3d.ftriangles ? "" : "not ");
+    fputs("\tclipping: ", stderr);
     if (pm3d.clip == PM3D_CLIP_1IN)
-	fprintf(stderr,"at least 1 point of the quadrangle in x,y ranges\n");
+	fputs("at least 1 point of the quadrangle in x,y ranges\n", stderr);
     else
-	fprintf(stderr, "all 4 points of the quadrangle in x,y ranges\n");
+	fputs( "all 4 points of the quadrangle in x,y ranges\n", stderr);
     if (pm3d.hidden3d_tag) {
 	fprintf(stderr,"\tpm3d-hidden3d is on an will use linestyle %d\n",
 	    pm3d.hidden3d_tag);
     } else {
-	fprintf(stderr,"\tpm3d-hidden3d is off\n");
+	fputs("\tpm3d-hidden3d is off\n", stderr);
     }
     if (pm3d.solid) {
-	fprintf(stderr,"\tborders, tics and labels may be hidden by the surface\n");
+	fputs("\tborders, tics and labels may be hidden by the surface\n", stderr);
     } else {
-	fprintf(stderr,"\tsurface is transparent for borders, tics and labels\n");
+	fputs("\tsurface is transparent for borders, tics and labels\n", stderr);
     }
     fprintf(stderr,"\t%s", PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit");
 }

@@ -38,7 +38,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
-* NEW splot ... with pm3d [at option]
+* NEW pm3d option {no}ftriangles
+* NEW splot ... with pm3d {at option}
 * CHANGE pause supports subsecond time resolution (on systems supporting it)
 * CHANGE "configure --with-x11-driver" and "set term x11 driver" removed.
 * CHANGE gnuplot_x11 now goes to $pkglibdir/$version, not $bindir
@@ -59,8 +60,8 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 * CHANGE reject candlesticks/financebars plots of to few colums --- warn
   and then plot with "points", instead
 * NEW Hotkeys to access clipboard in MS Windows version
-* NEW set style [data | function] filledcurves [options]
-      plot ... with filledcurves [options]
+* NEW set style [data | function] filledcurves {options}
+      plot ... with filledcurves {options}
 * NEW autoscale options: `fix`, `keepfix`
 * NEW some more fancy 3D demo plots
 * NEW mouse support and PM3D are now enabled by default

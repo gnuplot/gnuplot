@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.12 2002/02/25 03:10:41 broeker Exp $
+ * $Id: pm3d.h,v 1.13 2002/02/28 09:36:44 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -85,6 +85,7 @@ typedef struct {
   char map;		/* set to 1 during 'set pm3d map' (workaround for
 			   non-existing 2D map plot) */
   char flush;   	/* left, right, center */
+  char ftriangles;   	/* 0/1 (don't) draw flushing triangles */
   char direction;	/* forward, backward */
   char clip;		/* 1in, 4in */
   int hidden3d_tag;     /* if this is > 0, pm3d hidden lines are drawn with

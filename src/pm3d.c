@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.27 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.28 2002/02/28 09:36:44 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -40,6 +40,7 @@ pm3d_struct pm3d = {
     "",				/* where[6] */
     0,				/* no map */
     PM3D_FLUSH_BEGIN,		/* flush */
+    0,				/* no flushing triangles */
     PM3D_SCANS_AUTOMATIC,	/* scans direction is determined automatically */
     PM3D_CLIP_1IN,		/* clipping: at least 1 point in the ranges */
     0,				/* no pm3d hidden3d is drawn */
@@ -234,7 +235,9 @@ pm3d_plot(this_plot, at_which_z)
     struct surface_points *this_plot;
     char at_which_z;
 {
-    int i, j, ii, from, curve, scan, up_to, up_to_minus, invert = 0;
+    int j, i, i1, ii, ii1, from, curve, scan, up_to, up_to_minus, invert = 0;
+    int go_over_pts, max_pts;
+    int are_ftriangles, ftriangles_low_pt, ftriangles_high_pt;
     struct iso_curve *scanA, *scanB;
     struct coordinate GPHUGE *pointsA, *pointsB;
     struct iso_curve **scan_array;
@@ -314,7 +317,7 @@ pm3d_plot(this_plot, at_which_z)
 	pointsB = scanB->points;
 	/* if the number of points in both scans is not the same, then the
 	 * starting index (offset) of scan B according to the flushing setting
-	 *has to be determined
+	 * has to be determined
 	 */
 	from = 0;		/* default is pm3d.flush==PM3D_FLUSH_BEGIN */
 	if (pm3d.flush == PM3D_FLUSH_END)
@@ -323,32 +326,71 @@ pm3d_plot(this_plot, at_which_z)
 	    from = abs(scanA->p_count - scanB->p_count) / 2;
 	/* find the minimal number of points in both scans */
 	up_to = GPMIN(scanA->p_count, scanB->p_count) - 1;
-	/* go over the minimal number of points from both scans.
+	up_to_minus = up_to - 1; /* calculate only once */
+	are_ftriangles = pm3d.ftriangles && (scanA->p_count != scanB->p_count);
+	if (!are_ftriangles)
+	    go_over_pts = up_to;
+	else {
+	    max_pts = GPMAX(scanA->p_count, scanB->p_count);
+	    go_over_pts = max_pts - 1;
+	    /* the j-subrange of quadrangles; in the remaing of the interval 
+	     * [0..up_to] the flushing triangles are to be drawn */
+	    ftriangles_low_pt = from;
+	    ftriangles_high_pt = from + up_to_minus;
+	}
+	/* Go over 
+	 *   - the minimal number of points from both scans, if only quadrangles.
+	 *   - the maximal number of points from both scans if flush triangles
+	 *     (the missing points in the scan of lower nb of points will be 
+	 *     duplicated from the begin/end points).
+	 *
 	 * Notice: if it would be once necessary to go over points in `backward'
 	 * direction, then the loop body below would require to replace the data
 	 * point indices `i' by `up_to-i' and `i+1' by `up_to-i-1'.
 	 */
-	up_to_minus = up_to - 1;	/* calculate only once */
-	for (j = 0; j < up_to; j++) {
-	    i = j;
-	    if (PM3D_SCANS_AUTOMATIC == pm3d.direction && invert) {
-		i = up_to_minus - j;
+	for (j = 0; j < go_over_pts; j++) {
+	    /* Now i be the index of the scan with smaller number of points,
+	     * ii of the scan with larger number of points. */
+	    if (are_ftriangles && (j < ftriangles_low_pt || j > ftriangles_high_pt)) {
+		i = (j <= ftriangles_low_pt) ? 0 : ftriangles_high_pt-from+1;
+		ii = j;
+		i1 = i;
+		ii1 = ii + 1;
+	    } else {
+		int jj = are_ftriangles ? j - from : j;
+		i = jj;
+		if (PM3D_SCANS_AUTOMATIC == pm3d.direction && invert)
+		    i = up_to_minus - jj;
+		ii = i + from;
+		i1 = i + 1;
+		ii1 = ii + 1;
 	    }
-	    ii = i + from;	/* index to the B array */
+	    /* From here, i is index to scan A, ii to scan B */
+	    if (scanA->p_count > scanB->p_count) {
+	        int itmp = i;
+		i = ii;
+		ii = itmp;
+		itmp = i1;
+		i1 = ii1;
+		ii1 = itmp;
+	    }
+#if 0
+	    fprintf(stderr,"j=%i:  i=%i i1=%i  [%i]   ii=%i ii1=%i  [%i]\n",j,i,i1,scanA->p_count,ii,ii1,scanB->p_count);
+#endif
 	    /* choose the clipping method */
 	    if (pm3d.clip == PM3D_CLIP_4IN) {
 		/* (1) all 4 points of the quadrangle must be in x and y range */
-		if (!(pointsA[i].type == INRANGE && pointsA[i + 1].type == INRANGE &&
-		      pointsB[ii].type == INRANGE && pointsB[ii + 1].type == INRANGE))
+		if (!(pointsA[i].type == INRANGE && pointsA[i1].type == INRANGE &&
+		      pointsB[ii].type == INRANGE && pointsB[ii1].type == INRANGE))
 		    continue;
 	    } else {		/* (pm3d.clip == PM3D_CLIP_1IN) */
 		/* (2) all 4 points of the quadrangle must be defined */
-		if (pointsA[i].type == UNDEFINED || pointsA[i + 1].type == UNDEFINED ||
-		    pointsB[ii].type == UNDEFINED || pointsB[ii + 1].type == UNDEFINED)
+		if (pointsA[i].type == UNDEFINED || pointsA[i1].type == UNDEFINED ||
+		    pointsB[ii].type == UNDEFINED || pointsB[ii1].type == UNDEFINED)
 		    continue;
 		/* and at least 1 point of the quadrangle must be in x and y range */
-		if (pointsA[i].type == OUTRANGE && pointsA[i + 1].type == OUTRANGE &&
-		    pointsB[ii].type == OUTRANGE && pointsB[ii + 1].type == OUTRANGE)
+		if (pointsA[i].type == OUTRANGE && pointsA[i1].type == OUTRANGE &&
+		    pointsB[ii].type == OUTRANGE && pointsB[ii1].type == OUTRANGE)
 		    continue;
 	    }
 #ifdef EXTENDED_COLOR_SPECS
@@ -358,19 +400,20 @@ pm3d_plot(this_plot, at_which_z)
 		   I always wonder what is faster: d*0.25 or d/4? Someone knows? -- 0.25 (joze) */
 		if (color_from_column)
 		    /* ylow is set in plot3d.c:get_3ddata() */
-		    avgC = (pointsA[i].ylow + pointsA[i + 1].ylow + pointsB[ii].ylow + pointsB[ii + 1].ylow) * 0.25;
+		    avgC = (pointsA[i].ylow + pointsA[i1].ylow + pointsB[ii].ylow + pointsB[ii1].ylow) * 0.25;
 		else
-		    avgC = (z2cb(pointsA[i].z) + z2cb(pointsA[i + 1].z) + z2cb(pointsB[ii].z) + z2cb(pointsB[ii + 1].z)) * 0.25;
+		    avgC = (z2cb(pointsA[i].z) + z2cb(pointsA[i1].z) + z2cb(pointsB[ii].z) + z2cb(pointsB[ii1].z)) * 0.25;
 		/* transform z value to gray, i.e. to interval [0,1] */
 		gray = cb2gray(avgC);
-		/* print the quadrangle with the given color */
 #if 0
+		/* print the quadrangle with the given color */
 		printf("averageColor %g\tgray=%g\tM %g %g L %g %g L %g %g L %g %g\n",
 		       avgColor,
 		       gray,
-		       pointsA[i].x, pointsA[i].y,
-		       pointsB[ii].x, pointsB[ii].y, pointsB[ii + 1].x, pointsB[ii + 1].y, pointsA[i + 1].x, pointsA[i + 1].y);
+		       pointsA[i].x, pointsA[i].y, pointsB[ii].x, pointsB[ii].y,
+		       pointsB[ii1].x, pointsB[ii1].y, pointsA[i1].x, pointsA[i1].y);
 #endif
+		/* set the color */
 		set_color(gray);
 #ifdef EXTENDED_COLOR_SPECS
 	    }
@@ -379,10 +422,10 @@ pm3d_plot(this_plot, at_which_z)
 	    corners[0].y = pointsA[i].y;
 	    corners[1].x = pointsB[ii].x;
 	    corners[1].y = pointsB[ii].y;
-	    corners[2].x = pointsB[ii + 1].x;
-	    corners[2].y = pointsB[ii + 1].y;
-	    corners[3].x = pointsA[i + 1].x;
-	    corners[3].y = pointsA[i + 1].y;
+	    corners[2].x = pointsB[ii1].x;
+	    corners[2].y = pointsB[ii1].y;
+	    corners[3].x = pointsA[i1].x;
+	    corners[3].y = pointsA[i1].y;
 
 	    if (at_which_z == PM3D_AT_SURFACE) {
 		/* always supply the z value if
@@ -390,22 +433,22 @@ pm3d_plot(this_plot, at_which_z)
 		 */
 		corners[0].z = pointsA[i].z;
 		corners[1].z = pointsB[ii].z;
-		corners[2].z = pointsB[ii + 1].z;
-		corners[3].z = pointsA[i + 1].z;
+		corners[2].z = pointsB[ii1].z;
+		corners[3].z = pointsA[i1].z;
 	    }
 #ifdef EXTENDED_COLOR_SPECS
 	    if (supply_extended_color_specs) {
 		if (color_from_column) {
 		    icorners[0].z = pointsA[i].ylow;
 		    icorners[1].z = pointsB[ii].ylow;
-		    icorners[2].z = pointsB[ii + 1].ylow;
-		    icorners[3].z = pointsA[i + 1].ylow;
+		    icorners[2].z = pointsB[ii1].ylow;
+		    icorners[3].z = pointsA[i1].ylow;
 		} else {
 		    /* the target wants z and gray value */
 		    icorners[0].z = pointsA[i].z;
 		    icorners[1].z = pointsB[ii].z;
-		    icorners[2].z = pointsB[ii + 1].z;
-		    icorners[3].z = pointsA[i + 1].z;
+		    icorners[2].z = pointsB[ii1].z;
+		    icorners[3].z = pointsA[i1].z;
 		}
 		for (i = 0; i < 4; i++) {
 		    icorners[i].spec.gray = 
@@ -417,9 +460,8 @@ pm3d_plot(this_plot, at_which_z)
 	    /* filled_polygon( 4, corners ); */
 	    filled_quadrangle(corners);
 #endif
-	}			/* loop over points of two subsequent scans */
-    }				/* loop over scans */
-    /* printf("\n"); */
+	} /* loop quadrangles over points of two subsequent scans */
+    } /* loop over scans */
 
     /* free memory allocated by scan_array */
     free(scan_array);
@@ -487,6 +529,7 @@ pm3d_reset(void)
     pm3d.where[0] = 0;
     pm3d.map = 0;
     pm3d.flush = PM3D_FLUSH_BEGIN;
+    pm3d.ftriangles = 0;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_1IN;
     pm3d.hidden3d_tag = 0;
