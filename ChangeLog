@@ -1,5 +1,10 @@
 2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* config/makefile.os2: Lowercased IF EXIST and DEL commands (there is
+	a make.exe program reported to dislike uppercases).
+
+2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
         * src/gplt_x11.c:
         (getMultiTabConsoleSwitchCommand): New routine to return system command
         to switch to the appropriate "tab" of a multitab console window where

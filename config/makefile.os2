@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.40 2003/02/19 18:59:24 mikulik Exp $
+# $Id: makefile.os2,v 1.41 2003/04/04 13:58:19 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -333,7 +333,7 @@ getcolor_x11.o: getcolor.c
 # gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
 #
 config.h: ..\config\config.os2
-	IF EXIST $@ DEL $@
+	if exist $@ del $@
 	copy $< $@
 
 #
@@ -462,36 +462,37 @@ $(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
 
 # Clean up all files temporary used
 clean:
-	IF EXIST config.h               DEL config.h
-	IF EXIST *.$(O)                    DEL *.$(O)
-	IF EXIST *.$(O2)                   DEL *.$(O2)
-	cd $(OS2DIR) && IF EXIST *.$(O2)   DEL *.$(O2)
-	IF EXIST $(OS2DIR)\gnupmdrv.res    DEL $(OS2DIR)\gnupmdrv.res
-	IF EXIST $(DEMODIR)\bf_test.exe    DEL $(DEMODIR)\bf_test.exe
-	IF EXIST $(DOCDIR)\doc2*.exe       DEL $(DOCDIR)\doc2*.exe
-	IF EXIST $(DOCDIR)\gnuplot.ipf     DEL $(DOCDIR)\gnuplot.ipf
-	IF EXIST $(DOCDIR)\gnuplot_2*      DEL $(DOCDIR)\gnuplot_2*
-	IF EXIST $(DOCDIR)\gnuplot_3*      DEL $(DOCDIR)\gnuplot_3*
-	IF EXIST core                      DEL core
-	IF EXIST $(DOCDIR)\allterm.?       DEL $(DOCDIR)\allterm.?
+	if exist config.h               del config.h
+	if exist *.$(O)                    del *.$(O)
+	if exist *.$(O2)                   del *.$(O2)
+	cd $(OS2DIR) && if exist *.$(O2)   del *.$(O2)
+	if exist $(OS2DIR)\gnupmdrv.res    del $(OS2DIR)\gnupmdrv.res
+	if exist $(DEMODIR)\bf_test.exe    del $(DEMODIR)\bf_test.exe
+	if exist $(DOCDIR)\doc2*.exe       del $(DOCDIR)\doc2*.exe
+	if exist $(DOCDIR)\gnuplot.ipf     del $(DOCDIR)\gnuplot.ipf
+	if exist $(DOCDIR)\gnuplot_2*      del $(DOCDIR)\gnuplot_2*
+	if exist $(DOCDIR)\gnuplot_3*      del $(DOCDIR)\gnuplot_3*
+	if exist core                      del core
+	if exist $(DOCDIR)\allterm.?       del $(DOCDIR)\allterm.?
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
-	IF EXIST *.exe                     DEL *.exe         
-	IF EXIST $(DOCDIR)\gnuplot.dvi     DEL $(DOCDIR)\gnuplot.dvi
-	IF EXIST $(DOCDIR)\gnuplot.gih     DEL $(DOCDIR)\gnuplot.gih
-	IF EXIST $(DOCDIR)\gnupmdrv.hlp    DEL $(DOCDIR)\gnupmdrv.hlp
-	IF EXIST $(DOCDIR)\gnuplot.html    DEL $(DOCDIR)\gnuplot.html
-	IF EXIST $(DOCDIR)\gnuplot.inf     DEL $(DOCDIR)\gnuplot.inf
-	IF EXIST $(DOCDIR)\gnuplot.info    DEL $(DOCDIR)\gnuplot.info
-	IF EXIST $(DOCDIR)\gnuplot.ms      DEL $(DOCDIR)\gnuplot.ms
-	IF EXIST $(DOCDIR)\gnuplot.ps      DEL $(DOCDIR)\gnuplot.ps
-	IF EXIST $(DOCDIR)\gnuplot.pdf     DEL $(DOCDIR)\gnuplot.pdf
-	IF EXIST $(DOCDIR)\gnuplot.rtf     DEL $(DOCDIR)\gnuplot.rtf
-	IF EXIST $(DOCDIR)\gnuplot.tex     DEL $(DOCDIR)\gnuplot.tex
-	IF EXIST $(DOCDIR)\gpcard*.ps      DEL $(DOCDIR)\gpcard*.ps
-	IF EXIST $(DOCDIR)\*.dvi           DEL $(DOCDIR)\*.dvi
-	IF EXIST $(DOCDIR)\*.log           DEL $(DOCDIR)\*.log
-	IF EXIST $(DOCDIR)\*.aux           DEL $(DOCDIR)\*.aux
-	IF EXIST $(DOCDIR)\*.toc           DEL $(DOCDIR)\*.toc
-	IF EXIST $(DEMODIR)\binary?        DEL $(DEMODIR)\binary?
+	if exist *.exe                     del *.exe         
+	if exist $(DOCDIR)\gnuplot.dvi     del $(DOCDIR)\gnuplot.dvi
+	if exist $(DOCDIR)\gnuplot.gih     del $(DOCDIR)\gnuplot.gih
+	if exist $(DOCDIR)\gnupmdrv.hlp    del $(DOCDIR)\gnupmdrv.hlp
+	if exist $(DOCDIR)\gnuplot.html    del $(DOCDIR)\gnuplot.html
+	if exist $(DOCDIR)\gnuplot.inf     del $(DOCDIR)\gnuplot.inf
+	if exist $(DOCDIR)\gnuplot.info    del $(DOCDIR)\gnuplot.info
+	if exist $(DOCDIR)\gnuplot.ms      del $(DOCDIR)\gnuplot.ms
+	if exist $(DOCDIR)\gnuplot.ps      del $(DOCDIR)\gnuplot.ps
+	if exist $(DOCDIR)\gnuplot.pdf     del $(DOCDIR)\gnuplot.pdf
+	if exist $(DOCDIR)\gnuplot.rtf     del $(DOCDIR)\gnuplot.rtf
+	if exist $(DOCDIR)\gnuplot.tex     del $(DOCDIR)\gnuplot.tex
+	if exist $(DOCDIR)\gpcard*.ps      del $(DOCDIR)\gpcard*.ps
+	if exist $(DOCDIR)\*.dvi           del $(DOCDIR)\*.dvi
+	if exist $(DOCDIR)\*.log           del $(DOCDIR)\*.log
+	if exist $(DOCDIR)\*.aux           del $(DOCDIR)\*.aux
+	if exist $(DOCDIR)\*.toc           del $(DOCDIR)\*.toc
+	if exist $(DEMODIR)\binary?        del $(DEMODIR)\binary?
+
