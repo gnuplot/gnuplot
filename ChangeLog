@@ -1,3 +1,14 @@
+2001-02-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_text, EMF_reset): Reset emf_graphics flag to
+ 	FALSE to fix bug reported by J.Bollinger.
+
+	* term/emf.trm (EMF_STOCK_OBJECT_FLAG,
+ 	EMF_STOCK_OBJECT_WHITE_BRUSH, EMF_STOCK_OBJECT_BLACK_PEN,
+ 	EMF_STOCK_OBJECT_DEFAULT_FONT): New mnemonic macros to replace
+ 	magic numbers.
+	(EMF_setfont, EMF_text, EMF_dashtype): Use them.
+
 2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* 0INSTALL [HP-UX 10.x]: change recommendations regarding GCC on
