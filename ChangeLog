@@ -1,3 +1,32 @@
+1999-02-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c: Move STREQ and STREQN mcaros to plot.h.
+
+	* command.c, datafile.c, fit.c, gplt_x11.c, help.c, plot.c, plot2d.c,
+	plot3d.c, readline.c, stdfn.c, term.c: Replace strcmp() with STREQ().
+
+	* configure: Regenerated.
+
+	* configure.in: Warning message if terminal list could not be created.
+
+	* graphics.c, plot.c, set.c, specfun.c, term/emxvga.trm, term/fig.trm,
+	util.c, util3d.c: Remove local definitions of "pi", replace with
+	M_PI/M_PI_2/DEG2RAD where appropriate.
+
+	* plot.h: Cleaning up. Remove "Pi" symbol, define M_PI and M_PI_2
+	instead. Add STREQ() and STREQN() macros from command.c.
+
+	* term/x11.trm: Merge X11_opts[] and X11_optarg[] into one array.
+	Indentation.
+
+1999-02-16  "Jürgen v.Hagen" <vonhagen@ihefiji.etec.uni-karlsruhe.de>
+
+	* term/latex.trm: Add explanation about point symbols in LaTeX2e.
+
+1999-02-14  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* term.h: Include aed, unixplot and other drivers in OS/2 version.
+
 1999-02-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* fit.c, fit.h, matrix.c, matrix.h: Change of copyright status.
