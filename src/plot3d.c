@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.61 2003/02/16 00:07:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.62 2003/11/13 08:37:57 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -605,7 +605,7 @@ get_3ddata(this_plot)
 {
     int xdatum = 0;
     int ydatum = 0;
-    int i, j;
+    int j;
 #ifdef PM3D
     double v[4];
 #else
@@ -859,6 +859,7 @@ get_3ddata(this_plot)
     if (this_plot->has_grid_topology && !hidden3d) {
 	struct iso_curve *new_icrvs = NULL;
 	int num_new_iso = this_plot->iso_crvs->p_count, len_new_iso = this_plot->num_iso_read;
+	int i;
 
 	/* Now we need to set the other direction (pseudo) isolines. */
 	for (i = 0; i < num_new_iso; i++) {

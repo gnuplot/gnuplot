@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.40 2003/07/02 16:03:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.41 2004/01/10 21:13:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -493,7 +493,7 @@ pm3d_plot(this_plot, at_which_z)
 		    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
 		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
 		    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
-		    default: int_error(NO_CARET, "cannot be here");
+		    default: int_error(NO_CARET, "cannot be here"); avgC = 0;
 		}
 		/* transform z value to gray, i.e. to interval [0,1] */
 		gray = cb2gray(avgC);
