@@ -1,3 +1,8 @@
+2003-10-22  Petr Mikulik  <mikulik@physics.muni.cz> 
+
+	* src/set.c reset_palette(): Added missing reset of variable
+	pm3d_last_set_palette_mode. Bugfix by Daniel J Sebald.
+
 2003-10-21  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/specfun.c: Fix reported bug #826811. The inverse_error_func()
