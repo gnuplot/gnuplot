@@ -1,3 +1,8 @@
+2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* configure.in docs/Makefile.in: Check for PlainTeX, dvips
+	 as well
+
 2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
 
 	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:

@@ -85,11 +85,14 @@ TROFF = troff
 # LaTeX command, either latex or latex2e or no
 LATEX = @LATEX@
 
+# PlainTeX
+PLAINTEX = @PLAINTEX@
+
 # PDFLaTeX command
 PDFLATEX = @PDFLATEX@
 
 # substitute your DVI to PostScript conversion program here
-DVIPS = dvips
+DVIPS = @DVIPS@
 
 T = ${srcdir}/../term
 CORETERM = $(T)/aed.trm $(T)/ai.trm $(T)/amiga.trm $(T)/apollo.trm \
@@ -234,21 +237,33 @@ gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	else \
-	  echo latex not found - cannot build dvi file ; \
+	  echo "latex not found - cannot build dvi file" ; \
 	fi
 
 gpcard.dvi: gpcard.tex
-	TEXINPUTS=.:$(srcdir): tex gpcard
+	@if test $(PLAINTEX) != no ; then \
+              TEXINPUTS=.:$(srcdir): tex gpcard ; \
+	else \
+	  echo "plaintex not found - cannot build dvi file" ; \
+	fi
 
 ### Postscript format
 # if pslatex has been installed, add "times" to titlepage.tex
 ps: gnuplot.ps gpcard.ps
 
 gnuplot.ps: gnuplot.dvi
-	$(DVIPS) gnuplot.dvi -o gnuplot.ps
+	@if test $(DVIPS) != no ; then \
+	   $(DVIPS) gnuplot.dvi -o gnuplot.ps ; \
+	else \
+	   echo "dvips not found - cannot build PS file" ; \
+	fi
 
 gpcard.ps: gpcard.dvi
-	$(DVIPS) gpcard.dvi -o gpcard.ps
+	@if test $(DVIPS) != no ; then \
+            $(DVIPS) gpcard.dvi -o gpcard.ps ; \
+	else \
+	   echo "dvips not found - cannot build PS file" ; \
+	fi
 
 
 # this is how to make gnuplot.hlp

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.101 2001/07/28 16:53:06 lhecking Exp $
+dnl $Id: configure.in,v 1.102 2001/08/27 15:02:12 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -710,8 +710,14 @@ else
 fi
 AC_SUBST(TUTORIAL)
 
+# PlainTeX
+AC_CHECK_PROGS(PLAINTEX, tex, no)
+
 dnl for pdf format docs
 AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+
+dnl for dvips
+AC_CHECK_PROGS(DVIPS, dvips, no)
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile
