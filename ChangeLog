@@ -11,6 +11,15 @@
 	docs/gnuplot.doc:  Change syntax from 'set missing "<string>"' to 
 	'set datafile missing "<string>"'. The old syntax is still accepted.
 
+2002-11-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/be.trm, term/cgm.trm, term/x11.trm: Fix more
+	misprints in documentation.
+
+2002-11-26  Peter Wegener  <pete@shirkhan.ilr.ing.tu-bs.de>
+
+	* src/Makefile.am: Allow overriding X11_DRIVER_DIR from environment.
+
 2002-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/winmain.c (WinMain) [MSC, WIN32]: Use predefined __argc
@@ -1462,7 +1471,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/26 18:49:59 $).
+	last modification date (from the tag $Date: 2002/11/27 19:56:33 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
