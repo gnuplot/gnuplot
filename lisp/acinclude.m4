@@ -1,10 +1,10 @@
 ## ------------------------
 ## Emacs LISP file handling
 ## From Ulrich Drepper
-## Heavily simplified by Alexandre Oliva
+## Almost entirely rewritten by Alexandre Oliva
 ## ------------------------
 
-# serial 2
+# serial 3
 
 AC_DEFUN(AM_PATH_LISPDIR,
  [# If set to t, that means we are running in a shell under Emacs.
@@ -14,11 +14,9 @@ AC_DEFUN(AM_PATH_LISPDIR,
   if test $EMACS != "no"; then
     if test x${lispdir+set} != xset; then
       AC_CACHE_CHECK([where .elc files should go], [am_cv_lispdir], [dnl
-	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/emacs\/site-lisp$/{p;q;}'`
+	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
 	if test -z "$am_cv_lispdir"; then
 	  am_cv_lispdir='${datadir}/emacs/site-lisp'
-	else
-	  am_cv_lispdir=`echo "$am_cv_lispdir" | sed -e 's,^.*/lib/,${libdir}/,' -e 's,^.*/share/,${datadir}/,'`
 	fi
       ])
       lispdir="$am_cv_lispdir"
