@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.213 2004/04/14 15:26:19 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.214 2004/04/15 07:43:01 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -137,8 +137,8 @@ C
  type `help plotting`).
 
  See the simple.dem demo, also available together with other demos on the web page
-^ <a href="http://gnuplot.sourceforge.net/demo/simple.html">
-           http://gnuplot.sourceforge.net/demo/simple.html
+^ <a href="http://www.gnuplot.info/demo/simple.html">
+           http://www.gnuplot.info/demo/simple.html
 ^ </a>
 2 Seeking-assistance
 ^ <a name="Seeking-assistance"></a>
@@ -151,8 +151,8 @@ C
  We prefer that you read the messages through the newsgroup rather than
  subscribing to the mailing list.  Instructions for subscribing to gnuplot
  mailing lists may be found via the gnuplot development website on SourceForge
-^ <a href="http://gnuplot.sourceforge.net">
-           http://gnuplot.sourceforge.net
+^ <a href="http://sourceforge.net/projects/gnuplot">
+           http://sourceforge.net/projects/gnuplot
 ^ </a>
 
  The address for mailing to list members is:
@@ -164,7 +164,7 @@ C
  The list of those interested in beta-test versions is:
        gnuplot-beta@lists.sourceforge.net
 
- There is also a perennially out-of-date gnuplot web page at
+ There is also the canonical (if occassionally out-of-date) gnuplot web page at
 
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -366,8 +366,8 @@ C
        load "all.dem"
  before asking for help.  Plots produced by the demo scripts can also be viewed
  at 
-^ <a href="http://gnuplot.sourceforge.net/demo/">
- http://gnuplot.sourceforge.net/demo/
+^ <a href="http://www.gnuplot.info/demo/">
+ http://www.gnuplot.info/demo/
 ^ </a>
 
 2 Batch/Interactive Operation
@@ -1107,7 +1107,7 @@ C
  to fits or datafile plots.  See `plot datafile using`.
 @end table
  See also 
-^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
+^ <a href="http://www.gnuplot.info/demo/airfoil.html">
  airfoil.dem: use of functions and complex variables for airfoils demo.
 ^ </a>
 
@@ -1295,7 +1295,7 @@ C ... and restart the table:
  and undefined elsewhere:
        f(x) = 0<=x && x<1 ? sin(x) : 1<=x && x<2 ? 1/x : 1/0
        plot f(x)
-^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
+^ <img align=bottom src="http://www.gnuplot.info/doc/ternary.gif" alt="[ternary.gif]" width=640 height=480>
  Note that `gnuplot` quietly ignores undefined values, so the final branch of
  the function (1/0) will produce no plottable points.  Note also that f(x)
  will be plotted as a continuous function across the discontinuity if a line
@@ -1335,7 +1335,7 @@ C ... and restart the table:
        len3d(x,y,z) = sqrt(x*x+y*y+z*z)
        plot f(x) = sin(x*a), a = 0.2, f(x), a = 0.4, f(x)
 
-^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
+^ <img align=bottom src="http://www.gnuplot.info/doc/userdefined.gif" alt="[userdefined.gif]" width=640 height=480>
  Note that the variable `pi` is already defined.  But it is in no way magic;
  you may redefine it to be whatever you like.
 
@@ -2564,11 +2564,11 @@ C ... and restart the table:
        every ::5::15    # selects points 5 through 15 in each block
 
  See
-^ <a href="http://gnuplot.sourceforge.net/demo/simple.html"> simple plot demos (simple.dem) </a>
+^ <a href="http://www.gnuplot.info/demo/simple.html"> simple plot demos (simple.dem) </a>
  ,
-^ <a href="http://gnuplot.sourceforge.net/demo/surfacea.html">Non-parametric splot demos </a>
+^ <a href="http://www.gnuplot.info/demo/surfacea.html">Non-parametric splot demos </a>
  , and
-^ <a href="http://gnuplot.sourceforge.net/demo/surfaceb.html">Parametric splot demos</a>
+^ <a href="http://www.gnuplot.info/demo/surfaceb.html">Parametric splot demos</a>
  .
 4 example datafile
 ?commands plot datafile example
@@ -2592,7 +2592,7 @@ C ... and restart the table:
           1980   24
           1985   10
 
-^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/population.gif" alt="[population.gif]" width=640 height=480>
+^ <img align=bottom src="http://www.gnuplot.info/doc/population.gif" alt="[population.gif]" width=640 height=480>
 4 index
 ?commands plot datafile index
 ?plot datafile index
@@ -2617,7 +2617,7 @@ C ... and restart the table:
        plot 'file' index 4:5
 
 ^ See also web page
-^ <a href="http://gnuplot.sourceforge.net/demo/multimsh.html"> splot with indices demo. </a>
+^ <a href="http://www.gnuplot.info/demo/multimsh.html"> splot with indices demo. </a>
 4 smooth
 ?commands plot datafile smooth
 ?plot datafile smooth
@@ -2730,7 +2730,7 @@ C ... and restart the table:
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
 ^ See this
-^ <a href="http://gnuplot.sourceforge.net/demo/mgr.html">
+^ <a href="http://www.gnuplot.info/demo/mgr.html">
  demos
 ^ </a>
 ^ web page.
@@ -2960,7 +2960,7 @@ C ... and restart the table:
  However, if you want to leave text in your data files, it is safer to put the
  comment character (#) in the first column of the text lines.
 ^ See also the web page
-^ <a href="http://gnuplot.sourceforge.net/demo/using.html">
+^ <a href="http://www.gnuplot.info/demo/using.html">
  Feeble using demos.
 ^ </a>
 3 errorbars
@@ -3010,7 +3010,7 @@ C ... and restart the table:
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/errorbar.html">
  errorbar demos.
 ^ </a>
 
@@ -3084,7 +3084,7 @@ C ... and restart the table:
        plot sin(t),t**2 title 'Parametric example' with linespoints
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/param.html">
+^ <a href="http://www.gnuplot.info/demo/param.html">
  Parametric Mode Demos.
 ^ </a>
 3 ranges
@@ -3158,7 +3158,7 @@ C ... and restart the table:
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/ranges.html">
+^ <a href="http://www.gnuplot.info/demo/ranges.html">
  ranges demo.
 ^ </a>
 3 title
@@ -3328,7 +3328,7 @@ C ... and restart the table:
        splot x*x-y*y with pm3d, x*x+y*y with pm3d at t
 
  See `set style` to change the default styles. See also
-^ <a href="http://gnuplot.sourceforge.net/demo/styles.html">
+^ <a href="http://www.gnuplot.info/demo/styles.html">
  styles demos.
 ^ </a>
 2 print
@@ -3426,7 +3426,7 @@ C ... and restart the table:
  each other in multiplot mode) will have exactly the same axes.  The linetype
  must be specified; otherwise all the plots would be drawn with the same type.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/animate.html">
+^ <a href="http://www.gnuplot.info/demo/animate.html">
  Reread Animation Demo (animate.dem).
 ^ </a>
 2 reset
@@ -3550,7 +3550,7 @@ C ... and restart the table:
        print y         #prints {1.16933, 0.154051}
        print asinh(y)  #prints {57.29578, 5.729578}
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
+^ <a href="http://www.gnuplot.info/demo/poldat.html">
  poldat.dem: polar plot using `set angles` demo.
 ^ </a>
 3 arrow
@@ -3657,7 +3657,7 @@ C ... and restart the table:
  To show all arrows (in tag order), use:
        show arrow
  See also 
-^ <a href="http://gnuplot.sourceforge.net/demo/arrows.html"> 
+^ <a href="http://www.gnuplot.info/demo/arrows.html"> 
  arrows demos.
 ^ </a>
 3 autoscale
@@ -3786,7 +3786,7 @@ C ... and restart the table:
  Explicitly setting one or two ranges but not others may lead to unexpected
  results.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
+^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar demos.
 ^ </a>
 3 bars
@@ -3932,7 +3932,7 @@ C ... and restart the table:
        unset xtics; unset ytics; set x2tics; set y2tics; set border 12
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/borders.html">
+^ <a href="http://www.gnuplot.info/demo/borders.html">
  borders demo.
 ^ </a>
 3 boxwidth
@@ -4153,11 +4153,11 @@ C ... and restart the table:
  `set clabel` for control of the format of the contour labels and linetypes.
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/contours.html">
+^ <a href="http://www.gnuplot.info/demo/contours.html">
  contours demo (contours.dem)
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/discrete.html">
+^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 color box
@@ -4268,11 +4268,11 @@ C ... and restart the table:
  If contours are desired from non-grid data, `set dgrid3d` can be used to
  create an appropriate grid.  See `set dgrid3d` for more information.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/contours.html">
+^ <a href="http://www.gnuplot.info/demo/contours.html">
  contours demo (contours.dem)
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/discrete.html">
+^ <a href="http://www.gnuplot.info/demo/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 data style
@@ -4472,7 +4472,7 @@ C ... and restart the table:
  a norm value of 1 in the weight computation.  The second only modifies the
  norm, changing it to 4.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/scatter.html">
+^ <a href="http://www.gnuplot.info/demo/scatter.html">
  scatter.dem: dgrid3d demo.
 ^ </a>
 
@@ -4659,7 +4659,7 @@ C ... and restart the table:
  `set decimalsign` for how to use non-default decimal separators in numbers
  printed this way.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/electron.html">
+^ <a href="http://www.gnuplot.info/demo/electron.html">
  electron demo (electron.dem).
 ^ </a>
 4 format specifiers
@@ -4873,11 +4873,11 @@ C ... and restart the table:
  For information about the definition and usage of functions in `gnuplot`,
  please see `expressions`.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/spline.html">
+^ <a href="http://www.gnuplot.info/demo/spline.html">
  splines as user defined functions (spline.dem)
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
+^ <a href="http://www.gnuplot.info/demo/airfoil.html">
  use of functions and complex variables for airfoils (airfoil.dem).
 ^ </a>
 3 grid
@@ -5045,11 +5045,11 @@ C ... and restart the table:
  default option of `bentover` will turn it visible in this case.  If you don't
  want that, you may choose `nobentover` instead.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/hidden.html">
+^ <a href="http://www.gnuplot.info/demo/hidden.html">
  hidden line removal demo (hidden.dem)
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/singulr.html">
+^ <a href="http://www.gnuplot.info/demo/singulr.html">
  complex hidden line demo (singulr.dem).
 ^ </a>
 3 historysize
@@ -5507,7 +5507,7 @@ C ... and restart the table:
 
  `mapping` has no effect on `plot`.
 ^ See also
-^ <a href="http://gnuplot.sourceforge.net/demo/world.html">
+^ <a href="http://www.gnuplot.info/demo/world.html">
  world.dem: mapping demos.
 ^ </a>
 3 margin
@@ -5707,7 +5707,7 @@ C ... and restart the table:
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/multiplot.html">
+^ <a href="http://www.gnuplot.info/demo/multiplot.html">
  multiplot demo (multiplt.dem).
 ^ </a>
 3 mx2tics
@@ -6560,11 +6560,11 @@ C ... and restart the table:
  You may want to `set size square` to have `gnuplot` try to make the aspect
  ratio equal to unity, so that circles look circular.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/polar.html">
+^ <a href="http://www.gnuplot.info/demo/polar.html">
  polar demos (polar.dem)
 ^ </a>
  and
-^ <a href="http://gnuplot.sourceforge.net/demo/poldat.html">
+^ <a href="http://www.gnuplot.info/demo/poldat.html">
  polar data plot (poldat.dem).
 ^ </a>
 3 print
@@ -6684,7 +6684,7 @@ C ... and restart the table:
        set size ratio 2
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/airfoil.html">
+^ <a href="http://www.gnuplot.info/demo/airfoil.html">
   airfoil demo.
 ^ </a>
 3 style
@@ -6996,7 +6996,7 @@ C ... and restart the table:
  the `yerrorbars` style---either from y-ydelta to y+ydelta or from ylow to
  yhigh, depending on how many data columns are provided.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 5 boxes
@@ -7138,7 +7138,7 @@ C ... and restart the table:
  vertical bars if (close > open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
  See `set bars` and `financebars`.  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
+^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance demos.
 ^ </a>
 
@@ -7175,7 +7175,7 @@ C ... and restart the table:
  closing price.  The length of these tics may be changed by `set bars`.  The
  symbol will be unchanged if the high and low prices are interchanged.
  See `set bars` and `candlesticks`, and also the
-^ <a href="http://gnuplot.sourceforge.net/demo/finance.html">
+^ <a href="http://www.gnuplot.info/demo/finance.html">
  finance demo.
 ^ </a>
 5 fsteps
@@ -7188,7 +7188,7 @@ C ... and restart the table:
  points with two line segments: the first from (x1,y1) to (x1,y2) and the
  second from (x1,y2) to (x2,y2).
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
+^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
 ^ </a>
 5 histeps
@@ -7207,7 +7207,7 @@ C ... and restart the table:
  If `autoscale` is in effect, it selects the xrange from the data rather than
  the steps, so the end points will appear only half as wide as the others.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
+^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
 ^ </a>
 
@@ -7264,7 +7264,7 @@ C ... and restart the table:
  points with two line segments: the first from (x1,y1) to (x2,y1) and the
  second from (x2,y1) to (x2,y2).
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/steps.html">
+^ <a href="http://www.gnuplot.info/demo/steps.html">
  steps demo.
 ^ </a>
 5 vectors
@@ -7330,7 +7330,7 @@ C ... and restart the table:
  A tic mark is placed at the ends of the error bar (unless `set bars` is
  used---see `set bars` for details).
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 5 xerrorlines
@@ -7383,7 +7383,7 @@ C ... and restart the table:
  ends of the error bar (unless `set bars` is used---see `set bars` for
  details).
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/errorbar.html">
+^ <a href="http://www.gnuplot.info/demo/errorbar.html">
  errorbar demo.
 ^ </a>
 3 surface
@@ -7631,7 +7631,7 @@ C ... and restart the table:
  your data---what began as a tab may have been converted to spaces somewhere
  along the line; the format string must match what is actually in the file.)
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/timedat.html">
+^ <a href="http://www.gnuplot.info/demo/timedat.html">
  time data demo.
 ^ </a>
 3 title
@@ -8667,7 +8667,7 @@ C ... and restart the table:
  surface per file.  The `every` and `using` filters are supported.  `using`
  operates as if the data were read in the above triplet form.
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/binary.html">
+^ <a href="http://www.gnuplot.info/demo/binary.html">
  Binary File Splot Demo.
 ^ </a>
 4 example datafile
@@ -8700,7 +8700,7 @@ C ... and restart the table:
  Note that "datafile.dat" defines a 4 by 3 grid ( 4 rows of 3 points each ).
  Rows (datablocks) are separated by blank records.
 
-^ <img align=bottom src="http://gnuplot.sourceforge.net/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
+^ <img align=bottom src="http://www.gnuplot.info/doc/splot.gif" alt="[splot.gif]" width=640 height=480>
  Note also that the x value is held constant within each dataline.  If you
  instead keep y constant, and plot with hidden-line removal enabled, you will
  find that the surface is drawn 'inside-out'.
