@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.38 2002/03/26 20:31:04 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.39 2002/07/02 17:35:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1220,7 +1220,13 @@ df_3dmatrix(this_plot, need_palette)
     int width, height;
     int row, col;
     struct iso_curve *this_iso;
+#ifdef PM3D
+    double used[4];		/* output from using manip */
+    int use_spec_34 = (need_palette && df_no_use_specs == 4) ? 4 : 3; /* evaluate used[0..use_spec_34] */
+#else
     double used[3];		/* output from using manip */
+    int use_spec_34 = 3;	/* evaluate used[0..use_spec_34] */
+#endif
     struct coordinate GPHUGE *point;	/* HBB 980308: added 'GPHUGE' flag */
 
     assert(df_matrix);
@@ -1260,9 +1266,15 @@ df_3dmatrix(this_plot, need_palette)
     this_plot->plot_type = DATA3D;
     this_plot->has_grid_topology = TRUE;
 
-    if (df_no_use_specs != 0 && df_no_use_specs != 3)
-	int_error(NO_CARET, "Current implementation requires full using spec");
+    if (df_no_use_specs != 0 && df_no_use_specs != 3 && df_no_use_specs != use_spec_34 /*3 or 4*/)
+	int_error(NO_CARET, "Current implementation requires full `using` spec");
 
+#ifdef PM3D
+    if (need_palette && df_no_use_specs == 4)
+	this_plot->pm3d_color_from_column = 1;
+#endif
+
+    /* columns are those in the binary data file, not those of `using` spec */
     if (df_max_cols < 3) {
 	df_max_cols = 3;
 	df_column = (df_column_struct *) gp_realloc(df_column,
@@ -1280,7 +1292,7 @@ df_3dmatrix(this_plot, need_palette)
     for (row = firstline; row < nr; row += everyline) {
 	df_column[1].datum = rt ? rt[row] : row;
 
-	/*Allocate the correct number of entries */
+	/* Allocate the correct number of entries */
 	this_iso = iso_alloc(width);
 
 	point = this_iso->points;
@@ -1293,8 +1305,12 @@ df_3dmatrix(this_plot, need_palette)
 	    df_column[0].datum = ct ? ct[col] : col;
 	    df_column[2].datum = dmatrix[row][col];
 
+#ifdef PM3D
+	    if (df_no_use_specs != 4)
+		used[3] = used[2]; /* 3 parameters of `using` => color-value equals z-value */
+#endif
 	    /*{{{  pass through using spec */
-	    for (i = 0; i < 3; ++i) {
+	    for (i = 0; i < use_spec_34; ++i) {
 		int column = use_spec[i].column;
 
 		if (df_no_use_specs == 0)
@@ -1321,10 +1337,8 @@ df_3dmatrix(this_plot, need_palette)
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->y, used[1], point->type, FIRST_Y_AXIS, NOOP, goto skip);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(point->z, used[2], point->type, FIRST_Z_AXIS, NOOP, goto skip);
 #ifdef PM3D
-	    /* there should be `color' instead of used[2], when this is
-	     * implemented for binary files */
 	    if (need_palette)
-		STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[2], point->type, COLOR_AXIS, NOOP, goto skip);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[3], point->type, COLOR_AXIS, NOOP, goto skip);
 #endif
 
 	    /* some of you won't like this, but I say goto is for this */

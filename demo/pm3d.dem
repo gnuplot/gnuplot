@@ -306,13 +306,13 @@ unset pm3d
 set surface
 set format z
 set palette
-set title "color lines: 'splot sin(y)/(y) with linesp lt pal'"
+set title "color lines: 'splot sin(y)/(y) with linespoints palette'"
 set ticslevel 0
 set border 4095
 set xrange [-10:10]; set yrange [-10:10]
 set hidden3d
 set isosamples 40,40; set samples 40,40
-splot sin(y)/(y) w lp lt pal
+splot sin(y)/(y) w lp palette
 pause -1
 
 reset
@@ -345,17 +345,20 @@ sinc(u,v) = sin(sqrt(u**2+v**2)) /sqrt(u**2+v**2)
 set sam 40
 set iso 40
 
-set title "pm3d explicit mode --- coloring according to the 4th column"
+set title "pm3d explicit mode --- coloring according to the 4th parameter of 'using'"
 set ticslevel 0
 
 set pm3d at s explicit solid
 
+#	'binary2' binary u 1:2:(column(3)+column(-1)/20.0):3 w pm3d, 
+
 splot \
-	'binary2' binary u 1:2:(column(3)+column(-1)/20.0):3 w pm3d, \
-	3+sinc(x, y) w l
+	'binary2' binary u 1:2:3:($2+($1+$2)/10) w pm3d, \
+	1+sinc(x*4, y*4) w l
 pause -1 "Hit return to continue"
 
-set title "coloring according to the 3rd column (left) and the z-value (right)"
+set title "coloring according to the 3rd 'using' parameter (left) and to the z-value (bottom)"
+set border 895
 splot \
     'binary2' binary u 2:(12 - column(3) * 10):1 notitle w lines, \
     'binary2' binary u (-12 + column(3) * 10):2:1:(-12 + column(3) * 10) notitle w pm3d, \

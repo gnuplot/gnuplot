@@ -1,5 +1,11 @@
 2002-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/datafile.c demo/pm3d.dem: Binary datafiles now accept 'using'
+	with 4 parameters for independent z and color values of splotting
+	'with pm3d' and 'with lines|points palette'.
+
+2002-07-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* NEWS src/plot3d.c docs/gnuplot.doc: Support plotting surfaces with
 	color lines or points with color according to explicitly given 4th
 	column, e.g. "splot ... using 1:2:3:4 with [line|point] palette".
@@ -677,7 +683,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/16 12:07:40 $).
+	last modification date (from the tag $Date: 2002/07/02 17:35:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
