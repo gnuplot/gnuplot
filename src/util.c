@@ -300,9 +300,12 @@ int start, end;
     *str = gp_alloc((unsigned long) (e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index + 1; i < e && input_line[i] != NUL; i++)
-	if ((*s++ = input_line[i]) == '\\') ++escflag;
+	*s++ = input_line[i];
     *s = NUL;
-    if (escflag) parse_esc(*str);
+
+    if (input_line[token[start].start_index] == '"')
+	parse_esc(*str);
+
 }
 
 
