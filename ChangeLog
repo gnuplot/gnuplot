@@ -1,3 +1,9 @@
+2004-08-27  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm (PNG_vector): More specific test for libgd support of
+	antialiasing.  Versions 2.0.0 -> 2.0.11 were not correctly handled by
+	the previous test.
+
 2004-08-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c (main): Call term->options() on entry if the default

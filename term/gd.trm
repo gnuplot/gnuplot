@@ -1142,7 +1142,7 @@ PNG_vector(unsigned int x, unsigned int y)
 		    x, Y(y), gdStyled);
     } else {
 	if (png_state.linewidth == 1) {
-#ifdef GD2_VERS
+#if defined(GD2_VERS) && defined(gdAntiAliased) 
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdAntiAliased);
