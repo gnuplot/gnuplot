@@ -157,6 +157,7 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 @defindex op
 @defindex tm
 
+@dircategory Math
 @direntry
 * GNUPLOT: (gnuplot).             An Interactive Plotting Program
 @end direntry
