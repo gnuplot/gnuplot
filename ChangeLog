@@ -1,3 +1,11 @@
+2002-06-03  Johannes Zellner  <johannes@zellner.org>
+
+	* term/svg.trm:
+	- new pointtypes for svg (as X11 / post)
+	- implemented pm3d 'splot ... with points lt palette'
+	- implemented pm3d 'splot ... with lines  lt palette'
+	- implemented 'filledboxes'
+
 2002-05-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Explicit linking with libfreetype does not add
@@ -526,7 +534,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/29 16:39:50 $).
+	last modification date (from the tag $Date: 2002/05/29 20:26:51 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
