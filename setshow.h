@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.39 1998/04/14 00:16:18 drd Exp $
+ * $Id: setshow.h,v 1.3 1998/10/03 20:17:47 lhecking Exp $
  *
  */
 
@@ -45,6 +45,12 @@
 #define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
 #endif
  
+/* default format for tic mark labels */
+#define DEF_FORMAT "% g"
+
+/* less than one hundredth of a tic mark */
+#define SIGNIF (0.01)
+
 /*
  * global variables to hold status of 'set' options
  *
