@@ -1,5 +1,5 @@
 #! /bin/sh --
-# $Id$
+# $Id: prepare,v 1.2 2001/06/20 14:47:57 amai Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
@@ -11,7 +11,7 @@ chmod 755 $exelist >/dev/null 2>&1
 rm -f config.cache config.status
 
 if aclocal -I m4 && autoheader && (cd m4 && make -f Makefile.am.in ) \
-  && automake -i -a -c  && autoconf
+  && automake -a -c  && autoconf
 then
   echo
   echo "The gnuplot source code was successfully prepared."
