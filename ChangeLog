@@ -1,7 +1,10 @@
-2004-07-21  Ethan Merritt  <merritt@u.washington.edu>
+2004-07-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/parse.c (cleanup_udvlist): Fix memory leak; if udv structure
 	is freed, free its dynamically allocated name also.
+
+	* src/command.c (print_set_output): Fix memory leak; free old 
+	filename before setting a new one.
 
 	* src/plot3d.c: Remove unnecessary #include "plot2d.h".
 
