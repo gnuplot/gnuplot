@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.95 2002/01/25 18:02:09 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.96 2002/01/26 17:55:07 joze Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4723,7 +4723,7 @@ C ... and restart the table:
  data.  Using `front` will prevent a label from being obscured by dense data.
 
  If a style is given, using keywords `lw`, `pt` and `ps`, see `style`, a point
- with the given style and colour of the given line type is plotted at the
+ with the given style and color of the given line type is plotted at the
  label position and the text of the label is displaced slightly.
  The displacement defaults to 1, 1 in `pointsize` units and can be
  controlled by the optional `offset x, y`. Example: `offset 2, -3` would
@@ -4854,7 +4854,7 @@ C ... and restart the table:
  creates a surface plot using smooth colors according to `palette`. Note,
  that this works only on some terminals.
 
- See also `help palette`, `help pm3d`.
+ See also `set palette`, `set pm3d`.
 
 3 lmargin
 ?commands set lmargin
@@ -5439,7 +5439,8 @@ C ... and restart the table:
 ?set pm3d
 ?show pm3d
 ?pm3d
- pm3d is a [new] type of `splot` mode for drawing colour/gray maps and
+?help pm3d
+ pm3d is a [new] type of `splot` mode for drawing color/gray maps and
  surfaces.  It can be used for plotting gridded as well as non-gridded data.
  The main power of the pm3d algorithm (see also my program pm3d) is that it
  can draw maps or surfaces from large data sets without preprocessing even
@@ -5463,7 +5464,7 @@ C ... and restart the table:
  (You are welcome to implement the support for other terminals, e.g. png.)
 
  The pm3d algorithm fills the region between two neighbouring points in one 
- scan with another two points in the next scan by a gray (or colour) according 
+ scan with another two points in the next scan by a gray (or color) according 
  to the average of the z data (or an additional 'color' column, see `splot`)
  in these four points.  From this follows, that the neighbouring scans should
  not cross and the number of points in the neighbouring scans should not
@@ -5477,12 +5478,12 @@ C ... and restart the table:
      corners of the quadrangle into the range [min_color_z,max_color_z]
      providing range of grays [0:1].  This value can be used directly as the
      gray for gray maps.  The normalized gray value can be further mapped into
-     a colour.  See `set palette` for the complete description. 
+     a color.  See `set palette` for the complete description. 
  2. data splot with two ore four data columns:
      The gray is obtained by using the LAST coordinate instead of the z value.
 
- The pm3d mode requires a terminal supporting filled coloured polygons and
- palettes of smooth colours.  See above for the list of currently available
+ The pm3d mode requires a terminal supporting filled colored polygons and
+ palettes of smooth colors.  See above for the list of currently available
  terminals.
 
  Notes: 
@@ -5511,12 +5512,12 @@ C ... and restart the table:
  `set pm3d` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order.
 
- pm3d can be drawn at the base or top (colour or gray map) or as surface
- (colour or gray surface).  This is defined by the `at` option with a a string
+ pm3d can be drawn at the base or top (color or gray map) or as surface
+ (color or gray surface).  This is defined by the `at` option with a a string
  of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b` plots at
  bottom only, `at st` plots firstly surface, then top, `at bstbst`...
 
- Coloured quadrangles are plotted one after another.  When plotting surfaces
+ Colored quadrangles are plotted one after another.  When plotting surfaces
  (`at s`), the later overlaps the previous ones.  You may try to switch
  between `scansforward` and `scansbackward` to change whether the first scan
  of the data is plotted first or last. The default is `scansautomatic` where
@@ -5538,9 +5539,9 @@ C ... and restart the table:
  respect to the z coordinate will be necessary.  Maybe in future... (maybe
  something like "clipz1in" and "clipz4in").  Really needed?
 
- By default, the range of z-values for colouring is the same as that from 
+ By default, the range of z-values for coloring is the same as that from 
  `set zrange`. That's OK for maps; for surfaces, however, using separate z
- ranges for plotting and for colouring can be of advantage.  Then 
+ ranges for plotting and for coloring can be of advantage.  Then 
  `set cbrange` should be used.
 
  The option `hidden3d` takes as the argument a linestyle which must be created
@@ -5577,27 +5578,26 @@ C ... and restart the table:
  Please use `unset pm3d` to correctly get rid of the pm3d setup, notably the
  reversed y axis and rotated ylabel.
 
- The colouring setup as well as the colour box drawing are determinated by
- `set palette`. Maybe in future there could be a possibility of using more
- palettes, which will add new option `set pm3d palette <n>`.
+ The coloring setup as well as the color box drawing are determinated by
+ `set palette`. There can be only for palette for the given plot.
 
  If the option `implicit` is on (which is the default), all surface plots
  will be plotted additionally to the default type, e.g.
-       splot 'fred.dat' w l, 'lola.dat' w l
- would give both plots additionally a pm3d surface.
+       splot 'fred.dat' with lines, 'lola.dat' with lines
+ would give both plots additionally to a pm3d surface.
  If the option `implicit` is off (or `explicit` is on) only plots specified
  by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
-       splot 'fred.dat' w l, 'lola.dat' w pm3d
+       splot 'fred.dat' with lines, 'lola.dat' with pm3d
  would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
  a pm3d surface.
  If `explicit` is on, you can also switch to the default style `pm3d`, e.g.:
        set style data pm3d
 
- Note that when plotting several plots, they're plotted in the order given
+ Note that when plotting several plots, they are plotted in the order given
  on the command line. This can be of interest especially for pm3d surfaces
  which can overwrite and therefore hide part of earlier plots.
 
- See also `help palette`, `help colorbox`, `help x11 pm3d`, `help vgagl`.
+ See also `set palette`, `set colorbox`, `help x11 pm3d`, `help vgagl`.
 
 3 palette
 ?commands set palette
@@ -5605,13 +5605,14 @@ C ... and restart the table:
 ?set palette
 ?show palette
 ?palette
- Palette is a colour storage for use by `pm3d`, filled colour contours or
- polygons, colour histograms, colour gradient background, and whatever it is
+?help palette
+ Palette is a color storage for use by `pm3d`, filled color contours or
+ polygons, color histograms, color gradient background, and whatever it is
  or it will be implemented...  Here it stands for a palette of smooth
- "continuous" colours or grays, but let's call it just a palette.
+ "continuous" colors or grays, but let's call it just a palette.
 
- Colour palettes, or requires terminal entries for filled colour polygons and
- palettes of smooth colours, are currently available for terminals listed in
+ Color palettes, or requires terminal entries for filled color polygons and
+ palettes of smooth colors, are currently available for terminals listed in
  `help pm3d`.
 
  Syntax:
@@ -5629,20 +5630,20 @@ C ... and restart the table:
  `set palette` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order. `show palette` shows the
  current palette properties. `show palette palette <n>` shows RGB triplets for
- the current settings and a palette having <n> discrete colours.
+ the current settings and a palette having <n> discrete colors.
 
- The following options determine the colouring properties.
+ The following options determine the coloring properties.
 
  Figure using this palette can be `gray` or `color`.  For instance, in `pm3d`
  the gray is obtained by mapping the averaged z coordinate of the 4 corners of
  the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
- This value can be used directly as the gray for gray maps.  The colour map
+ This value can be used directly as the gray for gray maps.  The color map
  requires a transformation gray->(R,G,B), i.e.  a mapping
  [0:1]->([0:1],[0:1],[0:1]).  Therefore three suitable mapping functions have 
  to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
  mapping functions are listed by `show palette`.  Default is `7,5,15`, some 
  other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative numbers, like
- `3,-11,-6`, mean inverted colour (i.e.  1-gray passed into the formula, see 
+ `3,-11,-6`, mean inverted color (i.e.  1-gray passed into the formula, see 
  also `positive` and `negative` options below).
 
  Some nice schemes:
@@ -5650,11 +5651,11 @@ C ... and restart the table:
     3,11,6   ... green-red-violet
     23,28,3  ... ocean (green-blue-white); try also all other permutations
     21,22,23 ... hot (black-red-yellow-white)
-    30,31,32 ... colour printable on gray (black-blue-violet-yellow-white)
+    30,31,32 ... color printable on gray (black-blue-violet-yellow-white)
     33,13,10 ... rainbow (blue-green-yellow-red)
     34,35,36 ... AFM hot (black-red-yellow-white)
 
- Use `positive` and `negative` to invert the figure colours.
+ Use `positive` and `negative` to invert the figure colors.
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
@@ -5675,10 +5676,10 @@ C ... and restart the table:
  publication or before downloading a very large file into a slow printer.
  Usage: `awk -f pm3dCompress.awk thefile.ps >smallerfile.ps`.
 
- Many terminals have discrete number of colours (e.g. 256 colours in gif). All
- entries of the palette remaining after linetype colours declaration are
+ Many terminals have discrete number of colors (e.g. 256 colors in gif). All
+ entries of the palette remaining after linetype colors declaration are
  allocated for pm3d by default.  Then multiplot could fail if there are no
- more colour positions available.  You should use `set palette maxcolors
+ more color positions available.  You should use `set palette maxcolors
  <maxcolors>` with a reasonably small value. This option can also be used to
  separate levels of z=constant in discrete steps, thus to emulate filled
  contours. Default value is 0 for allocating all remaining entries or for to
@@ -5691,8 +5692,8 @@ C ... and restart the table:
 ?show colorbox
 ?colorbox
 
- The colour scheme, i.e. the gradient of the smooth colour with min_z and
- max_z values of `pm3d`'s `palette`, is drawn in a colour box unless `unset
+ The color scheme, i.e. the gradient of the smooth color with min_z and
+ max_z values of `pm3d`'s `palette`, is drawn in a color box unless `unset
  colorbox`.
 
        set colorbox
@@ -5709,7 +5710,7 @@ C ... and restart the table:
  Colorbox position can be `default` or `user`.  If the latter is specified the
  values as given with the `origin` and `size` subcommands are used.
 
- `vertical` and `horizontal` switches the orientation of the colour
+ `vertical` and `horizontal` switches the orientation of the color
  gradient.
 
  `origin x, y` and `size x, y` are used only in combination with the `user`
@@ -5927,7 +5928,7 @@ C ... and restart the table:
        show style function
        show style data
 
- The types used for all line and point styles (i.e., solid, dash-dot, colour,
+ The types used for all line and point styles (i.e., solid, dash-dot, color,
  etc. for lines; circles, squares, crosses, etc. for points) will be either
  those specified on the `plot` or `splot` command or will be chosen
  sequentially from the types available to the terminal in use.  Use the
@@ -6059,10 +6060,10 @@ C ... and restart the table:
 
  Syntax:
 
-     set style [data | function] filledcurves [options]
-     plot ... with filledcurves [options]
+     set style [data | function] filledcurves [option]
+     plot ... with filledcurves [option]
 
- where options are
+ where the option can be
 
      [closed | {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
 
@@ -7339,7 +7340,7 @@ C ... and restart the table:
 ?commands show cblabel
 ?set cblabel
 ?show cblabel
-?cbabel
+?cblabel
  This command sets the label for the color box axis.  Please see `set xlabel`.
 3 cbmtics
 ?commands set cbmtics

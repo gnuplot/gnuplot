@@ -1,3 +1,10 @@
+2002-02-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/pm3d.dem: Remove warning that pm3d works on some terminals
+	only.
+
+	* docs/gnuplot.doc: Minor fixes.
+
 2002-02-01 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/hidden3d.c (draw_line_hidden): Changed local variables
