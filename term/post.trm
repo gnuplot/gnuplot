@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.142 2005/01/12 00:05:43 sfeam Exp $
+ * $Id: post.trm,v 1.143 2005/02/09 11:43:12 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2199,6 +2199,7 @@ NULL };
     case PSTERM_PSTEX:
 	PSTEX_common_init();
 	break;
+    default:; /* do nothing, just avoid a compiler warning */
     }
 
     if (ps_params->psformat == PSTERM_EPS)
@@ -2306,7 +2307,7 @@ NULL };
 TERM_PUBLIC void
 PS_init()
 {
-    unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
+    unsigned int xmin_t = 0, ymin_t = 0, xmax_t = 0, ymax_t = 0;
 
     switch (ps_params->psformat) {
     case PSTERM_EPS:
@@ -2336,6 +2337,8 @@ PS_init()
 	xmin_t = term->ymax * (1-ysize-yoffset) / PS_SC;
 	xmax_t = term->ymax * (1-yoffset) / PS_SC;
 	break;
+    default:
+	int_error(NO_CARET, "invalid postscript format used");
     }
 
     /* for enhanced postscript, copy ps_params->font to ps_enh_font
@@ -2677,7 +2680,7 @@ TERM_PUBLIC int
 PS_set_font(const char *font)
 {
     char name[32];
-    int  i;
+    unsigned int  i;
     float size;
     size_t sep;
 

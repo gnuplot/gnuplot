@@ -1,3 +1,8 @@
+2005-02-13  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm term/pslatex.trm: Clean up code in accordance with
+	compiler warnings.
+
 2005-02-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* configure.in: New configuration option --enable-x11-mbfonts

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.49 2005/01/11 17:37:17 mikulik Exp $
+ * $Id: pslatex.trm,v 1.50 2005/02/09 11:43:12 mikulik Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -147,6 +147,7 @@ PSLATEX_reset()
 \\endgroup\n\
 \\endinput\n", gpoutfile);
 	break;
+    default:; /* do nothing, just avoid a compiler warning */
     }
 
     if (pslatex_auxname) {
@@ -254,10 +255,10 @@ PSTEX_common_init()
 	fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n",
 		(int) (xsize * term->xmax), (int) (ysize * term->ymax));
 	break;
+    default:; /* do nothing, just avoid a compiler warning */
     }
 
     if (gppsfile != gpoutfile) {
-	FILE *tmp;
 	/* these are taken from the post.trm file computation
 	 * of the bounding box, but without the X_OFF and Y_OFF */
 	int urx = (int) (xsize * term->xmax / (2*PS_SC) + 0.5);
