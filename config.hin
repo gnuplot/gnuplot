@@ -39,6 +39,9 @@
 /* Define if you have the bzero function.  */
 #undef HAVE_BZERO
 
+/* Define if you have the doprnt function.  */
+#undef HAVE_DOPRNT
+
 /* Define if you have the erf function.  */
 #undef HAVE_ERF
 
@@ -72,6 +75,9 @@
 /* Define if you have the pclose function.  */
 #undef HAVE_PCLOSE
 
+/* Define if you have the poll function.  */
+#undef HAVE_POLL
+
 /* Define if you have the popen function.  */
 #undef HAVE_POPEN
 
@@ -90,11 +96,26 @@
 /* Define if you have the snprintf function.  */
 #undef HAVE_SNPRINTF
 
+/* Define if you have the stpcpy function.  */
+#undef HAVE_STPCPY
+
+/* Define if you have the strcasecmp function.  */
+#undef HAVE_STRCASECMP
+
 /* Define if you have the strchr function.  */
 #undef HAVE_STRCHR
 
+/* Define if you have the strcspn function.  */
+#undef HAVE_STRCSPN
+
+/* Define if you have the strdup function.  */
+#undef HAVE_STRDUP
+
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
+
+/* Define if you have the stricmp function.  */
+#undef HAVE_STRICMP
 
 /* Define if you have the strncasecmp function.  */
 #undef HAVE_STRNCASECMP
@@ -113,6 +134,9 @@
 
 /* Define if you have the tcgetattr function.  */
 #undef HAVE_TCGETATTR
+
+/* Define if you have the vfprintf function.  */
+#undef HAVE_VFPRINTF
 
 /* Define if you have the <errno.h> header file.  */
 #undef HAVE_ERRNO_H
@@ -213,6 +237,9 @@
 /*  Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
 
+/*  Define if we have sigsetjmp().  */
+#undef HAVE_SIGSETJMP
+
 /*  Define if you do have the popen and pclose functions.  */
 #undef PIPES
 
@@ -237,14 +264,8 @@
 /*  Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
 
-/*  Define if you have the <plotcompat.h> header file.  */
-#undef HAVE_PLOTCOMPAT_H
-
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
-
-/*  Define if your libplot.a is from GNU plotutils.  */
-#undef GNU_PLOTUTILS
 
 /*  Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
@@ -269,4 +290,10 @@
 
 /*  Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
+
+/*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
+#undef USE_EMF_DRIVER
+
+/*  Define if you want to use the experimental epslatex driver.  */
+#undef USE_EPSLATEX_DRIVER
 
