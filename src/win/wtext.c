@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.8 2004/05/06 12:26:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.10 2004/07/07 16:56:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -462,7 +462,7 @@ UpdateText(LPTW lptw, int count)
     TextOut(hdc,xpos,ypos,
 	    (LPSTR)(lptw->ScreenBuffer + lptw->CursorPos.y*lptw->ScreenSize.x +
 		    lptw->CursorPos.x), count);
-    (void)ReleaseDC(lptw->hWndText,hdc);
+    ReleaseDC(lptw->hWndText,hdc);
     lptw->CursorPos.x += count;
     if (lptw->CursorPos.x >= lptw->ScreenSize.x)
 	NewLine(lptw);
@@ -697,7 +697,7 @@ DoMark(LPTW lptw, POINT pt, POINT end, BOOL mark)
 	else
 	    DoLine(lptw, hdc, xpos, ypos, offset, count);
     }
-    (void) ReleaseDC(lptw->hWndText,hdc);
+    ReleaseDC(lptw->hWndText,hdc);
 }
 
 void
@@ -1421,10 +1421,10 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		while((nYinc || nXinc) && !PtInRect(&rect, pt)
 		      && (GetAsyncKeyState(VK_LBUTTON) < 0));
 	    } /* moved inside viewport */
-	    break;
-	}
-    case WM_CHAR:
-    { /* store key in circular buffer */
+	} /* if(dragging) */
+	break;
+    case WM_CHAR: {
+	/* store key in circular buffer */
 	long count = lptw->KeyBufIn - lptw->KeyBufOut;
 
 	if (count < 0)
@@ -1504,6 +1504,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 	    } /* switch(loword(wparam)) */
 	return(0);
+
     case WM_SYSCOLORCHANGE:
 	DeleteObject(lptw->hbrBackground);
 	lptw->hbrBackground = CreateSolidBrush(lptw->bSysColors ?
@@ -1771,7 +1772,7 @@ TextClearEOL(LPTW lptw)
 		    + lptw->CursorPos.y * lptw->ScreenSize.x
 		    + lptw->CursorPos.x),
 	    lptw->ScreenSize.x - lptw->CursorPos.x);
-    (void)ReleaseDC(lptw->hWndText,hdc);
+    ReleaseDC(lptw->hWndText,hdc);
 }
 
 void WDPROC
