@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.19 2003/06/12 00:09:06 sfeam Exp $
+ * $Id: epslatex.trm,v 1.20 2003/06/13 10:44:10 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -587,7 +587,6 @@ static int EPSL_pen_x, EPSL_pen_y;
 static int EPSL_taken;
 static int EPSL_linetype_last;
 static TBOOLEAN EPSL_relative_ok;
-static char *EPSL_texfilename = NULL;
 static FILE *EPSL_texfile;
 
 TERM_PUBLIC void
@@ -679,6 +678,23 @@ Gpdict begin\n\
     ymin_t = EPSL_YMAX * yoffset / (EPSL_SC);
     ymax_t = EPSL_YMAX * (yoffset + ysize) / (EPSL_SC);
 
+    /* Clean up after common mistake of saying 'set output "xxx.tex"' */
+    EPSL_texfile = NULL;
+    if (outstr) {
+	i = strlen(outstr);
+	if (!(dotIndex = strrchr(outstr, '.'))) {
+	    dotIndex = &outstr[strlen(outstr)];
+	}
+	if (!strncmp( &outstr[i-4], ".tex", 4 )) {
+	    EPSL_texfile = gpoutfile;
+	    strncpy( &outstr[i-4], ".eps", 4);
+	    gpoutfile = fopen(outstr,"w");
+	    int_warn(NO_CARET, "Resetting primary output file to *.eps");
+	    if (!gpoutfile)
+		int_error(NO_CARET, "--- reopen failed");
+	}
+    }
+    
     fputs("%%!PS-Adobe-3.0 EPSF-3.0\n", gpoutfile);
     if (outstr)
 	fprintf(gpoutfile, "%%%%Title: (%s)\n", outstr);
@@ -699,17 +715,14 @@ Gpdict begin\n\
 
     fputs("end\n%%%%EndProlog\n", gpoutfile);
 
-    EPSL_texfile = NULL;
 
-    if (outstr && (dotIndex = strrchr(outstr, '.'))) {
-	/* assume file name is ending in ".eps" */
-	if (EPSL_texfilename)
-	    free(EPSL_texfilename);
+    if (outstr && !EPSL_texfile) {
+	char *EPSL_texfilename = NULL;
+	/* Create a tex output file parallel to the eps output file */
 	EPSL_texfilename = gp_alloc(dotIndex - outstr + 5, "epslatex texfilename");
 	if (EPSL_texfilename) {
-	    /* including . */
-	    safe_strncpy(EPSL_texfilename, outstr, dotIndex - outstr + 2);
-	    strcpy(EPSL_texfilename + (dotIndex - outstr) + 1, "tex");
+	    safe_strncpy(EPSL_texfilename, outstr, dotIndex - outstr + 1);
+	    strncpy(EPSL_texfilename + (dotIndex - outstr), ".tex",5);
 	    if ((EPSL_texfile = fopen(EPSL_texfilename, "w")) == (FILE *) NULL) {
 		fprintf(stderr, "Cannot open tex file %s for output\n", EPSL_texfilename);
 	    }
@@ -1088,20 +1101,19 @@ START_HELP(epslatex)
 " To create multiline labels, use \\shortstack, for example",
 "    set ylabel '[r]{\\shortstack{first line \\\\ second line}}' ",
 "",
-" The driver produces two different files, one for the LaTeX part and one for",
-" the eps part of the figure. ",
-" The name of the LaTeX file is derived from the name of",
-" the eps file given on the `set output` command; it is determined by replacing",
-" the trailing `.eps` (actually just the final extent in the file name---and",
-" the option will be turned off if there is no extent) with `.tex` in the output",
-" file name.  Remember to close the `output file` before leaving `gnuplot`.",
+" The driver produces two different files, one for the eps part of the figure",
+" and one for the LaTeX part. The name of the eps file is taken from the",
+" `set output` command. The name of the LaTeX file is derived by replacing",
+" the file extension (normally `.eps`) with `.tex` instead.",
 " There is no LaTeX output if no output file is given!",
-" In your LaTeX documents use '\\input{filename}' for inclusion of the figure.",
-" The `.eps` file is included by the command \\includegraphics{...}, thus",
-" include \\usepackage{graphicx} in the preamble!",
-" Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)",
-" pdf files can made out of the eps files. If the graphics package is properly",
-" configured, the LaTeX files can also be processed by pdflatex without",
-" changes, and the pdf files are included instead of the eps files."
+" Remember to close the `output file` before leaving `gnuplot`.",
+"",
+" In your LaTeX documents use '\\input{filename}' to include the figure.",
+" The `.eps` file is included by the command \\includegraphics{...}, so you",
+" must also include \\usepackage{graphicx} in the LaTeX preamble.",
+"",
+" Pdf files can be made from the eps file using 'epstopdf'. If the graphics",
+" package is properly configured, the LaTeX files can also be processed by",
+" pdflatex without changes, using the pdf files instead of the eps files."
 END_HELP(epslatex)
 #endif
