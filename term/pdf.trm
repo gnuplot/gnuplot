@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.13 2002/08/30 18:45:46 mikulik Exp $
+ * $Id: pdf.trm,v 1.14 2002/10/25 16:37:55 sfeam Exp $
  */
 
 /*------------------------------
@@ -179,7 +179,7 @@ PDF_DefinePattern1(int x1, int y1, int x2, int y2)
 {
     int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
     PDF_setlinewidth(myPDF, 0.2);
-    PDF_setlinecap(myPDF, 0); /* rounded ends */
+    PDF_setlinecap(myPDF, 2); /* square ends */
     PDF_moveto(myPDF, x1, y1);
     PDF_lineto(myPDF, x2, y2);
     PDF_stroke(myPDF);
@@ -192,7 +192,7 @@ PDF_DefinePattern2(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y
 {
     int handle = PDF_begin_pattern(myPDF, 8, 8, 8, 8, 2 /* painttype */);
     PDF_setlinewidth(myPDF, 0.2);
-    PDF_setlinecap(myPDF, 0); /* rounded ends */
+    PDF_setlinecap(myPDF, 2); /* square ends */
     PDF_moveto(myPDF, x1, y1);
     PDF_lineto(myPDF, x2, y2);
     PDF_moveto(myPDF, x3, y3);
@@ -205,12 +205,12 @@ PDF_DefinePattern2(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y
 static void
 PDF_DefinePatterns()
 {
-    PDF_patternHandles[0] = PDF_DefinePattern1(0, 7, 7, 0);
-    PDF_patternHandles[1] = PDF_DefinePattern1(0, 0, 7, 7);
-    PDF_patternHandles[2] = PDF_DefinePattern2(0, 7, 3, 0, 4, 7, 7, 0);
-    PDF_patternHandles[3] = PDF_DefinePattern2(0, 0, 3, 7, 4, 0, 7, 7);
-    PDF_patternHandles[4] = PDF_DefinePattern2(0, 3, 7, 0, 0, 7, 7, 4);
-    PDF_patternHandles[5] = PDF_DefinePattern2(0, 0, 7, 3, 0, 4, 7, 7);
+    PDF_patternHandles[0] = PDF_DefinePattern1(0, 8, 8, 0);
+    PDF_patternHandles[1] = PDF_DefinePattern1(0, 0, 8, 8);
+    PDF_patternHandles[2] = PDF_DefinePattern2(0, 8, 4, 0, 4, 8, 8, 0);
+    PDF_patternHandles[3] = PDF_DefinePattern2(0, 0, 4, 8, 4, 0, 8, 8);
+    PDF_patternHandles[4] = PDF_DefinePattern2(0, 4, 8, 0, 0, 8, 8, 4);
+    PDF_patternHandles[5] = PDF_DefinePattern2(0, 0, 8, 4, 0, 4, 8, 8);
 }
 #endif
 
@@ -968,11 +968,6 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
      */
     int fillpar = style >> 4;
 
-    /* style:
-     *   0 == empty
-     *   1 == solid
-     *   2 == pattern
-     */
     style &= 0xf;
 #else
     (void) style;		/* unused */
@@ -983,7 +978,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 
 #if USE_ULIG_FILLEDBOXES
     switch (style) {
-	case 0: /* fill with white */
+	case FS_EMPTY: /* fill with white */
 #endif
 	    PDF_setgray(myPDF, 1);
 #if USE_ULIG_FILLEDBOXES
@@ -1011,7 +1006,12 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
 		    break;
 		default:
-		    /* fill with white */
+		    /* fill with solid white then overlay pattern */
+		    PDF_save(myPDF);
+		    PDF_setcolor(myPDF, "fill", "rgb", 1, 1, 1, 0 /* unused */);
+		    PDF_rect(myPDF, x1, y1, width, height);
+		    PDF_fill(myPDF);
+		    PDF_restore(myPDF);
 		    PDF_setcolor(myPDF, "fill", "pattern", PDF_patternHandles[fillpar - 1], 0, 0, 0);
 	    }
 	    break;
