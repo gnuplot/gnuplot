@@ -1,3 +1,34 @@
+1999-03-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Add pgnuplot.c to WINDOWS variable.
+	Add m4/Makefile.am.in and m4/README to ETC. Variable.
+
+	* command.c, datafile.c: Change calls to gp_expand_tilde() to match
+	new prototype.
+
+	* configure: Regenerated.
+
+	* configure.in: Move macros from lisp/configure.in up here, generate
+	lisp/Makefile.
+
+	* plot.c(gp_expand_tilde): Use char ** instead of char * as first arg.
+
+	* protos.h: New prototype for gp_expand_tilde().
+
+	* set.c(set_two): Add tilde expansion in 'set output' command.
+
+	* docs/Makefile.in: Re-add srcdir variable, set EMACS at configure
+	time.
+
+	* docs/doc2info.c(convert): Add info directory entry to header of
+	generated info file.
+
+	* lisp/ChangeLog, lisp/Makefile.dst, lisp/Makefile.in, lisp/README,
+	lisp/gnuplot-gui.el, lisp/gnuplot.el, lisp/gpelcard.tex: Import
+	latest version from Bruce Ravel.
+
+	* term/pstricks: Correct off-by-one error in strncpy() call.
+
 1999-03-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* aclocal.m4: Regenerated.
