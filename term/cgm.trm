@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.26 2000/06/15 14:50:44 broeker Exp $
+ * $Id: cgm.trm,v 1.27 2000/10/15 13:08:46 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -683,7 +683,6 @@ CGM_graphics()
     CGM_write_int_record(0, 4, 0, NULL);
 
 #ifdef NEVER		/* no need for these, since we accept the defaults */
-    /*
     {
       static int vdc_integer_precision_data[] = { 16 };
       CGM_write_int_record(3, 1, 2, vdc_integer_precision_data);
@@ -1635,8 +1634,8 @@ START_HELP(cgm)
 
 " The first thirteen of these fonts are required for WebCGM.  The",
 " Microsoft Office CGM import filter implements the 13 standard fonts",
-" listed above, and also `ZapfDingbats' and `Script'.  However, the",
-" script font may only be accessed under the name `15'.  For more on",
+" listed above, and also 'ZapfDingbats' and 'Script'.  However, the",
+" script font may only be accessed under the name '15'.  For more on",
 " Microsoft import filter font substitutions, check its help file which",
 " you may find here:",
 "   C:\\Program Files\\Microsoft Office\\Office\\Cgmimp32.hlp",
