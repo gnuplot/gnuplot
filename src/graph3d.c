@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.27 2000/07/25 13:12:19 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.28 2000/08/02 13:53:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1969,8 +1969,10 @@ const char *what;
 	graph_error("Cannot mix screen co-ordinates with other types");
     } {
 	register struct termentry *t = term;
-	*x = pos->x * (t->xmax) + 0.5;
-	*y = pos->y * (t->ymax) + 0.5;
+	/* HBB 20000914: off-by-one bug. Maximum allowed output is
+         * t->?max - 1, not t->?max itself! */
+	*x = pos->x * (t->xmax -1) + 0.5;
+	*y = pos->y * (t->ymax -1) + 0.5;
     }
 
     return;
