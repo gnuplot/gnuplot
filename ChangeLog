@@ -1,3 +1,8 @@
+2003-11-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/command.c (test_palette_subcommand): Don't crash 'test palette'
+	in read-only directory.
+
 2003-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/xlib.h: Fixed typo (missing ` makes some of doc2xxx fail).

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.81 2003/11/24 16:22:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.82 2003/11/24 16:42:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1375,6 +1375,13 @@ se tit'R,G,B profiles of the current color palette';";
     strcpy(palFile, "gpRgbXXXXXX");
     i = mkstemp(&palFile[0]);
     f = fdopen(i, "w");
+    if (!f) {
+	free(cmd);
+#ifdef TESTPAL_SAVEFILE
+	remove(saveFile);
+#endif
+	int_error(NO_CARET, "cannot write temporary file (read-only directory?)");
+    }
     for (i = 0; i < colors; i++) {
 	/* colours equidistantly from [0,1] */
 	double z = (double)i / (colors - 1); 
