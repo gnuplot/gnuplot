@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaTerm.trm,v 1.15 2002/09/02 14:25:51 persquare Exp $
+ * $Id: aquaTerm.trm,v 1.15.4.1 2003/08/06 21:46:13 persquare Exp $
  *
  */
 
@@ -78,11 +78,12 @@ TERM_PUBLIC void AQUA_pointsize __PROTO((double pointsize));
 #endif /* PM3D */
 /* End of entries */
 
-#define AQUA_XMAX (11.69*72)  /* = 842, paper width times screen resolution */
-#define AQUA_YMAX (8.26*72)   /* = 595, paper height times screen resolution */
-#define AQUA_VTIC 8     
-#define AQUA_HTIC 8
-#define AQUA_VCHAR 16     /* default font is Times at 16 points */
+#define AQUA_SCALE_FACTOR 10.0                  /* Increase resolution */ 
+#define AQUA_XMAX (11.69*72*AQUA_SCALE_FACTOR)  /* = 842, paper width times screen resolution */
+#define AQUA_YMAX (8.26*72*AQUA_SCALE_FACTOR)   /* = 595, paper height times screen resolution */
+#define AQUA_VTIC (8*AQUA_SCALE_FACTOR)     
+#define AQUA_HTIC (8*AQUA_SCALE_FACTOR)
+#define AQUA_VCHAR (16*AQUA_SCALE_FACTOR)       /* default font is Times at 16 points */
 #define AQUA_HCHAR (AQUA_VCHAR*6/10)
 
 #define PM3D_COLORS 128
@@ -667,7 +668,7 @@ TERM_PUBLIC void
 AQUA_init()
 {
   float fontSize, fontWHRatio;
-  float vTicSize, pixelWHRatio;
+  // float vTicSize, pixelWHRatio;
   LOG(@"Aqua Init");
   if (arpool == NULL)   /* Make sure we don't leak mem by allocating every time */
   {
@@ -681,16 +682,16 @@ AQUA_init()
         [gnuTermAccess connectToServer];    /* This will reconnect (or print an explanation) */
     }
   }
-  term->xmax =[[[gnuTermAccess termInfo] objectForKey:@"AQTXMax"] unsignedIntValue]; 
-  term->ymax =[[[gnuTermAccess termInfo] objectForKey:@"AQTYMax"] unsignedIntValue]; 
+  term->xmax =[[[gnuTermAccess termInfo] objectForKey:@"AQTXMax"] unsignedIntValue]*AQUA_SCALE_FACTOR; 
+  term->ymax =[[[gnuTermAccess termInfo] objectForKey:@"AQTYMax"] unsignedIntValue]*AQUA_SCALE_FACTOR; 
   fontSize = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontSize"] floatValue];
   fontWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontWHRatio"] floatValue];
-  pixelWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTPixelWHRatio"] floatValue];
-  vTicSize = AQUA_VTIC;
-  term->v_char = (unsigned int) fontSize;
-  term->h_char = (unsigned int) (fontWHRatio * fontSize);
-  term->v_tic = (unsigned int) vTicSize;
-  term->h_tic = (unsigned int) (vTicSize * pixelWHRatio);
+  // pixelWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTPixelWHRatio"] floatValue];
+  // vTicSize = AQUA_VTIC;
+  term->v_char = (unsigned int) (fontSize * AQUA_SCALE_FACTOR);
+  term->h_char = (unsigned int) (fontWHRatio * fontSize * AQUA_SCALE_FACTOR);
+  term->v_tic = (unsigned int) AQUA_VTIC;
+  term->h_tic = (unsigned int) AQUA_HTIC;
   //
   // Set up the basic indexed colormap for gnuplot
   //
@@ -730,13 +731,13 @@ AQUA_graphics()
 TERM_PUBLIC void
 AQUA_move(unsigned int x, unsigned int y)
 {
-    [gnuTermAccess moveToPoint:NSMakePoint(x, y)];
+    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR, y/AQUA_SCALE_FACTOR)];
 }
 
 TERM_PUBLIC void
 AQUA_vector(unsigned int x, unsigned int y)
 {
-  [gnuTermAccess lineToPoint:NSMakePoint(x, y)];
+  [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR, y/AQUA_SCALE_FACTOR)];
 }
 
 TERM_PUBLIC void
@@ -751,7 +752,7 @@ AQUA_put_text(unsigned int x, unsigned int y, const char *str)
 {
   if (!strlen(str))
     return;
-  [gnuTermAccess putText:str at:NSMakePoint(x,y)];
+  [gnuTermAccess putText:str at:NSMakePoint(x/AQUA_SCALE_FACTOR,y/AQUA_SCALE_FACTOR)];
 }
 
 TERM_PUBLIC int 
@@ -776,8 +777,8 @@ AQUA_set_font(const char *font) /* "font,size" */
   // FIXME: Does gnuplot process these values?
   fontSize = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontSize"] floatValue];
   fontWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontWHRatio"] floatValue];
-  term->v_char = (unsigned int) fontSize;
-  term->h_char = (unsigned int) (fontWHRatio * fontSize);
+  term->v_char = (unsigned int) (fontSize * AQUA_SCALE_FACTOR);
+  term->h_char = (unsigned int) (fontWHRatio * fontSize * AQUA_SCALE_FACTOR);
 
   return (TRUE);
 }
@@ -796,14 +797,14 @@ AQUA_point(unsigned int x, unsigned int y, int number)
   {
     double tmplw = [gnuTermAccess linewidth];
     [gnuTermAccess setLinewidth:1.0];
-    [gnuTermAccess moveToPoint:NSMakePoint(x-.5, y)];
-    [gnuTermAccess lineToPoint:NSMakePoint(x+.5, y)];
+    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR-.5, y/AQUA_SCALE_FACTOR)];
+    [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR+.5, y/AQUA_SCALE_FACTOR)];
     [gnuTermAccess setLinewidth: tmplw];
   }
   else
   {
-    [gnuTermAccess moveToPoint:NSMakePoint(x-.5, y)];
-    [gnuTermAccess lineToPoint:NSMakePoint(x+.5, y)];
+    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR-.5, y/AQUA_SCALE_FACTOR)];
+    [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR+.5, y/AQUA_SCALE_FACTOR)];
   }
   do_point(x, y, number);
 }
@@ -823,7 +824,7 @@ AQUA_resume(void) /* before subsequent plot of multiplot */
 TERM_PUBLIC void 
 AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height) /* clear part of multiplot */
 {
-  [gnuTermAccess fillRect:NSMakeRect(x1,y1,width,height) style:style];
+  [gnuTermAccess fillRect:NSMakeRect(x1/AQUA_SCALE_FACTOR,y1/AQUA_SCALE_FACTOR,width/AQUA_SCALE_FACTOR,height/AQUA_SCALE_FACTOR) style:style];
 }
   
 TERM_PUBLIC void 
@@ -862,7 +863,19 @@ AQUA_pointsize(double pointsize)
   TERM_PUBLIC void 
   AQUA_filled_polygon(int points, gpiPoint *corners)
   {
-    [gnuTermAccess setPolygonUsing:points corners:corners];
+    int i;
+    gpiPoint *scaledPoints = (gpiPoint *)malloc(points*sizeof(gpiPoint));
+    if (scaledPoints)
+      {
+	/* Need to rescale the point coordinates */
+	for (i=0; i<points; i++)
+	  {
+	    scaledPoints[i].x = corners[i].x / AQUA_SCALE_FACTOR;
+	    scaledPoints[i].y = corners[i].y / AQUA_SCALE_FACTOR;
+	  }
+	[gnuTermAccess setPolygonUsing:points corners:scaledPoints];
+	free(scaledPoints);
+      }
   }
 #endif /* PM3D */
 
