@@ -57,12 +57,12 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
 
 #if defined(MSDOS) || defined(DOS386)
 # ifdef DJGPP
-extern char HelpFile[MAXPATH];	/* patch for do_help  - AP */
+extern char HelpFile[];		/* patch for do_help  - AP */
 # endif				/* DJGPP */
 # ifdef __TURBOC__
 #  ifndef _Windows
 extern unsigned _stklen = 16394;	/* increase stack size */
-extern char HelpFile[80];	/* patch for do_help  - DJL */
+extern char HelpFile[];		/* patch for do_help  - DJL */
 #  endif /* _Windows */
 # endif /* TURBOC */
 #endif /* MSDOS */
@@ -71,6 +71,7 @@ extern char HelpFile[80];	/* patch for do_help  - DJL */
 # include "help.h"
 #else
 # define MAXSTR 255
+static int winsystem __PROTO((char *));
 #endif /* _Windows */
 
 #ifndef STDOUT
@@ -103,8 +104,8 @@ extern int Pause(LPSTR mess);	/* in winmain.c */
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
 # define chdir  _chdir2
-int PM_pause(char *);
-int ExecuteMacro(char *, int);
+extern int PM_pause(char *);  /* term/pm.trm */
+extern int ExecuteMacro(char *, int); /* plot.c */
 #endif /* OS2 */
 
 #ifdef VMS
@@ -131,7 +132,6 @@ __far int num_tokens, c_token;
 int num_tokens, c_token;
 #endif
 
-extern TBOOLEAN do_load_arg_substitution;
 struct lexical_unit *token;
 int token_table_size;
 
@@ -139,13 +139,6 @@ char *input_line;
 int input_line_len;
 int inline_num;			/* input line number */
 
-/* things shared by plot2d.c and plot3d.c are here, for historical reasons */
-
-double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-int auto_array[AXIS_ARRAY_SIZE];
-TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-double base_array[AXIS_ARRAY_SIZE];
-double log_base_array[AXIS_ARRAY_SIZE];
 struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
 
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* current dummy vars */
@@ -158,14 +151,10 @@ int plot_token;			/* start of 'plot' command */
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
 
-
-
 #define Inc_c_token if (++c_token >= num_tokens)	\
                         int_error ("Syntax error", c_token);
 
-
 /* support for dynamic size of input line */
-
 void extend_input_line()
 {
     if (input_line_len == 0) {
@@ -232,16 +221,6 @@ int com_line()
 }
 
 
-#ifdef OS2
-void set_input_line(char *line, int nchar)
-{
-    safe_strncpy(input_line, line, nchar);
-    input_line[nchar] = NUL;
-}
-
-#endif
-
-
 int do_line()
 {
     /* Line continuation has already been handled
@@ -254,7 +233,8 @@ int do_line()
 
     if (inlptr != input_line) {
 	/* If there was leading whitespace, copy the actual
-	 * command string to the front. */
+	 * command string to the front. use memmove() because
+	 * source and target overlap */
 	memmove(input_line,inlptr,strlen(inlptr));
 	/* Terminate resulting string */
 	input_line[strlen(inlptr)] = NUL;
@@ -688,7 +668,8 @@ char *path;
 # endif
 
 
-/* HBB: recent versions of DJGPP also have setdisk():, so I del'ed the special code */
+/* HBB: recent versions of DJGPP also have setdisk():,
+ * so I del'ed the special code */
 # if ((defined(MSDOS) || defined(_Windows)) && defined(__TURBOC__)) || defined(DJGPP)
 	(void) setdisk(driveno);
 # endif
@@ -819,7 +800,7 @@ char *prompt;
 	    prompt_desc.dsc$w_length = strlen(expand_prompt);
 	    prompt_desc.dsc$a_pointer = expand_prompt;
 	    more = 1;
-	    input_line[start - 1] = ' '; /* old code: --start; */
+	    --start;
 	} else {
 	    line_desc.dsc$w_length = strlen(input_line);
 	    line_desc.dsc$a_pointer = input_line;
@@ -1051,25 +1032,19 @@ int toplevel;
 
 #ifndef VMS
 
-# ifdef _Windows
-/* this function is used before its definition */
-int winsystem(char *s);
-# endif
-
 # ifdef AMIGA_AC_5
-char strg0[256];
+static char *parms[80];
+static char strg0[256];
+static void getparms __PROTO((char *, char**));
 # endif
 
 static void do_system()
 {
 # ifdef AMIGA_AC_5
-    char *parms[80];
-    void getparms();
-
     getparms(input_line + 1, parms);
     if (fexecv(parms[0], parms) < 0)
-# else /* !AMIGA_AC_5 */
-#  if (defined(ATARI)&&defined(__GNUC__))		/* || (defined(MTOS)&&defined(__GNUC__)) */
+# elif (defined(ATARI) && defined(__GNUC__))
+/* || (defined(MTOS) && defined(__GNUC__)) */
     /* use preloaded shell, if available */
     short (*shell_p) (char *command);
     void *ssp;
@@ -1080,10 +1055,9 @@ static void do_system()
 
     /* this is a bit strange, but we have to have a single if */
     if ((shell_p ? (*shell_p) (input_line + 1) : system(input_line + 1)))
-#  else
-#   ifdef _Windows
+# elif defined(_Windows)
     if (winsystem(input_line + 1))
-#   else
+# else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -1091,45 +1065,40 @@ static void do_system()
  *  variables,...
  */
     if (system(input_line + 1))
-#   endif /* !_Windows */
-#  endif /* !(ATARI && GNUC) */
-# endif /* !AMIGA_AC_5 */
+# endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
 	os_error("system() failed", NO_CARET);
 }
 
 
 # ifdef AMIGA_AC_5
-/******************************************************************************/
-/* */
-/* Parses the command string (for fexecv use) and  converts the first token  */
-/* to lower case                                                          */
-/* */
-/******************************************************************************/
-
-void getparms(command, parms)
+/******************************************************************************
+ * Parses the command string (for fexecv use) and  converts the first token
+ * to lower case                                                 
+ *****************************************************************************/
+static void getparms(command, parms)
 char *command;
 char **parms;
 {
-    register int i = 0;		/* A bunch of indices          */
+    register int i = 0;		/* A bunch of indices */
     register int j = 0;
     register int k = 0;
 
-    while (*(command + j) != NUL) {	/* Loop on string characters   */
+    while (*(command + j) != NUL) {	/* Loop on string characters */
 	parms[k++] = strg0 + i;
 	while (*(command + j) == ' ')
 	    ++j;
 	while (*(command + j) != ' ' && *(command + j) != NUL) {
-	    if (*(command + j) == '"')	/* Get quoted string           */
+	    if (*(command + j) == '"')	/* Get quoted string */
 		for (*(strg0 + (i++)) = *(command + (j++));
 		     *(command + j) != '"';
 		     *(strg0 + (i++)) = *(command + (j++)));
 	    *(strg0 + (i++)) = *(command + (j++));
 	}
-	*(strg0 + (i++)) = NUL;	/* NUL terminate every token   */
+	*(strg0 + (i++)) = NUL;	/* NUL terminate every token */
     }
     parms[k] = NUL;
 
-    for (k = strlen(strg0) - 1; k >= 0; --k)	/* Convert to lower case       */
+    for (k = strlen(strg0) - 1; k >= 0; --k)	/* Convert to lower case */
 	*(strg0 + k) >= 'A' && *(strg0 + k) <= 'Z' ? *(strg0 + k) |= 32 : *(strg0 + k);
 }
 
@@ -1138,10 +1107,9 @@ char **parms;
 
 # if defined(READLINE) || defined(GNU_READLINE)
 /* keep some compilers happy */
-char *rlgets __PROTO((char *s, int n, char *prompt));
+static char *rlgets __PROTO((char *s, int n, char *prompt));
 
-char *
- rlgets(s, n, prompt)
+static char * rlgets(s, n, prompt)
 char *s;
 int n;
 char *prompt;
@@ -1153,8 +1121,9 @@ char *prompt;
 	/* If we already have a line, first free it */
 	if (line != (char *) NULL) {
 	    free(line);
-	    line = NULL;	/* so that ^C or int_error during readline() does */
-	    /* not result in line being free-ed twice         */
+	    line = NULL;
+	    /* so that ^C or int_error during readline() does
+	     * not result in line being free-ed twice */
 	}
 	line = readline((interactive) ? prompt : "");
 	leftover = 0;
@@ -1209,7 +1178,7 @@ static void do_shell()
     (void) putc('\n', stderr);
 }
 
-#  else /* AMIGA_SC_6_1 */
+#  else /* !AMIGA_SC_6_1 */
 
 #   ifdef OS2
 static void do_shell()
@@ -1240,9 +1209,9 @@ static void do_shell()
     (void) putc('\n', stderr);
 }
 
-#   endif /* OS2 */
-#  endif /* AMIGA_SC_6_1 */
-# endif /* MSDOS */
+#   endif /* !OS2 */
+#  endif /* !AMIGA_SC_6_1 */
+# endif /* !MSDOS */
 
 /* read from stdin, everything except VMS */
 
@@ -1257,8 +1226,9 @@ static void do_shell()
 #   ifdef __TURBOC__
 /* cgets implemented using dos functions */
 /* Maurice Castro 22/5/91 */
-char *
- doscgets(s)
+static char *doscgets __PROTO((char *));
+
+static char *doscgets(s)
 char *s;
 {
     long datseg;
@@ -1288,6 +1258,7 @@ void cputs(char *s)
     while (s[i] != NUL)
 	bdos(0x02, s[i++], NULL);
 }
+
 char *cgets(char *s)
 {
     bdosx(0x0A, s, NULL);
@@ -1381,8 +1352,7 @@ char *prompt;
 		    continue;	/* read rest of line, don't print "> " */
 		}
 		if (input_line[last] == '\\') {		/* line continuation */
-		    input_line[last] = ' ';
-		    start = last + 1; /* Old code: start = last; */
+		    start = last;
 		    more = TRUE;
 		} else
 		    more = FALSE;
@@ -1402,7 +1372,7 @@ char *prompt;
 /* there is a system like call on MS Windows but it is a bit difficult to 
    use, so we will invoke the command interpreter and use it to execute the 
    commands */
-int winsystem(char *s)
+static int winsystem(char *s)
 {
     LPSTR comspec;
     LPSTR execstr;
@@ -1452,52 +1422,3 @@ int winsystem(char *s)
 }
 #endif /* _Windows */
 
-#if 0				/* not used */
-static int get_time_data(line, maxcol, cols, types, x, y, z)
-char *line;
-int maxcol, *cols, *types;
-double *x, *y, *z;
-{
-    register int m, n, linestat;
-    double val[3];
-    char *s;
-    static struct tm tm;
-
-    linestat = 1;
-    m = n = 0;
-    s = line;
-    while ((linestat == 1) && (n < maxcol)) {
-	while (isspace(*s))
-	    s++;
-	if (*s == NUL) {
-	    linestat = 0;
-	    break;
-	}
-	n++;
-	if (n == cols[m]) {
-	    if (types[m] == TIME) {
-		if ((s = (char *) gstrptime(s, timefmt, &tm)) != NULL) {
-		    val[m] = (double) gtimegm(&tm);
-		    m++;
-		} else
-		    linestat = 2;
-	    } else if (isdigit(*s) || *s == '-' || *s == '+' || *s == '.') {
-		val[m] = atof(s);
-		m++;
-	    } else
-		linestat = 2;	/* abort the line non-digit in req loc */
-	}
-	while ((!isspace(*s)) && (*s != NUL))
-	    s++;
-    }
-    if (linestat == 2)
-	return (0);
-    if (m > 0)
-	*x = val[0];
-    if (m > 1)
-	*y = val[1];
-    if (m > 2)
-	*z = val[2];
-    return (m);
-}
-#endif /* not used */
