@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.14 2002/06/07 21:25:16 mikulik Exp $
+ * $Id: metapost.trm,v 1.15 2002/07/04 16:33:10 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -54,15 +54,6 @@
  * 	 	L Srinivasa Mohan <mohan@chemeng.iisc.ernet.in>
  */
 
-/* FIXME: pm3d support by Arun Persaud <apersaud@lbl.gov>
- It seems to be working quite well, but there is one bug which I haven't 
-been able to fix: the colored box drawn next to the figure has the tics 
-and the text colored in the `highest' color of the palette (white for 
-gray images, yellow for default colored ones). I guess there should be a 
-call to term->set_color somewhere before the tics are made and the text 
-is written, but I couldn't figure out where should go...perhaps you can 
-help me on this one...
- */
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -96,8 +87,6 @@ TERM_PUBLIC int MP_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void MP_previous_palette __PROTO((void));
 TERM_PUBLIC void MP_set_color __PROTO((double));
 TERM_PUBLIC void MP_filled_polygon __PROTO((int, gpiPoint *));
-
-#include "getcolor.h"
 #endif /* PM3D */
 
 /* 5 inches wide by 3 inches high (default) */
@@ -163,10 +152,17 @@ static int MP_tex = MP_TEX;
 #define MP_PSNFSS_7    1
 #define MP_PSNFSS_8    2
 static int MP_psnfss = MP_PSNFSS_NONE;
+/* should amstex packages be included? */
+static int MP_amstex = 0;
 /* add a4paper option to documentclass */
 static int MP_a4paper = 0;
 /* write a prologues line */
 static int MP_prologues = -1;
+
+#ifdef PM3D
+/* has color changed? */
+static int MP_color_changed = 0;
+#endif
 
 /* has a font change taken place? */
 static TBOOLEAN MP_fontchanged = FALSE;
@@ -190,7 +186,7 @@ enum MP_id {
     MP_OPT_NOTEX, MP_OPT_TEX, MP_OPT_LATEX,
     MP_OPT_A4PAPER,
     MP_OPT_PSNFSS, MP_OPT_PSNFSS_V7, MP_OPT_NOPSNFSS,
-    MP_OPT_DEFAULT,
+    MP_OPT_AMSTEX,
     MP_OPT_PROLOGUES, MP_OPT_NOPROLOGUES,
     MP_OPT_MAGNIFICATION, MP_OPT_OTHER
 };
@@ -205,10 +201,10 @@ static struct gen_table MP_opts[] = {
     { "t$ex", MP_OPT_TEX },
     { "la$tex", MP_OPT_LATEX },
     { "a4$paper", MP_OPT_A4PAPER },
+    { "am$stex", MP_OPT_AMSTEX },
     { "ps$nfss", MP_OPT_PSNFSS },
     { "psnfss-v$ersion7", MP_OPT_PSNFSS_V7 },
     { "nops$nfss", MP_OPT_NOPSNFSS },
-    { "de$fault", MP_OPT_DEFAULT },
     { "pro$logues", MP_OPT_PROLOGUES },
     { "nopro$logues", MP_OPT_NOPROLOGUES },
     { "ma$gnification", MP_OPT_MAGNIFICATION },
@@ -224,9 +220,11 @@ MP_options()
     MP_solid = FALSE;
     MP_tex = MP_TEX;
     MP_a4paper = 0;
+    MP_amstex  = 0;
     MP_psnfss = MP_PSNFSS_NONE;
     MP_fontsize = 10.0;
     MP_textmag = 1.0;
+    MP_prologues = -1;
     strcpy(MP_fontname, "cmr10");
     strcpy(default_font, "");	/* output file will store default font info */
 
@@ -261,23 +259,28 @@ MP_options()
 	    MP_tex = MP_LATEX;
 	    c_token++;
 	    break;
+	case MP_OPT_AMSTEX:
+	    MP_tex = MP_LATEX; /* only makes sense when using LaTeX */
+	    MP_amstex = 1;
+	    c_token++;
+	    break;
 	case MP_OPT_A4PAPER:
+	    MP_tex = MP_LATEX; /* only makes sense when using LaTeX */
 	    MP_a4paper = 1;
 	    c_token++;
 	    break;
 	case MP_OPT_PSNFSS:
+	    MP_tex = MP_LATEX;    /* only makes sense when using LaTeX */
 	    MP_psnfss = MP_PSNFSS_8;
 	    c_token++;
 	    break;
 	case MP_OPT_PSNFSS_V7:
+	    MP_tex = MP_LATEX; /* only makes sense when using LaTeX */
 	    MP_psnfss = MP_PSNFSS_7;
 	    c_token++;
 	    break;
 	case MP_OPT_NOPSNFSS:
 	    MP_psnfss = MP_PSNFSS_NONE;
-	    c_token++;
-	    break;
-	case MP_OPT_DEFAULT:
 	    c_token++;
 	    break;
 	case MP_OPT_PROLOGUES:
@@ -328,10 +331,29 @@ MP_options()
 	term->h_char = (unsigned int) (MP_DPI * MP_fontsize * MP_textmag * 5.3 / 720 + 0.5);
     }
 
-    sprintf(term_options, "%s%s%s%s%6.3f \"%s\" %5.2f %d %d",
-	    MP_color ? "color " : "", MP_solid ? "solid " : "",
-	    (MP_tex == MP_NO_TEX) ? "notex " : (MP_tex == MP_LATEX) ? "latex " : "", "mag ",
-	    MP_textmag, MP_fontname, MP_fontsize, MP_psnfss, MP_prologues);
+    if (MP_psnfss == MP_PSNFSS_NONE) { /* using the normal font scheme */
+      sprintf(term_options,
+	    "%s %s %stex%s%s mag %.3f font \"%s\" fontsize %.2f %sprologues(%d)",
+	    MP_color ? "color" : "monochrome",
+	    MP_solid ? "solid" : "dashed",
+	    (MP_tex == MP_NO_TEX) ? "no" : (MP_tex == MP_LATEX) ? "la" : "",
+	    MP_a4paper ? " a4paper" : "",
+	    MP_amstex ? " amstex" : "",
+	    MP_textmag,
+	    MP_fontname, MP_fontsize,
+	    (MP_prologues > -1) ? "" : "no", MP_prologues );
+    } else { /* using postscript fonts */
+      sprintf(term_options,
+	    "%s %s %stex%s%s mag %.3f %s %sprologues(%d)",
+	    MP_color ? "color" : "monochrome",
+	    MP_solid ? "solid" : "dashed",
+	    (MP_tex == MP_NO_TEX) ? "no" : (MP_tex == MP_LATEX) ? "la" : "",
+	    MP_a4paper ? " a4paper" : "",
+	    MP_amstex ? " amstex" : "",
+	    MP_textmag,
+	    (MP_psnfss == MP_PSNFSS_7) ? "psnsfss(v7)" : "psnsfss",
+	    (MP_prologues > -1) ? "" : "no", MP_prologues );
+    };
 }
 
 TERM_PUBLIC void
@@ -353,7 +375,7 @@ MP_init()
 %% mpost --tex=latex ...\n\
 \n\
 % BEGPRE\n\
-\\verbatimtex\n", gpoutfile);
+verbatimtex\n", gpoutfile);
 	if (MP_a4paper) {
 	    fputs("\\documentclass[a4paper]{article}\n", gpoutfile);
 	} else {
@@ -379,6 +401,10 @@ MP_init()
 	    }
 	    break;
 	}
+	if (MP_amstex) {
+	  fputs("\\usepackage[intlimits]{amsmath}\n\
+\\usepackage{amsfonts}\n", gpoutfile);
+          };
 	fputs("\\begin{document}\n\
 etex\n% ENDPRE\n", gpoutfile);
     }
@@ -426,7 +452,7 @@ verbatimtex\n\
 	}
     }
     fputs("\n\
-color currentcolor; currentcolor=black;\n\
+color currentcolor; currentcolor:=black;\n\
 boolean colorlines,dashedlines;\n", gpoutfile);
     if (MP_color) {
 	fputs("colorlines:=true;\n", gpoutfile);
@@ -532,6 +558,10 @@ MP_graphics()
 	    (term->xmax) / 10.0, (term->ymax) / 10.0);
     fprintf(gpoutfile, "scalepen 1; ptsize %.3f;linetype -2;\n", pointsize);
     MP_char_code++;
+#ifdef PM3D
+    /* reset MP_color_changed */
+    MP_color_changed = 0;
+#endif
 }
 
 TERM_PUBLIC void
@@ -550,6 +580,13 @@ MP_linetype(int lt)
 	linetype %= MP_LINE_TYPES;
     if (MP_inline)
 	MP_endline();
+#ifdef PM3D
+    /* reset the color in case it has been changed in MP_set_color() */
+    if (MP_color_changed) {
+	MP_oldline = linetype + 1;
+	MP_color_changed = 0;
+    }
+#endif
     if (MP_oldline != linetype) {
 	fprintf(gpoutfile, "linetype %d;\n", linetype);
 	MP_oldline = linetype;
@@ -749,6 +786,13 @@ MP_set_font(const char *font)
 TERM_PUBLIC void
 MP_reset()
 {
+    if (MP_tex == MP_LATEX) {
+	fputs("% BEGPOST\n",gpoutfile); 
+	fputs("verbatimtex\n",gpoutfile);
+	fputs(" \\end{document}\n",gpoutfile);
+	fputs("etex\n",gpoutfile);
+	fputs("% ENDPOST\n",gpoutfile); 
+    };
     fputs("end.\n", gpoutfile);
 }
 
@@ -781,6 +825,9 @@ MP_make_palette(t_sm_palette *palette)
 TERM_PUBLIC void
 MP_set_color(double gray)
 {
+    /* remeber that we changed the color, needed to reset color in MP_linetype()*/
+    MP_color_changed = 1;
+
     if (MP_inline)
 	MP_endline();
 
@@ -789,12 +836,17 @@ MP_set_color(double gray)
 		    1 : floor(gray * sm_palette.colors) / sm_palette.colors;
 
     if (!MP_color) {		/* gray mode */
-	fprintf(gpoutfile, "currentcolor:=%3fwhite;\n", gray);
+	if (gray < 1e-3) gray = 0;
+	fprintf(gpoutfile, "currentcolor:=%.3gwhite;\n", gray);
     } else {			/* color mode */
-	fprintf(gpoutfile, "currentcolor:=%4f*red+%4f*green+%4f*blue;\n",
-		GetColorValueFromFormula(sm_palette.formulaR, gray),
-		GetColorValueFromFormula(sm_palette.formulaG, gray),
-		GetColorValueFromFormula(sm_palette.formulaB, gray));
+	double red = GetColorValueFromFormula(sm_palette.formulaR, gray);
+	double green = GetColorValueFromFormula(sm_palette.formulaG, gray);
+	double blue = GetColorValueFromFormula(sm_palette.formulaB, gray);
+	if (red < 1e-4) red = 0;
+	if (green < 1e-4) green = 0;
+	if (blue < 1e-4) blue = 0;
+	fprintf(gpoutfile, "currentcolor:=%.4g*red+%.4g*green+%.4g*blue;\n",
+		red, green, blue);
     }
     return;
 }
@@ -833,10 +885,10 @@ TERM_TABLE_START(mp_driver)
     MP_text, null_scale, MP_graphics, MP_move, MP_vector,
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
-    0, 0, 0, MP_boxfill, MP_linewidth
+    TERM_BINARY /*flags*/, 0, 0, MP_boxfill, MP_linewidth
 #ifdef PM3D
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0		/* no mouse support for postscript */
+    , 0, 0, 0, 0, 0		/* no mouse support for metapost */
 #endif
     , MP_make_palette,
     MP_previous_palette,	/* write grestore */
@@ -867,8 +919,15 @@ START_HELP(mp)
 " allowing essentially  any TeX symbols in titles and labels.",
 "",
 " Syntax:",
-"    set term mp {color} {solid} {notex|tex|latex} {mag <magsize>} {\"<name>\"}",
-"                {<size>}",
+"    set term mp {color | colour | monochrome}",
+"                {solid | dashed}",
+"                {notex | tex | latex}",
+"                {magnification <magsize>}",
+"                {psnfss | psnfss-version7 | nopsnfss}",
+"                {prologues <value>}",
+"                {a4paper}",
+"                {amstex}",
+"                {\"<fontname>\"} {<fontsize>}",
 "",
 " The option `color` causes lines to be drawn in color (on a printer or display",
 " that supports it), `monochrome` (or nothing) selects black lines.  The option",
@@ -887,8 +946,9 @@ START_HELP(mp)
 " The option `latex` sets the terminal to output its text for processing by",
 " LaTeX. This allows things like \\frac for fractions which LaTeX knows about",
 " but TeX does not.  Note that you must set the environment variable TEX to the",
-" name of your LaTeX executable (normally latex) if you use this option. ",
-" Otherwise metapost will try and use TeX to process the text and it won't work.",
+" name of your LaTeX executable (normally latex) if you use this option or use",
+" `mpost --tex=<name of LaTeX executable> ...' Otherwise metapost will try and",
+"  use TeX to process the text and it won't work.",
 "",
 " Changing font sizes in TeX has no effect on the size of mathematics, and there",
 " is no foolproof way to make such a change, except by globally  setting a",
@@ -899,6 +959,36 @@ START_HELP(mp)
 " the discussion below on editing the MP output. `mag` will also work under",
 " `notex` but there seems no point in using it as the font size option (below)",
 " works as well.",
+"",
+" The option `psnfss` uses postscript fonts in combination with LaTeX. Since",
+" this option only makes sense, if LaTeX is being used, the `latex` option is selected",
+" automatically. This option includes the following packages for LaTeX:",
+" inputenc(latin1), fontenc(T1), mathptmx, helvet(scaled=09.2), courier, latexsym ",
+" and textcomp.",
+"",
+" The option `psnfss-version7` uses also postscript fonts in LaTeX (option `latex`",
+" is also automatically selected), but uses the following packages with LaTeX:",
+" inputenc(latin1), fontenc(T1), times, mathptmx, helvet and courier.",
+"",
+" The option `nopsnfss` is the default and uses the standard font (cmr10 if not",
+" otherwise specified).",
+"",
+" The option `prologues` takes a value as an additional argument and adds the line",
+" `prologues:=<value>` to the metapost file. If a value of `2` is specified metapost",
+" uses postscript fonts to generate the eps-file, so that the result can be viewed",
+" using e.g. ghostscript. Normally the output of metapost uses TeX fonts and therefore",
+" has to be included in a (La)TeX file before you can look at it.",
+"",
+" The option `noprologues` is the default. No additional line specifying the prologue",
+" will be added.",
+"",
+" The option `a4paper` adds a `[a4paper]` to the documentclass. Normally letter paper",
+" is used (default). Since this option is only used in case of LaTeX, the `latex` option",
+" is selected automatically.",
+"",
+" The option `amstex` automatically selects the `latex` option and includes the following",
+" LaTeX packages: amsfonts, amsmath(intlimits). By default these packages are not",
+" included.",
 "",
 " A name in quotes selects the font that will be used when no explicit font is",
 " given in a `set label` or `set title`.  A name recognized by TeX (a TFM file",
@@ -930,7 +1020,7 @@ START_HELP(mp)
 " If you type your labels inside double quotes, backslashes in TeX code need to",
 " be escaped (doubled). Using single quotes will avoid having to do this, but",
 " then you cannot use `\\n` for line breaks.  As of this writing, version 3.7 of",
-" gnuplot processess titles given in a `plot` command differently than in other",
+" gnuplot processes titles given in a `plot` command differently than in other",
 " places, and backslashes in TeX commands need to be doubled regardless of the",
 " style of quotes.",
 "",
