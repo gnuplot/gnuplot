@@ -4,7 +4,7 @@ Changes in release 4.0:
 * NEW grid options: {layerdefault | front | back}
 * NEW plot option "smooth frequency"
 * NEW terminal names now sorted alphabetically
-* NEW "linetype palette" also for points
+* NEW "with palette" also for points
 * NEW (incomplete) plotstyle "with filledcurves"
 * NEW plot style "with filledboxes", controlled by new
   "set style filling" options (needs --enable-filledboxes)
@@ -16,7 +16,7 @@ Changes in release 4.0:
 * FIXED candlesticks now ignore order of high/low entries
 * FIXED keeping old arrow options if new "set" command modifies it
 * FIXED undoing a mouse zoom that started from autoscaled axis
-* FIXED contour line colours in pm3d's "linetype palette" mode
+* FIXED contour line colours in pm3d's "with palette" mode
 * FIXED PostScript stack pollution caused by "Symbol Oblique" patch
 * FIXED warnings from perl -w in tkcanvas terminal output
 * FIXED dgrid3d floating point exception

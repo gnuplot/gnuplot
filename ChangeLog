@@ -1,3 +1,14 @@
+2001-11-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/misc.c: Allow any order of lt, lw, pal, ps, pt options in
+	'with <style> <options>'. Allow the smooth color change of lines,
+	points, dots by	'with ... palette' instead of 'with ... lt palette'
+	(but keep the parser knowing the older syntax too).
+
+	* docs/gnuplot.doc: Better documentation for 'with palette' in 
+	'with <style>' section. A section for 'lines' added (currently it
+	was commented out).
+
 2001-11-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (do_3dplot) [PM3D]: Handle plot style FILLEDBOXES
@@ -12,6 +23,7 @@
 	the syntax for that command a lot.
 
 2001-11-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/gadgets.h src/mouse.h src/graph3d.c src/graphics.c src/save.c
 	src/set.c src/show.c docs/gnuplot.doc NEWS: 'set label' with any
 	line type (colour), point type and point size; further allow any

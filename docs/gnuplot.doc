@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.85 2001/10/31 17:14:00 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.86 2001/11/10 18:27:13 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2963,10 +2963,12 @@ C ... and restart the table:
 
  Syntax:
        with <style> { {linestyle | ls <line_style>}
-                      | {{linetype | lt <line_type>}
+                      | {{linetype  | lt <line_type>}
                          {linewidth | lw <line_width>}
                          {pointtype | pt <point_type>}
-                         {pointsize | ps <point_size>}} }
+                         {pointsize | ps <point_size>}
+                         {palette}}
+                    }
 
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
@@ -3004,10 +3006,16 @@ C ... and restart the table:
  with `set style line`, one of these may be selected by setting <line_style> to
  the index of the desired style.
 
+ If gnuplot was built with `pm3d` support, the special keyword 'palette' is
+ allowed for smooth color change of lines, points and dots in splots. The
+ color is choosen from a smooth palette which was set previously with the 
+ command `set palette`. The color value corresponds to the z-value of the
+ point coordinates. The 2d `plot` command ignores this option.
+
  The keywords may be abbreviated as indicated.
 
- Note that the `linewidth` and `pointsize` options are not supported by all
- terminals.
+ Note that the `linewidth`, `pointsize` and palette options are not supported
+ by all terminals.
 
  Examples:
 
@@ -3043,6 +3051,9 @@ C ... and restart the table:
 
  This plots two data sets with lines differing only by weight:
        plot 'd1' t "good" w l lt 2 lw 3, 'd2' t "bad" w l lt 2 lw 1
+
+ This plots a surface with color lines:
+       splot x*x-y*y with line palette
 
  See `set style` to change the default styles.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html"> Styles demos. </a>
@@ -4752,10 +4763,10 @@ C ... and restart the table:
  an index instead of repeating all the information at each invocation.
 
  Syntax:
-       set style line <index> {linetype | lt <line_type>}
-                             {linewidth | lw <line_width>}
-                             {pointtype | pt <point_type>}
-                             {pointsize | ps <point_size>}
+       set style line <index> {linetype  | lt <line_type>}
+                              {linewidth | lw <line_width>}
+                              {pointtype | pt <point_type>}
+                              {pointsize | ps <point_size>}
                               {palette}
        set nolinestyle
        show style line
@@ -4783,7 +4794,7 @@ C ... and restart the table:
  allowed as `linetype` for splots (the 2d `plot` command ignores `palette`).
  In this case the line color is choosen from a smooth palette which was
  set previously with the command `set palette`.  The color value corresponds
- to the z-Value (elevation) of the splot.
+ to the z-value (elevation) of the splot.
 
  Example:
  Suppose that the default lines for indices 1, 2, and 3 are red, green, and
@@ -4807,10 +4818,10 @@ C ... and restart the table:
  will create a plot of p(x) using the default triangles connected by a red
  line and q(x) using small triangles connected by a green line.
 
-       splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l lt pal
+       splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
 
- creates a surface plot using smooth colors according `palette`. Note, that
- this works only on few terminals.
+ creates a surface plot using smooth colors according to `palette`. Note,
+ that this works only on some terminals.
 
  See also `help palette`, `help pm3d`.
 
@@ -6135,12 +6146,13 @@ C ... and restart the table:
 ?impulses
  The `impulses` style displays a vertical line from the x axis (not the graph
  border), or from the grid base for `splot`, to each point.
-C 4 lines
-C ?commands set style lines
-C ?set style lines
-C ?style lines
-C ?lines
-C  The `lines` style connects adjacent points with straight line segments.
+4 lines
+?commands set style lines
+?set style lines
+?style lines
+?lines
+ The `lines` style connects adjacent points with straight line segments.
+ See also `linetype`, `linewidth`, and `linestyle`.
 4 linespoints
 ?commands set style linespoints
 ?commands set style lp

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.29 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.30 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -478,6 +478,7 @@ int tag, pointflag;
 
 
 /* was a macro in plot.h */
+/* allow any order of options - pm 24.11.2001 */
 void
 lp_parse(lp, allow_ls, allow_point, def_line, def_point)
     struct lp_style_type *lp;
@@ -487,57 +488,87 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
     struct value t;
 
     if (allow_ls && (almost_equals(c_token, "lines$tyle") ||
-		     equals(c_token, "ls" ))) {
+		     equals(c_token, "ls"))) {
 	c_token++;
 	lp_use_properties(lp, (int) real(const_express(&t)), allow_point);
     } else {
-	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) {
-	    c_token++;
+	/* avoid duplicating options */
+	int set_lt=0, set_pal=0, set_lw=0, set_pt=0, set_ps=0;
+	/* set default values */
+	lp->l_type = def_line;
+	lp->l_width = 1.0;
 #ifdef PM3D
-	    if (almost_equals(c_token, "pal$ette")) {
-		lp->use_palette = 1;
-		lp->l_type = def_line;
-		++c_token;
-	    } else {
-		lp->use_palette = 0;
+	lp->use_palette = 0;
 #endif
-		lp->l_type = (int) real(const_express(&t)) - 1;
-#ifdef PM3D
-	    }
-#endif
-	} else
-	    lp->l_type = def_line;
-
-	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) {
-	    c_token++;
-	    lp->l_width = real(const_express(&t));
-	} else
-	    lp->l_width = 1.0;
-
-	/* HBB 20010622: restructured to allow for more descriptive
-	 * error message, here. Would otherwise only print out
-	 * 'undefined variable: pointtype' --- rather unhelpful. */
 	lp->pointflag = allow_point;
 	lp->p_type = def_point;
 	lp->p_size = pointsize; /* as in "set pointsize" */
-
-	if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt" )) {
-	    if (allow_point) {
+	while (1) {
+	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
+		if (set_lt++) break;
 		c_token++;
-		lp->p_type = (int) real(const_express(&t)) - 1;
-	    } else {
-		int_warn(c_token, "No pointtype specifier allowed, here");
+#ifdef PM3D
+		/* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
+		if (almost_equals(c_token, "pal$ette")) {
+		    if (set_pal++) break;
+		    c_token++;
+		    lp->use_palette = 1;
+		} else
+#endif
+		    lp->l_type = (int) real(const_express(&t)) - 1;
+		continue;
+	    } /* linetype, lt */
+
+#ifdef PM3D
+	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
+	    if (almost_equals(c_token, "pal$ette")) {
+		if (set_pal++) break;
+		c_token++;
+		lp->use_palette = 1;
+		continue;
 	    }
+#endif
+
+	    if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw")) {
+		if (set_lw++) break;
+		c_token++;
+		lp->l_width = real(const_express(&t));
+		continue;
+	    }
+
+	    /* HBB 20010622: restructured to allow for more descriptive
+	    * error message, here. Would otherwise only print out
+	    * 'undefined variable: pointtype' --- rather unhelpful. */
+	    if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt")) {
+		if (allow_point) {
+		    if (set_pt++) break;
+		    c_token++;
+		    lp->p_type = (int) real(const_express(&t)) - 1;
+		} else {
+		    int_warn(c_token, "No pointtype specifier allowed, here");
+		    c_token += 2;
+		}
+		continue;
+	    }
+
+	    if (almost_equals(c_token, "points$ize") || equals(c_token, "ps")) {
+		if (allow_point) {
+		    if (set_ps++) break;
+		    c_token++;
+		    lp->p_size = real(const_express(&t));
+		} else {
+		    int_warn(c_token, "No pointsize specifier allowed, here");
+		    c_token += 2;
+		}
+		continue;
+	    }
+
+	    /* unknown option catched -> quit the while(1) loop */
+	    break;
 	}
 
-	if (almost_equals(c_token, "points$ize") || equals(c_token, "ps" )) {
-	    if (allow_point) {
-		c_token++;
-		lp->p_size = real(const_express(&t));
-	    } else {
-		int_warn(c_token, "No pointsize specifier allowed, here");
-	    }
-	}
+	if (set_lt>1 || set_pal>1 || set_lw>1 || set_pt>1 || set_ps>1)
+	    int_error(c_token, "duplicated arguments in style specification");
 
 #if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
 	fprintf(stderr,
