@@ -1,5 +1,14 @@
 2002-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/axis.h src/axis.c src/datafile.c src/plot3d.c: Fixed color axis
+	autoscale. Removed update_pm3d_zrange(). Organize that 
+	STORE_WITH_LOG_AND_UPDATE_RANGE(point->color, ...) is called only
+	if (NEED_PALETTE(this_plot)).
+
+	* src/gp_types.h: Declare struct coordinate's color only #ifdef PM3D.
+
+2002-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/term.h: Updates in SHORT_TERMLIST: do not include regis and tek
 	terminals for non-relevant platforms.
 
@@ -145,7 +154,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/22 13:30:17 $).
+	last modification date (from the tag $Date: 2002/03/23 11:10:32 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
