@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.17 1999/07/20 15:32:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.18 1999/07/27 19:43:43 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -40,9 +40,13 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.17 1999/07/20 15:32:17 lhec
  * Added user-specified bases for log scaling.
  */
 
-
 #include "plot.h"
 #include "setshow.h"
+
+/* for show_version_long() */
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h>
+#endif
 
 #define DEF_FORMAT   "%g"	/* default format for tic mark labels */
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
@@ -174,7 +178,7 @@ static void show_key __PROTO((void));
 static void show_keytitle __PROTO((void));
 static void show_mtics __PROTO((int mini, double freq, const char *name));
 static void show_tics __PROTO((int showx, int showy, int showz, int showx2, int showy2));
-static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, const char *text, int rotate_tics, const char *ticfmt));
+static void show_ticdef __PROTO((struct axis_properties *, int));
 static void show_term __PROTO((void));
 static void show_autoscale __PROTO((void));
 static void show_clip __PROTO((void));
@@ -190,11 +194,15 @@ static void show_position __PROTO((struct position * pos));
 
 static void show_timefmt __PROTO((void));
 static void show_missing __PROTO((void));
+static void show_functions __PROTO((void));
+static void show_at __PROTO((void));
+static void disp_at __PROTO((struct at_type *, int));
+
 static enum setshow_id lookup_show __PROTO((int));
 
 /* Some defines for consistency */
-#define show_datatype(n,a) \
-	fprintf(stderr, "\t%s is set to %s\n", (n), \
+#define show_datatype(name,a) \
+	fprintf(stderr, "\t%s is set to %s\n", (name), \
 		datatype[a] == TIME ? "time" : "numerical");
 #define show_dummy() \
 	fprintf(stderr, "\tdummy variables are \"%s\" and \"%s\"\n", \
@@ -546,23 +554,23 @@ show_command()
 	BREAK;
     case S_MXTICS:
 	PUT_NEWLINE;
-	show_mtics(mxtics, mxtfreq, "x");
+	show_mtics(x_props.mtics, x_props.mtfreq, "x");
 	BREAK;
     case S_MYTICS:
 	PUT_NEWLINE;
-	show_mtics(mytics, mytfreq, "y");
+	show_mtics(y_props.mtics, y_props.mtfreq, "y");
 	BREAK;
     case S_MZTICS:
 	PUT_NEWLINE;
-	show_mtics(mztics, mztfreq, "z");
+	show_mtics(z_props.mtics, z_props.mtfreq, "z");
 	BREAK;
     case S_MX2TICS:
 	PUT_NEWLINE;
-	show_mtics(mx2tics, mx2tfreq, "x2");
+	show_mtics(x2_props.mtics, x2_props.mtfreq, "x2");
 	BREAK;
     case S_MY2TICS:
 	PUT_NEWLINE;
-	show_mtics(my2tics, my2tfreq, "y2");
+	show_mtics(y2_props.mtics, y2_props.mtfreq, "y2");
 	BREAK;
     case S_TIMESTAMP:
 	PUT_NEWLINE;
@@ -604,23 +612,23 @@ show_command()
 	BREAK;
     case S_XRANGE:
 	PUT_NEWLINE;
-	show_range(FIRST_X_AXIS, xmin, xmax, autoscale_x, "x");
+	show_range(FIRST_X_AXIS, x_props.min, x_props.max, x_props.autoscale, "x");
 	BREAK;
     case S_YRANGE:
 	PUT_NEWLINE;
-	show_range(FIRST_Y_AXIS, ymin, ymax, autoscale_y, "y");
+	show_range(FIRST_Y_AXIS, y_props.min, y_props.max, y_props.autoscale, "y");
 	BREAK;
     case S_X2RANGE:
 	PUT_NEWLINE;
-	show_range(SECOND_X_AXIS, x2min, x2max, autoscale_x2, "x2");
+	show_range(SECOND_X_AXIS, x2_props.min, x2_props.max, x2_props.autoscale, "x2");
 	BREAK;
     case S_Y2RANGE:
 	PUT_NEWLINE;
-	show_range(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, "y2");
+	show_range(SECOND_Y_AXIS, y2_props.min, y2_props.max, y2_props.autoscale, "y2");
 	BREAK;
     case S_ZRANGE:
 	PUT_NEWLINE;
-	show_range(FIRST_Z_AXIS, zmin, zmax, autoscale_z, "z");
+	show_range(FIRST_Z_AXIS, z_props.min, z_props.max, z_props.autoscale, "z");
 	BREAK;
     case S_TITLE:
 	PUT_NEWLINE;
@@ -628,23 +636,23 @@ show_command()
 	BREAK;
     case S_XLABEL:
 	PUT_NEWLINE;
-	show_xyzlabel("xlabel", &xlabel);
+	show_xyzlabel("xlabel", &x_props.label);
 	BREAK;
     case S_YLABEL:
 	PUT_NEWLINE;
-	show_xyzlabel("ylabel", &ylabel);
+	show_xyzlabel("ylabel", &y_props.label);
 	BREAK;
     case S_ZLABEL:
 	PUT_NEWLINE;
-	show_xyzlabel("zlabel", &zlabel);
+	show_xyzlabel("zlabel", &z_props.label);
 	BREAK;
     case S_X2LABEL:
 	PUT_NEWLINE;
-	show_xyzlabel("x2label", &x2label);
+	show_xyzlabel("x2label", &x2_props.label);
 	BREAK;
     case S_Y2LABEL:
 	PUT_NEWLINE;
-	show_xyzlabel("y2label", &y2label);
+	show_xyzlabel("y2label", &y2_props.label);
 	BREAK;
     case S_XDATA:
 	PUT_NEWLINE;
@@ -902,7 +910,7 @@ show_label_contours()
 static void
 show_size()
 {
-    fprintf(stderr, "\tsize is scaled by %g,%g\n", xsize, ysize);
+    fprintf(stderr, "\tsize is scaled by %g,%g\n", x_props.size, y_props.size);
     if (aspect_ratio > 0)
 	fprintf(stderr, "\tTry to set aspect ratio to %g:1.0\n", aspect_ratio);
     else if (aspect_ratio == 0)
@@ -917,28 +925,25 @@ show_xyzlabel(name, label)
 const char *name;
 label_struct *label;
 {
-    char str[MAX_LINE_LEN + 1];
     fprintf(stderr, "\t%s is \"%s\", offset at %f, %f",
-	    name, conv_text(str, label->text), label->xoffset, label->yoffset);
+	    name, conv_text(label->text), label->xoffset, label->yoffset);
+
     if (*label->font)
-	fprintf(stderr, ", using font \"%s\"", conv_text(str, label->font));
+	fprintf(stderr, ", using font \"%s\"", conv_text(label->font));
+
     putc('\n', stderr);
 }
 
 static void
 show_keytitle()
 {
-    char str[MAX_LINE_LEN + 1];
-    fprintf(stderr, "\tkeytitle is \"%s\"\n",
-	    conv_text(str, key_title));
+    fprintf(stderr, "\tkeytitle is \"%s\"\n", conv_text(key_title));
 }
 
 static void
 show_timefmt()
 {
-    char str[MAX_LINE_LEN + 1];
-    fprintf(stderr, "\tread format for time is \"%s\"\n",
-	    conv_text(str, timefmt));
+    fprintf(stderr, "\tread format for time is \"%s\"\n", conv_text(timefmt));
 }
 
 
@@ -974,14 +979,13 @@ int tag;			/* 0 means show all */
 {
     struct text_label *this_label;
     TBOOLEAN showed = FALSE;
-    char str[MAX_LINE_LEN+1];
 
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
 	if (tag == 0 || tag == this_label->tag) {
 	    showed = TRUE;
 	    fprintf(stderr, "\tlabel %d \"%s\" at ",
-		    this_label->tag, conv_text(str, this_label->text));
+		    this_label->tag, conv_text(this_label->text));
 	    show_position(&this_label->place);
 	    switch (this_label->pos) {
 	    case LEFT:{
@@ -1188,7 +1192,6 @@ static void
 show_tics(showx, showy, showz, showx2, showy2)
 TBOOLEAN showx, showy, showz, showx2, showy2;
 {
-    char str[MAX_LINE_LEN+1];
 
     fprintf(stderr, "\ttics are %s, \
 \tticslevel is %g\n\
@@ -1198,59 +1201,53 @@ TBOOLEAN showx, showy, showz, showx2, showy2;
 	    ticscale, miniticscale);
 
     if (showx)
-	show_ticdef(xtics, FIRST_X_AXIS, &xticdef, "x", rotate_xtics,
-		    conv_text(str, xformat));
+	show_ticdef(&x_props, FIRST_X_AXIS);
     if (showx2)
-	show_ticdef(x2tics, SECOND_X_AXIS, &x2ticdef, "x2", rotate_x2tics,
-		    conv_text(str, x2format));
+	show_ticdef(&x2_props, SECOND_X_AXIS);
     if (showy)
-	show_ticdef(ytics, FIRST_Y_AXIS, &yticdef, "y", rotate_ytics,
-		    conv_text(str, yformat));
+	show_ticdef(&y_props, FIRST_Y_AXIS);
     if (showy2)
-	show_ticdef(y2tics, SECOND_Y_AXIS, &y2ticdef, "y2", rotate_y2tics,
-		    conv_text(str, y2format));
+	show_ticdef(&y2_props, SECOND_Y_AXIS);
     if (showz)
-	show_ticdef(ztics, FIRST_Z_AXIS, &zticdef, "z", rotate_ztics,
-		    conv_text(str, zformat));
+	show_ticdef(&z_props, FIRST_Z_AXIS);
+
     screen_ok = FALSE;
 }
 
 /* called by show_tics */
 static void
-show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
-int tics;			/* xtics ytics or ztics */
+show_ticdef (axis_p, axis)
+struct axis_properties *axis_p;
 int axis;
-struct ticdef *tdef;		/* xticdef yticdef or zticdef */
-const char *text;		/* "x", ..., "x2", "y2" */
-const char *ticfmt;
-int rotate_tics;
 {
     register struct ticmark *t;
 
-    fprintf(stderr, "\t%s-axis tics:\t", text);
-    switch (tics & TICS_MASK) {
+    fprintf(stderr, "\t%s-axis tics:\t", axis_p->name);
+    switch (axis_p->tics & TICS_MASK) {
     case NO_TICS:
 	fputs("OFF\n", stderr);
 	return;
     case TICS_ON_AXIS:
 	fputs("on axis", stderr);
-	if (tics & TICS_MIRROR)
+	if (axis_p->tics & TICS_MIRROR)
 	    fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
 	fputs("on border", stderr);
-	if (tics & TICS_MIRROR)
+	if (axis_p->tics & TICS_MIRROR)
 	    fputs(" and mirrored on opposite border", stderr);
 	break;
     }
 
-    fprintf(stderr, "\n\t  labels are format \"%s\"", ticfmt);
-    if (rotate_tics)
+    fprintf(stderr, "\n\t  labels are format \"%s\"",
+	    conv_text(axis_p->format));
+
+    if (axis_p->rotate_tics)
 	fputs(", rotated in 2D mode, terminal permitting.\n\t", stderr);
     else
 	fputs(" and are not rotated\n\t", stderr);
 
-    switch (tdef->type) {
+    switch (axis_p->ticdef.type) {
     case TIC_COMPUTED:{
 	    fputs("  intervals computed automatically\n", stderr);
 	    break;
@@ -1265,14 +1262,15 @@ int rotate_tics;
 	}
     case TIC_SERIES:{
 	    fputs("  series", stderr);
-	    if (tdef->def.series.start != -VERYLARGE) {
+	    if (axis_p->ticdef.def.series.start != -VERYLARGE) {
 		fputs(" from ", stderr);
-		SHOW_NUM_OR_TIME(tdef->def.series.start, axis);
+		SHOW_NUM_OR_TIME(axis_p->ticdef.def.series.start, axis);
 	    }
-	    fprintf(stderr, " by %g%s", tdef->def.series.incr, datatype[axis] == TIME ? " secs" : "");
-	    if (tdef->def.series.end != VERYLARGE) {
+	    fprintf(stderr, " by %g%s", axis_p->ticdef.def.series.incr,
+		    datatype[axis] == TIME ? " secs" : "");
+	    if (axis_p->ticdef.def.series.end != VERYLARGE) {
 		fputs(" until ", stderr);
-		SHOW_NUM_OR_TIME(tdef->def.series.end, axis);
+		SHOW_NUM_OR_TIME(axis_p->ticdef.def.series.end, axis);
 	    }
 	    putc('\n', stderr);
 	    break;
@@ -1283,11 +1281,9 @@ int rotate_tics;
 	    time = (datatype[axis] == TIME);
  */
 	    fputs("  list (", stderr);
-	    for (t = tdef->def.user; t != NULL; t = t->next) {
-		if (t->label) {
-		    char str[MAX_LINE_LEN+1];
-		    fprintf(stderr, "\"%s\" ", conv_text(str, t->label));
-		}
+	    for (t = axis_p->ticdef.def.user; t != NULL; t = t->next) {
+		if (t->label)
+		    fprintf(stderr, "\"%s\" ", conv_text(t->label));
 		SHOW_NUM_OR_TIME(t->position, axis);
 		if (t->next)
 		    fputs(", ", stderr);
@@ -1297,6 +1293,7 @@ int rotate_tics;
 	}
     default:{
 	    int_error(NO_CARET, "unknown ticdef type in show_ticdef()");
+	    break;
 	    /* NOTREACHED */
 	}
     }
@@ -1362,21 +1359,21 @@ show_autoscale()
 		(autoscale_r == 1) ? " (min)" : "",
 		(autoscale_r == 2) ? " (max)" : "");
     }
-    fprintf(stderr, "x: %s%s%s, ", (autoscale_x) ? "ON" : "OFF",
-	    (autoscale_x == 1) ? " (min)" : "",
-	    (autoscale_x == 2) ? " (max)" : "");
-    fprintf(stderr, "y: %s%s%s, ", (autoscale_y) ? "ON" : "OFF",
-	    (autoscale_y == 1) ? " (min)" : "",
-	    (autoscale_y == 2) ? " (max)" : "");
-    fprintf(stderr, "x2: %s%s%s, ", (autoscale_x2) ? "ON" : "OFF",
-	    (autoscale_x2 == 1) ? " (min)" : "",
-	    (autoscale_x2 == 2) ? " (max)" : "");
-    fprintf(stderr, "y2: %s%s%s, ", (autoscale_y2) ? "ON" : "OFF",
-	    (autoscale_y2 == 1) ? " (min)" : "",
-	    (autoscale_y2 == 2) ? " (max)" : "");
-    fprintf(stderr, "z: %s%s%s\n", (autoscale_z) ? "ON" : "OFF",
-	    (autoscale_z == 1) ? " (min)" : "",
-	    (autoscale_z == 2) ? " (max)" : "");
+    fprintf(stderr, "x: %s%s%s, ", (x_props.autoscale) ? "ON" : "OFF",
+	    (x_props.autoscale == 1) ? " (min)" : "",
+	    (x_props.autoscale == 2) ? " (max)" : "");
+    fprintf(stderr, "y: %s%s%s, ", (y_props.autoscale) ? "ON" : "OFF",
+	    (y_props.autoscale == 1) ? " (min)" : "",
+	    (y_props.autoscale == 2) ? " (max)" : "");
+    fprintf(stderr, "x2: %s%s%s, ", (x2_props.autoscale) ? "ON" : "OFF",
+	    (x2_props.autoscale == 1) ? " (min)" : "",
+	    (x2_props.autoscale == 2) ? " (max)" : "");
+    fprintf(stderr, "y2: %s%s%s, ", (y2_props.autoscale) ? "ON" : "OFF",
+	    (y2_props.autoscale == 1) ? " (min)" : "",
+	    (y2_props.autoscale == 2) ? " (max)" : "");
+    fprintf(stderr, "z: %s%s%s\n", (z_props.autoscale) ? "ON" : "OFF",
+	    (z_props.autoscale == 1) ? " (min)" : "",
+	    (z_props.autoscale == 2) ? " (max)" : "");
 }
 
 static void
@@ -1472,28 +1469,28 @@ show_contour()
 static void
 show_format()
 {
-    char str[MAX_LINE_LEN+1];
-
-    fprintf(stderr, "\ttic format is x-axis: \"%s\"", conv_text(str, xformat));
-    fprintf(stderr, ", y-axis: \"%s\"", conv_text(str, yformat));
-    fprintf(stderr, ", z-axis: \"%s\"", conv_text(str, zformat));
-    fprintf(stderr, ", x2-axis: \"%s\"", conv_text(str, x2format));
-    fprintf(stderr, ", y2-axis: \"%s\"\n", conv_text(str, y2format));
+    fprintf(stderr, "\ttic format is x-axis: \"%s\"", conv_text(x_props.format));
+    fprintf(stderr, ", y-axis: \"%s\"", conv_text(y_props.format));
+    fprintf(stderr, ", z-axis: \"%s\"", conv_text(z_props.format));
+    fprintf(stderr, ", x2-axis: \"%s\"", conv_text(x2_props.format));
+    fprintf(stderr, ", y2-axis: \"%s\"\n", conv_text(y2_props.format));
 }
 
-#define SHOW_LOG(FLAG, BASE, TEXT) \
-if (FLAG) fprintf(stderr, "%s %s (base %g)", !count++ ? "\tlogscaling" : " and", TEXT,BASE)
+#define SHOW_LOG(AXIS) \
+    if ((AXIS).is_log) \
+      fprintf(stderr, "%s %s (base %g)", \
+	!count++ ? "\tlogscaling" : " and", (AXIS).name, (AXIS).base_log)
 
 static void
 show_logscale()
 {
     int count = 0;
 
-    SHOW_LOG(is_log_x, base_log_x, "x");
-    SHOW_LOG(is_log_y, base_log_y, "y");
-    SHOW_LOG(is_log_z, base_log_z, "z");
-    SHOW_LOG(is_log_x2, base_log_x2, "x2");
-    SHOW_LOG(is_log_y2, base_log_y2, "y2");
+    SHOW_LOG(x_props);
+    SHOW_LOG(y_props);
+    SHOW_LOG(z_props);
+    SHOW_LOG(x2_props);
+    SHOW_LOG(y2_props);
 
     if (count == 0)
 	fputs("\tno logscaling\n", stderr);
@@ -1702,14 +1699,22 @@ CONTACT      = <%s>\n\
 HELPMAIL     = <%s>\n", helpfile, bug_email, help_email);
 }
 
+
+/* convert unprintable characters as \okt, tab as \t, newline \n .. */
 char *
-conv_text(s, t)
-char *s, *t;
+conv_text(t)
+const char *t;
 {
-    /* convert unprintable characters as \okt, tab as \t, newline \n .. */
-    char *r;
+    static char *s = NULL, *r;
+
+    if (s)
+	s = r;
+
+    /* is this enough? */
+    s = gp_realloc(s, 4 * (strlen(t) + 1), "conv_text buffer");
     r = s;
-    while (*t != '\0') {
+
+    while (*t != NUL) {
 	switch (*t) {
 	case '\t':
 	    *s++ = '\\';
@@ -1737,15 +1742,16 @@ char *s, *t;
 		else {
 		    *s++ = '\\';
 		    sprintf(s, "%o", *t);
-		    while (*s != '\0')
+		    while (*s)
 			s++;
 		}
 	    }
+	    break;
 	}
 	t++;
     }
-    *s = '\0';
-    return (r);
+    *s = NUL;
+    return r;
 }
 
 
@@ -1764,6 +1770,107 @@ struct position *pos;
 	    pos->scalez == pos->scaley ? "" : msg[pos->scalez], pos->z);
 
 }
+
+
+static void
+show_at()
+{
+    (void) putc('\n', stderr);
+    disp_at(temp_at(), 0);
+}
+
+
+static void
+disp_at(curr_at, level)
+struct at_type *curr_at;
+int level;
+{
+    register int i, j;
+    register union argument *arg;
+
+    for (i = 0; i < curr_at->a_count; i++) {
+	(void) putc('\t', stderr);
+	for (j = 0; j < level; j++)
+	    (void) putc(' ', stderr);	/* indent */
+
+	/* print name of instruction */
+
+	fputs(ft[(int) (curr_at->actions[i].index)].f_name, stderr);
+	arg = &(curr_at->actions[i].arg);
+
+	/* now print optional argument */
+
+	switch (curr_at->actions[i].index) {
+	case PUSH:
+	    fprintf(stderr, " %s\n", arg->udv_arg->udv_name);
+	    break;
+	case PUSHC:
+	    (void) putc(' ', stderr);
+	    disp_value(stderr, &(arg->v_arg));
+	    (void) putc('\n', stderr);
+	    break;
+	case PUSHD1:
+	    fprintf(stderr, " %c dummy\n",
+		    arg->udf_arg->udf_name[0]);
+	    break;
+	case PUSHD2:
+	    fprintf(stderr, " %c dummy\n",
+		    arg->udf_arg->udf_name[1]);
+	    break;
+	case CALL:
+	    fprintf(stderr, " %s", arg->udf_arg->udf_name);
+	    if (level < 6) {
+		if (arg->udf_arg->at) {
+		    (void) putc('\n', stderr);
+		    disp_at(arg->udf_arg->at, level + 2);	/* recurse! */
+		} else
+		    fputs(" (undefined)\n", stderr);
+	    } else
+		(void) putc('\n', stderr);
+	    break;
+	case CALLN:
+	    fprintf(stderr, " %s", arg->udf_arg->udf_name);
+	    if (level < 6) {
+		if (arg->udf_arg->at) {
+		    (void) putc('\n', stderr);
+		    disp_at(arg->udf_arg->at, level + 2);	/* recurse! */
+		} else
+		    fputs(" (undefined)\n", stderr);
+	    } else
+		(void) putc('\n', stderr);
+	    break;
+	case JUMP:
+	case JUMPZ:
+	case JUMPNZ:
+	case JTERN:
+	    fprintf(stderr, " +%d\n", arg->j_arg);
+	    break;
+	case DOLLARS:
+	    fprintf(stderr, " %d\n", arg->v_arg.v.int_val);
+	    break;
+	default:
+	    (void) putc('\n', stderr);
+	}
+    }
+}
+
+
+static void
+show_functions()
+{
+    register struct udft_entry *udf = first_udf;
+
+    fputs("\n\tUser-Defined Functions:\n", stderr);
+
+    while (udf) {
+	if (udf->definition)
+	    fprintf(stderr, "\t%s\n", udf->definition);
+	else
+	    fprintf(stderr, "\t%s is undefined\n", udf->udf_name);
+	udf = udf->next_udf;
+    }
+}
+
 
 static void
 show_missing()
