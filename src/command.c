@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.61 2002/03/26 09:42:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.62 2002/03/30 13:15:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1417,7 +1417,7 @@ replotrequest()
 	char *replot_args = NULL;	/* else m_capture will free it */
 	int last_token = num_tokens - 1;
 
-	/* length = length of old part + length of new part + ',' + \0 */
+	/* length = length of old part + length of new part + ", " + \0 */
 	size_t newlen = strlen(replot_line) + token[last_token].start_index +
 	token[last_token].length - token[c_token].start_index + 2;
 
@@ -1425,7 +1425,7 @@ replotrequest()
 	while (input_line_len < newlen)
 	    extend_input_line();
 	strcpy(input_line, replot_line);
-	strcat(input_line, ",");
+	strcat(input_line, ", ");
 	strcat(input_line, replot_args);
 	free(replot_args);
     }
