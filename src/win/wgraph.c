@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.23 2001/10/26 12:58:38 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.24 2002/02/18 10:38:07 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -2372,7 +2372,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 	case 1: 
 		DrawZoomBox(lpgw);
 		if (zoombox.text1) {
-			free(zoombox.text1);
+			free((char*)zoombox.text1);
 		}
 		zoombox.text1 = strdup(text);
 		DrawZoomBox(lpgw);
@@ -2380,7 +2380,7 @@ Graph_put_tmptext (LPGW lpgw, int where, LPCSTR text )
 	case 2: 
 		DrawZoomBox(lpgw);
 		if (zoombox.text2) {
-			free(zoombox.text2);
+			free((char*)zoombox.text2);
 		}
 		zoombox.text2 = strdup(text);
 		DrawZoomBox(lpgw);
