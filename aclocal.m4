@@ -124,15 +124,16 @@ AC_EGREP_CPP(yes,
 [#ifdef __DJGPP__ && __DJGPP__ == 2
   yes
 #endif
-], LDFLAGS="$LDFLAGS -lpc"
+], AC_MSG_RESULT(yes)
+   LDFLAGS="$LDFLAGS -lpc"
    AC_DEFINE(MSDOS)
    AC_DEFINE(DOS32)
-   AC_MSG_RESULT(yes)
    with_linux_vga=no
    AC_CHECK_LIB(grx20,GrLine,
       LDFLAGS="$LDFLAGS -lgrx20"
-      TERMFLAGS="$TERMFLAGS -DDJSVGA -fno-inline-functions"
-      AC_CHECK_LIB(grx20,GrCustomLine,TERMFLAGS="$TERMFLAGS -DGRX21"))
+      CFLAGS="$CFLAGS -fno-inline-functions"
+      AC_DEFINE(DJSVGA)
+      AC_CHECK_LIB(grx20,GrCustomLine,AC_DEFINE(GRX21)))
  , AC_MSG_RESULT(no)
  )dnl 
 ])
@@ -142,16 +143,16 @@ AC_EGREP_CPP(yes,
 
 AC_DEFUN(gp_NEXT,
 [AC_MSG_CHECKING(for NeXT)
-NEXTOBJS=
-AC_SUBST(NEXTOBJS)
 AC_EGREP_CPP(yes,
 [#ifdef __NeXT__
   yes
 #endif
-], LIBS="$LIBS -lsys_s -lNeXT_s"
+], AC_MSG_RESULT(yes)
+   LIBS="$LIBS -lsys_s -lNeXT_s"
    NEXTOBJS=epsviewe.o
-   TERMFLAGS=-ObjC
-   AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+   CFLAGS="$CFLAGS -ObjC",
+   NEXTOBJS=
+   AC_MSG_RESULT(no))
 ])
 
 
@@ -220,20 +221,21 @@ changequote(, )dnl
   gp_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
+dnl The case for "no" is really just a safety net
 case "$with_$1" in
-  yes)
+  yes|no)
     gp_lib_list="";;
   *)
-    with_$1=`echo $with_$1 | sed 's%/lib$1\.a$%%'`
-    gp_lib_prefix=`echo $with_$1 | sed 's%/lib$%%'`
-    gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $with_$1"
+    gp_lib_path=`echo $with_$1 | sed -e 's%/lib$1\.a$%%'`
+    gp_lib_prefix=`echo $gp_lib_path | sed 's%/lib$%%'`
+    gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
 esac
 for ac_dir in '' $gp_lib_list ; do
   TERMLIBS="`test x${ac_dir} != x && echo -L${ac_dir}` $gp_save_TERMLIBS"
   gp_CHECK_LIB_QUIET($1,$2,dnl
-    TERMLIBS="$TERMLIBS -l$1 $3"; break, dnl ACTION-IF-FOUND
-    TERMLIBS="$gp_save_TERMLIBS",        dnl ACTION-IF-NOT-FOUND
-    $3)                                  dnl OTHER-LIBRARIES
+    TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
+    TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
+    $3)                               dnl OTHER-LIBRARIES
 done
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   AC_MSG_RESULT(yes)
@@ -268,8 +270,8 @@ fi
 
 AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 [AC_MSG_CHECKING([types of arguments accepted by select])
- for arg_fdset_p in 'fd_set *' 'int *'; do
-  for arg_size_t in 'int' 'size_t' 'unsigned'; do
+ for arg_fdset_p in 'fd_set *' 'int *' 'void *'; do
+  for arg_size_t in 'int' 'size_t' 'unsigned long' 'unsigned'; do
    for arg_timeval_p in 'struct timeval *' 'const struct timeval *'; do
     AC_TRY_COMPILE(dnl
 [#ifndef NO_SYS_TYPES_H
@@ -285,10 +287,15 @@ AC_DEFUN(gp_FIND_SELECT_ARGTYPES,
 #include <sys/socket.h>
 #endif
 extern select ($arg_size_t,$arg_fdset_p,$arg_fdset_p,$arg_fdset_p,$arg_timeval_p);],,dnl
-    [break 3])
+    [ac_not_found=no ; break 3],ac_not_found=yes)
    done
   done
  done
+ if test "$ac_not_found" = yes; then
+  arg_size_t=int 
+  arg_fdset_p='int *' 
+  arg_timeval_p='struct timeval *'
+ fi
  AC_MSG_RESULT([$arg_size_t,$arg_fdset_p,$arg_timeval_p])
  AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_1,$arg_size_t)
  AC_DEFINE_UNQUOTED(SELECT_ARGTYPE_234,($arg_fdset_p))
