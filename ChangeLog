@@ -6,6 +6,10 @@
 
 2206-07-27  Timothee Lecomte  <timothee.lecomte@ens.fr>
 
+	* docs/gnuplot.doc (x11_mouse): Reword the section about possible hangs
+	when piping from /dev/null to reflect the 4.2 behaviour where mouse is
+	turned on by default.
+
 	* src/plot.c (main):
 	* src/wxt_gui.c (wxt_atexit):
 	* src/wxt_plot.h:

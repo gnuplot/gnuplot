@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.370 2006/07/17 19:54:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.372 2006/07/23 22:28:41 tlecomte Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6856,16 +6856,11 @@ C ... and restart the table:
  range of mouse commands and hotkeys.  The other windows will, however,
  continue to display mouse coordinates at the lower left.
 
- This was valid only for gnuplot 4.0 (now mousing is on by default as in
- the case of other screen terminals):
- X11 mouse support is turned on by default if standard input comes from a
- terminal (tty). Mouse support is turned off if standard input does not
- come from a tty, e.g. a pipe. If you want to use mouse support while writing
- to gnuplot from a pipe, the mouse must be turned on *before* starting the x11
- driver, e.g. immediately after startup with the explicit command `set mouse`.
- Beware: on some UNIX flavours, special input devices as /dev/null might not
- be `select-able`; turning on the mouse when using such devices will hang
- gnuplot.
+ For consistency with other screen terminals, X11 mouse support is turned on by
+ default, wherever the standard input comes from. However, on some UNIX
+ flavors, special input devices as /dev/null might not be `select-able`; using
+ such devices with the mouse turned on will hang gnuplot. Please turn off
+ mousing with `unset mouse` if you are in this situation.
 3 multiplot
 ?commands set multiplot
 ?commands unset multiplot
