@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.26 1999/12/01 22:10:28 lhecking Exp $
+ * $Id: png.trm,v 1.27 1999/12/10 17:02:16 lhecking Exp $
  *
  */
 
@@ -155,8 +155,12 @@ PNG_options()
 
 	case PNG_TRANSPARENT:
 	    png_transparent = 1;
+	    c_token++;
+	    break;
 	case PNG_NOTRANSPARENT:
 	    png_transparent = 0;
+	    c_token++;
+	    break;
 	case PNG_SMALL:
 	    png_font = 1;
 	    c_token++;
