@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.99 2004/06/07 05:33:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.100 2004/06/16 18:58:46 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3324,18 +3324,10 @@ update_modifiers(unsigned int state)
 static void
 process_event(XEvent *event)
 {
-#if 0
-    static char key_string[0xf];
-#endif
     plot_struct *plot;
     KeySym keysym;
-#ifdef USE_MOUSE
 #if 0
-    static int border = 0;
-    static int aspect_ratio = 0;
-    int old_mod_mask = 0;
-    FPRINTF((stderr, "Event 0x%x\n", event->type));
-#endif
+    fprintf(stderr, "Event 0x%x\n", event->type);
 #endif
 
     switch (event->type) {
@@ -3653,13 +3645,23 @@ process_event(XEvent *event)
 		XDefineCursor(dpy, plot->window, cursor);
 	}
 	break;
+
     case ClientMessage:
 	if (event->xclient.message_type == WM_PROTOCOLS &&
 	    event->xclient.format == 32 && event->xclient.data.l[0] == WM_DELETE_WINDOW) {
 	    Remove_Plot_From_Linked_List(event->xclient.window);
+	    /* EAM FIXME - may have to generate GE_reset event here also */
 	}
 	break;
+
 #ifdef USE_MOUSE
+    case DestroyNotify:
+	plot = Find_Plot_In_Linked_List_By_Window(event->xconfigure.window);
+	if (plot == current_plot) {
+	    gp_exec_event(GE_reset, 0, 0, 0, 0);
+	}
+	break;
+
     case Expose:
 	/*
 	 * we need to handle expose events here, because

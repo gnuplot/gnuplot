@@ -1,3 +1,10 @@
+2004-06-17  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (process_event): Send a GE_reset event back to gnuplot
+	if the current plot window is closed.
+	* src/mouse.c (event_reset): Terminate paused_for_mouse state whenever a
+	GE_reset event is received.
+
 2004-06-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (mainloop): Yet another tweak to the mouse timing code.
