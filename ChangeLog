@@ -1,3 +1,13 @@
+Wed Dec 20 19:42:38 2000  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+
+	* src/graph3d.c (do_3dplot): change incrementation of linetype for
+ 	contour lines. Fixes off-by-one bug between key sample and actual
+ 	line.
+
+	* src/contour.c (calc_min_max): Don't logarithmize the ranges
+ 	another time.  Fixes bug observered by Theo Hopman (and others,
+ 	before).
+
 2000-12-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c: fixed one missing 'postscript_gpoutfile = 0;' after

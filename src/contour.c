@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.15 2000/11/01 18:57:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.16 2000/11/02 19:11:07 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -727,9 +727,13 @@ calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz
     }
     /* HBB 20000426: this code didn't take into account that axes might
      * be logscaled... */
+#if 0
+    /* HBB 20001220: DON'T. The values are actually already stored
+     * logarithmized, as should be! */
     axis_unlog_interval(FIRST_X_AXIS, xx_min, xx_max, 0);
     axis_unlog_interval(FIRST_Y_AXIS, yy_min, yy_max, 0);
     axis_unlog_interval(FIRST_Z_AXIS, zz_min, zz_max, 0);
+#endif
 
     /* 
      * fprintf(stderr," x: %g, %g\n", (*xx_min), (*xx_max));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.36 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.37 2000/11/23 14:14:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -441,9 +441,9 @@ static int key_size_right;	/* distance from x to right edge of box */
 
 void
 do_3dplot(plots, pcount, quick)
-struct surface_points *plots;
-int pcount;			/* count of plots in linked list */
-int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
+    struct surface_points *plots;
+    int pcount;			/* count of plots in linked list */
+    int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 {
     struct termentry *t = term;
     int surface;
@@ -933,7 +933,7 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 		struct lp_style_type thiscontour_lp_properties =
 		    this_plot->lp_properties;
 
-		thiscontour_lp_properties.l_type += (hidden3d ? 2 : 1);
+		thiscontour_lp_properties.l_type += (hidden3d ? 1 : 0);
 
 		term_apply_lp_properties(&(thiscontour_lp_properties));
 
@@ -981,7 +981,7 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 			    set_color(z2gray(cntrs->z));
 			else
 #endif
-			    (*t->linetype) (thiscontour_lp_properties.l_type++);
+			    (*t->linetype) (++thiscontour_lp_properties.l_type);
 
 			if (key != KEY_NONE) {
 
@@ -1018,8 +1018,9 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 
 			    NEXT_KEY_LINE();
 
-			}		/* key */
-		    }		/* label_contours */
+			} /* key */
+		    } /* label_contours */
+
 		    /* now draw the contour */
 		    switch (this_plot->plot_style) {
 		    case BOXES:
@@ -1027,6 +1028,7 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 		    case IMPULSES:
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);
 			break;
+
 		    case STEPS:	
 		    case FSTEPS:
 		    case HISTEPS:
@@ -1034,6 +1036,7 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 		    case LINES:
 			cntr3d_lines(cntrs, &thiscontour_lp_properties);
 			break;
+
 		    case YERRORLINES:	
 		    case XERRORLINES:
 		    case XYERRORLINES:
@@ -1055,12 +1058,12 @@ int quick;		 	/* !=0 means plot only axes etc., for quick rotation */
 		    case DOTS:
 			cntr3d_dots(cntrs);
 			break;
-		    }		/*switch */
+		    } /*switch */
 
 		    cntrs = cntrs->next;
-		}			/* loop over contours */
-	    }			/* draw contours */
-	}				/* loop over surfaces */
+		} /* loop over contours */
+	    } /* draw contours */
+	} /* loop over surfaces */
 
 #ifdef PM3D
     /* draw grid and coordinate system */
