@@ -1177,6 +1177,8 @@ void do_fit()
     /* HBB 980401: new: z range specification */
     double min_z, max_z;	/* range to fit */
     int dummy_x = -1, dummy_y = -1;	/* eg  fit [u=...] [v=...] */
+    /* HBB 981210: memorize position of possible third [ : ] spec: */
+    int zrange_token = -1;
 
     int i;
     double v[4];
@@ -1221,7 +1223,7 @@ void do_fit()
     /* ... and z */
 
     if (equals(c_token, "[")) {
-	c_token++;
+	zrange_token = c_token++;
 	if (isletter(c_token))
 	    /* do *not* allow the z range being given with a variable name */
 	    int_error("Can't re-name dependent variable", c_token);
@@ -1229,13 +1231,15 @@ void do_fit()
 	if (!equals(c_token, "]"))
 	    int_error("']' expected", c_token);
 	c_token++;
+#if 0 /* HBB 981210: move this to a later point */
     } else {
 	/* Just in case I muck up things below: make sure that the z
 	 * range is the same as the y range, if it didn't get specified
 	 */
 	autorange_z = autorange_y;
 	min_z = min_y;
-	max_z = max_z;
+	max_z = max_y;
+#endif
     }
 
 
@@ -1277,6 +1281,19 @@ void do_fit()
      * allowed a variable name specifier for 'y': */
     if ((dummy_y >= 0) && (columns < 4))
 	int_error("Can't re-name 'y' in a one-variable fit", dummy_y);
+
+    /* HBB 981210: two range specs mean different things, depending
+     * on wether this is a 2D or 3D fit */
+    if (columns<4) {
+      if (zrange_token != -1)
+	int_error("Three range-specs not allowed in on-variable fit", zrange_token);
+      else {
+	/* 2D fit, 2 ranges: second range is for *z*, not y: */
+	autorange_z = autorange_y;
+	min_z = min_y;
+	max_z = max_y;
+      }
+    }
 
     /* defer actually reading the data until we have parsed the rest
      * of the line */
@@ -1405,7 +1422,7 @@ void do_fit()
 	/* HBB 980401: check *z* range for all fits */
 	if (!(autorange_z & 1) && (v[2] < min_z))
 	    continue;
-	if (!(autorange_z & 2) && (v[2] > max_y))
+	if (!(autorange_z & 2) && (v[2] > max_z))
 	    continue;
 
 	fit_x[num_data] = v[0];
