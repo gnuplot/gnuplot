@@ -1,5 +1,8 @@
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/os2/gclient.c: Let the color sequence of the first 5 line types
+	be the same as in postscript.
+
 	* src/term.c (do_point): Let sequence of the 6 defined point types be
 	the same as in postscript, png and x11.
 

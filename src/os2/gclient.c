@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.23 2002/10/04 08:56:02 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.24 2003/11/28 17:15:52 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -132,18 +132,18 @@ static long lLineTypes[7] = { LINETYPE_SOLID,
                               LINETYPE_DASHDOUBLEDOT } ;
 static long lCols[16] =     { CLR_BLACK,
                               CLR_DARKGRAY,
-                              CLR_BLUE,
                               CLR_RED,
                               CLR_GREEN,
-                              CLR_CYAN,
+                              CLR_BLUE,
                               CLR_PINK,
+                              CLR_CYAN,
+                              CLR_BROWN,
                               CLR_YELLOW,
                               CLR_DARKBLUE,
                               CLR_DARKRED,
                               CLR_DARKGREEN,
                               CLR_DARKCYAN,
                               CLR_DARKPINK,
-                              CLR_BROWN,
                               CLR_PALEGRAY,
                               CLR_WHITE } ;
 
