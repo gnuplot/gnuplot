@@ -1,3 +1,41 @@
+2004-10-18  Volker Dobler  <v.dobler@web.de> 
+            Ethan Merritt  <merritt@u.washington.edu>
+
+	New plot style variant that reads individual point sizes from specified
+	input column. Examples:
+
+	    plot 'foo' using 1:2:3 with points pt 5 pointsize variable
+	    splot 'foo' using 1:2:3:4 with linespoints pt 5 ps variable
+	    splot 'foo' using 1:2:3:4:5 with points pt 5 ps variable lt palette
+
+	* NEWS docs/gnuplot.doc: Document new variant of line/point style in
+	which the point size is variable, with the size of each point read from
+	an extra column in the input file.
+
+	* demo/all.dem demo/pointsize.dem: Demo for 2D and 3D plots with 
+	variable point size and pm3d colors.
+
+	* src/gp_types.h: Define storage location for point size info in
+	struct coordinate (overload xlow).
+
+	* src/graph3d.c (plot3d_points plot3d_points_pm3d): Check for variable
+	pointsize request and change point size before plotting.
+
+	* src/graphics.c (do_plot plot_points): Check for variable pointsize
+	request and change point size before plotting and in plot key.
+
+	* src/misc.c (lp_parse): Parse "pointsize variable" in with spec.
+
+	* src/plot2d.c (get_data eval_plots): Allow 3 columns of input for points,
+	with the extra column holding point size.
+
+	* src/plot3d.c (get_3ddata): Allow 4 columns of input for points with
+	variable point size in 4th column, plus a possible 5th column of pm3d
+	color information.
+
+	* src/save.c (save_set_all) src/show.c (show_linestyle): Print or save
+	"pointstyle variable" characteristic of line style.
+
 2004-10-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/be.trm term/cgm.trm term/emf.trm term/epslatex.trm term/fig.trm

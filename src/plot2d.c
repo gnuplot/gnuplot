@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.82 2004/10/14 21:57:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.83 2004/10/18 01:04:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -366,6 +366,12 @@ get_data(struct curve_points *current_plot)
 	break;
 #endif
 
+    case POINTSTYLE:
+    	/* Allow 3rd column because of 'pointsize variable' */
+	min_cols = 1;
+	max_cols = 3;
+	break;
+
     default:
 	min_cols = 1;
 	max_cols = 2;
@@ -600,6 +606,12 @@ get_data(struct curve_points *current_plot)
 		    i++;
 		    break;
 #endif
+
+		case POINTSTYLE: /* x, y, variable point size */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], 
+				  v[1], v[1], v[2]);
+		    break;
+
 		}		/*inner switch */
 
 	    break;
@@ -1626,6 +1638,13 @@ eval_plots()
 		}
 #endif
 
+	    }
+
+	    /* Rule out incompatible line/point/style options */
+	    if (this_plot->plot_type == FUNC) {
+		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT != 0) 
+		&&  (this_plot->lp_properties.p_size < 0))
+		    this_plot->lp_properties.p_size = 1;
 	    }
 
 #ifdef USE_ULIG_FILLEDBOXES

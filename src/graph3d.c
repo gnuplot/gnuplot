@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.99 2004/10/13 22:23:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.100 2004/10/15 03:32:56 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1729,8 +1729,12 @@ plot3d_points(struct surface_points *plot, int p_type)
 	    if (points[i].type == INRANGE) {
 		map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
-		if (!clip_point(x, y))
+		if (!clip_point(x, y)) {
+		    if (plot->plot_style == POINTSTYLE
+		    &&  plot->lp_properties.p_size < 0)
+			(*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
 		    (*t->point) (x, y, p_type);
+		}
 	    }
 	}
 
@@ -1791,6 +1795,9 @@ plot3d_points_pm3d(struct surface_points *plot, int p_type)
 			    set_color( cb2gray(points[i].CRD_COLOR) );
 			else
 			    set_color( cb2gray( z2cb(points[i].z) ) );
+			if (plot->plot_style == POINTSTYLE
+			&&  plot->lp_properties.p_size < 0)
+			    (*t->pointsize)(pointsize * points[i].CRD_PTSIZE);
 			(*t->point) (x, y, p_type);
 		    }
 		}

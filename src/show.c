@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.135 2004/08/14 03:12:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.136 2004/09/01 15:53:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2804,9 +2804,13 @@ show_linestyle(int tag)
 #endif
 		fprintf(stderr, "linetype %d, ", this_linestyle->lp_properties.l_type + 1);
 
-	    fprintf(stderr, "linewidth %.3f, pointtype %d, pointsize %.3f\n",
+	    fprintf(stderr, "linewidth %.3f, pointtype %d ",
 		    this_linestyle->lp_properties.l_width,
-		    this_linestyle->lp_properties.p_type + 1,
+		    this_linestyle->lp_properties.p_type + 1);
+	    if (this_linestyle->lp_properties.p_size < 0)
+	        fprintf(stderr, "pointsize variable\n");
+	    else
+		fprintf(stderr, "pointsize %.3f\n",
 		    this_linestyle->lp_properties.p_size);
 	}
     }

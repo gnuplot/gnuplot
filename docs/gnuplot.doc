@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.244 2004/09/21 08:09:45 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.245 2004/10/13 22:23:58 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3753,6 +3753,12 @@ C ... and restart the table:
  `set pointsize 2; plot x w p ps 3` will use points three times default size,
  not six.
 
+ It is also possible to specify `pointsize variable` either as part of a 
+ line style or for an individual plot. In this case one extra column of input
+ is required, i.e. 3 columns for a 2D plot and 4 columns for a 3D splot. The
+ size of each individual point is determined by multiplying the global
+ pointsize by the value read from the data file.
+
  If you have defined specific line type/width and point type/size combinations
  with `set style line`, one of these may be selected by setting <line_style> to
  the index of the desired style.
@@ -3800,6 +3806,9 @@ C ... and restart the table:
 
  This plots file "data" with points of type 3 and twice usual size:
        plot 'data' with points pointtype 3 pointsize 2
+
+ This plots file "data" with variable pointsize read from column 4
+       plot 'data' using 1:2:4 with points pt 5 pointsize variable
 
  This plots two data sets with lines differing only by weight:
        plot 'd1' t "good" w l lt 2 lw 3, 'd2' t "bad" w l lt 2 lw 1

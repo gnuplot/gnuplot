@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.127 2004/10/12 22:05:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.128 2004/10/13 22:24:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1623,8 +1623,11 @@ do_plot(struct curve_points *plots, int pcount)
 
 	if (localkey && this_plot->title) {
 	    /* we deferred point sample until now */
-	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT) {
+		if (this_plot->lp_properties.p_size < 0)
+		    (*t->pointsize)(pointsize);
 		(*t->point) (xl + key_point_offset, yl, this_plot->lp_properties.p_type);
+	    }
 	    if (key->invert)
 		yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
 	    if (key_count >= key_rows) {
@@ -3015,8 +3018,13 @@ plot_points(struct curve_points *plot)
 		|| (x >= xleft + p_width
 		    && y >= ybot + p_height
 		    && x <= xright - p_width
-		    && y <= ytop - p_height))
+		    && y <= ytop - p_height)) {
+
+		if (plot->plot_style == POINTSTYLE
+		&&  plot->lp_properties.p_size < 0)
+		    (*t->pointsize)(pointsize * plot->points[i].z);
 		(*t->point) (x, y, plot->lp_properties.p_type);
+	    }
 	}
     }
 }
@@ -4469,8 +4477,8 @@ do_key_sample(
 
     /* oops - doing the point sample now would break the postscript
      * terminal for example, which changes current line style
-     * when drawing a point, but does not restore it.
-     * We must wait, then draw the point sample after plotting
+     * when drawing a point, but does not restore it. We must wait
+     then draw the point sample at the end of do_plot (line 1625)
      */
 }
 

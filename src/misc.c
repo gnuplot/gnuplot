@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.56 2004/09/01 15:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.57 2004/09/17 10:47:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -820,9 +820,14 @@ lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int 
 		    if (set_ps++)
 			break;
 		    c_token++;
-		    lp->p_size = real(const_express(&t));
-		    if (lp->p_size < 0)
-			lp->p_size = 0;
+		    if (almost_equals(c_token, "var$iable")) {
+			lp->p_size = -1;
+			c_token++;
+		    } else {
+			lp->p_size = real(const_express(&t));
+			if (lp->p_size < 0)
+			    lp->p_size = 0;
+		    }
 		} else {
 		    int_warn(c_token, "No pointsize specifier allowed, here");
 		    c_token += 2;

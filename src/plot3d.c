@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.86 2004/10/18 01:04:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.87 2004/10/18 03:43:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -860,6 +860,12 @@ get_3ddata(struct surface_points *this_plot)
 	    if (j >= 4) {
 		color = v[3];
 		color_from_column(TRUE);
+		if (this_plot->plot_style == POINTSTYLE
+		&&  this_plot->lp_properties.p_size < 0) {
+		    cp->CRD_PTSIZE = v[3];
+		    color = z;
+		    color_from_column(FALSE);
+		}
 #ifdef EAM_DATASTRINGS
 		if (this_plot->plot_style == LABELPOINTS) {
 		/* 4th column holds label text rather than color */
@@ -871,6 +877,11 @@ get_3ddata(struct surface_points *this_plot)
 	    }
 
 	    if (j >= 5) {
+		if (this_plot->plot_style == POINTSTYLE
+		&&  this_plot->lp_properties.p_size < 0) {
+		    color = v[4];
+		    color_from_column(TRUE);
+		}
 #ifdef EAM_DATASTRINGS
 		if (this_plot->plot_style == LABELPOINTS) {
 		    /* take color from an explicitly given 5th column */
@@ -1555,6 +1566,13 @@ eval_3dplots()
 		}
 #endif
 
+	    }
+
+	    /* Rule out incompatible line/point/style options */
+	    if (this_plot->plot_type == FUNC3D) {
+		if ((this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+		&&  (this_plot->lp_properties.p_size < 0))
+		    this_plot->lp_properties.p_size = 1;
 	    }
 
 	    if (crnt_param == 0
