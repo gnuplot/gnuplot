@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.13 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.14 2003/07/22 17:22:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -705,10 +705,29 @@ f_tanh(arg)
     union argument *arg;
 {
     struct value a;
-    register double den;
+    double den;
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
+
+#ifdef MINEXP
+    if (-fabs(real(&a)) < MINEXP) {
+	push(Gcomplex(&a, 1.0, 0.0));
+	return;
+    }
+#else
+    {
+	int old_errno = errno;
+	
+	if (exp(-fabs(real(&a))) == 0.0) {
+	    /* some libm's will raise a silly ERANGE in cosh() and sin() */
+	    errno = old_errno;
+	    push(Gcomplex(&a, 1.0, 0.0));
+	    return;
+	}
+    }
+#endif
+	    
     den = cosh(2 * real(&a)) + cos(2 * imag(&a));
     push(Gcomplex(&a, sinh(2 * real(&a)) / den, sin(2 * imag(&a)) / den));
 }

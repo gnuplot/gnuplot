@@ -1,5 +1,8 @@
 2004-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/standard.c (f_tanh): Added extra code to return an exact 1.0
+	for large absolute arguments.  Fixes SF bug #908184.
+
 	* term/x11.trm [TERM_HELP]: Explain colour control via command
 	line options more clearly, including the -xrm for colors other
 	than the background.
