@@ -965,6 +965,13 @@ void init_terminal()
 	    term_name = "next";
 #endif /* NeXT */
 
+#ifdef __BEOS__
+	env_term = getenv("TERM");
+	if (term_name == (char *) NULL
+	    && env_term != (char *) NULL && STREQ(term, "beterm"))
+	    term_name = "be";
+#endif /* BeOS */
+
 #ifdef SUN
 	env_term = getenv("TERM");	/* try $TERM */
 	if (term_name == (char *) NULL
