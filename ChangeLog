@@ -1,5 +1,11 @@
 2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graphics.c (boundary): move the setup_tics() calls of the x
+ 	axes above the code that applies 'set size ratio'. Otherwise, the
+ 	auto-extension of ranges can distort the aspect ratio.
+
+2000-12-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/win.trm: un-comment the mouse function dummy entries in the
 	terminal entry.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.39 2000/11/15 18:57:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.40 2000/11/23 18:22:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -268,9 +268,9 @@ struct lp_style_type grid;
 
 static void
 boundary(scaling, plots, count)
-TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
-struct curve_points *plots;
-int count;
+    TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
+    struct curve_points *plots;
+    int count;
 {
     int ytlen;
     int yticlin = 0, y2ticlin = 0, timelin = 0;
@@ -746,6 +746,21 @@ int count;
     /*  end of xright calculation }}} */
 
 
+    /*{{{  set up x and x2 tics */
+    /* we should base the guide on the width of the xtics, but we cannot
+     * use widest_tics until tics are set up. Bit of a downer - let us
+     * assume tics are 5 characters wide
+     */
+    /* HBB 20001205: moved this block to before aspect_ratio is
+     * applied: setup_tics may extend the ranges, which would distort
+     * the aspect ratio */
+
+    setup_tics(FIRST_X_AXIS, 20);
+    setup_tics(SECOND_X_AXIS, 20);
+
+
+    /* Modify the bounding box to fit the aspect ratio, if any was
+     * given. */
     if (aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
@@ -772,16 +787,6 @@ int count;
 	}
 	/*}}} */
     }
-
-    /*{{{  set up x and x2 tics */
-    /* we should base the guide on the width of the xtics, but we cannot
-     * use widest_tics until tics are set up. Bit of a downer - let us
-     * assume tics are 5 characters wide
-     */
-
-    setup_tics(FIRST_X_AXIS, 20);
-    setup_tics(SECOND_X_AXIS, 20);
-
 
     /*  adjust top and bottom margins for tic label rotation */
 
