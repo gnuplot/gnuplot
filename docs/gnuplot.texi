@@ -3112,8 +3112,8 @@ number of seconds if subsecond time resolution is not supported by the given
 platform.  `pause 0` is synonymous with `print`.
 
 If the current terminal supports mousing, then `pause mouse` will terminate
-on either a mouse click or on a carriage return.  For all other terminals
-`pause mouse` is equivalent to `pause -1`.
+on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
+is not active, `pause mouse` is equivalent to `pause -1`.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
