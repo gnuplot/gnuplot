@@ -136,6 +136,10 @@
 # define OS "VMS "
 # define HOME "sys$login:"
 # define PLOTRC "gnuplot.ini"
+# ifdef NO_GIH
+   /* for show version long */
+#  define HELPFILE "GNUPLOT$HELP"
+# endif
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  error Please /define either VAXCRTL or DECCRTL
 # endif
