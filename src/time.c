@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.11 1998/04/14 00:16:27 drd Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.3 1999/06/09 12:13:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -184,7 +184,7 @@ struct tm *tm;
 	    {
 		int m;
 		for (m = 0; m < 12; ++m)
-		    if (strnicmp(s, abbrev_month_names[m], strlen(abbrev_month_names[m])) == 0) {
+		    if (strncasecmp(s, abbrev_month_names[m], strlen(abbrev_month_names[m])) == 0) {
 			s += strlen(abbrev_month_names[m]);
 			goto found_abbrev_mon;
 		    }
@@ -200,7 +200,7 @@ struct tm *tm;
 	    {
 		int m;
 		for (m = 0; m < 12; ++m)
-		    if (strnicmp(s, full_month_names[m], strlen(full_month_names[m])) == 0) {
+		    if (strncasecmp(s, full_month_names[m], strlen(full_month_names[m])) == 0) {
 			s += strlen(full_month_names[m]);
 			goto found_full_mon;
 		    }

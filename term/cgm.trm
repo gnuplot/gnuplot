@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.16 1998/06/18 14:59:18 ddenholm Exp $
+ * $Id: cgm.trm,v 1.19 1999/05/13 18:51:53 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -359,8 +359,8 @@ int numchar;
     int font_index = 1;
     char *s;
     for (s = cgm_font_data; s < cgm_font_data + strlen(cgm_font_data); s += (int) *s + 1) {
-	/* strnicmp is not standard, but defined by stdfn.c if not available */
-	if (numchar == (int) *s && strnicmp(font, s + 1, numchar - 1) == 0)
+	/* strncasecmp is not standard, but defined by stdfn.c if not available */
+	if (numchar == (int) *s && strncasecmp(font, s + 1, numchar - 1) == 0)
 	    return font_index;
 	font_index++;
     }

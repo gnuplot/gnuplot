@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.23 1998/06/18 14:55:18 ddenholm Exp $
+ * $Id: stdfn.h,v 1.3 1999/06/06 18:21:51 lhecking Exp $
  *
  */
 
@@ -260,11 +260,11 @@ int pclose __PROTO((FILE *));
 # include <math.h>
 #endif
 
-#ifndef HAVE_STRNICMP
-# ifdef HAVE_STRNCASECMP
-#  define strnicmp strncasecmp
+#ifndef HAVE_STRNCASECMP
+# ifdef HAVE_STRNICMP
+#  define strncasecmp strnicmp
 # else
-int strnicmp __PROTO((char *, char *, int));
+#  define strncasecmp gp_strnicmp
 # endif
 #endif
 
