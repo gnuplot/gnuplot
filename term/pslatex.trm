@@ -115,7 +115,8 @@ TERM_PUBLIC void PSLATEX_options()
     }
 
     if (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "c$olor")) {
+	if (almost_equals(c_token, "c$olor")
+	    || almost_equals(c_token, "c$olour")) {
 	    ps_color = TRUE;
 	    c_token++;
 	}

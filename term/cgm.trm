@@ -947,7 +947,8 @@ TERM_PUBLIC void CGM_options()
 	  c_token++;
 	  continue;
 	}
-      if (almost_equals(c_token,"c$olor"))
+      if (almost_equals(c_token,"c$olor")
+	  || almost_equals(c_token,"c$olour"))
 	{
 	  cgm_monochrome=FALSE;
 	  c_token++;
