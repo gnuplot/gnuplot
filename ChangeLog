@@ -1,3 +1,8 @@
+2004-10-31  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readbinary): Fix incorrect indexing of 2D
+	rotation matrix.
+
 2004-10-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Fix indentation level of terminal types when

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.63 2004/10/26 04:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.64 2004/10/28 16:21:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -4357,7 +4357,7 @@ df_readbinary(double v[], int max)
 	     */
 	    for (i=0; i < 2; i++) {
 		int j;
-		for (j=0; j < 3; j++) {
+		for (j=0; j < 2; j++) {
 		    R[i][j] *= df_bin_record[df_bin_record_count].cart_dir[i];
 		}
 	    }
