@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.42 2000/08/02 13:53:11 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.43 2000/09/20 00:59:24 joze Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -3286,7 +3286,7 @@ C ... and restart the table:
  To draw a vertical arrow with T-shape ends, use:
        set arrow 3 from 0,-5 to 0,5 heads size screen 0.1,90
 
- To draw a arrow relatively to the start point, where the relative distances
+ To draw an arrow relatively to the start point, where the relative distances
  are given in graph coordinates, use:
        set arrow from 0,-5 rto graph 0.1,0.1
 
