@@ -39,11 +39,11 @@
 /* Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
 
-/* Define if the type in arguments 2-4 to select() is fd_set.  */
-#undef SELECT_USES_FD_SET
-
-/* Define to the type used in argument 1 `select'. Usually this is an `int'.  */
+/* First arg for select().  */
 #undef fd_set_size_t
+
+/* Define if the type in arguments 2-4 to select() is fd_set.  */
+#undef SELECT_FD_SET_CAST
 
 /* Define if you are using the GNU readline library.  */
 #undef HAVE_LIBREADLINE
@@ -89,9 +89,6 @@
 
 /* Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
-
-/* Define to the type used in arg 5 of select.  */
-#undef struct_timeval_t
 
 /* Define if you want to use the sunview terminal (sun).  */
 #undef SUN
