@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.95 2004/01/08 05:08:26 sfeam Exp $
+ * $Id: x11.trm,v 1.96 2004/01/11 20:06:57 sfeam Exp $
  *
  */
 
@@ -586,10 +586,15 @@ AGAIN:
      * TODO: should we close the ipc_back_fd in this case ? */
     if (ipc_back_fd >= 0)
 	do {
+	    int ierr;
 	    FD_ZERO(&fds);
 	    FD_SET(fd, &fds);
 	    FD_SET(ipc_back_fd, &fds);
-	    select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, NULL);
+	    ierr = select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, NULL);
+	    if (ierr < 0 && errno == EINTR) {
+		FD_ZERO(&fds);
+		continue;
+	    }
 	    if (FD_ISSET(ipc_back_fd, &fds)) {
 		n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
 		if (n == 0) {
