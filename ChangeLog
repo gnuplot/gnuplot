@@ -1,5 +1,9 @@
 2004-07-08  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/gplt_x11.c (pr_font): Before falling back all the way to a fixed
+	width font, try two common scalable fonts (helvetica, arial) as a last
+	resort. Fixes bug #963211 on systems with either of these fonts.
+
 	* src/gplt_x11.c (exec_cmd)  term/gd.trm (PNG_point): Apply current
 	linewidth to point symbols.
 

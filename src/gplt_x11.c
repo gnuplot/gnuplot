@@ -417,7 +417,7 @@ static void mouse_to_coords __PROTO((plot_struct *, XEvent *,
 static double mouse_to_axis __PROTO((int, axis_scale_t *));
 #endif
 
-#define FallbackFont "fixed"
+static char *FallbackFont = "fixed";
 enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
 static char default_font[64] = { '\0' };
 
@@ -4404,8 +4404,9 @@ static void
 pr_font( fontname )
 char *fontname;
 {
-    XFontStruct *previous_font = font;
     static char previous_font_name[128];
+    char fontspec[128];
+    int  fontsize = 0;
 
     if (!fontname || !(*fontname))
 	fontname = default_font;
@@ -4424,9 +4425,8 @@ char *fontname;
     if (!font) {
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
 	/* We are passed "font<,size><,slant>"                             */
-	char fontspec[128], shortname[64], *fontencoding, slant, *weight;
+	char shortname[64], *fontencoding, slant, *weight;
 	int  sep;
-	int  fontsize = 0;
 
 	/* Enhanced font processing wants a method of requesting a new size  */
 	/* for whatever the previously selected font was, so we have to save */
@@ -4510,19 +4510,31 @@ char *fontname;
         strncpy(previous_font_name, fontname, sizeof(previous_font_name)-1);
         FPRINTF((stderr,"gnuplot_x11:saving current font name \"%s\"\n",previous_font_name));
     } else {
-	if (!((font = XLoadQueryFont(dpy, default_font))))
-	    font = previous_font;
+	font = XLoadQueryFont(dpy, default_font);
+	FPRINTF((stderr,"Falling back to default_font %s\n",default_font));
     }
+
+    /* By now we have tried everything we can to honor the specific request. */
+    /* Try two common scaleable fonts before falling back to a last resort   */
+    /* fixed font.                                                           */
     if (!font) {
-	fprintf(stderr, "gnuplot_x11: using font '%s' instead.\n", FallbackFont);
-	font = XLoadQueryFont(dpy, FallbackFont);
+	sprintf(fontspec, "-*-arial-medium-r-*-*-%d-*-*-*-*-*-*-*", fontsize);
+	font = XLoadQueryFont(dpy, fontspec);
+	fontname = fontspec;
 	if (!font) {
-	    fprintf(stderr, "\
-gnuplot: can't load font '%s'\n\
-gnuplot: no useable font - X11 aborted.\n", FallbackFont);
-	    EXIT(1);
-	} else
+	    sprintf(fontspec, "-*-helvetica-medium-r-*-*-%d-*-*-*-*-*-*", fontsize);
+	    font = XLoadQueryFont(dpy, fontspec);
+	}
+	if (!font) {
+	    font = XLoadQueryFont(dpy, FallbackFont);
 	    fontname = FallbackFont;
+	}
+	if (!font) {
+	    fprintf(stderr, "\ngnuplot_x11: can't find usable font - X11 aborted.\n");
+	    EXIT(1);
+	}
+	FPRINTF((stderr, "\ngnuplot_x11: requested font not found, using '%s' instead.\n", fontname));
+	strncpy(default_font,fontname,sizeof(default_font)-1);
     }
 
     vchar = font->ascent + font->descent;
