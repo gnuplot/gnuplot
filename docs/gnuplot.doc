@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.44 2000/09/20 01:21:08 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.45 2000/10/06 03:56:36 joze Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -339,7 +339,6 @@ C
 2 Command-line-editing
 ?line-editing
 ?editing
-?history
 ?command-line-editing
  Command-line editing is supported by the Unix, Atari, VMS, MS-DOS and OS/2
  versions of `gnuplot`.  Also, a history mechanism allows previous commands to
@@ -2075,6 +2074,21 @@ C ... and restart the table:
 
  If a question mark (?) is given as the topic, the list of topics currently
  available is printed on the screen.
+2 history
+?history
+ 'history' command lists or saves previous entries in the history of the 
+ command line editing, or executes an etry.
+
+ Here you find 'usage by examples':
+
+       history               # show the complete history
+       history 5             # show last 5 entries in the history
+       history 10 "hist.gp"  # write last 10 commands to file hist.gp
+       history ?load         # show all history entries starting with "load"
+       history ?"set c"      # like above, several words enclosed in quotes
+       hi !reread            # execute last entry starting with "reread"
+       hist !"set xr"        # like above, several words enclosed in quotes
+       hi !hi                # guess yourself :-))
 2 if
 ?commands if
 ?if
@@ -6752,14 +6766,24 @@ C  The `lines` style connects adjacent points with straight line segments.
  type `logout` if using VMS, `exit` or the END-OF-FILE character if using
  Unix, `endcli` if using AmigaOS, or `exit` if using MS-DOS or OS/2.
 
- A single shell command may be spawned by preceding it with the ! character
- ($ if using VMS) at the beginning of a command line.  Control will return
- immediately to `gnuplot` after this command is executed.  For example, in
- Unix, AmigaOS, MS-DOS or OS/2,
+ There are two ways of spawning a shell command: using `system` command 
+ or via `!` ($ if using VMS). The former command takes a string as a
+ parameter and thus it can be used anywhere among other gnuplot commands,
+ while the latter syntax requires to bethe only command on the line. Control
+ will return immediately to `gnuplot` after this command is executed.  For
+ example, in Unix, AmigaOS, MS-DOS or OS/2,
 
        ! dir
+ or
+       system "dir"
+
 
  prints a directory listing and then returns to `gnuplot`.
+
+
+ Other examples of the former syntax:
+	system "date"; set time; plot "a.dat"
+	print=1; if (print) replot; set out; system "lpr x.ps"
 
  On an Atari, the `!` command first checks whether a shell is already loaded
  and uses it, if available.  This is practical if `gnuplot` is run from
@@ -7008,6 +7032,11 @@ C  The `lines` style connects adjacent points with straight line segments.
  base.  The base projections of the contour lines may be written to a
  file, and then read with `plot`, to take advantage of `plot`'s additional
  formatting capabilities.
+2 system
+?commands system
+?system
+ `system` spawns shell to execute a command. Please see `help shell` for
+ more details.
 2 test
 ?commands test
 ?test
