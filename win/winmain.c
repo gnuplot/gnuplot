@@ -1,24 +1,39 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.13 1996/09/15 13:08:44 drd Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.15 1998/03/22 23:32:01 drd Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
-/*
- * Copyright (C) 1992   Maurice Castro, Russell Lang
+/*[
+ * Copyright 1992, 1993, 1998   Maurice Castro, Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * AUTHORS
  * 
  *   Maurice Castro
@@ -49,10 +64,13 @@ static char *RCSid = "$Id: winmain.c,v 1.13 1996/09/15 13:08:44 drd Exp $";
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <ctype.h>
 #ifdef __MSC__
 #include <malloc.h>
 #else
+# ifdef __TURBOC__ /* HBB 981201: MinGW32 doesn't have this */
 #include <alloc.h>
+#endif
 #endif
 #include <io.h>
 #include "plot.h"
@@ -110,7 +128,9 @@ WinExit(void)
 {
 	term_reset();
 
+#ifndef __MINGW32__ /* HBB 980809: FIXME: doesn't exist for MinGW32. So...? */
 	fcloseall();
+#endif
 	if (graphwin.hWndGraph && IsWindow(graphwin.hWndGraph))
 		GraphClose(&graphwin);
 	TextMessage();	/* process messages */
@@ -145,8 +165,6 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		_argv[++_argc] = _fstrtok( NULL, " ");
 #endif /* __MSC__ */
 
-  	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
-  	CheckMemory(szModuleName);
 	szModuleName = (LPSTR)farmalloc(MAXSTR+1);
 	CheckMemory(szModuleName);
 
@@ -420,3 +438,47 @@ size_t MyFRead(void *ptr, size_t size, size_t n, FILE *file)
 	}
 	return fread(ptr, size, n, file);
 }
+
+/* public interface to printer routines : Windows PRN emulation
+ * (formerly in win.trm)
+ */
+
+#define MAX_PRT_LEN 256
+static char win_prntmp[MAX_PRT_LEN+1];
+
+extern GW graphwin;
+ 
+FILE *
+open_printer()
+{
+char *temp;
+	if ((temp = getenv("TEMP")) == (char *)NULL)
+		*win_prntmp='\0';
+	else  {
+		strncpy(win_prntmp,temp,MAX_PRT_LEN);
+		/* stop X's in path being converted by mktemp */
+		for (temp=win_prntmp; *temp; temp++)
+			*temp = tolower(*temp);
+		if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
+			strcat(win_prntmp,"\\");
+	}
+	strncat(win_prntmp, "_gptmp",MAX_PRT_LEN-strlen(win_prntmp));
+	strncat(win_prntmp, "XXXXXX",MAX_PRT_LEN-strlen(win_prntmp));
+	mktemp(win_prntmp);
+	return fopen(win_prntmp, "w");
+}
+
+void
+close_printer(FILE *outfile)
+{
+	fclose(outfile);
+	DumpPrinter(graphwin.hWndGraph, graphwin.Title, win_prntmp);
+}
+
+void
+screen_dump(void)
+{
+	GraphPrint(&graphwin);
+}
+
+

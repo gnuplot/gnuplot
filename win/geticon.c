@@ -12,9 +12,11 @@ static char *RCSid = "$Id: geticon.c,v 1.2 1993/09/27 17:24:27 alex Exp $";
 #include <string.h>
 #include <ctype.h>
 
+/* HBB 980809: naming a variable 'inline' is a bad idea, these days. Too
+ * many compilers use it as a keyword... Changed to 'inputline' */
 #define MAXLINE 255
 FILE *rcfile;
-char inline[MAXLINE+1];
+char inputline[MAXLINE+1];
 char *tok1, *tok2, *tok3;
 char *p;
 char iconname[MAXLINE+1];
@@ -39,9 +41,9 @@ void
 geticon(void)
 {
 char ch;
-    fgets(inline,MAXLINE,rcfile);
+    fgets(inputline,MAXLINE,rcfile);
     line++;
-    if (strncmp(inline,"BEGIN",5)) {
+    if (strncmp(inputline,"BEGIN",5)) {
     	fprintf(stderr,"Expecting BEGIN at line %d\n",line);
     	exit(3);
     }
@@ -49,17 +51,17 @@ char ch;
         fprintf(stderr,"Can't open ICON file %s\n",iconname);
         exit(4);
     }
-    fgets(inline,MAXLINE,rcfile);
+    fgets(inputline,MAXLINE,rcfile);
     line++;
-    while (strncmp(inline,"END",3) && !feof(rcfile)) {
-        for (p = inline; *p && (*p==' ' || *p == '\t' || *p=='\''); p++);
+    while (strncmp(inputline,"END",3) && !feof(rcfile)) {
+        for (p = inputline; *p && (*p==' ' || *p == '\t' || *p=='\''); p++);
         while (isxdigit(*p)) {
             ch = htoi(*p++)<<4;
             ch += htoi(*p++);
             fputc(ch, iconfile);
             p++;
         }
-        fgets(inline,MAXLINE,rcfile);
+        fgets(inputline,MAXLINE,rcfile);
         line++;
     }
     fclose(iconfile);
@@ -77,9 +79,9 @@ main(int argc, char *argv[])
 	return(2);
     }
     line = 0;
-    while (fgets(inline,MAXLINE,rcfile)) {
+    while (fgets(inputline,MAXLINE,rcfile)) {
         line++;
-	tok1 = strtok(inline," \t\r\n");
+	tok1 = strtok(inputline," \t\r\n");
 	tok2 = strtok(NULL," \t\r\n");
 	tok3 = strtok(NULL," \t\r\n");
 	if (tok2 && !strcmp(tok2,"ICON") && (tok3 == (char *)NULL)) {

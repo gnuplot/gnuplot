@@ -214,7 +214,7 @@ GraphInit(LPGW lpgw)
 		wndclass.hInstance = lpgw->hInstance;
 		wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 		wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wndclass.hbrBackground = GetStockBrush(WHITE_BRUSH);
+		wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 		wndclass.lpszMenuName = NULL;
 		wndclass.lpszClassName = szGraphClass;
 		RegisterClass(&wndclass);
@@ -400,13 +400,13 @@ DestroyPens(LPGW lpgw)
 {
 	int i;
 
-	DeleteBrush(lpgw->hbrush);
-	DeletePen(lpgw->hbpen);
-	DeletePen(lpgw->hapen);
+	DeleteObject(lpgw->hbrush);
+	DeleteObject(lpgw->hbpen);
+	DeleteObject(lpgw->hapen);
 	for (i=0; i<WGNUMPENS; i++)
-		DeletePen(lpgw->hpen[i]);
+		DeleteObject(lpgw->hpen[i]);
 	for (i=0; i<WGNUMPENS+2; i++)
-		DeleteBrush(lpgw->colorbrush[i]);
+		DeleteObject(lpgw->colorbrush[i]);
 }
 
 /* ================================== */
@@ -446,7 +446,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	}
 
 	/* save text size */
-	hfontold = SelectFont(hdc, lpgw->hfonth);
+	hfontold = SelectObject(hdc, lpgw->hfonth);
 #ifdef WIN32
 	{
 	SIZE size;
@@ -469,7 +469,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
         cy = MulDiv(cx/20, GetDeviceCaps(hdc,LOGPIXELSY), GetDeviceCaps(hdc,LOGPIXELSX));
         lpgw->vtic = MulDiv(cy,lpgw->ymax,lprect->bottom - lprect->top);
 	/* find out if we can rotate text 90deg */
-	SelectFont(hdc, lpgw->hfontv);
+	SelectObject(hdc, lpgw->hfontv);
 	result = GetDeviceCaps(hdc, TEXTCAPS);
 	if ((result & TC_CR_90) || (result & TC_CR_ANY))
 		lpgw->rotate = 1;
@@ -480,7 +480,7 @@ MakeFonts(LPGW lpgw, LPRECT lprect, HDC hdc)
 	if (tm.tmPitchAndFamily & TMPF_TRUETYPE)
 		lpgw->rotate = 1;	/* truetype fonts can all be rotated */
 #endif
-	SelectFont(hdc, hfontold);
+	SelectObject(hdc, hfontold);
 	return;
 }
 
@@ -488,11 +488,11 @@ void
 DestroyFonts(LPGW lpgw)
 {
 	if (lpgw->hfonth) {
-		DeleteFont(lpgw->hfonth);
+		DeleteObject(lpgw->hfonth);
 		lpgw->hfonth = 0;
 	}
 	if (lpgw->hfontv) {
-		DeleteFont(lpgw->hfontv);
+		DeleteObject(lpgw->hfontv);
 		lpgw->hfontv = 0;
 	}
 	return;
@@ -503,11 +503,11 @@ SetFont(LPGW lpgw, HDC hdc)
 {
 	if (lpgw->rotate && lpgw->angle) {
 		if (lpgw->hfontv)
-			SelectFont(hdc, lpgw->hfontv);
+			SelectObject(hdc, lpgw->hfontv);
 	}
 	else {
 		if (lpgw->hfonth)
-			SelectFont(hdc, lpgw->hfonth);
+			SelectObject(hdc, lpgw->hfonth);
 	}
 	return;
 }
@@ -610,8 +610,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
 	pen = 0;
-	SelectPen(hdc, lpgw->hpen[pen]);
-	SelectBrush(hdc, lpgw->colorbrush[pen+2]);
+	SelectObject(hdc, lpgw->hpen[pen]);
+	SelectObject(hdc, lpgw->colorbrush[pen+2]);
 	numsolid = lpgw->numsolid;
 
 	/* do the drawing */
@@ -657,22 +657,22 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				switch (curptr->x)
 				{
 				    case (WORD) -2:		/* black 2 pixel wide */
-					    SelectPen(hdc, lpgw->hbpen);
+					    SelectObject(hdc, lpgw->hbpen);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
 					    break;
 				    case (WORD) -1:		/* black 1 pixel wide doted */
-					    SelectPen(hdc, lpgw->hapen);
+					    SelectObject(hdc, lpgw->hapen);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[1].lopnColor);
 					    break;
 				    default:
-					    SelectPen(hdc, lpgw->hpen[(curptr->x)%WGNUMPENS]);
+					    SelectObject(hdc, lpgw->hpen[(curptr->x)%WGNUMPENS]);
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[(curptr->x)%WGNUMPENS + 2].lopnColor);
 				}
 				pen = curptr->x;
-				SelectBrush(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
+				SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
 				break;
 			case W_put_text:
 				{char *str;
@@ -736,8 +736,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 			default:	/* A plot mark */
 				if (pen >= numsolid) {
 					pen %= numsolid;	/* select solid pen */
-					SelectPen(hdc, lpgw->hpen[pen]);
-					SelectBrush(hdc, lpgw->colorbrush[pen+2]);
+					SelectObject(hdc, lpgw->hpen[pen]);
+					SelectObject(hdc, lpgw->colorbrush[pen+2]);
 				}
                                 switch (curptr->op) {
 					case W_dot:
@@ -865,7 +865,7 @@ CopyClip(LPGW lpgw)
 			rect.bottom - rect.top);
 	if (bitmap) {
 		/* there is enough memory and the bitmaps OK */
-		SelectBitmap(mem, bitmap);
+		SelectObject(mem, bitmap);
 		BitBlt(mem,0,0,rect.right - rect.left, 
 			rect.bottom - rect.top, hdc, rect.left,
 			rect.top, SRCCOPY);
@@ -1410,8 +1410,8 @@ LineStyleDlgProc(HWND hdlg, UINT wmsg, WPARAM wparam, LPARAM lparam)
 			plpc = &lpls->colorpen[pen];
 			hBrush = CreateSolidBrush(plpc->lopnColor);
 			FillRect(lpdis->hDC, &lpdis->rcItem, hBrush);
-			FrameRect(lpdis->hDC, &lpdis->rcItem, GetStockBrush(BLACK_BRUSH));
-			DeleteBrush(hBrush);
+			FrameRect(lpdis->hDC, &lpdis->rcItem, (HBRUSH)GetStockObject(BLACK_BRUSH));
+			DeleteObject(hBrush);
 			}
 			return FALSE;
 	}
