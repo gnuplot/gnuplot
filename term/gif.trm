@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.36 2002/04/29 13:37:02 broeker Exp $
+ * $Id: gif.trm,v 1.37 2002/06/07 23:03:06 joze Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -445,7 +445,9 @@ TERM_PUBLIC int GIF_make_palette (t_sm_palette *palette)
 
 TERM_PUBLIC void GIF_set_color (double gray)
 {
-    int gif_color = (int)( gray * sm_palette.colors );
+    int gif_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+    if (gif_color >= sm_palette.colors)
+	gif_color = sm_palette.colors - 1;
     /* map [0;1] to interval [0;gif_smooth_colors-1] */
     gif_state.color = gif_smooth_color[ gif_color ]; /* index to the palette */
     /*fprintf(stderr,"GIF terminal sets color gif_color=%i\n",gif_color); */

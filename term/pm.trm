@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.28 2001/12/01 13:09:00 amai Exp $
+ * $Id: pm.trm,v 1.29 2002/02/15 20:29:56 amai Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -715,14 +715,15 @@ int pm_color = -1;
 
 TERM_PUBLIC void PM_set_color (double gray)
 {
-    unsigned char c = (int)( gray * sm_palette.colors );
+    unsigned char c = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+    if (c >= sm_palette.colors)
+	c = sm_palette.colors - 1;
     /* map [0;1] to interval [0;smooth_colors-1] */
 #if 0 // color caching
     if (c == pm_color) return;
     pm_color = c;
 #endif
     putc(GR_SET_COLOR, PM_pipe);
-    //{int k=c; fprintf(stderr,"pm.trm: PM_set_color c=%i\n",k);}
     putc(c, PM_pipe);
 }
 

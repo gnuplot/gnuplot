@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.5 2002/06/07 22:52:37 joze Exp $
+ * $Id: gd.trm,v 1.6 2002/06/09 07:42:50 joze Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -717,7 +717,9 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
 TERM_PUBLIC 
 void PNG_set_color (double gray)
 {
-    int png_color = (int)( gray * sm_palette.colors );
+    int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+    if (png_color >= sm_palette.colors)
+	png_color = sm_palette.colors - 1;
     /* map [0;1] to interval [0;png_smooth_colors-1] */
     png_state.color = png_smooth_color[ png_color ]; /* index to the palette */
     /*fprintf(stderr,"PNG terminal sets color png_color=%i\n",png_color); */

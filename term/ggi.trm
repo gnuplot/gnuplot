@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.12 2001/08/27 15:04:12 broeker Exp $
+ * $Id: ggi.trm,v 1.13 2002/01/29 20:39:30 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1458,10 +1458,8 @@ GGI_set_color(gray)
     double gray;
 {
     if (GGIvisual) {
-	int idx = gray * ggi_pm3d_colors;
-	if (idx < 0)
-	    idx = 0;
-	else if (idx >= ggi_pm3d_colors)
+	int idx = (gray <= 0) ? 0 : (int)(gray * ggi_pm3d_colors);
+	if (idx >= ggi_pm3d_colors)
 	    idx = ggi_pm3d_colors - 1;
 	ggiSetGCForeground(GGIvisual, GGI_smooth_colors[idx]);
 #ifdef ENABLE_XMI

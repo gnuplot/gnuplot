@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.25 2001/09/18 17:42:40 broeker Exp $
+ * $Id: win.trm,v 1.26 2002/03/01 20:46:17 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -411,10 +411,11 @@ TERM_PUBLIC void
 WIN_set_color(gray)
     double gray;
 {
-    /* HBB 20000813: new routine */
+    int color = (color <= 0) ? 0 : (int)(256 * gray);
+    if (color >= 256)
+	color = 255;
     WIN_last_linetype = -3;      /* invalidate cached linetype */
-    /* Notice HBB 20010208: --> WIN_move() */
-    GraphOp(&graphwin, W_pm3d_setcolor, (int) 256*gray, 0, NULL);
+    GraphOp(&graphwin, W_pm3d_setcolor, color, 0, NULL);
 }
 
 TERM_PUBLIC void
@@ -422,9 +423,7 @@ WIN_filled_polygon(points, corners)
     int points;
     gpiPoint *corners;
 {
-    /* HBB 20000813: new routine */
     int i;
-    
     /* Notice HBB 20010208: --> WIN_move() */
     for (i=0; i<points; i++)
     	GraphOp(&graphwin, W_pm3d_filled_polygon_pt, corners[i].x, corners[i].y, NULL);

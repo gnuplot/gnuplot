@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.27 2002/04/30 14:08:53 broeker Exp $
+ * $Id: fig.trm,v 1.28 2002/06/07 22:52:36 joze Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1082,11 +1082,13 @@ TERM_PUBLIC void FIG_previous_palette()
 
 TERM_PUBLIC void FIG_set_color(double gray)
 {
-    int new_color;
+    int new_color = (gray <= 0) ? 0 : (int)(gray * FIG_palette_size);
+    if (new_color >= FIG_palette_size)
+	new_color = FIG_palette_size - 1;
     if (FIG_palette_set == FALSE) {
-	fprintf(stderr,"Palette used before set\n"); /* Error condition */
+	fprintf(stderr,"fig: Palette used before set\n"); /* Error condition */
     }
-    new_color = (int)(gray*FIG_palette_size) + FIG_palette_offst;
+    new_color += FIG_palette_offst;
     if (FIG_color != new_color) {
 	FIG_poly_clean(FIG_polyvec_stat);
 	FIG_color = new_color;
