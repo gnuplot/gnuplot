@@ -1,3 +1,8 @@
+2002-01-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc: Fixed all-spaces line and spurious <TAB>
+ 	character.
+
 2002-01-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg: Improvements, easily editable options.
