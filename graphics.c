@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.5 1999/12/02 20:40:02 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.6 1999/12/09 18:43:12 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1561,7 +1561,7 @@ int pcount;			/* count of plots in linked list */
     else if (y_min <= 0.0 && y_max <= 0.0)
 	axis_zero[FIRST_Y_AXIS] = ytop;
     else {
-	axis_zero[FIRST_X_AXIS] = map_y(0.0);
+	axis_zero[FIRST_Y_AXIS] = map_y(0.0);
 	if (xzeroaxis.l_type > -3) {
 	    term_apply_lp_properties(&xzeroaxis);
 	    (*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
@@ -1569,11 +1569,11 @@ int pcount;			/* count of plots in linked list */
 	}
     }
     if (x_min >= 0.0 && x_max >= 0.0)
-	axis_zero[FIRST_Y_AXIS] = xleft;
+	axis_zero[FIRST_X_AXIS] = xleft;
     else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[FIRST_Y_AXIS] = xright;
+	axis_zero[FIRST_X_AXIS] = xright;
     else {
-	axis_zero[FIRST_Y_AXIS] = map_x(0.0);
+	axis_zero[FIRST_X_AXIS] = map_x(0.0);
 	if ((yzeroaxis.l_type > -3) && !is_log_x) {
 	    term_apply_lp_properties(&yzeroaxis);
 	    (*t->move) (axis_zero[FIRST_X_AXIS], ybot);
@@ -1589,7 +1589,7 @@ int pcount;			/* count of plots in linked list */
     else if (y_min <= 0.0 && y_max <= 0.0)
 	axis_zero[SECOND_Y_AXIS] = ytop;
     else {
-	axis_zero[SECOND_X_AXIS] = map_y(0.0);
+	axis_zero[SECOND_Y_AXIS] = map_y(0.0);
 	if (x2zeroaxis.l_type > -3) {
 	    term_apply_lp_properties(&x2zeroaxis);
 	    (*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
@@ -1597,11 +1597,11 @@ int pcount;			/* count of plots in linked list */
 	}
     }
     if (y_min >= 0.0 && y_max >= 0.0)
-	axis_zero[SECOND_Y_AXIS] = xleft;
+	axis_zero[SECOND_X_AXIS] = xleft;
     else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[SECOND_Y_AXIS] = xright;
+	axis_zero[SECOND_X_AXIS] = xright;
     else {
-	axis_zero[SECOND_Y_AXIS] = map_x(0.0);
+	axis_zero[SECOND_X_AXIS] = map_x(0.0);
 	if ((y2zeroaxis.l_type > -3) && !is_log_x2) {
 	    term_apply_lp_properties(&y2zeroaxis);
 	    (*t->move) (axis_zero[SECOND_X_AXIS], ybot);
