@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.63 2003/02/18 16:38:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.64 2003/12/13 00:56:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -409,6 +409,22 @@ char **argv;
      */
     if (setvbuf(stdout, (char *) NULL, _IOLBF, (size_t) 1024) != 0)
 	(void) fputs("Could not linebuffer stdout\n", stderr);
+
+#ifdef X11
+    /* This call used to be in x11.trm, with the following comment:
+     *   Multi-character inputs like escape sequences but also mouse-pasted
+     *   text got buffered and therefore didn't trigger the select() function
+     *   in X11_waitforinput(). Switching to unbuffered input solved this.
+     *   23 Jan 2002 (joze)
+     * But switching to unbuffered mode causes all characters in the input
+     * buffer to be lost. So the only safe time to do it is on program entry.
+     * The #ifdef X11 is probably unnecessary, but makes the change minimal.
+     * Do any non-X platforms suffer from the same problem?
+     * EAM - Jan 2004.
+     */
+    setvbuf(stdin, (char *) NULL, _IONBF, 0);
+#endif
+
 #endif
 
     gpoutfile = stdout;

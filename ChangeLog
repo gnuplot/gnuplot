@@ -1,3 +1,11 @@
+2004-01-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot.c, term/x11.trm: Set stdin to unbuffered on program entry
+	rather than waiting for the start of an X11 plot. All buffered input
+	is lost by the call to setvbuf(), so the only safe time to call it is
+	before there is any input. This fixes the latest manifestation of the
+	"x11 clipboard paste problem", and also the "piping from awk" problem.
+
 2004-01-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in, configure.vms, src/fit.c, src/gplt_x11.c, src/stdfn.h,
