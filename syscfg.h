@@ -47,7 +47,6 @@
 #endif
 
 #include "ansichek.h"
-#include "stdfn.h"
 
 /*
  * Define operating system dependent constants [default value]:
@@ -122,7 +121,6 @@
 # define PLOTRC "gnuplot.ini"
 # define SHELL "c:\\os2\\cmd.exe"
 # define DIRSEP1 '\\'
-# define GP_GETCWD(path,len) _getcwd2 (path, len)
 #endif /* OS/2 */
 
 #ifdef OSK
