@@ -1,3 +1,8 @@
+2001-03-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c: changed default colour box position and size for
+	'pm3d map'; use logscale for cb-axis according to z-axis.
+
 2001-03-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS docs/gnuplot.doc pm3d/demo/Demo.gp src/axis.c src/axis.h
