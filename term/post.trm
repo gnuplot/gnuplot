@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.83 2002/12/13 14:58:55 lhecking Exp $
+ * $Id: post.trm,v 1.84 2002/12/13 20:12:10 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -3013,6 +3013,7 @@ START_HELP(post)
 "?set term postscript fontfile",
 "?terminal postscript fontfile",
 "?term postscript fontfile",
+"?postscript fontfile",
 "?fontfile",
 " The `fontfile` or `fontfile add` option takes one file name as argument",
 " and encapsulates this file into the postscript output in order to make",
