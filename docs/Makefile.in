@@ -314,7 +314,7 @@ gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@if test "$(EMACS)" != no; then \
 	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
 	else \
-           @echo "No emacs found - cannot create texinfo file" ; \
+	   echo "No emacs found - cannot create texinfo file" ; \
 	fi
 
 # this is how to make OS/2 ipfc documentation
