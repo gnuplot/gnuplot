@@ -57,7 +57,7 @@ CFLAGS1 = -Ff=256 -f -m$(MODEL) -w- -Z -3 -f287 -d -G -n. -v -y
 #CFLAGS2 = -I$(TC)\include -DLITE -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
 # HBB: try without -DLITE, to activate hidden-lining (for trying)
 #      and #define ANSI_C!
-CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_GETCWD -DHAVE_STRNICMP
+CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DANSI_C -DREADLINE -DHAVE_GETCWD -DHAVE_STRNICMP
 CFLAGS3 = -DHAVE_SLEEP -DLITE -DEXTERN_ERRNO -DHAVE_STRING_H -DHAVE_VALUES_H
 
 # separate set of FLAGS (both CFLAGS and LDFLAGS for the doc2xxx tools:
@@ -139,6 +139,7 @@ cflags.tc: makefile.tc
 	echo >>cflags.tc $(CFLAGS3)
 
 
+
 # default rules
 
 .c.obj:
@@ -187,6 +188,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
+	$(BIN)$(CC) -c $(OVLY2) @cflags.tc -DHELPFILE="$(HELPFILE)" show.c
 
 specfun.obj: specfun.c
 

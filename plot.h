@@ -39,7 +39,7 @@
 #define PLOT_H
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include "ansichek.h"
@@ -53,7 +53,7 @@
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
 # define OS "Amiga "
 # ifndef __amigaos__
-#define SHELL "NewShell"
+#  define SHELL "NewShell"
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -62,7 +62,7 @@
 
 #ifdef ATARI
 # define OS "TOS "
-#define SHELL "gulam.prg"
+# define SHELL "gulam.prg"
 #endif /* Atari */
 
 #ifdef DOS386
@@ -75,22 +75,22 @@
 
 #if defined(__NeXT__) && !defined(NEXT)
 # define NEXT
-#endif
+#endif /* NeXT */
 
 #ifdef OS2
 # define OS "OS/2 "
-#define SHELL "c:\\cmd.exe"
+# define SHELL "c:\\cmd.exe"
 #endif /* OS/2 */
 
 #ifdef OSK
 # define OS "OS-9 "
-#define SHELL "/dd/cmds/shell"
+# define SHELL "/dd/cmds/shell"
 #endif /* OS-9 */
 
 #if defined(vms) || defined(VMS)
 # ifndef VMS
 #  define VMS
-#endif
+# endif
 # define OS "VMS "
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  error Please /define either VAXCRTL or DECCRTL
@@ -104,7 +104,7 @@
 #if defined(_WINDOWS) || defined(_Windows)
 # ifndef _Windows
 #  define _Windows
-#endif
+# endif
 # ifdef WIN32
 #  define OS "MS-Windows 32 bit "
 # else
@@ -140,7 +140,7 @@
 #  define unix
 # endif
 # define OS "Unix "
-#endif
+#endif /* AIX */
 
 /* Attempted fix for SCO */
 #ifdef SCO
@@ -148,14 +148,14 @@
 #  define unix
 # endif
 # define OS "Unix "
-#endif
+#endif /* SCO */
 
 #ifndef OS
 # define OS ""
 #endif
 
 #ifndef SHELL
-#define SHELL "/bin/sh"    /* used if SHELL env variable not set */
+# define SHELL "/bin/sh"    /* used if SHELL env variable not set */
 #endif
 
 /* End OS section */
@@ -167,15 +167,15 @@
 
 #ifndef TERM
 /* default terminal is "unknown"; but see init_terminal */
-#define TERM "unknown"
+# define TERM "unknown"
 #endif
 
 /* avoid precompiled header conflict with redefinition */
 #ifdef NEXT
-#include <mach/boolean.h>
+# include <mach/boolean.h>
 #else
-#define TRUE 1
-#define FALSE 0
+# define TRUE 1
+# define FALSE 0
 #endif
 
 #define DTRUE 3 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
@@ -202,10 +202,10 @@
 #define NO_CARET (-1)
 
 #ifdef DOS16
-#define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
-#else
-#define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
-#endif
+# define MAX_NUM_VAR	3	/* Ploting projection of func. of max. five vars. */
+#else /* not DOS16 */
+# define MAX_NUM_VAR	5	/* Ploting projection of func. of max. five vars. */
+#endif /* not DOS16 */
 
 #define MAP3D_CARTESIAN		0	/* 3D Data mapping. */
 #define MAP3D_SPHERICAL		1
@@ -300,16 +300,16 @@
 
 /* To access curves larger than 64k, MSDOS needs to use huge pointers */
 #if (defined(__TURBOC__) && defined(MSDOS)) || defined(WIN16)
-#define GPHUGE huge
-#define GPFAR far
-#else
-#define GPHUGE
-#define GPFAR
-#endif
+# define GPHUGE huge
+# define GPFAR far
+#else /* not TurboC || WIN16 */
+# define GPHUGE /* nothing */
+# define GPFAR /* nothing */
+#endif /* not TurboC || WIN16 */
 
 #if defined(DOS16) || defined(WIN16)
 typedef float coordval;		/* memory is tight on PCs! */
-#define COORDVAL_FLOAT 1
+# define COORDVAL_FLOAT 1
 #else
 typedef double coordval;
 #endif
@@ -366,7 +366,7 @@ typedef double coordval;
 # define HUGE    DBL_MAX
 # undef HUGE_VAL
 # define HUGE_VAL DBL_MAX
-#endif
+#endif /* NEXT && NX_CURRENT_COMPILER_RELEASE<310 */
 
 /* Now define VERYLARGE. This is usually DBL_MAX/2 - 1. On MS-DOS however
  * we use floats for memory considerations and thus use FLT_MAX.
@@ -391,8 +391,8 @@ typedef double coordval;
 /* as a last resort */
 #  define VERYLARGE (1e37)
 #  warning "using last resort 1e37 as VERYLARGE define, please check your headers"
-# endif
-#endif
+# endif /* HUGE */
+#endif /* VERYLARGE */
 
 /* argument: char *fn */
 #define VALID_FILENAME(fn) ((fn) != NULL && (*fn) != '\0')
@@ -405,16 +405,16 @@ typedef double coordval;
 # define is_system(c) ((c) == '$')
 /* maybe configure could check this? */
 # define BACKUP_FILESYSTEM 1
-#else /* VMS */
+#else /* not VMS */
 # define is_comment(c) ((c) == '#')
 # define is_system(c) ((c) == '!')
-#endif /* VMS */
+#endif /* not VMS */
 
 #define top_of_stack stack[s_p]
 
 #ifndef RETSIGTYPE
 /* assume ANSI definition by default */
-#define RETSIGTYPE void
+# define RETSIGTYPE void
 #endif
 
 #ifndef SIGFUNC_NO_INT_ARG
@@ -701,9 +701,9 @@ struct TERMENTRY {
 };
 
 #ifdef WIN16
-#define termentry TERMENTRY far
+# define termentry TERMENTRY far
 #else
-#define termentry TERMENTRY
+# define termentry TERMENTRY
 #endif
 
 
@@ -905,4 +905,4 @@ if (allow_ls && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls" ))
    
 
  
-#endif	    /* PLOT_H */
+#endif /* not PLOT_H */

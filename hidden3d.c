@@ -347,7 +347,7 @@ struct Polygon {
     unsigned int xextent, yextent;
 #endif
     /* HBB 980317: the remaining bit of padding. */
-#if defined(DOS16) || defined(WIN16)
+#if defined(DOS16) || defined(WIN16) || defined(WIN32)
     char dummies[8];
 #endif
   };

@@ -1564,6 +1564,56 @@ show_version_long ()
 
 	puts ("\nCompile options:");
 
+#if 1 /* HBB 980812: made this compile on BC4.52 ... */
+        {
+          char readline[] =
+#ifdef READLINE
+	      "+READLINE  "
+#else
+	      "-READLINE  "
+#endif
+             , gnu_readline[] =
+#ifdef GNU_READLINE
+	      "+GNU_READLINE  "
+#else
+	      "-GNU_READLINE  "
+#endif
+             , libgd[] =
+#ifdef HAVE_LIBGD
+	      "+LIBGD  "
+#else
+	      "-LIBGD  "
+#endif
+             , libpng[] =
+#ifdef HAVE_LIBPNG
+	      "+LIBPNG  "
+#else
+	      "-LIBPNG  "
+#endif
+             , linuxvga[] =
+#ifdef LINUXVGA
+	      "+LINUXVGA  "
+#else
+              ""
+#endif
+             , nocwdrc[] =
+#ifdef NOCWDRC
+	      "+NOCWDRC  "
+#else
+	      "-NOCWDRC  "
+#endif
+             , x11[] =
+
+#ifdef X11
+	      "+X11  "
+#else
+              ""
+#endif
+          ;
+          printf("%s%s%s%s%s%s\n", readline, gnu_readline, libgd, libpng,
+               linuxvga, nocwdrc, x11);
+        }
+#else /* HBB: 0/1 */
 	puts (
 #ifdef READLINE
 	      "+READLINE  "
@@ -1603,6 +1653,7 @@ show_version_long ()
 	      "+X11  "
 #endif
 	      );
+#endif /* HBB: 0/1 */
 
 	printf ("HELPFILE=\"%s\"\n", HELPFILE);
 	printf ("CONTACT=<%s>\n", bug_email);

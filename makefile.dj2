@@ -54,10 +54,19 @@ TERMFLAGS = -DDJSVGA -fno-inline-functions
 # LINKOPT = -lm -lpc -lgrx
 
 ## DJGPP 2.0:
-# HBB : V2 isn't beta any more..., added $(OPTS) so user can
+# HBB : added $(OPTS) so user can
 #   change CFLAGS easily, without having to change makefile
-CFLAGS = -DMSDOS -DDOS32 -DANSI_C -DREADLINE -DHAVE_STRNICMP -DPIPES -O $(OPTS)
-LINKOPT = -lm -lpc -lgrx20
+CFLAGS = -DMSDOS -DDOS32 \
+	-DANSI_C -DSTDC_HEADERS \
+	-DHAVE_VALUES_H -DHAVE_UNISTD_H -DRETSIGTYPE=void \
+	-DHAVE_ERF -DHAVE_LGAMMA -DHAVE_GAMMA \
+	-DHAVE_GETCWD -DHAVE_SETLINEBUF -DHAVE_SLEEP \
+	-DHAVE_STRNCASECMP -DHAVE_STRNICMP -DHAVE_STRERROR \
+	-DHAVE_SETVBUF \
+	-DHAVE_TEMPNAM -DPIPES -DREADLINE \
+	-O $(OPTS)
+
+LINKOPT = $(LDFLAGS) -lm -lpc -lgrx20
 
 # HBB: removed reference to no-more-existing term/bigfig.trm
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
@@ -83,6 +92,10 @@ OBJS =  $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
 
 .c.o:  
 	$(CC) -c $(CFLAGS) $(INCLUDE) $<
+
+%:: RCS/%
+	$(patsubst $@-noexist,$(CO) $(COFLAGS) $< $@, \
+		$(filter-out $@,$(firstword $(wildcard $@) $@-noexist)))
 
 all: $(EXENAME).exe  $(HELPDEST)\$(HELPFILE)  demo\binary?.
 
@@ -113,6 +126,9 @@ $(EXENAME).exe : $(OBJS)
 command.o: command.c plot.h setshow.h help.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
 
+show.o: show.c plot.h setshow.h
+	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" $<
+
 term.o: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCES)
 	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm term.c
 
@@ -127,6 +143,14 @@ command.o fit.o matrix.o: fit.h
 fit.o matrix.o: matrix.h
 
 bitmap.o term.o: bitmap.h
+
+#HBB 961201: add dependencies to trigger RCS checkout if necessary:
+plot.h: protos.h
+protos.h: alloc.h
+
+EMAIL=broeker@physik.rwth-aachen.de
+version.o: version.c
+	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CFLAGS) $(INCLUDE) version.c
 
 # convert gnuplot.doc to gnuplot.gih
 $(HELPDEST)\$(HELPFILE): .\docs\doc2gih.exe .\docs\gnuplot.doc
@@ -172,15 +196,14 @@ install: all
 clean:
 	del *.o
 	del $(EXENAME)
-	del .\docs\doc2gih.exe
-
-# realclean target - remove all files created by the makefile
-realclean: clean
-	del $(EXENAME).exe
 	del .\docs\doc2gih
 	del .\docs\doc2gih.exe
 	del bf_test
 	del bf_test.exe
+
+# realclean target - remove all files created by the makefile
+realclean: clean
+	del $(EXENAME).exe
 	del $(HELPDEST)\$(HELPFILE)
 	del .\demo\binary1
 	del .\demo\binary2
