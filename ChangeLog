@@ -1,5 +1,15 @@
 2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* gnuplot.doc: Removed references to `help vgagl`.
+
+	* post.trm(START_HELP): Fixed broken reference to `postscript fontfile`.
+
+	* x11.trm(START_HELP): Added label `help x11 pm3d`.
+
+	* vgagl.trm(START_HELP): Added label `help vgagl`.
+
+2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* docs/titlepag.tex: Added fancy headings. Better procedure to read
 	gnuplot version from file VERSION.
 
@@ -1572,7 +1582,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/13 16:40:36 $).
+	last modification date (from the tag $Date: 2002/12/13 19:41:30 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

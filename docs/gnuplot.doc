@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.148 2002/12/05 05:12:33 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.149 2002/12/11 20:37:42 joze Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3998,8 +3998,7 @@ C ... and restart the table:
  `unset colorbox` resets the default parameters for the colorbox and switches
  the colorbox off.
 
- See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`,
- `help set style line`.
+ See also `help pm3d`, `help palette`, `help x11 pm3d`, `help set style line`.
 
 3 contour
 ?commands set contour
@@ -5812,7 +5811,7 @@ C ... and restart the table:
        set pm3d at s
        splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
 
- See also `set palette`, `set colorbox`, `help x11 pm3d`, `help vgagl`.
+ See also `set palette`, `set colorbox`, `help x11 pm3d`.
 
 3 palette
 ?commands set palette
