@@ -1,3 +1,8 @@
+2000-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_arrow): don't accept 'first' and 'second' as keywords
+ 	before 'from' or 'to'.
+	
 2000-10-12  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* term/cgm.trm (general): Initialize font table with the standard
