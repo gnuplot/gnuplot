@@ -1,3 +1,62 @@
+1999-02-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Fully integrate BeOS port and gnuplot-mode.
+
+	* configure: Regenerated.
+
+	* configure.in: X_PRE_LIBS is not required in X_LIBRARIES. Add
+	tests for poll.h, poll (experimental). Configure in lisp subdir.
+	Move configiuration report to after AC_OUTPUT.
+
+	* gplt_x11.c(mainloop): Experimental support for poll (not yet
+	complete).
+
+	* beos/makefile: Moved to beos/Makefile.in.
+
+	* beos/Makefile.in: Moved from makefile.
+
+	* docs/Makefile.in: Use $(MAKE) $(MFLAGS).
+
+	* lisp/Makefile: Moved to lisp/Makefile.dst.
+
+	* lisp/Makefile.dst: Moved from Makefile.
+
+	* lisp/Makefile.in: Old Makefile plus configuration changes.
+
+	* lisp/aclocal.m4: AM_PATH_LISPDIR macro for configure.
+
+	* lisp/configure: Generated from lisp/configure.in.
+
+	* lisp/configure.in: Minimal configure.in file.
+
+	* term/x11.trm: Minor changes.
+
+1999-02-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* datafile.c(df_open): Experimental tilde expansion.
+
+	* misc.c(save_set_all), show.c(show_format): Split fprintf()'s
+	into several separate fprintf()'s, and make local arrays smaller
+	to save stack space.
+
+1999-02-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c(boundary3d): Fix bug which compresses the z data
+	of 3D plots under Windows.
+
+1999-02-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Value of last parameter was not stored in a variable as
+	it should be.
+
+	* makefile.dj2: Binary to build is version 3.7, not 3.6.
+
+	* makefile.mgw: Don't compile with HAVE_SLEEP defined, hide
+	sleep() prototype in headers by defining _NO_OLDNAMES, add
+	$(OPT) for user specified compile flags.
+
+	* protos.h, stdfn.c: Declare second arg to safe_strncpy() const.
+
 1999-02-23  Lars Hecking  <lhecking@nmrc.ucc.ie>, Xavier Pianet <xavier@xingo.com>
 
 	* Makefile.in, configure.in, makefile.all, term.h: Integrate changes
