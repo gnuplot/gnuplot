@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.60 2002/08/26 05:34:35 sfeam Exp $
+ * $Id: x11.trm,v 1.61 2002/08/30 18:45:46 mikulik Exp $
  *
  */
 
@@ -117,6 +117,7 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
+static char X11_default_font[MAX_ID_LEN+1] = {'\0'};
 
 static void X11_atexit __PROTO((void));
 static void X11_set_default_font __PROTO((void));
@@ -367,7 +368,11 @@ X11_options()
 	    c_token++;
 	    break;
 	case X11_FONT:
-	    quote_str( default_font, ++c_token, sizeof(default_font) );
+	    c_token++;
+	    if (isstring(c_token))
+		quote_str( X11_default_font, c_token, sizeof(X11_default_font) );
+	    else
+ 		copy_str( X11_default_font, c_token, sizeof(X11_default_font) );
 	    c_token++;
 	    break;
 	case X11_OTHER:
@@ -396,9 +401,9 @@ X11_options()
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
     }
-    if (*default_font) {
+    if (*X11_default_font) {
 	strcat(term_options, " font \"");
-	strcat(term_options, default_font);
+	strcat(term_options, X11_default_font);
 	strcat(term_options, "\"");
     }
 #ifdef USE_MOUSE
@@ -1004,7 +1009,7 @@ X11_set_font(const char *fontname)
 void
 X11_set_default_font()
 {
-    PRINT1("QD%s\n",default_font);
+    PRINT1("QD%s\n",X11_default_font);
 }
 
 TERM_PUBLIC void

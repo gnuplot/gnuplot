@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.44 2002/07/21 12:32:53 mikulik Exp $
+ * $Id: cgm.trm,v 1.45 2002/07/26 16:42:28 mikulik Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -282,6 +282,7 @@ static struct fontdata cgm_basic_font_data[]={
 static struct fontdata *cgm_font_data = cgm_basic_font_data;
 
 #define DEFAULT_CGMFONT "Helvetica Bold"
+static char CGM_default_font[MAX_ID_LEN+1] = {'\0'};
 
 /* variables to record the options */
 static char cgm_font[32] = DEFAULT_CGMFONT;
@@ -491,8 +492,8 @@ CGM_options()
 	term->h_char = (unsigned int) (cgm_fontsize*CGM_PT*.527*w);
     }
 
-    sprintf(default_font, "%s,%d", cgm_font, cgm_fontsize);
-    /* default_font holds the font and size set at 'set term' */
+    sprintf(CGM_default_font, "%s,%d", cgm_font, cgm_fontsize);
+    /* CGM_default_font holds the font and size set at 'set term' */
     sprintf(term_options, "%s %s %s %s %s width %d linewidth %d \"%s\" %d",
 	    cgm_portrait ? "portrait" : "landscape",
 	    cgm_monochrome ? "monochrome" : "color",
@@ -787,6 +788,10 @@ CGM_set_font(font)
     char *comma = strchr(font, ',');
     int len;
     double width;
+
+    /* Allow null string to indicaute default font */
+    if (!font || !(*font))
+	font = CGM_default_font;
 
     /* find font in font table, or use 1st font */
     if (comma)

@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.19 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: metapost.trm,v 1.20 2002/08/30 18:45:46 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -226,7 +226,6 @@ MP_options()
     MP_textmag = 1.0;
     MP_prologues = -1;
     strcpy(MP_fontname, "cmr10");
-    strcpy(default_font, "");	/* output file will store default font info */
 
     while (!END_OF_COMMAND) {
 	switch (lookup_table(&MP_opts[0], c_token)) {

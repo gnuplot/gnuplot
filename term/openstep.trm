@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.8 2001/12/19 09:14:55 mikulik Exp $
+ * $Id: openstep.trm,v 1.9 2002/08/01 16:51:20 broeker Exp $
  *
  */
 
@@ -159,6 +159,7 @@ static char NEXT_title[MAX_LINE_LEN + 1];	/* name of font */
 
 static char NEXT_font[MAX_LINE_LEN + 1] = "Helvetica";	/* name of font */
 static int NEXT_fontsize = 14;	/* size of font in pts */
+static int NEXT_default_font[MAX_ID_LEN+1] = {'\0'};
 static TBOOLEAN NEXT_color = FALSE;
 static TBOOLEAN NEXT_solid = FALSE;	/*  use dashed lines */
 static int NEXT_path_count = 0;	/* count of lines in path */
@@ -534,7 +535,7 @@ NEXT_options()
 		NEXT_fontsize = (int) real(const_express(&a));
 		term->v_char = (unsigned int) (NEXT_fontsize * NEXT_SC);
 		term->h_char = (unsigned int) (NEXT_fontsize * NEXT_SC * 6 / 10);
-		sprintf(default_font, "%s,%d", NEXT_font, NEXT_fontsize);
+		sprintf(NEXT_default_font, "%s,%d", NEXT_font, NEXT_fontsize);
 	    }
 	    break;
 	}
@@ -879,11 +880,14 @@ const char *font;
     char name[32];
     int size, sep;
 
+    if (!font || !(*font))
+	font = NEXT_default_font;
     sep = strcspn(font, ",");
     strncpy(name, font, sep);
     name[sep] = NUL;
     size = NEXT_fontsize;
-    sscanf(&(font[sep + 1]), "%d", &size);
+    if (font[sep] == ',')
+	sscanf(&(font[sep + 1]), "%d", &size);
     NEXTPrintf("/%s findfont %d scalefont setfont\n", name, size * NEXT_SC);
     NEXT_RememberFont(name);
     return TRUE;

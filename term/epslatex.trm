@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.13 2002/03/24 16:33:50 mikulik Exp $
+ * $Id: epslatex.trm,v 1.14 2002/08/29 04:10:08 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -108,6 +108,7 @@ extern const char gnuplot_patchlevel[];
 
 static char EPSL_font[MAX_ID_LEN + 1] = "default";	/* name of font */
 static int EPSL_fontsize = 11;	/* size of font in pts */
+static char EPSL_default_font[MAX_ID_LEN+1] = {'\0'};
 
 static TBOOLEAN EPSL_color = FALSE;	/* don't use colors */
 static TBOOLEAN EPSL_solid = FALSE;	/*  use solid lines */
@@ -564,7 +565,7 @@ EPSL_options()
 	term->h_char = (unsigned int) (EPSL_fontsize * EPSL_SC * 5 / 10);
     }
 
-    sprintf(default_font, "%s,%d", EPSL_font, EPSL_fontsize);	/* 'default_font' declared in set.c */
+    sprintf(EPSL_default_font, "%s,%d", EPSL_font, EPSL_fontsize);
 
     sprintf(term_options, "%s %s \"%s\" %d",
 	    EPSL_color ? "color" : "monochrome",
@@ -864,11 +865,14 @@ const char *font;
     char name[32];
     int size, sep;
 
+    if (!font || !(*font))
+	font = EPSL_default_font;
     sep = strcspn(font, ",");
     strncpy(name, font, sep);
     name[sep] = 0;
     size = EPSL_fontsize;
-    sscanf(&(font[sep + 1]), "%d", &size);
+    if (font[sep] == ',')
+	sscanf(&(font[sep + 1]), "%d", &size);
     return TRUE;
 }
 

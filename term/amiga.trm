@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.13 2002/04/30 13:38:53 lhecking Exp $
+ * $Id: amiga.trm,v 1.14 2002/04/30 14:08:53 broeker Exp $
  *
  */
 
@@ -169,6 +169,7 @@ struct Library *DiskfontBase;
 static char *AMIGA_FontName = NULL;
 static int AMIGA_FontNameLen = 0;
 static int AMIGA_FontSize = 8;
+static char AMIGA_default_font[MAX_ID_LEN+1] = {'\0'};
 #define AMIGA_DEFAULTFONT "topaz"
 
 /* Font stuff */
@@ -324,7 +325,7 @@ AMIGA_options()
 	AMIGA_FontSize = 8;
 
     if (AMIGA_FontName != NULL && AMIGA_FontSize != 0) {
-	sprintf(default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
+	sprintf(AMIGA_default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
 	sprintf(term_options, "%s \"%s\" %d", \
 		(AMIGA_window_mode != TRUE ? "screen" : "window"), \
 		AMIGA_FontName, AMIGA_FontSize);
@@ -674,6 +675,10 @@ const char *font;
 	char *name = NULL;
 	int size, sep, namelen;
 
+	/* Allow caller to pass "" to indicate default font */
+	if (!font || !(*font))
+	    font = AMIGA_default_font;
+
 	sep = strcspn(font, ",");
 	namelen = strlen(font) + strlen(".font") + 1;
 	name = AllocMem(namelen,0);
@@ -682,7 +687,8 @@ const char *font;
 	strcpy(name,font);
 	name[sep] = NUL;
 	size = AMIGA_FontSize;
-	sscanf(&(font[sep + 1]), "%d", &size);
+	if (font[sep] == ',')
+	    sscanf(&(font[sep + 1]), "%d", &size);
 
 	if (name != NULL && strcmp(name, "") != 0) {
 	    strcat(name, ".font");

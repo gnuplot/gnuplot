@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.72 2002/08/24 21:11:35 sfeam Exp $
+ * $Id: post.trm,v 1.73 2002/08/30 18:45:46 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -526,6 +526,8 @@ static struct PS_FontName {
 	struct PS_FontName *next;
 } *PS_DocFonts = NULL;
 
+static char PS_default_font[MAX_ID_LEN+1] = {'\0'};
+
 /* given a font, look in store to see if it is there already
  * if so, return NULL. If not, reencode it if allowed to, otherwise
  * return an appropriate re-encode string
@@ -777,9 +779,7 @@ PS_options()
     if (!ps_color)
 	ps_blacktext = TRUE;
 
-    sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
-    /* default_font holds the font and size set at 'set term' */
-    /* Entry font added by DJL */
+    sprintf(PS_default_font,"%s,%d",ps_font,ps_fontsize);
     /* HBB 19990823: fixed the options string. It violated the 'save
      * loadable output' rule */
     sprintf(term_options,"%s %senhanced %s %s \\\n"
@@ -1467,12 +1467,14 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC int
 PS_set_font(font)  /* Entry font added by DJL */
-    const char *font;
+const char *font;
 {
     char name[32];
     int  i,size;
     size_t sep;
 
+    if (!font || !(*font))
+	font = PS_default_font;
     sep = strcspn(font,",");
     strncpy(name,font,sep);
     name[sep] = NUL;

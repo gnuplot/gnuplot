@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.43 2002/07/24 14:16:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.44 2002/07/26 16:42:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -177,14 +177,6 @@ static TBOOLEAN term_force_init = FALSE;
 
 /* internal pointsize for do_point */
 static double term_pointsize=1;
-
-/* Terminal's default font name */
-/* HBB 20010806: Moved here, from graphics.[ch] where it wasn't used
- * any longer */
-/* FIXME HBB 20010806: this shouldn't be needed. Instead, a call of
- * term->set_font(NULL,0) should reset the font to its default. This
- * would avoid having to know it, outside the driver itself. */
-static char default_font[MAX_ID_LEN + 1] = "";
 
 /* Internal prototypes: */
 
@@ -713,8 +705,9 @@ write_multiline(x, y, text, hor, vert, angle, font)
 	text = p + 1;
     }				/* unconditional branch back to the for(;;) - just a goto ! */
 
+    /* EAM 29-Aug2002 - tell driver to use default font (no longer a global default) */
     if (font && *font)
-	(*t->set_font) (default_font);
+	(*t->set_font) ("");
 
 }
 
