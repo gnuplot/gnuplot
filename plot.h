@@ -104,7 +104,7 @@
 # define OS "OS/2 "
 # define HOME  "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
-# define SHELL "c:\\cmd.exe"
+# define SHELL "c:\\os2\\cmd.exe"
 # define DIRSEP1 '\\'
 #endif /* OS/2 */
 
