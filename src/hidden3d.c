@@ -944,6 +944,9 @@ int pcount;
 	    npoly += 2 * (ncrv - 1) * (this_plot->iso_crvs->p_count - 1);
 	    break;
 	case DOTS:
+	case XERRORLINES:	/* handle as POINTSTYLE */
+	case YERRORLINES:
+	case XYERRORLINES:
 	case XERRORBARS:	/* handle as POINTSTYLE */
 	case YERRORBARS:
 	case XYERRORBARS:
@@ -976,6 +979,9 @@ int pcount;
 	case LINESPOINTS:
 	case BOXERROR:		/* handle as POINTSTYLE */
 	case BOXXYERROR:
+	case XERRORLINES:
+	case YERRORLINES:
+	case XYERRORLINES:
 	case XERRORBARS:
 	case YERRORBARS:
 	case XYERRORBARS:
@@ -1241,6 +1247,9 @@ int pcount;
 		    break;
 		case BOXERROR:	/* handle as POINTSTYLE */
 		case BOXXYERROR:
+		case XERRORLINES:	/* handle as POINTSTYLE */
+		case YERRORLINES:
+		case XYERRORLINES:
 		case XERRORBARS:	/* handle as POINTSTYLE */
 		case YERRORBARS:
 		case XYERRORBARS:

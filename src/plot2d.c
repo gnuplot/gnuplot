@@ -295,6 +295,7 @@ struct curve_points *this_plot;
     /* eval_plots has already opened file */
 
     switch (this_plot->plot_style) {	/* set maximum columns to scan */
+    case XYERRORLINES:
     case XYERRORBARS:
     case BOXXYERROR:
 	col = 7;
@@ -306,6 +307,8 @@ struct curve_points *this_plot;
 	col = 5;
 	break;
 
+    case XERRORLINES:
+    case YERRORLINES:
     case XERRORBARS:
     case YERRORBARS:
     case VECTOR:
@@ -407,12 +410,14 @@ struct curve_points *this_plot;
 		    this_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
+		case YERRORLINES:
 		case YERRORBARS:
 		case BOXERROR:	/* x, y, dy */
 		    store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1] - v[2], v[1] + v[2],
 				  -1.0);	/* auto width if boxes, else ignored */
 		    break;
 
+		case XERRORLINES:
 		case XERRORBARS:
 		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2], v[0] + v[2], v[1], v[1], 0.0);
 		    break;
@@ -444,11 +449,13 @@ struct curve_points *this_plot;
 		this_plot->plot_style = YERRORBARS;
 		/* fall through */
 
+	    case YERRORLINES:
 	    case YERRORBARS:
 		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2], v[3], -1.0);
 		break;
 
 	    case BOXXYERROR:	/* x, y, dx, dy */
+	    case XYERRORLINES:
 	    case XYERRORBARS:
 		store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2], v[0] + v[2], v[1] - v[3], v[1] + v[3], 0.0);
 		break;
@@ -458,6 +465,7 @@ struct curve_points *this_plot;
 		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
 		break;
 
+	    case XERRORLINES:
 	    case XERRORBARS:
 		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
 		break;
@@ -506,6 +514,7 @@ struct curve_points *this_plot;
 		int_warn("This plot style not work with 6 cols. Setting to xyerrorbars", storetoken);
 		this_plot->plot_style = XYERRORBARS;
 		/*fall through */
+	    case XYERRORLINES:
 	    case XYERRORBARS:
 	    case BOXXYERROR:
 		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[4], v[5], 0.0);
@@ -634,7 +643,8 @@ static char *plot_style_names[14] =
 {
     "Lines", "Points", "Impulses", "LinesPoints", "Dots", "XErrorbars",
  "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
-    "FSteps", "Vector"
+    "FSteps", "Vector",
+ "XErrorlines", "YErrorlines", "XYErrorlines"
 };
 static char *plot_smooth_names[5] =
 {

@@ -750,6 +750,15 @@ set data style ",
     case DOTS:
 	fputs("dots\n", fp);
 	break;
+    case YERRORLINES:
+	fputs("yerrorlines\n", fp);
+	break;
+    case XERRORLINES:
+	fputs("xerrorlines\n", fp);
+	break;
+    case XYERRORLINES:
+	fputs("xyerrorlines\n", fp);
+	break;
     case YERRORBARS:
 	fputs("yerrorbars\n", fp);
 	break;
@@ -803,6 +812,15 @@ set data style ",
 	break;
     case DOTS:
 	fputs("dots\n", fp);
+	break;
+    case YERRORLINES:
+	fputs("yerrorlines\n", fp);
+	break;
+    case XERRORLINES:
+	fputs("xerrorlines\n", fp);
+	break;
+    case XYERRORLINES:
+	fputs("xyerrorlines\n", fp);
 	break;
     case YERRORBARS:
 	fputs("yerrorbars\n", fp);

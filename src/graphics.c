@@ -1888,6 +1888,30 @@ int pcount;			/* count of plots in linked list */
 	    plot_dots(this_plot);
 	    break;
 	    /*}}} */
+
+	    /*{{{  YERRORLINES */
+	case YERRORLINES:{
+		plot_lines(this_plot);
+		plot_bars(this_plot);
+		plot_points(this_plot);
+		break;
+	    }
+	    /*}}} */
+	    /*{{{  XERRORLINES */
+	case XERRORLINES:{
+		plot_lines(this_plot);
+		plot_bars(this_plot);
+		plot_points(this_plot);
+	    }
+	    /*}}} */
+	    /*{{{  XYERRORLINES */
+	case XYERRORLINES:
+	    plot_lines(this_plot);
+	    plot_bars(this_plot);
+	    plot_points(this_plot);
+	    break;
+	    /*}}} */
+
 	    /*{{{  YERRORBARS */
 	case YERRORBARS:{
 		plot_bars(this_plot);
@@ -2423,8 +2447,11 @@ struct curve_points *plot;
 
 /* Limitation: no boxes with x errorbars */
 
-    if ((plot->plot_style == YERRORBARS) || (plot->plot_style == XYERRORBARS) ||
-	(plot->plot_style == BOXERROR)) {
+    if ((plot->plot_style == YERRORBARS) || 
+				(plot->plot_style == XYERRORBARS) || 
+				(plot->plot_style == BOXERROR) ||
+				(plot->plot_style == YERRORLINES) || 
+				(plot->plot_style == XYERRORLINES)) {
 /* Draw the vertical part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
@@ -2565,8 +2592,11 @@ struct curve_points *plot;
 		}
 	    }			/* HBB 981130: see above */
 	}			/* for loop */
-    }				/* if yerrorbars OR xyerrorbars */
-    if ((plot->plot_style == XERRORBARS) || (plot->plot_style == XYERRORBARS)) {
+    }				/* if yerrorbars OR xyerrorbars OR yerrorlines OR xyerrorlines */
+    if ((plot->plot_style == XERRORBARS)  || 
+				(plot->plot_style == XYERRORBARS) ||
+				(plot->plot_style == XERRORLINES) ||
+				(plot->plot_style == XYERRORLINES)) {
 
 /* Draw the horizontal part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
@@ -2617,7 +2647,7 @@ struct curve_points *plot;
 		(*t->vector) (xhighM, (unsigned int) (yM + bar_size * tic));
 	    }
 	}			/* for loop */
-    }				/* if xerrorbars OR xyerrorbars */
+    }				/* if xerrorbars OR xyerrorbars OR xerrorlines OR xyerrorlines */
 }
 
 /* plot_boxes:

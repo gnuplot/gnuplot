@@ -671,6 +671,17 @@ enum PLOT_STYLE style;
     case DOTS:
 	fputs("dots\n", stderr);
 	break;
+
+    case YERRORLINES:
+	fputs("yerrorlines\n", stderr);
+	break;
+    case XERRORLINES:
+	fputs("xerrorlines\n", stderr);
+	break;
+    case XYERRORLINES:
+	fputs("xyerrorlines\n", stderr);
+	break;
+
     case YERRORBARS:
 	fputs("yerrorbars\n", stderr);
 	break;
