@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.36 2001/06/28 09:58:40 amai Exp $
+ * $Id: x11.trm,v 1.37 2001/09/08 01:07:03 mikulik Exp $
  *
  */
 
@@ -1009,8 +1009,8 @@ TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
 	fprintf(stderr,
 	    "YOUR HOMEWORK: CANNOT PASS SO MUCH POLYGON POINTS THROUGH X11_IPC. "
 	    "YOU ARE WELCOME TO PROVIDE A PATCH. THE BEST WOULD BE A "
-	    "BINARY PROTOCOL FOR X11 TERMINAL, SIMILARLY TO THE OS/2
-	    "pm.trm.\n".);
+	    "BINARY PROTOCOL FOR X11 TERMINAL, SIMILARLY TO THE OS/2 "
+	    "pm.trm.\n");
 	/* OTHER HINT: send the polygon data in chunks of X11_buffer_size until
 	   all data are sent; but the PM_filled_polygon() is the best solution
 	   anyway.
