@@ -364,6 +364,9 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 
+# Empty target
+check:
+
 clean:
 	-rm -f gnuplot gnuplot_x11 bf_test *.o core *~
 	-rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
