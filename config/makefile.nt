@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.1 1999/03/26 21:32:36 lhecking Exp $
+# $Id: makefile.nt,v 1.2 2000/11/10 14:18:03 broeker Exp $
 #
 # GNUPLOT Makefile to compile gnuplot for WinNT and Win95/98
 #
@@ -24,7 +24,7 @@ TOP = .
 
 CC = cl /c
 LD = link
-CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /DPM3D /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DHAVE_SYS_STAT_H
+CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /DPM3D /DUSE_MOUSE /DWIN_IPC /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=\"$(HELPFILE)\" /DGP_INLINE=__inline /DANSI_C /DHAVE_GETCWD /DHAVE_SYS_STAT_H
 !IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
 MACHINE = ALPHA
 !ELSEIF "$(PROCESSOR_ARCHITECTURE)" == "x86"
@@ -68,6 +68,8 @@ WINDOWS = makefile.win makefile.nt README.win win\wcommon.h \
 linkopt1.msw: makefile.nt
 	copy gnuplot.opt linkopt1.msw
 	echo winmain >> linkopt1.msw
+	echo mouse >> linkopt1.msw
+	echo gpexecute >> linkopt1.msw
 	echo readline >> linkopt1.msw
 	echo wgnuplib >> linkopt1.msw
 	echo wtext >> linkopt1.msw

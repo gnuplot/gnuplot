@@ -1,3 +1,9 @@
+2001-05-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.nt: add "mouse" and "gpexecute" to the linker
+	response file, too, and add #define options for USE_MOUSE and
+	WIN_IPC. Thanks to Theo Hopman for noticing these.
+
 2001-04-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot3d.c (splines_kernel): Prototype moved up to where the
