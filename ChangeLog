@@ -1,3 +1,73 @@
+2000-02-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/pc.trm: Small change in the help section.
+
+2000-02-10  Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>
+
+	* term/pslatex.trm: Fix segfault.
+
+2000-02-10  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* INSTALL: Add instructions for using the new VMS configure script.
+
+	* configure.vms: A configure script for VMS. It replaces
+	config/buildvms.com, config/make_vms.com, config/makefile.vms,
+	src/genopt.com, src/gnuplot.opt, src/linkopt.vms and src/x11.opt,
+	but we leaves these files alone for the time being for backwards
+	compatibility.
+
+2000-02-06  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
+
+	* term/post.trm: Some programs complain about "Symbol-Oblique".
+	Use "Symbol" instead, because "Symbol-Oblique" is really just a
+	transformed "Symbol" font.
+
+2000-02-04  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
+
+	* term/post.trm: Provides an oblique symbol font, e.g.
+	set xlabel 'b' "Symbol-Oblique" gives an oblique (slanted) beta
+	character.
+
+2000-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	Start tracking the CVS set up by Johannes Zellner to add
+	mouse support for X11 and OS/2 PM. Implemented by Pieter-Tjerk de
+	Boer <ptdeboer@cs.utwente.nl>, Petr Mikulik <mikulik@physics.muni.cz>,
+	Johannes Zellner <johannes@zellner.org>.
+
+	* ANNOUNCE-MOUSE, gpconf, gpconf, gpconfopt, src/gpexecute.inc,
+	src/ipc.h, src/mouse.c, src/mouse.h, src/mousecmn.h: New files.
+
+	* configure.in: Updated for mouse support.
+
+	* config/makefile.os2: Updated for mouse support.
+
+	* docs/gnuplot.doc: Add documentation for mouse support and new
+	commands.
+
+	* src/Makefile.am, src/makefile.all: Add new source files.
+
+	* src/command.c, src/command.h, src/gplt_x11.c, src/graph3d.c,
+	src/graph3d.h, src/graphics.c, src/graphics.h, src/history.c,
+	src/plot.h, src/plot3d.c, src/readline.c, src/term.c: Add mouse
+	support, some minor fixes.
+
+	* src/hidden3d.c: Remove unused variable.
+
+	* src/save.c, src/set.c, src/show.c, src/tables.c, src/tables.h,
+	src/unset.c: New commands "bind", "set historysize", "set mouse",
+	and "set label [no]pointstyle".
+	
+	* src/stdfn.c, src/stdfn.h: Add new gp_stricmp() function.
+
+	* src/util3d.c(draw_clip_line), src/util3d.h: Change args type from
+	unsigned to int.
+
+	* src/os2/dialogs.c, src/os2/dialogs.h, src/os2/gclient.c,
+	src/os2/gnupmdrv.ipf, src/os2/gnupmdrv.rc: Updated for mouse support.
+
+	* term/README, term/pm.trm, term/x11.trm: Updated for mouse support.
+
 2000-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* doc/makefile.ami, docs/makefile.dst: Remove duplicate RCS id's.

@@ -1,4 +1,13 @@
 Changes in release 4.0:
+[3.8c]
+* NEW mouse support for OS/2 and X11
+  - --enable-nouse option
+  - --with-X11-driver option
+  - new commands "bind", "set historysize", "set mouse",
+    and "set label [no]pointstyle".
+* NEW configure.vms script for VMS
+* NEW oblique symbol font for ps driver
+* FIXED segfault in pslatex driver
 [3.8b]
 * retain backwards compatibility for old syntax
 * ongoing work: modularisation
