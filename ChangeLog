@@ -1,6 +1,8 @@
 1999-12-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* docs/gnuplot/doc: Add help entry "aspect ratio" to "set size".
+	* docs/gnuplot.doc: Add help entry "aspect ratio" to "set size".
+
+	* docs/gnuplot.texi: Regenerated.
 
 	* src/hidden3d.c, src/set.c, src/unset.c, term/next.trm,
 	term/openstep.trm, term/post.trm: Rename symbolic constants for
