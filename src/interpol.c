@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.24 2001/08/09 15:03:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.25 2002/02/15 17:04:04 amai Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1029,6 +1029,9 @@ cp_implode(cp)
     while ((num_points = next_curve(cp, &first_point)) > 0) {
 	k = 0;
 	for (i = first_point; i < first_point + num_points; i++) {
+	    /* HBB 20020801: don't try to use undefined datapoints */
+	    if (cp->points[i].type == UNDEFINED)
+	        continue;
 	    if (!k) {
 		x = cp->points[i].x;
 		y = cp->points[i].y;
@@ -1065,22 +1068,37 @@ cp_implode(cp)
 		 * */
 		cp->points[j].type = INRANGE;
 		if (! all_inrange) {
-		    x = AXIS_DE_LOG_VALUE(x_axis, x);
-		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX)))
-			cp->points[j].type = OUTRANGE;
-		    else {
-			y = AXIS_DE_LOG_VALUE(y_axis, y);
-			if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
-			    || ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
+		    if (X_AXIS.log) {
+			if (x <= -VERYLARGE) {
 			    cp->points[j].type = OUTRANGE;
+			    goto is_outrange;
+			}
+			x = AXIS_UNDO_LOG(x_axis, x);
 		    }
-		}
+		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
+			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
+			cp->points[j].type = OUTRANGE;
+			goto is_outrange;
+		    } 
+		    if (Y_AXIS.log) {
+			if (y <= -VERYLARGE) {
+			    cp->points[j].type = OUTRANGE;
+			    goto is_outrange;
+			}
+			y = AXIS_UNDO_LOG(y_axis, y);
+		    }
+		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
+			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
+			cp->points[j].type = OUTRANGE;
+		is_outrange:
+		} /* if(! all inrange) */
+
 		j++;		/* next valid entry */
 		k = 0;		/* to read */
 		i--;		/* from this (-> last after for(;;)) entry */
-	    }
-	}
+	    } /* else (same x position) */
+	} /* for(points in curve) */
+
 	if (k) {
 	    cp->points[j].x = x;
 	    if ( cp->plot_smooth == SMOOTH_FREQUENCY )
@@ -1092,16 +1110,29 @@ cp_implode(cp)
 	    cp->points[j].ylow = sly / (double) k;
 	    cp->points[j].type = INRANGE;
 	    if (! all_inrange) {
-		x = AXIS_DE_LOG_VALUE(x_axis, x);
-		if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
-		    || ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX)))
-		    cp->points[j].type = OUTRANGE;
-		else {
-		    y = AXIS_DE_LOG_VALUE(y_axis, y);
+		    if (X_AXIS.log) {
+			if (x <= -VERYLARGE) {
+			    cp->points[j].type = OUTRANGE;
+			    goto is_outrange2;
+			}
+			x = AXIS_UNDO_LOG(x_axis, x);
+		    }
+		    if (((x < X_AXIS.min) && !(X_AXIS.autoscale & AUTOSCALE_MIN))
+			|| ((x > X_AXIS.max) && !(X_AXIS.autoscale & AUTOSCALE_MAX))) {
+			cp->points[j].type = OUTRANGE;
+			goto is_outrange2;
+		    } 
+		    if (Y_AXIS.log) {
+			if (y <= -VERYLARGE) {
+			    cp->points[j].type = OUTRANGE;
+			    goto is_outrange2;
+			}
+			y = AXIS_UNDO_LOG(y_axis, y);
+		    }
 		    if (((y < Y_AXIS.min) && !(Y_AXIS.autoscale & AUTOSCALE_MIN))
 			|| ((y > Y_AXIS.max) && !(Y_AXIS.autoscale & AUTOSCALE_MAX)))
 			cp->points[j].type = OUTRANGE;
-		}
+		is_outrange2:
 	    }
 	    j++;		/* next valid entry */
 	}
