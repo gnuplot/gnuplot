@@ -1,3 +1,6 @@
+2000-09-21  Petr Mikulik <mikulik@physics.muni.cz>
+	* src/graphics.c src/graph3d.c: bugfix "if ((*t->pointsize))"
+	changed to "if (t->pointsize)
 
 2000-09-20  Johannes Zellner <johannes@zellner.org>
 
