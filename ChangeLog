@@ -10,12 +10,14 @@
 
 	* NEWS: Updated.
 
-	* docs/gnuplot.doc: Section "New features" reformatted to 80 chars
-	width.
-
 	* README.1ST: Updated.
 
 	* BUGS: Updated.
+
+	* docs/gnuplot.doc: Section "New features" reformatted to 80 chars
+	width.
+
+	* docs/gpcard.tex: Updated.
 
 2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
