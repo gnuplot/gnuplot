@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.124 2002/08/16 08:11:36 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.126 2002/08/20 10:15:14 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2266,11 +2266,14 @@ C ... and restart the table:
  Each data point represents an (x,y) pair. For `plot`s with error bars or
  error bars with lines (see `set style errorbars` or `set style errorlines`),
  each data point is (x,y,ydelta), (x,y,ylow,yhigh),
- (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). In all
- cases, the numbers on each record of a data file must be separated by
- white space (one or more blanks or tabs), unless a format specifier is
- provided by the `using` option. This white space divides each record 
- into columns.
+ (x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). 
+ 
+ In all cases, the numbers of each record of a data file must be separated
+ by white space (one or more blanks or tabs) unless a format specifier is 
+ provided by the `using` option. This white space divides each record into 
+ columns. However, whitespace inside a pair of double quotes is ignored when
+ counting columns, so the following datafile line has three columns:
+       1.0 "second column" 3.0
 
  Data may be written in exponential format with the exponent preceded by the
  letter e, E, d, D, q, or Q.

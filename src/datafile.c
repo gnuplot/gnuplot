@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.41 2002/07/11 10:24:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.42 2002/07/23 19:45:01 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -336,6 +336,11 @@ df_tokenise(s)
 	/* have always skipped spaces at this point */
 	df_column[df_no_cols].position = s;
 
+	/* EAM - 19-Aug-2002 treat contents of a quoted string as single column */
+	if (*s == '"')
+	    df_column[df_no_cols].good = DF_MISSING;
+	else
+
 	if (check_missing(s))
 	    df_column[df_no_cols].good = DF_MISSING;
 	else {
@@ -427,6 +432,12 @@ df_tokenise(s)
 	}
 
 	++df_no_cols;
+
+	/* EAM - 19 Aug 2002 If we are in a quoted string, skip to end of quote */
+	if ((unsigned char) *s == '"') {
+	    do s++;  while (*s && (unsigned char) *s != '"');
+	}
+	
 	/*{{{  skip chars to end of column */
 	while ((!isspace((unsigned char) *s)) && (*s != '\0'))
 	    ++s;
