@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.78 2002/10/25 16:37:54 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.79 2002/12/02 10:55:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -3741,8 +3741,14 @@ xtick2d_callback(axis, place, text, grid)
 	(*t->move) (x, tic_mirror);
 	(*t->vector) (x, tic_mirror - ticsize);
     }
-    if (text)
-	write_multiline(x, tic_text, text, tic_hjust, tic_vjust, rotate_tics, NULL);
+    if (text) {
+        /* User-specified different color for the tics text */
+        if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+            apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	write_multiline(x, tic_text, text, tic_hjust, tic_vjust, rotate_tics, 
+			axis_array[axis].ticdef.font);
+	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
+    }
 }
 
 /* display a y-axis ticmark - called by gen_ticks */
@@ -3808,8 +3814,14 @@ ytick2d_callback(axis, place, text, grid)
 	(*t->move) (tic_mirror, y);
 	(*t->vector) (tic_mirror - ticsize, y);
     }
-    if (text)
-	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics, NULL);
+    if (text) {
+        /* User-specified different color for the tics text */
+        if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+            apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	write_multiline(tic_text, y, text, tic_hjust, tic_vjust, rotate_tics, 
+			axis_array[axis].ticdef.font);
+	term_apply_lp_properties(&border_lp);	/* reset to border linetype */
+    }
 }
 
 int

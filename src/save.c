@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.58 2002/11/26 18:50:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.59 2002/12/17 15:38:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -902,6 +902,12 @@ save_tics(fp, axis)
 	    break;
 	}
     }
+ 
+    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
+        fprintf(fp, " font \"%s\"", axis_array[axis].ticdef.font);
+    }
+    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
+        fprintf(fp, " textcolor lt %d", axis_array[axis].ticdef.textcolor.lt+1);    }
     putc('\n', fp);
 }
 

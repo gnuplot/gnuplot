@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.96 2002/11/26 18:50:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.97 2002/12/18 17:38:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2853,6 +2853,15 @@ AXIS_INDEX axis;
 	    int_error(NO_CARET, "unknown ticdef type in show_ticdef()");
 	    /* NOTREACHED */
 	}
+    }
+ 
+    if (axis_array[axis].ticdef.textcolor.type != TC_DEFAULT) {
+        fprintf(stderr,"\t  textcolor lt %d\n",
+            axis_array[axis].ticdef.textcolor.lt+1);
+    }
+ 
+    if (axis_array[axis].ticdef.font && *axis_array[axis].ticdef.font) {
+        fprintf(stderr,"\t  font \"%s\"\n", axis_array[axis].ticdef.font);
     }
 }
 

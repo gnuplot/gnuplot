@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.24 2002/09/11 15:31:44 broeker Exp $
+ * $Id: axis.h,v 1.25 2002/10/21 10:24:18 mikulik Exp $
  *
  */
 
@@ -102,6 +102,8 @@ typedef struct ticmark {
 /* Tic-mark labelling definition; see set xtics */
 typedef struct ticdef {
     t_ticseries_type type;	
+    char *font;
+    struct t_colorspec textcolor;
     union {
 	   struct ticmark *user;	/* for TIC_USER */
 	   struct {			/* for TIC_SERIES */
@@ -227,7 +229,7 @@ typedef struct axis {
     lp_style_type zeroaxis;	/* drawing style for zeroaxis, if any */
 } AXIS;
 
-#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, {NULL} }
+#define DEFAULT_AXIS_TICDEF {TIC_COMPUTED, NULL, {TC_DEFAULT, 0, 0}, {NULL} }
 #ifdef PM3D
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0, 0}
 #else

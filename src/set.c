@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.105 2002/12/13 14:11:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.106 2002/12/28 06:13:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3682,10 +3682,27 @@ set_tic_prop(axis)
 	    }
 	    axis_array[axis].ticdef.type = TIC_COMPUTED;
 	}
-	/* user spec. is last */ 
-	else if (!END_OF_COMMAND) {
+	else if (!END_OF_COMMAND && !almost_equals(c_token, "f$ont") && !equals(c_token,"tc") && 
+		 !almost_equals(c_token,"text$color")) {
 	    load_tics(axis);
 	}
+ 
+        if (almost_equals(c_token, "f$ont")) {
+            ++c_token;
+            /* Make sure they've specified a font */
+            if (equals(c_token,"tc") || almost_equals(c_token,"text$color") ||
+                END_OF_COMMAND || almost_equals(c_token, nocmd)) {
+                int_error(c_token,"expected font");
+            } else {
+                if (isstring(c_token)) {
+		    m_quote_capture(&(axis_array[axis].ticdef.font), c_token, c_token);
+                    c_token++;
+                }
+            }
+        }
+        if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+            parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
+        }
     }
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
 	axis_array[axis].ticmode = NO_TICS;
@@ -3749,7 +3766,6 @@ set_tic_prop(axis)
     }
     return (match);
 }
-
 
 /* process a 'set {x/y/z}label command */
 /* set {x/y/z}label {label_text} {x}{,y} */
@@ -4148,8 +4164,6 @@ AXIS_INDEX axis;
 	    c_token++;
 	    GET_NUM_OR_TIME(end, axis);
 	}
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "tic series is defined by [start,]increment[,end]");
 
 	if (start < end && incr <= 0)
 	    int_error(incr_token, "increment must be positive");

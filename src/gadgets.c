@@ -247,30 +247,35 @@ int x1, y1, x2, y2;
 
 /* And text clipping routine. */
 void
-clip_put_text(x, y, str)
+clip_put_text(x, y, str, font)
 unsigned int x, y;
 char *str;
+char *font;
 {
     register struct termentry *t = term;
 
     if (clip_point(x, y))
 	return;
 
+    if (font && *font)
+	(*t->set_font) (font);
+
     (*t->put_text) (x, y, str);
 }
 
 /* seems sensible to put the justification in here too..? */
 void
-clip_put_text_just(x, y, str, just, vert_just)
+clip_put_text_just(x, y, str, just, vert_just, font)
     unsigned int x, y;
     char *str;
     JUSTIFY just;
     VERT_JUSTIFY vert_just;
+    char *font;
 {
     if (clip_point(x, y))
 	return;
     
-    write_multiline(x, y, str, just, vert_just, 0, NULL);
+    write_multiline(x, y, str, just, vert_just, 0, font);
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.75 2002/11/01 20:14:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.76 2002/11/12 16:56:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2496,7 +2496,12 @@ xtick_callback(axis, place, text, grid)
 	    v2.y -= tic_unity * t->v_tic * ticscale;
 	}
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2, y2, text, just, JUST_TOP);
+        /* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	clip_put_text_just(x2, y2, text, just, JUST_TOP,
+			   axis_array[axis].ticdef.font);
+	term_apply_lp_properties(&border_lp);
     }
 
 #ifdef PM3D
@@ -2571,8 +2576,13 @@ ytick_callback(axis, place, text, grid)
 	    v2.x -= tic_unitx * (t->h_tic) * ticscale;
 	    v2.y -= tic_unity * (t->v_tic) * ticscale;
 	}
+        /* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
-	clip_put_text_just(x2, y2, text, just, JUST_TOP);
+	clip_put_text_just(x2, y2, text, just, JUST_TOP,
+			   axis_array[axis].ticdef.font);
+	term_apply_lp_properties(&border_lp);
     }
 
 #ifdef PM3D
@@ -2628,7 +2638,12 @@ ztick_callback(axis, place, text, grid)
 	x1 -= (term->h_tic) * 2;
 	if (!tic_in)
 	    x1 -= (term->h_tic) * ticscale;
-	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE);
+        /* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
+	clip_put_text_just(x1, y1, text, RIGHT, JUST_CENTRE, 
+			   axis_array[axis].ticdef.font);
+	term_apply_lp_properties(&border_lp);
     }
 
     if (Z_AXIS.ticmode & TICS_MIRROR) {
@@ -2773,14 +2788,14 @@ char *text;
     } else {
 	if ((*term->justify_text) (RIGHT)) {
 	    if (key == KEY_USER_PLACEMENT)
-		clip_put_text(xl + key_text_right, yl, text);
+		clip_put_text(xl + key_text_right, yl, text, NULL);
 	    else
 		(*term->put_text) (xl + key_text_right, yl, text);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * strlen(text);
 	    if (key == KEY_USER_PLACEMENT) {
 		if (i_inrange(x, xleft, xright))
-		    clip_put_text(x, yl, text);
+		    clip_put_text(x, yl, text, NULL);
 	    } else {
 		(*term->put_text) (x, yl, text);
 	    }

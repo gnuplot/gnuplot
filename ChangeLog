@@ -1,3 +1,9 @@
+2003-01-07  Mike Kay <Mike.Kay@noaa.gov>
+
+	* src/axis.h src/color.c src/gadgets.c src/gadgets.h src/graph3d.c
+	src/graphics.c src/save.c src/set.c src/show.c src/unset.c:
+	Allow user to specify textcolor and font for axis tick labels.
+
 2002-12-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Check for legal value of linetype in parse_colorspec().
@@ -1678,7 +1684,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/18 17:40:28 $).
+	last modification date (from the tag $Date: 2002/12/28 06:13:25 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

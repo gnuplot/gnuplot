@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.36 2002/08/27 19:33:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.37 2002/08/30 18:45:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -443,6 +443,9 @@ cbtick_callback(axis, place, text, grid)
 
     /* draw label */
     if (text) {
+	/* User-specified different color for the tics text */
+	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
+	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
 	if (color_box.rotation == 'h') {
 	    int y3 = cb_y_from - (term->v_char);
 	    if (len > 0) y3 -= len; /* add outer tics len */
@@ -452,7 +455,8 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(CENTRE);
 	    (*term->put_text)(x2, y3, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP);
+	    clip_put_text_just(x2, y3, text, CENTRE, JUST_TOP, 
+			       axis_array[axis].ticdef.font);
 #endif
 	} else {
 	    unsigned int x3 = cb_x_to + (term->h_char);
@@ -462,9 +466,11 @@ cbtick_callback(axis, place, text, grid)
 		term->justify_text(LEFT);
 	    (*term->put_text)(x3, y2, text);
 #else /* clipping does not work properly for text around 3d graph */
-	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE);
+	    clip_put_text_just(x3, y2, text, LEFT, JUST_CENTRE, 
+			       axis_array[axis].ticdef.font);
 #endif
 	}
+	term_apply_lp_properties(&border_lp);	/* border linetype */
     }
 
     /* draw tic on the mirror side */
