@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.12 1999/06/22 12:00:48 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.13 1999/07/09 21:05:35 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1211,7 +1211,7 @@ const char *fromfile;
 *****************************************************************/
 
 void
-do_fit()
+fit_command()
 {
     TBOOLEAN autorange_x = 3, autorange_y = 3;	/* yes */
     /* HBB 980401: new: z range specification */
@@ -1230,6 +1230,8 @@ do_fit()
     time_t timer;
     int token1, token2, token3;
     char *tmp;
+
+    c_token++;
 
     /* first look for a restricted x fit range... */
 

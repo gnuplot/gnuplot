@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.14 1999/07/09 21:03:47 lhecking Exp $
+ * $Id: protos.h,v 1.15 1999/07/13 19:53:19 lhecking Exp $
  *
  */
 
@@ -77,7 +77,7 @@ void init_fit __PROTO((void));
 void setvar __PROTO((char *varname, struct value data));
 int getivar __PROTO((const char *varname));
 void update __PROTO((char *pfile, char *npfile));
-void do_fit __PROTO((void));
+void fit_command __PROTO((void));
 size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
 
 
