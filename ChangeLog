@@ -1,3 +1,10 @@
+2004-07-31  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm (PS_common_init PS_put_text ENHPS_put_text):
+	Check for black text only option in the PostScript code itself, 
+	rather than at the time the plot is generated. This allows you to
+	change your mind later by editing one line in the PostScript file.
+
 2004-07-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/show.c (show_key): Fix memory leak by making the variable in
