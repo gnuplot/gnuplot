@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.8 1999/06/19 20:52:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.9 1999/07/09 21:04:51 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -51,6 +51,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.8 1999/06/19 20:52:05 l
 
 #include "plot.h"
 #include "setshow.h"
+#include "tables.h"
 
 /* TODO (HBB's notes, just in case you're interested):
  * + fix all the problems I annotated by a 'FIXME' comment
@@ -485,75 +486,64 @@ void
 set_hidden3doptions()
 {
     struct value t;
+    int tmp;
 
-    c_token++;
-
-    if (END_OF_COMMAND) {
-	return;
-    }
-    if (almost_equals(c_token, "def$aults")) {
-	/* reset all parameters to defaults */
-	hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
-	hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
-	hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
-	hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
-	hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
+    while (!END_OF_COMMAND) {
+	switch(lookup_table(&set_hidden3d_tbl[0],c_token)) {
+	case H_DEFAULTS:
+	    /* reset all parameters to defaults */
+	    hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
+	    hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
+	    hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
+	    hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
+	    hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
+	    if (!END_OF_COMMAND)
+		int_error(c_token,
+			  "No further options allowed after 'defaults'");
+	    return;
+	    break;
+	case H_OFFSET:
+	    c_token++;
+	    hiddenBacksideLinetypeOffset = (int) real(const_express(&t));
+	    c_token--;
+	    break;
+	case H_NOOFFSET:
+	    hiddenBacksideLinetypeOffset = 0;
+	    break;
+	case H_TRIANGLEPATTERN:
+	    c_token++;
+	    hiddenTriangleLinesdrawnPattern = (int) real(const_express(&t));
+	    c_token--;
+	    break;
+	case H_UNDEFINED:
+	    c_token++;
+	    tmp = (int) real(const_express(&t));
+	    if (tmp <= 0 || tmp > UNHANDLED)
+		tmp = UNHANDLED;
+	    hiddenHandleUndefinedPoints = tmp;
+	    c_token--;
+	    break;
+	case H_NOUNDEFINED:
+	    hiddenHandleUndefinedPoints = UNHANDLED;
+	    break;
+	case H_ALTDIAGONAL:
+	    hiddenShowAlternativeDiagonal = 1;
+	    break;
+	case H_NOALTDIAGONAL:
+	    hiddenShowAlternativeDiagonal = 0;
+	    break;
+	case H_BENTOVER:
+	    hiddenHandleBentoverQuadrangles = 1;
+	    break;
+	case H_NOBENTOVER:
+	    hiddenHandleBentoverQuadrangles = 0;
+	    break;
+	case H_INVALID:
+	    int_error(c_token, "No such option to hidden3d (or wrong order)");
+	default:
+	    break;
+	}
 	c_token++;
-	if (!END_OF_COMMAND)
-	    int_error(c_token, "No further options allowed after 'defaults'");
-	return;
-    }
-    if (almost_equals(c_token, "off$set")) {
-	c_token++;
-	hiddenBacksideLinetypeOffset = (int) real(const_express(&t));
-    } else if (almost_equals(c_token, "nooff$set")) {
-	c_token++;
-	hiddenBacksideLinetypeOffset = 0;
-    }
-    if (END_OF_COMMAND) {
-	return;
-    }
-    if (almost_equals(c_token, "tri$anglepattern")) {
-	c_token++;
-	hiddenTriangleLinesdrawnPattern = (int) real(const_express(&t));
-    }
-    if (END_OF_COMMAND) {
-	return;
-    }
-    if (almost_equals(c_token, "undef$ined")) {
-	int tmp;
-
-	c_token++;
-	tmp = (int) real(const_express(&t));
-	if (tmp <= 0 || tmp > UNHANDLED)
-	    tmp = UNHANDLED;
-	hiddenHandleUndefinedPoints = tmp;
-    } else if (almost_equals(c_token, "nound$efined")) {
-	c_token++;
-	hiddenHandleUndefinedPoints = UNHANDLED;
-    }
-    if (END_OF_COMMAND) {
-	return;
-    }
-    if (almost_equals(c_token, "alt$diagonal")) {
-	c_token++;
-	hiddenShowAlternativeDiagonal = 1;
-    } else if (almost_equals(c_token, "noalt$diagonal")) {
-	c_token++;
-	hiddenShowAlternativeDiagonal = 0;
-    }
-    if (END_OF_COMMAND) {
-	return;
-    }
-    if (almost_equals(c_token, "bent$over")) {
-	c_token++;
-	hiddenHandleBentoverQuadrangles = 1;
-    } else if (almost_equals(c_token, "nobent$over")) {
-	c_token++;
-	hiddenHandleBentoverQuadrangles = 0;
-    }
-    if (!END_OF_COMMAND) {
-	int_error(c_token, "No such option to hidden3d (or wrong order)");
     }
 }
 
