@@ -1,0 +1,68 @@
+/*
+ * $Id: datafile.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $
+ */
+
+/* GNUPLOT - datafile.h */
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+#ifndef GNUPLOT_DATAFILE_H
+# define GNUPLOT_DATAFILE_H
+
+/* public variables client might access */
+
+/* how many using columns were specified */
+extern int df_no_use_specs;
+extern int df_line_number;
+/* suggested x value if none given */
+extern int df_datum;
+/* is this a matrix splot */
+extern TBOOLEAN df_matrix;
+extern int df_eof;
+extern int df_timecol[];
+/* this is a binary file */
+extern TBOOLEAN df_binary;
+
+#ifndef MAXINT			/* should there be one already defined ? */
+# ifdef INT_MAX			/* in limits.h ? */
+#  define MAXINT INT_MAX
+# else
+#  define MAXINT ((~0)>>1)
+# endif
+#endif
+
+int df_open __PROTO((int));
+int df_readline __PROTO((double [], int));
+void df_close __PROTO((void));
+int df_2dbinary __PROTO((struct curve_points *));
+int df_3dmatrix __PROTO((struct surface_points *));
+
+#endif /* GNUPLOT_DATAFILE_H */
