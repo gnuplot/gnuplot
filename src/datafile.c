@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.27 2001/09/05 02:01:49 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.28 2001/09/16 17:01:14 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1353,16 +1353,21 @@ f_column(arg)
 
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
-    column = (int) real(&a) - 1;
+    column = (int) real(&a);
     if (column == -2)
+	push(Ginteger(&a, df_current_index));
+    else if (column == -1)
 	push(Ginteger(&a, line_count));
-    else if (column == -1)	/* $0 = df_datum */
+    else if (column == 0)	/* $0 = df_datum */
 	push(Gcomplex(&a, (double) df_datum, 0.0));
-    else if (column < 0 || column >= df_no_cols || df_column[column].good != DF_GOOD) {
+    else if (column < 1
+	     || column > df_no_cols
+	     || df_column[column - 1].good != DF_GOOD
+	     ) {
 	undefined = TRUE;
 	push(&a);		/* any objection to this ? */
     } else
-	push(Gcomplex(&a, df_column[column].datum, 0.0));
+	push(Gcomplex(&a, df_column[column - 1].datum, 0.0));
 }
 
 /*}}} */
