@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.238 2004/09/09 12:13:04 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.239 2004/09/15 11:13:03 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8414,14 +8414,14 @@ C ... and restart the table:
  the plot.  `set title` is a special case of `set label`.
 
  Syntax:
-       set title {"<title-text>"} {<xoff>}{,<yoff>} {"<font>{,<size>}"}
+       set title {"<title-text>"} {offset <xoff>}{,<yoff>} {"<font>{,<size>}"}
                  {{textcolor | tc} {lt <line_type> | default}}
        show title
 
  Specifying constants <xoff> or <yoff> as optional offsets for the title will
  move the title <xoff> or <yoff> character screen coordinates (not graph
- coordinates).  For example, "`set title ,-1`" will change only the y offset
- of the title, moving the title down by roughly the height of one character.
+ coordinates).  For example, "`set title offset ,-1`" will change only the y 
+ offset of the title, moving it down by roughly the height of one character.
 
  <font> is used to specify the font with which the title is to be written;
  the units of the font <size> depend upon which terminal is used.
@@ -8660,7 +8660,7 @@ C ... and restart the table:
  on the other axes.
 
  Syntax:
-       set xlabel {"<label>"} {<xoff>}{,<yoff>} {font "<font>{,<size>}"}
+       set xlabel {"<label>"} {offset <xoff>}{,<yoff>} {font "<font>{,<size>}"}
                   {{textcolor | tc} {lt <line_type> | default}}
        show xlabel
 
@@ -8669,8 +8669,8 @@ C ... and restart the table:
 
  Specifying the constants <xoff> or <yoff> as optional offsets for a label
  will move it <xoff> or <yoff> character widths or heights.  For example,
- "` set xlabel -1`" will change only the x offset of the xlabel, moving the
- label roughly one character width to the left.   The size of a character
+ "` set xlabel offset -1`" will change only the x offset of the xlabel, moving
+ the label roughly one character width to the left.   The size of a character
  depends on both the font and the terminal.
 
  <font> is used to specify the font in which the label is written; the units

@@ -1,11 +1,11 @@
 #
-# $Id: surface1.dem,v 1.9 2001/12/09 19:03:29 lhecking Exp $
+# $Id: surface1.dem,v 1.10 2003/10/28 05:35:54 sfeam Exp $
 #
 set samples 21
 set isosample 11
-set xlabel "X axis" -3,-2
-set ylabel "Y axis" 3,-2
-set zlabel "Z axis" -5
+set xlabel "X axis" offset -3,-2
+set ylabel "Y axis" offset 3,-2
+set zlabel "Z axis" offset -5
 set title "3D gnuplot demo"
 set label 1 "This is the surface boundary" at -10,-5,150 center
 set arrow 1 from -10,-5,120 to -10,0,0 nohead
@@ -183,8 +183,8 @@ set ylabel "group index"
 splot "glass.dat" using 1, "glass.dat" using 2, "glass.dat" using 3
 pause -1 "Hit return to continue (21)"
 set title "splot of part of a data file"
-set xlabel "X axis" -3,-2
-set ylabel "Y axis" 3,-2
+set xlabel "X axis" offset -3,-2
+set ylabel "Y axis" offset 3,-2
 set hidden3d
 splot 'glass.dat' every 2::0::12 with lines
 pause -1 "Hit return to continue (22)"

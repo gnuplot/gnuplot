@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.149 2004/09/12 01:12:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.150 2004/09/15 11:13:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3312,6 +3312,10 @@ set_timestamp()
 	    timelabel_rotate = FALSE;
 	    ++c_token;
 	}
+	/* The "offset" keyword is new (v4.1), for backward compatibility we don't enforce it */
+	if (almost_equals(c_token,"off$set")) {
+	     ++c_token;
+	}
 	/* We have x,y offsets specified */
 	if (!END_OF_COMMAND && !equals(c_token,","))
 	    timelabel.xoffset = real(const_express(&a));
@@ -3661,7 +3665,7 @@ set_tic_prop(AXIS_INDEX axis)
 }
 
 /* process a 'set {x/y/z}label command */
-/* set {x/y/z}label {label_text} {x}{,y} {<fontspec>} {<textcolor>} */
+/* set {x/y/z}label {label_text} {offset {x}{,y}} {<fontspec>} {<textcolor>} */
 static void
 set_xyzlabel(label_struct *label)
 {
@@ -3704,6 +3708,11 @@ set_xyzlabel(label_struct *label)
 	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
 	    parse_colorspec( &(label->textcolor), TC_LT );
 	    continue;
+	}
+
+	if (almost_equals(c_token,"off$set")) {
+	    c_token++;
+	/* You didn't used to have to say "offset" before giving the values */
 	}
 
 	if (!isstring(c_token) && !got_offsets) {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.84 2004/08/14 03:12:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.85 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -674,7 +674,7 @@ set ticscale %g %g\n",
 
 #define SAVE_AXISLABEL_OR_TITLE(name,suffix,lab)		\
     {								\
-	fprintf(fp, "set %s%s \"%s\" %f,%f ",			\
+	fprintf(fp, "set %s%s \"%s\" offset %f,%f ",		\
 		name, suffix, conv_text(lab.text),		\
 		lab.xoffset, lab.yoffset);			\
 	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
@@ -685,7 +685,7 @@ set ticscale %g %g\n",
     SAVE_AXISLABEL_OR_TITLE("", "title", title);
 
     /* FIXME */
-    fprintf(fp, "set %s \"%s\" %s %srotate %f,%f ",
+    fprintf(fp, "set %s \"%s\" %s %srotate offset %f,%f ",
 	    "timestamp", conv_text(timelabel.text),
 	    (timelabel_bottom ? "bottom" : "top"),
 	    (timelabel_rotate ? "" : "no"),

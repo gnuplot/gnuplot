@@ -1,10 +1,21 @@
+2004-09-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_timestamp set_xyzlabel) src/save.c (save_set_all)
+	demo/contours.dem demo/surface1.dem docs/gnuplot.doc:
+	Add keyword "offset" to commands of the form
+	    old: set xlabel "foo" -1,-1
+	    new: set xlabel "foo" offset -1,-1
+	This is necessary to pave the way for string variables, as otherwise
+	"set title var -1" is mis-parsed as containing the arithmetic expression
+	(var-1). To maintain backward compatability, the keyword is optional.
+
 2004-09-16  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm (delete_ps_fontfile): Remove debugging printout line.
 
 2004-09-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* plot3d.c (get_3ddata) graphics.c (boundary) x11.trm:
+	* src/plot3d.c (get_3ddata) src/graphics.c (boundary) term/x11.trm:
 	Add #ifdefs so that ./configure --disable-pm3d will build successfully.
 
 	* term/fig.trm term/epslatex.trm term/pslatex.trm term/metapost.trm
