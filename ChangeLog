@@ -1,3 +1,20 @@
+1998-04-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Minor fixes.
+
+	* fit.c, fit.h, matrix.c, matrix.h: Re-import versions from beta 343.
+	Suggested by HBB.
+
+1998-04-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure, configure.in: Don't use sudo.
+
+	* graph3d.c: Fix range bug in splot. By HBB.
+
+1998-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Imported beta 344.
+
 1998-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* set.c: Don't include math.h, but stdfn.h.
