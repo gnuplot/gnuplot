@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.19 1999/07/13 19:55:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.20 1999/07/18 17:40:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -172,6 +172,7 @@ static struct cmd_entry {
     { "ex$it", CMD_EXIT },
     { "fit", CMD_FIT },
     { "h$elp", CMD_HELP },
+    { "hi$story", CMD_HISTORY },
     { "if", CMD_IF },
     { "l$oad", CMD_LOAD },
     { "pa$use", CMD_PAUSE },
@@ -183,7 +184,6 @@ static struct cmd_entry {
     { "re$read", CMD_REREAD },
     { "res$et", CMD_RESET },
     { "sa$ve", CMD_SAVE },
-    { "scr$eendump", CMD_SCREENDUMP },
     { "scr$eendump", CMD_SCREENDUMP },
     { "se$t", CMD_SET },
     { "she$ll", CMD_SHELL },
@@ -576,7 +576,7 @@ command()
 
 	    break;
 	case CMD_REPLOT:
-	    if (replot_line[0] == NUL)
+	    if (!*replot_line)
 		int_error(c_token, "no previous plot");
 	    c_token++;
 	    SET_CURSOR_WAIT;
@@ -718,6 +718,8 @@ command()
 		c_token++;
 	    }
 	    break;
+	case CMD_HISTORY:
+	    int_error(c_token, "Command not yet implemented");
 	case CMD_EXIT:
 	case CMD_QUIT:
 	    /* graphics will be tidied up in main */
@@ -725,7 +727,7 @@ command()
 	    break;
 	case CMD_SYSTEM:
 	    if (!isstring(++c_token))
-		int_error("expecting command", c_token);
+		int_error(c_token, "expecting command");
 	    else {
 		char *e = input_line + token[c_token].start_index + token[c_token].length - 1;
 		char c = *e;
@@ -741,7 +743,6 @@ command()
 	    if (sv_file) {
 		GP_GETCWD(sv_file, PATH_MAX);
 		fprintf(stderr, "%s\n", sv_file);
-		free(sv_file);
 		sv_file = NULL;
 	    }
 	    c_token++;
@@ -767,8 +768,7 @@ command()
 	}
     } /* else if(is_definition) */
 
-    if (sv_file)
-	free(sv_file);
+    free(sv_file);
 
     return (0);
 }
@@ -784,7 +784,7 @@ int token;
     if (equals(token, "?"))
 	return CMD_HELP;
 
-    /* null statement */
+    /* null command */
     if (equals(token, ";"))
 	return CMD_NULL;
 
