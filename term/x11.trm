@@ -335,9 +335,8 @@ static void X11_atexit HANDLER_DECL
 #include <descrip.h>
 #include <dvidef.h>
 
-#include <lib$routines.h>
-
 #ifdef __DECC
+#include <lib$routines.h>
 #include <starlet.h>
 #endif 
 
@@ -348,6 +347,8 @@ int vaxc$errno;
 #endif
 
 #define SS$_NORMAL 1        /* or include <ssdef.h> for all SS$_ def's */
+
+#define MBXMXMSG 128        /* DEFMBXMXMSG is set by SYSGEN */
 
 static short X11_channel;
 
@@ -393,7 +394,7 @@ struct  {
 		its STDIN.  Use an unnamed mailbox and refer to it by its device
                 number */
 
-		vaxc$errno = sys$crembx(0,&X11_channel,128,128,0,0,0,0);
+		vaxc$errno = sys$crembx(0,&X11_channel,MBXMXMSG,MBXMXMSG,0,0,0,0);
 		if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
 		   printf("SYS$CreMbx failed with status=%d\r\n", vaxc$errno);
 		   os_error("sys$crembx failed",NO_CARET);
@@ -437,6 +438,12 @@ struct  {
 { \
    char buffer[512]; int status; struct iosb iosb;\
    sprintf x; \
+   if (strlen(buffer) >= MBXMXMSG )  { \
+     printf("buffer contents (%d char) catenated to mailbox size (%d bytes)\n", \
+     strlen(buffer), MBXMXMSG); \
+     buffer[MBXMXMSG-1] = '\0';\
+     printf("%s\n", buffer); \
+   } \
    status = sys$qiow(0, X11_channel, IO$_WRITEVBLK, &iosb, 0, 0, buffer, strlen(buffer), 0, 0, 0, 0); \
    if ((status & SS$_NORMAL) == SS$_NORMAL) status = iosb.stat; \
    if((status & SS$_NORMAL) != SS$_NORMAL) exit(status); \
