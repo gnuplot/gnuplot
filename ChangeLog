@@ -1,3 +1,11 @@
+2001-08-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/term.c (list_terms): Sort terminals by name before
+ 	displaying. Code by Ulrich Gruenebaum, modified and cleaned up by
+ 	me
+	(termcomp): New function. Comparison function for qsort() to be
+ 	used by list_terms.
+
 2001-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Some bits extracted from a patchset by Ulrich Gruenebaum
