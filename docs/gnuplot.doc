@@ -32,8 +32,8 @@ C
 ^<li>  Johannes Zellner
 ^</h3></ul> <p>
 ^<h2>  Copyright (C) 1986 - 1993, 1998 - 2002   Thomas Williams, Colin Kelley<p>
-^   Mailing list for comments: info-gnuplot@dartmouth.edu <p>
-^   Mailing list for bug reports: bug-gnuplot@dartmouth.edu<p>
+^   Mailing list for comments: gnuplot-info@lists.sourceforge.net <p>
+^   Mailing list for bug reports: gnuplot-bugs@lists.sourceforge.net <p>
 ^</h2><p>
 ^<h3> This manual was prepared by Dick Crawford</h3><p>
 ^<h3> Last revised: 28 July 2003</h3><p>
@@ -148,22 +148,22 @@ C
        comp.graphics.apps.gnuplot
  is identical to the mailing list (they both carry the same set of messages).
  We prefer that you read the messages through the newsgroup rather than
- subscribing to the mailing list.  Administrative requests should be sent to
-       majordomo@dartmouth.edu
- Send a message with the body (not the subject) consisting of the single word
- "help" (without the quotes) for more details.
+ subscribing to the mailing list.  Instructions for subscribing to gnuplot
+ mailing lists may be found via the gnuplot development website on SourceForge
+^ <a href="http://gnuplot.sourceforge.net">
+           http://gnuplot.sourceforge.net
+^ </a>
 
  The address for mailing to list members is:
-       info-gnuplot@dartmouth.edu
+       gnuplot-info@lists.sourceforge.net
 
  Bug reports and code contributions should be mailed to:
-       bug-gnuplot@dartmouth.edu
+       gnuplot-bugs@lists.sourceforge.net
 
  The list of those interested in beta-test versions is:
-       info-gnuplot-beta@dartmouth.edu
+       gnuplot-beta@lists.sourceforge.net
 
- There is also a World Wide Web page with up-to-date information, including
- known bugs:
+ There is also a perennially out-of-date gnuplot web page at
 
 ^ <a href="http://www.gnuplot.info">
            http://www.gnuplot.info
@@ -178,7 +178,7 @@ C
  When posting a question, please include full details of the version of
  `gnuplot`, the machine, and operating system you are using.  A _small_ script
  demonstrating the problem may be useful.  Function plots are preferable to
- datafile plots.  If email-ing to info-gnuplot, please state whether or not
+ datafile plots.  If email-ing to gnuplot-info, please state whether or not
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
 
@@ -7609,7 +7609,7 @@ C ... and restart the table:
 ?show version
  The `show version` command lists the version of gnuplot being run, its last
  modification date, the copyright holders, and email addresses for the FAQ,
- the info-gnuplot mailing list, and reporting bugs--in short, the information
+ the gnuplot-info mailing list, and reporting bugs--in short, the information
  listed on the screen when the program is invoked interactively.
 
  Syntax:

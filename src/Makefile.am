@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 pkglibexecdir = $(libexecdir)/@PACKAGE@
 
 # Where to send email about bugs and comments (locally)
-EMAIL = bug-gnuplot@dartmouth.edu
+EMAIL = gnuplot-bugs@lists.sourceforge.net
 
 # Default help file location
 HELPFILE=@GIHDIR@/gnuplot.gih
