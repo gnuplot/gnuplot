@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.30 2001/11/29 14:12:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.31 2001/12/13 17:31:44 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1130,7 +1130,7 @@ eval_3dplots()
 		    int stored_token = c_token;
 		    struct lp_style_type lp;
 
-		    lp_parse(&lp, 1,
+ 		    lp_parse(&lp, 1,
 			     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			     line_num, point_num);
 		    if (stored_token != c_token) {
@@ -1142,7 +1142,7 @@ eval_3dplots()
 			    set_lpstyle = TRUE;
 			    continue;
 			}
-		    }
+		    }		
 		}
 
 		break; /* unknown option */
@@ -1162,24 +1162,35 @@ eval_3dplots()
 		    ytitle = this_plot->title;
 	    }
 
-	    /* allow old-style syntax too - ignore case lt 3 4 for example */
-	    if (!equals(c_token, ",") && !END_OF_COMMAND) {
-		struct value t;
-		this_plot->lp_properties.l_type =
-		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
+	    /* No line/point style given. As lp_parse also supplies
+	     * the defaults for linewidth and pointsize, call it now
+	     * to define them. */
+	    if (! set_lpstyle) {
+		lp_parse(&this_plot->lp_properties, 1,
+			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
+			 line_num, point_num);
 
-		if (!equals(c_token, ",") && !END_OF_COMMAND)
-		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
+		/* allow old-style syntax too - ignore case lt 3 4 for
+		 * example */
+		if (!equals(c_token, ",") && !END_OF_COMMAND) {
+		    struct value t;
+
+		    this_plot->lp_properties.l_type =
+			this_plot->lp_properties.p_type =
+			(int) real(const_express(&t)) - 1;
+
+		    if (!equals(c_token, ",") && !END_OF_COMMAND)
+			this_plot->lp_properties.p_type =
+			    (int) real(const_express(&t)) - 1;
+		}
+
 	    }
-	    if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)	/* lines, linesp, ... */
-		if (crnt_param == 0)
-		    point_num +=
-			1 + (draw_contour != 0)
-			+ (hidden3d != 0);
 
-	    if (crnt_param == 0)
-		line_num += 1 + (draw_contour != 0)
-		    + (hidden3d != 0);
+	    if (crnt_param == 0) {
+		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
+		    point_num += 1 + (draw_contour != 0) + (hidden3d != 0);
+		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
+	    }
 
 
 	    /* now get the data... having to think hard here...

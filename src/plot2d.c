@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.45 2001/11/29 14:12:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.46 2001/12/13 17:31:44 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1138,14 +1138,26 @@ eval_plots()
 		    xtitle = this_plot->title;
 	    }
 
-	    /* allow old-style syntax too - ignore case lt 3 4 for example */
-	    if (!equals(c_token, ",") && !END_OF_COMMAND) {
-		struct value t;
-		this_plot->lp_properties.l_type =
-		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
-
-		if (!equals(c_token, ",") && !END_OF_COMMAND)
-		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
+	    /* No line/point style given. As lp_parse also supplies
+	     * the defaults for linewidth and pointsize, call it now
+	     * to define them. */
+	    if (! set_lpstyle) {
+		lp_parse(&this_plot->lp_properties, 1,
+			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
+			 line_num, point_num);
+		
+		/* allow old-style syntax too - ignore case lt 3 4 for
+		 * example */
+		if (!equals(c_token, ",") && !END_OF_COMMAND) {
+		    struct value t;
+		    this_plot->lp_properties.l_type =
+			this_plot->lp_properties.p_type =
+			(int) real(const_express(&t)) - 1;
+		    
+		    if (!equals(c_token, ",") && !END_OF_COMMAND)
+			this_plot->lp_properties.p_type =
+			    (int) real(const_express(&t)) - 1;
+		}
 	    }
 
 
