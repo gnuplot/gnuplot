@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.42 2004/07/01 17:10:14 broeker Exp $
+ * $Id: gd.trm,v 1.43 2004/07/02 23:58:40 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1254,9 +1254,27 @@ PNG_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC void
 PNG_point(unsigned int x, unsigned int y, int number)
 {
+    int save_color = png_state.color;
+
     if (number < 0) {
 	gdImageSetPixel(png_state.image, x, Y(y), png_state.color);
 	return;
+    }
+    /* Use current linewidth to draw the point symbol */
+    if (png_state.linewidth > 1) {
+	/* EAM - Implement linewidth by selecting a pre-defined brush */
+	/* The tricky bit is re-coloring the brush to the current color */
+	int lw   = png_state.linewidth;
+	if (png_state.color != PNG_brush[lw].last_rgb) {
+	    PNG_brush[lw].fgnd = gdImageColorResolve(PNG_brush[lw].im,
+	    	gdImageRed(png_state.image,png_state.color),
+	    	gdImageGreen(png_state.image,png_state.color),
+	    	gdImageBlue(png_state.image,png_state.color) );
+	    PNG_brush[lw].last_rgb = png_state.color;
+	}
+    	gdImageFilledRectangle( PNG_brush[lw].im, 1, 1, lw, lw, PNG_brush[lw].fgnd );
+	gdImageSetBrush(png_state.image, PNG_brush[lw].im);
+	png_state.color = gdBrushed;
     }
 
     y = Y(y);
@@ -1310,6 +1328,8 @@ PNG_point(unsigned int x, unsigned int y, int number)
 	PNG_Diamond(x, y, gdImageFilledPolygon);
 	break;
     }
+
+    png_state.color = save_color;
 }
 
 TERM_PUBLIC int

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.104 2004/07/02 23:58:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.105 2004/07/06 02:44:08 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2108,7 +2108,7 @@ exec_cmd(plot_struct *plot, char *command)
 	    unsigned char upside_down_fill = 0;
 	    short upside_down_sign = 1;
 	    if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
-		XSetLineAttributes(dpy, *current_gc, 0, LineSolid, CapButt, JoinBevel);
+		XSetLineAttributes(dpy, *current_gc, plot->lwidth, LineSolid, CapButt, JoinBevel);
 	    }
 	    switch (point % 13) {
 	    case 0:		/* do plus */
