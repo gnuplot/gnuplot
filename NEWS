@@ -23,6 +23,23 @@ Changes in release 4.0:
 * FIXED logscaled colorbox axis
 * FIXED pgnuplot for Windows NT/2K/XP
 
+
+Mouse and hotkey support in screen terminals
+********************************************
+
+The pm, x11, ggi and windows terminals support interactive work with mouse
+and hotkeys. The usage of the mouse is mainly self-explanatory.  Just type
+'h' in the graph window (hereafter we mean either PM or X11 terminal window)
+and a short overview of commands will pop up.  The mouse is turned on and
+off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
+
+
+=============================================================================
+
+
+[3.8h]
+* NEW X11 can rotate text
+
 [3.8h]
 * NEW set key height <height>
 

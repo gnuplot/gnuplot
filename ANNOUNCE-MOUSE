@@ -1,3 +1,35 @@
+PM, 25.1.2002: I think that the following should be kept somewhere among 
+the programmers documentation:
+
+
+TECHNICAL DETAILS FOR MOUSE COMMUNICATION:
+
+    On OS/2, the communication between gnupmdrv and gnuplot is implemented by
+  shared memory and an event semaphore. 
+    On Unix, we decided to use a bidirectional pipe for the ipc communication
+  between gnuplot_x11 and gnuplot. The readline interfaces were modified to
+  listen to both stdin and the ipc file descriptor.  (Well, that's just the
+  usual way).  Note that if compiling with gnu readline, you must have a gnu
+  readline version > 2.2 (3.0).  This will not be a major drawback, as 2.2 is
+  out for years now and the current gnu readline version is 4.0. The
+  communication code is located in gpexecute.inc.
+    On Windows, gnuplot+its terminal are in one executable, so we can call
+  directly do_event(&ge); available in the same executable.
+
+
+TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES:
+
+  For splots (3d) the data is cached and can therefore be redrawn very quickly.
+  This enables smooth rotating and zooming of splots.
+
+
+
+*****************************************************************************
+
+THE ORIGINAL VERSION OF THIS FILE - IT IS OBSOLETE NOW AND CAN BE REMOVED:
+
+
+
 ANNOUNCEMENT OF MOUSE SUPPORT FOR PM AND X11 TERMINALS
 ------------------------------------------------------
 
