@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.17 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -111,7 +111,6 @@ scanner(char **expressionp, size_t *expressionlenp)
     char brace;
 
     for (current = t_num = 0; expression[current] != NUL; current++) {
-      again:
 	if (t_num + 1 >= token_table_size) {
 	    /* leave space for dummy end token */
 	    extend_token_table();
@@ -125,7 +124,8 @@ scanner(char **expressionp, size_t *expressionlenp)
 	if (expression[current] == '`') {
 	    substitute(expressionp, expressionlenp, current);
 	    expression = *expressionp;	/* expression might have moved */
-	    goto again;
+	    current--;
+	    continue;
 	}
 	/* allow _ to be the first character of an identifier */
 	if (isalpha((unsigned char) expression[current])
@@ -215,7 +215,7 @@ scanner(char **expressionp, size_t *expressionlenp)
 		    APPEND_TOKEN;
 		break;
 	    default:
-		int_error(t_num, "invalid character");
+		int_error(t_num, "invalid character %c",expression[current]);
 	    }
 	++t_num;		/* next token if not white space */
     }
