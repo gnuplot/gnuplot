@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.22 2000/10/31 19:59:30 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.23 2000/11/01 18:57:28 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -285,7 +285,7 @@ error_ex()
 {
     char *sp;
 
-    strncpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
+    memcpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
     sp = strchr(fitbuf, NUL);
     while (*--sp == '\n');
     strcpy(sp + 1, "\n\n");	/* terminate with exactly 2 newlines */
@@ -576,7 +576,7 @@ fit_interrupt()
 		    (void) Gcomplex(&v, a[i], 0.0);
 		    setvar(par_name[i], v);
 		}
-		sprintf(input_line, tmp);
+		safe_strncpy(input_line, tmp, input_line_len);
 		(void) do_line();
 	    }
 	}
@@ -889,8 +889,8 @@ init_fit()
 
 static void
 setvar(varname, data)
-char *varname;
-struct value data;
+    char *varname;
+    struct value data;
 {
     register struct udvt_entry *udv_ptr = first_udv, *last = first_udv;
 
@@ -910,7 +910,7 @@ struct value data;
 	udv_ptr->next_udv = NULL;
     }
     udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname) + 1, "user var");
-    safe_strncpy(udv_ptr->udv_name, varname, strlen(varname) + 1);
+    memcpy(udv_ptr->udv_name, varname, strlen(varname) + 1);
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
 }
@@ -994,16 +994,18 @@ double value;
 *****************************************************************/
 static void
 splitpath(s, p, f)
-char *s;
-char *p;
-char *f;
+    char *s;
+    char *p;
+    char *f;
 {
     register char *tmp;
     tmp = s + strlen(s) - 1;
     while (*tmp != '\\' && *tmp != '/' && *tmp != ':' && tmp - s >= 0)
 	tmp--;
+    /* FIXME HBB 20010121: unsafe! Sizes of 'f' and 'p' are not known.
+     * May write past buffer end. */
     strcpy(f, tmp + 1);
-    safe_strncpy(p, s, (size_t) (tmp - s + 1));
+    memcpy(p, s, (size_t) (tmp - s + 1));
     p[tmp - s + 1] = NUL;
 }
 
@@ -1112,11 +1114,13 @@ char *pfile, *npfile;
     Backup a file by renaming it to something useful. Return
     the new name in tofile
 *****************************************************************/
+
+/* tofile must point to a char array[] or allocated data. See update() */
+
 static void
 backup_file(tofile, fromfile)
-char *tofile;
-const char *fromfile;
-/* tofile must point to a char array[] or allocated data. See update() */
+    char *tofile;
+    const char *fromfile;
 {
 #if defined (WIN32) || defined(MSDOS) || defined(VMS)
     char *tmpn;
@@ -1151,14 +1155,9 @@ const char *fromfile;
 
     /* first attempt for msdos. Second attempt for win32s */
 
-    /* beware : strncpy is very dangerous since it does not guarantee
-     * to terminate the string. Copy up to 8 characters. If exactly
-     * chars were copied, the string is not terminated. If the
-     * source string was shorter than 8 chars, no harm is done
-     * (here) by writing to offset 8.
-     */
-    safe_strncpy(tofile, fromfile, 8);
-    /* tofile[8] = NUL; */
+    /* Copy only the first 8 characters of the filename, to comply
+     * with the restrictions of FAT filesystems. */
+    safe_strncpy(tofile, fromfile, 8 + 1);
 
     while ((tmpn = strchr(tofile, '.')) != NULL)
 	*tmpn = '_';

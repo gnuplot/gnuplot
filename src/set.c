@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.48 2000/12/18 08:21:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.49 2000/12/20 19:49:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2374,7 +2374,7 @@ set_pm3d()
 		    int_error(c_token,"ignoring so many redrawings");
 		    return /* (TRUE) */;
 		}
-		strncpy(pm3d.where, input_line + token[c_token].start_index, token[c_token].length);
+		memcpy(pm3d.where, input_line + token[c_token].start_index, token[c_token].length);
 		pm3d.where[ token[c_token].length ] = 0;
 		for (c = pm3d.where; *c; c++) {
 		    if (*c != 'C') /* !!!!! CONTOURS, UNDOCUMENTED, THIS LINE IS TEMPORARILY HERE !!!!! */

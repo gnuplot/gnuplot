@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.29 2000/12/15 11:46:01 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.30 2000/12/18 08:28:02 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1255,7 +1255,7 @@ record()
 #endif
 	    {
 		int len = strlen(buf + 1) - 1;	/* discard newline '\n' */
-		strncpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);
+		memcpy(selection, buf + 1, len < SEL_LEN ? len : SEL_LEN);
 		/* terminate */
 		selection[len + 1 < SEL_LEN ? len + 1 : SEL_LEN - 1] = '\0';
 		XStoreBytes(dpy, buf + 1, len);
@@ -1831,11 +1831,11 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 
     min_colors = minimal_possible_colors < max_colors ? minimal_possible_colors : max_colors / (num_colormaps > 1 ? 2 : 8);
 
-    if (tpal)
+    if (tpal) {
 	FPRINTF((stderr, "(PaletteMake) tpal->use_maxcolors = %d\n", tpal->use_maxcolors));
-    else
+    } else {
 	FPRINTF((stderr, "(PaletteMake) tpal=NULL\n"));
-
+    }
 
     /* reallocate the palette
      * only if it has changed.
@@ -1999,6 +1999,8 @@ static int
 ErrorHandler(Display * display, XErrorEvent * error_event)
 {
     plot_struct *plot = find_plot((Window) error_event->resourceid);
+
+    (void) display;		/* avoid -Wunused warnings */
     gp_exec_event(GE_reset, 0, 0, 0, 0);
     if (plot) {
 	delete_plot(plot);

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.41 2000/11/23 18:23:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.42 2000/11/24 15:44:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -745,7 +745,7 @@ get_user_env()
  */
 void
 gp_expand_tilde(pathp)
-char **pathp;
+    char **pathp;
 {
     if (!*pathp)
 	int_error(NO_CARET, "Cannot expand empty path");
@@ -757,7 +757,7 @@ char **pathp;
 	    *pathp = gp_realloc(*pathp, n + strlen(user_homedir), "tilde expansion");
 	    /* include null at the end ... */
 	    memmove(*pathp + strlen(user_homedir) - 1, *pathp, n + 1);
-	    strncpy(*pathp, user_homedir, strlen(user_homedir));
+	    memcpy(*pathp, user_homedir, strlen(user_homedir));
 	} else
 	    int_warn(NO_CARET, "HOME not set - cannot expand tilde");
     }
@@ -789,6 +789,9 @@ ExecuteMacro(char *argv, int namelength)
 
     if (namelength >= sizeof(pszName))
 	return 1;
+    /* FIXME HBB 20010121: 3rd argument doesn't make sense. Either
+     * this should be sizeof(pszName), or it shouldn't use
+     * safe_strncpy(), here */
     safe_strncpy(pszName, argv, namelength + 1);
     rxArgStr = &argv[namelength];
     RXSTRPTR(rxRc) = NULL;
@@ -881,6 +884,9 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 	/* Set variable input_line.
 	   Watch out for line length of NOT_ZERO_TERMINATED strings ! */
 	cmdlen = rxCmd->strlength + 1;
+	/* FIXME HBB 20010121: 3rd argument doesn't make sense. Either
+	 * this should be input_line_len, or it shouldn't use
+	 * safe_strncpy(), here */
 	safe_strncpy(input_line, rxCmd->strptr, cmdlen);
 	input_line[cmdlen] = NUL;
 	rc = do_line();

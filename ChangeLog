@@ -1,3 +1,60 @@
+2001-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	I had a look across all usages of [safe_]strncpy(), and patched
+	several: 
+	
+	* src/fit.c (backup_file): Off-by-one error in use of safe_strncpy
+	fixed.
+
+	* src/gplt_x11.c (ErrorHandler): cast 'display' argument to void
+	to silence a compiler warning.
+
+	* src/command.c (replotrequest): Replace strncpy call by memcpy
+	iff the 'size' argument of strncpy was hand-tailored to the length
+	of the 'from' string.  In that case, the result is exactly the
+	same as with memcpy, but strncpy is inherently slower.
+
+	* src/fit.c (error_ex): dito.
+	(splitpath): dito.
+	(setvar): dito.
+	
+	* src/gplt_x11.c (record): dito.
+
+	* src/plot.c (gp_expand_tilde): dito.
+
+	* src/set.c (set_pm3d): dito.
+
+	* src/fit.c (fit_interrupt): Replace sprintf() call with
+	user-specified string by safe_strncpy, to avoid format string
+	vulnerability.
+
+2001-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/contour.c (fuzzy_equal): Removed use of 'zero' as a fudge
+ 	term. Avoid division-by-zero in another way. This also removed the
+ 	need for the private ABS() macro in this source. Removed.
+
+	* src/axis.c (mant_exp): Added code to change results like 10.0e0
+ 	to the result got from sprintf: 1.0e1, for number very close, but
+ 	not equal to 10.0.  Takes the mantissa format string as a new
+ 	argument, to decide how close 'very close' should be.
+	(mant_exp): Also try to avoid calls to the pow() function wherever
+ 	possible.
+	(mant_exp): Changed type of 'scientific' flag to TBOOLEAN.
+	(gprintf): Now stores exponent found as a byproduct when
+ 	mant_exp() is called for the mantissa, to avoid another call to
+ 	mant_exp() for the exponent alone, later.  Shuffled some code
+ 	lines to build starting conditions for mat_exp() correctly.
+  	CAVEAT: this only works well if the mantissa is output _before_
+ 	the exponent, or the mantissa format has zero digits of precision.
+	(gprintf): Moved some repeated code out of the individual cases of
+ 	the main switch statement to behind it.
+	(gprintf): Avoids division of negative integers: the result would
+ 	be platform-dependant!
+	(gen_tics): Repaired numerically silly condition that would remove
+ 	all inner tics for axes shorter than DBL_EPSILON, i.e. about
+ 	1e-16.
+
 2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (boundary): fix rounding errors in multiplot

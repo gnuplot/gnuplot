@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.16 2000/11/02 19:11:07 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.17 2000/12/20 19:29:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -81,7 +81,6 @@ typedef enum en_edge_position {
 
 #define MAX_POINTS_PER_CNTR 	100
 
-#define ABS(x)  ((x) > 0 ? (x) : (-(x)))
 #define SQR(x)  ((x) * (x))
 
 /*
@@ -525,20 +524,19 @@ double z_level;
     return p_cntr;
 }
 
-/*
- * Simple routine to decide if two contour points are equal by
- * calculating the relative error (< EPSILON).
- */
+/* Simple routine to decide if two contour points are equal by
+ * calculating the relative error (< EPSILON).  */
+/* HBB 20010121: don't use absolute value 'zero' to compare to data
+ * values. */
 static int
 fuzzy_equal(p_cntr1, p_cntr2)
-struct cntr_struct *p_cntr1, *p_cntr2;
+    struct cntr_struct *p_cntr1, *p_cntr2;
 {
     double unit_x, unit_y;
-    unit_x = ABS(x_max - x_min) + zero;		/* reference */
-    unit_y = ABS(y_max - y_min) + zero;
-    return (
-	       ABS(p_cntr1->X - p_cntr2->X) / unit_x < EPSILON &&
-	       ABS(p_cntr1->Y - p_cntr2->Y) / unit_y < EPSILON);
+    unit_x = fabs(x_max - x_min);		/* reference */
+    unit_y = fabs(y_max - y_min);
+    return ((fabs(p_cntr1->X - p_cntr2->X) < unit_x * EPSILON)
+	    && (fabs(p_cntr1->Y - p_cntr2->Y) < unit_y * EPSILON));
 }
 
 /*
@@ -920,9 +918,9 @@ chk_contour_kind(p_cntr, contr_isclosed)
  */
 static void
 put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
-struct cntr_struct *p_cntr;
-double z_level, xx_min, xx_max, yy_min, yy_max;
-TBOOLEAN contr_isclosed;
+    struct cntr_struct *p_cntr;
+    double z_level, xx_min, xx_max, yy_min, yy_max;
+    TBOOLEAN contr_isclosed;
 {
     int num_pts, num_intpol;
     double unit_x, unit_y;	/* To define norm (x,y)-plane */
@@ -947,9 +945,11 @@ TBOOLEAN contr_isclosed;
     d2x = (double *) gp_alloc(num_pts * sizeof(double), "contour d2x");
     d2y = (double *) gp_alloc(num_pts * sizeof(double), "contour d2y");
 
-    /* Width and hight of the grid is used at unit length (2d-norm) */
+    /* Width and height of the grid is used as a unit length (2d-norm) */
     unit_x = xx_max - x_min;
     unit_y = yy_max - y_min;
+    /* FIXME HBB 20010121: 'zero' should not be used as an absolute
+     * figure to compare to data */
     unit_x = (unit_x > zero ? unit_x : zero);	/* should not be zero */
     unit_y = (unit_y > zero ? unit_y : zero);
 

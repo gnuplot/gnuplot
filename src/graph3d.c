@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.38 2000/12/20 19:29:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.39 2001/01/18 14:16:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1778,6 +1778,8 @@ double depth[2][2];
 {
     if (p->type != INRANGE)
 	return;
+    /* FIXME HBB 20010121: don't compare 'zero' to data values in
+     * absolute terms. */
     if ((fabs(p->x - X_AXIS.min) < zero || fabs(p->x - X_AXIS.max) < zero) &&
 	(fabs(p->y - Y_AXIS.min) < zero || fabs(p->y - Y_AXIS.max) < zero)) {
 	unsigned int x = MAP_HEIGHT_X(p->x);

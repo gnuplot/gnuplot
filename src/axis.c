@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.4 2000/11/03 13:45:15 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.5 2001/01/16 20:56:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -143,7 +143,7 @@ AXIS_INDEX z_axis = FIRST_Z_AXIS;
 static double dbl_raise __PROTO((double x, int y));
 static double make_ltic __PROTO((int, double));
 static double make_tics __PROTO((AXIS_INDEX, int));
-static void   mant_exp __PROTO((double log10_base, double x, int scientific, double *m, int *p));
+static void   mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 static double time_tic_just __PROTO((int, double));
 
 /* ---------------------- routines ----------------------- */
@@ -423,16 +423,21 @@ double incr;
 }
 
 /*{{{  mant_exp - split into mantissa and/or exponent */
+/* HBB 20010121: added code that attempts to fix rounding-induced
+ * off-by-one errors in 10^%T and similar output formats */
 static void
-mant_exp(log10_base, x, scientific, m, p)
-double log10_base, x;
-int scientific;			/* round to power of 3 */
-double *m;
-int *p;				/* results */
+mant_exp(log10_base, x, scientific, m, p, format)
+    double log10_base, x;
+    TBOOLEAN scientific;	/* round to power of 3 */
+    double *m;			/* results */
+    int *p;			
+    const char *format;		/* format string for fixup */
 {
     int sign = 1;
     double l10;
     int power;
+    double mantissa;
+
     /*{{{  check 0 */
     if (x == 0) {
 	if (m)
@@ -451,11 +456,57 @@ int *p;				/* results */
 
     l10 = log10(x) / log10_base;
     power = floor(l10);
+    mantissa = pow(10.0, (l10 - power) * log10_base);
+
+    /* round power to an integer multiple of 3, to get what's
+     * sometimes called 'scientific' or 'engineering' notation. Also
+     * useful for handling metric unit prefixes like 'kilo' or 'micro'
+     * */
+    /* HBB 20010121: avoid recalculation of mantissa via pow() */
     if (scientific) {
-	power = 3 * floor(power / 3.0);
+	int temp_power  = 3 * floor(power / 3.0);
+	switch (power - temp_power) {
+	case 2:
+	    mantissa *= 100; break;
+	case 1:
+	    mantissa *= 10; break;
+	case 0:
+	    break;
+	default:
+	    int_error (NO_CARET, "Internal error in scientific number formatting");
+	}
+	power = temp_power;
     }
+
+    /* HBB 20010121: new code for decimal mantissa fixups.  Looks at
+     * format string to see how many decimals will be put there.  Iff
+     * the number is so close to an exact power of ten that it will be
+     * rounded up to 10.0e??? by an sprintf() with that many digits of
+     * precision, increase the power by 1 to get a mantissa in the
+     * region of 1.0.  If this handling is not wanted, pass NULL as
+     * the format string */
+    if (format) {
+	double upper_border = scientific ? 1000 : 10;
+	int precision = 0;
+
+	format = strchr (format, '.');
+	if (format != NULL)
+	    /* a decimal point was found in the format, so use that 
+	     * precision. */
+	    precision = strtol(format + 1, NULL, 10);
+	
+	/* See if mantissa would be right on the border.  All numbers
+	 * greater than that will be rounded up to 10, by sprintf(), which
+	 * we want to avoid. */
+	if (mantissa > (upper_border - pow(10.0, -precision) / 2)
+	    ) {
+	    mantissa /= upper_border;
+	    power += (scientific ? 3 : 1);
+	}
+    }
+
     if (m)
-	*m = sign * pow(10.0, (l10 - power) * log10_base);
+	*m = sign * mantissa;
     if (p)
 	*p = power;
 }
@@ -476,14 +527,24 @@ int *p;				/* results */
 
 /*{{{  gprintf */
 /* extended s(n)printf */
+/* HBB 20010121: added code to maintain consistency between mantissa
+ * and exponent across sprintf() calls.  The problem: format string
+ * '%t*10^%T' will display 9.99 as '10.0*10^0', but 10.01 as
+ * '1.0*10^1'.  This causes problems for people using the %T part,
+ * only, with logscaled axes, in combination with the occasional
+ * round-off error. */
 void
 gprintf(dest, count, format, log10_base, x)
-char *dest, *format;
-size_t count;
-double log10_base, x;
+    char *dest, *format;
+    size_t count;
+    double log10_base, x;
 {
     char temp[MAX_LINE_LEN + 1];
     char *t;
+    TBOOLEAN seen_mantissa = FALSE; /* memorize if mantissa has been
+                                       output, already */
+    int stored_power = 0;	/* power that matches the mantissa
+                                   output earlier */
 
     for (;;) {
 	/*{{{  copy to dest until % */
@@ -504,7 +565,8 @@ double log10_base, x;
 	t = temp;
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit((int) *format) || *format == '-' || *format == '+' || *format == ' ')
+	while (*++format == '.' || isdigit((int) *format)
+	       || *format == '-' || *format == '+' || *format == ' ')
 	    *t++ = *format;
 	/*}}} */
 
@@ -515,10 +577,9 @@ double log10_base, x;
 	case 'X':
 	case 'o':
 	case 'O':
-	    t[0] = *format++;
+	    t[0] = *format;
 	    t[1] = 0;
 	    sprintf(dest, temp, (int) x);
-	    dest += strlen(dest);
 	    break;
 	    /*}}} */
 	    /*{{{  e, f and g */
@@ -528,99 +589,107 @@ double log10_base, x;
 	case 'F':
 	case 'g':
 	case 'G':
-	    t[0] = *format++;
+	    t[0] = *format;
 	    t[1] = 0;
 	    sprintf(dest, temp, x);
-	    dest += strlen(dest);
 	    break;
 	    /*}}} */
-	    /*{{{  l */
+	    /*{{{  l --- mantissa to current log base */
 	case 'l':
 	    {
 		double mantissa;
-		mant_exp(log10_base, x, 0, &mantissa, NULL);
+
 		t[0] = 'f';
 		t[1] = 0;
+		mant_exp(log10_base, x, FALSE, &mantissa, NULL, NULL);
 		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  t */
+	    /*{{{  t --- base-10 mantissa */
 	case 't':
 	    {
 		double mantissa;
-		mant_exp(1.0, x, 0, &mantissa, NULL);
+
 		t[0] = 'f';
 		t[1] = 0;
+		mant_exp(1.0, x, FALSE, &mantissa, &stored_power, temp);
+		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  s */
+	    /*{{{  s --- base-1000 / 'scientific' mantissa */
 	case 's':
 	    {
 		double mantissa;
-		mant_exp(1.0, x, 1, &mantissa, NULL);
+
 		t[0] = 'f';
 		t[1] = 0;
+		mant_exp(1.0, x, TRUE, &mantissa, &stored_power, temp);
+		seen_mantissa = TRUE;
 		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  L */
+	    /*{{{  L --- power to current log base */
 	case 'L':
 	    {
 		int power;
-		mant_exp(log10_base, x, 0, NULL, &power);
+
 		t[0] = 'd';
 		t[1] = 0;
+		mant_exp(log10_base, x, FALSE, NULL, &power, NULL);
 		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  T */
+	    /*{{{  T --- power of ten */
 	case 'T':
 	    {
 		int power;
-		mant_exp(1.0, x, 0, NULL, &power);
+
 		t[0] = 'd';
 		t[1] = 0;
+		if (seen_mantissa)
+		    power = stored_power;
+		else 
+		    mant_exp(1.0, x, FALSE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  S */
+	    /*{{{  S --- power of 1000 / 'scientific' */
 	case 'S':
 	    {
 		int power;
-		mant_exp(1.0, x, 1, NULL, &power);
+
 		t[0] = 'd';
 		t[1] = 0;
+		if (seen_mantissa)
+		    power = stored_power;
+		else 
+		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
 		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
-	    /*{{{  c */
+	    /*{{{  c --- ISO decimal unit prefix letters */
 	case 'c':
 	    {
 		int power;
-		mant_exp(1.0, x, 1, NULL, &power);
+
 		t[0] = 'c';
 		t[1] = 0;
-		power = power / 3 + 6;	/* -18 -> 0, 0 -> 6, +18 -> 12, ... */
-		if (power >= 0 && power <= 12) {
+		if (seen_mantissa)
+		    power = stored_power;
+		else 
+		    mant_exp(1.0, x, TRUE, NULL, &power, "%.0f");
+
+		if (power >= -18 && power <= 18) {
+		    /* -18 -> 0, 0 -> 6, +18 -> 12, ... */
+		    /* HBB 20010121: avoid division of -ve ints! */
+		    power = (power + 18) / 3;
 		    sprintf(dest, temp, "afpnum kMGTPE"[power]);
 		} else {
 		    /* please extend the range ! */
@@ -637,25 +706,27 @@ double log10_base, x;
 		    sprintf(dest, "e%+02d", (power - 6) * 3);
 		}
 
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
+	    /*}}} */
+	    /*{{{  P --- multiple of pi */
 	case 'P':
 	    {
 		t[0] = 'f';
 		t[1] = 0;
 		sprintf(dest, temp, x / M_PI);
-		dest += strlen(dest);
-		++format;
 		break;
 	    }
 	    /*}}} */
 	default:
 	    int_error(NO_CARET, "Bad format character");
-	}
+	} /* switch */
 	/*}}} */
-    }
+
+	/* this was at the end of every single case, before: */
+	dest += strlen(dest);
+	++format;
+    } /* for ever */
 }
 
 /*}}} */
@@ -1133,10 +1204,17 @@ gen_tics(axis, grid, callback)
 	    return;		/* just quietly ignore them ! */
 	/*}}} */
 
+	/* FIXME HBB 20010121: keeping adding 'step' to 'tic' is
+	 * begging for rounding errors to strike us. */
 	for (tic = start; tic <= end; tic += step) {
 	    if (anyticput == 2)	/* See below... */
 		break;
-	    if (anyticput && (fabs(tic - start) < DBL_EPSILON)) {
+	    /* HBB 20010121: Previous code checked absolute value
+	     * DBL_EPSILON against tic distance. That's numerical
+	     * nonsense. It essentially disallowed series ticmarks for
+	     * all axes shorter than DBL_EPSILON in absolute figures.
+	     * */
+	    if (anyticput && NearlyEqual(tic, start, step)) {
 		/* step is too small.. */
 		anyticput = 2;	/* Don't try again. */
 		tic = end;	/* Put end tic. */
