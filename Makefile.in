@@ -17,8 +17,9 @@ all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ doc demo/binary1
 # any variables are created, but after the default target
 .NOEXPORT:
 
-
 SHELL = /bin/sh
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
@@ -390,6 +391,9 @@ uninstall:
 command.o: command.c fit.h help.h setshow.h
 	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 
+misc.o:misc.c plot.h setshow.h
+	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DGNUPLOT_BINDIR=\"$(bindir)\" $<
+
 show.o: show.c plot.h setshow.h
 	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 
@@ -476,13 +480,12 @@ realclean: distclean
 
 distdir = gnuplot
 top_distdir = $(distdir)
-version=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' gnuplot/version.c|tr -d ' '`
 
 dist: distdir
 	-mv $(distdir)/docs/makefile.dst $(distdir)/docs/makefile
 	-mv $(distdir)/docs/latextut/makefile.dst $(distdir)/docs/latextut/makefile
 	-chmod -R a+r $(distdir)
-	$(TAR) chf - $(distdir) | gzip $(GZIP) > $(distdir)-$(version).tar.gz
+	$(TAR) chf - $(distdir) | gzip $(GZIP) > $(PACKAGE)-$(VERSION).tar.gz
 	-rm -rf $(distdir)
 
 distdir: $(DISTFILES)
