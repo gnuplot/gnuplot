@@ -2,10 +2,10 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 ##plt-files-begin
-PLT_SOURCES = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
+PLT_files = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
 ##plt-files-end
 
-EXTRA_DIST = Makefile.am.in $(PLT_SOURCES) \
+EXTRA_DIST = Makefile.am.in $(PLT_files) \
 header.tex makefile.dst tutorial.tex eg3.dat
 
 CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.ps eg1.tex \
@@ -51,7 +51,7 @@ clean-local:
 Makefile.am: Makefile.am.in
 	rm -f $@ $@t
 	sed -n '1,/^##plt-files-begin/p' Makefile.am.in > $@t
-	echo PLT_SOURCES = *.plt | fmt | (tr '\012' @; echo ) \
+	echo PLT_files = *.plt | fmt | (tr '\012' @; echo ) \
 	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
 	sed -n '/^##plt-files-end/,$$p' $< >> $@t
 	chmod a-w $@t
