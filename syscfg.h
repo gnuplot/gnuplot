@@ -275,6 +275,9 @@
 #   include <conio.h>
 #   include <dir.h>            /* setdisk() */
 #  endif                       /* _Windows */
+#  ifdef WIN32
+#   define HAVE_SLEEP 1
+#  endif
 
 # else                         /* must be MSC */
 #  if !defined(__EMX__) && !defined(DJGPP)
