@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.37 1999/12/10 17:01:44 lhecking Exp $
+ * $Id: post.trm,v 1.38 2000/02/11 19:22:21 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -541,7 +541,7 @@ static struct gen_table PS_opts[] =
 {
     { "p$ortrait", PS_PORTRAIT },
     { "l$andscape", PS_LANDSCAPE },
-    { "ep$sf", PS_LANDSCAPE },
+    { "ep$sf", PS_EPSF },
     { "enh$anced", PS_ENHANCED },
     { "noenh$anced", PS_NOENHANCED },
     { "m$onochrome", PS_MONOCHROME },
