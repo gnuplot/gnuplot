@@ -1,3 +1,7 @@
+1999-09-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Fix compile/link on NeXT.
+
 1999-09-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, configure.in, m4/next.m4: Remove references to NEXTOBJS.
