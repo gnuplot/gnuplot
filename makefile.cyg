@@ -4,7 +4,8 @@
 # Changed for use with MinGW32 by HBB
 # Modified for Cygwin beta 20.1 which includes MINGW32
 # Resource compiler is windres.exe in Cygwin b20.1
-# Note png and gif libraries if used have to be build for Cygwin b20.1 with -mno-cygwin option
+# Note png and gif libraries if used have to be built for Cygwin b20.1 
+# with -mno-cygwin option
 #
 
 # where to place gnuplot.gih helpfile

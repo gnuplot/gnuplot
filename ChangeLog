@@ -1,3 +1,19 @@
+2002-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.cyg: Reformatted one comment for legibility.
+
+	* 0INSTALL: Revised DOS/Windows build and installation
+ 	instructions. Mention new 16bit section in term.h.  Add generic
+ 	post-compile installation tips for Windows platform.  Clarify
+ 	which compiler/makefile is to be used for which type of Windows.
+  	More clearly describe the need for the M$ help compiler in MinGW
+ 	and Cygwin.  Mention 32bit Borland compilation method via
+ 	makefile.win.
+
+	* term.h [WIN16||DOS16]: Put selection of terminals that works for
+ 	these 16bit platforms directly in here, to ease building of these
+ 	"small" versions of gnuplot.
+
 2002-03-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graphics.c(gprintf), plot.c(main), plot.h, set.c(set_two),
