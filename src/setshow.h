@@ -249,7 +249,6 @@ void show_version __PROTO((FILE *fp));
 void show_version_long __PROTO((void));
 char * conv_text __PROTO((char *s, char *t));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
-char *access_loadpath __PROTO((char *));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;

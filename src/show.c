@@ -124,7 +124,6 @@ static void show_position __PROTO((struct position * pos));
 static TBOOLEAN show_one __PROTO((void));
 static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
-static void show_loadpath __PROTO((void));
 static void show_locale __PROTO((void));
 static void show_missing __PROTO((void));
 static void show_datatype __PROTO((char *name, int axis));
@@ -309,10 +308,6 @@ static TBOOLEAN
     } else if (almost_equals(c_token, "timef$mt")) {
 	(void) putc('\n', stderr);
 	show_timefmt();
-	c_token++;
-    } else if (almost_equals(c_token, "loa$dpath")) {
-	(void) putc('\n', stderr);
-	show_loadpath();
 	c_token++;
     } else if (almost_equals(c_token, "loca$le")) {
 	(void) putc('\n', stderr);
@@ -636,7 +631,6 @@ static TBOOLEAN
 	show_datatype("zdata", FIRST_Z_AXIS);
 	show_timefmt();
 	show_locale();
-	show_loadpath();
 	show_zero();
 	show_missing();
 	show_plot();
@@ -892,14 +886,6 @@ static void show_timefmt()
     char str[MAX_LINE_LEN+1];
     fprintf(stderr, "\tread format for time is \"%s\"\n",
 	    conv_text(str, timefmt));
-}
-
-static void show_loadpath()
-{
-    fprintf (stderr, "\
-\tloadpath is \"%s\"\n\
-\tThe path separator on this system is '%c'\n",
-	     access_loadpath(NULL), PATHSEP);
 }
 
 static void show_locale()

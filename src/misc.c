@@ -920,7 +920,6 @@ set ticscale %g %g\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
     fprintf(fp, "set locale \"%s\"\n", cur_locale);
-    fprintf(fp, "set loadpath \"%s\"\n", access_loadpath(NULL));
 
 }
 
