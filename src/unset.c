@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.62 2004/05/04 02:43:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.63 2004/07/01 17:10:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -105,7 +105,8 @@ static void unset_mouse __PROTO((void));
 static void unset_multiplot __PROTO((void));
 #endif
 
-static void unset_mtics __PROTO((AXIS_INDEX));
+static void unset_month_day_tics __PROTO((AXIS_INDEX));
+static void unset_minitics __PROTO((AXIS_INDEX));
 static void unset_tics_in __PROTO((void));
 
 static void unset_offsets __PROTO((void));
@@ -353,59 +354,65 @@ unset_command()
 	break;
 /* FIXME - are the tics correct? */
     case S_MXTICS:
-	unset_mtics(FIRST_X_AXIS);
+	unset_minitics(FIRST_X_AXIS);
 	break;
     case S_XTICS:
 	unset_tics(FIRST_X_AXIS);
 	break;
     case S_XDTICS:
     case S_XMTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MYTICS:
-	unset_mtics(FIRST_Y_AXIS);
+	unset_minitics(FIRST_Y_AXIS);
 	break;
     case S_YTICS:
 	unset_tics(FIRST_Y_AXIS);
 	break;
     case S_YDTICS:
     case S_YMTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MX2TICS:
-	unset_mtics(SECOND_X_AXIS);
+	unset_minitics(SECOND_X_AXIS);
 	break;
     case S_X2TICS:
 	unset_tics(SECOND_X_AXIS);
 	break;
     case S_X2DTICS:
     case S_X2MTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MY2TICS:
-	unset_mtics(SECOND_Y_AXIS);
+	unset_minitics(SECOND_Y_AXIS);
 	break;
     case S_Y2TICS:
 	unset_tics(SECOND_Y_AXIS);
 	break;
     case S_Y2DTICS:
     case S_Y2MTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
     case S_MZTICS:
-	unset_mtics(FIRST_Z_AXIS);
+	unset_minitics(FIRST_Z_AXIS);
 	break;
     case S_ZTICS:
 	unset_tics(FIRST_Z_AXIS);
 	break;
     case S_ZDTICS:
     case S_ZMTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
 #ifdef PM3D
     case S_MCBTICS:
-	unset_mtics(COLOR_AXIS);
+	unset_minitics(COLOR_AXIS);
 	break;
     case S_CBTICS:
 	unset_tics(COLOR_AXIS);
 	break;
     case S_CBDTICS:
     case S_CBMTICS:
+	unset_month_day_tics(FIRST_X_AXIS);
 	break;
 #endif
     case S_XDATA:
@@ -1004,7 +1011,7 @@ unset_mouse()
 
 /* process 'unset mxtics' command */
 static void
-unset_mtics(AXIS_INDEX axis)
+unset_minitics(AXIS_INDEX axis)
 {
     axis_array[axis].minitics = MINI_DEFAULT;
     axis_array[axis].mtic_freq = 10.0;
@@ -1032,6 +1039,11 @@ unset_tics(AXIS_INDEX axis)
     }
 }
 
+static void
+unset_month_day_tics(AXIS_INDEX axis)
+{
+    axis_array[axis].ticdef.type = TIC_COMPUTED;
+}
 
 /* process 'unset offsets' command */
 static void
@@ -1454,7 +1466,7 @@ reset_command()
 	/* 'tics' default is on for some, off for the other axes: */
 	unset_tics(axis);
 	axis_array[axis].ticmode = axis_defaults[axis].ticmode;
-	unset_mtics(axis);
+	unset_minitics(axis);
 	axis_array[axis].ticdef = default_axis_ticdef;
 
 	reset_logscale(axis);
