@@ -1,3 +1,28 @@
+1998-04-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* set.c: Don't include math.h, but stdfn.h.
+
+	* term/driver.h: Remove GOT_DRIVER_H, use TERM_DRIVER_H instead.
+	Add some comments.
+
+	* term/*.trm, TERM/README: Remove #ifndef GOT_DRIVER_H/#endif
+	around #include "driver.h".
+
+	* term/cgm.trm: Amend help section.
+
+	* term/emxvga.trm: Add some comments, don't include math.h.
+	
+	* term/latex.trm (LATEX_rule): Replace valid with isvalid
+	(valid is a macro in <locale.h> under SunOS 4.1.x).
+
+	* term/png.trm: Test for png version moved to configure.
+
+	* term/epson.trm, term/hp500c.trm, term/hpljii.trm, term/hppj.trm,
+	term/pbm.trm, term/png.trm: Replace #ifdef vms with #ifdef VMS.
+
+	* makefile.*: Remove unneeded symbols AUTOCONF, HAVE_STRERROR, NOGAMMA.
+	Add stdfn.c and appropriate rules.
+	
 1998-04-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* parse.c (factor): Final, working workaround for HP 300 compiler
