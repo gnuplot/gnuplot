@@ -1,3 +1,10 @@
+2002-11-27  Johannes Zellner  <johannes@zellner.org>
+
+	* term/cgm.trm:
+	- "plot w filledcurves" didn't use the correct line color
+	- replaced a few assertions by "truncations" at term->xmax /
+	  term->ymax
+
 2002-11-26  Ethan Merritt  <merritt@u.washington.edu>
 
         * src/save.c src/set.c src/show.c src/unset.c src/tables.c src/tables.h
@@ -1455,7 +1462,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/20 17:20:14 $).
+	last modification date (from the tag $Date: 2002/11/26 18:49:59 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.48 2002/09/28 02:01:42 vanzandt Exp $
+ * $Id: cgm.trm,v 1.49 2002/10/09 21:36:25 joze Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -886,6 +886,7 @@ CGM_linecolor(linecolor)
     if (cgm_monochrome || linecolor == cgm_color)
 	return;
     cgm_color = linecolor;
+    cgm_next.fill_color = linecolor;
 
     CGM_flush_polyline();
     CGM_write_int_record(5, 4, 2, (int *) &cgm_color);
@@ -965,7 +966,10 @@ TERM_PUBLIC void
 CGM_move(x, y)
 unsigned int x, y;
 {
-    assert(x < term->xmax && y < term->ymax);
+    if (x >= term->xmax)
+	x = term->xmax;
+    if (y >= term->ymax)
+	y = term->ymax;
 
     if (x == cgm_posx && y == cgm_posy)
 	return;
@@ -1225,7 +1229,10 @@ unsigned int ux, uy;
     long remain;		/* approximate distance in plot units
 				   remaining to specified end point. */
 
-    assert(ux < term->xmax && uy < term->ymax);
+    if (ux >= term->xmax)
+	ux = term->xmax;
+    if (uy >= term->ymax)
+	uy = term->ymax;
 
     dx = (ux - cgm_posx);
     dy = (uy - cgm_posy);
@@ -1271,7 +1278,10 @@ TERM_PUBLIC void
 CGM_solid_vector(ux, uy)
 unsigned int ux, uy;
 {
-    assert(ux < term->xmax && uy < term->ymax);
+    if (ux >= term->xmax)
+	ux = term->xmax;
+    if (uy >= term->ymax)
+	uy = term->ymax;
 
     if (ux == cgm_posx && uy == cgm_posy)
 	return;
