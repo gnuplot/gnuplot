@@ -51,6 +51,7 @@ term		(term.c, bitmap.h, plot.h, setshow.h, term.h,
 		 term\post.trm, term\texdraw.trm, term\tgif.h,
 		 term\tgif.trm, term\tpic.trm)
 util		(util.c, plot.h)
+variable	(variable.c, plot.h, variable.h)
 version		(version.c)
 PCFLTLIB.LIB	 ; note: the order of the librarys is significant !!
 PCSTDLIB.LIB
