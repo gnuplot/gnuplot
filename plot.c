@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.18.2.1 1999/08/19 14:37:07 lhecking Exp $";
+static char *RCSid = "$Id: plot.c,v 1.18.2.2 1999/09/23 13:26:36 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -41,6 +41,10 @@ static char *RCSid = "$Id: plot.c,v 1.18.2.1 1999/08/19 14:37:07 lhecking Exp $"
 #include "setshow.h"
 #include "fnproto.h"
 #include <setjmp.h>
+
+#ifdef HAVE_SYS_UTSNAME_H
+# include <sys/utsname.h>
+#endif
 
 #if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
 # include <io.h>
@@ -445,6 +449,33 @@ char **argv;
 	interactive = noinputfiles = FALSE;
     else
 	noinputfiles = TRUE;
+
+    /* Need this before show_version is called for the first time */
+
+#ifdef HAVE_SYS_UTSNAME_H
+    {
+	struct utsname uts;
+
+	/* something is fundamentally wrong if this fails ... */
+	if (uname(&uts) > -1) {
+# ifdef _AIX
+	    strcpy(os_name, uts.sysname);
+	    sprintf(os_name, "%s.%s", uts.version, uts.release);
+# elif defined(SCO)
+	    strcpy(os_name, "SCO");
+	    strcpy(os_rel, uts.release);
+# else
+	    strcpy(os_name, uts.sysname);
+	    strcpy(os_rel, uts.release);
+# endif
+	}
+    }
+#else /* ! HAVE_SYS_UTSNAME_H */
+
+    strcpy(os_name, OS);
+    strcpy(os_rel, "");
+
+#endif /* HAVE_SYS_UTSNAME_H */
 
     if (interactive)
 	show_version(stderr);
