@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.93 2004/12/05 08:04:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.94 2005/02/02 19:14:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1572,6 +1572,10 @@ eval_3dplots()
 		/* remember settings for second surface in file */
 		struct lp_style_type *these_props = &(this_plot->lp_properties);
 		enum PLOT_STYLE this_style = this_plot->plot_style;
+#ifdef PM3D
+		struct surface_points *first_dataset = this_plot;
+		    /* pointer to the plot of the first dataset (surface) in the file */
+#endif
 
 		int this_token = this_plot->token;
 		while (!df_eof) {
@@ -1596,6 +1600,12 @@ eval_3dplots()
 			 * in neither case do we update tp_3d_ptr
 			 */
 			continue;
+
+#ifdef PM3D
+		    if (this_plot != first_dataset)
+			/* copy (explicit) "with pm3d at ..." option from the first dataset in the file */
+			strcpy(this_plot->pm3d_where, first_dataset->pm3d_where);
+#endif
 
 		    /* okay, we have read a surface */
 		    ++plot_num;

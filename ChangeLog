@@ -1,3 +1,13 @@
+2005-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/plot3d.c (eval_3dplots): Better fix for 'set pm3d at X;
+	splot f(x,y), 'data_file' with pm3d at Y' for data_file with
+	multiple surfaces.
+
+	* src/graph3d.c (do_3dplot): Remove fix from 2005-03-17. 
+	Fix 'set pm3d at X; splot...with pm3d at Y'
+	for data files with multiple surfaces.
+
 2005-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (set title): Add missing keyword "font".
