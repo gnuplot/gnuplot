@@ -5,6 +5,8 @@
 	* term/emf.trm:  Add option 'set term emf {linewidth <factor>}'
 	* term/gd.trm:   Solid fill with density < 1 was not working with 
 			 rgb colors.  Trivial fix.
+	* term/gd.trm:   Add option 'set term ... {linewidth <factor>}';
+			 increase maximum linewidth from 6 to 12
 
 	* src/graphics.c (boundary): When estimating the length and height
 	of xlabel, increase the number of lines by one if we're in enhanced text

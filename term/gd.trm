@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.59 2005/02/01 11:28:52 broeker Exp $
+ * $Id: gd.trm,v 1.60 2005/02/19 03:39:18 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -221,6 +221,7 @@ enum PNG_id {
     PNG_SIZE,
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
+    PNG_LINEWIDTH,
     PNG_OTHER
 };
 
@@ -248,11 +249,17 @@ static struct gen_table PNG_opts[] =
     { "noenh$anced", PNG_NOENHANCED },
     { "true$color", PNG_TRUECOLOR },
     { "notrue$color", PNG_NOTRUECOLOR },
+    { "linew$idth", PNG_LINEWIDTH },
+    { "lw", PNG_LINEWIDTH },
     { NULL, PNG_OTHER }
 };
 
+#undef MAXLINEWIDTH
+#define MAXLINEWIDTH 12
+static double PNG_linewidth_factor = 1.0;
+
 /* EAM - gdImage structure to hold brushes for linewidth */
-/* We only use brushes 2-6 (could expand later)          */
+/* We only use brushes 2 through MAXLINEWIDTH            */
 typedef struct {
     gdImagePtr im;
     unsigned int last_rgb;
@@ -260,7 +267,7 @@ typedef struct {
     int fgnd;
 }   PNG_BRUSH;
 
-static PNG_BRUSH PNG_brush[7];
+static PNG_BRUSH PNG_brush[MAXLINEWIDTH+1];
 
 #if USE_ULIG_FILLEDBOXES
 typedef struct {
@@ -474,6 +481,7 @@ PNG_options()
 	png_state.default_ttfsize = 0;
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
+	PNG_linewidth_factor = 1.0;
     } else {
 	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
@@ -622,6 +630,12 @@ PNG_options()
 	    png_state.TrueColor = FALSE;
 	    c_token++;
 	    break;
+	case PNG_LINEWIDTH:
+	    c_token++;
+	    PNG_linewidth_factor = real(const_express(&s));
+	    if (PNG_linewidth_factor < 0)
+		PNG_linewidth_factor = 1.0;
+	    break;
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -747,6 +761,10 @@ PNG_options()
 	break;
     }
 
+    if (PNG_linewidth_factor != 1.0)
+	sprintf(term_options + strlen(term_options),
+	    "linewidth %3.1f ", PNG_linewidth_factor);
+
     sprintf(term_options + strlen(term_options),
 	    "size %d,%d ", PNG_XMAX, PNG_YMAX);
 
@@ -771,7 +789,7 @@ int i;
     png_state.linetype = 0;
     png_state.linewidth = 1;
     /* EAM - pre-define brushes to implement linewidth */
-    for (i=2; i<=6; i++) {
+    for (i=2; i<=MAXLINEWIDTH; i++) {
     	PNG_brush[i].im = gdImageCreate(i,i);
     	PNG_brush[i].bgnd = gdImageColorAllocate( PNG_brush[i].im, 255, 255, 255 );
 	gdImageFill( PNG_brush[i].im, 1, 1, PNG_brush[i].bgnd );
@@ -782,9 +800,9 @@ int i;
     /* EAM - quick and dirty is to fill the entire brush (square nib).    */
     /*       might be better to approximate a circular nib by selectively */
     /*       coloring the individual pixels of the brush image.           */
-    for (i=2; i<=6; i++) {
+    for (i=2; i<=MAXLINEWIDTH; i++) {
     	gdImageFilledRectangle( PNG_brush[i].im, 1, 1, i, i, PNG_brush[i].fgnd );
-}
+    }
 
 }
 
@@ -798,7 +816,7 @@ PNG_reset()
 {
     int i;
     /* EAM - Clean up the brushes used for linewidth */
-    for (i=2; i<=6; i++) {
+    for (i=2; i<=MAXLINEWIDTH; i++) {
 	if (PNG_brush[i].im)
 	    gdImageDestroy(PNG_brush[i].im);
 	PNG_brush[i].im = 0;
@@ -1222,16 +1240,15 @@ PNG_linetype(int type)
     png_state.linetype = type;
 }
 
-/* PNG_linewidth (EAM - May 2001)
- * Use the "brush" tools in the gd library to control line width.
+/* Use the "brush" tools in the gd library to control line width.
  * Pre-define brushes for linewidths 2, 3, 4, 5, 6 (1 doesn't need a brush!).
  * Here we just remember the state.
  */
 TERM_PUBLIC void
 PNG_linewidth(double linewidth)
 {
-    png_state.linewidth = (int)(linewidth+0.49);
-    if (png_state.linewidth > 6) png_state.linewidth = 6;
+    png_state.linewidth = (int)(PNG_linewidth_factor * linewidth+0.49);
+    if (png_state.linewidth > MAXLINEWIDTH) png_state.linewidth = MAXLINEWIDTH;
     if (png_state.linewidth < 1) png_state.linewidth = 1;
 }
 
@@ -1745,6 +1762,7 @@ PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagec
 }
 
 #endif
+#undef MAXLINEWIDTH
 
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
