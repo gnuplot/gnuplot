@@ -523,11 +523,11 @@ should work, though).
    It is recommended to use gcc, although the native compiler cc may
   work with warnings.
 
- - HP-UX 10.x
-   It is recommended to use the native compiler cc, as problems
-  have been reported when using gcc. In the cases reported, we have
-  yet to establish whether the compiler is at fault, or the compiler
-  setup/configuration is broken.
+ - HP-UX 10.x and above
+   GCC has known problems on this platform if configured to use HP's
+  assembler. The telltale symptom are tic labels all ending up at
+  position 0.0. So either make sure you use a GCC configured to use
+  GNU as, or use HP's ANSI cc (the unbundled one).
 
  - IRIX 6.x
    If you want to use the png terminal, you must install your own

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13.2.6 2000/05/07 16:45:31 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.7 2000/09/14 12:29:23 broeker Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -95,12 +95,13 @@ static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void draw_bottom_grid __PROTO((struct surface_points * plot,
 				      int plot_count));
-static void xtick_callback __PROTO((int axis, double place, char *text,
-				    struct lp_style_type grid));
-static void ytick_callback __PROTO((int axis, double place, char *text,
-				    struct lp_style_type grid));
-static void ztick_callback __PROTO((int axis, double place, char *text,
-				    struct lp_style_type grid));
+/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
+void xtick_callback __PROTO((int axis, double place, char *text,
+			     struct lp_style_type grid));
+void ytick_callback __PROTO((int axis, double place, char *text,
+			     struct lp_style_type grid));
+void ztick_callback __PROTO((int axis, double place, char *text,
+			     struct lp_style_type grid));
 static void setlinestyle __PROTO((struct lp_style_type style));
 
 static void boundary3d __PROTO((int scaling, struct surface_points * plots,
@@ -1704,7 +1705,10 @@ else if (height[i][j] != depth[i][j]) \
 }
 
 
-static void xtick_callback(axis, place, text, grid)
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
+void xtick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -1760,7 +1764,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
     }
 }
 
-static void ytick_callback(axis, place, text, grid)
+void ytick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -1814,7 +1818,7 @@ struct lp_style_type grid;
     }
 }
 
-static void ztick_callback(axis, place, text, grid)
+void ztick_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.7 2000/05/07 16:54:14 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.8 2000/09/14 12:29:22 broeker Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -137,12 +137,13 @@ static double make_tics __PROTO((int axis, int guide));
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
 
-static void widest2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
-static void ytick2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
-static void xtick2d_callback __PROTO((int axis, double place, char *text,
-					struct lp_style_type grid));
+/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
+void widest2d_callback __PROTO((int axis, double place, char *text,
+				struct lp_style_type grid));
+void ytick2d_callback __PROTO((int axis, double place, char *text,
+				      struct lp_style_type grid));
+void xtick2d_callback __PROTO((int axis, double place, char *text,
+				      struct lp_style_type grid));
 static void map_position __PROTO((struct position * pos, unsigned int *x,
 					unsigned int *y, char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
@@ -424,8 +425,11 @@ char *axis_name;
 /* we determine widest tick label by getting gen_ticks to call this
  * routine with every label
  */
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
 
-static void widest2d_callback(axis, place, text, grid)
+void widest2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -3782,9 +3786,13 @@ char *font;			/* NULL or "" means use default */
 
 }
 
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
+
 /* display a x-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void xtick2d_callback(axis, place, text, grid)
+void xtick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
@@ -3857,7 +3865,7 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 
 /* display a y-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void ytick2d_callback(axis, place, text, grid)
+void ytick2d_callback(axis, place, text, grid)
 int axis;
 double place;
 char *text;
