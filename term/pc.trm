@@ -1,5 +1,5 @@
 /*
- * $Id: pc.trm,v 1.13 1999/06/19 20:30:54 lhecking Exp $
+ * $Id: pc.trm,v 1.14 1999/06/22 11:54:21 lhecking Exp $
  *
  */
 
@@ -538,7 +538,7 @@ TERM_TABLE_START(dospc_driver)
     PC_text, null_scale, PC_graphics, PC_move, PC_vector,
     PC_linetype, PC_put_text, PC_text_angle,
     PC_justify_text, line_and_point, do_arrow, set_font_null
-TERM_TABLE_END(pc_driver)
+TERM_TABLE_END(dospc_driver)
 
 #undef LAST_TERM
 #define LAST_TERM dospc_driver
@@ -555,8 +555,8 @@ START_HELP(dospc)
 "?terminal dospc",
 "?term dospc",
 "?dospc",
-" The `dospc` terminal driver supports PCs with arbitrary graphics boards, which",
-" will be automatically detected.  It should be used only if you are not using",
-" the gcc or Zortec C/C++ compilers."
+" The `dospc` terminal driver supports PCs with arbitrary graphics boards,",
+" which will be automatically detected.  It should be used only if you are",
+" not using the gcc or Zortec C/C++ compilers."
 END_HELP(dospc)
 #endif /* TERM_HELP */
