@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.13 1998/06/18 14:59:23 ddenholm Exp $
+ * $Id: png.trm,v 1.11 1998/12/14 18:40:59 lhecking Exp $
  *
  */
 
@@ -69,15 +69,23 @@ register_term(png_driver)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PNGoptions __PROTO((void));
-TERM_PUBLIC void PNGinit __PROTO((void));
-TERM_PUBLIC void PNGreset __PROTO((void));
-TERM_PUBLIC void PNGsetfont __PROTO((void));
-TERM_PUBLIC void PNGgraphics __PROTO((void));
-TERM_PUBLIC void PNGtext __PROTO((void));
-TERM_PUBLIC void PNGlinetype __PROTO((int linetype));
-TERM_PUBLIC void PNGpoint __PROTO((unsigned int x, unsigned int y, int point));
+TERM_PUBLIC void PNG_options __PROTO((void));
+TERM_PUBLIC void PNG_init __PROTO((void));
+TERM_PUBLIC void PNG_reset __PROTO((void));
+TERM_PUBLIC void PNG_setfont __PROTO((void));
+TERM_PUBLIC void PNG_graphics __PROTO((void));
+TERM_PUBLIC void PNG_text __PROTO((void));
+TERM_PUBLIC void PNG_linetype __PROTO((int linetype));
+TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int point));
 #endif /* TERM_PROTO */
+
+/* make XMAX and YMAX a multiple of 8 */
+#define PNG_XMAX (640)
+#define PNG_YMAX (480)
+#define PNG_VCHAR (FNT5X9_VCHAR)
+#define PNG_HCHAR (FNT5X9_VCHAR)
+#define PNG_VTIC FNT5X9_HBITS
+#define PNG_HTIC FNT5X9_HBITS
 
 #ifdef TERM_BODY
 
@@ -90,18 +98,6 @@ TERM_PUBLIC void PNGpoint __PROTO((unsigned int x, unsigned int y, int point));
 
 /* png version test now in configure */
 
-/* From version.c */
-extern char version[];
-extern char patchlevel[];
-
-/* make XMAX and YMAX a multiple of 8 */
-#define PNG_XMAX (640)
-#define PNG_YMAX (480)
-#define PNG_VCHAR (FNT5X9_VCHAR)
-#define PNG_HCHAR (FNT5X9_VCHAR)
-#define PNG_VTIC FNT5X9_HBITS
-#define PNG_HTIC FNT5X9_HBITS
-
 static int png_font = 1;	/* small font */
 static int png_mode = 0;	/* 0:monochrome 1:gray 2:color */
 
@@ -111,7 +107,8 @@ static int png_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 static int png_color_table[] ={ 15, 8, 3, 5, 6, 4, 2, 1, 11, 13, 14 };	/* colors */
 static png_color png_palette[16];
 
-void PNGoptions()
+TERM_PUBLIC void
+PNG_options()
 {
     png_font = 1;
     png_mode = 0;
@@ -144,38 +141,42 @@ void PNGoptions()
     /* setup options string */
 
     switch (png_font) {
-    case 1:
-	strcat(term_options, "small");
+    case 3:
+	strcat(term_options, "large");
 	break;
     case 2:
 	strcat(term_options, "medium");
 	break;
-    case 3:
-	strcat(term_options, "large");
+    case 1:
+    default:
+	strcat(term_options, "small");
 	break;
     }
 
     switch (png_mode) {
-    case 0:
-	strcat(term_options, " monochrome");
+    case 2:
+	strcat(term_options, " color");
 	break;
     case 1:
 	strcat(term_options, " gray");
 	break;
-    case 2:
-	strcat(term_options, " color");
+    case 0:
+    default:
+	strcat(term_options, " monochrome");
 	break;
     }
 }
 
 
-void PNGinit()
+TERM_PUBLIC void
+PNG_init()
 {
-    PNGsetfont();		/* HBB 980226: do this here! */
+    PNG_setfont();		/* HBB 980226: do this here! */
 }
 
 
-void PNGreset()
+TERM_PUBLIC void
+PNG_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -183,15 +184,16 @@ void PNGreset()
 }
 
 
-void PNGsetfont()
+TERM_PUBLIC void
+PNG_setfont()
 {
     switch (png_font) {
-    case 1:
-	b_charsize(FNT5X9);
-	term->v_char = FNT5X9_VCHAR;
-	term->h_char = FNT5X9_HCHAR;
-	term->v_tic = FNT5X9_HBITS;
-	term->h_tic = FNT5X9_HBITS;
+    case 3:
+	b_charsize(FNT13X25);
+	term->v_char = FNT13X25_VCHAR;
+	term->h_char = FNT13X25_HCHAR;
+	term->v_tic = FNT13X25_HBITS;
+	term->h_tic = FNT13X25_HBITS;
 	break;
     case 2:
 	b_charsize(FNT9X17);
@@ -200,30 +202,33 @@ void PNGsetfont()
 	term->v_tic = FNT9X17_HBITS;
 	term->h_tic = FNT9X17_HBITS;
 	break;
-    case 3:
-	b_charsize(FNT13X25);
-	term->v_char = FNT13X25_VCHAR;
-	term->h_char = FNT13X25_HCHAR;
-	term->v_tic = FNT13X25_HBITS;
-	term->h_tic = FNT13X25_HBITS;
+    case 1:
+    default:
+	b_charsize(FNT5X9);
+	term->v_char = FNT5X9_VCHAR;
+	term->h_char = FNT5X9_HCHAR;
+	term->v_tic = FNT5X9_HBITS;
+	term->h_tic = FNT5X9_HBITS;
 	break;
     }
 }
 
 
-void PNGgraphics()
+TERM_PUBLIC void
+PNG_graphics()
 {
-    int numplanes;
+    int numplanes = 1;
 
     switch (png_mode) {
-    case 0:
-	numplanes = 1;
+    case 2:
+	numplanes = 4;
 	break;
     case 1:
 	numplanes = 3;
 	break;
-    case 2:
-	numplanes = 4;
+    case 0:
+    default:
+	numplanes = 1;
 	break;
     }
 
@@ -239,7 +244,8 @@ void PNGgraphics()
 	b_setlinetype(0);	/* solid lines */
 }
 
-void PNGtext()
+TERM_PUBLIC void
+PNG_text()
 {
     register int x, j, row;
     png_structp png_ptr;
@@ -248,7 +254,7 @@ void PNGtext()
     png_bytep prow;
     int mask, plane1, plane2, plane3, plane4;
     int red, green, blue;
-    png_text pngtext;
+    png_text pngtext, *pngtext_copy;
     char text[100];
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -275,7 +281,11 @@ void PNGtext()
 	return;
     }
     png_info_init(info_ptr);
-    png_write_init(png_ptr);
+    /* According the libpng documentation, this function
+     * is internal os of 0.95, and should not be used.
+     * The necessary initialisation is done by
+     * png_create_write_struct().
+    png_write_init(png_ptr); */
 
     png_init_io(png_ptr, gpoutfile);
 
@@ -319,19 +329,23 @@ void PNGtext()
 	    png_palette[i].green = green * 85;
 	    png_palette[i].blue = blue * 85;
 	}
-    sprintf(text, "gnuplot %sversion %s patchlevel %s", OS, version, patchlevel);
+    sprintf(text, "gnuplot %sversion %s patchlevel %s",
+	    OS, version, patchlevel);
 
     pngtext.compression = -1;
     pngtext.key = "Software";
     pngtext.text = text;
     pngtext.text_length = strlen(text);
 
+    pngtext_copy = malloc(sizeof(*pngtext_copy));
+    *pngtext_copy = pngtext;
     info_ptr->num_text = 1;
-    info_ptr->text = &pngtext;
+    info_ptr->text = pngtext_copy;
 
     png_write_info(png_ptr, info_ptr);
 
     info_ptr->num_text = 0;
+    if (info_ptr->text) free(info_ptr->text);
     info_ptr->text = NULL;
 
     png_set_packing(png_ptr);
@@ -380,27 +394,30 @@ void PNGtext()
     b_freebitmap();
 }
 
-void PNGlinetype(linetype)
+TERM_PUBLIC void
+PNG_linetype(linetype)
 int linetype;
 {
     switch (png_mode) {
-    case 0:
-	b_setlinetype(linetype);
+    case 2:
+	if (linetype >= 9)
+	    linetype %= 9;
+	b_setvalue(png_color_table[linetype + 2]);
 	break;
     case 1:
 	if (linetype >= 7)
 	    linetype %= 7;
 	b_setvalue(png_gray[linetype + 2]);
 	break;
-    case 2:
-	if (linetype >= 9)
-	    linetype %= 9;
-	b_setvalue(png_color_table[linetype + 2]);
+    case 0:
+    default:
+	b_setlinetype(linetype);
 	break;
     }
 }
 
-void PNGpoint(x, y, point)
+TERM_PUBLIC void
+PNG_point(x, y, point)
 unsigned int x, y;
 int point;
 {
@@ -418,10 +435,10 @@ TERM_TABLE_START(png_driver)
     "png",
     "Portable Network Graphics [small medium large] [monochrome gray color]",
     PNG_XMAX, PNG_YMAX, PNG_VCHAR,
-    PNG_HCHAR, PNG_VTIC, PNG_HTIC, PNGoptions,
-    PNGinit, PNGreset, PNGtext, null_scale,
-    PNGgraphics, b_move, b_vector, PNGlinetype,
-    b_put_text, b_text_angle, null_justify_text, PNGpoint,
+    PNG_HCHAR, PNG_VTIC, PNG_HTIC, PNG_options,
+    PNG_init, PNG_reset, PNG_text, null_scale,
+    PNG_graphics, b_move, b_vector, PNG_linetype,
+    b_put_text, b_text_angle, null_justify_text, PNG_point,
     do_arrow, set_font_null,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
@@ -449,6 +466,7 @@ START_HELP(png)
 "       set terminal png {small | medium | large}",
 "                        {monochrome | gray | color}",
 "",
-" The defaults are small (fontsize) and monochrome."
+" The defaults are small (fontsize) and monochrome.  Default size of the output",
+" is 640*480 pixel."
 END_HELP(png)
 #endif /* TERM_HELP */
