@@ -1,3 +1,12 @@
+2005-02-14  Harald Harders  <h.harders@tu-bs.de>
+
+	* term/pslatex.trm: SourceForge patch #1121972 "Improve input encoding
+	in epslatex terminal". Added the koi8-u encoding to epslatex. Added
+	\inputencoding{...} to the output file. This enables the user to use
+	different input encodings in the surrounding LaTeX file and in the plot.
+	Added a user-friendly error message if the package graphicx.sty or
+	graphics.sty is not loaded.
+
 2005-02-13  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm term/pslatex.trm: Clean up code in accordance with
@@ -94,7 +103,6 @@
 	src/show.c (show_label show_xyzlabel): Export save_textcolor() so
 	that various "show ...label" routines can use it also. Also fixes
 	compile error if configured --disable-pm3d.
-
 
 2005-02-01  Ethan Merritt  <merritt@u.washington.edu>
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.50 2005/02/09 11:43:12 mikulik Exp $
+ * $Id: pslatex.trm,v 1.51 2005/02/13 18:44:47 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -414,30 +414,38 @@ EPSLATEX_common_init()
         fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
 
         switch(encoding) {
+	case S_ENC_DEFAULT:
+	    break;
         case S_ENC_ISO8859_1:
-            inputenc = "\\usepackage[latin1]{inputenc}";
+            inputenc = "latin1";
             break;
         case S_ENC_ISO8859_2:
-            inputenc = "\\usepackage[latin2]{inputenc}";
+            inputenc = "latin2";
             break;
         case S_ENC_ISO8859_15:
-            inputenc = "\\usepackage[latin9]{inputenc}";
+            inputenc = "latin9";
             break;
         case S_ENC_CP437:
-            inputenc = "\\usepackage[cp437de]{inputenc}";
+            inputenc = "cp437de";
             break;
-        case S_ENC_CP850 :
-            inputenc = "\\usepackage[cp850]{inputenc}";
+        case S_ENC_CP850:
+            inputenc = "cp850";
             break;
-        case S_ENC_CP852 :
-            inputenc = "\\usepackage[cp852]{inputenc}";
+        case S_ENC_CP852:
+            inputenc = "cp852";
             break;
-        case S_ENC_KOI8_R :
-            inputenc = "\\usepackage[koi8-r]{inputenc}";
+        case S_ENC_CP1250:
+            inputenc = "cp1250";
             break;
-        case S_ENC_CP1250 :
-            inputenc = "\\usepackage[cp1250]{inputenc}";
+        case S_ENC_KOI8_R:
+            inputenc = "koi8-r";
             break;
+	case S_ENC_KOI8_U:
+            inputenc = "koi8-u";
+            break;
+	case S_ENC_INVALID:
+	    int_error(NO_CARET, "invalid input encoding used");
+	    break;
         default:
 	    /* do nothing */
             break;
@@ -496,11 +504,15 @@ EPSLATEX_common_init()
 		fprintf(gpoutfile, "\\renewcommand*\\updefault{%s}%%\n",
 			fontshape);
 
-            fprintf(gpoutfile, "\
-%% Load packages\n\
+            fputs("\
+% Load packages\n\
 \\usepackage{graphicx}\n\
-\\usepackage{color}\n\
-%s\n\
+\\usepackage{color}\n", gpoutfile);
+
+	    if (inputenc)
+		fprintf(gpoutfile, "\\usepackage[%s]{inputenc}\n", inputenc);
+
+            fprintf(gpoutfile, "\
 \\makeatletter\n\
 %% Select an appropriate default driver (from TeXLive graphics.cfg)\n\
 \\begingroup\n\
@@ -541,7 +553,6 @@ EPSLATEX_common_init()
 }\n\
 %s\n\
 \\begin{document}\n",
-                    inputenc!=NULL? inputenc : "%%",
                     term->xmax * xsize / (2.0*PS_SC),
                     term->ymax * ysize / (2.0*PS_SC),
                     term->xmax * xsize / (2.0*PS_SC),
@@ -549,12 +560,15 @@ EPSLATEX_common_init()
 		    epslatex_header ? epslatex_header : "%" );
         }
 
-        fprintf(gpoutfile, "\
-%% Encoding inside the plot:\n\
-%% %s\n\
-\\begingroup\n",
-                inputenc!=NULL? inputenc : "(none)");
+        fputs("\\begingroup\n", gpoutfile);
 	
+	if (inputenc)
+	    fprintf(gpoutfile, "\
+  %% Encoding inside the plot.  In the header of your document, this encoding\n\
+  %% should to defined, e.g., by using\n\
+  %% \\usepackage[%s,<other encodings>]{inputenc}\n\
+  \\inputencoding{%s}%%\n", inputenc, inputenc);
+
         if (!ps_params->epslatex_standalone) {
 	    if (fontfamily && strlen(fontfamily) > 0)
 		fprintf(gpoutfile, "  \\fontfamily{%s}%%\n",
@@ -582,6 +596,14 @@ EPSLATEX_common_init()
       color.sty in LaTeX.}%%\n\
     \\renewcommand\\color[2][]{}%%\n\
   }%%\n\
+  \\providecommand\\includegraphics[2][]{%%\n\
+    \\GenericError{(gnuplot) \\space\\space\\space\\@spaces}{%%\n\
+      Package graphicx or graphics not loaded%%\n\
+    }{See the gnuplot documentation for explanation.%%\n\
+    }{The gnuplot epslatex terminal needs graphicx.sty or graphics.sty.}%%\n\
+    \\renewcommand\\includegraphics[2][]{}%%\n\
+  }%%\n\
+  \\providecommand\\rotatebox[2]{#2}%%\n\
   \\@ifundefined{ifGPcolor}{%%\n\
     \\newif\\ifGPcolor\n\
     \\GPcolor%s\n\
