@@ -1,5 +1,5 @@
 %
-% $Id: titlepag.tex,v 1.10 2002/03/07 20:44:02 mikulik Exp $
+% $Id: titlepag.tex,v 1.11 2002/12/11 20:37:42 joze Exp $
 %
 
 \ifx\LaTeXe\undefined
@@ -14,7 +14,7 @@
 % LaTeX2e version
 % add `[a4paper]' before `{article}' to load settings for A4-paper
 % see below if you add 11pt or 12pt
-   \documentclass{article}
+   \documentclass[twoside]{article}
    \usepackage{toc_entr}
 
   % Fine tuning of the hyperref output option:
@@ -40,7 +40,7 @@
   %     ,pdfkeywords={...}
   ]{hyperref}
 
-  % \usepackage{fancyhdr}
+  \usepackage{fancyhdr}
 
 \fi
 
@@ -55,9 +55,11 @@
 %\addtolength{\topmargin}{-24pt}
 
 \setlength{\textwidth}{6.25in}
-\setlength{\oddsidemargin}{0.5cm}
+% \setlength{\oddsidemargin}{0.5cm}
+\setlength{\oddsidemargin}{0.0cm}
+\setlength{\evensidemargin}{0.0cm}
 \setlength{\topmargin}{-0.5in}
-\setlength{\textheight}{9in}
+\setlength{\textheight}{9.5in}
 
 \setlength{\parskip}{1ex}
 \setlength{\parindent}{0pt}
@@ -73,10 +75,33 @@
 \setcounter{secnumdepth}{5}
 \setcounter{tocdepth}{5}
 
+
+% Read the gnuplot version into macro \gnuplotVersion 
+\newread\fileGpVersion
+\openin\fileGpVersion ../VERSION
+\ifeof\fileGpVersion\openin\fileGpVersion ../VERSION.
+\ifeof\fileGpVersion\error FATAL: Cannot read file "VERSION"
+\fi\fi
+\read\fileGpVersion to \gpVersion
+\closein\fileGpVersion
+\newbox\GpVersion \setbox\GpVersion=\hbox{\gpVersion}
+\def\gnuplotVersion{\usebox\GpVersion}
+
+
+% Layout setup of fancy headings:
+\pagestyle{fancy} \headsep=5.5mm \addtolength{\headheight}{7mm}
+%\setlength{\headrulewidth}{0.4pt}
+\chead{\hyperlink{TableOfContents}{gnuplot \usebox\GpVersion}}
+\cfoot{}
+\rhead[\leftmark]{\thepage}
+\lhead[\thepage]{\leftmark}
+
 \begin{document}
+
 \sloppy
-\pagestyle{empty}
-  \rule{0in}{2.0in}
+\thispagestyle{empty}
+\rule{0in}{1.0in}
+
   \begin{center}
 
   {\huge\bf gnuplot}\\
@@ -90,16 +115,9 @@
 
   \vspace{2ex}
 
-\iffalse
-  Version 3.7 organized by: David Denholm \\
-\else
-  \IfFileExists{../VERSION.}{\gdef\gpVersion{\input{../VERSION.}}}{\gdef\gpVersion{\input{../VERSION}}}
-  \newbox\GpVersion \setbox\GpVersion=\hbox{\gpVersion}
-  \gdef\gnuplotVersion{\usebox\GpVersion}
   Version
     \gnuplotVersion
   organized by: David Denholm \\
-\fi
 
    \vspace{2ex}
 
@@ -143,7 +161,7 @@
 \else {
   \catcode`\$=10 \let\$\relax
   \def\ignoredate#1Date: #2{#2}
-  Last edited: \ignoredate $Date: 2002/03/07 20:44:02 $
+  Last edited: \ignoredate $Date: 2002/12/11 20:37:42 $
   }
 \fi
 
@@ -151,15 +169,7 @@
 \newpage
 
 
-\tableofcontents
 \hypertarget{TableOfContents}{}
+\tableofcontents
+
 \newpage
-
-
-\setcounter{page}{1}
-\pagestyle{myheadings}
-\iffalse
-  \markboth{{\bf gnuplot} 3.7}{{\bf gnuplot} 3.7}
-\else
-  \markboth{{\bf gnuplot} \gnuplotVersion}{{\bf gnuplot} \gnuplotVersion}
-\fi

@@ -1,3 +1,8 @@
+2002-12-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/titlepag.tex: Added fancy headings. Better procedure to read
+	gnuplot version from file VERSION.
+
 2002-12-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Regenerated and updated.
@@ -1567,7 +1572,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/13 14:11:17 $).
+	last modification date (from the tag $Date: 2002/12/13 16:40:36 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
