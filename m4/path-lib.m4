@@ -60,7 +60,7 @@ if test "$3" != yes && test "$3" != no; then
   gp_l_prfx=`echo $gp_l_path | sed -e 's%/lib$%%' -e 's%/include$%%'`
   gp_l_list="$gp_l_prfx $gp_l_prfx/lib $gp_l_path"
 fi
-for ac_dir in '' $gp_l_list /usr/local/lib ; do
+for ac_dir in $gp_l_list '' /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   GP_CHECK_LIB_QUIET($1,$2,$4)
   TERMLIBS="$gp_save_TERMLIBS"
