@@ -1195,12 +1195,14 @@ C ... and restart the table:
  document, it will always be preceded by the adjective "plot", "line", or
  "key" to differentiate among them.
 
- A graph may have up to four labelled axes.  Various commands have the name of
- an axis built into their names, such as `set xlabel`.  Other commands have
- one or more axis names as options, such as `set logscale xy`.  The names of
- the four axes for these usages are "x" for the axis along the bottom border
- of the plot, "y" for the left border, "x2" for the top border, and "y2" for
- the right border.  "z" also occurs in commands used with 3-d plotting.
+ A 2-d graph may have up to four labelled axes.  The names of the four axes
+ for these usages are "x" for the axis along the bottom border of the plot,
+ "y" for the left border, "x2" for the top border, and "y2" for the right
+ border.
+
+ A 3-d graph may have up to three labelled axes -- "x", "y" and "z".  It is
+ not possible to say where on the graph any particular axis will fall because
+ you can change the direction from which the graph is seen with `set view`.
 
  When discussing data files, the term "record" will be resurrected and used
  to denote a single line of text in the file, that is, the characters between
@@ -1225,11 +1227,27 @@ C ... and restart the table:
  treated.  In addition, the `using` option allows both `plot` and `splot` to
  treat almost any coordinate system you'd care to define.
 
+ `plot` also lets you use each of the four borders -- x (bottom), x2 (top), y
+ (left) and y2 (right) -- as an independent axis.  The `axes` option lets you
+ choose which pair of axes a given function or data set is plotted against.  A
+ full complement of `set` commands exists to give you complete control over
+ the scales and labelling of each axis.  Some commands have the name of an
+ axis built into their names, such as `set xlabel`.  Other commands have one
+ or more axis names as options, such as `set logscale xy`.  Commands and
+ options controlling the z axis have no effect on 2-d graphs.
+
  `splot` can plot surfaces and contours in addition to points and/or lines.
  In addition to `splot`, see `set isosamples` for information about defining
  the grid for a 3-d function;  `splot datafile` for information about the
  requisite file structure for 3-d data values; and `set contour` and `set
  cntrparam` for information about contours.
+
+ In `splot`, control over the scales and labels of the axes are the same as
+ with `plot`, except that commands and options controlling the x2 and y2 axes
+ have no effect whereas of course those controlling the z axis do take effect.
+
+ `splot` allows plotting of binary and matrix data, but only for specific
+ data formats.  See `splot` for details.
 2 Start-up
 ?startup
 ?start
@@ -2069,7 +2087,7 @@ C ... and restart the table:
  functions and data; `splot` draws 2-d projections of 3-d surfaces and data.
  `plot` and `splot` contain many common features; see `splot` for differences.
  Note specifically that `splot`'s `binary` and `matrix` options do not exist
- for `plot`.
+ for `plot`, and `plot`'s `axes` option does not exist for `splot`.
 
  Syntax:
        plot {<ranges>}
@@ -6285,7 +6303,8 @@ C ... and restart the table:
 
  See `plot` for features common to the `plot` command; only differences are
  discussed in detail here.  Note specifically that the `binary` and `matrix`
- options (discussed under "datafile-modifiers") are not available for `plot`.
+ options (discussed under "datafile-modifiers") are not available for `plot`,
+ and `plot`'s `axes` option is not available for `splot`.
 
  Syntax:
        splot {<ranges>}
