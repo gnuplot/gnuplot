@@ -1,5 +1,5 @@
 /*
- * $Id: imagen.trm,v 1.24 1998/04/14 00:17:51 drd Exp $
+ * $Id: imagen.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
  */
 
 /* GNUPLOT - imagen.trm */
@@ -175,7 +175,8 @@ char IMPdrpattern[10][10] =
 /*  7 */ {16, 4, 1, 8, 1, 4, 0}
 };
 
-TERM_PUBLIC void IMAGEN_init()
+TERM_PUBLIC void
+IMAGEN_init()
 {
     register struct termentry *t = term;
 
@@ -229,7 +230,8 @@ TERM_PUBLIC void IMAGEN_init()
     IM_vecpos = 0;
 }
 
-static void IM_page()
+static void
+IM_page()
 {
     if (IM_vecpos) {
 	/* fprintf(stderr,"graphics, draw path\n"); */
@@ -238,7 +240,8 @@ static void IM_page()
     putc(imP_ENDPAGE, gpoutfile);
 }
 
-TERM_PUBLIC void IMAGEN_graphics()
+TERM_PUBLIC void
+IMAGEN_graphics()
 {
     int tmpx, tmpy;
 /*    int xoff, yoff; */
@@ -258,7 +261,8 @@ TERM_PUBLIC void IMAGEN_graphics()
     IMAGEN_orgy = tmpy + (int) ((IMAGEN_winy - IMAGEN_ymax) / 2);
 }
 
-TERM_PUBLIC void IMAGEN_options()
+TERM_PUBLIC void
+IMAGEN_options()
 {
     struct value a;
 
@@ -309,7 +313,8 @@ TERM_PUBLIC void IMAGEN_options()
 }
 
 
-TERM_PUBLIC void IMAGEN_text()
+TERM_PUBLIC void
+IMAGEN_text()
 {
 }
 
@@ -317,7 +322,8 @@ TERM_PUBLIC void IMAGEN_text()
 #define DRAW_PATTERNS 6
 
 
-TERM_PUBLIC void IMAGEN_linetype(lt)
+TERM_PUBLIC void
+IMAGEN_linetype(lt)
 int lt;
 {
     static int lastlinetype = -10;
@@ -352,7 +358,8 @@ int lt;
 }
 
 
-TERM_PUBLIC void IMAGEN_move(x, y)
+TERM_PUBLIC void
+IMAGEN_move(x, y)
 unsigned int x, y;
 {
     if (IM_vecpos) {
@@ -369,7 +376,8 @@ unsigned int x, y;
      */
 }
 
-TERM_PUBLIC void IMAGEN_vector(ux, uy)
+TERM_PUBLIC void
+IMAGEN_vector(ux, uy)
 unsigned int ux, uy;
 {
     /* void IMAGEN_draw_path(); */
@@ -387,7 +395,8 @@ unsigned int ux, uy;
     }
 }
 
-static void IMAGEN_draw_path()
+static void
+IMAGEN_draw_path()
 {
 /*    unsigned int pos; */
     register int i;
@@ -413,7 +422,8 @@ static void IMAGEN_draw_path()
     /* IMAGEN_move(ux, uy); */
 }
 
-static void IMAGEN_setpos(ux, uy)
+static void
+IMAGEN_setpos(ux, uy)
 int ux, uy;
 {
     /* Set x and y position (for text), also set beginning-of-line. */
@@ -429,7 +439,8 @@ int ux, uy;
 	IMAGEN_putwd(ux + IMAGEN_orgx);		/* horizontal */
 }
 
-TERM_PUBLIC int IMAGEN_text_angle(ang)
+TERM_PUBLIC int
+IMAGEN_text_angle(ang)
 int ang;
 {
 
@@ -445,7 +456,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC int IMAGEN_justify_text(mode)
+TERM_PUBLIC int
+IMAGEN_justify_text(mode)
 enum JUSTIFY mode;
 {
     if (IM_vecpos) {
@@ -456,7 +468,8 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-static unsigned char *IMAGEN_cvts(str, width, height)
+static unsigned char *
+IMAGEN_cvts(str, width, height)
 unsigned char *str;
 int *width;
 int *height;
@@ -528,7 +541,8 @@ int *height;
     return (buf);
 }
 
-TERM_PUBLIC void IMAGEN_put_text(x, y, str)
+TERM_PUBLIC void
+IMAGEN_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
@@ -594,7 +608,8 @@ char str[];			/* the text */
     }
 }
 
-TERM_PUBLIC void IMAGEN_reset()
+TERM_PUBLIC void
+IMAGEN_reset()
 {
     if (IM_vecpos) {
 	/* fprintf(stderr,"reset, draw path\n"); */
@@ -603,7 +618,8 @@ TERM_PUBLIC void IMAGEN_reset()
     putc(imP_EOF, gpoutfile);
 }
 
-static void IMAGEN_putwd(w)
+static void
+IMAGEN_putwd(w)
 unsigned int w;
 {
     /* fprintf(stderr,"%1u\n",w); */
@@ -611,7 +627,8 @@ unsigned int w;
     putc(w, gpoutfile);
 }
 
-static void IMAGEN_createfamily(c, sz)
+static void
+IMAGEN_createfamily(c, sz)
 char *c;
 int sz;
 {
@@ -625,7 +642,8 @@ int sz;
     putc(0, gpoutfile);
 }
 
-static void IMAGEN_setfont(sz)
+static void
+IMAGEN_setfont(sz)
 int sz;
 {
     char font[20];
@@ -648,7 +666,8 @@ int sz;
     IMAGEN_putwd(IMAGEN_hchar);
 }
 
-void IMP_set_draw_pattern(pattern, sz)
+void
+IMP_set_draw_pattern(pattern, sz)
 int pattern, sz;
 {
     int i /*,j */ ;
@@ -666,7 +685,8 @@ int pattern, sz;
 }
 
 
-void IMAGEN_mapsinit()
+void
+IMAGEN_mapsinit()
 {
 
     register int i /*, j */ ;
@@ -817,7 +837,8 @@ void IMAGEN_mapsinit()
     IMP_chmap[255] = 121;
 }
 
-void IMAGEN_createmap(name, map)
+void
+IMAGEN_createmap(name, map)
 unsigned short *map;
 int name;
 {

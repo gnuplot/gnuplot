@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.17 1999/03/19 21:06:25 lhecking Exp $
+ * $Id: pslatex.trm,v 1.18 1999/06/12 16:37:59 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -102,7 +102,8 @@ struct text_command {
 
 static struct text_command *PSLATEX_labels;
 
-TERM_PUBLIC void PSLATEX_options()
+TERM_PUBLIC void
+PSLATEX_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "d$efault")) {
@@ -169,7 +170,8 @@ TERM_PUBLIC void PSLATEX_options()
 	    PSLATEX_useAuxFile ? " auxfile" : "");
 }
 
-TERM_PUBLIC void PSLATEX_init()
+TERM_PUBLIC void
+PSLATEX_init()
 {
     char *dotIndex;
 
@@ -271,7 +273,8 @@ Turning off auxfile option\n", outstr);
     PSLATEX_labels = 0;
 }
 
-TERM_PUBLIC void PSLATEX_graphics()
+TERM_PUBLIC void
+PSLATEX_graphics()
 {
     struct termentry *t = term;
     char *psfile_basename = strrchr(PSLATEX_psfile, DIRSEP1);
@@ -321,7 +324,8 @@ TERM_PUBLIC void PSLATEX_graphics()
     PSLATEX_labels = (struct text_command *) NULL;
 }
 
-TERM_PUBLIC void PSLATEX_put_text(x, y, str)
+TERM_PUBLIC void
+PSLATEX_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -343,14 +347,16 @@ char str[];
     PSLATEX_labels = tc;
 }
 
-TERM_PUBLIC int PSLATEX_justify_text(mode)
+TERM_PUBLIC int
+PSLATEX_justify_text(mode)
 enum JUSTIFY mode;
 {
     PSLATEX_justify = mode;
     return TRUE;
 }
 
-TERM_PUBLIC int PSLATEX_text_angle(ang)
+TERM_PUBLIC int
+PSLATEX_text_angle(ang)
 int ang;
 {
     /* rotated text is put in a short stack, and optionally uses 
@@ -360,7 +366,8 @@ int ang;
 }
 
 
-TERM_PUBLIC void PSLATEX_reset()
+TERM_PUBLIC void
+PSLATEX_reset()
 {
     if (PSLATEX_auxFile) {
 	fclose(PSLATEX_auxFile);
@@ -372,7 +379,8 @@ TERM_PUBLIC void PSLATEX_reset()
     }
 }
 
-TERM_PUBLIC void PSLATEX_text()
+TERM_PUBLIC void
+PSLATEX_text()
 {
     struct text_command *tc;
 
@@ -465,7 +473,8 @@ TERM_PUBLIC void PSLATEX_text()
     }
 }
 
-TERM_PUBLIC void PSLATEX_move(x, y)
+TERM_PUBLIC void
+PSLATEX_move(x, y)
 unsigned int x, y;
 {
     if (PSLATEX_auxFile) {
@@ -479,7 +488,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void PSLATEX_vector(x, y)
+TERM_PUBLIC void
+PSLATEX_vector(x, y)
 unsigned int x, y;
 {
 
@@ -494,7 +504,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void PSLATEX_linetype(lt)
+TERM_PUBLIC void
+PSLATEX_linetype(lt)
 int lt;
 {
     if (PSLATEX_auxFile) {
@@ -507,7 +518,8 @@ int lt;
     }
 }
 
-TERM_PUBLIC void PSLATEX_point(x, y, number)
+TERM_PUBLIC void
+PSLATEX_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -521,7 +533,8 @@ int number;
 }
 
 
-TERM_PUBLIC void PSLATEX_pointsize(ps)
+TERM_PUBLIC void
+PSLATEX_pointsize(ps)
 double ps;
 {
     if (PSLATEX_auxFile) {
@@ -534,7 +547,8 @@ double ps;
 }
 
 
-TERM_PUBLIC void PSLATEX_linewidth(ps)
+TERM_PUBLIC void
+PSLATEX_linewidth(ps)
 double ps;
 {
     if (PSLATEX_auxFile) {

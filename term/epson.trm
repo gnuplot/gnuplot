@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.19 1998/04/14 00:17:41 drd Exp $
+ * $Id: epson.trm,v 1.9 1999/05/31 18:33:50 lhecking Exp $
  *
  */
 
@@ -191,11 +191,13 @@ void epson_dump __PROTO((void));
 #define EPSONXLAST (EPSONXMAX - 1)
 #define EPSONYLAST (EPSONYMAX - 1)
 
-TERM_PUBLIC void EPSONinit()
+TERM_PUBLIC void
+EPSONinit()
 {
 }
 
-TERM_PUBLIC void EPSONgraphics()
+TERM_PUBLIC void
+EPSONgraphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (EPSONXMAX * xsize),
@@ -203,14 +205,16 @@ TERM_PUBLIC void EPSONgraphics()
 }
 
 
-TERM_PUBLIC void EPSONtext()
+TERM_PUBLIC void
+EPSONtext()
 {
     epson_dump();
     b_freebitmap();
 }
 
 
-TERM_PUBLIC void EPSONreset()
+TERM_PUBLIC void
+EPSONreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -219,7 +223,8 @@ TERM_PUBLIC void EPSONreset()
 
 
 /* output file must be binary mode for epson_dump */
-void epson_dump()
+void
+epson_dump()
 {
     register unsigned int x;
     int j;
@@ -264,7 +269,8 @@ static unsigned int necpcolor[] = { 0, 2, 1, 4 };
 
 static int NECmode;
 
-TERM_PUBLIC void NECoptions()
+TERM_PUBLIC void
+NECoptions()
 {
     if (END_OF_COMMAND) {
 	strcpy(term_options, "monochrome");
@@ -290,18 +296,21 @@ TERM_PUBLIC void NECoptions()
     }
 }
 
-TERM_PUBLIC void NECinit()
+TERM_PUBLIC void
+NECinit()
 {
 }
 
-TERM_PUBLIC void NECgraphics()
+TERM_PUBLIC void
+NECgraphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (NECXMAX * xsize),
 		 (unsigned int) (NECYMAX * ysize), (NECmode == 'c' ? 4 : 1));
 }
 
-TERM_PUBLIC void NECtext()
+TERM_PUBLIC void
+NECtext()
 {
     if (NECmode == 'd') {
 	nec_draft_dump();
@@ -311,7 +320,8 @@ TERM_PUBLIC void NECtext()
     b_freebitmap();
 }
 
-TERM_PUBLIC void NEClinetype(linetype)
+TERM_PUBLIC void
+NEClinetype(linetype)
 int linetype;
 {
     if (NECmode == 'c') {
@@ -325,7 +335,8 @@ int linetype;
 
 
 
-TERM_PUBLIC void NECreset()
+TERM_PUBLIC void
+NECreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -334,7 +345,8 @@ TERM_PUBLIC void NECreset()
 
 
 /* output file must be binary mode for nec_dump */
-void nec_dump()
+void
+nec_dump()
 {
     unsigned int x;
     unsigned int plane, offset;
@@ -405,7 +417,8 @@ void nec_dump()
 }
 
 /* output file must be binary mode for nec_dump */
-void nec_draft_dump()
+void
+nec_draft_dump()
 {
     unsigned int x;
     unsigned int plane, offset;
@@ -460,11 +473,13 @@ void STARC_dump __PROTO((void));
 static unsigned int STARCcolor[] = { 1, 8, 4, 2, 10, 12, 6, 14 };
 static unsigned int STARCpcolor[] = { 0, 2, 1, 4 };
 
-TERM_PUBLIC void STARCinit()
+TERM_PUBLIC void
+STARCinit()
 {
 }
 
-TERM_PUBLIC void STARCgraphics()
+TERM_PUBLIC void
+STARCgraphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (STARCXMAX * xsize),
@@ -472,13 +487,15 @@ TERM_PUBLIC void STARCgraphics()
 }
 
 
-TERM_PUBLIC void STARCtext()
+TERM_PUBLIC void
+STARCtext()
 {
     STARC_dump();
     b_freebitmap();
 }
 
-TERM_PUBLIC void STARClinetype(linetype)
+TERM_PUBLIC void
+STARClinetype(linetype)
 int linetype;
 {
     if (linetype >= 6)
@@ -488,7 +505,8 @@ int linetype;
 
 
 
-TERM_PUBLIC void STARCreset()
+TERM_PUBLIC void
+STARCreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -497,7 +515,8 @@ TERM_PUBLIC void STARCreset()
 
 
 /* output file must be binary mode for STARC_dump */
-void STARC_dump()
+void
+STARC_dump()
 {
     unsigned int x;
     unsigned int plane, offset;
@@ -539,7 +558,8 @@ void eps180_dump __PROTO((void));
 #define EPS180XLAST (EPS180XMAX - 1)
 #define EPS180YLAST (EPS180YMAX - 1)
 
-TERM_PUBLIC void EPS180graphics()
+TERM_PUBLIC void
+EPS180graphics()
 {
     b_charsize(FNT13X25);
     b_makebitmap((unsigned int) (EPS180XMAX * xsize),
@@ -547,7 +567,8 @@ TERM_PUBLIC void EPS180graphics()
 }
 
 
-TERM_PUBLIC void EPS180text()
+TERM_PUBLIC void
+EPS180text()
 {
     eps180_dump();
     b_freebitmap();
@@ -556,7 +577,8 @@ TERM_PUBLIC void EPS180text()
 
 
 /* output file must be binary mode for eps180_dump */
-void eps180_dump()
+void
+eps180_dump()
 {
     register unsigned int x;
     int j;
@@ -590,7 +612,8 @@ void eps60_dump __PROTO((void));
 #define EPS60XLAST (EPS60XMAX - 1)
 #define EPS60YLAST (EPS60YMAX - 1)
 
-TERM_PUBLIC void EPS60graphics()
+TERM_PUBLIC void
+EPS60graphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (EPS60XMAX * xsize),
@@ -598,7 +621,8 @@ TERM_PUBLIC void EPS60graphics()
 }
 
 
-TERM_PUBLIC void EPS60text()
+TERM_PUBLIC void
+EPS60text()
 {
     eps60_dump();
     b_freebitmap();
@@ -607,7 +631,8 @@ TERM_PUBLIC void EPS60text()
 
 
 /* output file must be binary mode for eps60_dump */
-void eps60_dump()
+void
+eps60_dump()
 {
     register unsigned int x;
     int j;
@@ -636,7 +661,8 @@ void eps60_dump()
    into Tandy mode.  For a Tandy already in IBM mode, use EPS60. */
 
 
-TERM_PUBLIC void TANDY60text()
+TERM_PUBLIC void
+TANDY60text()
 {
 #ifdef PC
     fputs("Inserting Tandy/IBM mode conversion codes\n", stderr);
@@ -659,7 +685,8 @@ TERM_PUBLIC void TANDY60text()
 
 void okidata_dump __PROTO((void));
 
-TERM_PUBLIC void OKIDATAtext()
+TERM_PUBLIC void
+OKIDATAtext()
 {
     okidata_dump();
     b_freebitmap();
@@ -702,7 +729,8 @@ int bitrev_tbl[] =
 };
 
 /* output file must be binary mode for okidata_dump */
-void okidata_dump()
+void
+okidata_dump()
 {
     register unsigned int x;
     int j;

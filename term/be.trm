@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: be.trm,v 1.4 1999/03/12 21:48:26 lhecking Exp $
  *
  */
 
@@ -122,7 +122,8 @@ static char BE_command[] = "gnuplot_be";
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
  */
 
-int BE_args(argc, argv)
+int
+BE_args(argc, argv)
 int argc;
 char *argv[];
 {
@@ -165,7 +166,8 @@ char *argv[];
 
 static unsigned int BE_plot_number;
 
-TERM_PUBLIC void BE_options()
+TERM_PUBLIC void
+BE_options()
 {
     if (almost_equals(c_token, "res$et")) {
 	BE_atexit ();	/* tell gnuplot_be to shut down */
@@ -189,7 +191,8 @@ TERM_PUBLIC void BE_options()
 /*
  *   The Be terminal driver uses popen() pipe IPC
  */
-static void BE_atexit ()
+static void
+BE_atexit ()
 {
     if (BE_ipc) {
 	fputs("R\n", BE_ipc);
@@ -199,7 +202,8 @@ static void BE_atexit ()
     }
 }
 
-TERM_PUBLIC void BE_init()
+TERM_PUBLIC void
+BE_init()
 {
     if (!BE_ipc) {
 	/* first time through or after a reset */
@@ -226,7 +230,8 @@ TERM_PUBLIC void BE_init()
     }
 }
 
-TERM_PUBLIC void BE_reset()
+TERM_PUBLIC void
+BE_reset()
 {
     /* leave the pipe alone, until exit or  set term be reset */
 }
@@ -247,13 +252,15 @@ TERM_PUBLIC void BE_reset()
 /* common stuff, using macros defined above */
 
 
-TERM_PUBLIC void BE_graphics()
+TERM_PUBLIC void
+BE_graphics()
 {
     BEFORE_GRAPHICS;		/* kludge for crippled select */
     PRINT1("G%d\n", BE_plot_number);	/* for VMS sake, keep as separate prints */
 }
 
-TERM_PUBLIC void BE_text()
+TERM_PUBLIC void
+BE_text()
 {
     PRINT0("E\n");
     FFLUSH();
@@ -261,38 +268,44 @@ TERM_PUBLIC void BE_text()
 }
 
 
-TERM_PUBLIC void BE_move(x, y)
+TERM_PUBLIC void
+BE_move(x, y)
 unsigned int x, y;
 {
     PRINT2("M%04d%04d\n", x, y);
 }
 
-TERM_PUBLIC void BE_vector(x, y)
+TERM_PUBLIC void
+BE_vector(x, y)
 unsigned int x, y;
 {
     PRINT2("V%04d%04d\n", x, y);
 }
 
-TERM_PUBLIC void BE_pointsize(ps)
+TERM_PUBLIC void
+BE_pointsize(ps)
 double ps;
 {
     PRINT2("P7%04d%04d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
-TERM_PUBLIC void BE_linewidth(lw)
+TERM_PUBLIC void
+BE_linewidth(lw)
 double lw;
 {
     PRINT1("W%04d\n", (int) lw);
 }
 
-TERM_PUBLIC void BE_linetype(lt)
+TERM_PUBLIC void
+BE_linetype(lt)
 int lt;
 {
     PRINT1("L%04d\n", lt);
 }
 
-TERM_PUBLIC void BE_put_text(x, y, str)
+TERM_PUBLIC void
+BE_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -302,14 +315,16 @@ char str[];
     }
 }
 
-TERM_PUBLIC int BE_justify_text(mode)
+TERM_PUBLIC int
+BE_justify_text(mode)
 enum JUSTIFY mode;
 {
     PRINT1("J%04d\n", mode);
     return (TRUE);
 }
 
-TERM_PUBLIC void BE_point(x, y, number)
+TERM_PUBLIC void
+BE_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -319,7 +334,8 @@ int number;
     PRINT3("P%01d%04d%04d\n", number, x, y);
 }
 
-TERM_PUBLIC void BE_fillbox(style, x, y, w, h)
+TERM_PUBLIC void
+BE_fillbox(style, x, y, w, h)
 int style;
 unsigned int x, y, w, h;
 {

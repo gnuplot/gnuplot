@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.1 1999/05/19 11:00:51 lhecking Exp $
+ * $Id: metapost.trm,v 1.2 1999/06/10 19:54:47 lhecking Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -152,7 +152,8 @@ static void MP_endline __PROTO((void));
 /* max number of path nodes before a newline */
 #define MP_LINEMAX 5
 
-TERM_PUBLIC void MP_options()
+TERM_PUBLIC void
+MP_options()
 {
     MP_color = FALSE;
     MP_solid = FALSE;
@@ -235,7 +236,8 @@ TERM_PUBLIC void MP_options()
 	    MP_textmag, MP_fontname, MP_fontsize);
 }
 
-TERM_PUBLIC void MP_init()
+TERM_PUBLIC void
+MP_init()
 {
     time_t now;
     time(&now);
@@ -372,7 +374,8 @@ enddef;\n",
 	  gpoutfile);
 }
 
-TERM_PUBLIC void MP_graphics()
+TERM_PUBLIC void
+MP_graphics()
 {
     /* initialize "remembered" drawing parameters */
     MP_oldline = -2;
@@ -385,14 +388,16 @@ TERM_PUBLIC void MP_graphics()
     MP_char_code++;
 }
 
-TERM_PUBLIC void MP_text()
+TERM_PUBLIC void
+MP_text()
 {
     if (MP_inline)
 	MP_endline();
     fputs("endfig;\n", gpoutfile);
 }
 
-TERM_PUBLIC void MP_linetype(lt)
+TERM_PUBLIC void
+MP_linetype(lt)
 int lt;
 {
     int linetype = lt;
@@ -406,7 +411,8 @@ int lt;
     }
 }
 
-TERM_PUBLIC void MP_move(x, y)
+TERM_PUBLIC void
+MP_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -418,7 +424,8 @@ unsigned int y;
     }				/* else we seem to be there already */
 }
 
-TERM_PUBLIC void MP_point(x, y, pt)
+TERM_PUBLIC void
+MP_point(x, y, pt)
 unsigned int x;
 unsigned int y;
 int pt;
@@ -435,7 +442,8 @@ int pt;
     fprintf(gpoutfile, "gpdraw(%d,%da,%db);\n", pointtype, x, y);
 }
 
-TERM_PUBLIC void MP_pointsize(ps)
+TERM_PUBLIC void
+MP_pointsize(ps)
 double ps;
 {
     if (MP_oldptsize != ps) {
@@ -447,7 +455,8 @@ double ps;
 }
 
 
-TERM_PUBLIC void MP_linewidth(lw)
+TERM_PUBLIC void
+MP_linewidth(lw)
 double lw;
 {
     if (MP_oldpen != lw) {
@@ -459,7 +468,8 @@ double lw;
 }
 
 
-TERM_PUBLIC void MP_vector(ux, uy)
+TERM_PUBLIC void
+MP_vector(ux, uy)
 unsigned int ux;
 unsigned int uy;
 {
@@ -481,13 +491,15 @@ unsigned int uy;
     fprintf(gpoutfile, "--(%da,%db)", MP_posx, MP_posy);
 }
 
-static void MP_endline()
+static void
+MP_endline()
 {
     MP_inline = FALSE;
     fprintf(gpoutfile, ";\n");
 }
 
-TERM_PUBLIC void MP_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+MP_arrow(sx, sy, ex, ey, head)
 unsigned int sx;
 unsigned int sy;
 unsigned int ex;
@@ -507,7 +519,8 @@ TBOOLEAN head;
 
 }
 
-TERM_PUBLIC void MP_put_text(x, y, str)
+TERM_PUBLIC void
+MP_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -553,14 +566,16 @@ put_text( btex \\setfont{%s}{%5.2f} %s etex, %da, %db, %d, %d);\n",
     }
 }
 
-TERM_PUBLIC int MP_justify_text(mode)
+TERM_PUBLIC int
+MP_justify_text(mode)
 enum JUSTIFY mode;
 {
     MP_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int MP_text_angle(ang)
+TERM_PUBLIC int
+MP_text_angle(ang)
 int ang;
 {
     /* Metapost code does the conversion */
@@ -568,7 +583,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC int MP_set_font(font)
+TERM_PUBLIC int
+MP_set_font(font)
 char *font;
 {
     if (*font) {
@@ -589,12 +605,14 @@ char *font;
 }
 
 
-TERM_PUBLIC void MP_reset()
+TERM_PUBLIC void
+MP_reset()
 {
     fputs("end.\n", gpoutfile);
 }
 
-TERM_PUBLIC void MP_boxfill(sty, x1, y1, wd, ht)
+TERM_PUBLIC void
+MP_boxfill(sty, x1, y1, wd, ht)
 int sty;
 unsigned int x1, y1, wd, ht;
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: hp2648.trm,v 1.14 1998/04/14 00:17:48 drd Exp $
+ * $Id: hp2648.trm,v 1.6 1998/11/25 21:06:34 lhecking Exp $
  *
  */
 
@@ -84,7 +84,8 @@ TERM_PUBLIC void HP2648reset __PROTO((void));
 #define HP2648YLAST (HP2648YMAX - 1)
 
 
-TERM_PUBLIC void HP2648init()
+TERM_PUBLIC void
+HP2648init()
 {
     fprintf(gpoutfile, "\033*m1m1n136,1cZ");
 /*                   1     2 3     4
@@ -96,7 +97,8 @@ TERM_PUBLIC void HP2648init()
 }
 
 
-TERM_PUBLIC void HP2648graphics()
+TERM_PUBLIC void
+HP2648graphics()
 {
     fprintf(gpoutfile, "\033*dacZ");
 /*                   1     23
@@ -107,12 +109,14 @@ TERM_PUBLIC void HP2648graphics()
 }
 
 
-TERM_PUBLIC void HP2648text()
+TERM_PUBLIC void
+HP2648text()
 {
 }
 
 
-TERM_PUBLIC void HP2648linetype(linetype)
+TERM_PUBLIC void
+HP2648linetype(linetype)
 int linetype;
 {
     static int hpline[] = { 1, 7, 1, 4, 5, 6, 8, 9, 10, 7, 2 };
@@ -120,7 +124,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void HP2648move(x, y)
+TERM_PUBLIC void
+HP2648move(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "\033*paf%d,%dZ", x, y);
@@ -133,7 +138,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void HP2648vector(x, y)
+TERM_PUBLIC void
+HP2648vector(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "\033*pbf%d,%dZ", x, y);
@@ -143,7 +149,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void HP2648put_text(x, y, str)
+TERM_PUBLIC void
+HP2648put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -152,14 +159,16 @@ char *str;
 }
 
 
-TERM_PUBLIC int HP2648_text_angle(ang)
+TERM_PUBLIC int
+HP2648_text_angle(ang)
 int ang;
 {
     fprintf(gpoutfile, "\033*m%dnZ\n", ang + 1);
     return TRUE;
 }
 
-TERM_PUBLIC void HP2648reset()
+TERM_PUBLIC void
+HP2648reset()
 {
 }
 

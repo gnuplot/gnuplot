@@ -1,5 +1,5 @@
 /*
- * $Id: unixpc.trm,v 1.14 1998/04/14 00:18:12 drd Exp $
+ * $Id: unixpc.trm,v 1.6 1998/12/14 18:41:43 lhecking Exp $
  *
  */
 
@@ -146,7 +146,8 @@ fprintf(stderr, "%s:: %s %s\n", sys_errlist[errno], s1, s2);\
 uPC_fixwind(0);\
 exit(-1);}
 
-TERM_PUBLIC void uPC_init()
+TERM_PUBLIC void
+uPC_init()
 {
     /* This routine will ioctl to change 0 size */
     int i;
@@ -175,7 +176,8 @@ TERM_PUBLIC void uPC_init()
 }
 
 
-TERM_PUBLIC void uPC_graphics()
+TERM_PUBLIC void
+uPC_graphics()
 {
 /* This routine will clear the uPC_display buffer and window. */
     register Scr_type *j;
@@ -198,7 +200,8 @@ TERM_PUBLIC void uPC_graphics()
 }
 
 
-TERM_PUBLIC void uPC_text()
+TERM_PUBLIC void
+uPC_text()
 {
 /* This routine will flush the display. */
 
@@ -207,7 +210,8 @@ TERM_PUBLIC void uPC_text()
 }
 
 
-TERM_PUBLIC void uPC_linetype(linetype)
+TERM_PUBLIC void
+uPC_linetype(linetype)
 int linetype;
 {
 /* This routine records the current linetype. */
@@ -218,7 +222,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void uPC_move(x, y)
+TERM_PUBLIC void
+uPC_move(x, y)
 unsigned int x, y;
 {
 /* This routine just records x and y in uPC_sx, uPC_sy */
@@ -231,7 +236,8 @@ unsigned int x, y;
 #define uPC_PLOT(a,b)   (uPC_cur_linetype != 0 ? uPC_plot_word (a,b) :\
                                 (*(a)|=(b)))
 
-void uPC_plot_word(a, b)
+void
+uPC_plot_word(a, b)
 Scr_type *a, b;
 /*
    Weak attempt to make line styles.  The real problem is the aspect
@@ -288,7 +294,8 @@ Scr_type *a, b;
     }
 }
 
-TERM_PUBLIC void uPC_vector(x, y)
+TERM_PUBLIC void
+uPC_vector(x, y)
 unsigned int x, y;
 {
 /* This routine calls line with x,y */
@@ -480,7 +487,8 @@ unsigned int x, y;
    This placement to the nearest character cell worked, and I'm leaving
    it here so the calculations involved won't be lost!  (jdc)
 */
-TERM_PUBLIC void uPC_put_text(x, y, str)
+TERM_PUBLIC void
+uPC_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -497,7 +505,8 @@ char str[];
 #endif
 
 
-TERM_PUBLIC void uPC_put_text(x, y, str)
+TERM_PUBLIC void
+uPC_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -519,7 +528,8 @@ char str[];
 }
 
 
-void uPC_putc(x, y, c, angle)
+void
+uPC_putc(x, y, c, angle)
 unsigned int x, y;
 int c, angle;
 /*
@@ -555,7 +565,8 @@ int c, angle;
 }
 
 
-TERM_PUBLIC int uPC_text_angle(ang)
+TERM_PUBLIC int
+uPC_text_angle(ang)
 int ang;
 {
     uPC_angle = ang;
@@ -563,7 +574,8 @@ int ang;
 }
 
 
-TERM_PUBLIC void uPC_reset()
+TERM_PUBLIC void
+uPC_reset()
 {
 /* Reset window to normal size. */
     uPC_fixwind(0);
@@ -571,7 +583,8 @@ TERM_PUBLIC void uPC_reset()
 
 
 
-void uPC_fixwind(signo)
+void
+uPC_fixwind(signo)
 int signo;
 {
     static struct uwdata wreset =

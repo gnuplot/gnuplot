@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.14 1998/04/14 00:17:54 drd Exp $
+ * $Id: metafont.trm,v 1.9 1999/05/04 19:58:08 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -175,7 +175,8 @@ static struct {
 
 
 
-TERM_PUBLIC void MF_init()
+TERM_PUBLIC void
+MF_init()
 {
     MF_char_code = 0;
     MF_ang = 0;
@@ -328,7 +329,8 @@ arrowhead = (-7pt,-2pt){dir30}..(-6pt,0pt)..\
 }
 
 
-TERM_PUBLIC void MF_graphics()
+TERM_PUBLIC void
+MF_graphics()
 {
     register struct termentry *t = term;
 
@@ -340,13 +342,15 @@ TERM_PUBLIC void MF_graphics()
 }
 
 
-TERM_PUBLIC void MF_text()
+TERM_PUBLIC void
+MF_text()
 {
     fputs("endchar;\n", gpoutfile);
 }
 
 
-TERM_PUBLIC int MF_justify_text(mode)
+TERM_PUBLIC int
+MF_justify_text(mode)
 enum JUSTIFY mode;
 {
     MF_justify = mode;
@@ -354,7 +358,8 @@ enum JUSTIFY mode;
 }
 
 
-TERM_PUBLIC int MF_text_angle(ang)
+TERM_PUBLIC int
+MF_text_angle(ang)
 int ang;
 {
     if (ang > 0)
@@ -365,7 +370,8 @@ int ang;
 }
 
 
-TERM_PUBLIC void MF_linetype(linetype)
+TERM_PUBLIC void
+MF_linetype(linetype)
 int linetype;
 {
     if (linetype >= 8)
@@ -385,7 +391,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void MF_move(x, y)
+TERM_PUBLIC void
+MF_move(x, y)
 unsigned int x, y;
 {
     MF_last_x = x;
@@ -395,7 +402,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void MF_vector(x, y)
+TERM_PUBLIC void
+MF_vector(x, y)
 unsigned int x, y;
 {
     if (MF_is_solid) {
@@ -454,7 +462,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void MF_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+MF_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -471,7 +480,8 @@ TBOOLEAN head;
 }
 
 
-TERM_PUBLIC void MF_put_text(x, y, str)
+TERM_PUBLIC void
+MF_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -496,7 +506,8 @@ char *str;
 }
 
 
-TERM_PUBLIC void MF_reset()
+TERM_PUBLIC void
+MF_reset()
 {
     fputs("end.\n", gpoutfile);
 }

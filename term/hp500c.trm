@@ -1,5 +1,5 @@
 /*
- * $Id: hp500c.trm,v 1.17 1998/04/14 00:17:48 drd Exp $
+ * $Id: hp500c.trm,v 1.8 1999/05/31 18:33:50 lhecking Exp $
  *
  */
 
@@ -144,7 +144,8 @@ static unsigned int b_300ppi_pattern[] =
 #endif
 
 
-TERM_PUBLIC void HP500Coptions()
+TERM_PUBLIC void
+HP500Coptions()
 {
     char opt[6];
 
@@ -216,7 +217,8 @@ TERM_PUBLIC void HP500Coptions()
     }
 }
 
-TERM_PUBLIC void HP500Cinit()
+TERM_PUBLIC void
+HP500Cinit()
 {
     /* HBB 980226: all changes to term-> fields *must* happen here, not
      * in graphics() !*/
@@ -244,7 +246,8 @@ TERM_PUBLIC void HP500Cinit()
     }
 }
 
-TERM_PUBLIC void HP500Creset()
+TERM_PUBLIC void
+HP500Creset()
 {
 #ifdef VMS
     fflush_binary();
@@ -255,7 +258,8 @@ TERM_PUBLIC void HP500Creset()
 
 /* HP DeskJet 500c routines */
 
-TERM_PUBLIC void HP500Clinetype(linetype)
+TERM_PUBLIC void
+HP500Clinetype(linetype)
 int linetype;
 {
     if (linetype < 0)
@@ -290,7 +294,8 @@ int linetype;
 }
 
 /*
-void HP500Cpoint(x,y,value)
+void
+HP500Cpoint(x,y,value)
 int x;
 int y;
 int value;
@@ -300,7 +305,8 @@ int value;
 }
 */
 
-TERM_PUBLIC void HP500Cgraphics()
+TERM_PUBLIC void
+HP500Cgraphics()
 {
     /* HBB 980226: moved block of code from here to init() */
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by 
@@ -315,7 +321,8 @@ TERM_PUBLIC void HP500Cgraphics()
  * this might double the size of the image.
  */
 
-static int HPcompress(op, oe, cp)
+static int
+HPcompress(op, oe, cp)
 unsigned char *op, *oe, *cp;
 {
     unsigned char *ce = cp;
@@ -337,14 +344,16 @@ unsigned char *op, *oe, *cp;
     return ce - cp;		/* length of  cbufs */
 }
 
-static unsigned char HPcomplement(c)
+static unsigned char
+HPcomplement(c)
 int c;
 {
     return (unsigned char) (256 - c);
 }
 
 
-static int HPcompress_to_TIFF(op, oe, cp)
+static int
+HPcompress_to_TIFF(op, oe, cp)
 unsigned char *op;		/* original pointer */
 unsigned char *oe;		/* end of orig string */
 unsigned char *cp;		/* pointer for compressed data */
@@ -387,7 +396,8 @@ unsigned char *cp;		/* pointer for compressed data */
 
 }
 
-static int HPnocompress(op, oe, cp)
+static int
+HPnocompress(op, oe, cp)
 unsigned char *op;
 unsigned char *oe;
 unsigned char *cp;
@@ -401,7 +411,8 @@ unsigned char *cp;
 /* 0 compression raster bitmap dump. Compatible with HP DeskJet 500
    hopefully compatible with other HP Deskjet printers */
 
-TERM_PUBLIC void HP500Ctext()
+TERM_PUBLIC void
+HP500Ctext()
 {
     register int x, j, row, count = 0;
     unsigned char *obuf, *oe, *cbuf, *ce;

@@ -1,5 +1,5 @@
 /*
- * $Id: eepic.trm,v 1.18 1998/04/14 00:17:39 drd Exp $
+ * $Id: eepic.trm,v 1.9 1999/02/22 15:20:35 lhecking Exp $
  *
  */
 
@@ -160,33 +160,41 @@ static int EEPIC_linecount = 0;	/* number of points in line so far */
 void best_latex_arrow __PROTO((int sx, int sy, int ex, int ey, int who,
 			       TBOOLEAN head));
 
-TERM_PUBLIC void EEPIC_init()
+TERM_PUBLIC void
+EEPIC_init()
 {
     EEPIC_posx = EEPIC_posy = 0;
     EEPIC_linetype(-1);
-    fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture using EEPIC macros\n\
-\\setlength{\\unitlength}{%fpt}\n", EEPIC_UNIT);
+    fprintf(gpoutfile, "\
+%% GNUPLOT: LaTeX picture using EEPIC macros\n\
+\\setlength{\\unitlength}{%fpt}\n",
+	    EEPIC_UNIT);
 }
 
 
-TERM_PUBLIC void EEPIC_graphics()
+TERM_PUBLIC void
+EEPIC_graphics()
 {
     register struct termentry *t = term;
 
-    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n\
-\\footnotesize\n", t->xmax, t->ymax);
+    fprintf(gpoutfile, "\
+\\begin{picture}(%d,%d)(0,0)\n\
+\\footnotesize\n",
+	    t->xmax, t->ymax);
 
 }
 
 
-TERM_PUBLIC void EEPIC_text()
+TERM_PUBLIC void
+EEPIC_text()
 {
     EEPIC_endline();
     fputs("\\end{picture}\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void EEPIC_linetype(linetype)
+TERM_PUBLIC void
+EEPIC_linetype(linetype)
 int linetype;
 {
     EEPIC_endline();
@@ -199,7 +207,8 @@ int linetype;
 
 
 
-TERM_PUBLIC void EEPIC_move(x, y)
+TERM_PUBLIC void
+EEPIC_move(x, y)
 unsigned int x, y;
 {
     EEPIC_endline();
@@ -209,7 +218,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void EEPIC_point(x, y, number) /* version of line_and_point */
+TERM_PUBLIC void
+EEPIC_point(x, y, number) /* version of line_and_point */
 unsigned int x, y;
 int number;			/* type of point */
 {
@@ -223,7 +233,8 @@ int number;			/* type of point */
 }
 
 
-TERM_PUBLIC void EEPIC_vector(ux, uy)
+TERM_PUBLIC void
+EEPIC_vector(ux, uy)
 unsigned int ux, uy;
 {
     if (!EEPIC_inline) {
@@ -251,7 +262,8 @@ unsigned int ux, uy;
     EEPIC_posy = uy;
 }
 
-void EEPIC_endline()
+void
+EEPIC_endline()
 {
     if (EEPIC_inline) {
 	putc('\n', gpoutfile);
@@ -260,7 +272,8 @@ void EEPIC_endline()
 }
 
 
-TERM_PUBLIC void EEPIC_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+EEPIC_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -271,7 +284,8 @@ TBOOLEAN head;
 }
 
 
-TERM_PUBLIC void EEPIC_put_text(x, y, str)
+TERM_PUBLIC void
+EEPIC_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
@@ -327,14 +341,16 @@ char str[];			/* the text */
 
 
 
-TERM_PUBLIC int EEPIC_justify_text(mode)
+TERM_PUBLIC int
+EEPIC_justify_text(mode)
 enum JUSTIFY mode;
 {
     eepic_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int EEPIC_text_angle(ang)
+TERM_PUBLIC int
+EEPIC_text_angle(ang)
 int ang;
 {
     /* we can't really write text vertically, but this will 
@@ -344,7 +360,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void EEPIC_reset()
+TERM_PUBLIC void
+EEPIC_reset()
 {
     EEPIC_endline();
     EEPIC_posx = EEPIC_posy = 0;

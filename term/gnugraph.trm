@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: gnugraph.trm,v 1.9 1999/03/31 19:49:36 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -184,7 +184,8 @@ extern int GNU_PLOTUTILS_PREFIX(textangle) __PROTO((int));
 extern int GNU_PLOTUTILS_PREFIX(closepl) __PROTO((void));
 #endif
 
-TERM_PUBLIC void UP_options()
+TERM_PUBLIC void
+UP_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "d$efault")) {
@@ -209,7 +210,8 @@ TERM_PUBLIC void UP_options()
     sprintf(term_options, "\"%s\" %d", up_font, up_fontsize);
 }
 
-TERM_PUBLIC void UP_init()
+TERM_PUBLIC void
+UP_init()
 {
     GNU_PLOTUTILS_PREFIX(openpl)();
     GNU_PLOTUTILS_PREFIX(space)(0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
@@ -226,20 +228,23 @@ TERM_PUBLIC void UP_init()
 }
 
 
-TERM_PUBLIC void UP_graphics()
+TERM_PUBLIC void
+UP_graphics()
 {
     GNU_PLOTUTILS_PREFIX(erase)();
 }
 
 
-TERM_PUBLIC void UP_text()
+TERM_PUBLIC void
+UP_text()
 {
     /* Flush here so that output will be complete. */
     fflush(stdout);
 }
 
 
-TERM_PUBLIC void UP_linetype(linetype)
+TERM_PUBLIC void
+UP_linetype(linetype)
 int linetype;
 {
     static char *lt[2+5] = { "solid", "longdashed", "solid", "dotted",
@@ -251,21 +256,24 @@ int linetype;
 }
 
 
-TERM_PUBLIC void UP_move(x, y)
+TERM_PUBLIC void
+UP_move(x, y)
 unsigned int x, y;
 {
     GNU_PLOTUTILS_PREFIX(move)(x + UP_XOFF, y + UP_YOFF);
 }
 
 
-TERM_PUBLIC void UP_vector(x, y)
+TERM_PUBLIC void
+UP_vector(x, y)
 unsigned int x, y;
 {
     GNU_PLOTUTILS_PREFIX(cont)(x + UP_XOFF, y + UP_YOFF);
 }
 
 
-TERM_PUBLIC void UP_put_text(x, y, str)
+TERM_PUBLIC void
+UP_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -284,21 +292,24 @@ char str[];
 
 }
 
-TERM_PUBLIC int UP_text_angle(ang)
+TERM_PUBLIC int
+UP_text_angle(ang)
 int ang;
 {
     ROTATE(ang);
     return TRUE;
 }
 
-TERM_PUBLIC int UP_justify_text(mode)
+TERM_PUBLIC int
+UP_justify_text(mode)
 enum JUSTIFY mode;
 {
     up_justify = mode;
     return TRUE;
 }
 
-TERM_PUBLIC void UP_reset()
+TERM_PUBLIC void
+UP_reset()
 {
     GNU_PLOTUTILS_PREFIX(closepl)();
 }

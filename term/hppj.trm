@@ -1,5 +1,5 @@
 /*
- * $Id: hppj.trm,v 1.13 1998/04/14 00:17:51 drd Exp $
+ * $Id: hppj.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
  *
  */
 
@@ -99,7 +99,8 @@ TERM_PUBLIC void HPPJlinetype __PROTO((int linetype));
 #ifdef TERM_BODY
 static int hppj_font = FNT9X17;
 
-TERM_PUBLIC void HPPJoptions()
+TERM_PUBLIC void
+HPPJoptions()
 {
     char opt[10];
 #define HPPJERROR "expecting font size FNT5X9, FNT9X17, or FNT13X25"
@@ -129,7 +130,8 @@ TERM_PUBLIC void HPPJoptions()
 }
 
 
-TERM_PUBLIC void HPPJinit()
+TERM_PUBLIC void
+HPPJinit()
 {
     /* HBB 980226: moved this here, from graphics(): only init() may
      * change fields of *term ! */
@@ -156,7 +158,8 @@ TERM_PUBLIC void HPPJinit()
 }
 
 
-TERM_PUBLIC void HPPJreset()
+TERM_PUBLIC void
+HPPJreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -164,7 +167,8 @@ TERM_PUBLIC void HPPJreset()
 }
 
 
-TERM_PUBLIC void HPPJgraphics()
+TERM_PUBLIC void
+HPPJgraphics()
 {
     /* HBB 980226: move a block of code from here to init() */
     b_charsize(hppj_font);
@@ -173,7 +177,8 @@ TERM_PUBLIC void HPPJgraphics()
 }
 
 
-TERM_PUBLIC void HPPJtext()
+TERM_PUBLIC void
+HPPJtext()
 {
     int x, plane, y;		/* loop indexes */
     int minRow, maxRow;		/* loop bounds */
@@ -238,7 +243,8 @@ TERM_PUBLIC void HPPJtext()
 }
 
 
-TERM_PUBLIC void HPPJlinetype(linetype)
+TERM_PUBLIC void
+HPPJlinetype(linetype)
 int linetype;
 {
     if (linetype >= 0) {

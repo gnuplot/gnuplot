@@ -1,5 +1,5 @@
 /*
- * $Id: vws.trm,v 1.8 1999/06/10 19:54:57 lhecking Exp $
+ * $Id: vws.trm,v 1.9 1999/06/14 19:14:09 lhecking Exp $
  *
  */
 
@@ -115,7 +115,8 @@ static $DESCRIPTOR(vd_title, "gnuplot");
 static float x0, y0, xsiz, ysiz, wc_xmin_new, wc_ymin_new, wc_xmax_new, wc_ymax_new, wc_xmin,
 wc_ymin, wc_xmax, wc_ymax, vd_width, vd_height;
 
-void VWS_resize_ast()
+void
+VWS_resize_ast()
 {
     uis$resize_window(&vd_id, &wd_id, &x0, &y0, &xsiz, &ysiz,
 		      &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
@@ -123,7 +124,8 @@ void VWS_resize_ast()
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_init()
+TERM_PUBLIC void
+VWS_init()
 {
     int i;
     int cattr;
@@ -270,30 +272,35 @@ if (ws_type >=  UIS$C_DEV_INTENSITY) {
 
 /****************************************************************************/
 
-TERM_PUBLIC void VWS_reset()
+TERM_PUBLIC void
+VWS_reset()
 {
     uis$delete_display(&vd_id);
 }
 
 /****************************************************************************/
-TERM_PUBLIC int VWS_scale(xs, ys)
+TERM_PUBLIC int
+VWS_scale(xs, ys)
 double xs, ys;
 {
     return FALSE;
 }
 /****************************************************************************/
-TERM_PUBLIC void VWS_graphics()
+TERM_PUBLIC void
+VWS_graphics()
 {
     uis$erase(&vd_id, &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_text()
+TERM_PUBLIC void
+VWS_text()
 {
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_move(x, y)
+TERM_PUBLIC void
+VWS_move(x, y)
 unsigned int x, y;
 {
     current_x = (float) (x);
@@ -301,7 +308,8 @@ unsigned int x, y;
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_vector(x, y)
+TERM_PUBLIC void
+VWS_vector(x, y)
 unsigned int x, y;
 {
     int col;
@@ -315,7 +323,8 @@ unsigned int x, y;
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_linetype(lt)
+TERM_PUBLIC void
+VWS_linetype(lt)
 int lt;
 {
     const int n1 = 0xFFFFFFFF;
@@ -388,14 +397,15 @@ int lt;
 /****************************************************************************/
 static int justify_mode = CENTRE, up;
 
-TERM_PUBLIC void VWS_put_text(x, y, str)
+TERM_PUBLIC void
+VWS_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     float fx, fy, thih, twid;
     int text_attr = TEXT_ATTR;
 
-/* uis$text parameter is descriptor string not character string */
+    /* uis$text parameter is descriptor string not character string */
 
     struct dsc$descriptor_s textline =
     {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, ""};
@@ -428,7 +438,8 @@ char *str;
 
 }
 /****************************************************************************/
-TERM_PUBLIC int VWS_text_angle(ang)
+TERM_PUBLIC int
+VWS_text_angle(ang)
 int ang;
 {
     float degrees;
@@ -438,14 +449,16 @@ int ang;
     return TRUE;
 }
 /****************************************************************************/
-TERM_PUBLIC int VWS_justify_text(mode)
+TERM_PUBLIC int
+VWS_justify_text(mode)
 enum JUSTIFY mode;
 {
     justify_mode = mode;
     return TRUE;
 }
 /****************************************************************************/
-TERM_PUBLIC void VWS_point(x, y, point)
+TERM_PUBLIC void
+VWS_point(x, y, point)
 unsigned int x, y;
 int point;
 {
@@ -453,7 +466,8 @@ int point;
 }
 
 /****************************************************************************/
-TERM_PUBLIC void VWS_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+VWS_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 int head;
 {

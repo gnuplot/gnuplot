@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.24 1998/04/14 00:17:49 drd Exp $
+ * $Id: hpgl.trm,v 1.8 1999/05/31 18:33:50 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -551,8 +551,8 @@ static char hpgl_iso_8859_1[128][4] =
  * Static variables to keep track of where we are, etc.
  */
 
-static int HPGL_ang = 0, HPGL_x = UNKNOWN, HPGL_y = UNKNOWN, HPGL_penstate = UNKNOWN, HPGL_pentype
-= UNKNOWN, HPGL2_in_pe, HPGL2_lost;
+static int HPGL_ang = 0, HPGL_x = UNKNOWN, HPGL_y = UNKNOWN,
+    HPGL_penstate = UNKNOWN, HPGL_pentype = UNKNOWN, HPGL2_in_pe, HPGL2_lost;
 
 /*
  * The subroutines, grouped by function for different versions.
@@ -560,7 +560,8 @@ static int HPGL_ang = 0, HPGL_x = UNKNOWN, HPGL_y = UNKNOWN, HPGL_penstate = UNK
 
 static int HPGL_numpen, HPGL_eject;
 
-TERM_PUBLIC void HPGL_options()
+TERM_PUBLIC void
+HPGL_options()
 {
     HPGL_numpen = 6;		/* default to six pens */
     HPGL_eject = 0;		/* default to no eject */
@@ -585,7 +586,8 @@ TERM_PUBLIC void HPGL_options()
 	    HPGL_eject ? "eject" : "noeject");
 }
 
-TERM_PUBLIC void HPGL2_options()
+TERM_PUBLIC void
+HPGL2_options()
 {
     struct termentry *t = term;
     int i;
@@ -625,7 +627,8 @@ TERM_PUBLIC void HPGL2_options()
     }
 }
 
-TERM_PUBLIC void PCL_options()
+TERM_PUBLIC void
+PCL_options()
 {
     int i;
     if (!END_OF_COMMAND) {
@@ -641,7 +644,8 @@ TERM_PUBLIC void PCL_options()
     HPGL2_options();
 }
 
-TERM_PUBLIC void HPGL_init()
+TERM_PUBLIC void
+HPGL_init()
 {
 }
 
@@ -649,7 +653,8 @@ TERM_PUBLIC void HPGL_init()
 {
 } */
 
-TERM_PUBLIC void PCL_init()
+TERM_PUBLIC void
+PCL_init()
 {
     struct termentry *t = term;
 /*
@@ -661,7 +666,8 @@ TERM_PUBLIC void PCL_init()
     t->ymax = PCL_mode->ymax;
 }
 
-TERM_PUBLIC void HPGL_graphics()
+TERM_PUBLIC void
+HPGL_graphics()
 {
     fputs("\033.Y\n\033.I81;;17:\033.N;19:\033.M500:\n", gpoutfile);
 /*	       1
@@ -682,7 +688,8 @@ TERM_PUBLIC void HPGL_graphics()
     HPGL_ang = 0;
 }
 
-TERM_PUBLIC void HPGL2_graphics()
+TERM_PUBLIC void
+HPGL2_graphics()
 {
 /*
  * IN - Initialize
@@ -706,7 +713,8 @@ TERM_PUBLIC void HPGL2_graphics()
     HPGL_penstate = UP;		/* Pen is up */
 }
 
-TERM_PUBLIC void PCL_graphics()
+TERM_PUBLIC void
+PCL_graphics()
 {
 /*
  * Enter HPGL/2 graphics mode
@@ -715,7 +723,8 @@ TERM_PUBLIC void PCL_graphics()
     HPGL2_graphics();
 }
 
-TERM_PUBLIC void HPGL_text()
+TERM_PUBLIC void
+HPGL_text()
 {
     if (HPGL_eject == 0) {
 	fputs("PUSP0;\033.Z\n\0", gpoutfile);
@@ -737,7 +746,8 @@ TERM_PUBLIC void HPGL_text()
 }
 
 #if 0				/* not used */
-void HPGL2_text()
+void
+HPGL2_text()
 {
 /*
  * If in Polyline Encoded command, leave Polyline Encoded command
@@ -753,7 +763,8 @@ void HPGL2_text()
 }
 #endif
 
-TERM_PUBLIC void PCL_text()
+TERM_PUBLIC void
+PCL_text()
 {
     if (HPGL2_in_pe) {
 	fputs(";\n", gpoutfile);
@@ -765,7 +776,8 @@ TERM_PUBLIC void PCL_text()
     fputs("\033%1A\033&l0H\n\0", gpoutfile);
 }
 
-TERM_PUBLIC void HPGL_linetype(linetype)
+TERM_PUBLIC void
+HPGL_linetype(linetype)
 int linetype;
 {
 /* allow for set number of pens */
@@ -778,7 +790,8 @@ int linetype;
     }
 }
 
-TERM_PUBLIC void HPGL2_linetype(linetype)
+TERM_PUBLIC void
+HPGL2_linetype(linetype)
 int linetype;
 {
 /*
@@ -812,7 +825,8 @@ int linetype;
     }
 }
 
-TERM_PUBLIC void HPGL_put_text(x, y, str)
+TERM_PUBLIC void
+HPGL_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -842,7 +856,8 @@ char *str;
 	fprintf(gpoutfile, "LB%s\003\n", str);
 }
 
-TERM_PUBLIC void HPGL2_put_text(x, y, str)
+TERM_PUBLIC void
+HPGL2_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -872,7 +887,8 @@ char *str;
  * Pen Up/Down and Pen (move) Absolute commands to be separate.
  */
 
-TERM_PUBLIC void HPGL_move(x, y)
+TERM_PUBLIC void
+HPGL_move(x, y)
 unsigned int x, y;
 {
     if (HPGL_x != x || HPGL_y != y) {	/* only move if necessary */
@@ -883,7 +899,8 @@ unsigned int x, y;
     }
 }
 
-TERM_PUBLIC void HPGL_vector(x, y)
+TERM_PUBLIC void
+HPGL_vector(x, y)
 unsigned int x, y;
 {
     if (HPGL_penstate != DOWN) {
@@ -895,7 +912,8 @@ unsigned int x, y;
     HPGL_y = y;
 }
 
-TERM_PUBLIC void HPGL2_move(x, y)
+TERM_PUBLIC void
+HPGL2_move(x, y)
 unsigned int x, y;
 {
     register int dx, dy;
@@ -931,7 +949,8 @@ unsigned int x, y;
     HPGL_y = y;
 }
 
-TERM_PUBLIC void HPGL2_vector(x, y)
+TERM_PUBLIC void
+HPGL2_vector(x, y)
 unsigned int x, y;
 {
     register int dx, dy;
@@ -977,7 +996,8 @@ unsigned int x, y;
  * Routine to encode position in base 32 or base 64 characters
  */
 
-TERM_PUBLIC void HPGL2_encode(d)
+TERM_PUBLIC void
+HPGL2_encode(d)
 register int d;
 {
     register int c;
@@ -993,7 +1013,8 @@ register int d;
     } while (d > 0);
 }
 
-TERM_PUBLIC int HPGL_text_angle(ang)
+TERM_PUBLIC int
+HPGL_text_angle(ang)
 int ang;
 {
     HPGL_ang = ang;
@@ -1010,7 +1031,8 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC int HPGL2_text_angle(ang)
+TERM_PUBLIC int
+HPGL2_text_angle(ang)
 int ang;
 {
 /*
@@ -1034,7 +1056,8 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC void HPGL_reset()
+TERM_PUBLIC void
+HPGL_reset()
 {
 /*
  * do nothing
@@ -1042,7 +1065,8 @@ TERM_PUBLIC void HPGL_reset()
 }
 
 #if 0
-void HPGL2_reset()
+void
+HPGL2_reset()
 {
 /*
  * Park the pen
@@ -1054,7 +1078,8 @@ void HPGL2_reset()
 
 #endif
 
-TERM_PUBLIC void PCL_reset()
+TERM_PUBLIC void
+PCL_reset()
 {
 /*
  * Return to PCL mode
@@ -1063,7 +1088,8 @@ TERM_PUBLIC void PCL_reset()
     fputs("\033%0A\033E\n", gpoutfile);
 }
 
-TERM_PUBLIC int HPGL2_justify_text(just)
+TERM_PUBLIC int
+HPGL2_justify_text(just)
 enum JUSTIFY just;
 {
 /*

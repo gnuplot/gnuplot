@@ -1,5 +1,5 @@
 /*
- * $Id: gpr.trm,v 1.13 1998/04/14 00:17:46 drd Exp $
+ * $Id: gpr.trm,v 1.6 1998/12/14 18:39:32 lhecking Exp $
  *
  */
 
@@ -109,7 +109,8 @@ static status_$t status;
 unsigned int Debug = 0;
 
 
-static void check(messagex)
+static void
+check(messagex)
 char *messagex;
 {
     if (status.all = status_$ok) {
@@ -119,14 +120,16 @@ char *messagex;
 }
 
 /* return whether stdout is a DM pad . Called by term.c */
-int gpr_isa_pad()
+int
+gpr_isa_pad()
 {
     pad_$isa(1, &status);
     return (status.all == status_$ok);
 }
 
 
-TERM_PUBLIC void GPR_init()
+TERM_PUBLIC void
+GPR_init()
 {
     gpr_$offset_t dm_bitmap_size;
     gpr_$bitmap_desc_t dm_bitmap_desc;
@@ -192,7 +195,8 @@ TERM_PUBLIC void GPR_init()
 }
 
 
-TERM_PUBLIC void GPR_graphics()
+TERM_PUBLIC void
+GPR_graphics()
 {
     gpr_$coordinate_t locx, locy, marker_size;
 
@@ -242,14 +246,16 @@ TERM_PUBLIC void GPR_graphics()
 }
 
 
-TERM_PUBLIC void GPR_text()
+TERM_PUBLIC void
+GPR_text()
 {
     gpr_$release_display(&status);
     check("gpr_$release_display");
 }
 
 
-void GPRold_linetype(linetype)
+void
+GPRold_linetype(linetype)
 int linetype;
 {
     static gpr_$line_pattern_t patterns[2 + 5] =
@@ -268,7 +274,8 @@ int linetype;
     check("in gpr_$set_line_pattern");
 }
 
-TERM_PUBLIC void GPR_linetype(linetype)
+TERM_PUBLIC void
+GPR_linetype(linetype)
 int linetype;
 {
     static gpr_$line_pattern_t patterns[2 + 7] =
@@ -295,7 +302,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void GPR_move(x, y)
+TERM_PUBLIC void
+GPR_move(x, y)
 unsigned int x, y;
 {
     gpr_$move((short) x, (short) (GPR_YMAX - 1 - y), &status);
@@ -303,7 +311,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void GPR_vector(x, y)
+TERM_PUBLIC void
+GPR_vector(x, y)
 unsigned int x, y;
 {
     gpr_$line((short) x, (short) (GPR_YMAX - 1 - y), &status);
@@ -311,7 +320,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void GPR_put_text(x, y, str)
+TERM_PUBLIC void
+GPR_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
@@ -414,7 +424,8 @@ char str[];			/* the text */
     check("in gpr_$text");
 }
 
-TERM_PUBLIC int GPR_text_angle(ang)
+TERM_PUBLIC int
+GPR_text_angle(ang)
 int ang;
 {
     if (gpr_ang != ang) {
@@ -424,14 +435,16 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC int GPR_justify_text(mode)
+TERM_PUBLIC int
+GPR_justify_text(mode)
 enum JUSTIFY mode;
 {
     gpr_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC void GPR_reset()
+TERM_PUBLIC void
+GPR_reset()
 {
     gpr_$terminate(false, &status);
     check("in gpr_$terminate");

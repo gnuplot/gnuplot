@@ -1,5 +1,5 @@
 /*
- * $Id: t410x.trm,v 1.16 1998/04/14 00:18:07 drd Exp $
+ * $Id: t410x.trm,v 1.7 1998/11/26 19:02:59 lhecking Exp $
  *
  */
 
@@ -93,12 +93,13 @@ TERM_PUBLIC int T410X_text_angle __PROTO((int ang));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 void T410X_encode_x_y __PROTO((unsigned int x, unsigned int y));
-void T410X_encode_int __PROTO((int number));
+static void T410X_encode_int __PROTO((int number));
 
 
 static int T410X_angle = 0;
 
-TERM_PUBLIC void T410X_init()
+TERM_PUBLIC void
+T410X_init()
 {
     fputs("\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1", gpoutfile);
     fputs("\033MG1\033RK!\033SK!\033LZ\033%%!1", gpoutfile);
@@ -118,7 +119,8 @@ TERM_PUBLIC void T410X_init()
 }
 
 
-TERM_PUBLIC void T410X_reset()
+TERM_PUBLIC void
+T410X_reset()
 {
     fputs("\033%%!0\033LZ\033%%!1", gpoutfile);
 /*
@@ -130,7 +132,8 @@ TERM_PUBLIC void T410X_reset()
 }
 
 
-TERM_PUBLIC void T410X_graphics()
+TERM_PUBLIC void
+T410X_graphics()
 {
     fputs("\033%%!0\033\014\033LV0", gpoutfile);
 /*
@@ -141,7 +144,8 @@ TERM_PUBLIC void T410X_graphics()
     (void) fflush(gpoutfile);
 }
 
-TERM_PUBLIC void T410X_text()
+TERM_PUBLIC void
+T410X_text()
 {
     fputs("\033LV1\033%%!1", gpoutfile);
 /*
@@ -152,7 +156,8 @@ TERM_PUBLIC void T410X_text()
 }
 
 
-TERM_PUBLIC void T410X_move(x, y)
+TERM_PUBLIC void
+T410X_move(x, y)
 unsigned int x, y;
 {
     fputs("\033LF", gpoutfile);
@@ -162,7 +167,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void T410X_vector(x, y)
+TERM_PUBLIC void
+T410X_vector(x, y)
 unsigned int x, y;
 {
     fputs("\033LG", gpoutfile);
@@ -171,7 +177,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void T410X_point(x, y, number)
+TERM_PUBLIC void
+T410X_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -183,7 +190,8 @@ int number;
 }
 
 
-TERM_PUBLIC void T410X_linetype(linetype)
+TERM_PUBLIC void
+T410X_linetype(linetype)
 int linetype;
 {
     switch (linetype) {
@@ -204,7 +212,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void T410X_put_text(x, y, str)
+TERM_PUBLIC void
+T410X_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -222,7 +231,8 @@ char str[];
     (void) fflush(gpoutfile);
 }
 
-TERM_PUBLIC int T410X_text_angle(ang)
+TERM_PUBLIC int
+T410X_text_angle(ang)
 int ang;
 {
 
@@ -234,7 +244,8 @@ int ang;
  * 4106/4107/4109/CX PROGRAMMERS manual.
  */
 
-void T410X_encode_x_y(x, y)
+void
+T410X_encode_x_y(x, y)
 unsigned int x, y;
 {
     static char chix = 0, chiy = 0, cloy = 0, ceb = 0;
@@ -267,7 +278,8 @@ unsigned int x, y;
 }
 
 
-void T410X_encode_int(number)
+static void
+T410X_encode_int(number)
 int number;
 {
     register unsigned int mag, hi1, hi2, lo;

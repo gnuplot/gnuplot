@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.22 1998/06/18 14:59:21 ddenholm Exp $
+ * $Id: openstep.trm,v 1.1 1999/05/27 20:58:48 lhecking Exp $
  *
  */
 
@@ -434,7 +434,8 @@ struct NEXT_FontName {
     struct NEXT_FontName *next;
 } *NEXT_DocFonts = NULL;
 
-TERM_PUBLIC char *NEXT_RememberFont(fname)
+TERM_PUBLIC char *
+NEXT_RememberFont(fname)
 char *fname;
 {
     struct NEXT_FontName *fnp;
@@ -459,7 +460,8 @@ int NEXT_taken;
 int NEXT_linetype_last;
 TBOOLEAN NEXT_relative_ok;
 
-TERM_PUBLIC void NEXT_options()
+TERM_PUBLIC void
+NEXT_options()
 {
     char buf[40];
     for (; !END_OF_COMMAND; ++c_token) {
@@ -540,7 +542,8 @@ static int NEXT_common_uses_fonts;
 static unsigned int NEXT_common_xoff, NEXT_common_yoff;
 
 
-TERM_PUBLIC void NEXT_common_init(uses_fonts, xoff, yoff, width, height, dict)
+TERM_PUBLIC void
+NEXT_common_init(uses_fonts, xoff, yoff, width, height, dict)
 int uses_fonts;			/* 0 for NEXT(la)tex */
 unsigned int xoff, yoff;	/* offset  - 50 for /post, 0 for NEXT(la)tex */
 unsigned int width, height;	/* for bounding box */
@@ -644,7 +647,8 @@ char **dict;			/* extra entries for the dictionary */
 }
 
 /* the init fn for the NeXT Terminal driver */
-TERM_PUBLIC void NEXT_init()
+TERM_PUBLIC void
+NEXT_init()
 {
     // is this called more than once?
     arpool = [[NSAutoreleasePool alloc] init];
@@ -667,7 +671,8 @@ TERM_PUBLIC void NEXT_init()
 }
 
 
-TERM_PUBLIC void NEXT_graphics()
+TERM_PUBLIC void
+NEXT_graphics()
 {
     static char GPFAR NEXTg1[] = "0 setgray\nnewpath\n";
     struct termentry *t = term;
@@ -694,7 +699,7 @@ TERM_PUBLIC void NEXT_graphics()
 }
 
 
-TERM_PUBLIC void NEXT_text()
+TERM_PUBLIC voidNEXT_text()
 {
     static DPSContext d;
 
@@ -716,7 +721,8 @@ TERM_PUBLIC void NEXT_text()
 }
 
 
-TERM_PUBLIC void NEXT_reset()
+TERM_PUBLIC void
+NEXT_reset()
 {
     NEXTPrintf("%%%%Trailer\n");
     if (!NEXT_common_uses_fonts) {
@@ -733,7 +739,8 @@ TERM_PUBLIC void NEXT_reset()
 }
 
 
-TERM_PUBLIC void NEXT_linetype(linetype)
+TERM_PUBLIC void
+NEXT_linetype(linetype)
 int linetype;
 {
     linetype = (linetype % 9) + 2;
@@ -748,7 +755,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void NEXT_move(x, y)
+TERM_PUBLIC void
+NEXT_move(x, y)
 unsigned int x, y;
 {
     int dx, dy;
@@ -772,7 +780,8 @@ unsigned int x, y;
     NEXT_pen_y = y;
 }
 
-TERM_PUBLIC void NEXT_vector(x, y)
+TERM_PUBLIC void
+NEXT_vector(x, y)
 unsigned int x, y;
 {
     int dx, dy;
@@ -801,7 +810,8 @@ unsigned int x, y;
 
 
 
-TERM_PUBLIC int NEXT_text_angle(ang)
+TERM_PUBLIC int
+NEXT_text_angle(ang)
 int ang;
 {
     NEXT_ang = ang;
@@ -809,7 +819,8 @@ int ang;
 }
 
 
-TERM_PUBLIC int NEXT_justify_text(mode)
+TERM_PUBLIC int
+NEXT_justify_text(mode)
 enum JUSTIFY mode;
 {
     NEXT_justify = mode;
@@ -817,7 +828,8 @@ enum JUSTIFY mode;
 }
 
 
-TERM_PUBLIC int NEXT_set_font(font) /* Entry font added by DJL */
+TERM_PUBLIC int
+NEXT_set_font(font) /* Entry font added by DJL */
 char *font;
 {
     char name[32];
@@ -836,14 +848,16 @@ char *font;
 
 /* postscript point routines */
 
-TERM_PUBLIC void NEXT_set_pointsize(size)
+TERM_PUBLIC void
+NEXT_set_pointsize(size)
 double size;
 {
     NEXTPrintf("/vpt %.1f def /hpt %.1f def /vpt2 vpt 2 mul def /hpt2 hpt 2 mul def\n",
 	       pointsize * NEXT_VTIC * 0.5, pointsize * NEXT_HTIC * 0.5);
 }
 
-TERM_PUBLIC void NEXT_point(x, y, number)
+TERM_PUBLIC void
+NEXT_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -876,12 +890,7 @@ int number;
     NEXT_linetype_last = -1;	/* force next linetype change */
 }
 
-
-
-
 /* All lifted from the enhanced postscript driver */
-
-
 
 static TBOOLEAN NEXT_opened_string;	/* try to cut out empty ()'s */
 
@@ -899,7 +908,8 @@ static float NEXT_max_height, NEXT_min_height;
  *              FALSE for zero width boxes
  */
 
-static char *NEXT_recurse(p, brace, fontname, fontsize, base, widthflag)
+static char *
+NEXT_recurse(p, brace, fontname, fontsize, base, widthflag)
 char *p, *fontname;
 TBOOLEAN brace, widthflag;
 double fontsize, base;
@@ -1065,7 +1075,8 @@ double fontsize, base;
 }
 
 
-TERM_PUBLIC void NEXT_put_text(x, y, str)
+TERM_PUBLIC void
+NEXT_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -1122,7 +1133,8 @@ char *str;
 
 
 /*
-static TBOOLEAN NEXT_colordetect()
+static TBOOLEAN
+NEXT_colordetect()
 {
 	NXScreen * mainscreen;
 
@@ -1136,7 +1148,8 @@ static TBOOLEAN NEXT_colordetect()
 	 * which will be passed (as a fake pointer) via D.O. to the server 
 	 */
 
-void NEXTPrintf(char *fmt,...)
+void
+NEXTPrintf(char *fmt,...)
 {
     va_list ap;
     char *pb;

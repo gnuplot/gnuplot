@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.46 1998/06/18 14:59:23 ddenholm Exp $
+ * $Id: post.trm,v 1.25 1999/05/12 13:53:19 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -107,8 +107,8 @@ TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
 /* From version.c */
-extern char version[];
-extern char patchlevel[];
+extern char gnuplot_version[];
+extern char gnuplot_patchlevel[];
 
 #define PS_FLUSH_PATH \
     if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
@@ -488,44 +488,44 @@ static struct PS_FontName {
  * return an appropriate re-encode string
  */
  
-TERM_PUBLIC char *PS_RememberFont(fname, can_reencode)
+TERM_PUBLIC char *
+PS_RememberFont(fname, can_reencode)
 char *fname;
 int can_reencode;
 {
-	struct PS_FontName *fnp;
-	char *recode = NULL;
+    struct PS_FontName *fnp;
+    char *recode = NULL;
 
-   for (fnp=PS_DocFonts; fnp ; fnp = fnp->next)
-		if (strcmp(fnp->name, fname)==0)
-			return NULL;
+    for (fnp=PS_DocFonts; fnp ; fnp = fnp->next)
+	if (strcmp(fnp->name, fname)==0)
+	    return NULL;
 
-	/* we did not find the name */
+    /* we did not find the name */
    
-   fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName), "PostScript Font record");
-   fnp->name = gp_alloc(1+strlen(fname), "PostScript Font name");
-   strcpy(fnp->name, fname);
-   fnp->next = PS_DocFonts;
-   PS_DocFonts = fnp;
+    fnp = (struct PS_FontName *)gp_alloc(sizeof(struct PS_FontName),
+					 "PostScript Font record");
+    fnp->name = gp_alloc(1+strlen(fname), "PostScript Font name");
+    strcpy(fnp->name, fname);
+    fnp->next = PS_DocFonts;
+    PS_DocFonts = fnp;
 
-	switch(encoding)
-	{
-		case ENCODING_ISO_8859_1:
-			recode = "reencodeISO def\n";
-			break;
-		case ENCODING_CP_437:
-			recode = "reencodeCP437 def\n";
-			break;
-		case ENCODING_CP_850 : 
-			recode = "reencodeCP850 def\n";
-			break;
-	}
+    switch(encoding) {
+    case ENCODING_ISO_8859_1:
+	recode = "reencodeISO def\n";
+	break;
+    case ENCODING_CP_437:
+	recode = "reencodeCP437 def\n";
+	break;
+    case ENCODING_CP_850 : 
+	recode = "reencodeCP850 def\n";
+	break;
+    }
 
-	if (can_reencode && recode)
-	{	fprintf(gpoutfile,"/%s %s",fname, recode);
-		return NULL;
-	}
-	else
-		return recode;
+    if (can_reencode && recode) {
+	fprintf(gpoutfile,"/%s %s",fname, recode);
+	return NULL;
+    } else
+	return recode;
 }
 
 static int PS_pen_x, PS_pen_y;
@@ -533,153 +533,146 @@ static int PS_taken;
 static int PS_linetype_last;
 static TBOOLEAN PS_relative_ok;
 
-TERM_PUBLIC void PS_options()
+TERM_PUBLIC void
+PS_options()
 {
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"p$ortrait")) {
-			ps_portrait=TRUE;
- 			ps_eps=FALSE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"l$andscape")) {
-			ps_portrait=FALSE;
- 			ps_eps=FALSE;
-			c_token++;
-		}
- 		else if (almost_equals(c_token,"ep$sf")) {
- 			ps_portrait=TRUE;
- 			ps_eps = TRUE;
- 			c_token++;
- 		}
-		else if (almost_equals(c_token,"d$efault")) {
-			ps_portrait=FALSE;
- 			ps_eps=FALSE;
-			ps_color=FALSE;
-			ps_blacktext=FALSE;
-			ps_solid=FALSE;
-			ps_dash_length = 1.0;
-			ps_linewidth_factor = 1.0;
-			ps_duplex_option=FALSE;
-			strcpy(ps_font,"Helvetica");
-			ps_fontsize = 14;
-			term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-			term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-			term->put_text = PS_put_text;
-			c_token++;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"p$ortrait")) {
+	    ps_portrait=TRUE;
+	    ps_eps=FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token,"l$andscape")) {
+	    ps_portrait=FALSE;
+	    ps_eps=FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token,"ep$sf")) {
+	    ps_portrait=TRUE;
+	    ps_eps = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"d$efault")) {
+	    ps_portrait=FALSE;
+	    ps_eps=FALSE;
+	    ps_color=FALSE;
+	    ps_blacktext=FALSE;
+	    ps_solid=FALSE;
+	    ps_dash_length = 1.0;
+	    ps_linewidth_factor = 1.0;
+	    ps_duplex_option=FALSE;
+	    strcpy(ps_font,"Helvetica");
+	    ps_fontsize = 14;
+	    term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+	    term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+	    term->put_text = PS_put_text;
+	    c_token++;
 	}
+    }
 
-	if (almost_equals(c_token, "enh$anced")) {
-		term->put_text = ENHPS_put_text;
-		term->set_font = ENHPS_set_font;
-		++c_token;
-	} else if (almost_equals(c_token, "noenh$anced")) {
-		term->put_text = PS_put_text;
-		term->set_font = PS_set_font;
-		++c_token;
+    if (almost_equals(c_token, "enh$anced")) {
+	term->put_text = ENHPS_put_text;
+	term->set_font = ENHPS_set_font;
+	++c_token;
+    } else if (almost_equals(c_token, "noenh$anced")) {
+	term->put_text = PS_put_text;
+	term->set_font = PS_set_font;
+	++c_token;
+    }
+
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"m$onochrome")) {
+	    ps_color=FALSE;
+	    c_token++;
+	} else if (almost_equals(c_token,"c$olor")
+		   || almost_equals(c_token,"c$olour")) {
+	    ps_color=TRUE;
+	    c_token++;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"m$onochrome")) {
-			ps_color=FALSE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"c$olor")
-			 || almost_equals(c_token,"c$olour")) {
-			ps_color=TRUE;
-			c_token++;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"b$lacktext")) {
+	    ps_blacktext=TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"color$text") ||
+		   almost_equals(c_token,"colour$text")) {
+	    ps_blacktext=FALSE;
+	    c_token++;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"b$lacktext")) {
-			ps_blacktext=TRUE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"color$text") ||
-		         almost_equals(c_token,"colour$text")) {
-			ps_blacktext=FALSE;
-			c_token++;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"so$lid")) {
+	    ps_solid=TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"da$shed")) {
+	    ps_solid=FALSE;
+	    c_token++;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"so$lid")) {
-			ps_solid=TRUE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"da$shed")) {
-			ps_solid=FALSE;
-			c_token++;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"dashl$ength") ||
+	    almost_equals(c_token,"dl")) {
+	    struct value a;
+	    c_token++;
+	    ps_dash_length = real(const_express(&a));
+	    if (ps_dash_length <= 0.0) ps_dash_length = 1.0;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"dashl$ength") ||
-		    almost_equals(c_token,"dl")) {
-			struct value a;
-			c_token++;
-                        ps_dash_length = real(const_express(&a));
-                        if (ps_dash_length <= 0.0) ps_dash_length = 1.0;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"linew$idth") ||
+	    almost_equals(c_token,"lw")) {
+	    struct value a;
+	    c_token++;
+	    ps_linewidth_factor = real(const_express(&a));
+	    if (ps_linewidth_factor <= 0.0) ps_linewidth_factor = 1.0;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"linew$idth") ||
-		    almost_equals(c_token,"lw")) {
-			struct value a;
-			c_token++;
-                        ps_linewidth_factor = real(const_express(&a));
-                        if (ps_linewidth_factor <= 0.0) ps_linewidth_factor = 1.0;
-		}
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token,"si$mplex")) {
+	    ps_duplex_state  = FALSE;
+	    ps_duplex_option = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"du$plex")) {
+	    ps_duplex_state  = TRUE;
+	    ps_duplex_option = TRUE;
+	    c_token++;
+	} else if (almost_equals(c_token,"defaultp$lex")) {
+	    ps_duplex_option = FALSE;
+	    c_token++;
 	}
+    }
 
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token,"si$mplex")) {
-			ps_duplex_state  = FALSE;
-			ps_duplex_option = TRUE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"du$plex")) {
-			ps_duplex_state  = TRUE;
-			ps_duplex_option = TRUE;
-			c_token++;
-		}
-		else if (almost_equals(c_token,"defaultp$lex")) {
-			ps_duplex_option = FALSE;
-			c_token++;
-		}
-	}
+    if (!END_OF_COMMAND && isstring(c_token)) {
+	quote_str(ps_font,c_token, MAX_ID_LEN);
+	c_token++;
+    }
 
-	if (!END_OF_COMMAND && isstring(c_token)) {
-		quote_str(ps_font,c_token, MAX_ID_LEN);
-		c_token++;
-	}
+    if (!END_OF_COMMAND) {
+	/* We have font size specified */
+	struct value a;
+	ps_fontsize = (int)real(const_express(&a));
+	term->v_char = (unsigned int)(ps_fontsize*PS_SC);
+	term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
+    }
 
-	if (!END_OF_COMMAND) {
-		/* We have font size specified */
-		struct value a;
-		ps_fontsize = (int)real(const_express(&a));
-		term->v_char = (unsigned int)(ps_fontsize*PS_SC);
-		term->h_char = (unsigned int)(ps_fontsize*PS_SC*6/10);
-	}
+    if (!ps_color) ps_blacktext=TRUE;
 
-        if (!ps_color) ps_blacktext=TRUE;
-
-	sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
-	/* default_font holds the font and size set at 'set term' */
-	/* Entry font added by DJL */
-	sprintf(term_options,"%s %senhanced %s text %s\n     %s (length * %.1f) linewidth %.1f %s \"%s\" %d",
-		ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
-      		term->put_text == ENHPS_put_text ? "" : "no",
-		ps_color ? "color" : "monochrome",
-                ps_blacktext ? "always black" : "can be colored",
-		ps_solid ? "solid" : "dashed",
-		ps_dash_length,
-		ps_linewidth_factor,
-		ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
-                                    : "defaultplex",
-		ps_font,ps_fontsize);
+    sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
+    /* default_font holds the font and size set at 'set term' */
+    /* Entry font added by DJL */
+    sprintf(term_options,"%s %senhanced %s text %s\n     %s (length * %.1f) linewidth %.1f %s \"%s\" %d",
+	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
+	    term->put_text == ENHPS_put_text ? "" : "no",
+	    ps_color ? "color" : "monochrome",
+	    ps_blacktext ? "always black" : "can be colored",
+	    ps_solid ? "solid" : "dashed",
+	    ps_dash_length,
+	    ps_linewidth_factor,
+	    ps_duplex_option ? (ps_duplex_state ? "duplex" : "simplex")
+	    : "defaultplex",
+	    ps_font,ps_fontsize);
 }
 
 /* store settings passed to common_init() for use in PS_graphics()
@@ -691,7 +684,8 @@ static int ps_common_uses_fonts;
 static unsigned int ps_common_xoff, ps_common_yoff;
 
 
-TERM_PUBLIC void PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
+TERM_PUBLIC void
+PS_common_init(encap, portrait, uses_fonts, xoff, yoff, bb_xmin, bb_ymin, bb_xmax, bb_ymax, dict)
 int encap; /* encapsulated or not - 1 for pslatex */
 int portrait; /* 1 for pslatex */
 int uses_fonts; /* 0 for ps(la)tex */
@@ -699,10 +693,11 @@ unsigned int xoff, yoff; /* how much to translate by */
 unsigned int bb_xmin, bb_ymin, bb_xmax, bb_ymax; /* bounding box */
 char **dict; /* extra entries for the dictionary */
 {
-static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
+    static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s\
 %%%%DocumentFonts: %s\n";
-static char GPFAR psi2[] = "%%%%EndComments\n\
+
+    static char GPFAR psi2[] = "%%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
 /Color %s def\n\
 /Solid %s def\n\
@@ -714,7 +709,8 @@ static char GPFAR psi2[] = "%%%%EndComments\n\
 /vpt_ %.1f def\n\
 /hpt hpt_ def\n\
 /vpt vpt_ def\n";
-static char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
+
+    static char GPFAR * GPFAR PS_iso_8859_1_encoding[] = {
 "/reencodeISO {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -767,7 +763,7 @@ NULL };
 /*                                                                         */
 /*   version 1.1:  - added some more special characters                    */
 /*                                                                         */
-static char GPFAR * GPFAR PS_cp_437_encoding[] = {
+    static char GPFAR * GPFAR PS_cp_437_encoding[] = {
 "/reencodeCP437 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -815,7 +811,7 @@ NULL };
 /*                   -- frame characters,                                  */
 /*                   -- a few special characters.                          */
 /*                                                                         */
-static char GPFAR * GPFAR PS_cp_850_encoding[] = {
+    static char GPFAR * GPFAR PS_cp_850_encoding[] = {
 "/reencodeCP850 {\n",
 "dup dup findfont dup length dict begin\n",
 "{ 1 index /FID ne { def }{ pop pop } ifelse } forall\n",
@@ -855,203 +851,208 @@ static char GPFAR * GPFAR PS_cp_850_encoding[] = {
 "] def\n",
 NULL };
 
-	struct termentry *t = term;
-	int i;
-        time_t now;
+    struct termentry *t = term;
+    int i;
+    time_t now;
 
-	ps_common_encap = encap; /* store for later */
-	ps_common_portrait = portrait; /* store for later */
-	ps_common_uses_fonts = uses_fonts;
-	ps_common_xoff = xoff;
-	ps_common_yoff = yoff;
+    ps_common_encap = encap; /* store for later */
+    ps_common_portrait = portrait; /* store for later */
+    ps_common_uses_fonts = uses_fonts;
+    ps_common_xoff = xoff;
+    ps_common_yoff = yoff;
 
-	ps_page = 0;
+    ps_page = 0;
 
-	if (!encap)
-		fprintf(gpoutfile,"%%!PS-Adobe-2.0\n");
-	else
-		fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+    if (!encap)
+	fprintf(gpoutfile,"%%!PS-Adobe-2.0\n");
+    else
+	fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
 
-	if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
-	time(&now);
-	fprintf(gpoutfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+    if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );   /*  JFi  */
+    time(&now);
+    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel, asctime(localtime(&now)),
+	    uses_fonts ? "(atend)" : "");
 
-	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
+    fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n",
+	    xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-	fprintf(gpoutfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
+    fprintf(gpoutfile,"%%%%Orientation: %s\n",
+	    ps_portrait ? "Portrait" : "Landscape");
 
-	if (!encap)
-		fprintf(gpoutfile,"%%%%Pages: (atend)\n");
-	fprintf(gpoutfile, psi2,
-		ps_color ? "true" : "false",
-		ps_solid ? "true" : "false",
-		PS_LW*ps_linewidth_factor,	/* line width */
-	 	(int)(t->v_char)/(-3),	/* shift for vertical centring */
-		PS_SC*ps_dash_length,	/* dash length */
-		PS_HTIC/2.0,		/* half point width */
-		PS_VTIC/2.0);		/* half point height */
+    if (!encap)
+	fprintf(gpoutfile,"%%%%Pages: (atend)\n");
+    fprintf(gpoutfile, psi2,
+	    ps_color ? "true" : "false",
+	    ps_solid ? "true" : "false",
+	    PS_LW*ps_linewidth_factor,	/* line width */
+	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
+	    PS_SC*ps_dash_length,	/* dash length */
+	    PS_HTIC/2.0,		/* half point width */
+	    PS_VTIC/2.0);		/* half point height */
 
-	if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
-		for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
-			fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
-		}
+    if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
+	for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
 	}
-	if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
-		for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
-			fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
-		}
+    }
+    if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
+	for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
 	}
-	if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
-		for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
-			fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
-		}
+    }
+    if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
+	for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
+	    fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
 	}
-/*        Duplicate code! 
-          As long as only two code pages are implemented, that's not a big 
-          problem. Otherwise a small procedure might be beneficial.
-*/
+    }
+    /* Duplicate code! 
+     * As long as only two code pages are implemented, that's not a big 
+     * problem. Otherwise a small procedure might be beneficial.
+     */
 
-	for ( i=0; PS_header[i] != NULL; i++)
-		fprintf(gpoutfile,"%s",PS_header[i]);
-	if (ps_duplex_option)
-		fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
-				ps_duplex_state ? "true" : "false");
-	PS_RememberFont(ps_font, 1);
+    for ( i=0; PS_header[i] != NULL; i++)
+	fprintf(gpoutfile,"%s",PS_header[i]);
+    if (ps_duplex_option)
+	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
+		ps_duplex_state ? "true" : "false");
+    PS_RememberFont(ps_font, 1);
 
-	if (dict)
-		while (*dict)
-			fputs(*(dict++), gpoutfile);	
+    if (dict)
+	while (*dict)
+	    fputs(*(dict++), gpoutfile);	
 
-	fprintf(gpoutfile,"end\n%%%%EndProlog\n");
+    fprintf(gpoutfile,"end\n%%%%EndProlog\n");
 }
 
 /* the init fn for the postscript driver */
-TERM_PUBLIC void PS_init()
+TERM_PUBLIC void
+PS_init()
 {
-	unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
+    unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
 
-	if (ps_eps)
-	{
-		term->xmax = PS_XMAX;
-		term->ymax = PS_YMAX;
-		xmin_t = PS_XMAX * xoffset / (2*PS_SC);
-		xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
-		ymin_t = PS_YMAX * yoffset / (2*PS_SC);
-		ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
-	}
-	else if (ps_portrait)
-	{
-		term->xmax = PS_YMAX;
-		term->ymax = PS_XMAX;
-		xmin_t = PS_YMAX * xoffset / PS_SC;
-		xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
-		ymin_t = PS_XMAX * yoffset / PS_SC;
-		ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
-	}
-	else
-	{
-		term->xmax = PS_XMAX;
-		term->ymax = PS_YMAX;
-		ymin_t = PS_XMAX * xoffset / PS_SC;
-		ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
-		xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
-		xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
-	}
+    if (ps_eps) {
+	term->xmax = PS_XMAX;
+	term->ymax = PS_YMAX;
+	xmin_t = PS_XMAX * xoffset / (2*PS_SC);
+	xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
+	ymin_t = PS_YMAX * yoffset / (2*PS_SC);
+	ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
+    } else if (ps_portrait) {
+	term->xmax = PS_YMAX;
+	term->ymax = PS_XMAX;
+	xmin_t = PS_YMAX * xoffset / PS_SC;
+	xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
+	ymin_t = PS_XMAX * yoffset / PS_SC;
+	ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
+    } else {
+	term->xmax = PS_XMAX;
+	term->ymax = PS_YMAX;
+	ymin_t = PS_XMAX * xoffset / PS_SC;
+	ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
+	xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
+	xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
+    }
 
-	/* for enhanced postscript, copy ps_font to ps_enh_font
-	 * does no harm for non-enhanced
-	 */
-	strcpy(ps_enh_font, ps_font);
-	ps_enh_fontsize = ps_fontsize;
-	
-	PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
-	   xmin_t, ymin_t, xmax_t, ymax_t,
-	   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
+    /* for enhanced postscript, copy ps_font to ps_enh_font
+     * does no harm for non-enhanced
+     */
+    strcpy(ps_enh_font, ps_font);
+    ps_enh_fontsize = ps_fontsize;
+
+    PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
+		   xmin_t, ymin_t, xmax_t, ymax_t,
+		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
 }
 
 
-TERM_PUBLIC void PS_graphics()
+TERM_PUBLIC void
+PS_graphics()
 {
-static char GPFAR psg1[] = "0 setgray\nnewpath\n";
-struct termentry *t = term;
-	ps_page++;
-	if (!ps_common_encap)
-		fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
-	fprintf(gpoutfile,"gnudict begin\ngsave\n");
-	fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
-	fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
-	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
-	if (!ps_common_portrait) {
-	    fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+    static char GPFAR psg1[] = "0 setgray\nnewpath\n";
+    struct termentry *t = term;
+    ps_page++;
+    if (!ps_common_encap)
+	fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+    fprintf(gpoutfile,"gnudict begin\ngsave\n");
+    fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
+    fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
+	    (ps_eps ? 0.5 : 1.0)/PS_SC);
+    if (!ps_common_portrait) {
+	fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+    }
+    fprintf(gpoutfile, psg1);
+    if (ps_common_uses_fonts)
+	fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n",
+		ps_font, (t->v_char) );
+    ps_path_count = 0;
+    PS_relative_ok = FALSE;
+    PS_pen_x = PS_pen_y = -4000;
+    PS_taken = 0;
+    PS_linetype_last = -1;
+}
+
+
+TERM_PUBLIC void
+PS_text()
+{
+    ps_path_count = 0;
+    fprintf(gpoutfile,"stroke\ngrestore\nend\nshowpage\n");
+    /* fprintf(stderr,"taken %d times\n",PS_taken); */
+    /* informational:  tells how many times it was "cheaper"
+     * to do a relative moveto or lineto rather than an
+     * absolute one */
+}
+
+
+TERM_PUBLIC void
+PS_reset()
+{
+    fprintf(gpoutfile,"%%%%Trailer\n");
+
+    /* I think the following commands should be executed 
+       `if (ps_common_uses_fonts)`. So I changed the next line. 
+       Please see "PS_RememberFont", too.                       */  /* JFi */
+
+    /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
+    if (ps_common_uses_fonts) {
+	fprintf(gpoutfile,"%%%%DocumentFonts: ");
+	while (PS_DocFonts) {
+	    struct PS_FontName *fnp;
+	    fnp = PS_DocFonts->next;
+	    fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
+	    free(PS_DocFonts->name);
+	    free(PS_DocFonts);
+	    PS_DocFonts=fnp;
 	}
-	fprintf(gpoutfile, psg1);
-	if (ps_common_uses_fonts)
-		fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
-	ps_path_count = 0;
-	PS_relative_ok = FALSE;
-	PS_pen_x = PS_pen_y = -4000;
-	PS_taken = 0;
-	PS_linetype_last = -1;
+    }
+    if (!ps_common_encap)
+	fprintf(gpoutfile,"%%%%Pages: %d\n",ps_page);
 }
 
 
-TERM_PUBLIC void PS_text()
-{
-	ps_path_count = 0;
-	fprintf(gpoutfile,"stroke\ngrestore\nend\nshowpage\n");
-	/* fprintf(stderr,"taken %d times\n",PS_taken); */
-	/* informational:  tells how many times it was "cheaper"
-	   to do a relative moveto or lineto rather than an
-	   absolute one */
-}
-
-
-TERM_PUBLIC void PS_reset()
-{
-	fprintf(gpoutfile,"%%%%Trailer\n");
-
-/*      I think the following commands should be executed 
-        `if (ps_common_uses_fonts)`. So I changed the next line. 
-        Please see "PS_RememberFont", too.                       */  /* JFi */
-
-/*	if (!ps_common_uses_fonts) {  */                             /* JFi */
-	if (ps_common_uses_fonts) {
-		fprintf(gpoutfile,"%%%%DocumentFonts: ");
-		while (PS_DocFonts) {
-		    struct PS_FontName *fnp;
-			fnp = PS_DocFonts->next;
-			fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
-			free(PS_DocFonts->name);
-			free(PS_DocFonts);
-			PS_DocFonts=fnp;
-		}
-	}
-	if (!ps_common_encap)
-		fprintf(gpoutfile,"%%%%Pages: %d\n",ps_page);
-}
-
-
-TERM_PUBLIC void PS_linetype(linetype)
+TERM_PUBLIC void
+PS_linetype(linetype)
 int linetype;
 {
-	linetype = (linetype % 9) + 2;
-	if (linetype < 0) linetype = 0;
-	PS_relative_ok = FALSE;
+    linetype = (linetype % 9) + 2;
+    if (linetype < 0) linetype = 0;
+    PS_relative_ok = FALSE;
 #if 0
-	/*  In order to make 'PS_linewidth' work properly, I need to comment
-	 *  this line out.  Especially in combination with the line width
-	 *  extension of the `set arrow` command this is necessary.
-	 *  Can we live with that drawback?  (JFi)
-	 */
-	if (PS_linetype_last == linetype) return;
+    /*  In order to make 'PS_linewidth' work properly, I need to comment
+     *  this line out.  Especially in combination with the line width
+     *  extension of the `set arrow` command this is necessary.
+     *  Can we live with that drawback?  (JFi)
+     */
+    if (PS_linetype_last == linetype) return;
 #endif
-	PS_linetype_last = linetype;
-	fprintf(gpoutfile,"LT%c\n", "ba012345678"[linetype]);
-	ps_path_count = 0;
+    PS_linetype_last = linetype;
+    fprintf(gpoutfile,"LT%c\n", "ba012345678"[linetype]);
+    ps_path_count = 0;
 }
 
 
-TERM_PUBLIC void PS_linewidth (linewidth)
+TERM_PUBLIC void
+PS_linewidth (linewidth)
 double linewidth;
 {
         fprintf(gpoutfile,"%.3f UL\n",linewidth);
@@ -1080,163 +1081,173 @@ double linewidth;
 }
 
 
-TERM_PUBLIC void PS_pointsize (ptsize)
+TERM_PUBLIC void
+PS_pointsize (ptsize)
 double ptsize;
 {
-        fprintf(gpoutfile,"%.3f UP\n",ptsize);
+    fprintf(gpoutfile,"%.3f UP\n",ptsize);
 
 /*  
-  Documentation of the 'change pointsize' strategy of the postscript terminal:
-
-  1. define two new postscript variables to hold the overall pointsize:
-     /hpt_  and  /vpt_
-
-  2. define a new postscript command to use the contents of these variables: 
-     /UP { cf. definition above } def
-     usage:  multiplication_factor UP
-
- [3.] [doesn't exist, skip to next number]
-
-  4. issue the new command whereever you change the symbols (and linetype):
-     example:
-         2.5 UP
-         4.0 UL  % optionally change linewidth, too
-         LT0
-     result:
-         Next symbols will be drawn 2.5 times as big as defined by the 
-         GNUPLOT `set pointsize` command (= overall pointsize).
-*/
+ *  Documentation of the 'change pointsize' strategy of the postscript
+ * terminal:
+ *
+ * 1. define two new postscript variables to hold the overall pointsize:
+ *    /hpt_  and  /vpt_
+ *
+ * 2. define a new postscript command to use the contents of these variables: 
+ *    /UP { cf. definition above } def
+ *    usage:  multiplication_factor UP
+ *
+ * [3.] [doesn't exist, skip to next number]
+ *
+ * 4. issue the new command whereever you change the symbols (and linetype):
+ *    example:
+ *        2.5 UP
+ *        4.0 UL  % optionally change linewidth, too
+ *        LT0
+ *    result:
+ *        Next symbols will be drawn 2.5 times as big as defined by the 
+ *        GNUPLOT `set pointsize` command (= overall pointsize).
+ */
 }
 
 
-TERM_PUBLIC void PS_move(x,y)
+TERM_PUBLIC void
+PS_move(x,y)
 unsigned int x,y;
 {
-	int dx, dy;
-	/* Make this semi-dynamic and independent of architecture */
-	char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
-	dx = x - PS_pen_x;
-	dy = y - PS_pen_y;
-	/* can't cancel all null moves--need a move after stroke'ing */
-	if (dx==0 && dy==0 && PS_relative_ok)
-		return;
-	sprintf(abso, "%d %d M\n", x, y);
-	sprintf(rel, "%d %d R\n", dx, dy);
-	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, gpoutfile);
-		PS_taken++;
-	}else
-		fputs(abso, gpoutfile);
-	PS_relative_ok = TRUE;
-	ps_path_count += 1;
+    int dx, dy;
+    /* Make this semi-dynamic and independent of architecture */
+    char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
+    dx = x - PS_pen_x;
+    dy = y - PS_pen_y;
+    /* can't cancel all null moves--need a move after stroke'ing */
+    if (dx==0 && dy==0 && PS_relative_ok)
+	return;
+    sprintf(abso, "%d %d M\n", x, y);
+    sprintf(rel, "%d %d R\n", dx, dy);
+    if (strlen(rel) < strlen(abso) && PS_relative_ok) {
+	fputs(rel, gpoutfile);
+	PS_taken++;
+    }else
+	fputs(abso, gpoutfile);
+    PS_relative_ok = TRUE;
+    ps_path_count += 1;
 
-	PS_pen_x = x;
-	PS_pen_y = y;
+    PS_pen_x = x;
+    PS_pen_y = y;
 }
 
-TERM_PUBLIC void PS_vector(x,y)
+TERM_PUBLIC void
+PS_vector(x,y)
 unsigned int x,y;
 {
-	int dx, dy;
-	char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
+    int dx, dy;
+    char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
 
-	dx = x - PS_pen_x;
-	dy = y - PS_pen_y;
-	if (dx==0 && dy==0) return;
-	sprintf(abso, "%d %d L\n", x, y);
-	sprintf(rel, "%d %d V\n", dx, dy);
-	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, gpoutfile);
-		PS_taken++;
-	}else
-		fputs(abso, gpoutfile);
-	PS_relative_ok = TRUE;
-	ps_path_count += 1;
-	PS_pen_x = x;
-	PS_pen_y = y;
-	if (ps_path_count >= 400) {
-		fprintf(gpoutfile,"currentpoint stroke M\n");
-		ps_path_count = 0;
-	}
+    dx = x - PS_pen_x;
+    dy = y - PS_pen_y;
+    if (dx==0 && dy==0) return;
+    sprintf(abso, "%d %d L\n", x, y);
+    sprintf(rel, "%d %d V\n", dx, dy);
+    if (strlen(rel) < strlen(abso) && PS_relative_ok) {
+	fputs(rel, gpoutfile);
+	PS_taken++;
+    }else
+	fputs(abso, gpoutfile);
+    PS_relative_ok = TRUE;
+    ps_path_count += 1;
+    PS_pen_x = x;
+    PS_pen_y = y;
+    if (ps_path_count >= 400) {
+	fprintf(gpoutfile,"currentpoint stroke M\n");
+	ps_path_count = 0;
+    }
 }
 
 
-TERM_PUBLIC void PS_put_text(x,y,str)
+TERM_PUBLIC void
+PS_put_text(x,y,str)
 unsigned int x, y;
 char *str;
 {
-char ch;
-	if (!strlen(str)) return;
-	PS_move(x,y);
-	if (ps_blacktext)
-		fprintf(gpoutfile,"gsave 0 setgray\n");
-	if (ps_ang != 0)
-		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
-			,ps_ang*90);
-	putc('(',gpoutfile);
+    char ch;
+
+    if (!str && !strlen(str)) return;
+    PS_move(x,y);
+    if (ps_blacktext)
+	fprintf(gpoutfile,"gsave 0 setgray\n");
+    if (ps_ang != 0)
+	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
+		,ps_ang*90);
+    putc('(',gpoutfile);
+    ch = *str++;
+    while(ch!='\0') {
+	if ( (ch=='(') || (ch==')') || (ch=='\\') )
+	    putc('\\',gpoutfile);
+	putc(ch,gpoutfile);
 	ch = *str++;
-	while(ch!='\0') {
-		if ( (ch=='(') || (ch==')') || (ch=='\\') )
-			putc('\\',gpoutfile);
-		putc(ch,gpoutfile);
-		ch = *str++;
-	}
-	switch(ps_justify) {
-		case LEFT : fprintf(gpoutfile,") Lshow\n");
-			break;
-		case CENTRE : fprintf(gpoutfile,") Cshow\n");
-			break;
-		case RIGHT : fprintf(gpoutfile,") Rshow\n");
-			break;
-	}
-	if (ps_ang != 0 || ps_blacktext)
-		fprintf(gpoutfile,"grestore\n");
-	if (ps_ang != 0 && ps_blacktext)
-		fprintf(gpoutfile,"grestore\n");
-	ps_path_count = 0;
-	PS_relative_ok = FALSE;
+    }
+    switch(ps_justify) {
+    case LEFT : fprintf(gpoutfile,") Lshow\n");
+	break;
+    case CENTRE : fprintf(gpoutfile,") Cshow\n");
+	break;
+    case RIGHT : fprintf(gpoutfile,") Rshow\n");
+	break;
+    }
+    if (ps_ang != 0 || ps_blacktext)
+	fprintf(gpoutfile,"grestore\n");
+    if (ps_ang != 0 && ps_blacktext)
+	fprintf(gpoutfile,"grestore\n");
+    ps_path_count = 0;
+    PS_relative_ok = FALSE;
 }
 
 
-TERM_PUBLIC int PS_text_angle(ang)
+TERM_PUBLIC int
+PS_text_angle(ang)
 int ang;
 {
-	ps_ang=ang;
-	return TRUE;
+    ps_ang=ang;
+    return TRUE;
 }
 
 
-TERM_PUBLIC int PS_justify_text(mode)
+TERM_PUBLIC int
+PS_justify_text(mode)
 enum JUSTIFY mode;
 {
-	ps_justify=mode;
-	return TRUE;
+    ps_justify=mode;
+    return TRUE;
 }
 
 
-TERM_PUBLIC int PS_set_font(font)  /* Entry font added by DJL */
+TERM_PUBLIC int
+PS_set_font(font)  /* Entry font added by DJL */
 char *font;
 {
-char name[32];
-int  size,sep;
+    char name[32];
+    int  size,sep;
 
-        sep=strcspn(font,",");
-        strncpy(name,font,sep); name[sep]=NUL;
-        size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
-        fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
-        PS_RememberFont(name,1 );
-        return TRUE;
+    sep=strcspn(font,",");
+    strncpy(name,font,sep); name[sep]=NUL;
+    size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
+    fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+    PS_RememberFont(name,1 );
+    return TRUE;
 }
 
 
 /* postscript point routines */
 
 
-TERM_PUBLIC void PS_point(x,y,number)
+TERM_PUBLIC void
+PS_point(x,y,number)
 unsigned int x,y;
 int number;
 {
-static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
+    static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
                            "Box",  "BoxF",  "Circle", "CircleF",
                            "TriU", "TriUF", "TriD",   "TriDF",
                            "Dia",  "DiaF",  "Pent",   "PentF",
@@ -1256,27 +1267,28 @@ static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
                            "DiaE", "PentE", "BoxW",   "CircW",
                            "TriUW", "TriDW", "DiaW",  "PentW"
 };
-	if (number < 0)
-		number = -1;		/* negative types are all 'dot' */
-	else
-		number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
-	fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
+    if (number < 0)
+	number = -1;		/* negative types are all 'dot' */
+    else
+	number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
+    fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
 
-	PS_relative_ok = 0;
-	ps_path_count = 0;
-	PS_linetype_last = -1; /* force next linetype change */
+    PS_relative_ok = 0;
+    ps_path_count = 0;
+    PS_linetype_last = -1; /* force next linetype change */
 }
 
-TERM_PUBLIC void PS_fillbox(style, x1,y1,x2,y2)
+TERM_PUBLIC void
+PS_fillbox(style, x1,y1,x2,y2)
 int style;
 unsigned int x1,y1,x2,y2;
 {
-	PS_FLUSH_PATH
+    PS_FLUSH_PATH;
 
-	fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+    fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
 
-	PS_relative_ok = 0;
-	PS_linetype_last = -1;
+    PS_relative_ok = 0;
+    PS_linetype_last = -1;
 }
 
 
@@ -1308,7 +1320,8 @@ static float ENHps_max_height, ENHps_min_height;
  *             FALSE if it should not be shown (like TeX \phantom)
  */
 
-static char *ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag)
+static char *
+ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag)
 char *p, *fontname;
 TBOOLEAN brace, widthflag, showflag;
 double fontsize, base;
@@ -1332,230 +1345,217 @@ double fontsize, base;
  	}	\
 }
 
-	ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag))
+    ENHPS_DEBUG(("RECURSE WITH [%p] \"%s\", %d %s %.1f %.1f %d %d\n", p, p, brace, fontname, fontsize, base, widthflag, showflag));
 
-	/* Start each recursion with a clean string */
-	ENHPS_FLUSH
+/* Start each recursion with a clean string */
+    ENHPS_FLUSH;
 
-	if (base + fontsize > ENHps_max_height)
-	{	ENHps_max_height = base + fontsize;
-		ENHPS_DEBUG(("Setting max height to %.1f\n", ENHps_max_height));
-	}
+    if (base + fontsize > ENHps_max_height) {
+	ENHps_max_height = base + fontsize;
+	ENHPS_DEBUG(("Setting max height to %.1f\n", ENHps_max_height));
+    }
 
-	if (base < ENHps_min_height)
-	{	ENHps_min_height = base;
-		ENHPS_DEBUG(("Setting min height to %.1f\n", ENHps_min_height));
-	}
+    if (base < ENHps_min_height) {
+	ENHps_min_height = base;
+	ENHPS_DEBUG(("Setting min height to %.1f\n", ENHps_min_height));
+    }
 
-	while (*p)
-	{	float shift;
+    while (*p) {
+	float shift;
 
-		switch (*p)
-		{
-			case '}'  :
+	switch (*p)
+	{
+	case '}'  :
 				/*{{{  deal with it*/
-				if (brace)
-					return (p);
-				
-				fprintf(stderr, "enhpost printer driver - spurious }\n");
-				break;
-				/*}}}*/
-		
-			case '_'  :
-			case '^'  :
-				/*{{{  deal with super/sub script*/
-				
-				shift = (*p == '^') ? 0.5 : -0.3;
-				
-				ENHPS_FLUSH
-				
-				p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag);
-				
-				break;
-				/*}}}*/
-		
-			case '{'  :
-			{
-				char *savepos=NULL, save=0;
-				char *localfontname=fontname, ch;
-				int recode=1;
-				float f=fontsize;
+	    if (brace)
+		return (p);
 
-				/*{{{  recurse (possibly with a new font) */
-				
-				ENHPS_DEBUG(("Dealing with {\n"))
-				
-				if (*++p == '/')
-				{	/* then parse a fontname, optional fontsize */
-					while (*++p == ' ');
-					if (*p=='-')
-					{
-						recode=0;
-						while (*++p == ' ');
-					}
-					localfontname = p;
-					while ((ch = *p) > ' ' && ch != '=' && ch != '*')
-						++p;
-					save = *(savepos=p);
-					if (ch == '=')
-					{
-						*p++ = '\0';				
-						/*{{{  get optional font size*/
-						ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p))
-						f = (float)strtod(p, &p);
-						ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p))
-						
-						if (f)
-							f *= PS_SC;  /* remember the scaling */
-						else
-							f = fontsize;
-						
-						ENHPS_DEBUG(("Font size %.1f\n", f))
-						/*}}}*/
-					}
-					else if (ch == '*')
-					{
-						*p++ = '\0';				
-						/*{{{  get optional font size scale factor*/
-						ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p))
-						f = (float)strtod(p, &p);
-						ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p))
-						
-						if (f)
-							f *= fontsize;  /* apply the scale factor */
-						else
-							f = fontsize;
-						
-						ENHPS_DEBUG(("Font size %.1f\n", f))
-						/*}}}*/
-					}
-					else
-					{
-						*p++ = '\0';
-						f = fontsize;
-					}				
-				
-					while (*p == ' ')
-						++p;
-					if (*localfontname)
-					{
-						/* only allow RememberFont to re-encode it if no string active */
-						char *recodestring = PS_RememberFont(localfontname, recode && !ENHps_opened_string);
-						if (recode && recodestring)
-						{
-							ENHPS_FLUSH
-							fprintf(gpoutfile, "/%s %s", localfontname, recodestring);
-						}
-					}
-					else
-						localfontname = fontname;
-				}
+	    fprintf(stderr, "enhpost printer driver - spurious }\n");
+	    break;
 				/*}}}*/
-				
-				ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p))
-				
-				p = ENHPS_recurse(p, TRUE, localfontname, f, base, widthflag, showflag);
-				
-				ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
-				
-				ENHPS_FLUSH
 
-				if (savepos)
-					/* restore overwritten character */
-					*savepos = save;
-		
-				break;
-			}
-				
-			case '@' :
-				/*{{{  phantom box - prints next 'char', then restores currentpoint */
-    
-				ENHPS_FLUSH
-    
-				p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, FALSE, showflag);
-					
-				break;
-				/*}}}*/
-		
-			case '&' :
-				/*{{{  character skip - skips space equal to length of character(s) */
-    
-				ENHPS_FLUSH
-    
-				p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base, widthflag, FALSE);
-					
-				break;
-				/*}}}*/
-		
-			case '('  :
-			case ')'  :
-				/*{{{  an escape and print it */
-				/* special cases */
-				ENHPS_OPEN
-				fputc('\\', gpoutfile);
-				fputc(*p, gpoutfile);
-				break;
-				/*}}}*/
-		
-			case '\\'  :
-				/*{{{  is it an escape */
-				/* special cases */
-				
-				if (p[1]=='\\' || p[1]=='(' || p[1]==')')
-				{
-					ENHPS_OPEN
-					fputc('\\', gpoutfile);
-				}
-				else if (p[1] >= '0' && p[1] <= '7')
-				{
-					/* up to 3 octal digits */
-					ENHPS_OPEN
-					fputc('\\', gpoutfile);
-					fputc(p[1], gpoutfile);
-					++p;
-					if (p[1] >= '0' && p[1] <= '7')
-					{
-						fputc(p[1], gpoutfile);
-						++p;
-						if (p[1] >= '0' && p[1] <= '7')
-						{
-							fputc(p[1], gpoutfile);
-							++p;
-						}
-					}
-					break;
-				}
-    
-				++p;
-				/* just go and print it (fall into the 'default' case) */
-    
-				/*}}}*/
-			default:
-				/*{{{  print it */
-				ENHPS_OPEN
-    
-				fputc(*p, gpoutfile);
-    
-			/*}}}*/
+	case '_'  :
+	case '^'  :
+	    /*{{{  deal with super/sub script*/
 
+	    shift = (*p == '^') ? 0.5 : -0.3;
+
+	    ENHPS_FLUSH;
+
+	    p = ENHPS_recurse(p+1, FALSE, fontname, fontsize*0.8, base+shift*fontsize, widthflag, showflag);
+
+	    break;
+	    /*}}}*/
+	case '{'  :
+	{
+	    char *savepos=NULL, save=0;
+	    char *localfontname=fontname, ch;
+	    int recode=1;
+	    float f=fontsize;
+
+	    /*{{{  recurse (possibly with a new font) */
+
+	    ENHPS_DEBUG(("Dealing with {\n"));
+
+	    if (*++p == '/') {
+		/* then parse a fontname, optional fontsize */
+		while (*++p == ' ');
+		if (*p=='-') {
+		    recode=0;
+		    while (*++p == ' ');
 		}
+		localfontname = p;
+		while ((ch = *p) > ' ' && ch != '=' && ch != '*')
+		    ++p;
+		save = *(savepos=p);
+		if (ch == '=') {
+		    *p++ = '\0';				
+		    /*{{{  get optional font size*/
+		    ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
+		    f = (float)strtod(p, &p);
+		    ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-		/* like TeX, we only do one character in a recursion, unless it's
-		 * in braces
-		 */
+		    if (f)
+			f *= PS_SC;  /* remember the scaling */
+		    else
+			f = fontsize;
 
-		if (!brace)
-		{
-			ENHPS_FLUSH
-			return(p);  /* the ++p in the outer copy will increment us */
+		    ENHPS_DEBUG(("Font size %.1f\n", f));
+		    /*}}}*/
 		}
+		else if (ch == '*') {
+		    *p++ = '\0';				
+		    /*{{{  get optional font size scale factor*/
+		    ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p));
+		    f = (float)strtod(p, &p);
+		    ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p));
 
-		if (*p) /* only not true if { not terminated, I think */
-			++p;	
+		    if (f)
+			f *= fontsize;  /* apply the scale factor */
+		    else
+			f = fontsize;
+
+		    ENHPS_DEBUG(("Font size %.1f\n", f));
+		    /*}}}*/
+		} else {
+		    *p++ = '\0';
+		    f = fontsize;
+		}				
+
+		while (*p == ' ')
+		    ++p;
+		if (*localfontname) {
+		    /* only allow RememberFont to re-encode it if no string
+		     * active */
+		    char *recodestring = PS_RememberFont(localfontname,
+							 recode && !ENHps_opened_string);
+		    if (recode && recodestring) {
+			ENHPS_FLUSH;
+			fprintf(gpoutfile, "/%s %s",
+				localfontname, recodestring);
+		    }
+		} else
+		    localfontname = fontname;
+	    }
+	    /*}}}*/
+
+	    ENHPS_DEBUG(("Before recursing, we are at [%p] \"%s\"\n", p, p));
+
+	    p = ENHPS_recurse(p, TRUE, localfontname, f, base,
+			      widthflag, showflag);
+
+	    ENHPS_DEBUG(("BACK WITH \"%s\"\n", p));
+
+	    ENHPS_FLUSH;
+
+	    if (savepos)
+		/* restore overwritten character */
+		*savepos = save;
+	    break;
 	}
-	ENHPS_FLUSH
-	return p;
-} 
+	case '@' :
+	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
+
+	    ENHPS_FLUSH;
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
+			      FALSE, showflag);
+
+	    break;
+	    /*}}}*/
+
+	case '&' :
+	    /*{{{  character skip - skips space equal to length of character(s) */
+	    ENHPS_FLUSH;
+
+	    p = ENHPS_recurse(++p, FALSE, fontname, fontsize, base,
+			      widthflag, FALSE);
+
+	    break;
+	    /*}}}*/
+
+	case '('  :
+	case ')'  :
+	    /*{{{  an escape and print it */
+	    /* special cases */
+	    ENHPS_OPEN;
+	    fputc('\\', gpoutfile);
+	    fputc(*p, gpoutfile);
+	    break;
+	    /*}}}*/
+
+	case '\\'  :
+	    /*{{{  is it an escape */
+	    /* special cases */
+
+	    if (p[1]=='\\' || p[1]=='(' || p[1]==')') {
+		ENHPS_OPEN;
+		fputc('\\', gpoutfile);
+	    } else if (p[1] >= '0' && p[1] <= '7') {
+		/* up to 3 octal digits */
+		ENHPS_OPEN
+		    fputc('\\', gpoutfile);
+		fputc(p[1], gpoutfile);
+		++p;
+		if (p[1] >= '0' && p[1] <= '7') {
+		    fputc(p[1], gpoutfile);
+		    ++p;
+		    if (p[1] >= '0' && p[1] <= '7') {
+			fputc(p[1], gpoutfile);
+			++p;
+		    }
+		}
+		break;
+	    }
+	    ++p;
+	    /* just go and print it (fall into the 'default' case) */
+
+	    /*}}}*/
+	default:
+	    /*{{{  print it */
+	    ENHPS_OPEN;
+
+	    fputc(*p, gpoutfile);
+
+	    /*}}}*/
+
+	}
+
+	/* like TeX, we only do one character in a recursion, unless it's
+	 * in braces
+	 */
+
+	if (!brace) {
+	    ENHPS_FLUSH;
+	    return(p);  /* the ++p in the outer copy will increment us */
+	}
+
+	if (*p) /* only not true if { not terminated, I think */
+	    ++p;	
+    }
+
+    ENHPS_FLUSH;
+    return p;
+}
 
 
 /* a set-font routine for enhanced post : simply copies
@@ -1563,125 +1563,120 @@ double fontsize, base;
  * to the ps_font default
  */
 
-TERM_PUBLIC int ENHPS_set_font(font)  /* Entry font added by DJL */
+TERM_PUBLIC int
+ENHPS_set_font(font)  /* Entry font added by DJL */
 char *font;
 {
-	ENHPS_DEBUG(("ENHPS_set_font(\"%s\")\n", font));
+    ENHPS_DEBUG(("ENHPS_set_font(\"%s\")\n", font));
 
-	if (*font)
-	{
-		int sep=strcspn(font,",");
-		strncpy(ps_enh_font,font,sep); ps_enh_font[sep]=NUL;
-		ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
-		PS_RememberFont(ps_enh_font, 1);
-	}
-	else
-	{
-		/* return to defaults */
-		strcpy(ps_enh_font, ps_font);
-		ps_enh_fontsize = ps_fontsize;
-	}
+    if (*font) {
+	int sep=strcspn(font,",");
+	strncpy(ps_enh_font,font,sep); ps_enh_font[sep]=NUL;
+	ps_enh_fontsize=ps_fontsize; sscanf (font+sep+1,"%d",&ps_enh_fontsize);
+	PS_RememberFont(ps_enh_font, 1);
+    } else {
+	/* return to defaults */
+	strcpy(ps_enh_font, ps_font);
+	ps_enh_fontsize = ps_fontsize;
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
-TERM_PUBLIC void ENHPS_put_text(x, y, str)
+TERM_PUBLIC void
+ENHPS_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	/* flush any pending graphics (all the XShow routines do this...) */
+    /* flush any pending graphics (all the XShow routines do this...) */
 
-	if (!strlen(str))
-		return;
+    if (!strlen(str))
+	return;
 
-	if (ps_path_count)
-	{
-		fputs(" stroke\n",gpoutfile);
-		ps_path_count=0;
-		PS_relative_ok=FALSE;
-	}
-
-	/* if there are no magic characters, we should just be able
-	 * punt the string to PS_put_text(), which will give shorter
-	 * ps output [eg tics and stuff rarely need extra processing],
-	 * but we need to make sure that the current font is the
-	 * default one before we can do that. {ie I tried it and it
-	 * used the wrong font !}
-	 * if (!strpbrk(str, "{}^_@&"))
-	 * {
-	 *   - do something to ensure default font is selected
-	 *   PS_put_text(x,y,str);
-	 *   return;
-	 * }
-	 */
-
-		
-	PS_move(x,y);
-
-	if (ps_blacktext)
-		fprintf(gpoutfile,"gsave 0 setgray\n");
-	if (ps_ang != 0)
-		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
-			ps_ang*90);
-
-	fputs("[ ",gpoutfile);
-
-	/* set up the globals */
-	
-	ENHps_opened_string = FALSE;
-	ENHps_max_height = -1000;
-	ENHps_min_height = 1000;
-
-	/* Set the recursion going. We say to keep going until a
-	 * closing brace, but we don't really expect to find one.
-	 * If the return value is not the nul-terminator of the
-	 * string, that can only mean that we did find an unmatched
-	 * closing brace in the string. We increment past it (else
-	 * we get stuck in an infinite loop) and try again.
-	 *
-	 * ps_enh_font and ps_enh_fontsize are either set to the
-	 * the defaults set on option line, or have been set to
-	 * "font,size". That is to say, ps_font is used only
-	 * at startup and by ENHPS_set_font
-	 */
-	while (*(str = ENHPS_recurse(str, TRUE, ps_enh_font,
-				     (double)(ps_enh_fontsize*PS_SC),
-				     0.0, TRUE, TRUE)))
-	{
-		ENHPS_FLUSH
-
-		/* I think we can only get here if *str == '}' */
-		if (*str == '}')
-			fprintf(stderr, "enhpost printer driver - ignoring spurious }\n");
-		else
-			fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
-
-		if (!*++str)
-			break; /* end of string */
-
-		/* else carry on and process the rest of the string */
-	}
-
-	ENHps_max_height += ENHps_min_height;
-		
-	fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
-
-	switch(ps_justify)
-	{
-		case LEFT : fprintf(gpoutfile, "MLshow\n");
-			break;
-		case CENTRE : fprintf(gpoutfile, "MCshow\n");
-			break;
-		case RIGHT : fprintf(gpoutfile, "MRshow\n");
-			break;
-	}
-
-	if (ps_ang != 0 || ps_blacktext)
-		fputs("grestore\n", gpoutfile);
-	if (ps_ang != 0 && ps_blacktext)
-		fputs("grestore\n", gpoutfile);
-	ps_path_count = 0;
+    if (ps_path_count) {
+	fputs(" stroke\n",gpoutfile);
+	ps_path_count=0;
 	PS_relative_ok=FALSE;
+    }
+
+    /* if there are no magic characters, we should just be able
+     * punt the string to PS_put_text(), which will give shorter
+     * ps output [eg tics and stuff rarely need extra processing],
+     * but we need to make sure that the current font is the
+     * default one before we can do that. {ie I tried it and it
+     * used the wrong font !}
+     * if (!strpbrk(str, "{}^_@&"))
+     * {
+     *   - do something to ensure default font is selected
+     *   PS_put_text(x,y,str);
+     *   return;
+     * }
+     */
+
+    PS_move(x,y);
+
+    if (ps_blacktext)
+	fprintf(gpoutfile,"gsave 0 setgray\n");
+    if (ps_ang != 0)
+	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
+		ps_ang*90);
+
+    fputs("[ ",gpoutfile);
+
+    /* set up the globals */
+
+    ENHps_opened_string = FALSE;
+    ENHps_max_height = -1000;
+    ENHps_min_height = 1000;
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     *
+     * ps_enh_font and ps_enh_fontsize are either set to the
+     * the defaults set on option line, or have been set to
+     * "font,size". That is to say, ps_font is used only
+     * at startup and by ENHPS_set_font
+     */
+    while (*(str = ENHPS_recurse(str, TRUE, ps_enh_font,
+				 (double)(ps_enh_fontsize*PS_SC),
+				 0.0, TRUE, TRUE))) {
+	ENHPS_FLUSH;
+
+	/* I think we can only get here if *str == '}' */
+	if (*str == '}')
+	    fprintf(stderr, "enhpost printer driver - ignoring spurious }\n");
+	else
+	    fprintf(stderr, "internal error in enhpost driver - *str=0x%x\n", *str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    ENHps_max_height += ENHps_min_height;
+
+    fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
+
+    switch(ps_justify) {
+    case LEFT : fprintf(gpoutfile, "MLshow\n");
+	break;
+    case CENTRE : fprintf(gpoutfile, "MCshow\n");
+	break;
+    case RIGHT : fprintf(gpoutfile, "MRshow\n");
+	break;
+    }
+
+    if (ps_ang != 0 || ps_blacktext)
+	fputs("grestore\n", gpoutfile);
+    if (ps_ang != 0 && ps_blacktext)
+	fputs("grestore\n", gpoutfile);
+    ps_path_count = 0;
+    PS_relative_ok=FALSE;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pc.trm,v 1.20 1998/06/18 14:59:22 ddenholm Exp $
+ * $Id: pc.trm,v 1.12 1998/12/14 18:40:51 lhecking Exp $
  *
  */
 
@@ -130,7 +130,8 @@ extern int far _Cdecl SVGA_driver_far[];
 enum {
     HORIZ_DIR, VERT_DIR
 };
-static void _settextang(ang)
+static void
+_settextang(ang)
 int ang;
 {
     if (ang == HORIZ_DIR) {
@@ -141,12 +142,14 @@ int ang;
 }
 #endif /* WATCOMC */
 
-static int huge detect_svga(void)
+static int huge
+detect_svga(void)
 {
     return 0;			/* the default mode, just a place holder */
 }
 
-void PC_setup()
+void
+PC_setup()
 {				/* called from the beginning of main() */
     int i, t, x, y;
     char pc_modename[9];
@@ -282,7 +285,8 @@ void PC_setup()
     pc_graphics = TRUE;
 }
 
-TERM_PUBLIC void PC_init()
+TERM_PUBLIC void
+PC_init()
 {
     char *pathp;
 #ifdef __WATCOMC__
@@ -322,7 +326,8 @@ TERM_PUBLIC void PC_init()
 #endif /* MSC */
 }
 
-TERM_PUBLIC void PC_graphics()
+TERM_PUBLIC void
+PC_graphics()
 {
     graphics_on = TRUE;
 #ifdef __TURBOC__
@@ -341,7 +346,8 @@ TERM_PUBLIC void PC_graphics()
 #endif /* MSC */
 }
 
-TERM_PUBLIC void PC_linetype(linetype)
+TERM_PUBLIC void
+PC_linetype(linetype)
 {
     if (pc_colors > 14) {	/* 16 or more colors */
 	if (linetype >= 13)
@@ -370,7 +376,8 @@ TERM_PUBLIC void PC_linetype(linetype)
     }
 }
 
-TERM_PUBLIC void PC_move(x, y)
+TERM_PUBLIC void
+PC_move(x, y)
 int x, y;
 {
 #ifdef __TURBOC__
@@ -385,7 +392,8 @@ int x, y;
     starty = y;
 }
 
-TERM_PUBLIC void PC_vector(x, y)
+TERM_PUBLIC void
+PC_vector(x, y)
 int x, y;
 {
 #ifdef __TURBOC__
@@ -402,7 +410,8 @@ int x, y;
     starty = y;
 }
 
-TERM_PUBLIC void PC_reset()
+TERM_PUBLIC void
+PC_reset()
 {
     graphics_on = FALSE;
 #ifdef __TURBOC__
@@ -417,7 +426,8 @@ TERM_PUBLIC void PC_reset()
 #endif /* MSC */
 }
 
-TERM_PUBLIC void PC_text()
+TERM_PUBLIC void
+PC_text()
 {
     if (graphics_on) {
 	graphics_on = FALSE;
@@ -439,7 +449,8 @@ TERM_PUBLIC void PC_text()
     }
 }
 
-TERM_PUBLIC int PC_text_angle(ang)
+TERM_PUBLIC int
+PC_text_angle(ang)
 int ang;
 {
     switch (ang) {
@@ -453,7 +464,8 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC int PC_justify_text(just)
+TERM_PUBLIC int
+PC_justify_text(just)
 enum JUSTIFY just;
 {
 #if defined(__TURBOC__)
@@ -495,7 +507,8 @@ enum JUSTIFY just;
 #endif
 }
 
-TERM_PUBLIC void PC_put_text(x, y, str)
+TERM_PUBLIC void
+PC_put_text(x, y, str)
 int x, y;
 char *str;
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: iris4d.trm,v 1.16 1998/04/14 00:17:52 drd Exp $
+ * $Id: iris4d.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
  *
  */
 
@@ -122,7 +122,8 @@ static iris24bits = FALSE;
 #define IRIS4D_CYAN		10
 #define IRIS4D_BROWN		11
 
-TERM_PUBLIC void IRIS4D_options()
+TERM_PUBLIC void
+IRIS4D_options()
 {
     int i = 0;
     struct value a;
@@ -135,7 +136,8 @@ TERM_PUBLIC void IRIS4D_options()
     sprintf(term_options, "%s", iris24bits ? "24" : "8");
 }
 
-TERM_PUBLIC void IRIS4D_init()
+TERM_PUBLIC void
+IRIS4D_init()
 {
     int i;
     char line[80];
@@ -189,7 +191,8 @@ TERM_PUBLIC void IRIS4D_init()
     return;
 }
 
-TERM_PUBLIC void IRIS4D_graphics()
+TERM_PUBLIC void
+IRIS4D_graphics()
 {
     reshapeviewport();
     ortho2((Coord) 0, (Coord) IRIS4D_XMAX, (Coord) 0, (Coord) IRIS4D_YMAX);
@@ -205,7 +208,8 @@ TERM_PUBLIC void IRIS4D_graphics()
     return;
 }
 
-TERM_PUBLIC void IRIS4D_text()
+TERM_PUBLIC void
+IRIS4D_text()
 {
     gflush();			/* flush buffer */
     return;			/* enter text from another window!!! */
@@ -228,8 +232,7 @@ int linetype;
 	IRIS4D_CYAN,
 	IRIS4D_BROWN,
     };
-    static int pen_color[8] =
-    {0, 1, 4, 5, 6, 1, 2, 4};
+    static int pen_color[8] = { 0, 1, 4, 5, 6, 1, 2, 4 };
 
     if (iris24bits) {
 	int pencolor = pen_color_24[linetype < 0 ? linetype + 2 : linetype % 9 + 2];
@@ -249,21 +252,24 @@ int linetype;
     return;
 }
 
-TERM_PUBLIC void IRIS4D_move(x, y)
+TERM_PUBLIC void
+IRIS4D_move(x, y)
 unsigned int x, y;
 {
     move2i(x, y);
     return;
 }
 
-void IRIS4D_cmove(x, y)
+void
+IRIS4D_cmove(x, y)
 unsigned int x, y;
 {
     cmov2i(x, y);
     return;
 }
 
-TERM_PUBLIC void IRIS4D_vector(x, y)
+TERM_PUBLIC void
+IRIS4D_vector(x, y)
 unsigned int x, y;
 {
     draw2i(x, y);
@@ -271,7 +277,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void IRIS4D_put_text(x, y, str)
+TERM_PUBLIC void
+IRIS4D_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -281,7 +288,8 @@ char *str;
 }
 
 
-TERM_PUBLIC void IRIS4D_reset()
+TERM_PUBLIC void
+IRIS4D_reset()
 {
     return;
 }

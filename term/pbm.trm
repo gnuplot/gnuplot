@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.19 1998/06/18 14:59:21 ddenholm Exp $
+ * $Id: pbm.trm,v 1.11 1999/05/31 18:33:51 lhecking Exp $
  *
  */
 
@@ -98,7 +98,8 @@ static int pgm_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
 /* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
 static int ppm_color[] ={ 15, 8, 3, 5, 6, 2, 4, 1, 11, 13, 14 };  /* colors */
 
-TERM_PUBLIC void PBMoptions()
+TERM_PUBLIC void
+PBMoptions()
 {
     pbm_font = 1;
     pbm_mode = 0;
@@ -156,13 +157,15 @@ TERM_PUBLIC void PBMoptions()
 }
 
 
-TERM_PUBLIC void PBMinit()
+TERM_PUBLIC void
+PBMinit()
 {
     PBMsetfont();		/* HBB 980226: call it here! */
 }
 
 
-TERM_PUBLIC void PBMreset()
+TERM_PUBLIC void
+PBMreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -170,7 +173,8 @@ TERM_PUBLIC void PBMreset()
 }
 
 
-TERM_PUBLIC void PBMsetfont()
+TERM_PUBLIC void
+PBMsetfont()
 {
     switch (pbm_font) {
     case 1:
@@ -198,7 +202,8 @@ TERM_PUBLIC void PBMsetfont()
 }
 
 
-TERM_PUBLIC void PBMgraphics()
+TERM_PUBLIC void
+PBMgraphics()
 {
     int numplanes = 1;
 
@@ -226,7 +231,8 @@ TERM_PUBLIC void PBMgraphics()
 }
 
 
-static void PBMmonotext()
+static void
+PBMmonotext()
 {
     register int x, j, row;
 
@@ -244,7 +250,8 @@ static void PBMmonotext()
     b_freebitmap();
 }
 
-static void PBMgraytext()
+static void
+PBMgraytext()
 {
     register int x, j, row;
     register int i, value;
@@ -284,7 +291,8 @@ P5\n\
     b_freebitmap();
 }
 
-static void PBMcolortext()
+static void
+PBMcolortext()
 {
     register int x, j, row;
     register int i;
@@ -328,7 +336,8 @@ static void PBMcolortext()
     b_freebitmap();
 }
 
-TERM_PUBLIC void PBMtext()
+TERM_PUBLIC void
+PBMtext()
 {
     switch (pbm_mode) {
     case 0:
@@ -344,7 +353,8 @@ TERM_PUBLIC void PBMtext()
 }
 
 
-TERM_PUBLIC void PBMlinetype(linetype)
+TERM_PUBLIC void
+PBMlinetype(linetype)
 int linetype;
 {
     switch (pbm_mode) {
@@ -364,7 +374,8 @@ int linetype;
     }
 }
 
-TERM_PUBLIC void PBMpoint(x, y, point)
+TERM_PUBLIC void
+PBMpoint(x, y, point)
 unsigned int x, y;
 int point;
 {

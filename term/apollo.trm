@@ -1,5 +1,5 @@
 /*
- * $Id: apollo.trm,v 1.13 1998/04/14 00:17:30 drd Exp $
+ * $Id: apollo.trm,v 1.9 1999/01/14 19:34:40 lhecking Exp $
  *
  */
 
@@ -83,6 +83,7 @@ static name_$long_pname_t font_name;	/* font path name */
 static boolean use_bitmap;	/* use a separate bitmap? */
 
 /* return whether stdout is a DM pad */
+int
 apollo_isa_pad()
 {
     status_$t status;
@@ -97,7 +98,8 @@ apollo_isa_pad()
     Note that we must save the font file name because we need
     to reload the font file everytime the window changes size.
 */
-static void apollo_font_info(struct termentry *tbl, char *fname)
+static void
+apollo_font_info(struct termentry *tbl, char *fname)
 {
     short fwidth, fheight, flen;
     status_$t status;
@@ -135,7 +137,8 @@ static void apollo_font_info(struct termentry *tbl, char *fname)
     anything about the current output device characteristics;
     we can just draw the default width, or twice the default width, etc.
 */
-static void apollo_gpr_init(struct termentry *tbl, pad_$window_desc_t * window)
+static void
+apollo_gpr_init(struct termentry *tbl, pad_$window_desc_t * window)
 {
     gpr_$offset_t size;
     short fontid;
@@ -182,7 +185,8 @@ static void apollo_gpr_init(struct termentry *tbl, pad_$window_desc_t * window)
     This routine must be called after apollo_gpr_init(), because we
     need to know the window size, as stored in the termentry table.
 */
-static void apollo_tic_sizes(struct termentry *tbl)
+static void
+apollo_tic_sizes(struct termentry *tbl)
 {
     /* base the tick size on the window size */
     tbl->v_tic = tbl->ymax / 50;
@@ -205,7 +209,8 @@ static void apollo_tic_sizes(struct termentry *tbl)
     The only actions should be those that will be reinitialized
     by apollo_gpr_init().
 */
-static void apollo_gpr_terminate()
+static void
+apollo_gpr_terminate()
 {
     status_$t status;
 
@@ -256,7 +261,8 @@ static void apollo_gpr_terminate()
     wants this kind of functionality, then he or she can run gnuplot
     multiple times.  I think that is a lot cleaner, don't you?
 */
-TERM_PUBLIC void APOLLO_init()
+TERM_PUBLIC void
+APOLLO_init()
 {
     /* only initialize once */
     if (stream == -1) {
@@ -321,7 +327,8 @@ TERM_PUBLIC void APOLLO_init()
     the new size.  We also need to update the termentry table.
     If the window stays the same size, then just clear it.
 */
-static void apollo_redo_window(pad_$window_desc_t * window)
+static void
+apollo_redo_window(pad_$window_desc_t * window)
 {
     struct termentry *tbl = term;
     status_$t status;
@@ -332,7 +339,8 @@ static void apollo_redo_window(pad_$window_desc_t * window)
     apollo_tic_sizes(tbl);
 }
 
-TERM_PUBLIC void APOLLO_graphics()
+TERM_PUBLIC void
+APOLLO_graphics()
 {
     pad_$window_desc_t window;
     short wnum;
@@ -420,7 +428,8 @@ static APOLLO_LINE apollo_lines[] =
 #define APOLLO_MAX_LINE		(sizeof(apollo_lines)/sizeof(*apollo_lines)-2)
 
 /* set the line style */
-TERM_PUBLIC void APOLLO_linetype(ltype)
+TERM_PUBLIC void
+APOLLO_linetype(ltype)
 int ltype;
 {
     status_$t status;
@@ -438,7 +447,8 @@ int ltype;
 }
 
 /* issue an error message that includes an (x, y) coordinate */
-static void apollo_xy_error(char *s, int x, int y, status_$t status)
+static void
+apollo_xy_error(char *s, int x, int y, status_$t status)
 {
     char buffer[128];
 
@@ -456,7 +466,8 @@ static void apollo_xy_error(char *s, int x, int y, status_$t status)
 #define plot_to_gpr(y)		(APOLLO_YMAX - (y))
 
 /* move to a new position */
-TERM_PUBLIC void APOLLO_move(unsigned int x, unsigned int y)
+TERM_PUBLIC void
+APOLLO_move(unsigned int x, unsigned int y)
 {
     status_$t status;
 
@@ -465,7 +476,8 @@ TERM_PUBLIC void APOLLO_move(unsigned int x, unsigned int y)
 }
 
 /* draw a line to a new position */
-TERM_PUBLIC void APOLLO_vector(unsigned int x, unsigned int y)
+TERM_PUBLIC void
+APOLLO_vector(unsigned int x, unsigned int y)
 {
     status_$t status;
 
@@ -478,7 +490,8 @@ TERM_PUBLIC void APOLLO_vector(unsigned int x, unsigned int y)
     however, is that the graphics are finished.  This means we can
     now display the saved bitmap.
 */
-TERM_PUBLIC void APOLLO_text()
+TERM_PUBLIC void
+APOLLO_text()
 {
     if (use_bitmap) {
 	static gpr_$position_t pos;	/* always zero */
@@ -502,7 +515,8 @@ TERM_PUBLIC void APOLLO_text()
     }
 }
 
-TERM_PUBLIC int APOLLO_text_angle(ang)
+TERM_PUBLIC int
+APOLLO_text_angle(ang)
 int ang;
 {
     status_$t status;
@@ -514,7 +528,8 @@ int ang;
 
 static enum JUSTIFY apollo_text_mode;
 
-TERM_PUBLIC int APOLLO_justify_text(mode)
+TERM_PUBLIC int
+APOLLO_justify_text(mode)
 enum JUSTIFY mode;
 {
     apollo_text_mode = mode;
@@ -526,7 +541,8 @@ enum JUSTIFY mode;
     have whatever height the current text has.  Make sure the
     text does not cover the tick marks.
 */
-TERM_PUBLIC void APOLLO_put_text(x, y, str)
+TERM_PUBLIC void
+APOLLO_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -554,7 +570,8 @@ char str[];
 }
 
 /* reset the graphics state and terminate */
-TERM_PUBLIC void APOLLO_reset()
+TERM_PUBLIC void
+APOLLO_reset()
 {
     if (stream != -1) {
 	apollo_gpr_terminate();

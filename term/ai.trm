@@ -1,5 +1,5 @@
 /*
- * $Id: ai.trm,v 1.18 1998/04/14 00:17:28 drd Exp $
+ * $Id: ai.trm,v 1.9 1999/01/13 21:49:44 lhecking Exp $
  *
  */
 
@@ -109,8 +109,8 @@ TERM_PUBLIC int AI_set_font __PROTO((char *font));
 #ifdef TERM_BODY
 
 /* From version.c */
-extern char version[];
-extern char patchlevel[];
+extern char gnuplot_version[];
+extern char gnuplot_patchlevel[];
 
 char ai_font[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
 int ai_fontsize = 14;		/* size of font in pts */
@@ -126,7 +126,8 @@ int ai_multiplot_group = 0;	/* group for multiplot */
 enum JUSTIFY ai_justify = LEFT;	/* text is flush left */
 
 
-TERM_PUBLIC void AI_options()
+TERM_PUBLIC void
+AI_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "d$efault")) {
@@ -167,7 +168,8 @@ TERM_PUBLIC void AI_options()
 }
 
 
-TERM_PUBLIC void AI_init()
+TERM_PUBLIC
+void AI_init()
 {
     ai_page = 0;
 
@@ -178,14 +180,15 @@ TERM_PUBLIC void AI_init()
 %%%%Template:\n\
 %%%%EndComments\n\
 %%%%EndProlog\n",
-	    version, patchlevel,
+	    gnuplot_version, gnuplot_patchlevel,
 	    AI_XOFF, AI_YOFF,
 	    (int) ((AI_XMAX) / AI_SC + 0.5 + AI_XOFF),
 	    (int) ((AI_YMAX) / AI_SC + 0.5 + AI_YOFF));
 }
 
 
-TERM_PUBLIC void AI_graphics()
+TERM_PUBLIC void
+AI_graphics()
 {
     ai_page++;
 /*	fprintf(gpoutfile,"%%%%Page: %d %d\n",ai_page,ai_page);*/
@@ -199,7 +202,8 @@ u\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void AI_text()
+TERM_PUBLIC void
+AI_text()
 {
     if (ai_stroke) {
 	fputs("S\n", gpoutfile);
@@ -215,14 +219,16 @@ TERM_PUBLIC void AI_text()
 }
 
 
-TERM_PUBLIC void AI_reset()
+TERM_PUBLIC void
+AI_reset()
 {
     fputs("%%%%Trailer\n", gpoutfile);
 /*	fprintf(gpoutfile,"%%%%Pages: %d\n",ai_page);*/
 }
 
 
-TERM_PUBLIC void AI_linetype(linetype)
+TERM_PUBLIC void
+AI_linetype(linetype)
 int linetype;
 {
     if (ai_stroke) {
@@ -368,7 +374,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void AI_move(x, y)
+TERM_PUBLIC void
+AI_move(x, y)
 unsigned int x, y;
 {
     if (ai_stroke)
@@ -379,7 +386,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void AI_vector(x, y)
+TERM_PUBLIC void
+AI_vector(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "%.2f %.2f l\n", x / AI_SC, y / AI_SC);
@@ -392,7 +400,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void AI_put_text(x, y, str)
+TERM_PUBLIC void
+AI_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -432,21 +441,24 @@ char *str;
     ai_path_count = 0;
 }
 
-TERM_PUBLIC int AI_text_angle(ang)
+TERM_PUBLIC int
+AI_text_angle(ang)
 int ang;
 {
     ai_ang = ang;
     return TRUE;
 }
 
-TERM_PUBLIC int AI_justify_text(mode)
+TERM_PUBLIC int
+AI_justify_text(mode)
 enum JUSTIFY mode;
 {
     ai_justify = mode;
     return TRUE;
 }
 
-TERM_PUBLIC int AI_set_font(font) /* Entry font added by DJL */
+TERM_PUBLIC int
+AI_set_font(font) /* Entry font added by DJL */
 char *font;
 {
     char name[32];
@@ -470,11 +482,13 @@ char *font;
 }
 
 
-TERM_PUBLIC void AI_suspend()
+TERM_PUBLIC void
+AI_suspend()
 {
 }
 
-TERM_PUBLIC void AI_resume()
+TERM_PUBLIC void
+AI_resume()
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: regis.trm,v 1.18 1998/04/14 00:18:06 drd Exp $
+ * $Id: regis.trm,v 1.6 1998/11/25 21:07:58 lhecking Exp $
  *
  */
 
@@ -95,7 +95,8 @@ static int REGIS16color = FALSE;
 
 static int REGISang = 0;
 
-TERM_PUBLIC void REGISinit()
+TERM_PUBLIC void
+REGISinit()
 {
     fputs("\033[r\033[24;1H", gpoutfile);
     /*     1     2
@@ -106,7 +107,8 @@ TERM_PUBLIC void REGISinit()
 
 
 /* thanks to calmasd!dko (Dan O'Neill) for adding S(E) for vt125s */
-TERM_PUBLIC void REGISgraphics()
+TERM_PUBLIC void
+REGISgraphics()
 {
     fputs("\033[2J\033P1pS(C0)S(E)T(A0)\n", gpoutfile);
     /*     1      2      3    4   5
@@ -120,7 +122,8 @@ TERM_PUBLIC void REGISgraphics()
 }
 
 
-TERM_PUBLIC void REGIStext()
+TERM_PUBLIC void
+REGIStext()
 {
     fputs("\033\\\033[24;1H", gpoutfile);
     /*     1    2
@@ -130,7 +133,8 @@ TERM_PUBLIC void REGIStext()
 }
 
 
-TERM_PUBLIC void REGISlinetype(linetype)
+TERM_PUBLIC void
+REGISlinetype(linetype)
 int linetype;
 {
     /* This will change color in order G,R,B,G-dot,R-dot,B-dot */
@@ -165,14 +169,16 @@ int linetype;
 ** NGB 9/13/93
 */
 
-TERM_PUBLIC void REGISmove(x, y)
+TERM_PUBLIC void
+REGISmove(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "P[%d,%d]\n", x, REGISYLAST - y);
 }
 
 
-TERM_PUBLIC void REGISvector(x, y)
+TERM_PUBLIC void
+REGISvector(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "v[]v[%d,%d]\n", x, REGISYLAST - y);
@@ -181,7 +187,8 @@ unsigned int x, y;
 
 
 /* put_text and text_angle by rjl */
-TERM_PUBLIC void REGISput_text(x, y, str)
+TERM_PUBLIC void
+REGISput_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -202,7 +209,8 @@ char *str;
 }
 
 
-TERM_PUBLIC int REGIStext_angle(ang)
+TERM_PUBLIC int
+REGIStext_angle(ang)
 int ang;
 {
     REGISang = ang;
@@ -214,12 +222,14 @@ int ang;
 }
 
 
-TERM_PUBLIC void REGISreset()
+TERM_PUBLIC void
+REGISreset()
 {
     fputs("\033[2J\033[24;1H", gpoutfile);
 }
 
-TERM_PUBLIC void REGISoptions()
+TERM_PUBLIC void
+REGISoptions()
 {
     int i = 0;
     struct value a;

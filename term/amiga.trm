@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.18 1998/04/14 00:17:29 drd Exp $
+ * $Id: amiga.trm,v 1.8 1998/12/17 22:07:52 lhecking Exp $
  *
  */
 
@@ -258,7 +258,8 @@ static struct RastPort *AMIGA_RastPort;
 /*
  * Close open font, screen and libraries.
  */
-TERM_PUBLIC void AMIGA_reset()
+TERM_PUBLIC void
+AMIGA_reset()
 {
     if (AMIGA_window_mode == TRUE) {
 	int i = 0;
@@ -306,7 +307,8 @@ TERM_PUBLIC void AMIGA_reset()
 /*
  * Init terminal.
  */
-TERM_PUBLIC void AMIGA_init()
+TERM_PUBLIC void
+AMIGA_init()
 {
     char name[MAX_ID_LEN + 1];
 
@@ -416,7 +418,8 @@ TERM_PUBLIC void AMIGA_init()
 /*
  * Scan terminal options
  */
-TERM_PUBLIC void AMIGA_options()
+TERM_PUBLIC void
+AMIGA_options()
 {
 
     /* Screen/Window mode */
@@ -459,7 +462,8 @@ TERM_PUBLIC void AMIGA_options()
 /*
  *
  */
-TERM_PUBLIC void AMIGA_text()
+TERM_PUBLIC void
+AMIGA_text()
 {
     if (AMIGA_window_mode != TRUE) {
 	if (interactive == TRUE) {
@@ -480,7 +484,8 @@ TERM_PUBLIC void AMIGA_text()
 /*
  *
  */
-TERM_PUBLIC void AMIGA_graphics()
+TERM_PUBLIC void
+AMIGA_graphics()
 {
 
     SetRast(AMIGA_RastPort, 0);
@@ -499,7 +504,8 @@ TERM_PUBLIC void AMIGA_graphics()
 /*
  *
  */
-TERM_PUBLIC void AMIGA_move(x, y)
+TERM_PUBLIC void
+AMIGA_move(x, y)
 unsigned int x, y;
 {
     if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
@@ -512,7 +518,8 @@ unsigned int x, y;
 /*
  *
  */
-TERM_PUBLIC void AMIGA_vector(x, y)
+TERM_PUBLIC void
+AMIGA_vector(x, y)
 unsigned int x, y;
 {
     if ((x >= AMIGA_xmax) || (y >= AMIGA_ymax))
@@ -525,7 +532,8 @@ unsigned int x, y;
 /*
  *
  */
-TERM_PUBLIC void AMIGA_linetype(linetype)
+TERM_PUBLIC void
+AMIGA_linetype(linetype)
 int linetype;
 {
     if (AMIGA_window_mode != TRUE) {
@@ -552,7 +560,8 @@ int linetype;
 /*
  *
  */
-TERM_PUBLIC void AMIGA_put_text(x, y, str)
+TERM_PUBLIC void
+AMIGA_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -595,7 +604,8 @@ char *str;
 /*
  *
  */
-TERM_PUBLIC int AMIGA_justify_text(mode)
+TERM_PUBLIC int
+AMIGA_justify_text(mode)
 enum JUSTIFY mode;
 {
     AMIGA_justify = mode;
@@ -606,7 +616,8 @@ enum JUSTIFY mode;
 /*
  *
  */
-TERM_PUBLIC int AMIGA_set_font(font)
+TERM_PUBLIC int
+AMIGA_set_font(font)
 char *font;
 {
     static char test_str[] =
@@ -676,7 +687,8 @@ char *font;
 /*
  *
  */
-TERM_PUBLIC void AMIGA_suspend()
+TERM_PUBLIC void
+AMIGA_suspend()
 {
     if (AMIGA_window_mode != TRUE) {
 	if (interactive == TRUE) {
@@ -697,7 +709,8 @@ TERM_PUBLIC void AMIGA_suspend()
 /*
  *
  */
-TERM_PUBLIC void AMIGA_resume()
+TERM_PUBLIC void
+AMIGA_resume()
 {
     if (AMIGA_window_mode != TRUE)
 	ScreenToFront(AMIGA_Screen);
@@ -712,7 +725,8 @@ TERM_PUBLIC void AMIGA_resume()
  * libraries and screens. This happens e.g. when loading "bivariat.demo"
  * and the stack is smaller than 120000 bytes.
  */
-void AMIGA_exit(void)
+void
+AMIGA_exit(void)
 {
     AMIGA_reset();
     RAWCON(0);

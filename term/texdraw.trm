@@ -1,5 +1,5 @@
 /*
- * $Id: texdraw.trm,v 1.15 1998/06/18 14:59:26 ddenholm Exp $
+ * $Id: texdraw.trm,v 1.10 1999/02/22 15:20:49 lhecking Exp $
  */
 
 /* GNUPLOT - texdraw.trm */
@@ -153,14 +153,16 @@ static int TEXDRAW_linecount = 0;
 /* max value for linecount */
 #define TEXDRAW_LINEMAX 5
 
-TERM_PUBLIC void TEXDRAW_init()
+TERM_PUBLIC void
+TEXDRAW_init()
 {
     TEXDRAW_posx = TEXDRAW_posy = 0;
     TEXDRAW_linetype(-1);
     fputs("%% GNUPLOT: LaTeX using TEXDRAW macros\n", gpoutfile);
 }
 
-TERM_PUBLIC void TEXDRAW_graphics()
+TERM_PUBLIC void
+TEXDRAW_graphics()
 {
     static char GPFAR tdg1[] = "\
 \\begin{texdraw}\n\
@@ -181,13 +183,15 @@ TERM_PUBLIC void TEXDRAW_graphics()
     TEXDRAW_type = 0;
 }
 
-TERM_PUBLIC void TEXDRAW_text()
+TERM_PUBLIC void
+TEXDRAW_text()
 {
     TEXDRAW_endline();
     fputs("\\end{texdraw}\n", gpoutfile);
 }
 
-TERM_PUBLIC void TEXDRAW_linetype(linetype)
+TERM_PUBLIC void
+TEXDRAW_linetype(linetype)
 int linetype;
 {
     TEXDRAW_endline();
@@ -198,7 +202,8 @@ int linetype;
     TEXDRAW_type = linetype;
 }
 
-TERM_PUBLIC void TEXDRAW_move(x, y)
+TERM_PUBLIC void
+TEXDRAW_move(x, y)
 unsigned int x, y;
 {
     TEXDRAW_endline();
@@ -207,7 +212,8 @@ unsigned int x, y;
     TEXDRAW_posy = y;
 }
 
-TERM_PUBLIC void TEXDRAW_point(x, y, number)
+TERM_PUBLIC void
+TEXDRAW_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -228,7 +234,8 @@ int number;
 	     TEXDRAW_points[number % TEXDRAW_POINT_TYPES]));
 }
 
-TERM_PUBLIC void TEXDRAW_vector(ux, uy)
+TERM_PUBLIC void
+TEXDRAW_vector(ux, uy)
 unsigned int ux, uy;
 {
     if (!TEXDRAW_inline) {
@@ -237,7 +244,8 @@ unsigned int ux, uy;
 	/* Start a new line. This depends on line type */
 	if (TEXDRAW_type != TEXDRAW_last_type) {
 	    if (TEXDRAW_lines[TEXDRAW_type + 2] != TEXDRAW_lines[TEXDRAW_last_type + 2])
-		fprintf(gpoutfile, "\\linewd %d\n", TEXDRAW_lines[TEXDRAW_type + 2]);
+		fprintf(gpoutfile, "\\linewd %d\n",
+			TEXDRAW_lines[TEXDRAW_type + 2]);
 	    TEXDRAW_last_type = TEXDRAW_type;
 	}
 	fprintf(gpoutfile, "\\path (%d %d)",
@@ -261,7 +269,8 @@ unsigned int ux, uy;
     TEXDRAW_posy = uy;
 }
 
-static void TEXDRAW_endline()
+static void
+TEXDRAW_endline()
 {
     if (TEXDRAW_inline) {
 	putc('\n', gpoutfile);
@@ -269,7 +278,8 @@ static void TEXDRAW_endline()
     }
 }
 
-TERM_PUBLIC void TEXDRAW_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+TEXDRAW_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -289,7 +299,8 @@ TBOOLEAN head;
     TEXDRAW_posy = ey;
 }
 
-TERM_PUBLIC void TEXDRAW_put_text(x, y, str)
+TERM_PUBLIC void
+TEXDRAW_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
@@ -319,21 +330,24 @@ char str[];			/* the text */
 }
 
 
-TERM_PUBLIC int TEXDRAW_justify_text(mode)
+TERM_PUBLIC int
+TEXDRAW_justify_text(mode)
 enum JUSTIFY mode;
 {
     TEXDRAW_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int TEXDRAW_text_angle(ang)
+TERM_PUBLIC int
+TEXDRAW_text_angle(ang)
 int ang;
 {
     TEXDRAW_angle = ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void TEXDRAW_reset()
+TERM_PUBLIC void
+TEXDRAW_reset()
 {
     TEXDRAW_endline();
     TEXDRAW_posx = TEXDRAW_posy = 0;

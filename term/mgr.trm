@@ -1,5 +1,5 @@
 /*
- * Id: $
+ * $Id: $
  */
 
 /* GNUPLOT - mgr.trm */
@@ -87,7 +87,8 @@ static int MGR_vchar = MGR_VCHAR;
 static int MGR_hchar = MGR_HCHAR;
 
 
-TERM_PUBLIC void MGR_init()
+TERM_PUBLIC void
+MGR_init()
 {
     char res[300];
     int winnbr;
@@ -128,7 +129,8 @@ TERM_PUBLIC void MGR_init()
 }
 
 
-TERM_PUBLIC void MGR_graphics()
+TERM_PUBLIC void
+MGR_graphics()
 {
     char res[32];
     int c, r, w, h;
@@ -153,7 +155,8 @@ TERM_PUBLIC void MGR_graphics()
 }
 
 
-TERM_PUBLIC void MGR_text()
+TERM_PUBLIC void
+MGR_text()
 {
     m_go(0, 0);
     m_aligntext();
@@ -164,7 +167,8 @@ TERM_PUBLIC void MGR_text()
 }
 
 
-TERM_PUBLIC void MGR_linetype(linetype)
+TERM_PUBLIC void
+MGR_linetype(linetype)
 int linetype;
 {
 /*
@@ -175,21 +179,24 @@ int linetype;
 }
 
 
-TERM_PUBLIC void MGR_move(x, y)
+TERM_PUBLIC void
+MGR_move(x, y)
 unsigned int x, y;
 {
     m_go(x, MGR_winheight - 1 - y);
 }
 
 
-TERM_PUBLIC void MGR_vector(x, y)
+TERM_PUBLIC void
+MGR_vector(x, y)
 unsigned int x, y;
 {
     m_draw(x, MGR_winheight - 1 - y);
 }
 
 
-TERM_PUBLIC void MGR_put_text(x, y, str)
+TERM_PUBLIC void
+MGR_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -199,7 +206,8 @@ char *str;
 }
 
 
-TERM_PUBLIC void MGR_reset()
+TERM_PUBLIC void
+MGR_reset()
 {
     m_destroywin(MGR_winnbr);
     MGR_winnbr = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: fg.trm,v 1.5 1998/12/14 18:39:04 lhecking Exp $
  */
 
 /* GNUPLOT - fg.trm */
@@ -175,13 +175,15 @@ int pc_angle;
 #define PC_VCHAR FNT5X9_VCHAR
 #define PC_HCHAR FNT5X9_HCHAR
 */
-void pause()
+void
+pause()
 {				/* press any key to continue... */
     (void) getch();
 }
 
 
-TERM_PUBLIC void PC_text()
+TERM_PUBLIC void
+PC_text()
 {
     if (graphics_on) {
 	graphics_on = FALSE;
@@ -190,7 +192,8 @@ TERM_PUBLIC void PC_text()
     fg_term();
 }
 
-TERM_PUBLIC void PC_reset()
+TERM_PUBLIC void
+PC_reset()
 {
 }
 
@@ -207,20 +210,23 @@ static fg_color_t vga_color;
 static int text_angle;
 static fg_line_t line_to_draw;
 
-TERM_PUBLIC int VGA_text_angle(ang)
+TERM_PUBLIC int
+VGA_text_angle(ang)
 int ang;
 {
     text_angle = ang;
     return TRUE;
 }
 
-TERM_PUBLIC int VGA_justify_text(mode)
+TERM_PUBLIC int
+VGA_justify_text(mode)
 enum JUSTIFY mode;
 {
     return FALSE;
 }
 
-TERM_PUBLIC void VGA_init()
+TERM_PUBLIC void
+VGA_init()
 {
     if (fg_init() == FG_NULL) {
 	fputs("Graphics card not detected.\n", stderr);
@@ -228,70 +234,81 @@ TERM_PUBLIC void VGA_init()
     }
 }
 
-TERM_PUBLIC void HERC_graphics()
+TERM_PUBLIC void
+HERC_graphics()
 {
     fg_init_herc();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void EGAMONO_graphics()
+TERM_PUBLIC void
+EGAMONO_graphics()
 {
     fg_init_egamono();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void EGA_graphics()
+TERM_PUBLIC void
+EGA_graphics()
 {
     fg_init_egaecd();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void VGA_graphics()
+TERM_PUBLIC void
+VGA_graphics()
 {
     fg_init_vga12();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void VGAMONO_graphics()
+TERM_PUBLIC void
+VGAMONO_graphics()
 {
     fg_init_vga11();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void SVGA_graphics()
+TERM_PUBLIC void
+SVGA_graphics()
 {
     fg_init_vesa6a();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void SSVGA_graphics()
+TERM_PUBLIC void
+SSVGA_graphics()
 {
     fg_init_vesa5();
     graphics_on = TRUE;
 }
 
-TERM_PUBLIC void VGA_linetype(linetype)
+TERM_PUBLIC void
+VGA_linetype(linetype)
 {
     if (linetype >= 13)
 	linetype %= 13;
     vga_color = fg.color[vgacolor[linetype + 2]];
 }
 
-TERM_PUBLIC void VGA_put_text(x, y, str)
+TERM_PUBLIC void
+VGA_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     fg_puts(vga_color, FG_MODE_SET, ~0, text_angle, x, y, str, fg.displaybox);
 }
 
-TERM_PUBLIC void VGA_move(x, y)
+TERM_PUBLIC void
+VGA_move(x, y)
 {
     line_to_draw[FG_X1] = x;
     line_to_draw[FG_Y1] = y;
 }
 
 
-TERM_PUBLIC void VGA_vector(x, y)
+TERM_PUBLIC void
+VGA_vector(x, y)
 {
     line_to_draw[FG_X2] = x;
     line_to_draw[FG_Y2] = y;
@@ -300,7 +317,8 @@ TERM_PUBLIC void VGA_vector(x, y)
     line_to_draw[FG_Y1] = y;
 }
 
-TERM_PUBLIC void VGA_text()
+TERM_PUBLIC void
+VGA_text()
 {
     if (graphics_on) {
 	graphics_on = FALSE;
@@ -310,7 +328,8 @@ TERM_PUBLIC void VGA_text()
     fg_term();
 }
 
-TERM_PUBLIC void VGA_reset()
+TERM_PUBLIC void
+VGA_reset()
 {
     fg_term();
 }

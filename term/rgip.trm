@@ -1,5 +1,5 @@
 /*
- * $Id: rgip.trm,v 1.16 1998/04/14 00:18:06 drd Exp $
+ * $Id: rgip.trm,v 1.9 1999/05/31 18:33:52 lhecking Exp $
  */
 
 /* GNUPLOT - rgip.trm Uniplex graphics metafile */
@@ -167,7 +167,8 @@ unsigned int RGIP_yvector[RGIP_MAX_POLY];
 static unsigned char *RGIP_cvts();
 
 
-TERM_PUBLIC void RGIP_init()
+TERM_PUBLIC void
+RGIP_init()
 {
     register struct termentry *t = term;
 
@@ -191,7 +192,8 @@ TERM_PUBLIC void RGIP_init()
     RGIP_vecpos = 0;
 }
 
-TERM_PUBLIC void RGIP_graphics()
+TERM_PUBLIC void
+RGIP_graphics()
 {
     static int Gnr = 0;
     struct stat buf;
@@ -247,11 +249,13 @@ TERM_PUBLIC void RGIP_graphics()
     /* RGIP_linetype(-1); */
 }
 
-TERM_PUBLIC void RGIP_text()
+TERM_PUBLIC void
+RGIP_text()
 {
 }
 
-TERM_PUBLIC void RGIP_linetype(lt)
+TERM_PUBLIC void
+RGIP_linetype(lt)
 int lt;
 {
 /*    int pen, pattern; */
@@ -286,7 +290,8 @@ int lt;
 }
 
 
-TERM_PUBLIC void RGIP_move(x, y)
+TERM_PUBLIC void
+RGIP_move(x, y)
 unsigned int x, y;
 {
 /*
@@ -306,7 +311,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void RGIP_vector(ux, uy)
+TERM_PUBLIC void
+RGIP_vector(ux, uy)
 unsigned int ux, uy;
 {
     /* store polygon-node */
@@ -322,7 +328,8 @@ unsigned int ux, uy;
     }
 }
 
-void RGIP_write_poly()
+void
+RGIP_write_poly()
 {
     register int i;
 
@@ -349,7 +356,8 @@ void RGIP_write_poly()
 }
 
 
-TERM_PUBLIC int RGIP_text_angle(ang)
+TERM_PUBLIC int
+RGIP_text_angle(ang)
 int ang;
 {
     if (RGIP_vecpos) {
@@ -361,7 +369,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC int RGIP_justify_text(mode)
+TERM_PUBLIC int
+RGIP_justify_text(mode)
 enum JUSTIFY mode;
 {
     if (RGIP_vecpos) {
@@ -371,7 +380,8 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-static unsigned char *RGIP_cvts(str, lcnt)
+static unsigned char *
+RGIP_cvts(str, lcnt)
 unsigned char *str;
 int *lcnt;			/* lines */
 {
@@ -425,7 +435,8 @@ int *lcnt;			/* lines */
     return (buf);
 }
 
-TERM_PUBLIC void RGIP_put_text(x, y, str)
+TERM_PUBLIC void
+RGIP_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char *str;			/* the text */
 {
@@ -466,7 +477,8 @@ char *str;			/* the text */
 }
 
 
-TERM_PUBLIC void RGIP_reset()
+TERM_PUBLIC void
+RGIP_reset()
 {
     if (RGIP_vecpos) {
 	RGIP_write_poly();
@@ -486,7 +498,8 @@ RGIP_setfont(sz)
 }
 */
 
-TERM_PUBLIC void RGIP_do_point(x, y, number)
+TERM_PUBLIC void
+RGIP_do_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -506,7 +519,8 @@ int number;
 	    x, y, RGIP_msize, RGIP_msty, RGIP_mcol, RGIP_Obj[RGIPMARK]);
 }
 
-TERM_PUBLIC void RGIP_options()
+TERM_PUBLIC void
+RGIP_options()
 {
     struct value a;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.63 1998/04/14 00:17:53 drd Exp $
+ * $Id: latex.trm,v 1.14 1999/06/06 18:17:24 lhecking Exp $
  *
  */
 
@@ -215,7 +215,8 @@ static struct vslope {
 /* figure out the best arrow */
 void best_latex_arrow __PROTO((int, int, int, int, int, TBOOLEAN));
 
-TERM_PUBLIC void LATEX_options()
+TERM_PUBLIC void
+LATEX_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "c$ourier")) {
@@ -247,7 +248,8 @@ TERM_PUBLIC void LATEX_options()
 }
 
 
-TERM_PUBLIC void LATEX_init()
+TERM_PUBLIC void
+LATEX_init()
 {
 #ifdef EMTEX
     emtex = FALSE;
@@ -264,7 +266,8 @@ TERM_PUBLIC void LATEX_init()
     LATEX_size = 0;
 }
 
-TERM_PUBLIC void LATEX_graphics()
+TERM_PUBLIC void
+LATEX_graphics()
 {
     register struct termentry *t = term;
 
@@ -282,7 +285,8 @@ TERM_PUBLIC void LATEX_graphics()
 }
 
 
-TERM_PUBLIC void LATEX_text()
+TERM_PUBLIC void
+LATEX_text()
 {
     LATEX_flushrule();
     LATEX_flushdot();
@@ -291,7 +295,8 @@ TERM_PUBLIC void LATEX_text()
     LATEX_moved = TRUE;		/* pen is up after move */
 }
 
-TERM_PUBLIC void LATEX_linetype(linetype)
+TERM_PUBLIC void
+LATEX_linetype(linetype)
 int linetype;
 {
     float size;
@@ -327,7 +332,8 @@ int linetype;
     LATEX_moved = TRUE;		/* reset */
 }
 
-TERM_PUBLIC void LATEX_move(x, y)
+TERM_PUBLIC void
+LATEX_move(x, y)
 unsigned int x, y;
 {
     LATEX_flushdot();
@@ -338,7 +344,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void LATEX_point(x, y, number) /* version of line_and_point */
+TERM_PUBLIC void
+LATEX_point(x, y, number) /* version of line_and_point */
 unsigned int x, y;
 int number;			/* type of point */
 {
@@ -352,7 +359,8 @@ int number;			/* type of point */
 }
 
 
-TERM_PUBLIC void LATEX_vector(ux, uy)
+TERM_PUBLIC void
+LATEX_vector(ux, uy)
 unsigned int ux, uy;
 {
     if (LATEX_dotspace == 0.0) {
@@ -371,7 +379,8 @@ unsigned int ux, uy;
     LATEX_posy = uy;
 }
 
-static void LATEX_solid_line(x1, x2, y1, y2)
+static void
+LATEX_solid_line(x1, x2, y1, y2)
 int x1, x2, y1, y2;
 {
     float slope;
@@ -471,7 +480,8 @@ int x1, x2, y1, y2;
  * combined with the current rule (if possible) if code is 1.
  * The previous rule is output, and the new one ignored, if code is 2.
  */
-static void LATEX_rule(code, x, y, width, height)
+static void
+LATEX_rule(code, x, y, width, height)
 int code;			/* how do we treat this rule? */
 double x, y;
 double width;
@@ -532,7 +542,8 @@ double height;
     }
 }
 
-static void LATEX_dot_line(x1, x2, y1, y2)
+static void
+LATEX_dot_line(x1, x2, y1, y2)
 int x1, x2, y1, y2;
 {
     static float LATEX_left;	/* fraction of space left after last dot */
@@ -597,7 +608,8 @@ int x1, x2, y1, y2;
     LATEX_moved = FALSE;
 }
 
-static void LATEX_flushdot()
+static void
+LATEX_flushdot()
 {
     if (LATEX_needsdot)
 	fprintf(gpoutfile, "\\put(%d,%d){%s}\n",
@@ -605,7 +617,8 @@ static void LATEX_flushdot()
     LATEX_needsdot = FALSE;
 }
 
-TERM_PUBLIC void LATEX_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+LATEX_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -615,7 +628,8 @@ TBOOLEAN head;
     LATEX_posy = ey;
 }
 
-void best_latex_arrow(sx, sy, ex, ey, who, head)
+void
+best_latex_arrow(sx, sy, ex, ey, who, head)
 int sx, sy, ex, ey;		/* start and end points */
 int who;			/* 1=LATEX, 2=EEPIC */
 TBOOLEAN head;
@@ -692,7 +706,8 @@ TBOOLEAN head;
     }
 }
 
-TERM_PUBLIC void LATEX_put_text(x, y, str)
+TERM_PUBLIC void
+LATEX_put_text(x, y, str)
 unsigned int x, y;		/* reference point of string */
 char str[];			/* the text */
 {
@@ -717,14 +732,16 @@ char str[];			/* the text */
 		justify[latex_justify], str);
 }
 
-TERM_PUBLIC int LATEX_justify_text(mode)
+TERM_PUBLIC int
+LATEX_justify_text(mode)
 enum JUSTIFY mode;
 {
     latex_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int LATEX_text_angle(ang)
+TERM_PUBLIC int
+LATEX_text_angle(ang)
 int ang;
 {
     /* we can't really write text vertically, but this will 
@@ -734,7 +751,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void LATEX_reset()
+TERM_PUBLIC void
+LATEX_reset()
 {
     LATEX_posx = LATEX_posy = 0;	/* current position */
     LATEX_moved = TRUE;		/* pen is up after move */
@@ -743,7 +761,8 @@ TERM_PUBLIC void LATEX_reset()
 
 #ifdef EMTEX
 
-TERM_PUBLIC void EMTEX_init()
+TERM_PUBLIC void
+EMTEX_init()
 {
     emtex = TRUE;
     LATEX_posx = LATEX_posy = 0;
@@ -756,20 +775,23 @@ TERM_PUBLIC void EMTEX_init()
 }
 
 
-TERM_PUBLIC void EMTEX_reset()
+TERM_PUBLIC void
+EMTEX_reset()
 {
     emtex = FALSE;
     LATEX_posx = LATEX_posy = 0;
 }
 
 
-TERM_PUBLIC void EMTEX_text()
+TERM_PUBLIC void
+EMTEX_text()
 {
     fputs("\\end{picture}\n", gpoutfile);
 }
 
 
-static void EMTEX_solid_line(x1, x2, y1, y2)
+static void
+EMTEX_solid_line(x1, x2, y1, y2)
 int x1, x2, y1, y2;
 {
     /* emtex special solid line */

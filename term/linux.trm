@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.21 1998/06/18 14:59:20 ddenholm Exp $
+ * $Id: linux.trm,v 1.12 1999/05/31 18:33:51 lhecking Exp $
  *
  */
 
@@ -111,7 +111,8 @@ static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
  * /dev/console and /dev/tty\d are considered graphic terminals, all other
  * don't support the linux terminal */
 
-void LINUX_setup(void)
+void
+LINUX_setup(void)
 {
     char line[256];
     FILE *pipe;
@@ -142,7 +143,8 @@ void LINUX_setup(void)
     }
 }
 
-TERM_PUBLIC void LINUX_options()
+TERM_PUBLIC
+void LINUX_options()
 {
     if (!LINUX_graphics_allowed) {
 	int_error(NO_CARET, "Linux terminal driver not available");
@@ -150,7 +152,8 @@ TERM_PUBLIC void LINUX_options()
     fprintf(stderr, "%s\n", vga_getmodename(linux_vmode));
 }
 
-TERM_PUBLIC void LINUX_init()
+TERM_PUBLIC
+void LINUX_init()
 {
     /* vga_init () has been moved to immediately after main () for security */
     if (vga_getdefaultmode() != -1)
@@ -169,7 +172,8 @@ TERM_PUBLIC void LINUX_init()
     linux_lasty = modeinfo->height - 1;
 }
 
-TERM_PUBLIC void LINUX_reset()
+TERM_PUBLIC void
+LINUX_reset()
 {
     if (graphics_on) {
 	vga_setmode(TEXT);
@@ -177,7 +181,8 @@ TERM_PUBLIC void LINUX_reset()
     }
 }
 
-TERM_PUBLIC void LINUX_text()
+TERM_PUBLIC void
+LINUX_text()
 {
     if (graphics_on) {
 	vga_getch();
@@ -186,7 +191,8 @@ TERM_PUBLIC void LINUX_text()
     }
 }
 
-TERM_PUBLIC void LINUX_graphics()
+TERM_PUBLIC void
+LINUX_graphics()
 {
     if (!graphics_on) {
 	vga_setmode(linux_vmode);
@@ -194,17 +200,20 @@ TERM_PUBLIC void LINUX_graphics()
     }
 }
 
-TERM_PUBLIC void LINUX_suspend()
+TERM_PUBLIC void
+LINUX_suspend()
 {
     vga_flip();
 }
 
-TERM_PUBLIC void LINUX_resume()
+TERM_PUBLIC void
+LINUX_resume()
 {
     vga_flip();
 }
 
-TERM_PUBLIC void LINUX_linetype(linetype)
+TERM_PUBLIC void
+LINUX_linetype(linetype)
 int linetype;
 {
     if (linetype >= 13)
@@ -212,7 +221,8 @@ int linetype;
     vga_setcolor(vgacolor[linetype + 2]);
 }
 
-TERM_PUBLIC void LINUX_move(x, y)
+TERM_PUBLIC void
+LINUX_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -220,7 +230,8 @@ unsigned int y;
     linux_starty = y;
 }
 
-TERM_PUBLIC void LINUX_vector(x, y)
+TERM_PUBLIC void
+LINUX_vector(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -229,14 +240,16 @@ unsigned int y;
     linux_starty = y;
 }
 
-TERM_PUBLIC int LINUX_text_angle(ang)
+TERM_PUBLIC int
+LINUX_text_angle(ang)
 int ang;
 {
     linux_angle = ang;
     return TRUE;
 }
 
-static void LINUX_putc(x, y, c, ang, line_func)
+static void
+LINUX_putc(x, y, c, ang, line_func)
 unsigned int x, y;
 int c;
 int ang;
@@ -262,7 +275,8 @@ linux_line_func_ptr line_func;
     }
 }
 
-TERM_PUBLIC void LINUX_put_text(x, y, str)
+TERM_PUBLIC void
+LINUX_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {

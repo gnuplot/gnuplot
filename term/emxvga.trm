@@ -1,5 +1,5 @@
 /*
- * $Id: emxvga.trm,v 1.16 1998/04/14 00:17:40 drd Exp $
+ * $Id: emxvga.trm,v 1.8 1999/05/31 18:33:49 lhecking Exp $
  */
 
 /* GNUPLOT - emxvga.trm */
@@ -119,7 +119,9 @@ static int graphics_on = FALSE;
 int startx, starty, lasty;
 int EMXVGA_angle, EMXVGA_color;
 char *EMXVGA_buf;
-void emx_getch()
+
+void
+emx_getch()
 {
     union REGS reg;
     char c;
@@ -270,7 +272,8 @@ unsigned char font[128][8] =
 
 void g_set(int x, int y, int color);	/* part of SVGA */
 
-void g_string(x0, y0, color, angle, s)
+void
+g_string(x0, y0, color, angle, s)
 /* upper left corner of text, color and angle */
 int x0, y0, color, angle;
 char *s;
@@ -294,7 +297,8 @@ char *s;
 
 /* end of gstring.c */
 
-TERM_PUBLIC void EMXVGA_init()
+TERM_PUBLIC void
+EMXVGA_init()
 {
     if (!g_mode(EMXVGA_vmode)) {
 	fputs("Unable to initiate graphics.\n", stderr);
@@ -304,12 +308,16 @@ TERM_PUBLIC void EMXVGA_init()
     term->ymax = g_ysize;
     lasty = g_ysize - 1;
 }
-TERM_PUBLIC void EMXVGA_reset()
+
+TERM_PUBLIC void
+EMXVGA_reset()
 {
     g_mode(GTEXT);
     graphics_on = FALSE;
 }
-TERM_PUBLIC void EMXVGA_text()
+
+TERM_PUBLIC void
+EMXVGA_text()
 {
     if (graphics_on) {
 	emx_getch();
@@ -317,44 +325,58 @@ TERM_PUBLIC void EMXVGA_text()
 	graphics_on = FALSE;
     }
 }
-TERM_PUBLIC void EMXVGA_graphics()
+
+TERM_PUBLIC void
+EMXVGA_graphics()
 {
     if (!graphics_on) {
 	g_mode(EMXVGA_vmode);
 	graphics_on = TRUE;
     }
 }
-TERM_PUBLIC void EMXVGA_linetype(linetype)
+
+TERM_PUBLIC void
+EMXVGA_linetype(linetype)
 int linetype;
 {
     EMXVGA_color = vgacolor[(linetype % 13) + 2];
 }
-TERM_PUBLIC void EMXVGA_move(x, y)
+
+TERM_PUBLIC void
+EMXVGA_move(x, y)
 unsigned int x, y;
 {
     startx = x;
     starty = y;
 }
-TERM_PUBLIC void EMXVGA_vector(x, y)
+
+TERM_PUBLIC void
+EMXVGA_vector(x, y)
 unsigned int x, y;
 {
     g_line(startx, lasty - starty, x, lasty - y, EMXVGA_color);
     startx = x;
     starty = y;
 }
-TERM_PUBLIC int EMXVGA_text_angle(ang)
+
+TERM_PUBLIC int
+EMXVGA_text_angle(ang)
 int ang;
 {
     EMXVGA_angle = ang * 90;
     return (TRUE);
 }
-TERM_PUBLIC void EMXVGA_put_text(x, y, str)
+
+TERM_PUBLIC void
+EMXVGA_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     g_string(x, lasty - y - 3, EMXVGA_color, EMXVGA_angle, str);
 }
-TERM_PUBLIC void EMXVGA_suspend()
+
+TERM_PUBLIC void
+EMXVGA_suspend()
 {
     if (EMXVGA_buf)
 	free(EMXVGA_buf);	/* do this just for safety */
@@ -363,7 +385,9 @@ TERM_PUBLIC void EMXVGA_suspend()
     emx_getch();
     g_mode(GTEXT);
 }
-TERM_PUBLIC void EMXVGA_resume()
+
+TERM_PUBLIC void
+EMXVGA_resume()
 {
     g_mode(EMXVGA_vmode);
     g_restore(EMXVGA_buf);
@@ -373,7 +397,8 @@ TERM_PUBLIC void EMXVGA_resume()
 #ifdef EMXVESA
 int emx_vesamode = G640x480x256;
 int emx_xlast, emx_ylast;
-TERM_PUBLIC void EMXVESA_options()
+TERM_PUBLIC void
+EMXVESA_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "d$efault")) {
@@ -388,7 +413,9 @@ TERM_PUBLIC void EMXVESA_options()
     }
     sprintf(term_options, "%d", emx_vesamode);
 }
-TERM_PUBLIC void EMXVESA_init()
+
+TERM_PUBLIC void
+EMXVESA_init()
 {
     if (!g_mode(emx_vesamode))
 	int_error(NO_CARET, "Couldn't select graphics mode");
@@ -398,11 +425,15 @@ TERM_PUBLIC void EMXVESA_init()
     term->ymax = emx_ylast + 1;
     g_mode(GTEXT);
 }
-TERM_PUBLIC void EMXVESA_graphics()
+
+TERM_PUBLIC void
+EMXVESA_graphics()
 {
     g_mode(emx_vesamode);
 }
-TERM_PUBLIC void EMXVESA_text()
+
+TERM_PUBLIC void
+EMXVESA_text()
 {
     int ch;
     ch = getch();
@@ -410,7 +441,9 @@ TERM_PUBLIC void EMXVESA_text()
     if (ch == 3)
 	int_error(NO_CARET, "Interrupt");
 }
-TERM_PUBLIC void EMXVESA_reset()
+
+TERM_PUBLIC void
+EMXVESA_reset()
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: kyo.trm,v 1.12 1998/04/14 00:17:52 drd Exp $
+ * $Id: kyo.trm,v 1.6 1998/11/25 21:06:54 lhecking Exp $
  *
  */
 
@@ -81,7 +81,8 @@ TERM_PUBLIC void PRE_reset __PROTO((void));
 
 enum JUSTIFY pre_justify = LEFT;	/* text is flush left */
 
-TERM_PUBLIC void PRE_init()
+TERM_PUBLIC void
+PRE_init()
 {
     fputs("!R! RES;\n", gpoutfile);
     /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
@@ -92,7 +93,8 @@ TERM_PUBLIC void PRE_init()
     fputs("FTMD 15; FONT 29; SCPI 9;\n", gpoutfile);
 }
 
-TERM_PUBLIC void KYO_init()
+TERM_PUBLIC void
+KYO_init()
 {
     fputs("!R! RES;\n", gpoutfile);
     /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
@@ -103,16 +105,19 @@ TERM_PUBLIC void KYO_init()
     fputs("FTMD 15; FONT 17; SCPI 10;\n", gpoutfile);
 }
 
-TERM_PUBLIC void PRE_graphics()
+TERM_PUBLIC void
+PRE_graphics()
 {
 }
 
-TERM_PUBLIC void PRE_text()
+TERM_PUBLIC void
+PRE_text()
 {				/* eject page after each plot */
     fputs("PAGE;\n", gpoutfile);
 }
 
-TERM_PUBLIC void PRE_linetype(linetype)
+TERM_PUBLIC void
+PRE_linetype(linetype)
 int linetype;
 {
     /* actually choose pendiameter */
@@ -123,19 +128,22 @@ int linetype;
     (void) fprintf(gpoutfile, "SPD %d;\n", linetype);
 }
 
-TERM_PUBLIC void PRE_move(x, y)
+TERM_PUBLIC void
+PRE_move(x, y)
 unsigned int x, y;
 {
     (void) fprintf(gpoutfile, "MAP %1d,%1d;\n", x, PRE_YMAX - y);
 }
 
-TERM_PUBLIC void PRE_vector(x, y)
+TERM_PUBLIC void
+PRE_vector(x, y)
 unsigned int x, y;
 {
     (void) fprintf(gpoutfile, "DAP %1d, %1d;\n", x, PRE_YMAX - y);
 }
 
-TERM_PUBLIC void PRE_put_text(x, y, str)
+TERM_PUBLIC void
+PRE_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -149,7 +157,8 @@ char *str;
     }
 }
 
-TERM_PUBLIC int PRE_justify_text(mode)
+TERM_PUBLIC int
+PRE_justify_text(mode)
 enum JUSTIFY mode;
 {
     pre_justify = mode;
@@ -163,7 +172,8 @@ enum JUSTIFY mode;
 
 }
 
-TERM_PUBLIC void PRE_reset()
+TERM_PUBLIC void
+PRE_reset()
 {
     fputs("PAGE; RES; EXIT;\n", gpoutfile);
 }

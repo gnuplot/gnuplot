@@ -1,7 +1,7 @@
 /*{{{}}}*/
 /***************************************************************************/
 /*                                                                         */
-/* $Id: tgif.trm,v 1.66 1998/04/14 00:18:10 drd Exp $                     */
+/* $Id: tgif.trm,v 1.11 1999/05/31 18:33:52 lhecking Exp $                     */
 /*                                                                         */
 /***************************************************************************/
 /* GNUPLOT - tgif.trm                                                      */
@@ -193,7 +193,8 @@ static void TGIF_flush_poly __PROTO((void));
 
 /*}}}  */
 /***************************************************************************/
-static void TGIF_flush_poly()
+static void
+TGIF_flush_poly()
 {
     int i;
 
@@ -221,7 +222,8 @@ static void TGIF_flush_poly()
 }				/* TGIF_flush_poly */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_options()
+TERM_PUBLIC void
+TGIF_options()
 {
 
     struct value a, b;
@@ -355,7 +357,8 @@ TERM_PUBLIC void TGIF_options()
 }
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_init()
+TERM_PUBLIC void
+TGIF_init()
 {
 
     if (multiplot) {
@@ -371,7 +374,7 @@ TERM_PUBLIC void TGIF_init()
     fprintf(gpoutfile, "\
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
-%%\n%% @(#)$Header: /export/home/cheetah/ddenholm/cvsroot/gnuplot/term/tgif.trm,v 1.66 1998/04/14 00:18:10 drd Exp $\n%% %%W%%\n%%\n\
+%%\n%% @(#)$Header: /var/tmp/CVSROOT/gnuplot/term/tgif.trm,v 1.11 1999/05/31 18:33:52 lhecking Exp $\n%% %%W%%\n%%\n\
 page(1,\"\").\n",
 	    TgifPortrait ? 0 : 1, uActResolution, uActZoom, sActFont, uActFontSize);
     eTgifState = NEWPOLY;
@@ -382,7 +385,8 @@ page(1,\"\").\n",
 }				/* TGIF_init */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_graphics()
+TERM_PUBLIC void
+TGIF_graphics()
 {
 
     TGIF_flush_poly();
@@ -438,7 +442,8 @@ TERM_PUBLIC void TGIF_graphics()
 }				/* TGIF_graphics */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_text()
+TERM_PUBLIC void
+TGIF_text()
 {
     TGIF_flush_poly();
 
@@ -447,7 +452,8 @@ TERM_PUBLIC void TGIF_text()
 
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_reset()
+TERM_PUBLIC void
+TGIF_reset()
 {
     TGIF_flush_poly();
     iTgifPolyCount = 0;
@@ -462,7 +468,8 @@ TERM_PUBLIC void TGIF_reset()
 }				/* TGIF_reset */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_linetype(linetype)
+TERM_PUBLIC void
+TGIF_linetype(linetype)
 int linetype;
 {
     unsigned int ult;
@@ -491,7 +498,8 @@ int linetype;
 }				/* TGIF_linetype */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_move(ux, uy)
+TERM_PUBLIC void
+TGIF_move(ux, uy)
 unsigned int ux, uy;
 {
 
@@ -506,7 +514,8 @@ unsigned int ux, uy;
 }				/* TGIF_move */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_vector(ux, uy)
+TERM_PUBLIC void
+TGIF_vector(ux, uy)
 unsigned int ux, uy;
 {
 
@@ -535,7 +544,8 @@ unsigned int ux, uy;
 }				/* TGIF_vector */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+TGIF_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -566,7 +576,8 @@ TBOOLEAN head;
 }				/* TGIF_arrow */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_put_text(ux, uy, str)
+TERM_PUBLIC void
+TGIF_put_text(ux, uy, str)
 unsigned int ux, uy;
 char *str;
 {
@@ -598,7 +609,8 @@ char *str;
 }				/* TGIF_put_text */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC int TGIF_text_angle(ang)
+TERM_PUBLIC int
+TGIF_text_angle(ang)
 int ang;
 {
     uActAngle = uTextAngle[ang];	/* 0=waag.  1=senkrecht */
@@ -607,7 +619,8 @@ int ang;
 
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC int TGIF_justify_text(mode)
+TERM_PUBLIC int
+TGIF_justify_text(mode)
 enum JUSTIFY mode;
 {
     uActJust = mode;
@@ -616,11 +629,12 @@ enum JUSTIFY mode;
 
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_point(ux, uy, number)
+TERM_PUBLIC void
+TGIF_point(ux, uy, number)
 unsigned int ux, uy;
 int number;
 {
-    double p;			/* all pointtypes fit in a (x +/-p)x(y +/-p) box */
+    double p;		/* all pointtypes fit in a (x +/-p)x(y +/-p) box */
 
     double x, y;
 
@@ -639,7 +653,7 @@ int number;
 	number = number % 63;
     switch (number) {
     case -1:
-/* HBB: corrected format string, shuts up gcc -Wall */
+	/* HBB: corrected format string, shuts up gcc -Wall */
 	fprintf(gpoutfile, "poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,1,1,%u,0,0,0,0,8,3,0,[\n]).\n",
 		sActColor, x, y, x + 1, y + 1, uActNr++);
 	break;
@@ -1385,7 +1399,8 @@ poly('%s',2,[\n\t%.1f,%.1f,%.1f,%.1f],0,2,1,%u,0,0,0,0,8,3,0,[\n])\n",
 
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC void TGIF_set_pointsize(size)
+TERM_PUBLIC void
+TGIF_set_pointsize(size)
 double size;
 {
     uActPointSize = size;
@@ -1393,7 +1408,8 @@ double size;
 
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC int TGIF_set_font(font) /* Entry font as added by DJL in post.trm */
+TERM_PUBLIC int
+TGIF_set_font(font) /* Entry font as added by DJL in post.trm */
 char *font;
 {
     char name[32];

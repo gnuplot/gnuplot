@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: gif.trm,v 1.16 1999/06/09 12:05:11 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -276,7 +276,8 @@ static unsigned int gif_color_rgbs[] =
  * suitable for use with the set term command.  term_options[] is used by 
  * the save command.  Use options_null() if no options are available. 
  */
-TERM_PUBLIC void GIF_options()
+TERM_PUBLIC void
+GIF_options()
 {
     int gif_font, i;
     term_options[0] = NUL;
@@ -397,7 +398,8 @@ TERM_PUBLIC void GIF_options()
  * should set up things that only need to be set once, like handshaking and
  * character sets etc...
  */
-TERM_PUBLIC void GIF_init()
+TERM_PUBLIC void
+GIF_init()
 {
     gif_state.linetype = 0;
 }
@@ -407,7 +409,8 @@ TERM_PUBLIC void GIF_init()
  * the terminal type changed.  This procedure should reset the device, 
  * possibly flushing a buffer somewhere or generating a form feed.
  */
-TERM_PUBLIC void GIF_reset()
+TERM_PUBLIC void
+GIF_reset()
 {
 }
 
@@ -417,7 +420,8 @@ TERM_PUBLIC void GIF_reset()
  * be used as terminals (like plotters) will probably be in graphics mode 
  * always and therefore won't need this.
  */
-TERM_PUBLIC void GIF_graphics()
+TERM_PUBLIC void
+GIF_graphics()
 {
     int i;
     unsigned int rgb;
@@ -451,7 +455,8 @@ TERM_PUBLIC void GIF_graphics()
  * that commands can be seen as they're typed.  Again, this will probably
  * do nothing if the device can't be used as a terminal.
  */
-TERM_PUBLIC void GIF_text()
+TERM_PUBLIC void
+GIF_text()
 {
     if (gif_state.flags & GIF_USE_INTERLACE)
 	gdImageInterlace(gif_state.image, 1);
@@ -462,7 +467,8 @@ TERM_PUBLIC void GIF_text()
 /* _move(x,y)  Called at the start of a line.  The cursor should move to the
  * (x,y) position without drawing.
  */
-TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
+TERM_PUBLIC void
+GIF_move(unsigned int x, unsigned int y)
 {
     gif_state.x = x;
     gif_state.y = y;
@@ -472,7 +478,8 @@ TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
  * from the last (x,y) position given by _move() or _vector() to this new (x,y)
  * position.
  */
-TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
+TERM_PUBLIC void
+GIF_vector(unsigned int x, unsigned int y)
 {
     int gif_linetype_dotted[5];
 
@@ -505,7 +512,8 @@ TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
  * it should map it to one of the available line types.
  * Most drivers provide 9 different linetypes (lt is 0 to 8).
  */
-TERM_PUBLIC void GIF_linetype(int type)
+TERM_PUBLIC void
+GIF_linetype(int type)
 {
     if (type >= (gif_state.n_colors - 3))
 	type %= (gif_state.n_colors - 3);
@@ -520,7 +528,8 @@ TERM_PUBLIC void GIF_linetype(int type)
  * to _text_angle and then horizontally (with respect to the text)
  * justified according to _justify_text.
  */
-TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char *string)
+TERM_PUBLIC void
+GIF_put_text(unsigned int x, unsigned int y, char *string)
 {
     if (gif_state.angle == 1) {
 	x -= gif_state.charh / 2;
@@ -539,13 +548,15 @@ TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char *string)
  * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
  * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
  */
-TERM_PUBLIC int GIF_text_angle(int ang)
+TERM_PUBLIC int
+GIF_text_angle(int ang)
 {
     gif_state.angle = ang;
     return TRUE;
 }
 
-TERM_PUBLIC int GIF_set_font(char *fontname)
+TERM_PUBLIC int
+GIF_set_font(char *fontname)
 {
     char name[32];
     int  sep;

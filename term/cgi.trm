@@ -1,5 +1,5 @@
 /*
- * $Id: cgi.trm,v 1.12 1998/04/14 00:17:32 drd Exp $
+ * $Id: cgi.trm,v 1.8 1999/05/31 18:33:49 lhecking Exp $
  *
  */
 
@@ -105,21 +105,24 @@ static short gin[19] =
 char *cgidriver, *getenv();
 
 
-TERM_PUBLIC void CGI_init()
+TERM_PUBLIC void
+CGI_init()
 {
     if (getenv(cgidriver = "CGIDISP") == NULL)
 	HCGI_init();
 }
 
 
-TERM_PUBLIC void HCGI_init()
+TERM_PUBLIC void
+HCGI_init()
 {
     if (getenv(cgidriver = "CGIPRNT") == NULL)
 	int_error(NO_CARET, "no CGI driver");
 }
 
 
-TERM_PUBLIC void CGI_graphics()
+TERM_PUBLIC void
+CGI_graphics()
 {
     int i, aspect;
     char *s;
@@ -146,7 +149,8 @@ TERM_PUBLIC void CGI_graphics()
 }
 
 
-TERM_PUBLIC void CGI_text()
+TERM_PUBLIC void
+CGI_text()
 {
     if (CRT) {
 	short ptin[2];
@@ -160,19 +164,22 @@ TERM_PUBLIC void CGI_text()
 }
 
 
-TERM_PUBLIC void CGI_reset()
+TERM_PUBLIC void
+CGI_reset()
 {
 }
 
 
-TERM_PUBLIC void CGI_move(x, y)
+TERM_PUBLIC void
+CGI_move(x, y)
 unsigned int x, y;
 {
     vect[0] = x;
     vect[1] = y;
 }
 
-TERM_PUBLIC void CGI_vector(x, y)
+TERM_PUBLIC void
+CGI_vector(x, y)
 unsigned int x, y;
 {
     vect[2] = x;
@@ -183,7 +190,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void CGI_linetype(linetype)
+TERM_PUBLIC void
+CGI_linetype(linetype)
 int linetype;
 {
     short lcolor;
@@ -197,7 +205,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void CGI_put_text(x, y, str)
+TERM_PUBLIC void
+CGI_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -205,7 +214,8 @@ char *str;
 }
 
 
-TERM_PUBLIC CGI_text_angle(ang)
+TERM_PUBLIC int
+CGI_text_angle(ang)
 int ang;
 {
     if (!CGIROTATES)
@@ -216,7 +226,8 @@ int ang;
 }
 
 
-TERM_PUBLIC CGI_justify_text(mode)
+TERM_PUBLIC int
+CGI_justify_text(mode)
 enum JUSTIFY mode;
 {
     short hor_in, hor_out, vert_out;
@@ -242,7 +253,8 @@ enum JUSTIFY mode;
 
 #define POINT_TYPES 6
 
-TERM_PUBLIC void CGI_point(x, y, num)
+TERM_PUBLIC void
+CGI_point(x, y, num)
 unsigned int x, y;
 int num;
 {

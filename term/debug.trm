@@ -1,5 +1,5 @@
 /*
- * $Id: debug.trm,v 1.11 1998/04/14 00:17:35 drd Exp $
+ * $Id: debug.trm,v 1.7 1998/11/26 19:04:03 lhecking Exp $
  *
  */
 
@@ -100,27 +100,31 @@ int DEBUG_linetype_last;
 int DEBUG_xlast;
 int DEBUG_ylast;
 
-TERM_PUBLIC void DEBUG_init()
+TERM_PUBLIC void
+DEBUG_init()
 {
     fputs("init\n", gpoutfile);
     DEBUG_linetype_last = -3;
 }
 
 
-TERM_PUBLIC void DEBUG_graphics()
+TERM_PUBLIC void
+DEBUG_graphics()
 {
     DEBUG_xlast = DEBUG_ylast = 0;
     fputs("graphics\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void DEBUG_text()
+TERM_PUBLIC void
+DEBUG_text()
 {
     fputs("text\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void DEBUG_linetype(linetype)
+TERM_PUBLIC void
+DEBUG_linetype(linetype)
 int linetype;
 {
     /*
@@ -133,7 +137,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void DEBUG_move(x, y)
+TERM_PUBLIC void
+DEBUG_move(x, y)
 unsigned int x, y;
 {
     /*
@@ -149,7 +154,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void DEBUG_vector(x, y)
+TERM_PUBLIC void
+DEBUG_vector(x, y)
 unsigned int x, y;
 {
     /*
@@ -165,7 +171,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void DEBUG_put_text(x, y, str)
+TERM_PUBLIC void
+DEBUG_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -180,12 +187,14 @@ char *str;
 
 
 
-TERM_PUBLIC void DEBUG_reset()
+TERM_PUBLIC void
+DEBUG_reset()
 {
     fputs("reset", gpoutfile);
 }
 
-TERM_PUBLIC int DEBUG_justify_text(mode)
+TERM_PUBLIC int
+DEBUG_justify_text(mode)
 enum JUSTIFY mode;
 {
     fputs("justify ", gpoutfile);
@@ -205,7 +214,8 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int DEBUG_text_angle(ang)
+TERM_PUBLIC int
+DEBUG_text_angle(ang)
 int ang;
 {
     fprintf(gpoutfile, "text_angle %d:", ang);
@@ -223,14 +233,16 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC void DEBUG_point(x, y, pointstyle)
+TERM_PUBLIC void
+DEBUG_point(x, y, pointstyle)
 unsigned int x, y;
 int pointstyle;
 {
     fprintf(gpoutfile, "point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }
 
-TERM_PUBLIC void DEBUG_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+DEBUG_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 int head;
 {
@@ -238,7 +250,8 @@ int head;
 	    sx, sy, ex, ey, head ? "with" : "without");
 }
 
-TERM_PUBLIC int DEBUG_set_font(font)
+TERM_PUBLIC int
+DEBUG_set_font(font)
 char *font;
 {
     fprintf(gpoutfile, "set font to \"%s\"\n",
@@ -246,23 +259,27 @@ char *font;
     return TRUE;
 }
 
-TERM_PUBLIC void DEBUG_pointsize(pointsize)
+TERM_PUBLIC void
+DEBUG_pointsize(pointsize)
 double pointsize;
 {
     fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
 }
 
-TERM_PUBLIC void DEBUG_suspend(void)
+TERM_PUBLIC void
+DEBUG_suspend(void)
 {
     fputs("suspended terminal driver\n", gpoutfile);
 }
 
-TERM_PUBLIC void DEBUG_resume(void)
+TERM_PUBLIC void
+DEBUG_resume(void)
 {
     fputs("resumed terminal driver\n", gpoutfile);
 }
 
-TERM_PUBLIC void DEBUG_fillbox(style, x1, y1, width, height)
+TERM_PUBLIC void
+DEBUG_fillbox(style, x1, y1, width, height)
 int style;
 unsigned int x1, y1, width, height;
 {
@@ -270,7 +287,8 @@ unsigned int x1, y1, width, height;
 	    x1, y1, width, height, style);
 }
 
-TERM_PUBLIC void DEBUG_linewidth(double linewidth)
+TERM_PUBLIC void
+DEBUG_linewidth(double linewidth)
 {
     fprintf(gpoutfile, "set linewidth %lf\n", linewidth);
 }

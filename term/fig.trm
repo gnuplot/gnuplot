@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.57 1998/06/18 14:59:20 ddenholm Exp $
+ * $Id: fig.trm,v 1.14 1999/05/31 18:33:50 lhecking Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -184,7 +184,8 @@ static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 #define FIG_POINT_TYPES POINT_TYPES	/* we use the same points */
 
 
-static void FIG_poly_clean(fig_stat)
+static void
+FIG_poly_clean(fig_stat)
 enum FIG_poly_stat fig_stat;
 {
     int i, j;
@@ -218,7 +219,8 @@ enum FIG_poly_stat fig_stat;
     FIG_polyvec_stat = FIG_poly_new;
 }
 
-TERM_PUBLIC void FIG_options()
+TERM_PUBLIC void
+FIG_options()
 {
     static char *options_list =	/* sun cc does not concat strings */
     "expecting monochrome, color, small, big, portrait, landscape,\n\
@@ -402,7 +404,8 @@ TERM_PUBLIC void FIG_options()
     }
 }
 
-TERM_PUBLIC void FIG_init()
+TERM_PUBLIC void
+FIG_init()
 {
     FIG_posx = FIG_posy = 0;
     FIG_polyvec_stat = FIG_poly_new;
@@ -436,7 +439,8 @@ TERM_PUBLIC void FIG_init()
 }
 
 
-TERM_PUBLIC void FIG_graphics()
+TERM_PUBLIC void
+FIG_graphics()
 {
     FIG_posx = FIG_posy = 0;
     FIG_polyvec_stat = FIG_poly_new;
@@ -444,7 +448,8 @@ TERM_PUBLIC void FIG_graphics()
 }
 
 
-TERM_PUBLIC void FIG_text()
+TERM_PUBLIC void
+FIG_text()
 {
     /* there is no way to have separate pictures in a FIG file */
     FIG_poly_clean(FIG_polyvec_stat);
@@ -468,7 +473,8 @@ TERM_PUBLIC void FIG_text()
  *   as a color.
  */
 
-TERM_PUBLIC void FIG_linetype(linetype)
+TERM_PUBLIC void
+FIG_linetype(linetype)
 int linetype;			/* expect linetype >= -2 */
 {
     int last_FIG_type = FIG_type;
@@ -531,7 +537,8 @@ int linetype;			/* expect linetype >= -2 */
 	FIG_poly_clean(FIG_polyvec_stat);
 }
 
-TERM_PUBLIC void FIG_move(x, y)
+TERM_PUBLIC void
+FIG_move(x, y)
 unsigned int x, y;
 {
     int last_FIG_posx = FIG_posx;
@@ -543,7 +550,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void FIG_vector(ux, uy)
+TERM_PUBLIC void
+FIG_vector(ux, uy)
 unsigned int ux, uy;
 {
     int x = ux, y = uy;
@@ -580,7 +588,8 @@ unsigned int ux, uy;
 }
 
 
-TERM_PUBLIC void FIG_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+FIG_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy;		/* start coord */
 unsigned int ex, ey;		/* end coord */
 TBOOLEAN head;
@@ -610,7 +619,8 @@ TBOOLEAN head;
 }
 
 
-TERM_PUBLIC void FIG_put_text(x, y, str)
+TERM_PUBLIC void
+FIG_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -641,7 +651,8 @@ char *str;
     free(outstr);
 }
 
-TERM_PUBLIC int FIG_justify_text(mode)
+TERM_PUBLIC int
+FIG_justify_text(mode)
 enum JUSTIFY mode;
 {
     switch (mode) {
@@ -663,7 +674,8 @@ enum JUSTIFY mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int FIG_text_angle(ang)
+TERM_PUBLIC int
+FIG_text_angle(ang)
 int ang;
 {
     if (ang)
@@ -673,7 +685,8 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void FIG_lpoint(x, y, number)
+TERM_PUBLIC void
+FIG_lpoint(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -751,7 +764,8 @@ int number;
 	do_point(x, y, number);
 }
 
-TERM_PUBLIC void FIG_pointsize(arg_pointsize)
+TERM_PUBLIC void
+FIG_pointsize(arg_pointsize)
 double arg_pointsize;
 {
     FIG_current_pointsize = arg_pointsize;
@@ -759,13 +773,15 @@ double arg_pointsize;
     do_pointsize(arg_pointsize * FIG_font_s / (double) FIG_FONT_S);
 }
 
-TERM_PUBLIC void FIG_linewidth(linewidth)
+TERM_PUBLIC void
+FIG_linewidth(linewidth)
 double linewidth;
 {
     FIG_current_linewidth = linewidth;
 }
 
-TERM_PUBLIC void FIG_reset()
+TERM_PUBLIC void
+FIG_reset()
 {
     FIG_poly_clean(FIG_polyvec_stat);
     FIG_posx = FIG_posy = 0;

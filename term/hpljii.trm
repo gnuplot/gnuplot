@@ -1,5 +1,5 @@
 /*
- * $Id: hpljii.trm,v 1.20 1998/04/14 00:17:51 drd Exp $
+ * $Id: hpljii.trm,v 1.10 1999/05/31 18:33:51 lhecking Exp $
  *
  */
 
@@ -132,7 +132,8 @@ static unsigned int b_300ppi_pattern[] =
 };
 #endif
 
-TERM_PUBLIC void HPLJIIoptions()
+TERM_PUBLIC void
+HPLJIIoptions()
 {
     char opt[4];
     int parse_error = 0;
@@ -191,14 +192,16 @@ TERM_PUBLIC void HPLJIIoptions()
 }
 
 
-TERM_PUBLIC void HPLJIIinit()
+TERM_PUBLIC void
+HPLJIIinit()
 {
     term->v_char = HPLJII_VCHAR;
     term->h_char = HPLJII_HCHAR;
 }
 
 
-TERM_PUBLIC void HPLJIIgraphics()
+TERM_PUBLIC void
+HPLJIIgraphics()
 {
     HPLJII_COURIER;
     HPLJII_PUSH_CURSOR;
@@ -210,7 +213,8 @@ TERM_PUBLIC void HPLJIIgraphics()
 
 
 /* HPLJIItext by rjl - no compression */
-TERM_PUBLIC void HPLJIItext()
+TERM_PUBLIC void
+HPLJIItext()
 {
     register int x, j, row;
 
@@ -238,7 +242,8 @@ TERM_PUBLIC void HPLJIItext()
 
 
 
-TERM_PUBLIC void HPLJIIlinetype(linetype)
+TERM_PUBLIC void
+HPLJIIlinetype(linetype)
 int linetype;
 {
 
@@ -253,7 +258,8 @@ int linetype;
     }
 }
 
-TERM_PUBLIC void HPLJIIput_text(x, y, str)
+TERM_PUBLIC void
+HPLJIIput_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -279,9 +285,11 @@ char *str;
 }
 
 #ifdef PROTOTYPES
-void HPLJIIputc(unsigned int x, unsigned int y, char c, int ang)
+void
+HPLJIIputc(unsigned int x, unsigned int y, char c, int ang)
 #else
-void HPLJIIputc(x, y, c, ang)
+void
+HPLJIIputc(x, y, c, ang)
 unsigned int x, y;
 int ang;
 char c;
@@ -296,7 +304,8 @@ char c;
 }
 
 
-TERM_PUBLIC void HPLJIIreset()
+TERM_PUBLIC void
+HPLJIIreset()
 {
 #ifdef VMS
     fflush_binary();
@@ -305,7 +314,8 @@ TERM_PUBLIC void HPLJIIreset()
 
 
 /* HP DeskJet routines */
-TERM_PUBLIC void HPDJgraphics()
+TERM_PUBLIC void
+HPDJgraphics()
 {
     switch (hplj_dpp) {
     case 1:
@@ -338,7 +348,8 @@ TERM_PUBLIC void HPDJgraphics()
 
 /* 0 compression raster bitmap dump. Compatible with HP DeskJet 500
    hopefully compatible with other HP Deskjet printers */
-TERM_PUBLIC void HPDJtext()
+TERM_PUBLIC void
+HPDJtext()
 {
     register int x, j, row;
 

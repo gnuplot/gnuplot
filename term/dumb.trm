@@ -1,5 +1,5 @@
 /*
- * $Id: dumb.trm,v 1.24 1998/04/14 00:17:37 drd Exp $
+ * $Id: dumb.trm,v 1.6 1998/12/14 18:38:38 lhecking Exp $
  *
  */
 
@@ -100,7 +100,8 @@ static int dumb_feed = 1;
 static void dumb_set_pixel __PROTO((int x, int y, int v, int p));
 
 
-static void dumb_set_pixel(x, y, v, p)
+static void
+dumb_set_pixel(x, y, v, p)
 int x, y, v, p;
 {
     if ((unsigned) x <= dumb_xmax &&	/* ie x>=0 && x<=dumb_xmax */
@@ -112,7 +113,8 @@ int x, y, v, p;
 }
 
 
-TERM_PUBLIC void DUMB_options()
+TERM_PUBLIC void
+DUMB_options()
 {
     int x, y;
     struct value a;
@@ -135,18 +137,20 @@ TERM_PUBLIC void DUMB_options()
 }
 
 
-TERM_PUBLIC void DUMB_init()
+TERM_PUBLIC void
+DUMB_init()
 {
     if (dumb_matrix)
 	free(dumb_matrix);
 
-    dumb_matrix = gp_alloc((unsigned long) dumb_xmax * dumb_ymax * 2, "dumb terminal");
+    dumb_matrix = gp_alloc(dumb_xmax * dumb_ymax * 2, "dumb terminal");
 
     dumb_priority = dumb_matrix + dumb_xmax * dumb_ymax;
 }
 
 
-TERM_PUBLIC void DUMB_graphics()
+TERM_PUBLIC void
+DUMB_graphics()
 {
     int i;
     char *pm = dumb_matrix, *pp = dumb_priority;
@@ -158,7 +162,8 @@ TERM_PUBLIC void DUMB_graphics()
 }
 
 
-TERM_PUBLIC void DUMB_text()
+TERM_PUBLIC void
+DUMB_text()
 {
     int x, y, l;
 
@@ -174,14 +179,16 @@ TERM_PUBLIC void DUMB_text()
 }
 
 
-TERM_PUBLIC void DUMB_reset()
+TERM_PUBLIC void
+DUMB_reset()
 {
     free(dumb_matrix);
     dumb_matrix = NULL;
 }
 
 
-TERM_PUBLIC void DUMB_linetype(linetype)
+TERM_PUBLIC void
+DUMB_linetype(linetype)
 int linetype;
 {
     static char pen_type[7] = { '*', '#', '$', '%', '@', '&', '=' };
@@ -197,7 +204,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void DUMB_move(x, y)
+TERM_PUBLIC void
+DUMB_move(x, y)
 unsigned int x, y;
 {
     dumb_x = x;
@@ -205,7 +213,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void DUMB_point(x, y, point)
+TERM_PUBLIC void
+DUMB_point(x, y, point)
 unsigned int x, y;
 int point;
 {
@@ -213,7 +222,8 @@ int point;
 }
 
 
-TERM_PUBLIC void DUMB_vector(_x, _y)
+TERM_PUBLIC void
+DUMB_vector(_x, _y)
 unsigned int _x, _y;
 {
     int x = _x;			/* we need signed int, since
@@ -305,7 +315,8 @@ unsigned int _x, _y;
 }
 
 
-TERM_PUBLIC void DUMB_put_text(x, y, str)
+TERM_PUBLIC void
+DUMB_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -320,7 +331,8 @@ char *str;
 }
 
 
-TERM_PUBLIC void DUMB_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+DUMB_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 int head;			/* ignored */
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: corel.trm,v 1.12 1998/04/14 00:17:35 drd Exp $
+ * $Id: corel.trm,v 1.8 1998/12/14 18:38:27 lhecking Exp $
  */
 
 /*
@@ -75,7 +75,8 @@ unsigned int corel_xmax = CORELD_XMAX;
 unsigned int corel_ymax = CORELD_YMAX;
 float corel_lw = CORELD_LW;
 
-TERM_PUBLIC void COREL_options()
+TERM_PUBLIC void
+COREL_options()
 {
     struct value a;
 
@@ -129,7 +130,8 @@ TERM_PUBLIC void COREL_options()
 	    corel_lw / COREL_SC);
 }
 
-TERM_PUBLIC void COREL_init()
+TERM_PUBLIC void
+COREL_init()
 {
     fprintf(gpoutfile, "\
 %%!PS-Adobe-2.0 EPSF-1.2\n\
@@ -147,14 +149,16 @@ TERM_PUBLIC void COREL_init()
 }
 
 
-TERM_PUBLIC void COREL_graphics()
+TERM_PUBLIC void
+COREL_graphics()
 {
     corel_path_count = 0;
     corel_stroke = FALSE;
 }
 
 
-TERM_PUBLIC void COREL_text()
+TERM_PUBLIC void
+COREL_text()
 {
     if (corel_stroke) {
 	fputs("S\n", gpoutfile);
@@ -164,13 +168,15 @@ TERM_PUBLIC void COREL_text()
 }
 
 
-TERM_PUBLIC void COREL_reset()
+TERM_PUBLIC void
+COREL_reset()
 {
     fputs("%%%%Trailer\n", gpoutfile);
 }
 
 
-TERM_PUBLIC void COREL_linetype(linetype)
+TERM_PUBLIC void
+COREL_linetype(linetype)
 int linetype;
 {
     if (corel_stroke) {
@@ -303,7 +309,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void COREL_move(x, y)
+TERM_PUBLIC void
+COREL_move(x, y)
 unsigned int x, y;
 {
     if (corel_stroke)
@@ -314,7 +321,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void COREL_vector(x, y)
+TERM_PUBLIC void
+COREL_vector(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "%.2f %.2f l\n", x / COREL_SC, y / COREL_SC);
@@ -327,7 +335,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void COREL_put_text(x, y, str)
+TERM_PUBLIC void
+COREL_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -370,14 +379,16 @@ char *str;
     corel_path_count = 0;
 }
 
-TERM_PUBLIC int COREL_text_angle(ang)
+TERM_PUBLIC int
+COREL_text_angle(ang)
 int ang;
 {
     corel_ang = ang;
     return TRUE;
 }
 
-TERM_PUBLIC int COREL_justify_text(mode)
+TERM_PUBLIC int
+COREL_justify_text(mode)
 enum JUSTIFY mode;
 {
     corel_justify = mode;

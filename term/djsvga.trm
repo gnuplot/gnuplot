@@ -1,5 +1,5 @@
 /*
- * $Id: djsvga.trm,v 1.17 1998/04/14 00:17:36 drd Exp $
+ * $Id: djsvga.trm,v 1.10 1998/12/21 22:23:31 lhecking Exp $
  */
 
 /* GNUPLOT - djsvga.trm */
@@ -140,7 +140,8 @@ static int dj_width, dj_height;
 static double dj_linewidth;	/* store linewidth assignments here */
 #endif
 
-TERM_PUBLIC void DJSVGA_init()
+TERM_PUBLIC void
+DJSVGA_init()
 {
     int i, on, r, g, b, medium = 170, low = 85;
     GrFont *font = NULL;
@@ -219,7 +220,8 @@ TERM_PUBLIC void DJSVGA_init()
  * on by 'gcc -O3') doesn't work for compiling term.c
  */
 __inline__
-TERM_PUBLIC void DJSVGA_graphics()
+TERM_PUBLIC void
+DJSVGA_graphics()
 {
     ScreenRetrieve(dj_textsave);	/* HBB: save text screen contents */
     ScreenGetCursor(&dj_cursory, &dj_cursorx);
@@ -230,7 +232,8 @@ TERM_PUBLIC void DJSVGA_graphics()
 }
 
 __inline__
-TERM_PUBLIC void DJSVGA_text()
+TERM_PUBLIC void
+DJSVGA_text()
 {
     (void) getkey();
     GrSetMode(GR_width_height_text, dj_width, dj_height);
@@ -238,13 +241,15 @@ TERM_PUBLIC void DJSVGA_text()
     ScreenSetCursor(dj_cursory, dj_cursorx);
 }
 
-TERM_PUBLIC void DJSVGA_reset()
+TERM_PUBLIC void
+DJSVGA_reset()
 {
     GrResetColors();
     free(dj_textsave);
 }
 
-TERM_PUBLIC void DJSVGA_options()
+TERM_PUBLIC void
+DJSVGA_options()
 {
     if (!END_OF_COMMAND && isstring(c_token)) {
 	quote_str(DJSVGA_fontname, c_token, MAX_ID_LEN);
@@ -253,7 +258,8 @@ TERM_PUBLIC void DJSVGA_options()
     sprintf(term_options, "\"%s\"", DJSVGA_fontname);
 }
 
-TERM_PUBLIC void DJSVGA_linetype(linetype)
+TERM_PUBLIC void
+DJSVGA_linetype(linetype)
 int linetype;
 {
     if (linetype >= 13)
@@ -262,7 +268,8 @@ int linetype;
     DJSVGA_TextOption.txo_fgcolor.v = dj_color = dj_colors[linetype + 2];
 }
 
-TERM_PUBLIC void DJSVGA_move(x, y)
+TERM_PUBLIC void
+DJSVGA_move(x, y)
 unsigned int x, y;
 {
     dj_startx = x;
@@ -270,7 +277,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void DJSVGA_vector(x, y)
+TERM_PUBLIC void
+DJSVGA_vector(x, y)
 unsigned int x, y;
 {
 #ifdef GRX21
@@ -293,7 +301,8 @@ unsigned int x, y;
  *   otherwise pointless) own private driver, djgrx.trm, to
  *   cure that.
  */
-TERM_PUBLIC int DJSVGA_angle(ang)
+TERM_PUBLIC int
+DJSVGA_angle(ang)
 int ang;
 {
     if (ang) {
@@ -304,7 +313,8 @@ int ang;
     return TRUE;
 }
 
-TERM_PUBLIC int DJSVGA_justify_text(mode)
+TERM_PUBLIC int
+DJSVGA_justify_text(mode)
 enum JUSTIFY mode;
 {
     if (DJSVGA_TextOption.txo_direct == GR_TEXT_RIGHT) {
@@ -337,7 +347,8 @@ enum JUSTIFY mode;
     return TRUE;
 }
 
-TERM_PUBLIC int DJSVGA_set_font(fontname)
+TERM_PUBLIC int
+DJSVGA_set_font(fontname)
 char *fontname;
 {
     char *cp;
@@ -359,7 +370,8 @@ char *fontname;
     }
 }
 
-TERM_PUBLIC void DJSVGA_put_text(x, y, str)
+TERM_PUBLIC void
+DJSVGA_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -370,21 +382,24 @@ char *str;
     GrDrawString(str, strlen(str), x, dj_ylast - y, &DJSVGA_TextOption);
 }
 
-TERM_PUBLIC void DJSVGA_suspend()
+TERM_PUBLIC void
+DJSVGA_suspend()
 {
     DJSVGA_context = GrCreateContext(GrSizeX(), GrSizeY(), 0, 0);
     GrBitBltNC(DJSVGA_context, 0, 0, 0, 0, 0, GrMaxX(), GrMaxY(), GrWRITE);
     DJSVGA_text();
 }
 
-TERM_PUBLIC void DJSVGA_resume()
+TERM_PUBLIC void
+DJSVGA_resume()
 {
     DJSVGA_graphics();
     GrBitBltNC(0, 0, 0, DJSVGA_context, 0, 0, GrMaxX(), GrMaxY(), GrWRITE);
     GrDestroyContext(DJSVGA_context);
 }
 
-TERM_PUBLIC void DJSVGA_fillbox(style, left, bottom, width, height)
+TERM_PUBLIC void
+DJSVGA_fillbox(style, left, bottom, width, height)
 int style;
 unsigned int left, bottom, width, height;
 {
@@ -395,7 +410,8 @@ unsigned int left, bottom, width, height;
     GrFilledBox(left, dj_ylast - bottom, left + width, dj_ylast - bottom - height, 0);
 }
 
-TERM_PUBLIC void DJSVGA_linewidth(double linewidth)
+TERM_PUBLIC void
+DJSVGA_linewidth(double linewidth)
 {
 #ifdef GRX21
     dj_linewidth = linewidth;

@@ -1,5 +1,5 @@
 /*
- * $Id: hp26.trm,v 1.14 1998/04/14 00:17:47 drd Exp $
+ * $Id: hp26.trm,v 1.6 1998/12/14 18:39:41 lhecking Exp $
  */
 
 /* GNUPLOT - HP26.trm */
@@ -108,7 +108,8 @@ typedef struct _HP26_Buffer_Node {
 } HP26_Buffer_Node;
 
 /* constructor method */
-HP26_Buffer_Node *BN_create(index, size, linetype)
+HP26_Buffer_Node *
+BN_create(index, size, linetype)
 int index, size, linetype;
 {
     HP26_Buffer_Node *the_node;
@@ -129,7 +130,8 @@ int index, size, linetype;
 }
 
 /* destructor method */
-void BN_delete(the_node)
+void
+BN_delete(the_node)
 HP26_Buffer_Node *the_node;
 {
     free(the_node->x);
@@ -212,7 +214,8 @@ char HP26_bin_table[32] =
 	if can't use binary short incremental, use binary 
 	absolute(4 bytes/point)
 -- finally, resets the HP26_next pointer to zero    */
-int HP26_flush(the_buff)
+int
+HP26_flush(the_buff)
 HP26_Buffer_Node *the_buff;
 {
     int i, delta_x, delta_y, half_dx, half_dy;
@@ -333,7 +336,8 @@ HP26_Buffer_Node *the_buff;
     return (TRUE);
 }
 
-void HP26_handle_overflow()
+void
+HP26_handle_overflow()
 {
     HP26_Buffer_Node *bigger, *old;
     int x, y;
@@ -361,7 +365,8 @@ void HP26_handle_overflow()
 }
 
 /* checks for NOP, overcapacity condition, and then adds vector to the list */
-TERM_PUBLIC void HP26_vector(x, y)
+TERM_PUBLIC void
+HP26_vector(x, y)
 unsigned int x, y;
 {
     if (HP26_buff->next > 2
@@ -381,7 +386,8 @@ unsigned int x, y;
 }
 
 /* checks for NOP, checks for overcapacity, puts self on list */
-TERM_PUBLIC void HP26_move(x, y)
+TERM_PUBLIC void
+HP26_move(x, y)
 unsigned int x, y;
 {
     if (HP26_buff->next > 0) {
@@ -407,7 +413,8 @@ unsigned int x, y;
     return;
 }
 
-TERM_PUBLIC void HP26_init()
+TERM_PUBLIC void
+HP26_init()
 {
     HP26_gnu_map[-2 + 2] = BN_create(0, 2048, DOTS);	/* border */
     HP26_gnu_map[-1 + 2] = HP26_gnu_map[-2 + 2];	/* axes */
@@ -434,7 +441,8 @@ TERM_PUBLIC void HP26_init()
 }
 
 
-TERM_PUBLIC void HP26_graphics()
+TERM_PUBLIC void
+HP26_graphics()
 {
     fputs("\033*daflsC", gpoutfile);
     /*           12345
@@ -457,7 +465,8 @@ TERM_PUBLIC void HP26_graphics()
 }
 
 
-TERM_PUBLIC void HP26_text()
+TERM_PUBLIC void
+HP26_text()
 {
     int i, j, curr;
 
@@ -505,14 +514,16 @@ TERM_PUBLIC void HP26_text()
      */
 }
 
-TERM_PUBLIC void HP26_reset()
+TERM_PUBLIC void
+HP26_reset()
 {
     int i;
     for (i = 2; i < HP26_gnu_map_size; i++)
 	BN_delete(HP26_gnu_map[i]);
 }
 
-TERM_PUBLIC int HP26_text_angle(ang)
+TERM_PUBLIC int
+HP26_text_angle(ang)
 int ang;
 {
     HP26_angle = ang + 1;
@@ -521,7 +532,8 @@ int ang;
 }
 
 
-TERM_PUBLIC void HP26_put_text(x, y, str)
+TERM_PUBLIC void
+HP26_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
@@ -559,7 +571,8 @@ char *str;
 
 
 /* checks for NOP, sets HP26_buff to point to the right buffer */
-TERM_PUBLIC void HP26_linetype(linetype)
+TERM_PUBLIC void
+HP26_linetype(linetype)
 int linetype;
 {
     if (linetype > 8)
@@ -575,7 +588,8 @@ int linetype;
 
 
 /* switches to a solid linetype and calls do_point, then switches back */
-TERM_PUBLIC void HP26_line_and_point(x, y, number)
+TERM_PUBLIC void
+HP26_line_and_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -597,7 +611,8 @@ int number;
 /* provides 9 point types so they stay in sync with the linetypes 
 puts simpler point types first on the assumption they are more
 frequently used */
-void HP26_do_point(x, y, number)
+void
+HP26_do_point(x, y, number)
 unsigned int x, y;
 int number;
 {

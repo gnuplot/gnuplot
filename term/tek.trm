@@ -1,5 +1,5 @@
 /*
- * $Id: tek.trm,v 1.20 1998/04/14 00:18:07 drd Exp $
+ * $Id: tek.trm,v 1.8 1998/12/14 18:41:23 lhecking Exp $
  *
  */
 
@@ -133,12 +133,14 @@ TERM_PUBLIC void CTEK_vector __PROTO((unsigned int x, unsigned int y));
 #define UPPER5 (31<<5)
 
 
-TERM_PUBLIC void TEK40init()
+TERM_PUBLIC void
+TEK40init()
 {
 }
 
 
-TERM_PUBLIC void TEK40graphics()
+TERM_PUBLIC void
+TEK40graphics()
 {
 #ifdef VMS
     term_pasthru();
@@ -153,7 +155,8 @@ TERM_PUBLIC void TEK40graphics()
        tektronix terminals */
 }
 
-TERM_PUBLIC void TEK40text()
+TERM_PUBLIC void
+TEK40text()
 {
 #ifdef VMS
     (void) fflush(gpoutfile);	/* finish the graphics */
@@ -169,12 +172,14 @@ TERM_PUBLIC void TEK40text()
 }
 
 
-TERM_PUBLIC void TEK40linetype(linetype)
+TERM_PUBLIC void
+TEK40linetype(linetype)
 int linetype;
 {
 }
 
-TERM_PUBLIC void TEK40move(x, y)
+TERM_PUBLIC void
+TEK40move(x, y)
 unsigned int x, y;
 {
     (void) putc('\035', gpoutfile);	/* into graphics */
@@ -182,7 +187,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void TEK40vector(x, y)
+TERM_PUBLIC void
+TEK40vector(x, y)
 unsigned int x, y;
 {
     (void) putc((HY | (y & UPPER5) >> 5), gpoutfile);
@@ -192,7 +198,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void TEK40put_text(x, y, str)
+TERM_PUBLIC void
+TEK40put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -201,12 +208,12 @@ char str[];
 }
 
 
-TERM_PUBLIC void TEK40reset()
+TERM_PUBLIC void
+TEK40reset()
 {
 }
 
 #endif /* TEK */
-
 
 
 /* thanks to dukecdu!evs (Ed Simpson) for the BBN BitGraph driver */
@@ -238,7 +245,8 @@ TERM_PUBLIC void TEK40reset()
 #define BG_vector TEK40vector
 
 
-TERM_PUBLIC void BG_text()
+TERM_PUBLIC void
+BG_text()
 {
 #ifdef VMS
     (void) fflush(gpoutfile);	/* finish the graphics */
@@ -251,7 +259,8 @@ TERM_PUBLIC void BG_text()
 }
 
 
-TERM_PUBLIC void BG_put_text(x, y, str)
+TERM_PUBLIC void
+BG_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -272,7 +281,8 @@ char str[];
 
 #define KTEK40HCHAR		13
 
-TERM_PUBLIC void KTEK40graphics()
+TERM_PUBLIC void
+KTEK40graphics()
 {
 #ifdef VMS
     term_mode_tek();
@@ -285,7 +295,8 @@ TERM_PUBLIC void KTEK40graphics()
     /* kermit tektronix emulation doesn't need to wait */
 }
 
-TERM_PUBLIC void KTEK40Ctext()
+TERM_PUBLIC void
+KTEK40Ctext()
 {
     TEK40text();
     KTEK40Clinetype(0);		/* change to green */
@@ -305,7 +316,8 @@ static char *kermit_color[15] =
  "\033[1;35m", "\033[1;32m", "\033[1;36m", "\033[0;34m",
  "\033[0;33m"};
 
-TERM_PUBLIC void KTEK40Clinetype(linetype)
+TERM_PUBLIC void
+KTEK40Clinetype(linetype)
 int linetype;
 {
     if (linetype >= 13)
@@ -319,7 +331,8 @@ int linetype;
    d=long dash dot, e=dash dot dot */
 static char *kerm_linetype = "`a`abcde";
 
-TERM_PUBLIC void KTEK40Mlinetype(linetype)
+TERM_PUBLIC void
+KTEK40Mlinetype(linetype)
 int linetype;
 {
     if (linetype >= 6)
@@ -327,7 +340,8 @@ int linetype;
     fprintf(gpoutfile, "\033%c", kerm_linetype[linetype + 2]);
 }
 
-TERM_PUBLIC void KTEK40reset()
+TERM_PUBLIC void
+KTEK40reset()
 {
     fputs("\030\n", gpoutfile);	/* turn off Tek emulation */
 #ifdef VMS
@@ -343,7 +357,8 @@ TERM_PUBLIC void KTEK40reset()
 
 #ifdef SELANAR
 
-TERM_PUBLIC void SEL_init()
+TERM_PUBLIC void
+SEL_init()
 {
     fputs("\033\062", gpoutfile);
 /*					1
@@ -352,7 +367,8 @@ TERM_PUBLIC void SEL_init()
 }
 
 
-TERM_PUBLIC void SEL_graphics()
+TERM_PUBLIC void
+SEL_graphics()
 {
     fputs("\033[H\033[J\033\061\033\014", gpoutfile);
 /*                   1           2       3
@@ -366,7 +382,8 @@ TERM_PUBLIC void SEL_graphics()
 }
 
 
-TERM_PUBLIC void SEL_text()
+TERM_PUBLIC void
+SEL_text()
 {
 #ifdef VMS
     (void) fflush(gpoutfile);	/* finish the graphics */
@@ -381,7 +398,8 @@ TERM_PUBLIC void SEL_text()
 #endif /* VMS */
 }
 
-TERM_PUBLIC void SEL_reset()
+TERM_PUBLIC void
+SEL_reset()
 {
     fputs("\033\061\033\012\033\062\033[H\033[J", gpoutfile);
 /*                   1        2       3      4
@@ -396,7 +414,8 @@ TERM_PUBLIC void SEL_reset()
 
 #ifdef VTTEK
 
-TERM_PUBLIC void VTTEK40init()
+TERM_PUBLIC void
+VTTEK40init()
 {
     fputs("\033[?38h", gpoutfile);
     fflush(gpoutfile);
@@ -407,7 +426,8 @@ TERM_PUBLIC void VTTEK40init()
 #endif /* VMS */
 }
 
-TERM_PUBLIC void VTTEK40reset()
+TERM_PUBLIC void
+VTTEK40reset()
 {
     fputs("\033[?38l", gpoutfile);
     fflush(gpoutfile);
@@ -424,7 +444,8 @@ TERM_PUBLIC void VTTEK40reset()
    k=bold dash dot, l=bold long dash dot */
 static char *vt_linetype = "`a`abcdhijkl";
 static int last_vt_linetype = 0;
-TERM_PUBLIC void VTTEK40linetype(linetype)
+TERM_PUBLIC void
+VTTEK40linetype(linetype)
 int linetype;
 {
     if (linetype >= 10)
@@ -433,7 +454,8 @@ int linetype;
     last_vt_linetype = linetype;
 }
 
-TERM_PUBLIC void VTTEK40put_text(x, y, str)
+TERM_PUBLIC void
+VTTEK40put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -448,12 +470,14 @@ char str[];
 
 #ifdef LN03P
 
-TERM_PUBLIC void LN03Pinit()
+TERM_PUBLIC void
+LN03Pinit()
 {
     fputs("\033[?38h", gpoutfile);
 }
 
-TERM_PUBLIC void LN03Preset()
+TERM_PUBLIC void
+LN03Preset()
 {
     fputs("\033[?38l", gpoutfile);
 }
@@ -489,7 +513,8 @@ static unsigned long *CT_pattern = &CT_lines[0];
 /* we need to keep track of tek cursor location */
 static int CT_last_linetype = 0, CT_last_x, CT_last_y;
 
-TERM_PUBLIC void CTEK_linetype(linetype)
+TERM_PUBLIC void
+CTEK_linetype(linetype)
 int linetype;
 {
     if (linetype < 0)
@@ -499,7 +524,8 @@ int linetype;
     CT_last_linetype = linetype;
 }
 
-TERM_PUBLIC void CTEK_move(x, y)
+TERM_PUBLIC void
+CTEK_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -508,7 +534,8 @@ unsigned int y;
     CT_last_y = y;
 }
 
-static void CT_solid_vector(x, y)
+static void
+CT_solid_vector(x, y)
 int x;
 int y;
 {
@@ -524,7 +551,8 @@ int y;
 */
 static int CT_penon = 0;	/* is Pen on? */
 
-static void CT_draw_vpoint(x, y, last)
+static void
+CT_draw_vpoint(x, y, last)
 int x;
 int y;
 int last;
@@ -561,7 +589,8 @@ int last;
    draw vector line with pattern
 */
 
-static void CT_pattern_vector(x1, y1)
+static void
+CT_pattern_vector(x1, y1)
 int x1;
 int y1;
 {
@@ -597,7 +626,8 @@ int y1;
     CT_last_y = y1;
 }
 
-TERM_PUBLIC void CTEK_vector(x, y)
+TERM_PUBLIC void
+CTEK_vector(x, y)
 unsigned int x;
 unsigned int y;
 {

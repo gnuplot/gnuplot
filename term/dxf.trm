@@ -1,5 +1,5 @@
 /*
- * $Id: dxf.trm,v 1.15 1998/04/14 00:17:37 drd Exp $
+ * $Id: dxf.trm,v 1.7 1998/12/14 18:38:43 lhecking Exp $
  *
  */
 
@@ -127,7 +127,8 @@ static char *layer_lines[] = { "CONTINUOUS", "DASHED", "HIDDEN", "CENTER",
 
 static TBOOLEAN vector_was_last = FALSE;
 
-TERM_PUBLIC void DXF_init()
+TERM_PUBLIC void
+DXF_init()
 {
     DXF_posx = DXF_posy = 0;
     dxf_linetype = 0;
@@ -135,7 +136,8 @@ TERM_PUBLIC void DXF_init()
     vector_was_last = FALSE;
 }
 
-TERM_PUBLIC void DXF_graphics()
+TERM_PUBLIC void
+DXF_graphics()
 {
     register struct termentry *t = term;
     int i;
@@ -213,14 +215,16 @@ TERM_PUBLIC void DXF_graphics()
 	  gpoutfile);
 }
 
-TERM_PUBLIC void DXF_text()
+TERM_PUBLIC void
+DXF_text()
 {
     if (vector_was_last)
 	fputs("  0\nSEQEND\n", gpoutfile);
     fputs("  0\nENDSEC\n  0\nEOF\n", gpoutfile);
 }
 
-TERM_PUBLIC void DXF_linetype(linetype)
+TERM_PUBLIC void
+DXF_linetype(linetype)
 int linetype;
 {
     linetype = ABS(linetype);
@@ -228,7 +232,8 @@ int linetype;
     dxf_linetype = linetype;
 }
 
-TERM_PUBLIC void DXF_move(x, y)
+TERM_PUBLIC void
+DXF_move(x, y)
 unsigned int x, y;
 {
     DXF_posx = x;
@@ -250,7 +255,8 @@ unsigned int x, y;
 
 }
 
-TERM_PUBLIC void DXF_vector(ux, uy)
+TERM_PUBLIC void
+DXF_vector(ux, uy)
 unsigned int ux, uy;
 {
     DXF_posx = ux;
@@ -266,7 +272,8 @@ unsigned int ux, uy;
 	    DXF_posx / DXF_UNIT, DXF_posy / DXF_UNIT);
 }
 
-TERM_PUBLIC void DXF_put_text(x, y, str)
+TERM_PUBLIC void
+DXF_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -347,7 +354,8 @@ char str[];
     }
 }
 
-TERM_PUBLIC int DXF_text_angle(ang)
+TERM_PUBLIC int
+DXF_text_angle(ang)
 int ang;
 {
     dxf_angle = 0.0;
@@ -356,14 +364,16 @@ int ang;
     return (TRUE);
 }
 
-TERM_PUBLIC int DXF_justify_text(mode)
+TERM_PUBLIC int
+DXF_justify_text(mode)
 enum JUSTIFY mode;
 {
     dxf_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC void DXF_reset()
+TERM_PUBLIC void
+DXF_reset()
 {
     DXF_posx = DXF_posy = 0;
 }

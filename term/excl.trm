@@ -1,5 +1,5 @@
 /*
- * $Id: excl.trm,v 1.9 1998/04/14 00:17:41 drd Exp $
+ * $Id: excl.trm,v 1.9 1998/12/14 18:38:59 lhecking Exp $
  *
  */
 
@@ -160,7 +160,8 @@ c     TALGMV: graphical move to hor,vert ** abs  coords       (p. 213)
 
 #define TALPYL  "\033P5;1}"
 
-TERM_PUBLIC void EXCL_init()
+TERM_PUBLIC void
+EXCL_init()
 {
     fprintf(gpoutfile, "%s%s%s%s%s%s",
 	    TALPSH, TALAMS, TALMOD, TALCCNT, TALFCTL, TALASF);
@@ -173,18 +174,21 @@ TERM_PUBLIC void EXCL_init()
 /*                    ^Units1/1000" ^pageClip     ^SetLine            */
 }
 
-TERM_PUBLIC void EXCL_graphics()
+TERM_PUBLIC void
+EXCL_graphics()
 {
 }
 
-TERM_PUBLIC void EXCL_text()
+TERM_PUBLIC void
+EXCL_text()
 {
     fputs(TALFPO, gpoutfile);
     /*    ^pageout  */
 }
 
 
-TERM_PUBLIC void EXCL_linetype(linetype)
+TERM_PUBLIC void
+EXCL_linetype(linetype)
 int linetype;
 {
 /* excl line widths in mils: 4 is mimimum, but too thin; then 
@@ -211,7 +215,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void EXCL_move(x, y)
+TERM_PUBLIC void
+EXCL_move(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
@@ -219,7 +224,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void EXCL_vector(x2, y2)
+TERM_PUBLIC void
+EXCL_vector(x2, y2)
 unsigned int x2, y2;
 {
     fprintf(gpoutfile, TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
@@ -227,7 +233,8 @@ unsigned int x2, y2;
 }
 
 
-TERM_PUBLIC void EXCL_put_text(x, y, str)
+TERM_PUBLIC void
+EXCL_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -240,7 +247,8 @@ char str[];
     }
 }
 
-TERM_PUBLIC void EXCL_reset()
+TERM_PUBLIC void
+EXCL_reset()
 {
     fprintf(gpoutfile, "%s%s", TALFPO, TALPOP);
     /*                         ^pageout ^pop  */
