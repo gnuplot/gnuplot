@@ -2,6 +2,10 @@
 
 	* term/pdf.trm: Update "Creator: " field to report version 4.1
 
+	* term/post.trm: Petr's optimized format for solid pm3d quadrangles
+	can be generated even outside the pm3d code, so the \h macro it uses
+	must be defined in the header regardless of whether pm3d is in use.
+
 2004-07-17  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/post.trm (PS_filled_polygon): Remove extraneous gsave

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.114 2004/07/17 03:32:24 sfeam Exp $
+ * $Id: post.trm,v 1.115 2004/07/17 18:28:28 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -511,6 +511,10 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  /ColB ColB Fillden mul Fillden sub 1 add def\n",
 "  ColR ColG ColB setrgbcolor\n",
 "  fill grestore grestore } def\n",
+
+"%\n",
+"%Special short form for the common case of solid quadrangle\n",
+"/h {rlineto rlineto rlineto gsave fill grestore} bind def\n",
 
 "%\n",
 "% PostScript Level 1 Pattern Fill routine\n",
@@ -2741,7 +2745,6 @@ PS_make_header(t_sm_palette *palette)
     fputs("}{\n", gpoutfile);
     fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
     fputs("} ifelse\n", gpoutfile);
-    fputs("/h {rlineto rlineto rlineto gsave fill grestore} bind def\n", gpoutfile);
 #undef R
 #undef G
 #undef B
