@@ -1,3 +1,7 @@
+2001-09-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c: Bugfix for reversing axes during zoom.
+
 2001-08-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (typedef enum t_timelevel): New type to give names to

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.20 2001/05/22 14:25:53 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.21 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1342,20 +1342,16 @@ event_buttonpress(struct gp_event_t *ge)
 		x2max = real_x2;
 		ymax = real_y;
 		y2max = real_y2;
-#define swap(x, y) do { double h = x; x = y; y = h; } while (0)
-		if (xmin > xmax) {
-		    swap(xmin, xmax);
-		}
-		if (ymin > ymax) {
-		    swap(ymin, ymax);
-		}
-		if (x2min > x2max) {
-		    swap(x2min, x2max);
-		}
-		if (y2min > y2max) {
-		    swap(y2min, y2max);
-		}
-#undef swap
+		/* keep the axes (no)reversed as they are now */
+#define sgn(x) (x==0 ? 0 : (x>0 ? 1 : -1))
+#define rev(a1,a2,A) if (sgn(a2-a1) != sgn(axis_array[A].max-axis_array[A].min)) \
+			    { double tmp = a1; a1 = a2; a2 = tmp; }
+		rev(xmin,  xmax,  FIRST_X_AXIS);
+		rev(ymin,  ymax,  FIRST_Y_AXIS);
+		rev(x2min, x2max, SECOND_X_AXIS);
+		rev(y2min, y2max, SECOND_Y_AXIS);
+#undef rev
+#undef sgn
 		do_zoom(xmin, ymin, x2min, y2min, xmax, ymax, x2max, y2max);
 		if (display_ipc_commands()) {
 		    fprintf(stderr, "zoom region finished.\n");
