@@ -1,3 +1,21 @@
+2004-03-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL: Raised to 2 for new release candidate.
+
+	* src/version.c: Updated.
+
+	* docs/doc2texi.el (d2t-texi-header): Updated version to 4.0,
+	changed "organized by" entry from Dave to Lars.  Added Copyright
+	year entry for 2004.
+
+	* docs/titlepag.ms: Likewise.
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* docs/Makefile.in ($(srcdir)/gnuplot.texi): Renamed rule target
+	to include $(srcdir).  Fixed copy command to pull gnuplot.doc,
+	into build directory, not gnuplot.texi.
+
 2004-03-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	The fix for SF bug "[905651] Grid and border overlap the plot".
