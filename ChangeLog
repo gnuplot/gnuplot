@@ -1,4 +1,25 @@
+2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Add gnuplot.pdf to clean target.
+
+	* term/cgm.trm: Use gnuplot_version and gnuplot_patchlevel instead of
+	VERSION. Escape underscores in font names for TeX/LaTeX.
+
+2000-10-24  Brendt Wohlberg  <brendt@cnls.lanl.gov>
+
+	* term/pslatex.trm: The current pslatex term has an option for
+	modifying the text font size, but this option only changes text
+	positioning without actually changing the font size. This patch
+	changes the optional value from a scaling factor to a font size
+	(in points) and includes LaTeX commands to actually change the
+	font size. 
+
 2000-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all, makefile.amg, makefile.win,
+	docs/Makefile.in: Add new terminal drivers.
+
+	* Makefile.in, makefile.all: Add correct directory for Be source.
 
 	* configure.in: New configure option for ggi driver.
 
