@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.47 2000/12/04 12:02:19 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.48 2000/12/18 08:21:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1832,9 +1832,9 @@ set_logscale()
 	    if (chr_in_str(c_token, 'x'))
  		set_for_axis[FIRST_X_AXIS] = TRUE;
 	    if (chr_in_str(c_token, 'y'))
- 		set_for_axis[FIRST_X_AXIS] = TRUE;
+ 		set_for_axis[FIRST_Y_AXIS] = TRUE;
 	    if (chr_in_str(c_token, 'z'))
- 		set_for_axis[FIRST_X_AXIS] = TRUE;
+ 		set_for_axis[FIRST_Z_AXIS] = TRUE;
 	}
 	c_token++;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.19 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.20 2000/11/23 08:35:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -805,8 +805,8 @@ set ticscale %g %g\n",
 
 static void
 save_tics(fp, axis)
-FILE *fp;
-AXIS_INDEX axis;
+    FILE *fp;
+    AXIS_INDEX axis;
 {
     if (axis_array[axis].ticmode == NO_TICS) {
 	fprintf(fp, "set no%stics\n", axis_defaults[axis].name);
@@ -835,7 +835,7 @@ AXIS_INDEX axis;
 	    SAVE_NUM_OR_TIME(fp,
 			     (double) axis_array[axis].ticdef.def.series.start,
 			     axis);
-	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
+	fprintf(fp, ",%g,", axis_array[axis].ticdef.def.series.incr);
 	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) 
 	    SAVE_NUM_OR_TIME(fp,
 			     (double) axis_array[axis].ticdef.def.series.end,

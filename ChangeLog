@@ -1,12 +1,17 @@
-Wed Dec 20 19:42:38 2000  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+2000-12-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+        Fix bugs reported by Theo Hopman:
+	
+	* src/set.c (set_logscale): "set logscale yz" bug fixed.
+
+	* src/save.c (save_tics): xtics saveing fixed.
 
 	* src/graph3d.c (do_3dplot): change incrementation of linetype for
  	contour lines. Fixes off-by-one bug between key sample and actual
  	line.
 
 	* src/contour.c (calc_min_max): Don't logarithmize the ranges
- 	another time.  Fixes bug observered by Theo Hopman (and others,
- 	before).
+ 	another time.
 
 2000-12-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
