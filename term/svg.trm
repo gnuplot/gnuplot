@@ -118,7 +118,6 @@ static void SVG_GroupFilledOpen __PROTO ((void));
 static void SVG_GroupFilledClose __PROTO ((void));
 static void SVG_StyleColor __PROTO((const char*));
 static void SVG_StyleFillColor __PROTO((void));
-static void SVG_StyleStrokeColor __PROTO((void));
 static void SVG_DefineFillPatternWithPath __PROTO((const char* path));
 static void SVG_DefineFillPattern __PROTO((int fillpat));
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
@@ -277,12 +276,6 @@ static void
 SVG_StyleFillColor(void)
 {
     SVG_StyleColor("fill");
-}
-
-static void
-SVG_StyleStrokeColor(void)
-{
-    SVG_StyleColor("stroke");
 }
 
 static void
