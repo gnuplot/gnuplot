@@ -87,7 +87,7 @@ TERM_PUBLIC int T410X_text_angle __PROTO((int ang));
 #define T410XVCHAR	71
 #define T410XHCHAR	51
 #define T410XVTIC	36
-#define T410XHTIC	36	
+#define T410XHTIC	36
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -96,12 +96,12 @@ void T410X_encode_x_y __PROTO((unsigned int x, unsigned int y));
 void T410X_encode_int __PROTO((int number));
 
 
-static int T410X_angle=0;
+static int T410X_angle = 0;
 
 TERM_PUBLIC void T410X_init()
 {
-	(void) fprintf(gpoutfile, "\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1");
-	(void) fprintf(gpoutfile, "\033MG1\033RK!\033SK!\033LZ\033%%!1");
+    fputs("\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1", gpoutfile);
+    fputs("\033MG1\033RK!\033SK!\033LZ\033%%!1", gpoutfile);
 /*
 	 1. set tek mode
 	 2. set character path to 0 (characters placed equal to rotation)
@@ -114,59 +114,60 @@ TERM_PUBLIC void T410X_init()
 	 9. clear the dialog buffer
 	10. set ansi mode
 */
-	(void) fflush(gpoutfile);
+    (void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_reset()
 {
-	(void) fprintf(gpoutfile, "\033%%!0\033LZ\033%%!1");
+    fputs("\033%%!0\033LZ\033%%!1", gpoutfile);
 /*
 	1. set tek mode
 	2. clear the dialog buffer
 	3. set ansi mode
 */
-	(void) fflush(gpoutfile);
+    (void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_graphics()
 {
-	(void) fprintf(gpoutfile, "\033%%!0\033\014\033LV0");
+    fputs("\033%%!0\033\014\033LV0", gpoutfile);
 /*
 	1. set tek mode
 	2. clear the screen
 	3. set dialog area invisible
 */
-	(void) fflush(gpoutfile);
+    (void) fflush(gpoutfile);
 }
 
 TERM_PUBLIC void T410X_text()
 {
-	(void) fprintf(gpoutfile, "\033LV1\033%%!1");
+    fputs("\033LV1\033%%!1", gpoutfile);
 /*
 	1. set dialog area visible
 	2. set ansi mode
 */
-	(void) fflush(gpoutfile);
+    (void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_move(x, y)
 unsigned int x, y;
 {
-	(void) fprintf(gpoutfile, "\033LF");
-	(void) T410X_encode_x_y(x, y);
-	(void) fflush(gpoutfile);
+    fputs("\033LF", gpoutfile);
+
+    (void) T410X_encode_x_y(x, y);
+    (void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_vector(x, y)
 unsigned int x, y;
 {
-	(void) fprintf(gpoutfile, "\033LG");
-	(void) T410X_encode_x_y(x, y);
-	(void) fflush(gpoutfile);
+    fputs("\033LG", gpoutfile);
+    (void) T410X_encode_x_y(x, y);
+    (void) fflush(gpoutfile);
 }
 
 
@@ -174,32 +175,32 @@ TERM_PUBLIC void T410X_point(x, y, number)
 unsigned int x, y;
 int number;
 {
-	(void) fprintf(gpoutfile, "\033MM");
-	(void) T410X_encode_int(GPMAX(number, 0)%11);
-	(void) fprintf(gpoutfile, "\033LH");
-	(void) T410X_encode_x_y(x, y);
-	(void) fflush(gpoutfile);
+    fputs("\033MM", gpoutfile);
+    (void) T410X_encode_int(GPMAX(number, 0) % 11);
+    fputs("\033LH", gpoutfile);
+    (void) T410X_encode_x_y(x, y);
+    (void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_linetype(linetype)
 int linetype;
 {
-	switch (linetype) {
-		case -1:
-			(void) fprintf(gpoutfile, "\033ML5");
-			break;
-		case -2:
-			(void) fprintf(gpoutfile, "\033ML?");
-			break;
-		default:
-			(void) fprintf(gpoutfile, "\033ML");
-			(void) T410X_encode_int(linetype%14+2);
-			break;
-	}
-	(void) fprintf(gpoutfile, "\033MV");
-	(void) T410X_encode_int(GPMAX(linetype, 0)%8);
-	(void) fflush(gpoutfile);
+    switch (linetype) {
+    case -1:
+	fputs("\033ML5", gpoutfile);
+	break;
+    case -2:
+	fputs("\033ML?", gpoutfile);
+	break;
+    default:
+	fputs("\033ML", gpoutfile);
+	(void) T410X_encode_int(linetype % 14 + 2);
+	break;
+    }
+    fputs("\033MV", gpoutfile);
+    (void) T410X_encode_int(GPMAX(linetype, 0) % 8);
+    (void) fflush(gpoutfile);
 }
 
 
@@ -208,25 +209,25 @@ unsigned int x, y;
 char str[];
 {
 
-	if (T410X_angle == 0) {
-		(void) T410X_move(x, y-T410XVCHAR/2+6);
-		(void) fprintf(gpoutfile, "\033MR00");
-	} else {
-		(void) T410X_move(x+T410XHCHAR/2-6, y);
-		(void) fprintf(gpoutfile, "\033MRE:0");
-	}
-	(void) fprintf(gpoutfile, "\033LT");
-	(void) T410X_encode_int(strlen(str));
-	(void) fputs(str, gpoutfile);
-	(void) fflush(gpoutfile);
+    if (T410X_angle == 0) {
+	(void) T410X_move(x, y - T410XVCHAR / 2 + 6);
+	fputs("\033MR00", gpoutfile);
+    } else {
+	(void) T410X_move(x + T410XHCHAR / 2 - 6, y);
+	fputs("\033MRE:0", gpoutfile);
+    }
+    (void) fprintf(gpoutfile, "\033LT", gpoutfile);
+    (void) T410X_encode_int(strlen(str));
+    (void) fputs(str, gpoutfile);
+    (void) fflush(gpoutfile);
 }
 
 TERM_PUBLIC int T410X_text_angle(ang)
 int ang;
 {
 
-	T410X_angle = ang;
-	return(TRUE);
+    T410X_angle = ang;
+    return (TRUE);
 }
 
 /* These last two routines are based on fortran code found in the
@@ -236,48 +237,55 @@ int ang;
 void T410X_encode_x_y(x, y)
 unsigned int x, y;
 {
-	static char chix=0, chiy=0, cloy=0, ceb=0;
+    static char chix = 0, chiy = 0, cloy = 0, ceb = 0;
 
-	register unsigned int hix, lox, hiy, loy, eb, lx, ly;
+    register unsigned int hix, lox, hiy, loy, eb, lx, ly;
 
-	lx = (x <= T410XXMAX) ? x : T410XXMAX;
-	ly = (y <= T410XYMAX) ? y : T410XYMAX;
+    lx = (x <= T410XXMAX) ? x : T410XXMAX;
+    ly = (y <= T410XYMAX) ? y : T410XYMAX;
 
-	hix = lx/128 + 32;
-	lox = (lx/4)%32 + 64;
-	hiy = ly/128 + 32;
-	loy = (ly/4)%32 + 96;
-	eb = (ly%4)*4 + lx%4 + 96;
+    hix = lx / 128 + 32;
+    lox = (lx / 4) % 32 + 64;
+    hiy = ly / 128 + 32;
+    loy = (ly / 4) % 32 + 96;
+    eb = (ly % 4) * 4 + lx % 4 + 96;
 
-	if (chiy != hiy) (void) putc(hiy, gpoutfile);
-	if (ceb != eb) (void) putc(eb, gpoutfile);
-	if ((cloy!=loy) || (ceb!=eb) || (chix!=hix)) (void) putc(loy, gpoutfile);
-	if (chix != hix) (void) putc(hix, gpoutfile);
-	(void) putc(lox, gpoutfile);
+    if (chiy != hiy)
+	(void) putc(hiy, gpoutfile);
+    if (ceb != eb)
+	(void) putc(eb, gpoutfile);
+    if ((cloy != loy) || (ceb != eb) || (chix != hix))
+	(void) putc(loy, gpoutfile);
+    if (chix != hix)
+	(void) putc(hix, gpoutfile);
+    (void) putc(lox, gpoutfile);
 
-	chix = hix;
-	chiy = hiy;
-	cloy = loy;
-	ceb = eb;
+    chix = hix;
+    chiy = hiy;
+    cloy = loy;
+    ceb = eb;
 }
 
 
 void T410X_encode_int(number)
 int number;
 {
-	register unsigned int mag, hi1, hi2, lo;
+    register unsigned int mag, hi1, hi2, lo;
 
-	mag = ABS(number);
+    mag = ABS(number);
 
-	hi1 = mag/1024 + 64;
-	hi2 = (mag/16)%64 + 64;
-	lo = mag%16 + 32;
+    hi1 = mag / 1024 + 64;
+    hi2 = (mag / 16) % 64 + 64;
+    lo = mag % 16 + 32;
 
-	if (number >= 0) lo += 16;
+    if (number >= 0)
+	lo += 16;
 
-	if (hi1 != 64) (void) putc(hi1, gpoutfile);
-	if ((hi2 != 64) || (hi1 != 64)) (void) putc(hi2, gpoutfile);
-	(void) putc(lo, gpoutfile);
+    if (hi1 != 64)
+	(void) putc(hi1, gpoutfile);
+    if ((hi2 != 64) || (hi1 != 64))
+	(void) putc(hi2, gpoutfile);
+    (void) putc(lo, gpoutfile);
 
 }
 
@@ -287,11 +295,11 @@ int number;
 
 TERM_TABLE_START(tek410x_driver)
     "tek410x", "Tektronix 4106, 4107, 4109 and 420X terminals",
-	   T410XXMAX, T410XYMAX, T410XVCHAR, T410XHCHAR, 
-	   T410XVTIC, T410XHTIC, options_null, T410X_init, T410X_reset, 
-	   T410X_text, null_scale, T410X_graphics, T410X_move, T410X_vector, 
-	   T410X_linetype, T410X_put_text, T410X_text_angle, 
-	   null_justify_text, T410X_point, do_arrow, set_font_null
+    T410XXMAX, T410XYMAX, T410XVCHAR, T410XHCHAR,
+    T410XVTIC, T410XHTIC, options_null, T410X_init, T410X_reset,
+    T410X_text, null_scale, T410X_graphics, T410X_move, T410X_vector,
+    T410X_linetype, T410X_put_text, T410X_text_angle,
+    null_justify_text, T410X_point, do_arrow, set_font_null
 TERM_TABLE_END(tek410x_driver)
 
 #undef LAST_TERM

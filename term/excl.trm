@@ -24,8 +24,9 @@
  * 
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
- ***     $Id: excl.trm,v 1.9 1998/04/14 00:17:41 drd Exp $
-     
+ */     
+
+/***
   NAME
      quic
    PURPOSE
@@ -145,13 +146,13 @@ c     TALGMV: graphical move to hor,vert ** abs  coords       (p. 213)
 
 TERM_PUBLIC void EXCL_init()
 {
-  fprintf(gpoutfile,"%s%s%s%s%s%s",
-  	          TALPSH,TALAMS,TALMOD,TALCCNT,TALFCTL,TALASF);
+    fprintf(gpoutfile, "%s%s%s%s%s%s",
+	    TALPSH, TALAMS, TALMOD, TALCCNT, TALFCTL, TALASF);
 /*                ^save state   ^setEXCL       ^PaperSize8.5x11       */
 /*                       ^setANSI      ^copyCount1     ^absorbCtlChar */
-  fprintf(gpoutfile, "%s%s%s%s%s%s",
-		  PUM,TALPRM,TALPGO,TALPCW,TALORG,TALGLP_init);
-  fprintf(gpoutfile,                                            TALGLT,"");
+    fprintf(gpoutfile, "%s%s%s%s%s%s",
+	    PUM, TALPRM, TALPGO, TALPCW, TALORG, TALGLP_init);
+    fprintf(gpoutfile, TALGLT, "");
 /*                ^setUnits  ^landscape    ^OriginZero        ^SolidLine   */
 /*                    ^Units1/1000" ^pageClip     ^SetLine            */
 }
@@ -162,8 +163,8 @@ TERM_PUBLIC void EXCL_graphics()
 
 TERM_PUBLIC void EXCL_text()
 {
-	fprintf(gpoutfile,TALFPO );
-	/*              ^pageout  */
+    fputs(TALFPO, gpoutfile);
+    /*    ^pageout  */
 }
 
 
@@ -175,55 +176,56 @@ int linetype;
    exclpen=MOD(NPEN,8)*7
    CSI  exclpen; exclpen; TALGLPE
 */
-  static char *type[2+9]={ 
-    "", "40;40", "",  "42;42",  "14;21",
+    static char *type[2 + 9] =
+    {
+	"", "40;40", "", "42;42", "14;21",
     /*   ....   ----  -- -- --   . . .   */
-     "",  "49;30",  "14;21",         "",  "49;30",  "14;21"
+	"", "49;30", "14;21", "", "49;30", "14;21"
     /*  same pattern, but thicker..  and thicker       */
     };
-  static int width[2+9] = {14, 7,    7, 7, 7, 10, 10, 10, 17, 17, 17};
-  if (linetype >= 9)
-    linetype %= 9;
-  fprintf(gpoutfile,TALGLP,width[linetype+2],width[linetype+2]); 
-  /*	          ^width in dots */
-  fprintf(gpoutfile,TALGLT,type[linetype+2]);
-  /*              ^line type     */
+    static int width[2 + 9] = { 14, 7, 7, 7, 7, 10, 10, 10, 17, 17, 17 };
+    if (linetype >= 9)
+	linetype %= 9;
+    fprintf(gpoutfile, TALGLP, width[linetype + 2], width[linetype + 2]);
+    /*                 ^width in dots */
+    fprintf(gpoutfile, TALGLT, type[linetype + 2]);
+    /*                 ^line type     */
 }
 
 
-TERM_PUBLIC void EXCL_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void EXCL_move(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
-/*	                 ^pen up vector*/
+    fprintf(gpoutfile, TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
+    /*                 ^pen up vector*/
 }
 
 
-TERM_PUBLIC void EXCL_vector(x2,y2)
-unsigned int x2,y2;
+TERM_PUBLIC void EXCL_vector(x2, y2)
+unsigned int x2, y2;
 {
-	fprintf(gpoutfile,TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
-/*	                 ^pen down vector*/
+    fprintf(gpoutfile, TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
+    /*                 ^pen down vector*/
 }
 
 
-TERM_PUBLIC void EXCL_put_text(x,y,str)
-unsigned int x,y;
+TERM_PUBLIC void EXCL_put_text(x, y, str)
+unsigned int x, y;
 char str[];
 {
-char ch;
-	EXCL_move(x,y - EXCL_VCHAR/3);
+    char ch;
+    EXCL_move(x, y - EXCL_VCHAR / 3);
+    ch = *str++;
+    while (ch != NUL) {
+	putc(ch, gpoutfile);
 	ch = *str++;
-	while(ch!='\0') {
-		putc(ch,gpoutfile);
-		ch = *str++;
-	}
+    }
 }
 
 TERM_PUBLIC void EXCL_reset()
 {
-	fprintf(gpoutfile,"%s%s", TALFPO, TALPOP);
-	/*                      ^pageout ^pop  */
+    fprintf(gpoutfile, "%s%s", TALFPO, TALPOP);
+    /*                         ^pageout ^pop  */
 }
 
 
@@ -233,11 +235,11 @@ TERM_PUBLIC void EXCL_reset()
 
 TERM_TABLE_START(excl_driver)
     "excl", "Talaris EXCL Laser printer (also Talaris 1590 and others)",
-	   EXCL_XMAX,EXCL_YMAX, EXCL_VCHAR, EXCL_HCHAR, 
-	   EXCL_VTIC, EXCL_HTIC, options_null, EXCL_init,EXCL_reset, 
-	   EXCL_text, null_scale, EXCL_graphics, EXCL_move, EXCL_vector,
-	   EXCL_linetype,EXCL_put_text, null_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null
+    EXCL_XMAX, EXCL_YMAX, EXCL_VCHAR, EXCL_HCHAR,
+    EXCL_VTIC, EXCL_HTIC, options_null, EXCL_init, EXCL_reset,
+    EXCL_text, null_scale, EXCL_graphics, EXCL_move, EXCL_vector,
+    EXCL_linetype, EXCL_put_text, null_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(excl_driver)
 
 #undef LAST_TERM

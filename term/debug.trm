@@ -80,7 +80,7 @@ TERM_PUBLIC void DEBUG_resume __PROTO((void));
 TERM_PUBLIC void DEBUG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void DEBUG_linewidth __PROTO((double linewidth));
 
-#define DEBUG_XMAX 512 
+#define DEBUG_XMAX 512
 #define DEBUG_YMAX 390
 
 #define DEBUG_XLAST (DEBUG_XMAX - 1)
@@ -89,8 +89,8 @@ TERM_PUBLIC void DEBUG_linewidth __PROTO((double linewidth));
 /* Assume a character size of 1, or a 7 x 10 grid. */
 #define DEBUG_VCHAR	10
 #define DEBUG_HCHAR	7
-#define DEBUG_VTIC	(DEBUG_YMAX/70)		
-#define DEBUG_HTIC	(DEBUG_XMAX/75)		
+#define DEBUG_VTIC	(DEBUG_YMAX/70)
+#define DEBUG_HTIC	(DEBUG_XMAX/75)
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -102,171 +102,177 @@ int DEBUG_ylast;
 
 TERM_PUBLIC void DEBUG_init()
 {
-	fprintf(gpoutfile,"init\n");
-	DEBUG_linetype_last = -3;
+    fputs("init\n", gpoutfile);
+    DEBUG_linetype_last = -3;
 }
 
 
 TERM_PUBLIC void DEBUG_graphics()
 {
-	DEBUG_xlast = DEBUG_ylast=0;
-	fprintf(gpoutfile,"graphics\n");
+    DEBUG_xlast = DEBUG_ylast = 0;
+    fputs("graphics\n", gpoutfile);
 }
 
 
 TERM_PUBLIC void DEBUG_text()
 {
-	fprintf(gpoutfile,"text\n");
+    fputs("text\n", gpoutfile);
 }
 
 
 TERM_PUBLIC void DEBUG_linetype(linetype)
 int linetype;
 {
-	/*
-	if (linetype != DEBUG_linetype_last){
-		fprintf(gpoutfile,"l%d",linetype);
-		DEBUG_linetype_last = linetype;
-	}
-	*/
-	fprintf(gpoutfile,"line %d\n",linetype);
+    /*
+       if (linetype != DEBUG_linetype_last){
+       fprintf(gpoutfile,"l%d",linetype);
+       DEBUG_linetype_last = linetype;
+       }
+     */
+    fprintf(gpoutfile, "line %d\n", linetype);
 }
 
 
-TERM_PUBLIC void DEBUG_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void DEBUG_move(x, y)
+unsigned int x, y;
 {
-	/*
-	if (x != DEBUG_xlast || y != DEBUG_ylast){
-		fprintf(gpoutfile,"mm");
-		DEBUG_xlast = x;
-		DEBUG_ylast = y;
-	}
-	*/
-	fprintf(gpoutfile,"move %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
-	DEBUG_xlast = x;
-	DEBUG_ylast = y;
+    /*
+       if (x != DEBUG_xlast || y != DEBUG_ylast){
+       fprintf(gpoutfile,"mm");
+       DEBUG_xlast = x;
+       DEBUG_ylast = y;
+       }
+     */
+    fprintf(gpoutfile, "move %d, %d\t(%d, %d)\n", x, y, x - DEBUG_xlast, y - DEBUG_ylast);
+    DEBUG_xlast = x;
+    DEBUG_ylast = y;
 }
 
 
-TERM_PUBLIC void DEBUG_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void DEBUG_vector(x, y)
+unsigned int x, y;
 {
-	/*
-	if (x != DEBUG_xlast || y != DEBUG_ylast){
-		fprintf(gpoutfile,"vv");
-		DEBUG_xlast = x;
-		DEBUG_ylast = y;
-	}
-	*/
-	fprintf(gpoutfile,"vect %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
-	DEBUG_xlast = x;
-	DEBUG_ylast = y;
+    /*
+       if (x != DEBUG_xlast || y != DEBUG_ylast){
+       fprintf(gpoutfile,"vv");
+       DEBUG_xlast = x;
+       DEBUG_ylast = y;
+       }
+     */
+    fprintf(gpoutfile, "vect %d, %d\t(%d, %d)\n", x, y, x - DEBUG_xlast, y - DEBUG_ylast);
+    DEBUG_xlast = x;
+    DEBUG_ylast = y;
 }
 
 
-TERM_PUBLIC void DEBUG_put_text(x,y,str)
+TERM_PUBLIC void DEBUG_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	/*
-	DEBUG_move(x,y);
-	fprintf(gpoutfile,"tx%s\r",str);
-	*/
-	fprintf(gpoutfile,"put_text calls:");
-	DEBUG_move(x,y);
-	fprintf(gpoutfile,"put_text '%s'\n",str);
+    /*
+       DEBUG_move(x,y);
+       fprintf(gpoutfile,"tx%s\r",str);
+     */
+    fputs("put_text calls:", gpoutfile);
+    DEBUG_move(x, y);
+    fprintf(gpoutfile, "put_text '%s'\n", str);
 }
 
 
 
 TERM_PUBLIC void DEBUG_reset()
 {
-	fprintf(gpoutfile,"reset");
+    fputs("reset", gpoutfile);
 }
 
 TERM_PUBLIC int DEBUG_justify_text(mode)
 enum JUSTIFY mode;
 {
-	fprintf(gpoutfile,"justify ");
-	switch(mode){
-		case (CENTRE):
-			fprintf(gpoutfile,"centre");
-			break;
-		case (RIGHT):
-			fprintf(gpoutfile,"right");
-			break;
-		default:
-		case (LEFT):
-			fprintf(gpoutfile,"left");
-			break;
-	}
-	fprintf(gpoutfile,"\n");
-	return(TRUE);
+    fputs("justify ", gpoutfile);
+    switch (mode) {
+    case (CENTRE):
+	fputs("centre", gpoutfile);
+	break;
+    case (RIGHT):
+	fputs("right", gpoutfile);
+	break;
+    default:
+    case (LEFT):
+	fputs("left", gpoutfile);
+	break;
+    }
+    fputs("\n", gpoutfile);
+    return (TRUE);
 }
 
 TERM_PUBLIC int DEBUG_text_angle(angle)
-	int angle;
+int angle;
 {
-	fprintf(gpoutfile,"text_angle %d:", angle);
-	switch(angle) {
-		case 0: fprintf(gpoutfile, ": horizontal\n"); break;
-		case 1: fprintf(gpoutfile, ": upwards\n"); break;
-		default: fprintf(gpoutfile, ": \a*undefined*\n"); break;
-	}
-	return TRUE;
+    fprintf(gpoutfile, "text_angle %d:", angle);
+    switch (angle) {
+    case 0:
+	fputs(": horizontal\n", gpoutfile);
+	break;
+    case 1:
+	fputs(": upwards\n", gpoutfile);
+	break;
+    default:
+	fputs(": \a*undefined*\n", gpoutfile);
+	break;
+    }
+    return TRUE;
 }
 
 TERM_PUBLIC void DEBUG_point(x, y, pointstyle)
-	unsigned int x, y;
-	int pointstyle;
+unsigned int x, y;
+int pointstyle;
 {
-	fprintf(gpoutfile,"point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
+    fprintf(gpoutfile, "point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }
 
 TERM_PUBLIC void DEBUG_arrow(sx, sy, ex, ey, head)
-	unsigned int sx, sy, ex, ey;
-	int head;
+unsigned int sx, sy, ex, ey;
+int head;
 {
-	fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
-	        sx, sy, ex, ey, head ? "with" : "without");
+    fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
+	    sx, sy, ex, ey, head ? "with" : "without");
 }
 
 TERM_PUBLIC int DEBUG_set_font(font)
-	char *font;
+char *font;
 {
-	fprintf(gpoutfile, "set font to \"%s\"\n",
-	       font ? (*font ? font : "\aempty string!" ) : "\aNULL string!");
-	return TRUE;
+    fprintf(gpoutfile, "set font to \"%s\"\n",
+	    font ? (*font ? font : "\aempty string!") : "\aNULL string!");
+    return TRUE;
 }
 
 TERM_PUBLIC void DEBUG_pointsize(pointsize)
-	double pointsize;
+double pointsize;
 {
-	fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
+    fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
 }
 
 TERM_PUBLIC void DEBUG_suspend(void)
 {
-	fprintf(gpoutfile, "suspended terminal driver\n");
+    fputs("suspended terminal driver\n", gpoutfile);
 }
 
 TERM_PUBLIC void DEBUG_resume(void)
 {
-	fprintf(gpoutfile, "resumed terminal driver\n");
+    fputs("resumed terminal driver\n", gpoutfile);
 }
 
 TERM_PUBLIC void DEBUG_fillbox(style, x1, y1, width, height)
-	int style;
-	unsigned int x1, y1, width, height;
+int style;
+unsigned int x1, y1, width, height;
 {
-	fprintf(gpoutfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
-	        x1, y1, width, height, style);
+    fprintf(gpoutfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
+	    x1, y1, width, height, style);
 }
 
 TERM_PUBLIC void DEBUG_linewidth(double linewidth)
 {
-	fprintf(gpoutfile, "set linewidth %lf\n", linewidth);
+    fprintf(gpoutfile, "set linewidth %lf\n", linewidth);
 }
 
 
@@ -276,14 +282,14 @@ TERM_PUBLIC void DEBUG_linewidth(double linewidth)
 
 TERM_TABLE_START(debug_driver)
     "debug", "debugging driver",
-	   DEBUG_XMAX, DEBUG_YMAX, DEBUG_VCHAR, DEBUG_HCHAR,
-	   DEBUG_VTIC, DEBUG_HTIC, options_null, DEBUG_init, DEBUG_reset,
-	   DEBUG_text, null_scale, DEBUG_graphics, DEBUG_move, DEBUG_vector,
-           DEBUG_linetype, DEBUG_put_text, DEBUG_text_angle,
-           DEBUG_justify_text, DEBUG_point, DEBUG_arrow, DEBUG_set_font,
-           DEBUG_pointsize,
-           TERM_CAN_MULTIPLOT,
-           DEBUG_suspend, DEBUG_resume, DEBUG_fillbox, DEBUG_linewidth
+    DEBUG_XMAX, DEBUG_YMAX, DEBUG_VCHAR, DEBUG_HCHAR,
+    DEBUG_VTIC, DEBUG_HTIC, options_null, DEBUG_init, DEBUG_reset,
+    DEBUG_text, null_scale, DEBUG_graphics, DEBUG_move, DEBUG_vector,
+    DEBUG_linetype, DEBUG_put_text, DEBUG_text_angle,
+    DEBUG_justify_text, DEBUG_point, DEBUG_arrow, DEBUG_set_font,
+    DEBUG_pointsize,
+    TERM_CAN_MULTIPLOT,
+    DEBUG_suspend, DEBUG_resume, DEBUG_fillbox, DEBUG_linewidth
 TERM_TABLE_END(debug_driver)
 
 #undef LAST_TERM

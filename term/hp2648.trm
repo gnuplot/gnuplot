@@ -69,11 +69,11 @@ TERM_PUBLIC void HP2648put_text __PROTO((unsigned int x, unsigned int y, char *s
 TERM_PUBLIC int HP2648_text_angle __PROTO((int ang));
 TERM_PUBLIC void HP2648reset __PROTO((void));
 
-#define HP2648XMAX 720             
+#define HP2648XMAX 720
 #define HP2648YMAX 360
 
-#define HP2648VCHAR		12  	
-#define HP2648HCHAR		7		
+#define HP2648VCHAR		12
+#define HP2648HCHAR		7
 #define HP2648VTIC		8
 #define HP2648HTIC		8
 #endif /* TERM_PROTO */
@@ -86,7 +86,7 @@ TERM_PUBLIC void HP2648reset __PROTO((void));
 
 TERM_PUBLIC void HP2648init()
 {
-	fprintf(gpoutfile,"\033*m1m1n136,1cZ");
+    fprintf(gpoutfile, "\033*m1m1n136,1cZ");
 /*                   1     2 3     4
 	1. mode
 	2. textsize=1
@@ -98,7 +98,7 @@ TERM_PUBLIC void HP2648init()
 
 TERM_PUBLIC void HP2648graphics()
 {
-	fprintf(gpoutfile,"\033*dacZ");
+    fprintf(gpoutfile, "\033*dacZ");
 /*                   1     23
 	1. mode
 	2. clear grahics screen
@@ -115,50 +115,50 @@ TERM_PUBLIC void HP2648text()
 TERM_PUBLIC void HP2648linetype(linetype)
 int linetype;
 {
-	static int hpline[] = {1,7,1,4,5,6,8,9,10,7,2};
-	fprintf(gpoutfile,"\033*m%dbZ",hpline[(linetype+2)%11]);
+    static int hpline[] = { 1, 7, 1, 4, 5, 6, 8, 9, 10, 7, 2 };
+    fprintf(gpoutfile, "\033*m%dbZ", hpline[(linetype + 2) % 11]);
 }
 
 
-TERM_PUBLIC void HP2648move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void HP2648move(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"\033*paf%d,%dZ",x,y);
+    fprintf(gpoutfile, "\033*paf%d,%dZ", x, y);
     /*               1     23     4
-	1	plot mode
-	2	"pen up"
-	3	goto absolute x,y
-	4	end command
-	*/
+       1        plot mode
+       2        "pen up"
+       3        goto absolute x,y
+       4        end command
+     */
 }
 
 
-TERM_PUBLIC void HP2648vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void HP2648vector(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"\033*pbf%d,%dZ",x,y);
+    fprintf(gpoutfile, "\033*pbf%d,%dZ", x, y);
     /*                     1 
-	1	"pen down"
-	*/
+       1        "pen down"
+     */
 }
 
 
-TERM_PUBLIC void HP2648put_text(x,y,str)
+TERM_PUBLIC void HP2648put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	HP2648move(x,y-HP2648VCHAR/2 + 1);
-	fprintf(gpoutfile,"\033*l%s\n",str);
+    HP2648move(x, y - HP2648VCHAR / 2 + 1);
+    fprintf(gpoutfile, "\033*l%s\n", str);
 }
 
 
 TERM_PUBLIC int HP2648_text_angle(ang)
 int ang;
 {
-	fprintf(gpoutfile,"\033*m%dnZ\n",ang+1);
-	return TRUE;
+    fprintf(gpoutfile, "\033*m%dnZ\n", ang + 1);
+    return TRUE;
 }
-	
+
 TERM_PUBLIC void HP2648reset()
 {
 }
@@ -166,14 +166,13 @@ TERM_PUBLIC void HP2648reset()
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(hp2648_driver)
     "hp2648", "HP2648 and HP2647",
-	   HP2648XMAX, HP2648YMAX, HP2648VCHAR, HP2648HCHAR, 
-	   HP2648VTIC, HP2648HTIC, options_null, HP2648init, HP2648reset, 
-	   HP2648text, null_scale, HP2648graphics, HP2648move, HP2648vector, 
-	   HP2648linetype, HP2648put_text, HP2648_text_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null
+    HP2648XMAX, HP2648YMAX, HP2648VCHAR, HP2648HCHAR,
+    HP2648VTIC, HP2648HTIC, options_null, HP2648init, HP2648reset,
+    HP2648text, null_scale, HP2648graphics, HP2648move, HP2648vector,
+    HP2648linetype, HP2648put_text, HP2648_text_angle,
+    null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(hp2648_driver)
 
 #undef LAST_TERM

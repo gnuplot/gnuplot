@@ -36,11 +36,11 @@
 ]*/
 
 /*
-      The terminal 'table' is built into the source code; it is not
-      available separately.  This file is needed only for building
-      the documentation for gnuplot 3.6 (or higher) using the new
-      including mechanismn.
-*/
+ * The terminal 'table' is built into the source code; it is not
+ * available separately.  This file is needed only for building
+ * the documentation for gnuplot 3.6 (or higher) using the new
+ * including mechanismn.
+ */
 
 #ifdef TERM_REGISTER
 register_term(table)
@@ -62,7 +62,7 @@ START_HELP(table)
 " range, \"o\" if it is out-of-range, or \"u\" if it is undefined.  The data",
 " format is determined by the format of the axis labels (see `set format`).",
 "",
-" For those times when you want the numbers, you can display them on the", 
+" For those times when you want the numbers, you can display them on the",
 " screen or save them to a file.  This can be useful if you want to generate",
 " contours and then save them for further use, perhaps for plotting with",
 " `plot`;  see `set contour` for an example.  The same method can be used to",

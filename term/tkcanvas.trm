@@ -81,8 +81,8 @@ TERM_PUBLIC void TK_reset __PROTO((void));
 
 #define TK_VCHAR	(25)	/* double actual height of characters */
 #define TK_HCHAR	(16)	/* actual width including spacing */
-#define TK_VTIC	(18)		
-#define TK_HTIC	(18)		
+#define TK_VTIC	(18)
+#define TK_HTIC	(18)
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -92,15 +92,18 @@ static int tk_angle = 0;
 static int tk_lastx;
 static int tk_lasty;
 static int tk_color = 0;
-static char *tk_colors[] = {"black","gray","red","blue","green","brown","magenta","cyan"};
-   
+static char *tk_colors[] = { "black", "gray", "red", "blue", "green", "brown", "magenta", "cyan" };
+
 TERM_PUBLIC void TK_init()
 {
-	fprintf(gpoutfile,"proc gnuplot can {\n");
-	fprintf(gpoutfile,"$can delete all\n");
-	fprintf(gpoutfile,"set cmx [lindex [$can configure -width] 4]\n");
-	fprintf(gpoutfile,"set cmy [lindex [$can configure -height] 4]\n");
-	tk_lastx = tk_lasty = tk_color = 0;
+    fputs("\
+proc gnuplot can {\n\
+$can delete all\n\
+set cmx [lindex [$can configure -width] 4]\n\
+set cmy [lindex [$can configure -height] 4]\n",
+	  gpoutfile);
+
+    tk_lastx = tk_lasty = tk_color = 0;
 }
 
 
@@ -116,52 +119,56 @@ TERM_PUBLIC void TK_reset()
 TERM_PUBLIC void TK_linetype(linetype)
 int linetype;
 {
-	tk_color = (linetype + 2) & 7;
+    tk_color = (linetype + 2) & 7;
 }
 
-TERM_PUBLIC void TK_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void TK_move(x, y)
+unsigned int x, y;
 {
-	tk_lastx = x;
-	tk_lasty = 1000 - y;
+    tk_lastx = x;
+    tk_lasty = 1000 - y;
 }
 
 
-TERM_PUBLIC void TK_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void TK_vector(x, y)
+unsigned int x, y;
 {
-	y = 1000 - y;
-	fprintf(gpoutfile,"$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",tk_lastx,tk_lasty,x,y,tk_colors[tk_color]);
-        tk_lastx = x;
-        tk_lasty = y;
+    y = 1000 - y;
+    fprintf(gpoutfile,
+	    "$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",
+	    tk_lastx, tk_lasty, x, y, tk_colors[tk_color]);
+    tk_lastx = x;
+    tk_lasty = y;
 }
 
 
-TERM_PUBLIC void TK_put_text(x,y,str)
+TERM_PUBLIC void TK_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	y = 1000 - y;
-	fprintf(gpoutfile,"$can create text [expr $cmx * %d /1000] [expr $cmy * %d /1000] -text {%s} -fill %s -anchor w\n",x,y,str,tk_colors[tk_color]);
+    y = 1000 - y;
+    fprintf(gpoutfile,
+	    "$can create text [expr $cmx * %d /1000] [expr $cmy * %d /1000] -text {%s} -fill %s -anchor w\n",
+	    x, y, str, tk_colors[tk_color]);
 }
 
 TERM_PUBLIC void TK_text()
 {
-	fprintf(gpoutfile,"}\n");
-	fflush(gpoutfile);
+    fputs("}\n", gpoutfile);
+    fflush(gpoutfile);
 }
 
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
- TERM_TABLE_START(tkcanvas)
+TERM_TABLE_START(tkcanvas)
     "tkcanvas", "Tk/Tcl canvas widget",
-           TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
-           TK_VTIC, TK_HTIC, options_null, TK_init, TK_reset,
-           TK_text, null_scale, TK_graphics, TK_move, TK_vector,
-           TK_linetype, TK_put_text, null_text_angle,
-           null_justify_text, do_point, do_arrow,set_font_null
+    TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
+    TK_VTIC, TK_HTIC, options_null, TK_init, TK_reset,
+    TK_text, null_scale, TK_graphics, TK_move, TK_vector,
+    TK_linetype, TK_put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(tkcanvas)
 
 #undef LAST_TERM

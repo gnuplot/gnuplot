@@ -67,7 +67,7 @@ extern float xsize, ysize;
 /* it seems that sign as macro causes some conflict with precompiled headers */
 static int sign(int x)
 {
-  return x >=0 ? 1 : -1;
+    return x >= 0 ? 1 : -1;
 }
 #endif /* NEXT */
 

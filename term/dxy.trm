@@ -78,8 +78,8 @@ TERM_PUBLIC void DXY_reset __PROTO((void));
 
 #define DXY_VCHAR	(56)	/* double actual height of characters */
 #define DXY_HCHAR	(28)	/* actual width including spacing */
-#define DXY_VTIC	(28)		
-#define DXY_HTIC	(28)		
+#define DXY_VTIC	(28)
+#define DXY_HTIC	(28)
 #endif /* TERM_PROTO */
 
 #ifndef TERM_PROTO_ONLY
@@ -89,24 +89,20 @@ int dxy_angle = 0;
 
 TERM_PUBLIC void DXY_init()
 {
-/*
-	No initialisation sequences for DXY 800A
-*/
+    /* No initialisation sequences for DXY 800A */
 }
 
 
 TERM_PUBLIC void DXY_graphics()
 {
-	/* HOME, Character size 3 */
-	fprintf(gpoutfile,"H\nS3\n");
+    /* HOME, Character size 3 */
+    fputs("H\nS3\n", gpoutfile);
 }
 
 
 TERM_PUBLIC void DXY_text()
 {
-/*
-	No sequences needed
-*/
+    /* No sequences needed */
 }
 
 
@@ -114,72 +110,74 @@ TERM_PUBLIC void DXY_linetype(linetype)
 int linetype;
 {
     /* select pen */
-	fprintf(gpoutfile,"J%d\n",(linetype+2)%8+1);
-	switch(linetype) {
-	   case -1 :  /* use dotted line for axis */
-	   	    fprintf(gpoutfile,"L1\nB50\n");
-			break;
-	   default :  /* use solid line for all others */
-			fprintf(gpoutfile,"L0\n");
-	    		break;
-   	}
+    fprintf(gpoutfile, "J%d\n", (linetype + 2) % 8 + 1);
+    switch (linetype) {
+    case -1:
+	/* use dotted line for axis */
+	fputs("L1\nB50\n", gpoutfile);
+	break;
+    default:
+	/* use solid line for all others */
+	fputs("L0\n", gpoutfile);
+	break;
+    }
 }
 
 
-TERM_PUBLIC void DXY_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void DXY_move(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"M%d,%d\n",x,y);
+    fprintf(gpoutfile, "M%d,%d\n", x, y);
 }
 
 
-TERM_PUBLIC void DXY_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void DXY_vector(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"D%d,%d\n",x,y);
+    fprintf(gpoutfile, "D%d,%d\n", x, y);
 }
 
 
-TERM_PUBLIC void DXY_put_text(x,y,str)
+TERM_PUBLIC void DXY_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	if (dxy_angle == 1 ) 
-		/* vertical */
-		DXY_move(x + DXY_VCHAR/4,y);
-	else
-		/* horiz */
-		DXY_move(x,y - DXY_VCHAR/4);
-	fprintf(gpoutfile,"P%s\n",str);
+    if (dxy_angle == 1) {
+	/* vertical */
+	DXY_move(x + DXY_VCHAR / 4, y);
+    } else {
+	/* horiz */
+	DXY_move(x, y - DXY_VCHAR / 4);
+    }
+    fprintf(gpoutfile, "P%s\n", str);
 }
 
 
 TERM_PUBLIC int DXY_text_angle(ang)
 int ang;
 {
-	dxy_angle = ang;
-	fprintf(gpoutfile,"Q%d\n",ang);
-	return TRUE;
+    dxy_angle = ang;
+    fprintf(gpoutfile, "Q%d\n", ang);
+    return TRUE;
 }
 
 
 TERM_PUBLIC void DXY_reset()
 {
-	/* Home pen */
-	fprintf(gpoutfile,"H\n");
+    /* Home pen */
+    fputs("H\n", gpoutfile);
 }
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(dxy_driver)
     "dxy800a", "Roland DXY800A plotter",
-	   DXY_XMAX, DXY_YMAX, DXY_VCHAR, DXY_HCHAR,
-	   DXY_VTIC, DXY_HTIC, options_null, DXY_init, DXY_reset,
-	   DXY_text, null_scale, DXY_graphics, DXY_move, DXY_vector,
-	   DXY_linetype, DXY_put_text, DXY_text_angle, 
-	   null_justify_text, do_point, do_arrow, set_font_null
+    DXY_XMAX, DXY_YMAX, DXY_VCHAR, DXY_HCHAR,
+    DXY_VTIC, DXY_HTIC, options_null, DXY_init, DXY_reset,
+    DXY_text, null_scale, DXY_graphics, DXY_move, DXY_vector,
+    DXY_linetype, DXY_put_text, DXY_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(dxy_driver)
 
 #undef LAST_TERM

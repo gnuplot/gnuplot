@@ -95,72 +95,75 @@ TERM_PUBLIC void V384_reset __PROTO((void));
 
 TERM_PUBLIC void V384_init()
 {
-	fprintf(gpoutfile,"%c%c  G0   \n",27,18);
-	fprintf(gpoutfile,"Q 0 8\n");
-	fprintf(gpoutfile,"0 0 0\n");
-	fprintf(gpoutfile,"255 0 0\n");
-	fprintf(gpoutfile,"0 255 0\n");
-	fprintf(gpoutfile,"0 0 255\n");
-	fprintf(gpoutfile,"0 255 255\n");
-	fprintf(gpoutfile,"255 0 255\n");
-	fprintf(gpoutfile,"255 255 0\n");
-	fprintf(gpoutfile,"255 255 255\n");
+    fprintf(gpoutfile, "%c%c  G0   \n\
+Q 0 8\n\
+0 0 0\n\
+255 0 0\n\
+0 255 0\n\
+0 0 255\n\
+0 255 255\n\
+255 0 255\n\
+255 255 0\n\
+255 255 255\n",
+	    27, 18);
 }
 
 
 TERM_PUBLIC void V384_graphics()
 {
-	fprintf(gpoutfile,"%c%c E0 RE N 65535\n",27,18);
+    fprintf(gpoutfile, "%c%c E0 RE N 65535\n", 27, 18);
 }
 
 
 TERM_PUBLIC void V384_text()
 {
-	fprintf(gpoutfile,"%c%c\n",27,17);
+    fprintf(gpoutfile, "%c%c\n", 27, 17);
 }
 
 
 TERM_PUBLIC void V384_linetype(linetype)
 int linetype;
 {
-static int color[]= {
-		1 /* red */,
-		2 /* green */,
-		3 /* blue */,
-		4 /* cyan */,
-		5 /* magenta */,
-		6 /* yellow */, /* not a good color so not in use at the moment */
-		7 /* white */
-	};
-		
-	if (linetype < 0)
-		linetype=6;
-	else
-		linetype %= 5;
-	fprintf(gpoutfile,"C %d\n",color[linetype]);
+    static int color[] =
+    {
+	1 /* red */ ,
+	2 /* green */ ,
+	3 /* blue */ ,
+	4 /* cyan */ ,
+	5 /* magenta */ ,
+	6 /* yellow */ ,	/* not a good color so not in use at the moment */
+	7 /* white */
+    };
+
+    if (linetype < 0)
+	linetype = 6;
+    else
+	linetype %= 5;
+
+    fprintf(gpoutfile, "C %d\n", color[linetype]);
 }
 
 
-TERM_PUBLIC void V384_move(x,y)
-unsigned int x,y;
+TERM_PUBLIC void V384_move(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"M %d %d\n",x+20,y);
+    fprintf(gpoutfile, "M %d %d\n", x + 20, y);
 }
 
 
-TERM_PUBLIC void V384_vector(x,y)
-unsigned int x,y;
+TERM_PUBLIC void V384_vector(x, y)
+unsigned int x, y;
 {
-	fprintf(gpoutfile,"L %d %d\n",x+20,y);
+    fprintf(gpoutfile, "L %d %d\n", x + 20, y);
 }
 
 
-TERM_PUBLIC void V384_put_text (x, y, str)
+TERM_PUBLIC void V384_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
-	V384_move (x, y + V384_VCHAR/2);
-	fprintf (gpoutfile, "$%s\n", str);
+    V384_move(x, y + V384_VCHAR / 2);
+    fprintf(gpoutfile, "$%s\n", str);
 }
 
 
@@ -171,14 +174,13 @@ TERM_PUBLIC void V384_reset()
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-
 TERM_TABLE_START(vx384_driver)
     "vx384", "Vectrix 384 and Tandy color printer",
-	   V384_XMAX, V384_YMAX, V384_VCHAR, V384_HCHAR, 
-	   V384_VTIC, V384_HTIC, options_null, V384_init, V384_reset, 
-	   V384_text, null_scale, V384_graphics, V384_move, V384_vector, 
-	   V384_linetype, V384_put_text, null_text_angle, 
-	   null_justify_text, do_point, do_arrow, set_font_null
+    V384_XMAX, V384_YMAX, V384_VCHAR, V384_HCHAR,
+    V384_VTIC, V384_HTIC, options_null, V384_init, V384_reset,
+    V384_text, null_scale, V384_graphics, V384_move, V384_vector,
+    V384_linetype, V384_put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(vx384_driver)
 
 #undef LAST_TERM

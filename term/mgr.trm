@@ -73,7 +73,7 @@ TERM_PUBLIC void MGR_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 #undef ESC
-#include <term.h>	/* from Mgr, not gnuplot */
+#include <term.h>		/* from Mgr, not gnuplot */
 
 
 
@@ -89,119 +89,122 @@ static int MGR_hchar = MGR_HCHAR;
 
 TERM_PUBLIC void MGR_init()
 {
-char res[300];
-int winnbr;
-int w, h, bor;
+    char res[300];
+    int winnbr;
+    int w, h, bor;
 
-	m_setup( 0);
-	m_ttyset();
+    m_setup(0);
+    m_ttyset();
 
-	m_getinfo( G_SYSTEM);
-	if( m_gets( res) && sscanf( res, "%*s%d%d%d", &w, &h, &bor) == 3)
-		MGR_border = bor;
+    m_getinfo(G_SYSTEM);
+    if (m_gets(res) && sscanf(res, "%*s%d%d%d", &w, &h, &bor) == 3)
+	MGR_border = bor;
 
-	m_newwin( 0, 0, MGR_winwidth+2*MGR_border, MGR_winheight+2*MGR_border);
-	if( m_gets( res) && sscanf( res, "%d", &winnbr) == 1)
-		MGR_winnbr = winnbr;
-		/* if no alt window is created, then the main window is used */
-		/* and if size is different, term_tbl updated later */
-	m_selectwin( MGR_winnbr);
-	m_setmode( M_ABS);
+    m_newwin(0, 0, MGR_winwidth + 2 * MGR_border,
+	     MGR_winheight + 2 * MGR_border);
 
-	m_getinfo( G_FONT);
-	if( m_gets( res) && sscanf( res, "%d %d", &w, &h) == 2) {
-		MGR_vchar = h;
-		MGR_hchar = w;
-	}
-	m_ttyreset();
+    if (m_gets(res) && sscanf(res, "%d", &winnbr) == 1)
+	MGR_winnbr = winnbr;
 
-	term->v_char = MGR_vchar;
-	term->h_char = MGR_hchar;
-	term->v_tic = MGR_vchar / 4;
-	term->h_tic = MGR_hchar / 2;
+    /* if no alt window is created, then the main window is used
+     * and if size is different, term_tbl updated later */
+    m_selectwin(MGR_winnbr);
+    m_setmode(M_ABS);
 
-	m_selectwin( 0);
-	m_flush();
+    m_getinfo(G_FONT);
+    if (m_gets(res) && sscanf(res, "%d %d", &w, &h) == 2) {
+	MGR_vchar = h;
+	MGR_hchar = w;
+    }
+    m_ttyreset();
+
+    term->v_char = MGR_vchar;
+    term->h_char = MGR_hchar;
+    term->v_tic = MGR_vchar / 4;
+    term->h_tic = MGR_hchar / 2;
+
+    m_selectwin(0);
+    m_flush();
 }
 
 
 TERM_PUBLIC void MGR_graphics()
 {
-char res[32];
-int c, r, w, h;
+    char res[32];
+    int c, r, w, h;
 
-	m_selectwin( MGR_winnbr);
-	m_setmode( M_ACTIVATE);
-	m_clear();
+    m_selectwin(MGR_winnbr);
+    m_setmode(M_ACTIVATE);
+    m_clear();
 
-	/* we permit the user to reshape the window arbitrarily.
-	   do_plot calls boundary to recheck the term_tbl for each plot */
-	m_ttyset();
-	m_getinfo( G_WINSIZE);
-	if( m_gets( res) && sscanf( res, "%d %d", &c, &r) == 2)
-		MGR_rowcount = r;
-	m_getinfo( G_COORDS);
-	if( m_gets( res) && sscanf( res, "%d %d %d %d", &c, &r, &w, &h) == 4) {
-		term->xmax = MGR_winwidth = w;
-		term->ymax = MGR_winheight = h;
-	}
-	m_ttyreset();
-	m_flush();
+    /* we permit the user to reshape the window arbitrarily.
+       do_plot calls boundary to recheck the term_tbl for each plot */
+    m_ttyset();
+    m_getinfo(G_WINSIZE);
+    if (m_gets(res) && sscanf(res, "%d %d", &c, &r) == 2)
+	MGR_rowcount = r;
+    m_getinfo(G_COORDS);
+    if (m_gets(res) && sscanf(res, "%d %d %d %d", &c, &r, &w, &h) == 4) {
+	term->xmax = MGR_winwidth = w;
+	term->ymax = MGR_winheight = h;
+    }
+    m_ttyreset();
+    m_flush();
 }
 
 
 TERM_PUBLIC void MGR_text()
 {
-	m_go( 0, 0);
-	m_aligntext();
-	if( MGR_winnbr == 0)
-		m_move( 0, MGR_rowcount - 1);
-	m_selectwin( 0);
-	m_flush();
+    m_go(0, 0);
+    m_aligntext();
+    if (MGR_winnbr == 0)
+	m_move(0, MGR_rowcount - 1);
+    m_selectwin(0);
+    m_flush();
 }
 
 
-TERM_PUBLIC void MGR_linetype( linetype)
-int     linetype;
+TERM_PUBLIC void MGR_linetype(linetype)
+int linetype;
 {
 /*
  * this mapping of colors is intended for a color sun on which
  * colors 0-23 are defined, 0 is white, 1 is black.
  */
-	m_linecolor( B_SRC, (linetype < 0)? 1: (2 + (linetype % 22)));
+    m_linecolor(B_SRC, (linetype < 0) ? 1 : (2 + (linetype % 22)));
 }
 
 
-TERM_PUBLIC void MGR_move( x, y)
+TERM_PUBLIC void MGR_move(x, y)
 unsigned int x, y;
 {
-	m_go( x, MGR_winheight - 1 - y);
+    m_go(x, MGR_winheight - 1 - y);
 }
 
 
-TERM_PUBLIC void MGR_vector( x, y)
+TERM_PUBLIC void MGR_vector(x, y)
 unsigned int x, y;
 {
-	m_draw( x, MGR_winheight - 1 - y);
+    m_draw(x, MGR_winheight - 1 - y);
 }
 
 
-TERM_PUBLIC void MGR_put_text( x, y, str)
+TERM_PUBLIC void MGR_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
-	MGR_move( x, y - MGR_vchar/2);
-	m_aligntext();
-	m_printstr( str);
+    MGR_move(x, y - MGR_vchar / 2);
+    m_aligntext();
+    m_printstr(str);
 }
 
 
 TERM_PUBLIC void MGR_reset()
 {
-	m_destroywin( MGR_winnbr);
-	MGR_winnbr = 0;
-	m_setmode( M_ACTIVATE);
-	m_flush();
+    m_destroywin(MGR_winnbr);
+    MGR_winnbr = 0;
+    m_setmode(M_ACTIVATE);
+    m_flush();
 }
 
 #endif /* TERM_BODY */
@@ -210,12 +213,12 @@ TERM_PUBLIC void MGR_reset()
 
 TERM_TABLE_START(mgr_driver)
     "mgr", "Mgr window system",
-	/* dimensions nominal, replaced during MGR_graphics call */
-	   MGR_XMAX, MGR_YMAX, MGR_VCHAR, MGR_HCHAR, 
-	   MGR_VTIC, MGR_HTIC, options_null, MGR_init, MGR_reset, 
-	   MGR_text, null_scale, MGR_graphics, MGR_move, MGR_vector,
-	   MGR_linetype, MGR_put_text, null_text_angle, 
-	   null_justify_text, do_point, do_arrow, set_font_null
+    /* dimensions nominal, replaced during MGR_graphics call */
+    MGR_XMAX, MGR_YMAX, MGR_VCHAR, MGR_HCHAR,
+    MGR_VTIC, MGR_HTIC, options_null, MGR_init, MGR_reset,
+    MGR_text, null_scale, MGR_graphics, MGR_move, MGR_vector,
+    MGR_linetype, MGR_put_text, null_text_angle,
+    null_justify_text, do_point, do_arrow, set_font_null
 TERM_TABLE_END(mgr_driver)
 
 #undef LAST_TERM
