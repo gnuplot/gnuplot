@@ -153,6 +153,7 @@ L=$(srcdir)/docs/latextut/
 Q=$(srcdir)/docs/old/
 S=$(srcdir)/docs/ps/
 M=$(srcdir)/demo/
+E=$(srcdir)/lisp/
 N=$(srcdir)/NeXT/
 P=$(srcdir)/os2/
 W=$(srcdir)/win/
@@ -193,6 +194,7 @@ W=$(srcdir)/win/
 # Q as the prefix for old doc files (eg docs/old)
 # S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
+# E as the prefix for lisp (eg lisp/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
@@ -284,7 +286,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	INSTALL.gnu Makefile.in NEWS PGPKEYS TODO acconfig.h $(ACLOCAL_M4) \
 	amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) configure \
 	configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h descrip.mms \
-	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
+	djconfig.sh errorfix.sh genopt.com gnuplot.def gnuplot.opt \
 	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
 	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
 	makefile.all makefile.amg makefile.ami makefile.cyg makefile.dj2 \
@@ -293,7 +295,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
 	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
-	m4/search-hdr.m4 m4/search-lib.m4 $(T)README 
+	m4/search-hdr.m4 m4/search-lib.m4 $(T)README
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -317,6 +319,11 @@ DOCS5 = $(Q)ChangeLog.old $(Q)History.old $(Q)README.3d $(Q)README.3p1 \
 	$(Q)README.xli $(Q)makefile.r
 
 DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
+
+# Bruce Ravel's new gnuplot-mode for X/Emacs
+LISP =  $(E)ChangeLog $(E)Makefile $(E)README $(E)dot.el $(E)dotemacs \
+	$(E)gnuplot-gui.el $(E)gnuplot.el $(E)gpelcard.tex \
+	$(E)info-look.20.2.el $(E)info-look.20.3.el $(E)old/gnuplot.el
 
 #########################################################################
 # Simple Dependencies
@@ -452,11 +459,11 @@ $(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
 SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
 	  $(OS2SRC) $(WINDOWS)
 
-DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
+DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS) $(LISP)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/old \
-	  docs/ps m4 os2 term win
+	  docs/ps lisp lisp/old m4 os2 term win
 
 clean:
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~

@@ -29,6 +29,7 @@
 # Q as the prefix for old doc files (eg docs/old)
 # S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
+# E as the prefix for lisp (eg lisp/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
@@ -153,6 +154,11 @@ DOCS5 = $(Q)ChangeLog.old $(Q)History.old $(Q)README.3d $(Q)README.3p1 \
 	$(Q)README.xli $(Q)makefile.r
 
 DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
+
+# Bruce Ravel's new gnuplot-mode for X/Emacs
+LISP =  $(E)ChangeLog $(E)Makefile $(E)README $(E)dot.el $(E)dotemacs \
+	$(E)gnuplot-gui.el $(E)gnuplot.el $(E)gpelcard.tex \
+	$(E)info-look.20.2.el $(E)info-look.20.3.el $(E)old/gnuplot.el
 
 #########################################################################
 # Simple Dependencies
