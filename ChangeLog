@@ -1,3 +1,8 @@
+2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Quoting and cleanup. Should now work with
+	autoconf 2.5x.
+
 2002-04-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/amiga.trm (AMIGA_linetype): Use mnemonic name L_TYPE_NODRAW
@@ -405,7 +410,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/30 13:42:07 $).
+	last modification date (from the tag $Date: 2002/04/30 14:08:53 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

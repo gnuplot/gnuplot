@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.111 2002/03/07 16:14:28 lhecking Exp $
+dnl $Id: configure.in,v 1.112 2002/04/29 13:37:01 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -50,9 +50,7 @@ if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   LIBRARIES_FOR_X="$X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
-  AC_DEFINE(X11, 1,
-            [ Define if you are using the X11 window system. ])
-
+  AC_DEFINE(X11, 1, [ Define if you are using the X11 window system. ])
 else
   GNUPLOT_X11=
 fi
@@ -75,8 +73,6 @@ AC_CHECK_FUNC(sin)
 if test "$ac_cv_func_sin" = no ; then
   AC_CHECK_LIB(m,sin)
 fi
-dnl this has to be after -lsys_s on NeXT
-dnl AC_CHECK_LIB(m,sin)
 
 dnl Header files. ANSI first
 dnl We prefer that the absense of a macro is the norm, so in syscfg.h
@@ -97,9 +93,9 @@ if test "$ac_cv_header_math_h" = yes ; then
   AC_MSG_CHECKING([for struct exception in math.h])
   AC_TRY_LINK([#include <math.h>],
     [struct exception *x; x->type; x->name;],
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H, 1,
-              [ Define if math.h declares struct exception for matherr(). ]),
+    [AC_MSG_RESULT(yes)
+     AC_DEFINE(HAVE_STRUCT_EXCEPTION_IN_MATH_H, 1,
+               [ Define if math.h declares struct exception for matherr(). ])],
     AC_MSG_RESULT(no))
 fi
 
@@ -108,7 +104,9 @@ test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
 dnl conditionalized for _POSIX_SOURCE
 AC_MSG_CHECKING(for unistd.h)
-AC_EGREP_HEADER(execv, unistd.h, AC_DEFINE(HAVE_UNISTD_H) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_EGREP_HEADER(execv, unistd.h,
+  [AC_DEFINE(HAVE_UNISTD_H) AC_MSG_RESULT(yes)],
+   AC_MSG_RESULT(no))
 
 dnl check if errno.h header declares errno
 AC_MSG_CHECKING(if errno variable is declared)
@@ -118,19 +116,17 @@ AC_TRY_COMPILE(
 #include <errno.h>
 #endif],
   errno=0,AC_MSG_RESULT(yes),
-  AC_DEFINE(EXTERN_ERRNO, 1,
-            [ Define if <errno.h> declares errno. ])
-  AC_MSG_RESULT(no)
-)dnl
+  [AC_DEFINE(EXTERN_ERRNO, 1, [ Define if <errno.h> declares errno. ])
+   AC_MSG_RESULT(no)])
 
 
 dnl Types.
 AC_TYPE_SIZE_T
 AC_MSG_CHECKING(for time_t in time.h)
 AC_EGREP_HEADER(time_t,time.h,
-  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],
-  AC_MSG_RESULT(no)
-  AC_CHECK_TYPE(time_t, long))
+  [ac_cv_type_time_t=yes; AC_MSG_RESULT(yes)],
+  [AC_MSG_RESULT(no)
+   AC_CHECK_TYPE(time_t, long)])
 AC_TYPE_SIGNAL
  
 
@@ -160,12 +156,10 @@ AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
   [AC_MSG_RESULT(yes)
    AC_DEFINE(HAVE_SIGSETJMP, 1,
              [ Define if we have sigsetjmp(). ])],
-  AC_MSG_RESULT(no)
-)
+  AC_MSG_RESULT(no))
 
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
-  AC_DEFINE(PIPES, 1,
-            [ Define if you do have the popen and pclose functions. ])
+  AC_DEFINE(PIPES, 1, [ Define if you do have the popen and pclose functions. ])
 fi
 
 dnl Argument types of select()
@@ -266,7 +260,7 @@ if test "$with_readline" != no; then
 
     if test "$with_readline" = gnu; then
       AC_CHECK_LIB(readline, readline,
-       TERMLIBS="-lreadline $gp_tcap $TERMLIBS",, ${gp_tcap})
+        [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],, [${gp_tcap}])
     else
       if test -d $with_readline/include; then
         CPPFLAGS="$CPPFLAGS -I$with_readline/include"
@@ -276,7 +270,7 @@ if test "$with_readline" != no; then
       fi
 
       AC_CHECK_LIB(readline,readline,
-        TERMLIBS="-lreadline $gp_tcap $TERMLIBS",,[${gp_tcap}])
+        [TERMLIBS="-lreadline $gp_tcap $TERMLIBS"],,[${gp_tcap}])
 
     fi
 
@@ -346,31 +340,25 @@ dnl end libplot
 dnl JPEG library
 AC_ARG_WITH(jpeg,dnl
 [  --with-jpeg[=PATH]      specify location of libjpeg if default is broken
-                           (no to turn off JPEG support in gd.trm) ],
-  [
-  if test "$withval" = no; then
-    with_jpeg=no
-  elif test -d $withval/lib; then
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-  elif test -d "$withval"; then
-    LDFLAGS="$LDFLAGS -L$withval"
-  fi
-  ]
-  )
+                         (no to turn off JPEG support in gd.trm) ],
+  [if test "$withval" = no; then
+     with_jpeg=no
+   elif test -d $withval/lib; then
+     LDFLAGS="$LDFLAGS -L$withval/lib"
+   elif test -d "$withval"; then
+     LDFLAGS="$LDFLAGS -L$withval"
+   fi])
 dnl end jpeg
 
 dnl PNG library path if required for *NEW* png driver gd.trm
 AC_ARG_WITH(libpng,dnl
 [  --with-libpng[=PATH]    specify location of libpng if default is broken
-			  (==>specify only if not found by default!) ], 
-  [
-  if test -d $withval/lib; then
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-  elif test -d "$withval"; then
-    LDFLAGS="$LDFLAGS -L$withval"
-  fi
-  ]
-  )
+                         (==>specify only if not found by default!) ], 
+  [if test -d $withval/lib; then
+     LDFLAGS="$LDFLAGS -L$withval/lib"
+   elif test -d "$withval"; then
+     LDFLAGS="$LDFLAGS -L$withval"
+   fi])
 dnl end png
 
 dnl The location of Tom Boutell's gd library
@@ -378,94 +366,81 @@ AC_ARG_WITH(gd,dnl
 [  --with-gd[=PATH]        specify location of Tom Boutell's gd library
                           (version >= 1.8 needed for new png/jpeg driver)
                           (version 1.3 or 1.4 needed for gif driver) ], ,
-			  withval=yes)
+                          withval=yes)
   
-  if test "$withval" != no; then
-     if test -d "$withval/include"; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     else
-       test -d "$withval" && CPPFLAGS="$CPPFLAGS -I$withval"
-     fi 
-     if test -d "$withval/lib"; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     else
-       test -d "$withval" && LDFLAGS="$LDFLAGS -L$withval"
-     fi 
+if test "$withval" != no; then
+  if test -d "$withval/include"; then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+  else
+    test -d "$withval" && CPPFLAGS="$CPPFLAGS -I$withval"
+  fi 
+  if test -d "$withval/lib"; then
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+  else
+    test -d "$withval" && LDFLAGS="$LDFLAGS -L$withval"
+  fi 
 
-     AC_CHECK_LIB(gd,gdImageCreate,
-       [TERMLIBS="-lgd $TERMLIBS"
-        AC_CHECK_HEADERS(gd.h,
-	dnl ACTION-IF-FOUND
-        AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have Thomas Boutell's gd library. ]),
-	dnl ACTION-IF-NOT-FOUND
-        AC_MSG_WARN([found gd library but not gd.h])
-	AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
-        )],
-       AC_MSG_RESULT([  GD library not found ]))
+  AC_CHECK_LIB(gd,gdImageCreate,
+    [TERMLIBS="-lgd $TERMLIBS"
+     AC_CHECK_HEADERS(gd.h,
+       AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have Thomas Boutell's gd library. ]),
+       [AC_MSG_WARN([found gd library but not gd.h])
+        AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])])],
+    AC_MSG_RESULT([  GD library not found ]))
 
-     AC_CHECK_LIB(gd,gdImagePng,
-       [TERMLIBS="$TERMLIBS -lpng -lz"
-       AC_DEFINE(HAVE_NEWGD, 1, [ Define if you have libgd version >= 1.8 ])
-       AC_DEFINE(HAVE_PNG,   1, [ Define if you have want png support ])
-       with_png="yes"
-       with_newgd="yes"
-       ],
-       [
-       AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])
-       with_png="no"
-       ],
-       -lpng -lz
-       )
+  AC_CHECK_LIB(gd,gdImagePng,
+    [TERMLIBS="$TERMLIBS -lpng -lz"
+     AC_DEFINE(HAVE_NEWGD, 1, [ Define if you have libgd version >= 1.8 ])
+     AC_DEFINE(HAVE_PNG,   1, [ Define if you have want png support ])
+     with_png="yes"
+     with_newgd="yes"],
+    [AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])
+     with_png="no"],
+    [-lpng -lz])
 
-     if test "$with_jpeg" != no; then
-     AC_CHECK_LIB(gd,gdImageJpeg,
-       [TERMLIBS="$TERMLIBS -ljpeg"
+  if test "$with_jpeg" != no; then
+    AC_CHECK_LIB(gd,gdImageJpeg,
+      [TERMLIBS="$TERMLIBS -ljpeg"
        AC_DEFINE(HAVE_JPEG, 1, [ Define if you have libjpeg and libgd version >= 1.8 ])
-       with_jpeg="yes"
-       ],
-       [
-       AC_MSG_WARN([ No JPEG support found in libgd, or libjpeg not found  ])
-       with_jpeg="no"
-       ],
-       -ljpeg
-       )
-     fi
+       with_jpeg="yes"],
+      [AC_MSG_WARN([ No JPEG support found in libgd, or libjpeg not found  ])
+       with_jpeg="no"],
+      [-ljpeg])
+  fi
 
-     AC_CHECK_LIB(gd,gdImageGif,
-       AC_DEFINE(HAVE_GIF, 1, [ Define if you have libgd version 1.2 - 1.4 ]),
-       AC_MSG_WARN([ No GIF support found in libgd  ])
-       )
+  AC_CHECK_LIB(gd,gdImageGif,
+    AC_DEFINE(HAVE_GIF, 1, [ Define if you have libgd version 1.2 - 1.4 ]),
+    AC_MSG_WARN([ No GIF support found in libgd  ]))
 
-   fi
+fi
 
 dnl end gd library
 
 dnl freetype library (may be required to specify along with gd)
 dnl There should really be a test on whether TTF support was built into libgd
 if test "$with_newgd" = yes; then
-AC_ARG_WITH(freetype,dnl
-[  --with-freetype[=PATH]  location of libfreetype (TrueType font support)
+  AC_ARG_WITH(freetype,dnl
+  [  --with-freetype[=PATH]  location of libfreetype (TrueType font support)
                           (used via libgd by new png/jpeg driver) 
-			  (==>specify only if not found by default!) ], 
-  [if test "$withval" != no; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     else
-       CPPFLAGS="$CPPFLAGS -I$withval"
-     fi 
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     else
-       LDFLAGS="$LDFLAGS -L$withval"
-     fi 
-     AC_CHECK_LIB(freetype, FT_Open_Face,
-       [TERMLIBS="-lfreetype $TERMLIBS"
-     	with_ttf="yes"
-       ],
-       AC_MSG_RESULT([  freetype library not found ]))
-   fi],
-   with_ttf="yes"
-  )
+                          (==>specify only if not found by default!) ], 
+    [if test "$withval" != no; then
+       if test -d $withval/include; then
+         CPPFLAGS="$CPPFLAGS -I$withval/include"
+       else
+         CPPFLAGS="$CPPFLAGS -I$withval"
+       fi 
+       if test -d $withval/lib; then
+         LDFLAGS="$LDFLAGS -L$withval/lib"
+       else
+         LDFLAGS="$LDFLAGS -L$withval"
+       fi 
+       AC_CHECK_LIB(freetype, FT_Open_Face,
+         [TERMLIBS="-lfreetype $TERMLIBS"
+       	with_ttf="yes"],
+         AC_MSG_RESULT([  freetype library not found ]))
+     fi],
+    with_ttf="yes")
+
   if test "$with_ttf" = yes; then
     AC_DEFINE(HAVE_TTF, 1, [ Define if TrueType font support in libgd ])
   fi
@@ -475,8 +450,8 @@ dnl end freetype library
 dnl gif terminal support emulated using Tom Boutell's new gd library
 AC_ARG_WITH(gif,dnl
 [  --with-gif=png          'set term gif' produces png images instead
-                          (libgd version >= 1.8) ],,
-)
+                          (libgd version >= 1.8) ],,)
+
 if test "$with_gif" = png; then
   if test "$with_newgd" = yes; then
     AC_DEFINE(PNG_FOR_GIF, 1,
@@ -489,44 +464,44 @@ dnl
 
 dnl The *OLD* Portable Network Graphics (png) terminal
 if test "$with_newgd" != yes ; then
-AC_ARG_WITH(png,dnl
-[  --with-png[=PATH]       enable *old* png terminal (requires libpng and libz)
+  AC_ARG_WITH(png,dnl
+  [  --with-png[=PATH]       enable *old* png terminal (requires libpng and libz)
                           (libgd versions 1.2 - 1.4) ],
-  [if test [-n] "$with_png" -a "$withval" != no; then
-     if test -d $withval/include; then
-       CPPFLAGS="$CPPFLAGS -I$withval/include"
-     fi
-     if test -d $withval/lib; then
-       LDFLAGS="$LDFLAGS -L$withval/lib"
-     fi
-     with_png=yes
-   fi],with_png=no)
+    [if test [-n] "$with_png" -a "$withval" != no; then
+       if test -d $withval/include; then
+         CPPFLAGS="$CPPFLAGS -I$withval/include"
+       fi
+       if test -d $withval/lib; then
+         LDFLAGS="$LDFLAGS -L$withval/lib"
+       fi
+       with_png=yes
+     fi],
+    with_png=no)
 
-if test "$with_png" = yes; then
-  AC_CHECK_LIB(png,png_init_io,
-    [TERMLIBS="-lpng -lz $TERMLIBS"
-     AC_CHECK_HEADER(png.h,
-     [AC_CHECK_HEADER(zlib.h,,
-      AC_MSG_WARN([found z library but not zlib.h
+  if test "$with_png" = yes; then
+    AC_CHECK_LIB(png,png_init_io,
+      [TERMLIBS="-lpng -lz $TERMLIBS"
+       AC_CHECK_HEADER(png.h,
+       [AC_CHECK_HEADER(zlib.h,,
+        AC_MSG_WARN([found z library but not zlib.h
 please add path to zlib.h to CPPFLAGS in Makefile]))
-      AC_EGREP_CPP([You lose], [#include "png.h"
+        AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
 ],
-        AC_MSG_WARN([- libpng too old - not including png driver])
-        ac_cv_header_png_h=no)],
-     AC_MSG_WARN([found png library but not png.h
+          [AC_MSG_WARN([- libpng too old - not including png driver])
+           ac_cv_header_png_h=no])],
+       AC_MSG_WARN([found png library but not png.h
 please add path to png.h to CPPFLAGS in Makefile]))],
-    AC_MSG_RESULT([  PNG library not found.
-    See term/png.trm for download details]),
-    [-lz])
+      AC_MSG_RESULT([  PNG library not found.
+ See term/png.trm for download details]),
+      [-lz])
 
-  if test "$ac_cv_header_png_h" = yes; then
-    AC_DEFINE(HAVE_LIBPNG, 1,
-              [ Define if you have the png library. ])
+    if test "$ac_cv_header_png_h" = yes; then
+      AC_DEFINE(HAVE_LIBPNG, 1, [ Define if you have the png library. ])
+    fi
   fi
-fi
 fi
 dnl end png and z
 
@@ -542,7 +517,8 @@ AC_ARG_WITH(pdf,dnl
        LDFLAGS="$LDFLAGS -L$withval/lib"
      fi
      with_pdf=yes
-   fi],with_pdf=no)
+   fi],
+  with_pdf=no)
 
 if test "$with_pdf" = yes; then
   AC_CHECK_LIB(pdf,PDF_get_majorversion,
@@ -582,12 +558,12 @@ AC_EGREP_CPP(yes,
 [#ifdef sun
 yes
 #endif
-], AC_CHECK_LIB(suntool, window_create,
-    AC_CHECK_HEADER(suntool/sunview.h,
-    AC_DEFINE(SUN, 1,
-              [ Define if you want to use the sunview terminal (sun). ])
-    TERMLIBS="-lsuntool -lsunwindow -lpixrect $TERMLIBS"),,
-    [-lsunwindow -lpixrect]))
+],[AC_CHECK_LIB(suntool, window_create,
+     [AC_CHECK_HEADER(suntool/sunview.h,
+        [AC_DEFINE(SUN, 1,
+                   [ Define if you want to use the sunview terminal (sun). ])
+         TERMLIBS="-lsuntool -lsunwindow -lpixrect $TERMLIBS"])],,
+    [-lsunwindow -lpixrect])])
 
 dnl Process with and enable options
 
@@ -604,7 +580,7 @@ dnl Wether we want to build the lisp files
 config_lisp=lisp
 AC_ARG_WITH(lisp-files,dnl
 [  --without-lisp-files    do not build emacs lisp files],
-  [if test "$with_lisp_files" = no; then
+  [if test "$withval" = no; then
      config_lisp=
    fi])
 dnl only if X/Emacs was found
@@ -613,7 +589,7 @@ if test "$EMACS" = no; then
   with_lisp_files=no
 fi
 
-AC_CONFIG_SUBDIRS($config_lisp)
+test "x$config_lisp" != x && AC_CONFIG_SUBDIRS(lisp)
 AM_CONDITIONAL(BUILD_LISP_SUBDIR, test x$config_lisp = xlisp)
 
 dnl Sort help/subtopic tables by row or column
@@ -683,8 +659,7 @@ if test "$with_linux_vga" = yes -a "$enable_pm3d" = yes; then
              VGAGLLIB="-l3dkit -lvgagl"
              with_vgagl=yes
             ],dnl <-- 3dkit.h found
-            [
-             with_vgagl=no
+            [with_vgagl=no
              AC_MSG_RESULT([unable to find 3dkit.h])
             ]dnl <-- 3dkit.h not found
           )
@@ -701,8 +676,7 @@ if test "$with_linux_vga" = yes -a "$enable_pm3d" = yes; then
       ]dnl <-- vgagl.h is not present
      )
     ],dnl <-- libvgagl was found
-    [
-     with_vgagl=no
+    [with_vgagl=no
      AC_MSG_RESULT([unable to find libvgagl])
     ]dnl <-- libvgagl was not found
   )
@@ -741,9 +715,10 @@ AC_ARG_ENABLE(iris,dnl
 [  --enable-iris           enable IRIS terminal (IRIS4D only)],
   [if test "$enableval" = yes; then
      AC_CHECK_LIB(gl_s,winopen,
-       AC_DEFINE(IRIS, 1,
-                 [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
-       TERMLIBS="-lgl_s $TERMLIBS",enable_iris=no)
+       [AC_DEFINE(IRIS, 1,
+                  [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
+        TERMLIBS="-lgl_s $TERMLIBS"],
+       enable_iris=no)
    fi])
 
 dnl MGR Window system
@@ -751,8 +726,10 @@ AC_ARG_ENABLE(mgr,dnl
 [  --enable-mgr            enable MGR terminal],
   [if test "$enableval" = yes; then
      AC_CHECK_LIB(mgr,m_getinfo,
-       AC_DEFINE(MGR, 1, [ Define if you want to use the MGR Window system. ])
-       TERMLIBS="-lmgr -lpixrect $TERMLIBS",enable_mgr=no,[-lpixrect])
+       [AC_DEFINE(MGR, 1, [ Define if you want to use the MGR Window system. ])
+        TERMLIBS="-lmgr -lpixrect $TERMLIBS"],
+       enable_mgr=no,
+       [-lpixrect])
    fi])
 
 dnl Redwood Graphics Interface Protocol
@@ -783,8 +760,7 @@ AC_OUTPUT([Makefile
            src/Makefile
            term/Makefile
            tutorial/Makefile], \
-          [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h
-          ])
+          [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
 
 dnl Report configuration
 eval gp_datadir=$datadir
