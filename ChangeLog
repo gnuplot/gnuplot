@@ -1,5 +1,10 @@
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
+	* configure configure.in docs/Makefile.in: Let configure 
+	check for even more utils which we use. Always check for emacs
+
+2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
 	* src/readline.c: Fix Gnuplot-readline implementation to
 	distinguish between VIO and xterm
 

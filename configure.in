@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.102 2001/08/27 15:02:12 broeker Exp $
+dnl $Id: configure.in,v 1.103 2001/09/18 15:23:26 amai Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -681,17 +681,17 @@ AC_SUBST(LINUXSUID)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
+# Use emacs for docs, lisp packages
+AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 dnl Build gnuplot-mode in lisp only
 dnl if a suitable emacs is found
+
 if test "$with_lisp_files" = yes; then
-  AC_CHECK_PROGS(EMACS, emacs xemacs, no)
-else
-  EMACS=no
-fi
 if test "$EMACS" != no; then
   config_lisp=lisp
 else
   config_lisp=
+fi
 fi
 AC_CONFIG_SUBDIRS($config_lisp)
 AM_CONDITIONAL(BUILD_LISP_SUBDIR, test x$config_lisp = xlisp)
@@ -718,6 +718,12 @@ AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
 
 dnl for dvips
 AC_CHECK_PROGS(DVIPS, dvips, no)
+
+dnl for GNU makeinfo
+AC_CHECK_PROGS(MAKEINFO, makeinfo, no)
+
+dnl for troff
+AC_CHECK_PROGS(TROFF, troff, no)
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile

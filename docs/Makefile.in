@@ -74,13 +74,13 @@ LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 	$(COMPILE) -c $<
 
 # The makeinfo command from GNU texinfo
-MAKEINFO = makeinfo
+MAKEINFO = @MAKEINFO@
 
 # Required for the temporary .info file fix
 EMACS = @EMACS@
 
 # substitute your troff command (and any flags) for this one
-TROFF = troff
+TROFF = @TROFF@
 
 # LaTeX command, either latex or latex2e or no
 LATEX = @LATEX@
@@ -131,7 +131,7 @@ gnuplot.nroff checkdoc
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
 allterm.h: $(CORETERM)
-	@echo Building allterm.h
+	@echo "Building allterm.h"
 	@cat $(top_srcdir)/term/*.trm > allterm.c
 	$(CPP) -I$(top_srcdir)/term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
 	  sed '/^ *$$/d;/^#/d' > allterm.h
@@ -309,9 +309,9 @@ gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	  cp $(srcdir)/gnuplot.texi . ; \
 	fi
 	@if test "$(EMACS)" != no; then \
-	  $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
+	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \
 	else \
-	  @echo No emacs found - cannot create texinfo file; \
+           @echo "No emacs found - cannot create texinfo file" ; \
 	fi
 
 # this is how to make OS/2 ipfc documentation
