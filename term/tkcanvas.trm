@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.6.2.1 1999/09/27 16:29:46 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.6.2.2 1999/10/11 21:24:41 lhecking Exp $
  *
  */
 
@@ -64,7 +64,12 @@
  * added the perltk.trm code written by Slaven Rezic <eserte@cs.tu-berlin.de>,
  * the variable 'tk_perl' switches between tcl/tk and perltk code.
  * 'linewidth' and 'justify text' added, ends of plotted lines are now rounded.
+ * if 'perltk' is chosen, perl code is produced, otherwise tcl code.
  * Thomas Sefzick, May 1999, t.sefzick@fz-juelich.de
+ *
+ * scale plot to fit into the actual size of the canvas as reported by
+ * the window manager (the canvas itself doesn't report its real size).
+ * Matt Willis, October 1999, mattbwillis@my-deja.com
  */
 
 #include "driver.h"
@@ -166,15 +171,19 @@ my($can) = @_;\n\
 $can->delete('all');\n\
 my $cmx = ($can->configure(-width))[4];\n\
 my $cmy = ($can->configure(-height))[4];\n\
-my $font;\n\
-my $temp;\n",
+my $cmx = $can->width - 2 * $can->cget(-border);\n\
+if ($cmx <= 1) {\n$cmx = ($can->cget(-width));\n}\n\
+my $cmy = $can->height - 2 * $can->cget(-border);\n\
+if ($cmy <= 1) {\n$cmy = ($can->cget(-height));\n}\n",
 	      gpoutfile);
     } else {
 	fputs("\
 proc gnuplot can {\n\
 $can delete all\n\
-set cmx [lindex [$can configure -width] 4]\n\
-set cmy [lindex [$can configure -height] 4]\n",
+set cmx [expr [winfo width $can]-2*[$can cget -border]]\n\
+if {$cmx <= 1} {set cmx [$can cget -width]}\n\
+set cmy [expr [winfo height $can]-2*[$can cget -border]]\n\
+if {$cmy <= 1} {set cmy [$can cget -height]}\n",
 	      gpoutfile);
     }
     tk_lastx = tk_lasty = tk_color = 0;
@@ -236,12 +245,12 @@ unsigned int x, y;
 	    fprintf(gpoutfile, "$can bind [\n");
     }
 	/*
-	* end of 1st part of wrapper
-	*/
+	 * end of 1st part of wrapper
+	 */
     y = 1000 - y;
 	/*
-	* here is the basic well-known command for plotting a line segment
-	*/
+	 * here is the basic well-known command for plotting a line segment
+	 */
     if (tk_perl) {
 	fprintf(gpoutfile,"\
 $can->createLine(\
@@ -261,10 +270,11 @@ $can create line \
     }
 
 	/*
-	* this is the 2nd part of the wrapper around the 'create line' command,
-	* it generates a mechanism which calls 'gnuplot_xy' for the line segment
-	* pointed to by the mouse cursor when a mouse button is pressed 
-	*/
+	 * this is the 2nd part of the wrapper around the 'create line'
+	 * command, it generates a mechanism which calls 'gnuplot_xy' for
+	 * the line segment pointed to by the mouse cursor when a mouse
+	 * button is pressed 
+	 */
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl) {
 	    /* Ev('W') not needed here, supplied anyhow, WHY ??? */
@@ -348,8 +358,8 @@ $can create line \
 	}
     }
 	/*
-	* end of the wrapper
-	*/
+	 * end of the wrapper
+	 */
     tk_lastx = x;
     tk_lasty = y;
 }
