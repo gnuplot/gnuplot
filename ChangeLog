@@ -1,3 +1,15 @@
+1999-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* command.c, protos.h, scanner.c, docs/gnuplot.doc: Old patch by
+	James R. Van Zandt to allow command substitution in double-quoted
+	strings, backported from -current.
+
+	* graphics.c: Added missing part of older patch by Dick Crawford
+	to fix y-positioning of timestamp.
+
+	* plot.h, set.c, setshow.h: Old patch by James R. Van Zandt to
+	remove fixed limit for contour levels, backported from -current.
+
 1999-12-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/hpgl.trm: Bugfixes in term help section.
