@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.39 2002/02/13 22:58:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.40 2002/02/15 15:40:58 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1339,7 +1339,12 @@ eval_3dplots()
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
-		m_capture(&(this_plot->title), start_token, end_token);
+		if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
+		    /* let default title for  splot 'a.dat' binary  is 'a.dat'
+		     * while for  'a.dat' binary using 2:1:3  will be all 4 words */ 
+                    m_capture(&(this_plot->title), start_token, start_token);
+		else
+		    m_capture(&(this_plot->title), start_token, end_token);
 		if (crnt_param == 2)
 		    xtitle = this_plot->title;
 		else if (crnt_param == 1)
