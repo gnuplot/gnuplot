@@ -310,6 +310,7 @@
 
 /* TeX related terminals */
 #define EMTEX
+#define EEPIC
 #include "latex.trm"		/* latex and emtex */
 #include "pslatex.trm"		/* latex/tex with picture in postscript */
 #include "eepic.trm"		/* EEPIC-extended LaTeX driver, for EEPIC users */
