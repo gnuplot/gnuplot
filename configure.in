@@ -1,4 +1,3 @@
-dnl -*-Mode: M4 -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.5 (pre-3.6) on Unix.
 dnl
@@ -71,6 +70,57 @@ AC_ARG_WITH(linux-vga,dnl
 [  --without-linux-vga     do not use the Linux console driver
                           (requires Linux SVGAlib /usr/lib/libvga)],,
 test -z "$with_linux_vga" && with_linux_vga=yes
+)dnl
+
+dnl Unix plot library
+AC_ARG_ENABLE(unixplot,dnl
+[  --enable-unixplot       enable standard Unix plot library],,
+test -z "$enable_unixplot" && enable_unixplot=no
+)dnl
+
+dnl GNU version of plot library
+dnl This can either be the ancient GNU graphics library,
+dnl or libplot.a from GNU plotutils
+AC_ARG_WITH(gnugraph,dnl
+[  --with-gnugraph         use the GNU plot library
+  --with-gnugraph=PATH            Specify the location of libplot],,
+test -z "$with_gnugraph" && with_gnugraph=no
+)dnl
+
+dnl Apollo Graphics Primitive Resource
+AC_ARG_ENABLE(apollo,dnl
+[  --enable-apollo         Apollo Graphics Primitive Resource],,
+test -z "$enable_apollo" && enable_apollo=no
+)dnl
+
+dnl Apollo Graphics Primitive Resource (fixed-size window)
+AC_ARG_ENABLE(gpr,dnl
+[  --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)],,
+test -z "$enable_gpr" && enable_gpr=no
+)dnl
+
+dnl On SCO only: cgi terminal
+AC_ARG_ENABLE(cgi,dnl
+[  --enable-cgi            enable CGI terminal (SCO only)],,
+test -z "$enable_cgi" && enable_cgi=no
+)dnl
+
+dnl IRIS terminal on IRIS4D series computer
+AC_ARG_ENABLE(iris,dnl
+[  --enable-iris           enable IRIS terminal (IRIS4D only)],,
+test -z "$enable_iris" && enable_iris=no
+)dnl
+
+dnl SUNview driver
+AC_ARG_ENABLE(sun,dnl
+[  --enable-sun            enable sunview terminal (Sun only)],,
+test -z "$enable_sun" && enable_sun=no
+)dnl
+
+dnl ATT 3b1 or ATT 7300 unixpc
+AC_ARG_ENABLE(unixpc,dnl
+[  --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)],,
+test -z "$enable_unixpc" && enable_unixpc=no
 )dnl
 
 dnl configure.in body
@@ -229,12 +279,35 @@ if test "$with_gnu_readline" = yes; then
 fi
 dnl end readline
 
+dnl GNU libplot - test for new version first
+if test "$with_gnugraph" != no; then
+  with_plot="$with_gnugraph"
+  TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
+  gp_CHECK_LIB_PATH(plot,textangle,[$TERMXLIBS])
+  if test "$ac_cv_lib_plot_textangle" = no; then
+    TERMXLIBS=
+    gp_CHECK_LIB_PATH(plot,rotate)
+    if test "$ac_cv_lib_plot_textangle" = no; then
+      AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
+      with_gnugraph=no
+    else
+      AC_MSG_RESULT([ - using obsolete GNU graphics library])
+      AC_DEFINE(GNUGRAPH)
+    fi
+  else
+    AC_MSG_RESULT([ - using GNU plotutils library])
+    AC_DEFINE(GNUGRAPH)
+    AC_DEFINE(GNU_PLOTUTILS)
+  fi
+fi
+dnl end gnugraph
+
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  gp_CHECK_LIB_PATH(gd, gdImageCreate)
+  gp_CHECK_LIB_PATH(gd,gdImageCreate)
   if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
     gp_CHECK_HEADER(gd.h,,
-     AC_MSG_WARN([please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile])
+     AC_MSG_WARN([please add path to gd.h to INCLUDES in Makefile])
     )dnl gp_CHECK_HEADER
     AC_DEFINE(HAVE_LIBGD)
   else
@@ -245,13 +318,14 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  gp_CHECK_LIB_PATH(png, png_info_init, -lz)
+  gp_CHECK_LIB_PATH(png,png_info_init,[-lz])
   if test "$ac_cv_lib_png_png_info_init" = yes; then
+    TERMLIBS="$TERMLIBS -lz"
     gp_CHECK_HEADER(png.h,,
-     AC_MSG_WARN([please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile])
+     AC_MSG_WARN([please add path to png.h to INCLUDES in Makefile])
     )dnl gp_CHECK_HEADER
     gp_CHECK_HEADER(zlib.h,,
-     AC_MSG_WARN([please add path to `echo $ac_safe|sed 's/\_/\./'` to INCLUDES in Makefile])
+     AC_MSG_WARN([please add path to zlib.h to INCLUDES in Makefile])
     )dnl gp_CHECK_HEADER
     AC_EGREP_CPP(yes,
      [#include "png.h"
@@ -270,14 +344,78 @@ dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
+dnl Process enable options
+
+if test "$enable_unixplot" = yes && test "$with_gnugraph" = no; then
+  AC_CHECK_LIB(plot,openpl,dnl
+   AC_DEFINE(UNIXPLOT)
+   TERMLIBS="$TERMLIBS -lplot",dnl
+   enable_unixplot=no)
+fi
+
+if test "$enable_apollo" = yes; then
+  AC_EGREP_CPP(yes,
+   [#ifdef apollo
+     yes
+    #endif
+   ],AC_DEFINE(APOLLO),dnl
+   enable_apollo=no)
+fi
+
+if test "$enable_gpr" = yes; then
+  AC_EGREP_CPP(yes,
+   [#ifdef apollo 
+     yes
+    #endif
+   ],AC_DEFINE(GPR),dnl
+   enable_gpr=no)
+fi
+
+if test "$enable_cgi" = yes; then
+  AC_EGREP_CPP(yes,
+   [#ifdef SCO
+     yes
+    #endif
+   ],AC_CHECK_LIB(ccgi,v_opnwk,dnl
+      AC_DEFINE(CGI)
+      TERMLIBS="$TERMLIBS -lccgi"),dnl
+   enable_cgi=no)
+fi
+
+if test "$enable_iris" = yes; then
+  AC_CHECK_LIB(gl_s,winopen,dnl
+   AC_DEFINE(IRIS)
+   TERMLIBS="$TERMLIBS -lgl_s",dnl
+   enable_iris=no)
+fi
+
+if test "$enable_sun" = yes; then
+  AC_CHECK_LIB(suntool,window_create,dnl
+   AC_DEFINE(SUN)dnl
+   TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect",dnl
+   enable_sun=no,[-lsunwindow -lpixrect])
+fi
+
+if test "$enable_unixpc" = yes; then
+  AC_EGREP_CPP(yes,
+   [/* Not sure about this; definitely
+     * true for gcc */
+    #ifdef unixpc
+     yes
+    #endif
+   ],AC_DEFINE(UNIXPC),dnl
+   enable_unixpc=no)
+fi
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(LASERGNU)
 AC_SUBST(LINUXSUID)
+AC_SUBST(NEXTOBJS)
 AC_SUBST(TERMFLAGS)
 AC_SUBST(TERMLIBS)
+AC_SUBST(TERMXLIBS)
 
 
 dnl rename makefiles in subdirectories, so that they don't take precedence
@@ -296,10 +434,12 @@ if test ! -f docs/latextut/makefile.dst && \
 fi
 
 dnl Report configuration
+eval gp_datadir=$datadir
+test $gp_datadir = NONE/share && gp_datadir=/usr/local/share
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-  Where is the help file?           `eval echo $datadir/gnuplot.gih`
+  Where is the help file?           $gp_datadir/gnuplot.gih
 ])
 test "$ac_cv_header_gd_h" = yes && \
   AC_MSG_RESULT([  Enable generation of GIF files.])
@@ -322,6 +462,28 @@ test "$with_lasergnu" = yes && \
 
 test "$with_linux_vga" = yes && \
   AC_MSG_RESULT([  Use the Linux console driver.])
+
+if test "$with_gnugraph" != no ; then
+  AC_MSG_RESULT([  Use the GNU plot library.])
+else
+  test "$enable_unixplot" = yes && \
+    AC_MSG_RESULT([  Use the Unix plot library.])
+fi
+
+test "$enable_apollo" = yes && \
+  AC_MSG_RESULT([  Enable Apollo terminal (resizeable window).])
+
+test "$enable_gpr" = yes && \
+  AC_MSG_RESULT([  Enable Apollo terminal (fixed-size window).])
+
+test "$enable_cgi" = yes && \
+  AC_MSG_RESULT([  Enable cgi terminal (SCO).])
+
+test "$enable_sun" = yes && \
+  AC_MSG_RESULT([  Enable sunview terminal.])
+
+test "$enable_unixpc" = yes && \
+  AC_MSG_RESULT([  Enable unixpc terminal (ATT 3b1 or ATT 7300).])
 
 test "$no_x" != yes && \
   AC_MSG_RESULT([  Use the X Window System.
