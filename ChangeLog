@@ -1,3 +1,18 @@
+2000-10-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pstricks.trm (PSTRICKS_xscale): removed, as it was
+	essentially unused, anyway.
+	(PSTRICKS_yscale): dito.
+	(PSTRICKS_graphics): respect 'size' and 'offset' settings in
+	creating the bounding box of the graph.
+
+	* term/eepic.trm (EEPIC_lines): Added a few more linetypes which
+ 	had been blissfully commented out.
+	(EEPIC_NUMLINES): raised to 10, accordingly.
+	(EEPIC_graphics): respect 'size' and 'offset' settings in creating
+ 	the bounding box of the graph. This overrides the patch of
+ 	2000-10-24 filed in by Lars.
+
 2000-10-25  Petr Mikulik <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: added documentation for the "history" and 

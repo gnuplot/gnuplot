@@ -1,5 +1,6 @@
+/* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.13 1999/10/29 18:39:39 lhecking Exp $
+ * $Id: eepic.trm,v 1.14 2000/10/24 12:00:46 lhecking Exp $
  *
  */
 
@@ -132,7 +133,7 @@ static const char GPFAR *GPFAR EEPIC_points[] = {
 };
 
 /* LINES */
-#define EEPIC_NUMLINES 5	/* number of linetypes below */
+#define EEPIC_NUMLINES 10	/* number of linetypes below */
 
 static const char GPFAR *GPFAR EEPIC_lines[] = {
     "\\thicklines \\path",	/* -2 border */
@@ -140,14 +141,14 @@ static const char GPFAR *GPFAR EEPIC_lines[] = {
     "\\thinlines \\path",	/*  0 solid thin  */
     "\\thicklines \\path",	/*  1 solid thick */
     "\\Thicklines \\path",	/*  2 solid Thick */
-};
-/* These are other possibilities
+/* These are other possibilities */
+/* HBB 20001027: enabled these */
     "\\thinlines \\dottedline{30}",
     "\\thinlines \\drawline[-30]",	
     "\\thinlines \\dottedline{60}",
     "\\thinlines \\drawline[-60]",	
     "\\thinlines \\dashline[-10]{20}[6]"
-*/
+};
 static int EEPIC_type;		/* current line type */
 static TBOOLEAN EEPIC_inline = FALSE;	/* are we in the middle of a line */
 static void EEPIC_endline __PROTO((void)); /* terminate any line in progress */
@@ -176,13 +177,15 @@ EEPIC_graphics()
 {
     register struct termentry *t = term;
 
-    int xscale = xsize * t->xmax;
-    int yscale = ysize * t->ymax;
-
+    /* HBB 20001027: respect 'size' and 'offset' settings to modify
+     * picture box size and position */
     fprintf(gpoutfile, "\
-\\begin{picture}(%d,%d)(0,0)\n\
+\\begin{picture}(%d,%d)(%d,%d)\n\
 \\footnotesize\n",
-	    xscale, yscale);
+	    (int) (t->xmax * xsize),
+	    (int) (t->ymax * ysize),
+	    (int) (t->xmax * xoffset),
+	    (int) (t->ymax * xoffset));
 
 }
 

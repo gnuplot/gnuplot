@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  * 
- * $Id: pstricks.trm,v 1.16 1999/06/25 17:07:56 lhecking Exp $
+ * $Id: pstricks.trm,v 1.17 1999/10/01 15:09:13 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -112,8 +112,6 @@ TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 static void PSTRICKS_endline __PROTO((void));
 static char *PSTRICKS_hack_text __PROTO((const char *s));
 
-static float PSTRICKS_xscale = 1.0;
-static float PSTRICKS_yscale = 1.0;
 static float PSTRICKS_posx;
 static float PSTRICKS_posy;
 static enum JUSTIFY PSTRICKS_justify = LEFT;
@@ -251,15 +249,20 @@ PSTRICKS_graphics()
 
     /* Set the scaled plot size, if it's not a unit plot */
     if (!PST_unit_plot) {
-	fprintf(gpoutfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
-		5.0 * PSTRICKS_xscale,
-		5.0 * PSTRICKS_xscale,
-		3.0 * PSTRICKS_yscale);
+	fputs("\\psset{unit=5.0in,xunit=5.0in,yunit=3.0in}\n", gpoutfile);
     }
-    fputs("\
-\\pspicture(0,0)(1,1)\n\
+    /* HBB 20001027: fix bounding box bug by letting the currently
+     * active 'size' and 'offset' setting influence the area used by
+     * the picture environment */
+    fprintf(gpoutfile, "\
+\\pspicture(%f,%f)(%f,%f)\n\
 \\ifx\\nofigs\\undefined\n\
-\\catcode`@=11\n\n", gpoutfile);
+\\catcode`@=11\n\n",
+	    xoffset,
+	    yoffset,
+	    (xoffset + xsize),
+	    (yoffset + ysize)
+    );
 }
 
 
