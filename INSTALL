@@ -106,8 +106,7 @@ used through the CC environment variable:
 $ CC=c89 ./configure
 
 (C shell)
-$ setenv CC c89
-$ ./configure
+$ env CC=c89 ./configure
  
    Any environment settings for CFLAGS are included into the Makefile,
 so please make sure that these are really needed.
@@ -559,14 +558,13 @@ should work, though).
 
   (Bourne shell syntax)
 
-  $ cd gnuplot
+  $ cd gnuplot-3.7
   $ CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   or (C shell syntax)
 
-  prompt (41) cd gnuplot
-  prompt (42) setenv CC 'cc -B/full/path/to/unproto/dir/ -tp'
-  prompt (43) ./configure <options>
+  $ cd gnuplot-3.7
+  $ env CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   The required compiler options shown here are for System V.2.  For other
   platforms, consult the unproto documentation. `/full/path/to/unproto/dir'
