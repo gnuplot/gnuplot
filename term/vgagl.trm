@@ -1,5 +1,5 @@
 /*
- * $Id: vgagl.trm,v 1.5 2002/06/10 18:53:01 mikulik Exp $
+ * $Id: vgagl.trm,v 1.6 2002/07/26 16:42:29 mikulik Exp $
  */
 
 #if defined(USE_MOUSE) && defined(PM3D)
@@ -1558,6 +1558,7 @@ START_HELP(vgagl)
 "?set term vgagl",
 "?terminal vgagl",
 "?term vgagl",
+"?help vgagl",
 "?vgagl",
 " The `vgagl` driver is a fast linux console driver with full mouse and pm3d",
 " support.  It looks at the environment variable SVGALIB_DEFAULT_MODE for the",
