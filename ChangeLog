@@ -1,3 +1,20 @@
+1999-08-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/command.c: Add missing parser functions and cases. Remove
+	command_tbl, lookup_command().
+
+	* src/command.h: CAPTURE_FILENAME_AND_FOPEN() macro moved from
+	command.c.
+
+	* src/setshow.h: Remove enum setshow_id.
+
+	* src/show.c: Remove show_tbl. Remove lookup_show() and replace
+	with call to lookup_table().
+
+	* src/tables.c: Add set_tbl for set and show commands.
+
+	* src/tables.h: New enum set_id to replace setshow_id from setshow.h.
+
 1999-08-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: check target must depend on all target.
@@ -6,6 +23,9 @@
 	to gnuplot_SOURCES.
 
 	* src/command.h: enum command_id moved to tables.h.
+
+	* src/tables.c, src/tables.h: New files for table lookup structures
+	and functions.
 
 1999-07-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
