@@ -82,17 +82,17 @@ struct TERMENTRY {
 One consequence of (1) is that we would like drivers to be backwards
 compatible - drivers in the correct form below should work in future
 versions of gnuplot without change. C compilers guarantee to fill
-unitialised members of a structure to zero, so gnuplot can detect old
-drivers, in which fields have not been initalised, and can point
+uninitialised members of a structure to zero, so gnuplot can detect old
+drivers, in which fields have not been initialised, and can point
 new interface entry pointers to dummy functions.
 
 We can add fields to the terminal structure, but only at the end of the list.
-If you design a terminal that cant work without a new interface being defined,
+If you design a terminal that can't work without a new interface being defined,
 and consequent changes to the main gnuplot source, please contact
 bug-gnuplot@dartmouth.edu simply to ensure that you have the most
-up to date defn of the terminal structure. Also, please ensure that
+up to date definition of the terminal structure. Also, please ensure that
 the 'set term' command checks for 0 values in added fields when an
-old driver is selected, and a pointer to a suitable 'cant do' function
+old driver is selected, and a pointer to a suitable 'can't do' function
 is provided. It is therefore not required (and in fact not possible)
 to add padding fields to the end of all drivers.
 
@@ -103,7 +103,7 @@ Some of the above fields are required - this should not be a problem,
 since they were all required in earlier releases of gnuplot.
 The later fields are interfaces to capabilities that not all devices
 can do, or for which the generic routines provided should be adequate.
-There are several null ('cant do') functions provided by term.c which
+There are several null ('can't do') functions provided by term.c which
 a driver can reference in the table. Similarly, for bitmap devices, there
 are generic routines for lines and text provided by bitmap.c
 
@@ -276,16 +276,16 @@ line type 0 before drawing the point.  line type 0 should be solid.
 There is a global variable 'pointsize' which is controlled by the
 set pointsize command. If possible, use that. pointsize should be
 examined at terminal init. If it is subsequently changed, the
-pointsize() fn will be called.
+pointsize() function will be called.
 
 
-_arrow(sx,sy,ex,ey,head)  Called to draw an arrrow from (sx,sy) to (ex,ey).
+_arrow(sx,sy,ex,ey,head)  Called to draw an arrow from (sx,sy) to (ex,ey).
 A head is drawn on the arrow if head = TRUE.
 An _arrow() function called do_arrow() is provided in term.c which will
 draw arrows using the _move() and _vector() functions.  
 Drivers should use do_arrow unless it causes problems.
 
-_set_font() is called to set the font of labels, etc [new 3.7 feature]
+_set_font() is called to set the font of labels, etc. [new 3.7 feature]
 fonts are selected as strings "name,size"
 
 _pointsize() is used to set the pointsize for subsequent points
@@ -293,7 +293,7 @@ _pointsize() is used to set the pointsize for subsequent points
 _flags stores various flags describing driver capabilities. Currently
  three bits are allocated
   - TERM_CAN_MULTIPLOT - driver can do multiplot
-  fully-interactively when output is not redirected. ie text and graphics
+  fully-interactively when output is not redirected. I.e. text and graphics
   go to different places, or driver can flip using suspend.
   - TERM_CANT_MULTIPLOT - driver cannot multiplot, even if output
   is redirected.
@@ -301,7 +301,7 @@ _flags stores various flags describing driver capabilities. Currently
   Another bit is earmarked for VMS_PASTHRU, but not yet implemented.
 
 _suspend() - called before gnuplot issues a prompt in multiplot mode
-   linux vga driver uses this entry point to flip from graphics to
+   linux VGA driver uses this entry point to flip from graphics to
    text mode. X11 driver will take this opportunity to paint the window
    on the display.
 
@@ -378,7 +378,7 @@ routines are made:
       _pointsize(size)
       _point(x,y,point)
       _text_angle(angle)
-      _justify(mode)
+      _justify_text(mode)
       _set_font(font)
       _put_text(x,y,text)
       _arrow(sx,sy,ex,ey)
@@ -415,19 +415,19 @@ per pixel..?
 
 The pixels are currently organised horizontally packed into bytes.
 
-ie
+i.e.
 
 ********%%%%%%%%$$$$$$$$!!!!!!!! etc
 ^^^^^^^^@@@@@@@@########++++++++ etc
 
 where like symbols are stored in one byte. Vertical packing can be
 arranged by reversing x and y dimensions and setting the global
-b_rastermode to TRUE.  (eg epson 8-pin dot-matrix printer)
+b_rastermode to TRUE.  (e.g. Epson 8-pin dot-matrix printer)
 
 
 Functions provided are
 
-(internal fns ? - should probably be static, not external ?)
+(internal functions ? - should probably be static, not external ?)
 b_setpixel(x,y,value)     
 b_setmaskpixel(x,y,value)
 b_putc(x,y,char,angle)
@@ -552,7 +552,7 @@ Each record is enclosed in double-quotes and (except for the last
 record) followed by a comma.  The text is copied as a single string
 into gnuplot.doc, so the syntax must obey the rules of that entity.
 If the text includes double-quotes or backslashes, these must be
-escaped by preceding each occurence with a backslash.
+escaped by preceding each occurrence with a backslash.
 
 --------------
 
@@ -569,8 +569,8 @@ We may include term.h, and therefore all these files, one or more times.
 If just once (all modules compiled into term.c) putting the four
 parts in this order should make it work.
 
-we may compile the table entries into either an array or a linked list
-This organisation should support both
+We may compile the table entries into either an array or a linked list.
+This organisation should support both.
 
 For separate compilation, we may write a program which
 defines TERM_REGISTER and #include term.h to find out which drivers are
@@ -578,7 +578,7 @@ selected in term.h and thereby generate a makefile.
 
 
 
-For a driver which depends on another (eg enhpost and pslatex on post)
+For a driver which depends on another (e.g. enhpost and pslatex on post)
 the driver can do something like
 
 #ifndef GOT_POST_PROTO
@@ -587,12 +587,12 @@ the driver can do something like
 #undef TERM_PROTO_ONLY
 #endif
 
-this is probably needed only in the TERM_TABLE section only, but may
+this is probably needed only in the TERM_TABLE section, but may
 also be used in the body. The TERM_PROTO_ONLY means that we pick up
-only the protos from post.trm, even if current driver is being compiled
+only the prototypes from post.trm, even if current driver is being compiled
 with TERM_BODY or TERM_TABLE
 
-If we do it the linked-list way, the arg to TERM_TABLE_START will be
+If we do it the linked-list way, the argument to TERM_TABLE_START will be
 the name of the variable, so any valid, unique name is fine.
 The TERM_TABLE_START macro will do all the work of linking the entries
 together, probably using LAST_TERM
@@ -604,12 +604,13 @@ of the printed manual, all can be included.
 
 
 Please make as many things as possible static, but do still try to use unique
-names since all drivers may all be compiled into term.o
+names since all drivers may be compiled into term.o
 
 The bit in the PROTO section is basically what you would put into a .h
 file if we had them - everything that is needed by the TABLE_ENTRY
-should be defined in this part. In particular, dont forget all the maxes
+should be defined in this part. In particular, don't forget all the maxes
 and character sizes and things for the table entry.
 
-Dont forget to put TERM_PUBLIC in the defns of the fns as well as the
-prototypes. It will probably always expand to 'static' except for pcs.
+Don't forget to put TERM_PUBLIC in the definitions of the functions as
+well as the prototypes. It will probably always expand to 'static'
+except for PCs.

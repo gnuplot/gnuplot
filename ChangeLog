@@ -1,3 +1,7 @@
+2003-05-17  James R. Van Zandt  <jrv@debian.org>
+
+	* term/README: spelling and grammar fixes
+
 2003-05-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/svg.trm: Support filled polygons with more than 4 corners.
