@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.10 2001/08/17 13:59:26 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.11 2001/08/22 11:53:19 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -54,15 +54,16 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.10 2001/08/17 13:59:26 bro
 /*
  * cheap and slow version of memcpy() in case you don't have one 
  */
-int memcpy __PROTO((char *, char *, size_t));
 
-int
+char *
 memcpy(dest, src, len)
-char *dest, *src;
-size_t len;
+    char *dest, *src;
+    size_t len;
 {
     while (len--)
 	*dest++ = *src++;
+
+    return dest;
 }
 # endif				/* !HAVE_BCOPY */
 #endif /* NO_MEMCPY */
@@ -73,12 +74,11 @@ size_t len;
  */
 #ifdef NO_STRCHR
 # ifndef HAVE_INDEX
-char *strchr __PROTO((const char *, int));
 
 char *
 strchr(s, c)
-const char *s;
-int c;
+    const char *s;
+    int c;
 {
     do {
 	if (*s == (char) c)
@@ -114,14 +114,9 @@ do {                      \
 /* strerror() */
 #ifdef NO_STRERROR
 
-extern int sys_nerr;
-extern char *sys_errlist[];
-
-char *strerror __PROTO((int));
-
 char *
 strerror(no)
-int no;
+    int no;
 {
     static char res_str[30];
 
@@ -137,7 +132,6 @@ int no;
 
 /* strstr() */
 #ifdef NO_STRSTR
-char *strstr __PROTO((const char *, const char *));
 
 char *
 strstr(cs, ct)
@@ -304,7 +298,6 @@ purec_sscanf(const char *string, const char *format,...)
  * it doesn't really matter on these systems. lh
  */
 
-unsigned int sleep __PROTO((unsigned int));
 
 #ifdef AMIGA_SC_6_1
 #include <proto/dos.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.16 2001/08/22 11:53:19 broeker Exp $
+ * $Id: stdfn.h,v 1.17 2002/02/04 11:53:34 lhecking Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -62,15 +62,21 @@
 # ifdef NO_MEMMOVE
 #  define memmove(d,s,n) bcopy((s),(d),(n))
 # endif
+#else
+# ifdef NO_MEMCPY
+char * memcpy __PROTO((char *, char *, size_t));
+# endif
 #endif /* HAVE_BCOPY */
 
 #ifdef NO_STRCHR
 # ifdef strchr
 #  undef strchr
 # endif
-#ifdef HAVE_INDEX
-# define strchr index
-#endif
+# ifdef HAVE_INDEX
+#  define strchr index
+# else
+char *strchr __PROTO((const char *, int));
+# endif
 # ifdef strrchr
 #  undef strrchr
 # endif
@@ -81,6 +87,10 @@
 #ifndef HAVE_STRCSPN
 size_t gp_strcspn __PROTO((const char *, const char *));
 # define strcspn gp_strcspn
+#endif
+
+#ifdef NO_STRSTR
+char *strstr __PROTO((const char *, const char *));
 #endif
 
 #ifdef NO_STDLIB_H
@@ -151,6 +161,11 @@ double strtod();
 #endif
 # ifdef EXTERN_ERRNO
 extern int errno;
+#endif
+#ifdef NO_STRERROR
+char *strerror __PROTO((int));
+extern int sys_nerr;
+extern char *sys_errlist[];
 #endif
 
 #ifndef NO_SYS_TYPES_H
