@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.3 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.4 1999/06/10 19:59:19 lhecking Exp $"); }
 #endif
 
 
@@ -391,7 +391,6 @@ int n;
  * safe_strncpy(dest, src, n), where n = sizeof(dest)
  * This is basically the old fit.c(copy_max) function
  */
-
 char *
 safe_strncpy(d, s, n)
 char *d;
@@ -406,3 +405,29 @@ size_t n;
 
     return ret;
 }
+
+#ifndef HAVE_STRCSPN
+/*
+ * our own substitute for strcspn()
+ * return the length of the inital segment of str1
+ * consisting of characters not in str2
+ * returns strlen(str1) if none of the characters
+ * from str2 are in str1
+ * based in misc.c(instring) */
+size_t
+gp_strcspn(str1, str2)
+const char *str1, str2;
+{
+    char *s;
+    size_t pos;
+
+    if (!str1 || !str2)
+	return 0;
+    pos = strlen(str1);
+    while (*str2++)
+	if (s = strchr(str1, *str2))
+	    if ((s - str1) < pos)
+		pos = s - str1;
+    return (pos);
+}
+#endif /* !HAVE_STRCSPN */
