@@ -1,3 +1,43 @@
+1999-05-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: Demonstrate use of GNUPLOT_LIB variable in
+	check-interactive and check-noninteractive targets.
+
+	* src/command.c(command): Use loadpath_fopen() instead of fopen()
+	for `call` and `load` commands.
+
+	* src/datafile.c(df_open): Use loadpath_fopen() instead of fopen()
+	to open data file. Fix typo.
+
+	* src/fit.c(do_fit,update): Use loadpath_fopen() instead of fopen()
+	to open parameter files.
+
+	* src/genopt.com, src/graphics.c: Fix typo.
+
+	* src/gnuplot.opt, src/gnuplot.prj, src/linkopt.ztc: Add new file
+ 	variable(.c).
+
+	* src/misc.c, src/protos.h: New function loadpath_fopen();
+
+	* src/plot.c(main): Use loadpath_fopen() instead of fopen() to
+	open files named on the command line.
+
+	* src/util.c(m_quote_capture): Remove unused variable escflag,
+	fix comment.
+
+1999-05-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* README.1st: Add some notes about gnuplot-mode.el.
+
+	* docs/gnuplot.doc: Add documentation for GNUPLOT_LIB and loadpath.
+
+	* lisp/README, lisp/gnuplot-gui.el, lisp/gnuplot.el,
+	lisp/gpelcard.tex: Updated to version 0.5f of Bruce Ravel's
+	gnuplot-mode.
+
+	* src/Makefile.maint: Add generation of Makefile.in, other small
+	additions.
+
 1999-05-27  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, aclocal.m4, config.hin, configure, m4/Makefile.am,

@@ -10,3 +10,16 @@
    to src, cd to src and make. Some makefiles have not yet
    been updated to the new directory structure.
 
+
+ NOTES:
+
+ - some files from Bruce Ravel's gnuplot-mode distribution have
+   not been included here, namely
+
+   o INSTALL              (covered by gnuplot install instructions)
+   o Win9x/INSTALL.Win9x
+   o Win9x/pgnuplot.c     (already in src/win)
+   o gnuplot.info         (can be created from docs/gnuplot.texi)
+   o gpelcard.ps          (can be created from lisp/gpelcard.tex)
+   o install-sh, mkinstalldirs  (provided by gnuplot)
+
