@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.124 2003/01/28 21:22:15 lhecking Exp $
+dnl $Id: configure.in,v 1.125 2003/01/30 18:02:27 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -29,7 +29,7 @@ AC_C_INLINE
 AC_C_STRINGIZE
 
 dnl Various programs
-dnl X/Emacs for building lisp packages
+dnl X/Emacs for building lisp packages and creating .texi version of docs
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
 AC_CHECK_PROGS(PLAINTEX, tex, no)
 AC_CHECK_PROGS(LATEX, latex latex2e, no)
@@ -760,12 +760,14 @@ AC_OUTPUT([Makefile
           [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
 
 dnl Report configuration
-eval gp_datadir=$datadir
-test "$gp_datadir" = NONE/share && gp_datadir=/usr/local/share
+eval pkgdatadir=$datadir/$PACKAGE
+if test "$pkgdatadir" = "NONE/share/$PACKAGE"; then
+  pkgdatadir="/usr/local/share/$PACKAGE"
+fi
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-  Where is the help file?           $gp_datadir/share/gnuplot/$VERSION/gnuplot.gih
+  Where is the help file?           $pkgdatadir/$PKG_MAJOR/gnuplot.gih
 ])
 
 if test "$with_lasergnu" = yes; then
