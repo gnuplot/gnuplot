@@ -1,5 +1,5 @@
 /*
- * $Id: amiga.trm,v 1.8 1998/12/17 22:07:52 lhecking Exp $
+ * $Id: amiga.trm,v 1.9 1999/06/19 20:30:44 lhecking Exp $
  *
  */
 
@@ -63,9 +63,12 @@
  *   Carsten Steger     Converted to new terminal layout.
  *   10/01/95
  *
- *   Lars Hecking	Add code from George Coulouris <glc5@cornell.edu> to
- *   06/20/97		implement window option, requires AmigaOS 3.0+.
- *			General cleanup, better readability.
+ *   Lars Hecking       Add code from George Coulouris <glc5@cornell.edu> to
+ *   06/20/97           implement window option, requires AmigaOS 3.0+.
+ *                      General cleanup, better readability.
+ *
+ *   Lars Hecking       Replace static arrays for AMIGA_FontName and temporary
+ *   06/21/97           arrays with AllocMem()'d memory.
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
@@ -95,9 +98,9 @@ TERM_PUBLIC void AMIGA_graphics __PROTO((void));
 TERM_PUBLIC void AMIGA_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AMIGA_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void AMIGA_linetype __PROTO((int linetype));
-TERM_PUBLIC void AMIGA_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void AMIGA_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 TERM_PUBLIC int AMIGA_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int AMIGA_set_font __PROTO((char *font));
+TERM_PUBLIC int AMIGA_set_font __PROTO((const char *font));
 TERM_PUBLIC void AMIGA_suspend __PROTO((void));
 TERM_PUBLIC void AMIGA_resume __PROTO((void));
 
@@ -164,9 +167,10 @@ struct Library *DiskfontBase;
 
 
 /* Name of font, size in pts */
-static char AMIGA_FontName[MAX_ID_LEN+1] = "";
+static char *AMIGA_FontName = NULL;
+static int AMIGA_FontNameLen;
 static int AMIGA_FontSize;
-
+#define AMIGA_DEFAULTFONT "topaz"
 
 /* Font stuff */
 static struct TextAttr AMIGA_Font =
@@ -294,6 +298,11 @@ AMIGA_reset()
     if (GfxBase != NULL)
 	CloseLibrary((struct Library *) GfxBase);
 
+    if (AMIGA_FontName != NULL)
+	FreeMem(AMIGA_FontName,AMIGA_FontNameLen);
+
+    AMIGA_FontName = NULL;
+    AMIGA_FontNameLen = 0;
     AMIGA_TextFont = NULL;
     DiskfontBase = NULL;
     AMIGA_Screen = NULL;
@@ -310,7 +319,6 @@ AMIGA_reset()
 TERM_PUBLIC void
 AMIGA_init()
 {
-    char name[MAX_ID_LEN + 1];
 
     /* Install exit trap in case of abnormal termination (see below). */
     if (ATEXIT(AMIGA_exit))
@@ -387,8 +395,15 @@ AMIGA_init()
     term->ymax = AMIGA_ymax;
 
     if (AMIGA_window_mode != TRUE) {
+	char *name =  NULL;
+	assert(AMIGA_FontName != NULL);
+	/* should even do for ridiculously large FontSize :) */
+	name = AllocMem(AMIGA_FontNameLen + 1 + INT_STR_LEN + 1,0);
+	if (name == NULL)
+	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
 	sprintf(name, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
 	AMIGA_set_font(name);
+	FreeMem(name,AMIGA_FontNameLen + INT_STR_LEN + 2);
 
 	LoadRGB4(&AMIGA_Screen->ViewPort, AMIGA_Colors, 16);
 	RemakeDisplay();
@@ -433,8 +448,17 @@ AMIGA_options()
 	}
     }
     /* Font name */
+    if (AMIGA_FontNameLen != 0) {
+	FreeMem(AMIGA_FontName,AMIGA_FontNameLen);
+	AMIGA_FontName = NULL;
+	AMIGA_FontNameLen = 0;
+    }
     if (!END_OF_COMMAND && isstring(c_token)) {
-	quote_str(AMIGA_FontName, c_token, MAX_ID_LEN);
+	AMIGA_FontNameLen = token_len(c_token);
+	AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
+	if (AMIGA_FontName == NULL)
+	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
+	quote_str(AMIGA_FontName, c_token, AMIGA_FontNameLen);
 	c_token++;
     }
     /* Font size */
@@ -443,13 +467,17 @@ AMIGA_options()
 	struct value a;
 	AMIGA_FontSize = (int) real(const_express(&a));
     }
-    if (strcmp(AMIGA_FontName, "") == 0 && AMIGA_FontSize != 0)
-	strcpy(AMIGA_FontName, "topaz");
-
-    if (strcmp(AMIGA_FontName, "") != 0 && AMIGA_FontSize == 0)
+    if (AMIGA_FontName == NULL && AMIGA_FontSize != 0) {
+	AMIGA_FontNameLen = strlen(AMIGA_DEFAULTFONT) + 1;
+	AMIGA_FontName = AllocMem(AMIGA_FontNameLen,0);
+	if (AMIGA_FontName == NULL)
+	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
+	strcpy(AMIGA_FontName, AMIGA_DEFAULTFONT);
+    }
+    if (AMIGA_FontName != NULL && AMIGA_FontSize == 0)
 	AMIGA_FontSize = 8;
 
-    if (strcmp(AMIGA_FontName, "") != 0 && AMIGA_FontSize != 0) {
+    if (AMIGA_FontName != NULL && AMIGA_FontSize != 0) {
 	sprintf(default_font, "%s,%d", AMIGA_FontName, AMIGA_FontSize);
 	sprintf(term_options, "%s \"%s\" %d", \
 		(AMIGA_window_mode != TRUE ? "screen" : "window"), \
@@ -563,7 +591,7 @@ int linetype;
 TERM_PUBLIC void
 AMIGA_put_text(x, y, str)
 unsigned int x, y;
-char *str;
+const char *str;
 {
     LONG len, tx_len;
     WORD x_min, x_max, y_min, y_max;
@@ -618,24 +646,29 @@ enum JUSTIFY mode;
  */
 TERM_PUBLIC int
 AMIGA_set_font(font)
-char *font;
+const char *font;
 {
     static char test_str[] =
     " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
     static WORD test_len, test_pxl;
-    char name[MAX_ID_LEN+1];
-    int size, sep;
 
     /* Disable for window mode */
     if (AMIGA_window_mode != TRUE) {
+	char *name = NULL;
+	int size, sep, namelen;
+
 	sep = strcspn(font, ",");
-	strncpy(name, font, sep);
+	namelen = strlen(font) + strlen(".font") + 1;
+	name = AllocMem(namelen,0);
+	if (name == NULL)
+	    AMIGA_ERROR("No memory for font name", RETURN_FAIL);
+	strcpy(name,font);
 	name[sep] = NUL;
 	size = AMIGA_FontSize;
 	sscanf(&(font[sep + 1]), "%d", &size);
 
-	if (strcmp(name, "") != 0) {
-	    strncat(name, ".font", MAX_ID_LEN+1);
+	if (name != NULL && strcmp(name, "") != 0) {
+	    strcat(name, ".font");
 
 	    /* Avoid opening "diskfont.library" if a built-in font is desired */
 	    if ((strcmp("topaz.font", name) == 0) &&
@@ -679,6 +712,7 @@ char *font;
 	term->v_char = AMIGA_cht + 4;	/* So lines won't be too close */
 	term->h_char = AMIGA_cwd;
 
+	FreeMem(name,namelen);
     }				/* !window_mode */
     return TRUE;
 }
