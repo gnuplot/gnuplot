@@ -42,6 +42,10 @@
       including mechanismn.
 */
 
+#ifdef TERM_REGISTER
+register_term(table)
+#endif
+
 #ifdef TERM_HELP
 START_HELP(table)
 "1 table",
