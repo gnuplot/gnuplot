@@ -35,6 +35,15 @@ AC_ARG_WITH(gnu-readline,dnl
 test -z "$with_gnu_readline" && with_gnu_readline=no
 )dnl
 
+dnl If no PATH argument given, use the Unix plot library
+dnl Else use either GNU libplot from plotutils,
+dnl or ancient GNU graphics libplot
+AC_ARG_WITH(plot,dnl
+[  --with-plot             use the Unix plot library
+  --with-plot=PATH                Specify the location of GNU libplot],,
+test -z "$with_plot" && with_plot=no
+)dnl
+
 dnl The gif terminal with Tom Boutell's gd library
 AC_ARG_WITH(gd,dnl
 [  --with-gd               enable gif terminal with Tom Boutell's gd library
@@ -70,21 +79,6 @@ AC_ARG_WITH(linux-vga,dnl
 [  --without-linux-vga     do not use the Linux console driver
                           (requires Linux SVGAlib /usr/lib/libvga)],,
 test -z "$with_linux_vga" && with_linux_vga=yes
-)dnl
-
-dnl Unix plot library
-AC_ARG_ENABLE(unixplot,dnl
-[  --enable-unixplot       enable standard Unix plot library],,
-test -z "$enable_unixplot" && enable_unixplot=no
-)dnl
-
-dnl GNU version of plot library
-dnl This can either be the ancient GNU graphics library,
-dnl or libplot.a from GNU plotutils
-AC_ARG_WITH(gnugraph,dnl
-[  --with-gnugraph         use the GNU plot library
-  --with-gnugraph=PATH            Specify the location of libplot],,
-test -z "$with_gnugraph" && with_gnugraph=no
 )dnl
 
 dnl Apollo Graphics Primitive Resource
@@ -279,28 +273,36 @@ if test "$with_gnu_readline" = yes; then
 fi
 dnl end readline
 
-dnl GNU libplot - test for new version first
-if test "$with_gnugraph" != no; then
-  with_plot="$with_gnugraph"
-  TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-  gp_CHECK_LIB_PATH(plot,textangle,[$TERMXLIBS])
-  if test "$ac_cv_lib_plot_textangle" = no; then
-    TERMXLIBS=
-    gp_CHECK_LIB_PATH(plot,rotate)
-    if test "$ac_cv_lib_plot_textangle" = no; then
-      AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
-      with_gnugraph=no
-    else
-      AC_MSG_RESULT([ - using obsolete GNU graphics library])
-      AC_DEFINE(GNUGRAPH)
-    fi
+dnl libplot
+if test "$with_plot" != no; then
+  if test "$with_plot" = yes; then
+    dnl Unix plot library
+    AC_CHECK_LIB(plot,openpl,dnl
+     AC_DEFINE(UNIXPLOT)
+     TERMLIBS="$TERMLIBS -lplot",dnl
+     with_plot=no)
   else
-    AC_MSG_RESULT([ - using GNU plotutils library])
-    AC_DEFINE(GNUGRAPH)
-    AC_DEFINE(GNU_PLOTUTILS)
-  fi
+    dnl GNU plot library - test for new version first
+    TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
+    gp_CHECK_LIB_PATH(plot,textangle,[$TERMXLIBS])
+    if test "$ac_cv_lib_plot_textangle" = no; then
+      TERMXLIBS=
+      gp_CHECK_LIB_PATH(plot,rotate)
+      if test "$ac_cv_lib_plot_rotate" = no; then
+        AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
+        with_plot=no
+      else
+        AC_MSG_RESULT([ - using obsolete GNU graphics library])
+        AC_DEFINE(GNUGRAPH)
+      fi dnl old GNU plotlib
+    else
+      AC_MSG_RESULT([ - using GNU plotutils library])
+      AC_DEFINE(GNUGRAPH)
+      AC_DEFINE(GNU_PLOTUTILS)
+    fi dnl new GNU plotlib
+  fi dnl Unix plotlib
 fi
-dnl end gnugraph
+dnl end plot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
@@ -345,13 +347,6 @@ dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
 dnl Process enable options
-
-if test "$enable_unixplot" = yes && test "$with_gnugraph" = no; then
-  AC_CHECK_LIB(plot,openpl,dnl
-   AC_DEFINE(UNIXPLOT)
-   TERMLIBS="$TERMLIBS -lplot",dnl
-   enable_unixplot=no)
-fi
 
 if test "$enable_apollo" = yes; then
   AC_EGREP_CPP(yes,
@@ -457,18 +452,17 @@ else
     AC_MSG_RESULT([  Use included readline.])
 fi
 
+if test "$with_plot" = yes; then
+  AC_MSG_RESULT([  Use the Unix plot library.])
+elif test "$with_plot" != no; then
+  AC_MSG_RESULT([  Use the GNU plot library.])
+fi
+
 test "$with_lasergnu" = yes && \
   AC_MSG_RESULT([  Install lasergnu printer script.])
 
 test "$with_linux_vga" = yes && \
   AC_MSG_RESULT([  Use the Linux console driver.])
-
-if test "$with_gnugraph" != no ; then
-  AC_MSG_RESULT([  Use the GNU plot library.])
-else
-  test "$enable_unixplot" = yes && \
-    AC_MSG_RESULT([  Use the Unix plot library.])
-fi
 
 test "$enable_apollo" = yes && \
   AC_MSG_RESULT([  Enable Apollo terminal (resizeable window).])
