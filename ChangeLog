@@ -2,7 +2,9 @@
 
 	* src/gp_types.h src/graphics.c src/plot2d.c: Create a new flag
 	PLOT_STYLE_HAS_BOXES and use this to trigger filled-box processing
-	rather than testing individually for all plot styles that use it.
+	rather than testing individually for each plot style that uses it.
+
+	* src/mouse.c: #include "util3d.h" to get prototype for map3d_xy().
 
 2003-07-10  Ethan Merritt <merritt@u.washington.edu>
 
