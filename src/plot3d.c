@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.92 2004/12/01 19:27:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.93 2004/12/05 08:04:43 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -656,6 +656,9 @@ get_3ddata(struct surface_points *this_plot)
 		if ((this_plot->plot_style == IMAGE) || (this_plot->plot_style == RGBIMAGE))
 		    continue;
 #endif
+		if (this_plot->plot_style == VECTOR)
+		    continue;
+
 		/* one blank line */
 		if (pt_in_iso_crv == 0) {
 		    if (xdatum == 0)
@@ -667,12 +670,6 @@ get_3ddata(struct surface_points *this_plot)
 		    local_this_iso->next = this_plot->iso_crvs;
 		    this_plot->iso_crvs = local_this_iso;
 		    this_plot->num_iso_read++;
-
-		    if (this_plot->plot_style == VECTOR) {
-			if (this_plot->num_iso_read > 0)
-			    /* FIXME - Will the plot data structures be freed anywhere??? */
-			    int_error(NO_CARET,"Cannot plot multiple contours in style vectors");
-		    }
 
 		    if (xdatum != pt_in_iso_crv)
 			this_plot->has_grid_topology = FALSE;

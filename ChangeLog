@@ -1,3 +1,8 @@
+2005-02-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot3d.c (get_3ddata): Ignore blank lines in data file input to
+	"splot with vectors".
+
 2005-02-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_boxes): Plot with boxerrorbars and three columns
