@@ -59,6 +59,7 @@ static char    *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp
 # ifdef DJGPP
 #  include <dos.h>
 #  include <dir.h>            /* HBB: for setdisk() */
+extern char HelpFile[MAXPATH] ;      /* patch for do_help  - AP */
 # else
 #  include <process.h>
 # endif /* DJGPP */
@@ -956,7 +957,7 @@ int toplevel;
 	/* if can't find environment variable then just use HELPFILE */
 
 /* patch by David J. Liu for getting GNUHELP from home directory */
-#if defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))
+#if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
         help_ptr = HelpFile ;
 #else
 #if defined(MTOS) || defined(ATARI)

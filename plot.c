@@ -89,8 +89,10 @@ extern char* rl_readline_name;
 extern int rl_complete_with_tilde_expansion;
 #endif
 
-#if defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))  /* patch to get home dir, see command.c */
-char HelpFile[80] ;
+/* patch to get home dir, see command.c */
+#if (defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))) || defined(DJGPP)
+#include <dir.h>   /* MAXPATH */
+char HelpFile[MAXPATH] ;
 #endif             /*   - DJL */
 
 #ifndef STDOUT
@@ -256,7 +258,8 @@ int main(argc, argv)
      }
 #endif 
 
-#ifdef OSK	/* malloc large blocks, otherwise problems with fragmented mem */
+/* malloc large blocks, otherwise problems with fragmented mem */
+#ifdef OSK
    _mallocmin (102400);
 #endif
 	
@@ -264,14 +267,23 @@ int main(argc, argv)
 malloc_debug(7);
 #endif
 
+/* get helpfile from home directory */
 #ifndef DOSX286
 # ifndef _Windows
 #  if defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))
-strcpy (HelpFile,argv[0]) ;                       /* got helpfile from */
-strcpy (strrchr(HelpFile,'\\'),"\\gnuplot.gih") ; /* home directory    */
+    strcpy (HelpFile,argv[0]);
+    strcpy (strrchr(HelpFile,DIRSEP1), "\\gnuplot.gih");
 #  endif                                          /*   - DJL */
 # endif /* !_Windows */
 #endif /* !DOSX286 */
+#ifdef __DJGPP__
+    { char * s;
+      strcpy (HelpFile,argv[0]);
+      for (s = HelpFile; *s; s++)
+	if (*s == DIRSEP1) *s = DIRSEP2;  /* '\\' to '/' */
+      strcpy (strrchr (HelpFile,DIRSEP2), "/gnuplot.gih");
+    } /* Add also some "paranoid" tests for '\\':  AP */
+#endif /* DJGPP */
 
 #ifdef VMS
 unsigned int status[2] = {1, 0};
