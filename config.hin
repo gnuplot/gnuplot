@@ -186,6 +186,9 @@
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
 
+/* Define if you have the c library (-lc).  */
+#undef HAVE_LIBC
+
 /* Name of package */
 #undef PACKAGE
 
