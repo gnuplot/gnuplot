@@ -12,6 +12,7 @@ datadir = @datadir@
 lispdir = @lispdir@
 srcdir = @srcdir@
 subdir = lisp
+top_builddir = .
 top_srcdir = @top_srcdir@
 
 @SET_MAKE@
@@ -24,16 +25,18 @@ INSTALL_DATA = @INSTALL_DATA@
 VPATH = @srcdir@
 
 # Command to byte-compile
-BYTEC = $(EMACS) -batch -q -no-site-file -l dot.el -f batch-byte-compile
+BYTEC = $(EMACS) -batch -q -no-site-file -l $(srcdir)/dot.el -f batch-byte-compile
 
 ELCS = info-look.elc gnuplot.elc gnuplot-gui.elc
 
 default: $(ELCS)
 
 gnuplot.elc: gnuplot.el
+	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot.el .
 	$(BYTEC) gnuplot.el
 
-gnuplot-gui.elc: gnuplot-gui.el
+gnuplot-gui.elc: gnuplot.elc gnuplot-gui.el
+	test "$(srcdir)" = "$(top_builddir)" || cp $(srcdir)/gnuplot-gui.el .
 	$(BYTEC) gnuplot-gui.el
 
 ## There are many possibilities for info-look:
@@ -66,11 +69,11 @@ info-look.elc:  info-look.20.2.el info-look.20.3.el
 	  else echo "$(MESSAGE)"; \
 	fi; \
 	if   [ $(EMACS) = "emacs"  -a $$version -lt 2030 ]; \
-	  then cp -v info-look.20.2.el info-look.el; \
+	  then cp -v $(srcdir)/info-look.20.2.el info-look.el; \
 	elif [ $(EMACS) = "xemacs" -a $$version -ge 2000 ]; \
-	  then cp -v info-look.20.3.el info-look.el; \
+	  then cp -v $(srcdir)/info-look.20.3.el info-look.el; \
 	elif [ $(EMACS) = "xemacs" -a $$version -lt 2000 ]; \
-	  then cp -v info-look.20.2.el info-look.el; \
+	  then cp -v $(srcdir)/info-look.20.2.el info-look.el; \
 	fi ;\
 	if [ ! \( $(EMACS) = "emacs" -a $$version -ge 2030 \) ]; \
 	  then $(BYTEC) info-look.el; fi;
@@ -81,7 +84,7 @@ gpelcard.ps: gpelcard.dvi
 	$(DVIPS) -o gpelcard.ps gpelcard.dvi
 
 gpelcard.dvi: gpelcard.tex
-	$(LATEX) gpelcard.tex
+	$(LATEX) $(srcdir)/gpelcard.tex
 
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 
@@ -95,6 +98,7 @@ install:
 clean:
 	rm -f *.elc info-look.el gpelcard.ps gpelcard.dvi gpelcard.log \
 	  gpelcard.aux
+	test "$(srcdir)" = "$(top_builddir)" || rm -f gnuplot.el gnuplot-gui.el
 
 distclean: clean
 	rm -f Makefile config.status config.log
