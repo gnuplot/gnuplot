@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.53 2002/02/19 12:36:59 amai Exp $
+ * $Id: x11.trm,v 1.54 2002/02/25 03:10:42 broeker Exp $
  *
  */
 
@@ -150,7 +150,7 @@ static struct x11opt {
 
 static FILE *X11_ipc = (FILE *) 0;
 #ifdef PIPE_IPC
-#define X11_ipc_back_fd ipc_back_fd	/* defined in ipc.h */
+#define X11_ipc_back_fd ipc_back_fd
 #endif
 
 static char **xargv = (char **) NULL;
