@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.27 1999/11/24 13:31:17 lhecking Exp $
+ * $Id: plot.h,v 1.28 2000/02/11 19:17:20 lhecking Exp $
  *
  */
 
@@ -43,7 +43,6 @@
 #endif
 
 #include "syscfg.h"
-#include "ansichek.h"
 #include "stdfn.h"
 
 #ifdef USE_MOUSE
@@ -737,7 +736,6 @@ extern int plot_token;
 
 /* plot.c */
 extern TBOOLEAN interactive;
-extern TBOOLEAN noinputfiles;
 
 extern struct termentry *term;/* from term.c */
 extern TBOOLEAN undefined;		/* from internal.c */
