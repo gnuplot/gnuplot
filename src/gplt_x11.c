@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.81 2004/01/07 19:11:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.82 2004/01/08 15:58:45 lhecking Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3721,9 +3721,11 @@ process_event(XEvent *event)
 	 * happened, and how?  The fprintf to stderr is just for debugging. */
 	else if (plot->axis_mask) {
 	    double x, y, x2, y2;
+#ifdef DEBUG
 	    mouse_to_coords(plot, event, &x, &y, &x2, &y2);
 	    fprintf(stderr, "gnuplot_x11 %d: mouse button %1d from window %d at %g %g\n",
 		    __LINE__, event->xbutton.button, (plot ? plot->plot_number : 0), x, y);
+#endif
 	}
 #endif
 	break;

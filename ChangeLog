@@ -1,3 +1,8 @@
+2004-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* gplt_x11.c: Print the debugging message "gnuplot_x11 3769: mouse
+	button 1 from window 1 at 0 0" only #ifdef DEBUG.
+
 2004-01-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/configure.in: Remove superfluous file copying commands, now
