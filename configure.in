@@ -1,11 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.41.2.10 1999/11/21 20:20:02 lhecking Exp $
+dnl $Id: configure.in,v 1.41.2.11 1999/12/01 19:19:49 lhecking Exp $
 dnl
 AC_INIT(graphics.c)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.41.2.10 $)
+AC_REVISION($Revision: 1.41.2.11 $)
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 PL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION.$PL)
@@ -86,6 +86,18 @@ AC_ARG_ENABLE(rgip,dnl
 test -z "$enable_rgip" && enable_rgip=no
 )dnl
 
+dnl new Enhanced Metafile Format driver
+AC_ARG_ENABLE(emf,dnl
+[  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)],,
+test -z "$enable_emf" && enable_emf=no
+)dnl
+
+dnl new epslatex driver
+AC_ARG_ENABLE(epslatex,dnl
+[  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)],,
+test -z "$enable_epslatex" && enable_epslatex=no
+)dnl
+
 dnl configure.in body
 
 dnl Compiler characteristics
@@ -133,9 +145,11 @@ fi
 dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
-dnl Check for MSDOS and djgpp, NeXT
+dnl Check for MSDOS and djgpp, NeXT, Apple MacOsX (NeXT like), BeOS
 GP_MSDOS
 GP_NEXT
+GP_APPLE
+GP_BEOS
 
 dnl Apparently, -lNeXT_s is needed on NeXT
 dnl _instead_ of -lm ...
@@ -153,12 +167,14 @@ dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
 dnl headers and functions
 AC_HEADER_STDC
 
-dnl Standard headers
+dnl Header files
+dnl ANSI/ISO C, POSIX, others
 AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
-  time.h sys/time.h sys/timeb.h sys/types.h)
-dnl other
-AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
-  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h values.h)
+  time.h sys/time.h sys/timeb.h sys/types.h \
+  sys/bsdtypes.h sys/select.h sys/socket.h sys/stat.h \
+  sys/systeminfo.h sys/utsname.h libc.h malloc.h sgtty.h termios.h values.h
+)
+
 test "$ac_cv_header_sys_stat_h" = yes && AC_HEADER_STAT
 
 dnl check if unistd actually declares anything. On NeXT 3.2 unistd is
@@ -173,7 +189,7 @@ AC_TRY_COMPILE(
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif],
-  errno=0,AC_MSG_RESULT(yes),dnl
+  errno=0,AC_MSG_RESULT(yes),
   AC_DEFINE(EXTERN_ERRNO, 1,
             [ Define if <errno.h> declares errno. ])
   AC_MSG_RESULT(no)
@@ -183,23 +199,42 @@ AC_TRY_COMPILE(
 dnl Types.
 AC_TYPE_SIZE_T
 AC_MSG_CHECKING(for time_t in time.h)
-AC_EGREP_HEADER(time_t,time.h,dnl
-  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],dnl
-  [ AC_MSG_RESULT(no) AC_CHECK_TYPE(time_t, long)])
+AC_EGREP_HEADER(time_t,time.h,
+  [ ac_cv_type_time_t=yes; AC_MSG_RESULT(yes) ],
+  AC_MSG_RESULT(no)
+  AC_CHECK_TYPE(time_t, long))
 AC_TYPE_SIGNAL
  
 
 dnl Functions. Standard first, then others
 
+dnl ANSI/ISO and their predecessors
 dnl sunos 4 has on_exit() in place of atexit()
-AC_CHECK_FUNCS(atexit on_exit memcpy memmove memset bcopy bzero setvbuf \
-  strerror strchr index strrchr rindex strstr)
-
 dnl gamma is called lgamma on apollos and linux
 dnl we prefer lgamma over gamma, see specfun.c
 dnl math lib is already available, see operating systems part
-AC_CHECK_FUNCS(erf erfc gamma lgamma getcwd pclose popen sleep snprintf \
-  strncasecmp strnicmp sysinfo tcgetattr)
+AC_CHECK_FUNCS(atexit memcpy memmove memset \
+  on_exit bcopy bzero \
+  setvbuf strerror strchr strrchr strstr \
+  index rindex \
+  erf erfc gamma lgamma \
+  getcwd poll pclose popen select sleep snprintf stpcpy \
+  strcspn strdup strcasecmp stricmp strncasecmp strnicmp \
+  sysinfo tcgetattr vfprintf doprnt
+)
+
+dnl check, if we have sigsetjmp and siglongjmp.
+dnl a trivial AC_CHECK_FUNCS(sigsetjmp) won't do
+dnl because sigsetjmp() might be a macro declared
+dnl in <setjmp.h>. (joze)
+AC_MSG_CHECKING(for sigsetjmp)
+AC_TRY_LINK([#include <setjmp.h>], [jmp_buf env; sigsetjmp(env, 1);],
+  [AC_MSG_RESULT(yes)
+   AC_DEFINE(HAVE_SIGSETJMP, 1,
+             [ Define if we have sigsetjmp(). ])],
+  AC_MSG_RESULT(no)
+)
+
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
   AC_DEFINE(PIPES, 1,
             [ Define if you do have the popen and pclose functions. ])
@@ -218,7 +253,7 @@ if test "$with_linux_vga" = yes; then
     [AC_DEFINE(LINUXVGA, 1,
                [ Define if this is a Linux system with SuperVGA library. ])
      LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
-     TERMLIBS="$TERMLIBS -lvga"],dnl
+     TERMLIBS="$TERMLIBS -lvga"],
     with_linux_vga=no)
 fi
 
@@ -238,11 +273,11 @@ if test "$with_readline" != no; then
     done
 
     if test "$with_readline" = gnu; then
-      AC_CHECK_LIB(readline, readline,dnl
+      AC_CHECK_LIB(readline, readline,
        TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
       GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
-      if test "$ac_cv_lib_readline_readline" != no; then
+      if test "$ac_cv_lib_readline_readline" = yes; then
         TERMLIBS="$TERMLIBS $gp_tcap"
       fi
     fi
@@ -255,7 +290,7 @@ if test "$with_readline" != no; then
                 [ Define if you are using the GNU readline library. ])
     fi # ! ac_cv_lib_readline_readline = no
 
-  fi # ! with_readline != yes
+  fi # ! with_readline = no
 
   if test "$with_readline" = yes; then
     AC_DEFINE(READLINE, 1,
@@ -269,43 +304,22 @@ dnl libplot
 if test "$with_plot" != no; then
   if test "$with_plot" = yes; then
     dnl Unix plot library
-    AC_CHECK_LIB(plot,openpl,dnl
+    AC_CHECK_LIB(plot,openpl,
      AC_DEFINE(UNIXPLOT, 1,
                [ Define if you want to use the standard Unix plot library. ])
-     TERMLIBS="$TERMLIBS -lplot",dnl
+     TERMLIBS="$TERMLIBS -lplot",
      with_plot=no)
-  else
-    dnl GNU plot library - test for new version first
+  else # require GNU plotutils 2.2 or better
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
     GP_PATH_LIB(plot,pl_textangle,[$with_plot],[$TERMXLIBS])
     if test "$ac_cv_lib_plot_pl_textangle" = no; then
-      GP_PATH_LIB(plot,textangle,[$with_plot],[$TERMXLIBS])
-      if test "$ac_cv_lib_plot_textangle" = no; then
-        TERMXLIBS=
-        GP_PATH_LIB(plot,rotate,[$with_plot])
-        if test "$ac_cv_lib_plot_rotate" = no; then
-          AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
-          with_plot=no
-        else
-          AC_MSG_RESULT([ - using obsolete GNU graphics library])
-        fi # old GNU plotlib
-      else
-        AC_MSG_RESULT([ - using GNU plotutils library])
-      fi # GNU plotlib pre-2.2
-    else
-      GP_PATH_HEADER(plotcompat.h,[$with_plot],dnl
-        AC_DEFINE(HAVE_PLOTCOMPAT_H, 1,
-                  [ Define if you have the <plotcompat.h> header file. ]),
-        AC_MSG_WARN([found GNU plotutils 2.2+ library but not plotcompat.h])
-        AC_MSG_WARN([please add path to plotcompat.h to CPPFLAGS in Makefile])
-      ) # plotcompat.h
-    fi # new GNU plotlib
+      AC_MSG_WARN([GNU plotutils v2.2 or newer required -- disabling gnugraph terminal])
+      with_plot=no
+    fi # GNU plotutils v2.2
 
     if test "$with_plot" != no; then
       AC_DEFINE(GNUGRAPH, 1,
                 [ Define if you want to use the GNU version of the Unix plot library. ])
-      AC_DEFINE(GNU_PLOTUTILS, 1,
-                [ Define if your libplot.a is from GNU plotutils. ])
     fi
 
   fi # ! Unix plotlib
@@ -314,18 +328,17 @@ dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  GP_PATH_LIB(gd,gdImageGif,[$with_gd])
-  if test "$ac_cv_lib_gd_gdImageGif" != no; then
-    GP_PATH_HEADER(gd.h,[$with_gd],dnl
+  GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
+  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
+    GP_PATH_HEADER(gd.h,[$with_gd],
       dnl ACTION-IF-FOUND
       AC_DEFINE(HAVE_LIBGD, 1,
-                [ Define if you have Thomas Boutell's gd library. ]),dnl
+                [ Define if you have Thomas Boutell's gd library. ]),
       dnl ACTION-IF-NOT-FOUND
       AC_MSG_WARN([found gd library but not gd.h])
       AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile]))
   else
     AC_MSG_RESULT([- see term/gif.trm for download details])
-    with_gd=no
   fi
 fi
 dnl end gd
@@ -333,36 +346,35 @@ dnl end gd
 dnl check for png and z library
 if test "$with_png" != no; then
   GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
-  if test "$ac_cv_lib_png_png_info_init" != no; then
+  if test "$ac_cv_lib_png_png_info_init" = yes; then
     TERMLIBS="$TERMLIBS -lz"
-    GP_PATH_HEADER(png.h,[$with_png],,dnl
+    GP_PATH_HEADER(png.h,[$with_png],,
      AC_MSG_WARN([found png library but not png.h])
      AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
     )
-    GP_PATH_HEADER(zlib.h,[$with_png],,dnl
+    GP_PATH_HEADER(zlib.h,[$with_png],,
      AC_MSG_WARN([found z library but not zlib.h])
      AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
     )
-    if test "$ac_cv_header_png_h" != no; then
+    if test "$ac_cv_header_png_h" = yes; then
       AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
-],dnl
+],
        AC_MSG_WARN([- libpng too old - not including png driver])
-       with_png=no)
+       ac_cv_header_png_h=no)
     else
       AC_MSG_WARN([- cannot check png version - compilation may fail])
     fi
 
-  if test "$with_png" != no; then
+  if test "$ac_cv_header_png_h" = yes; then
     AC_DEFINE(HAVE_LIBPNG, 1,
               [ Define if you have the png library. ])
   fi
 
   else
     AC_MSG_RESULT([- see term/png.trm for download details])
-    with_png=no
   fi
 fi
 dnl end png and z
@@ -379,9 +391,9 @@ AC_EGREP_CPP(yes,
 [#ifdef SCO
 yes
 #endif
-],AC_CHECK_LIB(ccgi, v_opnwk,dnl
+],AC_CHECK_LIB(ccgi, v_opnwk,
     AC_DEFINE(CGI, 1,
-              [ Define if you want to use the CGI terminal under SCO. ])dnl
+              [ Define if you want to use the CGI terminal under SCO. ])
               TERMLIBS="$TERMLIBS -lccgi"))
 
 dnl Sun sunview
@@ -389,11 +401,11 @@ AC_EGREP_CPP(yes,
 [#ifdef sun
 yes
 #endif
-], AC_CHECK_LIB(suntool, window_create,dnl
-    AC_CHECK_HEADER(suntool/sunview.h,dnl
+], AC_CHECK_LIB(suntool, window_create,
+    AC_CHECK_HEADER(suntool/sunview.h,
     AC_DEFINE(SUN, 1,
-              [ Define if you want to use the sunview terminal (sun). ])dnl
-    TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect"),,dnl
+              [ Define if you want to use the sunview terminal (sun). ])
+    TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect"),,
     [-lsunwindow -lpixrect]))
 
 dnl Process with and enable options
@@ -404,24 +416,34 @@ if test "$with_cdwrc" = no; then
 fi
 
 if test "$enable_iris" = yes; then
-  AC_CHECK_LIB(gl_s,winopen,dnl
+  AC_CHECK_LIB(gl_s,winopen,
    AC_DEFINE(IRIS, 1,
              [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
-   TERMLIBS="$TERMLIBS -lgl_s",dnl
+   TERMLIBS="$TERMLIBS -lgl_s",
    enable_iris=no)
 fi
 
 if test "$enable_mgr" = yes; then
-  AC_CHECK_LIB(mgr,m_getinfo,dnl
+  AC_CHECK_LIB(mgr,m_getinfo,
    AC_DEFINE(MGR, 1,
              [ Define if you want to use the MGR Window system. ])
-   TERMLIBS="$TERMLIBS -lmgr -lpixrect",dnl
+   TERMLIBS="$TERMLIBS -lmgr -lpixrect",
    enable_mgr=no,[-lpixrect])
 fi
 
 if test "$enable_rgip" = yes; then
   AC_DEFINE(RGIP, 1,
             [ Define if you want to use the Redwood Graphics Interface Protocol. ])
+fi
+
+if test "$enable_emf" = yes; then
+  AC_DEFINE(USE_EMF_DRIVER, 1,
+            [ Define if you want to use the experimental Enhanced Metafile Format driver. ])
+fi
+
+if test "$enable_epslatex" = yes; then
+  AC_DEFINE(USE_EPSLATEX_DRIVER, 1,
+            [ Define if you want to use the experimental epslatex driver. ])
 fi
 
 dnl Substitute variables
@@ -441,10 +463,10 @@ AC_MSG_RESULT([
 
   Where is the help file?           $gp_datadir/gnuplot.gih
 ])
-test "$with_gd" != no && \
+test "$ac_cv_header_gd_h" = yes && \
   AC_MSG_RESULT([  Enable generation of GIF files])
 
-test "$with_png" != no && \
+test "$ac_cv_header_png_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PNG files])
 
 test "$with_cwdrc" = yes && \
@@ -462,13 +484,7 @@ fi
 if test "$with_plot" = yes; then
   AC_MSG_RESULT([  Use the Unix plot library])
 elif test "$with_plot" != no; then
-  AC_MSG_RESULT([  Use the GNU plot library,])
-  if test x"$ac_cv_header_plotcompat_h" != x && \
-     test "$ac_cv_header_plotcompat_h" != no ; then
-    AC_MSG_RESULT([    version 2.2 or newer])
-  else
-    AC_MSG_RESULT([    version 2.1 or older])
-  fi
+  AC_MSG_RESULT([  Use the GNU plot library])
 fi
 
 test "$with_lasergnu" = yes && \
@@ -479,6 +495,12 @@ if test "$with_linux_vga" = yes; then
   AC_MSG_RESULT([    SECURITY NOTICE: SVGAlib requires that])
   AC_MSG_RESULT([    gnuplot is installed suid root!])
 fi
+
+test "$enable_emf" = yes && \
+  AC_MSG_RESULT([  Enable Enhanced Metafile Format terminal (EXPERIMENTAL)])
+
+test "$enable_epslatex" = yes && \
+  AC_MSG_RESULT([  Enable epslatex terminal (EXPERIMENTAL)])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
