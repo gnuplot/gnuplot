@@ -27,6 +27,7 @@ tutorial.ps: tutorial.dvi
 tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	tutorial.tex header.tex
 	@if [ "$(LATEX)" != no ]; then \
+	  @echo Building LaTeX tutorial \
 	  TEXINPUTS=.:$(srcdir): $(LATEX) tutorial ; \
 	  TEXINPUTS=.:$(srcdir): $(LATEX) tutorial ; \
 	fi
