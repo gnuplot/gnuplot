@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.7 1999/11/08 19:19:15 lhecking Exp $
+# $Id: surface1.dem,v 1.8 2001/06/30 19:58:22 vanzandt Exp $
 #
 set samples 21
 set isosample 11
@@ -74,8 +74,6 @@ replot
 pause -1 "Hit return to continue (13)"
 set title "Sinc function"
 set zrange [-1:1]
-#set label 1 "This is equal to 1" at -5,-2,0.75 right
-#set arrow 1 from -5,-2.1,0.75 to 0,0,1
 set label 1 "This is equal to 1" at 0,3.2,1 left
 set arrow 1 from 0,3,1 to 0,0,1
 sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
@@ -206,7 +204,7 @@ pause -1 "Hit return to continue (24)"
 # mandelbrot demo
 set title "Mandelbrot function"
 set noparametric
-set mapping cart
+set mapping cartesian
 set view 60,30,1,1
 set auto
 set isosamples 60
