@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.8 1999/06/19 20:55:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.9 1999/06/22 11:58:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -310,7 +310,7 @@ int current;
 
 # ifdef VMS
     int chan, one = 1;
-    static $DESCRIPTOR(pgmdsc, pgm);
+    struct dsc$descriptor_s pgmdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
     static $DESCRIPTOR(lognamedsc, MAILBOX);
 # endif				/* VMS */
 
@@ -335,7 +335,8 @@ int current;
 	}
     }
 # ifdef VMS
-    pgmdsc.dsc$w_length = i;
+    pgmdsc.dsc$a_pointer = pgm;
+    pgmdsc.dsc$w_length = pgm_len;
     if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
 	os_error(NO_CARET, "sys$crembx failed");
 
