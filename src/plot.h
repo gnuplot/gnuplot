@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.11 1999/06/19 20:54:20 lhecking Exp $
+ * $Id: plot.h,v 1.12 1999/06/22 12:01:56 lhecking Exp $
  *
  */
 
@@ -391,17 +391,6 @@ typedef int (*sortfunc) __PROTO((const generic *, const generic *));
 typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
 #endif
 
-enum operators {
-	/* keep this in line with table in plot.c */
-	PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, CALL, CALLN, LNOT, BNOT, UMINUS,
-	LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
-	DIV, MOD, POWER, FACTORIAL, BOOLE,
-	DOLLARS, /* for using extension - div */
-	/* only jump operators go between jump and sf_start */
-   JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
-};
-
-
 #define is_jump(operator) ((operator) >=(int)JUMP && (operator) <(int)SF_START)
 
 
@@ -507,19 +496,6 @@ union argument {			/* p-code argument */
 	struct value v_arg;		/* constant value */
 	struct udvt_entry *udv_arg;	/* pointer to dummy variable */
 	struct udft_entry *udf_arg; /* pointer to udf to execute */
-};
-
-
-struct at_entry {			/* action table entry */
-	enum operators index;	/* index of p-code function */
-	union argument arg;
-};
-
-
-struct at_type {
-	int a_count;			/* count of entries in .actions[] */
-	struct at_entry actions[MAX_AT_LEN];
-		/* will usually be less than MAX_AT_LEN is malloc()'d copy */
 };
 
 
@@ -809,6 +785,7 @@ extern const char *user_gnuplotpath;
 #include "command.h"
 #include "datafile.h"
 #include "graphics.h"
+#include "parse.h"
 #include "util.h"
 #include "util3d.h"
 
