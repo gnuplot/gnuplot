@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.93 2002/10/20 21:19:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.94 2002/10/21 10:24:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -962,7 +962,7 @@ show_version(fp)
 		"-LIBGD  "
 #endif
 		, libpng =
-#ifdef HAVE_PNG
+#if defined(HAVE_PNG) || defined(HAVE_LIBPNG)
 		"+PNG  "
 #else
 		"-PNG  "

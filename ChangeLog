@@ -1,3 +1,8 @@
+2002-11-15  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/term.h src/show.c: Accommodate minor inconsistencies in the
+	PNG options in various Makefile.{OS} files.
+
 2002-11-13  Ethan Merritt  <merritt@u.washington.edu>
 
         * configure.in: Tweak the logic to correctly handle a more complete
@@ -1438,7 +1443,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/12 16:56:25 $).
+	last modification date (from the tag $Date: 2002/11/14 03:27:32 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.16 2002/03/23 11:10:32 mikulik Exp $
+ * $Id: term.h,v 1.17 2002/04/29 13:37:02 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -349,7 +349,7 @@
 #ifdef HAVE_NEWGD
 # include "gd.trm"
 #else
-#ifdef HAVE_LIBPNG
+#if defined(HAVE_LIBPNG) || defined(HAVE_PNG)
 # include "png.trm"
 #endif
 #endif
