@@ -1,4 +1,4 @@
-/* $Id: driver.h,v 1.19 2002/02/25 03:10:41 broeker Exp $ */
+/* $Id: driver.h,v 1.20 2004/04/13 17:24:16 broeker Exp $ */
 
 /* GNUPLOT - driver.h */
 
@@ -56,7 +56,8 @@ static int null_scale __PROTO((double x, double y));
 /* static int do_scale __PROTO((double x, double y)); */ /* unused */
 static void options_null __PROTO((void));
 static void UNKNOWN_null __PROTO((void));
-static int set_font_null __PROTO((const char *s));
+/* static int set_font_null __PROTO((const char *s));     */ /* unused */
+#define set_font_null NULL
 /* static void null_set_pointsize __PROTO((double size)); */ /* unused */
 
 extern FILE *gpoutfile;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.81 2004/08/14 04:41:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.82 2004/08/19 05:05:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -207,7 +207,6 @@ static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
 static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
-static int set_font_null __PROTO((const char *s));
 
 /* Support for enhanced text mode. These can be static because all  */
 /* the terminal drivers are included into term.c at compile time.   */
@@ -830,7 +829,7 @@ write_multiline(
 	return;
 
     /* EAM 9-Feb-2003 - Set font before calculating sizes */
-    if (font && *font)
+    if (font && *font && t->set_font)
 	(*t->set_font) (font);
 
     if (vert != JUST_TOP) {
@@ -877,7 +876,7 @@ write_multiline(
 	text = p + 1;
     }				/* unconditional branch back to the for(;;) - just a goto ! */
 
-    if (font && *font)
+    if (font && *font && t->set_font)
 	(*t->set_font) ("");
 
 }
@@ -1232,13 +1231,6 @@ PUTTEXT_null(unsigned int x, unsigned int y, const char *s)
 }
 
 
-static int
-set_font_null(const char *s)
-{
-    (void) s;			/* avoid -Wunused warning */
-    return FALSE;
-}
-
 static void
 null_linewidth(double s)
 {
@@ -1389,8 +1381,6 @@ change_term(const char *name, int length)
 	term->point = do_point;
     if (term->arrow == 0)
 	term->arrow = do_arrow;
-    if (term->set_font == 0)
-	term->set_font = set_font_null;
     if (term->pointsize == 0)
 	term->pointsize = do_pointsize;
     if (term->linewidth == 0)
