@@ -25,7 +25,8 @@ ps_fontfile_doc.pdf: ps_fontfile_doc.tex
 	pdflatex ps_fontfile_doc
 
 clean:
-	-rm -f ps_symbols.ps ps_fontfile_doc.{ps,log,aux,dvi,pdf}
+	-rm -f ps_symbols.ps ps_fontfile_doc.aux ps_fontfile_doc.dvi \
+	       ps_fontfile_doc.log ps_fontfile_doc.pdf ps_fontfile_doc.ps
 
 distclean: clean
 
