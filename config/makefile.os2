@@ -1,10 +1,10 @@
 #
-# $Id: makefile.os2,v 1.23 2001/12/01 13:08:59 amai Exp $
+# $Id: makefile.os2,v 1.24 2001/12/09 19:04:06 lhecking Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
 #
-# last modification date: (see CVS Id)
+# last modification date: (see CVS timestamp)
 #
 
 # We depend on using cmd.exe (or a compatible one) and the
@@ -69,10 +69,10 @@ PM3D=1
 # A reasonable default
 default: runtime
 
-# a help screen
+# A basic help screen
 help:
 	   @echo " Usage: $(MAKE) -f makefile.os2 target"
-	   @echo "   target is one of:"
+	   @echo "   where target is one of:"
 	   @echo "   all runtime alldocs demo binaries infomin help clean veryclean"
 
 #
@@ -294,19 +294,23 @@ gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 #
 # Create documentation in various formats
 #
-# Don't care about the strange way it's implemented ...
+# The idea behind the renaming business is that we may want to
+# use various LaTeX systems which may choke if they find existing
+# intermediate files from other systems.
 # Call LaTeX three times to get the toc right.
 $(DOCDIR)\gnuplot.dvi: $(DOCDIR)\gnuplot.tex
 	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_2.tex
 	cd $(DOCDIR) && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex
+	if exist $(DOCDIR)\gnuplot.dvi del $(DOCDIR)\gnuplot.dvi
 	move $(DOCDIR)\gnuplot_2.dvi $(DOCDIR)\gnuplot.dvi
 	del $(DOCDIR)\gnuplot_2*
 $(DOCDIR)\gnuplot.ps: $(DOCDIR)\gnuplot.dvi
 	$(DVIPS) -o $@ $(DOCDIR)\gnuplot.dvi
 $(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
-	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex
-	move $(DOCDIR)\gnuplot_2.pdf $(DOCDIR)\gnuplot.pdf
+	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_3.tex
+	cd $(DOCDIR) && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex && $(PDFLATEX) gnuplot_3.tex
+	if exist $(DOCDIR)\gnuplot.pdf del $(DOCDIR)\gnuplot.pdf
+	move $(DOCDIR)\gnuplot_3.pdf $(DOCDIR)\gnuplot.pdf
 $(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
 	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
 $(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
@@ -326,9 +330,9 @@ $(DOCDIR)\gnuplot.ms:   $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ms.exe
 $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ipf.exe
 	$(DOCDIR)\doc2ipf.exe $(DOCDIR)\gnuplot.doc $@
 # Assume we need A4 format
-gpcard.ps: $(DOCDIR)\gpcard.dvi
-	$(DVIPS) -o gpcard_letter.ps $< 
-	psresize -pletter -Pa4 gpcard_letter.ps $@
+$(DOCDIR)\gpcard.ps: $(DOCDIR)\gpcard.dvi
+	cd $(DOCDIR) && $(DVIPS) -o gpcard_letter.ps $< 
+	cd $(DOCDIR) && psresize -pletter -Pa4 gpcard_letter.ps $@
 $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
 	cd $(DOCDIR) && $(PLAINTEX) gpcard.tex && $(PLAINTEX) gpcard.tex
 
@@ -383,26 +387,28 @@ clean:
 	IF EXIST $(DEMODIR)\bf_test.exe    DEL $(DEMODIR)\bf_test.exe
 	IF EXIST $(DOCDIR)\doc2*.exe       DEL $(DOCDIR)\doc2*.exe
 	IF EXIST $(DOCDIR)\gnuplot.ipf     DEL $(DOCDIR)\gnuplot.ipf
+	IF EXIST $(DOCDIR)\gnuplot_2*      DEL $(DOCDIR)\gnuplot_2*
+	IF EXIST $(DOCDIR)\gnuplot_3*      DEL $(DOCDIR)\gnuplot_3*
 	IF EXIST core                      DEL core
-	IF EXIST $(DOCDIR)\allterm.h       DEL $(DOCDIR)\allterm.h
+	IF EXIST $(DOCDIR)\allterm.?       DEL $(DOCDIR)\allterm.?
 
 # Clean up ALL files that were not part of the source distribution
 veryclean: clean
 	IF EXIST *.exe                     DEL *.exe         
-	IF EXIST gnuplot.dvi               DEL gnuplot.dvi
-	IF EXIST gnuplot.gih               DEL gnuplot.gih
-	IF EXIST gnupmdrv.hlp              DEL gnupmdrv.hlp
-	IF EXIST gnuplot.html              DEL gnuplot.html
-	IF EXIST gnuplot.inf               DEL gnuplot.inf
-	IF EXIST gnuplot.info              DEL gnuplot.info
-	IF EXIST gnuplot.ms                DEL gnuplot.ms
-	IF EXIST gnuplot.ps                DEL gnuplot.ps
-	IF EXIST gnuplot.pdf               DEL gnuplot.pdf
-	IF EXIST gnuplot.rtf               DEL gnuplot.rtf
-	IF EXIST gnuplot.tex               DEL gnuplot.tex
-	IF EXIST gpcard*.ps                DEL gpcard*.ps
-	cd $(DOCDIR)  && IF EXIST *.dvi    DEL *.dvi
-	cd $(DOCDIR)  && IF EXIST *.log    DEL *.log
-	cd $(DOCDIR)  && IF EXIST *.aux    DEL *.aux
-	cd $(DOCDIR)  && IF EXIST *.toc    DEL *.toc
-	cd $(DEMODIR) && IF EXIST binary?  DEL binary?
+	IF EXIST $(DOCDIR)\gnuplot.dvi     DEL $(DOCDIR)\gnuplot.dvi
+	IF EXIST $(DOCDIR)\gnuplot.gih     DEL $(DOCDIR)\gnuplot.gih
+	IF EXIST $(DOCDIR)\gnupmdrv.hlp    DEL $(DOCDIR)\gnupmdrv.hlp
+	IF EXIST $(DOCDIR)\gnuplot.html    DEL $(DOCDIR)\gnuplot.html
+	IF EXIST $(DOCDIR)\gnuplot.inf     DEL $(DOCDIR)\gnuplot.inf
+	IF EXIST $(DOCDIR)\gnuplot.info    DEL $(DOCDIR)\gnuplot.info
+	IF EXIST $(DOCDIR)\gnuplot.ms      DEL $(DOCDIR)\gnuplot.ms
+	IF EXIST $(DOCDIR)\gnuplot.ps      DEL $(DOCDIR)\gnuplot.ps
+	IF EXIST $(DOCDIR)\gnuplot.pdf     DEL $(DOCDIR)\gnuplot.pdf
+	IF EXIST $(DOCDIR)\gnuplot.rtf     DEL $(DOCDIR)\gnuplot.rtf
+	IF EXIST $(DOCDIR)\gnuplot.tex     DEL $(DOCDIR)\gnuplot.tex
+	IF EXIST $(DOCDIR)\gpcard*.ps      DEL $(DOCDIR)\gpcard*.ps
+	IF EXIST $(DOCDIR)\*.dvi           DEL $(DOCDIR)\*.dvi
+	IF EXIST $(DOCDIR)\*.log           DEL $(DOCDIR)\*.log
+	IF EXIST $(DOCDIR)\*.aux           DEL $(DOCDIR)\*.aux
+	IF EXIST $(DOCDIR)\*.toc           DEL $(DOCDIR)\*.toc
+	IF EXIST $(DEMODIR)\binary?        DEL $(DEMODIR)\binary?
