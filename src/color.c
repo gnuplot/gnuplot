@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.38 2003/01/07 22:29:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.39 2003/01/22 08:47:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -186,6 +186,8 @@ make_palette(void)
 void
 set_color(double gray)
 {
+    if (!(term->set_color))
+	return;
     if (sm_palette.positive == SMPAL_NEGATIVE)
 	gray = 1 - gray;
     term->set_color(gray);

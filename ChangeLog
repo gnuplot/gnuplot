@@ -1,3 +1,7 @@
+2003-11-10  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/color.c: Don't try to set color of non-supporting terminals.
+
 2003-11-06  Ethan Merritt <merritt@u.washington.edu>
 
 	* configure.in, term/pdf.trm:  Test for and accommodate older
