@@ -55,8 +55,12 @@ static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
 #include "stdfn.h"
 
 #define MAX_LINE_LEN    1024
-#define TRUE 1
 #define MAX_COL 6
+#ifdef TRUE
+# undef TRUE
+# undef FALSE
+#endif
+#define TRUE 1
 #define FALSE 0
 
 #include "termdoc.c"

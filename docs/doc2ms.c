@@ -69,6 +69,10 @@ static char *RCSid = "$Id: doc2ms.c,v 1.19 1998/06/18 14:59:11 ddenholm Exp $";
 #define MAX_LINE_LEN	256
 #define LINE_SKIP		3
 
+#ifdef TRUE
+# undef TRUE
+# undef FALSE
+#endif
 #define TRUE 1
 #define FALSE 0
 

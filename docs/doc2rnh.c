@@ -73,6 +73,10 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
 #define LINE_SKIP		3
 #define DSR_RM		70
 
+#ifdef TRUE
+# undef TRUE
+# undef FALSE
+#endif
 #define TRUE 1
 #define FALSE 0
 

@@ -65,6 +65,10 @@
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
+#ifdef TRUE
+# undef TRUE
+# undef FALSE
+#endif
 #define TRUE 1
 #define FALSE 0
 

@@ -56,6 +56,10 @@ static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
 #include "stdfn.h"
 
 #define MAX_LINE_LEN	256
+#ifdef TRUE
+# undef TRUE
+# undef FALSE
+#endif
 #define TRUE 1
 #define FALSE 0
 
