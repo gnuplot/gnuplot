@@ -4,7 +4,7 @@ Changes in release 3.7.2:
   inverse error function from platforms that have no native implementation.
 * Support for BeOS
 * New terminal drivers: emf (Enhanced Metafile Format), epslatex,
-  ggi (General Graphics Interface)
+  ggi (General Graphics Interface), pdf, svg (W3C Scalable Vector Graphics)
 * Updated png driver: web-friendly palette, transparent images,
   explicit colour specification
 * Updated HPGL driver: optional multi-pen support, alternative plot sizes,
@@ -17,6 +17,7 @@ Changes in release 3.7.2:
 * configure-alike script for VMS
 * Command substitution in double-quoted strings
 * Vector clipping style for 2D plots
+* Sort terminals by name before displaying
 * Numerous bugfixes
 Changes in release 3.7.1:
 * Updated makefiles and autoconf files
