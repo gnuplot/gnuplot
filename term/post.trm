@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.117 2004/07/21 11:34:51 broeker Exp $
+ * $Id: post.trm,v 1.118 2004/08/01 03:53:02 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -147,6 +147,7 @@ static int  ps_enh_fontsize;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
 static TBOOLEAN ps_color = FALSE;
+static TBOOLEAN ps_level2 = TRUE;		/*  Use level 2 pattern-fill */
 static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
 static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
 static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
@@ -493,31 +494,29 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
 
 #if USE_ULIG_FILLEDBOXES
-/* filled box in current color,
-   but color lightened up as defined by filldensity (ULIG),
-   usage:   density x1 y1 x2 y2 BoxColFill */
-"/BoxColFill { gsave Rec PolyFill } def\n",
-
-/* Generalization of BoxColFill to polygons
- * usage: gsave x1 y1 N x2 y2 V ... xi yi V density PolyFill
- */
-"/PolyFill {\n",
-"  gsave\n",
+"/Density {\n",
 "  /Fillden exch def\n",
 "  currentrgbcolor\n",
 "  /ColB exch def /ColG exch def /ColR exch def\n",
 "  /ColR ColR Fillden mul Fillden sub 1 add def\n",
 "  /ColG ColG Fillden mul Fillden sub 1 add def\n",
 "  /ColB ColB Fillden mul Fillden sub 1 add def\n",
-"  ColR ColG ColB setrgbcolor\n",
-"  fill grestore grestore } def\n",
+"  ColR ColG ColB setrgbcolor } def\n",
 
-"%\n",
-"%Special short form for the common case of solid quadrangle\n",
+/* filled box in current color,
+   but color lightened up as defined by filldensity (ULIG),
+   usage:   density x1 y1 x2 y2 BoxColFill */
+"/BoxColFill { gsave Rec PolyFill } def\n",
+/* Generalization of BoxColFill to polygons
+ * usage: gsave x1 y1 N x2 y2 V ... xi yi V density PolyFill
+ */
+"/PolyFill {gsave Density  fill grestore grestore} def\n",
+
+/* Special short form for the common case of a solid quadrangle */
 "/h {rlineto rlineto rlineto gsave fill grestore} bind def\n",
 
 "%\n",
-"% PostScript Level 1 Pattern Fill routine\n",
+"% PostScript Level 1 Pattern Fill routine for rectangles\n",
 /* original code: Dick Crawford <crawford@arete.com> */
 /* modified by: Ethan A Merritt <merritt@u.washington.edu> */
 "% Usage: x y w h s a XX PatternFill\n",
@@ -546,7 +545,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 
 #define EAM_PSLEVEL2
 /*
- * To protect this stuff at run-time rather than at compile time:
+ * To select which code block at run-time rather than at plot time:
  *
  * /languagelevel where
  *   {pop languagelevel} {1} ifelse
@@ -560,7 +559,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "% PostScript level 2 pattern fill definitions\n",
 "% Ethan A Merritt April 2004\n",
 "%\n",
-"% Pattern fill definitions\n",
+"/Level2PatternFill {\n",
 
 "/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}\n",
 "          bind def\n",
@@ -626,7 +625,26 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/Pattern5 {KeepColor Landscape { Pat4 } { Pat5 } ifelse setpattern} bind def\n",
 "/Pattern6 {KeepColor Landscape { Pat9 } { Pat6 } ifelse setpattern} bind def\n",
 "/Pattern7 {KeepColor Landscape { Pat8 } { Pat7 } ifelse setpattern} bind def\n",
+"} def\n%\n",
 "%\n%End of PostScript Level 2 code\n%\n",
+
+"%\n",
+"% Substitute for Level 2 pattern fill codes with\n",
+"% grayscale if Level 2 support is not selected.\n",
+"%\n",
+"/Level1PatternFill {\n",
+"/Pattern1 {0.250 Density} bind def\n",
+"/Pattern2 {0.500 Density} bind def\n",
+"/Pattern3 {0.750 Density} bind def\n",
+"/Pattern4 {0.125 Density} bind def\n",
+"/Pattern5 {0.375 Density} bind def\n",
+"/Pattern6 {0.625 Density} bind def\n",
+"/Pattern7 {0.875 Density} bind def\n",
+"} def\n",
+
+"%\n% Now test for support of Level 2 code\n%\n",
+"Level2 {Level2PatternFill} {Level1PatternFill} ifelse\n%\n",
+
 #endif /* EAM_PSLEVEL2 */
 
 /* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
@@ -770,6 +788,7 @@ enum PS_id {
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
+    PS_LEVEL2, PS_NOLEVEL2,
     PS_OTHER
 };
 
@@ -802,6 +821,8 @@ static struct gen_table PS_opts[] =
 #ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
+    { "level2", PS_LEVEL2 },
+    { "nolevel2", PS_NOLEVEL2 },
     { NULL, PS_OTHER }
 };
 
@@ -811,6 +832,7 @@ PS_options()
 {
     struct value a;
     char *ps_fontfile_char = NULL;
+    ps_level2 = TRUE;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PS_opts[0],c_token)) {
@@ -824,6 +846,14 @@ PS_options()
 	    ps_eps = FALSE;
 	    c_token++;
 	    break;
+	case PS_LEVEL2:
+	    ps_level2 = TRUE;
+	    c_token++;
+	    break;
+	case PS_NOLEVEL2:
+	    ps_level2 = FALSE;
+	    c_token++;
+	    break;
 	case PS_EPSF:
 	    ps_portrait = TRUE;
 	    ps_eps = TRUE;
@@ -831,6 +861,7 @@ PS_options()
 	    break;
 	case PS_DEFAULT:
 	    ps_portrait = FALSE;
+	    ps_level2 = TRUE;
 	    ps_eps = FALSE;
 	    ps_color = FALSE;
 	    ps_blacktext = FALSE;
@@ -1082,7 +1113,7 @@ PS_options()
 #ifdef PM3D
 	                 "   palfuncparam %d,%g \\\n"
 #endif /* PM3D */
-	                 "   %s \"%s\" %d%s",
+	                 "   %s \"%s\" %d%s %s",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
@@ -1097,7 +1128,9 @@ PS_options()
 #endif /* PM3D */
 	    ps_rounded ? "rounded" : "butt",
 	    ps_font,ps_fontsize,
-	    ps_fontfile_char ? ps_fontfile_char : "");
+	    ps_fontfile_char ? ps_fontfile_char : "",
+	    ps_level2 ? "level2" : "nolevel2"
+	    );
 }
 
 /* store settings passed to common_init() for use in PS_graphics()
@@ -1344,10 +1377,14 @@ PS_common_init(
     static const char GPFAR psi2[] = "\
 %%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
+%\n\
+%The following 5 true/false flags may be edited by hand if required\n\
+%\n\
 /Color %s def\n\
 /Blacktext %s def\n\
 /Solid %s def\n\
 /Landscape %s def\n\
+/Level2 %s def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 /vshift %d def\n\
@@ -1757,7 +1794,8 @@ NULL };
 	    ps_color ? "true" : "false",
 	    ps_blacktext ? "true" : "false",
 	    ps_solid ? "true" : "false",
-		ps_portrait ? "false" : "true",
+	    ps_portrait ? "false" : "true",
+	    ps_level2 ? "true" : "false",
 	    PS_LW*ps_linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*ps_dash_length,	/* dash length */
@@ -2919,7 +2957,7 @@ START_HELP(post)
 "                               {blacktext | colortext | colourtext}",
 "                               {solid | dashed} {dashlength | dl <DL>}",
 "                               {linewidth | lw <LW>}",
-"                               {<duplexing>}",
+"                               {<duplexing>} {{no}level2}",
 "                               {rounded | butt}",
 "                               {fontfile [add | delete] \"<filename>\"}",
 "                               {palfuncparam <samples>{,<maxdeviation>}}",
@@ -2934,11 +2972,22 @@ START_HELP(post)
 " `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",
 " (which is a floating-point number greater than zero);",
 " `linewidth` or `lw` scales all linewidths by <LW>;",
+"",
 " <duplexing> is `defaultplex`, `simplex` or `duplex` (\"duplexing\" in",
 " PostScript is the ability of the printer to print on both sides of the same",
 " page---don't set this if your printer can't do it);",
+"",
+" By default the generated PostScript code uses language features that were",
+" introduced in PostScript Level 2, notably pattern-fill of irregular objects",
+" such as filledcurves.  However, not all PostScript viewers support these",
+" features. The `nolevel2` flag substitutes Level 1 compatible code instead.",
+" This flag can be toggled later by editing a single line of the PostScript",
+" output file itself, if necessary. Older versions of Adobe Illustrator may",
+" not accept gnuplot output generated with level2 set.",
+"",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins;",
+"",
 " `\"<fontname>\"` is the name of a valid PostScript font; and `<fontsize>` is",
 " the size of the font in PostScript points.",
 " In addition to the standard postscript fonts, an oblique version of the",

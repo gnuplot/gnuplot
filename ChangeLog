@@ -1,3 +1,13 @@
+2004-08-01  Ethan Merritt  <merritt@u.washington.edu>
+            Harald Harders  <h.harders@tu-bs.de>
+
+	* term/post.trm: Introduce a boolean value PSLevel2 into the PostScript
+	prolog, and use it to determine whether pattern-fill is defined using
+	PostScript Level 2 primitives or via a Level 1 solid fill. Introduce a
+	corresponding option 'set term post ... {no}level2'.  Setting level2
+	to false either via 'set term' or by editing the output PostScript file
+	accommodates older printers and older versions of Adobe Illustrator.
+
 2004-07-31  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm (PS_common_init PS_put_text ENHPS_put_text):
