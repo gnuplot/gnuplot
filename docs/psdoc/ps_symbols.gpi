@@ -12,6 +12,87 @@ set label '40' at  1.07*f(40), 1.07*g(40) center
 set label '50' at  1.07*f(50), 1.07*g(50) center
 set label '60' at  1.07*f(60), 1.07*g(60) center
 set label '70' at  1.07*f(70), 1.07*g(70) center
+
+set noarrow
+f1(x)=0.45 *cos(pi*x/38.0); g1(x)=0.45 *sin(pi*x/38.0)
+f2(x)=0.97*cos(pi*x/38.0); g2(x)=0.97*sin(pi*x/38.0)
+l= 0; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+l=l+1; set arrow from f1(l),g1(l) to f2(l),g2(l) nohead lt l
+
 plot f( 0),g( 0) w p 0  0,\
  f( 1),g( 1) w p 0  1,  f( 2),g( 2) w p 0  2,  f( 3),g( 3) w p 0  3,\
  f( 4),g( 4) w p 0  4,  f( 5),g( 5) w p 0  5,  f( 6),g( 6) w p 0  6,\
@@ -38,3 +119,4 @@ plot f( 0),g( 0) w p 0  0,\
  f(67),g(67) w p 0 67,  f(68),g(68) w p 0 68,  f(69),g(69) w p 0 69,\
  f(70),g(70) w p 0 70,  f(71),g(71) w p 0 71,  f(72),g(72) w p 0 72,\
  f(73),g(73) w p 0 73,  f(74),g(74) w p 0 74,  f(75),g(75) w p 0 75
+
