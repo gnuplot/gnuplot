@@ -278,8 +278,7 @@ AC_EGREP_CPP(yes,
               [ Define if you want to use libgrx20 with MSDOS/djgpp. ])
     AC_CHECK_LIB(grx20,GrCustomLine,
       AC_DEFINE(GRX21, 1,
-                [ Define if you want to use a newer version of libgrx
-                  under MSDOS/djgpp. ])dnl
+                [ Define if you want to use a newer version of libgrx under MSDOS/djgpp. ])dnl
     )dnl
   ),
   AC_MSG_RESULT(no)
@@ -430,12 +429,10 @@ changequote([,]),dnl
     ac_cast="($ac_cv_type_fd_set *)",dnl
     # No fd_set type; it is safe to define it
     AC_DEFINE_UNQUOTED(fd_set,$ac_cv_type_fd_set,
-                       [ Define if the type in arguments 2-4 to select
-                         is fd_set. ]))
+                       [ Define if the type in arguments 2-4 to select is fd_set. ]))
   fi
   AC_DEFINE_UNQUOTED(SELECT_FD_SET_CAST,$ac_cast,
-                     [ Define if the type in arguments 2-4 to select
-                       is fd_set. ])
+                     [ Define if the type in arguments 2-4 to select is fd_set. ])
 fi
 ])
 

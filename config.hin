@@ -231,8 +231,7 @@
 /*  Define if you want to use libgrx20 with MSDOS/djgpp.  */
 #undef DJSVGA
 
-/*  Define if you want to use a newer version of libgrx
-                  under MSDOS/djgpp.  */
+/*  Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
 #undef GRX21
 
 /*  Define if <errno.h> declares errno.  */
@@ -244,12 +243,10 @@
 /*  First arg for select.  */
 #undef fd_set_size_t
 
-/*  Define if the type in arguments 2-4 to select
-                         is fd_set.  */
+/*  Define if the type in arguments 2-4 to select is fd_set.  */
 #undef fd_set
 
-/*  Define if the type in arguments 2-4 to select
-                       is fd_set.  */
+/*  Define if the type in arguments 2-4 to select is fd_set.  */
 #undef SELECT_FD_SET_CAST
 
 /*  Define if this is a Linux system with SuperVGA library.  */
@@ -270,8 +267,7 @@
 /*  Define if you have the <plotcompat.h> header file.  */
 #undef HAVE_PLOTCOMPAT_H
 
-/*  Define if you want to use the GNU version of the Unix plot
-                  library.  */
+/*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
 
 /*  Define if your libplot.a is from GNU plotutils.  */
@@ -289,25 +285,21 @@
 /*  Define if you want to use the sunview terminal (sun).  */
 #undef SUN
 
-/*  Define if you do not want to read .gnuplot in the current
-              directory.  */
+/*  Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
 /*  Define to use thin plate spines. EXPERIMENTAL  */
 #undef THIN_PLATE_SPLINES_GRID
 
-/*  Define if you want online help and subtopic tables sorted
-              by column.  */
+/*  Define if you want online help and subtopic tables sorted by column.  */
 #undef COLUMN_HELP
 
-/*  Define if you want to use the IRIS terminal on IRIS4D series
-               computers.  */
+/*  Define if you want to use the IRIS terminal on IRIS4D series computers.  */
 #undef IRIS
 
 /*  Define if you want to use the MGR Window system.  */
 #undef MGR
 
-/*  Define if you want to use the Redwood Graphics Interface
-              Protocol.  */
+/*  Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
 
