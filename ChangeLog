@@ -1,3 +1,30 @@
+2001-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	A new 'smooth' method, implemented by Todd Lewis
+ 	<utoddl@email.unc.edu>. This is a modified version of Patch
+ 	#438326 from SourceForge.
+	
+	* src/gp_types.h (enum PLOT_SMOOTH): New label SMOOTH_FREQUENCY.
+
+	* src/tables.c (plot_smooth_tbl): Added parse table entry for
+ 	smooth option 'f$requency'.
+
+	* src/plot2d.c (plot_smooth_names): Added entry for "Frequency".
+	(eval_plots): Added handling for case SMOOTH_FREQUENCY.
+
+	* src/interpol.c (do_freq): New function to implement 'smooth
+ 	frequency'. Takes care of extending the axis ranges, if
+ 	autoscalilng.
+	(gen_interp_frequency): New function, replaces gen_interp() for
+ 	this particular smoothing method.
+	(cp_implode): Avoid division by number of imploded input
+ 	datapoints, so we get counts or sums instead of averages.
+
+	* docs/gnuplot.doc: Document new 'smooth frequency' option.
+
+	* demo/steps.dem: Added demonstration plot to show typical use of
+ 	'smooth frequency' to collect a histogram from unsorted data.
+
 2001-07-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Release 3.8g snapshot

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.71 2001/07/27 14:46:09 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.72 2001/08/06 12:09:55 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2393,14 +2393,14 @@ C ... and restart the table:
  externally or by using `fit` with an appropriate model.
 
  Syntax:
-       smooth {unique | csplines | acsplines | bezier | sbezier}
+       smooth {unique | frequency | csplines | acsplines | bezier | sbezier}
 
- `unique` plots the data after making them monotonic.  Each of the other
- routines uses the data to determine the coefficients of a continuous curve
- between the endpoints of the data.  This curve is then plotted in the same
- manner as a function, that is, by finding its value at uniform intervals
- along the abscissa (see `set samples`) and connecting these points with
- straight line segments (if a line style is chosen).
+ `unique` and `frequency` plot the data after making them monotonic.  Each of
+ the other routines uses the data to determine the coefficients of a
+ continuous curve between the endpoints of the data.  This curve is then
+ plotted in the same manner as a function, that is, by finding its value at
+ uniform intervals along the abscissa (see `set samples`) and connecting these
+ points with straight line segments (if a line style is chosen).
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.
@@ -2411,8 +2411,8 @@ C ... and restart the table:
  the fixed abscissa range as defined by `set xrange`. 
 
  If too few points are available to allow the selected option to be applied,
- an error message is produced.  The minimum number is one for `unique`, four
- for `acsplines`, and three for the others.
+ an error message is produced.  The minimum number is one for `unique`, and
+ `frequency`, four for `acsplines`, and three for the others.
 
  The `smooth` options have no effect on function plots.
 5 acsplines
@@ -2492,6 +2492,18 @@ C ... and restart the table:
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html"> See demos. </a>
+5 frequency
+?commands plot datafile smooth frequency
+?plot datafile smooth frequency
+?plot smooth frequency
+?data-file smooth frequency
+?datafile smooth frequency
+?plot frequency
+?smooth frequency
+?frequency
+ The `frequency` option makes the data monotonic in x; points with the same
+ x-value are replaced by a single point having the summed y-values.  The
+ resulting points are then connected by straight line segments.
 4 special-filenames
 ?commands plot datafile special-filenames
 ?plot datafile special-filenames

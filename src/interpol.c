@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.22 2001/07/23 16:10:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.23 2001/07/27 14:47:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -201,6 +201,7 @@ static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
 static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
+static void do_freq __PROTO((struct curve_points *plot,	int first_point, int num_points));		
 int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 
@@ -815,9 +816,90 @@ do_cubic(plot, sc, first_point, num_points, dest)
 
 }
 
+
 /*
- * This is the main entry point used. As stated in the header, it is fine,
- * but I'm not too happy with it.
+ * do_freq() is like the other smoothers only in that it
+ * needs to adjust the plot ranges. We don't have to copy
+ * approximated curves or anything like that.
+ */
+
+static void
+do_freq(plot, first_point, num_points)
+    struct curve_points *plot;	/* still contains old plot->points */
+    int first_point;		/* where to start in plot->points */
+    int num_points;		/* to determine end in plot->points */
+{
+    double xdiff, temp, x, y;
+    int i, l;
+    int x_axis = plot->x_axis;
+    int y_axis = plot->y_axis;
+    struct coordinate GPHUGE *this;
+
+    /* min and max in internal (eg logged) co-ordinates. We update
+     * these, then update the external extrema in user co-ordinates
+     * at the end.
+     */
+
+    double ixmin, ixmax, iymin, iymax;
+    double sxmin, sxmax, symin, symax;	/* starting values of above */
+
+    ixmin = sxmin = AXIS_LOG_VALUE(x_axis, X_AXIS.min);
+    ixmax = sxmax = AXIS_LOG_VALUE(x_axis, X_AXIS.max);
+    iymin = symin = AXIS_LOG_VALUE(y_axis, Y_AXIS.min);
+    iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
+
+    this = (plot->points) + first_point;
+
+    for (i=0; i<num_points; i++) {
+
+	x = this[i].x;
+	y = this[i].y;
+
+	this[i].type = INRANGE;
+
+	STORE_AND_FIXUP_RANGE(this[i].x, x, this[i].type, ixmin, ixmax, X_AXIS.autoscale, NOOP, continue);
+	STORE_AND_FIXUP_RANGE(this[i].y, y, this[i].type, iymin, iymax, Y_AXIS.autoscale, NOOP, NOOP);
+
+	this[i].xlow = this[i].xhigh = this[i].x;
+	this[i].ylow = this[i].yhigh = this[i].y;
+	this[i].z = -1;
+    }
+
+    UPDATE_RANGE(ixmax > sxmax, X_AXIS.max, ixmax, x_axis);
+    UPDATE_RANGE(ixmin < sxmin, X_AXIS.min, ixmin, x_axis);
+    UPDATE_RANGE(iymax > symax, Y_AXIS.max, iymax, y_axis);
+    UPDATE_RANGE(iymin < symin, Y_AXIS.min, iymin, y_axis);
+}
+
+
+/*
+ * Frequency plots have don't need new points allocated; we just need
+ * to adjust the plot ranges. Wedging this into gen_interp() would
+ * make that code even harder to read.
+ */
+ 
+void
+gen_interp_frequency(plot)
+    struct curve_points *plot;
+{
+
+    int i, curves;
+    int first_point, num_points;
+
+    curves = num_curves(plot);
+
+    first_point = 0;
+    for (i = 0; i < curves; i++) {
+	num_points = next_curve(plot, &first_point);
+	do_freq(plot, first_point, num_points);
+	first_point += num_points + 1;
+    }
+    return;
+}
+
+/*
+ * This is the main entry point used for everything except frequencies.
+ * As stated in the header, it is fine, but I'm not too happy with it.
  */
 
 void
@@ -967,6 +1049,8 @@ cp_implode(cp)
 		k++;
 	    } else {
 		cp->points[j].x = x;
+ 		if ( cp->plot_smooth == SMOOTH_FREQUENCY )
+		    k = 1;
 		cp->points[j].y = y /= (double) k;
 		cp->points[j].xhigh = sux / (double) k;
 		cp->points[j].xlow = slx / (double) k;
@@ -999,6 +1083,8 @@ cp_implode(cp)
 	}
 	if (k) {
 	    cp->points[j].x = x;
+	    if ( cp->plot_smooth == SMOOTH_FREQUENCY )
+		k = 1;
 	    cp->points[j].y = y /= (double) k;
 	    cp->points[j].xhigh = sux / (double) k;
 	    cp->points[j].xlow = slx / (double) k;

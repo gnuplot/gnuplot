@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.40 2001/06/22 15:44:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.41 2001/07/20 14:04:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -652,20 +652,20 @@ store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
  */
 
 #if 0				/* not used */
-static char *plot_type_names[4] =
+static char *plot_type_names[] =
 {
     "Function", "Data", "3D Function", "3d data"
 };
-static char *plot_style_names[14] =
+static char *plot_style_names[] =
 {
     "Lines", "Points", "Impulses", "LinesPoints", "Dots", "XErrorbars",
     "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
     "FSteps", "Vector",
     "XErrorlines", "YErrorlines", "XYErrorlines"
 };
-static char *plot_smooth_names[5] =
+static char *plot_smooth_names[] =
 {
-    "None", "Unique", "CSplines", "ACSplines", "Bezier", "SBezier"
+    "None", "Unique", "Frequency", "CSplines", "ACSplines", "Bezier", "SBezier"
 };
 
 static void
@@ -951,11 +951,12 @@ eval_plots()
 		case SMOOTH_CSPLINES:
 		case SMOOTH_SBEZIER:
 		case SMOOTH_UNIQUE:
+		case SMOOTH_FREQUENCY:
 		    this_plot->plot_smooth = found_token;
 		    break;
 		case SMOOTH_NONE:
 		default:
-		    int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+		    int_error(c_token, "expecting 'unique', 'frequency', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
 		    break;
 		}
 		this_plot->plot_style = LINES;
@@ -1107,6 +1108,7 @@ eval_plots()
 		switch (this_plot->plot_smooth) {
 		/* sort and average, if the style requires */
 		case SMOOTH_UNIQUE:
+		case SMOOTH_FREQUENCY:
 		case SMOOTH_CSPLINES:
 		case SMOOTH_ACSPLINES:
 		case SMOOTH_SBEZIER:
@@ -1120,6 +1122,9 @@ eval_plots()
 		switch (this_plot->plot_smooth) {
 		/* create new data set by evaluation of
 		 * interpolation routines */
+		case SMOOTH_FREQUENCY:
+		    gen_interp_frequency(this_plot);
+		    break;
 		case SMOOTH_CSPLINES:
 		case SMOOTH_ACSPLINES:
 		case SMOOTH_BEZIER:
