@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.52 2000/11/22 10:04:24 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.53 2000/11/23 08:35:38 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -158,13 +158,9 @@ C
 ^ </a>
 
  Before seeking help, please check the
-^ <a href="http://www.uni-karlsruhe.de/~ig25/gnuplot-faq.html">
+^ <a href="http://www.gnuplot.org/gnuplot/faq/">
  FAQ (Frequently Asked Questions) list.
 ^ </a>
- If you do not have a copy of the FAQ, you may request a copy by email from
- the Majordomo address above, ftp a copy from
-       ftp://ftp.dartmouth.edu/pub/gnuplot
- or see the WWW `gnuplot` page.
 
  When posting a question, please include full details of the version of
  `gnuplot`, the machine, and operating system you are using.  A _small_ script
@@ -172,7 +168,8 @@ C
  datafile plots.  If email-ing to info-gnuplot, please state whether or not
  you are subscribed to the list, so that users who use news will know to email
  a reply to you.  There is a form for such postings on the WWW site.
-2 What's New in version 3.7
+
+2 What is New in version 3.7
 ?new-features
  Gnuplot version 3.7 contains many new features.  This section gives a partial
  list and links to the new items in no particular order.
@@ -1696,7 +1693,7 @@ C ... and restart the table:
  designate variables as fixed parameters so that their values are reported by
  `fit`.  The keyword `# FIXED` has to appear in exactly this form.
 
-3 beginner's guide
+3 short introduction
 ?commands fit beginners_guide
 ?fit beginners_guide
 ?fit guide
