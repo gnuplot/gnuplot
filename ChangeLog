@@ -3,6 +3,9 @@
 	* src/gplt_x11.c (PaletteSetColor): Fix off-by-one error in indexing
 	color ramp of gray values.
 
+	* src/mouse.c (do_event): Allow font and terminal size information to
+	be processed while in multiplot mode. See bug #955081.
+
 2004-05-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/getcolor.h src/getcolor.c: New routines rgb1maxcolors_from_gray()

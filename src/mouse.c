@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.49 2004/05/19 14:43:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.50 2004/05/26 07:06:33 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1755,10 +1755,12 @@ event_reset(struct gp_event_t *ge)
 void
 do_event(struct gp_event_t *ge)
 {
-    if (multiplot || !term) {
-	/* no event processing for multiplot or undefined terminal */
+    if (!term)
 	return;
-    }
+
+    if (multiplot && ge->type != GE_fontprops)
+	/* only informational event processing for multiplot */
+	return;
 
     /* disable `replot` when some data were sent through stdin */
     replot_disabled = plotted_data_from_stdin;
