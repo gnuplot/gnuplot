@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.47 2004/11/27 02:38:37 sfeam Exp $
+ * $Id: fig.trm,v 1.48 2004/12/03 13:31:10 broeker Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -854,8 +854,8 @@ FIG_put_text(unsigned int x, unsigned int y, const char *str)
     if (FIG_angle == 0.)
 	y -= term->v_char / 2;	/* assuming vertical center justified */
     else {
-	x += (int)(term->v_char*sin(FIG_angle)/2.);
-	y -= (int)(term->v_char*cos(FIG_angle)/2.);
+	x += (int)(term->v_char*sin(FIG_angle)/4.);
+	y -= (int)(term->v_char*cos(FIG_angle)/4.);
     }
 
     /* (old: we assume that a string contains LaTeX commands if it contains */

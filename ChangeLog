@@ -1,3 +1,10 @@
+2004-12-20  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/fig.trm (FIG_put_text) term/gd.trm (PNG_put_text, ENHGD_FLUSH):
+	Modify vertical centering text to match most other terminal types.
+	This causes text rotation to occur about the vertical midpoint, as in
+	the post, x11, pdf, and other terminals. (Bug #1086549)
+
 2004-12-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* pm.trm (PM_set_color): Reflect recent changes of parameters in term

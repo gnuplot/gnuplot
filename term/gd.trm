@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.55 2004/11/28 02:02:52 sfeam Exp $
+ * $Id: gd.trm,v 1.56 2004/12/03 05:52:22 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1259,8 +1259,8 @@ PNG_put_text(unsigned int x, unsigned int y, const char *string)
 	    fprintf(stderr,"gdImageStringFT: %s while printing string %s with font %s\n",
 	    	err,string,png_state.ttffont);
 	} else {
-	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
-	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
+	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    switch (png_state.justify) {
 		case RIGHT:
 		    		x -= (brect[2]-brect[0]);
@@ -1568,8 +1568,8 @@ ENHGD_FLUSH()
 	    y = png_state.y;
 	    x -= sin((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
 	    y += cos((double)png_state.angle * M_PI_2/90.) * ENHgd_base;
-	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
-	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/2.;
+	    x += sin((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
+	    y -= cos((double)png_state.angle * M_PI_2/90.) * (double)png_state.charh/4.;
 	    err = gdImageStringFT(
 			(ENHgd_show && !ENHgd_sizeonly) ? png_state.image : NULL,
 	    		brect, png_state.color,
