@@ -138,55 +138,38 @@ END {
   printf "\n%s\n", pltcmd;
 }
 
- 9. There is an initialization problem of when plotting time data with an
-    interval calculation; an inordinate number of m[]tics are automatically
-    drawn, e.g., 
 
-       set xdata time; set ydata time
-       set timefmt "%d/%m"
-       set format x "%b %d"
-       set xrange ["01/12":"06/12"]
-       set xtics "01/12", 172800, "05/12"
-       plot x
-
-    The problem can be avoided by initializing via a plot before the 
-    interval calculation:
-       [...]
-       set xrange ["01/12":"06/12"]
-       plot x
-       set xtics "01/12", 172800, "05/12"
-       plot x
-
-10. (Not really a bug)
+ 9. (Not really a bug)
   Terminal drivers which are accompanied by external executables
   could cause some trouble: their subprocesses (started by fork() e.g.)
   may inherit handles to open file(s) from the main process.
   If the filesystem doesn't allow deleting open files these file are
   locked for the time the terminal driver is running.
 
-11. OS/2 gcc optimiser bug
+10. (Not really a bug)
+  There seems to be a bug in OS/2 gcc 2.7.2x (emx 0.9c)
   The following gnuplot commands demonstrate a bug in gcc's optimiser
-  under OS/2. The workaround is to use "-O2 -ffloat-store" instead of "-O2".
+  on OS/2. The workaround is to use "-O2 -ffloat-store" instead of "-O2".
 
-reset
-set key
-set xlabel "Year"
-set xdata time
-set timefmt "%y%m%d"
-set format x "%y"
-set xrange ["900621" : "950126"]
-set ylabel "Price per $100 principal"
-plot '-' using 1:2 title 'Fitted IO' with lines 1
-900621 20
-950126 55
-e
+  reset
+  set key
+  set xlabel "Year"
+  set xdata time
+  set timefmt "%y%m%d"
+  set format x "%y"
+  set xrange ["900621" : "950126"]
+  set ylabel "Price per $100 principal"
+  plot '-' using 1:2 title 'Fitted IO' with lines 1
+  900621 20
+  950126 55
+  e
 
-12. compiling help file with Visual C++ 4.0/Windows NT
+11. compiling help file with Visual C++ 4.0/Windows NT
   The help compiler is unable to compile gnuplot.rtf, possibly because
   it cannot handle the new RTF spec. There is no workaround, but
   VC++ 5.0/6.0 users should have no problems.
  
-13. The 16bit Windows version, compiled by Borland C++ 3.1, crashes with
+12. The 16bit Windows version, compiled by Borland C++ 3.1, crashes with
   a protection violation in 'all.dem', on the first plot that tries
   to read a datafile. Heap corruption suspected.
 
@@ -200,4 +183,3 @@ BUGS outstanding
   source file copyrights are out of date - what should go on new files ?
   to be documented - ms-windows cannot do wide, dashed lines (well, win32 can,
   but...)
-
