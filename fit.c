@@ -811,7 +811,6 @@ double a[];
 	struct value val;
 	Gcomplex (&val, a[num_params-1], 0.0);
 	setvar (par_name[num_params-1], val);
-	free(dpar);
     }
 
     /* call destructor for allocated vars */
