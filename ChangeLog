@@ -1,3 +1,43 @@
+1999-06-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* CodeStyle, TODO: Updated.
+
+	* docs/*.c: Add RCSid's, move function return types to separate
+	line for ansi2knr.
+
+	* src/Makefile.am: Remove TERMLIBS, TERMXLIBS (automatically added
+	by automake).
+
+	* src/bitmap.c, src/bitmap.h, src/datafile.c, src/fit.c, src/graph3d.c,
+	src/hidden3d.c, src/misc.c, src/parse.c, src/term.c: Move inclusion of
+	command.h to plot.h.
+
+	* src/command.c, src/command.h, src/graphics.c, src/graphics.h,
+	src/util.c: Cleanup, move declarations and defines to the resp. header
+	file.
+
+	* src/interpol.c, src/plot2d.c, src/plot3d.c: Remove unused define.
+
+	* src/plot.c: Move declarations and defines to header files.
+
+	* src/plot.h: Add declarations and header file inclusions.
+
+	* src/protos.h: Move function declarations to new header files.
+
+	* src/set.c: Re-add variable declarations, remove set_locale().
+
+	* src/setshow.h: Remove reference to global cur_locale variable.
+
+	* src/show.c: Remove show_locale() function.
+
+	* src/util.h, src/util3d.c: New header files.
+	
+	* src/variable.c, src/variable.h: Add new locale_handler() function.
+
+	* term/mac.trm: Split long line in terminal help.
+
+	* term/vws.trm: Remove nested extern function declaration.
+
 1999-06-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/Makefile.am: Add AM_CPPFLAGS (hard-wired flags for CPP and CC).
@@ -6,6 +46,10 @@
 	* term/pslatex.trm: Fix auxiliary ps filename creation, strip pathname
 	off filename written to LaTeX file.
 
+1999-06-12  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* term/png.trm: Add note about default output size to terminal help.
+	
 1999-06-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.maint: Add configure options to my-distcheck.
