@@ -1,16 +1,27 @@
 #! /bin/sh --
-# $Id: prepare,v 1.4 2002/10/28 13:58:34 mikulik Exp $
+# $Id: prepare,v 1.5 2002/10/31 20:01:57 sfeam Exp $
 # Small shell script to prepare the gnuplot sources when
 # checked out from CVS.
 
-exelist="configure configure.vms install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
+# Note that both autoconf 2.13/automake 1.5 and autoconf 2.5x/automake 1.7 or
+# newer may be used, although the gnuplot project continues to use the former
+
+exelist="configure configure.vms depcomp install-sh missing mkinstalldirs config/djconfig.sh lisp/configure"
 
 chmod 755 $exelist >/dev/null 2>&1
+chmod og-w docs/* >/dev/null 2>&1
 
 # Clean up
 rm -f config.cache config.status
 
-if aclocal -I m4 && autoheader && (cd m4 && make -f Makefile.am.in ) \
+if aclocal -I m4 && autoheader \
+  && (cd config && make -f Makefile.am.in Makefile.am ) \
+  && (cd config && make -f Makefile.am.in Makefile.am ) \
+  && (cd demo && make -f Makefile.am.in Makefile.am ) \
+  && (cd lisp && aclocal && autoconf ) \
+  && (cd m4 && make -f Makefile.am.in Makefile.am ) \
+  && (cd term && make -f Makefile.am.in Makefile.am ) \
+  && (cd tutorial && make -f Makefile.am.in Makefile.am ) \
   && automake -a -c \
   && sed 's/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@/noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)/' \
 	<src/Makefile.in >src/Makefile.in2 \
