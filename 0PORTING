@@ -113,12 +113,13 @@ terminals, printers, and protocols that a given version of gnuplot can
 access and the description of such for the help file.
 
 
-define      file            note
-------      ----            --------
-TERMFLAGS   Makefile        the set of terminals you want, from below
-            or term.h
-NO_ALL_TERM  term.h            edit term.h to specify desired devices at
-                               the beginning (instead of to comment out, 
+define      file               note
+------      ----               --------
+TERMFLAGS   Various makefiles  (obsolete under Unix; use configure instead)
+                               the set of terminals you want, from below or
+                               term.h
+SHORT_TERMLIST  term.h         edit term.h to specify desired devices at
+                               the beginning (instead of commenting out, 
                                throughout the file, devices not desired.) 
 
 ALL_TERM_DOC   docs/termdoc.c  on-line help documentation for all devices
@@ -165,7 +166,7 @@ of devices that may be selected/deselected by editing term.h.
    HPLJII      HP Laserjet II
    HPPJ        HP PaintJet
    IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
-   IRIS4D      IRIS4D series computer
+   IRIS        IRIS4D series computer
    KERMIT      MS-DOS Kermit Tektronix 4010 emulator
    LATEX       LaTeX picture environment
    LINUXVGA    Linux PC with (s)vgalib

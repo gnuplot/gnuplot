@@ -55,7 +55,7 @@ $!       will cause problems with some of the demos
 $!
 $!$ CFLAGS    = "/NOOP/DEFINE=(NO_STRSTR, NO_SYS_TYPES_H, "-
 $!               +"HAVE_GETCWD, HAVE_SLEEP, NO_LOCALE_H,"-
-$!               +"NO_ALL_TERM, NO_GIH,PIPES, ''rtl')"
+$!               +"SHORT_TERMLIST, NO_GIH,PIPES, ''rtl')"
 $!$!
 $!
 $!-----------------------------------------------------------------

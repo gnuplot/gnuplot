@@ -50,20 +50,19 @@
  * Stefan Bodewig Dec. 1995
  */
 
-/* Define NO_ALL_TERM to select a few terminals. It is easier to
- * define the macro and list desired terminals in this section.
+/* Define SHORT_TERMLIST to select a few terminals. It is easier
+ * to define the macro and list desired terminals in this section.
  * Sample configuration for a Unix workstation
  */
-#ifdef NO_ALL_TERM
-#include "dumb.trm"     /* dumb terminal */
-#include "post.trm"     /* postscript */
-#include "regis.trm"    /* regis graphics */
-#include "table.trm"    /* built-in, but used for the documentation */
-#include "tek.trm"      /* a Tek 4010 and others including VT-style */
-#ifdef X11
-#include "x11.trm"      /* x windows */
-#endif /* X11 */
-
+#ifdef SHORT_TERMLIST
+# include "dumb.trm"     /* dumb terminal */
+# include "post.trm"     /* postscript */
+# include "regis.trm"    /* regis graphics */
+# include "table.trm"    /* built-in, but used for the documentation */
+# include "tek.trm"      /* a Tek 4010 and others including VT-style */
+# ifdef X11
+#  include "x11.trm"      /* x windows */
+# endif /* X11 */
 #else  /* include all applicable terminals not commented out */
 
 /* Platform dependent part */
@@ -156,13 +155,15 @@
 /* These terminals are not relevant for MSDOS, OS2, MS-Windows, ATARI or Amiga */
 #if !defined(MSDOS) && !defined(_Windows) && !defined(ATARI) && !defined(MTOS) && !defined(AMIGA)
 #include "aed.trm"     /* AED 512 and AED 767 */
-#ifdef UNIXPLOT
-#ifdef GNUGRAPH
-#include "gnugraph.trm"
-#else
-#include "unixplot.trm"
-#endif
-#endif
+
+#if UNIXPLOT || GNUGRAPH
+# if GNUGRAPH
+#  include "gnugraph.trm"
+# else
+#  include "unixplot.trm"
+# endif /* not GNUGRAPH */
+#endif /* UNIXPLOT || GNUGRAPH */
+
 #include "gpic.trm"    /* gpic for groff */
 /* #include "mgr.trm"     /* MGR Window Manager */
 #include "regis.trm"   /* regis graphics */
@@ -239,4 +240,4 @@
 #include "texdraw.trm"  /* TeXDraw drawing package for LaTeX */
 #include "metafont.trm" /* METAFONT */
 
-#endif /* not NO_ALL_TERM */
+#endif /* not SHORT_TERMLIST */
