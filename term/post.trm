@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.98 2003/12/15 07:52:15 mikulik Exp $
+ * $Id: post.trm,v 1.99 2003/12/16 00:25:24 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2663,8 +2663,8 @@ START_HELP(post)
 "",
 " where <mode> is `landscape`, `portrait`, `eps` or `default`;",
 " `enhanced` enables enhanced text mode features (subscripts,",
-" superscripts and mixed fonts). See `enhanced` for more information;",
-" `color` enables color;",
+" superscripts and mixed fonts). See `enhanced` for more information.",
+" Option `color` enables color;",
 " `blacktext` forces all text to be written in black even in color mode;",
 " `solid` draws all plots with solid lines, overriding any dashed patterns;",
 " `dashlength` or `dl` scales the length of the dashed-line segments by <DL>",
