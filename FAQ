@@ -105,7 +105,7 @@ via anonymous ftp from ftp.gnuplot.info in /pub/gnuplot/faq/gnuplot-faq.txt.
 If you have access to the WWW, you can get the newest version of this
 document from http://www.ucc.ie/gnuplot/gnuplot-faq.html.
 
-Today's version is version $Revision: 1.8 $, dated $Date: 2001/11/06
+Today's version is version $Revision: 1.10 $, dated $Date: 2001/11/06
 19:12:16 $
 
 0.2 Where do I send comments about this document?
@@ -764,7 +764,7 @@ possible.
 
 Yes. John Campbell jdc@nauvax.ucc.nau.edu has written gplotlib, a version of
 gnuplot as C subroutines callable from a C program. This is available as
-gplotlib.tar.Z at ftp.nau.edu in /pub/gplotlib.tar.Z. This library has been
+gplotlib.tar.gz at ftp.nau.edu in /pub/gplotlib.tar.gz. This library has been
 updated to be compatible with version 3.5.
 
 On systems supporting the pipes, you can pipe commands to gnuplot from other
