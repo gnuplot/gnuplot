@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.8 1999/06/11 18:53:16 lhecking Exp $
+ * $Id: plot.h,v 1.9 1999/06/14 19:24:57 lhecking Exp $
  *
  */
 
@@ -833,6 +833,7 @@ extern const char *user_gnuplotpath;
 
 #include "protos.h"
 #include "command.h"
+#include "datafile.h"
 #include "graphics.h"
 #include "util.h"
 #include "util3d.h"
