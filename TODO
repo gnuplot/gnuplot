@@ -3,6 +3,8 @@
 
 - documentation for all X11 command line switches (joze)
 - similar line and point type sequences for the main terminal drivers (joze)
+- pm3d doesn't work for concave data, concave in the sense of valid data
+  per scan, where single scans are interrupted by invalid data points. (joze)
 
 [--]
 
