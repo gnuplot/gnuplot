@@ -1,4 +1,14 @@
-2003-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2004-04-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* INSTALL: Include a notice about the demise of 16-bit versions
+	on MS-DOS and Windows.  Updated the paragraph about the history
+	of gnuplot-mode.
+
+	* README.1ST: Updated. Added a paragraph about PDFlib licensing.
+
+	* README: Updated to reflect imminent release.  Changed text about
+	mailing lists.  Added pointers to the web pages at SF.net.  Removed
+	some mirrors that don't exist any longer.
 
 	* src/fit.c (Dblfn): Re-initialize va_args between uses.  Needed
 	to be C standard compliant and survive running on Linux/AMD64.

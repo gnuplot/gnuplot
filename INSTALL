@@ -64,8 +64,8 @@ gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share/gnuplot/$VERSION
 
    The only files where the runtime location is defined at compile time are
-gnuplot.gih and show.c. This is important if gnuplot is not installed by running
-'make install'.
+gnuplot.gih and show.c. This is important if gnuplot is not installed 
+by running 'make install'.
 
    The default path for the help library, gnuplot.gih, can be controlled in
 several different ways:
@@ -106,7 +106,7 @@ different ways:
    gnuplot will be installed as /gnuplot/bin/gnuplot.
 
  o at make time, eg.
-   make BINDIR='/gnuplot/bin'
+   make bindir='/gnuplot/bin'
    gnuplot will be installed as /gnuplot/bin/gnuplot.
 
    The default location of the additional executable, like gnuplot_x11, 
@@ -145,11 +145,7 @@ $ make install
    If gcc is installed, it is used by default. A different compiler can be
 used through the CC environment variable:
 
-(Bourne shell)
-$ CC=c89 ./configure
-
-(C shell)
-$ env CC=c89 ./configure
+$ ./configure CC=c89
  
    Any environment settings for CFLAGS are included into the Makefile,
 so please make sure that these are really needed.
@@ -220,22 +216,20 @@ arguments:
 Unix, no configure
 ------------------
 
-  The older, no-longer-preferred, way is to copy makefile.unx to Makefile
-      cp makefile.unx Makefile
-  Look through the Makefile to see if you need to make any changes.
-  See especially the HELPDEST and TERMFLAGS variables.  Edit if needed.
-  Alternatively, all these variables may be set as command line arguments to
-  'make'. For example:
+  The older, now strongly disfavoured way is to copy config/makefile.unx 
+  to Makefile, then look through the Makefile to see if you need to make 
+  any changes.  See especially the HELPDEST and TERMFLAGS variables.  Edit 
+  if needed.  Alternatively, all these variables may be set as command 
+  line arguments to 'make'. For example:
 
         make <MACHINE> HELPDEST='/usr/um/misc/lib' \
                 DEST='/usr/um/misc/bin' READLINE=
 
   Type
       make
-  For further instructions.
+
   If that works, try
       make install
-  For further instructions.
 
 VMS
 ---
@@ -313,36 +307,39 @@ Using TurboC
 MS-Windows
 ----------
 
-Using Microsoft C 7.0 and compiling for MS-Windows
-      copy makefile.msw makefile
-      nmake
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
-
-Using Borland C++ 3.1 and compiling for MS-Windows
-      copy makefile.win makefile
-  Edit makefile to change TC.
-      make
-  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
-  in the windows directory.
-
-Using Visual C++ and compiling for Windows NT/95/98
+Using Visual C++ and compiling for Windows (32-bit, i.e. 9x and NT family)
       nmake -f makefile.nt
  or
       copy makefile.nt makefile
       nmake
 
-Using the MinGW32 port of egcs: you need the Micrsoft SDK for the
+Using the MinGW32 port of gcc: you need parts of the Micrsoft SDK for the
 moment.
       copy makefile.mgw makefile
   Look through the Makefile to see if you need to make any changes.
       make 
       make install
 
-Using the Cygwin port of gcc, which includes MinGW32: you need the
-Microsoft SDK for the moment.
+Using the Cygwin port of gcc, which includes MinGW32: you need parts of
+the Microsoft SDK for the moment.
       copy makefile.cyg makefile
   Look through the Makefile to see if you need to make any changes.
+      make
+  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
+  in the windows directory.
+
+[NOTE: the 16-bit Windows version no longer work.  gnuplot has become
+too large.]
+
+Using Microsoft C 7.0 and compiling for MS-Windows (16-bit)
+      copy makefile.msw makefile
+      nmake
+  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
+  in the windows directory.
+
+Using Borland C++ 3.1 and compiling for MS-Windows (16-bit)
+      copy makefile.win makefile
+  Edit makefile to change TC.
       make
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
@@ -350,7 +347,7 @@ Microsoft SDK for the moment.
 MSDOS
 -----
 
-Using DJGPP
+Using DJGPP (32-bit DOS port of GNU CC)
   Basically the same as Unix+configure. Andris Pavenis <pavenis@lanet.lv>
   has contributed a shell script which makes the whole process even easier:
   just run djconfig.sh, and then make.
@@ -358,11 +355,14 @@ Using DJGPP
       copy makefile.dj2 makefile
       make
 
-Using Microsoft C 7.0.
+[NOTE: the 16-bit DOS versions of gnuplot no longer work.  gnuplot has
+outgrown this platform.]
+
+Using Microsoft C 7.0 targetting 16-bit DOS
       copy makefile.msc makefile
       nmake 
 
-Using Borland C++ 3.0
+Using Borland C++ 3.0 targetting 16-bit DOS
       copy makefile.tc makefile
   Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
   off overlays (See manual for more on overlays).
@@ -667,6 +667,9 @@ $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot simple.dem </dev/null
 
 $ gnuplot all.dem </dev/null
 $ GNUPLOT_DRIVER_DIR=../src ../src/gnuplot all.dem </dev/null
+   For convencience, the special make target 'check' will run the above
+   if you run it from the demo directory of the source tree:
+$ make check
 
    To use a different plotting device than the default (usually X11 under
 Unix), use eg.
@@ -686,7 +689,7 @@ $ gnuplot
         patchlevel 0
         last modified Tue Apr 13 13:13:13 GMT 2004
 
-        Copyright(C) 1986 - 1993, 1998
+        Copyright(C) 1986 - 1993, 1998, 2004
         Thomas Williams, Colin Kelley and many others
 
         Send comments and requests for help to info-gnuplot@dartmouth.edu
@@ -739,8 +742,9 @@ Front-ends for gnuplot
 
  o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
    gnuplot-mode for GNU emacs and XEmacs. This version is based on
-   the gnuplot.el file by Gershon Elber which is included with this
-   distribution. The package is available from
+   the gnuplot.el file by Gershon Elber which used to be included with 
+   gnuplot's source distribution. The package is available from
    http://feff.phys.washington.edu/~ravel/gnuplot/.
-   From gnuplot 4.0 on, this package is included in the distribution.
+   As of gnuplot 4.0 Bruce's version of gnuplot-mode is included 
+   with the gnuplot distribution.
 

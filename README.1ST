@@ -1,14 +1,35 @@
  To install:
  ==========
 
+ Installation instructions are found in the file INSTALL in this
+ directory after going through this file. In a very small nutshell:
+
  - Under Unix, use configure and make
  
  - Under DOS, if you are using bash and DJGPP,
    you can just run config/djconfig.sh
 
  - Other platforms, copy the relevant makefile from config/
-   to src, cd to src and make. Some makefiles have not yet
-   been updated to the new directory structure.
+   to src, cd to src and make. See config/README for what
+   each of those files is for.  Note: some of those files
+   haven't been updated in ages, so they may no longer be
+   usable.
+
+
+ An important about the PDFlib Lite library:
+ ===========================================
+
+ The 'pdf' terminal driver uses an external library provided by 
+ PDFlib GmbH, Germany ( http://www.pdflib.de/ ).  This library
+ is available under two strictly separate licencing models.
+ Depending on the environment you use gnuplot in, you may have to
+ purchase a commercial licence for PDFlib even though gnuplot itself
+ is free software.  
+
+ There's a special version of PDFlib, called ``PDFlib Lite'', which
+ is freely redistrutable, but programs linked to that are strictly for
+ non-commercial usage only.  *You* are liable for whatever violations
+ of this licence occur in a gnuplot binary built by you.
 
 
  IMPORTANT NOTE ON GIF, PNG and JPEG SUPPORT
@@ -26,7 +47,7 @@
  line widths, and other features that were not possible in the 
  older gnuplot terminal drivers for either GIF or PNG.
 
- When you build gnuplot 3.8 you may choose between two options.
+ When you build gnuplot 4.0 you may choose between two options.
  
  Option 1:
  If you link against an old version of the Boutell gd library 
