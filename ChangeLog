@@ -1,3 +1,16 @@
+2001-08-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Some bits extracted from a patchset by Ulrich Gruenebaum
+ 	<grueneba@zkom.de>:
+	
+	* src/stdfn.c (gp_stricmp): Corrected sign of return value, to
+ 	match that of predefined library function stricmp() which it tries
+ 	to mimic. I changed arguments to 'const', and internal variabales
+ 	to unsigned char to avoid char signedness and constness problems.
+	(gp_strnicmp): Dito.
+
+	* docs/gnuplot.doc: Fixed minor typo in "help set" text.
+
 2001-08-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_label): Don't reduce pointstyle number modulo
