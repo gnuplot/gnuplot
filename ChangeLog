@@ -1,3 +1,9 @@
+2004-07-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/util.c (parse_esc): Limit size of octal constants to 3 chars,
+	possibly with a leading 0. This prevents consuming additional 
+	numerical characters from input stream.
+
 2004-07-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (pr_font): Before falling back all the way to a fixed

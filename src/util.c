@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.42 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.43 2004/07/03 06:08:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -990,7 +990,8 @@ parse_esc(char *instr)
 		s++;
 	    } else if (*s >= '0' && *s <= '7') {
 		int i, n;
-		if (sscanf(s, "%o%n", &i, &n) > 0) {
+		char *octal = (*s == '0' ? "%4o%n" : "%3o%n");
+		if (sscanf(s, octal, &i, &n) > 0) {
 		    *t++ = i;
 		    s += n;
 		} else {
