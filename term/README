@@ -35,31 +35,31 @@ struct TERMENTRY {
 
 /* required entries */
 
-	const char *name;
-	const char *description;
-	unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
+    const char *name;
+    const char *description;
+    unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
-	void (*options) __PROTO((void));
-	void (*init) __PROTO((void));
-	void (*reset) __PROTO((void));
-	void (*text) __PROTO((void));
-	int (*scale) __PROTO((double, double));
-	void (*graphics) __PROTO((void));
-	void (*move) __PROTO((unsigned int, unsigned int));
-	void (*vector) __PROTO((unsigned int, unsigned int));
-	void (*linetype) __PROTO((int));
-	void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
+    void (*options) __PROTO((void));
+    void (*init) __PROTO((void));
+    void (*reset) __PROTO((void));
+    void (*text) __PROTO((void));
+    int (*scale) __PROTO((double, double));
+    void (*graphics) __PROTO((void));
+    void (*move) __PROTO((unsigned int, unsigned int));
+    void (*vector) __PROTO((unsigned int, unsigned int));
+    void (*linetype) __PROTO((int));
+    void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
 
 /* optional entries */
 
-	int (*text_angle) __PROTO((int));
-	int (*justify_text) __PROTO((enum JUSTIFY));
-	void (*point) __PROTO((unsigned int, unsigned int,int));
-	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
-			   unsigned int, int));
+    int (*text_angle) __PROTO((int));
+    int (*justify_text) __PROTO((enum JUSTIFY));
+    void (*point) __PROTO((unsigned int, unsigned int,int));
+    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int,
+                           unsigned int, TBOOLEAN));
    int (*set_font) __PROTO((const char *font));  /* "font,size" */
    void (*pointsize) __PROTO((double pointsize));
-	int flags; /* various flags */
+                              int flags; /* various flags */
    void (*suspend) __PROTO((void)); /* after one plot of multiplot */
    void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
    void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
