@@ -1,57 +1,43 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.62 1997/11/25 23:03:03 drd Exp $";
+static char *RCSid = "$Id: set.c,v 1.65 1998/03/22 23:31:24 drd Exp $";
 #endif
 
-
 /* GNUPLOT - set.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+
+/*
  * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
  * Added user-specified bases for log scaling.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <math.h>
@@ -277,7 +263,7 @@ int 			tmargin		= -1; /* space between top egde and ytop in chars (-1: computed)
 char *missing_val = NULL;
 
 /* date&time language conversions */ 
-extern struct dtconv *dtc;
+/* extern struct dtconv *dtc; */ /* HBB 980317: unused and not defined anywhere !? */
 
 /*** other things we need *****/
 
@@ -719,10 +705,12 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	else if (almost_equals(c_token,"hi$dden3d")) {
 #ifdef LITE
 		printf(" Hidden Line Removal Not Supported in LITE version\n");
+		c_token++;
 #else
+		/* HBB 970618: new parsing engine for hidden3d options */
+		set_hidden3doptions();
 	    hidden3d = TRUE;
 #endif /* LITE */
-	    c_token++;
 	}
 	else if (almost_equals(c_token,"nohi$dden3d")) {
 #ifdef LITE
@@ -2350,10 +2338,19 @@ set_arrow()
     struct arrow_def *new_arrow = NULL;
     struct arrow_def *prev_arrow = NULL;
     struct position spos, epos;
+#ifndef ANSI_C
+    struct lp_style_type loc_lp;
+#else
     struct lp_style_type loc_lp=LP_DEFAULT;
+#endif
     int axes=FIRST_AXES;
     int tag;
     TBOOLEAN set_start, set_end, head = 1, set_axes=0, set_line=0;
+
+#ifndef ANSI_C
+    loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
+    loc_lp.l_width   = loc_lp.p_size = 1.0;
+#endif
 
     /* get tag */
     if (!END_OF_COMMAND 
@@ -2552,8 +2549,17 @@ set_linestyle()
     struct linestyle_def *this_linestyle = NULL;
     struct linestyle_def *new_linestyle = NULL;
     struct linestyle_def *prev_linestyle = NULL;
+#ifndef ANSI_C
+    struct lp_style_type loc_lp;
+#else
     struct lp_style_type loc_lp=LP_DEFAULT;
+#endif
     int tag;
+
+#ifndef ANSI_C
+    loc_lp.pointflag = loc_lp.l_type = loc_lp.p_type = 0;
+    loc_lp.l_width   = loc_lp.p_size = 1.0;
+#endif
 
     /* get tag */
     if (!END_OF_COMMAND) {
