@@ -1,0 +1,13 @@
+Please note that this directory and the stand-alone gnuplot mode
+distribution by Bruce Ravel are slightly different.  In particular
+some files have not been included here, namely
+
+   o INSTALL              (covered by gnuplot install instructions)
+   o Win9x/INSTALL.Win9x
+   o Win9x/pgnuplot.c     (already in src/win)
+   o gnuplot.info         (can be created from docs/gnuplot.texi)
+   o gpelcard.ps          (can be created from lisp/gpelcard.tex)
+   o install-sh, mkinstalldirs  (provided by gnuplot)
+
+For more information about this directory, see the README file in this
+directory.
