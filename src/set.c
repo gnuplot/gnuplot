@@ -661,6 +661,12 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	} else if (equals(c_token, "y")) {
 	    autoscale_y = FALSE;
 	    c_token++;
+	} else if (equals(c_token, "x2")) {
+	    autoscale_x2 = FALSE;
+	    c_token++;
+	} else if (equals(c_token, "y2")) {
+	      autoscale_y2 = FALSE;
+	      c_token++;
 	} else if (equals(c_token, "z")) {
 	    autoscale_z = FALSE;
 	    c_token++;
