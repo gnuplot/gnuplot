@@ -568,7 +568,7 @@ fi
 
 
 
-# From configure.in Revision: 1.79 
+# From configure.in Revision: 1.80 
 
 VERSION="`cat $srcdir/VERSION`"
 ac_aux_dir=
