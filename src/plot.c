@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.28 1999/12/01 22:09:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.29 2000/01/22 16:53:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -98,7 +98,7 @@ extern int rl_complete_with_tilde_expansion;
 #  ifndef HISTORY_SIZE
 /* Can be overriden with the environment variable 'GNUPLOT_HISTORY_SIZE' */
 #   define HISTORY_SIZE 666
-static long int gnuplot_history_size = HISTORY_SIZE;
+long int gnuplot_history_size = HISTORY_SIZE;
 #  endif
 /* 
  * The next variable is a pointer to the value returned from 'tilde_expand()'.
@@ -862,7 +862,8 @@ wrapper_for_write_history()
     /* Alternative code, saves one disk access */
     if (history_is_stifled())
 	unstifle_history();
-    stifle_history (gnuplot_history_size);
+    if (gnuplot_history_size >= 0)
+	stifle_history (gnuplot_history_size);
 
     /* returns 0 on success */
     if (write_history(expanded_history_filename))
@@ -871,10 +872,12 @@ wrapper_for_write_history()
     unstifle_history();
 #else
     /* if writing was successful, truncate history
-     *  to HISTORY_SIZE lines
+     *  to gnuplot_history_size lines
      */
-    if (write_history(expanded_history_filename))
-	history_truncate_file(expanded_history_filename, gnuplot_history_size);
+    if (write_history(expanded_history_filename)) {
+	if (gnuplot_history_size >= 0)
+	    history_truncate_file(expanded_history_filename, gnuplot_history_size);
+    }
 #endif
 }
 #endif /* HAVE_LIBREADLINE && GNUPLOT_HISTORY */
