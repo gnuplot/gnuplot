@@ -289,7 +289,7 @@ extern TBOOLEAN suppressMove;
 void draw_clip_line __PROTO((int, int, int, int));
 int clip_line __PROTO((int *, int *, int *, int *));
 int clip_point __PROTO((unsigned int, unsigned int));
-void clip_put_text __PROTO((unsigned int, unsigned int, char *, char *));
+void clip_put_text __PROTO((unsigned int, unsigned int, char *));
 void clip_put_text_just __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, char *));
 
 /* moved here from graph3d: */

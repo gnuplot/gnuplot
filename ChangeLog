@@ -1,3 +1,12 @@
+2003-02-09  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gadgets.c src/gadgets.h src/graph3d.c: Remove unused parameter.
+	* src/term.c: Do not calculate line spacing until after new font is set.
+	Correct the placement of lines in multi-line text rotated by -90.
+	* term/gd.trm: Take font height and width directly from font structure
+	(corrects an error in the declared size of small font). Recalculate
+	font height and width each time a new TTF font is set in PNG_set_font().
+
 2003-02-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/configure.in: Determining emacs version was broken for GNU Emacs.
@@ -1903,7 +1912,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/05 21:43:35 $).
+	last modification date (from the tag $Date: 2003/02/06 18:24:29 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

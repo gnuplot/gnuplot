@@ -247,18 +247,14 @@ int x1, y1, x2, y2;
 
 /* And text clipping routine. */
 void
-clip_put_text(x, y, str, font)
+clip_put_text(x, y, str)
 unsigned int x, y;
 char *str;
-char *font;
 {
     register struct termentry *t = term;
 
     if (clip_point(x, y))
 	return;
-
-    if (font && *font)
-	(*t->set_font) (font);
 
     (*t->put_text) (x, y, str);
 }

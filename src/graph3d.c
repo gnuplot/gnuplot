@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.77 2003/01/07 22:29:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.78 2003/01/27 20:39:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2790,14 +2790,14 @@ char *text;
     } else {
 	if ((*term->justify_text) (RIGHT)) {
 	    if (key == KEY_USER_PLACEMENT)
-		clip_put_text(xl + key_text_right, yl, text, NULL);
+		clip_put_text(xl + key_text_right, yl, text);
 	    else
 		(*term->put_text) (xl + key_text_right, yl, text);
 	} else {
 	    int x = xl + key_text_right - (term->h_char) * strlen(text);
 	    if (key == KEY_USER_PLACEMENT) {
 		if (i_inrange(x, xleft, xright))
-		    clip_put_text(x, yl, text, NULL);
+		    clip_put_text(x, yl, text);
 	    } else {
 		(*term->put_text) (x, yl, text);
 	    }
