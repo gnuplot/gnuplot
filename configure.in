@@ -1,38 +1,24 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl Where possible, please adopt a convention that the absense of
-dnl a macro is the usual case : this saves having to update
-dnl countless makefiles when new tests are added. By usual case
-dnl I guess ansi compiler on posix system or something like that
+dnl $Id: configure.in,v 1.41 1999/01/12 19:15:48 lhecking Exp $
 dnl
-dnl [Lars: this is no longer necessary. I have cut this stuff out
-dnl  of configure.in and added the necessery definitions to syscfg.h.
-dnl  This reduced the size of configure by 30k!
-dnl
-dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
-dnl
-AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.90 $)
 AC_INIT(graphics.c)
+AC_PREREQ(2.13)
+AC_REVISION($Revision: 1.41 $)
 VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
 
 dnl Optional features.
 
-dnl Do not use the included readline function
+dnl Use builtin readline or GNU readline
 AC_ARG_WITH(readline,dnl
-[  --with-readline         use the included minimal readline function (default)
-  --without-readline      do not use the included readline function],,
+[  --with-readline         use the builtin minimal readline function (default)
+  --without-readline      do not use the builtin readline function
+  --with-readline=gnu     use the GNU readline library
+  --with-readline=PATH            Specify the location of GNU readline],,
 test -z "$with_readline" && with_readline=yes
-)dnl
-
-dnl The GNU readline library
-AC_ARG_WITH(gnu-readline,dnl
-[  --with-gnu-readline     use the GNU readline library
-  --with-gnu-readline=PATH        Specify the location of GNU readline],,
-test -z "$with_gnu_readline" && with_gnu_readline=no
 )dnl
 
 dnl If no PATH argument given, use the Unix plot library
@@ -63,8 +49,8 @@ test -z "$with_png" && with_png=yes
 dnl Use .gnuplot file in current directory
 AC_ARG_WITH(cwdrc,dnl
 [  --with-cwdrc            check current directory for .gnuplot file,
-                          normally disabled for security reasons],
-test "$withval" = no && AC_DEFINE(NOCWDRC), AC_DEFINE(NOCWDRC)
+                          normally disabled for security reasons],,
+test -z "$with_cwdrc" && with_cwdrc=no
 )dnl
 
 dnl Install the lasergnu printer script
@@ -76,27 +62,9 @@ else LASERGNU=lasergnu_noinstall; fi, LASERGNU=lasergnu_noinstall
 
 dnl The Linux console driver
 AC_ARG_WITH(linux-vga,dnl
-[  --without-linux-vga     do not use the Linux console driver
-                          (requires Linux SVGAlib /usr/lib/libvga)],,
-test -z "$with_linux_vga" && with_linux_vga=yes
-)dnl
-
-dnl Apollo Graphics Primitive Resource
-AC_ARG_ENABLE(apollo,dnl
-[  --enable-apollo         Apollo Graphics Primitive Resource],,
-test -z "$enable_apollo" && enable_apollo=no
-)dnl
-
-dnl Apollo Graphics Primitive Resource (fixed-size window)
-AC_ARG_ENABLE(gpr,dnl
-[  --enable-gpr            Apollo Graphics Primitive Resource (fixed-size window)],,
-test -z "$enable_gpr" && enable_gpr=no
-)dnl
-
-dnl On SCO only: cgi terminal
-AC_ARG_ENABLE(cgi,dnl
-[  --enable-cgi            enable CGI terminal (SCO only)],,
-test -z "$enable_cgi" && enable_cgi=no
+[  --with-linux-vga        use the Linux SVGA console driver
+                          (requires /usr/lib/libvga)],,
+test -z "$with_linux_vga" && with_linux_vga=no
 )dnl
 
 dnl IRIS terminal on IRIS4D series computer
@@ -115,24 +83,6 @@ dnl Redwood Graphics Interface Protocol
 AC_ARG_ENABLE(rgip,dnl
 [  --enable-rgip           enable Redwood Graphics Interface Protocol],,
 test -z "$enable_rgip" && enable_rgip=no
-)dnl
-
-dnl SUNview driver
-AC_ARG_ENABLE(sun,dnl
-[  --enable-sun            enable sunview terminal (Sun only)],,
-test -z "$enable_sun" && enable_sun=no
-)dnl
-
-dnl ATT 3b1 or ATT 7300 unixpc
-AC_ARG_ENABLE(unixpc,dnl
-[  --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)],,
-test -z "$enable_unixpc" && enable_unixpc=no
-)dnl
-
-dnl enable system time routines
-AC_ARG_ENABLE(system-time,dnl
-[  --enable-system-time    use the system time routines in time.c],,
-test -z "$enable_system_time" && enable_system_time=no
 )dnl
 
 dnl configure.in body
@@ -166,7 +116,8 @@ if test "$no_x" != yes; then
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   X_LIBRARIES="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
-  AC_DEFINE(X11)
+  AC_DEFINE(X11, 1,
+            [ Define if you are using the X11 window system. ])
 fi
 
 
@@ -174,8 +125,8 @@ dnl Operating systems.
 dnl FIXME AC_DEFINE(ISC22)
 dnl FIXME AC_DEFINE(KSR)
 dnl Check for MSDOS and djgpp, NeXT
-gp_MSDOS
-gp_NEXT
+GP_MSDOS
+GP_NEXT
 
 dnl this has to be after -lsys_s on NeXT
 LIBS="$LIBS -lm"
@@ -207,7 +158,11 @@ AC_TRY_COMPILE(
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif],
-  errno=0,AC_MSG_RESULT(yes),AC_DEFINE(EXTERN_ERRNO) AC_MSG_RESULT(no))
+  errno=0,AC_MSG_RESULT(yes),dnl
+  AC_DEFINE(EXTERN_ERRNO, 1,
+            [ Define if <errno.h> declares errno. ])
+  AC_MSG_RESULT(no)
+)dnl
 
 
 dnl Types.
@@ -231,7 +186,8 @@ dnl math lib is already available, see operating systems part
 AC_CHECK_FUNCS(erf erfc gamma lgamma getcwd pclose popen sleep snprintf \
   strncasecmp strnicmp sysinfo tcgetattr)
 if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
-  AC_DEFINE(PIPES)
+  AC_DEFINE(PIPES, 1,
+            [ Define if you do have the popen and pclose functions. ])
 fi
 
 dnl arg types for select
@@ -244,58 +200,54 @@ dnl check for installed linux vgalib
 if test "$with_linux_vga" = yes; then
   AC_MSG_CHECKING(for linux vga library)
   AC_CHECK_LIB(vga, vga_init,
-    [AC_DEFINE(LINUXVGA)
+    [AC_DEFINE(LINUXVGA, 1,
+               [ Define if this is a Linux system with SuperVGA library. ])
      LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
      TERMLIBS="$TERMLIBS -lvga"],dnl
     with_linux_vga=no)
 fi
 
 dnl GNU readline and the required terminal library
-if test "$with_gnu_readline" != no; then
-  dnl check for terminal library
-  dnl this is a very cool solution from octave's configure.in
-  gp_tcap=""
-  for termlib in ncurses curses termcap terminfo termlib; do
-    AC_CHECK_LIB(${termlib}, tputs, [gp_tcap="${gp_tcap} -l${termlib}"])
-    case "${gp_tcap}" in
-      *-l${termlib}*)
-        AC_MSG_RESULT([using ${gp_tcap} with readline])
-        break
-      ;;
-    esac
-  done
+if test "$with_readline" != no; then
+  if test "$with_readline" != yes; then
+    dnl check for terminal library
+    dnl this is a very cool solution from octave's configure.in
+    gp_tcap=""
+    for termlib in ncurses curses termcap terminfo termlib; do
+      AC_CHECK_LIB(${termlib}, tputs, [gp_tcap="$gp_tcap -l$termlib"])
+      case "$gp_tcap" in
+        *-l${termlib}*)
+          break
+        ;;
+      esac
+    done
 
-  if test "$with_gnu_readline" = yes; then
-    AC_CHECK_LIB(readline, readline,dnl
-     LIBS="$LIBS -lreadline $gp_tcap"
-     AC_DEFINE(GNU_READLINE)
-     with_readline=no,dnl
-     AC_MSG_ERROR([Can't find -lreadline in a standard path -- specify its location using --with-gnu-readline=/path/to/libreadline.a]),dnl
-     ${gp_tcap})dnl readline
-  else
-    if test ! -f $with_gnu_readline ; then
-      if test ! -f ${with_gnu_readline}/lib/libreadline.a ; then
-        if test ! -f ${with_gnu_readline}/libreadline.a ; then
-          AC_MSG_ERROR([GNU readline library not found])
-        else
-          AC_MSG_RESULT([using ${with_gnu_readline}/libreadline.a])
-          LIBS="$LIBS ${with_gnu_readline}/libreadline.a $gp_tcap"
-        fi
-      else
-        AC_MSG_RESULT([using ${with_gnu_readline}/lib/libreadline.a])
-        LIBS="$LIBS ${with_gnu_readline}/lib/libreadline.a $gp_tcap"
-      fi
+    if test "$with_readline" = gnu; then
+      AC_CHECK_LIB(readline, readline,dnl
+       TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
-      AC_MSG_RESULT([using ${with_gnu_readline}])
-      LIBS="$LIBS $with_gnu_readline $gp_tcap"
+      GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
+      if test "$ac_cv_lib_readline_readline" != no; then
+        TERMLIBS="$TERMLIBS $gp_tcap"
+      fi
     fi
 
-    AC_DEFINE(GNU_READLINE)
-    with_readline=no
-  fi
-fi
+    if test "$ac_cv_lib_readline_readline" = no; then
+      AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
+      with_readline=yes
+    else
+      AC_DEFINE(HAVE_LIBREADLINE, 1,
+                [ Define if you are using the GNU readline library. ])
+    fi # ! ac_cv_lib_readline_readline = no
 
-test "$with_readline" = yes && AC_DEFINE(READLINE)
+  fi # ! with_readline != yes
+
+  if test "$with_readline" = yes; then
+    AC_DEFINE(READLINE, 1,
+              [ Define if you want to use the included readline function. ])
+  fi
+
+fi
 dnl end readline
 
 dnl libplot
@@ -303,41 +255,59 @@ if test "$with_plot" != no; then
   if test "$with_plot" = yes; then
     dnl Unix plot library
     AC_CHECK_LIB(plot,openpl,dnl
-     AC_DEFINE(UNIXPLOT)
+     AC_DEFINE(UNIXPLOT, 1,
+               [ Define if you want to use the standard Unix plot library. ])
      TERMLIBS="$TERMLIBS -lplot",dnl
      with_plot=no)
   else
     dnl GNU plot library - test for new version first
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-    gp_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
-    if test "$ac_cv_lib_plot_textangle" = no; then
-      TERMXLIBS=
-      gp_SEARCH_LIBDIRS(plot,rotate)
-      if test "$ac_cv_lib_plot_rotate" = no; then
-        AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
-        with_plot=no
+    GP_PATH_LIB(plot,pl_textangle,[$with_plot],[$TERMXLIBS])
+    if test "$ac_cv_lib_plot_pl_textangle" = no; then
+      GP_PATH_LIB(plot,textangle,[$with_plot],[$TERMXLIBS])
+      if test "$ac_cv_lib_plot_textangle" = no; then
+        TERMXLIBS=
+        GP_PATH_LIB(plot,rotate,[$with_plot])
+        if test "$ac_cv_lib_plot_rotate" = no; then
+          AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
+          with_plot=no
+        else
+          AC_MSG_RESULT([ - using obsolete GNU graphics library])
+        fi # old GNU plotlib
       else
-        AC_MSG_RESULT([ - using obsolete GNU graphics library])
-        AC_DEFINE(GNUGRAPH)
-      fi # old GNU plotlib
+        AC_MSG_RESULT([ - using GNU plotutils library])
+      fi # GNU plotlib pre-2.2
     else
-      AC_MSG_RESULT([ - using GNU plotutils library])
-      AC_DEFINE(GNUGRAPH)
-      AC_DEFINE(GNU_PLOTUTILS)
+      GP_PATH_HEADER(plotcompat.h,[$with_plot],dnl
+        AC_DEFINE(HAVE_PLOTCOMPAT_H, 1,
+                  [ Define if you have the <plotcompat.h> header file. ]),
+        AC_MSG_WARN([found GNU plotutils 2.2+ library but not plotcompat.h])
+        AC_MSG_WARN([please add path to plotcompat.h to CPPFLAGS in Makefile])
+      ) # plotcompat.h
     fi # new GNU plotlib
-  fi # Unix plotlib
+
+    if test "$with_plot" != no; then
+      AC_DEFINE(GNUGRAPH, 1,
+                [ Define if you want to use the GNU version of the Unix plot library. ])
+      AC_DEFINE(GNU_PLOTUTILS, 1,
+                [ Define if your libplot.a is from GNU plotutils. ])
+    fi
+
+  fi # ! Unix plotlib
 fi
-dnl end plot
+dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  gp_SEARCH_LIBDIRS(gd,gdImageCreate)
-  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
-    gp_SEARCH_HEADERDIRS(gd.h,,
-     AC_MSG_WARN([found gd library but not gd.h])
-     AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERDIRS
-    AC_DEFINE(HAVE_LIBGD)
+  GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
+  if test "$ac_cv_lib_gd_gdImageCreate" != no; then
+    GP_PATH_HEADER(gd.h,[$with_gd],dnl
+      dnl ACTION-IF-FOUND
+      AC_DEFINE(HAVE_LIBGD, 1,
+                [ Define if you have Thomas Boutell's gd library. ]),dnl
+      dnl ACTION-IF-NOT-FOUND
+      AC_MSG_WARN([found gd library but not gd.h])
+      AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile]))
   else
     AC_MSG_RESULT([- see term/gif.trm for download details])
   fi
@@ -346,116 +316,95 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  gp_SEARCH_LIBDIRS(png,png_info_init,[-lz])
-  if test "$ac_cv_lib_png_png_info_init" = yes; then
+  GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
+  if test "$ac_cv_lib_png_png_info_init" != no; then
     TERMLIBS="$TERMLIBS -lz"
-    gp_SEARCH_HEADERDIRS(png.h,,
+    GP_PATH_HEADER(png.h,[$with_png],,dnl
      AC_MSG_WARN([found png library but not png.h])
      AC_MSG_WARN([please add path to png.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERIRS
-    gp_SEARCH_HEADERDIRS(zlib.h,,
+    )
+    GP_PATH_HEADER(zlib.h,[$with_png],,dnl
      AC_MSG_WARN([found z library but not zlib.h])
      AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
-    )dnl gp_SEARCH_HEADERDIRS
-    if test "$ac_cv_header_png_h" = yes; then
+    )
+    if test "$ac_cv_header_png_h" != no; then
       AC_EGREP_CPP([You lose], [#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
 ],dnl
-       AC_MSG_WARN([- libpng too old - not including png driver]),dnl
-       AC_DEFINE(HAVE_LIBPNG))
+       AC_MSG_WARN([- libpng too old - not including png driver])
+       with_png=no)
     else
       AC_MSG_WARN([- cannot check png version - compilation may fail])
-      AC_DEFINE(HAVE_LIBPNG)
     fi
+
+  if test "$with_png" != no; then
+    AC_DEFINE(HAVE_LIBPNG, 1,
+              [ Define if you have the png library. ])
+  fi
+
   else
     AC_MSG_RESULT([- see term/png.trm for download details])
   fi
 fi
 dnl end png and z
 
-dnl create list of terminals
-AC_MSG_CHECKING([terminal driver sources])
-( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
- |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
-TERM_LIST=termlist
-AC_SUBST_FILE(TERM_LIST)
-AC_MSG_RESULT([list created])
-
 dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
-dnl Process enable options
+dnl Removed enable options for these
+dnl Just autodetect
 
-if test "$enable_apollo" = yes; then
-  AC_EGREP_CPP(yes,
-   [#ifdef apollo
-     yes
-    #endif
-   ],AC_DEFINE(APOLLO),dnl
-   enable_apollo=no)
-fi
+dnl SCO cgi
+AC_EGREP_CPP(yes,
+[#ifdef SCO
+yes
+#endif
+],AC_CHECK_LIB(ccgi, v_opnwk,dnl
+    AC_DEFINE(CGI, 1,
+              [ Define if you want to use the CGI terminal under SCO. ])dnl
+              TERMLIBS="$TERMLIBS -lccgi"))
 
-if test "$enable_gpr" = yes; then
-  AC_EGREP_CPP(yes,
-   [#ifdef apollo 
-     yes
-    #endif
-   ],AC_DEFINE(APOLLO) AC_DEFINE(GPR),dnl
-   enable_gpr=no)
-fi
+dnl Sun sunview
+AC_EGREP_CPP(yes,
+[#ifdef sun
+yes
+#endif
+], AC_CHECK_LIB(suntool, window_create,dnl
+    AC_CHECK_HEADER(suntool/sunview.h,dnl
+    AC_DEFINE(SUN, 1,
+              [ Define if you want to use the sunview terminal (sun). ])dnl
+    TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect"),,dnl
+    [-lsunwindow -lpixrect]))
 
-if test "$enable_cgi" = yes; then
-  AC_EGREP_CPP(yes,
-   [#ifdef SCO
-     yes
-    #endif
-   ],AC_CHECK_LIB(ccgi,v_opnwk,dnl
-      AC_DEFINE(CGI)
-      TERMLIBS="$TERMLIBS -lccgi"),dnl
-   enable_cgi=no)
+dnl Process with and enable options
+
+if test "$with_cdwrc" = no; then
+  AC_DEFINE(NOCWDRC, 1,
+            [ Define if you do not want to read .gnuplot in the current directory. ])
 fi
 
 if test "$enable_iris" = yes; then
   AC_CHECK_LIB(gl_s,winopen,dnl
-   AC_DEFINE(IRIS)
+   AC_DEFINE(IRIS, 1,
+             [ Define if you want to use the IRIS terminal on IRIS4D series computers. ])
    TERMLIBS="$TERMLIBS -lgl_s",dnl
    enable_iris=no)
 fi
 
 if test "$enable_mgr" = yes; then
   AC_CHECK_LIB(mgr,m_getinfo,dnl
-   AC_DEFINE(MGR)dnl
+   AC_DEFINE(MGR, 1,
+             [ Define if you want to use the MGR Window system. ])
    TERMLIBS="$TERMLIBS -lmgr -lpixrect",dnl
    enable_mgr=no,[-lpixrect])
 fi
 
 if test "$enable_rgip" = yes; then
-  AC_DEFINE(RGIP)
-fi
-
-if test "$enable_sun" = yes; then
-  AC_CHECK_LIB(suntool,window_create,dnl
-   AC_DEFINE(SUN)dnl
-   TERMLIBS="$TERMLIBS -lsuntool -lsunwindow -lpixrect",dnl
-   enable_sun=no,[-lsunwindow -lpixrect])
-fi
-
-if test "$enable_unixpc" = yes; then
-  AC_EGREP_CPP(yes,
-   [/* Not sure about this; definitely
-     * true for gcc */
-    #ifdef unixpc
-     yes
-    #endif
-   ],AC_DEFINE(UNIXPC),dnl
-   enable_unixpc=no)
-fi
-
-if test "$enable_system_time" = yes; then
-  AC_DEFINE(USE_SYSTEM_TIME)
+  AC_DEFINE(RGIP, 1,
+            [ Define if you want to use the Redwood Graphics Interface Protocol. ])
 fi
 
 dnl Substitute variables
@@ -477,67 +426,60 @@ AC_MSG_RESULT([
   Where is the help file?           $gp_datadir/gnuplot.gih
 ])
 test "$ac_cv_header_gd_h" = yes && \
-  AC_MSG_RESULT([  Enable generation of GIF files.])
+  AC_MSG_RESULT([  Enable generation of GIF files])
 
 test "$ac_cv_header_zlib_h" = yes && \
-  AC_MSG_RESULT([  Enable generation of PNG files.])
+  AC_MSG_RESULT([  Enable generation of PNG files])
 
 test "$with_cwdrc" = yes && \
-  AC_MSG_RESULT([  Check current directory for .gnuplot file.])
+  AC_MSG_RESULT([  Check current directory for .gnuplot file])
 
-if test "$with_gnu_readline" != no; then
-  AC_MSG_RESULT([  Use GNU readline library.])
-else
-  test "$with_readline" != no && \
-    AC_MSG_RESULT([  Use included readline.])
+if test "$with_readline" != no; then
+  if test "$with_readline" != yes; then
+    AC_MSG_RESULT([  Use GNU readline library])
+      test -n "$gp_tcap" && AC_MSG_RESULT([    with ${gp_tcap}])
+  else
+    AC_MSG_RESULT([  Use builtin minimal readline])
+  fi
 fi
 
 if test "$with_plot" = yes; then
-  AC_MSG_RESULT([  Use the Unix plot library.])
+  AC_MSG_RESULT([  Use the Unix plot library])
 elif test "$with_plot" != no; then
-  AC_MSG_RESULT([  Use the GNU plot library.])
+  AC_MSG_RESULT([  Use the GNU plot library,])
+  if test x"$ac_cv_header_plotcompat_h" != x && \
+     test "$ac_cv_header_plotcompat_h" != no ; then
+    AC_MSG_RESULT([    version 2.2 or newer])
+  else
+    AC_MSG_RESULT([    version 2.1 or older])
+  fi
 fi
 
 test "$with_lasergnu" = yes && \
-  AC_MSG_RESULT([  Install lasergnu printer script.])
+  AC_MSG_RESULT([  Install lasergnu printer script])
 
-test "$with_linux_vga" = yes && \
-  AC_MSG_RESULT([  Use the Linux console driver.])
-
-test "$enable_apollo" = yes && \
-  AC_MSG_RESULT([  Enable Apollo terminal (resizeable window).])
-
-test "$enable_cgi" = yes && \
-  AC_MSG_RESULT([  Enable cgi terminal (SCO).])
-
-test "$enable_gpr" = yes && \
-  AC_MSG_RESULT([  Enable Apollo terminal (fixed-size window).])
+if test "$with_linux_vga" = yes; then
+  AC_MSG_RESULT([  Use the Linux SVGA console driver])
+  AC_MSG_RESULT([    SECURITY NOTICE: SVGAlib requires that])
+  AC_MSG_RESULT([    gnuplot is installed suid root!])
+fi
 
 test "$enable_iris" = yes && \
-  AC_MSG_RESULT([  Enable IRIS terminal.])
+  AC_MSG_RESULT([  Enable IRIS terminal])
 
 test "$enable_mgr" = yes && \
-  AC_MSG_RESULT([  Enable MGR terminal.])
+  AC_MSG_RESULT([  Enable MGR terminal])
 
 test "$enable_rgip" = yes && \
-  AC_MSG_RESULT([  Enable RGIP terminal.])
-
-test "$enable_sun" = yes && \
-  AC_MSG_RESULT([  Enable sunview terminal.])
-
-test "$enable_unixpc" = yes && \
-  AC_MSG_RESULT([  Enable unixpc terminal (ATT 3b1 or ATT 7300).])
-
-test "$enable_system_time" = yes && \
-  AC_MSG_RESULT([  Use system time routines in time.c.])
+  AC_MSG_RESULT([  Enable RGIP terminal])
 
 test "$no_x" != yes && \
-  AC_MSG_RESULT([  Use the X Window System.
+  AC_MSG_RESULT([  Use the X Window System
 ])
 dnl end config report
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile docs/Makefile docs/latextut/Makefile], \
-[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h ; rm -f termlist])
+[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
 
 dnl end configure.in
