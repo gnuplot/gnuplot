@@ -1,3 +1,26 @@
+2000-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/eepic.trm: Gabriel Zachmann <zach@igd.fhg.de> added lots of
+ 	new options to the 'eepic' driver, and fixed some bux while at it.
+	(EEPIC_PTS_PER_INCH): set to 72.27.
+	(EEPIC_DOTS_PER_INCH): set to 600, and renamed from DOTS_PER_INCH.
+	(eepic_color_on, eepic_true_rotate, fontsize_set): new variables.
+	(eepic_num_point_types, eepic_pointsize, EEPIC_points): split up
+ 	into three lists for different point sizes.
+	(eepic_numlines, EEPIC_lines): split up into three lists for
+ 	different 'line sets'.
+	(EEPIC_NUM_COLORS, eepic_color, eepic_colors): new variables, for
+ 	colored output feature.
+	(EEPIC_init): change initializers to new variables.
+	(EEPIC_graphics): change fontsize setting method.
+	(EEPIC_linetype): change linetype selection method; respect color.
+	(EEPIC_point): change point output method to respect pointsize.
+	(EEPIC_put_text): use real \rotatebox style rotation, if
+ 	available.
+	(EEPIC_options): new function. Handles all new options of the
+ 	eepic terminal.
+	help section: document new options.
+
 2000-12-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc src/set.c src/term.c src/term.h src/term_api.h:
