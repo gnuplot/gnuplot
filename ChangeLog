@@ -1,3 +1,41 @@
+2002-01-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add --with-pdf, remove --enable-emf and --enable-epslatex.
+
+	* configure.in: Fix libpng test so that library is always searched for.
+
+	* configure.in: Add PDF driver support.
+
+	* configure.in: Remove switches for emf and epslatex driver, they are
+	now included by default.
+
+	* specfunc.c: More descriptive error messages.
+
+	* term.h: Enable emf and epslatex driver unconditionally.
+
+2002-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, gnuplot.prj, makefile.all, makefile.amg, makefile.ami,
+	makefile.dj2, makefile.djg, makefile.emx, makefile.msc, makefile.msw,
+	makefile.mto,makefile.st,makefile.unx, makefile.vms, makefile.win,
+	term.h, docs/Makefile.in, docs/old/makefile.r, term/pdf.trm,
+	term/svg.trm: Add support for pdf and W3C Scalable Vector Graphics
+	output, ported over from cvs MAIN branch.
+
+	* specfun.c: Minor cleanup.
+
+	* term.c(list_terms): Sort terminals by name before displaying. Ported
+	over from cvs MAIN branch.
+
+	* util.c(gp_strdup): New function, from cvs MAIN branch.
+
+	* term/cgi.trm: By permission of the original author, Ronald Florence,
+	remove the non-commercial use clause and switch to gnuplot license.
+
+	* term/eepic.trm, term/emf.trm, term/epslatex.trm, term/linux.trm,
+	term/metafont.trm, term/pstricks.trm, term/regis.trm, term/tgif.trm:
+	Updated from cvs MAIN branch.
+	
 2002-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0FAQ: Update to current version.
