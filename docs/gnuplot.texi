@@ -693,7 +693,7 @@ if desired.
 
 On Unix, HOME is used as the name of a directory to search for a .gnuplot
 file if none is found in the current directory.  On AmigaOS, AtariTOS,
-MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. Type `help
+MS-DOS and OS/2, GNUPLOT is used.  On VMS, SYS$LOGIN: is used. Type `help
 start-up`.
 
 On Unix, PAGER is used as an output filter for help messages.
@@ -2990,7 +2990,7 @@ separately.  In brief, @ref{index} selects which data sets in a multi-data-set
 file are to be plotted, @ref{every} specifies which points within a single data
 set are to be plotted, @ref{using} determines how the columns within a single
 record are to be interpreted (@ref{thru} is a special case of @ref{using}), and
-@ref{smooth} allows for simple interpolation and approximation.  ('splot' has a
+@ref{smooth} allows for simple interpolation and approximation.  (`splot` has a
 similar syntax, but does not support the @ref{smooth} and @ref{thru} options.)
 
 Data files should contain at least one data point per record (@ref{using}
@@ -3036,7 +3036,7 @@ number of tics, but the x2 axis has not.  The following example illustrates
 the problem:
 
 @example
-      reset; plot '-', '-'
+      reset; plot '-', '-' axes x2y1
       1 1
       19 19
       e
@@ -3222,7 +3222,7 @@ done across the intersection of the x range covered by the input data and
 the fixed abscissa range as defined by @ref{xrange}.
 
 If too few points are available to allow the selected option to be applied,
-an error message is produced.  The minimum number is one for `unique`, and
+an error message is produced.  The minimum number is one for `unique` and
 `frequency`, four for `acsplines`, and three for the others.
 
 The @ref{smooth} options have no effect on function plots.
@@ -3822,7 +3822,6 @@ unneeded ones cannot be skipped---use an empty range `[]` as a placeholder.
 
 `*` can be used to allow autoscaling of either of min and max.  See also
 @ref{autoscale}.
-.
 
 Ranges specified on the `plot` or `splot` command line affect only that
 graph; use the @ref{xrange}, @ref{yrange}, etc., commands to change the
@@ -4013,7 +4012,7 @@ with `set style line`, one of these may be selected by setting <line_style> to
 the index of the desired style.
 
 If gnuplot was built with @ref{pm3d} support, the special keyword @ref{palette} is
-allowed for smooth color change of lines, points and dots in splots. The
+allowed for smooth color change of lines, points and dots in `splots`. The
 color is chosen from a smooth palette which was set previously with the
 command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates or to the color coordinate if specified by the 4th parameter
@@ -4021,7 +4020,7 @@ in @ref{using}. The 2d `plot` command ignores this option.
 
 The keywords may be abbreviated as indicated.
 
-Note that the `linewidth`, @ref{pointsize} and palette options are not supported
+Note that the `linewidth`, @ref{pointsize} and @ref{palette} options are not supported
 by all terminals.
 
 Examples:
@@ -4095,7 +4094,7 @@ This plots filled curve of x*x and a color stripe:
 
 @end example
 
-This plots filled curve of x*x and a color box:
+This plots x*x and a color box:
 @example
       plot x*x, (x>=-5 && x<=5 ? 40 : 1/0) with filledcurve y1=10 lt 8
 
@@ -4290,7 +4289,7 @@ unchanged: the terminal set with `set term`, the output file set with @ref{outpu
 
 
 The @ref{save} command saves user-defined functions, variables, the `set
-term` status, all `set` options, or all of these, plus the last `plot `
+term` status, all `set` options, or all of these, plus the last `plot`
 (`splot`) command to the specified file.
 
 Syntax:
@@ -4614,7 +4613,7 @@ properties (type and width) cannot be altered merely by issuing another
 
 If `front` is given, the arrow is written on top of the graphed data. If
 `back` is given (the default), the arrow is written underneath the graphed
-data.  Using `front` will prevent a arrow from being obscured by dense data.
+data.  Using `front` will prevent an arrow from being obscured by dense data.
 
 Examples:
 
@@ -4861,7 +4860,7 @@ See also
 
 
 The @ref{bars} command controls the tics at the ends of error bars,
-and also the width of the boxes in plot styles candlestick and
+and also the width of the boxes in plot styles candlesticks and
 financebars.
 
 Syntax:
@@ -4960,7 +4959,7 @@ way the border lines are drawn can be influenced (limited by what the current
 terminal driver supports).
 
 For `plot`, tics may be drawn on edges other than bottom and left by enabling
-the second axes -- see @ref{xtics} for details..
+the second axes -- see @ref{xtics} for details.
 
 If a `splot` draws only on the base, as is the case with "`unset surface; set
 contour base`", then the verticals and the top are not drawn even if they are
@@ -7085,7 +7084,7 @@ See also @ref{bind} and @ref{label}.
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
 
-
+@c ?commands set multiplot
 @c ?commands unset multiplot
 @c ?set multiplot
 @c ?unset multiplot
@@ -8737,7 +8736,7 @@ of the `steps` styles can be used with `splot`s. If an inappropriate style
 is specified, it will be changed to `points`.
 
 For 2-d data with more than two columns, `gnuplot` is picky about the
-allowed `errorbar` and `errorline` styles. The @ref{using} option on the
+allowed @ref{errorbars} and @ref{errorlines} styles. The @ref{using} option on the
 `plot` command can be used to set up the correct columns for the style
 you want. (In this discussion, "column" will be used to refer both to
 a column in the data file and an entry in the @ref{using} list.)
@@ -10544,8 +10543,8 @@ the option will be turned off if there is no extent) with `.tex` in the output
 file name.  Remember to close the @ref{file} before leaving `gnuplot`.
 There is no LaTeX output if no output file is given!
 In your LaTeX documents use '\\input@{filename@}' for inclusion of the figure.
-Thus `.eps` file is included by the command \\includegraphics@{...@}, thus
-Include \\usepackage@{graphicx@} in the preamble!
+The `.eps` file is included by the command \\includegraphics@{...@}, thus
+include \\usepackage@{graphicx@} in the preamble!
 Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)
 pdf files can made out of the eps files. If the graphics package is properly
 configured, the LaTeX files can also be processed by pdflatex without
@@ -15117,7 +15116,7 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ydata}, @ref{zdata}, @ref{x2data}, @ref{y2data} and `mcbtics`.
+The same syntax applies to @ref{ydata}, @ref{zdata}, @ref{x2data}, @ref{y2data} and @ref{cbdata}.
 
 The `time` option signals that the datatype is indeed time/date.  If the
 option is not specified, the datatype reverts to normal.

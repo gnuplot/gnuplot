@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.173 2003/05/17 05:59:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.174 2003/06/03 08:06:26 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -429,7 +429,7 @@ C
        Up    Arrow      - same as ^P.
        Down  Arrow      - same as ^N.
 #\begin{tabular}{|cl|} \hline
-#Key        & Function \\ \hline
+#Arrow key  & Function \\ \hline
 #Left       & same as \verb~^B~. \\
 #Right      & same as \verb~^F~. \\
 #Ctrl Left  & same as \verb~^A~. \\
@@ -437,7 +437,7 @@ C
 #Up         & same as \verb~^P~. \\
 #Down       & same as \verb~^N~. \\
 %c l .
-%Key@Function
+%Arrow key@Function
 %_
 %Left Arrow@same as ^B.
 %Right Arrow@same as ^F.
@@ -458,7 +458,7 @@ C
        Help            - `help` plus return.
        Ctrl Help       - `help `.
 #\begin{tabular}{|cl|} \hline
-#Arrow key & Function \\ \hline
+#Key & Function \\ \hline
 #Undo      & same as \verb~^L~. \\
 #Home      & same as \verb~^A~. \\
 #Ctrl Home & same as \verb~^E~. \\
@@ -466,7 +466,7 @@ C
 #Help      & `{\bf help}` plus return. \\
 #Ctrl Help & `{\bf help}`. \\
 %c l .
-%Arrow key@Function
+%Key@Function
 %_
 %Undo@same as ^L.
 %Home@same as ^A.
@@ -530,7 +530,7 @@ C
 
  On Unix, HOME is used as the name of a directory to search for a .gnuplot
  file if none is found in the current directory.  On AmigaOS, AtariTOS,
- MS-DOS and OS/2, gnuplot is used.  On VMS, SYS$LOGIN: is used. Type `help
+ MS-DOS and OS/2, GNUPLOT is used.  On VMS, SYS$LOGIN: is used. Type `help
  start-up`.
 
  On Unix, PAGER is used as an output filter for help messages.
@@ -2277,7 +2277,7 @@ C ... and restart the table:
  file are to be plotted, `every` specifies which points within a single data
  set are to be plotted, `using` determines how the columns within a single
  record are to be interpreted (`thru` is a special case of `using`), and
- `smooth` allows for simple interpolation and approximation.  ('splot' has a
+ `smooth` allows for simple interpolation and approximation.  (`splot` has a
  similar syntax, but does not support the `smooth` and `thru` options.)
 
  Data files should contain at least one data point per record (`using`
@@ -2319,7 +2319,7 @@ C ... and restart the table:
  number of tics, but the x2 axis has not.  The following example illustrates
  the problem:
 
-       reset; plot '-', '-'
+       reset; plot '-', '-' axes x2y1
        1 1
        19 19
        e
@@ -2456,7 +2456,7 @@ C ... and restart the table:
  the fixed abscissa range as defined by `set xrange`.
 
  If too few points are available to allow the selected option to be applied,
- an error message is produced.  The minimum number is one for `unique`, and
+ an error message is produced.  The minimum number is one for `unique` and
  `frequency`, four for `acsplines`, and three for the others.
 
  The `smooth` options have no effect on function plots.
@@ -2932,7 +2932,6 @@ C ... and restart the table:
 
  `*` can be used to allow autoscaling of either of min and max.  See also
  `set autoscale`.
- .
 
  Ranges specified on the `plot` or `splot` command line affect only that
  graph; use the `set xrange`, `set yrange`, etc., commands to change the
@@ -3078,7 +3077,7 @@ C ... and restart the table:
  the index of the desired style.
 
  If gnuplot was built with `pm3d` support, the special keyword `palette` is
- allowed for smooth color change of lines, points and dots in splots. The
+ allowed for smooth color change of lines, points and dots in `splots`. The
  color is chosen from a smooth palette which was set previously with the
  command `set palette`. The color value corresponds to the z-value of the
  point coordinates or to the color coordinate if specified by the 4th parameter
@@ -3086,7 +3085,7 @@ C ... and restart the table:
 
  The keywords may be abbreviated as indicated.
 
- Note that the `linewidth`, `pointsize` and palette options are not supported
+ Note that the `linewidth`, `pointsize` and `palette` options are not supported
  by all terminals.
 
  Examples:
@@ -3127,7 +3126,7 @@ C ... and restart the table:
  This plots filled curve of x*x and a color stripe:
        plot x*x with filledcurve closed, 40 with filledcurve y1=10
 
- This plots filled curve of x*x and a color box:
+ This plots x*x and a color box:
        plot x*x, (x>=-5 && x<=5 ? 40 : 1/0) with filledcurve y1=10 lt 8
 
  This plots a surface with color lines:
@@ -3256,7 +3255,7 @@ C ... and restart the table:
 ?commands save
 ?save
  The `save` command saves user-defined functions, variables, the `set
- term` status, all `set` options, or all of these, plus the last `plot `
+ term` status, all `set` options, or all of these, plus the last `plot`
  (`splot`) command to the specified file.
 
  Syntax:
@@ -3427,7 +3426,7 @@ C ... and restart the table:
 
  If `front` is given, the arrow is written on top of the graphed data. If
  `back` is given (the default), the arrow is written underneath the graphed
- data.  Using `front` will prevent a arrow from being obscured by dense data.
+ data.  Using `front` will prevent an arrow from being obscured by dense data.
 
  Examples:
 
@@ -3601,7 +3600,7 @@ C ... and restart the table:
 ?show bars
 ?bars
  The `set bars` command controls the tics at the ends of error bars,
- and also the width of the boxes in plot styles candlestick and
+ and also the width of the boxes in plot styles candlesticks and
  financebars.
 
  Syntax:
@@ -3708,7 +3707,7 @@ C ... and restart the table:
  terminal driver supports).
 
  For `plot`, tics may be drawn on edges other than bottom and left by enabling
- the second axes -- see `set xtics` for details..
+ the second axes -- see `set xtics` for details.
 
  If a `splot` draws only on the base, as is the case with "`unset surface; set
  contour base`", then the verticals and the top are not drawn even if they are
@@ -5432,7 +5431,7 @@ C ... and restart the table:
 
  See also `help bind` and `help label`.
 3 multiplot
-
+?commands set multiplot
 ?commands unset multiplot
 ?set multiplot
 ?unset multiplot
@@ -6729,7 +6728,7 @@ C ... and restart the table:
  is specified, it will be changed to `points`.
 
  For 2-d data with more than two columns, `gnuplot` is picky about the
- allowed `errorbar` and `errorline` styles. The `using` option on the
+ allowed `errorbars` and `errorlines` styles. The `using` option on the
  `plot` command can be used to set up the correct columns for the style
  you want. (In this discussion, "column" will be used to refer both to
  a column in the data file and an entry in the `using` list.)
@@ -7615,7 +7614,7 @@ C ... and restart the table:
        set xdata {time}
        show xdata
 
- The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `mcbtics`.
+ The same syntax applies to `ydata`, `zdata`, `x2data`, `y2data` and `cbdata`.
 
  The `time` option signals that the datatype is indeed time/date.  If the
  option is not specified, the datatype reverts to normal.

@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.18 2003/04/04 21:22:34 sfeam Exp $
+ * $Id: epslatex.trm,v 1.19 2003/06/12 00:09:06 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -1097,8 +1097,8 @@ START_HELP(epslatex)
 " file name.  Remember to close the `output file` before leaving `gnuplot`.",
 " There is no LaTeX output if no output file is given!",
 " In your LaTeX documents use '\\input{filename}' for inclusion of the figure.",
-" Thus `.eps` file is included by the command \\includegraphics{...}, thus",
-" Include \\usepackage{graphicx} in the preamble!",
+" The `.eps` file is included by the command \\includegraphics{...}, thus",
+" include \\usepackage{graphicx} in the preamble!",
 " Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)",
 " pdf files can made out of the eps files. If the graphics package is properly",
 " configured, the LaTeX files can also be processed by pdflatex without",

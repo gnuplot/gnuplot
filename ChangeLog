@@ -1,3 +1,7 @@
+2003-06-13  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc, term/epslatex.trm: Fix misprints in gnuplot manual.
+
 2003-06-11  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/epslatex.trm term/pslatex.trm: Add text rotation.
