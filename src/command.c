@@ -52,7 +52,7 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
  * April 1999 Franz Bakan (bakan@ukezyk.desy.de)
  * Added code to support mouse-input from OS/2 PM window
  * Works with gnuplot's readline routine, it does not work with GNU readline
- * Changes marked by USE_MOUSE and fraba
+ * Changes marked by USE_MOUSE
  *
  */
 
@@ -73,7 +73,7 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
 #if defined(USE_MOUSE) && defined(OS2)
 #define INCL_DOSMEMMGR
 #include <os2.h>
-#endif /* USE_MOUSE in OS/2 PM */
+#endif /* USE_MOUSE &&  OS2 */
 
 #if defined(MSDOS) || defined(DOS386)
 # ifdef DJGPP
@@ -83,8 +83,8 @@ extern char HelpFile[];		/* patch for do_help  - AP */
 #  ifndef _Windows
 extern unsigned _stklen = 16394;	/* increase stack size */
 extern char HelpFile[];		/* patch for do_help  - DJL */
-#  endif /* _Windows */
-# endif /* TURBOC */
+#  endif			/* _Windows */
+# endif				/* TURBOC */
 #endif /* MSDOS */
 
 #ifndef _Windows
@@ -116,16 +116,16 @@ extern int Pause(LPSTR mess);	/* in winmain.c */
 # define SET_CURSOR_WAIT SetCursor(LoadCursor((HINSTANCE) NULL, IDC_WAIT))
 # define SET_CURSOR_ARROW SetCursor(LoadCursor((HINSTANCE) NULL, IDC_ARROW))
 #else
-# define SET_CURSOR_WAIT /* nought, zilch */
-# define SET_CURSOR_ARROW /* nought, zilch */
+# define SET_CURSOR_WAIT	/* nought, zilch */
+# define SET_CURSOR_ARROW	/* nought, zilch */
 #endif
 
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
 # define chdir  _chdir2
-extern int PM_pause(char *);  /* term/pm.trm */
-extern int ExecuteMacro(char *, int); /* plot.c */
-extern TBOOLEAN CallFromRexx;  /* plot.c */
+extern int PM_pause(char *);	/* term/pm.trm */
+extern int ExecuteMacro(char *, int);	/* plot.c */
+extern TBOOLEAN CallFromRexx;	/* plot.c */
 #endif /* OS2 */
 
 #ifdef VMS
@@ -166,9 +166,9 @@ char *input_line;
 int input_line_len;
 int inline_num;			/* input line number */
 
-#if defined(USE_MOUSE) && defined(OS2) /* fraba */
+#if defined(USE_MOUSE) && defined(OS2)
 PVOID input_from_PM_Terminal = NULL;
-#endif /* USE_MOUSE in OS/2 PM */
+#endif /* USE_MOUSE && OS2 */
 
 struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
 
@@ -194,13 +194,13 @@ void extend_input_line()
 	input_line_len = MAX_LINE_LEN;
 	input_line[0] = NUL;
 
-	#if defined(USE_MOUSE) && defined(OS2) /* fraba  */
-	if (DosAllocSharedMem((PVOID) &input_from_PM_Terminal,
-		"\\SHAREMEM\\PMouse_Input",
-		MAX_LINE_LEN,
-		PAG_WRITE | PAG_COMMIT))
-	  fprintf(stderr,"DosAllocSharedMem_ERROR\n");
-	#endif /* USE_MOUSE in OS/2 PM */
+#if defined(USE_MOUSE) && defined(OS2)
+	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
+			      "\\SHAREMEM\\PMouse_Input",
+			      MAX_LINE_LEN,
+			      PAG_WRITE | PAG_COMMIT))
+	    fprintf(stderr, "DosAllocSharedMem_ERROR\n");
+#endif /* USE_MOUSE && OS2 */
 
     } else {
 	input_line = gp_realloc(input_line, input_line_len + MAX_LINE_LEN, "extend input line");
@@ -268,19 +268,18 @@ int do_line()
     char *inlptr = input_line;
 
     /* Skip leading whitespace */
-    while (isspace((int)*inlptr))
+    while (isspace((int) *inlptr))
 	inlptr++;
 
     if (inlptr != input_line) {
 	/* If there was leading whitespace, copy the actual
 	 * command string to the front. use memmove() because
 	 * source and target overlap */
-	memmove(input_line,inlptr,strlen(inlptr));
+	memmove(input_line, inlptr, strlen(inlptr));
 	/* Terminate resulting string */
 	input_line[strlen(inlptr)] = NUL;
     }
-
-    FPRINTF((stderr, "Input line: \"%s\"\n",input_line));
+    FPRINTF((stderr, "Input line: \"%s\"\n", input_line));
 
     /* also used in load_file */
     if (is_system(input_line[0])) {
@@ -315,7 +314,7 @@ void define()
 	/* function ! */
 	int dummy_num = 0;
 	struct at_type *at_tmp;
-	char save_dummy[MAX_NUM_VAR][MAX_ID_LEN + 1];
+	char save_dummy[MAX_NUM_VAR][MAX_ID_LEN+1];
 	memcpy(save_dummy, c_dummy_var, sizeof(save_dummy));
 	start_token = c_token;
 	do {
@@ -374,12 +373,16 @@ static int command()
 		gstrptime(string, format, &tm);
 		secs = gtimegm(&tm);
 		fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
+			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+			tm.tm_yday);
 		memset(&tm, 0, sizeof(tm));
 		ggmtime(&tm, secs);
 		gstrftime(string, 159, format, secs);
 		fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
+			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
+			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
+			tm.tm_yday);
 	    }
 	}
     } else if (almost_equals(c_token, "test")) {
@@ -395,7 +398,7 @@ static int command()
     } else if (almost_equals(c_token, "pa$use")) {
 	struct value a;
 	int sleep_time, text = 0;
-	char buf[MAX_LINE_LEN + 1];
+	char buf[MAX_LINE_LEN+1];
 
 	c_token++;
 	sleep_time = (int) real(const_express(&a));
@@ -413,9 +416,9 @@ static int command()
 		if (strcmp(term->name, "pm") != 0 || sleep_time >= 0)
 # else
 #  ifdef MTOS
-		if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
-#  endif /* MTOS */
-# endif /* OS2 */
+		    if (strcmp(term->name, "mtos") != 0 || sleep_time >= 0)
+#  endif			/* MTOS */
+# endif				/* OS2 */
 #endif /* _Windows */
 			fputs(buf, stderr);
 		text = 1;
@@ -433,8 +436,8 @@ static int command()
 /*           if (!CallFromRexx)
   would help to stop REXX programs w/o raising an error message
   in RexxInterface() ... */
-              bail_to_command_line();
-        } else if (rc == 2) {
+		    bail_to_command_line();
+		} else if (rc == 2) {
 		    fputs(buf, stderr);
 		    text = 1;
 		    (void) fgets(buf, MAX_LINE_LEN, stdin);
@@ -493,7 +496,7 @@ static int command()
 	do {
 	    ++c_token;
 	    if (isstring(c_token)) {
-		char s[MAX_LINE_LEN];
+		char s[MAX_LINE_LEN+1];
 		quote_str(s, c_token, MAX_LINE_LEN);
 		fputs(s, stderr);
 		need_space = 0;
@@ -577,7 +580,7 @@ static int command()
 		int_error("expecting filename", c_token);
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file,strlen(sv_file));
+		gp_expand_tilde(&sv_file, strlen(sv_file));
 		save_functions(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
@@ -585,7 +588,7 @@ static int command()
 		int_error("expecting filename", c_token);
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file,strlen(sv_file));
+		gp_expand_tilde(&sv_file, strlen(sv_file));
 		save_variables(fopen(sv_file, "w"));
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
@@ -593,12 +596,12 @@ static int command()
 		int_error("expecting filename", c_token);
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
-		gp_expand_tilde(&sv_file,strlen(sv_file));
+		gp_expand_tilde(&sv_file, strlen(sv_file));
 		save_set(fopen(sv_file, "w"));
 	    }
 	} else if (isstring(c_token)) {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file,strlen(sv_file));
+	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    save_all(fopen(sv_file, "w"));
 	} else {
 	    int_error("filename or keyword 'functions', 'variables', or 'set' expected", c_token);
@@ -609,7 +612,7 @@ static int command()
 	    int_error("expecting filename", c_token);
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file,strlen(sv_file));
+	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    /* load_file(fp=fopen(sv_file, "r"), sv_file, FALSE); OLD
 	     * DBT 10/6/98 handle stdin as special case
 	     * passes it on to load_file() so that it gets
@@ -625,7 +628,7 @@ static int command()
 	    int_error("expecting filename", c_token);
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file,strlen(sv_file));
+	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    /* Argument list follows filename */
 	    load_file(fopen(sv_file, "r"), sv_file, TRUE);
 	    /* input_line[] and token[] now destroyed! */
@@ -657,18 +660,19 @@ static int command()
 	    int_error("expecting directory name", c_token);
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
-	    gp_expand_tilde(&sv_file,strlen(sv_file));
+	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    if (changedir(sv_file)) {
 		int_error("Can't change to this directory", c_token);
 	    }
 	    c_token++;
 	}
     } else if (almost_equals(c_token, "pwd")) {
-	sv_file = (char *) gp_alloc (PATH_MAX, "print current dir");
+	sv_file = (char *) gp_alloc(PATH_MAX, "print current dir");
 	if (sv_file) {
 	    GP_GETCWD(sv_file, PATH_MAX);
 	    fprintf(stderr, "%s\n", sv_file);
-	    free (sv_file); sv_file = NULL;
+	    free(sv_file);
+	    sv_file = NULL;
 	}
 	c_token++;
     } else if (almost_equals(c_token, "ex$it") ||
@@ -691,9 +695,8 @@ static int command()
 #endif
 	int_error("invalid command", c_token);
     }
-
     if (sv_file)
-	free (sv_file);
+	free(sv_file);
 
     return (0);
 }
@@ -774,8 +777,11 @@ void replotrequest()
     } else {
 	char *replot_args = NULL;	/* else m_capture will free it */
 	int last_token = num_tokens - 1;
+
 	/* length = length of old part + length of new part + ',' + \0 */
-	int newlen = strlen(replot_line) + token[last_token].start_index + token[last_token].length - token[c_token].start_index + 2;
+	int newlen = strlen(replot_line) + token[last_token].start_index +
+	token[last_token].length - token[c_token].start_index + 2;
+
 	m_capture(&replot_args, c_token, last_token);	/* might be empty */
 	while (input_line_len < newlen)
 	    extend_input_line();
@@ -813,7 +819,7 @@ extern lib$spawn();
 
 int vms_len;
 
-unsigned int status[2] = {1, 0};
+unsigned int status[2] = { 1, 0 };
 
 static char Help[MAX_LINE_LEN+1] = "gnuplot";
 
@@ -889,11 +895,11 @@ int toplevel;			/* not used for VMS version */
     capture(Help + 8, first, c_token - 1, sizeof(Help) - 9);
     help_desc.dsc$w_length = strlen(Help);
     if ((vaxc$errno = lbr$output_help(lib$put_output, 0, &help_desc,
-			&helpfile_desc, 0, lib$get_input)) != SS$_NORMAL)
+				      &helpfile_desc, 0, lib$get_input)) != SS$_NORMAL)
 	os_error("can't open GNUPLOT$HELP", NO_CARET);
 }
 
-# endif /* NO_GIH */
+# endif				/* NO_GIH */
 
 static void do_shell()
 {
@@ -939,7 +945,7 @@ int toplevel;			/* not used for windows */
 	WinHelp(textwin.hWndParent, (LPSTR) winhelpname, HELP_PARTIALKEY, (DWORD) buf);
     }
 }
-# endif /* NO_GIH */
+# endif				/* NO_GIH */
 #endif /* _Windows */
 
 /*
@@ -970,11 +976,11 @@ int toplevel;
     int start;			/* starting token of help string */
     char *help_ptr;		/* name of help file */
 # if defined(SHELFIND)
-    static char help_fname[256] = ""; /* keep helpfilename across calls */
+    static char help_fname[256] = "";	/* keep helpfilename across calls */
 # endif
 
 # if defined(ATARI) || defined(MTOS)
-    char const *const ext[] = {NULL};
+    char const *const ext[] = { NULL };
 # endif
 
     if ((help_ptr = getenv("GNUHELP")) == (char *) NULL)
@@ -994,28 +1000,28 @@ int toplevel;
 	    help_ptr = HELPFILE;
     }
 #   else
-	help_ptr = HELPFILE;
-#   endif /* ATARI || MTOS */
-#  endif /* __TURBOC__ */
+    help_ptr = HELPFILE;
+#   endif			/* ATARI || MTOS */
+#  endif			/* __TURBOC__ */
 /* end of patch  - DJL */
 
-# else /* !SHELFIND */
-	/* try whether we can find the helpfile via shell_find. If not, just
-	   use the default. (tnx Andreas) */
+# else				/* !SHELFIND */
+    /* try whether we can find the helpfile via shell_find. If not, just
+       use the default. (tnx Andreas) */
 
-	if (!strchr(HELPFILE, ':') && !strchr(HELPFILE, '/') &&
-	    !strchr(HELPFILE, '\\')) {
-	    if (strlen(help_fname) == 0) {
+    if (!strchr(HELPFILE, ':') && !strchr(HELPFILE, '/') &&
+	!strchr(HELPFILE, '\\')) {
+	if (strlen(help_fname) == 0) {
+	    strcpy(help_fname, HELPFILE);
+	    if (shel_find(help_fname) == 0) {
 		strcpy(help_fname, HELPFILE);
-		if (shel_find(help_fname) == 0) {
-		    strcpy(help_fname, HELPFILE);
-		}
 	    }
-	    help_ptr = help_fname;
-	} else {
-	    help_ptr = HELPFILE;
 	}
-# endif /* !SHELFIND */
+	help_ptr = help_fname;
+    } else {
+	help_ptr = HELPFILE;
+    }
+# endif				/* !SHELFIND */
 
     /* Since MSDOS DGROUP segment is being overflowed we can not allow such  */
     /* huge static variables (1k each). Instead we dynamically allocate them */
@@ -1102,7 +1108,7 @@ int toplevel;
 # ifdef AMIGA_AC_5
 static char *parms[80];
 static char strg0[256];
-static void getparms __PROTO((char *, char**));
+static void getparms __PROTO((char *, char **));
 # endif
 
 static void do_system()
@@ -1127,7 +1133,7 @@ static void do_system()
 	system(input_line + 1);
 # elif defined(_Windows)
     winsystem(input_line + 1);
-# else /* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
+# else				/* !(AMIGA_AC_5 || ATARI && __GNUC__ || _Windows) */
 /* (am, 19980929)
  * OS/2 related note: cmd.exe returns 255 if called w/o argument.
  * i.e. calling a shell by "!" will always end with an error message.
@@ -1135,7 +1141,7 @@ static void do_system()
  *  variables,...
  */
     system(input_line + 1);
-# endif /* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
+# endif				/* !(AMIGA_AC_5 || ATARI&&__GNUC__ || _Windows) */
 }
 
 
@@ -1171,14 +1177,14 @@ char **parms;
 	*(strg0 + k) >= 'A' && *(strg0 + k) <= 'Z' ? *(strg0 + k) |= 32 : *(strg0 + k);
 }
 
-# endif /* AMIGA_AC_5 */
+# endif				/* AMIGA_AC_5 */
 
 
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, int n, char *prompt));
 
-static char * rlgets(s, n, prompt)
+static char *rlgets(s, n, prompt)
 char *s;
 int n;
 char *prompt;
@@ -1203,17 +1209,16 @@ char *prompt;
 
 	    /* Must always be called at this point or
 	     * 'temp' has the wrong value. */
-	    using_history();   
-	    temp = previous_history ();
+	    using_history();
+	    temp = previous_history();
 
-	    if (temp == 0 || strcmp (temp->line, line) != 0)
+	    if (temp == 0 || strcmp(temp->line, line) != 0)
 		add_history(line);
 
 #else /* !HAVE_LIBREADLINE */
 	    add_history(line);
 #endif
 	}
-
     }
     if (line) {
 	safe_strncpy(s, line + leftover, n);
@@ -1224,7 +1229,7 @@ char *prompt;
     }
     return NULL;
 }
-# endif /* READLINE || HAVE_LIBREADLINE */
+# endif				/* READLINE || HAVE_LIBREADLINE */
 
 
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
@@ -1234,11 +1239,11 @@ static void do_shell()
 #  if defined(_Windows)
 	if (WinExec(user_shell, SW_SHOWNORMAL) <= 32)
 #  elif defined(DJGPP)
-	if (system(user_shell) == -1)
+	    if (system(user_shell) == -1)
 #  else
-	if (spawnl(P_WAIT, user_shell, NULL) == -1)
-#  endif /* !(_Windows || DJGPP) */
-	    os_error("unable to spawn shell", NO_CARET);
+		if (spawnl(P_WAIT, user_shell, NULL) == -1)
+#  endif			/* !(_Windows || DJGPP) */
+		    os_error("unable to spawn shell", NO_CARET);
     }
 }
 
@@ -1264,7 +1269,8 @@ static void do_shell()
     }
     (void) putc('\n', stderr);
 }
-#  else /* !OS2 */
+
+#  else				/* !OS2 */
 
 /* plain old Unix */
 
@@ -1281,7 +1287,7 @@ static void do_shell()
     (void) putc('\n', stderr);
 }
 
-# endif /* !MSDOS */
+# endif				/* !MSDOS */
 
 /* read from stdin, everything except VMS */
 
@@ -1319,7 +1325,7 @@ char *s;
     /* return the input string */
     return (&(s[2]));
 }
-#   endif /* __TURBOC__ */
+#   endif			/* __TURBOC__ */
 
 #   ifdef __ZTC__
 void cputs(char *s)
@@ -1339,7 +1345,7 @@ char *cgets(char *s)
     /* return the input string */
     return (&(s[2]));
 }
-#   endif /* __ZTC__ */
+#   endif			/* __ZTC__ */
 
 /* emulate a fgets like input function with DOS cgets */
 char *cgets_emu(str, len)
@@ -1365,13 +1371,13 @@ int len;
     leftover += strlen(str);
     return str;
 }
-#  else /* !plain DOS */
+#  else				/* !plain DOS */
 
 #   define PUT_STRING(s) fputs(s, stderr)
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
-#  endif /* !plain DOS */
-# endif /* !READLINE && !HAVE_LIBREADLINE) */
+#  endif			/* !plain DOS */
+# endif				/* !READLINE && !HAVE_LIBREADLINE) */
 
 /* Non-VMS version */
 static int read_line(prompt)
@@ -1384,14 +1390,14 @@ char *prompt;
 # if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
     if (interactive)
 	PUT_STRING(prompt);
-# endif /* no READLINE */
+# endif				/* no READLINE */
     do {
 	/* grab some input */
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
-	     ? rlgets(&(input_line[start]), input_line_len - start,
-		      ((more) ? "> " : prompt))
-	     : fgets(&(input_line[start]), input_line_len - start, stdin))
+	    ? rlgets(&(input_line[start]), input_line_len - start,
+		     ((more) ? "> " : prompt))
+	    : fgets(&(input_line[start]), input_line_len - start, stdin))
 	    == (char *) NULL) {
 # else /* !(READLINE || HAVE_LIBREADLINE) */
 	if (GET_STRING(&(input_line[start]), input_line_len - start)
@@ -1436,6 +1442,7 @@ char *prompt;
     } while (more);
     return (0);
 }
+
 #endif /* !VMS */
 
 #ifdef _Windows
@@ -1491,4 +1498,3 @@ static int winsystem(char *s)
     return (0);			/* success */
 }
 #endif /* _Windows */
-
