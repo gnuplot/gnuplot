@@ -1,3 +1,9 @@
+2002-11-13  Ethan Merritt  <merritt@u.washington.edu>
+
+        * configure.in: Tweak the logic to correctly handle a more complete
+	set of combinations of old/new libgd old/new PNG driver and 
+	--with/--without/--with=dir/ configuration options.
+
 2002-11-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c(xtick_callback): Remove extra } when #ifndef PM3D.
@@ -1432,7 +1438,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/05 16:47:37 $).
+	last modification date (from the tag $Date: 2002/11/12 16:56:25 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

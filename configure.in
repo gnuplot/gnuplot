@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.117 2002/10/08 17:53:01 lhecking Exp $
+dnl $Id: configure.in,v 1.118 2002/10/09 12:40:56 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -394,8 +394,7 @@ if test "$withval" != no; then
      AC_DEFINE(HAVE_PNG,   1, [ Define if you have want png support ])
      with_png="yes"
      with_newgd="yes"],
-    [AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])
-     with_png="no"],
+    [AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])],
     [-lpng -lz])
 
   if test "$with_jpeg" != no; then
@@ -477,20 +476,22 @@ fi
 dnl
 
 dnl The *OLD* Portable Network Graphics (png) terminal
-if test "$with_newgd" != yes ; then
+if test "$with_newgd" != yes -a "$with_png" != no; then
   AC_ARG_WITH(png,dnl
   [  --with-png[=PATH]       enable *old* png terminal (requires libpng and libz)
                           (libgd versions 1.2 - 1.4) ],
-    [if test [-n] "$with_png" -a "$withval" != no; then
+
+    [if test "$withval" != no; then
        if test -d $withval/include; then
          CPPFLAGS="$CPPFLAGS -I$withval/include"
        fi
        if test -d $withval/lib; then
          LDFLAGS="$LDFLAGS -L$withval/lib"
        fi
-       with_png=yes
-     fi],
-    with_png=no)
+     fi
+     with_png=yes
+     ],
+  )
 
   if test "$with_png" = yes; then
     AC_CHECK_LIB(png,png_init_io,
