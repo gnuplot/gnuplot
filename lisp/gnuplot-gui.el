@@ -1218,7 +1218,7 @@ into the buffer.  TYPE is the object whose arguments are being set."
 (defface gnuplot-gui-error-face '((((class color) (background light))
 				  (:foreground "grey30"))
 				 (((class color) (background dark))
-				  (:foreground "gery70")))
+				  (:foreground "grey70")))
   "Face used to display message about unknown widget types."
   :group 'gnuplot-faces)
 
@@ -1458,9 +1458,9 @@ menu.  STARRED is true if this a 'list* widget."
 		(mapcar (lambda (x) (list 'item :value x))
 			list))))
     (widget-value-set widget default)
-    (unless (string-match "^\\s-*$" default)
-      (setcdr (assoc item gnuplot-gui-alist)
-	      (format "%s %s" (downcase item) default)))
+    (if (and starred (not (string-match "^\\s-*$" default)))
+	(setcdr (assoc item gnuplot-gui-alist)
+		(format "%s %s" (downcase item) default)))
     widget))
 
 (defun gnuplot-gui-number (item default &optional prefix)

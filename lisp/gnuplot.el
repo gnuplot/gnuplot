@@ -6,7 +6,7 @@
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
 ;; Updated:    April 11 1999
-;; Version:    0.5e
+;; Version:    0.5f
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -214,6 +214,10 @@
 ;;        unique completion.  add a few GUI types, rewrite some stuff
 ;;        in the GUI interface.  primitive support for plot, splot,
 ;;        and fit.  Fixed completion in file widget.
+;;  0.5f  May 15 1999 <BR> Add pgnuplot.c and Win9x install instructions
+;;        to the distribution.  Fixed a defface bug.  Added
+;;        `gnuplot-keywords-when' allowing deferral of parsing the
+;;        info file.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty <DB> (numerous corrections)
@@ -223,6 +227,7 @@
 ;;    Hrvoje Niksic (help with defcustom arguments for insertions)
 ;;    Michael Sanders <MS> (help with the info-look interface)
 ;;    Jinwei Shen <JS> (suggested functionality in comint buffer)
+;;    Holger Wenzel <HW> (suggested using `gnuplot-keywords-when')
 ;;  and especially to Lars Hecking <LH> for including gnuplot-mode
 ;;  with the gnuplot 3.7-beta distribution and for providing me with
 ;;  installation materials
@@ -234,7 +239,7 @@
 ;;    `gnuplot-after-plot-buffer-hook' to check and see if the script
 ;;    executed properly.  Alas I am not sure how gnuplot signals its
 ;;    errors.
-;; 2. improve plot, splot, fit,
+;; 2. improve plot, splot, fit in GUI
 ;;; Bugs:
 ;;
 ;; -- indentation is not quite right (but close)
@@ -298,7 +303,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5e")
+(defconst gnuplot-version "0.5f")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -479,7 +484,18 @@ to the empty string."
   "A list of keywords used in GNUPLOT.
 These are set by `gnuplot-set-keywords-list' from the values in
 `info-lookup-cache'.")
-
+(defvar gnuplot-keywords-pending t	;; <HW>
+  "A boolean which gets toggled when the info file is probed.")
+(defcustom gnuplot-keywords-when 'deferred ;; 'immediately
+  "This variable controls when the info file is parsed.
+The choices are immediately upon starting gnuplot-mode or the first
+time that data is needed.  If you use hilit19, then the info file is
+parsed immediately regardless of the value of this variable.  But
+you're not using that musty old thing, are you..."
+  :group 'gnuplot
+  :type
+  '(radio (const :tag "Parse info file when gnuplot-mode starts"    immediately)
+	  (const :tag "Parse info file the first time it is needed" deferred)))
 
 (defgroup gnuplot-faces nil
   "Text faces used by gnuplot-mode."
@@ -545,7 +561,8 @@ These are set by `gnuplot-set-keywords-list' from the values in
 	"---"
 	["Insert filename at point" gnuplot-insert-filename t]
 	["Negate set option"        gnuplot-negate-option t]
-	["Keyword help"             gnuplot-info-lookup-symbol gnuplot-keywords]
+	["Keyword help"             gnuplot-info-lookup-symbol
+	 (or gnuplot-keywords gnuplot-keywords-pending)]
 	["Set arguments at point"   gnuplot-gui-set-options-and-insert
 	 (fboundp 'gnuplot-gui-set-options-and-insert)]
 	["Show gnuplot process buffer"      gnuplot-show-gnuplot-buffer t]
@@ -1849,6 +1866,7 @@ Also set the variable `gnuplot-keywords' and do something sensible if
 info-look was not available.
 See the comments in `gnuplot-info-hook'."
   (interactive)
+  (setq gnuplot-keywords-pending nil)
   (if (featurep 'info-look)
       (progn
 	(cond ((boundp 'info-lookup-symbol-alist) ; older version
@@ -1923,6 +1941,8 @@ Return a list of keywords."
 This is a pretty simple minded completion function.  It is loosely
 adapted from `lisp-complete-symbol'."
   (interactive)
+  (if gnuplot-keywords-pending		; <HW>
+      (gnuplot-setup-info-look))
   (let* ((end (point))
 	 (beg (unwind-protect (save-excursion (backward-sexp 1) (point))))
 	 (patt (buffer-substring beg end))
@@ -1965,10 +1985,14 @@ frame as specified by the value of `gnuplot-info-display'.  If
 the size of the info entry if it is smaller than half the height of
 the frame."
   (interactive
-   (if gnuplot-keywords
-       (info-lookup-interactive-arguments 'symbol)
-     (list nil (message
-       "Help is not available.  The gnuplot info file could not be found."))))
+   (cond (gnuplot-keywords
+	  (info-lookup-interactive-arguments 'symbol))
+	 (gnuplot-keywords-pending	; <HW>
+	  (gnuplot-setup-info-look)
+	  (info-lookup-interactive-arguments 'symbol))
+	 (t
+	  (list nil (message
+       "Help is not available.  The gnuplot info file could not be found.")))))
   (if (and (featurep 'info-look) gnuplot-keywords)
       (let ((buff (current-buffer))
 	    (info-lookup-other-window-flag
@@ -2058,18 +2082,19 @@ maintainer of `gnuplot-mode'."
 	     gnuplot-insertions-show-help-flag
 	     gnuplot-delay
 	     gnuplot-quote-character
-	     gnuplot-insertions-menu-flag
-	     gnuplot-insertions-adornments
-	     gnuplot-insertions-plot-options
-	     gnuplot-insertions-terminal
-	     gnuplot-insertions-x-axis
-	     gnuplot-insertions-x2-axis
-	     gnuplot-insertions-y-axis
-	     gnuplot-insertions-y2-axis
-	     gnuplot-insertions-z-axis
-	     gnuplot-insertions-parametric-plots
-	     gnuplot-insertions-polar-plots
-	     gnuplot-insertions-surface-plots
+	     gnuplot-keywords-when
+	     ;;gnuplot-insertions-menu-flag
+	     ;;gnuplot-insertions-adornments
+	     ;;gnuplot-insertions-plot-options
+	     ;;gnuplot-insertions-terminal
+	     ;;gnuplot-insertions-x-axis
+	     ;;gnuplot-insertions-x2-axis
+	     ;;gnuplot-insertions-y-axis
+	     ;;gnuplot-insertions-y2-axis
+	     ;;gnuplot-insertions-z-axis
+	     ;;gnuplot-insertions-parametric-plots
+	     ;;gnuplot-insertions-polar-plots
+	     ;;gnuplot-insertions-surface-plots
 	     gnuplot-toolbar-display-flag
 	     gnuplot-toolbar-use-toolbar
 	     gnuplot-gui-popup-flag
@@ -2128,7 +2153,7 @@ web page for more details.
 
 			    ------O------
 
-There are several known shortcomings of `gnuplot-mode', version 0.5e.
+There are several known shortcomings of `gnuplot-mode', version 0.5f.
 Many of the shortcomings involve the graphical interface (refered to
 as the GUI) to setting arguments to plot options.  Here is a list:
 
@@ -2168,7 +2193,9 @@ as the GUI) to setting arguments to plot options.  Here is a list:
   (set (make-local-variable 'comment-start-skip) "#[ \t]*")
   (set (make-local-variable 'indent-line-function) 'gnuplot-indent-line)
   (set-syntax-table gnuplot-mode-syntax-table)
-  (gnuplot-setup-info-look) ;; <SE>
+  (if (or (fboundp 'hilit-set-mode-patterns)
+	  (equal gnuplot-keywords-when 'immediately)) ; <HW>
+      (gnuplot-setup-info-look)) ;; <SE>
   (if (fboundp 'hilit-set-mode-patterns) ; deal with hilit19 (ho hum!)
       (let ((keywords (concat "\\b\\(" (mapconcat 'identity
 						  gnuplot-keywords "\\|")
