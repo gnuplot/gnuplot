@@ -1,7 +1,53 @@
+2004-03-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	The fix for SF bug "[905651] Grid and border overlap the plot".
+	This is rather elaborate, unfortunately:
+	
+	* src/graph3d.c (USE_GRID_LAYERS): New feature test macro.  Turned
+	on automatically for now. If PM3D is on , this is forced on, too.
+	(whichgrid): Removed global variable.
+	(do_3dplot) [USE_GRID_LAYERS]: Draw back part of grid before the
+	plotted data/functions, and front part afterwards, by passing a
+	new argument to draw_3d_graphbox().
+	(draw_3d_graphbox): Added new argument 'whichgrid' to control
+	which parts of the graph box will be drawn.  Default is ALLGRID,
+	i.e. draw all of it.  All calls updated accordingly.
+	(draw_3d_graphbox) [USE_GRID_LAYERS]: Use new parameter to decide
+	which parts to actually draw.  Changed #if PM3D to USE_GRID_LAYERS
+	to enable this former PM3D-only code for general usage.
+	(xtick_callback, ytick_callback, ztick_allback): Removed former
+	PM3D-only checks --- they're done in graphbox now, before calling
+	gen_tics().
+
+	* src/pm3d.h (PM3D_HAVE_SOLID): New macro, default value zero.
+	Disables pm3d option {transparent|solid}, which is no longer
+	needed --- it's a duplicate of what 'set grid front' already
+	achieves.
+	(pm3d_struct) [!PM3D_HAVE_SOLID]: Remove struct field
+	corresponding to disabled option.
+
+	* src/pm3d.c (pm3d) [!PM3D_HAVE_SOLID]: Remove initializer of
+	removed struct field.
+	(pm3d_reset) [!PM3D_HAVE_SOLID]: Remove operation to clear removed
+	struct field.
+	
+	* src/set.c (set_pm3d) [!PM3D_HAVE_SOLID]: Ignore disabled option,
+	warn if running interactively.
+
+	* src/show.c (show_pm3d) [!PM3D_HAVE_SOLID]: Disable display of
+	removed option.
+
+	* src/save.c (save_set_all) [!PM3D_HAVE_SOLID]: Disable saving of
+	removed option.
+
+	* docs/gnuplot.doc (pm3d): Removed documentation of no longer
+	existant option.
+	(grid): Document new default layering of 3D grid/boundary.
+	
 2004-03-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	*  tutorial/tutorial.tex tutorial/header.tex: Updates about TeX-friendly
-	terminals in gnuplot 4.0.
+	* tutorial/tutorial.tex tutorial/header.tex: Updates about
+	TeX-friendly terminals in gnuplot 4.0.
 
 	* term/gd.trm term/gif.trm: Don't print debugging message.
 
@@ -12,13 +58,14 @@
 
 2004-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/os2/gnupmdrv.rc: Renamed menu entry "~data style" to
-	"style ~data", and same for "~function".
+	* src/os2/gnupmdrv.rc: Renamed menu entry "~data style" to "style
+	~data", and same for "~function".
 
-	* config/config.mgw config/config.os2: #define HAVE_TIME_T_IN_TIME_H.
+	* config/config.mgw config/config.os2: #define
+	HAVE_TIME_T_IN_TIME_H.
 
-	* ChangeLog: Fixed typos and spaces in author names and their e-mails
-	in ChangeLog entries.
+	* ChangeLog: Fixed typos and spaces in author names and their
+	e-mails in ChangeLog entries.
 
 2004-03-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -30,12 +77,13 @@
 2004-03-07  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* src/gplt_x11.c: Selecting linetype -2 worked only because bounds
-	checking was incorrect.  Now treat LT_BACKGROUND, LT_NODRAW, and other
-	negative linetypes as a request for the background color.
+	checking was incorrect.  Now treat LT_BACKGROUND, LT_NODRAW, and
+	other negative linetypes as a request for the background color.
 
-	* src/term.c: Allow explicit vertical offset of 0 in enhanced text mode
-	overprint statement.  Patch by Harald Harders (bug report #911068).
-	Overprint positioning remains inexact at best in non-PostScript drivers.
+	* src/term.c: Allow explicit vertical offset of 0 in enhanced text
+	mode overprint statement.  Patch by Harald Harders (SF.net bug
+	report #911068).  Overprint positioning remains inexact at best in
+	non-PostScript drivers.
 
 2004-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

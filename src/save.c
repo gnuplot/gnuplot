@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.71 2004/01/18 01:30:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.72 2004/02/27 10:12:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -731,7 +731,9 @@ set ticscale %g %g\n",
     fputs("ftriangles", fp);
     if (pm3d.hidden3d_tag) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
 	else fputs(" nohidden3d", fp);
+#if PM3D_HAVE_SOLID
     fputs((pm3d.solid ? " solid" : " transparent"), fp);
+#endif
     fputs((PM3D_IMPLICIT == pm3d.implicit ? " implicit" : " explicit"), fp);
     fputs(" corners2color ", fp);
     switch (pm3d.which_corner_color) {

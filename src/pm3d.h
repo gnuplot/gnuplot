@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.17 2003/03/13 14:47:54 mikulik Exp $
+ * $Id: pm3d.h,v 1.18 2003/09/08 12:55:59 broeker Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -33,6 +33,12 @@
 /****
   Global options for pm3d algorithm (to be accessed by set / show)
 ****/
+
+/* HBB NEW 20040311: setting this to 0 removes the pm3d option
+ * {transparent|solid} --- it's a duplicate of 'set grid front' */
+#ifndef PM3D_HAVE_SOLID
+# define PM3D_HAVE_SOLID 0
+#endif
 
 /*
   where to plot pm3d: base or top (color map) or surface (color surface)
@@ -106,8 +112,10 @@ typedef struct {
   char clip;		/* 1in, 4in */
   int hidden3d_tag;     /* if this is > 0, pm3d hidden lines are drawn with
 			   this linestyle (which must naturally present). */
+#if PM3D_HAVE_SOLID
   int solid;            /* if this is != 0, border tics and labels might be
 			   hidden by the surface */
+#endif
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.125 2003/12/22 05:13:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.126 2003/12/26 22:59:12 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2853,12 +2853,23 @@ set_pm3d()
 		continue;
 	    case S_PM3D_SOLID: /* "so$lid" */
 	    case S_PM3D_NOTRANSPARENT: /* "notr$ansparent" */
+#if PM3D_HAVE_SOLID
 		pm3d.solid = 1;
+
+#else
+		if (interactive)
+		    int_warn(c_token, "Deprecated syntax --- ignored");
+#endif
 		continue;
 	    case S_PM3D_NOSOLID: /* "noso$lid" */
 	    case S_PM3D_TRANSPARENT: /* "tr$ansparent" */
+#if PM3D_HAVE_SOLID
 		pm3d.solid = 0;
 		continue;
+#else
+		if (interactive)
+		    int_warn(c_token, "Deprecated syntax --- ignored");
+#endif
 	    case S_PM3D_IMPLICIT: /* "i$mplicit" */
 	    case S_PM3D_NOEXPLICIT: /* "noe$xplicit" */
 		pm3d.implicit = PM3D_IMPLICIT;

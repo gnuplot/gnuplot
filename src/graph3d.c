@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.83 2003/10/10 10:33:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.84 2003/12/19 01:31:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -69,6 +69,15 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.83 2003/10/10 10:33:39 m
 #   include "color.h"
 #endif
 
+/* HBB NEW 20040311: PM3D did already split up grid drawing into two
+ * parts, one before, the other after drawing the main surfaces, as a
+ * poor-man's depth-sorting algorithm.  Make this independent of
+ * PM3D. Turn the new option on by default. */
+#if defined(PM3D) || !defined(USE_GRID_LAYERS)
+# define USE_GRID_LAYERS 1
+#endif
+
+
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
 static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
@@ -101,10 +110,7 @@ int iso_samples_2 = ISO_SAMPLES;
 
 double xscale3d, yscale3d, zscale3d;
 
-#ifdef PM3D
 typedef enum { ALLGRID, FRONTGRID, BACKGRID } WHICHGRID;
-static WHICHGRID whichgrid = ALLGRID;
-#endif
 
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
@@ -129,7 +135,8 @@ static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 					 double height[2][2], double depth[2][2]));
 static void setup_3d_box_corners __PROTO((void));
 static void draw_3d_graphbox __PROTO((struct surface_points * plot,
-				      int plot_count));
+				      int plot_count,
+				      WHICHGRID whichgrid));
 /* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
 void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
 			     struct lp_style_type grid));
@@ -243,7 +250,7 @@ int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
 #endif
 
 /* the penalty for convenience of using tic_gen to make callbacks
- * to tick routines is that we cant pass parameters very easily.
+ * to tick routines is that we cannot pass parameters very easily.
  * We communicate with the tick_callbacks using static variables
  */
 
@@ -659,26 +666,28 @@ do_3dplot(plots, pcount, quick)
     setup_3d_box_corners();
 
     /* DRAW GRID AND BORDER */
+    /* Original behaviour: draw entire grid in back, if 'set grid back': */
     if (grid_layer == 0)
-	draw_3d_graphbox(plots, pcount);
+	draw_3d_graphbox(plots, pcount, ALLGRID);
 
 #ifdef PM3D
-    /* DRAW PM3D ALL COLOR SURFACES */
+    /* Draw PM3D color key box */
     if (!quick) {
-	can_pm3d = is_plot_with_palette() && !make_palette() && term->set_color;
+	can_pm3d = is_plot_with_palette() && !make_palette()
+	    && term->set_color;
 	if (can_pm3d) {
-	    /* draw the color surfaces */
-	    if (pm3d.where[0]) {
-		if (pm3d.solid) {
-		    whichgrid = BACKGRID;
-		    draw_3d_graphbox(plots, pcount);
-		}
-	    }
-	    /* draw color box */
 	    draw_color_smooth_box();
-	} /* can_pm3d */
+	}
     }
-#endif
+#endif /* PM3D */
+
+#ifdef USE_GRID_LAYERS
+    if (!hidden3d && (grid_layer == -1))
+	/* Draw the back part now, per default, but not if hidden3d is
+	 * in use, because that relies on all isolated lines being
+	 * output after all surfaces have been defined. */
+	draw_3d_graphbox(plots, pcount, BACKGRID);
+#endif /* USE_GRID_LAYERS */
 
     /* PLACE TITLE */
     if (*title.text != 0) {
@@ -1245,18 +1254,22 @@ do_3dplot(plots, pcount, quick)
 	    } /* draw contours */
 	} /* loop over surfaces */
 
-#ifdef PM3D
-    /* draw grid and coordinate system */
-    if (pm3d.where[0] && pm3d.solid && !quick) {
-	whichgrid = FRONTGRID;
-    } else {
-	whichgrid = ALLGRID;
-    }
-#endif
-
     /* DRAW GRID AND BORDER */
-    if (grid_layer == 1 || grid_layer == -1)
-	draw_3d_graphbox(plots, pcount);
+#ifndef USE_GRID_LAYERS
+    /* Old behaviour: draw entire grid now, unless it was requested to
+     * be in the back. */
+    if (grid_layer != 0)
+	draw_3d_graphbox(plots, pcount, ALLGRID);
+#else
+    /* HBB NEW 20040311: do front part now, after surfaces have been
+     * output. If "set grid front", or hidden3d is active, must output
+     * the whole shebang now, otherwise only the front part. */
+    if (hidden3d || grid_layer == 1)
+	draw_3d_graphbox(plots, pcount, ALLGRID);
+    else if (grid_layer == -1)
+	draw_3d_graphbox(plots, pcount, FRONTGRID);
+
+#endif /* USE_GRID_LAYERS */
 
     /* PLACE LABELS */
     place_labels3d(first_label, 1);
@@ -2037,16 +2050,17 @@ setup_3d_box_corners()
 /* Draw all elements of the 3d graph box, including borders, zeroaxes,
  * tics, gridlines, ticmarks, axis labels and the base plane. */
 static void
-draw_3d_graphbox(plot, plot_num)
+draw_3d_graphbox(plot, plot_num, whichgrid)
     struct surface_points *plot;
     int plot_num;
+    WHICHGRID whichgrid;
 {
     unsigned int x, y;		/* point in terminal coordinates */
     struct termentry *t = term;
 
     if (draw_border) {
 	/* the four corners of the base plane, in normalized view
-	 * coordinates (-1..1) * on all three axes: */
+	 * coordinates (-1..1) on all three axes. */
 	vertex bl, bb, br, bf;  
 
 	/* map to normalized view coordinates the corners of the
@@ -2056,21 +2070,25 @@ draw_3d_graphbox(plot, plot_num)
 	map3d_xyz(right_x, right_y, base_z, &br);
 	map3d_xyz(front_x, front_y, base_z, &bf);
 
-#ifdef PM3D /* FIXME: probably completely unneeded, now. */
+#ifdef USE_GRID_LAYERS
 	if (BACKGRID != whichgrid)
 #endif
 	{
+	    /* Draw front part of base grid, right to front corner: */
 	    if (draw_border & 4)
 		draw3d_line(&br, &bf, &border_lp);
+	    /* ... and left to front: */
 	    if (draw_border & 1)
 		draw3d_line(&bl, &bf, &border_lp);
 	}
-#ifdef PM3D /* FIXME: dito */
+#ifdef USE_GRID_LAYERS
 	if (FRONTGRID != whichgrid)
 #endif
 	{
+	    /* Draw back part of base grid: left to back corner: */
 	    if (draw_border & 2)
 		draw3d_line(&bl, &bb, &border_lp);
+	    /* ... and right to back: */
 	    if (draw_border & 8)
 		draw3d_line(&br, &bb, &border_lp);
 	}
@@ -2098,16 +2116,20 @@ draw_3d_graphbox(plot, plot_num)
 		/* all four verticals are drawn - save some time by
 		 * drawing them to the full height, regardless of
 		 * where the surface lies */
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 		if (FRONTGRID != whichgrid) {
 #endif
+		    /* Draw the back verticals floor-to-ceiling, left: */
 		    draw3d_line(&fl, &tl, &border_lp);
+		    /* ... back: */
 		    draw3d_line(&fb, &tb, &border_lp);
+		    /* ... and right */
 		    draw3d_line(&fr, &tr, &border_lp);
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 		}
 		if (BACKGRID != whichgrid) 
 #endif
+		    /* Draw the front vertical: floor-to-ceiling, front: */
 		    draw3d_line(&ff, &tf, &border_lp);
 	    } else {
 		/* find heights of surfaces at the corners of the xy
@@ -2158,42 +2180,50 @@ draw_3d_graphbox(plot, plot_num)
 		    draw3d_line(&a, &b, &border_lp);		\
 		}
 
-#ifdef PM3D			/* FIXME: probably no longer needed */
+#ifdef USE_GRID_LAYERS
 		if (FRONTGRID != whichgrid) {
 #endif
-		    VERTICAL(16, zaxis_x, zaxis_y, zaxis_i, zaxis_j, &fl, &tl);
-		    VERTICAL(32, back_x, back_y, back_i, back_j, &fb, &tb);
-		    VERTICAL(64, right_x, right_y, 1 - zaxis_i, 1 - zaxis_j,
+		    /* Draw back verticals: floor-to-ceiling left: */
+		    VERTICAL(0x10, zaxis_x, zaxis_y, zaxis_i, zaxis_j, &fl, &tl);
+		    /* ... back: */
+		    VERTICAL(0x20, back_x, back_y, back_i, back_j, &fb, &tb);
+		    /* ... and right: */
+		    VERTICAL(0x40, right_x, right_y, 1 - zaxis_i, 1 - zaxis_j,
 			     &fr, &tr);
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 		}
 		if (BACKGRID != whichgrid) {
 #endif
-		    VERTICAL(128, front_x, front_y, 1 - back_i, 1 - back_j,
+		    /* Draw front verticals: floor-to-ceiling front */
+		    VERTICAL(0x80, front_x, front_y, 1 - back_i, 1 - back_j,
 			     &ff, &tf);
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 		}
 #endif
 #undef VERTICAL
 	    } /* else (all 4 verticals drawn?) */
 
 	    /* now border lines on top */
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 	    if (FRONTGRID != whichgrid)
 #endif
 	    {
-		if (draw_border & 256)
+		/* Draw back part of top of box: top left to back corner: */
+		if (draw_border & 0x100)
 		    draw3d_line(&tl, &tb, &border_lp);
-		if (draw_border & 512)
+		/* ... and top right to back: */
+		if (draw_border & 0x200)
 		    draw3d_line(&tr, &tb, &border_lp);
 	    }
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 	    if (BACKGRID != whichgrid)
 #endif
 	    {
-		if (draw_border & 1024)
+		/* Draw front part of top of box: top left to front corner: */
+		if (draw_border & 0x400)
 		    draw3d_line(&tl, &tf, &border_lp);
-		if (draw_border & 2048)
+		/* ... and top right to front: */
+		if (draw_border & 0x800)
 		    draw3d_line(&tr, &tf, &border_lp);
 	    }
 	} /* else (surface is drawn) */
@@ -2214,14 +2244,19 @@ draw_3d_graphbox(plot, plot_num)
 	tic_unity = (v1.y - v0.y) / (double)yscaler;
 	tic_unitz = (v1.z - v0.z) / (double)yscaler;
 
+#ifdef USE_GRID_LAYERS
+	/* Don't output tics and grids if this is the front part of a
+	 * two-part grid drawing process: */
+	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
+	    (surface_rot_x > 90 && BACKGRID != whichgrid)) 
+#endif
 	if (X_AXIS.ticmode) {
-	    gen_tics(FIRST_X_AXIS, /* grid_selection & (GRID_X | GRID_MX), */
-		     xtick_callback);
+	    gen_tics(FIRST_X_AXIS, xtick_callback);
 	}
 
 	if (*X_AXIS.label.text) {
 	    /* label at xaxis_y + 1/4 of (xaxis_y-other_y) */
-#ifdef PM3D /* FIXME: still needed??? what for? */
+#ifdef USE_GRID_LAYERS /* FIXME: still needed??? what for? */
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
@@ -2248,19 +2283,20 @@ draw_3d_graphbox(plot, plot_num)
 		    v2.y += tics_len;
 		}
 #endif
-    	    TERMCOORD(&v2, x1, y1);
-	    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
+		TERMCOORD(&v2, x1, y1);
+		/* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
 #define DEFAULT_Y_DISTANCE 0.5
-	    y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
+		y1 -= (unsigned int) ((1 + DEFAULT_Y_DISTANCE) * t->v_char);
 #undef DEFAULT_Y_DISTANCE
 	    } else { /* usual 3d set view ... */
     		double step = (xaxis_y - other_end) / 4;
-	    map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
-	    if (!tic_in) {
-		v1.x -= tic_unitx * ticscale * t->v_tic;
-		v1.y -= tic_unity * ticscale * t->v_tic;
-	    }
-	    TERMCOORD(&v1, x1, y1);
+
+		map3d_xyz(mid_x, xaxis_y + step, base_z, &v1);
+		if (!tic_in) {
+		    v1.x -= tic_unitx * ticscale * t->v_tic;
+		    v1.y -= tic_unity * ticscale * t->v_tic;
+		}
+		TERMCOORD(&v1, x1, y1);
 	    }
 
 	    x1 += X_AXIS.label.xoffset * t->h_char; /* user-defined label offset */
@@ -2270,7 +2306,7 @@ draw_3d_graphbox(plot, plot_num)
 			    CENTRE, JUST_TOP, 0,
 			    X_AXIS.label.font);
 	    reset_textcolor(&(X_AXIS.label.textcolor),t);
-#ifdef PM3D
+#ifdef USE_GRID_LAYERS
 	    }
 #endif
 	}
@@ -2291,12 +2327,17 @@ draw_3d_graphbox(plot, plot_num)
 	tic_unity = (v1.y - v0.y) / (double)xscaler;
 	tic_unitz = (v1.z - v0.z) / (double)xscaler;
 
+#ifdef USE_GRID_LAYERS
+	/* Don't output tics and grids if this is the front part of a
+	 * two-part grid drawing process: */
+	if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
+	    (surface_rot_x > 90 && BACKGRID != whichgrid)) 
+#endif
 	if (Y_AXIS.ticmode) {
-	    gen_tics(FIRST_Y_AXIS, /* grid_selection & (GRID_Y | GRID_MY), */
-		     ytick_callback);
+	    gen_tics(FIRST_Y_AXIS, ytick_callback);
 	}
 	if (*Y_AXIS.label.text) {
-#ifdef PM3D /* FIXME */
+#ifdef USE_GRID_LAYERS
 	    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 		(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
 #endif
@@ -2322,7 +2363,7 @@ draw_3d_graphbox(plot, plot_num)
 		    widest_tic_strlen = 0;
 		    if (Y_AXIS.ticmode & TICS_ON_BORDER) {
 			widest_tic_strlen = 0; /* reset the global variable */
-		      	gen_tics(FIRST_Y_AXIS, /* 0, */ widest_tic_callback);
+		      	gen_tics(FIRST_Y_AXIS, widest_tic_callback);
 		    }
 		    /* DEFAULT_Y_DISTANCE is with respect to baseline of tics labels */
 #define DEFAULT_X_DISTANCE 0.
@@ -2376,7 +2417,7 @@ draw_3d_graphbox(plot, plot_num)
 		/* revert from vertical y-label for maps */
 		if (splot_map == TRUE)
 		    (*t->text_angle)(0);
-#ifdef PM3D /* FIXME */
+#ifdef USE_GRID_LAYERS
 	    }
 #endif
 	}
@@ -2384,6 +2425,11 @@ draw_3d_graphbox(plot, plot_num)
 
     /* do z tics */
     if (Z_AXIS.ticmode
+#ifdef USE_GRID_LAYERS
+	/* Don't output tics and grids if this is the front part of a
+	 * two-part grid drawing process: */
+	&& (FRONTGRID != whichgrid)
+#endif
 	&& (splot_map == FALSE)
 	&& (draw_surface
 	    || (draw_contour & CONTOUR_SRF)
@@ -2392,8 +2438,7 @@ draw_3d_graphbox(plot, plot_num)
 #endif
 	    )
 	) {
-	gen_tics(FIRST_Z_AXIS, /* grid_selection & (GRID_Z | GRID_MZ), */
-		 ztick_callback);
+	gen_tics(FIRST_Z_AXIS, ztick_callback);
     }
     if ((Y_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
 	&& !X_AXIS.log
@@ -2462,10 +2507,6 @@ xtick_callback(axis, place, text, grid)
 
     (void) axis;		/* avoid -Wunused warning */
 
-#ifdef PM3D
-    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
-	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
-#endif
     map3d_xyz(place, xaxis_y, base_z, &v1);
     if (grid.l_type > L_TYPE_NODRAW) {
 	/* to save mapping twice, map non-axis y */
@@ -2512,11 +2553,6 @@ xtick_callback(axis, place, text, grid)
 	term_apply_lp_properties(&border_lp);
     }
 
-#ifdef PM3D
-    }
-    if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
-	(surface_rot_x > 90 && BACKGRID != whichgrid)) 
-#endif
     if (X_AXIS.ticmode & TICS_MIRROR) {
 	map3d_xyz(place, other_end, base_z, &v1);
 	v2.x = v1.x - tic_unitx * scale * t->v_tic;
@@ -2544,10 +2580,6 @@ ytick_callback(axis, place, text, grid)
 
     (void) axis;		/* avoid -Wunused warning */
 
-#ifdef PM3D
-    if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
-	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
-#endif
     map3d_xyz(yaxis_x, place, base_z, &v1);
     if (grid.l_type > L_TYPE_NODRAW) {
 	map3d_xyz(other_end, place, base_z, &v2);
@@ -2593,11 +2625,6 @@ ytick_callback(axis, place, text, grid)
 	term_apply_lp_properties(&border_lp);
     }
 
-#ifdef PM3D
-    }
-    if ((surface_rot_x <= 90 && FRONTGRID != whichgrid) ||
-	(surface_rot_x > 90 && BACKGRID != whichgrid))
-#endif
     if (Y_AXIS.ticmode & TICS_MIRROR) {
 	map3d_xyz(other_end, place, base_z, &v1);
 	v2.x = v1.x - tic_unitx * scale * t->h_tic;
