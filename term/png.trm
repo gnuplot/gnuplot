@@ -62,9 +62,7 @@
    xmax and ymax, and then setting b_rastermode to TRUE.  b_setpixel()
    will then perform the interchange before each pixel is plotted */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(png_driver)
@@ -90,9 +88,7 @@ TERM_PUBLIC void PNGpoint __PROTO((unsigned int x, unsigned int y, int point));
  * we use
  */
 
-#if PNG_LIBPNG_VER < 89
-#error png library is too old
-#endif
+/* png version test now in configure */
 
 /* make XMAX and YMAX a multiple of 8 */
 #define PNG_XMAX (640)
@@ -163,9 +159,9 @@ void PNGinit()
 
 void PNGreset()
 {
-#ifdef vms
+#ifdef VMS
    fflush_binary();
-#endif /* vms */
+#endif /* VMS */
 }
 
 

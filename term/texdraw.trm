@@ -55,9 +55,7 @@
  *  latex driver. You need texdraw.sty, and texdraw.tex in the texdraw package.
  *
  */
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(texdraw)

@@ -57,9 +57,7 @@
  *                       to DSC, added version no. and patchl. to %%Creator
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(post)

@@ -1,24 +1,41 @@
 /*
- * $Id: latex.trm,v 1.61 1997/04/10 02:34:22 drd Exp $
+ * $Id: latex.trm,v 1.62 1998/03/22 22:34:49 drd Exp $
  *
  */
 
 /* GNUPLOT - latex.trm */
-/*
- * Copyright (C) 1990 - 1993, 1997
+
+/*[
+ * Copyright 1990 - 1993, 1998
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software  is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
@@ -57,9 +74,7 @@
  * - drd, Sept 1996
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(latex)
@@ -445,7 +460,7 @@ LATEX_rule(code, x,y, width, height)
 {  
     static float lastx, lasty;
     static float lastw, lasth;
-    static TBOOLEAN valid = FALSE; /* is 'last' data valid? */
+    static TBOOLEAN isvalid = FALSE; /* is 'last' data valid? */
     TBOOLEAN combine = (code == 1);
     TBOOLEAN flush = (code == 2);
 
@@ -453,7 +468,7 @@ LATEX_rule(code, x,y, width, height)
 	 if (width == 0 || height == 0)
 	   return;			/* ignore this rule */
 
-    if (valid && combine) {
+    if (isvalid && combine) {
 	   /* try to combine new rule with old rule */
 	   if ((int)lastx == (int)x && lastw == width) { /* vertical rule */
 		  if (lasth * height >= 0) { /* same sign */
@@ -469,7 +484,7 @@ LATEX_rule(code, x,y, width, height)
 	   /* oh well, output last and remember the new one */
     }
 
-    if (valid) {
+    if (isvalid) {
 	   /* output the rule */
 	   if (lastw < 0) {
 		  lastx += lastw;
@@ -491,11 +506,11 @@ LATEX_rule(code, x,y, width, height)
     }
     
     if (flush) {
-	   valid = FALSE;
+	   isvalid = FALSE;
     } else {
 	   lastx = x; lasty = y;
 	   lastw = width; lasth = height;
-	   valid = TRUE;
+	   isvalid = TRUE;
     }
 }
 

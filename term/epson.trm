@@ -55,9 +55,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 #ifdef EPS180
@@ -214,7 +212,7 @@ TERM_PUBLIC void EPSONtext()
 
 TERM_PUBLIC void EPSONreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -331,7 +329,7 @@ int linetype;
 	
 TERM_PUBLIC void NECreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -395,7 +393,7 @@ char column3, column2, column1;
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
 #endif
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -486,7 +484,7 @@ int linetype;
 
 TERM_PUBLIC void STARCreset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }

@@ -60,9 +60,7 @@
    the Portable BitMap format and for programs to convert PBM files  
    to other bitmap formats. */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pbm_driver)
@@ -152,9 +150,9 @@ TERM_PUBLIC void PBMinit()
 
 TERM_PUBLIC void PBMreset()
 {
-#ifdef vms
+#ifdef VMS
    fflush_binary();
-#endif /* vms */
+#endif /* VMS */
 }
 
 

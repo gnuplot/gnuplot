@@ -37,9 +37,7 @@
  *    x11.trm  --- inboard terminal driver for X11
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(x11)

@@ -66,9 +66,7 @@
  * adapted to the new terminal layout by Stefan Bodewig (Dec. 1995)
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(hp500c)
@@ -246,7 +244,7 @@ TERM_PUBLIC void HP500Cinit()
 
 TERM_PUBLIC void HP500Creset()
 {
-#ifdef vms
+#ifdef VMS
 	fflush_binary();
 #endif
 }
@@ -490,9 +488,9 @@ TERM_PUBLIC void HP500Ctext()
   free(obuf);  
   b_freebitmap();
   
-#ifndef vms  /* most vms spoolers add a formfeed character */
+#ifndef VMS  /* most vms spoolers add a formfeed character */
   fprintf(outfile,"\f");
-#endif /* not vms */
+#endif /* not VMS */
 }
 
 #endif

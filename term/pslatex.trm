@@ -49,9 +49,7 @@
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(pslatex)

@@ -60,9 +60,7 @@
  * plus symbols and depth/thickness by bernlohr@eu1.mpi-hd.mpg.de (KB) Aug 15 1996
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif /* GOT_DRIVER_H */
 
 #ifdef TERM_REGISTER
 register_term(fig)

@@ -54,9 +54,7 @@
  * monitor features (Lucas P. Hart, June 1997) 
  */
 
-#ifndef GOT_DRIVER_H
 #include "driver.h"
-#endif
 
 #ifdef TERM_REGISTER
 register_term(vws)
