@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.11 1999/06/22 11:54:20 lhecking Exp $
+ * $Id: metafont.trm,v 1.12 1999/06/25 17:07:55 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -486,13 +486,18 @@ unsigned int x, y;
 const char *str;
 {
     int i, j = 0;
+    char *text;
 
+    /* ignore empty strings */
     if (!str || !*str)
 	return;
 
-    for (i = 0; i < strlen(str); i++)
-	if (str[i] == '"')
-	    str[i] = '\'';	/* Replace " with ' */
+    /* F***. why do drivers need to modify string args? */
+    text = gp_strdup(str);
+
+    for (i = 0; i < strlen(text); i++)
+	if (text[i] == '"')
+	    text[i] = '\'';	/* Replace " with ' */
     switch (MF_justify) {
     case LEFT:
 	j = 1;
@@ -505,7 +510,8 @@ const char *str;
 	break;
     }
     fprintf(gpoutfile, "put_text(\"%s\",%da,%db,%d,%d);\n",
-	    str, x, y, MF_ang, j);
+	    text, x, y, MF_ang, j);
+    free(text);
 }
 
 
