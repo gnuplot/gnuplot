@@ -524,7 +524,7 @@ static void CGM_write_char_record(class, cgm_id, numbytes, data)
 int class, cgm_id, numbytes;
 char *data;
 {
-    int pad, length;
+    int i, pad, length;
     static unsigned char flag = 0xff;
     static unsigned char paddata = 0;
     char short_len;
@@ -544,7 +544,13 @@ char *data;
         fwrite(&flag, 1, 1, gpoutfile);
 	CGM_write_int(numbytes);
     }
-    fwrite(data, 1, numbytes, gpoutfile);		/* write string */
+
+    if (data)
+        fwrite(data, 1, numbytes, gpoutfile);		/* write string */
+    else
+	for (i=0; i<numbytes+pad; i++)
+	    fputc('\0', gpoutfile);			/* write null bytes */
+
     if(pad)
       fwrite(&paddata, 1, 1, gpoutfile);
 }
