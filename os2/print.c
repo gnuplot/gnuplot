@@ -488,7 +488,7 @@ int FindPrinter( char *szName, PPRQINFO3 piPrinter )
     {
     PPRQINFO3 pprq = NULL ;
     PDRIVDATA pdriv = NULL ;
-    ULONG np ;
+    LONG np ;
     
     if( *szName && (strcmp( szName, piPrinter->pszName ) == 0) ) return 0 ;
     if( GetPrinters( &pprq , &np ) == 0 ) return 1 ;

@@ -322,19 +322,18 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             {
             ULONG ulCount ;
             PID pid; TID tid;
-            if(bFirst) { /* ignore first paint message */
-                bFirst = FALSE ;
-                return (WinDefWindowProc(hWnd, message, mp1, mp2));
-                }
-                /* suppress paint messages while building plot */
+            HPS hps_tmp;
+            RECTL rectl_tmp;
               DosQueryMutexSem( semHpsAccess, &pid, &tid, &ulCount ) ;
-              if( ulCount > 0 ) {
-//            if( DosWaitEventSem( semDrawDone, 0 ) != 0 ) {
-                        /* include in update region */
-                WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
-                        /* mark as done, but save region for later update */ 
-                WinBeginPaint( hWnd, hpsScreen, &rectlPaint ) ;
-                WinEndPaint(hpsScreen) ; 
+            if (( ulCount > 0 ) && (tid != tidDraw)) {
+                /* simple repaint while building plot or metafile */
+                /* use temporary PS                   */
+              hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
+              WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
+              WinEndPaint(hps_tmp);
+                /* add dirty rectangle to saved rectangle     */
+                /* to be repainted when PS is available again */
+              WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
                 iPaintCount ++ ;
                 break ;
                 } 
@@ -873,8 +872,7 @@ static void DoPaint( HWND hWnd, HPS hps  )
             /* winbeginpaint here, so paint message is
                not resent when we return, then spawn a 
                thread to do the drawing */
-//    WinBeginPaint( hWnd, hps, &rectl ) ;
-    WinBeginPaint( hWnd, hps, NULL ) ;
+    WinBeginPaint( hWnd, hps, &rectl ) ;                 //rl
     tidDraw = _beginthread( ThreadDraw, NULL, 32768, NULL ) ;
     }
 
