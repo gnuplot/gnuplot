@@ -1,3 +1,8 @@
+2005-02-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_arrow): Fix parsing of 'rto' vs. 'to'.  Thanks to
+	Shigeharu Takeno for spotting this.
+
 2005-01-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/ai.trm (AI_reset) term/corel.trm (COREL_reset) term/epslatex.trm
