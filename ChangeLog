@@ -1,3 +1,9 @@
+2002-02-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/x11.trm (X11_options): Removed superfluous comma, broke
+ 	re-readability of term_options string.  Found and fixed by Don
+ 	Taber <dtaber@blackrat.risc.rockwell.com>.
+
 2002-02-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c: For 'splot ... with ... palette', draw key as a line

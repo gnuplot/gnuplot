@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.48 2002/01/31 17:14:26 lhecking Exp $
+ * $Id: x11.trm,v 1.49 2002/02/04 11:53:34 lhecking Exp $
  *
  */
 
@@ -342,7 +342,7 @@ X11_options()
 	    break;
 	}
     }
-    sprintf(term_options, "%d, driver \"%s\"", X11_plot_number, X11_command);
+    sprintf(term_options, "%d driver \"%s\"", X11_plot_number, X11_command);
     if (UNSET != do_raise) {
 	strcat(term_options, (yes == do_raise ? ", raise" : ", noraise"));
     }
