@@ -378,8 +378,7 @@ dnl end png and z
 dnl create list of terminals
 AC_MSG_CHECKING([terminal driver sources])
 ( cd $srcdir/term && for i in *.trm ; do echo '${srcdir}'/../term/$i ; done )\
- |fmt |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g'\
- |tr @% '\012\012' >termlist
+ |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
 TERM_LIST=termlist
 AC_SUBST_FILE(TERM_LIST)
 AC_MSG_RESULT([list created])
