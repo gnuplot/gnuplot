@@ -1,3 +1,7 @@
+2002-01-27  Johannes Zellner  <johannes@zellner.org>
+
+	* term/ggi.trm: remove stdin buffering like in x11
+
 2002-01-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (plot3d_lines_pm3d): Fix line misordering in
