@@ -294,7 +294,7 @@ typedef double coordval;
 #ifndef inrange
 # define inrange(z,min,max) \
    (((min)<(max)) ? (((z)>=(min)) && ((z)<=(max))) : \
-                    (((z)>=(max)) && ((z)<=(min))))
+	            (((z)>=(max)) && ((z)<=(min))))
 #endif
 
 /* There is a bug in the NEXT OS. This is a workaround. Lookout for
@@ -545,19 +545,19 @@ struct coordinate {
 	enum coord_type type;	/* see above */
 	coordval x, y, z;
 	coordval ylow, yhigh;	/* ignored in 3d */
-        coordval xlow, xhigh;   /* also ignored in 3d */
+	coordval xlow, xhigh;   /* also ignored in 3d */
 #if defined(WIN16) || (defined(MSDOS) && defined(__TURBOC__))
 	char pad[2];		/* pad to 32 byte boundary */
 #endif
 };
 
 struct lp_style_type {          /* contains all Line and Point properties */
-        int     pointflag;      /* 0 if points not used, otherwise 1 */
-        int     l_type,
-                p_type;
-        double  l_width,
-                p_size;
-                                /* more to come ? */
+	int     pointflag;      /* 0 if points not used, otherwise 1 */
+	int     l_type,
+	        p_type;
+	double  l_width,
+	        p_size;
+	                        /* more to come ? */
 };
 
 /* Now unused; replaced with set.c(reset_lp_properties) */
@@ -572,7 +572,7 @@ struct curve_points {
 	enum PLOT_STYLE plot_style;
 	enum PLOT_SMOOTH plot_smooth;
 	char *title;
-        struct lp_style_type lp_properties;
+	struct lp_style_type lp_properties;
  	int p_max;					/* how many points are allocated */
 	int p_count;					/* count of points in points */
 	int x_axis;					/* FIRST_X_AXIS or SECOND_X_AXIS */
@@ -601,7 +601,7 @@ struct surface_points {
 	enum PLOT_TYPE plot_type;
 	enum PLOT_STYLE plot_style;
 	char *title;
-        struct lp_style_type lp_properties;
+	struct lp_style_type lp_properties;
 	int has_grid_topology;
 	int num_iso_read;  /* Data files only - num of isolines read from file. */
 	/* for functions, num_iso_read is the number of 'primary' isolines (in x dirn) */
@@ -681,10 +681,10 @@ struct text_label {
 	int tag;			/* identifies the label */
 	struct position place;
 	enum JUSTIFY pos;
-        int rotate;
+	int rotate;
 	int layer;
-	char text[MAX_LINE_LEN+1];
-        char font[MAX_LINE_LEN+1];
+	char *text;
+	char *font;
 }; /* Entry font added by DJL */
 
 struct arrow_def {
@@ -694,13 +694,13 @@ struct arrow_def {
 	struct position end;
 	TBOOLEAN head;			/* arrow has a head or not */
 	int layer;			/* 0 = back, 1 = front */
-        struct lp_style_type lp_properties;
+	struct lp_style_type lp_properties;
 };
 
 struct linestyle_def {
 	struct linestyle_def *next;	/* pointer to next linestyle in linked list */
 	int tag;			/* identifies the linestyle */
-        struct lp_style_type lp_properties;
+	struct lp_style_type lp_properties;
 };
 
 /* Tic-mark labelling definition; see set xtics */
@@ -844,27 +844,25 @@ if (allow_ls && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls" ))
  struct value t; ++c_token; \
  lp_use_properties(&(lp), (int) real(const_express(&t)), allow_point); \
 } else { \
- 	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) { \
- 		struct value t; ++c_token; \
+	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) { \
+		struct value t; ++c_token; \
       lp.l_type = (int) real(const_express(&t))-1; \
    } else lp.l_type = def_line; \
- 	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) { \
+	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) { \
 		struct value t; ++c_token; \
       lp.l_width = real(const_express(&t)); \
    } else lp.l_width = 1.0; \
    if ( (lp.pointflag = allow_point) != 0) { \
-  	   if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt" )) { \
+	   if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt" )) { \
 		   struct value t; ++c_token; \
-         lp.p_type = (int) real(const_express(&t))-1; \
+	lp.p_type = (int) real(const_express(&t))-1; \
       } else lp.p_type = def_point; \
- 	   if (almost_equals(c_token, "points$ize") || equals(c_token, "ps" )) { \
+	   if (almost_equals(c_token, "points$ize") || equals(c_token, "ps" )) { \
 		   struct value t; ++c_token; \
-         lp.p_size = real(const_express(&t)); \
+	lp.p_size = real(const_express(&t)); \
       } else lp.p_size = pointsize; /* as in "set pointsize" */ \
    } else lp.p_size = pointsize; /* give it a value */ \
    LP_DUMP(lp); \
 }
-   
-
  
 #endif /* not PLOT_H */

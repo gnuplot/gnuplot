@@ -2190,7 +2190,7 @@ static void set_label()
     struct text_label *new_label = NULL;
     struct text_label *prev_label = NULL;
     struct position pos;
-    char text[MAX_LINE_LEN + 1], font[MAX_LINE_LEN + 1];
+    char *text = NULL, *font = NULL;
     enum JUSTIFY just = LEFT;
     int rotate = 0;
     int tag;
@@ -2222,13 +2222,12 @@ static void set_label()
     /* get text */
     if (!END_OF_COMMAND && isstring(c_token)) {
 	/* get text */
-	quote_str(text, c_token, MAX_LINE_LEN);
+	text = gp_alloc (token_len(c_token)+1, "text_label->text");
+	quote_str(text, c_token, token_len(c_token));
 	c_token++;
 	set_text = TRUE;
-    } else {
-	text[0] = '\0';		/* default no text */
-	set_text = FALSE;
-    }
+    } else
+	set_text = FALSE; /* default no text */
 
     /* get justification - what the heck, let him put it here */
     if (!END_OF_COMMAND && !equals(c_token, "at") && !equals(c_token, "font")
@@ -2292,7 +2291,6 @@ static void set_label()
 	set_rot = TRUE;
     }
     /* get font */
-    font[0] = NUL;
     set_font = FALSE;
     if (!END_OF_COMMAND && equals(c_token, "font") &&
 	!equals(c_token, "front") && !equals(c_token, "back")) {
@@ -2300,7 +2298,8 @@ static void set_label()
 	if (END_OF_COMMAND)
 	    int_error("font name and size expected", c_token);
 	if (isstring(c_token)) {
-	    quote_str(font, c_token, MAX_ID_LEN);
+	    font = gp_alloc (token_len(c_token)+1, "text_label->font");
+	    quote_str(font, c_token, token_len(c_token));
 	    /* get 'name,size', no further check */
 	    set_font = TRUE;
 	} else
@@ -2339,7 +2338,7 @@ static void set_label()
 	    this_label->place = pos;
 	}
 	if (set_text)
-	    (void) strcpy(this_label->text, text);
+	    this_label->text = text;
 	if (set_just)
 	    this_label->pos = just;
 	if (set_rot)
@@ -2347,7 +2346,7 @@ static void set_label()
 	if (set_layer)
 	    this_label->layer = layer;
 	if (set_font)
-	    (void) strcpy(this_label->font, font);
+	    this_label->font = font;
     } else {
 	/* adding the label */
 	new_label = (struct text_label *)
@@ -2359,11 +2358,11 @@ static void set_label()
 	new_label->tag = tag;
 	new_label->next = this_label;
 	new_label->place = pos;
-	(void) strcpy(new_label->text, text);
+	new_label->text = text;
 	new_label->pos = just;
 	new_label->rotate = rotate;
 	new_label->layer = layer;
-	(void) strcpy(new_label->font, font);
+	new_label->font = font;
     }
 }				/* Entry font added by DJL */
 
@@ -2397,9 +2396,11 @@ static void set_nolabel()
     }
 }
 
-/* assign a new label tag */
-/* labels are kept sorted by tag number, so this is easy */
-static int /* the lowest unassigned tag number */ assign_label_tag()
+/* assign a new label tag
+ * labels are kept sorted by tag number, so this is easy
+ * returns the lowest unassigned tag number
+ */
+static int assign_label_tag()
 {
     struct text_label *this_label;
     int last = 0;		/* previous tag value */
@@ -2428,7 +2429,9 @@ struct text_label *prev, *this;
 	    prev->next = this->next;
 	else			/* this = first_label so change first_label */
 	    first_label = this->next;
-	free((char *) this);
+	free (this->text);
+	free (this->font);
+	free (this);
     }
 }
 

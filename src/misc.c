@@ -594,7 +594,7 @@ set y2data%s\n",
 	    break;
 	}
 	fprintf(fp, " %srotate", this_label->rotate ? "" : "no");
-	if ((this_label->font)[0] != NUL)
+	if (this_label->font != NULL)
 	    fprintf(fp, " font \"%s\"", this_label->font);
 	/* Entry font added by DJL */
 	fputc('\n', fp);
