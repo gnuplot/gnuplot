@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.126 2004/09/09 12:13:05 lhecking Exp $
+ * $Id: post.trm,v 1.127 2004/09/09 17:33:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -149,6 +149,7 @@ static void PS_make_header __PROTO((t_sm_palette *palette));
  */
 static char ps_enh_font[MAX_ID_LEN+1];
 static int  ps_enh_fontsize;
+static int  ENHPS_initialized;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
 static TBOOLEAN ps_color = FALSE;
@@ -1391,7 +1392,8 @@ PS_common_init(
 %%%%EndComments\n\
 /gnudict 256 dict def\ngnudict begin\n\
 %%\n\
-%%The following 5 true/false flags may be edited by hand if required\n\
+%% The following 5 true/false flags may be edited by hand if required\n\
+%% The unit line width may also be changed\n\
 %%\n\
 /Color %s def\n\
 /Blacktext %s def\n\
@@ -1400,6 +1402,7 @@ PS_common_init(
 /Level1 %s def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
+%%\n\
 /vshift %d def\n\
 /dl {%.1f mul} def\n\
 /hpt_ %.1f def\n\
@@ -1894,6 +1897,10 @@ PS_init()
     PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
 		   xmin_t, ymin_t, xmax_t, ymax_t,
 		   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
+    
+    /* Keep track of whether we have written the enhanced text dictionary yet */
+    ENHPS_initialized = (term->put_text == ENHPS_put_text) ? 2 : 1;
+    
 #ifdef PM3D
     /* to optimize output for postscript terminals family */
     postscript_gpoutfile = gpoutfile;
@@ -1909,6 +1916,17 @@ PS_graphics()
     ps_page++;
     if (!ps_common_encap)
 	fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+
+    /* If we are about to use enhanced text mode for the first time in a plot that */
+    /* was initialized previously without it, we need to write out the macros now */
+    if (term->put_text == ENHPS_put_text && ENHPS_initialized == 1) {
+	const char **dict = ENHPS_header;
+	while (*dict)
+	    fputs(*(dict++), gpoutfile);
+	fprintf(stderr,"Writing out PostScript macros for enhanced text mode\n");
+	ENHPS_initialized = 2;
+    }
+
     fprintf(gpoutfile,"\
 gnudict begin\ngsave\n\
 %d %d translate\n\

@@ -1,3 +1,18 @@
+2004-09-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: Trivial cleanup to remove compiler warnings.
+
+	* term/post.trm: Keep track of whether the macro definitions required
+	for enhanced text mode have been written to the output file yet, or not.
+	If enhanced text mode is enabled after the terminal has already been
+	initialized, make sure that the macros are added to the next output
+	page.  The allows, for example,
+	    setenv GNUTERM post;  gnuplot all.dem > all.ps
+	Without this fix, the output pages following the enhanced text demo
+	are corrupted. An alternative would be to write the enhanced text
+	macros in the %%Prolog for every PostScript output file regardless of
+	whether enhanced text mode has been selected.
+
 2004-09-11  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/command.c src/mouse.c src/parse.c src/parse.h: Rename utility
