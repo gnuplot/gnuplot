@@ -1,3 +1,27 @@
+1998-11-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* CodeStyle: Updated.
+
+	* command.c: Cleaning up. Make local functions static. Remove unused
+	variables and functions.
+
+	* fit.c: Make kbhit() static.
+
+	* graph3d.c: Indentation.
+
+	* plot.c: Cleaning up. Add OS/2 set_input_line() from command.c.
+
+	* plot2d.c: Delete `extern' keyword from variables removed from
+	command.c.
+
+1998-11-20  Don Taber  <dtaber@blackrat.risc.rockwell.com>
+
+	* graphics.c: Revise margin calculation.
+
+1998-11-20  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* show.c: Adjust 'show tics' after set_tic_prop patch from 1998-10-31.
+
 1998-11-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Remove entry for manual key placement in hidden3d splot.
@@ -5,16 +29,14 @@
 
 	* ChangeLog: Reorganised.
 
-	* command.c(do_line): Skip leading spaces in input. Change both
-	versions of read_line() to replace the continuation character
-	(backslash) with a space.
+	* command.c(do_line): Skip leading spaces in input.
 
 	* config.hin, configure: Regenerated.
 
 	* configure.in: Add test for memmove().
 
-	* errorfix.sh: Simplified. Only creates temporary copies of files
-	to be fixed, not of all files.
+	* errorfix.sh: Simplified. Now only creates temporary copies
+	of files to be fixed, not of all files.
 
 	* plot.c(main): Fix compiler warnings.
 
@@ -83,8 +105,8 @@
 
 	* term/ai.trm, term/cgm.trm, term/corel.trm, term/epson.trm,
 	term/fig.trm, term/mif.trm, term/next.trm, term/pbm.trm, term/png.trm,
-	term/post.trm, term/pslatex.trm, term/win.trm: Spelling: Accept
-	"colour" and "color" option.
+	term/post.trm, term/pslatex.trm, term/win.trm: Accept alternative
+	spelling "colour" for "color".
 	
 1998-11-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -167,7 +189,7 @@
 
 	* set.c(set_two): Skip leading whitespace in argument to 'set output'.
 
-	* specfun.c: Fix #ifdef directive. Reported by Alexander Mai.
+	* specfun.c: Fix #ifdef directive.
 
 	* docs/gnuplot.doc: Change 'set output' documentation accordingly.
 
@@ -227,14 +249,15 @@
 
 1998-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* graphics.c, hidden3d.c, specfun.c, stdfn.h: VMS fixes by
-	Lucas Hart <hartl@ucs.orst.edu>.
-
 	* hidden3d.c, scanner.c, show.c: Fix indentation.
 
 	* syscfg.h: Add comment.
 
 	* version.c: Patchlevel pl6.
+	
+1998-11-04  Lucas Hart <hartl@ucs.orst.edu>
+
+	* graphics.c, hidden3d.c, specfun.c, stdfn.h: VMS fixes.
 
 1998-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -336,9 +359,6 @@
 
 	* fit.h: Moved macros from fit.c. Move function prototypes to protos.h.
 
-	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
-	patches	from HBB.
-
 	* protos.h: safe_strncpy() prototype from stdfn.c. Prototypes from
 	fit.h.
 
@@ -350,6 +370,11 @@
 
 	* term/amiga.trm, term/cgm.trm, term/djsvga.trm, term/grass.trm,
 	term/next.trm, term/post.trm, term/tgif.trm: Replace '\0' with NUL.
+
+1998-10-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
+	patches.
 
 1998-10-28  Jochen Schuetze  <jos@GBF.DE>
 
@@ -682,13 +707,8 @@
 
 	* aclocal.m4, config.hin, configure: Regenerated.
 
-	* command.c, makefile.os2: Patches from Alexander Mai
-	<st002279@hrzpub.tu-darmstadt.de>.
-
 	* configure.in: Cleanup, remove caching of CPPFLAGS and TERMLIBS.
 	New options --enable-unixplot and --with-gnugraph.
-
-	* docs/gnuplot.doc: Updates by Dick Crawford <u600256@gamma.lanl.gov>.
 
 	* gplt_x11.c: Move inclusion of ansichk.h and stdfn.h below
 	select stuff. Replace call to index() with strchr().
@@ -714,10 +734,17 @@
 
 	* version.c: Add faq_location.
 
-	* os2/gnupmdrv.c: Close all open files on first initialisation.
-	Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
-
 	* term/gif.trm: Update help text.
+
+1998-10-01  Dick Crawford  <u600256@gamma.lanl.gov>.
+
+	* docs/gnuplot.doc: Updates.
+
+1998-10-01  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* os2/gnupmdrv.c: Close all open files on first initialisation.
+
+	* command.c, makefile.os2: OS/2 related changes.
 
 1998-09-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -748,15 +775,17 @@
 
 1998-09-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* 0INSTALL, makefile.os2, plot.c, term/emxvga.trm, term/pm.trm:
-	More OS/2 patches from Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
-
 	* term/sun.trm(local_notice_destroy): Comment out assignment to
 	non-existent variable term_init.
 
+1998-09-26  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* 0INSTALL, makefile.os2, plot.c, term/emxvga.trm, term/pm.trm:
+	More OS/2 related changes.
+
 1998-09-25  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
-	* 0INSTALL, makefile.os2: OS/2 related patches.
+	* 0INSTALL, makefile.os2: OS/2 related changes.
 
 1998-09-25  Andris Pavenis  <pavenis@lanet.lv>
 	
@@ -787,14 +816,16 @@
 	
 	* stdfn.h: Add missing stat macros for WIN32 and AMIGA_SC_6_1.
 
-	* term/x11.trm: VMS patch by Lucas Hart <hartl@ucs.orst.edu>.
-
 	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
 
 	* plot.h: Remove X_DISPLAY_MISSING and re-add X11. Move definition of
 	PLOTRC into OS specific section.
 
 	* term.h: Remove X_DISPLAY_MISSING.
+
+1998-09-24  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* term/x11.trm: VMS patch.
 
 1998-09-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -839,13 +870,16 @@
 
 	* os2/gclient.h: Move #include <math.h> to top.
 
-	* readline.c: Patch by Petr Mikulik to not store duplicated
-	history entries. Indentation and comments cleanup.
+	* readline.c: Indentation and comments cleanup.
 
 	* term/excl.trm, term/fg.trm, term/gif.trm, term/gnugraph.trm,
 	term/metafont.trm, term/mgr.trm, term/mif.trm, term/multitos.trm,
 	term/pm.trm, term/table.trm, term/win.trm, term/xlib.trm: Add
 	comments and RCS id.
+
+1998-09-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* readline.c: Don't store duplicated history entries.
 
 1998-09-22  Dick Crawford  <rccrawford@lanl.gov>
 
@@ -916,7 +950,7 @@
 
 1998-09-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* set.c(): Fix typo.
+	* set.c(get_style): Fix typo.
 
 1998-09-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -929,7 +963,7 @@
 	* configure.in: Don't define X11. Add check for <sys/stat.h> and
 	AC_HEADER_STAT.
 
-	* datafile.c: Add modified version of Alexander Mai's stat(2) patch
+	* datafile.c: Modified version of Alexander Mai's stat(2) patch
 	(check if regular file or pipe before opening data file).
 
 	* makefile.amg: Remove stdfn.h from datafile.c deps.
@@ -1144,9 +1178,6 @@
 
 1998-07-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* hidden3d.c: Fix core dump, allocated storage not free()'d in
-	case of errors. By HBB.
-
 	* Makefile.in: New target for show.o, for 'show version long'.
 
 	* acconfig.h, config.hin, configure.in: The correct file name
@@ -1162,6 +1193,11 @@
 
 	* show.c: Add show_version_long(), and add 'version long' option
 	to parser.
+
+1998-07-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* hidden3d.c: Fix core dump, allocated storage not free()'d in
+	case of errors.
 
 1998-06-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1254,7 +1290,9 @@
 
 	* configure, configure.in: Don't use sudo.
 
-	* graph3d.c: Fix range bug in splot. By HBB.
+1998-04-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graph3d.c: Fix range bug in splot.
 
 1998-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
