@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.10 1999/06/11 18:53:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.11 1999/06/14 19:20:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -127,27 +127,22 @@ static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i,
 				    double *ex, double *ey));
 static int two_edge_intersect __PROTO((struct coordinate GPHUGE * points,
 				       int i, double *lx, double *ly));
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double
-						  *lx, double *ly));
+static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
-static void plot_histeps __PROTO((struct curve_points * plot));		/* CAC */
+static void plot_histeps __PROTO((struct curve_points * plot));	/* CAC */
 static void histeps_horizontal __PROTO((int *xl, int *yl, double x1, double x2,
 					double y));	/* CAC */
 static void histeps_vertical __PROTO((int *xl, int *yl, double x, double y1,
 				      double y2));	/* CAC */
 static void edge_intersect_steps __PROTO((struct coordinate GPHUGE * points,
-					  int i, double *ex, double *ey));	/* JG */
+					  int i, double *ex, double *ey));      /* JG */
 static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points,
 					   int i, double *ex, double *ey));	/* HOE */
-static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double
-						  *lx, double *ly));	/* JG */
-static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i,
-						   double *lx, double *ly));
+static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
+static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
-static double LogScale __PROTO((double coord, int is_log, double log_base_log,
-				char *what, char *axis));
 static double dbl_raise __PROTO((double x, int y));
 static void boundary __PROTO((int scaling, struct curve_points * plots,
 			      int count));
@@ -163,15 +158,11 @@ static void ytick2d_callback __PROTO((int axis, double place, char *text,
 static void xtick2d_callback __PROTO((int axis, double place, char *text,
 				      struct lp_style_type grid));
 static void map_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, char *what));
+				  unsigned int *y, const char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
 			      double *m, int *p));
 static void gprintf __PROTO((char *dest, size_t count, char *format,
 			     double log_base, double x));
-
-#if defined(sun386) || defined(AMIGA_SC_6_1)
-static double CheckLog __PROTO((TBOOLEAN is_log, double base_log, double x));
-#endif
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -266,7 +257,7 @@ static double scale[AXIS_ARRAY_SIZE];	/* scale factors for mapping for each axis
  * also subscribe here. Even without inlining you gain speed with log plots
  */
 #if defined(sun386) || defined(AMIGA_SC_6_1)
-GP_INLINE static double
+GP_INLINE double
 CheckLog(is_log, base_log, x)
 TBOOLEAN is_log;
 double base_log;
@@ -284,20 +275,17 @@ double x;
 /*}}} */
 
 /*{{{  LogScale() */
-static double
+double
 LogScale(coord, is_log, log_base_log, what, axis)
 double coord;			/* the value */
 TBOOLEAN is_log;		/* is this axis in logscale? */
 double log_base_log;		/* if so, the log of its base */
-char *what;			/* what is the coord for? */
-char *axis;			/* which axis is this for ("x" or "y")? */
+const char *what;		/* what is the coord for? */
+const char *axis;		/* which axis is this for ("x" or "y")? */
 {
     if (is_log) {
 	if (coord <= 0.0) {
-	    char errbuf[100];	/* place to write error message */
-	    (void) sprintf(errbuf, "%s has %s coord of %g; must be above 0 for log scale!",
-			   what, axis, coord);
-	    graph_error(errbuf);
+	    graph_error("%s has %s coord of %g; must be above 0 for log scale!", what, axis, coord);
 	} else
 	    return (log(coord) / log_base_log);
     }
@@ -307,13 +295,30 @@ char *axis;			/* which axis is this for ("x" or "y")? */
 
 /*{{{  graph_error() */
 /* handle errors during graph-plot in a consistent way */
+#if defined(VA_START) && defined(ANSI_C)
 void
-graph_error(text)
-char *text;
+graph_error(const char *fmt, ...)
+#else
+void graph_error(fmt, va_alist)
+const char *fmt;
+va_dcl
+#endif
 {
+#ifdef VA_START
+    va_list args;
+#endif
+
     multiplot = FALSE;
     term_end_plot();
-    int_error(NO_CARET, text);
+
+#ifdef VA_START
+    VA_START(args, fmt);
+    int_error(NO_CARET, fmt, args);
+    va_end(args);
+#else
+    int_error (fmt, a1, a2, a3, a4, a5, a6, a7, a8);
+#endif
+
 }
 
 /*}}} */
@@ -392,7 +397,7 @@ char *text;
 void
 fixup_range(axis, axis_name)
 int axis;
-char *axis_name;
+const char *axis_name;
 {
 #define MAX_AXIS_NAME_LEN	2	/* max legal strlen(axis_name) */
 
@@ -422,9 +427,7 @@ char *axis_name;
 	} else {
 	    /* user has explicitly set the range */
 	    /* (to something empty) ==> we're in trouble */
-	    char msg_buffer[MAX_LINE_LEN + 1];
-	    sprintf(msg_buffer, "Can't plot with an empty %s range!", axis_name);
-	    int_error(c_token, msg_buffer);	/* never returns */
+	    int_error(c_token, "Can't plot with an empty %s range!", axis_name);
 	}
     }
 }
@@ -613,7 +616,7 @@ int count;
 	    top_margin += (int) (t->v_char);
 
 	ytop -= top_margin;
-	if (ytop == (int) ((ysize + yoffset) * (t->ymax))) {
+	if (ytop == (int) (0.5 + (ysize + yoffset) * (t->ymax))) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ytop -= (int) ((t->h_char) * 2);
 	}
@@ -689,7 +692,9 @@ int count;
 	    ybot += xlabel_textheight;
 	if (timebot_textheight > 0)
 	    ybot += timebot_textheight;
-	if (ybot == (t->ymax) * yoffset) {
+	/* HBB 19990616: round to nearest integer, required to escape
+	 * floating point inaccuracies */
+	if (ybot == (int)(0.5 + (t->ymax) * yoffset)) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
 	}
@@ -869,7 +874,7 @@ int count;
 	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset
 										 * (t->h_char)))
 	    xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
-	if (xleft == (t->xmax) * xoffset) {
+	if (xleft == (int)(0.5 + (t->xmax) * xoffset)) {
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
 	}
@@ -932,7 +937,7 @@ int count;
 	    xright -= key_col_wth * key_cols;
 	    key_xl = xright + (int) (t->h_tic);
 	}
-	if (xright == (t->xmax) * (xsize + xoffset)) {
+	if (xright == (int)(0.5 + (t->xmax) * (xsize + xoffset))) {
 	    /* make room for end of xtic or x2tic label */
 	    xright -= (int) ((t->h_char) * 2);
 	}
@@ -1320,7 +1325,7 @@ int pcount;			/* count of plots in linked list */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     TBOOLEAN scaling;
-    char ss[MAX_LINE_LEN + 1], *s, *e;
+    char *s, *e;
 
     /* so that macros for x_min etc pick up correct values
      * until this is done properly
@@ -1470,7 +1475,7 @@ int pcount;			/* count of plots in linked list */
 
     /* label second y axis tics */
     if (y2tics) {
-	/* set the globalss ytick2d_callback() needs */
+	/* set the globals ytick2d_callback() needs */
 	int axis = map_x(ZERO);
 
 	if (rotate_y2tics && (*t->text_angle) (1)) {
@@ -1645,68 +1650,66 @@ int pcount;			/* count of plots in linked list */
     }
 /* YLABEL */
     if (*ylabel.text) {
-	strcpy(ss, ylabel.text);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = ylabel_x + (t->v_char / 2);
 	    unsigned int y = (ytop + ybot) / 2 + ylabel.yoffset * (t->h_char);
-	    write_multiline(x, y, ss, CENTRE, JUST_TOP, 1, ylabel.font);
+	    write_multiline(x, y, ylabel.text, CENTRE, JUST_TOP, 1, ylabel.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines 
 	       so we need to adjust x-posn by one line */
 	    unsigned int x = ylabel_x;
 	    unsigned int y = ylabel_y;
-	    write_multiline(x, y, ss, LEFT, JUST_TOP, 0, ylabel.font);
+	    write_multiline(x, y, ylabel.text, LEFT, JUST_TOP, 0, ylabel.font);
 	}
     }
 /* Y2LABEL */
     if (*y2label.text) {
-	strcpy(ss, y2label.text);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
 	    unsigned int y = (ytop + ybot) / 2 + y2label.yoffset * (t->h_char);
-	    write_multiline(x, y, ss, CENTRE, JUST_TOP, 1, y2label.font);
+	    write_multiline(x, y, y2label.text, CENTRE, JUST_TOP, 1, y2label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines */
 	    unsigned int x = y2label_x;
 	    unsigned int y = y2label_y;
-	    write_multiline(x, y, ss, RIGHT, JUST_TOP, 0, y2label.font);
+	    write_multiline(x, y, y2label.text, RIGHT, JUST_TOP, 0, y2label.font);
 	}
     }
 /* XLABEL */
     if (*xlabel.text) {
 	unsigned int x = (xright + xleft) / 2 + xlabel.xoffset * (t->h_char);
 	unsigned int y = xlabel_y - t->v_char / 2;	/* HBB */
-	strcpy(ss, xlabel.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, xlabel.font);
+	write_multiline(x, y, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
     }
 /* PLACE TITLE */
     if (*title.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xleft + xright) / 2 + title.xoffset * t->h_char;
 	unsigned int y = title_y - t->v_char / 2;
-	strcpy(ss, title.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, title.font);
+	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
     }
 /* X2LABEL */
     if (*x2label.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xright + xleft) / 2 + x2label.xoffset * (t->h_char);
 	unsigned int y = x2label_y - t->v_char / 2 - 1;
-	strcpy(ss, x2label.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, x2label.font);
+	write_multiline(x, y, x2label.text, CENTRE, JUST_TOP, 0, x2label.font);
     }
 /* PLACE TIMEDATE */
     if (*timelabel.text) {
 	/* we worked out coordinates in boundary() */
-	char str[MAX_LINE_LEN + 1];
+	char *str;
 	time_t now;
 	unsigned int x = time_x;
 	unsigned int y = time_y;
 	time(&now);
+	/* there is probably now way to find out in advance how many
+	 * chars strftime() writes */
+	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
 	if (timelabel_rotate && (*t->text_angle) (1)) {
@@ -1723,6 +1726,7 @@ int pcount;			/* count of plots in linked list */
 	    else
 		write_multiline(x, y, str, LEFT, JUST_TOP, 0, timelabel.font);
 	}
+	free(str);
     }
 /* PLACE LABELS */
     for (this_label = first_label; this_label != NULL;
@@ -1732,12 +1736,11 @@ int pcount;			/* count of plots in linked list */
 	if (this_label->layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
-	strcpy(ss, this_label->text);
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 1, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
     }
 
@@ -1764,6 +1767,8 @@ int pcount;			/* count of plots in linked list */
 	yl = key_yt;
 
 	if (*key_title) {
+	    char *ss = gp_strdup(key_title);
+
 	    sprintf(ss, "%s\n", key_title);
 	    s = ss;
 	    yl -= t->v_char / 2;
@@ -1787,6 +1792,7 @@ int pcount;			/* count of plots in linked list */
 		yl -= t->v_char;
 	    }
 	    yl += t->v_char / 2;
+	    free(ss);
 	}
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
@@ -2010,12 +2016,11 @@ int pcount;			/* count of plots in linked list */
 	if (this_label->layer == 0)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
-	strcpy(ss, this_label->text);
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 1, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
     }
 
@@ -3009,6 +3014,9 @@ struct curve_points *plot;
     }
 }
 
+/* FIXME
+ * there are LOADS of == style double comparisons in here!
+ */
 /* single edge intersection algorithm */
 /* Given two points, one inside and one outside the plot, return
  * the point where an edge of the plot intersects the line segment defined 
@@ -3669,8 +3677,8 @@ make_ltic(tlevel, incr)
 int tlevel;
 double incr;
 {
-    double tinc;
-    tinc = 0;
+    double tinc = 0.0;
+
     if (tlevel < 0)
 	tlevel = 0;
     switch (tlevel) {
@@ -3767,21 +3775,26 @@ double incr;
 void
 write_multiline(x, y, text, hor, vert, angle, font)
 unsigned int x, y;
-char *text;
+const char *text;
 enum JUSTIFY hor;		/* horizontal ... */
 int vert;			/* ... and vertical just - text in hor direction despite angle */
 int angle;			/* assume term has already been set for this */
-char *font;			/* NULL or "" means use default */
+const char *font;		/* NULL or "" means use default */
 {
     /* assumes we are free to mangle the text */
+    /* FIXME no, not anymore! */
     register struct termentry *t = term;
-    char *p;
+    char *p = text;
+
     if (vert != JUST_TOP) {
 	/* count lines and adjust y */
 	int lines = 0;		/* number of linefeeds - one fewer than lines */
-	for (p = text; *p; ++p)
-	    if (*p == '\n')
-		++lines;
+	if (p != NULL) {
+	    while (*p++) {
+		if (*p == '\n')
+		    ++lines;
+	    }
+	}
 	if (angle)
 	    x -= (vert * lines * t->v_char) / 2;
 	else
@@ -3793,7 +3806,7 @@ char *font;			/* NULL or "" means use default */
 
     for (;;) {			/* we will explicitly break out */
 
-	if ((p = strchr(text, '\n')) != NULL)
+	if ((text != NULL) && (p = strchr(text, '\n')) != NULL)
 	    *p = 0;		/* terminate the string */
 
 	if ((*t->justify_text) (hor)) {
@@ -3812,12 +3825,17 @@ char *font;			/* NULL or "" means use default */
 
 	if (!p)
 	    break;
+	else {
+	    /* put it back */
+	    *p = '\n';
+	}
 
 	text = p + 1;
     }				/* unconditional branch back to the for(;;) - just a goto ! */
 
     if (font && *font)
 	(*t->set_font) (default_font);
+
 }
 
 /* display a x-axis ticmark - called by gen_ticks */
@@ -3907,6 +3925,7 @@ struct lp_style_type grid;	/* linetype or -2 */
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) (t->h_tic) * (text ? ticscale : miniticscale);
     unsigned int y = map_y(place);
+
     if (grid.l_type > -2) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
@@ -3959,13 +3978,14 @@ struct lp_style_type grid;	/* linetype or -2 */
 
 int
 label_width(str, lines)
-char *str;
+const char *str;
 int *lines;
 {
-    char lab[MAX_LINE_LEN + 1], *s, *e;
+    char *lab = NULL, *s, *e;
     int mlen, len, l;
 
     l = mlen = len = 0;
+    lab = gp_alloc(strlen(str)+1, "in label_width");
     sprintf(lab, "%s\n", str);
     s = lab;
     while ((e = (char *) strchr(s, '\n')) != NULL) {	/* HBB 980308: quiet BC-3.1 warning */
@@ -3980,6 +4000,8 @@ int *lines;
     /* lines = NULL => not interested - div */
     if (lines)
 	*lines = l;
+
+    free(lab);
     return (mlen);
 }
 
@@ -4566,7 +4588,7 @@ static void
 map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
-char *what;
+const char *what;
 {
     switch (pos->scalex) {
     case first_axes:
