@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.35 2002/09/02 21:03:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.36 2002/09/16 18:24:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -44,9 +44,11 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.35 2002/09/02 21:03:27 miku
 /*  #include "setshow.h" */		/* for month names etc */
 #include "term_api.h"		/* for term_end_plot() used by graph_error() */
 
-#ifdef HAVE_DIRENT_H
-#include <sys/types.h>
-#include <dirent.h>
+#if defined(HAVE_DIRENT_H)
+# include <sys/types.h>
+# include <dirent.h>
+#elif defined(_Windows)
+# include <windows.h>
 #endif
 
 /* Exported (set-table) variables */
@@ -1024,8 +1026,8 @@ char *instr;
 }
 
 
-/* FIXME HH 20020915: This function does nothing if dirent.h not available. */
-/* But it must check for the existance of the directory */
+/* FIXME HH 20020915: This function does nothing if dirent.h and windows.h 
+ * not available. */
 TBOOLEAN 
 existdir (name)
      const char *name;
@@ -1037,7 +1039,20 @@ existdir (name)
     
     closedir(dp);
     return TRUE;
+#elif defined(_Windows)
+    HANDLE FileHandle;
+    WIN32_FIND_DATA finddata;
+
+    FileHandle = FindFirstFile(name, &finddata);
+    if (FileHandle != INVALID_HANDLE_VALUE) {
+	if (finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	    return TRUE;
+    }
+    return FALSE;
 #else
+    int_warn(NO_CARET,
+	     "Test on directory existence not supported\n\t('%s!')",
+	     name);
     return FALSE;
 #endif
 }

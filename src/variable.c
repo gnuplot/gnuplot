@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.16 2002/09/16 18:24:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.17 2002/10/09 09:27:43 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -223,14 +223,14 @@ const struct path_table fontpath_tbl[] =
 #  define FONTPATHSET
 const struct path_table fontpath_tbl[] =
 {
-    { "$(windir)/fonts" },
+    { "$(windir)\\fonts" },
     /* Ghostscript */
-    { "c:/gs/fonts" },
+    { "c:\\gs\\fonts" },
     /* X11 */
-    { "$(CYGWIN_ROOT)/usr/X11R6/lib/X11/fonts/Type1" },
+    { "$(CYGWIN_ROOT)\\usr\\X11R6\\lib\\X11\\fonts\\Type1" },
     /* fpTeX */
-    { "$`kpsewhich -expand-path=$TEXMFMAIN`/fonts/type1!" },
-    { "$`kpsewhich -expand-path=$TEXMFLOCAL`/fonts/type1!" },
+    { "$`kpsewhich -expand-path=$TEXMFMAIN`\\fonts\\type1!" },
+    { "$`kpsewhich -expand-path=$TEXMFLOCAL`\\fonts\\type1!" },
     { NULL }
 };
 #endif
@@ -259,6 +259,9 @@ const struct path_table fontpath_tbl[] =
 #ifndef FONTPATHSET
 const struct path_table fontpath_tbl[] =
 {
+    /* teTeX */
+    { "$`kpsexpand '$TEXMFMAIN'`/fonts/type1!" },
+    { "$`kpsexpand '$TEXMFLOCAL'`/fonts/type1!" },
     /* Linux paths */
     { "/usr/X11R6/lib/X11/fonts/Type1" },
     { "/usr/X11R6/lib/X11/fonts/truetype" },
@@ -267,9 +270,6 @@ const struct path_table fontpath_tbl[] =
     /* Ghostscript */
     { "/usr/share/ghostscript/fonts" },
     { "/usr/local/share/ghostscript/fonts" },
-    /* teTeX */
-    { "$`kpsexpand '$TEXMFMAIN'`/fonts/type1!" },
-    { "$`kpsexpand '$TEXMFLOCAL'`/fonts/type1!" },
     { NULL }
 };
 #endif
@@ -326,7 +326,7 @@ fontpath_handler(action, path)
 		/* convert all PATHSEPs to \0 */
 		PATHSEP_TO_NUL(fontpath);
 	    }
-#if defined(HAVE_DIRENT_H)
+#if defined(HAVE_DIRENT_H) || defined(_Windows)
 	    else {
 		/* set hardcoded paths */
 		const struct path_table *curr_fontpath = fontpath_tbl;

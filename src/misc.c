@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.41 2002/09/27 00:12:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.42 2002/10/09 14:13:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -45,16 +45,18 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.41 2002/09/27 00:12:25 sfea
 #include "util.h"
 #include "variable.h"
 
-#ifdef HAVE_DIRENT_H
-#include <sys/types.h>
-#include <dirent.h>
+#if defined(HAVE_DIRENT_H)
+# include <sys/types.h>
+# include <dirent.h>
+#elif defined(_Windows)
+# include <windows.h>
 #endif
 
 /* name of command file; NULL if terminal */
 char *infile_name = NULL;
 
 static TBOOLEAN lf_pop __PROTO((void));
-static void lf_push __PROTO((FILE * fp));
+static void lf_push __PROTO((FILE *));
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
@@ -70,8 +72,7 @@ static char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, N
  * points.
  */
 struct iso_curve *
-iso_alloc(num)
-int num;
+iso_alloc(int num)
 {
     struct iso_curve *ip;
     ip = (struct iso_curve *) gp_alloc(sizeof(struct iso_curve), "iso curve");
@@ -90,9 +91,7 @@ int num;
  * points. This will either expand or shrink the storage.
  */
 void
-iso_extend(ip, num)
-struct iso_curve *ip;
-int num;
+iso_extend(struct iso_curve *ip, int num)
 {
     if (num == ip->p_max)
 	return;
@@ -128,8 +127,7 @@ int num;
  *   iso curve points.
  */
 void
-iso_free(ip)
-struct iso_curve *ip;
+iso_free(struct iso_curve *ip)
 {
     if (ip) {
 	if (ip->points)
@@ -139,10 +137,7 @@ struct iso_curve *ip;
 }
 
 void
-load_file(fp, name, can_do_args)
-FILE *fp;
-char *name;
-TBOOLEAN can_do_args;
+load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 {
     register int len;
 
@@ -273,10 +268,12 @@ TBOOLEAN can_do_args;
     (void) lf_pop();		/* also closes file fp */
 }
 
-/* pop from load_file state stack */
-static TBOOLEAN			/* FALSE if stack was empty */
+/* pop from load_file state stack
+   FALSE if stack was empty
+   called by load_file and load_file_error */
+static TBOOLEAN
 lf_pop()
-{				/* called by load_file and load_file_error */
+{
     LFS *lf;
 
     if (lf_head == NULL)
@@ -306,11 +303,11 @@ lf_pop()
     }
 }
 
-/* push onto load_file state stack */
-/* essentially, we save information needed to undo the load_file changes */
+/* push onto load_file state stack
+   essentially, we save information needed to undo the load_file changes
+   called by load_file */
 static void
-lf_push(fp)			/* called by load_file */
-FILE *fp;
+lf_push(FILE *fp)
 {
     LFS *lf;
     int argindex;
@@ -359,15 +356,14 @@ load_file_error()
  * 'misc' is almost always a sign of bad design, IMHO */
 /* may return NULL */
 FILE *
-loadpath_fopen(filename, mode)
-const char *filename, *mode;
+loadpath_fopen(const char *filename, const char *mode)
 {
     FILE *fp;
 
 #if defined(PIPES)
     if (*filename == '<') {
 	if ((fp = popen(filename + 1, "r")) == (FILE *) NULL)
-	    return (FILE*) 0;
+	    return (FILE *) 0;
     } else
 #endif /* PIPES */
     if ((fp = fopen(filename, mode)) == (FILE *) NULL) {
@@ -399,113 +395,135 @@ const char *filename, *mode;
 }
 
 
+/* Harald Harders <h.harders@tu-bs.de> */
+/* Thanks to John Bollinger <jab@bollingerbands.com> who has tested the
+   windows part */
 static char *
-recursivefullname(path, filename, recursive)
-     const char *path;
-     const char *filename;
-     TBOOLEAN recursive;
+recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 {
     char *fullname = NULL;
-#ifdef HAVE_DIRENT_H
-    struct dirent *direntry;
-    struct stat buf;
-    DIR *dir;
-#endif
     FILE *fp;
 
     /* length of path, dir separator, filename, \0 */
-    fullname = gp_alloc(strlen(path) + 1 + strlen(filename) + 1, 
+    fullname = gp_alloc(strlen(path) + 1 + strlen(filename) + 1,
 			"recursivefullname");
     strcpy(fullname, path);
     PATH_CONCAT(fullname, filename);
+
     if ((fp = fopen(fullname, "r")) != NULL) {
 	fclose(fp);
 	return fullname;
-    } /* if */
-    else {
+    } else {
 	free(fullname);
 	fullname = NULL;
-    } /* else */
+    }
 
-    /* FIXME HH 20020915: implement recursive directory search for MSC */
     if (recursive) {
 #ifdef HAVE_DIRENT_H
+	DIR *dir;
+	struct dirent *direntry;
+	struct stat buf;
+
 	dir = opendir(path);
 	if (dir) {
-	    while ((direntry=readdir(dir))!=NULL) {
-		char *fulldir = gp_alloc(strlen(path) + 1 + 
-					 strlen(direntry->d_name) + 1, 
+	    while ((direntry = readdir(dir)) != NULL) {
+		char *fulldir = gp_alloc(strlen(path) + 1 + strlen(direntry->d_name) + 1,
 					 "fontpath_fullname");
-		strcpy(fulldir,path);
-#if defined(VMS)
-		if (fulldir[strlen(fulldir)-1]==']')
-		    fulldir[strlen(fulldir)-1]='\0';
-		strcpy(&(fulldir[strlen(fulldir)]),".");
-		strcpy(&(fulldir[strlen(fulldir)]),direntry->d_name);
-		strcpy(&(fulldir[strlen(fulldir)]),"]");
-#else
-		PATH_CONCAT(fulldir,direntry->d_name);
-#endif
-		stat(fulldir,&buf);
-		if ( (S_ISDIR(buf.st_mode)) && 
-		     (strcmp(direntry->d_name,".")!=0) &&
-		     (strcmp(direntry->d_name,"..")!=0) ) {
-		    fullname = recursivefullname(fulldir,filename);
+		strcpy(fulldir, path);
+#  if defined(VMS)
+		if (fulldir[strlen(fulldir) - 1] == ']')
+		    fulldir[strlen(fulldir) - 1] = '\0';
+		strcpy(&(fulldir[strlen(fulldir)]), ".");
+		strcpy(&(fulldir[strlen(fulldir)]), direntry->d_name);
+		strcpy(&(fulldir[strlen(fulldir)]), "]");
+#  else
+		PATH_CONCAT(fulldir, direntry->d_name);
+#  endif
+		stat(fulldir, &buf);
+		if ((S_ISDIR(buf.st_mode)) &&
+		    (strcmp(direntry->d_name, ".") != 0) &&
+		    (strcmp(direntry->d_name, "..") != 0)) {
+		    fullname = recursivefullname(fulldir, filename);
 		    if (fullname != NULL)
 			break;
-		} /* if */
+		}
 		free(fulldir);
-	    } /* while */
+	    }
 	    closedir(dir);
-	} /* if */
-#else
-	int_warn(NO_CARET,"Recursive directory search not supported\n\t('%s!')",
-		 path);
-#endif
-    } /* if */
+	}
+#elif defined(_Windows)
+	HANDLE filehandle;
+	WIN32_FIND_DATA finddata;
+	char *pathwildcard = gp_alloc(strlen(path) + 2, "fontpath_fullname");
 
+	strcpy(pathwildcard, path);
+	PATH_CONCAT(pathwildcard, "*");
+
+	filehandle = FindFirstFile(pathwildcard, &finddata);
+	free(pathwildcard);
+	if (filehandle != INVALID_HANDLE_VALUE)
+	    do {
+		if ((finddata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+		    (strcmp(finddata.cFileName, ".") != 0) &&
+		    (strcmp(finddata.cFileName, "..") != 0)) {
+		    char *fulldir = gp_alloc(strlen(path) + 1 + strlen(finddata.cFileName) + 1,
+					     "fontpath_fullname");
+		    strcpy(fulldir, path);
+		    PATH_CONCAT(fulldir, finddata.cFileName);
+
+		    fullname = recursivefullname(fulldir, filename);
+		    free(fulldir);
+		    if (fullname != NULL)
+			break;
+		}
+	    } while (FindNextFile(filehandle, &finddata) != 0);
+	FindClose(filehandle);
+
+#else
+	int_warn(NO_CARET, "Recursive directory search not supported\n\t('%s!')", path);
+#endif
+    }
     return fullname;
-}/* recursivefullname */
+}
 
 
 /* may return NULL */
 char *
-fontpath_fullname(filename)
-     const char *filename;
+fontpath_fullname(const char *filename)
 {
     FILE *fp;
     char *fullname = NULL;
 
 #if defined(PIPES)
     if (*filename == '<') {
-       os_error(NO_CARET, "fontpath_fullname: No Pipe allowed");
+	os_error(NO_CARET, "fontpath_fullname: No Pipe allowed");
     } else
 #endif /* PIPES */
     if ((fp = fopen(filename, "r")) == (FILE *) NULL) {
-       /* try 'fontpath' variable */
-       char *tmppath, *path = NULL;
+	/* try 'fontpath' variable */
+	char *tmppath, *path = NULL;
 
-       while ((tmppath = get_fontpath()) != NULL) {
-	   TBOOLEAN subdirs = FALSE;
-	   path = gp_strdup(tmppath);
-	   if ( path[strlen(path)-1] == '!' ) {
-	       path[strlen(path)-1] = '\0';
-	       subdirs = TRUE;
-	   } /* if */
-	   fullname = recursivefullname(path, filename, subdirs);
-	   if (fullname != NULL) {
-	       while (get_fontpath());
-	       free(path);
-	       break;
-	   } /* if */
-	   free(path);
-       } /* while */
+	while ((tmppath = get_fontpath()) != NULL) {
+	    TBOOLEAN subdirs = FALSE;
+	    path = gp_strdup(tmppath);
+	    if (path[strlen(path) - 1] == '!') {
+		path[strlen(path) - 1] = '\0';
+		subdirs = TRUE;
+	    }			/* if */
+	    fullname = recursivefullname(path, filename, subdirs);
+	    if (fullname != NULL) {
+		while (get_fontpath());
+		free(path);
+		break;
+	    }
+	    free(path);
+	}
 
     } else
 	fullname = gp_strdup(filename);
 
     return fullname;
-}/* fontpath_fullname */
+}
 
 
 /* Parse a plot style. Used by 'set style {data|function}' and by
@@ -518,12 +536,12 @@ get_style()
 
     c_token++;
 
-    ps = lookup_table(&plotstyle_tbl[0],c_token);
+    ps = lookup_table(&plotstyle_tbl[0], c_token);
 
     c_token++;
 
     if (ps == -1) {
-	int_error(c_token,"\
+	int_error(c_token, "\
 expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
 \t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
@@ -540,23 +558,27 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
  * If no option given, then set fco->opt_given to 0.
  */
 void
-get_filledcurves_style_options( filledcurves_opts *fco )
+get_filledcurves_style_options(filledcurves_opts *fco)
 {
     int p;
     struct value a;
     p = lookup_table(&filledcurves_opts_tbl[0], c_token);
     fco->opt_given = (p != -1);
-    if (p==-1) return; /* no option given */
+    if (p == -1)
+	return;			/* no option given */
     c_token++;
     fco->closeto = p;
-    if (!equals(c_token,"=")) return;
+    if (!equals(c_token, "="))
+	return;
     /* parameter required for filledcurves x1=... and friends */
-    if (p!=FILLEDCURVES_ATXY) fco->closeto += 4;
+    if (p != FILLEDCURVES_ATXY)
+	fco->closeto += 4;
     c_token++;
     fco->at = real(const_express(&a));
-    if (p!=FILLEDCURVES_ATXY) return;
+    if (p != FILLEDCURVES_ATXY)
+	return;
     /* two values required for FILLEDCURVES_ATXY */
-    if (!equals(c_token,","))
+    if (!equals(c_token, ","))
 	int_error(c_token, "syntax is xy=<x>,<y>");
     c_token++;
     fco->aty = real(const_express(&a));
@@ -567,11 +589,10 @@ get_filledcurves_style_options( filledcurves_opts *fco )
  * commands).
  */
 void
-filledcurves_options_tofile(fco, fp)
-    filledcurves_opts *fco;
-    FILE *fp;
+filledcurves_options_tofile(filledcurves_opts *fco, FILE *fp)
 {
-    if (!fco->opt_given) return;
+    if (!fco->opt_given)
+	return;
     if (fco->closeto == FILLEDCURVES_CLOSED) {
 	fputs("closed", fp);
 	return;
@@ -581,11 +602,11 @@ filledcurves_options_tofile(fco, fp)
 	return;
     }
     if (fco->closeto <= FILLEDCURVES_ATY2) {
-	fprintf(fp,"%s=%g",filledcurves_opts_tbl[fco->closeto-4].key,fco->at);
+	fprintf(fp, "%s=%g", filledcurves_opts_tbl[fco->closeto - 4].key, fco->at);
 	return;
     }
     if (fco->closeto == FILLEDCURVES_ATXY) {
-	fprintf(fp,"xy=%g,%g",fco->at,fco->aty);
+	fprintf(fp, "xy=%g,%g", fco->at, fco->aty);
 	return;
     }
 }
@@ -600,9 +621,7 @@ filledcurves_options_tofile(fco, fp)
  */
 
 void
-lp_use_properties(lp, tag, pointflag)
-struct lp_style_type *lp;
-int tag, pointflag;
+lp_use_properties(struct lp_style_type *lp, int tag, int pointflag)
 {
     /*  This function looks for a linestyle defined by 'tag' and copies
      *  its data into the structure 'lp'.
@@ -626,27 +645,24 @@ int tag, pointflag;
     }
 
     /* tag not found: */
-    int_error(NO_CARET,"linestyle not found", NO_CARET);
+    int_error(NO_CARET, "linestyle not found", NO_CARET);
 }
 
 
 /* was a macro in plot.h */
 /* allow any order of options - pm 24.11.2001 */
 void
-lp_parse(lp, allow_ls, allow_point, def_line, def_point)
-    struct lp_style_type *lp;
-    TBOOLEAN allow_ls, allow_point;
-    int def_line, def_point;
+lp_parse(struct lp_style_type *lp, TBOOLEAN allow_ls, TBOOLEAN allow_point, int def_line, int def_point)
 {
     struct value t;
 
-    if (allow_ls && (almost_equals(c_token, "lines$tyle") ||
-		     equals(c_token, "ls"))) {
+    if (allow_ls &&
+	(almost_equals(c_token, "lines$tyle") || equals(c_token, "ls"))) {
 	c_token++;
 	lp_use_properties(lp, (int) real(const_express(&t)), allow_point);
     } else {
 	/* avoid duplicating options */
-	int set_lt=0, set_pal=0, set_lw=0, set_pt=0, set_ps=0;
+	int set_lt = 0, set_pal = 0, set_lw = 0, set_pt = 0, set_ps = 0;
 	/* set default values */
 	lp->l_type = def_line;
 	lp->l_width = 1.0;
@@ -655,7 +671,7 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 #endif
 	lp->pointflag = allow_point;
 	lp->p_type = def_point;
-	lp->p_size = pointsize; /* as in "set pointsize" */
+	lp->p_size = pointsize;	/* as in "set pointsize" */
 	while (!END_OF_COMMAND) {
 	    if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt")) {
 		if (set_lt++)
@@ -673,7 +689,6 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 		    lp->l_type = (int) real(const_express(&t)) - 1;
 		continue;
 	    } /* linetype, lt */
-
 #ifdef PM3D
 	    /* both syntaxes allowed: 'with lt pal' as well as 'with pal' */
 	    if (almost_equals(c_token, "pal$ette")) {
@@ -726,25 +741,24 @@ lp_parse(lp, allow_ls, allow_point, def_line, def_point)
 	    break;
 	}
 
-	if (set_lt>1 || set_pal>1 || set_lw>1 || set_pt>1 || set_ps>1)
+	if (set_lt > 1 || set_pal > 1 || set_lw > 1 || set_pt > 1 || set_ps > 1)
 	    int_error(c_token, "duplicated arguments in style specification");
 
 #if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
 	fprintf(stderr,
-		"lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n",     
-		__FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type, lp->p_size);
+		"lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n",
+		__FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type,
+		lp->p_size);
 #endif
     }
 }
 
 /* <fillstyle> = {empty | solid {<density>} | pattern {<n>}} {noborder | border {<lt>}} */
 void
-parse_fillstyle( struct fill_style_type *fs, 
-		int def_style, int def_density, int def_pattern,
-		int def_bordertype)
+parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int def_pattern, int def_bordertype)
 {
     struct value a;
-    TBOOLEAN set_fill  = FALSE;
+    TBOOLEAN set_fill = FALSE;
     TBOOLEAN set_param = FALSE;
 
     /* Set defaults */
@@ -759,7 +773,7 @@ parse_fillstyle( struct fill_style_type *fs,
 #else
     if (END_OF_COMMAND)
 	return;
-    if (!equals(c_token,"fs") && !equals(c_token,"fill"))
+    if (!equals(c_token, "fs") && !equals(c_token, "fill"))
 	return;
     c_token++;
 
@@ -775,16 +789,18 @@ parse_fillstyle( struct fill_style_type *fs,
 	    fs->fillstyle = FS_PATTERN;
 	    set_fill = TRUE;
 	    c_token++;
-	} 
-	
+	}
+
 	if (END_OF_COMMAND)
 	    continue;
 	else if (almost_equals(c_token, "bo$rder")) {
 	    fs->border_linetype = LT_UNDEFINED;
 	    c_token++;
 	    /* FIXME EAM - isanumber really means `is a positive number` */
-	    if (isanumber(c_token) || (equals(c_token,"-")&&isanumber(c_token+1)))
-		fs->border_linetype = (int)real(const_express(&a)) - 1;
+	    if (isanumber(c_token) ||
+		(equals(c_token, "-") && isanumber(c_token + 1))) {
+		fs->border_linetype = (int) real(const_express(&a)) - 1;
+	    }
 	    continue;
 	} else if (almost_equals(c_token, "nobo$rder")) {
 	    fs->border_linetype = LT_NODRAW;
@@ -793,19 +809,19 @@ parse_fillstyle( struct fill_style_type *fs,
 	}
 	/* We hit something unexpected */
 	else if (!set_fill || !isanumber(c_token) || set_param)
- 	    break;
+	    break;
 
 	if (fs->fillstyle == FS_SOLID) {
 	    /* user sets 0...1, but is stored as an integer 0..100 */
 	    fs->filldensity = 100.0 * real(const_express(&a)) + 0.5;
-	    if( fs->filldensity < 0 )
-		fs->filldensity = 0; 
-	    if( fs->filldensity > 100 )
+	    if (fs->filldensity < 0)
+		fs->filldensity = 0;
+	    if (fs->filldensity > 100)
 		fs->filldensity = 100;
 	    set_param = TRUE;
 	} else if (fs->fillstyle == FS_PATTERN) {
 	    fs->fillpattern = real(const_express(&a));
-	    if( fs->fillpattern < 0 )
+	    if (fs->fillpattern < 0)
 		fs->fillpattern = 0;
 	    set_param = TRUE;
 	}
