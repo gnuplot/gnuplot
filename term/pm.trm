@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.26 2000/12/20 11:57:09 mikulik Exp $
+ * $Id: pm.trm,v 1.27 2001/10/26 12:58:38 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -173,6 +173,7 @@ FILE *PM_pipe = NULL;
 static FILE *PM_savepipe = NULL;
 
 int PM_pause __PROTO((char *str));
+void PM_intc_cleanup(void);
 void PM_setup(void);
 static void PM_reset_opts(void);
 static void PM_query(void);
@@ -604,7 +605,7 @@ PM_abortplot()
 }
 
 void
-PM_intc_cleanup()
+PM_intc_cleanup(void)
 {
     if (PM_pipe == NULL || PM_mode == SET_TEXT)
 	PM_abortplot();

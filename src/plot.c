@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.44 2001/07/10 19:10:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.45 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -177,8 +177,8 @@ static int exit_status = EXIT_SUCCESS;
 # include <process.h>
 static ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 TBOOLEAN CallFromRexx = FALSE;
-void PM_intc_cleanup();
-void PM_setup();
+void PM_intc_cleanup(void);
+void PM_setup(void);
 #endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
@@ -193,23 +193,27 @@ static RETSIGTYPE
 inter(anint)
     int anint;
 {
-#ifdef OS2
-    (void) signal(anint, SIG_ACK);
-#else
     (void) anint;		/* aovid -Wunused warning */
     (void) signal(SIGINT, (sigfunc) inter);
-#endif
 
 #ifndef DOSX286
     (void) signal(SIGFPE, SIG_DFL);	/* turn off FPE trapping */
 #endif
+
 #ifdef OS2
-    PM_intc_cleanup();
-#else
+    if (!strcmp(term->name,"pm")) {
+        PM_intc_cleanup();
+        /* ?? 
+          putc('\n', stderr);
+          LONGJMP(command_line_env, TRUE);
+         */
+    } else
+#endif
+    {
     term_reset();
     (void) putc('\n', stderr);
     LONGJMP(command_line_env, TRUE);	/* return to prompt */
-#endif
+    }
 }
 
 #ifdef LINUXVGA

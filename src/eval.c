@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.10 2000/11/07 14:37:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.11 2001/08/22 14:15:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -198,12 +198,8 @@ fpe(an_int)
     _fpreset();
 #endif
 
-#ifdef OS2
-    (void) signal(an_int, SIG_ACK);
-#else
     (void) an_int;		/* avoid -Wunused warning */
     (void) signal(SIGFPE, (sigfunc) fpe);
-#endif
     undefined = TRUE;
     LONGJMP(fpe_env, TRUE);
 }

@@ -1,3 +1,9 @@
+2001-12-01  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* src/eval.c src/fit.c src/plot.c src/os2/gclient.c
+	config/makefile.os2: Abandon EMX non-standard signal processing
+	model. Also avoid calling PM-term functions if it's not running
+
 2001-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c src/misc.c src/plot2d.c src/plot3d.c: Allow
