@@ -41,7 +41,7 @@ Major contributors (alphabetic order):
 
 @c ^ <h2> An Interactive Plotting Program </h2><p>
 @c ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-@c ^ <h2>   Version 3.7 organized by: David Denholm </h2><p>
+@c ^ <h2>   Version 3.8 organized by Hans-Bernhard Broeker and others</h2><p>
 @c ^ <h2>Major contributors (alphabetic order):</h2>
 
 @itemize @bullet
@@ -76,6 +76,8 @@ Alexander Lehmann
 @item
 Alexander Mai
 @item
+Ethan A Merritt
+@item
 Petr Mikulik
 @item
 Carsten Steger
@@ -96,7 +98,7 @@ Johannes Zellner
 @c ^   Mailing list for bug reports: bug-gnuplot@@dartmouth.edu<p>
 @c ^</h2><p>
 @c ^<h3> This manual was prepared by Dick Crawford</h3><p>
-@c ^<h3> 3 December 1998</h3><p>
+@c ^<h3> Last revised: 28 July 2003</h3><p>
 @c ^<hr>
 
 @menu
@@ -119,7 +121,7 @@ Johannes Zellner
 * Copyright::                   
 * Introduction::                
 * Seeking-assistance::          
-* What_is_New_in_version_3.7::  
+* What_is_New_since_version_3.7::  
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
 * Comments::                    
@@ -127,6 +129,7 @@ Johannes Zellner
 * Environment::                 
 * Expressions::                 
 * Glossary::                    
+* mouse_input::                 
 * Plotting::                    
 * Start-up::                    
 * Substitution::                
@@ -261,7 +264,7 @@ See the simple.dem demo, also available together with other demos on the web pag
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html,http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html
 }
 
-@node Seeking-assistance, What_is_New_in_version_3.7, Introduction, gnuplot
+@node Seeking-assistance, What_is_New_since_version_3.7, Introduction, gnuplot
 @section Seeking-assistance
 
 ^ <a name="Seeking-assistance"></a>
@@ -320,186 +323,178 @@ you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
 
-@node What_is_New_in_version_3.7, Batch/Interactive_Operation, Seeking-assistance, gnuplot
-@section What is New in version 3.7
+@node What_is_New_since_version_3.7, Batch/Interactive_Operation, Seeking-assistance, gnuplot
+@section What is New since version 3.7
 
 @cindex new-features
 
-Gnuplot version 3.7 contains many new features.  This section gives a partial
-list and links to the new items in no particular order.
+Gnuplot version 3.8 contains many new features.  This section lists major
+additions and gives a partial list of changes and minor new features.
+Sample gnuplot scripts demonstrating many of these features are provided
+in the gnuplot distribution, and are referred to here by name.
 
-1. `fit f(x) 'file' via` uses the Marquardt-Levenberg method to `fit` data.
-(This is only slightly different from the `gnufit` patch available for 3.5.)
-
-2. Greatly expanded @ref{using} command.  See @ref{using}.
-
-3. @ref{timefmt} allows for the use of dates as input and output for time
-series plots.  See `Time/Date data` and
-@uref{http://www.nas.nasa.gov/~woo/gnuplot/timefmt/timefmt.html,timedat.dem demo.
-}
-
-4. Multiline labels and font selection in some drivers.
-
-5. Minor (unlabeled) tics.  See @ref{mxtics}.
-
-6. @ref{key} options for moving the key box in the page (and even outside of the
-plot), putting a title on it and a box around it, and more.  See @ref{key}.
-
-7. Multiplots on a single logical page with @ref{multiplot}.
-
-8. @ref{postscript} driver with super/subscripts and font changes.
-(This was a separate driver (`enhpost`) that was available as a patch for
-3.5.)
-
-9. Second axes:  use the top and right axes independently of the bottom and
-left, both for plotting and labels.  See `plot`.
-
-10. Special datafile names `'-'` and `""`.  See @ref{special-filenames}.
-
-11. Additional coordinate systems for labels and arrows.  See `coordinates`.
-
-12. @ref{size} can try to plot with a specified aspect ratio.
-
-13. `set missing` now treats missing data correctly.
-
-14. The @ref{call} command: `load` with arguments.
-
-15. More flexible `range` commands with `reverse`, `writeback`, and `restore`
-keywords.
-
-16. @ref{encoding} for multi-lingual encoding.
-
-17. New `x11` driver with persistent and multiple windows.
-
-18. New plotting styles: `xerrorbars`, @ref{errorlines}, `yerrorlines`,
-`xerrorlines`, `xyerrorlines`, `histeps`, `financebars` and more.
-See @ref{style}.
-
-19. New tic label formats, including `"%l %L"` which uses the mantissa and
-exponents to a given base for labels.  See `set format`.
-
-20. New drivers, including `cgm` for inclusion into MS-Office applications
-and `gif` for serving plots to the WEB.
-
-21. Smoothing and spline-fitting options for `plot`.  See @ref{smooth}.
-
-22. @ref{margin} and @ref{origin} give much better control over where a
-graph appears on the page.
-
-23. @ref{border} now controls each border individually.
-
-24. The new commands @ref{if} and @ref{reread} allow command loops.
-
-25. Point styles and sizes, line types and widths can be specified on the
-`plot` command.  Line types and widths can also be specified for grids,
-borders, tics and arrows.  See @ref{with}.  Furthermore these types may be
-combined and stored for further use.  See `set style line`.
-
-26. Text (labels, tic labels, and the time stamp) can be written vertically
-by those terminals capable of doing so.
 
 @menu
-* bind::                        
+* Mouse_support::               
+* New_plotting_style_PM3D::     
+* New_terminal_types::          
+* New_plot_style_`filledcurves`::  
+* Filled_boxes::                
+* New_plot_option_smooth_frequency::  
+* Improved_text_options::       
+* Data_file_format::            
+* Arrows::                      
+* PostScript_output_features::  
+* Other_changes_and_additions::  
 @end menu
 
-@node bind,  , What_is_New_in_version_3.7, What_is_New_in_version_3.7
-@subsection bind
+@node Mouse_support, New_plotting_style_PM3D, What_is_New_since_version_3.7, What_is_New_since_version_3.7
+@subsection Mouse support
 
-@c ?commands bind
-@cindex bind
 
-@c ?help bind
-The @ref{bind} command allows to (re-)define a hotkey, i.e. a sequence of gnuplot
-commands which will be executed when a certain key or key sequence is pressed
-while the driver's window has the input focus. Note that @ref{bind} is only
-available if gnuplot was compiled with @ref{mouse} support and it is used by all
-mouse-capable terminals. Bindings overwrite the builtin bindings (like in
-every real editor), except <space> and 'q' which cannot be rebound. Mouse
-buttons cannot be rebound.
+Interaction with the current plot via mouse and hotkey input is supported for
+the X11, OS/2, ggi and windows terminals. See `mouse input` for more 
+information on mousing. See @ref{bind} for information on hotkeys. Also see 
+the documentation for indivual mousing terminals `ggi`, `pm`, `windows` and 
+`x11`.
 
-Note that multikey-bindings with modifiers have to be quoted.
+Sample script: mousevariables.dem
 
-Syntax:
+
+@node New_plotting_style_PM3D, New_terminal_types, Mouse_support, What_is_New_since_version_3.7
+@subsection New plotting style PM3D
+
+
+The `splot` command is now capable of plotting generates 2D and 3D surfaces 
+coloured by greyscale or color palettes. See @ref{pm3d}, @ref{palette}, 
+@ref{cbrange}, `set view map` and `set colorbox`.
+
+Sample script: pm3d.dem
+
+
+@node New_terminal_types, New_plot_style_`filledcurves`, New_plotting_style_PM3D, What_is_New_since_version_3.7
+@subsection New terminal types
+
+
 @example
-      bind [<key-sequence>] ["<gnuplot commands>"]
-      bind!
+ epslatex - prepares eps figures for inclusion in latex documents
+ ggi      - interface to the General Graphics Interface Library
+ pdf      - Adobe Portable Document Format, requires libpdf 
+ png/jpeg - Support for both PNG and JPEG image output is provided by a
+            a new driver via libgd. The new driver supports many more features
+            than the old png driver, including TrueType fonts. Requires libgd.
+ svg      - Scalable Vector Graphics
 
 @end example
 
-Examples:
 
-- set bindings:
-
-@example
-    bind a "replot"
-    bind "ctrl-a" "plot x*x"
-    bind "ctrl-alt-a" 'print "great"'
-    bind Home "set view 60,30; replot"
-
-@end example
-
-- show bindings:
-@example
-    bind "ctrl-a"          # shows the binding for ctrl-a
-    bind                   # shows all bindings
-
-@end example
-
-- remove bindings:
-@example
-    bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
-                             (note that builtins cannot be removed)
-    bind!                  # installs default (builtin) bindings
-
-@end example
-
-- bind a key to toggle something:
-@example
-  v=0
-  bind "ctrl-r" "v=v+1;if(v%2)set term x11 noraise; else set term x11 raise"
-
-@end example
-
-Modifiers (ctrl / alt) are case insensitive, keys not:
-@example
-    ctrl-alt-a == CtRl-alT-a
-    ctrl-alt-a != ctrl-alt-A
-
-@end example
-
-List of modifiers (alt == meta):
-@example
-    ctrl, alt
-
-@end example
-
-List of supported special keys:
-
-@example
-   "BackSpace", "Tab", "Linefeed", "Clear", "Return", "Pause", "Scroll_Lock",
-   "Sys_Req", "Escape", "Delete", "Home", "Left", "Up", "Right", "Down",
-   "PageUp", "PageDown", "End", "Begin",
-
-@end example
-
-@example
-   "KP_Space", "KP_Tab", "KP_Enter", "KP_F1", "KP_F2", "KP_F3", "KP_F4",
-   "KP_Home", "KP_Left", "KP_Up", "KP_Right", "KP_Down", "KP_PageUp",
-   "KP_PageDown", "KP_End", "KP_Begin", "KP_Insert", "KP_Delete", "KP_Equal",
-   "KP_Multiply", "KP_Add", "KP_Separator", "KP_Subtract", "KP_Decimal",
-   "KP_Divide",
-
-@end example
-
-@example
-   "KP_1" - "KP_9", "F1" - "F12"
-
-@end example
-
-See also @ref{mouse} and @ref{if}.
+@node New_plot_style_`filledcurves`, Filled_boxes, New_terminal_types, What_is_New_since_version_3.7
+@subsection New plot style `filledcurves`
 
 
-@node Batch/Interactive_Operation, Command-line-editing, What_is_New_in_version_3.7, gnuplot
+Sample script: fillcrvs.dem
+
+
+@node Filled_boxes, New_plot_option_smooth_frequency, New_plot_style_`filledcurves`, What_is_New_since_version_3.7
+@subsection Filled boxes
+
+
+A solid color or patterned fill style can be set for any plot style that 
+contains boxes. See `boxes`, `boxerrorbars`, `boxxyerrorbars`,
+`candlesticks`, `set style fill`.
+
+Sample scripts: fillstyle.dem candlesticks.dem
+
+
+@node New_plot_option_smooth_frequency, Improved_text_options, Filled_boxes, What_is_New_since_version_3.7
+@subsection New plot option smooth frequency
+
+
+Input data can be filtered through several built-in routines for interpolation
+or approximation of data.  See @ref{smooth}, `frequency`, `unique`.
+
+Sample scripts: step.dem mgr.dem
+
+
+@node Improved_text_options, Data_file_format, New_plot_option_smooth_frequency, What_is_New_since_version_3.7
+@subsection Improved text options
+
+
+Most gnuplot plot commands that produce text labels now accept modifiers to 
+specify text color, font, size, and rotation angle. See @ref{label}.
+Not all terminal types support these options, however.
+
+Sample scripts: textcolor.dem textrotate.dem
+
+
+@node Data_file_format, Arrows, Improved_text_options, What_is_New_since_version_3.7
+@subsection Data file format
+
+
+The new `set datafile` command can be used to specify information about the
+format of input data files, including the characters used to separate fields, 
+to indicate comment lines, and to specify missing data.  Gnuplot now attempts 
+to recognize text fields with embedded blanks as single entities based on the 
+datafile format settings.  This allows input from csv (comma-separated value)
+files. See `set datafile`.
+
+
+@node Arrows, PostScript_output_features, Data_file_format, What_is_New_since_version_3.7
+@subsection Arrows
+
+
+Single- or double-ended arrows can be placed on a plot individually from the
+command line or from a data file via the `plot with vectors` style.
+See @ref{arrow}, `plotting styles vectors`.
+
+Sample script: arrowstyle.dem
+
+
+@node PostScript_output_features, Other_changes_and_additions, Arrows, What_is_New_since_version_3.7
+@subsection PostScript output features
+
+
+The PostScript driver provides now an oblique symbol font, and allows run-time
+inclusion of embedded PostScript fonts. It also supports ISO-8859-2 and 
+CP-852 character encodings. See `postscript fontfile`.
+
+Sample script: fontfile.dem
+
+
+@node Other_changes_and_additions,  , PostScript_output_features, What_is_New_since_version_3.7
+@subsection Other changes and additions
+
+
+The preferred syntax to undue a command `set <something>` is now 
+`unset <something>` rather than `set no<something>`. The older form has been
+deprecated.  Version 3.8 continues to allow the older syntax, but such 
+backwards compatibility may be lost in future versions.
+
+Commands of the form `set data <style>` also are deprectated in favor of
+the more general form `set style <something> <options>`.  Many more plot
+elements now have style options of their own, including arrows, filled
+areas, lines, and points. There are also style settings for input data and
+formatting. Please see @ref{style}, @ref{decimalsign}, and `set datafile`.
+
+Improved 2D and 3D clipping (hidden lines).
+
+More consistent point styles and other default formatting styles across
+all terminals. Please use the @ref{test} command to check default styles and
+plotting capabilities for the currently selected terminal type.
+
+The @ref{label} command supports associated points, and allow you to 
+specify point style and text style (font, rotation, etc). User variables
+can be included in labels via format specifiers in the label text.
+See @ref{label}.
+
+New command `set view map` to select 2D projection view of 3d surface plot.
+
+New commands `set term push` and `set term pop`.
+
+The `load` command accepts piped input.
+
+
+@node Batch/Interactive_Operation, Command-line-editing, What_is_New_since_version_3.7, gnuplot
 @section Batch/Interactive Operation
 
 @cindex batch/interactive
@@ -827,6 +822,7 @@ defaults to radians.
 * tan::                         
 * tanh::                        
 * column::                      
+* defined::                     
 * tm_hour::                     
 * tm_mday::                     
 * tm_min::                      
@@ -1340,7 +1336,7 @@ A few additional functions are also available.
 
 
 
-@node column, tm_hour, tanh, Functions
+@node column, defined, tanh, Functions
 @subsubsection column
 
 @c ?expressions functions column
@@ -1352,7 +1348,15 @@ A few additional functions are also available.
 `column(x)` may be used only in expressions as part of @ref{using} manipulations
 to fits or datafile plots.  See @ref{using}.
 
-@node tm_hour, tm_mday, column, Functions
+@node defined, tm_hour, column, Functions
+@subsubsection defined
+
+@c ?expressions functions defined
+@c ?functions defined
+`defined(X)` returns 1 if a variable named X has been defined, otherwise 
+it returns 0.
+
+@node tm_hour, tm_mday, defined, Functions
 @subsubsection tm_hour
 
 @c ?expressions tm_hour
@@ -1637,7 +1641,7 @@ on `fit` for details.
 See `show functions`, @ref{variables}, and `fit`.
 
 
-@node Glossary, Plotting, Expressions, gnuplot
+@node Glossary, mouse_input, Expressions, gnuplot
 @section Glossary
 
 @cindex glossary
@@ -1686,7 +1690,148 @@ a single record.  A "datablock" is a set of points from consecutive records,
 delimited by blank records.  A line, when referred to in the context of a
 data file, is a subset of a datablock.
 
-@node Plotting, Start-up, Glossary, gnuplot
+@node mouse_input, Plotting, Glossary, gnuplot
+@section mouse input
+
+@c ?mouse input
+The `x11`, `windows`, `ggi` and `pm` terminals allow interaction with the
+current plot using the mouse. They also support the definition of hotkeys
+to activate pre-defined functions by hitting a single key while the mouse
+focus is in the active plot window.  It is even possible to combine mouse
+input with `batch` command scripts, by invoking the command `pause mouse`
+and then using the mouse variables returned by mouse clicking as parameters
+for subsequent scripted actions. See @ref{bind} and @ref{variables}.  
+See also the command `set mouse`.
+
+
+@menu
+* bind::                        
+* mouse_variables::             
+@end menu
+
+@node bind, mouse_variables, mouse_input, mouse_input
+@subsection bind
+
+@c ?commands bind
+@cindex bind
+
+@c ?help bind
+The @ref{bind} allows defining or redefining a hotkey, i.e. a sequence of gnuplot
+commands which will be executed when a certain key or key sequence is pressed
+while the driver's window has the input focus. Note that @ref{bind} is only
+available if gnuplot was compiled with `mouse` support and it is used by all
+mouse-capable terminals. Bindings overwrite the builtin bindings (like in
+every real editor), except <space> and 'q' which cannot be rebound. Mouse
+buttons cannot be rebound.
+
+Note that multikey-bindings with modifiers have to be quoted.
+
+Syntax:
+@example
+      bind [<key-sequence>] ["<gnuplot commands>"]
+      bind!
+
+@end example
+
+Examples:
+
+- set bindings:
+
+@example
+    bind a "replot"
+    bind "ctrl-a" "plot x*x"
+    bind "ctrl-alt-a" 'print "great"'
+    bind Home "set view 60,30; replot"
+
+@end example
+
+- show bindings:
+@example
+    bind "ctrl-a"          # shows the binding for ctrl-a
+    bind                   # shows all bindings
+
+@end example
+
+- remove bindings:
+@example
+    bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
+                             (note that builtins cannot be removed)
+    bind!                  # installs default (builtin) bindings
+
+@end example
+
+- bind a key to toggle something:
+@example
+  v=0
+  bind "ctrl-r" "v=v+1;if(v%2)set term x11 noraise; else set term x11 raise"
+
+@end example
+
+Modifiers (ctrl / alt) are case insensitive, keys not:
+@example
+    ctrl-alt-a == CtRl-alT-a
+    ctrl-alt-a != ctrl-alt-A
+
+@end example
+
+List of modifiers (alt == meta):
+@example
+    ctrl, alt
+
+@end example
+
+List of supported special keys:
+
+@example
+   "BackSpace", "Tab", "Linefeed", "Clear", "Return", "Pause", "Scroll_Lock",
+   "Sys_Req", "Escape", "Delete", "Home", "Left", "Up", "Right", "Down",
+   "PageUp", "PageDown", "End", "Begin",
+
+@end example
+
+@example
+   "KP_Space", "KP_Tab", "KP_Enter", "KP_F1", "KP_F2", "KP_F3", "KP_F4",
+   "KP_Home", "KP_Left", "KP_Up", "KP_Right", "KP_Down", "KP_PageUp",
+   "KP_PageDown", "KP_End", "KP_Begin", "KP_Insert", "KP_Delete", "KP_Equal",
+   "KP_Multiply", "KP_Add", "KP_Separator", "KP_Subtract", "KP_Decimal",
+   "KP_Divide",
+
+@end example
+
+@example
+   "KP_1" - "KP_9", "F1" - "F12"
+
+@end example
+
+See also `help mouse` and @ref{if}.
+
+
+@node mouse_variables,  , bind, mouse_input
+@subsection mouse_variables
+
+@c ?help mouse variables
+@c ?help mouse mouse_variables
+@c ?mouse variables
+When mousing is active, clicking in the active window will set several user
+variables that can be accessed from the gnuplot command line. The coordinates
+of the mouse at the time of the click are stored in MOUSE_X MOUSE_Y MOUSE_X2
+and MOUSE_Y2. The mouse button clicked, and any meta-keys active at that time,
+are stored in MOUSE_BUTTON MOUSE_SHIFT MOUSE_ALT and MOUSE_CTRL.  These 
+variables are set to undefined at the start of every plot, and only become 
+defined in the event of a mouse click in the active plot window. To determine
+from a script if the mouse has been clicked in the active plot window, it is
+sufficient to test for any one of these variables being defined.
+
+@example
+      plot 'something'
+      set pause mouse
+      if (defined(MOUSE_BUTTON)) call 'something_else'; \
+      else print "No mouse click." 
+
+@end example
+
+
+@node Plotting, Start-up, mouse_input, gnuplot
 @section Plotting
 
 @cindex plotting
@@ -2877,6 +3022,7 @@ waits a specified amount of time or until the carriage return is pressed.
 Syntax:
 @example
       pause <time> @{"<string>"@}
+      pause mouse @{"<string>"@}
 
 @end example
 
@@ -2885,6 +3031,10 @@ carriage return is hit, zero (0) won't pause at all, and a positive number
 will wait the specified number of seconds.  The time is rounded to an integer
 number of seconds if subsecond time resolution is not supported by the given
 platform.  `pause 0` is synonymous with `print`.
+
+If the current terminal supports mousing, then `pause mouse` will terminate
+on either a mouse click or on a carriage return.  For all other terminals
+`pause mouse` is equivalent to `pause -1`.
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -2896,6 +3046,7 @@ Examples:
       pause 3     # Wait three seconds
       pause -1  "Hit return to continue"
       pause 10  "Isn't this pretty?  It's a cubic spline."
+      pause mouse "Click mouse on selected data point"
 
 @end example
 
@@ -6649,7 +6800,7 @@ controlled by the optional `offset x, y`. Example: `offset 2, -3` would
 displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
 from the actual coordinate point as given by `position`.  The size of the
 point depends also on the setting of @ref{pointsize}.
-This option is used by default for placing labels in @ref{mouse} enhanced
+This option is used by default for placing labels in `mouse` enhanced
 terminals.  Use `nopoint` to turn off the drawing of a point near
 the label (this is the default).
 
@@ -6967,14 +7118,14 @@ to tic labels overwriting other text if the axis is very close to the border.
 @c ?commands unset mouse
 @c ?set mouse
 @c ?unset mouse
+@c ?help mouse
 @cindex mouse
 @opindex mouse
 
 
 @cindex nomouse
 
-@c ?help mouse
-The command @ref{mouse} enables mouse actions. Currently the pm, x11, ggi and
+The command `set mouse` enables mouse actions. Currently the pm, x11, ggi and
 windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
 mode works for 2d graphs and for maps (i.e. splots with @ref{view} having
 z-rotation 0, 90, 180, 270 or 360 degrees) and it allows tracing the position
@@ -6988,15 +7139,6 @@ ticslevel.
 Mousing is not available in multiplot mode. If multiplot is disabled using
 @ref{multiplot} though,  the mouse will be turned on again and acts on the
 last plot (like replot does).
-
-X11 specific implementation details: Mouse support is turned on by default if
-standard input comes from a terminal (tty). Mouse support is turned off if
-standard input does not come from a tty, e.g. a pipe. If you want to use mouse
-support while writing to gnuplot from a pipe, the mouse must be turned on
-*before* starting the x11 driver, e.g. immediately after startup with the
-explicit command @ref{mouse}. Beware: on some UNIX flavours, special input
-devices as /dev/null might not be `select-able`; turning on the mouse when
-using such devices will hang gnuplot.
 
 Syntax:
 @example
@@ -7029,7 +7171,7 @@ The default is "% #g".
 
 `clipboardformat` and `mouseformat` are used for formatting the text on
 Button1 and Button2 actions -- copying the coordinates to the clipboard and
-temporaryly annotating the mouse position. This corresponds to the key
+temporarily annotating the mouse position. This corresponds to the key
 bindings '1', '2', '3', '4' (see the drivers's help window). If the argument
 is a string this string is used as c format specifier and should contain two
 float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
@@ -7078,6 +7220,31 @@ Press 'q' in the driver's window to close the window. This key cannot be
 overridden with the @ref{bind} command.
 
 See also @ref{bind} and @ref{label}.
+
+@menu
+* x11_mouse::                   
+@end menu
+
+@node x11_mouse,  , mouse, mouse
+@subsubsection x11_mouse
+
+@cindex x11_mouse
+
+@c ?help x11_mouse
+@c ?mouse x11_mouse
+X11 mouse support is turned on by default if standard input comes from a 
+terminal (tty). Mouse support is turned off if standard input does not 
+come from a tty, e.g. a pipe. If you want to use mouse support while writing
+to gnuplot from a pipe, the mouse must be turned on *before* starting the x11
+driver, e.g. immediately after startup with the explicit command `set mouse`.
+Beware: on some UNIX flavours, special input devices as /dev/null might not 
+be `select-able`; turning on the mouse when using such devices will hang 
+gnuplot.
+
+If multiple X11 plot windows have been opened using the `set term x11 <n>`
+terminal option, then only the current plot window supports the entire 
+range of mouse commands and hotkeys.  The other windows will, however,
+continue to display mouse coordinates at the lower left.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -7757,7 +7924,7 @@ Otherwise, the options can be given in any order. @ref{palette} shows the
 current palette properties. `show palette palette <n>` shows RGB triplets for
 the current settings and a palette having <n> discrete colors.  `show palette
 gradient` displays the gradient defining the palette (if apropriate).  @ref{rgbformulae} prints the available fixed gray --> color transformation
-formulaes.  `show palette colornames` prints the implemented color names.
+formulas.  `show palette colornames` prints the implemented color names.
 
 The following options determine the coloring properties.
 
@@ -7770,7 +7937,7 @@ as the gray for gray maps. The color map requires a transformation gray -->
 
 Basically two different types of mappings can be used:  Analytic formulae
 to convert gray to color, or discrete mapping tables which are interpolated.
-@ref{rgbformulae} and `functions` use analytic formulae whereas @ref{defined} and
+@ref{rgbformulae} and `functions` use analytic formulae whereas `defined` and
 @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript
 output to a minimum.
 
@@ -7779,7 +7946,7 @@ to use it for non-rgbformulae palettes. This command can be found useful
 mainly for external programs using the same rgbformulae definition of palettes
 as gnuplot, like zimg.
 
-`set palette gray` switches to a gray only palette.  @ref{rgbformulae}, @ref{defined},
+`set palette gray` switches to a gray only palette.  @ref{rgbformulae}, `defined`,
 @ref{file} and `functions` switch to a color mapping.  `set palette color` is an
 easy way to switch back from the gray palette to the last color mapping.
 
@@ -7798,7 +7965,7 @@ gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
 
 RGB color space might not be the most useful color space to work in.  For
 that reason you may change the color space with `model` to one of `RGB`,
-`HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for @ref{defined} tables and a
+`HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for `defined` tables and a
 color space other than RGB will result in funny colors.  All explanation have
 been written for RGB color space, so please note, that `R` can be `H`, `C`,
 `Y`, or `X`, depending on the actual color space (`G` and `B` accordingly).
@@ -7821,14 +7988,14 @@ and
 
 @menu
 * rgbformulae::                 
-* defined::                     
+* defined_::                    
 * functions_::                  
 * file::                        
 * gamma-correction::            
 * postscript::                  
 @end menu
 
-@node rgbformulae, defined, palette, palette
+@node rgbformulae, defined_, palette, palette
 @subsubsection rgbformulae
 
 @c ?commands set palette rgbformulae
@@ -7861,7 +8028,7 @@ A full color palette in HSV color space
 
 @end example
 
-Please note that even if called @ref{rgbformulae} the formulaes might actually
+Please note that even if called @ref{rgbformulae} the formulas might actually
 determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
 
 Use `positive` and `negative` to invert the figure colors.
@@ -7875,15 +8042,17 @@ other color scheme by the command
 
 @end example
 
-@node defined, functions_, rgbformulae, palette
+@node defined_, functions_, rgbformulae, palette
 @subsubsection defined
 
 @c ?commands set palette defined
 @c ?set palette defined
 @c ?palette defined
 @cindex defined
+@findex defined
 
-Gray-to-rgb mapping can be manualy set by use of @ref{defined}:  A color gradient
+
+Gray-to-rgb mapping can be manually set by use of `defined`:  A color gradient
 is defined and used to give the rgb values.  Such a  gradient is a piecewise
 linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
 You have to specify the gray values and the corresponding RGB values in
@@ -7918,7 +8087,7 @@ depending on the selected color model.
 The <gray> values have to form an ascending sequence of real numbers; the
 sequence will be automatically rescaled to [0,1].
 
-@ref{defined} (without a gradient definition in braces) switches to
+`set palette defined` (without a gradient definition in braces) switches to
 RGB color space and uses a preset full-spectrum color gradient.
 Use `show palette gradient` to display the gradient.
 
@@ -7969,7 +8138,7 @@ To produce a palette with few colors only use:
 @end example
 
 
-@node functions_, file, defined, palette
+@node functions_, file, defined_, palette
 @subsubsection functions
 
 @c ?commands set palette functions
@@ -9138,8 +9307,14 @@ The `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
 it requires four columns of data.  It also draws a small arrowhead at the
 end of the vector.
 
+Example:
+@example
+      plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
+
+@end example
+
 `set clip one` and `set clip two` affect drawing vectors.
-Please see @ref{clip}.
+Please see @ref{clip} and `arrowstyle`.
 
 
 @noindent --- XERRORBARS ---
