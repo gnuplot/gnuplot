@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24 1999/01/12 14:02:37 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.1 1999/08/19 14:39:42 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1303,7 +1303,7 @@ int pcount;			/* count of plots in linked list */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     TBOOLEAN scaling;
-    char ss[MAX_LINE_LEN + 1], *s, *e;
+    char *s, *e;
 
     /* so that macros for x_min etc pick up correct values
      * until this is done properly
@@ -1629,68 +1629,66 @@ int pcount;			/* count of plots in linked list */
     }
 /* YLABEL */
     if (*ylabel.text) {
-	strcpy(ss, ylabel.text);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = ylabel_x + (t->v_char / 2);
 	    unsigned int y = (ytop + ybot) / 2 + ylabel.yoffset * (t->h_char);
-	    write_multiline(x, y, ss, CENTRE, JUST_TOP, 1, ylabel.font);
+	    write_multiline(x, y, ylabel.text, CENTRE, JUST_TOP, 1, ylabel.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines 
 	       so we need to adjust x-posn by one line */
 	    unsigned int x = ylabel_x;
 	    unsigned int y = ylabel_y;
-	    write_multiline(x, y, ss, LEFT, JUST_TOP, 0, ylabel.font);
+	    write_multiline(x, y, ylabel.text, LEFT, JUST_TOP, 0, ylabel.font);
 	}
     }
 /* Y2LABEL */
     if (*y2label.text) {
-	strcpy(ss, y2label.text);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (1)) {
 	    unsigned int x = y2label_x + (t->v_char / 2) - 1;
 	    unsigned int y = (ytop + ybot) / 2 + y2label.yoffset * (t->h_char);
-	    write_multiline(x, y, ss, CENTRE, JUST_TOP, 1, y2label.font);
+	    write_multiline(x, y, y2label.text, CENTRE, JUST_TOP, 1, y2label.font);
 	    (*t->text_angle) (0);
 	} else {
 	    /* really bottom just, but we know number of lines */
 	    unsigned int x = y2label_x;
 	    unsigned int y = y2label_y;
-	    write_multiline(x, y, ss, RIGHT, JUST_TOP, 0, y2label.font);
+	    write_multiline(x, y, y2label.text, RIGHT, JUST_TOP, 0, y2label.font);
 	}
     }
 /* XLABEL */
     if (*xlabel.text) {
 	unsigned int x = (xright + xleft) / 2 + xlabel.xoffset * (t->h_char);
 	unsigned int y = xlabel_y - t->v_char / 2;	/* HBB */
-	strcpy(ss, xlabel.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, xlabel.font);
+	write_multiline(x, y, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
     }
 /* PLACE TITLE */
     if (*title.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xleft + xright) / 2 + title.xoffset * t->h_char;
 	unsigned int y = title_y - t->v_char / 2;
-	strcpy(ss, title.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, title.font);
+	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
     }
 /* X2LABEL */
     if (*x2label.text) {
 	/* we worked out y-coordinate in boundary() */
 	unsigned int x = (xright + xleft) / 2 + x2label.xoffset * (t->h_char);
 	unsigned int y = x2label_y - t->v_char / 2 - 1;
-	strcpy(ss, x2label.text);
-	write_multiline(x, y, ss, CENTRE, JUST_TOP, 0, x2label.font);
+	write_multiline(x, y, x2label.text, CENTRE, JUST_TOP, 0, x2label.font);
     }
 /* PLACE TIMEDATE */
     if (*timelabel.text) {
 	/* we worked out coordinates in boundary() */
-	char str[MAX_LINE_LEN + 1];
+	char *str;
 	time_t now;
 	unsigned int x = time_x;
 	unsigned int y = time_y;
 	time(&now);
+	/* there is probably now way to find out in advance how many
+	 * chars strftime() writes */
+	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));
 
 	if (timelabel_rotate && (*t->text_angle) (1)) {
@@ -1713,12 +1711,11 @@ int pcount;			/* count of plots in linked list */
 	 this_label = this_label->next) {
 	unsigned int x, y;
 	map_position(&this_label->place, &x, &y, "label");
-	strcpy(ss, this_label->text);
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 1, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, ss, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
 	}
     }
 
@@ -1742,7 +1739,10 @@ int pcount;			/* count of plots in linked list */
 	yl = key_yt;
 
 	if (*key_title) {
-	    sprintf(ss, "%s\n", key_title);
+	    char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
+	    strcpy(ss, key_title);
+	    strcat(ss, "\n");
+
 	    s = ss;
 	    yl -= t->v_char / 2;
 	    while ((e = (char *) strchr(s, '\n')) != NULL) {
@@ -1763,6 +1763,7 @@ int pcount;			/* count of plots in linked list */
 		yl -= t->v_char;
 	    }
 	    yl += t->v_char / 2;
+	    free(ss);
 	}
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
@@ -3667,15 +3668,19 @@ int vert;			/* ... and vertical just - text in hor direction despite angle */
 int angle;			/* assume term has already been set for this */
 char *font;			/* NULL or "" means use default */
 {
-    /* assumes we are free to mangle the text */
     register struct termentry *t = term;
-    char *p;
+    char *p = text;
+
+    if (!p)
+	return;
+
     if (vert != JUST_TOP) {
 	/* count lines and adjust y */
 	int lines = 0;		/* number of linefeeds - one fewer than lines */
-	for (p = text; *p; ++p)
+	while (*p++) {
 	    if (*p == '\n')
 		++lines;
+	}
 	if (angle)
 	    x -= (vert * lines * t->v_char) / 2;
 	else
@@ -3687,7 +3692,7 @@ char *font;			/* NULL or "" means use default */
 
     for (;;) {			/* we will explicitly break out */
 
-	if ((p = strchr(text, '\n')) != NULL)
+	if ((text != NULL) && (p = strchr(text, '\n')) != NULL)
 	    *p = 0;		/* terminate the string */
 
 	if ((*t->justify_text) (hor)) {
@@ -3706,12 +3711,17 @@ char *font;			/* NULL or "" means use default */
 
 	if (!p)
 	    break;
+	else {
+	    /* put it back */
+	    *p = '\n';
+	}
 
 	text = p + 1;
     }				/* unconditional branch back to the for(;;) - just a goto ! */
 
     if (font && *font)
 	(*t->set_font) (default_font);
+
 }
 
 /* display a x-axis ticmark - called by gen_ticks */

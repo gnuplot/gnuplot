@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.13.2.1 1999/08/19 14:39:48 lhecking Exp $";
+static char *RCSid = "$Id: graph3d.c,v 1.13.2.2 1999/09/14 19:19:11 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -491,13 +491,13 @@ int pcount;			/* count of plots in linked list */
     struct surface_points *this_plot = NULL;
     unsigned int xl, yl;
     int linetypeOffset = 0;
-    double ztemp, temp;
+    /* double ztemp, temp; unused */
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     TBOOLEAN scaling;
     transform_matrix mat;
     int key_count;
-    char ss[MAX_LINE_LEN+1], *s, *e;
+    char *s, *e;
 
     /* Initiate transformation matrix using the global view variables. */
     mat_rot_z(surface_rot_z, trans_mat);
@@ -506,13 +506,14 @@ int pcount;			/* count of plots in linked list */
     mat_scale(surface_scale / 2.0, surface_scale / 2.0, surface_scale / 2.0, mat);
     mat_mult(trans_mat, trans_mat, mat);
 
-#if 0 /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
+#if 0
+    /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
     /* modify min_z/max_z so it will zscale properly. */
     ztemp = (z_max3d - z_min3d) / (2.0 * surface_zscale);
     temp = (z_max3d + z_min3d) / 2.0;
     z_min3d = temp - ztemp;
     z_max3d = temp + ztemp;
-#endif
+#endif /* 0 */
 
     /* The extrema need to be set even when a surface is not being
      * drawn.   Without this, gnuplot used to assume that the X and
@@ -586,10 +587,9 @@ int pcount;			/* count of plots in linked list */
 
     /* PLACE TITLE */
     if (*title.text != 0) {
-	safe_strncpy(ss, title.text, sizeof(ss));
 	write_multiline((unsigned int) ((xleft + xright) / 2 + title.xoffset * t->h_char),
 			(unsigned int) (ytop + (titlelin + title.yoffset) * (t->h_char)),
-			ss, CENTRE, JUST_TOP, 0, title.font);
+			title.text, CENTRE, JUST_TOP, 0, title.font);
     }
     /* PLACE TIMEDATE */
     if (*timelabel.text) {
@@ -624,7 +624,6 @@ int pcount;			/* count of plots in linked list */
 
 
 	map_position(&this_label->place, &x, &y, "label");
-	safe_strncpy(ss, this_label->text, sizeof(ss));
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -744,7 +743,9 @@ int pcount;			/* count of plots in linked list */
 
     /* KEY TITLE */
     if (key != 0 && strlen(key_title)) {
-	sprintf(ss, "%s\n", key_title);
+	char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
+	strcpy(ss, key_title);
+	strcat(ss, "\n");
 	s = ss;
 	yl -= t->v_char / 2;
 	while ((e = (char *) strchr(s, '\n')) != NULL) {
@@ -766,6 +767,7 @@ int pcount;			/* count of plots in linked list */
 	    yl -= t->v_char;
 	}
 	yl += t->v_char / 2;
+	free(ss);
     }
     key_count = 0;
     yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
@@ -1627,8 +1629,7 @@ else if (height[i][j] != depth[i][j]) \
 		y1 -= tic_unity * ticscale * (t->v_tic);
 	    }
 	    /* write_multiline mods it */
-	    safe_strncpy(ss, xlabel.text, sizeof(ss));
-	    write_multiline(x1, y1, ss, CENTRE, JUST_TOP, 0, xlabel.font);
+	    write_multiline(x1, y1, xlabel.text, CENTRE, JUST_TOP, 0, xlabel.font);
 	}
     }
     if (ytics || *ylabel.text) {
@@ -1695,8 +1696,7 @@ else if (height[i][j] != depth[i][j]) \
 	x += zlabel.xoffset * t->h_char;
 	y += zlabel.yoffset * t->v_char;
 
-	safe_strncpy(ss, zlabel.text, sizeof(ss));
-	write_multiline(x, y, ss, CENTRE, CENTRE, 0, zlabel.font);
+	write_multiline(x, y, zlabel.text, CENTRE, CENTRE, 0, zlabel.font);
 
     }
 }
