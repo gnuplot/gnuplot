@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.26 2000/04/30 22:37:52 joze Exp $
+ * $Id: x11.trm,v 1.28 2000/05/02 20:56:27 broeker Exp $
  *
  */
 
@@ -68,11 +68,13 @@ TERM_PUBLIC void X11_put_text __PROTO((unsigned int x, unsigned int y, const cha
 TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
+#ifdef USE_MOUSE
 TERM_PUBLIC int X11_waitforinput __PROTO((void));
 TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
 TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
+#endif
 #define X11_XMAX 4096
 #define X11_YMAX 4096
 
@@ -377,11 +379,12 @@ X11_atexit HANDLER_DECL
 
 
 
+#ifdef USE_MOUSE
 TERM_PUBLIC int
 X11_waitforinput()
 {
     char c;
-#if defined(USE_MOUSE) && !defined(OS2)
+#if !defined(OS2)
     fd_set fds;
     static struct gp_event_t ge;
     static int l=0;
@@ -420,6 +423,7 @@ X11_waitforinput()
     if (read(0, &c, 1)!=1) return EOF;
     else return c;
 }
+#endif
 
 
 TERM_PUBLIC void
@@ -889,6 +893,7 @@ unsigned int x, y, w, h;
     }
 }
 
+#ifdef USE_MOUSE
 TERM_PUBLIC void
 X11_put_tmptext(i,str)
 int i;
@@ -929,7 +934,7 @@ const char s[];
 	FFLUSH();
     }
 }
-
+#endif
 
 
 #endif /* TERM_BODY */

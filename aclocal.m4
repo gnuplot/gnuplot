@@ -1,4 +1,4 @@
-dnl aclocal.m4 generated automatically by aclocal 1.4a
+dnl aclocal.m4 generated automatically by aclocal 1.4
 
 dnl Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
@@ -44,8 +44,6 @@ dnl AM_INIT_AUTOMAKE(package,version, [no-define])
 
 AC_DEFUN(AM_INIT_AUTOMAKE,
 [AC_REQUIRE([AC_PROG_INSTALL])
-dnl We require 2.13 because we rely on SHELL being computed by configure.
-AC_PREREQ([2.13])
 PACKAGE=[$1]
 AC_SUBST(PACKAGE)
 VERSION=[$2]
@@ -66,23 +64,6 @@ AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
 AM_MISSING_PROG(AUTOMAKE, automake, $missing_dir)
 AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
 AM_MISSING_PROG(MAKEINFO, makeinfo, $missing_dir)
-dnl Set install_sh for make dist
-install_sh="$missing_dir/install-sh"
-test -f "$install_sh" || install_sh="$missing_dir/install.sh"
-AC_SUBST(install_sh)
-dnl We check for tar when the user configures the end package.
-dnl This is sad, since we only need this for "dist".  However,
-dnl there's no other good way to do it.  We prefer GNU tar if
-dnl we can find it.  If we can't find a tar, it doesn't really matter.
-AC_CHECK_PROGS(AMTAR, gnutar gtar tar)
-AMTARFLAGS=
-if test -n "$AMTAR"; then
-  if $SHELL -c "$AMTAR --version" > /dev/null 2>&1; then
-    dnl We have GNU tar.
-    AMTARFLAGS=o
-  fi
-fi
-AC_SUBST(AMTARFLAGS)
 AC_REQUIRE([AC_PROG_MAKE_SET])])
 
 #
@@ -202,10 +183,9 @@ ac_save_CC="$CC"
 # breaks some systems' header files.
 # AIX			-qlanglvl=ansi
 # Ultrix and OSF/1	-std1
-# HP-UX 10.20 and later	-Ae
-# HP-UX older versions	-Aa -D_HPUX_SOURCE
+# HP-UX			-Aa -D_HPUX_SOURCE
 # SVR4			-Xc -D__EXTENSIONS__
-for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
 do
   CC="$ac_save_CC $ac_arg"
   AC_TRY_COMPILE(

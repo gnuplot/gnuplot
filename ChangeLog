@@ -1,3 +1,10 @@
+
+2000-05-01  Johannes Zellner <johannes@zellner.org>
+
+	* src/command.c: always include ipc.h
+
+	* term/linux.trm: typedef int in declaration of linux_line_func_ptr
+
 2000-05-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL: In "Platform notes" section, add hint for using
