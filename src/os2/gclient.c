@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.36 2005/01/05 09:48:36 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.37 2005/03/26 22:06:51 sfeam Exp $";
 #endif
 
 /****************************************************************************
@@ -168,10 +168,12 @@ static BOOL     bColours = TRUE;
 static BOOL     bShellPos = FALSE;
 static BOOL     bPopFront = TRUE;
 static BOOL     bKeepRatio = TRUE;	//PM
+#if 0
 static BOOL     bNewFont = FALSE;
+#endif
 
-static double   multLineHor  = 1; /* Horizontal and vertical spacing shifts */
-static double   multLineVert = 0; /* for multiline prints.		    */
+static double   multLineHor  = 1.; /* Horizontal and vertical spacing shifts */
+static double   multLineVert = 0.; /* for multiline prints.		    */
 
 static int	codepage = 0;
 
@@ -902,7 +904,9 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 			      pp,
 			      QPF_NOINHERIT) != 0L) {
 	    strcpy(szFontNameSize, pp);
+#if 0
 	    bNewFont = TRUE;
+#endif
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	free(pp);
@@ -1199,7 +1203,9 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_FONTS:
 	if (GetNewFont(hWnd, hpsScreen)) {
-	    bNewFont = TRUE;
+#if 0
+	bNewFont = TRUE;
+#endif
 	    WinInvalidateRect(hWnd, NULL, TRUE);
 	}
 	break;
@@ -1906,7 +1912,7 @@ static struct _ft {
 };
 
 /*
-**  Select a named and sized outline(adobe) font
+**  Select a named and sized outline font
 */
 void
 SelectFont(HPS hps, char *szFontNameSize)
@@ -1986,10 +1992,12 @@ SelectFont(HPS hps, char *szFontNameSize)
     }
     sizCurFont = sizBaseFont;
     sizCurSubSup = sizBaseSubSup;
+#if 0
     if (bNewFont) {
 	/* EditCharCell(hps, &sizfx); */
         bNewFont = FALSE;
     }
+#endif
 }
 
 /*
@@ -2022,7 +2030,7 @@ SwapFont(HPS hps, char *szFNS)
             int i;
 
             lcid = 0;
-            for (i=0;i<itab;i++) {
+            for (i=0; i<itab; i++) {
                 if (strcmp(szFontName, tabFont[i].name) == 0) {
                     lcid = tabFont[i].lcid;
                     break;
@@ -2043,7 +2051,6 @@ SwapFont(HPS hps, char *szFNS)
 		FATTR_FONTUSE_TRANSFORMABLE;
 
 	    strcpy(fat.szFacename, szFontName);
-
 
 	    tabFont[itab].name = strdup(szFontName);
 	    lcid = itab+10;
@@ -2436,7 +2443,7 @@ ReadGnu(void* arg)
 		}
 
 	    case 'J' :   /* justify */
-		BufRead(hRead,&jmode, sizeof(int), &cbR);
+		BufRead(hRead, &jmode, sizeof(int), &cbR);
 		break;
 
 	    case 'A' :   /* text angle */
@@ -2449,7 +2456,7 @@ ReadGnu(void* arg)
 		    GpiStrokePath(hps, 1, 0);
 		    bPath = FALSE;
 		}
-		BufRead(hRead,&ta, sizeof(int), &cbR);
+		BufRead(hRead, &ta, sizeof(int), &cbR);
 		t1 = ta % 360;
 		if (t1 < 0)
 		    t1 += 360;
@@ -2653,6 +2660,7 @@ ReadGnu(void* arg)
 
 		BufRead(hRead,&len, sizeof(int), &cbR);
 		len =(len + sizeof(int) - 1) / sizeof(int);
+
 		if (len == 0) {
 		    SwapFont(hps, NULL);
 		} else {
@@ -2667,7 +2675,7 @@ ReadGnu(void* arg)
 			*p = '\0';
 			strcpy(font, p+1);
 		    }
-		    strcat(font,".");
+		    strcat(font, ".");
 		    strcat(font, str);
 		    free(str);
 		    SwapFont(hps, font);
@@ -3200,11 +3208,11 @@ static char
     if (bText) {
 	if (textlen > 0) {
 	    GpiCharStringAt(hps, &ptlText, textlen, starttext);
-	    ptlText.x += aptl[TXTBOX_CONCAT].x - multLineHor*base;
-	    ptlText.y += aptl[TXTBOX_CONCAT].y + multLineVert*base;
+	    ptlText.x += aptl[TXTBOX_CONCAT].x - multLineVert * base;
+	    ptlText.y += aptl[TXTBOX_CONCAT].y + multLineHor * base;
 	} else {
-	    ptlText.x -= multLineHor * base;
-	    ptlText.y += multLineVert * base;
+	    ptlText.x -= multLineVert * base;
+	    ptlText.y += multLineHor * base;
 	}
     }
     textlen = 0;
@@ -3235,9 +3243,9 @@ static char
 	case '_':
 	case '^':
 	    /*{{{  deal with super/sub script*/
-	    shift =(*p == '^') ? lSupOffset : lSubOffset;
+	    shift = ((*p == '^') ? lSupOffset : lSubOffset);
 	    p = ParseText(hps, p+1, FALSE,
-			  NULL/*fontname*/, fontsize*0.7,
+			  NULL/*fontname*/, fontsize*0.8,
 			  base+shift, widthflag, showflag);
 	    break;
 	    /*}}}*/
@@ -3394,13 +3402,13 @@ static char
     if (textlen > 0) {
 	GpiQueryTextBox(hps, textlen, starttext, TXTBOX_COUNT, aptl);
 	if (widthflag) {
-	    textwidth += multLineHor * aptl[TXTBOX_BOTTOMRIGHT].x +
-			 multLineVert * aptl[TXTBOX_BOTTOMRIGHT].y;
+	    textwidth += aptl[TXTBOX_BOTTOMRIGHT].x * multLineHor;
+	    textwidth += aptl[TXTBOX_BOTTOMRIGHT].y * multLineVert;
 	}
     }
     if (bText) {
 	if (textlen > 0) {
-	    if (showflag)
+	    if (showflag) 
 		GpiCharStringAt(hps, &ptlText, textlen, starttext);
 	    if (widthflag) {
 		ptlText.x += aptl[TXTBOX_CONCAT].x;
@@ -3408,8 +3416,8 @@ static char
 	    }
 	}
 	if (base != 0) {
-	    ptlText.x += multLineHor * base;
-	    ptlText.y -= multLineVert * base;
+	    ptlText.x += multLineVert * base;
+	    ptlText.y -= multLineHor * base;
 	}
     }
     if (bChangeFont) {

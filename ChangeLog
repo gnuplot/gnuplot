@@ -1,3 +1,8 @@
+2005-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
+
+	* src/os2/gclient.c (ParseText): Fix super- and subscripts in enhanced
+	mode of the pm terminal.
+
 2005-06-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	New functions related to string variables:
