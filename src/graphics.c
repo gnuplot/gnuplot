@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.75 2002/09/02 18:15:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.76 2002/09/27 00:12:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -970,24 +970,25 @@ unsigned int* ey;
 /* FIXME HBB 20020225: this is shared with graph3d.c, so it shouldn't
  * be in this module */
 void
-apply_head_properties(struct position* headsize, TBOOLEAN filled)
+apply_head_properties(struct arrow_style_type *arrow_properties)
 {
-    curr_arrow_headfilled = filled;
+    curr_arrow_headfilled = arrow_properties->head_filled;
     curr_arrow_headlength = 0;
-    if (headsize->x > 0) { /* set head length+angle for term->arrow */
+    if (arrow_properties->head_length > 0) { /* set head length+angle for term->arrow */
 	unsigned int itmp, x1, x2;
-	double savex = headsize->x;
+	struct position headsize;
+	headsize.x = arrow_properties->head_length;
+	headsize.scalex = arrow_properties->head_lengthunit;
 
-	curr_arrow_headangle = headsize->y;
-	headsize->y = 1.0; /* any value, just avoid log y */
-	map_position(headsize, &x2, &itmp, "arrow");
+	headsize.y = 1.0; /* any value, just avoid log y */
+	map_position(&headsize, &x2, &itmp, "arrow");
 
-	headsize->x = 0; /* measure length from zero */
-	map_position(headsize, &x1, &itmp, "arrow");
+	headsize.x = 0; /* measure length from zero */
+	map_position(&headsize, &x1, &itmp, "arrow");
 
+	curr_arrow_headangle = arrow_properties->head_angle;
+	curr_arrow_headbackangle = arrow_properties->head_backangle;
 	curr_arrow_headlength = x2 - x1;
-	headsize->y = curr_arrow_headangle; /* restore the angle */
-	headsize->x = savex; /* restore the length */
     }
 }
 
@@ -1057,13 +1058,13 @@ place_arrows(layer)
     for (this_arrow = first_arrow; this_arrow != NULL; this_arrow = this_arrow->next) {
 	unsigned int sx, sy, ex, ey;
 
-	if (this_arrow->layer != layer)
+	if (this_arrow->arrow_properties.layer != layer)
 	    continue;
 	get_arrow(this_arrow, &sx, &sy, &ex, &ey);
 
-	term_apply_lp_properties(&(this_arrow->lp_properties));
-	apply_head_properties(&(this_arrow->headsize), this_arrow->filled);
-	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
+	term_apply_lp_properties(&(this_arrow->arrow_properties.lp_properties));
+	apply_head_properties(&(this_arrow->arrow_properties));
+	(*t->arrow) (sx, sy, ex, ey, this_arrow->arrow_properties.head);
     }
 }
 
@@ -2797,10 +2798,13 @@ plot_vectors(plot)
     int i;
     int x1, y1, x2, y2;
     struct termentry *t = term;
-    TBOOLEAN head, filled;
     struct coordinate points[2];
     double ex, ey;
     double lx[2], ly[2];
+
+    /* Only necessary once because all arrows equal */
+    term_apply_lp_properties(&(plot->arrow_properties.lp_properties));
+    apply_head_properties(&(plot->arrow_properties));
 
     for (i = 0; i < plot->p_count; i++) {
 	points[0] = plot->points[i];
@@ -2811,26 +2815,25 @@ plot_vectors(plot)
 	    points[1].type = INRANGE;
 	    x2 = map_x(points[1].x);
 	    y2 = map_y(points[1].y);
-	    head = TRUE;
-	    filled = FALSE;
 	    if (points[0].type == INRANGE) {
 		x1 = map_x(points[0].x);
 		y1 = map_y(points[0].y);
-		(*t->arrow) (x1, y1, x2, y2, head);
+		(*t->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
 	    } else if (points[0].type == OUTRANGE) {
 		/* from outrange to inrange */
 		if (clip_lines1) {
 		    edge_intersect(points, 1, &ex, &ey);
 		    x1 = map_x(ex);
 		    y1 = map_y(ey);
-		    (*t->arrow) (x1, y1, x2, y2, head);
+		    if (plot->arrow_properties.head == 2)
+			(*t->arrow) (x1, y1, x2, y2, 1);
+		    else
+			(*t->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
 		}
 	    }
 	} else {
 	    /* to outrange */
 	    points[1].type = OUTRANGE;
-	    head = FALSE;
-	    filled = FALSE;
 	    if (points[0].type == INRANGE) {
 		/* from inrange to outrange */
 		if (clip_lines1) {
@@ -2839,7 +2842,10 @@ plot_vectors(plot)
 		    edge_intersect(points, 1, &ex, &ey);
 		    x2 = map_x(ex);
 		    y2 = map_y(ey);
-		    (*t->arrow) (x1, y1, x2, y2, head);
+		    if (plot->arrow_properties.head == 2)
+			(*t->arrow) (x2, y2, x1, y1, 1);
+		    else
+			(*t->arrow) (x2, y2, x1, y1, plot->arrow_properties.head);
 		}
 	    } else if (points[0].type == OUTRANGE) {
 		/* from outrange to outrange */
@@ -2849,7 +2855,7 @@ plot_vectors(plot)
 			y1 = map_y(ly[0]);
 			x2 = map_x(lx[1]);
 			y2 = map_y(ly[1]);
-			(*t->arrow) (x1, y1, x2, y2, head);
+			(*t->arrow) (x1, y1, x2, y2, FALSE);
 		    }
 		}
 	    }

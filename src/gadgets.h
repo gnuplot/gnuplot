@@ -115,12 +115,8 @@ typedef struct arrow_def {
     int tag;			/* identifies the arrow */
     t_position start;
     t_position end;
-    TBOOLEAN head;		/* arrow has a head or not */
-    struct position headsize;	/* x = length, y = angle [deg] */
-    int layer;			/* 0 = back, 1 = front */
     TBOOLEAN relative;		/* second coordinate is relative to first */
-    struct lp_style_type lp_properties;
-    TBOOLEAN filled;            /* filled arrow heads or not */
+    struct arrow_style_type arrow_properties;
 } arrow_def;
 
 /* Datastructure implementing 'set linestyle' */
@@ -128,6 +124,13 @@ struct linestyle_def {
     struct linestyle_def *next;	/* pointer to next linestyle in linked list */
     int tag;			/* identifies the linestyle */
     struct lp_style_type lp_properties;
+};
+
+/* Datastructure implementing 'set linestyle' */
+struct arrowstyle_def {
+    struct arrowstyle_def *next;/* pointer to next arrowstyle in linked list */
+    int tag;			/* identifies the arrowstyle */
+    struct arrow_style_type arrow_properties;
 };
 
 /* The vertical positioning of the key box: (top, bottom, under) */
@@ -228,6 +231,8 @@ extern struct text_label *first_label;
 
 extern struct linestyle_def *first_linestyle;
 
+extern struct arrowstyle_def *first_arrowstyle;
+
 extern label_struct title;
 
 extern label_struct timelabel;
@@ -302,5 +307,7 @@ extern fill_style_type default_fillstyle;
 extern filledcurves_opts filledcurves_opts_data;
 extern filledcurves_opts filledcurves_opts_func;
 #endif
+
+void default_arrow_style __PROTO((struct arrow_style_type *arrow));
 
 #endif /* GNUPLOT_GADGETS_H */

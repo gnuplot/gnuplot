@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.32 2002/08/24 16:20:43 mikulik Exp $
+ * $Id: fig.trm,v 1.33 2002/08/24 16:49:49 mikulik Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -786,6 +786,8 @@ TBOOLEAN head;
 
     /* arrow head(s) */
     if (head) {
+	unsigned int headbackangleparameter = 0;
+	unsigned int headfillparameter = 0;
 	/* arrow head size */
 	if (curr_arrow_headlength==0) {
 	    awidth  = (double) (term->h_tic / 2 + 1);
@@ -794,13 +796,28 @@ TBOOLEAN head;
 	    awidth  = (double) curr_arrow_headlength * 2*sin(curr_arrow_headangle*M_PI/180);
 	    aheight = (double) curr_arrow_headlength * cos(curr_arrow_headangle*M_PI/180);
 	}
+	/* arrow head geometry */
+	if ( curr_arrow_headbackangle < 70 )
+	    headbackangleparameter = 2;
+	else if ( curr_arrow_headbackangle > 110 )
+	    headbackangleparameter = 3;
+	else
+	    headbackangleparameter = 1;
+
+	if (curr_arrow_headfilled==2)
+	    headfillparameter = 1;
+	else
+	    headfillparameter = 0;
+
 	/* forward head */
 	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
-		0, 0, 1.0, awidth, aheight);
+		headbackangleparameter, headfillparameter,
+		1.0, awidth, aheight);
 	/* backward head */
 	if (head==2)
-	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
-		0, 0, 1.0, awidth, aheight);
+	    fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
+		    headbackangleparameter,  headfillparameter,
+		    1.0, awidth, aheight);
     }
 
     /* arrow line */

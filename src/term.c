@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.45 2002/08/30 20:18:22 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.46 2002/09/02 21:03:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -838,6 +838,7 @@ int number;
 
 int curr_arrow_headlength;    /* access head length + angle without changing API */
 double curr_arrow_headangle;  /* angle in degrees */
+double curr_arrow_headbackangle;  /* angle in degrees */
 TBOOLEAN curr_arrow_headfilled; /* arrow head filled or not */
 
 static void
@@ -854,8 +855,9 @@ TBOOLEAN head;
     double dy = (double) sy - (double) ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
 #ifdef PM3D
-    gpiPoint filledhead[3];
+    gpiPoint filledhead[5];
 #endif
+    int xm, ym;
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,
@@ -875,39 +877,51 @@ TBOOLEAN head;
 	    y1 = (int) ((SIN15 * dx + COS15 * dy) * head_coeff);
 	    x2 = (int) ((COS15 * dx + SIN15 * dy) * head_coeff);
 	    y2 = (int) ((-SIN15 * dx + COS15 * dy) * head_coeff);
-	    (*t->move) (ex + x1, ey + y1);
-	    (*t->vector) (ex, ey);
-	    (*t->vector) (ex + x2, ey + y2);
+	    /* backangle defaults to 90 deg */
+	    xm = (int) ((x1 + x2)/2);
+	    ym = (int) ((y1 + y2)/2);
 	} else {
 	    /* the arrow head with the length + angle specified explicitly */
 	    double alpha = curr_arrow_headangle * DEG2RAD;
+	    double beta = curr_arrow_headbackangle * DEG2RAD;
 	    double phi = atan2(-dy,-dx); /* azimuthal angle of the vector */
+	    double backlen = curr_arrow_headlength * sin(alpha) / sin(beta);
+	    double dx2, dy2;
 	    /* anticlock-wise head segment */
 	    x1 = -(int)(curr_arrow_headlength * cos( alpha - phi ));
 	    y1 =  (int)(curr_arrow_headlength * sin( alpha - phi ));
 	    /* clock-wise head segment */
-	    x2 = -(int)(curr_arrow_headlength * cos( phi + alpha ));
-	    y2 = -(int)(curr_arrow_headlength * sin( phi + alpha ));
+	    dx2 = -curr_arrow_headlength * cos( phi + alpha );
+	    dy2 = -curr_arrow_headlength * sin( phi + alpha );
+	    x2 = (int) (dx2);
+	    y2 = (int) (dy2);
+	    /* back point */
+	    xm = (int) (dx2 + backlen * cos( phi + beta ));
+	    ym = (int) (dy2 + backlen * sin( phi + beta ));
 	}
 #ifdef PM3D
-	if (curr_arrow_headfilled) {
+	if (curr_arrow_headfilled==2) {
 	    /* draw filled forward arrow head */
-	    filledhead[0].x = ex + x1;
-	    filledhead[0].y = ey + y1;
-	    filledhead[1].x = ex;
-	    filledhead[1].y = ey;
-	    filledhead[2].x = ex + x2;
-	    filledhead[2].y = ey + y2;
-	    (*t->filled_polygon) (3, filledhead);
+	    filledhead[0].x = ex + xm;
+	    filledhead[0].y = ey + ym;
+	    filledhead[1].x = ex + x1;
+	    filledhead[1].y = ey + y1;
+	    filledhead[2].x = ex;
+	    filledhead[2].y = ey;
+	    filledhead[3].x = ex + x2;
+	    filledhead[3].y = ey + y2;
+	    filledhead[4].x = ex + xm;
+	    filledhead[4].y = ey + ym;
+	    (*t->filled_polygon) (5, filledhead);
 	}
 #endif
 	/* draw outline of forward arrow head */
-	if (curr_arrow_headfilled) {
-	    (*t->move) (ex + (x1 + x2)/2, ey + (y1 + y2)/2);
+	if (curr_arrow_headfilled!=0) {
+	    (*t->move) (ex + xm, ey + ym);
 	    (*t->vector) (ex + x1, ey + y1);
 	    (*t->vector) (ex, ey);
 	    (*t->vector) (ex + x2, ey + y2);
-	    (*t->vector) (ex + (x1 + x2)/2, ey + (y1 + y2)/2);
+	    (*t->vector) (ex + xm, ey + ym);
 	} else {
 	    (*t->move) (ex + x1, ey + y1);
 	    (*t->vector) (ex, ey);
@@ -915,35 +929,46 @@ TBOOLEAN head;
 	}
 	if (head == 2) { /* backward arrow head */
 #ifdef PM3D
-	    if (curr_arrow_headfilled) {
+	    if (curr_arrow_headfilled==2) {
 		/* draw filled backward arrow head */
-		filledhead[0].x = sx - x1;
-		filledhead[0].y = sy - y1;
-		filledhead[1].x = sx;
-		filledhead[1].y = sy;
-		filledhead[2].x = sx - x2;
-		filledhead[2].y = sy - y2;
-		(*t->filled_polygon) (3, filledhead);
+		filledhead[0].x = sx - xm;
+		filledhead[0].y = sy - ym;
+		filledhead[1].x = sx - x1;
+		filledhead[1].y = sy - y1;
+		filledhead[2].x = sx;
+		filledhead[2].y = sy;
+		filledhead[3].x = sx - x2;
+		filledhead[3].y = sy - y2;
+		filledhead[4].x = sx - xm;
+		filledhead[4].y = sy - ym;
+		(*t->filled_polygon) (5, filledhead);
 	    }
 #endif
 	    /* draw outline of backward arrow head */
-	    if (curr_arrow_headfilled) {
-		(*t->move) ( sx - (x1 + x2)/2, sy - (y1 + y2)/2);
+	    if (curr_arrow_headfilled!=0) {
+		(*t->move) ( sx - xm, sy - ym);
 		(*t->vector) ( sx - x2, sy - y2);
 		(*t->vector) (sx, sy);
 		(*t->vector) (sx - x1, sy - y1);
-		(*t->vector) ( sx - (x1 + x2)/2, sy - (y1 + y2)/2);
+		(*t->vector) ( sx - xm, sy - ym);
 	    } else {
-	    (*t->move) ( sx - x2, sy - y2);
-	    (*t->vector) (sx, sy);
-	    (*t->vector) (sx - x1, sy - y1);
+		(*t->move) ( sx - x2, sy - y2);
+		(*t->vector) (sx, sy);
+		(*t->vector) (sx - x1, sy - y1);
 	    }
 	}
     }
     /* Draw the line for the arrow. */
-    /* Must be here, because in postscript N does not force stroke. */
-    (*t->move) (sx, sy);
-    (*t->vector) (ex, ey);
+    if ( (head == 2) && 
+	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
+	(*t->move) (sx - xm, sy - ym);
+    else
+	(*t->move) (sx, sy);
+    if ( head && 
+	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
+	(*t->vector) (ex + xm, ey + ym);
+    else
+	(*t->vector) (ex, ey);
 }
 
 #if 0				/* oiginal routine */

@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.23 2002/09/02 18:15:30 sfeam Exp $
+ * $Id: axis.h,v 1.24 2002/09/11 15:31:44 broeker Exp $
  *
  */
 
@@ -637,6 +637,8 @@ void set_writeback_max __PROTO((AXIS_INDEX));
 
 /* set widest_tic_label: length of the longest tics label */
 void widest_tic_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+
+void get_position __PROTO((struct position * pos));
 
 /* ------------ autoscaling of the color axis */
 #ifdef PM3D

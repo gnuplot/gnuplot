@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.92 2002/09/27 12:17:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.93 2002/10/20 21:19:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -157,6 +157,7 @@ static void show_plot __PROTO((void));
 static void show_variables __PROTO((void));
 
 static void show_linestyle __PROTO((int tag));
+static void show_arrowstyle __PROTO((int tag));
 static void show_arrow __PROTO((int tag));
 
 static void show_ticdef __PROTO((AXIS_INDEX));
@@ -1366,6 +1367,11 @@ show_style()
 	c_token++;
 	break;
 #endif /* USE_ULIG_FILLEDBOXES */
+    case SHOW_STYLE_ARROW:
+	c_token++;
+	CHECK_TAG_GT_ZERO;
+	show_arrowstyle(tag);
+	break;
     default:
 	/* show all styles */
 	show_styles("Data",data_style);
@@ -1374,6 +1380,7 @@ show_style()
 #if USE_ULIG_FILLEDBOXES
 	show_fillstyle();
 #endif /* USE_ULIG_FILLEDBOXES */
+	show_arrowstyle(0);
 	break;
     }
 }
@@ -1655,23 +1662,28 @@ int tag;			/* 0 means show all */
 	 this_arrow = this_arrow->next) {
 	if (tag == 0 || tag == this_arrow->tag) {
 	    showed = TRUE;
-	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %sfilled %s\n\t  from ",
+	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %s %s\n\t  from ",
 		    this_arrow->tag,
-		    this_arrow->lp_properties.l_type + 1,
-		    this_arrow->lp_properties.l_width,
-		    this_arrow->head ? (this_arrow->head==2 ? " both heads " : "") : " (nohead)",
-		    this_arrow->filled ? "" : "no",
-		    this_arrow->layer ? "front" : "back");
+		    this_arrow->arrow_properties.lp_properties.l_type + 1,
+		    this_arrow->arrow_properties.lp_properties.l_width,
+		    this_arrow->arrow_properties.head ? (this_arrow->arrow_properties.head==2 ? " both heads " : "") : " (nohead)",
+		    ( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
+		      ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
+			"nofilled" )),
+		    this_arrow->arrow_properties.layer ? "front" : "back");
 	    show_position(&this_arrow->start);
 	    fputs(this_arrow->relative ? " rto " : " to ", stderr);
 	    show_position(&this_arrow->end);
-	    if (this_arrow->headsize.x > 0) {
+	    if (this_arrow->arrow_properties.head_length > 0) {
 		static char *msg[] =
 		{"(first x axis) ", "(second x axis) ", "(graph units) ", "(screen units) "};
 		fprintf(stderr,"\n\t  arrow head: length %s%g, angle %g deg", 
-		   this_arrow->headsize.scalex == first_axes ? "" : msg[this_arrow->headsize.scalex],
-		   this_arrow->headsize.x,
-		   this_arrow->headsize.y);
+		   this_arrow->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrow->arrow_properties.head_lengthunit],
+		   this_arrow->arrow_properties.head_length,
+                   this_arrow->arrow_properties.head_angle);
+		if (this_arrow->arrow_properties.head_filled!=0)
+		    fprintf(stderr,", backangle %g deg", 
+			    this_arrow->arrow_properties.head_backangle);
 	    }
 	    putc('\n', stderr);
 	}
@@ -2704,6 +2716,55 @@ int tag;			/* 0 means show all */
     }
     if (tag > 0 && !showed)
 	int_error(c_token, "linestyle not found");
+}
+
+
+static void
+show_arrowstyle(tag)
+int tag;			/* 0 means show all */
+{
+    struct arrowstyle_def *this_arrowstyle;
+    TBOOLEAN showed = FALSE;
+
+    for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
+	 this_arrowstyle = this_arrowstyle->next) {
+	if (tag == 0 || tag == this_arrowstyle->tag) {
+	    showed = TRUE;
+	    fprintf(stderr, "\tarrowstyle %d, ", this_arrowstyle->tag);
+	    fflush(stderr);
+
+	    fprintf(stderr, "\tlinetype %d, linewidth %.3f %s %s\n",
+		    this_arrowstyle->arrow_properties.lp_properties.l_type+1,
+		    this_arrowstyle->arrow_properties.lp_properties.l_width,
+		    this_arrowstyle->arrow_properties.head ? 
+		    (this_arrowstyle->arrow_properties.head==2 ? 
+		     " both heads " : " one head ") : " nohead",
+		    this_arrowstyle->arrow_properties.layer ? "front" : "back");
+	    if (this_arrowstyle->arrow_properties.head > 0) {
+		fprintf(stderr, "\t  arrow heads: %s, ",
+		  ( (this_arrowstyle->arrow_properties.head_filled==2) ? "filled" :
+		    ( (this_arrowstyle->arrow_properties.head_filled==1) ? "empty" :
+		      "nofilled" )));
+		if (this_arrowstyle->arrow_properties.head_length > 0) {
+		    static char *msg[] =
+			{"(first x axis) ", "(second x axis) ", 
+			 "(graph units) ", "(screen units) "};
+		    fprintf(stderr," length %s%g, angle %g deg", 
+			    this_arrowstyle->arrow_properties.head_lengthunit == first_axes ? "" : msg[this_arrowstyle->arrow_properties.head_lengthunit],
+			    this_arrowstyle->arrow_properties.head_length,
+			    this_arrowstyle->arrow_properties.head_angle);
+		    if (this_arrowstyle->arrow_properties.head_filled!=0)
+			fprintf(stderr,", backangle %g deg", 
+				this_arrowstyle->arrow_properties.head_backangle);
+		    fprintf(stderr,"\n");
+		}
+		else
+		    fprintf(stderr," (default length and angles)\n");
+	    }
+	}
+    }
+    if (tag > 0 && !showed)
+	int_error(c_token, "arrowstyle not found");
 }
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.43 2002/10/11 16:26:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.44 2002/10/11 21:27:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -44,6 +44,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.43 2002/10/11 16:26:49 lhec
 #include "tables.h"
 #include "util.h"
 #include "variable.h"
+#include "axis.h"
 
 #if defined(HAVE_DIRENT_H)
 # include <sys/types.h>
@@ -57,6 +58,11 @@ char *infile_name = NULL;
 
 static TBOOLEAN lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE *));
+
+/* A copy of the declaration from set.c */
+/* There should only be one declaration in a header file. But I do not know
+ * where to put it */
+//void get_position __PROTO((struct position * pos));
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
@@ -828,3 +834,174 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
     }
 #endif /* USE_ULIG_FILLEDBOXES */
 }
+
+
+/* arrow parsing...
+ *
+ * allow_as controls whether we are allowed to accept arrowstyle in
+ * the current context [ie not when doing a  set style arrow command]
+ */
+  
+void
+arrow_use_properties(arrow, tag)
+     struct arrow_style_type *arrow;
+     int tag;
+{
+    /*  This function looks for an arrowstyle defined by 'tag' and copies
+     *  its data into the structure 'ap'.
+     */
+
+    struct arrowstyle_def *this;
+
+    this = first_arrowstyle;
+    while (this != NULL) {
+	if (this->tag == tag) {
+	    *arrow = this->arrow_properties;
+	    return;
+	} else {
+	    this = this->next;
+	}
+    }
+
+    /* tag not found: */
+    int_error(NO_CARET,"arrowstyle not found", NO_CARET);
+}
+
+void
+arrow_parse(arrow, allow_as)
+    struct arrow_style_type *arrow;
+    TBOOLEAN allow_as;
+{
+    struct value t;
+
+    if (allow_as && (almost_equals(c_token, "arrows$tyle") ||
+		     equals(c_token, "as"))) {
+	c_token++;
+	arrow_use_properties(arrow, (int) real(const_express(&t)));
+    } else {
+	/* avoid duplicating options */
+	int set_layer=0, set_line=0, set_head=0;
+	int set_headsize=0, set_headfilled=0;
+	/* set default values */
+	default_arrow_style(arrow);
+
+	while (!END_OF_COMMAND) {
+	    if (equals(c_token, "nohead")) {
+		if (set_head++)
+		    break;
+		c_token++;
+		arrow->head = 0;
+		continue;
+	    }
+	    if (equals(c_token, "head")) {
+		if (set_head++)
+		    break;
+		c_token++;
+		arrow->head = 1;
+		continue;
+	    }
+	    if (equals(c_token, "heads")) {
+		if (set_head++)
+		    break;
+		c_token++;
+		arrow->head = 2;
+		continue;
+	    }
+
+	    if (almost_equals(c_token, "fill$ed")) {
+		if (set_headfilled++)
+		    break;
+		c_token++;
+		arrow->head_filled = 2;
+		continue;
+	    }
+	    if (almost_equals(c_token, "empty")) {
+		if (set_headfilled++)
+		    break;
+		c_token++;
+		arrow->head_filled = 1;
+		continue;
+	    }
+	    if (almost_equals(c_token, "nofill$ed")) {
+		if (set_headfilled++)
+		    break;
+		c_token++;
+		arrow->head_filled = 0;
+		continue;
+	    }
+
+	    if (equals(c_token, "size")) {
+		struct position hsize;
+		if (set_headsize++)
+		    break;
+		hsize.scalex = hsize.scaley = hsize.scalez = first_axes;
+		/* only scalex used; scaley is angle of the head in [deg] */
+		c_token++;
+		if (END_OF_COMMAND)
+		    int_error(c_token, "head size expected");
+		get_position(&hsize);
+		arrow->head_length = hsize.x;
+		arrow->head_lengthunit = hsize.scalex;
+		arrow->head_angle = hsize.y;
+		arrow->head_backangle = hsize.z;
+		/* invalid backangle --> default of 90.0° */
+		if (arrow->head_backangle <= arrow->head_angle)
+		    arrow->head_backangle = 90.0;
+		continue;
+	    }
+
+	    if (equals(c_token, "back")) {
+		if (set_layer++)
+		    break;
+		c_token++;
+		arrow->layer = 0;
+		continue;
+	    }
+	    if (equals(c_token, "front")) {
+		if (set_layer++)
+		    break;
+		c_token++;
+		arrow->layer = 1;
+		continue;
+	    }
+
+	    /* pick up a line spec - allow ls, but no point. */
+	    {
+		int stored_token = c_token;
+		struct lp_style_type loc_lp;
+
+		lp_parse(&loc_lp, 1, 0, 0, 0);
+		if (stored_token != c_token) {
+		    if (set_line++)
+			break;
+		    arrow->lp_properties = loc_lp;
+		    continue;
+		}
+	    }
+
+	    /* unknown option catched -> quit the while(1) loop */
+	    break;
+	}
+
+	if (set_layer>1 || set_line>1 || set_head>1 || set_headsize>1 || set_headfilled>1)
+	    int_error(c_token, "duplicated arguments in style specification");
+
+#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
+	arrow->layer = 0;
+	arrow->lp_properties = tmp_lp_style;
+	arrow->head = 1;
+	arrow->head_length = 0.0;
+	arrow->head_lengthunit = first_axes;
+	arrow->head_angle = 15.0;
+	arrow->head_backangle = 90.0;
+	arrow->head_filled = 0;
+	fprintf(stderr,
+		"arrow_properties at %s:%d : layer: %d, lt: %d, lw: %.3f, head: %d, headlength/unit: %.3f/%d, headangles: %.3f/%.3f, headfilled %d\n",     
+		__FILE__, __LINE__, arrow->layer, arrow->lp_properties.l_type, 
+		arrow->lp_properties.l_width, arrow->head, arrow->head_length,
+		arrow->head_lengthunit, arrow->head_angle, 
+		arrow->head_backangle, arrow->head_filled);
+#endif
+    }
+}
+

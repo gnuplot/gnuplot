@@ -105,6 +105,9 @@ struct text_label *first_label = NULL;
 /* Pointer to first 'set linestyle' definition in linked list */
 struct linestyle_def *first_linestyle = NULL;
 
+/* Pointer to first 'set style arrow' definition in linked list */
+struct arrowstyle_def *first_arrowstyle = NULL;
+
 /* set arrow */
 struct arrow_def *first_arrow = NULL;
 
@@ -430,3 +433,17 @@ reset_textcolor(const struct t_colorspec *tc, const struct termentry *t)
 	(*t->linetype)(LT_BLACK);
 }
 
+
+void 
+default_arrow_style(struct arrow_style_type *arrow)
+{
+    struct lp_style_type tmp_lp_style = DEFAULT_LP_STYLE_TYPE;
+    arrow->layer = 0;
+    arrow->lp_properties = tmp_lp_style;
+    arrow->head = 1;
+    arrow->head_length = 0.0;
+    arrow->head_lengthunit = first_axes;
+    arrow->head_angle = 15.0;
+    arrow->head_backangle = 90.0;
+    arrow->head_filled = 0;
+}

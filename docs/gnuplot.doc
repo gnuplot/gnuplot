@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.139 2002/10/18 10:03:00 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.140 2002/10/20 21:19:50 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3348,15 +3348,16 @@ C ... and restart the table:
 
  Syntax:
        set arrow {<tag>} {from <position>} {to|rto <position>}
-                 {nohead | head | heads}
-                 {size <length>,<angle>}
-                 {filled | nofilled}
-                 {front | back}
-                 { {linestyle | ls <line_style>}
-                   | {linetype | lt <line_type>}
-                     {linewidth | lw <line_width} }
+                 { {arrowstyle | as <arrow_style>}
+                   | {nohead | head | heads}
+                     {size <length>,<angle>}
+                     {filled | nofilled}
+                     {front | back}
+                     { {linestyle | ls <line_style>}
+                       | {linetype | lt <line_type>}
+                         {linewidth | lw <line_width} } }
        unset arrow {<tag>}
-       show arrow
+       show arrow {<tag>}
 
  <tag> is an integer that identifies the arrow.  If no tag is given, the
  lowest unused tag value is assigned automatically.  The tag can be used to
@@ -5102,6 +5103,84 @@ C ... and restart the table:
  that this works only on some terminals.
 
  See also `set palette`, `set pm3d`.
+
+3 arrowstyle
+?commands set style arrow
+?commands unset style arrow
+?commands show style arrow
+?set style arrow
+?unset style arrow
+?show style arrow
+?arrowstyle
+?help set style arrow
+^ <a name="arrowtype">
+^ <a name="arrowwidth">
+ Each terminal has a default set of arrow and point types, which can be seen
+ by using the command `test`.  `set style arrow` defines a set of arrow types
+ and widths and point types and sizes so that you can refer to them later by
+ an index instead of repeating all the information at each invocation.
+
+ Syntax:
+       set style arrow <index> {nohead | head | heads}
+                               {size <length>,<angle>{,<backangle>}}
+                               {filled | empty | nofilled}
+                               {front | back}
+                               { {linestyle | ls <line_style>}
+                                 | {linetype | lt <line_type>}
+                                   {linewidth | lw <line_width} }
+       unset style arrow
+       show style arrow
+
+ <index> is an integer that identifies the arrowstyle.
+
+ Specifying `nohead` produces arrows drawn without a head---a line segment.
+ This gives you yet another way to draw a line segment on the plot.  By
+ default, arrows have one head. Specifying `heads` draws arrow heads on both
+ ends of the line.
+
+ Head size can be controlled by `size <length>,<angle>` or 
+ `size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+ branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+ the arrow. `<Length>` is in x-axis units; this can be
+ changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
+ see `coordinates` for details.
+ `<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
+ `<backangle>` is the angle (in degrees) the back branches make with the 
+ arrow (in the same direction as `<angle>`).
+ The `fig` terminal has a restricted backangle function. It supports three
+ different angles. There are two thresholds: Below 70 degrees, the arrow head
+ gets an indented back angle. Above 110 degrees, the arrow head has an acute
+ back angle. Between these thresholds, the back line is straight.
+
+ Specifying `filled` produces filled arrow heads (if heads are used). 
+ Filling is supported on filled-polygon capable terminals, see `help pm3d`
+ for their list, otherwise the arrow heads are closed but not filled.
+ The same result (closed but not filled arrow head) is reached by specifying
+ `empty`.
+ Further, filling and outline is obviously not supported on terminals drawing
+ arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
+ or `tgif`. 
+
+ The line style may be selected from a user-defined list of line styles 
+ (see `set style line`) or may be defined here by providing values for 
+ `<line_type>` (an index from the default list of styles) and/or 
+ `<line_width>` (which is a  multiplier for the default width).
+
+ Note, however, that if a user-defined line style has been selected, its
+ properties (type and width) cannot be altered merely by issuing another
+ `set style arrow` command with the appropriate index and `lt` or `lw`.
+
+ If `front` is given, the arrows are written on top of the graphed data. If
+ `back` is given (the default), the arrow is written underneath the graphed
+ data.  Using `front` will prevent a arrow from being obscured by dense data.
+
+ Examples:
+
+ To draw an arrow without an arrow head and double width, use:
+       set style arrow 1 nohead lw 2
+       set arrow arrowstyle 1
+
+  See also 'set arrow' for further examples.
 
 3 lmargin
 ?commands set lmargin

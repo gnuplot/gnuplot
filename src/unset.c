@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.41 2002/10/08 19:15:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.42 2002/10/20 21:19:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1232,9 +1232,9 @@ unset_style()
 #endif /* USE_ULIG_FILLEDBOXES */
     default:
 #if USE_ULIG_FILLEDBOXES
-        int_error(c_token, "expecting 'data', 'function', 'line' or 'fill'");
+        int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
 #else
-        int_error(c_token, "expecting 'data', 'function', or 'line'");
+        int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
 #endif /* USE_ULIG_FILLEDBOXES */
     }
 }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.54 2002/09/27 12:17:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.55 2002/10/20 21:19:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -214,6 +214,7 @@ save_set_all(fp)
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
+    struct arrowstyle_def *this_arrowstyle;
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -426,12 +427,23 @@ set y2data%s\n",
 	save_position(fp, &this_arrow->start);
 	fputs(this_arrow->relative ? " rto " : " to ", fp);
 	save_position(fp, &this_arrow->end);
-	fprintf(fp, " %s %s %sfilled linetype %d linewidth %.3f\n",
-		this_arrow->head ? "" : " nohead",
-		(this_arrow->layer==0) ? "back" : "front",
-		this_arrow->filled ? "" : "no",
-		this_arrow->lp_properties.l_type + 1,
-		this_arrow->lp_properties.l_width);
+	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
+		this_arrow->arrow_properties.head ? "" : " nohead",
+		(this_arrow->arrow_properties.layer==0) ? "back" : "front",
+		( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
+		  ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
+		    "nofilled" )),
+		this_arrow->arrow_properties.lp_properties.l_type + 1,
+		this_arrow->arrow_properties.lp_properties.l_width);
+	if (this_arrow->arrow_properties.head_length > 0) {
+	    static char *msg[] = {"first", "second", "graph", "screen"};
+	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
+		    msg[this_arrow->arrow_properties.head_lengthunit],
+		    this_arrow->arrow_properties.head_length,
+		    this_arrow->arrow_properties.head_angle,
+		    this_arrow->arrow_properties.head_backangle);
+	}
+	fprintf(fp, "\n");
     }
     fputs("unset style line\n", fp);
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
@@ -447,6 +459,28 @@ set y2data%s\n",
 		this_linestyle->lp_properties.l_width,
 		this_linestyle->lp_properties.p_type + 1,
 		this_linestyle->lp_properties.p_size);
+    }
+    fputs("unset style arrow\n", fp);
+    for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
+	 this_arrowstyle = this_arrowstyle->next) {
+	fprintf(fp, "set style arrow %d", this_arrowstyle->tag);
+	fprintf(fp, " %s %s %s linetype %d linewidth %.3f",
+		this_arrowstyle->arrow_properties.head ? "" : " nohead",
+		(this_arrowstyle->arrow_properties.layer==0) ? "back" : "front",
+		( (this_arrow->arrow_properties.head_filled==2) ? "filled" :
+		  ( (this_arrow->arrow_properties.head_filled==1) ? "empty" :
+		    "nofilled" )),
+		this_arrowstyle->arrow_properties.lp_properties.l_type + 1,
+		this_arrowstyle->arrow_properties.lp_properties.l_width);
+	if (this_arrowstyle->arrow_properties.head_length > 0) {
+	    static char *msg[] = {"first", "second", "graph", "screen"};
+	    fprintf(fp, " size %s %.3f,%.3f,%.3f",
+		    msg[this_arrowstyle->arrow_properties.head_lengthunit],
+		    this_arrowstyle->arrow_properties.head_length,
+		    this_arrowstyle->arrow_properties.head_angle,
+		    this_arrowstyle->arrow_properties.head_backangle);
+	}
+	fprintf(fp, "\n");
     }
     fputs("unset logscale\n", fp);
 #define SAVE_LOG(axis)							\

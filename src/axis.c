@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.32 2002/08/24 22:04:13 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.33 2002/08/25 15:13:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -167,6 +167,7 @@ static double time_tic_just __PROTO((t_timelevel, double));
 static double round_outward __PROTO((AXIS_INDEX, TBOOLEAN, double));
 static TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 static double quantize_duodecimal_tics __PROTO((double, int));
+static void get_position_type __PROTO((enum position_type * type, int *axes));
 
 /* ---------------------- routines ----------------------- */
 
@@ -1559,3 +1560,65 @@ set_pm3d_zminmax()
 }
 
 #endif /* PM3D */
+
+static void
+get_position_type(type, axes)
+enum position_type *type;
+int *axes;
+{
+    if (almost_equals(c_token, "fir$st")) {
+	++c_token;
+	*type = first_axes;
+    } else if (almost_equals(c_token, "sec$ond")) {
+	++c_token;
+	*type = second_axes;
+    } else if (almost_equals(c_token, "gr$aph")) {
+	++c_token;
+	*type = graph;
+    } else if (almost_equals(c_token, "sc$reen")) {
+	++c_token;
+	*type = screen;
+    }
+    switch (*type) {
+    case first_axes:
+	*axes = FIRST_AXES;
+	return;
+    case second_axes:
+	*axes = SECOND_AXES;
+	return;
+    default:
+	*axes = (-1);
+	return;
+    }
+}
+
+/* get_position() - reads a position for label,arrow,key,... */
+
+void
+get_position(pos)
+struct position *pos;
+{
+    int axes;
+    enum position_type type = first_axes;
+
+    get_position_type(&type, &axes);
+    pos->scalex = type;
+    GET_NUMBER_OR_TIME(pos->x, axes, FIRST_X_AXIS);
+    if (!equals(c_token, ","))
+	int_error(c_token, "expected comma");
+    ++c_token;
+    get_position_type(&type, &axes);
+    pos->scaley = type;
+    GET_NUMBER_OR_TIME(pos->y, axes, FIRST_Y_AXIS);
+
+    /* z is not really allowed for a screen co-ordinate, but keep it simple ! */
+    if (equals(c_token, ",")) {
+	++c_token;
+	get_position_type(&type, &axes);
+	pos->scalez = type;
+	GET_NUMBER_OR_TIME(pos->z, axes, FIRST_Z_AXIS);
+    } else {
+	pos->z = 0;
+	pos->scalez = type;	/* same as y */
+    }
+}

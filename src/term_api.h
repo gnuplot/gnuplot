@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.17 2002/07/23 18:53:13 mikulik Exp $
+ * $Id: term_api.h,v 1.18 2002/09/27 00:12:26 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -76,6 +76,22 @@ typedef struct lp_style_type {	/* contains all Line and Point properties */
 #endif
     /* ... more to come ? */
 } lp_style_type;
+
+
+typedef struct arrow_style_type {    /* contains all Arrow properties */
+    int layer;	                     /* 0 = back, 1 = front */
+    struct lp_style_type lp_properties;
+    /* head options */
+    int head;		/* arrow head: 0=no, 1=at end, 2=at start and end */
+    //    struct position headsize;	/* x = length, y = angle [deg] */
+    double head_length;              /* length of head, 0 = default */
+    int head_lengthunit;             /* unit (x1, x2, screen, graph) */
+    double head_angle;               /* front angle / deg */
+    double head_backangle;           /* back angle / deg */
+    unsigned int head_filled;        /* filled heads: 0=not, 1=empty, 2=filled */
+    /* ... more to come ? */
+} arrow_style_type;
+
 
 #define L_TYPE_NODRAW -3	/* use if line is not to be drawn */
 
@@ -242,6 +258,7 @@ extern char term_options[];
 extern int curr_arrow_headlength;
 /* angle in degrees */
 extern double curr_arrow_headangle;
+extern double curr_arrow_headbackangle;
 /* arrow head filled or not */
 extern TBOOLEAN curr_arrow_headfilled;
 

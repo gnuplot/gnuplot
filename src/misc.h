@@ -1,5 +1,5 @@
 /*
- * $Id: misc.h,v 1.11 2002/09/06 17:36:29 sfeam Exp $
+ * $Id: misc.h,v 1.12 2002/09/27 00:12:25 sfeam Exp $
  */
 
 /* GNUPLOT - misc.h */
@@ -44,6 +44,7 @@
 #include "graphics.h"
 #include "graph3d.h"
 
+
 /* Variables of misc.c needed by other modules: */
 
 extern char *infile_name;
@@ -67,9 +68,13 @@ void filledcurves_options_tofile __PROTO((filledcurves_opts *, FILE *));
 #endif
 void lp_parse __PROTO((struct lp_style_type *, TBOOLEAN, TBOOLEAN, int, int));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
+void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
+void arrow_parse __PROTO((struct arrow_style_type *, TBOOLEAN));
 
 void parse_fillstyle __PROTO((struct fill_style_type *fs, int def_style, 
                               int def_density, int def_pattern, int def_border ));
+  
+
 
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.100 2002/10/09 19:24:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.101 2002/10/20 21:19:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -145,8 +145,6 @@ static void set_allzeroaxis __PROTO((void));
 
 /******** Local functions ********/
 
-static void get_position __PROTO((struct position * pos));
-static void get_position_type __PROTO((enum position_type * type, int *axes));
 static void set_xyzlabel __PROTO((label_struct * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
@@ -157,6 +155,8 @@ static void parse_colorspec __PROTO((struct t_colorspec *tc, int option));
 
 static void set_linestyle __PROTO((void));
 static int assign_linestyle_tag __PROTO((void));
+static void set_arrowstyle __PROTO((void));
+static int assign_arrowstyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
@@ -628,17 +628,13 @@ set_arrow()
     struct arrow_def *this_arrow = NULL;
     struct arrow_def *new_arrow = NULL;
     struct arrow_def *prev_arrow = NULL;
-    struct position spos, epos, headsize;
-    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
+    struct position spos, epos;
+    struct arrow_style_type loc_arrow;
     TBOOLEAN relative = FALSE;
     int tag = -999;
-    int head = 1;
-    TBOOLEAN filled = FALSE;
     TBOOLEAN set_tag = FALSE, set_start = FALSE, set_end = FALSE;
-    TBOOLEAN set_line = FALSE, set_headsize = FALSE, set_layer = FALSE;
-    TBOOLEAN set_head = FALSE, set_filled = FALSE;
+    TBOOLEAN set_arrowstyle = FALSE;
     TBOOLEAN duplication = FALSE;
-    int layer = 0;
     /* remember current token number to see because it can be a tag: */
     int maybe_tag_coken = ++c_token;
 
@@ -647,7 +643,7 @@ set_arrow()
     spos.scalex = spos.scaley = spos.scalez = first_axes;
     epos.x = epos.y = epos.z = 0;
     epos.scalex = epos.scaley = epos.scalez = first_axes;
-    headsize.x = 0; /* length being zero means the default head size */
+    default_arrow_style(&loc_arrow);
 
     while (!END_OF_COMMAND) {
 
@@ -676,82 +672,17 @@ set_arrow()
 	    continue;
 	}
 
-	if (equals(c_token, "nohead")) {
-	    if (set_head) { duplication = TRUE; break; }
-	    c_token++;
-	    head = 0;
-	    set_head = TRUE;
-	    continue;
-	}
-	if (equals(c_token, "head")) {
-	    if (set_head) { duplication = TRUE; break; }
-	    c_token++;
-	    head = 1;
-	    set_head = TRUE;
-	    continue;
-	}
-	if (equals(c_token, "heads")) {
-	    if (set_head) { duplication = TRUE; break; }
-	    c_token++;
-	    head = 2;
-	    set_head = TRUE;
-	    continue;
-	}
 
-	if (almost_equals(c_token, "fill$ed")) {
-	    if (set_filled) { duplication = TRUE; break; }
-	    c_token++;
-	    filled = TRUE;
-	    set_filled = TRUE;
-	    continue;
-	}
-
-	if (almost_equals(c_token, "nofill$ed")) {
-	    if (set_filled) { duplication = TRUE; break; }
-	    c_token++;
-	    filled = FALSE;
-	    set_filled = TRUE;
-	    continue;
-	}
-
-	if (equals(c_token, "size")) {
-	    if (set_headsize) { duplication = TRUE; break; }
-	    headsize.scalex = headsize.scaley = headsize.scalez = first_axes;
-	      /* only scalex used; scaley is angle of the head in [deg] */
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "head size expected");
-	    get_position(&headsize);
-	    set_headsize = TRUE;
-	    continue;
-	}
-
-	if (equals(c_token, "back")) {
-	    if (set_layer) { duplication = TRUE; break; }
-	    c_token++;
-	    layer = 0;
-	    set_layer = TRUE;
-	    continue;
-	}
-	if (equals(c_token, "front")) {
-	    if (set_layer) { duplication = TRUE; break; }
-	    c_token++;
-	    layer = 1;
-	    set_layer = TRUE;
-	    continue;
-	}
-
-	/* pick up a line spec - allow ls, but no point. */
-	/* HBB 20010807: Only set set_line to TRUE if there really was a
-	 * lp spec at the end of this command. */
+	/* pick up a arrow spec - allow as. */
 	{
 	    int stored_token = c_token;
+	    //	    struct arrow_style_type loc_arrow;
 
-	    lp_parse(&loc_lp, 1, 0, 0, 0);
-	    /* HBB 20010807: this is already taken care of by lp_parse()... */
-	    /* loc_lp.pointflag = 0; */ /* standard value for arrows, don't use points */
+	    arrow_parse(&loc_arrow, TRUE);
 	    if (stored_token != c_token) {
-		set_line = TRUE;
+		if (set_arrowstyle) { duplication = TRUE; break; }
+		set_arrowstyle = TRUE;
+		//		arrow->arrow_properties = loc_arrow;
 		continue;
 	    }
 	}
@@ -795,19 +726,8 @@ set_arrow()
 	    this_arrow->end = epos;
 	    this_arrow->relative = relative;
 	}
-	if (set_head) 
-	    this_arrow->head = head;
-	if (set_filled) 
-	    this_arrow->filled = filled;
-	if (set_layer) {
-	    this_arrow->layer = layer;
-	}
-	if (set_headsize) {
-	    this_arrow->headsize = headsize;
-	}
-	if (set_line) {
-	    this_arrow->lp_properties = loc_lp;
-	}
+	if (set_arrowstyle) 
+	    this_arrow->arrow_properties = loc_arrow;
     } else {	/* adding the arrow */
 	new_arrow = (struct arrow_def *)
 	    gp_alloc(sizeof(struct arrow_def), "arrow");
@@ -819,12 +739,8 @@ set_arrow()
 	new_arrow->next = this_arrow;
 	new_arrow->start = spos;
 	new_arrow->end = epos;
-	new_arrow->head = head;
-	new_arrow->filled = filled;
-	new_arrow->headsize = headsize;
-	new_arrow->layer = layer;
 	new_arrow->relative = relative;
-	new_arrow->lp_properties = loc_lp;
+	new_arrow->arrow_properties = loc_arrow;
     }
 }
 
@@ -3246,10 +3162,12 @@ set_style()
 			default_fillstyle.fillpattern,
 			default_fillstyle.border_linetype);
 	break;
+    case SHOW_STYLE_ARROW:
+	set_arrowstyle();
+	break;
     default:
 	int_error(c_token,
-		  "expecting 'data', 'function', 'line' or 'fill'"
-		  );
+		  "expecting 'data', 'function', 'line', 'fill' or 'arrow'" );
     }
 }
 
@@ -3978,6 +3896,105 @@ delete_linestyle(prev, this)
     }
 }
 
+
+/* ======================================================== */
+/* process a 'set arrowstyle' command */
+/* set style arrow {tag} {nohead|head|heads} {size l,a{,b}} {{no}filled} {linestyle...} {layer n}*/
+static void
+set_arrowstyle()
+{
+    struct value a;
+    struct arrowstyle_def *this_arrowstyle = NULL;
+    struct arrowstyle_def *new_arrowstyle = NULL;
+    struct arrowstyle_def *prev_arrowstyle = NULL;
+    struct arrow_style_type loc_arrow;
+    int tag;
+
+    default_arrow_style(&loc_arrow);
+
+    c_token++;
+
+    /* get tag */
+    if (!END_OF_COMMAND) {
+	/* must be a tag expression! */
+	tag = (int) real(const_express(&a));
+	if (tag <= 0)
+	    int_error(c_token, "tag must be > zero");
+    } else
+	tag = assign_arrowstyle_tag();	/* default next tag */
+
+    /* pick up a arrow spec : dont allow ls, do allow point type
+     * default to same arrow type = point type = tag
+     */
+    arrow_parse(&loc_arrow, 0);
+
+    if (!END_OF_COMMAND)
+	int_error(c_token, "extraneous or out-of-order arguments in set arrowstyle");
+
+    /* OK! add arrowstyle */
+    if (first_arrowstyle != NULL) {	/* skip to last arrowstyle */
+	for (this_arrowstyle = first_arrowstyle; this_arrowstyle != NULL;
+	     prev_arrowstyle = this_arrowstyle, this_arrowstyle = this_arrowstyle->next)
+	    /* is this the arrowstyle we want? */
+	    if (tag <= this_arrowstyle->tag)
+		break;
+    }
+    if (this_arrowstyle != NULL && tag == this_arrowstyle->tag) {
+	/* changing the arrowstyle */
+	this_arrowstyle->arrow_properties = loc_arrow;
+    } else {
+	/* adding the arrowstyle */
+	new_arrowstyle = (struct arrowstyle_def *)
+	    gp_alloc(sizeof(struct arrowstyle_def), "arrowstyle");
+	if (prev_arrowstyle != NULL)
+	    prev_arrowstyle->next = new_arrowstyle;	/* add it to end of list */
+	else
+	    first_arrowstyle = new_arrowstyle;	/* make it start of list */
+	new_arrowstyle->tag = tag;
+	new_arrowstyle->next = this_arrowstyle;
+	new_arrowstyle->arrow_properties = loc_arrow;
+    }
+}
+
+/* assign a new arrowstyle tag
+ * arrowstyles are kept sorted by tag number, so this is easy
+ * returns the lowest unassigned tag number
+ */
+static int
+assign_arrowstyle_tag()
+{
+    struct arrowstyle_def *this;
+    int last = 0;		/* previous tag value */
+
+    for (this = first_arrowstyle; this != NULL; this = this->next)
+	if (this->tag == last + 1)
+	    last++;
+	else
+	    break;
+
+    return (last + 1);
+}
+
+/* delete arrowstyle from linked list started by first_arrowstyle.
+ * called with pointers to the previous arrowstyle (prev) and the 
+ * arrowstyle to delete (this).
+ * If there is no previous arrowstyle (the arrowstyle to delete is
+ * first_arrowstyle) then call with prev = NULL.
+ */
+void
+delete_arrowstyle(prev, this)
+struct arrowstyle_def *prev, *this;
+{
+    if (this != NULL) {		/* there really is something to delete */
+	if (prev != NULL)	/* there is a previous arrowstyle */
+	    prev->next = this->next;
+	else			/* this = first_arrowstyle so change first_arrowstyle */
+	    first_arrowstyle = this->next;
+	free((char *) this);
+    }
+}
+
+
 /* For set [xy]tics... command */
 static void
 load_tics(axis)
@@ -4197,72 +4214,6 @@ char *format;
     return (*format == 'f' || *format == 'g' || *format == 'e');
 }
 
-
-/* get_position_type - for use by get_position().
- * parses first/second/graph/screen keyword
- */
-
-static void
-get_position_type(type, axes)
-enum position_type *type;
-int *axes;
-{
-    if (almost_equals(c_token, "fir$st")) {
-	++c_token;
-	*type = first_axes;
-    } else if (almost_equals(c_token, "sec$ond")) {
-	++c_token;
-	*type = second_axes;
-    } else if (almost_equals(c_token, "gr$aph")) {
-	++c_token;
-	*type = graph;
-    } else if (almost_equals(c_token, "sc$reen")) {
-	++c_token;
-	*type = screen;
-    }
-    switch (*type) {
-    case first_axes:
-	*axes = FIRST_AXES;
-	return;
-    case second_axes:
-	*axes = SECOND_AXES;
-	return;
-    default:
-	*axes = (-1);
-	return;
-    }
-}
-
-/* get_position() - reads a position for label,arrow,key,... */
-
-static void
-get_position(pos)
-struct position *pos;
-{
-    int axes;
-    enum position_type type = first_axes;
-
-    get_position_type(&type, &axes);
-    pos->scalex = type;
-    GET_NUMBER_OR_TIME(pos->x, axes, FIRST_X_AXIS);
-    if (!equals(c_token, ","))
-	int_error(c_token, "expected comma");
-    ++c_token;
-    get_position_type(&type, &axes);
-    pos->scaley = type;
-    GET_NUMBER_OR_TIME(pos->y, axes, FIRST_Y_AXIS);
-
-    /* z is not really allowed for a screen co-ordinate, but keep it simple ! */
-    if (equals(c_token, ",")) {
-	++c_token;
-	get_position_type(&type, &axes);
-	pos->scalez = type;
-	GET_NUMBER_OR_TIME(pos->z, axes, FIRST_Z_AXIS);
-    } else {
-	pos->z = 0;
-	pos->scalez = type;	/* same as y */
-    }
-}
 
 /*
  * Backwards compatibility ...

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.55 2002/10/09 14:13:15 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.56 2002/10/20 21:19:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1111,6 +1111,24 @@ eval_plots()
 		 * - point spec allowed if style uses points, ie style&2 != 0
 		 * - keywords for lt and pt are optional
 		 */
+		if (this_plot->plot_style == VECTOR)
+		{
+		    int stored_token = c_token;
+		    struct arrow_style_type arrow;
+
+		    arrow_parse(&arrow, TRUE);
+		    if (stored_token != c_token) {
+			if (set_lpstyle) {
+			    duplication=TRUE;
+			    break;
+			} else {
+			    this_plot->arrow_properties = arrow;
+			    set_lpstyle = TRUE;
+			    continue;
+			}
+		    }
+		}
+		else
 		{
 		    int stored_token = c_token;
 		    struct lp_style_type lp;
