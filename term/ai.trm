@@ -108,6 +108,10 @@ TERM_PUBLIC int AI_set_font __PROTO((char *font));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
+/* From version.c */
+extern char version[];
+extern char patchlevel[];
+
 char ai_font[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
 int ai_fontsize = 14;		/* size of font in pts */
 char ai_oldfont[MAX_ID_LEN + 1] = "Times-Roman";	/* name of font */
@@ -169,11 +173,12 @@ TERM_PUBLIC void AI_init()
 
     fprintf(gpoutfile, "%%!PS-Adobe-2.0 EPSF-1.2\n\
 %%%%Creator: Adobe Illustrator(TM) 3.2\n\
-%%%%TrueCreator: gnuplot 3.6 ai terminal\n\
+%%%%TrueCreator: gnuplot %s patchlevel %s ai terminal\n\
 %%%%BoundingBox: %d %d %d %d\n\
 %%%%Template:\n\
 %%%%EndComments\n\
 %%%%EndProlog\n",
+	    version, patchlevel,
 	    AI_XOFF, AI_YOFF,
 	    (int) ((AI_XMAX) / AI_SC + 0.5 + AI_XOFF),
 	    (int) ((AI_YMAX) / AI_SC + 0.5 + AI_YOFF));
