@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.5 1999/06/11 18:53:15 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.6 1999/06/14 19:22:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -946,7 +946,7 @@ struct curve_points *plot;
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
-	qsort((char *) (plot->points + first_point), num_points,
+	qsort((char *) (plot->points + first_point), (size_t)num_points,
 	      sizeof(struct coordinate), (sortfunc) compare_points);
 	first_point += num_points;
     }
