@@ -1,7 +1,6 @@
 Projects, in no particular order:
 
 - revise border command to use keywords
-- clean up includes at the top of all files (string etc)
 - put minor tics into demo file
 - allow load '-' or  gnuplot -  to mean interactive
 
@@ -23,3 +22,20 @@ longer term
 
 - group related 'set' variables into structures, particularly xaxis
   stuff,etc. This will allow a move to table-driven parsing.
+
+Lars' ideas
+
+- completely rewrite the parser. Use yacc/bison if possible.
+- maybe rewrite the scanner in lex? The benefits are not so obvious,
+  because the current scanner is extremely simple. This is probably
+  only worthwhile if the parser is rewritten too.
+- rewrite term.c to provide an interface to GNU plotutils
+- [HBB] rewrite hidden3d code
+- for post-3.7 release: integrate new feature patches (M. Koga's
+  polygon patch, various postscript driver patches by Dick, T. Walter's
+  gnuplot command line history save file, etc)?
+- standardise float/double comparisons around the suggestion in the
+  comp.lang.c FAQ (What's a good way to check for "close enough"
+  floating-point equality?) and symbolic vars from standard header files.
+- autogenerate term.h from config file in text format and/or configure
+
