@@ -3,6 +3,18 @@
 	* src/datafile.c (df_readbinary): Fix incorrect indexing of 2D
 	rotation matrix.
 
+	* src/mousecmn.h: Remove trailing comma from enum definition.
+
+	* src/color.c (cbtick_callback) src/graph3d.c (do_3dplot xtick_callback
+	ytick_callback ztick_callback map3d_position plot3d_vectors)
+	src/mouse.c (nearest_label_tag):
+	DEC cc is much pickier about mixing (unsigned int) and (int) across
+	function calls or call-backs. Clean up the parameter usage to allow
+	compilation under DU 4.0
+
+	* src/internal.c (f_concatenate f_sprintf): Provide fallback for 
+	configurations that don't support snprintf().
+
 2004-10-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Fix indentation level of terminal types when

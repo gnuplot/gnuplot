@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.102 2004/10/20 20:14:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.103 2004/10/22 01:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -537,7 +537,7 @@ do_3dplot(
     struct termentry *t = term;
     int surface;
     struct surface_points *this_plot = NULL;
-    unsigned int xl, yl;
+    int xl, yl;
     /* double ztemp, temp; unused */
     transform_matrix mat;
     int key_count;
@@ -2575,7 +2575,7 @@ xtick_callback(
 	int just;
 	unsigned int x2, y2;
 	/* get offset */
-	unsigned int offsetx, offsety;
+	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "xtics");
 	if (tic_unitx * xscaler < -0.9)
@@ -2651,7 +2651,7 @@ ytick_callback(
 	int just;
 	unsigned int x2, y2;
 	/* get offset */
-	unsigned int offsetx, offsety;
+	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "ytics");
 
@@ -2721,7 +2721,7 @@ ztick_callback(
     if (text) {
 	unsigned int x1, y1;
 	/* get offset */
-	unsigned int offsetx, offsety;
+	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 		       &offsetx, &offsety, "ztics");
 
@@ -2836,7 +2836,10 @@ map3d_position(
     
     
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
-	map3d_xy(xpos, ypos, zpos, x, y);
+	double xx, yy;
+	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
+	*x = xx;
+	*y = yy;
     } else {
 	/* Screen or character coordinates */
 	*x = xpos;
@@ -2859,7 +2862,10 @@ map3d_position_r(
     /* startpoint in graph coordinates */
     if (map3d_getposition(pos, what, &xpos, &ypos, &zpos) == 0) {
 	unsigned int xoriginlocal, yoriginlocal;
-	map3d_xy(xpos, ypos, zpos, x, y);
+	double xx, yy;
+	map3d_xy_double(xpos, ypos, zpos, &xx, &yy);
+	*x = xx;
+	*y = yy;
 	if (pos->scalex == graph)
 	    xpos = X_AXIS.min;
 	else
@@ -3086,7 +3092,7 @@ static void
 plot3d_vectors(struct surface_points *plot)
 {
     int i;
-    int x1, y1, x2, y2;
+    unsigned int x1, y1, x2, y2;
     struct coordinate GPHUGE *heads = plot->iso_crvs->points;
     struct coordinate GPHUGE *tails = plot->iso_crvs->next->points;
 

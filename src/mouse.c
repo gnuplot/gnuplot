@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.63 2004/10/11 12:58:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.64 2004/10/26 04:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -156,7 +156,6 @@ static int motion = 0;
 /* values for rot_x and rot_z corresponding to zero position of mouse */
 static float zero_rot_x, zero_rot_z;
 
-typedef void (map_func_type) __PROTO((struct position * pos, unsigned int *x, unsigned int *y, const char *what));
 
 /* bind related stuff */
 
@@ -247,7 +246,7 @@ static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct 
 /* void bind_remove_all __PROTO((void)); */
 static void recalc_ruler_pos __PROTO((void));
 static void turn_ruler_off __PROTO((void));
-static int nearest_label_tag __PROTO((int x, int y, struct termentry * t, map_func_type *));
+static int nearest_label_tag __PROTO((int x, int y, struct termentry * t));
 static void remove_label __PROTO((int x, int y));
 static void put_label __PROTO((char *label, double x, double y));
 # ifdef OS2
@@ -2267,7 +2266,7 @@ turn_ruler_off()
 }
 
 static int
-nearest_label_tag(int xref, int yref, struct termentry *t, map_func_type * map_func)
+nearest_label_tag(int xref, int yref, struct termentry *t)
 {
     double min = -1;
     int min_tag = -1;
@@ -2278,9 +2277,15 @@ nearest_label_tag(int xref, int yref, struct termentry *t, map_func_type * map_f
     int yd;
 
     for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
-	map_func(&this_label->place, &x, &y, "label");
-	xd = (int) x - (int) xref;
-	yd = (int) y - (int) yref;
+	if (is_3d_plot) {
+	    map3d_position(&this_label->place, &xd, &yd, "label");
+	    xd -= xref;
+	    yd -= yref;
+	} else {
+	    map_position(&this_label->place, &x, &y, "label");
+	    xd = (int) x - (int) xref;
+	    yd = (int) y - (int) yref;
+	}
 	diff_squared = xd * xd + yd * yd;
 	if (-1 == min || min > diff_squared) {
 	    /* now we check if we're within a certain
@@ -2302,8 +2307,7 @@ nearest_label_tag(int xref, int yref, struct termentry *t, map_func_type * map_f
 static void
 remove_label(int x, int y)
 {
-    int tag = nearest_label_tag(x, y, term,
-				is_3d_plot ? map3d_position : map_position);
+    int tag = nearest_label_tag(x, y, term);
     if (-1 != tag) {
 	char cmd[0x40];
 	sprintf(cmd, "unset label %d", tag);

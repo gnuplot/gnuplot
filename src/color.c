@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.48 2004/09/01 15:53:46 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.49 2004/10/22 01:30:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -423,7 +423,7 @@ cbtick_callback(
     /* draw label */
     if (text) {
 	/* get offset */
-	unsigned int offsetx, offsety;
+	int offsetx, offsety;
 	map3d_position_r(&(axis_array[axis].ticdef.offset),
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
