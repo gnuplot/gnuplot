@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.88 2004/03/23 05:40:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.89 2004/03/23 19:08:14 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -280,6 +280,7 @@ typedef struct plot_struct {
     int angle;			/* 0 = horizontal (default), 1 = vertical */
     int lt;
 #ifdef USE_MOUSE
+    TBOOLEAN mouse_on;		/* is mouse bar on? */
     TBOOLEAN ruler_on;		/* is ruler on? */
     int ruler_x, ruler_y;	/* coordinates of ruler */
     TBOOLEAN zoombox_on;	/* is zoombox on? */
@@ -1061,6 +1062,7 @@ prepare_plot(plot_struct *plot, int term_number)
 	 * to a well-defined state.
 	 */
 	plot->button = 0;
+	plot->mouse_on = TRUE;
 	plot->x = NOT_AVAILABLE;
 	plot->y = NOT_AVAILABLE;
 	if (plot->str[0] != '\0') {
@@ -2788,10 +2790,6 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 		unique_colors++;
 	    }
 	}
-#if 0
-	/* removed this as it is annoying */
-	fprintf(stderr, "got %d unique colors.\n", unique_colors);
-#endif
     }
 
     if (plot->window && save_title) {
@@ -3326,9 +3324,9 @@ process_event(XEvent *event)
     static int border = 0;
     static int aspect_ratio = 0;
     int old_mod_mask = 0;
-#endif
-#endif
     FPRINTF((stderr, "Event 0x%x\n", event->type));
+#endif
+#endif
 
     switch (event->type) {
     case ConfigureNotify:
@@ -3430,15 +3428,7 @@ process_event(XEvent *event)
 		    cmd = getMultiTabConsoleSwitchCommand(&newGnuplotXID);
 		/* overwrite gnuplotXID (re)set after x11.trm:X11_options() */
 	    	if (newGnuplotXID) gnuplotXID = newGnuplotXID;
-#if 0 
-	    	fprintf(stderr, "Command is: |%s|\nAnd newGnuplotXID=%lu\n", cmd, newGnuplotXID);
-#endif
     		if (cmd) system(cmd);
-#if 0
-		/* having cmd static in order to call getMultiTabConsoleSwitchCommand()
-		 * only once (it may need to read from popen()), thus don't free it */
-		free(cmd); /* works also for NULL parameter */
-#endif
 		}
 		if (gnuplotXID) {
 		    XMapRaised(dpy, gnuplotXID);
@@ -3446,6 +3436,11 @@ process_event(XEvent *event)
 		    XFlush(dpy);
 		}
 		return;
+	    case 'm': /* Toggle mouse display, but only if we control the window here */
+		if (plot != current_plot || pipe_died) {
+		    plot->mouse_on = !(plot->mouse_on);
+		}
+		break;
 #endif
 	    case 'q':
 		/* close X window */
@@ -3713,7 +3708,7 @@ process_event(XEvent *event)
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
-	    } else if (plot->axis_mask) {
+	    } else if (plot->axis_mask && plot->mouse_on) {
 		/* This is not the active plot window, but we can still update the mouse coords */
 		char mouse_format[60];
 		char *m = mouse_format;
@@ -3737,6 +3732,8 @@ process_event(XEvent *event)
 		    m += 15; 
 		}
 		DisplayCoords(plot, mouse_format);
+	    } else if (!plot->mouse_on) {
+		DisplayCoords(plot,"");
 #endif
 	    }
 

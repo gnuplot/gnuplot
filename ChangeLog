@@ -2,7 +2,8 @@
 	
 	* src/gplt_x11.c: If gnuplot exits while "x11 -persist" is active,
 	hand over mousing of last active plot to gnuplot_x11. This fixes the
-	test case provided with bug #921033.
+	test case provided with bug #921033.  Also, continue to honor 'm'
+	key as a toggle for mousing in detached windows.
 	
 2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
