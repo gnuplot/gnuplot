@@ -18,6 +18,9 @@
 /* Define if you have the ANSI C header files.  */
 #undef STDC_HEADERS
 
+/* Define if the X Window System is missing or not being used.  */
+#undef X_DISPLAY_MISSING
+
 /* Define if compiler can handle ANSI prototypes.  */
 #undef ANSI_C
 
@@ -146,6 +149,9 @@
 
 /* Define if you have the sleep function.  */
 #undef HAVE_SLEEP
+
+/* Define if you have the snprintf function.  */
+#undef HAVE_SNPRINTF
 
 /* Define if you have the strnicmp function.  */
 #undef HAVE_STRNICMP
