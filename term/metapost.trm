@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: metapost.trm,v 1.25 2004/04/13 17:24:34 broeker Exp $
+ * $Id: metapost.trm,v 1.26 2004/07/01 17:10:15 broeker Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -886,10 +886,10 @@ TERM_TABLE_START(mp_driver)
     MP_linetype, MP_put_text, MP_text_angle,
     MP_justify_text, MP_point, MP_arrow, MP_set_font, MP_pointsize,
     TERM_BINARY /*flags*/, 0, 0, MP_boxfill, MP_linewidth
-#ifdef PM3D
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0		/* no mouse support for metapost */
 #endif
+#ifdef PM3D
     , MP_make_palette,
     MP_previous_palette,	/* write grestore */
     MP_set_color,

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*- */
-/* $Id: tgif.trm,v 1.24 2004/04/13 17:24:38 broeker Exp $ */
+/* $Id: tgif.trm,v 1.25 2004/07/01 17:10:34 broeker Exp $ */
 
 /* GNUPLOT - tgif.trm */
 
@@ -394,7 +394,7 @@ TGIF_init()
 %%TGIF 2.15-p7\n\
 state(%d,30,%u,0,0,%u,16,1,9,1,1,0,0,0,0,1,0,'%s',0,%u,0,0,1,10,0,0,1,1,0,16,0,0,1,1,1).\n\
 %%\n\
-%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.24 2004/04/13 17:24:38 broeker Exp $\n\
+%% @(#)$Header: /cvsroot/gnuplot/gnuplot/term/tgif.trm,v 1.25 2004/07/01 17:10:34 broeker Exp $\n\
 %% %%W%%\n\
 %%\n\
 page(1,\"\").\n",
@@ -1583,10 +1583,10 @@ TERM_TABLE_START(tgif_driver)
     TGIF_linetype, TGIF_put_text, TGIF_text_angle,
     TGIF_justify_text, TGIF_point, TGIF_arrow, TGIF_set_font,
     TGIF_set_pointsize, TERM_CAN_MULTIPLOT, 0, 0, 0, 0
-#ifdef PM3D
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the tgif terminal */
 #endif
+#ifdef PM3D
     , TGIF_make_palette, 0 /*previous_palette*/, TGIF_set_color, TGIF_filled_polygon
 #endif /* PM3D */
 TERM_TABLE_END(tgif_driver)

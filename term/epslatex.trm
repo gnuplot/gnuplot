@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epslatex.trm,v 1.25 2004/09/01 15:53:50 mikulik Exp $
+ * $Id: epslatex.trm,v 1.26 2004/09/09 12:13:05 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -1040,10 +1040,10 @@ EPSL_text, null_scale, EPSL_graphics, EPSL_move, EPSL_vector,
 EPSL_linetype, EPSL_put_text, EPSL_text_angle,
 EPSL_justify_text, EPSL_point, EPSL_arrow, EPSL_set_font, EPSL_pointsize,
 0 /*flags */ , 0 /*suspend */ , 0 /*resume */ , EPSL_fillbox, EPSL_linewidth
-#ifdef PM3D
 #ifdef USE_MOUSE
 , 0, 0, 0, 0, 0 /* no mouse support for epslatex */
 #endif
+#ifdef PM3D
 , PS_make_palette,
 PS_previous_palette,
 PS_set_color,

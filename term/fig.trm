@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.43 2004/07/15 13:05:40 broeker Exp $
+ * $Id: fig.trm,v 1.44 2004/08/24 04:44:25 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1168,10 +1168,10 @@ TERM_TABLE_START(fig_driver)
     FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
     TERM_BINARY /*flags */ , 0 /*suspend */ , 0 /*resume */ ,
     FIG_boxfill, FIG_linewidth
-#ifdef PM3D
 #ifdef USE_MOUSE
     ,0, 0, 0, 0, 0 /* no mouse support for the fig terminal */
 #endif
+#ifdef PM3D
     , FIG_make_palette, 0 /*previous_palette*/, FIG_set_color, FIG_filled_polygon
 #endif /* PM3D */
 TERM_TABLE_END(fig_driver)

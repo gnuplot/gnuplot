@@ -1,6 +1,6 @@
 /* Hey Emacs this is -*- C -*-
  *
- * $Id: pstricks.trm,v 1.25 2004/04/13 17:24:38 broeker Exp $
+ * $Id: pstricks.trm,v 1.26 2004/07/01 17:10:34 broeker Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -665,10 +665,10 @@ TERM_TABLE_START(pstricks_driver)
     PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle,
     PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow, set_font_null, 0,
     TERM_BINARY /*flags*/, 0 /*suspend*/, 0 /*resume*/, 0 , 0
-#ifdef PM3D
 #ifdef USE_MOUSE
     , 0, 0, 0, 0, 0
 #endif
+#ifdef PM3D
      , PSTRICKS_make_palette, 0,  PSTRICKS_set_color, PSTRICKS_filled_polygon
 #endif /*PM3D*/
 TERM_TABLE_END(pstricks_driver)

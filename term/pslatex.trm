@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.43 2004/09/15 04:43:09 sfeam Exp $
+ * $Id: pslatex.trm,v 1.44 2004/09/15 04:49:41 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -721,10 +721,10 @@ TERM_TABLE_START(pslatex_driver)
     , 0 /*resume */ ,
     PSLATEX_fillbox ,
     PSLATEX_linewidth
-#ifdef PM3D
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
+#ifdef PM3D
    , PSLATEX_make_palette,
    PSLATEX_previous_palette, /* write grestore */
    PSLATEX_set_color,
@@ -747,10 +747,10 @@ TERM_TABLE_START(pstex_driver)
     PSLATEX_pointsize, 0 /*flags */ , 0 /*suspend */
     , 0 /*resume */ , 0 /*fillbox */ ,
     PSLATEX_linewidth
-#ifdef PM3D
 #ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for postscript */
 #endif
+#ifdef PM3D
    , PSLATEX_make_palette,
    PSLATEX_previous_palette, /* write grestore */
    PSLATEX_set_color,
