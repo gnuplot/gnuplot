@@ -3,6 +3,7 @@ News, changes and fixes since gnuplot version 4.0
 
 * NEW user defined variables can contain strings
 * NEW expression evaluation can manipulate and return strings
+* NEW command line macro expansion   @<stringvariablename>
 * NEW automatic variable $# expanded to number of arguments after "call"
 * NEW reading of (almost) arbitrary image binary files
 * NEW plot styles "with image" and "with rgbimage"
