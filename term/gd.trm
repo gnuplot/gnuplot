@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.22 2003/01/28 21:19:13 lhecking Exp $
+ * $Id: gd.trm,v 1.23 2003/02/10 04:28:11 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -160,9 +160,9 @@ static const int PNG_POINT_SCALE = 3;
 static int PNG_ps = 3;
 
 /* This will be the default font */
-# define gdfont gdFontSmall
-# define PNG_VCHAR 12
-# define PNG_HCHAR 6
+# define gdfont gdFontMediumBold
+# define PNG_VCHAR 13
+# define PNG_HCHAR 7
 
 #define PNG_VTIC (GREG_YMAX/100)
 #define PNG_HTIC (GREG_XMAX/150)
@@ -431,11 +431,12 @@ PNG_options()
     int i;
     char *string;
     unsigned long color;
+    TBOOLEAN new_colors = FALSE;
 
     if (!PNG_initialized) {
 	PNG_initialized = TRUE;
 	term_options[0] = '\0';
-	term->h_char = 7; /* Medium font */
+	term->h_char = PNG_HCHAR; /* Default to medium font */
 	png_state.default_font = gdfont;
 	png_state.n_colors = 0;
 	png_state.flags = 0;
@@ -574,10 +575,14 @@ PNG_options()
 
 	    if (sscanf(string, "x%lx", &color) != 1) {
 		    int_error(c_token, "invalid color spec, must be xRRGGBB");
-	    } else if (png_state.n_colors == PNG_MAX_COLORS) {
+	    } else if (png_state.n_colors == PNG_MAX_COLORS && new_colors) {
 		int_warn(c_token, "too many colors, ignoring");
 		++c_token;
 	    } else {
+	        if (!new_colors) {
+		    new_colors = TRUE;
+		    png_state.n_colors = 0;
+		}
 		png_state.rgb_table[png_state.n_colors++] = color;
 		++c_token;
 	    }
