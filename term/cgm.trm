@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.31 2000/10/31 19:59:32 joze Exp $
+ * $Id: cgm.trm,v 1.32 2000/11/03 17:46:44 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -157,6 +157,7 @@ TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 static unsigned int cgm_posx;
 static unsigned int cgm_posy;
 static unsigned int cgm_linetype = 1;
+static unsigned int cgm_linetypes = CGM_COLORS;
 static unsigned int cgm_dashtype = 0;
 static unsigned int cgm_color = 0;
 static int cgm_polyline[CGM_MAX_SEGMENTS]; /* stored polyline coordinates */
@@ -184,7 +185,9 @@ static struct cgm_properties {
 
 static int cgm_user_color_count[] = { 0 };
 static int cgm_user_color_max = 0;
-static int cgm_maximum_color_index[] = { CGM_COLORS };
+#ifdef PM3D
+static int cgm_smooth_colors = 0;
+#endif
 static int GPFAR *cgm_user_color_table;
 static int GPFAR cgm_default_color_table[] =
 {
@@ -409,20 +412,24 @@ CGM_options()
 	        unsigned short red, green, blue;
 	      
 		if (sscanf(string, "x%2hx%2hx%2hx", &red, &green, &blue ) != 3)
-		    int_error(c_token, "invalid color spec, must be xRRGGBB");
+		     int_error(c_token, "invalid color spec, must be xRRGGBB");
 		if (cgm_user_color_count[0] >= cgm_user_color_max) {
-		  cgm_user_color_max = cgm_user_color_max*2 + 4;
-		  cgm_user_color_table = 
-		    gp_realloc(cgm_user_color_table, 
-			       (cgm_user_color_max*3+1)*sizeof(int),
-			       "CGM color table");
-		  /* 1st table entry is the minimum color index value */
-		  cgm_user_color_table[0] = 0;
+		     cgm_user_color_max = cgm_user_color_max*2 + 4;
+		     cgm_user_color_table = 
+			  gp_realloc(cgm_user_color_table, 
+				     (cgm_user_color_max*3+1)*sizeof(int),
+				     "CGM color table");
+		     /* 1st table entry is the minimum color index value */
+		     cgm_user_color_table[0] = 0;
 		}
 		cgm_user_color_table[1 + 3*cgm_user_color_count[0]] = red;
 		cgm_user_color_table[2 + 3*cgm_user_color_count[0]] = green;
 		cgm_user_color_table[3 + 3*cgm_user_color_count[0]] = blue;
-		cgm_user_color_count[0]++;
+		/* usually, there is one more color than there are
+                   linetypes (the extra color is for the background).
+                   However, the smooth colors used for PM3D are not
+                   used for lines. */
+		cgm_linetypes = cgm_user_color_count[0]++;
 		++c_token;
 	    } else {
 		 if (isstring(c_token)) {
@@ -503,8 +510,7 @@ CGM_options()
 	      cgm_default_color_table[2] = cgm_user_color_table[2];
 	      cgm_default_color_table[3] = cgm_user_color_table[3];
 	      cgm_user_color_count[0] = 0;
-	 } else {
-	      cgm_maximum_color_index[0] = cgm_user_color_count[0] - 1;
+	      cgm_linetypes = CGM_COLORS;
 	 }
     }
 }
@@ -648,7 +654,13 @@ Gnuplot version %s patchlevel %s,\
     CGM_write_int_record(1, 6, 2, index_precision_data);
     CGM_write_int_record(1, 7, 2, color_precision_data);
     CGM_write_int_record(1, 8, 2, color_index_precision_data);
-    CGM_write_int_record(1, 9, 2, cgm_maximum_color_index);
+    {
+      /* we usually do not use 255 colors.  However, we may need to
+	 enlarge the color table after the picture descriptor is
+	 written (for PM3D) */
+      static int cgm_maximum_color_index[] = { 255 };
+      CGM_write_int_record(1, 9, 2, cgm_maximum_color_index);
+    }
     CGM_write_int_record(1, 10, sizeof(color_value_extent_data) / CGM_ADJ,
 			 color_value_extent_data);
     if (cgm_nofontlist_mode == FALSE)
@@ -834,7 +846,7 @@ int linecolor;
 {
     assert(linecolor >= -2);
     linecolor = (linecolor < 1) ? 1 : 
-      linecolor % cgm_maximum_color_index[0] + 1;
+      linecolor % cgm_linetypes + 1;
     if (cgm_monochrome || linecolor == cgm_color)
 	return;
     cgm_color = linecolor;
@@ -923,6 +935,67 @@ unsigned int x, y;
     cgm_posx = x;
     cgm_posy = y;
 }
+
+#ifdef PM3D
+
+TERM_PUBLIC int CGM_make_palette(t_sm_palette *palette)
+{
+    if (palette) {
+	 int i, k;
+	 cgm_smooth_colors = palette->colors;
+	 if (1 + CGM_COLORS + cgm_smooth_colors > cgm_user_color_max) {
+	      cgm_user_color_max = 1 + CGM_COLORS + cgm_smooth_colors;
+	      cgm_user_color_table = 
+		   gp_realloc(cgm_user_color_table, 
+			      (cgm_user_color_max*3+1)*sizeof(int),
+			      "CGM color table");
+	      /* include default colors */
+	      memcpy(cgm_user_color_table, cgm_default_color_table,
+		     sizeof(cgm_default_color_table));
+	      }
+	 k = 1 + (1 + CGM_COLORS)*3;
+	 for (i = 0; i < cgm_smooth_colors; i++) {
+	      cgm_user_color_table[k++] = palette->color[i].r*255.9;
+	      cgm_user_color_table[k++] = palette->color[i].g*255.9;
+	      cgm_user_color_table[k++] = palette->color[i].b*255.9;
+	      cgm_user_color_count[0] = 1 + CGM_COLORS + cgm_smooth_colors;
+	 }
+	 CGM_write_int_record(5, 34, (cgm_user_color_count[0]*3+1)*
+			      sizeof(cgm_user_color_table[0])/CGM_ADJ,
+			      cgm_user_color_table);
+	 return 0;
+    } else {
+      return 200;
+    }
+}
+
+TERM_PUBLIC void CGM_set_color(double gray)
+{
+    /* map [0...1] to interval [0...cgm_smooth_colors-1], then add
+       offset to get past the default colors */
+    cgm_next.fill_color = 1 + CGM_COLORS + 
+	 (int)( gray * (cgm_smooth_colors-1) + 0.5 );
+}
+
+TERM_PUBLIC void CGM_filled_polygon(int points, gpiPoint *corner)
+{
+    int i;
+    if (cgm_current.fill_color != cgm_next.fill_color){
+      cgm_current.fill_color = cgm_next.fill_color;
+      CGM_write_int_record(5, 23, 2, &cgm_next.fill_color);
+    }
+    cgm_next.edge_visibility = 0;
+    if (cgm_current.edge_visibility != cgm_next.edge_visibility){
+      cgm_current.edge_visibility = cgm_next.edge_visibility;
+      CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
+    }
+    CGM_move(corner[0].x, corner[0].y);
+    for (i = 1; i < points; i++)
+	 CGM_solid_vector(corner[i].x, corner[i].y);
+    CGM_flush_polygon();
+}
+
+#endif /* PM3D */
 
 static void
 CGM_flush_polyline()
@@ -1454,6 +1527,16 @@ TERM_TABLE_START(cgm_driver)
     NULL,			/* before subsequent plot of multiplot */
     NULL,			/* clear part of multiplot */
     CGM_linewidth
+#ifdef USE_MOUSE
+    , NULL, NULL, NULL, NULL, NULL
+/*  , waitforinput, put_tmptext, set_ruler, set_cursor, set_clipboard */
+#endif
+#ifdef PM3D
+    , CGM_make_palette,
+    NULL /* _previous_palette */,
+    CGM_set_color,
+    CGM_filled_polygon
+#endif
 TERM_TABLE_END(cgm_driver)
 
 #undef LAST_TERM
@@ -1767,4 +1850,3 @@ END_HELP(cgm)
  * eval: (c-set-style "k&r")
  * End:
  */
- 
