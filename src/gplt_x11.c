@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.5 1999/06/19 20:53:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.6 1999/06/22 12:00:48 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -141,10 +141,6 @@ Error. Incompatible options.
 # define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
 #endif /* not FD_SET */
 
-#ifdef HAVE_POLL_H
-# include <poll.h>
-#endif
-
 #include "plot.h"
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
@@ -261,6 +257,7 @@ double xscale, yscale, pointsize;
 
 #define Nbuf 1024
 char buf[Nbuf], **commands = (char **) 0;
+static int buffered_input_available = 0;
 
 FILE *X11_ipc;
 char X11_ipcpath[32];
@@ -346,36 +343,13 @@ char *argv[];
 void
 mainloop()
 {
-#if defined(HAVE_POLL) && defined(HAVE_POLL_H) && !defined(HAVE_SELECT)
-    int cn, in, retval, timeout;
-    struct pollfd poll_list[2];
-
-    cn = ConnectionNumber(dpy);
-    X11_ipc = stdin;
-    in = fileno(X11_ipc);
-
-    poll_list[0].fd = cn;
-    poll_list[1].fd = in;
-    poll_list[0].events = POLLIN | POLLOUT;
-    poll_list[1].events = POLLIN | POLLOUT;
-/* FIXME */
-#else
     int nf, cn = ConnectionNumber(dpy), in;
     fd_set_size_t nfds;
-    struct timeval *timer = (struct timeval *) 0;
-#ifdef ISC22
-    struct timeval timeout;
-#endif
-    fd_set rset, tset;
+    struct timeval timeout, *timer = (struct timeval *) 0;
+    fd_set tset;
 
     X11_ipc = stdin;
     in = fileno(X11_ipc);
-
-    FD_ZERO(&rset);
-    FD_SET(cn, &rset);
-
-    FD_SET(in, &rset);
-    nfds = (cn > in) ? cn + 1 : in + 1;
 
 #ifdef ISC22
 /* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
@@ -395,14 +369,33 @@ mainloop()
 
 	XFlush(dpy);
 
-	tset = rset;
+	FD_ZERO(&tset);
+	FD_SET(cn, &tset);
+
+	/* Don't wait for events if we know that input is
+	 * already sitting in a buffer.  Also don't wait for
+	 * input to become available.
+	*/
+	if (buffered_input_available) {
+	    timeout.tv_sec  = 0;
+	    timeout.tv_usec = 0;
+	    timer = &timeout;
+	} else {
+	    timer = (struct timeval *) 0;
+	    FD_SET(in, &tset);
+	}
+
+	nfds = (cn > in) ? cn + 1 : in + 1;
+
 	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
+
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
 	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
 	    EXIT(1);
 	}
+
 	if (nf > 0)
 	    XNoOp(dpy);
 
@@ -424,12 +417,12 @@ mainloop()
 		process_event(&xe);
 	    } while (XPending(dpy));
 	}
-	if (FD_ISSET(in, &tset)) {
+
+	if (FD_ISSET(in, &tset) || buffered_input_available) {
 	    if (!record())	/* end of input */
 		return;
 	}
     }
-#endif /* !(HAVE_POLL && HAVE_POLL_H && !HAVE_SELECT) */
 }
 
 
@@ -443,12 +436,9 @@ mainloop()
 {
     fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
     struct timeval timeout, *timer;
-    fd_set rset, tset;
+    fd_set tset;
     unsigned long all = (unsigned long) (-1L);
     XEvent xe;
-
-    FD_ZERO(&rset);
-    FD_SET(cn, &rset);
 
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
@@ -458,15 +448,37 @@ mainloop()
 
     while (1) {
 	XFlush(dpy);		/* see above */
-	tset = rset;
+
+	FD_ZERO(&tset);
+	FD_SET(cn, &tset);
+
+	/* Don't wait for events if we know that input is
+	 * already sitting in a buffer.  Also don't wait for
+	 * input to become available.
+	*/
+	if (buffered_input_available) {
+	    timeout.tv_sec  = 0;
+	    timeout.tv_usec = 0;
+	    timer = &timeout;
+	} else {
+	    timer = (struct timeval *) 0;
+	    FD_SET(in, &tset);
+	}
+
+	nfds = (cn > in) ? cn + 1 : in + 1;
+
 	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
+
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
 	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
 	    EXIT(1);
 	}
-	nf > 0 && XNoOp(dpy);
+
+	if (nf > 0)
+	    XNoOp(dpy);
+
 	if (FD_ISSET(cn, &tset)) {
 	    while (XCheckMaskEvent(dpy, all, &xe)) {
 		process_event(&xe);
@@ -489,12 +501,14 @@ mainloop()
 /*  In VMS there is no decent Select(). hence, we have to loop inside
  *  XGetNextEvent for getting the next X window event. In order to get input
  *  from the master we assign a channel to SYS$INPUT and use AST's in order to
- *  receive data. In order to exit the mainloop, we need to somehow make XNextEvent
- *  return from within the ast. We do this with a XSendEvent() to ourselves !
+ *  receive data. In order to exit the mainloop, we need to somehow make
+ *  XNextEvent return from within the ast. We do this with a XSendEvent() to
+ *  ourselves !
  *  This needs a window to send the message to, so we create an unmapped window
  *  for this purpose. Event type XClientMessage is perfect for this, but it
- *  appears that such messages come from elsewhere (motif window manager, perhaps ?)
- *  So we need to check fairly carefully that it is the ast event that has been received.
+ *  appears that such messages come from elsewhere (motif window manager,
+ *  perhaps ?) So we need to check fairly carefully that it is the ast event
+ *  that has been received.
  */
 
 #include <iodef.h>
@@ -660,6 +674,61 @@ plot_struct *plot;
 }
 
 #ifndef VMS
+
+/* Handle input.  Use read instead of fgets because stdio buffering
+* causes trouble when combined with calls to select.
+*/
+int
+read_input ()
+{
+    static int rdbuf_size = 10*Nbuf;
+    static char rdbuf[10*Nbuf-1];
+    static int total_chars;
+    static int rdbuf_offset;
+    static int buf_offset;
+    static int partial_read = 0;
+    int fd = fileno (X11_ipc);
+
+    if (! partial_read)
+	buf_offset = 0;
+
+    if (! buffered_input_available) {
+	total_chars = read (fd, rdbuf, rdbuf_size);
+	buffered_input_available = 1;
+	partial_read = 0;
+	rdbuf_offset = 0;
+	if (total_chars < 0)
+	    return -1;
+    }
+
+    if (rdbuf_offset < total_chars) {
+	while (rdbuf_offset < total_chars && buf_offset < Nbuf) {
+	    char c = rdbuf[rdbuf_offset++];
+	    buf[buf_offset++] = c;
+	    if (c == '\n')
+		break;
+	}
+
+	if (buf_offset == Nbuf) {
+	    fputs("\
+\n\
+gnuplot: buffer overflow in read_input!\n\
+gnuplot: X11 aborted.\n", stderr);
+	    EXIT(1);
+	} else
+	    buf[buf_offset] = NUL;
+    }
+
+    if (rdbuf_offset == total_chars) {
+	buffered_input_available = 0;
+	if (buf[buf_offset-1] != '\n')
+	    partial_read = 1;
+    }
+
+    return partial_read;
+}
+
+
 /*-----------------------------------------------------------------------------
  *   record - record new plot from gnuplot inboard X11 driver (Unix)
  *---------------------------------------------------------------------------*/
@@ -669,11 +738,15 @@ record()
 {
     static plot_struct *plot = plot_array;
 
-    while (fgets(buf, Nbuf, X11_ipc)) {
+    while (1) {
+	int status = read_input (buf, Nbuf);
+	if (status != 0)
+	    return status;
+
 	switch (*buf) {
 	case 'G':		/* enter graphics mode */
 	    {
-		int plot_number = atoi(buf + 1);	/* 0 if none specified */
+		int plot_number = atoi(buf + 1);    /* 0 if none specified */
 
 		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
 		    plot_number = 0;
@@ -694,20 +767,6 @@ record()
 	    continue;
 	}
     }
-
-    /* get here if fgets fails */
-
-#ifdef OSK
-    if (feof(X11_ipc))		/* On OS-9 sometimes while resizing the window,  */
-	_cleareof(X11_ipc);	/* and plotting data, the eof or error flag of   */
-    if (ferror(X11_ipc))	/* X11_ipc stream gets set, while there is       */
-	clearerr(X11_ipc);	/* nothing wrong! Probably a bug in my select()? */
-#else
-    if (feof(X11_ipc) || ferror(X11_ipc))
-	return 0;
-#endif /* not OSK */
-
-    return 1;
 }
 
 #else /* VMS */
