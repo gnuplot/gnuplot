@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.74 2002/02/13 17:59:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.75 2002/02/13 22:58:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1999,8 +1999,6 @@ set_locale()
 }
 
 
-/* FIXME - check whether the next two functions can be merged */
-
 /* process 'set logscale' command */
 static void
 set_logscale()
@@ -2014,18 +2012,17 @@ set_logscale()
 	int axis;
 	double newbase = 10;
 
-	if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	    set_for_axis[axis] = TRUE;
-	} else { /* must not see x when x2, etc */
-	    if (chr_in_str(c_token, 'x'))
- 		set_for_axis[FIRST_X_AXIS] = TRUE;
-	    if (chr_in_str(c_token, 'y'))
- 		set_for_axis[FIRST_Y_AXIS] = TRUE;
-	    if (chr_in_str(c_token, 'z'))
- 		set_for_axis[FIRST_Z_AXIS] = TRUE;
-	    if (chr_in_str(c_token, 'c') && chr_in_str(c_token, 'b'))
-		/* FIXME should be strstr(token,"cb") */
- 		set_for_axis[COLOR_AXIS] = TRUE;
+	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
+	int i = 0;
+	while (i < token[c_token].length) {
+	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE, 
+		       input_line+token[c_token].start_index+i );
+	    if (axis < 0) {
+		token[c_token].start_index += i;
+		int_error(c_token, "unknown axis");
+	    }
+	    set_for_axis[axisname_tbl[axis].value] = TRUE;
+	    i += strlen(axisname_tbl[axis].key);
 	}
 	c_token++;
 

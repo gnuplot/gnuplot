@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.29 2002/02/13 22:58:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.30 2002/02/14 14:28:20 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -914,19 +914,19 @@ unset_logscale()
 	 * unused ones, too, but that's actually a good thing, IMHO */
 	for(axis = 0; axis < AXIS_ARRAY_SIZE; axis++)
 	    reset_logscale(axis);
-    } else if ((axis = lookup_table(axisname_tbl, c_token)) >= 0) {
-	reset_logscale(axis);
-	++c_token;
     } else {
-	if (chr_in_str(c_token, 'x')) 
-	    reset_logscale(FIRST_X_AXIS);
-	if (chr_in_str(c_token, 'y'))
-	    reset_logscale(FIRST_Y_AXIS);
-	if (chr_in_str(c_token, 'z')) 
-	    reset_logscale(FIRST_Z_AXIS);
-	if (chr_in_str(c_token, 'c') && chr_in_str(c_token, 'b'))
-	    /* FIXME should be strstr(token,"cb") */
-	    reset_logscale(COLOR_AXIS);
+	int i = 0;
+	/* do reverse search because of "x", "x1", "x2" sequence in axisname_tbl */
+	while (i < token[c_token].length) {
+	    axis = lookup_table_nth_reverse( axisname_tbl, AXIS_ARRAY_SIZE, 
+		       input_line+token[c_token].start_index+i );
+	    if (axis < 0) {
+		token[c_token].start_index += i;
+		int_error(c_token, "unknown axis");
+	    }
+	    reset_logscale(axisname_tbl[axis].value);
+	    i += strlen(axisname_tbl[axis].key);
+	}
 	++c_token;
     }
 }
