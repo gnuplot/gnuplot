@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.52 2002/12/02 05:16:25 sfeam Exp $
+ * $Id: cgm.trm,v 1.53 2002/12/16 14:18:34 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -184,12 +184,14 @@ struct cgm_properties {
   int edge_visibility;		/* nonzero if edge is visible */
   int edge_color;
   int fill_color;
+  int interior_style;
+  int hatch_index;
 };
 
 static struct cgm_properties
-    cgm_current={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}, /* written to file */
-    cgm_next={0,-2,-2,LEFT,-2,-2,-2}, /* needed for next text string/marker */
-    cgm_reset={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1}; /* invalid entries */
+    cgm_current={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1,-1,-1}, /* written to file */
+    cgm_next={0,-2,-2,LEFT,-2,-2,-2,-1,-1}, /* needed for next text string/marker */
+    cgm_reset={-1,-1,-1,(enum JUSTIFY)-1,-1,-1,-1,-1,-1}; /* invalid entries */
 
 static int cgm_user_color_count = 0;
 static int cgm_user_color_max = 0;
@@ -567,6 +569,8 @@ CGM_init()
     cgm_posx = cgm_posy = 0;
     cgm_linetype = 0;
     cgm_next.angle = 0;
+    cgm_next.interior_style = 2;
+    cgm_next.hatch_index = 1;
 }
 
 TERM_PUBLIC void
@@ -589,7 +593,16 @@ CGM_graphics()
     static int vdc_extent_data[] = { 0, 0, 0, 0 };
 /*  static int line_color_data[] = { 1 }; */
     static int line_type_data[] = { 1 };
-    static int interior_style_data[] = { 1 };			/* 1=filled */
+    static int interior_style_data[] = { 1 }; /* 0=hollow 1=filled
+					       * 2=pattern 3=hatch
+					       * 4=empty */
+    static int hatch_index_data[] = { 1 }; /* 1=horizontal 2=vertical
+					    * 3=positive slope
+					    * 4=negative slope
+					    * 5=horizontal/vertical
+					    * crosshatch
+					    * 6=positive/negative
+					    * slope crosshatch */
 
     static int GPFAR elements_list_data[] =
     {
@@ -763,6 +776,7 @@ Gnuplot version %s patchlevel %s,\
     cgm_next.char_height = t->v_char;
 
     CGM_write_int_record(5, 22, 2, interior_style_data);
+    CGM_write_int_record(5, 24, 2, hatch_index_data);
     {
 	char buf[45];
 	sprintf(buf, "%.31s,%d", cgm_font, cgm_fontsize);
@@ -893,6 +907,65 @@ CGM_linecolor(linecolor)
     /* EAM - set text color to same as line color */
     CGM_write_int_record(5, 14, 2, (int *) &cgm_color);
 }
+
+#ifdef USE_ULIG_FILLEDBOXES
+TERM_PUBLIC void
+CGM_fillbox(style, x1,y1,width,height)
+    int style;
+    unsigned int x1,y1,width,height;
+{
+    int new_linewidth, saved_fill_color = cgm_next.fill_color;
+    /* CGM defines six hatch patterns.  For pattern 0 we want solid
+       fill.  Otherwise, we offset by 2 to use the better patterns
+       first (so the first pattern has slanted lines). */
+    int hatch_index[]={0, 3, 4, 5, 6, 1, 2};
+    double filldens;
+    gpiPoint corner[5];
+
+    corner[0].x = x1;        corner[0].y = y1;
+    corner[1].x = x1+width;  corner[1].y = y1;
+    corner[2].x = x1+width;  corner[2].y = y1+height;
+    corner[3].x = x1;        corner[3].y = y1+height;
+    corner[4].x = x1;        corner[4].y = y1;
+
+    switch( style & 0xf ) {
+    case FS_SOLID:
+	/* style == 1 --> fill with intensity according to filldensity */
+/*
+        filldens = (style >> 4) / 100.0;
+        if( filldens < 0.0 )
+	    filldens = 0.0;
+        if( filldens > 1.0 )
+	    filldens = 1.0;
+	/* FIXME: There's no way to set the density.  One solution
+	 * would be to use direct color rather than indexed color. Or,
+	 * initialize the color table with some generic colors
+	 * (e.g. the "web colors") whether or not we know we'll need
+	 * them. */
+
+	cgm_next.interior_style = 1; /* solid */
+        break;
+    case FS_PATTERN: 
+	/* style == 2 --> fill with pattern according to fillpattern */
+	/* the upper 3 nibbles of 'style' contain hatch pattern number */
+	cgm_next.fill_color = 0; /* index 0 is always the background color */
+	cgm_next.interior_style = 1; /* solid */
+	cgm_next.hatch_index = hatch_index[(style >> 4) % 7];
+	if (cgm_next.hatch_index) {
+	     CGM_filled_polygon(5, corner);
+	     cgm_next.fill_color = saved_fill_color;
+	     cgm_next.interior_style = 3; /* hatched */
+	}
+        break;
+    default: /* style == 0 or unknown --> fill with background color */
+	cgm_next.fill_color = 0; /* index 0 is always the background color */
+	cgm_next.interior_style = 1; /* solid */
+	CGM_filled_polygon(5, corner);
+    }
+    CGM_filled_polygon(5, corner);
+    cgm_next.interior_style = 1; /* solid */
+}
+#endif /* USE_ULIG_FILLEDBOXES */
 
 TERM_PUBLIC void
 CGM_linewidth(width)
@@ -1026,8 +1099,8 @@ TERM_PUBLIC void CGM_set_color(gray)
 	cgm_color = cgm_next.fill_color;
 	cgm_linetype = cgm_color;
     	CGM_flush_polyline();
-    	CGM_write_int_record(5,  4, 2, (int *) &cgm_color);
-    	CGM_write_int_record(5, 14, 2, (int *) &cgm_color);
+    	CGM_write_int_record(5,  4, 2, (int *) &cgm_color); /* line color */
+    	CGM_write_int_record(5, 14, 2, (int *) &cgm_color); /* text color */
     }
 }
 
@@ -1036,9 +1109,18 @@ TERM_PUBLIC void CGM_filled_polygon(points, corner)
      gpiPoint *corner;
 {
     int i;
+    if (cgm_current.interior_style != cgm_next.interior_style){
+      cgm_current.interior_style = cgm_next.interior_style;
+      CGM_write_int_record(5, 22, 2, &cgm_next.interior_style);
+    }
     if (cgm_current.fill_color != cgm_next.fill_color){
       cgm_current.fill_color = cgm_next.fill_color;
       CGM_write_int_record(5, 23, 2, &cgm_next.fill_color);
+    }
+    if (cgm_current.hatch_index != cgm_next.hatch_index &&
+	cgm_next.interior_style == 3){
+      cgm_current.hatch_index = cgm_next.hatch_index;
+      CGM_write_int_record(5, 24, 2, &cgm_next.hatch_index);
     }
     cgm_next.edge_visibility = 0;
     if (cgm_current.edge_visibility != cgm_next.edge_visibility){
@@ -1427,6 +1509,8 @@ int number;
     CGM_flush_polyline();
     old_dashtype = cgm_dashtype;
     CGM_dashtype(0);
+    if (number >= 3)		/* using a polygon */
+      cgm_next.interior_style = 1; /* solid */
     if (number == 4 || number == 6 || number == 8
 	    || number == 10 || number == 12) {
 	/* filled */
@@ -1438,18 +1522,23 @@ int number;
       cgm_next.fill_color = 0;	/* index 0 is always the background color */
       cgm_next.edge_color = cgm_color;
     }
+
+    if (cgm_current.interior_style != cgm_next.interior_style){
+      cgm_current.interior_style = cgm_next.interior_style;
+      CGM_write_int_record(5, 22, 2, &cgm_next.interior_style);
+    }
     if (cgm_current.fill_color != cgm_next.fill_color){
       cgm_current.fill_color = cgm_next.fill_color;
       CGM_write_int_record(5, 23, 2, &cgm_next.fill_color);
-    }
-    if (cgm_current.edge_visibility != cgm_next.edge_visibility){
-      cgm_current.edge_visibility = cgm_next.edge_visibility;
-      CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
     }
     if (cgm_current.edge_visibility &&
 	cgm_current.edge_color != cgm_next.edge_color){
       cgm_current.edge_color = cgm_next.edge_color;
       CGM_write_int_record(5, 29, 2, &cgm_current.edge_color);
+    }
+    if (cgm_current.edge_visibility != cgm_next.edge_visibility){
+      cgm_current.edge_visibility = cgm_next.edge_visibility;
+      CGM_write_int_record(5, 30, 2, &cgm_current.edge_visibility);
     }
       
     switch (number) {
@@ -1593,7 +1682,11 @@ TERM_TABLE_START(cgm_driver)
     TERM_BINARY,		/* various flags */
     NULL,			/* after one plot of multiplot */
     NULL,			/* before subsequent plot of multiplot */
-    NULL,			/* clear part of multiplot */
+#ifdef USE_ULIG_FILLEDBOXES
+    CGM_fillbox,
+#else
+    NULL,			/* fillbox: clear part of multiplot */
+#endif
     CGM_linewidth
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL

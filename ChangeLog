@@ -1,3 +1,8 @@
+2003-05-06  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* term/cgm.trm (CGM_fillbox): Implement pattern filled boxes,
+	conditioned on USE_ULIG_FILLEDBOXES.
+
 2003-05-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c (test_term): Improvements in the 'test' command: Some of
