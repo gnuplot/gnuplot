@@ -1,6 +1,6 @@
-C RCS $Id: gnuplot.doc,v 1.76 2001/08/27 15:02:14 broeker Exp $
-C 3 December 1998
-C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+C RCS $Id: gnuplot.doc,v 1.78 2001/09/08 00:50:01 mikulik Exp $
+C 18 September 2001
+C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
@@ -153,8 +153,8 @@ C
 
  There is also a World Wide Web page with up-to-date information, including
  known bugs:
-^ <a href="http://www.cs.dartmouth.edu/gnuplot_info.html">
-       http://www.cs.dartmouth.edu/gnuplot_info.html
+^ <a href="http://www.gnuplot.org">
+       http://www.gnuplot.org
 ^ </a>
 
  Before seeking help, please check the
@@ -7669,12 +7669,14 @@ C  The `lines` style connects adjacent points with straight line segments.
  specific bugs documented in release 3.5, now relegated to `old_bugs`, may
  no longer be relevant.
 
- Bugs reported since the current release may be located via the official
- distribution site:
-        ftp://ftp.dartmouth.edu/pub/gnuplot
-       http://www.cs.dartmouth.edu/gnuplot_info.html
+ Bugs reported since the current release as well as older ones
+ may be located via the official distribution site:
+^ <a href="ftp://ftp.gnuplot.org">ftp://ftp.gnuplot.org </a>
 
- Please e-mail any bugs to bug-gnuplot@dartmouth.edu.
+^ <a href="http://www.gnuplot.org">http://www.gnuplot.org </a>
+
+ Please e-mail any bugs to bug-gnuplot mailinglist (see `Seeking-assistance`)
+
 2 Old_bugs
 ?old_bugs
 ?os_bugs
@@ -7754,8 +7756,3 @@ C  The `lines` style connects adjacent points with straight line segments.
  On AIX 4, the literal 'NaNq' in a datafile causes the special internal value
  'not-a-number' to be stored, rather than setting an internal 'undefined'
  flag.  A workaround is to use `set missing 'NaNq'`.
-
- There may be an up-to-date list of bugs since the release on the WWW page:
-       http://www.cs.dartmouth.edu/gnuplot_info.html
-
- Please report any bugs to bug-gnuplot@dartmouth.edu.
