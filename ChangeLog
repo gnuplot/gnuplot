@@ -1,3 +1,9 @@
+2003-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/axis.h: Change the definition of AUTOSCALE_FIXMIN from 1<<2 to
+	AUTOSCALE_MIN | 1<<2. Similarly for AUTOSCALE_FIXMAX. Fixes a bug of
+	wrong z- and cb-ranges during mouse zooming of a pm3d splot. 
+
 2003-01-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A patch from Allin Cottrell <cottrell@wfu.edu> to fix unreadable
@@ -1777,7 +1783,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/24 08:26:43 $).
+	last modification date (from the tag $Date: 2003/01/24 17:45:06 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
