@@ -618,7 +618,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
+      Ctrl Help       - `help `.
 
 @end example
 
@@ -9197,23 +9197,33 @@ to you, depending on its output format.
 @menu
 * aed767::                      
 * aifm::                        
+* amiga::                       
 * apollo::                      
-* apollo_::                     
+* atari_ST_(via_AES)::          
+* atari_ST_(via_VDI)::          
+* be::                          
+* cgi::                         
 * cgm::                         
 * corel::                       
 * debug::                       
+* svga::                        
 * dumb::                        
 * dxf::                         
 * dxy800a::                     
 * eepic::                       
 * emf::                         
+* emxvga::                      
+* epslatex::                    
 * epson-180dpi::                
 * excl::                        
+* hercules::                    
 * fig::                         
 * png_(NEW)::                   
+* ggi::                         
 * gif::                         
 * Gnugraph(GNU_plotutils)::     
 * gpic::                        
+* gpic_::                       
 * gpr::                         
 * grass::                       
 * hp2623a::                     
@@ -9223,33 +9233,49 @@ to you, depending on its output format.
 * hpljii::                      
 * hppj::                        
 * imagen::                      
+* iris4d::                      
 * kyo::                         
 * latex::                       
 * linux::                       
+* macintosh::                   
 * mf::                          
 * mp::                          
 * mgr::                         
 * mif::                         
+* mtos::                        
+* next::                        
+* Openstep_(next)::             
 * pbm::                         
+* dospc::                       
 * png_(OLD)::                   
 * postscript_::                 
 * pslatex_and_pstex::           
 * pstricks::                    
 * qms::                         
 * regis::                       
+* regis_::                      
 * rgip::                        
+* sun::                         
+* sun_::                        
 * tek410x::                     
+* tek410x_::                    
 * table::                       
 * tek40::                       
 * texdraw::                     
 * tgif::                        
+* tgif_::                       
 * tkcanvas::                    
 * tpic::                        
 * unixpc::                      
 * unixplot::                    
 * vx384::                       
+* vgagl::                       
+* VWS::                         
+* windows::                     
 * x11::                         
+* x11_::                        
 * xlib::                        
+* xlib_::                       
 @end menu
 
 @node aed767, aifm, terminal, terminal
@@ -9278,7 +9304,7 @@ The two drivers differ only in their horizontal ranges, which are 512 and
 768 pixels, respectively.  Their vertical range is 575 pixels.  There are
 no options for these drivers."
 
-@node aifm, apollo, aed767, terminal
+@node aifm, amiga, aed767, terminal
 @subsubsection aifm
 
 @c ?commands set terminal aifm
@@ -9316,7 +9342,35 @@ Examples:
 
 @end example
 
-@node apollo, apollo_, aifm, terminal
+@node amiga, apollo, aifm, terminal
+@subsubsection amiga
+
+@c ?commands set terminal amiga
+@c ?set terminal amiga
+@c ?set term amiga
+@c ?terminal amiga
+@c ?term amiga
+@cindex amiga
+@tmindex amiga
+
+
+The `amiga` terminal, for Commodore Amiga computers, allows the user to
+plot either to a screen (default), or, if Kickstart 3.0 or higher is
+installed, to a window on the current public screen. The font and its size
+can also be selected.
+
+Syntax:
+@example
+      set terminal amiga @{screen | window@} @{"<fontname>"@} @{<fontsize>@}
+
+@end example
+
+The default font is 8-point "topaz".
+
+The screen option uses a virtual screen, so it is possible that the graph
+will be larger than the screen."
+
+@node apollo, atari_ST_(via_AES), amiga, terminal
 @subsubsection apollo
 
 @c ?commands set terminal apollo
@@ -9333,24 +9387,348 @@ with rescaling after window resizing.  It has no options.
 
 If a fixed-size window is desired, the `gpr` terminal may be used instead."
 
-@node apollo_, cgm, apollo, terminal
-@subsubsection apollo
+@node atari_ST_(via_AES), atari_ST_(via_VDI), apollo, terminal
+@subsubsection atari ST (via AES)
 
-@c ?commands set terminal apollo
-@c ?set terminal apollo
-@c ?set term apollo
-@c ?terminal apollo
-@c ?term apollo
-@cindex apollo
-@tmindex apollo
+@c ?commands set terminal atari
+@c ?set terminal atari
+@c ?set term atari
+@c ?terminal atari
+@c ?term atari
+@cindex atari
+@tmindex atari
 
 
-The `apollo` terminal driver supports the Apollo Graphics Primitive Resource
-with rescaling after window resizing.  It has no options.
+The `atari` terminal has options to set the character size and the screen
+colors.
 
-If a fixed-size window is desired, the `gpr` terminal may be used instead."
+Syntax:
+@example
+      set terminal atari @{<fontsize>@} @{<col0> <col1> ... <col15>@}
 
-@node cgm, corel, apollo_, terminal
+@end example
+
+The character size must appear if any colors are to be specified.  Each of
+the (up to 16) colors is given as a three-digit hex number, where the digits
+represent RED, GREEN and BLUE (in that order).  The range of 0--15 is scaled
+to whatever color range the screen actually has.  On a normal ST screen, odd
+and even intensities are the same.
+
+Examples:
+@example
+      set terminal atari 4    # use small (6x6) font
+      set terminal atari 6 0  # set monochrome screen to white on black
+      set terminal atari 13 0 fff f00 f0 f ff f0f
+                 # set first seven colors to black, white, red, green,
+                 # blue, cyan, and purple and use large font (8x16).
+
+@end example
+
+Additionally, if an environment variable GNUCOLORS exists, its contents are
+interpreted as an options string, but an explicit terminal option takes
+precedence."
+
+@node atari_ST_(via_VDI), be, atari_ST_(via_AES), terminal
+@subsubsection atari ST (via VDI)
+
+@c ?commands set terminal vdi
+@c ?set terminal vdi
+@c ?set term vdi
+@c ?terminal vdi
+@c ?term vdi
+@cindex vdi
+@tmindex vdi
+
+
+The `vdi` terminal is the same as the `atari` terminal, except that it sends
+output to the screen via the VDI and not into AES-Windows.
+
+The `vdi` terminal has options to set the character size and the screen
+colors.
+
+Syntax:
+@example
+      set terminal vdi @{<fontsize>@} @{<col0> <col1> ... <col15>@}
+
+@end example
+
+The character size must appear if any colors are to be specified.  Each of
+the (up to 16) colors is given as a three-digit hex number, where the digits
+represent RED, GREEN and BLUE (in that order).  The range of 0--15 is scaled
+to whatever color range the screen actually has.  On a normal ST screen, odd
+and even intensities are the same.
+
+Examples:
+@example
+      set terminal vdi 4    # use small (6x6) font
+      set terminal vdi 6 0  # set monochrome screen to white on black
+      set terminal vdi 13 0 fff f00 f0 f ff f0f
+                 # set first seven colors to black, white, red, green,
+                 # blue, cyan, and purple and use large font (8x16).
+
+@end example
+
+Additionally, if an environment variable GNUCOLORS exists, its contents are
+interpreted as an options string, but an explicit terminal option takes
+precedence."
+
+@node be, cgi, atari_ST_(via_VDI), terminal
+@subsubsection be
+
+@c ?commands set terminal be
+@c ?set terminal be
+@c ?set term be
+@c ?terminal be
+@c ?term be
+@cindex be
+
+@cindex BE
+
+`gnuplot` provides the `be` terminal type for use with X servers.  This
+terminal type is set automatically at startup if the `DISPLAY` environment
+variable is set, if the `TERM` environment variable is set to `xterm`, or
+if the `-display` command line option is used.
+
+Syntax:
+@example
+          set terminal be @{reset@} @{<n>@}
+
+@end example
+
+Multiple plot windows are supported: `set terminal be <n>` directs the
+output to plot window number n.  If n>0, the terminal number will be
+appended to the window title and the icon will be labeled `gplt <n>`.
+The active window may distinguished by a change in cursor (from default
+to crosshair.)
+
+Plot windows remain open even when the `gnuplot` driver is changed to a
+different device.  A plot window can be closed by pressing the letter q
+while that window has input focus, or by choosing `close` from a window
+manager menu.  All plot windows can be closed by specifying @ref{reset}, which
+actually terminates the subprocess which maintains the windows (unless
+`-persist` was specified).
+
+Plot windows will automatically be closed at the end of the session
+unless the `-persist` option was given.
+
+The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
+window.
+
+Linewidths and pointsizes may be changed from within `gnuplot` with
+`set linestyle`.
+
+For terminal type `be`, `gnuplot` accepts (when initialized) the standard
+X Toolkit options and resources such as geometry, font, and name from the
+command line arguments or a configuration file.  See the X(1) man page
+(or its equivalent) for a description of such options.
+
+A number of other `gnuplot` options are available for the `be` terminal.
+These may be specified either as command-line options when `gnuplot` is
+invoked or as resources in the configuration file ".Xdefaults".  They are
+set upon initialization and cannot be altered during a `gnuplot` session.
+
+
+@noindent --- COMMAND-LINE_OPTIONS ---
+
+@c ?commands set terminal be command-line-options
+@c ?set terminal be command-line-options
+@c ?set term be command-line-options
+@c ?be command-line-options
+In addition to the X Toolkit options, the following options may be specified
+on the command line when starting `gnuplot` or as resources in your
+".Xdefaults" file:
+
+@example
+ `-mono`        forces monochrome rendering on color displays.
+ `-gray`        requests grayscale rendering on grayscale or color displays.
+                        (Grayscale displays receive monochrome rendering by default.)
+ `-clear`   requests that the window be cleared momentarily before a
+                        new plot is displayed.
+ `-raise`   raises plot window after each plot
+ `-noraise` does not raise plot window after each plot
+ `-persist` plots windows survive after main gnuplot program exits
+
+@end example
+
+The options are shown above in their command-line syntax.  When entered as
+resources in ".Xdefaults", they require a different syntax.
+
+Example:
+@example
+          gnuplot*gray: on
+
+@end example
+
+`gnuplot` also provides a command line option (`-pointsize <v>`) and a
+resource, `gnuplot*pointsize: <v>`, to control the size of points plotted
+with the `points` plotting style.  The value `v` is a real number (greater
+than 0 and less than or equal to ten) used as a scaling factor for point
+sizes.  For example, `-pointsize 2` uses points twice the default size, and
+`-pointsize 0.5` uses points half the normal size.
+
+
+@noindent --- MONOCHROME_OPTIONS ---
+
+@c ?commands set terminal be monochrome_options
+@c ?set terminal be monochrome_options
+@c ?set term be monochrome_options
+@c ?be monochrome_options
+For monochrome displays, `gnuplot` does not honor foreground or background
+colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`
+requests white-on-black.
+
+
+
+@noindent --- COLOR_RESOURCES ---
+
+@c ?commands set terminal be color_resources
+@c ?set terminal be color_resources
+@c ?set term be color_resources
+@c ?be color_resources
+For color displays, `gnuplot` honors the following resources (shown here
+with their default values) or the greyscale resources.  The values may be
+color names as listed in the BE rgb.txt file on your system, hexadecimal
+RGB color specifications (see BE documentation), or a color name followed
+by a comma and an `intensity` value from 0 to 1.  For example, `blue, 0.5`
+means a half intensity blue.
+
+@example
+ gnuplot*background:  white
+ gnuplot*textColor:   black
+ gnuplot*borderColor: black
+ gnuplot*axisColor:   black
+ gnuplot*line1Color:  red
+ gnuplot*line2Color:  green
+ gnuplot*line3Color:  blue
+ gnuplot*line4Color:  magenta
+ gnuplot*line5Color:  cyan
+ gnuplot*line6Color:  sienna
+ gnuplot*line7Color:  orange
+ gnuplot*line8Color:  coral
+
+@end example
+
+
+The command-line syntax for these is, for example,
+
+Example:
+@example
+          gnuplot -background coral
+
+@end example
+
+
+
+@noindent --- GRAYSCALE_RESOURCES ---
+
+@c ?commands set terminal be grayscale_resources
+@c ?set terminal be grayscale_resources
+@c ?set term be grayscale_resources
+@c ?be grayscale_resources
+When `-gray` is selected, `gnuplot` honors the following resources for
+grayscale or color displays (shown here with their default values).  Note
+that the default background is black.
+
+@example
+ gnuplot*background: black
+ gnuplot*textGray:   white
+ gnuplot*borderGray: gray50
+ gnuplot*axisGray:   gray50
+ gnuplot*line1Gray:  gray100
+ gnuplot*line2Gray:  gray60
+ gnuplot*line3Gray:  gray80
+ gnuplot*line4Gray:  gray40
+ gnuplot*line5Gray:  gray90
+ gnuplot*line6Gray:  gray50
+ gnuplot*line7Gray:  gray70
+ gnuplot*line8Gray:  gray30
+
+@end example
+
+
+
+
+@noindent --- LINE_RESOURCES ---
+
+@c ?commands set terminal be line_resources
+@c ?set terminal be line_resources
+@c ?set term be line_resources
+@c ?be line_resources
+`gnuplot` honors the following resources for setting the width (in pixels) of
+plot lines (shown here with their default values.)  0 or 1 means a minimal
+width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of
+some plots.
+
+@example
+ gnuplot*borderWidth: 2
+ gnuplot*axisWidth:   0
+ gnuplot*line1Width:  0
+ gnuplot*line2Width:  0
+ gnuplot*line3Width:  0
+ gnuplot*line4Width:  0
+ gnuplot*line5Width:  0
+ gnuplot*line6Width:  0
+ gnuplot*line7Width:  0
+ gnuplot*line8Width:  0
+
+@end example
+
+
+`gnuplot` honors the following resources for setting the dash style used for
+plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`
+are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels
+on followed by `k` pixels off.  For example, '16' is a "dotted" line with one
+pixel on followed by six pixels off.  More elaborate on/off patterns can be
+specified with a four-digit value.  For example, '4441' is four on, four off,
+four on, one off.  The default values shown below are for monochrome displays
+or monochrome rendering on color or grayscale displays.  For color displays,
+the default for each is 0 (solid line) except for `axisDashes` which defaults
+to a '16' dotted line.
+
+@example
+ gnuplot*borderDashes:   0
+ gnuplot*axisDashes:        16
+ gnuplot*line1Dashes:        0
+ gnuplot*line2Dashes:   42
+ gnuplot*line3Dashes:   13
+ gnuplot*line4Dashes:   44
+ gnuplot*line5Dashes:   15
+ gnuplot*line6Dashes: 4441
+ gnuplot*line7Dashes:   42
+ gnuplot*line8Dashes:   13
+
+@end example
+
+
+@node cgi, cgm, be, terminal
+@subsubsection cgi
+
+@c ?commands set terminal cgi
+@c ?set terminal cgi
+@c ?set term cgi
+@c ?terminal cgi
+@c ?term cgi
+@cindex cgi
+@tmindex cgi
+
+
+@c ?commands set terminal hcgi
+@c ?set terminal hcgi
+@c ?set term hcgi
+@c ?terminal hcgi
+@c ?term hcgi
+@cindex hcgi
+@tmindex hcgi
+
+
+The `cgi` and `hcgi` terminal drivers support SCO CGI drivers.  `hcgi` is for
+printers; the environment variable CGIPRNT must be set.  `cgi` may be used
+for either a display or hardcopy; if the environment variable CGIDISP is set,
+then that display is used.  Otherwise CGIPRNT is used.
+
+These terminals have no options."
+
+@node cgm, corel, cgi, terminal
 @subsubsection cgm
 
 @c ?commands set terminal cgm
@@ -9645,7 +10023,7 @@ Syntax:
 where the fontsize and linewidth are specified in points and the sizes in
 inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 
-@node debug, dumb, corel, terminal
+@node debug, svga, corel, terminal
 @subsubsection debug
 
 @c ?commands set terminal debug
@@ -9660,7 +10038,28 @@ inches.  The defaults are monochrome, "SwitzerlandLight", 22, 8.2, 10 and 1.2."
 This terminal is provided to allow for the debugging of `gnuplot`.  It is
 likely to be of use only for users who are modifying the source code."
 
-@node dumb, dxf, debug, terminal
+@node svga, dumb, debug, terminal
+@subsubsection svga
+
+@c ?commands set terminal svga
+@c ?set terminal svga
+@c ?set term svga
+@c ?terminal svga
+@c ?term svga
+@cindex svga
+@tmindex svga
+
+
+The `svga` terminal driver supports PCs with SVGA graphics.  It can only be
+used if it is compiled with DJGPP.  Its only option is the font.
+
+Syntax:
+@example
+      set terminal svga @{"<fontname>"@}"
+
+@end example
+
+@node dumb, dxf, svga, terminal
 @subsubsection dumb
 
 @c ?commands set terminal dumb
@@ -9829,11 +10228,11 @@ Specify own positioning (top here):
 
 The other label -- account for long ticlabels:
 @example
-       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}'"
+       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}@}'"
 
 @end example
 
-@node emf, epson-180dpi, eepic, terminal
+@node emf, emxvga, eepic, terminal
 @subsubsection emf
 
 @c ?commands set terminal emf
@@ -9870,7 +10269,117 @@ Examples:
 
 @end example
 
-@node epson-180dpi, excl, emf, terminal
+@node emxvga, epslatex, emf, terminal
+@subsubsection emxvga
+
+@c ?commands set terminal emxvga
+@c ?set terminal emxvga
+@c ?set term emxvga
+@c ?terminal emxvga
+@c ?term emxvga
+@cindex emxvga
+@tmindex emxvga
+
+
+@c ?commands set terminal emxvesa
+@c ?set terminal emxvesa
+@c ?set term emxvesa
+@c ?terminal emxvesa
+@c ?term emxvesa
+@cindex emxvesa
+@tmindex emxvesa
+
+
+@c ?commands set terminal vgal
+@c ?set terminal vgal
+@c ?set term vgal
+@c ?terminal vgal
+@c ?term vgal
+@cindex vgal
+@tmindex vgal
+
+
+The `emxvga`, `emxvesa` and `vgal` terminal drivers support PCs with SVGA,
+vesa SVGA and VGA graphics boards, respectively.  They are intended to be
+compiled with "emx-gcc" under either DOS or OS/2.  They also need VESA and
+SVGAKIT maintained by Johannes Martin (JMARTIN@@GOOFY.ZDV.UNI-MAINZ.DE) with
+additions by David J. Liu (liu@@phri.nyu.edu).
+
+Syntax:
+@example
+      set terminal emxvga
+      set terminal emxvesa @{vesa-mode@}
+      set terminal vgal
+
+@end example
+
+The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
+
+@node epslatex, epson-180dpi, emxvga, terminal
+@subsubsection epslatex
+
+@c ?commands set terminal epslatex
+@c ?set terminal epslatex
+@c ?set term epslatex
+@c ?terminal epslatex
+@c ?term epslatex
+@cindex epslatex
+@tmindex epslatex
+
+
+The `epslatex` driver generates output for further processing by LaTeX."
+
+Syntax:
+@example
+      set terminal epslatex @{default@}
+                              @{color | monochrome@} @{solid | dashed@}
+                              @{"<fontname>"@} @{<fontsize>@}
+
+@end example
+
+`default` mode sets all options to their defaults: `monochrome`, `dashed`,
+"default" and 11pt.
+Default size of a plot is 5 inches wide and 3 inches high.
+
+`solid` draws all plots with solid lines, overriding any dashed patterns;
+`"<fontname>"` is the name of font; and `<fontsize>` is
+the size of the font in PostScript points. Font selection isn't supported yet.
+Font size selection is supported only for the calculation of proper spacing.
+The actual LaTeX font at the point of inclusion is taken, so use LaTeX commands
+for changing fonts. If you use e.g. 12pt as font size for your LaTeX documents, 
+use '"default" 12' as options.
+
+All drivers for LaTeX offer a special way of controlling text positioning: 
+(a) If any text string begins with '@{', you also need to include a '@}' at the
+end of the text, and the whole text will be centered both horizontally
+and vertically by LaTeX.  (b) If the text string begins with '[', you need
+to continue it with: a position specification (up to two out of t,b,l,r),
+']@{', the text itself, and finally, '@}'. The text itself may be anything
+LaTeX can typeset as an LR-box. \\rule@{@}@{@}'s may help for best positioning.
+See also the documentation for the `pslatex` terminal driver.
+To create multiline labels, use \\shortstack, for example
+@example
+   set ylabel '[r]@{\\shortstack@{first line \\\\ second line@}@}' 
+
+@end example
+
+The driver produces two different files, one for the LaTeX part and one for
+the eps part of the figure. 
+The name of the LaTeX file is derived from the name of
+the eps file given on the @ref{output} command; it is determined by replacing
+the trailing `.eps` (actually just the final extent in the file name---and
+the option will be turned off if there is no extent) with `.tex` in the output
+file name.  Remember to close the @ref{file} before leaving `gnuplot`.
+There is no LaTeX output if no output file is given!
+In your LaTeX documents use '\\input@{filename@}' for inclusion of the figure.
+Thus `.eps` file is included by the command \\includegraphics@{...@}, thus
+Include \\usepackage@{graphicx@} in the preamble!
+Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)
+pdf files can made out of the eps files. If the graphics package is properly
+configured, the LaTeX files can also be processed by pdflatex without
+changes, and the pdf files are included instead of the eps files."
+
+@node epson-180dpi, excl, epslatex, terminal
 @subsubsection epson-180dpi
 
 @c ?commands set terminal epson-180dpi
@@ -9944,7 +10453,7 @@ printers with resolutions of 180 and 60 dots per inch, respectively.
 `epson-lx800` is a generic 9-pin driver appropriate for printers like the
 Epson LX-800, the Star NL-10 and NX-1000, the PROPRINTER, and so forth.
 
-`nec-cp6` is generix 24-pin driver that can be used for printers like the
+`nec-cp6` is generic 24-pin driver that can be used for printers like the
 NEC CP6 and the Epson LQ-800.
 
 The `okidata` driver supports the 9-pin OKIDATA 320/321 Standard printers.
@@ -9967,7 +10476,7 @@ which defaults to monochrome.
 With each of these drivers, a binary copy is required on a PC to print.  Do
 not use `print`---use instead `copy file /b lpt1:`."
 
-@node excl, fig, epson-180dpi, terminal
+@node excl, hercules, epson-180dpi, terminal
 @subsubsection excl
 
 @c ?commands set terminal excl
@@ -9982,7 +10491,76 @@ not use `print`---use instead `copy file /b lpt1:`."
 The `excl` terminal driver supports Talaris printers such as the EXCL Laser
 printer and the 1590.  It has no options."
 
-@node fig, png_(NEW), excl, terminal
+@node hercules, fig, excl, terminal
+@subsubsection hercules
+
+@c ?commands set terminal hercules
+@c ?set terminal hercules
+@c ?set term hercules
+@c ?terminal hercules
+@c ?term hercules
+@cindex hercules
+@tmindex hercules
+
+
+@c ?commands set terminal egalib
+@c ?set terminal egalib
+@c ?set term egalib
+@c ?terminal egalib
+@c ?term egalib
+@cindex egalib
+@tmindex egalib
+
+
+@c ?commands set terminal egamono
+@c ?set terminal egamono
+@c ?set term egamono
+@c ?terminal egamono
+@c ?term egamono
+@cindex egamono
+@tmindex egamono
+
+
+@c ?commands set terminal vgalib
+@c ?set terminal vgalib
+@c ?set term vgalib
+@c ?terminal vgalib
+@c ?term vgalib
+@cindex vgalib
+@tmindex vgalib
+
+
+@c ?commands set terminal vgamono
+@c ?set terminal vgamono
+@c ?set term vgamono
+@c ?terminal vgamono
+@c ?term vgamono
+@cindex vgamono
+@tmindex vgamono
+
+
+@c ?commands set terminal svgalib
+@c ?set terminal svgalib
+@c ?set term svgalib
+@c ?terminal svgalib
+@c ?term svgalib
+@cindex svgalib
+@tmindex svgalib
+
+
+@c ?commands set terminal ssvgalib
+@c ?set terminal ssvgalib
+@c ?set term ssvgalib
+@c ?terminal ssvgalib
+@c ?term ssvgalib
+@cindex ssvgalib
+@tmindex ssvgalib
+
+
+These drivers supports PC monitors with autodetected graphics boards.  They
+can be used only when compiled with Zortech C/C++.  None have options."
+
+@node fig, png_(NEW), hercules, terminal
 @subsubsection fig
 
 @c ?commands set terminal fig
@@ -10039,7 +10617,7 @@ only versions 3.1 and 3.2 are supported.
 
 `thickness` sets the default line thickness, which is 1 if not specified.
 Overriding the thickness can be achieved by adding a multiple of 100 to the
-to the `linetype` value for a `plot` command.  In a similar way the `depth`
+`linetype` value for a `plot` command.  In a similar way the `depth`
 of plot elements (with respect to the default depth) can be controlled by
 adding a multiple of 1000 to <linetype>.  The depth is then <layer> +
 <linetype>/1000 and the thickness is (<linetype>%1000)/100 or, if that is
@@ -10096,7 +10674,7 @@ To plot the error bars on top of the circles use
 
 @end example
 
-@node png_(NEW), gif, fig, terminal
+@node png_(NEW), ggi, fig, terminal
 @subsubsection png (NEW)
 
 @c ?commands set terminal png
@@ -10181,7 +10759,58 @@ which uses white for the transparent background, black for borders, dark
 gray for axes, and a gray-scale for the six plotting colors.
 
 
-@node gif, Gnugraph(GNU_plotutils), png_(NEW), terminal
+@node ggi, gif, png_(NEW), terminal
+@subsubsection ggi
+
+@c ?commands set terminal ggi
+@c ?set terminal ggi
+@c ?set term ggi
+@c ?terminal ggi
+@c ?term ggi
+@cindex ggi
+@tmindex ggi
+
+
+The `ggi` driver can run on different targets as X or svgalib.
+
+Syntax:
+@example
+   set terminal ggi [acceleration <integer>] [[mode] @{mode@}]
+
+@end example
+
+In X the window cannot be resized using window manager handles, but the
+mode can be given with the mode option, e.g.:
+@example
+ - V1024x768
+ - V800x600
+ - V640x480
+ - V320x200
+@end example
+
+Please refer to the ggi documentation for other modes. The 'mode' keyword
+is optional. It is recommended to select the target by environment variables
+as explained in the libggi manual page. To get DGA on X, you should for
+example
+@example
+   bash> export GGI_DISPLAY=DGA
+   csh>  setenv GGI_DISPLAY DGA
+
+@end example
+
+'acceleration' is only used for targets which report relative pointer
+motion events (e.g. DGA) and is a strictly positive integer multiplication
+factor for the relative distances.  The default for acceleration is 7.
+
+Examples:
+@example
+   set term ggi acc 10
+   set term ggi acc 1 mode V1024x768
+   set term ggi V1024x768"
+
+@end example
+
+@node gif, Gnugraph(GNU_plotutils), ggi, terminal
 @subsubsection gif
 
 @c ?commands set terminal gif
@@ -10243,7 +10872,8 @@ plum and dark violet for eight plotting colors.
 @example
       set terminal gif transparent xffffff \\
                        x000000 x202020 x404040 x606060 \\
-                       x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\
+                       x808080 xA0A0A0 xC0C0C0 xE0E0E0
+
 @end example
 
 which uses white for the transparent background, black for borders, dark
@@ -10296,7 +10926,7 @@ Examples:
 There is a non-GNU version of the `unixplot` driver which cannot be compiled
 unless this version is left out."
 
-@node gpic, gpr, Gnugraph(GNU_plotutils), terminal
+@node gpic, gpic_, Gnugraph(GNU_plotutils), terminal
 @subsubsection gpic
 
 @c ?commands set terminal gpic
@@ -10384,7 +11014,95 @@ for example, using
 
 @end example
 
-@node gpr, grass, gpic, terminal
+@node gpic_, gpr, gpic, terminal
+@subsubsection gpic
+
+@c ?commands set terminal gpic
+@c ?set terminal gpic
+@c ?set term gpic
+@c ?terminal gpic
+@c ?term gpic
+@cindex gpic
+@tmindex gpic
+
+
+The `gpic` terminal driver generates GPIC graphs in the Free Software
+Foundations's "groff" package.  The default size is 5 x 3 inches.  The only
+option is the origin, which defaults to (0,0).
+
+Syntax:
+@example
+      set terminal gpic @{<x> <y>@}
+
+@end example
+
+where `x` and `y` are in inches.
+
+A simple graph can be formatted using
+
+@example
+      groff -p -mpic -Tps file.pic > file.ps.
+
+@end example
+
+The output from pic can be pipe-lined into eqn, so it is possible to put
+complex functions in a graph with the @ref{label} and `set @{x/y@}label`
+commands.  For instance,
+
+@example
+      set ylab '@@space 0 int from 0 to x alpha ( t ) roman d t@@'
+
+@end example
+
+will label the y axis with a nice integral if formatted with the command:
+
+@example
+      gpic filename.pic | geqn -d@@@@ -Tps | groff -m[macro-package] -Tps
+          > filename.ps
+
+@end example
+
+Figures made this way can be scaled to fit into a document.  The pic language
+is easy to understand, so the graphs can be edited by hand if need be.  All
+co-ordinates in the pic-file produced by `gnuplot` are given as x+gnuplotx
+and y+gnuploty.  By default x and y are given the value 0.  If this line is
+removed with an editor in a number of files, one can put several graphs in
+one figure like this (default size is 5.0x3.0 inches):
+
+@example
+      .PS 8.0
+      x=0;y=3
+      copy "figa.pic"
+      x=5;y=3
+      copy "figb.pic"
+      x=0;y=0
+      copy "figc.pic"
+      x=5;y=0
+      copy "figd.pic"
+      .PE
+
+@end example
+
+This will produce an 8-inch-wide figure with four graphs in two rows on top
+of each other.
+
+One can also achieve the same thing by the command
+
+@example
+      set terminal gpic x y
+
+@end example
+
+for example, using
+
+@example
+      .PS 6.0
+      copy "trig.pic"
+      .PE"
+
+@end example
+
+@node gpr, grass, gpic_, terminal
 @subsubsection gpr
 
 @c ?commands set terminal gpr
@@ -10635,7 +11353,7 @@ Syntax:
 
 with the middle-sized font (FNT9X17) being the default."
 
-@node imagen, kyo, hppj, terminal
+@node imagen, iris4d, hppj, terminal
 @subsubsection imagen
 
 @c ?commands set terminal imagen
@@ -10669,7 +11387,56 @@ Example:
 
 puts six graphs on the page in three rows of two in portrait orientation."
 
-@node kyo, latex, imagen, terminal
+@node iris4d, kyo, imagen, terminal
+@subsubsection iris4d
+
+@c ?commands set terminal iris4d
+@c ?set terminal iris4d
+@c ?set term iris4d
+@c ?terminal iris4d
+@c ?term iris4d
+@cindex iris4d
+@tmindex iris4d
+
+
+The `iris4d` terminal driver supports Silicon Graphics IRIS 4D computers.
+Its only option is 8- or 24-bit color depth.  The default is 8.
+
+Syntax:
+@example
+      set terminal iris4d @{8 | 24@}
+
+@end example
+
+The color depth is not really a choice -- the value appropriate for the
+hardware should be selected.
+
+When using 24-bit mode, the colors can be directly specified via the file
+.gnuplot_iris4d that is searched in the current directory and then in the
+home directory specified by the HOME environment variable.  This file holds
+RGB values for the background, border, labels and nine plotting colors, in
+that order.  For example, here is a file containing the default colors:
+
+@example
+      85   85   85     Background   (dark gray)
+      0    0    0      Boundary     (black)
+      170  0    170    Labeling     (magenta)
+      85   255  255    Plot Color 1 (light cyan)
+      170  0    0      Plot Color 2 (red)
+      0    170  0      Plot Color 3 (green)
+      255  85   255    Plot Color 4 (light magenta)
+      255  255  85     Plot Color 5 (yellow)
+      255  85   85     Plot Color 6 (light red)
+      85   255  85     Plot Color 7 (light green)
+      0    170  170    Plot Color 8 (cyan)
+      170  170  0      Plot Color 9 (brown)
+
+@end example
+
+This file must have exactly 12 lines of RGB triples.  No empty lines are
+allowed, and anything after the third number on a line is ignored."
+
+@node kyo, latex, iris4d, terminal
 @subsubsection kyo
 
 @c ?commands set terminal kyo
@@ -10744,11 +11511,6 @@ Points, among other things, are drawn using the LaTeX commands "\\Diamond" and
 in the latexsym package, which is part of the base distribution and thus part
 of any LaTeX implementation.  Please do not forget to use this package.
 
-Points are drawn with the LaTex commands \\Diamond and \\Box.  These
-commands do no longer belong to the LaTeX2e core, but are included in the
-latexsym-package in the base distribution, and are hence part of all LaTeX
-implementations. Please do not forget to use this package.
-
 Examples:
 About label positioning:
 Use gnuplot defaults (mostly sensible, but sometimes not really best):
@@ -10768,11 +11530,11 @@ Specify own positioning (top here):
 
 The other label -- account for long ticlabels:
 @example
-       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}'"
+       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}@}'"
 
 @end example
 
-@node linux, mf, latex, terminal
+@node linux, macintosh, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -10789,7 +11551,60 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node mf, mp, linux, terminal
+@node macintosh, mf, linux, terminal
+@subsubsection macintosh
+
+@c ?set terminal macintosh
+@c ?set term macintosh
+@c ?terminal macintosh
+@c ?term macintosh
+@cindex macintosh
+@tmindex macintosh
+
+
+Several options may be set in the 'macintosh' driver.
+
+Syntax:
+@example
+     set terminal macintosh @{singlewin | multiwin@} @{vertical | novertical@}
+                            @{size <width>, <height> | default@}
+
+@end example
+
+'singlewin' limits the output to a single window and is useful for animations.
+'multiwin' allows multiple windows.
+'vertical' is only valid under the gx option. With this option, rotated text
+@example
+    be drawn vertically. novertical turns this option off.
+ size <width>, <height> overrides the graph size set in the preferences
+    dialog until it is cleared with either 'set term mac size default'
+    or 'set term mac default'.
+
+@end example
+
+@example
+ 'set term mac size default' sets the window size settings to those set in
+    the preferences dialog.
+
+@end example
+
+@example
+ 'set term mac default' sets all options to their default values.
+    Default values: nogx, multiwin, novertical.
+
+@end example
+
+@example
+ If you generate graphs under the multiwin option and then switch to singlewin,
+ the next plot command will cause one more window to be created. This new
+ window will be reused as long as singlewin is in effect. If you switch back
+ to multiwin, generate some graphs, and then switch to singlewin again, the
+ orginal 'singlewin' window will be resused if it is still open. Otherwise
+ a new 'singlewin' window will be created. The 'singlewin' window is not numbered."
+
+@end example
+
+@node mf, mp, macintosh, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -11145,7 +11960,7 @@ LaTeX instead of plainTeX."
 
 The `mgr` terminal driver supports the Mgr Window system.  It has no options."
 
-@node mif, pbm, mgr, terminal
+@node mif, mtos, mgr, terminal
 @subsubsection mif
 
 @c ?commands set terminal mif
@@ -11177,7 +11992,7 @@ Syntax:
 `polyline` plots curves as continuous curves and `vectors` plots curves as
 collections of vectors.
 @ref{help} and `?` print online help on standard error output---both print a
-short description of the usage; @ref{help} also lists the options;
+short description of the usage; @ref{help} also lists the options.
 
 Examples:
 @example
@@ -11188,7 +12003,107 @@ Examples:
 
 @end example
 
-@node pbm, png_(OLD), mif, terminal
+@node mtos, next, mif, terminal
+@subsubsection mtos
+
+@c ?commands set terminal mtos
+@c ?set terminal mtos
+@c ?set term mtos
+@c ?terminal mtos
+@c ?term mtos
+@cindex mtos
+@tmindex mtos
+
+
+The `mtos` terminal has no options.  It sends data via a pipe to an external
+program called GPCLIENT.  It runs under MULTITOS, Magic 3.x, MagicMAC. and
+MiNT.  If you cannot find GPCLIENT, than mail to dirk@@lstm.uni-erlangen.de."
+
+@node next, Openstep_(next), mtos, terminal
+@subsubsection next
+
+@c ?commands set terminal next
+@c ?set terminal next
+@c ?set term next
+@c ?terminal next
+@c ?term next
+@cindex next
+
+@cindex NeXT
+
+Several options may be set in the next driver.
+
+Syntax:
+@example
+      set terminal next @{<mode>@} @{<type> @} @{<color>@} @{<dashed>@}
+                 @{"<fontname>"@} @{<fontsize>@} title @{"<newtitle>"@}
+
+@end example
+
+where <mode> is  `default`, which sets all options to their defaults;
+<type> is either `new` or `old`, where `old` invokes the old single window;
+<color> is either `color` or `monochrome`;
+<dashed> is either `solid` or `dashed`;
+"<fontname>" is the name of a valid PostScript font;
+<fontsize> is the size of the font in PostScript points; and
+<title> is the title for the GnuTerm window.
+Defaults are  `new`, `monochrome`, `dashed`, "Helvetica", 14pt.
+
+Examples:
+@example
+      set term next default
+      set term next 22
+      set term next color "Times-Roman" 14
+      set term next color "Helvetica" 12 title "MyPlot"
+      set term next old
+
+@end example
+
+Pointsizes may be changed with `set linestyle`."
+
+@node Openstep_(next), pbm, next, terminal
+@subsubsection Openstep (next)
+
+@c ?commands set terminal next
+@c ?set terminal next
+@c ?set term next
+@c ?terminal next
+@c ?term next
+@cindex next
+
+@cindex NeXT
+
+Several options may be set in the openstep (next) driver.
+
+Syntax:
+@example
+      set terminal next @{<mode>@} @{<type> @} @{<color>@} @{<dashed>@}
+                 @{"<fontname>"@} @{<fontsize>@} title @{"<newtitle>"@}
+
+@end example
+
+where <mode> is  `default`, which sets all options to their defaults;
+<type> is either `new` or `old`, where `old` invokes the old single window;
+<color> is either `color` or `monochrome`;
+<dashed> is either `solid` or `dashed`;
+"<fontname>" is the name of a valid PostScript font;
+<fontsize> is the size of the font in PostScript points; and
+<title> is the title for the GnuTerm window.
+Defaults are  `new`, `monochrome`, `dashed`, "Helvetica", 14pt.
+
+Examples:
+@example
+      set term next default
+      set term next 22
+      set term next color "Times-Roman" 14
+      set term next color "Helvetica" 12 title "MyPlot"
+      set term next old
+
+@end example
+
+Pointsizes may be changed with `set linestyle`."
+
+@node pbm, dospc, Openstep_(next), terminal
 @subsubsection pbm
 
 @c ?commands set terminal pbm
@@ -11230,7 +12145,41 @@ Examples:
 
 @end example
 
-@node png_(OLD), postscript_, pbm, terminal
+@node dospc, png_(OLD), pbm, terminal
+@subsubsection dospc
+
+@c ?commands set terminal dospc
+@c ?set terminal dospc
+@c ?set term dospc
+@c ?terminal dospc
+@c ?term dospc
+@cindex dospc
+@tmindex dospc
+
+
+The `dospc` terminal driver supports PCs with arbitrary graphics boards,
+which will be automatically detected.  It should be used only if you are
+not using the gcc or Zortec C/C++ compilers."
+@example
+   "1 pdf
+   "?commands set terminal pdf
+   "?set terminal pdf
+   "?set term pdf
+   "?terminal pdf
+   "?term pdf
+   "?pdf
+   " This terminal produces files in the Adobe Portable Document Format
+   " (PDF), useable for printing or display with tools like Acrobat Reader
+   "
+   " Syntax:
+   "       set terminal pdf @{fname "<font>"@} @{fsize <fontsize>@}
+   "
+   " where <font> is the name of the default font to use (default Helvetica)
+   " and <fontsize> is the font size (in points, default 12)"
+
+@end example
+
+@node png_(OLD), postscript_, dospc, terminal
 @subsubsection png (OLD)
 
 @c ?commands set terminal png (old)
@@ -11408,7 +12357,7 @@ section for some hints.
 Braces can be used to place multiple-character text where a single character
 is expected (e.g., 2^@{10@}).  To change the font and/or size, use the full
 form:  @{/[fontname][=fontsize | *fontscale] text@}.  Thus @{/Symbol=20 G@} is a
-20-point GAMMA) and @{/*0.75 K@} is a K at three-quarters of whatever fontsize
+20-point GAMMA and @{/*0.75 K@} is a K at three-quarters of whatever fontsize
 is currently in effect.  (The '/' character MUST be the first character after
 the '@{'.)
 
@@ -11705,7 +12654,7 @@ Specify own positioning (top here):
 
 The other label -- account for long ticlabels:
 @example
-       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}'
+       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}@}'
 
 @end example
 
@@ -11756,7 +12705,7 @@ has to do with plot scaling.  The defaults are `hacktext` and `nounit`."
 The `qms` terminal driver supports the QMS/QUIC Laser printer, the Talaris
 1200 and others.  It has no options."
 
-@node regis, rgip, qms, terminal
+@node regis, regis_, qms, terminal
 @subsubsection regis
 
 @c ?commands set terminal regis
@@ -11777,7 +12726,28 @@ Syntax:
 
 @end example
 
-@node rgip, tek410x, regis, terminal
+@node regis_, rgip, regis, terminal
+@subsubsection regis
+
+@c ?commands set terminal regis
+@c ?set terminal regis
+@c ?set term regis
+@c ?terminal regis
+@c ?term regis
+@cindex regis
+@tmindex regis
+
+
+The `regis` terminal device generates output in the REGIS graphics language.
+It has the option of using 4 (the default) or 16 colors.
+
+Syntax:
+@example
+      set terminal regis @{4 | 16@}"
+
+@end example
+
+@node rgip, sun, regis_, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -11821,7 +12791,56 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node tek410x, table, rgip, terminal
+@node sun, sun_, rgip, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node sun_, tek410x, sun, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+@example
+   "1 svg
+   "?commands set terminal svg
+   "?set terminal svg
+   "?set term svg
+   "?terminal svg
+   "?term svg
+   "?svg
+   " This terminal produces files in the W3C Scalable Vector Graphics format.
+   "
+   " Syntax:
+   "       set terminal svg @{size <x> <y>@}
+   "                        @{fname "<font>"@} @{fsize <fontsize>@}
+   "
+   " where <x> and <y> are the size of the SVG plot to generate,
+   " <font> is the name of the default font to use (default Arial) and
+   " <fontsize> is the font size (in points, default 12)"
+
+@end example
+
+@node tek410x, tek410x_, sun_, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -11836,7 +12855,22 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
 terminals.  It has no options."
 
-@node table, tek40, tek410x, terminal
+@node tek410x_, table, tek410x, terminal
+@subsubsection tek410x
+
+@c ?commands set terminal tek410x
+@c ?set terminal tek410x
+@c ?set term tek410x
+@c ?terminal tek410x
+@c ?term tek410x
+@cindex tek410x
+@tmindex tek410x
+
+
+The `tek410x` terminal driver supports the 410x and 420x family of Tektronix
+terminals.  It has no options."
+
+@node table, tek40, tek410x_, terminal
 @subsubsection table
 
 @c ?commands set terminal table
@@ -11948,7 +12982,7 @@ of any LaTeX implementation.  Please do not forget to use this package.
 
 It has no options."
 
-@node tgif, tkcanvas, texdraw, terminal
+@node tgif, tgif_, texdraw, terminal
 @subsubsection tgif
 
 @c ?commands set terminal tgif
@@ -12032,7 +13066,91 @@ Examples using the built-in multiplot mechanism:
 
 @end example
 
-@node tkcanvas, tpic, tgif, terminal
+@node tgif_, tkcanvas, tgif, terminal
+@subsubsection tgif
+
+@c ?commands set terminal tgif
+@c ?set terminal tgif
+@c ?set term tgif
+@c ?terminal tgif
+@c ?term tgif
+@cindex tgif
+@tmindex tgif
+
+
+Tgif is an X11-based drawing tool---it has nothing to do with GIF.
+
+The `tgif` driver supports different pointsizes (with @ref{pointsize}),
+different label fonts and font sizes (e.g. `set label "Hallo" at x,y font
+"Helvetica,34"`) and multiple graphs on the page.  The proportions of the
+axes are not changed.
+
+Syntax:
+@example
+      set terminal tgif @{portrait | landscape@} @{<[x,y]>@}
+                        @{solid | dashed@}
+                        @{"<fontname>"@} @{<fontsize>@}
+
+@end example
+
+where <[x,y]> specifies the number of graphs in the x and y directions on the
+page, "<fontname>" is the name of a valid PostScript font, and <fontsize>
+specifies the size of the PostScript font.  Defaults are `portrait`, `[1,1]`,
+`dashed`, `"Helvetica"`, and `18`.
+
+The `solid` option is usually prefered if lines are colored, as they often
+are in the editor.  Hardcopy will be black-and-white, so `dashed` should be
+chosen for that.
+
+Multiplot is implemented in two different ways.
+
+The first multiplot implementation is the standard gnuplot multiplot feature:
+
+@example
+      set terminal tgif
+      set output "file.obj"
+      set multiplot
+      set origin x01,y01
+      set size  xs,ys
+      plot ...
+           ...
+      set origin x02,y02
+      plot ...
+      set nomultiplot
+
+@end example
+
+See @ref{multiplot} for further information.
+
+The second version is the [x,y] option for the driver itself.  The advantage
+of this implementation is that everything is scaled and placed automatically
+without the need for setting origins and sizes; the graphs keep their natural
+x/y proportions of 3/2 (or whatever is fixed by @ref{size}).
+
+If both multiplot methods are selected, the standard method is chosen and a
+warning message is given.
+
+Examples of single plots (or standard multiplot):
+@example
+      set terminal tgif                  # defaults
+      set terminal tgif "Times-Roman" 24
+      set terminal tgif landscape
+      set terminal tgif landscape solid
+
+@end example
+
+Examples using the built-in multiplot mechanism:
+@example
+      set terminal tgif portrait [2,4]  # portrait; 2 plots in the x-
+                                        # and 4 in the y-direction
+      set terminal tgif [1,2]           # portrait; 1 plot in the x-
+                                        # and 2 in the y-direction
+      set terminal tgif landscape [3,3] # landscape; 3 plots in both
+                                        # directions"
+
+@end example
+
+@node tkcanvas, tpic, tgif_, terminal
 @subsubsection tkcanvas
 
 @c ?commands set terminal tkcanvas
@@ -12150,7 +13268,7 @@ Specify own positioning (top here):
 
 The other label -- account for long ticlabels:
 @example
-       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}'"
+       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}@}'"
 
 @end example
 
@@ -12187,7 +13305,7 @@ language.  It has no options.
 This terminal cannot be compiled if the GNU version of plot is to be used;
 in that case, use the `gnugraph` terminal instead."
 
-@node vx384, x11, unixplot, terminal
+@node vx384, vgagl, unixplot, terminal
 @subsubsection vx384
 
 @c ?commands set terminal vx384
@@ -12202,7 +13320,329 @@ in that case, use the `gnugraph` terminal instead."
 The `vx384` terminal driver supports the Vectrix 384 and Tandy color
 printers.  It has no options."
 
-@node x11, xlib, vx384, terminal
+@node vgagl, VWS, vx384, terminal
+@subsubsection vgagl
+
+@c ?commands set terminal vgagl
+@c ?set terminal vgagl
+@c ?set term vgagl
+@c ?terminal vgagl
+@c ?term vgagl
+@cindex vgagl
+@tmindex vgagl
+
+
+The `vgagl` driver is a fast linux console driver with full mouse and pm3d
+support.  It looks at the environment variable SVGALIB_DEFAULT_MODE for the
+default mode; if not set, it uses a 256 color mode with the highest
+available resolution.
+
+Syntax:
+@example
+   set terminal vgagl \\
+                background [red] [[green] [blue]] \\
+                [uniform | interpolate] \\
+                [dump "file"] \\
+                [mode]
+
+@end example
+
+The color mode can also be given with the mode option. Both Symbolic
+names as G1024x768x256 and integers are allowed. The `background` option
+takes either one or three integers in the range [0, 255]. If only one
+integers is supplied, it is taken as gray value for the background.
+If three integers are present, the background gets the corresponding
+color.
+The (mutually exclusive) options `interpolate` and `uniform` control
+if color interpolation is done while drawing triangles (on by default).
+
+A @ref{file} can be specified with the `dump "file"` option.
+If this option is present, (i.e the dump file name is not empty) pressing
+the key KP_Delete will write the file.  This action cannot and cannot be
+rebound. The file is written in raw ppm (P6) format. Note that this option
+is reset each time the `set term` command is issued.
+
+To get high resolution modes, you will probably have to modify the
+configuration file of libvga, usually /etc/vga/libvga.conf.  Using
+the VESA fb is a good choice, but this needs to be compiled in the
+kernel.
+
+The vgagl driver uses the first *available* vga mode from the following list:
+@example
+ - the driver which was supplied when setting vgagl, e.g. `set term vgagl
+   G1024x768x256` would first check, if the G1024x768x256 mode is available.
+ - the environment variable SVGALIB_DEFAULT_MODE
+ - G1024x768x256
+ - G800x600x256
+ - G640x480x256
+ - G320x200x256
+ - G1280x1024x256
+ - G1152x864x256
+ - G1360x768x256
+ - G1600x1200x256
+@end example
+
+"
+
+@node VWS, windows, vgagl, terminal
+@subsubsection VWS
+
+@c ?commands set terminal VWS
+@c ?set terminal VWS
+@c ?set term VWS
+@c ?terminal VWS
+@c ?term VWS
+@cindex VWS
+@tmindex VWS
+
+
+The `VWS` terminal driver supports the VAX Windowing System.  It has
+no options.  It will sense the display type (monochrome, gray scale,
+or color.)  All line styles are plotted as solid lines."
+
+@node windows, x11, VWS, terminal
+@subsubsection windows
+
+@c ?commands set terminal windows
+@c ?set terminal windows
+@c ?set term windows
+@c ?terminal windows
+@c ?term windows
+@cindex windows
+@tmindex windows
+
+
+Three options may be set in the `windows` terminal driver.
+
+Syntax:
+@example
+      set terminal windows @{<color>@} @{"<fontname>"@} @{<fontsize>@}
+
+@end example
+
+where `<color>` is either `color` or `monochrome`, `"<fontname>"` is the
+name of a valid Windows font, and `<fontsize>` is the size of the font in
+points.
+
+Other options may be set with the graph-menu, the initialization file,
+and `set linestyle`.
+/* Does this really belong here? If not, someone move it where it does. */
+
+The Windows version normally terminates immediately as soon as the end of
+any files given as command line arguments is reached (i.e. in non-interactive
+mode). It will also not show the text-window at all, in this mode, only
+the plot. By giving the optional argument
+`/noend` or `-noend`, you can disable this behaviour.
+
+
+@noindent --- GRAPH-MENU ---
+
+@c ?commands set terminal windows graph-menu
+@c ?set terminal windows graph-menu
+@c ?set term windows graph-menu
+@c ?windows graph-menu
+@cindex graph-menu
+@tmindex graph-menu
+
+
+The `gnuplot graph` window has the following options on a pop-up menu
+accessed by pressing the right mouse button or selecting `Options` from the
+system menu:
+
+`Bring to Top` when checked brings the graph window to the top after every
+plot.
+
+`Color` when checked enables color linestyles.  When unchecked it forces
+monochrome linestyles.
+
+`Copy to Clipboard` copies a bitmap and a Metafile picture.
+
+`Background...` sets the window background color.
+
+`Choose Font...` selects the font used in the graphics window.
+
+`Line Styles...` allows customization of the line colors and styles.
+
+`Print...` prints the graphics windows using a Windows printer driver and
+allows selection of the printer and scaling of the output.  The output
+produced by `Print` is not as good as that from `gnuplot`'s own printer
+drivers.
+
+`Update wgnuplot.ini` saves the current window locations, window sizes, text
+window font, text window font size, graph window font, graph window font
+size, background color and linestyles to the initialization file
+`WGNUPLOT.INI`.
+
+
+@noindent --- PRINTING ---
+
+@c ?commands set terminal windows printing
+@c ?set terminal windows printing
+@c ?set term windows printing
+@c ?windows printing
+@cindex printing
+@tmindex printing
+
+
+In order of preference, graphs may be be printed in the following ways.
+
+`1.` Use the `gnuplot` command @ref{terminal} to select a printer and @ref{output} to redirect output to a file.
+
+`2.` Select the `Print...` command from the `gnuplot graph` window.  An extra
+command `screendump` does this from the text window.
+
+`3.` If `set output "PRN"` is used, output will go to a temporary file.  When
+you exit from `gnuplot` or when you change the output with another @ref{output} command, a dialog box will appear for you to select a printer port.
+If you choose OK, the output will be printed on the selected port, passing
+unmodified through the print manager.  It is possible to accidentally (or
+deliberately) send printer output meant for one printer to an incompatible
+printer.
+
+
+@noindent --- TEXT-MENU ---
+
+@c ?commands set terminal windows text-menu
+@c ?set terminal windows text-menu
+@c ?set term windows text-menu
+@c ?windows text-menu
+@cindex text-menu
+@tmindex text-menu
+
+
+The `gnuplot text` window has the following options on a pop-up menu accessed
+by pressing the right mouse button or selecting `Options` from the system
+menu:
+
+`Copy to Clipboard` copies marked text to the clipboard.
+
+`Paste` copies text from the clipboard as if typed by the user.
+
+`Choose Font...` selects the font used in the text window.
+
+`System Colors` when selected makes the text window honor the System Colors
+set using the Control Panel.  When unselected, text is black or blue on a
+white background.
+
+`Update wgnuplot.ini` saves the current text window location, text window
+size, text window font and text window font size to the initialisation file
+`WGNUPLOT.INI`.
+
+`MENU BAR`
+
+If the menu file `WGNUPLOT.MNU` is found in the same directory as
+WGNUPLOT.EXE, then the menu specified in `WGNUPLOT.MNU` will be loaded.
+Menu commands:
+
+[Menu] starts a new menu with the name on the following line.
+
+[EndMenu] ends the current menu.
+
+[--] inserts a horizontal menu separator.
+
+[|] inserts a vertical menu separator.
+
+[Button] puts the next macro on a push button instead of a menu.
+
+Macros take two lines with the macro name (menu entry) on the first line and
+the macro on the second line.  Leading spaces are ignored.  Macro commands:
+
+[INPUT] --- Input string with prompt terminated by [EOS] or @{ENTER@}
+
+[EOS] --- End Of String terminator.  Generates no output.
+
+[OPEN] --- Get name of file to open from list box, with title of list box
+terminated by [EOS], followed by default filename terminated by [EOS] or
+@{ENTER@}.  This uses COMMDLG.DLL from Windows 3.1.
+
+[SAVE] --- Get name of file to save.  Similar to [OPEN]
+
+Macro character substitutions:
+
+@{ENTER@} --- Carriage Return '\\r'
+
+@{TAB@} --- Tab '\\011'
+
+@{ESC@} --- Escape '\\033'
+
+@{^A@} --- '\\001'
+
+...
+
+@{^_@} --- '\\031'
+
+Macros are limited to 256 characters after expansion.
+
+
+@noindent --- WGNUPLOT.INI ---
+
+@c ?commands set terminal windows wgnuplot.ini
+@c ?set terminal windows wgnuplot.ini
+@c ?set term windows wgnuplot.ini
+@c ?windows wgnuplot.ini
+@cindex wgnuplot.ini
+@tmindex wgnuplot.ini
+
+
+Windows `gnuplot` will read some of its options from the `[WGNUPLOT]` section
+of `WGNUPLOT.INI` in the Windows directory.  A sample `WGNUPLOT.INI` file:
+
+@example
+      [WGNUPLOT]
+      TextOrigin=0 0
+      TextSize=640 150
+      TextFont=Terminal,9
+      GraphOrigin=0 150
+      GraphSize=640 330
+      GraphFont=Arial,10
+      GraphColor=1
+      GraphToTop=1
+      GraphBackground=255 255 255
+      Border=0 0 0 0 0
+      Axis=192 192 192 2 2
+      Line1=0 0 255 0 0
+      Line2=0 255 0 0 1
+      Line3=255 0 0 0 2
+      Line4=255 0 255 0 3
+      Line5=0 0 128 0 4
+
+@end example
+
+The `GraphFont` entry specifies the font name and size in points.  The five
+numbers given in the `Border`, `Axis` and `Line` entries are the `Red`
+intensity (0--255), `Green` intensity, `Blue` intensity, `Color Linestyle`
+and `Mono Linestyle`.  `Linestyles` are 0=SOLID, 1=DASH, 2=DOT, 3=DASHDOT,
+4=DASHDOTDOT.  In the sample `WGNUPLOT.INI` file above, Line 2 is a green
+solid line in color mode, or a dashed line in monochrome mode.  The default
+line width is 1 pixel.  If `Linestyle` is negative, it specifies the width of
+a SOLID line in pixels.  Line1 and any linestyle used with the `points` style
+must be SOLID with unit width.
+
+
+@noindent --- WINDOWS3.0 ---
+
+@c ?commands set terminal windows windows3.0
+@c ?set terminal windows windows3.0
+@c ?set term windows windows3.0
+@c ?windows windows3.0
+@cindex windows3.0
+@tmindex windows3.0
+
+
+Windows 3.1 is preferred, but WGNUPLOT will run under Windows 3.0 with the
+following restrictions:
+`1.` COMMDLG.DLL and SHELL.DLL (available with Windows 3.1 or Borland C++
+3.1) must be in the windows directory.
+
+`2.` WGNUPLOT.HLP produced by Borland C++ 3.1 is in Windows 3.1 format.
+You need to use the WINHELP.EXE supplied with Borland C++ 3.1.
+
+`3.` It will not run in real mode due to lack of memory.
+
+`4.` TrueType fonts are not available in the graph window.
+
+`5.` Drag-drop does not work."
+
+@node x11, x11_, windows, terminal
 @subsubsection x11
 
 @c ?commands set terminal x11
@@ -12555,7 +13995,360 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 @end example
 
 
-@node xlib,  , x11, terminal
+@node x11_, xlib, x11, terminal
+@subsubsection x11
+
+@c ?commands set terminal x11
+@c ?set terminal x11
+@c ?set term x11
+@c ?terminal x11
+@c ?term x11
+@cindex x11
+
+@cindex X11
+
+`gnuplot` provides the `x11` terminal type for use with X servers.  This
+terminal type is set automatically at startup if the `DISPLAY` environment
+variable is set, if the `TERM` environment variable is set to `xterm`, or
+if the `-display` command line option is used.
+
+Syntax:
+@example
+   set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
+   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
+
+@end example
+
+Multiple plot windows are supported: `set terminal x11 <n>` directs the
+output to plot window number n.  If n>0, the terminal number will be
+appended to the window title and the icon will be labeled `gplt <n>`.
+The active window may distinguished by a change in cursor (from default
+to crosshair.)
+
+X11 fonts:
+A preferred default font may be specified to the x11 driver using
+@example
+     `set term x11 font "<fontspec>"`
+@end example
+
+The driver first queries the X-server for a font of the exact name given,
+for example `set term x11 font "lucidasans-10"`. If this query fails, then
+the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+and to construct a full X11 font name of the form
+@example
+      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+@end example
+
+<font> is the base name of the font (e.g. Times or Symbol)
+<size> is the point size (defaults to 12 if not specified)
+<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+<encoding> is set based on the current character set (help set encoding)
+So `set term x11 font "arial,15,italic"` will be translated to
+-*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The driver also recognizes some common PostScript font names and
+replaces them with possible X11 or TrueType equivalents.
+This same sequence is used to process font requests from @ref{label}.
+
+Plot windows remain open even when the `gnuplot` driver is changed to a
+different device.  A plot window can be closed by pressing the letter q
+while that window has input focus, or by choosing `close` from a window
+manager menu.  All plot windows can be closed by specifying @ref{reset}, which
+actually terminates the subprocess which maintains the windows (unless
+`-persist` was specified).
+
+The option `driver` can be used to specify a driver different from the
+default driver `gnuplot_x11`. This options is thought mainly for developers
+who are working on new driver features. Note that changing the driver will
+shut down the connection to the previous driver. Example:
+@example
+    gnuplot> set term x11 driver "gnuplot_x11_38a"
+
+@end example
+
+The gnuplot outboard driver, gnuplot_x11, is searched in a default place
+chosen when the program is compiled.  You can override that by defining
+the environment variable GNUPLOT_DRIVER_DIR to point to a different
+location.
+
+Plot windows will automatically be closed at the end of the session
+unless the `-persist` option was given.
+
+The options `persist` and `raise` are unset by default, which means that
+the defaults (persist == no and raise == yes) or the command line options
+-persist / -raise or the Xresources are taken.  If [no]persist or
+[no]raise are specified, they will override command line options and
+Xresources.  Setting one of these options takes place immediately, so
+the behaviour of an already running driver can be modified.
+
+The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
+window.
+
+Linewidths and pointsizes may be changed from within `gnuplot` with
+`set linestyle`.
+
+For terminal type `x11`, `gnuplot` accepts (when initialized) the standard
+X Toolkit options and resources such as geometry, font, and name from the
+command line arguments or a configuration file.  See the X(1) man page
+(or its equivalent) for a description of such options.
+
+A number of other `gnuplot` options are available for the `x11` terminal.
+These may be specified either as command-line options when `gnuplot` is
+invoked or as resources in the configuration file ".Xdefaults".  They are
+set upon initialization and cannot be altered during a `gnuplot` session.
+(except `persist` and `raise`)
+
+
+@noindent --- COMMAND-LINE_OPTIONS ---
+
+@c ?commands set terminal x11 command-line-options
+@c ?set terminal x11 command-line-options
+@c ?set term x11 command-line-options
+@c ?x11 command-line-options
+@cindex command-line-options
+
+In addition to the X Toolkit options, the following options may be specified
+on the command line when starting `gnuplot` or as resources in your
+".Xdefaults" file (note that `raise` and `persist` can be overridden
+later by `set term x11 [no]raise [no]persist)`:
+
+@example
+ `-mono`     forces monochrome rendering on color displays.
+ `-gray`     requests grayscale rendering on grayscale or color displays.
+             (Grayscale displays receive monochrome rendering by default.)
+ `-clear`    requests that the window be cleared momentarily before a
+             new plot is displayed.
+ `-tvtwm`    requests that geometry specifications for position of the
+             window be made relative to the currently displayed portion
+             of the virtual root.
+ `-raise`    raises plot window after each plot
+ `-noraise`  does not raise plot window after each plot
+ `-noevents` does not process mouse and key events
+ `-persist`  plot windows survive after main gnuplot program exits
+
+@end example
+
+The options are shown above in their command-line syntax.  When entered as
+resources in ".Xdefaults", they require a different syntax.
+
+Example:
+@example
+      gnuplot*gray: on
+
+@end example
+
+`gnuplot` also provides a command line option (`-pointsize <v>`) and a
+resource, `gnuplot*pointsize: <v>`, to control the size of points plotted
+with the `points` plotting style.  The value `v` is a real number (greater
+than 0 and less than or equal to ten) used as a scaling factor for point
+sizes.  For example, `-pointsize 2` uses points twice the default size, and
+`-pointsize 0.5` uses points half the normal size.
+
+The `-noevents` switch disables all mouse and key event processing (except
+for `q` and `<space>` for closing the window). This is useful for programs
+which use the x11 driver independent of the gnuplot main program.
+
+
+@noindent --- MONOCHROME_OPTIONS ---
+
+@c ?commands set terminal x11 monochrome_options
+@c ?set terminal x11 monochrome_options
+@c ?set term x11 monochrome_options
+@c ?x11 monochrome_options
+@cindex monochrome_options
+
+For monochrome displays, `gnuplot` does not honor foreground or background
+colors.  The default is black-on-white.  `-rv` or `gnuplot*reverseVideo: on`
+requests white-on-black.
+
+
+
+@noindent --- COLOR_RESOURCES ---
+
+@c ?commands set terminal x11 color_resources
+@c ?set terminal x11 color_resources
+@c ?set term x11 color_resources
+@c ?x11 color_resources
+@cindex color_resources
+
+For color displays, `gnuplot` honors the following resources (shown here
+with their default values) or the greyscale resources.  The values may be
+color names as listed in the X11 rgb.txt file on your system, hexadecimal
+RGB color specifications (see X11 documentation), or a color name followed
+by a comma and an `intensity` value from 0 to 1.  For example, `blue, 0.5`
+means a half intensity blue.
+
+@example
+ gnuplot*background:  white
+ gnuplot*textColor:   black
+ gnuplot*borderColor: black
+ gnuplot*axisColor:   black
+ gnuplot*line1Color:  red
+ gnuplot*line2Color:  green
+ gnuplot*line3Color:  blue
+ gnuplot*line4Color:  magenta
+ gnuplot*line5Color:  cyan
+ gnuplot*line6Color:  sienna
+ gnuplot*line7Color:  orange
+ gnuplot*line8Color:  coral
+
+@end example
+
+
+The command-line syntax for these is, for example,
+
+Example:
+@example
+      gnuplot -background coral
+
+@end example
+
+
+
+@noindent --- GRAYSCALE_RESOURCES ---
+
+@c ?commands set terminal x11 grayscale_resources
+@c ?set terminal x11 grayscale_resources
+@c ?set term x11 grayscale_resources
+@c ?x11 grayscale_resources
+@cindex grayscale_resources
+
+When `-gray` is selected, `gnuplot` honors the following resources for
+grayscale or color displays (shown here with their default values).  Note
+that the default background is black.
+
+@example
+ gnuplot*background: black
+ gnuplot*textGray:   white
+ gnuplot*borderGray: gray50
+ gnuplot*axisGray:   gray50
+ gnuplot*line1Gray:  gray100
+ gnuplot*line2Gray:  gray60
+ gnuplot*line3Gray:  gray80
+ gnuplot*line4Gray:  gray40
+ gnuplot*line5Gray:  gray90
+ gnuplot*line6Gray:  gray50
+ gnuplot*line7Gray:  gray70
+ gnuplot*line8Gray:  gray30
+
+@end example
+
+
+
+
+@noindent --- LINE_RESOURCES ---
+
+@c ?commands set terminal x11 line_resources
+@c ?set terminal x11 line_resources
+@c ?set term x11 line_resources
+@c ?x11 line_resources
+@cindex line_resources
+
+`gnuplot` honors the following resources for setting the width (in pixels) of
+plot lines (shown here with their default values.)  0 or 1 means a minimal
+width line of 1 pixel width.  A value of 2 or 3 may improve the appearance of
+some plots.
+
+@example
+ gnuplot*borderWidth: 2
+ gnuplot*axisWidth:   0
+ gnuplot*line1Width:  0
+ gnuplot*line2Width:  0
+ gnuplot*line3Width:  0
+ gnuplot*line4Width:  0
+ gnuplot*line5Width:  0
+ gnuplot*line6Width:  0
+ gnuplot*line7Width:  0
+ gnuplot*line8Width:  0
+
+@end example
+
+
+`gnuplot` honors the following resources for setting the dash style used for
+plotting lines.  0 means a solid line.  A two-digit number `jk` (`j` and `k`
+are >= 1  and <= 9) means a dashed line with a repeated pattern of `j` pixels
+on followed by `k` pixels off.  For example, '16' is a "dotted" line with one
+pixel on followed by six pixels off.  More elaborate on/off patterns can be
+specified with a four-digit value.  For example, '4441' is four on, four off,
+four on, one off.  The default values shown below are for monochrome displays
+or monochrome rendering on color or grayscale displays.  For color displays,
+the default for each is 0 (solid line) except for `axisDashes` which defaults
+to a '16' dotted line.
+
+@example
+ gnuplot*borderDashes:   0
+ gnuplot*axisDashes:    16
+ gnuplot*line1Dashes:    0
+ gnuplot*line2Dashes:   42
+ gnuplot*line3Dashes:   13
+ gnuplot*line4Dashes:   44
+ gnuplot*line5Dashes:   15
+ gnuplot*line6Dashes: 4441
+ gnuplot*line7Dashes:   42
+ gnuplot*line8Dashes:   13
+
+@end example
+
+, "
+
+
+@noindent --- PM3D_RESOURCES ---
+
+@c ?commands set terminal x11 pm3d_resources
+@c ?set terminal x11 pm3d_resources
+@c ?set term x11 pm3d_resources
+@c ?x11 pm3d_resources
+@cindex pm3d_resources
+
+Choosing the appropriate visual class and number of colors is a crucial
+point in X11 applications and a bit awkward, since X11 supports six visual
+types in different depths.
+
+By default `gnuplot` uses the default visual of the screen. The number of
+colors which can be allocated depends on the visual class chosen. On a
+visual class with a depth > 12bit, gnuplot starts with a maximal number
+of 0x200 colors.  On a visual class with a depth > 8bit (but <= 12 bit)
+the maximal number of colors is 0x100, on <= 8bit displays the maximum
+number of colors is 240 (16 are left for line colors).
+
+Gnuplot first starts to allocate the maximal number of colors as stated
+above.  If this fails, the number of colors is reduced by the factor 2
+until gnuplot gets all colors wich are requested. If dividing `maxcolors`
+by 2 repeatedly results in a number which is smaller than `mincolors`
+`gnuplot` tries to install a private colormap. In this case the window
+manager is responsible for swapping colormaps when the pointer is moved
+in and out the x11 driver's window.
+
+The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8,
+where num_colormaps is the number of colormaps which are currently used
+by gnuplot (usually 1, if only one x11 window is open).
+
+Some systems support multiple (different) visual classes together on one
+screen. On these systems it might be necessary to force gnuplot to use a
+specific visual class, e.g. the default visual might be 8bit PseudoColor
+but the screen would also support 24bit TrueColor which would be the
+preferred choice.
+
+The information about an Xserver's capabilities can be obtained with the
+program `xdpyinfo`.  For the visual names below you can choose one of
+StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor, DirectColor.
+If an Xserver supports a requested visual type at different depths,
+`gnuplot` chooses the visual class with the highest depth (deepest).
+If the requested visual class matches the default visual and multiple
+classes of this type are supported, the default visual is preferred.
+
+Example: on an 8bit PseudoColor visual you can force a private color map
+by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
+
+
+@example
+ gnuplot*maxcolors:  <integer number>
+ gnuplot*mincolors:  <integer number>
+ gnuplot*visual:     <visual name>
+
+@end example
+
+
+@node xlib, xlib_, x11_, terminal
 @subsubsection xlib
 
 @c ?commands set terminal xlib
@@ -12568,7 +14361,23 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 
 The `xlib` terminal driver supports the X11 Windows System.  It generates
-gnulib_x11 commands.  `set term x11` behaves similarly to `set terminal xlib;
+gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;
+set output "|gnuplot_x11"`.  `xlib` has no options, but see `x11`."
+
+@node xlib_,  , xlib, terminal
+@subsubsection xlib
+
+@c ?commands set terminal xlib
+@c ?set terminal xlib
+@c ?set term xlib
+@c ?terminal xlib
+@c ?term xlib
+@cindex xlib
+@tmindex xlib
+
+
+The `xlib` terminal driver supports the X11 Windows System.  It generates
+gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;
 set output "|gnuplot_x11"`.  `xlib` has no options, but see `x11`."
 
 @node tics, ticslevel, terminal, set-show

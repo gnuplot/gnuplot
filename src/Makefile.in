@@ -92,6 +92,8 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
+
+# There is probably no need to edit anything below this line
 GNUPLOT_X11 = @GNUPLOT_X11@
 
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
@@ -104,10 +106,6 @@ HELPFILE = $(datadir)/gnuplot.gih
 
 # Default X11 driver location
 X11_DRIVER_DIR = $(pkglibdir)/$(PKG_MAJOR)
-
-
-# There is probably no need to edit anything below this line
-CLEANFILES = getcolor_x11.c
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot
 noinst_PROGRAMS = bf_test $(GNUPLOT_X11)
@@ -132,9 +130,9 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c getcolor_x11.c gpexecute.c gpexecute.h mousecmn.h
+gnuplot_x11_SOURCES = gplt_x11.c gpexecute.c gpexecute.h mousecmn.h
 
-gnuplot_x11_LDADD = $(XLIBS)
+gnuplot_x11_LDADD = getcolor_x11.o $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 
@@ -157,10 +155,10 @@ COREOBJS = alloc.$(O) axis.$(O) binary.$(O) bitmap.$(O) color.$(O) \
 command.$(O) contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) \
 gadgets.$(O) getcolor.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
 hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) matrix.$(O) \
-misc.$(O) mouse.$(O) parse.$(O) plot2d.$(O) plot3d.$(O) plot.$(O) \
+misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) \
 pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) \
 specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) term.$(O) time.$(O) \
-unset.$(O) util3d.$(O) util.$(O) variable.$(O)
+unset.$(O) util.$(O) util3d.$(O) variable.$(O)
 
 
 # List of terminal driver sources
@@ -168,18 +166,18 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm \
 $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
 $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm \
-$(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm $(T)gif.trm \
-$(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm $(T)hp2648.trm \
-$(T)hp26.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm \
-$(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm \
-$(T)mac.trm $(T)metafont.trm $(T)metapost.trm $(T)mgr.trm $(T)mif.trm \
-$(T)multitos.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm \
-$(T)pdf.trm $(T)pm.trm $(T)png.trm $(T)post.trm $(T)pslatex.trm \
-$(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm \
-$(T)svg.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm $(T)texdraw.trm \
-$(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm \
-$(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm $(T)x11.trm \
-$(T)xlib.trm
+$(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \
+$(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm \
+$(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm \
+$(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)jpeg.trm $(T)kyo.trm \
+$(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
+$(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm \
+$(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
+$(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm \
+$(T)sun.trm $(T)svg.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm \
+$(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm \
+$(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm \
+$(T)x11.trm $(T)xlib.trm
 
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -187,7 +185,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 EXTRA_PROGRAMS = gnuplot_x11$(EXEEXT)
 bin_PROGRAMS = gnuplot$(EXEEXT)
-noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)
+noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
 am_bf_test_OBJECTS = bf_test$U.$(OBJEXT) binary$U.$(OBJEXT) \
@@ -214,10 +212,9 @@ am_gnuplot_OBJECTS = alloc$U.$(OBJEXT) axis$U.$(OBJEXT) \
 gnuplot_OBJECTS = $(am_gnuplot_OBJECTS)
 gnuplot_DEPENDENCIES =
 gnuplot_LDFLAGS =
-am_gnuplot_x11_OBJECTS = gplt_x11$U.$(OBJEXT) getcolor_x11$U.$(OBJEXT) \
-	gpexecute$U.$(OBJEXT)
+am_gnuplot_x11_OBJECTS = gplt_x11$U.$(OBJEXT) gpexecute$U.$(OBJEXT)
 gnuplot_x11_OBJECTS = $(am_gnuplot_x11_OBJECTS)
-gnuplot_x11_DEPENDENCIES =
+gnuplot_x11_DEPENDENCIES = getcolor_x11.o
 gnuplot_x11_LDFLAGS =
 
 DEFS = @DEFS@
@@ -234,7 +231,6 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/datafile$U.Po $(DEPDIR)/dynarray$U.Po \
 @AMDEP_TRUE@	$(DEPDIR)/eval$U.Po $(DEPDIR)/fit$U.Po \
 @AMDEP_TRUE@	$(DEPDIR)/gadgets$U.Po $(DEPDIR)/getcolor$U.Po \
-@AMDEP_TRUE@	$(DEPDIR)/getcolor_x11$U.Po \
 @AMDEP_TRUE@	$(DEPDIR)/gpexecute$U.Po $(DEPDIR)/gplt_x11$U.Po \
 @AMDEP_TRUE@	$(DEPDIR)/graph3d$U.Po $(DEPDIR)/graphics$U.Po \
 @AMDEP_TRUE@	$(DEPDIR)/help$U.Po $(DEPDIR)/hidden3d$U.Po \
@@ -349,7 +345,6 @@ mostlyclean-kr:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/fit$U.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gadgets$U.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getcolor$U.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/getcolor_x11$U.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gpexecute$U.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gplt_x11$U.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/graph3d$U.Po@am__quote@
@@ -434,8 +429,6 @@ gadgets_.c: gadgets.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gadgets.c; then echo $(srcdir)/gadgets.c; else echo gadgets.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gadgets_.c || rm -f gadgets_.c
 getcolor_.c: getcolor.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor.c; then echo $(srcdir)/getcolor.c; else echo getcolor.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_.c || rm -f getcolor_.c
-getcolor_x11_.c: getcolor_x11.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/getcolor_x11.c; then echo $(srcdir)/getcolor_x11.c; else echo getcolor_x11.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > getcolor_x11_.c || rm -f getcolor_x11_.c
 gpexecute_.c: gpexecute.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gpexecute.c; then echo $(srcdir)/gpexecute.c; else echo gpexecute.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gpexecute_.c || rm -f gpexecute_.c
 gplt_x11_.c: gplt_x11.c $(ANSI2KNR)
@@ -512,16 +505,16 @@ alloc_.$(OBJEXT) amiga_.$(OBJEXT) axis_.$(OBJEXT) bf_test_.$(OBJEXT) \
 binary_.$(OBJEXT) bitmap_.$(OBJEXT) color_.$(OBJEXT) command_.$(OBJEXT) \
 contour_.$(OBJEXT) corplot_.$(OBJEXT) datafile_.$(OBJEXT) \
 dynarray_.$(OBJEXT) eval_.$(OBJEXT) fit_.$(OBJEXT) gadgets_.$(OBJEXT) \
-getcolor_.$(OBJEXT) getcolor_x11_.$(OBJEXT) gpexecute_.$(OBJEXT) \
-gplt_x11_.$(OBJEXT) graph3d_.$(OBJEXT) graphics_.$(OBJEXT) \
-help_.$(OBJEXT) hidden3d_.$(OBJEXT) history_.$(OBJEXT) \
-internal_.$(OBJEXT) interpol_.$(OBJEXT) matrix_.$(OBJEXT) \
-misc_.$(OBJEXT) mouse_.$(OBJEXT) os9_.$(OBJEXT) parse_.$(OBJEXT) \
-plot_.$(OBJEXT) plot2d_.$(OBJEXT) plot3d_.$(OBJEXT) pm3d_.$(OBJEXT) \
-readline_.$(OBJEXT) save_.$(OBJEXT) scanner_.$(OBJEXT) set_.$(OBJEXT) \
-show_.$(OBJEXT) specfun_.$(OBJEXT) standard_.$(OBJEXT) stdfn_.$(OBJEXT) \
-strftime_.$(OBJEXT) tables_.$(OBJEXT) term_.$(OBJEXT) time_.$(OBJEXT) \
-unset_.$(OBJEXT) util_.$(OBJEXT) util3d_.$(OBJEXT) variable_.$(OBJEXT) \
+getcolor_.$(OBJEXT) gpexecute_.$(OBJEXT) gplt_x11_.$(OBJEXT) \
+graph3d_.$(OBJEXT) graphics_.$(OBJEXT) help_.$(OBJEXT) \
+hidden3d_.$(OBJEXT) history_.$(OBJEXT) internal_.$(OBJEXT) \
+interpol_.$(OBJEXT) matrix_.$(OBJEXT) misc_.$(OBJEXT) mouse_.$(OBJEXT) \
+os9_.$(OBJEXT) parse_.$(OBJEXT) plot_.$(OBJEXT) plot2d_.$(OBJEXT) \
+plot3d_.$(OBJEXT) pm3d_.$(OBJEXT) readline_.$(OBJEXT) save_.$(OBJEXT) \
+scanner_.$(OBJEXT) set_.$(OBJEXT) show_.$(OBJEXT) specfun_.$(OBJEXT) \
+standard_.$(OBJEXT) stdfn_.$(OBJEXT) strftime_.$(OBJEXT) \
+tables_.$(OBJEXT) term_.$(OBJEXT) time_.$(OBJEXT) unset_.$(OBJEXT) \
+util_.$(OBJEXT) util3d_.$(OBJEXT) variable_.$(OBJEXT) \
 version_.$(OBJEXT) vms_.$(OBJEXT) : $(ANSI2KNR)
 uninstall-info-am:
 
@@ -674,7 +667,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES) stamp-h stamp-h[0-9]*
@@ -742,8 +734,8 @@ uninstall-info: uninstall-info-recursive
 	uninstall-recursive
 
 
-getcolor_x11.c: getcolor.c 
-	 $(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DGPLT_X11_MODE -o getcolor_x11.c $(srcdir)/getcolor.c 
+getcolor_x11.o: getcolor.c
+	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c
 # begin makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
