@@ -190,7 +190,7 @@ TERM_PUBLIC void PSLATEX_init()
 	/* assume file name is ending in ".tex" */
 	if (PSLATEX_psfile)
 	    free(PSLATEX_psfile);
-	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 3, "pslatex aux filename");
+	PSLATEX_psfile = gp_alloc(dotIndex - outstr + 4, "pslatex aux filename");
 	if (PSLATEX_psfile) {
 	/* including . */
 	    safe_strncpy(PSLATEX_psfile, outstr, dotIndex - outstr + 2);
