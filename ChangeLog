@@ -1,3 +1,28 @@
+1999-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Remove all doc2info and doc2html related targets.
+	Use makeinfo for both info and html targets.
+
+	* docs/doc2html.c, docs/doc2info.c,docs/fixinfo.el: Remove. 
+
+	* src/Makefile.maint: Comment out version.c target.
+
+	* src/hidden3d, src/save.c: Fix writing of save files with new
+	syntax.
+
+	* src/save.c, src/show.c: In the SAVE/SHOW_NUM_OR_TIME macro, add a
+	'#' to the format specifier in the fprintf() call. This adds a decimal
+	point to the saved 'set ?range' commands to prevent integer overflow
+	on 16 bit platforms when the saved commands are loaded.
+
+	* src/unset.c: Fix bug in unset style command.
+
+1999-10-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Remove doc2texi.pl from EXTRA_DIST.
+
+	* docs/doc2texi.pl: Remove.
+
 1999-10-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config/makefile.amg: Updated.
@@ -43,7 +68,8 @@
 
 	* configure.in: Better test for whether math library is needed.
 
-	* src/plot2d.c: Rename variables, move some code into different places.
+	* src/plot2d.c: Rename variables, move some code into different
+	places.
 
 	* src/tables.c, src/tables.h: Add table for plot axes/axis option.
 
@@ -54,7 +80,8 @@
 
 1999-10-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* config/makefile.win, src/plot.h: Updated for newer Borland compilers.
+	* config/makefile.win, src/plot.h: Updated for newer Borland
+	compilers.
 
 	* src/graph3d.c: Fix for 'set key below' bug.
 
