@@ -2049,7 +2049,7 @@ static int iPatt[8][9]
     { 500, 200, 150, 200,  -1,   0,   0,   0,  0 }
     } ;
 
-int LMove( HPS hps, POINTL *p )
+void LMove( HPS hps, POINTL *p )
     {
     double ds, dx, dy ;
     if( iLinebegin ) {
