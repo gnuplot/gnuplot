@@ -1,11 +1,18 @@
-2002-01-27  Johannes Zellner  <johannes@zellner.org>
+2002-01-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* term/ggi.trm: remove stdin buffering like in x11
+	* INSTALL, README: Fix references to distribution files.
+
+	* configure.in: Fix libpng and libpdf tests so that these libraries
+	are always searched for. Remove "EXPERIMENTAL" notice for pdf driver.
+	Clean fix for non-zero exit code problem.
 
 2002-01-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graph3d.c (plot3d_lines_pm3d): Fix line misordering in
  	color_axis handling.
+
+2002-01-27  Johannes Zellner  <johannes@zellner.org>
+	* term/ggi.trm: remove stdin buffering like in x11
 
 2002-01-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -17,6 +24,13 @@
 	* pm3d/demo/pm3dColumn.gpi: a 90 deg rotated 3d sinc which
  	demonstrates the difference between coloring according to the z
  	value and according to a specific data column.
+
+2002-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/cgi.trm: By permission of the original author, Ronald Florence,
+	remove the non-commercial use clause and switch to gnuplot license.
+
+	* term/metafont.trm: Fix typo (lowerrcase instead of lowercase).
 
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
