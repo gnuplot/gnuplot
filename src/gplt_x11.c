@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.102 2004/06/21 03:58:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.103 2004/07/01 17:10:04 broeker Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4342,6 +4342,11 @@ char *fontname;
 
     if (!fontname)
 	fontname = FallbackFont;
+
+    /* Release current font. This is inefficient, but plugs a memory leak. */
+    if (font)
+	XFreeFont(dpy, font);
+	
     font = XLoadQueryFont(dpy, fontname);
 
     if (!font) {

@@ -1,3 +1,12 @@
+2004-10-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/gplt_x11.c (pr_font): Release current font before loading a new
+	one. This is inefficient, but plugs a substantial memory leak.
+
+	* term/x11.trm (X11_graphics): Initialize X11_last_font_used at the
+	start of every plot. Fixes font problems caused by multiple plot
+	windows with different default fonts.
+
 2004-09-20  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (enhanced_recursion): Pass unescaped backslash character

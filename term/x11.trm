@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.113 2004/06/07 05:33:00 sfeam Exp $
+ * $Id: x11.trm,v 1.114 2004/07/01 17:10:35 broeker Exp $
  *
  */
 
@@ -1099,6 +1099,7 @@ X11_graphics()
     }
 #endif
     /* Force default font at start of plot */
+    *X11_last_font_used = '\01';
     X11_set_default_font();
     X11_set_font("");
 }
