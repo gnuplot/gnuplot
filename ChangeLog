@@ -1,3 +1,13 @@
+1999-06-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Add ansi2knr stuff, include makefile.all.
+
+	* src/Makefile.maint: Add ansi2knr.
+
+	* src/ansi2knr.c, srcansi2knr.1: New files from automake distribution,
+	to prepare for transparent compilation of ANSI/ISO C with K&R
+	compilers.
+
 1999-06-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Codestyle: Add note about #error and #warning directives.
