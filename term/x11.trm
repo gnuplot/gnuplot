@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.98 2004/02/23 13:27:13 broeker Exp $
+ * $Id: x11.trm,v 1.99 2004/02/27 06:39:43 mikulik Exp $
  *
  */
 
@@ -1682,7 +1682,7 @@ START_HELP(x11)
 "  <size> is the point size (defaults to 12 if not specified)",
 "  <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
 "  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`",
-"  <encoding> is set based on the current character set (`help set encoding`).",
+"  <encoding> is set based on the current character set (see help for `set encoding`).",
 " So `set term x11 font \"arial,15,italic\"` will be translated to",
 " -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).",
 " The <size>, <slant>, and <weight> specifications are all optional.",
@@ -1979,7 +1979,6 @@ START_HELP(x11)
 "?x11 pm3d_resources",
 "?pm3d_resources",
 "?x11 pm3d",
-"?help x11 pm3d",
 " Choosing the appropriate visual class and number of colors is a crucial",
 " point in X11 applications and a bit awkward, since X11 supports six visual",
 " types in different depths.",

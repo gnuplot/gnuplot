@@ -1,3 +1,7 @@
+2004-03-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc term/x11.trm: Fix entries appearing in 'help help'.
+
 2004-02-27  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* term/mif.trm: Revise #ifdef so that it compiles if you select
