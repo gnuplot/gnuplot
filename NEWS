@@ -11,7 +11,7 @@ Changes in release 3.7.1:
 * Windows linestyle fixed
 * introduce layers (front, back) for labels and arrows
 * tiny and giant fonts added to gif driver
-* tilde expansion; (does not for for "cd" and "set output")
+* tilde expansion; (does not work for "cd" and "set output")
 * GNU readline related:
     new syntax for --with-readline option in configure
     no more duplicate history entries
