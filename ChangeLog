@@ -1,6 +1,26 @@
+2000-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/Makefile.dst, lisp/Makefile.in, lisp/gnuplot.el,
+	lisp/gpelcard.tex: Update to gnuplot-mode 0.5k (long overdue).
+
+	* lisp/Makefile.in: Add gnuplot.el and gnuplot-gui.el to install
+	target, patch by Ralf Ahlbrink <ahlbrink@uos.de>.
+
+	* lisp/Makefile.in: Add DESTDIR support.
+
+	* src/Makefile.am: Add new README to EXTRA_DIST.
+
+	* term/cgm.trm: Correct LaTex table width in term doc section, patch
+	by Ralf Ahlbrink <ahlbrink@uos.de>.
+
+2000-11-03  "Bernardo A. Mello"  <bernardo@unb.br> 
+
+	* docs/psdoc/ps_symbols.gpi: Show not only the symbols, but also
+	the lines corresponding to each code.
+
 2000-11-03  Johannes Zellner  <johannes@zellner.org>
 
-	* src/gpexecute.inc: splitted into src/gpexecute.c
+	* src/gpexecute.inc: split into src/gpexecute.c
 	/ src/gpexecute.h.  Updated src/Makefile.am so that
 	gnuplot_x11 uses also gpexecute.o. Removed the
 	USE_NONBLOCKING_STDOUT definition, it wasn't configurable
