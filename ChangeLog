@@ -1,5 +1,10 @@
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
+	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support
+	for the pdf driver
+
+2002-05-16  Johannes Zellner  <johannes@zellner.org>
+
 	* term/pdf.trm: small changes for error messages
 
 2002-05-15  Johannes Zellner  <johannes@zellner.org>
@@ -431,7 +436,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/15 20:56:26 $).
+	last modification date (from the tag $Date: 2002/05/15 21:06:28 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
