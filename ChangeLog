@@ -1,3 +1,10 @@
+2004-08-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/set.c (set_print set_output):  Do not chop whitespace from the
+	front of input string; it causes a segfault when the string is freed.
+	If we really need to strip whitespace from filenames, it should be done
+	in a routine shared by all callers.
+
 2004-08-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/graphics.c (place_arrows): Restore default text color after

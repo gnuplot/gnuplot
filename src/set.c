@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.138 2004/07/20 05:22:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.139 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2170,9 +2170,6 @@ set_output()
 	static char *testfile = NULL;
 	m_quote_capture(&testfile,c_token, c_token); /* reallocs store */
 	gp_expand_tilde(&testfile);
-	/* Skip leading whitespace */
-	while (isspace((unsigned char)*testfile))
-	    testfile++;
 	c_token++;
 	term_set_output(testfile);
 	/* if we get here then it worked, and outstr now = testfile */
@@ -2197,9 +2194,6 @@ set_print()
 
 	m_quote_capture(&testfile, c_token, c_token); /* reallocs store */
 	gp_expand_tilde(&testfile);
-	/* Skip leading whitespace */
-	while (isspace((unsigned char)*testfile))
-	    testfile++;
 	c_token++;
 	if (!END_OF_COMMAND) {
 	    if (equals(c_token, "append")) {
