@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: ggi.trm,v 1.2 2000/10/22 11:13:00 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -42,9 +42,12 @@
  */
 
 #include "driver.h"
+
 #ifdef TERM_REGISTER
 register_term(ggi)
 #endif
+
+#ifdef TERM_PROTO
 
 #include <ggi/ggi.h>
 #ifdef USE_MOUSE
@@ -53,8 +56,6 @@ register_term(ggi)
 /* #include <ggi/gii.h> */
 /* #include <ggi/wmh.h> */
 
-
-#ifdef TERM_PROTO
 TERM_PUBLIC void GGI_graphics __PROTO((void));
 TERM_PUBLIC void GGI_set_size __PROTO((void));
 TERM_PUBLIC void GGI_init __PROTO((void));
@@ -73,6 +74,12 @@ TERM_PUBLIC void GGI_vector __PROTO((unsigned int,unsigned int));
 #ifdef USE_MOUSE
 
 /* zoom box information */
+
+typedef struct  {
+    int x;
+    int y;
+} GGI_point_t;
+
 typedef struct {
     int x;
     int y;
@@ -80,16 +87,6 @@ typedef struct {
     int height;
     char str[0xff];
 } GGI_vertex_t;
-
-typedef struct {
-    int x;
-    int y;
-} GGI_point_t;
-
-static GGI_vertex_t GGI_zoom[2][2];
-static GGI_vertex_t GGI_stl_vertex;
-static GGI_point_t GGI_ruler = {-1, -1};
-static GGI_point_t GGI_zoombox[2] = {{-1, -1}, {-1, -1}};
 
 TERM_PUBLIC long int GGI_SetTime(const struct timeval* current);
 TERM_PUBLIC int GGI_from_keysym __PROTO((uint32 keysym));
@@ -117,6 +114,28 @@ TERM_PUBLIC void GGI_clear_vline __PROTO((int y1, int y2, int x));
 TERM_PUBLIC void GGI_draw_hline __PROTO((int x1, int x2, int y));
 TERM_PUBLIC void GGI_draw_vline __PROTO((int y1, int y2, int x));
 TERM_PUBLIC void GGI_set_clipboard __PROTO((const char[]));
+#endif /* USE_MOUSE */
+
+#define GOT_GGI_PROTO
+#endif
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#define GGI_XMAX 800
+#define GGI_YMAX 600
+#define GGI_VCHAR 8
+#define GGI_HCHAR 8
+#define GGI_VTIC 8
+#define GGI_HTIC 8
+
+
+#ifdef USE_MOUSE
+static GGI_vertex_t GGI_zoom[2][2];
+static GGI_vertex_t GGI_stl_vertex;
+static GGI_point_t GGI_ruler = {-1, -1};
+static GGI_point_t GGI_zoombox[2] = {{-1, -1}, {-1, -1}};
+
 static struct timeval GGI_timestamp;
 static int GGI_mouse_x = 0;
 static int GGI_mouse_y = 0;
@@ -127,21 +146,8 @@ static int GGI_font_width = 0;
 static int GGI_font_height = 0;
 static int GGI_saved_canvas = 0;
 static int GGI_saved_stl = 0;
-
-#endif /* USE_MOUSE */
-
-#define GOT_GGI_PROTO
 #endif
 
-#define GGI_XMAX 800
-#define GGI_YMAX 600
-#define GGI_VCHAR 8
-#define GGI_HCHAR 8
-#define GGI_VTIC 8
-#define GGI_HTIC 8
-
-#ifndef TERM_PROTO_ONLY
-#ifdef TERM_BODY
 
 /* First to some global variables
  *
