@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.17 2004/07/03 06:08:50 sfeam Exp $
+ * $Id: util.h,v 1.18 2004/07/13 14:11:24 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -90,10 +90,10 @@ void int_error __PROTO((int, const char *, ...));
 void int_warn __PROTO((int, const char *, ...));
 void graph_error __PROTO((const char *, ...));
 #else
-void os_error __PROTO((void));
-void int_error __PROTO((void));
-void int_warn __PROTO((void));
-void graph_error __PROTO((void));
+void os_error __PROTO(());
+void int_error __PROTO(());
+void int_warn __PROTO(());
+void graph_error __PROTO(());
 #endif
 
 /* Helper functions for help_command() */

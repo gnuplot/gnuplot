@@ -1,3 +1,9 @@
+2004-07-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util.h (os_error, int_error, int_warn, graph_error):
+	Reverted change to prototypes for non-ANSI case back from (void)
+	to ().
+
 2004-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_bars plot_betweencurves): If the current
