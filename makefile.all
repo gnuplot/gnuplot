@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.28.2.3 1999/10/27 11:15:10 lhecking Exp $
+# $Id: makefile.all,v 1.28.2.4 2000/05/07 16:54:39 lhecking Exp $
 #
 ########################################################
 #
@@ -60,8 +60,8 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)cgm.trm $(T)compact.c $(T)corel.trm $(T)debug.trm \
 	   $(T)djsvga.trm $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm \
 	   $(T)eepic.trm $(T)/emf.trm $(T)emxvga.trm $(T)epslatex.trm \
-	   $(T)epson.trm $(T)excl.trm $(T)fg.trm \
-	   $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm \
+	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \

@@ -1,6 +1,6 @@
 # Makefile for SAS/C 6.1 or better on the Amiga
 #
-# $Id: makefile.amg,v 1.8 1998/12/02 18:37:11 lhecking Exp $
+# $Id: makefile.amg,v 1.8.2.1 1999/08/19 14:39:00 lhecking Exp $
 #
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
@@ -118,7 +118,8 @@ CSOURCE5 = term/aed.trm term/ai.trm term/amiga.trm term/apollo.trm \
 	term/atariaes.trm term/atarivdi.trm term/cgi.trm term/cgm.trm \
 	term/compact.c term/corel.trm term/debug.trm term/driver.h \
 	term/djsvga.trm term/dumb.trm term/dxf.trm term/dxy.trm term/eepic.trm \
-	term/emxvga.trm term/epson.trm term/excl.trm term/fg.trm term/fig.trm \
+	term/emf.trm term/emxvga.trm term/epslatex.trm term/epson.trm \
+	term/excl.trm term/fg.trm term/fig.trm term/ggi.trm \
 	term/gif.trm term/gnugraph.trm
 CSOURCE6 = term/gpic.trm term/gpr.trm term/grass.trm term/hp26.trm \
 	term/hp2648.trm term/hp500c.trm term/hpgl.trm term/hpljii.trm \
