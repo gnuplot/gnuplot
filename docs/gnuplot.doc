@@ -1449,8 +1449,8 @@ C ... and restart the table:
 
  Back-quotes are used to enclose system commands for substitution.
 2 Time/Date data
-^ <a name="Time/Date data">
-^ <a name="Time/date">
+^ <a name="Time/Date data"></a>
+^ <a name="Time/date"></a>
 ?time/date
  `gnuplot` supports the use of time and/or date information as input data.
  This feature is activated by the commands `set xdata time`, `set ydata time`,
@@ -3030,7 +3030,7 @@ C ... and restart the table:
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
  `xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
  `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or `pm3d`. Some
- of these styles require additional information. See `set style <style>` for
+ of these styles require additional information. See `plotting styles` for
  details of each style.  `fill` is relevant only to certain 2D plots
  (currently `boxes` and `candlesticks`).  Note that `filledcurves` and `pm3d` 
  can take an additional option not listed above (the latter only when used in 
@@ -4063,7 +4063,12 @@ C ... and restart the table:
  This form of the command is deprecated. Please see `set style data`.
 3 datafile 
 ?set datafile
+ The `set datafile` command options control interpretation of fields read from
+ input data files by the `plot`, `splot`, and `fit` commands.  Only one such
+ option is currently implemented.
+4 set datafile missing
 ?set datafile missing
+?set missing
 ?missing
  The `set datafile missing` command allows you to tell `gnuplot` what character
  string is used in a data file to denote missing data.  Exactly how this missing
@@ -4239,6 +4244,7 @@ C ... and restart the table:
 
  The second example sets the second variable to s.
 3 encoding
+^ <a name="set encoding"></a>
 ?commands set encoding
 ?commands show encoding
 ?set encoding
@@ -4294,7 +4300,7 @@ C ... and restart the table:
 ?show fontpath
 ?fontpath
  The `fontpath` setting defines additional locations for font files
- files searched when including font files. Yet, only the postscript terminal
+ searched when including font files. Currently only the postscript terminal
  supports `fontpath`. If a file cannot be found in the current directory,
  the directories in `fontpath` are tried. Further documentation concerning
  the supported file formats is included in the `terminal postscript` section
@@ -6332,7 +6338,7 @@ C ... and restart the table:
 3 style
 ?set style
 ?show style
-^ <a name="set style <style>">
+^ <a name="set style <style>"></a>
  Default plotting styles are chosen with the `set style data` and 
  `set style function` commands.  See `plot with` for information about how to
  override the default plotting style for individual functions and data sets.
@@ -6360,8 +6366,8 @@ C ... and restart the table:
 ?show style arrow
 ?arrowstyle
 ?help set style arrow
-^ <a name="arrowtype">
-^ <a name="arrowwidth">
+^ <a name="arrowtype"></a>
+^ <a name="arrowwidth"></a>
  Each terminal has a default set of arrow and point types, which can be seen
  by using the command `test`.  `set style arrow` defines a set of arrow types
  and widths and point types and sizes so that you can refer to them later by
@@ -6504,8 +6510,8 @@ C ... and restart the table:
 ?show style line
 ?linestyle
 ?help set style line
-^ <a name="linetype">
-^ <a name="linewidth">
+^ <a name="linetype"></a>
+^ <a name="linewidth"></a>
  Each terminal has a default set of line and point types, which can be seen
  by using the command `test`.  `set style line` defines a set of line types
  and widths and point types and sizes so that you can refer to them later by
@@ -6576,6 +6582,7 @@ C ... and restart the table:
 
 4 plotting styles
 ?plotting styles
+^ <a name="plotting styles"></a>
 
  The commands `set style data` and `set style function` change the 
  default plotting style for subsequent `plot` and `splot` commands.
