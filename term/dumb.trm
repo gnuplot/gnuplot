@@ -417,6 +417,7 @@ static TBOOLEAN ENHdumb_opened_string;
 static TBOOLEAN ENHdumb_show = TRUE;
 static TBOOLEAN ENHdumb_overprint = 0;
 static TBOOLEAN ENHdumb_widthflag = TRUE;
+static unsigned int ENHdumb_xsave, ENHdumb_ysave;
 #define ENHdumb_fontsize 1
 #define ENHdumb_font ""
 static double ENHdumb_base;
@@ -428,6 +429,20 @@ ENHdumb_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     */
+    if (overprint == 3) {
+	ENHdumb_xsave = dumb_x;
+	ENHdumb_ysave = dumb_y;
+	return;
+    } else if (overprint == 4) {
+	DUMB_move(ENHdumb_xsave, ENHdumb_ysave);
+	return;
+    }
+
+
     if (!ENHdumb_opened_string) {
 	ENHdumb_opened_string = TRUE;
 	/* Start new text fragment */

@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.35 2004/02/02 06:19:55 sfeam Exp $
+ * $Id: gd.trm,v 1.36 2004/03/11 15:30:19 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1368,6 +1368,7 @@ static TBOOLEAN ENHgd_show = TRUE;
 static TBOOLEAN ENHgd_sizeonly = FALSE;
 static TBOOLEAN ENHgd_overprint = FALSE;
 static TBOOLEAN ENHgd_widthflag = TRUE;
+static unsigned int ENHgd_xsave, ENHgd_ysave;
 
 TERM_PUBLIC void
 ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
@@ -1376,6 +1377,16 @@ ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
+    /* If the overprint code requests a save or request, that's all we do */
+    if (overprint == 3) {
+	ENHgd_xsave = png_state.x;
+	ENHgd_ysave = png_state.y;
+	return;
+    } else if (overprint == 4) {
+	PNG_move(ENHgd_xsave, ENHgd_ysave);
+	return;
+    }
+
     if (!ENHgd_opened_string) {
 	ENHgd_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];

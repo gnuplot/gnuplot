@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.68 2004/02/27 10:13:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.69 2004/03/08 04:32:09 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2242,10 +2242,11 @@ enhanced_recursion(p, brace, fontname, fontsize, base, widthflag, showflag, over
 	    } /* case '{' */
 	case '@' :
 	    /*{{{  phantom box - prints next 'char', then restores currentpoint */
-
 	    (term->enhanced_flush)();
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 3);
 	    p = enhanced_recursion(++p, FALSE, fontname, fontsize, base,
-			      FALSE, showflag, overprint);
+			      widthflag, showflag, overprint);
+	    (term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, 4);
 	    break;
 	    /*}}}*/
 

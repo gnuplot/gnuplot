@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.102 2004/02/02 06:19:56 sfeam Exp $
+ * $Id: post.trm,v 1.103 2004/02/14 03:14:45 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -544,15 +544,21 @@ NULL
 static const char GPFAR * GPFAR ENHPS_header[] = {
 /* For MFshow and MFwidth the tos is an array with the string and font info:  */
 /*	[<fontname (a string)> <fontsize> <vertical offset> <width significant?> <printed?> <overprint> <text string>]  */
+/* EAM Mar 2004 - Add in a special case overprint 3 = save, overprint 4 = restore */
 
-"/MFshow {{dup dup 0 get findfont exch 1 get scalefont setfont\n",
+"/MFshow {\n",
+"   { dup 5 get 3 ge\n",	/* EAM test for overprint 3 or 4 */
+"     { 5 get 3 eq {gsave} {grestore} ifelse }\n", /* EAM */
+"     {dup dup 0 get findfont exch 1 get scalefont setfont\n",
 "     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6\n",
 "     get exch 4 get {show} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq\n",
 "     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5\n",
 "     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div\n",
 "     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get\n",
 "     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop\n",
-"     pop aload pop M} ifelse }ifelse }ifelse } forall} bind def\n",
+"     pop aload pop M} ifelse }ifelse }ifelse }\n",
+"     ifelse }\n", /* EAM */
+"   forall} bind def\n",
 "/MFwidth {0 exch {dup 3 get{dup dup 0 get findfont exch 1 get scalefont\n",
 "     setfont 6 get stringwidth pop add} {pop} ifelse} forall} bind def\n",
 
@@ -2176,6 +2182,18 @@ ENHPS_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
+    /* overprint 3 means save current position; 4 means restore saved position */
+    /* EAM FIXME - I couldn't figure out how to use less than the 7 parameters */
+    /* that the normal case macro wants. Somebody more familiar with PostScript*/
+    /* than I am please clean it up!                                           */
+    if (overprint == 3) {
+	fprintf(gpoutfile,"[( ) 1 2 true true 3 (GSAVE)]\n");
+	return;
+    } else if (overprint == 4) {
+	fprintf(gpoutfile,"[( ) 1 2 true true 4 (GRESTORE)]\n");
+	return;
+    }
+
 	if (!ENHps_opened_string) {
 	    fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s %d (",
 		    fontname, fontsize, base,

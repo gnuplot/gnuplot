@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.86 2004/02/27 21:01:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.87 2004/03/08 00:35:05 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -304,6 +304,8 @@ typedef struct plot_struct {
 #endif
     /* Last text position  - used by enhanced text mode */
     int xLast, yLast;
+    /* Saved text position  - used by enhanced text mode */
+    int xSave, ySave;
     
     struct plot_struct *prev_plot;  /* Linked list pointers and number */
     struct plot_struct *next_plot;
@@ -1922,6 +1924,14 @@ exec_cmd(plot_struct *plot, char *command)
 		    v_offset = 0;
 		    str = buffer + 10;
 		    break;
+	case 'p':	/* Push (Save) position for later use */
+		    plot->xSave = plot->xLast;
+		    plot->ySave = plot->yLast;
+		    return;
+	case 'r':	/* Pop (Restore) saved position */
+		    plot->xLast = plot->xSave;
+		    plot->yLast = plot->ySave;
+		    return;
 	default:
 		    sscanf(buffer, "T%4d%4d", &x, &y);
 		    v_offset = vchar/3;		/* Why is this??? */

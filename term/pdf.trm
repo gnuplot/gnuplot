@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.26 2003/12/01 03:32:02 sfeam Exp $
+ * $Id: pdf.trm,v 1.27 2004/02/02 06:19:56 sfeam Exp $
  */
 
 /*------------------------------
@@ -1193,6 +1193,7 @@ static TBOOLEAN ENHpdf_sizeonly = FALSE;
 static TBOOLEAN ENHpdf_show = TRUE;
 static TBOOLEAN ENHpdf_overprint = FALSE;
 static TBOOLEAN ENHpdf_widthflag = FALSE;
+static unsigned int ENHpdf_xsave, ENHpdf_ysave;
 
 /* Start a new string fragment */
 TERM_PUBLIC void
@@ -1202,6 +1203,16 @@ ENHPDF_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
+    /* If the overprint code requests a save or request, that's all we do */
+    if (overprint == 3) {
+	ENHpdf_xsave = PDF_xLast;
+	ENHpdf_ysave = PDF_yLast;
+	return;
+    } else if (overprint == 4) {
+	PDF_move(ENHpdf_xsave, ENHpdf_ysave);
+	return;
+    }
+
     if (!ENHpdf_opened_string) {
 	ENHpdf_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.100 2004/03/02 12:17:10 mikulik Exp $
+ * $Id: x11.trm,v 1.101 2004/03/02 18:07:38 broeker Exp $
  *
  */
 
@@ -1378,6 +1378,7 @@ static TBOOLEAN ENHx11_sizeonly = FALSE;
 static TBOOLEAN ENHx11_show = TRUE;
 static TBOOLEAN ENHx11_overprint = FALSE;
 static TBOOLEAN ENHx11_widthflag = TRUE;
+static unsigned int ENHx11_xsave, ENHx11_ysave;
 static double ENHx11_base;
 static double ENHx11_fontsize;
 static char  *ENHx11_font;
@@ -1389,6 +1390,15 @@ ENHX11_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
+    /* If the overprint code requests a save or request, that's all we do */
+    if (overprint == 3) {
+	PRINT2("Tp%04d%04d\n", 0, 0);
+	return;
+    } else if (overprint == 4) {
+	PRINT2("Tr%04d%04d\n", 0, 0);
+	return;
+    }
+
     if (!ENHx11_opened_string) {
 	ENHx11_opened_string = TRUE;
 	enhanced_cur_text = &enhanced_text[0];

@@ -1,3 +1,13 @@
+2004-03-22  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* src/term.c src/gplt_x11.c term/gd.trm term/pdf.trm term/x11.trm
+	term/dumb.trm term/post.trm: Revamp the implementation of the '@'
+	character (phantom box) in enhanced text processing.  This fixes
+	bug #906056 "@-aligned string does not work with font change".
+	Basically it adds a save/restore position command to the 
+	term->enhanced_open() routine, and brackets the @-text with a save
+	and restore.  Probably a PostScript guru can beautify my code further.
+
 2004-03-21  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* term/svg.trm: Add an enhanced text mode for the svg terminal. 
