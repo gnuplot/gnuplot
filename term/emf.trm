@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.4 2000/10/31 20:26:03 joze Exp $
+ * $Id: emf.trm,v 1.5 2000/11/02 15:14:21 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -431,7 +431,7 @@ EMF_options()
 	struct value a;
 	emf_defaultfontsize = (int) real(const_express(&a));
     }
-    EMF_set_font(NULL);		// set default font
+    EMF_set_font(NULL);		/* set default font */
 
     sprintf(term_options, "%s %s \"%s\" %d",
 	    emf_monochrome ? "monochrome" : "color",
