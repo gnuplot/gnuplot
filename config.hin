@@ -387,7 +387,7 @@
 /*  Define if you want to have Uli Gruenebaum's relative boxwidth.  */
 #undef USE_ULIG_RELATIVE_BOXWIDTH
 
-/*  Define to use thin plate spines. EXPERIMENTAL  */
+/*  Define to use thin plate spines.  */
 #undef THIN_PLATE_SPLINES_GRID
 
 /*  Define if you want to use the IRIS terminal on IRIS4D series computers.  */

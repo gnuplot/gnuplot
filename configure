@@ -68,15 +68,15 @@ ac_help="$ac_help
 ac_help="$ac_help
   --without-tutorial      do not build LaTeX tutorial"
 ac_help="$ac_help
-  --enable-mouse          enable mouse for the x11 terminal"
+  --disable-mouse         disable mouse for the x11 terminal"
 ac_help="$ac_help
-  --enable-pm3d           enable pm3d"
+  --disable-pm3d          disable pm3d"
 ac_help="$ac_help
-  --enable-filledboxes    enable filledboxes style (EXPERIMENTAL)"
+  --disable-filledboxes   disable filledboxes style"
 ac_help="$ac_help
-  --enable-relative-boxwidth    enable relative_boxwidths (EXPERIMENTAL)"
+  --disable-relative-boxwidth   disable relative_boxwidths"
 ac_help="$ac_help
-  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)"
+  --enable-thin-splines   enable thin plate splines"
 ac_help="$ac_help
   --enable-iris           enable IRIS terminal (IRIS4D only)"
 ac_help="$ac_help
@@ -5842,26 +5842,34 @@ TERMLIBS="$VGAGLLIB $TERMLIBS"
 # Check whether --enable-filledboxes or --disable-filledboxes was given.
 if test "${enable_filledboxes+set}" = set; then
   enableval="$enable_filledboxes"
-  if test "$enableval" = yes; then
-     cat >> confdefs.h <<\EOF
+  :
+else
+  test -z "$enable_filledboxes" && enable_filledboxes=yes
+fi
+
+
+if test "$enable_filledboxes" = yes; then
+  cat >> confdefs.h <<\EOF
 #define USE_ULIG_FILLEDBOXES 1
 EOF
 
-   fi
 fi
-
 
 # Check whether --enable-relative-boxwidth or --disable-relative-boxwidth was given.
 if test "${enable_relative_boxwidth+set}" = set; then
   enableval="$enable_relative_boxwidth"
-  if test "$enableval" = yes; then
-     cat >> confdefs.h <<\EOF
+  :
+else
+  test -z "$enable_relative_boxwidth" && enable_relative_boxwidth=yes
+fi
+
+
+if test "$enable_relative_boxwidth" = yes; then
+  cat >> confdefs.h <<\EOF
 #define USE_ULIG_RELATIVE_BOXWIDTH 1
 EOF
 
-   fi
 fi
-
 
 # Check whether --enable-thin-splines or --disable-thin-splines was given.
 if test "${enable_thin_splines+set}" = set; then
@@ -5880,7 +5888,7 @@ if test "${enable_iris+set}" = set; then
   enableval="$enable_iris"
   if test "$enableval" = yes; then
      echo $ac_n "checking for winopen in -lgl_s""... $ac_c" 1>&6
-echo "configure:5884: checking for winopen in -lgl_s" >&5
+echo "configure:5892: checking for winopen in -lgl_s" >&5
 ac_lib_var=`echo gl_s'_'winopen | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -5888,7 +5896,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgl_s  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 5892 "configure"
+#line 5900 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -5899,7 +5907,7 @@ int main() {
 winopen()
 ; return 0; }
 EOF
-if { (eval echo configure:5903: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5911: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -5933,7 +5941,7 @@ if test "${enable_mgr+set}" = set; then
   enableval="$enable_mgr"
   if test "$enableval" = yes; then
      echo $ac_n "checking for m_getinfo in -lmgr""... $ac_c" 1>&6
-echo "configure:5937: checking for m_getinfo in -lmgr" >&5
+echo "configure:5945: checking for m_getinfo in -lmgr" >&5
 ac_lib_var=`echo mgr'_'m_getinfo | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -5941,7 +5949,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lmgr -lpixrect $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 5945 "configure"
+#line 5953 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -5952,7 +5960,7 @@ int main() {
 m_getinfo()
 ; return 0; }
 EOF
-if { (eval echo configure:5956: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5964: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -6671,13 +6679,13 @@ test "$enable_pm3d" = yes && \
   echo "$ac_t""  Enable pm3d" 1>&6
 
 test "$enable_filledboxes" = yes && \
-  echo "$ac_t""  Enable filledboxes (EXPERIMENTAL)" 1>&6
+  echo "$ac_t""  Enable filledboxes" 1>&6
 
 test "$enable_relative_boxwidth" = yes && \
-  echo "$ac_t""  Enable relative boxwidths (EXPERIMENTAL)" 1>&6
+  echo "$ac_t""  Enable relative boxwidths" 1>&6
 
 test "$enable_thin_splines" = yes && \
-  echo "$ac_t""  Enable thin plate splines (EXPERIMENTAL)" 1>&6
+  echo "$ac_t""  Enable thin plate splines" 1>&6
 
 test "$enable_iris" = yes && \
   echo "$ac_t""  Enable IRIS terminal" 1>&6
