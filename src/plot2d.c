@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.13 1999/06/22 12:00:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.14 1999/07/18 17:39:46 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -57,9 +57,6 @@ static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plo
 /* the curves/surfaces of the plot */
 struct curve_points *first_plot = NULL;
 static struct udft_entry plot_func;
-
-extern TBOOLEAN is_3d_plot;
-extern int plot_token;
 
 /* in order to support multiple axes, and to
  * simplify ranging in parametric plots, we use

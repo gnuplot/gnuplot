@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.7 1999/06/17 14:18:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.8 1999/06/19 20:52:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -54,10 +54,6 @@ static void parametric_3dfixup __PROTO((struct surface_points * start_plot, int 
 /* the curves/surfaces of the plot */
 struct surface_points *first_3dplot = NULL;
 static struct udft_entry plot_func;
-
-
-extern TBOOLEAN is_3d_plot;
-extern int plot_token;
 
 /* in order to support multiple axes, and to
  * simplify ranging in parametric plots, we use
