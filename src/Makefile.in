@@ -8,7 +8,7 @@
 
 # default target
 
-all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ @GNUPLOT_BE@ ../demo/binary1
+all: @ERRORFIX@ gnuplot @GNUPLOT_X11@ @GNUPLOT_BE@ bf_test
 
 
 # this tells GNU make not to export variables into the environment
@@ -307,9 +307,6 @@ $(B)gnuplot_be :
 	cd $(B) && make $(MFLAGS)
 
 gnuplot_be: $(B)gnuplot_be
-
-../demo/binary1 ../demo/binary2 ../demo/binary3: bf_test
-	wd=`pwd` && cd $(top_srcdir)/demo && $$wd/bf_test
 
 bf_test: bf_test.o binary.o alloc.o
 	$(LINK) bf_test.o binary.o alloc.o $(LIBS)
