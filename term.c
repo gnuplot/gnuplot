@@ -1068,7 +1068,7 @@ char *ztc_init()
 
     switch (g_mode) {
     case FG_NULL:
-	fprintf(stderr, "Graphics card not detected or not supported.\n");
+	fputs("Graphics card not detected or not supported.\n", stderr);
 	exit(1);
     case FG_HERCFULL:
 	term_name = "hercules";
@@ -1346,7 +1346,8 @@ void reopen_binary()
 # include <dcdef.h>
 # include <stat.h>
 # include <fab.h>
- /* If you use WATCOM C, you may have to comment out the following branch */
+/* If you use WATCOM C or a very strict ANSI compiler, you may have to 
+ * delete or comment out the following 3 lines: */
 # ifndef TT2$M_DECCRT3		/* VT300 not defined as of VAXC v2.4 */
 #  define TT2$M_DECCRT3 0X80000000
 # endif
