@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.38 2000/11/01 18:57:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.39 2000/11/15 18:57:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -915,39 +915,6 @@ get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *
     }
 }
 
-int
-nearest_label_tag(int xref, int yref, struct termentry *t,
-		  void (*map_func) (struct position * pos, unsigned int *x, unsigned int *y, const char *what))
-{
-    double min = -1;
-    int min_tag = -1;
-    double diff_squared;
-    unsigned int x, y;
-    struct text_label *this_label;
-    int xd;
-    int yd;
-
-    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
-	map_func(&this_label->place, &x, &y, "label");
-	xd = (int) x - (int) xref;
-	yd = (int) y - (int) yref;
-	diff_squared = xd * xd + yd * yd;
-	if (-1 == min || min > diff_squared) {
-	    /* now we check if we're within a certain
-	     * threshold around the label */
-	    double tic_diff_squared;
-	    int htic, vtic;
-	    get_offsets(this_label, t, &htic, &vtic);
-	    tic_diff_squared = htic * htic + vtic * vtic;
-	    if (diff_squared < tic_diff_squared) {
-		min = diff_squared;
-		min_tag = this_label->tag;
-	    }
-	}
-    }
-
-    return min_tag;
-}
 
 static void
 get_arrow(arrow, sx, sy, ex, ey)
@@ -991,17 +958,18 @@ unsigned int* ey;
 void
 apply_head_properties(struct position* headsize)
 {
-    extern double curr_arrow_headangle;
-    extern int curr_arrow_headlength;
     curr_arrow_headlength = 0;
     if (headsize->x > 0) { /* set head length+angle for term->arrow */
 	int itmp, x1, x2;
 	double savex = headsize->x;
+
 	curr_arrow_headangle = headsize->y;
 	headsize->y = 1.0; /* any value, just avoid log y */
 	map_position(headsize, &x2, &itmp, "arrow");
+
 	headsize->x = 0; /* measure length from zero */
 	map_position(headsize, &x1, &itmp, "arrow");
+
 	curr_arrow_headlength = x2 - x1;
 	headsize->y = curr_arrow_headangle; /* restore the angle */
 	headsize->x = savex; /* restore the length */
