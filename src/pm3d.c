@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.19 2002/01/25 18:02:08 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.20 2002/01/26 17:55:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -63,8 +63,16 @@ int
 set_pm3d_zminmax()
 {
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	if (PM3D_IMPLICIT == pm3d.implicit)
-	    CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
+	/* CB_AXIS.min has been initialized to VERYLARGE
+	 * in plot3d.c:plot3drequest() */
+	if (PM3D_IMPLICIT == pm3d.implicit) {
+	    double x = get_non_pm3d_min();
+	    if (x < CB_AXIS.min)
+		CB_AXIS.min = x;
+	    else if (CB_AXIS.min == VERYLARGE)
+		/* fallback, should in principle never happen */
+		CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
+	}
     } else {
 	/* Negative z: Call graph_error(), thus stop by an error message
 	 * without any plot as in the case of other negative-range-and-log
@@ -77,8 +85,16 @@ set_pm3d_zminmax()
 				   "color axis");
     }
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	if (PM3D_IMPLICIT == pm3d.implicit)
-	    CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
+	/* CB_AXIS.min has been initialized to -VERYLARGE
+	 * in plot3d.c:plot3drequest() */
+	if (PM3D_IMPLICIT == pm3d.implicit) {
+	    double x = get_non_pm3d_max();
+	    if (x > CB_AXIS.max)
+		CB_AXIS.max = x;
+	    else if (CB_AXIS.max == -VERYLARGE)
+		/* fallback, should in principle never happen */
+		CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
+	}
     } else {
 	/* Negative z: see above */
 	CB_AXIS.max = 

@@ -1,5 +1,5 @@
 /*
- * $Id: plot3d.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
+ * $Id: plot3d.h,v 1.6 2000/11/02 19:11:07 lhecking Exp $
  */
 
 /* GNUPLOT - plot3d.h */
@@ -63,5 +63,10 @@ extern TBOOLEAN	dgrid3d;
 
 void plot3drequest __PROTO((void));
 void sp_free __PROTO((struct surface_points *sp));
+
+#ifdef PM3D
+double get_non_pm3d_min __PROTO((void));
+double get_non_pm3d_max __PROTO((void));
+#endif
 
 #endif /* GNUPLOT_PLOT3D_H */

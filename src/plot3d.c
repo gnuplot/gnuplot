@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.34 2002/01/25 18:27:10 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.35 2002/01/26 17:55:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -72,6 +72,8 @@ TBOOLEAN dgrid3d = FALSE;
 /* static prototypes */
 
 #ifdef PM3D
+static double g_non_pm3d_min;
+static double g_non_pm3d_max;
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
@@ -246,7 +248,11 @@ plot3drequest()
     AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
     AXIS_INIT3D(U_AXIS, 1, 0);
     AXIS_INIT3D(V_AXIS, 1, 0);
+    /* will set CB_AXIS.min / CB_AXIS.max to VERYLARGE / -VERYLARGE
+     * respectively, which is used and assumed in pm3d.c:set_pm3d_zminmax() */
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
+    g_non_pm3d_min =  VERYLARGE;
+    g_non_pm3d_max = -VERYLARGE;
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -299,8 +305,22 @@ double h;
 #endif
 
 #ifdef PM3D
+double
+get_non_pm3d_min()
+{
+    return g_non_pm3d_min;
+}
+
+double
+get_non_pm3d_max()
+{
+    return g_non_pm3d_max;
+}
+
 static void
-update_pm3d_zrange(double value, TBOOLEAN pal)
+update_pm3d_zrange(value, pal)
+    double value;
+    TBOOLEAN pal;
 {
     if (pal) {
 	if (value < CB_AXIS.min) {
@@ -312,6 +332,15 @@ update_pm3d_zrange(double value, TBOOLEAN pal)
 	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX) // XXX ??? */
 	    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
 		CB_AXIS.max = value;
+	}
+    } else {
+	if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
+	    if (value < g_non_pm3d_min)
+		g_non_pm3d_min = value;
+	}
+	if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
+	    if (value > g_non_pm3d_max)
+		g_non_pm3d_max = value;
 	}
     }
 }
@@ -621,7 +650,9 @@ get_3ddata(this_plot)
 
 	while ((j = df_readline(v,
 #ifdef PM3D
-		    4
+		    /* currently pm3d mapping is only implemented
+		     * for MAP3D_CARTESIAN */
+		    (MAP3D_CARTESIAN == mapping3d) ? 4 : 3
 #else
 		    3
 #endif
@@ -674,9 +705,15 @@ get_3ddata(this_plot)
 		switch (j) {
 #ifdef PM3D
 		case 2:
-		    /* TODO: could also specify the column number */
-		    pm3d_color_from_column = 1;
-		    color = v[1];
+		    if (PM3DSURFACE != this_plot->plot_style) {
+			int_error(this_plot->token,
+				  "2 columns only possible with explicit pm3d style (line %d)",
+				  df_line_number);
+			return;
+		    } else {
+			pm3d_color_from_column = 1;
+			color = v[1];
+		    }
 		    /* FALLTHRU */
 #endif
 		case 1:
@@ -686,9 +723,16 @@ get_3ddata(this_plot)
 		    break;
 #ifdef PM3D
 		case 4:
-		    /* TODO: could also specify the column number */
-		    pm3d_color_from_column = 1;
-		    color = v[3];
+		    if (PM3DSURFACE != this_plot->plot_style) {
+			int_error(this_plot->token,
+				  "4 columns only possible with explicit pm3d style (line %d)",
+				  df_line_number);
+			return;
+		    } else {
+			/* TODO: could also specify the column number */
+			pm3d_color_from_column = 1;
+			color = v[3];
+		    }
 		    /* FALLTHRU */
 #endif
 		case 3:
@@ -698,7 +742,6 @@ get_3ddata(this_plot)
 		    break;
 		default:
 		    {
-			/* TODO: pm3d color? (joze) 18 Dez 2000 */
 			int_error(this_plot->token,
 				  "Need 1 or 3 columns - line %d",
 				  df_line_number);
@@ -1084,6 +1127,10 @@ eval_3dplots()
 
 #ifdef PM3D
 		specs = df_open(4);
+		if ((2 == specs || 4 == specs) && MAP3D_CARTESIAN == mapping3d) {
+		    /* switch default to pm3d */
+		    this_plot->plot_style = PM3DSURFACE;
+		}
 #else
 		specs = df_open(3);
 #endif
