@@ -1,3 +1,8 @@
+2002-12-09  Ethan Merritt  <merritt@u.washington.edu>
+	* src/unset.c: Implement 'unset style arrow'
+	* src/set.c src/setshow.h: 
+	  Comment out unused function delete_arrowstyle(prev,next).
+
 2002-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp: gnuplot-mode updated to 0.5t.
@@ -1514,7 +1519,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/06 23:55:17 $).
+	last modification date (from the tag $Date: 2002/12/07 19:08:59 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

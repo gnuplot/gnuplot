@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.102 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.103 2002/11/26 18:50:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3982,6 +3982,8 @@ assign_arrowstyle_tag()
     return (last + 1);
 }
 
+#if (0)
+/* EAM - not called by anyone */
 /* delete arrowstyle from linked list started by first_arrowstyle.
  * called with pointers to the previous arrowstyle (prev) and the 
  * arrowstyle to delete (this).
@@ -4000,7 +4002,7 @@ struct arrowstyle_def *prev, *this;
 	free((char *) this);
     }
 }
-
+#endif
 
 /* For set [xy]tics... command */
 static void

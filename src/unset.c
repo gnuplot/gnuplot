@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.43 2002/10/21 10:24:19 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.44 2002/11/26 18:50:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -59,6 +59,8 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.43 2002/10/21 10:24:19 mik
 
 static void unset_angles __PROTO((void));
 static void unset_arrow __PROTO((void));
+static void unset_arrowstyles __PROTO((void));
+static void free_arrowstyle __PROTO((struct arrowstyle_def *));
 static void delete_arrow __PROTO((struct arrow_def *, struct arrow_def *));
 static void unset_autoscale __PROTO((void));
 static void unset_bars __PROTO((void));
@@ -566,6 +568,22 @@ struct arrow_def *prev, *this;
     }
 }
 
+/* delete the whole list of arrow styles */
+static void
+unset_arrowstyles()
+{
+    free_arrowstyle(first_arrowstyle);
+    first_arrowstyle = NULL;
+}
+
+static void
+free_arrowstyle(struct arrowstyle_def *arrowstyle)
+{
+    if (arrowstyle) {
+	free_arrowstyle(arrowstyle->next);
+	free(arrowstyle);
+    }
+}
 
 /* process 'unset autoscale' command */
 static void
@@ -1231,6 +1249,10 @@ unset_style()
 	c_token++;
 	break;
 #endif /* USE_ULIG_FILLEDBOXES */
+    case SHOW_STYLE_ARROW:
+	unset_arrowstyles();
+	c_token++;
+	break;
     default:
 #if USE_ULIG_FILLEDBOXES
         int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
@@ -1425,6 +1447,7 @@ reset_command()
     /* delete arrows */
     while (first_arrow != NULL)
 	delete_arrow((struct arrow_def *) NULL, first_arrow);
+    unset_arrowstyles();
     /* delete labels */
     while (first_label != NULL)
 	delete_label((struct text_label *) NULL, first_label);

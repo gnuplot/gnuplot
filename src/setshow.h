@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.32 2002/10/05 00:12:02 sfeam Exp $
+ * $Id: setshow.h,v 1.33 2002/10/21 10:24:18 mikulik Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -74,7 +74,7 @@ void show_command __PROTO((void));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
-void delete_arrowstyle __PROTO((struct arrowstyle_def *, struct arrowstyle_def *));
+/* void delete_arrowstyle __PROTO((struct arrowstyle_def *, struct arrowstyle_def *)); */
 void reset_key __PROTO((void));
 void free_marklist __PROTO((struct ticmark * list));
 #ifdef PM3D
