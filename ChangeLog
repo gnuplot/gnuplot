@@ -1,7 +1,9 @@
-2001-03-20  Petr Mikulik  <mikulik@physics.muni.cz>
+2001-03-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/color.c: changed default colour box position and size for
-	'pm3d map'; use logscale for cb-axis according to z-axis.
+	* src/color.c: changed default colour box position and size;
+	use logscale for cb-axis according to z-axis.
+
+	* docs/gnuplot.doc: list all mouseable terminals.
 
 2001-03-18  Petr Mikulik  <mikulik@physics.muni.cz>
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.62 2000/12/19 14:26:40 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.63 2001/03/19 14:52:23 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -254,7 +254,7 @@ C
  support and it is used by all mouse-capable terminals.
  Bindings overwrite the builtin bindings (like in every real editor),
  except <space> and 'q' which cannot be rebound.
- Mouse Buttons cannot be rebound.
+ Mouse buttons cannot be rebound.
 
  Note that multikey-bindings with modifiers have to be quoted.
 
@@ -4928,8 +4928,8 @@ C ... and restart the table:
 ?set nomouse
 ?mouse
 ?nomouse
- The command `set mouse` enables mouse actions. Currently only the
- X11 and pm driver are mouse enhanced. There are two mouse modes.
+ The command `set mouse` enables mouse actions. Currently the pm, x11,
+ ggi and windows terminals are mouse enhanced. There are two mouse modes.
  The 2d-graph mode works for 2d graphs and for maps (i.e. splots with 
  `set view` having z-rotation 0, 90, 180, 270 or 360 degrees) and it
  allows tracing the position over graph, zooming, annotating graph etc.
@@ -4939,17 +4939,17 @@ C ... and restart the table:
  useful for large data sets. A vertical motion of Button 2 with the
  shift key hold down changes the ticslevel.
 
- Mousing is not available in multiplot mode.  If multiplot is disabled
+ Mousing is not available in multiplot mode. If multiplot is disabled
  using `unset multiplot` though,  the mouse will be turned on again and
  acts on the last plot (like replot do).
 
  X11 specific implementation details:
  Mouse support is turned on by default if standard input comes from
  a terminal (tty). Mouse support is turned off, if standard input
- does not come from a tty e.g. a pipe.  If you want to use mouse support
+ does not come from a tty e.g. a pipe. If you want to use mouse support
  while writing to gnuplot from a pipe, the mouse must be turned on *before*
  starting the x11 driver, e.g. immediately after startup with the explicit
- command `set mouse`.  Beware: on some UNIX flavours, special input devices
+ command `set mouse`. Beware: on some UNIX flavours, special input devices
  as /dev/null might not be `select-able`; turning on the mouse when using
  such devices will hang gnuplot.
 

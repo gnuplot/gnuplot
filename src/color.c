@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.14 2001/03/20 15:46:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.15 2001/03/20 16:34:36 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -524,17 +524,14 @@ draw_color_smooth_box()
     } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
 	double dx = (X_AXIS.max - X_AXIS.min);
 	double dz = CB_AXIS.max - CB_AXIS.min;
-	map3d_xy(X_AXIS.max + dx * 0.05, Y_AXIS.max, base_z + dz * 0.35, &cb_x_from, &cb_y_from);
-	map3d_xy(X_AXIS.max + dx * 0.20, Y_AXIS.max, ceiling_z - dz * 0.0, &cb_x_to, &cb_y_to);
+	/* note: [0.05 0.35; 0.20 0.00] were the values before cbaxis */
+	map3d_xy(X_AXIS.max + dx * 0.03, Y_AXIS.max, base_z + dz * 0.35, &cb_x_from, &cb_y_from);
+	map3d_xy(X_AXIS.max + dx * 0.11, Y_AXIS.max, ceiling_z - dz * 0, &cb_x_to, &cb_y_to);
 	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
 	    dz = Y_AXIS.max - Y_AXIS.min;
-#ifdef SIZEPOS_BEFORE_CBAXIS
-	    map3d_xy(X_AXIS.max + dx * 0.04, Y_AXIS.min + dz * 0.25, base_z, &cb_x_from, &cb_y_from);
-	    map3d_xy(X_AXIS.max + dx * 0.18, Y_AXIS.max - dz * 0.25, ceiling_z, &cb_x_to, &cb_y_to);
-#else
+	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
 	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &cb_x_from, &cb_y_from);
 	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
-#endif
 	}
     }
 
