@@ -241,7 +241,7 @@ int ggmtime __PROTO((struct tm *, double)); /* seconds to *tm */
 
 /* Prototypes from file "util.c" */
 
-int chr_in_str __PROTO((int t_num, char c));
+int chr_in_str __PROTO((int t_num, int c));
 int equals __PROTO((int t_num, char *str));
 int almost_equals __PROTO((int t_num, char *str));
 int isstring __PROTO((int t_num));
