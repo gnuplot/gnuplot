@@ -86,7 +86,7 @@ void close_printer __PROTO((FILE * outfile));
 #  include <malloc.h>
 # else
 #  include <alloc.h>
-# endif /* MSC */
+# endif				/* MSC */
 #endif /* _Windows */
 
 
@@ -119,18 +119,6 @@ void do_point __PROTO((unsigned int x, unsigned int y, int number));
 void do_pointsize __PROTO((double size));
 void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
 void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
-
-
-int null_text_angle __PROTO((int ang));
-int null_justify_text __PROTO((enum JUSTIFY just));
-int null_scale __PROTO((double x, double y));
-static void null_linewidth __PROTO((double s));
-int do_scale __PROTO((double x, double y));
-void options_null __PROTO((void));
-void UNKNOWN_null __PROTO((void));
-void MOVE_null __PROTO((unsigned int, unsigned int));
-void LINETYPE_null __PROTO((int));
-void PUTTEXT_null __PROTO((unsigned int, unsigned int, char *));
 
 
 #ifdef __ZTC__
@@ -173,11 +161,9 @@ int aesid = -1;
  * too complex for the rest of gnuplot to be allowed in
  */
 
-
 #if defined(PIPES)
 static TBOOLEAN pipe_open = FALSE;
 #endif /* PIPES */
-
 
 static void term_close_output()
 {
@@ -206,6 +192,11 @@ static void term_close_output()
     outstr = NULL;
 }
 
+#ifdef OS2
+# define POPEN_MODE ("wb")
+#else
+# define POPEN_MODE ("w")
+#endif
 
 /* assigns dest to outstr, so it must be allocated or NULL
  * and it must not be outstr itself !
@@ -219,7 +210,7 @@ char *dest;
     assert(dest == NULL || dest != outstr);
 
     if (multiplot) {
-	fprintf(stderr, "In multiplotmode you can't change the output\n");
+	fputs("In multiplotmode you can't change the output\n", stderr);
 	return;
     }
     if (term && term_initialised) {
@@ -233,14 +224,10 @@ char *dest;
 
 #if defined(PIPES)
 	if (*dest == '|') {
-# ifdef OS2
-	    if ((f = popen(dest + 1, "wb")) == (FILE *) NULL)
-# else
-	    if ((f = popen(dest + 1, "w")) == (FILE *) NULL)
-# endif
-		os_error("cannot create pipe; output not changed", c_token);
-	    else
-		pipe_open = TRUE;
+	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
+		    os_error("cannot create pipe; output not changed", c_token);
+		else
+		    pipe_open = TRUE;
 	} else
 #endif /* PIPES */
 
@@ -299,11 +286,11 @@ void term_init()
 	char *temp = gp_alloc(strlen(outstr) + 1, "temp file string");
 	if (temp) {
 	    FPRINTF((stderr, "term_init : reopening \"%s\" as %s\n",
-		 outstr, term->flags & TERM_BINARY ? "binary" : "text"));
+		     outstr, term->flags & TERM_BINARY ? "binary" : "text"));
 	    strcpy(temp, outstr);
 	    term_set_output(temp);	/* will free outstr */
 	} else
-	    fprintf(stderr, "Cannot reopen output file in binary");
+	    fputs("Cannot reopen output file in binary", stderr);
 	/* and carry on, hoping for the best ! */
     }
 #ifdef OS2
@@ -456,10 +443,10 @@ struct lp_style_type *lp;
 
 
 
-void term_check_multiplot_okay(interactive)
-TBOOLEAN interactive;
+void term_check_multiplot_okay(f_interactive)
+TBOOLEAN f_interactive;
 {
-    FPRINTF((stderr, "term_multiplot_okay(%d)\n", interactive));
+    FPRINTF((stderr, "term_multiplot_okay(%d)\n", f_interactive));
 
     if (!term_initialised)
 	return;			/* they've not started yet */
@@ -471,7 +458,7 @@ TBOOLEAN interactive;
      *   we are not writing to stdout and terminal doesn't
      *     refuse multiplot outright
      */
-    if (!interactive || (term->flags & TERM_CAN_MULTIPLOT) ||
+    if (!f_interactive || (term->flags & TERM_CAN_MULTIPLOT) ||
 	((gpoutfile != stdout) && !(term->flags & TERM_CANNOT_MULTIPLOT))
 	) {
 	/* it's okay to use multiplot here, but suspend first */
@@ -506,7 +493,8 @@ int number;
 	return;
     }
     number %= POINT_TYPES;
-    htic = (term_pointsize * t->h_tic / 2);	/* should be in term_tbl[] in later version */
+    /* should be in term_tbl[] in later version */
+    htic = (term_pointsize * t->h_tic / 2);
     vtic = (term_pointsize * t->v_tic / 2);
 
     switch (number) {
@@ -620,15 +608,20 @@ TBOOLEAN head;
     register struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
     /* average of tic sizes */
+    /* (dx,dy) : vector from end to start */
     double dx = (double) sx - (double) ex;
-    double dy = (double) sy - (double) ey;	/* (dx,dy) : vector from end to start */
+    double dy = (double) sy - (double) ey;
     double len_arrow = sqrt(dx * dx + dy * dy);
 
     /* draw the line for the arrow. That's easy. */
     (*t->move) (sx, sy);
     (*t->vector) (ex, ey);
 
-    if (head && len_arrow != 0.0) {	/* no head for arrows whih length=0 */
+    /* no head for arrows whih length = 0
+     * or, to be more specific, length < DBL_EPSILON,
+     * because len_arrow will almost always be != 0
+     */
+    if (head && fabs(len_arrow) >= DBL_EPSILON) {
 	/* now calc the head_coeff */
 	double coeff_shortest = len_tic * HEAD_SHORT_LIMIT / len_arrow;
 	double coeff_longest = len_tic * HEAD_LONG_LIMIT / len_arrow;
@@ -679,7 +672,7 @@ TBOOLEAN head;
 	    int dx = sx - ex;
 	    int dy = sy - ey;
 	    double coeff = len / sqrt(2.0 * ((double) dx * (double) dx
-					   + (double) dy * (double) dy));
+					     + (double) dy * (double) dy));
 	    int x, y;		/* one endpoint */
 
 	    x = (int) (ex + (dx + dy) * coeff);
@@ -844,25 +837,27 @@ void list_terms()
 		term_tbl[i].name, term_tbl[i].description);
     (void) putc('\n', stderr);
 }
+
 #endif /* 0 */
 
 
-/* set_term: get terminal number from name on command line */
-/* will change 'term' variable if successful */
+/* set_term: get terminal number from name on command line
+ * will change 'term' variable if successful
+ */
 struct termentry *
- set_term(c_token)
-int c_token;
+ set_term(c_token_arg)
+int c_token_arg;
 {
     register struct termentry *t = NULL;
     char *input_name;
 
-    if (!token[c_token].is_token)
-	int_error("terminal name expected", c_token);
-    input_name = input_line + token[c_token].start_index;
-    t = change_term(input_name, token[c_token].length);
+    if (!token[c_token_arg].is_token)
+	int_error("terminal name expected", c_token_arg);
+    input_name = input_line + token[c_token_arg].start_index;
+    t = change_term(input_name, token[c_token_arg].length);
     if (!t)
 	int_error("unknown or ambiguous terminal type; type just 'set terminal' for a list",
-		  c_token);
+		  c_token_arg);
 
     /* otherwise the type was changed */
 
@@ -900,7 +895,7 @@ int length;
     name = term->name;
 
     if (term->scale != null_scale)
-	fprintf(stderr, "Warning : scale interface is not null_scale - may not work with multiplot\n");
+	fputs("Warning : scale interface is not null_scale - may not work with multiplot\n", stderr);
 
     /* check that optional fields are initialised to something */
     if (term->text_angle == 0)
@@ -945,7 +940,7 @@ void init_terminal()
 {
     char *term_name = DEFAULTTERM;
 #if (defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
-    char *term = NULL;		/* from TERM environment var */
+    char *env_term = NULL;	/* from TERM environment var */
 #endif
 #ifdef X11
     char *display = NULL;
@@ -967,18 +962,18 @@ void init_terminal()
 #endif /* VMS */
 
 #ifdef NEXT
-	term = getenv("TERM");
+	env_term = getenv("TERM");
 	if (term_name == (char *) NULL
-	    && term != (char *) NULL && strcmp(term, "next") == 0)
+	    && env_term != (char *) NULL && strcmp(term, "next") == 0)
 	    term_name = "next";
 #endif /* NeXT */
 
 #ifdef SUN
-	term = getenv("TERM");	/* try $TERM */
+	env_term = getenv("TERM");	/* try $TERM */
 	if (term_name == (char *) NULL
-	    && term != (char *) NULL && strcmp(term, "sun") == 0)
+	    && env_term != (char *) NULL && strcmp(env_term, "sun") == 0)
 	    term_name = "sun";
-#endif /* sun */
+#endif /* SUN */
 
 #ifdef _Windows
 	term_name = "win";
@@ -997,9 +992,9 @@ void init_terminal()
 #endif /* GPR    */
 
 #ifdef X11
-	term = getenv("TERM");	/* try $TERM */
+	env_term = getenv("TERM");	/* try $TERM */
 	if (term_name == (char *) NULL
-	    && term != (char *) NULL && strcmp(term, "xterm") == 0)
+	    && env_term != (char *) NULL && strcmp(env_term, "xterm") == 0)
 	    term_name = "x11";
 	display = getenv("DISPLAY");
 	if (term_name == (char *) NULL && display != (char *) NULL)
@@ -1039,12 +1034,12 @@ void init_terminal()
 /*      if (_osmode==OS2_MODE) term_name = "pm" ; else term_name = "emxvga"; */
 # ifdef X11
 /* This catch is hopefully ok ... */
-	term = getenv("WINDOWID");
+	env_term = getenv("WINDOWID");
 	display = getenv("DISPLAY");
-	if ((term != (char *) NULL) && (display != (char *) NULL))
+	if ((env_term != (char *) NULL) && (display != (char *) NULL))
 	    term_name = "x11";
 	else
-# endif /* X11 */
+# endif				/* X11 */
 	    term_name = "pm";
 #endif /*OS2 */
 
@@ -1067,8 +1062,7 @@ void init_terminal()
 
 
 #ifdef __ZTC__
-char *
- ztc_init()
+char *ztc_init()
 {
     int g_mode;
     char *term_name = NULL;
@@ -1150,7 +1144,7 @@ int caller;
 	break;
     case 3:
 	/* New terminal in use--put stdout back to original. */
-	/* closepl(); *//* This is called by the term. */
+/* closepl(); *//* This is called by the term. */
 	fflush(stdout);
 	*(stdout) = save_stdout;	/* Copy FILE structure */
 	unixplot = 0;
@@ -1174,15 +1168,15 @@ void test_term()
     register struct termentry *t = term;
     char *str;
     int x, y, xl, yl, i;
-    unsigned int xmax, ymax;
+    unsigned int xmax_t, ymax_t;
     char label[MAX_ID_LEN];
     int key_entry_height;
     int p_width;
 
     term_start_plot();
     screen_ok = FALSE;
-    xmax = (unsigned int) (t->xmax * xsize);
-    ymax = (unsigned int) (t->ymax * ysize);
+    xmax_t = (unsigned int) (t->xmax * xsize);
+    ymax_t = (unsigned int) (t->ymax * ysize);
 
     p_width = pointsize * (t->h_tic);
     key_entry_height = pointsize * (t->v_tic) * 1.25;
@@ -1192,69 +1186,73 @@ void test_term()
     /* border linetype */
     (*t->linetype) (-2);
     (*t->move) (0, 0);
-    (*t->vector) (xmax - 1, 0);
-    (*t->vector) (xmax - 1, ymax - 1);
-    (*t->vector) (0, ymax - 1);
+    (*t->vector) (xmax_t - 1, 0);
+    (*t->vector) (xmax_t - 1, ymax_t - 1);
+    (*t->vector) (0, ymax_t - 1);
     (*t->vector) (0, 0);
     (void) (*t->justify_text) (LEFT);
-    (*t->put_text) (t->h_char * 5, ymax - t->v_char * 3, "Terminal Test");
+    (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Terminal Test");
     /* axis linetype */
     (*t->linetype) (-1);
-    (*t->move) (xmax / 2, 0);
-    (*t->vector) (xmax / 2, ymax - 1);
-    (*t->move) (0, ymax / 2);
-    (*t->vector) (xmax - 1, ymax / 2);
+    (*t->move) (xmax_t / 2, 0);
+    (*t->vector) (xmax_t / 2, ymax_t - 1);
+    (*t->move) (0, ymax_t / 2);
+    (*t->vector) (xmax_t - 1, ymax_t / 2);
     /* test width and height of characters */
     (*t->linetype) (-2);
-    (*t->move) (xmax / 2 - t->h_char * 10, ymax / 2 + t->v_char / 2);
-    (*t->vector) (xmax / 2 + t->h_char * 10, ymax / 2 + t->v_char / 2);
-    (*t->vector) (xmax / 2 + t->h_char * 10, ymax / 2 - t->v_char / 2);
-    (*t->vector) (xmax / 2 - t->h_char * 10, ymax / 2 - t->v_char / 2);
-    (*t->vector) (xmax / 2 - t->h_char * 10, ymax / 2 + t->v_char / 2);
-    (*t->put_text) (xmax / 2 - t->h_char * 10, ymax / 2,
+    (*t->move) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
+    (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 + t->v_char / 2);
+    (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 - t->v_char / 2);
+    (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 - t->v_char / 2);
+    (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
+    (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2,
 		    "12345678901234567890");
     /* test justification */
     (void) (*t->justify_text) (LEFT);
-    (*t->put_text) (xmax / 2, ymax / 2 + t->v_char * 6, "left justified");
+    (*t->put_text) (xmax_t / 2, ymax_t / 2 + t->v_char * 6, "left justified");
     str = "centre+d text";
     if ((*t->justify_text) (CENTRE))
-	(*t->put_text) (xmax / 2,
-			ymax / 2 + t->v_char * 5, str);
+	(*t->put_text) (xmax_t / 2,
+			ymax_t / 2 + t->v_char * 5, str);
     else
-	(*t->put_text) (xmax / 2 - strlen(str) * t->h_char / 2,
-			ymax / 2 + t->v_char * 5, str);
+	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char / 2,
+			ymax_t / 2 + t->v_char * 5, str);
     str = "right justified";
     if ((*t->justify_text) (RIGHT))
-	(*t->put_text) (xmax / 2,
-			ymax / 2 + t->v_char * 4, str);
+	(*t->put_text) (xmax_t / 2,
+			ymax_t / 2 + t->v_char * 4, str);
     else
-	(*t->put_text) (xmax / 2 - strlen(str) * t->h_char,
-			ymax / 2 + t->v_char * 4, str);
+	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char,
+			ymax_t / 2 + t->v_char * 4, str);
     /* test text angle */
     str = "rotated ce+ntred text";
     if ((*t->text_angle) (1)) {
 	if ((*t->justify_text) (CENTRE))
 	    (*t->put_text) (t->v_char,
-			    ymax / 2, str);
+			    ymax_t / 2, str);
 	else
 	    (*t->put_text) (t->v_char,
-			    ymax / 2 - strlen(str) * t->h_char / 2, str);
+			    ymax_t / 2 - strlen(str) * t->h_char / 2, str);
     } else {
 	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (t->h_char * 2, ymax / 2 - t->v_char * 2, "Can't rotate text");
+	(*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "Can't rotate text");
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
     /* test tic size */
-    (*t->move) ((unsigned int) (xmax / 2 + t->h_tic * (1 + ticscale)), (unsigned) 0);
-    (*t->vector) ((unsigned int) (xmax / 2 + t->h_tic * (1 + ticscale)), (unsigned int) (ticscale * t->v_tic));
-    (*t->move) ((unsigned int) (xmax / 2), (unsigned int) (t->v_tic * (1 + ticscale)));
-    (*t->vector) ((unsigned int) (xmax / 2 + ticscale * t->h_tic), (unsigned int) (t->v_tic * (1 + ticscale)));
-    (*t->put_text) ((unsigned int) (xmax / 2 - 10 * t->h_char), (unsigned int) (t->v_tic * 2 + t->v_char / 2), "test tics");
+    (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned) 0);
+    (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned int)
+		  (ticscale * t->v_tic));
+    (*t->move) ((unsigned int) (xmax_t / 2), (unsigned int) (t->v_tic * (1 + ticscale)));
+    (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic), (unsigned int) (t->v_tic * (1
+												 + ticscale)));
+    (*t->put_text) ((unsigned int) (xmax_t / 2 - 10 * t->h_char), (unsigned int) (t->v_tic * 2 +
+										  t->v_char / 2),
+		    "test tics");
 
     /* test line and point types */
-    x = xmax - t->h_char * 6 - p_width;
-    y = ymax - key_entry_height;
+    x = xmax_t - t->h_char * 6 - p_width;
+    y = ymax_t - key_entry_height;
     (*t->pointsize) (pointsize);
     for (i = -2; y > key_entry_height; i++) {
 	(*t->linetype) (i);
@@ -1274,8 +1272,8 @@ void test_term()
     /* test some arrows */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
-    x = xmax / 4;
-    y = ymax / 4;
+    x = xmax_t / 4;
+    y = ymax_t / 4;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
     (*t->arrow) (x, y, x + xl, y, TRUE);
@@ -1340,20 +1338,21 @@ void reopen_binary()
 
 #ifdef VMS
 /* these are needed to modify terminal characteristics */
-#ifndef VWS_XMAX	/* avoid duplicate warning; VWS includes these */
-#include <descrip.h>
-#include <ssdef.h>
-#endif
-#include <iodef.h>
-#include <ttdef.h>
-#include <tt2def.h>
-#include <dcdef.h>
-#include <stat.h>
-#include <fab.h>
-/* If you use WATCOM C, you may have to comment out the following branch */
-#ifndef TT2$M_DECCRT3		/* VT300 not defined as of VAXC v2.4 */
-#define TT2$M_DECCRT3 0X80000000
-#endif
+# ifndef VWS_XMAX
+   /* avoid duplicate warning; VWS includes these */
+#  include <descrip.h>
+#  include <ssdef.h>
+# endif /* !VWS_MAX */
+# include <iodef.h>
+# include <ttdef.h>
+# include <tt2def.h>
+# include <dcdef.h>
+# include <stat.h>
+# include <fab.h>
+ /* If you use WATCOM C, you may have to comment out the following branch */
+# ifndef TT2$M_DECCRT3		/* VT300 not defined as of VAXC v2.4 */
+#  define TT2$M_DECCRT3 0X80000000
+# endif
 static unsigned short chan;
 static int old_char_buf[3], cur_char_buf[3];
 $DESCRIPTOR(sysoutput_desc, "SYS$OUTPUT");
