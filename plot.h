@@ -52,23 +52,25 @@
 /*
  * Define operating system dependent constants [default value]:
  *
- * OS:      [" "] Name of OS plus trailing space
- * HOME:    [HOME] Name of environment variable which points to
- *          the directory where gnuplot's config file is found.
- * PLOTRC:  [".gnuplot"] Name of the gnuplot startup file.
- * SHELL:   ["/bin/sh"] Name, and in some cases, full path to the shell
- *          that is used to run external commands.
- * DIRSEP1: ['/'] Primary character which separates path components.
- * DIRSEP2: ['\0'] Secondary character which separates path components.
+ * OS:       [" "] Name of OS plus trailing space
+ * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overriden by Makefile
+ * HOME:     ["HOME"] Name of environment variable which points to
+ *           the directory where gnuplot's config file is found.
+ * PLOTRC:   [".gnuplot"] Name of the gnuplot startup file.
+ * SHELL:    ["/bin/sh"] Name, and in some cases, full path to the shell
+ *           that is used to run external commands.
+ * DIRSEP1:  ['/'] Primary character which separates path components.
+ * DIRSEP2:  ['\0'] Secondary character which separates path components.
  *        
  */
 
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
 # define OS "Amiga "
 # ifndef __amigaos__
+#  define HELPFILE "S:gnuplot.gih"
 #  define HOME     "GNUPLOT"
 #  define SHELL    "NewShell"
-#  define DIRSEP2 ':'
+#  define DIRSEP2  ':'
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -88,6 +90,7 @@
 
 #ifdef DOS386
 # define OS "DOS 386 "
+# define HELPFILE "gnuplot.gih"
 # define HOME  "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
 # define DIRSEP1 '\\'
@@ -103,6 +106,7 @@
 
 #ifdef OS2
 # define OS "OS/2 "
+# define HELPFILE "gnuplot.gih"
 # define HOME  "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
 # define SHELL "c:\\os2\\cmd.exe"
@@ -154,6 +158,7 @@
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
+# define HELPFILE "gnuplot.gih"
 # define HOME "GNUPLOT"
 # define PLOTRC "gnuplot.ini"
 # define OS "MS-DOS "
@@ -163,7 +168,8 @@
 # endif
 #endif /* MSDOS */
 
-#if defined(__unix__) || defined(unix)
+/* Note: may not catch all IBM AIX compilers or SCO compilers */
+#if __unix__ || unix || _AIX || SCO
 # ifndef unix
 #  define unix
 # endif
@@ -172,22 +178,6 @@
 # endif
 #endif /* Unix */
 
-/* Note: may not catch all IBM AIX compilers */
-#ifdef _AIX
-# ifndef unix
-#  define unix
-# endif
-# define OS "Unix "
-#endif /* AIX */
-
-/* Attempted fix for SCO */
-#ifdef SCO
-# ifndef unix
-#  define unix
-# endif
-# define OS "Unix "
-#endif /* SCO */
-
 /* End OS dependent constants; fall-through defaults
  * for the constants defined above are following.
  */
@@ -195,6 +185,10 @@
 #ifndef OS
 # define OS " "
 #endif
+
+#ifndef HELPFILE
+# define HELPFILE "docs/gnuplot.gih"
+#endif /* !HELPFILE */
 
 #ifndef HOME
 # define HOME "HOME"
@@ -216,19 +210,6 @@
 # define DIRSEP2 NUL
 #endif
 
-/* Define helpfile location - overriden by Makefile */
-#ifndef HELPFILE
-# if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
-#  define HELPFILE "gnuplot.gih"
-# else
-#  if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
-#   define HELPFILE "S:gnuplot.gih"
-#  else
-#   define HELPFILE "docs/gnuplot.gih"  /* changed by makefile */
-#  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
-# endif /* MSDOS || OS2 || DOS386 */
-#endif /* !HELPFILE */
-
 #ifndef FAQ_LOCATION
 # define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/"
 #endif
@@ -240,6 +221,40 @@
 #ifndef HELPMAIL
 # define HELPMAIL "info-gnuplot@dartmouth.edu"
 #endif
+/* End fall-through defaults */
+
+/* DOS/Windows stuff. Moved here from command.c */
+#if defined(MSDOS) || defined(DOS386)
+# ifdef DJGPP
+#  include <dos.h>
+#  include <dir.h>              /* HBB: for setdisk() */
+# else
+#  include <process.h>
+# endif                         /* DJGPP */
+
+# ifdef __ZTC__
+#  define HAVE_SLEEP 1
+#  define P_WAIT 0
+# else
+
+#  ifdef __TURBOC__
+#   ifndef _Windows
+#    define HAVE_SLEEP 1
+#    include <conio.h>
+#    include <dir.h>            /* setdisk() */
+#   endif                       /* _Windows */
+
+#  else                         /* must be MSC */
+#   if !defined(__EMX__) && !defined(DJGPP)
+#    ifdef __MSC__
+#     include <direct.h>        /* for _chdrive() */
+#    endif                      /* __MSC__ */
+
+#   endif                       /* !__EMX__ && !DJGPP */
+#  endif                        /* TURBOC */
+# endif                         /* ZTC */
+#endif /* MSDOS */
+/**/
 
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */

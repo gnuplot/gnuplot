@@ -1,5 +1,5 @@
 #ifndef lint
-static char    *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -34,30 +34,6 @@ static char    *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $
  * to the extent permitted by applicable law.
 ]*/
 
-#if defined(MSDOS) || defined(DOS386)
-# ifdef DJGPP
-#  include <dos.h>
-# else
-#  include <process.h>
-# endif /* !DJGPP */
-# ifdef __ZTC__
-#  define P_WAIT 0
-# else /* !ZTC */
-#  ifdef __TURBOC__
-#   ifndef _Windows
-#    include <conio.h>
-#    include <dir.h>    /* setdisk() */
-#   endif /* !_Windows */
-#  else				/* must be MSC */
-#   if !defined(__EMX__) && !defined(DJGPP)
-#    ifdef __MSC__
-#     include <direct.h>		/* for _chdrive() */
-#    endif
-#   endif /* !__EMX__ && !DJGPP */
-#  endif /* !TURBOC */
-# endif /* !ZTC */
-#endif /* MSDOS || DOS386 */
-
 #include "plot.h"
 #include "setshow.h"
 #include "fit.h"
@@ -74,10 +50,10 @@ static char    *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $
 #  include <ext.h>
 #  include <tos.h>
 #  include <aes.h>
-# else /* !PUREC */
+# else				/* !PUREC */
 #  include <osbind.h>
 #  include <aesbind.h>
-# endif /* !PUREC */
+# endif				/* !PUREC */
 #endif /* ATARI || MTOS */
 
 #ifndef STDOUT
@@ -89,11 +65,11 @@ static char    *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $
 void plotrequest __PROTO((void));
 void plot3drequest __PROTO((void));
 void define __PROTO((void));
-static void get_data __PROTO((struct curve_points *this_plot));
-static void store2d_point __PROTO((struct curve_points *this_plot, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
-static void print_table __PROTO((struct curve_points *first_plot, int plot_num));
+static void get_data __PROTO((struct curve_points * this_plot));
+static void store2d_point __PROTO((struct curve_points * this_plot, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
+static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
-static void parametric_fixup __PROTO((struct curve_points *start_plot, int *plot_num));
+static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
 
 
 /* the curves/surfaces of the plot */
@@ -102,7 +78,8 @@ static struct udft_entry plot_func;
 extern struct udft_entry *dummy_func;
 
 /* jev -- for passing data thru user-defined function */
-/* static */ struct udft_entry ydata_func;  /* datafile.c needs access */
+/* Needed by datafile.c */
+struct udft_entry ydata_func;
 
 extern int datatype[];
 extern char timefmt[];
@@ -117,11 +94,11 @@ extern int plot_token;
  * these are given symbolic names in plot.h
  */
 
-extern double          min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-extern int             auto_array[AXIS_ARRAY_SIZE];
-extern TBOOLEAN        log_array[AXIS_ARRAY_SIZE];
-extern double          base_array[AXIS_ARRAY_SIZE];
-extern double          log_base_array[AXIS_ARRAY_SIZE];
+extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
+extern int auto_array[AXIS_ARRAY_SIZE];
+extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
+extern double base_array[AXIS_ARRAY_SIZE];
+extern double log_base_array[AXIS_ARRAY_SIZE];
 
 /* Deleted from setshow.h and renamed */
 extern FILE *gpoutfile;
@@ -203,10 +180,10 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
       if (auto_array[AXIS] & 2) max_array[AXIS] = VALUE; else { TYPE = OUTRANGE; OUT_ACTION; }   \
      } \
 } while(0)
-     
+
 /* use this instead empty macro arguments to work around NeXT cpp bug */
 /* if this fails on any system, we might use ((void)0) */
-#define NOOP /* */
+#define NOOP			/* */
 
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
@@ -216,7 +193,7 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
 #else
 # define LOG_MSG(x) "x range must be greater than 0 for log scale!"
 #endif
- 
+
 #define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
 do { if (reverse_range[AXIS]) { \
       double temp = min_array[AXIS]; \
@@ -240,7 +217,7 @@ void plotrequest()
  * sin(b)
  */
 {
-    int             dummy_token = -1;
+    int dummy_token = -1;
 
     if (!term)			/* unknown */
 	int_error("use 'set term' to set terminal type first", c_token);
@@ -251,13 +228,14 @@ void plotrequest()
 	strcpy(dummy_var[0], "t");
 
     /* initialise the arrays from the 'set' scalars */
-     
+
     INIT_ARRAYS(FIRST_X_AXIS, xmin, xmax, autoscale_x, is_log_x, base_log_x, log_base_log_x, 0);
     INIT_ARRAYS(FIRST_Y_AXIS, ymin, ymax, autoscale_y, is_log_y, base_log_y, log_base_log_y, 1);
     INIT_ARRAYS(SECOND_X_AXIS, x2min, x2max, autoscale_x2, is_log_x2, base_log_x2, log_base_log_x2, 0);
     INIT_ARRAYS(SECOND_Y_AXIS, y2min, y2max, autoscale_y2, is_log_y2, base_log_y2, log_base_log_y2, 1);
 
-    min_array[T_AXIS] = tmin; max_array[T_AXIS] = tmax;
+    min_array[T_AXIS] = tmin;
+    max_array[T_AXIS] = tmax;
 
     if (equals(c_token, "[")) {
 	c_token++;
@@ -270,24 +248,20 @@ void plotrequest()
 		/* Parse it as an xmin expression. */
 		/* used to be: int_error("'=' expected",c_token); */
 	    }
-	}
-	
-	{   int axis = (parametric||polar) ? T_AXIS : FIRST_X_AXIS;
+	} {
+	    int axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
 
-	    auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]);
+	    auto_array[axis] = load_range(axis, &min_array[axis], &max_array[axis], auto_array[axis]);
 	    if (!equals(c_token, "]"))
 		int_error("']' expected", c_token);
 	    c_token++;
-	} /* end of scope of 'axis' */
-    } /* first '[' */
-    
-
-    
-    if (parametric||polar)	/* set optional x ranges */
+	}			/* end of scope of 'axis' */
+    }				/* first '[' */
+    if (parametric || polar)	/* set optional x ranges */
 	LOAD_RANGE(FIRST_X_AXIS);
     else {
- 	/* order of t doesn't matter, but x does */
+	/* order of t doesn't matter, but x does */
 	CHECK_REVERSE(FIRST_X_AXIS);
     }
 
@@ -307,8 +281,8 @@ void plotrequest()
     eval_plots();
 }
 
-#define NCOL 7          /* Use up to 7 columns in data file at once --
-                           originally it was 5 */
+/* Use up to 7 columns in data file at once -- originally it was 5 */
+#define NCOL 7
 
 
 /* A quick note about boxes style. For boxwidth auto, we cannot
@@ -319,272 +293,264 @@ void plotrequest()
  * calculated, or 0 to mean that xmin/xmax are set correctly
  */
 
- 
+
 static void get_data(this_plot)
 struct curve_points *this_plot;
 /* this_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
  */
 {
-	register int    i /* num. points ! */, j,col;
-	double v[NCOL];
-	int storetoken = this_plot->token;
+    register int i /* num. points ! */ , j, col;
+    double v[NCOL];
+    int storetoken = this_plot->token;
 
-	/* eval_plots has already opened file */
+    /* eval_plots has already opened file */
 
-	switch(this_plot->plot_style){            /* set maximum columns to scan */
-		case XYERRORBARS:
-		case BOXXYERROR:  
-			col = 7; 
-			break;
+    switch (this_plot->plot_style) {	/* set maximum columns to scan */
+    case XYERRORBARS:
+    case BOXXYERROR:
+	col = 7;
+	break;
 
-		case BOXERROR:    
-		case FINANCEBARS:
-		case CANDLESTICKS:
-			col = 5; 
-			break;
+    case BOXERROR:
+    case FINANCEBARS:
+    case CANDLESTICKS:
+	col = 5;
+	break;
+
+    case XERRORBARS:
+    case YERRORBARS:
+    case VECTOR:
+	col = 4;
+	break;
+
+    case BOXES:
+	col = 4;
+	break;
+
+    default:
+	col = 2;
+    }
+
+    if (this_plot->plot_smooth == ACSPLINES)
+	col = 3;
+
+    if (df_no_use_specs > col)
+	fprintf(stderr, "warning : too many using specs for this style\n");
+
+    i = 0;
+    while ((j = df_readline(v, col)) != DF_EOF) {
+	/* j <= col */
+
+	if (i >= this_plot->p_max) {
+	    /*
+	     * overflow about to occur. Extend size of points[] array. We
+	     * either double the size, or add 1000 points, whichever is a
+	     * smaller increment. Note i = p_max.
+	     */
+	    cp_extend(this_plot, i + (i < 1000 ? i : 1000));
+	}
+	/* Limitation: No xerrorbars with boxes */
+	switch (j) {
+	default:
+	    {
+		char message[80];
+		sprintf(message, "internal error : df_readline returned %d : datafile line %d", j, df_line_number);
+		df_close();
+		int_error(message, c_token);
+	    }
+	case DF_UNDEFINED:
+	    /* bad result from extended using expression */
+	    this_plot->points[i].type = UNDEFINED;
+	    i++;
+	    continue;
+
+	case DF_FIRST_BLANK:
+	    /* break in data, make next point undefined */
+	    this_plot->points[i].type = UNDEFINED;
+	    i++;
+	    continue;
+
+	case DF_SECOND_BLANK:
+	    /* second blank line. We dont do anything
+	     * (we did everything when we got FIRST one)
+	     */
+	    continue;
+
+	case 0:		/* not blank line, but df_readline couldn't parse it */
+	    {
+		char message[80];
+		sprintf(message, "Bad data on line %d", df_line_number);
+		df_close();
+		int_error(message, this_plot->token);
+	    }
+
+	case 1:
+	    {			/* only one number */
+		/* x is index, assign number to y */
+		v[1] = v[0];
+		v[0] = df_datum;
+		/* nobreak */
+	    }
+
+	case 2:
+	    /* x, y */
+	    /* ylow and yhigh are same as y */
+
+	    if (this_plot->plot_style == BOXES && boxwidth > 0) {
+		/* calc width now */
+		store2d_point(this_plot, i++, v[0], v[1], v[0] - boxwidth / 2, v[0] + boxwidth / 2, v[1], v[1], 0.0);
+	    } else {
+		/* xlow and xhigh are same as x */
+		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1],
+			      -1.0);	/* auto width if boxes, else ignored */
+	    }
+	    break;
+
+
+	case 3:
+	    /* x, y, ydelta OR x, y, xdelta OR x, y, width */
+	    if (this_plot->plot_smooth == ACSPLINES)
+		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
+	    else
+		switch (this_plot->plot_style) {
+		default:
+		    int_warn("This plot style not work with 3 cols. Setting to yerrorbars", storetoken);
+		    this_plot->plot_style = YERRORBARS;
+		    /* fall through */
+
+		case YERRORBARS:
+		case BOXERROR:	/* x, y, dy */
+		    store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1] - v[2], v[1] + v[2],
+				  -1.0);	/* auto width if boxes, else ignored */
+		    break;
 
 		case XERRORBARS:
-		case YERRORBARS:
-		case VECTOR:
-			col = 4; 
-			break;
+		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2], v[0] + v[2], v[1], v[1], 0.0);
+		    break;
 
-		case BOXES:       
-			col = 4;
-			break;
+		case BOXES:
+		    /* calculate xmin and xmax here, so that logs are taken if
+		     * if necessary
+		     */
+		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2] / 2, v[0] + v[2] / 2, v[1], v[1], 0.0);
+		    break;
 
-		default:          
-			col = 2;
-	}
+		}		/*inner switch */
 
-	if (this_plot->plot_smooth == ACSPLINES)
-	  col = 3;
-
-	if (df_no_use_specs > col)
-		fprintf(stderr, "warning : too many using specs for this style\n");
-
-	i = 0;
-	while ( (j = df_readline(v, col)) != DF_EOF)  {
-		/* j <= col */
-
-		if (i >= this_plot->p_max) {
-			/*
-			 * overflow about to occur. Extend size of points[] array. We
-			 * either double the size, or add 1000 points, whichever is a
-			 * smaller increment. Note i = p_max.
-			 */
-			cp_extend(this_plot, i + (i < 1000 ? i : 1000));
-		}
+	    break;
 
 
-		/* Limitation: No xerrorbars with boxes */
-		switch (j) {
+
+	case 4:
+	    /* x, y, ylow, yhigh OR
+	     * x, y, xlow, xhigh OR
+	     * x, y, xdelta, ydelta OR
+	     * x, y, ydelta, width
+	     */
+
+	    switch (this_plot->plot_style) {
+	    default:
+		int_warn("This plot style does not work with 4 cols. Setting to yerrorbars",
+			 storetoken);
+		this_plot->plot_style = YERRORBARS;
+		/* fall through */
+
+	    case YERRORBARS:
+		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2], v[3], -1.0);
+		break;
+
+	    case BOXXYERROR:	/* x, y, dx, dy */
+	    case XYERRORBARS:
+		store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2], v[0] + v[2], v[1] - v[3], v[1] + v[3], 0.0);
+		break;
+
+
+	    case BOXES:	/* x, y, xmin, xmax */
+		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
+		break;
+
+	    case XERRORBARS:
+		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
+		break;
+
+	    case BOXERROR:
+		/* x,y, xleft, xright */
+		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1] - v[2], v[1] + v[2], 0.0);
+		break;
+
+	    case VECTOR:
+		/* x,y,dx,dy */
+		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0] + v[2], v[1], v[1] + v[3], -1.0);
+		break;
+	    }			/*inner switch */
+
+	    break;
+
+
+	case 5:
+	    {			/* x, y, ylow, yhigh, width  or  x open low high close */
+		switch (this_plot->plot_style) {
 		default:
-			{	char message[80];
-				sprintf(message, "internal error : df_readline returned %d : datafile line %d", j, df_line_number);
-				df_close();
-				int_error(message, c_token);
-			}
-		case DF_UNDEFINED:
-			/* bad result from extended using expression */
-			this_plot->points[i].type = UNDEFINED;
-			i++;
-			continue;
+		    int_warn("Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars", storetoken);
+		    this_plot->plot_style = BOXERROR;
+		    /*fall through */
 
-		case DF_FIRST_BLANK:
-			/* break in data, make next point undefined */
-			this_plot->points[i].type = UNDEFINED;
-			i++;
-			continue;
+		case BOXERROR:	/* x, y, ylow, yhigh, width */
+		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[4] / 2, v[0] + v[4] / 2, v[2], v[3], 0.0);
+		    break;
 
-		case DF_SECOND_BLANK:
-			/* second blank line. We dont do anything
-			 * (we did everything when we got FIRST one)
-			 */
-			 continue;
-		
-		case 0: /* not blank line, but df_readline couldn't parse it */
-			{
-				char message[80];
-				sprintf(message, "Bad data on line %d", df_line_number);
-				df_close();
-				int_error(message, this_plot->token);
-			}
-			
-		case 1:
-			{		/* only one number */
-				/* x is index, assign number to y */
-				v[1] = v[0];
-				v[0] = df_datum;
-				/* nobreak */
-			}
+		case FINANCEBARS:
+		case CANDLESTICKS:
+		    store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2], v[3], v[4]);
+		    break;
+		}
+		break;
+	    }
 
-		case 2: 
-			/* x, y */
-			/* ylow and yhigh are same as y */
+	case 7:
+	    /* same as six columns. Width ignored */
+	    /* eh ? - fall through */
+	case 6:
+	    /* x, y, xlow, xhigh, ylow, yhigh */
+	    switch (this_plot->plot_style) {
+	    default:
+		int_warn("This plot style not work with 6 cols. Setting to xyerrorbars", storetoken);
+		this_plot->plot_style = XYERRORBARS;
+		/*fall through */
+	    case XYERRORBARS:
+	    case BOXXYERROR:
+		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[4], v[5], 0.0);
+		break;
+	    }
 
-			if (this_plot->plot_style == BOXES && boxwidth > 0)
-			{
-				/* calc width now */
-				store2d_point(this_plot, i++, v[0], v[1], v[0]-boxwidth/2, v[0]+boxwidth/2, v[1], v[1], 0.0);
-			}
-			else
-			{
-				/* xlow and xhigh are same as x */
-				store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1],
-				-1.0); /* auto width if boxes, else ignored */
-			}
-			break;
+	}			/*switch */
 
+    }				/*while */
 
-		case 3:
-			/* x, y, ydelta OR x, y, xdelta OR x, y, width */
-			if(this_plot->plot_smooth == ACSPLINES)
-       			store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
-			else
-				switch(this_plot->plot_style)
-				{
-					default:
-						int_warn("This plot style not work with 3 cols. Setting to yerrorbars", storetoken);
-						this_plot->plot_style = YERRORBARS;
-						/* fall through */
-						
-					case YERRORBARS:
-					case BOXERROR: /* x, y, dy */
-						store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1]-v[2], v[1]+v[2],
-						  -1.0); /* auto width if boxes, else ignored */
-						 break;
-						  
-					case XERRORBARS:
-						store2d_point(this_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2], v[1], v[1], 0.0);
-						break;
+    this_plot->p_count = i;
+    cp_extend(this_plot, i);	/* shrink to fit */
 
-					case BOXES:
-						/* calculate xmin and xmax here, so that logs are taken if
-						 * if necessary
-						 */
-						store2d_point(this_plot, i++, v[0], v[1], v[0]-v[2]/2, v[0]+v[2]/2, v[1], v[1], 0.0);
-						break;
-
-				} /*inner switch*/
-				
-			break;
-
-
-			
-		case 4:
-			/* x, y, ylow, yhigh OR
-			 * x, y, xlow, xhigh OR
-			 * x, y, xdelta, ydelta OR
-			 * x, y, ydelta, width
-			 */
-
-			 switch (this_plot->plot_style)
-			 {
-			 	default:
-					int_warn("This plot style not work with 4 cols. Setting to yerrorbars",
-					    storetoken);
-					this_plot->plot_style = YERRORBARS;
-					/* fall through */
-
-				case YERRORBARS:
-					store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2], v[3], -1.0);
-					break;
-					
-				case BOXXYERROR: /* x, y, dx, dy */
-				case XYERRORBARS:
-					store2d_point(this_plot, i++, v[0], v[1], v[0]-v[2], v[0]+v[2], v[1]-v[3], v[1]+v[3], 0.0);
-					break;
-					
-
-				case BOXES: /* x, y, xmin, xmax */
-					store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
-					break;
-
-				case XERRORBARS:
-					store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1], v[1], 0.0);
-					break;
-
-				case BOXERROR:
-					/* x,y, xleft, xright */
-					store2d_point(this_plot, i++, v[0], v[1], v[0],v[0], v[1]-v[2], v[1]+v[2], 0.0);
-					break;
-
-				case VECTOR:
-					/* x,y,dx,dy */
-					store2d_point(this_plot, i++, v[0], v[1], v[0], v[0]+v[2], v[1], v[1]+v[3], -1.0);
-					break;
-			 } /*inner switch*/
-
-			break;
-
-			
-		case 5: 
-			{		/* x, y, ylow, yhigh, width  or  x open low high close */
-				switch(this_plot->plot_style)
-				{
-					default:
-						int_warn("Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars", storetoken);
-						this_plot->plot_style = BOXERROR;
-						/*fall through*/
-
-					case BOXERROR: /* x, y, ylow, yhigh, width */
-						store2d_point(this_plot, i++, v[0], v[1], v[0]-v[4]/2, v[0]+v[4]/2, v[2], v[3], 0.0);
-						break;
-						
-					case FINANCEBARS:
-					case CANDLESTICKS:
-						store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2], v[3], v[4]);
-						break;
-				}
-				break;
-			}
-			
-		case 7: 
-			/* same as six columns. Width ignored */
-			/* eh ? - fall through */
-		case 6:
-				/* x, y, xlow, xhigh, ylow, yhigh */
-				switch (this_plot->plot_style)
-				{
-					default:
-						int_warn("This plot style not work with 6 cols. Setting to xyerrorbars",storetoken);
-						this_plot->plot_style = XYERRORBARS;
-						/*fall through*/
-					case XYERRORBARS:
-					case BOXXYERROR:
-						store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[4], v[5], 0.0);
-						break;
-				}
-				
-		} /*switch*/
-		
-	} /*while*/
-	
-	this_plot->p_count = i;
-	cp_extend(this_plot, i);	/* shrink to fit */
-
-	df_close();
+    df_close();
 }
 
 /* called by get_data for each point */
 static void store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
-    struct curve_points *this_plot;
-    int             i;		/* point number */
-    double          x, y;
-    double          ylow, yhigh;
-    double          xlow, xhigh;
-    double          width; /* -1 means autocalc, 0 means use xmin/xmax */
+struct curve_points *this_plot;
+int i;				/* point number */
+double x, y;
+double ylow, yhigh;
+double xlow, xhigh;
+double width;			/* -1 means autocalc, 0 means use xmin/xmax */
 {
     struct coordinate GPHUGE *cp = &(this_plot->points[i]);
-    int dummy_type = INRANGE; /* sometimes we dont care about outranging */
+    int dummy_type = INRANGE;	/* sometimes we dont care about outranging */
 
 
     /* jev -- pass data values thru user-defined function */
     /* div -- y is dummy variable 2 - copy value there */
     if (ydata_func.at) {
-	struct value    val;
+	struct value val;
 
 	(void) Gcomplex(&ydata_func.dummy_values[0], y, 0.0);
 	ydata_func.dummy_values[2] = ydata_func.dummy_values[0];
@@ -601,34 +567,37 @@ static void store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
 	evaluate_at(ydata_func.at, &val);
 	yhigh = undefined ? 0 : real(&val);
     }
-
     dummy_type = cp->type = INRANGE;
 
     if (polar) {
-    	double newx, newy;
-	if ( !(autoscale_r&2) && y>rmax)
-		cp->type = OUTRANGE;
-	if ( !(autoscale_r&1) )
-		y -= rmin; /* we store internally as if plotting r(t)-rmin */
-	newx = y*cos(x * ang2rad);
-	newy = y*sin(x * ang2rad);
-	y = ylow = yhigh = newy; /* only lines and points supported with polar */
+	double newx, newy;
+	if (!(autoscale_r & 2) && y > rmax) {
+	    cp->type = OUTRANGE;
+	}
+	if (!(autoscale_r & 1)) {
+	    /* we store internally as if plotting r(t)-rmin */
+	    y -= rmin;
+	}
+	newx = y * cos(x * ang2rad);
+	newy = y * sin(x * ang2rad);
+	/* only lines and points supported with polar */
+	y = ylow = yhigh = newy;
 	x = xlow = xhigh = newx;
     }
-
     /* return immediately if x or y are undefined
      * we dont care if outrange for high/low.
-     * BUT if high/low undefined (ie log( < 0 ), no number is stored, but graphics.c doesn't know.
+     * BUT if high/low undefined (ie log( < 0 ), no number is stored,
+     * but graphics.c doesn't know.
      * explicitly store -VERYLARGE;
      */
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, this_plot->x_axis, NOOP, return );
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, this_plot->x_axis, NOOP, return);
     STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xlow, xlow, dummy_type, this_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
     STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xhigh, xhigh, dummy_type, this_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, this_plot->y_axis, NOOP, return );
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->ylow, ylow, dummy_type, this_plot->y_axis, NOOP,cp->ylow = -VERYLARGE);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->yhigh, yhigh, dummy_type, this_plot->y_axis, NOOP,cp->yhigh = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, this_plot->y_axis, NOOP, return);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->ylow, ylow, dummy_type, this_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->yhigh, yhigh, dummy_type, this_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
     cp->z = width;
-} /* store2d_point */
+}				/* store2d_point */
 
 
 
@@ -637,27 +606,27 @@ static void store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
  * the curve structure. If curve<0, then we print the list of curves.
  */
 
-#if 0 /* not used */
-static char    *plot_type_names[4] =
+#if 0				/* not used */
+static char *plot_type_names[4] =
 {
     "Function", "Data", "3D Function", "3d data"
 };
-static char    *plot_style_names[14] =
+static char *plot_style_names[14] =
 {
     "Lines", "Points", "Impulses", "LinesPoints", "Dots", "XErrorbars",
-    "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
+ "YErrorbars", "XYErrorbars", "BoxXYError", "Boxes", "Boxerror", "Steps",
     "FSteps", "Vector"
 };
-static char    *plot_smooth_names[5] =
+static char *plot_smooth_names[5] =
 {
     "None", "Unique", "CSplines", "ACSplines", "Bezier", "SBezier"
 };
 
 static void print_points(curve)
-    int             curve;	/* which curve to print */
+int curve;			/* which curve to print */
 {
     register struct curve_points *this_plot;
-    int             i;
+    int i;
 
     if (curve < 0) {
 	for (this_plot = first_plot, i = 0;
@@ -695,15 +664,15 @@ static void print_points(curve)
 	else {
 	    printf("Curve %d, %d points\n", curve, this_plot->p_count);
 	    for (i = 0; i < this_plot->p_count; i++) {
-                printf("%c x=%g y=%g z=%g xlow=%g xhigh=%g ylow=%g yhigh=%g\n",
+		printf("%c x=%g y=%g z=%g xlow=%g xhigh=%g ylow=%g yhigh=%g\n",
 		       this_plot->points[i].type == INRANGE ? 'i'
 		       : this_plot->points[i].type == OUTRANGE ? 'o'
 		       : 'u',
 		       this_plot->points[i].x,
 		       this_plot->points[i].y,
 		       this_plot->points[i].z,
-                       this_plot->points[i].xlow,
-                       this_plot->points[i].xhigh,
+		       this_plot->points[i].xlow,
+		       this_plot->points[i].xhigh,
 		       this_plot->points[i].ylow,
 		       this_plot->points[i].yhigh);
 	    }
@@ -717,7 +686,7 @@ static void print_table(this_plot, plot_num)
 struct curve_points *this_plot;
 int plot_num;
 {
-    int             i, curve;
+    int i, curve;
 
     for (curve = 0; curve < plot_num;
 	 curve++, this_plot = this_plot->next_cp) {
@@ -732,7 +701,7 @@ int plot_num;
 	}
 	fprintf(gpoutfile, "\n");
     }
-    fprintf(gpoutfile, "\n"); /* two blank lines between plots in table output */
+    fprintf(gpoutfile, "\n");	/* two blank lines between plots in table output */
     fflush(gpoutfile);
 }
 
@@ -748,21 +717,21 @@ int plot_num;
  */
 static void eval_plots()
 {
-    register int    i;
+    register int i;
     register struct curve_points *this_plot, **tp_ptr;
 
-    int            some_functions = 0;
-    int             plot_num, line_num, point_num, xparam = 0;
-    char           *xtitle;
-    int begin_token = c_token; /* so we can rewind for second pass */
+    int some_functions = 0;
+    int plot_num, line_num, point_num, xparam = 0;
+    char *xtitle;
+    int begin_token = c_token;	/* so we can rewind for second pass */
 
     int uses_axis[AXIS_ARRAY_SIZE];
 
     uses_axis[FIRST_X_AXIS] =
-    uses_axis[FIRST_Y_AXIS] =
-    uses_axis[SECOND_X_AXIS] =
-    uses_axis[SECOND_Y_AXIS] = 0;
-    
+	uses_axis[FIRST_Y_AXIS] =
+	uses_axis[SECOND_X_AXIS] =
+	uses_axis[SECOND_Y_AXIS] = 0;
+
     /* Reset first_plot. This is usually done at the end of this function.
        If there is an error within this function, the memory is left allocated,
        since we cannot call cp_free if the list is incomplete. Making sure that
@@ -792,15 +761,14 @@ static void eval_plots()
 	    int specs;
 
 	    /* for datafile plot, record datafile spec for title */
-	    int    start_token = c_token, end_token;
-	    
+	    int start_token = c_token, end_token;
+
 	    plot_num++;
 
 	    if (isstring(c_token)) {	/* data file to plot */
-	    	
+
 		if (parametric && xparam)
-		    int_error("previous parametric function not fully specified",
-			      c_token);
+		    int_error("previous parametric function not fully specified", c_token);
 
 		if (*tp_ptr)
 		    this_plot = *tp_ptr;
@@ -812,13 +780,13 @@ static void eval_plots()
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = NONE;
 
-		specs = df_open(NCOL);  /* up to NCOL cols */
+		specs = df_open(NCOL);	/* up to NCOL cols */
 		/* this parses data-file-specific modifiers only */
 		/* we'll sort points when we know style, if necessary */
 		if (df_binary)
-			int_error("2d binary files not yet supported", c_token);
+		    int_error("2d binary files not yet supported", c_token);
 
-		this_plot->token = end_token = c_token-1;  /* include modifiers in default title */
+		this_plot->token = end_token = c_token - 1;	/* include modifiers in default title */
 
 	    } else {
 
@@ -841,110 +809,95 @@ static void eval_plots()
 		dummy_func = NULL;
 		/* ignore it for now */
 		end_token = c_token - 1;
-	} /* end of IS THIS A FILE OR A FUNC block */
+	    }			/* end of IS THIS A FILE OR A FUNC block */
 
-	
-	/*  deal with smooth */
-	if (almost_equals(c_token,"s$mooth")) {
-	    
-	    if (END_OF_COMMAND)
-	      int_error("expecting smooth parameter", c_token);
-	    else {
-		c_token++;
-		if (almost_equals(c_token,"u$nique"))
-		    this_plot->plot_smooth = UNIQUE;
-		else if (almost_equals(c_token,"a$csplines"))
-		    this_plot->plot_smooth = ACSPLINES;
-		else if (almost_equals(c_token,"c$splines"))
-		    this_plot->plot_smooth = CSPLINES;
-		else if (almost_equals(c_token,"b$ezier"))
-		    this_plot->plot_smooth = BEZIER;
-		else if (almost_equals(c_token,"s$bezier"))
-		    this_plot->plot_smooth = SBEZIER;
-		else int_error("expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'", c_token);
+
+	    /*  deal with smooth */
+	    if (almost_equals(c_token, "s$mooth")) {
+
+		if (END_OF_COMMAND)
+		    int_error("expecting smooth parameter", c_token);
+		else {
+		    c_token++;
+		    if (almost_equals(c_token, "u$nique"))
+			this_plot->plot_smooth = UNIQUE;
+		    else if (almost_equals(c_token, "a$csplines"))
+			this_plot->plot_smooth = ACSPLINES;
+		    else if (almost_equals(c_token, "c$splines"))
+			this_plot->plot_smooth = CSPLINES;
+		    else if (almost_equals(c_token, "b$ezier"))
+			this_plot->plot_smooth = BEZIER;
+		    else if (almost_equals(c_token, "s$bezier"))
+			this_plot->plot_smooth = SBEZIER;
+		    else
+			int_error("expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'", c_token);
+		}
+		this_plot->plot_style = LINES;
+		c_token++;	/* skip format */
 	    }
-	    this_plot->plot_style = LINES;
-	    c_token++;	/* skip format */
-	}
+	    /* look for axes/axis */
 
-
-	/* look for axes/axis */
-
-	if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is"))
-	{
+	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
 		if (parametric && xparam)
-			int_error("previous parametric function not fully specified", c_token);
-	
+		    int_error("previous parametric function not fully specified", c_token);
+
 		if (equals(++c_token, "x1y1")) {
-			x_axis = FIRST_X_AXIS;
-			y_axis = FIRST_Y_AXIS;
-			++c_token;
+		    x_axis = FIRST_X_AXIS;
+		    y_axis = FIRST_Y_AXIS;
+		    ++c_token;
 		} else if (equals(c_token, "x2y2")) {
-			x_axis = SECOND_X_AXIS;
-			y_axis = SECOND_Y_AXIS;
-			++c_token;
+		    x_axis = SECOND_X_AXIS;
+		    y_axis = SECOND_Y_AXIS;
+		    ++c_token;
 		} else if (equals(c_token, "x1y2")) {
-			x_axis = FIRST_X_AXIS;
-			y_axis = SECOND_Y_AXIS;
-			++c_token;
+		    x_axis = FIRST_X_AXIS;
+		    y_axis = SECOND_Y_AXIS;
+		    ++c_token;
 		} else if (equals(c_token, "x2y1")) {
-			x_axis = SECOND_X_AXIS;
-			y_axis = FIRST_Y_AXIS;
-			++c_token;
+		    x_axis = SECOND_X_AXIS;
+		    y_axis = FIRST_Y_AXIS;
+		    ++c_token;
 		} else
-			int_error("axes must be x1y1, x1y2, x2y1 or x2y2", c_token);
-	}
-	else
-	{
+		    int_error("axes must be x1y1, x1y2, x2y1 or x2y2", c_token);
+	    } else {
 		x_axis = FIRST_X_AXIS;
 		y_axis = FIRST_Y_AXIS;
-	}
-	
+	    }
 
-	this_plot->x_axis = x_axis;
-	this_plot->y_axis = y_axis;
 
-	/* we can now do some checks that we deferred earlier */
+	    this_plot->x_axis = x_axis;
+	    this_plot->y_axis = y_axis;
 
-	if (this_plot->plot_type == DATA)
-	{
-		if (!(uses_axis[x_axis]&1) && autoscale_lx) {
+	    /* we can now do some checks that we deferred earlier */
+
+	    if (this_plot->plot_type == DATA) {
+		if (!(uses_axis[x_axis] & 1) && autoscale_lx) {
 		    if (auto_array[x_axis] & 1)
-		    	min_array[x_axis] = VERYLARGE;
+			min_array[x_axis] = VERYLARGE;
 		    if (auto_array[x_axis] & 2)
-		    	max_array[x_axis] = -VERYLARGE;
+			max_array[x_axis] = -VERYLARGE;
 		}
-
 		if (datatype[x_axis] == TIME) {
-			if (specs < 2)
-				int_error("Need full using spec for x time data", c_token);
-			df_timecol[0] = 1;
+		    if (specs < 2)
+			int_error("Need full using spec for x time data", c_token);
+		    df_timecol[0] = 1;
 		}
-		
 		if (datatype[y_axis] == TIME) {
-			if (specs < 1)
-				int_error("Need using spec for y time data", c_token);
-			df_timecol[y_axis] = 1;  /* need other cols, but I'm lazy */
+		    if (specs < 1)
+			int_error("Need using spec for y time data", c_token);
+		    df_timecol[y_axis] = 1;	/* need other cols, but I'm lazy */
 		}
-		
-
-		uses_axis[x_axis] |= 1; /* separate record of datafile and func */
+		uses_axis[x_axis] |= 1;		/* separate record of datafile and func */
 		uses_axis[y_axis] |= 1;
-	}
-	else if (!parametric || !xparam)
-	{
+	    } else if (!parametric || !xparam) {
 		/* for x part of a parametric function, axes are possibly wrong */
-		uses_axis[x_axis] |= 2; /* separate record of data and func */
+		uses_axis[x_axis] |= 2;		/* separate record of data and func */
 		uses_axis[y_axis] |= 2;
-	}
-	
-	
-	if (almost_equals(c_token, "t$itle")) {
+	    }
+	    if (almost_equals(c_token, "t$itle")) {
 		if (parametric) {
 		    if (xparam)
-			int_error(
-				     "\"title\" allowed only after parametric function fully specified",
-				     c_token);
+			int_error("\"title\" allowed only after parametric function fully specified", c_token);
 		    else if (xtitle != NULL)
 			xtitle[0] = '\0';	/* Remove default title . */
 		}
@@ -955,83 +908,77 @@ static void eval_plots()
 		    int_error("expecting \"title\" for plot", c_token);
 		}
 		c_token++;
-	} else if (almost_equals(c_token, "not$itle")) {
+	    } else if (almost_equals(c_token, "not$itle")) {
 		if (xtitle != NULL)
-			xtitle[0] = '\0';
-	        c_token++;
-	} else {
+		    xtitle[0] = '\0';
+		c_token++;
+	    } else {
 		m_capture(&(this_plot->title), start_token, end_token);
 		if (xparam)
 		    xtitle = this_plot->title;
-	}
+	    }
 
 
-	if (almost_equals(c_token, "w$ith")) {
+	    if (almost_equals(c_token, "w$ith")) {
 		if (parametric && xparam)
-		    int_error("\"with\" allowed only after parametric function fully specified",
-			      c_token);
+		    int_error("\"with\" allowed only after parametric function fully specified", c_token);
 		this_plot->plot_style = get_style();
-	}
+	    }
+	    /* pick up line/point specs
+	     * - point spec allowed if style uses points, ie style&2 != 0
+	     * - keywords for lt and pt are optional
+	     */
+	    LP_PARSE(this_plot->lp_properties, 1, this_plot->plot_style & 2,
+		     line_num, point_num);
 
-	/* pick up line/point specs
-	 * - point spec allowed if style uses points, ie style&2 != 0
-	 * - keywords for lt and pt are optional
-	 */
-	LP_PARSE(this_plot->lp_properties, 1, this_plot->plot_style & 2,
-	   line_num, point_num);
-
-	/* allow old-style syntax too - ignore case lt 3 4 for example */
-	if (!equals(c_token, ",") && !END_OF_COMMAND)
-	{
+	    /* allow old-style syntax too - ignore case lt 3 4 for example */
+	    if (!equals(c_token, ",") && !END_OF_COMMAND) {
 		struct value t;
 		this_plot->lp_properties.l_type =
-		this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
+		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
 
 		if (!equals(c_token, ",") && !END_OF_COMMAND)
-			this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
-	}
-		
-	if (!xparam) {
-		if (this_plot->plot_style & 2) /* style includes points */
-			++point_num;
-		++line_num;
-	}
-
-	
-	    if (this_plot->plot_type == DATA)
-	    {
-	    	/* actually get the data now */
-	    	get_data(this_plot);
-
-	    	/* sort */
-                switch(this_plot->plot_smooth){   /* sort and average, if */
-                   case UNIQUE:                   /* the style requires   */
-                   case CSPLINES:
-                   case ACSPLINES:
-                   case SBEZIER:  sort_points(this_plot);
-                                  cp_implode(this_plot);
-				  break;
-		   default:
-					;	  /* keep gcc -Wall happy */
-                }
-                switch(this_plot->plot_smooth){   /* create new data set     */
-                   case SBEZIER:                  /* by evaluation of        */
-                   case BEZIER:                   /* interpolation routines  */
-                   case ACSPLINES:
-                   case CSPLINES: gen_interp(this_plot);
-			break;
-		   default:
-		   			; /* keep gcc -Wall happy */
-                }
-
-                /* now that we know the plot style, adjust the x- and yrange */
-                /* adjust_range(this_plot); no longer needed */
+		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
 	    }
-	    
-	    this_plot->token = c_token;  /* save end of plot for second pass */
+	    if (!xparam) {
+		if (this_plot->plot_style & 2)	/* style includes points */
+		    ++point_num;
+		++line_num;
+	    }
+	    if (this_plot->plot_type == DATA) {
+		/* actually get the data now */
+		get_data(this_plot);
+
+		/* sort */
+		switch (this_plot->plot_smooth) {	/* sort and average, if */
+		case UNIQUE:	/* the style requires   */
+		case CSPLINES:
+		case ACSPLINES:
+		case SBEZIER:
+		    sort_points(this_plot);
+		    cp_implode(this_plot);
+		    break;
+		default:
+		    ;		/* keep gcc -Wall happy */
+		}
+		switch (this_plot->plot_smooth) {	/* create new data set     */
+		case SBEZIER:	/* by evaluation of        */
+		case BEZIER:	/* interpolation routines  */
+		case ACSPLINES:
+		case CSPLINES:
+		    gen_interp(this_plot);
+		    break;
+		default:
+		    ;		/* keep gcc -Wall happy */
+		}
+
+		/* now that we know the plot style, adjust the x- and yrange */
+		/* adjust_range(this_plot); no longer needed */
+	    }
+	    this_plot->token = c_token;		/* save end of plot for second pass */
 	    tp_ptr = &(this_plot->next_cp);
-	    
-	} /* !is_defn */
+
+	}			/* !is_defn */
 
 	if (equals(c_token, ","))
 	    c_token++;
@@ -1043,7 +990,7 @@ static void eval_plots()
 	int_error("parametric function not fully specified", NO_CARET);
 
 
-    /*** Second Pass: Evaluate the functions ***/
+/*** Second Pass: Evaluate the functions ***/
     /*
      * Everything is defined now, except the function data. We expect no
      * syntax errors, etc, since the above parsed it all. This makes the code
@@ -1055,47 +1002,48 @@ static void eval_plots()
      * parametric or polar fns can still affect x ranges
      */
 
-     if (!parametric && !polar) {
+    if (!parametric && !polar) {
 	if (min_array[FIRST_X_AXIS] == VERYLARGE ||
 	    max_array[FIRST_X_AXIS] == -VERYLARGE)
-		int_error("x range is invalid", c_token);
+	    int_error("x range is invalid", c_token);
 	/* check that xmin -> xmax is not too small */
 	fixup_range(FIRST_X_AXIS, "x");
 
 	if (uses_axis[SECOND_X_AXIS] & 1) {
-		/* some data plots with x2 */
-		if (min_array[SECOND_X_AXIS] == VERYLARGE ||
-        	    max_array[SECOND_X_AXIS] == -VERYLARGE)
-			int_error("x2 range is invalid", c_token);
-		/* check that x2min -> x2max is not too small */
-		fixup_range(SECOND_X_AXIS, "x2");
-        } else if (auto_array[SECOND_X_AXIS]) {
-		/* copy x1's range */
-		if (auto_array[SECOND_X_AXIS] & 1)
-			min_array[SECOND_X_AXIS] = min_array[FIRST_X_AXIS];
-		if (auto_array[SECOND_X_AXIS] & 2)
-			max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
+	    /* some data plots with x2 */
+	    if (min_array[SECOND_X_AXIS] == VERYLARGE ||
+		max_array[SECOND_X_AXIS] == -VERYLARGE)
+		int_error("x2 range is invalid", c_token);
+	    /* check that x2min -> x2max is not too small */
+	    fixup_range(SECOND_X_AXIS, "x2");
+	} else if (auto_array[SECOND_X_AXIS]) {
+	    /* copy x1's range */
+	    if (auto_array[SECOND_X_AXIS] & 1)
+		min_array[SECOND_X_AXIS] = min_array[FIRST_X_AXIS];
+	    if (auto_array[SECOND_X_AXIS] & 2)
+		max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
 	}
     }
+    if (some_functions) {
 
-    
-  if (some_functions) {
+	/* call the controlled variable t, since x_min can also mean smallest x */
+	double t_min, t_max, t_step;
 
-    /* call the controlled variable t, since x_min can also mean smallest x */
-    double t_min, t_max, t_step;
-
-    if (parametric || polar) {
-	if (!(uses_axis[FIRST_X_AXIS]&1)) {
+	if (parametric || polar) {
+	    if (!(uses_axis[FIRST_X_AXIS] & 1)) {
 		/* these have not yet been set to full width */
-		if (auto_array[FIRST_X_AXIS] & 1) min_array[FIRST_X_AXIS] = VERYLARGE;
-		if (auto_array[FIRST_X_AXIS] & 2) max_array[FIRST_X_AXIS] = -VERYLARGE;
+		if (auto_array[FIRST_X_AXIS] & 1)
+		    min_array[FIRST_X_AXIS] = VERYLARGE;
+		if (auto_array[FIRST_X_AXIS] & 2)
+		    max_array[FIRST_X_AXIS] = -VERYLARGE;
+	    }
+	    if (!(uses_axis[SECOND_X_AXIS] & 1)) {
+		if (auto_array[SECOND_X_AXIS] & 1)
+		    min_array[SECOND_X_AXIS] = VERYLARGE;
+		if (auto_array[SECOND_X_AXIS] & 2)
+		    max_array[SECOND_X_AXIS] = -VERYLARGE;
+	    }
 	}
-	if (!(uses_axis[SECOND_X_AXIS]&1)) {
-		if (auto_array[SECOND_X_AXIS] & 1) min_array[SECOND_X_AXIS] = VERYLARGE;
-		if (auto_array[SECOND_X_AXIS] & 2) max_array[SECOND_X_AXIS] = -VERYLARGE;
-	}
-    }
-    
 #define SET_DUMMY_RANGE(AXIS) \
 do{ assert(!polar && !parametric); \
  if (log_array[AXIS]) {\
@@ -1108,229 +1056,218 @@ do{ assert(!polar && !parametric); \
  t_step = (t_max - t_min) / (samples - 1); \
 }while(0)
 
-    if (parametric || polar) {
-    	t_min = min_array[T_AXIS];
-    	t_max = max_array[T_AXIS];
-    	t_step = (t_max-t_min) /  (samples-1);
-    }
-    /* else we'll do it on each plot */
+	if (parametric || polar) {
+	    t_min = min_array[T_AXIS];
+	    t_max = max_array[T_AXIS];
+	    t_step = (t_max - t_min) / (samples - 1);
+	}
+	/* else we'll do it on each plot */
 
-    tp_ptr = &(first_plot);
-    plot_num = 0;
-    this_plot = first_plot;
-    c_token = begin_token;	/* start over */
+	tp_ptr = &(first_plot);
+	plot_num = 0;
+	this_plot = first_plot;
+	c_token = begin_token;	/* start over */
 
-    /* Read through functions */
-    while (TRUE) {
-	if (is_definition(c_token)) {
-	    define();
-	} else {
-	    int x_axis = this_plot->x_axis;
-	    int y_axis = this_plot->y_axis;
-	    
-	    plot_num++;
-	    if (!isstring(c_token))  {   /* function to plot */
-		if (parametric) {	/* toggle parametric axes */
-		    xparam = 1 - xparam;
-		}
-		dummy_func = &plot_func;
-		plot_func.at = temp_at();	/* reparse function */
-		
-		if (!parametric && !polar)
-		{
-		    SET_DUMMY_RANGE(x_axis);
-		}
-    
+	/* Read through functions */
+	while (TRUE) {
+	    if (is_definition(c_token)) {
+		define();
+	    } else {
+		int x_axis = this_plot->x_axis;
+		int y_axis = this_plot->y_axis;
 
-		for (i = 0; i < samples; i++) {
-		    double temp;
-		    struct value a;
-		    double t = t_min + i * t_step;
-		   /* parametric/polar => NOT a log quantity */
-		    double x = (!parametric && !polar &&
-		      log_array[x_axis]) ? pow(base_array[x_axis], t) : t;
-		        
-		    (void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
-		    evaluate_at(plot_func.at, &a);
-
-		    if (undefined || (fabs(imag(&a)) > zero)) {
-			this_plot->points[i].type = UNDEFINED;
-			continue;
+		plot_num++;
+		if (!isstring(c_token)) {	/* function to plot */
+		    if (parametric) {	/* toggle parametric axes */
+			xparam = 1 - xparam;
 		    }
+		    dummy_func = &plot_func;
+		    plot_func.at = temp_at();	/* reparse function */
 
-		    temp = real(&a);
+		    if (!parametric && !polar) {
+			SET_DUMMY_RANGE(x_axis);
+		    }
+		    for (i = 0; i < samples; i++) {
+			double temp;
+			struct value a;
+			double t = t_min + i * t_step;
+			/* parametric/polar => NOT a log quantity */
+			double x = (!parametric && !polar &&
+				    log_array[x_axis]) ? pow(base_array[x_axis], t) : t;
 
-		    this_plot->points[i].z = -1.0;  /* width of box not specified */
-		    this_plot->points[i].type = INRANGE;  /* for the moment */
+			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
+			evaluate_at(plot_func.at, &a);
 
-		    if (parametric) {
-			/* we cannot do range-checking now, since for
-			 * the x function we did not know which axes
-			 * we were using
-			 * DO NOT TAKE LOGS YET - do it in parametric_fixup
-			 */
-			this_plot->points[i].x = t; /* ignored, actually... */
-			this_plot->points[i].y = temp;
-		    } else if (polar) {
-			double y;
-			if ( !(autoscale_r&2) && temp>rmax)
+			if (undefined || (fabs(imag(&a)) > zero)) {
+			    this_plot->points[i].type = UNDEFINED;
+			    continue;
+			}
+			temp = real(&a);
+
+			this_plot->points[i].z = -1.0;	/* width of box not specified */
+			this_plot->points[i].type = INRANGE;	/* for the moment */
+
+			if (parametric) {
+			    /* we cannot do range-checking now, since for
+			     * the x function we did not know which axes
+			     * we were using
+			     * DO NOT TAKE LOGS YET - do it in parametric_fixup
+			     */
+			    this_plot->points[i].x = t;		/* ignored, actually... */
+			    this_plot->points[i].y = temp;
+			} else if (polar) {
+			    double y;
+			    if (!(autoscale_r & 2) && temp > rmax)
 				this_plot->points[i].type = OUTRANGE;
-			if ( !(autoscale_r&1))
+			    if (!(autoscale_r & 1))
 				temp -= rmin;
-			y = temp * sin(x * ang2rad);
-			x = temp * cos(x * ang2rad);
-			temp = y;
-			STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].x, x, this_plot->points[i].type,
-			  x_axis, NOOP, goto come_here_if_undefined);
-			STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, y, this_plot->points[i].type,
-			  y_axis, NOOP, goto come_here_if_undefined);
-		    } else { /* neither parametric or polar */
+			    y = temp * sin(x * ang2rad);
+			    x = temp * cos(x * ang2rad);
+			    temp = y;
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].x, x, this_plot->points[i].type,
+			      x_axis, NOOP, goto come_here_if_undefined);
+			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, y, this_plot->points[i].type,
+			      y_axis, NOOP, goto come_here_if_undefined);
+			} else {	/* neither parametric or polar */
 			    /* If non-para, it must be INRANGE */
-		            this_plot->points[i].x = t; /* logscale ? log(x) : x */
+			    this_plot->points[i].x = t;		/* logscale ? log(x) : x */
 
 			    STORE_WITH_LOG_AND_FIXUP_RANGE(this_plot->points[i].y, temp, this_plot->points[i].type,
-			      y_axis + (x_axis-y_axis)*xparam, NOOP, goto come_here_if_undefined);
+							   y_axis + (x_axis - y_axis) * xparam, NOOP, goto come_here_if_undefined);
 
-			    come_here_if_undefined: /* could not use a continue in this case */
-			    ; /* ansi requires a statement after a label */
-		    }
-		    
-		} /* loop over samples */
-		this_plot->p_count = i;	/* samples */
+			  come_here_if_undefined:	/* could not use a continue in this case */
+			    ;	/* ansi requires a statement after a label */
+			}
+
+		    }		/* loop over samples */
+		    this_plot->p_count = i;	/* samples */
+		}
+		c_token = this_plot->token;	/* skip all modifers func / whole of data plots */
+
+		tp_ptr = &(this_plot->next_cp);		/* used below */
+		this_plot = this_plot->next_cp;
 	    }
 
-	    c_token = this_plot->token;  /* skip all modifers func / whole of data plots */
-
-	    tp_ptr = &(this_plot->next_cp);	/* used below */
-	    this_plot = this_plot->next_cp;
+	    if (equals(c_token, ","))
+		c_token++;
+	    else
+		break;
 	}
 
-	if (equals(c_token, ","))
-	    c_token++;
-	else
-	    break;
-    }
-
-    if (parametric) {
-	/* Now actually fix the plot pairs to be single plots */
-	/* also fixes up polar&&parametric fn plots */
-	parametric_fixup(first_plot, &plot_num);
-	/* we omitted earlier check for range too small */
-	fixup_range(FIRST_X_AXIS, "x");
-	if (uses_axis[SECOND_X_AXIS]) {
+	if (parametric) {
+	    /* Now actually fix the plot pairs to be single plots */
+	    /* also fixes up polar&&parametric fn plots */
+	    parametric_fixup(first_plot, &plot_num);
+	    /* we omitted earlier check for range too small */
+	    fixup_range(FIRST_X_AXIS, "x");
+	    if (uses_axis[SECOND_X_AXIS]) {
 		fixup_range(SECOND_X_AXIS, "x2");
+	    }
 	}
-    }
-
-  }  /* some_functions */
-
+    }				/* some_functions */
     /* throw out all curve_points at end of list, that we don't need  */
     cp_free(*tp_ptr);
     *tp_ptr = NULL;
 
-    
+
     /* if first_plot is NULL, we have no functions or data at all. This can
        happen, if you type "plot x=5", since x=5 is a variable assignment */
 
     if (plot_num == 0 || first_plot == NULL) {
 	int_error("no functions or data to plot", c_token);
     }
-
     if (uses_axis[FIRST_X_AXIS]) {
 	if (max_array[FIRST_X_AXIS] == -VERYLARGE ||
-	    min_array[FIRST_X_AXIS] ==  VERYLARGE)
-	   int_error("all points undefined!", NO_CARET);
+	    min_array[FIRST_X_AXIS] == VERYLARGE)
+	    int_error("all points undefined!", NO_CARET);
 	FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
     }
-
     if (uses_axis[SECOND_X_AXIS]) {
 	if (max_array[SECOND_X_AXIS] == -VERYLARGE ||
-	    min_array[SECOND_X_AXIS] ==  VERYLARGE)
-	   int_error("all points undefined!", NO_CARET);
+	    min_array[SECOND_X_AXIS] == VERYLARGE)
+	    int_error("all points undefined!", NO_CARET);
 	FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     } else {
-    	assert(uses_axis[FIRST_X_AXIS]);
-	if (auto_array[SECOND_X_AXIS]&1) min_array[SECOND_X_AXIS] = min_array[FIRST_X_AXIS];
-	if (auto_array[SECOND_X_AXIS]&2) max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
+	assert(uses_axis[FIRST_X_AXIS]);
+	if (auto_array[SECOND_X_AXIS] & 1)
+	    min_array[SECOND_X_AXIS] = min_array[FIRST_X_AXIS];
+	if (auto_array[SECOND_X_AXIS] & 2)
+	    max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
     }
 
     if (!uses_axis[FIRST_X_AXIS]) {
-    	assert(uses_axis[SECOND_X_AXIS]);
-	if (auto_array[FIRST_X_AXIS]&1) min_array[FIRST_X_AXIS] = min_array[SECOND_X_AXIS];
-	if (auto_array[FIRST_X_AXIS]&2) max_array[FIRST_X_AXIS] = max_array[SECOND_X_AXIS];
+	assert(uses_axis[SECOND_X_AXIS]);
+	if (auto_array[FIRST_X_AXIS] & 1)
+	    min_array[FIRST_X_AXIS] = min_array[SECOND_X_AXIS];
+	if (auto_array[FIRST_X_AXIS] & 2)
+	    max_array[FIRST_X_AXIS] = max_array[SECOND_X_AXIS];
     }
-
-
     if (uses_axis[FIRST_Y_AXIS]) {
 	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
-	    min_array[FIRST_Y_AXIS] ==  VERYLARGE)
-	   int_error("all points undefined!", NO_CARET);
+	    min_array[FIRST_Y_AXIS] == VERYLARGE)
+	    int_error("all points undefined!", NO_CARET);
 	fixup_range(FIRST_Y_AXIS, "y");
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
-    } /* else we want to copy y2 range, but need to fix it up first */
-
+    }				/* else we want to copy y2 range, but need to fix it up first */
     if (uses_axis[SECOND_Y_AXIS]) {
 	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
-	    min_array[SECOND_Y_AXIS] ==  VERYLARGE)
-	   int_error("all points undefined!", NO_CARET);
+	    min_array[SECOND_Y_AXIS] == VERYLARGE)
+	    int_error("all points undefined!", NO_CARET);
 	fixup_range(SECOND_Y_AXIS, "y2");
 	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {
-    	assert(uses_axis[FIRST_Y_AXIS]);
-	if (auto_array[SECOND_Y_AXIS]&1) min_array[SECOND_Y_AXIS] = min_array[FIRST_Y_AXIS];
-	if (auto_array[SECOND_Y_AXIS]&2) max_array[SECOND_Y_AXIS] = max_array[FIRST_Y_AXIS];
+	assert(uses_axis[FIRST_Y_AXIS]);
+	if (auto_array[SECOND_Y_AXIS] & 1)
+	    min_array[SECOND_Y_AXIS] = min_array[FIRST_Y_AXIS];
+	if (auto_array[SECOND_Y_AXIS] & 2)
+	    max_array[SECOND_Y_AXIS] = max_array[FIRST_Y_AXIS];
     }
 
     if (!uses_axis[FIRST_Y_AXIS]) {
-    	assert(uses_axis[SECOND_Y_AXIS]);
-	if (auto_array[FIRST_Y_AXIS]&1) min_array[FIRST_Y_AXIS] = min_array[SECOND_Y_AXIS];
-	if (auto_array[FIRST_Y_AXIS]&2) max_array[FIRST_Y_AXIS] = max_array[SECOND_Y_AXIS];
+	assert(uses_axis[SECOND_Y_AXIS]);
+	if (auto_array[FIRST_Y_AXIS] & 1)
+	    min_array[FIRST_Y_AXIS] = min_array[SECOND_Y_AXIS];
+	if (auto_array[FIRST_Y_AXIS] & 2)
+	    max_array[FIRST_Y_AXIS] = max_array[SECOND_Y_AXIS];
     }
-
-
 #define WRITEBACK(axis,min,max) \
 if(range_flags[axis]&RANGE_WRITEBACK) \
   {if (auto_array[axis]&1) min = min_array[axis]; \
    if (auto_array[axis]&2) max = max_array[axis]; \
   }
 
-	WRITEBACK(FIRST_X_AXIS,xmin,xmax)
-	WRITEBACK(FIRST_Y_AXIS,ymin,ymax)
-	WRITEBACK(SECOND_X_AXIS,x2min,x2max)
-	WRITEBACK(SECOND_Y_AXIS,y2min,y2max)
-
-
-    if (strcmp(term->name, "table") == 0)
+    WRITEBACK(FIRST_X_AXIS, xmin, xmax)
+	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
+	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
+	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
+	if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
-    else
-    {
-	START_LEAK_CHECK(); /* check for memory leaks in this routine */
-	
+    else {
+	START_LEAK_CHECK();	/* check for memory leaks in this routine */
+
 	/* do_plot now uses max_array[], etc */
 	do_plot(first_plot, plot_num);
 
 	END_LEAK_CHECK();
     }
-    
-	/* if we get here, all went well, so record this line for replot */
-	
+
+    /* if we get here, all went well, so record this line for replot */
+
     if (plot_token != -1) {
 	/* note that m_capture also frees the old replot_line */
-        m_capture(&replot_line, plot_token, c_token-1);
-        plot_token = -1;		
+	m_capture(&replot_line, plot_token, c_token - 1);
+	plot_token = -1;
     }
-  
     cp_free(first_plot);
     first_plot = NULL;
-} /* eval_plots */
+}				/* eval_plots */
 
 
 
 
-static void 
-parametric_fixup(start_plot, plot_num)
-    struct curve_points *start_plot;
-    int            *plot_num;
+static void parametric_fixup(start_plot, plot_num)
+struct curve_points *start_plot;
+int *plot_num;
 /*
  * The hardest part of this routine is collapsing the FUNC plot types in the
  * list (which are garanteed to occur in (x,y) pairs while preserving the
@@ -1343,8 +1280,8 @@ parametric_fixup(start_plot, plot_num)
 {
     struct curve_points *xp, *new_list = NULL, *free_list = NULL;
     struct curve_points **last_pointer = &new_list;
-    int             i, tlen, curve;
-    char           *new_title;
+    int i, tlen, curve;
+    char *new_title;
 
     /*
      * Ok, go through all the plots and move FUNC types together.  Note: this
@@ -1363,76 +1300,75 @@ parametric_fixup(start_plot, plot_num)
     curve = 0;
 
     while (++curve <= *plot_num) {
-      if (xp->plot_type == FUNC) {
-	/* Here's a FUNC parametric function defined as two parts. */
-	struct curve_points *yp = xp->next_cp;
+	if (xp->plot_type == FUNC) {
+	    /* Here's a FUNC parametric function defined as two parts. */
+	    struct curve_points *yp = xp->next_cp;
 
-	--(*plot_num);
+	    --(*plot_num);
 
-	assert(xp->p_count == yp->p_count);
+	    assert(xp->p_count == yp->p_count);
 
-	/* because syntax is   plot x(t), y(t) axes ..., only
-	 * the y function axes are correct
-	 */
+	    /* because syntax is   plot x(t), y(t) axes ..., only
+	     * the y function axes are correct
+	     */
 
 
-	/*
-	 * Go through all the points assigning the y's from xp to be the x's
-	 * for yp. In polar mode, we need to check max's and min's as we go.
-	 */
+	    /*
+	     * Go through all the points assigning the y's from xp to be the x's
+	     * for yp. In polar mode, we need to check max's and min's as we go.
+	     */
 
-	for (i = 0; i < yp->p_count; ++i) {
-	    if (polar) {
-		double r = yp->points[i].y;
-		double t = xp->points[i].y * ang2rad;
-		double x,y;
-		if ( !(autoscale_r&2) && r>rmax)
+	    for (i = 0; i < yp->p_count; ++i) {
+		if (polar) {
+		    double r = yp->points[i].y;
+		    double t = xp->points[i].y * ang2rad;
+		    double x, y;
+		    if (!(autoscale_r & 2) && r > rmax)
 			yp->points[i].type = OUTRANGE;
-		if ( !(autoscale_r&1) )
-			r -= rmin; /* store internally as if plotting r(t)-rmin */
-		x = r * cos(t);
-		y = r * sin(t);
-		/* we hadn't done logs when we stored earlier */
-		STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x, yp->points[i].type,
-		  xp->x_axis, NOOP, NOOP);
-		STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y, yp->points[i].type,
-		  xp->y_axis, NOOP,NOOP);
-	    } else {
-		double x = xp->points[i].y;
-		double y = yp->points[i].y;
-		STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x,
-		  yp->points[i].type, yp->x_axis, NOOP, NOOP);
-		STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y,
-		  yp->points[i].type, yp->y_axis, NOOP, NOOP);
+		    if (!(autoscale_r & 1))
+			r -= rmin;	/* store internally as if plotting r(t)-rmin */
+		    x = r * cos(t);
+		    y = r * sin(t);
+		    /* we hadn't done logs when we stored earlier */
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x, yp->points[i].type,
+						 xp->x_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y, yp->points[i].type,
+						 xp->y_axis, NOOP, NOOP);
+		} else {
+		    double x = xp->points[i].y;
+		    double y = yp->points[i].y;
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].x, x,
+			     yp->points[i].type, yp->x_axis, NOOP, NOOP);
+		    STORE_WITH_LOG_AND_FIXUP_RANGE(yp->points[i].y, y,
+			     yp->points[i].type, yp->y_axis, NOOP, NOOP);
+		}
 	    }
+
+	    /* Ok, fix up the title to include both the xp and yp plots. */
+	    if (xp->title && xp->title[0] != '\0' && yp->title) {
+		tlen = strlen(yp->title) + strlen(xp->title) + 3;
+		new_title = gp_alloc((unsigned long) tlen, "string");
+		strcpy(new_title, xp->title);
+		strcat(new_title, ", ");	/* + 2 */
+		strcat(new_title, yp->title);	/* + 1 = + 3 */
+		free(yp->title);
+		yp->title = new_title;
+	    }
+	    /* move xp to head of free list */
+	    xp->next_cp = free_list;
+	    free_list = xp;
+
+	    /* append yp to new_list */
+	    *last_pointer = yp;
+	    last_pointer = &(yp->next_cp);
+	    xp = yp->next_cp;
+
+	} else {		/* data plot */
+	    assert(*last_pointer == xp);
+	    last_pointer = &(xp->next_cp);
+	    xp = xp->next_cp;
 	}
-
-	/* Ok, fix up the title to include both the xp and yp plots. */
-	if (xp->title && xp->title[0] != '\0' && yp->title) {
-	    tlen = strlen(yp->title) + strlen(xp->title) + 3;
-	    new_title = gp_alloc((unsigned long) tlen, "string");
-	    strcpy(new_title, xp->title);
-	    strcat(new_title, ", ");	/* + 2 */
-	    strcat(new_title, yp->title);	/* + 1 = + 3 */
-	    free(yp->title);
-	    yp->title = new_title;
-	}
-
-	/* move xp to head of free list */
-	xp->next_cp = free_list;
-	free_list = xp;
-
-	/* append yp to new_list */
-	*last_pointer = yp;
-	last_pointer = &(yp->next_cp);
-	xp = yp->next_cp;
-
-      } else {  /* data plot */
-	assert(*last_pointer == xp);
-	last_pointer = &(xp->next_cp);
-	xp = xp->next_cp;
-      }
-    } /* loop over plots */
+    }				/* loop over plots */
 
     first_plot = new_list;
 

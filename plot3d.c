@@ -809,8 +809,7 @@ static void eval_3dplots()
 
 				/*{{{  data file*/
 				if (parametric && crnt_param != 0)
-					int_error("previous parametric function not fully specified",
-					  c_token);
+					int_error("previous parametric function not fully specified", c_token);
 				
 				if (!some_data_files) {
 					if (autoscale_lx & 1) {
