@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.66 2005/03/06 23:35:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.67 2005/03/09 19:05:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -1173,7 +1173,7 @@ arrow_parse(
 		int stored_token = c_token;
 		struct lp_style_type loc_lp;
 
-		lp_parse(&loc_lp, 1, 0, 0, 0);
+		lp_parse(&loc_lp, 1, 0, default_linetype, 0);
 		if (stored_token != c_token) {
 		    if (set_line++)
 			break;
