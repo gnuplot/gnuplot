@@ -1,3 +1,25 @@
+2002-03-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c(gprintf), plot.c(main), plot.h, set.c(set_two),
+	util.c(angle), util3d.c(mat_rot_x,mat_rot_y,mat_rot_z),
+	term/cgm.trm(CGM_text_angle), term/emxvga.trm(g_string),
+	term/fig.trm(FIG_text_angle): Remove local definition of Pi, use M_PI,
+	M_PI_2 and DEG2RAD instead.
+
+	* parse.c, plot.c, syscfg.h: Move sigsetjmp/setjmp definitions to
+	syscfg.h, and use the same code as the development version. Bug noted
+	by Hans Werner Strube <strube@physik3.gwdg.de>.
+
+	* stdfn.c, stdfn.h: Add fallback definition for stricmp(). Patch by
+	HBB.
+
+	* stdfn.h: Define M_PI and M_PI_2.
+
+	* term/fig.trm(FIG_put_text): Text rotated by 90 degrees should be
+	centered horizontally rather than vertically. Also in one place, 3.1
+	should be replaced by 3.2. Noted by Hans Werner Strube
+	<strube@physik3.gwdg.de>.
+	
 2002-03-11 Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A whole bout of DOS/Windows specific fixes found in release 3.7.2.
