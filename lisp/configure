@@ -676,11 +676,9 @@ echo "configure:676: checking where .elc files should go" >&5
 if eval "test \"`echo '$''{'am_cv_lispdir'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/emacs\/site-lisp$/{p;q;}'`
+  	am_cv_lispdir=`$EMACS -q -batch -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' | sed -n -e 's,/$,,' -e '/.*\/lib\/\(x\?emacs\/site-lisp\)$/{s,,${libdir}/\1,;p;q;}' -e '/.*\/share\/\(x\?emacs\/site-lisp\)$/{s,,${datadir}/\1,;p;q;}'`
 	if test -z "$am_cv_lispdir"; then
 	  am_cv_lispdir='${datadir}/emacs/site-lisp'
-	else
-	  am_cv_lispdir=`echo "$am_cv_lispdir" | sed -e 's,^.*/lib/,${libdir}/,' -e 's,^.*/share/,${datadir}/,'`
 	fi
       
 fi
@@ -694,7 +692,7 @@ EMACS=`basename $EMACS`
 # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:698: checking for $ac_word" >&5
+echo "configure:696: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_path_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else

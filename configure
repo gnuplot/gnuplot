@@ -3653,7 +3653,7 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-         LIBS="$LIBS -lreadline $gp_tcap"
+         TERMLIBS="$TERMLIBS -lreadline $gp_tcap"
 else
   echo "$ac_t""no" 1>&6
 fi
