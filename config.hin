@@ -144,6 +144,9 @@
 /* Define if you have the <float.h> header file.  */
 #undef HAVE_FLOAT_H
 
+/* Define if you have the <gd.h> header file.  */
+#undef HAVE_GD_H
+
 /* Define if you have the <libc.h> header file.  */
 #undef HAVE_LIBC_H
 
@@ -158,6 +161,9 @@
 
 /* Define if you have the <math.h> header file.  */
 #undef HAVE_MATH_H
+
+/* Define if you have the <png.h> header file.  */
+#undef HAVE_PNG_H
 
 /* Define if you have the <sgtty.h> header file.  */
 #undef HAVE_SGTTY_H
@@ -206,6 +212,9 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
+
+/* Define if you have the <zlib.h> header file.  */
+#undef HAVE_ZLIB_H
 
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
@@ -261,14 +270,14 @@
 /*  Define if you want to use the included readline function.  */
 #undef READLINE
 
+/*  Define if you have Thomas Boutell's gd library.  */
+#undef HAVE_LIBGD
+
 /*  Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
 
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
-
-/*  Define if you have Thomas Boutell's gd library.  */
-#undef HAVE_LIBGD
 
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG
@@ -282,15 +291,6 @@
 /*  Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
-/*  Define if you want to use the IRIS terminal on IRIS4D series computers.  */
-#undef IRIS
-
-/*  Define if you want to use the MGR Window system.  */
-#undef MGR
-
-/*  Define if you want to use the Redwood Graphics Interface Protocol.  */
-#undef RGIP
-
 /*  Define if you want to use the experimental Enhanced Metafile Format driver.  */
 #undef USE_EMF_DRIVER
 
@@ -299,4 +299,13 @@
 
 /*  Define if you have the required ggi libraries.  */
 #undef HAVE_GGI
+
+/*  Define if you want to use the IRIS terminal on IRIS4D series computers.  */
+#undef IRIS
+
+/*  Define if you want to use the MGR Window system.  */
+#undef MGR
+
+/*  Define if you want to use the Redwood Graphics Interface Protocol.  */
+#undef RGIP
 
