@@ -1,3 +1,7 @@
+2005-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (set title): Add missing keyword "font".
+
 2005-03-17  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c (do_3dplot): Fix 'set pm3d at X; splot...with pm3d at Y'

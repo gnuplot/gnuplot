@@ -1044,6 +1044,7 @@ defaults to radians.
 * sprintf::                     
 * column::                      
 * defined::                     
+* stringcolumn::                
 * tm_hour::                     
 * tm_mday::                     
 * tm_min::                      
@@ -1601,9 +1602,10 @@ documentation or the unix sprintf man page.
 
 
 `column(x)` may be used only in expressions as part of @ref{using} manipulations
-to fits or datafile plots.  See @ref{using}.
+to fits or datafile plots.  It evaluates to the numerical value of the contents
+of column x. See @ref{using}.
 
-@node defined, tm_hour, column, Functions
+@node defined, stringcolumn, column, Functions
 @subsubsection defined
 
 @c ?expressions functions defined
@@ -1611,7 +1613,20 @@ to fits or datafile plots.  See @ref{using}.
 `defined(X)` returns 1 if a variable named X has been defined, otherwise 
 it returns 0.
 
-@node tm_hour, tm_mday, defined, Functions
+@node stringcolumn, tm_hour, defined, Functions
+@subsubsection stringcolumn
+
+@c ?expressions functions stringcolumn
+@c ?functions stringcolumn
+@cindex stringcolumn
+@findex stringcolumn
+
+
+`stringcolumn(x)` may be used only in expressions as part of @ref{using} manipulations
+to fits or datafile plots.  It returns the content of column x as a string variable.
+See @ref{using}.
+
+@node tm_hour, tm_mday, stringcolumn, Functions
 @subsubsection tm_hour
 
 @c ?expressions tm_hour
@@ -2020,12 +2035,13 @@ data file, is a subset of a datablock.
 
 @cindex colors
 
-Gnuplot commands use the term "linetype" to refer to the color of a line or
-other plot element.  Each terminal type provides a certain number of 
-pre-defined line types (colors).  These can be previewed by issuing
-the @ref{test} command after setting the terminal type.  The pre-defined colors
-are not guaranteed to be consistent for all terminal types, but all terminals
-use the special index -1 to mean the primary foreground color (normally black).
+Each gnuplot terminal type provides a set of distinct "linetypes". These may
+differ in color, in thickness, in dot/dash pattern, or in some combination of
+color and dot/dash. The default linetypes for a particular terminal can be
+previewed by issuing the @ref{test} command after setting the terminal type.
+The pre-defined colors and dot/dash patterns are not guaranteed to be
+consistent for all terminal types, but all terminals use the special linetype
+-1 to mean a solid line in the primary foreground color (normally black).
 By default, successive functions or datafiles plotted by a single command will
 be assigned successive linetypes.  You can override this default by specifying
 a particular linetype for any function, datafile, or plot element.
@@ -2055,6 +2071,21 @@ Examples:
 @end example
 
 See @ref{colornames}, @ref{palette}, @ref{cbrange}.
+
+For terminals that support dot/dash patterns, each default linetype has both
+a dot-dash pattern and a default color. However, you can override the default
+color by using the keyword `linecolor`, abbreviated `lc`.  For example, the
+postscript terminal provides a dashed blue line as linetype 3.  The plot
+commands below use this same dash pattern for three plots, one in blue (the
+default), another in red (the default for linetype 1), and a third in gold.
+
+Example:
+
+@example
+     set term postscript dashed color
+     plot 'foo' lt 3, 'baz' lt 3 linecolor 1, 'bar' lt 3 lc rgb 'gold'
+
+@end example
 
 Lines can have additional properties such as linewidth.  You can associate
 these various properties, as well as equivalent properties for point symbols,
@@ -2128,7 +2159,7 @@ The final option, "palette z", is available only in 3d plots, and treats the
 z value of each plot segment or plot element as an index into the cbrange
 mapping of the palette. This allows smoothly-varying color along a 3d line
 or surface.
-      
+
 
 @node mouse_input, Plotting, linetype, gnuplot
 @section mouse input
@@ -4401,7 +4432,8 @@ Example:
 @end example
 
 @c ^ See also web page
-@uref{http://www.gnuplot.info/demo/multimsh.html,splot with indices demo. }
+@uref{http://www.gnuplot.info/demo/multimsh.html, splot with indices demo.
+}
 
 @node smooth, special-filenames, index, data
 @subsubsection smooth
@@ -5252,6 +5284,7 @@ Syntax:
       with <style> @{ @{linestyle | ls <line_style>@}
                      | @{@{linetype  | lt <line_type>@}
                         @{linewidth | lw <line_width>@}
+                        @{linecolor | lc <colorspec>@}
                         @{pointtype | pt <point_type>@}
                         @{pointsize | ps <point_size>@}
                         @{fill | fs <fillstyle>@}
@@ -7711,7 +7744,7 @@ and
 @cindex nohistorysize
 
 Note: the command @ref{historysize} is only available when
-compiled with the gnu readline.
+gnuplot has been configured with the GNU readline.
 
 Syntax:
 @example
@@ -8021,6 +8054,7 @@ either a linetype or a mapping onto the pm3d color palette (available only in
    `textcolor` may be abbreviated `tc`.
    `tc default` resets the text color to its default state.
    `tc lt <n>` sets the text color to that of line type <n>.
+   `tc ls <n>` sets the text color to that of line style <n>.
    `tc palette z` selects a palette color corresponding to the label z position.
    `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
    `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
@@ -10385,6 +10419,10 @@ For backwards compatibility with earlier gnuplot versions, when the
 boxwidth parameter has not been set then the width of the candlestick
 rectangle is controlled by `set bars <width>`.
 
+By default the vertical line segments have no crossbars at the top and
+bottom. If you want crossbars, which are typically used for box-and-whisker
+plots, then add the keyword `whiskerbars` to the plot command.
+
 By default the rectangle is empty if (open > close), and filled with three
 vertical bars if (close > open). If filled-boxes support is present, then
 the rectangle is colored according to `set style fill <fillstyle>`.
@@ -10406,6 +10444,12 @@ box-and-whisker plot requires additional plot commands as in this example:
 @end example
 
 @example
+  # Plot with crossbars on the whiskers
+  plot 'stat.dat' using 1:3:2:6:5 with candlesticks whiskerbars
+
+@end example
+
+@example
  See @ref{boxwidth}, @ref{bars} and `set style fill`.
 
 @end example
@@ -10420,7 +10464,8 @@ box-and-whisker plot requires additional plot commands as in this example:
 @cindex dots
 
 The `dots` style plots a tiny dot at each point; this is useful for scatter
-plots with many points.
+plots with many points. For some terminals (post, pdf) the size of the dot can
+be contolled by changing the linewidth.
 
 
 @noindent --- FILLEDCURVES ---
@@ -11376,7 +11421,7 @@ the plot.  `set title` is a special case of @ref{label}.
 
 Syntax:
 @example
-      set title @{"<title-text>"@} @{offset <offset>@} @{"<font>@{,<size>@}"@}
+      set title @{"<title-text>"@} @{offset <offset>@} @{font "<font>@{,<size>@}"@}
                 @{@{textcolor | tc@} @{lt <line_type> | default@}@} @{@{no@}enhanced@}
       show title
 
@@ -13193,7 +13238,6 @@ with no modifiers.
 * eepic::                       
 * emf::                         
 * emxvga::                      
-* epslatex::                    
 * epson-180dpi::                
 * excl::                        
 * hercules::                    
@@ -13228,8 +13272,6 @@ with no modifiers.
 * pbm::                         
 * dospc::                       
 * pdf::                         
-* postscript_::                 
-* pslatex_and_pstex::           
 * pstricks::                    
 * qms::                         
 * regis::                       
@@ -14262,13 +14304,14 @@ format is the metafile standard on MS Win32 Systems.
 
 Syntax:
 @example
-      set terminal emf @{<color>@} @{solid | dashed@}
+      set terminal emf @{<color>@} @{solid | dashed@} @{linewidth <X>@}
                        @{"<font>"@} @{<fontsize>@}
 
 @end example
 
 <color> is either `color` or `monochrome`; 
 `solid` draws all curves with solid lines, overriding any dashed patterns;
+`linewidth <factor>` multiplies all line widths by this factor.
 <font> is the name of a font; and 
 `<fontsize>` is the size of the font in points.
 
@@ -14282,7 +14325,7 @@ Examples:
 
 @end example
 
-@node emxvga, epslatex, emf, terminal_
+@node emxvga, epson-180dpi, emf, terminal_
 @subsubsection emxvga
 
 @c ?commands set terminal emxvga
@@ -14328,70 +14371,7 @@ Syntax:
 
 The only option is the vesa mode for `emxvesa`, which defaults to G640x480x256."
 
-@node epslatex, epson-180dpi, emxvga, terminal_
-@subsubsection epslatex
-
-@c ?commands set terminal epslatex
-@c ?set terminal epslatex
-@c ?set term epslatex
-@c ?terminal epslatex
-@c ?term epslatex
-@cindex epslatex
-@tmindex epslatex
-
-
-The `epslatex` driver generates output for further processing by LaTeX.
-
-Syntax:
-@example
-      set terminal epslatex @{default@}
-                              @{color | monochrome@} @{solid | dashed@}
-                              @{"<fontname>"@} @{<fontsize>@}
-
-@end example
-
-`default` mode sets all options to their defaults: `monochrome`, `dashed`,
-"default" and 11pt.
-Default size of a plot is 5 inches wide and 3 inches high.
-
-`solid` draws all plots with solid lines, overriding any dashed patterns;
-`"<fontname>"` is the name of font; and `<fontsize>` is
-the size of the font in PostScript points. Font selection isn't supported yet.
-Font size selection is supported only for the calculation of proper spacing.
-The actual LaTeX font at the point of inclusion is taken, so use LaTeX commands
-for changing fonts. If you use e.g. 12pt as font size for your LaTeX documents, 
-use '"default" 12' as options.
-
-All drivers for LaTeX offer a special way of controlling text positioning: 
-(a) If any text string begins with '@{', you also need to include a '@}' at the
-end of the text, and the whole text will be centered both horizontally
-and vertically by LaTeX.  (b) If the text string begins with '[', you need
-to continue it with: a position specification (up to two out of t,b,l,r),
-']@{', the text itself, and finally, '@}'. The text itself may be anything
-LaTeX can typeset as an LR-box. \\rule@{@}@{@}'s may help for best positioning.
-See also the documentation for the `pslatex` terminal driver.
-To create multiline labels, use \\shortstack, for example
-@example
-   set ylabel '[r]@{\\shortstack@{first line \\\\ second line@}@}' 
-
-@end example
-
-The driver produces two different files, one for the eps part of the figure
-and one for the LaTeX part. The name of the eps file is taken from the
-@ref{output} command. The name of the LaTeX file is derived by replacing
-the file extension (normally `.eps`) with `.tex` instead.
-There is no LaTeX output if no output file is given!
-Remember to close the @ref{file} before leaving `gnuplot`.
-
-In your LaTeX documents use '\\input@{filename@}' to include the figure.
-The `.eps` file is included by the command \\includegraphics@{...@}, so you
-must also include \\usepackage@{graphicx@} in the LaTeX preamble.
-
-Pdf files can be made from the eps file using 'epstopdf'. If the graphics
-package is properly configured, the LaTeX files can also be processed by
-pdflatex without changes, using the pdf files instead of the eps files."
-
-@node epson-180dpi, excl, epslatex, terminal_
+@node epson-180dpi, excl, emxvga, terminal_
 @subsubsection epson-180dpi
 
 @c ?commands set terminal epson-180dpi
@@ -16139,7 +16119,7 @@ The `dospc` terminal driver supports PCs with arbitrary graphics boards,
 which will be automatically detected.  It should be used only if you are
 not using the gcc or Zortec C/C++ compilers."
 
-@node pdf, postscript_, dospc, terminal_
+@node pdf, pstricks, dospc, terminal_
 @subsubsection pdf
 
 @c ?commands set terminal pdf
@@ -16156,485 +16136,36 @@ This terminal produces files in the Adobe Portable Document Format
 
 Syntax:
 @example
-      set terminal pdf @{fname "<font>"@} @{fsize <fontsize>@}
-                       @{@{no@}enhanced@} @{linewidth <n>@}
+      set terminal pdf @{monochrome|color|colour@}
+                       @{fname "<font>"@} @{fsize <fontsize>@}
+                       @{@{no@}enhanced@} @{linewidth <n>@} @{rounded|butt@}
+                       @{solid|dashed @{dl <dashlength>@}@}
 
 @end example
+
+The default is to use a different color for each line type. Selecting 
+`monochome` will use black for all linetypes, in which case you probably 
+want to select `dashed` to distinguish line types. Even in in mono mode 
+you can still use explicit colors for filled areas or linestyles.
 
 where <font> is the name of the default font to use (default Helvetica)
 and <fontsize> is the font size (in points, default 12).
+For help on which fonts are available or how to install new ones, please 
+see the documentation for your local installation of pdflib.
 
 The `enhanced` option enables enhanced text processing features
-(subscripts, superscripts and mixed fonts). See `enhanced` for more
-information. Only the core PDF fonts are supported.
+(subscripts, superscripts and mixed fonts). See `enhanced`.
 
 The width of all lines in the plot can be increased by the factor <n>
-specified in `linewidth`."
-
-@node postscript_, pslatex_and_pstex, pdf, terminal_
-@subsubsection postscript
-
-@c ?commands set terminal postscript
-@c ?set terminal postscript
-@c ?set term postscript
-@c ?terminal postscript
-@c ?term postscript
-@cindex postscript
-@tmindex postscript
-
-
-Several options may be set in the @ref{postscript} driver.
-
-Syntax:
-@example
-      set terminal postscript @{<mode>@} @{level1@} @{enhanced | noenhanced@}
-                              @{color | colour | monochrome@}
-                              @{blacktext | colortext | colourtext@}
-                              @{solid | dashed@} @{dashlength | dl <DL>@}
-                              @{linewidth | lw <LW>@}
-                              @{<duplexing>@}
-                              @{rounded | butt@}
-                              @{fontfile [add | delete] "<filename>"@}
-                              @{palfuncparam <samples>@{,<maxdeviation>@}@}
-                              @{"<fontname>"@} @{<fontsize>@}
-
-@end example
-
-where <mode> is `landscape`, `portrait`, `eps` or `default`;
-`enhanced` enables enhanced text mode features (subscripts,
-superscripts and mixed fonts). See `enhanced` for more information.
-Option `color` enables color;
-`blacktext` forces all text to be written in black even in color mode;
-`solid` draws all plots with solid lines, overriding any dashed patterns;
-`dashlength` or `dl` scales the length of the dashed-line segments by <DL>
-(which is a floating-point number greater than zero);
-`linewidth` or `lw` scales all linewidths by <LW>;
-
-<duplexing> is `defaultplex`, `simplex` or `duplex` ("duplexing" in
-PostScript is the ability of the printer to print on both sides of the same
-page---don't set this if your printer can't do it);
-
-By default the generated PostScript code uses language features that were
-introduced in PostScript Level 2, notably pattern-fill of irregular objects
-such as filledcurves.  The `level1` option substitutes PostScript Level 1
-approximations of these features. This may be required by some old printers
-and by some old versions of Adobe Illustrator. This flag can be toggled
-later by editing a single line in the PostScript output file.
+specified in `linewidth`. Similarly `dashlength` is a multiplier for the 
+default dash spacing.
 
 `rounded` sets line caps and line joins to be rounded; `butt` is the
-default, butt caps and mitered joins;
+default, butt caps and mitered joins;"
 
-`"<fontname>"` is the name of a valid PostScript font; and `<fontsize>` is
-the size of the font in PostScript points.
-In addition to the standard postscript fonts, an oblique version of the
-Symbol font, useful for mathematics, is defined. It is called
-"Symbol-Oblique".
+* does not work.
 
-`default` mode sets all options to their defaults: `landscape`, `monochrome`,
-`dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, "Helvetica" and
-14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.
-
-`palfuncparam` is only available if compiled with @ref{pm3d} support.  It controls
-how `set palette functions` are encoded as gradients in the output.
-Analytic color component functions (set via `set palette functions`) are
-encoded as linear interpolated gradients in the postscript output:  The color
-component functions are sampled at <samples> points and all points are
-removed from this gradient which can be removed without changing the
-resulting colors by more than <maxdeviation>.  For almost every useful
-palette you may savely leave the defaults of <samples>=2000 and
-<maxdeviation>=0.003 untouched.
-
-`eps` mode generates EPS (Encapsulated PostScript) output, which is just
-regular PostScript with some additional lines that allow the file to be
-imported into a variety of other applications.  (The added lines are
-PostScript comment lines, so the file may still be printed by itself.)  To
-get EPS output, use the `eps` mode and make only one plot per file.  In `eps`
-mode the whole plot, including the fonts, is reduced to half of the default
-size.
-
-Fonts listed by `fontfile` or `fontfile add` encapsulate the font
-definitions of the listed font from a postscript Type 1 or TrueType font
-file directly into the gnuplot output postscript file. Thus, the enclosed
-font can be used in labels, titles, etc. See the section
-`postscript fontfile` for more details.
-With `fontfile delete` a fontfile is deleted from the list of embedded
-files.
-
-Examples:
-@example
-      set terminal postscript default       # old postscript
-      set terminal postscript enhanced      # old enhpost
-      set terminal postscript landscape 22  # old psbig
-      set terminal postscript eps 14        # old epsf1
-      set terminal postscript eps 22        # old epsf2
-      set size 0.7,1.4; set term post portrait color "Times-Roman" 14
-      set term post "VAGRoundedBT_Regular" 14 fontfile "bvrr8a.pfa"
-
-@end example
-
-Linewidths and pointsizes may be changed with `set style line`.
-
-The @ref{postscript} driver supports about 70 distinct pointtypes, selectable
-through the `pointtype` option on `plot` and `set style line`.
-
-Several possibly useful files about `gnuplot`'s PostScript are included
-in the /docs/psdoc subdirectory of the `gnuplot` distribution and at the
-distribution sites.  These are "ps_symbols.gpi" (a `gnuplot` command file
-that, when executed, creates the file "ps_symbols.ps" which shows all the
-symbols available through the @ref{postscript} terminal), "ps_guide.ps" (a
-PostScript file that contains a summary of the enhanced syntax and a page
-showing what the octal codes produce with text and symbol fonts),
-"ps_file.doc" (a text file that contains a discussion of the organization
-of a PostScript file written by `gnuplot`), and "ps_fontfile_doc.tex"
-(a LaTeX file which contains a short documentation concerning the
-encapsulation of LaTeX fonts with a glyph table of the math fonts).
-
-A PostScript file is editable, so once `gnuplot` has created one, you are
-free to modify it to your heart's desire.  See the @ref{postscript}
-section for some hints.
-
-
-@noindent --- ENHANCED POSTSCRIPT ---
-
-@c ?commands set terminal postscript enhanced
-@c ?set terminal postscript enhanced
-@c ?set term postscript enhanced
-@c ?terminal postscript enhanced
-@c ?term postscript enhanced
-@cindex enhanced_postscript
-
-@c ?enhanced postscript
-@c ?Enhanced postscript
-@c ?enhanced text
-@c ?Enhanced text
-@cindex enhanced
-@tmindex enhanced
-
-
-Several terminal types support an enhanced text mode in which 
-additional formatting information is embedded in the text string.
-
-
-@example
- Control      Examples        Explanation
-  ^           a^x             superscript
-  _           a_x             subscript
-  @@           @@x or a@@^b_c    phantom box (occupies no width)
-  &           &@{space@}        inserts space of specified length
-  ~           ~a@{.8-@}         overprints '-' on 'a', raised by .8
-                              times the current fontsize
-
-@end example
-
-
-Braces can be used to place multiple-character text where a single character
-is expected (e.g., 2^@{10@}).  To change the font and/or size, use the full
-form:  @{/[fontname][=fontsize | *fontscale] text@}.  Thus @{/Symbol=20 G@} is a
-20-point GAMMA and @{/*0.75 K@} is a K at three-quarters of whatever fontsize
-is currently in effect.  (The '/' character MUST be the first character after
-the '@{'.)
-
-If the encoding vector has been changed by @ref{encoding}, the default
-encoding vector can be used instead by following the slash with a dash.  This
-is unnecessary if you use the Symbol font, however---since /Symbol uses its
-own encoding vector, `gnuplot` will not apply any other encoding vector to
-it.
-
-The phantom box is useful for a@@^b_c to align superscripts and subscripts
-but does not work well for overwriting an accent on a letter.  (To do the
-latter, it is much better to use 'set encoding iso_8859_1' to change to the
-ISO Latin-1 encoding vector, which contains a large variety of letters with
-accents or other diacritical marks.)  Since the box is non-spacing, it is
-sensible to put the shorter of the subscript or superscript in the box (that
-is, after the @@).
-
-Space equal in length to a string can be inserted using the '&' character.
-Thus
-@example
-        'abc&@{def@}ghi'
-@end example
-
-would produce
-@example
-        'abc   ghi'.
-
-@end example
-
-The '~' character causes the next character or bracketed text to be
-overprinted by the following character or bracketed text.  The second text
-will be horizontally centered on the first.  Thus '~a/' will result in an 'a'
-with a slash through it.  You can also shift the second text vertically by
-preceding the second text with a number, which will define the fraction of the
-current fontsize by which the text will be raised or lowered.  In this case
-the number and text must be enclosed in brackets because more than one
-character is necessary.  If the overprinted text begins with a number, put a
-space between the vertical offset and the text ('~@{abc@}@{.5 000@}'); otherwise
-no space is needed ('~@{abc@}@{.5---@}').  You can change the font for one or
-both strings ('~a@{.5 /*.2 o@}'---an 'a' with a one-fifth-size 'o' on top---and
-the space between the number and the slash is necessary), but you can't
-change it after the beginning of the string.  Neither can you use any other
-special syntax within either string.  You can, of course, use control
-characters by escaping them (see below), such as '~a@{\\^@}'
-
-You can access special symbols numerically by specifying \\character-code (in
-octal), e.g., @{/Symbol \\245@} is the symbol for infinity.
-
-You can escape control characters using \\, e.g.,  \\\\, \\@{, and so on.
-
-But be aware that strings in double-quotes are parsed differently than those
-enclosed in single-quotes.  The major difference is that backslashes may need
-to be doubled when in double-quoted strings.
-
-Examples (these are hard to describe in words---try them!):
-@example
-      set xlabel 'Time (10^6 @{/Symbol m@}s)'
-      set title '@{/Symbol=18 \\362@@_@{/=9.6 0@}^@{/=12 x@}@} \\
-                 @{/Helvetica e^@{-@{/Symbol m@}^2/2@} d@}@{/Symbol m@}'
-
-@end example
-
-The file "ps_guide.ps" in the /docs/psdoc subdirectory of the `gnuplot` source
-distribution contains more examples of the enhanced syntax.
-
-
-@noindent --- EDITING POSTSCRIPT ---
-
-@c ?commands set terminal postscript editing
-@c ?set terminal postscript editing
-@c ?set term postscript editing
-@c ?terminal postscript editing
-@c ?term postscript editing
-@cindex editing_postscript
-
-@c ?editing postscript
-The PostScript language is a very complex language---far too complex to
-describe in any detail in this document.  Nevertheless there are some things
-in a PostScript file written by `gnuplot` that can be changed without risk of
-introducing fatal errors into the file.
-
-For example, the PostScript statement "/Color true def" (written into the
-file in response to the command `set terminal postscript color`), may be
-altered in an obvious way to generate a black-and-white version of a plot.
-Similarly line colors, text colors, line weights and symbol sizes can also be
-altered in straight-forward ways.  Text (titles and labels) can be edited to
-correct misspellings or to change fonts.  Anything can be repositioned, and
-of course anything can be added or deleted, but modifications such as these
-may require deeper knowledge of the PostScript language.
-
-The organization of a PostScript file written by `gnuplot` is discussed in
-the text file "ps_file.doc" in the docs/ps subdirectory of the gnuplot
-source distribution.
-
-
-@noindent --- POSTSCRIPT FONTFILE ---
-
-@c ?commands set terminal postscript fontfile
-@c ?set terminal postscript fontfile
-@c ?set term postscript fontfile
-@c ?terminal postscript fontfile
-@c ?term postscript fontfile
-@c ?postscript fontfile
-@cindex fontfile
-@tmindex fontfile
-
-
-The `fontfile` or `fontfile add` option takes one file name as argument
-and encapsulates this file into the postscript output in order to make
-this font available for text elements (labels, tic marks, titles, etc.).
-The `fontfile delete` option also takes one file name as argument. It
-deletes this file name from the list of encapsulated files.
-
-The postscript terminal understands some
-font file formats: Type 1 fonts in ASCII file format (extension ".pfa"),
-Type 1 fonts in binary file format (extension ".pfb"), and TrueType
-fonts (extension ".ttf"). Pfa files are understood directly, pfb and ttf
-files are converted on the fly if appropriate conversion tools are
-installed (see below). You have to specify the full filename with the
-extension. Each `fontfile` option takes exact one font file name. This
-option can be used multiple times in order to include more than one font
-file.
-
-The font file is searched in the working directory and in all directories
-listed in the fontpath which is determined by @ref{fontpath}.
-In addition, the fontpath can be set using the environment variable
-GNUPLOT_FONTPATH. If this is not set a system dependent default search
-list is used. See @ref{fontpath} for more details.
-
-For using the encapsulated font file you have to specify the font name
-(which normally is not the same as the file name). When embedding a
-font file by using the `fontfile` option in interactive mode, the 
-font name is printed on the screen. E.g.
-@example
-   Font file 'p052004l.pfb' contains the font 'URWPalladioL-Bold'. Location:
-   /usr/lib/X11/fonts/URW/p052004l.pfb
-
-@end example
-
-When using pfa or pfb fonts, you can also find it out by looking into the
-font file. There is a line similar to "/FontName /URWPalladioL-Bold def".
-The middle string without the slash is the fontname, here
-"URWPalladioL-Bold".
-For TrueType fonts, this is not so easy since the font name is stored in a
-binary format. In addition, they often have spaces in the font names which
-is not supported by Type 1 fonts (in which a TrueType is converted on the
-fly). The font names are changed in order to eliminate the spaces in the
-fontnames. The easiest way to find out which font name is generated for
-use with gnuplot, start gnuplot in interactive mode and type in
-"set terminal postscript fontfile '<filename.ttf>'".
-
-For converting font files to pfa format the conversion tool has to read
-the font from a file and write it to standard output.
-For pfb files "pfbtops" is a tool which can do this. If this program
-is installed on your system the on the fly conversion should work.
-Just try to encapsulate a pfb file. If the compiled in program call does
-not work correctly you can specify how this program is called by
-defining the environment variable GNUPLOT_PFBTOPFA e.g. to
-"pfbtops %s". The `%s` will be repeated by the font file name and thus
-has to exist in the string.
-If you don't want to do the conversion on the fly but get a pfa file of
-the font you can use the tool "pfb2pfa" which is written in simple c
-and should compile with any c compiler.
-It is available from many ftp servers, e.g.
-@uref{ftp://ftp.dante.de/tex-archive/fonts/utilities/ps2mf/,ftp://ftp.dante.de/tex-archive/fonts/utilities/ps2mf/
-}
-In fact, "pfbtopfa" and "pfb2ps" do the same job. "pfbtopfa" puts
-the resulting pfa code into a file, whereas "pfbtops" writes it to
-standard output.
-
-TrueType fonts are converted into Type 1 pfa format, e.g.
-by using the tool "ttf2pt1" which is available from
-@uref{http://ttf2pt1.sourceforge.net/,http://ttf2pt1.sourceforge.net/
-}
-If the builtin conversion does not
-work, the conversion command can be changed by the environment variable
-GNUPLOT_TTFTOPFA. For usage with ttf2pt1 it may be set to
-"ttf2pt1 -a -e -W 0 %s - ". Here again, `%s` stands for the
-file name.
-
-For special purposes you also can use a pipe (if available for your
-operating system). Therefore you start the file name definition with 
-the character "<" and append a program call. This program has 
-to write pfa data to standard output. Thus, a pfa file may be accessed
-by `set fontfile "< cat garamond.pfa"`.
-
-For example, including Type 1 font files can be used for including the
-postscript output in LaTeX documents. The "european computer modern"
-font (which is a variant of the "computer modern" font) is available
-in pfb format from any CTAN server, e.g.
-@uref{ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/,ftp://ftp.dante.de/tex-archive/fonts/ps-type1/cm-super/
-}
-For example, the file "sfrm1000.pfb" contains the normal upright fonts
-with serifs in the design size 10pt (font name "SFRM1000").
-The computer modern fonts, which are still necessary for mathematics,
-are available from
-@uref{ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky,ftp://ftp.dante.de/tex-archive/fonts/cm/ps-type1/bluesky
-}
-With these you can use any character available in TeX. However, the
-computer modern fonts have a strange encoding. (This is why you should not
-use cmr10.pfb for text, but sfrm1000.pfb instead.)
-The usage of TeX fonts is shown in one of the demos.
-The file "ps_fontfile_doc.tex" in the /docs/psdoc subdirectory of the
-`gnuplot` source distribution contains a table with glyphs of the TeX
-mathfonts.
-
-If the font "CMEX10" is embedded (file "cmex10.pfb") gnuplot defines
-the additional font "CMEX10-Baseline". It is shifted vertically in order
-to fit better to the other glyphs (CMEX10 has its baseline at the top of
-the symbols)."
-
-@node pslatex_and_pstex, pstricks, postscript_, terminal_
-@subsubsection pslatex and pstex
-
-@c ?commands set terminal pslatex
-@c ?set terminal pslatex
-@c ?set term pslatex
-@c ?terminal pslatex
-@c ?term pslatex
-@cindex pslatex
-@tmindex pslatex
-
-
-@c ?commands set terminal pstex
-@c ?set terminal pstex
-@c ?set term pstex
-@c ?terminal pstex
-@c ?term pstex
-@cindex pstex
-@tmindex pstex
-
-
-The `pslatex` and `pstex` drivers generate output for further processing by
-LaTeX and TeX, respectively.  Figures generated by `pstex` can be included
-in any plain-based format (including LaTeX).
-
-Syntax:
-@example
-      set terminal [pslatex | pstex] @{<color>@} @{<dashed>@} @{<rotate>@}
-                                     @{auxfile@} @{<font_size>@}
-
-@end example
-
-<color> is either `color` or `monochrome`.  <dashed> is either `dashed`
-or `solid`.  <rotate> is either `rotate` or `norotate` and determines
-if the y-axis label is rotated.  <font_size> is the size (in pts) of the
-desired font.
-
-If `auxfile` is specified, it directs the driver to put the PostScript
-commands into an auxiliary file instead of directly into the LaTeX file.
-This is useful if your pictures are large enough that dvips cannot handle
-them.  The name of the auxiliary PostScript file is derived from the name of
-the TeX file given on the @ref{output} command; it is determined by replacing
-the trailing `.tex` (actually just the final extent in the file name) with
-`.ps` in the output file name, or, if the TeX file has no extension, `.ps`
-is appended.  Remember to close the @ref{file} before leaving `gnuplot`.
-The `.ps` is included into the `.tex` file by a \\special@{psfile=...@} command.
-If you would rather prefer \\includegraphics@{...@}, then use the `epslatex`
-terminal.
-
-All drivers for LaTeX offer a special way of controlling text positioning: 
-(a) If any text string begins with '@{', you also need to include a '@}' at the
-end of the text, and the whole text will be centered both horizontally
-and vertically by LaTeX.  (b) If the text string begins with '[', you need
-to continue it with: a position specification (up to two out of t,b,l,r),
-']@{', the text itself, and finally, '@}'. The text itself may be anything
-LaTeX can typeset as an LR-box. \\rule@{@}@{@}'s may help for best positioning.
-
-Examples:
-@example
-      set term pslatex monochrome dashed rotate       # set to defaults
-@end example
-
-To write the PostScript commands into the file "foo.ps":
-@example
-      set term pslatex auxfile
-      set output "foo.tex"; plot ...; set output
-@end example
-
-About label positioning:
-Use gnuplot defaults (mostly sensible, but sometimes not really best):
-@example
-       set title '\\LaTeX\\ -- $ \\gamma $'
-@end example
-
-Force centering both horizontally and vertically:
-@example
-       set label '@{\\LaTeX\\ -- $ \\gamma $@}' at 0,0
-@end example
-
-Specify own positioning (top here):
-@example
-       set xlabel '[t]@{\\LaTeX\\ -- $ \\gamma $@}'
-@end example
-
-The other label -- account for long ticlabels:
-@example
-       set ylabel '[r]@{\\LaTeX\\ -- $ \\gamma $\\rule@{7mm@}@{0pt@}@}'
-
-@end example
-
-Linewidths and pointsizes may be changed with `set style line`."
-
-@node pstricks, qms, pslatex_and_pstex, terminal_
+@node pstricks, qms, pdf, terminal_
 @subsubsection pstricks
 
 @c ?commands set terminal pstricks
@@ -17786,6 +17317,37 @@ The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
 
+If your gnuplot was built with configuration option --enable-x11-mbfonts,
+you can specify multi-byte fonts by using the prefix "mbfont:" on the font
+name. An additional font may be given, separated by a semicolon.
+Since multi-byte font encodings are interpreted according to the locale
+setting, you must make sure that the environmental variable LC_CTYPE is set
+to some appropriate locale value such as ja_JP.eucJP, ko_KR.EUC, or zh_CN.EUC.
+
+Example:
+@example
+      set term x11 font 'mbfont:kana14;k14'
+            # 'kana14' and 'k14' are Japanese X11 font aliases, and ';'
+            # is the separator of font names.
+      set term x11 font 'mbfont:fixed,16,r,medium'
+            # <font>,<size>,<slant>,<weight> form is also usable.
+      set title '(mb strings)' font 'mbfont:*-fixed-medium-r-normal--14-*'
+
+@end example
+
+The same syntax applies to the default font in Xresources settings,
+for example,
+@example
+      gnuplot*font: \\
+          mbfont:-misc-fixed-medium-r-normal--14-*-*-*-c-*-jisx0208.1983-0
+
+@end example
+
+If gnuplot is built with --enable-x11-mbfonts, you can use two special
+PostScript font names 'Ryumin-Light-*' and 'GothicBBB-Medium-*' (standard
+Japanese PS fonts) without the prefix "mbfont:".
+
+
 
 @noindent --- COMMAND-LINE_OPTIONS ---
 
@@ -18071,9 +17633,15 @@ By default the contents of the current plot window are exported to the X11
 clipboard in response to X events in the window. Setting the resource
 'gnuplot*exportselection' to 'off' or 'false' will disable this.
 
+By default text rotation is done using a method that is fast, but can
+corrupt nearby colors depending on the background.  If this is a problem,
+you can set the resource 'gnuplot.fastrotate' to 'off'
+
 
 @example
  gnuplot*exportselection:  off
+ gnuplot*fastrotate:  on
+ gnuplot*ctrlq:  off
 
 @end example
 
@@ -18221,6 +17789,37 @@ The driver also recognizes some common PostScript font names and
 replaces them with possible X11 or TrueType equivalents.
 This same sequence is used to process font requests from @ref{label}.
 
+If your gnuplot was built with configuration option --enable-x11-mbfonts,
+you can specify multi-byte fonts by using the prefix "mbfont:" on the font
+name. An additional font may be given, separated by a semicolon.
+Since multi-byte font encodings are interpreted according to the locale
+setting, you must make sure that the environmental variable LC_CTYPE is set
+to some appropriate locale value such as ja_JP.eucJP, ko_KR.EUC, or zh_CN.EUC.
+
+Example:
+@example
+      set term x11 font 'mbfont:kana14;k14'
+            # 'kana14' and 'k14' are Japanese X11 font aliases, and ';'
+            # is the separator of font names.
+      set term x11 font 'mbfont:fixed,16,r,medium'
+            # <font>,<size>,<slant>,<weight> form is also usable.
+      set title '(mb strings)' font 'mbfont:*-fixed-medium-r-normal--14-*'
+
+@end example
+
+The same syntax applies to the default font in Xresources settings,
+for example,
+@example
+      gnuplot*font: \\
+          mbfont:-misc-fixed-medium-r-normal--14-*-*-*-c-*-jisx0208.1983-0
+
+@end example
+
+If gnuplot is built with --enable-x11-mbfonts, you can use two special
+PostScript font names 'Ryumin-Light-*' and 'GothicBBB-Medium-*' (standard
+Japanese PS fonts) without the prefix "mbfont:".
+
+
 
 @noindent --- COMMAND-LINE_OPTIONS ---
 
@@ -18506,9 +18105,15 @@ By default the contents of the current plot window are exported to the X11
 clipboard in response to X events in the window. Setting the resource
 'gnuplot*exportselection' to 'off' or 'false' will disable this.
 
+By default text rotation is done using a method that is fast, but can
+corrupt nearby colors depending on the background.  If this is a problem,
+you can set the resource 'gnuplot.fastrotate' to 'off'
+
 
 @example
  gnuplot*exportselection:  off
+ gnuplot*fastrotate:  on
+ gnuplot*ctrlq:  off
 
 @end example
 

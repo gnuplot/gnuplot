@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.278 2005/03/05 04:52:13 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.279 2005/03/09 19:05:34 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8757,7 +8757,7 @@ C ... and restart the table:
  the plot.  `set title` is a special case of `set label`.
 
  Syntax:
-       set title {"<title-text>"} {offset <offset>} {"<font>{,<size>}"}
+       set title {"<title-text>"} {offset <offset>} {font "<font>{,<size>}"}
                  {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
        show title
 
