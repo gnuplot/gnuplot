@@ -1,3 +1,10 @@
+2004-12-07  Ethan Merritt  <merritt@u.washington.edu>
+
+	term/emf.trm: Implement term->set_color(), term->filled_polygon, and
+	term->fillbox() for the emf terminal.  This does not provide PM3D
+	palette support, but it does allow coloring by explicit RGB and plot 
+	styles that use filled boxes.
+
 2004-12-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/pm3d.dem: Turn on colorbox in the demo of corners2color, and

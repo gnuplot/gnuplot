@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.24 2004/09/30 23:01:25 sfeam Exp $
+ * $Id: emf.trm,v 1.25 2004/10/19 00:24:08 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,9 @@
  *
  * HISTORY
  *
+ * 1.0.11 06-Dec-2004 Ethan A Merritt
+ * - implement term->set_color(), term->filled_polygon(), and term->fillbox()
+ *   RGB colors supported, but not yet PM3D palettes
  * 1.0.10 08-Jul-2004 Hans-Bernhard Broeker
  * - cleaned up to match gnuplot CodeStyle conventions (one line per statement,
  *   even in macro bodies, no meddling with assert()).
@@ -121,6 +124,12 @@ TERM_PUBLIC int EMF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
 TERM_PUBLIC int EMF_set_font __PROTO((const char *));
+
+#ifdef PM3D
+TERM_PUBLIC void EMF_set_color __PROTO((t_colorspec *colorspec));
+TERM_PUBLIC void EMF_filled_polygon __PROTO((int, gpiPoint *));
+TERM_PUBLIC void EMF_fillbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
+#endif
 
 #undef RGB
 #define RGB(r,g,b) ((long)					\
@@ -391,15 +400,6 @@ EMF_flush_polygon()
 
     if (emf_coords == 0)
 	return;
-
-#if 0 /* was commented out */
-    /* Polygon works for NT4 but not on W9x */
-    EMF_write_emr(3,(7+emf_coords*2)*4);
-    EMF_write_rectl(0,0,0,0);
-    EMF_write_long(emf_coords);
-    while(i < emf_coords*2)
-	EMF_write_pointl(emf_polyline[i++],term->ymax-emf_polyline[i++]);
-#endif
 
     EMF_MoveToEx(emf_polyline[i++], term->ymax - emf_polyline[i++]);
     while (i < emf_coords * 2)
@@ -689,6 +689,81 @@ EMF_linecolor(int linecolor)
 
     EMF_flush_polyline();
 }
+
+#ifdef PM3D
+
+TERM_PUBLIC void
+EMF_set_color(t_colorspec *colorspec)
+{
+    if (colorspec->type == TC_RGB) {
+	emf_color = RGB( colorspec->lt >> 16 & 0xff,
+			 colorspec->lt >> 8 & 0xff,
+			 colorspec->lt & 0xff );
+    }
+
+    EMF_flush_polyline();
+}
+
+TERM_PUBLIC void
+EMF_filled_polygon(int points, gpiPoint *corners)
+{
+    int i;
+    unsigned long color = emf_color;
+    int fillpar = corners->style >> 4;
+    int style = corners->style &= 0xf;
+
+#define META_POLYGON 3
+
+    switch (style) {
+	case FS_EMPTY: /* fill with background color */
+		color = RGB(255,255,255);
+		break;
+	case FS_PATTERN: /* pattern fill implemented as partial density */
+		fillpar *= 12;
+	case FS_SOLID: /* solid fill */
+		if (fillpar >= 0 && fillpar < 100) {
+		    double density = (double)fillpar / 100.;
+		    color = ((int)((double)((emf_color>>16)&0xff)*density) << 16)
+			  + ((int)((double)((emf_color>>8)&0xff)*density) << 8)
+			  + ((int)((double)(emf_color&0xff)*density));
+		    color += ((int)(255.*(1.-density)) << 16)
+		           + ((int)(255.*(1.-density)) << 8)
+			   + ((int)(255.*(1.-density)));
+		}
+		break;
+	default:
+		break;
+    }
+
+    /* Sequence of operations cribbed from Windows example */
+	EMF_CreateBrush(EMF_HANDLE_BRUSH, 0, color, 0);
+	EMF_SelectObject(EMF_HANDLE_BRUSH);
+
+	EMF_write_emr(META_POLYGON, (7 + 2*points) * 4);
+	EMF_write_rectl(0,0,0,0);  /* What are these? */
+	EMF_write_long(points);
+	for (i=0; i<points; i++)
+	    EMF_write_pointl(corners[i].x, term->ymax - corners[i].y);
+
+	EMF_DeleteObject(EMF_HANDLE_BRUSH);
+}
+
+TERM_PUBLIC void
+EMF_fillbox(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)
+{
+    gpiPoint corner[4];
+
+	corner[0].x = x1;        corner[0].y = y1;
+	corner[1].x = x1+width;  corner[1].y = y1;
+	corner[2].x = x1+width;  corner[2].y = y1+height;
+	corner[3].x = x1;        corner[3].y = y1+height;
+	corner->style = style;
+
+	EMF_filled_polygon(4, corner);
+}
+
+
+#endif /* PM3D */
 
 TERM_PUBLIC void 
 EMF_linewidth(double width)
@@ -1033,18 +1108,35 @@ EMF_set_pointsize(double size)
 
 #ifdef TERM_TABLE
 TERM_TABLE_START(emf_driver)
-"emf", "Enhanced Metafile format",
-EMF_XMAX, EMF_YMAX, EMF_VCHAR, EMF_HCHAR,
-EMF_VTIC, EMF_HTIC, EMF_options, EMF_init, EMF_reset,
-EMF_text, null_scale, EMF_graphics, EMF_move, EMF_solid_vector,
-EMF_linetype, EMF_put_text, EMF_text_angle,
-EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
-EMF_set_pointsize,
-TERM_BINARY,		/* various flags */
-NULL,				/* suspend */
-NULL,				/* resume  */
-NULL,				/* boxfill */
-EMF_linewidth
+    "emf", "Enhanced Metafile format",
+    EMF_XMAX, EMF_YMAX, EMF_VCHAR, EMF_HCHAR,
+    EMF_VTIC, EMF_HTIC, EMF_options, EMF_init, EMF_reset,
+    EMF_text, null_scale, EMF_graphics, EMF_move, EMF_solid_vector,
+    EMF_linetype, EMF_put_text, EMF_text_angle,
+    EMF_justify_text, EMF_point, do_arrow, EMF_set_font,
+    EMF_set_pointsize,
+    TERM_BINARY,		/* various flags */
+    NULL,				/* suspend */
+    NULL,				/* resume  */
+#ifdef PM3D
+    EMF_fillbox,
+#else
+    NULL,				/* boxfill */
+#endif
+    EMF_linewidth
+#ifdef USE_MOUSE
+   , 0, 0, 0, 0, 0 /* no mouse support for emf */
+#endif
+#ifdef PM3D
+   , NULL,		/* make_palette */
+   NULL,		/* previous_palette */
+   EMF_set_color,
+   EMF_filled_polygon
+#endif /* PM3D */
+#ifdef WITH_IMAGE
+    , NULL
+#endif
+
 TERM_TABLE_END(emf_driver)
 #undef LAST_TERM
 #define LAST_TERM emf_driver
