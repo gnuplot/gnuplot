@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.18 1999/08/11 18:09:41 lhecking Exp $
+ * $Id: plot.h,v 1.19 1999/08/24 11:22:57 lhecking Exp $
  *
  */
 
@@ -744,7 +744,6 @@ extern const char gnuplot_version[];
 extern const char gnuplot_patchlevel[];
 extern const char gnuplot_date[];
 extern const char gnuplot_copyright[];
-extern const char more_info[];
 extern const char faq_location[];
 extern const char bug_email[];
 extern const char help_email[];
