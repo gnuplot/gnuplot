@@ -1,3 +1,7 @@
+2001-06-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: remove backslahes from "\/".
+
 2001-06-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (gprintf): Added code to make use of new features of

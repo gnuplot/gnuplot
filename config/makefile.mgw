@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.10 2001/03/12 16:56:27 mikulik Exp $
+# $Id: makefile.mgw,v 1.11 2001/04/11 14:45:55 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -244,7 +244,7 @@ geticon.exe: win/geticon.c
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
 	./doc2rtf $(D)gnuplot.doc win/gnuplot.rtf
-	$(HCW) \/c \/e win/wgnuplot.hpj
+	$(HCW) /c /e win/wgnuplot.hpj
 
 doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI $(CFLAGS) -I. -I$(D) -I$(T) $^
