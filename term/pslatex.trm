@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.15.2.2 1999/10/01 18:22:37 lhecking Exp $
+ * $Id: pslatex.trm,v 1.15.2.3 2000/05/07 16:39:23 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -93,6 +93,7 @@ static char *PSLATEX_psfile = NULL;
 static TBOOLEAN PSLATEX_useAuxFile = FALSE;	/* do we write two files? */
 static FILE *PSLATEX_auxFile = NULL;
 static TBOOLEAN PSLATEX_output = TRUE;	/* do we write LaTeX? */
+static int PSLATEX_fontsize = 0;
 
 struct text_command {
     int x, y, angle, justify;
@@ -156,9 +157,14 @@ TERM_PUBLIC void PSLATEX_options()
     if (!END_OF_COMMAND) {
 	/* We have font size specified */
 	struct value a;
-	int ps_fontsize = (int) real(const_express(&a));
-	term->v_char = (unsigned int) (ps_fontsize * PS_SC);
-	term->h_char = (unsigned int) (ps_fontsize * PS_SC / 2);
+	/* Copied from latex.trm */
+        PSLATEX_fontsize = (int) real(const_express(&a));
+	/*
+	term->v_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 72);
+	term->h_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 144);
+	*/
+	term->v_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 60);
+	term->h_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 120);
     }
     /* be sure to generate an options string that PSLATEX_init understands */
 
@@ -167,6 +173,11 @@ TERM_PUBLIC void PSLATEX_options()
 	    ps_solid ? "solid" : "dashed",
 	    PSLATEX_rotate ? "rotate" : "norotate",
 	    PSLATEX_useAuxFile ? " auxfile" : "");
+    if (PSLATEX_fontsize) {
+      char fs[8] = "";
+      sprintf(fs," %d", PSLATEX_fontsize);
+      strcat(term_options, fs);
+    }
 }
 
 TERM_PUBLIC void PSLATEX_init()
@@ -387,6 +398,13 @@ TERM_PUBLIC void PSLATEX_text()
     } else {
 	PS_text();
 	fputs("}}%\n", gpoutfile);
+    }
+
+    if (PSLATEX_fontsize) {
+      if (PSLATEX_output)
+	fprintf(gpoutfile, "\\fontsize{%d}{\\baselineskip}\\selectfont\n",
+		PSLATEX_fontsize);
+      /* Should have an else clause here to handle pstex equivalent */
     }
 
     for (tc = PSLATEX_labels; tc != (struct text_command *) NULL; tc = tc->next) {
@@ -616,7 +634,7 @@ START_HELP(pslatex)
 "",
 " <color> is either `color` or `monochrome`.  <rotate> is either `rotate` or",
 " `norotate` and determines if the y-axis label is rotated.  <font_size> is",
-" used to scale the font from its usual size.",
+" the size (in pts) of the desired font.",
 "",
 " If `auxfile` is specified, it directs the driver to put the PostScript",
 " commands into an auxiliary file instead of directly into the LaTeX file.",
