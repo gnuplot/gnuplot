@@ -42,8 +42,8 @@ static char *RCSid = "$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $";
 #include "fnproto.h"
 #include <setjmp.h>
 
-#if defined(MSDOS) || defined(DOS386)
-#include <io.h>
+#if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
+# include <io.h>
 #endif
 
 /* HBB: for the control87 function, if used with DJGPP V1: */
@@ -52,10 +52,10 @@ static char *RCSid = "$Id: plot.c,v 1.87 1998/04/14 00:16:05 drd Exp $";
 #endif
 
 #ifdef VMS
-#ifndef __GNUC__
-#include <unixio.h>
-#endif
-#include <smgdef.h>
+# ifndef __GNUC__
+#  include <unixio.h>
+# endif
+# include <smgdef.h>
 extern int vms_vkid;
 extern smg$create_virtual_keyboard();
 extern int vms_ktid;
@@ -63,15 +63,15 @@ extern smg$create_key_table();
 #endif /* VMS */
 
 #ifdef AMIGA_SC_6_1
-#include <proto/dos.h>
+# include <proto/dos.h>
 #endif
 
 #ifdef _Windows
-#include <windows.h>
-#ifndef SIGINT
-#define SIGINT 2	/* for MSC */
-#endif
-#endif
+# include <windows.h>
+# ifndef SIGINT
+#  define SIGINT 2	/* for MSC */
+# endif
+#endif /* _Windows */
 
 extern FILE *outfile;
 
@@ -173,43 +173,25 @@ struct ft_entry GPFAR ft[] = {	/* built-in function table */
 };
 
 static struct udvt_entry udv_pi = {NULL, "pi",FALSE};
-									/* first in linked list */
+/* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
-
-
-#ifdef VMS
-#define HOME "sys$login:"
-#else /* VMS */
-
-#if defined(MSDOS) ||  defined(AMIGA_AC_5) || defined(AMIGA_SC_6_1) || defined(ATARI) || defined(OS2) || defined(_Windows) || defined(DOS386)
-
-#define HOME "GNUPLOT"
-
-#else /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
-
-#define HOME "HOME"
-
-#endif /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
-#endif /* VMS */
-
 #ifdef OS2
-#define INCL_DOS
-#define INCL_REXXSAA
-#include <os2.h>
-#include <process.h>
+# define INCL_DOS
+# define INCL_REXXSAA
+# include <os2.h>
+# include <process.h>
 ULONG RexxInterface( PRXSTRING, PUSHORT, PRXSTRING ) ;
 int   ExecuteMacro( char* , int) ;  
-#endif
-
-#if defined(unix) || defined(AMIGA) || defined(OSK)
-#define PLOTRC ".gnuplot"
-#else /* AMIGA || unix || OSK */
-#define PLOTRC "gnuplot.ini"
-#endif /* AMIGA || unix || OSK */
+void PM_intc_cleanup();
+void PM_setup();
+void set_input_line( char *, int );
+#endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
+/* For findfile () (?) */
+# include <support.h> 
 void appl_exit(void);
 void MTOS_open_pipe(void);
 extern int aesid;
@@ -283,14 +265,13 @@ malloc_debug(7);
 #endif
 
 #ifndef DOSX286
-#ifndef _Windows
-#if defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))
+# ifndef _Windows
+#  if defined (__TURBOC__) && (defined (MSDOS) || defined(DOS386))
 strcpy (HelpFile,argv[0]) ;                       /* got helpfile from */
 strcpy (strrchr(HelpFile,'\\'),"\\gnuplot.gih") ; /* home directory    */
-                                                  /*   - DJL */
-#endif
-#endif
-#endif
+#  endif                                          /*   - DJL */
+# endif /* !_Windows */
+#endif /* !DOSX286 */
 
 #ifdef VMS
 unsigned int status[2] = {1, 0};
@@ -349,12 +330,13 @@ rl_complete_with_tilde_expansion = 1;
      if (IsInteractive(Input()) == DOSTRUE) interactive = TRUE;
      else interactive = FALSE;
 #else
-#if (defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)
+# if (defined(__MSC__) && defined(_Windows)) || defined(__WIN32__)
      interactive = TRUE;
-#else
+# else
      interactive = isatty(fileno(stdin));
-#endif
-#endif
+# endif
+#endif /* !AMIGA_SC_6_1 */
+
      if (argc > 1)
 	  interactive = noinputfiles = FALSE;
      else
@@ -387,6 +369,7 @@ rl_complete_with_tilde_expansion = 1;
 #ifdef _Windows
 	SetCursor(LoadCursor((HINSTANCE)NULL, IDC_ARROW));
 #endif
+
 #ifdef VMS
 	    /* after catching interrupt */
 	    /* VAX stuffs up stdout on SIGINT while writing to stdout,
@@ -401,7 +384,7 @@ rl_complete_with_tilde_expansion = 1;
 		   }
 		   outfile = stdout;
 	    }
-#endif					/* VMS */
+#endif /* VMS */
 	    if (!interactive && !noinputfiles) {
 			term_reset();
 #if defined(ATARI) || defined(MTOS)
@@ -490,72 +473,57 @@ void interrupt_setup()
 /* Look for a gnuplot start-up file */
 static void load_rcfile()
 {
-    register FILE *plotrc;
+    FILE *plotrc = NULL;
     char home[80]; 
     char rcfile[sizeof(PLOTRC)+80];
-#if defined(ATARI) || defined(MTOS)
-    #include <support.h> 
-    char *ini_ptr;
-    char const *const ext[] = {NULL};
-#endif
+    char *tmp_home = NULL;
     /* Look for a gnuplot init file in . or home directory */
-#ifdef VMS
-    (void) strcpy(home,HOME);
-#else /* VMS */
-    char *tmp_home=getenv(HOME);
-    char *p;	/* points to last char in home path, or to \0, if none */
-    char c='\0';/* character that should be added, or \0, if none */
+#ifndef VMS
+    char *p;	  /* points to last char in home path, or to \0, if none */
+    char c = NUL; /* character that should be added, or \0, if none */
 
-    if(tmp_home) {
-    	strcpy(home,tmp_home);
-	if( strlen(home) ) p = &home[strlen(home)-1];
-	else		   p = home;
-#if defined(MSDOS) || defined(ATARI) || defined( OS2 ) || defined(_Windows) || defined(DOS386)
-	if( *p!='\\' && *p!='\0' ) c='\\';
-#else
-#if defined(MTOS)
-	if( *p!='\\' && *p!='/' && *p!='\0' ) c='\\';
-#else
-#if defined(AMIGA_AC_5)
-	if( *p!='/' && *p!=':' && *p!='\0' ) c='/';
-#else /* that leaves unix and OSK */
-	c='/';
-#endif
-#endif
-#endif
-	if(c) {
-	    if(*p) p++;
-	    *p++=c;
-	    *p='\0';
+    tmp_home = getenv(HOME);
+    if (tmp_home) {
+    	strncpy (home, tmp_home, (sizeof (home)) - 1);
+	if ( strlen(home) )
+	    p = &home[strlen(home)-1];
+	else
+ 	    p = home;
+	if ( (*p != PATHSEP1) && (*p != PATHSEP2) && (*p != NUL) ) {
+	    assert (p>=home && p<=(home+sizeof(home)-1-2));
+	    if (*p) p++;
+	    *p++ = PATHSEP1;
+	    *p = NUL;
 	}
     }
+#else /* VMS */
+    (void) strcpy(home,HOME);
+    tmp_home = home;
 #endif /* VMS */
 
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
-    {
 #else
-    (void) strcpy(rcfile, PLOTRC);
-    plotrc = fopen(rcfile,"r");
-    if (plotrc == (FILE *)NULL) {
-#endif
-#ifndef VMS
-	if( tmp_home ) {
-#endif
-	   (void) sprintf(rcfile, "%s%s", home, PLOTRC);
-	   plotrc = fopen(rcfile,"r");
+    (void) strcpy (rcfile, PLOTRC);
+    plotrc = fopen (rcfile,"r");
+
+    if (plotrc == NULL) {
+        if (tmp_home) {
+	    (void) sprintf (rcfile, "%s%s", home, PLOTRC);
+	    plotrc = fopen (rcfile,"r");
 #if defined(ATARI) || defined(MTOS)
-	}
-	if (plotrc == (FILE *)NULL) {
-	   ini_ptr = findfile(PLOTRC,getenv("GNUPLOTPATH"),ext);
-	   if (ini_ptr)  plotrc = fopen(ini_ptr,"r");
-        }
+	    if (plotrc == NULL) {
+	        char const *const ext[] = { NULL };
+                char *ini_ptr = findfile(PLOTRC,getenv("GNUPLOTPATH"),ext);
+
+		if (ini_ptr)
+		    plotrc = fopen (ini_ptr,"r");
+	    }
 #endif /* ATARI || MTOS */
-#if !defined(VMS) && !defined(ATARI) && !defined(MTOS)
-	} else
-	   plotrc=NULL;
-#endif /* !VMS && !ATARI && !MTOS */
+	}
     }
+#endif /* !NOCWDRC */
+
     if (plotrc)
 	 load_file(plotrc, rcfile, FALSE);
 }
