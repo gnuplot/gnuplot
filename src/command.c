@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.103 2004/08/10 05:54:34 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.104 2004/09/01 15:53:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -920,10 +920,10 @@ pause_command()
 		}
 	    }
 	    /* Set the pause mouse return codes to -1 */
-	    current = get_udv("MOUSE_KEY");
+	    current = add_udv_by_name("MOUSE_KEY");
 	    current->udv_undef = FALSE;
 	    Ginteger(&current->udv_value,-1);
-	    current = get_udv("MOUSE_BUTTON");
+	    current = add_udv_by_name("MOUSE_BUTTON");
 	    current->udv_undef = FALSE;
 	    Ginteger(&current->udv_value,-1);
 	} else
@@ -1035,14 +1035,14 @@ plot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_PLOT);
-    get_udv("MOUSE_X")->udv_undef = TRUE;
-    get_udv("MOUSE_Y")->udv_undef = TRUE;
-    get_udv("MOUSE_X2")->udv_undef = TRUE;
-    get_udv("MOUSE_Y2")->udv_undef = TRUE;
-    get_udv("MOUSE_BUTTON")->udv_undef = TRUE;
-    get_udv("MOUSE_SHIFT")->udv_undef = TRUE;
-    get_udv("MOUSE_ALT")->udv_undef = TRUE;
-    get_udv("MOUSE_CTRL")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_Y")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X2")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_Y2")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_BUTTON")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_SHIFT")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_ALT")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_CTRL")->udv_undef = TRUE;
 #endif
     plotrequest();
     SET_CURSOR_ARROW;
@@ -1296,11 +1296,11 @@ splot_command()
     SET_CURSOR_WAIT;
 #ifdef USE_MOUSE
     plot_mode(MODE_SPLOT);
-    get_udv("MOUSE_X")->udv_undef = TRUE;
-    get_udv("MOUSE_Y")->udv_undef = TRUE;
-    get_udv("MOUSE_X2")->udv_undef = TRUE;
-    get_udv("MOUSE_Y2")->udv_undef = TRUE;
-    get_udv("MOUSE_BUTTON")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_Y")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_X2")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_Y2")->udv_undef = TRUE;
+    add_udv_by_name("MOUSE_BUTTON")->udv_undef = TRUE;
 #endif
     plot3drequest();
     SET_CURSOR_ARROW;

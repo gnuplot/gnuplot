@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.46 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.47 2004/09/01 15:53:47 mikulik Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -881,25 +881,7 @@ init_fit()
 static void
 setvar(char *varname, struct value data)
 {
-    struct udvt_entry *udv_ptr = first_udv, *last = first_udv;
-
-    /* check if it's already in the table... */
-
-    while (udv_ptr) {
-	last = udv_ptr;
-	if (!strcmp(varname, udv_ptr->udv_name))
-	    break;
-	udv_ptr = udv_ptr->next_udv;
-    }
-
-    if (!udv_ptr) {             /* generate new entry */
-	udv_ptr = (struct udvt_entry *) gp_alloc(sizeof(struct udvt_entry), "fit setvar");
-	udv_ptr->udv_name = NULL;
-	last->next_udv = udv_ptr;
-	udv_ptr->next_udv = NULL;
-    }
-    udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname) + 1, "user var");
-    memcpy(udv_ptr->udv_name, varname, strlen(varname) + 1);
+    struct udvt_entry *udv_ptr = add_udv_by_name(varname);
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
 }

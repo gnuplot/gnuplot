@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.59 2004/07/13 14:11:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.60 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2353,40 +2353,40 @@ load_mouse_variables(double x, double y, TBOOLEAN button, int c)
 
     MousePosToGraphPosReal(x, y, &real_x, &real_y, &real_x2, &real_y2);
 
-    if ((current = get_udv("MOUSE_BUTTON"))) {
+    if ((current = add_udv_by_name("MOUSE_BUTTON"))) {
 	current->udv_undef = !button;
 	Ginteger(&current->udv_value, button?c:-1);
     }
-    if ((current = get_udv("MOUSE_KEY"))) {
+    if ((current = add_udv_by_name("MOUSE_KEY"))) {
 	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value,c);
     }
 
-    if ((current = get_udv("MOUSE_X"))) {
+    if ((current = add_udv_by_name("MOUSE_X"))) {
 	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_x,0);
     }
-    if ((current = get_udv("MOUSE_Y"))) {
+    if ((current = add_udv_by_name("MOUSE_Y"))) {
 	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_y,0);
     }
-    if ((current = get_udv("MOUSE_X2"))) {
+    if ((current = add_udv_by_name("MOUSE_X2"))) {
 	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_x2,0);
     }
-    if ((current = get_udv("MOUSE_Y2"))) {
+    if ((current = add_udv_by_name("MOUSE_Y2"))) {
 	current->udv_undef = FALSE;
 	Gcomplex(&current->udv_value,real_y2,0);
     }
-    if ((current = get_udv("MOUSE_SHIFT"))) {
+    if ((current = add_udv_by_name("MOUSE_SHIFT"))) {
 	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Shift);
     }
-    if ((current = get_udv("MOUSE_ALT"))) {
+    if ((current = add_udv_by_name("MOUSE_ALT"))) {
 	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Alt);
     }
-    if ((current = get_udv("MOUSE_CTRL"))) {
+    if ((current = add_udv_by_name("MOUSE_CTRL"))) {
 	current->udv_undef = FALSE;
 	Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
     }

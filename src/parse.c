@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.24 2004/07/24 19:37:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.25 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -695,10 +695,10 @@ is_builtin_function(int t_num)
     return (0);
 }
 
-/* EAM July 2003 - get_udv() is like add_udv except that it does not require
- * that the udv key be a token in the current command line. */
+/* EAM July 2003 - add_udv_by_name() is like add_udv except that it does not
+ * require that the udv key be a token in the current command line. */
 struct udvt_entry *
-get_udv(char *key)
+add_udv_by_name(char *key)
 {
     struct udvt_entry **udv_ptr = &first_udv;
 

@@ -1,3 +1,13 @@
+2004-09-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/command.c src/mouse.c src/parse.c src/parse.h: Rename utility
+	function get_udv(char *name) to be add_udv_by_name(char *name), since
+	this is what it really does.
+
+	* src/fit.c (setvar): Simplify existing code by using add_udv_by_name.
+
+	* src/set.c (set_termoptions): Update comment explaining this routine.
+
 2004-09-09  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Update the comment on plot-time evaluation of 
