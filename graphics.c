@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.14 2002/04/26 16:45:29 broeker Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.15 2002/09/19 15:19:41 broeker Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1185,8 +1185,8 @@ double amin, amax;
  */
 
 double set_tic(l10, guide)
-double l10;
-int guide;
+    double l10;
+    int guide;
 {
     double xnorm, tics, posns;
 
@@ -1224,7 +1224,7 @@ int guide;
 
 /*{{{  make_tics() */
 static double make_tics(axis, guide)
-int axis, guide;
+    int axis, guide;
 {
     register double xr, tic, l10;
 
@@ -1295,14 +1295,9 @@ int axis, guide;
 
 
 void do_plot(plots, pcount)
-struct curve_points *plots;
-int pcount;			/* count of plots in linked list */
+    struct curve_points *plots;
+    int pcount;			/* count of plots in linked list */
 {
-
-/* BODGES BEFORE I FIX IT UP */
-#define ytic ticstep[y_axis]
-#define xtic ticstep[x_axis]
-
     register struct termentry *t = term;
     register int curve;
     int axis_zero[AXIS_ARRAY_SIZE];	/* axes in terminal coords for FIRST_X_AXIS, etc */
@@ -1979,10 +1974,6 @@ int pcount;			/* count of plots in linked list */
     term_end_plot();
 }
 
-
-/* BODGES */
-#undef ytic
-#undef xtic
 
 /* plot_impulses:
  * Plot the curves in IMPULSES style
@@ -3981,10 +3972,10 @@ int *lines;
 
 
 void setup_tics(axis, ticdef, format, max)
-int axis;
-struct ticdef *ticdef;
-char *format;
-int max;			/* approx max number of slots available */
+    int axis;
+    struct ticdef *ticdef;
+    char *format;
+    int max;			/* approx max number of slots available */
 {
     double tic = 0;		/* HBB: shut up gcc -Wall */
 
@@ -3995,6 +3986,8 @@ int max;			/* approx max number of slots available */
 	ticstep[axis] = tic = ticdef->def.series.incr;
 	fixmin &= (ticdef->def.series.start == -VERYLARGE);
 	fixmax &= (ticdef->def.series.end == VERYLARGE);
+	if (log_array[axis])
+	    tic = fabs(log(fabs(tic))) / log_base_array[axis];
     } else if (ticdef->type == TIC_COMPUTED) {
 	ticstep[axis] = tic = make_tics(axis, max);
     } else {
@@ -4269,12 +4262,12 @@ double log_base, x;		/* we print one number in a number of different formats */
  */
 
 void gen_tics(axis, def, grid, minitics, minifreq, callback)
-int axis;			/* FIRST_X_AXIS, etc */
-struct ticdef *def;		/* tic defn */
-int grid;			/* GRID_X | GRID_MX etc */
-int minitics;			/* minitics - off/default/auto/explicit */
-double minifreq;		/* frequency */
-tic_callback callback;		/* fn to call to actually do the work */
+    int axis;			/* FIRST_X_AXIS, etc */
+    struct ticdef *def;		/* tic defn */
+    int grid;			/* GRID_X | GRID_MX etc */
+    int minitics;		/* minitics - off/default/auto/explicit */
+    double minifreq;		/* frequency */
+    tic_callback callback;	/* fn to call to actually do the work */
 {
     /* seperate main-tic part of grid */
     struct lp_style_type lgrd, mgrd;
@@ -4319,6 +4312,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 	return;			/* NO MINITICS FOR USER-DEF TICS */
 	/*}}} */
     }
+
     /* series-tics
      * need to distinguish user co-ords from internal co-ords.
      * - for logscale, internal = log(user), else internal = user
@@ -4330,7 +4324,6 @@ tic_callback callback;		/* fn to call to actually do the work */
      * If step>1, we are looking at 1,1e6,1e12 for example, so
      * minitics are 10,100,1000,... - done in internal co-ords
      */
-
     {
 	double tic;		/* loop counter */
 	double internal;	/* in internal co-ords */
@@ -4350,28 +4343,30 @@ tic_callback callback;		/* fn to call to actually do the work */
 	    lmin = lmax;
 	    lmax = temp;
 	}
+
 	/*{{{  choose start, step and end */
 	switch (def->type) {
 	case TIC_SERIES:
+	    start = def->def.series.start;
+	    step = def->def.series.incr;
+	    end = def->def.series.end;
+
 	    if (log_array[axis]) {
-		/* we can tolerate start <= 0 if step and end > 0 */
-		if (def->def.series.end <= 0 ||
-		    def->def.series.incr <= 0)
-		    return;	/* just quietly ignore */
-		step = log(def->def.series.incr) / log_base_array[axis];
-		end = log(def->def.series.end) / log_base_array[axis];
-		start = def->def.series.start > 0 ?
-		    log(def->def.series.start) / log_base_array[axis] :
-		    step;
-	    } else {
-		start = def->def.series.start;
-		step = def->def.series.incr;
-		end = def->def.series.end;
-		if (start == -VERYLARGE)
-		    start = step * floor(lmin / step);
-		if (end == VERYLARGE)
-		    end = step * ceil(lmax / step);
+		step = fabs(log(fabs(step))) / log_base_array[axis];
 	    }
+	    
+	    /* NOTE: lmin/lmax already are already logarithms, if
+	     * applicable */
+	    if (start == -VERYLARGE)
+		start = step * floor(lmin / step);
+	    else if (log_array[axis])
+		start = log(fabs(start)) / log_base_array[axis];
+		    
+	    if (end == VERYLARGE)
+		end = step * ceil(lmax / step);
+	    else if (log_array[axis])
+		end = log(fabs(end)) / log_base_array[axis];
+	    
 	    break;
 	case TIC_COMPUTED:
 	    /* round to multiple of step */
@@ -4458,6 +4453,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 		minitics = 0;	/* dont get stuck in infinite loop */
 	    /*}}} */
 	}
+
 	/*{{{  a few tweaks and checks */
 	/* watch rounding errors */
 	end += SIGNIF * step;

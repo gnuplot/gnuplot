@@ -1,4 +1,14 @@
-Mon Nov 11 14:40:11 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2002-11-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c (do_plot): Get rid of old xtic and ytic #defines.
+	(setup_tics): For series tics on log axes, logarithmize tic step
+ 	for use by endpoint fixups.
+	(gen_tics): Rewrite handling of series tics on log axes.  Handle
+ 	un-specified ticking endpoints.  Handle both negative values and
+ 	negative exponents of the stepsize correctly, and also negative
+ 	user-specified endpoints.
+
+2002-11-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/svg.trm (SVG_init): Backports from 3.8 branch: adds the
  	viewBox attribute to the <svg> tag, and replaces the original SVG
