@@ -1,3 +1,9 @@
+2003-05-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/show.c show_palette_colornames(): Command 'show palette
+	colornames': print color names and their rgb values (was printing
+	only names).
+
 2003-05-16  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gadgets.h src/graph3d.c src/graphics.c src/save.c src/set.c

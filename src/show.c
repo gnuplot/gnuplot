@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.105 2003/04/29 07:04:30 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.106 2003/05/17 05:59:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1987,8 +1987,18 @@ static void show_palette_colornames()
   int i=0;
   fputs( "\tList of known color names:", stderr );
   while (tbl->key) {
+#if 0
+      /* Print only color names, table with 4 columns */
       if (i%4 == 0) fputs( "\n  ", stderr );
       fprintf( stderr, "%-18s ", tbl->key );
+#else
+      /* Print color names and their rgb values, table with 1 column */
+      fprintf( stderr, "\n  %-18s ", tbl->key );
+      int r = ((tbl->value >> 16 ) & 255);
+      int g = ((tbl->value >> 8 ) & 255);
+      int b = (tbl->value & 255);
+      fprintf(stderr, "#%02x%02x%02x = %3i %3i %3i", r,g,b, r,g,b);
+#endif
       ++tbl;
       ++i;
   }
