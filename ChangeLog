@@ -1,7 +1,14 @@
+2001-10-01  Slaven Rezic  <slaven.rezic@berlin.de>
+
+	* term/tkcanvas.trm: No more warnings if running with perl -w. Take
+	-highlightthickness into account for height/width computation. Use
+	a subroutine reference rather than a subroutine name in the perl
+	version (as in my original patch). Doc fix for perl sample.
+
 2001-09-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* fit.c (do_fit): Fix bug in copying of partly fixed yrange spec
- 	to zrange variables.
+	to zrange variables.
 
 2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
 
@@ -12,15 +19,15 @@
 2001-06-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graphics.c (histeps_current_plot, histeps_compare): New
- 	file-scope variable and comparison function, used in applying
- 	qsort() to sorting the datapoints in "histeps" mode.
+	file-scope variable and comparison function, used in applying
+	qsort() to sorting the datapoints in "histeps" mode.
 	(plot_histeps): Use qsort() instead of homegrown bubblesort
- 	implementation to sort datapoints by x. Removed now-unused locals
- 	'bigi' and 'hold'.
+	implementation to sort datapoints by x. Removed now-unused locals
+	'bigi' and 'hold'.
 	(plot_histeps): Don't blindly assume 0.0 is the baseline y
- 	position for the histogram.  For logarithmic y axis, it isn't.
-  	Set up new local 'y_null' to hold the correct position.
-	
+	position for the histogram.  For logarithmic y axis, it isn't.
+	Set up new local 'y_null' to hold the correct position.
+
 	* alloc.c (gp_alloc): Fix return type to 'generic pointer'.
 
 	* alloc.h (gp_alloc): Update prototype.
@@ -28,16 +35,16 @@
 2001-05-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pslatex.trm (PSLATEX_graphics): Use PSLATEX_{X|Y}MAX
- 	instead of PS_{X|Y}MAX to calculate the bounding box parameters of
- 	the dvips \special command. Was wrong by a factor of two, before.
-	
+	instead of PS_{X|Y}MAX to calculate the bounding box parameters of
+	the dvips \special command. Was wrong by a factor of two, before.
+
 2001-03-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* parse.c (xterms, aterms, bterms): Avoid storing pointers into
- 	the dynamical array at->actions[]. They break if the action table
- 	has to be reallocated. This caused a really strange endless loop
- 	bug for a very complicated function using 8 nested levels of
- 	conditional operators plus lots of function calls.
+	the dynamical array at->actions[]. They break if the action table
+	has to be reallocated. This caused a really strange endless loop
+	bug for a very complicated function using 8 nested levels of
+	conditional operators plus lots of function calls.
 
 2001-03-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -51,12 +58,12 @@
 2001-02-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_text, EMF_reset): Reset emf_graphics flag to
- 	FALSE to fix bug reported by J.Bollinger.
+	FALSE to fix bug reported by J.Bollinger.
 
 	* term/emf.trm (EMF_STOCK_OBJECT_FLAG,
- 	EMF_STOCK_OBJECT_WHITE_BRUSH, EMF_STOCK_OBJECT_BLACK_PEN,
- 	EMF_STOCK_OBJECT_DEFAULT_FONT): New mnemonic macros to replace
- 	magic numbers.
+	EMF_STOCK_OBJECT_WHITE_BRUSH, EMF_STOCK_OBJECT_BLACK_PEN,
+	EMF_STOCK_OBJECT_DEFAULT_FONT): New mnemonic macros to replace
+	magic numbers.
 	(EMF_setfont, EMF_text, EMF_dashtype): Use them.
 
 2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
@@ -65,9 +72,9 @@
 	HP-UX 10.x and higher.
 
 	* graph3d.c (xtick_callback, ytick_callback, ztick_callback):
- 	remove 'static' attribute to avoid bug in HP-UX assembler. This
- 	was the root of the long-standing compilation problems with GCC on
- 	HP-UX 10 and higher.
+	remove 'static' attribute to avoid bug in HP-UX assembler. This
+	was the root of the long-standing compilation problems with GCC on
+	HP-UX 10 and higher.
 
 	* graphics.c (widest2d_callback, xtick2d_callback): dito
 	(ytick2d_callback): dito.
@@ -144,13 +151,13 @@
 	axes were incorrect.
 
 	* set.c (set_arrow): don't accept 'first' and 'second' as keywords
- 	before 'from' or 'to'.
+	before 'from' or 'to'.
 	
 2000-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graphics.c (map_position), graph3d.c (map_position): Fix
- 	off-by-one bug in treatment of term->{x,y}max when translating
- 	'screen' coordinates.
+	off-by-one bug in treatment of term->{x,y}max when translating
+	'screen' coordinates.
 
 2000-09-13  Daniel Luecking  <luecking@uark.edu>
 
