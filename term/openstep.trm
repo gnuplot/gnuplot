@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: openstep.trm,v 1.9 2002/08/01 16:51:20 broeker Exp $
+ * $Id: openstep.trm,v 1.10 2002/08/30 20:18:26 sfeam Exp $
  *
  */
 
@@ -890,6 +890,8 @@ const char *font;
 	sscanf(&(font[sep + 1]), "%d", &size);
     NEXTPrintf("/%s findfont %d scalefont setfont\n", name, size * NEXT_SC);
     NEXT_RememberFont(name);
+    term->v_char = (unsigned int) (size * NEXT_SC);
+    term->h_char = (unsigned int) (size * NEXT_SC * 6 / 10);
     return TRUE;
 }
 

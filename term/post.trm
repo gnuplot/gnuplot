@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.86 2003/01/22 08:47:56 mikulik Exp $
+ * $Id: post.trm,v 1.87 2003/01/22 15:08:37 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1730,10 +1730,11 @@ unsigned int x,y;
 	return;
     sprintf(abso, "%d %d M\n", x, y);
     sprintf(rel, "%d %d R\n", dx, dy);
+
     if (strlen(rel) < strlen(abso) && PS_relative_ok) {
 	fputs(rel, gpoutfile);
 	PS_taken++;
-    }else
+    } else
 	fputs(abso, gpoutfile);
     PS_relative_ok = TRUE;
     ps_path_count += 1;
@@ -1847,6 +1848,8 @@ const char *font;
 	sscanf (&(font[sep+1]),"%d",&size);
     PS_RememberFont(name,1 );
     fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+    term->v_char = (unsigned int)(size*PS_SC);
+    term->h_char = (unsigned int)(size*PS_SC*6/10);
     return TRUE;
 }
 
@@ -2309,6 +2312,8 @@ const char *font;
 	strcpy(ps_enh_font, ps_font);
 	ps_enh_fontsize = ps_fontsize;
     }
+    term->v_char = (unsigned int)(ps_enh_fontsize*PS_SC);
+    term->h_char = (unsigned int)(ps_enh_fontsize*PS_SC*6/10);
 
     return TRUE;
 }

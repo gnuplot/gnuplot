@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.16 2002/11/01 20:14:32 sfeam Exp $
+ * $Id: pdf.trm,v 1.17 2002/12/17 13:32:56 lhecking Exp $
  */
 
 /*------------------------------
@@ -954,6 +954,10 @@ PDF_set_font (const char *font)
 
     PDF_PathClose();
     PDF_SetFont();
+   
+    term->h_char = PDF_fontAvWidth;
+    term->v_char = (PDF_fontAscent + PDF_fontDescent + PDF_fontLeading);
+    
     return (TRUE);
 }
 

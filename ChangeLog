@@ -1,3 +1,8 @@
+2003-02-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/next.trm term/openstep.trm term/pdf.trm term/post.trm:
+	Update term->v_char and term->h_char whenever font is changed.
+
 2003-02-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gadgets.c src/gadgets.h src/graph3d.c: Remove unused parameter.
@@ -1912,7 +1917,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/06 18:24:29 $).
+	last modification date (from the tag $Date: 2003/02/10 04:28:08 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
