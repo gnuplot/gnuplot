@@ -90,14 +90,8 @@
 /* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
-/* Define to the name of the distribution.  */
-#undef PACKAGE
-
 /* Define if you do have the popen and pclose functions.  */
 #undef PIPES
-
-/* Define if you have the function prototypes.  */
-#undef PROTOTYPES
 
 /* Define if you want to use the included readline function.  */
 #undef READLINE
@@ -125,9 +119,6 @@
 
 /* Define if you want to use the system time routines.  */
 #undef USE_SYSTEM_TIME
-
-/* Define to the version of the distribution.  */
-#undef VERSION
 
 /* Define if you are using the X11 window system.  */
 #undef X11
@@ -281,3 +272,13 @@
 
 /* Define if you have the <values.h> header file.  */
 #undef HAVE_VALUES_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
+/* Define if compiler has function prototypes */
+#undef PROTOTYPES
+
