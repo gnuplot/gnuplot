@@ -4363,7 +4363,9 @@ Arbitrary arrows can be placed on a plot using the @ref{arrow} command.
 
 Syntax:
 @example
-      set arrow @{<tag>@} @{from <position>@} @{to <position>@} @{@{no@}head@}
+      set arrow @{<tag>@} @{from <position>@} @{to|rto <position>@}
+                @{nohead | head | heads@}
+                @{size <length>,<angle>@}
                 @{front | back@}
                 @{ @{linestyle | ls <line_style>@}
                   | @{linetype | lt <line_type>@}
@@ -4386,10 +4388,19 @@ one of four coordinate systems---`first` or `second` axes, `graph` or
 `screen`.  See `coordinates` for details.  A coordinate system specifier
 does not carry over from the "from" position to the "to" position.  Arrows
 outside the screen boundaries are permitted but may cause device errors.
+If the endpoint is specified by "rto" instead of "to" it is drawn relatively
+to the start point.
 
 Specifying `nohead` produces an arrow drawn without a head---a line segment.
 This gives you yet another way to draw a line segment on the plot.  By
-default, arrows have heads.
+default, arrows have heads. Specifying `heads` draws arrow heads on both
+ends of the line.
+
+Head size can be controlled by `size <length>,<angle>`, where <length> 
+defines length of each branch of the arrow head and <angle> the angle (in 
+degrees) they make with the arrow. <Length> is in x-axis units; this can be
+changed by `first`, `second`, `graph` or `screen` before the <length>; see
+`coordinates` for details.
 
 The line style may be selected from a user-defined list of line styles (see
 `set style line`) or may be defined here by providing values for <line_type>
@@ -4430,6 +4441,19 @@ double its width, use:
 To draw a vertical line from the bottom to the top of the graph at x=3, use:
 @example
       set arrow from 3, graph 0 to 3, graph 1 nohead
+
+@end example
+
+To draw a vertical arrow with T-shape ends, use:
+@example
+      set arrow 3 from 0,-5 to 0,5 heads size screen 0.1,90
+
+@end example
+
+To draw an arrow relatively to the start point, where the relative distances
+are given in graph coordinates, use:
+@example
+      set arrow from 0,-5 rto graph 0.1,0.1
 
 @end example
 
@@ -5902,7 +5926,8 @@ Syntax:
 @example
       set label @{<tag>@} @{"<label_text>"@} @{at <position>@}
                 @{<justification>@} @{@{no@}rotate@} @{font "<name>@{,<size>@}"@}
-                @{front | back@} @{pointstyle <style> | nopointstyle@}
+                @{front | back@}
+                @{pointstyle <style> @{offset x, y@}| nopointstyle@}
       set nolabel @{<tag>@}
       show label
 
@@ -5934,10 +5959,14 @@ data.  Using `front` will prevent a label from being obscured by dense data.
 
 If `pointstyle` is given, a point with the given style is plotted at
 the label position and the text of the label is displaced slightly.
-The size of the point depends on the setting of @ref{pointsize}. This
-option is used by default for placing labels in mouse enhanced terminals.
-Use `nopointstyle` to turn off the drawing of a point near the label
-(this is the default).
+The displacement defaults to 1, 1 in @ref{pointsize} units and can be
+controlled by the optional `offset x, y`. Example: `offset 2, -3` would
+displace the labels 2 * pointsize horizontally and -3 * pointsize vertically
+from the actual coordinate point as given by `position`.  The size of the
+point depends also on the setting of @ref{pointsize}.
+This option is used by default for placing labels in mouse enhanced
+terminals.  Use `nopointstyle` to turn off the drawing of a point near
+the label (this is the default).
 
 If one (or more) axis is timeseries, the appropriate coordinate should be
 given as a quoted time string according to the @ref{timefmt} format string.  See
@@ -7755,9 +7784,10 @@ If a fixed-size window is desired, the `gpr` terminal may be used instead."
 @tmindex cgm
 
 
-The `cgm` terminal generates a Computer Graphics Metafile.  This file format
-is a subset of the ANSI X3.122-1986 standard entitled "Computer Graphics -
-Metafile for the Storage and Transfer of Picture Description Information".
+The `cgm` terminal generates a Computer Graphics Metafile, Version 1. 
+This file format is a subset of the ANSI X3.122-1986 standard entitled
+"Computer Graphics - Metafile for the Storage and Transfer of Picture
+Description Information".
 Several options may be set in `cgm`.
 
 Syntax:
@@ -7765,6 +7795,7 @@ Syntax:
       set terminal cgm @{<mode>@} @{<color>@} @{<rotation>@} @{solid | dashed@}
                        @{width <plot_width>@} @{linewidth <line_width>@}
                        @{"<font>"@} @{<fontsize>@}
+                       @{<color0> <color1> <color2> ...@}
 
 @end example
 
@@ -7772,25 +7803,31 @@ where <mode> is `landscape`, `portrait`, or `default`;
 <color> is either `color` or `monochrome`; 
 <rotation> is either `rotate` or `norotate`;
 `solid` draws all curves with solid lines, overriding any dashed patterns;
-<plot_width> is the width of the page in points; 
-<line_width> is the line width in points; 
+<plot_width> is the assumed width of the plot in points; 
+<line_width> is the line width in points (default 1); 
 <font> is the name of a font; and 
-`<fontsize>` is the size of the font in points.
+<fontsize> is the size of the font in points (default 12).
 
 By default, `cgm` uses rotated text for the Y axis label.
 
 The first six options can be in any order.  Selecting `default` sets all
 options to their default values.
 
+Each color must be of the form 'xrrggbb', where x is the literal
+character 'x' and 'rrggbb' are the red, green and blue components in
+hex.  For example, 'x00ff00' is green.  The background color is set
+first, then the plotting colors."
+
 Examples:
 @example
       set terminal cgm landscape color rotate dashed width 432 \\
-                     linewidth 1  'Arial Bold' 12       # defaults
+                     linewidth 1  'Helvetica Bold' 12       # defaults
       set terminal cgm 14 linewidth 2  14  # wider lines & larger font
-      set terminal cgm portrait 'Times Roman Italic' 12
-      set terminal cgm color solid    # no pesky dashes!
+      set terminal cgm portrait "Times Italic" 12
+      set terminal cgm color solid      # no pesky dashes!
 
 @end example
+
 
 
 @noindent --- FONT ---
@@ -7802,30 +7839,87 @@ Examples:
 The first part of a Computer Graphics Metafile, the metafile description,
 includes a font table.  In the picture body, a font is designated by an
 index into this table.  By default, this terminal generates a table with
-the following fonts:
+the following 16 fonts, plus six more with `italic` replaced by
+`oblique`, or vice-versa (since at least the Microsoft Office and Corel
+Draw CGM import filters treat `italic` and `oblique` as equivalent):
 
 @example
-      Arial
-      Arial Italic
-      Arial Bold
-      Arial Bold Italic
-      Times Roman
-      Times Roman Italic
-      Times Roman Bold
-      Times Roman Bold Italic
       Helvetica
-      Roman
+      Helvetica Bold
+      Helvetica Oblique
+      Helvetica Bold Oblique
+      Times Roman
+      Times Bold
+      Times Italic
+      Times Bold Italic
+      Courier
+      Courier Bold
+      Courier Oblique
+      Courier Bold Oblique
+      Symbol
+      Hershey/Cartographic_Roman
+      Hershey/Cartographic_Greek
+      Hershey/Simplex_Roman
+      Hershey/Simplex_Greek
+      Hershey/Simplex_Script
+      Hershey/Complex_Roman
+      Hershey/Complex_Greek
+      Hershey/Complex_Script
+      Hershey/Complex_Italic
+      Hershey/Complex_Cyrillic
+      Hershey/Duplex_Roman
+      Hershey/Triplex_Roman
+      Hershey/Triplex_Italic
+      Hershey/Gothic_German
+      Hershey/Gothic_English
+      Hershey/Gothic_Italian
+      Hershey/Symbol_Set_1
+      Hershey/Symbol_Set_2
+      Hershey/Symbol_Math
+      ZapfDingbats
+      Script
+      15
 
 @end example
 
-Case is not distinct, but the modifiers must appear in the above order (that
-is, not 'Arial Italic Bold').  'Arial Bold' is the default font.
 
-You may also specify a font name which does not appear in the default font
-table.  In that case, a new font table is constructed with the specified
-font as its only entry.  You must ensure that the spelling, capitalization,
-and spacing of the name are appropriate for the application that will read
-the CGM file.
+The first thirteen of these fonts are required for WebCGM.  The
+Microsoft Office CGM import filter implements the 13 standard fonts
+listed above, and also 'ZapfDingbats' and 'Script'.  However, the
+script font may only be accessed under the name '15'.  For more on
+Microsoft import filter font substitutions, check its help file which
+you may find here:
+@example
+  C:\\Program Files\\Microsoft Office\\Office\\Cgmimp32.hlp
+@end example
+
+and/or its configuration file, which you may find here:
+@example
+  C:\\Program Files\\Common Files\\Microsoft Shared\\Grphflt\\Cgmimp32.cfg
+
+@end example
+
+In the `set term` command, you may specify a font name which does not
+appear in the default font table.  In that case, a new font table is
+constructed with the specified font as its first entry. You must ensure
+that the spelling, capitalization, and spacing of the name are
+appropriate for the application that will read the CGM file.  (Gnuplot
+and any MIL-D-28003A compliant application ignore case in font names.)
+If you need to add several new fonts, use several `set term` commands.
+
+Example:
+@example
+      set terminal cgm 'Old English'
+      set terminal cgm 'Tengwar'
+      set terminal cgm 'Arabic'
+      set output 'myfile.cgm'
+      plot ...
+      set output
+
+@end example
+
+You cannot introduce a new font in a @ref{label} command."
+
 
 
 @noindent --- FONTSIZE ---
@@ -7834,11 +7928,12 @@ the CGM file.
 @c ?set terminal cgm fontsize
 @c ?set term cgm fontsize
 @c ?cgm fontsize
-Fonts are scaled assuming the page is 6 inches wide.  If the @ref{size} command
-is used to change the aspect ratio of the page or the CGM file is converted
-to a different width (e.g. it is imported into a document in which the
-margins are not 6 inches apart), the resulting font sizes will be different.
-To change the assumed width, use the `width` option.
+Fonts are scaled assuming the page is 6 inches wide.  If the @ref{size}
+command is used to change the aspect ratio of the page or the CGM file
+is converted to a different width, the resulting font sizes will be
+scaled up or down accordingly.  To change the assumed width, use the
+`width` option.
+
 
 
 @noindent --- LINEWIDTH ---
@@ -7847,9 +7942,10 @@ To change the assumed width, use the `width` option.
 @c ?set terminal cgm linewidth
 @c ?set term cgm linewidth
 @c ?cgm linewidth
-The `linewidth` option sets the width of lines in pt.  The default width is
-1 pt.  Scaling is affected by the actual width of the page, as discussed
-under the `fontsize` and `width` options
+The `linewidth` option sets the width of lines in pt.  The default width
+is 1 pt.  Scaling is affected by the actual width of the page, as
+discussed under the `fontsize` and `width` options
+
 
 
 @noindent --- ROTATE ---
@@ -7858,13 +7954,15 @@ under the `fontsize` and `width` options
 @c ?set terminal cgm rotate
 @c ?set term cgm rotate
 @c ?cgm rotate
-The `norotate` option may be used to disable text rotation.  For example,
-the CGM input filter for Word for Windows 6.0c can accept rotated text, but
-the DRAW editor within Word cannot.  If you edit a graph (for example, to
-label a curve), all rotated text is restored to horizontal.  The Y axis
-label will then extend beyond the clip boundary.  With `norotate`, the Y
-axis label starts in a less attractive location, but the page can be edited
-without damage.  The `rotate` option confirms the default behavior.
+The `norotate` option may be used to disable text rotation.  For
+example, the CGM input filter for Word for Windows 6.0c can accept
+rotated text, but the DRAW editor within Word cannot.  If you edit a
+graph (for example, to label a curve), all rotated text is restored to
+horizontal.  The Y axis label will then extend beyond the clip boundary.
+With `norotate`, the Y axis label starts in a less attractive location,
+but the page can be edited without damage.  The `rotate` option confirms
+the default behavior.
+
 
 
 @noindent --- SOLID ---
@@ -7873,9 +7971,11 @@ without damage.  The `rotate` option confirms the default behavior.
 @c ?set term cgm solid
 @c ?cgm solid
 The `solid` option may be used to disable dashed line styles in the
-plots.  This is useful when color is enabled and the dashing of the lines
-detracts from the appearance of the plot. The `dashed` option confirms the
-default behavior, which gives a different dash pattern to each curve.
+plots.  This is useful when color is enabled and the dashing of the
+lines detracts from the appearance of the plot. The `dashed` option
+confirms the default behavior, which gives a different dash pattern to
+each curve.
+
 
 
 @noindent --- SIZE ---
@@ -7883,9 +7983,10 @@ default behavior, which gives a different dash pattern to each curve.
 @c ?commands set terminal cgm size
 @c ?set terminal cgm size
 @c ?set term cgm size
-@c ?scgm size
-Default size of a CGM page is 32599 units wide and 23457 units high for
+@c ?cgm size
+Default size of a CGM plot is 32599 units wide and 23457 units high for
 landscape, or 23457 units wide by 32599 units high for portrait.
+
 
 
 @noindent --- WIDTH ---
@@ -7894,14 +7995,16 @@ landscape, or 23457 units wide by 32599 units high for portrait.
 @c ?set terminal cgm width
 @c ?set term cgm width
 @c ?cgm width
-All distances in the CGM file are in abstract units.  The application that
-reads the file determines the size of the final page.  By default, the width
-of the final page is assumed to be 6 inches (15.24 cm).  This distance is
-used to calculate the correct font size, and may be changed with the `width`
-option.  The keyword should be followed by the width in points.  (Here, a
-point is 1/72 inch, as in PostScript.  This unit is known as a "big point"
-in TeX.)  `gnuplot` arithmetic can be used to convert from other units, as
-follows:
+All distances in the CGM file are in abstract units.  The application
+that reads the file determines the size of the final plot.  By default,
+the width of the final plot is assumed to be 6 inches (15.24 cm).  This
+distance is used to calculate the correct font size, and may be changed
+with the `width` option.  The keyword should be followed by the width in
+points.  (Here, a point is 1/72 inch, as in PostScript.  This unit is
+known as a "big point" in TeX.)  Gnuplot `expressions` can be used to
+convert from other units.
+
+Example:
 @example
       set terminal cgm width 432            # default
       set terminal cgm width 6*72           # same as above
@@ -7910,28 +8013,33 @@ follows:
 @end example
 
 
-@noindent --- WINWORD6 ---
 
+@noindent --- NOFONTLIST ---
+
+@c ?commands set terminal cgm nofontlist
+@c ?set terminal cgm nofontlist
+@c ?set term cgm nofontlist
+@c ?cgm nofontlist
 @c ?commands set terminal cgm winword6
 @c ?set terminal cgm winword6
 @c ?set term cgm winword6
 @c ?cgm winword6
-The default font table was chosen to match, where possible, the default font
-assignments made by the Computer Graphics Metafile input filter for
-Microsoft Word 6.0c, although the filter makes available only 'Arial' and
-'Times Roman' fonts and their bold and/or italic variants.  Other fonts such
-as 'Helvetica' and 'Roman' are not available.  If the CGM file includes a
-font table, the filter mostly ignores it.  However, it changes certain font
-assignments so that they disagree with the table.  As a workaround, the
-`winword6` option deletes the font table from the CGM file.  In this case,
-the filter makes predictable font assignments.  'Arial Bold' is correctly
-assigned even with the font table present, which is one reason it was chosen
-as the default.
+The default font table includes the fonts recommended for WebCGM, which
+are compatible with the Computer Graphics Metafile input filter for
+Microsoft Office and Corel Draw.  Another application might use
+different fonts and/or different font names, which may not be
+documented.  As a workaround, the `nofontlist` option deletes the font
+table from the CGM file.  In this case, the reading application should
+use a default table.  Gnuplot will still use its own default font table
+to select font indices.  Thus, 'Helvetica' will give you an index of 1,
+which should get you the first entry in your application's default font
+table. 'Helvetica Bold' will give you its second entry, etc.
 
-`winword6` disables the color tables for a similar reason---with the color
-table included, Microsoft Word displays black for color 7.
+The former `winword6` option is now a deprecated synonym for
+`nofontlist`.  The problems involving the color and font tables that
+the `winword6` option was intended to work around turned out to be
+gnuplot bugs which have now been fixed."
 
-Linewidths and pointsizes may be changed with @ref{linestyle}."
 
 @node corel, debug, cgm, terminal
 @subsubsection corel
@@ -9594,8 +9702,8 @@ Syntax:
 
 <color> is either `color` or `monochrome`.  <dashed> is either `dashed`
 or `solid`.  <rotate> is either `rotate` or `norotate` and determines
-if the y-axis label is rotated.  <font_size> is used to scale the font
-from its usual size.
+if the y-axis label is rotated.  <font_size> is the size (in pts) of the
+desired font.
 
 If `auxfile` is specified, it directs the driver to put the PostScript
 commands into an auxiliary file instead of directly into the LaTeX file.
