@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.46 2005/02/16 21:28:49 sfeam Exp $
+ * $Id: pdf.trm,v 1.47 2005/02/17 20:48:00 sfeam Exp $
  */
 
 /*------------------------------
@@ -338,7 +338,7 @@ PDF_options ()
 	    continue;
 	}
 
-	if (almost_equals (c_token, "linew$idth")) {
+	if (equals(c_token, "lw") || almost_equals(c_token, "linew$idth")) {
 	    c_token++;
 
 	    if (END_OF_COMMAND)
