@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.221 2004/04/29 22:24:58 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.222 2004/05/09 14:35:01 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2927,9 +2927,12 @@ C ... and restart the table:
  make use of error information, and `fit` for use of error information in
  curve fitting.
 
- 'scanf' accepts several numerical specifications but `gnuplot` requires all
- inputs to be double-precision floating-point variables, so `lf` is the only
- permissible specifier.  'scanf' expects to see white space---a blank, tab
+ 'scanf' accepts several numerical specifications but `gnuplot`
+ requires all inputs to be double-precision floating-point variables,
+ so "%lf" is essentially the only permissible specifier.
+ A format string given by the user must contain at least one such
+ input specifier, and no more than seven of them.
+ 'scanf' expects to see white space---a blank, tab
  ("\t"), newline ("\n"), or formfeed ("\f")---between numbers; anything else
  in the input stream must be explicitly skipped.
 

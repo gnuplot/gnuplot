@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.48 2003/05/09 22:35:18 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.49 2004/04/13 17:23:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -902,7 +902,7 @@ plot_option_thru()
 
 static void
 plot_option_using(max_using)
-int max_using;
+    int max_using;
 {
     if (!END_OF_COMMAND && !isstring(++c_token)) {
 	struct value a;
@@ -934,7 +934,7 @@ int max_using;
 
 	quote_str(df_format, c_token, MAX_LINE_LEN);
 	if (!valid_format(df_format))
-	    int_error(c_token, "Please use a double conversion %lf");
+	    int_error(c_token, "Please use between 1 and 7 conversions, of type double (%%lf)");
 
 	c_token++;		/* skip format */
     }
@@ -1591,18 +1591,25 @@ char *s;
 
 /* formerly in misc.c, but only used here */
 /* check user defined format strings for valid double conversions */
+/* HBB 20040601: Added check that the number of format specifiers is
+ * workable (between 0 and 7) */
 static TBOOLEAN
 valid_format(format)
-const char *format;
+    const char *format;
 {
+    int formats_found = 0;
+
     for (;;) {
-	if (!(format = strchr(format, '%')))	/* look for format spec  */
-	    return TRUE;	/* passed Test           */
-	do {			/* scan format statement */
+	if (!(format = strchr(format, '%'))) 	/* look for format spec  */
+	    return (formats_found > 0 && formats_found <= 7);
+	
+	/* Found a % to check --- scan past option specifiers: */
+	do {
 	    format++;
 	} while (strchr("+-#0123456789.", *format));
 
-	switch (*format) {	/* Now at format modifier */
+	/* Now at format modifier */
+	switch (*format) {
 	case '*':		/* Ignore '*' statements */
 	case '%':		/* Char   '%' itself     */
 	    format++;
@@ -1610,6 +1617,7 @@ const char *format;
 	case 'l':		/* Now we found it !!! */
 	    if (!strchr("fFeEgG", format[1]))	/* looking for a valid format */
 		return FALSE;
+	    formats_found++;
 	    format++;
 	    break;
 	default:
