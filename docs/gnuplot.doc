@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.169 2003/04/18 10:41:36 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.170 2003/04/29 07:04:25 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4080,6 +4080,7 @@ C ... and restart the table:
  This form of the command is deprecated. Please see `set style data`.
 3 datafile 
 ?set datafile
+?show datafile
  The `set datafile` command options control interpretation of fields read from
  input data files by the `plot`, `splot`, and `fit` commands.  Three such
  options are currently implemented.
@@ -4161,11 +4162,11 @@ C ... and restart the table:
        set datafile separator ","
 4 set datafile commentschars
 ?set datafile commentschars
-?set commentschars
 ?commentschars
  The `set datafile commentschars` command allows you to tell `gnuplot` what
  characters are used in a data file to denote comments.  Gnuplot will ignore
- rest of the line behind the specified characters.
+ rest of the line behind the specified characters if either of them is the
+ first non-blank character on the line.
 
  Syntax:
        set datafile commentschars {"<string>"}
@@ -4173,6 +4174,14 @@ C ... and restart the table:
        unset commentschars
 
  Default value of the string is "#!" on VMS and "#" otherwise.
+
+ Then, the following line in a data file is completely ignored
+     # 1 2 3 4
+ but the following
+     1 # 3 4
+ produces rather unexpected plot unless
+     set datafile missing '#'
+ is specified as well.
 
  Example:
        set datafile commentschars "#!%"
