@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.53 2001/08/27 15:04:12 broeker Exp $
+ * $Id: post.trm,v 1.54 2001/09/08 00:50:01 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1606,9 +1606,10 @@ int overprint;
 	    /* get vertical offset (if present) for overprinted text */
 	    while (*++p == ' ');
 	    if (overprint == 2)	{
-		ovp = (float)strtod(p,&p);
-		if (ovp)
+	 	 ovp = (float)strtod(p,&p);
+		 if (ovp != 0) {
 		    overprint_voffset = ovp*f;
+		 }
 	    }
 	    --p;		/* HBB 20001021: bug fix: 10^{2} broken */
 
