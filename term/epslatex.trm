@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.14 2002/08/29 04:10:08 sfeam Exp $
+ * $Id: epslatex.trm,v 1.15 2002/08/30 20:18:25 sfeam Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -651,6 +651,7 @@ Gpdict begin\n\
 \\begin{picture}(0,0)%%\n\
 \\includegraphics{%s}%%\n\
 \\end{picture}%%\n\
+\\begingroup\n\
 \\setlength{\\unitlength}{%.4fbp}%%\n", name, 1.0 / EPSL_SC);
     }
 #ifdef PM3D
@@ -694,7 +695,7 @@ EPSL_text()
     EPSL_FLUSH_PATH;
     fputs("grestore\nend\nshowpage\n%%%%EOF\n", gpoutfile);
     if (EPSL_texfile) {
-	fputs("\\end{picture}%\n\\endinput\n", EPSL_texfile);
+	fputs("\\end{picture}%\n\\endgroup\n\\endinput\n", EPSL_texfile);
     }
 }
 
