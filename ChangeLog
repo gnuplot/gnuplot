@@ -1,3 +1,17 @@
+1998-12-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/*.trm: Indentation, use fputs for static strings.
+
+	* version.c: Beta349.
+
+1998-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* makefile.win: Patch.
+
+1998-12-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c: Fix range bug in 3d fits.
+
 1998-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Remove references to upd_make.sh. Move
