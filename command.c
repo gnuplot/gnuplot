@@ -1105,6 +1105,12 @@ static void do_system()
 #ifdef _Windows
     if (winsystem(input_line + 1))
 #else
+/* (am, 19980929)
+ * OS/2 related note: cmd.exe returns 255 if called w/o argument.
+ * i.e. calling a shell by "!" will always end with an error message.
+ * A workaround has to include checking for EMX,OS/2, two environment
+ *  variables,...
+ */
     if (system(input_line + 1))
 #endif
 #endif
