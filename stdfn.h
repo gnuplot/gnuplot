@@ -254,26 +254,11 @@ int strnicmp __PROTO((char *, char *, int));
 # endif
 #endif
 
-/* Argument types for select() */
-#ifdef SELECT_TYPE_ARG1
-# define gp_nfds_t SELECT_TYPE_ARG1
+#ifdef SELECT_USES_FD_SET
+typedef fd_set gp_fd_set;
 #else
-# define gp_nfds_t int
-#endif /* 1 */
-#ifdef SELECT_TYPE_ARG234
-# define gp_fd_set_p SELECT_TYPE_ARG234
-#else
-# ifndef __EMX__
-#  define gp_fd_set_p (int *)
-# else
-#  define gp_fd_set_p (fd_set *)
-# endif
-#endif /* 234 */
-#ifdef SELECT_TYPE_ARG5
-# define gp_timeval_p SELECT_TYPE_ARG5
-#else
-# define gp_timeval_p (struct timeval *)
-#endif /* 5 */
+typedef int gp_fd_set;
+#endif
 
 #ifndef GP_GETCWD
 # if defined(HAVE_GETCWD)
