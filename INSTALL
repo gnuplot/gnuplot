@@ -190,22 +190,28 @@ Unix, no configure
 VMS
 ---
 
-   On VMS, invoke MAKE_VMS.COM (or BUILDVMS.COM if you have MMS or MMK
-but don't want to use the supplied DESCRIP.MMS).  You may get warnings
-or more serious errors depending on the versions of the C compiler, the 
-C run-time libraries, and {Open}VMS on your system.  
+   On VMS, you can use MMS, MMK, or another make utility, or you can
+use BUILDVMS.COM.  The supplied files work with Alpha/VMS V6.2 and
+DECC V5.7; you may get warnings or more serious errors depending on
+the versions of the C compiler, the C run-time libraries, and VMS on
+your system.
 
-
-  To compile using DEC MMS or MMK (PD clone),
-     invoke MMS or MMK with the supplied descrip.mms
-  Or if you have a unix-like make utility
-     copy makefile.vms makefile
-     make
+  To compile using MMK:
+     MMK/DESCRIPTION=MAKEFILE.VMS
+  To compile using MMS on VAX:
+     MMS/DESCRIPTION=MAKEFILE.VMS
+  To compile using MMS on Alpha:
+     MMS/DESCRIPTION=MAKEFILE.VMS/MACRO=__ALPHA__
+  To compile using GNUC or VAXC:
+     add /MACRO=GNUC or /MACRO=VAXC to the above command
+  To compile with another make utility:
+     check the documentation of your utility to specify the description
+     file and any necessary macros (__ALPHA__, GNUC, or VAXC)
   Or if you don't have a suitable make:
-     @buildvms
+     @BUILDVMS
   To tell gnuplot where to find the help library:
-      $ define gnuplot$help disk:[directory]gnuplot.hlb
-  Alternatively (and preferably) put the help in the main system help library.
+     $ define gnuplot$help disk:[directory]gnuplot.hlb
+  Alternatively, put the help in the main system help library.
 
 AmigaOS
 -------
