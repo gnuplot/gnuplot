@@ -5590,7 +5590,12 @@ C ... and restart the table:
  want to mirror the z-axis tics, you might want to create a bit more room for
  them with `set border`.
 
- The positions of the tics may be specified in either of two forms:
+ `set xtics` with no options restores the default border if xtics are not
+ being displayed;  otherwise it has no effect.  Any previously specified
+ tic frequency or position {and labels} are retained.
+
+ Positions of the tics are calculated automatically by default or after the
+ 'autofreq' option;  otherwise they may be specified in either of two forms:
 
  The <start>, <incr>, <end> form specifies that a series of tics will be
  plotted on the axis between the values <start> and <end> with an increment of
