@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.22 1999/08/09 15:58:23 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.23 1999/08/11 18:14:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -69,8 +69,6 @@ static void show_label_contours __PROTO((void));
 static void show_mapping __PROTO((void));
 static void show_dummy __PROTO((void));
 static void show_format __PROTO((void));
-static void show_data __PROTO((void));
-static void show_func __PROTO((void));
 static void show_styles __PROTO((const char *name, enum PLOT_STYLE style));
 static void show_style __PROTO((void));
 static void show_grid __PROTO((void));
@@ -213,11 +211,6 @@ show_command()
     case S_CNTRPARAM:
 	show_contour();
 	break;
-/*
-    case S_DATA:
-	show_data();
-	break;
-*/
     case S_DGRID3D:
 	show_dgrid3d();
 	break;
@@ -1148,32 +1141,6 @@ show_style()
     }
 }
 
-/* process 'show data style' command */
-static void
-show_data()
-{
-    c_token++;
-    if (!almost_equals(c_token,"s$tyle"))
-	int_error(c_token,"expecting keyword 'style'");
-    SHOW_ALL_NL;
-    show_styles("data",data_style);
-    c_token++;
-}
-
-
-/* process 'show function style' command */
-static void
-show_func()
-{
-    c_token++;
-    if (almost_equals(c_token, "s$tyle")) {
-	SHOW_ALL_NL;
-	show_styles("functions", func_style);
-	c_token++;
-    } else
-	show_functions();
-}
-
 
 /* called by show_data() and show_func() */
 static void
@@ -1256,6 +1223,8 @@ static void
 show_functions()
 {
     register struct udft_entry *udf = first_udf;
+
+    c_token++;
 
     fputs("\n\tUser-Defined Functions:\n", stderr);
 
