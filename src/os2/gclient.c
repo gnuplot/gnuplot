@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.30 2004/11/29 11:56:45 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.31 2004/12/20 16:50:36 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -1131,17 +1131,26 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_GPLOTINF:  /* view gnuplot.inf */
     {
-	/* should be bigger or dynamic */
-	char path[256];
-	char *p;
+	const char cmd_prefix[] = "start view ";
+	const char helpfile[] = "gnuplot.inf";
+	char *cmd;
+	char *gnuplot_path;
+	unsigned cmd_length;
 
-	strcpy(path, "start view ");
-	if ((p=getenv("GNUPLOT")) != NULL) {
-	    strcat(path, p);
-	    strcat(path, "/");
+	cmd_length = strlen(cmd_prefix) + strlen(helpfile);
+        gnuplot_path = getenv("GNUPLOT");
+	if (gnuplot_path != NULL) 
+	    cmd_length += strlen(gnuplot_path) + 1;
+
+	cmd = (char *)malloc( cmd_length );
+	strcpy(cmd, cmd_prefix);
+	if (gnuplot_path != NULL) {
+	    strcat(cmd, gnuplot_path);
+	    strcat(cmd, "\\");
 	}
-	strcat(path, "gnuplot");
-	system(path);
+	strcpy(cmd, cmd_prefix);
+	system(cmd);
+	free(cmd);
 	break;
     }
 
