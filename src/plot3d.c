@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.14 1999/10/29 18:47:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.15 1999/11/08 19:24:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -886,6 +886,17 @@ int pcount;
     int i, curve, surface;
     struct iso_curve *icrvs;
     struct coordinate GPHUGE *points;
+    char *table_format = NULL;
+    char *pcat;
+
+    table_format = gp_alloc(strlen(xformat)+strlen(yformat)+strlen(zformat)+6,
+			    "table format");
+    strcpy(table_format, xformat);
+    strcat(table_format, " ");
+    strcat(table_format, yformat);
+    strcat(table_format, " ");
+    strcat(table_format, zformat);
+    pcat = &table_format[strlen(table_format)];
 
     for (surface = 0, this_plot = first_3dplot; surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
@@ -894,12 +905,13 @@ int pcount;
 	curve = 0;
 
 	if (draw_surface) {
+	    strcpy(pcat," %c\n");
 	    /* only the curves in one direction */
 	    while (icrvs && curve < this_plot->num_iso_read) {
 		fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
 			curve, icrvs->p_count);
 		for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
-		    fprintf(gpoutfile, "%g %g %g %c\n",
+		    fprintf(gpoutfile, table_format,
 			    points[i].x,
 			    points[i].y,
 			    points[i].z,
@@ -915,6 +927,7 @@ int pcount;
 	if (draw_contour) {
 	    int number = 0;
 	    struct gnuplot_contours *c = this_plot->contours;
+	    strcpy(pcat,"\n");
 	    while (c) {
 		int count = c->num_pts;
 		struct coordinate GPHUGE *p = c->coords;
@@ -924,7 +937,8 @@ int pcount;
 		    /* double blank line to allow plot ... index ... */
 		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label);
 		for (; --count >= 0; ++p)
-		    fprintf(gpoutfile, "%g %g %g\n", p->x, p->y, p->z);
+		    fprintf(gpoutfile, table_format, p->x, p->y, p->z);
+
 		/* blank line between segments of same contour */
 		putc('\n', gpoutfile);
 		c = c->next;
@@ -932,6 +946,8 @@ int pcount;
 	}
     }
     fflush(gpoutfile);
+
+    free(table_format);
 }
 
 
