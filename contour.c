@@ -1311,7 +1311,7 @@ static void gen_bspline_approx(p_cntr, num_of_points, order, contr_kind)
 struct cntr_struct *p_cntr;
 int num_of_points, order, contr_kind;
 {
-    int i, knot_index = 0, pts_count = 1;
+    int knot_index = 0, pts_count = 1;
     double dt, t, next_t, t_min, t_max, x, y;
     struct cntr_struct *pc_temp = p_cntr, *pc_tail = NULL;
 
@@ -1327,8 +1327,8 @@ int num_of_points, order, contr_kind;
 
 	/* test if first and last point are equal */
 	if (fuzzy_equal(pc_tail, p_cntr)) {
-
-	    pc_tail->next = p_cntr->next;	/* Close contour list - make it circular. */
+	    /* Close contour list - make it circular. */
+	    pc_tail->next = p_cntr->next;
 	    num_of_points += order - 1;
 	} else {
 	    pc_tail->next = p_cntr;

@@ -2545,7 +2545,6 @@ struct Polygon GPHUGE *p;
     struct Vertex GPHUGE *v;
     struct Polygon GPHUGE *q;
     long Q;
-    struct Cross *cross1, *cross2;
     int i;
     int x, y;			/* point in terminal coordinates */
     register struct termentry *t = term;

@@ -251,8 +251,6 @@ static double tic_unitx, tic_unity;
 static void setlinestyle(style)
 struct lp_style_type style;
 {
-    register struct termentry *t = term;
-
     term_apply_lp_properties(&style);
 
 #ifndef LITE
@@ -1814,7 +1812,6 @@ struct lp_style_type grid;
 /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
     int len = (text ? ticscale : miniticscale) * (tic_in ? 1 : -1) * (term->h_tic);
     unsigned int x, y;
-    register struct termentry *t = term;
 
     if (grid.l_type > -2) {
 	unsigned int x1, y1, x2, y2, x3, y3;
