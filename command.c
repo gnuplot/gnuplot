@@ -137,7 +137,9 @@ static int changedir __PROTO((char *path));
 
 /* plot.c */
 extern const char *user_shell;
-
+#if defined(ATARI) || defined(MTOS)
+extern const char *user_gnuplotpath;
+#endif
 
 /* input data, parsing variables */
 #ifdef AMIGA_SC_6_1
@@ -941,7 +943,7 @@ int toplevel;
     static char help_fname[256] = ""; /* keep helpfilename across calls */
 # endif
 
-# if defined(MTOS) || defined(ATARI)
+# if defined(ATARI) || defined(MTOS)
     char const *const ext[] = {NULL};
 # endif
 
@@ -953,16 +955,17 @@ int toplevel;
 #  if (defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))) || defined(__DJGPP__)
 	help_ptr = HelpFile;
 #  else
-#   if defined(MTOS) || defined(ATARI)
+#   if defined(ATARI) || defined(MTOS)
     {
-	if ((help_ptr = findfile(HELPFILE, getenv("GNUPLOTPATH"), ext)) == NULL)
+	/* I hope findfile really can accept a NULL argument ... */
+	if ((help_ptr = findfile(HELPFILE, user_gnuplotpath, ext)) == NULL)
 	    help_ptr = findfile(HELPFILE, getenv("PATH"), ext);
 	if (!help_ptr)
 	    help_ptr = HELPFILE;
     }
 #   else
 	help_ptr = HELPFILE;
-#   endif /* MTOS || ATARI */
+#   endif /* ATARI || MTOS */
 #  endif /* __TURBOC__ */
 /* end of patch  - DJL */
 

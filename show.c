@@ -61,6 +61,10 @@ extern char faq_location[];
 extern char bug_email[];
 extern char help_email[];
 
+#if defined(ATARI) || defined(MTOS)
+/* plot.c */
+extern const char *user_gnuplotpath;
+#endif
 
 #ifndef TIMEFMT
 #define TIMEFMT "%d/%m/%y,%H:%M"
@@ -1647,7 +1651,7 @@ void show_version_long()
 
     if ((helpfile = getenv("GNUHELP")) == NULL) {
 #if defined(ATARI) || defined(MTOS)
-	if ((helpfile = getenv("GNUPLOTPATH")) == NULL) {
+	if ((helpfile = user_gnuplotpath) == NULL) {
 	    helpfile = HELPFILE;
 	}
 #else

@@ -96,6 +96,9 @@ TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number);
 #include <osbind.h>
 #include <mintbind.h>
 
+/* plot.c */
+extern const char *user_gnuplotpath;
+
 int MTOS_pause(char *str);
 static void MTOS_quit(void);
 void MTOS_open_pipe(void);
@@ -129,7 +132,6 @@ static void init_exit(void);
 #define GPCLIENT2       "gpclient"
 
 /* environment */
-#define MYENV          "GNUPLOTPATH"
 #define PATH           "PATH"
 
 /* some global variables */
@@ -153,7 +155,7 @@ TERM_PUBLIC void MTOS_init()
 	    if ((aesid = appl_init()) < 0)
 		int_error("APPL_INIT failed !", NO_CARET);
 	}
-	file = findfile(GPCLIENT2, getenv(MYENV), ext);
+	file = findfile(GPCLIENT2, user_gnuplotpath, ext);
 	if (!file)
 	    safe_strncpy(cmd, GPCLIENT1, sizeof(cmd));
 	else if (file && !strchr(file, '\\') && !strchr(file, '/'))
