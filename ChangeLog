@@ -1,6 +1,8 @@
 2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/term.c (test_term): Fix broken test of filled_polygon.
+	* src/graphics.c (plot_betweencurves, fill_between, bound_intersect):
+	ANSIfication of function definitions.
 
 2004-07-04  Hans-Bernhard Broeker  <broeker@accip02.physik.rwth-aachen.de>
 

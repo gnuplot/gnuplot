@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.110 2004/07/03 00:27:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.111 2004/07/03 06:08:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1903,8 +1903,7 @@ plot_filledcurves(struct curve_points *plot)
  * Fill the area between two curves
  */
 static void
-plot_betweencurves(plot)
-struct curve_points *plot;
+plot_betweencurves(struct curve_points *plot)
 {
     double x1, x2, yl1, yu1, yl2, yu2;
     double xmid, ymid;
@@ -1937,9 +1936,9 @@ struct curve_points *plot;
 }
 
 static void
-fill_between(x1,yl1,yu1,x2,yl2,yu2,plot)
-double x1,yl1,yu1,x2,yl2,yu2;
-struct curve_points *plot;
+fill_between(
+double x1, double yl1, double yu1, double x2, double yl2, double yu2,
+struct curve_points *plot)
 {
     double xmin, xmax, ymin, ymax, dx, dy1, dy2;
     int axis;
@@ -3681,11 +3680,11 @@ two_edge_intersect(
  * interpolate an extra corner and split the filled polygon into two.
  */
 static TBOOLEAN
-bound_intersect(points, i, ex, ey, filledcurves_options)
-struct coordinate GPHUGE *points;
-int i;				/* line segment from point i-1 to point i */
-double *ex, *ey;		/* the point where it crosses a boundary */
-filledcurves_opts *filledcurves_options;
+bound_intersect(
+struct coordinate GPHUGE *points,
+int i,				/* line segment from point i-1 to point i */
+double *ex, *ey,		/* the point where it crosses a boundary */
+filledcurves_opts *filledcurves_options)
 {
     double dx1, dx2, dy1, dy2;
 
