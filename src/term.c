@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.37 2001/08/20 15:39:40 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.38 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1345,15 +1345,17 @@ init_terminal()
 #endif
 
 #ifdef OS2
-/*      if (_osmode==OS2_MODE) term_name = "pm" ; else term_name = "emxvga"; */
-# ifdef X11
-/* This catch is hopefully ok ... */
+/* amai: Note that we do some checks above and now overwrite any
+   results. Perhaps we may disable checks above!? */
+#ifdef X11
+/* WINDOWID is set in sessions like xterm, etc.
+   DISPLAY is also mandatory. */
 	env_term = getenv("WINDOWID");
-	display = getenv("DISPLAY");
+	display  = getenv("DISPLAY");
 	if ((env_term != (char *) NULL) && (display != (char *) NULL))
 	    term_name = "x11";
 	else
-# endif				/* X11 */
+#endif		/* X11 */
 	    term_name = "pm";
 #endif /*OS2 */
 
@@ -1839,4 +1841,3 @@ fflush_binary()
     }
 }
 #endif /* VMS */
-
