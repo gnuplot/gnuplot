@@ -82,6 +82,9 @@ Contents
         o Set output 'filename' isn't outputting everything it should!
         o When using the LATEX-terminal, there is an error during the
           LATEX-run!
+        o The exit command does not work as documented!
+        o I can't find the demos and example files at the URLs in the
+          documentation!
    * Credits
 
 Meta - Questions
@@ -260,7 +263,7 @@ oes.orst.edu or ftp.luth.se.
 MS-DOS and MS-Windows binaries are available from the above servers and are
 called gp37dos.zip, gp37dj.zip, gp37w16.zip, gp37mgw.zip, gnuplot3.7cyg.zip.
 
-OS/2 2.x binaries are called gp37os2.zip.
+OS/2 binaries are called gp37os2.zip.
 
 The NeXTSTEP front end can be found at next-ftp.peak.org in
 /pub/next/binaries/plotting/Gnuplot1.2_bin.tar.Z .
@@ -378,7 +381,7 @@ tool for this is Jef Poskanzer's PBMPLUS package.
 
 The PBMPLUS package is available in the contrib distribution for the X
 Window System. The original site for this is ftp.x.org in /contrib/ . There
-are many mirrors, e.g. ftp.th-darmstadt.de in /pub/X11/contrib/ or .
+are many mirrors, e.g. ftp.tu-darmstadt.de in /pub/X11/contrib/ or .
 sunsite.unc.edu in /pub/X11/contrib/ .
 
 The most recent release of pbm by the author is dated December 91 and is
@@ -495,6 +498,11 @@ Can I put multiple pages on one page?
 
 Yes. "set multiplot"
 
+If you use the postscript terminal and plot one graph per page you can use
+the program mpage (http://www.mesa.nl/pub/mpage ) to print multiple logical
+pages per physical page. A similar program is the psnup program in the
+psutils package. This package is available at any CTAN mirror.
+
 Can I put both data files and commands into a single file?
 
 This feature is in gnuplot 3.7 when using the set multiplot command.
@@ -559,7 +567,7 @@ How do I plot a vertical line?
 Depending on context, the main methods are:
 
    * set arrow .... .... nohead where you have to compute explicitly the
-     strat and the end of the arrow.
+     start and the end of the arrow.
    * generate (inlined) datapoints and plot them
    * switch to parametric mode
 
@@ -613,7 +621,7 @@ Some extensions available:
    * perltk: A perl/tk canvas widget.
    * polyg.patch: Implements a polygon plotting style.
    * xgfe: graphical front end using the Qt widgets available at
-     http://jasper.he.net/ dmishee/xgfe/xgfe.html .
+     http://lnc.usc.edu/docs/xgfe/xgfe.html .
 
 Can I do heavy-duty data processing with gnuplot?
 
@@ -633,7 +641,7 @@ gnuplot; it is merged into gnuplot 3.7.
 
 Michael Courtney has written a program called lsqrft, which uses the
 Levenberg-Marquardt - Algorithm for fitting data to a function. It is
-avialiable from ftp.cdrom.com in /pub/os2/2_x/unix/lsqrft13.zip ; sources,
+available from ftp.cdrom.com in /pub/os2/2_x/unix/lsqrft13.zip ; sources,
 which should compile on Unix, and executables for MS-DOS and OS/2 2.x are
 included. There is an interface to the OS/2 presentation manager.
 
@@ -767,7 +775,7 @@ carrying the source for gnuplot.
 
 What if I need h-bar (Planck's constant)?
 
-There is no predefined varaible like pi. However to put h-bar as a character
+There is no predefined variable like pi. However to put h-bar as a character
 into the label, you must use the PostScript terminal. You can play around
 with constructs like @{/=56 -} {/=24 h} \verb or {/=8 @{/Symbol=24 -} _{/=14
 h}}\verb In the latter, the "-" (a long one in /Symbol) is non-spacing and
@@ -860,6 +868,19 @@ When using the LATEX-terminal, there is an error during the LATEX-run!
 Please upgrade to gnuplot 3.7. Some versions of its beta-release had a
 problem in the LATEX-terminal.
 
+The exit command does not work as documented!
+
+This is a known bug and is fixed in the latest release. If you need the
+feature please upgrade to the latest release.
+
+I can't find the demos and example files at the URLs in the documentation!
+
+The examples have been removed from the NASA site. You can find the examples
+now at http://www.gnuplot.vt.edu/gnuplot/gpdocs . There you will find both
+PNG and GIF versions of the demo plots. There are some licensing problems
+with GIF images, so you should probably prefer the PNG ones. They also have
+the advantage to be much smaller in size.
+
 Credits
 
 This list was initially compiled by John Fletcher with contributions from
@@ -882,8 +903,8 @@ Learning Unit, University of Leeds.
 The command line arguments were:
 latex2html -split 0 gnuplot-faq.tex.
 
-The translation was initiated by Juergen von Hagen on 1999-07-05
+The translation was initiated by Juergen von Hagen on 1999-09-13
   ------------------------------------------------------------------------
 [next] [up] [previous]
 Juergen von Hagen
-1999-07-05
+1999-09-13
