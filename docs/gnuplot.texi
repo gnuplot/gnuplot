@@ -613,7 +613,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - @ref{help}.
+      Ctrl Help       - `help `.
 
 @end example
 
@@ -4157,7 +4157,7 @@ the `set` command to see the default values that the various options take.
 
 
 The @ref{save} command saves user-defined functions, variables, the `set
-term` status, all `set` options, or all of these, plus the last @ref{plot}
+term` status, all `set` options, or all of these, plus the last `plot `
 (`splot`) command to the specified file.
 
 Syntax:
@@ -7249,7 +7249,7 @@ etc. Proposed usage: `set pm3d palette <n>`, `set contour ... filled palette
 
 
 The colour scheme, i.e. the gradient of the smooth colour with min_z and max_z
-values of @ref{pm3d}'s @ref{palette}, is drawn in a colour box unless `unset colorbox`.  Its
+values of @ref{pm3d}'s @ref{palette}, is drawn in a colour box unless `unset colorbox`.
 
 @example
       set colorbox
@@ -8071,7 +8071,6 @@ to you, depending on its output format.
 * imagen::                      
 * kyo::                         
 * latex::                       
-* linux::                       
 * mf::                          
 * mp::                          
 * mgr::                         
@@ -8084,6 +8083,7 @@ to you, depending on its output format.
 * qms::                         
 * regis::                       
 * rgip::                        
+* sun::                         
 * tek410x::                     
 * table::                       
 * tek40::                       
@@ -9393,7 +9393,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, linux, kyo, terminal
+@node latex, mf, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -9471,24 +9471,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, mf, latex, terminal
-@subsubsection linux
-
-@c ?commands set terminal linux
-@c ?set terminal linux
-@c ?set term linux
-@c ?terminal linux
-@c ?term linux
-@cindex linux
-@tmindex linux
-
-
-The `linux` driver has no additional options to specify.  It looks at the
-environment variable GSVGAMODE for the default mode; if not set, it uses
-1024x768x256 as default mode or, if that is not possible, 640x480x16
-(standard VGA)."
-
-@node mf, mp, linux, terminal
+@node mf, mp, latex, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -10282,7 +10265,7 @@ Syntax:
 
 @end example
 
-@node rgip, tek410x, regis, terminal
+@node rgip, sun, regis, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -10326,7 +10309,22 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node tek410x, table, rgip, terminal
+@node sun, tek410x, rgip, terminal
+@subsubsection sun
+
+@c ?commands set terminal sun
+@c ?set terminal sun
+@c ?set term sun
+@c ?terminal sun
+@c ?term sun
+@cindex sun
+@tmindex sun
+
+
+The `sun` terminal driver supports the SunView window system.  It has no
+options."
+
+@node tek410x, table, sun, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
