@@ -1,6 +1,14 @@
 Changes in release 3.7.1:
 [3.7.0.8]
 * embedding document font is now default font in latex output
+* static limits for user defined function and variable names removed
+* 'make check' now passes GNUTERM from the command line to gnuplot.
+* FIXED off-by-one error in gif driver y-scaling
+* gnuplot-mode updated to 0.5g
+* FIXED errors in 'set view <z_scale>'. Related demos have
+  been updated too.
+* src directory now used automake Makefile
+* #error and #warning directives have been removed.
 [3.7.0.7]
 * FIXED timestamp positioning problem in X11 terminal
 * FIXED exit/quit in batch files now works as documented
