@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.242 2004/09/19 23:42:24 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.243 2004/09/20 19:05:18 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6167,7 +6167,7 @@ C ... and restart the table:
        unset multiplot
 
  For some terminals, no plot is displayed until the command `unset multiplot`
- is given, which causes the entire page to be drawn and then returns `gnuplot`
+ is given, which causes the entire page to be drawn and then returns gnuplot
  to its normal single-plot mode.  For other terminals, each separate `plot`
  command produces a plot, but the screen may not be cleared between plots.
 
@@ -6180,8 +6180,8 @@ C ... and restart the table:
  commands within the `set multiplot`/`unset multiplot` block.
 
  The commands `set origin` and `set size` must be used to correctly position
- each plot if no `layout` is specified or if finetuning is desired.
- See `set origin` and `set size` for details of their usage.
+ each plot if no `layout` is specified or if fine tuning is desired.  See
+ `set origin` and `set size` for details of their usage.
 
  Example:
        set size 0.7,0.7
@@ -6204,8 +6204,8 @@ C ... and restart the table:
 
  `set size` and `set origin` refer to the entire plotting area used for each
  plot.  If you want to have the axes themselves line up, you can guarantee
- that the margins are the same size with the `set margin` commands.
- See `set margin` for their use.  Note that the margin settings are absolute,
+ that the margins are the same size with the `set margin` commands.  See
+ `set margin` for their use.  Note that the margin settings are absolute,
  in character units, so the appearance of the graph in the remaining space
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
@@ -6213,17 +6213,17 @@ C ... and restart the table:
  With the `layout` option you can generate simple multiplots without having
  to give the `set size` and `set origin` commands before each plot:  Those
  are generated automatically, but can be overridden at any time.  With
- `layout` the display will be devided by a grid with <cols> colums and 
- <rows> rows.  This grid is filled rows first or colums first depending whether
- `rowmajor` or `columnmajor` is given by the subsequent option of the 
+ `layout` the display will be divided by a grid with <cols> columns and 
+ <rows> rows.  This grid is filled rows first or columns first depending on
+ whether `rowmajor` or `columnmajor` is given by the subsequent option of the 
  multiplot command. Default is `columnmajor`.
+
  Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
- for scale or offset are ommited, the x-value will be used.
- `unset multiplot` will turn off the automatic layout.  You should manually
- `set size` and `set origin` to usefull values (i.e. 1,1 and 0,0) after
- `unset multiplot` if you wish to make more plots in non-multiplot-mode
- as `unset multiplot` will leave those values as they were in the automatic
- layout mode.
+ for scale or offset are omitted, the x-value will be used.  `unset multiplot`
+ will turn off the automatic layout.  You should manually `set size` and
+ `set origin` to useful values (i.e. 1,1 and 0,0) after `unset multiplot` if
+ you wish to make more plots in non-multiplot-mode as `unset multiplot` will
+ leave those values as they were in the automatic layout mode.
 
  Example:
        set size 1,1
@@ -6232,8 +6232,8 @@ C ... and restart the table:
        [ up to 6 plot commands here ]
        unset multiplot
 
- Above example will a produce 6 plots in 3 colmns filled top to bottom, left
- to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
+ The above example will produce 6 plots in 3 columns filled top to bottom,
+ left to right.  Each plot will have a horizontal size of 1.1/2 and a vertical
  size of 0.9/3. 
 
  See also

@@ -1,3 +1,9 @@
+2004-09-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Fix documentation for multiplot.
+
+	* src/term.c: Better error message for an invalid option of multiplot.
+
 2004-09-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Fix some minor errors that interfered with 
