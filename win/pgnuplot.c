@@ -161,7 +161,7 @@ BOOL CALLBACK cbGetTextWindow(HWND  hwnd, LPARAM  lParam )
 	hwndText = FindWindowEx(hwnd, NULL, TEXTCLASS, NULL );
 
 	/* if the text window was found, stop looking */
-	return ( hwndText != NULL );
+	return ( hwndText == NULL );
 }
 
 /* sends a string to the specified window */
