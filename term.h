@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.12.2.4 2002/01/26 18:55:01 lhecking Exp $
+ * $Id: term.h,v 1.12.2.5 2002/01/31 19:23:43 lhecking Exp $
  *
  */
 
@@ -63,6 +63,49 @@
 #  include "x11.trm"		/* x Window system */
 # endif				/* X11 */
 #else /* include all applicable terminals not commented out */
+
+/***************************************************************/
+/* Another special subset, this time for 16bit DOS/Windows
+ * builds. There's precious little space to squeeze drivers into on
+ * these platforms, so it's easier to provide a working selection here
+ * than to have every user try to find one him/herself. If you
+ * HAVE_LIBPDF, HAVE_LIBGD and/or HAVE_LIBPNG, even this selection may
+ * already be too large. */
+#if defined(DOS16) || defined (WIN16)
+# ifndef WIN16
+#  ifdef PC
+/* uncomment the next line to include SuperVGA support using the
+ * SVGA.BGI drivers. This also triggers the inclusion of Super VGA
+ * support */
+/* #   define BGI_NAME "svga256" */
+#   include "pc.trm"		
+#  endif /* PC */
+# else /* WIN16 */
+#  include "win.trm"
+# endif /* WIN16 */
+# include "cgm.trm"
+# ifdef DEBUG
+#  include "debug.trm"
+# endif
+/* NOTE THAT GIF REQUIRES A SEPARATE LIBRARY : see term/gif.trm */
+# ifdef HAVE_LIBGD
+#  include "gif.trm"
+# endif
+# include "hpgl.trm"
+# include "pbm.trm"
+/* NOTE THAT PDF REQUIRES A SEPARATE LIBRARY : see term/pdf.trm */
+# ifdef HAVE_LIBPDF
+#  include "pdf.trm"
+# endif
+/* NOTE THAT PNG REQUIRES A SEPARATE LIBRARY : see term/png.trm */
+# ifdef HAVE_LIBPNG
+#  include "png.trm"
+# endif
+/* # include "post.trm" */
+# include "table.trm"
+#else
+/* not (WIN16 || DOS16) --> use general terminal selection */
+
 
 /****************************************************************************/
 /* Platform dependent part                                                  */
@@ -413,4 +456,5 @@
 /* METAPOST */
 #include "metapost.trm"
 
+#endif /* DOS16 || WIN16 special short termlist */
 #endif /* !SHORT_TERMLIST */
