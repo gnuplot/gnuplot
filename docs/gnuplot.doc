@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.20.2.7 2002/05/17 11:42:45 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.20.2.8 2002/10/25 11:33:24 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2828,8 +2828,8 @@ C ... and restart the table:
  This plots sin(x) with impulses:
        plot sin(x) with impulses
 
- This plots x*y with points, x**2 with the default:
-       plot x*y w points, x**2
+ This plots x with points, x**2 with the default:
+       plot x w points, x**2
 
  This plots tan(x) with the default function style, file "data.1" with lines:
        plot [ ] [-2:5] tan(x), 'data.1' with l
