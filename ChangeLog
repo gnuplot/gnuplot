@@ -1,5 +1,10 @@
 2003-05-10  Ethan Merritt <merritt@u.washington.edu>
 
+	* src/plot2d.c docs/gnuplot.doc: Apply current fill style to boxes 
+	drawn for 'plot with boxxyerror'.
+
+2003-05-10  Ethan Merritt <merritt@u.washington.edu>
+
 	* term/x11.trm: Expand documentation of font handling.
 	* src/readline.c: Allow <tab> characters in input stream.
 
