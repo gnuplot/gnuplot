@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.31 2004/12/20 16:50:36 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.32 2004/12/20 16:51:16 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -170,11 +170,6 @@ static BOOL     bPopFront = TRUE;
 static BOOL     bKeepRatio = TRUE;	//PM
 static BOOL     bNewFont = FALSE;
 
-static BOOL     bHorz = TRUE;
-
-/* Horizontal or vertical 90deg text.  Now it can be taken away as it
- * was completely replaced by those 2 variables below (and bHorz's
- * occurencies put into #if 0).  FIXME */
 static double   multLineHor  = 1; /* Horizontal and vertical spacing shifts */
 static double   multLineVert = 0; /* for multiline prints.		    */
 
@@ -2473,23 +2468,9 @@ ReadGnu(void* arg)
 			break;
 		    }
 
-#if 0 /* FIXME -- I'm not sure what's correct ! */
-                    if (bHorz) {
-			ptl.x =(LONG) (x + sw);
-			ptl.y =(LONG) (y - lVOffset / 4);
-		    } else {
-                        ptl.x =(LONG) x;
-			ptl.y =(LONG) (y + sw);
-		    }
-#else /* FIXME -- use mutlLineHor, multLineVert instead of bHorz ! */
-                    if (bHorz) {
-			ptl.x = (LONG) (x + multLineHor * sw);
-			ptl.y = (LONG) (y - lVOffset / 4);
-                    } else {
-			ptl.x = (LONG) x;
-			ptl.y = (LONG) (y + multLineVert * sw);
-                    }
-#endif
+		    ptl.x = (LONG) (x + multLineHor * sw + multLineVert * (lVOffset / 4));
+		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));
+		    
                     if (bEnhanced)
                         CharStringAt(hps, ptl.x, ptl.y, strlen(str) , str);
                     else
@@ -2556,10 +2537,6 @@ ReadGnu(void* arg)
 		} /* switch(t1) */
 
 		GpiSetCharAngle(hps, &grdl);
-		/* More or less horizontal text. But its usage should be
-		   replaced by using multLineHor and multLineVert, and then
-		   removed. FIXME */
-		bHorz =(t1<45 ||(t1>180-45 && t1<180+45)) ? TRUE : FALSE;
 		break;
 	    }
 
@@ -3220,37 +3197,18 @@ static char
 
     if (textlen > 0) {
 	GpiQueryTextBox(hps, textlen, starttext, TXTBOX_COUNT, aptl);
-#if 0
-	if (bHorz)
-	    textwidth += aptl[TXTBOX_BOTTOMRIGHT].x;
-	else
-	    textwidth += aptl[TXTBOX_BOTTOMRIGHT].y;
-#else
-	/* FIXME -- is this correct? */
 	textwidth += aptl[TXTBOX_BOTTOMRIGHT].x * multLineHor;
 	textwidth += aptl[TXTBOX_BOTTOMRIGHT].y * multLineVert;
-#endif
     }
 
     if (bText) {
 	if (textlen > 0) {
 	    GpiCharStringAt(hps, &ptlText, textlen, starttext);
-#if 0
-	    ptlText.x += aptl[TXTBOX_CONCAT].x +(bHorz?0:(-base));
-	    ptlText.y += aptl[TXTBOX_CONCAT].y +(bHorz?base:0);
-#else
 	    ptlText.x += aptl[TXTBOX_CONCAT].x - multLineHor*base;
 	    ptlText.y += aptl[TXTBOX_CONCAT].y + multLineVert*base;
-#endif
 	} else {
-#if 0
-	    ptlText.x += (bHorz ? 0 : (-base));
-	    ptlText.y += (bHorz ? base:0);
-#else
 	    ptlText.x -= multLineHor * base;
 	    ptlText.y += multLineVert * base;
-#endif
-
 	}
     }
     textlen = 0;
@@ -3441,18 +3399,8 @@ static char
     if (textlen > 0) {
 	GpiQueryTextBox(hps, textlen, starttext, TXTBOX_COUNT, aptl);
 	if (widthflag) {
-#if 0
-	    if (bHorz)
-		textwidth += aptl[TXTBOX_BOTTOMRIGHT].x;
-	    else
-		textwidth += aptl[TXTBOX_BOTTOMRIGHT].y;
-#else
-	    /* FIXME -- use mutlLineHor, multLineVert instead of bHorz ! */
-	    if (bHorz)
-		textwidth += aptl[TXTBOX_BOTTOMRIGHT].x;
-	    else
-		textwidth += aptl[TXTBOX_BOTTOMRIGHT].y;
-#endif
+	    textwidth += multLineHor * aptl[TXTBOX_BOTTOMRIGHT].x +
+			 multLineVert * aptl[TXTBOX_BOTTOMRIGHT].y;
 	}
     }
     if (bText) {
@@ -3465,13 +3413,8 @@ static char
 	    }
 	}
 	if (base != 0) {
-#if 0
-	    ptlText.x -= (bHorz ? 0 : (-base));
-	    ptlText.y -= (bHorz ? base : 0);
-#else
 	    ptlText.x += multLineHor * base;
 	    ptlText.y -= multLineVert * base;
-#endif
 	}
     }
     if (bChangeFont) {
