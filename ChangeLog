@@ -1,3 +1,8 @@
+2005-03-23  Aapo Lankinen <aapo.lankinen@gmail.com>
+
+	* src/contour.c (contour): Bugfix: logscale on CB was being applied
+	twice when calculating contour colors.
+
 2005-03-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS src/plot2d.c src/plot3d.c docs/gnuplot.doc: SF patch # 1098256
