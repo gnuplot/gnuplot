@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.4 1999/06/09 12:07:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.5 1999/06/10 19:59:19 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -186,3 +186,63 @@ char *path;
     return loadpath;
 
 }
+
+
+char *
+locale_handler(action, newlocale)
+int action;
+char *newlocale;
+{
+    static char *current_locale = NULL;
+    struct tm tm;
+    int i;
+
+    switch(action) {
+    case ACTION_CLEAR:
+    case ACTION_INIT:
+	free(current_locale);
+	current_locale = gp_alloc(strlen(INITIAL_LOCALE) + 1, "initial locale");
+	strcpy(current_locale, INITIAL_LOCALE);
+	break;
+    case ACTION_SET:
+#ifndef NO_LOCALE_H
+	if (setlocale(LC_TIME, newlocale)) {
+	    current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
+	    strcpy(current_locale, newlocale);
+	}
+	else
+	    int_error(c_token, "Locale not available");
+
+	/* we can do a *lot* better than this ; eg use system functions
+	 * where available; create values on first use, etc
+	 */
+	memset(&tm, 0, sizeof(struct tm));
+	for (i = 0; i < 7; ++i) {
+	    tm.tm_wday = i;		/* hope this enough */
+	    strftime(full_day_names[i], sizeof(full_day_names[i]), "%A", &tm);
+	    strftime(abbrev_day_names[i], sizeof(abbrev_day_names[i]), "%a", &tm);
+	}
+	for (i = 0; i < 12; ++i) {
+	    tm.tm_mon = i;		/* hope this enough */
+	    strftime(full_month_names[i], sizeof(full_month_names[i]), "%B", &tm);
+	    strftime(abbrev_month_names[i], sizeof(abbrev_month_names[i]), "%b", &tm);
+	}
+#else
+	current_locale = gp_realloc(current_locale, strlen(newlocale) + 1, "locale");
+	strcpy(current_locale, newlocale);
+#endif /* NO_LOCALE_H */
+	break;
+    case ACTION_SHOW:
+	fprintf(stderr, "\tlocale is \"%s\"\n", current_locale);
+	break;
+    case ACTION_SAVE:
+    case ACTION_GET:
+    case ACTION_NULL:
+    default:
+	/* just return */
+	break;
+    }
+
+    return current_locale;
+}
+

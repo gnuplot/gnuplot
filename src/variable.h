@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: variable.h,v 1.2 1999/06/09 12:07:44 lhecking Exp $
  *
  */
 
@@ -40,6 +40,8 @@
 #ifndef VARIABLE_H
 # define VARIABLE_H
 
+/* Generic defines */
+
 #ifdef ACTION_NULL
 # undef ACTION_NULL
 #endif
@@ -76,7 +78,10 @@
 #define ACTION_SAVE   (1<<4)
 #define ACTION_CLEAR  (1<<5)
 
+/* Loadpath related */
+
 extern char *loadpath_handler __PROTO((int, char *));
+extern char *locale_handler __PROTO((int, char *));
 
 #define init_loadpath()    loadpath_handler(ACTION_INIT,NULL)
 #define show_loadpath()    loadpath_handler(ACTION_SHOW,NULL)
@@ -84,5 +89,21 @@ extern char *loadpath_handler __PROTO((int, char *));
 #define get_loadpath()     loadpath_handler(ACTION_GET,NULL)
 #define save_loadpath()    loadpath_handler(ACTION_SAVE,NULL)
 #define clear_loadpath()   loadpath_handler(ACTION_CLEAR,NULL)
+
+/* Locale related */
+
+#define INITIAL_LOCALE ("C")
+
+#define init_locale()      locale_handler(ACTION_INIT,NULL)
+#define show_locale()      locale_handler(ACTION_SHOW,NULL)
+#define set_locale(path)   locale_handler(ACTION_SET,(path))
+#define get_locale()       locale_handler(ACTION_GET,NULL)
+#define save_locale()      locale_handler(ACTION_SAVE,NULL)
+#define clear_locale()     locale_handler(ACTION_CLEAR,NULL)
+
+extern char full_month_names[12][32];
+extern char abbrev_month_names[12][8];
+extern char full_day_names[7][32];
+extern char abbrev_day_names[7][8];
 
 #endif /* VARIABLE_H */
