@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.75 2002/03/09 22:41:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.76 2002/03/26 09:42:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -112,6 +112,7 @@ static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
 static void show_decimalsign __PROTO((void));
 static void show_polar __PROTO((void));
+static void show_print __PROTO((void));
 static void show_angles __PROTO((void));
 static void show_samples __PROTO((void));
 static void show_isosamples __PROTO((void));
@@ -175,7 +176,7 @@ show_command()
 \t'dummy', 'encoding', 'format', 'functions', 'grid', 'hidden',\n\
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
-\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', '[rtuv]range',\n\
+\t'palette', 'parametric', 'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range',\n\
 \t'samples', 'size', 'style', 'terminal', 'tics', 'timestamp',\n\
 \t'timefmt', 'title', 'variables', 'version', 'view',\n\
 \t'[xyz,cb]{2}label', '[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics',\n\
@@ -330,6 +331,9 @@ show_command()
 	break;
     case S_POLAR:
 	show_polar();
+	break;
+    case S_PRINT:
+	show_print();
 	break;
     case S_ANGLES:
 	show_angles();
@@ -745,6 +749,7 @@ show_all()
     show_offsets();
     show_margin();
     show_output();
+    show_print();
     show_parametric();
 #ifdef PM3D
 	show_palette();
@@ -1792,6 +1797,16 @@ show_output()
 	fprintf(stderr, "\toutput is sent to '%s'\n", outstr);
     else
 	fputs("\toutput is sent to STDOUT\n", stderr);
+}
+
+
+/* process 'show print' command */
+static void
+show_print()
+{
+    SHOW_ALL_NL;
+
+    fprintf(stderr, "\tprint output is sent to '%s'\n", print_show_output());
 }
 
 

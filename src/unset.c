@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.31 2002/02/14 21:14:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.32 2002/03/12 10:23:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -118,6 +118,7 @@ static void unset_colorbox __PROTO((void));
 #endif
 static void unset_pointsize __PROTO((void));
 static void unset_polar __PROTO((void));
+static void unset_print __PROTO((void));
 static void unset_samples __PROTO((void));
 static void unset_size __PROTO((void));
 static void unset_style __PROTO((void));
@@ -150,7 +151,7 @@ unset_command()
 \t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
 \t'[blrt]margin', 'mapping', 'missing', 'mouse', 'multiplot', 'offsets',\n\
 \t'origin', 'output', 'palette', 'parametric', 'pm3d', 'pointsize',\n\
-\t'polar', '[rtuv]range', 'samples', 'size', 'style', 'surface',\n\
+\t'polar', 'print', '[rtuv]range', 'samples', 'size', 'style', 'surface',\n\
 \t'terminal', 'tics', 'ticscale', 'ticslevel', 'timestamp', 'timefmt',\n\
 \t'title', 'view', '[xyz,cb]{2}data', '[xyz,cb]{2}label',\n\
 \t'[xyz,cb]{2}range', '{m}[xyz,cb]{2}tics', '[xyz,cb]{2}[md]tics',\n\
@@ -299,6 +300,9 @@ unset_command()
 	break;
     case S_POLAR:
 	unset_polar();
+	break;
+    case S_PRINT:
+	unset_print();
 	break;
     case S_SAMPLES:
 	unset_samples();
@@ -1043,6 +1047,14 @@ unset_output()
     term_set_output(NULL);
     free(outstr);
     outstr = NULL; /* means STDOUT */
+}
+
+
+/* process 'unset print' command */
+static void
+unset_print()
+{
+    print_set_output(NULL, FALSE);
 }
 
 

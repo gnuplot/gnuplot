@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.20 2001/08/22 14:15:33 broeker Exp $
+ * $Id: command.h,v 1.21 2002/03/26 09:42:34 mikulik Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -157,6 +157,9 @@ void done __PROTO((int status));
 void define __PROTO((void));
 
 void replotrequest __PROTO((void)); /* used in command.c & mouse.c */
+
+void print_set_output __PROTO((char *, TBOOLEAN)); /* set print output file */
+char *print_show_output __PROTO((void)); /* show print output file */
 
 /**/
 #endif /* GNUPLOT_COMMAND_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.60 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.61 2002/03/26 09:42:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -977,6 +977,66 @@ plot_command()
     SET_CURSOR_ARROW;
 }
 
+static FILE *print_out = NULL;
+static char *print_out_name = NULL;
+
+void 
+print_set_output(name, append_p)
+    char *name;
+    TBOOLEAN append_p;
+{
+    if (print_out && print_out != stderr && print_out != stdout) {
+#ifdef PIPES
+	if (print_out_name[0] == '|') {
+	    if (0 > pclose(print_out))
+		perror(print_out_name);
+	} else
+#endif
+	    if (0 > fclose(print_out))
+		perror(print_out_name);
+    }
+
+    print_out_name = NULL;
+
+    if (! name) {
+	print_out = stderr;
+	return;
+    }
+
+    if (! strcmp(name, "-")) {
+	print_out = stdout;
+	return;
+    }
+
+#ifdef PIPES
+    if (name[0]=='|') {
+	print_out = popen(name + 1, "w");
+	if (!print_out)
+	    perror(name);
+	else
+	    print_out_name = name;
+	return;
+    }
+#endif
+
+    print_out = fopen(name, append_p ? "a" : "w");
+    if (!print_out) {
+	perror(name);
+	return;
+    }
+
+    print_out_name = name;
+}
+
+char * 
+print_show_output()
+{
+    if (!print_out_name)
+	return "<STDERR>";
+    if (!strcmp(print_out_name, "-"))
+	return "<STDOUT>";
+    return print_out_name;
+}
 
 /* process the 'print' command */
 void
@@ -987,27 +1047,30 @@ print_command()
     /* space printed between two expressions only */
     int need_space = 0;
 
+    if (!print_out) {
+        print_out = stderr;
+    }
     screen_ok = FALSE;
     do {
 	++c_token;
 	if (isstring(c_token)) {
 	    s = NULL;
 	    m_quote_capture(&s, c_token, c_token);
-	    fputs(s, stderr);
+	    fputs(s, print_out);
 	    need_space = 0;
 	    free(s);
 	    ++c_token;
 	} else {
 	    (void) const_express(&a);
 	    if (need_space)
-		putc(' ', stderr);
+		putc(' ', print_out);
 	    need_space = 1;
-	    disp_value(stderr, &a);
+	    disp_value(print_out, &a);
 	}
     } while (!END_OF_COMMAND && equals(c_token, ","));
 
-    (void) putc('\n', stderr);
-
+    (void) putc('\n', print_out);
+    fflush(print_out);
 }
 
 

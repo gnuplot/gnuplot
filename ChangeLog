@@ -1,3 +1,38 @@
+2002-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Brought in a patch from Stephan Boettcher to add a new command
+	"set print". SF Patch # 533094.
+	
+	* docs/gnuplot.doc (commands->print): Point towards "set print".
+	(commands->set->print): Document new option "set print".
+
+	* src/command.c (print_out, print_out_name): New variables to
+	store status of 'set print' option.
+	(print_set_output, print_show_output): New functions to make it
+	accessible to other modules.
+	(print_command): Respect new setting by directing all output to
+	the specified stream.
+
+	* src/command.h (print_set_output, print_show_output): Prototypes
+	added.
+
+	* src/tables.h (set_id): Added enum value S_PRINT.
+
+	* src/tables.c (set_tbl): Added entry for "set/show print"
+	command.
+	
+	* src/show.c (show_command): Handle new case "show print". Added
+	to list of options displayed.
+	(show_print): New function, implements "show print".
+
+	* src/set.c (set_command): Handle new case "set print".  Added to
+	the list of options displayed.
+	(set_print): New function, implements "set print".
+
+	* src/unset.c (unset_command): Handle new case "unset print".
+	Added to the list of options displayed.
+	(unset_print): New function, implements "unset print".
+
 2002-03-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: Added many "see web page" and "see demo" so that 
@@ -212,7 +247,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/26 20:31:04 $).
+	last modification date (from the tag $Date: 2002/03/28 20:00:17 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

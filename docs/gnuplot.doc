@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.107 2002/03/24 16:34:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.108 2002/03/28 20:00:21 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3115,7 +3115,7 @@ C ... and restart the table:
  Syntax:
        print <expression> {, <expression>, ...}
 
- See `expressions`.
+ See `expressions`.  The output file can be set with `set print`.
 2 pwd
 ?commands pwd
 ?pwd
@@ -5978,6 +5978,24 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/poldat/poldat.html">
  polar data plot (poldat.dem).
 ^ </a>
+3 print
+?commands set print
+?commands show print
+?set print
+?show print
+ The `set print` command redirects the output of the `print` command to a file.
+
+ Syntax:o
+       set print
+       set print "-"
+       set print "<filename>"
+       set print "<filename>" append
+       set print "|<shell_command>"
+
+ Without "<filename>", the output file is restored to <STDERR>.  The <filename>
+ "-" means <STDOUT>. The `append` flag causes the file to be opened in append
+ mode.  A <filename> starting with "|" is opened as a pipe to the 
+ <shell_command> on platforms that support piping.
 3 rmargin
 ?commands set rmargin
 ?set rmargin

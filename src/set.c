@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.82 2002/03/21 15:11:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.83 2002/03/26 09:42:43 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -120,6 +120,7 @@ static void set_colorbox __PROTO((void));
 #endif
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
+static void set_print __PROTO((void));
 static void set_samples __PROTO((void));
 static void set_size __PROTO((void));
 static void set_style __PROTO((void));
@@ -171,7 +172,7 @@ set_command()
 \t'hidden3d', 'historysize', 'isosamples', 'key', 'label',  'locale',\n\
 \t'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
 \t'multiplot', 'offsets', 'origin', 'output', 'palette', 'parametric',\n\
-\t'pm3d', 'pointsize', 'polar', '[rtuv]range', 'samples', 'size',\n\
+\t'pm3d', 'pointsize', 'polar', 'print', '[rtuv]range', 'samples', 'size',\n\
 \t'style', 'surface', 'terminal', tics', 'ticscale', 'ticslevel',\n\
 \t'timestamp', 'timefmt', 'title', 'view', '[xyz]{2}data',\n\
 \t'[xyz]{2}label', '[xyz]{2}range', '{no}{m}[xyz]{2}tics',\n\
@@ -357,6 +358,9 @@ set_command()
 	    break;
 	case S_POLAR:
 	    set_polar();
+	    break;
+	case S_PRINT:
+	    set_print();
 	    break;
 	case S_SAMPLES:
 	    set_samples();
@@ -2296,6 +2300,39 @@ set_output()
 	term_set_output(testfile);
 	/* if we get here then it worked, and outstr now = testfile */
 	testfile = NULL;
+    }
+}
+
+
+/* process 'set print' command */
+static void
+set_print()
+{
+    TBOOLEAN append_p = FALSE;
+
+    c_token++;
+    if (END_OF_COMMAND) {	/* no file specified */
+	print_set_output(NULL, append_p);
+    } else if (! isstring(c_token)) {
+	int_error(c_token, "expecting filename");
+    } else {
+	static char *testfile = NULL;
+
+	m_quote_capture(&testfile, c_token, c_token); /* reallocs store */
+	gp_expand_tilde(&testfile);
+	/* Skip leading whitespace */
+	while (isspace((unsigned char)*testfile))
+	    testfile++;
+	c_token++;
+	if (!END_OF_COMMAND) {
+	    if (equals(c_token, "append")) {
+		append_p = TRUE;
+		c_token++;
+	    } else {
+		int_error(c_token, "expecting keyword \'append\'");
+	    }
+	}
+	print_set_output(testfile, append_p);
     }
 }
 
