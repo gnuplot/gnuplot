@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.6 1999/10/15 16:03:27 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.7 1999/10/27 11:15:10 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -165,7 +165,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.6 1999/10/15 16:03:27 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.7 1999/10/27 11:15:10 lhecking Exp $
 #
 ########################################################
 #
@@ -361,6 +361,8 @@ install: all $(LASERGNU)
 	@LINUXSUID@
 
 lasergnu_install: lasergnu docs/lasergnu.1
+	$(srcdir)/mkinstalldirs $(bindir)
+	$(srcdir)/mkinstalldirs $(mandir)/man1
 	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
 	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/man1/lasergnu.1
 
