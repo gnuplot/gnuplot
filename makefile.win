@@ -1,5 +1,6 @@
 # make file for Borland C++ 3.1 Windows version
-# and Win32 using Borland C++ 4.0
+# and Win32 using Borland C++ 4 (4.52 is known to work)
+# CAVEAT: may not work correctly with BC 5 due to changes in flags
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)
 
@@ -44,7 +45,7 @@ BIN = $(TC)\bin\\
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DHAVE_SLEEP -DWIN32=1 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DHAVE_STRNICMP -DANSI_C
 !else
 CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
@@ -56,7 +57,8 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
 	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
-	hidden3d.obj time.obj
+	hidden3d.obj time.obj help.obj
+
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
@@ -86,7 +88,7 @@ wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
 #	$(BIN)tlink /Twe /c @&&!
 	$(BIN)tlink /Twe /c /s /v /l @&&!
 $(TC)\lib\C0Wl +
-bitmap command eval graphics graph3d internal misc parse +
+bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 binary interpol +
 winmain +
@@ -108,7 +110,7 @@ wgnupl32.exe: $(OBJS) $(DLLOBJS) win\wgnupl32.def wgnupl32.res winmain.obj
 #	$(BIN)tlink32 /Tpe /c @&&!
 	$(BIN)tlink32 /Tpe /c /m /s /v @&&!
 $(TC)\lib\C0W32 +
-bitmap command eval graphics graph3d internal misc parse +
+bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 wgnuplib wtext wmenu wpause wgraph wprinter +
 binary interpol +
@@ -257,7 +259,7 @@ $(HELPFILE): win\gnuplot.rtf
 win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 
-doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
+doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
