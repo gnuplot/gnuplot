@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.11 1999/06/22 11:53:27 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.12 1999/08/24 11:24:54 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -74,7 +74,7 @@ stdout.  All other terminals write to gpoutfile.
 
 #include "driver.h"
 
-#if defined (HAVE_PLOTCOMPAT_H)
+#ifdef HAVE_PLOTCOMPAT_H
 # include <plotcompat.h>
 #endif
 
