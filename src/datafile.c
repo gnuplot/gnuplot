@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.46 2003/04/29 07:04:29 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.47 2003/05/04 17:10:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -618,6 +618,8 @@ int max_using;
 
     assert(max_using <= NCOL);
 
+    if (END_OF_COMMAND)
+	int_error(c_token,"missing filename");
     /* empty name means re-use last one */
     if (isstring(c_token) && token_len(c_token) == 2) {
 	if (!df_filename || !*df_filename)

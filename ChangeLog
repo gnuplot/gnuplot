@@ -2,6 +2,7 @@
 
 	* term/cgm.trm: Add missing prototype for CGM_fillbox().
 	* src/term.c: Work around Microsoft compiler inadequacy.
+	* src/datafile.c: Trap missing filename in df_open().
 
 2003-05-06  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
