@@ -1,8 +1,36 @@
+1999-04-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* NEWS: Updated.
+
+	* configure: Regenerated.
+
+	* configure.in: Add switches to disable building of files in
+	the lisp subdir and LaTeX tutorial.
+
+	* docs/gnuplot.doc: Fix typo/
+
+	* src/Makefile.maint: Simplify generation of version.c.
+
+	* src/set.c(set_one): 'set noautoscale' does not accept x2 and y2.
+	Bug noted by Peter Hackenberg <phackenberg@aip.de>.
+
+	* src/show.c(show_autoscale): 'show autoscale' does not show
+	'x2' and 'y2'. Bug noted by HBB.
+
+1999-04-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c(eval_plots): Bugfix for logscale y2 plots.
+
 1999-04-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL, config/makefile.cyg, config/makefile.mgw,
 	config/makefile.unx, src/Makefile.in, src/show.c: Use BINDIR
 	instead of GNUPLOT_BINDIR.
+
+1999-04-22  Thomas Sefzick  <t.sefzick@fz-juelich.de>
+
+	* term/tkcanvas.trm: Extended to print the line segment coordinates
+	on mouse click.
 
 1999-04-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -14,9 +42,9 @@
 
 1999-04-19  Dick Crawford  <u600256@gamma.lanl.gov>
 
-	* term/post.trm: Old patch from 1998, implementing different colours
-	for key text and sample (blacktext), linewidth, and dashlength options.
-	See terminal help section for more info.
+	* term/post.trm: Old patch from July 1998, implementing different
+	colours	for key text and sample (blacktext), linewidth, and dashlength
+	options. See terminal help section for more info.
 
 1999-04-18  Lars Hecking  <lhecking@nmrc.ucc.ie>
 

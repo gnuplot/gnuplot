@@ -4,9 +4,17 @@ Changes in release 3.7.1:
 * 'make check' now runs demos non-interactively
 * Linux SVGA driver: don't drop root priviledge until VGA is initialised
 * LaTeX tutorial updated for LaTeX2e
+* gnuplot-mode updated to 0.5e
+* old patches for postscript driver integrated:
+  different colours for key text and sample (blacktext),
+  linewidth, dashlength options
+* extensions to tkcanvas driver
+* bugfixes related to secondary axes (show/nologscale)
+* new '--without-lisp-files' and '--without-tutorial' configure options
 * new targets to build documentation with groff
 * quoting bug fixed 
 * new files VERSION, PATCHLEVEL, README.exp
+
 [3.7.0.5]
 * another off-by-one error fixed in pstricks driver
 * updated to latest version of gnuplot-mode
