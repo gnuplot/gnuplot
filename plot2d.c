@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.4 1999/10/11 12:18:56 lhecking Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.5 1999/11/17 19:55:43 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -718,14 +718,15 @@ struct curve_points *this_plot;
 int plot_num;
 {
     int i, curve;
+    char *table_format = NULL;
     /* The data format is determined by the format of the axis labels.
      * See 'set format'.  Patch by Don Taber
      */
     table_format = gp_alloc(strlen(xformat)+strlen(yformat)+5, "table format");
     strcpy(table_format, xformat);
-    strcat(table_format, "\t");
+    strcat(table_format, " ");
     strcat(table_format, yformat);
-    strcat(table_format, "\t%c\n");
+    strcat(table_format, " %c\n");
 
     for (curve = 0; curve < plot_num;
 	 curve++, this_plot = this_plot->next_cp) {
@@ -740,7 +741,8 @@ int plot_num;
 	}
 	fputc('\n', gpoutfile);
     }
-/* two blank lines between plots in table output */
+
+    /* two blank lines between plots in table output */
     fputc('\n', gpoutfile);
     fflush(gpoutfile);
 

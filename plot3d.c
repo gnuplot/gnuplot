@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot3d.c,v 1.16 1998/12/10 18:30:52 lhecking Exp $";
+static char *RCSid = "$Id: plot3d.c,v 1.16.2.1 1999/11/17 19:55:44 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -695,14 +695,16 @@ int pcount;
     struct iso_curve *icrvs;
     struct coordinate GPHUGE *points;
     char *table_format = NULL;
+    char * pcat;
 
-    table_format = gp_alloc(strlen(xformat)+strlen(yformat)+strlen(zformat)+3,
+    table_format = gp_alloc(strlen(xformat)+strlen(yformat)+strlen(zformat)+6,
 			    "table format");
     strcpy(table_format, xformat);
-    strcat(table_format, "\t");
+    strcat(table_format, " ");
     strcat(table_format, yformat);
-    strcat(table_format, "\t");
+    strcat(table_format, " ");
     strcat(table_format, zformat);
+    pcat = &table_format[strlen(table_format)];
 
     for (surface = 0, this_plot = first_3dplot; surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
@@ -711,6 +713,7 @@ int pcount;
 	curve = 0;
 
 	if (draw_surface) {
+	    strcpy(pcat," %c\n");
 	    /* only the curves in one direction */
 	    while (icrvs && curve < this_plot->num_iso_read) {
 		fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
@@ -719,8 +722,7 @@ int pcount;
 		    fprintf(gpoutfile, table_format,
 			    points[i].x,
 			    points[i].y,
-			    points[i].z);
-		    fprintf(gpoutfile, "\t%c\n",
+			    points[i].z,
 			    points[i].type == INRANGE ? 'i'
 			    : points[i].type == OUTRANGE ? 'o'
 			    : 'u');
@@ -733,6 +735,7 @@ int pcount;
 	if (draw_contour) {
 	    int number = 0;
 	    struct gnuplot_contours *c = this_plot->contours;
+	    strcpy(pcat,"\n");
 	    while (c) {
 		int count = c->num_pts;
 		struct coordinate GPHUGE *p = c->coords;
@@ -741,10 +744,8 @@ int pcount;
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
 		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label);
-		for (; --count >= 0; ++p) {
+		for (; --count >= 0; ++p)
 		    fprintf(gpoutfile, table_format, p->x, p->y, p->z);
-		    putc('\n', gpoutfile);
-		}
 		/* blank line between segments of same contour */
 		putc('\n', gpoutfile);
 		c = c->next;
