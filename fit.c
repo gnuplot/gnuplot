@@ -265,9 +265,10 @@ void error_ex()
 {
     char *sp;
 
-    safe_strncpy(fitbuf, "         ", 9);	/* start after GNUPLOT> */
-    sp = strchr(fitbuf, '\0');
-    while (*--sp == '\n');
+    strncpy(fitbuf, "         ", 9);		/* start after GNUPLOT> */
+    sp = strchr(fitbuf, NUL);
+    while (*--sp == '\n')
+	;
     strcpy(sp + 1, "\n\n");	/* terminate with exactly 2 newlines */
     fprintf(STANDARD, fitbuf);
     if (log_f) {
