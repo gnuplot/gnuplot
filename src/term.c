@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.79 2004/07/13 14:11:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.80 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -2254,6 +2254,14 @@ enhanced_recursion(
 		for (e=escape; *e; e++) {
 		    (term->enhanced_writec)(*e);
 		}
+		break;
+	    } else if (term->flags & TERM_IS_POSTSCRIPT) {
+		/* Shigeharu TAKENO  Aug 2004 - Needed in order for shift-JIS encoding to work */
+		/* If this change causes problems then we need a separate flag for shift-JIS   */
+		/* and certain other 8-bit character sets.                                     */
+		(term->enhanced_open)(fontname, fontsize, base, widthflag, showflag, overprint);
+		(term->enhanced_writec)('\\');
+		(term->enhanced_writec)('\\');
 		break;
 	    }
 	    ++p;

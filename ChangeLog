@@ -1,3 +1,10 @@
+2004-08-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* src/term.c (enhanced_recursion): Pass unescaped backslash character
+	through to PostScript output in enhanced text mode. This is necessary
+	for Shift-JIS character encoding to work in enhanced mode (the non-
+	enhanced mode already does this). Bug report #998479.
+
 2004-08-13  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc:  Re-word the filledcurves section according to
