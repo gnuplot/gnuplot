@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.70 1999/06/22 12:05:38 lhecking Exp $
+dnl $Id: configure.in,v 1.71 1999/06/25 17:11:17 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.70 $)
+AC_REVISION($Revision: 1.71 $)
 
 VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -260,8 +260,8 @@ if test "$with_readline" != no; then
       AC_CHECK_LIB(readline, readline,dnl
        TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
-      GP_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
-      if test "$ac_cv_lib_readline_readline" = yes; then
+      GP_PATH_LIB(readline,readline,[$with_readline],[${gp_tcap}])
+      if test "$ac_cv_lib_readline_readline" != no; then
         TERMLIBS="$TERMLIBS $gp_tcap"
       fi
     fi
@@ -312,12 +312,12 @@ if test "$with_plot" != no; then
   else
     dnl GNU plot library - test for new version first
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-    GP_SEARCH_LIBDIRS(plot,pl_textangle,[$TERMXLIBS])
+    GP_PATH_LIB(plot,pl_textangle,[$with_plot],[$TERMXLIBS])
     if test "$ac_cv_lib_plot_pl_textangle" = no; then
-      GP_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
+      GP_PATH_LIB(plot,textangle,[$with_plot],[$TERMXLIBS])
       if test "$ac_cv_lib_plot_textangle" = no; then
         TERMXLIBS=
-        GP_SEARCH_LIBDIRS(plot,rotate)
+        GP_PATH_LIB(plot,rotate,[$with_plot])
         if test "$ac_cv_lib_plot_rotate" = no; then
           AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
           with_plot=no
@@ -331,7 +331,7 @@ if test "$with_plot" != no; then
       GP_PATH_HEADER(plotcompat.h,[$with_plot],dnl
         AC_DEFINE(HAVE_PLOTCOMPAT_H, 1,
                   [ Define if you have the <plotcompat.h> header file. ]),
-        AC_MSG_WARN([found GNU GNU plotutils 2.2+ library but not plotcompat.h])
+        AC_MSG_WARN([found GNU plotutils 2.2+ library but not plotcompat.h])
         AC_MSG_WARN([please add path to plotcompat.h to CPPFLAGS in Makefile])
       ) # plotcompat.h
     fi # new GNU plotlib
@@ -350,8 +350,8 @@ dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  GP_SEARCH_LIBDIRS(gd,gdImageCreate)
-  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
+  GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
+  if test "$ac_cv_lib_gd_gdImageCreate" != no; then
     GP_PATH_HEADER(gd.h,[$with_gd],dnl
      AC_DEFINE(HAVE_LIBGD, 1,
                [ Define if you have Thomas Boutell's gd library. ]),dnl
@@ -366,8 +366,8 @@ dnl end gd
 
 dnl check for png and z library
 if test "$with_png" != no; then
-  GP_SEARCH_LIBDIRS(png,png_info_init,[-lz])
-  if test "$ac_cv_lib_png_png_info_init" = yes; then
+  GP_PATH_LIB(png,png_info_init,[$with_png],[-lz])
+  if test "$ac_cv_lib_png_png_info_init" != no; then
     TERMLIBS="$TERMLIBS -lz"
     GP_PATH_HEADER(png.h,[$with_png],,dnl
      AC_MSG_WARN([found png library but not png.h])
