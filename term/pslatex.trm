@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.37 2003/04/04 21:22:32 sfeam Exp $
+ * $Id: pslatex.trm,v 1.38 2003/06/12 00:09:06 sfeam Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -472,8 +472,8 @@ PSLATEX_text()
 	    case TEXT_VERTICAL:		/* put text in a short stack */
 		if (PSLATEX_rotate) {
 		    fprintf(gpoutfile, "\
-%\n\\special{ps: gsave currentpoint currentpoint translate\n\
-%d rotate neg exch neg exch translate}%\n", 360 - tc->angle);
+%%\n\\special{ps: gsave currentpoint currentpoint translate\n\
+%d rotate neg exch neg exch translate}%%\n", 360 - tc->angle);
 		}
 		switch (tc->justify) {
 		case LEFT:
