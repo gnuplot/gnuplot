@@ -1,29 +1,82 @@
 # Makefile for SAS/C 6.1 or better on the Amiga
 #
-# $Id: makefile.amg,v 1.29 1998/04/14 00:15:50 drd Exp $
+# $Id: makefile.amg,v 1.8 1998/12/02 18:37:11 lhecking Exp $
 #
+# Makefile for use with SAS/C 6.50 or newer
+#   on AmigaOS 2.0 and above
 #
+# last modification date: 19990204
+#
+
+#
+# ***************** Begin of Configuration section ***************************
+#
+
+# Comment out the definition lines to disable the according features
+# Substitute the path names for the actual path where includes/libs reside
+
+# GD (GIF) device driver
+# requires GD library (not part of gnuplot)
+#GD_DEF = DEF=HAVE_LIBGD
+#GD_INCLUDE = IDIR=gd1.3
+#GD_LIB = gd1.3/gd.lib
+
+# PNG device driver
+# requires PNG and Z libraries (not part of gnuplot)
+#PNG_DEF = def=HAVE_LIBPNG
+#PNG_INCLUDE = IDIR=libpng-1.0.2
+#PNG_LIB = libpng-1.0.2/png.lib
+#Z_INCLUDE = IDIR=zlib-1.1.3
+#Z_LIB = zlib-1.1.3/z.lib
 
 CC = sc
 
-# Remove 'MATH=IEEE' if you don't want to use the better Commodore
-# math-routines. If you do so, you'll have to change 'scmieee.lib'
-# to 'scm.lib' in the gnuplot and bf_test target lines below.
-# I am guessing the syntax here : I want to define GP_INLINE=__inline.
-# If you have SAS/C 6.57 or newer, you may wish to disable warning 317
-# too. Just add it in the COPTS line.
+# cpu type
+# valid values are:
+#  ANY (default; same as 68000) 68010 68020 68030 68040 68060 (new in 6.57)
+CPU = CPU=ANY
+
+# Floating point math type
+# valid values are NOMATH (default) STANDARD FFP 68881 (same as 68882) IEEE
+# Compared to the old version of this makefile, the link commands have
+# been changed so that the MATH option also selects the proper math
+# library to link with
+MATH = MATH=IEEE
+
+# Optimiser flags
 OFLAGS = opt
-DEFS   = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_STRNICMP def=HAVE_GETCWD def=PIPES def=GP_INLINE=__inline
-COPTS  = idir=term data=f math=i ign=304+306 #noerrhigh #errrexx
-DEBUG  = # Will be dbg=sf when called with smake -f makefile.amg debug
-CFLAGS = $(COPTS) $(DEFS) $(OFLAGS) $(DEBUG)
-LNDBG  = # Will be addsym when called with smake -f makefile.amg debug
 
-# The directories where gnuplot and gnuplot.gih go:
+# Defines; format is def=SYMBOL[=value]
+DEFS = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_STRNICMP def=HAVE_GETCWD def=PIPES def=GP_INLINE=__inline $(GD_DEF) $(PNG_DEF)
 
+# Other options; if you have SAS/C 6.57 or newer, you may wish to disable
+# warning 317
+COPTS = ign=304+306 #noerrhigh #errrexx
+
+# Debug options
+DEBUG = # Will be dbg=sf when called with smake -f makefile.amg debug
+LNDBG = # Will be addsym when called with smake -f makefile.amg debug
+
+# The directories where gnuplot and gnuplot.gih go, respectively
 DEST     = C:
 HELPDEST = S:
 
+#
+# ****************** End of Configuration section ****************************
+# ********** No changes should be necessary beyond this point! ***************
+#
+
+#
+# Miscellaneous setup
+#
+
+# Merge compiler flags
+CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
+
+# NOTE: I have disabled the compilation rule for .oo files as described
+# below, because when linking with sc (as opposed to slink), all object
+# files not ending in .o must be prefied with the objname option!
+#
 # To simplify the handling of files that have grown so large that they
 # must be compiled with the code=far option, the rules below have been
 # set up. Now, if a file grows large, you only have to change its
@@ -31,19 +84,29 @@ HELPDEST = S:
 # This must be done in the OBJS-variable below and in the corresponding 
 # dependency-rule near the end of the file.
 
+all: gnuplot demo/bf_test
 
 # Normal compilation rule
 .c.o:
 	$(CC) $(CFLAGS) objname=$@ $<
 
 # Compilation rule for large files
-.c.oo:
+#.c.oo:
+#	$(CC) $(CFLAGS) code=f objname=$@ $<
+
+graphics.o: graphics.c plot.h setshow.h
 	$(CC) $(CFLAGS) code=f objname=$@ $<
 
+set.o: set.c plot.h setshow.h
+	$(CC) $(CFLAGS) code=f objname=$@ $<
+
+term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(CC) $(CFLAGS) idir=term code=f $(GD_INCLUDE) $(PNG_INCLUDE) $(Z_INCLUDE) objname=$@ $<
+
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
-       eval.o fit.o graph3d.o graphics.oo help.o hidden3d.o internal.o \
+       eval.o fit.o graph3d.o graphics.o help.o hidden3d.o internal.o \
        interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o scanner.o \
-       set.oo show.o specfun.o standard.o stdfn.o term.oo time.o util.o \
+       set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o \
        util3d.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c 
@@ -51,93 +114,70 @@ CSOURCE2 = help.c graphics.c graph3d.o internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c \
 	standard.c stdfn.c 
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
-CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atariaes.trm \
-	term/atarivdi.trm term/cgi.trm term/corel.trm \
-	term/djsvga.trm term/dumb.trm term/dxf.trm term/dxy.trm \
-	term/debug.trm term/eepic.trm term/epson.trm term/excl.trm \
-	term/fig.trm term/hp26.trm term/hp2648.trm term/hpgl.trm  \
-	term/hpljii.trm term/metafont.trm\
-	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c 
-CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
-	term/pbm.trm term/pc.trm 
-CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
-	term/rgip.trm term/sun.trm\
-	term/t410x.trm term/tek.trm term/texdraw.trm\
-	term/tgif.trm term/tpic.trm \
-	term/unixpc.trm term/unixplot.trm \
-	term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
+CSOURCE5 = term/aed.trm term/ai.trm term/amiga.trm term/apollo.trm \
+	term/atariaes.trm term/atarivdi.trm term/cgi.trm term/cgm.trm \
+	term/compact.c term/corel.trm term/debug.trm term/driver.h \
+	term/djsvga.trm term/dumb.trm term/dxf.trm term/dxy.trm term/eepic.trm \
+	term/emxvga.trm term/epson.trm term/excl.trm term/fg.trm term/fig.trm \
+	term/gif.trm term/gnugraph.trm
+CSOURCE6 = term/gpic.trm term/gpr.trm term/grass.trm term/hp26.trm \
+	term/hp2648.trm term/hp500c.trm term/hpgl.trm term/hpljii.trm \
+	term/hppj.trm term/imagen.trm term/impcodes.h term/iris4d.trm \
+	term/kyo.trm term/latex.trm term/linux.trm term/mac.trm \
+	term/metafont.trm term/mgr.trm term/mif.trm term/multitos.trm \
+	term/next.trm term/object.h term/pbm.trm term/pc.trm
+CSOURCE7 = term/pm.trm term/png.trm term/post.trm term/pslatex.trm \
+	term/pstricks.trm term/qms.trm term/regis.trm term/rgip.trm \
+	term/sun.trm term/t410x.trm term/table.trm term/tek.trm \
+	term/texdraw.trm term/tgif.trm term/tkcanvas.trm term/tpic.trm \
+	term/unixpc.trm term/unixplot.trm term/v384.trm term/vws.trm \
+	term/win.trm term/x11.trm term/xlib.trm
 CSOURCE8 = contour.c specfun.c amiga.c
 CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 
-
-all: gnuplot demo/bf_test
+#gnuplot: $(OBJS)
+#	slink from lib:c.o $(OBJS) to gnuplot\
+#	lib $(GD_LIB) $(PNG_LIB) $(Z_LIB) lib:scmieee.lib lib:scnb.lib $(LNDBG) verbose
 
 gnuplot: $(OBJS)
-	slink from lib:c.o $(OBJS) to gnuplot\
-	lib lib:scmieee.lib lib:scnb.lib $(LNDBG)
+	$(CC) <WITH <
+$(CFLAGS)
+LINK TO $@
+FROM $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
+<
+
+#demo/bf_test: bf_test.o binary.o alloc.o
+#	slink from lib:c.o bf_test.o binary.o alloc.o to demo/bf_test\
+#	lib lib:scmieee.lib lib:scnb.lib
+#	@echo "*N*NRun bf_test in demo subdirectory to make binary demo files*N"
 
 demo/bf_test: bf_test.o binary.o alloc.o
-	slink from lib:c.o bf_test.o binary.o alloc.o to demo/bf_test\
-	lib lib:scmieee.lib lib:scnb.lib
+	$(CC) $(CFLAGS) LINK TO $@ bf_test.o binary.o alloc.o
 	@echo "*N*NRun bf_test in demo subdirectory to make binary demo files*N"
 
 docs: docs/gnuplot.doc docs/doc2gih docs/doc2tex docs/doc2ms docs/checkdoc
 	docs/doc2gih <docs/gnuplot.doc >docs/gnuplot.gih
 
 docs/doc2gih: docs/doc2gih.c docs/termdoc.c
-	$(CC) $(CFLAGS) idir= link to docs/doc2gih docs/doc2gih.c docs/termdoc.c
+	$(CC) $(CFLAGS) idir= LINK TO docs/doc2gih FROM docs/doc2gih.c docs/termdoc.c
+
+docs/doc2html: docs/doc2html.c docs/allterm.h docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2html FROM docs/doc2html.c docs/termdoc.c
 
 docs/doc2tex: docs/doc2tex.c docs/allterm.h docs/termdoc.c
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/doc2tex docs/doc2tex.c docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2tex FROM docs/doc2tex.c docs/termdoc.c
 
 docs/doc2ms: docs/doc2ms.c docs/allterm.h docs/termdoc.c
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/doc2ms docs/doc2ms.c docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2ms FROM docs/doc2ms.c docs/termdoc.c
 
 docs/checkdoc: docs/checkdoc.c docs/allterm.h docs/termdoc.c 
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/checkdoc docs/checkdoc.c docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/checkdoc FROM docs/checkdoc.c docs/termdoc.c
 
 docs/allterm.h: $(CORETERM)
 	join term/\#?.trm as docs/allterm.h
 
-
-alloc.o: alloc.c plot.h
-amiga.o: amiga.c
-bf_test.o: bf_test.c
-binary.o: binary.c plot.h
-bitmap.o: bitmap.c bitmap.h plot.h
-command.o: command.c plot.h setshow.h help.h
-contour.o: contour.c plot.h
-datafile.o: datafile.c plot.h fnproto.h binary.h setshow.h
-eval.o: eval.c plot.h
-fit.o: fit.c fit.h matrix.h plot.h
-graph3d.o: graph3d.c plot.h setshow.h
-graphics.oo: graphics.c plot.h setshow.h
-help.o: help.c plot.h help.h
-hidden3d.o: hidden3d.c plot.h setshow.h
-internal.o: internal.c plot.h
-interpol.o: interpol.c plot.h setshow.h
-matrix.o: matrix.c matrix.h fit.h
-misc.o: misc.c plot.h setshow.h help.h
-parse.o: parse.c plot.h help.h
-plot.o: plot.c plot.h setshow.h
-plot2d.o: plot2d.c plot.h setshow.h fit.h binary.h help.h
-plot3d.o: plot3d.c plot.h setshow.h binary.h help.h
-scanner.o: scanner.c plot.h
-set.oo: set.c plot.h setshow.h
-show.o: show.c plot.h setshow.h
-specfun.o: specfun.c plot.h
-standard.o: standard.c plot.h
-stdfn.o: stdfn.c stdfn.h
-term.oo: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-time.o: time.c plot.h setshow.h
-util.o: util.c plot.h
-util3d.o: util3d.c plot.h setshow.h
-version.o: version.c
-
-
 clean:
-	@-delete $(OBJS) bf_test.o binary.o quiet
+	@-delete $(OBJS) bf_test.o quiet
 	@-delete docs/\#?.o docs/\#?.lnk quiet
 
 veryclean: clean
@@ -151,3 +191,37 @@ install: gnuplot docs/gnuplot.gih
 
 debug:
 	smake -f makefile.amg DEBUG=dbg=sf LNDBG=addsym OFLAGS= all
+
+#
+# Dependencies; do not edit!
+#
+alloc.o: alloc.c plot.h
+amiga.o: amiga.c
+bf_test.o: bf_test.c
+binary.o: binary.c plot.h
+bitmap.o: bitmap.c bitmap.h plot.h
+command.o: command.c plot.h setshow.h help.h
+contour.o: contour.c plot.h
+datafile.o: datafile.c plot.h fnproto.h binary.h setshow.h
+eval.o: eval.c plot.h
+fit.o: fit.c fit.h matrix.h plot.h
+graph3d.o: graph3d.c plot.h setshow.h
+help.o: help.c plot.h help.h
+hidden3d.o: hidden3d.c plot.h setshow.h
+internal.o: internal.c plot.h
+interpol.o: interpol.c plot.h setshow.h
+matrix.o: matrix.c matrix.h fit.h
+misc.o: misc.c plot.h setshow.h help.h
+parse.o: parse.c plot.h help.h
+plot.o: plot.c plot.h setshow.h
+plot2d.o: plot2d.c plot.h setshow.h fit.h binary.h help.h
+plot3d.o: plot3d.c plot.h setshow.h binary.h help.h
+scanner.o: scanner.c plot.h
+show.o: show.c plot.h setshow.h
+specfun.o: specfun.c plot.h
+standard.o: standard.c plot.h
+stdfn.o: stdfn.c stdfn.h
+time.o: time.c plot.h setshow.h
+util.o: util.c plot.h
+util3d.o: util3d.c plot.h setshow.h
+version.o: version.c
