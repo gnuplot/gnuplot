@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.36 2004/03/11 15:30:19 mikulik Exp $
+ * $Id: gd.trm,v 1.37 2004/03/23 05:40:48 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1084,7 +1084,7 @@ PNG_linetype(int type)
 {
     if (type >= (png_state.n_colors - 3))
 	type %= (png_state.n_colors - 3);
-    if (type <= L_TYPE_NODRAW)
+    if (type <= L_TYPE_NODRAW) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
 	type = -3;	/* Draw in background color */
 
     png_state.color = png_state.color_table[type + 3];
@@ -1341,12 +1341,10 @@ PNG_pointsize(ptsize)
  * Ethan A Merritt November 2003
  *	- Support for enhanced text mode
  * BUGS:
- *	- placement of overprinted characters is not correct
+ *	- placement of overprinted characters is not correct;
+ *	  the overprinted text (pass 2) should be centered, not left-justified
  * PROBLEMS:
- *	- the Symbol font encoding doesn't work in libgd (up to 2.0.15), 
- *	  which makes the whole thing considerably less useful than it 
- *	  ought to be. On the bright side, when libgd is fixed then this
- *	  code will work with no changes needed.
+ *	- the Symbol font encoding didn't work in libgd until 2.0.21
  * 	- Placement of superscripts and subscripts relies on information
  * 	  in the font description that is not always reliable
  *	- the TTF character encoding for non-keyboard characters does
@@ -1377,7 +1375,7 @@ ENHGD_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
     double fontsize, base;
     int overprint;
 {
-    /* If the overprint code requests a save or request, that's all we do */
+    /* If the overprint code requests a save or restore, that's all we do */
     if (overprint == 3) {
 	ENHgd_xsave = png_state.x;
 	ENHgd_ysave = png_state.y;
