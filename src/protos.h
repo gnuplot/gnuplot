@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.13 1999/07/05 13:11:30 lhecking Exp $
+ * $Id: protos.h,v 1.14 1999/07/09 21:03:47 lhecking Exp $
  *
  */
 
@@ -48,7 +48,6 @@
 
 void extend_input_line __PROTO((void));
 void extend_token_table __PROTO((void));
-void init_memory __PROTO((void));
 int com_line __PROTO((void));
 int do_line __PROTO((void));
 void done __PROTO((int status));
@@ -165,15 +164,6 @@ int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
 int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
 TBOOLEAN valid_format __PROTO((const char *format));
 FILE *loadpath_fopen __PROTO((const char *, const char *));
-
-
-/* Prototypes from file "parse.c" */
-
-/* void fpe __PROTO((void)); */
-void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
-struct value * const_express __PROTO((struct value *valptr));
-struct at_type * temp_at __PROTO((void));
-struct at_type * perm_at __PROTO((void));
 
 
 /* Prototypes from file "plot.c" */
