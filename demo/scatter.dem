@@ -1,8 +1,8 @@
 #
-# Simple demo to scatter data conversion to grid data.
+# Simple demo of scatter data conversion to grid data.
 #
 
-set title "Simple demo to scatter data conversion to grid data"
+set title "Simple demo of scatter data conversion to grid data"
 set nohidden3d
 set ticslevel 0.5
 set view 60,30
