@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.33 2000/11/24 15:44:31 mikulik Exp $
+ * $Id: x11.trm,v 1.34 2000/12/15 11:46:01 joze Exp $
  *
  */
 
@@ -439,10 +439,21 @@ X11_waitforinput()
 	}
     } while (!FD_ISSET(fd, &fds));
 #endif /* PIPE_IPC */
-    if (read(0, &c, 1)!=1) return EOF;
-    else return c;
+# if 0 
+/* HBB 20010620: switching back and forth between X11 and a non-GUI
+ * terminal, while stdin is redirected, causes gnuplot to terminate
+ * right after it re-enters the X11 terminal --- read() returns a '\0'
+ * character once, and then EOF. Switching to <stdio.h>'s getc() fixed
+ * that, for me. */
+    if (read(0, &c, 1)!=1)
+	return EOF;
+    else
+	return c;
+# else
+    return getc(stdin);
+# endif /* 0/1 */
 }
-#endif
+#endif /* USE_MOUSE */
 
 
 TERM_PUBLIC void
