@@ -1,3 +1,7 @@
+2002-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* misc.c (save_set_all): Fix quoting of 'set missing' save text.
+
 2002-04-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Patch from Dietmar Warning <dwarning@danalyse.de>: 

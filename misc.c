@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.15.2.3 2000/10/18 13:42:55 broeker Exp $";
+static char *RCSid = "$Id: misc.c,v 1.15.2.4 2002/01/31 21:18:22 lhecking Exp $";
 #endif
 
 /* GNUPLOT - misc.c */
@@ -689,7 +689,7 @@ set %scontour",
     }
 
     if (missing_val != NULL)
-	fprintf(fp, "set missing %s\n", missing_val);
+	fprintf(fp, "set missing '%s'\n", missing_val);
 
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
