@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.65 2001/03/27 09:15:17 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.66 2001/05/11 16:54:14 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -4819,17 +4819,19 @@ C ... and restart the table:
 
  A cartesian coordinate system is used by default.
 
- For a spherical coordinate system, the data occupy two or three columns (or
- `using` entries).  The first two are interpreted as the polar and azimuthal
- angles theta and phi (in the units specified by `set angles`).  The radius r
- is taken from the third column if there is one, or is set to unity if there
- is no third column.  The mapping is:
+ For a spherical coordinate system, the data occupy two or three columns
+ (or `using` entries).  The first two are interpreted as the polar and
+ azimuthal angles theta and phi (or "longitude" and "latitude"), in the
+ units specified by `set angles`.  The radius r is taken from the third
+ column if there is one, or is set to unity if there is no third column.
+ The mapping is:
 
        x = r * cos(theta) * cos(phi)
        y = r * sin(theta) * cos(phi)
        z = r * sin(phi)
 
- Note that this is a "geographic" spherical system, rather than a "polar" one.
+ Note that this is a "geographic" spherical system, rather than a "polar"
+ one (that is, phi is measured from the equator, rather than the pole).
 
  For a cylindrical coordinate system, the data again occupy two or three
  columns.  The first two are interpreted as theta (in the units specified by
@@ -5332,6 +5334,7 @@ C ... and restart the table:
      GIF
      Xfig
      tgif
+     cgm
 
  (You are welcome to implement the support for other terminals, e.g. png.)
 

@@ -1,5 +1,9 @@
 2001-06-30  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
+	* docs/gnuplot.doc: Introduced "latitude" and "longitude"
+	terminology into description of spherical coordinate system.
+	The CGM terminal supports PM3D.
+
 	* demo/surface1.dem: In first sinc function plot, move label and
 	arrow so it does not interfere with Z axis.  Add two sample "fence"
 	plots using different methods.  In data grid plotting with
