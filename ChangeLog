@@ -1,3 +1,10 @@
+2002-02-26  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw config/makefile.cyg: Fixing broken makefiles due
+	to recent removal of NO_ symbols.  Create a temporary config.h file 
+	in order to avoid 12 lines of text for each gcc command (too many HAVE_
+	symbols).
+
 2002-02-25  Hans-Bernhard Broeker  <hbb@ballermann.oche.de>
 
 	* docs/titlepag.tex: Minor spelling correction of my last name.

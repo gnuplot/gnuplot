@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.15 2002/02/19 12:52:33 mikulik Exp $
+# $Id: makefile.mgw,v 1.16 2002/02/21 12:27:37 lhecking Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -110,9 +110,7 @@ TOP = ..
 TERMFLAGS = -I$(TOP)/term
 TERMLIBS = 
 
-CFLAGS += -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
-	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DHAVE_ATEXIT -DNEAR= \
+CFLAGS += -I$(TOP) -I. -D_Windows -DHAVE_CONFIG_H\
 	$(OPTS)
 
 ifdef MOUSE
@@ -158,10 +156,11 @@ L=docs/latex/
 M=../demo/
 
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
+default: config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
+	pgnuplot.exe
 
-all:	 wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe \
-	 gnuplot.ps gnuplot.pdf
+all:	 config.h wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
+	pgnuplot.exe gnuplot.ps gnuplot.pdf
 
 
 # include the 'core makefile template'
@@ -261,6 +260,66 @@ dbinary.$(O): binary.c
 
 
 #
+# Create config.h
+# This file is preferable over having explicit gcc command longer than 10 lines:
+# gcc ... -DHAVE_ -DHAVE_ ... -DHAVE_ -DHAVE_ ... myfile.c
+#
+
+config.h: ../config/makefile.mgw
+	echo "#define NO_GIH"		>config.h
+	echo "#define READLINE"		>>config.h
+	echo "#define GP_INLINE inline"	>>config.h
+	echo "#define ANSI_C"		>>config.h
+	echo "#define NEAR"		>>config.h
+
+	echo "#define PROTOTYPES 1"	>>config.h
+
+	echo "#define HAVE_STRINGIZE"	>>config.h
+	echo "#define RETSIGTYPE void"	>>config.h
+	echo "#define STAT_MACROS_BROKEN 1"	>>config.h
+	echo "#define STDC_HEADERS 1"	>>config.h
+	echo "#define HAVE_ATEXIT 1"	>>config.h
+	echo "#define HAVE_GETCWD 1"	>>config.h
+	echo "#define HAVE_MEMCPY 1"	>>config.h
+	echo "#define HAVE_MEMMOVE 1"	>>config.h
+	echo "#define HAVE_MEMSET 1"	>>config.h
+	echo "#define HAVE_PCLOSE 1"	>>config.h
+	echo "#define HAVE_POPEN 1"	>>config.h
+	echo "#define HAVE_SETVBUF 1"	>>config.h
+	echo "#define HAVE_STRCASECMP 1"	>>config.h
+	echo "#define HAVE_STRCHR 1"	>>config.h
+	echo "#define HAVE_STRCSPN 1"	>>config.h
+	echo "#define HAVE_STRDUP 1"	>>config.h
+	echo "#define HAVE_STRERROR 1"	>>config.h
+	echo "#define HAVE_STRICMP 1"	>>config.h
+	echo "#define HAVE_STRNCASECMP 1"	>>config.h
+	echo "#define HAVE_STRNICMP 1"	>>config.h
+	echo "#define HAVE_STRRCHR 1"	>>config.h
+	echo "#define HAVE_STRSTR 1"	>>config.h
+	echo "#define HAVE_VFPRINTF 1"	>>config.h
+
+	echo "#define HAVE_ERRNO_H 1"	>>config.h
+	echo "#define HAVE_FLOAT_H 1"	>>config.h
+	echo "#define HAVE_LIMITS_H 1"	>>config.h
+	echo "#define HAVE_LOCALE_H 1"	>>config.h
+	echo "#define HAVE_MALLOC_H 1"	>>config.h
+	echo "#define HAVE_MATH_H 1"	>>config.h
+	echo "#define HAVE_POLL_H 1"	>>config.h
+	echo "#define HAVE_STDLIB_H 1"	>>config.h
+	echo "#define HAVE_STRING_H 1"	>>config.h
+	echo "#define HAVE_SYS_PARAM_H 1"	>>config.h
+	echo "#define HAVE_SYS_SELECT_H 1"	>>config.h
+	echo "#define HAVE_SYS_SOCKET_H 1"	>>config.h
+	echo "#define HAVE_SYS_STAT_H 1"	>>config.h
+	echo "#define HAVE_SYS_TIME_H 1"	>>config.h
+	echo "#define HAVE_SYS_TIMEB_H 1"	>>config.h
+	echo "#define HAVE_SYS_TYPES_H 1"	>>config.h
+	echo "#define HAVE_TERMIOS_H 1"	>>config.h
+	echo "#define HAVE_TIME_H 1"	>>config.h
+	echo "#define HAVE_VALUES_H 1"	>>config.h
+
+
+#
 # Create documentation in various formats
 #
 # Call LaTeX three times to get the toc right.
@@ -285,7 +344,7 @@ doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c
 
 # clean up temporary files
 clean:
-	$(RM) *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
+	$(RM) config.h *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
 	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
 	$(RM) $(M)bf_test.exe *.ico geticon.exe
 	$(RM) gnuplot.tex gnuplot.dvi gnuplot.ps gnuplot.pdf
