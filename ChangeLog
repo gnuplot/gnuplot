@@ -1,3 +1,7 @@
+2002-01-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/titlepag.tex: Have \usepackage{hyperref} only once.
+
 2002-01-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/demo/Demo.gp: Remove 'set term pop' after 'reset' (the latter

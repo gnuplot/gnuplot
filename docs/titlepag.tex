@@ -1,72 +1,48 @@
 %
-% $Id: titlepag.tex,v 1.5 2001/12/19 09:14:55 mikulik Exp $
+% $Id: titlepag.tex,v 1.6 2002/01/15 21:47:01 amai Exp $
 %
+
 \ifx\LaTeXe\undefined
+
 % old LaTeX version
 % add `,a4' to `toc_entry' to load settings for A4-paper
 % see below if you add 11pt or 12pt
    \documentstyle[toc_entr]{article}
+
 \else
+
 % LaTeX2e version
 % add `[a4paper]' before `{article}' to load settings for A4-paper
 % see below if you add 11pt or 12pt
-   \documentclass{article} % DSL 24 May 1995
+   \documentclass{article}
    \usepackage{toc_entr}
-%
-% Those macros are available from
-%    DANTE:/macros/latex/contrib/supported/oberdiek/
-% They are required to distinguish between various
-% PDF creating LaTeX systems.
-% If you have dvipdfm installed outcomment the according
-% line in the DEFAULT branch below.
-%
-   \usepackage{ifpdf, ifvtex}
-\fi
 
-%
-% pdflatex
-%
-\ifpdf
+  % Fine tuning of the hyperref output option:
+  \def\OtherHyperrefOpt{} % no special option by default
+  \ifx\pdfoutput\undefined
+	% *** uncomment for dvipdfm output
+	% ***
+	% \def\OtherHyperrefOpt{dvipdfm,}
+  \else	% *** pdflatex output
+	% ***
+	\def\OtherHyperrefOpt{pdftex,}
+  \fi
+
   \usepackage[
-	pdftex, hyperindex, bookmarks,
+	\OtherHyperrefOpt
+	hyperindex,
+	bookmarks,
+	bookmarksnumbered=true,
 	pdftitle={gnuplot documentation},
 	pdfauthor={gnuplot},
 	pdfsubject={see www.gnuplot.org}
-	,pdfcreator={}
-	,pdfkeywords={...}
+  %	,pdfcreator={}
+  %	,pdfkeywords={...}
   ]{hyperref}
-\else
-%
-% v(la)tex
-%
-\ifvtex
-  \usepackage[
-    hyperindex,
-    bookmarks=true,
-    bookmarksnumbered=true,
-    bookmarkstype=toc,
-    pdftitle={gnuplot documentation},
-    pdfauthor={gnuplot},
-    pdfsubject={see www.gnuplot.org}
-  ]{hyperref}
-\else
-%
-% DEFAULT:
-%
-  \usepackage[
-%    dvipdfm,
-    hyperindex,
-    bookmarks=true,
-    bookmarksnumbered=true,
-    bookmarkstype=toc,
-    pdftitle={gnuplot documentation},
-    pdfauthor={gnuplot},
-    pdfsubject={see www.gnuplot.org}
-  ]{hyperref}
+
+  % \usepackage{fancyhdr}
+
 \fi
-
-
-%\usepackage{fancyheadings}
 
 % The following statements should adjust the default values for
 % different papersizes, mainly required for verbatim output
