@@ -1,3 +1,7 @@
+1999-12-17  Ascan Morlang  <morlang@fokus.gmd.de>
+
+	* plot2d.c(eval_plots): Fix various memory leaks.
+
 1999-12-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* command.c, protos.h, scanner.c, docs/gnuplot.doc: Old patch by
