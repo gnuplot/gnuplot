@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.49 2001/10/31 17:13:59 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.50 2001/11/10 18:27:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -869,6 +869,9 @@ do_3dplot(plots, pcount, quick)
 #if USE_ULIG_FILLEDBOXES
 	    case FILLEDBOXES:	/* can't do filledboxes in 3d yet so use impulses */
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+	    case FILLEDCURVES:
+#endif
 	    case IMPULSES:
 		{
 		    if (lkey) {
@@ -1001,6 +1004,9 @@ do_3dplot(plots, pcount, quick)
 #if USE_ULIG_FILLEDBOXES
 		    case FILLEDBOXES:
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+		    case FILLEDCURVES:
+#endif
 		    case STEPS:
 		    case FSTEPS:
 		    case HISTEPS:
@@ -1050,6 +1056,9 @@ do_3dplot(plots, pcount, quick)
 #if USE_ULIG_FILLEDBOXES
 			    case FILLEDBOXES:
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+			    case FILLEDCURVES:
+#endif
 			    case STEPS:
 			    case FSTEPS:
 			    case HISTEPS:
@@ -1085,6 +1094,9 @@ do_3dplot(plots, pcount, quick)
 #if USE_ULIG_FILLEDBOXES
 		    case FILLEDBOXES:
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+		    case FILLEDCURVES:
+#endif
 			/* treat boxes like impulses: */
 		    case IMPULSES:
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);

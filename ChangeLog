@@ -1,3 +1,10 @@
+2001-11-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (do_3dplot) [PM3D]: Handle plot style FILLEDBOXES
+ 	by falling back to IMPULSES.
+
+	* src/hidden3d.c (build_networks) [PM3D]: Dito.
+
 2001-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_label): Corrected as yet un-ChangeLog'ed new code
