@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.13.2.1 1999/08/19 14:39:28 lhecking Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13.2.2 1999/11/17 18:12:41 lhecking Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -288,19 +288,29 @@ static t_hl_extent_y *ymin_hl, *ymax_hl;
    Each column is splitted into pairs of points (a,b).
    Each pair describes a cross of one line with the column. */
 
+/* HBB 20000608: finally, someone found a serious bug in this code :-(
+ * whenever the Cross_store array has to be reallocated, all the
+ * pointers in hl_buffer, and the next pointers in struct Cross become
+ * invalid. Use indices instead of pointers. */
+
 struct Cross {
     int a, b;
-    struct Cross GPHUGE *next;
+    unsigned int next;		/* (unsigned int) -1 means: no next */
+    /* HBB 20000608: was struct Cross GPHUGE *next;*/
 };
 
+#if 0 /* HBB 20000608 */
 static struct Cross GPHUGE *GPHUGE * hl_buffer;
+#else
+static unsigned int GPHUGE * hl_buffer;
+#endif
 
 /* HBB 980303: added a global array of Cross structures, to save lots
  * of gp_alloc() calls (3 millions in a run through all.dem!)  */
 
 #define CROSS_STORE_INCREASE 500	/* number of Cross'es to alloc at a time */
 static struct Cross *Cross_store = 0;
-static int last_Cross_store = 0, free_Cross_store = 0;
+static unsigned int last_Cross_store = 0, free_Cross_store = 0;
 
 struct Vertex {
     coordval x, y, z;
@@ -473,7 +483,7 @@ static long split_polygon_by_plane __PROTO((long P, double a, double b,
 static int in_front __PROTO((long Last, long Test));
 
 /* HBB 980303: new, for the new back-buffer for *Cross structures: */
-static GP_INLINE struct Cross *get_Cross_from_store __PROTO((void));
+static GP_INLINE unsigned int get_Cross_from_store __PROTO((void));
 static GP_INLINE void init_Cross_store __PROTO((void));
 
 static GP_INLINE TBOOLEAN hl_buffer_set __PROTO((int xv, int yv));
@@ -2220,7 +2230,8 @@ static GP_INLINE void init_Cross_store()
 		 "hidden cross store");
 }
 
-static GP_INLINE struct Cross *get_Cross_from_store()
+static GP_INLINE unsigned int 
+get_Cross_from_store()
 {
     while (last_Cross_store <= free_Cross_store) {
 	last_Cross_store += CROSS_STORE_INCREASE;
@@ -2229,18 +2240,21 @@ static GP_INLINE struct Cross *get_Cross_from_store()
 		 (unsigned long) last_Cross_store * sizeof(struct Cross),
 		       "hidden cross store");
     }
-    return Cross_store + (free_Cross_store++);
+    return free_Cross_store++;
 }
 
 static GP_INLINE TBOOLEAN
  hl_buffer_set(xv, yv)
 int xv, yv;
 {
-    struct Cross GPHUGE *c;
+    unsigned int c;
+
     /*HBB 961110: lclint wanted this: */
     assert(hl_buffer != 0);
-    for (c = hl_buffer[xv]; c != NULL; c = c->next)
-	if (c->a <= yv && c->b >= yv) {
+    for (c = hl_buffer[xv];
+	 c < last_Cross_store;
+	 c = Cross_store[c].next)
+	if (Cross_store[c].a <= yv && Cross_store[c].b >= yv) {
 	    return TRUE;
 	}
     return FALSE;
@@ -2256,7 +2270,12 @@ static int hl_buff_xmin, hl_buff_xmax;
 static GP_INLINE void update_hl_buffer_column(xv, ya, yb)
 int xv, ya, yb;
 {
+#if 0 /* HBB 20000608 */
     struct Cross GPHUGE *GPHUGE * cross, GPHUGE * cross2;
+#else
+    unsigned int GPHUGE cross, cross2;
+    TBOOLEAN still_in_hl_buffer = TRUE;
+#endif
 
     /* First, ensure that ya <= yb */
     if (ya > yb) {
@@ -2265,15 +2284,20 @@ int xv, ya, yb;
 	ya = y_temp;
     }
     /* loop over all previous crossings at this x-value */
-    for (cross = hl_buffer + xv; 1; cross = &(*cross)->next) {
-	if (*cross == NULL) {
+    for (cross = hl_buffer[xv], still_in_hl_buffer = TRUE;
+	 1;
+	 cross = Cross_store[cross].next, still_in_hl_buffer = FALSE
+	 ) {
+	if (cross > last_Cross_store) {
 	    /* first or new highest crossing at this x-value */
 
 	    /* HBB 980303: new method to allocate Cross structures */
-	    *cross = get_Cross_from_store();
-	    (*cross)->a = ya;
-	    (*cross)->b = yb;
-	    (*cross)->next = NULL;
+	    cross = get_Cross_from_store();
+	    if (still_in_hl_buffer)
+		hl_buffer[xv] = cross;
+	    Cross_store[cross].a = ya;
+	    Cross_store[cross].b = yb;
+	    Cross_store[cross].next = (unsigned int) -1;
 	    /* HBB 961201: keep track of x-range of hl_buffer, to
 	     * speedup free()ing it */
 	    if (xv < hl_buff_xmin)
@@ -2282,28 +2306,32 @@ int xv, ya, yb;
 		hl_buff_xmax = xv;
 	    break;
 	}
-	if (yb < (*cross)->a - 1) {
+	if (yb < Cross_store[cross].a - 1) {
 	    /* crossing below 'cross', create new entry before 'cross' */
-	    cross2 = *cross;
+	    cross2 = cross;
 	    /* HBB 980303: new method to allocate Cross structures */
-	    *cross = get_Cross_from_store();
-	    (*cross)->a = ya;
-	    (*cross)->b = yb;
-	    (*cross)->next = cross2;
+	    cross = get_Cross_from_store();
+	    if (still_in_hl_buffer)
+		hl_buffer[xv] = cross;
+	    Cross_store[cross].a = ya;
+	    Cross_store[cross].b = yb;
+	    Cross_store[cross].next = cross2;
 	    break;
-	} else if (ya <= (*cross)->b + 1) {
+	} else if (ya <= Cross_store[cross].b + 1) {
 	    /* crossing overlaps or covers 'cross' */
-	    if (ya < (*cross)->a)
-		(*cross)->a = ya;
-	    if (yb > (*cross)->b) {
-		if ((*cross)->next && (*cross)->next->a <= yb) {
+	    if (ya < Cross_store[cross].a)
+		Cross_store[cross].a = ya;
+	    if (yb > Cross_store[cross].b) {
+		if (Cross_store[cross].next < last_Cross_store
+		    && Cross_store[Cross_store[cross].next].a <= yb
+		    ) {
 		    /* crossing spans all the way up to 'cross->next' so
 		     * unite them */
-		    cross2 = (*cross)->next;
-		    (*cross)->b = cross2->b;
-		    (*cross)->next = cross2->next;
+		    cross2 = Cross_store[cross].next;
+		    Cross_store[cross].b = Cross_store[cross2].b;
+		    Cross_store[cross].next = Cross_store[cross2].next;
 		} else
-		    (*cross)->b = yb;
+		    Cross_store[cross].b = yb;
 	    }
 	    break;
 	}
@@ -2631,7 +2659,7 @@ struct Polygon GPHUGE *p;
     for (i = hl_buff_xmin; i <= hl_buff_xmax; i++) {
 	/* HBB 980303: one part was removed here. It isn't needed any more,
 	 * with the global store for Cross structs. */
-	hl_buffer[i] = NULL;
+	hl_buffer[i] = (unsigned int) -1;
     }
     /* HBB 980303: instead, set back the free pointer of the Cross store: */
     free_Cross_store = 0;
@@ -2707,11 +2735,11 @@ int pcount;
     /* HBB 980303 new: initialize the global store for Cross structs: */
     init_Cross_store();
     i = XREDUCE(xright) - XREDUCE(xleft) + 1;
-    hl_buffer =
-	(struct Cross GPHUGE * GPHUGE *) gp_alloc((unsigned long) (i * sizeof(struct Cross GPHUGE *)),
+    hl_buffer = (unsigned int GPHUGE *)
+	gp_alloc((unsigned long) (i * sizeof(unsigned int)),
 						  "hidden hl_buffer");
     while (--i >= 0)
-	hl_buffer[i] = (struct Cross *) 0;
+	hl_buffer[i] = (unsigned int) -1;
 
     init_polygons(plots, pcount);
 
