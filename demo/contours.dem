@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.2.2.1 1999/08/19 14:33:04 lhecking Exp $
+# $Id: contours.dem,v 1.2.2.2 2000/07/24 13:31:30 broeker Exp $
 #
 set samples 20
 set isosamples 21
@@ -36,7 +36,7 @@ set contour both
 replot
 pause -1 "Hit return to continue (7)"
 set contour base
-set title "3D gnuplot demo - 2 surfaces
+set title "3D gnuplot demo - 2 surfaces"
 splot x**2*y**3, x**3*y**2
 pause -1 "Hit return to continue (8)"
 set title "3D gnuplot demo - some more interesting contours"
