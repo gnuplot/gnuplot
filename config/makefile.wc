@@ -1,0 +1,183 @@
+#
+# $Id: $
+#
+# GNUPLOT Makefile for Watcom C 9.5a
+#
+# Modified from the TurboC makefile by Aurel Gabris
+#
+# the makefile does longer depends on a linker options file.
+# this file will be created as needed.                          (AL 07/17/92)
+
+# where to place gnuplot.gih helpfile
+HELPFILE = gnuplot.gih
+# location of Watcom C compiler
+WC = c:\watcom
+# name of C compiler
+CC = wcc386
+# name of C compiler/linker
+CL = wcl386
+# name of linker
+LINK = wlink
+# location of WLINK.EXE and WCC386.EXE and WCL386.EXE
+BIN = $(WC)\bin\
+BINB = $(WC)\binb\
+# location of the system libraries
+LIB = $(WC)\lib386\
+
+# the memory model to use (f = flat)
+MODEL = f
+
+# -w0 means ignore warnings and do not report them
+# -d1{+} means include line numbers for debugger
+# -d2 means full symbolic debug info
+# -fpi means inline 80x87 instructions with emulation
+# -fpi87 means inline 80x87 instructions
+# -o{x} controls optimization
+#      a           -> relax aliasing constraints
+#      f           -> generate traceable stack frames as needed
+#           The selection of the optimization flags include some wizardry.
+#           Thus omiting any flags from the above two, may result in run-time
+#           errors.
+#      m           -> generate inline 80x87 code for math functions
+#      d           -> disable all optimizations (Watch out!)
+# -DREADLINE to use the history/line editing capability. If you want this
+#    capability add -DREADLINE to CFLAGS
+# -DLITE means no hiddenline removal to conserve memory
+# option {stack=n} sets stack size to n
+CFLAGS = -m$(MODEL) -omaf -fpi -fp3 -I$(WC)\include -UMSDOS -DDOS386 -DDOS32 -DPC -DREADLINE
+DOC2XXX_FLAGS = -Idocs -Iterm $(CFLAGS) -L$(TC)\lib
+TERMFLAGS =
+LNKOPT = option{stack=100000}
+
+OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
+OBJ2 =  help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
+OBJ3 =  scanner.obj set.obj show.obj specfun.obj standard.obj term.obj time.obj util.obj
+OBJ4 =  version.obj binary.obj interpol.obj fit.obj matrix.obj
+OBJ5 =  datafile.obj alloc.obj hidden3d.obj util3d.obj
+
+OBJS = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
+
+CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm &
+           term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm &
+           term\hp2648.trm term\hpgl.trm term\hpljii.trm
+CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h term\iris4d.trm &
+           term\kyo.trm term\latex.trm term\pc.trm
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm &
+           term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm &
+           term\v384.trm term\x11.trm
+CSOURCE8 = contour.c specfun.c binary.c interpol.c
+
+all: gnuplot.exe $(HELPFILE) bf_test.exe .SYMBOLIC
+     @%null
+
+# use linkopt.wc to avoid command-line overflow
+
+gnuplot.exe: $(OBJS) linkopt.wc .PRECIOUS
+        $(BIN)$(LINK) $(LNKOPT) system dos4g name gnuplot file @linkopt.wc
+
+# create linker options file
+# note that when you change the model or switch overlaying,
+# you will have to execute 'make clean'
+
+
+linkopt.wc: makefile.wc
+        echo  >linkopt.wc {$(OBJ1)
+        echo >>linkopt.wc $(OBJ2)
+        echo >>linkopt.wc $(OBJ3)
+        echo >>linkopt.wc $(OBJ4)
+        echo >>linkopt.wc $(OBJ5)}
+#       echo >>linkopt.tc -----
+#       echo >>linkopt.tc this file is generated automatically. don't change it, change the makefile.
+
+# default rules
+
+.c.obj:
+        $(BIN)$(CC) $^& $(CFLAGS)
+
+bitmap.obj: bitmap.c bitmap.h plot.h
+
+command.obj: command.c plot.h setshow.h help.h fit.h
+        $(BIN)$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" command.c
+
+contour.obj: contour.c plot.h
+
+eval.obj: eval.c plot.h
+
+graphics.obj: graphics.c plot.h setshow.h
+
+graph3d.obj: graph3d.c plot.h setshow.h
+
+hidden3d.obj: hidden3d.c plot.h setshow.h
+
+util3d.obj: util3d.c plot.h setshow.h
+
+fit.obj: fit.c fit.h matrix.h plot.h
+
+matrix.obj: matrix.c matrix.h fit.h
+
+help.obj: help.c plot.h help.h
+
+internal.obj: internal.c plot.h
+
+misc.obj: misc.c plot.h setshow.h help.h
+
+parse.obj: parse.c plot.h
+        $(BIN)$(CC) $(OVLY1) @cflags.tc parse.c
+
+plot.obj: plot.c plot.h setshow.h
+        $(BIN)$(CC) $(OVLY1) @cflags.tc plot.c
+
+readline.obj: readline.c
+
+scanner.obj: scanner.c plot.h
+
+set.obj: set.c plot.h setshow.h
+
+show.obj: show.c plot.h setshow.h
+	$(BIN)$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" show.c
+
+specfun.obj: specfun.c
+
+standard.obj: standard.c plot.h
+
+interpol.obj: interpol.c plot.h setshow.h
+
+# the CSOURCE? dependencies are not up to date (but who cares)
+term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+        $(BIN)$(CC) $(CFLAGS) $(TERMFLAGS) -DDEFAULTTERM="dospc" -Iterm term.c
+
+util.obj: util.c plot.h
+
+version.obj: version.c
+
+# convert gnuplot.doc to gnuplot.gih
+$(HELPFILE): doc2gih.exe docs\gnuplot.doc
+        doc2gih docs\gnuplot.doc $(HELPFILE)
+
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+    $(BINB)$(CL) $(DOC2XXX_FLAGS) name doc2gih docs\doc2gih.c docs\termdoc.c
+
+doc2tex.exe: docs\doc2tex.c docs\termdoc.c
+    $(BINB)$(CL) -w0 -m$(MODEL) $(DOC2XXX_FLAGS) -DALL_TERM_DOC -I$(WC)\include -L$(WC)\lib name doc2tex docs\doc2tex.c docs\termdoc.c
+
+bf_test.exe: bf_test.c binary.obj alloc.obj
+    $(BIN)$(CC) -m$(MODEL) bf_test.c
+    $(BIN)$(LINK) system dos4g name bf_test file {bf_test binary alloc}
+
+# clean target - remove all temp files, but leave executable intact
+# needed when changing configuration (model or overlaying)
+
+clean: .SYMBOLIC
+        del *.obj
+        del linkopt.wc
+        del doc2gih.exe
+
+# realclean target - remove all files created by the makefile
+
+realclean: clean .SYMBOLIC
+        del gnuplot.exe
+        del gnuplot.gih
+        del demo\bf_test.exe
+        del demo\binary1
+        del demo\binary2
+        del demo\binary3
