@@ -1,8 +1,33 @@
+1998-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c, hidden3d.c, specfun.c, stdfn.h: VMS fixes by
+	Lucas Hart <hartl@ucs.orst.edu>.
+
+	* hidden3d.c, scanner.c, show.c: Fix indentation.
+
+	* syscfg.h: Add comment.
+
 1998-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* bf_test.c, binary.c, bitmap.c: Fix indentation.
 
 	* config.hin, configure: Regenerated.
 
-	* configure.in: Add erfc() function check.
+	* configure.in: Add erfc() function check, change png version
+	test indentation to satisfy DU 4.0 cc.
+
+	* graphics.c(gen_tics): Hopefully fixed xmtics to start from 1
+	instead of 0.
+
+	* graphics.c(fixup_range), set.c(set_tic_prop): Avoid automatic
+	aggregate initialisation.
+
+	* show.c(show_two): Map show command for [xyz]{2}[md]tics to
+	[xyz]{2}tics.
+
+	* specfun.c: Fix typo in comment.
+
+	* docs/Makefile.in: Fix dependencies for config.h.
 
 1998-10-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -172,7 +197,7 @@
 
 	* type.h: Obsolete file removed.
 
-	* docs/Makefile.in: Fix alldoc ,clean, html targets and dependencies.
+	* docs/Makefile.in: Fix alldoc, clean, html targets and dependencies.
 	Compile doc2html with -DALL_TERM_DOC. Print gpcard.ps to file
 	instead of printer.
 
