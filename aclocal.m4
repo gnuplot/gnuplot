@@ -430,12 +430,13 @@ fi
 
 
 
-# serial 1
+# serial 2
 
+dnl AC_CHECK_LIB(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
 AC_DEFUN(GP_CHECK_LIB_QUIET,
 [ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 ac_save_LIBS="$LIBS"
-LIBS="$TERMLIBS $TERMXLIBS -l$1 $5 $LIBS"
+LIBS="$TERMLIBS $TERMXLIBS -l$1 $3 $LIBS"
 AC_TRY_LINK(dnl
 ifelse([$2], [main], , dnl Avoid conflicting decl of main.
 [/* Override any gcc2 internal prototype to avoid an error.  */
@@ -452,47 +453,47 @@ char $2();
             eval "ac_cv_lib_$ac_lib_var=no")
 LIBS="$ac_save_LIBS"
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
-  ifelse([$3], ,
-[changequote(, )dnl
+changequote(, )dnl
   ac_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
-  LIBS="$LIBS -l$1"
-], [$3])
-else
-  ifelse([$4], , , [$4
-])dnl
+dnl  LIBS="$LIBS -l$1"
 fi
 ])
 
 
-# serial 1
+# serial 2
 
-dnl GP_SEARCH_LIBDIRS(LIBRARY, FUNCTION [, OTHER-LIBRARIES])
-AC_DEFUN(GP_SEARCH_LIBDIRS,
-[AC_MSG_CHECKING([for $2 in -l$1])
-gp_save_TERMLIBS="$TERMLIBS"
+dnl GP_PATH_LIB(LIBRARY, FUNCTION, SEARCH-DIRS [, OTHER-LIBRARIES])
+AC_DEFUN(GP_PATH_LIB,
+[ac_lib_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 changequote(, )dnl
   gp_tr_lib=HAVE_LIB`echo $1 | sed -e 's/[^a-zA-Z0-9_]/_/g' \
     -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 changequote([, ])dnl
-dnl The "no" case is just a safety net
-case "$with_$1" in
-  yes|no)
-    gp_lib_list="";;
-  *)
-    gp_lib_path=`echo $with_$1 | sed -e 's%/lib$1\.a$%%'`
-    gp_lib_prefix=`echo $gp_lib_path | sed 's%/lib$%%'`
-    gp_lib_list="$gp_lib_prefix $gp_lib_prefix/lib $gp_lib_path"
-esac
-for ac_dir in '' /usr/local/lib $gp_lib_list ; do
+AC_MSG_CHECKING([for $2 in -l$1])
+AC_CACHE_VAL(ac_cv_lib_$ac_lib_var,
+[gp_save_TERMLIBS="$TERMLIBS"
+if test "$3" != yes && test "$3" != no; then
+  gp_l_path=`echo "$3" | sed -e 's%/lib$1\.a$%%'`
+  gp_l_prfx=`echo $gp_l_path | sed -e 's%/lib$%%' -e 's%/include$%%'`
+  gp_l_list="$gp_l_prfx $gp_l_prfx/lib $gp_l_path"
+fi
+for ac_dir in '' $gp_l_list /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
-  GP_CHECK_LIB_QUIET($1,$2,dnl
-    TERMLIBS="$TERMLIBS -l$1"; break, dnl ACTION-IF-FOUND
-    TERMLIBS="$gp_save_TERMLIBS",     dnl ACTION-IF-NOT-FOUND
-    $3)                               dnl OTHER-LIBRARIES
+  GP_CHECK_LIB_QUIET($1,$2,$4)
+  TERMLIBS="$gp_save_TERMLIBS"
+  if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+    eval "ac_cv_lib_$ac_lib_var=${ac_dir}"
+    break
+  fi
 done
-if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+])
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" != no"; then
+  if eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != x" && eval "test \"`echo x'$ac_cv_lib_'$ac_lib_var`\" != xyes"; then
+    eval "TERMLIBS=\"$gp_save_TERMLIBS -L`echo '$ac_cv_lib_'$ac_lib_var`\""
+  fi
+  TERMLIBS="$TERMLIBS -l$1"
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -512,9 +513,12 @@ changequote([, ])dnl
 AC_MSG_CHECKING([for $1])
 AC_CACHE_VAL(ac_cv_header_$ac_safe,
 [gp_save_CPPFLAGS="$CPPFLAGS"
-gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
-gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
-for ac_dir in '' /usr/local/include $gp_h_prfx $gp_h_prfx/include $gp_h_path ; do
+if test "$2" != yes && test "$2" != no; then
+  gp_h_path=`echo "$2" | sed -e 's%/lib$1\.a$%%'`
+  gp_h_prfx=`echo "$gp_h_path" | sed -e 's%/lib$%%' -e 's%/include$%%'`
+  gp_h_list="$gp_h_prfx $gp_h_prfx/include $gp_h_path"
+fi
+for ac_dir in '' $gp_h_list /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
   AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")

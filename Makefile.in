@@ -114,7 +114,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4):  configure.in  m4/apple.m4 m4/beos.m4 m4/msdos.m4 \
-		m4/next.m4 m4/path-hdr.m4 m4/search-lib.m4 m4/select.m4
+		m4/next.m4 m4/path-hdr.m4 m4/path-lib.m4 m4/select.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
