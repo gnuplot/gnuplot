@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.46 1998/06/18 14:55:20 ddenholm Exp $";
+static char *RCSid = "$Id: util.c,v 1.10 1998/12/09 15:26:04 lhecking Exp $";
 #endif
 
 /* GNUPLOT - util.c */
@@ -103,8 +103,10 @@ char *str;
     register int start = token[t_num].start_index;
     register int length = token[t_num].length;
 
+    if (!str)
+	return FALSE;
     if (!token[t_num].is_token)
-	return (FALSE);		/* must be a value--can't be equal */
+	return FALSE;		/* must be a value--can't be equal */
     for (i = 0; i < length + after; i++) {
 	if (str[i] != input_line[start + i]) {
 	    if (str[i] != '$')
@@ -190,16 +192,18 @@ int max;
 {
     register int i = 0;
     register int start = token[t_num].start_index;
-    register int count;
+    register int count = token[t_num].length;
 
-    if ((count = token[t_num].length) >= max) {
+    if (count >= max) {
 	count = max - 1;
 	FPRINTF((stderr, "str buffer overflow in copy_str"));
     }
+
     do {
 	str[i++] = input_line[start++];
     } while (i != count);
     str[i] = NUL;
+
 }
 
 /* length of token string */
@@ -272,10 +276,8 @@ int start, end;
     register int i, e;
     register char *s;
 
-    if (*str)			/* previous pointer to malloc'd memory there */
-	free(*str);
     e = token[end].start_index + token[end].length;
-    *str = gp_alloc((unsigned long) (e - token[start].start_index + 1), "string");
+    *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index; i < e && input_line[i] != NUL; i++)
 	*s++ = input_line[i];
@@ -291,18 +293,19 @@ void m_quote_capture(str, start, end)
 char **str;
 int start, end;
 {
-    register int i, e, escflag = 0;
+    register int i, e;
     register char *s;
 
-    if (*str)			/* previous pointer to malloc'd memory there */
-	free(*str);
     e = token[end].start_index + token[end].length - 1;
-    *str = gp_alloc((unsigned long) (e - token[start].start_index + 1), "string");
+    *str = gp_realloc(*str, (e - token[start].start_index + 1), "string");
     s = *str;
     for (i = token[start].start_index + 1; i < e && input_line[i] != NUL; i++)
-	if ((*s++ = input_line[i]) == '\\') ++escflag;
+	*s++ = input_line[i];
     *s = NUL;
-    if (escflag) parse_esc(*str);
+
+    if (input_line[token[start].start_index] == '"')
+	parse_esc(*str);
+
 }
 
 
