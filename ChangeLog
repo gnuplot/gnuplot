@@ -1,6 +1,13 @@
+2000-11-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.h, tables.h, set.c, show.c, tables.c, unset.c 
+	docs/gnuplot.doc pm3d/demo/README pm3d/demo/Demo.gp: new
+	pm3d command "[set|unset|show] colorbox" (formerly this was
+	a part of the "palette" options).
+
 2000-11-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/mouse.c: don't zoom x2 and y2 axes when in 3D plot
+	* src/mouse.c: don't zoom x2 and y2 axes when in 3D plot.
 
 2000-11-21  Johannes Zellner  <johannes@zellner.org>
 
@@ -20,16 +27,16 @@
 
 	* src/: color.c pm3d.c term.c term_api.h
 	  term/: epslatex.trm pslatex.trm post.trm
-	  pm3d: added 'FILE *postscript_gpoutfile' which is set to 
-	  'PSLATEX_auxfile' or 'gpoutfile' or '0' according to 'set term',
-	  i.e. to the file where the postscript code goes to (if outputted).
-	  Condition 'if (!postscript_gpoutfile)' can be used to distinguish 
-	  postscript terminals family (used in postscript optimized output
-	  in pm3d).
+	pm3d: added 'FILE *postscript_gpoutfile' which is set to 
+	'PSLATEX_auxfile' or 'gpoutfile' or '0' according to 'set term',
+	i.e. to the file where the postscript code goes to (if outputted).
+	Condition 'if (!postscript_gpoutfile)' can be used to distinguish 
+	postscript terminals family (used in postscript optimized output
+	in pm3d).
 
-	* src/pm3d.c: bugfix crash when plotting surface with 1 scan only
+	* src/pm3d.c: bugfix crash when plotting surface with 1 scan only.
 
-	* src/mouse.c: disable changing 3D view and scale during 'set pm3d map'
+	* src/mouse.c: disable changing 3D view and scale during 'set pm3d map'.
 
 2000-11-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -43,18 +50,18 @@
 2000-11-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.h src/getcolor.c src/color.c src/show.c term/post.trm:
-	  pm3d --- move PostScriptColorFormulae from post.trm to getcolor.c and
-	  rename them to ps_math_color_formulae
+	pm3d --- move PostScriptColorFormulae from post.trm to getcolor.c and
+	rename them to ps_math_color_formulae.
 
-	* src/getcolor.h: pm3d --- new file, declarations for getcolor.c
+	* src/getcolor.h: pm3d --- new file, declarations for getcolor.c.
 
 	* term/epslatex.trm: pm3d --- removed pm3d code from epslatex.trm which
-	  duplicated the code in post.trm, and call the particular ps.trm 
-	  functions instead
+	duplicated the code in post.trm, and call the particular ps.trm 
+	functions instead.
 
 2000-11-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* make the branched version compile under OS/2
+	* make the branched version compile under OS/2.
 
 2000-11-12  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
@@ -70,7 +77,7 @@
 
 2000-11-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/color.c, src/pm3d.c: allow pm3d compile without pslatex
+	* src/color.c, src/pm3d.c: allow pm3d compile without pslatex.
 
 2000-11-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -123,7 +130,7 @@
 
 2000-11-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* term/post.trm: fixed /h definition for pm3d gray palette 
+	* term/post.trm: fixed /h definition for pm3d gray palette.
 
 2000-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -328,7 +335,7 @@
 2000-10-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: added documentation for the "history" and 
-	  "system" commands.
+	"system" commands.
 
 2000-10-25  Johannes Zellner  <johannes@zellner.org>
 
@@ -339,9 +346,9 @@
 2000-10-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* trm/post.trm: "g" makes stroke + set(gray/rgb), "G" and "H" removed;
-	  finally supporting 'with l lt pal' too
+	finally supporting 'with l lt pal' too.
 
-	* docs/gnuplot.doc, pm3d/README: say PM3D works under Win too
+	* docs/gnuplot.doc, pm3d/README: say PM3D works under Win too.
 
 2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -415,7 +422,7 @@
 
 2000-10-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/os2/gclient.c: support for 'with l lt pal'
+	* src/os2/gclient.c: support for 'with l lt pal'.
 
 2000-10-23  Johannes Zellner  <johannes@zellner.org>
 
@@ -629,8 +636,9 @@
 	the mouse stuff.
 
 2000-09-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/graphics.c src/graph3d.c: bugfix "if ((*t->pointsize))"
-	changed to "if (t->pointsize)
+	changed to "if (t->pointsize).
 
 2000-09-20  Johannes Zellner  <johannes@zellner.org>
 
@@ -652,6 +660,7 @@
 	exponential notation). Changed MP_DPI from 300 to 2400.
 
 2000-08-02  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/graph3d.c src/graphics.c src/set.c src/show.c src/term.c
 	  src/plot.h docs/gnuplot.doc term/fig.trm:
 	allow setting arrow head(s) sizes --- new keywords `heads` and
@@ -689,21 +698,21 @@
 2000-07-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d: src/os2/gclient.c, term/pm.trm: bugfix for color palette
-	allocation ('set palette maxcolors' was ignored)
+	allocation ('set palette maxcolors' was ignored).
 
 2000-07-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c: boundary around the color box is drawn by move&line
 	for bitmap as well as postscript-including terminals.
-	Contributed by Gregor Thalhammer <Gregor.Thalhammer@uibk.ac.at>
+	Contributed by Gregor Thalhammer <Gregor.Thalhammer@uibk.ac.at>.
 
 2000-06-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/color.c: if is_log_z, then print the non-logged values of z_min
-	and z_max around the color box
+	and z_max around the color box.
 
 	* src/unset.c: 'unset pm3d' sets the y axis to noreversed if the reversed
-	has been set by 'set pm3d map'
+	has been set by 'set pm3d map'.
 
 	* pm3d: a trick for rotating the ylabel via 'set pm3d map' (see variable
 	`pm3d_map_rotate_ylabel`). That's needed because gnuplot does not have an
@@ -874,10 +883,12 @@
 	New variables: plotted_data_from_stdin, replot_disabled.
 
 2000-05-25  Petr Mikulik  <mikulik@physics.muni.cz>
-	* pm3d: support for pm3d functionality in 'pslatex / pstex' terminals
+
+	* pm3d: support for pm3d functionality in 'pslatex / pstex' terminals.
 
 2000-05-25  Petr Mikulik  <mikulik@physics.muni.cz>
-	* pm3d: unset.c: #ifdef X11 .. #endif missing in unset_pm3d()
+
+	* pm3d: unset.c: #ifdef X11 .. #endif missing in unset_pm3d().
 
 2000-05-24  Lars Hecking  <lhecking@nmrc.ie>
 
@@ -885,13 +896,16 @@
 	of zero.
 
 2000-05-16  Petr Mikulik  <mikulik@physics.muni.cz>
-	* pm3d/contrib: updated pm3dConvertToImage.awk to support colour images
+
+	* pm3d/contrib: updated pm3dConvertToImage.awk to support colour images.
 
 2000-05-11  Petr Mikulik  <mikulik@physics.muni.cz>
-	* pm3d/contrib: added pm3dConvertToImage.awk
+
+	* pm3d/contrib: added pm3dConvertToImage.awk.
 
 2000-05-09  Petr Mikulik  <mikulik@physics.muni.cz>
-	* pm3d: three new color mapping formulae 34--36: 2x,2x-0.5,2x-1
+
+	* pm3d: three new color mapping formulae 34--36: 2x,2x-0.5,2x-1.
 
 2000-05-04  Johannes Zellner  <johannes@zellner.org>
 
@@ -1139,19 +1153,21 @@
 
 2000-03-16  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* REXX unknown command crash solved
-	* minor changes to avoid compiler warnings from command.c
+	* REXX unknown command crash solved.
+
+	* minor changes to avoid compiler warnings from command.c.
 
 2000-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* let background the background of the PM window be white always
-	  (before: system background)
+	(before: system background).
 
 2000-03-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/latex.trm: Avoid compiler warning about if - else - if - else
 	without {}.
-	* let 'show bind' print bindings for Space and q (mouse.c)
+
+	* let 'show bind' print bindings for Space and q (mouse.c).
 
 2000-03-08  Johannes Zellner  <johannes@zellner.org>
 

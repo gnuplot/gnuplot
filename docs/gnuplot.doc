@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.50 2000/11/07 14:37:28 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.51 2000/11/07 23:31:33 joze Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -4664,6 +4664,7 @@ C ... and restart the table:
                              {linewidth | lw <line_width>}
                              {pointtype | pt <point_type>}
                              {pointsize | ps <point_size>}
+                              {palette}
        set nolinestyle
        show style line
 
@@ -4719,7 +4720,7 @@ C ... and restart the table:
  creates a surface plot using smooth colors according `palette`. Note, that
  this works only on few terminals.
 
- see also `help palette`, `help pm3d`
+ See also `help palette`, `help pm3d`.
 
 3 lmargin
 ?commands set lmargin
@@ -5316,16 +5317,20 @@ C ... and restart the table:
  when the data are non-gridded and the scans do not have same number of 
  points---thus it produces no artefacts.  Currently supported terminals are:
 
+   Screen terminals:
      OS/2 Presentation Manager
      X11
      Linux VGA (vgagl)
      GGI
-     Win
+     Windows
+   Files:
      PostScript
      pslatex, pstex, epslatex
      GIF
      Xfig
      tgif
+
+ (You are welcome to implement the support for other terminals, e.g. png.)
 
  The pm3d algorithm fills the region between two neighbouring points in one 
  scan with another two points in the next scan by a gray (or colour) according 
@@ -5342,25 +5347,28 @@ C ... and restart the table:
  be mapped into a colour. See `set palette` for the complete description. 
 
  The pm3d mode requires a terminal supporting filled coloured polygons and
- palettes of smooth colours. See `help set palette` for the list of currently 
- available terminals.
+ palettes of smooth colours. See above for the list of currently available
+ terminals.
 
  Notes: 
     1. What I call scan, it is called iso_curve in gnuplot sources. I am 
        physicist and we measure maps taking one scan after another scan, 
-       that's why 
+       that's why.
     2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`, 
        plus something more. This can be easily switched on by using
-       `set pm3d map`.
+       `set pm3d map`. Use `unset pm3d` before switching to 2d plots.
     3. If you find this help unclear, then your assistance is welcome.
        Similarly, any feedback for the code is welcome as well as the
-       required terminal entries for other terminals, like X11
+       required terminal entries (pm3d support) for other terminals.
+    4. pm3d mode has been developed by Petr Mikulik. It has been greatly
+       improved and support for many new terminals has been added since the
+       first public release as a gnuplot patch in March 1999.  Major
+       contributions by Johannes Zellner are very appreciated.
 
- pm3d mode has been developed by Petr Mikulik.  It is currently in a
- development stage and distributed as a patch to the current gnuplot beta
- sources.  Please read the READMEs enclosed with the pm3d patch distribution.
- You may find the current version of the patch and snapshots at my web page:
+ Please read the READMEs enclosed with the pm3d patch distribution.  
+ You may find snapshots at my web page:
          http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d
+ and you should also run pm3d/demo/Demo.gp.
 
  Syntax:
        set pm3d
@@ -5374,8 +5382,8 @@ C ... and restart the table:
                   { transparent | solid }
                   { map }
                 }
-       set nopm3d
        show pm3d
+       unset pm3d
 
  `set pm3d` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order.
@@ -5451,7 +5459,7 @@ C ... and restart the table:
  palette`. Maybe in future there could be a possibility of using more palettes, 
  which will add new option `set pm3d palette <n>`.
 
- see also `help palette`, `help x11 pm3d`, `help vgagl`
+ See also `help palette`, `help colorbox`, `help x11 pm3d`, `help vgagl`.
 
 3 palette
 ?commands set palette
@@ -5464,11 +5472,9 @@ C ... and restart the table:
  it will be implemented...  Here it stands for a palette of smooth "continuous"
  colours or grays, but let's call it just a palette.
 
- Colour palettes, or requires terminal entries for filled colour 
- polygons and palettes of smooth colours, are currently available for
- `*** fig, ggi, gif, pm, postscript, pslatex, pstex, linux vgagl, win, x11 ***`
- terminals. You are welcome to implement it for other terminals, e.g. png.
-
+ Colour palettes, or requires terminal entries for filled colour polygons and
+ palettes of smooth colours, are currently available for terminals listed in
+ `help pm3d`.
 
  Syntax:
        set palette
@@ -5478,11 +5484,6 @@ C ... and restart the table:
                   { positive | negative }
                   { nops_allcF | ps_allcF }
                   { maxcolors <maxcolors> }
-                  { nocb | cbdefault | cbuser }
-                  { cbvertical | set cbhorizontal }
-                  { origin x, y }
-                  { size x, y }
-                  { noborder | bdefault | border [line style] }
                 }
        show palette
        show palette palette <n>
@@ -5545,38 +5546,55 @@ C ... and restart the table:
  etc. Proposed usage: `set pm3d palette <n>`, `set contour ... filled palette 
  <n>`, etc.
 
-
- *** Color box properties ***
+3 color box
+?commands set colorbox
+?commands show colorbox
+?set colorbox
+?show colorbox
+?colorbox
 
  The colour scheme, i.e. the gradient of the smooth colour with min_z and max_z
- values of pm3d, is drawn in a colour box unless `nocb`.  Its position can be
- `cbdefault` or `cbuser`.  If the latter is specified the values as given
- with the `origin` and `size` subcommands are used.
+ values of `pm3d`'s `palette`, is drawn in a colour box unless `unset colorbox`.  Its
 
- `cbvertical` and `cbhorizontal` switches the orientation of the colour
+       set colorbox
+       set colorbox {
+                  { vertical | horizontal }
+                  { default | user }
+                  { origin x, y }
+                  { size x, y }
+                  { noborder | bdefault | border [line style] }
+                }
+       show colorbox
+       unset colorbox
+
+ Colorbox position can be `default` or `user`.  If the latter is specified the
+ values as given with the `origin` and `size` subcommands are used.
+
+ `vertical` and `horizontal` switches the orientation of the colour
  gradient.
 
- `origin x, y` and `size x, y` are used only in combination with the `cbuser`
+ `origin x, y` and `size x, y` are used only in combination with the `user`
  option. The x and y values must be given in screen coordinates (as everything
  else did not seem to make sense) that is between [0 - 1]. Try for example:
-     set pal cbh cbuser origin .1,.02 size .8,.04
+     set colorbox horiz user origin .1,.02 size .8,.04
  which will draw a horizontal gradient somewhere at the bottom of the graph.
 
  `border` turns the border on (this is the default). `noborder` turns the border
- off. If an positive integer argument is given after `border`, it is used as
- a line style tag which is used for drawing the border, e.g.:
+ off. If an positive integer argument is given after `border`, it is used as a
+ line style tag which is used for drawing the border, e.g.:
      set style line 2604 linetype -1 linewidth .4
-     set pal border 2604
+     set colorbox border 2604
  will use line style `2604`, a thin line with the default border color (-1)
  for drawing the border. `bdefault` (which is the default) will use the default
  border line style for drawing the border of the color box.
 
- Currently for horizontal color boxes (cbhorizontal) the labels are drawn
+ Currently for horizontal color boxes (horizontal) the labels are drawn
  above the box, if the box is at the bottom of the graph, and below the
  box, if the box is at the top of the graph. If someone does not like this,
  he/she could yet add more options for controlling how the box is drawn!
 
- see also `help pm3d`, `help x11 pm3d`, `help vgagl`, `help set style line`
+ See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`, 
+ `help set style line`.
 
 3 pointsize
 ?commands set pointsize

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.12 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.13 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -108,8 +108,9 @@ static void unset_origin __PROTO((void));
 static void unset_output __PROTO((void));
 static void unset_parametric __PROTO((void));
 #ifdef PM3D
-static void unset_palette __PROTO((void));
 static void unset_pm3d __PROTO((void));
+static void unset_palette __PROTO((void));
+static void unset_colorbox __PROTO((void));
 #endif
 static void unset_pointsize __PROTO((void));
 static void unset_polar __PROTO((void));
@@ -139,8 +140,8 @@ unset_command()
 {
     static char GPFAR unsetmess[] = 
     "valid unset options:  [] = choose one, {} means optional\n\n\
-\t'angles',  'arrow',  'autoscale',  'bar',  'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'contour', 'dgrid3d',  'dummy',\n\
+\t'angles', 'arrow', 'autoscale',  'bar', 'border', 'boxwidth', 'clabel',\n\
+\t'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d',  'dummy',\n\
 \t'encoding',  'format', 'grid', 'hidden3d',  'historysize',  'isosamples',\n\
 \t'key',  'label', 'loadpath', 'locale', 'logscale', '[blrt]margin',\n\
 \t'mapping',  'missing', 'mouse', 'multiplot', 'offsets', 'origin',\n\
@@ -275,11 +276,14 @@ unset_command()
 	unset_parametric();
 	break;
 #ifdef PM3D
+    case S_PM3D:
+	unset_pm3d();
+	break;
     case S_PALETTE:
 	unset_palette();
 	break;
-    case S_PM3D:
-	unset_pm3d();
+    case S_COLORBOX:
+	unset_colorbox();
 	break;
 #endif
     case S_POINTSIZE:
@@ -990,6 +994,15 @@ unset_palette()
 {
     c_token++;
     fprintf(stderr, "you can't unset the palette.\n");
+}
+
+
+/* process 'unset colorbox' command */
+static void
+unset_colorbox()
+{
+    c_token++;
+    color_box.where = SMCOLOR_BOX_NO;
 }
 
 

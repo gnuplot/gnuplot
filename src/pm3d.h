@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: pm3d.h,v 1.4 2000/11/02 19:07:16 lhecking Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -27,8 +27,6 @@
 #define PM3D_H
 
 #include "graph3d.h" /* struct surface_points */
-
-#define PM3D_VERSION "gp38c-pm3d"
 
 
 

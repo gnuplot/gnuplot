@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.45 2000/11/01 20:37:48 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.46 2000/11/15 15:51:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -66,6 +66,7 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.45 2000/11/01 20:37:48 joze
 
 #ifdef PM3D
 # include "pm3d.h"
+# include "getcolor.h"
 #endif
 
 #include <ctype.h>
@@ -101,6 +102,7 @@ static void show_parametric __PROTO((void));
 #ifdef PM3D
 static void show_pm3d __PROTO((void));
 static void show_palette __PROTO((void));
+static void show_colorbox __PROTO((void));
 #endif
 static void show_pointsize __PROTO((void));
 static void show_encoding __PROTO((void));
@@ -160,10 +162,10 @@ show_command()
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all',  'angles',  'arrow',  'autoscale',  'bars', 'border',\n\
-\t'boxwidth', 'clip', 'cntrparam', 'contour',  'dgrid3d', 'dummy',\n\
-\t'encoding', 'format', 'functions',  'grid',  'hidden', 'isosamples',\n\
-\t'key', 'label', 'loadpath', 'locale', 'logscale', 'mapping',\n\
-\t'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
+\t'boxwidth', 'clip', 'cntrparam', 'colorbox', 'contour', 'dgrid3d',\n\
+\t'dummy', 'encoding', 'format', 'functions',  'grid',  'hidden',\n\
+\t'isosamples', 'key', 'label', 'loadpath', 'locale', 'logscale',\n\
+\t'mapping', 'margin', 'missing', 'offsets', 'origin', 'output', 'plot',\n\
 \t'palette', 'parametric', 'pm3d', 'pointsize', 'polar',\n\
 \t'[rtuv]range', 'samples', 'size', 'style', 'terminal', 'tics',\n\
 \t'timestamp', 'timefmt', 'title', 'variables', 'version', 'view',\n\
@@ -286,11 +288,14 @@ show_command()
 	show_parametric();
 	break;
 #ifdef PM3D
+    case S_PM3D:
+	show_pm3d();
+	break;
     case S_PALETTE:
 	show_palette();
 	break;
-    case S_PM3D:
-	show_pm3d();
+    case S_COLORBOX:
+	show_colorbox();
 	break;
 #endif
     case S_POINTSIZE:
@@ -611,6 +616,7 @@ show_all()
     show_parametric();
 #ifdef PM3D
 	show_palette();
+    show_colorbox();
 	show_pm3d();
 #endif
     show_pointsize();
@@ -1541,70 +1547,42 @@ show_parametric()
 #ifdef PM3D
 static void show_palette()
 {
-    c_token++;
     /* no option given, i.e. "show palette" */
     if (END_OF_COMMAND) {
-	fprintf(stderr,"\tfigure is %s\n",
+	int i;
+	fprintf(stderr,"\tpalette is %s\n",
 	    sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "GRAY" : "COLOR");
 	fprintf(stderr,"\trgb color mapping formulae are %i,%i,%i\n",
 	    sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
 	fprintf(stderr,"\t  * there are %i available rgb color mapping formulae:",
 	    sm_palette.colorFormulae);
-	/* take the description of the color formulae from the comment to their
-	   PostScript definition */
-	{
-	    extern char *( ps_math_color_formulae[] );
-	    char *s;
-	    int i = 0;
+	/* print the description of the color formulae */
+	i = 0;
 	    while ( *(ps_math_color_formulae[2*i]) ) {
 		if (i % 3 == 0) fprintf(stderr, "\n\t    ");
 		fprintf(stderr, "%2i: %-15s",i,ps_math_color_formulae[2*i+1]);
 		i++;
 	    }
 	    fprintf(stderr, "\n");
-	}
 	fprintf(stderr,"\t  * negative numbers mean inverted=negative colour component\n");
 	fprintf(stderr,"\t  * thus the ranges in `set pm3d rgbformulae' are -%i..%i\n",
 	    sm_palette.colorFormulae-1,sm_palette.colorFormulae-1);
+	fprintf(stderr,"\t  * use 'show palette palette <n>' to print the colormap\n");
 	fprintf(stderr,"\tfigure is %s\n",
 	    sm_palette.positive == SMPAL_POSITIVE ? "POSITIVE" : "NEGATIVE");
 	fprintf(stderr,"\tall color formulae ARE%s written into output postscript file\n",
-	    sm_palette.ps_allcF == 0 ? "" : " NOT");
+	    sm_palette.ps_allcF == 0 ? " NOT" : "");
 	fprintf(stderr,"\tallocating ");
 	if (sm_palette.use_maxcolors) fprintf(stderr,"MAX %i",sm_palette.use_maxcolors);
 	else fprintf(stderr,"ALL remaining");
 	fprintf(stderr," color positions for discrete palette terminals\n");
-	if (color_box.border) {
-	    fprintf(stderr,"\tcolor box with border, ");
-	    if (color_box.border_lt_tag >= 0)
-		fprintf(stderr,"line type %d is ", color_box.border_lt_tag);
-	    else
-		fprintf(stderr,"DEFAULT line type is ");
-	} else {
-	    fprintf(stderr,"\tcolor box without border is ");
-	}
-	if (color_box.where == SMCOLOR_BOX_NO ) {
-	    fprintf(stderr,"NOT drawn\n");
-	} else if (color_box.where == SMCOLOR_BOX_DEFAULT ) {
-	    fprintf(stderr,"drawn at DEFAULT position\n");
-	} else if (color_box.where == SMCOLOR_BOX_USER ) {
-	    fprintf(stderr,"drawn at USER position:\n");
-	    fprintf(stderr,"\t\torigin: %f, %f\n", color_box.xorigin, color_box.yorigin);
-	    fprintf(stderr,"\t\tsize  : %f, %f\n", color_box.xsize  , color_box.ysize  );
-	} else {
-	    /* should *never* happen */
-	    fprintf(stderr, "%s:%d please report this bug to <johannes@zellner.org>\n", __FILE__, __LINE__);
-	}
-	fprintf(stderr,"\tcolor gradient is %s in the color box\n",
-	    color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");
 	return;
     }
     /* option: "show palette palette <n>" */
-    if (almost_equals(c_token, "pal$ette")) {
+    if (almost_equals(c_token-1, "pal$ette")) {
 	int colors, i;
 	struct value a;
 	double gray, r, g, b;
-	extern double GetColorValueFromFormula (int formula, double x);
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token,"palette size required");
@@ -1613,7 +1591,7 @@ static void show_palette()
 	if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY)
 	    printf("Gray palette with %i discrete colors\n", colors);
 	else
-	    printf("Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i\n",
+	    printf("Color palette with %i discrete colors, formulae R=%i, G=%i, B=%i:\n",
 		colors, sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB);
 	for (i = 0; i < colors; i++) {
 	    gray = (double)i / (colors - 1); /* colours equidistantly from [0,1] */
@@ -1635,6 +1613,35 @@ static void show_palette()
     }
     /* wrong option to "show palette" */
     int_error(c_token,"required 'show palette' or 'show palette palette <n>'");
+}
+
+
+static void show_colorbox()
+{
+    c_token++;
+    if (color_box.border) {
+	fprintf(stderr,"\tcolor box with border, ");
+	if (color_box.border_lt_tag >= 0)
+	    fprintf(stderr,"line type %d is ", color_box.border_lt_tag);
+	else
+	    fprintf(stderr,"DEFAULT line type is ");
+    } else {
+	fprintf(stderr,"\tcolor box without border is ");
+    }
+    if (color_box.where == SMCOLOR_BOX_NO ) {
+	fprintf(stderr,"NOT drawn\n");
+    } else if (color_box.where == SMCOLOR_BOX_DEFAULT ) {
+	fprintf(stderr,"drawn at DEFAULT position\n");
+    } else if (color_box.where == SMCOLOR_BOX_USER ) {
+	fprintf(stderr,"drawn at USER position:\n");
+	fprintf(stderr,"\t\torigin: %f, %f\n", color_box.xorigin, color_box.yorigin);
+	fprintf(stderr,"\t\tsize  : %f, %f\n", color_box.xsize  , color_box.ysize  );
+    } else {
+	/* should *never* happen */
+	fprintf(stderr, "%s:%d please report this bug to <johannes@zellner.org>\n", __FILE__, __LINE__);
+    }
+    fprintf(stderr,"\tcolor gradient is %s in the color box\n",
+	color_box.rotation == 'v' ? "VERTICAL" : "HORIZONTAL");
 }
 
 

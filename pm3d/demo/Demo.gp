@@ -7,9 +7,10 @@
 
 # Prepared by Petr Mikulik
 # History: 
+# 	- 18.11. 2000: updated for 'set colorbox'
+# 	- 03. 3. 2000: updated to show new pm3d features (Johannes Zellner)
 #	- 15. 6. 1999: update for `set pm3d`+`set palette`
 # 	- 29. 4. 1999: 1st version
-# 	- 03. 3. 2000: updated to show new pm3d features (Johannes Zellner)
 
 
 print "Working..."
@@ -183,26 +184,20 @@ splot y
 pause -1 "Press Enter."
 
 set title "color box is on again, now with horizontal gradient"
-set palette cbhorizontal
+set colorbox horizontal
 replot 
 pause -1 "Press Enter."
 
 set title "color box is switched off"
-set palette nocb
+unset colorbox
 replot 
 pause -1 "Press Enter."
 
-set title 'using again "set pm3d solid"'
-set palette nocb
+set title 'using again "set pm3d solid; unset colorbox"'
+unset colorbox
 set pm3d solid
 replot 
 pause -1 "Press Enter."
-
-set title "Any position of the color box has not been implemented. Volunteer?"
-unset pm3d
-replot
-pause -1 "Press Enter."
-
 
 set xlabel "X LABEL"
 set ylabel "Y LABEL" 7
@@ -211,6 +206,7 @@ set sample 11; set isosamples 11
 unset surface
 set pm3d
 set palette
+set colorbox
 set lmargin 0
 set view 180,0,1.3; set yrange [*:*] reverse
 #set term table; set out 'demo.dat'
@@ -250,6 +246,32 @@ set pm3d at s solid; set palette gray
 splot abs(x)**3+abs(y)**3
 pause -1 "Press Enter."
 
+set pal color
+set xrange [*:*]; set yrange [*:*]
+set title "function 'x+y' using all colors available, 'set pal maxcolors 0'"
+set pal maxcolors 0
+splot x+y
+pause -1 "Press Enter."
+
+set xrange [*:*]; set yrange [*:*]
+set title "function 'x+y' using only 5 colors, 'set pal maxcolors 5'"
+set pal maxcolors 5
+splot x+y
+pause -1 "Press Enter."
+
+set pal maxcolors 0
+unset pm3d
+set surface
+set format z
+set palette
+set title "color lines: 'splot sin(y)/(y) with linesp lt pal'"
+set ticslevel 0
+set border 4095
+set xrange [-10:10]; set yrange [-10:10]
+set hidden3d
+set isosamples 40,40; set samples 40,40
+splot sin(y)/(y) w lp lt pal
+pause -1
 
 reset
 set title "Demo for clipping of 2 rectangles will come. Now xrange is [0:2]"
@@ -261,7 +283,7 @@ splot 'demoTwo.dat'
 pause -1 "Press Enter."
 
 set xrange [0:1.5]
-
+set yrange [*:*]
 set title "...now xrange is [0:1.5] and 'set pm3d clip1in'"
 set pm3d clip1in
 replot

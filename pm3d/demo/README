@@ -6,10 +6,12 @@ Requirements: gnuplot with pm3d; awk, sed; ghostview; gif viewer
 
 Demo.gp
   This demo can be run if your default terminal supports pm3d.
-  The following terminals are currently supporting this:
+  The following screen terminals are currently supporting this:
 	- OS/2 Presentation Manager
 	- X11
 	- Linux VGA
+	- GGI
+	- Windows
 
 Demo-PostScript.gp
   Makes one postscript file with all demo pictures.
@@ -29,5 +31,4 @@ Demo-Gif-xv-pipe.gp
 
 Note: Xfig demo is not available, try this yourself.
 
-Petr Mikulik, 30. 4. 1999, and March 2000
-
+Petr Mikulik, 30. 4. 1999, and November 2000

@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.26.2.3 2000/10/23 04:35:28 joze Exp $
+ * $Id: gif.trm,v 1.29 2000/10/31 19:59:32 joze Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -361,8 +361,8 @@ GIF_reset()
 
 #ifdef PM3D
 
-#if 1
-/* use  #if 1  that's just for debuggin */
+#if 0
+/* use  #if 1  that's just for debugging */
 void GIF_show_current_palette()
 {
 int i;

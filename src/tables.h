@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.15 2000/10/31 19:59:31 joze Exp $
+ * $Id: tables.h,v 1.16 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -88,7 +88,7 @@ enum set_id {
     S_MZTICS, S_NOMZTICS,
     S_OFFSETS, S_ORIGIN, S_OUTPUT, S_PARAMETRIC,
 #ifdef PM3D
-    S_PALETTE, S_PM3D,
+    S_PALETTE, S_PM3D, S_COLORBOX,
 #endif
     S_PLOT, S_POINTSIZE, S_POLAR,
     S_RRANGE, S_SAMPLES, S_SIZE, S_SURFACE, S_STYLE, S_TERMINAL, S_TERMOPTIONS,

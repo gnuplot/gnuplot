@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.41 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.42 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -110,8 +110,9 @@ static void set_origin __PROTO((void));
 static void set_output __PROTO((void));
 static void set_parametric __PROTO((void));
 #ifdef PM3D
-static void set_palette __PROTO((void));
 static void set_pm3d __PROTO((void));
+static void set_palette __PROTO((void));
+static void set_colorbox __PROTO((void));
 #endif
 static void set_pointsize __PROTO((void));
 static void set_polar __PROTO((void));
@@ -162,8 +163,8 @@ set_command()
     static char GPFAR setmess[] = 
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'angles',  'arrow',  'autoscale',  'bars',  'border', 'boxwidth',\n\
-\t'clabel', 'clip', 'cntrparam', 'contour', 'data style',  'dgrid3d',\n\
-\t'dummy',  'encoding',  'format', 'function style',   'grid',\n\
+\t'clabel', 'clip', 'cntrparam', 'colorbox', 'contour', 'data style',\n\
+\t'dgrid3d',  'dummy',  'encoding',  'format', 'function style', 'grid',\n\
 \t'hidden3d',  'historysize', 'isosamples', 'key', 'label', 'linestyle',\n\
 \t'locale',  'logscale', '[blrt]margin', 'mapping', 'missing', 'mouse',\n\
 \t'multiplot',  'offsets', 'origin', 'output', 'palette', 'parametric',\n\
@@ -329,11 +330,14 @@ set_command()
 	    set_parametric();
 	    break;
 #ifdef PM3D
+	case S_PM3D:
+	    set_pm3d();
+	    break;
     case S_PALETTE:
 	set_palette();
 	break;
-    case S_PM3D:
-	set_pm3d();
+	case S_COLORBOX:
+	    set_colorbox();
 	break;
 #endif
 	case S_POINTSIZE:
@@ -2177,11 +2181,6 @@ set_palette()
 	sm_palette.positive = SMPAL_POSITIVE;
 	sm_palette.ps_allcF = 0;
 	sm_palette.use_maxcolors = 0;
-
-	color_box.where = SMCOLOR_BOX_DEFAULT;
-	color_box.rotation = 'v';
-	color_box.border = 1;
-	color_box.border_lt_tag = -1; /* use default border */
     }
     else { /* go through all options of 'set palette' */
 	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
@@ -2247,29 +2246,54 @@ set_palette()
 		sm_palette.use_maxcolors = i;
 		continue;
 	    }
-	    /* Now color box properties */
+	    int_error(c_token,"invalid palette option");
+	} /* end of while over palette options */
+    }
+}
+
+
+/* process 'set colorobox' command */
+static void
+set_colorbox()
+{
+    c_token++;
+
+    if (END_OF_COMMAND) { /* assume default settings */
+	color_box.where = SMCOLOR_BOX_DEFAULT;
+	color_box.rotation = 'v';
+	color_box.border = 1;
+	color_box.border_lt_tag = -1; /* use default border */
+    }
+    else { /* go through all options of 'set colorbox' */
+	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
 	    /* vertical or horizontal color gradient */
-	    if (almost_equals(c_token, "cbv$ertical")) {
+	    if (almost_equals(c_token, "v$ertical")) {
 		color_box.rotation = 'v';
 		continue;
 	    }
-	    if (almost_equals(c_token, "cbh$orizontal")) {
+	    if (almost_equals(c_token, "h$orizontal")) {
 		color_box.rotation = 'h';
 		continue;
 	    }
-	    /* color box where: no box, default position, position by user */
-	    if (equals(c_token, "nocb")) {
+#if 0
+	    /* obsolete -- used 'unset colorbox' instead */
+	    /* color box where: no box */
+	    if (equals(c_token, "no")) {
 		color_box.where = SMCOLOR_BOX_NO;
 		continue;
 	    }
-	    if (almost_equals(c_token, "cbdef$ault")) {
+#endif
+	    /* color box where: default position */
+	    if (almost_equals(c_token, "def$ault")) {
 		color_box.where = SMCOLOR_BOX_DEFAULT;
 		continue;
 	    }
-	    if (almost_equals(c_token, "cbu$ser")) {
+	    /* color box where: position by user */
+	    if (almost_equals(c_token, "u$ser")) {
 		color_box.where = SMCOLOR_BOX_USER;
 		continue;
 	    }
+	    /* border of the color box */
 	    if (almost_equals(c_token, "bo$rder")) {
 
 		color_box.border = 1;
@@ -2325,8 +2349,8 @@ set_palette()
 		} 
 		continue;
 	    }
-	    int_error(c_token,"invalid palette option");
-	} /* end of while over palette options */
+	    int_error(c_token,"invalid colorbox option");
+	} /* end of while over colorbox options */
     }
 }
 
