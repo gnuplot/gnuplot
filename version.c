@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: version.c,v 1.344 1998/04/14 00:38:57 drd Exp $";
+static char *RCSid = "$Id: version.c,v 1.345 1998/05/19 18:05:03 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - version.c */
@@ -46,7 +46,10 @@ static char *RCSid = "$Id: version.c,v 1.344 1998/04/14 00:38:57 drd Exp $";
  * do not agree with the one in the log. I hope to fix this some time soon.
  *
  * $Log: version.c,v $
- * Revision 1.344  1998/04/14  00:38:57  drd
+ * Revision 1.345  1998/05/19 18:05:03  ddenholm
+ * drd: add missing stdfn.c file
+ *
+ * Revision 1.344  1998/04/14 00:38:57  drd
  * drd: oops - forgot to bump version number with last checkin.
  *
  * Revision 1.343  1998/03/22  23:31:31  drd
@@ -1603,8 +1606,8 @@ static char *RCSid = "$Id: version.c,v 1.344 1998/04/14 00:38:57 drd Exp $";
  */
 
 char version[] = "3.5 (pre 3.6)";
-char patchlevel[] = "beta 344";
-char date[] = "Tue Apr 14 01:38:00 BST 1998"; 
+char patchlevel[] = "beta 345";
+char date[] = "Tue May 19 19:04:41 BST 1998"; 
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
 

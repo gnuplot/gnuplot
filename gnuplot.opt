@@ -22,6 +22,7 @@ set
 show
 specfun
 standard
+stdfn
 term
 time
 util

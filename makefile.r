@@ -2,7 +2,7 @@
 # $Id: makefile.r,v 1.7 1998/04/14 00:15:55 drd Exp $
 #
 # $Log: makefile.r,v $
-# Revision 1.7  1998/04/14  00:15:55  drd
+# Revision 1.7  1998/04/14 00:15:55  drd
 # HBB, Lars : latest mega monster patches. (Yes, this was supposed
 #             to be frozen...)
 #

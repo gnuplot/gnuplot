@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.8 1998/04/14 00:15:49 drd Exp $
+# $Id: makefile.all,v 1.9 1998/05/19 20:55:36 ddenholm Exp $
 #
 ########################################################
 #
@@ -31,6 +31,10 @@
 
 ####################################################################
 # List of object files except version.$(O)
+#
+# If you add files here, please also add them to gnuplot.opt,
+# which is used on various platforms (VMS, NT, ..?)
+
 COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) datafile.$(O) eval.$(O) fit.$(O)\
        graphics.$(O) graph3d.$(O) help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O)\
        matrix.$(O) misc.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O)\
