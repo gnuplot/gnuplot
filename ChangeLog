@@ -1,3 +1,19 @@
+2001-06-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (histeps_current_plot, histeps_compare): New
+ 	file-scope variable and comparison function, used in applying
+ 	qsort() to sorting the datapoints in "histeps" mode.
+	(plot_histeps): Use qsort() instead of homegrown bubblesort
+ 	implementation to sort datapoints by x. Removed now-unused locals
+ 	'bigi' and 'hold'.
+	(plot_histeps): Don't blindly assume 0.0 is the baseline y
+ 	position for the histogram.  For logarithmic y axis, it isn't.
+  	Set up new local 'y_null' to hold the correct position.
+	
+	* alloc.c (gp_alloc): Fix return type to 'generic pointer'.
+
+	* alloc.h (gp_alloc): Update prototype.
+
 2001-05-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/pslatex.trm (PSLATEX_graphics): Use PSLATEX_{X|Y}MAX

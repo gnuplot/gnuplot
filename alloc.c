@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: alloc.c,v 1.12 1998/03/22 22:31:16 drd Exp $";
+static char *RCSid = "$Id: alloc.c,v 1.1.1.2 1998/04/15 19:21:56 lhecking Exp $";
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -154,9 +154,10 @@ void check_pointer_in_block(void *block, void *p, int size, char *file, int line
 	}
 }
 
-char *gp_alloc(size, usage)
-unsigned long size;
-char *usage;
+generic *
+gp_alloc(size, usage)
+    unsigned long size;
+    char *usage;
 {
 	struct frame_struct *p;
 	unsigned long total_size = size + RESERVED_SIZE + 1;
@@ -263,7 +264,7 @@ void end_leak_check(char *file, int line)
  * so it depends on this using malloc().
  */
 
-char *
+generic *
 gp_alloc(size, message)
 	unsigned long size;		/* # of bytes */
 	char *message;			/* description of what is being allocated */
