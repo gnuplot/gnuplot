@@ -1,3 +1,17 @@
+2004-10-13  Harald Harders  <h.harders@tu-bs.de>
+
+	* src/graph3d.c (map3d_position_r get_arrow3d):
+	Change the interface of the function map3d_position_r() to be similar 
+	to map_position_r().  Now, map3d_position_r() does not need to get the 
+	startpoint.  This will make it easier to use it for all kinds of 
+	relative coordinates as text offsets.
+
+	* src/graphics.c (get_arrow):  map_position_r already handles the
+	relative position; no need to duplicate it in get_arrow.
+
+	* docs/gnuplot.doc: Mention that relative coordinates in log scale
+	imply a multiplicative rather than an additive offset.
+
 2004-10-12  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (place_labels): Add a TBOOLEAN flag to indicate whether

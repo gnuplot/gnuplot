@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.126 2004/10/12 18:10:14 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.127 2004/10/12 22:05:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1047,30 +1047,17 @@ get_arrow(
     unsigned int* ex, unsigned int* ey)
 {
     if (arrow->relative) {
-	if (arrow->start.scalex == arrow->end.scalex &&
-	    arrow->start.scaley == arrow->end.scaley) {
-	    /* coordinate systems are equal. The advantage of
-	     * handling this special case is that it works also
-	     * for logscale (which might not work otherwise, if
-	     * the relative arrows point downwards for example) */
-	    struct position delta_pos;
-	    delta_pos = arrow->start;
-	    delta_pos.x += arrow->end.x;
-	    delta_pos.y += arrow->end.y;
-	    map_position(&arrow->start, sx, sy, "arrow");
-	    map_position(&delta_pos, ex, ey, "arrow");
-	} else {
-	    /* different coordinate systems:
-	     * add the values in the drivers
-	     * coordinate system */
-	    double sx_d, sy_d, ex_d, ey_d;
-	    map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
-	    map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
-	    *sx = (unsigned int)sx_d;
-	    *sy = (unsigned int)sy_d;
-	    *ex = (unsigned int)(ex_d + sx_d);
-	    *ey = (unsigned int)(ey_d + sy_d);
-	}
+	/* different coordinate systems:
+	 * add the values in the drivers
+	 * coordinate system.
+	 * For log scale: relative coordinate is factor */
+	double sx_d, sy_d, ex_d, ey_d;
+	map_position_double(&arrow->start, &sx_d, &sy_d, "arrow");
+	map_position_r(&arrow->end, &ex_d, &ey_d, "arrow");
+	*sx = (unsigned int)sx_d;
+	*sy = (unsigned int)sy_d;
+	*ex = (unsigned int)(ex_d + sx_d);
+	*ey = (unsigned int)(ey_d + sy_d);
     } else {
 	map_position(&arrow->start, sx, sy, "arrow");
 	map_position(&arrow->end, ex, ey, "arrow");

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.97 2004/09/19 23:42:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.98 2004/09/24 21:42:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -166,7 +166,7 @@ static TBOOLEAN get_arrow3d __PROTO((struct arrow_def*, unsigned int*, unsigned 
 static void place_arrows3d __PROTO((int));
 static void place_labels3d __PROTO((struct text_label * listhead, int layer));
 static int map3d_getposition __PROTO((struct position* pos, const char* what, double* xpos, double* ypos, double* zpos));
-static void map3d_position_r __PROTO((struct position* pos1, struct position* pos2, unsigned int* x, unsigned int* y, const char* what));
+static void map3d_position_r __PROTO((struct position* pos, int* x, int* y, const char* what));
 
 /*
  * The Amiga SAS/C 6.2 compiler moans about macro envocations causing
@@ -459,22 +459,9 @@ get_arrow3d(
 	return FALSE;
 
     if (arrow->relative) {
-	if (arrow->start.scalex == arrow->end.scalex &&
-	    arrow->start.scaley == arrow->end.scaley &&
-	    arrow->start.scalez == arrow->end.scalez) {
-	    /* coordinate systems are equal. The advantage of
-	     * handling this special case is that it works also
-	     * for logscale (which might not work otherwise, if
-	     * the relative arrows point downwards for example) */
-	    struct position delta_pos;
-	    delta_pos = arrow->start;
-	    delta_pos.x += arrow->end.x;
-	    delta_pos.y += arrow->end.y;
-	    delta_pos.z += arrow->end.z;
-	    map_position(&delta_pos, ex, ey, "arrow");
-	} else {
-	    map3d_position_r(&(arrow->start), &(arrow->end), ex, ey, "arrow");
-	}
+	map3d_position_r(&(arrow->end), ex, ey, "arrow");
+	*ex += *sx;
+	*ey += *sy;
     } else {
 	map3d_position(&(arrow->end), ex, ey, "arrow");
     }
@@ -2811,37 +2798,45 @@ map3d_position(
 
 static void
 map3d_position_r(
-    struct position *pos_s,
-    struct position *pos_e,
-    unsigned int *x, unsigned int *y,
+    struct position *pos,
+    int *x, int *y,
     const char *what)
 {
-    double xpos_s = pos_s->x;
-    double ypos_s = pos_s->y;
-    double zpos_s = pos_s->z;
-    int screens1 = map3d_getposition(pos_s, what, &xpos_s, &ypos_s, &zpos_s);
+    double xpos = pos->x;
+    double ypos = pos->y;
+    double zpos = pos->z;
+    int screens = map3d_getposition(pos, what, &xpos, &ypos, &zpos);
 
-    double xpos_e = pos_e->x;
-    double ypos_e = pos_e->y;
-    double zpos_e = pos_e->z;
-    int screens2 = map3d_getposition(pos_e, what, &xpos_e, &ypos_e, &zpos_e);
-
-    if (screens1 == 0 && screens2 == 0) {
-	map3d_xy(xpos_s + xpos_e, ypos_s + ypos_e, zpos_s + zpos_e, x, y);
+    /* startpoint in graph coordinates */
+    if (screens == 0) {
+	unsigned int xlocal, ylocal;
+	unsigned int xoriginlocal, yoriginlocal;
+	map3d_xy(xpos, ypos, zpos, x, y);
+	if (pos->scalex == graph)
+	    xpos = X_AXIS.min;
+	else
+	    xpos = 0;
+	if (pos->scaley == graph)
+	    ypos = Y_AXIS.min;
+	else
+	    ypos = 0;
+	if (pos->scalez == graph)
+	    zpos = Z_AXIS.min;
+	else
+	    zpos = 0;
+	map3d_xy(xpos, ypos, zpos, &xoriginlocal, &yoriginlocal);
+	*x -= xoriginlocal;
+	*y -= yoriginlocal;
 	return;
     }
-    if (screens1 != 3 || screens2 != 3) {
-	graph_error("Cannot mix screen co-ordinates with other types");
-    } {
+    /* endpoint `screen' coordinates */
+    if (screens == 3) {
 	struct termentry *t = term;
-	*x = pos_s->x + pos_e->x * (t->xmax -1) + 0.5;
-	*y = pos_s->y + pos_e->y * (t->ymax -1) + 0.5;
+	*x = pos->x * (t->xmax -1) + 0.5;
+	*y = pos->y * (t->ymax -1) + 0.5;
+	return;
     }
-    /* TODO:
-     *   would it make any sense in 3d to mix screen
-     *   with non-screen coordinates ? (joze)
-     */
-
+    graph_error("Cannot mix screen co-ordinates with other types");
     return;
 }
 

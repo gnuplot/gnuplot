@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.243 2004/09/20 19:05:18 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.244 2004/09/21 08:09:45 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -559,6 +559,18 @@ C
 
  If the coordinate system for x is not specified, `first` is used.  If the
  system for y is not specified, the one used for x is adopted.
+
+ In some cases, the given coordinate is not an absolute position but a
+ relative value (e.g., the second position in `set arrow` ... `rto`).  In
+ most cases, the given value serves as difference to the first position.
+ If the given coordinate resides in a logarithmic axis the value is
+ interpreted as factor. For example,
+
+       set logscale x
+       set arrow 100,5 rto 10,2
+
+ plots an arrow from position 100,5 to position 1000,7 since the x axis is
+ logarithmic while the y axis is linear.
 
  If one (or more) axis is timeseries, the appropriate coordinate should
  be given as a quoted time string according to the `timefmt` format string.
@@ -4055,13 +4067,18 @@ C ... and restart the table:
 
  The <position>s are specified by either x,y or x,y,z, and may be preceded by
  `first`, `second`, `graph`, or `screen` to select the coordinate system.
- Unspecified coordinates default to 0.  The endpoints can be specified in
+ Unspecified coordinates default to 0.  The end points can be specified in
  one of four coordinate systems---`first` or `second` axes, `graph` or
  `screen`.  See `coordinates` for details.  A coordinate system specifier
  does not carry over from the "from" position to the "to" position.  Arrows
  outside the screen boundaries are permitted but may cause device errors.
- If the endpoint is specified by "rto" instead of "to" it is drawn relatively
- to the start point.
+ If the end point is specified by "rto" instead of "to" it is drawn relatively
+ to the start point.  For linear axes, `graph` and `screen` coordinates,
+ the distance between the start and the end point corresponds to the given 
+ relative coordinate.  For logarithmic axes, the relative given coordinate 
+ corresponds to the factor of the coordinate between start and end point.
+ Thus, a negative relative value or zero are not allowed for logarithmic
+ axes.
 
  Specifying `nohead` produces an arrow drawn without a head---a line segment.
  This gives you yet another way to draw a line segment on the plot.  By
@@ -4117,6 +4134,13 @@ C ... and restart the table:
  To draw an arrow relatively to the start point, where the relative distances
  are given in graph coordinates, use:
        set arrow from 0,-5 rto graph 0.1,0.1
+
+ To draw an arrow with relative end point in logarithmic x axis, use:
+       set logscale x
+       set arrow from 100,-5 rto 10,10
+ This draws an arrow from 100,-5 to 1000,5. For the logarithmic x axis, the
+ relative coordinate 10 means "factor 10" while for the linear y axis, the
+ relative coordinate 10 means "difference 10".
 
  To delete arrow number 2, use:
        unset arrow 2
