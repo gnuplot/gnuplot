@@ -1,7 +1,11 @@
 
-# $Id: makefile.r,v 1.6 1996/01/28 16:31:40 drd Exp $
+# $Id: makefile.r,v 1.7 1998/04/14 00:15:55 drd Exp $
 #
 # $Log: makefile.r,v $
+# Revision 1.7  1998/04/14 00:15:55  drd
+# HBB, Lars : latest mega monster patches. (Yes, this was supposed
+#             to be frozen...)
+#
 # Revision 1.6  1996/01/28  16:31:40  drd
 # drd: take out defunct atari.trm from some makefiles
 #      (try to) choose real(sqrt(z)) >= 0
