@@ -1,16 +1,65 @@
+1998-10-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING, buildvms.com, term.h: Rename NO_ALL_TERM to SHORT_TERMLIST.
+
+	* Makefile.in: Eliminate TERMFLAGS, add TERMXLIBS (for GNU libplot.a
+	from GNU plotutils). Remove misc.o target. Remove CPPFLAGS and TERMLIBS
+	from Makefile and config.status targets.
+
+	* acconfig.h: Add APOLLO, CGI, DJSVGA, GNU_PLOTUTILS, GNUGRAPH,
+	GPR, GRX21, IRIS, SUN, UNIXPC, UNIXPLOT.
+
+	* acinclude.m4: Clean up gp_MSDOS, gp_NEXT, gp_CHECK_LIB_PATH. Add
+	cases to gp_FIND_SELECT_ARGTYPES.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Add --enable options and checks for Unix and GNU plot
+	library, Apollo, SCO/cgi library, Iris, SunView, AT&T Unix PC. Add
+	to configuration report.
+
+	* misc.c: Remove extern declarations. Remove save_version() and
+	replace with show_version(fp). Indentation.
+
+	* plot.c, plot2d.c, plot3d.c, set.c, term.c, term/driver.h term/*.trm:
+	Rename outfile variable to gpoutfile (name clash with GNU plotutils
+	library). Call show_version(stderr) instead of show_version().
+
+	* plot.h: Add FAQ_LOCATION.
+
+	* setshow.h: Remove outfile declaration. Fix show_version() prototpe.
+
+	* show.c: Add faq_location. Fix show_version() calls. Rewrite
+	show_version() to accept file pointer arg, add optional prefix to
+	output, and use one single call to fprintf(). In show_version_long(),
+	make all output to stderr instead of stdout, use one single call
+	to fprintf().
+
+	* version.c: Add faq_location.
+
+	* docs/gnuplot.doc: Fix URL.
+
+	* docs/termdoc.c: Patches from Lucas Hart.
+
 1998-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Update with-PACKAGE section.
 
-	* acinclude.m4: Remove caching from gp_CHECK_HEADER_QUIET and
-	gp_CHECK_LIB_QUIET, cleanup.
+	* 0PORTING, Makefile.in, makefile.unx: The preprocessor symbol
+	is IRIS, not IRIS4D.
 
-	* aclocal.m4, configure: Regenerated.
+	* acconfig.h: Add GNUGRAPH and UNIXPLOT symbols.
+
+	* acinclude.m4: Remove caching from gp_CHECK_HEADER_QUIET and
+	gp_CHECK_LIB_QUIET, cleanup. Add new macro gp_SCO.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
 
 	* command.c, makefile.os2: Patches from Alexander Mai
 	<st002279@hrzpub.tu-darmstadt.de>.
 
 	* configure.in: Cleanup, remove caching of CPPFLAGS and TERMLIBS.
+	New options --enable-unixplot and --with-gnugraph.
 
 	* docs/gnuplot.doc: Updates by Dick Crawford <u600256@gamma.lanl.gov>.
 
@@ -21,6 +70,28 @@
 
 	* help.c(ShowSubtopics): Move spacelen out of for loop and init
 	spacelen and ispacelen to zero. Suggested by HBB.
+
+	* plot.c, plot2d.c, plot3d.c, set.c, term.c, term/driver.h,
+	term/*.trm: Rename outfile gpoutfile to	resolve clash with GNU
+	plotutils library.
+
+	* plot.h: Define _PLOT_H_ to avoid accidental includsion of <plot.h>
+	from GNU plotutils. Add FAQ_LOCATION.
+
+	* plot2d.c, plot3d.c: Add declaration of gpoutfile.
+
+	* setshow.h: Remove outfile declaration.
+
+	* show.c: Add faq_location. Rewrite show_version() to use fprintf()
+	only once. Rewrite show_version_long() to output to stderr instead
+	of stdout. Add UNIXPLOT and GNUGRAPH.
+
+	* term.h: Use GNUGRAPH independenlty of UNIXPLOT.
+
+	* version.c: Add faq_location.
+
+	* os2/gnupmdrv.c: Close all open files on first initialisation.
+	Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
 
 	* term/gif.trm: Update help text.
 
