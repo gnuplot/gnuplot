@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.84 2002/12/13 20:12:10 mikulik Exp $
+ * $Id: post.trm,v 1.85 2002/12/15 17:17:23 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2675,7 +2675,7 @@ fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
 TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 {
     if (palette == NULL) {
-        return 0;  /* postscript can do continous colors */
+        return 0;  /* postscript can do continuous colors */
     }
 
     PS_make_header(palette);

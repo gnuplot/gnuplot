@@ -1,3 +1,8 @@
+2003-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/README src/color.c term/post.trm: Changed "continous" to
+	"continuous".
+
 2003-01-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot3d.c (get_3ddata): Move dgrid3d call outside if-else
@@ -1715,7 +1720,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/09 23:34:25 $).
+	last modification date (from the tag $Date: 2003/01/13 13:22:10 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -10,7 +10,7 @@ TABLE OF CONTENTS:
   * TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES
   * TECHNICAL DETAILS ABOUT PM3D
 
-Document version: "$Id: README,v 1.3 2002/02/21 08:14:49 mikulik Exp $"
+Document version: "$Id: README,v 1.5 2002/06/10 18:49:00 mikulik Exp $"
 
 
 *******************************************************************************
@@ -601,7 +601,7 @@ entries (see below for more details):
 The topmost implementation of colour filled areas in plot3d.c:
 
 (*) pm3d mode is set on if (pm3d.where[0]). Its setting, or using 'with ...
-palette', requests the palette of continous (smooth) colours for the given
+palette', requests the palette of continuous (smooth) colours for the given
 terminal according to 'set palette' setup. The palette is created by a call to
 make_palette(). The routine make_palette() is coded in pm3d.c. It will be
 commented below.
