@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.37 2002/12/18 17:38:51 lhecking Exp $
+# $Id: makefile.os2,v 1.38 2003/01/08 16:12:23 mikulik Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x (and above)
 # using emx 0.9 (and above) and GNUMake
@@ -390,12 +390,26 @@ $(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
       $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h ..\src\config.h
 
 
+SORT_TERMINALS=1
+ifdef SORT_TERMINALS
+# sort alphabetically all terminals
+$(DOCDIR)\allterm.h: $(CORETERM)
+	# Note: untested, maybe req. bash? Test/fix it!
+	@echo "Building allterm.h"
+	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
+	     gsort -f -t':' -k2` ; do \
+	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
+	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
+	done >$@
+else
+# sequence of terminals according to "ls term/*.trm":
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
 #	cd $(TERMDIR) && type *.trm > $@
 	cd $(DOCDIR) && cat $(TERMDIR)/*.trm > allterm.c
 	cd $(DOCDIR) && $(CPP) -I$(TERMDIR) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
       sed -e "/^ *$$/d;/^#/d" > allterm.h
+endif
 
 $(DOCDIR)\doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c

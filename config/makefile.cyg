@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.17 2002/12/18 17:38:50 lhecking Exp $
+# $Id: makefile.cyg,v 1.18 2003/01/08 16:12:23 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -343,12 +343,25 @@ ALL_TERMINALS_DOC=1
 ifdef ALL_TERMINALS_DOC
 # Generate TeX documentation with the complete list of all terminals
 # (gnuplot.tex should be the same on all platforms):
+SORT_TERMINALS=1
+ifdef SORT_TERMINALS
+# sort alphabetically all terminals (note: req. sort=cygwin's, not from MS)
+allterm.h: $(CORETERM)
+	@echo "Building allterm.h"
+	@for e in `egrep "^[ 	]*START_HELP" $(CORETERM) |\
+	     sort -f -t':' -k2` ; do \
+	  f=`echo $$e |cut -d\: -f1` ; s=`echo $$e | cut -d\: -f2` ;\
+	  sed -n "/^[ 	]*$$s/,/^[ 	]*END_HELP/p" $$f ; \
+	done >$@
+else
+# sequence of terminals according to "ls term/*.trm":
 allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
 	@cat ../term/*.trm > allterm.c
 	$(CPP) $(CFLAGS) -I$../term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
+endif
 doc2tex.exe: $(D)doc2tex.c $(D)termdoc.c allterm.h
 	$(LD) $(LDFLAGS) -o $@ -DWINDOWS_NO_GUI -DALL_TERM_DOC $(CFLAGS) -I. -I$(D) -I../term -I$(T) $(D)doc2tex.c $(D)termdoc.c
 else
