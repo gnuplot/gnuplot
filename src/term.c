@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.82 2004/08/19 05:05:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.83 2004/08/21 20:58:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1471,6 +1471,11 @@ init_terminal()
 	    term_name = "apollo";
 # endif				/* APOLLO */
 #endif /* GPR    */
+
+#if defined(__APPLE__) && defined(__MACH__) && defined(HAVE_LIBAQUATERM)
+	/* Mac OS X with AquaTerm installed */
+	term_name = "aqua";
+#endif 
 
 #ifdef X11
 	env_term = getenv("TERM");	/* try $TERM */

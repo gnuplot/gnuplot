@@ -1,3 +1,8 @@
+2004-08-25  Per Persson <persquare@mac.com>
+
+	* src/term.c (init_terminal): Make aqua the default terminal on
+	Mac OS X if AquaTerm is installed.
+	
 2004-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_vector): More specific test for libgd support of
