@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.33 2001/09/19 15:47:18 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.34 2002/01/17 21:07:58 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -243,12 +243,15 @@ typedef struct plot_struct {
     char **commands;
     char titlestring[0x40];
 #ifdef USE_MOUSE
-    int button;			/* buttons which are currently pressed      */
-    char str[0xff];		/* last displayed string                    */
-    Time time;			/* time of last button press event          */
+    int button;			/* buttons which are currently pressed         */
+    char str[0xff];		/* last displayed string                       */
+    Time time;			/* time of last button press event             */
 #endif
-    int lwidth, type, user_width;	/* this and the following 3 lines declare */
-    enum JUSTIFY jmode;		/* variables used during drawing in exec_cmd() */
+    int lwidth;			/* this and the following 6 lines declare      */
+    int type;			/* variables used during drawing in exec_cmd() */
+    int user_width;
+    enum JUSTIFY jmode;
+    int angle;		/* 0 = horizontal (default), 1 = vertical      */
     int lt;
 #ifdef USE_MOUSE
     TBOOLEAN ruler_on;		/* is ruler on? */
@@ -351,8 +354,10 @@ void DisplayCoords __PROTO((plot_struct * plot, const char *s));
 int is_control __PROTO((KeySym mod));
 int is_meta __PROTO((KeySym mod));
 int is_shift __PROTO((KeySym mod));
-void exec_cmd __PROTO((plot_struct *, char *));
 #endif
+
+void DrawVerticalString __PROTO((Display* dpy, Drawable d, GC gc, int x, int y, const char* str, int len));
+void exec_cmd __PROTO((plot_struct *, char *));
 
 static plot_struct *find_plot __PROTO((Window window));
 void reset_cursor __PROTO((void));
@@ -985,6 +990,7 @@ int term_number;
     /* allow releasing of the cmap at the first drawing
      * operation if no palette was allocated until then.
      */
+    plot->angle = 0; /* default is horizontal */
 #ifdef PM3D
     plot->release_cmap = TRUE;
 #endif
@@ -1393,6 +1399,48 @@ record()
 }
 #endif /* VMS */
 
+void
+DrawVerticalString(Display* dpy, Drawable d, GC gc, int xdest, int ydest, const char* str, int len)
+{
+    int x, y, x2;
+    int width = XTextWidth(font, str, len);
+    int height = vchar;
+    char* data = (char*)malloc(width * height * sizeof (char));
+    Pixmap pixmap_src = XCreatePixmap(dpy, root, width, height, 1);
+    /* Pixmap pixmap_dest = XCreatePixmap(dpy, root, height, width, 1); */
+    XImage* image_src;
+    XImage* image_dest;
+    GC bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
+
+    /* set font and colors for the bitmap GC */
+    XSetFont(dpy, bitmapGC, font->fid);
+    XSetForeground(dpy, bitmapGC, WhitePixel(dpy, scr));
+    XSetBackground(dpy, bitmapGC, BlackPixel(dpy, scr));
+
+    /* draw string to the source bitmap */
+    XDrawImageString(dpy, pixmap_src, bitmapGC, 0, font->ascent, str, len);
+
+    /* create XImage's of depth 1 */
+    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height, 1, XYPixmap /* ZPixmap, XYBitmap */);
+    image_dest = XCreateImage(dpy, vis, 1, XYBitmap, 0, data, height, width, 8, 0);
+
+    /* copy & rotate from source --> dest */
+    for (x = 0, x2 = width - 1; x < width; x++, x2--) {
+	for (y = 0; y < height; y++) {
+	    XPutPixel(image_dest, y, x2, XGetPixel(image_src, x, y));
+	}
+    }
+
+    /* copy the rotated image to the drawable d */
+    XPutImage(dpy, d, gc, image_dest, 0, 0, xdest, ydest, height, width);
+
+    /* free resources */
+    XFreePixmap(dpy, pixmap_src);
+    XDestroyImage(image_src);
+    XDestroyImage(image_dest);
+    XFreeGC(dpy, bitmapGC);
+}
+
 
 /*-----------------------------------------------------------------------------
  *   exec_cmd - execute drawing command from inboard driver
@@ -1427,20 +1475,41 @@ exec_cmd(plot, command)
 	sl = strlen(str) - 1;
 	sw = XTextWidth(font, str, sl);
 
-	switch (plot->jmode) {
-	case LEFT:
-	    sw = 0;
-	    break;
-	case CENTRE:
-	    sw = -sw / 2;
-	    break;
-	case RIGHT:
-	    sw = -sw;
-	    break;
+
+	/* switch to text color */
+	XSetForeground(dpy, gc, plot->cmap->colors[2]);
+
+	if (1 == plot->angle) {
+	    switch (plot->jmode) {
+		case LEFT:
+		    sw = -sw;
+		    break;
+		case CENTRE:
+		    sw = -sw / 2;
+		    break;
+		case RIGHT:
+		    sw = 0;
+		    break;
+	    }
+	    /* vertical text, center horizontally about x */
+	    DrawVerticalString(dpy, plot->pixmap, gc, X(x) - vchar / 2, Y(y) + sw, str, sl);
+	} else {
+	    switch (plot->jmode) {
+		case LEFT:
+		    sw = 0;
+		    break;
+		case CENTRE:
+		    sw = -sw / 2;
+		    break;
+		case RIGHT:
+		    sw = -sw;
+		    break;
+	    }
+	    /* horizontal text */
+	    XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
 	}
 
-	XSetForeground(dpy, gc, plot->cmap->colors[2]);
-	XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
+	/* restore line color */
 	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
     } else if (*buffer == 'F') {	/* fill box */
 	int style, xtmp, ytmp, w, h;
@@ -1495,6 +1564,9 @@ exec_cmd(plot, command)
     /*   X11_justify_text(mode) - set text justification mode  */
     else if (*buffer == 'J')
 	sscanf(buffer, "J%4d", (int *) &plot->jmode);
+
+    else if (*buffer == 'A')
+	sscanf(buffer, "A%d", (int *) &plot->angle);
 
     /*  X11_linewidth(plot->lwidth) - set line width */
     else if (*buffer == 'W')
@@ -1694,6 +1766,9 @@ exec_cmd(plot, command)
 	}
     }
 #endif
+    else {
+	fprintf(stderr, "gnuplot_x11: unknown command <%s>\n", buffer);
+    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -2411,17 +2486,7 @@ xfree(void *fred)
 void
 EraseCoords(plot_struct * plot)
 {
-    if (!gc_xor) {
-	GetGCXor(plot, &gc_xor);
-    }
-
-    if (plot->str[0]) {
-	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, plot->str, strlen(plot->str));
-    }
-
-    /*
-       XFlush(dpy);
-     */
+    DrawCoords(plot, plot->str);
 }
 
 
@@ -2435,10 +2500,6 @@ DrawCoords(plot_struct * plot, const char *str)
 
     if (str[0] != 0)
 	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
-
-    /*
-       XFlush(dpy);
-     */
 }
 
 
