@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.9 1999/10/29 18:47:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.10 1999/11/08 19:24:35 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -111,7 +111,6 @@ char *full_day_names[] =
 #endif /* TEST_TIME */
 
 static char *read_int __PROTO((char *s, int nr, int *d));
-static int gdysize __PROTO((int yr));
 
 
 static char *
@@ -136,6 +135,7 @@ int nr, *d;
  * Use at your own risk
  */
 
+static int gdysize __PROTO((int yr));
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
@@ -257,8 +257,6 @@ struct tm *tm;
 	case 'Y':
 	    s = read_int(s, 4, &tm->tm_year);
 	    date++;
-	    /* tm->tm_year -= 1900; */
-	    /* HOE tm->tm_year %= 100; */
 	    break;
 
 	case 'j':
@@ -280,13 +278,36 @@ struct tm *tm;
 	    s = read_int(s, 2, &tm->tm_sec);
 	    break;
 
+	/* read EPOCH data
+	 * EPOCH is the std. unixtimeformat seconds since 01.01.1970 UTC
+	 * actualy i would need a read_long (or what time_t is else)
+	 *  aktualy this is not my idea       i got if from
+	 * AlunDa Penguin Jones (21.11.97)
+	 * but changed %t to %s because of strftime
+	 * and fixed the localtime() into gmtime()
+	 * maybe we should use ggmtime() ? but who choose double ????
+	 * Walter Harms <WHarms@bfs.de> 26 Mar 2000
+	 */
+
+	case 's':
+	    {
+		/* time_t when; */
+		int when;
+		struct tm *tmwhen;
+		s = read_int(s, 10, &when);
+		tmwhen = gmtime((time_t*)&when);
+		tmwhen->tm_year += 1900;
+		*tm = *tmwhen;
+		break;
+	    }
+
 	default:
 	    int_warn(NO_CARET, "Bad time format in string");
 	}
 	fmt++;
     }
 
-    FPRINTF((stderr, "read date-time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "read date-time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     /* now check the date/time entered, normalising if necessary
      * read_int cannot read a -ve number, but can read %m=0 then decrement
@@ -315,7 +336,7 @@ struct tm *tm;
 #undef M
 #undef H
 
-    FPRINTF((stderr, "normalised time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "normalised time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     if (date) {
 	if (yday) {
@@ -356,7 +377,7 @@ struct tm *tm;
     return (s);
 }
 
-int
+size_t
 gstrftime(s, bsz, fmt, l_clock)
 char *s;
 size_t bsz;
@@ -612,9 +633,8 @@ struct tm *tm;
 {
     register int i;
     /* returns sec from year ZERO_YEAR, defined in plot.h */
-    double dsec;
+    double dsec = 0.;
 
-    dsec = 0;
     if (tm->tm_year < ZERO_YEAR) {
 	for (i = tm->tm_year; i < ZERO_YEAR; i++) {
 	    dsec -= (double) gdysize(i);
@@ -640,7 +660,7 @@ struct tm *tm;
     dsec *= 60.0;
     dsec += tm->tm_sec;
 
-    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
+    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour,
 	     tm->tm_min, tm->tm_sec, dsec));
 
     return (dsec);
@@ -700,7 +720,7 @@ double l_clock;
     }
     tm->tm_mday = days + 1;
 
-    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     return (0);
 }
@@ -712,11 +732,11 @@ double l_clock;
 
 /* define gnu time routines in terms of system time routines */
 
-int
+size_t
 gstrftime(buf, bufsz, fmt, l_clock)
 char *buf;
-int bufsz;
-char *fmt;
+size_t bufsz;
+const char *fmt;
 double l_clock;
 {
     time_t t = (time_t) l_clock;
@@ -738,6 +758,7 @@ double l_clock;
     time_t t = (time_t) l_clock;
     struct tm *m = gmtime(&t);
     *tm = *m;			/* can any non-ansi compilers not do this ? */
+    return 0;
 }
 
 #define NOTHING

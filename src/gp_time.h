@@ -1,6 +1,5 @@
 /*
- * $Id: gp_time.h,v 1.1 1999/10/01 14:04:18 lhecking Exp $
- *
+ * $Id: gp_time.h,v 1.2 1999/11/08 19:24:15 lhecking Exp $
  */
 
 /* GNUPLOT - gp_time.h */
@@ -52,7 +51,7 @@
 char * gstrptime __PROTO((char *, char *, struct tm *));
 
 /* *tm to string */
-int gstrftime __PROTO((char *, size_t, const char *, double));
+size_t gstrftime __PROTO((char *, size_t, const char *, double));
 
 /* *tm to seconds */
 double gtimegm __PROTO((struct tm *));
