@@ -37,7 +37,7 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	plot3d.obj readline.obj scanner.obj set.obj show.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj pcgraph.obj hrcgraph.obj \
 	corgraph.obj specfun.obj binary.obj interpol.obj fit.obj matrix.obj \
-	datafile.obj alloc.obj
+	datafile.obj alloc.obj variable.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -67,7 +67,7 @@ linkopt.msc: makefile.msc
       echo (set)+(show)+(help)+(specfun)+(binary)+ >>linkopt.msc
       echo plot+plot2d+plot3d+command+internal+interpol+misc+readline+ >>linkopt.msc
       echo parse+eval+scanner+standard+stdfn+util+ >>linkopt.msc
-      echo (version)+(fit+matrix)+datafile+alloc >>linkopt.msc
+      echo (version)+(fit+matrix)+datafile+alloc+variable >>linkopt.msc
       echo gnuplot >>linkopt.msc
       echo nul; >>linkopt.msc
 
@@ -129,6 +129,8 @@ term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOU
 	$(CC) $(CFLAGS) $(TERMFLAGS) /Iterm term.c
 
 util.obj: util.c plot.h
+
+variable.obj: variable.c plot.h variable.h
 
 version.obj: version.c
 

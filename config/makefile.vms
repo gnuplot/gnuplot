@@ -41,11 +41,11 @@ TERMFLAGS = /include=[.term]
 OBJS1 = alloc.$O,binary.$O,bitmap.$O,command.$O,contour.$O,datafile.$O,eval.$O,
 OBJS2 = fit.$O,graphics.$O,graph3d.$O,hidden3d.$O,internal.$O,interpol.$O,
 OBJS3 = matrix.$O,misc.$O,parse.$O,plot.$O,plot2d.$O,plot3d.$O,scanner.$O,set.$O,
-OBJS4 = show.$O,specfun.$O,standard.$O,stdfn.$O,term.$O,time.$O,util.$O,util3d.$O,version.$O,vms.$O
+OBJS4 = show.$O,specfun.$O,standard.$O,stdfn.$O,term.$O,time.$O,util.$O,util3d.$O,version.$O,vms.$O,variable.$O
 OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
 
-CSOURCE1 = command.c set.c show.c 
-CSOURCE2 = help.c graphics.c graph3d.c internal.c 
+CSOURCE1 = command.c set.c show.c variable.c
+CSOURCE2 = help.c graphics.c graph3d.c internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c time.c util.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = [.term]aed.trm [.term]cgi.trm [.term]dumb.trm [.term]dxf.trm [.term]dxy.trm \

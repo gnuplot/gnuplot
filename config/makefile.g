@@ -63,7 +63,7 @@ EXTRA_CFLAGS=$(GTERMFLAGS) $(REGULAR_FLAGS) -DCONTACT=\"$(EMAIL)\" \
 OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
 	internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
 	scanner.o set.o show.o specfun.o standard.o term.o util.o binary.o \
-	interpol.o fit.o matrix.o datafile.o alloc.o version.o
+	interpol.o fit.o matrix.o datafile.o alloc.o variable.o version.o
 
 all: $(BIN_MAIN_CMD)/g.gnuplot $(GISBASE)/man/help/g.gnuplot
 
@@ -93,6 +93,8 @@ fit.o: fit.c fit.h matrix.h plot.h
 matrix.o: matrix.c matrix.h fit.h
 
 bitmap.o term.o: bitmap.h
+
+variable.o: variable.c plot.h variable.h
 
 ################################################################
 $(RASTERLIB): #

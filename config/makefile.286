@@ -37,7 +37,7 @@ TERMFLAGS =
 OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
 OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj util.obj
-OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj
+OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj
 BGIFILES = cga.bgi egavga.bgi herc.bgi att.bgi
 
 OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
@@ -128,6 +128,8 @@ term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOU
 	$(LITECC) $(CFLAGS) $(TERMFLAGS) -Iterm -I. term.c
 
 util.obj: util.c plot.h
+
+variable.obj: variable.c plot.h variable.h
 
 version.obj: version.c
 

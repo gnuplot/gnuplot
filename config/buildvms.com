@@ -128,6 +128,7 @@ $ cc 'cflags' 'TERMFLAGS' term.c
 $ cc 'cflags' time.c
 $ cc 'CFLAGS' util.c
 $ cc 'CFLAGS' util3d.c
+$ cc 'CFLAGS' variable.c
 $ cc 'CFLAGS' version.c
 $ cc 'CFLAGS' vms.c
 $ if its_gnuc then cc 'CFLAGS' GNU_CC_INCLUDE:[000000]_assert.c

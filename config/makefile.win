@@ -86,7 +86,7 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
 	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
-	hidden3d.obj time.obj help.obj
+	hidden3d.obj time.obj help.obj variable.obj
 
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
@@ -119,7 +119,7 @@ wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
 $(TC)\lib\C0Wl +
 bitmap command eval graphics graph3d help internal misc parse +
 plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
-binary interpol +
+binary interpol variable +
 winmain +
 readline +
 fit matrix datafile alloc util3d hidden3d time +
@@ -230,6 +230,8 @@ $(CFLAGS)
 util.obj: util.c plot.h
 
 util3d.obj: util3d.c plot.h setshow.h
+
+variable.obj: variable.c plot.h variable.h
 
 version.obj: version.c
 

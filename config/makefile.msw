@@ -37,7 +37,7 @@ OBJS =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
-	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj
+	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -138,6 +138,8 @@ term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOU
 	cl $(CFLAGS) $(TERMFLAGS) /Iterm term.c
 
 util.obj: util.c plot.h
+
+variable.obj: variable.c plot.h variable.h
 
 version.obj: version.c
 

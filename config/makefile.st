@@ -70,7 +70,8 @@ OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
          hidden3d.o util3d.o help.o internal.o misc.o parse.o \
          plot.o readline.o scanner.o set.o show.o specfun.o \
          standard.o stdfn.o term.o util.o version.o binary.o fit.o \
-         matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o
+         matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o \
+         variable.o
 
 # path prefix for the term subdirectory
 TERM=term$(SL)
@@ -128,6 +129,7 @@ stdfn.o:     stdfn.c sstdfn.h
 term.o:      term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS) $(TERMFLAGS) -Iterm term.c
 util.o:      util.c plot.h
+variable.o:  variable.c plot.h variable.h
 version.o:   version.c
 
 # convert gnuplot.doc to gnuplot.gih

@@ -6,7 +6,7 @@
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
 #
-# last modification date: 19990317 - St. Patrick's Day!
+# last modification date: 19990530
 #
 
 #
@@ -120,12 +120,12 @@ OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
        eval.o fit.o graph3d.o graphics.o help.o hidden3d.o internal.o \
        interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o scanner.o \
        set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o \
-       util3d.o version.o
+       util3d.o variable.o version.o
 
-CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c 
-CSOURCE2 = help.c graphics.c graph3d.o internal.c 
+CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
+CSOURCE2 = help.c graphics.c graph3d.o internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c \
-	standard.c stdfn.c 
+	standard.c stdfn.c variable.c
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = $(TERMDIR)/aed.trm $(TERMDIR)/ai.trm $(TERMDIR)/amiga.trm \
 	   $(TERMDIR)/apollo.trm $(TERMDIR)/atariaes.trm \
@@ -251,4 +251,5 @@ stdfn.o: stdfn.c stdfn.h
 time.o: time.c plot.h setshow.h
 util.o: util.c plot.h
 util3d.o: util3d.c plot.h setshow.h
+variable.o: variable.c plot.h variable.h
 version.o: version.c
