@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: version.c,v 1.346 1998/06/18 14:55:21 ddenholm Exp $";
+static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - version.c */
@@ -46,6 +46,10 @@ static char *RCSid = "$Id: version.c,v 1.346 1998/06/18 14:55:21 ddenholm Exp $"
  * do not agree with the one in the log. I hope to fix this some time soon.
  *
  * $Log: version.c,v $
+ * Revision 1.347  1998/06/22 12:24:56  ddenholm
+ * dd : retrieve fit.*, matrix.*, docs/latextut/makefile from earlier vsns
+ *      add  set noxdtics etc. (behave same as  set xtics)
+ *
  * Revision 1.346  1998/06/18 14:55:21  ddenholm
  * Lars : compilation of many patches posted to the net.
  * 1998-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
@@ -136,7 +140,7 @@ static char *RCSid = "$Id: version.c,v 1.346 1998/06/18 14:55:21 ddenholm Exp $"
  * 	* fit.c, matrix.c, matrix.h: fit-unlimited.diff.980105 from
  * 	Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>.
  *
- * 	* cgm.trm: Updated version, fixes "plot size change" bug, and "ugly
+ * 	* cgm.trm: Updated version, fixes "plot size change"Mon Jun 22 13:22:33 BST 1998"ugly
  * 	dashed lines" bug. From "James R. Van Zandt" <jrv@vanzandt.mv.com>.
  *
  * 	* term/README: Documentation fix from
@@ -1815,8 +1819,8 @@ static char *RCSid = "$Id: version.c,v 1.346 1998/06/18 14:55:21 ddenholm Exp $"
  */
 
 char version[] = "3.5 (pre 3.6)";
-char patchlevel[] = "beta 346";
-char date[] = "Thu Jun 18 15:52:11 BST 1998"; 
+char patchlevel[] = "beta 347";
+char date[] = "Mon Jun 22 13:22:33 BST 1998"; 
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
 
