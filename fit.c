@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.23.2.4 2001/09/26 14:55:02 broeker Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23.2.5 2002/01/31 21:22:33 lhecking Exp $";
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -619,7 +619,7 @@ static TBOOLEAN fit_interrupt()
     frame routine for the marquardt-fit
 *****************************************************************/
 static TBOOLEAN regress(a)
-double a[];
+    double a[];
 {
     double **covar, *dpar, **C, chisq, last_chisq, lambda;
     int iter, i, j;
@@ -635,7 +635,7 @@ double a[];
 
     /* Initialize internal variables and 1st chi-square check */
     if ((res = marquardt(a, C, &chisq, &lambda)) == ERROR)
-	Eex("FIT: error occured during fit");
+	Eex("FIT: error occurred during fit");
     res = BETTER;
 
     show_fit(iter, chisq, chisq, a, lambda, STANDARD);
@@ -715,7 +715,7 @@ double a[];
     }
 
     if (res == ERROR)
-	Eex("FIT: error occured during fit");
+	Eex("FIT: error occurred during fit");
 
     /* compute errors in the parameters */
 
