@@ -1,3 +1,28 @@
+1998-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, 0PORTING: Updated.
+
+	* Makefile.in, makefile.all: Add new file syscfg.h to HEADERS variable.
+
+	* acconfig.h: Remove obsolete defines.
+
+	* bf_test.c, gplt_x11.c, readline.c, stdfn.c: Include plot.h instead
+	of config.h, ansichek.h and stdfn.h. Make enum JUSTIFY local in
+	gplt_x11.c(display).
+
+	* configure, config.hin: Regenerated.
+
+	* configure.in: Move some tests, rewrite some header and library tests.
+
+	* fit.c: Fix bug in vector resizing of bigger than default data sets.
+	By Andris Pavenis <pavenis@lanet.lv>. Don't include config.h.
+
+	* plot.h, stdfn.h: Move OS dependent defines to new file syscfg.h.
+
+	* plot2d.c: Fix typo in #define.
+
+	* syscfg.h: New file for OS dependencies.
+
 1998-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acconfig.h, ansichek.h, hidden3d, plot2d.c, plot3d.c, docs/doc2x.h:
