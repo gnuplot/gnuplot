@@ -169,7 +169,7 @@ TERM_PUBLIC void IRIS4D_init()
 	for (i = 0; i < COLOR24_SIZE; i++) {
 	    if (fgets(line, 79, f) == NULL ||
 		sscanf(line, "%d %d %d", &c1, &c2, &c3) != 3)
-		int_error("Iris4d color file terminated prematurely or wrong format.\n", NO_CARET);
+		int_error(NO_CARET, "Iris4d color file terminated prematurely or wrong format.\n");
 	    colors24bits[i][0] = c1;
 	    colors24bits[i][1] = c2;
 	    colors24bits[i][2] = c3;

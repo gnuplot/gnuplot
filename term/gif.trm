@@ -345,9 +345,9 @@ TERM_PUBLIC void GIF_options()
 	    char *string = input_line + token[c_token].start_index;
 	    unsigned long color;
 	    if (sscanf(string, "x%lx", &color) != 1) {
-		int_error("invalid color spec, must be xRRGGBB", c_token);
+		int_error(c_token, "invalid color spec, must be xRRGGBB");
 	    } else if (gif_state.n_colors == GIF_MAX_COLORS) {
-		int_warn("too many colors, ingoring", c_token);
+		int_warn(c_token, "too many colors, ingoring");
 		++c_token;
 	    } else {
 		gif_state.rgb_table[gif_state.n_colors++] = color;

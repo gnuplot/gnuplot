@@ -391,7 +391,7 @@ TERM_PUBLIC void EMXVESA_options()
 TERM_PUBLIC void EMXVESA_init()
 {
     if (!g_mode(emx_vesamode))
-	int_error("Couldn't select graphics mode", NO_CARET);
+	int_error(NO_CARET, "Couldn't select graphics mode");
     emx_xlast = g_xsize - 1;
     term->xmax = emx_xlast + 1;
     emx_ylast = g_ysize - 1;
@@ -408,7 +408,7 @@ TERM_PUBLIC void EMXVESA_text()
     ch = getch();
     g_mode(GTEXT);
     if (ch == 3)
-	int_error("Interrupt", NO_CARET);
+	int_error(NO_CARET, "Interrupt");
 }
 TERM_PUBLIC void EMXVESA_reset()
 {

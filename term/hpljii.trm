@@ -187,8 +187,7 @@ TERM_PUBLIC void HPLJIIoptions()
     }
 
     if (parse_error)
-	int_error("expecting dots per inch size 75, 100, 150 or 300",
-		  c_token);
+	int_error(c_token, "expecting dots per inch size 75, 100, 150 or 300");
 }
 
 

@@ -145,7 +145,7 @@ void LINUX_setup(void)
 TERM_PUBLIC void LINUX_options()
 {
     if (!LINUX_graphics_allowed) {
-	int_error("Linux terminal driver not available", NO_CARET);
+	int_error(NO_CARET, "Linux terminal driver not available");
     }
     fprintf(stderr, "%s\n", vga_getmodename(linux_vmode));
 }

@@ -286,7 +286,7 @@ TERM_PUBLIC void NECoptions()
 	/* error, but since the terminal is already set, default to mono */
 	strcpy(term_options, "monochrome");
 	NECmode = 'm';
-	int_error("modes: color, monochrome, draft", c_token);
+	int_error(c_token, "modes: color, monochrome, draft");
     }
 }
 

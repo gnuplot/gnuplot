@@ -115,7 +115,7 @@ TERM_PUBLIC void CGI_init()
 TERM_PUBLIC void HCGI_init()
 {
     if (getenv(cgidriver = "CGIPRNT") == NULL)
-	int_error("no CGI driver", NO_CARET);
+	int_error(NO_CARET, "no CGI driver");
 }
 
 
@@ -124,7 +124,6 @@ TERM_PUBLIC void CGI_graphics()
     int i, aspect;
     char *s;
     short font_cap[9];
-    char err_str[80];
 
     if ((s = getenv("ASPECT")) != NULL && (aspect = atoi(s)) >= 0 && aspect <= 3)
 	gin[0] = aspect;
@@ -133,8 +132,7 @@ TERM_PUBLIC void CGI_graphics()
     gin[18] = ' ';
 
     if (v_opnwk(gin, &cgidev, gout) < 0) {
-	sprintf(err_str, "CGI error %d opening %s", -vq_error(), cgidriver);
-	int_error(err_str, NO_CARET);
+	int_error(NO_CARET, "CGI error %d opening %s", -vq_error(), cgidriver);
     }
     vqt_representation(cgidev, 9, font_cap);
     CGI_VCHAR = font_cap[8] * 3 / 2;

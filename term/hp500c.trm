@@ -151,7 +151,7 @@ TERM_PUBLIC void HP500Coptions()
 #define HPDJCERROR "expecting dots per inch size 75, 100, 150 or 300 and/or compression method"
     while (!END_OF_COMMAND) {
 	if (token[c_token].length > 4)
-	    int_error(HPDJCERROR, c_token);
+	    int_error(c_token, HPDJCERROR);
 
 	/* almost_equals() won't accept numbers - use strcmp() instead */
 	capture(opt, c_token, c_token, 6);

@@ -262,18 +262,18 @@ TERM_PUBLIC void TGIF_options()
 	if (equals(c_token, "[")) {	/* windows specified */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("no. windows: [horizontal,vertical] expected", c_token);
+		int_error(c_token, "no. windows: [horizontal,vertical] expected");
 	    } else if (!equals(c_token, ",")) {
 		uTgif_win_horiz = (int) real(const_express(&a));
 	    }
 	    if (!equals(c_token, ","))
-		int_error("',' expected", c_token);
+		int_error(c_token, "',' expected");
 	    c_token++;
 	    if (!equals(c_token, "]")) {
 		uTgif_win_verti = (int) real(const_express(&a));
 	    }
 	    if (!equals(c_token, "]"))
-		int_error("expecting ']'", c_token);
+		int_error(c_token, "expecting ']'");
 	    c_token++;
 
 	    uTgifPlotsPerPage = uTgif_win_verti * uTgif_win_horiz;

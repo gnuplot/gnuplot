@@ -136,7 +136,7 @@ void PNGoptions()
 	    /* reset to default, since term is already set */
 	    png_font = 1;
 	    png_mode = 0;
-	    int_error("expecting: {small, medium, large} and {monochrome, gray, color}", c_token);
+	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
 	}
 	c_token++;
     }

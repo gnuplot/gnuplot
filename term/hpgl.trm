@@ -572,10 +572,10 @@ TERM_PUBLIC void HPGL_options()
 	    HPGL_numpen = (int) real(&token[c_token].l_val);
 	    if (HPGL_numpen <= 0) {
 		HPGL_numpen = 6;
-		int_error("Number of pens must be positive", c_token);
+		int_error(c_token, "Number of pens must be positive");
 	    }
 	} else
-	    int_error("expecting \"eject\" or number of pens", c_token);
+	    int_error(c_token, "expecting \"eject\" or number of pens");
 
 	c_token++;
     }
@@ -597,7 +597,7 @@ TERM_PUBLIC void HPGL2_options()
 	if (i < HPGL2_FONTS) {
 	    HPGL2_font = &HPGL2_font_table[i];
 	} else
-	    int_error("expecting font: stick, cg_times, or univers", c_token);
+	    int_error(c_token, "expecting font: stick, cg_times, or univers");
 	c_token++;
 	if (!END_OF_COMMAND) {
 	    if ((point_size = real(&token[c_token].l_val)) > 0.0) {
@@ -608,7 +608,7 @@ TERM_PUBLIC void HPGL2_options()
 		else
 		    HPGL2_font->pitch = 72 * 3 / (point_size * 2);
 	    } else
-		int_error("expecting font point size: real number", c_token);
+		int_error(c_token, "expecting font point size: real number");
 	    c_token++;
 	}
     }
@@ -634,7 +634,7 @@ TERM_PUBLIC void PCL_options()
 	if (i < PCL_MODES)
 	    PCL_mode = &PCL_mode_table[i];
 	else
-	    int_error("expecting mode: portrait or landscape", c_token);
+	    int_error(c_token, "expecting mode: portrait or landscape");
 	c_token++;
     }
     sprintf(term_options, " %s", PCL_mode->name);

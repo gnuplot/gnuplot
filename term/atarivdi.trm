@@ -143,7 +143,7 @@ TERM_PUBLIC void VDI_options()
 	    VDI_numpalette = 0;
 	    VDI_c_height = VDI_c_height_default;
 	    term_options[0] = NUL;
-	    int_error(VDIHEXERROR, c_token);
+	    int_error(c_token, VDIHEXERROR);
 	}
 	capture(opt, c_token, c_token, 6);
 	if (!i) {
@@ -152,7 +152,7 @@ TERM_PUBLIC void VDI_options()
 		VDI_numpalette = 0;
 		VDI_c_height = VDI_c_height_default;
 		term_options[0] = NUL;
-		int_error(VDIHEIGHTERROR, c_token);
+		int_error(c_token, VDIHEIGHTERROR);
 	    }
 	    if (VDI_c_height > 999)
 		VDI_c_height = 999;	/* avoid opt length overflow */
@@ -163,7 +163,7 @@ TERM_PUBLIC void VDI_options()
 		VDI_numpalette = 0;
 		VDI_c_height = VDI_c_height_default;
 		term_options[0] = NUL;
-		int_error(VDIHEXERROR, c_token);
+		int_error(c_token, VDIHEXERROR);
 	    }
 	    sprintf(opt, "%03X ", VDI_colors[i - 1]);
 	}
@@ -210,13 +210,13 @@ TERM_PUBLIC void VDI_init()
     }
     vdi_vdi_handle = graf_handle(&wchar, &hchar, &dummy, &dummy);
     if (!vdi_vdi_handle)
-	int_error("Fatal error opening virtual workstation", NO_CARET);
+	int_error(NO_CARET, "Fatal error opening virtual workstation");
 
     for (i = 0; i < 10; work_in[i++] = 1);
     work_in[10] = 2;		/* use raster coordinates */
     v_opnvwk(work_in, &vdi_vdi_handle, work_out);
     if (!vdi_vdi_handle)
-	int_error("Fatal error opening virtual workstation", NO_CARET);
+	int_error(NO_CARET, "Fatal error opening virtual workstation");
 
     vst_height(vdi_vdi_handle, VDI_c_height, &dummy, &dummy, &wchar, &hchar);
 

@@ -123,7 +123,7 @@ TERM_PUBLIC void PBMoptions()
 	    /* reset to default, since term is already set */ 
 	    pbm_font = 1;
 	    pbm_mode = 0;
-	    int_error("expecting: {small, medium, large} and {monochrome, gray, color}", c_token);
+	    int_error(c_token, "expecting: {small, medium, large} and {monochrome, gray, color}");
 	}
 	c_token++;
     }

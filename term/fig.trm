@@ -273,51 +273,51 @@ TERM_PUBLIC void FIG_options()
 	} else if (almost_equals(c_token, "si$ze")) {	/* KB */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("size: 2 numbers expected", c_token);
+		int_error(c_token, "size: 2 numbers expected");
 	    } else {
 		xsize_t = real(const_express(&a));
 		if (END_OF_COMMAND) {
-		    int_error("size: 2 numbers expected", c_token);
+		    int_error(c_token, "size: 2 numbers expected");
 		    xsize_t = 0.;
 		} else {
 		    ysize_t = real(const_express(&a));
 		}
 		if (xsize_t < 2. || ysize_t < 2. || xsize_t > 99. || ysize_t > 99.) {
 		    if (xsize_t != 0. || ysize_t != 0.)
-			int_error("size: out of range", c_token);
+			int_error(c_token, "size: out of range");
 		    xsize_t = ysize_t = 0.;
 		}
 	    }
 	} else if (almost_equals(c_token, "f$ontsize")) {	/* KB */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("fontsize: number expected", c_token);
+		int_error(c_token, "fontsize: number expected");
 	    } else {
 		FIG_font_s = (int) real(const_express(&a));
 		if (FIG_font_s < 5 || FIG_font_s > 36) {
-		    int_error("fontsize out of range", c_token - 1);
+		    int_error(c_token - 1, "fontsize out of range");
 		    FIG_font_s = 0;
 		}
 	    }
 	} else if (almost_equals(c_token, "t$hickness")) {	/* KB */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("thickness: number expected", c_token);
+		int_error(c_token, "thickness: number expected");
 	    } else {
 		FIG_default_thickness = (int) real(const_express(&a));
 		if (FIG_default_thickness < 1 || FIG_default_thickness > 10) {
-		    int_error("thickness out of range", c_token - 1);
+		    int_error(c_token - 1, "thickness out of range");
 		    FIG_default_thickness = 1;
 		}
 	    }
 	} else if (almost_equals(c_token, "d$epth")) {	/* KB */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("depth: number expected", c_token);
+		int_error(c_token, "depth: number expected");
 	    } else {
 		FIG_depth = (int) real(const_express(&a));
 		if (FIG_depth < 0 || FIG_depth > 99) {
-		    int_error("depth out of range", c_token - 1);
+		    int_error(c_token - 1, "depth out of range");
 		    FIG_depth = 10;
 		}
 		FIG_linedepth = FIG_depth;
@@ -326,7 +326,7 @@ TERM_PUBLIC void FIG_options()
 	    /* Skip the word and then expect the number ! */
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		int_error("max. points per polyline: number expected", c_token);
+		int_error(c_token, "max. points per polyline: number expected");
 	    } else {
 		temp_max = (long) real(const_express(&a));
 		/* Now check the range for the number */
@@ -334,16 +334,12 @@ TERM_PUBLIC void FIG_options()
 		    /* OK. subtract one to the right number! See other numbers... */
 		    FIG_poly_vec_max = temp_max - 1;
 		} else {
-		    char t[128];
-
-		    sprintf(t, "pointsmax: number out of range (2,%ld)",
-			    (FIG_MAX_POINTS + 1));
-		    int_error(t, c_token);
+		    int_error(c_token, "pointsmax: number out of range (2,%ld)", (FIG_MAX_POINTS + 1));
 		}
 	    }
 	} else {
 	    parse_error = TRUE;
-	    int_error(options_list, c_token);
+	    int_error(c_token, options_list);
 	}
     }
 
@@ -402,7 +398,7 @@ TERM_PUBLIC void FIG_options()
     term->h_char = FIG_to_pixel_h(FIG_font_s);
     FIG_thickness = FIG_default_thickness;
     if (parse_error) {		/* JFS, KB */
-	int_error(options_list, c_token);
+	int_error(c_token, options_list);
     }
 }
 

@@ -165,7 +165,7 @@ static void open_window(void)
 
 	if (window_id < 0) {
 	    window_id = -1;
-	    int_error("Can't create window", NO_CARET);
+	    int_error(NO_CARET, "Can't create window");
 	}
 	wind_set(window_id, WF_NAME, "gnuplot output");
 	wind_open(window_id, x, y, w, h);
@@ -218,7 +218,7 @@ void application_init(void)
 {
     if (aesid < 0) {
 	if ((aesid = appl_init()) < 0)
-	    int_error("APPL_INIT failed !", NO_CARET);
+	    int_error(NO_CARET, "APPL_INIT failed !");
     }
 #ifdef __PUREC__
     multi_aes = _GemParBlk.global[1] == -1;
@@ -459,7 +459,7 @@ TERM_PUBLIC void ATARI_options()
 	    ATARI_numpalette = 0;
 	    ATARI_c_height = ATARI_c_height_default;
 	    term_options[0] = NUL;
-	    int_error(ATARIHEXERROR, c_token);
+	    int_error(c_token, ATARIHEXERROR);
 	}
 	capture(opt, c_token, c_token, 6);
 	if (!i) {
@@ -468,7 +468,7 @@ TERM_PUBLIC void ATARI_options()
 		ATARI_numpalette = 0;
 		ATARI_c_height = ATARI_c_height_default;
 		term_options[0] = NUL;
-		int_error(ATARIHEIGHTERROR, c_token);
+		int_error(c_token, ATARIHEIGHTERROR);
 	    }
 	    if (ATARI_c_height > 999)
 		ATARI_c_height = 999;	/* avoid opt length overflow */
@@ -483,7 +483,7 @@ TERM_PUBLIC void ATARI_options()
 		ATARI_numpalette = 0;
 		ATARI_c_height = ATARI_c_height_default;
 		term_options[0] = NUL;
-		int_error(ATARIHEXERROR, c_token);
+		int_error(c_token, ATARIHEXERROR);
 	    }
 	    sprintf(opt, "%X ", ATARI_colors[i - 1]);
 
@@ -541,14 +541,14 @@ TERM_PUBLIC void ATARI_init()
     vdi_handle = graf_handle(&dummy, &dummy, &dummy, &dummy);
 
     if (!vdi_handle)
-	int_error("Fatal error opening virtual workstation", NO_CARET);
+	int_error(NO_CARET, "Fatal error opening virtual workstation");
 
     for (i = 0; i < 10; work_in[i++] = 1);
     work_in[10] = 2;		/* use raster coordinates */
     v_opnvwk(work_in, &vdi_handle, work_out);
 
     if (!vdi_handle)
-	int_error("Fatal error opening virtual workstation", NO_CARET);
+	int_error(NO_CARET, "Fatal error opening virtual workstation");
 
     if (!have_win_size) {
 	wind_get(0, WF_WORKXYWH, &x, &y, &w, &h);

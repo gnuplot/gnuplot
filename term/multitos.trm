@@ -153,7 +153,7 @@ TERM_PUBLIC void MTOS_init()
     if (handle < 0) {
 	if (aesid < 0) {
 	    if ((aesid = appl_init()) < 0)
-		int_error("APPL_INIT failed !", NO_CARET);
+		int_error(NO_CARET, "APPL_INIT failed !");
 	}
 	file = findfile(GPCLIENT2, user_gnuplotpath, ext);
 	if (!file)
@@ -163,20 +163,20 @@ TERM_PUBLIC void MTOS_init()
 	else
 	    unx2dos(file, cmd);
 	if (!shel_find(cmd))
-	    int_error("Cannot find GPCLIENT !", NO_CARET);
+	    int_error(NO_CARET, "Cannot find GPCLIENT !");
 
 	sprintf(&pipe[1], PIPE1, aesid);
 
 	if ((handle = open(&pipe[1], O_RDWR | O_CREAT)) < 0) {
 	    if ((handle = (int) Fcreate(&pipe[1], 0)) < 0)
-		int_error("Cannot open PIPE to GPCLIENT !", NO_CARET);
+		int_error(NO_CARET, "Cannot open PIPE to GPCLIENT !");
 	}
 	pipe[0] = (char) (strlen(&pipe[1]) + 1);
 
 	if (!shel_write(1, 1, 100, cmd, pipe)) {
 	    close(handle);
 	    handle = -1;
-	    int_error("Cannot spawn GPCLIENT !", NO_CARET);
+	    int_error(NO_CARET, "Cannot spawn GPCLIENT !");
 	}
 	init_exit();
     }

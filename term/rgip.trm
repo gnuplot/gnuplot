@@ -217,8 +217,7 @@ TERM_PUBLIC void RGIP_graphics()
 		*p = NUL;
 		sprintf(fn, "%s%1d%s", outstr, ++Gnr, p + 1);
 		if ((gpoutfile = fopen(fn, "w")) == (FILE *) NULL) {
-		    os_error("cannot reopen file with binary type; output unknown",
-			     NO_CARET);
+		    os_error(NO_CARET, "cannot reopen file with binary type; output unknown");
 		}
 		*p = 'X';	/* put back X */
 	    }
@@ -527,18 +526,18 @@ TERM_PUBLIC void RGIP_options()
 		continue;
 	    }
 	    if (END_OF_COMMAND) {
-		int_error("no. windows: [horizontal,vertical] expected", c_token);
+		int_error(c_token, "no. windows: [horizontal,vertical] expected");
 	    } else if (!equals(c_token, ",")) {
 		RGIP_win_horiz = (int) real(const_express(&a));
 	    }
 	    if (!equals(c_token, ","))
-		int_error("',' expected", c_token);
+		int_error(c_token, "',' expected");
 	    c_token++;
 	    if (!equals(c_token, "]")) {
 		RGIP_win_verti = (int) real(const_express(&a));
 	    }
 	    if (!equals(c_token, "]"))
-		int_error("expecting ']'", c_token);
+		int_error(c_token, "expecting ']'");
 	    c_token++;
 	} else {
 	    /* We have font size specified */

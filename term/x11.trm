@@ -418,7 +418,7 @@ TERM_PUBLIC void X11_init()
 	vaxc$errno = sys$crembx(0, &X11_channel, MBXMXMSG, MBXMXMSG, 0, 0, 0, 0);
 	if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
 	    printf("SYS$CreMbx failed with status=%d\r\n", vaxc$errno);
-	    os_error("sys$crembx failed", NO_CARET);
+	    os_error(NO_CARET, "sys$crembx failed");
 	}
 	vaxc$errno = sys$getdviw(0, X11_channel, 0, &item_list, &iosb, 0, 0, 0);
 	if ((vaxc$errno & SS$_NORMAL) == SS$_NORMAL)
@@ -427,7 +427,7 @@ TERM_PUBLIC void X11_init()
 	    printf("SYS$Getdviw failed with status=%d\r\n", vaxc$errno);
 	    sys$dassgn(X11_channel);
 	    X11_channel = 0;
-	    os_error("sys$getdviw failed", NO_CARET);
+	    os_error(NO_CARET, "sys$getdviw failed");
 	}
 	/* Create a subprocess whose input is this mailbox. */
 	vaxc$errno = lib$spawn(&pgmdsc, &devnam, 0, &one, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -435,7 +435,7 @@ TERM_PUBLIC void X11_init()
 	    printf("LIB$SPAWN failed with status=%d\r\n", vaxc$errno);
 	    sys$dassgn(X11_channel);
 	    X11_channel = 0;
-	    os_error("lib$spawn failed", NO_CARET);
+	    os_error(NO_CARET, "lib$spawn failed");
 	}
     } {
 	static int been_here = 0;
