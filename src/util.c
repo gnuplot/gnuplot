@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.30 2001/09/18 15:56:29 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.31 2001/12/17 12:10:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -428,7 +428,8 @@ va_dcl
     sys$putmsg(status);
     (void) putc('\n', stderr);
 #else /* VMS */
-    fprintf(stderr, "(%s)\n\n", strerror(errno));
+    perror("util.c");
+    putc('\n', stderr);
 #endif /* VMS */
 
     bail_to_command_line();
