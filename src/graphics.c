@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.102 2004/05/17 04:35:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.103 2004/05/20 15:23:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1398,133 +1398,69 @@ do_plot(plots, pcount)
 	/* be sure to draw all lines before drawing any points */
 
 	switch (this_plot->plot_style) {
-	    /*{{{  IMPULSE */
 	case IMPULSES:
 	    plot_impulses(this_plot, X_AXIS.term_zero, Y_AXIS.term_zero);
 	    break;
-	    /*}}} */
-	    /*{{{  LINES */
 	case LINES:
 	    plot_lines(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  STEPS */
 	case STEPS:
 	    plot_steps(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  FSTEPS */
 	case FSTEPS:
 	    plot_fsteps(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  HISTEPS */
 	case HISTEPS:
 	    plot_histeps(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  POINTSTYLE */
 	case POINTSTYLE:
 	    plot_points(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  LINESPOINTS */
 	case LINESPOINTS:
 	    plot_lines(this_plot);
 	    plot_points(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  DOTS */
 	case DOTS:
 	    if (localkey && this_plot->title) {
 		(*t->point) (xl + key_point_offset, yl, -1);
 	    }
 	    plot_dots(this_plot);
 	    break;
-	    /*}}} */
-
-	    /*{{{  YERRORLINES */
-	case YERRORLINES:{
-		plot_lines(this_plot);
-		plot_bars(this_plot);
-		plot_points(this_plot);
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  XERRORLINES */
-	case XERRORLINES:{
-		plot_lines(this_plot);
-		plot_bars(this_plot);
-		plot_points(this_plot);
-	    }
-	    /*}}} */
-	    /*{{{  XYERRORLINES */
+	case YERRORLINES:
+	case XERRORLINES:
 	case XYERRORLINES:
 	    plot_lines(this_plot);
 	    plot_bars(this_plot);
 	    plot_points(this_plot);
 	    break;
-	    /*}}} */
-
-	    /*{{{  YERRORBARS */
-	case YERRORBARS:{
-		plot_bars(this_plot);
-		plot_points(this_plot);
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  XERRORBARS */
-	case XERRORBARS:{
-		plot_bars(this_plot);
-		plot_points(this_plot);
-	    }
-	    /*}}} */
-	    /*{{{  XYERRORBARS */
+	case YERRORBARS:
+	case XERRORBARS:
 	case XYERRORBARS:
 	    plot_bars(this_plot);
 	    plot_points(this_plot);
 	    break;
-
-	    /*}}} */
-	    /*{{{  BOXXYERROR */
 	case BOXXYERROR:
-	  plot_boxes(this_plot, Y_AXIS.term_zero);
-	    break;
-	    /*}}} */
-	    /*{{{  BOXERROR (falls through to) */
-	case BOXERROR:
-	    plot_bars(this_plot);
-	    /* no break */
-
-	    /*}}} */
-	    /*{{{  BOXES */
 	case BOXES:
-          plot_boxes(this_plot, Y_AXIS.term_zero);
+	    plot_boxes(this_plot, Y_AXIS.term_zero);
 	    break;
-	    /*}}} */
+	case BOXERROR:
+	    plot_boxes(this_plot, Y_AXIS.term_zero);
+	    plot_bars(this_plot);
+	    break;
 #ifdef PM3D
-	    /*{{{  FILLEDCURVES */
 	case FILLEDCURVES:
 	    plot_filledcurves(this_plot);
 	    break;
-	    /*}}} */
 #endif
-	    /*{{{  VECTOR */
 	case VECTOR:
 	    plot_vectors(this_plot);
 	    break;
-
-	    /*}}} */
-	    /*{{{  FINANCEBARS */
 	case FINANCEBARS:
 	    plot_f_bars(this_plot);
 	    break;
-	    /*}}} */
-	    /*{{{  CANDLESTICKS */
 	case CANDLESTICKS:
 	    plot_c_bars(this_plot);
 	    break;
-	    /*}}} */
 #ifdef PM3D
 	case PM3DSURFACE:
 	    fprintf(stderr, "** warning: can't use pm3d for 2d plots\n");
@@ -2523,7 +2459,6 @@ plot_boxes(plot, xaxis_y)
     double dxl, dxr, dyt;
     struct termentry *t = term;
     enum coord_type prev = UNDEFINED;	/* type of previous point */
-    TBOOLEAN boxxy = (plot->plot_style == BOXXYERROR);
 
     for (i = 0; i < plot->p_count; i++) {
 
@@ -2571,9 +2506,13 @@ plot_boxes(plot, xaxis_y)
 		    dxl = plot->points[i].xlow;
 		}
 
-		if (boxxy) {
+		/* HBB 20040521: ylow should be clipped to the y range. */
+		if (plot->plot_style == BOXXYERROR) {
+		    double temp_y = plot->points[i].ylow;
+
+		    cliptorange(temp_y, Y_AXIS.min, Y_AXIS.max);
+		    xaxis_y = map_y(temp_y);
 		    dyt = plot->points[i].yhigh;
-		    xaxis_y = map_y(plot->points[i].ylow);
 		} else {
 		    dyt = plot->points[i].y;
 		}

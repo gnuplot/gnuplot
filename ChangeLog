@@ -1,5 +1,11 @@
 2004-05-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graphics.c (plot_boxes): Clip lower border of
+	boxxyerrorbars, too.
+	(do_plot): Regrouped master switch over plot types.  Draw box
+	first in BOXERROR mode, to keep the lower part of the errorbar
+	visible.
+
 	* src/util.c (mant_exp): Extend technique for rounding exponents
 	depending on the printf format precison of the mantissa to format
 	specifiers %l and %L used for log bases other than 10.  Fixes SF
