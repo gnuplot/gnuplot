@@ -933,7 +933,8 @@ struct value data;
 	    gp_alloc((unsigned int) sizeof(struct udvt_entry), "fit setvar");
 	udv_ptr->next_udv = NULL;
     }
-    safe_strncpy(udv_ptr->udv_name, varname, sizeof(udv_ptr->udv_name));
+    udv_ptr->udv_name = gp_realloc(udv_ptr->udv_name, strlen(varname)+1, "user var");
+    safe_strncpy(udv_ptr->udv_name, varname, strlen(varname)+1);
     udv_ptr->udv_value = data;
     udv_ptr->udv_undef = FALSE;
 }
