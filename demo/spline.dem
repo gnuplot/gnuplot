@@ -1,5 +1,5 @@
 #
-# $Id: spline.dem,v 1.4 1999/11/08 19:19:14 lhecking Exp $
+# $Id: spline.dem,v 1.5 2003/10/28 05:35:54 sfeam Exp $
 #
 # Some curve plotting using common cubic polynomial basis function for cagd.
 #
@@ -70,8 +70,8 @@ cub_bsplin_y(t) = bsp0(t) * y0 + bsp1(t) * y1 + bsp2(t) * y2 + bsp3(t) * y3
 set parametric
 set trange [0:1]
 set title "The cubic Bezier/Bspline basis functions in use"
-plot cub_bezier_x(t), cub_bezier_y(t) with lines 2,\
-     cub_bsplin_x(t), cub_bsplin_y(t) with lines 3
+plot cub_bezier_x(t), cub_bezier_y(t) with lines lt 2,\
+     cub_bsplin_x(t), cub_bsplin_y(t) with lines lt 3
 pause -1 "Press return to continue"
 
 unset arrow
@@ -88,7 +88,7 @@ cub_hermit_y1(t) = h00(t) * y1 + h01(t) * y2 + h10(t) * yv0 + h11(t) * yv1
 cub_hermit_x2(t) = h00(t) * x1 + h01(t) * x2 + h10(t) * xv0*3 + h11(t) * xv1*3
 cub_hermit_y2(t) = h00(t) * y1 + h01(t) * y2 + h10(t) * yv0*3 + h11(t) * yv1*3
 set title "The cubic Hermite basis functions in use"
-plot cub_hermit_x1(t), cub_hermit_y1(t) with lines 2,\
-     cub_hermit_x2(t), cub_hermit_y2(t) with lines 3
+plot cub_hermit_x1(t), cub_hermit_y1(t) with lines lt 2,\
+     cub_hermit_x2(t), cub_hermit_y2(t) with lines lt 3
 pause -1 "Press return to continue"
 reset

@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
+# $Id: airfoil.dem,v 1.8 2003/12/16 04:46:20 sfeam Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
@@ -127,18 +127,18 @@ set xrange [-0.1:1.1]
 set yrange [-0.1:.7]
 set trange [ 0.0:1.0]
 set title "NACA6409 Airfoil"
-plot airfoil_x(t), airfoil_y(t) title "mean line" w l 2, \
-     airfoil_x(t), airfoil_y1(t, thick) title "upper surface" w l 1, \
-     airfoil_x(t), airfoil_y2(t, thick) title "lower surface" w l 1
+plot airfoil_x(t), airfoil_y(t) title "mean line" w l lt 2, \
+     airfoil_x(t), airfoil_y1(t, thick) title "upper surface" w l lt 1, \
+     airfoil_x(t), airfoil_y2(t, thick) title "lower surface" w l lt 1
 pause -1 "Press Return"
 mm = 0.0
 pp = .5
 thick = .12
 set title "NACA0012 Airfoil"
 set xlabel "12% thick, no camber -- classical test case"
-plot airfoil_x(t), airfoil_y(t) title "mean line" w l 2, \
-     airfoil_x(t), airfoil_y1(t, thick) title "upper surface" w l 1, \
-     airfoil_x(t), airfoil_y2(t, thick) title "lower surface" w l 1
+plot airfoil_x(t), airfoil_y(t) title "mean line" w l lt 2, \
+     airfoil_x(t), airfoil_y1(t, thick) title "upper surface" w l lt 1, \
+     airfoil_x(t), airfoil_y2(t, thick) title "lower surface" w l lt 1
 pause -1 "Press Return"
 set title ""
 set xlab ""

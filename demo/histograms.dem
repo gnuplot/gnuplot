@@ -3,7 +3,7 @@
 #
 reset
 set title "US immigration from Europe by decade"
-set missing "-"
+set datafile missing "-"
 set xtics nomirror rotate by -45
 #
 # First plot using linespoints
