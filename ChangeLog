@@ -1,3 +1,16 @@
+2003-01-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* INSTALL: Updated file locations.
+
+	* configure.in: Fix gih location report foobar.
+
+	* term/x11.trm: Remove obsolete USE_X11_DRIVER code.
+
+2003-01-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am, lisp/Makefile.am: Remove gnuplot.info and gnuplot.texi
+	from gnuplot-mode build.
+
 2003-01-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL: Updated.
@@ -1859,7 +1872,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/27 20:40:10 $).
+	last modification date (from the tag $Date: 2003/01/28 21:25:07 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
