@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 1.34 2002/10/21 10:24:19 mikulik Exp $
+ * $Id: fig.trm,v 1.35 2002/10/25 16:37:54 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1230,7 +1230,7 @@ START_HELP(fig)
 "",
 " `thickness` sets the default line thickness, which is 1 if not specified.",
 " Overriding the thickness can be achieved by adding a multiple of 100 to the",
-" to the `linetype` value for a `plot` command.  In a similar way the `depth`",
+" `linetype` value for a `plot` command.  In a similar way the `depth`",
 " of plot elements (with respect to the default depth) can be controlled by",
 " adding a multiple of 1000 to <linetype>.  The depth is then <layer> +",
 " <linetype>/1000 and the thickness is (<linetype>%1000)/100 or, if that is",

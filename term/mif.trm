@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.21 2002/07/21 13:06:54 mikulik Exp $
+ * $Id: mif.trm,v 1.22 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -917,7 +917,7 @@ START_HELP(mif)
 " `polyline` plots curves as continuous curves and `vectors` plots curves as",
 " collections of vectors.",
 " `help` and `?` print online help on standard error output---both print a",
-" short description of the usage; `help` also lists the options;",
+" short description of the usage; `help` also lists the options.",
 "",
 " Examples:",
 "       set term mif colour polylines    # defaults",

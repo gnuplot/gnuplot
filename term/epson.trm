@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.16 2001/08/27 15:04:12 broeker Exp $
+ * $Id: epson.trm,v 1.17 2002/02/25 03:10:41 broeker Exp $
  *
  */
 
@@ -937,7 +937,7 @@ START_HELP(epson_180dpi)
 " `epson-lx800` is a generic 9-pin driver appropriate for printers like the",
 " Epson LX-800, the Star NL-10 and NX-1000, the PROPRINTER, and so forth.",
 "",
-" `nec-cp6` is generix 24-pin driver that can be used for printers like the",
+" `nec-cp6` is generic 24-pin driver that can be used for printers like the",
 " NEC CP6 and the Epson LQ-800.",
 "",
 " The `okidata` driver supports the 9-pin OKIDATA 320/321 Standard printers.",
