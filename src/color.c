@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.12 2000/12/06 12:38:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.13 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -528,8 +528,13 @@ draw_color_smooth_box()
 	map3d_xy(X_AXIS.max + dx * 0.20, Y_AXIS.max, ceiling_z - dz * 0.0, &cb_x_to, &cb_y_to);
 	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
 	    dz = Y_AXIS.max - Y_AXIS.min;
+#ifdef SIZEPOS_BEFORE_CBAXIS
 	    map3d_xy(X_AXIS.max + dx * 0.04, Y_AXIS.min + dz * 0.25, base_z, &cb_x_from, &cb_y_from);
 	    map3d_xy(X_AXIS.max + dx * 0.18, Y_AXIS.max - dz * 0.25, ceiling_z, &cb_x_to, &cb_y_to);
+#else
+	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &cb_x_from, &cb_y_from);
+	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
+#endif
 	}
     }
 
