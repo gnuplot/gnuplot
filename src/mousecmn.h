@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.11 2004/12/21 19:59:24 sfeam Exp $
+ * $Id: mousecmn.h,v 1.12 2004/12/22 19:22:40 sfeam Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -49,7 +49,6 @@ struct gp_event_t {
     int type;		/* see below */
     int mx, my;		/* current mouse coordinates */
     int par1, par2;	/* other parameters, depending on the event type */
-    char text[100];	/* literal command string for type=GE_cmd */
 };
 
 
