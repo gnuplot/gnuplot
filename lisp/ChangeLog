@@ -1,4 +1,12 @@
 
+Jan 23 1999  Bruce Ravel  <bruce.ravel@nist.gov>
+	* gnuplot.el: Version 0.5a
+	* send file to gnuplot now uses the "load" command
+	* can plot scripts from the comint buffer using
+	  gnuplot-plot-from-comint or gnuplot-save-and-plot-from-comint.
+	* C-d in comint buffer is more graceful
+
+
 Dec 27 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 
 	* gnuplot.el: Version 0.5

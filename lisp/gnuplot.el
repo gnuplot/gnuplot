@@ -4,9 +4,9 @@
 
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
-;; Created:    June 21 1998
-;; Updated:    January 2 1999
-;; Version:    0.5
+;; Created:    June 28 1998
+;; Updated:    January 26 1999
+;; Version:    0.5b
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -23,14 +23,16 @@
 ;;; Commentary:
 ;;
 ;; This is a major mode for composing gnuplot scripts and displaying
-;; their results using gnuplot.  This mode offers several tools to
-;; help you compose your scripts, including syntax colorization using
-;; either font-lock or hilit19, a syntax table appropriate to gnuplot,
-;; key bindings, pull-down menus, indentation, keyword completions and
-;; variable customization using the Custom package.  Once the script
-;; is composed, there are several function for sending some or all of
-;; the script to gnuplot.  The interaction with the gnuplot process is
-;; within a comint buffer.
+;; their results using gnuplot.  It is optimized for use with gnuplot
+;; 3.7 or one of the later patchlevels of "version 3.6".  It should
+;; also work very handily with version 3.5.  This mode offers several
+;; tools to help you compose your scripts, including syntax
+;; colorization using either font-lock or hilit19, a syntax table
+;; appropriate to gnuplot, key bindings, pull-down menus, indentation,
+;; keyword completions and variable customization using the Custom
+;; package.  Once the script is composed, there are several function
+;; for sending some or all of the script to gnuplot.  The interaction
+;; with the gnuplot process is within a comint buffer.
 ;;
 ;;    C-c C-l       send current line to gnuplot
 ;;    C-c C-v       send current line to gnuplot and move forward 1 line
@@ -38,7 +40,7 @@
 ;;    C-c C-b       send entire buffer to gnuplot
 ;;    C-c C-f       send a file to gnuplot
 ;;    C-c C-i       insert filename at point
-;;    C-c C-n       negate set option at point
+;;    C-c C-n       negate set option on current line
 ;;    C-c C-c       set arguments for command at point
 ;;   S-mouse-2      set arguments for command under mouse cursor
 ;;    C-c C-h       read the gnuplot info file
@@ -48,6 +50,10 @@
 ;; M-tab or M-ret   complete keyword before point
 ;;      ret         newline and indent
 ;;      tab         indent current line
+;;
+;; Gnuplot mode adds two key bindings to the comint buffer:
+;;     M-C-p        plot the current script buffer line-by-line
+;;     M-C-f        save the current script buffer and load that file
 ;;
 ;; These two functions are useful for starting up gnuplot-mode.
 ;;
@@ -114,8 +120,9 @@
 ;;                    (expand-file-name "/path/to/file")))
 ;;       where "/path/to/file" is the location of gnuplot.info
 ;;
-;; This had been tested with Emacs 19.30, 19.34 and 20.2 and XEmacs
-;; 19.14 and 20.3.
+;; This had been tested extensively with Emacs 19.34 and 20.2 and
+;; XEmacs 20.3 and in a limited manner with Emacs 19.30 and XEmacs
+;; 19.14.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; History:
@@ -178,6 +185,15 @@
 ;;        C-c C-h with no response goes to Commands menu.  Transparent
 ;;        toolbar icons.  Replace kw-compl with a simple completion
 ;;        function.  Put gnuplot-toolbar code in gnuplot.el.
+;;  0.5a  Jan 23 1999 <BR> send file uses the load command.  add
+;;        gnuplot-plot-from-comint and
+;;        gnuplot-save-and-plot-from-comint and keybindings in the
+;;        comint buffer.  do (process-kill-without-query
+;;        gnuplot-process nil).  `gnuplot-negate-option' checks if set
+;;        option has a negated form.
+;;  0.5b  `gnuplot-kill-gnuplot-buffer' made more robust.  fixed a bug
+;;        in `gnuplot-plot-from-comint'.  fixed description of
+;;        gnuplot-faces group.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty <DB> (numerous corrections)
@@ -187,6 +203,7 @@
 ;;    Hrvoje Niksic (help with defcustom arguments for insertions)
 ;;    John Palmieri (help with installation instructions)
 ;;    Michael Sanders <MS> (help with the info-look interface)
+;;    Jinwei Shen <JS> (suggested functionality in comint buffer)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; To Do:
 ;;
@@ -213,7 +230,6 @@
 
 ;; handle defcustom
 (eval-and-compile
-  (require 'info)  ;; <DB>
   (condition-case ()
       (require 'custom)
     (error nil))
@@ -242,6 +258,8 @@
 ;;   (condition-case ()
 ;;       (require 'kw-compl)
 ;;     (error nil)))
+(eval-and-compile  ;; <DB>
+  (require 'info))
 (eval-and-compile
   (condition-case ()
       (require 'info-look)
@@ -258,7 +276,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5")
+(defconst gnuplot-version "0.5b")
 
 (defgroup gnuplot nil
   "Gnuplot mode for Emacs."
@@ -297,13 +315,13 @@ region, a buffer, or a file."
 (defcustom gnuplot-info-hook nil
   "*Hook run before setting up the info-look interface.
 This hook is necessary to handle inconsistencies in versions of and
-sources of the gnuplot info file.  Gnuplot-mode ships with a copy of
-the info file generated from the 3.6beta patchlevel 347 release of
-Gnuplot.  If that file is used, then this hook probably is not
-necessary.  Some versions of the info file may have a General Index
-session, which can be used by info-look.  In that case the following
-(or something similar with the value of `info-lookup-symbol-alist'
-altered appropriately) should be placed in the .emacs file.
+sources of the gnuplot info file.  If Gnuplot-mode can find the info
+file generated from the 3.6beta patchlevel 347 (or later) release of
+Gnuplot, then this hook probably is not necessary.  Some versions of
+the info file may have a General Index session, which can be used by
+info-look.  In that case the following (or something similar with the
+value of `info-lookup-symbol-alist' altered appropriately) should be
+placed in the .emacs file.
 
 Emacs version 20.2 ships with a different version of info-look that
 does 20.3.  If you use any version of Emacs 19, you must use the
@@ -364,6 +382,7 @@ useful for functions included in `gnuplot-after-plot-hook'.")
 (defvar gnuplot-process-frame nil
   "The frame for displaying the gnuplot process.
 This is used when gnuplot-display-process is equal to 'frame.")
+(defvar gnuplot-comint-recent-buffer nil)
 (defcustom gnuplot-gnuplot-buffer "plot.gp"
   "*The name of the gnuplot scratch buffer opened by 'gnuplot-make-buffer'."
   :group 'gnuplot
@@ -448,7 +467,7 @@ These are set by `gnuplot-set-keywords-list' from the values in
 
 
 (defgroup gnuplot-faces nil
-  "Insert commands into gnuplot-scripts from a pull-down menu."
+  "Text faces used by gnuplot mode."
   :prefix "gnuplot-"
   :group 'gnuplot)
 
@@ -595,10 +614,11 @@ create a `gnuplot-mode' buffer."
     ["samples"	       (gnuplot-insert "set samples ")	      t]
     ["size"            (gnuplot-insert "set size ")	      t]
     ["tics"            (gnuplot-insert "set tics ")	      t]
-    ["time"            (gnuplot-insert "set time ")	      t]
+    ["timefmt"         (gnuplot-insert "set timefmt ")        t]
+    ["timestamp"       (gnuplot-insert "set timestamp ")      t]
     ["title"	       (gnuplot-insert "set title ")	      t]
     ["zeroaxis"	       (gnuplot-insert "set zeroaxis")        t] )
-        "Adornments submenu in the insertions menu.
+  "Adornments submenu in the insertions menu.
 See the document string for `gnuplot-insertions-menu'
 Changing this will not effect a change in any currently existing
 `gnuplot-mode' buffer.  You will see the change the next time you
@@ -876,7 +896,7 @@ opening an argument-setting popup.")
 ;; ;; explicitly call `easy-menu-add' and `easy-menu-remove' to add and
 ;; ;; remove menus from the menu bar.
 ;;
-;; in Emacs, easy-menu-add is defined in this manner:
+;; in Emacs, easy-menu-add is defined like this:
 ;;      (defun easy-menu-add (menu &optional map))
 
 (defun gnuplot-setup-menubar ()
@@ -943,7 +963,7 @@ and `left-toolbar', although choosing `default-toolbar' or
 `top-toolbar' may be a bad idea since either will make the GNUPLOT
 toolbar replace the standard toolbar.  Changing this will not change
 the toolbar in a currently existing buffer, but it will take effect
-the next time you use gnuplot-mode and emacs.
+the next time you use `gnuplot-mode' and emacs.
 
 This is only used if a toolbar can be displayed, thus this is used in
 XEmacs and ignored in FSF Emacs."
@@ -958,7 +978,8 @@ XEmacs and ignored in FSF Emacs."
 (defvar gnuplot-toolbar-location "")
 
 (defun gnuplot-toolbar-setup-toolbar (toolbar)
-  "Setup function for the gnuplot-mode toolbar.
+  "Setup function for the `gnuplot-mode' toolbar.
+TOOLBAR contains the toolbar specification.
 This is basically swiped from VM."
   (let ((width 46) (height 46)
 	(frame (selected-frame))
@@ -1438,6 +1459,7 @@ nil, 'line, 'region, 'buffer, or 'file.  TEXT may be useful for
 functions in `gnuplot-after-plot-hook'.  `gnuplot-after-plot-hook' is
 called by this function after all of STRING is sent to gnuplot."
   (gnuplot-make-gnuplot-buffer)	; make sure a gnuplot buffer exists
+  (setq gnuplot-comint-recent-buffer (current-buffer))
   (if (equal gnuplot-display-process 'frame)
       (or (and gnuplot-process-frame
 	       (frame-live-p gnuplot-process-frame))
@@ -1454,7 +1476,7 @@ called by this function after all of STRING is sent to gnuplot."
     (goto-char (point-max))
     ;; bruce asks: what is this next line for?
     (set-marker (process-mark gnuplot-process) (point-marker))
-    (sleep-for (* 10 gnuplot-delay))
+    (sleep-for (* 20 gnuplot-delay))
     (while list
       (insert (car list))
       (comint-send-input)
@@ -1530,19 +1552,59 @@ This sets `gnuplot-recently-sent' to 'buffer."
     (message "You can only send gnuplot-mode buffers to gnuplot.")))
 
 (defun gnuplot-send-file-to-gnuplot ()
-  "Sends a selected file to the gnuplot program.
+  "Sends a selected file to the gnuplot program using the \"load\" command.
 This sets `gnuplot-recently-sent' to 'file."
   (interactive)
-  (let* ((file (read-file-name "Name of file to send to gnuplot > " nil nil t))
-	 (string (concat "cd '" (expand-file-name (file-name-directory file))
-			 "'\n")))
-    (save-excursion
-      (find-file file)
-      (setq string (concat string (buffer-substring-no-properties
-				   (point-min) (point-max))))
-      (bury-buffer (get-buffer file)))
+  (let ((string (read-file-name "Name of file to send to gnuplot > " nil nil t)))
+    (setq string (concat "load '" (expand-file-name string) "'\n"))
+    (message "%S" string)
     (gnuplot-make-gnuplot-buffer)	; make sure a gnuplot buffer exists
     (gnuplot-send-string-to-gnuplot string 'file)))
+
+;; suggested by <JS>
+(defun gnuplot-plot-from-comint ()
+  "Send the contents of a script to gnuplot from the process buffer.
+This inserts the contents of the most recently used gnuplot script
+into the process buffer and sends those lines to gnuplot.  It does
+this by copying the script line by line."
+  (interactive)
+  (if (equal major-mode 'comint-mode)
+      (let (string list (buffer (current-buffer)))
+	(set-buffer gnuplot-comint-recent-buffer)
+	(setq string (buffer-substring-no-properties (point-min) (point-max))
+	      string (concat string "\n")
+	      list   (gnuplot-split-string string))
+	(set-buffer buffer)
+	(while list
+	  (insert (car list))
+	  (comint-send-input)
+	  (sleep-for gnuplot-delay)
+	  (setq list (cdr list)))
+	(comint-send-input))
+    (message
+     "`gnuplot-plot-from-comint' only works in the gnuplot process buffer")))
+
+(defun gnuplot-save-and-plot-from-comint ()
+  "Send a current script to gnuplot from the process buffer.
+This sends the most recently used gnuplot script to gnuplot using the
+\"load\" command.  This function first saves the script buffer to a
+file, prompting for a filename if one is not associated with the script
+buffer.  Then it sends a load command to gnuplot using the name of the
+file visited by the script buffer."
+  (interactive)
+  (if (equal major-mode 'comint-mode)
+      (let (fname (buffer (current-buffer)))
+	(set-buffer gnuplot-comint-recent-buffer)
+	(save-buffer)
+	(setq fname (buffer-file-name))
+	(set-buffer buffer)
+	(goto-char (point-max))
+	(insert (format "load '%s'" fname))
+	(comint-send-input))
+    (message (concat "`gnuplot-save-and-plot-from-comint' only works "
+		     "in the gnuplot process buffer"))))
+
+
 
 
 ;;; --- functions controlling the gnuplot process
@@ -1563,6 +1625,11 @@ buffer.  Further customization is possible via
   ;;	(setq kw-compl-list gnuplot-keywords
   ;;	      kw-compl-upper-case nil)
   ;;	(define-key comint-mode-map "\M-\r" 'kw-compl-abbrev)))
+  (define-key comint-mode-map "\M-\C-p" 'gnuplot-plot-from-comint)
+  (define-key comint-mode-map "\M-\C-f" 'gnuplot-save-and-plot-from-comint)
+  (define-key comint-mode-map "\C-d"    'gnuplot-delchar-or-maybe-eof)
+  (define-key comint-mode-map "\M-\r"   'gnuplot-complete-keyword)
+  (define-key comint-mode-map "\M-\t"   'gnuplot-complete-keyword)
   (run-hooks 'gnuplot-comint-setup-hook))
 
 (defun gnuplot-make-gnuplot-buffer ()
@@ -1573,7 +1640,7 @@ buffer.  Further customization is possible via
 	(message "Starting gnuplot plotting program...")
 	(setq gnuplot-buffer (make-comint gnuplot-process-name gnuplot-program)
 	      gnuplot-process (get-process gnuplot-process-name))
-	;;(process-kill-without-query gnuplot-process) ; <-- what's this for???
+	(process-kill-without-query gnuplot-process nil)
 	(save-excursion
 	  (set-buffer gnuplot-buffer)
 	  (make-local-hook 'kill-buffer-hook)
@@ -1612,14 +1679,23 @@ STRING is the text as originally inserted in the comint buffer."
   (setq gnuplot-process nil
         gnuplot-buffer nil))
 
+(defun gnuplot-delchar-or-maybe-eof (arg)
+  "Delete ARG characters forward, or (if at eob) send an EOF to subprocess.
+This is very similar to `comint-delchar-or-maybe-eof'."
+  (interactive "p")
+  (if (eobp)
+      (gnuplot-kill-gnuplot-buffer)
+    (delete-char arg)))
+
 (defun gnuplot-kill-gnuplot-buffer ()
   "Kill the gnuplot process and its display buffers."
   (interactive)
-  (if (get-process gnuplot-process)
+  (if (and gnuplot-process (get-process gnuplot-process))
       (kill-process gnuplot-process))
-  (if (get-buffer gnuplot-buffer)
+  (if (and gnuplot-buffer (get-buffer gnuplot-buffer))
       (progn
-	(delete-window (get-buffer-window gnuplot-buffer))
+	(if (one-window-p) ()
+	  (delete-window (get-buffer-window gnuplot-buffer)))
 	(kill-buffer gnuplot-buffer)))
   (setq gnuplot-process nil
         gnuplot-buffer nil))
@@ -1693,25 +1769,28 @@ lines."
     (if (looking-at "[ \t]+$")
 	(end-of-line))))
 
-;; FWIW, here are all the options which can be negated
-;;   arrow autoscale border clabel clip contour dgrid3d grid hidden3d
-;;   key label linestyle logscale multiplot m.tics offsets polar
-;;   surface timestamp title .dtics .mtics .tics .zeroaxis
-;;      . E {x,y,z,x2,y2}
+;; FWIW, here are all the options which can be negated:
+;; (insert (format "%s"
+;; 		(regexp-quote
+;; 		 (make-regexp
+;; 		  '("arrow" "autoscale" "border" "clabel" "clip"
+;; 		    "contour" "dgrid3d" "grid" "hidden3d" "key" "label"
+;; 		    "linestyle" "logscale" "multiplot" "mxtics"
+;; 		    "mytics" "mztics" "mx2tics" "my2tics"
+;; 		    "offsets" "polar" "surface" "timestamp" "title"
+;; 		    "xdtics" "ydtics" "zdtics" "x2dtics" "y2dtics"
+;; 		    "xmtics" "ymtics" "zmtics" "x2mtics" "y2mtics"
+;; 		    "xtics" "ytics" "ztics" "x2tics" "y2tics"
+;; 		    "xzeroaxis" "yzeroaxis" "zzeroaxis" "x2zeroaxis"
+;; 		    "y2zeroaxis")))))
 
 (defun gnuplot-negate-option ()
-  "Append \"no\" to or remove \"no\" from a set option.
-If point is in a line containing a set option, then append \"no\" to
-the option or remove it if it is there.  Note that this will work on
-any set option without regard to whether Gnuplot allows it to be
-negated in this manner.  For example, 'set key' will be turned into
-'set nokey', and vice versa.  However, 'set xrange' will be turned in
-to 'set noxrange', which does not make sense.  See the Gnuplot
-documentation for which set options are negated in this way and use
-this function with care."
+  "Append \"no\" to or remove \"no\" from the set option on the current line.
+This checks if the set option is one which has a negated form."
   (interactive)
   (let ((begin (save-excursion (beginning-of-line) (point-marker)))
-	(end   (save-excursion (end-of-line)       (point-marker))))
+	(end   (save-excursion (end-of-line)       (point-marker)))
+	(regex "a\\(rrow\\|utoscale\\)\\|border\\|c\\(l\\(abel\\|ip\\)\\|ontour\\)\\|dgrid3d\\|grid\\|hidden3d\\|key\\|l\\(abel\\|inestyle\\|ogscale\\)\\|m\\(ultiplot\\|x\\(2tics\\|tics\\)\\|y\\(2tics\\|tics\\)\\|ztics\\)\\|offsets\\|polar\\|surface\\|ti\\(mestamp\\|tle\\)\\|x\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|y\\(2\\(dtics\\|mtics\\|tics\\|zeroaxis\\)\\|dtics\\|mtics\\|tics\\|zeroaxis\\)\\|z\\(dtics\\|mtics\\|tics\\|zeroaxis\\)"))
     (save-excursion
       (if (search-backward ";" begin t)
 	  (progn (forward-char  1) (setq begin (point-marker))))
@@ -1725,10 +1804,10 @@ this function with care."
 	    (if (> (point) end) (goto-char end))
 	    (cond ((looking-at "no")
 		   (delete-char 2))
-		  ((looking-at "\\w")
+		  ((looking-at regex)
 		   (insert "no"))
 		  (t
-		   (message "There is nothing set on this line"))))
+		   (message "There is not a negatable set option on this line"))))
 	(message "There is not a set option on this line")) )))
 
 (defun gnuplot-customize ()
@@ -1856,12 +1935,6 @@ adapted from `lisp-complete-symbol'."
 	       (switch-to-buffer orig)
 	       (kill-buffer buff)
 	       (delete-other-windows) ))) )))
-
-;; 	   (let ((completion-auto-help t)
-;; 		 (w (completing-read "Keyword (<tab> displays completions): "
-;; 				     alist nil nil pattern)))
-;; 	     (delete-region beg end)
-;; 	     (insert w))) ) ))
 
 (defun gnuplot-info-lookup-symbol (symbol &optional mode)
   "Wrapper for `info-lookup-symbol'.
@@ -2006,8 +2079,8 @@ maintainers of gnuplot mode."
 ;;;###autoload
 (defun gnuplot-mode ()
   "Major mode for editing and executing GNUPLOT scripts.
-This was written with version 3.6 of gnuplot in mind but it should
-work fine with other versions.
+This was written with version 3.7 of gnuplot in mind but it should
+work fine with version 3.5 and the various 3.6 versions.
 
 Report bugs in gnuplot mode using \\[gnuplot-bug-report].
 
@@ -2017,8 +2090,7 @@ Report bugs in gnuplot mode using \\[gnuplot-bug-report].
  (http://feff.phys.washington.edu/~ravel/gnuplot/) for more details.
 
  Key bindings:
- \\{gnuplot-mode-map}
- "
+ \\{gnuplot-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (use-local-map gnuplot-mode-map)

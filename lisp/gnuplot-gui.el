@@ -5,6 +5,7 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu>
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    19 December 1998
+;; Updated:
 ;; Version:    (see gnuplot.el)
 ;; Keywords:   gnuplot, plotting, interactive, GUI
 
@@ -29,7 +30,7 @@
 ;; arguments appropriate the the item that was near point.  The goal
 ;; is to provide point-and-click functionality to gnuplot-mode.
 ;;
-;; gnuplot-gui is designed for gnuplot 3.6, but since much of 3.6 is
+;; gnuplot-gui is designed for gnuplot 3.7, but since much of 3.7 is
 ;; backward compatible to 3.5, it will work well for that version
 ;; also.
 ;;
@@ -48,7 +49,7 @@
 ;; -- 'position: two or three comma separated numbers used to denote a
 ;;               position or a tic start/end/increment (see arrow,
 ;;               need a prefix)
-;; -- 'file: field is not behaving properly, M-tab and ret
+;; -- 'file: field is not behaving properly -- M-tab and ret
 ;;
 ;; command types which are currently unsupported:
 ;; -- plot, splot, fit, cntrparam, hidden3d
@@ -56,11 +57,11 @@
 ;; overall:
 ;; -- continuation lines (ugh!)
 ;; -- multiple frames end up displaying same window after setting options
-;; -- make the frame not jump all over the screen
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
 
+(require 'gnuplot)
 (eval-and-compile
   (condition-case ()
       (progn
@@ -1444,7 +1445,7 @@ is non-nil if this is a 'range widget."
 
 
 ;; suppress compiler warning
-(eval-when-compile (defun gnuplot-info-lookup-symbol (sym mode)))
+;;(eval-when-compile (defun gnuplot-info-lookup-symbol (sym mode)))
 (define-widget 'gnuplot-gui-info-link 'info-link
   "A link to an info file for the Gnuplot GUI."
   :action '(lambda (widget &optional event)

@@ -1,5 +1,5 @@
 
-%% Time-stamp: <99/01/02 23:44:25 bruce>
+%% Time-stamp: <99/01/23 19:13:08 bruce>
 
 \documentclass[twocolumn]{article}
 \usepackage{fancybox,dcolumn,amsmath,amssymb}
@@ -98,6 +98,8 @@ to aid in composing scripts.  See the comments in the file
     \vspace{0.2ex}
     \begin{tabular}[h]{>{\ttfamily}cl}
       \hline \hline
+      \\[-1ex]
+      \multicolumn{2}{l}{~\quad\textbf{Gnuplot mode buffer}}\\[0.5ex]
       \textrm{key} & \quad description \\
       \hline
       C-c C-l & send line to gnuplot \\
@@ -117,6 +119,13 @@ to aid in composing scripts.  See the comments in the file
       C-c C-k & kill the gnuplot process \\
       C-c C-u & submit a bug report about gnuplot mode \\
       C-c C-z & customize gnuplot mode \\
+      \hline
+      \\[-1ex]
+      \multicolumn{2}{l}{~\quad\textbf{Gnuplot process buffer}}\\[0.5ex]
+      \textrm{key} & \quad description \\
+      \hline
+      M-C-p   & plot script \\
+      M-C-f   & load file containing script \\
       \hline \hline
     \end{tabular}
   \end{center}
