@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.12.2.3 2000/10/20 19:02:58 lhecking Exp $
+ * $Id: term.h,v 1.12.2.4 2002/01/26 18:55:01 lhecking Exp $
  *
  */
 
@@ -280,9 +280,7 @@
 #include "dxf.trm"
 
 /* Enhanced Metafile Format driver */
-#ifdef USE_EMF_DRIVER
-# include "emf.trm"
-#endif
+#include "emf.trm"
 
 /* Roland DXY800A plotter */
 /* #include "dxy.trm" */
@@ -394,10 +392,8 @@
 /* latex/tex with picture in postscript */
 #include "pslatex.trm"
 
-#ifdef USE_EPSLATEX_DRIVER
 /* new epslatex driver */
 #include "epslatex.trm"
-#endif
 
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"
