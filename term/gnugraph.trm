@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.14 1999/11/24 12:32:05 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.15 1999/12/01 22:09:52 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -165,17 +165,47 @@ extern int pl_alabel __PROTO((int, int, const char *));
 extern int pl_textangle __PROTO((int));
 extern int pl_closepl __PROTO((void));
 /* T.Walter added: */
-int pl_parampl __PROTO((const char *parameter, void *value));
-int pl_newpl __PROTO((const char *type, FILE *infile, FILE *outfile, FILE *errfile));
-int pl_selectpl __PROTO((int handle));
-int pl_deletepl __PROTO((int handle));
-double pl_ffontsize __PROTO((double size));
+extern int pl_parampl __PROTO((const char *parameter, void *value));
+extern int pl_newpl __PROTO((const char *type, FILE *infile, FILE *outfile, FILE *errfile));
+extern int pl_selectpl __PROTO((int handle));
+extern int pl_deletepl __PROTO((int handle));
+extern double pl_ffontsize __PROTO((double size));
 
-enum UP_id { UP_DEFAULT, UP_OTHER };
+/* Formats supported by GNU plotutils */
+enum PL_types {
+    PL_X, PL_PNM, PL_GIF, PL_AI, PL_PS, PL_CGM, PL_FIG, PL_PCL5,
+    PL_HPGL, PL_TEK, PL_META, PL_INVALID
+};
+
+struct gen_table term_up_pt_tbl[] =
+{
+    { "X", PL_X },
+    { "pnm", PL_PNM },
+    { "gif", PL_GIF },
+    { "ai", PL_AI },
+    { "ps", PL_PS },
+    { "cgm", PL_CGM },
+    { "fig", PL_FIG },
+    { "pcl5", PL_PCL5 },
+    { "hpgl", PL_HPGL },
+    { "tek", PL_TEK },
+    { "meta", PL_META },
+    { NULL, PL_INVALID }
+};
+
+/* Plot type, default */
+static int pl_plottype = PL_META;
+
+/* Plot size, default */
+static char pl_pagesize[MAX_ID_LEN+1] = "a4";
+
+enum UP_id { UP_DEFAULT, UP_PAGESIZE, UP_PLOTTYPE, UP_OTHER };
 
 static struct gen_table UP_opts[] =
 {
     { "d$efault", UP_DEFAULT },
+    { "s$ize", UP_PAGESIZE },
+    { "t$ype", UP_PLOTTYPE },
     { NULL, UP_OTHER }
 };
 
@@ -193,6 +223,22 @@ UP_options()
 	    term->h_char = (unsigned int) (up_fontsize * UP_HFONTSC);
 	    c_token++;
 	    break;
+	case UP_PAGESIZE:
+	    c_token++;
+	    /* user is responsible for valid page size specification, e.g.
+	     * "a4", "letter", "b5", "a4,xoffset=-5mm,yoffset=2.0cm".
+	     * See GNU plotutils documentation for details. */
+	    quote_str(pl_pagesize, c_token, MAX_ID_LEN);
+	    /* else use default quietly */
+	    c_token++;
+	    break;
+	case UP_PLOTTYPE:
+	    c_token++;
+	    pl_plottype = lookup_table(&term_up_pt_tbl[0],c_token);
+	    if (pl_plottype == PL_INVALID)
+		pl_plottype = PL_META;
+	    c_token++;
+	    break;
 	case UP_OTHER:
 	default:
 	    if (isstring(c_token)) {
@@ -208,34 +254,24 @@ UP_options()
 	}
     }
 
-    sprintf(term_options, "\"%s\" %d", up_font, up_fontsize);
+    sprintf(term_options, "\"%s\" %d size \"%s\" type %s",
+	    up_font,
+	    up_fontsize,
+	    pl_pagesize,
+	    term_up_pt_tbl[pl_plottype].key);
 }
 
 TERM_PUBLIC void
 UP_init()
 {
 #if 1
-    pl_parampl ("PAGESIZE", "a4");
-# if defined(PSPLOTTER)
-    /* create a PS-plotter writing to 'gpoutfile'. */
-    if ((handle_global = pl_newpl ("ps", NULL, gpoutfile, stderr)) < 0) {
-	fprintf (stderr, "GNU plotutils (gnugraph) failed to create PS-plotter\n");
-	/* return (1); */
+    pl_parampl ("PAGESIZE", pl_pagesize);
+
+    if ((handle_global = pl_newpl (term_up_pt_tbl[pl_plottype].key,
+				   NULL, gpoutfile, stderr)) < 0) {
+	int_error(NO_CARET, "GNU plotutils (gnugraph) failed to create \"%s\" plotter.",
+		  term_up_pt_tbl[pl_plottype].key);
     }
-# endif
-# if defined(X11PLOTTER)
-    /* create a X11-plotter with a window, in- and out-file are ignored. */
-    if ((handle_global = pl_newpl ("X", NULL, gpoutfile, stderr)) < 0) {
-	fprintf (stderr, "GNU plotutils (gnugraph) failed to create X11-plotter\n");
-	/* return (1); */
-    }
-# else
-    /* create a X11-plotter with a window, in- and out-file are ignored. */
-    if ((handle_global = pl_newpl ("meta", NULL, gpoutfile, stderr)) < 0) {
-	fprintf (stderr, "GNU plotutils (gnugraph) failed to create META-plotter\n");
-	/* return (1); */
-    }
-# endif
 
     pl_selectpl (handle_global);         /* select the Plotter for use */
 
@@ -243,7 +279,8 @@ UP_init()
     pl_space (0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
     pl_fontname (up_font);
 
-    /* T.Walter: Try to find the correct font size
+    /* T.Walter: Try to find the correct font size */
+# if 0
     pl_fontsize (up_fontsize);  too small
     pl_fontsize (up_fontsize*10);  too small
     pl_fontsize (up_fontsize*100);  too large
@@ -252,8 +289,8 @@ UP_init()
     pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_XMAX), (UP_YMAX)));  too small
     pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_SCREENX), (UP_SCREENY))); too small
     pl_fontsize (up_fontsize/72.0*GPMIN((UP_SCREENX), (UP_SCREENY)));  too large
-    pl_fontsize (up_fontsize/72.0*8*0.0525*GPMIN((UP_XMAX), (UP_YMAX)));  passt grob, etwas zu gross
-    */
+    pl_fontsize (up_fontsize/72.0*8*0.0525*GPMIN((UP_XMAX), (UP_YMAX))); just about too large
+# endif /* 0 */
     pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_SCREENX), (UP_SCREENY)));
 
 #else  /* Old code */
@@ -413,8 +450,19 @@ START_HELP(unixplot)
 "",
 " Syntax:",
 "       set terminal unixplot {\"<fontname>\"} {<fontsize>}",
+"                             {type <pt>} {size \"<size>\"}",
 "",
 " which defaults to 10-point \"Courier\".",
+"",
+" For `type`, the following options are accepted: `X`, `pnm`, `gif`, `ai`,",
+" `ps`, `cgm`, `fig`, `pcl5`, `hpgl`, `tek`, and `meta` (default). The",
+" `size` option (default is a4) is passed straight through to plotutils, it's",
+" the user's responsibility to provide correct values. Details can be found",
+" in the plotutils documentation.",
+"",
+" Examples:",
+"       set terminal unixplot type hpgl size \"a4\"",
+"       set terminal unixplot size \"a4,xoffset=-5mm,yoffset=2.0cm\" type pnm",
 "",
 " There is a non-GNU version of the `unixplot` driver which cannot be compiled",
 " unless this version is left out."
