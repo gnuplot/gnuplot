@@ -28,18 +28,18 @@ makefile.all: Makefile.maint
 	 | tr @% '\012\012' >>$@t
 	@if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi
 
-version.c: ../VERSION ../PATCHLEVEL Makefile.maint
-	@echo Making $@
-	@vn=`sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	pl=`sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	dt=`sed -n 's/.*gnuplot_date.*"\(.*\)".*/\1/p' ./version.c`; \
-	if [ "$(version)" != $$vn -o \
-	     "$(patchlevel)" != $$pl -o \
-	     "$$date" != "$$dt" ]; then \
-	  sed -e '/^const char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
-	      -e '/^const char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
-	      -e '/^const char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
-	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
-	      -e "s/@DATE@/$(date)/" $@ >$@t; \
-	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
-	fi
+#version.c: ../VERSION ../PATCHLEVEL Makefile.maint
+#	@echo Making $@
+#	@vn=`sed -n 's/.*gnuplot_version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
+#	pl=`sed -n 's/.*gnuplot_patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
+#	dt=`sed -n 's/.*gnuplot_date.*"\(.*\)".*/\1/p' ./version.c`; \
+#	if [ "$(version)" != $$vn -o \
+#	     "$(patchlevel)" != $$pl -o \
+#	     "$$date" != "$$dt" ]; then \
+#	  sed -e '/^const char gnuplot_version/ s/"[^"]*"/"@VERS@"/' \
+#	      -e '/^const char gnuplot_patchlevel/ s/"[^"]*"/"@PLVL@"/' \
+#	      -e '/^const char gnuplot_date/ s/"[^"]*"/"@DATE@"/' \
+#	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
+#	      -e "s/@DATE@/$(date)/" $@ >$@t; \
+#	  if cmp -s $@ $@t; then rm -f $@t; else mv $@t $@; fi \
+#	fi
