@@ -2,11 +2,11 @@
 
 	* src/gplt_x11.c: Trivial cleanup to remove compiler warnings.
 
-	* term/post.trm: Keep track of whether the macro definitions required
-	for enhanced text mode have been written to the output file yet, or not.
-	If enhanced text mode is enabled after the terminal has already been
-	initialized, make sure that the macros are added to the next output
-	page.  The allows, for example,
+	* term/post.trm: Keep track of whether or not the macro definitions
+	required for enhanced text mode have been written to the output file
+	yet.  If enhanced text mode is enabled after the terminal has already
+	been initialized, make sure that the macros are added to the next
+	output page.  This allows, for example,
 	    setenv GNUTERM post;  gnuplot all.dem > all.ps
 	Without this fix, the output pages following the enhanced text demo
 	are corrupted. An alternative would be to write the enhanced text
@@ -24,7 +24,7 @@
 	* src/set.c (set_termoptions): Update comment explaining this routine.
 
 	* src/plot3d.c (eval_3dplots): Surface plots are no longer the only
-	plot style that can use four 'using' specs; remove the error check 
+	plot style that can have four 'using' specs; remove the error check 
 	that incorrectly prevents this.
 
 	* src/plot3d.c (get_3ddata set_plot_with_palette) 
