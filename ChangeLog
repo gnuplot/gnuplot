@@ -1,3 +1,8 @@
+2004-01-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/Makefile.in: gnuplot.tex needs to be latexed 3 times (it contains
+	multipage toc).
+
 2004-01-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Copy file

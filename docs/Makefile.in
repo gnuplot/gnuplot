@@ -234,6 +234,7 @@ gnuplot.pdf: gnuplot.tex
 	@if test $(PDFLATEX) != no ; then \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
 	else \
 	  echo pdflatex not found - cannot build pdf file ; \
 	fi
@@ -255,6 +256,7 @@ dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	@if test $(LATEX) != no ; then \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	else \
