@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.37 2004/07/01 17:10:34 broeker Exp $
+ * $Id: svg.trm,v 1.38 2004/07/02 23:58:55 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -61,8 +61,11 @@ TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
 TERM_PUBLIC int SVG_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void SVG_previous_palette __PROTO((void));
 TERM_PUBLIC void SVG_set_color __PROTO((double));
-TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
 #endif /* PM3D */
+
+#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
+TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
+#endif
 
 TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
@@ -986,6 +989,18 @@ SVG_set_color(double gray)
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_previous_palette
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_previous_palette()
+{
+    SVG_GroupFilledClose();
+}
+
+#endif /* PM3D */
+
+#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
+/*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_filled_polygon
 ------------------------------------------------------------------------------------------------------------------------------------*/
 TERM_PUBLIC void
@@ -1032,16 +1047,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     fputs("'/>\n", gpoutfile);
 }
 
-/*------------------------------------------------------------------------------------------------------------------------------------
-	SVG_previous_palette
-------------------------------------------------------------------------------------------------------------------------------------*/
-TERM_PUBLIC void
-SVG_previous_palette()
-{
-    SVG_GroupFilledClose();
-}
-
-#endif /* PM3D */
+#endif /* PM3D || USE_ULIG_FILLEDBOXES */
 
 /* Enhanced text mode support starts here */
 

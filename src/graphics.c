@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.112 2004/07/04 21:21:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.113 2004/07/04 21:43:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -115,6 +115,7 @@ static void plot_filledcurves __PROTO((struct curve_points * plot));
 static void finish_filled_curve __PROTO((int, gpiPoint *, struct curve_points *));
 static void plot_betweencurves __PROTO((struct curve_points * plot));
 static void fill_between __PROTO((double, double, double, double, double, double, struct curve_points *));
+static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 #endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
@@ -127,7 +128,6 @@ static void place_grid __PROTO((void));
 static void edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey));
 static TBOOLEAN two_edge_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
-static TBOOLEAN bound_intersect __PROTO((struct coordinate GPHUGE * points, int i, double *ex, double *ey, filledcurves_opts *filledcurves_options));
 
 static void plot_steps __PROTO((struct curve_points * plot));	/* JG */
 static void plot_fsteps __PROTO((struct curve_points * plot));	/* HOE */
@@ -3676,6 +3676,7 @@ two_edge_intersect(
     return (FALSE);
 }
 
+#ifdef PM3D
 /* EAM April 2004 - If the line segment crosses a bounding line we will
  * interpolate an extra corner and split the filled polygon into two.
  */
@@ -3722,6 +3723,7 @@ filledcurves_opts *filledcurves_options)
 
     return FALSE;
 }
+#endif
 
 
 /* HBB 20010118: all the *_callback() functions made non-static. This

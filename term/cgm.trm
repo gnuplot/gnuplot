@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.58 2004/07/01 17:10:12 broeker Exp $
+ * $Id: cgm.trm,v 1.59 2004/07/02 23:58:40 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -106,15 +106,10 @@ TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y
 #ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CGM_set_color __PROTO((double gray));
-TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
 #endif
 
-#ifdef USE_ULIG_FILLEDBOXES
-#ifndef PM3D
-    /* Normally defined in color.h, but without PM3D it is missing in action */
-    typedef struct { unsigned int x, y; } gpiPoint;
+#if defined(USE_ULIG_FILLEDBOXES) || defined(PM3D)
     TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
-#endif
 #endif
 
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));

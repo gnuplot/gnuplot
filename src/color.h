@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.15 2004/07/01 17:10:04 broeker Exp $
+ * $Id: color.h,v 1.16 2004/07/02 23:58:35 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -31,6 +31,17 @@ of palettes between terminals and making palette routines.
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+/* EAM July 2004 - Disentangle polygon support and PM3D support  */
+/* a point (with integer coordinates) for use in polygon drawing */
+typedef struct {
+    unsigned int x, y;
+#ifdef EXTENDED_COLOR_SPECS
+    double z;
+    colorspec_t spec;
+#endif
+    int style;
+} gpiPoint;
 
 #ifdef PM3D
 
@@ -68,16 +79,6 @@ typedef struct {
     /* to be extended */
 } colorspec_t;
 #endif
-
-/* a point (with integer coordinates) for use in polygon drawing */
-typedef struct {
-    unsigned int x, y;
-#ifdef EXTENDED_COLOR_SPECS
-    double z;
-    colorspec_t spec;
-#endif
-    int style;
-} gpiPoint;
 
 
 /* a point (with double coordinates) for use in polygon drawing */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.70 2004/07/03 00:27:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.71 2004/07/03 06:08:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -441,11 +441,13 @@ get_data(struct curve_points *current_plot)
 		    current_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
+#ifdef PM3D
 		case FILLEDCURVES:
 		    current_plot->filledcurves_options.closeto = FILLEDCURVES_BETWEEN;
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 					v[1], v[2], -1.0);
 		    break;
+#endif
 
 		case YERRORLINES:
 		case YERRORBARS:

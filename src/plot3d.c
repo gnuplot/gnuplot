@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.69 2004/07/01 17:10:07 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.70 2004/07/03 06:08:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -739,13 +739,15 @@ get_3ddata(struct surface_points *this_plot)
 		case 4:
 #ifdef EAM_DATASTRINGS
 		    if (this_plot->plot_style == LABELPOINTS) {
+#ifdef PM3D
 		    /* FIXME EAM - as it stands we cannot have LABELPOINTS   */
 		    /* with pm3d colors, because they don't agree on columns */
-			/* 4th column holds label text */
 			pm3d_color_from_column = FALSE;
+#endif
 			x = v[0];
 			y = v[1];
 			z = v[2];
+			/* 4th column holds label text */
 			/* text = df_tokens[3]; */
 			break;
 		    }

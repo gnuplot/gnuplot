@@ -1,6 +1,13 @@
 2004-07-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/color.h src/plot2d.c (get_data) src/plot3d.c (get_3ddata)
+	src/save.c (save_set_all) graphics.c (bound_intersect)
+	term/cgm.trm term/pdf.trm term/svg.trm:
+	Add #ifdef PM3D where appropriate to allow building without PM3D.
+	This patch starts to make term->filled_polygon independent of PM3D.
+
 	* src/term.c (test_term): Fix broken test of filled_polygon.
+
 	* src/graphics.c (plot_betweencurves, fill_between, bound_intersect):
 	ANSIfication of function definitions.
 
