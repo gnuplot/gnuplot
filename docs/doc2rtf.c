@@ -91,7 +91,7 @@ char **argv;
     }
     parse(infile);
     convert(infile, outfile);
-    exit(EXIT_SUCCESS);
+    return (EXIT_SUCCESS);
 }
 
 /* generate an RTF footnote with reference char c and text s */
