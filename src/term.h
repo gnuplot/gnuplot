@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.18 2002/11/16 04:23:18 sfeam Exp $
+ * $Id: term.h,v 1.19 2002/12/18 17:38:52 lhecking Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -145,8 +145,13 @@
 #endif
 
 /* Apple MacOs X Server (Openstep Unix) */
+/* Apparently, Openstep code won't work on newer versions of
+ * MacOS X. If someone can fix this, and provide a proper
+ * configure test, let us know.
+ */
 #if defined(__APPLE__) && defined(__MACH__)
-# include "openstep.trm"
+/* # include "openstep.trm" */
+# include "aquaterm.trm"
 #endif 
 
 /* OS/2 */
