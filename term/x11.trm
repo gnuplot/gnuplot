@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.50 2002/02/12 16:41:17 broeker Exp $
+ * $Id: x11.trm,v 1.51 2002/02/13 18:01:00 broeker Exp $
  *
  */
 
@@ -109,6 +109,8 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 
 #ifdef TERM_BODY
 
+#include <ctype.h>
+
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
 
@@ -164,7 +166,9 @@ static char X11_default_command[] = GNUPLOT_X11;
 # endif
 # endif	/* !OS/2 */
 static char *X11_command = X11_default_command;
-static char *X11_command_parsed = (char *) 0;
+static char *X11_command_parsed = NULL;
+static char *X11_full_command_path = NULL;
+
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
@@ -178,10 +182,10 @@ parse_driver(const char *cmd)
     char *ptr;
 
     /* make a copy of cmd, as parsing will modify the string */
-    if (X11_command_parsed)
-	free(X11_command_parsed);
-    X11_command_parsed = gp_alloc(strlen(cmd) + 1, "x11->parse_driver");
-    strcpy(X11_command_parsed, X11_command), ptr = X11_command_parsed;
+    X11_command_parsed = gp_realloc(X11_command_parsed,
+				    strlen(cmd) + 1, "x11->parse_driver");
+    strcpy(X11_command_parsed, X11_command);
+    ptr = X11_command_parsed;
 
     while (*ptr != '\0' && nr < sizeof(optvec) / sizeof(char)) {
 
@@ -189,7 +193,7 @@ parse_driver(const char *cmd)
 	 * the previous argument is terminated
 	 * automatically.
 	 */
-	while ((*ptr == ' ') || (*ptr == '\t') || (*ptr == '\n'))
+	while (isspace((unsigned char)*ptr))
 	    *ptr++ = '\0';
 
 	if (!(*ptr))		/* don't count the terminating NULL */
@@ -199,11 +203,28 @@ parse_driver(const char *cmd)
 	optvec[nr++] = ptr;
 
 	/* Skip over the argument. */
-	while ('\0' != *ptr && ' ' != *ptr && '\t' != *ptr && '\n' != *ptr) {
+	while ('\0' != *ptr && !isspace((unsigned char)*ptr)) {
 	    ptr++;
 	}
     }
 
+    /* HBB 20020214: new code to prepend the environment X11_DRIVER_DIR
+     * to the command name, if it doesn't contain any slashes yet */
+    if (!strchr(optvec[0],'/')) {
+	char *dir = getenv("GNUPLOT_DRIVER_DIR");
+
+	if (!dir)
+	    dir = X11_DRIVER_DIR;
+	if (dir[0] != '/' && dir[0] != '.')
+	    int_error(NO_CARET, "Illegal X11 driver directory name !");
+	X11_full_command_path = gp_realloc(X11_full_command_path,
+					   strlen(dir) + strlen(optvec[0]) + 2,
+					   "x11 driver pathname");
+	sprintf(X11_full_command_path, "%s/%s",
+		dir, optvec[0]);
+	/* optvec[0] = X11_full_command_path; */
+    }
+	       
     return nr;
 }
 
@@ -214,7 +235,7 @@ parse_driver(const char *cmd)
 int
 X11_args(int argc, char *argv[])
 {
-    int nx11 = 0, i = 0, n;
+    int nx11 = 0, i, n;
 
     xargv = (char **) gp_alloc(argc * sizeof(char *), "<xargv>");
 
@@ -226,7 +247,7 @@ X11_args(int argc, char *argv[])
     /* We make a copy of the argument vector because
      * argv is modified later. */
     memcpy(xargv, argv, argc * sizeof(char *));
-    i += parse_driver(X11_command);
+    i = parse_driver(X11_command);
 
     while (++argv, ++xargv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
@@ -260,7 +281,9 @@ static unsigned int X11_plot_number;
 
 enum X11_id {
     X11_RESET,
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
     X11_DRIVER,
+#endif
     X11_PERSIST,
     X11_NOPERSIST,
     X11_RAISE,
@@ -270,7 +293,9 @@ enum X11_id {
 
 static struct gen_table X11_opts[] = {
     {"res$et", X11_RESET},
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
     {"dr$iver", X11_DRIVER},
+#endif
     {"per$sist", X11_PERSIST},
     {"noper$sist", X11_NOPERSIST},
     {"rai$se", X11_RAISE},
@@ -292,6 +317,7 @@ X11_options()
 	    X11_atexit();	/* tell gnuplot_x11 to shut down */
 	    ++c_token;
 	    break;
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
 	case X11_DRIVER:
 	    ++c_token;
 	    if (isstring(c_token)) {
@@ -311,6 +337,7 @@ X11_options()
 		c_token++;
 	    }
 	    break;
+#endif /* no X11_DRIVER */
 	case X11_PERSIST:
 	    persist = yes;
 	    c_token++;
@@ -342,7 +369,11 @@ X11_options()
 	    break;
 	}
     }
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
     sprintf(term_options, "%d driver \"%s\"", X11_plot_number, X11_command);
+#else
+    sprintf(term_options, "%d", X11_plot_number);
+#endif
     if (UNSET != do_raise) {
 	strcat(term_options, (yes == do_raise ? " raise" : " noraise"));
     }
@@ -479,6 +510,9 @@ X11_init()
 	/* OS-9 popen() does not block on close for child to end, so
 	 * we can safely use it here
 	 */
+	/* FIXME HBB 20020214: This doesn't understand X11_DRIVER_DIR
+	 * or $GNUPLOT_DRIVER_DIR yet. This may break execution of
+	 * freshly built gnuplot until 'make install' */
 	X11_ipc = popen(X11_command, "w");
 #else /* !(OSK || OS/2) */
 	int fdes[2];
@@ -504,7 +538,7 @@ X11_init()
 	    } else {
 		char **ptr;
 		for (ptr = optvec; ptr && *ptr; ptr++)
-		    /* EMPTY (skip over set arguments) */ ;
+		    ;		/* do nothing: skip over set arguments */ 
 		/* tell the driver not to supply any events by
 		 * appending "-noevents" to the optvec list. */
 		*ptr = noevents;
@@ -515,7 +549,7 @@ X11_init()
 	    close(fdes[1]);
 
 	    dup2(fdes[0], 0);	/* stdin from pipe */
-	    execvp(optvec[0], optvec);
+	    execvp(X11_full_command_path, optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed (X11 driver)");
 	    exit(EXIT_FAILURE);
@@ -597,7 +631,7 @@ TERM_PUBLIC void
 X11_init()
 {
     if (!(X11_pid = fork())) {
-	execvp(optvec[0], optvec);
+	execvp(X11_full_command_path, optvec);
 	_exit(1);
     }
     sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
@@ -1090,7 +1124,11 @@ START_HELP(x11)
 " if the `-display` command line option is used.",
 "",
 " Syntax:",
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
 "    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]",
+#else
+"    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise]",
+#endif    
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
 " output to plot window number n.  If n>0, the terminal number will be",
@@ -1105,11 +1143,18 @@ START_HELP(x11)
 " actually terminates the subprocess which maintains the windows (unless",
 " `-persist` was specified).",
 "",
+#ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
 " The option `driver` can be used to specify a driver different from the",
 " default driver `gnuplot_x11`. This options is thought mainly for developers",
 " who are working on new driver features. Note that changing the driver will",
 " shut down the connection to the previous driver. Example:",
 "     gnuplot> set term x11 driver \"gnuplot_x11_38a\"",
+#endif
+"",
+" The gnuplot outboard driver, gnuplot_x11, is searched in a default place",
+" chosen when the program is compiled.  You can override that by defining",
+" the environment variable GNUPLOT_DRIVER_DIR to point to a different",
+" location",    
 "",
 " Plot windows will automatically be closed at the end of the session",
 " unless the `-persist` option was given.",
@@ -1206,7 +1251,7 @@ START_HELP(x11)
 " sizes.  For example, `-pointsize 2` uses points twice the default size, and",
 " `-pointsize 0.5` uses points half the normal size.",
 "",
-" The `-noevents` switch disables all mouse and key event processing (execpt",
+" The `-noevents` switch disables all mouse and key event processing (except",
 " for `q` and `<space>` for closing the window). This is useful for programs",
 " which use the x11 driver independent of the gnuplot main program.",
 "2 monochrome_options",
