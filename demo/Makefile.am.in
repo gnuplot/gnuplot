@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par \
-temp.set fontfile.ps fontfile_latex.ps
+CLEANFILES = binary1 binary2 binary3 defaults.ini equipo2.dat field2xy.dat \
+fit.log soundfit.par temp.set fontfile.ps fontfile_latex.ps
 
 BINARY_FILES = binary1 binary2 binary3
 
