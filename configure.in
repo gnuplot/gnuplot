@@ -120,7 +120,6 @@ else
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   X_LIBRARIES="$X_PRE_LIBS $X_LIBRARIES $X_LIBS $X_EXTRA_LIBS"
   GNUPLOT_X11=gnuplot_x11
-  AC_DEFINE(X11)
 fi
 
 
@@ -160,6 +159,7 @@ AC_CHECK_HEADER(time.h, ,AC_DEFINE(NO_TIME_H) AC_CHECK_TYPE(time_t, long))
 dnl
 AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h)
 AC_CHECK_HEADERS(sys/systeminfo.h, AC_CHECK_FUNCS(sysinfo))
+AC_CHECK_HEADER(sys/stat.h, AC_HEADER_STAT, AC_DEFINE(NO_SYS_STAT_H))
 AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
 AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(libc.h malloc.h)
@@ -343,7 +343,7 @@ else
 fi
 test "$with_lasergnu" = yes       && echo "  Install lasergnu printer script."
 test "$with_linux_vga" = yes      && echo "  Use the Linux console driver."
-test "$GNUPLOT_X11" = gnuplot_x11 && echo "  Use the X Window System."
+test "$no_x" != yes               && echo "  Use the X Window System."
 echo
 dnl end config report
 
