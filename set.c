@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: set.c,v 1.67 1998/06/18 14:55:17 ddenholm Exp $";
+static char *RCSid = "$Id: set.c,v 1.68 1998/06/22 12:24:54 ddenholm Exp $";
 #endif
 
 /* GNUPLOT - set.c */
@@ -1689,10 +1689,12 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 
 /* to save duplicating code for x/y/z/x2/y2, make a macro
  * (should perhaps be a function ?)
- * unfortunately, string concatenation is not supported on all compilers :-(
+ * unfortunately, string concatenation is not supported on all compilers,
+ * so we have to explicitly include both 'on' and 'no' strings in
+ * the args
  */
 
-#define PROCESS_TIC_COMMANDS(TICS, MTICS, FREQ, TICDEF, AXIS, ROTATE, STRING, NOSTRING, MONTH, DAY, MINISTRING, NOMINI) \
+#define PROCESS_TIC_COMMANDS(TICS, MTICS, FREQ, TICDEF, AXIS, ROTATE, STRING, NOSTRING, MONTH, NOMONTH, DAY, NODAY, MINISTRING, NOMINI) \
 else if (almost_equals(c_token, STRING)) { \
  if (almost_equals(++c_token, "ax$is")) {\
   TICS &= ~TICS_ON_BORDER; TICS |= TICS_ON_AXIS; ++c_token;\
@@ -1719,9 +1721,13 @@ else if (almost_equals(c_token, STRING)) { \
 } else if (almost_equals(c_token,MONTH)) {\
   if (TICDEF.type == TIC_USER) { free_marklist(TICDEF.def.user); TICDEF.def.user = NULL; }\
   TICDEF.type = TIC_MONTH; ++c_token;\
+} else if (almost_equals(c_token,NOMONTH)) {\
+  TICDEF.type = TIC_COMPUTED; ++c_token; \
 } else if (almost_equals(c_token,DAY)) {\
   if (TICDEF.type == TIC_USER) { free_marklist(TICDEF.def.user); TICDEF.def.user = NULL; }\
   TICDEF.type = TIC_DAY; ++c_token; \
+} else if (almost_equals(c_token,NODAY)) {\
+  TICDEF.type = TIC_COMPUTED; ++c_token; \
 } else if (almost_equals(c_token,MINISTRING)) { /* eg mxtics */\
  struct value freq;\
  c_token++; \
@@ -1736,11 +1742,11 @@ else if (almost_equals(c_token, STRING)) { \
 }
 
 
-PROCESS_TIC_COMMANDS(x2tics,mx2tics,mx2tfreq,x2ticdef,SECOND_X_AXIS,rotate_x2tics,"x2t$ics","nox2t$ics","x2m$tics","x2d$tics","mx2t$ics","nomx2t$ics")
-PROCESS_TIC_COMMANDS(y2tics,my2tics,my2tfreq,y2ticdef,SECOND_Y_AXIS,rotate_y2tics,"y2t$ics","noy2t$ics","y2m$tics","y2d$tics","my2t$ics","nomy2t$ics" )
-PROCESS_TIC_COMMANDS(xtics, mxtics, mxtfreq, xticdef, FIRST_X_AXIS,rotate_xtics,"xt$ics","noxt$ics","xm$tics","xd$tics","mxt$ics","nomxt$ics")
-PROCESS_TIC_COMMANDS(ytics, mytics, mytfreq, yticdef, FIRST_Y_AXIS,rotate_ytics,"yt$ics","noyt$ics","ym$tics","yd$tics","myt$ics","nomyt$ics")
-PROCESS_TIC_COMMANDS(ztics, mztics, mztfreq, zticdef, FIRST_Z_AXIS,rotate_ztics,"zt$ics","nozt$ics","zm$tics","zd$tics","mzt$ics","nomzt$ics")
+PROCESS_TIC_COMMANDS(x2tics,mx2tics,mx2tfreq,x2ticdef,SECOND_X_AXIS,rotate_x2tics,"x2t$ics","nox2t$ics","x2m$tics","nox2m$tics", "x2d$tics","nox2d$tics", "mx2t$ics","nomx2t$ics")
+PROCESS_TIC_COMMANDS(y2tics,my2tics,my2tfreq,y2ticdef,SECOND_Y_AXIS,rotate_y2tics,"y2t$ics","noy2t$ics","y2m$tics","noy2m$tics", "y2d$tics","noy2d$tics", "my2t$ics","nomy2t$ics" )
+PROCESS_TIC_COMMANDS(xtics, mxtics, mxtfreq, xticdef, FIRST_X_AXIS,rotate_xtics,"xt$ics","noxt$ics","xm$tics","noxm$tics", "xd$tics","noxd$tics","mxt$ics","nomxt$ics")
+PROCESS_TIC_COMMANDS(ytics, mytics, mytfreq, yticdef, FIRST_Y_AXIS,rotate_ytics,"yt$ics","noyt$ics","ym$tics","noym$tics", "yd$tics","noyd$tics","myt$ics","nomyt$ics")
+PROCESS_TIC_COMMANDS(ztics, mztics, mztfreq, zticdef, FIRST_Z_AXIS,rotate_ztics,"zt$ics","nozt$ics","zm$tics","nozm$tics", "zd$tics","nozd$tics","mzt$ics","nomzt$ics")
 
     else if (almost_equals(c_token,"ticsl$evel")) {
 		double tlvl;
