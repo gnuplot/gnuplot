@@ -23,7 +23,81 @@
 \newcount\rownum
 
 \newcommand*\row[1]{%
-  \textbackslash #1 & 
+  \gdef\zus{}%
+  \ifnum#1=000
+    \gdef\zus{, \textbackslash 241}%
+  \else\ifnum#1=001
+    \gdef\zus{, \textbackslash 242}%
+  \else\ifnum#1=002
+    \gdef\zus{, \textbackslash 243}%
+  \else\ifnum#1=003
+    \gdef\zus{, \textbackslash 244}%
+  \else\ifnum#1=004
+    \gdef\zus{, \textbackslash 245}%
+  \else\ifnum#1=005
+    \gdef\zus{, \textbackslash 246}%
+  \else\ifnum#1=006
+    \gdef\zus{, \textbackslash 247}%
+  \else\ifnum#1=007
+    \gdef\zus{, \textbackslash 250}%
+  \else\ifnum#1=010
+    \gdef\zus{, \textbackslash 251}%
+  \else\ifnum#1=011
+    \gdef\zus{, \textbackslash 252}%
+  \else\ifnum#1=012
+    \gdef\zus{, \textbackslash 255}%
+  \else\ifnum#1=013
+    \gdef\zus{, \textbackslash 256}%
+  \else\ifnum#1=014
+    \gdef\zus{, \textbackslash 257}%
+  \else\ifnum#1=015
+    \gdef\zus{, \textbackslash 260}%
+  \else\ifnum#1=016
+    \gdef\zus{, \textbackslash 261}%
+  \else\ifnum#1=017
+    \gdef\zus{, \textbackslash 262}%
+  \else\ifnum#1=020
+    \gdef\zus{, \textbackslash 263}%
+  \else\ifnum#1=021
+    \gdef\zus{, \textbackslash 264}%
+  \else\ifnum#1=022
+    \gdef\zus{, \textbackslash 265}%
+  \else\ifnum#1=023
+    \gdef\zus{, \textbackslash 266}%
+  \else\ifnum#1=024
+    \gdef\zus{, \textbackslash 267}%
+  \else\ifnum#1=025
+    \gdef\zus{, \textbackslash 270}%
+  \else\ifnum#1=026
+    \gdef\zus{, \textbackslash 271}%
+  \else\ifnum#1=027
+    \gdef\zus{, \textbackslash 272}%
+  \else\ifnum#1=030
+    \gdef\zus{, \textbackslash 273}%
+  \else\ifnum#1=031
+    \gdef\zus{, \textbackslash 274}%
+  \else\ifnum#1=032
+    \gdef\zus{, \textbackslash 275}%
+  \else\ifnum#1=033
+    \gdef\zus{, \textbackslash 276}%
+  \else\ifnum#1=034
+    \gdef\zus{, \textbackslash 277}%
+  \else\ifnum#1=035
+    \gdef\zus{, \textbackslash 300}%
+  \else\ifnum#1=036
+    \gdef\zus{, \textbackslash 301}%
+  \else\ifnum#1=037
+    \gdef\zus{, \textbackslash 302}%
+  \else\ifnum#1=040
+    \gdef\zus{, \textbackslash 303}% and \200
+  \else\ifnum#1=177
+    \gdef\zus{, \textbackslash 304}%
+  \fi\fi\fi\fi\fi\fi\fi
+  \fi\fi\fi\fi\fi\fi\fi
+  \fi\fi\fi\fi\fi\fi\fi
+  \fi\fi\fi\fi\fi\fi\fi
+  \fi\fi\fi\fi\fi\fi
+  \textbackslash #1\zus & 
   {\cmr\char'#1} & 
   {\cmti\char'#1} & 
   {\cmtt\char'#1} & 
@@ -37,13 +111,13 @@
   \ifodd\rownum \else\qquad\fi
   \global\advance\rownum 1
   {\raisebox{1.7ex}[0mm][1ex]{\cmex\char'#1}} &
-  \textbackslash #1 \\
+  \textbackslash #1\zus \\
 }
 
 \begin{document}
 \title{Using \TeX\ Fonts in the Gnuplot Postscript Terminal}
 \author{Harald Harders, {\ttfamily h.harders@tu-bs.de}}
-\date{2002-10-15}
+\date{2002-11-14}
 \maketitle
 
 The Postscript terminal can embed Postscript Type\,1 fonts (with
@@ -151,6 +225,21 @@ overlap sometimes in the table. Since the baseline of the
 \verb|CMEX10-Baseline| with a different baseline if \verb|CMEX10| is
 embedded (normaly by using \verb|fontfile 'cmex10.pfb'|.
 
+Since characters with an octal number below \textbackslash 040 can't
+be displayed by some postscript interpreters, these characters are
+repeated in the Computer Modern Fonts with a larger code.
+Thus, you should use the larger number, where two octal numbers are
+given (e.g. \textbackslash 000, \textbackslash 241).
+For example, you better use
+\begin{verbatim}
+set xlabel '{/CMR10 \242}'
+\end{verbatim}
+than
+\begin{verbatim}
+set xlabel '{/CMR10 \001}'
+\end{verbatim}
+to get an upright uppercase Delta. 
+
 \begin{longtable}{lllllllllllll}
   \toprule
   Oct& \rotatebox{90}{CMR10}& \rotatebox{90}{CMTI10}&
@@ -163,23 +252,23 @@ embedded (normaly by using \verb|fontfile 'cmex10.pfb'|.
   \endhead
   \bottomrule
   \endfoot
-  \row{001}\row{002}\row{003}\row{004}\row{005}\row{006}\row{007}
-  \row{011}\row{012}\row{013}\row{014}\row{015}\row{016}\row{017}
-  \row{021}\row{022}\row{023}\row{024}\row{025}\row{026}\row{027}
-  \row{031}\row{032}\row{033}\row{034}\row{035}\row{036}\row{037}
-  \row{041}\row{042}\row{043}\row{044}\row{045}\row{046}\row{047}
-  \row{051}\row{052}\row{053}\row{054}\row{055}\row{056}\row{057}
-  \row{061}\row{062}\row{063}\row{064}\row{065}\row{066}\row{067}
-  \row{071}\row{072}\row{073}\row{074}\row{075}\row{076}\row{077}
+  \row{000}\row{001}\row{002}\row{003}\row{004}\row{005}\row{006}\row{007}
+  \row{010}\row{011}\row{012}\row{013}\row{014}\row{015}\row{016}\row{017}
+  \row{020}\row{021}\row{022}\row{023}\row{024}\row{025}\row{026}\row{027}
+  \row{030}\row{031}\row{032}\row{033}\row{034}\row{035}\row{036}\row{037}
+  \row{040}\row{041}\row{042}\row{043}\row{044}\row{045}\row{046}\row{047}
+  \row{050}\row{051}\row{052}\row{053}\row{054}\row{055}\row{056}\row{057}
+  \row{060}\row{061}\row{062}\row{063}\row{064}\row{065}\row{066}\row{067}
+  \row{070}\row{071}\row{072}\row{073}\row{074}\row{075}\row{076}\row{077}
   %
-  \row{101}\row{102}\row{103}\row{104}\row{105}\row{106}\row{107}
-  \row{111}\row{112}\row{113}\row{114}\row{115}\row{116}\row{117}
-  \row{121}\row{122}\row{123}\row{124}\row{125}\row{126}\row{127}
-  \row{131}\row{132}\row{133}\row{134}\row{135}\row{136}\row{137}
-  \row{141}\row{142}\row{143}\row{144}\row{145}\row{146}\row{147}
-  \row{151}\row{152}\row{153}\row{154}\row{155}\row{156}\row{157}
-  \row{161}\row{162}\row{163}\row{164}\row{165}\row{166}\row{167}
-  \row{171}\row{172}\row{173}\row{174}\row{175}\row{176}\row{177}
+  \row{100}\row{101}\row{102}\row{103}\row{104}\row{105}\row{106}\row{107}
+  \row{110}\row{111}\row{112}\row{113}\row{114}\row{115}\row{116}\row{117}
+  \row{120}\row{121}\row{122}\row{123}\row{124}\row{125}\row{126}\row{127}
+  \row{130}\row{131}\row{132}\row{133}\row{134}\row{135}\row{136}\row{137}
+  \row{140}\row{141}\row{142}\row{143}\row{144}\row{145}\row{146}\row{147}
+  \row{150}\row{151}\row{152}\row{153}\row{154}\row{155}\row{156}\row{157}
+  \row{160}\row{161}\row{162}\row{163}\row{164}\row{165}\row{166}\row{167}
+  \row{170}\row{171}\row{172}\row{173}\row{174}\row{175}\row{176}\row{177}
   %
 \end{longtable}
 
