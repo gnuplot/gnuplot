@@ -1,7 +1,7 @@
 #
-# $Id: mgr.dem,v 1.6 2002/02/17 20:41:51 mikulik Exp $
+# $Id: mgr.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
 #
-pause 0 "Watch some  cubic splines"
+print "Watch some  cubic splines"
 set samples 50
 set xlabel "Angle (deg)"
 set ylabel "Amplitude"
