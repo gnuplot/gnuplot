@@ -4237,7 +4237,7 @@ int minitics;			/* minitics - off/default/auto/explicit */
 double minifreq;		/* frequency */
 tic_callback callback;		/* fn to call to actually do the work */
 {
-    /* seperate main-tic part of grid */
+    /* separate main-tic part of grid */
     struct lp_style_type lgrd, mgrd;
 
     memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
