@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.19 2002/03/21 21:46:14 amai Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.20 2002/03/29 21:44:23 amai Exp $" ;
 #endif
 
 /****************************************************************************
@@ -183,7 +183,12 @@ static BOOL     bPlotPos = FALSE ;
 static BOOL     bPopFront = TRUE ;
 static BOOL     bKeepRatio = TRUE ;	//PM
 static BOOL     bNewFont = FALSE ;
+
 static BOOL     bHorz = TRUE ;
+  /* Horizontal or vertical 90deg text. It should be taken away and completely
+     replaced by those 2 variables below. FIXME */
+static double   multLineHor  = 1; /* Horizontal and vertical spacing shifts */
+static double   multLineVert = 0; /* for multiline prints.		    */
 
 static int	codepage = 0;
 
@@ -2295,12 +2300,24 @@ server:
 	                case CENTRE: sw = -sw/2; break;
 	                case RIGHT:  sw = -sw;   break;
                         }
+		    /* FIXME -- I'm not sure what's correct ! */
+#if 0
                     if( bHorz ) {
 			ptl.x = (LONG)(x+sw) ; ptl.y = (LONG)(y-lVOffset/4) ;
                         }
                     else {
                         ptl.x = (LONG)x ; ptl.y = (LONG)(y+sw) ;
                         }
+#else
+		    /* FIXME -- use mutlLineHor, multLineVert instead of bHorz ! */
+                    if( bHorz ) {
+			ptl.x = (LONG)(x+multLineHor*sw); 
+			ptl.y = (LONG)(y-lVOffset/4);
+                    } else {
+			ptl.x = (LONG)x;
+			ptl.y = (LONG)(y+multLineVert*sw);
+                    }
+#endif
                     if(bEnhanced)
                         CharStringAt( hps, ptl.x, ptl.y, strlen( str ) , str ) ;
                     else
@@ -2318,7 +2335,7 @@ server:
 
                 case 'A' :   /* text angle */
                     {
-                    int ta ;    
+                    int ta, t1;
                     GRADIENTL grdl ;
                     SIZEF sizHor, sizVer ;
                     if( bPath ) {
@@ -2327,20 +2344,33 @@ server:
                         bPath = FALSE ;
                         }
                     BufRead(hRead,&ta, sizeof(int), &cbR) ;
-                    if( ta == 0 ) {
-                        grdl.x = 0L ; grdl.y = 0L ;
-                        GpiSetCharAngle( hps, &grdl ) ;
-			if( !bHorz ) {
-                            bHorz = TRUE ;
+		    t1 = ta % 360;
+		    if (t1 < 0) t1 += 360;
+		    switch (t1) {
+			case   0: grdl.x =  1L; grdl.y =  0L;
+				  multLineHor = 0; multLineVert = 1;
+				  break;
+			case  90: grdl.x =  0L; grdl.y =  1L;
+				  multLineHor = 1; multLineVert = 0;
+				  break;
+			case 180: grdl.x = -1L; grdl.y =  0L;
+				  multLineHor = -1; multLineVert = 0;
+				  break;
+			case 270: grdl.x =  0L; grdl.y = -1L;
+				  multLineHor = -1; multLineVert = 0;
+				  break;
+			default:  {
+				  double t = t1 * M_PI/180;
+				  grdl.x = (LONG)(100*cos(t));
+				  grdl.y = (LONG)(100*sin(t));
+				  multLineHor = sin(t); multLineVert = cos(t);
                             }
                         }
-                    else if( ta == 1 ) {
-                        grdl.x = 0L ; grdl.y = 1L ;
-			GpiSetCharAngle( hps, &grdl ) ;
-                        if( bHorz ) {
-                            bHorz = FALSE ;
-                            }
-                        }
+		    GpiSetCharAngle(hps, &grdl) ;
+		    /* More or less horizontal text. But its usage should be
+		       replaced by using multLineHor and multLineVert, and then
+		       removed. FIXME */
+		    bHorz = (t1<45 || (t1>180-45 && t1<180+45)) ? TRUE : FALSE;
                     }
 		    break ;
 
@@ -2362,7 +2392,7 @@ server:
 	            lt = (lt%8);
 	            col = (col+2)%16 ;
                     GpiLabel( hps, lLineTypes[lt] ) ;
-lOldLine=lt ;
+		    lOldLine = lt;
                     LType( (bLineTypes||bBW)?lt:0 ) ;
 /*                    GpiSetLineType( hps, (bLineTypes||bBW)?lLineTypes[lt]:lLineTypes[0] ) ; */
                     if( !bBW ) { /* maintain some flexibility here in case we don't want
@@ -2894,18 +2924,35 @@ static char *ParseText(HPS hps, char *p, BOOL brace, char *fontname,
 /*for(i=0;i<textlen;i++)fputc(starttext[i], ff);fputc('\n',ff) ; fclose(ff);} */
         if( textlen > 0 ) {
             GpiQueryTextBox( hps, textlen, starttext, TXTBOX_COUNT, aptl ) ;
+#if 0
             if( bHorz ) textwidth += aptl[TXTBOX_BOTTOMRIGHT].x ;
             else        textwidth += aptl[TXTBOX_BOTTOMRIGHT].y ;
+#else
+	    /* FIXME -- is this correct? */
+            textwidth += aptl[TXTBOX_BOTTOMRIGHT].x * multLineHor;
+            textwidth += aptl[TXTBOX_BOTTOMRIGHT].y * multLineVert;
+#endif
             }
         if( bText ) {
             if(textlen > 0 ) {
                 GpiCharStringAt( hps, &ptlText, textlen, starttext ) ;
+#if 0
                 ptlText.x += aptl[TXTBOX_CONCAT].x + (bHorz?0:(-base)) ;
                 ptlText.y += aptl[TXTBOX_CONCAT].y + (bHorz?base:0) ;
+#else
+                ptlText.x += aptl[TXTBOX_CONCAT].x - multLineHor*base ;
+                ptlText.y += aptl[TXTBOX_CONCAT].y + multLineVert*base ;
+#endif
                 }
             else {
+#if 0
                 ptlText.x += (bHorz?0:(-base)) ;
                 ptlText.y += (bHorz?base:0) ;
+#else
+                ptlText.x -= multLineHor * base;
+                ptlText.y += multLineVert * base;
+#endif
+
                 }
             }
         textlen = 0 ;
@@ -3092,8 +3139,14 @@ static char *ParseText(HPS hps, char *p, BOOL brace, char *fontname,
         if( textlen > 0 ) {
             GpiQueryTextBox( hps, textlen, starttext, TXTBOX_COUNT, aptl ) ;
             if( widthflag ) {
+#if 0
                 if( bHorz ) textwidth += aptl[TXTBOX_BOTTOMRIGHT].x ;
                 else        textwidth += aptl[TXTBOX_BOTTOMRIGHT].y ;
+#else
+		/* FIXME -- use mutlLineHor, multLineVert instead of bHorz ! */
+                if( bHorz ) textwidth += aptl[TXTBOX_BOTTOMRIGHT].x ;
+                else        textwidth += aptl[TXTBOX_BOTTOMRIGHT].y ;
+#endif
                 }
             }
         if( bText ) {
@@ -3106,8 +3159,13 @@ static char *ParseText(HPS hps, char *p, BOOL brace, char *fontname,
                     }
                 }
             if( base != 0 ) {
+#if 0
                 ptlText.x -= (bHorz?0:(-base)) ;
                 ptlText.y -= (bHorz?base:0) ;
+#else
+                ptlText.x += multLineHor * base;
+                ptlText.y -= multLineVert * base;
+#endif
                 }
             }
         if( bChangeFont ) {
