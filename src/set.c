@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.66 2001/11/10 18:27:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.67 2001/11/11 21:37:56 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1636,6 +1636,8 @@ set_keytitle()
 /* set label {tag} {label_text} {at x,y} {pos} {font name,size} {...} */
 /* Entry font added by DJL */
 /* allow any order of options - pm 10.11.2001 */
+/* Changed again, to still allow every class of exclusive options only
+ * *once* in the command line. */
 static void
 set_label()
 {
@@ -1649,14 +1651,14 @@ set_label()
     int rotate = 0;
     int tag;
     TBOOLEAN set_text = FALSE, set_position = FALSE, set_just = FALSE,
-	     set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
-	     set_layer = FALSE;
+	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
+	set_layer = FALSE;
     int layer = 0;
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     float hoff = 1.0;
     float voff = 1.0;
 
-    loc_lp.pointflag = -1; /* untouched */
+    loc_lp.pointflag = -2;	/* untouched */
     c_token++;
     /* get tag */
     if (!END_OF_COMMAND
@@ -1699,145 +1701,135 @@ set_label()
     }
 
     while (!END_OF_COMMAND) {
-    /* get justification - what the heck, let him put it here */
-	if (almost_equals(c_token, "l$eft")) {
-	    just = LEFT;
+	/* get position */
+	if (! set_position && equals(c_token, "at")) {
 	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-    if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
-	    just = CENTRE;
-	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-    if (almost_equals(c_token, "r$ight")) {
-	    just = RIGHT;
-	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-
-    /* get position */
-    if (equals(c_token, "at")) {
-	c_token++;
-	get_position(&pos);
-	set_position = TRUE;
-	continue;
-#if 0 /* pm, 10.11.2001: don't support position without "at" keyword */
-    } else {
-	pos.x = pos.y = pos.z = 0;
-	pos.scalex = pos.scaley = pos.scalez = first_axes;
-	set_position = FALSE;
-	continue;
-#endif
-    }
-
-    /* get justification */
-	if (almost_equals(c_token, "l$eft")) {
-	    just = LEFT;
-	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-    if (almost_equals(c_token, "c$entre") || almost_equals(c_token, "c$enter")) {
-	    just = CENTRE;
-	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-    if (almost_equals(c_token, "r$ight")) {
-	    just = RIGHT;
-	    c_token++;
-	    set_just = TRUE;
-	    continue;
-    }
-
-    /* get rotation (added by RCC) */
-	if (almost_equals(c_token, "rot$ate")) {
-	    rotate = TRUE;
-	    c_token++;
-	    set_rot = TRUE;
-	    continue;
-    }
-    if (almost_equals(c_token, "norot$ate")) {
-	    rotate = FALSE;
-	    c_token++;
-	    set_rot = TRUE;
-	    continue;
-    }
-
-    /* get font */
-    /* Entry font added by DJL */
-    if (equals(c_token, "font")) {
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "font name and size expected");
-	if (isstring(c_token)) {
-	    font = gp_alloc (token_len(c_token), "text_label->font");
-	    quote_str(font, c_token, token_len(c_token));
-	    /* get 'name,size', no further check */
-	    set_font = TRUE;
-	} else
-	    int_error(c_token, "'fontname,fontsize' expected");
-	c_token++;
-	continue;
-    }
-
-    /* get front/back (added by JDP) */
-    if (equals(c_token, "back")) {
-	layer = 0;
-	c_token++;
-	set_layer = TRUE;
-	continue;
-    }
-    if (equals(c_token, "front")) {
-	if (set_layer)
-	    int_error(c_token, "only one of front or back expected");
-	layer = 1;
-	c_token++;
-	set_layer = TRUE;
-	continue;
-    }
-    
-    { /* read point type */
-	int stored_token = c_token;
-	struct lp_style_type tmp_lp;
-	lp_parse(&tmp_lp, 0, 1, -2, -2);
-	if (stored_token != c_token) {
-	    loc_lp = tmp_lp;
-	    loc_lp.pointflag = 1;
-	    if (loc_lp.p_type < -1) loc_lp.p_type = 0;
+	    get_position(&pos);
+	    set_position = TRUE;
 	    continue;
 	}
-    }
 
-    if (almost_equals(c_token, "nopo$int")) {
-	loc_lp.pointflag = 0;
-	c_token++;
-	continue;
-    }
+	/* get justification */
+	if (! set_just) {
+	    if (almost_equals(c_token, "l$eft")) {
+		just = LEFT;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    } else if (almost_equals(c_token, "c$entre")
+		       || almost_equals(c_token, "c$enter")) {
+		just = CENTRE;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    } else if (almost_equals(c_token, "r$ight")) {
+		just = RIGHT;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    }
+	}
 
-    if (almost_equals(c_token, "of$fset")) {
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "Expected horizontal offset");
-	hoff = real(const_express(&a));
+	/* get rotation (added by RCC) */
+	if (! set_rot) {
+	    if (almost_equals(c_token, "rot$ate")) {
+		rotate = TRUE;
+		c_token++;
+		set_rot = TRUE;
+		continue;
+	    } else if (almost_equals(c_token, "norot$ate")) {
+		rotate = FALSE;
+		c_token++;
+		set_rot = TRUE;
+		continue;
+	    }
+	}
 
-	/* c_token++; */
-	if (!equals(c_token, ","))
-	    int_error(c_token, "Expected comma");
+	/* get font */
+	/* Entry font added by DJL */
+	if (! set_font && equals(c_token, "font")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "font name and size expected");
+	    if (isstring(c_token)) {
+		font = gp_alloc (token_len(c_token), "text_label->font");
+		quote_str(font, c_token, token_len(c_token));
+		/* get 'name,size', no further check */
+		set_font = TRUE;
+		c_token++;
+		continue;
+	    } else
+		int_error(c_token, "'fontname,fontsize' expected");
+	}
 
-	c_token++;
-	if (END_OF_COMMAND)
-	    int_error(c_token, "Expected vertical offset");
-	voff = real(const_express(&a));
-	set_offset = TRUE;
-	continue;
-    }
+	/* get front/back (added by JDP) */
+	if (! set_layer) {
+	    if (equals(c_token, "back")) {
+		layer = 0;
+		c_token++;
+		set_layer = TRUE;
+		continue;
+	    } else if (equals(c_token, "front")) {
+		layer = 1;
+		c_token++;
+		set_layer = TRUE;
+		continue;
+	    }
+	}
+    
+	if (loc_lp.pointflag == -2) {
+	    /* read point type */
+	    /* FIXME HBB 20011120: should probably have a keyword
+	     * "point" required before the actual lp-style spec, for
+	     * clarity and better parsing */
+	    int stored_token = c_token;
+	    struct lp_style_type tmp_lp;
+	    
+	    lp_parse(&tmp_lp, 0, 1, -2, -2);
+	    if (stored_token != c_token) {
+		loc_lp = tmp_lp;
+		loc_lp.pointflag = 1;
+		if (loc_lp.p_type < -1)
+		    loc_lp.p_type = 0;
+		continue;
+	    } else if (almost_equals(c_token, "nopo$int")) {
+		/* didn't look like a pointstyle... */
+		loc_lp.pointflag = 0;
+		c_token++;
+		continue;
+	    }
+	}
 
-    int_error(c_token, "extraenous argument in set label");
+	if (! set_offset && almost_equals(c_token, "of$fset")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "Expected horizontal offset");
+	    hoff = real(const_express(&a));
+
+	    if (!equals(c_token, ","))
+		int_error(c_token, "Expected comma");
+
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "Expected vertical offset");
+	    voff = real(const_express(&a));
+	    set_offset = TRUE;
+	    continue;
+	}
+
+	/* Coming here means that none of the previous 'if's struck
+	 * its "continue" statement, i.e.  whatever is in the command
+	 * line is forbidden by the command syntax. */
+	int_error(c_token, "extraenous or contradicting arguments in set label");
+
+    } /* while(!END_OF_COMMAND) */
+
+    /* HBB 20011120: this chunk moved here, behind the while()
+     * loop. Only after all options have been parsed it's safe to
+     * overwrite the position if none has been specified. */
+    if (!set_position) {
+	pos.x = pos.y = pos.z = 0;
+	pos.scalex = pos.scaley = pos.scalez = first_axes;
     }
 
     /* OK! add label */
@@ -1871,8 +1863,7 @@ set_label()
 	}
     } else {
 	/* adding the label */
-	new_label = (struct text_label *)
-	    gp_alloc(sizeof(struct text_label), "label");
+	new_label = gp_alloc(sizeof(struct text_label), "label");
 	if (prev_label != NULL)
 	    prev_label->next = new_label;	/* add it to end of list */
 	else

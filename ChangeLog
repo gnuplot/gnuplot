@@ -1,3 +1,9 @@
+2001-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_label): Corrected as yet un-ChangeLog'ed new code
+ 	from Petr that allows linetypes to be set for labels and relaxes
+	the syntax for that command a lot.
+
 2001-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/datafile.c (f_column): Added missing implementation of
@@ -7,16 +13,16 @@
 2001-11-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* NEWS: Lots of additional fixes and new features mentioned, and
-	some entries moved to the correct release they came with.
+ 	some entries moved to the correct release they came with.
 
 2001-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/axis.h src/axis.c src/graphics.c src/save.c src/set.c
-	src/unset.c src/show.c src/graph3d.c docs/gnuplot.doc NEWS:
-	New options for 'set grid': {layerdefault | front | back}.
+ 	src/unset.c src/show.c src/graph3d.c docs/gnuplot.doc NEWS: New
+ 	options for 'set grid': {layerdefault | front | back}.
 
 	* src/save.c: Labels and arrows were not saving "back", "front"
-	option.
+ 	option.
 
 2001-10-31  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
