@@ -27,7 +27,9 @@ EMACS = @EMACS@
 MAKEINFO = @MAKEINFO@
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 LATEX = @LATEX@
-DVIPS = dvips
+# $Header$
+
+DVIPS = @DVIPS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 
@@ -97,10 +99,15 @@ info-look.elc:  info-look.20.2.el info-look.20.3.el
 	  then $(BYTEC) info-look.el; fi;
 
 
-ps: gpelcard.ps
+pdf: gpelcard.pdf
+ps:  gpelcard.ps
 
 gpelcard.ps: gpelcard.dvi
 	$(DVIPS) -o gpelcard.ps gpelcard.dvi
+
+gpelcard.pdf: gpelcard.tex
+	@test -f gpelcard.tex || cp $(srcdir)/gpelcard.tex .
+	$(PDFLATEX) gpelcard.tex
 
 gpelcard.dvi: gpelcard.tex
 	@test -f gpelcard.tex || cp $(srcdir)/gpelcard.tex .

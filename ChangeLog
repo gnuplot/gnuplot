@@ -1,6 +1,12 @@
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* doc/.cvsignore docs/psdoc/.cvsignore: Add missing entries
+	* lisp/Makefile.in lisp/configure.in lisp/configure:
+	Some more checks; get additional targets to work
+
+2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* doc/.cvsignore docs/psdoc/.cvsignorelisp/.cvsignore:
+	Add missing entries
 
 2001-09-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 

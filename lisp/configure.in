@@ -1,7 +1,19 @@
+# $HEader$
+
 AC_INIT(dot.el)
+AC_PREREQ(2.13)
+
 AC_SET_MAKE
 AC_PROG_INSTALL
 AM_PATH_LISPDIR
+
 EMACS=`basename $EMACS`
+
+AC_CHECK_PROGS(DVIPS, dvips, no)
+AC_CHECK_PROGS(LATEX, latex latex2e, no)
 AC_PATH_PROG(MAKEINFO, makeinfo, no)
+
+dnl for pdf format docs
+AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+
 AC_OUTPUT(Makefile)
