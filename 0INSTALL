@@ -248,6 +248,14 @@ moment.
 MSDOS
 -----
 
+Using DJGPP
+  Basically the same as Unix+configure. Andris Pavenis <pavenis@lanet.lv>
+  has contributed a shell script which makes the whole process even easier:
+  just run djconfig.sh, and then make.
+  For novices, it is recommended to use makefile.dj2 instead:
+      copy makefile.dj2 makefile
+      make
+
 Using Microsoft C 7.0.
       copy makefile.msc makefile
       nmake 
