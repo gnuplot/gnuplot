@@ -129,11 +129,14 @@ static struct x11opt {
 #define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
 
 static FILE *X11_ipc;
-#ifdef OS2
-static char X11_command[1024] = "gnuplot_x11.exe";
-#else
-static char X11_command[1024] = "exec gnuplot_x11";
-#endif
+
+static char **xargv = (char **)NULL;
+static char *optvec[2*X11_nopts+1];
+# ifdef OS2
+static char X11_command[] = "gnuplot_x11.exe";
+# else
+static char X11_command[] = "gnuplot_x11";
+# endif /* !OS/2 */
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
@@ -143,21 +146,30 @@ int X11_args(argc, argv)
 int argc;
 char *argv[];
 {
-    int nx11 = 0, n;
+    int nx11 = 0, i = 0, n;
 
-    while (++argv, --argc > 0) {
+    xargv = (char **) gp_alloc (argc*sizeof(char *), "<xargv>");
+
+    if (!xargv) {
+	fputs ("not enough memory for argv - quitting\n", stderr);
+	exit (EXIT_FAILURE);
+    }
+
+    /* We make of copy of the argument vector because
+     * other functions might modify to their purpose. */
+    memcpy (xargv, argv, argc*sizeof(char *));
+    optvec[i++] = X11_command;
+
+    while (++argv, ++xargv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
-	    if (!strcmp(*argv, X11_opts[n].option)) {
-		strcat(X11_command, " ");
-		strcat(X11_command, *argv);
+	    if (strcmp(*argv, X11_opts[n].option) == 0) {
+		optvec[i++] = *xargv;
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
 		if (X11_opts[n].type == hasValue) {
 		    if (--argc <= 0)
-			return (nx11);
-		    strcat(X11_command, " \"");
-		    strcat(X11_command, *++argv);
-		    strcat(X11_command, "\"");
+			return nx11;
+		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
 		}
 		nx11++;
@@ -167,6 +179,7 @@ char *argv[];
 	if (n == X11_nopts)
 	    break;
     }
+
     return (nx11);
 }
 
@@ -239,14 +252,14 @@ TERM_PUBLIC void X11_init()
 	 * we can safely use it here
 	 */
 	X11_ipc = popen(X11_command, "w");
-#else
+#else /* !(OSK || OS/2) */
 	int fdes[2];
 	pipe(fdes);
 	if (fork() == 0) {
 	    /* child */
 	    close(fdes[1]);
 	    dup2(fdes[0], 0);	/* stdin from pipe */
-	    execl("/bin/sh", "sh", "-c", X11_command, NULL);
+	    execvp(X11_command, optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed");
 	    exit(1);
@@ -254,7 +267,7 @@ TERM_PUBLIC void X11_init()
 	/* parent */
 	close(fdes[0]);		/* read end of pipe */
 	X11_ipc = fdopen(fdes[1], "w");
-#endif
+#endif /* !(OSK || OS/2) */
     } {
 	static int been_here = 0;
 	if (!been_here) {
