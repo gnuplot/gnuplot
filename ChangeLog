@@ -1,3 +1,11 @@
+1998-08-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* descrip.mms: Patch by Rolf Niepraschk
+	<niepraschk@ChbRB.berlin.ptb.de>.
+
+	* term/post.trm: Patch by Joji Maeda <jiji@ee.noda.sut.ac.jp> to
+	increase the number of dictionaries to 256.
+
 1998-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* gplt_x11.c, makefile.os2, os2/gclient.c, os2/print.c, term/pm.trm:
