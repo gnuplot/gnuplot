@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.8 2004/04/13 17:24:03 broeker Exp $
+ * $Id: util3d.h,v 1.9 2004/09/01 15:53:49 mikulik Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -52,6 +52,9 @@ typedef struct vertex {
     int style;			/* point symbol type (if any) */
 #ifdef PM3D
     coordval real_z;
+#endif
+#ifdef EAM_DATASTRINGS
+    struct text_label *label;
 #endif
 } vertex;
 typedef vertex GPHUGE * p_vertex;

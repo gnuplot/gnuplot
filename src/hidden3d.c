@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.43 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.44 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1044,6 +1044,29 @@ build_networks(struct surface_points *plots, int pcount)
 		struct coordinate GPHUGE *points = icrvs->points;
 		long int previousvertex = -1;
 
+#ifdef EAM_DATASTRINGS
+		/* To handle labels we must look inside a separate list */
+		/* rather than just walking through the points arrays.  */
+		if (this_plot->plot_style == LABELPOINTS) {
+		    struct text_label *label;
+		    long int thisvertex;
+		    struct coordinate labelpoint;
+		    lp->pointflag = 1; /* Labels can use the code for hidden points */
+		    for (label = this_plot->labels; label != NULL; label = label->next) {
+			labelpoint.x = label->place.x;
+			labelpoint.y = label->place.y;
+			labelpoint.z = label->place.z;
+			thisvertex = store_vertex(&labelpoint, 1, color_from_column);
+			if (thisvertex < 0 || previousvertex < 0) {
+			    previousvertex = thisvertex;
+			    continue;
+	 		}
+			(vlist+thisvertex)->label = label;
+			store_edge(thisvertex, edir_point, crvlen, lp, above);
+		    }
+		} else
+#endif
+
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 
@@ -1429,7 +1452,14 @@ draw_vertex(p_vertex v)
 
     TERMCOORD(v, x, y);
     if (v->style >= 0 && !clip_point(x,y)) {
-	(term->point)(x,y, v->style);
+
+#ifdef EAM_DATASTRINGS
+	if (v->label)  {
+	    write_label(x,y, v->label);
+	} else
+#endif
+	    (term->point)(x,y, v->style);
+
 	/* vertex has been drawn --> flag it as done */
 	v->style = -1;
     }
