@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.56 2002/01/28 16:38:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.57 2002/02/03 11:18:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -110,6 +110,7 @@ static void plot3d_points __PROTO((struct surface_points * plot, /* FIXME PM3D: 
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
 static void plot3d_points_pm3d __PROTO((struct surface_points * plot, int p_type));
+static void get_surface_cbminmax __PROTO((struct surface_points *plot, double *cbmin, double *cbmax));
 #endif
 static void cntr3d_impulses __PROTO((struct gnuplot_contours * cntr,
 				     struct lp_style_type * lp));
@@ -141,8 +142,8 @@ static void boundary3d __PROTO((struct surface_points * plots, int count));
 static void key_sample_line __PROTO((int xl, int yl));
 static void key_sample_point __PROTO((int xl, int yl, int pointtype));
 #ifdef PM3D
-static void key_sample_line_pm3d __PROTO((int xl, int yl));
-static void key_sample_point_pm3d __PROTO((int xl, int yl, int pointtype));
+static void key_sample_line_pm3d __PROTO((struct surface_points *plot, int xl, int yl));
+static void key_sample_point_pm3d __PROTO((struct surface_points *plot, int xl, int yl, int pointtype));
 #endif
 static void key_text __PROTO((int xl, int yl, char *text));
 
@@ -900,7 +901,7 @@ do_3dplot(plots, pcount, quick)
 		    if (lkey) {
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette) 
-			    key_sample_line_pm3d(xl, yl);
+			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
 #endif
 			key_sample_line(xl, yl);
@@ -930,7 +931,7 @@ do_3dplot(plots, pcount, quick)
 		if (lkey) {
 #ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
 #endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
@@ -950,7 +951,7 @@ do_3dplot(plots, pcount, quick)
 		if (lkey) {
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
-			    key_sample_line_pm3d(xl, yl);
+			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
 #endif
 		    key_sample_line(xl, yl);
@@ -969,7 +970,7 @@ do_3dplot(plots, pcount, quick)
 		if (lkey) {
 #ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 		    else
 #endif
 		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
@@ -990,7 +991,7 @@ do_3dplot(plots, pcount, quick)
 		if (lkey) {
 #ifdef PM3D
 		    if (this_plot->lp_properties.use_palette)
-			key_sample_point_pm3d(xl, yl, -1);
+			key_sample_point_pm3d(this_plot, xl, yl, -1);
 		    else
 #endif
 			key_sample_point(xl, yl, -1);
@@ -1066,7 +1067,7 @@ do_3dplot(plots, pcount, quick)
 		    case POINTSTYLE:
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
-			    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 			else
 #endif
 			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
@@ -1074,7 +1075,7 @@ do_3dplot(plots, pcount, quick)
 		    case LINESPOINTS:
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
-			    key_sample_line_pm3d(xl, yl);
+			    key_sample_line_pm3d(this_plot, xl, yl);
 			else
 #endif
 			key_sample_line(xl, yl);
@@ -1082,7 +1083,7 @@ do_3dplot(plots, pcount, quick)
 		    case DOTS:
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
-			    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+			    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 			else
 #endif
 			key_sample_point(xl, yl, -1);
@@ -1137,7 +1138,7 @@ do_3dplot(plots, pcount, quick)
 			    case POINTSTYLE:
 #ifdef PM3D
 				if (this_plot->lp_properties.use_palette)
-				    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 				else
 #endif
 				key_sample_point(xl, yl, this_plot->lp_properties.p_type);
@@ -1145,7 +1146,7 @@ do_3dplot(plots, pcount, quick)
 			    case DOTS:
 #ifdef PM3D
 				if (this_plot->lp_properties.use_palette)
-				    key_sample_point_pm3d(xl, yl, this_plot->lp_properties.p_type);
+				    key_sample_point_pm3d(this_plot, xl, yl, this_plot->lp_properties.p_type);
 				else
 #endif
 				key_sample_point(xl, yl, -1);
@@ -1667,10 +1668,8 @@ plot3d_points_pm3d(plot, p_type)
     unsigned int x, y;
     struct termentry *t = term;
 
-#ifdef PM3D
     /* just a shortcut */
     int color_from_column = plot->pm3d_color_from_column;
-#endif
 
     /* split the bunch of scans in two sets in
      * which the scans are already depth ordered */
@@ -1706,11 +1705,9 @@ plot3d_points_pm3d(plot, p_type)
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		    if (!clip_point(x, y)) {
-#ifdef PM3D
 			if (color_from_column)
 			    set_color(z2gray(points[i].ylow));
 			else
-#endif
 			set_color(z2gray(points[i].z));
 			(*t->point) (x, y, p_type);
 		    }
@@ -2735,25 +2732,80 @@ int pointtype;
     }
 }
 
+
 #ifdef PM3D
-/* let us make a gradient color line */
+
+/*
+ * returns minimal and maximal values of the cb-range (or z-range if taking the
+ * color from the z value) of the given surface
+ */
 static void
-key_sample_line_pm3d(xl, yl)
+get_surface_cbminmax(plot, cbmin, cbmax)
+    struct surface_points *plot;
+    double *cbmin, *cbmax;
+{
+    int i, curve = 0;
+    int color_from_column = plot->pm3d_color_from_column; /* just a shortcut */
+    coordval cb;
+    struct iso_curve *icrvs = plot->iso_crvs;
+    struct coordinate GPHUGE *points;
+
+    *cbmin = VERYLARGE;
+    *cbmax = -VERYLARGE;
+
+    while (icrvs && curve < plot->num_iso_read) {
+	/* fprintf(stderr,"**** NEW ISOCURVE - nb of pts: %i ****\n", icrvs->p_count); */
+        for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
+		/* fprintf(stderr,"  point i=%i => x=%4g y=%4g z=%4lg cb=%4lg\n",i, points[i].x,points[i].y,points[i].z,points[i].ylow); */
+		if (points[i].type == INRANGE) {
+		    /* ?? if (!clip_point(x, y)) ... */
+		    cb = color_from_column ? points[i].ylow : points[i].z;
+		    if (cb < *cbmin) *cbmin = cb;
+		    if (cb > *cbmax) *cbmax = cb;
+		}
+	} /* points on one scan */
+	icrvs = icrvs->next;
+	curve++;
+    } /* surface */
+}
+
+
+/* 
+ * Draw a gradient color line for a key (legend).
+ */
+static void
+key_sample_line_pm3d(plot, xl, yl)
+    struct surface_points *plot;
 int xl, yl;
 {
-    const int steps = 32;
+    int steps = GPMIN(24, abs(key_sample_right - key_sample_left)); 
+        /* don't multiply by key_swidth --- could be >> palette.maxcolors */
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     double step = ((double)(key_sample_right - key_sample_left)) / steps;
     int i = 1, x1 = xl + key_sample_left, x2;
+    double cbmin, cbmax;
+    double gray_from, gray_to, gray_step;
+
+    /* color gradient only over the cb-values of the surface, if smaller than the 
+     * cb-axis range (the latter are gray values [0:1]) */
+    get_surface_cbminmax(plot, &cbmin, &cbmax);
+    if (cbmin > cbmax) return; /* splot 1/0, for example */
+    cbmin = GPMAX(cbmin, CB_AXIS.min);
+    cbmax = GPMIN(cbmax, CB_AXIS.max);
+    gray_from = z2gray(cbmin);
+    gray_to = z2gray(cbmax);
+    gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
+
     if (key == KEY_AUTO_PLACEMENT)
 	(*term->move) (x1, yl);
     else 
 	clip_move(x1, yl);
-    set_color(0);
+    set_color(gray_from);
     x2 = x1;
     while (i <= steps) {
-	if (i>1) set_color( i==steps ? 1 : (i-0.5)/steps );
+	/* if (i>1) set_color( i==steps ? 1 : (i-0.5)/steps ); ... range [0:1] */
+	if (i>0) set_color( i==steps ? gray_to : gray_from+i*gray_step );
 	(*term->move) (x2, yl);
 	x2 = (i==steps) ? x_to : x1 + (int)(i*step+0.5);
 	if (key == KEY_AUTO_PLACEMENT)
@@ -2764,24 +2816,48 @@ int xl, yl;
     }
 }
 
-/* let us make a sequence of points with gradient color */
+
+/*
+ * Draw a sequence of points with gradient color a key (legend).
+ */
 static void
-key_sample_point_pm3d(xl, yl, pointtype)
+key_sample_point_pm3d(plot, xl, yl, pointtype)
+    struct surface_points *plot;
 int xl, yl;
 int pointtype;
 {
     /* int x_from = xl + key_sample_left; */
     int x_to = xl + key_sample_right;
     int i = 0, x1 = xl + key_sample_left, x2;
+    double cbmin, cbmax;
+    double gray_from, gray_to, gray_step;
     /* rule for number of steps: 3*char_width*pointsize or char_width for dots, 
      * but at least 3 points */
-    double step = term->h_char * (pointtype == -1 ? 1 : 3*pointsize);
+    double step = term->h_char * (pointtype == -1 ? 1 : 3*(1+(pointsize-1)/2));
     int steps = (int)(((double)(key_sample_right - key_sample_left)) / step + 0.5);
     if (steps < 2) steps = 2;
     step = ((double)(key_sample_right - key_sample_left)) / steps;
-    set_color(0);
+
+    /* color gradient only over the cb-values of the surface, if smaller than the 
+     * cb-axis range (the latter are gray values [0:1]) */
+    get_surface_cbminmax(plot, &cbmin, &cbmax);
+    if (cbmin > cbmax) return; /* splot 1/0, for example */
+    cbmin = GPMAX(cbmin, CB_AXIS.min);
+    cbmax = GPMIN(cbmax, CB_AXIS.max);
+    gray_from = z2gray(cbmin);
+    gray_to = z2gray(cbmax);
+    gray_step = (gray_to > gray_from) ? (gray_to - gray_from)/steps : 0;
+#if 0
+    fprintf(stderr,"POINT_pm3D: cbmin=%g  cbmax=%g\n",cbmin, cbmax);
+    fprintf(stderr,"steps=%i gray_from=%g gray_to=%g gray_step=%g\n",steps,gray_from,gray_to,gray_step);
+#endif
+    set_color(gray_from);
     while (i <= steps) {
-	if (i>0) set_color( i==steps ? 1 : (i-0.5)/steps );
+	/* if (i>0) set_color( i==steps ? gray_to : (i-0.5)/steps ); ... range [0:1] */
+	if (i>0) set_color( i==steps ? gray_to : gray_from+i*gray_step );
+#if 0
+	fprintf(stderr,"  i=%i\t %g\n", i, (i==steps ? gray_to : gray_from+i*gray_step ));
+#endif
 	x2 = i==0 ? x1 : (i==steps ? x_to : x1 + (int)(i*step+0.5));
 	/* x2 += key_point_offset; ... that's if there is only 1 point */
 	if (key == KEY_AUTO_PLACEMENT || !clip_point(x2, yl))

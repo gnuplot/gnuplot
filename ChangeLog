@@ -1,3 +1,10 @@
+2002-02-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c: For 'splot ... with ... palette', draw key as a line
+	or point/dot sequence with a color gradient according to the color
+	range of the function/datafile itself, not over the whole global color
+	range.
+
 2002-02-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg config/makefile.mgw: Add -DHAVE_ATEXIT.
