@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.56 2002/07/22 09:22:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.57 2002/08/16 08:11:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1284,7 +1284,7 @@ eval_3dplots()
 			    this_plot->plot_style = POINTSTYLE;
 			}
 #ifdef PM3D
-		    if (data_style & PM3DSURFACE) {
+		    if ((this_plot->plot_style | data_style) & PM3DSURFACE) {
 			if (equals(c_token, "at")) {
 			/* option 'with pm3d [at ...]' is explicitly specified */
 			c_token++;
