@@ -1,5 +1,7 @@
 2004-03-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* config/config.mgw config/config.os2: #define HAVE_TIME_T_IN_TIME_H.
+
 	* ChangeLog: Fixed typos and spaces in author names and their e-mails
 	in ChangeLog entries.
 
