@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.58 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.59 2001/07/03 12:48:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1551,16 +1551,7 @@ set_label()
 	set_text = FALSE; /* default no text */
 
     /* get justification - what the heck, let him put it here */
-    if (!END_OF_COMMAND
-#if 0 /* HBB 20001021: unnecessary checks */
-	&& !equals(c_token, "at")
-	&& !equals(c_token, "font")
-	&& !almost_equals(c_token, "rot$ate")
-	&& !almost_equals(c_token, "norot$ate")
-	&& !equals(c_token, "front")
-	&& !equals(c_token, "back")
-#endif
-	) {
+    if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	    c_token++;
@@ -1572,12 +1563,8 @@ set_label()
 	    set_just = TRUE;
 	} else if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
-	c_token++;
-	set_just = TRUE;
-#if 0 /* HBB 20001021: with the above change, this is not an error */
-	} else {
-	    int_error(c_token, "bad syntax in set label");
-#endif
+	    c_token++;
+	    set_just = TRUE;
 	}
     }
 
@@ -1593,17 +1580,7 @@ set_label()
     }
 
     /* get justification */
-    if (!END_OF_COMMAND
-#if 0 /* HBB 20001021: none of these are needed */
-	&& !almost_equals(c_token, "rot$ate")
-	&& !almost_equals(c_token, "norot$ate")
-	&& !equals(c_token, "front")
-	&& !equals(c_token, "back")
-	&& !equals(c_token, "font")
-	&& !almost_equals(c_token, "po$intstyle")
-	&& !almost_equals(c_token, "nopo$intstyle")
-#endif
-	) {
+    if (!END_OF_COMMAND) {
 	if (set_just)
 	    int_error(c_token, "only one justification is allowed");
 	if (almost_equals(c_token, "l$eft")) {
@@ -1617,52 +1594,29 @@ set_label()
 	    set_just = TRUE;
 	} else if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
-	c_token++;
-	set_just = TRUE;
-#if 0 /* HBB 20001021: not an error, in this version */
-	} else {
-	    int_error(c_token, "bad syntax in set label");
-#endif
+	    c_token++;
+	    set_just = TRUE;
 	}
 
     }
 
     /* get rotation (added by RCC) */
-    if (!END_OF_COMMAND
-#if 0 /* HBB 20001021: no need to check all these */
-	&& !equals(c_token, "font")
-	&& !equals(c_token, "front")
-	&& !equals(c_token, "back")
-	&& !almost_equals(c_token, "po$intstyle")
-	&& !almost_equals(c_token, "nopo$intstyle")
-#endif
-	) {
+    if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "rot$ate")) {
 	    rotate = TRUE;
 	    c_token++;
 	    set_rot = TRUE;
 	} else if (almost_equals(c_token, "norot$ate")) {
 	    rotate = FALSE;
-	c_token++;
-	set_rot = TRUE;
-#if 0 /* HBB 20001021: not an error, in this version */
-	} else {
-	    int_error(c_token, "bad syntax in set label");
-#endif
-    }
+	    c_token++;
+	    set_rot = TRUE;
+	}
     }
 
     /* get font */
     /* Entry font added by DJL */
     set_font = FALSE;
-    if (!END_OF_COMMAND	&& equals(c_token, "font")
-#if 0 /* HBB 20001021: the followin cannot possibly happen... */
-	&& !equals(c_token, "front")
-	&& !equals(c_token, "back")
-	&& !almost_equals(c_token, "po$intstyle")
-	&& !almost_equals(c_token, "nopo$intstyle")
-#endif /* 1/0 HBB 20001021 */
-	) {
+    if (!END_OF_COMMAND && equals(c_token, "font")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error(c_token, "font name and size expected");
@@ -1679,38 +1633,30 @@ set_label()
 
     /* get front/back (added by JDP) */
     set_layer = FALSE;
-    if (!END_OF_COMMAND	&& equals(c_token, "back")
-#if 0 /* HBB 20001021: none of these can happen */
-	&& !equals(c_token, "front")
-	&& !almost_equals(c_token, "po$intstyle")
-	&& !almost_equals(c_token, "nopo$intstyle")
-#endif
-	) {
+    if (!END_OF_COMMAND && equals(c_token, "back")) {
 	layer = 0;
 	c_token++;
 	set_layer = TRUE;
     }
-    if(!END_OF_COMMAND && equals(c_token, "front")
-#if 0 /* HBB 20001021: none of these can happen */
-	&& !almost_equals(c_token, "po$intstyle")
-	&& !almost_equals(c_token, "nopo$intstyle")
-#endif
-       ) {
+    if(!END_OF_COMMAND && equals(c_token, "front")) {
 	if (set_layer)
 	    int_error(c_token, "only one of front or back expected");
 	layer = 1;
 	c_token++;
 	set_layer = TRUE;
     }
-
+    
+    /* FIXME HBB 20010813: ill-named option. This should be
+     * 'pointtype'.  And it should allow to pass in a point _size_ and
+     * linetype (i.e.  pen color), too. Or a true (line)style
+     * number. */
     if(!END_OF_COMMAND && almost_equals(c_token, "po$intstyle")) {
 	c_token++;
 	pointstyle = (int) real(const_express(&a));
 	if (pointstyle < 0)
 	    pointstyle = -1; /* UNSET */
-	else
-#define POINT_TYPES 6 /* compare with term.c */
-	    pointstyle %= POINT_TYPES;
+	/* HBB 20010813: removed code that modulo'ed the pointstyle
+	 * with POINT_TYPES==6. */
     }
     if(!END_OF_COMMAND && almost_equals(c_token, "nopo$intstyle")) {
 	pointstyle = -1; /* UNSET */
