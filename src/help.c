@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.6 1999/06/17 14:21:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.7 1999/06/19 20:53:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -343,7 +343,7 @@ sortkeys()
     /* sort the array */
     /* note that it only moves objects of size (two pointers + long + int) */
     /* it moves no strings */
-    qsort((char *) keys, keycount, sizeof(KEY), (sortfunc) keycomp);
+    qsort((char *) keys, (size_t)keycount, sizeof(KEY), (sortfunc) keycomp);
 }
 
 static int
@@ -427,7 +427,7 @@ size_t len;
     char *prev;
     TBOOLEAN status = FALSE;	/* assume not ambiguous */
     int compare;
-    int sublen;
+    size_t sublen;
 
     if (key->key[len] == NUL)
 	return (FALSE);
@@ -510,7 +510,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
     size_t len;			/* length of key name */
     char line[BUFSIZ];		/* subtopic output line */
     char *start;		/* position of subname in key name */
-    int sublen;			/* length of subname */
+    size_t sublen;			/* length of subname */
     char *prev = NULL;		/* the last thing we put on the list */
 
 #define MAXSTARTS 256
@@ -538,11 +538,12 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
 	    if (prev == NULL || strncmp(start, prev, sublen) != 0) {
 		if (subt == 0) {
 		    subt++;
-		    if (len)
-			(void) sprintf(line, "\nSubtopics available for %s:\n",
-				       key->key);
-		    else
-			(void) sprintf(line, "\nHelp topics available:\n");
+		    if (len) {
+			strcpy(line, "\nSubtopics available for ");
+			strncat(line, key->key, BUFSIZ - 28);
+			strcat(line, ":\n");
+		    } else
+			strcpy(line, "\nHelp topics available:\n");
 		    OutLine(line);
 		    *line = NUL;
 		}
@@ -652,7 +653,7 @@ StartOutput()
 /* line should contain only one \n, at the end */
 void
 OutLine(line)
-char *line;
+const char *line;
 {
     int c;			/* dummy input char */
 #if defined(PIPES)

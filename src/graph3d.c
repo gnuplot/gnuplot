@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.8 1999/06/14 19:19:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.9 1999/06/17 14:25:49 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -695,8 +695,9 @@ int pcount;			/* count of plots in linked list */
 
     /* KEY TITLE */
     if (key != 0 && strlen(key_title)) {
-	char *ss = gp_alloc(strlen(key_title) + 1, "tmp string ss");
-	sprintf(ss, "%s\n", key_title);
+	char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
+	strcpy(ss, key_title);
+	strcat(ss, "\n");
 	s = ss;
 	yl -= t->v_char / 2;
 	while ((e = (char *) strchr(s, '\n')) != NULL) {

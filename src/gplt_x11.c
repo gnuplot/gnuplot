@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.4 1999/06/11 11:18:54 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.5 1999/06/19 20:53:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1276,17 +1276,17 @@ gnuplot: X11 aborted.\n", ldisplay);
 
 #ifdef VMS
     strcpy(buffer, "DECW$USER_DEFAULTS:GNUPLOT_X11.INI");
-#else
-# ifdef OS2
+#elif defined OS2
 /* for Xfree86 ... */
     {
 	char *appdefdir = "XFree86/lib/X11/app-defaults";
 	char *xroot = getenv("X11ROOT");
 	sprintf(buffer, "%s/%s/%s", xroot, appdefdir, "Gnuplot");
     }
-# else
-    sprintf(buffer, "%s/%s", AppDefDir, "Gnuplot");
-# endif				/* !OS2 */
+# else /* !OS/2 */
+    strcpy(buffer, AppDefDir);
+    strcat(buffer, "/");
+    strcat(buffer, "Gnuplot");
 #endif /* !VMS */
 
     dbApp = XrmGetFileDatabase(buffer);
@@ -1300,7 +1300,8 @@ gnuplot: X11 aborted.\n", ldisplay);
 #ifdef VMS
 	strcpy(buffer, "DECW$USER_DEFAULTS:DECW$XDEFAULTS.DAT");
 #else
-	sprintf(buffer, "%s/.Xdefaults", home);
+	strcpy(buffer, home);
+	strcat(buffer, ".Xdefaults");
 #endif
 	dbDef = XrmGetFileDatabase(buffer);
     }
@@ -1320,7 +1321,9 @@ gnuplot: X11 aborted.\n", ldisplay);
 	}
 	if ((p = strchr(host, '.')) != NULL)
 	    *p = '\0';
-	sprintf(buffer, "%s/.Xdefaults-%s", home, host);
+	strcpy(buffer, home);
+	strcat(buffer, "/.Xdefaults-");
+	strcat(buffer, host);
 	dbEnv = XrmGetFileDatabase(buffer);
     }
     XrmMergeDatabases(dbEnv, &db);

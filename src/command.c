@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.14 1999/06/14 19:20:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.15 1999/06/19 20:52:04 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -358,7 +358,7 @@ command()
 			tm.tm_yday);
 		memset(&tm, 0, sizeof(tm));
 		ggmtime(&tm, secs);
-		gstrftime(string, 159, format, secs);
+		gstrftime(string, strlen(string), format, secs);
 		fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
 			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
@@ -534,11 +534,11 @@ command()
 	term_start_plot();
 
 	if (multiplot && term->fillbox) {
-	    unsigned int x1 = (unsigned int) (xoffset * term->xmax);
-	    unsigned int y1 = (unsigned int) (yoffset * term->ymax);
+	    unsigned int xx1 = (unsigned int) (xoffset * term->xmax);
+	    unsigned int yy1 = (unsigned int) (yoffset * term->ymax);
 	    unsigned int width = (unsigned int) (xsize * term->xmax);
 	    unsigned int height = (unsigned int) (ysize * term->ymax);
-	    (*term->fillbox) (0, x1, y1, width, height);
+	    (*term->fillbox) (0, xx1, yy1, width, height);
 	}
 	term_end_plot();
 
@@ -1068,10 +1068,12 @@ int toplevel;
 	    do {
 		if (subtopics && !only) {
 		    /* prompt for subtopic with current help string */
-		    if (len > 0)
-			(void) sprintf(prompt, "Subtopic of %s: ", helpbuf);
-		    else
-			(void) strcpy(prompt, "Help topic: ");
+		    if (len > 0) {
+			strcpy (prompt, "Subtopic of ");
+			strncat (prompt, helpbuf, MAX_LINE_LEN - 16);
+			strcat (prompt, ": ");
+		    } else
+			strcpy(prompt, "Help topic: ");
 		    read_line(prompt);
 		    num_tokens = scanner(&input_line, &input_line_len);
 		    c_token = 0;
@@ -1178,13 +1180,13 @@ char **parms;
 
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 /* keep some compilers happy */
-static char *rlgets __PROTO((char *s, size_t n, char *prompt));
+static char *rlgets __PROTO((char *s, size_t n, const char *prompt));
 
 static char *
 rlgets(s, n, prompt)
 char *s;
 size_t n;
-char *prompt;
+const char *prompt;
 {
     static char *line = (char *) NULL;
     static int leftover = -1;	/* index of 1st char leftover from last call */

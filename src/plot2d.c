@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.11 1999/06/17 14:19:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.12 1999/06/19 20:52:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1368,7 +1368,9 @@ int *plot_num;
 	    if (xp->title && xp->title[0] != '\0' && yp->title) {
 		tlen = strlen(yp->title) + strlen(xp->title) + 3;
 		new_title = gp_alloc(tlen, "string");
-		sprintf(new_title, "%s, %s", xp->title, yp->title);
+		strcpy(new_title, xp->title);
+		strcat(new_title, ", ");
+		strcat(new_title, yp->title);
 		free(yp->title);
 		yp->title = new_title;
 	    }
