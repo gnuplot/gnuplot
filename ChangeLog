@@ -1,3 +1,8 @@
+2001-02-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/fit.c (fit_command): Bugfix for 2D fits with a fixed yrange.
+  	Local copying of range endpoints over to zrange was not done.
+
 2001-02-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/win/wgraph.c src/win/wgnuplib.h term/win.trm: partial

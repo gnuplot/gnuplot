@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.24 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.25 2001/02/01 17:56:04 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1290,9 +1290,9 @@ fit_command()
 	else {
 	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
 	    Z_AXIS.autoscale = Y_AXIS.autoscale;
-	    if (Y_AXIS.autoscale & 1)
+	    if (!(Y_AXIS.autoscale & 1))
 		Z_AXIS.min = Y_AXIS.min;
-	    if (Y_AXIS.autoscale & 2)
+	    if (!(Y_AXIS.autoscale & 2))
 		Z_AXIS.max = Y_AXIS.max;
 	}
     }
