@@ -14,6 +14,9 @@
 	* term/x11.trm: Redefine VMS-only macro to allow if/then/else
 	constructs: GO(x) = do {} while (0)
 
+	* src/show.c: Protect call to add_history() with a test for the
+	presence of READLINE support.
+
 2004-04-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gpcard.tex: Remove duplicated X11 terminal entry.
