@@ -1,9 +1,12 @@
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
+	* src/readline.c: Fix Gnuplot-readline implementation to
+	distinguish between VIO and xterm
+
 	* term/post.trm: Fix broken PS code for Symbol Oblique font
 	definition. Thanks to Michael Vulis from MicroPress
 
-	* src/getcolor.c: Add an #include
+	* src/getcolor.c: Drop duplicate #includes
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 

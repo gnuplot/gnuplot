@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.22 2000/11/24 15:44:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.23 2000/11/27 11:13:57 amai Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -48,6 +48,7 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.22 2000/11/24 15:44:31 
 
 #include <signal.h>
 
+#include "stdfn.h"
 #include "readline.h"
 
 #include "alloc.h"
@@ -306,8 +307,9 @@ FILE *fp;
 # if defined( special_getc )
 #  undef special_getc()
 # endif				/* special_getc */
-# define special_getc() msdos_getch()
+# define special_getc() os2_getch()
 static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
+static char os2_getch __PROTO((void));
 #endif /* OS2 */
 
 
@@ -817,8 +819,9 @@ msdos_getch()
 	c = getc(stdin);
 # else				/* not OS2 */
 	c = getch();		/* Get the extended code. */
-# endif				/* not OS2 */
+# endif				/* OS2 */
 #endif /* not DJGPP */
+
 	switch (c) {
 	case 75:		/* Left Arrow. */
 	    c = 002;
@@ -855,6 +858,27 @@ msdos_getch()
 
 #endif /* MSDOS || _Windows || DOS386 || OS2 */
 
+#ifdef OS2
+/* We need to call different procedures, dependent on the  
+   session type: VIO/window or an (XFree86) xterm */
+static char
+os2_getch() {
+  static int IsXterm = 0;
+  static int init = 0;
+  
+  if (!init) {
+     if (getenv("WINDOWID")) {
+        IsXterm = 1;
+     }
+     init = 1;
+  }
+  if (IsXterm) {
+     return ansi_getc();
+  } else {
+     return msdos_getch();
+  }
+}
+#endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
 
