@@ -332,7 +332,8 @@ static void X11_atexit HANDLER_DECL { /* WHAT SHOULD I DO ? */
 #endif
 #ifdef __GNUC__
 #include <errno.h>
-#else int vaxc$errno;
+#else
+int vaxc$errno;
 #endif
 
 #define SS$_NORMAL 1		/* or include <ssdef.h> for all SS$_ def's */
