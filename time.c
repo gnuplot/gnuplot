@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: time.c,v 1.5 1998/12/09 15:25:54 lhecking Exp $";
+static char *RCSid = "$Id: time.c,v 1.5.2.1 1999/08/19 14:35:30 lhecking Exp $";
 #endif
 
 /* GNUPLOT - time.c */
@@ -240,8 +240,6 @@ struct tm *tm;
 	case 'Y':
 	    s = read_int(s, 4, &tm->tm_year);
 	    date++;
-	    /* tm->tm_year -= 1900; */
-	    /* HOE tm->tm_year %= 100; */
 	    break;
 
 	case 'j':
@@ -263,13 +261,36 @@ struct tm *tm;
 	    s = read_int(s, 2, &tm->tm_sec);
 	    break;
 
+	/* read EPOCH data
+	 * EPOCH is the std. unixtimeformat seconds since 01.01.1970 UTC
+	 * actualy i would need a read_long (or what time_t is else)
+	 *  aktualy this is not my idea       i got if from
+	 * AlunDa Penguin Jones (21.11.97)
+	 * but changed %t to %s because of strftime
+	 * and fixed the localtime() into gmtime()
+	 * maybe we should use ggmtime() ? but who choose double ????
+	 * Walter Harms <WHarms@bfs.de> 26 Mar 2000
+	 */
+
+	case 's':
+	    {
+		/* time_t when; */
+		int when;
+		struct tm *tmwhen;
+		s = read_int(s, 10, &when);
+		tmwhen = gmtime((time_t*)&when);
+		tmwhen->tm_year += 1900;
+		*tm = *tmwhen;
+		break;
+	    }
+
 	default:
 	    int_warn("Bad time format in string", NO_CARET);
 	}
 	fmt++;
     }
 
-    FPRINTF((stderr, "read date-time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "read date-time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     /* now check the date/time entered, normalising if necessary
      * read_int cannot read a -ve number, but can read %m=0 then decrement
@@ -298,7 +319,7 @@ struct tm *tm;
 #undef M
 #undef H
 
-    FPRINTF((stderr, "normalised time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "normalised time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     if (date) {
 	if (yday) {
@@ -620,7 +641,7 @@ struct tm *tm;
     dsec *= 60.0;
     dsec += tm->tm_sec;
 
-    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, dsec));
+    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d = %g seconds\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, dsec));
 
     return (dsec);
 }
@@ -678,7 +699,7 @@ double l_clock;
     }
     tm->tm_mday = days + 1;
 
-    FPRINTF((stderr, "broken-down time : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
+    FPRINTF((stderr, "broken-down time : %02d/%02d/%d:%02d:%02d:%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
     return (0);
 }
