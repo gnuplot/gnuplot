@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: gpltconv.c,v 1.1 1999/08/17 15:51:16 lhecking Exp $"); }
 #endif
 
 /* gnuplot - gpltconv.c */
@@ -7,20 +7,22 @@ static char *RCSid() { return RCSid("$Id: $"); }
 /*
  * Copyright (C) 1999  Lars Hecking
  *
- * The code is released to the public domain.
+ * This code is in the public domain.
  *
  */
 
 /*
  *
- * Convert old gnuplot syntax to gnuplot 4.0 command syntax
+ * Convert old gnuplot syntax to gnuplot 4.0 command syntax. This program
+ * was provided because some platforms do not have the tools necessary to
+ * perform processing of text files.
  *
  * Usage: gpltconv [infile [outfile]]
  *
- * If no file names are present, the program filters from stdin to stdout.
- * If one file name is present, the programs filters from that file to stdout.
+ * If no file names are present, gpltconv filters from stdin to stdout.
+ * If one file name is present, gpltconv filters from that file to stdout.
  *
- * The conversions are:
+ * The conversions are (so far):
  *
  * set data style xxx     -> set style data xxx
  * set function style xxx -> set style function xxx
@@ -41,6 +43,8 @@ static char *RCSid() { return RCSid("$Id: $"); }
  *
  * or perl.
  *
+ * TODO: Make conversion both ways. Detect old/new syntax automagically
+ *
  */
 
 #include <stdio.h>
@@ -50,14 +54,28 @@ static char *RCSid() { return RCSid("$Id: $"); }
 #define GNUPLOT_COMMENT '#'
 
 /* translation buffer; should be big enough for everyone ...
- * we don't use dynamic memory to keep the code simple */
+ * we don't use dynamic memory to keep it nice and simple */
 static char tbuf[4096];
 
-/* strings to be replaced */
-static char *datastring = "set data style ";
-static char *funcstring = "set function style ";
-static char *linestring = "set linestyle ";
-static char *nostring   = "set no";
+/* strings to be changed */
+static char *instrings[] =
+{
+    "set data style ",
+    "set function style ",
+    "set linestyle ",
+    "set no"
+};
+
+/* replacements */
+static char *outstrings[] =
+{
+    "set style data ",
+    "set style function ",
+    "set style line ",
+    "unset "
+};
+
+#define N_REPL (int)(sizeof(instrings)/sizeof(instrings[0]))
 
 int
 main(argc, argv)
@@ -87,71 +105,42 @@ char **argv;
 	}
     }
 
-    /* if two filename are specified, read from from the first
+    /* if two filenames are specified, read from from the first
      * and write to the second */
     if (argc == 3) {
 	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
 	    fprintf(stderr, "%s: Can't open %s for writing\n",
 		    argv[0], argv[2]);
+	    (void)fclose(infile);
 	    exit(EXIT_FAILURE);
 	}
     }
 
     /* loop over input file */
-    while (fgets(tbuf,sizeof(tbuf),infile) != NULL) {
-	char *q = &tbuf[0];
-	int len = strlen(tbuf);
+    while (fgets(tbuf,(int)sizeof(tbuf),infile) != NULL) {
+	/* skip processing if line is commented */
+	if (*tbuf != GNUPLOT_COMMENT) {
+	    char *q;
+	    int i;
+	    /* look for original strings */
+	    for (i = 0; i < N_REPL; i++) {
+		/* there may be more than one occurrence per line */
+		while((q = strstr(tbuf,instrings[i])) != NULL) {
+		    size_t inlen = strlen(instrings[i]),
+			outlen = strlen(outstrings[i]);
 
-	/* if the line is a comment, or does not contain any of the
-	 * strings to be translated, write it out directly and
-	 * skip all processing */
-	if (*tbuf == GNUPLOT_COMMENT ||
-	    (strstr(tbuf,datastring) == NULL &&
-	     strstr(tbuf,funcstring) == NULL &&
-	     strstr(tbuf,linestring) == NULL &&
-	     strstr(tbuf,nostring) == NULL))
-	    fputs(tbuf,outfile);
-	else {
-	    /* loop over input line, may contain several commands */
-	    while (q < &tbuf[len]) {
+		    if (inlen != outlen)
+			memmove(q + outlen, q + inlen, strlen(q) - inlen + 1);
 
-		q = strstr(tbuf,datastring);
-		if (q != NULL) {
-		    strncpy(q,"set style data ",strlen(datastring));
-		    q += strlen(datastring);
-		} else {
-
-		    q = strstr(tbuf,funcstring);
-		    if (q != NULL) {
-			strncpy(q,"set style function ",strlen(funcstring));
-			q += strlen(funcstring);
-		    } else {
-
-			q = strstr(tbuf,linestring);
-			if (q != NULL) {
-			    /* the replacement string is one byte longer, so
-			     * we shift everything by one byte, including the
-			     * match string and the concluding \0 byte */
-			    memmove(q+1,q,strlen(q)+1);
-			    strncpy(q,"set style line ",strlen(linestring)+1);
-			    q += strlen(linestring);
-			} else {
-
-			    q = strstr(tbuf,nostring);
-			    if (q != NULL) {
-				strncpy(q,"unset ",strlen(nostring));
-				q += strlen(nostring);
-			    } else
-				break;
-			}
-		    }
+		    strncpy(q,outstrings[i],outlen);
 		}
 	    }
-
-	    fputs(tbuf,outfile);
 	}
+	(void)fputs(tbuf,outfile);
     }
 
+    (void)fclose(infile);
+    (void)fclose(outfile);
 
     exit(EXIT_SUCCESS);
 }
