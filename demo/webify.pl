@@ -33,7 +33,7 @@ require "ctime.pl";
 
 # open pipe to gnuplot and set terminal type
 	open(GNUPLOT, "|gnuplot") or die "can't find gnuplot";
-	print GNUPLOT "set term png font arial 8 size 420,320\n";
+	print GNUPLOT "set term png enhanced font arial 8 transparent size 420,320\n";
 	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 
 # find out if gpsavediff is available in current path
@@ -43,7 +43,7 @@ require "ctime.pl";
 
 # Boiler plate header
 	print OUT "<html>\n<head>\n<title>gnuplot demo script: $ARGV[0].dem </title>\n";
-	print OUT "<link rel=\"stylesheet\" href=\"gnuplot.css\" text=\"text/css\">\n"
+	print OUT "<link rel=\"stylesheet\" href=\"gnuplot.css\" type=\"text/css\">\n"
 		  if (-e "gnuplot.css");
 	print OUT "</head>\n";
 	print OUT "<body>\n<h2>gnuplot demo script: <font color=blue>$ARGV[0].dem</font> </h2>\n";
@@ -55,8 +55,8 @@ require "ctime.pl";
 	print OUT "<hr>\n";
 
 # Start processing
+	print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\" align=right>\n";
 	print OUT "<pre>\n";
-	print OUT "<img src=\"$ARGV[0].$plot.png\" align=right>\n";
 
 	while (<IN>) {
 		if (/^pause /) {
@@ -65,9 +65,10 @@ require "ctime.pl";
 				  "for minimal script to generate this plot</p>\n";
 			    print GNUPLOT "save \"| gpsavediff > $ARGV[0].$plot.gnu\"\n";
 			}
-			print OUT "<br clear=all>\n</pre>\n<hr><pre>\n";
+			print OUT "</pre>\n<br clear=all>\n<hr>\n";
 			$plot++;
-			print OUT "<img src=\"$ARGV[0].$plot.png\" align=right>\n";
+			print OUT "<img src=\"$ARGV[0].$plot.png\" alt=\"\" align=right>\n";
+			print OUT "<pre>\n";
 			print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 		} else {
 			print OUT HTML::Entities::encode($_);
