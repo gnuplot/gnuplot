@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.93 2005/03/02 20:35:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.94 2005/03/03 04:09:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1489,13 +1489,6 @@ eval_plots()
 			get_filledcurves_style_options(&this_plot->filledcurves_options);
 		    }
 #endif
-#ifdef EAM_DATASTRINGS
-		    if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
-			this_plot->labels = new_text_label(-1);
-			this_plot->labels->pos = JUST_CENTRE;
-			this_plot->labels->layer = 1;
-		    }
-#endif
 		    if ((this_plot->plot_type == FUNC) &&
 			((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 #ifdef EAM_DATASTRINGS
@@ -1516,6 +1509,11 @@ eval_plots()
 		/* that all labels in the plot will share.                     */
 		if (this_plot->plot_style == LABELPOINTS) {
 		    int stored_token = c_token;
+		    if (this_plot->labels == NULL) {
+			this_plot->labels = new_text_label(-1);
+			this_plot->labels->pos = JUST_CENTRE;
+			this_plot->labels->layer = 1;
+		    }
 		    parse_label_options(this_plot->labels);
 		    if (stored_token != c_token) {
 			if (set_labelstyle) {
@@ -1669,6 +1667,13 @@ eval_plots()
 		if (this_plot->plot_style == FILLEDCURVES
 		&& this_plot->fill_properties.fillstyle == FS_EMPTY)
 		    this_plot->fill_properties.fillstyle = FS_SOLID;
+	    }
+
+	    /* If we got this far without initializing the label list, do it now */
+	    if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
+		this_plot->labels = new_text_label(-1);
+		this_plot->labels->pos = JUST_CENTRE;
+		this_plot->labels->layer = 1;
 	    }
 
 	    this_plot->x_axis = x_axis;

@@ -1,3 +1,8 @@
+2005-03-12  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/plot2d.c (eval_plots): Fix bug in initialization order that
+	prevented "set style data labels" from working in 2D plots.
+
 2005-03-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/emf.trm term/gd.trm term/pdf.trm term/pm.trm term/post.trm
