@@ -245,6 +245,13 @@ moment.
       make 
       make install
 
+Using the Cygwin port of gcc, which includes MinGW32: you need the
+Micrsoft SDK for the moment.
+      copy makefile.cyg makefile
+  Look through the Makefile to see if you need to make any changes.
+      make
+  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
+  in the windows directory.
 
 MSDOS
 -----
