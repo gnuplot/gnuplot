@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.23 2000/11/27 11:13:57 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.24 2001/09/18 23:08:26 amai Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -81,9 +81,12 @@ LineCompleteHandler(char* ptr)
 static int
 getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
 {
-    if (term && term->waitforinput && interactive)
+#ifdef USE_MOUSE
+    if (term && term->waitforinput && interactive) {
 	return term->waitforinput();
+    }
     else
+#endif
 	return getc(fp);
 }
 
