@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.39 2004/05/21 00:07:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.40 2004/06/30 20:01:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -406,10 +406,17 @@ mant_exp(log10_base, x, scientific, m, p, format)
 	 * the logarithmic axis is anything but 10.0 */
 	assert(log10_base == 1.0);
 
+	/* HBB FIXED 20040701: negative modulo positive may yield
+	 * negative result.  But we always want an effectively
+	 * positive modulus --> adjust input by one step */
 	switch (power % 3) {
+	case -1:
+	    power -= 3;
 	case 2:
 	    mantissa *= 100;
 	    break;
+	case -2:
+	    power -= 3;
 	case 1:
 	    mantissa *= 10;
 	    break;
@@ -418,7 +425,7 @@ mant_exp(log10_base, x, scientific, m, p, format)
 	default:
 	    int_error (NO_CARET, "Internal error in scientific number formatting");
 	}
-	power /= 3;
+	power -= (power % 3);
     }
 
     /* HBB 20010121: new code for decimal mantissa fixups.  Looks at
