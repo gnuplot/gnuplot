@@ -387,7 +387,7 @@ clean: clean-local
 	  doc2rnh gnuplot.rnh \
 	  doc2rtf gnuplot.rtf \
 	  gnuplot.nroff checkdoc *.o core a.out allterm.h
-	rm -f *.exe
+	rm -f *.exe *~
 
 mostlyclean: clean
 
