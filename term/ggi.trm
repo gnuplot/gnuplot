@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.7 2000/10/31 20:26:03 joze Exp $
+ * $Id: ggi.trm,v 1.8 2000/12/04 20:41:50 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -197,6 +197,7 @@ static int GGI_frames =
 #endif
 ;
 
+static TBOOLEAN GGI_mode_changed = 1;
 static char GGI_mode_spec[0xff] = "";
 static int GGI_acceleration = 7; /* arbitrary */
 
@@ -352,8 +353,13 @@ TERM_PUBLIC void GGI_init()
     }
 
     ggiGetMode(GGIvisual, &mode);
-    ggiFPrintMode(stderr, &mode);
-    fprintf(stderr, "\n");
+
+    /* print the mode only once if it has changed */
+    if (GGI_mode_changed) {
+	GGI_mode_changed = 0;
+	ggiFPrintMode(stderr, &mode);
+	fprintf(stderr, "\n");
+    }
 
 #ifdef USE_MOUSE
     /* must come before GGI_set_size() */
@@ -430,7 +436,6 @@ GGI_options()
 			fprintf(stderr, "acceleration must be strictly positive!\n");
 		    } else {
 			GGI_acceleration = itmp;
-			fprintf(stderr, "acceleration = %d\n", GGI_acceleration);
 		    }
 		}
 		break;
@@ -440,10 +445,17 @@ GGI_options()
 	    default:
 		if (!END_OF_COMMAND) {
 		    copy_str(GGI_mode_spec, c_token, 0xfe);
+		    GGI_mode_changed = 1;
 		}
 		break;
 	}
 	c_token++;
+    }
+    if (*GGI_mode_spec) {
+	sprintf(term_options, "mode %s acceleration %d",
+	    GGI_mode_spec, GGI_acceleration);
+    } else {
+	sprintf(term_options, "acceleration %d", GGI_acceleration);
     }
 }
 

@@ -1,5 +1,9 @@
 2000-12-04  Johannes Zellner  <johannes@zellner.org>
 
+	* term/ggi.trm: copy the ggi options to term_options
+
+2000-12-04  Johannes Zellner  <johannes@zellner.org>
+
 	* term/ggi.trm: implemented relative motion events for the ggi
 	terminal.  so that mouse actions work also with the DGA target.
 
