@@ -4,7 +4,7 @@
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
 #
-# last modification date: 19990510
+# last modification date: 19990520
 #
 
 # We depend on using cmd.exe (or a compatible one)
@@ -117,7 +117,7 @@ OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 # Special note: -ffloat-store is necessary to avoid some
 # strange behaviour (confirmed for gcc 2.7.x and graphics.c)
 EMXSPECIFIC = -ffloat-store \
-	      -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H -DHAVE_SLEEP
+	      -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H -DHAVE_SLEEP -DHAVE_UNISTD_H
 LIBS = 
 ifdef GNU_RL
   EMXSPECIFIC += -DHAVE_LIBREADLINE
