@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.31 2003/08/22 12:36:17 lhecking Exp $
+ * $Id: gd.trm,v 1.32 2003/12/01 03:32:02 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -626,6 +626,27 @@ PNG_options()
     }
 
 #ifdef HAVE_GD_TTF
+    /* If no font has been chosen but there is a default, use it */
+    /* EAM FIXME - this is a duplication of code from above */
+    if (!png_state.ttffont[0]) {
+	char *external_default = getenv("GNUPLOT_DEFAULT_GDFONT");
+	if (external_default) {
+		int brect[8];
+		char *err;
+		strncpy(png_state.ttffont, external_default, sizeof(png_state.ttffont));
+		strcpy(png_state.default_ttffont, png_state.ttffont);
+	        png_state.ttfsize = 2 * term->h_char - 2;
+		err = gdImageStringFT(NULL, &brect[0], 0, 
+			png_state.ttffont, (double)png_state.ttfsize,
+			0.0, 0, 0, "test");
+		if (err) {
+			fprintf(stderr,"%s when opening font %s, using default\n",
+				err, png_state.ttffont);
+			png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
+		}
+	}
+    }
+
     /* If no explicit TTF font size found, generate default */
     if (png_state.default_ttfsize == 0) 
 	png_state.default_ttfsize = 2 * term->h_char - 2;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.200 2004/01/07 14:44:32 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.201 2004/01/11 20:06:57 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -607,7 +607,9 @@ C
 
  Several gnuplot terminal drivers access TrueType fonts via the gd library.
  For these drivers the font search path is controlled by the environmental
- variable GDFONTPATH.
+ variable GDFONTPATH.  Furthermore, a default font for these drivers may be
+ set via the environmental variable GNUPLOT_DEFAULT_GDFONT.
+
  The postscript terminal uses its own font search path. It is controlled by
  the environmental variable GNUPLOT_FONTPATH. The format is the same as for
  GNUPLOT_LIB. The contents of GNUPLOT_FONTPATH are appended to the `fontpath`

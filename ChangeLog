@@ -1,3 +1,8 @@
+2004-01-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm docs/gnuplot.doc: Take default font for gdlib terminals
+	(png jpeg) from environmental variable GNUPLOT_DEFAULT_GDFONT.
+
 2004-01-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/Makefile.in: gnuplot.tex needs to be latexed 3 times (it contains
