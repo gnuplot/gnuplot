@@ -10,10 +10,10 @@ install-data-hook: @LASERGNU@
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)
-	rm -f $(man1dir)/lasergnu.1
+	rm -f $(DESTDIR)$(man1dir)/lasergnu.1
 
 lasergnu_install:
-	$(INSTALL_DATA) $(srcdir)/lasergnu.1 $(man1dir)
+	$(INSTALL_DATA) $(srcdir)/lasergnu.1 $(DESTDIR)$(man1dir)
 
 lasergnu_noinstall:
 
