@@ -1,3 +1,14 @@
+2004-11-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/stdfn.h
+	* src/eval.c (gp_exp) src/specfun.c (f_gamma) src/standard.c (f_tanh):
+	Rename constant MINEXP to be E_MINEXP, since this is more in line with
+	the terminology used in standard math libraries. Only fall back to the
+	current assumption that E_MINEXP == -88 if the build environment does
+	not provide a definition for DBL_MIN_10_EXP, probably in <float.h>.
+	On most machines this means that gnuplot's gamma() function should now
+	have the same allowed input domain as exp(lgamma()).
+
 2004-11-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/save.c: Fix y-axes reversal when saving during 'set view map'.

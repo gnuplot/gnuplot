@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.26 2004/04/13 17:24:01 broeker Exp $
+ * $Id: stdfn.h,v 1.27 2004/07/01 17:10:08 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -290,7 +290,17 @@ int pclose __PROTO((FILE *));
 #ifndef M_PI_2
 # define M_PI_2 1.57079632679489661923
 #endif
+#ifndef M_LN10
+#  define M_LN10    2.3025850929940456840e0
+#endif
 
+/* Use definitions from float.h and math.h if we found them */
+#if defined(DBL_MIN_10_EXP)
+# define E_MINEXP (DBL_MIN_10_EXP * M_LN10)
+#endif
+#if defined(DBL_MAX_10_EXP)
+# define E_MAXEXP (DBL_MAX_10_EXP * M_LN10)
+#endif
 
 #ifndef HAVE_STRCASECMP
 # ifdef HAVE_STRICMP
@@ -377,11 +387,6 @@ int gp_strnicmp __PROTO((const char *, const char *, size_t));
 
 #define INT_STR_LEN (3*sizeof(int))
 
-
-/* The XOPEN ln(10) macro */
-#ifndef M_LN10
-#  define M_LN10    2.3025850929940456840e0
-#endif
 
 /* HBB 20010223: moved this whole block from syscfg.h to here. It
  * needs both "syscfg.h" and <float.h> to have been #include'd before

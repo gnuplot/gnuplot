@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.20 2004/10/26 04:30:51 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.21 2004/10/27 21:54:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -437,17 +437,17 @@ Gstring(struct value *a, char *s)
 #endif
 
 /* some machines have trouble with exp(-x) for large x
- * if MINEXP is defined at compile time, use gp_exp(x) instead,
- * which returns 0 for exp(x) with x < MINEXP
+ * if E_MINEXP is defined at compile time, use gp_exp(x) instead,
+ * which returns 0 for exp(x) with x < E_MINEXP
  * exp(x) will already have been defined as gp_exp(x) in plot.h
  */
 
 double
 gp_exp(double x)
 {
-#ifdef MINEXP
-    return (x < (MINEXP)) ? 0.0 : exp(x);
-#else  /* MINEXP */
+#ifdef E_MINEXP
+    return (x < (E_MINEXP)) ? 0.0 : exp(x);
+#else  /* E_MINEXP */
     int old_errno = errno;
     double result = exp(x);
 
@@ -455,7 +455,7 @@ gp_exp(double x)
     if (result == 0.0)
 	errno = old_errno;
     return result;
-#endif /* MINEXP */
+#endif /* E_MINEXP */
 }
 
 void

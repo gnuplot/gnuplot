@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.29 2004/07/13 14:11:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.30 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -58,8 +58,13 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.29 2004/07/13 14:11:24 b
 # define MACHEPS 1.0E-08
 #endif
 
+#ifndef E_MINEXP
 /* AS239 value, e^-88 = 2^-127 */
-#define MINEXP  (-88.0)
+#define E_MINEXP  (-88.0)
+#endif
+#ifndef E_MAXEXP
+#define E_MAXEXP (-E_MINEXP)
+#endif
 
 #ifdef FLT_MAX
 # define OFLOW   FLT_MAX		/* 1.0E+37 */
@@ -654,7 +659,7 @@ void f_gamma(union argument *arg)
 
     (void) arg;				/* avoid -Wunused warning */
     y = GAMMA(real(pop(&a)));
-    if (y > -MINEXP) {
+    if (y > E_MAXEXP) {
 	undefined = TRUE;
 	push(Ginteger(&a, 0));
     } else

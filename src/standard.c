@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.19 2004/10/26 04:31:12 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.20 2004/10/27 21:54:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -704,8 +704,8 @@ f_tanh(union argument *arg)
     (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
 
-#ifdef MINEXP
-    if (-fabs(real(&a)) < MINEXP) {
+#ifdef E_MINEXP
+    if (-fabs(real(&a)) < E_MINEXP) {
 	push(Gcomplex(&a, 1.0, 0.0));
 	return;
     }
