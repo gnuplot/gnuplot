@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.9 1999/07/09 20:59:41 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: doc2ipf.c,v 1.10 2001/09/20 19:02:38 amai Exp $"); }
 #endif
 
 /* GNUPLOT - doc2ipf.c */
@@ -205,6 +205,7 @@ FILE *b;
 		} else
 		    line2[j] = line[i];
 		break;
+
 	    case ':':
 		strcpy(&line2[j], "&colon.");
 		j += strlen("&colon.") - 1;
@@ -224,6 +225,7 @@ FILE *b;
 	    case '\r':
 	    case '\n':
 		break;
+
 	    case '`':		/* backquotes mean boldface or link */
 		if (nblanks > 7) {
 		    line2[j] = line[i];
@@ -268,6 +270,15 @@ FILE *b;
 		    }
 		}
 		break;
+
+	    case '.':
+	      /* Makes code less readable but fixes warnings like 
+               <..\docs\gnuplot.ipf:6546> Warning 204: Invalid macro [.gnuplot_iris4d]
+               which seems to be triggered by a '.' character in the first column?! */
+            strcpy(line2+j, "&per.");
+	      j += 4;
+	      break;
+
 	    default:
 		line2[j] = line[i];
 	    }
