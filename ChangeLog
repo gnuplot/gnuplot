@@ -6,6 +6,8 @@
 
 	* term/gif.trm term/png.trm:  Remove these old drivers.
 
+	* src/makefile.all docs/Makefile.in: And remove them as make targets.
+
 2004-08-01  Ethan Merritt  <merritt@u.washington.edu>
             Harald Harders  <h.harders@tu-bs.de>
 
