@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.70 2003/05/11 00:29:08 sfeam Exp $
+ * $Id: x11.trm,v 1.71 2003/06/20 04:54:36 sfeam Exp $
  *
  */
 
@@ -187,6 +187,13 @@ static char *X11_full_command_path = NULL;
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
+
+#ifdef USE_MOUSE
+/* Interlock to prevent the mouse channel from being coopted more than
+ * once per plot by the gnuplot_x11<->x11.trm font information query.
+ */
+static TBOOLEAN default_font_size_known = FALSE;
+#endif
 
 static int parse_driver __PROTO((const char *));
 
@@ -619,6 +626,7 @@ X11_init()
 	been_here++;
     }
 #ifdef USE_MOUSE
+    default_font_size_known = FALSE;
     X11_update_opts();
 #endif
 }
@@ -909,8 +917,11 @@ X11_graphics()
     /* EAM June 2003 - Flush the set font command through the pipe */
     /* to gnuplot_x11, then wait for it to return the resulting    */
     /* font size information (v_char and h_char).                  */
-    FFLUSH();
-    X11_waitforinput();
+    if (!default_font_size_known) {
+	FFLUSH();
+	X11_waitforinput();
+	default_font_size_known = TRUE;
+    }
 #endif
 }
 

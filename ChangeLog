@@ -1,3 +1,16 @@
+2003-06-20  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c:
+	It turns out that yesterday's patch breaks the "pause -1" command
+	(it always returns immediately).  I have temporarily disabled the
+	new code while I track down the problem.  The offending line is now
+	protected by #ifdef X11_FONT_UPDATE.
+
+	* term/x11.trm:
+	Add an interlock so that the gnuplot_x11<->x11.trm font info exchange
+	is only performed once per splot, rather than every time the view is
+	changed using the mouse.
+
 2003-06-19  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c src/graphics.c src/mouse.c src/mousecmn.h term/x11.trm

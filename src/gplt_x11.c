@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.58 2003/05/23 16:09:47 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.59 2003/06/20 04:54:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1446,7 +1446,11 @@ record()
 		scaled_vchar = (1.0/yscale) * vchar;
 		FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
 			default_font, scaled_hchar, scaled_vchar));
+#ifdef X11_FONT_UPDATE
+		/* FIXME EAM - calling this breaks the "pause -1" command!! */
+		/* I have no idea why, but it's a show-stopper until fixed. */
 		gp_exec_event(GE_fontprops, 0, 0, scaled_hchar, scaled_vchar);
+#endif
 	        continue;
 	    }
 	    /* fall through */
