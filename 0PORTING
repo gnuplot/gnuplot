@@ -69,7 +69,7 @@ Function Availability
 =====================
 
  It is generally assumed that standard ANSI/ISO functions are available.
-The code is protected against missing standard funktions with NO_XXX defines:
+The code is protected against missing standard functions with NO_XXX defines:
 
 NO_ATEXIT   - atexit() not available
 NO_MEMCPY   - memcpy() not available
