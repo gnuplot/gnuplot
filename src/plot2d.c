@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.19 1999/09/24 15:40:13 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.20 1999/10/01 14:54:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1233,6 +1233,8 @@ do{ assert(!polar && !parametric); \
     if (plot_num == 0 || first_plot == NULL) {
 	int_error(c_token, "no functions or data to plot");
     }
+
+
     if (uses_axis[FIRST_X_AXIS]) {
 	if (max_array[FIRST_X_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_X_AXIS] == VERYLARGE)
@@ -1250,8 +1252,9 @@ do{ assert(!polar && !parametric); \
 	    min_array[SECOND_X_AXIS] = min_array[FIRST_X_AXIS];
 	if (auto_array[SECOND_X_AXIS] & 2)
 	    max_array[SECOND_X_AXIS] = max_array[FIRST_X_AXIS];
+	if (! auto_array[SECOND_X_AXIS])
+	    FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     }
-
     if (!uses_axis[FIRST_X_AXIS]) {
 	assert(uses_axis[SECOND_X_AXIS]);
 	if (auto_array[FIRST_X_AXIS] & 1)
@@ -1259,13 +1262,15 @@ do{ assert(!polar && !parametric); \
 	if (auto_array[FIRST_X_AXIS] & 2)
 	    max_array[FIRST_X_AXIS] = max_array[SECOND_X_AXIS];
     }
+
+
     if (uses_axis[FIRST_Y_AXIS]) {
 	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_Y_AXIS] == VERYLARGE)
 	    int_error(NO_CARET, "all points undefined!");
 	fixup_range(FIRST_Y_AXIS, "y");
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
-    }	/* else we want to copy y2 range, but need to fix it up first */
+    }
     if (uses_axis[SECOND_Y_AXIS]) {
 	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
 	    min_array[SECOND_Y_AXIS] == VERYLARGE)
@@ -1273,14 +1278,17 @@ do{ assert(!polar && !parametric); \
 	fixup_range(SECOND_Y_AXIS, "y2");
 	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {
-	assert(uses_axis[FIRST_Y_AXIS]);
+        /* else we want to copy y2 range */
+        assert(uses_axis[FIRST_Y_AXIS]);
 	if (auto_array[SECOND_Y_AXIS] & 1)
 	    min_array[SECOND_Y_AXIS] = min_array[FIRST_Y_AXIS];
 	if (auto_array[SECOND_Y_AXIS] & 2)
 	    max_array[SECOND_Y_AXIS] = max_array[FIRST_Y_AXIS];
-	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
+	/* Log() fixup is only necessary if the range was *not* copied from
+	 * the (already logarithmized) yrange */
+	if (! auto_array[SECOND_Y_AXIS])
+	    FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     }
-
     if (!uses_axis[FIRST_Y_AXIS]) {
 	assert(uses_axis[SECOND_Y_AXIS]);
 	if (auto_array[FIRST_Y_AXIS] & 1)
@@ -1288,6 +1296,7 @@ do{ assert(!polar && !parametric); \
 	if (auto_array[FIRST_Y_AXIS] & 2)
 	    max_array[FIRST_Y_AXIS] = max_array[SECOND_Y_AXIS];
     }
+
 #define WRITEBACK(axis,min,max) \
 if(range_flags[axis]&RANGE_WRITEBACK) \
   {if (auto_array[axis]&1) min = min_array[axis]; \
@@ -1295,10 +1304,10 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
   }
 
     WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
-	if (strcmp(term->name, "table") == 0)
+    WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
+    WRITEBACK(SECOND_X_AXIS, x2min, x2max)
+    WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
+    if (strcmp(term->name, "table") == 0)
 	print_table(first_plot, plot_num);
     else {
 	START_LEAK_CHECK();	/* check for memory leaks in this routine */
