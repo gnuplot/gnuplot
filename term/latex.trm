@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.63 1998/04/14 00:17:53 drd Exp $
+ * $Id: latex.trm,v 1.9 1998/12/15 20:21:36 lhecking Exp $
  *
  */
 
@@ -102,6 +102,11 @@ TERM_PUBLIC void LATEX_reset __PROTO((void));
 TERM_PUBLIC void EMTEX_init __PROTO((void));
 TERM_PUBLIC void EMTEX_reset __PROTO((void));
 TERM_PUBLIC void EMTEX_text __PROTO((void));
+#endif
+
+#ifdef EEPIC
+TERM_PUBLIC void EEPIC_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 #endif
 
 #define TINY_STEP 0.5		/* tiny steps for high quality lines */
@@ -220,8 +225,7 @@ TERM_PUBLIC void LATEX_options()
 	    strcpy(LATEX_font, "cmr");
 	    c_token++;
 	} else if (almost_equals(c_token, "d$efault")) {
-	    strcpy(LATEX_font, "cmr");
-	    LATEX_fontsize = 10;
+	    strcpy(LATEX_font, "doc");
 	    c_token++;
 	}
     }
@@ -235,8 +239,11 @@ TERM_PUBLIC void LATEX_options()
     term->v_char = (unsigned int) (LATEX_fontsize * DOTS_PER_INCH / 72);
     term->h_char = (unsigned int) (LATEX_fontsize * DOTS_PER_INCH / 144);
 
-    sprintf(term_options, "%s %d", LATEX_font[2] == 't' ? "courier" : "roman",
-	    LATEX_fontsize);
+    if (strcmp(LATEX_font, "doc")==0)
+	strncpy(term_options, "(document specific font)",MAX_LINE_LEN);
+    else
+	sprintf(term_options, "%s %d",
+		LATEX_font[2] == 't' ? "courier" : "roman", LATEX_fontsize);
 }
 
 
@@ -265,12 +272,13 @@ TERM_PUBLIC void LATEX_graphics()
     int xscale = xsize * t->xmax;
     int yscale = ysize * t->ymax;
 
-    fprintf(gpoutfile, "\
-\\begin{picture}(%d,%d)(0,0)\n\
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
+    if (strcmp(LATEX_font, "doc") != 0) {
+	fprintf(gpoutfile, "\
 \\font\\gnuplot=%s10 at %dpt\n\
 \\gnuplot\n",
-	    xscale, yscale,
-	    LATEX_font, LATEX_fontsize);
+		LATEX_font, LATEX_fontsize);
+    }
 }
 
 
@@ -831,9 +839,10 @@ START_HELP(latex)
 " The `latex` and `emtex` drivers allow two options.",
 "",
 " Syntax:",
-"       set terminal latex | emtex {courier | roman} {<fontsize>}",
+"       set terminal latex | emtex {courier | roman | default} {<fontsize>}",
 "",
-" `fontsize` may be any size you specify.  The default is 10-point Roman.",
+" `fontsize` may be any size you specify.  The default is for the plot to",
+" inherit its font setting from the embedding document.",
 "",
 " Unless your driver is capable of building fonts at any size (e.g. dvips),",
 " stick to the standard 10, 11 and 12 point sizes.",
@@ -842,11 +851,21 @@ START_HELP(latex)
 "",
 " All drivers for LaTeX offer a special way of controlling text positioning:",
 " If any text string begins with '{', you also need to include a '}' at the",
-" end of the text, and the whole text will be centered both horizontally",
-" and vertically by LaTeX. --- If the text string begins with '[', you need",
-" to continue it with: a position specification (up to two out of t,b,l,r),",
-" ']{', the text itself, and finally, '}'. The text itself may be anything",
-" LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
+" end of the text, and the whole text will be centered both horizontally and",
+" vertically.  If the text string begins with '[', you need to follow this with",
+" a position specification (up to two out of t,b,l,r), ']{', the text itself,",
+" and finally '}'.  The text itself may be anything LaTeX can typeset as an",
+" LR-box.  '\\rule{}{}'s may help for best positioning.",
+"",
+" Points, among other things, are drawn using the LaTeX commands \"\\Diamond\" and",
+" \"\\Box\".  These commands no longer belong to the LaTeX2e core; they are included",
+" in the latexsym package, which is part of the base distribution and thus part",
+" of any LaTeX implementation.  Please do not forget to use this package.",
+"",
+" Points are drawn with the LaTex commands \\Diamond and \\Box.  These",
+" commands do no longer belong to the LaTeX2e core, but are included in the",
+" latexsym-package in the base distribution, and are hence part of all LaTeX",
+" implementations. Please do not forget to use this package.",
 "",
 " Examples:",
 " About label positioning:",
