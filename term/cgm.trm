@@ -443,7 +443,7 @@ double width;
 {
     int new_linewidth;
 
-    assert(width >= 1.);
+    assert(width >= 0);
     new_linewidth = width * cgm_linewidth_pt * CGM_PT;
     if (new_linewidth == cgm_linewidth)
 	return;
