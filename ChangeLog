@@ -1,3 +1,8 @@
+2003-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/post.trm (PS_vector): Fix bug in moveto in the previous patch.
+	Add more comments on the new anti-gs-rounding-bug functionality.
+
 2003-02-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/post.trm (PS_vector): Fix bug introduced by the changes
@@ -12,7 +17,7 @@
 
 2003-02-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/graphics.c(histeps_compare): There was a wrong comparison
+	* src/graphics.c (histeps_compare): There was a wrong comparison
  	returned by this qsort-called routine, which caused 'plot with
  	histeps' buggy.
 
