@@ -47,3 +47,5 @@
 #define HAVE_STRRCHR		1
 #define HAVE_STRSTR		1
 #define HAVE_VFPRINTF		1
+
+#define PROTOTYPES  1

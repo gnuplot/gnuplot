@@ -1,3 +1,7 @@
+2002-03-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+	* config/makefile.os2 config/makefile.os2: Some fixes to
+	get it build again (#define PROTOTYPES, TERMFLAGS updated)
+
 2002-03-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/contrib/pm3dCompress.awk: Fixed "N g" to "2 index g N" in the
