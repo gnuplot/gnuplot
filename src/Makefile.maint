@@ -1,5 +1,5 @@
 # -*-Makefile-*-
-# Makefile fragment to generate makefile.all
+# Makefile fragment to generate makefile.all and update version.c
 
 # Non-core sources and version.c
 noncoresrc = amiga.c bf_test.c corplot.c ctrl87.c gplt_x11.c os9.c \
@@ -12,6 +12,8 @@ coreterm := $(shell cd ../term && echo *.trm)
 version := $(shell cat ../VERSION)
 
 patchlevel := $(shell cat ../PATCHLEVEL)
+
+date := $(shell date)
 
 makefile.all: Makefile.maint
 	@echo "# $@ generated automatically by GNU make" >$@
@@ -28,20 +30,16 @@ makefile.all: Makefile.maint
 version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	@vn=`sed -n 's/.*version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
 	pl=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	dt=`sed -n 's/.*date.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
-	date=`date`; \
+	dt=`sed -n 's/.*date.*"\(.*\)".*/\1/p' ./version.c`; \
 	if [ "$(version)" != $$vn -o "$(patchlevel)" != $$pl -o "$$date" != "$$dt" ]; then \
-	  ( echo '#ifndef lint'; \
-	  echo 'static char *RCSid = "$$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $$";'; \
-	  echo '#endif'; echo; echo '/* GNUPLOT - version.c */'; echo; \
-	  cat ../Copyright; echo; echo '#include "plot.h"' ; echo; \
-	  echo 'char version[] = "@VERS@";'; \
-	  echo 'char patchlevel[] = "@PLVL@";'; \
-	  echo 'char date[] = "@DATE@";'; \
-	  echo 'char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1999";'; \
-	  echo; echo 'char faq_location[] = FAQ_LOCATION;'; \
-	  echo 'char bug_email[] = CONTACT;'; \
-	  echo 'char help_email[] = HELPMAIL;'; ) | \
-	  sed -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
-	    -e "s/@DATE@/$$date/" >$@ ; \
+	  sed -e '/^char version/ s/"[^"]*"/"@VERS@"/' \
+	      -e '/^char patchlevel/ s/"[^"]*"/"@PLVL@"/' \
+	      -e '/^char date/ s/"[^"]*"/"@DATE@"/' \
+	      -e "s/@VERS@/$(version)/" -e "s/@PLVL@/$(patchlevel)/" \
+	      -e "s/@DATE@/$(date)/" $@ >$@t; \
+	  if cmp -s $@ $@t; then \
+	    rm -f $@t; \
+	  else \
+	    mv $@t $@; \
+	  fi \
 	fi
