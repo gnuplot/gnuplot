@@ -2971,10 +2971,10 @@ C ... and restart the table:
  where <style> is either `lines`, `points`, `linespoints`, `impulses`,
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
- `xyerrorlines`, `boxes`, `filledboxes`, `boxerrorbars`, `boxxyerrorbars`,
- `financebars`, `candlesticks` or `vector`. Some of these styles
- require additional information. See `set style <style>` for details of
- each style.
+ `xyerrorlines`, `boxes`, `filledboxes`, `filledcurves`, `boxerrorbars`,
+ `boxxyerrorbars`, `financebars`, `candlesticks` or `vector`. Some of these
+ styles require additional information. See `set style <style>` for details
+ of each style.
 
  Default styles are chosen with the `set style function` and `set style data`
  commands.
@@ -5958,7 +5958,7 @@ C ... and restart the table:
  draws a box centered about the given x coordinate from the x axis (not the
  graph border) to the given y coordinate.  See the `boxes` style for how the
  width of the box is obtained.  The `filledboxes` keyword may be abbreviated
- to `fill`. The drawn box is filled with a color pattern according to a style
+ to `fillb`. The drawn box is filled with a color pattern according to a style
  defined by the `set style filling` command.  The fillstyle may be one of
  `empty`, `solid` and `pattern`.
 
@@ -5997,6 +5997,45 @@ C ... and restart the table:
  nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
  tandy_60dpi. The BeOS driver (`be`) supports `filledboxes` too, but it is
  unknown whether it works as intended.
+5 filledcurves
+?commands set style filledcurves
+?set style filledcurves
+?style filledcurves
+?filledcurves
+ The `filledcurves` style is only relevant to 2-d plotting. It draws either the
+ the current curve closed and filled, or the region between the current curve
+ and a given axis, horizontal or vertical line, or point, filled with the
+ current drawing color.
+
+ Proposed syntax:
+
+     set style [data | function] filledcurves [options]
+     plot ... with filledcurves [options]
+
+ where options are
+
+     [closed | {x1 | x2 | y1 | y2}[=<value>] | xy=<x>,<y>]
+
+ The filled area is between the current curve and
+     filledcurves closed   ... filled closed curve,
+     filledcurves x1       ... x1 axis,
+     filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
+     filledcurves y1=0     ... line y=0 (at y1 axis) parallel to x1 axis,
+     filledcurves y2=42    ... line y=42 (at y2 axis) parallel to x2, etc,
+     filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+
+ Note: filling is supported on filled-polygon capable terminals, see `help
+ pm3d` for their list.
+
+ Currently implemented syntax (demo-like switching between the first five
+ options):
+
+     set style [data | function] filledcurves
+     plot ... with filledcurves
+
+ *** TODO - WHAT YOU CAN DO FOR FILLEDCURVES (please): ***
+ Implement the proposed options; please make it in such a way that <value>,
+ <x>,<y> can be formulae.
 4 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars

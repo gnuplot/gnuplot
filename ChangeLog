@@ -1,3 +1,14 @@
+2001-09-08 Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc src/gp_types.h src/graphics.c src/save.c
+	src/show.c src/tables.c term/post.trm NEWS: Implemented plotting
+	of filled curves for terminals supporting pm3d --- req. termentry
+	filled_polygon(). Syntax:
+	     set style [data | function] filledcurves [options]
+	     plot ... with filledcurves [options]
+	Options are not yet implemented -- this is let as a homework
+	for somebody else.
+
 2001-09-07 Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Use %g format instead of %f when placing labels by

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.51 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.52 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -113,6 +113,9 @@ static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y, TBOOLEA
 #else
 static void plot_boxes __PROTO((struct curve_points * plot, int xaxis_y));
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+static void plot_filledcurves __PROTO((struct curve_points * plot));
+#endif
 static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
@@ -1508,6 +1511,13 @@ do_plot(plots, pcount)
 	    break;
 	    /*}}} */
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+	    /*{{{  FILLEDCURVES */
+	case FILLEDCURVES:
+	    plot_filledcurves(this_plot);
+	    break;
+	    /*}}} */
+#endif
 	    /*{{{  VECTOR */
 	case VECTOR:
 	    plot_vectors(this_plot);
@@ -1695,6 +1705,251 @@ struct curve_points *plot;
 	prev = plot->points[i].type;
     }
 }
+
+/* plot_filledcurves:
+ * Plot FILLED curves.
+ * Only compiled in for PM3D because term->filled_polygon() is required.
+ */
+#ifdef PM3D
+
+/* finalize and draw the filled curve */
+void
+finish_filled_curve(points, corners)
+int points;
+gpiPoint *corners;
+{
+
+#if 1
+    /* emulate currently inimplemented style filledcurves options */
+#define FILLEDCURVES_CLOSED 0
+#define FILLEDCURVES_X1	    1
+#define FILLEDCURVES_Y1	    2
+#define FILLEDCURVES_X2	    3
+#define FILLEDCURVES_Y2	    4
+#define FILLEDCURVES_ATX1   5
+#define FILLEDCURVES_ATY1   6
+#define FILLEDCURVES_ATX2   7
+#define FILLEDCURVES_ATY2   8
+#define FILLEDCURVES_ATXY   9
+
+    /* a structure like this should go to an appropriate.h file, and it
+       should be possible to set / show it by set/show commands, respectively
+    */
+    struct {
+	int closeto; /* see #defines FILLEDCURVES_* above */
+#if 1
+	int x, y;
+#else
+	coordval x, y;
+	  /* does this allow to specify them by formulae? */
+#endif
+    } filledcurves_opts;
+    
+#if 1
+    /* for demo purposes - increment over several curve closing options to 
+       try all possibilities
+    */
+    if (points <= 0) return;
+    {
+    static int bla = 0; bla++; if (bla > 1*4) bla = 0;
+    filledcurves_opts.closeto = bla / 1;
+    /*
+    filledcurves_opts.closeto = FILLEDCURVES_CLOSED;
+    filledcurves_opts.closeto = FILLEDCURVES_Y1;
+    */
+    fprintf(stderr,"%s:%li: Closing of filledcurves_opts: until implemented according to the proposed docs --- now set to %i  (points=%i)\n", __FILE__, __LINE__, filledcurves_opts.closeto, points);
+    }
+#endif
+
+#endif
+
+    if (points <= 0) return;
+
+    /* add side (closing) points */
+    switch (filledcurves_opts.closeto) {
+	case FILLEDCURVES_CLOSED:
+		/* the polygon is closed by default */
+		break;
+	case FILLEDCURVES_X1:
+		corners[points].x   = corners[points-1].x;
+		corners[points+1].x = corners[0].x;
+		corners[points].y   = 
+		corners[points+1].y = axis_array[FIRST_Y_AXIS].term_lower;
+		points += 2;
+		break;
+	case FILLEDCURVES_X2:
+		corners[points].x   = corners[points-1].x;
+		corners[points+1].x = corners[0].x;
+		corners[points].y   = 
+		corners[points+1].y = axis_array[FIRST_Y_AXIS].term_upper;
+		points += 2;
+		break;
+	case FILLEDCURVES_Y1:
+		corners[points].y   = corners[points-1].y;
+		corners[points+1].y = corners[0].y;
+		corners[points].x   = 
+		corners[points+1].x = axis_array[FIRST_X_AXIS].term_lower;
+		points += 2;
+		break;
+	case FILLEDCURVES_Y2:
+		corners[points].y   = corners[points-1].y;
+		corners[points+1].y = corners[0].y;
+		corners[points].x   = 
+		corners[points+1].x = axis_array[FIRST_X_AXIS].term_upper;
+		points += 2;
+		break;
+	case FILLEDCURVES_ATX1:
+		corners[points].x   = 
+		corners[points+1].x = filledcurves_opts.x;
+		    /* should be mapping real x1axis/graph/screen => screen */
+		corners[points].y   = corners[points-1].y;
+		corners[points+1].y = corners[0].y;
+		points += 2;
+		break;
+	case FILLEDCURVES_ATX2:
+		corners[points].x   = 
+		corners[points+1].x = filledcurves_opts.x;
+		    /* should be mapping real x2axis/graph/screen => screen */
+		corners[points].y   = corners[points-1].y;
+		corners[points+1].y = corners[0].y;
+		points += 2;
+		break;
+	case FILLEDCURVES_ATY1:
+		corners[points].y   = 
+		corners[points+1].y = filledcurves_opts.x;
+		    /* should be mapping real y1axis/graph/screen => screen */
+		corners[points].x   = corners[points-1].x;
+		corners[points+1].x = corners[0].x;
+		points += 2;
+		break;
+	case FILLEDCURVES_ATY2:
+		corners[points].y   = 
+		corners[points+1].y = filledcurves_opts.x;
+		    /* should be mapping real y2axis/graph/screen => screen */
+		corners[points].x   = corners[points-1].x;
+		corners[points+1].x = corners[0].x;
+		points += 2;
+		break;
+	case FILLEDCURVES_ATXY:
+		corners[points].x = filledcurves_opts.x;
+		    /* should be mapping real x1axis/graph/screen => screen */
+		corners[points].y = filledcurves_opts.y;
+		    /* should be mapping real y1axis/graph/screen => screen */
+		points++;
+		break;
+    }
+    /* now plot the filled polygon */
+    term->filled_polygon(points, corners);
+#if 0
+    { /* for debugging purposes */
+    int i;
+    fprintf(stderr, "List of %i corners:\n", points);
+    for (i=0; i<points; i++)
+	fprintf(stderr, "%2i: %3i,%3i | ", i, corners[i].x, corners[i].y);
+    fprintf(stderr, "\n");
+    }
+#endif
+    points = 0;
+}
+
+
+static void
+plot_filledcurves(plot)
+struct curve_points *plot;
+{
+    int i;			/* point index */
+    int x, y;			/* point in terminal coordinates */
+    struct termentry *t = term;
+    enum coord_type prev = UNDEFINED;	/* type of previous point */
+    double ex, ey;			/* an edge point */
+    double lx[2], ly[2];		/* two edge points */
+    int points = 0;			/* how many corners */
+    static gpiPoint *corners = 0;	/* array of corners */
+    static int corners_allocated = 0;	/* how many allocated */
+    
+    if (!t->filled_polygon) { /* filled polygons are not available */
+	plot_lines(plot);
+	return;
+    }
+    for (i = 0; i < plot->p_count; i++) {
+	if (points+2 >= corners_allocated) { /* there are 2 side points */
+	    corners_allocated += 128; /* reallocate more corners */
+	    corners = gp_realloc( corners, corners_allocated*sizeof(gpiPoint), "corners for filledcurves");
+	}
+	switch (plot->points[i].type) {
+	case INRANGE:{
+		x = map_x(plot->points[i].x);
+		y = map_y(plot->points[i].y);
+
+		if (prev == INRANGE) {
+		    /* vector(x,y) */
+		    corners[points].x = x;
+		    corners[points++].y = y;
+		} else if (prev == OUTRANGE) {
+		    /* from outrange to inrange */
+		    if (!clip_lines1) {
+			finish_filled_curve(points, corners);
+			/* move(x,y) */
+			corners[points].x = x;
+			corners[points++].y = y;
+		    } else {
+			finish_filled_curve(points, corners);
+			edge_intersect(plot->points, i, &ex, &ey);
+			/* move(map_x(ex),map_y(ey)); */
+			corners[points].x = map_x(ex);
+			corners[points++].y = map_y(ey);
+			/* vector(x,y); */
+			corners[points].x = x;
+			corners[points++].y = y;
+
+		    }
+		} else {	/* prev == UNDEFINED */
+		    finish_filled_curve(points, corners);
+		    /* move(x,y) */
+		    corners[points].x = x;
+		    corners[points++].y = y;
+		    /* vector(x,y); */
+		    corners[points].x = x;
+		    corners[points++].y = y;
+		}
+
+		break;
+	    }
+	case OUTRANGE:{
+		if (prev == INRANGE) {
+		    /* from inrange to outrange */
+		    if (clip_lines1) {
+			edge_intersect(plot->points, i, &ex, &ey);
+			/* vector(map_x(ex),map_y(ey)); */
+			corners[points].x = map_x(ex);
+			corners[points++].y = map_y(ey);
+		    }
+		} else if (prev == OUTRANGE) {
+		    /* from outrange to outrange */
+		    if (clip_lines2) {
+			if (two_edge_intersect(plot->points, i, lx, ly)) {
+			    finish_filled_curve(points, corners);
+			    /* move(map_x(lx[0]),map_y(ly[0])); */
+			    corners[points].x = map_x(lx[0]);
+			    corners[points++].y = map_y(ly[0]);
+			    /* vector(map_x(lx[1]),map_y(ly[1])); */
+			    corners[points].x = map_x(lx[1]);
+			    corners[points++].y = map_y(ly[1]);
+			}
+		    }
+		}
+		break;
+	    }
+	default:		/* just a safety */
+	case UNDEFINED:{
+		break;
+	    }
+	}
+	prev = plot->points[i].type;
+    }
+    finish_filled_curve(points, corners);
+}
+#endif /* plot_filledcurves() only ifdef PM3D */
 
 /* XXX - JG  */
 /* plot_steps:                          

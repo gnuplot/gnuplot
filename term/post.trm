@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.52 2001/04/04 19:54:26 broeker Exp $
+ * $Id: post.trm,v 1.53 2001/08/27 15:04:12 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -144,6 +144,8 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/L {lineto} bind def\n",
 "/R {rmoveto} bind def\n",
 "/V {rlineto} bind def\n",
+"/N {newpath moveto} bind def\n",
+"/f {rlineto fill} bind def\n",
 "/vpt2 vpt 2 mul def\n",
 "/hpt2 hpt 2 mul def\n",
 /* flush left show */
@@ -1980,8 +1982,8 @@ fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
 /*
 fprintf(gpoutfile, "%%  /G {currentrgbcolor 3 index stroke g} bind def\n");
 fprintf(gpoutfile, "%%  /H {h setrgbcolor pop} bind def\n");
-*/
 fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
+*/
 fprintf(gpoutfile, "}{\n");
 fprintf(gpoutfile, "  /g {stroke pm3dround setgray} bind def\n");
 fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
@@ -1989,11 +1991,9 @@ fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
 fprintf(gpoutfile, "%%  /g {currentgray exch stroke setgray} bind def\n");
 fprintf(gpoutfile, "%%  /G {currentgray exch stroke g} bind def\n");
 fprintf(gpoutfile, "%%  /H {h setgray} bind def\n");
-*/
 fprintf(gpoutfile, "  /F {rlineto fill setgray} bind def\n");
+*/
 fprintf(gpoutfile, "} ifelse\n");
-fprintf(gpoutfile, "/N {newpath moveto} def\n");
-fprintf(gpoutfile, "/f {rlineto fill} bind def\n");
 return 0;
 #undef R
 #undef G
@@ -2037,11 +2037,11 @@ TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 {
     int i;
     /* produce lines like:
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
+       9055 29350 N 695 0 V 0 564 V -695 0 h  ... for quadrangles
+       9055 29350 N 695 0 V 0 564 f           ... otherwise
      */
     fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
-    if (points == 4) /* shorter version */
+    if (points == 4) /* shorter version for quadrangles */
 	fprintf(gpoutfile, " %i %i %i %i %i %i h\n",
 	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
 	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
@@ -2051,7 +2051,7 @@ TERM_PUBLIC void PS_filled_polygon ( int points, gpiPoint *corners )
 	for (i = 1; i < points-1; i++)
 	    fprintf(gpoutfile, " %i %i V",
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-	fprintf(gpoutfile, " %i %i F\n",
+	fprintf(gpoutfile, " %i %i f\n",
 	    corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
     }
     PS_relative_ok = FALSE;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.21 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.22 2001/08/27 15:02:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -386,8 +386,11 @@ const struct gen_table plotstyle_tbl[] =
     { "xye$rrorbars", XYERRORBARS },
     { "boxes", BOXES },
 #if USE_ULIG_FILLEDBOXES
-    { "fill$edboxes", FILLEDBOXES },
+    { "filledb$oxes", FILLEDBOXES },
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+    { "filledc$urves", FILLEDCURVES },
+#endif
     { "boxer$rorbars", BOXERROR },
     { "boxx$yerrorbars", BOXXYERROR },
     { "st$eps", STEPS },
