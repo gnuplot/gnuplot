@@ -374,7 +374,7 @@ TERM_TABLE_START(hpljii_driver)
        HPLJIIinit, HPLJIIreset, HPLJIItext, null_scale,
        HPLJIIgraphics, HPLJIImove, HPLJIIvector, HPLJIIlinetype,
        HPLJIIput_text, HPLJIItext_angle, null_justify_text, line_and_point,
-       do_arrow, set_font_null
+       do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(hpljii_driver)
 #undef LAST_TERM
 #define LAST_TERM hpljii_driver
