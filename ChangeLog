@@ -1,3 +1,7 @@
+2004-08-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#14).
+
 2004-08-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_termoptions):  Only call term->options for
