@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.10 2001/02/19 17:08:24 broeker Exp $
+ * $Id: wgnuplib.h,v 1.11 2001/03/09 16:14:21 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -70,7 +70,8 @@
 /* HBB: bumped version for pointsize, linewidth and PM3D implementation */
 /* HBB: bumped version for massive changes due to mouse-ing and removal of
  *      variables no longer needed, in struct GW */
-#define WGNUPLOTVERSION  "1.4   2001-02-18"
+/* HBB: bumped version because of changes in PM3D interface and pointtypes */
+#define WGNUPLOTVERSION  "1.5   2001-04-11"
 BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 
 /* ================================== */
@@ -283,7 +284,10 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_fbox 19
 #define W_fdiamond 20
 #define W_fitriangle 21
-#define W_itriangle 22
+#define W_ftriangle 22
+#define W_fpentagon 23
+#define W_itriangle 24		/* HBB 20010411: renumbered! */
+#define W_pentagon 25	
 #define W_move 30
 #define W_vect 31
 #define W_line_type 32

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.18 2001/02/28 16:37:08 broeker Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.19 2001/03/09 16:14:21 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -664,333 +664,356 @@ dot(HDC hdc, int xdash, int ydash)
 static void
 drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 {
-	int xdash, ydash;			/* the transformed coordinates */
-	int rr, rl, rt, rb;
-	struct GWOP FAR *curptr;
-	struct GWOPBLK *blkptr;
-	int htic, vtic;
-	int hshift, vshift;
-	unsigned int lastop=-1;		/* used for plotting last point on a line */
-	int pen;
-	int polymax = 200;
-	int polyi = 0;
-	POINT *ppt;
-	unsigned int ngwop=0;
-	BOOL isColor;
-	double line_width = 1.0;
+    int xdash, ydash;			/* the transformed coordinates */
+    int rr, rl, rt, rb;
+    struct GWOP FAR *curptr;
+    struct GWOPBLK *blkptr;
+    int htic, vtic;
+    int hshift, vshift;
+    unsigned int lastop=-1;		/* used for plotting last point on a line */
+    int pen;
+    int polymax = 200;
+    int polyi = 0;
+    POINT *ppt;
+    unsigned int ngwop=0;
+    BOOL isColor;
+    double line_width = 1.0;
 
-	if (lpgw->locked) 
-		return;
+    if (lpgw->locked) 
+	return;
 
-	/* HBB 20010218: the GDI status query functions don't work on Metafile
-	 * handles, so can't know whether the screen is actually showing
-	 * color or not, if drawgraph() is being called from CopyClip().
-	 * Solve by defaulting isColor to 1 if hdc is a metafile. */
-	isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL)) > 2)
-		   || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
+    /* HBB 20010218: the GDI status query functions don't work on Metafile
+     * handles, so can't know whether the screen is actually showing
+     * color or not, if drawgraph() is being called from CopyClip().
+     * Solve by defaulting isColor to 1 if hdc is a metafile. */
+    isColor = (((GetDeviceCaps(hdc, PLANES) * GetDeviceCaps(hdc,BITSPIXEL)) 
+		> 2)
+	       || (GetDeviceCaps(hdc, TECHNOLOGY) == DT_METAFILE));
 
-	if (lpgw->background != RGB(255,255,255) && lpgw->color && isColor) {
-		SetBkColor(hdc,lpgw->background);
-		FillRect(hdc, rect, lpgw->hbrush);
-	}
+    if (lpgw->background != RGB(255,255,255) && lpgw->color && isColor) {
+	SetBkColor(hdc,lpgw->background);
+	FillRect(hdc, rect, lpgw->hbrush);
+    }
 
-	ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
+    ppt = (POINT *)LocalAllocPtr(LHND, (polymax+1) * sizeof(POINT));
 
-	rr = rect->right;
-	rl = rect->left;
-	rt = rect->top;
-	rb = rect->bottom;
+    rr = rect->right;
+    rl = rect->left;
+    rt = rect->top;
+    rb = rect->bottom;
 
-	htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-	vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+    htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
+    vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
 
-	lpgw->angle = 0;
-	SetFont(lpgw, hdc);
-	SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
-	vshift = MulDiv(lpgw->vchar, rb-rt, lpgw->ymax)/2;
-	/* HBB 980630: new variable for moving rotated text to the correct
-	 * position: */
-	hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
+    lpgw->angle = 0;
+    SetFont(lpgw, hdc);
+    SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+    vshift = MulDiv(lpgw->vchar, rb-rt, lpgw->ymax)/2;
+    /* HBB 980630: new variable for moving rotated text to the correct
+     * position: */
+    hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
-	pen = 0;
-	SelectObject(hdc, lpgw->hapen);
-	SelectObject(hdc, lpgw->colorbrush[pen+2]);
+    pen = 0;
+    SelectObject(hdc, lpgw->hapen);
+    SelectObject(hdc, lpgw->colorbrush[pen+2]);
 
-	/* do the drawing */
-	blkptr = lpgw->gwopblk_head;
-	curptr = NULL;
-	if (blkptr) {
-		if (!blkptr->gwop)
-			blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
-		if (!blkptr->gwop)
-			return;
-		curptr = (struct GWOP FAR *)blkptr->gwop;
-	}
-	while(ngwop < lpgw->nGWOP)
-   	{
-		/* transform the coordinates */
-		xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
-		ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
-		if ((lastop==W_vect) && (curptr->op!=W_vect)) {
-			if (polyi >= 2)
-				Polyline(hdc, ppt, polyi);
-			polyi = 0;
-		}
-		switch (curptr->op) {
-			case 0:	/* have run past last in this block */
-				break;
-			case W_move:
-				ppt[0].x = xdash;
-				ppt[0].y = ydash;
-				polyi = 1;
-				break;
-			case W_vect:
-				ppt[polyi].x = xdash;
-				ppt[polyi].y = ydash;
-				polyi++;
-				if (polyi >= polymax) {
-					Polyline(hdc, ppt, polyi);
-					ppt[0].x = xdash;
-					ppt[0].y = ydash;
-					polyi = 1;
-				}
-				break;
-                        case W_filledbox:
-                             {
-                                 RECT rect;
+    /* do the drawing */
+    blkptr = lpgw->gwopblk_head;
+    curptr = NULL;
+    if (blkptr) {
+	if (!blkptr->gwop)
+	    blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
+	if (!blkptr->gwop)
+	    return;
+	curptr = (struct GWOP FAR *)blkptr->gwop;
+    }
 
-                                 assert (polyi == 1);
-                                 
-                                 rect.left = ppt[0].x;
-                                 rect.bottom = ppt[0].y;
-                                 rect.right = ppt[0].x + xdash;
-                                 rect.top = ppt[0].y - ydash;
-
-                                 SetBkColor(hdc,lpgw->background);
-                                 FillRect(hdc, &rect, lpgw->hbrush);
-                                 polyi = 0;
-                             }
-
-			case W_line_type:
-				{
-				   	short cur_pen = ((curptr->x < (WORD)(-2)) ? (curptr->x % WGNUMPENS) + 2: curptr->x + 2);
-				   	LOGPEN cur_penstruct = (lpgw->color && isColor) ?
-						lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
-
-					if (line_width != 1)
-						cur_penstruct.lopnWidth.x *= line_width;
-					lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
-					DeleteObject(SelectObject(hdc, lpgw->hapen));
-					if (lpgw->color && isColor)
-						SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
-				}
-				pen = curptr->x;
-				SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
-				break;
-			case W_put_text:
-				{char *str;
-				str = LocalLock(curptr->htext);
-				if (str) {
-					/* HBB 980630: shift differently for rotated text: */
-					if (lpgw->angle)
-						xdash += hshift;
-					else
-						ydash += vshift;
-					SetBkMode(hdc,TRANSPARENT);
-					TextOut(hdc,xdash,ydash,str,lstrlen(str));
-					SetBkMode(hdc,OPAQUE);
-				}
-				LocalUnlock(curptr->htext);
-				}
-				break;
-			case W_text_angle:
-				lpgw->angle = curptr->x;
-				SetFont(lpgw,hdc);
-				break;
-			case W_justify:
-				switch (curptr->x)
-				{
-					case LEFT:
-						SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
-						break;
-					case RIGHT:
-						SetTextAlign(hdc, TA_RIGHT|TA_BOTTOM);
-						break;
-					case CENTRE:
-						SetTextAlign(hdc, TA_CENTER|TA_BOTTOM);
-						break;
-					}
-				break;
-			case W_pointsize:
-				/* HBB 980309: term->pointsize() passes the number as a scaled-up
-				 * integer now, so we can avoid calling sscanf() here (in a Win16
-				 * DLL sharing stack with the stack-starved wgnuplot.exe !).
-				 */
-				if (curptr->x != 0) {
-					double pointsize = curptr->x / 100.0;
-					/* HBB 980309: the older code didn't make *any* use of the
-					 * pointsize at all! That obviously can't be correct. So use it! */
-					htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-					vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-                               } else {
-					char *str;
-					str = LocalLock(curptr->htext);
-					if (str) {
-						double pointsize;
-						sscanf(str, "%lg", &pointsize);
-						htic = lpgw->org_pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
-						vtic = lpgw->org_pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
-					}
-					LocalUnlock(curptr->htext);
-				}
-				break;
-			case W_line_width:
-				/* HBB 20000813: this may look strange, but it ensures
-				 * that linewidth is exactly 1 iff it's in default
-				 * state */
-				line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
-				break;
-#ifdef PM3D /* HBB 20000813: implemented PM3D for Windows terminal */
-			case W_pm3d_setcolor:
-                        	{
-                                	double level = curptr->x / 256.0;
-					unsigned char R, G, B;
-                                        static HBRUSH last_pm3d_brush = NULL;
-					HBRUSH this_brush;
-                                        COLORREF c;
-
-                                        if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
-                                            R = G = B = curptr->x;
-                                        } else {
-                                            R = 0xff * GetColorValueFromFormula(sm_palette.formulaR, level);
-                                            G = 0xff * GetColorValueFromFormula(sm_palette.formulaG, level);
-                                            B = 0xff * GetColorValueFromFormula(sm_palette.formulaB, level);
-                                        }
-
-                                        c = RGB(R,G,B);
-                                        this_brush = CreateSolidBrush(c);
-                                        SelectObject(hdc, this_brush);
-                                        if (last_pm3d_brush != NULL)
-                                        	DeleteObject(last_pm3d_brush);
-                                        last_pm3d_brush = this_brush;
-                                        /* create new pen, too: */
-					DeleteObject(SelectObject(hdc,
-					    CreatePen(PS_SOLID, 1, c)));
-                                }
-                        	break;
-			case W_pm3d_filled_polygon_pt:
-                        	{
-					/* a point of the polygon is coming.
-					   note: if a polygon with larger nb of pts is needed, then reallocated
-					   ppt for an increased number polymax
-					*/
-					assert(polyi<polymax);
-					ppt[polyi].x = xdash;
-					ppt[polyi].y = ydash;
-					polyi++;
-                                }
-				break;
-			case W_pm3d_filled_polygon_draw:
-                        	{
-					/* end of point series --> draw polygon now */
-					Polygon(hdc, ppt, polyi);
-					polyi = 0;
-                                }
-				break;
-#endif /* PM3D */
-			default:	/* A plot mark */
-                                switch (curptr->op) {
-					case W_dot:
-						dot(hdc, xdash, ydash);
-						break;
-					case W_plus: /* do plus */ 
-						MoveTo(hdc,xdash-htic,ydash);
-						LineTo(hdc,xdash+htic+1,ydash);
-						MoveTo(hdc,xdash,ydash-vtic);
-						LineTo(hdc,xdash,ydash+vtic+1);
-						break;
-					case W_cross: /* do X */ 
-						MoveTo(hdc,xdash-htic,ydash-vtic);
-						LineTo(hdc,xdash+htic+1,ydash+vtic+1);
-						MoveTo(hdc,xdash-htic,ydash+vtic);
-						LineTo(hdc,xdash+htic+1,ydash-vtic-1);
-						break;
-					case W_star: /* do star */ 
-						MoveTo(hdc,xdash-htic,ydash);
-						LineTo(hdc,xdash+htic+1,ydash);
-						MoveTo(hdc,xdash,ydash-vtic);
-						LineTo(hdc,xdash,ydash+vtic+1);
-						MoveTo(hdc,xdash-htic,ydash-vtic);
-						LineTo(hdc,xdash+htic+1,ydash+vtic+1);
-						MoveTo(hdc,xdash-htic,ydash+vtic);
-						LineTo(hdc,xdash+htic+1,ydash-vtic-1);
-						break;
-					case W_circle: /* do open circle */ 
-						Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1, xdash, ydash+vtic+1, xdash, ydash+vtic+1);
-						dot(hdc, xdash, ydash);
-						break;
-					case W_fcircle: /* do filled circle */ 
-		        			Ellipse(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1);
-						break;
-					default:	/* Closed figure */
-				      	{	POINT p[6];
-					        int i;
-						int shape;
-						int filled = 0;
-						static float pointshapes[5][10] = {
-							{-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
-							{ 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
-							{ 0, -4./3, -4./3, 2./3, 4./3,  2./3, 0, 0}, /* triangle */
-							{ 0, 4./3, -4./3, -2./3, 4./3,  -2./3, 0, 0}, /* inverted triangle */
-							{ 0, 1, 0.95106, 0.30902, 0.58779, -0.80902, -0.58779, -0.80902, -0.95106, 0.30902} /* pentagon (not used) */
-						};
-						switch (curptr->op) {
-							case W_box: 		shape = 0;	break;
-							case W_diamond:		shape = 1;	break;
-							case W_itriangle:	shape = 2;	break;
-							case W_triangle:	shape = 3;	break;
-							default:		shape = curptr->op-W_fbox;
-										filled = 1;
-										break;
-						}
-						
-					        for ( i = 0; i<5; ++i )
-					        	if ( pointshapes[shape][i*2+1] == 0 && pointshapes[shape][i*2] == 0 )
-					        		break;
-							else {
-					        		p[i].x = xdash + htic*pointshapes[shape][i*2] + 0.5;
-				        	        	p[i].y = ydash + vtic*pointshapes[shape][i*2+1] + 0.5;
-				            		}
-					        if ( filled )
-							/* Filled polygon */
-					            	Polygon(hdc, p, i);
-					        else {
-				            		/* Outline polygon */
-				            		p[i].x = p[0].x;
-				            		p[i].y = p[0].y;
-				            		Polyline(hdc, p, i+1);
-				            		dot(hdc, xdash, ydash);
-				        	}
-				      	}
-				}
-		}
-		lastop = curptr->op;
-		ngwop++;
-		curptr++;
-		if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
-			GlobalUnlock(blkptr->hblk);
-			blkptr->gwop = (struct GWOP FAR *)NULL;
-			blkptr = blkptr->next;
-			if (!blkptr->gwop)
-				blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
-			if (!blkptr->gwop)
-					return;
-				curptr = (struct GWOP FAR *)blkptr->gwop;
-		}
-	}
-	if (polyi >= 2)
+    while(ngwop < lpgw->nGWOP) {
+	/* transform the coordinates */
+	xdash = MulDiv(curptr->x, rr-rl-1, lpgw->xmax) + rl;
+	ydash = MulDiv(curptr->y, rt-rb+1, lpgw->ymax) + rb - 1;
+	if ((lastop==W_vect) && (curptr->op!=W_vect)) {
+	    if (polyi >= 2)
 		Polyline(hdc, ppt, polyi);
-	LocalFreePtr(ppt);
+	    polyi = 0;
+	}
+	switch (curptr->op) {
+	case 0:	/* have run past last in this block */
+	    break;
+	case W_move:
+	    ppt[0].x = xdash;
+	    ppt[0].y = ydash;
+	    polyi = 1;
+	    break;
+	case W_vect:
+	    ppt[polyi].x = xdash;
+	    ppt[polyi].y = ydash;
+	    polyi++;
+	    if (polyi >= polymax) {
+		Polyline(hdc, ppt, polyi);
+		ppt[0].x = xdash;
+		ppt[0].y = ydash;
+		polyi = 1;
+	    }
+	    break;
+	case W_filledbox:
+	    {
+		RECT rect;
+
+		assert (polyi == 1);
+                                 
+		rect.left = ppt[0].x;
+		rect.bottom = ppt[0].y;
+		rect.right = ppt[0].x + xdash;
+		rect.top = ppt[0].y - ydash;
+
+		SetBkColor(hdc,lpgw->background);
+		FillRect(hdc, &rect, lpgw->hbrush);
+		polyi = 0;
+	    }
+
+	case W_line_type:
+	    {
+		short cur_pen = ((curptr->x < (WORD)(-2))
+				 ? (curptr->x % WGNUMPENS) + 2
+				 : curptr->x + 2);
+		LOGPEN cur_penstruct = (lpgw->color && isColor) ?
+		    lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
+
+		if (line_width != 1)
+		    cur_penstruct.lopnWidth.x *= line_width;
+		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+		DeleteObject(SelectObject(hdc, lpgw->hapen));
+		if (lpgw->color && isColor)
+		    SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
+	    }
+	pen = curptr->x;
+	SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
+	break;
+	case W_put_text:
+	    {
+		char *str;
+		str = LocalLock(curptr->htext);
+		if (str) {
+		    /* HBB 980630: shift differently for rotated text: */
+		    if (lpgw->angle)
+			xdash += hshift;
+		    else
+			ydash += vshift;
+		    SetBkMode(hdc,TRANSPARENT);
+		    TextOut(hdc,xdash,ydash,str,lstrlen(str));
+		    SetBkMode(hdc,OPAQUE);
+		}
+		LocalUnlock(curptr->htext);
+	    }
+	break;
+	case W_text_angle:
+	    lpgw->angle = curptr->x;
+	    SetFont(lpgw,hdc);
+	    break;
+	case W_justify:
+	    switch (curptr->x)
+		{
+		case LEFT:
+		    SetTextAlign(hdc, TA_LEFT|TA_BOTTOM);
+		    break;
+		case RIGHT:
+		    SetTextAlign(hdc, TA_RIGHT|TA_BOTTOM);
+		    break;
+		case CENTRE:
+		    SetTextAlign(hdc, TA_CENTER|TA_BOTTOM);
+		    break;
+		}
+	    break;
+	case W_pointsize:
+	    /* HBB 980309: term->pointsize() passes the number as
+	     * a scaled-up integer now, so we can avoid calling
+	     * sscanf() here (in a Win16 DLL sharing stack with
+	     * the stack-starved wgnuplot.exe !).  */
+	    if (curptr->x != 0) {
+		double pointsize = curptr->x / 100.0;
+		htic = pointsize*MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
+		vtic = pointsize*MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+	    } else {
+		char *str;
+		str = LocalLock(curptr->htext);
+		if (str) {
+		    double pointsize;
+		    sscanf(str, "%lg", &pointsize);
+		    htic = lpgw->org_pointsize
+			* MulDiv(lpgw->htic, rr-rl, lpgw->xmax) + 1;
+		    vtic = lpgw->org_pointsize
+			* MulDiv(lpgw->vtic, rb-rt, lpgw->ymax) + 1;
+		}
+		LocalUnlock(curptr->htext);
+	    }
+	    break;
+	case W_line_width:
+	    /* HBB 20000813: this may look strange, but it ensures
+	     * that linewidth is exactly 1 iff it's in default
+	     * state */
+	    line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
+	    break;
+#ifdef PM3D /* HBB 20000813: implemented PM3D for Windows terminal */
+	case W_pm3d_setcolor:
+	    {
+		double level = curptr->x / 256.0;
+		unsigned char R, G, B;
+		static HBRUSH last_pm3d_brush = NULL;
+		HBRUSH this_brush;
+		COLORREF c;
+
+		if (sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+		    R = G = B = curptr->x;
+		} else {
+		    R = 0xff * GetColorValueFromFormula(sm_palette.formulaR, level);
+		    G = 0xff * GetColorValueFromFormula(sm_palette.formulaG, level);
+		    B = 0xff * GetColorValueFromFormula(sm_palette.formulaB, level);
+		}
+
+		c = RGB(R,G,B);
+		this_brush = CreateSolidBrush(c);
+		SelectObject(hdc, this_brush);
+		if (last_pm3d_brush != NULL)
+		    DeleteObject(last_pm3d_brush);
+		last_pm3d_brush = this_brush;
+		/* create new pen, too: */
+		DeleteObject(SelectObject(hdc, CreatePen(PS_SOLID, 1, c)));
+	    }
+	break;
+	case W_pm3d_filled_polygon_pt:
+	    {
+		/* a point of the polygon is coming.
+		   note: if a polygon with larger nb of pts is needed, then reallocated
+		   ppt for an increased number polymax
+		   */
+		assert(polyi<polymax);
+		ppt[polyi].x = xdash;
+		ppt[polyi].y = ydash;
+		polyi++;
+	    }
+	break;
+	case W_pm3d_filled_polygon_draw:
+	    {
+		/* end of point series --> draw polygon now */
+		Polygon(hdc, ppt, polyi);
+		polyi = 0;
+	    }
+	break;
+#endif /* PM3D */
+	case W_dot:
+	    dot(hdc, xdash, ydash);
+	    break;
+	case W_plus: /* do plus */ 
+	    MoveTo(hdc,xdash-htic,ydash);
+	    LineTo(hdc,xdash+htic+1,ydash);
+	    MoveTo(hdc,xdash,ydash-vtic);
+	    LineTo(hdc,xdash,ydash+vtic+1);
+	    break;
+	case W_cross: /* do X */ 
+	    MoveTo(hdc,xdash-htic,ydash-vtic);
+	    LineTo(hdc,xdash+htic+1,ydash+vtic+1);
+	    MoveTo(hdc,xdash-htic,ydash+vtic);
+	    LineTo(hdc,xdash+htic+1,ydash-vtic-1);
+	    break;
+	case W_star: /* do star */ 
+	    MoveTo(hdc,xdash-htic,ydash);
+	    LineTo(hdc,xdash+htic+1,ydash);
+	    MoveTo(hdc,xdash,ydash-vtic);
+	    LineTo(hdc,xdash,ydash+vtic+1);
+	    MoveTo(hdc,xdash-htic,ydash-vtic);
+	    LineTo(hdc,xdash+htic+1,ydash+vtic+1);
+	    MoveTo(hdc,xdash-htic,ydash+vtic);
+	    LineTo(hdc,xdash+htic+1,ydash-vtic-1);
+	    break;
+	case W_circle: /* do open circle */ 
+	    Arc(hdc, xdash-htic, ydash-vtic, xdash+htic+1, ydash+vtic+1,
+		xdash, ydash+vtic+1, xdash, ydash+vtic+1);
+	    dot(hdc, xdash, ydash);
+	    break;
+	case W_fcircle: /* do filled circle */ 
+	    Ellipse(hdc, xdash-htic, ydash-vtic,
+		    xdash+htic+1, ydash+vtic+1);
+	    break;
+	default:	/* potentially closed figure */
+	    {
+		POINT p[6];
+		int i;
+		int shape;
+		int filled = 0;
+		static float pointshapes[5][10] = {
+		    {-1, -1, +1, -1, +1, +1, -1, +1, 0, 0}, /* box */
+		    { 0, +1, -1,  0,  0, -1, +1,  0, 0, 0}, /* diamond */
+		    { 0, -4./3, -4./3, 2./3,
+		      4./3,  2./3, 0, 0}, /* triangle */
+		    { 0, 4./3, -4./3, -2./3,
+		      4./3,  -2./3, 0, 0}, /* inverted triangle */
+		    { 0, 1, 0.95106, 0.30902, 0.58779, -0.80902,
+		      -0.58779, -0.80902, -0.95106, 0.30902} /* pentagon */
+		};
+
+		switch (curptr->op) {
+		case W_box:
+		    shape = 0;
+		    break;
+		case W_diamond:
+		    shape = 1;
+		    break;
+		case W_itriangle:
+		    shape = 2;
+		    break;
+		case W_triangle:
+		    shape = 3;
+		    break;
+		case W_pentagon:
+		    shape = 4;
+		    break;
+		case W_fbox:
+		case W_fdiamond:
+		case W_fitriangle:
+		case W_ftriangle:
+		case W_fpentagon:
+		    shape = curptr->op-W_fbox;
+		    filled = 1;
+		    break;
+		}
+						
+		for (i = 0; i < 5; ++i) {
+		    if (pointshapes[shape][i * 2 + 1] == 0
+			&& pointshapes[shape][i * 2] == 0)
+			break;
+		    p[i].x = xdash + htic*pointshapes[shape][i*2] + 0.5;
+		    p[i].y = ydash + vtic*pointshapes[shape][i*2+1] + 0.5;
+		}
+		if ( filled )
+		    /* Filled polygon */
+		    Polygon(hdc, p, i);
+		else {
+		    /* Outline polygon */
+		    p[i].x = p[0].x;
+		    p[i].y = p[0].y;
+		    Polyline(hdc, p, i+1);
+		    dot(hdc, xdash, ydash);
+		}
+	    } /* default case */
+	} /* switch(opcode) */
+	lastop = curptr->op;
+	ngwop++;
+	curptr++;
+	if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
+	    GlobalUnlock(blkptr->hblk);
+	    blkptr->gwop = (struct GWOP FAR *)NULL;
+	    blkptr = blkptr->next;
+	    if (!blkptr->gwop)
+		blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
+	    if (!blkptr->gwop)
+		return;
+	    curptr = (struct GWOP FAR *)blkptr->gwop;
+	}
+    }
+    if (polyi >= 2)
+	Polyline(hdc, ppt, polyi);
+    LocalFreePtr(ppt);
 }
 
 /* ================================== */

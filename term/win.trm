@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.22 2001/02/09 15:06:11 broeker Exp $
+ * $Id: win.trm,v 1.23 2001/03/09 16:14:21 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -133,7 +133,7 @@ TERM_PUBLIC void WIN_filledbox __PROTO((int, unsigned int, unsigned int, unsigne
 #include <io.h>			/* for mktemp() */
 #endif
 
-#define WIN_POINT_TYPES 12
+#define WIN_POINT_TYPES 15	/* 20010411: raised */
 
 /* Interface routines - create list of actions for Windows */
 
@@ -316,6 +316,9 @@ WIN_point(x, y, number)
     /* size of point symbols */
     graphwin.htic = pointsize * term->h_tic / 2;
     graphwin.vtic = pointsize * term->v_tic / 2;
+    /* HBB 20010411: secure against pointtype -1 or lower */
+    if (number < -1)
+	number = -1;		/* refuse nonsense values */
     if (number >= 0)
 	number %= WIN_POINT_TYPES;
     number += 1;
