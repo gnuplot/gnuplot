@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.67 2004/12/22 19:22:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.68 2004/12/29 19:47:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -165,6 +165,7 @@ typedef struct bind_t {
     char modifier;
     char *command;
     char *(*builtin) (struct gp_event_t * ge);
+    TBOOLEAN allwindows;
     struct bind_t *next;
 } bind_t;
 
@@ -194,7 +195,7 @@ static void incr_mousemode __PROTO((const int amount));
 static void incr_clipboardmode __PROTO((const int amount));
 static void UpdateStatuslineWithMouseSetting __PROTO((mouse_setting_t * ms));
 
-static void event_keypress __PROTO((struct gp_event_t * ge));
+static void event_keypress __PROTO((struct gp_event_t * ge, TBOOLEAN current));
 static void ChangeView __PROTO((int x, int z));
 static void event_buttonpress __PROTO((struct gp_event_t * ge));
 static void event_buttonrelease __PROTO((struct gp_event_t * ge));
@@ -239,10 +240,9 @@ static char *bind_fmt_lhs __PROTO((const bind_t * in));
 static int bind_matches __PROTO((const bind_t * a, const bind_t * b));
 static void bind_display_one __PROTO((bind_t * ptr));
 static void bind_display __PROTO((char *lhs));
+static void bind_all __PROTO((char *lhs));
 static void bind_remove __PROTO((bind_t * b));
 static void bind_append __PROTO((char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge)));
-/* void bind_process __PROTO((char *lhs, char *rhs)); */
-/* void bind_remove_all __PROTO((void)); */
 static void recalc_ruler_pos __PROTO((void));
 static void turn_ruler_off __PROTO((void));
 static int nearest_label_tag __PROTO((int x, int y, struct termentry * t));
@@ -1293,7 +1293,7 @@ builtin_cancel_zoom(struct gp_event_t *ge)
 }
 
 static void
-event_keypress(struct gp_event_t *ge)
+event_keypress(struct gp_event_t *ge, TBOOLEAN current)
 {
     int x, y;
     int c, par2;
@@ -1317,28 +1317,52 @@ event_keypress(struct gp_event_t *ge)
     keypress.key = c;
     keypress.modifier = modifier_mask;
 
-
-    /* On 'pause mouse keypress'
-     * export current keypress and mouse coords to user variables.
-     * Ignore NULL keypress
+    /* Key bindings take precedence over generic actions like
+     * 'pause mouse key'.
      */
-    if (paused_for_mouse && paused_for_mousekeys && (c > '\0')) {
-	load_mouse_variables(x, y, FALSE, c);
-	return;
-    }
 
     for (ptr = bindings; ptr; ptr = ptr->next) {
 	if (bind_matches(&keypress, ptr)) {
-	    if ((par2 & 1) == 0 && ptr->command) {
-		/* let user defined bindings overwrite the builtin bindings */
+	    struct udvt_entry *keywin;
+	    if ((keywin = add_udv_by_name("MOUSE_KEY_WINDOW"))) {
+		keywin->udv_undef = FALSE;
+		Ginteger(&keywin->udv_value, ge->winid);
+	    }
+	    /* Always honor keys set with "bind all" */
+	    if (ptr->allwindows && ptr->command) {
+		if (current)
+		    load_mouse_variables(x, y, FALSE, c);
+		else
+		    /* FIXME - Better to clear MOUSE_[XY] than to set it wrongly. */
+		    /*         This may be worth a separate subroutine.           */
+		    load_mouse_variables(0, 0, FALSE, c);
 		do_string(ptr->command);
-		return;
+		/* Treat as a current event after we return to x11.trm */
+		ge->type = GE_keypress;
+		break;
+	    /* But otherwise ignore inactive windows */
+	    } else if (!current) {
+		break;
+	    /* Let user defined bindings overwrite the builtin bindings */
+	    } else if ((par2 & 1) == 0 && ptr->command) {
+		do_string(ptr->command);
+		break;
 	    } else if (ptr->builtin) {
 		ptr->builtin(ge);
 	    } else {
 		fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);
 	    }
 	}
+    }
+
+    /* On 'pause mouse keypress' in active window
+     * export current keypress and mouse coords to user variables.
+     * A key with 'bind all' terminates a pause even from non-active windows.
+     * Ignore NULL keypress
+     */
+    if (paused_for_mouse && paused_for_mousekeys && (c > '\0') && current) {
+	load_mouse_variables(x, y, FALSE, c);
+	return;
     }
 }
 
@@ -1404,10 +1428,12 @@ event_buttonpress(struct gp_event_t *ge)
 		/* not bound in 2d graphs */
 	    } else if (2 == b) {
 		/* not bound in 2d graphs */
-	    } else if (3 == b && !replot_disabled && !paused_for_mouse) {
+	    } else if (3 == b && !replot_disabled 
+		   &&  !(paused_for_mouse && !paused_for_mousekeys)) {
 		/* start zoom; but ignore it when
 		 *   - replot is disabled, e.g. with inline data, or
-		 *   - during 'pause mouse' */
+		 *   - during 'pause mouse'
+		 * allow zooming during 'pause mouse key' */
 		setting_zoom_x = mouse_x;
 		setting_zoom_y = mouse_y;
 		setting_zoom_region = TRUE;
@@ -1606,7 +1632,7 @@ event_buttonrelease(struct gp_event_t *ge)
     UpdateStatusline();
 
 #ifdef _Windows
-    if (paused_for_mouse) {
+    if (paused_for_mouse && !paused_for_mousekeys) {
 	/* remove pause message box after 'pause mouse' */
 	paused_for_mouse = FALSE;
 	kill_pending_Pause_dialog();
@@ -1760,6 +1786,7 @@ event_reset(struct gp_event_t *ge)
 
     if (paused_for_mouse) {
 	paused_for_mouse = FALSE;
+	paused_for_mousekeys = FALSE;
 #ifdef _Windows
 	/* remove pause message box after 'pause mouse' */
 	kill_pending_Pause_dialog();
@@ -1795,7 +1822,10 @@ do_event(struct gp_event_t *ge)
 	event_plotdone();
 	break;
     case GE_keypress:
-	event_keypress(ge);
+	event_keypress(ge, TRUE);
+	break;
+    case GE_keypress_old:
+	event_keypress(ge, FALSE);
 	break;
     case GE_modifier:
 	event_modifier(ge);
@@ -2018,7 +2048,8 @@ bind_matches(const bind_t * a, const bind_t * b)
 static void
 bind_display_one(bind_t * ptr)
 {
-    fprintf(stderr, " %-12s  ", bind_fmt_lhs(ptr));
+    fprintf(stderr, " %-12s ", bind_fmt_lhs(ptr));
+    fprintf(stderr, "%c ", ptr->allwindows ? '*' : ' ');
     if (ptr->command) {
 	fprintf(stderr, "`%s'\n", ptr->command);
     } else if (ptr->builtin) {
@@ -2052,12 +2083,14 @@ bind_display(char *lhs)
 	fprintf(stderr, fmt, "<B2-Motion>", "change view (scaling). Use <ctrl> to scale the axes only.");
 	fprintf(stderr, fmt, "<Shift-B2-Motion>", "vertical motion -- change ticslevel");
 	fprintf(stderr, "\n");
-	fprintf(stderr, " %-12s  %s\n", "Space", "raise gnuplot console window");
-	fprintf(stderr, " %-12s  %s\n", "q", "quit X11 terminal");
+	fprintf(stderr, " %-12s   %s\n", "Space", "raise gnuplot console window");
+	fprintf(stderr, " %-12s * %s\n", "q", "close this X11 plot window");
 	fprintf(stderr, "\n");
 	for (ptr = bindings; ptr; ptr = ptr->next) {
 	    bind_display_one(ptr);
 	}
+	fprintf(stderr, "\n");
+	fprintf(stderr, "              * indicates this key is active from all plot windows\n");
 	fprintf(stderr, "\n");
 	return;
     }
@@ -2147,6 +2180,7 @@ bind_append(char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge))
 
     bindings->prev = new;
     new->next = (struct bind_t *) 0;
+    new->allwindows = FALSE;	/* Can be explicitly set later */
     if (!rhs) {
 	new->builtin = builtin;
     } else if (*rhs) {
@@ -2157,7 +2191,7 @@ bind_append(char *lhs, char *rhs, char *(*builtin) (struct gp_event_t * ge))
 }
 
 void
-bind_process(char *lhs, char *rhs)
+bind_process(char *lhs, char *rhs, TBOOLEAN allwindows)
 {
     if (!bindings) {
 	bind_install_default_bindings();
@@ -2166,9 +2200,26 @@ bind_process(char *lhs, char *rhs)
 	bind_display(lhs);
     } else {
 	bind_append(lhs, rhs, 0);
+	if (allwindows)
+	    bind_all(lhs);
     }
     if (lhs)
 	free(lhs);
+}
+
+void
+bind_all(char *lhs)
+{
+    bind_t *ptr;
+    bind_t keypress;
+
+    if (!bind_scan_lhs(&keypress, lhs))
+	return;
+
+    for (ptr = bindings; ptr; ptr = ptr->next) {
+	if (bind_matches(&keypress, ptr))
+	    ptr->allwindows = TRUE;
+    }
 }
 
 void

@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.35 2005/01/04 13:02:58 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.36 2005/01/05 09:48:36 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -532,41 +532,41 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    DrawZoomBox(); /* draw new zoom box */
 	}
 	/* track(show) mouse position -- send the event to gnuplot */
-	gp_exec_event(GE_motion, mx, my, 0, 0);
+	gp_exec_event(GE_motion, mx, my, 0, 0, 0);
 	return 0L; /* end of WM_MOUSEMOVE */
 
     case WM_BUTTON1DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
 	if (! IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonpress, mx, my, 1, 0);
+	    gp_exec_event(GE_buttonpress, mx, my, 1, 0, 0);
 	return 0L;
 
     case WM_BUTTON2DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonpress, mx, my, 3, 0);
+	    gp_exec_event(GE_buttonpress, mx, my, 3, 0, 0);
 	return 0L;
 
     case WM_BUTTON3DOWN:
 	WinSetFocus(HWND_DESKTOP, hWnd);
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonpress, mx, my, 2, 0);
+	    gp_exec_event(GE_buttonpress, mx, my, 2, 0, 0);
 	return 0L;
 
     case WM_BUTTON1DBLCLK:
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonrelease, mx, my, 1, 0);
+	    gp_exec_event(GE_buttonrelease, mx, my, 1, 0, 0);
 	return 0L;
 
     case WM_BUTTON2DBLCLK:
 	if (!IGNORE_MOUSE)
 	    /* Note: 9999 should be replaced by time! */
-	    gp_exec_event(GE_buttonrelease, mx, my, 3, 9999);
+	    gp_exec_event(GE_buttonrelease, mx, my, 3, 9999, 0);
 	return 0L;
 
     case WM_BUTTON3DBLCLK:
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999);
+	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999, 0);
 	return 0L;
 
 #if 1
@@ -575,7 +575,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case WM_BUTTON1CLICK:
 #endif
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonrelease, mx, my, 1, 9999);
+	    gp_exec_event(GE_buttonrelease, mx, my, 1, 9999, 0);
 	return 0L;
 
 #if 0
@@ -584,7 +584,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case WM_BUTTON2CLICK:
 #endif
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonrelease, mx, my, 3, 9999);
+	    gp_exec_event(GE_buttonrelease, mx, my, 3, 9999, 0);
 	return 0L;
 
 #if 1
@@ -593,7 +593,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     case WM_BUTTON3CLICK:
 #endif
 	if (!IGNORE_MOUSE)
-	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999);
+	    gp_exec_event(GE_buttonrelease, mx, my, 2, 9999, 0);
 	return 0L;
 
     } /* switch over mouse events */
@@ -712,7 +712,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	    | ((usFlag & KC_ALT) ? Mod_Alt : 0);
 
 	if (modifier_mask != last_modifier_mask) {
-	    gp_exec_event(GE_modifier, mx, my, modifier_mask, 0);
+	    gp_exec_event(GE_modifier, mx, my, modifier_mask, 0, 0);
 	    last_modifier_mask = modifier_mask;
 	}
 #if 0
@@ -832,14 +832,14 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case VK_SHIFT:
 	case VK_CTRL:
 	case VK_ALT:
-	    gp_exec_event(GE_modifier, mx, my, modifier_mask, 0);
+	    gp_exec_event(GE_modifier, mx, my, modifier_mask, 0, 0);
 	    return 0L;
 	default:
 	    key = SHORT1FROMMP(mp2); /* character key code */
 	} /* switch(key) */
 
 	if (key)
-	    gp_exec_event(GE_keypress, mx, my, key, 0);
+	    gp_exec_event(GE_keypress, mx, my, key, 0, 0);
 
 	return 0L;
     } /*case(WM_CHAR) */
@@ -1300,7 +1300,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_MOUSE_HELP:
-	gp_exec_event(GE_keypress, mx, my, 'h', 1);
+	gp_exec_event(GE_keypress, mx, my, 'h', 1, 0);
 	return 0L;
 
 #if 0
@@ -1377,15 +1377,15 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	return 0L;
 
     case IDM_MOUSE_ZOOMNEXT: /* zoom to next level */
-	gp_exec_event(GE_keypress, mx, my, 'n', 1);
+	gp_exec_event(GE_keypress, mx, my, 'n', 1, 0);
 	return 0L;
 
     case IDM_MOUSE_UNZOOM: /* unzoom one level back */
-	gp_exec_event(GE_keypress, mx, my, 'p', 1);
+	gp_exec_event(GE_keypress, mx, my, 'p', 1, 0);
 	return 0L;
 
     case IDM_MOUSE_UNZOOMALL: /* unzoom to the first level */
-	gp_exec_event(GE_keypress, mx, my, 'u', 1);
+	gp_exec_event(GE_keypress, mx, my, 'u', 1, 0);
 	return 0L;
 
     case IDM_MOUSE_RULER:
@@ -1393,7 +1393,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	int mx, my;
 
 	GetMousePosViewport(hWnd,&mx,&my);
-	gp_exec_event(GE_keypress, mx, my, 'r', 1);
+	gp_exec_event(GE_keypress, mx, my, 'r', 1, 0);
 	return 0L;
     }
 
@@ -1403,13 +1403,13 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
     case IDM_SET_GRID:
     {
-	gp_exec_event(GE_keypress, mx, my, 'g', 1);
+	gp_exec_event(GE_keypress, mx, my, 'g', 1, 0);
 	return 0L;
     }
 
     case IDM_SET_LINLOGY:
     {
-	gp_exec_event(GE_keypress, mx, my, 'l', 1);
+	gp_exec_event(GE_keypress, mx, my, 'l', 1, 0);
 	return 0L;
     }
 
@@ -1805,7 +1805,7 @@ ThreadDraw(void* arg)
     tidDraw = 0;
 #if 0
     /* This does not work here(why?!), thus moved to pm.trm: PM_text(); */
-    gp_exec_event(GE_plotdone, mx, my, 0, 0); /* enable again zoom and scale by mouse motions */
+    gp_exec_event(GE_plotdone, mx, my, 0, 0, 0); /* enable again zoom and scale by mouse motions */
 #endif
 }
 

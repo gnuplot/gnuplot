@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.109 2005/02/01 11:28:50 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.110 2005/02/18 09:47:41 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -545,12 +545,18 @@ bind_command()
 {
     char* lhs = (char*) 0;
     char* rhs = (char*) 0;
+    TBOOLEAN allwindows = FALSE;
     ++c_token;
 
     if (!END_OF_COMMAND && equals(c_token,"!")) {
 	bind_remove_all();
 	++c_token;
 	return;
+    }
+
+    if (!END_OF_COMMAND && almost_equals(c_token,"all$windows")) {
+	allwindows = TRUE;
+	c_token++;
     }
 
     /* get left hand side: the key or key sequence */
@@ -606,14 +612,9 @@ bind_command()
 
     FPRINTF((stderr, "(bind_command) |%s| |%s|\n", lhs, rhs));
 
-#if 0
-    if (!END_OF_COMMAND) {
-	int_error(c_token, "usage: bind \"<lhs>\" \"<rhs>\"");
-    }
-#endif
-
     /* bind_process() will eventually free lhs / rhs ! */
-    bind_process(lhs, rhs);
+    bind_process(lhs, rhs, allwindows);
+
 }
 #endif /* USE_MOUSE */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: mousecmn.h,v 1.12 2004/12/22 19:22:40 sfeam Exp $
+ * $Id: mousecmn.h,v 1.13 2004/12/22 20:31:17 sfeam Exp $
  */
 
 /* GNUPLOT - mousecnm.h */
@@ -49,6 +49,7 @@ struct gp_event_t {
     int type;		/* see below */
     int mx, my;		/* current mouse coordinates */
     int par1, par2;	/* other parameters, depending on the event type */
+    int winid;		/* ID of window in which the event occurred */
 };
 
 
@@ -59,6 +60,9 @@ enum {
     GE_buttonpress,     /* mouse button has been pressed; par1 = number of the button (1, 2, 3...) */
     GE_buttonrelease,   /* mouse button has been released; par1 = number of the button (1, 2, 3...); par2 = time (ms) since previous button release */
     GE_keypress,        /* keypress; par1 = keycode (either ASCII, or one of the GP_ enums defined below); par2 = ( |1 .. don't pass through bindings )*/
+    GE_buttonpress_old,	/* same as GE_buttonpress but triggered from inactive window */
+    GE_buttonrelease_old,	/* same as GE_buttonrelease but triggered from inactive window */
+    GE_keypress_old,	/* same as GE_keypress but triggered from inactive window */
     GE_modifier,        /* shift/ctrl/alt key pressed or released; par1 = is new mask, see Mod_ enums below */
     GE_plotdone,        /* acknowledgement of plot completion (for synchronization) */
     GE_replot,          /* used only by ggi.trm */

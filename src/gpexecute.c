@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.12 2002/03/06 16:27:41 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.13 2004/07/01 17:10:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -216,7 +216,7 @@ pipe_died_handler(int signum)
 #endif /* PIPE_IPC */
 
 void
-gp_exec_event(char type, int mx, int my, int par1, int par2)
+gp_exec_event(char type, int mx, int my, int par1, int par2, int winid)
 {
     struct gp_event_t ge;
 #if defined(PIPE_IPC) /* || defined(WIN_IPC) */
@@ -225,7 +225,7 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
 
 #if 0 /* DEBUGGING */
     char s[127];
-    sprintf(s, "%%%c %d %d %d %d", type, mx, my, par1, par2);
+    sprintf(s, "%%%c %d %d %d %d %d", type, mx, my, par1, par2, winid);
     gp_execute(s);
 #endif
 
@@ -234,6 +234,7 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
     ge.my = my;
     ge.par1 = par1;
     ge.par2 = par2;
+    ge.winid = winid;
 #ifdef PIPE_IPC
     if (pipe_died)
 	return;

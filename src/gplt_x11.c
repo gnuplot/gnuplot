@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.130 2005/03/03 04:09:47 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.131 2005/03/09 18:26:43 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -219,7 +219,7 @@ typedef struct axis_scale_t {
 # ifdef PIPE_IPC
 #  define EXIT(status)                         \
     do {                                       \
-	gp_exec_event(GE_pending, 0, 0, 0, 0); \
+	gp_exec_event(GE_pending, 0, 0, 0, 0, 0); \
 	close(1);                              \
 	close(0);                              \
 	exit(status);                          \
@@ -873,7 +873,7 @@ mainloop()
 	}
 #ifdef PIPE_IPC
 	if (!pipe_died && (FD_ISSET(out, &tset) || buffered_output_pending)) {
-	    gp_exec_event(GE_pending, 0, 0, 0, 0);
+	    gp_exec_event(GE_pending, 0, 0, 0, 0, 0);
 	}
 #endif
 	/* A method in which the ErrorHandler can queue plots to be
@@ -1442,7 +1442,7 @@ record()
 		display(plot);
 #ifdef USE_MOUSE
 	    if (plot == current_plot)
-		gp_exec_event(GE_plotdone, 0, 0, 0, 0);	/* notify main program */
+		gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);	/* notify main program */
 #endif
 	    return 1;
 	case 'R':		/* leave x11 mode */
@@ -1649,7 +1649,7 @@ record()
 		    FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n",
 			     default_font, scaled_hchar, scaled_vchar));
 		    gp_exec_event(GE_fontprops, plot->width, plot->height,
-				  scaled_hchar, scaled_vchar);
+				  scaled_hchar, scaled_vchar, 0);
 		}
 		return 1;
 	    }
@@ -3596,7 +3596,7 @@ ErrorHandler(Display * display, XErrorEvent * error_event)
     /* Don't remove directly.  Main program might be using the memory. */
     (void) display;		/* avoid -Wunused warnings */
     Add_Plot_To_Remove_FIFO_Queue((Window) error_event->resourceid);
-    gp_exec_event(GE_reset, 0, 0, 0, 0);
+    gp_exec_event(GE_reset, 0, 0, 0, 0, 0);
     return 0;
 }
 
@@ -4081,7 +4081,7 @@ update_modifiers(unsigned int state)
 	| ((state & ControlMask) ? Mod_Ctrl : 0)
 	| ((state & Mod1Mask) ? Mod_Alt : 0);
     if (old_mod_mask != modifier_mask) {
-	gp_exec_event(GE_modifier, 0, 0, modifier_mask, 0);
+	gp_exec_event(GE_modifier, 0, 0, modifier_mask, 0, 0);
     }
 }
 
@@ -4250,13 +4250,17 @@ process_event(XEvent *event)
 
 	switch (keysym) {
 
-#define KNOWN_KEYSYMS(gp_keysym)                                             \
-		if (plot == current_plot) {                                  \
-		    gp_exec_event(GE_keypress,                               \
-			(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
-			gp_keysym, 0);                                       \
-		}                                                            \
-		return;
+#define KNOWN_KEYSYMS(gp_keysym)                                     \
+	if (plot == current_plot) {                                  \
+	    gp_exec_event(GE_keypress,                               \
+		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
+		gp_keysym, 0, plot->plot_number);                    \
+	} else {                                                     \
+	    gp_exec_event(GE_keypress_old,                              \
+		(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
+		gp_keysym, 0, plot->plot_number);                    \
+	}                                                            \
+	return;
 
 	case XK_BackSpace:
 	    KNOWN_KEYSYMS(GP_BackSpace);
@@ -4420,9 +4424,7 @@ process_event(XEvent *event)
 	    KNOWN_KEYSYMS(GP_F12);
 
 	default:
-	    if (plot == current_plot) {
-		KNOWN_KEYSYMS((int) keysym);
-	    }
+	    KNOWN_KEYSYMS((int) keysym);
 	    break;
 	}
 #endif
@@ -4452,7 +4454,7 @@ process_event(XEvent *event)
     case DestroyNotify:
 	plot = Find_Plot_In_Linked_List_By_Window(event->xconfigure.window);
 	if (plot == current_plot) {
-	    gp_exec_event(GE_reset, 0, 0, 0, 0);
+	    gp_exec_event(GE_reset, 0, 0, 0, 0, 0);
 	}
 	break;
 
@@ -4490,7 +4492,7 @@ process_event(XEvent *event)
 	    break;
 	if (plot == current_plot) {
 	    Call_display(plot);
-	    gp_exec_event(GE_motion, (int) RevX(event->xcrossing.x), (int) RevY(event->xcrossing.y), 0, 0);
+	    gp_exec_event(GE_motion, (int) RevX(event->xcrossing.x), (int) RevY(event->xcrossing.y), 0, 0, 0);
 	}
 	if (plot->zoombox_on) {
 	    DrawBox(plot);
@@ -4517,7 +4519,7 @@ process_event(XEvent *event)
 #endif
 	       ) {
 		Call_display(plot);
-		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
+		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0, 0);
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
 	    } else if (plot->axis_mask && plot->mouse_on) {
 		/* This is not the active plot window, but we can still update the mouse coords */
@@ -4568,7 +4570,7 @@ process_event(XEvent *event)
 	{
 	    if (plot == current_plot) {
 		Call_display(plot);
-		gp_exec_event(GE_buttonpress, (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, 0);
+		gp_exec_event(GE_buttonpress, (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, 0, 0);
 	    }
 	}
 	break;
@@ -4586,7 +4588,8 @@ process_event(XEvent *event)
 	    update_modifiers(event->xbutton.state);
 	    Call_display(plot);
 	    gp_exec_event(GE_buttonrelease,
-			  (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y), event->xbutton.button, (int) doubleclick);
+			  (int) RevX(event->xbutton.x), (int) RevY(event->xbutton.y),
+			  event->xbutton.button, (int) doubleclick, 0);
 	}
 
 #ifdef DEBUG

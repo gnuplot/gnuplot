@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.134 2005/03/03 04:09:52 sfeam Exp $
+ * $Id: x11.trm,v 1.135 2005/03/09 18:26:46 sfeam Exp $
  *
  */
 
@@ -646,7 +646,7 @@ AGAIN:
 			}
 			return(GE_fontprops);
 		    }
-		    if (ge.type == GE_buttonrelease && paused_for_mouse) {
+		    if (ge.type == GE_buttonrelease && paused_for_mouse && !paused_for_mousekeys) {
 			paused_for_mouse = FALSE;
 			return '\0';
 		    }

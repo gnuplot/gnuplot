@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.281 2005/03/23 16:47:11 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.282 2005/03/25 05:01:06 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1642,8 +1642,14 @@ C ... and restart the table:
 
  Note that multikey-bindings with modifiers have to be quoted.
 
+ Normally hotkeys are only recognized when the currently active plot window
+ has focus. `bind allwindows <key> ...` (short form: `bind all <key> ...`)
+ causes the binding for <key> to apply to all gnuplot plot windows, active
+ or not.  In this case gnuplot variable MOUSE_KEY_WINDOW is set to the ID
+ of the originating window, and may be used by the bound command.
+
  Syntax:
-       bind [<key-sequence>] ["<gnuplot commands>"]
+       bind {allwindows} [<key-sequence>] ["<gnuplot commands>"]
        bind!
 
  Examples:
@@ -1654,6 +1660,7 @@ C ... and restart the table:
      bind "ctrl-a" "plot x*x"
      bind "ctrl-alt-a" 'print "great"'
      bind Home "set view 60,30; replot"
+     bind all Home 'print "This is window ",MOUSE_KEY_WINDOW'
 
  - show bindings:
      bind "ctrl-a"          # shows the binding for ctrl-a
@@ -1715,11 +1722,11 @@ C ... and restart the table:
        pause mouse keypress
        print "Keystroke ", MOUSE_KEY, " at ", MOUSE_X, " ", MOUSE_Y
 
- If `pause mouse keypress` is terminated by a mouse click rather than by a
- keypress, then MOUSE_KEY will contain the button number, otherwise it will
- contain the ascii character value of the key that was pressed. If the
- pause command is terminated abnormally (e.g. by ctrl-C or by externally
- closing the plot window) then MOUSE_KEY will equal -1.
+ When `pause mouse keypress` is terminated by a keypress, then MOUSE_KEY will
+ contain the ascii character value of the key that was pressed. MOUSE_CHAR will
+ contain the character itself as a string variable.  If the pause command is
+ terminated abnormally (e.g. by ctrl-C or by externally closing the plot window)
+ then MOUSE_KEY will equal -1.
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
@@ -2756,11 +2763,14 @@ C ... and restart the table:
 
  If the current terminal supports mousing, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
- is not active, `pause mouse` is equivalent to `pause -1`.  The variant command
- `pause mouse keypress` will terminate on either a mouse click or on a 
- keypress in the plot window.  In all cases the coordinates of the mouse are
- returned in variables MOUSE_X, MOUSE_Y, MOUSE_X2, MOUSE_Y2.  The button number
- or the ascii value of the key pressed is returned in MOUSE_KEY.
+ is not active, `pause mouse` is equivalent to `pause -1`.
+ 
+ The variant command `pause mouse keypress` will terminate on a keypress in the
+ plot window.  The ascii value of the key pressed is returned in MOUSE_KEY.
+ The character itself is returned as a one character string in MOUSE_CHAR.
+ 
+ In all cases the coordinates of the mouse are returned in variables MOUSE_X,
+ MOUSE_Y, MOUSE_X2, MOUSE_Y2.
  See `mouse variables`.
 
  Note: Since `pause` communicates with the operating system rather than the
@@ -2773,6 +2783,18 @@ C ... and restart the table:
        pause -1  "Hit return to continue"
        pause 10  "Isn't this pretty?  It's a cubic spline."
        pause mouse "Click mouse on selected data point"
+
+ The variant "pause mouse key" will resume after any keypress in the active
+ plot window. If you want to wait for a particular key to be pressed, you can
+ use a reread loop such as:
+
+       printf "I will resume after you hit the Tab key in the plot window"
+       load "wait_for_tab"
+
+ File "wait_for_tab" contains the lines
+
+       pause mouse key
+       if (MOUSE_KEY != 9) reread
 
 2 plot
 ?commands plot

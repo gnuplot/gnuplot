@@ -82,6 +82,6 @@ extern int buffered_output_pending;
 #endif /* PIPE_IPC || WIN_IPC */
 
 
-void gp_exec_event __PROTO((char type, int mx, int my, int par1, int par2));
+void gp_exec_event __PROTO((char type, int mx, int my, int par1, int par2, int winid));
 
 #endif /* GPEXECUTE_H */

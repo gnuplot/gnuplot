@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.39 2004/07/01 17:10:10 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.40 2005/03/03 04:09:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -437,7 +437,7 @@ GraphEnd(LPGW lpgw)
 	lpgw->locked = FALSE;
 	UpdateWindow(lpgw->hWndGraph);
 #ifdef USE_MOUSE
-	gp_exec_event(GE_plotdone, 0, 0, 0, 0);	/* notify main program */
+	gp_exec_event(GE_plotdone, 0, 0, 0, 0, 0);	/* notify main program */
 #endif
 }
 
@@ -1828,7 +1828,7 @@ Wnd_exec_event(LPGW lpgw, LPARAM lparam, char type, int par1)
     unsigned long thisTimestamp = GetMessageTime();
 
     GetMousePosViewport(lpgw, &mx, &my);
-    gp_exec_event(type, mx, my, par1, thisTimestamp - lastTimestamp);
+    gp_exec_event(type, mx, my, par1, thisTimestamp - lastTimestamp, 0);
     lastTimestamp = thisTimestamp;
 }
 
