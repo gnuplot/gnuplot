@@ -1,3 +1,8 @@
+2003-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graphics.c src/graph3d.c: Title of 'set key title' was not
+	placed properly under simultaneous 'set key height'.
+
 2003-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/tables.h src/tables.c: New routine lookup_table_nth.

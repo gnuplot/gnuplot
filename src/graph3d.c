@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.81 2003/03/21 17:38:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.82 2003/05/17 05:59:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -846,10 +846,13 @@ do_3dplot(plots, pcount, quick)
     /* KEY TITLE */
     if (key->visible && strlen(key->title)) {
 	char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
+	int tmp = (int)(0.5 * key->height_fix * (t->v_char));
 	strcpy(ss, key->title);
 	strcat(ss, "\n");
 	s = ss;
 	yl -= t->v_char / 2;
+	yl += tmp;
+
 	while ((e = (char *) strchr(s, '\n')) != NULL) {
 	    *e = '\0';
 	    if (key->just == JLEFT) {
@@ -869,6 +872,7 @@ do_3dplot(plots, pcount, quick)
 	    yl -= t->v_char;
 	}
 	yl += t->v_char / 2;
+	yl -= tmp;
 	free(ss);
     }
     key_count = 0;

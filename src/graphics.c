@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.95 2003/07/05 02:51:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.96 2003/07/16 04:17:32 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1315,7 +1315,6 @@ do_plot(plots, pcount)
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
 	yl = keybox.yt;
-	yl -= (int)(0.5 * key->height_fix * (t->v_char));
 
 	if (*key->title) {
 	    char *ss = gp_alloc(strlen(key->title) + 2, "tmp string ss");
@@ -1341,6 +1340,7 @@ do_plot(plots, pcount)
 	    yl += t->v_char / 2;
 	    free(ss);
 	}
+	yl -= (int)(0.5 * key->height_fix * (t->v_char));
 	yl_ref = yl -= key_entry_height / 2;	/* centralise the keys */
 	key_count = 0;
 
