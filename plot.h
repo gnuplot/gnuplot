@@ -35,7 +35,6 @@
  * to the extent permitted by applicable law.
 ]*/
 
-/* avoid multiple includes */
 #ifndef PLOT_H
 #define PLOT_H
 
@@ -50,9 +49,7 @@
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/* The part for OS dependent defines
- * has been moved to a new file.
- */
+/* OS dependent defines are now in syscfg.h */
 
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
@@ -83,8 +80,15 @@ typedef int TBOOLEAN;
 /* double true, used in autoscale: 1=autoscale ?min, 2=autoscale ?max */
 #define DTRUE 3
 
-#define Pi 3.141592653589793
-#define DEG2RAD (Pi / 180.0)
+/* Normally in <math.h> */
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+#ifndef M_PI_2
+# define M_PI_2 1.57079632679489661923
+#endif
+
+#define DEG2RAD (M_PI / 180.0)
 
 
 /* minimum size of points[] in curve_points */
@@ -95,6 +99,10 @@ typedef int TBOOLEAN;
 
 /* Minimum number of chars to represent an integer */
 #define INT_STR_LEN (3*sizeof(int))
+
+/* Useful macros to compare strings */
+#define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
+#define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
 
 /* note that MAX_LINE_LEN, MAX_TOKENS and MAX_AT_LEN do no longer limit the
    size of the input. The values describe the steps in which the sizes are
