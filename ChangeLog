@@ -1,3 +1,9 @@
+2005-01-25  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/ai.trm (AI_reset) term/corel.trm (COREL_reset) term/epslatex.trm
+	(EPSL_init EPSL_text): Remove extraneous % characters in strings output
+	by fputs().
+
 2004-12-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (xtick2d_callback ytick2d_callback): Fix bug
