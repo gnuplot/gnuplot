@@ -1,3 +1,11 @@
+2005-01-08  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c (term_start_multiplot): Replace keywords "rowmajor" and
+	"columnmajor" with "columnsfirst" and "rowsfirst", respectively.
+
+	* docs/gnuplot.doc: Correct the description of row and column layout
+	'set term multiplot layout <rows>,<cols> {rowsfirst|columnsfirst}'
+
 2005-01-08  Harald Harders  <h.harders@tu-bs.de>
 
 	* src/pm3d.c src/term.c src/term_api.h term/epslatex.trm term/post.trm

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.269 2005/01/04 20:12:25 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.270 2005/01/05 00:41:41 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6443,7 +6443,7 @@ C ... and restart the table:
 
  Syntax:
        set multiplot { layout <rows>,<cols>
-                       {rowmajor|columnmajor} {downwards|upwards}
+                       {rowsfirst|columnsfirst} {downwards|upwards}
                        {scale <xscale>{,<yscale>}} {offset <xoff>{,<yoff>}} 
                      }
        unset multiplot
@@ -6497,9 +6497,9 @@ C ... and restart the table:
  are generated automatically, but can be overridden at any time.  With
  `layout` the display will be divided by a grid with <rows> rows and 
  <cols> columns.  This grid is filled rows first or columns first depending on
- whether `rowmajor` or `columnmajor` is given by the subsequent option of the 
- multiplot command.  The stack of plots can grow `downwards` or `upwards`.
- Default is `columnmajor` and `downwards`.
+ whether the corresponding option is given in the multiplot command.  The stack
+ of plots can grow `downwards` or `upwards`.
+ Default is `rowsfirst` and `downwards`.
 
  Each plot can be scaled by `scale` and shifted with `offset`; if the y-values
  for scale or offset are omitted, the x-value will be used.  `unset multiplot`
@@ -6509,7 +6509,7 @@ C ... and restart the table:
  Example:
        set size 1,1
        set origin 0,0
-       set multiplot layout 3,2 columnmajor scale 1.1,0.9
+       set multiplot layout 3,2 columnsfirst scale 1.1,0.9
        [ up to 6 plot commands here ]
        unset multiplot
 
@@ -6518,9 +6518,9 @@ C ... and restart the table:
  size of 0.9/3. 
 
  See also
-^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">multiplot demo (multiplt.dem)</a>
- .
-
+^ <a href="http://gnuplot.sourceforge.net/demo/multiplt.html">
+ multiplot demo (multiplt.dem)
+^ </a>
 3 mx2tics
 ?commands set mx2tics
 ?commands unset mx2tics

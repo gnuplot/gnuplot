@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.95 2005/01/08 15:37:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.96 2005/01/08 16:08:59 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -233,15 +233,15 @@ static void do_enh_writec __PROTO((int c));
 static void mp_layout_size_and_offset __PROTO((void));
 
 enum set_multiplot_id {
-    S_MULTIPLOT_ROWMAJOR, S_MULTIPLOT_COLUMNMAJOR, S_MULTIPLOT_SCALE,
+    S_MULTIPLOT_COLUMNSFIRST, S_MULTIPLOT_ROWSFIRST, S_MULTIPLOT_SCALE,
     S_MULTIPLOT_DOWNWARDS, S_MULTIPLOT_UPWARDS, 
     S_MULTIPLOT_OFFSET, S_MULTIPLOT_INVALID
 };
 
 static const struct gen_table set_multiplot_tbl[] =
 {
-    { "row$major", S_MULTIPLOT_ROWMAJOR },
-    { "col$umnmajor", S_MULTIPLOT_COLUMNMAJOR },
+    { "col$umnsfirst", S_MULTIPLOT_COLUMNSFIRST },
+    { "row$sfirst", S_MULTIPLOT_ROWSFIRST },
     { "down$wards", S_MULTIPLOT_DOWNWARDS },
     { "up$wards", S_MULTIPLOT_UPWARDS },
     { "sca$le", S_MULTIPLOT_SCALE },
@@ -630,11 +630,11 @@ term_start_multiplot()
 
 	while (!END_OF_COMMAND) {
 	    switch(lookup_table(&set_multiplot_tbl[0],c_token)) {
-		case S_MULTIPLOT_ROWMAJOR:
+		case S_MULTIPLOT_COLUMNSFIRST:
 		    mp_layout.row_major = TRUE;
 		    c_token++;
 		    break;
-		case S_MULTIPLOT_COLUMNMAJOR:
+		case S_MULTIPLOT_ROWSFIRST:
 		    mp_layout.row_major = FALSE;
 		    c_token++;
 		    break;
