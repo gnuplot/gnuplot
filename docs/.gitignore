@@ -1,1 +1,12 @@
 Makefile
+allterm.h
+doc2gih
+doc2rtf
+doc2tex
+gnuplot.tex
+*.aux
+*.dvi
+*.log
+*.pdf
+*.ps
+*.toc
