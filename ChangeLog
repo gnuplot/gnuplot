@@ -1,8 +1,8 @@
 2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
-	* docs/gnuplot.doc: Re-format a large section of text dealing with
-	binary files.  The previous layout caused PDF output to treat the
-	entire section as quoted monospace text, as for a code example.
+	* docs/gnuplot.doc docs/gnuplot.texi: Re-format a large section of text
+	dealing with binary files.  The previous layout caused PDF output to
+	treat the whole section as quoted monospace text, as for a code example.
 
 2004-11-27  Ethan Merritt  <merritt@u.washington.edu>
 
