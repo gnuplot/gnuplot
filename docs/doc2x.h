@@ -1,5 +1,5 @@
 /*
- * $Id: doc2x.h,v 1.3 1998/11/03 12:47:36 lhecking Exp $
+ * $Id: doc2x.h,v 1.4 1999/07/09 20:59:42 lhecking Exp $
  *
  */
 
@@ -37,6 +37,8 @@
 
 #ifndef DOCS_DOC2X_H
 # define DOCS_DOC2X_H
+
+#include "stdfn.h"		/* HBB 990828: safe_strncpy() prototype */
 
 /* TRUE or FALSE */
 typedef int TBOOLEAN;
@@ -97,7 +99,5 @@ extern char termdoc_filename[];
 extern
 #endif
        char *get_line __PROTO((char *, int, FILE *));
-
-char *safe_strncpy __PROTO((char *, char *, size_t));
 
 #endif /* DOCS_DOC2X_H */

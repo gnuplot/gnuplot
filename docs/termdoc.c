@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.9 1999/06/14 19:17:09 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: termdoc.c,v 1.10 1999/07/09 20:59:42 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - termdoc.c */
@@ -192,7 +192,8 @@ FILE *fp;
 
 char *
 safe_strncpy(d, s, n)
-char *d, *s;
+char *d;
+const char *s;			/* HBB 990828: added 'const' */
 size_t n;
 {
     char *ret;
