@@ -1,3 +1,7 @@
+2004-10-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/gplt_x11.c (process_event): Added missing cmd_tried = 1.
+
 2004-10-03  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/gplt_x11.c (delete_plot): Fix small memory leak.
