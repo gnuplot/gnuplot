@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.12 2002/08/30 18:45:45 mikulik Exp $
+ * $Id: color.h,v 1.13 2003/11/13 08:18:15 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -16,7 +16,7 @@
 
 /*
 In general, this file deals with colours, and in the current gnuplot
-source layout it would correspond structures and routines found in
+source layout it would correspond to structures and routines found in
 driver.h, term.h and term.c.
 
 Here we define structures which are required for the communication
@@ -44,7 +44,7 @@ typedef enum {
     SMPAL_COLOR_MODE_NONE = '0',
     SMPAL_COLOR_MODE_GRAY = 'g',      /* grayscale only */
     SMPAL_COLOR_MODE_RGB = 'r',       /* one of several fixed transforms */ 
-    SMPAL_COLOR_MODE_FUNCTIONS = 'f', /* user definded transforms */
+    SMPAL_COLOR_MODE_FUNCTIONS = 'f', /* user defined transforms */
     SMPAL_COLOR_MODE_GRADIENT = 'd'   /* interpolated table: 
 				       * explicitly defined or read from file */
 } palette_color_mode;
@@ -136,7 +136,7 @@ typedef struct {
   int colors;
   /* Table of RGB triplets resulted from applying the formulae. Used
    * in the 2nd call to term->make_palette for a terminal with
-   * discrete colours. Unused by PostScript which has calculates them
+   * discrete colours. Unused by PostScript which calculates them
    * analytically. */
   rgb_color *color;
 
