@@ -3,6 +3,9 @@
 /* Define to empty if the keyword does not work.  */
 #undef const
 
+/* Define if you have the ANSI # stringizing operator in cpp. */
+#undef HAVE_STRINGIZE
+
 /* Define if you have <unistd.h>.  */
 #undef HAVE_UNISTD_H
 
@@ -11,6 +14,15 @@
 
 /* Define as the return type of signal handlers (int or void).  */
 #undef RETSIGTYPE
+
+/* Define to the type of arg1 for select(). */
+#undef SELECT_TYPE_ARG1
+
+/* Define to the type of args 2, 3 and 4 for select(). */
+#undef SELECT_TYPE_ARG234
+
+/* Define to the type of arg5 for select(). */
+#undef SELECT_TYPE_ARG5
 
 /* Define to `unsigned' if <sys/types.h> doesn't define.  */
 #undef size_t
