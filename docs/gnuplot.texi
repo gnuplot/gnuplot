@@ -402,7 +402,7 @@ Note that @ref{bind} is only available if gnuplot was compiled with mouse
 support and it is used by all mouse-capable terminals.
 Bindings overwrite the builtin bindings (like in every real editor),
 except <space> and 'q' which cannot be rebound.
-Mouse Buttons cannot be rebound.
+Mouse buttons cannot be rebound.
 
 Note that multikey-bindings with modifiers have to be quoted.
 
@@ -4175,7 +4175,9 @@ unwillingly overwriting files.
 the comment marker in front of it. This is mainly useful for
 switching the @ref{terminal} setting for a short while, and getting back
 to the previously set terminal, afterwards, by loading the saved
-@ref{terminal} status.
+@ref{terminal} status. Note that for a single gnuplot session you may
+rather use the other method of saving and restoring current terminal
+by the commands `set term push` and `set term pop`, see `set term`.
 
 The filename must be enclosed in quotes.
 
@@ -4313,12 +4315,18 @@ when the variable was initially defined.
 * yzeroaxis::                   
 * zdata::                       
 * zdtics::                      
+* cbdata::                      
+* cbdtics::                     
 * zero::                        
 * zeroaxis::                    
 * zlabel::                      
 * zmtics::                      
 * zrange::                      
 * ztics::                       
+* cblabel::                     
+* cbmtics::                     
+* cbrange::                     
+* cbtics::                      
 @end menu
 
 @node angles, arrow, set-show, set-show
@@ -5574,6 +5582,7 @@ Syntax:
 @example
       set grid @{@{no@}@{m@}xtics@} @{@{no@}@{m@}ytics@} @{@{no@}@{m@}ztics@}
                @{@{no@}@{m@}x2tics@} @{@{no@}@{m@}y2tics@}
+               @{@{no@}@{m@}cbtics@}
                @{polar @{<angle>@}@}
                @{ @{linestyle <major_linestyle>@}
                  | @{linetype | lt <major_linetype>@}
@@ -6474,8 +6483,8 @@ There is no default character for @ref{missing}.
 
 @cindex nomouse
 
-The command @ref{mouse} enables mouse actions. Currently only the
-X11 and pm driver are mouse enhanced. There are two mouse modes.
+The command @ref{mouse} enables mouse actions. Currently the pm, x11,
+ggi and windows terminals are mouse enhanced. There are two mouse modes.
 The 2d-graph mode works for 2d graphs and for maps (i.e. splots with 
 @ref{view} having z-rotation 0, 90, 180, 270 or 360 degrees) and it
 allows tracing the position over graph, zooming, annotating graph etc.
@@ -6485,17 +6494,17 @@ with mouse buttons 1 and 2. If additionally to these buttons the modifier
 useful for large data sets. A vertical motion of Button 2 with the
 shift key hold down changes the ticslevel.
 
-Mousing is not available in multiplot mode.  If multiplot is disabled
+Mousing is not available in multiplot mode. If multiplot is disabled
 using @ref{multiplot} though,  the mouse will be turned on again and
 acts on the last plot (like replot do).
 
 X11 specific implementation details:
 Mouse support is turned on by default if standard input comes from
 a terminal (tty). Mouse support is turned off, if standard input
-does not come from a tty e.g. a pipe.  If you want to use mouse support
+does not come from a tty e.g. a pipe. If you want to use mouse support
 while writing to gnuplot from a pipe, the mouse must be turned on *before*
 starting the x11 driver, e.g. immediately after startup with the explicit
-command @ref{mouse}.  Beware: on some UNIX flavours, special input devices
+command @ref{mouse}. Beware: on some UNIX flavours, special input devices
 as /dev/null might not be `select-able`; turning on the mouse when using
 such devices will hang gnuplot.
 
@@ -6554,10 +6563,7 @@ if the format string was specified already):
 
 Choose the option `labels` to get real gnuplot labels on Button 2.
 (The default is `nolabels` which makes Button 2 drawing only
-@example
- temporary annotations at the mouse positions). The labes are
-@end example
-
+temporary annotations at the mouse positions). The labes are
 drawn with the current setting of `mouseformat`. `labeloptions`
 controls which options are passed to the @ref{label} command.
 The default is "pointstyle 1" which will plot a small plus at
@@ -6587,7 +6593,7 @@ User defined `hotkeys` can be defined using the @ref{bind} command.
 (see @ref{bind}).  Note, that user defined `hotkeys` may override
 the default bindings.
 
-see also @ref{bind} and @ref{label}.
+See also @ref{bind} and @ref{label}.
 
 @node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
@@ -7001,9 +7007,10 @@ gridded) are needed.  Another advantage is that the algorithm does not draw
 anything outside of the input (measured or calculated) region.
 
 The gray is obtained by mapping the averaged z coordinate of the four corners
-of the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
-This value can be used directly as the gray for gray maps. The gray value can 
-be mapped into a colour. See @ref{palette} for the complete description. 
+of the quadrangle into the range [min_color_z,max_color_z] providing range of
+grays [0:1]. This value can be used directly as the gray for gray maps. The
+normalized gray value can be further mapped into a colour. See @ref{palette}
+for the complete description. 
 
 The pm3d mode requires a terminal supporting filled coloured polygons and
 palettes of smooth colours. See above for the list of currently available
@@ -7043,7 +7050,6 @@ Syntax:
                  @{ scansautomatic | scansforward | scansbackward @}
                  @{ flush @{ begin | center | end @} @}
                  @{ clip1in | clip4in @}
-                 @{ zrange [@{<z_from>|*@}:@{<z_to>|*@}] @}
                  @{ hidden3d <linestyle> | nohidden3d @}
                  @{ transparent | solid @}
                  @{ map @}
@@ -7083,9 +7089,10 @@ The above clipping is OK for plotting maps.  For surfaces, clipping with
 respect to the z coordinate will be necessary.  Maybe in future...  (maybe
 something like "clipz1in" and "clipz4in").  Really needed?
 
-By default, the z range for colouring is the same as that from @ref{zrange}.
-That's OK for maps; for surfaces, however, using separate z ranges for 
-plotting and colouring can be of advantage.  Then use @ref{zrange}.
+By default, the range of z-values for colouring is the same as that from 
+@ref{zrange}. That's OK for maps; for surfaces, however, using separate 
+z ranges for plotting and for colouring can be of advantage.  Then 
+@ref{cbrange} should be used.
 
 The option @ref{hidden3d} takes as the argument a linestyle which must be
 created by `set style line ...`. (The style need not to be present when
@@ -7126,7 +7133,7 @@ as far as no user option is available to rotate x,y,z labels explicitly.
 Furthermore, the graph area is smaller than that of 2D graphs (some more 
 white space than I would expect like). Thus: 
 PLEASE IMPLEMENT A 2D LAYOUT FOR 3D MAPS!
-Please use 'unset pm3d' to correctly get rid of the pm3d setup, notably
+Please use @ref{pm3d} to correctly get rid of the pm3d setup, notably
 the reversed y axis and rotated ylabel.
 
 The colouring setup as well as the colour box drawing are determinated by @ref{palette}. Maybe in future there could be a possibility of using more palettes, 
@@ -7290,13 +7297,14 @@ will use line style `2604`, a thin line with the default border color (-1)
 for drawing the border. `bdefault` (which is the default) will use the default
 border line style for drawing the border of the color box.
 
-Currently for horizontal color boxes (horizontal) the labels are drawn
-above the box, if the box is at the bottom of the graph, and below the
-box, if the box is at the top of the graph. If someone does not like this,
-he/she could yet add more options for controlling how the box is drawn!
+The axis of the color box is called `cb` and it is controlled by means of the
+usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
+`format cb`, `grid [m]cb`, @ref{cblabel}, and perhaps even @ref{cbdata}, `[no]cbdtics`,
+`[no]cbmtics`.
 
 See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`, 
 `help set style line`.
+
 
 
 @node pointsize, polar, color_box, set-show
@@ -8034,7 +8042,7 @@ in some operating systems.
 Several terminals have additional options.  For example, see `dumb`,
 `iris4d`, `hpljii` or `postscript`.
 
-The command `set term push` remembers the current terminal including its 
+The command `set term push` remembers the current terminal including its
 settings while `set term pop` restores it. This is equivalent to `save term`
 and `load term`, but without accessing the filesystem. Therefore they can be
 used to achieve platform independent restoring of the terminal after printing,
@@ -11671,7 +11679,8 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{x2label}, @ref{ylabel}, @ref{y2label} and @ref{zlabel}.
+The same syntax applies to @ref{x2label}, @ref{ylabel}, @ref{y2label}, @ref{zlabel} and
+@ref{cblabel}.
 
 Specifying the constants <xoff> or <yoff> as optional offsets for a label
 will move it <xoff> or <yoff> character widths or heights.  For example,
@@ -11707,6 +11716,9 @@ using \\ to prevent the ylabel from overwriting the plot.
 
 zlabel: The z-axis label is centered along the z axis and placed in the space
 above the grid level.
+
+cblabel: The color box axis label is centered along the box and placed below 
+or right according to horizontal or vertical color box gradient.
 
 y2label: The y2-axis label is placed to the right of the y2 axis.  The
 position is terminal-dependent in the same manner as is the y-axis label.
@@ -11899,7 +11911,7 @@ Syntax:
 
 @end example
 
-The same syntax applies to @ref{ytics}, @ref{ztics}, @ref{x2tics} and @ref{y2tics}.
+The same syntax applies to @ref{ytics}, @ref{ztics}, @ref{x2tics}, @ref{y2tics} and @ref{cbtics}.
 
 `axis` or @ref{border} tells `gnuplot` to put the tics (both the tics themselves
 and the accompanying labels) along the axis or the border, respectively.  If
@@ -12266,7 +12278,7 @@ The @ref{yzeroaxis} command draws a line at x = 0.  For details, please see
 
 Set zaxis date to timeseries (dates/times).  Please see @ref{xdata}.
 
-@node zdtics, zero, zdata, set-show
+@node zdtics, cbdata, zdata, set-show
 @subsection zdtics
 
 @c ?commands set zdtics
@@ -12284,7 +12296,38 @@ Set zaxis date to timeseries (dates/times).  Please see @ref{xdata}.
 The @ref{zdtics} command changes tics on the z axis to days of the week.
 Please see @ref{xdtics} for details.
 
-@node zero, zeroaxis, zdtics, set-show
+@node cbdata, cbdtics, zdtics, set-show
+@subsection cbdata
+
+@c ?commands set cbdata
+@c ?commands show cbdata
+@c ?set cbdata
+@c ?show cbdata
+@cindex cbdata
+@opindex cbdata
+
+
+Set color box axis date to timeseries (dates/times).  Please see @ref{xdata}.
+
+@node cbdtics, zero, cbdata, set-show
+@subsection cbdtics
+
+@c ?commands set cbdtics
+@c ?commands set nocbdtics
+@c ?commands show cbdtics
+@c ?set cbdtics
+@c ?set nocbdtics
+@c ?show cbdtics
+@cindex cbdtics
+@opindex cbdtics
+
+
+@cindex nocbdtics
+
+The @ref{cbdtics} command changes tics on the color box axis to days of the
+week. Please see @ref{cbdtics} for details.
+
+@node zero, zeroaxis, cbdtics, set-show
 @subsection zero
 
 @c ?commands set zero
@@ -12396,7 +12439,7 @@ Please see @ref{xmtics} for details.
 The @ref{zrange} command sets the range that will be displayed on the z axis.
 The zrange is used only by `splot` and is ignored by @ref{plot}.  Please see @ref{xrange} for details.
 
-@node ztics,  , zrange, set-show
+@node ztics, cblabel, zrange, set-show
 @subsection ztics
 
 @c ?commands set ztics
@@ -12412,6 +12455,70 @@ The zrange is used only by `splot` and is ignored by @ref{plot}.  Please see @re
 @cindex noztics
 
 The @ref{ztics} command controls major (labelled) tics on the z axis.
+Please see @ref{xtics} for details.
+
+@node cblabel, cbmtics, ztics, set-show
+@subsection cblabel
+
+@c ?commands set cblabel
+@c ?commands show cblabel
+@c ?set cblabel
+@c ?show cblabel
+@cindex cbabel
+
+This command sets the label for the color box axis.  Please see @ref{xlabel}.
+
+@node cbmtics, cbrange, cblabel, set-show
+@subsection cbmtics
+
+@c ?commands set cbmtics
+@c ?commands set nocbmtics
+@c ?commands show cbmtics
+@c ?set cbmtics
+@c ?set nocbmtics
+@c ?show cbmtics
+@cindex cbmtics
+@opindex cbmtics
+
+
+@cindex nocbmtics
+
+The @ref{cbmtics} command changes tics on the color box axis to months of the
+year. Please see @ref{xmtics} for details.
+
+@node cbrange, cbtics, cbmtics, set-show
+@subsection cbrange
+
+@c ?commands set cbrange
+@c ?commands show cbrange
+@c ?set cbrange
+@c ?show cbrange
+@cindex cbrange
+@opindex cbrange
+
+
+The @ref{cbrange} command sets the range of z-values which are colored by 
+@ref{pm3d} mode of `splot`. If the cb-axis is autoscaled, then the @ref{pm3d} /
+@ref{palette} range is taken from @ref{zrange}.
+
+Please see @ref{xrange} for details on @ref{cbrange} syntax.
+
+@node cbtics,  , cbrange, set-show
+@subsection cbtics
+
+@c ?commands set cbtics
+@c ?commands set nocbtics
+@c ?commands show cbtics
+@c ?set cbtics
+@c ?set nocbtics
+@c ?show cbtics
+@cindex cbtics
+@opindex cbtics
+
+
+@cindex nocbtics
+
+The @ref{cbtics} command controls major (labelled) tics on the color box axis.
 Please see @ref{xtics} for details.
 
 @node shell, splot, set-show, Commands
