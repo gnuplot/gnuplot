@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.40 2000/11/23 18:22:17 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.41 2000/12/05 19:03:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -965,7 +965,7 @@ apply_head_properties(struct position* headsize)
 {
     curr_arrow_headlength = 0;
     if (headsize->x > 0) { /* set head length+angle for term->arrow */
-	int itmp, x1, x2;
+	unsigned int itmp, x1, x2;
 	double savex = headsize->x;
 
 	curr_arrow_headangle = headsize->y;
