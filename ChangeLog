@@ -93,6 +93,12 @@
  	off-by-one bug in treatment of term->{x,y}max when translating
  	'screen' coordinates.
 
+2000-09-13  Daniel Luecking  <luecking@uark.edu>
+
+	* term/metapost.trm: Disambiguated options m$onochrome and
+	m$agnification. Changed %g to %f in output format (MPt doesn't know
+	exponential notation). Changed MP_DPI from 300 to 2400.
+
 2000-08-02  Petr Mikulik <mikulik@physics.muni.cz>
 	* src/graph3d.c src/graphics.c src/set.c src/show.c src/term.c
 	  src/plot.h docs/gnuplot.doc term/fig.trm:
@@ -122,6 +128,10 @@
 
 	* src/gplt_x11.c: repaired `selection' (by left mouse).
 	I really don't know when and how this got broken!
+
+2000-06-20  Juha Takala  <juha.takala@vtt.fi>
+
+	* gplt_x11.c: Add missing forward slash to path for .Xdefaults.
 
 2000-06-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
