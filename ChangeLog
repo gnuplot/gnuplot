@@ -1,5 +1,11 @@
 2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graphics.c (boundary): fix rounding errors in multiplot
+	placement by adding 0.5 to ytop, ybot, xleft and xright initial
+	values.
+
+2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* INSTALL [HP-UX 10.x]: change recommendations regarding GCC on
 	HP-UX 10.x and higher.
 
