@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.3 1999/06/09 12:13:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.4 1999/06/11 11:18:57 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -35,6 +35,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.3 1999/06/09 12:13:31 lhe
 ]*/
 
 #include "plot.h"
+#include "command.h"
 #include "setshow.h"
 #include "binary.h"
 #include "matrix.h"
@@ -60,9 +61,6 @@ struct surface_points *first_3dplot = NULL;
 static struct udft_entry plot_func;
 
 
-extern struct udft_entry *dummy_func;
-extern int datatype[];
-extern char timefmt[];
 extern TBOOLEAN is_3d_plot;
 extern int plot_token;
 
@@ -73,12 +71,6 @@ extern int plot_token;
  * for 3d,  z = 0, x = 1, y = 2
  * these are given symbolic names in plot.h
  */
-
-extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-extern int auto_array[AXIS_ARRAY_SIZE];
-extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-extern double base_array[AXIS_ARRAY_SIZE];
-extern double log_base_array[AXIS_ARRAY_SIZE];
 
 /* some file-wide variables to store which axis we are using */
 static int x_axis, y_axis, z_axis;

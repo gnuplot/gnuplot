@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.8 1999/06/09 12:13:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.9 1999/06/11 11:18:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -36,6 +36,7 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.8 1999/06/09 12:13:29 l
 
 
 #include "plot.h"
+#include "command.h"
 #include "setshow.h"
 
 /* key placement is calculated in boundary, so we need file-wide variables
@@ -201,16 +202,6 @@ f_min(double a, double b)
 /*}}} */
 
 /*{{{  more variables */
-/* Define the boundary of the plot
- * These are computed at each call to do_plot, and are constant over
- * the period of one do_plot. They actually only change when the term
- * type changes and when the 'set size' factors change.
- * - no longer true, for 'set key out' or 'set key under'. also depend
- * on tic marks and multi-line labels.
- * They are shared with graph3d.c since we want to use its draw_clip_line()
- */
-int xleft, xright, ybot, ytop;
-
 
 /* we make a local copy of the 'key' variable so that if something
  * goes wrong, we can switch it off temporarily
@@ -225,12 +216,7 @@ static int lkey;
  * since code already uses x_min, etc  Eventually it will be done properly
  */
 
-
-extern double min_array[], max_array[];
-extern int auto_array[];
-
-extern int log_array[];
-extern double base_array[], log_base_array[];
+/* arrays now in graphics.h */
 
 static int x_axis = FIRST_X_AXIS, y_axis = FIRST_Y_AXIS;	/* current axes */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.11 1999/06/09 12:05:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.12 1999/06/11 11:18:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -58,6 +58,9 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.11 1999/06/09 12:05:58 l
  */
 
 #include "plot.h"
+#define MAIN_C
+#include "command.h"
+#undef MAIN_C
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
@@ -151,13 +154,6 @@ extern const char *user_shell;
 extern const char *user_gnuplotpath;
 #endif
 
-/* input data, parsing variables */
-#ifdef AMIGA_SC_6_1
-__far int num_tokens, c_token;
-#else
-int num_tokens, c_token;
-#endif
-
 struct lexical_unit *token;
 int token_table_size;
 
@@ -169,11 +165,6 @@ int inline_num;			/* input line number */
 PVOID input_from_PM_Terminal = NULL;
 char mouseShareMemName[40] = "";
 #endif /* USE_MOUSE && OS2 */
-
-struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
-
-char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* current dummy vars */
-
 
 /* support for replot command */
 char *replot_line;

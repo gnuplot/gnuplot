@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.6 1999/06/09 12:13:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.7 1999/06/11 11:18:53 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -64,6 +64,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.6 1999/06/09 12:13:28 lhecki
 #include <signal.h>
 
 #include "plot.h"
+#include "command.h"
 #include "matrix.h"
 #include "fit.h"
 #include "setshow.h"		/* for load_range */
@@ -92,16 +93,12 @@ static int kbhit(void);
 
 
 /* access external global variables  (ought to make a globals.h someday) */
+/* you name it, we deliver */
 
-extern struct udft_entry *dummy_func;
-extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-extern int c_token;
 extern int df_datum, df_line_number;
 
 /* following 2 external arrays are needed to use time data */
 
-extern int datatype[];
 extern int df_timecol[];
 
 enum marq_res {

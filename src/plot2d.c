@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.7 1999/06/09 12:13:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.8 1999/06/11 11:18:56 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -35,6 +35,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.7 1999/06/09 12:13:30 lhe
 ]*/
 
 #include "plot.h"
+#include "command.h"
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
@@ -49,7 +50,6 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.7 1999/06/09 12:13:30 lhe
 
 /* static prototypes */
 
-void plotrequest __PROTO((void));
 void plot3drequest __PROTO((void));
 void define __PROTO((void));
 static int get_data __PROTO((struct curve_points * this_plot));
@@ -62,14 +62,6 @@ static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plo
 /* the curves/surfaces of the plot */
 struct curve_points *first_plot = NULL;
 static struct udft_entry plot_func;
-extern struct udft_entry *dummy_func;
-
-/* jev -- for passing data thru user-defined function */
-/* Needed by datafile.c */
-struct udft_entry ydata_func;
-
-extern int datatype[];
-extern char timefmt[];
 
 extern TBOOLEAN is_3d_plot;
 extern int plot_token;
@@ -82,11 +74,7 @@ extern int plot_token;
  */
 
 /* Were declared in command.c */
-double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-int auto_array[AXIS_ARRAY_SIZE];
-TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-double base_array[AXIS_ARRAY_SIZE];
-double log_base_array[AXIS_ARRAY_SIZE];
+/* moved to graphics.h */
 
 /* Deleted from setshow.h and renamed */
 extern FILE *gpoutfile;
@@ -197,14 +185,13 @@ do { if (reverse_range[AXIS]) { \
 } while(0)
 
 
-
-void
-plotrequest()
 /*
  * In the parametric case we can say plot [a= -4:4] [-2:2] [-1:1] sin(a),a**2
  * while in the non-parametric case we would say only plot [b= -2:2] [-1:1]
  * sin(b)
  */
+void
+plotrequest()
 {
     int dummy_token = -1;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.6 1999/06/09 12:10:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.7 1999/06/11 11:18:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -140,7 +140,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.6 1999/06/09 12:10:22 l
 /*}}} */
 
 #include "plot.h"
-#include "fnproto.h"		/* check prototypes against our defns */
+#include "command.h"
 #include "binary.h"
 #include "setshow.h"
 
@@ -232,19 +232,8 @@ static int df_max_cols = 0;	/* space allocated */
 static int df_no_cols;		/* cols read */
 static int fast_columns;	/* corey@cac optimization */
 
-/* external variables we need */
-
-extern int c_token, num_tokens;
-extern char timefmt[];		/* I would rather not need this, but ... */
 /* columns needing timefmt are passed in df_timecol[] after df_open */
 
-/* jev -- for passing data thru user-defined function */
-extern struct udft_entry ydata_func;
-extern struct udft_entry *dummy_func;
-extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-
-extern double min_array[], max_array[];
 /*}}} */
 
 

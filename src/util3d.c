@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.2 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.3 1999/06/11 11:18:59 lhecking Exp $"); }
 #endif
 
 
@@ -49,7 +49,6 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.2 1999/06/09 12:13:32 lhe
 #include "plot.h"
 #include "setshow.h"
 
-extern int xleft, xright, ybot, ytop;
 extern int hidden_active;	/* HBB 980324: hidden_no_update was unused here */
 
 /* ACCESS THINGS THAT OUGHT TO BE HIDDEN IN hidden3d.c - perhaps we
@@ -60,17 +59,7 @@ extern int hidden_active;	/* HBB 980324: hidden_no_update was unused here */
 
 extern int suppressMove;
 
-extern double min_array[], max_array[];
-extern int auto_array[], log_array[];
-extern double base_array[], log_base_array[];
-
 /* for convenience while converting to use these arrays */
-#define x_min3d min_array[FIRST_X_AXIS]
-#define x_max3d max_array[FIRST_X_AXIS]
-#define y_min3d min_array[FIRST_Y_AXIS]
-#define y_max3d max_array[FIRST_Y_AXIS]
-#define z_min3d min_array[FIRST_Z_AXIS]
-#define z_max3d max_array[FIRST_Z_AXIS]
 #define min3d_z min_array[FIRST_Z_AXIS]
 #define max3d_z max_array[FIRST_Z_AXIS]
 

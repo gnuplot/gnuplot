@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.11 1999/06/09 12:13:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.12 1999/06/11 11:18:56 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -34,16 +34,11 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.11 1999/06/09 12:13:30 lhec
  * to the extent permitted by applicable law.
 ]*/
 
-#ifdef AMIGA_AC_5
-# include <exec/types.h>
-#endif /* AMIGA_AC_5 */
-
 #include "plot.h"
+#include "command.h"
 #include "setshow.h"
 
 extern int key_vpos, key_hpos, key_just;
-extern int datatype[];
-extern char timefmt[];
 
 static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, char *text));
 static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef * tdef, TBOOLEAN rotate, char *text));

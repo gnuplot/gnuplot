@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.12 1999/06/10 19:54:11 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.13 1999/06/11 11:18:57 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.12 1999/06/10 19:54:11 lheck
  */
 
 #include "plot.h"
+#include "command.h"
 #include "stdfn.h"
 #include "setshow.h"
 #include "national.h"
@@ -287,18 +288,6 @@ extern struct surface_points *first_3dplot;
 int key_hpos = TRIGHT;		/* place for curve-labels, corner or outside */
 int key_vpos = TTOP;		/* place for curve-labels, corner or below */
 int key_just = JRIGHT;		/* alignment of key labels, left or right */
-
-#ifndef TIMEFMT
-#define TIMEFMT "%d/%m/%y\n%H:%M"
-#endif
-/* format for date/time for reading time in datafile */
-char timefmt[25] = TIMEFMT;
-
-/* array of datatypes (x in 0,y in 1,z in 2,..(rtuv)) */
-/* not sure how rtuv come into it ?
- * oh well, make first six compatible with FIRST_X_AXIS, etc
- */
-int datatype[DATATYPE_ARRAY_SIZE];
 
 char cur_locale[MAX_ID_LEN+1] = "C";
 

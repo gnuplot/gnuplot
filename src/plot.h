@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.6 1999/06/09 12:11:38 lhecking Exp $
+ * $Id: plot.h,v 1.7 1999/06/10 19:54:11 lhecking Exp $
  *
  */
 
@@ -770,16 +770,12 @@ extern int input_line_len;
 extern char *replot_line;
 extern struct lexical_unit *token;
 extern int token_table_size;
-extern int num_tokens, c_token;
 extern int inline_num;
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern struct ft_entry GPFAR ft[];	/* from plot.c */
 extern struct udft_entry *first_udf;
 extern struct udvt_entry *first_udv;
 extern TBOOLEAN interactive;
 extern char *infile_name;
-extern struct udft_entry *dummy_func;
-extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 
 /* Windows needs to redefine stdin/stdout functions */
 #ifdef _Windows
@@ -827,7 +823,16 @@ extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 #endif
 
 #include "protos.h"
-
+/* nifty trick I stole from ELM 2.5alpha. */
+/* and I, in turn, stole it from mutt ...*/
+#ifdef MAIN_C
+# define WHERE 
+# define INITVAL(x) = x
+#else
+# define WHERE extern
+# define INITVAL(x) 
+# endif
+#include "graphics.h"
 
 /* line/point parsing...
  *

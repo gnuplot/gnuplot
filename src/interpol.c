@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.3 1999/06/09 12:13:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.4 1999/06/11 11:18:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -123,14 +123,6 @@ static char *RCSid() { return RCSid("$Id: interpol.c,v 1.3 1999/06/09 12:13:30 l
  * elements are z=0,y1=1,x1=2,z2=4,y2=5,x2=6 these are given symbolic
  * names in plot.h
  */
-
-extern double min_array[AXIS_ARRAY_SIZE];
-extern double max_array[AXIS_ARRAY_SIZE];
-extern int auto_array[AXIS_ARRAY_SIZE];
-extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-extern double base_array[AXIS_ARRAY_SIZE];
-extern double log_base_array[AXIS_ARRAY_SIZE];
-
 
 #define Inc_c_token if (++c_token >= num_tokens) \
   int_error (c_token, "Syntax error");

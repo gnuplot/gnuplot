@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.5 1999/06/10 20:00:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.6 1999/06/11 11:18:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -162,11 +162,6 @@ f_min(double a, double b)
  * type changes and when the 'set size' factors change. 
  */
 
-/* in order to allow graphic.c to use clip_draw_line, we must
- * share xleft, xright, ybot, ytop with graphics.c
- */
-extern int xleft, xright, ybot, ytop;
-
 int xmiddle, ymiddle, xscaler, yscaler;
 static int ptitl_cnt;
 static int max_ptitl_len;
@@ -181,17 +176,7 @@ static int ktitle_lines = 0;
  */
 /*static double x_min3d, x_max3d, y_min3d, y_max3d, z_min3d, z_max3d; */
 /* sizes are now set in min_array[], max_array[] from plot.c */
-extern double min_array[], max_array[];
-extern int auto_array[], log_array[];
-extern double base_array[], log_base_array[];
-
-/* for convenience while converting to use these arrays */
-#define x_min3d min_array[FIRST_X_AXIS]
-#define x_max3d max_array[FIRST_X_AXIS]
-#define y_min3d min_array[FIRST_Y_AXIS]
-#define y_max3d max_array[FIRST_Y_AXIS]
-#define z_min3d min_array[FIRST_Z_AXIS]
-#define z_max3d max_array[FIRST_Z_AXIS]
+/* now in graphics.h */
 
 /* There are several z's to take into account - I hope I get these
  * right !
@@ -212,10 +197,6 @@ double ceiling_z, floor_z, base_z;
 /* and some bodges while making the change */
 #define min3d_z min_array[FIRST_Z_AXIS]
 #define max3d_z max_array[FIRST_Z_AXIS]
-
-
-double xscale3d, yscale3d, zscale3d;
-
 
 typedef double transform_matrix[4][4];
 transform_matrix trans_mat;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.4 1999/06/09 12:13:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.5 1999/06/11 11:18:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -50,6 +50,7 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.4 1999/06/09 12:13:29 l
  */
 
 #include "plot.h"
+#include "command.h"
 #include "setshow.h"
 
 /* TODO (HBB's notes, just in case you're interested):
@@ -202,12 +203,7 @@ int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 #define map_z3d(z) ((z-base_z)*zscale3d-1.0)
 
 extern int suppressMove;
-extern int xright, xleft, ybot, ytop;
 extern int xmiddle, ymiddle, xscaler, yscaler;
-extern double min_array[], max_array[];
-extern int auto_array[], log_array[];
-extern double base_array[], log_base_array[];
-extern double xscale3d, yscale3d, zscale3d;
 extern double base_z;
 
 extern int hidden_no_update, hidden_active;
