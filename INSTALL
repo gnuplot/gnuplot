@@ -1,7 +1,7 @@
 Installation
 ************
 
-   This document is divided into four parts: the first part (For the
+   This document is divided into several parts: the first part (For the
 impatient) provides a quick overview of configuration and compilation
 instructions.  It also lists those options to the configure shell script
 which are unique to gnuplot.  Part two describes the environment variables
@@ -151,31 +151,30 @@ $ ./configure --help
   --with-lasergnu         install lasergnu printer script
   --with-linux-vga        use the Linux SVGA console driver
                           (requires /usr/lib/libvga)
-  --with-ggi[=PATH]       enable the ggi driver (EXPERIMENTAL)
-  --with-xmi[=PATH]       ggi's xmi support for pm3d (EXPERIMENTAL)
+  --with-ggi[=DIR]        enable the ggi driver (EXPERIMENTAL)
+  --with-xmi[=DIR]        ggi's xmi support for pm3d (EXPERIMENTAL)
   --with-readline   (*)   use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
   --with-readline=gnu     use the GNU readline library
-  --with-readline=PATH    Specify the location of GNU readline
+  --with-readline=DIR     Specify the location of GNU readline
   --enable-history-file   use history file (requires GNU readline)
-  --with-gd[=PATH]        enable gif terminal with Tom Boutell's gd library
-                          (requires GD library)
-  --with-plot=[PATH]      use the Unix plot library
-  --with-png[=PATH] (*)   enable png terminal
-                          (requires libpng and libz)
-  --with-pdf=[PATH] (*)   enable pdf terminal 
+  --with-plot[=DIR]       use the Unix plot library
+  --with-png[=DIR]  (*)   where to find the png library
+  --with-gd[=DIR]   (*)   where to find Tom Boutell's gd library
+  --with-gif=png          'set term gif' produces png images instead
+                          (libgd version >= 1.8) 
+  --with-pdf[=DIR]  (*)   enable pdf terminal 
                           (requires PDFLib)
   --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons
-  --without-lisp-files    do not build emacs lisp files
-  --with-row-help   (*)   format help and subtopic tables by row (default)
-  --without-row-help      format help and subtopic tables by column
+  --with-row-help         format help and subtopic tables by row (default)
+  --without-row-help (*)  format help and subtopic tables by column
   --without-tutorial      do not build LaTeX tutorial
-  --enable-mouse    (*)   enable mouse for the x11 terminal
-  --enable-pm3d     (*)   enable pm3d
-  --enable-filledboxes    enable filledboxes style (EXPERIMENTAL)
-  --enable-relative-boxwidth    enable relative_boxwidths (EXPERIMENTAL)
-  --enable-thin-splines   enable thin plate splines (EXPERIMENTAL)
+  --disable-mouse         disable mouse for the x11 terminal
+  --disable-pm3d          disable pm3d
+  --disable-filledboxes   disable filledboxes style
+  --disable-relative-boxwidth   disable relative_boxwidths
+  --enable-thin-splines   enable thin plate splines
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
   --enable-rgip           enable Redwood Graphics Interface Protocol
@@ -188,7 +187,7 @@ can have additional arguments:
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
  o `--with-PACKAGE=no' disables checking for PACKAGE. It has the same
    effect as `--without-PACKAGE'.
- o `--with-PACKAGE=PATH' checks for PACKAGE in PATH
+ o `--with-PACKAGE=DIR' checks for PACKAGE in DIR
 
 Unix, no configure
 ------------------
@@ -390,7 +389,7 @@ the name of the directory from which to load the initialization file
 GNUPLOT.INI.  See the help on 'start_up' for more information.
 
 HOME is examined as a directory where a .gnuplot startup file might be
-found. See help on "start-up".
+found. See help on "start-up". The Atari/MTOS version uses GNUPLOTPATH.
 
 If defined, the environment variable GNUHELP is used for the name
 of the .gih help file, otherwise HELPFILE (defined in makefile or
@@ -398,6 +397,30 @@ command.c) is used.
 
 The VMS version looks for the logical name GNUPLOT$HELP to locate
 the help library.
+
+If gnuplot is configured to use its own, private history file, the size
+of this file can be set via GNUPLOT_HISTORY_SIZE. The default is 666
+(lines).
+
+If gnuplot is configured for the X11 window system, it looks for the X11
+driver program in GNUPLOT_DRIVER_DIR (default platform-dependent). This
+variable was introduced when the X11 driver program was moved into a
+platform-dependent location to allow concurrent use of drivers with
+different builtin features.
+
+GNUPLOT_FONTPATH is used by the postscript driver as search path for
+TrueType fonts.
+
+GNUPLOT_LIB may be used to define additional search directories for data
+and command files. The variable may contain a single directory name, or
+a list of directories separated by a platform-specific path separator,
+eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
+of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
+with the `save` and `save set` commands.
+
+GNUFITLOG holds the name of a file that saves fit results. The default is
+fit.log. If the name ends with a "/" or "\", it is treated as a directory
+name, and fit.log appended.
 
 The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
@@ -410,7 +433,7 @@ SunOS and Solaris use -R to specify the runtime library search path, whereas
 OSF/Dec Unix, Irix and Linux use -rpath. If this is not possible, the
 LD_LIBRARY_PATH environment variable should be set.
 
-About --with-PACKAGE[=PATH]
+About --with-PACKAGE[=DIR]
 ***************************
 
  Every `--with-PACKAGE' option sets a `with_package' variable in
@@ -423,11 +446,11 @@ only three different possible values for the `with_package' variable:
 --with-package            yes
 --with-package=yes        yes
 --with-package=no         no
---with-package=PATH       PATH
+--with-package=DIR        DIR
 --without-package         no
 
  In gnuplot, the following --with-PACKAGE options are available.
-The --with-PACKAGE=PATH form is always required if a package is installed
+The --with-PACKAGE=DIR form is always required if a package is installed
 in a non-default location that is not searched by the preprocessor
 or linker.
 
@@ -443,32 +466,38 @@ or linker.
 
    Use the GNU readline library instead of gnuplot's builtin readline.
 
-  --with-readline=[PATH]
+  --with-readline[=DIR]
 
    Use the GNU readline library instead of gnuplot's builtin readline.
    This form is required if GNU readline is not installed in a default
    location.
 
-  --with-gd[=PATH]
+  --with-gd[=DIR]
 
-   Dto. for Thomas Boutell's gd library. This option is off by default,
-   as the developers want to encourage users to use the png format instead
-   of gif.
+   Dto. for Thomas Boutell's gd library. configure determines whether
+   the found library supports gif, png, jpeg, and freetype. On by default.
 
-  --with-png[=PATH]
+  --with-png[=DIR]
 
     Dto. for the png library. This option is on by default.
 
-  --with-pdf[=PATH]
+  --with-pdf[=DIR]
 
     Dto. for the pdf library. This option is on by default.
 
-  --with-plot[=PATH]
+  --with-plot[=DIR]
 
-    If used without the PATH argument, this option selects the standard
-    UNIX plot library, if available. If used with the PATH argument,
+    If used without the DIR argument, this option selects the standard
+    UNIX plot library, if available. If used with the DIR argument,
     configure looks for the plot library from GNU plotutils version 2.2
     or better. The option is off by default.
+
+   --with-gif=png
+
+    If specified, the gif driver produces png images instead of gif.
+    Other arguments to this option are ignored! This feature exists
+    mainly for backwards compatibility with old plot scripts, and is
+    off by default.
 
 Platform problems and testing
 *****************************
