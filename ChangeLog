@@ -1,3 +1,10 @@
+2001-03-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (get_data): Automatically revert to 'with points'
+ 	from candlesticks or financebars if input has only 1 or 2 columns.
+  	Output a warning to the user about this. Fixed wording of the
+ 	error message in 3-column case.
+	
 2001-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.h [HAVE_LIBPNG]: Include new PDF terminal driver.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.36 2001/01/16 20:56:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.37 2001/02/15 17:02:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -385,11 +385,16 @@ get_data(current_plot)
 			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
 			      v[1], v[1], 0.0);
 	    } else {
+		if (current_plot->plot_style == CANDLESTICKS
+		    || current_plot->plot_style == FINANCEBARS) {
+		    int_warn(storetoken, "This plot style does not work with 1 or 2 cols. Setting to points");
+		    current_plot->plot_style = POINTSTYLE;
+		}
 		/* xlow and xhigh are same as x */
 		/* auto width if boxes, else ignored */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
 			      v[1], -1.0);
-	    } 
+	    }
 	    break;
 
 
@@ -401,7 +406,7 @@ get_data(current_plot)
 	    else
 		switch (current_plot->plot_style) {
 		default:
-		    int_warn(storetoken, "This plot style not work with 3 cols. Setting to yerrorbars");
+		    int_warn(storetoken, "This plot style does not work with 3 cols. Setting to yerrorbars");
 		    current_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
