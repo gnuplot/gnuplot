@@ -1,5 +1,5 @@
 #
-# $Id: contours.dem,v 1.2 1993/09/27 17:11:16 alex Exp $
+# $Id: contours.dem,v 1.2 1998/12/09 15:26:49 lhecking Exp $
 #
 set samples 20
 set isosamples 21
@@ -137,7 +137,8 @@ pause -1 "Hit Return to Continue (22)"
 set logscale z
 set hidden3d
 set isosamples 60
-set view 20,340,1,2
+set ticslevel 0.
+set view 20,340	#HBB: ,1,2
 set xlabel "x"
 set ylabel "y"
 splot [-1.5:1.5] [-0.5:1.5] (1-x)**2 + 100*(y - x**2)**2
