@@ -1,5 +1,5 @@
 /*
- * $Id: gnugraph.trm,v 1.13 1999/11/15 21:56:46 lhecking Exp $
+ * $Id: gnugraph.trm,v 1.14 1999/11/24 12:32:05 lhecking Exp $
  */
 
 /* GNUPLOT -- gnugraph.trm */
@@ -146,13 +146,10 @@ int up_fontsize = 10;
 
 enum JUSTIFY up_justify = LEFT;
 
-#ifdef GNU_PLOTUTILS
-# define ROTATE(angle) pl_textangle(90*angle)
-#else
-# define ROTATE(angle) rotate(0,0,90*angle)
-#endif
+#define ROTATE(angle) pl_textangle(90*angle)
 
-#ifdef GNU_PLOTUTILS
+static int handle_global;              /* T.Walter 1999-05-23 */
+
 /* We don't include plot.h from plotutils because of
  * the name clash with ../plot.h.
  */
@@ -167,7 +164,12 @@ extern int pl_cont __PROTO((int, int));
 extern int pl_alabel __PROTO((int, int, const char *));
 extern int pl_textangle __PROTO((int));
 extern int pl_closepl __PROTO((void));
-#endif
+/* T.Walter added: */
+int pl_parampl __PROTO((const char *parameter, void *value));
+int pl_newpl __PROTO((const char *type, FILE *infile, FILE *outfile, FILE *errfile));
+int pl_selectpl __PROTO((int handle));
+int pl_deletepl __PROTO((int handle));
+double pl_ffontsize __PROTO((double size));
 
 enum UP_id { UP_DEFAULT, UP_OTHER };
 
@@ -212,18 +214,54 @@ UP_options()
 TERM_PUBLIC void
 UP_init()
 {
+#if 1
+    pl_parampl ("PAGESIZE", "a4");
+# if defined(PSPLOTTER)
+    /* create a PS-plotter writing to 'gpoutfile'. */
+    if ((handle_global = pl_newpl ("ps", NULL, gpoutfile, stderr)) < 0) {
+	fprintf (stderr, "GNU plotutils (gnugraph) failed to create PS-plotter\n");
+	/* return (1); */
+    }
+# endif
+# if defined(X11PLOTTER)
+    /* create a X11-plotter with a window, in- and out-file are ignored. */
+    if ((handle_global = pl_newpl ("X", NULL, gpoutfile, stderr)) < 0) {
+	fprintf (stderr, "GNU plotutils (gnugraph) failed to create X11-plotter\n");
+	/* return (1); */
+    }
+# else
+    /* create a X11-plotter with a window, in- and out-file are ignored. */
+    if ((handle_global = pl_newpl ("meta", NULL, gpoutfile, stderr)) < 0) {
+	fprintf (stderr, "GNU plotutils (gnugraph) failed to create META-plotter\n");
+	/* return (1); */
+    }
+# endif
+
+    pl_selectpl (handle_global);         /* select the Plotter for use */
+
+    pl_openpl ();
+    pl_space (0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
+    pl_fontname (up_font);
+
+    /* T.Walter: Try to find the correct font size
+    pl_fontsize (up_fontsize);  too small
+    pl_fontsize (up_fontsize*10);  too small
+    pl_fontsize (up_fontsize*100);  too large
+    pl_fontsize (up_fontsize*0.0525*GPMIN((UP_XMAX), (UP_YMAX)));  too large
+    pl_fontsize (up_fontsize/72.0*GPMIN((UP_XMAX), (UP_YMAX)));  too large
+    pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_XMAX), (UP_YMAX)));  too small
+    pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_SCREENX), (UP_SCREENY))); too small
+    pl_fontsize (up_fontsize/72.0*GPMIN((UP_SCREENX), (UP_SCREENY)));  too large
+    pl_fontsize (up_fontsize/72.0*8*0.0525*GPMIN((UP_XMAX), (UP_YMAX)));  passt grob, etwas zu gross
+    */
+    pl_fontsize (up_fontsize/72.0*0.0525*GPMIN((UP_SCREENX), (UP_SCREENY)));
+
+#else  /* Old code */
     pl_openpl();
-    pl_space(0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
-    pl_fontname(up_font);
-/*
-#ifdef GNU_PLOTUTILS
-	pl_fontsize((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
-#else
-*/
-    pl_fontsize(up_fontsize);
-/*
+    pl_space (0, 0, UP_SCREENX - 1, UP_SCREENY - 1);
+    pl_fontname (up_font);
 #endif
-*/
+    pl_fontsize(up_fontsize);
 }
 
 
@@ -246,12 +284,31 @@ TERM_PUBLIC void
 UP_linetype(linetype)
 int linetype;
 {
+    /* T.Walter, 1999-05-23 */
+#if 0
+    static char *lt[2+7] =
+    {
+	"solid", "longdashed",
+	"solid", "longdashed", "shortdashed", "dotted",
+	"dotdashed", "dotdotdashed", "dotdotdotdashed"
+    };
+
+    if (linetype >= 7)
+	linetype %= 7;
+    }
+
+    pl_linemod (lt[linetype + 2]);
+
+#else /* original */
     static char *lt[2+5] = { "solid", "longdashed", "solid", "dotted",
 			     "shortdashed", "dotdashed", "longdashed"};
 
     if (linetype >= 5)
 	linetype %= 5;
+
     pl_linemod(lt[linetype + 2]);
+
+#endif /* original */
 }
 
 
@@ -311,6 +368,14 @@ TERM_PUBLIC void
 UP_reset()
 {
     pl_closepl();
+
+    /* T.Walter, 1999-05-23 */
+
+    pl_selectpl (0);                     /* default plotter */
+
+    if (pl_deletepl (handle_global) < 0) /* delete plotter we used above */
+	fprintf (stderr, "GNU Plotutils (gnugraph) is not able to delete Plotter\n");
+
 }
 
 #endif /* TERM_BODY */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.20 1999/11/08 19:24:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.21 1999/11/15 21:59:05 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -179,8 +179,9 @@ void fflush_binary();
 #include <fcntl.h>
 #endif
 
-/* This is needed because the unixplot library only writes to stdout. */
-#if defined(UNIXPLOT) || defined(GNUGRAPH)
+/* This is needed because the unixplot library only writes to stdout,
+ * but GNU plotutils libplot.a doesn't */
+#if defined(UNIXPLOT) && !defined(GNUGRAPH)
 static FILE save_stdout;
 #endif
 static int unixplot = 0;
@@ -1189,33 +1190,20 @@ ztc_init()
 #endif /* __ZTC__ */
 
 
-/*
-   This is always defined so we don't have to have command.c know if it
-   is there or not.
- */
-#if !(defined(UNIXPLOT) || defined(GNUGRAPH))
-static void
-UP_redirect(caller)
-int caller;
-{
-    caller = caller;		/* to stop Turbo C complaining 
-				   * about caller not being used */
-}
-
-#else /* UNIXPLOT || GNUGRAPH */
+#if defined(UNIXPLOT) && !defined(GNUGRAPH)
 static void
 UP_redirect(caller)
 int caller;
 /*
-   Unixplot can't really write to gpoutfile--it wants to write to stdout.
-   This is normally ok, but the original design of gnuplot gives us
-   little choice.  Originally users of unixplot had to anticipate
-   their needs and redirect all I/O to a file...  Not very gnuplot-like.
-
-   caller:  1 - called from SET OUTPUT "FOO.OUT"
-   2 - called from SET TERM UNIXPLOT
-   3 - called from SET TERM other
-   4 - called from SET OUTPUT
+ * Unixplot can't really write to gpoutfile--it wants to write to stdout.
+ * This is normally ok, but the original design of gnuplot gives us
+ * little choice.  Originally users of unixplot had to anticipate
+ * their needs and redirect all I/O to a file...  Not very gnuplot-like.
+ *
+ * caller:  1 - called from SET OUTPUT "FOO.OUT"
+ * 2 - called from SET TERM UNIXPLOT
+ * 3 - called from SET TERM other
+ * 4 - called from SET OUTPUT
  */
 {
     switch (caller) {
@@ -1234,7 +1222,7 @@ int caller;
 	break;
     case 3:
 	/* New terminal in use--put stdout back to original. */
-/* closepl(); *//* This is called by the term. */
+	/* closepl(); *//* This is called by the term. */
 	fflush(stdout);
 	*(stdout) = save_stdout;	/* Copy FILE structure */
 	unixplot = 0;
@@ -1248,7 +1236,19 @@ int caller;
 	break;
     }
 }
-#endif /* UNIXPLOT || GNUGRAPH */
+#else /* !UNIXPLOT || GNUGRAPH */
+/*
+ * This is always defined so we don't have to have command.c know if it
+ * is there or not.
+ */
+static void
+UP_redirect(caller)
+int caller;
+{
+    caller = caller;		/* to stop Turbo C complaining 
+				   * about caller not being used */
+}
+#endif /* !UNIXPLOT || GNUGRAPH */
 
 
 /* test terminal by drawing border and text */
