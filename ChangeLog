@@ -1,3 +1,10 @@
+2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm:  Lauris Kaplinski <lauris@users.sourceforge.net>
+	diagnosed that the reason gnuplot point styles were not displaying 
+	properly in some svg applications was our failure to specify the 
+	xlink: namespace.
+
 2003-12-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.os2: Lowercased IF EXIST and DEL commands (there is

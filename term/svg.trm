@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.26 2003/11/13 08:18:18 mikulik Exp $
+ * $Id: svg.trm,v 1.27 2003/12/03 01:06:27 sfeam Exp $
  *
  */
 
@@ -529,10 +529,11 @@ SVG_init ()
         fprintf (gpoutfile, "width=\"%u\" height=\"%u\" ",
 		 term->xmax, term->ymax);
 
+    fprintf (gpoutfile, "viewBox=\"0 0 %u %u\"\n", term->xmax, term->ymax);
+    fprintf (gpoutfile, " xmlns:xlink=\"http://junk.www.w3.org/1999/xlink\">\n");
     fprintf (gpoutfile,
-	     "viewBox=\"0 0 %u %u\">\n"
 	     "<desc>Produced by GNUPLOT %s patchlevel %s </desc>\n\n",
-	     term->xmax, term->ymax, gnuplot_version, gnuplot_patchlevel);
+	     gnuplot_version, gnuplot_patchlevel);
 
     /* definitions of point symbols */
     /* FIXME: SVG scales linewidth along with the marker itself, and
