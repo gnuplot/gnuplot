@@ -29,8 +29,12 @@ TYPE= APP
 #	if two source files with the same name (source.c or source.cpp)
 #	are included from different directories.  Also note that spaces
 #	in folder names do not work well with this makefile.
-SRCS= GPApp.cpp GPWindow.cpp GPView.cpp GPBitmap.cpp
-		
+SOURCES= GPApp.cpp GPWindow.cpp GPView.cpp GPBitmap.cpp
+
+HEADERS= GPApp.h GPBitmap.h GPView.h GPWindow.h XStringList.h constants.h
+
+EXTRA_DIST= Makefile XStringList.cpp
+
 # specify the resource files to use
 #	full path or a relative path to the resource file can be used.
 RSRCS= gnuplot_be.rsrc
@@ -262,20 +266,20 @@ endif
 endif
 
 
-# psuedo-function for converting a list of source files in SRCS variable
+# psuedo-function for converting a list of source files in SOURCES variable
 # to a corresponding list of object files in $(OBJ_DIR)/xxx.o
 # The "function" strips off the src file suffix (.ccp or .c or whatever)
 # and then strips of the directory name, leaving just the root file name.
 # It then appends the .o suffix and prepends the $(OBJ_DIR)/ path
 define SRCS_LIST_TO_OBJS
-	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(foreach file, $(SRCS), \
+	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(foreach file, $(SOURCES), \
 	$(basename $(notdir $(file))))))
 endef
 
 OBJS = $(SRCS_LIST_TO_OBJS)
 
 # create a unique list of paths to our sourcefiles
-SRC_PATHS += $(sort $(foreach file, $(SRCS), $(dir $(file))))
+SRC_PATHS += $(sort $(foreach file, $(SOURCES), $(dir $(file))))
 
 # add source paths to VPATH if not already present
 VPATH :=
@@ -354,3 +358,27 @@ distclean: clean
 #	remove just the application from the object folder
 rmapp ::
 	-rm -f $(TARGET)
+
+# generic distdir rules - needed with automake
+# maybe we can automakify the Makefile?
+srcdir = .
+top_builddir = ../..
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/src/$(subdir)
+
+subdir = beos
+
+DISTFILES = $(SOURCES) $(HEADERS) $(EXTRA_DIST)
+
+distdir: $(DISTFILES)
+	distdir=`cd $(distdir) && pwd`
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
