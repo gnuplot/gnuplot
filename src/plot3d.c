@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.41 2002/02/15 22:59:08 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.42 2002/02/16 14:52:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -830,7 +830,6 @@ get_3ddata(this_plot)
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
-		assert(0 == this_plot->lp_properties.use_palette);
 		if (0 != pm3d_color_from_column) {
 		    cp->ylow = color; /* abuse ylow for storing the color value */
 		    update_pm3d_zrange(color, NEED_PALETTE(this_plot));
