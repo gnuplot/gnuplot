@@ -83,11 +83,12 @@ extern int plot_token;
  * these are given symbolic names in plot.h
  */
 
-extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-extern int auto_array[AXIS_ARRAY_SIZE];
-extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-extern double base_array[AXIS_ARRAY_SIZE];
-extern double log_base_array[AXIS_ARRAY_SIZE];
+/* Were declared in command.c */
+double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
+int auto_array[AXIS_ARRAY_SIZE];
+TBOOLEAN log_array[AXIS_ARRAY_SIZE];
+double base_array[AXIS_ARRAY_SIZE];
+double log_base_array[AXIS_ARRAY_SIZE];
 
 /* Deleted from setshow.h and renamed */
 extern FILE *gpoutfile;
