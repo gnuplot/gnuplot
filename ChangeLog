@@ -1,4 +1,12 @@
-Wed Feb 28 17:15:51 2001  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+2001-03-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pdf.trm: New terminal driver for Adobe PDF (Portable
+	Document Format) files.
+	
+	* configure.in: Added detection code for PDFLib library, needed
+	to compile term/pdf.trm.
+
+2001-02-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term_api.h (DEFAULT_LP_STYLE_TYPE): New macro, to help
  	initializing lp_style_type struct variables directly.

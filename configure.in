@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.95 2000/12/05 23:23:12 joze Exp $
+dnl $Id: configure.in,v 1.96 2000/12/26 19:54:08 joze Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.95 $)
+AC_REVISION($Revision: 1.96 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -46,6 +46,14 @@ AC_ARG_WITH(png,dnl
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng],,
 test -z "$with_png" && with_png=yes
+)dnl
+
+dnl The Portable Document Format (PDF) terminal
+AC_ARG_WITH(pdf,dnl
+[   --with-pdf		   enable pdf terminal 
+                          (requires PDFLib, libz and maybe libtiff)
+   --with-pdf=PATH                Specify the location of libpdf],,
+test -z "$with_pdf" && with_pdf=yes
 )dnl
 
 dnl Use .gnuplot file in current directory
@@ -544,6 +552,31 @@ You lose.
 fi
 dnl end png and z
 
+dnl check for PDFlib and its support libraries --- experimental
+if test "$with_pdf" != no; then
+  GP_PATH_LIB(pdf,PDF_get_majorversion,[$with_pdf],[-lz -ltiff])
+  if test "$ac_cv_lib_pdf_PDF_get_majorversion" = yes; then
+    TERMLIBS="$TERMLIBS -lz -ltiff"
+    GP_PATH_HEADER(pdflib.h,[$with_pdf],,
+     AC_MSG_WARN([found pdf library but not pdflib.h])
+     AC_MSG_WARN([please add path to pdflib.h to CPPFLAGS in Makefile])
+    )
+    GP_PATH_HEADER(zlib.h,[$with_pdf],,
+     AC_MSG_WARN([found z library but not zlib.h])
+     AC_MSG_WARN([please add path to zlib.h to CPPFLAGS in Makefile])
+    )
+
+    if test "$ac_cv_header_pdflib_h" = yes; then
+      AC_DEFINE(HAVE_LIBPDF, 1,
+      	         [ Define if you have the pdf library. ])
+    fi
+
+  else
+    AC_MSG_RESULT([  PDF library not found.
+  See term/pdf.trm for download details])
+  fi
+fi
+
 dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
@@ -689,6 +722,9 @@ test "$ac_cv_header_gd_h" = yes && \
 
 test "$ac_cv_header_png_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PNG files])
+
+test "$ac_cv_header_pdflib_h" = yes && \
+  AC_MSG_RESULT([  Enable generation of PDF files (EXPERIMENTAL)])
 
 test "$with_cwdrc" = yes && \
   AC_MSG_RESULT([  Check current directory for .gnuplot file])
