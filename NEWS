@@ -57,6 +57,7 @@ and the example script demo/mousevariables.dem.
 * CHANGE terminal provided by gnugraph is called "gnugraph", not "unixplot"
 * NEW pm3d option corners2color
 * NEW PM3D support for pstricks terminal
+* NEW configure option --with-gihdir to specify location of .gih file
 
 [3.8i]
 * NEW 'set style arrow' and back angles for arrow heads.

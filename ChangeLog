@@ -1,3 +1,11 @@
+2003-08-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: Add equipo2.dat, field2xy.dat to CLEANFILES.
+
+2003-08-05  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#11).
+
 2003-08-04  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c term/x11.trm docs/gnuplot.doc:  Honor explicit request
