@@ -643,6 +643,7 @@ struct text_label {
 	struct position place;
 	enum JUSTIFY pos;
         int rotate;
+	int layer;
 	char text[MAX_LINE_LEN+1];
         char font[MAX_LINE_LEN+1];
 }; /* Entry font added by DJL */
@@ -653,6 +654,7 @@ struct arrow_def {
 	struct position start;
 	struct position end;
 	TBOOLEAN head;			/* arrow has a head or not */
+	int layer;			/* 0 = back, 1 = front */
         struct lp_style_type lp_properties;
 };
 

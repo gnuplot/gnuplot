@@ -956,6 +956,7 @@ int tag;			/* 0 means show all */
 		}
 	    }
 	    fprintf(stderr, " %s ", this_label->rotate ? "rotated (if possible)" : "not rotated");
+	    fprintf(stderr, " %s ", this_label->layer ? "front" : "back");
 	    if ((this_label->font)[0] != NUL)
 		fprintf(stderr, " font \"%s\"", this_label->font);
 	    /* Entry font added by DJL */
@@ -976,11 +977,12 @@ int tag;			/* 0 means show all */
 	 this_arrow = this_arrow->next) {
 	if (tag == 0 || tag == this_arrow->tag) {
 	    showed = TRUE;
-	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s\n\t  from ",
+	    fprintf(stderr, "\tarrow %d, linetype %d, linewidth %.3f %s %s\n\t  from ",
 		    this_arrow->tag,
 		    this_arrow->lp_properties.l_type + 1,
 		    this_arrow->lp_properties.l_width,
-		    this_arrow->head ? "" : " (nohead)");
+		    this_arrow->head ? "" : " (nohead)",
+		    this_arrow->layer ? "front" : "back");
 	    show_position(&this_arrow->start);
 	    fputs(" to ", stderr);
 	    show_position(&this_arrow->end);

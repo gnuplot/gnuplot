@@ -617,7 +617,8 @@ int pcount;			/* count of plots in linked list */
 	 this_label = this_label->next) {
 	unsigned int x, y;
 
-
+	if (this_label->layer)
+	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	safe_strncpy(ss, this_label->text, sizeof(ss));
 	if (this_label->rotate && (*t->text_angle) (1)) {
@@ -633,6 +634,8 @@ int pcount;			/* count of plots in linked list */
 	 this_arrow = this_arrow->next) {
 	unsigned int sx, sy, ex, ey;
 
+	if (this_arrow->layer)
+		continue;
 	map_position(&this_arrow->start, &sx, &sy, "arrow");
 	map_position(&this_arrow->end, &ex, &ey, "arrow");
 	term_apply_lp_properties(&(this_arrow->lp_properties));
@@ -999,6 +1002,35 @@ int pcount;			/* count of plots in linked list */
 
     draw_bottom_grid(plots, pcount);
 
+    /* PLACE LABELS */
+    for (this_label = first_label; this_label != NULL;
+	 this_label = this_label->next) {
+	unsigned int x, y;
+
+	if (this_label->layer == 0)
+		continue;
+	map_position(&this_label->place, &x, &y, "label");
+	safe_strncpy(ss, this_label->text, sizeof(ss));
+	if (this_label->rotate && (*t->text_angle) (1)) {
+	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
+	    (*t->text_angle) (0);
+	} else {
+	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 0, this_label->font);
+	}
+    }
+
+    /* PLACE ARROWS */
+    for (this_arrow = first_arrow; this_arrow != NULL;
+	 this_arrow = this_arrow->next) {
+	unsigned int sx, sy, ex, ey;
+
+	if (this_arrow->layer == 0)
+		continue;
+	map_position(&this_arrow->start, &sx, &sy, "arrow");
+	map_position(&this_arrow->end, &ex, &ey, "arrow");
+	term_apply_lp_properties(&(this_arrow->lp_properties));
+	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
+    }
     term_end_plot();
 
 #ifndef LITE

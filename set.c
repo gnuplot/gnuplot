@@ -2178,6 +2178,8 @@ static void set_label()
     int tag;
     TBOOLEAN set_text, set_position, set_just = FALSE, set_rot = FALSE,
      set_font;
+    TBOOLEAN set_layer = FALSE;
+    int layer = 0;
 
     /* get tag */
     if (!END_OF_COMMAND
@@ -2187,6 +2189,8 @@ static void set_label()
 	&& !equals(c_token, "center")
 	&& !equals(c_token, "centre")
 	&& !equals(c_token, "right")
+	&& !equals(c_token, "front")
+	&& !equals(c_token, "back")
 	&& !almost_equals(c_token, "rot$ate")
 	&& !almost_equals(c_token, "norot$ate")
 	&& !equals(c_token, "font")) {
@@ -2210,7 +2214,8 @@ static void set_label()
 
     /* get justification - what the heck, let him put it here */
     if (!END_OF_COMMAND && !equals(c_token, "at") && !equals(c_token, "font")
-	&& !almost_equals(c_token, "rot$ate") && !almost_equals(c_token, "norot$ate")) {
+	&& !almost_equals(c_token, "rot$ate") && !almost_equals(c_token, "norot$ate")
+	&& !equals(c_token, "front") && !equals(c_token, "back")) {
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	} else if (almost_equals(c_token, "c$entre")
@@ -2236,7 +2241,10 @@ static void set_label()
     }
 
     /* get justification */
-    if (!END_OF_COMMAND && !almost_equals(c_token, "rot$ate") && !almost_equals(c_token, "norot$ate") && !equals(c_token, "font")) {
+    if (!END_OF_COMMAND
+	&& !almost_equals(c_token, "rot$ate") && !almost_equals(c_token, "norot$ate")
+	&& !equals(c_token, "front") && !equals(c_token, "back")
+	&& !equals(c_token, "font")) {
 	if (set_just)
 	    int_error("only one justification is allowed", c_token);
 	if (almost_equals(c_token, "l$eft")) {
@@ -2253,7 +2261,8 @@ static void set_label()
 	set_just = TRUE;
     }
     /* get rotation (added by RCC) */
-    if (!END_OF_COMMAND && !equals(c_token, "font")) {
+    if (!END_OF_COMMAND && !equals(c_token, "font")
+	&& !equals(c_token, "front") && !equals(c_token, "back")) {
 	if (almost_equals(c_token, "rot$ate")) {
 	    rotate = TRUE;
 	} else if (almost_equals(c_token, "norot$ate")) {
@@ -2267,7 +2276,8 @@ static void set_label()
     /* get font */
     font[0] = NUL;
     set_font = FALSE;
-    if (!END_OF_COMMAND && equals(c_token, "font")) {
+    if (!END_OF_COMMAND && equals(c_token, "font") &&
+	!equals(c_token, "front") && !equals(c_token, "back")) {
 	c_token++;
 	if (END_OF_COMMAND)
 	    int_error("font name and size expected", c_token);
@@ -2280,6 +2290,20 @@ static void set_label()
 
 	c_token++;
     }				/* Entry font added by DJL */
+    /* get front/back (added by JDP) */
+    set_layer = FALSE;
+    if (!END_OF_COMMAND && equals(c_token, "back") && !equals(c_token, "front")) {
+	layer = 0;
+	c_token++;
+	set_layer = TRUE;
+    }
+    if(!END_OF_COMMAND && equals(c_token, "front")) {
+	if (set_layer)
+	    int_error("only one of front or back expected", c_token);
+	layer = 1;
+	c_token++;
+	set_layer = TRUE;
+    }
     if (!END_OF_COMMAND)
 	int_error("extraenous or out-of-order arguments in set label", c_token);
 
@@ -2302,6 +2326,8 @@ static void set_label()
 	    this_label->pos = just;
 	if (set_rot)
 	    this_label->rotate = rotate;
+	if (set_layer)
+	    this_label->layer = layer;
 	if (set_font)
 	    (void) strcpy(this_label->font, font);
     } else {
@@ -2318,6 +2344,7 @@ static void set_label()
 	(void) strcpy(new_label->text, text);
 	new_label->pos = just;
 	new_label->rotate = rotate;
+	new_label->layer = layer;
 	(void) strcpy(new_label->font, font);
     }
 }				/* Entry font added by DJL */
@@ -2400,7 +2427,8 @@ static void set_arrow()
     struct lp_style_type loc_lp;
     int axes = FIRST_AXES;
     int tag;
-    TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0;
+    TBOOLEAN set_start, set_end, head = 1, set_axes = 0, set_line = 0, set_layer = 0;
+    int layer = 0;
 
     /* Init struct lp_style_type loc_lp */
     reset_lp_properties (&loc_lp);
@@ -2474,6 +2502,17 @@ static void set_arrow()
 	c_token++;
 	head = 1;
     }
+    set_layer = FALSE;
+    if (!END_OF_COMMAND && equals(c_token, "back")) {
+	c_token++;
+	layer = 0;
+	set_layer = TRUE;
+    }
+    if (!END_OF_COMMAND && equals(c_token, "front")) {
+	c_token++;
+	layer = 1;
+	set_layer = TRUE;
+    }
     set_line = 1;
 
     /* pick up a line spec - allow ls, but no point. */
@@ -2500,6 +2539,9 @@ static void set_arrow()
 	    this_arrow->end = epos;
 	}
 	this_arrow->head = head;
+	if (set_layer) {
+	    this_arrow->layer = layer;
+	}
 	if (set_line) {
 	    this_arrow->lp_properties = loc_lp;
 	}
@@ -2516,6 +2558,7 @@ static void set_arrow()
 	new_arrow->start = spos;
 	new_arrow->end = epos;
 	new_arrow->head = head;
+	new_arrow->layer = layer;
 	new_arrow->lp_properties = loc_lp;
     }
 }
