@@ -1,5 +1,5 @@
 #
-# $Id: airfoil.dem,v 1.6 1999/11/08 19:19:11 lhecking Exp $
+# $Id: airfoil.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
 #
 # This demo shows how to use bezier splines to define NACA four
 # series airfoils and complex variables to define Joukowski
@@ -14,8 +14,8 @@
 #
 # m = percent camber
 # p = percent chord with maximum camber
-pause 0  "NACA four series airfoils by bezier splines"
-pause 0  "Will add pressure distribution later with Overplotting"
+print  "NACA four series airfoils by bezier splines"
+print  "Will add pressure distribution later with Overplotting"
 mm = 0.6
 # NACA6xxx
 thick = 0.09  
@@ -148,7 +148,7 @@ set samples 100
 set isosamples 10
 set style data lines
 set style function lines
-pause 0  "Joukowski Airfoil using Complex Variables" 
+print  "Joukowski Airfoil using Complex Variables" 
 set title "Joukowski Airfoil using Complex Variables" 0,0
 set time
 set yrange [-.2 : 1.8]

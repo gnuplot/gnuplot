@@ -36,6 +36,14 @@ check-noninteractive: $(BINARY_FILES)
 	    GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	fi
 
+#
+# Several of these need manual intervention
+#	fontfile.html vector.html
+#
+html: airfoil.html arrowstyle.html binary.html bivariat.html candlesticks.html contours.html controls.html discrete.html electron.html fillcrvs.html fillstyle.html fit.html fontfile.html hidden.html mgr.html multimsh.html multiplt.html param.html pm3dcolors.html pm3d.html pm3dgamma.html polar.html poldat.html prob2.html prob.html random.html scatter.html simple.html singulr.html spline.html steps.html surface1.html surface2.html textcolor.html textrotate.html timedat.html using.html world.html
+
+%.html: %.dem webify.pl
+	./webify.pl $*
 
 ##m4-files-begin
 ##m4-files-end

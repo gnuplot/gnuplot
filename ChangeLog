@@ -1,5 +1,12 @@
 2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
 
+	* demo/Makefile.am.in demo/webify.pl demo/airfoil.dem demo/prob2.dem:
+	Integrate generation of demo web pages into the Makefile, so that
+	'make html' autogenerates most of them.  A few oddball scripts need
+	to be processed by hand.
+
+2003-12-15  Ethan Merritt  <merritt@u.washington.edu>
+
 	* term/svg.trm:  Lauris Kaplinski <lauris@users.sourceforge.net>
 	diagnosed that the reason gnuplot point styles were not displaying 
 	properly in some svg applications was our failure to specify the 
