@@ -1,3 +1,10 @@
+2000-12-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc src/set.c src/term.c src/term.h src/term_api.h:
+	new commands 'set term push', 'set term pop' (in order to achieve
+	platform independent restoring of the terminal after printing, for
+	instance) --- see 'help set term'.
+
 2000-12-12  Johannes Zellner  <johannes@zellner.org>
 
 	* src/gplt_x11.c: minor changes for -noevents

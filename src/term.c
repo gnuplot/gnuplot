@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.31 2000/12/04 12:02:20 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.32 2000/12/15 10:10:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -179,8 +179,6 @@ static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
-
-static struct termentry *change_term __PROTO((const char *name, int length));
 
 static void UP_redirect __PROTO((int called));
 
@@ -1119,7 +1117,7 @@ int c_token_arg;
  * returns NULL for unknown or ambiguous, otherwise is terminal
  * driver pointer
  */
-static struct termentry *
+struct termentry *
 change_term(name, length)
 const char *name;
 int length;

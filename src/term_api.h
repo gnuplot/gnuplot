@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.10 2000/11/29 10:20:31 mikulik Exp $
+ * $Id: term_api.h,v 1.11 2000/12/04 12:02:20 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -244,6 +244,7 @@ extern void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY
 GP_INLINE int term_count __PROTO((void));
 void list_terms __PROTO((void));
 struct termentry *set_term __PROTO((int));
+struct termentry *change_term __PROTO((const char *name, int length));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));
 

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.59 2000/12/06 12:38:55 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.60 2000/12/08 17:57:08 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -6132,7 +6132,7 @@ C  The `lines` style connects adjacent points with straight line segments.
  that output to a file or device.
 
  Syntax:
-       set terminal {<terminal-type>}
+       set terminal {<terminal-type> | push | pop}
        show terminal
 
  If <terminal-type> is omitted, `gnuplot` will list the available terminal
@@ -6144,6 +6144,12 @@ C  The `lines` style connects adjacent points with straight line segments.
 
  Several terminals have additional options.  For example, see `dumb`,
  `iris4d`, `hpljii` or `postscript`.
+
+ The command `set term push` remembers the current terminal including its 
+ settings while `set term pop` restores it. This is equivalent to `save term`
+ and `load term`, but without accessing the filesystem. Therefore they can be
+ used to achieve platform independent restoring of the terminal after printing,
+ for instance.
 
  This document may describe drivers that are not available to you because they
  were not installed, or it may not describe all the drivers that are available

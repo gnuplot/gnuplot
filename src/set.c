@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.46 2000/11/29 10:20:31 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.47 2000/12/04 12:02:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2645,6 +2645,23 @@ set_terminal()
 	list_terms();
 	screen_ok = FALSE;
     } else {
+	static struct termentry *push_term = NULL;
+	static char *push_term_opts = NULL;
+	/* `set term push' ? */
+	if (equals(c_token,"push")) {
+	    if (term) {
+		if (push_term == NULL) push_term = gp_alloc(sizeof(struct termentry),"push_term");
+		if (push_term_opts != NULL) free(push_term_opts);
+		if (push_term) {
+		    memcpy((void*)&push_term[0], (void*)term, sizeof(struct termentry));
+		    push_term_opts = strdup(term_options);
+		    fprintf(stderr, "\tpushed terminal %s %s\n", term->name, push_term_opts);
+		}
+	    } else
+		fputs("\tcurrent terminal type is unknown\n", stderr);
+	    c_token++;
+	} /* set term push */
+	else {
 #ifdef EXTENDED_COLOR_SPECS
 	/* each terminal is supposed to turn this on, probably
 	 * somewhere when the graphics is initialized */
@@ -2654,10 +2671,26 @@ set_terminal()
         event_reset((void *)1);   /* cancel zoombox etc. */
 #endif
 	term_reset();
+	/* `set term pop' ? */
+	if (equals(c_token,"pop")) {
+	    if (push_term != NULL) {
+		int it = interactive;
+		interactive = 0;
+		change_term(push_term->name, strlen(push_term->name));
+		interactive = it;
+		memcpy((void*)term, (void*)&push_term[0], sizeof(struct termentry));
+		if (push_term_opts != NULL)
+		    strcpy(term_options, push_term_opts);
+		if (interactive)
+		    fprintf(stderr,"\trestored terminal is %s %s\n", term->name, (*term_options) ? term_options : "");
+	     } else
+		 fprintf(stderr,"No terminal has been pushed yet\n");
+	    c_token++;
+	} /* set term pop */
+	else { /* `set term <normal terminal>' */
 	term = 0; /* in case set_term() fails */
 	term = set_term(c_token);
 	c_token++;
-
 	/* FIXME
 	 * handling of common terminal options before term specific options
 	 * as per HBB's suggestion
@@ -2672,6 +2705,8 @@ set_terminal()
 	    (*term->options)();
 	if (interactive && *term_options)
 	    fprintf(stderr,"Options are '%s'\n",term_options);
+		} /* set term <normal terminal> */
+	    } /* if / else of 'set term push' */
     }
 }
 

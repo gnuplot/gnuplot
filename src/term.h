@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.10 2000/11/02 19:12:45 lhecking Exp $
+ * $Id: term.h,v 1.11 2000/12/05 17:24:50 broeker Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -59,8 +59,11 @@
 # include "table.trm"		/* built-in, but used for the documentation */
 # include "tek.trm"		/* a Tek 4010 and others including VT-style */
 # ifdef X11
-#  include "x11.trm"		/* x Window system */
+#  include "x11.trm"		/* X Window system */
 # endif				/* X11 */
+# ifdef OS2
+#  include "pm.trm"		/* OS/2 Presentation Manager */
+# endif
 #else /* include all applicable terminals not commented out */
 
 /****************************************************************************/
