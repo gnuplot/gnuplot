@@ -1,3 +1,9 @@
+2000-11-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/Makefile.am.in: Use variables in place of "gnuplot" (GNUPLOT)
+	and "all.dem" (DEMO) to allow more fine-grained control over what is
+	run with "make check". Regenerate Makefile.am.
+
 2000-11-06  Ian MacPhedran  <Ian_MacPhedran@engr.USask.Ca>
 
 	* term/tgif.trm: Add PM3D support.
