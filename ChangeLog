@@ -1,3 +1,11 @@
+2000-11-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: New variables BUILT_SOURCES, CLEANFILES. Reorganise
+	clean target.
+
+	* src/color.c, src/gadgets.c, src/getcolor.c, src/gpexecute.c,
+	src/gplt_x11.c, src/mouse.c, src/pm3d.c: Coding style.
+
 2000-11-24  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
 
         * docs/gnuplot.doc: Update FAQ location.
@@ -35,8 +43,7 @@
 	* docs/gnuplot.texi, src/Makefile.in, src/makefile.all, src/version.c:
 	Regenerated.
 
-	* src/Makefile.maint: Add getcolor.c to noncoresrc. Re-enable version.c
-	target.
+	* src/Makefile.maint: Re-enable version.c target.
 
 	* src/getcolor.c: Include getcolor.h.
 
@@ -82,6 +89,7 @@
 	* src/plot2d.c (get_data): fix bug in datafile plots 'with boxes'.
 
 2000-11-22  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
         * src/gplt_x11.c: fix two crashes (segmentation fault
 	  and floating exception)
 
