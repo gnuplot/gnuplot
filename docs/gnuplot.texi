@@ -2904,14 +2904,18 @@ available is printed on the screen.
 
 
 `history` command lists or saves previous entries in the history of the
-command line editing, or executes an etry.
+command line editing, or executes an entry.
 
 Here you find 'usage by examples':
 
 @example
       history               # show the complete history
       history 5             # show last 5 entries in the history
+      history quiet 5       # show last 5 entries without entry numbers
+      history "hist.gp"     # write the complete history to file hist.gp
+      history "hist.gp" append # append the complete history to file hist.gp
       history 10 "hist.gp"  # write last 10 commands to file hist.gp
+      history 10 "|head -5 >>diary.gp" # write 5 history commands using pipe
       history ?load         # show all history entries starting with "load"
       history ?"set c"      # like above, several words enclosed in quotes
       hi !reread            # execute last entry starting with "reread"
@@ -2919,6 +2923,10 @@ Here you find 'usage by examples':
       hi !hi                # guess yourself :-))
 
 @end example
+
+On systems which support a popen function (Unix), the output of history can be
+piped through an external program by starting the file name with a '|', as one
+of the above examples demonstrates.
 
 @node if, load, history, Commands
 @section if
@@ -7913,6 +7921,7 @@ Syntax:
       set palette
       set palette @{
                  @{ gray | color @}
+                 @{ gamma <gamma> @}
                  @{   rgbformulae <r>,<g>,<b>
                    | defined @{ ( <gray1> <color1> @{, <grayN> <colorN>@}... ) @}
                    | file '<filename>' @{datafile-modifiers@}
@@ -7922,7 +7931,6 @@ Syntax:
                  @{ positive | negative @}
                  @{ nops_allcF | ps_allcF @}
                  @{ maxcolors <maxcolors> @}
-                 @{ gamma <gamma> @}
                @}
       show palette
       show palette palette <n> @{@{float | int@}@}
@@ -7948,6 +7956,7 @@ and a palette having <n> discrete colors.  The default wide table can be
 limited to 3 columns of r,g,b float values [0..1] or integer values [0..255]
 by options float or int, respectively.  This way, the current gnuplot color
 palette can be loaded into other imaging applications, for example Octave.
+Additionally to this textual list of RGB table, you can enjoy command @ref{palette} to draw graphically the R,G,B profiles for the current palette.
 
 The following options determine the coloring properties.
 
@@ -7973,6 +7982,10 @@ as gnuplot, like zimg.
 @ref{file} and `functions` switch to a color mapping.  `set palette color` is an
 easy way to switch back from the gray palette to the last color mapping.
 
+Automatic gamma correction via `set palette gamma <gamma>` can be done for
+gray maps only (`set palette gray`).  Linear mapping to gray is for gamma
+equals 1, see @ref{palette}.  Gamma is ignored for color mappings.
+
 Most terminals support only discrete number of colors (e.g. 256 colors in
 gif).  All entries of the palette remaining after the default gnuplot linetype
 colors declaration are allocated for pm3d by default.  Then @ref{multiplot} could
@@ -7982,9 +7995,6 @@ This option can also be used to separate levels of z=constant in discrete
 steps, thus to emulate filled contours. Default value of 0 stays for
 allocating all remaining entries in the terminal palette or for to use exact
 mapping to RGB.
-
-Automatic gamma correction via `set palette gamma <gamma>` can be done for
-gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
 
 RGB color space might not be the most useful color space to work in.  For
 that reason you may change the color space with `model` to one of `RGB`,
@@ -10445,6 +10455,7 @@ linefeed control.
 Syntax:
 @example
       set terminal dumb @{[no]feed@} @{<xsize> <ysize>@}
+                        @{[no]enhanced@}
 
 @end example
 
@@ -11060,6 +11071,7 @@ Syntax:
              @{tiny | small | medium | large | giant@}
              @{font <face> @{<pointsize>@}@}
              @{size <x>,<y>@} @{@{no@}crop@}
+             @{@{no@}enhanced@}
              @{<color0> <color1> <color2> ...@}
 
 @end example
@@ -11087,6 +11099,12 @@ directories listed in the GDFONTPATH environmental variable. That is,
 'set term png font "Face"' will look for a font file named either 
 <somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and 
 Adobe Type 1 fonts are fully scalable and may be rotated through any angle.
+
+`enhanced` enables the enhanced text processing features, (subscripts, 
+superscripts and mixed fonts). See `enhanced` for more information. 
+The full enhanced mode syntax is supported by the PNG/JPEG driver itself,
+but some of these features are dependent on which version of the 
+underlying libgd library is present, and which fonts are available.
 
 The size <x,y> is given in pixels---it defaults to 640x480.  The number of
 pixels can be also modified by scaling with the @ref{size} command.
@@ -12559,11 +12577,16 @@ This terminal produces files in the Adobe Portable Document Format
 Syntax:
 @example
       set terminal pdf @{fname "<font>"@} @{fsize <fontsize>@}
+                       @{@{no@}enhanced@}
 
 @end example
 
 where <font> is the name of the default font to use (default Helvetica)
-and <fontsize> is the font size (in points, default 12)"
+and <fontsize> is the font size (in points, default 12).
+
+The `enhanced` option enables enhanced text processing features
+(subscripts, superscripts and mixed fonts). See `enhanced` for more
+information. Only the core PDF fonts are supported."
 
 @node png_(OLD), postscript_, pdf, terminal
 @subsubsection png (OLD)
@@ -12633,8 +12656,8 @@ Syntax:
 @end example
 
 where <mode> is `landscape`, `portrait`, `eps` or `default`;
-`enhanced` activates the "enhanced PostScript" features (subscripts,
-superscripts and mixed fonts);
+`enhanced` enables enhanced text mode features (subscripts,
+superscripts and mixed fonts). See `enhanced` for more information;
 `color` enables color;
 `blacktext` forces all text to be written in black even in color mode;
 `solid` draws all plots with solid lines, overriding any dashed patterns;
@@ -12727,6 +12750,13 @@ section for some hints.
 
 @c ?enhanced postscript
 @c ?Enhanced postscript
+@cindex enhanced
+@tmindex enhanced
+
+
+Several terminal types support an enhanced text mode in which 
+additional formatting information is embedded in the text string.
+
 
 @example
  Control      Examples        Explanation
@@ -14058,22 +14088,43 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
+   set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]
+                    [title "<string>"] [[no]persist] [[no]raise] [close]
 
 @end example
 
 Multiple plot windows are supported: `set terminal x11 <n>` directs the
 output to plot window number n.  If n>0, the terminal number will be
-appended to the window title and the icon will be labeled `gplt <n>`.
-The active window may distinguished by a change in cursor (from default
-to crosshair.)
+appended to the window title (unless a title has been supplied manually)
+and the icon will be labeled `gplt <n>`.  The active window may be
+distinguished by a change in cursor (from default to crosshair.)
+
+The x11 terminal support enhanced text mode (see `enhanced`), subject
+to the available fonts. In order for font size commands embedded in text
+to have any effect, the default x11 font must be scalable. Thus the first
+example below will work as expected, but the second will not.
+
+@example
+   set term x11 enhanced font "arial,15" 
+   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+
+@end example
+
+@example
+   set term x11 enhanced font "terminal-14" 
+   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+
+@end example
 
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
 while that window has input focus, or by choosing `close` from a window
 manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
-`-persist` was specified).
+`-persist` was specified).  The `close` command can be used to close
+individual plot windows by number.  However, after a @ref{reset}, those plot
+windows left due to persist cannot be closed with the command `close`.
+A `close` without a number closes the current active plot window.
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -14089,6 +14140,9 @@ the defaults (persist == no and raise == yes) or the command line options
 [no]raise are specified, they will override command line options and
 Xresources.  Setting one of these options takes place immediately, so
 the behaviour of an already running driver can be modified.
+
+The option `title "<title name>"` will supply the title name of the window
+for the current plot window or plot window <n> if a number is given.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -14428,22 +14482,43 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
+   set terminal x11 [reset] <n> [[no]enhanced] [font <fontspec>]
+                    [title "<string>"] [[no]persist] [[no]raise] [close]
 
 @end example
 
 Multiple plot windows are supported: `set terminal x11 <n>` directs the
 output to plot window number n.  If n>0, the terminal number will be
-appended to the window title and the icon will be labeled `gplt <n>`.
-The active window may distinguished by a change in cursor (from default
-to crosshair.)
+appended to the window title (unless a title has been supplied manually)
+and the icon will be labeled `gplt <n>`.  The active window may be
+distinguished by a change in cursor (from default to crosshair.)
+
+The x11 terminal support enhanced text mode (see `enhanced`), subject
+to the available fonts. In order for font size commands embedded in text
+to have any effect, the default x11 font must be scalable. Thus the first
+example below will work as expected, but the second will not.
+
+@example
+   set term x11 enhanced font "arial,15" 
+   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+
+@end example
+
+@example
+   set term x11 enhanced font "terminal-14" 
+   set title '@{\\=20 Big@} Medium @{\\=5 Small@}' 
+
+@end example
 
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
 while that window has input focus, or by choosing `close` from a window
 manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
-`-persist` was specified).
+`-persist` was specified).  The `close` command can be used to close
+individual plot windows by number.  However, after a @ref{reset}, those plot
+windows left due to persist cannot be closed with the command `close`.
+A `close` without a number closes the current active plot window.
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -14459,6 +14534,9 @@ the defaults (persist == no and raise == yes) or the command line options
 [no]raise are specified, they will override command line options and
 Xresources.  Setting one of these options takes place immediately, so
 the behaviour of an already running driver can be modified.
+
+The option `title "<title name>"` will supply the title name of the window
+for the current plot window or plot window <n> if a number is given.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -14793,7 +14871,7 @@ by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.
 
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
-`set output '<filename>'. `set term x11` is equivalent to
+`set output '<filename>'`. `set term x11` is equivalent to
 `set terminal xlib; set output "|gnuplot_x11 -noevents"`.
 `xlib` takes the same set of options as `x11`."
 
@@ -14811,7 +14889,7 @@ gnuplot_x11 commands, but sends them to the output file specified by
 
 The `xlib` terminal driver supports the X11 Windows System.  It generates
 gnuplot_x11 commands, but sends them to the output file specified by
-`set output '<filename>'. `set term x11` is equivalent to
+`set output '<filename>'`. `set term x11` is equivalent to
 `set terminal xlib; set output "|gnuplot_x11 -noevents"`.
 `xlib` takes the same set of options as `x11`."
 
@@ -16665,18 +16743,29 @@ more details.
 @section test
 
 @c ?commands test
+@c ?test palette
 @cindex test
 @cmindex test
 
 
-@ref{test} creates a display of line and point styles and other useful things
-appropriate for the terminal you are using.
+This command graphically tests or presents terminal and palette capabilities.
 
 Syntax:
 @example
-      test
+      test @{terminal | palette [rgb|rbg|grb|gbr|brg|bgr]@}
 
 @end example
+
+@ref{test} or @ref{terminal} creates a display of line and point styles and other
+useful things appropriate for and supported by the @ref{terminal} you are just
+using.
+
+@ref{palette} draws graphically profiles R(z),G(z),B(z), where 0<=z<=1, as
+calculated by the current color @ref{palette}. In other words, it is a beautiful
+plot you would have to do yourself with the result of `show palette palette 256 float`.
+The optional parameter, a permutation of letters rgb, determines the sequence of
+r,g,b profiles drawn one after the other --- try this yourself for `set palette
+gray`. The default sequence is rgb.
 
 @node unset, update, test, Commands
 @section unset
