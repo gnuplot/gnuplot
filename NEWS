@@ -6,7 +6,7 @@ Changes in release 3.7.1:
 * win/pgnuplot.c added, stdin redirection for gnuplot
   under Windows
 * extended interactive Tk/Tcl capabilities
-* only read from stdin if the complete filename given is '-'
+* only read from stdin if the complete filename is "-"
 * added fitting of time format data
 * workaround for the bug that made 'set key below' sometimes
   lack some of the key texts
