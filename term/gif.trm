@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.12.2.2 1999/09/28 16:05:16 lhecking Exp $
+ * $Id: gif.trm,v 1.12.2.3 1999/09/29 13:53:53 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -218,7 +218,7 @@ GIF_options()
 	    term->v_char = (unsigned int) (16);
 	    term->h_char = (unsigned int) (8);
 	    ++c_token;
-	} else if (almost_equals(c_token, "l$arge")) {
+	} else if (almost_equals(c_token, "g$iant")) {
 	    GIF_font=gdFontGiant;
 	    gif_font = 4;
 	    term->v_char = (unsigned int)(15);
