@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.4 1999/11/18 20:32:09 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.5 1999/12/02 20:40:02 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1011,7 +1011,7 @@ int count;
 
     if (vertical_timelabel) {
 	if (timelabel_bottom)
-	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
+	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight + t->v_char;
 	else {
 	    time_y = title_y + timetop_textheight - title_textheight - x2label_textheight;
 	}
