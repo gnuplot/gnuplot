@@ -106,9 +106,11 @@ gpelcard.dvi: gpelcard.tex
 	@test -f gpelcard.tex || cp $(srcdir)/gpelcard.tex .
 	$(LATEX) gpelcard.tex
 
-all: gnuplot.elc info-look.elc gnuplot-gui.elc
+all: $(ELCS)
 
-install:
+install: install-elcs
+
+install-elcs: $(ELCS)
 	$(mkinstalldirs) $(DESTDIR)$(lispdir)
 	@for p in gnuplot.el gnuplot-gui.el *.elc; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p"; \
