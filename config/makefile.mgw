@@ -5,8 +5,7 @@
 #
 # To compile gnuplot for WinNT and Win95
 #
-# Changed for use with Cygwin/MinGW32 by HBB
-# compile the package with make -f makefile.mgw
+# compile the package with 'make -C src -f ../config/makefile.mgw'
 # the make utility for MinGW32 can be obtained the MinGW sites
 #
 # you need Cygwin's windres as of Mingw32-egcs-1.1b
@@ -17,12 +16,12 @@
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
-TOP = .
+TOP = ..
 
 DESTDIR=/Progra~1/Gnuplot3.7
 
 # give here the path to your compiler (preferrably MinGW's one)
-GCCPATH=/mingw32/bin/
+GCCPATH=//e/mingw32/bin/
 
 # -c  means don't link
 # -I  means extra include directory
@@ -33,7 +32,7 @@ GCCPATH=/mingw32/bin/
 
 CC = $(GCCPATH)gcc
 LD = $(GCCPATH)gcc
-CFLAGS = -g -O2 -I$(TOP) -D_Windows -DNO_GIH -DHAVE_STRNICMP \
+CFLAGS = -g -O2 -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
 	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
 	-DHAVE_GETCWD -DNEAR= -DHAVE_LIBPNG -DHAVE_LIBGD $(OPTS)
 LDFLAGS = -g 
@@ -50,7 +49,8 @@ CP = cp -p
 #
 # the followind switches are for HCW 4.03
 #
-HCWPATH=/Program\ Files/Help\ Workshop/
+#HCWPATH=/Program\ Files/Help\ Workshop/
+HCWPATH=f:/mssdk/bin/
 HCW = $(HCWPATH)hcw
 HCWFLAG=
 
@@ -59,7 +59,7 @@ HCWFLAG=
 # as the one shipped with mingw32/egcs 1.1b is buggy
 # the one with cygwin b20.1 is ok, so give here the complete path
 #
-RCPATH = /cygnus/cygwin-b20/H-i586-cygwin32/bin
+RCPATH = //d/cygnus/cygwin-b20/H-i586-cygwin32/bin
 RC  = windres
 RCFLAGS=--include-dir /mingw32/include \
 	--define __WIN32__ --define __WIN95__ --define MSRC \
@@ -80,16 +80,17 @@ RES2COFF=echo wgplt_res.o
 
 # see other terminal defines in term.h
 TERMFLAGS = -I$(TOP)/term
+TERMLIBS = -lgd -lpng -lz
 
 # There shouldn't be anything to be changed below this line
 #=======================================================================
 
 # macros for makefile.all
 O=o
-T=term/
-D=docs/
+T=../term/
+D=../docs/
 L=docs/latex/
-M=demo/
+M=../demo/
 
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
@@ -106,7 +107,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/wgnuplot.def win/wgnuplot.hpj win/wgnuplot.mnu win/wgraph.c \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
-	docs/doc2rtf.c term/win.trm win/grpicon.ico win/texticon.ico
+	$(D)doc2rtf.c $(T)win.trm win/grpicon.ico win/texticon.ico
 
 
 # default rules
@@ -117,7 +118,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS)
+	$(LD) $(LDFLAGS) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
 
 # rules
 
@@ -169,17 +170,17 @@ geticon.exe: win/geticon.c
 	$(LD) $(LDFLAGS) -o $@ win/geticon.c
 
 # convert gnuplot.doc to gnuplot.rtf
-$(HELPFILE): doc2rtf.exe docs/gnuplot.doc win/wgnuplot.hpj
-	./doc2rtf docs/gnuplot.doc win/gnuplot.rtf
+$(HELPFILE): doc2rtf.exe $(D)gnuplot.doc win/wgnuplot.hpj
+	./doc2rtf $(D)gnuplot.doc win/gnuplot.rtf
 	$(HCW) \/c \/e win/wgnuplot.hpj
 
-doc2rtf.exe: docs/doc2rtf.c docs/termdoc.c docs/xref.c
-	$(LD) $(LDFLAGS) -o $@ $(CFLAGS) -I. -Idocs -Iterm $^
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
+	$(LD) $(LDFLAGS) -o $@ $(CFLAGS) -I. -I$(D) -I$(T) $^
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.$(O) alloc.$(O)
 	$(LD) $(LDFLAGS) $(CFLAGS) -U_Windows -o $@ $^
-	(cd demo ; ./bf_test.exe )
+	(cd ../demo ; ./bf_test.exe )
 #	cd ..
 
 # _Windows causes wtext.h to define fread() etc
@@ -190,12 +191,12 @@ dbinary.$(O): binary.c
 clean:
 	$(RM) *.$(O) wgnuplot.map wgnuplot.res win/gnuplot.rtf
 	$(RM) doc2rtf.exe win/wgnuplib.res wgnuplib.map wgnuplot.lib
-	$(RM) demo/bf_test.exe *.ico geticon.exe
+	$(RM) $(M)bf_test.exe *.ico geticon.exe
 
 realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
-	$(RM) demo/binary[123] demo/fit.log demo/soundfit.par
+	$(RM) $(M)binary[123] $(M)fit.log $(M)soundfit.par
 
 # now move the whole stuff to its destination
 install: default

@@ -3,6 +3,9 @@
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #
+# copy this file to the 'src' directory, cd into there, and
+#     make -fmakefile.tc
+#
 # uses Borland proprietary overlay manager
 # Modified from the TurboC makefile by Maurice Castro
 # The compile and link includes debug flags.  Take them out if you
@@ -15,15 +18,22 @@
 # modified the make file to use an options file to store $(CFLAGS) 
 #                                                              (ALM 08/08/94)
 #
-# You will probably also need to edit term.h to not include some of the
+# You will need to edit term.h to not include some of the
 # terminal types which you are not going to use, otherwise you will get a 
-# message about too much global data defined in term.c.
+# message about too much global data defined in term.c. A working example
+# is 'config/term_pc.h'.
 #
+
+# directory names, like for use with makefile.all:
+T=..\\term\\
+D=..\\docs\\
+M=..\\demo\\
+
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 # location of Turbo C compiler
-TC = c:\bc
+TC = d:\bc31
 #TC = c:\tc
 # name of C compiler
 CC = bcc
@@ -40,7 +50,7 @@ BGIOBJ = $(TC)\bgi\bgiobj
 # location of the system libraries
 LIB = $(TC)\lib\\
 # Super VGA support: name and location of the SuperVGA driver
-SVGA_BGI = c:\bc\bgi\svga256.bgi
+SVGA_BGI = d:\bc\bgi\svga256.bgi
 # the memory model to use (l = large code, large data; h = huge)
 MODEL = l
 
@@ -65,7 +75,7 @@ CFLAGS2 = -I$(TC)\include -DMSDOS=1 -DPC -DANSI_C -DREADLINE=1 -DHAVE_GETCWD -DH
 CFLAGS3 = -DHAVE_SLEEP -DEXTERN_ERRNO -DHAVE_STRING_H -DHAVE_VALUES_H
 
 # separate set of FLAGS (both CFLAGS and LDFLAGS for the doc2xxx tools:
-DOC2XXX_FLAGS = -Idocs -Iterm @cflags.tc -ml -L$(TC)\lib
+DOC2XXX_FLAGS = -I$(D) -I$(T) @cflags.tc -ml -L$(TC)\lib
 
 TERMFLAGS =
 
@@ -95,17 +105,17 @@ OBJBGI= cgaf.obj egavgaf.obj hercf.obj attf.obj pc3270f.obj svgaf.obj
 
 OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJBGI)
 
-CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
-	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
-	term\hp2648.trm term\hpgl.trm term\hpljii.trm
-CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
-	term\iris4d.trm term\kyo.trm term\latex.trm term\pc.trm
-CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
-	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
-	term\v384.trm term\x11.trm
+CSOURCE5 = $(T)aed.trm $(T)cgi.trm $(T)dumb.trm $(T)dxy.trm \
+	$(T)eepic.trm $(T)epson.trm $(T)fig.trm $(T)hp26.trm \
+	$(T)hp2648.trm $(T)hpgl.trm $(T)hpljii.trm
+CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)object.h \
+	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)pc.trm
+CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
+	$(T)t410x.trm $(T)tek.trm $(T)unixpc.trm $(T)unixplot.trm \
+	$(T)v384.trm $(T)x11.trm
 CSOURCE8 = contour.c specfun.c binary.c interpol.c
 
-all: cflags.tc gnuplot.exe $(HELPFILE) demo\bf_test.exe
+all: cflags.tc gnuplot.exe $(HELPFILE) $(M)bf_test.exe
 
 # use linkopt.tc and cflags.tc to avoid command-line overflow
 
@@ -206,27 +216,27 @@ interpol.obj: interpol.c plot.h setshow.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-        $(BIN)$(CC) -c $(OVLY2) @cflags.tc $(TERMFLAGS) -DDEFAULTTERM="dospc" -Iterm -I. term.c
+	$(BIN)$(CC) -c $(OVLY2) @cflags.tc $(TERMFLAGS) -DDEFAULTTERM="dospc" -I$(T) -I. term.c
 
 util.obj: util.c plot.h
 
 version.obj: version.c
 
 # convert gnuplot.doc to gnuplot.gih
-$(HELPFILE): doc2gih.exe docs\gnuplot.doc
-	doc2gih docs\gnuplot.doc $(HELPFILE)
+$(HELPFILE): doc2gih.exe $(D)gnuplot.doc
+	doc2gih $(D)gnuplot.doc $(HELPFILE)
 
-doc2gih.exe: docs\doc2gih.c docs\termdoc.c
-    $(BIN)$(CC) $(DOC2XXX_FLAGS) -edoc2gih.exe docs\doc2gih.c docs\termdoc.c
+doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c
+    $(BIN)$(CC) $(DOC2XXX_FLAGS) -edoc2gih.exe $(D)doc2gih.c $(D)termdoc.c
 
-doc2tex.exe: docs\doc2tex.c
-    $(BIN)$(CC) $(DOC2XXX_FLAGS) -DALL_TERM_DOC docs\doc2tex.c
+doc2tex.exe: $(D)doc2tex.c
+    $(BIN)$(CC) $(DOC2XXX_FLAGS) -DALL_TERM_DOC $(D)doc2tex.c
 
-demo\bf_test.exe: bf_test.c binary.obj alloc.obj
-	$(BIN)$(CC) -edemo\bf_test.exe @cflags.tc -L$(TC)\lib bf_test.c binary.obj alloc.obj
-	cd demo
+$(M)bf_test.exe: bf_test.c binary.obj alloc.obj
+	$(BIN)$(CC) -e$(M)bf_test.exe @cflags.tc -L$(TC)\lib bf_test.c binary.obj alloc.obj
+	cd ..\demo
 	bf_test
-	cd ..
+	cd ..\src
 
 # convert Borland Graphics Interface files to object for linking
 cgaf.obj: $(BGI)\cga.bgi
@@ -264,10 +274,10 @@ clean:
 realclean: clean
 	del gnuplot.exe
 	del gnuplot.gih
-	del demo\soundfit.par
-	del demo\fit.log
-	del demo\bf_test.exe
-	del demo\bf_test.map
-	del demo\binary1
-	del demo\binary2
-	del demo\binary3
+	del $(M)soundfit.par
+	del $(M)fit.log
+	del $(M)bf_test.exe
+	del $(M)bf_test.map
+	del $(M)binary1
+	del $(M)binary2
+	del $(M)binary3

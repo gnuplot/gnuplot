@@ -4,9 +4,26 @@
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 #  and Win32 using Borland C++ 4 (4.52 is known to work)
 #
+# Cd to the 'src' directory, and 'make -f ../config/makefile.win'
+# To compile for win32, pass option '-DWIN32=1' to 'make'.
+#
 # CAVEAT: may not work correctly with BC 5 due to changes in flags
+#  (should be fixed now)
+#
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)
+#
+# CAVEAT for the 16bit Windows (BC 3.1) version:
+# You will also need to edit term.h to not include some of the
+# terminal types which you are not going to use, otherwise you will get a
+# message about too much global data defined in term.c. A working example
+# is 'config/term_pc.h'.
+
+# directory names, like for use with makefile.all:
+T=..\\term\\
+D=..\\docs\\
+M=..\\demo\\
+
 
 # where to place wgnuplot.hlp helpfile
 HELPFILE = wgnuplot.hlp
@@ -19,7 +36,8 @@ WIN32=0
 !endif
 
 !if $(WIN32)
-# name of C compiler
+
+# name of 32bit C compiler
 # bcc32a is the pentium-scheduling compiler in BC 4.52
 !if $(PENTIUM)
 CC = bcc32a
@@ -29,10 +47,17 @@ CC = bcc32
 PROCESSOR_OPT =
 !endif
 CCAUX = bcc
+DEFINE_HELPFILE=-DHELPFILE=\"$(HELPFILE)\"
+
 !else
+
+# 16bit Windows compiler
 CC = bcc
 CCAUX = bcc
+DEFINE_HELPFILE = -DHELPFILE="$(HELPFILE)"
+
 !endif
+
 # location of TLINK.EXE and BCC.EXE
 BIN = $(TC)\bin\\
 
@@ -65,27 +90,27 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 
-CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
-	term\dumb.trm term\dxy.trm \
-	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
-	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
-CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
-	term\iris4d.trm term\kyo.trm term\latex.trm term/pbm.trm term\win.trm
-CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
-	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
-	term\v384.trm term\x11.trm
+CSOURCE5 = $(T)aed.trm $(T)cgi.trm $(T)cgm.trm $(T)debug.trm \
+	$(T)dumb.trm $(T)dxy.trm \
+	$(T)eepic.trm $(T)epson.trm $(T)fig.trm $(T)hp26.trm \
+	$(T)hp2648.trm $(T)hpgl.trm $(T)hpljii.trm
+CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)object.h \
+	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)pbm.trm $(T)win.trm
+CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
+	$(T)t410x.trm $(T)tek.trm $(T)unixpc.trm $(T)unixplot.trm \
+	$(T)v384.trm $(T)x11.trm
 CSOURCE8 = contour.c specfun.c binary.c interpol.obj
 WINDOWS = makefile.win makefile.msw README.win win\wcommon.h \
 	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc\
 	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgnuplot.rc \
 	win\wgraph.c win\winmain.c win\wmenu.c win\wpause.c \
 	win\wprinter.c win\wresourc.h win\wtext.c win\wtext.h \
-	win\geticon.c docs\doc2rtf.c term\win.trm win\wgnupl32.def
+	win\geticon.c $(D)doc2rtf.c $(T)win.trm win\wgnupl32.def
 
 !if $(WIN32)
-all: wgnupl32.exe $(HELPFILE) wgnuplot.mnu demo\bf_test.exe
+all: wgnupl32.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 !else
-all: wgnuplot.exe wgnuplot.dll $(HELPFILE) wgnuplot.mnu demo\bf_test.exe
+all: wgnuplot.exe wgnuplot.dll $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 !endif
 
 wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
@@ -142,7 +167,7 @@ $(CFLAGS)
 bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h fit.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+	$(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! command.c
 
@@ -185,7 +210,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+	$(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! show.c
 
@@ -200,7 +225,7 @@ interpol.obj: interpol.c plot.h setshow.h
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7) win\wgnuplib.h
 	$(BIN)$(CC) @&&!
 $(CFLAGS)
-! $(TERMFLAGS) -Iterm -I. term.c
+! $(TERMFLAGS) -I$(T) -I. term.c
 
 util.obj: util.c plot.h
 
@@ -209,7 +234,7 @@ util3d.obj: util3d.c plot.h setshow.h
 version.obj: version.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+	$(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! win\winmain.c
 
@@ -260,26 +285,26 @@ wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 $(HELPFILE): win\gnuplot.rtf
 	$(BIN)hc win\wgnuplot.hpj 
 
-win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
-	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+win\gnuplot.rtf: doc2rtf.exe $(D)gnuplot.doc win\wgnuplot.hpj
+	doc2rtf $(D)gnuplot.doc win\gnuplot.rtf
 
-doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+doc2rtf.exe: $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
 $(CAUXFLAGS)
--I. -Iterm -Idocs
-! docs\doc2rtf.c docs\termdoc.c docs\xref.c
+-I. -I$(T) -I$(D)
+! $(D)doc2rtf.c $(D)termdoc.c $(D)xref.c
 
 # make binary demo files
-demo\bf_test.exe: bf_test.c dbinary.obj dalloc.obj
-	$(BIN)$(CCAUX) -edemo\bf_test.exe @&&!
+$(M)bf_test.exe: bf_test.c dbinary.obj dalloc.obj
+	$(BIN)$(CCAUX) -e$(M)bf_test.exe @&&!
 $(CAUXFLAGS)
 -L$(TC)\lib
 ! bf_test.c dbinary.obj dalloc.obj
-	cd demo
+	cd ..\demo
 	bf_test
-	cd ..
+	cd ..\src
 
 dalloc.obj: alloc.c
 	$(BIN)$(CCAUX) -c @&&!
@@ -304,7 +329,8 @@ clean:
 	del win\wgnuplib.res
 	del wgnuplib.map
 	del wgnuplot.lib
-	del demo\bf_test.exe
+	del $(M)bf_test.exe
+	del $(M)bf_test.map
 	
 realclean: veryclean
 
@@ -316,6 +342,6 @@ veryclean: clean
 	del wgnuplot.mnu
 	del wgnuplot.dll
 	del wgnupl32.exe
-	del demo\binary1
-	del demo\binary2
-	del demo\binary3
+	del $(M)binary1
+	del $(M)binary2
+	del $(M)binary3

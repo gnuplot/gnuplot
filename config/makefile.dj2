@@ -1,15 +1,16 @@
-#
+# Hello, emacs: this is a -*- Makefile -*-
 # $Id: $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
 # Usage:
-#       make -f makefile.dj2 in the main gnuplot directory
+#       from the main gnuplot directory, do:
+#       make -C src -f ../config/makefile.dj2
 #
 #
 # AUTHORS : several ... including Edzer Pebesma <pebesma@metoor.frw.uva.nl>
-#                  last mod. by Emmanuel Bigler <bigler@lpmo.univ-fcomte.fr> 
-# DATE of last mod :    1996 FEB 20
+#           last mod. by Hans-Bernhard Broeker <broeker@physik.rwth-aachen.de>
+# DATE of last mod :    1999 Mar 29
 #
 # 
 # removed atari reference and added binary demo bf_test
@@ -36,28 +37,22 @@ EXENAME = gp37
 # where to place gnuplot.gih helpfile upon MAKE
 # note it will be built inside gnuplot\$(HELPDEST)
 # and eventually copied to FINALDEST when install
-HELPDEST =docs
+HELPDEST =.
 
 # name of the helpfile
 HELPFILE =gnuplot.gih
 
 # compiler
-CCDIR = c:\djgpp\bin\
-CC = $(CCDIR)gcc
+CC = gcc
+
 # include directory
 INCLUDE = -I.
 
 # for svga term driver
 # HBB: -finline-functions bombs out on term.c, so disable it unconditionally
-TERMFLAGS = -DDJSVGA -fno-inline-functions
-#
-#
-#just for historical purpose..
-## DJGPP 1.xx:
-# CFLAGS = -DMSDOS -DDJGPP -DREADLINE -DHAVE_STRNICMP -O
-# LINKOPT = -lm -lpc -lgrx
+TERMFLAGS = -DDJSVGA -DHAVE_LIBGD
+LDFLAGS = -lgd
 
-## DJGPP 2.0:
 # HBB : added $(OPTS) so user can
 #   change CFLAGS easily, without having to change makefile
 CFLAGS = -DMSDOS -DDOS32 \
@@ -72,20 +67,25 @@ CFLAGS = -DMSDOS -DDOS32 \
 
 LINKOPT = $(LDFLAGS) -lm -lpc -lgrx20
 
-# HBB: removed reference to no-more-existing term/bigfig.trm
-CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
-	term/cgi.trm term/djsvga.trm term/dumb.trm \
-	term/dxf.trm term/dxy.trm \
-	term/debug.trm term/eepic.trm term/epson.trm term/fig.trm  \
-	term/hp26.trm term/hp2648.trm term/hpgl.trm  \
-	term/hpljii.trm term/metafont.trm\
-	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c 
-CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
-	term/pbm.trm term/pc.trm 
-CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
-	term/t410x.trm term/tek.trm term/texdraw.trm term/unixpc.trm \
-	term/unixplot.trm term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
+# abbreviations for relative directory names (NB: target 'clean' will
+#   still need manual change if this is changed...)
+T=../term/
+D=../docs/
+M=../demo/
+
+CSOURCE5 = $(T)ai.trm $(T)amiga.trm $(T)aed.trm \
+	$(T)cgi.trm $(T)djsvga.trm $(T)dumb.trm \
+	$(T)dxf.trm $(T)dxy.trm \
+	$(T)debug.trm $(T)eepic.trm $(T)epson.trm $(T)fig.trm  \
+	$(T)hp26.trm $(T)hp2648.trm $(T)hpgl.trm  \
+	$(T)hpljii.trm $(T)metafont.trm\
+	$(T)apollo.trm $(T)gpr.trm $(T)hppj.trm $(T)compact.c 
+CSOURCE6 = $(T)impcodes.h $(T)imagen.trm $(T)next.trm $(T)object.h \
+	$(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)mif.trm \
+	$(T)pbm.trm $(T)pc.trm 
+CSOURCE7 = $(T)post.trm $(T)qms.trm $(T)regis.trm $(T)sun.trm \
+	$(T)t410x.trm $(T)tek.trm $(T)texdraw.trm $(T)unixpc.trm \
+	$(T)unixplot.trm $(T)v384.trm $(T)vws.trm $(T)x11.trm $(T)xlib.trm
 OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
 OBJ2 =  help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o
 OBJ3 =  scanner.o set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o
@@ -101,7 +101,7 @@ OBJS =  $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
 	$(patsubst $@-noexist,$(CO) $(COFLAGS) $< $@, \
 		$(filter-out $@,$(firstword $(wildcard $@) $@-noexist)))
 
-all: $(EXENAME).exe  $(HELPDEST)\$(HELPFILE)  demo\binary?.
+all: $(EXENAME).exe  $(HELPDEST)/$(HELPFILE)  $(M)binary?
 
 # -s performs the coff2exe step implicitly (?)
 # HBB: that's plain wrong: -s means 'strip executable',
@@ -112,20 +112,6 @@ $(EXENAME).exe : $(OBJS)
 	$(CC) -o $(EXENAME) $(OBJS) $(LINKOPT)
 	objcopy --strip-all $(EXENAME) $(EXENAME).exe
 	stubify $(EXENAME).exe
-#HBB: I think that message is superfluous, and maybe even confusing
-#   for new users of DJGPP V2, who never used DJGPP V1 at all.
-#	@echo.
-#	@echo Rem: with djgpp v.2, you do not need  go32 any longer to run gnuplot
-#	@echo.
-
-# This used to copy go32 to the exe file.. under v1.xx
-# obsolete under djgpp v. 2.
-#
-#$(EXENAME).exe : $(OBJS)
-#       $(CC) -o $(EXENAME) $(OBJS) $(LINKOPT)
-#       strip $(EXENAME)
-#       copy /b $(CCDIR)\$(EXENAME).exe+$(EXENAME) $(EXENAME).exe
-#       del $(EXENAME)
 
 command.o: command.c plot.h setshow.h help.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
@@ -134,7 +120,7 @@ show.o: show.c plot.h setshow.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" $<
 
 term.o: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCES)
-	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm term.c
+	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -I$(T) term.c
 
 $(OBJS): plot.h
 
@@ -157,25 +143,23 @@ version.o: version.c
 	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CFLAGS) $(INCLUDE) version.c
 
 # convert gnuplot.doc to gnuplot.gih
-$(HELPDEST)\$(HELPFILE): .\docs\doc2gih.exe .\docs\gnuplot.doc
-	.\docs\doc2gih  docs/gnuplot.doc > $(HELPDEST)\$(HELPFILE)
+$(HELPDEST)/$(HELPFILE): doc2gih.exe $(D)gnuplot.doc
+	./doc2gih.exe  $(D)gnuplot.doc > $@
 
-.\docs\doc2gih.exe: .\docs\doc2gih.c .\docs\termdoc.c $(CSOURCES)
-	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o ./docs/doc2gih ./docs/doc2gih.c ./docs/termdoc.c
-	coff2exe ./docs/doc2gih
+doc2gih.exe: $(D)doc2gih.c $(D)termdoc.c $(CSOURCES)
+	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -I$(T) -o $@ $(D)doc2gih.c $(D)termdoc.c
 
 # now for the demo bin
-demo\binary?.: bf_test.exe
-	bf_test
-	copy binary? demo\binary?
+$(M)binary?: bf_test.exe
+	./bf_test.exe
+	copy binary? ..\demo
 	del binary?
 
 bf_test.o:
 	$(CC) $(CFLAGS) -c bf_test.c
 
 bf_test.exe: bf_test.o binary.o alloc.o
-	$(CC) $(CFLAGS) bf_test.o binary.o alloc.o -lm -o bf_test
-	coff2exe bf_test
+	$(CC) $(CFLAGS) bf_test.o binary.o alloc.o -lm -o $@
 
 # now install things and create a .bat file to make things easier
 install: all
@@ -199,8 +183,8 @@ install: all
 clean:
 	del *.o
 	del $(EXENAME)
-	del .\docs\doc2gih
-	del .\docs\doc2gih.exe
+	del doc2gih
+	del doc2gih.exe
 	del bf_test
 	del bf_test.exe
 
@@ -208,11 +192,11 @@ clean:
 realclean: clean
 	del $(EXENAME).exe
 	del $(HELPDEST)\$(HELPFILE)
-	del .\demo\binary1
-	del .\demo\binary2
-	del .\demo\binary3
-	del .\demo\fit.log
-	del .\demo\soundfit.par
+	del ..\demo\binary1
+	del ..\demo\binary2
+	del ..\demo\binary3
+	del ..\demo\fit.log
+	del ..\demo\soundfit.par
 #####
 ##     END OF GNUPLOT 3.7 MAKEFILE FOR DJGPP V2
 #####
