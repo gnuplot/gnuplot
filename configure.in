@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.96 2000/12/26 19:54:08 joze Exp $
+dnl $Id: configure.in,v 1.97 2001/03/01 18:35:30 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.96 $)
+AC_REVISION($Revision: 1.97 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -50,9 +50,9 @@ test -z "$with_png" && with_png=yes
 
 dnl The Portable Document Format (PDF) terminal
 AC_ARG_WITH(pdf,dnl
-[   --with-pdf		   enable pdf terminal 
+[  --with-pdf              enable pdf terminal 
                           (requires PDFLib, libz and maybe libtiff)
-   --with-pdf=PATH                Specify the location of libpdf],,
+  --with-pdf=PATH                 Specify the location of libpdf],,
 test -z "$with_pdf" && with_pdf=yes
 )dnl
 
