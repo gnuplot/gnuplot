@@ -14,6 +14,9 @@
 	XLookupString() rather than XKeycodeToKeysym(). This method handles
 	characters produced using shift, alt, or other multi-key sequences.
 
+	* src/graphics.c (plot_f_bars plot_c_bars), term/gd.trm PNG_options):
+	Make sure that the tic size is greater than zero.
+
 2004-06-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/graph3d.c (key_sample_line_pm3d key_sample_point_pm3d): Fixed

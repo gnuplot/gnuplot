@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.39 2004/04/13 16:50:50 broeker Exp $
+ * $Id: gd.trm,v 1.40 2004/05/25 04:14:53 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -593,6 +593,8 @@ PNG_options()
 	    term->xmax = PNG_XMAX;
 	    /* EAM Apr 2003 - same tic size on both x and y axes */
 	    term->v_tic = (PNG_XMAX < PNG_YMAX) ? PNG_XMAX/100 : PNG_YMAX/100;
+	    if (term->v_tic < 1)
+		term->v_tic = 1;
 	    term->h_tic = term->v_tic;
 	    break;
 	case PNG_ENHANCED:
