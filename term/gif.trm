@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.23 1999/08/24 11:24:54 lhecking Exp $
+ * $Id: gif.trm,v 1.24 1999/10/01 15:12:18 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -361,6 +361,7 @@ GIF_graphics()
 {
     int i;
     unsigned int rgb;
+
     gif_state.font = GIF_font;
     gif_state.color = 0;
     gif_state.image = gdImageCreate((int) (xsize * GIF_XMAX),
