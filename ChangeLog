@@ -1,3 +1,23 @@
+1999-09-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/Makefile.am: Do not install bf_test and gpltconv.
+
+	* src/show.c: Add additional beta info.
+
+1999-08-25  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* INSTALL: VMS section updated.
+
+1999-08-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc, src/command.c, src/protos.h, src/save.c, src/set.c,
+	src/tables.c, src/tables.h: 'save term' patch.
+
+	* src/alloc.c, src/alloc.h, src/fit.c, src/graphics.c: Minor fixes.
+
+	* term/post.trm: Options string violated the 'save loadable output'
+	rule.
+
 1999-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/gpltconv.c: Rewrite to allow more general approach for string

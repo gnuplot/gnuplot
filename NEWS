@@ -18,6 +18,7 @@ Changes in release 4.0:
   replaced with the new 'unset Variable' command.
 * NEW the gpltconv program has been included to translate old
   gnuplot command files to the new syntax.
+* NEW 'save term' option
 
 [3.7.0.9]
 * moved some declarations to new header files
