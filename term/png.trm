@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.33 2001/08/27 15:04:12 broeker Exp $
+ * $Id: png.trm,v 1.34 2002/08/27 21:22:19 sfeam Exp $
  *
  */
 
@@ -580,14 +580,13 @@ TERM_TABLE_END(png_driver)
 #endif /* TERM_TABLE */
 
 #ifdef TERM_HELP
-START_HELP(png)
+START_HELP(png (OLD))
 "1 png (OLD)",
-"?commands set terminal png",
-"?set terminal png",
-"?set term png",
-"?terminal png",
-"?term png",
-"?png",
+"?commands set terminal png (old)",
+"?set terminal png (old)",
+"?set term png (old)",
+"?terminal png (old)",
+"?term png (old)",
 " The `png` terminal driver supports Portable Network Graphics.  This old ",
 " version of the png driver requires the third-party libraries \"libpng\" ",
 " and \"zlib\".  There is a newer png driver, with many more features, that",
@@ -611,7 +610,7 @@ START_HELP(png)
 " 'x00ff00' is green.  The background color is set first, then the border",
 " color, then the X & Y axis color, then the plotting colors.  The maximum",
 " number of colors that can be set is currently 99."
-END_HELP(png)
+END_HELP(png (OLD))
 #endif /* TERM_HELP */
 
 #endif /* ifndef HAVE_NEWGD */
