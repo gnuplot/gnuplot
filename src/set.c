@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.69 2001/11/25 12:40:22 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.70 2002/01/06 16:31:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1595,6 +1595,11 @@ set_key()
 	    case S_KEY_WIDTH:
 		c_token++;
 		key_width_fix = real(const_express(&a));
+		c_token--; /* it is incremented after loop */
+		break;
+	    case S_KEY_HEIGHT:
+		c_token++;
+		key_height_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
 	    case S_KEY_TITLE:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.51 2001/11/22 12:25:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.52 2001/11/26 09:18:17 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -788,6 +788,10 @@ do_3dplot(plots, pcount, quick)
 	int yt = yl;
 	int yb = yl - key_entry_height * (key_rows - ktitle_lines) - ktitle_lines * t->v_char;
 	int key_xr = xl + key_col_wth * (key_cols - 1) + key_size_right;
+	int tmp = (int)(0.5 * key_height_fix * (t->v_char));
+	yt += 2 * tmp;
+	yl += tmp;
+	
 	/* key_rows seems to contain title at this point ??? */
 	term_apply_lp_properties(&key_box);
 	(*t->move) (xl - key_size_left, yb);

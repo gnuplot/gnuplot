@@ -168,6 +168,7 @@ extern double key_swidth;
 extern double key_vert_factor; 
 /* user specified additional (+/-) width of key titles */
 extern double key_width_fix;
+extern double key_height_fix;
 /* key back to front */ 
 extern TBOOLEAN	key_reverse;
 /* title line for the key as a whole */

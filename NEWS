@@ -23,6 +23,9 @@ Changes in release 4.0:
 * FIXED logscaled colorbox axis
 * FIXED pgnuplot for Windows NT/2K/XP
 
+[3.8h]
+* NEW set key height <height>
+
 [3.8g]
 * CHANGE set label with any line type (colour), point type and point size
 * CHANGE use either two or five minitic steps, never 4 (in logscale)

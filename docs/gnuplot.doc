@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.90 2002/01/06 16:31:12 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.91 2002/01/18 15:07:10 cgaylord Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4561,6 +4561,7 @@ C ... and restart the table:
                {Left | Right} {{no}reverse}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
+               {height <height_increment>}
                {title "<text>"}
                {{no}box { {linestyle | ls <line_style>}
                           | {linetype | lt <line_type>}
@@ -4596,6 +4597,11 @@ C ... and restart the table:
  `gnuplot` simply counts the number of characters in the string when computing
  the box width; this allows you to correct it.
 
+ The <height_increment> is a number of character heights to be added to or
+ subtracted from the height of the key box.  This is useful mainly when you are
+ putting a box around the key, otherwise it can be used to adjust the vertical
+ shift of automatically chosen key position by <height_increment>/2.
+
  A title can be put on the key (`title "<text>"`)---see also `syntax` for the
  distinction between text in single- or double-quotes.  The key title uses the
  same justification as do the plot titles.
@@ -4607,8 +4613,8 @@ C ... and restart the table:
 
  The <position> can be a simple x,y,z as in previous versions, but these can
  be preceded by one of four keywords (`first`, `second`, `graph`, `screen`)
- which selects the coordinate system in which the position is specified.  
- See `coordinates` for more details.
+ which selects the coordinate system in which the position of the first sample
+ line is specified.  See `coordinates` for more details.
 
  The key is drawn as a sequence of lines, with one plot described on each
  line.  On the right-hand side (or the left-hand side, if `reverse` is

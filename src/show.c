@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.66 2001/12/03 12:00:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.67 2002/01/06 16:31:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1661,10 +1661,12 @@ show_key()
 	fprintf(stderr, "\tsample length is %g characters\n\
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
+\theight adjustment is %g characters\n\
 \tkey title is \"%s\"\n",
 		    key_swidth,
 		    key_vert_factor,
 		    key_width_fix,
+		    key_height_fix,
 		    key_title);
     }
 }

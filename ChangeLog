@@ -1,17 +1,23 @@
+2002-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/gadgets.h src/gadgets.c src/graph3d.c
+	src/graphics.c src/save.c src/set.c src/show.c src/tables.h
+	src/tables.c src/unset.c: New option 'set key height <height>'.
+
 2002-01-18  Clark Gaylord  <cgaylord@vt.edu>
-	* change all references in documenation from gnuplot.org
-	to gnuplot.info
+	* Change all references in documenation from gnuplot.org to
+	gnuplot.info.
 
 2002-01-17  Johannes Zellner  <johannes@zellner.org>
 
-	* term/x11.trm term/emf.trm: removed unsued variables
+	* term/x11.trm term/emf.trm: Removed unused variables.
 
 2002-01-17  Johannes Zellner  <johannes@zellner.org>
 
-	* term/x11.trm src/unset.c src/gplt_x11.c: removed the
-	X11_unset_pm3d() function which made multiplot not working
-	on X11. Introduced a variable plot->release_cmap in gplt_x11.c
-	for controlling freeing of pm3d colors.
+	* term/x11.trm src/unset.c src/gplt_x11.c: Removed the
+	X11_unset_pm3d() function which made multiplot not working on X11.
+	Introduced a variable plot->release_cmap in gplt_x11.c for
+	controlling freeing of pm3d colors.
 
 2002-01-17  Petr Mikulik  <mikulik@physics.muni.cz>
 

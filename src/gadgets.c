@@ -60,6 +60,7 @@ TBOOLEAN key_reverse = FALSE;	/* reverse text & sample ? */
 double key_swidth = 4.0;
 double key_vert_factor = 1.0;
 double key_width_fix = 0.0;
+double key_height_fix = 0.0;
 char key_title[MAX_LINE_LEN + 1] = "";
 
 #ifdef PM3D

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.59 2001/11/10 18:27:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.60 2002/01/06 16:31:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -591,10 +591,12 @@ boundary(plots, count)
 		keybox.xr = keybox.xl + key_col_wth * (key_cols - 1) + key_size_left + key_size_right;
 		keybox.yb = t->ymax * yoffset;
 		keybox.yt = keybox.yb + key_rows * key_entry_height + ktitl_lines * t->v_char;
+		keybox.yt += (int)(key_height_fix * (t->v_char));
 		ybot += key_entry_height * key_rows + (int) ((t->v_char) * (ktitl_lines + 1));
+		ybot += (int)(key_height_fix * (t->v_char));
 	    } else {
 		/* maximise no rows, limited by ytop-ybot */
-		int i = (int) (ytop - ybot - (ktitl_lines + 1) * (t->v_char)) / key_entry_height;
+		int i = (int) (ytop - ybot - key_height_fix * (t->v_char) - (ktitl_lines + 1) * (t->v_char)) / key_entry_height;
 		KEY_PANIC(i == 0);
 		if (ptitl_cnt > i) {
 		    key_cols = (int) (ptitl_cnt + i - 1) / i;
@@ -884,6 +886,7 @@ boundary(plots, count)
 	/* do it even if there is no grid, as do_plot will use these to position key */
 	key_w = key_col_wth * key_cols;
 	key_h = (ktitl_lines) * t->v_char + key_rows * key_entry_height;
+	key_h += (int)(key_height_fix * (t->v_char));
 	if (lkey == KEY_AUTO_PLACEMENT) {
 	    if (key_vpos == TTOP) {
 		keybox.yt = (int) ytop - (t->v_tic);
@@ -907,6 +910,17 @@ boundary(plots, count)
 	} else {
 	    unsigned int x, y;
 	    map_position(&key_user_pos, &x, &y, "key");
+#if 0
+// FIXME!!!
+// pm 22.1.2002: if key_user_pos.scalex or scaley == first_axes or second_axes,
+// then the graph scaling is not yet known and the box is positioned incorrectly;
+// you must do "replot" to avoid the wrong plot ... bad luck if output does not
+// go to screen
+#define OK fprintf(stderr,"Line %i of %s is OK\n",__LINE__,__FILE__);
+OK
+fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",key_user_pos.x,key_user_pos.y);
+fprintf(stderr,"\tHELE: user pos: x=%i y=%i\n",x,y);
+#endif
 	    keybox.xl = x - key_size_left;
 	    keybox.xr = keybox.xl + key_w;
 	    keybox.yt = y + (ktitl_lines ? t->v_char : key_entry_height) / 2;
@@ -1306,6 +1320,7 @@ do_plot(plots, pcount)
 	/* just use keybox.xl etc worked out in boundary() */
 	xl = keybox.xl + key_size_left;
 	yl = keybox.yt;
+	yl -= (int)(0.5 * key_height_fix * (t->v_char));
 
 	if (*key_title) {
 	    char *ss = gp_alloc(strlen(key_title) + 2, "tmp string ss");
