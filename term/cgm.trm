@@ -1,5 +1,5 @@
 /*
- * $Id: cgm.trm,v 1.28 2000/10/18 14:12:23 broeker Exp $
+ * $Id: cgm.trm,v 1.16.2.3 2000/10/20 19:03:57 lhecking Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -612,9 +612,10 @@ CGM_graphics()
     CGM_write_int_record(1, 1, 2, version_data);
     {
       char description_data[256];
-      sprintf(description_data, "Gnuplot version %s, Computer Graphics Metafi"
-	      "le version 1 per MIL-D-28003A/BASIC-1.%d", 
-	      VERSION, cgm_monochrome?0:2);
+      sprintf(description_data, "\
+Gnuplot version %s patchlevel %s,\
+ Computer Graphics Metafile version 1 per MIL-D-28003A/BASIC-1.%d", 
+	      gnuplot_version, gnuplot_patchlevel, cgm_monochrome? 0:2);
 	CGM_write_char_record(1, 2, strlen(description_data),
 			      description_data);
     }
@@ -1550,25 +1551,25 @@ START_HELP(cgm)
 "#&Courier Oblique&\\\\",
 "#&Courier Bold Oblique&\\\\",
 "#&Symbol&\\\\",
-"#&Hershey/Cartographic_Roman&\\\\",
-"#&Hershey/Cartographic_Greek&\\\\",
-"#&Hershey/Simplex_Roman&\\\\",
-"#&Hershey/Simplex_Greek&\\\\",
-"#&Hershey/Simplex_Script&\\\\",
-"#&Hershey/Complex_Roman&\\\\",
-"#&Hershey/Complex_Greek&\\\\",
-"#&Hershey/Complex_Script&\\\\",
-"#&Hershey/Complex_Italic&\\\\",
-"#&Hershey/Complex_Cyrillic&\\\\",
-"#&Hershey/Duplex_Roman&\\\\",
-"#&Hershey/Triplex_Roman&\\\\",
-"#&Hershey/Triplex_Italic&\\\\",
-"#&Hershey/Gothic_German&\\\\",
-"#&Hershey/Gothic_English&\\\\",
-"#&Hershey/Gothic_Italian&\\\\",
-"#&Hershey/Symbol_Set_1&\\\\",
-"#&Hershey/Symbol_Set_2&\\\\",
-"#&Hershey/Symbol_Math&\\\\",
+"#&Hershey/Cartographic\\_Roman&\\\\",
+"#&Hershey/Cartographic\\_Greek&\\\\",
+"#&Hershey/Simplex\\_Roman&\\\\",
+"#&Hershey/Simplex\\_Greek&\\\\",
+"#&Hershey/Simplex\\_Script&\\\\",
+"#&Hershey/Complex\\_Roman&\\\\",
+"#&Hershey/Complex\\_Greek&\\\\",
+"#&Hershey/Complex\\_Script&\\\\",
+"#&Hershey/Complex\\_Italic&\\\\",
+"#&Hershey/Complex\\_Cyrillic&\\\\",
+"#&Hershey/Duplex\\_Roman&\\\\",
+"#&Hershey/Triplex\\_Roman&\\\\",
+"#&Hershey/Triplex\\_Italic&\\\\",
+"#&Hershey/Gothic\\_German&\\\\",
+"#&Hershey/Gothic\\_English&\\\\",
+"#&Hershey/Gothic\\_Italian&\\\\",
+"#&Hershey/Symbol\\_Set\\_1&\\\\",
+"#&Hershey/Symbol\\_Set\\_2&\\\\",
+"#&Hershey/Symbol\\_Math&\\\\",
 "#&ZapfDingbats&\\\\",
 "#&Script&\\\\",
 "#&15&\\\\",
