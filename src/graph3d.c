@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.42 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.43 2001/06/29 12:57:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1592,6 +1592,11 @@ cntr3d_impulses(cntr, lp)
 		      &vertex_on_surface);
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &vertex_on_base);
+#ifdef PM3D
+	    /* HBB 20010822: Provide correct color-coding for
+	     * "linetype palette" PM3D mode */
+	    vertex_on_base.real_z = cntr->coords[i].z;
+#endif
 	    draw3d_line(&vertex_on_surface, &vertex_on_base, lp);
 	}
     } else {
@@ -1636,10 +1641,21 @@ cntr3d_lines(cntr, lp)
     if (draw_contour & CONTOUR_BASE) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
 		  &previous_vertex);
+#ifdef PM3D
+	/* HBB 20010822: in "linetype palette" mode,
+	 * draw3d_line_unconditional() will look at real_z to
+	 * determine the contour line's color --> override base_z by
+	 * the actual z position of the contour line */
+	previous_vertex.real_z = cntr->coords[0].z;
+#endif
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &this_vertex);
+#ifdef PM3D
+	    /* HBB 20010822: see above */
+	    this_vertex.real_z = cntr->coords[i].z;
+#endif
 	    draw3d_line(&previous_vertex, &this_vertex, lp);
 	    previous_vertex=this_vertex;
 	}
@@ -1647,8 +1663,7 @@ cntr3d_lines(cntr, lp)
 }
 
 /* cntr3d_linespoints:
- * Plot a surface contour in LINESPOINTS style
- */
+ * Plot a surface contour in LINESPOINTS style */
 static void
 cntr3d_linespoints(cntr, lp)
     struct gnuplot_contours *cntr;
@@ -1684,11 +1699,22 @@ cntr3d_linespoints(cntr, lp)
     if (draw_contour & CONTOUR_BASE) {
 	map3d_xyz(cntr->coords[0].x, cntr->coords[0].y, base_z,
 		  &previous_vertex);
+#ifdef PM3D
+	/* HBB 20010822: in "linetype palette" mode,
+	 * draw3d_line_unconditional() will look at real_z to
+	 * determine the contour line's color --> override base_z by
+	 * the actual z position of the contour line */
+	previous_vertex.real_z = cntr->coords[0].z;
+#endif
 	draw3d_point(&previous_vertex, lp);
 
 	for (i = 1; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		      &this_vertex);
+#ifdef PM3D
+	    /* HBB 20010822: see above */
+	    this_vertex.real_z = cntr->coords[i].z;
+#endif
 	    draw3d_line(&previous_vertex, &this_vertex, lp);
 	    draw3d_point(&this_vertex, lp);
 	    previous_vertex=this_vertex;
@@ -1701,8 +1727,8 @@ cntr3d_linespoints(cntr, lp)
  */
 static void
 cntr3d_points(cntr, lp)
-struct gnuplot_contours *cntr;
-struct lp_style_type *lp;
+    struct gnuplot_contours *cntr;
+    struct lp_style_type *lp;
 {
     int i;
     vertex v;
@@ -1723,6 +1749,10 @@ struct lp_style_type *lp;
 	for (i = 0; i < cntr->num_pts; i++) {
 	    map3d_xyz(cntr->coords[i].x, cntr->coords[i].y, base_z,
 		     &v);
+#ifdef PM3D
+	    /* HBB 20010822: see above */
+	    v.real_z = cntr->coords[i].z;
+#endif
 	    draw3d_point(&v, lp);
 	}
     }
