@@ -320,6 +320,9 @@ typedef struct tagGW {
 	HPEN	hbpen;					/* border pen */
 	HPEN	hapen;					/* axis pen */
 	HPEN	hpen[WGNUMPENS];		/* pens */
+#if 1 /* HBB 980118: new try ... */
+        HPEN    hsolidpen[WGNUMPENS];           /* solid pens (for point symbols) */
+#endif
 	LOGPEN	colorpen[WGNUMPENS+2];	/* logical color pens */
 	LOGPEN	monopen[WGNUMPENS+2];	/* logical mono pens */
 	COLORREF background;			/* background color */

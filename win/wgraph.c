@@ -384,6 +384,9 @@ MakePens(LPGW lpgw, HDC hdc)
 		for (i=0; i<WGNUMPENS; i++)
 		{
 			lpgw->hpen[i] = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[i+2]);
+#if 1 /* HBB 980118 fix 'numsolid' problem */
+			lpgw->hsolidpen[i] = CreatePen(PS_SOLID, 1, lpgw->colorpen[i+2].lopnColor);
+#endif
 			}
 		/* find number of solid, unit width line styles */
 		for (i=0; i<WGNUMPENS && lpgw->colorpen[i+2].lopnStyle==PS_SOLID
@@ -405,6 +408,10 @@ DestroyPens(LPGW lpgw)
 	DeleteObject(lpgw->hapen);
 	for (i=0; i<WGNUMPENS; i++)
 		DeleteObject(lpgw->hpen[i]);
+#if 1 /* HBB 980118: fix 'numsolid' gotcha */
+	for (i=0; i<WGNUMPENS; i++)
+		DeleteObject(lpgw->hsolidpen[i]);
+#endif
 	for (i=0; i<WGNUMPENS+2; i++)
 		DeleteObject(lpgw->colorbrush[i]);
 }
@@ -732,11 +739,15 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 				break;
 			default:	/* A plot mark */
+#if 0 /* HBB 980118: fix 'sumsolid' gotcha: */
 				if (pen >= numsolid) {
 					pen %= numsolid;	/* select solid pen */
 					SelectObject(hdc, lpgw->hpen[pen]);
 					SelectObject(hdc, lpgw->colorbrush[pen+2]);
 				}
+#else
+                                SelectObject(hdc, lpgw->hsolidpen[pen%WGNUMPENS]);
+#endif
                                 switch (curptr->op) {
 					case W_dot:
 						dot(hdc, xdash, ydash);
