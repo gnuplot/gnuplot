@@ -81,8 +81,8 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
  * all other characters are ignored
  */
 
-#ifdef __linux__
-/* HBB: to get prototype for ioctl() */
+#ifdef HAVE_SYS_IOCTL_H
+/* For ioctl() prototype under Linux (and BeOS?) */
 # include <sys/ioctl.h>
 #endif
 
