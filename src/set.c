@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.28 1999/11/15 22:00:13 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.29 1999/11/24 13:32:26 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -631,7 +631,7 @@ reset_command()
     datatype[V_AXIS] = FALSE;
 
     pointsize = 1.0;
-    encoding = ENCODING_DEFAULT;
+    encoding = S_ENC_DEFAULT;
 
     init_locale();
     clear_loadpath();
@@ -852,6 +852,7 @@ set_command()
 	case S_ZERO:
 	    set_zero();
 	    break;
+/* FIXME */
 	case S_MXTICS:
 	case S_NOMXTICS:
 	case S_XTICS:
@@ -1521,24 +1522,20 @@ set_dummy()
 static void
 set_encoding()
 {
+    int temp;
+
     c_token++;
-    if(END_OF_COMMAND) {
-	encoding = ENCODING_DEFAULT;
-    } else if (almost_equals(c_token,"def$ault")) {
+
+    if(END_OF_COMMAND)
+	temp = S_ENC_DEFAULT;
+    else {
+	temp = lookup_table(&set_encoding_tbl[0],c_token);
+
+	if (temp == S_ENC_INVALID)
+	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'cp437' or 'cp850'");
 	c_token++;
-	encoding = ENCODING_DEFAULT;
-    } else if (almost_equals(c_token,"iso$_8859_1")) {
-	c_token++;
-	encoding = ENCODING_ISO_8859_1;
-    } else if (almost_equals(c_token,"cp4$37")) {
-	c_token++;
-	encoding = ENCODING_CP_437;
-    } else if (almost_equals(c_token,"cp8$50")) {
-	c_token++;
-	encoding = ENCODING_CP_850;
-    } else {
-	int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'cp437' or 'cp850'");
     }
+    encoding = temp;
 }
 
 
@@ -1776,52 +1773,52 @@ set_key()
     } else {
 	while (!END_OF_COMMAND) {
 	    switch(lookup_table(&set_key_tbl[0],c_token)) {
-	    case KEY_TOP:
+	    case S_KEY_TOP:
 		key_vpos = TTOP;
 		key = -1;
 		break;
-	    case KEY_BOTTOM:
+	    case S_KEY_BOTTOM:
 		key_vpos = TBOTTOM;
 		key = -1;
 		break;
-	    case KEY_LEFT:
+	    case S_KEY_LEFT:
 		key_hpos = TLEFT;
 		/* key_just = TRIGHT; */
 		key = -1;
 		break;
-	    case KEY_RIGHT:
+	    case S_KEY_RIGHT:
 		key_hpos = TRIGHT;
 		key = -1;
 		break;
-	    case KEY_UNDER:
+	    case S_KEY_UNDER:
 		key_vpos = TUNDER;
 		if (key_hpos == TOUT)
 		    key_hpos--;
 		key = -1;
 		break;
-	    case KEY_OUTSIDE:
+	    case S_KEY_OUTSIDE:
 		key_hpos = TOUT;
 		if (key_vpos == TUNDER)
 		    key_vpos--;
 		key = -1;
 		break;
-	    case KEY_LLEFT:
+	    case S_KEY_LLEFT:
 		/* key_hpos = TLEFT; */
 		key_just = JLEFT;
 		/* key = -1; */
 		break;
-	    case KEY_RRIGHT:
+	    case S_KEY_RRIGHT:
 		/* key_hpos = TLEFT; */
 		key_just = JRIGHT;
 		/* key = -1; */
 		break;
-	    case KEY_REVERSE:
+	    case S_KEY_REVERSE:
 		key_reverse = TRUE;
 		break;
-	    case KEY_NOREVERSE:
+	    case S_KEY_NOREVERSE:
 		key_reverse = FALSE;
 		break;
-	    case KEY_BOX:
+	    case S_KEY_BOX:
 		c_token++;
 		if (END_OF_COMMAND)
 		    key_box.l_type = -2;
@@ -1834,27 +1831,27 @@ set_key()
 		}
 		c_token--;  /* is incremented after loop */
 		break;
-	    case KEY_NOBOX:
+	    case S_KEY_NOBOX:
 		key_box.l_type = -3;
 		break;
-	    case KEY_SAMPLEN:
+	    case S_KEY_SAMPLEN:
 		c_token++;
 		key_swidth = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
-	    case KEY_SPACING:
+	    case S_KEY_SPACING:
 		c_token++;
 		key_vert_factor = real(const_express(&a));
 		if (key_vert_factor < 0.0)
 		    key_vert_factor = 0.0;
 		c_token--; /* it is incremented after loop */
 		break;
-	    case KEY_WIDTH:
+	    case S_KEY_WIDTH:
 		c_token++;
 		key_width_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
-	    case KEY_TITLE:
+	    case S_KEY_TITLE:
 		if (isstring(c_token+1)) {
 		    /* We have string specified - grab it. */
 		    quote_str(key_title,++c_token, MAX_LINE_LEN);
@@ -1862,7 +1859,7 @@ set_key()
 		else
 		    key_title[0] = 0;
 		break;
-	    case KEY_INVALID:
+	    case S_KEY_INVALID:
 	    default:
 		get_position(&key_user_pos);
 		key = 1;
