@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.85 2004/10/17 04:52:11 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.86 2004/10/18 01:04:51 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1549,7 +1549,7 @@ eval_3dplots()
 			this_plot->lp_properties.p_type =
 			(int) real(const_express(&t)) - 1;
 
-		    if (isanumber(c_token)) {
+		    if (isanumber(c_token))
 			this_plot->lp_properties.p_type =
 			    (int) real(const_express(&t)) - 1;
 		}
