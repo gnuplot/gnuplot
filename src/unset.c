@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.45 2002/12/11 01:31:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.46 2002/12/12 12:27:46 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1321,10 +1321,11 @@ unset_timefmt()
 	    strcpy(axis_array[axis].timefmt,TIMEFMT);
     else if ((axis=lookup_table(axisname_tbl, c_token)) >= 0) {
 	strcpy(axis_array[axis].timefmt, TIMEFMT);
-    c_token++;
+	c_token++;
     }
     else
-	int_error(c_token, "expected optional axis name");
+	/* int_error() from inside 'reset' would cause problems */
+	int_warn(c_token, "expected optional axis name");
 	
 }
 
@@ -1549,6 +1550,8 @@ reset_command()
 #if USE_ULIG_FILLEDBOXES
     unset_fillstyle();
 #endif
+
+    unset_missing();
     unset_locale();
     unset_loadpath();
     unset_fitlogfile();
