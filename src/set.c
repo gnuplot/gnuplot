@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.51 2001/02/01 16:45:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.52 2001/02/01 17:56:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -194,8 +194,14 @@ set_command()
 	    int_warn(c_token, "deprecated syntax, use \"set style function\"");
         if (!almost_equals(++c_token,"s$tyle"))
             int_error(c_token,"expecting keyword 'style'");
-	else
-	    func_style = get_style();
+	else {
+	    enum PLOT_STYLE temp_style = get_style();
+	
+	    if (temp_style & 4)
+		int_error(c_token, "style not usable for function plots, left unchanged");
+	    else
+		func_style = temp_style;
+	}
     } else if (almost_equals(c_token,"li$nestyle") || equals(c_token, "ls" )) {
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set style line\"");
@@ -2618,9 +2624,14 @@ set_style()
 
     if (almost_equals(c_token, "d$ata"))
 	data_style = get_style();
-    else if (almost_equals(c_token, "f$unction"))
-	func_style = get_style();
-    else if (almost_equals(c_token, "l$ine")) {
+    else if (almost_equals(c_token, "f$unction")) {
+	enum PLOT_STYLE temp_style = get_style();
+
+	if (temp_style & 4)
+	    int_error(c_token, "style not usable for function plots, left unchanged");
+	else 
+	    func_style = temp_style;
+    } else if (almost_equals(c_token, "l$ine")) {
 	set_linestyle();
     } else
 	int_error(c_token, "expecting 'data', 'function', or 'line'");
@@ -2962,14 +2973,14 @@ set_range(axis)
 	} else if (almost_equals(c_token, "norev$erse")) {
 	    ++c_token;
 	    axis_array[axis].range_flags &= ~RANGE_REVERSE;
-}
+	}
 	if (almost_equals(c_token, "wr$iteback")) {
 	    ++c_token;
 	    axis_array[axis].range_flags |= RANGE_WRITEBACK;
 	} else if (almost_equals(c_token, "nowri$teback")) {
 	    ++c_token;
 	    axis_array[axis].range_flags &= ~RANGE_WRITEBACK;
-}
+	}
 }
   }
 

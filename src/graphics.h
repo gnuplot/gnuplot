@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.16 2000/10/31 19:59:31 joze Exp $
+ * $Id: graphics.h,v 1.17 2000/11/01 18:57:32 broeker Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -48,10 +48,10 @@
 typedef struct curve_points {
     struct curve_points *next;	/* pointer to next plot in linked list */
     int token;			/* last token nr., for second pass */
-    enum PLOT_TYPE plot_type;
-    enum PLOT_STYLE plot_style;
-    enum PLOT_SMOOTH plot_smooth;
-    char *title;
+    enum PLOT_TYPE plot_type;	/* data, function? 3D? */
+    enum PLOT_STYLE plot_style;	/* which "with" option in use? */
+    enum PLOT_SMOOTH plot_smooth; /* which "smooth" method to be used? */
+    char *title;		/* plot title, a.k.a. key entry */
     int title_no_enhanced;	/* don't typeset title in enhanced mode */
     struct lp_style_type lp_properties;
     int p_max;			/* how many points are allocated */

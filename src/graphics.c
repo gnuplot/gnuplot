@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.43 2001/01/18 14:16:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.44 2001/01/18 18:45:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1852,6 +1852,8 @@ struct curve_points *plot;
 	    ++goodcount;
 	}
 /* sort the data */
+    /* FIXME HBB 20010214: should replace home-grown bubblesort by
+     * call of qsort(), or at least insertion sort ... */
     for (bigi = i = 1; i < goodcount;) {
 	if (plot->points[gl[i]].x < plot->points[gl[i - 1]].x) {
 	    hold = gl[i];
@@ -1896,35 +1898,64 @@ struct curve_points *plot;
  * Draw vertical line for the histeps routine.
  * Performs clipping.
  */
+/* HBB 20010214: renamed parameters. xl vs. x1 is just _too_ easy to
+ * mis-read */
 static void
-histeps_vertical(xl, yl, x, y1, y2)
-int *xl, *yl;			/* keeps track of "cursor" position */
-double x, y1, y2;		/* coordinates of vertical line */
+histeps_vertical(cur_x, cur_y, x, y1, y2)
+    int *cur_x, *cur_y;		/* keeps track of "cursor" position */
+    double x, y1, y2;		/* coordinates of vertical line */
 {
     struct termentry *t = term;
     int xm, y1m, y2m;
 
-    if ((y1 < Y_AXIS.min && y2 < Y_AXIS.min) || (y1 > Y_AXIS.max && y2 > Y_AXIS.max) || x < X_AXIS.min || x > X_AXIS.max)
-	return;
+    /* FIXME HBB 20010215: wouldn't it be simpler to call
+     * draw_clip_line() instead? And in histeps_horizontal(), too, of
+     * course? */
 
-    if (y1 < Y_AXIS.min)
-	y1 = Y_AXIS.min;
-    if (y1 > Y_AXIS.max)
-	y1 = Y_AXIS.max;
-    if (y2 < Y_AXIS.min)
-	y2 = Y_AXIS.min;
-    if (y2 > Y_AXIS.max)
-	y2 = Y_AXIS.max;
+    /* HBB 20010215: reversed axes need special treatment, here: */
+    if (X_AXIS.min <= X_AXIS.max) {
+	if ((x < X_AXIS.min) || (x > X_AXIS.max))
+	    return;
+    } else {
+	if ((x < X_AXIS.max) || (x > X_AXIS.min))
+	    return;
+    }
 
+    if (Y_AXIS.min <= Y_AXIS.max) {
+	if ((y1 < Y_AXIS.min && y2 < Y_AXIS.min)
+	    || (y1 > Y_AXIS.max && y2 > Y_AXIS.max))
+	    return;
+	if (y1 < Y_AXIS.min)
+	    y1 = Y_AXIS.min;
+	if (y1 > Y_AXIS.max)
+	    y1 = Y_AXIS.max;
+	if (y2 < Y_AXIS.min)
+	    y2 = Y_AXIS.min;
+	if (y2 > Y_AXIS.max)
+	    y2 = Y_AXIS.max;
+    } else {	
+	if ((y1 < Y_AXIS.max && y2 < Y_AXIS.max)
+	    || (y1 > Y_AXIS.min && y2 > Y_AXIS.min))
+	    return;
+
+	if (y1 < Y_AXIS.max)
+	    y1 = Y_AXIS.max;
+	if (y1 > Y_AXIS.min)
+	    y1 = Y_AXIS.min;
+	if (y2 < Y_AXIS.max)
+	    y2 = Y_AXIS.max;
+	if (y2 > Y_AXIS.min)
+	    y2 = Y_AXIS.min;
+    }
     xm = map_x(x);
     y1m = map_y(y1);
     y2m = map_y(y2);
 
-    if (y1m != *yl || xm != *xl)
+    if (y1m != *cur_y || xm != *cur_x)
 	(*t->move) (xm, y1m);
     (*t->vector) (xm, y2m);
-    *xl = xm;
-    *yl = y2m;
+    *cur_x = xm;
+    *cur_y = y2m;
 
     return;
 }
@@ -1934,36 +1965,59 @@ double x, y1, y2;		/* coordinates of vertical line */
  * Performs clipping.
  */
 static void
-histeps_horizontal(xl, yl, x1, x2, y)
-int *xl, *yl;			/* keeps track of "cursor" position */
-double x1, x2, y;		/* coordinates of vertical line */
+histeps_horizontal(cur_x, cur_y, x1, x2, y)
+    int *cur_x, *cur_y;		/* keeps track of "cursor" position */
+    double x1, x2, y;		/* coordinates of vertical line */
 {
     struct termentry *t = term;
     int x1m, x2m, ym;
 
-    if ((x1 < X_AXIS.min && x2 < X_AXIS.min) ||
-	(x1 > X_AXIS.max && x2 > X_AXIS.max) ||
-	 y < Y_AXIS.min || y > Y_AXIS.max)
-	return;
+    /* HBB 20010215: reversed axes need special treatment, here: */
 
-    if (x1 < X_AXIS.min)
-	x1 = X_AXIS.min;
-    if (x1 > X_AXIS.max)
-	x1 = X_AXIS.max;
-    if (x2 < X_AXIS.min)
-	x2 = X_AXIS.min;
-    if (x2 > X_AXIS.max)
-	x2 = X_AXIS.max;
+    if (Y_AXIS.min <= Y_AXIS.max) {
+	if ((y < Y_AXIS.min) || (y > Y_AXIS.max))
+	    return;
+    } else {
+	if ((y < Y_AXIS.max) || (y > Y_AXIS.min))
+	    return;
+    }
 
+    if (X_AXIS.min <= X_AXIS.max) {
+	if ((x1 < X_AXIS.min && x2 < X_AXIS.min)
+	    || (x1 > X_AXIS.max && x2 > X_AXIS.max))
+	    return;
+
+	if (x1 < X_AXIS.min)
+	    x1 = X_AXIS.min;
+	if (x1 > X_AXIS.max)
+	    x1 = X_AXIS.max;
+	if (x2 < X_AXIS.min)
+	    x2 = X_AXIS.min;
+	if (x2 > X_AXIS.max)
+	    x2 = X_AXIS.max;
+    } else {
+	if ((x1 < X_AXIS.max && x2 < X_AXIS.max)
+	    || (x1 > X_AXIS.min && x2 > X_AXIS.min))
+	    return;
+
+	if (x1 < X_AXIS.max)
+	    x1 = X_AXIS.max;
+	if (x1 > X_AXIS.min)
+	    x1 = X_AXIS.min;
+	if (x2 < X_AXIS.max)
+	    x2 = X_AXIS.max;
+	if (x2 > X_AXIS.min)
+	    x2 = X_AXIS.min;
+    }
     ym = map_y(y);
     x1m = map_x(x1);
     x2m = map_x(x2);
 
-    if (x1m != *xl || ym != *yl)
+    if (x1m != *cur_x || ym != *cur_y)
 	(*t->move) (x1m, ym);
     (*t->vector) (x2m, ym);
-    *xl = x2m;
-    *yl = ym;
+    *cur_x = x2m;
+    *cur_y = ym;
 
     return;
 }
@@ -2476,7 +2530,7 @@ struct curve_points *plot;
  */
 static void
 plot_c_bars(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int i;			/* point index */
     struct termentry *t = term;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.35 2000/11/22 12:53:29 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.36 2001/01/16 20:56:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -297,7 +297,12 @@ get_data(current_plot)
     case BOXES:
 	min_cols = 2;
 	max_cols = 4;
-	current_plot->z_axis = current_plot->x_axis;
+	/* HBB 20010214: commented out. z_axis is abused to store a
+	 * flag here, not for the actual width, as I thought it
+	 * was. Setting it to x_axis would cause the x axis to be
+	 * auto-extended to contain -1 or 0 because of those magical
+	 * values */
+	/* current_plot->z_axis = current_plot->x_axis; */
 	break;
 
     default:
@@ -376,13 +381,15 @@ get_data(current_plot)
 
 	    if (current_plot->plot_style == BOXES && boxwidth > 0) {
 		/* calc width now */
-		store2d_point(current_plot, i++, v[0], v[1], v[0] - boxwidth / 2, v[0] + boxwidth / 2, v[1], v[1], 0.0);
+		store2d_point(current_plot, i++, v[0], v[1],
+			      v[0] - boxwidth / 2, v[0] + boxwidth / 2,
+			      v[1], v[1], 0.0);
 	    } else {
 		/* xlow and xhigh are same as x */
 		/* auto width if boxes, else ignored */
 		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
 			      v[1], -1.0);
-	    }
+	    } 
 	    break;
 
 
@@ -413,11 +420,11 @@ get_data(current_plot)
 		    break;
 
 		case BOXES:
-		    /* calculate xmin and xmax here, so that logs are taken if
-		     * if necessary
-		     */
-		    store2d_point(current_plot, i++, v[0], v[1], v[0] - v[2] / 2,
-				  v[0] + v[2] / 2, v[1], v[1], 0.0);
+		    /* calculate xmin and xmax here, so that logs are
+		     * taken if if necessary */
+		    store2d_point(current_plot, i++, v[0], v[1],
+				  v[0] - v[2] / 2, v[0] + v[2] / 2,
+				  v[1], v[1], 0.0);
 		    break;
 
 		}		/*inner switch */
@@ -535,12 +542,12 @@ get_data(current_plot)
 /* called by get_data for each point */
 static void
 store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
-struct curve_points *current_plot;
-int i;				/* point number */
-double x, y;
-double ylow, yhigh;
-double xlow, xhigh;
-double width;			/* -1 means autocalc, 0 means use xmin/xmax */
+    struct curve_points *current_plot;
+    int i;			/* point number */
+    double x, y;
+    double ylow, yhigh;
+    double xlow, xhigh;
+    double width;		/* BOXES widths: -1 -> autocalc, 0 -> use xlow/xhigh */
 {
     struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     int dummy_type = INRANGE;	/* sometimes we dont care about outranging */
@@ -624,7 +631,12 @@ double width;			/* -1 means autocalc, 0 means use xmin/xmax */
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
     STORE_WITH_LOG_AND_UPDATE_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
-    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, NOOP, cp->z = -VERYLARGE);
+    /* HBB 20010214: if z is not used for some actual value, just
+     * store 'width' to that axis and be done with it */
+    if ((int)current_plot->z_axis != -1)
+	STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, width, dummy_type, current_plot->z_axis, NOOP, cp->z = -VERYLARGE);
+    else 
+	cp->z = width;
 }				/* store2d_point */
 
 
@@ -1009,6 +1021,12 @@ eval_plots()
 		if (parametric && xparam)
 		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		this_plot->plot_style = get_style();
+		if ((this_plot->plot_type == FUNC)
+		    && (this_plot->plot_style & 4))
+		    {
+			int_warn(c_token, "This plot style is only for datafiles, reverting to \"points\"");
+			this_plot->plot_style = POINTSTYLE;
+		    }
 	    }
 
 	    /* pick up line/point specs

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.6 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.7 2001/02/01 17:56:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1470,15 +1470,18 @@ axis_position_zeroaxis(axis)
      AXIS_INDEX axis;
 {
     TBOOLEAN is_inside = FALSE;
+    AXIS *this = axis_array + axis;
 
-    if ((axis_array[axis].min >= 0.0 && axis_array[axis].max >= 0.0)
-	|| axis_array[axis].log) {
-	/* save for impulse plotting */
-	axis_array[axis].term_zero = axis_array[axis].term_lower;	
-    } else if (axis_array[axis].min <= 0.0 && axis_array[axis].max <= 0.0) {
-	axis_array[axis].term_zero = axis_array[axis].term_upper;
+    /* HBB 20020215: correctly treat reversed axes, too! */
+    if ((this->min >= 0.0 && this->max >= 0.0)
+	|| this->log) {
+	this->term_zero = (this->max < this->min)
+	    ? this->term_upper : this->term_lower;	
+    } else if (this->min <= 0.0 && this->max <= 0.0) {
+	this->term_zero = (this->max < this->min)
+	    ? this->term_lower : this->term_upper;
     } else {
-	axis_array[axis].term_zero = AXIS_MAP(axis, 0.0);
+	this->term_zero = AXIS_MAP(axis, 0.0);
 	is_inside = TRUE;
     }
 
@@ -1489,15 +1492,17 @@ void
 axis_draw_2d_zeroaxis(axis, crossaxis)
     AXIS_INDEX axis, crossaxis;
 {
+    AXIS *this = axis_array + axis;
+
     if (axis_position_zeroaxis(crossaxis)
-	    && (axis_array[axis].zeroaxis.l_type > -3)) {
-	term_apply_lp_properties(&axis_array[axis].zeroaxis);
+	    && (this->zeroaxis.l_type > -3)) {
+	term_apply_lp_properties(&this->zeroaxis);
 	if ((axis % SECOND_AXES) == FIRST_X_AXIS) {
-	    (*term->move) (axis_array[axis].term_lower, axis_array[crossaxis].term_zero);
-	    (*term->vector) (axis_array[axis].term_upper, axis_array[crossaxis].term_zero);
+	    (*term->move) (this->term_lower, axis_array[crossaxis].term_zero);
+	    (*term->vector) (this->term_upper, axis_array[crossaxis].term_zero);
 	} else {
-	    (*term->move) (axis_array[crossaxis].term_zero, axis_array[axis].term_lower);
-	    (*term->vector) (axis_array[crossaxis].term_zero, axis_array[axis].term_upper);
+	    (*term->move) (axis_array[crossaxis].term_zero, this->term_lower);
+	    (*term->vector) (axis_array[crossaxis].term_zero, this->term_upper);
 	}
     }
 }

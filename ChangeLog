@@ -1,3 +1,32 @@
+2001-02-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (axis_position_zeroaxis): Fixed behaviour for
+ 	reversed axes if 0.0 is not inside the range.
+	
+	* src/graphics.c (histeps_vertical, histeps_horizontal): Added
+ 	code to handle clipping lines on reversed axes. Renamed parameters
+ 	'xl' and 'yl' to 'cur_x' and 'cur_y', in order to avoid confusion
+ 	with 'x1' and 'y1'.
+
+2001-02-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (get_data): For BOXES plots, don't set z_axis of
+ 	the plot to x_axis. That element is only used for a marker, not
+ 	for an actual x value.
+	(store2d_point): If z_axis of current plot is unused (-1), simply
+ 	store 'width' argument as the z value, without any of the usual
+ 	processing by STORE_WITH_LOG_AND_UPDATE_RANGE.
+	(eval_plots): Catch plot styles that don't work for functions.
+  	Prints a warning and reverts to 'with points'
+	
+	* src/plot3d.c (eval_3dplots): Catch plot styles that don't work
+ 	for functions.  Prints a warning and reverts to 'with points'
+
+	* src/set.c (set_command): In 'set function style' handler, check
+ 	that plot style is applicable to function plots. If it isn't,
+ 	issue an error message and keep previous value.
+	(set_style): dito, for 'set style function' handler.
+
 2001-02-12  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.h (MyVFPrintF): Fix typo: missing semicolon after

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.2.2.3 2000/06/22 12:57:38 broeker Exp $
+ * $Id: gp_types.h,v 1.3 2000/11/01 18:57:28 broeker Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -77,6 +77,9 @@ typedef enum PLOT_STYLE {
 	HISTEPS      = 13*8 + 1,
 	VECTOR       = 14*8 + 1,
 	CANDLESTICKS = 15*8 + 4,
+	/* FIXME HBB 20010214: shouldn't fincancebars have 4 or 5?
+	 * They behave very much like errorbars, with the sole
+	 * exception of the key entry ... */
 	FINANCEBARS  = 16*8 + 1,
 	XERRORLINES  = 17*8 + 7,
 	YERRORLINES  = 18*8 + 7,
