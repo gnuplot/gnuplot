@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.107 2004/05/17 05:28:11 sfeam Exp $
+ * $Id: post.trm,v 1.108 2004/05/27 07:58:10 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -655,6 +655,7 @@ int can_reencode;
 static int PS_pen_x, PS_pen_y;
 static int PS_taken;
 static int PS_linetype_last;
+static double PS_linewidth_last; /* HBB NEW 20031219 */
 static TBOOLEAN PS_relative_ok;
 
 /* HBB 990914: PS_SOLID is already used by the WIN32 API headers.
@@ -1771,7 +1772,7 @@ gnudict begin\ngsave\n\
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
     PS_taken = 0;
-    PS_linetype_last = -1;
+    PS_linewidth_last = PS_linetype_last =  -1;
 }
 
 
@@ -1830,6 +1831,11 @@ PS_linetype(linetype)
      */
     if (PS_linetype_last == linetype) return;
 #endif
+
+    /* HBB 20031219: use PS_FLUSH_PATH! */
+    /* PS_relative_ok = FALSE; */
+    PS_FLUSH_PATH;
+
     PS_linetype_last = linetype;
     fprintf(gpoutfile,"LT%c\n", "wba012345678"[linetype]);
     ps_path_count = 0;
@@ -1838,31 +1844,38 @@ PS_linetype(linetype)
 
 TERM_PUBLIC void
 PS_linewidth (linewidth)
-double linewidth;
+    double linewidth;
 {
-        fprintf(gpoutfile,"%.3f UL\n",linewidth);
+    /* HBB NEW 20031219: don't do anything if nothing changed */
+    if (ps_path_count != 0 && PS_linewidth_last == linewidth)
+	return;
+    PS_linewidth_last = linewidth;
+    PS_linetype_last = -1;	/* disable cache for next linetype change */
 
-/*  
-  Documentation of the 'change linewidth' strategy of the postscript terminal:
+    PS_FLUSH_PATH;
+    fprintf(gpoutfile,"%.3f UL\n",linewidth);
 
-  1. define a new postscript variable with a default value:
-     /userlinewidth gnulinewidth def
+    /*  
+	Documentation of the 'change linewidth' strategy of the postscript terminal:
 
-  2. define a new postscript command to change the contents of that variable:
-     /UL { gnulinewidth mul /userlinewidth exch def } def
-     usage:  multiplication_factor UL
+	1. define a new postscript variable with a default value:
+	/userlinewidth gnulinewidth def
 
-  3. modify the already known postscript command /PL for the plot lines:
-     /PL { stroke userlinewidth setlinewidth } def
+	2. define a new postscript command to change the contents of that variable:
+	/UL { gnulinewidth mul /userlinewidth exch def } def
+	usage:  multiplication_factor UL
 
-  4. issue the new command before every change of the plot linestyle:
-     example:
-         4.0 UL
-         LT0
-     result:
-         Linetype 0 is drawn four times as thick as defined by the contents
-         of the postscript variable 'gnulinewidth'.
-*/
+	3. modify the already known postscript command /PL for the plot lines:
+	/PL { stroke userlinewidth setlinewidth } def
+
+	4. issue the new command before every change of the plot linestyle:
+	example:
+	4.0 UL
+	LT0
+	result:
+	Linetype 0 is drawn four times as thick as defined by the contents
+	of the postscript variable 'gnulinewidth'.
+    */
 }
 
 
@@ -2071,8 +2084,8 @@ const char *font;
 
 TERM_PUBLIC void
 PS_point(x,y,number)
-unsigned int x,y;
-int number;
+    unsigned int x,y;
+    int number;
 {
     static const char GPFAR * GPFAR pointFNS[] = {
 	"Pnt",  "Pls",   "Crs",    "Star",
@@ -2103,7 +2116,7 @@ int number;
 
     PS_relative_ok = FALSE;
     ps_path_count = 0;
-    PS_linetype_last = -1; /* force next linetype change */
+    PS_linewidth_last = PS_linetype_last =  -1; /* force next linetype change */
 }
 
 TERM_PUBLIC void
@@ -2180,7 +2193,7 @@ PS_fillbox(style, x1,y1,width,height)
 #endif /* USE_ULIG_FILLEDBOXES */
 
     PS_relative_ok = FALSE;
-    PS_linetype_last = -1;
+    PS_linewidth_last = PS_linetype_last =  -1;
 }
 
 
