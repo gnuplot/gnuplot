@@ -1405,7 +1405,7 @@ char *s;
 {
     if (missing_val != NULL) {
 	int len = strlen(missing_val);
-	if (strncmp(s, missing_val, len) == 0 &&
+	if (STREQN(s, missing_val, len) &&
 	    (isspace((int)s[len]) || !s[len])) {
 	    return (1);;	/* store undefined point in plot */
 	}

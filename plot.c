@@ -401,7 +401,7 @@ char **argv;
 #endif
 
     gpoutfile = stdout;
-    (void) Gcomplex(&udv_pi.udv_value, Pi, 0.0);
+    (void) Gcomplex(&udv_pi.udv_value, M_PI, 0.0);
 
     init_memory();
 
@@ -517,7 +517,7 @@ char **argv;
 		noend = 1;
 	    else
 #endif
-	    if (strcmp(*argv, "-") == 0) {
+	    if (STREQ(*argv, "-")) {
 		/* DBT 10-7-98  go interactive if "-" on command line */
 
 		interactive = TRUE;

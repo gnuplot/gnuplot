@@ -153,7 +153,7 @@ const char *cs, *ct;
   len = strlen(ct);
   while (*cs)
     {
-      if (strncmp(cs, ct, len)==0)
+      if (STREQN(cs, ct, len))
 	return (char *)cs;
       cs++;
     }

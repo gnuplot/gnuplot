@@ -515,7 +515,7 @@ void mainloop()
 	if (xe.type == ClientMessage && xe.xclient.window == message_window) {
 	    if (xe.xclient.message_type == None &&
 		xe.xclient.format == 8 &&
-		strcmp(xe.xclient.data.b, "die gnuplot die") == 0) {
+		STREQ(xe.xclient.data.b, "die gnuplot die")) {
 		FPRINTF((stderr, "quit message from ast\n"));
 		return;
 	    } else {

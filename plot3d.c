@@ -213,7 +213,7 @@ void plot3drequest()
 
     is_3d_plot = TRUE;
 
-    if (parametric && strcmp(dummy_var[0], "t") == 0) {
+    if (parametric && STREQ(dummy_var[0], "t")) {
 	strcpy(dummy_var[0], "u");
 	strcpy(dummy_var[1], "v");
     }
@@ -1436,7 +1436,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	}
     }				/* draw_contour */
     /* perform the plot */
-    if (strcmp(term->name, "table") == 0)
+    if (STREQ(term->name, "table"))
 	print_3dtable(plot_num);
     else {
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */

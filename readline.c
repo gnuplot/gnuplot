@@ -852,7 +852,7 @@ char tos_getch()
     int scan_code;
     static int in_help = 0;
 
-    if (strcmp(term->name, "atari") == 0)
+    if (STREQ(term->name, "atari"))
 	poll_events(0);
 
     if (in_help) {
@@ -877,7 +877,7 @@ char tos_getch()
 	    return ' ';
 	}
     }
-    if (strcmp(term->name, "atari") == 0) {
+    if (STREQ(term->name, "atari")) {
 	do {
 	    if (Bconstat(2))
 		rawkey = Cnecin();

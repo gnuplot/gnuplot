@@ -212,7 +212,7 @@ void plotrequest()
 
     is_3d_plot = FALSE;
 
-    if (parametric && strcmp(dummy_var[0], "u") == 0)
+    if (parametric && STREQ(dummy_var[0], "u"))
 	strcpy(dummy_var[0], "t");
 
     /* initialise the arrays from the 'set' scalars */
@@ -1255,10 +1255,10 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
   }
 
     WRITEBACK(FIRST_X_AXIS, xmin, xmax)
-	WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
-	WRITEBACK(SECOND_X_AXIS, x2min, x2max)
-	WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
-	if (strcmp(term->name, "table") == 0)
+    WRITEBACK(FIRST_Y_AXIS, ymin, ymax)
+    WRITEBACK(SECOND_X_AXIS, x2min, x2max)
+    WRITEBACK(SECOND_Y_AXIS, y2min, y2max)
+    if (STREQ(term->name, "table"))
 	print_table(first_plot, plot_num);
     else {
 	START_LEAK_CHECK();	/* check for memory leaks in this routine */
