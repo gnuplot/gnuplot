@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.13 1999/06/14 19:23:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.14 1999/06/17 14:17:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -53,9 +53,9 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.13 1999/06/14 19:23:21 lhec
 extern TBOOLEAN is_3d_plot;
 
 /* From version.c, used in show_version () */
-extern char version[];
-extern char patchlevel[];
-extern char date[];
+extern char gnuplot_version[];
+extern char gnuplot_patchlevel[];
+extern char gnuplot_date[];
 extern char gnuplot_copyright[];
 extern char faq_location[];
 extern char bug_email[];
@@ -1524,7 +1524,7 @@ show_variables()
 
     fputs("\n\tVariables:\n", stderr);
     while (udv) {
-	len = instring(udv->udv_name, ' ');
+	len = strcspn(udv->udv_name, " ");
 	fprintf(stderr, "\t%-*s ", len, udv->udv_name);
 	if (udv->udv_undef)
 	    fputs("is undefined\n", stderr);
@@ -1586,9 +1586,9 @@ FILE *fp;
 %s\n",
 	    p,			/* empty line */
 	    p, PROGRAM,
-	    p, OS, version,
-	    p, patchlevel,
-	    p, date,
+	    p, OS, gnuplot_version,
+	    p, gnuplot_patchlevel,
+	    p, gnuplot_date,
 	    p,			/* empty line */
 	    p, gnuplot_copyright,
 	    p,			/* authors */
@@ -1775,8 +1775,8 @@ static void
 show_position(pos)
 struct position *pos;
 {
-    static char *msg[] =
-    {"(first axes) ", "(second axes) ", "(graph units) ", "(screen units) "};
+    static const char *msg[] = { "(first axes) ", "(second axes) ",
+				 "(graph units) ", "(screen units) " };
 
     assert(first_axes == 0 && second_axes == 1 && graph == 2 && screen == 3);
 
