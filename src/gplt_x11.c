@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.80 2004/01/07 14:45:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.81 2004/01/07 19:11:30 lhecking Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4548,7 +4548,7 @@ pr_window(plot_struct *plot)
 #define TEMP_NUM_LEN 16
     {
     /* append the X11 terminal number (if greater than zero) */
-    char numstr[strlen(ICON_TEXT)+TEMP_NUM_LEN+1]; /* space for text, number and terminating \0 */
+    char numstr[sizeof(ICON_TEXT)+TEMP_NUM_LEN+1]; /* space for text, number and terminating \0 */
     if (plot->plot_number)
 	sprintf(numstr, "%s%d%c", ICON_TEXT, plot->plot_number, '\0');
     else
