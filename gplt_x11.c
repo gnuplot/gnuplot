@@ -92,16 +92,15 @@ static char *RCSid = "$Id: gplt_x11.c,v 1.71 1998/04/14 00:15:22 drd Exp $";
  */
 
 #ifdef EXPORT_SELECTION
-#undef EXPORT_SELECTION
+# undef EXPORT_SELECTION
 #endif /* EXPORT SELECTION */
 #ifndef NOEXPORT
-#define EXPORT_SELECTION XA_PRIMARY
+# define EXPORT_SELECTION XA_PRIMARY
 #endif  /* NOEXPORT */
 
 
-#define DEFAULT_X11
-#if defined(VMS) || defined(CRIPPLED_SELECT)
-#undef DEFAULT_X11
+#if !(defined(VMS) || defined(CRIPPLED_SELECT))
+# define DEFAULT_X11
 #endif
 
 #if defined(VMS) && defined(CRIPPLED_SELECT)
@@ -130,43 +129,41 @@ Error. Incompatible options.
 #endif /* HAVE_SYS_BSDTYPES_H */
 
 #ifdef __EMX__
-# include <sys/select.h>
+/* for gethostname ... */
 # include <netdb.h>
-#else /* not __EMX__ */
-# if defined(HAVE_SYS_SELECT_H) && !defined(VMS) && !defined(FD_SET)
+#endif
+
+# if defined(HAVE_SYS_SELECT_H) && !defined(VMS)
 #  include <sys/select.h>
-# endif /* HAVE_SYS_SELECT_H && !VMS && !FD_SET */
-#endif /* not __EMX__ */
+# endif /* HAVE_SYS_SELECT_H && !VMS */
 
 #ifndef FD_SET
-
-#define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
-#define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
-#define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
-#define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p))) 
-
-#endif /* !FD_SET */
+# define FD_SET(n, p)    ((p)->fds_bits[0] |= (1 << ((n) % 32)))
+# define FD_CLR(n, p)    ((p)->fds_bits[0] &= ~(1 << ((n) % 32)))
+# define FD_ISSET(n, p)  ((p)->fds_bits[0] & (1 << ((n) % 32)))
+# define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p))) 
+#endif /* not FD_SET */
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
-#include <sys/systeminfo.h>
-#define SYSINFO_METHOD "sysinfo"
-#define GP_SYSTEMINFO(host) sysinfo (SI_HOSTNAME, (host), MAXHOSTNAMELEN)
+# include <sys/systeminfo.h>
+# define SYSINFO_METHOD "sysinfo"
+# define GP_SYSTEMINFO(host) sysinfo (SI_HOSTNAME, (host), MAXHOSTNAMELEN)
 #else
-#define SYSINFO_METHOD "gethostname"
-#define GP_SYSTEMINFO(host) gethostname ((host), MAXHOSTNAMELEN)
+# define SYSINFO_METHOD "gethostname"
+# define GP_SYSTEMINFO(host) gethostname ((host), MAXHOSTNAMELEN)
 #endif /* HAVE_SYS_SYSTEMINFO_H && HAVE_SYSINFO */
 
 #ifdef VMS
-#ifdef __DECC
-#include <starlet.h>
-#endif /* __DECC */
-#define EXIT(status) sys$delprc(0,0)	  /* VMS does not drop itself */
+# ifdef __DECC
+#  include <starlet.h>
+# endif /* __DECC */
+# define EXIT(status) sys$delprc(0,0)	  /* VMS does not drop itself */
 #else
-#define EXIT(status) exit(status)
+# define EXIT(status) exit(status)
 #endif
 
 #ifdef OSK
-#define EINTR	E_ILLFNC
+# define EINTR	E_ILLFNC
 #endif
 
 /* information about one window/plot */
@@ -283,7 +280,8 @@ XSegment Plus[2], Cross[2], Star[4];
 int main(argc, argv) int argc; char *argv[]; {
 
 
-#ifdef OSK	/* malloc large blocks, otherwise problems with fragmented mem */
+#ifdef OSK
+   /* malloc large blocks, otherwise problems with fragmented mem */
    _mallocmin (102400);
 #endif
 
@@ -682,7 +680,7 @@ int record()
    	  clearerr (X11_ipc);  /* nothing wrong! Probably a bug in my select()? */
 #else
    if (feof(X11_ipc) || ferror(X11_ipc)) return 0;
-#endif
+#endif /* not OSK */
 
 	return 1;
 }
