@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.35 1998/06/18 14:59:27 ddenholm Exp $
+ * $Id: x11.trm,v 1.11 1998/12/17 22:08:13 lhecking Exp $
  *
  */
 
@@ -73,7 +73,9 @@ TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, uns
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-int X11_Display = 0;		/* non-zero if '-display' found on command line */
+
+/* non-zero if '-display' found on command line */
+int X11_Display = 0;
 
 
 /* sunos 4 uses on_exit() in place of atexit(). If both are missing,
@@ -98,58 +100,79 @@ int X11_Display = 0;		/* non-zero if '-display' found on command line */
 
 static void X11_atexit HANDLER_PROTO;
 
-static char X11_opts[][20] =
+/* Merged the old char X11_opts[] and int X11_optarg[]
+ * into one array of structs.
+ * Loosely based on XrmOptionDescRec, the use of which
+ * would probably be overkill here. */
+typedef enum { hasNoArg, hasArg } OptionArg;
+
+static struct x11opt {
+    const char *option;	/* Name of option */
+    OptionArg arg;	/* Whether option has argument */
+}  X11_opts[] =
 {
-    "-mono", "-gray", "-clear", "-tvtwm", "-pointsize",
-    "-iconic", "-rv", "-reverse", "+rv", "-synchronous",
-    "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
-    "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name",
-    "-selectionTimeout", "-title", "-xnllanguage", "-xrm",
-    "-raise", "-noraise", "-persist"
+   { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
+   { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
+   { "-iconic", hasNoArg }, { "-rv", hasNoArg },
+   { "-reverse", hasNoArg }, { "+rv", hasNoArg },
+   { "-synchronous", hasNoArg },
+   { "-display", hasArg }, { "-geometry", hasArg }, { "-bg", hasArg },
+   { "-background", hasArg }, { "-bd", hasArg },
+   { "-bordercolor", hasArg }, { "-bw", hasArg },
+   { "-borderwidth", hasArg }, { "-fg", hasArg },
+   { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
+   { "-name", hasArg },
+   { "-selectionTimeout", hasArg }, { "-title", hasArg },
+   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
+   { "-raise", hasNoArg }, { "-noraise", hasNoArg },
+   { "-persist", hasNoArg }
 };
 
 #define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
 
-static int X11_optarg[X11_nopts] =
-{
-    0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1,
-    0, 0, 0
-};
-
 static FILE *X11_ipc;
-#ifdef OS2
-static char X11_command[1024] = "gnuplot_x11.exe";
-#else
-static char X11_command[1024] = "gnuplot_x11";
-#endif
+
+static char **xargv = (char **)NULL;
+static char *optvec[2*X11_nopts+1];
+# ifdef OS2
+static char X11_command[] = "gnuplot_x11.exe";
+# else
+static char X11_command[] = "gnuplot_x11";
+# endif /* !OS/2 */
 
 /*   X11_args - scan gnuplot command line for standard X Toolkit options
  * called from plot.c so must not be TERM_PUBLIC (which may be static)
  */
 
-int X11_args(argc, argv)
+int
+X11_args(argc, argv)
 int argc;
 char *argv[];
 {
-    int nx11 = 0, n;
+    int nx11 = 0, i = 0, n;
 
-    while (++argv, --argc > 0) {
+    xargv = (char **) gp_alloc (argc*sizeof(char *), "<xargv>");
+
+    if (!xargv) {
+	fputs ("not enough memory to copy argv - quitting\n", stderr);
+	exit (EXIT_FAILURE);
+    }
+
+    /* We make a copy of the argument vector because
+     * argv is modified later. */
+    memcpy (xargv, argv, argc*sizeof(char *));
+    optvec[i++] = X11_command;
+
+    while (++argv, ++xargv, --argc > 0) {
 	for (n = 0; n < X11_nopts; n++) {
-	    if (!strcmp(*argv, X11_opts[n])) {
-		strcat(X11_command, " ");
-		strcat(X11_command, *argv);
+	    if (strcmp(*argv, X11_opts[n].option) == 0) {
+		optvec[i++] = *xargv;
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
-		if (X11_optarg[n]) {
+		if (X11_opts[n].arg == hasArg) {
 		    if (--argc <= 0)
-			return (nx11);
-		    strcat(X11_command, " \"");
-		    strcat(X11_command, *++argv);
-		    strcat(X11_command, "\"");
+			return nx11;
+		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
 		}
 		nx11++;
@@ -159,13 +182,15 @@ char *argv[];
 	if (n == X11_nopts)
 	    break;
     }
+
     return (nx11);
 }
 
 
 static unsigned int X11_plot_number;
 
-TERM_PUBLIC void X11_options()
+TERM_PUBLIC void
+X11_options()
 {
     if (almost_equals(c_token, "res$et")) {
 	X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
@@ -194,7 +219,7 @@ TERM_PUBLIC void X11_options()
 
 #define DEFAULT_X11
 #if defined(VMS) || defined(CRIPPLED_SELECT)
-#undef DEFAULT_X11
+# undef DEFAULT_X11
 #endif
 #if defined(VMS) && defined(CRIPPLED_SELECT)
 Error.Incompatible options.
@@ -212,14 +237,22 @@ Error.Incompatible options.
  *   DEFAULT_X11 popen() pipe IPC
  *---------------------------------------------------------------------------*/
 
-	static void X11_atexit HANDLER_DECL { if (X11_ipc) {
+static void
+X11_atexit HANDLER_DECL
+{
+    if (X11_ipc) {
 	fputs("R\n", X11_ipc);
 	fclose(X11_ipc);
 	/* dont wait(), since they might be -persist */
 	X11_ipc = NULL;
     }
-} TERM_PUBLIC void X11_init()
+}
+
+TERM_PUBLIC void
+X11_init()
 {
+    static int been_here = 0;
+
     if (!X11_ipc) {
 	/* first time through or after a reset */
 #if defined(OSK) || defined(OS2)
@@ -227,33 +260,34 @@ Error.Incompatible options.
 	 * we can safely use it here
 	 */
 	X11_ipc = popen(X11_command, "w");
-#else
+#else /* !(OSK || OS/2) */
 	int fdes[2];
-	pipe(fdes);
+
+	if (pipe(fdes)) perror("pipe() failed:");
+
 	if (fork() == 0) {
 	    /* child */
 	    close(fdes[1]);
 	    dup2(fdes[0], 0);	/* stdin from pipe */
-	    execl("/bin/sh", "sh", "-c", X11_command, NULL);
+	    execvp(X11_command, optvec);
 	    /* if we get here, something went wrong */
 	    perror("exec failed");
-	    exit(1);
+	    exit(EXIT_FAILURE);
 	}
 	/* parent */
 	close(fdes[0]);		/* read end of pipe */
 	X11_ipc = fdopen(fdes[1], "w");
-#endif
-    } {
-	static int been_here = 0;
-	if (!been_here) {
-	    atexit(X11_atexit);
-	    been_here = 1;
-	}
+#endif /* !(OSK || OS/2) */
     }
 
+    if (!been_here) {
+	atexit(X11_atexit);
+	been_here++;
+    }
 }
 
-TERM_PUBLIC void X11_reset()
+TERM_PUBLIC void
+X11_reset()
 {
     /* leave the pipe alone, until exit or  set term x11 reset */
 }
@@ -269,10 +303,9 @@ TERM_PUBLIC void X11_reset()
 
 #define BEFORE_GRAPHICS		/* nowt */
 #define AFTER_TEXT		/* nowt */
-#endif /* DEFAULT_X11 */
 
 
-#ifdef CRIPPLED_SELECT
+#elif defined(CRIPPLED_SELECT)
 
 /* PLEASE CAN SOMEONE CHECK THAT THIS STILL WORKS !!! */
 
@@ -283,10 +316,11 @@ TERM_PUBLIC void X11_reset()
 static char X11_tmp[32], X11_tmp0[32], X11_shutdown[32];
 static int X11_pid;
 
-TERM_PUBLIC void X11_init()
+TERM_PUBLIC void
+X11_init()
 {
     if (!(X11_pid = fork())) {
-	execl("/bin/sh", "sh", "-c", X11_command, NULL);
+	execvp(X11_command, optvec);
 	_exit(1);
     }
     sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
@@ -294,7 +328,8 @@ TERM_PUBLIC void X11_init()
     sprintf(X11_shutdown, "echo R >%s", X11_tmp);
 }
 
-TERM_PUBLIC void X11_reset()
+TERM_PUBLIC void
+X11_reset()
 {
     system(X11_shutdown);
 }
@@ -315,11 +350,11 @@ TERM_PUBLIC void X11_reset()
 #define PRINT5(fmt,p1,p2,p3,p4,p5) fprintf(X11_ipc, fmt,p1,p2,p3,p4,p5)
 #define FFLUSH()             fflush(X11_ipc)
 
-static void X11_atexit HANDLER_DECL { /* WHAT SHOULD I DO ? */
+static void
+X11_atexit HANDLER_DECL { /* WHAT SHOULD I DO ? */
 }
 
-#endif				/* CRIPPLED_SELECT */
-#ifdef VMS
+#elif defined(VMS)
 /*-----------------------------------------------------------------------------
  *   VMS mailbox/spawn IPC - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
  *---------------------------------------------------------------------------*/
@@ -349,7 +384,8 @@ struct iosb {
 };
 
 
-TERM_PUBLIC void X11_init()
+TERM_PUBLIC void
+X11_init()
 {
 
     struct iosb iosb;
@@ -368,7 +404,9 @@ TERM_PUBLIC void X11_init()
 	    devnam.dsc$a_pointer,
 	    &devnam.dsc$w_length, 0
     };
-
+#define CMDLEN 1024
+    char cmdline[CMDLEN], *cmdp;
+    int optindex;
 
     if (!X11_channel) {
 	int one = 1;
@@ -376,22 +414,35 @@ TERM_PUBLIC void X11_init()
 	/* Create a descriptor for the command line that starts
 	   GNUPLOT_X11. $DESCRIP doesn't work in this context... */
 
+	/* FIXME!
+	 * This does not work anymore since X11 option passing has been
+	 * changed to use execvp() in the DEFAULT_X11 case
+	 */
 	struct dsc$descriptor_s pgmdsc =
 	{0, DSC$K_DTYPE_T,
 	 DSC$K_CLASS_S, 0};
-	pgmdsc.dsc$w_length = strlen(X11_command);
-	pgmdsc.dsc$a_pointer = X11_command;
-
+        optindex = 0;
+        strcpy (cmdline, optvec[optindex]);
+        cmdp = cmdline + strlen (optvec[optindex]);
+        while (optvec[++optindex] != NULL) {
+          *cmdp++ = ' ';
+          *cmdp++ = '\"';
+          strcpy (cmdp, optvec[optindex]);
+          cmdp += strlen (optvec[optindex]);
+          *cmdp++ = '\"';
+        }
+	pgmdsc.dsc$w_length = cmdp-cmdline;
+	pgmdsc.dsc$a_pointer = cmdline;
 
 	/* Create a mailbox which will be used as a pipe for commands to the 
-	   subprocess.  What we'll write to it will be read by the subprocess as 
-	   its STDIN.  Use an unnamed mailbox and refer to it by its device
-	   number */
+	 * subprocess.  What we'll write to it will be read by the subprocess
+	 * as its STDIN.  Use an unnamed mailbox and refer to it by its device
+	 * number */
 
 	vaxc$errno = sys$crembx(0, &X11_channel, MBXMXMSG, MBXMXMSG, 0, 0, 0, 0);
 	if ((vaxc$errno & SS$_NORMAL) != SS$_NORMAL) {
 	    printf("SYS$CreMbx failed with status=%d\r\n", vaxc$errno);
-	    os_error("sys$crembx failed", NO_CARET);
+	    os_error(NO_CARET, "sys$crembx failed");
 	}
 	vaxc$errno = sys$getdviw(0, X11_channel, 0, &item_list, &iosb, 0, 0, 0);
 	if ((vaxc$errno & SS$_NORMAL) == SS$_NORMAL)
@@ -400,7 +451,7 @@ TERM_PUBLIC void X11_init()
 	    printf("SYS$Getdviw failed with status=%d\r\n", vaxc$errno);
 	    sys$dassgn(X11_channel);
 	    X11_channel = 0;
-	    os_error("sys$getdviw failed", NO_CARET);
+	    os_error(NO_CARET, "sys$getdviw failed");
 	}
 	/* Create a subprocess whose input is this mailbox. */
 	vaxc$errno = lib$spawn(&pgmdsc, &devnam, 0, &one, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -408,7 +459,7 @@ TERM_PUBLIC void X11_init()
 	    printf("LIB$SPAWN failed with status=%d\r\n", vaxc$errno);
 	    sys$dassgn(X11_channel);
 	    X11_channel = 0;
-	    os_error("lib$spawn failed", NO_CARET);
+	    os_error(NO_CARET, "lib$spawn failed");
 	}
     } {
 	static int been_here = 0;
@@ -450,32 +501,38 @@ TERM_PUBLIC void X11_init()
 #define BEFORE_GRAPHICS		/* nowt */
 #define AFTER_TEXT		/* nowt */
 
-    static void X11_atexit HANDLER_DECL { if (X11_channel) {
+static void
+X11_atexit HANDLER_DECL
+{
+    if (X11_channel) {
 	PRINT0("R\n");
 	sleep(2);		/* Wait for subprocess to finish */
 	sys$dassgn(X11_channel);
 	X11_channel = 0;
     }
-} TERM_PUBLIC void X11_reset()
+}
+
+TERM_PUBLIC void
+X11_reset()
 {
     /* do nothing until exit */
 }
 
-#endif /* VMS */
-
-
-
+#else /* !VMS */
+You lose.
+#endif /* !VMS */
 
 
 /* common stuff, using macros defined above */
 
 
-
-TERM_PUBLIC void X11_graphics()
+TERM_PUBLIC void
+X11_graphics()
 {
     BEFORE_GRAPHICS;		/* kludge for crippled select */
 
-    PRINT1("G%d\n", X11_plot_number);	/* for VMS sake, keep as separate prints */
+    /* for VMS sake, keep as separate prints */
+    PRINT1("G%d\n", X11_plot_number);
 
 #ifdef ULTRIX_KLUDGE
     fflush(X11_ipc);
@@ -483,7 +540,8 @@ TERM_PUBLIC void X11_graphics()
 
 }
 
-TERM_PUBLIC void X11_text()
+TERM_PUBLIC void
+X11_text()
 {
     PRINT0("E\n");
     FFLUSH();
@@ -496,38 +554,44 @@ TERM_PUBLIC void X11_text()
 }
 
 
-TERM_PUBLIC void X11_move(x, y)
+TERM_PUBLIC void
+X11_move(x, y)
 unsigned int x, y;
 {
     PRINT2("M%04d%04d\n", x, y);
 }
 
-TERM_PUBLIC void X11_vector(x, y)
+TERM_PUBLIC void
+X11_vector(x, y)
 unsigned int x, y;
 {
     PRINT2("V%04d%04d\n", x, y);
 }
 
-TERM_PUBLIC void X11_pointsize(ps)
+TERM_PUBLIC void
+X11_pointsize(ps)
 double ps;
 {
     PRINT2("P7%04d%04d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
-TERM_PUBLIC void X11_linewidth(lw)
+TERM_PUBLIC void
+X11_linewidth(lw)
 double lw;
 {
     PRINT1("W%04d\n", (int) lw);
 }
 
-TERM_PUBLIC void X11_linetype(lt)
+TERM_PUBLIC void
+X11_linetype(lt)
 int lt;
 {
     PRINT1("L%04d\n", lt);
 }
 
-TERM_PUBLIC void X11_put_text(x, y, str)
+TERM_PUBLIC void
+X11_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
@@ -537,14 +601,16 @@ char str[];
     }
 }
 
-TERM_PUBLIC int X11_justify_text(mode)
+TERM_PUBLIC int
+X11_justify_text(mode)
 enum JUSTIFY mode;
 {
     PRINT1("J%04d\n", mode);
     return (TRUE);
 }
 
-TERM_PUBLIC void X11_point(x, y, number)
+TERM_PUBLIC void
+X11_point(x, y, number)
 unsigned int x, y;
 int number;
 {
@@ -554,7 +620,8 @@ int number;
     PRINT3("P%01d%04d%04d\n", number, x, y);
 }
 
-TERM_PUBLIC void X11_fillbox(style, x, y, w, h)
+TERM_PUBLIC void
+X11_fillbox(style, x, y, w, h)
 int style;
 unsigned int x, y, w, h;
 {
