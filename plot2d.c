@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.53 1998/06/18 14:55:14 ddenholm Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16 1998/12/09 15:24:20 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1239,6 +1239,7 @@ do{ assert(!polar && !parametric); \
 	    min_array[SECOND_Y_AXIS] = min_array[FIRST_Y_AXIS];
 	if (auto_array[SECOND_Y_AXIS] & 2)
 	    max_array[SECOND_Y_AXIS] = max_array[FIRST_Y_AXIS];
+	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     }
 
     if (!uses_axis[FIRST_Y_AXIS]) {
