@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.111 2003/02/16 00:07:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.112 2003/02/18 16:19:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -104,10 +104,7 @@ static void set_fontpath __PROTO((void));
 static void set_locale __PROTO((void));
 static void set_logscale __PROTO((void));
 static void set_mapping __PROTO((void));
-static void set_bmargin __PROTO((void));
-static void set_lmargin __PROTO((void));
-static void set_rmargin __PROTO((void));
-static void set_tmargin __PROTO((void));
+static void set_margin __PROTO((int *));
 static void set_missing __PROTO((void));
 static void set_separator __PROTO((void));
 #ifdef USE_MOUSE
@@ -161,6 +158,8 @@ static int assign_arrowstyle_tag __PROTO((void));
 static int looks_like_numeric __PROTO((char *));
 static int set_tic_prop __PROTO((AXIS_INDEX));
 static char *fill_numbers_into_string __PROTO((char *pattern));
+static struct text_label * new_text_label __PROTO((int tag));
+static void parse_label_options __PROTO((struct text_label *this_label));
 
 #ifdef PM3D
 static void check_palette_grayscale __PROTO((void));
@@ -202,14 +201,14 @@ set_command()
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set style data\"");
 	if (!almost_equals(++c_token,"s$tyle"))
-            int_error(c_token,"expecting keyword 'style'");
+	    int_error(c_token,"expecting keyword 'style'");
 	else
 	    data_style = get_style();
     } else if (almost_equals(c_token,"fu$nction")) {
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set style function\"");
-        if (!almost_equals(++c_token,"s$tyle"))
-            int_error(c_token,"expecting keyword 'style'");
+	if (!almost_equals(++c_token,"s$tyle"))
+	    int_error(c_token,"expecting keyword 'style'");
 	else {
 	    enum PLOT_STYLE temp_style = get_style();
 	
@@ -221,11 +220,11 @@ set_command()
     } else if (almost_equals(c_token,"li$nestyle") || equals(c_token, "ls" )) {
 	if (interactive)
 	    int_warn(c_token, "deprecated syntax, use \"set style line\"");
-        c_token++;
-        set_linestyle();
+	c_token++;
+	set_linestyle();
     } else if (almost_equals(c_token,"noli$nestyle") || equals(c_token, "nols" )) {
-        c_token++;
-        set_nolinestyle();
+	c_token++;
+	set_nolinestyle();
     } else if (input_line[token[c_token].start_index] == 'n' &&
 	       input_line[token[c_token].start_index+1] == 'o') {
 	if (interactive)
@@ -330,16 +329,16 @@ set_command()
 	    set_mapping();
 	    break;
 	case S_BMARGIN:
-	    set_bmargin();
+	    set_margin(&bmargin);
 	    break;
 	case S_LMARGIN:
-	    set_lmargin();
+	    set_margin(&lmargin);
 	    break;
 	case S_RMARGIN:
-	    set_rmargin();
+	    set_margin(&rmargin);
 	    break;
 	case S_TMARGIN:
-	    set_tmargin();
+	    set_margin(&tmargin);
 	    break;
 	case S_DATAFILE:
 	    if (almost_equals(++c_token,"miss$ing"))
@@ -922,14 +921,14 @@ set_boxwidth()
     if (END_OF_COMMAND) {
 	boxwidth = -1.0;
 #if USE_ULIG_RELATIVE_BOXWIDTH
-        boxwidth_is_absolute = TRUE;
+	boxwidth_is_absolute = TRUE;
 #endif /* USE_ULIG_RELATIVE_BOXWIDTH */
     } else {
 	boxwidth = real(const_express(&a));
     }
 #if USE_ULIG_RELATIVE_BOXWIDTH
     if (END_OF_COMMAND)
-        return;
+	return;
     else {
 	if (almost_equals(c_token, "a$bsolute"))
 	    boxwidth_is_absolute = TRUE;
@@ -1142,14 +1141,14 @@ set_decimalsign()
     c_token++;
 
     if (END_OF_COMMAND) {
-        if (decimalsign != NULL)
-            free(decimalsign);
-        decimalsign=NULL;
+	if (decimalsign != NULL)
+	    free(decimalsign);
+	decimalsign=NULL;
     } else if (!isstring(c_token)) {
-        int_error(c_token, "expecting string");
+	int_error(c_token, "expecting string");
     } else {
-        m_quote_capture(&decimalsign, c_token, c_token); /* reallocs store */
-        c_token++;
+	m_quote_capture(&decimalsign, c_token, c_token); /* reallocs store */
+	c_token++;
     }
 }
 
@@ -1241,7 +1240,7 @@ set_format()
 	set_for_axis[axis] = TRUE;
 	c_token++;
     } else if (equals(c_token,"xy") || equals(c_token,"yx")) {
-        set_for_axis[FIRST_X_AXIS]
+	set_for_axis[FIRST_X_AXIS]
 	    = set_for_axis[FIRST_Y_AXIS]
 	    = TRUE;
 	c_token++;
@@ -1553,12 +1552,12 @@ set_key()
 		key->height_fix = real(const_express(&a));
 		c_token--; /* it is incremented after loop */
 		break;
-            case S_KEY_AUTOTITLES:
-                key->auto_titles = TRUE;
-                break;
-            case S_KEY_NOAUTOTITLES:
-                key->auto_titles = FALSE;
-                break;
+	    case S_KEY_AUTOTITLES:
+		key->auto_titles = TRUE;
+		break;
+	    case S_KEY_NOAUTOTITLES:
+		key->auto_titles = FALSE;
+		break;
 	    case S_KEY_TITLE:
 		if (isstring(c_token+1)) {
 		    /* We have string specified - grab it. */
@@ -1600,33 +1599,18 @@ set_keytitle()
 }
 
 /* process 'set label' command */
-/* set label {tag} {label_text} {at x,y} {pos} {font name,size} {...} */
-/* Entry font added by DJL */
-/* allow any order of options - pm 10.11.2001 */
-/* Changed again, to still allow every class of exclusive options only
- * *once* in the command line. */
+/* set label {tag} {"label_text"{,<value>{,...}}} {<label options>} */
+/* EAM Mar 2003 - option parsing broken out into separate routine */
 static void
 set_label()
 {
-    struct value a;
     struct text_label *this_label = NULL;
     struct text_label *new_label = NULL;
     struct text_label *prev_label = NULL;
-    struct position pos;
-    char *text = NULL, *font = NULL;
-    enum JUSTIFY just = LEFT;
-    int rotate = 0;
+    struct value a;
+    char *text = NULL;
     int tag;
-    TBOOLEAN set_text = FALSE, set_position = FALSE, set_just = FALSE,
-	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
-	set_layer = FALSE, set_textcolor = FALSE;
-    int layer = 0;
-    t_colorspec textcolor = {0,0,0.0};
-    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
-    float hoff = 1.0;
-    float voff = 1.0;
 
-    loc_lp.pointflag = -2;	/* untouched */
     c_token++;
     /* get tag */
     if (!END_OF_COMMAND
@@ -1654,9 +1638,28 @@ set_label()
     } else
 	tag = assign_label_tag();	/* default next tag */
 
+    if (first_label != NULL) {	/* skip to last label */
+	for (this_label = first_label; this_label != NULL;
+	     prev_label = this_label, this_label = this_label->next)
+	    /* is this the label we want? */
+	    if (tag <= this_label->tag)
+		break;
+    }
+    /* Insert this label into the list if it is a new one */
+    if (this_label == NULL || tag != this_label->tag) {
+	new_label = new_text_label(tag);
+	new_label->voffset = 1.0;
+	new_label->hoffset = 1.0;
+	if (prev_label == NULL)
+	    first_label = new_label;
+	else
+	    prev_label->next = new_label;
+	new_label->next = this_label;
+	this_label = new_label;
+    }
+
     /* get text */
     if (!END_OF_COMMAND && isstring(c_token)) {
-	/* get text */
 	text = gp_alloc (token_len(c_token), "text_label->text");
 	quote_str(text, c_token, token_len(c_token));
 	c_token++;
@@ -1667,207 +1670,11 @@ set_label()
 	 * appropriate %f format string) */
 	if (!END_OF_COMMAND && equals(c_token, ",")) 
 	    text = fill_numbers_into_string(text);
-	set_text = TRUE;
+	this_label->text = text;
     }
 
-    while (!END_OF_COMMAND) {
-	/* get position */
-	if (! set_position && equals(c_token, "at")) {
-	    c_token++;
-	    get_position(&pos);
-	    set_position = TRUE;
-	    continue;
-	}
-
-	/* get justification */
-	if (! set_just) {
-	    if (almost_equals(c_token, "l$eft")) {
-		just = LEFT;
-		c_token++;
-		set_just = TRUE;
-		continue;
-	    } else if (almost_equals(c_token, "c$entre")
-		       || almost_equals(c_token, "c$enter")) {
-		just = CENTRE;
-		c_token++;
-		set_just = TRUE;
-		continue;
-	    } else if (almost_equals(c_token, "r$ight")) {
-		just = RIGHT;
-		c_token++;
-		set_just = TRUE;
-		continue;
-	    }
-	}
-
-	/* get rotation (added by RCC) */
-	if (! set_rot) {
-	    if (almost_equals(c_token, "rot$ate")) {
-		rotate = TEXT_VERTICAL;
-		c_token++;
-		set_rot = TRUE;
-		if (equals(c_token, "by")) {
-		    c_token++;
-		    rotate = (int)real(const_express(&a));
-		}
-		continue;
-	    } else if (almost_equals(c_token, "norot$ate")) {
-		rotate = 0;
-		c_token++;
-		set_rot = TRUE;
-		continue;
-	    }
-	}
-
-	/* get font */
-	/* Entry font added by DJL */
-	if (! set_font && equals(c_token, "font")) {
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "font name and size expected");
-	    if (isstring(c_token)) {
-		font = gp_alloc (token_len(c_token), "text_label->font");
-		quote_str(font, c_token, token_len(c_token));
-		/* get 'name,size', no further check */
-		set_font = TRUE;
-		c_token++;
-		continue;
-	    } else
-		int_error(c_token, "'fontname,fontsize' expected");
-	}
-
-	/* get front/back (added by JDP) */
-	if (! set_layer) {
-	    if (equals(c_token, "back")) {
-		layer = 0;
-		c_token++;
-		set_layer = TRUE;
-		continue;
-	    } else if (equals(c_token, "front")) {
-		layer = 1;
-		c_token++;
-		set_layer = TRUE;
-		continue;
-	    }
-	}
-    
-	if (loc_lp.pointflag == -2) {
-	    if (almost_equals(c_token, "po$int")) {
-		int stored_token = ++c_token;
-	    struct lp_style_type tmp_lp;
-	    
-	    lp_parse(&tmp_lp, 0, 1, -2, -2);
-	    if (stored_token != c_token) {
-		loc_lp = tmp_lp;
-		loc_lp.pointflag = 1;
-		if (loc_lp.p_type < -1)
-		    loc_lp.p_type = 0;
-		} 
-		continue;
-	    } else if (almost_equals(c_token, "nopo$int")) {
-		loc_lp.pointflag = 0;
-		c_token++;
-		continue;
-	    }
-	}
-
-	if (! set_offset && almost_equals(c_token, "of$fset")) {
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expected horizontal offset");
-	    hoff = real(const_express(&a));
-
-	    if (!equals(c_token, ","))
-		int_error(c_token, "expected comma");
-
-	    c_token++;
-	    if (END_OF_COMMAND)
-		int_error(c_token, "expected vertical offset");
-	    voff = real(const_express(&a));
-	    set_offset = TRUE;
-	    continue;
-	}
-
-	if ((equals(c_token,"tc") || almost_equals(c_token,"text$color"))
-	    && ! set_textcolor ) {
-	    parse_colorspec( &textcolor, TC_Z );
-	    set_textcolor = TRUE;
-	    continue;
-	}
-
-	/* Coming here means that none of the previous 'if's struck
-	 * its "continue" statement, i.e.  whatever is in the command
-	 * line is forbidden by the command syntax. */
-	int_error(c_token, "extraneous or contradicting arguments in set label");
-
-    } /* while(!END_OF_COMMAND) */
-
-    /* HBB 20011120: this chunk moved here, behind the while()
-     * loop. Only after all options have been parsed it's safe to
-     * overwrite the position if none has been specified. */
-    if (!set_position) {
-	pos.x = pos.y = pos.z = 0;
-	pos.scalex = pos.scaley = pos.scalez = first_axes;
-    }
-
-    /* OK! add label */
-    if (first_label != NULL) {	/* skip to last label */
-	for (this_label = first_label; this_label != NULL;
-	     prev_label = this_label, this_label = this_label->next)
-	    /* is this the label we want? */
-	    if (tag <= this_label->tag)
-		break;
-    }
-    if (this_label != NULL && tag == this_label->tag) {
-	/* changing the label */
-	if (set_position) {
-	    this_label->place = pos;
-	}
-	if (set_text)
-	    this_label->text = text;
-	if (set_just)
-	    this_label->pos = just;
-	if (set_rot)
-	    this_label->rotate = rotate;
-	if (set_layer)
-	    this_label->layer = layer;
-	if (set_font)
-	    this_label->font = font;
-	if (set_textcolor) {
-	    memcpy(&(this_label->textcolor), &textcolor, sizeof(t_colorspec));
-	}
-	if (loc_lp.pointflag >= 0)
-	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
-	if (set_offset) {
-	    this_label->hoffset = hoff;
-	    this_label->voffset = voff;
-	}
-    } else {
-	/* adding the label */
-	new_label = gp_alloc(sizeof(struct text_label), "label");
-	if (prev_label != NULL)
-	    prev_label->next = new_label;	/* add it to end of list */
-	else
-	    first_label = new_label;	/* make it start of list */
-	new_label->tag = tag;
-	new_label->next = this_label;
-	new_label->place = pos;
-	new_label->text = text;
-	new_label->pos = just;
-	new_label->rotate = rotate;
-	new_label->layer = layer;
-	new_label->font = font;
-	memcpy(&(new_label->textcolor), &textcolor, sizeof(t_colorspec));
-	if (loc_lp.pointflag == -2)
-	    loc_lp.pointflag = 0;
-	memcpy(&(new_label->lp_properties), &loc_lp, sizeof(loc_lp));
-	new_label->hoffset = hoff;
-	new_label->voffset = voff;
-	this_label = new_label;
-    }
-    /* EAM - make sure the z coord and the z-coloring agree */
-    if (this_label->textcolor.type == TC_Z) 
-	this_label->textcolor.value = this_label->place.z;
+    /* Now parse the label format and style options */
+    parse_label_options( this_label );
 }
 
 
@@ -2048,52 +1855,22 @@ set_mapping()
     else
 	int_error(c_token,
 		  "expecting 'cartesian', 'spherical', or 'cylindrical'");
-        c_token++;
+	c_token++;
 }
 
 
-/* FIXME - merge set_*margin() functions */
-
-#define PROCESS_MARGIN(MARGIN) \
- c_token++; \
- if (END_OF_COMMAND) \
-  MARGIN = -1; \
- else { \
-  struct value a; \
-  MARGIN = real(const_express(&a)); \
- }
-
-/* process 'set bmargin' command */
+/* process 'set {blrt}margin' command */
 static void
-set_bmargin()
+set_margin(int *margin)
 {
-    PROCESS_MARGIN(bmargin); 
+    c_token++;
+    if (END_OF_COMMAND)
+	*margin = -1;
+    else {
+	struct value a;
+	*margin = real(const_express(&a));
+    }
 }
-
-
-/* process 'set lmargin' command */
-static void
-set_lmargin()
-{
-    PROCESS_MARGIN(lmargin);
-}
-
-
-/* process 'set rmargin' command */
-static void
-set_rmargin()
-{
-    PROCESS_MARGIN(rmargin);
-}
-
-
-/* process 'set tmargin' command */
-static void
-set_tmargin()
-{
-    PROCESS_MARGIN(tmargin);
-}
-
 
 static void
 set_separator()
@@ -2437,14 +2214,14 @@ set_palette_defined()
     int actual_size=8;
 
     if (sm_palette.gradient) {
-        free( sm_palette.gradient );
+	free( sm_palette.gradient );
     }
     sm_palette.gradient = (gradient_struct*) 
       gp_alloc( actual_size*sizeof(gradient_struct), "pm3d gradient" );
     
     if (END_OF_COMMAND) {
-        /* lets use some default gradient */
-        double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},       
+	/* lets use some default gradient */
+	double pal[][4] = { {0.0, 0.05, 0.05, 0.2}, {0.1, 0, 0, 1},       
 			    {0.25, 0.7, 0.85, 0.9}, {0.4, 0, 0.75, 0}, 
 			    {0.5, 1, 1, 0}, {0.7, 1, 0, 0},
 			    {0.9, 0.6, 0.6, 0.6}, {1.0, 0.95, 0.95, 0.95} };
@@ -2461,20 +2238,20 @@ set_palette_defined()
     }
 
     if ( !equals(c_token,"(") ) 
-        int_error( c_token, "Expected ( to start gradient definition." ); 
+	int_error( c_token, "Expected ( to start gradient definition." ); 
 
     ++c_token;
     num = -1;
     
     while (!END_OF_COMMAND) {
-        p = real(const_express(&a));
+	p = real(const_express(&a));
 	if (isstring(c_token)) {
 	    /* either color name or X-styel rgb value "#rrggbb" */
 	    char col_buf[21];
 	    quote_str(col_buf, c_token++, 20);
 	    if (col_buf[0] == '#') {
-	        /* X-style specifier */
-	        int rr,gg,bb;
+		/* X-style specifier */
+		int rr,gg,bb;
 		if (sscanf( col_buf, "#%2x%2x%2x", &rr, &gg, &bb ) != 3 )
 		    int_error( c_token-1, 
 			       "Unknown color specifier. Use '#rrggbb'." );
@@ -2483,19 +2260,19 @@ set_palette_defined()
 		b = (double)(bb)/255.;
 	    }
 	    else { /* some predefined names */
-	        /* Maybe we could scan the X11 rgb.txt file to look up color 
+		/* Maybe we could scan the X11 rgb.txt file to look up color 
 		 * names?  Or at least move these definitions to some file 
 		 * which is included somehow during compilation instead 
 		 * hardcoding them. */
-	        /* Can't use lookupt_table() as it works for tokens only,
+		/* Can't use lookupt_table() as it works for tokens only,
 		   so we'll do it manually */
-	        const struct gen_table *tbl = pm3d_color_names_tbl;
+		const struct gen_table *tbl = pm3d_color_names_tbl;
 		while (tbl->key) {
 		    if (!strcmp(col_buf, tbl->key)) {
 			r = (double)((tbl->value >> 16 ) & 255) / 255.;
 			g = (double)((tbl->value >> 8 ) & 255) / 255.;
-		        b = (double)(tbl->value & 255) / 255.;
-		        break;
+			b = (double)(tbl->value & 255) / 255.;
+			break;
 		    }
 		    tbl++;
 		}
@@ -2558,13 +2335,13 @@ set_palette_file()
 
     specs = df_open( 4 );
     if (df_binary)
-        int_error( c_token, "Binary palette files not implemented");
+	int_error( c_token, "Binary palette files not implemented");
   
     if (specs > 0 && specs < 3) 
-        int_error( c_token, "Less than 3 using specs for palette");
+	int_error( c_token, "Less than 3 using specs for palette");
 
     if (sm_palette.gradient) {
-        free( sm_palette.gradient );
+	free( sm_palette.gradient );
 	sm_palette.gradient = 0;
     }
     actual_size = 10;
@@ -2576,7 +2353,7 @@ set_palette_file()
 #define VCONSTRAIN(x) ( (x)<0 ? 0 : ( (x)>1 ? 1: (x) ) )
     /* values are simply clipped to [0,1] without notice */
     while ((j = df_readline(v, 4)) != DF_EOF) {
-        if (i >= actual_size) {
+	if (i >= actual_size) {
 	  actual_size += 10;
 	  sm_palette.gradient = (gradient_struct*) 
 	    gp_realloc( sm_palette.gradient, 
@@ -2585,19 +2362,19 @@ set_palette_file()
 	}
 	switch (j) {
 	    case 3:
-	        sm_palette.gradient[i].col.r = VCONSTRAIN(v[0]);
+		sm_palette.gradient[i].col.r = VCONSTRAIN(v[0]);
 		sm_palette.gradient[i].col.g = VCONSTRAIN(v[1]);
 		sm_palette.gradient[i].col.b = VCONSTRAIN(v[2]);
 		sm_palette.gradient[i].pos = i ;
 		break;
 	    case 4:
-	        sm_palette.gradient[i].col.r = VCONSTRAIN(v[1]);
+		sm_palette.gradient[i].col.r = VCONSTRAIN(v[1]);
 		sm_palette.gradient[i].col.g = VCONSTRAIN(v[2]);
 		sm_palette.gradient[i].col.b = VCONSTRAIN(v[3]);
 		sm_palette.gradient[i].pos = v[0];
 		break;
 	    default:
-	        df_close();
+		df_close();
 		int_error(c_token, "Bad data on line %d", df_line_number);
 		break;
 	}
@@ -2606,7 +2383,7 @@ set_palette_file()
 #undef VCONSTRAIN
     df_close();
     if (i==0)
-        int_error( c_token, "No valid palette found" );
+	int_error( c_token, "No valid palette found" );
 
     sm_palette.gradient_num = i;
     check_palette_grayscale();
@@ -2638,7 +2415,7 @@ set_palette_function()
     /* set dummy variable */
 #ifdef ALLOW_DUMMY_VAR_FOR_GRAY
     if (isstring(c_token)) { 
-        quote_str( c_dummy_var[0], c_token, MAX_ID_LEN );
+	quote_str( c_dummy_var[0], c_token, MAX_ID_LEN );
 	++c_token;
     }
     else 
@@ -2649,45 +2426,45 @@ set_palette_function()
     /* Afunc */ 
     start_token = c_token;
     if (sm_palette.Afunc.at) {
-        free( sm_palette.Afunc.at );
+	free( sm_palette.Afunc.at );
 	sm_palette.Afunc.at = NULL;
     }
     dummy_func = &sm_palette.Afunc;
     sm_palette.Afunc.at = perm_at();
     if (! sm_palette.Afunc.at)
-        int_error(start_token, "not enough memory for function");
+	int_error(start_token, "not enough memory for function");
     m_capture(&(sm_palette.Afunc.definition), start_token, c_token-1);
     dummy_func = NULL;
     if (!equals(c_token,","))
-        int_error(c_token,"Expected comma" );
+	int_error(c_token,"Expected comma" );
     ++c_token;
 
     /* Bfunc */
     start_token = c_token;
     if (sm_palette.Bfunc.at) {
-        free( sm_palette.Bfunc.at );
+	free( sm_palette.Bfunc.at );
 	sm_palette.Bfunc.at = NULL;
     }
     dummy_func = &sm_palette.Bfunc;
     sm_palette.Bfunc.at = perm_at();
     if (! sm_palette.Bfunc.at)
-        int_error(start_token, "not enough memory for function");
+	int_error(start_token, "not enough memory for function");
     m_capture(&(sm_palette.Bfunc.definition), start_token, c_token-1);
     dummy_func = NULL;
     if (!equals(c_token,","))
-        int_error(c_token,"Expected comma" );
+	int_error(c_token,"Expected comma" );
     ++c_token;
     
     /* Cfunc */
     start_token = c_token;
     if (sm_palette.Cfunc.at) {
-        free( sm_palette.Cfunc.at );
+	free( sm_palette.Cfunc.at );
 	sm_palette.Cfunc.at = NULL;
     }
     dummy_func = &sm_palette.Cfunc;
     sm_palette.Cfunc.at = perm_at();
     if (! sm_palette.Cfunc.at)
-        int_error(start_token, "not enough memory for function");
+	int_error(start_token, "not enough memory for function");
     m_capture(&(sm_palette.Cfunc.definition), start_token, c_token-1);
     dummy_func = NULL;
     
@@ -2709,7 +2486,7 @@ check_palette_grayscale()
 
     /* check if gray values are sorted */
     for (i=0; i<sm_palette.gradient_num-1; ++i ) {
-        if (sm_palette.gradient[i].pos > sm_palette.gradient[i+1].pos) {
+	if (sm_palette.gradient[i].pos > sm_palette.gradient[i+1].pos) {
 	    int_error( c_token, "Gray scale not sorted in gradient." );
 	}
     }
@@ -2718,7 +2495,7 @@ check_palette_grayscale()
     off = sm_palette.gradient[0].pos;
     f = 1.0 / ( sm_palette.gradient[sm_palette.gradient_num-1].pos-off );
     for (i=1; i<sm_palette.gradient_num-1; ++i ) {
-        sm_palette.gradient[i].pos = f*(sm_palette.gradient[i].pos-off);
+	sm_palette.gradient[i].pos = f*(sm_palette.gradient[i].pos-off);
     }
 
     /* paranoia on the first and last entries */
@@ -2770,8 +2547,8 @@ set_palette()
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
 		continue;
 	    case S_PALETTE_GAMMA: /* "gamma" */
-	        ++c_token;
-	        sm_palette.gamma = real(const_express(&a));
+		++c_token;
+		sm_palette.gamma = real(const_express(&a));
 		continue;
 	    case S_PALETTE_COLOR: /* "col$or" */
 		if (pm3d_last_set_palette_mode != SMPAL_COLOR_MODE_NONE) {
@@ -2796,7 +2573,7 @@ set_palette()
 		continue;
 	    } /* rgbformulae */
 	    case S_PALETTE_DEFINED: { /* "def$ine" */
-	        CHECK_TRANSFORM;
+		CHECK_TRANSFORM;
 		++c_token;
 		named_color = set_palette_defined();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
@@ -2804,7 +2581,7 @@ set_palette()
 		continue;
 	    }
 	    case S_PALETTE_FILE: { /* "file" */
-	        CHECK_TRANSFORM;
+		CHECK_TRANSFORM;
 		set_palette_file();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRADIENT;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_GRADIENT;
@@ -2812,7 +2589,7 @@ set_palette()
 		continue;
 	    }
 	    case S_PALETTE_FUNCTIONS: { /* "func$tions" */
-	        CHECK_TRANSFORM;
+		CHECK_TRANSFORM;
 		set_palette_function();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_FUNCTIONS;
 		pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_FUNCTIONS;
@@ -2820,7 +2597,7 @@ set_palette()
 		continue;
 	    }
 	    case S_PALETTE_MODEL: { /* "mo$del" */
-	        int model;
+		int model;
 
 		++c_token;
 		if (END_OF_COMMAND)
@@ -3698,22 +3475,22 @@ set_tic_prop(axis)
 	    load_tics(axis);
 	}
  
-        if (almost_equals(c_token, "f$ont")) {
-            ++c_token;
-            /* Make sure they've specified a font */
-            if (equals(c_token,"tc") || almost_equals(c_token,"text$color") ||
-                END_OF_COMMAND || almost_equals(c_token, nocmd)) {
-                int_error(c_token,"expected font");
-            } else {
-                if (isstring(c_token)) {
+	if (almost_equals(c_token, "f$ont")) {
+	    ++c_token;
+	    /* Make sure they've specified a font */
+	    if (equals(c_token,"tc") || almost_equals(c_token,"text$color") ||
+		END_OF_COMMAND || almost_equals(c_token, nocmd)) {
+		int_error(c_token,"expected font");
+	    } else {
+		if (isstring(c_token)) {
 		    m_quote_capture(&(axis_array[axis].ticdef.font), c_token, c_token);
-                    c_token++;
-                }
-            }
-        }
-        if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
-            parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
-        }
+		    c_token++;
+		}
+	    }
+	}
+	if (equals(c_token,"tc") || almost_equals(c_token,"text$color")) {
+	    parse_colorspec(&axis_array[axis].ticdef.textcolor, TC_LT);
+	}
     }
     if (almost_equals(c_token, nocmd)) {	/* NOSTRING */
 	axis_array[axis].ticmode = NO_TICS;
@@ -4012,28 +3789,6 @@ assign_arrowstyle_tag()
     return (last + 1);
 }
 
-#if (0)
-/* EAM - not called by anyone */
-/* delete arrowstyle from linked list started by first_arrowstyle.
- * called with pointers to the previous arrowstyle (prev) and the 
- * arrowstyle to delete (this).
- * If there is no previous arrowstyle (the arrowstyle to delete is
- * first_arrowstyle) then call with prev = NULL.
- */
-void
-delete_arrowstyle(prev, this)
-struct arrowstyle_def *prev, *this;
-{
-    if (this != NULL) {		/* there really is something to delete */
-	if (prev != NULL)	/* there is a previous arrowstyle */
-	    prev->next = this->next;
-	else			/* this = first_arrowstyle so change first_arrowstyle */
-	    first_arrowstyle = this->next;
-	free((char *) this);
-    }
-}
-#endif
-
 /* For set [xy]tics... command */
 static void
 load_tics(axis)
@@ -4254,23 +4009,23 @@ static void set_nolinestyle()
     int tag;
 
     if (END_OF_COMMAND) {
-        /* delete all linestyles */
-        while (first_linestyle != NULL)
-            delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
+	/* delete all linestyles */
+	while (first_linestyle != NULL)
+	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
     } else {
-        /* get tag */
-        tag = (int) real(const_express(&a));
-        if (!END_OF_COMMAND)
-            int_error(c_token, "extraneous arguments to set nolinestyle");
-        for (this = first_linestyle, prev = NULL;
-             this != NULL;
-             prev = this, this = this->next) {
-            if (this->tag == tag) {
-                delete_linestyle(prev, this);
-                return;         /* exit, our job is done */
-            }
-        }
-        int_error(c_token, "linestyle not found");
+	/* get tag */
+	tag = (int) real(const_express(&a));
+	if (!END_OF_COMMAND)
+	    int_error(c_token, "extraneous arguments to set nolinestyle");
+	for (this = first_linestyle, prev = NULL;
+	     this != NULL;
+	     prev = this, this = this->next) {
+	    if (this->tag == tag) {
+		delete_linestyle(prev, this);
+		return;         /* exit, our job is done */
+	    }
+	}
+	int_error(c_token, "linestyle not found");
     }
 }
 
@@ -4372,7 +4127,7 @@ parse_colorspec( struct t_colorspec *tc, int options )
 	    int_warn(c_token,"illegal linetype");
 	}
     } else if (options <= TC_LT) {
-        tc->type = TC_DEFAULT;
+	tc->type = TC_DEFAULT;
 	int_error(c_token, "only tc lt <n> possible here");
     } else if (almost_equals(c_token,"pal$ette")) {
     	c_token++;
@@ -4406,3 +4161,225 @@ parse_colorspec( struct t_colorspec *tc, int options )
     	int_error(c_token, "textcolor colorspec not recognized");
     }
 }
+
+/* 
+ * new_text_label() allocates and initializes a text_label structure.
+ * This routine will eventually be exported so it can be shared by the
+ * plot and splot with labels commands.
+ */
+static
+struct text_label *
+new_text_label(int tag)
+{
+    struct text_label *new;
+    
+    new = gp_alloc( sizeof(struct text_label), "text_label");
+    new->next = NULL;
+    new->tag = tag;
+    new->place.scalex = first_axes;
+    new->place.scaley = first_axes;
+    new->place.scalez = first_axes;
+    new->place.x = 0;
+    new->place.y = 0;
+    new->place.z = 0;
+    new->pos = LEFT;
+    new->rotate = 0;
+    new->layer = 0;
+    new->text = (char *)NULL;
+    new->font = (char *)NULL;
+    new->textcolor.type = TC_DEFAULT;
+    new->lp_properties.pointflag = 0;
+    new->hoffset = 0;
+    new->voffset = 0;
+
+    return(new);
+}
+
+/*
+ * Parse the sub-options for label style and placement.
+ * This is called from set_label, and will eventually be called from
+ * plot2d and plot3d to handle options for 'plot with labels' 
+ */
+static void
+parse_label_options( struct text_label *this_label )
+{
+    struct value a;
+    struct position pos;
+    char *font = NULL;
+    enum JUSTIFY just = LEFT;
+    int rotate = 0;
+    TBOOLEAN set_position = FALSE, set_just = FALSE,
+	set_rot = FALSE, set_font = FALSE, set_offset = FALSE,
+	set_layer = FALSE, set_textcolor = FALSE;
+    int layer = 0;
+    float hoff = 1.0;
+    float voff = 1.0;
+    t_colorspec textcolor = {TC_DEFAULT,0,0.0};
+    struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
+    loc_lp.pointflag = -2;
+
+   /* Now parse the label format and style options */
+    while (!END_OF_COMMAND) {
+	/* get position */
+	if (! set_position && equals(c_token, "at")) {
+	    c_token++;
+	    get_position(&pos);
+	    set_position = TRUE;
+	    continue;
+	}
+
+	/* get justification */
+	if (! set_just) {
+	    if (almost_equals(c_token, "l$eft")) {
+		just = LEFT;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    } else if (almost_equals(c_token, "c$entre")
+		       || almost_equals(c_token, "c$enter")) {
+		just = CENTRE;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    } else if (almost_equals(c_token, "r$ight")) {
+		just = RIGHT;
+		c_token++;
+		set_just = TRUE;
+		continue;
+	    }
+	}
+
+	/* get rotation (added by RCC) */
+	if (! set_rot) {
+	    if (almost_equals(c_token, "rot$ate")) {
+		rotate = TEXT_VERTICAL;
+		c_token++;
+		set_rot = TRUE;
+		if (equals(c_token, "by")) {
+		    c_token++;
+		    rotate = (int)real(const_express(&a));
+		}
+		continue;
+	    } else if (almost_equals(c_token, "norot$ate")) {
+		rotate = 0;
+		c_token++;
+		set_rot = TRUE;
+		continue;
+	    }
+	}
+
+	/* get font (added by DJL) */
+	if (! set_font && equals(c_token, "font")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "font name and size expected");
+	    if (isstring(c_token)) {
+		font = gp_alloc (token_len(c_token), "text_label->font");
+		quote_str(font, c_token, token_len(c_token));
+		/* get 'name,size', no further check */
+		set_font = TRUE;
+		c_token++;
+		continue;
+	    } else
+		int_error(c_token, "'fontname,fontsize' expected");
+	}
+
+	/* get front/back (added by JDP) */
+	if (! set_layer) {
+	    if (equals(c_token, "back")) {
+		layer = 0;
+		c_token++;
+		set_layer = TRUE;
+		continue;
+	    } else if (equals(c_token, "front")) {
+		layer = 1;
+		c_token++;
+		set_layer = TRUE;
+		continue;
+	    }
+	}
+    
+	if (loc_lp.pointflag == -2) {
+	    if (almost_equals(c_token, "po$int")) {
+		int stored_token = ++c_token;
+	    struct lp_style_type tmp_lp;
+	    
+	    lp_parse(&tmp_lp, 0, 1, -2, -2);
+	    if (stored_token != c_token) {
+		loc_lp = tmp_lp;
+		loc_lp.pointflag = 1;
+		if (loc_lp.p_type < -1)
+		    loc_lp.p_type = 0;
+		} 
+		continue;
+	    } else if (almost_equals(c_token, "nopo$int")) {
+		loc_lp.pointflag = 0;
+		c_token++;
+		continue;
+	    }
+	}
+
+	if (! set_offset && almost_equals(c_token, "of$fset")) {
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expected horizontal offset");
+	    hoff = real(const_express(&a));
+
+	    if (!equals(c_token, ","))
+		int_error(c_token, "expected comma");
+
+	    c_token++;
+	    if (END_OF_COMMAND)
+		int_error(c_token, "expected vertical offset");
+	    voff = real(const_express(&a));
+	    set_offset = TRUE;
+	    continue;
+	}
+
+	if ((equals(c_token,"tc") || almost_equals(c_token,"text$color"))
+	    && ! set_textcolor ) {
+	    parse_colorspec( &textcolor, TC_Z );
+	    set_textcolor = TRUE;
+	    continue;
+	}
+
+	/* Coming here means that none of the previous 'if's struck
+	 * its "continue" statement, i.e.  whatever is in the command
+	 * line is forbidden by the command syntax. */
+	int_error(c_token, "extraneous or contradicting arguments in label options");
+
+    } /* while(!END_OF_COMMAND) */
+
+    /* HBB 20011120: this chunk moved here, behind the while()
+     * loop. Only after all options have been parsed it's safe to
+     * overwrite the position if none has been specified. */
+    if (!set_position) {
+	pos.x = pos.y = pos.z = 0;
+	pos.scalex = pos.scaley = pos.scalez = first_axes;
+    }
+
+    /* OK! copy the requested options into the label */
+	if (set_position)
+	    this_label->place = pos;
+	if (set_just)
+	    this_label->pos = just;
+	if (set_rot)
+	    this_label->rotate = rotate;
+	if (set_layer)
+	    this_label->layer = layer;
+	if (set_font)
+	    this_label->font = font;
+	if (set_textcolor)
+	    memcpy(&(this_label->textcolor), &textcolor, sizeof(t_colorspec));
+	if (loc_lp.pointflag >= 0)
+	    memcpy(&(this_label->lp_properties), &loc_lp, sizeof(loc_lp));
+	if (set_offset) {
+	    this_label->hoffset = hoff;
+	    this_label->voffset = voff;
+	}
+
+    /* Make sure the z coord and the z-coloring agree */
+    if (this_label->textcolor.type == TC_Z) 
+	this_label->textcolor.value = this_label->place.z;
+}
+

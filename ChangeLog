@@ -1,3 +1,10 @@
+2003-03-13  Ethan Merritt <merritt@u.washington.edu>
+
+	* set.c: Consolidate set_{blrt}margin into a single routine, break out
+	text_label creation and label option parsing into separate routines so
+	that they can be called separately, general code cleanup.
+	* unset.c: Consolidate unset_{blrt}margin into a single routine.
+
 2003-03-07  Ethan Merritt <merritt@u.washington.edu>
 
 	* graphics.c: Filled boxes can obscure the x-axis (see for
