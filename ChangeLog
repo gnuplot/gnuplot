@@ -1,3 +1,9 @@
+2002-07-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/svg.trm: Support for "textcolor ...".
+
+	* term/mif.trm: Documented option "color".
+
 2002-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* NEWS docs/gnuplot.doc src/color.c src/gadgets.c src/gadgets.h
@@ -753,7 +759,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/20 14:56:29 $).
+	last modification date (from the tag $Date: 2002/07/21 12:32:52 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: svg.trm,v 1.16 2002/06/10 21:11:17 mikulik Exp $
  *
  */
 
@@ -816,10 +816,19 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 /* define text position and attributes*/
 
     fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)%s\" \
-style=\"stroke:none; fill:%s; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
+style=\"stroke:none; fill:", 
 	     h, term->ymax - v,
-	     SVG_TextAngle ? " rotate(-90)" : "",
-	     SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+	     SVG_TextAngle ? " rotate(-90)" : "");
+
+#ifdef PM3D
+    if (!SVG_use_pm3d_color)
+#endif
+	fprintf (gpoutfile, "%s", SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
+#ifdef PM3D
+    else
+	fprintf (gpoutfile, "rgb(%d,%d,%d)", SVG_red, SVG_green, SVG_blue);
+#endif
+    fprintf (gpoutfile, "; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
 	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
 
 /* output text*/
