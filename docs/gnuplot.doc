@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.82 2001/09/27 19:52:50 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.83 2001/09/28 12:45:05 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3357,7 +3357,7 @@ C ... and restart the table:
  axes. The default is to autoscale all axes.
 
  Syntax:
-       set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix}
+       set autoscale {<axes>{|min|max|fixmin|fixmax|fix} | fix | keepfix}
        unset autoscale {<axes>}
        show autoscale
 
@@ -3369,6 +3369,8 @@ C ... and restart the table:
  A keyword with `fixmin`, `fixmax` or `fix` appended tells gnuplot to disable
  extension of the axis range to the next tic mark position, for autoscaled
  axes using equidistant tics; `set autoscale fix` sets this for all axes.
+ Command `set autoscale keepfix` autoscales all axes while keeping the fix
+ settings.
 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the

@@ -1,3 +1,11 @@
+2001-10-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c docs/gnuplot.doc: New autoscale option:
+	`set autoscale keepfix` autoscales all axes while keeping the fix
+	settings.
+	* src/mouse.c: Let hotkey 'a' do `set autoscale keepfix` instead
+	of `set autoscale`.
+
 2001-10-05  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/plot3d.c (grid_nongrid_data): Fix bug in code to handle the
@@ -63,10 +71,10 @@
 
 2001-09-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/set.c docs/gnuplot.doc: new autoscale option:
+	* src/set.c docs/gnuplot.doc: New autoscale option:
 	`set autoscale {{axis}{...|fix} | fix}` to easily set fixmin and
 	fixmax in one command for one or all axes.
-	* src/unset.c: wrong indentation of two "}" in unset_autoscale().
+	* src/unset.c: Wrong indentation of two "}" in unset_autoscale().
 
 2001-09-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

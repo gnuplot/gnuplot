@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.62 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.63 2001/09/27 19:52:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -823,6 +823,12 @@ set_autoscale()
 	    axis_array[a].set_autoscale |= AUTOSCALE_FIXMIN | AUTOSCALE_FIXMAX;
 	    a++;
 	}
+	c_token++;
+	return;
+    } else if (almost_equals(c_token, "ke$epfix")) {
+	int a = 0;
+	while (a < AXIS_ARRAY_SIZE) 
+	    axis_array[a++].set_autoscale |= AUTOSCALE_BOTH;
 	c_token++;
 	return;
     }

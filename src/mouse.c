@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.23 2001/09/07 18:39:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.24 2001/10/05 16:37:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -855,9 +855,9 @@ static char *
 builtin_autoscale(struct gp_event_t *ge)
 {
     if (!ge) {
-	return "`builtin-autoscale` (set autoscale; replot)";
+	return "`builtin-autoscale` (set autoscale keepfix; replot)";
     }
-    do_string_replot("set autoscale");
+    do_string_replot("set autoscale keepfix");
     return (char *) 0;
 }
 

@@ -31,7 +31,7 @@ Changes in release 4.0:
 [3.8g]
 * NEW set style [data | function] filledcurves [options]
       plot ... with filledcurves [options]
-* NEW autoscale option `fix`
+* NEW autoscale options: `fix`, `keepfix`
 
 [3.8f]
   Note: Options are not yet implemented -- *YOU* may contribute
