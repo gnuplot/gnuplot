@@ -49,7 +49,7 @@
  * Stefan Bodewig Dec. 1995
  */
 
-/* This versio of term.h is pre-crippled to easily support 16bit
+/* This version of term.h is pre-crippled to easily support 16bit
  * PC (DOS/Win) compilers that can't cope with many terminals */
 
 /* Define SHORT_TERMLIST to select a few terminals. It is easier
