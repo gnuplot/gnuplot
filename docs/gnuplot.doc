@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.20.2.5 2000/05/07 16:46:56 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.20.2.6 2002/04/10 09:36:49 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -1585,7 +1585,7 @@ C ... and restart the table:
  parameter file.  The two use different means to set initial values.
 
  Adjustable parameters can be specified by a comma-separated list of variable
- names after the `via` keyword.  Any variable that is not already defined is
+ names after the `via` keyword.  Any variable that is not already defined
  is created with an initial value of 1.0.  However, the fit is more likely
  to converge rapidly if the variables have been previously declared with more
  appropriate starting values.
@@ -3857,7 +3857,7 @@ C ... and restart the table:
        %M           minute, 0--60
        %p           "am" or "pm"
        %r           shorthand for "%I:%M:%S %p"
-       %R           shorthand for %H:%M"
+       %R           shorthand for "%H:%M"
        %S           second, 0--60
        %T           shorthand for "%H:%M:%S"
        %U           week of the year (week starts on Sunday)
@@ -4471,7 +4471,7 @@ C ... and restart the table:
  A cartesian coordinate system is used by default.
 
  For a spherical coordinate system, the data occupy two or three columns (or
- `using` entries).  The first two are interpreted as the polar and azimuthal
+ `using` entries).  The first two are interpreted as the azimuthal and polar
  angles theta and phi (in the units specified by `set angles`).  The radius r
  is taken from the third column if there is one, or is set to unity if there
  is no third column.  The mapping is:
