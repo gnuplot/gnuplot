@@ -151,8 +151,8 @@ TERM_PUBLIC void DJSVGA_init()
     /* HBB: save textscreen contents and cursor-position */
     dj_textsave = gp_alloc(ScreenRows() * ScreenCols() * 2, "djsvga term scrbuf");
     ScreenRetrieve(dj_textsave);
-    dj_width = ScreenRows();
-    dj_height = ScreenCols();
+    dj_width = ScreenCols();
+    dj_height = ScreenRows();
     ScreenGetCursor(&dj_cursory, &dj_cursorx);
     GrSetMode(GR_default_graphics);
     GrSetRGBcolorMode();
