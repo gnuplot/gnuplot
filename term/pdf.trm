@@ -911,10 +911,57 @@ TERM_PUBLIC void
 PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	    unsigned int width, unsigned int height)
 {
+#if USE_ULIG_FILLEDBOXES
+    /* fillpar:
+     * - solid   : 0 - 100
+     * - pattern : 0 - 100
+     */
+    int fillpar = style >> 4;
+
+    /* style:
+     *   0 == empty
+     *   1 == solid
+     *   2 == pattern
+     */
+    style &= 0xf;
+#else
     (void) style;		/* unused */
+#endif
+
     PDF_PathClose();
     PDF_save(myPDF);
-    PDF_setgray(myPDF, 1);
+
+#if USE_ULIG_FILLEDBOXES
+    switch (style) {
+	case 0: /* fill with white */
+#endif
+	    PDF_setgray(myPDF, 1);
+#if USE_ULIG_FILLEDBOXES
+	    break;
+	case 1: /* solid fill */
+	    {
+		int real_linetype = PDF_Pen_RealID(PDF_LineType);
+		struct rgb *this_color = web_color_rgbs + 1 + real_linetype;
+
+		double fact = (100 - fillpar) * 0.01;
+		double fact_ = (1.0 - fact) / 255.0;
+
+		double red = (double)this_color->r   * fact_ + fact;
+		double green = (double)this_color->g * fact_ + fact;
+		double blue = (double)this_color->b  * fact_ + fact;
+
+		PDF_setcolor(myPDF, "fill", "rgb", red, green, blue, 0 /* unused */);
+	    }
+	    break;
+	case 2: /* pattern fill */
+	    /* TODO */
+	    fprintf(stderr, "(PDF_boxfill) pattern fill not implemented\n");
+	    break;
+	default:
+	    break;
+    }
+#endif
+
     PDF_moveto(myPDF, x1, y1);
     PDF_lineto(myPDF, x1+width, y1);
     PDF_lineto(myPDF, x1+width, y1+height);
