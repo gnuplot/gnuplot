@@ -634,7 +634,7 @@ static void
 SVG_GroupPm3dOpen()
 {
     if (!SVG_groupPm3dIsOpen) {
-	fprintf(gpoutfile, "<g style = 'stroke:none'>\n");
+	fprintf(gpoutfile, "\t<g style = 'stroke:none; shape-rendering:crispEdges'>\n");
 	SVG_groupPm3dIsOpen = TRUE;
     }
 }
@@ -643,7 +643,7 @@ static void
 SVG_GroupPm3dClose()
 {
     if (SVG_groupPm3dIsOpen) {
-	fprintf(gpoutfile, "</g>\n");
+	fprintf(gpoutfile, "\t</g>\n");
 	SVG_groupPm3dIsOpen = FALSE;
     }
 }
@@ -702,7 +702,7 @@ SVG_filled_polygon(int points, gpiPoint* corners)
 	return;
     }
 
-    fprintf(gpoutfile, "\t<polygon fill = '#%02x%02x%02x' points = '%d,%d %d,%d %d,%d %d,%d'/>\n",
+    fprintf(gpoutfile, "\t\t<polygon fill = 'rgb(%3d, %3d, %3d)' points = '%d,%d %d,%d %d,%d %d,%d'/>\n",
 	    SVG_red, SVG_green, SVG_blue,
 	    corners[0].x, term->ymax - corners[0].y,
 	    corners[1].x, term->ymax - corners[1].y,

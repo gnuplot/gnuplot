@@ -1,7 +1,13 @@
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
+	* term/svg.trm: added shape-rendering:crispEdges to render
+	surfaces correctly, changed color spec to rgb() which is
+	more readable
+
+2002-05-16  Johannes Zellner  <johannes@zellner.org>
+
 	* term/svg.trm, docs/gnuplot.doc pm3d/README: pm3d support
-	for the pdf driver
+	for the svg driver
 
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
@@ -436,7 +442,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/15 21:06:28 $).
+	last modification date (from the tag $Date: 2002/05/15 21:59:06 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
