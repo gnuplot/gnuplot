@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.55 1997/07/22 23:20:36 drd Exp $";
+static char *RCSid = "$Id: fit.c,v 1.57 1998/03/22 23:31:07 drd Exp $";
 #endif
 
 /*
@@ -12,7 +12,7 @@ static char *RCSid = "$Id: fit.c,v 1.55 1997/07/22 23:20:36 drd Exp $";
  *
  *	Internet address: cagr@rz.uni-sb.de
  *
- *	Copyright of this module:  1993, 1997  Carsten Grammes
+ *	Copyright of this module:  1993, 1998  Carsten Grammes
  *
  *	Permission to use, copy, and distribute this software and its
  *	documentation for any purpose with or without fee is hereby granted,
@@ -48,30 +48,31 @@ static char *RCSid = "$Id: fit.c,v 1.55 1997/07/22 23:20:36 drd Exp $";
 
 #define FIT_MAIN
 
-#include <math.h>
-#include <ctype.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <signal.h>
+
+#include "plot.h"
+#include "type.h"               /* own types */
+#include "matrix.h"
+#include "fit.h"
+#include "setshow.h"   /* for load_range */
+#include "alloc.h"
 
 #if defined(MSDOS) || defined(DOS386)	     /* non-blocking IO stuff */
 #include <io.h>
 #include <conio.h>
 #include <dos.h>
-#if (DJGPP==2) /* HBB: for unlink() */
-#include <unistd.h>
-#endif
-#else
-#ifdef OSK
-#include <stdio.h>
 #else
 #ifndef VMS
 #include <fcntl.h>
 #endif	/* VMS */
-#endif /* OSK */
 #endif	/* DOS */
 
 #if defined(ATARI) || defined(MTOS)
 #include <osbind.h>
-#include <stdio.h>
 #include <time.h>
 #define getchx() Crawcin()
 int kbhit(void);
@@ -80,13 +81,6 @@ int kbhit(void);
 #define STANDARD    stderr	/* compatible with gnuplot philosophy */
 
 #define BACKUP_SUFFIX ".old"
-
-#include "plot.h"
-#include "type.h"               /* own types */
-#include "matrix.h"
-#include "fit.h"
-#include "setshow.h"   /* for load_range */
-#include "alloc.h"
 
 
 /* access external global variables  (ought to make a globals.h someday) */
@@ -234,6 +228,9 @@ static void ctrlc_setup()
     getch that handles also function keys etc.
 *****************************************************************/
 #if defined(MSDOS) || defined(DOS386)
+/* HBB 980317: added a prototype... */
+int getchx __PROTO((void));
+
 int getchx ()
 {
     register int c = getch();
@@ -873,32 +870,6 @@ int n;
 
 
 /*****************************************************************
-    portable implementation of strnicmp (hopefully)
-*****************************************************************/
-
-#ifdef NEED_STRNICMP
-int strnicmp (s1, s2, n)
-char *s1;
-char *s2;
-int n;
-{
-    char c1,c2;
-
-    if(n==0) return 0;
-
-    do {
-	c1 = *s1++; if(islower(c1)) c1=toupper(c1);
-	c2 = *s2++; if(islower(c2)) c2=toupper(c2);
-    } while(c1==c2 && c1 && c2 && --n>0);
-
-    if(n==0 || c1==c2) return 0;
-    if(c1=='\0' || c1<c2) return 1;
-    return -1;
-}
-#endif
-
-
-/*****************************************************************
     first time settings
 *****************************************************************/
 void init_fit ()
@@ -1077,7 +1048,7 @@ char *pfile, *npfile;
 		strncpy (ifilename, pfile, sizeof ifilename);
 		ofilename = npfile;
 	} else {
-#ifdef VMS
+#ifdef BACKUP_FILESYSTEM
 		/* filesystem will keep original as previous version */
 		strncpy (ifilename, pfile, sizeof ifilename);
 #else

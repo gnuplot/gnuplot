@@ -1,36 +1,40 @@
 #ifndef lint
-static char    *RCSid = "$Id: datafile.c,v 1.38 1997/10/10 06:51:53 drd Exp $";
+static char    *RCSid = "$Id: datafile.c,v 1.41 1998/03/22 23:31:06 drd Exp $";
 #endif
 
-
 /* GNUPLOT - datafile.c */
-/*
- * Copyright (C) 1995 - 1997   David Denholm
- * 
- * Permission to use, copy, and distribute this software and its documentation
- * for any purpose with or without fee is hereby granted, provided that the
- * above copyright notice appear in all copies and that both that copyright
- * notice and this permission notice appear in supporting documentation.
- * 
- * Permission to modify the software is granted, but not the right to distribute
- * the modified code.  Modifications are to be distributed as patches to
- * released version.
- * 
- * This software is provided "as is" without express or implied warranty.
- * 
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- */
 
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/* AUTHOR : David Denholm */
 
 /*
  * this file provides the functions to handle data-file reading..
@@ -135,13 +139,6 @@ static char    *RCSid = "$Id: datafile.c,v 1.38 1997/10/10 06:51:53 drd Exp $";
  */
 /*}}}*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
-#include <time.h>
-#include <assert.h>
-
 #include "plot.h"
 #include "fnproto.h"  /* check prototypes against our defns */
 #include "binary.h"
@@ -244,137 +241,13 @@ extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern double min_array[], max_array[];
 /*}}}*/
 
-/*{{{  replacement sscanf for purec*/
-#ifdef __PUREC__
-/*
- * a substitute for PureC's buggy sscanf.
- * this uses the normal sscanf and fixes the following bugs:
- * - whitespace in format matches whitespace in string, but doesn't
- *   require any. ( "%f , %f" scans "1,2" correctly )
- * - the ignore value feature works (*). this created an address error
- *   in PureC.
- */
-
-#include <stdarg.h>
-#include <string.h>
-
-int purec_sscanf( const char *string, const char *format, ... )
-{
-  va_list args;
-  int cnt=0;
-  char onefmt[256];
-  char buffer[256];
-  const char *f=format;
-  const char *s=string;
-  char *f2;
-  char ch;
-  int ignore;
-  void *p;
-  int *ip;
-  int pos;
-
-  va_start(args,format);
-  while( *f && *s ) {
-    ch=*f++;
-    if( ch!='%' ) {
-      if(isspace(ch)) {
-        /* match any number of whitespace */
-        while(isspace(*s)) s++;
-      } else {
-        /* match exactly the character ch */
-        if( *s!=ch ) goto finish;
-        s++;
-      }
-    } else {
-      /* we have got a '%' */
-      ch=*f++;
-      if( ch=='%' ) {
-        /* match exactly % */
-        if( *s!=ch ) goto finish;
-        s++;
-      } else {
-        f2=onefmt;
-        *f2++='%';
-        *f2++=ch;
-        ignore=0;
-        if( ch=='*' ) {
-          ignore=1;
-          ch=f2[-1]=*f++;
-        }
-        while( isdigit(ch) ) {
-          ch=*f2++=*f++;
-        }
-        if( ch=='l' || ch=='L' || ch=='h' ) {
-          ch=*f2++=*f++;
-        }
-        switch(ch) {
-          case '[':
-            while( ch && ch!=']' ) {
-              ch=*f2++=*f++;
-            }
-            if( !ch ) goto error;
-            break;
-          case 'e':
-          case 'f':
-          case 'g':
-          case 'd':
-          case 'o':
-          case 'i':
-          case 'u':
-          case 'x':
-          case 'c':
-          case 's':
-          case 'p':
-          case 'n': /* special case handled below */
-            break;
-          default:
-            goto error;
-        }
-        if( ch!='n' ) {
-          strcpy(f2,"%n");
-          if( ignore ) {
-            p=buffer;
-          } else {
-            p=va_arg(args,void *);
-          }
-          switch( sscanf( s, onefmt, p, &pos ) ) {
-            case EOF: goto error;
-            case  0 : goto finish;
-          }
-          if( !ignore ) cnt++;
-          s+=pos;
-        } else {
-          if( !ignore ) {
-            ip=va_arg(args,int *);
-            *ip=(int)(s-string);
-          }
-        }
-      }
-    }
-  }
-
-  if( !*f ) goto finish;
-
-error:
-  cnt=EOF;
-finish:
-  va_end(args);
-  return cnt;
-}
-
-/* use the substitute now. I know this is dirty trick, but it works. */
-#define sscanf purec_sscanf
-
-#endif /* __PUREC__ */
-/*}}}*/
-
 
 /*{{{  static char *df_gets()*/
 static char *df_gets()
 {
 	int len=0;
 	
-	if (!fgets(line, max_line_len-1, data_fp))
+	if (!fgets(line, max_line_len, data_fp))
 		return NULL;
 
 	if (mixed_data_fp)
@@ -386,6 +259,9 @@ static char *df_gets()
 		
 		if (len > 0 && line[len-1]=='\n')
 		{
+			/* we have read an entire text-file line.
+			 * Strip the trailing linefeed and return
+			 */
 			line[len-1]=0;
 			return line;
 		}
@@ -399,7 +275,7 @@ static char *df_gets()
 		if ( (max_line_len-len) < 32)
 			line = gp_realloc(line, max_line_len*=2, "datafile line buffer");
 
-		if (!fgets(line+len-1, max_line_len - len, data_fp))
+		if (!fgets(line+len, max_line_len - len, data_fp))
 			return line; /* unexpected end of file, but we have something to do */
 	}
 
@@ -1208,7 +1084,7 @@ struct surface_points *this_plot;
 	int row,col;
 	struct iso_curve *this_iso;
 	double used[3]; /* output from using manip */
-	struct coordinate *point;
+	struct coordinate GPHUGE *point; /* HBB 980308: added 'GPHUGE' flag */
 	
 	assert(df_matrix);
 	

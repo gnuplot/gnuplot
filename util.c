@@ -1,39 +1,40 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 1.43 1997/07/22 23:20:53 drd Exp $";
+static char *RCSid = "$Id: util.c,v 1.44 1998/03/22 22:32:19 drd Exp $";
 #endif
 
 /* GNUPLOT - util.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
-#include <ctype.h>
-#include <math.h> /* get prototype for sqrt */
+
 #include "plot.h"
 #include "setshow.h" /* for month names etc */
 
@@ -198,9 +199,7 @@ register int count;
 
 	if ((count = token[t_num].length) >= max) {
 		count = max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in copy_str");
-#endif
+		FPRINTF((stderr, "str buffer overflow in copy_str"));
 	}
 	do {
 		str[i++] = input_line[start++];
@@ -231,9 +230,7 @@ register int count;
 
 	if ((count = token[t_num].length - 2) >= max) {
 		count = max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in quote_str");
-#endif
+		FPRINTF((stderr, "str buffer overflow in quote_str"));
 	}
 	if (count>0) {
 		do {
@@ -261,9 +258,7 @@ register int i,e;
 	e = token[end].start_index + token[end].length;
 	if(e-token[start].start_index>=max) {
 		e=token[start].start_index+max-1;
-#ifdef DEBUG_STR
-		fprintf(stderr, "str buffer overflow in capture");
-#endif
+		FPRINTF((stderr, "str buffer overflow in capture"));
 	}
 
 	for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
@@ -463,34 +458,13 @@ int i;
 }
 
 
-#if !defined(vms) && !defined(HAVE_STRERROR)
-/* substitute for systems that don't have ANSI function strerror */
-
-extern int sys_nerr;
-extern char *sys_errlist[];
-
-char *strerror(no)
-int no;
-{
-  static char res_str[30];
-
-  if(no>sys_nerr) {
-    sprintf(res_str, "unknown errno %d", no);
-    return res_str;
-  } else {
-    return sys_errlist[no];
-  }
-}
-#endif
-
-
 void os_error(str,t_num)
 char str[];
 int t_num;
 {
-#ifdef vms
+#ifdef VMS
 static status[2] = {1, 0};		/* 1 is count of error msgs */
-#endif
+#endif /* VMS */
 
 register int i;
 
@@ -522,13 +496,13 @@ register int i;
 	    fprintf(stderr,"line %d: ", inline_num);
 
 
-#ifdef vms
+#ifdef VMS
 	status[1] = vaxc$errno;
 	sys$putmsg(status);
 	(void) putc('\n',stderr);
-#else /* vms */
+#else /* VMS */
 	fprintf(stderr,"(%s)\n\n", strerror(errno));
-#endif /* vms */
+#endif /* VMS */
 
 	bail_to_command_line();
 }

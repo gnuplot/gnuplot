@@ -1,6 +1,39 @@
 #ifndef lint
-static char *RCSid = "$Id: interpol.c,v 1.26 1997/07/22 23:20:41 drd Exp $";
+static char *RCSid = "$Id: interpol.c,v 1.28 1998/03/22 23:31:18 drd Exp $";
 #endif
+
+/* GNUPLOT - interpol.c */
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
 
 /*
  * C-Source file identification Header
@@ -81,7 +114,6 @@ static char *RCSid = "$Id: interpol.c,v 1.26 1997/07/22 23:20:41 drd Exp $";
  *      implemented handling of UNDEFINED points
  */
 
-#include <math.h>
 #include "plot.h"
 #include "setshow.h"
 
@@ -300,7 +332,7 @@ coordval *py;
 double *c;
 {
     unsigned int n = num_points - 1;
-    struct coordinate *this_points;
+    struct coordinate GPHUGE *this_points; /* HBB 980308: added 'GPHUGE' tag for DOS */
 
     this_points = (cp->points)+first_point;
 
@@ -491,7 +523,7 @@ int num_points;			/* to determine end in plot->points */
     spline_coeff *sc;
     five_diag *m;
     double *r, *x, *h;
-    struct coordinate *this_points;
+    struct coordinate GPHUGE *this_points; /* HBB 980308: added 'GPHUGE' tag */
     int i;
 
     sc = (spline_coeff *) gp_alloc((num_points) * sizeof(spline_coeff),
@@ -602,7 +634,7 @@ int first_point, num_points;
     spline_coeff *sc;
     tri_diag *m;
     double *r, *x, *h;
-    struct coordinate *this_points;
+    struct coordinate GPHUGE *this_points;  /* HBB 980308: added 'GPHUGE' tag */ 	 
     int i;
 
     if (num_points < 3)
@@ -680,7 +712,7 @@ struct coordinate *dest;	/* where to put the interpolated data */
     int i, l;
     int xaxis = plot->x_axis;
     int yaxis = plot->y_axis;
-    struct coordinate *this_points;
+    struct coordinate GPHUGE *this_points;  /* HBB 980308: added 'GPHUGE' tag */
 
     /* min and max in internal (eg logged) co-ordinates. We update
      * these, then update the external extrema in user co-ordinates

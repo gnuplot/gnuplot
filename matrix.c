@@ -28,8 +28,6 @@ static char *RCSid = "$Id: matrix.c,v 1.14 1997/04/10 02:33:05 drd Exp $";
 
 #define MATRIX_MAIN
 
-#include <math.h>
-
 #include "type.h"
 #include "fit.h"
 #include "matrix.h"

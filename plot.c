@@ -1,55 +1,38 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.85 1997/07/22 23:20:47 drd Exp $";
+static char *RCSid = "$Id: plot.c,v 1.86 1998/03/22 22:31:55 drd Exp $";
 #endif
 
-
 /* GNUPLOT - plot.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 #include <signal.h>
 
@@ -62,22 +45,23 @@ static char *RCSid = "$Id: plot.c,v 1.85 1997/07/22 23:20:47 drd Exp $";
 #if defined(MSDOS) || defined(DOS386)
 #include <io.h>
 #endif
+
 /* HBB: for the control87 function, if used with DJGPP V1: */
 #if defined(DJGPP) && (DJGPP!=2)
 #include "ctrl87.h"
 #endif
-/* HBB: for isatty() */
-#if (DJGPP==2)
-#include <unistd.h>
-#endif
-#ifdef vms
+
+#ifdef VMS
 #ifndef __GNUC__
 #include <unixio.h>
 #endif
 #include <smgdef.h>
 extern int vms_vkid;
 extern smg$create_virtual_keyboard();
-#endif
+extern int vms_ktid;
+extern smg$create_key_table();
+#endif /* VMS */
+
 #ifdef AMIGA_SC_6_1
 #include <proto/dos.h>
 #endif
@@ -106,7 +90,6 @@ extern int rl_complete_with_tilde_expansion;
 #endif
 
 #if defined(__TURBOC__) && (defined(MSDOS) || defined(DOS386))  /* patch to get home dir, see command.c */
-#include <string.h>
 char HelpFile[80] ;
 #endif             /*   - DJL */
 
@@ -121,7 +104,6 @@ static jmp_buf far command_line_env;
 static jmp_buf command_line_env;
 #endif
 
-int main __PROTO((int argc, char **argv));
 static void load_rcfile __PROTO((void));
 RETSIGTYPE inter __PROTO((int anint));
 
@@ -197,37 +179,35 @@ struct udft_entry *first_udf = NULL;
 
 
 
-#ifdef vms
-
+#ifdef VMS
 #define HOME "sys$login:"
+#else /* VMS */
 
-#else /* vms */
 #if defined(MSDOS) ||  defined(AMIGA_AC_5) || defined(AMIGA_SC_6_1) || defined(ATARI) || defined(OS2) || defined(_Windows) || defined(DOS386)
 
 #define HOME "GNUPLOT"
 
-#else /* MSDOS || AMIGA || ATARI || OS2 || _Windows || defined(DOS386)*/
+#else /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
 
 #define HOME "HOME"
 
-#endif /* MSDOS || AMIGA || ATARI || OS2 || _Windows || defined(DOS386)*/
-#endif /* vms */
+#endif /* MSDOS || AMIGA_AC/SC || ATARI || OS2 || _Windows || defined(DOS386)*/
+#endif /* VMS */
 
 #ifdef OS2
 #define INCL_DOS
 #define INCL_REXXSAA
-#include <stdlib.h>
 #include <os2.h>
 #include <process.h>
 ULONG RexxInterface( PRXSTRING, PUSHORT, PRXSTRING ) ;
 int   ExecuteMacro( char* , int) ;  
 #endif
 
-#if defined(unix) || defined(AMIGA_AC_5) || defined(AMIGA_SC_6_1) || defined(__amigaos__) || defined(OSK)
+#if defined(unix) || defined(AMIGA) || defined(OSK)
 #define PLOTRC ".gnuplot"
-#else /* AMIGA || unix */
+#else /* AMIGA || unix || OSK */
 #define PLOTRC "gnuplot.ini"
-#endif /* AMIGA || unix */
+#endif /* AMIGA || unix || OSK */
 
 #if defined(ATARI) || defined(MTOS)
 void appl_exit(void);
@@ -381,10 +361,12 @@ rl_complete_with_tilde_expansion = 1;
 
      if (interactive)
 	  show_version();
-#ifdef vms   /* initialise screen management routines for command recall */
+#ifdef VMS   /* initialise screen management routines for command recall */
           if (status[1] = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
                done(status[1]);
-#endif
+	  if (status[1] = smg$create_key_table(&vms_ktid) != SS$_NORMAL)
+	       done(status[1]);
+#endif /* VMS */
 
 	if (!setjmp(command_line_env)) {
 	    /* first time */
@@ -404,7 +386,7 @@ rl_complete_with_tilde_expansion = 1;
 #ifdef _Windows
 	SetCursor(LoadCursor((HINSTANCE)NULL, IDC_ARROW));
 #endif
-#ifdef vms
+#ifdef VMS
 	    /* after catching interrupt */
 	    /* VAX stuffs up stdout on SIGINT while writing to stdout,
 		  so reopen stdout. */
@@ -468,8 +450,7 @@ rl_complete_with_tilde_expansion = 1;
     return(IO_SUCCESS);
 }
 
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
-#include <math.h>
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 int purec_matherr(struct exception *e)
 {	char *c;
 	switch (e->type) {
@@ -486,7 +467,7 @@ int purec_matherr(struct exception *e)
 	fprintf(stderr, "    ret  : %e\n", e->retval);
 	return 1;
 }
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
 
 
 /* Set up to catch interrupts */
@@ -517,9 +498,9 @@ static void load_rcfile()
     char const *const ext[] = {NULL};
 #endif
     /* Look for a gnuplot init file in . or home directory */
-#ifdef vms
+#ifdef VMS
     (void) strcpy(home,HOME);
-#else /* vms */
+#else /* VMS */
     char *tmp_home=getenv(HOME);
     char *p;	/* points to last char in home path, or to \0, if none */
     char c='\0';/* character that should be added, or \0, if none */
@@ -547,7 +528,7 @@ static void load_rcfile()
 	    *p='\0';
 	}
     }
-#endif /* vms */
+#endif /* VMS */
 
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
@@ -557,7 +538,7 @@ static void load_rcfile()
     plotrc = fopen(rcfile,"r");
     if (plotrc == (FILE *)NULL) {
 #endif
-#ifndef vms
+#ifndef VMS
 	if( tmp_home ) {
 #endif
 	   (void) sprintf(rcfile, "%s%s", home, PLOTRC);
@@ -568,15 +549,16 @@ static void load_rcfile()
 	   ini_ptr = findfile(PLOTRC,getenv("GNUPLOTPATH"),ext);
 	   if (ini_ptr)  plotrc = fopen(ini_ptr,"r");
         }
-#endif
-#if !defined(vms) && !defined(ATARI) && !defined(MTOS)
+#endif /* ATARI || MTOS */
+#if !defined(VMS) && !defined(ATARI) && !defined(MTOS)
 	} else
 	   plotrc=NULL;
-#endif
+#endif /* !VMS && !ATARI && !MTOS */
     }
     if (plotrc)
 	 load_file(plotrc, rcfile, FALSE);
 }
+
 #ifdef OS2
 int ExecuteMacro( char *argv, int namelength ) 
     {

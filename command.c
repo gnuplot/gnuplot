@@ -1,35 +1,40 @@
 #ifndef lint
-static char    *RCSid = "$Id: command.c,v 1.121 1997/07/22 23:20:28 drd Exp $";
+static char    *RCSid = "$Id: command.c,v 1.123 1998/03/22 23:31:00 drd Exp $";
 #endif
 
-
 /* GNUPLOT - command.c */
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
 /*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
- * 
- * Permission to use, copy, and distribute this software and its documentation
- * for any purpose with or without fee is hereby granted, provided that the
- * above copyright notice appear in all copies and that both that copyright
- * notice and this permission notice appear in supporting documentation.
- * 
- * Permission to modify the software is granted, but not the right to distribute
- * the modified code.  Modifications are to be distributed as patches to
- * released version.
- * 
- * This software is provided "as is" without express or implied warranty.
- * 
- * 
- * AUTHORS
- * 
- * Original Software: Thomas Williams,  Colin Kelley.
- * 
- * Gnuplot 2.0 additions: Russell Lang, Dave Kotz, John Campbell.
- * 
- * Gnuplot 3.0 additions: Gershon Elber and many others.
- * 
- *   Nonlinear Least squares fit:
- *	 Carsten Grammes
- * 
  * Changes:
  * 
  * Feb 5, 1992	Jack Veenstra	(veenstra@cs.rochester.edu) Added support to
@@ -43,93 +48,51 @@ static char    *RCSid = "$Id: command.c,v 1.121 1997/07/22 23:20:28 drd Exp $";
  * 
  * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
  * Added user-specified bases for log scaling.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * Send bug reports regarding the fit to
- *	   cagr@rz.uni-sb.de
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
  */
-
-#include <math.h>
-#include <ctype.h>
-#include <assert.h>
-
-#ifdef VMS
-#include <signal.h>  /* for sleep() */
-#endif
-
-#if defined(MSDOS) || defined(DOS386)
-#ifdef DJGPP
-#include <dos.h>
-#include <dir.h>            /* HBB: for setdisk() */
-#else
-#include <process.h>
-#endif
-
-#ifdef __ZTC__
-#define HAVE_SLEEP 1
-#define P_WAIT 0
-#else
-
-#ifdef __TURBOC__
-#define HAVE_SLEEP 1
-#ifndef _Windows
-#include <conio.h>
-#include <dir.h>    /* setdisk() */
-extern unsigned _stklen = 16394;/* increase stack size */
-extern char HelpFile[80] ;      /* patch for do_help  - DJL */
-#endif
-
-#else				/* must be MSC */
-#if !defined(__EMX__) && !defined(DJGPP)
-#ifdef __MSC__
-#include <direct.h>		/* for _chdrive() */
-#endif				/* __MSC__ */
-#endif				/* !__EMX__ && !DJGPP */
-#endif				/* TURBOC */
-#endif				/* ZTC */
-
-#endif				/* MSDOS */
-
-#ifdef _Windows
-#ifdef __MSC__
-#include <direct.h>		/* for _chdrive() */
-#endif
-#endif /* _Windows */
-
-#ifndef GP_SLEEP
-# ifdef __ZTC__
-#  define GP_SLEEP(delay) usleep ((unsigned long) (delay))
-# else
-#  define GP_SLEEP(delay) sleep ((unsigned int) (delay))
-# endif
-#endif
 
 #include "plot.h"
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
+
+#if defined(MSDOS) || defined(DOS386)
+# ifdef DJGPP
+#  include <dos.h>
+#  include <dir.h>            /* HBB: for setdisk() */
+# else
+#  include <process.h>
+# endif /* DJGPP */
+
+# ifdef __ZTC__
+#  define HAVE_SLEEP 1
+#  define P_WAIT 0
+# else /* __ZTC__ */
+
+# ifdef __TURBOC__
+#  ifndef _Windows
+#   define HAVE_SLEEP 1
+#   include <conio.h>
+#   include <dir.h>    /* setdisk() */
+extern unsigned _stklen = 16394;/* increase stack size */
+extern char HelpFile[80] ;      /* patch for do_help  - DJL */
+#  endif /* _Windows */
+
+# else				/* must be MSC */ 
+#  if !defined(__EMX__) && !defined(DJGPP)
+#   ifdef __MSC__
+#    include <direct.h>		/* for _chdrive() */
+#   endif /* __MSC__ */
+#  endif /* !__EMX__ && !DJGPP */
+# endif	/* TURBOC */
+#endif /* ZTC */
+
+#endif /* MSDOS */
+
 #ifndef _Windows
-#include "help.h"
+# include "help.h"
 #else
-#define MAXSTR 255
-#endif
+# define MAXSTR 255
+#endif /* _Windows */
 
 #if defined(ATARI) || defined(MTOS)
 #ifdef __PUREC__
@@ -144,26 +107,21 @@ extern char HelpFile[80] ;      /* patch for do_help  - DJL */
 #endif /* __PUREC__ */
 #endif /* ATARI || MTOS */
 
-#ifndef HAVE_SLEEP
-/* POSIX.1 synopsis */
-unsigned int sleep __PROTO((unsigned int));
-#endif
-
 #ifndef STDOUT
 #define STDOUT 1
 #endif
 
 #ifndef HELPFILE
-#if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
-#define HELPFILE "gnuplot.gih"
-#else
-#ifdef AMIGA_SC_6_1
-#define HELPFILE "S:gnuplot.gih"
-#else
-#define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
-#endif				/* AMIGA_SC_6_1 */
-#endif
-#endif				/* HELPFILE */
+# if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
+#  define HELPFILE "gnuplot.gih"
+# else
+#  if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
+#   define HELPFILE "S:gnuplot.gih"
+#  else
+#   define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
+#  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
+# endif /* MSDOS || OS2 || DOS386 */ 
+#endif /* HELPFILE */
 
 #ifdef _Windows
 #include <windows.h>
@@ -182,17 +140,12 @@ extern int Pause(LPSTR mess); /* in winmain.c */
 
 #define inrange(z,min,max) ((min<max) ? ((z>=min)&&(z<=max)) : ((z>=max)&&(z<=min)) )
 
-/* purec_sscanf is now in datafile.c */
-#ifdef __PUREC__
-# define sscanf purec_sscanf
-#endif
-
 #ifdef OS2
  /* emx has getcwd, chdir that can handle drive names */
 #define chdir  _chdir2
 #endif /* OS2 */
 
-#ifdef vms
+#ifdef VMS
 int             vms_vkid;	/* Virtual keyboard id */
 #endif
 
@@ -834,60 +787,10 @@ static void replotrequest()
 	else  plotrequest();
 }
 
-#ifndef HAVE_SLEEP
-/* The implementations below do not even come close
-   to what is required by POSIX, but I suppose
-   it doesn't really matter on these systems. lh
- */
-#ifdef AMIGA_SC_6_1
-#include <proto/dos.h>
-
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    Delay(50 * delay);
-
-    return (unsigned int)0;
-}
-#endif /* AMIGA_SC_6_1 */
-
-#ifdef WIN32
-/* the WIN32 API has a Sleep function that does not consume CPU cycles */
-#include <windows.h>
-
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    Sleep( (DWORD) delay*1000 );
-
-    return (unsigned int)0;
-}
-#else
-#if defined(MSDOS) || defined(_Windows) || defined(DOS386) || defined(AMIGA_AC_5)
-#if (!defined(__TURBOC__) && !defined(__EMX__) && !defined(DJGPP)) || defined(_Windows) /* Turbo C already has sleep() */
-/* kludge to provide sleep() for msc 5.1 */
-unsigned int
-sleep(delay)
-    unsigned int    delay;
-{
-    unsigned long   time_is_up;
-
-    time_is_up = time(NULL) + (unsigned long) delay;
-    while (time(NULL) < time_is_up)
-	 /* wait */ ;
-
-    return (unsigned int)0;
-}
-#endif				/* (!TURBOC && !__EMX__ && !DJGPP) or _Windows */
-#endif				/* MSDOS || _Windows || AMIGA_AC_5 */
-#endif				/* WIN32 */
-#endif                          /* HAVE_SLEEP */
 
 /* Support for input, shell, and help for various systems */
 
-#ifdef vms
+#ifdef VMS
 
 #include <descrip.h>
 #include <rmsdef.h>
@@ -1000,7 +903,7 @@ static void do_system()
     (void) putc('\n', stderr);
 }
 
-#else				/* vms */
+#else				/* VMS */
 
 #ifdef _Windows
 static void do_help(toplevel)
@@ -1360,7 +1263,7 @@ static void do_shell()
 #endif				/* AMIGA_SC_6_1 */
 #endif				/* MSDOS */
 
-/* read from stdin, everything except vms */
+/* read from stdin, everything except VMS */
 
 #ifndef READLINE
 #if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
@@ -1513,7 +1416,7 @@ static int read_line(prompt)
     } while (more);
     return(0);
 }
-#endif				/* vms */
+#endif				/* VMS */
 
 #ifdef _Windows
 /* there is a system like call on MS Windows but it is a bit difficult to 

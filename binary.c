@@ -22,9 +22,6 @@ static char *RCSid = "$Id: binary.c,v 1.9 1997/04/10 02:32:40 drd Exp $";
  *
  */
 
-#include <math.h>
-
-
 #include "plot.h"   /* We have to get TRUE and FALSE */
 #include "stdfn.h"
 #include "binary.h"

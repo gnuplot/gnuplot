@@ -1,58 +1,39 @@
 #ifndef lint
-static char *RCSid = "$Id: scanner.c,v 1.53 1997/04/10 02:33:15 drd Exp $";
+static char *RCSid = "$Id: scanner.c,v 1.54 1998/03/22 22:32:04 drd Exp $";
 #endif
 
-
 /* GNUPLOT - scanner.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
-#include <ctype.h>
-#include <math.h>
 #include "plot.h"
 
 static int get_num __PROTO((char str[]));
@@ -62,16 +43,13 @@ static void substitute __PROTO((char *str, int max));
 #define O_RDONLY	0
 int open(const char * _name, int _mode, ...);
 int close(int);
-#endif
+#endif /* AMIGA_AC_5 */
 
-#ifdef vms
-
+#ifdef VMS
 #include <descrip.h>
-
 #define MAILBOX "PLOT$MAILBOX"
 #define pclose(f) fclose(f)
-
-#endif /* vms */
+#endif /* VMS */
 
 
 #define isident(c) (isalnum(c) || (c) == '_')
@@ -277,7 +255,7 @@ register long lval;
 	return(count);
 }
 
-#if defined(vms) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if defined(VMS) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
 
 /* this really ought to make use of the dynamic-growth of the
  * input line in 3.6.  And it definitely should not have
@@ -293,19 +271,19 @@ register int i,c;
 register FILE *f;
 #ifdef AMIGA_AC_5
 int fd;
-#else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* AMIGA_AC_5 */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 char	*atari_tmpfile;
 char	*atari_pgm[MAX_LINE_LEN+100];
-#endif /* ATARI && PUREC || MTOS && PUREC */
+#endif /* (ATARI || MTOS) && PUREC */
 #endif /* AMIGA_AC_5 */
 static char pgm[MAX_LINE_LEN+1],output[MAX_LINE_LEN+1];
 
-#ifdef vms
+#ifdef VMS
 int chan, one = 1;
 static $DESCRIPTOR(pgmdsc,pgm);
 static $DESCRIPTOR(lognamedsc,MAILBOX);
-#endif /* vms */
+#endif /* VMS */
 
 	/* forgive missing closing backquote at end of line */
 	i = 0;
@@ -320,7 +298,7 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	pgm[i] = '\0';		/* end with null */
 	max -= strlen(last);	/* max is now the max length of output sub. */
   
-#ifdef vms
+#ifdef VMS
   	pgmdsc.dsc$w_length = i;
    	if (!((vaxc$errno = sys$crembx(0,&chan,0,0,0,0,&lognamedsc)) & 1))
    		os_error("sys$crembx failed",NO_CARET);
@@ -330,8 +308,8 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
    
    	if ((f = fopen(MAILBOX,"r")) == NULL)
    		os_error("mailbox open failed",NO_CARET);
-#else /* vms */
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* VMS */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 		if (system(NULL) == 0)
 			os_error("no command shell", NO_CARET);
 		if ((strlen(atari_tmpfile) + strlen(pgm) + 5) > MAX_LINE_LEN+100)
@@ -345,12 +323,12 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 #else
 #ifdef AMIGA_AC_5
   	if ((fd = open(pgm,"O_RDONLY")) == -1)
-#else
+#else /* AMIGA_AC_5 */
   	if ((f = popen(pgm,"r")) == NULL)
-#endif
-#endif	/* ATARI && PUREC || MTOS && PUREC */
+#endif /* AMIGA_AC_5 */
+#endif	/* (ATARI || MTOS) && PUREC */
   		os_error("popen failed",NO_CARET);
-#endif /* vms */
+#endif /* VMS */
 
 	i = 0;
 	while ((c = getc(f)) != EOF) {
@@ -358,27 +336,27 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 		if (i == max) {
 #ifdef AMIGA_AC_5
 			(void) close(fd);
-#else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#else /* AMIGA_AC_5 */
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 			(void) fclose(f);
 			(void) unlink(atari_tmpfile);
-#else
+#else /* (ATARI || MTOS) && PUREC */
 			(void) pclose(f);
-#endif /* ATARI && PUREC || MTOS && PUREC */
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
+#endif /* AMIGA_AC_5 */
 			int_error("substitution overflow", t_num);
 		}
 	}
 #ifdef AMIGA_AC_5
 	(void) close(fd);
 #else
-#if (defined(ATARI) && defined(__PUREC__)) || (defined(MTOS) && defined(__PUREC__))
+#if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
 	(void) fclose(f);
 	(void) unlink(atari_tmpfile);
-#else
+#else /* (ATARI || MTOS) && PUREC */
 	(void) pclose(f);
-#endif /* ATARI && PUREC || MTOS && PUREC */
-#endif
+#endif /* (ATARI || MTOS) && PUREC */
+#endif /* AMIGA_AC_5 */
 
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
@@ -388,7 +366,7 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	screen_ok = FALSE;
 }
 
-#else /* vms || PIPES || ATARI && PUREC */
+#else /* VMS || PIPES || ATARI && PUREC */
 
 static void substitute(str,max)
 char *str;
@@ -398,4 +376,4 @@ int max;
 
 	int_error( strcat(strcpy(line,"substitution not supported by "),OS),t_num);
 }
-#endif /* unix || vms || PIPES || ATARI && PUREC */
+#endif /* unix || VMS || PIPES || ATARI && PUREC */
