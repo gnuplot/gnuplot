@@ -1,14 +1,14 @@
 #
 # $Id: makefile.os2,v 1.27 1998/04/14 00:15:54 drd Exp $
 #
-# Makefile for use with emx (0.9 and above) and GNUMake
+# Makefile for use with emx 0.9 (and above) and GNUMake
 #   on OS/2 3.0 and above (might also work for OS/2 2.x)
 #
-# last modification date: 19981005
+# last modification date: 19981107
 #
 
 # We depend on using cmd.exe (or a compatible one)
-SHELL=cmd
+SHELL=cmd.exe
 
 #
 # ***************** Begin of Configuration section ***************************
@@ -39,7 +39,7 @@ GNU_RL=1
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
-DEBUG=1
+# DEBUG=1
 
 # MOUSE support for PM terminal
 # (not yet supported in official release)
@@ -111,7 +111,9 @@ O3 = o
 OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
 
 # Flags for compiling with EMX/GCC
-EMXSPECIFIC = -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
+# Special note: -ffloat-store is necessary to avoid some
+# strange behaviour (confirmed for gcc 2.7.x and graphics.c)
+EMXSPECIFIC = -ffloat-store -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
 LIBS = 
 ifdef GNU_RL
   EMXSPECIFIC += -DGNU_READLINE
@@ -122,16 +124,16 @@ endif
 # Choose flags suitable for a debugging or for a production build
 #
 ifdef DEBUG
-CFLAGS  = -g $(OS2FLAGS) -Wall -Wno-comment -O0
+CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
 LFLAGS  = -g -Zcrtdll
-CFLAGS2 = -g $(OS2FLAGS) -Zomf -Zsys -Zmt -Wall -O0
+CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Zomf -Zsys -Zmt -Wall -O0
 LFLAGS2 = -g -Zomf -Zmt -Zcrtdll
 CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
 LFLAGS3 = -g
 else
-CFLAGS  = $(OS2FLAGS) -O2 -Wall -Wno-unused -Wno-comment
+CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS  = -s -Zcrtdll
-CFLAGS2 = $(OS2FLAGS) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
+CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
 LFLAGS2 = -s -Zomf -Zmt -Zsys
 CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS3 = -s
@@ -176,9 +178,10 @@ endif
 # Default Rules
 #
 .c.$(O):
-	$(CC)  $(CFLAGS) $(TERMFLAGS) $(EMXSPECIFIC) -o $*.$(O) -c $*.c
+	$(CC)  $(CFLAGS) $(TERMFLAGS) -o $*.$(O) -c $*.c
 .c.obj:
 	$(CC2) $(CFLAGS2) -o $*.obj -c $*.c
+
 #
 # Include dependencies valid for all platforms from makefile.all
 #
@@ -197,17 +200,6 @@ ifdef X11
 binaries: gnuplot.exe gnupmdrv.exe gnuplot_x11.exe
 else
 binaries: gnuplot.exe gnupmdrv.exe
-endif
-
-#
-# Special rule to build graphics.o 
-# ('plain' -O2 does not work properly here !)
-graphics.o: graphics.c
-ifdef DEBUG
-#	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O2 -ffloat-store -o $@ -c graphics.c
-	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O0 -ffloat-store -o $@ -c graphics.c
-else
-	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -O2 -ffloat-store -o $@ -c graphics.c
 endif
 
 OBJS = $(COREOBJS) version.$(O)
@@ -232,6 +224,7 @@ gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 	ipfc $(OS2DIR)\gnupmdrv.ipf
 	move $(OS2DIR)\gnupmdrv.hlp .
+
 #
 # Build the X11 outboard driver
 #
@@ -243,7 +236,7 @@ X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
 
 gnuplot_x11.exe: gplt_x11.o stdfn.o
-	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ gplt_x11.o stdfn.o $(X11LIBS)
+	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<

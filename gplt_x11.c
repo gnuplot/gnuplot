@@ -281,6 +281,10 @@ char *argv[];
     /* malloc large blocks, otherwise problems with fragmented mem */
     _mallocmin(102400);
 #endif
+#ifdef __EMX__
+    /* close open file handles */
+    fcloseall();
+#endif
 
     FPRINTF((stderr, "gnuplot_X11 starting up\n"));
 
