@@ -1,3 +1,10 @@
+2002-02-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/Makefile.in: Add missing .trm files to CORETERM. Always build
+	gnuplot.info. Improve install and uninstall targets.
+
+	* tutorial/Makefile.am.in: Use $(top_srcdir) instead of hardcoded path.
+
 2002-02-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c: Fix of cb-axis autoscale for binary and with palette
