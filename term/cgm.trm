@@ -702,7 +702,7 @@ TERM_PUBLIC void CGM_put_text(x, y, str)
   char *s = str;
 
   while(*s) 
-    if(!isspace(*s++)) 
+    if(!isspace((int)*s++)) 
       goto showit;
   return;
 

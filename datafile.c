@@ -187,11 +187,11 @@ static TBOOLEAN pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE;
 
 #ifndef MAXINT			/* should there be one already defined ? */
-#ifdef INT_MAX			/* in limits.h ? */
-#define MAXINT INT_MAX
-#else
-#define MAXINT ((~0)>>1)
-#endif
+# ifdef INT_MAX			/* in limits.h ? */
+#  define MAXINT INT_MAX
+# else
+#  define MAXINT ((~0)>>1)
+# endif
 #endif
 
 /* stuff for implementing index */
@@ -348,11 +348,11 @@ char *s;
 #endif /* NO_FORTRAN_NUMS */
 	    } else {
 		/* skip any space at start of column */
-		while (isspace(*s))
+		while (isspace((int)*s))
 		    ++s;
 		count = *s ? 1 : 0;
 		/* skip chars to end of column */
-		for (used = 0; !isspace(*s) && (*s != NUL); ++used, ++s)
+		for (used = 0; !isspace((int)*s) && (*s != NUL); ++used, ++s)
 		    ;
 	    }
 
@@ -376,11 +376,11 @@ char *s;
 
 	++df_no_cols;
 	/*{{{  skip chars to end of column */
-	while ((!isspace(*s)) && (*s != '\0'))
+	while ((!isspace((int)*s)) && (*s != '\0'))
 	    ++s;
 	/*}}} */
 	/*{{{  skip spaces to start of next column */
-	while (isspace(*s))
+	while (isspace((int)*s))
 	    ++s;
 	/*}}} */
     }
@@ -411,7 +411,7 @@ int *rows, *cols;
 	    df_eof = 1;
 	    return rmatrix;	/* NULL if we have not read anything yet */
 	}
-	while (isspace(*s))
+	while (isspace((int)*s))
 	    ++s;
 
 	if (!*s || is_comment(*s)) {
@@ -797,7 +797,7 @@ int max;
 
 	/*{{{  check for blank lines, and reject by index/every */
 	/*{{{  skip leading spaces */
-	while (isspace(*s))
+	while (isspace((int)*s))
 	    ++s;		/* will skip the \n too, to point at \0  */
 	/*}}} */
 
@@ -1406,7 +1406,7 @@ char *s;
     if (missing_val != NULL) {
 	int len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
-	    (isspace(s[len]) || !s[len])) {
+	    (isspace((int)s[len]) || !s[len])) {
 	    return (1);;	/* store undefined point in plot */
 	}
     }

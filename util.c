@@ -148,7 +148,7 @@ int isletter(t_num)
 int t_num;
 {
     return (token[t_num].is_token &&
-	    ((isalpha(input_line[token[t_num].start_index])) ||
+	    ((isalpha((int)input_line[token[t_num].start_index])) ||
 	     (input_line[token[t_num].start_index] == '_')));
 }
 
@@ -485,11 +485,12 @@ int t_num;
 
     for (i = 0; i < sizeof(PROMPT) - 1; i++)
 	(void) putc(' ', stderr);
-    if (!interactive)
+    if (!interactive) {
 	if (infile_name != NULL)
 	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
 	else
 	    fprintf(stderr, "line %d: ", inline_num);
+    }
 
 
 #ifdef VMS
@@ -526,11 +527,12 @@ int t_num;
     }
     for (i = 0; i < sizeof(PROMPT) - 1; i++)
 	(void) putc(' ', stderr);
-    if (!interactive)
+    if (!interactive) {
 	if (infile_name != NULL)
 	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
 	else
 	    fprintf(stderr, "line %d: ", inline_num);
+    }
     fprintf(stderr, "%s\n\n", str);
 
     bail_to_command_line();
@@ -559,11 +561,12 @@ int t_num;
     }
     for (i = 0; i < sizeof(PROMPT) - 1; i++)
 	(void) putc(' ', stderr);
-    if (!interactive)
+    if (!interactive) {
 	if (infile_name != NULL)
 	    fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num);
 	else
 	    fprintf(stderr, "line %d: ", inline_num);
+    }
     fprintf(stderr, "warning: %s\n", str);
 
 }				/* int_warn */
@@ -576,7 +579,7 @@ char *s;
     register char *p = s;
 
     while (*p != NUL) {
-	if (isupper(*p))
+	if (isupper((int)*p))
 	    *p = tolower(*p);
 	p++;
     }
@@ -593,7 +596,7 @@ char *s;
     TBOOLEAN space = FALSE;	/* TRUE if we've already copied a space */
 
     for (w = r = s; *r != NUL; r++) {
-	if (isspace(*r)) {
+	if (isspace((int)*r)) {
 	    /* white space; only copy if we haven't just copied a space */
 	    if (!space) {
 		space = TRUE;

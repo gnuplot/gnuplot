@@ -1379,6 +1379,7 @@ int pcount;			/* count of plots in linked list */
 	if ((ytics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis, xleft, xright)) {
 	    tic_start = axis;
 	    tic_direction = -1;
+	    if (ytics & TICS_MIRROR) tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((tic_start - xleft) > (3 * t->h_char)) ? tic_start : xleft) - t->h_char;
 	} else {
@@ -1415,6 +1416,7 @@ int pcount;			/* count of plots in linked list */
 	if ((xtics & TICS_ON_AXIS) && !log_array[FIRST_Y_AXIS] && inrange(axis, ybot, ytop)) {
 	    tic_start = axis;
 	    tic_direction = -1;
+	    if (xtics & TICS_MIRROR) tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    if (tic_start - ybot > 2 * t->v_char)
 		tic_text = tic_start - ticscale * t->v_tic - t->v_char;
@@ -1457,6 +1459,7 @@ int pcount;			/* count of plots in linked list */
 	if ((y2tics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis, xleft, xright)) {
 	    tic_start = axis;
 	    tic_direction = 1;
+	    if (y2tics & TICS_MIRROR) tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((xright - tic_start) > (3 * t->h_char)) ? tic_start : xright) + t->h_char;
 	} else {
@@ -1492,6 +1495,7 @@ int pcount;			/* count of plots in linked list */
 	if ((x2tics & TICS_ON_AXIS) && !log_array[SECOND_Y_AXIS] && inrange(axis, ybot, ytop)) {
 	    tic_start = axis;
 	    tic_direction = 1;
+	    if (x2tics & TICS_MIRROR) tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((ytop - tic_start) > (2 * t->v_char)) ? tic_start : ytop) + t->v_char;
 	} else {
@@ -3873,7 +3877,7 @@ double log_base, x;		/* we print one number in a number of different formats */
 	t = temp;
 	*t++ = '%';
 	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit(*format) ||
+	while (*++format == '.' || isdigit((int)*format) ||
 	       *format == '-' || *format == '+' || *format == ' ')
 	    *t++ = *format;
 	/*}}} */

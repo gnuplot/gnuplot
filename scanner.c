@@ -67,7 +67,7 @@ int close(int);
 
 #define APPEND_TOKEN {token[t_num].length++; current++;}
 
-#define SCAN_IDENTIFIER while (isident(expression[current + 1]))\
+#define SCAN_IDENTIFIER while (isident((int)expression[current + 1]))\
 				APPEND_TOKEN
 
 static int t_num;	/* number of token I'm working on */
@@ -111,7 +111,7 @@ again:
 		/* leave space for dummy end token */
 			extend_token_table();
 		}
-		if (isspace(expression[current]))
+		if (isspace((int)expression[current]))
 			continue;						/* skip the whitespace */
 		token[t_num].start_index = current;
 		token[t_num].length = 1;
@@ -122,9 +122,9 @@ again:
 			goto again;
 		}
 		/* allow _ to be the first character of an identifier */
-		if (isalpha(expression[current]) || expression[current] == '_') {
+		if (isalpha((int)expression[current]) || expression[current] == '_') {
 			SCAN_IDENTIFIER;
-		} else if (isdigit(expression[current]) || expression[current] == '.'){
+		} else if (isdigit((int)expression[current]) || expression[current] == '.'){
 			token[t_num].is_token = FALSE;
 			token[t_num].length = get_num(&expression[current]);
 			current += (token[t_num].length - 1);
@@ -230,11 +230,11 @@ register long lval;
 
 	token[t_num].is_token = FALSE;
 	token[t_num].l_val.type = INTGR;		/* assume unless . or E found */
-	while (isdigit(str[count]))
+	while (isdigit((int)str[count]))
 		count++;
 	if (str[count] == '.') {
 		token[t_num].l_val.type = CMPLX;
-		while (isdigit(str[++count]))	/* swallow up digits until non-digit */
+		while (isdigit((int)str[++count]))	/* swallow up digits until non-digit */
 			;
 		/* now str[count] is other than a digit */
 	}
@@ -245,11 +245,11 @@ register long lval;
 		count++;
 		if (str[count] == '-' || str[count] == '+')
 			count++;
-		if (!isdigit(str[count])) {
+		if (!isdigit((int)str[count])) {
 			token[t_num].start_index += count;
 			int_error("expecting exponent",t_num);
 		}
-		while (isdigit(str[++count]))
+		while (isdigit((int)str[++count]))
 			;
 	}
 	if (token[t_num].l_val.type == INTGR) {

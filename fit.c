@@ -854,7 +854,7 @@ static TBOOLEAN is_variable(s)
 char *s;
 {
     while (*s != '\0') {
-	if (!isalnum(*s) && *s != '_')
+	if (!isalnum((int)*s) && *s != '_')
 	    return FALSE;
 	s++;
     }
