@@ -1,3 +1,7 @@
+1999-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.cyg: Updated version from W. Kirby.
+
 1999-08-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/latextut/header.tex: Modified for LaTeX2e.
