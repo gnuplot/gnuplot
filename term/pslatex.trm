@@ -217,19 +217,25 @@ TERM_PUBLIC void PSLATEX_init()
 
     if (PSLATEX_output) {
         fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
-	fprintf(gpoutfile, "\\setlength{\\unitlength}{0.1bp}\n");
+	fprintf(gpoutfile, "\\begingroup%%\n");
+	fprintf(gpoutfile, "  \\makeatletter%%\n");
+	fprintf(gpoutfile, "  \\newcommand{\\GNUPLOTspecial}{%%\n");
+	fprintf(gpoutfile, "    \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n");
+	fprintf(gpoutfile, "  \\setlength{\\unitlength}{0.1bp}%%\n");
     } else {
 
         /* write plain TeX header */
 
         fprintf(gpoutfile, "%% GNUPLOT: plain TeX with Postscript\n");
+	fprintf(gpoutfile, "\\begingroup\n");
+	fprintf(gpoutfile, "  \\catcode`\\@=11\\relax\n");
+	fprintf(gpoutfile, "  \\def\\GNUPLOTspecial{%%\n");
+	fprintf(gpoutfile, "    \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n");
+	fprintf(gpoutfile, "    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%%=14\\relax\\special}%%\n");
+	fprintf(gpoutfile, "%%\n");	
 	fprintf(gpoutfile, "\\expandafter\\ifx\\csname GNUPLOTpicture\\endcsname\\relax\n");
-	fprintf(gpoutfile, "  \\begingroup\n");
+	fprintf(gpoutfile, "  \\csname newdimen\\endcsname\\GNUPLOTunit\n");
 
-	fprintf(gpoutfile, "    %% Inner version of \\newdimen from btxmac.tex\n");
-	fprintf(gpoutfile, "    \\edef\\innernewdimen{\\expandafter\\noexpand\\csname newdimen\\endcsname}%%\n");
-	fprintf(gpoutfile, "    \\innernewdimen\\GNUPLOTunit\n");
-	fprintf(gpoutfile, "  \\endgroup\n");
 	fprintf(gpoutfile, "  \\gdef\\GNUPLOTpicture(#1,#2){\\vbox to#2\\GNUPLOTunit\\bgroup\n");
 	fprintf(gpoutfile, "    \\def\\put(##1,##2)##3{\\unskip\\raise##2\\GNUPLOTunit\n");
 	fprintf(gpoutfile, "      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%%\n");
@@ -258,9 +264,9 @@ TERM_PUBLIC void PSLATEX_init()
 			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 			gpoutfile = tmp;
 		} else {
-			fprintf(gpoutfile, "\\special{!\n");
+			fprintf(gpoutfile, "{\\GNUPLOTspecial{!\n");
 			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-			fprintf(gpoutfile, "}\n");
+			fprintf(gpoutfile, "}}%%\n");
 		}
 	}
 
@@ -274,7 +280,7 @@ TERM_PUBLIC void PSLATEX_graphics()
     struct termentry *t = term;
 
     if (PSLATEX_output)
-        fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", (int)(xsize*t->xmax), (int)(ysize*t->ymax));
+        fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)%%\n", (int)(xsize*t->xmax), (int)(ysize*t->ymax));
     else
         fprintf(gpoutfile, "\\GNUPLOTpicture(%d,%d)\n", (int)(xsize*t->xmax), (int)(ysize*t->ymax));
 
@@ -296,7 +302,7 @@ TERM_PUBLIC void PSLATEX_graphics()
 	PS_graphics();
 	gpoutfile = tmp;
     } else {
-	fprintf(gpoutfile, "\\special{\"\n");
+	fprintf(gpoutfile, "{\\GNUPLOTspecial{\"\n");
 	PS_graphics();
     }
 
@@ -365,7 +371,7 @@ TERM_PUBLIC void PSLATEX_text()
 	gpoutfile = tmp;
     } else {
 	PS_text();
-	fprintf(gpoutfile, "}\n");
+	fprintf(gpoutfile, "}}%%\n");
     }
 
     for (tc = PSLATEX_labels; tc != (struct text_command*)NULL; tc = tc->next) {
@@ -422,7 +428,7 @@ TERM_PUBLIC void PSLATEX_text()
 	        fprintf(gpoutfile, "%%\n\\special{ps: currentpoint grestore moveto}%%\n");
 	    }
 	}
-	fprintf(gpoutfile, "}\n");
+	fprintf(gpoutfile, "}%%\n");
     }
 
     while (PSLATEX_labels) {
@@ -432,10 +438,15 @@ TERM_PUBLIC void PSLATEX_text()
 	PSLATEX_labels = tc;
     }
 
-    if (PSLATEX_output)
-        fprintf(gpoutfile, "\\end{picture}\n");
-    else
+    if (PSLATEX_output) {
+        fprintf(gpoutfile, "\\end{picture}%%\n");
+	fprintf(gpoutfile, "\\endgroup\n");
+	fprintf(gpoutfile, "\\endinput\n");
+    } else {
 	fprintf(gpoutfile, "\\endGNUPLOTpicture\n");
+	fprintf(gpoutfile, "\\endgroup\n");
+	fprintf(gpoutfile, "\\endinput\n");
+    }
 }
 
 TERM_PUBLIC void PSLATEX_move(x,y)
