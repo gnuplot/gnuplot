@@ -1,5 +1,5 @@
 #
-# $Id: makefile.emx,v 1.3 1999/11/08 19:20:58 lhecking Exp $
+# $Id: makefile.emx,v 1.4 1999/12/01 22:07:56 lhecking Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -17,7 +17,7 @@ EMXPATH = c:/emx
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 
-CFLAGS = -c -O2 -DMSDOS -DDOS32 -DANSI_C -DREADLINE -DHAVE_STRNICMP
+CFLAGS = -c -O2 -DMSDOS -DDOS32 -DPROTOTYPES -DHAVE_STRINGIZE -DREADLINE -DHAVE_STRNICMP
 
 # see other terminal defines in term.h
 TERMFLAGS = -DEMXVGA $(VESA)

@@ -11,7 +11,6 @@
 #define NO_GIH
 #define READLINE
 #define GP_INLINE inline
-#define ANSI_C
 #define NEAR
 
 #define PROTOTYPES		1

@@ -11,7 +11,8 @@
 #define NO_GIH
 #define READLINE
 #define GP_INLINE __inline
-#define ANSI_C
+#define GP_EXCEPTION_NAME	_exception
+#define GP_MATHERR		_matherr
 #define PROTOTYPES		1
 
 #ifndef __WIN32__

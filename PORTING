@@ -186,7 +186,6 @@ incomplete.
 
 define        note
 ------        --------
-ANSI_C        defined by ansichek.h if the compiler can handle ANSI prototypes
 AMIGA_AC_5    defined for Manx Aztec C 5.2a on the Amiga.
 AMIGA_SC_6_1  defined for SAS/C 6.1 or later versions on the Amiga.
 __amigaos__   defined by gcc on AmigaOS.

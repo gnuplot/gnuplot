@@ -1,5 +1,5 @@
 #
-# $Id: makefile.g,v 1.3 1999/11/08 19:20:58 lhecking Exp $
+# $Id: makefile.g,v 1.4 1999/12/01 22:07:56 lhecking Exp $
 #
 # GNUPLOT Makefile for GRASS, a geographic information system. 
 #
@@ -38,8 +38,8 @@
 # you compiled the plain (non-GRASS) version of gnuplot.
 #
 # the following is what I use for Solaris 2.3
-REGULAR_FLAGS=-DREADLINE=1 -DNOCWDRC=1 -DPROTOTYPES=1 -DX11=1 \
-	-DHAVE_UNISTD_H=1 -DHAVE_TERMIOS_H=1 -DSTDC_HEADERS=1 \
+REGULAR_FLAGS=-DREADLINE=1 -DNOCWDRC=1 -DPROTOTYPES=1 -DHAVE_STRINGIZE=1 \
+	-DX11=1 -DHAVE_UNISTD_H=1 -DHAVE_TERMIOS_H=1 -DSTDC_HEADERS=1 \
 	-DRETSIGTYPE=void -DGAMMA=lgamma -DHAVE_GETCWD=1 -DHAVE_STRNCASECMP=1 \
 	-DXPG3_LOCALE=1 -DHAVE_SYS_SYSTEMINFO_H=1 -DHAVE_SYSINFO=1 \
 	-DHAVE_TCGETATTR=1 -I/opt/x11r5/include -g -O
