@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.8 2001/03/07 08:40:05 mikulik Exp $
+# $Id: makefile.mgw,v 1.9 2001/03/07 10:06:23 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -31,7 +31,7 @@ PNG=1
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
-DEBUG=1
+#DEBUG=1
 
 # MOUSE support for the windows terminal
 MOUSE=1
@@ -39,6 +39,11 @@ MOUSE=1
 # PM3D splot mode + colours and filled polygons
 PM3D=1
 
+# PIPES: define if you would prefer support of pipes undef Windows (e.g.
+# plot '<awk -f preprocess.awk my.dat'). Drawback: wgnuplot.exe keeps attached
+# to a console=DOS window it was launched from, or it opens a new one.
+# Also does not work properly with pgnuplot.
+#PIPES=1
 
 # Below you can adapt paths according to your software setup:
 
@@ -96,13 +101,18 @@ else
   LDFLAGS += -s
 endif
 
+ifdef PIPES
+  OPTS += -DPIPES
+  LDFLAGS2 = -mconsole
+endif
+
 TOP = ..
 TERMFLAGS = -I$(TOP)/term
 TERMLIBS = 
 
 CFLAGS += -I$(TOP) -I. -D_Windows -DNO_GIH -DHAVE_STRNICMP \
 	-DREADLINE -DGP_INLINE=inline -D_NO_OLDNAMES -DANSI_C \
-	-DHAVE_GETCWD -DPIPES -DNEAR= \
+	-DHAVE_GETCWD -DNEAR= \
 	$(OPTS)
 
 ifdef MOUSE
@@ -176,7 +186,7 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi32
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
-	$(LD) $(LDFLAGS) -mconsole -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
+	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
 
 # rules
 

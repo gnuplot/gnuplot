@@ -1,3 +1,9 @@
+2001-03-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: do not support pipes on Windows by default
+	as it causes some problems (requires attached dos window - makes
+	problems to pgnuplot or when started as gui-only).
+
 2001-03-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/parse.c (xterms, aterms, bterms): Avoid storing pointers
