@@ -1,5 +1,5 @@
 /* 
- * $Id: emf.trm,v 1.1 2000/05/02 13:31:40 lhecking Exp $
+ * $Id: emf.trm,v 1.1.6.1 2000/05/07 16:37:22 lhecking Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -44,6 +44,11 @@
  *
  * HISTORY
  *
+ * 1.0.5 2000/07/20
+ * - Handles were not freed at all, resulting to resource leaks when viewing on Windows 9x (not on NT4/W2000!!!)
+ * 1.0.4 2000/06/28
+ * - Emulated dashed vectors are now looking better
+ * - 15 colors * 8 pointstyles = 120 pointtypes
  * 1.0.3 2000/03/29
  * - default font is now Arial 12
  * - implemented options (color/mono,dashed/solid,font)
@@ -90,18 +95,17 @@ TERM_PUBLIC void EMF_linetype __PROTO((int linetype));
 TERM_PUBLIC void EMF_linecolor __PROTO((int color));
 TERM_PUBLIC void EMF_dashtype __PROTO((int dashtype));
 TERM_PUBLIC void EMF_linewidth __PROTO((double width));
-TERM_PUBLIC void EMF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
+TERM_PUBLIC void EMF_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC int EMF_text_angle __PROTO((int ang));
 TERM_PUBLIC int EMF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void EMF_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void EMF_set_pointsize __PROTO((double size));
-TERM_PUBLIC int EMF_set_font __PROTO((const char *));
+TERM_PUBLIC int EMF_set_font __PROTO((char *));
 
 #ifdef RGB
 #undef RGB
 #endif
-#define RGB(r,g,b) \
-  ((long)(((unsigned char)(r)|((short)((unsigned char)(g))<<8))|(((long)(unsigned char)(b))<<16)))
+#define RGB(r,g,b) ((long)(((unsigned char)(r)|((short)((unsigned char)(g))<<8))|(((long)(unsigned char)(b))<<16)))
 
 #ifndef min
 #define min(a,b) (a<b?a:b)
@@ -248,6 +252,9 @@ EMF_setfont()
 	count = min(sub - emf_fontname, count);
     }
     strncpy(font, emf_fontname, count);
+
+    EMF_SelectObject(0x8000000A);
+    EMF_DeleteObject(EMF_HANDLE_FONT);
 
     EMF_write_emr(82, 104);
     EMF_write_long(EMF_HANDLE_FONT);
@@ -431,7 +438,9 @@ EMF_options()
     EMF_set_font(NULL);		/* set default font */
 
     sprintf(term_options, "%s %s \"%s\" %d",
-	    emf_monochrome ? "monochrome" : "color", emf_dashed ? "dashed" : "solid", emf_defaultfontname, emf_defaultfontsize);
+	    emf_monochrome ? "monochrome" : "color",
+	    emf_dashed ? "dashed" : "solid",
+	    emf_defaultfontname, emf_defaultfontsize);
 }
 
 TERM_PUBLIC void
@@ -488,8 +497,7 @@ EMF_graphics()
 }
 
 TERM_PUBLIC int
-EMF_set_font(font)
-const char *font;
+EMF_set_font(char *font)
 {
     int sep, i;			/* hope this function exist everywhere... */
 
@@ -519,6 +527,12 @@ EMF_text()
     EMF_flush_polyline();
 
     /* writing end of metafile */
+    EMF_SelectObject(0x8000000A);
+    EMF_DeleteObject(EMF_HANDLE_FONT);
+    EMF_SelectObject(0x80000007);
+    EMF_DeleteObject(EMF_HANDLE_PEN);
+    EMF_SelectObject(0x80000000);
+    EMF_DeleteObject(EMF_HANDLE_BRUSH);
     EMF_EOF();
 
     /* updating header */
@@ -597,9 +611,9 @@ int dashtype;
        linewidth. */
     static int dot_length[EMF_LINE_TYPES * 8] = {	/* 0 - solid             */
 	5, 8, 5, 8, 5, 8, 5, 8,	/* 1 - dashes            */
-	4, 1, 4, 1, 4, 1, 4, 1,	/* 2 - dotted            */
-	4, 8, 4, 1, 4, 8, 4, 1,	/* 3 - dash-dot          */
-	4, 9, 4, 1, 4, 1, 0, 0,	/* 4 - dash-dot-dot      */
+	4, 2, 4, 2, 4, 2, 4, 2,	/* 2 - dotted            */
+	4, 8, 4, 2, 4, 8, 4, 2,	/* 3 - dash-dot          */
+	4, 9, 4, 2, 4, 2, 0, 0,	/* 4 - dash-dot-dot      */
     };
 
 
@@ -615,12 +629,16 @@ int dashtype;
 	dashtype = (dashtype / EMF_COLORS) % EMF_LINE_TYPES;
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
+	EMF_SelectObject(0x80000007);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
 	term->vector = EMF_solid_vector;
     } else {			/* Since win32 dashed lines works only with 1 pixel linewith we must emulate */
 
+	EMF_SelectObject(0x80000007);
+	EMF_DeleteObject(EMF_HANDLE_PEN);
 	EMF_CreatePen(EMF_HANDLE_PEN, 0, emf_linewidth * EMF_PX2HM, emf_color);
 	EMF_SelectObject(EMF_HANDLE_PEN);
 
@@ -722,10 +740,9 @@ unsigned int ux, uy;
 TERM_PUBLIC void
 EMF_put_text(x, y, str)
 unsigned int x, y;
-const char str[];
+char str[];
 {
     int i, len = strlen(str);
-
     if (len % 2)		/* Must be long aligned! */
 	len++;
     EMF_flush_polyline();
@@ -779,7 +796,6 @@ EMF_justify_text(mode)
 enum JUSTIFY mode;
 {
     int align = 8;		/* y referenced to bottom */
-
     switch (mode) {
     case LEFT:
 	align |= 0;
@@ -807,17 +823,21 @@ unsigned int x, y;
 int number;
 {
     int old_dashtype;
+    unsigned long old_linecolor;
+
+    EMF_flush_polyline();
+    old_dashtype = emf_dashtype;
+    old_linecolor = emf_color;
+    EMF_linecolor(number);
+    EMF_dashtype(number % EMF_COLORS);
 
     if (number < 0) {		/* draw dot */
 	EMF_move(x, y);
 	EMF_solid_vector(x + 1, y);
-	return;
+	goto end_points;
     }
-    number %= EMF_POINTS;
 
-    EMF_flush_polyline();
-    old_dashtype = emf_dashtype;
-    EMF_dashtype(0);
+    number = (number / EMF_COLORS) % EMF_POINTS;
 
     switch (number) {
     case 0:			/* draw diamond */
@@ -885,6 +905,8 @@ int number;
 	EMF_flush_polygon();
 	break;
     }
+  end_points:
+    emf_color = old_linecolor;
     EMF_dashtype(old_dashtype);
 }
 
@@ -922,7 +944,7 @@ TERM_TABLE_START(emf_driver)
     EMF_VTIC, EMF_HTIC, EMF_options, EMF_init, EMF_reset,
     EMF_text, null_scale, EMF_graphics, EMF_move, EMF_solid_vector,
     EMF_linetype, EMF_put_text, EMF_text_angle, EMF_justify_text, EMF_point,
-    do_arrow, EMF_set_font, EMF_set_pointsize, TERM_BINARY,  /* various flags */
+    do_arrow, EMF_set_font, EMF_set_pointsize, TERM_BINARY, /* various flags */
     NULL,			/* after one plot of multiplot */
     NULL,			/* before subsequent plot of multiplot */
     NULL,			/* clear part of multiplot */
