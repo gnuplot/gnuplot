@@ -454,8 +454,12 @@ ac_subdir_list=lisp
 AC_CONFIG_SUBDIRS([$ac_subdir_list])
 
 dnl Write Makefiles and configuration header
-AC_OUTPUT([Makefile beos/Makefile docs/Makefile docs/latextut/Makefile], \
-[test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
+AC_OUTPUT([Makefile
+           beos/Makefile
+           docs/Makefile
+           docs/latextut/Makefile], \
+          [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h
+          ])
 
 dnl Report configuration
 eval gp_datadir=$datadir
