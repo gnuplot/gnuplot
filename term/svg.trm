@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.28 2003/12/15 18:13:40 sfeam Exp $
+ * $Id: svg.trm,v 1.29 2003/12/19 07:08:15 sfeam Exp $
  *
  */
 
@@ -148,7 +148,7 @@ SVG_Pen_RealID (inPenCode)
     if (inPenCode >= 13)
 	inPenCode %= 13;	/* normalize pen code*/
     if (inPenCode <= L_TYPE_NODRAW)
-	inPenCode = -2;
+	inPenCode = 13;		/* LT_NODRAW or LT_BACKGROUND should use background color */
 
     return (inPenCode + 2);
 }
@@ -494,7 +494,7 @@ SVG_init ()
     SVG_pens[14].width = SVG_LineWidth;
     sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
     SVG_pens[15].width = SVG_LineWidth;
-    sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 222, 0, 186);	/* red violet*/
+    sprintf (SVG_pens[15].color, "white");	/* white - should really be background */
 
     SVG_LineType = -3;
 
