@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.1 1999/07/13 19:54:04 lhecking Exp $
+ * $Id: parse.h,v 1.2 1999/11/08 19:24:16 lhecking Exp $
  *
  */
 
@@ -41,7 +41,7 @@
 #include "plot.h"
 
 enum operators {
-    /* keep this in line with table in plot.c */
+    /* keep this in line with table in eval.c */
     PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, CALL, CALLN, LNOT, BNOT, UMINUS,
     LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
     DIV, MOD, POWER, FACTORIAL, BOOLE,
