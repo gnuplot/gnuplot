@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.57 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.58 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -804,20 +804,34 @@ set_autoscale()
     /* save on replication with a macro */
 #define PROCESS_AUTO_LETTER(axis)					\
     do {								\
+	AXIS *this = axis_array + axis;					\
+									\
 	if (equals(c_token, axis_defaults[axis].name)) {		\
-	    axis_array[axis].set_autoscale = AUTOSCALE_BOTH;		\
+	    this->set_autoscale = AUTOSCALE_BOTH;			\
 	    ++c_token;							\
 	    return;							\
 	}								\
 	sprintf(min_string, "%smi$n", axis_defaults[axis].name);	\
 	if (almost_equals(c_token, min_string)) {			\
-	    axis_array[axis].set_autoscale |= AUTOSCALE_MIN;		\
+	    this->set_autoscale |= AUTOSCALE_MIN;			\
 	    ++c_token;							\
 	    return;							\
 	}								\
 	sprintf(max_string, "%sma$x", axis_defaults[axis].name);	\
 	if (almost_equals(c_token, max_string)) {			\
-	    axis_array[axis].set_autoscale |= AUTOSCALE_MAX;		\
+	    this->set_autoscale |= AUTOSCALE_MAX;			\
+	    ++c_token;							\
+	    return;							\
+	}								\
+	sprintf(min_string, "%sfixmi$n", axis_defaults[axis].name);	\
+	if (almost_equals(c_token, min_string)) {			\
+	    this->set_autoscale |= AUTOSCALE_FIXMIN;			\
+	    ++c_token;							\
+	    return;							\
+	}								\
+	sprintf(max_string, "%sfixma$x", axis_defaults[axis].name);	\
+	if (almost_equals(c_token, max_string)) {			\
+	    this->set_autoscale |= AUTOSCALE_FIXMAX;			\
 	    ++c_token;							\
 	    return;							\
 	}								\

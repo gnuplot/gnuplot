@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.23 2001/03/27 09:15:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.24 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -879,8 +879,8 @@ save_tics(fp, axis)
 
 static void
 save_position(fp, pos)
-FILE *fp;
-struct position *pos;
+    FILE *fp;
+    struct position *pos;
 {
     static const char *msg[] = { "first ", "second ", "graph ", "screen " };
 
@@ -895,12 +895,15 @@ struct position *pos;
 
 static void
 save_range(fp, axis)
-FILE *fp;
-AXIS_INDEX axis;
+    FILE *fp;
+    AXIS_INDEX axis;
 {
+#if 0 /* unused ?*/
     int i;
 
     i = axis;
+#endif
+    
     fprintf(fp, "set %srange [ ", axis_defaults[axis].name);
     if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
 	putc('*', fp);
@@ -928,9 +931,14 @@ AXIS_INDEX axis;
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MAX) {
 	    SAVE_NUM_OR_TIME(fp, axis_array[axis].set_max, axis);
 	}
-	fputs("] )", fp);
-    }
-    putc('\n', fp);
+	fputs("] )\n", fp);
+
+	if (axis_array[axis].set_autoscale & (AUTOSCALE_FIXMIN)) 
+	    fprintf(fp, "set autoscale %sfixmin\n", axis_defaults[axis].name);
+	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
+	    fprintf(fp, "set autoscale %sfixmax\n", axis_defaults[axis].name);
+    } else
+	putc('\n', fp);
 }
 
 static void

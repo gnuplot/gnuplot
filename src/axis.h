@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.7 2001/06/11 16:47:59 broeker Exp $
+ * $Id: axis.h,v 1.8 2001/06/21 17:24:10 broeker Exp $
  *
  */
 
@@ -166,9 +166,11 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
  * all 4 possible bit masks given readable names. */
 typedef enum e_autoscale {
     AUTOSCALE_NONE = 0,
-    AUTOSCALE_MIN,
-    AUTOSCALE_MAX,
-    AUTOSCALE_BOTH
+    AUTOSCALE_MIN = 1<<0,
+    AUTOSCALE_MAX = 1<<1,
+    AUTOSCALE_BOTH = (1<<0 | 1 << 1),
+    AUTOSCALE_FIXMIN = 1<<2,
+    AUTOSCALE_FIXMAX = 1<<3
 } t_autoscale;
 
 
@@ -329,14 +331,16 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 
 /* write current min/max_array contents into the set/show status
  * variables */
-#define AXIS_WRITEBACK(axis)					\
-do {								\
-    if (axis_array[axis].range_flags & RANGE_WRITEBACK) {	\
-	if (axis_array[axis].autoscale & AUTOSCALE_MIN)		\
-	    axis_array[axis].set_min = axis_array[axis].min;	\
-	if (axis_array[axis].autoscale & AUTOSCALE_MAX)		\
-	    axis_array[axis].set_max = axis_array[axis].max;	\
-    }								\
+#define AXIS_WRITEBACK(axis)			\
+do {						\
+    AXIS *this = axis_array + axis;		\
+						\
+    if (this->range_flags & RANGE_WRITEBACK) {	\
+	if (this->autoscale & AUTOSCALE_MIN)	\
+	    this->set_min = this->min;		\
+	if (this->autoscale & AUTOSCALE_MAX)	\
+	    this->set_max = this->max;		\
+    }						\
 } while(0)
 
 /* HBB 20000430: New macros, logarithmize a value into a stored

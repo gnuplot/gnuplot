@@ -1,3 +1,23 @@
+2001-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (t_autoscale): Two new enum names to flag a
+ 	range that's not to be auto-extended. Old definitions slightly
+ 	changed.
+
+	* src/axis.c (setup_tics): Check new flags to optionally avoid
+ 	auto-extending axes to endpoints at integer ticstep multiples.
+	
+	* src/set.c (PROCESS_AUTO_LETTER): Added new options
+ 	"{axis}fixmin" and "{axis}fixmax" to "set autoscale".
+
+	* src/show.c (SHOW_AUTOSCALE): Show new autoscale options.
+	(show_range): Report status in "show {axis}range" command, too.
+
+	* src/save.c (save_range): Save status to file as a "set autoscale
+ 	{axis}fix{min|max}" command following the "set {axis}range ...".
+
+	* docs/gnuplot.doc: Document these changes.
+
 2001-07-01  James R. Van Zandt  <jrv@vanzandt.mv.com>
 
 	* src/axis.c (gen_tics): Default to either one or four minitics

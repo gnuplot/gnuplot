@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.56 2001/06/16 14:22:51 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.57 2001/06/19 20:37:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -994,12 +994,15 @@ show_autoscale()
 {
     SHOW_ALL_NL;
 
-#define SHOW_AUTOSCALE(axis)							\
-    fprintf(stderr, "\t%s: %s%s%s, ",						\
-	    axis_defaults[axis].name,						\
-	    (axis_array[axis].set_autoscale) ? "ON" : "OFF",			\
-	    (axis_array[axis].set_autoscale == AUTOSCALE_MIN) ? " (min)" : "",	\
-	    (axis_array[axis].set_autoscale == AUTOSCALE_MAX) ? " (max)" : "");
+#define SHOW_AUTOSCALE(axis)							     \
+    fprintf(stderr, "\t%s: %s%s%s%s%s, ",					     \
+	    axis_defaults[axis].name,						     \
+	    (axis_array[axis].set_autoscale & AUTOSCALE_BOTH) ? "ON" : "OFF",	     \
+	    (axis_array[axis].set_autoscale == AUTOSCALE_MIN) ? " (min)" : "",	     \
+	    (axis_array[axis].set_autoscale == AUTOSCALE_MAX) ? " (max)" : "",	     \
+	    (axis_array[axis].set_autoscale & AUTOSCALE_FIXMIN) ? " (fixmin)" : "", \
+	    (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX) ? " (fixmax)" : ""  \
+	    );
 
     fputs("\tautoscaling is ", stderr);
     if (parametric) {
@@ -2078,7 +2081,7 @@ show_timestamp()
 /* process 'show [xyzx2y2rtuv]range' commands */
 static void
 show_range(axis)
-AXIS_INDEX axis;
+    AXIS_INDEX axis;
 {
     /* this probably ought to just invoke save_range(stderr) from misc.c
      * since I think it is identical
@@ -2103,7 +2106,7 @@ AXIS_INDEX axis;
 	    (axis_array[axis].range_flags & RANGE_REVERSE) ? "" : "no",
 	    (axis_array[axis].range_flags & RANGE_WRITEBACK) ? "" : "no");
 
-    if (axis_array[axis].set_autoscale) {
+    if (axis_array[axis].set_autoscale & AUTOSCALE_BOTH) {
 	/* add current (hidden) range as comments */
 	fputs("  # (currently [", stderr);
 	if (axis_array[axis].set_autoscale & AUTOSCALE_MIN) {
@@ -2114,6 +2117,10 @@ AXIS_INDEX axis;
 	    SHOW_NUM_OR_TIME(axis_array[axis].set_max, axis);
 	}
 	fputs("] )\n", stderr);
+	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMIN)
+	    fputs("\t\tLower end will not be extended to ticstep boundary\n", stderr);
+	if (axis_array[axis].set_autoscale & AUTOSCALE_FIXMAX)
+	    fputs("\t\tUpper end will not be extended to ticstep boundary\n", stderr);
     } else {
 	putc('\n', stderr);
     }

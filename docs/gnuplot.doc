@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.67 2001/06/30 20:50:22 vanzandt Exp $
+C RCS $Id: gnuplot.doc,v 1.68 2001/07/01 18:40:47 vanzandt Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2288,6 +2288,10 @@ C ... and restart the table:
        1 1
        19 19
        e
+
+ To avoid this, you can use the `fixmin`/`fixmax` feature of the 
+ `set autoscale` command, which turns off the automatic extension of the
+ axis range upto the next tic mark.
 4 every
 ?commands plot datafile every
 ?plot datafile every
@@ -3334,14 +3338,18 @@ C ... and restart the table:
  axes. The default is to autoscale all axes.
 
  Syntax:
-       set autoscale {<axes>{min|max}}
-       set noautoscale {<axes>{min|max}}
+       set autoscale {<axes>{|min|max|fixmin|fixmax}}
+       set noautoscale {<axes>{|min|max|fixmin|fixmax}}
        show autoscale
 
  where <axes> is either `x`, `y`, `z`, `x2`, `y2` or `xy`.  A keyword with
  `min` or `max` appended (this cannot be done with `xy`) tells `gnuplot` to
  autoscale just the minimum or maximum of that axis.  If no keyword is given,
- all axes are autoscaled.
+ all axes are autoscaled. 
+
+ A keyword with `fixmin` or `fixmax` appended tells gnuplot to disable
+ extension the axis range to the next tic mark position, for autoscaled axes
+ using equidistant tics.
 
  When autoscaling, the axis range is automatically computed and the dependent
  axis (y for a `plot` and z for `splot`) is scaled to include the range of the
@@ -3372,7 +3380,8 @@ C ... and restart the table:
  When tics are displayed on second axes but no plot has been specified for
  those axes, x2range and y2range are inherited from xrange and yrange.  This
  is done _before_ xrange and yrange are autoextended to a whole number of
- tics, which can cause unexpected results.
+ tics, which can cause unexpected results.  You can use the `fixmin`
+ or `fixmax` options to avoid this.
 
  Examples:
 
@@ -3382,6 +3391,11 @@ C ... and restart the table:
  This sets autoscaling only for the minimum of the y axis (the maximum of the
  y axis and the other axes are not affected):
        set autoscale ymin
+
+ This disables extension of the x2 axis tics to the next tic mark,
+ thus keeping the exact range as found in the plotted data and functions:
+       set autoscale x2fixmin
+       set autoscale x2fixmax
 
  This sets autoscaling of the x and y axes:
        set autoscale xy
