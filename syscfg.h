@@ -191,7 +191,7 @@
 #endif /* MSDOS */
 
 /* Note: may not catch all IBM AIX compilers or SCO compilers */
-#if defined(__unix__)|| defined(unix) || defined(_AIX) || defined(SCO)
+#if defined(unix)|| defined(__unix) || defined(_AIX) || defined(SCO)
 # ifndef unix
 #  define unix
 # endif
