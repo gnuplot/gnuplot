@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.12 2002/02/25 03:10:41 broeker Exp $
+ * $Id: epslatex.trm,v 1.13 2002/03/24 16:33:50 mikulik Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -982,7 +982,7 @@ START_HELP(post)
 " to continue it with: a position specification (up to two out of t,b,l,r),",
 " ']{', the text itself, and finally, '}'. The text itself may be anything",
 " LaTeX can typeset as an LR-box. \\rule{}{}'s may help for best positioning.",
-" See also the documenation for the `pslatex` terminal driver.",
+" See also the documentation for the `pslatex` terminal driver.",
 " To create multiline labels, use \\shortstack, for example",
 "    set ylabel '[r]{\\shortstack{first line \\\\ second line}}' ",
 "",
@@ -996,7 +996,7 @@ START_HELP(post)
 " There is no LaTeX output if no output file is given!",
 " In your LaTeX documents use '\\input{filename}' for inclusion of the figure.",
 " Thus `.eps` file is included by the command \\includegraphics{...}, thus",
-" Include \\usepackage{graphicx} in the preambel!",
+" Include \\usepackage{graphicx} in the preamble!",
 " Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)",
 " pdf files can made out of the eps files. If the graphics package is properly",
 " configured, the LaTeX files can also be processed by pdflatex without",

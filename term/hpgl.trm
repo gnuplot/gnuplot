@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.13 2002/02/25 03:10:41 broeker Exp $
+ * $Id: hpgl.trm,v 1.14 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -2691,7 +2691,7 @@ START_HELP(hpgl)
 " by specifying pspoints.",
 "",
 " Note that built-in support of some of these options is printer device",
-" dependendent. For instance, all the fonts are supposedly supported by the HP",
+" dependent. For instance, all the fonts are supposedly supported by the HP",
 " Laserjet IV, but only a few (e.g. univers, stick) may be supported by the HP",
 " Laserjet III and the Designjet 750C. Also, color obviously won't work on the",
 " the laserjets since they are monochrome devices.",
