@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.9 2000/11/01 18:57:34 broeker Exp $
+ * $Id: util.h,v 1.10 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -43,6 +43,10 @@
 /* special token number meaning 'do not draw the "caret"', for
  * int_error and friends: */
 #define NO_CARET (-1)
+
+/* token number meaning 'the error was in the datafile, not the
+   command line' */
+#define DATAFILE (-2)
 
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line

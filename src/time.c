@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.12 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.13 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -208,7 +208,7 @@ struct tm *tm;
 			goto found_abbrev_mon;
 		    }
 		/* get here => not found */
-		int_warn(NO_CARET, "Bad abbreviated month name");
+		int_warn(DATAFILE, "Bad abbreviated month name");
 		m = 0;
 	      found_abbrev_mon:
 		tm->tm_mon = m;
@@ -224,7 +224,7 @@ struct tm *tm;
 			goto found_full_mon;
 		    }
 		/* get here => not found */
-		int_warn(NO_CARET, "Bad full month name");
+		int_warn(DATAFILE, "Bad full month name");
 		m = 0;
 	      found_full_mon:
 		tm->tm_mon = m;
@@ -303,7 +303,7 @@ struct tm *tm;
 	    }
 
 	default:
-	    int_warn(NO_CARET, "Bad time format in string");
+	    int_warn(DATAFILE, "Bad time format in string");
 	}
 	fmt++;
     }
@@ -343,7 +343,7 @@ struct tm *tm;
 	if (yday) {
 
 	    if (tm->tm_yday < 0)
-		int_error(NO_CARET, "Illegal day of year");
+		int_error(DATAFILE, "Illegal day of year");
 
 	    /* we just set month to jan, day to yday, and let the
 	     * normalising code do the work.
@@ -354,11 +354,11 @@ struct tm *tm;
 	    tm->tm_mday = tm->tm_yday + 1;
 	}
 	if (tm->tm_mon < 0) {
-	    int_error(NO_CARET, "illegal month");
+	    int_error(DATAFILE, "illegal month");
 	    return (NULL);
 	}
 	if (tm->tm_mday < 1) {
-	    int_error(NO_CARET, "illegal day of month");
+	    int_error(DATAFILE, "illegal day of month");
 	    return (NULL);
 	}
 	if (tm->tm_mon > 11) {
@@ -815,7 +815,7 @@ struct tm *tm;
 	    LETTER('S', 2, tm_sec, NOTHING);
 
 	default:
-	    int_error(NO_CARET, "incorrect time format character");
+	    int_error(DATAFILE, "incorrect time format character");
 	}
     }
 
@@ -824,7 +824,7 @@ struct tm *tm;
 
     if (mktime(tm) == -1) {
 	FPRINTF((stderr, "mktime() was not happy\n"));
-	int_error(NO_CARET, "Invalid date/time [mktime() did not like it]");
+	int_error(DATAFILE, "Invalid date/time [mktime() did not like it]");
     }
     FPRINTF((stderr, "After mktime : %d/%d/%d:%d:%d:%d\n", tm->tm_mday, tm->tm_mon, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec));
 
