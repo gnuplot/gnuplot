@@ -73,7 +73,9 @@ TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, uns
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
-int X11_Display = 0;		/* non-zero if '-display' found on command line */
+
+/* non-zero if '-display' found on command line */
+int X11_Display = 0;
 
 
 /* sunos 4 uses on_exit() in place of atexit(). If both are missing,
@@ -102,28 +104,28 @@ static void X11_atexit HANDLER_PROTO;
  * into one array of structs.
  * Loosely based on XrmOptionDescRec, the use of which
  * would probably be overkill here. */
-typedef enum { hasNoValue, hasValue } OptionType;
+typedef enum { hasNoArg, hasArg } OptionArg;
 
 static struct x11opt {
     char *option;	/* Name of option */
-    OptionType type;	/* Type of option */
+    OptionArg arg;	/* Whether option has argument */
 }  X11_opts[] =
 {
-   { "-mono", hasNoValue }, { "-gray", hasNoValue }, { "-clear", hasNoValue },
-   { "-tvtwm", hasNoValue }, { "-pointsize", hasValue },
-   { "-iconic", hasNoValue }, { "-rv", hasNoValue },
-   { "-reverse", hasNoValue }, { "+rv", hasNoValue },
-   { "-synchronous", hasNoValue },
-   { "-display", hasValue }, { "-geometry", hasValue }, { "-bg", hasValue },
-   { "-background", hasValue }, { "-bd", hasValue },
-   { "-bordercolor", hasValue }, { "-bw", hasValue },
-   { "-borderwidth", hasValue }, { "-fg", hasValue },
-   { "-foreground", hasValue }, { "-fn", hasValue }, { "-font", hasValue },
-   { "-name", hasValue },
-   { "-selectionTimeout", hasValue }, { "-title", hasValue },
-   { "-xnllanguage", hasValue }, { "-xrm", hasValue },
-   { "-raise", hasNoValue }, { "-noraise", hasNoValue },
-   { "-persist", hasNoValue }
+   { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
+   { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
+   { "-iconic", hasNoArg }, { "-rv", hasNoArg },
+   { "-reverse", hasNoArg }, { "+rv", hasNoArg },
+   { "-synchronous", hasNoArg },
+   { "-display", hasArg }, { "-geometry", hasArg }, { "-bg", hasArg },
+   { "-background", hasArg }, { "-bd", hasArg },
+   { "-bordercolor", hasArg }, { "-bw", hasArg },
+   { "-borderwidth", hasArg }, { "-fg", hasArg },
+   { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
+   { "-name", hasArg },
+   { "-selectionTimeout", hasArg }, { "-title", hasArg },
+   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
+   { "-raise", hasNoArg }, { "-noraise", hasNoArg },
+   { "-persist", hasNoArg }
 };
 
 #define X11_nopts (sizeof(X11_opts) / sizeof(X11_opts[0]))
@@ -151,12 +153,12 @@ char *argv[];
     xargv = (char **) gp_alloc (argc*sizeof(char *), "<xargv>");
 
     if (!xargv) {
-	fputs ("not enough memory for argv - quitting\n", stderr);
+	fputs ("not enough memory to copy argv - quitting\n", stderr);
 	exit (EXIT_FAILURE);
     }
 
-    /* We make of copy of the argument vector because
-     * other functions might modify to their purpose. */
+    /* We make a copy of the argument vector because
+     * argv is modified later. */
     memcpy (xargv, argv, argc*sizeof(char *));
     optvec[i++] = X11_command;
 
@@ -166,7 +168,7 @@ char *argv[];
 		optvec[i++] = *xargv;
 		if (strcmp(*argv, "-display") == 0)
 		    X11_Display++;
-		if (X11_opts[n].type == hasValue) {
+		if (X11_opts[n].arg == hasArg) {
 		    if (--argc <= 0)
 			return nx11;
 		    optvec[i++] = *++xargv, ++argv;
@@ -215,7 +217,7 @@ TERM_PUBLIC void X11_options()
 
 #define DEFAULT_X11
 #if defined(VMS) || defined(CRIPPLED_SELECT)
-#undef DEFAULT_X11
+# undef DEFAULT_X11
 #endif
 #if defined(VMS) && defined(CRIPPLED_SELECT)
 Error.Incompatible options.
@@ -294,10 +296,9 @@ TERM_PUBLIC void X11_reset()
 
 #define BEFORE_GRAPHICS		/* nowt */
 #define AFTER_TEXT		/* nowt */
-#endif /* DEFAULT_X11 */
 
 
-#ifdef CRIPPLED_SELECT
+#elif defined(CRIPPLED_SELECT)
 
 /* PLEASE CAN SOMEONE CHECK THAT THIS STILL WORKS !!! */
 
@@ -343,8 +344,7 @@ TERM_PUBLIC void X11_reset()
 static void X11_atexit HANDLER_DECL { /* WHAT SHOULD I DO ? */
 }
 
-#endif				/* CRIPPLED_SELECT */
-#ifdef VMS
+#elif defined(VMS)
 /*-----------------------------------------------------------------------------
  *   VMS mailbox/spawn IPC - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
  *---------------------------------------------------------------------------*/
@@ -490,9 +490,9 @@ TERM_PUBLIC void X11_reset()
     /* do nothing until exit */
 }
 
-#endif /* VMS */
-
-
+#else /* !VMS */
+You lose.
+#endif /* !VMS */
 
 
 
@@ -504,7 +504,8 @@ TERM_PUBLIC void X11_graphics()
 {
     BEFORE_GRAPHICS;		/* kludge for crippled select */
 
-    PRINT1("G%d\n", X11_plot_number);	/* for VMS sake, keep as separate prints */
+    /* for VMS sake, keep as separate prints */
+    PRINT1("G%d\n", X11_plot_number);
 
 #ifdef ULTRIX_KLUDGE
     fflush(X11_ipc);
