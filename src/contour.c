@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.9 1999/11/15 22:21:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.10 1999/12/01 22:09:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -552,7 +552,7 @@ struct edge_struct **p_edges;	/* list of edges output */
 {
     int i, j, grid_x_max = iso_lines->p_count;
     struct edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail,
-	   *pe_tail1, *pe_tail2, *pe_temp;
+	   *pe_tail2, *pe_temp;
     struct poly_struct *pp_tail, *lower_tri, *upper_tri;
     /* HBB 980308: need to tag *each* of them as GPHUGE! */
     struct coordinate GPHUGE *p_vrtx1, GPHUGE * p_vrtx2;
@@ -564,7 +564,6 @@ struct edge_struct **p_edges;	/* list of edges output */
     p_edge1 = pe_tail = NULL;	/* clear list of edges */
 
     /* Generate edges of first row */
-    /* HBB 19991130: removed effectively unused variable 'pe_tail1' */
     for (j = 0; j < grid_x_max - 1; j++)
 	add_edge(p_vrtx1 + j, p_vrtx1 + j + 1, &p_edge1, &pe_tail);
 
@@ -745,7 +744,11 @@ struct edge_struct **p_edge, **pe_tail;		/* pointers to edge list in/out */
 {
     struct edge_struct *pe_temp = NULL;
 
+#if 1
+    if (point0->type == INRANGE && point1->type == INRANGE) {
+#else
     if (point0->type != UNDEFINED && point1->type != UNDEFINED) {
+#endif
 
 	pe_temp = (struct edge_struct *)
 	    gp_alloc(sizeof(struct edge_struct), "contour edge");
