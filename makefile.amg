@@ -5,7 +5,7 @@
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
 #
-# last modification date: 19990204
+# last modification date: 19990226
 #
 
 #
@@ -17,7 +17,7 @@
 
 # GD (GIF) device driver
 # requires GD library (not part of gnuplot)
-#GD_DEF = DEF=HAVE_LIBGD
+#GD_DEF = def=HAVE_LIBGD
 #GD_INCLUDE = IDIR=gd1.3
 #GD_LIB = gd1.3/gd.lib
 
@@ -47,7 +47,7 @@ MATH = MATH=IEEE
 OFLAGS = opt
 
 # Defines; format is def=SYMBOL[=value]
-DEFS = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_STRNICMP def=HAVE_GETCWD def=PIPES def=GP_INLINE=__inline $(GD_DEF) $(PNG_DEF)
+DEFS = def=AMIGA_SC_6_1 def=ANSI_C def=HAVE_SYS_STAT_H def=HAVE_GETCWD def=HAVE_STRNICMP def=HAVE_VFPRINTF def=PIPES def=GP_INLINE=__inline $(GD_DEF) $(PNG_DEF)
 
 # Other options; if you have SAS/C 6.57 or newer, you may wish to disable
 # warning 317
@@ -75,7 +75,7 @@ CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
 
 # NOTE: I have disabled the compilation rule for .oo files as described
 # below, because when linking with sc (as opposed to slink), all object
-# files not ending in .o must be prefied with the objname option!
+# files not ending in .o must be prefixed with the objname option!
 #
 # To simplify the handling of files that have grown so large that they
 # must be compiled with the code=far option, the rules below have been
