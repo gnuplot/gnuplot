@@ -8,6 +8,10 @@
 
 	* src/set.c (set_termoptions): Update comment explaining this routine.
 
+	* src/plot3d.c (eval_3dplots): Surface plots are no longer the only
+	plot style that can use four 'using' specs; remove the error check 
+	that incorrectly prevents this.
+
 2004-09-09  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm: Update the comment on plot-time evaluation of 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.73 2004/08/10 03:55:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.74 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1411,13 +1411,6 @@ eval_3dplots()
 
 	    if (duplication)
 		int_error(c_token, "duplicated or contradicting arguments in plot options");
-
-#ifdef PM3D
-	    if (df_no_use_specs==4 &&
-		!(this_plot->lp_properties.use_palette ||
-		  pm3d.where[0] || this_plot->pm3d_where[0] || this_plot->plot_style & PM3DSURFACE))
-		int_error(c_token, "`using` with 4 parameters but surface without `pm3d` or `palette`");
-#endif
 
 	    /* set default values for title if this has not been specified */
 	    if (!set_title) {
