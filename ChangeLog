@@ -1,3 +1,8 @@
+2001-10-03  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/contrib/pm3dConvertToImage.awk: Fix for a too early "stroke"
+	in converting colour images (replace "/g {stroke" by "/g {Stroke").
+
 2001-10-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (gen_tics): Renamed local variable `ticmin' to

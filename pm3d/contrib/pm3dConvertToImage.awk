@@ -1,7 +1,7 @@
 # pm3dConvertToImage.awk
 # Written by Petr Mikulik, mikulik@physics.muni.cz
 # Code of pm3dImage contributed by Dick Crawford
-# Version: 16. 5. 2000
+# Version: 3. 10. 2001
 #
 # This awk script tries to compress maps in a postscript file created by pm3d
 # or gnuplot with pm3d splotting mode. If the input data formed a rectangular
@@ -17,8 +17,16 @@
 # Distribution policy: this script belongs to the pm3d and gnuplot programs.
 #
 # Notes:
-#  - no usage of run length encoding etc.; but if anybody has this written
-#    in awk, then do not hesitate to contribute
+#    - no usage of run length encoding etc.; but if anybody has this written
+#      in awk, then do not hesitate to contribute
+#
+# History of changes:
+#    - 3. 10. 2001 Petr Mikulik: Replaced "stroke" by "Stroke" in the "/g"
+#      definition - fixes conversion of colour images.
+#    - 16. 5. 2000 Petr Mikulik and Dick Crawford: The first version.
+#
+# License: public domain.
+
 
 BEGIN {
 err = "/dev/stderr"
@@ -53,9 +61,11 @@ x2=0; y2 = 0; x2last=0; y2last=0
 # Add definition of pm3dImage to the dictionary
 $1=="/BoxFill" && $NF=="def" {
 print
+print "/Stroke {stroke} def"
 print "/pm3dImage {/I exch def gsave		% saves the input array"
 print "  /ps 1 string def"
-print "  Color not {/g {setgray} def} if	% avoid stroke in the usual def"
+# print "  Color not {/g {setgray} def} if	% avoid stroke in the usual def of /g"
+print "  /Stroke {} def			% avoid stroke in the usual def"
 print "  I 0 get I 1 get translate I 2 get rotate % translate & rotate"
 print "  /XCell I 3 get I 5 get div def	% pixel width"
 print "  /YCell I 4 get I 6 get div def	% pixel height"
@@ -91,9 +101,15 @@ next
 !inside_pm3d_map {
 if ($1 == "%%Creator:")
     print $0 ", compressed by pm3dConvertToImage.awk"
-else print
+else if ($1 == "/g" && $2 == "{stroke") {
+    # Replace "/g {stroke ...}" by "/g {Stroke ...}" (stroke cannot be used
+    # in the pm3dImage region.
+    $2 = "{Stroke"
+    print
+} else print
 next
 }
+
 
 ########################################
 # End of pm3d map region: write all.
@@ -183,6 +199,7 @@ if ( pm3dline>2 && ((scan_in_x && y2!=y2last) || (!scan_in_x && x2!=x2last)) ) {
 row[scans] = row[scans] sprintf( "%02X", $1*255 );
 next
 } # reading map/image data
+
 
 
 ########################################
