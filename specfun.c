@@ -52,39 +52,37 @@ extern int s_p;
 extern double zero;
 
 /* Function wrappers */
-#ifndef HAVE_ERF
-# define GP_ERF(x) ((x)<0.0 ? -igamma(0.5,(x)*(x)) : igamma(0.5,(x)*(x)))
-#else
+#ifdef HAVE_ERF
 # define GP_ERF(x) erf(x)
+#else
+# define GP_ERF(x) ((x)<0.0 ? -igamma(0.5,(x)*(x)) : igamma(0.5,(x)*(x)))
 #endif
 #ifndef HAVE_ERFC
-# define GP_ERFC(x) ((x)<0.0 ? 1.0+igamma(0.5,(x)*(x)) : 1.0-igamma(0.5,(x)*(x)))
+# define GP_ERFC(x) erfc(x)
 #else
-# define GP_ERFC(x) erfc(x);
+# define GP_ERFC(x) ((x)<0.0 ? 1.0+igamma(0.5,(x)*(x)) : 1.0-igamma(0.5,(x)*(x)))
 #endif
-/* End wrappers
+/* End wrappers */
 
-#define ITMAX   100
+#define ITMAX   200
+
 #ifdef FLT_EPSILON
 # define MACHEPS FLT_EPSILON	/* 1.0E-08 */
 #else
 # define MACHEPS 1.0E-08
 #endif
-#ifdef FLT_MIN_EXP
-# define MINEXP  FLT_MIN_EXP	/* -88.0 */
-#else
-# define MINEXP  -88.0
-#endif
+
+/* AS239 value, e^-88 = 2^-127 */
+#define MINEXP  -88.0
+
 #ifdef FLT_MAX
 # define OFLOW   FLT_MAX		/* 1.0E+37 */
 #else
 # define OFLOW   1.0E+37
 #endif
-#ifdef FLT_MAX_10_EXP
-# define XBIG    FLT_MAX_10_EXP	/* 2.55E+305 */
-#else
-# define XBIG    2.55E+305
-#endif
+
+/* AS239 value for igamma(a,x>=XBIG) = 1.0 */
+#define XBIG    1.0E+08
 
 /*
  * Mathematical constants

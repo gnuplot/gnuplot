@@ -87,7 +87,6 @@ long atol();
 double strtod();
 #else /* !NO_STDLIB_H */
 # include <stdlib.h>
-/* need to find out about VMS */
 # ifndef VMS
 #  ifndef EXIT_FAILURE
 #   define EXIT_FAILURE (1)
@@ -96,11 +95,19 @@ double strtod();
 #   define EXIT_SUCCESS (0)
 #  endif
 # else /* VMS */
-#  ifndef EXIT_FAILURE
-#   define  EXIT_FAILURE  0x10000002
-# endif
-#  ifndef EXIT_SUCCESS
-#   define  EXIT_SUCCESS  0
+#  ifdef VAXC            /* replacement values suppress some messages */
+#   ifdef  EXIT_FAILURE
+#    undef EXIT_FAILURE
+#   endif
+#   ifdef  EXIT_SUCCESS
+#    undef EXIT_SUCCESS
+#   endif
+#  endif /* VAXC */
+#  ifndef  EXIT_FAILURE
+#   define EXIT_FAILURE  0x10000002
+#  endif
+#  ifndef  EXIT_SUCCESS
+#   define EXIT_SUCCESS  1
 #  endif
 # endif /* VMS */
 #endif /* !NO_STDLIB_H */
@@ -111,17 +118,7 @@ double strtod();
 # ifdef HAVE_LIBC_H /* NeXT uses libc instead of unistd */
 #  include <libc.h>
 # endif
-# ifdef VMS
-/* prototype for sleep() */
-#  include <signal.h>
-# endif
 #endif /* HAVE_UNISTD_H */
-
-#ifdef VMS
-# ifndef HAVE_SLEEP
-#  define HAVE_SLEEP
-# endif
-#endif
 
 #ifndef NO_ERRNO_H
 # include <errno.h>

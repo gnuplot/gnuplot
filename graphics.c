@@ -396,9 +396,8 @@ char *axis_name;
 	} else {
 	    /* user has explicitly set the range */
 	    /* (to something empty) ==> we're in trouble */
-	    char msg_fmt[] = "Can't plot with an empty %s range!";
-	    char msg_buffer[sizeof(msg_fmt)];
-	    sprintf(msg_buffer, msg_fmt, axis_name);
+	    char msg_buffer[MAX_LINE_LEN+1];
+	    sprintf(msg_buffer, "Can't plot with an empty %s range!", axis_name);
 	    int_error(msg_buffer, c_token);	/* never returns */
 	}
     }
@@ -4265,14 +4264,14 @@ tic_callback callback;		/* fn to call to actually do the work */
 		/*{{{  draw tick via callback */
 		switch (def->type) {
 		case TIC_DAY:{
-			int d = (long) floor(user + 0.5) % 7;
+			int d = (long) floor(user+0.5) % 7;
 			if (d < 0)
 			    d += 7;
 			(*callback) (axis, internal, abbrev_day_names[d], lgrd);
 			break;
 		    }
 		case TIC_MONTH:{
-			int m = (long) floor(user + 0.5) % 12;
+			int m = (long) floor(user-1) % 12;
 			if (m < 0)
 			    m += 12;
 			(*callback) (axis, internal, abbrev_month_names[m], lgrd);
@@ -4306,7 +4305,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) / log_base_array[axis] : mplace);
 		    if (inrange(mtic, internal_min, internal_max) &&
 			inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
-			callback(axis, mtic, NULL, mgrd);
+			(*callback) (axis, mtic, NULL, mgrd);
 		}
 		/*}}} */
 	    }
