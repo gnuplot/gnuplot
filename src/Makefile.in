@@ -1,6 +1,7 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4a from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -9,12 +10,6 @@
 # but WITHOUT ANY WARRANTY, to the extent permitted by law; without
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
-
-
-# makefile.all generated automatically by GNU make
-
-# List of core object files except version.$(O)
-
 
 SHELL = @SHELL@
 
@@ -37,8 +32,6 @@ mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
 
-DESTDIR =
-
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -51,9 +44,10 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_FLAG =
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -62,9 +56,18 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+
+@SET_MAKE@
+AMDEP = @AMDEP@
+AMTAR = @AMTAR@
+AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DEPDIR = @DEPDIR@
 EMACS = @EMACS@
+GNUPLOT_X11 = @GNUPLOT_X11@
 LASERGNU = @LASERGNU@
 LATEX = @LATEX@
 LIBRARIES_FOR_X = @LIBRARIES_FOR_X@
@@ -77,6 +80,13 @@ TERMXLIBS = @TERMXLIBS@
 TUTORIAL = @TUTORIAL@
 U = @U@
 VERSION = @VERSION@
+install_sh = @install_sh@
+
+
+# makefile.all generated automatically by GNU make
+
+# List of core object files except version.$(O)
+
 
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
@@ -96,7 +106,19 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c binary.h bitmap.c bitmap.h color.c color.h command.c command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c gp_hist.h gp_time.h gp_types.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h pm3d.c pm3d.h protos.h readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c version.h
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
+binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
+contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c \
+eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c gp_hist.h gp_time.h \
+gp_types.h graph3d.c graph3d.h graphics.c graphics.h help.c help.h \
+hidden3d.c hidden3d.h history.c internal.c internal.h interpol.c \
+interpol.h ipc.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
+mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
+plot3d.c plot3d.h pm3d.c pm3d.h readline.c readline.h save.c \
+save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
+standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h \
+template.h term_api.h term.c term.h time.c unset.c util.c util.h \
+util3d.c util3d.h variable.c variable.h version.c version.h
 
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
@@ -107,24 +129,49 @@ gnuplot_x11_LDADD = $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
 
-@BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = beos
+@BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = @BUILD_SRC_BEOS_SUBDIR_TRUE@beos
 
 SUBDIRS = $(d_beos)
 
 OTHER_SOURCES = amiga.c corplot.c os9.c strftime.c vms.c
 
-EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com gnuplot.def gnuplot.opt gnuplot.prj gpexecute.inc header.mac hrcgraph.asm intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
+EXTRA_DIST = GNUmakefile Makefile.maint NeXT OpenStep corgraph.asm genopt.com \
+gnuplot.def gnuplot.opt gnuplot.prj gpexecute.inc header.mac hrcgraph.asm \
+intergra.x11 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 \
+pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
 
 
 O = o
 T = $(top_srcdir)/term/
 
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) color.$(O) command.$(O) contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) getcolor.$(O) graph3d.$(O) graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) pm3d.$(O) readline.$(O) save.$(O) scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
+COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) color.$(O) command.$(O) \
+contour.$(O) datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) getcolor.$(O) \
+graph3d.$(O) graphics.$(O) help.$(O) hidden3d.$(O) history.$(O) \
+internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) \
+plot.$(O) plot2d.$(O) plot3d.$(O) pm3d.$(O) readline.$(O) save.$(O) \
+scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) \
+tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) \
+variable.$(O)
 
 
 # List of terminal driver sources
-CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm $(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm $(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
+$(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm \
+$(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
+$(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm \
+$(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)ggi.trm $(T)gif.trm \
+$(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm $(T)hp26.trm \
+$(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm \
+$(T)imagen.trm $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm $(T)linux.trm \
+$(T)mac.trm $(T)metafont.trm $(T)metapost.trm $(T)mgr.trm $(T)mif.trm \
+$(T)multitos.trm $(T)next.trm $(T)openstep.trm $(T)pbm.trm $(T)pc.trm \
+$(T)pm.trm $(T)png.trm $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm \
+$(T)qms.trm $(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm \
+$(T)table.trm $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
+$(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm \
+$(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
 
+subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
 CONFIG_CLEAN_FILES = 
@@ -140,10 +187,12 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 ANSI2KNR = @ANSI2KNR@
-gnuplot_x11_OBJECTS =  gplt_x11$U.o getcolor$U.o
-gnuplot_x11_DEPENDENCIES = 
-gnuplot_x11_LDFLAGS = 
-gnuplot_OBJECTS =  alloc$U.o axis$U.o binary$U.o bitmap$U.o color$U.o \
+am_bf_test_OBJECTS =  bf_test$U.o binary$U.o alloc$U.o
+bf_test_OBJECTS =  $(am_bf_test_OBJECTS)
+bf_test_LDADD = $(LDADD)
+bf_test_DEPENDENCIES = 
+bf_test_LDFLAGS = 
+am_gnuplot_OBJECTS =  alloc$U.o axis$U.o binary$U.o bitmap$U.o color$U.o \
 command$U.o contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o \
 gadgets$U.o getcolor$U.o graph3d$U.o graphics$U.o help$U.o hidden3d$U.o \
 history$U.o internal$U.o interpol$U.o matrix$U.o misc$U.o mouse$U.o \
@@ -151,32 +200,51 @@ parse$U.o plot$U.o plot2d$U.o plot3d$U.o pm3d$U.o readline$U.o save$U.o \
 scanner$U.o set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o \
 tables$U.o term$U.o time$U.o unset$U.o util$U.o util3d$U.o variable$U.o \
 version$U.o
+gnuplot_OBJECTS =  $(am_gnuplot_OBJECTS)
 gnuplot_DEPENDENCIES = 
 gnuplot_LDFLAGS = 
-bf_test_OBJECTS =  bf_test$U.o binary$U.o alloc$U.o
-bf_test_LDADD = $(LDADD)
-bf_test_DEPENDENCIES = 
-bf_test_LDFLAGS = 
-CFLAGS = @CFLAGS@
+am_gnuplot_x11_OBJECTS =  gplt_x11$U.o getcolor$U.o
+gnuplot_x11_OBJECTS =  $(am_gnuplot_x11_OBJECTS)
+gnuplot_x11_DEPENDENCIES = 
+gnuplot_x11_LDFLAGS = 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CFLAGS = @CFLAGS@
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
-DIST_COMMON =  Makefile.am Makefile.in ansi2knr.1 ansi2knr.c
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+DIST_SOURCES =  $(bf_test_SOURCES) $(gnuplot_SOURCES) \
+$(gnuplot_x11_SOURCES)
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+DEP_FILES =  @AMDEP@ $(DEPDIR)/alloc$U.Po $(DEPDIR)/axis$U.Po \
+$(DEPDIR)/bf_test$U.Po $(DEPDIR)/binary$U.Po $(DEPDIR)/bitmap$U.Po \
+$(DEPDIR)/color$U.Po $(DEPDIR)/command$U.Po $(DEPDIR)/contour$U.Po \
+$(DEPDIR)/datafile$U.Po $(DEPDIR)/dynarray$U.Po $(DEPDIR)/eval$U.Po \
+$(DEPDIR)/fit$U.Po $(DEPDIR)/gadgets$U.Po $(DEPDIR)/getcolor$U.Po \
+$(DEPDIR)/gplt_x11$U.Po $(DEPDIR)/graph3d$U.Po $(DEPDIR)/graphics$U.Po \
+$(DEPDIR)/help$U.Po $(DEPDIR)/hidden3d$U.Po $(DEPDIR)/history$U.Po \
+$(DEPDIR)/internal$U.Po $(DEPDIR)/interpol$U.Po $(DEPDIR)/matrix$U.Po \
+$(DEPDIR)/misc$U.Po $(DEPDIR)/mouse$U.Po $(DEPDIR)/parse$U.Po \
+$(DEPDIR)/plot$U.Po $(DEPDIR)/plot2d$U.Po $(DEPDIR)/plot3d$U.Po \
+$(DEPDIR)/pm3d$U.Po $(DEPDIR)/readline$U.Po $(DEPDIR)/save$U.Po \
+$(DEPDIR)/scanner$U.Po $(DEPDIR)/set$U.Po $(DEPDIR)/show$U.Po \
+$(DEPDIR)/specfun$U.Po $(DEPDIR)/standard$U.Po $(DEPDIR)/stdfn$U.Po \
+$(DEPDIR)/tables$U.Po $(DEPDIR)/term$U.Po $(DEPDIR)/time$U.Po \
+$(DEPDIR)/unset$U.Po $(DEPDIR)/util$U.Po $(DEPDIR)/util3d$U.Po \
+$(DEPDIR)/variable$U.Po $(DEPDIR)/version$U.Po
+DIST_COMMON =  Makefile.am Makefile.in ansi2knr.1 ansi2knr.c depcomp
 
 
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  beos
-SOURCES = $(gnuplot_x11_SOURCES) $(gnuplot_SOURCES) $(bf_test_SOURCES)
-OBJECTS = $(gnuplot_x11_OBJECTS) $(gnuplot_OBJECTS) $(bf_test_OBJECTS)
+SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
+OBJECTS = $(am_bf_test_OBJECTS) $(am_gnuplot_OBJECTS) $(am_gnuplot_x11_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
+.SUFFIXES: .c .h .o
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/makefile.all
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign --include-deps src/Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
@@ -197,15 +265,18 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
-	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	    f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
+	    echo "  $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f"; \
+	     $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f; \
 	  else :; fi; \
 	done
 
 uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
-	list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
 	done
 
 mostlyclean-noinstPROGRAMS:
@@ -216,15 +287,6 @@ clean-noinstPROGRAMS:
 distclean-noinstPROGRAMS:
 
 maintainer-clean-noinstPROGRAMS:
-
-.c.o:
-	$(COMPILE) -c $<
-
-.s.o:
-	$(COMPILE) -c $<
-
-.S.o:
-	$(COMPILE) -c $<
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
@@ -258,17 +320,17 @@ distclean-kr:
 
 maintainer-clean-kr:
 
-gnuplot_x11: $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES)
-	@rm -f gnuplot_x11
-	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
+bf_test: $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES)
+	@rm -f bf_test
+	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
 
 gnuplot: $(gnuplot_OBJECTS) $(gnuplot_DEPENDENCIES)
 	@rm -f gnuplot
 	$(LINK) $(gnuplot_LDFLAGS) $(gnuplot_OBJECTS) $(gnuplot_LDADD) $(LIBS)
 
-bf_test: $(bf_test_OBJECTS) $(bf_test_DEPENDENCIES)
-	@rm -f bf_test
-	$(LINK) $(bf_test_LDFLAGS) $(bf_test_OBJECTS) $(bf_test_LDADD) $(LIBS)
+gnuplot_x11: $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES)
+	@rm -f gnuplot_x11
+	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
 alloc_.c: alloc.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/alloc.c; then echo $(srcdir)/alloc.c; else echo alloc.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > alloc_.c
 axis_.c: axis.c $(ANSI2KNR)
@@ -376,8 +438,6 @@ time_.o unset_.o util_.o util3d_.o variable_.o version_.o : $(ANSI2KNR)
 #     (which will cause the Makefiles to be regenerated when you run `make');
 # (2) otherwise, pass the desired values on the `make' command line.
 
-@SET_MAKE@
-
 all-recursive install-data-recursive install-exec-recursive \
 installdirs-recursive install-recursive uninstall-recursive  \
 check-recursive installcheck-recursive info-recursive dvi-recursive:
@@ -404,10 +464,11 @@ maintainer-clean-recursive:
 	@set fnord $(MAKEFLAGS); amf=$$2; \
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
-	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  if test "$$subdir" = "."; then :; else \
+	    rev="$$subdir $$rev"; \
+	  fi; \
 	done; \
-	test "$$dot_seen" = "no" && rev=". $$rev"; \
+	rev="$$rev ."; \
 	target=`echo $@ | sed s/-recursive//`; \
 	for subdir in $$rev; do \
 	  echo "Making $$target in $$subdir"; \
@@ -426,15 +487,17 @@ tags-recursive:
 
 tags: TAGS
 
-ID: $(HEADERS) $(SOURCES) $(LISP)
-	list='$(SOURCES) $(HEADERS)'; \
-	unique=`for i in $$list; do echo $$i; done | \
-	  awk '    { files[$$0] = 1; } \
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
-	here=`pwd` && cd $(srcdir) \
-	  && mkid -f$$here/ID $$unique $(LISP)
+	mkid -fID $$unique $(LISP)
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -442,12 +505,14 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	    test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
    fi; \
 	done; \
-	list='$(SOURCES) $(HEADERS)'; \
-	unique=`for i in $$list; do echo $$i; done | \
-	  awk '    { files[$$0] = 1; } \
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
 	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+	  || etags $(ETAGS_ARGS) $$tags  $$unique $(LISP)
 
 mostlyclean-tags:
 
@@ -458,19 +523,83 @@ distclean-tags:
 
 maintainer-clean-tags:
 
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+@AMDEP@include $(DEPDIR)/alloc$U.Po
+@AMDEP@include $(DEPDIR)/axis$U.Po
+@AMDEP@include $(DEPDIR)/bf_test$U.Po
+@AMDEP@include $(DEPDIR)/binary$U.Po
+@AMDEP@include $(DEPDIR)/bitmap$U.Po
+@AMDEP@include $(DEPDIR)/color$U.Po
+@AMDEP@include $(DEPDIR)/command$U.Po
+@AMDEP@include $(DEPDIR)/contour$U.Po
+@AMDEP@include $(DEPDIR)/datafile$U.Po
+@AMDEP@include $(DEPDIR)/dynarray$U.Po
+@AMDEP@include $(DEPDIR)/eval$U.Po
+@AMDEP@include $(DEPDIR)/fit$U.Po
+@AMDEP@include $(DEPDIR)/gadgets$U.Po
+@AMDEP@include $(DEPDIR)/getcolor$U.Po
+@AMDEP@include $(DEPDIR)/gplt_x11$U.Po
+@AMDEP@include $(DEPDIR)/graph3d$U.Po
+@AMDEP@include $(DEPDIR)/graphics$U.Po
+@AMDEP@include $(DEPDIR)/help$U.Po
+@AMDEP@include $(DEPDIR)/hidden3d$U.Po
+@AMDEP@include $(DEPDIR)/history$U.Po
+@AMDEP@include $(DEPDIR)/internal$U.Po
+@AMDEP@include $(DEPDIR)/interpol$U.Po
+@AMDEP@include $(DEPDIR)/matrix$U.Po
+@AMDEP@include $(DEPDIR)/misc$U.Po
+@AMDEP@include $(DEPDIR)/mouse$U.Po
+@AMDEP@include $(DEPDIR)/parse$U.Po
+@AMDEP@include $(DEPDIR)/plot$U.Po
+@AMDEP@include $(DEPDIR)/plot2d$U.Po
+@AMDEP@include $(DEPDIR)/plot3d$U.Po
+@AMDEP@include $(DEPDIR)/pm3d$U.Po
+@AMDEP@include $(DEPDIR)/readline$U.Po
+@AMDEP@include $(DEPDIR)/save$U.Po
+@AMDEP@include $(DEPDIR)/scanner$U.Po
+@AMDEP@include $(DEPDIR)/set$U.Po
+@AMDEP@include $(DEPDIR)/show$U.Po
+@AMDEP@include $(DEPDIR)/specfun$U.Po
+@AMDEP@include $(DEPDIR)/standard$U.Po
+@AMDEP@include $(DEPDIR)/stdfn$U.Po
+@AMDEP@include $(DEPDIR)/tables$U.Po
+@AMDEP@include $(DEPDIR)/term$U.Po
+@AMDEP@include $(DEPDIR)/time$U.Po
+@AMDEP@include $(DEPDIR)/unset$U.Po
+@AMDEP@include $(DEPDIR)/util$U.Po
+@AMDEP@include $(DEPDIR)/util3d$U.Po
+@AMDEP@include $(DEPDIR)/variable$U.Po
+@AMDEP@include $(DEPDIR)/version$U.Po
 
-subdir = src
+mostlyclean-depend:
+
+clean-depend:
+
+distclean-depend:
+	-rm -rf $(DEPDIR)
+
+maintainer-clean-depend:
+
+@AMDEP@CCDEPMODE = @CCDEPMODE@
+
+.c.o:
+@AMDEP@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP@	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' @AMDEPBACKSLASH@
+@AMDEP@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(COMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
+
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pR $$d/$$file $(distdir) \
+	    || exit 1; \
 	  else \
 	    test -f $(distdir)/$$file \
-	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
 	  fi; \
 	done
 	for subdir in $(DIST_SUBDIRS); do \
@@ -478,7 +607,6 @@ distdir: $(DISTFILES)
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
 	    || exit 1; \
-	    chmod 777 $(distdir)/$$subdir; \
 	    (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
 	      || exit 1; \
 	  fi; \
@@ -505,7 +633,7 @@ uninstall: uninstall-recursive
 all-am: Makefile $(ANSI2KNR) $(PROGRAMS)
 all-redirect: all-recursive
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkinstalldirs)  $(DESTDIR)$(bindir)
@@ -520,21 +648,23 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
+	-rm -f Makefile.in
 mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
 		mostlyclean-compile mostlyclean-krextra mostlyclean-kr \
-		mostlyclean-tags mostlyclean-generic
+		mostlyclean-tags mostlyclean-depend mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
 clean-am:  clean-binPROGRAMS clean-noinstPROGRAMS clean-compile \
-		clean-krextra clean-kr clean-tags clean-generic \
-		mostlyclean-am
+		clean-krextra clean-kr clean-tags clean-depend \
+		clean-generic mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-binPROGRAMS distclean-noinstPROGRAMS \
 		distclean-compile distclean-krextra distclean-kr \
-		distclean-tags distclean-generic clean-am
+		distclean-tags distclean-depend distclean-generic \
+		clean-am
 
 distclean: distclean-recursive
 
@@ -542,7 +672,8 @@ maintainer-clean-am:  maintainer-clean-binPROGRAMS \
 		maintainer-clean-noinstPROGRAMS \
 		maintainer-clean-compile maintainer-clean-krextra \
 		maintainer-clean-kr maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-depend maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -555,18 +686,20 @@ clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
 mostlyclean-compile distclean-compile clean-compile \
 maintainer-clean-compile mostlyclean-krextra distclean-krextra \
 clean-krextra maintainer-clean-krextra mostlyclean-kr distclean-kr \
-clean-kr maintainer-clean-kr install-data-recursive \
-uninstall-data-recursive install-exec-recursive \
+clean-kr maintainer-clean-kr install-recursive uninstall-recursive \
+install-data-recursive uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
-distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
-dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
-install-exec install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs-am \
-installdirs mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+distclean-tags clean-tags maintainer-clean-tags mostlyclean-depend \
+distclean-depend clean-depend maintainer-clean-depend distdir info-am \
+info dvi-am dvi check check-am installcheck-am installcheck \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all install-strip \
+installdirs-am installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
 
 
 @ALT_X11_DRIVER_TRUE@$(GNUPLOT_X11): gnuplot_x11
