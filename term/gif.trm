@@ -1,4 +1,4 @@
-/* GNUPLOT -- gdgif.trm */
+/* GNUPLOT -- gif.trm */
 
 /*[
  * Copyright 1998
@@ -34,7 +34,7 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *  GD GIF library 1.2
+ *  GD GIF library 1.2 & 1.3
  *
  * To Use:
  *
@@ -61,10 +61,14 @@
  * This driver is modeled after the PBM driver pbm.trm.
  *
  * AUTHORS
- *  Sam Shen sls@mh1.lbl.gov
- *  Alex Woo woo@playfair.stanford.edu
+ *  Sam Shen <sls@mh1.lbl.gov>
+ *  Alex Woo <woo@playfair.stanford.edu>
  *
- * send your comments or suggestions to (info-gnuplot@cs.dartmouth.edu).
+ * CONTRIBUTORS
+ *  Alfred Reibenschuh <alfred.reibenschuh@cait.co.at> or <fredo@blackbox.at>
+ *
+ * send your comments or suggestions to:
+ *  info-gnuplot@cs.dartmouth.edu
  * 
  * This version outputs either color or monochrome GIFs.  The default
  * is 640x480 pixels.  
@@ -150,17 +154,106 @@ static struct {
 #define GIF_USE_INTERLACE   2
 
 static unsigned int gif_color_rgbs[] = {
-    0xffffff, /* white - background */
-    0x000000, /* black - borders */
-    0x404040, /* gray - X & y axes */
-    0xff0000, /* red */
-    0xffa500, /* orange */
-    0x66cdaa, /* mediumacquamarine */
-    0xcdb5cd, /* thistle3 */
-    0xadd8e6, /* lightblue */
-    0x0000ff, /* blue */
-    0xdda0dd, /* plum */
-    0x9500d3  /* dark violet */
+    0xffffff, /* background: white         */
+    0x000000, /*    borders: black         */
+    0x404040, /* x & y axes: grey          */
+    0xff0000, /*   color 01: red           */
+    0x00c000, /*   color 02: dark green    */
+    0x0080ff, /*   color 03: dark blue     */
+    0xc000ff, /*   color 04: dark magenta  */
+    0xc0ff40, /*   color 05: yellow        */
+    0xc04000, /*   color 06: orange        */
+    0x40ff80, /*   color 07: sea green     */
+    0x2020c0, /*   color 08: royal blue    */
+    0x8000c0, /*   color 09: dark violet   */
+    /* please note: these colors are optimized for web216 compatibility */
+    0x006080, /* DeepSkyBlue4 */ 
+    0x008000, /* green4 */ 
+    0x008040, /* SpringGreen4 */ 
+    0x008080, /* dark cyan, turquoise4 */ 
+    0x00c060, /* SpringGreen3 */ 
+    0x00c0c0, /* cyan3, turquoise3 */ 
+    0x00ff00, /* green */ 
+    0x208020, /* forest green */ 
+    0x306080, /* SteelBlue4 */ 
+    0x404040, /* grey25-31 */ 
+    0x408000, /* chartreuse4 */ 
+    0x000080, /* dark blue, navy blue */ 
+    0x806000, /* DarkGoldenrod4 */ 
+    0x806010, /* goldenrod4 */ 
+    0x806060, /* pink4 */ 
+    0x806080, /* plum4 */ 
+    0x0000c0, /* medium blue */ 
+    0x0000ff, /* blue */ 
+    0x006000, /* dark green */ 
+    0x40c080, /* SeaGreen3 */ 
+    0x60a0c0, /* SkyBlue3 */ 
+    0x60c000, /* chartreuse3 */ 
+    0x60c0a0, /* medium aquamarine */ 
+    0x800000, /* dark red */ 
+    0x800080, /* dark magenta */ 
+    0x602080, /* DarkOrchid4 */ 
+    0x606060, /* dim grey */ 
+    0x00ffff, /* cyan1, turquoise1 */ 
+    0x202020, /* grey13-18 */ 
+    0x204040, /* dark slate grey */ 
+    0x204080, /* RoyalBlue4 */ 
+    0x608020, /* olive drab */ 
+    0x608060, /* DarkSeaGreen4 */ 
+    0x608080, /* LightBlue4, PaleTurquoise4 */ 
+    0x808040, /* LightGoldenrod4, khaki4 */ 
+    0x808080, /* grey51-56 */ 
+    0xa0a0a0, /* dark grey, grey63-68 */ 
+    0xa0d0e0, /* light blue */ 
+    0xc02020, /* firebrick3 */ 
+    0xc06000, /* DarkOrange3 */ 
+    0x80c0e0, /* sky blue */ 
+    0xc060c0, /* orchid3 */ 
+    0xc08000, /* orange3 */ 
+    0xc08060, /* LightSalmon3 */ 
+    0xff4000, /* orange red */ 
+    0xff4040, /* brown1, tomato */ 
+    0x80c0ff, /* light sky blue */ 
+    0xff8060, /* salmon */ 
+    0xff8080, /* light coral */ 
+    0xc0a000, /* gold3 */ 
+    0xc0c0c0, /* grey76-81, honeydew3, ivory3, snow3 */ 
+    0xc0ffc0, /* DarkSeaGreen1 */ 
+    0xff0000, /* red */ 
+    0xff00ff, /* magenta */ 
+    0xff80a0, /* PaleVioletRed1 */ 
+    0xff80ff, /* orchid1 */ 
+    0xc0c0a0, /* LemonChiffon3 */ 
+    0xff6060, /* IndianRed1 */ 
+    0xff8000, /* dark orange */ 
+    0xffa000, /* orange */ 
+    0x80e0e0, /* CadetBlue2, DarkSlateGray2 */ 
+    0xa0e0e0, /* pale turquoise */ 
+    0xa0ff20, /* green yellow */ 
+    0xc00000, /* red3 */ 
+    0xc000c0, /* magenta3 */ 
+    0xa02020, /* brown */ 
+    0xa020ff, /* purple */ 
+    0x802000, /* OrangeRed4 */ 
+    0x802020, /* brown4 */ 
+    0x804000, /* DarkOrange4 */ 
+    0x804020, /* sienna4 */ 
+    0x804080, /* orchid4 */ 
+    0x8060c0, /* MediumPurple3 */ 
+    0x8060ff, /* SlateBlue1 */ 
+    0x808000, /* yellow4 */ 
+    0xa080ff, /* MediumPurple1 */ 
+    0xc06080, /* PaleVioletRed3 */ 
+    0xc0c000, /* yellow3 */ 
+    0xff8040, /* sienna1 */ 
+    0xffa040, /* tan1 */ 
+    0xffa060, /* sandy brown */ 
+    0xffa070, /* light salmon */ 
+    0xffc020, /* goldenrod1 */ 
+    0xffc0c0, /* RosyBrown1, pink */ 
+    0xffff00, /* yellow */ 
+    0xffff80, /* khaki1 */ 
+    0xffffc0 /* lemon chiffon */ 
 };
 #define GIF_N_DEFAULT_COLORS (sizeof(gif_color_rgbs)/sizeof(gif_color_rgbs[0]))
 
@@ -271,7 +364,7 @@ TERM_PUBLIC void GIF_options()
  */
 TERM_PUBLIC void GIF_init()
 {
-    /*     gif_state.linetype=0;    */
+    gif_state.linetype=0;
 }
 
 /*
@@ -347,18 +440,15 @@ TERM_PUBLIC void GIF_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void GIF_vector(unsigned int x, unsigned int y)
 {
     int gif_linetype_dotted[5];
-
-    FPRINTF((stderr,"getting (linetype/linecolor) : %d/%d/%d:%d:%d:%d\n",gif_st
-ate.linetype,gif_state.color));
-
+    
     if (gif_state.linetype==-1) {
-        gif_linetype_dotted[0] = gif_state.color_table[2];
+	gif_linetype_dotted[0] = gif_state.color_table[2];
 	gif_linetype_dotted[1] = gif_state.color_table[2];
 	gif_linetype_dotted[2] = gif_state.color_table[0];
 	gif_linetype_dotted[3] = gif_state.color_table[0];
 	gif_linetype_dotted[4] = gif_state.color_table[0];
 
-	gdImageSetStyle(gif_state.image, gif_linetype_dotted,5);
+	gdImageSetStyle(gif_state.image, gif_linetype_dotted, 5);
 	gdImageLine(gif_state.image, gif_state.x, gif_state.height - gif_state.y,
 		    x, gif_state.height - y, gdStyled);
     } else {
@@ -384,6 +474,7 @@ TERM_PUBLIC void GIF_linetype(int type)
 {
     if (type >= (gif_state.n_colors - 3))
 	type %= (gif_state.n_colors - 3);
+
     gif_state.color = gif_state.color_table[type + 3];
     gif_state.linetype = type;
 }
@@ -397,7 +488,7 @@ TERM_PUBLIC void GIF_linetype(int type)
 TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
 {
     if (gif_state.angle == 1) {
-	x -= gif_state.charh / 2;
+	x -= gif_state.charh / 2; 
 	gdImageStringUp(gif_state.image, gif_state.font,
 			x, gif_state.height - y,
 			string, gif_state.color);
