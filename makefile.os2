@@ -1,10 +1,10 @@
 #
-# $Id: makefile.os2,v 1.13 1998/12/06 21:55:07 lhecking Exp $
+# $Id: makefile.os2,v 1.13.2.1 1999/08/19 14:38:45 lhecking Exp $
 #
-# Makefile for use with emx (and above) and GNUMake
+# Makefile for use with emx and GNUMake
 #   on OS/2 3.0 and above (might also work for OS/2 2.x)
 #
-# last modification date: 19981205
+# last modification date: 19991027
 #
 
 # We depend on using cmd.exe (or a compatible one)
@@ -235,7 +235,7 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 X11LIBS = -lX11 -lsocket -Zcrtdll
 # X11 includes
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
-X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
+X11FLAGS= -Zmtd -Zsysv-signals
 
 gnuplot_x11.exe: gplt_x11.o stdfn.o
 	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
@@ -250,7 +250,7 @@ gplt_x11.o: gplt_x11.c
 # (and don't care about the strange way it's implemented ...)
 gnuplot.dvi: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) & latex2e gnuplot_2.tex
+	cd $(DOCDIR) & latex gnuplot_2.tex & latex gnuplot_2.tex
 	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
 	del $(DOCDIR)\gnuplot_2*
 gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
