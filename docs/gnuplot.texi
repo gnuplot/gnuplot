@@ -296,7 +296,7 @@ The list of those interested in beta-test versions is:
 
 There is also a World Wide Web page with up-to-date information, including
 known bugs:
-@uref{http://www.cs.dartmouth.edu/gnuplot_info.html,http://www.cs.dartmouth.edu/gnuplot_info.html
+@uref{http://www.gnuplot.org,http://www.gnuplot.org
 }
 
 Before seeking help, please check the
@@ -607,7 +607,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -3149,16 +3149,16 @@ externally or by using `fit` with an appropriate model.
 
 Syntax:
 @example
-      smooth @{unique | csplines | acsplines | bezier | sbezier@}
+      smooth @{unique | frequency | csplines | acsplines | bezier | sbezier@}
 
 @end example
 
-`unique` plots the data after making them monotonic.  Each of the other
-routines uses the data to determine the coefficients of a continuous curve
-between the endpoints of the data.  This curve is then plotted in the same
-manner as a function, that is, by finding its value at uniform intervals
-along the abscissa (see @ref{samples}) and connecting these points with
-straight line segments (if a line style is chosen).
+`unique` and `frequency` plot the data after making them monotonic.  Each of
+the other routines uses the data to determine the coefficients of a
+continuous curve between the endpoints of the data.  This curve is then
+plotted in the same manner as a function, that is, by finding its value at
+uniform intervals along the abscissa (see @ref{samples}) and connecting these
+points with straight line segments (if a line style is chosen).
 
 If @ref{autoscale} is in effect, the ranges will be computed such that the
 plotted curve lies within the borders of the graph.
@@ -3169,8 +3169,8 @@ done across the intersection of the x range covered by the input data and
 the fixed abscissa range as defined by @ref{xrange}. 
 
 If too few points are available to allow the selected option to be applied,
-an error message is produced.  The minimum number is one for `unique`, four
-for `acsplines`, and three for the others.
+an error message is produced.  The minimum number is one for `unique`, and
+`frequency`, four for `acsplines`, and three for the others.
 
 The @ref{smooth} options have no effect on function plots.
 
@@ -3276,6 +3276,22 @@ The `unique` option makes the data monotonic in x; points with the same
 x-value are replaced by a single point having the average y-value.  The
 resulting points are then connected by straight line segments.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html,See demos. }
+
+
+@noindent --- FREQUENCY ---
+
+@c ?commands plot datafile smooth frequency
+@c ?plot datafile smooth frequency
+@c ?plot smooth frequency
+@c ?data-file smooth frequency
+@c ?datafile smooth frequency
+@c ?plot frequency
+@c ?smooth frequency
+@cindex frequency
+
+The `frequency` option makes the data monotonic in x; points with the same
+x-value are replaced by a single point having the summed y-values.  The
+resulting points are then connected by straight line segments.
 
 @node special-filenames, thru, smooth, data-file
 @subsubsection special-filenames
@@ -3477,7 +3493,7 @@ permissible specifier.  'scanf' expects to see white space---a blank, tab
 ("\t"), newline ("\n"), or formfeed ("\f")---between numbers; anything else
 in the input stream must be explicitly skipped.
 
-Note that the use of "\t", "\n", or "\f" or requires use of double-quotes
+Note that the use of "\t", "\n", or "\f" requires use of double-quotes
 rather than single-quotes.
 
 Examples:
@@ -3889,10 +3905,10 @@ Syntax:
 where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
 @ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{xerrorbars},
 @ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
-@ref{xyerrorlines}, @ref{boxes}, @ref{boxerrorbars}, @ref{boxxyerrorbars},
-@ref{financebars}, @ref{candlesticks} or @ref{vector}. Some of these styles
-require additional information. See `set style <style>` for details of
-each style.
+@ref{xyerrorlines}, @ref{boxes}, @ref{filledboxes}, `filledcurves`, @ref{boxerrorbars},
+@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks} or @ref{vector}. Some of these
+styles require additional information. See `set style <style>` for details
+of each style.
 
 Default styles are chosen with the `set style function` and `set style data`
 commands.
@@ -3935,7 +3951,7 @@ This plots sin(x) with impulses:
 
 @end example
 
-This plots x with points, x**2 with the default:
+This plots x*y with points, x**2 with the default:
 @example
       plot x*y w points, x**2 + y**2
 
@@ -4160,7 +4176,7 @@ the `set` command to see the default values that the various options take.
 
 
 The @ref{save} command saves user-defined functions, variables, the `set
-term` status, all `set` options, or all of these, plus the last `plot `
+term` status, all `set` options, or all of these, plus the last @ref{plot}
 (`splot`) command to the specified file.
 
 Syntax:
@@ -4215,7 +4231,7 @@ Examples:
 @cindex show
 
 @c ?show all
-The `set` command can be used to sets _lots_ of options.  No screen is
+The `set` command can be used to set _lots_ of options.  No screen is
 drawn, however, until a @ref{plot}, `splot`, or @ref{replot} command is given.
 
 The `show` command shows their settings;  `show all` shows all the
@@ -4233,6 +4249,7 @@ when the variable was initially defined.
 * bmargin::                     
 * border::                      
 * boxwidth::                    
+* fillstyle::                   
 * clabel::                      
 * clip::                        
 * cntrparam::                   
@@ -4841,7 +4858,7 @@ Draw only the top and right borders for a @ref{plot} and label them as axes:
 
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/borders/borders.html,Borders Demo. }
 
-@node boxwidth, clabel, border, set-show
+@node boxwidth, fillstyle, border, set-show
 @subsection boxwidth
 
 @c ?commands set boxwidth
@@ -4853,11 +4870,11 @@ Draw only the top and right borders for a @ref{plot} and label them as axes:
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-@ref{boxes} and @ref{boxerrorbars} styles.
+@ref{boxes}, @ref{filledboxes} and @ref{boxerrorbars} styles.
 
 Syntax:
 @example
-      set boxwidth @{<width>@}
+      set boxwidth @{<width>@} @{absolute|relative@}
       show boxwidth
 
 @end example
@@ -4868,13 +4885,16 @@ width of each box is set by the @ref{boxwidth} command.  (If a width is given
 both in the file and by the @ref{boxwidth} command, the one in the file is
 used.)  If the width is not specified in one of these ways, the width of each
 box will be calculated automatically so that it touches the adjacent boxes.
-In a four-column data set, the fourth column will be interpreted as the box
-width unless the width is set to -2.0, in which case the width will be
-calculated automatically.  See @ref{boxerrorbars} for more details.
+`relative` indicates, that the specified boxwidth is a scaling factor for
+the automatically calculated boxwidth, otherwise the boxwidth is taken as an
+`absolute` value (which is the default). In a four-column data set, the fourth
+column will be interpreted as the box width unless the width is set to -2.0,
+in which case the width will be calculated automatically.  See @ref{boxerrorbars} for more details.
 
 To set the box width to automatic use the command
 @example
       set boxwidth
+
 @end example
 
 or, for four-column data,
@@ -4889,7 +4909,65 @@ The same effect can be achieved with the @ref{using} keyword in @ref{plot}:
 
 @end example
 
-@node clabel, clip, boxwidth, set-show
+To set the box width to half of the automatic size use
+@example
+      set boxwidth 0.5 relative
+
+@end example
+
+To set the box width to an absolute value of 2 use
+@example
+      set boxwidth 2 absolute
+
+@end example
+
+or, if you didn't specify a relative boxwidth before,
+@example
+      set boxwidth 2
+
+@end example
+
+@node fillstyle, clabel, boxwidth, set-show
+@subsection fillstyle
+
+@c ?commands set style filling
+@c ?commands show style filling
+@c ?set style filling
+@c ?show style filling
+@cindex fillstyle
+@opindex fillstyle
+
+
+The `set style filling` command is used to set the fillstyle of boxes in the
+@ref{filledboxes} style.
+
+Syntax: 
+@example
+      set style filling @{empty | solid @{<density>@} | pattern @{<number>@}@}
+
+@end example
+
+The defaule fillstyle is `solid 1.0`.
+
+The `solid` option causes filling with a solid color, if the terminal 
+supports that. The <density> parameter specifies the intensity
+of the filled colors. At a <density> of 0.0, the box is empty, at 
+<density> of 1.0, the inner area is of the same color as the border of 
+the box. Solid filling may be implemented either by modifying the
+color of the box border continuously, or by dithering, depending on
+the terminal driver. If no <density> parameter is given, a default of
+1.0 is used, automatically.
+
+The `pattern` option causes filling to be done with a fill pattern supplied
+by the terminal driver. <pattern> is the pattern number, starting at 0. 
+The kind and number of available fill patterns depend on the terminal driver. 
+If no <pattern> number is given, a default of 0 is assumed.
+
+The `empty` option causes filled boxes not to be filled, after all. This
+makes the @ref{filledboxes} style equivalent to simple @ref{boxes}. It is equivalent
+to the `solid` option with a <density> parameter of zero.
+
+@node clabel, clip, fillstyle, set-show
 @subsection clabel
 
 @c ?commands set clabel
@@ -5063,7 +5141,7 @@ tic marks).
 
 For `levels discrete`, contours will be generated at z = <z1>, <z2> ... as
 specified; the number of discrete levels sets the number of contour levels.
-In `discrete` mode, any `set cntrparms levels <n>` are ignored.
+In `discrete` mode, any `set cntrparam levels <n>` are ignored.
 
 For `incremental`, contours are generated at values of z beginning at <start>
 and increasing by <increment>, until the number of contours is reached. <end>
@@ -5240,7 +5318,7 @@ power.  (Actually, the weights are given by the inverse of dx^norm + dy^norm,
 where dx and dy are the components of the separation of the grid point from
 each data point.  For some norms that are powers of two, specifically 4, 8,
 and 16, the computation is optimized by using the Euclidean distance in the
-weight calculation, (dx^2+dx^2)^norm/2.  However, any non-negative integer
+weight calculation, (dx^2+dy^2)^norm/2.  However, any non-negative integer
 can be used.)
 
 The closer the data point is to a grid point, the more effect it has on
@@ -5460,7 +5538,7 @@ Examples:
       set format y "%s*10^@{%S@}"; set ytic(12345)   # "12.345*10^@{3@}"
       set format y "%s %cg"; set ytic(12345)       # "12.345 kg"
       set format y "%.0P pi"; set ytic(6.283185)   # "2 pi"
-      set format y "%.0P%%"; set ytic(50)          # "50%"
+      set format y "%.0f%%"; set ytic(50)          # "50%"
 
 @end example
 
@@ -5532,7 +5610,7 @@ Suppose the text is "76/12/25 23:11:11".  Then
 @example
       set format x                 # defaults to "12/25/76" \n "23:11"
       set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
-      set format x "%r %d"         # "11:11:11 pm 12/25/76"
+      set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
 @end example
 
@@ -5881,8 +5959,8 @@ terminal drivers support linewidth selection, though.
 The length of the sample line can be controlled by `samplen`.  The sample
 length is computed as the sum of the tic length and <sample_length> times the
 character width.  `samplen` also affects the positions of point samples in
-the key since these are drawn at the midpoint of the sample line, even if it
-is not drawn.  <sample_length> must be an integer.
+the key since these are drawn at the midpoint of the sample line, even if 
+the sample line itself is not drawn.  
 
 The vertical spacing between lines is controlled by `spacing`.  The spacing
 is set equal to the product of the pointsize, the vertical tic size, and
@@ -6202,7 +6280,7 @@ using the user-defined wide green line.  Similarly the commands
 
 @end example
 
-will create a plot of f(x) using the default triangles connected by a red
+will create a plot of p(x) using the default triangles connected by a red
 line and q(x) using small triangles connected by a green line.
 
 @example
@@ -7605,9 +7683,9 @@ command @ref{test} to see what is available.
 
 None of the styles requiring more than two columns of information
 (e.g., @ref{errorbars} or @ref{errorlines}) can be used with `splot`s or
-function @ref{plot}s. Neither @ref{boxes} nor any of the @ref{steps} styles can be
-used with `splot`s. If an inappropriate style is specified, it will be
-changed to `points`.
+function @ref{plot}s. Neither @ref{boxes} or @ref{filledboxes} nor any of the @ref{steps}
+styles can be used with `splot`s. If an inappropriate style is specified,
+it will be changed to `points`.
 
 For 2-d data with more than two columns, `gnuplot` is picky about the
 allowed `errorbar` and `errorline` styles. The @ref{using} option on the
@@ -7616,8 +7694,8 @@ you want. (In this discussion, "column" will be used to refer both to
 a column in the data file and an entry in the @ref{using} list.)
 
 For three columns, only @ref{xerrorbars}, @ref{yerrorbars} (or @ref{errorbars}),
-@ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{boxes}, and
-@ref{boxerrorbars} are allowed. If another plot style is used, the style
+@ref{xerrorlines}, @ref{yerrorlines} (or @ref{errorlines}), @ref{boxes}, @ref{filledboxes}
+and @ref{boxerrorbars} are allowed. If another plot style is used, the style
 will be changed to @ref{yerrorbars}. The @ref{boxerrorbars} style will
 calculate the boxwidth automatically.
 
@@ -7641,6 +7719,7 @@ For more information about error bars with and without lines, please see
 @menu
 * boxerrorbars::                
 * boxes::                       
+* filledboxes::                 
 * boxxyerrorbars::              
 * candlesticks::                
 * dots::                        
@@ -7683,18 +7762,13 @@ the @ref{yerrorbars} style---either from y-ydelta to y+ydelta or from ylow to
 yhigh, depending on how many data columns are provided.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html,See Demo. }
 
-@node boxes, boxxyerrorbars, boxerrorbars, style
+@node boxes, filledboxes, boxerrorbars, style
 @subsubsection boxes
 
 @c ?commands set style boxes
-@c ?commands set style bargraph
 @c ?set style boxes
-@c ?set style bargraph
 @c ?style boxes
-@c ?style bargraph
 @cindex boxes
-
-@cindex bargraph
 
 The @ref{boxes} style is only relevant to 2-d plotting.  It draws a box centered
 about the given x coordinate from the x axis (not the graph border) to the
@@ -7702,9 +7776,121 @@ given y coordinate.  The width of the box is obtained in one of three ways.
 If it is a data plot and the data file has a third column, this will be used
 to set the width of the box.  If not, if a width has been set using the @ref{boxwidth} command, this will be used.  If neither of these is available, the
 width of each box will be calculated automatically so that it touches the
-adjacent boxes.
+adjacent boxes. For filled boxes, see the @ref{filledboxes} style.
 
-@node boxxyerrorbars, candlesticks, boxes, style
+@node filledboxes, boxxyerrorbars, boxes, style
+@subsubsection filledboxes
+
+@c ?commands set style filledboxes
+@c ?set style filledboxes
+@c ?style filledboxes
+@cindex filledboxes
+
+The @ref{filledboxes} style is only relevant to 2-d plotting.  Like @ref{boxes}, it
+draws a box centered about the given x coordinate from the x axis (not the
+graph border) to the given y coordinate.  See the @ref{boxes} style for how the
+width of the box is obtained.  The @ref{filledboxes} keyword may be abbreviated
+to `fillb`. The drawn box is filled with a color pattern according to a style
+defined by the `set style filling` command.  The fillstyle may be one of
+`empty`, `solid` and `pattern`.
+
+For fillstyle `empty` the box is filled with the background color.
+
+For fillstyle `solid` the box is filled with a solid pattern using the
+current drawing color. The fill density is determined by `set filldensity`.
+Values for `filldensity` are in the range from 0.0 (empty) to 1.0 (solid).
+It depends on the terminal driver how many density steps between 0.0 and 1.0
+are available (e.g. the bitmap drivers currently support only filldensities
+0.0, 0.25, 0.5, 0.75 and 1.0). Most drivers (e.g. x11, windows, bitmap
+drivers) use halftone patterns to achieve several filldensities, others
+(e.g. postscript) use true RGB colors.
+
+For fillstyle `pattern` the box is filled in the current drawing color with
+a pattern as selected by `set style filling pattern <number>`. 
+`fillpattern` is a number starting at 0. The kind and number of the available
+fillpatterns depend on the terminal driver.
+
+Examples:
+
+To plot a data file with solid filled boxes with a small vertical space
+seperating them (bargraph):
+
+@example
+      set boxwidth 0.9 relative
+      plot 'file.dat' with filledboxes
+
+@end example
+
+To plot a sine and a cosine curve in filledboxes style with
+filldensity 50 percent:
+@example
+      set style function filledboxes
+      set style filling solid 0.5
+      plot sin(x), cos(x)
+
+@end example
+
+Currently only the following terminal drivers support the @ref{filledboxes} style:
+x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
+nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
+tandy_60dpi. The BeOS driver (`be`) supports @ref{filledboxes} too, but it is
+unknown whether it works as intended.
+
+
+@noindent --- FILLEDCURVES ---
+
+@c ?commands set style filledcurves
+@c ?set style filledcurves
+@c ?style filledcurves
+@cindex filledcurves
+
+The `filledcurves` style is only relevant to 2-d plotting. It draws either the
+the current curve closed and filled, or the region between the current curve
+and a given axis, horizontal or vertical line, or point, filled with the
+current drawing color.
+
+Proposed syntax:
+
+@example
+    set style [data | function] filledcurves [options]
+    plot ... with filledcurves [options]
+
+@end example
+
+where options are
+
+@example
+    [closed | @{x1 | x2 | y1 | y2@}[=<value>] | xy=<x>,<y>]
+
+@end example
+
+The filled area is between the current curve and
+@example
+    filledcurves closed   ... filled closed curve,
+    filledcurves x1       ... x1 axis,
+    filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
+    filledcurves y1=0     ... line y=0 (at y1 axis) parallel to x1 axis,
+    filledcurves y2=42    ... line y=42 (at y2 axis) parallel to x2, etc,
+    filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
+
+@end example
+
+Note: filling is supported on filled-polygon capable terminals, see @ref{pm3d} for their list.
+
+Currently implemented syntax (demo-like switching between the first five
+options):
+
+@example
+    set style [data | function] filledcurves
+    plot ... with filledcurves
+
+@end example
+
+*** TODO - WHAT YOU CAN DO FOR FILLEDCURVES (please): ***
+Implement the proposed options; please make it in such a way that <value>,
+<x>,<y> can be formulae.
+
+@node boxxyerrorbars, candlesticks, filledboxes, style
 @subsubsection boxxyerrorbars
 
 @c ?commands set style boxxyerrorbars
@@ -8109,6 +8295,7 @@ to you, depending on its output format.
 * imagen::                      
 * kyo::                         
 * latex::                       
+* linux::                       
 * mf::                          
 * mp::                          
 * mgr::                         
@@ -8121,7 +8308,6 @@ to you, depending on its output format.
 * qms::                         
 * regis::                       
 * rgip::                        
-* sun::                         
 * tek410x::                     
 * table::                       
 * tek40::                       
@@ -8886,10 +9072,13 @@ Syntax:
                        @{pointsmax <max_points>@}
                        @{landscape | portrait@}
                        @{metric | inches@}
+                       @{solid | dashed@}
                        @{fontsize <fsize>@}
+                       @{textnormal | @{textspecial texthidden textrigid@} @}
                        @{size <xsize> <ysize>@}
                        @{thickness <units>@}
                        @{depth <layer>@}
+                       @{version <number>@}
 
 @end example
 
@@ -8897,12 +9086,19 @@ Syntax:
 `color`.  `small` and `big` produce a 5x3 or 8x5 inch graph in the default
 `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.  <max_points>
 sets the maximum number of points per polyline.  Default units for editing
-with "xfig" may be `metric` or `inches`.  `fontsize` sets the size of the
-text font to <fsize> points.  @ref{size} sets (overrides) the size of the drawing
+with "xfig" may be `metric` or `inches`. 'solid' inhibts automatic usage
+of dashed lines when solid linestyles are used up, which otherwise occurs.
+
+`fontsize` sets the size of the text font to <fsize> points.  `textnormal`
+resets the text flags and selects postscript fonts, `textspecial` sets the
+text flags for LaTeX specials, `texthidden` sets the hidden flag and
+`textrigid` the rigid flag.  @ref{size} sets (overrides) the size of the drawing
 area to <xsize>*<ysize> in units of inches or centimeters depending on the
-`inches` or `metric` setting in effect.  `depth` sets the default depth layer
-for all lines and text.  The default depth is 10 to leave room for adding
-material with "xfig" on top of the plot.
+`inches` or `metric` setting in effect.  `depth` sets the default depth
+layer for all lines and text.  The default depth is 10 to leave room for
+adding material with "xfig" on top of the plot.  'version' sets the format
+version of the generated fig output. Currently only versions 3.1 and 3.2 are
+supported.
 
 `thickness` sets the default line thickness, which is 1 if not specified.
 Overriding the thickness can be achieved by adding a multiple of 100 to the
@@ -9473,7 +9669,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, mf, kyo, terminal
+@node latex, linux, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -9551,7 +9747,24 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node mf, mp, latex, terminal
+@node linux, mf, latex, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node mf, mp, linux, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -10346,7 +10559,7 @@ Syntax:
 
 @end example
 
-@node rgip, sun, regis, terminal
+@node rgip, tek410x, regis, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -10390,22 +10603,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, tek410x, rgip, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node tek410x, table, sun, terminal
+@node tek410x, table, rgip, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -12664,7 +12862,7 @@ Syntax:
 
 The special filenames `""` and `"-"` are permitted, as in @ref{plot}.
 
-In brief, @ref{binary} and @ref{matrix} indicate that the the data are in a special
+In brief, @ref{binary} and @ref{matrix} indicate that the data are in a special
 form, @ref{index} selects which data sets in a multi-data-set file are to be
 plotted, @ref{every} specifies which datalines (subsets) within a single data
 set are to be plotted, and @ref{using} determines how the columns within a single
@@ -12675,7 +12873,7 @@ does so also, except that the @ref{using} list must provide three entries
 instead of two.
 
 The @ref{plot} options @ref{thru} and @ref{smooth} are not available for `splot`, but
-`cntrparams` and @ref{dgrid3d} provide limited smoothing cabilities.
+@ref{cntrparam} and @ref{dgrid3d} provide limited smoothing cabilities.
 
 Data file organization is essentially the same as for @ref{plot}, except that
 each point is an (x,y,z) triple.  If only a single value is provided, it
@@ -12906,7 +13104,7 @@ surface is viewed can be changed with @ref{view}.
 Additionally, for points in a grid format, `splot` can interpolate points
 having a common amplitude (see @ref{contour}) and can then connect those
 new points to display contour lines, either directly with straight-line
-segments or smoothed lines (see `set cntrparams`).  Functions are already
+segments or smoothed lines (see @ref{cntrparam}).  Functions are already
 evaluated in a grid format, determined by @ref{isosamples} and @ref{samples},
 while file data must either be in a grid format, as described in `data-file`,
 or be used to generate a grid (see @ref{dgrid3d}).
@@ -12987,8 +13185,22 @@ win32 is included in this distribution.  In addition, there is a Macintosh
 interface at
 @uref{ftp://ftp.ee.gatech.edu/pub/mac/gnuplot,ftp://ftp.ee.gatech.edu/pub/mac/gnuplot
 }
-and several X11 interfaces include three Tcl/Tk located at the usual Tcl/Tk
-repositories.
+
+
+Also several X11 interfaces exist.
+One of them is called xgfe (
+@uref{http://www.flash.net/~dmishee/xgfe/xgfe.html,http://www.flash.net/~dmishee/xgfe/xgfe.html } ) 
+which uses the Qt library.
+In addition three Tcl/Tk located at the usual Tcl/Tk repositories exist.
+
+Bruce Ravel (ravel@@phys.washington.edu) has written a new version of
+gnuplot-mode for GNU emacs and XEmacs. This version is based on
+the gnuplot.el file by Gershon Elber.
+While the gnuplot CVS repository has its own copy the most recent
+version of this package is available from
+@uref{http://feff.phys.washington.edu/~ravel/gnuplot/,http://feff.phys.washington.edu/~ravel/gnuplot }
+
+
 
 @node Bugs, Concept_Index, Graphical_User_Interfaces, Top
 @chapter Bugs
@@ -13011,18 +13223,17 @@ With current operating system, compiler, and library releases, the OS
 specific bugs documented in release 3.5, now relegated to `old_bugs`, may
 no longer be relevant.
 
-Bugs reported since the current release may be located via the official
-distribution site:
-@example
-       ftp://ftp.dartmouth.edu/pub/gnuplot
-      http://www.cs.dartmouth.edu/gnuplot_info.html
+Bugs reported since the current release as well as older ones
+may be located via the official distribution site:
+@uref{ftp://ftp.gnuplot.org,ftp://ftp.gnuplot.org }
 
-@end example
+@uref{http://www.gnuplot.org,http://www.gnuplot.org }
 
-Please e-mail any bugs to bug-gnuplot@@dartmouth.edu.
+Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
+
 
 @menu
-* Old_bugs::			
+* Old_bugs::                    
 @end menu
 
 @node Old_bugs,  , Bugs, Bugs
@@ -13108,14 +13319,6 @@ the printer afterwards using a shell command.
 On AIX 4, the literal 'NaNq' in a datafile causes the special internal value
 'not-a-number' to be stored, rather than setting an internal 'undefined'
 flag.  A workaround is to use `set missing 'NaNq'`.
-
-There may be an up-to-date list of bugs since the release on the WWW page:
-@example
-      http://www.cs.dartmouth.edu/gnuplot_info.html
-
-@end example
-
-Please report any bugs to bug-gnuplot@@dartmouth.edu.
 @node Concept_Index, Command_Index, Bugs, Top
 @unnumbered Concept Index
 @printindex cp
