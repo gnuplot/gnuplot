@@ -1,4 +1,6 @@
-/* $Id: command.h,v 1.6 2000/01/20 20:46:44 joze Exp $ */
+/*
+ * $Id: command.h,v 1.15 2000/02/11 19:17:18 lhecking Exp $
+ */
 
 /* GNUPLOT - command.h */
 

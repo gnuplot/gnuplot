@@ -1,6 +1,5 @@
 /*
- * $Id: parse.h,v 1.2 1999/11/08 19:24:16 lhecking Exp $
- *
+ * $Id: parse.h,v 1.3 1999/11/15 22:03:06 lhecking Exp $
  */
 
 /* GNUPLOT - parse.h */

@@ -1,6 +1,5 @@
 /*
- * $Id: plot.h,v 1.28 2000/02/11 19:17:20 lhecking Exp $
- *
+ * $Id: plot.h,v 1.29 2000/03/30 14:03:24 lhecking Exp $
  */
 
 /* GNUPLOT - plot.h */

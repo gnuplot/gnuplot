@@ -1,6 +1,5 @@
 /*
- * $Id: util.h,v 1.3 1999/06/19 20:52:08 lhecking Exp $
- *
+ * $Id: util.h,v 1.4 1999/11/08 19:24:18 lhecking Exp $
  */
 
 /* GNUPLOT - util.h */

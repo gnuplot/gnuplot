@@ -1,6 +1,5 @@
 /*
- * $Id: $
- *
+ * $Id: template.h,v 1.1 1999/10/01 14:04:21 lhecking Exp $
  */
 
 /* GNUPLOT - template.h */

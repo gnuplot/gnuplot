@@ -1,4 +1,8 @@
-/* $Id: matrix.h,v 1.3 1999/10/01 14:54:33 lhecking Exp $ */
+/*
+ * $Id: matrix.h,v 1.4 1999/11/08 19:24:16 lhecking Exp $
+ */
+
+/* GNUPLOT - matrix.h */
 
 /*  NOTICE: Change of Copyright Status
  *

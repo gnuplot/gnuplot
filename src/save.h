@@ -1,6 +1,5 @@
 /*
- * save.h,v 1.1.1.1 1999/08/28 16:52:59 hbb Exp
- *
+ * $Id: $
  */
 
 /* GNUPLOT - save.h */

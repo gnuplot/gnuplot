@@ -1,3 +1,7 @@
+/*
+ * $Id: $
+ */
+
 /* GNUPLOT - mouse.h */
 
 /*[

@@ -1,6 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.7 1999/10/17 19:14:00 lhecking Exp $
- *
+ * $Id: syscfg.h,v 1.8 1999/11/24 13:22:24 lhecking Exp $
  */
 
 /* GNUPLOT - syscfg.h */

@@ -1,4 +1,8 @@
-/* $Id: fit.h,v 1.4 1999/10/01 14:54:31 lhecking Exp $ */
+/*
+ * $Id: fit.h,v 1.5 1999/11/08 19:24:15 lhecking Exp $
+ */
+
+/* GNUPLOT - fit.h */
 
 /*  NOTICE: Change of Copyright Status
  *

@@ -1,4 +1,6 @@
-/* $Id: bitmap.h,v 1.6 1999/10/29 18:49:23 lhecking Exp $ */
+/*
+ * $Id: bitmap.h,v 1.7 1999/11/08 19:24:14 lhecking Exp $
+ */
 
 /* GNUPLOT - bitmap.h */
 

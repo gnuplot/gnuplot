@@ -1,6 +1,5 @@
 /*
- * $Id: readline.h,v 1.3 1999/11/24 13:31:59 lhecking Exp $
- *
+ * $Id: readline.h,v 1.4 2000/03/28 21:28:34 lhecking Exp $
  */
 
 /* GNUPLOT - readline.h */

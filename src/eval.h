@@ -1,6 +1,5 @@
 /*
- * eval.h,v 1.1.1.1 1999/08/28 16:52:54 hbb Exp
- *
+ * $Id: $
  */
 
 /* GNUPLOT - eval.h */

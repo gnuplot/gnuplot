@@ -1,6 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.8 1999/11/08 19:24:18 lhecking Exp $
- *
+ * $Id: stdfn.h,v 1.9 2000/02/11 19:14:05 lhecking Exp $
  */
 
 /* GNUPLOT - stdfn.h */

@@ -1,6 +1,5 @@
 /*
- * graph3d.h,v 1.1.1.2 1999/08/28 16:52:54 hbb Exp
- *
+ * $Id: $
  */
 
 /* GNUPLOT - graph3d.h */

@@ -1,6 +1,5 @@
 /*
- * internal.h,v 1.1.1.2 1999/08/28 16:52:55 hbb Exp
- *
+ * $Id: $
  */
 
 /* GNUPLOT - internal.h */
