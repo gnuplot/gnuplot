@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.108 2003/01/24 08:26:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.109 2003/02/05 00:01:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2080,20 +2080,21 @@ static void
 set_separator()
 {
     c_token++;
-    if (END_OF_COMMAND)
+    if (END_OF_COMMAND) {
 	df_separator = '\0';
-    else if (almost_equals(c_token,"white$space")) {
-	df_separator = '\0';
-	c_token++;
-    } else {
-	if (!isstring(c_token))
-	    int_error(c_token, "expected \"<separator_char>\"");
-	if (equals(c_token,"\"\\t\"") || equals(c_token,"\'\\t\'"))
-	    df_separator = '	';
-	else
-	    df_separator = input_line[token[c_token].start_index+1];
-	c_token++;
+	return;
     }
+    if (almost_equals(c_token,"white$space"))
+	df_separator = '\0';
+    else if (!isstring(c_token))
+	int_error(c_token, "expected \"<separator_char>\"");
+    else if (equals(c_token,"\"\\t\"") || equals(c_token,"\'\\t\'"))
+	df_separator = '	';
+    else if (input_line[token[c_token].start_index] != input_line[token[c_token].start_index+2])
+	int_error(c_token, "extra chars after <separation_char>");
+    else
+	df_separator = input_line[token[c_token].start_index+1];
+    c_token++;
 }
 
 /* process 'set missing' command */

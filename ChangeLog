@@ -1,5 +1,10 @@
 2003-02-04  Ethan Merritt  <merritt@u.washington.edu>
 
+	* src/set.c: Trap syntax error 
+	* docs/gnuplot.doc Fix indentation, and add a section for `unset`.
+
+2003-02-04  Ethan Merritt  <merritt@u.washington.edu>
+
 	* NEWS docs/gnuplot.doc src/datafile.c src/datafile.h src/save.c 
 	src/set.c src/show.c src/unset.c: 
 	Add new command `set datafile separator { whitespace | "<char>"}`.
@@ -1894,7 +1899,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/02/04 23:59:01 $).
+	last modification date (from the tag $Date: 2003/02/05 00:04:24 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

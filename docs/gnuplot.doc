@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.157 2003/01/24 08:26:53 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.158 2003/02/05 00:00:59 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -3294,6 +3294,10 @@ C ... and restart the table:
  The `show` command shows their settings;  `show all` shows all the
  settings.
 
+ Options changed using `set` can be returned to the default state by giving the 
+ corresponding `unset` command.  See also the `reset` command, which returns
+ all settable parameters to default values.
+
  If a variable contains time/date data, `show` will display it according to
  the format currently defined by `set timefmt`, even if that was not in effect
  when the variable was initially defined.
@@ -4122,19 +4126,19 @@ C ... and restart the table:
  non-parsible string of characters found where a numerical value is expected
  will be treated as missing data.
 
-4separator
+4 set datafile separator
 ?set datafile separator
 ?separator
-  The command `set datafile separator "<char>"` tell `gnuplot` that data fields
-  in subsequent input files are separated by <char> rather than by whitespace.
-  The most common use is to read in csv (comma-separated value) files written 
-  by spreadsheet or database programs. By default data fields are separated by 
-  whitespace.
+ The command `set datafile separator "<char>"` tell `gnuplot` that data fields
+ in subsequent input files are separated by <char> rather than by whitespace.
+ The most common use is to read in csv (comma-separated value) files written 
+ by spreadsheet or database programs. By default data fields are separated by 
+ whitespace.
 
-  Syntax:
+ Syntax:
        set datafile separator {"<char>" | whitespace}
 
-  Examples:
+ Examples:
        # Input file contains tab-separated fields
        set datafile separator "\t"
 
@@ -8447,6 +8451,17 @@ C ... and restart the table:
 
  Syntax:
        test
+2 unset
+?commands unset
+?unset
+ Options set using the `set` command may be returned to their default state by
+ issuing the corresponding `unset` command.
+
+ Example:
+       set xtics mirror rotate by -45 0,10,100
+       ...
+       unset xtics
+
 2 update
 ?commands update
 ?update
