@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.15 1999/10/29 18:47:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.16 1999/11/08 19:24:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -44,9 +44,6 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.15 1999/10/29 18:47:20 
  *   Msdos port and some enhancements:
  *     Gershon Elber and many others.
  *
- *   In add_history(), do not store duplicated entries:
- *     Petr Mikulik
- *
  */
 
 #include <signal.h>
@@ -54,6 +51,7 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.15 1999/10/29 18:47:20 
 #include "readline.h"
 
 #include "alloc.h"
+#include "gp_hist.h"
 #include "util.h"
 
 #if defined(USE_MOUSE) && defined(OS2)
@@ -281,15 +279,6 @@ static char msdos_getch __PROTO((void));	/* HBB 980308: PROTO'ed it */
 # define NEWLINE	'\n'
 #endif /* not OSK */
 
-struct hist {
-    char *line;
-    struct hist *prev;
-    struct hist *next;
-};
-
-static struct hist *history = NULL;	/* no history yet */
-static struct hist *cur_entry = NULL;
-
 static char *cur_line;		/* current contents of the line */
 static size_t line_len = 0;
 static size_t cur_pos = 0;	/* current position of the cursor */
@@ -371,7 +360,7 @@ extend_cur_line()
 
 char *
 readline(prompt)
-const char *prompt;
+char *prompt;
 {
 
     int cur_char;
@@ -721,58 +710,6 @@ char *line;
     user_puts(cur_line);
     cur_pos = max_pos = strlen(cur_line);
 }
-
-/* add line to the history */
-void
-add_history(line)
-char *line;
-{
-    struct hist *entry;
-
-
-    entry = history;
-    while (entry != NULL) {
-	/* Don't store duplicate entries */
-	if (!strcmp(entry->line, line)) {
-	    /* cmd lines are equal, relink entry that was found last */
-	    if (entry->next == NULL) {
-		/* previous command repeated, no change */
-		return;
-	    }
-	    if (entry->prev == NULL) {
-		/* current cmd line equals the first in the history */
-		(entry->next)->prev = NULL;
-		history->next = entry;
-		entry->prev = history;
-		entry->next = NULL;
-		history = entry;
-		return;
-	    }
-	    /* bridge over entry's vacancy, then move it to the end */
-	    (entry->prev)->next = entry->next;
-	    (entry->next)->prev = entry->prev;
-	    entry->prev = history;
-	    history->next = entry;
-	    entry->next = NULL;
-	    history = entry;
-	    return;
-	}
-	entry = entry->prev;
-    }				/* end of not-storing duplicated entries */
-
-    entry = (struct hist *) gp_alloc(sizeof(struct hist), "history");
-/*    entry->line = gp_alloc(strlen(line) + 1, "history");
-      strcpy(entry->line, line); */
-    entry->line = gp_strdup(line);
-
-    entry->prev = history;
-    entry->next = NULL;
-    if (history != NULL) {
-	history->next = entry;
-    }
-    history = entry;
-}
-
 
 /* Convert ANSI arrow keys to control characters */
 static int
@@ -1133,147 +1070,6 @@ reset_termio()
 	term_set = 0;
     }
 #endif /* not MSDOS && not ATARI && not MTOS && not _Windows && not DOS386 */
-}
-
-
-/*
- * New functions for browsing the history. They are called from command.c
- * when the user runs the 'history' command
- */
-
-/* write <n> last entries of the history to the file <filename>
- * Input parameters:
- *    n > 0 ... write only <n> last entries; otherwise all entries
- *    filename == NUL ... write to stdout; otherwise to the filename
-*/
-void
-write_history_n(n, filename)
-int n;
-char *filename;
-{
-    struct hist *entry = history, *start = NULL;
-    FILE *out = stdout;
-    int hist_entries = 0;
-    int hist_index = 1;
-
-    if (entry == NULL)
-	return; /* no history yet */
-
-    /* find the beginning of the history and count nb of entries */
-    while (entry->prev != NUL) {
-	hist_entries++;
-	if (n > 0 && n == hist_entries) /* listing will start from this entry */
-	    start = entry;
-	entry = entry->prev;
-    }
-    if (start != NULL) {
-	entry = start;
-	hist_index = hist_entries - n + 1;
-    }
-    /* now write the history */
-    if (filename != NULL)
-	out = fopen(filename, "w");
-    while (entry != NULL) {
-	/* don't add line numbers when writing to file
-	 * to make file loadable */
-	if (filename)
-	    fprintf(out,"%s\n",entry->line);
-	else
-	    fprintf(out,"%5i  %s\n",hist_index++,entry->line);
-	entry = entry->next;
-    }
-    if (filename != NULL)
-	fclose(out);
-}
-
-
-/* obviously the same routine as in GNU readline, according to code from
- * plot.c:#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
- */
-void
-write_history (filename)
-char *filename;
-{
-    write_history_n ( 0, filename );
-}
-
-
-/* finds and returns a command from the history which starts with <cmd>
- * (ignores leading spaces in <cmd>)
- * Returns NULL if nothing found
- */
-char *
-history_find (cmd)
-char *cmd;
-{
-    struct hist *entry = history;
-    int len;
-    char *line;
-    if (entry == NULL)
-	return NULL; /* no history yet */
-    if (*cmd == '"')
-	cmd++; /* remove surrounding quotes */
-    if (!*cmd)
-	return NULL;
-    len = strlen(cmd);
-    if (cmd[len-1] == '"')
-	cmd[--len] = 0;
-    if (!*cmd)
-	return NULL;
-    /* search through the history */
-    while (entry->prev != NULL) {
-	line = entry->line;
-	while (isspace((int)*line)) line++; /* skip leading spaces */
-	if (!strncmp(cmd,line,len)) /* entry found */
-	    return line;
-	entry = entry->prev;
-    }
-    return NULL;
-}
-
-
-/* finds and print all occurencies of commands from the history which
- * start with <cmd>
- * (ignores leading spaces in <cmd>)
- * Returns 1 on success, 0 if no such entry exists
- */
-int
-history_find_all(cmd)
-char *cmd;
-{
-    struct hist *entry = history;
-    int hist_index = 1;
-    char res = 0;
-    int len;
-    char *line;
-
-    if (entry == NULL)
-	return 0; /* no history yet */
-    if (*cmd == '"')
-	cmd++; /* remove surrounding quotes */
-    if (!*cmd)
-	return 0;
-    len = strlen(cmd);
-    if (cmd[len-1] == '"') 
-	cmd[--len] = 0;
-    if (!*cmd)
-	return 0;
-    /* find the beginning of the history */
-    while (entry->prev != NULL)
-	entry = entry->prev;
-    /* search through the history */
-    while (entry != NULL) {
-	line = entry->line;
-	while (isspace((int)*line))
-	    line++; /* skip leading spaces */
-	if (!strncmp(cmd,line,len)) { /* entry found */
-	    printf("%5i  %s\n",hist_index,line);
-	    res = 1;
-	}
-	entry = entry->next;
-	hist_index++;
-    }
-    return res;
 }
 
 #endif /* READLINE && !HAVE_LIBREADLINE */
