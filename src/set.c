@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.145 2004/08/20 18:19:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.146 2004/08/21 20:57:52 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -354,6 +354,10 @@ set_command()
 		set_separator();
 	    else if (almost_equals(c_token,"com$mentschars"))
 		set_datafile_commentschars();
+#ifdef BINARY_DATA_FILE
+	    else if (almost_equals(c_token,"bin$ary"))
+		df_set_datafile_binary();
+#endif
 	    else
 		int_error(c_token,"expecting datafile modifier");
 	    break;
@@ -2373,7 +2377,11 @@ set_palette_file()
     if (END_OF_COMMAND || !isstring(c_token) )
       int_error( c_token, "Expected file name" );
 
+#ifdef BINARY_DATA_FILE
+    specs = df_open( 4, MODE_QUERY );
+#else
     specs = df_open( 4 );
+#endif
     if (df_binary)
 	int_error( c_token, "Binary palette files not implemented");
 
@@ -2911,6 +2919,7 @@ set_pm3d()
 	strcpy(pm3d.where,"s");
 }
 #endif
+
 
 /* process 'set pointsize' command */
 static void

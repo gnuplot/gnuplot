@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.58 2004/07/01 17:10:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.59 2004/07/13 14:11:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -971,10 +971,22 @@ builtin_toggle_log(struct gp_event_t *ge)
 	    do_string_replot("set log z");
 #endif
     } else {
+#ifdef WITH_IMAGE
+	/* set log cb or log y whether using "with (rgb)image" plot or not */
+	if (is_cb_plot) {
+	    if (CB_AXIS.log)
+		do_string_replot("unset log cb");
+	    else
+		do_string_replot("set log cb");
+	} else {
+#endif
 	if (axis_array[FIRST_Y_AXIS].log)
 	    do_string_replot("unset log y");
 	else
 	    do_string_replot("set log y");
+#ifdef WITH_IMAGE
+	}
+#endif
     }
     return (char *) 0;
 }

@@ -10,7 +10,7 @@ TABLE OF CONTENTS:
   * TECHNICAL DETAILS FOR FAST MOUSE ROTATION OF 3D SURFACES
   * TECHNICAL DETAILS ABOUT PM3D
 
-Document version: "$Id: README,v 1.5 2002/06/10 18:49:00 mikulik Exp $"
+Document version: "$Id: README,v 1.6 2003/01/22 08:47:55 mikulik Exp $"
 
 
 *******************************************************************************
@@ -781,6 +781,321 @@ void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
     The declaration has been made the same as in GIF's gd.h. It fills the given
     polygon according to color set by the previous call to set_color().
 
+
+*******************************************************************************
+*******************************************************************************
+
+TECHNICAL DETAILS ABOUT PLOT WITH IMAGE
+=======================================
+
+The plot_image() routine in graphics.c was added by Daniel Sebald on October
+30, 2003.  It is intended for plotting images if the terminal driver supports
+images, otherwise it reverts to pm3d color boxes if possible.  A large part of
+the routine checks that the visible points form a valid rectangular grid.
+Because the data is in the form of 2D/3D point structures, this must be done.
+(A future feature might be the ability to circumvent the large storage
+requirements of 2D/3D point structures and the need to check whether data
+forms a grid whenever the user supplies image data in a known matrix format.)
+
+If a grid aligned with the Cartesian axes is not given, plot_image() will
+revert to plotting color boxes using Petr Mikulik's pm3d features, provided
+the user has selected palette image, as opposed to RGB image.
+
+Only details about the "tricky" algorithms are given here.
+
+There are eight valid ways that pixel grid information can be entered via the
+plot->points[] array.  These are based upon the scanning direction (i.e., along
+one of the dimensions) and the two directions (positive vs. negative) along
+the dimensions that the points are entered.
+
+Definitions:
+
+    K = input scan line length (i.e., number of samples along line)
+    L = input plane length (i.e., number of scan lines)
+  dim = dimension (0 means increments along x, 1 means increments along y)
+ dxg0 = delta x grid along the scan line (can be positive or negative)
+ dyg0 = delta y grid along the scan line (can be positive or negative)
+ dxg1 = delta x grid between scan lines (can be positive or negative)
+ dyg1 = delta y grid between scan lines (can be positive or negative)
+sgn() = sign of variable (- represented as 0, + represented as 1)
+  a^b = raise a to the power b
+    M = output row length (i.e., number of columns)
+    N = output column length (i.e., number of rows)
+
+The goal is to move the data from the plot->points[] array to the matrix pixel
+grid in the order (1,1), (1,2), (1,3), ..., (M,N-1), (M,N) forming the M x N
+matrix
+
+   (1,1)...(M,1)
+     .       .
+     .       .
+     .       .
+   (1,N)...(M,N)
+
+The approach is to step through the plot points and copy each visible point to
+its appropriate spot in the image matrix array.  The routine that does this is
+fundamentally
+
+  for (i=0, j=line_length, i_image=i_start; i < plot->p_count; i++) {
+    image[i_image] = plot->points[i].CRD_COLOR;
+    i_image += i_delta_pixel;
+    j--;
+    if (j == 0) {
+      i_image += i_delta_line;
+      j = line_length;
+    }
+  }
+
+Thus the indexing parameters i_start, line_length, i_delta_pixel and
+i_delta_line must be determined.  line_length is solely dependent upon the
+dimension; K if dimension = 0 (i.e., increment along a row) and L if
+dimension = 1 (i.e., along column).  The other relationships can be determined
+by looking at the eight 4 x 2 illustrations which follow.  Assume points are
+entered 0, 1, 2, 3, 4, 5, 6, 7, then the various ways of entry are:
+
+  (1)       (2)       (3)       (4)       (5)       (6)       (7)       (8)
+
+3 2 1 0   7 6 5 4   0 1 2 3   4 5 6 7   6 4 2 0   7 5 3 1   0 2 4 6   1 3 5 7
+7 6 5 4   3 2 1 0   4 5 6 7   0 1 2 3   7 5 3 1   6 4 2 0   1 3 5 7   0 2 4 6
+
+The functions are:
+
+sgn(dyg1)---------|
+sgn(dxg1)------   |
+sgn(dyg0)--   |   |                        i_delta_pixel
+sgn(dxg0) |   |   |                              |
+      |   |   |   |          i_start        |    |    |   i_delta_line
+     --- --- --- --- | -------------------- | ------- | ---------------
+(1)   -   0   0   -  |    K - 1 =  K*1 - 1  |   -1    |   2*K =  K + K
+(2)   -   0   0   +  |  K*L - 1 =  K*L - 1  |   -1    |     0 =  K - K
+(3)   +   0   0   -  |      0   =  K*1 - K  |    1    |     0 = -K + K
+(4)   +   0   0   +  |  K*(L-1) =  K*L - K  |    1    |  -2*K = -K - K
+                     |                      |         |
+(5)   0   -   -   0  |  (L-1)*K =  K*L - K  |   -K    |      K*L + 1
+(6)   0   +   -   0  |  K*L - 1 =  K*L - 1  |   -K    |      K*L - 1
+(7)   0   -   +   0  |      0   =  K*1 - K  |    K    |     -K*L + 1
+(8)   0   +   +   0  |    K - 1 =  K*1 - 1  |    K    |     -K*L - 1
+
+
+
+There is a clear distinction between formulas based upon dimension.
+Summarizing,
+
+
+               dimension = 0 (x changing)
+-------------------------------------------------------
+line_length:                     K
+
+i_start:           L^(dyg1 > 0) * K - K^(dxg0 > 0)
+
+i_delta_pixel:             (-1)^(dxg0 < 0)
+
+i_delta_line:   K*[(-1)^(dxg0 > 0) + (-1)^(dyg1 > 0)]
+-------------------------------------------------------
+
+
+
+               dimension = 1 (y changing)
+-------------------------------------------------------
+line_length:                     L
+
+i_start:           L^(dxg1 < 0) * K - K^(dyg0 < 0)
+
+i_delta_pixel:             K*(-1)^(dxg1 < 0)
+
+i_delta_line:   K*L*(-1)^(dxg1 > 0) + (-1)^(dyg0 > 0)
+-------------------------------------------------------
+
+
+The above formulas are what appear preceding the for() loop in the actual code.
+
+
+/***** NOTE:  Info between starred comments was original method and now a
+              simple, but less efficient, method of finding the corners by
+              conditional tests while rearranging the points is done.  So
+              this is obsolete... but may come back to it at some point.
+              But if this has been sitting around for quite a while now,
+              feel free to delete what is between the stars.
+
+There is also the matter of computing what points in the array of plot->point[]
+constitute pixels (1,1) and (N,M).  There are four grid corners determined on
+the first pass through the data.  However, what these map to also depend upon
+the three variables dim, d_x_g and d_y_g. Again, looking at the illustrations:
+
+      dim  sgn(d_x_g)  sgn(d_y_g) | pixel_1_1 | pixel_M_N
+      ---  ----------  ---------- | --------- | ---------
+(1)    0       -           -      |     1     |     2
+(2)    0       -           +      |     3     |     0
+(3)    0       +           -      |     0     |     3
+(4)    0       +           +      |     2     |     1
+(5)    1       -           -      |     2     |     1
+(6)    1       -           +      |     3     |     0
+(7)    1       +           -      |     0     |     3
+(8)    1       +           +      |     1     |     2
+
+
+These functions are implemented by table look up.  With
+
+    int pixel_1_1_logic[2][2][2] = {1, 3, 0, 2, 2, 3, 0, 1};
+    int pixel_M_N_logic[2][2][2] = {2, 0, 3, 1, 1, 0, 3, 2};
+
+The following yields the desired functions:
+
+pixel_1_1 =
+ grid_corner[ pixel_1_1_logic[dimension][delta_x_grid > 0][delta_y_grid > 0] ];
+pixel_M_N =
+ grid_corner[ pixel_M_N_logic[dimension][delta_x_grid > 0][delta_y_grid > 0] ];
+
+*****/
+
+
+TECHNICAL DETAILS ABOUT TERMINAL DRIVER FUNCTION image
+======================================================
+
+Support for images in the X11 driver was added by Daniel Sebald on February
+27, 2003.  The function
+
+  void (*image) __PROTO((unsigned M, unsigned N, coordval *image,
+                         gpiPoint *corner, int color_mode));
+
+is the terminal driver routine for displaying an image.  'M' is the number of
+rows, 'N' is the number of columns, 'image' is a pointer to image data stored
+with upper left pixel first and scanning horizontally from left to right,
+'corner' contains
+
+ corner[0].x  upper left pixel (1,1) location (extent) of image
+ corner[0].y
+ corner[1].x  lower right pixel (M,N) location (extent) of image
+ corner[1].y
+ corner[2].x  upper left corner of visible window
+ corner[2].y
+ corner[3].x  lower right corner of visible window
+ corner[3].y
+
+and 'color_mode' indicates if the image should use RGB triples or palette
+lookup.
+
+Image samples are a coordval which is a float.  Image data attempts to be
+consistent with the color schemes of Petr Mikulik's pm3d.  Therefore, the
+values in the image array are in the range [0.0,1.0] and the terminal driver
+routine can handle this data by mapping this range to a range appropriate for
+the output device.
+
+If `color_mode` is IC_RGB, the `image` array should be treated as triples of
+floats.  That is, rather than the length of the image array being M*N, as is
+the case when `color_mode` is IC_PALETTE, the length of the array is 3*M*N.
+Triples are of the form
+
+image[0] = red 1,1
+image[1] = green 1,1
+image[2] = blue 1,1
+image[3] = red 1,2
+image[4] = green 1,2
+image[5] = blue 1,2
+etc.
+
+When in IC_PALETTE mode, image data should be used as an index into the
+palette constructed by the make_palette() terminal routine.  That is, one
+should multiply the value by the palette size minus one, cast to an integer
+and range check (good practice) the index.
+
+The meaning of the corners is that the first two represent the outer extent of
+the pixels representing the image; not the centers of the pixels on the outer
+edge, but the outer edge of the pixels on the outer edge.  The next two corners
+represent the extent of the visual, or clipping region.  Thus, on the outer
+edge of the image may be pixels which are only fractionally displayed.
+
+
+TECHNICAL DETAILS ABOUT X11 IMAGE DRIVER
+========================================
+
+Support for images in the X11 driver was added by Daniel Sebald on February
+27, 2003.
+
+For X11, this image terminal function is X11_image().  Because of the large
+amount of data associated with an image, the routine avoids using floats and
+avoids using formatted I/O representation for numbers.  The "scanf" function
+is a very inefficient routine for large amounts of data.
+
+To avoid using floats, the maximum resolution of the color plane of the X11
+device is assumed to be 16 bits.  (Not an unreasonable assumption.)  The image
+data is converted to short by multiplying by the maximum palette value.  On
+the gplt_x11.c side of the pipe, these unsigned short values are shifted to
+the right to match the size of its palette.
+
+To avoid using formatted I/O.  A simple encoding scheme is used to eliminate
+all image data values having a value equivalent to a '\n' character or a '\0'
+character because the core gplt_x11.c routine interprets these characters in
+a special way.  The scheme is as follows: if the character '\n' or '\0' are
+found, they are replaced by a two byte representation (CODE_WORD,value+1).
+On the receiving side, if the CODE_WORD is found, the next byte after it minus
+one is the decoded character.  Naturally, the CODE_WORD itself must also be
+encoded so as to not lose those in the data stream.
+
+An additional step is to first translate the data before sending it over the
+pipe.  This is done by subtracting a constant.  The constant is added back
+in on the other side.  The reason for this is that image data often contains
+many 0 characters (e.g., upper 8 bits).  Thus the character '\0' is prevalent
+in image data, and without translation, the encoding scheme would result in
+noticable expansion of the data stream.  The encoding is meant to cut down the
+amount of data that is stored in the gplt_x11.c replot buffers.
+
+Because there may be an endianess problem if the gnuplot and gnuplot_x11
+programs were compiled under different compilers, Petr and Dan added an endian
+check command.  If this check finds it is necessary to swap bytes in encoded
+binary data coming across the pipe, then gnuplot_x11 will do so for those
+commands using encoded binary.  In most cases, these programs will have been
+compiled with the same compiler so byte swapping will not be done.  But it is
+there just in case.
+
+The X11 color bit packing is a bit tricky.  It attempts to be portable, but I'm
+sure there are peculiar hardware formats out there that will not work properly
+as it currently exists.  (Some additions and tweaking will probably be need,
+but without examples of every hardware configuration it is difficult to program
+for them.)  Basically, shifts and masking for packing the bits from the RGB
+data (16 bits per channel) are derived from the masks of the X11 display
+information.  Also, there is hardware option of byte order:  most significant
+byte first or least significant byte first.  The routine will swap bytes if
+necessary.  However, if the bytes need to be swapped and the RGB masks are all
+8 bits, then the swapping can be done inherently by appropriately altering the
+bit shifts.  For example, say the masks are R: 0xff0000, G: 0xff00, B: 0xff
+and bytes need to be swapped.  Rather than using these masks and swapping
+bytes, the masks could be changed to R: 0xff00, G: 0xff0000, B: 0xff000000.
+
+Comments:
+
+The method works rather well, short of a more direct method of storing image
+data in gplt_x11.c without having to pull the data out of the replot buffer for
+every refresh.  The new 2D binary data file entry (well documented in the
+gnuplot.doc file) in concert with the image routines was suppose to make Octave
+fast at drawing images.  However, Octave needs some reworking yet to make this
+happen seamlessly.  The problem is that Octave does not yet use binary data but
+instead uses ASCII data files to get information to Gnuplot.  I've attempted to
+write data to a file in binary format using Octave's fwrite() routine then use
+Octave's graw() routine.  This speeds things up somewhat, but I still think
+this interface can be improved at a later time.
+
+
+TECHNICAL DETAILS ABOUT POSTSCRIPT IMAGE DRIVER
+===============================================
+
+The PostScript image driver is rather straightforward.  Its main processing
+involves encoding the data in ASCII85 format.  No compression scheme is used
+currently.  Run length encoding hardly seems worth the effort because in most
+cases the amount of compression won't be too significant, I'm guessing.  For
+image data, other than the single bit variety such as a facsimile, other forms
+of compression are more efficient.
+
+
+COMMENTS ABOUT BINARY DATA FILE SYNTAX
+======================================
+
+A keyword for binary data indicates which way to scan within the file.  The
+Cartesian variables x, y, and z are analogous to the cylindrical variables
+t (theta), r, and z internally.  However, the common math convention for
+listing triples in these coordinate systems is (x,y,z) and (r,t,z).  It may
+be worth switching the role of theta and r inside the program.  (If done,
+change the `scan` note inside the `binary` documentation.)
 
 *******************************************************************************
 *******************************************************************************

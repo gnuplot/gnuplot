@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.134 2004/08/02 18:36:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.135 2004/08/14 03:12:47 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2237,6 +2237,7 @@ show_pm3d()
 
 #endif
 
+
 /* process 'show pointsize' command */
 static void
 show_pointsize()
@@ -2674,6 +2675,25 @@ show_datafile()
     if (END_OF_COMMAND || almost_equals(c_token,"com$ments")) {
 	fprintf(stderr, "\tComments chars are \"%s\"\n", df_commentschars);
     }
+#if BINARY_DATA_FILE
+    if (END_OF_COMMAND || almost_equals(c_token,"bin$ary")) {
+	if (!END_OF_COMMAND)
+	    c_token++;
+	if (END_OF_COMMAND) {
+	    /* 'show datafile binary' */
+	    df_show_binary(stderr);
+	    fputc('\n',stderr);
+	}
+	if (END_OF_COMMAND || almost_equals(c_token, "datas$izes"))
+	    /* 'show datafile binary datasizes' */
+	    df_show_datasizes(stderr);
+	if (END_OF_COMMAND)
+	    fputc('\n',stderr);
+	if (END_OF_COMMAND || almost_equals(c_token, "filet$ypes"))
+	    /* 'show datafile binary filetypes' */
+	    df_show_filetypes(stderr);
+    }
+#endif
     if (!END_OF_COMMAND)
 	c_token++;
 }

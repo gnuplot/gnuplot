@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.40 2004/08/19 05:04:33 sfeam Exp $
+ * $Id: svg.trm,v 1.41 2004/08/24 05:02:54 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1295,6 +1295,9 @@ TERM_TABLE_START (svg_driver)
    SVG_set_color,
    SVG_filled_polygon
 #endif /* PM3D */
+#ifdef WITH_IMAGE
+    , NULL
+#endif
    , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
 TERM_TABLE_END (svg_driver)
 

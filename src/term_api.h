@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.31 2004/07/02 23:58:40 sfeam Exp $
+ * $Id: term_api.h,v 1.32 2004/07/13 14:11:24 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -120,6 +120,13 @@ typedef enum t_fillstyle { FS_EMPTY, FS_SOLID, FS_PATTERN, FS_DEFAULT }
 	     t_fillstyle;
 #define FS_OPAQUE (FS_SOLID + (100<<4))
 
+#ifdef WITH_IMAGE
+/* Color construction for an image, palette lookup or rgb components.
+ */
+typedef enum t_imagecolor { IC_PALETTE, IC_RGB }
+	     t_imagecolor;
+#endif
+
 /* values for the optional flags field - choose sensible defaults
  * these aren't really very sensible names - multiplot attributes
  * depend on whether stdout is redirected or not. Remember that
@@ -205,6 +212,9 @@ typedef struct TERMENTRY {
        this colour so that it can apply it for the subsequent drawings
      */
     void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
+#endif
+#ifdef WITH_IMAGE
+    void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 /* Enhanced text mode driver call-backs */

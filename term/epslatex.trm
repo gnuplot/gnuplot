@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: epslatex.trm,v 1.23 2004/04/13 17:24:17 broeker Exp $
+ * $Id: epslatex.trm,v 1.24 2004/07/01 17:10:13 broeker Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -744,6 +744,11 @@ Gpdict begin\n\
 #ifdef PM3D
     /* to optimize output for postscript terminals family */
     postscript_gpoutfile = gpoutfile;
+#else
+#ifdef WITH_IMAGE
+    /* to optimize output for postscript terminals family */
+    postscript_gpoutfile = gpoutfile;
+#endif
 #endif
 }
 
@@ -1043,6 +1048,9 @@ EPSL_justify_text, EPSL_point, EPSL_arrow, EPSL_set_font, EPSL_pointsize,
 PS_previous_palette,
 PS_set_color,
 EPSL_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+, PS_image
 #endif
 TERM_TABLE_END(epslatex_driver)
 

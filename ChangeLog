@@ -1,8 +1,187 @@
+2004-09-01  Daniel Sebald  <daniel.sebald@ieee.org>
+
+	* NEWS: Updated.
+
+	* configure.in: Added enable and define switches to activate new
+	portions of code:
+	  WITH_IMAGE (--enable-with-image) code for plotting images
+	  WITH_IMAGE_VERIFY_ALL_PIXEL_LOCATIONS (--enable-image-grid-verify)
+	    code for verifying every point in image grid is uniformly spaced
+	  BINARY_DATA_FILE (--enable-binary-data-file) code to allow reading
+	    general binary data files
+	  BINARY_X11_POLYGON (--enable-binary-x11-polygon) code for X11 that
+	    allows transferring polygon information as binary values rather
+	    than ASCII, to save space in plot buffers
+
+	* demo/all.dem: Added inclusion of image.dem.
+
+	* demo/image.dem: New demo to illustrate and test various new image
+	and binary and matrix data file features.
+
+	* docs/gnuplot.doc: Added documentation for image features and general
+	binary file syntax.  Also, removed language indicating gnuplot matrix
+	binary is restricted to `splot`, as it now can be used for images in
+	`plot`.
+
+	* src/Makefile.am: Added gplt_x11.h to gnuplot_SOURCES list and
+	gnuplot_x11_SOURCES list.  Added bin_hook.c to gnuplot_SOURCES list and
+	removed binary.c and binary.h from this list.
+
+	* src/README: Added a discussion of technical details about how the
+	formulas for properly orienting an image and passing that to the
+	terminal driver are derived.  They can be arcane if just looking at the
+	code inside plot_image_or_update_axes().  Same goes for the details
+	about sending binary data to gnuplot_x11 for images.  It requires a
+	simple heuristic encoding scheme to avoid a few particular characters
+	from the data stream and can appear confusing at first sight.
+
+	* src/bin_hook.c: A new, short file to include binary.c in the source
+	tree if BINARY_DATA_FILE is not defined.  Otherwise, binary.c is no
+	longer required.
+
+	* src/breaders.h: An example of how to read a header in a particular
+	file format and fill in the general binary structure details.  Not
+	completely sure just yet how this should be integrated into gnuplot.
+
+	* src/color.c (draw_color_smooth_box): Added an option for `plot` mode
+	for use in images with a palette.
+
+	* src/color.h: Adjusted function definition for change noted above.
+
+	* src/command.c: Now save a new property is_cb_plot to determine if a
+	color box can be part of the plot in question.
+
+	* src/command.h: Added declaration of is_cb_plot variable.
+
+	* src/datafile.c: Extensive additional code for interpreting general
+	binary keyword syntax.  Changed df_readline() to df_readascii() and
+	added a new file df_readbinary() analogous to df_readascii().  A new
+	df_readline() chooses which of these two to utilize.  Code for reading
+	binary and ASCII matrix format file was moved to df_readbinary().  This
+	means other files in the source tree could be restructured so that the
+	routine df_readline() is the only method to bring data into gnuplot.
+
+	* src/datafile.h: Declarations for new functions as part of code noted
+	above.  Also, there are a few new enumerations and, most importantly,
+	the definition for the structure containing information about general
+	binary records.
+
+	* src/fit.c (fit_command): Altered df_open() argument to include the
+	plot mode MODE_QUERY.
+
+	* src/getcolor.c: Reactivated rgb255_from_gray(), required for images.
+
+	* src/gp_types.h: Added IMAGE and RGBIMAGE to PLOT_STYLE enumeration.
+
+	* src/gplt_x11.c: Extensive additional code for handling images in
+	binary data format, polygons in binary data format, and an endianess
+	check to determine if bytes need be swapped.  A simple, short encoding
+	scheme is used for binary data to avoid a couple special characters in
+	the data stream.
+
+	* src/gplt_x11.h: A new header file to go along with gplt_x11.h
+	containing definitions for code characters sent across pipe.  Also some
+	definitions for translation characters in the binary encoding scheme.
+
+	* src/graph3d.c (do_3dplot): Added a plot_mode of MODE_SPLOT to
+	argument of draw_color_smooth_box(), as now that can also be done for
+	`plot`.  Also, added cases of IMAGE and RGBIMAGE to plot style switch.
+
+	* src/graphics.c: Added plot_image_or_update_axes(), a new image
+	plotting routine.  The new routine is fairly long and arcane in spots.
+	The README file contains details to clear up obscure parts.  Added the
+	cases IMAGE and RGBIMAGE to the switch statement for plot style.  Also,
+	there is code for making room for a color box on the plot, followed by
+	a call to draw_color_smooth_box() where appropriate.
+
+	* src/graphics.h: Added definitions PLOT_IMAGE(), SPLOT_IMAGE() and
+	UPDATE_AXES_FOR_PLOT_IMAGE() to make plot_image_or_update_axes() seem
+	more intuitive.
+
+	* src/misc.c: Added 'image' and 'rgbimage' to list of plot styles in
+	error message indicating valid styles.
+
+	* src/mouse.c (builtin_toggle_log): For plots having a color box
+	property, allow changing the color box to logarithmic scale.
+
+	* src/plot2d.c: Many small alterations to case statements, etc. to
+	integrate IMAGE and RGBIMAGE plot styles.  Also, added MODE_PLOT to
+	df_open() argument list for binary data files.
+
+	* src/plot3d.c: Similar to plot2d.c, many little changes made to
+	incorporate IMAGE and RGBIMAGE plot styles.  Also, for general binary
+	there is no longer need for df_3dmatrix(), so that call was removed.
+	Added MODE_SPLOT to argument list of df_open().
+
+	* src/save.c (save_data_func_style): Write `image` or `rgbimage` to
+	file if appropriate plot style.
+
+	* src/set.c (set_command/set_palette_file): Added call to routine
+	setting defaults for binary data files if `binary` is specified as
+	part of `set` command. / Added MODE_QUERY to list of arguments for
+	df_open().
+
+	* src/show.c (show_datafile): Now show information about binary data
+	file settings and details about binary variable sizes in bytes for the
+	compiler under which gnuplot was built.
+
+	* src/tables.c (show_style_tbl): Added `image` and `rgbimage` to table.
+
+	* src/term_api.h (TERMENTRY): Added image() prototype function to
+	TERMENTRY structure as well as an enumeration for image type as an
+	argument to image() routine.
+
+	* src/unset.c (unset_command/reset_command): Added call to routine that
+	clears the binary data file record information.
+
+	* src/util3d.c: Added a routine map3d_xy_double() to retain more
+	accurate coordinates necessary for checking uniformity of the image
+	grid via hyperplane concepts.  It is repetition of existing code,
+	but there is a note and define switch for code-reuse.
+
+	* src/util3d.h: Added declaration for map3d_xy_double().
+
+	* term/README: Added note about how to properly use image() terminal
+	function.
+
+	* term/aquaterm.trm: Per Persson added an implementation of the image()
+	terminal function, AQUA_image().
+
+	* term/dumb.trm: Ethan Merritt added a space filler for the image()
+	terminal function location of TERM_TABLE.
+
+	* term/epslatex.term: Added PS_image() to structure for image() in
+	TERM_TABLE.  PS_image() is in post.trm.
+
+	* term/gd.trm: Ethan Merritt added a routine PNG_image() for the
+	TERM_TABLE entry of image().  Also, a supporting routine PNG_set_color
+	was created.
+
+	* term/pdf.trm: Ethan Merritt added a routine PDF_image() and entry
+	into the TERM_TABLE for image support for PDF files.
+
+	* term/post.trm: Added a routine PS_image() and appropriate entry in
+	the TERM_TABLE for image support in PostScript files.  There is also a
+	supporting routine PS_encode85() for encoding binary image data in
+	ASCII85 data format.
+
+	* term/pslatex.trm: Added PSLATEX_image() to structure for image() in
+	TERM_TABLE.  It uses a simple call to PS_image(), which is in post.trm.
+
+	* term/svg.trm: Added space filler in TERM_TABLE for image() function.
+
+	* term/x11.trm: Added X11_image() function and entry in TERM_TABLE.
+	The new image routine contains code for a simple, heuristic encoding
+	scheme to prevent a couple specific bytes from being in the image data
+	stream.  Similarly, X11_filled_polygon() and X11_set_color() were
+	altered to use the same scheme to reduce the amount of characters
+	inside the plot buffer.
+
 2004-08-25  Per Persson <persquare@mac.com>
 
 	* src/term.c (init_terminal): Make aqua the default terminal on
 	Mac OS X if AquaTerm is installed.
-	
+
 2004-08-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm (PNG_vector): More specific test for libgd support of

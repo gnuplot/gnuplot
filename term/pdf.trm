@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.35 2004/07/18 20:53:57 sfeam Exp $
+ * $Id: pdf.trm,v 1.36 2004/08/24 05:02:54 sfeam Exp $
  */
 
 /*------------------------------
@@ -26,6 +26,7 @@
 
 /* PM3D support by Johannes Zellner <johannes@zellner.org>, May-15-2002 */
 /* set_color fixes by Petr Mikulik <mikulik@physics.muni.cz>, June-10-2002 */
+/* image support by Ethan A Merritt <merritt@u.washington.edu>, March 2003 */
 
 /* Text rotation 24-Jul-2002 Ethan A Merritt <merritt@u.washington.edu> */
 /* Revised fill patterns 02-Apr-2003 Ethan A Merritt */
@@ -59,6 +60,9 @@ TERM_PUBLIC int PDF_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void PDF_previous_palette __PROTO((void));
 TERM_PUBLIC void PDF_set_color __PROTO((double));
 #endif /* PM3D */
+#ifdef WITH_IMAGE
+TERM_PUBLIC void PDF_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+#endif
 
 #if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
@@ -1166,6 +1170,65 @@ PDF_previous_palette()
 
 #endif /* PM3D */
 
+ 
+#ifdef WITH_IMAGE
+TERM_PUBLIC void
+PDF_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+{
+    unsigned char *pixel;
+    float xscale, yscale;
+    int i, im;
+
+    /* Allocate memory to hold a copy of the entire image in raw RGB format */
+    unsigned char *rawrgb = gp_alloc( M*N*3, "Raw RGB image");
+
+    /* Convert the input image into raw RGB 24-bit color representation */
+    if (color_mode == IC_RGB) {
+    	for (i=0, pixel=rawrgb; i<N*M*3;) {
+	    rgb_color rgb1;
+	    rgb255_color rgb255;
+	    rgb1.r = image[i++];
+	    rgb1.g = image[i++];
+	    rgb1.b = image[i++];
+	    rgb255_from_rgb1( rgb1, &rgb255 );
+	    *pixel++ = rgb255.r;
+	    *pixel++ = rgb255.g;
+	    *pixel++ = rgb255.b;
+	}
+    } else {
+        for (i=0, pixel=rawrgb; i< N*M; i++) {
+	    rgb255_color rgb;
+	    rgb255_from_gray(image[i], &rgb);
+	    *pixel++ = rgb.r;
+	    *pixel++ = rgb.g;
+	    *pixel++ = rgb.b;
+	}
+    }
+      
+    /* Describe this image to PDF library */
+    im = PDF_open_image( myPDF, "raw", "memory", rawrgb,
+			 (long)(M*N*3), (int)M, (int)N,
+			 3, 8,				/* 3 colors, 8 bits each */
+			 "");
+
+    /* Scale and copy into the main PDF image */
+	xscale = fabs((float)corner[1].x - (float)corner[0].x) / (float)M;
+	yscale = fabs((float)corner[1].y - (float)corner[0].y) / (float)N;
+	PDF_save(myPDF);
+	PDF_translate(myPDF, corner[0].x, corner[0].y);
+	PDF_scale(myPDF, xscale, yscale);
+	PDF_translate(myPDF, 0, -(float)N);
+	PDF_place_image(myPDF, im, 0.0, 0.0, 1.0 );
+	PDF_restore(myPDF);
+
+    /* Clean up */
+	PDF_close_image(myPDF, im);
+	free(rawrgb);
+
+}
+#endif 
+
+
 /*
  * Ethan A Merritt November 2003
  *	- support for enhanced text mode
@@ -1389,6 +1452,9 @@ TERM_TABLE_START (pdf_driver)
    PDF_set_color,
    PDF_filled_polygon
 #endif /* PM3D */
+#ifdef WITH_IMAGE
+   , PDF_image
+#endif
    , ENHPDF_OPEN, ENHPDF_FLUSH, do_enh_writec
 TERM_TABLE_END (pdf_driver)
 #undef LAST_TERM

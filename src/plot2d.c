@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.77 2004/08/16 04:13:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.78 2004/08/17 21:21:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -52,6 +52,9 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.77 2004/08/16 04:13:50 sf
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+#ifdef BINARY_DATA_FILE
+#include "plot.h"
+#endif
 
 #ifndef _Windows
 # include "help.h"
@@ -206,6 +209,9 @@ plotrequest()
 	int_error(c_token, "use 'set term' to set terminal type first");
 
     is_3d_plot = FALSE;
+#ifdef WITH_IMAGE
+    is_cb_plot = FALSE;
+#endif
 
     /* Deactivate if 'set view map' is still running after the previous 'splot': */
     splot_map_deactivate();
@@ -221,6 +227,11 @@ plotrequest()
     AXIS_INIT2D(SECOND_Y_AXIS, 1);
     AXIS_INIT2D(T_AXIS, 0);
     AXIS_INIT2D(R_AXIS, 1);
+#ifdef WITH_IMAGE
+#ifdef PM3D
+    AXIS_INIT2D(COLOR_AXIS, 1);
+#endif
+#endif
 
     t_axis = (parametric || polar) ? T_AXIS : FIRST_X_AXIS;
 
@@ -265,6 +276,11 @@ get_data(struct curve_points *current_plot)
     int max_cols, min_cols;    /* allowed range of column numbers */
     double v[MAXDATACOLS];
     int storetoken = current_plot->token;
+#ifdef WITH_IMAGE
+#ifdef PM3D
+    struct coordinate GPHUGE *cp;
+#endif
+#endif
 
     /* eval_plots has already opened file */
 
@@ -338,6 +354,18 @@ get_data(struct curve_points *current_plot)
 	break;
 #endif
 
+#ifdef WITH_IMAGE
+    case IMAGE:
+	min_cols = 3;
+	max_cols = 3;
+	break;
+
+    case RGBIMAGE:
+	min_cols = 5;
+	max_cols = 5;
+	break;
+#endif
+
     default:
 	min_cols = 1;
 	max_cols = 2;
@@ -403,8 +431,22 @@ get_data(struct curve_points *current_plot)
 	    continue;
 
 	case DF_FIRST_BLANK:
+#if !defined(WITH_IMAGE) || !defined(BINARY_DATA_FILE)
 	    /* break in data, make next point undefined */
 	    current_plot->points[i].type = UNDEFINED;
+#else
+	    /* The binary input routines generate DF_FIRST_BLANK at the end
+	     * of scan lines, so that the data may be used for the isometric
+	     * splots.  Rather than turning that off inside the binary
+	     * reading routine based upon the plot mode, DF_FIRST_BLANK is
+	     * ignored for certain plot types requiring 3D coordinates in
+	     * MODE_PLOT.
+	     */
+	    if ((current_plot->plot_style == IMAGE) || (current_plot->plot_style == RGBIMAGE))
+		continue;
+	    /* break in data, make next point undefined */
+	    current_plot->points[i].type = UNDEFINED;
+#endif
 	    i++;
 	    continue;
 
@@ -545,6 +587,18 @@ get_data(struct curve_points *current_plot)
 		    break;
 #endif
 
+#ifdef WITH_IMAGE
+		case IMAGE:  /* x_center y_center z_value */
+		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1],
+				  v[1], v[2]);
+#ifdef PM3D
+		    cp = &(current_plot->points[i]);
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type,
+							  COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+#endif
+		    i++;
+		    break;
+#endif
 		}		/*inner switch */
 
 	    break;
@@ -613,7 +667,11 @@ get_data(struct curve_points *current_plot)
 	    {	/* x, y, ylow, yhigh, width  or  x open low high close */
 		switch (current_plot->plot_style) {
 		default:
+#ifdef WITH_IMAGE
+		    int_warn(storetoken, "Five col. plot style must be boxerrorbars, financebars, candlesticks, or rgbimage. Setting to boxerrorbars");
+#else
 		    int_warn(storetoken, "Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars");
+#endif
 		    current_plot->plot_style = BOXERROR;
 		    /*fall through */
 
@@ -628,6 +686,32 @@ get_data(struct curve_points *current_plot)
 		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 				  v[2], v[3], v[4]);
 		    break;
+
+#ifdef WITH_IMAGE
+		case RGBIMAGE:  /* x_center y_center r_value g_value b_value (rgb) */
+		    store2d_point(current_plot, i, v[0], v[1], v[0], v[0], v[1], v[1], v[2]);
+#ifdef PM3D
+		    /* A slight kludge, but it does in fact do what it is supposed to.
+		     * There is only one color axis, but we are storing components in
+		     * different variables.  Place all components on the same axis.
+		     * (That will maintain a consistent mapping amongst the components.)
+		     * But then retrieve what was stored and break it back into its
+		     * components storing without updating any axes.
+		     */
+		    cp = &(current_plot->points[i]);
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[2], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    v[2] = cp->CRD_COLOR;
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[3], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    v[3] = cp->CRD_COLOR;
+		    COLOR_STORE_WITH_LOG_AND_UPDATE_RANGE(cp->CRD_COLOR, v[4], cp->type, COLOR_AXIS, NOOP, cp->CRD_COLOR=-VERYLARGE);
+		    v[4] = cp->CRD_COLOR;
+		    cp->z = v[2];
+		    cp->xlow = v[3];
+		    cp->ylow = v[4];
+#endif
+		    i++;
+		    break;
+#endif
 		}
 		break;
 	    }
@@ -1220,13 +1304,22 @@ eval_plots()
 		this_plot->plot_smooth = SMOOTH_NONE;
 #ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
+#ifdef WITH_IMAGE
+		/* default no palette */
+		this_plot->lp_properties.use_palette = 0;
+#endif
 #endif
 
+#ifdef BINARY_DATA_FILE
+		specs = df_open(MAXDATACOLS, MODE_PLOT);	/* up to MAXDATACOLS cols */
+#else
 		specs = df_open(MAXDATACOLS);	/* up to MAXDATACOLS cols */
+
 		/* this parses data-file-specific modifiers only */
 		/* we'll sort points when we know style, if necessary */
 		if (df_binary)
 		    int_error(c_token, "2d binary files not yet supported");
+#endif
 
 		/* include modifiers in default title */
 		this_plot->token = end_token = c_token - 1;
@@ -1249,6 +1342,10 @@ eval_plots()
 		this_plot->plot_style = func_style;
 #ifdef PM3D
 		this_plot->filledcurves_options.opt_given = 0;
+#ifdef WITH_IMAGE
+		/* default no palette */
+		this_plot->lp_properties.use_palette = 0;
+#endif
 #endif
 		dummy_func = &plot_func;
 		plot_func.at = temp_at();
@@ -1585,6 +1682,15 @@ eval_plots()
 	    }
 #endif
 
+#ifdef WITH_IMAGE
+	    /* Styles that utilize palettes. */
+	    if (this_plot->plot_style == IMAGE)
+		this_plot->lp_properties.use_palette = 1;
+	    /* Styles that use colorbus. */
+	    if (this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE)
+		is_cb_plot = TRUE;
+#endif
+
 	    /* we can now do some checks that we deferred earlier */
 
 	    if (this_plot->plot_type == DATA) {
@@ -1666,6 +1772,16 @@ eval_plots()
 
 		/* now that we know the plot style, adjust the x- and yrange */
 		/* adjust_range(this_plot); no longer needed */
+
+#ifdef WITH_IMAGE
+		/* Images are defined by a grid representing centers of pixels.
+		 * Compensate for extent of the image so `set autoscale fix`
+		 * uses outer edges of outer pixels in axes adjustment.
+		 */
+		if ((this_plot->plot_style == IMAGE || this_plot->plot_style == RGBIMAGE))
+		    UPDATE_AXES_FOR_PLOT_IMAGE(this_plot, IC_PALETTE);
+#endif
+
 	    }
 	    /* save end of plot for second pass */
 	    this_plot->token = c_token;

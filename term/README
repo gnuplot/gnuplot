@@ -77,6 +77,9 @@ struct TERMENTRY {
    void (*set_color) __PROTO((double gray));
    void (*filled_polygon) __PROTO((int points, gpiPoint *corners));
 #endif
+#ifdef IMAGE_DRIVER
+    void (*image) __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+#endif
 };
 
 One consequence of (1) is that we would like drivers to be backwards
@@ -364,6 +367,39 @@ _previous_palette() - Release the palette that the above routine
    don't need this routine.
 
 
+The following function should be conditioned on IMAGE_DRIVER.  See also:
+src/README for notes about image support.
+
+_image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+   This routine is to plot a pixel-based image on the display device.
+   'M' is the number of pixels along the y-dimension of the image and
+   'N' is the number of pixels along the x-dimension of the image.  The
+   coordval pointer 'image' is the pixel values normalized to the range
+   [0:1].  These values should be scaled accordingly for the output
+   device.  They 'image' data starts in the upper left corner and scans
+   along rows finishing in the lower right corner.  If 'color_mode' is
+   IC_PALETTE, the terminal is to use palette lookup to generate color
+   information.  In this scenario the size of 'image' is M*N.  If
+   'color_mode' is IC_RGB, the terminal is to use RGB components.  In
+   this scenario the size of 'image' is 3*M*N.  The data appears in RGB
+   tripples, i.e., image[0] = R(1,1), image[1] = G(1,1), image[2] =
+   B(1,1), image[3] = R(1,2), image[4] = G(1,2), ..., image[3*M*N-1] =
+   B(M,N).  The 'image' is actually an "input" image in the sense that
+   it must also be properly resampled for the output device.  Many output
+   mediums, e.g., PostScript, do this work via various driver functions.
+   To determine the appropriate rescaling, the 'corner' information
+   should be used.  There are four entries in the gpiPoint data array.
+   'corner[0]' is the upper left corner (in terms of plot location) of
+   the outer edge of the image.  Similarly, 'corner[1]' is the lower
+   right corner of the outer edge of the image.  (Outer edge means the
+   outer extent of the corner pixels, not the middle of the corner
+   pixels.)  'corner[2]' is the upper left corner of the visible part
+   of the image, and 'corner[3]' is the lower right corner of the visible
+   part of the image.  The information is provided in this way because
+   often it is necessary to clip a portion of the outer pixels of the
+   image.
+
+
 The following should illustrate the order in which calls to these
 routines are made:
 
@@ -382,6 +418,7 @@ routines are made:
       _set_font(font)
       _put_text(x,y,text)
       _arrow(sx,sy,ex,ey)
+      _image(M,N,image,corner,color_mode)
     _text()
     _graphics()
       .

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.45 2004/07/22 16:03:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.46 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -1281,7 +1281,11 @@ fit_command()
 
     /* use datafile module to parse the datafile and qualifiers */
 
+#ifdef BINARY_DATA_FILE
+    columns = df_open(4, MODE_QUERY);	/* up to 4 using specs allowed */
+#else
     columns = df_open(4);	/* up to 4 using specs allowed */
+#endif
     if (columns == 1)
 	int_error(c_token, "Need 2 to 4 using specs");
     is_a_3d_fit = (columns == 4);

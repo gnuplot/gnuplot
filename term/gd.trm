@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.46 2004/08/02 18:36:43 sfeam Exp $
+ * $Id: gd.trm,v 1.48 2004/08/27 19:05:38 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -129,6 +129,9 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *);
 /* TERM_PUBLIC void PNG_previous_palette (void); */
 TERM_PUBLIC void PNG_set_color (double);
 TERM_PUBLIC void PNG_filled_polygon (int, gpiPoint *);
+#endif
+#ifdef WITH_IMAGE
+TERM_PUBLIC void PNG_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 /* To support "set term png enhanced" */
@@ -714,6 +717,12 @@ PNG_options()
     else if (png_state.TrueColor) {
 	strcat(term_options, "truecolor ");
     }
+    /* JPEG files are always 24-bit color */
+    if (strcmp(term->name, "jpeg") == 0)
+	png_state.TrueColor = TRUE;
+    else if (png_state.TrueColor) {
+	strcat(term_options, "truecolor ");
+    }
     if (!(png_state.flags & PNG_USE_CROP)) {
 	strcat(term_options, "no");
     }
@@ -887,6 +896,25 @@ TERM_PUBLIC int PNG_make_palette (t_sm_palette *palette)
     }
 
 
+#ifdef WITH_IMAGE
+TERM_PUBLIC
+void PNG_set_color (double gray)
+{
+    if (png_state.TrueColor) {
+	rgb255_color color;
+	rgb255_from_gray(gray, &color);
+	png_state.color = gdImageColorResolve(png_state.image,
+	    (int)color.r, (int)color.g, (int)color.b);
+	return;
+    } else {
+	int png_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+	if (png_color >= sm_palette.colors)
+	    png_color = sm_palette.colors - 1;
+	/* map [0;1] to interval [0;png_smooth_colors-1] */
+	png_state.color = png_smooth_color[ png_color ];
+    }
+}
+#else
 TERM_PUBLIC
 void PNG_set_color (double gray)
 {
@@ -904,6 +932,7 @@ void PNG_set_color (double gray)
 	png_state.color = png_smooth_color[ png_color ];
     }
 }
+#endif
 
 
 TERM_PUBLIC
@@ -1649,6 +1678,69 @@ ENHGD_put_text(unsigned int x, unsigned int y, const char *str)
 
 #undef gdfont
 
+#ifdef WITH_IMAGE
+
+TERM_PUBLIC void
+PNG_image (unsigned M, unsigned N, coordval * image, gpiPoint * corner, t_imagecolor color_mode)
+{
+    int m, n, mout, nout;
+    int pixel;
+    gdImagePtr im;
+
+#ifdef GD2_VERS
+    if (png_state.TrueColor)
+	im = gdImageCreateTrueColor(M, N);
+    else
+#endif
+	{
+	im = gdImageCreate(M, N);
+	gdImagePaletteCopy(im, png_state.image);
+	}
+
+    /* TrueColor 24-bit color mode */
+    if (color_mode == IC_RGB) {
+	for (n=0; n<N; n++) {
+	for (m=0; m<M; m++) {
+	    rgb_color rgb1;
+	    rgb255_color rgb255;
+	    rgb1.r = *image++;
+	    rgb1.g = *image++;
+	    rgb1.b = *image++;
+	    rgb255_from_rgb1( rgb1, &rgb255 );
+	    pixel = gdImageColorResolve( im, 
+		(int)rgb255.r, (int)rgb255.g, (int)rgb255.b );
+	    gdImageSetPixel( im, m, n, pixel );
+	}
+	}
+    /* Palette color lookup from gray value */
+    } else {
+	for (n=0; n<N; n++) {
+	for (m=0; m<M; m++) {
+	    rgb255_color rgb;
+	    rgb255_from_gray( *image++, &rgb );
+	    pixel = gdImageColorResolve( im,
+		(int)rgb.r, (int)rgb.g, (int)rgb.b );
+	    gdImageSetPixel( im, m, n, pixel );
+	}
+	}
+    }
+
+    /* Copy and resize onto requested region of plot */
+    /* FIXME - WOULD gdImageCopyResampled() do a nicer job ??? */
+    mout = abs( (int)corner[1].x - (int)corner[0].x );
+    nout = abs( (int)corner[1].y - (int)corner[0].y );
+    gdImageCopyResized(png_state.image, im,
+    	(corner[0].x), Y(corner[0].y),	/* Destination X, Y */
+	0, 0, 				/* Source X, Y */
+	mout, nout,			/* Destination Width, Height */
+	M, N				/* Source Width, Height */
+	);
+    gdImageDestroy(im);
+
+}
+
+#endif
+
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
 
@@ -1677,6 +1769,9 @@ TERM_TABLE_START(png_driver)
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , PNG_image
 #endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(png_driver)
@@ -1835,6 +1930,9 @@ TERM_TABLE_START(jpeg_driver)
     0, /* previous_palette() ... no, single array of 256 colours for PNG */
     PNG_set_color,
     PNG_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , PNG_image
 #endif
     , ENHGD_OPEN, ENHGD_FLUSH, do_enh_writec
 TERM_TABLE_END(png_driver)

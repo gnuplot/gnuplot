@@ -1,6 +1,8 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
+* NEW reading of (almost) arbitrary image binary files
+* NEW plot styles "with image" and "with rgbimage"
 * NEW plot style "with labels" reads text data along with X/Y/Z coordinates
 * NEW plot style "with histograms" creates clustered or stacked histograms
 * NEW auto-layout of multiplot using "set multiplot layout <rows>, <cols>"

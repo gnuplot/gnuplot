@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.16 2004/07/02 23:58:35 sfeam Exp $
+ * $Id: color.h,v 1.17 2004/07/04 23:58:46 sfeam Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -279,7 +279,11 @@ void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUG
 /*
   Draw colour smooth box
 */
+#ifdef WITH_IMAGE
+void draw_color_smooth_box __PROTO((int plot_mode));
+#else
 void draw_color_smooth_box __PROTO((void));
+#endif
 
 
 #endif /* PM3D */

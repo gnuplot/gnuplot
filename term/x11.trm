@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.115 2004/07/02 23:58:55 sfeam Exp $
+ * $Id: x11.trm,v 1.116 2004/07/13 14:11:25 broeker Exp $
  *
  */
 
@@ -54,6 +54,9 @@
  * 2003
  */
 
+/* Daniel Sebald: added X11 support for images. (27 February 2003)
+ */
+
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -80,6 +83,10 @@ TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
 
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+TERM_PUBLIC void X11_send_endianess __PROTO((void));
+#endif
+
 # ifdef USE_MOUSE
 TERM_PUBLIC int X11_waitforinput __PROTO((void));
 TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
@@ -93,12 +100,10 @@ TERM_PUBLIC void X11_update_opts __PROTO((void));
 TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void X11_set_color __PROTO((double));
 TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
+# endif
 
-/* these must match the definitions in gplt_x11.c */
-#  define X11_GR_MAKE_PALETTE     'p'
-#  define X11_GR_RELEASE_PALETTE  'e'
-#  define X11_GR_SET_COLOR        'c'
-#  define X11_GR_FILLED_POLYGON   'f'
+# ifdef WITH_IMAGE
+TERM_PUBLIC void X11_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 # endif
 
 /* To support "set term x11 enhanced" */
@@ -126,6 +131,13 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 #include <ctype.h>
 #ifdef PM3D
 # include "getcolor.h"
+#endif
+
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON) || defined(PM3D)
+#include "gplt_x11.h"
+#endif
+#ifdef WITH_IMAGE
+#include "graphics.h"
 #endif
 
 /* non-zero if '-display' found on command line */
@@ -791,6 +803,9 @@ X11_init()
 	GP_ATEXIT(X11_atexit);
 	been_here++;
     }
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+    X11_send_endianess();
+#endif
 #ifdef USE_MOUSE
     default_font_size_known = FALSE;
     X11_update_opts();
@@ -1352,18 +1367,77 @@ X11_make_palette(t_sm_palette *palette)
 }
 
 
+#if 0
+/* The following are some handy little routines to keep around
+ * in case one wants to do statistics on the binary data being
+ * passed to a terminal function.
+ */
+
+int char_count[256];
+
+void histogram(unsigned char c) {
+    char_count[c] += 1;
+}
+
+void dump_histogram(void) {
+  int i, sum;
+  fprintf(stderr,"\n\n");
+  for (i=0,sum=0; i<256; i++) {
+    fprintf(stderr," %3.3d:%7.7d ", i, char_count[i]);
+    sum += char_count[i];
+  }
+  fprintf(stderr,"\n\ntotal: %d\n\n",sum);
+}
+#endif
+
 TERM_PUBLIC void
 X11_set_color(double gray)
 {
+
+#ifndef BINARY_X11_POLYGON
+
     fputc(X11_GR_SET_COLOR, X11_ipc);
     PRINT1("%f\n", gray);
     FFLUSH();
     return;
+
+#else
+
+    char *c_ptr;
+    unsigned short byte_remaining;
+    float fgray = gray;
+
+    fputc(X11_GR_SET_COLOR, X11_ipc);
+    byte_remaining = sizeof(fgray);
+    c_ptr = (char *) &fgray;
+
+    while (byte_remaining) {
+
+	char c_tmp = *c_ptr++ - SET_COLOR_TRANSLATION_CHAR;
+
+	byte_remaining--;
+
+	if ( (c_tmp == '\n') || (c_tmp == SET_COLOR_CODE_CHAR) || (c_tmp == '\0') ) {
+	    fputc(SET_COLOR_CODE_CHAR, X11_ipc);
+	    c_tmp += 1;
+	}
+	fputc(c_tmp, X11_ipc);
+
+    }
+
+    fputc('\n', X11_ipc);
+    FFLUSH();
+
+#endif
+
 }
 
 TERM_PUBLIC void
 X11_filled_polygon(int points, gpiPoint *corners)
 {
+
+#ifndef BINARY_X11_POLYGON
+
     int i;
 
     fputc(X11_GR_FILLED_POLYGON, X11_ipc);
@@ -1384,9 +1458,92 @@ X11_filled_polygon(int points, gpiPoint *corners)
     fputc('\n', X11_ipc);
     FFLUSH();
     return;
+
+#else
+
+    int int_cache[2];
+    int i_corner;
+    unsigned short i_buffer;
+    unsigned short byte_remaining;
+    unsigned point_remaining;
+
+    /* Encode and transfer data to the pipe, one character at a time. */
+
+    if (!points) return;
+
+    fputc(X11_GR_FILLED_POLYGON, X11_ipc);
+    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+
+    /* First put number of points into the buffer.  Initialize the "cache"
+     * to the number of points and the number of bytes to transfer to the
+     * size of an int.  This will be the first transfer, so increase the
+     * number of points by one.
+     */
+    int_cache[0] = points;
+#if USE_ULIG_FILLEDBOXES
+    int_cache[1] = corners->style;
+    byte_remaining = 2*sizeof(int_cache[0]);
+#else
+    byte_remaining = sizeof(int_cache[0]);
+#endif
+    point_remaining = points + 1;
+    i_corner = 0;
+
+    while (point_remaining) {
+
+	unsigned char *uc_ptr = (unsigned char *) int_cache;
+
+	while (byte_remaining) {
+
+	    int sent_val;
+
+	    unsigned char uc_tmp = *uc_ptr++ - FILLED_POLYGON_TRANSLATION_CHAR;
+	    byte_remaining--;
+
+	    if ( (uc_tmp == '\n') || (uc_tmp == FILLED_POLYGON_CODE_CHAR) || (uc_tmp == '\0') ) {
+		uc_tmp += 1;
+		sent_val = fputc(FILLED_POLYGON_CODE_CHAR, X11_ipc);
+		if (sent_val != (int)FILLED_POLYGON_CODE_CHAR)
+		    fprintf(stderr, "Bad character mapping %d -> %d\n", (int)FILLED_POLYGON_CODE_CHAR, sent_val);
+		i_buffer--;
+		if (!i_buffer) {
+		    fputc('\n', X11_ipc);  FFLUSH();               /* End of chunk. */
+		    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+		    fputc(X11_GR_FILLED_POLYGON, X11_ipc);         /* Will be another chunk. */
+		}
+	    }
+
+	    sent_val = fputc(uc_tmp, X11_ipc);
+	    if (sent_val != (int)uc_tmp)
+		fprintf(stderr, "Bad character mapping %d -> %d\n", (int)uc_tmp, sent_val);
+	    i_buffer--;
+	    if (!i_buffer) {
+		fputc('\n', X11_ipc);  FFLUSH();                   /* End of chunk. */
+		i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+		if (point_remaining || byte_remaining)
+		    fputc(X11_GR_FILLED_POLYGON, X11_ipc);         /* Will be another chunk. */
+	    }
+
+	}
+
+	int_cache[0] = corners[i_corner].x;
+	int_cache[1] = corners[i_corner].y;
+	byte_remaining = 2*sizeof(int);
+	point_remaining--;
+	i_corner++;
+
+    }
+
+    /* Check if some characters were put in the buffer that need to be flushed. */
+    if (i_buffer != BINARY_MAX_CHAR_PER_TRANSFER) {fputc('\n', X11_ipc);  FFLUSH();}
+
+    return;
+#endif
+
 }
 
 #endif /* PM3D */
+
 
 /*
  * Ethan A Merritt November 2003
@@ -1558,6 +1715,144 @@ PASS2:
 
 }
 
+
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+TERM_PUBLIC void
+X11_send_endianess(void)
+{
+    /* Place an integer 1 in the pipe and see if the byte order agrees
+     * with program on the other side.  Information used for routines
+     * having encoded binary data.
+     */
+    unsigned short tmp = (unsigned short) ENDIAN_VALUE;
+    fputc(X11_GR_CHECK_ENDIANESS, X11_ipc);
+    fputc(((char *)&tmp)[0], X11_ipc);
+    fputc(((char *)&tmp)[1], X11_ipc);
+    fputc('\n', X11_ipc);
+    fflush(X11_ipc);
+}
+#endif
+
+#ifdef WITH_IMAGE
+
+TERM_PUBLIC void
+X11_image(unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+{
+
+    /* Avoid using floats or formatted I/O.  That's too slow for image data.
+     *
+     * To avoid using floats, we assume that the maximum resolution of the
+     * color plane of the x11 device is 16 bits.  (Not an unreasonable
+     * assumption.)  So we convert coordval to unsigned short and then
+     * send those.  The driver then shifts these unsigned short values to
+     * the right to match the size of its palette.
+     *
+     * The driver uses the '\n' character to mean end of command.  When the
+     * core routine sees the '\n', it stops copying the remaining characters
+     * that are in the buffer.  Therefore, we need to hide the '\n' character
+     * from the data stream.  We also need to hide the '\0' because the core
+     * routine also does an 'strcpy'.  So the scheme is as follows:
+     *
+     *   On the driver side, if the char CODE_WORD is found it
+     *   should be ignored and replaced with the char that
+     *   follows it, but subtract one from that value.
+     *
+     * This means that there exists the chance of the data stream enlarging
+     * by a factor of two.  So the algorithm must make sure to keep the
+     * number of bytes transfered less than the buffer length.
+     *
+     * Also note that the '\0' character is often prevalent in 16 bit image
+     * data where the palette may be 8 bits or less.  For this reason, a
+     * translation is first done on the character to make the '\0' occur less
+     * often.  In this way, less amount of data is sent and fewer command
+     * lines are used to store an image.
+     */
+
+    unsigned short i_buffer;
+    unsigned coord_remaining;
+    coordval *coord_ptr;
+
+    /* Use formatted I/O to transfer image information.  Hexadecimal uses less characters.
+     *
+     * Note that X11 has different frame of reference (top left origin) than does Gnuplot
+     * (bottom left origin)
+     */
+    fputc(X11_GR_IMAGE, X11_ipc);
+    fprintf(X11_ipc,"%x %x %x %x %x %x %x %x %x %x %x\n", M, N, corner[0].x, corner[0].y, corner[1].x,
+      corner[1].y, corner[2].x, corner[2].y, corner[3].x, corner[3].y, color_mode);
+    FFLUSH();
+
+    /* Encode and transfer data to the pipe, one character at a time. */
+
+    coord_remaining = M*N;
+    if (color_mode == IC_RGB) coord_remaining *= 3;
+
+    if (!coord_remaining) return;
+
+    fputc(X11_GR_IMAGE, X11_ipc);
+    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+    coord_ptr = image;
+
+    while (coord_remaining) {
+
+	unsigned short us_tmp;
+	unsigned short byte_remaining;
+	unsigned char *uc_ptr;
+
+	/* Convert coordinate value to an unsigned short.  Note that there
+	 * is no need for a range check because we are already using the
+	 * full range of the unsigned short value.  It is the C casting
+	 * routine that should do the range check.
+	 */
+	us_tmp = (unsigned short) ((*coord_ptr++)*IMAGE_PALETTE_VALUE_MAX + 0.5);
+	coord_remaining--;
+
+	byte_remaining = sizeof(us_tmp);
+	uc_ptr = (unsigned char *) &us_tmp;
+
+	while (byte_remaining) {
+
+	    int sent_val;
+
+	    unsigned char uc_tmp = *uc_ptr++ - IMAGE_TRANSLATION_CHAR;
+	    byte_remaining--;
+
+	    if ((uc_tmp == '\n') || (uc_tmp == IMAGE_CODE_CHAR) || (uc_tmp == '\0') ) {
+		uc_tmp += 1;
+		sent_val = fputc(IMAGE_CODE_CHAR, X11_ipc);
+		if (sent_val != (int)IMAGE_CODE_CHAR)
+		    fprintf(stderr, "Bad character mapping %d -> %d\n", (int)IMAGE_CODE_CHAR, sent_val);
+		i_buffer--;
+		if (!i_buffer) {
+		    fputc('\n', X11_ipc);  FFLUSH();               /* End of chunk. */
+		    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+		    fputc(X11_GR_IMAGE, X11_ipc);                  /* Will be another chunk. */
+		}
+	    }
+
+	    sent_val = fputc(uc_tmp, X11_ipc);
+	    if (sent_val != (int)uc_tmp)
+		fprintf(stderr, "Bad character mapping %d -> %d\n", (int)uc_tmp, sent_val);
+	    i_buffer--;
+	    if (!i_buffer) {
+		fputc('\n', X11_ipc);  FFLUSH();                   /* End of chunk. */
+		i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+		if (coord_remaining || byte_remaining)
+		    fputc(X11_GR_IMAGE, X11_ipc);                  /* Will be another chunk. */
+	    }
+
+	}
+
+    }
+
+    /* Check if some characters were put in the buffer that need to be flushed. */
+    if (i_buffer != BINARY_MAX_CHAR_PER_TRANSFER) {fputc('\n', X11_ipc);  FFLUSH();}
+
+    return;
+}
+
+#endif /* WITH_IMAGE */
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -1578,6 +1873,9 @@ TERM_TABLE_START(x11_driver)
 #ifdef PM3D
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , X11_image
 #endif
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(x11_driver)
@@ -1601,6 +1899,9 @@ TERM_TABLE_START(X11_driver)
 #ifdef PM3D
     , X11_make_palette, 0 /* X11_previous_palette */ ,
     X11_set_color, X11_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , X11_image
 #endif
     , ENHX11_OPEN, ENHX11_FLUSH, do_enh_writec
 TERM_TABLE_END(X11_driver)

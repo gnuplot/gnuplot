@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.72 2004/07/24 19:37:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.73 2004/08/10 03:55:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -52,6 +52,9 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.72 2004/07/24 19:37:37 sf
 #include "util.h"
 #ifdef PM3D
 # include "pm3d.h"
+#endif
+#ifdef BINARY_DATA_FILE
+#include "plot.h"
 #endif
 
 #ifdef THIN_PLATE_SPLINES_GRID
@@ -652,9 +655,17 @@ get_3ddata(struct surface_points *this_plot)
     }
     /* data file is already open */
 
+#ifndef BINARY_DATA_FILE /* NO LONGER REQUIRED FOR GENERAL BINARY OR MATRIX BINARY DATA */
     if (df_matrix)
 	xdatum = df_3dmatrix(this_plot, NEED_PALETTE(this_plot));
     else {
+#else
+    if (df_matrix) {
+	this_plot->has_grid_topology = TRUE;
+    }
+
+    {
+#endif
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
@@ -672,6 +683,17 @@ get_3ddata(struct surface_points *this_plot)
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
+
+#if defined(WITH_IMAGE) && defined(BINARY_DATA_FILE)
+		/* Images are in a sense similar to isocurves.  However, the routine
+		 * for images is written to compute the two dimensions of coordinates
+		 * by examining the data alone.  That way it can be used in the 2D
+		 * plots, for which there is no isoline record.  So, toss out isoline
+		 * information for images.
+		 */
+		if ((this_plot->plot_style == IMAGE) || (this_plot->plot_style == RGBIMAGE))
+		    continue;
+#endif
 		/* one blank line */
 		if (pt_in_iso_crv == 0) {
 		    if (xdatum == 0)
@@ -1171,7 +1193,14 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 
+#ifdef BINARY_DATA_FILE
+		specs = df_open(MAXDATACOLS, MODE_SPLOT);
+
+		if (df_matrix)
+		    this_plot->has_grid_topology = TRUE;
+#else
 		specs = df_open(MAXDATACOLS);
+#endif
 
 		/* parses all datafile-specific modifiers */
 		/* we will load the data after parsing title,with,... */
@@ -1394,6 +1423,13 @@ eval_3dplots()
 	    if (!set_title) {
 		this_plot->title_no_enhanced = 1; /* filename or function cannot be enhanced */
 		if (key->auto_titles == FILENAME_KEYTITLES) {
+#ifdef BINARY_DATA_FILE
+		    /* DJS (20 Aug 2004) I'd prefer that the df_binary flag be discarded.  There
+		     * is nothing special about the file being binary that its title should be
+		     * different.  Can't the decision to do this be based on some other criteria,
+		     * like the presence of a nonconventional `using`?
+		     */
+#endif
 		    if (this_plot->plot_type == DATA3D && df_binary==TRUE && end_token==start_token+1)
 			/* let default title for  splot 'a.dat' binary  is 'a.dat'
 			 * while for  'a.dat' binary using 2:1:3  will be all 4 words */
@@ -1457,6 +1493,12 @@ eval_3dplots()
 	     */
 	    if (this_plot->plot_style == PM3DSURFACE && !pm3d.where[0])
 		int_warn(NO_CARET, "ignoring pm3d style without previous 'set pm3d'");
+#endif
+
+#ifdef WITH_IMAGE
+	    /* Styles that utilize palettes. */
+	    if (this_plot->plot_style == IMAGE)
+		this_plot->lp_properties.use_palette = 1;
 #endif
 
 	    /* now get the data... having to think hard here...
@@ -1798,8 +1840,9 @@ eval_3dplots()
     plot3d_num=plot_num;
 
     /* perform the plot */
-    if (strcmp(term->name, "table") == 0)
+    if (strcmp(term->name, "table") == 0) {
 	print_3dtable(plot_num);
+    }
     else {
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */
 	do_3dplot(first_3dplot, plot_num, 0);

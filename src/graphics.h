@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.26 2004/07/03 06:08:49 sfeam Exp $
+ * $Id: graphics.h,v 1.27 2004/07/05 03:49:21 sfeam Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -113,6 +113,17 @@ void apply_head_properties __PROTO((struct arrow_style_type *arrow_properties));
 #ifdef EAM_HISTOGRAMS
 void init_histogram __PROTO((struct histogram_style *hist, char *title));
 void free_histlist __PROTO((struct histogram_style *hist));
+#endif
+
+#ifdef WITH_IMAGE
+void plot_image_or_update_axes __PROTO((void *plot, t_imagecolor pixel_planes,
+					TBOOLEAN map_points, TBOOLEAN update_axes));
+#define PLOT_IMAGE(plot, pixel_planes) \
+	plot_image_or_update_axes(plot, pixel_planes, FALSE, FALSE)
+#define UPDATE_AXES_FOR_PLOT_IMAGE(plot, pixel_planes) \
+	plot_image_or_update_axes(plot, pixel_planes, FALSE, TRUE)
+#define SPLOT_IMAGE(plot, pixel_planes) \
+	plot_image_or_update_axes(plot, pixel_planes, TRUE, FALSE)
 #endif
 
 #endif /* GNUPLOT_GRAPHICS_H */

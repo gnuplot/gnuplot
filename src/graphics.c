@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.120 2004/08/07 01:40:37 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.121 2004/08/17 21:21:25 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -34,7 +34,19 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.120 2004/08/07 01:40:37
  * to the extent permitted by applicable law.
 ]*/
 
+/* Daniel Sebald: added plot_image_or_update_axes() routine for images.
+ * (5 November 2003)
+ */
+
 #include "graphics.h"
+
+#ifdef WITH_IMAGE
+#ifdef PM3D
+#include "color.h"
+#include "pm3d.h"
+#include "plot.h"
+#endif
+#endif
 
 #include "alloc.h"
 #include "axis.h"
@@ -456,6 +468,18 @@ boundary(struct curve_points *plots, int count)
     /*}}} */
 
 
+#ifdef WITH_IMAGE
+#ifdef PM3D
+#define COLORBOX_SCALE 0.125
+#define WIDEST_COLORBOX_TICTEXT 3
+    /* Make room for the color box if it will be seen for the IMAGE plot style. */
+    if ((plots->lp_properties.use_palette) && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
+	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+    }
+#endif
+#endif
+
     /*{{{  preliminary ybot calculation
      *     first compute heights of labels and tics */
 
@@ -638,6 +662,9 @@ boundary(struct curve_points *plots, int count)
     setup_tics(SECOND_Y_AXIS, 20);
     /*}}} */
 
+    /* Adjust color axis limits if necessary. */
+    set_cbminmax();
+    axis_checked_extend_empty_range(COLOR_AXIS, "All points of color axis undefined.");
 
     /*{{{  recompute xleft based on widths of ytics, ylabel etc
        unless it has been explicitly set by lmargin */
@@ -770,6 +797,16 @@ boundary(struct curve_points *plots, int count)
      *     unless rmargin is explicitly specified  */
 
     xright = (int) (0.5 + t->xmax * (xsize + xoffset));
+
+#ifdef WITH_IMAGE
+#ifdef PM3D
+    /* Make room for the color box if it will be seen for the IMAGE plot style. */
+    if ((plots->lp_properties.use_palette) && (color_box.where != SMCOLOR_BOX_NO) && (color_box.where != SMCOLOR_BOX_USER)) {
+	xright -= (int) (xright-xleft)*COLORBOX_SCALE;
+	xright -= (int) ((t->h_char) * WIDEST_COLORBOX_TICTEXT);
+    }
+#endif
+#endif
 
     if (rmargin < 0) {
 	/* xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */
@@ -1262,6 +1299,14 @@ do_plot(struct curve_points *plots, int pcount)
      */
     boundary(plots, pcount);
 
+#ifdef WITH_IMAGE
+#ifdef PM3D
+    /* Add colorbox if appropriate. */
+    if (plots->lp_properties.use_palette && !make_palette() && term->set_color)
+	draw_color_smooth_box(MODE_PLOT);
+#endif
+#endif
+
     screen_ok = FALSE;
 
     /* DRAW TICS AND GRID */
@@ -1596,6 +1641,15 @@ do_plot(struct curve_points *plots, int pcount)
 #ifdef EAM_DATASTRINGS
 	case LABELPOINTS:
 	    place_labels( this_plot->labels->next, 1);
+	    break;
+#endif
+#ifdef WITH_IMAGE
+	case IMAGE:
+	    PLOT_IMAGE(this_plot, IC_PALETTE);
+	    break;
+
+	case RGBIMAGE:
+	    PLOT_IMAGE(this_plot, IC_RGB);
 	    break;
 #endif
 	}
@@ -3313,6 +3367,7 @@ plot_c_bars(struct curve_points *plot)
     }
 }
 
+
 /* FIXME
  * there are LOADS of == style double comparisons in here!
  */
@@ -4491,3 +4546,616 @@ style_from_fill(struct fill_style_type *fs)
 
     return style;
 }
+
+
+#ifdef WITH_IMAGE
+
+/* Similar to HBB's comment above, this routine is shared with
+ * graph3d.c, so it shouldn't be in this module (graphics.c).
+ * However, I feel that 2d and 3d graphing routines should be
+ * made as much in common as possible.  They seem to be
+ * bifurcating a bit too much.  (Dan Sebald)
+ */
+#include "util3d.h"
+
+/* These might work better as fuctions, but defines will do for now. */
+#define ERROR_NOTICE(str)         "\nGNUPLOT (plot_image):  " str
+#define ERROR_NOTICE_NEWLINE(str) "\n                       " str
+
+/* hyperplane_between_points:
+ * Compute the hyperplane representation of a line passing
+ *  between two points.
+ */
+void
+hyperplane_between_points(double *p1, double *p2, double *w, double *b)
+{
+    w[0] = p1[1] - p2[1];
+    w[1] = p2[0] - p1[0];
+    *b = -(w[0]*p1[0] + w[1]*p1[1]);
+}
+
+/* plot_image_or_update_axes:
+ * Plot the coordinates similar to the points option except use
+ *  pixels.  Check if the data forms a valid image array, i.e.,
+ *  one for which points are spaced equidistant along two non-
+ *  coincidence vectors.  If the two directions are orthogonal
+ *  within some tolerance and they are aligned with the view
+ *  box x and y directions, then use the image feature of the
+ *  terminal if it has one.  Otherwise, use parallelograms via
+ *  the polynomial function.  If it just necessary to update
+ *  the axis ranges for `set autoscale`, do so and then return.
+ */
+void
+plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN project_points, TBOOLEAN update_axes)
+{
+
+    struct coordinate GPHUGE *points;
+    int p_count;
+    int i;
+    double w_hyp[2], b_hyp;                    /* Hyperlane vector and constant */
+    double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */
+    int view_port[4];
+    unsigned int K = 0, L = 0;                 /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
+    double p_mid_corner[2];                    /* Point representing first corner found, i.e. p(K-1) */
+    double delta_x_grid[2] = {0, 0};           /* Spacings between points, two non-orthogonal directions. */
+    double delta_y_grid[2] = {0, 0};
+    int grid_corner[4] = {-1, -1, -1, -1};     /* The corner pixels of the image. */
+
+    if (project_points) {
+      points = ((struct surface_points *)plot)->iso_crvs->points;
+      p_count = ((struct surface_points *)plot)->iso_crvs->p_count;
+    } else {
+      points = ((struct curve_points *)plot)->points;
+      p_count = ((struct curve_points *)plot)->p_count;
+    }
+
+    if (p_count < 1) {
+	fprintf(stderr, ERROR_NOTICE("No points (visible or invisible) to plot.\n\n"));
+	return;
+    }
+
+    if (p_count < 4) {
+	fprintf(stderr, ERROR_NOTICE("Image grid must be at least 4 points (2 x 2).\n\n"));
+	return;
+    }
+
+    view_port[0] = axis_array[FIRST_X_AXIS].term_lower; view_port[1] = axis_array[FIRST_Y_AXIS].term_lower;
+    view_port[2] = axis_array[FIRST_X_AXIS].term_upper; view_port[3] = axis_array[FIRST_Y_AXIS].term_upper;
+
+    /* Check if the pixel data forms a valid rectangular grid for potential image
+     * matrix support.  A general grid orientation is considered.  If the grid
+     * points are orthogonal and oriented along the x/y dimensions the terminal
+     * function for images will be used.  Otherwise, the terminal function for
+     * filled polygons are used to construct parallelograms for the pixel elements.
+     */
+
+    /* Compute the hyperplane representation of the cross diagonal from
+     * the very first point of the scan to the very last point of the
+     * scan.
+     */
+    if (project_points) {
+	map3d_xy_double(points[0].x, points[0].y, points[0].z, &p_start_corner[0], &p_start_corner[1]);
+	map3d_xy_double(points[p_count-1].x, points[p_count-1].y, points[p_count-1].z, &p_end_corner[0], &p_end_corner[1]);
+    } else {
+	p_start_corner[0] = points[0].x;
+	p_start_corner[1] = points[0].y;
+	p_end_corner[0] = points[p_count-1].x;
+	p_end_corner[1] = points[p_count-1].y;
+    }
+
+    hyperplane_between_points(p_start_corner, p_end_corner, w_hyp, &b_hyp);
+
+    for (K = p_count, i=1; i < p_count; i++) {
+	double p[2];
+	if (project_points) {
+	    map3d_xy_double(points[i].x, points[i].y, points[i].z, &p[0], &p[1]);
+	} else {
+	    p[0] = points[i].x;
+	    p[1] = points[i].y;
+	}
+	if (i == 1) {
+	    /* Determine what side (sign) of the hyperplane the second point is on.
+	     * If the second point is on the negative side of the plane, change
+	     * the sign of hyperplane variables.  Then any remaining points on the
+	     * first line will test positive in the hyperplane formula.  The first
+	     * point on the second line will test negative.
+	     */
+	    if ((w_hyp[0]*p[0] + w_hyp[1]*p[1] + b_hyp) < 0) {
+		w_hyp[0] = -w_hyp[0];
+		w_hyp[1] = -w_hyp[1];
+		b_hyp = -b_hyp;
+	    }
+	} else {
+	    /* The first point on the opposite side of the hyperplane is the
+	     * candidate for the first point of the second scan line.
+	     */
+	    if ((w_hyp[0]*p[0] + w_hyp[1]*p[1] + b_hyp) < 0) {
+		K = i;
+		break;
+	    }
+	}
+    }
+
+    if (K == p_count) {
+	fprintf(stderr, ERROR_NOTICE("Image grid must be at least 2 x 2.\n\n"));
+	return;
+    }
+    L = p_count/K;
+    if (((double)L) != ((double)p_count/K)) {
+	fprintf(stderr, ERROR_NOTICE("Number of pixels cannot be factored into integers matching grid. N = %d  K = %d\n\n"), p_count, K);
+	return;
+    }
+    grid_corner[0] = 0;
+    grid_corner[1] = K-1;
+    grid_corner[3] = p_count - 1;
+    grid_corner[2] = p_count - K;
+    if (project_points) {
+	map3d_xy_double(points[K-1].x, points[K-1].y, points[K-1].z, &p_mid_corner[0], &p_mid_corner[1]);
+    } else {
+	p_mid_corner[0] = points[K-1].x;
+	p_mid_corner[1] = points[K-1].y;
+    }
+    /* The grid spacing in one direction. */
+    delta_x_grid[0] = (p_mid_corner[0] - p_start_corner[0])/(K-1);
+    delta_y_grid[0] = (p_mid_corner[1] - p_start_corner[1])/(K-1);
+    /* The grid spacing in the second direction. */
+    delta_x_grid[1] = (p_end_corner[0] - p_mid_corner[0])/(L-1);
+    delta_y_grid[1] = (p_end_corner[1] - p_mid_corner[1])/(L-1);
+
+#define GRID_TOLERANCE 0.001
+
+#ifdef WITH_IMAGE_VERIFY_ALL_PIXEL_LOCATIONS
+    /* The following is an extensive verification of each pixel location in the
+     * image array.  There may be a scenario where this is desirable.  Since it
+     * is a rather nice approach, it is left here even though perhaps not active
+     * most of the time.  This could be utilized elsewhere when attempting to
+     * determine if a valid grid exists, yet data may have been in a data file
+     * where x and y were specified, rather than generated or in matrix format.
+     */
+
+    /* Could perhaps have a global variable indicating uniform grid.  However,
+     * df_matrix does not necessarily indicate that.  Also, because of the
+     * possibility of applying a function to grid coordinates, determining if
+     * the grid is uniform inside datafile.c is tricky.
+     */
+    {
+	int l;
+	double p1[2], p2[2], w_tol[2][2], b_tol[2];
+	double x_start, y_start;
+
+	/* Position middle of tolerance box at origin when computing hyperplanes. */
+	p1[0] = GRID_TOLERANCE*(delta_x_grid[0] + delta_x_grid[1])/2;
+	p1[1] = GRID_TOLERANCE*(delta_y_grid[0] + delta_y_grid[1])/2;
+	p2[0] = GRID_TOLERANCE*(delta_x_grid[0] - delta_x_grid[1])/2;
+	p2[1] = GRID_TOLERANCE*(delta_y_grid[0] - delta_y_grid[1])/2;
+	for (l=0; l < 2; l++) {
+	    hyperplane_between_points(p1, p2, &w_tol[l][0], &b_tol[l]);
+	    b_tol[l] = fabs(b_tol[l]); /* Force interior of tolerance parallelogram to be positive. */
+	    p2[0] = -p2[0];            /* Change sign for next time through loop. */
+	    p2[1] = -p2[1];
+	}
+
+	if (project_points) {
+	    map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x_start, &y_start);
+	} else {
+	    x_start = points[grid_corner[0]].x;
+	    y_start = points[grid_corner[0]].y;
+	}
+	i = 0;
+	for (l=0; l < L; l++) {
+	    int k;
+	    for (k=0; k < K; k++) {
+		double x, y, vprod;
+		int m;
+		if (project_points) {
+		    map3d_xy_double(points[i].x, points[i].y, points[i].z, &x, &y);
+		} else {
+		    x = points[i].x;
+		    y = points[i].y;
+		}
+		i++;
+		/* Subtract expected position. */
+		x -= x_start + k*delta_x_grid[0] + l*delta_x_grid[1];
+		y -= y_start + k*delta_y_grid[0] + l*delta_y_grid[1];
+		/* Check if within tolerance. */
+		for (m=0; m < 2; m++) {
+		    vprod = w_tol[m][0]*x + w_tol[m][1]*y;
+		    if (fabs(vprod) > b_tol[m]) {
+			fprintf(stderr, ERROR_NOTICE("Pixel %d (location %d,%d in grid) out of tolerance.\n\n"), i, k+1, l+1);
+			return;
+		    }
+		}
+	    }
+	}
+    }
+#endif
+
+    if (update_axes) {
+	for (i=0; i < 4; i++) {
+	    int dummy_type = INRANGE;
+	    double x = points[grid_corner[i]].x;
+	    double y = points[grid_corner[i]].y;
+	    x -= (points[grid_corner[(5-i)%4]].x - points[grid_corner[i]].x)/(2*(K-1));
+	    y -= (points[grid_corner[(5-i)%4]].y - points[grid_corner[i]].y)/(2*(K-1));
+	    x -= (points[grid_corner[(i+2)%4]].x - points[grid_corner[i]].x)/(2*(L-1));
+	    y -= (points[grid_corner[(i+2)%4]].y - points[grid_corner[i]].y)/(2*(L-1));
+	    /* Update range and store value back into itself. */
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(x, x, dummy_type, ((struct curve_points *)plot)->x_axis, NOOP, x = -VERYLARGE);
+	    STORE_WITH_LOG_AND_UPDATE_RANGE(y, y, dummy_type, ((struct curve_points *)plot)->y_axis, NOOP, y = -VERYLARGE);
+	}
+	return;
+    }
+
+    /* Check if the pixel grid is orthogonal and oriented with axes.
+     * If so, then can use efficient terminal image routines.
+     */
+    {TBOOLEAN rectangular_image = FALSE;
+
+#define SHIFT_TOLERANCE 0.01
+    if ( ( (fabs(delta_x_grid[0]) < SHIFT_TOLERANCE*fabs(delta_x_grid[1]))
+	|| (fabs(delta_x_grid[1]) < SHIFT_TOLERANCE*fabs(delta_x_grid[0])) )
+	&& ( (fabs(delta_y_grid[0]) < SHIFT_TOLERANCE*fabs(delta_y_grid[1]))
+	|| (fabs(delta_y_grid[1]) < SHIFT_TOLERANCE*fabs(delta_y_grid[0])) ) ) {
+
+	/* If the terminal does not have image support indicate so,
+	 * just once.  Then, use polygons to construct pixels.
+	 */
+	if (*term->image) {
+	    rectangular_image = TRUE;
+	} else {
+	    static short no_image_support_indicated = 0;
+	    if (!no_image_support_indicated) {
+		fprintf(stderr,"\n\nNOTICE:  Visible pixels form rectangular grid, but\n"
+			"         there is no image matrix support for the\n"
+			"         active terminal.  Reverting to color boxes.\n\n");
+		no_image_support_indicated = 1;
+	    }
+	}
+
+    }
+
+    /* This make_palette() call needs to be present not only for the polygon
+     * function but also the image function.  May want to investigate why
+     * this is because it seems like only the polygon function would need it.
+     */
+    if (make_palette() || !term->set_color) {
+	fprintf(stderr, ERROR_NOTICE("Unable to make palette or set terminal color.\n\n"));
+	return;
+    }
+
+    if (rectangular_image) {
+
+	/* There are eight ways that a valid pixel grid can be entered.  Use table
+	 * lookup instead of if() statements.  (Draw the various array combinations
+	 * on a sheet of paper, or see the README file.)
+	 */
+	int line_length, i_delta_pixel, i_delta_line, i_start;
+	int pixel_1_1, pixel_M_N;
+	coordval *image;
+	int array_size;
+
+	/* Set up parameters for indexing through the image matrix to transfer data.
+	 * These formulas were derived for a terminal image routine which uses the
+	 * upper left corner as pixel (1,1).
+	 */
+	if (fabs(delta_x_grid[0]) > fabs(delta_x_grid[1])) {
+	    line_length = K;
+	    i_start = (delta_y_grid[1] > 0 ? L : 1) * K - (delta_x_grid[0] > 0 ? K : 1);
+	    i_delta_pixel = (delta_x_grid[0] > 0 ? +1 : -1);
+	    i_delta_line = (delta_x_grid[0] > 0 ? -K : +K) + (delta_y_grid[1] > 0 ? -K : +K);
+	} else {
+	    line_length = L;
+	    i_start = (delta_x_grid[1] > 0 ? 1 : L) * K - (delta_y_grid[0] > 0 ? 1 : K);
+	    i_delta_pixel = (delta_x_grid[1] > 0 ? +K : -K);
+	    i_delta_line = K*L*(delta_x_grid[1] > 0 ? -1 : +1) + (delta_y_grid[0] > 0 ? -1 : +1);
+	}
+
+	/* Assign enough memory for the maximum image size. */
+	array_size = K*L;
+
+	/* If doing color, multiply size by three for RGB triples. */
+	if (pixel_planes == IC_RGB) {
+	    array_size *= 3;
+	}
+
+	image = (coordval *) malloc(array_size*sizeof(image[0]));
+
+	/* Place points into image array based upon the arrangement of point indeces and
+	 * the visibility of pixels.
+	 */
+	if (image != NULL) {
+
+	    int j;
+	    gpiPoint corners[4];
+	    int M = 0, N = 0;  /* M = number of columns, N = number of rows.  (K and L don't
+				* have a set direction, but M and N do.)
+				*/
+	    int i_image, i_sub_image = 0;
+	    double d_x_o_2, d_y_o_2;
+	    int line_pixel_count = 0;
+
+	    if (project_points) {
+		double x0, x1, x2, y0, y1, y2;
+		map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x0, &y0);
+		map3d_xy_double(points[grid_corner[1]].x, points[grid_corner[1]].y, points[grid_corner[1]].z, &x1, &y1);
+		map3d_xy_double(points[grid_corner[2]].x, points[grid_corner[2]].y, points[grid_corner[2]].z, &x2, &y2);
+		d_x_o_2 = ( (x0 - x1)/(K-1) + (x0 - x2)/(L-1) ) / 2;
+		d_y_o_2 = ( (y0 - y1)/(K-1) + (y0 - y2)/(L-1) ) / 2;
+	    } else {
+		d_x_o_2 = ( (points[grid_corner[0]].x - points[grid_corner[1]].x)/(K-1)
+			    + (points[grid_corner[0]].x - points[grid_corner[2]].x)/(L-1) ) / 2;
+		d_y_o_2 = ( (points[grid_corner[0]].y - points[grid_corner[1]].y)/(K-1)
+			    + (points[grid_corner[0]].y - points[grid_corner[2]].y)/(L-1) ) / 2;
+	    }
+
+	    pixel_1_1 = -1;
+	    pixel_M_N = -1;
+
+	    /* Step through the points placing them in the proper spot in the matrix array. */
+	    for (i=0, j=line_length, i_image=i_start; i < p_count; i++) {
+
+		double x, y;
+		int x_low, x_high, y_low, y_high;
+		TBOOLEAN visible;
+
+		if (project_points) {
+		    map3d_xy_double(points[i_image].x, points[i_image].y, points[i_image].z, &x, &y);
+		    x_low = x - d_x_o_2;  x_high = x + d_x_o_2;
+		    y_low = y - d_y_o_2;  y_high = y + d_y_o_2;
+		} else {
+		    x = points[i_image].x;
+		    y = points[i_image].y;
+		    x_low = map_x(x - d_x_o_2);  x_high = map_x(x + d_x_o_2);
+		    y_low = map_y(y - d_y_o_2);  y_high = map_y(y + d_y_o_2);
+		}
+
+		/* Check if a portion of this pixel will be visible.  Do not use the
+		 * points[i].type == INRANGE test because a portion of a pixel can
+		 * extend into view and the INRANGE type doesn't account for this.
+		 *
+		 * This series of tests is designed for speed.  If one of the corners
+		 * of the pixel in question falls in the view port range then the pixel
+		 * will be visible.  Do this test first because it is the more likely
+		 * of situations.  It could also happen that the view port is smaller
+		 * than a pixel.  In that case, if one of the view port corners lands
+		 * inside the pixel then the pixel in question will be visible.  This
+		 * won't be as common, so do those tests last.  Set up the if structure
+		 * in such a way that as soon as one of the tests is true, the conditional
+		 * tests stop.
+		 */
+		if ( i_inrange(x_low, view_port[0], view_port[2]) &&  i_inrange(y_low, view_port[1], view_port[3]) )
+		    visible = TRUE;
+		else if ( i_inrange(x_high, view_port[0], view_port[2]) &&  i_inrange(y_low, view_port[1], view_port[3]) )
+		    visible = TRUE;
+		else if ( i_inrange(x_low, view_port[0], view_port[2]) &&  i_inrange(y_high, view_port[1], view_port[3]) )
+		    visible = TRUE;
+		else if ( i_inrange(x_high, view_port[0], view_port[2]) &&  i_inrange(y_high, view_port[1], view_port[3]) )
+		    visible = TRUE;
+		else if ( i_inrange(view_port[0], x_low, x_high) && i_inrange(view_port[1], y_low, y_high) )
+		    visible = TRUE;
+		else if ( i_inrange(view_port[2], x_low, x_high) && i_inrange(view_port[1], y_low, y_high) )
+		    visible = TRUE;
+		else if ( i_inrange(view_port[0], x_low, x_high) && i_inrange(view_port[3], y_low, y_high) )
+		    visible = TRUE;
+		else if ( i_inrange(view_port[2], x_low, x_high) && i_inrange(view_port[3], y_low, y_high) )
+		    visible = TRUE;
+		else
+		    visible = FALSE;
+
+#define USE_CLIP_POINTS 0
+#if USE_CLIP_POINTS
+		if ( !clip_points ||
+#else
+		if (
+#endif
+		    visible ) {
+
+		    if (pixel_1_1 < 0) {
+			/* First visible point. */
+			pixel_1_1 = i_image;
+			M = 1;
+			N = 1;
+			line_pixel_count = 1;
+		    } else {
+			if (line_pixel_count == 0)
+			    N += 1;
+			line_pixel_count++;
+			if ( (N != 1) && (line_pixel_count > M) ) {
+			    fprintf(stderr, ERROR_NOTICE("Visible pixel grid has a scan line longer than previous scan lines."));
+			    return;
+			}
+		    }
+
+		    pixel_M_N = i_image;
+
+		    if (pixel_planes == IC_PALETTE) {
+			image[i_sub_image++] = cb2gray( points[i_image].CRD_COLOR );
+		    } else {
+			image[i_sub_image++] = cb2gray( points[i_image].z );
+			image[i_sub_image++] = cb2gray( points[i_image].xlow );
+			image[i_sub_image++] = cb2gray( points[i_image].ylow );
+		    }
+
+		}
+
+		i_image += i_delta_pixel;
+		j--;
+		if (j == 0) {
+		    if (N == 1)
+			M = line_pixel_count;
+		    else if ((line_pixel_count > 0) && (line_pixel_count != M)) {
+			fprintf(stderr, ERROR_NOTICE("Visible pixel grid has a scan line shorter than previous scan lines."));
+			return;
+		    }
+		    line_pixel_count = 0;
+		    i_image += i_delta_line;
+		    j = line_length;
+		}
+	    }
+
+	    if ( (M > 0) && (N > 0) ) {
+
+		/* The information collected to this point is:
+		 *
+		 * M = <number of columns>
+		 * N = <number of rows>
+		 * image[] = M x N array of pixel data.
+		 * pixel_1_1 = position in points[] associated with pixel (1,1)
+		 * pixel_M_N = position in points[] associated with pixel (M,N)
+		 */
+
+		/* One of the delta values in each direction is zero, so add. */
+		if (project_points) {
+		    double x, y;
+		    map3d_xy_double(points[pixel_1_1].x, points[pixel_1_1].y, points[pixel_1_1].z, &x, &y);
+		    corners[0].x = x - fabs(delta_x_grid[0]+delta_x_grid[1])/2;
+		    corners[0].y = y + fabs(delta_y_grid[0]+delta_y_grid[1])/2;
+		    map3d_xy_double(points[pixel_M_N].x, points[pixel_M_N].y, points[pixel_M_N].z, &x, &y);
+		    corners[1].x = x + fabs(delta_x_grid[0]+delta_x_grid[1])/2;
+		    corners[1].y = y - fabs(delta_y_grid[0]+delta_y_grid[1])/2;
+		} else {
+		    corners[0].x = map_x(points[pixel_1_1].x - fabs(delta_x_grid[0]+delta_x_grid[1])/2);
+		    corners[0].y = map_y(points[pixel_1_1].y + fabs(delta_y_grid[0]+delta_y_grid[1])/2);
+		    corners[1].x = map_x(points[pixel_M_N].x + fabs(delta_x_grid[0]+delta_x_grid[1])/2);
+		    corners[1].y = map_y(points[pixel_M_N].y - fabs(delta_y_grid[0]+delta_y_grid[1])/2);
+		}
+		corners[2].x = view_port[0];
+		corners[2].y = view_port[3];
+		corners[3].x = view_port[2];
+		corners[3].y = view_port[1];
+
+		if ( (pixel_planes == IC_PALETTE) || (pixel_planes == IC_RGB) )
+		    (*term->image) (M, N, image, corners, pixel_planes);
+		else
+		    fprintf(stderr, ERROR_NOTICE("Invalid pixel color planes specified.\n\n"));
+	    }
+
+	    free ((void *)image);
+
+	} else {
+	    fprintf(stderr, ERROR_NOTICE("Could not allocate memory for image."));
+	    return;
+	}
+
+    } else {
+
+#ifdef PM3D
+	if (pixel_planes != IC_RGB) {
+
+	    /* Use sum of vectors to compute the pixel corners with respect to its center. */
+	    struct {double x; double y;} delta_grid[2], delta_pixel[4];
+	    int j, i_image;
+	    double x0, x1, x2, y0, y1, y2;
+
+	    if (project_points) {
+		map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x0, &y0);
+		map3d_xy_double(points[grid_corner[1]].x, points[grid_corner[1]].y, points[grid_corner[1]].z, &x1, &y1);
+		map3d_xy_double(points[grid_corner[2]].x, points[grid_corner[2]].y, points[grid_corner[2]].z, &x2, &y2);
+	    } else {
+		x0 = points[grid_corner[0]].x;
+		y0 = points[grid_corner[0]].y;
+		x1 = points[grid_corner[1]].x;
+		y1 = points[grid_corner[1]].y;
+		x2 = points[grid_corner[2]].x;
+		y2 = points[grid_corner[2]].y;
+	    }
+	    delta_grid[0].x = (x1 - x0)/(K-1);
+	    delta_grid[0].y = (y1 - y0)/(K-1);
+	    delta_grid[1].x = (x2 - x0)/(L-1);
+	    delta_grid[1].y = (y2 - y0)/(L-1);
+	    delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
+	    delta_pixel[0].y = (delta_grid[0].y + delta_grid[1].y) / 2;
+	    delta_pixel[1].x = (delta_grid[0].x - delta_grid[1].x) / 2;
+	    delta_pixel[1].y = (delta_grid[0].y - delta_grid[1].y) / 2;
+	    delta_pixel[2].x = -delta_pixel[0].x;
+	    delta_pixel[2].y = -delta_pixel[0].y;
+	    delta_pixel[3].x = -delta_pixel[1].x;
+	    delta_pixel[3].y = -delta_pixel[1].y;
+
+	    i_image = 0;
+
+	    for (j=0; j < L; j++) {
+
+		double x_line_start, y_line_start;
+
+		x_line_start = x0 + j * delta_grid[1].x;
+		y_line_start = y0 + j * delta_grid[1].y;
+
+		for (i=0; i < K; i++) {
+
+		    double x, y;
+		    int k;
+		    TBOOLEAN corner_in_range[4];
+		    gpiPoint corners[4];
+
+		    x = x_line_start + i * delta_grid[0].x;
+		    y = y_line_start + i * delta_grid[0].y;
+
+		    if (project_points) {
+			corners[0].x = x + delta_pixel[0].x;
+			corners[0].y = y + delta_pixel[0].y;
+			corners[1].x = x + delta_pixel[1].x;
+			corners[1].y = y + delta_pixel[1].y;
+			corners[2].x = x + delta_pixel[2].x;
+			corners[2].y = y + delta_pixel[2].y;
+			corners[3].x = x + delta_pixel[3].x;
+			corners[3].y = y + delta_pixel[3].y;
+		    } else {
+			corners[0].x = map_x(x + delta_pixel[0].x);
+			corners[0].y = map_y(y + delta_pixel[0].y);
+			corners[1].x = map_x(x + delta_pixel[1].x);
+			corners[1].y = map_y(y + delta_pixel[1].y);
+			corners[2].x = map_x(x + delta_pixel[2].x);
+			corners[2].y = map_y(y + delta_pixel[2].y);
+			corners[3].x = map_x(x + delta_pixel[3].x);
+			corners[3].y = map_y(y + delta_pixel[3].y);
+		    }
+
+		    /* If after the above clipping x_low > x_high or y_low > y_high,
+		     * that corresponds to the rectangle being outside the view port.
+		     * Do not plot in that case.
+		     */
+		    for (k=0; k < 4; k++)
+			corner_in_range[k] = ( i_inrange(corners[k].x, view_port[0], view_port[2]) &&
+					       i_inrange(corners[k].y, view_port[1], view_port[3]) );
+
+		    corners[0].style = FS_DEFAULT;
+
+		    if (corner_in_range[0] || corner_in_range[1] || corner_in_range[2] || corner_in_range[3]) {
+			set_color( cb2gray(points[i_image].CRD_COLOR) );
+			if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3])
+			    (*term->filled_polygon) (4, corners);
+			else {
+			    /* Clip out one or more of the corners to create triangle, quadrangle or pentagon. */
+			    static short clipping_yet_to_be_added_indicated = 0;
+			    if (!clipping_yet_to_be_added_indicated) {
+				/* Some tricky geometry.  Save until certain this will be in Gnuplot. */
+				fprintf(stderr,"\nNOTICE:  A triangle/quadrangle/pentagon clipping algorithm\n"
+					"         needs to be added for pixels at the boundary.  Image\n"
+					"         may lie outside borders in some instances.\n\n");
+				clipping_yet_to_be_added_indicated = 1;
+			    }
+			    (*term->filled_polygon) (4, corners);
+			}
+		    } else {
+			/* Could still be visible if any of the four corners of the view port are
+			 * within the parallelogram formed by the pixel.  This is also some tricky
+			 * geometry.  Wait until it is certain that this will be a part of Gnuplot..
+			 */
+		    }
+
+		    i_image++;
+		}
+	    }
+	} else {
+	    fprintf(stdout, ERROR_NOTICE("Color boxes cannot handle RGB components.\n\n"));
+	}
+#else
+	fprintf(stdout, ERROR_NOTICE("Unable to plot color boxes without PM3D.\n\n"));
+	return;
+#endif
+
+    }}
+
+}
+#endif

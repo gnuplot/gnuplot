@@ -1,5 +1,5 @@
 /*
- * $Id: util3d.h,v 1.7 2003/12/19 01:31:04 broeker Exp $
+ * $Id: util3d.h,v 1.8 2004/04/13 17:24:03 broeker Exp $
  */
 
 /* GNUPLOT - util3d.h */
@@ -82,6 +82,9 @@ void mat_rot_z __PROTO((double teta, double mat[4][4]));
 void mat_mult __PROTO((double mat_res[4][4], double mat1[4][4], double mat2[4][4]));
 void map3d_xyz __PROTO((double x, double y, double z, p_vertex out));
 void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
+#ifdef WITH_IMAGE
+void map3d_xy_double __PROTO((double x, double y, double z, double *xt, double *yt));
+#endif
 void draw3d_line __PROTO((p_vertex, p_vertex, struct lp_style_type *));
 void draw3d_line_unconditional __PROTO((p_vertex, p_vertex, struct lp_style_type *, int));
 void draw3d_point __PROTO((p_vertex v, struct lp_style_type *lp));

@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.5 2004/07/01 17:10:12 broeker Exp $
+ * $Id: aquaterm.trm,v 1.6 2004/08/25 10:25:24 persquare Exp $
  *
  */
 
@@ -68,6 +68,9 @@ TERM_PUBLIC void AQUA_previous_palette __PROTO((void));
 TERM_PUBLIC void AQUA_set_color __PROTO((double gray));
 TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif /* PM3D */
+# ifdef WITH_IMAGE
+TERM_PUBLIC void AQUA_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
+# endif
 /* End of entries */
 
 #define AQUA_RESOLUTION (20.0)                    /* Increase resolution */
@@ -533,6 +536,55 @@ AQUA_previous_palette()
 }
 
 #endif /* PM3D */
+
+#ifdef WITH_IMAGE
+
+TERM_PUBLIC void
+AQUA_image (unsigned int M, unsigned int N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+{
+  float width = (corner[1].x - corner[0].x)/AQUA_RESOLUTION;   
+  float height = (corner[0].y - corner[1].y)/AQUA_RESOLUTION;
+  float xPos = corner[0].x/AQUA_RESOLUTION;
+  float yPos = corner[1].y/AQUA_RESOLUTION;  
+  int bitmapSize = M*N;
+  int targetSize = 3 * bitmapSize;
+  int srcSize;
+  unsigned char *bitmap;
+  int i;
+
+  bitmap = malloc(targetSize*sizeof(unsigned char));
+  if (bitmap != nil) {
+    if (color_mode == IC_RGB) {
+      srcSize = targetSize;
+      for (i=0;i<srcSize;i++) {
+	bitmap[i] = (unsigned char)(255*image[i]);
+      }
+    } else if (color_mode == IC_PALETTE) {
+      rgb_color color;
+      unsigned char *bitmapPtr = bitmap;
+      srcSize = bitmapSize;
+      for (i=0;i<srcSize;i++) {
+	rgb1maxcolors_from_gray(image[i], &color);
+	*bitmapPtr = (unsigned char)(255*color.r);
+	bitmapPtr++;
+	*bitmapPtr = (unsigned char)(255*color.g);
+	bitmapPtr++;
+	*bitmapPtr = (unsigned char)(255*color.b);
+	bitmapPtr++;
+      }
+    } else {
+      NSLog(@"Unknown bitmap format");
+    }
+    [adapter addImageWithBitmap:bitmap 
+	     size:NSMakeSize(M, N)
+	     bounds:NSMakeRect(xPos, yPos, width, height)];
+    free(bitmap);
+  }
+  return;
+}
+
+#endif /* WITH_IMAGE */
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -560,6 +612,9 @@ TERM_TABLE_START(aqua_driver)
   AQUA_set_color,
   AQUA_filled_polygon
 #endif /* PM3D */
+#ifdef WITH_IMAGE
+  , AQUA_image
+#endif
 TERM_TABLE_END(aqua_driver)
 
 #undef LAST_TERM

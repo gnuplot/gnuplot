@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.109 2004/08/11 20:52:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.110 2004/08/12 04:09:31 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -96,10 +96,17 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.109 2004/08/11 20:52:59
  * Dan Sebald <daniel.sebald@ieee.org>
  */
 
+/* Daniel Sebald: added X11 support for images. (27 February 2003)
+ */
+
 #include "syscfg.h"
 #include "stdfn.h"
 #include "gp_types.h"
 #include "term_api.h"
+
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON) || defined(PM3D)
+#include "gplt_x11.h"
+#endif
 
 #ifdef EXPORT_SELECTION
 # undef EXPORT_SELECTION
@@ -351,6 +358,39 @@ static int GetVisual __PROTO((int, Visual **, int *));
 static void scan_palette_from_buf __PROTO((plot_struct *));
 #endif
 
+#if defined(WITH_IMAGE)
+static unsigned short BitMaskDetails __PROTO((unsigned long mask, unsigned short *left_shift, unsigned short *right_shift));
+#endif
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+TBOOLEAN swap_endian = 0;  /* For binary data. */
+/* Petr's byte swapping routine. */
+static inline void
+byteswap(char* data, int datalen)
+{
+    char tmp, *dest = data + datalen - 1;
+    if (datalen < 2) return;
+    while (dest > data) {
+	tmp = *dest;
+	*dest-- = *data;
+	*data++ = tmp;
+    }
+}
+/* Additional macros that should be more efficient when data size is known. */
+char byteswap_char;
+#define byteswap1(x)
+#define byteswap2(x) \
+    byteswap_char = ((char *)x)[0]; \
+    ((char *)x)[0] = ((char *)x)[1]; \
+    ((char *)x)[1] = byteswap_char;
+#define byteswap4(x) \
+    byteswap_char = ((char *)x)[0]; \
+    ((char *)x)[0] = ((char *)x)[3]; \
+    ((char *)x)[3] = byteswap_char; \
+    byteswap_char = ((char *)x)[1]; \
+    ((char *)x)[1] = ((char *)x)[2]; \
+    ((char *)x)[2] = byteswap_char
+#endif
+
 static void store_command __PROTO((char *, plot_struct *));
 static void prepare_plot __PROTO((plot_struct *, int));
 static void delete_plot __PROTO((plot_struct *));
@@ -429,13 +469,6 @@ static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static char dashes[Ndashes][5];
 
 #ifdef PM3D
-/* these must match the definitions in x11.trm */
-/* FIXME HBB 20010919: don't say so, *force* it!  Include a common
- * header file into both x11.trm and this file. */
-#define X11_GR_MAKE_PALETTE     'p'
-#define X11_GR_RELEASE_PALETTE  'e'
-#define X11_GR_SET_COLOR        'c'
-#define X11_GR_FILLED_POLYGON   'f'
 t_sm_palette sm_palette = {
     -1,				/* colorFormulae */
     SMPAL_COLOR_MODE_NONE,	/* colorMode */
@@ -537,7 +570,11 @@ double pointsize = -1.;
 #define RevY(y) (4095-((y)+0.5)/yscale)
 /* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+#define Nbuf X11_COMMAND_BUFFER_LENGTH
+#else
 #define Nbuf 1024
+#endif
 static char buf[Nbuf];
 static int buffered_input_available = 0;
 
@@ -1401,6 +1438,19 @@ record()
 #endif
 #endif
 
+#if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON)
+	case X11_GR_CHECK_ENDIANESS:
+	    {
+	        /* Initialize variable in case short happens to be longer than two bytes. */
+		unsigned short tmp = (unsigned short) ENDIAN_VALUE;
+		((char *)&tmp)[0] = buf[1];
+		((char *)&tmp)[1] = buf[2];
+		if (tmp == (unsigned short) ENDIAN_VALUE) swap_endian = 0;
+		else swap_endian = 1;
+	    }
+	    return 1;
+#endif
+
 	case 'X':		/* tell the driver about do_raise /  persist */
 	    {
 		int tmp_do_raise, tmp_persist;
@@ -2245,13 +2295,56 @@ exec_cmd(plot_struct *plot, char *command)
 #ifdef PM3D
     else if (*buffer == X11_GR_SET_COLOR) {	/* set color */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
+#ifndef BINARY_X11_POLYGON
 	    double gray;
 	    sscanf(buffer + 1, "%lf", &gray);
 	    PaletteSetColor(plot, gray);
 	    current_gc = &gc_pm3d;
+#else
+	    /* This command will fit within a single buffer so it doesn't
+	     * need to be so elaborate.
+	     */
+            unsigned char *iptr;
+	    float gray;
+	    unsigned i_remaining;
+	    char *bptr;
+	    TBOOLEAN code_detected = 0;
+
+            iptr = (unsigned char *) &gray;
+	    i_remaining = sizeof(gray);
+
+	    /* Decode and reconstruct the data. */
+	    for (bptr = buffer + 1; i_remaining; ) {
+	      unsigned char uctmp = *bptr++;
+	      if (code_detected) {
+		code_detected = 0;
+		*iptr++ = uctmp - 1 + SET_COLOR_TRANSLATION_CHAR;
+		i_remaining--;
+	      }
+	      else {
+		if ( uctmp == SET_COLOR_CODE_CHAR ) {
+		  code_detected = 1;
+		}
+		else {
+		  *iptr++ = uctmp + SET_COLOR_TRANSLATION_CHAR;
+		  i_remaining--;
+		}
+	      }
+	    }
+
+	    if (swap_endian) {
+	      byteswap((char *)&gray, sizeof(gray));
+	    }
+
+	    PaletteSetColor(plot, (double)gray);
+	    current_gc = &gc_pm3d;
+#endif
 	}
     } else if (*buffer == X11_GR_FILLED_POLYGON) {	/* filled polygon */
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
+
+#ifndef BINARY_X11_POLYGON
+
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
 	    static int saved_npoints = -1, saved_i = -1;	/* HBB 20010919 */
@@ -2262,48 +2355,8 @@ exec_cmd(plot_struct *plot, char *command)
 
 #if USE_ULIG_FILLEDBOXES
 	    if (npoints > 0) {
-		int fillpar, idx;
-
-		/* Load selected pattern or fill into a separate gc */
-		if (!fill_gc)
-		    fill_gc = XCreateGC(dpy,plot->window,0,0);
-		XCopyGC(dpy, *current_gc, ~0, fill_gc);
-		current_gc = &fill_gc;
-
 		ptr += 4;
 		sscanf(ptr, "%4d", &style);
-		fillpar = style >> 4;
-		switch (style & 0xf) {
-		case FS_SOLID:
-		    /* use halftone fill pattern according to filldensity */
-		    /* filldensity is from 0..100 percent */
-		    idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
-		    if (idx < 0)
-			idx = 0;
-		    if (idx >= stipple_halftone_num)
-			idx = stipple_halftone_num - 1;
-		    XSetStipple(dpy, *current_gc, stipple_halftone[idx]);
-		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
-		    break;
-		case FS_PATTERN:
-		    /* use fill pattern according to fillpattern */
-		    idx = (int) fillpar;	/* fillpattern is enumerated */
-		    if (idx < 0)
-			idx = 0;
-		    idx = idx % stipple_pattern_num;
-		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
-		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
-		    break;
-		case FS_EMPTY:
-		    /* fill with background color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    XSetForeground(dpy, *current_gc, plot->cmap->colors[0]);
-		    break;
-		default:
-		    /* fill with current color */
-		    XSetFillStyle(dpy, *current_gc, FillSolid);
-		    break;
-		}
 	    }
 #endif /* USE_ULIG_FILLEDBOXES */
 
@@ -2344,17 +2397,604 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    if (i >= npoints) {
 		/* only do the call if list is complete by now */
+#if USE_ULIG_FILLEDBOXES
+		int fillpar, idx;
+#endif
+
+#else /* BINARY_X11_POLYGON */
+
+	    static TBOOLEAN transferring = 0;
+	    static unsigned char *iptr;
+#if USE_ULIG_FILLEDBOXES
+	    static int int_cache[2];
+#define style int_cache[1]
+#else
+	    static int int_cache[1];
+#endif
+#define npoints int_cache[0]
+	    static unsigned i_remaining;
+	    unsigned short i_buffer;
+	    char *bptr;
+	    static TBOOLEAN code_detected = 0;
+	    static XPoint *points = NULL;
+	    static int st_npoints = 0;
+
+	    /* The first value read will be the number of points or the number of
+	     * points followed by style.  Set up parameters to point to npoints.
+	     */
+	    if (!transferring) {
+		iptr = (unsigned char *) &npoints;
+		i_remaining = sizeof(int_cache);
+	    }
+
+	    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+
+	    /* Decode and reconstruct the data. */
+	    for (bptr = &buffer[1]; i_buffer && i_remaining; i_buffer--) {
+
+		unsigned char uctmp = *bptr++;
+
+		if (code_detected) {
+		    code_detected = 0;
+		    *iptr++ = uctmp - 1 + FILLED_POLYGON_TRANSLATION_CHAR;
+		    i_remaining--;
+		} else {
+		    if ( uctmp == FILLED_POLYGON_CODE_CHAR ) {
+			code_detected = 1;
+		    } else {
+			*iptr++ = uctmp + FILLED_POLYGON_TRANSLATION_CHAR;
+			i_remaining--;
+		    }
+		}
+
+		if(!i_remaining && !transferring) {
+		    /* The number of points was just read.  Now set up points array and continue. */
+		    if (swap_endian) {
+			byteswap((char *)&npoints, sizeof(npoints));
+#if USE_ULIG_FILLEDBOXES
+			byteswap((char *)&style, sizeof(style));
+#endif
+		    }
+		    if (npoints > st_npoints) {
+			XPoint *new_points = realloc(points, npoints*2*sizeof(int));
+			st_npoints = npoints;
+			if (!new_points) {
+			    perror("gnuplot_x11: exec_cmd()->points");
+			    EXIT(1);
+			}
+			points = new_points;
+		    }
+		    i_remaining = npoints*2*sizeof(int);
+		    iptr = (unsigned char *) points;
+		    transferring = 1;
+		}
+
+	    }
+
+	    if (!i_remaining) {
+
+		int i;
+#if USE_ULIG_FILLEDBOXES
+		int fillpar, idx;
+#endif
+
+		transferring = 0;
+
+		/* If the byte order needs to be swapped, do so. */
+		if (swap_endian) {
+		    i = 2*npoints;
+		    for (i--; i >= 0; i--) {
+			byteswap((char *)&((int *)points)[i],sizeof(int));
+		    }
+		}
+
+		/* Convert the ints to XPoint format. This looks like it tramples
+		 * on itself, but the XPoint x and y are smaller than an int.
+		 */
+		for (i=0; i < npoints; i++) {
+		    points[i].x = X( ((int *)points)[2*i] );
+		    points[i].y = Y( ((int *)points)[2*i+1] );
+		}
+
+#endif /* BINARY_X11_POLYGON */
+
+#if USE_ULIG_FILLEDBOXES
+		/* Load selected pattern or fill into a separate gc */
+		if (!fill_gc)
+		    fill_gc = XCreateGC(dpy,plot->window,0,0);
+		XCopyGC(dpy, *current_gc, ~0, fill_gc);
+		current_gc = &fill_gc;
+
+		fillpar = style >> 4;
+		switch (style & 0xf) {
+		case FS_SOLID:
+		    /* use halftone fill pattern according to filldensity */
+		    /* filldensity is from 0..100 percent */
+		    idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
+		    if (idx < 0)
+			idx = 0;
+		    if (idx >= stipple_halftone_num)
+			idx = stipple_halftone_num - 1;
+		    XSetStipple(dpy, *current_gc, stipple_halftone[idx]);
+		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    break;
+		case FS_PATTERN:
+		    /* use fill pattern according to fillpattern */
+		    idx = (int) fillpar;	/* fillpattern is enumerated */
+		    if (idx < 0)
+			idx = 0;
+		    idx = idx % stipple_pattern_num;
+		    XSetStipple(dpy, *current_gc, stipple_pattern[idx]);
+		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
+		    break;
+		case FS_EMPTY:
+		    /* fill with background color */
+		    XSetFillStyle(dpy, *current_gc, FillSolid);
+		    XSetForeground(dpy, *current_gc, plot->cmap->colors[0]);
+		    break;
+		default:
+		    /* fill with current color */
+		    XSetFillStyle(dpy, *current_gc, FillSolid);
+		    break;
+		}
+#endif
+
 		XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
+
+#ifndef BINARY_X11_POLYGON
+
 		/* Flag this continuation line as closed */
 		saved_npoints = saved_i = -1;
 	    } else {
 		/* Store how far we got: */
 		saved_i = i;
 	    }
+
+#else /* BINARY_X11_POLYGON */
+
+	    }
+#if USE_ULIG_FILLEDBOXES
+#undef style
+#endif
+#undef npoints
+
+#endif /* BINARY_X11_POLYGON */
+
 	}
+
     }
 #endif
+#ifdef WITH_IMAGE
+    else if (*buffer == X11_GR_IMAGE) {	/* image */
+
+	static unsigned char *iptr;
+	static TBOOLEAN transferring = 0;
+	static unsigned short *image;
+	static int M, N;
+	static int pixel_1_1_x, pixel_1_1_y, pixel_M_N_x, pixel_M_N_y;
+	static int visual_1_1_x, visual_1_1_y, visual_M_N_x, visual_M_N_y;
+	static int color_mode;
+	static unsigned i_remaining;
+
+/* These might work better as fuctions, but defines will do for now. */
+#define ERROR_NOTICE(str)         "\nGNUPLOT (gplt_x11):  " str
+#define ERROR_NOTICE_NEWLINE(str) "\n                     " str
+
+	if (!transferring) {
+
+	    /* Get variables. */
+	    if (11 != sscanf( &buffer[1], "%x %x %x %x %x %x %x %x %x %x %x", &M, &N, &pixel_1_1_x,
+			      &pixel_1_1_y, &pixel_M_N_x, &pixel_M_N_y, &visual_1_1_x, &visual_1_1_y,
+			      &visual_M_N_x, &visual_M_N_y, &color_mode)) {
+		fprintf(stderr, ERROR_NOTICE("Couldn't read image parameters correctly.\n\n"));
+	    } else {
+
+		/* Number of symbols depends upon whether it is color or palette lookup. */
+		i_remaining = M*N*sizeof(image[0]);
+		if (color_mode == IC_RGB) i_remaining *= 3;
+
+		if (!i_remaining) {
+		    fprintf(stderr, ERROR_NOTICE("Image of size zero.\n\n"));
+		} else {
+		    image = (unsigned short *) malloc(i_remaining);
+		    if (image) {
+			iptr = (unsigned char *) image;
+			transferring = 1;
+		    } else {
+			fprintf(stderr, ERROR_NOTICE("Cannot allocate memory for image.\n\n"));
+		    }
+		}
+	    }
+
+	} else {
+
+	    unsigned short i_buffer;
+	    char *bptr;
+	    static TBOOLEAN code_detected = 0;
+
+	    i_buffer = BINARY_MAX_CHAR_PER_TRANSFER;
+
+	    /* Decode and reconstruct the data. */
+	    for (bptr = &buffer[1]; i_buffer && i_remaining; i_buffer--) {
+		unsigned char uctmp = *bptr++;
+		if (code_detected) {
+		    code_detected = 0;
+		    *iptr++ = uctmp - 1 + IMAGE_TRANSLATION_CHAR;
+		    i_remaining--;
+		} else {
+		    if (uctmp == IMAGE_CODE_CHAR) {
+			code_detected = 1;
+		    } else {
+			*iptr++ = uctmp + IMAGE_TRANSLATION_CHAR;
+			i_remaining--;
+		    }
+		}
+	    }
+
+	    if (!i_remaining) {
+
+		/* Expand or contract the image into a new image and place this on the screen. */
+
+		static unsigned short R_msb_mask=0, R_rshift, R_lshift;
+		static unsigned short G_msb_mask, G_rshift, G_lshift;
+		static unsigned short B_msb_mask, B_rshift, B_lshift;
+		static unsigned long prev_red_mask, prev_green_mask, prev_blue_mask;
+#define LET_XPUTPIXEL_SWAP_BYTES 1
+#if !LET_XPUTPIXEL_SWAP_BYTES
+		static TBOOLEAN swap_image_bytes = FALSE;
+#endif
+		TBOOLEAN create_image = FALSE;
+#define SINGLE_PALETTE_BIT_SHIFT 0  /* Discard over time, 16aug2004 */
+#if SINGLE_PALETTE_BIT_SHIFT
+		static int prev_allocated=0;
+		static short palette_bit_shift=0;
+#endif
+
+		transferring = 0;
+
+		/* If the byte order needs to be swapped, do so. */
+		if (swap_endian) {
+		    int i = M*N;
+		    if (color_mode == IC_RGB) {i *= 3;}
+		    for (i--; i >= 0; i--) {
+			/* The assumption is that image data through the pipe is 16 bits. */
+			byteswap2(&image[i]);
+		    }
+		}
+
+		if (color_mode == IC_PALETTE) {
+
+#if SINGLE_PALETTE_BIT_SHIFT
+/* If the palette size is 2 to some power then a single bit shift would work.
+ * The multiply/shift method doesn't seem noticably slower and generally works
+ * with any size pallete.  Keep this around for the time being in case some
+ * use for it comes up.
+ */
+		    /* Initialize the palette shift, or if the palette size changes then update the shift. */
+		    if (!palette_bit_shift || (plot->cmap->allocated != prev_allocated)) {
+			short i_bits, n_colors;
+			prev_allocated = plot->cmap->allocated;
+			for (palette_bit_shift = 16, n_colors = 1; palette_bit_shift > 0; palette_bit_shift--) {
+			    if (n_colors >= plot->cmap->allocated) {break;}
+			    n_colors <<= 1;
+			}
+		    }
+#endif
+
+		    create_image = TRUE;
+		}
+		else {
+
+		    switch( vis->class ) {
+
+			static char *display_error_text_after = " display class cannot use component"
+			    ERROR_NOTICE_NEWLINE("data.  Try palette mode.\n\n");
+
+		    case TrueColor:
+
+			/* This algorithm for construction of pixel values from the RGB components
+			 * doesn't look to be the most portable.  However, it tries to be.  It
+			 * gets the red/green/blue masks from the X11 information and generates
+			 * appropriate shifts and masks from that.  The X11 documentation mentions
+			 * something about using the masks in some odd way to generate an index
+			 * for a color table.  It all seemed like a bother for no benefit however.
+			 * Certainly we don't want to have only a few bits of color, and we don't
+			 * want to have some huge color table.  My feeling on the matter is to
+			 * just pack bits according to the masks that X11 indicates.  If someone
+			 * finds they have a peculiar display type that doesn't work, that can be
+			 * considered when and if it happens.
+			 */
+
+			/* Get the color mask information and compute the proper bit shifts, but only upon
+			 * first call or if the masks change.  I'm not sure if it is necessary to check if
+			 * the masks changed, but I left it in as a safeguard in case there is some strange
+			 * system out there somewhere.
+			 */
+			if (!R_msb_mask || (vis->red_mask != prev_red_mask) ||
+			    (vis->green_mask != prev_green_mask) || (vis->blue_mask != prev_blue_mask)) {
+			    short R_bits, G_bits, B_bits, min_bits;
+			    prev_red_mask = vis->red_mask;
+			    prev_green_mask = vis->green_mask;
+			    prev_blue_mask = vis->blue_mask;
+			    R_msb_mask = BitMaskDetails(vis->red_mask, &R_rshift, &R_lshift);
+			    G_msb_mask = BitMaskDetails(vis->green_mask, &G_rshift, &G_lshift);
+			    B_msb_mask = BitMaskDetails(vis->blue_mask, &B_rshift, &B_lshift);
+
+			    /* Graphics info in case strange behavior occurs in a particular system.
+			     */
+			    FPRINTF((stderr,"\n\nvis->visualid: 0x%x   vis->class: %d   vis->bits_per_rgb: %d\n",
+				(int)vis->visualid, vis->class, vis->bits_per_rgb));
+			    FPRINTF((stderr,"vis->red_mask: %lx   vis->green_mask: %lx   vis->blue_mask: %lx\n",
+				vis->red_mask,vis->green_mask,vis->blue_mask));
+			    FPRINTF((stderr,"ImageByteOrder:  %d\n\n",ImageByteOrder(dpy)));
+
+			    R_bits = 32-R_rshift-R_lshift;
+			    G_bits = 32-G_rshift-G_lshift;
+			    B_bits = 32-B_rshift-B_lshift;
+			    min_bits = GPMIN(GPMIN(R_bits,G_bits),B_bits);
+			    if (R_bits > min_bits) {
+				R_msb_mask >>= (R_bits-min_bits);
+				R_lshift += (R_bits-min_bits);
+				R_bits = min_bits;
+			    }
+			    if (G_bits > min_bits) {
+				G_msb_mask >>= (G_bits-min_bits);
+				G_lshift += (G_bits-min_bits);
+				G_bits = min_bits;
+			    }
+			    if (B_bits > min_bits) {
+				B_msb_mask >>= (B_bits-min_bits);
+				B_lshift += (B_bits-min_bits);
+				B_bits = min_bits;
+			    }
+			    R_rshift = 16-R_bits;
+			    G_rshift = 16-G_bits;
+			    B_rshift = 16-B_bits;
+
+#if !LET_XPUTPIXEL_SWAP_BYTES
+			    /* Now deal with the byte order issue. */
+			    if (ImageByteOrder(dpy)) {
+				/* If the bit field for each channel is 8 bits, the masks can be rearranged instead
+				 * of having to actually perform a byte order swap on the image data.
+				 */
+				if ((R_bits == 8) && (G_bits == 8) && (B_bits == 8)) {
+				    R_lshift = 24 - R_lshift;
+				    G_lshift = 24 - G_lshift;
+				    B_lshift = 24 - B_lshift;
+				    swap_image_bytes = FALSE;
+				} else {
+				    swap_image_bytes = TRUE;
+				}
+			    } else {
+				swap_image_bytes = FALSE;
+			    }
+#endif
+			}
+
+			create_image = TRUE;
+			break;
+
+		    case PseudoColor:
+			fprintf(stderr, ERROR_NOTICE("PseudoColor"));
+			fprintf(stderr, display_error_text_after);
+			break;
+
+		    case GrayScale:
+			fprintf(stderr, ERROR_NOTICE("GrayScale"));
+			fprintf(stderr, display_error_text_after);
+			break;
+
+		    case StaticColor:
+			fprintf(stderr, ERROR_NOTICE("StaticColor"));
+			fprintf(stderr, display_error_text_after);
+			break;
+
+		    case StaticGray:
+			fprintf(stderr, ERROR_NOTICE("StaticGray"));
+			fprintf(stderr, display_error_text_after);
+			break;
+
+		    case DirectColor:
+			fprintf(stderr, ERROR_NOTICE("DirectColor display class currently")
+				ERROR_NOTICE_NEWLINE("not supported.\n\n"));
+			break;
+
+		    default:
+			fprintf(stderr, ERROR_NOTICE("Unknown X11 display class.\n\n"));
+			break;
+
+		    }
+
+		}
+
+		if (create_image) {
+
+		    int M_pixel, N_pixel;
+		    int M_view, N_view;
+		    int pixel_1_1_x_plot, pixel_1_1_y_plot, pixel_M_N_x_plot, pixel_M_N_y_plot;
+		    int view_1_1_x_plot, view_1_1_y_plot, view_M_N_x_plot, view_M_N_y_plot;
+		    int final_1_1_x_plot, final_1_1_y_plot;
+		    int i_start, j_start;
+		    int itmp;
+
+		    /* Compute the image extent with sanity check. */
+		    pixel_1_1_x_plot = X(pixel_1_1_x);
+		    pixel_M_N_x_plot = X(pixel_M_N_x);
+		    M_pixel = pixel_M_N_x_plot - pixel_1_1_x_plot;
+		    if (M_pixel < 0) {
+			M_pixel = -M_pixel;
+			itmp = pixel_1_1_x_plot;
+			pixel_1_1_x_plot = pixel_M_N_x_plot;
+			pixel_M_N_x_plot = itmp;
+		    }
+		    pixel_1_1_y_plot = Y(pixel_1_1_y);
+		    pixel_M_N_y_plot = Y(pixel_M_N_y);
+		    N_pixel = pixel_M_N_y_plot - pixel_1_1_y_plot;
+		    if (N_pixel < 0) {
+			N_pixel = -N_pixel;
+			itmp = pixel_1_1_y_plot;
+			pixel_1_1_y_plot = pixel_M_N_y_plot;
+			pixel_M_N_y_plot = itmp;
+		    }
+
+		    /* Compute the visual extent of the plot with sanity check. */
+		    view_1_1_x_plot = X(visual_1_1_x);
+		    view_M_N_x_plot = X(visual_M_N_x);
+		    if (view_M_N_x_plot < view_1_1_x_plot) {
+			itmp = view_1_1_x_plot;
+			view_1_1_x_plot = view_M_N_x_plot;
+			view_M_N_x_plot = itmp;
+		    }
+		    view_1_1_y_plot = Y(visual_1_1_y);
+		    view_M_N_y_plot = Y(visual_M_N_y);
+		    if (view_M_N_y_plot < view_1_1_y_plot) {
+			itmp = view_1_1_y_plot;
+			view_1_1_y_plot = view_M_N_y_plot;
+			view_M_N_y_plot = itmp;
+		    }
+
+		    /* Determine parameters for the image that will be built and put on screen. */
+		    itmp = view_1_1_x_plot - pixel_1_1_x_plot;
+		    if (itmp > 0) {
+			i_start = itmp; final_1_1_x_plot = view_1_1_x_plot;
+		    } else {
+			i_start = 0; final_1_1_x_plot = pixel_1_1_x_plot;
+		    }
+		    itmp = pixel_M_N_x_plot - view_M_N_x_plot;
+		    if (itmp > 0) {
+			M_view = M_pixel - itmp - i_start;
+		    } else {
+			M_view = M_pixel - i_start;
+		    }
+
+		    itmp = view_1_1_y_plot - pixel_1_1_y_plot;
+		    if (itmp > 0) {
+			j_start = itmp; final_1_1_y_plot = view_1_1_y_plot;
+		    } else {
+			j_start = 0; final_1_1_y_plot = pixel_1_1_y_plot;
+		    }
+		    itmp = pixel_M_N_y_plot - view_M_N_y_plot;
+		    if (itmp > 0) {
+			N_view = N_pixel - itmp - j_start;
+		    } else {
+			N_view = N_pixel - j_start;
+		    }
+
+		    if ((M_view > 0) && (N_view > 0)) {
+
+			char *sample_data;
+			short sample_data_size;
+			int i_view, j_view;
+
+			/* Determine if 2 bytes is sufficient or 4 bytes are necessary for color image data. */
+			if (dep > 16) {
+			    sample_data_size = 4;
+			} else {
+			    sample_data_size = 2;
+			}
+
+			/* Expand or compress the original image to the pixels it will occupy on the screen. */
+			sample_data = (char *) malloc(M_view*N_view*sample_data_size);
+
+			if (sample_data) {
+
+			    XImage *image_dest;
+
+			    /* Create an initialized image object. */
+			    image_dest = XCreateImage(dpy, vis, dep, ZPixmap, 0, sample_data, M_view, N_view,
+						      32, M_view*sample_data_size);
+
+			    /* Fill in the output image data by decimating or repeating the input image data. */
+			    for (j_view=0; j_view < N_view; j_view++) {
+				int j = ((j_view+j_start) * N) / N_pixel;
+				int row_start = j*M;
+				for (i_view=0; i_view < M_view; i_view++) {
+				    int i = ((i_view+i_start) * M) / M_pixel;
+				    if (color_mode == IC_PALETTE) {
+
+#if SINGLE_PALETTE_BIT_SHIFT
+/* If the palette size is 2 to some power then a single bit shift would work.
+ * The multiply/shift method doesn't seem noticably slower and generally works
+ * with any size pallete.  Keep this around for the time being in case some
+ * use for it comes up.
+ */
+					unsigned long pixel = plot->cmap->pixels[image[row_start + i]>>palette_bit_shift];
+#else
+					/* The methods below avoid using floating point.  The basic idea is to multiply
+					 * the palette size by the "normalized" data coming across the pipe.  (I think
+					 * some DSP people call this Q1 or Q0 format, or something like that.)  Following
+					 * this multiplication by division by 2^16 gives the final answer.  Most moderately
+					 * advanced CPUs have bit shifting.  The first method uses this.  However, a bit
+					 * shift isn't necessary because we can just take the top word of a two word
+					 * number and we've effectively divided by 2^16.  The second method uses this.
+					 * However, my guess is that C compilers more effeciently translate the first
+					 * method with the bit shift than the second method which pulls out the top word.
+					 * (There is one instruction less for the shift version than the word selection
+					 * version on gcc for x86.)
+					 */
+#if 1
+					unsigned long pixel;
+					unsigned short index  = (plot->cmap->allocated * (unsigned long) image[row_start + i]) >> 16;
+					pixel = plot->cmap->pixels[index];
+#else
+					unsigned long index;
+					unsigned long pixel;
+					index  = plot->cmap->allocated * (unsigned long) image[row_start + i];
+					pixel = plot->cmap->pixels[((unsigned short *)&index)[1]];
+#endif
+#endif
+					XPutPixel(image_dest, i_view, j_view, pixel);
+				    } else {
+					int index3 = 3*(row_start + i);
+					unsigned long pixel = ((unsigned int)((image[index3++]>>R_rshift)&R_msb_mask)) << R_lshift;
+					pixel |= ((unsigned int)((image[index3++]>>G_rshift)&G_msb_mask)) << G_lshift;
+					pixel |= ((unsigned int)((image[index3]>>B_rshift)&B_msb_mask)) << B_lshift;
+					XPutPixel(image_dest, i_view, j_view, pixel);
+				    }
+				}
+			    }
+
+#if !LET_XPUTPIXEL_SWAP_BYTES
+			    /* Swap the image byte order if necessary. */
+			    if (swap_image_bytes) {
+				int i_swap = M_view*N_view - 1;
+				if (sample_data_size == 2) {
+				    for (; i_swap >= 0; i_swap--) {
+					byteswap2(&(((unsigned short *)sample_data)[i_swap]));
+				    }
+				} else {
+				    for (; i_swap >= 0; i_swap--) {
+					byteswap4(&(((unsigned int *)sample_data)[i_swap]));
+				    }
+				}
+			    }
+#endif
+
+			    /* Copy the image to the drawable d. */
+			    XPutImage(dpy, plot->pixmap, gc_pm3d, image_dest, 0, 0,
+				      final_1_1_x_plot, final_1_1_y_plot, M_view, N_view);
+
+			    /* Free resources. */
+			    XDestroyImage(image_dest);
+
+			    /* XDestroyImage frees the sample_data memory, so no "free" here. */
+
+			} else {
+			    fprintf(stderr, ERROR_NOTICE("Could not allocate memory for image.\n\n"));
+			}
+		    }
+
+		}
+
+		/* image was not used as part of X resource, so must "free" here. */
+		free(image);
+
+	    }
+	}
+
+    }
+#endif /* WITH_IMAGE */
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
     /*   Axis scaling information to save for later mouse clicks */
     else if (*buffer == 'S') {
@@ -2521,6 +3161,7 @@ UpdateWindow(plot_struct * plot)
 	/* EMPTY */ ;
 #endif
 }
+
 
 #ifdef PM3D
 
@@ -5150,3 +5791,44 @@ Process_Remove_FIFO_Queue()
      */
 
 }
+
+
+#ifdef WITH_IMAGE
+/* Extract details about the extent of a bit mask by doing a
+ * single bit shift up and then down (left shift) and down
+ * and then up (right shift).  When the pre- and post-shift
+ * numbers are not equal, a bit was lost so that is the
+ * extent of the mask.
+ */
+static unsigned short
+BitMaskDetails(unsigned long mask, unsigned short *left_shift, unsigned short *right_shift)
+{
+    unsigned short i;
+    unsigned long m = mask;
+
+    if (mask == 0) {
+	*left_shift = 0;
+	*right_shift = 0;
+	return 0;
+    }
+
+    for (i=0; i < 32; i++) {
+	if ( (((m << 1)&0xffffffff) >> 1) != m )
+	    break;
+	else
+	    m <<= 1;
+    }
+    *left_shift = i;
+
+    m = mask;
+    for (i=0; i < 32 ; i++) {
+	if ( ((m >> 1) << 1) != m )
+	    break;
+	else
+	    m >>= 1;
+    }
+    *right_shift = i;
+
+    return (unsigned short) m;
+}
+#endif

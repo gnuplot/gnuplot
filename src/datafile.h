@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.13 2004/07/03 06:08:48 sfeam Exp $
+ * $Id: datafile.h,v 1.14 2004/07/05 03:49:21 sfeam Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -108,7 +108,11 @@ extern TBOOLEAN plotted_data_from_stdin;
 
 /* Prototypes of functions exported by datafile.c */
 
+#ifdef BINARY_DATA_FILE
+int df_open __PROTO((int, int));
+#else
 int df_open __PROTO((int));
+#endif
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
 void df_showdata __PROTO((void));
@@ -123,5 +127,141 @@ void f_dollars __PROTO((union argument *x));
 void f_column  __PROTO((union argument *x));
 void f_valid   __PROTO((union argument *x));
 void f_timecolumn   __PROTO((union argument *x));
+
+
+#if BINARY_DATA_FILE
+/* Details about the records contained in a binary data file. */
+
+typedef enum df_translation_type {
+    DF_TRANSLATE_DEFAULT,     /* Gnuplot will position in first quadrant at origin. */
+    DF_TRANSLATE_VIA_ORIGIN,
+    DF_TRANSLATE_VIA_CENTER
+} df_translation_type;
+
+typedef enum df_sample_scan_type {
+    DF_SCAN_POINT = -3,  /* fastest */
+    DF_SCAN_LINE  = -4,
+    DF_SCAN_PLANE = -5   /* slowest */
+} df_sample_scan_type;
+
+/* To generate a swap, take the bit-wise complement of the lowest two bits. */
+typedef enum df_endianess_type {
+    DF_LITTLE_ENDIAN,
+    DF_PDP_ENDIAN,
+    DF_DPD_ENDIAN,
+    DF_BIG_ENDIAN,
+    DF_ENDIAN_TYPE_LENGTH  /* Must be last */
+} df_endianess_type;
+
+/* The various types of numerical types that can be read from a data file. */
+typedef enum df_data_type {
+    DF_CHAR, DF_UCHAR, DF_SHORT, DF_USHORT, DF_INT,
+    DF_UINT, DF_LONG,  DF_ULONG, DF_FLOAT,  DF_DOUBLE,
+    DF_BAD_TYPE
+} df_data_type;
+#define DF_DEFAULT_TYPE DF_FLOAT
+
+/* Some macros for making the compiler figure out what function
+ * the "machine independent" names should execute to read the
+ * appropriately sized variable from a data file.
+ */ 
+#define SIGNED_TEST(val) ((val)==sizeof(long) ? DF_LONG : \
+			 ((val)==sizeof(int) ? DF_INT : \
+			 ((val)==sizeof(short) ? DF_SHORT : \
+			 ((val)==sizeof(char) ? DF_CHAR : DF_BAD_TYPE))))
+#define UNSIGNED_TEST(val) ((val)==sizeof(unsigned long) ? DF_ULONG : \
+			   ((val)==sizeof(unsigned int) ? DF_UINT : \
+			   ((val)==sizeof(unsigned short) ? DF_USHORT : \
+			   ((val)==sizeof(unsigned char) ? DF_UCHAR : DF_BAD_TYPE))))
+#define FLOAT_TEST(val) ((val)==sizeof(float) ? DF_FLOAT : \
+			((val)==sizeof(double) ? DF_DOUBLE : DF_BAD_TYPE))
+
+typedef enum df_records_type {
+    DF_CURRENT_RECORDS,
+    DF_DEFAULT_RECORDS
+} df_records_type;
+
+typedef struct df_binary_type_struct {
+    df_data_type read_type;
+    unsigned short read_size;
+} df_binary_type_struct;
+
+typedef struct df_column_bininfo_struct {
+    short skip_bytes;
+    df_binary_type_struct column;
+} df_column_bininfo_struct;
+
+/* NOTE TO THOSE WRITING FILE TYPE FUNCTIONS
+ *
+ * "cart" means Cartesian, i.e., the (x,y,z) [or (r,t,z)] coordinate
+ * system of the plot.  "scan" refers to the scanning method of the
+ * file in question, i.e., first points, then lines, then planes.
+ * The important variables for a file type function to fill in are
+ * those beginning with "scan".  There is a tricky set of rules
+ * related to the "scan_cart" mapping, the file-specified variables,
+ * the default variables, and the command-line variables.  Basically,
+ * command line overrides data file which overrides default.  (Yes,
+ * like a confusing version of rock, paper, scissors.) So, from the
+ * file type function perspective, it is better to leave those
+ * variables which are not specifically known from file data or
+ * otherwise (e.g., sample periods "scan_delta") unaltered in case
+ * the user has issued "set datafile" to define defaults.
+ */
+typedef struct df_binary_file_record_struct {
+    int cart_dim[3];                  /* dimension array size, x/y/z */
+    int cart_dir[3];                  /* 1 scan in positive direction, -1 negative, x/y/z */
+    double cart_delta[3];             /* spacing between array points, x/y/z */
+    df_translation_type cart_trans;   /* translate via origin, center or default */
+    double cart_cen_or_ori[3];        /* vector representing center or origin, x/y/z */
+    double cart_alpha;                /* 2D rotation angle (rotate) */
+    double cart_p[3];                 /* 3D rotation normal vector (perpendicular) */
+
+    df_sample_scan_type cart_scan[3]; /* how to assign the dimensions read from file when generating coordinates */
+    TBOOLEAN scan_generate_coord;     /* whether or not Gnuplot should generate coordinates. */
+    int scan_skip[3];                 /* skip bytes before the record, line, plane */
+
+    /* Not controllable by the user, only by file type functions.
+     * These are all points/lines/planes format.
+     */
+    int scan_dim[3];                  /* number of points, lines, planes */
+    int scan_dir[3];                  /* 1 scan in positive direction wrt Cartesian coordinate system, -1 negative */
+    double scan_delta[3];             /* sample period along points, lines, planes */
+    df_translation_type scan_trans;   /* translate via origin, center or default */
+    double scan_cen_or_ori[3];        /* vector representing center or origin, x/y/z */
+
+    /* *** Do not modify outside of datafile.c!!! *** */
+    char GPFAR *memory_data;
+} df_binary_file_record_struct;
+
+extern df_binary_file_record_struct *df_bin_record;
+extern int df_num_bin_records;
+
+struct use_spec_s {
+    int column;
+#ifdef EAM_DATASTRINGS
+    int expected_type;
+#endif
+    struct at_type *at;
+};
+
+extern struct use_spec_s use_spec[];
+
+/* Prototypes of functions exported by datafile.c */
+
+void df_show_binary __PROTO((FILE *fp));
+void df_show_datasizes __PROTO((FILE *fp));
+void df_show_filetypes __PROTO((FILE *fp));
+int df_open __PROTO((int, int));
+void df_set_datafile_binary __PROTO((void)); 
+void df_unset_datafile_binary __PROTO((void));
+void df_add_binary_records __PROTO((int, df_records_type));
+void df_extend_binary_columns __PROTO((int));
+void df_set_skip_before __PROTO((int col, int bytes));                /* Number of bytes to skip before a binary column. */
+#define df_set_skip_after(col,bytes) df_set_skip_before(col+1,bytes)  /* Number of bytes to skip after a binary column. */
+void df_set_read_type __PROTO((int col, df_data_type type));          /* Type of data in the binary column. */
+df_data_type df_get_read_type __PROTO((int col));                     /* Type of data in the binary column. */
+int df_get_read_size __PROTO((int col));                              /* Size of data in the binary column. */
+int df_get_num_matrix_cols __PROTO((void));
+#endif
 
 #endif /* GNUPLOT_DATAFILE_H */

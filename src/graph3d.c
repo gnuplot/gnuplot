@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.94 2004/07/06 00:00:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.95 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -67,6 +67,9 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.94 2004/07/06 00:00:35 s
 #   include "pm3d.h"
 #   include "plot3d.h"
 #   include "color.h"
+#endif
+#ifdef WITH_IMAGE
+#include "plot.h"
 #endif
 
 /* HBB NEW 20040311: PM3D did already split up grid drawing into two
@@ -686,7 +689,11 @@ do_3dplot(
 	can_pm3d = is_plot_with_palette() && !make_palette()
 	    && term->set_color;
 	if (can_pm3d) {
+#ifdef WITH_IMAGE
+	    draw_color_smooth_box(MODE_SPLOT);
+#else
 	    draw_color_smooth_box();
+#endif
 	}
     }
 #endif /* PM3D */
@@ -1078,6 +1085,17 @@ do_3dplot(
 	    case HISTOGRAMS: /* Cannot happen */
 		break;
 #endif
+#ifdef WITH_IMAGE
+	    case IMAGE:
+		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
+		SPLOT_IMAGE(this_plot, IC_PALETTE);
+		break;
+
+	    case RGBIMAGE:
+		/* Plot image using projection of 3D plot coordinates to 2D viewing coordinates. */
+		SPLOT_IMAGE(this_plot, IC_RGB);
+		break;
+#endif
 	    }			/* switch(plot-style) */
 
 		/* move key on a line */
@@ -1162,6 +1180,11 @@ do_3dplot(
 		    case LABELPOINTS: /* Already handled above */
 			break;
 #endif
+#ifdef WITH_IMAGE
+		    case IMAGE:
+		    case RGBIMAGE:
+			break;
+#endif
 		    }
 		    NEXT_KEY_LINE();
 		}
@@ -1232,6 +1255,11 @@ do_3dplot(
 			    case LABELPOINTS: /* Already handled above */
 				break;
 #endif
+#ifdef WITH_IMAGE
+			    case IMAGE:
+			    case RGBIMAGE:
+				break;
+#endif
 			    }	/* switch */
 
 			    NEXT_KEY_LINE();
@@ -1281,6 +1309,11 @@ do_3dplot(
 			break;
 #ifdef PM3D
 		    case PM3DSURFACE: /* ignored */
+			break;
+#endif
+#ifdef WITH_IMAGE
+		    case IMAGE:
+		    case RGBIMAGE:
 			break;
 #endif
 #ifdef EAM_HISTOGRAMS 

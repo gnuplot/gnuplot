@@ -24,11 +24,11 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DX11_DRIVER_DIR=\"$(X11_DRIVER_DIR)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c \
-binary.h bitmap.c bitmap.h color.c color.h command.c command.h \
-contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h eval.c \
-eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h \
-gp_hist.h gp_time.h gp_types.h graph3d.c graph3d.h graphics.c graphics.h \
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h bin_hook.c \
+breaders.c breaders.h bitmap.c bitmap.h color.c color.h command.c \
+command.h contour.c contour.h datafile.c datafile.h dynarray.c dynarray.h \
+eval.c eval.h fit.c fit.h gadgets.c gadgets.h getcolor.c getcolor.h gp_hist.h \
+gp_time.h gp_types.h gplt_x11.h graph3d.c graph3d.h graphics.c graphics.h \
 help.c help.h hidden3d.c hidden3d.h history.c internal.c internal.h \
 interpol.c interpol.h matrix.c matrix.h misc.c misc.h mouse.c mouse.h \
 mousecmn.h national.h parse.c parse.h plot.c plot.h plot2d.c plot2d.h \
@@ -40,7 +40,7 @@ util3d.c util3d.h variable.c variable.h version.c version.h
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
-gnuplot_x11_SOURCES = gplt_x11.c gpexecute.c gpexecute.h mousecmn.h
+gnuplot_x11_SOURCES = gplt_x11.c gplt_x11.h gpexecute.c gpexecute.h mousecmn.h
 
 getcolor_x11.o: getcolor.c
 	$(COMPILE) -c -DGPLT_X11_MODE -o getcolor_x11.o $(srcdir)/getcolor.c

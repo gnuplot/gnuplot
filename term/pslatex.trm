@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pslatex.trm,v 1.40 2004/04/13 17:24:38 broeker Exp $
+ * $Id: pslatex.trm,v 1.41 2004/07/01 17:10:33 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -48,6 +48,8 @@
  *
  *  Petr Mikulik, May 2000: terminal entries for PM3D functionality
  *
+ *  Dan Sebald, 5 March 2003: terminal entry for image functionality
+ *
  * send your comments or suggestions to (gnuplot-info@lists.sourceforge.net).
  */
 
@@ -79,6 +81,9 @@ TERM_PUBLIC int PSLATEX_make_palette (t_sm_palette *);
 TERM_PUBLIC void PSLATEX_previous_palette (void);
 TERM_PUBLIC void PSLATEX_set_color (double);
 TERM_PUBLIC void PSLATEX_filled_polygon (int, gpiPoint *);
+#endif
+#ifdef WITH_IMAGE
+TERM_PUBLIC void PSLATEX_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
 #define PSLATEX_XMAX (5*720)
@@ -228,7 +233,7 @@ PSLATEX_init()
      */
 
     /* if there's no extension, append ".ps" */
-    if (outstr && (dotIndex = strrchr(outstr, '.')) == NULL)
+    if (outstr && ((dotIndex = strrchr(outstr, '.')) == NULL))
 	dotIndex = strchr(outstr, NUL);
 
     /* try to open the auxiliary file for the postscript parts. */
@@ -666,6 +671,19 @@ PSLATEX_previous_palette ()
 
 #endif /* PM3D */
 
+#ifdef WITH_IMAGE
+TERM_PUBLIC void PSLATEX_image (unsigned M, unsigned N, coordval *image, gpiPoint *corner, t_imagecolor color_mode)
+{
+    if (PSLATEX_auxfile) {
+	FILE *tmp = gpoutfile;
+	gpoutfile = PSLATEX_auxfile;
+	PS_image(M, N, image, corner, color_mode);
+	gpoutfile = tmp;
+    } else
+	PS_image(M, N, image, corner, color_mode);
+}
+#endif
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -696,6 +714,9 @@ TERM_TABLE_START(pslatex_driver)
    PSLATEX_set_color,
    PSLATEX_filled_polygon
 #endif
+#ifdef WITH_IMAGE
+    , PSLATEX_image
+#endif
 TERM_TABLE_END(pslatex_driver)
 #undef LAST_TERM
 #define LAST_TERM pslatex_driver
@@ -718,6 +739,9 @@ TERM_TABLE_START(pstex_driver)
    PSLATEX_previous_palette, /* write grestore */
    PSLATEX_set_color,
    PSLATEX_filled_polygon
+#endif
+#ifdef WITH_IMAGE
+    , PSLATEX_image
 #endif
 TERM_TABLE_END(pstex_driver)
 #undef LAST_TERM
