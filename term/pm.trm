@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.37 2004/07/13 14:11:25 broeker Exp $
+ * $Id: pm.trm,v 1.38 2004/11/29 11:56:45 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -255,7 +255,7 @@ PM_init()
 	spawnmode = P_SESSION | P_DEFAULT;
 	if (PM_optargs != 0)
 	    spawnmode |= P_UNRELATED;
-	pid = spawnl(spawnmode, PM_path, "GnuplotPM", tempname, PM_opts, NULL);
+	pid = spawnl(spawnmode, PM_path, PM_path, tempname, PM_opts, NULL);
 	if (pid == -1) {
 	    fputs("Cannot spawn gnupmdrv.exe !\n", stderr);
 	    exit(3);
@@ -715,14 +715,18 @@ TERM_PUBLIC void PM_set_color (t_colorspec *colorspec)
 	fflush(PM_pipe);
 	return;
     }
-    if (colorspec->type != TC_FRAC)
-	return;
-    unsigned char c = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
-    if (c >= sm_palette.colors)
-	c = sm_palette.colors - 1;
+    if (colorspec->type == TC_FRAC) {
     /* map [0;1] to interval [0;smooth_colors-1] */
+        unsigned char colorindex = 0;
+	/* FIXME: we are actually checking if colorspec->value is
+		  in range [0;1]. Is this really necessary? */
+        if (colorspec->value > 0)
+	    colorindex = floor( colorspec->value * sm_palette.colors );
+	if (colorindex >= sm_palette.colors)  
+	    colorindex = sm_palette.colors - 1;
     putc(GR_SET_COLOR, PM_pipe);
-    putc(c, PM_pipe);
+	putc(colorindex, PM_pipe);
+    }
 }
 
 
