@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.1 1999/03/26 22:11:15 lhecking Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.2 2000/10/20 15:12:33 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -358,10 +358,11 @@ MakePens(LPGW lpgw, HDC hdc)
 	int i;
 
 	if ((GetDeviceCaps(hdc,NUMCOLORS) == 2) || !lpgw->color) {
+		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->monopen[1]); 	/* axis */
+#if 0 /* HBB 20000813: throw this part out, use on-the-fly pen creation instead... */
 		/* Monochrome Device */
 		/* create border pens */
 		lpgw->hbpen = CreatePenIndirect((LOGPEN FAR *)&lpgw->monopen[0]);	/* border */
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->monopen[1]); 	/* axis */
 		/* create drawing pens */
 		for (i=0; i<WGNUMPENS; i++)
 		{
@@ -369,6 +370,7 @@ MakePens(LPGW lpgw, HDC hdc)
 			lpgw->hsolidpen[i] = CreatePenIndirect((LOGPEN FAR *)&lpgw->monopen[2]);
 		}
 		/* find number of solid, unit width line styles */
+#endif
 		for (i=0; i<WGNUMPENS && lpgw->monopen[i+2].lopnStyle==PS_SOLID
 			&& lpgw->monopen[i+2].lopnWidth.x==1; i++) ;
 		lpgw->numsolid = i ? i : 1;	/* must be at least 1 */
@@ -377,10 +379,11 @@ MakePens(LPGW lpgw, HDC hdc)
 	    		lpgw->colorbrush[i] = CreateSolidBrush(RGB(0,0,0));
 	}
 	else {
+		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[1]); 	/* axis */
+#if 0 /* HBB 20000813: throw this part out, use on-the-fly pen creation instead... */
 		/* Color Device */
 		/* create border pens */
 		lpgw->hbpen = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[0]);	/* border */
-		lpgw->hapen = CreatePenIndirect((LOGPEN FAR *)&lpgw->colorpen[1]); 	/* axis */
 		/* create drawing pens */
 		for (i=0; i<WGNUMPENS; i++)
 		{
@@ -389,6 +392,7 @@ MakePens(LPGW lpgw, HDC hdc)
 			lpgw->hsolidpen[i] = CreatePen(PS_SOLID, 1, lpgw->colorpen[i+2].lopnColor);
 #endif
 			}
+#endif	/* 0/1 HBB 20000813 */
 		/* find number of solid, unit width line styles */
 		for (i=0; i<WGNUMPENS && lpgw->colorpen[i+2].lopnStyle==PS_SOLID
 			&& lpgw->colorpen[i+2].lopnWidth.x==1; i++) ;
@@ -405,14 +409,16 @@ DestroyPens(LPGW lpgw)
 	int i;
 
 	DeleteObject(lpgw->hbrush);
-	DeleteObject(lpgw->hbpen);
 	DeleteObject(lpgw->hapen);
+#if 0 /* HBB 20000813: disable all this, create/delete pens dynamically as needed */
+	DeleteObject(lpgw->hbpen);
 	for (i=0; i<WGNUMPENS; i++)
 		DeleteObject(lpgw->hpen[i]);
 #if 1 /* HBB 980118: fix 'numsolid' gotcha */
 	for (i=0; i<WGNUMPENS; i++)
 		DeleteObject(lpgw->hsolidpen[i]);
 #endif
+#endif /* 0/1 HBB 20000813 */
 	for (i=0; i<WGNUMPENS+2; i++)
 		DeleteObject(lpgw->colorbrush[i]);
 }
@@ -589,6 +595,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	POINT *ppt;
 	unsigned int ngwop=0;
 	BOOL isColor;
+	double line_width = 1.0;
 
 	if (lpgw->locked) 
 		return;
@@ -618,8 +625,13 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	hshift = MulDiv(lpgw->vchar, rr-rl, lpgw->xmax)/2;
 
 	pen = 0;
+#if 0 /* HBB 20000813: dynamically create/delete pens */
 	SelectObject(hdc, lpgw->hpen[pen]);
+#else
+	SelectObject(hdc, lpgw->hapen);
+#endif
 	SelectObject(hdc, lpgw->colorbrush[pen+2]);
+
 	numsolid = lpgw->numsolid;
 
 	/* do the drawing */
@@ -662,6 +674,7 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 				}
 				break;
 			case W_line_type:
+#if 0 /* HBB 20000813 */			
 				switch (curptr->x)
 				{
 				    case (WORD) -2:		/* black 2 pixel wide */
@@ -679,6 +692,20 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					    if (lpgw->color && isColor)
 					        SetTextColor(hdc, lpgw->colorpen[(curptr->x)%WGNUMPENS + 2].lopnColor);
 				}
+#else
+				{
+				   	short cur_pen = ((curptr->x < (WORD)(-2)) ? (curptr->x % WGNUMPENS) + 2: curptr->x + 2);
+				   	LOGPEN cur_penstruct = (lpgw->color && isColor) ?
+						lpgw->colorpen[cur_pen] : lpgw->monopen[cur_pen];
+						
+				   	if (line_width != 1)
+				    		cur_penstruct.lopnWidth.x *= line_width;
+					lpgw->hapen = CreatePenIndirect((LOGPEN FAR *) &cur_penstruct);
+					DeleteObject(SelectObject(hdc, lpgw->hapen));
+					if (lpgw->color && isColor)
+						SetTextColor(hdc, lpgw->colorpen[0].lopnColor);
+				}
+#endif
 				pen = curptr->x;
 				SelectObject(hdc, lpgw->colorbrush[pen%WGNUMPENS + 2]);
 				break;
@@ -739,6 +766,12 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					LocalUnlock(curptr->htext);
 				}
 				break;
+			case W_line_width:
+				/* HBB 20000813: this may look strange, but it ensures
+				 * that linewidth is exactly 1 iff it's in default
+				 * state */
+				line_width = curptr->x == 100 ? 1 : (curptr->x / 100.0);
+				break;
 			default:	/* A plot mark */
 #if 0 /* HBB 980118: fix 'sumsolid' gotcha: */
 				if (pen >= numsolid) {
@@ -747,7 +780,9 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 					SelectObject(hdc, lpgw->colorbrush[pen+2]);
 				}
 #else
+#if 0 /* HBB 20000813: dynamically create/destroy pens */
                                 SelectObject(hdc, lpgw->hsolidpen[pen%WGNUMPENS]);
+#endif
 #endif
                                 switch (curptr->op) {
 					case W_dot:

@@ -1,3 +1,39 @@
+2000-10-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgnuplib.h (WGNUPLOTVERSION): bumped version number of
+ 	wgnuplib interface to 1.3. That's the DLL version, in Win16
+ 	builds.
+	(LOGPEN) and some others: commented out some definitions no longer
+ 	needed, for the MinGW32 build. The compiler's headers no provide
+ 	them.
+	(W_line_width): new message number, for implementing linewidth.
+	(W_pm3d_setcolor), (W_pm3d_filled_polygon): new message numbers
+ 	for PM3D support
+
+	* src/win/winmain.c (MyVFPrintF): New function. vfprintf() was
+ 	missing in the simulated <stdio.h> functions of the Windows text
+ 	terminal emulation.
+
+	* src/win/wtext.h: comment out 'dontuse_vfprintf', to allow the
+ 	new vfprintf() to be used.
+
+	* term/win.trm (WIN_linewidth): new function. Now you can use the
+ 	'linewidth' option of gnuplot commands too, not just the
+ 	Windows-specific method of globally changing the definition of
+ 	linetypes.
+	(WIN_last_linetype): new variable caching the linetype last set.
+	(WIN_linetype): check against cached linetype, to avoid unneeded
+ 	pen changes.
+	(WIN_init): invalidate cache
+	(WIN_graphics): invalidate cache
+
+	* src/win/wgraph.c (MakePens): Create pens on-the-fly, rather than
+ 	all in a bunch at plot start time. Needed to support dynmicaly
+ 	changeable line widths.
+	(DestroyPens): dito.
+	(drawgraph): dito, plus the low-level side of the implementation
+ 	of changeable linewidths.
+
 2000-10-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_arrow): don't accept 'first' and 'second' as keywords

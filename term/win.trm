@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.12 1999/08/24 11:24:57 lhecking Exp $
+ * $Id: win.trm,v 1.13 1999/10/01 15:09:14 lhecking Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -99,6 +99,8 @@ TERM_PUBLIC int WIN_text_angle __PROTO((int ang));
 TERM_PUBLIC void WIN_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void WIN_resume __PROTO((void));
 TERM_PUBLIC void WIN_set_pointsize __PROTO((double));
+TERM_PUBLIC void WIN_linewidth __PROTO((double linewidth));
+
 
 
 /* Initialization values - Guess Now Scale later */
@@ -136,6 +138,8 @@ static struct gen_table WIN_opts[] =
     { "c$olour", WIN_COLOR },
     { NULL, WIN_OTHER }
 };
+
+static int WIN_last_linetype = -3;		/* HBB 20000813: linetype caching */
 
 TERM_PUBLIC void
 WIN_options()
@@ -215,6 +219,7 @@ WIN_init()
 #endif
 	graphwin.resized = FALSE;
     }
+    WIN_last_linetype = -3;		/* HBB 20000813: linetype caching */
 }
 
 
@@ -233,6 +238,7 @@ TERM_PUBLIC void
 WIN_graphics()
 {
     GraphStart(&graphwin, pointsize);
+    WIN_last_linetype = -3;			/* HBB 20000813: linetype caching */
 }
 
 TERM_PUBLIC void
@@ -253,7 +259,10 @@ TERM_PUBLIC void
 WIN_linetype(lt)
 int lt;
 {
+    if (lt != WIN_last_linetype) {
     GraphOp(&graphwin, W_line_type, lt, 0, NULL);
+	WIN_last_linetype = lt;
+    }
 }
 
 TERM_PUBLIC void
@@ -321,6 +330,16 @@ double s;
 #endif
 }
 
+TERM_PUBLIC void
+WIN_linewidth(linewidth)
+    double linewidth;
+{
+    /* HBB 20000813: New routine */
+    WIN_last_linetype = -3;        /* invalidate cached linetype */
+    GraphOp(&graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
+}
+
+
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -333,7 +352,9 @@ TERM_TABLE_START(win_driver)
     WIN_linetype, WIN_put_text, WIN_text_angle,
     WIN_justify_text, WIN_point, do_arrow, set_font_null,
     WIN_set_pointsize, TERM_CAN_MULTIPLOT,
-    WIN_text /* suspend */ , WIN_resume, 0		/*boxfill */
+    WIN_text /* suspend */ , WIN_resume, 
+    0 /*boxfill */, WIN_linewidth,
+    /* 0, 0, 0, 0, 0, */ /* mouse functions */
 TERM_TABLE_END(win_driver)
 
 #undef LAST_TERM

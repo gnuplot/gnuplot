@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.1 1999/03/26 22:11:07 lhecking Exp $
+ * $Id: wgnuplib.h,v 1.2 1999/07/27 19:42:16 lhecking Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -65,7 +65,8 @@
 
 #define WDPROC WINAPI WINEXPORT
 
-#define WGNUPLOTVERSION  "1.2   1996-01-18"
+/* HBB: bumped version for pointsize, linewidth and PM3D implementation */
+#define WGNUPLOTVERSION  "1.3   2000-08-13" 
 BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 
 /* ================================== */
@@ -90,10 +91,12 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 #ifdef __MINGW32__
 /* HBB 980809: MinGW32 doesn't define some of the more traditional
  * things gnuplot expects in every Windows C compiler, it seems: */
-typedef LOGPEN *LPLOGPEN;
-typedef HGLOBAL GLOBALHANDLE;
-#define WINVER 0x0400
-#define HFILE_ERROR ((HFILE)-1)
+/* HBB 20000813: This has change, in the meantime. I'm taking some of these
+ * out again: */
+/* typedef LOGPEN *LPLOGPEN; */
+/* typedef HGLOBAL GLOBALHANDLE; */
+/* #define WINVER 0x0400 */
+/* #define HFILE_ERROR ((HFILE)-1)*/
 
 /* the far mem/string function family: */
 #define _fstrstr(s1,s2) (strstr(s1,s2))
@@ -103,8 +106,8 @@ typedef HGLOBAL GLOBALHANDLE;
 #define _fstrcpy(d,s) (strcpy(d,s))
 #define _fstrncpy(d,s,n) (strncpy(d,s,n))
 #define _fstrcat(s1,s2) (strcat(s1,s2))
-#define _fmemset(s,c,n) (memset(s,c,n))
-#define _fmemmove(d,s,n) (memmove(d,s,n))
+/* #define _fmemset(s,c,n) (memset(s,c,n)) */
+/* #define _fmemmove(d,s,n) (memmove(d,s,n)) */
 
 #endif /* __MINGW32__ */
 /* ================================== */
@@ -291,6 +294,9 @@ struct GWOPBLK {			/* kept in local memory */
 #define W_justify 34
 #define W_text_angle 35
 #define W_pointsize 36
+#define W_line_width 37
+#define W_pm3d_setcolor 38
+#define W_pm3d_filled_polygon 39
 
 typedef struct tagGW {
 	LPPRINT	lpr;			/* must be first */
@@ -344,14 +350,10 @@ typedef GW FAR*  LPGW;
 #define WIN30FONT "Courier"
 #define WINFONT "Arial"
 
-#ifndef LEFT
-#define LEFT 0
-#endif
-#ifndef CENTRE
-#define CENTRE 1
-#endif
-#ifndef RIGHT
-#define RIGHT 2
+#if 0
+enum JUSTIFY {
+	LEFT, CENTRE, RIGHT
+};
 #endif
 
 void WDPROC GraphInit(LPGW lpgw);

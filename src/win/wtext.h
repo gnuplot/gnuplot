@@ -1,5 +1,5 @@
 /*
- * $Id: wtext.h,v 1.5 1998/04/14 00:18:29 drd Exp $
+ * $Id: wtext.h,v 1.1 1999/03/26 22:11:26 lhecking Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
@@ -67,7 +67,7 @@
 /* now cause errors for some unimplemented functions */
 
 #define vprintf dontuse_vprintf
-#define vfprintf dontuse_vfprintf
+/* #define vfprintf dontuse_vfprintf */
 #define fscanf dontuse_fscanf
 #define scanf dontuse_scanf
 #define clreol dontuse_clreol
