@@ -1,5 +1,5 @@
 #
-# $Id: pm3d.dem,v 1.9 2003/10/17 15:02:21 mikulik Exp $
+# $Id: pm3d.dem,v 1.10 2003/10/28 05:35:54 sfeam Exp $
 #
 # demo for pm3d splotting
 #
@@ -52,7 +52,7 @@ set cblabel "colour gradient"
 replot
 pause -1 "Hit return to continue"
 
-set title "set pm3d solid; the surface hides part of border, tics and lables"
+set title "set pm3d solid; the surface hides part of border, tics and labels"
 set pm3d solid
 replot
 pause -1 "Hit return to continue"
