@@ -12,7 +12,7 @@ There are also some hints how to build gnuplot with pre-ANSI C compilers.
 Part five finally describes a few graphical front ends for gnuplot.
 
  The description of preprocessor options previously found here has been
-moved to a new file called 0PORTING. Generic installation instructions
+moved to a new file called PORTING. Generic installation instructions
 for `configure', such as distributed with FSF/GNU packages, have been
 moved to the file INSTALL.gnu.
 

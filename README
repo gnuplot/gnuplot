@@ -41,9 +41,9 @@ Copyright and Porting
 
  See the ChangeLog and docs/old/History.old file for changes to GNUPLOT.
 
- Build instructions are in the 0INSTALL file. Porting instructions
-are in the 0PORTING file. Compile and testing problems are also in
-0INSTALL.
+ Build instructions are in the INSTALL file. Porting instructions
+are in the PORTING file. Compile and testing problems are also in
+INSTALL.
 
  The code for GNUPLOT was written with portability in mind; however, the
 new features incorporated in v3.7 were developed with ANSI-C compliant
