@@ -141,10 +141,10 @@ $ ./configure --help
   --with-plot[=PATH]      use the Unix plot library
   --with-png[=PATH] (*)   enable png terminal
                           (requires libpng and libz)
+  --with-pdf[=PATH]       enable pdf terminal 
+                          (requires PDFLib)
   --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons
-  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)
-  --enable-epslatex       enable epslatex driver (EXPERIMENTAL)
   --enable-ggi            enable ggi driver (EXPERIMENTAL)
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-mgr            enable MGR terminal
@@ -423,14 +423,18 @@ only three different possible values for the `with_package' variable:
 
   --with-png[=PATH]
 
-    Dto. for the png library. This option is on by default.
+   Dto. for the png library. This option is on by default.
+
+  --with-pdf[=PATH]
+
+   Dto. for the pdf library. This option off on by default.
 
   --with-plot[=PATH]
 
-    If used without the PATH argument, this option selects the standard
-    UNIX plot library, if available. If used with the PATH argument,
-    configure looks for the plot library from GNU plotutils. Version 2.2
-    or better is required. The option is off by default.
+   If used without the PATH argument, this option selects the standard
+   UNIX plot library, if available. If used with the PATH argument,
+   configure looks for the plot library from GNU plotutils. Version 2.2
+   or better is required. The option is off by default.
 
 Platform problems and testing
 *****************************
