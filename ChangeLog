@@ -1,3 +1,7 @@
+1999-10-20  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* buildvms.com: Updated.
+
 1999-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/png.trm: Back out Eric and HBB's changes (back to 16 colours,
