@@ -1,3 +1,7 @@
+1999-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* syscfg.h: cc on NetBSD doesn't define unix anymore.
+
 1999-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Add m4/select.m4 to ETC.
