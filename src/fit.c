@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.43 2004/07/02 05:03:30 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.44 2004/07/13 14:11:22 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -64,7 +64,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.43 2004/07/02 05:03:30 sfeam
 #if defined(VA_START) && defined(STDC_HEADERS)
 static void Dblfn __PROTO((const char *fmt, ...));
 #else
-static void Dblfn __PROTO((void));
+static void Dblfn __PROTO(());
 #endif
 #define Dblf  Dblfn
 #define Dblf2 Dblfn

@@ -4,6 +4,8 @@
 	Reverted change to prototypes for non-ANSI case back from (void)
 	to ().
 
+	* src/fit.c (Dblfn): Likewise.
+
 2004-07-21  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (plot_bars plot_betweencurves): If the current
