@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: parse.c,v 1.9.2.2 2001/03/09 18:12:41 broeker Exp $";
+static char *RCSid = "$Id: parse.c,v 1.9.2.3 2002/01/31 21:27:50 lhecking Exp $";
 #endif
 
 /* GNUPLOT - parse.c */
@@ -41,14 +41,6 @@ static char *RCSid = "$Id: parse.c,v 1.9.2.2 2001/03/09 18:12:41 broeker Exp $";
 #include <signal.h>
 #include <setjmp.h>
 
-#ifdef HAVE_SIGSETJMP
-# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
-# define LONGJMP(env, retval) siglongjmp(env, retval)
-#else
-# define SETJMP(env, save_signals) setjmp(env)
-# define LONGJMP(env, retval) longjmp(env, retval)
-#endif
-
 #include "plot.h"
 #include "help.h"
 
@@ -81,9 +73,9 @@ static void unary __PROTO((void));
 static struct at_type *at = NULL;
 static int at_size = 0;
 #if defined(_Windows) && !defined(WIN32)
-static jmp_buf far fpe_env;
+static JMP_BUF far fpe_env;
 #else
-static jmp_buf fpe_env;
+static JMP_BUF fpe_env;
 #endif
 
 #define dummy (struct value *) 0

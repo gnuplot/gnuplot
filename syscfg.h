@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.9.2.5 2002/01/23 11:18:28 lhecking Exp $
+ * $Id: syscfg.h,v 1.9.2.6 2002/01/23 11:26:12 lhecking Exp $
  *
  */
 
@@ -318,6 +318,16 @@
 # ifndef UNIXPC
 #  define UNIXPC
 # endif
+#endif
+
+#ifdef HAVE_SIGSETJMP
+# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
+# define LONGJMP(env, retval) siglongjmp(env, retval)
+# define JMP_BUF sigjmp_buf
+#else
+# define SETJMP(env, save_signals) setjmp(env)
+# define LONGJMP(env, retval) longjmp(env, retval)
+# define JMP_BUF jmp_buf
 #endif
 
 /* Autoconf related stuff
