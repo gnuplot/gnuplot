@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.23 2003/02/10 04:28:11 sfeam Exp $
+ * $Id: gd.trm,v 1.24 2003/03/19 06:39:11 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1276,6 +1276,8 @@ PNG_pointsize(ptsize)
 {
     PNG_ps = (int)(((double)PNG_POINT_SCALE * ptsize) + 0.5);
 }
+
+#undef gdfont
 
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE

@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.41 2002/12/12 11:10:45 mikulik Exp $
+ * $Id: gif.trm,v 1.42 2002/12/13 14:58:46 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -483,6 +483,7 @@ void GIF_filled_polygon(int points, gpiPoint *corners)
 #endif
 }
 
+#undef gdfont
 
 #endif
 
