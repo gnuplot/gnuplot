@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.19 2002/10/05 15:18:57 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.20 2003/03/20 14:36:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -92,9 +92,7 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.19 2002/10/05 15:18:57 m
 # endif
 #endif
 
-#ifndef GAMMA
-int signgam = 0;
-#else
+#ifdef GAMMA
 extern int signgam;		/* this is not always declared in math.h */
 #endif
 
@@ -551,6 +549,8 @@ loverf:
 }
 
 #define GAMMA(x) lngamma ((x))
+/* HBB 20030816: must override name of sgngam so f_gamma() uses it */
+#define signgam sgngam
 #endif /* !GAMMA */
 
 void f_erf(union argument *arg)

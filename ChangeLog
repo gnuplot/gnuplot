@@ -1,3 +1,9 @@
+2003-08-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+	
+	* src/specfun.c [!GAMMA] (signgam): Replace explicit variable
+ 	definition by macro to map from sgngam in fall-back implementation
+ 	to default name.  Fixes gamma(x)==0 bug on Cygwin/MinGW32 builds.
+
 2003-08-12  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: Apply linewidth changes directly to pm3d mode (fixes
