@@ -49,7 +49,7 @@
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/* OS dependent defines are now in syscfg.h */
+/* OS dependent constants are now defined in syscfg.h */
 
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
@@ -96,6 +96,17 @@ typedef int TBOOLEAN;
 /* minimum size of points[] in surface_points */
 #define MIN_SRF_POINTS 1000
 
+/* _POSIX_PATH_MAX is too small for practical purposes */
+#ifndef PATH_MAX
+# ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+# endif
+# ifndef MAXPATHLEN
+#  define PATH_MAX 1024
+# else
+#  define PATH_MAX MAXPATHLEN
+# endif
+#endif
 
 /* Minimum number of chars to represent an integer */
 #define INT_STR_LEN (3*sizeof(int))
@@ -104,6 +115,20 @@ typedef int TBOOLEAN;
 #define STREQ(a, b) ((a)[0] == (b)[0] && strcmp(a, b) == 0)
 #define STREQN(a, b, n) ((a)[0] == (b)[0] && strncmp(a, b, n) == 0)
 
+/* Concatenate a path name and a file name. The file name
+ * may or may not end with a "directory separation" character.
+ * Path must not be NULL, but can be empty
+ */
+#define PATH_CONCAT(path,file) \
+ { char *p = path; \
+   p += strlen(path); \
+   if (p!=path) p--; \
+   if (*p && (*p != DIRSEP1) && (*p != DIRSEP2)) { \
+     if (*p) p++; *p++ = DIRSEP1; *p = NUL; \
+   } \
+   strcat (path, file); \
+ }
+      
 /* note that MAX_LINE_LEN, MAX_TOKENS and MAX_AT_LEN do no longer limit the
    size of the input. The values describe the steps in which the sizes are
    extended. */
