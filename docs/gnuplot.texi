@@ -9796,7 +9796,7 @@ Examples:
 The first part of a Computer Graphics Metafile, the metafile description,
 includes a font table.  In the picture body, a font is designated by an
 index into this table.  By default, this terminal generates a table with
-the following 16 fonts, plus six more with `italic` replaced by
+the following 35 fonts, plus six more with `italic` replaced by
 `oblique`, or vice-versa (since at least the Microsoft Office and Corel
 Draw CGM import filters treat `italic` and `oblique` as equivalent):
 
@@ -10162,7 +10162,7 @@ of your latex document.
 'dashed' will allow dashed line types; without this option, only solid lines
 with varying thickness will be used.
 'dashed' and 'color' are mutually exclusive; if 'color' is specified, then 'dashed'
-will be ignored
+will be ignored.
 'rotate' will enable true rotated text (by 90 degrees). Otherwise, rotated text
 will be typeset with letters stacked above each other. If you use this option
 you must include \\usepackage@{graphicx@} in the preamble.
@@ -10183,7 +10183,7 @@ It seems that dashed lines become solid lines when the vertices of a plot
 are too close. (I do not know if that is a general problem with the tpic specials,
 or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)
 The default size of an eepic plot is 5x3 inches, which can be scaled 
-by 'set size a,b'
+by 'set size a,b'.
 Points, among other things, are drawn using the LaTeX commands "\\Diamond",
 "\\Box", etc.  These commands no longer belong to the LaTeX2e core; they are
 included in the latexsym package, which is part of the base distribution and
@@ -11267,14 +11267,14 @@ standard (8 1/2" X 11") displays, `legal` for (8 1/2" X 14") displays,
 `color` is for multi-pen (i.e. color) plots, and <number_of_pens> is
 the number of pens (i.e. colors) used in color plots. `monochrome` is for
 one (e.g. black) pen plots. `solid` draws all lines as solid lines, or
-'dashed' will draw lines with different dashed and dotted line patterns.
+`dashed` will draw lines with different dashed and dotted line patterns.
 <font> is `stick`, `univers`, `cg_times`, `zapf_dingbats`, `antique_olive`,
 `arial`, `courier`, `garamond_antigua`, `letter_gothic`, `cg_omega`,
 `albertus`, `times_new_roman`, `clarendon`, `coronet`, `marigold`,
 `truetype_symbols`, or `wingdings`. <fontsize> is the font size in points.
 The point type selection can be the standard default set by specifying
-nopspoints, or the same set of point types found in the postscript terminal
-by specifying pspoints.
+`nopspoints`, or the same set of point types found in the postscript terminal
+by specifying `pspoints`.
 
 Note that built-in support of some of these options is printer device
 dependent. For instance, all the fonts are supposedly supported by the HP
@@ -12461,6 +12461,7 @@ source distribution.
 @c ?set term postscript fontfile
 @c ?terminal postscript fontfile
 @c ?term postscript fontfile
+@c ?postscript fontfile
 @cindex fontfile
 @tmindex fontfile
 
