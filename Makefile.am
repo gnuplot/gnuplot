@@ -17,11 +17,3 @@ dist-hook:
 	@for dir in `find $(distdir) -type d -name CVS -print`; do \
 	  rm -rf $$dir; done
 
-pre-dist:
-	@cd docs && make gnuplot.texi
-	@cd config && rm -f Makefile.am && make -f Makefile.am.in Makefile.am
-	@cd demo && rm -f Makefile.am && make -f Makefile.am.in Makefile.am
-	@cd m4 && rm -f Makefile.am && make -f Makefile.am.in Makefile.am
-	@cd src && rm -f makefile.all && make -f Makefile.maint makefile.all
-	@cd term && rm -f Makefile.am && make -f Makefile.am.in Makefile.am
-	@cd tutorial && rm -f Makefile.am && make -f Makefile.am.in Makefile.am
