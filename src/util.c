@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.48 2004/07/29 16:34:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.49 2004/08/09 00:51:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -145,6 +145,23 @@ isstring(int t_num)
 	    (input_line[token[t_num].start_index] == '\'' ||
 	     input_line[token[t_num].start_index] == '"'));
 }
+
+
+#ifdef GP_STRING_VARS
+TBOOLEAN
+isstringvar(int t_num)
+{
+    struct udvt_entry **udv_ptr = &first_udv;
+
+    while (*udv_ptr) {
+       if (equals(t_num, (*udv_ptr)->udv_name))
+	   return ((*udv_ptr)->udv_value.type == STRING);
+       udv_ptr = &((*udv_ptr)->next_udv);
+    }
+
+    return FALSE;
+}
+#endif
 
 
 int
@@ -322,10 +339,22 @@ try_to_get_string()
 {
     char *newstring = NULL;
 
+#ifdef GP_STRING_VARS
+    struct value a;
+    int save_token = c_token;
+    if (END_OF_COMMAND)
+	return NULL;
+    const_express(&a);
+    if (a.type == STRING)
+	newstring = a.v.string_val;
+    else
+	c_token = save_token;
+#else
     if (!END_OF_COMMAND && isstring(c_token)) {
 	m_quote_capture(&newstring, c_token, c_token);
 	c_token++;
     }
+#endif
 
     return newstring;
 }
@@ -352,6 +381,18 @@ gp_strdup(const char *s)
     return d;
 }
 
+/*
+ * Allocate a new string and initialize it by concatenating two
+ * existing strings.
+ */
+char *
+gp_stradd(const char *a, const char *b)
+{
+    char *new = gp_alloc(strlen(a)+strlen(b)+1,"gp_stradd");
+    strcpy(new,a);
+    strcat(new,b);
+    return new;
+}
 
 /* HBB 20020405: moved these functions here from axis.c, where they no
  * longer truly belong. */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.17 2004/07/01 17:10:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.18 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -811,6 +811,7 @@ f_int(union argument *arg)
     push(Ginteger(&a, (int) real(pop(&a))));
 }
 
+#define BAD_DEFAULT default: int_error(NO_CARET, "internal error : argument neither INT or CMPLX")
 
 void
 f_abs(union argument *arg)
@@ -825,6 +826,8 @@ f_abs(union argument *arg)
 	break;
     case CMPLX:
 	push(Gcomplex(&a, magnitude(&a), 0.0));
+	break;
+    BAD_DEFAULT;
     }
 }
 
@@ -844,6 +847,7 @@ f_sgn(union argument *arg)
 	push(Ginteger(&a, (a.v.cmplx_val.real > 0.0) ? 1 :
 		      (a.v.cmplx_val.real < 0.0) ? -1 : 0));
 	break;
+    BAD_DEFAULT;
     }
 }
 
@@ -927,6 +931,8 @@ f_floor(union argument *arg)
 	break;
     case CMPLX:
 	push(Ginteger(&a, (int) floor(a.v.cmplx_val.real)));
+	break;
+    BAD_DEFAULT;
     }
 }
 
@@ -944,6 +950,8 @@ f_ceil(union argument *arg)
 	break;
     case CMPLX:
 	push(Ginteger(&a, (int) ceil(a.v.cmplx_val.real)));
+	break;
+    BAD_DEFAULT;
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.20 2004/07/27 09:08:49 broeker Exp $
+ * $Id: util.h,v 1.21 2004/08/09 00:51:30 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -79,6 +79,11 @@ void m_capture __PROTO((char **, int, int));
 void m_quote_capture __PROTO((char **, int, int));
 char *try_to_get_string __PROTO(());
 void parse_esc __PROTO((char *));
+
+#ifdef GP_STRING_VARS
+TBOOLEAN isstringvar __PROTO((int));
+char *gp_stradd __PROTO((const char *, const char *));
+#endif
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
 char *gp_strdup __PROTO((const char *));
