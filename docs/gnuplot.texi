@@ -1975,6 +1975,7 @@ vertical bar (|) separates mutually exclusive choices.
 * splot::                       
 * system::                      
 * test::                        
+* unset::                       
 * update::                      
 @end menu
 
@@ -3547,7 +3548,8 @@ rather than single-quotes.
 Examples:
 
 This creates a plot of the sum of the 2nd and 3rd data against the first:
-(The format string specifies comma- rather than space-separated columns.)
+The format string specifies comma- rather than space-separated columns.
+The same result could be achieved by specifying `set datafile separator ","`.
 @example
       plot 'file' using 1:($2+$3) '%lf,%lf,%lf'
 
@@ -4337,6 +4339,10 @@ drawn, however, until a `plot`, `splot`, or @ref{replot} command is given.
 
 The `show` command shows their settings;  `show all` shows all the
 settings.
+
+Options changed using `set` can be returned to the default state by giving the 
+corresponding @ref{unset} command.  See also the @ref{reset} command, which returns
+all settable parameters to default values.
 
 If a variable contains time/date data, `show` will display it according to
 the format currently defined by @ref{timefmt}, even if that was not in effect
@@ -5442,14 +5448,15 @@ This form of the command is deprecated. Please see `set style data`.
 
 @c ?set datafile
 The `set datafile` command options control interpretation of fields read from
-input data files by the `plot`, `splot`, and `fit` commands.  Only one such
-option is currently implemented.
+input data files by the `plot`, `splot`, and `fit` commands.  Two such
+options are currently implemented.
 
 @menu
 * set_datafile_missing::        
+* set_datafile_separator::      
 @end menu
 
-@node set_datafile_missing,  , datafile_, datafile_
+@node set_datafile_missing, set_datafile_separator, datafile_, datafile_
 @subsubsection set datafile missing
 
 @c ?set datafile missing
@@ -5458,13 +5465,14 @@ option is currently implemented.
 
 The `set datafile missing` command allows you to tell `gnuplot` what character
 string is used in a data file to denote missing data.  Exactly how this missing
-value will be treated depends on the @ref{using} specifier on the @{`s`@}`plot` 
+value will be treated depends on the @ref{using} specifier of the @{`s`@}`plot` 
 command.
 
 Syntax:
 @example
       set datafile missing @{"<string>"@}
       show datafile missing
+      unset datafile
 
 @end example
 
@@ -5511,6 +5519,37 @@ There is no default character for `missing`, but in many cases any
 non-parsible string of characters found where a numerical value is expected
 will be treated as missing data.
 
+
+@node set_datafile_separator,  , set_datafile_missing, datafile_
+@subsubsection set datafile separator
+
+@c ?set datafile separator
+@cindex separator
+
+The command `set datafile separator "<char>"` tells `gnuplot` that data fields
+in subsequent input files are separated by <char> rather than by whitespace.
+The most common use is to read in csv (comma-separated value) files written 
+by spreadsheet or database programs. By default data fields are separated by 
+whitespace.
+
+Syntax:
+@example
+      set datafile separator @{"<char>" | whitespace@}
+
+@end example
+
+Examples:
+@example
+      # Input file contains tab-separated fields
+      set datafile separator "\t"
+
+@end example
+
+@example
+      # Input file contains comma-separated values fields
+      set datafile separator ","
+
+@end example
 
 @node decimalsign, dgrid3d, datafile_, set-show
 @subsection decimalsign
@@ -10248,8 +10287,8 @@ The other label -- account for long ticlabels:
 @tmindex emf
 
 
-The `emf` terminal generates an Enhanced Metafile Format file.  This file format
-is the metafile standard on MS Win32 Systems"
+The `emf` terminal generates an Enhanced Metafile Format file.  This file
+format is the metafile standard on MS Win32 Systems"
 
 Syntax:
 @example
@@ -13679,7 +13718,6 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
 
 @end example
@@ -13721,14 +13759,6 @@ manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
 
-The option `driver` can be used to specify a driver different from the
-default driver `gnuplot_x11`. This options is thought mainly for developers
-who are working on new driver features. Note that changing the driver will
-shut down the connection to the previous driver. Example:
-@example
-    gnuplot> set term x11 driver "gnuplot_x11_38a"
-
-@end example
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -14034,7 +14064,6 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-   set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
 
 @end example
@@ -14076,14 +14105,6 @@ manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
 
-The option `driver` can be used to specify a driver different from the
-default driver `gnuplot_x11`. This options is thought mainly for developers
-who are working on new driver features. Note that changing the driver will
-shut down the connection to the previous driver. Example:
-@example
-    gnuplot> set term x11 driver "gnuplot_x11_38a"
-
-@end example
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -16250,7 +16271,7 @@ formatting capabilities.
 @ref{system} spawns shell to execute a command. Please type @ref{shell} for
 more details.
 
-@node test, update, system, Commands
+@node test, unset, system, Commands
 @section test
 
 @c ?commands test
@@ -16267,7 +16288,27 @@ Syntax:
 
 @end example
 
-@node update,  , test, Commands
+@node unset, update, test, Commands
+@section unset
+
+@c ?commands unset
+@cindex unset
+@cmindex unset
+
+
+Options set using the `set` command may be returned to their default state by
+issuing the corresponding @ref{unset} command.
+
+Example:
+@example
+      set xtics mirror rotate by -45 0,10,100
+      ...
+      unset xtics
+
+@end example
+
+
+@node update,  , unset, Commands
 @section update
 
 @c ?commands update
