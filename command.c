@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $";
+static char *RCSid = "$Id: command.c,v 1.20 1998/12/09 15:22:38 lhecking Exp $";
 #endif
 
 /* GNUPLOT - command.c */
@@ -334,12 +334,12 @@ static int command()
 		gstrptime(string, format, &tm);
 		secs = gtimegm(&tm);
 		fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
+			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
 		memset(&tm, 0, sizeof(tm));
 		ggmtime(&tm, secs);
 		gstrftime(string, 159, format, secs);
 		fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
+			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday, tm.tm_yday);
 	    }
 	}
     } else if (almost_equals(c_token, "test")) {
@@ -1114,7 +1114,7 @@ char **parms;
 # endif /* AMIGA_AC_5 */
 
 
-# if defined(READLINE) || defined(GNU_READLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE)
 /* keep some compilers happy */
 static char *rlgets __PROTO((char *s, int n, char *prompt));
 
@@ -1149,7 +1149,7 @@ char *prompt;
     }
     return NULL;
 }
-# endif /* READLINE || GNU_READLINE */
+# endif /* READLINE || HAVE_LIBREADLINE */
 
 
 # if defined(MSDOS) || defined(_Windows) || defined(DOS386)
@@ -1224,7 +1224,7 @@ static void do_shell()
 
 /* read from stdin, everything except VMS */
 
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
 #  if (defined(MSDOS) || defined(DOS386)) && !defined(_Windows) && !defined(__EMX__) && !defined(DJGPP)
 
 /* if interactive use console IO so CED will work */
@@ -1310,7 +1310,7 @@ int len;
 #   define GET_STRING(s,l) fgets(s, l, stdin)
 
 #  endif /* !plain DOS */
-# endif /* !READLINE && !GNU_READLINE) */
+# endif /* !READLINE && !HAVE_LIBREADLINE) */
 
 /* Non-VMS version */
 static int read_line(prompt)
@@ -1320,22 +1320,22 @@ char *prompt;
     TBOOLEAN more = FALSE;
     int last = 0;
 
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
     if (interactive)
 	PUT_STRING(prompt);
 # endif /* READLINE */
     do {
 	/* grab some input */
-# if defined(READLINE) || defined(GNU_READLINE)
+# if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
 	     ? rlgets(&(input_line[start]), input_line_len - start,
 		      ((more) ? "> " : prompt))
 	     : fgets(&(input_line[start]), input_line_len - start, stdin))
 	    == (char *) NULL) {
-# else /* !(READLINE || GNU_READLINE) */
+# else /* !(READLINE || HAVE_LIBREADLINE) */
 	if (GET_STRING(&(input_line[start]), input_line_len - start)
 	    == (char *) NULL) {
-# endif /* !(READLINE || GNU_READLINE) */
+# endif /* !(READLINE || HAVE_LIBREADLINE) */
 	    /* end-of-file */
 	    if (interactive)
 		(void) putc('\n', stderr);
@@ -1368,7 +1368,7 @@ char *prompt;
 	    } else
 		more = FALSE;
 	}
-# if !defined(READLINE) && !defined(GNU_READLINE)
+# if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
 	if (more && interactive)
 	    PUT_STRING("> ");
 # endif
