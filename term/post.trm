@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.93 2003/04/25 03:22:56 sfeam Exp $
+ * $Id: post.trm,v 1.94 2003/08/22 12:36:17 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2136,7 +2136,7 @@ ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag, overprint
 		char *savepos = NULL, save = 0;
 		char *localfontname = fontname, ch;
 		int recode = 1;
-		float f = fontsize, ovp, overprint_voffset = 0.0;
+		float f = fontsize, ovp;
 
 		/*{{{  recurse (possibly with a new font) */
 
@@ -2147,7 +2147,7 @@ ENHPS_recurse(p, brace, fontname, fontsize, base, widthflag, showflag, overprint
 		if (overprint == 2) {
 		    ovp = (float)strtod(p,&p);
 		    if (ovp != 0) {
-			overprint_voffset = ovp*f;
+			base += ovp*f;
 		    }
 		}
 		--p;		/* HBB 20001021: bug fix: 10^{2} broken */
