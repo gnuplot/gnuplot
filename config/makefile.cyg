@@ -1,6 +1,6 @@
 #
 #
-# $Id: makefile.cyg,v 1.4 2002/01/23 09:57:07 mikulik Exp $
+# $Id: makefile.cyg,v 1.5 2002/01/25 09:46:22 mikulik Exp $
 #
 # GNUPLOT Makefile for Cygwin on WinNT and Win95/98/2000
 #
@@ -169,9 +169,9 @@ L=docs/latex/
 M=../demo/
 
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
 
-all: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe \
+all: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe \
 	gnuplot.ps gnuplot.pdf
 
 
@@ -202,6 +202,9 @@ wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpic
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -mno-cygwin -o $@ \
 		$(OBJS) $(WINOBJS) \
 		wgplt_res.o $(LDLIBS) $(TERMLIBS)
+
+pgnuplot.exe: win/pgnuplot.c
+	gcc -O2 -s -mno-cygwin -o pgnuplot.exe win/pgnuplot.c -luser32
 
 
 # Rules:
@@ -313,3 +316,4 @@ install: default
 	cp wgnuplot.exe $(DESTDIR)/wgnuplot.exe
 	cp win/wgnuplot.mnu $(DESTDIR)/wgnuplot.mnu
 	cp wgnuplot.hlp $(DESTDIR)/wgnuplot.hlp
+	cp pgnuplot.exe $(DESTDIR)/pgnuplot.exe

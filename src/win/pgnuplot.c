@@ -46,6 +46,10 @@
  * command line looking like this:
  *
  *     gcc -o pgnuplot.exe pgnuplot.c -luser32 -s
+ *
+ * Note that if you're using Cygwin GCC, you'll want to add the option
+ * -mno-cygwin to that command line to avoid getting a pgnuplot.exe
+ * that depends on their GPL'ed cygwin1.dll.
  */
 
 /*	Modifications by Craig R. Schardt (17 Jun 1999)

@@ -1,7 +1,19 @@
+2001-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/pgnuplot.c: Added comment about -mno-cygwin option to be
+ 	used to avoid GPLification of pgnuplot by use of Cygwin's DLL.
+
+	* config/makefile.cyg (pgnuplot.exe): Added rule to build the
+ 	helper program.
+	(default, all): Added dependencies on pgnuplot.exe.
+	(install): Added command to install pgnuplot.exe, too.
+
+	* config/makefile.mgw (install): Also install pgnuplot.exe.
+
 2002-01-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* demo/all.dem demo/pm3d.dem demo/clip14in.dat demo/triangle.dat:
-	New files for pm3d demo.
+ 	New files for pm3d demo.
 
 	* pm3d/demo: Directory removed (contents merged with demo/).
 
