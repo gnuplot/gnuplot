@@ -476,6 +476,13 @@ C
  FIT_SCRIPT may be used to specify a `gnuplot` command to be executed when a
  fit is interrupted---see `fit`.  FIT_LOG specifies the filename of the
  logfile maintained by fit.
+
+ GNUPLOT_LIB may be used to define additional search directories for data
+ and command files. The variable may contain a single directory name, or
+ a list of directories separated by a platform-specific path separator,
+ eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
+ of GNUPLOT_LIB are appended to the `loadpath` variable, but not saved
+ with the `save` and `save set` commands.
 2 Expressions
 ?expressions
  In general, any mathematical expression accepted by C, FORTRAN, Pascal, or
@@ -4519,6 +4526,33 @@ C ... and restart the table:
 ?lmargin
  The command `set lmargin` sets the size of the left margin.  Please see
  `set margin` for details.
+3 loadpath
+? commands set loadpath
+? commands show loadpath
+? set loadpath
+? show loadpath
+? loadpath
+ The `loadpath` setting defines additional locations for data and command
+ files searched by the `call`, `load`, `plot` and `splot` commands.  If a
+ file cannot be found in the current directory, the directories in
+ `loadpath` are tried.
+
+ Syntax:
+       set loadpath {"pathlist1" {"pathlist2"...}}
+       show loadpath
+
+ Path names may be entered as single directory names, or as a list of
+ path names separated by a platform-specific path separator, eg. colon
+ (':') on Unix, semicolon (';') on DOS/Windows/OS/2/Amiga platforms.
+ The `show loadpath`, `save` and `save set` commands replace the
+ platform-specific separator with a space character (' ') for maximum
+ portability.
+
+ If the environment variable GNUPLOT_LIB is set, its contents are
+ appended to `loadpath`.  However, `show loadpath` prints the contents
+ of user defined loadpath and system loadpath separately.  Also, the
+ `save` and `save set` commands save only the user specified parts of
+ `loadpath`, for portability reasons.
 3 locale
 ?commands set locale
 ?commands show logscale
