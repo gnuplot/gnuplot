@@ -1,6 +1,6 @@
-/* $Id: driver.h,v 1.9 1998/06/18 14:59:19 ddenholm Exp $ */
+/* $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
 
-/* GNUPLOT - driver.h  $Id: driver.h,v 1.9 1998/06/18 14:59:19 ddenholm Exp $ */
+/* GNUPLOT - driver.h  $Id: driver.h,v 1.8 1998/11/25 21:05:34 lhecking Exp $ */
 
 /*[
  * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
@@ -42,7 +42,7 @@
 #define fputc putc
 #endif
 
-/* functions provided by in term.c */
+/* functions provided by term.c */
 
 void do_point __PROTO((unsigned int x, unsigned int y, int number));
 void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
