@@ -1,14 +1,29 @@
+1999-01-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* syscfg.h: Define unix if unix or __unix is defined. Fixes
+	empty OS string under HP-UX.
+
 1999-01-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0PORTING, acconfig.h, command.c, configure.in, makefile.os2,
+	makefile.unx, plot.c, protos.h, readline.c, show.c: GNU_READLINE is
+	now HAVE_LIBREADLINE.
 
 	* acconfig.h: Remove APOLLO, GPR, UNIXPC.
 
 	* aclocal.m4, config.hin, configure: Regenerated.
 
-	* configure.in: Cleanup up --enable options.
+	* configure.in: Cleanup up --enable options. New --enable-history
+	option.
 
 	* parse.c, plot.c: Use symbol APOLLO instead of apollo.
 
 	* syscfg.h: Define APOLLO and UNIXPC.
+
+1999-01-26  Thomas Walter  <twalter@pc2-69.chemie.uni-erlangen.de>
+
+	* plot.c: Add the ability to use a command history file if GNU
+	readline is used.
 
 1999-01-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
