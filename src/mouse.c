@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.51 2004/05/26 22:50:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.52 2004/06/04 06:29:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -203,6 +203,7 @@ static void event_motion __PROTO((struct gp_event_t * ge));
 static void event_modifier __PROTO((struct gp_event_t * ge));
 static void event_print __PROTO((FILE * fp, char *s));
 static void do_save_3dplot __PROTO((struct surface_points *, int, int));
+static void load_mouse_variables __PROTO((double, double, TBOOLEAN, int));
 
 /* builtins */
 static char *builtin_autoscale __PROTO((struct gp_event_t * ge));
@@ -1291,6 +1292,16 @@ event_keypress(struct gp_event_t *ge)
     keypress.key = c;
     keypress.modifier = modifier_mask;
 
+
+    /* On 'pause mouse keypress'
+     * export current keypress and mouse coords to user variables.
+     * Ignore NULL keypress
+     */
+    if (paused_for_mouse && paused_for_mousekeys && (c > '\0')) {
+	load_mouse_variables(x, y, FALSE, c);
+	return;
+    }
+
     for (ptr = bindings; ptr; ptr = ptr->next) {
 	if (bind_matches(&keypress, ptr)) {
 	    if ((par2 & 1) == 0 && ptr->command) {
@@ -1563,47 +1574,10 @@ event_buttonrelease(struct gp_event_t *ge)
 	    term->set_cursor(0, 0, 0);
     }
 
-    MousePosToGraphPosReal(mouse_x, mouse_y, &real_x, &real_y, &real_x2, &real_y2);
+    /* Export current mouse coords to user-accessible variables also */
+    load_mouse_variables(mouse_x, mouse_y, TRUE, b);
     UpdateStatusline();
-
-    /* Export current mouse coords to user-accessible variables also
-     * FIXME EAM: Maybe don't export if axis ticmode == NO_TICS     */
-    {
-	struct udvt_entry *current;
-
-	if ((current = get_udv("MOUSE_X"))) {
-	    current->udv_undef = FALSE;
-	    Gcomplex(&current->udv_value,real_x,0);
-	}
-	if ((current = get_udv("MOUSE_Y"))) {
-	    current->udv_undef = FALSE;
-	    Gcomplex(&current->udv_value,real_y,0);
-	}
-	if ((current = get_udv("MOUSE_X2"))) {
-	    current->udv_undef = FALSE;
-	    Gcomplex(&current->udv_value,real_x2,0);
-	}
-	if ((current = get_udv("MOUSE_Y2"))) {
-	    current->udv_undef = FALSE;
-	    Gcomplex(&current->udv_value,real_y2,0);
-	}
-	if ((current = get_udv("MOUSE_BUTTON"))) {
-	    current->udv_undef = FALSE;
-	    Ginteger(&current->udv_value,b);
-	}
-	if ((current = get_udv("MOUSE_SHIFT"))) {
-	    current->udv_undef = FALSE;
-	    Ginteger(&current->udv_value, modifier_mask & Mod_Shift);
-	}
-	if ((current = get_udv("MOUSE_ALT"))) {
-	    current->udv_undef = FALSE;
-	    Ginteger(&current->udv_value, modifier_mask & Mod_Alt);
-	}
-	if ((current = get_udv("MOUSE_CTRL"))) {
-	    current->udv_undef = FALSE;
-	    Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
-	}
-    }
+     
 #ifdef _Windows
     if (paused_for_mouse) {
 	/* remove pause message box after 'pause mouse' */
@@ -2341,5 +2315,56 @@ update_menu_items_PM_terminal(void)
     send_gpPMmenu(PM_pipe);
 }
 # endif
+
+/* Save current mouse position to user-accessible variables.
+ * Save the keypress or mouse button that triggered this in MOUSE_KEY,
+ * and define MOUSE_BUTTON if it was a button click.
+ */
+static void
+load_mouse_variables(double x, double y, TBOOLEAN button, int c)
+{
+    struct udvt_entry *current;
+
+    MousePosToGraphPosReal(x, y, &real_x, &real_y, &real_x2, &real_y2);
+
+    if ((current = get_udv("MOUSE_BUTTON"))) {
+	current->udv_undef = !button;
+	Ginteger(&current->udv_value, button?c:-1);
+    }
+    if ((current = get_udv("MOUSE_KEY"))) {
+	current->udv_undef = FALSE;
+	Ginteger(&current->udv_value,c);
+    }
+
+    if ((current = get_udv("MOUSE_X"))) {
+	current->udv_undef = FALSE;
+	Gcomplex(&current->udv_value,real_x,0);
+    }
+    if ((current = get_udv("MOUSE_Y"))) {
+	current->udv_undef = FALSE;
+	Gcomplex(&current->udv_value,real_y,0);
+    }
+    if ((current = get_udv("MOUSE_X2"))) {
+	current->udv_undef = FALSE;
+	Gcomplex(&current->udv_value,real_x2,0);
+    }
+    if ((current = get_udv("MOUSE_Y2"))) {
+	current->udv_undef = FALSE;
+	Gcomplex(&current->udv_value,real_y2,0);
+    }
+    if ((current = get_udv("MOUSE_SHIFT"))) {
+	current->udv_undef = FALSE;
+	Ginteger(&current->udv_value, modifier_mask & Mod_Shift);
+    }
+    if ((current = get_udv("MOUSE_ALT"))) {
+	current->udv_undef = FALSE;
+	Ginteger(&current->udv_value, modifier_mask & Mod_Alt);
+    }
+    if ((current = get_udv("MOUSE_CTRL"))) {
+	current->udv_undef = FALSE;
+	Ginteger(&current->udv_value, modifier_mask & Mod_Ctrl);
+    }
+    return;
+}
 
 #endif /* USE_MOUSE */

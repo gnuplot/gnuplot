@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.95 2004/05/21 20:10:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.98 2004/05/27 16:35:11 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -380,11 +380,8 @@ static void xfree __PROTO((void *));
 static void EraseCoords __PROTO((plot_struct *));
 static void DrawCoords __PROTO((plot_struct *, const char *));
 static void DisplayCoords __PROTO((plot_struct *, const char *));
-#if 0
-static int is_control __PROTO((KeySym));
-static int is_meta __PROTO((KeySym));
-static int is_shift __PROTO((KeySym));
-#endif
+
+static TBOOLEAN is_meta __PROTO((KeySym));
 static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *)));
 #endif
 
@@ -3148,31 +3145,29 @@ DisplayCoords(plot_struct * plot, const char *s)
 }
 
 
-#if 0
-/* FIXME HBB 20020225: This function is not used anywhere ??? */
-static int
-is_control(KeySym mod)
-{
-    return (XK_Control_R == mod || XK_Control_L == mod);
-}
-
-/* FIXME HBB 20020225: This function is not used anywhere ??? */
-static int
+static TBOOLEAN
 is_meta(KeySym mod)
 {
-    /* we make no difference between alt and meta */
-    return (XK_Meta_R == mod || XK_Meta_L == mod
-	    || XK_Alt_R == mod || XK_Alt_L == mod);
-}
+    /* CJK keyboards may have these meta keys */
+    if (0xFF20 <= mod && mod <= 0xFF3F)
+	return TRUE;
 
-/* FIXME HBB 20020225: This function is not used anywhere ??? */
-static int
-is_shift(KeySym mod)
-{
-    return (XK_Shift_R == mod || XK_Shift_L == mod);
+    /* Everyone else may have these meta keys */
+    switch (mod) {
+	case XK_Multi_key:
+	case XK_Shift_L:
+	case XK_Shift_R:
+	case XK_Control_L:
+	case XK_Control_R:
+	case XK_Meta_L:
+	case XK_Meta_R:
+	case XK_Alt_L:
+	case XK_Alt_R:
+			return TRUE;
+	default:
+			return FALSE;
+    }
 }
-#endif
-
 
 /* It returns NULL if we are not running in any known (=implemented) multitab
  * console.
@@ -3415,14 +3410,6 @@ process_event(XEvent *event)
 	break;
     case KeyPress:
 	plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
-#if 0
-	if (0 == XLookupString(&(event->xkey), key_string, sizeof(key_string), (KeySym *) NULL, (XComposeStatus *) NULL))
-	    key_string[0] = 0;
-#endif
-
-#ifdef USE_MOUSE
-
-#endif
 	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
 #ifdef USE_MOUSE
 	update_modifiers(event->xkey.state);
@@ -3467,7 +3454,10 @@ process_event(XEvent *event)
 	    }			/* switch (keysym) */
 #ifdef USE_MOUSE
 	}
-	/* if (!modifier_mask) */
+
+	if (is_meta(keysym))
+	    return;
+	    
 	switch (keysym) {
 
 #define KNOWN_KEYSYMS(gp_keysym)                                             \
@@ -3639,7 +3629,6 @@ process_event(XEvent *event)
 	case XK_F12:
 	    KNOWN_KEYSYMS(GP_F12);
 
-
 	default:
 	    if (plot == current_plot) {
 		KNOWN_KEYSYMS((int) keysym);
@@ -3653,15 +3642,7 @@ process_event(XEvent *event)
 	update_modifiers(event->xkey.state);
 #endif
 	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
-	switch (keysym) {
-	case XK_Shift_L:
-	case XK_Shift_R:
-	case XK_Control_L:
-	case XK_Control_R:
-	case XK_Meta_L:
-	case XK_Meta_R:
-	case XK_Alt_L:
-	case XK_Alt_R:
+	if (is_meta(keysym)) {
 	    plot = Find_Plot_In_Linked_List_By_Window(event->xkey.window);
 	    cursor = cursor_default;
 	    if (plot)

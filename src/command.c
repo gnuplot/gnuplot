@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.91 2004/04/12 19:53:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.92 2004/04/22 11:39:13 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -163,6 +163,7 @@ TBOOLEAN replot_disabled = FALSE;
 
 #ifdef USE_MOUSE
 TBOOLEAN paused_for_mouse = FALSE;
+TBOOLEAN paused_for_mousekeys = FALSE;
 #endif
 
 /* If last plot was a 3d one. */
@@ -900,12 +901,19 @@ pause_command()
 
 #ifdef USE_MOUSE
     paused_for_mouse = FALSE;
+    paused_for_mousekeys = FALSE;
     if (equals(c_token,"mouse")) {
 	sleep_time = -1;
 	c_token++;
-	if (term_initialised)
+	if (term_initialised) {
 	    paused_for_mouse = TRUE;
-	else
+	    if (!(END_OF_COMMAND)) {
+		if (almost_equals(c_token,"key$press")) {
+		paused_for_mousekeys = TRUE;
+		c_token++;
+		}
+	    }
+	} else
 	    int_warn(NO_CARET,"Mousing not active");
     } else
 #endif

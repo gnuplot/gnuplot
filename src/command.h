@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.27 2003/11/24 15:15:14 mikulik Exp $
+ * $Id: command.h,v 1.28 2004/04/13 17:23:52 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -66,6 +66,7 @@ extern TBOOLEAN replot_disabled;
 
 #ifdef USE_MOUSE
 extern TBOOLEAN paused_for_mouse;
+extern TBOOLEAN paused_for_mousekeys;
 #endif
 
 extern TBOOLEAN is_3d_plot;

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.222 2004/05/09 14:35:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.223 2004/06/01 16:20:02 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1507,6 +1507,17 @@ C ... and restart the table:
        if (defined(MOUSE_BUTTON)) call 'something_else'; \
        else print "No mouse click." 
 
+ It is also possible to track keystrokes in the plot window using the mousing
+ code.
+
+       plot 'something'
+       pause mouse keypress
+       print "Keystroke ", MOUSE_KEY, " at ", MOUSE_X, " ", MOUSE_Y
+
+ If 'pause mouse keypress' is terminated by a mouse click rather than by a
+ keypress, then MOUSE_KEY will contain the button number, otherwise it will
+ contain the ascii character value of the key that was pressed.
+
 2 Plotting
 ?plotting
  There are three `gnuplot` commands which actually create a plot: `plot`,
@@ -2411,7 +2422,7 @@ C ... and restart the table:
 
  Syntax:
        pause <time> {"<string>"}
-       pause mouse {"<string>"}
+       pause mouse {keypress} {"<string>"}
 
  <time> may be any constant or expression.  Choosing -1 will wait until a
  carriage return is hit, zero (0) won't pause at all, and a positive number
@@ -2421,7 +2432,12 @@ C ... and restart the table:
 
  If the current terminal supports mousing, then `pause mouse` will terminate
  on either a mouse click or on ctrl-C.  For all other terminals, or if mousing
- is not active, `pause mouse` is equivalent to `pause -1`.
+ is not active, `pause mouse` is equivalent to `pause -1`.  The variant command
+ `pause mouse keypress` will terminate on either a mouse click or on a 
+ keypress in the plot window.  In all cases the coordinates of the mouse are
+ returned in variables MOUSE_X, MOUSE_Y, MOUSE_X2, MOUSE_Y2.  The button number
+ or the ascii value of the key pressed is returned in MOUSE_KEY.
+ See `mouse variables`.
 
  Note: Since `pause` communicates with the operating system rather than the
  graphics, it may behave differently with different device drivers (depending
