@@ -1,3 +1,15 @@
+2000-11-15  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.h src/getcolor.c src/color.c src/show.c term/post.trm:
+	  pm3d --- move PostScriptColorFormulae from post.trm to getcolor.c and
+	  rename them to ps_math_color_formulae
+
+	* src/getcolor.h: pm3d --- new file, declarations for getcolor.c
+
+	* term/epslatex.trm: pm3d --- removed pm3d code from epslatex.trm which
+	  duplicated the code in post.trm, and call the particular ps.trm 
+	  functions instead
+
 2000-11-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* make the branched version compile under OS/2

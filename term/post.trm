@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.43 2000/11/02 19:14:15 lhecking Exp $
+ * $Id: post.trm,v 1.44 2000/11/04 11:24:14 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -103,6 +103,9 @@ TERM_PUBLIC void PS_filled_polygon (int, gpiPoint *);
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
 #include "post.h"
+#ifdef PM3D
+#include "../src/getcolor.h"
+#endif
 
 #define PS_FLUSH_PATH \
     if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
@@ -1779,51 +1782,8 @@ const char *str;
     PS_relative_ok = FALSE;
 }
 
-#ifdef PM3D
 
-/* implementation of pm3dGetColorValue() in the postscript way.
-   Notice that the description, i.e. the part after %, is important 
-   since it is used in `show pm3d' for displaying the analytical formulae.
-*/
-char *( PostScriptColorFormulae[] ) = {
-  "/cF0 {pop 0} bind def\t% 0",
-  "/cF1 {pop 0.5} bind def\t% 0.5",
-  "/cF2 {pop 1} bind def\t% 1",
-  "/cF3 {} bind def\t% x",
-  "/cF4 {dup mul} bind def\t% x^2",
-  "/cF5 {dup dup mul mul} bind def\t% x^3",
-  "/cF6 {dup mul dup mul} bind def\t% x^4",
-  "/cF7 {sqrt} bind def\t% sqrt(x)",
-  "/cF8 {sqrt sqrt} bind def\t% sqrt(sqrt(x))",
-  "/cF9 {90 mul sin} bind def\t% sin(90x)",
-  "/cF10 {90 mul cos} bind def\t% cos(90x)",
-  "/cF11 {0.5 sub abs} bind def\t% |x-0.5|",
-  "/cF12 {2 mul 1 sub dup mul} bind def\t% (2x-1)^2",
-  "/cF13 {180 mul sin} bind def\t% sin(180x)",
-  "/cF14 {180 mul cos abs} bind def\t% |cos(180x)|",
-  "/cF15 {360 mul sin} bind def\t% sin(360x)",
-  "/cF16 {360 mul cos} bind def\t% cos(360x)",
-  "/cF17 {360 mul sin abs} bind def\t% |sin(360x)|",
-  "/cF18 {360 mul cos abs} bind def\t% |cos(360x)|",
-  "/cF19 {720 mul sin abs} bind def\t% |sin(720x)|",
-  "/cF20 {720 mul cos abs} bind def\t% |cos(720x)|",
-  "/cF21 {3 mul} bind def\t% 3x",
-  "/cF22 {3 mul 1 sub} bind def\t% 3x-1",
-  "/cF23 {3 mul 2 sub} bind def\t% 3x-2",
-  "/cF24 {3 mul 1 sub abs} bind def\t% |3x-1|",
-  "/cF25 {3 mul 2 sub abs} bind def\t% |3x-2|",
-  "/cF26 {1.5 mul .5 sub} bind def\t% (3x-1)/2",
-  "/cF27 {1.5 mul 1 sub} bind def\t% (3x-2)/2",
-  "/cF28 {1.5 mul .5 sub abs} bind def\t% |(3x-1)/2|",
-  "/cF29 {1.5 mul 1 sub abs} bind def\t% |(3x-2)/2|",
-  "/cF30 {0.32 div 0.78125 sub} def\t% x/0.32-0.78125",
-  "/cF31 {2 mul 0.84 sub} def\t% 2*x-0.84",
-  "/cF32 {dup 0.42 le {4 mul} {dup 0.92 le {-2 mul 1.84 add} {0.08 div 11.5 sub} ifelse} ifelse } def\t% 4x;1;-2x+1.84;x/0.08-11.5",
-  "/cF33 {2 mul 0.5 sub abs} def\t% |2*x - 0.5|",
-  "/cF34 {2 mul} def\t% 2*x",
-  "/cF35 {2 mul 0.5 sub} def\t% 2*x - 0.5",
-  "/cF36 {2 mul 1 sub} def\t% 2*x - 1",
-  "" };
+#ifdef PM3D
 
 TERM_PUBLIC int PS_make_palette (t_sm_palette *palette)
 {
@@ -1839,19 +1799,21 @@ fprintf(gpoutfile, "gsave %% colour palette begin\n");
 /* print the definition of R,G,B formulae */
 
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(R) ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", R, ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(G) ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", G, ps_math_color_formulae[ 2*abs(G) ], ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ abs(B) ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", B, ps_math_color_formulae[ 2*abs(B) ], ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
-    while ( *(PostScriptColorFormulae[i]) )
-      fprintf(gpoutfile, "%s\n",PostScriptColorFormulae[ i++ ]);
+    while ( *(ps_math_color_formulae[2*i]) ) {
+      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", i, ps_math_color_formulae[ 2*i ], ps_math_color_formulae[ 2*i+1 ]);
+      i++;
+      }
     }
 
-/* now print something like
+/* Now print something like
 /g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
 */
 fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
@@ -1891,7 +1853,7 @@ return 0;
 }
 
 
-#if 0 /* caching of color value removed; won't be so efficient for z=const 
+#if 0 /* caching of color value removed; won't be so efficient for z=const
 	 surfaces/map, but will save a lot of headache (linetype changes 
 	 color, for instance) */
 double pm3d_last_color;

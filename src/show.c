@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.44 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.45 2000/11/01 20:37:48 joze Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1553,13 +1553,12 @@ static void show_palette()
 	/* take the description of the color formulae from the comment to their
 	   PostScript definition */
 	{
-	    extern char *( PostScriptColorFormulae[] );
+	    extern char *( ps_math_color_formulae[] );
 	    char *s;
 	    int i = 0;
-	    while ( *(PostScriptColorFormulae[i]) ) {
+	    while ( *(ps_math_color_formulae[2*i]) ) {
 		if (i % 3 == 0) fprintf(stderr, "\n\t    ");
-		s = strchr( PostScriptColorFormulae[ i ], '%' ) + 2;
-		fprintf(stderr, "%2i: %-15s",i,s);
+		fprintf(stderr, "%2i: %-15s",i,ps_math_color_formulae[2*i+1]);
 		i++;
 	    }
 	    fprintf(stderr, "\n");

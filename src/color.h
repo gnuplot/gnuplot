@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: color.h,v 1.5 2000/11/02 19:07:16 lhecking Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -88,10 +88,10 @@ typedef struct {
   /** Constants: **/
   int colorFormulae;
 	/*
-	(fixed) number of formulae implemented for gray index to RGB mapping in
-	pm3d.c:double pm3dGetColorValue(..) + post.trm: PostScriptColorFormulae[]
+	(Fixed) number of formulae implemented for gray index to RGB mapping in
+	color.c.
 	Usage: somewhere in `set' command to check that each of the below-given
-	formula R,G,B are lower than this value
+	formula R,G,B are lower than this value.
 	*/
 
   /** Values that can be changed by `set' and shown by `show' commands: **/
@@ -105,19 +105,19 @@ typedef struct {
   /* Now the variables that contain the discrete approximation of the
   desired palette of smooth colours as created by make_palette in pm3d.c.
   This is then passed into terminal's make_palette, who transforms
-  this [0;1] into whatever it supports
+  this [0;1] into whatever it supports.
   */
 
   int use_maxcolors;
-	/* only this number of colour positions will be used even though there
+	/* Only this number of colour positions will be used even though there
 	     are some more available in the discrete palette of the terminal.
 	   Useful for multiplot. Max. number of colours is taken if this
 	     value equals 0.
 	   Unused by: PostScript
 	*/
   int colors;
-	/* number of colours used for the discrete palette. Equals to the result
-	   from term->make_palette(NULL), or restricted by use_maxcolor
+	/* Number of colours used for the discrete palette. Equals to the result
+	   from term->make_palette(NULL), or restricted by use_maxcolor.
 	   Used by: pm, gif
 	   Unused by: PostScript
 	 */
@@ -262,9 +262,6 @@ void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUG
 */
 void draw_color_smooth_box __PROTO((void));
 
-
-/* in getcolor.c */
-double GetColorValueFromFormula __PROTO((int formula, double x));
 
 #endif /* PM3D */
 

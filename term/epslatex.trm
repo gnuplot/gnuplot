@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.5 2000/11/07 16:35:55 lhecking Exp $
+ * $Id: epslatex.trm,v 1.6 2000/11/10 12:48:52 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -69,9 +69,11 @@ TERM_PUBLIC void EPSL_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void EPSL_pointsize __PROTO((double ptsize));
 
 #ifdef PM3D
+/* Not needed --- PS terminal version reused:
 TERM_PUBLIC int EPSL_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void EPSL_previous_palette __PROTO((void));
 TERM_PUBLIC void EPSL_set_color __PROTO((double));
+*/
 TERM_PUBLIC void EPSL_filled_polygon __PROTO((int, gpiPoint *));
 #endif
 
@@ -898,148 +900,13 @@ unsigned int x1, y1, x2, y2;
 
 #ifdef PM3D
 
-/* implementation of pm3dGetColorValue() in the postscript way.
-   Notice that the description, i.e. the part after %, is important 
-   since it is used in `show pm3d' for displaying the analytical formulae.
-*/
-
-/* duplicate code removed - this is in post.trm */
-extern char *( PostScriptColorFormulae[] );
-
-#define EPSL_PostScriptColorFormulae PostScriptColorFormulae
-
-TERM_PUBLIC int
-EPSL_make_palette(palette)
-    t_sm_palette *palette;
-{
-#define R sm_palette.formulaR
-#define G sm_palette.formulaG
-#define B sm_palette.formulaB
-    if (palette == NULL)
-	/* postscript can do continous number of colours */
-	return 0;
-    /* write header for smooth colours */
-
-    fprintf(gpoutfile, "gsave %% colour palette begin\n");
-    /* print the definition of R,G,B formulae */
-
-    if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-	fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(R) ]);
-	if (abs(G) != abs(R))
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(G) ]);
-	if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(B) ]);
-    }
-    else { /* all color formulae are written into the output PostScript file */
-	int i = 0;
-	while ( *(EPSL_PostScriptColorFormulae[i]) )
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ i++ ]);
-    }
-
-    /* now print something like
-       /g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
-     */
-    fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
-	(sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) ? "true" : "false"
-	   );
-    fprintf(gpoutfile,"  /g {dup ");
-    if (R < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-    fprintf(gpoutfile,"cF%i exch dup ", abs(R));
-    if (G < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-    fprintf(gpoutfile,"cF%i exch ", abs(G));
-    if (R<0 || G<0 || B<0) fprintf(gpoutfile,"\n\t");
-    if (B < 0) fprintf(gpoutfile, "1 exch sub "); /* negate */
-    fprintf(gpoutfile,"cF%i ", abs(B));
-    fprintf(gpoutfile,"setrgbcolor} bind def\n");
-    fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill} bind def\n");
-    fprintf(gpoutfile, "  /G {currentrgbcolor 3 index stroke g} bind def\n");
-    fprintf(gpoutfile, "  /H {h setrgbcolor pop} bind def\n");
-    fprintf(gpoutfile, "  /F {rlineto fill setrgbcolor pop} bind def\n");
-    fprintf(gpoutfile, "}{\n");
-    fprintf(gpoutfile, "  /g {currentgray exch stroke setgray} bind def\n");
-    fprintf(gpoutfile, "  /h {rlineto rlineto rlineto fill setgray} bind def\n");
-    fprintf(gpoutfile, "  /G {currentgray exch stroke g} bind def\n");
-    fprintf(gpoutfile, "  /H {h setgray} bind def\n");
-    fprintf(gpoutfile, "  /F {rlineto fill setgray} bind def\n");
-    fprintf(gpoutfile, "} ifelse\n");
-    fprintf(gpoutfile, "/N {newpath moveto} def\n");
-    fprintf(gpoutfile, "/f {rlineto fill} bind def\n");
-    return 0;
-#undef R
-#undef G
-#undef B
-}
-
-
-#if 0 /* caching of color value removed; won't be so efficient for z=const 
-	 surfaces/map, but will save a lot of headache (linetype changes 
-	 color, for instance) */
-double pm3d_last_color;
-  /* last choosen colour */
-
-double pm3d_ps_color;
-  /* keep here the last set color */
-#endif
-
-TERM_PUBLIC void
-EPSL_set_color(gray)
-    double gray;
-{
-    /* map [0;1] to interval [16;255] */
-    /* Note: command G puts on stack current colour/gray values to be restored 
-       afterwards!
-     */
-#if 0
-    pm3d_ps_color = gray;
-    pm3d_last_color = gray;
-#endif
-    /* printing the gray with 4 digits and without the leading 0 ... saving space */
-    if (gray <= 0)
-	fprintf(gpoutfile, "0 G ");
-    else if (gray >= 1)
-	fprintf(gpoutfile, "1 G ");
-    else {
-	char s[15];
-	gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
-	sprintf(s,"%.4g G ",gray);
-	if (s[0] == '0' && s[1] == '.')
-	    fprintf(gpoutfile, "%s", &(s[1]));
-	else
-	    fprintf(gpoutfile, "%s", s);
-    }
-}
-
 TERM_PUBLIC void
 EPSL_filled_polygon(points, corners)
     int points;
     gpiPoint *corners;
 {
-    int i;
-    /* produce lines like:
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
-     */
-    fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
-    if (points == 4) /* shorter version */
-	fprintf(gpoutfile, " %i %i %i %i %i %i H\n",
-	    corners[3].x-corners[2].x, corners[3].y-corners[2].y,
-	    corners[2].x-corners[1].x, corners[2].y-corners[1].y,
-	    corners[1].x-corners[0].x, corners[1].y-corners[0].y
-	       );
-    else {  
-	for (i = 1; i < points-1; i++)
-	    fprintf(gpoutfile, " %i %i V",
-		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-	fprintf(gpoutfile, " %i %i F\n",
-	    corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-    }
+    PS_filled_polygon(points, corners);
     EPSL_relative_ok = FALSE;
-}
-
-TERM_PUBLIC void
-EPSL_previous_palette()
-{
-    fprintf(gpoutfile, "grestore %% colour palette end\n");
 }
 
 #endif /* PM3D */
@@ -1061,9 +928,9 @@ EPSL_justify_text, EPSL_point, EPSL_arrow, EPSL_set_font, EPSL_pointsize,
 #ifdef USE_MOUSE
 , 0, 0, 0, 0, 0 /* no mouse support for epslatex */
 #endif
-, EPSL_make_palette,
-EPSL_previous_palette, /* write grestore */
-EPSL_set_color,
+, PS_make_palette,
+PS_previous_palette,
+PS_set_color,
 EPSL_filled_polygon
 #endif
 TERM_TABLE_END(epslatex_driver)

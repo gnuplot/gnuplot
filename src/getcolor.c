@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.4 2000/11/02 19:07:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -77,7 +77,7 @@ switch (formula) {
   /*
   IMPORTANT: if any new formula is added here, then:
 	(1) its postscript counterpart must be added into term/post.trm,
-	    search for "PostScriptColorFormulae[]"
+	    search for "ps_math_color_formulae[]"
 	(2) number of colours must be incremented in color.c: variable
 	    sm_palette, first item---search for "t_sm_palette sm_palette = "
   */
@@ -89,4 +89,58 @@ if (x >= 1) return 1;
 return x;
 }
 
+
+/* Implementation of pm3dGetColorValue() in the postscript way.
+   Notice that the description, i.e. the part after %, is important
+   since it is used in `show pm3d' for displaying the analytical formulae.
+   The postscript formulae will be expanded into lines like:
+	"/cF0 {pop 0} bind def\t% 0",
+	"/cF4 {dup mul} bind def\t% x^2",
+*/
+
+char *( ps_math_color_formulae[] ) = {
+  /* /cF0  */ "pop 0",		      "0",
+  /* /cF1  */ "pop 0.5", 	      "0.5",
+  /* /cF2  */ "pop 1", 		      "1",
+  /* /cF3  */ " ",		      "x",
+  /* /cF4  */ "dup mul",              "x^2",
+  /* /cF5  */ "dup dup mul mul",      "x^3",
+  /* /cF6  */ "dup mul dup mul",      "x^4",
+  /* /cF7  */ "sqrt",	              "sqrt(x)",
+  /* /cF8  */ "sqrt sqrt",	      "sqrt(sqrt(x))",
+  /* /cF9  */ "90 mul sin",	      "sin(90x)",
+  /* /cF10 */ "90 mul cos",	      "cos(90x)",
+  /* /cF11 */ "0.5 sub abs",	      "|x-0.5|",
+  /* /cF12 */ "2 mul 1 sub dup mul",  "(2x-1)^2",
+  /* /cF13 */ "180 mul sin",	      "sin(180x)",
+  /* /cF14 */ "180 mul cos abs",      "|cos(180x)|",
+  /* /cF15 */ "360 mul sin",	      "sin(360x)",
+  /* /cF16 */ "360 mul cos",	      "cos(360x)",
+  /* /cF17 */ "360 mul sin abs",      "|sin(360x)|",
+  /* /cF18 */ "360 mul cos abs",      "|cos(360x)|",
+  /* /cF19 */ "720 mul sin abs",      "|sin(720x)|",
+  /* /cF20 */ "720 mul cos abs",      "|cos(720x)|",
+  /* /cF21 */ "3 mul",		      "3x",
+  /* /cF22 */ "3 mul 1 sub",	      "3x-1",
+  /* /cF23 */ "3 mul 2 sub",	      "3x-2",
+  /* /cF24 */ "3 mul 1 sub abs",      "|3x-1|",
+  /* /cF25 */ "3 mul 2 sub abs",      "|3x-2|",
+  /* /cF26 */ "1.5 mul .5 sub",        "(3x-1)/2",
+  /* /cF27 */ "1.5 mul 1 sub",	      "(3x-2)/2",
+  /* /cF28 */ "1.5 mul .5 sub abs",   "|(3x-1)/2|",
+  /* /cF29 */ "1.5 mul 1 sub abs",    "|(3x-2)/2|",
+  /* /cF30 */ "0.32 div 0.78125 sub", "x/0.32-0.78125",
+  /* /cF31 */ "2 mul 0.84 sub",       "2*x-0.84",
+  /* /cF32 */ "dup 0.42 le {4 mul} {dup 0.92 le {-2 mul 1.84 add} {0.08 div 11.5 sub} ifelse} ifelse", "4x;1;-2x+1.84;x/0.08-11.5",
+  /* /cF33 */ "2 mul 0.5 sub abs",    "|2*x - 0.5|",
+  /* /cF34 */ "2 mul", 		      "2*x",
+  /* /cF35 */ "2 mul 0.5 sub", 	      "2*x - 0.5",
+  /* /cF36 */ "2 mul 1 sub",	      "2*x - 1",
+  "", "" };
+
+
 #endif
+
+/* eof getcolor.c */
+
+
