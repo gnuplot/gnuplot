@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.23.2.2 1999/10/01 10:36:35 lhecking Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23.2.3 1999/10/01 18:22:14 lhecking Exp $";
 #endif
 
 /*
@@ -1330,9 +1330,10 @@ void do_fit()
 	else {
 	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
 	    autorange_z = autorange_y;
-	    if (autorange_y & 1)
+	    /* HBB 20010926: Bug fixed. Checks were the wrong way round */
+	    if (! (autorange_y & 1))
 		min_z = min_y;
-	    if (autorange_y & 2)
+	    if (! (autorange_y & 2))
 		max_z = max_y;
 	}
     }

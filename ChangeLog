@@ -1,3 +1,8 @@
+2001-09-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* fit.c (do_fit): Fix bug in copying of partly fixed yrange spec
+ 	to zrange variables.
+
 2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
 
 	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:
@@ -6,7 +11,7 @@
 
 2001-06-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/graphics.c (histeps_current_plot, histeps_compare): New
+	* graphics.c (histeps_current_plot, histeps_compare): New
  	file-scope variable and comparison function, used in applying
  	qsort() to sorting the datapoints in "histeps" mode.
 	(plot_histeps): Use qsort() instead of homegrown bubblesort
