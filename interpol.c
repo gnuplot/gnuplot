@@ -324,8 +324,8 @@ unsigned int exponent;
 
 static void eval_bezier(cp, first_point, num_points, sr, px, py, c)
 struct curve_points *cp;
-int first_point;	/* where to start in plot->points (to find x-range) */
-int num_points;		/* to determine end in plot->points */
+int first_point;		/* where to start in plot->points (to find x-range) */
+int num_points;			/* to determine end in plot->points */
 double sr;
 coordval *px;
 coordval *py;
@@ -523,7 +523,9 @@ int num_points;			/* to determine end in plot->points */
 {
     spline_coeff *sc;
     five_diag *m;
-    double *r, *x, *h;
+    int xaxis = plot->x_axis;
+    int yaxis = plot->y_axis;
+    double *r, *x, *h, *xp, *yp;
     /* HBB 980308: added 'GPHUGE' tag */
     struct coordinate GPHUGE *this_points;
     int i;
@@ -546,14 +548,34 @@ int num_points;			/* to determine end in plot->points */
     x = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
     h = (double *) gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
 
+    xp = (double *) gp_alloc((num_points) * sizeof(double), "x pos");
+    yp = (double *) gp_alloc((num_points) * sizeof(double), "y pos");
+
+    /* KB 981107: With logarithmic axis first convert back to linear scale */
+
+    if (log_array[xaxis]) {
+	for (i = 0; i <= num_points - 1; i++)
+	    xp[i] = exp(this_points[i].x * log_base_array[xaxis]);
+    } else {
+	for (i = 0; i <= num_points - 1; i++)
+	    xp[i] = this_points[i].x;
+    }
+    if (log_array[yaxis]) {
+	for (i = 0; i <= num_points - 1; i++)
+	    yp[i] = exp(this_points[i].y * log_base_array[yaxis]);
+    } else {
+	for (i = 0; i <= num_points - 1; i++)
+	    yp[i] = this_points[i].y;
+    }
+
     for (i = 0; i <= num_points - 2; i++)
-	h[i] = this_points[i + 1].x - this_points[i].x;
+	h[i] = xp[i + 1] - xp[i];
 
     /* set up the matrix and the vector */
 
     for (i = 0; i <= num_points - 3; i++) {
-	r[i] = 3 * ((this_points[i + 2].y - this_points[i + 1].y) / h[i + 1]
-		    - (this_points[i + 1].y - this_points[i].y) / h[i]);
+	r[i] = 3 * ((yp[i + 2] - yp[i + 1]) / h[i + 1]
+		    - (yp[i + 1] - yp[i]) / h[i]);
 
 	if (i < 2)
 	    m[i][0] = 0;
@@ -589,6 +611,8 @@ int num_points;			/* to determine end in plot->points */
 	free(x);
 	free(r);
 	free(m);
+	free(xp);
+	free(yp);
 	int_error("Can't calculate approximation splines", NO_CARET);
     }
     sc[0][2] = 0;
@@ -596,13 +620,13 @@ int num_points;			/* to determine end in plot->points */
 	sc[i][2] = x[i - 1];
     sc[num_points - 1][2] = 0;
 
-    sc[0][0] = this_points[0].y + 2 / this_points[0].z / h[0] * (sc[0][2] - sc[1][2]);
+    sc[0][0] = yp[0] + 2 / this_points[0].z / h[0] * (sc[0][2] - sc[1][2]);
     for (i = 1; i <= num_points - 2; i++)
-	sc[i][0] = this_points[i].y - 2 / this_points[i].z *
+	sc[i][0] = yp[i] - 2 / this_points[i].z *
 	    (sc[i - 1][2] / h[i - 1]
 	     - sc[i][2] * (1 / h[i - 1] + 1 / h[i])
 	     + sc[i + 1][2] / h[i]);
-    sc[num_points - 1][0] = this_points[num_points - 1].y
+    sc[num_points - 1][0] = yp[num_points - 1]
 	- 2 / this_points[num_points - 1].z / h[num_points - 2]
 	* (sc[num_points - 2][2] - sc[num_points - 1][2]);
 
@@ -616,6 +640,8 @@ int num_points;			/* to determine end in plot->points */
     free(x);
     free(r);
     free(m);
+    free(xp);
+    free(yp);
 
     return (sc);
 }
@@ -635,7 +661,9 @@ int first_point, num_points;
 {
     spline_coeff *sc;
     tri_diag *m;
-    double *r, *x, *h;
+    int xaxis = plot->x_axis;
+    int yaxis = plot->y_axis;
+    double *r, *x, *h, *xp, *yp;
     /* HBB 980308: added 'GPHUGE' tag */
     struct coordinate GPHUGE *this_points;
     int i;
@@ -652,14 +680,34 @@ int first_point, num_points;
     x = (double *) gp_alloc((num_points - 2) * sizeof(double), "spline solution vector");
     h = (double *) gp_alloc((num_points - 1) * sizeof(double), "spline help vector");
 
+    xp = (double *) gp_alloc((num_points) * sizeof(double), "x pos");
+    yp = (double *) gp_alloc((num_points) * sizeof(double), "y pos");
+
+    /* KB 981107: With logarithmic axis first convert back to linear scale */
+
+    if (log_array[xaxis]) {
+	for (i = 0; i <= num_points - 1; i++)
+	    xp[i] = exp(this_points[i].x * log_base_array[xaxis]);
+    } else {
+	for (i = 0; i <= num_points - 1; i++)
+	    xp[i] = this_points[i].x;
+    }
+    if (log_array[yaxis]) {
+	for (i = 0; i <= num_points - 1; i++)
+	    yp[i] = exp(this_points[i].y * log_base_array[yaxis]);
+    } else {
+	for (i = 0; i <= num_points - 1; i++)
+	    yp[i] = this_points[i].y;
+    }
+
     for (i = 0; i <= num_points - 2; i++)
-	h[i] = this_points[i + 1].x - this_points[i].x;
+	h[i] = xp[i + 1] - xp[i];
 
     /* set up the matrix and the vector */
 
     for (i = 0; i <= num_points - 3; i++) {
-	r[i] = 3 * ((this_points[i + 2].y - this_points[i + 1].y) / h[i + 1]
-		    - (this_points[i + 1].y - this_points[i].y) / h[i]);
+	r[i] = 3 * ((yp[i + 2] - yp[i + 1]) / h[i + 1]
+		    - (yp[i + 1] - yp[i]) / h[i]);
 
 	if (i < 1)
 	    m[i][0] = 0;
@@ -680,6 +728,8 @@ int first_point, num_points;
 	free(x);
 	free(r);
 	free(m);
+	free(xp);
+	free(yp);
 	int_error("Can't calculate cubic splines", NO_CARET);
     }
     sc[0][2] = 0;
@@ -688,7 +738,7 @@ int first_point, num_points;
     sc[num_points - 1][2] = 0;
 
     for (i = 0; i <= num_points - 1; i++)
-	sc[i][0] = this_points[i].y;
+	sc[i][0] = yp[i];
 
     for (i = 0; i <= num_points - 2; i++) {
 	sc[i][1] = (sc[i + 1][0] - sc[i][0]) / h[i]
@@ -700,6 +750,8 @@ int first_point, num_points;
     free(x);
     free(r);
     free(m);
+    free(xp);
+    free(yp);
 
     return (sc);
 }
@@ -755,10 +807,23 @@ struct coordinate *dest;	/* where to put the interpolated data */
 	while ((x >= this_points[l + 1].x) && (l < num_points - 2))
 	    l++;
 
-	temp = x - this_points[l].x;
+	/* KB 981107: With logarithmic x axis the values were converted back to linear  */
+	/* scale before calculating the coefficients. Use exponential for log x values. */
 
-	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
-
+	if (log_array[xaxis]) {
+	    temp = exp(x * log_base_array[xaxis]) - exp(this_points[l].x * log_base_array[xaxis]);
+	    y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
+	} else {
+	    temp = x - this_points[l].x;
+	    y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
+	}
+	/* With logarithmic y axis, we need to convert from linear to log scale now. */
+	if (log_array[yaxis]) {
+	    if (y > 0.)
+		y = log(y) / log_base_array[yaxis];
+	    else
+		y = symin - (symax - symin);
+	}
 	dest[i].type = INRANGE;
 	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, auto_array[xaxis], NOOP, continue);
 	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, auto_array[yaxis], NOOP, NOOP);
