@@ -1,22 +1,35 @@
-Changes in release 3.7.1:
+Changes in release 4.0:
 [3.7.0.10]
 * removed DJGPP version 1 support
 * improved version of stdin wrapper for Win32
+* ongoing work: rewrite of the input parser
+* gnuplot now passes the correct return value back to
+  the environment
 * FIXED buffering bug in gnuplot_x11
-* NEW `system' command
+* NEW 'system', 'unset' command
 * FIXED crash in 16bit Windows
+* UPDATED FAQ
+* FIXED some inconsistencies in error messages and the manual
+* INCOMPATIBLE CHANGE: the 'set data style', 'set function style'
+  and 'set linestyle' commands have been removed. They have been
+  replaced with 'set style data|function|line'. The 'set nolinestyle'
+  command, however, is still available for the time being.
+* INCOMPATIBLE CHANGE: all 'set noVariable' commands have been
+  replaced with the new 'unset Variable' command.
+* NEW the gpltconv program has been included to translate old
+  gnuplot command files to the new syntax.
 
 [3.7.0.9]
 * moved some declarations to new header files
-* FIXED bug in plot positioning with multiplot
 * more static arrays removed or replaced with malloc'd storage
+* duplicate functions removed
+* driver for OpenStep/MacOS X server now complete
+* FIXED bug in plot positioning with multiplot
 * FIXED bug in J. Pepin's layers patch
 * FIXED bug in M. Gardner's help formatting patch
-* duplicate functions removed
 * FIXED definition of ANSI_C on autoconf platforms
 * FIXED argument passing to gnuplot_x11 on VMS
 * NEW `save' command now accepts "-" as filename, "saving" to stdout
-* driver for OpenStep/MacOS X server now complete
 * INCOMPATIBLE CHANGE: "%y" date specifiers are now interpreted according
   the recommendations of The Open Group. When a century is not otherwise
   specified, values in the range 69-99 refer to the twentieth century and

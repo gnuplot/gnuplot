@@ -1,3 +1,26 @@
+1999-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* demo/*.dem, tutorial/*.plt: Updated to new command syntax.
+
+	* src/Makefile.am, src/Makefile.maint, src/makefile.all: Add new
+	files gpltconv.c and unset.c.
+
+	* src/command.c: Add new 'unset' command.
+
+	* src/gpltconv.c: New program to convert old script files to
+	new command syntax.
+
+	* src/set.c: Remove all set_no* related cases and functions.
+
+	* src/setshow.h: Updated to refelct changes in set/unset commands.
+
+	* src/show.c: Remove show_data() and show_func(). Fixes.
+
+	* src/tables.c, src/tables.h: Add unset command, remove 'set novar'
+	related stuff.
+
+	* src/unset.c: New file to implement 'unset' command.
+
 1999-08-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Updated to latest version from Juergen.
@@ -149,8 +172,8 @@
 	references to global variables, now in plot.h.
 
 	* src/show.c: Add table for `show' commands. Remove simple one-line
-	functions and reimplement as #define's. Merge show_one() and show_two()
-	back into show_command(). Add function for table-lookup.
+	functions and reimplement as #define's. Merge show_one() and
+	show_two() back into show_command(). Add function for table-lookup.
 
 	* src/util.c(m_capture,m_quote_capture): Don't free() string pointer,
 	use gp_realloc() instead of gp_alloc().
