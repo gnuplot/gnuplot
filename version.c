@@ -1615,7 +1615,7 @@ static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $"
 #include "plot.h"
 
 char version[] = "3.5 (pre 3.6)";
-char patchlevel[] = "beta 347pl5";
+char patchlevel[] = "beta 347pl6";
 char date[] = "Mon Jun 22 13:22:33 BST 1998"; 
 char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
