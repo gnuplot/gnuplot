@@ -1,3 +1,13 @@
+2001-08-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (set_label): Don't reduce pointstyle number modulo
+ 	POINT_TYPES --- the terminal drivers know how to deal with that,
+ 	already, and POINT_TYPES is incorrect for many terminals.  Removed
+ 	long-commented-out checks, while at it, and fixed indentation.
+
+	* doc/gnuplot.doc: Lots of typos fixed.  Reported by Shigeharu
+ 	TAKENO <shige@iee.niit.ac.jp>.
+	
 2001-08-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	A new 'smooth' method, implemented by Todd Lewis
