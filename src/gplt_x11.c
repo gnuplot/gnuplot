@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.78 2003/12/17 00:56:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.79 2003/12/22 05:13:18 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -721,7 +721,7 @@ static void
 mainloop()
 {
     int nf, cn = ConnectionNumber(dpy), in;
-    fd_set_size_t nfds;
+    SELECT_TYPE_ARG1 nfds;
     struct timeval timeout, *timer = (struct timeval *) 0;
     fd_set tset;
 
@@ -781,7 +781,7 @@ mainloop()
 	}
 #endif
 
-	nf = select(nfds, SELECT_FD_SET_CAST & tset, 0, 0, timer);
+	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)
@@ -842,7 +842,7 @@ char X11_ipcpath[32];
 static void
 mainloop()
 {
-    fd_set_size_t nf, nfds, cn = ConnectionNumber(dpy);
+    SELECT_TYPE_ARG1 nf, nfds, cn = ConnectionNumber(dpy);
     struct timeval timeout, *timer;
     fd_set tset;
     unsigned long all = (unsigned long) (-1L);
@@ -875,7 +875,7 @@ mainloop()
 
 	nfds = (cn > in) ? cn + 1 : in + 1;
 
-	nf = select(nfds, SELECT_FD_SET_CAST & tset, 0, 0, timer);
+	nf = select(nfds, SELECT_TYPE_ARG234 &tset, 0, 0, timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)

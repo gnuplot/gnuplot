@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.136 2003/11/06 23:43:05 sfeam Exp $
+dnl $Id: configure.in,v 1.137 2004/01/01 21:52:37 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -171,7 +171,7 @@ if test "$ac_cv_func_pclose" = yes -a "$ac_cv_func_popen" = yes ; then
 fi
 
 dnl Argument types of select()
-AC_FUNC_SELECT
+AC_FUNC_SELECT_ARGTYPES
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)

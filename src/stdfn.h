@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.23 2002/10/08 17:53:02 lhecking Exp $
+ * $Id: stdfn.h,v 1.24 2003/01/27 20:39:31 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -309,15 +309,6 @@ int gp_stricmp __PROTO((const char *, const char *));
 int gp_strnicmp __PROTO((const char *, const char *, size_t));
 #  define strncasecmp gp_strnicmp
 # endif
-#endif
-
-/* Argument types for select */
-/* These may need some work ... */
-#ifndef fd_set_size_t
-# define fd_set_size_t size_t
-#endif
-#ifndef SELECT_FD_SET_CAST
-# define SELECT_FD_SET_CAST
 #endif
 
 #ifndef GP_GETCWD

@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.90 2003/12/17 00:56:49 sfeam Exp $
+ * $Id: x11.trm,v 1.91 2003/12/21 20:20:13 mikulik Exp $
  *
  */
 
@@ -587,7 +587,7 @@ AGAIN:
 	    FD_ZERO(&fds);
 	    FD_SET(fd, &fds);
 	    FD_SET(ipc_back_fd, &fds);
-	    select(ipc_back_fd + 1, SELECT_FD_SET_CAST & fds, 0, 0, (struct timeval *) NULL);
+	    select(ipc_back_fd + 1, SELECT_TYPE_ARG234 &fds, 0, 0, (struct timeval *) NULL);
 	    if (FD_ISSET(ipc_back_fd, &fds)) {
 		n = read(ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
 		if (n == 0) {
@@ -604,10 +604,11 @@ AGAIN:
 		    l = 0;
 		    do_event(&ge);
 		    if (ge.type == GE_fontprops) {
-		    	if (repeat_count > 0)
+		    	if (repeat_count > 0) {
 		    	    FPRINTF((stderr,
 			        "X11_waitforinput: caught GE_fontprops after %d tries\n",
 				repeat_count));
+			}
 			return(GE_fontprops);
 		    }
 		}

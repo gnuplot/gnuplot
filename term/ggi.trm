@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.14 2002/06/10 18:53:00 mikulik Exp $
+ * $Id: ggi.trm,v 1.15 2002/07/10 19:46:16 mikulik Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -1284,7 +1284,7 @@ GGI_waitforinput()
 	    }
 
 	    n = ggiEventSelect(GGIvisual, &mask, fd + 1,
-		SELECT_FD_SET_CAST &fds, 0, 0, (struct timeval*)0);
+		(SELECT_TYPE_ARG234) &fds, 0, 0, (struct timeval*)0);
 
 	    if (mask) {
 		ggi_event event;
