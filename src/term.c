@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.55 2003/04/04 21:19:03 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.56 2003/04/14 18:11:54 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1586,15 +1586,22 @@ test_term()
     (*t->vector) (xmax_t - 1, ymax_t - 1);
     (*t->vector) (0, ymax_t - 1);
     (*t->vector) (0, 0);
+    (*t->linetype)(0);
     (void) (*t->justify_text) (LEFT);
-    (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Terminal Test");
+    (*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 1.5, "Terminal Test");
+#ifdef USE_MOUSE
+    if (t->set_ruler) {
+	(*t->put_text) (t->h_char * 5, ymax_t - t->v_char * 3, "Mouse and hotkeys are supported, hit: h r m 6");
+    }
+#endif
+    (*t->linetype)(LT_BLACK);
     (*t->linetype) (LT_AXIS);
     (*t->move) (xmax_t / 2, 0);
     (*t->vector) (xmax_t / 2, ymax_t - 1);
     (*t->move) (0, ymax_t / 2);
     (*t->vector) (xmax_t - 1, ymax_t / 2);
     /* test width and height of characters */
-    (*t->linetype) (LT_BLACK);
+    (*t->linetype) (3);
     (*t->move) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->vector) (xmax_t / 2 + t->h_char * 10, ymax_t / 2 - t->v_char / 2);
@@ -1602,6 +1609,9 @@ test_term()
     (*t->vector) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char / 2);
     (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2,
 		    "12345678901234567890");
+    (*t->put_text) (xmax_t / 2 - t->h_char * 10, ymax_t / 2 + t->v_char * 1.4,
+		    "test of character width:");
+    (*t->linetype) (LT_BLACK);
     /* test justification */
     (void) (*t->justify_text) (LEFT);
     (*t->put_text) (xmax_t / 2, ymax_t / 2 + t->v_char * 6, "left justified");
@@ -1620,6 +1630,7 @@ test_term()
 	(*t->put_text) (xmax_t / 2 - strlen(str) * t->h_char,
 			ymax_t / 2 + t->v_char * 4, str);
     /* test text angle */
+    (*t->linetype)(1);
     str = "rotated ce+ntred text";
     if ((*t->text_angle) (TEXT_VERTICAL)) {
 	if ((*t->justify_text) (CENTRE))
@@ -1628,14 +1639,31 @@ test_term()
 	else
 	    (*t->put_text) (t->v_char,
 			    ymax_t / 2 - strlen(str) * t->h_char / 2, str);
+	if ((*t->justify_text) (LEFT));
+	str = " rotated by +45 deg";
+	(*t->text_angle)(45);
+	(*t->put_text)(t->v_char * 3, ymax_t / 2, str);
+	if ((*t->justify_text) (LEFT));
+	str = " rotated by -45 deg";
+	(*t->text_angle)(-45);
+	(*t->put_text)(t->v_char * 2, ymax_t / 2, str);
+#ifdef HAVE_GD_PNG
+	if (!strcmp(t->name, "png") || !strcmp(t->name, "gif") || !strcmp(t->name, "jpeg")) {
+	    (*t->text_angle)(0);
+	    str = "this terminal supports text rotation only for truetype fonts";
+	    (*t->put_text)(t->v_char * 2 + t->h_char * 4, ymax_t / 2 - t->v_char * 2, str);
+	}
+#endif
     } else {
 	(void) (*t->justify_text) (LEFT);
-	(*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "Can't rotate text");
+	(*t->put_text) (t->h_char * 2, ymax_t / 2 - t->v_char * 2, "can't rotate text");
     }
     (void) (*t->justify_text) (LEFT);
     (void) (*t->text_angle) (0);
+    (*t->linetype)(LT_BLACK);
 
     /* test tic size */
+    (*t->linetype)(4);
     (*t->move) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)), (unsigned int) ymax_t - 1);
     (*t->vector) ((unsigned int) (xmax_t / 2 + t->h_tic * (1 + ticscale)),
 		  (unsigned int) (ymax_t - ticscale * t->v_tic));
@@ -1643,15 +1671,17 @@ test_term()
     (*t->vector) ((unsigned int) (xmax_t / 2 + ticscale * t->h_tic),
                   (unsigned int) (ymax_t - t->v_tic * (1 + ticscale)));
     /* HBB 19990530: changed this to use right-justification, if possible... */
+    str = "show ticscale";
     if ((*t->justify_text) (RIGHT))
 	(*t->put_text) ((unsigned int) (xmax_t / 2 - 1* t->h_char),
 			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-		    "test tics");
+		    str);
     else
-	(*t->put_text) ((unsigned int) (xmax_t / 2 - 10 * t->h_char),
+	(*t->put_text) ((unsigned int) (xmax_t / 2 - (strlen(str)+1)	 * t->h_char),
 			(unsigned int) (ymax_t - (t->v_tic * 2 + t->v_char / 2)),
-			"test tics");
+			str);
     (void) (*t->justify_text) (LEFT);
+    (*t->linetype)(LT_BLACK);
 
     /* test line and point types */
     x = xmax_t - t->h_char * 6 - p_width;
@@ -1730,6 +1760,32 @@ test_term()
     }
 #endif
 
+#ifdef PM3D
+    {
+    int cen_x = (int)(0.75 * xmax_t);
+    int cen_y = (int)(0.83 * ymax_t);
+    int radius = t->v_tic * 8;
+    (*t->linetype)(2);
+    /* test pm3d -- filled_polygon(), but not set_color() */
+    if (t->filled_polygon) {
+	const int n = 6; /* number of corners of the polygon */
+	int i;
+	gpiPoint corners[n+1];
+	for (i = 0; i < n; i++) {
+	    corners[i].x = cen_x + radius * cos(2*M_PI*i/n);
+	    corners[i].y = cen_y + radius * sin(2*M_PI*i/n);
+	}
+	corners[n].x = corners[0].x;
+	corners[n].y = corners[0].y;
+	term->filled_polygon(n+1, corners);
+	str = "(color) filled polygon:";
+    } else
+	str = "filled polygons not supported";
+    i = ((*t->justify_text) (CENTRE)) ? 0 : t->h_char * strlen(str) / 2;
+    (*t->put_text) (cen_x + i, cen_y + radius + t->v_char * 0.5, str);
+    (*t->linetype)(LT_BLACK);
+    }
+#endif
     term_end_plot();
 }
 

@@ -1,5 +1,11 @@
 2003-05-06  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/term.c (test_term): Improvements in the 'test' command: Some of
+	the text labels are in colors; added test for text at +-45 deg; added
+	test for mouse and for pm3d.
+
+2003-05-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/mouse.c (recalc_ruler_pos): Take care of ruler in 'set view map'
 	splot.
 
