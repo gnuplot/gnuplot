@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.68 2003/06/25 18:01:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.69 2003/07/02 07:45:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -371,18 +371,17 @@ void
 do_string(s)
 char *s;
 {
-    char *orig_input_line;
-    static char buf[256];
-
+    char *orig_input_line = gp_alloc(strlen(input_line)+1, "do_string");
+    strcpy(orig_input_line, input_line);
+    while (input_line_len < strlen(s)+1)
+	extend_input_line();
 #ifdef USE_MOUSE
     if (display_ipc_commands())
 	fprintf(stderr, "%s\n", s);
 #endif
-    orig_input_line = input_line;
-    input_line = buf;
-    strcpy(buf,s);
     do_line();
-    input_line = orig_input_line;
+    strcpy(input_line,orig_input_line);
+    free(orig_input_line);
 }
 
 
@@ -406,20 +405,18 @@ void
 do_string_replot(s)
 char *s;
 {
-    char *orig_input_line;
-    char *buf;
-
-    orig_input_line = input_line;
-    buf = gp_alloc(strlen(s)+9, "do_string_replot"); /*9=strlen("; replot")+1*/
-    strcpy(buf, s);
-    input_line = buf;
-    if (!replot_disabled)
-	strcat(buf, "; replot");
+    char *orig_input_line = gp_alloc(strlen(input_line)+1, "do_string_replot");
+    strcpy(orig_input_line, input_line);
+    while (input_line_len < strlen(s)+1)
+	extend_input_line();
+    strcpy(input_line,s);
     if (display_ipc_commands())
-	fprintf(stderr, "%s\n", buf);
+	fprintf(stderr, "%s\n", s);
     do_line();
-    input_line = orig_input_line;
-    free(buf);
+    if (!replot_disabled)
+	replotrequest();
+    strcpy(input_line,orig_input_line);
+    free(orig_input_line);
 }
 
 void
