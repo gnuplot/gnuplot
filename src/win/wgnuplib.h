@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.12 2001/04/12 15:02:30 broeker Exp $
+ * $Id: wgnuplib.h,v 1.13 2001/09/18 17:46:33 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -94,7 +94,7 @@ BOOL WDPROC CheckWGNUPLOTVersion(LPSTR str);
 # endif /* __TURBOC__ */
 #endif
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) && !defined(CYGWIN)
 /* MinGW32 doesn't define some of the more traditional
  * things gnuplot expects in every Windows C compiler, it seems: */
 #define _fstrstr(s1,s2) (strstr(s1,s2))
