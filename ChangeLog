@@ -1,5 +1,14 @@
 1999-10-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* help.c: Change subtopic help entry formatting to skip next column
+	if very long entries are encountered.
+
+1999-10-11  Thomas Sefzick  <t.sefzick@fz-juelich.de>
+
+	* term/tkcanvas.trm: Bug fix, some comments added.
+
+1999-10-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
 	* help.c: Change help index formatting to start in column 4
  	(instead 6) and use column length of 18 (instead 15).
 

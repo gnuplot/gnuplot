@@ -5,16 +5,18 @@ Changes in release 3.7.1:
 * New drivers for Be, metapost, MacOS X Server
 * Added support for transparent png's
 * Share web216-subset palette between gif and png
-* Improved configure options for GNU readline
+* Improved configuration of GNU readline support
 * Security: the Linux SVGAlib driver is now disabled by default
 * Support for GNU plotutils 2.2
+* Improved tkcanvas driver (extend interactive capabilities, integrated
+  perltk driver)
 * Bug fix for negative aspect ratio
 * Bug fixes in the cgm, eepic, png, and pslatex drivers
 * Bug fix in the data fitting code (store value of last parameter)
 * Bug fixes for HP-UX, NEXT, and Windows
 * Bug fixes for save and set lmargin commands
 * Bug fix for 'set view <z_scale>' (compressed z-axis) problem
-* Bug fix for surface plots and bnegative ticslevel
+* Bug fix for surface plots and negative ticslevel
 * Bug fix for multiline labels
 * Bug fix for multiplot and eps output
 * Improved makefile for Amiga SAS/C
