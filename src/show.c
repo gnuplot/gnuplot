@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.16 1999/07/18 17:38:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.17 1999/07/20 15:32:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -120,7 +120,7 @@ static struct setshow_entry {
     { "y2da$ta", S_Y2DATA },
     { "xti$cs", S_XTICS },
     { "yti$cs", S_YTICS },
-    { "zti$cs", S_ZTICS }
+    { "zti$cs", S_ZTICS },
     { "xdti$cs", S_XDTICS },
     { "ydti$cs", S_YDTICS },
     { "zdti$cs", S_ZDTICS },
@@ -146,7 +146,7 @@ static struct setshow_entry {
     { "xzeroa$xis", S_XZEROAXIS },
     { "yzeroa$xis", S_YZEROAXIS },
     { "zeroa$xis", S_ZEROAXIS },
-    { "z$ero", S_ZERO },
+    { "z$ero", S_ZERO }
 };
 
 #define NSHOWS (sizeof(show_tbl) / sizeof(show_tbl[0]))
