@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.150 2005/03/06 05:07:26 sfeam Exp $
+ * $Id: post.trm,v 1.151 2005/03/09 18:26:45 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -212,7 +212,7 @@ static const ps_params_t pslatex_params_default = PSLATEX_PARAMS_DEFAULT;
 static ps_params_t pstex_params = PSTEX_PARAMS_DEFAULT;
 static const ps_params_t pstex_params_default = PSTEX_PARAMS_DEFAULT;
 
-static ps_params_t *ps_params = NULL;
+static ps_params_t *ps_params = &post_params;
 
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
 

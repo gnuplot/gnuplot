@@ -1,3 +1,10 @@
+2005-03-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: Initialize the data structure pointer ps_params to
+	point to the normal postscript mode values; without this, setting
+	environmental variable GNUTERM to any of the PostScript terminal modes
+	will cause a segfault on entry.
+
 2005-03-23  Aapo Lankinen <aapo.lankinen@gmail.com>
 
 	* src/contour.c (contour): Bugfix: logscale on CB was being applied
