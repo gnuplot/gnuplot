@@ -1,3 +1,16 @@
+2001-06-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/misc.c (lp_parse): Changed two arguments' type from int to
+ 	the more proper TBOOLEAN. Restructured handling of point symbol
+ 	modifiers to give more helpful error message than just 'undefined
+ 	variable: pointtype'.
+
+	* src/misc.h (lp_parse): Updated prototype.
+
+	* src/plot2d.c (eval_plots): Bugfix from removing magic
+ 	numbers. Was testing whether the plot contained lines, not points,
+ 	as it called lp_parse().
+	
 2001-06-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.mgw: remove backslahes from "\/".

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.26 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.27 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -468,20 +468,12 @@ int tag, pointflag;
 }
 
 
-#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
-# define LP_DUMP(lp) \
- fprintf(stderr, \
-  "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
-  __FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type, lp->p_size)
-#else
-# define LP_DUMP(lp)
-#endif
-
 /* was a macro in plot.h */
 void
 lp_parse(lp, allow_ls, allow_point, def_line, def_point)
-struct lp_style_type *lp;
-int allow_ls, allow_point, def_line, def_point;
+    struct lp_style_type *lp;
+    TBOOLEAN allow_ls, allow_point;
+    int def_line, def_point;
 {
     struct value t;
 
@@ -504,24 +496,48 @@ int allow_ls, allow_point, def_line, def_point;
 #ifdef PM3D
 	    }
 #endif
-	} else lp->l_type = def_line;
+	} else
+	    lp->l_type = def_line;
+
 	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) {
 	    c_token++;
 	    lp->l_width = real(const_express(&t));
-	} else lp->l_width = 1.0;
-	if ( (lp->pointflag = allow_point) != 0) {
-	    if (almost_equals(c_token, "pointt$ype") ||
-		equals(c_token, "pt" )) {
+	} else
+	    lp->l_width = 1.0;
+
+	/* HBB 20010622: restructured to allow for more descriptive
+	 * error message, here. Would otherwise only print out
+	 * 'undefined variable: pointtype' --- rather unhelpful. */
+	lp->pointflag = allow_point;
+	lp->p_type = def_point;
+	lp->p_size = pointsize; /* as in "set pointsize" */
+
+	if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt" )) {
+	    if (allow_point) {
 		c_token++;
-		lp->p_type = (int) real(const_express(&t))-1;
-	    } else lp->p_type = def_point;
-	    if (almost_equals(c_token, "points$ize") ||
-		equals(c_token, "ps" )) {
+		lp->p_type = (int) real(const_express(&t)) - 1;
+	    } else {
+		int_warn(c_token, "No pointtype specifier allowed, here");
+	    }
+	}
+
+	if (almost_equals(c_token, "points$ize") || equals(c_token, "ps" )) {
+	    if (allow_point) {
 		c_token++;
 		lp->p_size = real(const_express(&t));
-	    } else lp->p_size = pointsize; /* as in "set pointsize" */
-	} else lp->p_size = pointsize; /* give it a value */
-	LP_DUMP(lp);
+	    } else {
+		int_warn(c_token, "No pointsize specifier allowed, here");
+	    }
+	}
+
+#if defined(__FILE__) && defined(__LINE__) && defined(DEBUG_LP)
+	fprintf(stderr,
+		"lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n",     
+		__FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type, lp->p_size);
+#endif
     }
 }
+
+
+
 

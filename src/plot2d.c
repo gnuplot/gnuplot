@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.38 2001/03/05 11:52:08 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.39 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1045,7 +1045,7 @@ eval_plots()
 	     * - keywords for lt and pt are optional
 	     */
 	    lp_parse(&(this_plot->lp_properties), 1,
-		     this_plot->plot_style & PLOT_STYLE_HAS_LINE,
+		     this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
