@@ -1,3 +1,9 @@
+2004-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.texi: Regenerated.
+
+	* src/show.c (show_version): Updated the splash text another time.
+
 2004-04-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS: Updated.
@@ -7,11 +13,11 @@
 
 2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/plot.c (get_user_env): Check $USERPROFILE on Windows,
-	before giving up on finding a $HOME.
+	* src/plot.c (get_user_env): Check $USERPROFILE on Windows, before
+	giving up on finding a $HOME.
 
-	* docs/gnuplot.doc (startup, environment): Document the
-	behaviour regarding USERPROFILE.
+	* docs/gnuplot.doc (startup, environment): Document the behaviour
+	regarding USERPROFILE.
 
 	* docs/gnuplot.texi: Recreated.
 
