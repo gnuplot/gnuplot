@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.12 2000/10/31 19:59:31 joze Exp $
+ * $Id: syscfg.h,v 1.13 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -523,6 +523,16 @@ typedef double coordval;
 typedef RETSIGTYPE (*sigfunc)__PROTO((int));
 #else
 typedef RETSIGTYPE (*sigfunc)__PROTO((void));
+#endif
+
+#ifdef HAVE_SIGSETJMP
+# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
+# define LONGJMP(env, retval) siglongjmp(env, retval)
+# define JMP_BUF sigjmp_buf
+#else
+# define SETJMP(env, save_signals) setjmp(env)
+# define LONGJMP(env, retval) longjmp(env, retval)
+# define JMP_BUF jmp_buf
 #endif
 
 #ifndef SORTFUNC_ARGS

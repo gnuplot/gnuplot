@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.5 2000/11/02 15:14:21 broeker Exp $
+ * $Id: emf.trm,v 1.6 2000/11/02 19:13:50 lhecking Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -519,7 +519,7 @@ EMF_set_font(const char *font)
 TERM_PUBLIC void 
 EMF_text()
 {
-    fpos_t pos;
+    long pos;
     EMF_flush_polyline();
 
     /* writing end of metafile */
@@ -532,9 +532,9 @@ EMF_text()
     EMF_EOF();
 
     /* updating header */
-    fgetpos(gpoutfile, &pos);
+    pos = ftell(gpoutfile);
     fseek(gpoutfile, 48, SEEK_SET);
-    EMF_write_long((long) pos);
+    EMF_write_long(pos);
     EMF_write_long(emf_record_count);
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.12 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.13 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -34,21 +34,7 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.12 2000/10/31 19:59:31 joz
  * to the extent permitted by applicable law.
 ]*/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <signal.h>
-#include <setjmp.h>
-
-#ifdef HAVE_SIGSETJMP
-# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
-# define LONGJMP(env, retval) siglongjmp(env, retval)
-#else
-# define SETJMP(env, save_signals) setjmp(env)
-# define LONGJMP(env, retval) longjmp(env, retval)
-#endif
-
+#include "syscfg.h"
 #include "parse.h"
 
 #include "alloc.h"
@@ -57,6 +43,9 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.12 2000/10/31 19:59:31 joz
 #include "help.h"
 #include "internal.h"
 #include "util.h"
+
+#include <signal.h>
+#include <setjmp.h>
 
 /* current dummy vars */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
@@ -92,9 +81,9 @@ static void unary __PROTO((void));
 static struct at_type *at = NULL;
 static int at_size = 0;
 #if defined(_Windows) && !defined(WIN32)
-static jmp_buf far fpe_env;
+static JMP_BUF far fpe_env;
 #else
-static jmp_buf fpe_env;
+static JMP_BUF fpe_env;
 #endif
 
 #define dummy (struct value *) 0

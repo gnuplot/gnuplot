@@ -1,3 +1,19 @@
+2000-11-03  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+
+	* src/syscfg.h: repeated block of code moved to here.  JMP_BUF:
+ 	new #define. Will be sigjmp_buf, if HAVE_SIGSETJMP
+
+	* src/parse.c: #include syscfg.h instead of config.h
+	(fpe_env): make it type JMP_BUF
+
+	* src/plot.c: #include syscfg.h, not config.h
+	(command_line_env): make it type JMP_BUF
+	(RexxInterface): make local variable keep_env type JMP_BUF
+	
+2000-11-03  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
+
+	* term/emf.trm (EMF_text): replace fgetpos() call by ftell()
+
 2000-11-03  Johannes Zellner  <johannes@zellner.org>
 
 	* src/graph3d.c: made `pm3d solid' working again.
@@ -19,7 +35,7 @@
 	* term/post.trm: Add missing backslashes in LaTeX part of terminal
 	documentation.
 
-2000-02-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+2000-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/color.c (make_palette, filled_polygon)
 	(filled_polygon_3dcoords, filled_polygon_3dcoords_zfixed):
@@ -29,9 +45,7 @@
 	* src/mouse.c (do_zoom): dito
 	* src/pm3d.c (pm3d_rearrange_part): dito.
 	
-	* src/color.h: __PROTO()'ize all the prototypes.
-
-	* src/color.c: include util3d.h for map3d_xyz()
+	* src/color.h: __PROTO()'ize all the declarations.
 
 	* src/color.c (filled_quadrangle): move #ifdef
  	EXTENDED_COLOR_SPECS to outside the function definition.
@@ -40,6 +54,8 @@
 	* src/graph3d.c: remove plot3d_dots prototype
 
 	* src/hidden3d.h: remove map3d_xyz prototype
+
+	* src/color.c: include util3d.h for map3d_xyz()
 
 	* src/util3d.c: include pm3d.h for set_color()
 

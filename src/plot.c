@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.37 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.38 2000/11/01 20:37:48 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -34,21 +34,7 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.37 2000/11/01 18:57:33 broe
  * to the extent permitted by applicable law.
 ]*/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
-#include <signal.h>
-#include <setjmp.h>
-
-#ifdef HAVE_SIGSETJMP
-# define SETJMP(env, save_signals) sigsetjmp(env, save_signals)
-# define LONGJMP(env, retval) siglongjmp(env, retval)
-#else
-# define SETJMP(env, save_signals) setjmp(env)
-# define LONGJMP(env, retval) longjmp(env, retval)
-#endif
-
+#include "syscfg.h"
 #include "plot.h"
 
 #include "alloc.h"
@@ -63,6 +49,10 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.37 2000/11/01 18:57:33 broe
 #include "util.h"
 #include "variable.h"
 #include "version.h"
+
+#include <signal.h>
+#include <setjmp.h>
+
 
 #ifdef USE_MOUSE
 #   ifndef OS2
@@ -159,10 +149,12 @@ char HelpFile[MAXPATH];
 #endif /*   - DJL */
 
 /* a longjmp buffer to get back to the command line */
-#ifdef _Windows
-static jmp_buf far command_line_env;
+/* FIXME HBB 20001103: should probably just use GPFAR, rather than
+ * check for _Windows */
+#ifdef _Windows 
+static JMP_BUF far command_line_env;
 #else
-static jmp_buf command_line_env;
+static JMP_BUF command_line_env;
 #endif
 
 static void load_rcfile __PROTO((void));
@@ -874,17 +866,15 @@ ExecuteMacro(char *argv, int namelength)
    return rc;
 }
 
+/* Rexx command line interface */
 ULONG
 RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
-/*
-   ** Rexx command line interface
- */
 {
     int rc;
-    static jmp_buf keepenv;
+    static JMP_BUF keepenv;
     int cmdlen;
 
-    memcpy(keepenv, command_line_env, sizeof(jmp_buf));
+    memcpy(keepenv, command_line_env, sizeof(JMP_BUF));
     if (!SETJMP(command_line_env, 1)) {
 	/* Set variable input_line.
 	   Watch out for line length of NOT_ZERO_TERMINATED strings ! */
@@ -906,7 +896,7 @@ RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 	*pusErr = RXSUBCOM_ERROR;
 	RexxSetHalt(getpid(), 1);
     }
-    memcpy(command_line_env, keepenv, sizeof(jmp_buf));
+    memcpy(command_line_env, keepenv, sizeof(JMP_BUF));
     return 0;
 }
 #endif
