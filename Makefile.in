@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.14 1998/08/18 16:31:59 lhecking Exp $
+# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -157,7 +157,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.14 1998/08/18 16:31:59 lhecking Exp $
+# $Id: Makefile.in,v 1.50 1998/06/18 14:55:00 ddenholm Exp $
 #
 ########################################################
 #
