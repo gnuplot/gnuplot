@@ -1,3 +1,7 @@
+2001-09-06 Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/internal.c: matherr(exception) unsupported by mingw compiler.
+
 2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* .cvsignore docs/.cvsignore: Add entries
