@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.42 2002/10/09 14:13:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.43 2002/10/11 16:26:49 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -443,7 +443,7 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 		if ((S_ISDIR(buf.st_mode)) &&
 		    (strcmp(direntry->d_name, ".") != 0) &&
 		    (strcmp(direntry->d_name, "..") != 0)) {
-		    fullname = recursivefullname(fulldir, filename);
+		    fullname = recursivefullname(fulldir, filename, TRUE);
 		    if (fullname != NULL)
 			break;
 		}
@@ -471,7 +471,7 @@ recursivefullname(const char *path, const char *filename, TBOOLEAN recursive)
 		    strcpy(fulldir, path);
 		    PATH_CONCAT(fulldir, finddata.cFileName);
 
-		    fullname = recursivefullname(fulldir, filename);
+		    fullname = recursivefullname(fulldir, filename, TRUE);
 		    free(fulldir);
 		    if (fullname != NULL)
 			break;
