@@ -1,5 +1,5 @@
 /*
- * $Id: rgip.trm,v 1.10 1999/06/19 20:30:56 lhecking Exp $
+ * $Id: rgip.trm,v 1.11 1999/06/22 11:54:23 lhecking Exp $
  */
 
 /* GNUPLOT - rgip.trm Uniplex graphics metafile */
@@ -437,8 +437,8 @@ int *lcnt;			/* lines */
 
 TERM_PUBLIC void
 RGIP_put_text(x, y, str)
-unsigned int x, y;		/* reference point of string */
-const char *str;		/* the text */
+    unsigned int x, y;		/* reference point of string */
+    const char *str;		/* the text */
 {
     register struct termentry *t = term;
     unsigned char *cvstr, *p;
@@ -465,7 +465,7 @@ const char *str;		/* the text */
 	*p = '\0';
 	if (strlen(cvstr))
 	    fprintf(gpoutfile, "%1d %1d %1d  %1d (%s) %1d %1d %1d %1d %s\n",
-		    x, y, RGIP_justify, RGIP_angle * 90, cvstr, RGIP_fface,
+		    x, y, RGIP_justify, RGIP_angle, cvstr, RGIP_fface,
 		    RGIP_ftype, RGIP_fontsize, RGIP_tcol, RGIP_Obj[RGIPTEXT]);
 	cvstr = ++p;
 	if (RGIP_angle) {	/* vertical */

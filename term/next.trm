@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.17 1999/12/10 17:01:44 lhecking Exp $
+ * $Id: next.trm,v 1.18 2001/12/19 09:14:55 mikulik Exp $
  *
  */
 
@@ -1167,8 +1167,8 @@ double fontsize, base;
 
 TERM_PUBLIC void
 NEXT_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     /* flush any pending graphics (all the XShow routines do this...) */
 
@@ -1184,7 +1184,7 @@ const char *str;
 
     if (NEXT_ang != 0)
 	NEXTPrintf("currentpoint gsave translate %d rotate 0 0 moveto\n",
-		   NEXT_ang * 90);
+		   NEXT_ang);
 
     NEXTPrintf("[ ");
 

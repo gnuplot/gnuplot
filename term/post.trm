@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.66 2002/07/25 12:25:10 mikulik Exp $
+ * $Id: post.trm,v 1.67 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1366,8 +1366,8 @@ unsigned int x,y;
 
 TERM_PUBLIC void
 PS_put_text(x,y,str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     char ch;
 
@@ -1906,8 +1906,8 @@ const char *font;
 
 TERM_PUBLIC void
 ENHPS_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
     if (ignore_enhanced_text) {
 	PS_put_text(x,y,str);
@@ -1945,7 +1945,7 @@ const char *str;
 	fputs("gsave 0 setgray\n", gpoutfile);
     if (ps_ang != 0)
 	fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
-		ps_ang*90);
+		ps_ang);
 
     fputs("[ ",gpoutfile);
 

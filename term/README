@@ -62,7 +62,7 @@ struct TERMENTRY {
                               int flags; /* various flags */
    void (*suspend) __PROTO((void)); /* after one plot of multiplot */
    void (*resume) __PROTO((void));  /* before subsequent plot of multiplot */
-   void (*boxfill) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
+   void (*fillbox) __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); /* clear part of multiplot */
    void (*linewidth) __PROTO((double linewidth));
 #ifdef USE_MOUSE
    int (*waitforinput) __PROTO((void));
@@ -307,9 +307,11 @@ _suspend() - called before gnuplot issues a prompt in multiplot mode
 
 _resume() - called after suspend(), before subsequent plots of a multiplot.
 
-_boxfill() - fills a box in given style (currently unimplemented - always
-           background colour at present). used by 'clear' in multiplot for
-           support of inset graphs
+_fillbox() - draws a filled axis-aligned rectangular box. The first
+   argument controls the type of fill-in: either a solid color at some
+   percentage of full intensity, or a hatch pattern.  Used by plot style
+   "with filledboxes" and by the "clear" command (with background as
+   fill colour) to do inset plots via multiplot.
 
 _linewidth() - sets the linewidth
 

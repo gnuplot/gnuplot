@@ -1,5 +1,20 @@
+2002-08-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/next.trm (NEXT_put_text): Fix incorrect multiplication of
+ 	text rotation angle by 90 degrees
+
+	* term/openstep.trm (NEXT_put_text): Dito.
+
+	* term/post.trm (ENHPS_put_text): Dito.
+
+	* term/rgip.trm (RGIP_put_text): Dito.
+
 2002-08-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/README: Updated documentation of _fillbox() terminal entry
+ 	previously incorrectly referred to as _boxfill().  Mention usage
+ 	by "with filledboxes".
+	
 	* src/interpol.c (cp_implode): Introduced special handling for
  	former zeroes on log axes, now represented by type==OUTRANGE,
  	value==-VERYLARGE. Avoid SIGFPE crash on Alpha.
@@ -856,7 +871,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/01 12:05:14 $).
+	last modification date (from the tag $Date: 2002/08/01 13:52:42 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
