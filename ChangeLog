@@ -1,3 +1,8 @@
+2002-09-09  Johannes Zellner  <johannes@zellner.org>
+
+	* src/mouse.c: changed "pointtype 1" to "point pt 1" which conforms to
+	the changed point option for 'set label'.
+
 Wed Sep 11 16:56:58 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (load_tic_user): Make sure ticdef.def.user is
@@ -1089,7 +1094,7 @@ Wed Sep 11 16:56:58 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/09 20:39:04 $).
+	last modification date (from the tag $Date: 2002/09/11 15:31:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

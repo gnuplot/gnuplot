@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.30 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.31 2002/08/16 18:14:05 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -71,7 +71,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.30 2002/02/25 03:10:41 bro
 /********************** variables ***********************************************************/
 
 mouse_setting_t mouse_setting = {
-    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "pointtype 1"
+    1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "point pt 1"
 };
 
 /* the status of the shift, ctrl and alt keys
