@@ -1751,7 +1751,7 @@ START_HELP(post)
 " but does not work well for overwriting an accent on a letter.  (To do the",
 " latter, it is much better to use `set encoding iso_8859_1` to change to the",
 " ISO Latin-1 encoding vector, which contains a large variety of letters with",
-! " accents or other diacritical marks.)  Since the box is non-spacing, it is",
+" accents or other diacritical marks.)  Since the box is non-spacing, it is",
 " sensible to put the shorter of the subscript or superscript in the box (that",
 " is, after the @).",
 "",

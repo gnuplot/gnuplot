@@ -6103,7 +6103,7 @@ C ... and restart the table:
 
  The gamma function does not work for complex arguments.
 
- As of `gnuplot` version 3.6, all development has been done using ANSII C.
+ As of `gnuplot` version 3.6, all development has been done using ANSI C.
  With current operating system, compiler, and library releases, the OS 
  specific bugs documented in release 3.5, now relegated to `old_bugs`, may
  no longer be relevant.
