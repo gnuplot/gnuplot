@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wtext.c,v 1.3 2001/06/25 08:15:22 mikulik Exp $";
+static char *RCSid = "$Id: wtext.c,v 1.4 2001/07/23 16:11:51 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1085,6 +1085,39 @@ WndParentProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+
+/* PM 20011218: Reallocate larger keyboard buffer */
+int
+ReallocateKeyBuf(LPTW lptw)
+{
+    int newbufsize = lptw->KeyBufSize + 16*1024; /* new buffer size */
+    HGLOBAL h_old = (HGLOBAL)GlobalHandle( SELECTOROF(lptw->KeyBuf) );
+    HGLOBAL h = GlobalAlloc(LHND, newbufsize);
+    int pos_in = lptw->KeyBufIn - lptw->KeyBuf;
+    int pos_out = lptw->KeyBufOut - lptw->KeyBuf;
+    BYTE FAR *NewKeyBuf = (BYTE FAR *)GlobalLock(h);
+    if (NewKeyBuf == (BYTE FAR *)NULL) {
+	MessageBox((HWND)NULL,szNoMemory,(LPSTR)NULL, MB_ICONHAND | MB_SYSTEMMODAL);
+	return 1;
+    }
+    if (lptw->KeyBufIn > lptw->KeyBufOut) { /*  | Buf ... Out ... In | */
+	_fmemcpy( NewKeyBuf, lptw->KeyBufOut, lptw->KeyBufIn - lptw->KeyBufOut );
+	lptw->KeyBufIn = NewKeyBuf + (pos_in - pos_out);
+    } else {				    /*  | Buf ... In ... Out ... | */
+	_fmemcpy( NewKeyBuf, lptw->KeyBufOut, lptw->KeyBufSize - pos_out );
+	_fmemcpy( NewKeyBuf, lptw->KeyBuf, pos_in );
+	lptw->KeyBufIn = NewKeyBuf + (lptw->KeyBufSize - pos_out + pos_in);
+    }
+    if (h_old) {
+	GlobalUnlock(h_old);
+	GlobalFree(h_old);
+    }
+    lptw->KeyBufSize = newbufsize;
+    lptw->KeyBufOut = lptw->KeyBuf = NewKeyBuf;
+    return 0;
+}
+
+
 /* child text window */
 LRESULT CALLBACK WINEXPORT
 WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1380,13 +1413,20 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			long count;
 				count = lptw->KeyBufIn - lptw->KeyBufOut;
 				if (count < 0) count += lptw->KeyBufSize;
+			    if (count == lptw->KeyBufSize-1) {
+				/* PM 20011218: Keyboard buffer is full, thus reallocate larger one.
+				 * (Up to now: forthcoming characters were silently ignored.)
+				 */
+				if ( ReallocateKeyBuf(lptw) )
+				    return 0; /* not enough memory */
+			    }
 				if (count < lptw->KeyBufSize-1) {
 					*lptw->KeyBufIn++ = wParam;
 					if (lptw->KeyBufIn - lptw->KeyBuf >= lptw->KeyBufSize)
 						lptw->KeyBufIn = lptw->KeyBuf;	/* wrap around */
 				}
 			}
-			return(0);
+			return 0;
 		case WM_COMMAND:
 			if (LOWORD(wParam) < NUMMENU)
 				SendMacro(lptw, LOWORD(wParam));
