@@ -1,3 +1,10 @@
+2004-05-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wtext.c (WndTextProc): Fix unbelievably old
+	long-standing bug: dragging the scroll bar "thumb" around didn't
+	work, because the method of acccessing the position was completely
+	wrong.
+
 2004-05-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/set.c (set_range): Fix SF bug #946900: buggy interaction of

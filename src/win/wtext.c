@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wtext.c,v 1.6 2002/03/10 18:54:52 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wtext.c,v 1.7 2004/04/13 17:24:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wtext.c */
@@ -1181,7 +1181,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					nYinc = max(1,lptw->ClientSize.y);
 					break;
 				case SB_THUMBPOSITION:
-					nYinc = LOWORD(lParam) - lptw->ScrollPos.y;
+					nYinc = HIWORD(wParam) - lptw->ScrollPos.y;
 					break;
 				default:
 					nYinc = 0;
@@ -1210,7 +1210,7 @@ WndTextProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 					nXinc = max(1,lptw->ClientSize.x);
 					break;
 				case SB_THUMBPOSITION:
-					nXinc = LOWORD(lParam) - lptw->ScrollPos.x;
+					nXinc = HIWORD(wParam) - lptw->ScrollPos.x;
 					break;
 				default:
 					nXinc = 0;
