@@ -172,9 +172,9 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 3.7 organized by: David Denholm
+          Version 4.0 organized by: Lars Hecking
 
- Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
        Mailing list for comments: info-gnuplot@@dartmouth.edu
      Mailing list for bug reports: bug-gnuplot@@dartmouth.edu

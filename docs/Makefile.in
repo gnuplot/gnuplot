@@ -327,10 +327,10 @@ gnuplot.info: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
 	$(MAKEINFO) -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 # Thanks to Bruce Ravel for doc2texi.el!
-gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
+$(srcdir)/gnuplot.texi: $(srcdir)/doc2texi.el $(srcdir)/gnuplot.doc
 	@echo "Creating texinfo"
-	@if test ! -f gnuplot.texi ; then \
-	  cp $(srcdir)/gnuplot.texi . ; \
+	@if test ! -f gnuplot.doc ; then \
+	  cp $(srcdir)/gnuplot.doc. ; \
 	fi
 	@if test "$(EMACS)" != no; then \
 	   $(EMACS) -batch -l $(srcdir)/doc2texi.el -f d2t-doc-to-texi; \

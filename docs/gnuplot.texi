@@ -26,9 +26,9 @@
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 3.7 organized by: David Denholm
+          Version 4.0 organized by: Lars Hecking
 
- Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
+ Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
        Mailing list for comments: info-gnuplot@@dartmouth.edu
      Mailing list for bug reports: bug-gnuplot@@dartmouth.edu
@@ -6468,8 +6468,11 @@ major gridlines is used.  The default polar angle is 30 degrees.
 
 If `front` is given, the grid is drawn on top of the graphed data. If
 `back` is given, the grid is drawn underneath the graphed data. Using
-`front` will prevent the grid from being obscured by dense data. The default
-setup, `layerdefault`, is `back` for 2d plots and `front` for 3d plots.
+`front` will prevent the grid from being obscured by dense data. The
+default setup, `layerdefault`, is `back` for 2d plots.  In 3D plots,
+the default is to split up the grid and the graph box into two
+layers, one behind, the other in front of the plotted data and
+functions.
 
 Z grid lines are drawn on the bottom of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
@@ -7854,7 +7857,6 @@ Syntax:
                  @{ clip1in | clip4in @}
                  @{ corners2color @{ mean|geomean|median|c1|c2|c3|c4 @} @}
                  @{ hidden3d <linestyle> | nohidden3d @}
-                 @{ transparent | solid @}
                  @{ implicit | explicit @}
                  @{ map @}
                @}
@@ -7938,12 +7940,9 @@ correct order. So the recommended choice when using pm3d is
 
 @end example
 
-If the option `transparent` is on, borders, tics and labels are drawn always
-above (that is after) the surface. This option is on by default to be
-compatible with the standard splot hidden3d style. If the option is off
-(`solid`), borders, tics and labels might be partially hidden by the
-surface. This is accomplished by drawing the surface and decorations in the
-right order and looks more realistic.
+There used to be an option @{transparent|solid@} to this command.  Now
+you get the same effect from `set grid @{front|layerdefault@}`,
+respectively.
 
 The `set pm3d map` is an abbreviation for `set pm3d at b`; `set view map`;
 @ref{pm3d}; @ref{pm3d};.
@@ -9715,6 +9714,7 @@ to you, depending on its output format.
 * kyo::                         
 * latex::                       
 * linux::                       
+* linux_::                      
 * macintosh::                   
 * mf::                          
 * mp::                          
@@ -9735,7 +9735,6 @@ to you, depending on its output format.
 * regis_::                      
 * rgip::                        
 * sun::                         
-* sun_::                        
 * svg::                         
 * tek410x::                     
 * tek410x_::                    
@@ -12028,7 +12027,7 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node linux, macintosh, latex, terminal
+@node linux, linux_, latex, terminal
 @subsubsection linux
 
 @c ?commands set terminal linux
@@ -12045,7 +12044,24 @@ environment variable GSVGAMODE for the default mode; if not set, it uses
 1024x768x256 as default mode or, if that is not possible, 640x480x16
 (standard VGA)."
 
-@node macintosh, mf, linux, terminal
+@node linux_, macintosh, linux, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node macintosh, mf, linux_, terminal
 @subsubsection macintosh
 
 @c ?set terminal macintosh
@@ -13314,7 +13330,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, sun_, rgip, terminal
+@node sun, svg, rgip, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -13329,22 +13345,7 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node sun_, svg, sun, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node svg, tek410x, sun_, terminal
+@node svg, tek410x, sun, terminal
 @subsubsection svg
 
 @c ?commands set terminal svg
