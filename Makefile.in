@@ -293,7 +293,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc \
 	missing mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
 	strftime.c vms.c m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-	m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4 $(T)README 
+	m4/search-lib.m4 $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -424,7 +424,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
-		m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4
+		m4/search-lib.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
