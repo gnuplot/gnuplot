@@ -1,3 +1,9 @@
+2004-03-21  Ethan Merritt  <merritt@u.washington.edu>
+	
+	* term/svg.trm: Add an enhanced text mode for the svg terminal. 
+	It's not perfect, but it works well enough to overcome some of the
+	text formatting limitations in the svg plain text mode.
+
 2004-03-18  Ethan Merritt  <merritt@u.washington.edu>
 	
 	* term/dumb.trm: Fix segfault on 'unset output' while in dumb terminal.

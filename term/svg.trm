@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.30 2004/02/02 19:22:04 sfeam Exp $
+ * $Id: svg.trm,v 1.31 2004/02/14 03:14:45 sfeam Exp $
  *
  */
 
@@ -28,10 +28,10 @@
 /* ISO-Latin encoding, Font selection fixes, option "fixed|dynamic" by
  * Wilhelm Braunschober <Wilhelm.Braunschober@t-online.de>, Feb-21-2002 */
 
-/* Conditional code for compatibility with Sodipodi svg viewer/editor
- *   NB: Our point styles still don't work in Sodipodi
- *   Ethan Merritt  <merritt@u.washington.edu> December 2003 */
-#define SODIPODI
+/* Tweaked code for compatibility with Sodipodi svg viewer/editor.
+ * Added beginnings of enhanced text support.  
+ *   Ethan Merritt  <merritt@u.washington.edu>
+ */
 
 #include "driver.h"
 
@@ -64,6 +64,12 @@ TERM_PUBLIC void SVG_previous_palette __PROTO((void));
 TERM_PUBLIC void SVG_set_color __PROTO((double));
 TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
 #endif /* PM3D */
+
+TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
+TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
+TERM_PUBLIC void ENHsvg_put_text __PROTO((unsigned int, unsigned int, const char *));
+TERM_PUBLIC void ENHsvg_writec __PROTO((char));
+
 
 #define SVG_XMAX	600
 #define SVG_YMAX	480
@@ -138,6 +144,9 @@ static void SVG_DefineFillPattern __PROTO((int fillpat));
 #endif
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
 
+/* Stuff for enhanced text mode */
+static int ENHsvg_string_state = 0;
+
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_Pen_RealID
 ------------------------------------------------------------------------------------------------------------------------------------*/
@@ -163,12 +172,7 @@ SVG_GroupOpen ()
     SVG_GroupFilledClose();
     if (!SVG_groupIsOpen)     {
 	fprintf (gpoutfile,
-#ifdef SODIPODI
-		 "<g style=\"fill:none; color:%s; stroke:%s; stroke-width:%.2f\">\n",
-		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
-#else
 		 "<g style=\"fill:none; color:%s; stroke:currentColor; stroke-width:%.2f\">\n",
-#endif
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
 		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width);
 
@@ -288,11 +292,7 @@ SVG_StyleColor(const char* paint)
     else
 #endif
 
-#ifdef SODIPODI
-	fprintf (gpoutfile, "%s='%s'", paint, SVG_pens[SVG_Pen_RealID (SVG_LineType)].color);
-#else
 	fprintf(gpoutfile, "%s = 'currentColor'", paint);
-#endif
 }
 
 static void
@@ -346,12 +346,7 @@ SVG_DefineFillPattern(int fillpat)
 		    break;
 	}
 	if (*path)
-#ifdef SODIPODI
-	    fprintf(gpoutfile, "\t\t\t<path style = '%s:%s' d='%s'/>\n",
-			style, SVG_pens[SVG_Pen_RealID (SVG_LineType)].color, path);
-#else
 	    fprintf(gpoutfile, "\t\t\t<path style = '%s:currentColor' d='%s'/>\n", style, path);
-#endif
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
     }
 }
@@ -380,6 +375,8 @@ SVG_options ()
     struct value a;
 
     SVG_local_reset();
+
+    /* FIXME - Make this a loop over options (order-independent) */
     if (!END_OF_COMMAND) {	/* get terminal size*/
 	if (almost_equals (c_token, "s$ize")) {
 	    double value;
@@ -400,16 +397,25 @@ SVG_options ()
 		int_error(c_token,"y size out of range");
 	    SVG_ySize = (unsigned int) value;
 
-	    if (almost_equals (c_token, "d$ynamic")) {
+	    if (almost_equals(c_token, "d$ynamic")) {
 		c_token++;
 		SVG_fixed_size = FALSE;
-	    } else if (almost_equals (c_token, "fi$xed")){
+	    } else if (almost_equals(c_token, "fi$xed")){
 		c_token++;
 		SVG_fixed_size = TRUE;
 	    }
+
 	}
     }
 
+    if (almost_equals(c_token, "enh$anced")) {
+	c_token++;
+	term->put_text = ENHsvg_put_text;
+    } else if (almost_equals(c_token, "noenh$anced")) {
+	c_token++;
+	term->put_text = SVG_put_text;
+    }
+	    
     if (!END_OF_COMMAND) {	/* get default font family name*/
 	if (almost_equals (c_token, "fn$ame"))  {
 	    c_token++;
@@ -436,9 +442,10 @@ SVG_options ()
 	 int_error(c_token, "unexpected text at end of command");
 
     /* Save options back into options string in normalized format */
-    sprintf(term_options, "size %d %d%s fname '%s'  fsize %g",
+    sprintf(term_options, "size %d %d%s %s fname '%s'  fsize %g",
 	    SVG_xSize, SVG_ySize,
         SVG_fixed_size ? " fixed": " dynamic",
+	term->put_text == ENHsvg_put_text ? "enhanced" : "",
         SVG_fontNameCur, SVG_fontSizeCur);
 }
 
@@ -876,9 +883,10 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
     fprintf (gpoutfile, "; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
 	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
 
-/* output text*/
-
-    fprintf (gpoutfile, "\t\t<text>%s</text>\n\t</g>\n", str);
+/* output text (unless the enhanced_text processing is in action) */
+    fprintf (gpoutfile, "\t\t<text>");
+    if (!ENHsvg_string_state)
+	fprintf (gpoutfile, "%s</text>\n\t</g>\n", str);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1009,6 +1017,134 @@ SVG_previous_palette(void)
 
 #endif /* PM3D */
 
+/* Enhanced text mode support starts here */
+
+static double ENHsvg_base = 0.0;
+static TBOOLEAN ENHsvg_opened_string = FALSE;
+static int ENHsvg_charcount = 0;
+
+TERM_PUBLIC void
+ENHsvg_OPEN(fontname, fontsize, base, widthflag, showflag, overprint)
+    char *fontname;
+    TBOOLEAN widthflag, showflag;
+    double fontsize, base;
+    int overprint;
+{
+    /* There are two special cases:
+     * overprint = 3 means save current position
+     * overprint = 4 means restore saved position
+     * EAM FIXME - Unfortunately I can find no way in the svg spec to do this.
+     * The best I can come up with is to count characters from here and then
+     * try to back up over them.
+     */
+    if (overprint == 3) {
+	ENHsvg_charcount = 0;
+	return;
+    } else if (overprint == 4) {
+	fprintf(gpoutfile,"<tspan dx=\"-%dem\"/>",ENHsvg_charcount);
+	ENHsvg_charcount = 0;
+	return;
+    }
+   
+    if (!ENHsvg_opened_string) {
+	ENHsvg_opened_string = TRUE;
+	enhanced_cur_text = &enhanced_text[0];
+	/* Start a new textspan fragment */
+	fprintf(gpoutfile,"<tspan");
+	if (strcmp(SVG_fontNameCur,fontname)) {
+	    strncpy(SVG_fontNameCur,fontname,sizeof(SVG_fontNameCur));
+	    fprintf(gpoutfile," font-family=\"%s\"",SVG_fontNameCur);
+	}
+	if (SVG_fontSizeCur != fontsize) {
+	    SVG_fontSizeCur = fontsize;
+	    fprintf(gpoutfile," font-size=\"%.1f\"",SVG_fontSizeCur);
+	}
+	if (ENHsvg_base != base) {
+	    fprintf(gpoutfile," y=\"%.2f\"",-base);
+	    ENHsvg_base = base;
+	}
+	if (!showflag) {
+	    fprintf(gpoutfile," fill=\"none\"");
+	}
+	fprintf(gpoutfile,">");
+    }
+    
+}
+
+TERM_PUBLIC void
+ENHsvg_FLUSH()
+{
+    if (ENHsvg_opened_string) {
+	ENHsvg_opened_string = FALSE;
+	*enhanced_cur_text = '\0';
+	fprintf(gpoutfile, "%s</tspan>\n\t\t", enhanced_text);
+    }
+}
+
+TERM_PUBLIC void
+ENHsvg_put_text(unsigned int x, unsigned int y, const char *str)
+{
+    /* We need the full set of tags for text, just as normal. But in */
+    /* the case of enhanced text ENHsvg_string_state == 1 tells the  */
+    /* SVG_put_text() to return without actually putting the text.   */
+    if (ignore_enhanced_text || !strpbrk(str, "{}^_@&~<")) {
+	ENHsvg_string_state = 0;
+	SVG_put_text(x, y, str);
+	return;
+    } else {
+	ENHsvg_string_state = 1;
+	SVG_put_text(x, y, str);
+    }
+
+    /* Set up global variables needed by enhanced_recursion() */
+    enhanced_fontscale = 1.0;
+    strncpy(enhanced_escape_format,"&#%d;",sizeof(enhanced_escape_format));
+
+    /* Set the recursion going. We say to keep going until a
+     * closing brace, but we don't really expect to find one.
+     * If the return value is not the nul-terminator of the
+     * string, that can only mean that we did find an unmatched
+     * closing brace in the string. We increment past it (else
+     * we get stuck in an infinite loop) and try again.
+     */
+    while (*(str = enhanced_recursion((char *)str, TRUE, 
+    			SVG_fontNameCur, SVG_fontSizeCur, 
+			0.0, TRUE, TRUE, 0))) {
+	(term->enhanced_flush)();
+
+	/* I think we can only get here if *str == '}' */
+	    enh_err_check(str);
+
+	if (!*++str)
+	    break; /* end of string */
+
+	/* else carry on and process the rest of the string */
+    }
+
+    /* Close the text section */
+    fprintf (gpoutfile, "</text>\n\t</g>\n", str);
+
+}
+
+TERM_PUBLIC void 
+ENHsvg_writec (char c)
+{
+    /* Kludge for phantom box accounting */
+    ENHsvg_charcount++;
+
+    /* Escape SVG reserved characters. Are there any besides '<'? */
+    switch (c) {
+    case '<':
+		*enhanced_cur_text++ = '&';
+		*enhanced_cur_text++ = 'l';
+		*enhanced_cur_text++ = 't';
+		*enhanced_cur_text++ = ';';
+		break;
+    default:
+		*enhanced_cur_text++ = c;
+		break;
+    }
+}
 
 #endif /* TERM_BODY */
 
@@ -1022,20 +1158,22 @@ TERM_TABLE_START (svg_driver)
     SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
     TERM_CAN_MULTIPLOT | TERM_BINARY,
     0 /* suspend */, 0 /* resume */ , SVG_fillbox, SVG_linewidth
-#ifdef PM3D
-#   ifdef USE_MOUSE
+#ifdef USE_MOUSE
    , 0, 0, 0, 0, 0 /* no mouse support for svg */
-#   endif
+#endif
+#ifdef PM3D
    , SVG_make_palette,
    SVG_previous_palette,
    SVG_set_color,
    SVG_filled_polygon
 #endif /* PM3D */
+   , ENHsvg_OPEN, ENHsvg_FLUSH, ENHsvg_writec
 TERM_TABLE_END (svg_driver)
+
 #undef LAST_TERM
 #define LAST_TERM svg_driver
-#endif /* TERM_TABLE */
 
+#endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
