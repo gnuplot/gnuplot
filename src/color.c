@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.32 2002/07/26 16:42:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.33 2002/08/20 16:50:14 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -91,10 +91,10 @@ make_palette(void)
     double gray;
 
     /* this is simpy for deciding, if we print
-     * a * message after allocating new colors */
+     * a message after allocating new colors */
     static t_sm_palette save_pal = {
 	-1, -1, -1, -1, -1, -1, -1, -1,
-	(rgb_color *) 0, -1, -1
+	(rgb_color *) 0, -1
     };
 
 #if 0
