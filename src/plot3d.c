@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.43 2002/02/16 15:03:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.44 2002/02/18 15:03:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -50,11 +50,11 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.43 2002/02/16 15:03:11 mi
 #include "term_api.h"
 #include "util.h"
 #ifdef PM3D
-#include "pm3d.h"
+# include "pm3d.h"
 #endif
 
 #ifdef THIN_PLATE_SPLINES_GRID
-#include "matrix.h"
+# include "matrix.h"
 #endif
 
 #ifndef _Windows
@@ -83,7 +83,6 @@ static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN c
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
 					       TBOOLEAN need_palette));
-#define NEED_PALETTE(plot) (PM3DSURFACE == (plot)->plot_style || 1 == (plot)->lp_properties.use_palette)
 #else
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
