@@ -1,3 +1,55 @@
+1999-03-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.am: Reorder SUBDIRS.
+
+	* Makefile.in, configure, config/Makefile.am, config/Makefile.in,
+	demo/Makefile.in, m4/Makefile.in, man/Makefile.in, term/Makefile.in,
+	tutorial/Makefile.am, tutorial/Makefile.in: Regenerated.
+
+	* config/Makefile.am.in: Add term_pc.h to EXTRA_DIST files.
+
+	* configure.in: Only configure lisp/ if emacs is found.
+
+	* lisp/Makefile.in: Add some tests for EMACS=no, remove unnecessary
+	targets.
+
+	* src/Makefile.in: Rewrite some tests.
+
+	* src/beos/Makefile: Don't rm Makefile in distclean target.
+
+	* tutorial/Makefile.am.in: Add echo line in tutorial.dvi target.
+
+1999-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.dj2, config/makefile.mgw, config/makefile.tc,
+	config/makefile.win: Changed to reflect new directory structure.
+
+	* config/term_pc.h: Edited copy of src/term.h, tailored for use on
+	16bit PC platforms (DOS16, WIN16). To save some work for people
+	building their own gnuplot on those platforms.
+
+	* docs/Makefile.in: Do not build gnuplot.hlp by default (VMS only).
+
+	* docs/doc2rtf.c: Change exit(EXIT_SUCCESS) to return(EXIT_SUCCESS).
+
+	* src/graphics.c: Workaround for the bug that made 'set key below'
+	sometimes lack some of the key texts: don't check these texts for
+	being inside the graph area (xleft..xright).
+
+	* src/term.c: Patched to set stdout to binary on DOS/Windows
+	platforms. I had to resolve a conflict between term/object.h and
+	POSIX header <fcntl.h>: both #define O_TEXT, for different purposes.
+
+	* win/pgnuplot.c: Fixed for binary file output to stdout.
+
+	* win/wgnuplot.def: Lowered stacksize (again) to make it fit into
+	those pesky 64KB of DGROUP, again (plot.c grew in DATA size, due to
+	the strings needed for the tilde expansion code...).
+
+	* term/fig.trm, term/object.h: Rename O_TEXT to OBJ_TEXT, for now.
+
+	* term/win.trm: Change include statement for new directory structure.
+
 1999-03-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* TODO: Updated.
