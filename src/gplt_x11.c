@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.129 2005/02/24 23:17:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.130 2005/03/03 04:09:47 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -2175,9 +2175,15 @@ exec_cmd(plot_struct *plot, char *command)
 	plot->current_rgb = plot->cmap->rgbcolors[plot->lt + 3];
 	current_gc = &gc;
 #ifdef PM3D
-	/* Set line width for pm3d mode also, but not dashes */
-	if (gc_pm3d)
-	    XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, LineSolid, CapButt, JoinBevel);
+	if (gc_pm3d) {
+	    /* EAM Mar 2005 - Needed in order to maintain dash type separatedly from color */
+	    if (plot->type == LineOnOffDash) {
+		XSetDashes(dpy, gc_pm3d, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
+		XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, plot->type, CapButt, JoinBevel);
+	    } else
+	    /* Set line width for pm3d mode also, but not dashes */
+		XSetLineAttributes(dpy, gc_pm3d, plot->lwidth, LineSolid, CapButt, JoinBevel);
+	}
 #endif
     }
     /*   X11_point(number) - draw a point */
@@ -2330,7 +2336,16 @@ exec_cmd(plot_struct *plot, char *command)
 	}
     }
 #ifdef PM3D
-    else if (*buffer == X11_GR_SET_RGBCOLOR) {
+    else if (*buffer == X11_GR_SET_LINECOLOR) {
+	    int lt;
+	    sscanf(buffer + 1, "%4d", &lt);
+	    lt = (lt % 8) + 2;
+	    if (lt < 0) /* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+		lt = -3;
+	    XSetForeground(dpy, gc_pm3d, plot->cmap->colors[lt + 3]);
+	    plot->current_rgb = plot->cmap->rgbcolors[lt + 3];
+	    current_gc = &gc_pm3d;
+    } else if (*buffer == X11_GR_SET_RGBCOLOR) {
 	    int rgb255color;
 	    XColor xcolor;
 	    sscanf(buffer + 1, "%x", &rgb255color);

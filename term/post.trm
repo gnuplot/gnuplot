@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.149 2005/03/03 04:09:51 sfeam Exp $
+ * $Id: post.trm,v 1.150 2005/03/06 05:07:26 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -291,20 +291,37 @@ static const char GPFAR * GPFAR PS_header1[] = {
 NULL
 };
 
+static const char GPFAR * GPFAR PS_linecolors[] = {
+"% Default Line colors\n",
+"/LCw { 1 1 1 } def\n",
+"/LCb { 0 0 0 } def\n",
+"/LCa { 0 0 0 } def\n",
+"/LC0 { 1 0 0 } def\n",
+"/LC1 { 0 1 0 } def\n",
+"/LC2 { 0 0 1 } def\n",
+"/LC3 { 1 0 1 } def\n",
+"/LC4 { 0 1 1 } def\n",
+"/LC5 { 1 1 0 } def\n",
+"/LC6 { 0 0 0 } def\n",
+"/LC7 { 1 0.3 0 } def\n",
+"/LC8 { 0.5 0.5 0.5 } def\n",
+NULL
+};
+
 static const char GPFAR * GPFAR PS_linetypes[] = {
-/* Line Types */
+"% Default Line Types\n",
 "/LTw { PL [] 1 setgray } def\n", /* background (assumed white) */
-"/LTb { BL [] 0 0 0 DL } def\n", /* border */
-"/LTa { AL [1 udl mul 2 udl mul] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
-"/LT0 { PL [] 1 0 0 DL } def\n",
-"/LT1 { PL [4 dl1 2 dl2] 0 1 0 DL } def\n",
-"/LT2 { PL [2 dl1 3 dl2] 0 0 1 DL } def\n",
-"/LT3 { PL [1 dl1 1.5 dl2] 1 0 1 DL } def\n",
-"/LT4 { PL [6 dl1 2 dl2 1 dl1 2 dl2] 0 1 1 DL } def\n",
-"/LT5 { PL [3 dl1 3 dl2 1 dl1 3 dl2] 1 1 0 DL } def\n",
-"/LT6 { PL [2 dl1 2 dl2 2 dl1 6 dl2] 0 0 0 DL } def\n",
-"/LT7 { PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] 1 0.3 0 DL } def\n",
-"/LT8 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] 0.5 0.5 0.5 DL } def\n",
+"/LTb { BL [] LCb DL } def\n", /* border */
+"/LTa { AL [1 udl mul 2 udl mul] 0 setdash LCa setrgbcolor } def\n", /* axes */
+"/LT0 { PL [] LC0 DL } def\n",
+"/LT1 { PL [4 dl1 2 dl2] LC1 DL } def\n",
+"/LT2 { PL [2 dl1 3 dl2] LC2 DL } def\n",
+"/LT3 { PL [1 dl1 1.5 dl2] LC3 DL } def\n",
+"/LT4 { PL [6 dl1 2 dl2 1 dl1 2 dl2] LC4 DL } def\n",
+"/LT5 { PL [3 dl1 3 dl2 1 dl1 3 dl2] LC5 DL } def\n",
+"/LT6 { PL [2 dl1 2 dl2 2 dl1 6 dl2] LC6 DL } def\n",
+"/LT7 { PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] LC7 DL } def\n",
+"/LT8 { PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] LC8 DL } def\n",
 NULL
 };
 
@@ -2301,6 +2318,8 @@ NULL };
 	for (i = 0; OldEPSL_linetypes[i] != NULL; i++)
 	    fprintf(gppsfile,"%s",OldEPSL_linetypes[i]);
     } else {
+	for (i = 0; PS_linecolors[i] != NULL; i++)
+	    fprintf(gppsfile,"%s",PS_linecolors[i]);
 	for (i = 0; PS_linetypes[i] != NULL; i++)
 	    fprintf(gppsfile,"%s",PS_linetypes[i]);
     }
@@ -3335,7 +3354,17 @@ TERM_PUBLIC void PS_set_color (t_colorspec *colorspec)
 {
     double gray;
 
-    if (colorspec->type == TC_RGB) {
+    if (colorspec->type == TC_LT) {
+	int linetype = colorspec->lt;
+	PS_FLUSH_PATH;
+	if ((ps_params->terminal == PSTERM_EPSLATEX) && ps_params->oldstyle)
+	    linetype = (linetype % 4) + 3;
+	else
+	    linetype = (linetype % 9) + 3;
+	if (linetype < 0)	/* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	    linetype = 0;
+	fprintf(gppsfile, "LC%1c setrgbcolor\n","wba012345678"[linetype]);
+    } else if (colorspec->type == TC_RGB) {
 	double r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
 	double g = (double)((colorspec->lt >> 8 ) & 255) / 255.;
 	double b = (double)(colorspec->lt & 255) / 255.;

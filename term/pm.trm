@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.39 2004/12/20 16:49:17 mikulik Exp $
+ * $Id: pm.trm,v 1.40 2004/12/31 06:12:56 sfeam Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -710,6 +710,10 @@ TERM_PUBLIC void PM_previous_palette ()
 
 TERM_PUBLIC void PM_set_color (t_colorspec *colorspec)
 {
+    if (colorspec->type == TC_LT) {
+	PM_linetype(colorspec->lt);
+	return;
+    }
     if (colorspec->type == TC_RGB) {
 	putc(GR_SET_RGBCOLOR, PM_pipe);
 	fwrite(&(colorspec->lt), sizeof(int), 1, PM_pipe);
@@ -725,7 +729,7 @@ TERM_PUBLIC void PM_set_color (t_colorspec *colorspec)
 	    colorindex = floor( colorspec->value * sm_palette.colors );
 	if (colorindex >= sm_palette.colors)  
 	    colorindex = sm_palette.colors - 1;
-    putc(GR_SET_COLOR, PM_pipe);
+	putc(GR_SET_COLOR, PM_pipe);
 	putc(colorindex, PM_pipe);
     }
 }

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.61 2005/02/19 05:37:32 sfeam Exp $
+ * $Id: gd.trm,v 1.62 2005/03/03 04:09:51 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -921,6 +921,13 @@ TERM_PUBLIC
 void PNG_set_color (t_colorspec *colorspec)
 {
     double gray = colorspec->value;
+
+    if (colorspec->type == TC_LT) {
+	int savetype = png_state.linetype;
+	PNG_linetype(colorspec->lt);
+	/* Harmless now; will be needed if we ever support dot/dash */
+	png_state.linetype = savetype;
+    }
 
     if (colorspec->type == TC_RGB) {
 	png_state.rgb = colorspec->lt;

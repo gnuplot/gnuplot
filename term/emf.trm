@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.27 2004/12/21 13:09:41 broeker Exp $
+ * $Id: emf.trm,v 1.28 2005/02/18 21:39:50 sfeam Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -707,13 +707,17 @@ EMF_linecolor(int linecolor)
 TERM_PUBLIC void
 EMF_set_color(t_colorspec *colorspec)
 {
-    if (colorspec->type == TC_RGB) {
+    if (colorspec->type == TC_LT) {
+	EMF_linecolor(colorspec->lt);
+    } else if (colorspec->type == TC_RGB) {
 	emf_color = RGB( colorspec->lt >> 16 & 0xff,
 			 colorspec->lt >> 8 & 0xff,
 			 colorspec->lt & 0xff );
     }
 
-    EMF_flush_polyline();
+    /* Force reevaluation of dash type */
+    emf_dashtype = LT_UNDEFINED;
+    EMF_dashtype(emf_linetype);
 }
 
 TERM_PUBLIC void

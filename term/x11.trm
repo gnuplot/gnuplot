@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.133 2005/02/24 23:17:36 sfeam Exp $
+ * $Id: x11.trm,v 1.134 2005/03/03 04:09:52 sfeam Exp $
  *
  */
 
@@ -1412,10 +1412,17 @@ X11_set_color(t_colorspec *colorspec)
 	return;
     }
 
-#ifndef BINARY_X11_POLYGON
+    if (colorspec->type == TC_LT) {
+	fputc(X11_GR_SET_LINECOLOR, X11_ipc);
+	PRINT1("%4d\n", colorspec->lt);
+	FFLUSH();
+	return;
+    }
+
     if (colorspec->type != TC_FRAC)
 	return;
 
+#ifndef BINARY_X11_POLYGON
     fputc(X11_GR_SET_COLOR, X11_ipc);
     PRINT1("%f\n", colorspec->value);
     FFLUSH();
@@ -1425,9 +1432,6 @@ X11_set_color(t_colorspec *colorspec)
     char *c_ptr;
     unsigned short byte_remaining;
     float fgray = colorspec->value;
-
-    if (colorspec->type != TC_FRAC)
-	return;
 
     fputc(X11_GR_SET_COLOR, X11_ipc);
     byte_remaining = sizeof(fgray);

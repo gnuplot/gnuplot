@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.48 2005/02/18 21:40:32 sfeam Exp $
+ * $Id: pdf.trm,v 1.49 2005/03/03 04:09:51 sfeam Exp $
  */
 
 /*------------------------------
@@ -1269,7 +1269,12 @@ PDF_set_color(t_colorspec *colorspec)
 {
     rgb_color color;
 
-    if (colorspec->type == TC_FRAC)
+    if (colorspec->type == TC_LT) {
+        struct rgb *this_color = web_color_rgbs + 1 + PDF_Pen_RealID(colorspec->lt);
+	color.r = this_color->r / 255.0;
+	color.g = this_color->g / 255.0;
+	color.b = this_color->b / 255.0;
+    } else if (colorspec->type == TC_FRAC)
 	rgb1maxcolors_from_gray( colorspec->value, &color );
     else if (colorspec->type == TC_RGB) {
 	color.r = (double)((colorspec->lt >> 16 ) & 255) / 255.;
