@@ -577,25 +577,15 @@ void reset_command()
     encoding = ENCODING_DEFAULT;
 
     set_locale("C");		/* default */
+
+    /* KLUGDE ALERT */
+    access_loadpath(getenv("GNUPLOT_LIB"));
 }
 
 /******** The 'set' command ********/
 void set_command()
 {
-    static char GPFAR setmess[] = "\
-valid set options:  [] = choose one, {} means optional\n\n\
-\t'angles',  '{no}arrow',  '{no}autoscale',  'bars',  '{no}border',\n\
-\t'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', '{no}contour',\n\
-\t'data style',  '{no}dgrid3d',  'dummy',  'encoding',  'format',\n\
-\t'function style',   '{no}grid',   '{no}hidden3d',   'isosamples',\n\
-\t'{no}key', '{no}label', '{no}linestyle', 'locale', '{no}logscale',\n\
-\t'[blrt]margin', 'mapping', 'missing', '{no}multiplot', 'offsets',\n\
-\t'origin', 'output', '{no}parametric', 'pointsize', '{no}polar',\n\
-\t'[rtuv]range',  'samples',  'size',  '{no}surface',  'terminal',\n\
-\t'tics',  'ticscale',  'ticslevel',  '{no}timestamp',  'timefmt',\n\
-\t'title', 'view', '[xyz]{2}data', '[xyz]{2}label', '[xyz]{2}range',\n\
-\t'{no}{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '{no}{[xyz]{2}}zeroaxis',\n\
-\t'zero'";
+    static char GPFAR setmess[] = SETSHOWMSG;
 
     c_token++;
 
@@ -1263,6 +1253,18 @@ set_two()
 	    char ss[MAX_ID_LEN+1];
 	    quote_str(ss,c_token,MAX_ID_LEN);
 	    set_locale(ss);
+	    ++c_token;
+	} else {
+	    int_error("Expected string", c_token);
+	}
+    }
+    else if (almost_equals(c_token,"loa$dpath")) {
+	c_token++;
+	if (isstring(c_token)) {
+	    char *ss = gp_alloc(token_len(c_token)+1, "temp string");
+	    quote_str(ss,c_token,token_len(c_token));
+	    access_loadpath(ss);
+	    free(ss);
 	    ++c_token;
 	} else {
 	    int_error("Expected string", c_token);
@@ -2614,9 +2616,11 @@ static void set_noarrow()
     }
 }
 
-/* assign a new arrow tag */
-/* arrows are kept sorted by tag number, so this is easy */
-static int /* the lowest unassigned tag number */ assign_arrow_tag()
+/* assign a new arrow tag
+ * arrows are kept sorted by tag number, so this is easy
+ * returns the lowest unassigned tag number
+ */
+static int assign_arrow_tag()
 {
     struct arrow_def *this_arrow;
     int last = 0;		/* previous tag value */
@@ -2735,9 +2739,11 @@ static void set_nolinestyle()
     }
 }
 
-/* assign a new linestyle tag */
-/* linestyles are kept sorted by tag number, so this is easy */
-static int /* the lowest unassigned tag number */ assign_linestyle_tag()
+/* assign a new linestyle tag
+ * linestyles are kept sorted by tag number, so this is easy
+ * returns the lowest unassigned tag number
+ */
+static int assign_linestyle_tag()
 {
     struct linestyle_def *this;
     int last = 0;		/* previous tag value */
@@ -3226,4 +3232,45 @@ char *lcl;
 #else
     safe_strncpy(cur_locale, lcl, sizeof(cur_locale));
 #endif /* NO_LOCALE_H */
+}
+
+/*
+ * char *access_loadpath (char *)
+ *
+ * Takes a list of PATHSEP separated path names or NULL
+ * If called for the first time with a NULL argument, the loadpath
+ * (var_loadpath) is initialised from the GNUPLOT_LIB environment variable
+ * Subsequent invocations with NULL will leave var_loadpath unchanged
+ * Subsequent invocations with non-NULL will set var_loadpath to the new value
+ * Returns the current loadpath; parsing is up to the caller
+ */
+char *access_loadpath (char *new_loadpath)
+{
+    static char *var_loadpath;
+
+    if (var_loadpath == NULL) { /* first time around */
+	if (new_loadpath == NULL) {
+	    char *envlib = getenv("GNUPLOT_LIB");
+	    if (envlib != NULL) { /* init from environment */
+		var_loadpath = gp_alloc(strlen(envlib)+1, "loadpath");
+		strcpy(var_loadpath,envlib);
+	    } else { /* Need some sort of initialisation */
+		var_loadpath = gp_alloc(1, "loadpath");
+		*var_loadpath = NUL;
+	    }
+	} else { /* init from function parameter */
+	    var_loadpath = gp_alloc(strlen(new_loadpath)+1, "loadpath");
+	    strcpy(var_loadpath,new_loadpath);
+	}
+    } else { /* set new value */
+	if (new_loadpath != NULL) {
+	    if (strlen(var_loadpath) != strlen(new_loadpath))
+		var_loadpath = gp_realloc(var_loadpath, strlen(new_loadpath)+1, "loadpath");
+	    /* else: no need to realloc */
+	    strcpy(var_loadpath,new_loadpath);
+	}
+	/* else do nothing, loadpath unchanged */
+    }
+
+    return var_loadpath;
 }

@@ -920,6 +920,8 @@ set ticscale %g %g\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
     fprintf(fp, "set locale \"%s\"\n", cur_locale);
+    fprintf(fp, "set loadpath \"%s\"\n", access_loadpath(NULL));
+
 }
 
 static void save_tics(fp, where, axis, tdef, rotate, text)

@@ -124,10 +124,10 @@ static void show_position __PROTO((struct position * pos));
 static TBOOLEAN show_one __PROTO((void));
 static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
+static void show_loadpath __PROTO((void));
 static void show_locale __PROTO((void));
 static void show_missing __PROTO((void));
 static void show_datatype __PROTO((char *name, int axis));
-static void show_locale __PROTO((void));
 
 /* following code segment appears over and over again */
 
@@ -152,19 +152,7 @@ do{if (datatype[axis]==TIME) { \
 void show_command()
 {
     /* show at is undocumented/hidden... */
-    static char GPFAR showmess[] =
-    "valid set options:  [] = choose one, {} means optional\n\n\
-\t'all',  'angles',  'arrow',  'autoscale',  'bar', 'border',  'boxwidth',\n\
-\t'clip', 'cntrparam', 'contour',  'data',  'dgrid3d',  'dummy',\n\
-\t'encoding', 'format', 'function',  'grid',  'hidden',  'isosamples',\n\
-\t'key', 'label', 'linestyle', 'locale', 'logscale', 'mapping', 'margin',\n\
-\t'missing', 'offsets', 'origin', 'output', 'plot', 'parametric',\n\
-\t'pointsize', 'polar', '[rtuv]range', 'samples', 'size', 'terminal',\n\
-\t'tics', 'timestamp', 'timefmt', 'title', 'variables', 'version',\n\
-\t'view',   '[xyz]{2}label',   '[xyz]{2}range',   '{m}[xyz]{2}tics',\n\
-\t'[xyz]{2}[md]tics',   '[xyz]{2}zeroaxis',   '[xyz]data',   'zero',\n\
-\t'zeroaxis'";
-
+    static char GPFAR showmess[] = SETSHOWMSG;
 
     c_token++;
 
@@ -321,6 +309,10 @@ static TBOOLEAN
     } else if (almost_equals(c_token, "timef$mt")) {
 	(void) putc('\n', stderr);
 	show_timefmt();
+	c_token++;
+    } else if (almost_equals(c_token, "loa$dpath")) {
+	(void) putc('\n', stderr);
+	show_loadpath();
 	c_token++;
     } else if (almost_equals(c_token, "loca$le")) {
 	(void) putc('\n', stderr);
@@ -644,6 +636,7 @@ static TBOOLEAN
 	show_datatype("zdata", FIRST_Z_AXIS);
 	show_timefmt();
 	show_locale();
+	show_loadpath();
 	show_zero();
 	show_missing();
 	show_plot();
@@ -899,6 +892,14 @@ static void show_timefmt()
     char str[MAX_LINE_LEN+1];
     fprintf(stderr, "\tread format for time is \"%s\"\n",
 	    conv_text(str, timefmt));
+}
+
+static void show_loadpath()
+{
+    fprintf (stderr, "\
+\tloadpath is \"%s\"\n\
+\tThe path separator on this system is '%c'\n",
+	     access_loadpath(NULL), PATHSEP);
 }
 
 static void show_locale()
