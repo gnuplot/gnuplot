@@ -53,7 +53,7 @@
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
  */
-/* must encapsulate HAVE_CPP_STRINGIFY to avoid having it defined
+/* must encapsulate HAVE_STRINGIZE to avoid having it defined
  * on autoconfiscated platforms where it's unavailable
  */ 
 
@@ -61,8 +61,8 @@
 # ifndef PROTOTYPES
 #  define PROTOTYPES
 # endif /* PROTOTYPES */
-# ifndef HAVE_CPP_STRINGIFY
-#  define HAVE_CPP_STRINGIFY
+# ifndef HAVE_STRINGIZE
+#  define HAVE_STRINGIZE
 # endif
 #endif /* ANSI_C ... */
 

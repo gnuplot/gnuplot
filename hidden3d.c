@@ -216,7 +216,7 @@ extern int hidden_line_type_above, hidden_line_type_below;
 extern double trans_mat[4][4];
 
 
-#ifdef HAVE_CPP_STRINGIFY
+#ifdef HAVE_STRINGIZE
 /* ANSI preprocessor concatenation */
 # define CONCAT(x,y) x##y
 # define CONCAT3(x,y,z) x##y##z

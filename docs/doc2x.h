@@ -60,7 +60,7 @@ typedef int boolean;
 #endif
 #define FALSE 0
 
-#ifdef HAVE_CPP_STRINGIFY
+#ifdef HAVE_STRINGIZE
 # define START_HELP(driver) "C#" #driver ,
 # define END_HELP(driver)   ,"C#",
 #else

@@ -188,7 +188,7 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
  */
-#ifdef HAVE_CPP_STRINGIFY
+#ifdef HAVE_HAVE_STRINGIZE
 # define LOG_MSG(x) #x " range must be greater than 0 for log scale!"
 #else
 # define LOG_MSG(x) "x range must be greater than 0 for log scale!"

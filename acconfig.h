@@ -48,7 +48,7 @@
 #undef GRX21
 
 /* Define if the C preprocessor understands ANSI stringification.  */
-#undef HAVE_CPP_STRINGIFY
+#undef HAVE_STRINGIZE
 
 /* Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD

@@ -188,7 +188,7 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
  * this also restores min and max for ranges like [10:-10]
  */
 
-#ifdef HAVE_CPP_STRINGIFY
+#ifdef HAVE_STRINGIZE
 # define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
 #else
 # define RANGE_MSG(x) "x range is less than threshold : see `set zero`"
