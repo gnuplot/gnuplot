@@ -250,25 +250,20 @@ if test "$with_readline" != no; then
 
     if test "$with_readline" = gnu; then
       AC_CHECK_LIB(readline, readline,dnl
-       LIBS="$LIBS -lreadline $gp_tcap"
-       AC_DEFINE(HAVE_LIBREADLINE, 1,
-                 [ Define if you are using the GNU readline library. ]),,dnl
-       ${gp_tcap})dnl readline
+       LIBS="$LIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
       gp_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
       if test "$ac_cv_lib_readline_readline" = yes; then
         TERMLIBS="$TERMLIBS $gp_tcap"
-       AC_DEFINE(HAVE_LIBREADLINE, 1,
-                 [ Define if you are using the GNU readline library. ])
       fi
     fi
 
     if test "$ac_cv_lib_readline_readline" = no; then
       AC_MSG_WARN([GNU readline not found - falling back to builtin readline])
       with_readline=yes
-      AC_DEFINE(READLINE, 1,
-                [ Define if you want to use the included readline function. ])
     else
+      AC_DEFINE(HAVE_LIBREADLINE, 1,
+                [ Define if you are using the GNU readline library. ])
       gp_SEARCH_HEADERDIRS(readline/readline.h,,
         AC_MSG_WARN([found GNU readline library but not readline.h])
         AC_MSG_WARN([please add path to readline.h to CPPFLAGS in Makefile])
@@ -285,9 +280,11 @@ if test "$with_readline" != no; then
                     [ Define if you want to use the history feature with GNU readline. ]))
       fi
 
-    fi
+    fi # ! ac_cv_lib_readline_readline = no
 
-  else # with_readline = yes
+  fi # ! with_readline != yes
+
+  if test "$with_readline" = yes; then
     AC_DEFINE(READLINE, 1,
               [ Define if you want to use the included readline function. ])
   fi
@@ -307,28 +304,39 @@ if test "$with_plot" != no; then
   else
     dnl GNU plot library - test for new version first
     TERMXLIBS="$X_LIBS -lXaw -lXmu -lXt -lXext -lX11"
-    gp_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
-    if test "$ac_cv_lib_plot_textangle" = no; then
-      TERMXLIBS=
-      gp_SEARCH_LIBDIRS(plot,rotate)
-      if test "$ac_cv_lib_plot_rotate" = no; then
-        AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
-        with_plot=no
+    gp_SEARCH_LIBDIRS(plot,pl_textangle,[$TERMXLIBS])
+    if test "$ac_cv_lib_plot_pl_textangle" = no; then
+      gp_SEARCH_LIBDIRS(plot,textangle,[$TERMXLIBS])
+      if test "$ac_cv_lib_plot_textangle" = no; then
+        TERMXLIBS=
+        gp_SEARCH_LIBDIRS(plot,rotate)
+        if test "$ac_cv_lib_plot_rotate" = no; then
+          AC_MSG_WARN([can't find GNU libplot -- disabling gnugraph terminal])
+          with_plot=no
+        else
+          AC_MSG_RESULT([ - using obsolete GNU graphics library])
+        fi # old GNU plotlib
       else
-        AC_MSG_RESULT([ - using obsolete GNU graphics library])
-        AC_DEFINE(GNUGRAPH, 1,
-                  [ Define if you want to use the GNU version of the Unix plot library. ])
-      fi # old GNU plotlib
+        AC_MSG_RESULT([ - using GNU plotutils library])
+        gnu_libplot_version=1
+      fi # GNU plotlib pre-2.2
+
     else
-      AC_MSG_RESULT([ - using GNU plotutils library])
+      AC_MSG_RESULT([ - using GNU plotutils 2.2+ library])
+      gnu_libplot_version=2
+    fi # new GNU plotlib
+
+    if test "$with_plot" != no; then
       AC_DEFINE(GNUGRAPH, 1,
                 [ Define if you want to use the GNU version of the Unix plot library. ])
-      AC_DEFINE(GNU_PLOTUTILS, 1,
-                [ Define if your libplot.a is from GNU plotutils. ])
-    fi # new GNU plotlib
-  fi # Unix plotlib
+      AC_DEFINE_UNQUOTED(GNU_PLOTUTILS, ${gnu_libplot_version},
+                         [ Define if your libplot.a is from GNU plotutils. Define as "2" if your GNU plotutils version is 2.2 or greater.])
+    fi
+
+  fi # ! Unix plotlib
+
 fi
-dnl end plot
+dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
@@ -365,14 +373,17 @@ if test "$with_png" != no; then
 You lose.
 #endif
 ],dnl
-       AC_MSG_WARN([- libpng too old - not including png driver]),dnl
-       AC_DEFINE(HAVE_LIBPNG, 1,
-                 [ Define if you have the png library. ]))
+       AC_MSG_WARN([- libpng too old - not including png driver])
+       with_png=no)
     else
       AC_MSG_WARN([- cannot check png version - compilation may fail])
-      AC_DEFINE(HAVE_LIBPNG, 1,
-                [ Define if you have the png library. ])
     fi
+
+  if test "$with_png" != no; then
+    AC_DEFINE(HAVE_LIBPNG, 1,
+              [ Define if you have the png library. ])
+  fi
+
   else
     AC_MSG_RESULT([- see term/png.trm for download details])
   fi
