@@ -15,6 +15,9 @@
 
 	* demo/all.dem: Added inclusion of image.dem.
 
+	* demo/asciimat.dat demo/blutux.rgb demo/demo.edf demo/scatter2.bin
+	demo/sine.bin demo/using.bin: New datafiles required by image.dem.
+
 	* demo/image.dem: New demo to illustrate and test various new image
 	and binary and matrix data file features.
 
