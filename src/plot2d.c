@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.46 2001/12/13 17:31:44 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.47 2001/12/14 14:22:45 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -934,6 +934,9 @@ eval_plots()
 		this_plot->plot_type = DATA;
 		this_plot->plot_style = data_style;
 		this_plot->plot_smooth = SMOOTH_NONE;
+#ifdef PM3D
+		this_plot->filledcurves_options.opt_given = 0;
+#endif
 
 		specs = df_open(NCOL);	/* up to NCOL cols */
 		/* this parses data-file-specific modifiers only */
@@ -960,6 +963,9 @@ eval_plots()
 		}
 		this_plot->plot_type = FUNC;
 		this_plot->plot_style = func_style;
+#ifdef PM3D
+		this_plot->filledcurves_options.opt_given = 0;
+#endif
 		dummy_func = &plot_func;
 		plot_func.at = temp_at();
 		dummy_func = NULL;
@@ -1090,6 +1096,11 @@ eval_plots()
 		    if (parametric && xparam)
 			int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		    this_plot->plot_style = get_style();
+#ifdef PM3D
+		    if (data_style & FILLEDCURVES)
+			/* read a possible option for 'with filledcurves' */
+			get_filledcurves_style_options(&this_plot->filledcurves_options);
+#endif
 		    if ((this_plot->plot_type == FUNC)
 			&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR))
 			{

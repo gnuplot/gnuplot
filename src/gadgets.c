@@ -157,6 +157,12 @@ int filldensity = 100;
 int fillpattern = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
 
+#ifdef PM3D
+/* filledcurves style options */
+filledcurves_opts filledcurves_opts_data = EMPTY_FILLEDCURVES_OPTS;
+filledcurves_opts filledcurves_opts_func = EMPTY_FILLEDCURVES_OPTS;
+#endif
+
 /*****************************************************************/
 /* Routines that deal with global objects defined in this module */
 /*****************************************************************/

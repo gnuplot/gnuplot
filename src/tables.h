@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.20 2001/08/27 15:02:14 broeker Exp $
+ * $Id: tables.h,v 1.21 2001/11/29 14:12:55 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -136,6 +136,16 @@ enum show_style_id {
 #endif
 };
 
+#ifdef PM3D
+enum filledcurves_opts_id {
+    FILLEDCURVES_CLOSED, 
+    FILLEDCURVES_X1, FILLEDCURVES_Y1, FILLEDCURVES_X2, FILLEDCURVES_Y2,
+    /* requirement: FILLEDCURVES_ATX1 = FILLEDCURVES_X1+4 */
+    FILLEDCURVES_ATX1, FILLEDCURVES_ATY1, FILLEDCURVES_ATX2, FILLEDCURVES_ATY2,
+    FILLEDCURVES_ATXY
+};
+#endif
+
 extern const struct gen_table command_tbl[];
 /* pm 011129: unused for 2 yers, therefore #if 0 .. #endif; in future should
  * be split into datafile_tbl and plot_tbl: */
@@ -152,6 +162,10 @@ extern const struct gen_table show_style_tbl[];
 extern const struct gen_table plotstyle_tbl[];
 
 extern const struct gen_ftable command_ftbl[];
+
+#ifdef PM3D
+extern const struct gen_table filledcurves_opts_tbl[];
+#endif
 
 /* Function prototypes */
 int lookup_table __PROTO((const struct gen_table *, int));

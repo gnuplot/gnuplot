@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.32 2001/11/29 14:12:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.33 2001/12/13 17:31:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -421,15 +421,15 @@ get_style()
 	int_error(c_token,"\
 expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
-\t'histeps', 'boxes', 'filledboxes', 'boxerrorbars', 'boxxyerrorbars',\n\
-\t'vectors', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
-\t'yerrorlines', 'xyerrorlines'");
+\t'histeps', 'filledcurves', 'boxes', 'filledboxes', 'boxerrorbars',\n\
+\t'boxxyerrorbars', 'vectors', 'financebars', 'candlesticks',\n\
+\t'errorlines', 'xerrorlines', 'yerrorlines', 'xyerrorlines'");
 #else  /* USE_ULIG_FILLEDBOXES*/
 	int_error(c_token,"\
 expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
-\t'histeps', 'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector',\n\
-\t'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
+\t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
+\t'vector', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
 \t'yerrorlines', 'xyerrorlines'");
 #endif /* USE_ULIG_FILLEDBOXES */
 	ps = LINES;
@@ -437,6 +437,62 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 
     return ps;
 }
+
+#ifdef PM3D
+/* Parse options for style filledcurves and fill fco accordingly.
+ * If no option given, then set fco->opt_given to 0.
+ */
+void
+get_filledcurves_style_options( filledcurves_opts *fco )
+{
+    int p;
+    struct value a;
+    p = lookup_table(&filledcurves_opts_tbl[0], c_token);
+    c_token++;
+    fco->opt_given = (p != -1);
+    if (p==-1) return; /* no option given */
+    fco->closeto = p;
+    if (!equals(c_token,"=")) return;
+    /* parameter required for filledcurves x1=... and friends */
+    if (p!=FILLEDCURVES_ATXY) fco->closeto += 4;
+    c_token++;
+    fco->at = real(const_express(&a));
+    if (p!=FILLEDCURVES_ATXY) return;
+    /* two values required for FILLEDCURVES_ATXY */
+    if (!equals(c_token,","))
+	int_error(c_token, "syntax is xy=<x>,<y>");
+    c_token++;
+    fco->aty = real(const_express(&a));
+    return;
+}
+
+/* Print filledcurves style options to a file (used by 'show' and 'save'
+ * commands).
+ */
+void
+filledcurves_options_tofile(fco, fp)
+    filledcurves_opts *fco;
+    FILE *fp;
+{
+    if (!fco->opt_given) return;
+    if (fco->closeto == FILLEDCURVES_CLOSED) {
+	fputs("closed", fp);
+	return;
+    }
+    if (fco->closeto <= FILLEDCURVES_Y2) {
+	fputs(filledcurves_opts_tbl[fco->closeto].key, fp);
+	return;
+    }
+    if (fco->closeto <= FILLEDCURVES_ATY2) {
+	fprintf(fp,"%s=%g",filledcurves_opts_tbl[fco->closeto-4].key,fco->at);
+	return;
+    }
+    if (fco->closeto == FILLEDCURVES_ATXY) {
+	fprintf(fp,"xy=%g,%g",fco->at,fco->aty);
+	return;
+    }
+}
+#endif
 
 /* line/point parsing...
  *

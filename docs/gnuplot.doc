@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.88 2001/11/29 13:35:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.89 2001/12/19 09:14:55 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1705,7 +1705,7 @@ C ... and restart the table:
 ?fit guide
 ?fitting
  `fit` is used to find a set of parameters that 'best' fits your data to your
- user-defined function.  The fit is judged on the basis of the the sum of the
+ user-defined function.  The fit is judged on the basis of the sum of the
  squared differences or 'residuals' (SSR) between the input data points and
  the function values, evaluated at the same places.  This quantity is often
  called 'chisquare' (i.e., the Greek letter chi, to the power of 2).  The
@@ -3008,11 +3008,12 @@ C ... and restart the table:
 
  You may also scale the line width and point size for a plot by using
  <line_width> and <point_size>, which are specified relative to the default
- values for each terminal.  The pointsize may also be altered globally---
- see `set pointsize` for details.  But note that both <point_size> as set 
- here and  as set by `set pointsize` multiply the default point size---their
- effects are  not cumulative.  That is, `set pointsize 2; plot x w p ps 3`
- will use points three times default size, not six.
+ values for each terminal.  The pointsize may also be altered 
+ globally---see `set pointsize` for details.  But note that both <point_size>
+ as set here and  as set by `set pointsize` multiply the default point 
+ size---their effects are  not cumulative.  That is, 
+ `set pointsize 2; plot x w p ps 3` will use points three times default size,
+ not six.
 
  If you have defined specific line type/width and point type/size combinations
  with `set style line`, one of these may be selected by setting <line_style> to
@@ -3063,6 +3064,12 @@ C ... and restart the table:
 
  This plots two data sets with lines differing only by weight:
        plot 'd1' t "good" w l lt 2 lw 3, 'd2' t "bad" w l lt 2 lw 1
+
+ This plots filled curve of x*x and a color stripe:
+       plot x*x with filledcurve closed, 40 with filledcurve y1=10
+
+ This plots filled curve of x*x and a color box:
+       plot x*x, (x>=-5 && x<=5 ? 40 : 1/0) with filledcurve y1=10 lt 8
 
  This plots a surface with color lines:
        splot x*x-y*y with line palette
@@ -5924,9 +5931,9 @@ C ... and restart the table:
 
  None of the styles requiring more than two columns of information
  (e.g., `errorbars` or `errorlines`) can be used with `splot`s or
- function `plot`s. Neither `boxes` or `filledboxes` nor any of the `steps`
- styles can be used with `splot`s. If an inappropriate style is specified,
- it will be changed to `points`.
+ function `plot`s. Neither `boxes`, `filledboxes`, `filledcurves` nor any
+ of the `steps` styles can be used with `splot`s. If an inappropriate style
+ is specified, it will be changed to `points`.
 
  For 2-d data with more than two columns, `gnuplot` is picky about the
  allowed `errorbar` and `errorline` styles. The `using` option on the
@@ -6036,45 +6043,42 @@ C ... and restart the table:
  nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
  tandy_60dpi. The BeOS driver (`be`) supports `filledboxes` too, but it is
  unknown whether it works as intended.
-5 filledcurves
+4 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
 ?style filledcurves
 ?filledcurves
- The `filledcurves` style is only relevant to 2-d plotting. It draws either the
+ The `filledcurves` style is only relevant to 2-d plotting. It draws either
  the current curve closed and filled, or the region between the current curve
- and a given axis, horizontal or vertical line, or point, filled with the
+ and a given axis, horizontal or vertical line, or a point, filled with the
  current drawing color.
 
- Proposed syntax:
+ Syntax:
 
      set style [data | function] filledcurves [options]
      plot ... with filledcurves [options]
 
  where options are
 
-     [closed | {x1 | x2 | y1 | y2}[=<value>] | xy=<x>,<y>]
+     [closed | {x1 | x2 | y1 | y2}[=<a>] | xy=<x>,<y>]
 
- The filled area is between the current curve and
-     filledcurves closed   ... filled closed curve,
+ The area is filled between the current curve and
+     filledcurves closed   ... just filled closed curve,
      filledcurves x1       ... x1 axis,
      filledcurves x2       ... x2 axis, etc for y1 and y2 axes,
-     filledcurves y1=0     ... line y=0 (at y1 axis) parallel to x1 axis,
-     filledcurves y2=42    ... line y=42 (at y2 axis) parallel to x2, etc,
+     filledcurves y1=0     ... line y=0 (at y1 axis) ie parallel to x1 axis,
+     filledcurves y2=42    ... line y=42 (at y2 axis) ie parallel to x2, etc,
      filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
 
  Note: filling is supported on filled-polygon capable terminals, type `help
  pm3d` for their list.
 
- Currently implemented syntax (demo-like switching between the first five
- options):
+ Zoom of a filled curve drawn from a datafile may produce empty or incorrect
+ area because gnuplot is clipping points and lines, and not areas.
 
-     set style [data | function] filledcurves
-     plot ... with filledcurves
-
- *** TODO - WHAT YOU CAN DO FOR FILLEDCURVES (please): ***
- Implement the proposed options; please make it in such a way that <value>,
- <x>,<y> can be formulae.
+ If the values of <a>, <x>, <y> are out of the drawing boundary, then they 
+ are moved to the graph boundary. Then the actually filled area in the case
+ of option xy=<x>,<y> will depend on xrange and yrange.
 4 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
@@ -6984,7 +6988,7 @@ C ... and restart the table:
 
  The defaults are `border mirror norotate` for tics on the x and y axes, and
  `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
- the the `{axis | border}` option is not available and the default is
+ the `{axis | border}` option is not available and the default is
  `nomirror`.  If you do want to mirror the z-axis tics, you might want to
  create a bit more room for them with `set border`.
 

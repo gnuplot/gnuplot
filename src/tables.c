@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.23 2001/09/08 00:50:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.24 2001/11/29 14:12:55 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -408,6 +408,19 @@ const struct gen_table plotstyle_tbl[] =
     { "can$dlesticks", CANDLESTICKS },
     { NULL, -1 }
 };
+
+#ifdef PM3D
+const struct gen_table filledcurves_opts_tbl[] =
+{
+    { "c$losed", FILLEDCURVES_CLOSED },
+    { "x1", FILLEDCURVES_X1 },
+    { "y1", FILLEDCURVES_Y1 },
+    { "x2", FILLEDCURVES_X2 },
+    { "y2", FILLEDCURVES_Y2 },
+    { "xy", FILLEDCURVES_ATXY },
+    { NULL, -1 }
+};
+#endif
 
 int
 lookup_table(tbl, find_token)

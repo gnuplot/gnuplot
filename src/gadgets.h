@@ -137,6 +137,15 @@ typedef struct {
 } label_struct;
 #define EMPTY_LABELSTRUCT {"", "", 0.0, 0.0}
 
+#ifdef PM3D
+typedef struct {
+    int opt_given; /* option given / not given (otherwise default) */
+    int closeto;   /* from list FILLEDCURVES_CLOSED, ... */
+    double at;	   /* value for FILLEDCURVES_AT... */
+    double aty;	   /* the other value for FILLEDCURVES_ATXY */
+} filledcurves_opts;
+#define EMPTY_FILLEDCURVES_OPTS { 0, 0, 0.0, 0.0 }
+#endif
 
 
 /***********************************************************/
@@ -255,5 +264,11 @@ extern int fillstyle;
 extern int filldensity;
 extern int fillpattern;
 #endif /* USE_ULIG_FILLEDBOXES */
+
+#ifdef PM3D
+/* filledcurves style options set by 'set style [data|func] filledcurves opts' */
+extern filledcurves_opts filledcurves_opts_data;
+extern filledcurves_opts filledcurves_opts_func;
+#endif
 
 #endif /* GNUPLOT_GADGETS_H */

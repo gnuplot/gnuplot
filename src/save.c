@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.31 2001/11/10 18:27:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.32 2001/12/03 12:00:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -591,7 +591,9 @@ set style data ",
 #endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
     case FILLEDCURVES:
-	fputs("filledcurves\n", fp);
+	fputs("filledcurves ", fp);
+	filledcurves_options_tofile(&filledcurves_opts_data, fp);
+	fputc('\n', fp);
 	break;
 #endif
     case BOXERROR:
@@ -668,6 +670,13 @@ set style data ",
 	fputs("filledboxes\n", fp);
 	break;
 #endif /* USE_ULIG_FILLEDBOXES */
+#ifdef PM3D
+    case FILLEDCURVES:
+	fputs("filledcurves ", fp);
+	filledcurves_options_tofile(&filledcurves_opts_func, fp);
+	fputc('\n', fp);
+	break;
+#endif
     case BOXERROR:
 	fputs("boxerrorbars\n", fp);
 	break;

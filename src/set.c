@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.68 2001/11/20 11:51:13 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.69 2001/11/25 12:40:22 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2743,6 +2743,13 @@ set_style()
     switch(lookup_table(&show_style_tbl[0],c_token)){
     case SHOW_STYLE_DATA:
 	data_style = get_style();
+#ifdef PM3D
+	if (data_style & FILLEDCURVES) {
+	    get_filledcurves_style_options(&filledcurves_opts_data);
+	    if (!filledcurves_opts_data.opt_given) /* default value */
+		filledcurves_opts_data.closeto = FILLEDCURVES_CLOSED;
+	}
+#endif
 	break;
     case SHOW_STYLE_FUNCTION:
 	{
@@ -2752,6 +2759,13 @@ set_style()
 		int_error(c_token, "style not usable for function plots, left unchanged");
 	    else 
 		func_style = temp_style;
+#ifdef PM3D
+	    if (func_style & FILLEDCURVES) {
+		get_filledcurves_style_options(&filledcurves_opts_func);
+		if (!filledcurves_opts_func.opt_given) /* default value */
+		    filledcurves_opts_func.closeto = FILLEDCURVES_CLOSED;
+	    }
+#endif
 	    break;
 	}
     case SHOW_STYLE_LINE:

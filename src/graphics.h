@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.18 2001/02/15 17:02:56 broeker Exp $
+ * $Id: graphics.h,v 1.19 2001/08/22 14:15:34 broeker Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -60,6 +60,10 @@ typedef struct curve_points {
     int y_axis;			/* FIRST_Y_AXIS or SECOND_Y_AXIS */
     /* HBB 20000504: new field */
     int z_axis;			/* same as either x_axis or y_axis, for 5-column plot types */
+    /* pm 5.1.2002: new field */
+#ifdef PM3D
+    filledcurves_opts filledcurves_options;
+#endif
     struct coordinate GPHUGE *points;
 } curve_points;
 
