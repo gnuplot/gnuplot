@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.19 1999/08/24 11:22:57 lhecking Exp $
+ * $Id: plot.h,v 1.20 1999/09/14 15:27:41 lhecking Exp $
  *
  */
 
@@ -434,8 +434,9 @@ enum PLOT_STYLE {
 };
 
 enum PLOT_SMOOTH { 
-	NONE, UNIQUE, CSPLINES, ACSPLINES, BEZIER, SBEZIER
-
+    SMOOTH_NONE,
+    SMOOTH_ACSPLINES, SMOOTH_BEZIER, SMOOTH_CSPLINES, SMOOTH_SBEZIER,
+    SMOOTH_UNIQUE
 };
 
 /* this order means we can use  x-(just*strlen(text)*t->h_char)/2 if

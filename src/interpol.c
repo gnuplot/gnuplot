@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.8 1999/07/30 19:37:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.9 1999/08/07 17:21:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -880,21 +880,21 @@ struct curve_points *plot;
     for (i = 0; i < curves; i++) {
 	num_points = next_curve(plot, &first_point);
 	switch (plot->plot_smooth) {
-	case CSPLINES:
+	case SMOOTH_CSPLINES:
 	    sc = cp_tridiag(plot, first_point, num_points);
 	    do_cubic(plot, sc, first_point, num_points,
 		     new_points + i * (samples + 1));
 	    free(sc);
 	    break;
-	case ACSPLINES:
+	case SMOOTH_ACSPLINES:
 	    sc = cp_approx_spline(plot, first_point, num_points);
 	    do_cubic(plot, sc, first_point, num_points,
 		     new_points + i * (samples + 1));
 	    free(sc);
 	    break;
 
-	case BEZIER:
-	case SBEZIER:
+	case SMOOTH_BEZIER:
+	case SMOOTH_SBEZIER:
 	    bc = cp_binomial(num_points);
 	    do_bezier(plot, bc, first_point, num_points,
 		      new_points + i * (samples + 1));
