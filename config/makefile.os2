@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.10 1999/11/08 19:20:59 lhecking Exp $
+# $Id: makefile.os2,v 1.11 1999/12/01 22:07:57 lhecking Exp $
 #
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
@@ -42,7 +42,7 @@ VESA=1
 # as opposed to a production build since we lower the optimization level
 # DEBUG=1
 
-# MOUSE support for PM terminal
+# MOUSE support for PM and X11 terminals
 MOUSE=1
 
 #
@@ -120,8 +120,8 @@ EMXSPECIFIC = -ffloat-store \
    -DHAVE_MATH_H -DHAVE_MEMCPY -DHAVE_MEMMOVE -DHAVE_MEMSET -DHAVE_STRCSPN \
    -DHAVE_SELECT -DHAVE_SLEEP -DHAVE_SNPRINTF -DHAVE_STDLIB_H -DHAVE_STRCHR \
    -DHAVE_STRCSPN -DHAVE_STRERROR -DHAVE_STRING_H -DHAVE_STRNICMP \
-   -DHAVE_STRRCHR -DHAVE_SYS_PARAM_H -DHAVE_SYS_SELECT_H -DHAVE_SYS_SOCKET_H \
-   -DHAVE_SYS_STAT_H -DHAVE_SYS_TIME_H -DHAVE_SYS_TYPES_H \
+   -DHAVE_STRRCHR -DHAVE_SYS_IOCTL_H -DHAVE_SYS_PARAM_H -DHAVE_SYS_SELECT_H \
+   -DHAVE_SYS_SOCKET_H -DHAVE_SYS_STAT_H -DHAVE_SYS_TIME_H -DHAVE_SYS_TYPES_H \
    -DHAVE_TIME_H -DHAVE_UNISTD_H -DHAVE_VFPRINTF \
    -DPIPES -DREADLINE
 
@@ -223,7 +223,7 @@ gnuplot.exe: $(OBJS)
 # Build the PM outboard driver
 #
 $(OS2DIR)\gnupmdrv.$(O2):  $(OS2DIR)\gnupmdrv.c   $(OS2DIR)\gnupmdrv.h
-$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h
+$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h  mouse.h  gpexecute.inc
 $(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h  $(OS2DIR)\dialogs.h
 $(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h
 $(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
@@ -248,11 +248,14 @@ X11LIBS = -lX11 -lsocket -Zcrtdll
 # X11 includes
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
+ifdef MOUSE
+X11FLAGS += -DUSE_MOUSE
+endif
 
 gnuplot_x11.exe: gplt_x11.o
 	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
 
-gplt_x11.o: gplt_x11.c
+gplt_x11.o: gplt_x11.c mouse.h gpexecute.inc
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<
 
 #
