@@ -1,3 +1,13 @@
+2004-07-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/unset.c (unset_mtics): Renamed to unset_minitics, for
+	clarity.
+	(unset_month_day_tics): New function, to implement 'unset xmtics'
+	and friends.
+	(unset_command): Change all calls of unset_mtics to the new name.
+	Implement previously missing 'unset xmtics' and friends by calling
+	new function.
+
 2004-07-09  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/util.c (parse_esc): Limit size of octal constants to 3 chars,
