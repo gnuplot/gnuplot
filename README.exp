@@ -18,7 +18,7 @@
 
  USAGE:     configure --enable-thin-splines
             -OR-
-            add  -DTHIN_PLATE_SPLINES_GRID=1  to CFLAGS in the makefile
+            add  -DTHIN_PLATE_SPLINES_GRID=1  to CFLAGS in the platform makefile
 
  Mouse support for the pm terminal
  =================================
@@ -33,4 +33,19 @@
 
  USAGE:     Uncomment  USE_MOUSE=1  in the configuration section of
             makefile.os2
+
+ Sort help and subtopic tables by column
+ =======================================
+
+ SYSTEMS:   All
+
+ PURPOSE:   Sort help and subtopic tables bei row (default) or column
+
+ AUTHOR:    "Mark K. Gardner" <mkgardne@rtsl3.cs.uiuc.edu>
+
+ REFERENCE: Patch in private email from Tue, 27 Apr 1999
+
+ USAGE:     configure --without-row-help
+            -OR-
+            add  -DCOLUMN_HELP  to CFLAGS in the platform makefile
 
