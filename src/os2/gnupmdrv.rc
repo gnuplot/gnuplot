@@ -100,7 +100,7 @@ BEGIN
 	MENUITEM  "~lin/log y\tl, L", IDM_SET_LINLOGY
 	SUBMENU "~set",IDM_SET
         BEGIN
-            SUBMENU "~data style",IDM_SET_D_S
+            SUBMENU "style ~data", IDM_SET_D_S
             BEGIN
                 MENUITEM  "~boxes", IDM_SET_D_S_BOXES
                 MENUITEM  "~dots", IDM_SET_D_S_DOTS
@@ -112,7 +112,7 @@ BEGIN
                 MENUITEM  "~points", IDM_SET_D_S_POINTS
                 MENUITEM  "~steps", IDM_SET_D_S_STEPS
             END
-            SUBMENU "~function style",IDM_SET_F_S
+            SUBMENU "style ~function", IDM_SET_F_S
             BEGIN
                 MENUITEM  "~boxes", IDM_SET_F_S_BOXES
                 MENUITEM  "~dots", IDM_SET_F_S_DOTS
@@ -230,7 +230,7 @@ BEGIN
     BEGIN
         CTEXT           "GnuplotPM", -1, 8, 65, 128, 8
         CTEXT           "Gnuplot display for OS/2", -1, 8, 50, 128, 8
-        CTEXT           "$Revision: 1.8 $", -1, 8, 35, 128, 8
+        CTEXT           "$Revision: 1.9 $", -1, 8, 35, 128, 8
         DEFPUSHBUTTON   "OK", DID_OK, 56, 10, 32, 14, WS_GROUP
     END
 END
