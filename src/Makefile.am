@@ -1,14 +1,17 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
+# in the spirit of automake ...
+pkglibexecdir = $(libexecdir)/@PACKAGE@
+
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
 
 # Default help file location
-HELPFILE=$(datadir)/gnuplot.gih
+HELPFILE=$(pkgdatadir)/$(PKG_MAJOR)/gnuplot.gih
 
 # Default X11 driver location
-X11_DRIVER_DIR=$(pkglibdir)/$(PKG_MAJOR)
+X11_DRIVER_DIR=$(pkglibexecdir)/$(PKG_MAJOR)
 
 # There is probably no need to edit anything below this line
 
@@ -69,14 +72,14 @@ term$U.o: $(CORETERM)
 
 install-exec-local: $(EXTRA_PROGRAMS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)
+	$(mkinstalldirs) $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)
 	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
 	  ; then \
 	    f=`echo $$p1|sed '$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
-	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f ; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f ; \
 	  else :; fi; \
 	done
 
@@ -84,6 +87,6 @@ uninstall-local:
 	@$(NORMAL_UNINSTALL)
 	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
 	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f"; \
-	  rm -f $(DESTDIR)$(pkglibdir)/$(PKG_MAJOR)/$$f; \
+	  echo " rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f"; \
+	  rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f; \
 	done
