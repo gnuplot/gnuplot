@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.114 2003/11/13 08:18:16 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.115 2003/11/13 08:59:09 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1927,7 +1927,8 @@ show_palette_fit2rgbformulae()
 {
 #define rgb_distance(r,g,b) ((r)*(r) + (g)*(g) + (b)*(b))
     int pts = 32; /* resolution: nb of points in the discrete raster for comparisons */
-    int i, p, r, g, b, ir, ig, ib, rMin, gMin, bMin;
+    int i, p, ir, ig, ib;
+    int rMin=0, gMin=0, bMin=0;
     int maxFormula = sm_palette.colorFormulae - 1; /* max formula number */
     double gray, dist, distMin;
     rgb_color *currRGB;
@@ -1998,7 +1999,7 @@ show_palette_palette()
 {
     int colors, i;
     struct value a;
-    double gray, r, g, b;
+    double gray;
     rgb_color rgb1;
     rgb255_color rgb255;
     int how = 0; /* How to print table: 0: default large; 1: rgb 0..1; 2: integers 0..255 */
