@@ -1,3 +1,9 @@
+2004-06-24  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/mouse.c (event_reset): If 'pause mouse' terminates because the
+	plot window is closed, insert an extra '\n' into the input stream so
+	that the first character of the subsequent command is not swallowed.
+
 2004-06-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c (event_reset), src/command.c (pause_command),
