@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.63 2003/10/06 22:26:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.64 2004/04/13 17:23:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -752,30 +752,32 @@ print_table(current_plot, plot_num)
 	 curve++, current_plot = current_plot->next) {
 	struct coordinate GPHUGE *point = NULL;
 
-	fprintf(gpoutfile, "#Curve %d, %d points\n#x y",
-		curve, current_plot->p_count);
+	/* two blank lines between plots in table output by prepending
+	 * a \n here */
+	fprintf(gpoutfile, "\n#Curve %d of %d, %d points\n#x y",
+		curve, plot_num, current_plot->p_count);
 	switch (current_plot->plot_style) {
 	case BOXES:
 	case XERRORBARS:
-	    fprintf(gpoutfile, " xlow xhigh");
+	    fputs(" xlow xhigh", gpoutfile);
 	    break;
 	case BOXERROR:
 	case YERRORBARS:
-	    fprintf(gpoutfile, " ylow yhigh");
+	    fputs(" ylow yhigh", gpoutfile);
 	    break;
 	case BOXXYERROR:
 	case XYERRORBARS:
-	    fprintf(gpoutfile, " xlow xhigh ylow yhigh");
+	    fputs(" xlow xhigh ylow yhigh", gpoutfile);
 	    break;
 	case FINANCEBARS:
 	case CANDLESTICKS:
-	    fprintf(gpoutfile, "open ylow yhigh yclose");
+	    fputs("open ylow yhigh yclose", gpoutfile);
 	default:
 	    /* ? */
 	    break;
 	}
 
-	fprintf(gpoutfile, " type\n");
+	fputs(" type\n", gpoutfile);
 	for (i = 0, point = current_plot->points;
 	     i < current_plot->p_count;
 	     i++, point++) {
@@ -819,19 +821,17 @@ print_table(current_plot, plot_num)
 	    default:
 		/* ? */
 		break;
-	    }
+	    } /* switch(plot type) */
 	    fprintf(gpoutfile, " %c\n",
 		    current_plot->points[i].type == INRANGE
 		    ? 'i' : current_plot->points[i].type == OUTRANGE
 		    ? 'o' : 'u');
-	}
-	fputc('\n', gpoutfile);
-    }
+	} /* for(point i) */
 
-    /* two blank lines between plots in table output */
-    fputc('\n', gpoutfile);
+	putc('\n', gpoutfile);
+    } /* for(curve) */
+
     fflush(gpoutfile);
-
     free(buffer);
 }
 #undef OUTPUT_NUMBER
