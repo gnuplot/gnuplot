@@ -1,3 +1,17 @@
+2004-01-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in, configure.vms, src/fit.c, src/gplt_x11.c, src/stdfn.h,
+	term/ggi.trm, term/x11.trm: Use AC_FUNC_SELECT_ARGTYPES instead of
+	AC_FUNC_SELECT and related changes.
+
+	* config/config.amg: Updated.
+
+	* docs/gnuplot.doc: Removed whitespace-only line as pointed out by
+	"make check".
+
+	* m4/apple.m4, m4/beos.m4, m4/msdos.m4, m4/next.m4: Newer autoconf
+	versions require stricter quoting.
+
 2004-01-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/command.c (test_palette_subcommand, test_time_subcommand):
