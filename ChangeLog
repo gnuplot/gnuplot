@@ -1,7 +1,7 @@
 2004-10-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot3d.c (get_3ddata):  Reorganize the code so that fewer
-	assumptions are made about what the plot more must be based on the
+	assumptions are made about what the plot must be based on the
 	number of columns, and so that the various 3D mapping modes share
 	the interpretations of columns other than the first three.
 
