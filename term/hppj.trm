@@ -1,5 +1,5 @@
 /*
- * $Id: hppj.trm,v 1.8 1999/05/31 18:33:51 lhecking Exp $
+ * $Id: hppj.trm,v 1.9 1999/06/19 20:30:51 lhecking Exp $
  *
  */
 
@@ -68,16 +68,16 @@ register_term(hppj)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void HPPJoptions __PROTO((void));
-TERM_PUBLIC void HPPJinit __PROTO((void));
-TERM_PUBLIC void HPPJreset __PROTO((void));
-TERM_PUBLIC void HPPJgraphics __PROTO((void));
-TERM_PUBLIC void HPPJtext __PROTO((void));
-TERM_PUBLIC void HPPJlinetype __PROTO((int linetype));
-#define HPPJmove       b_move
-#define HPPJvector     b_vector
-#define HPPJtext_angle b_text_angle
-#define HPPJput_text   b_put_text
+TERM_PUBLIC void HPPJ_options __PROTO((void));
+TERM_PUBLIC void HPPJ_init __PROTO((void));
+TERM_PUBLIC void HPPJ_reset __PROTO((void));
+TERM_PUBLIC void HPPJ_graphics __PROTO((void));
+TERM_PUBLIC void HPPJ_text __PROTO((void));
+TERM_PUBLIC void HPPJ_linetype __PROTO((int linetype));
+#define HPPJ_move       b_move
+#define HPPJ_vector     b_vector
+#define HPPJ_text_angle b_text_angle
+#define HPPJ_put_text   b_put_text
 
 /* We define 3 different font sizes: 5x9, 9x17, and 13x25 */
 
@@ -100,7 +100,7 @@ TERM_PUBLIC void HPPJlinetype __PROTO((int linetype));
 static int hppj_font = FNT9X17;
 
 TERM_PUBLIC void
-HPPJoptions()
+HPPJ_options()
 {
     char opt[10];
 #define HPPJERROR "expecting font size FNT5X9, FNT9X17, or FNT13X25"
@@ -131,7 +131,7 @@ HPPJoptions()
 
 
 TERM_PUBLIC void
-HPPJinit()
+HPPJ_init()
 {
     /* HBB 980226: moved this here, from graphics(): only init() may
      * change fields of *term ! */
@@ -159,7 +159,7 @@ HPPJinit()
 
 
 TERM_PUBLIC void
-HPPJreset()
+HPPJ_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -168,7 +168,7 @@ HPPJreset()
 
 
 TERM_PUBLIC void
-HPPJgraphics()
+HPPJ_graphics()
 {
     /* HBB 980226: move a block of code from here to init() */
     b_charsize(hppj_font);
@@ -178,7 +178,7 @@ HPPJgraphics()
 
 
 TERM_PUBLIC void
-HPPJtext()
+HPPJ_text()
 {
     int x, plane, y;		/* loop indexes */
     int minRow, maxRow;		/* loop bounds */
@@ -244,7 +244,7 @@ HPPJtext()
 
 
 TERM_PUBLIC void
-HPPJlinetype(linetype)
+HPPJ_linetype(linetype)
 int linetype;
 {
     if (linetype >= 0) {
@@ -264,8 +264,8 @@ TERM_TABLE_START(hppj_driver)
     "hppj", "HP PaintJet and HP3630 [FNT5X9 FNT9X17 FNT13X25]",
     HPPJ_XMAX, HPPJ_YMAX,
     HPPJ_9x17_VCHAR, HPPJ_9x17_HCHAR, HPPJ_9x17_VTIC, HPPJ_9x17_HTIC,
-    HPPJoptions, HPPJinit, HPPJreset, HPPJtext, null_scale, HPPJgraphics,
-    HPPJmove, HPPJvector, HPPJlinetype, HPPJput_text, HPPJtext_angle,
+    HPPJ_options, HPPJ_init, HPPJ_reset, HPPJ_text, null_scale, HPPJ_graphics,
+    HPPJ_move, HPPJ_vector, HPPJ_linetype, HPPJ_put_text, HPPJ_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(hppj_driver)
 

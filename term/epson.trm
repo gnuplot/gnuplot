@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.13 1999/08/24 11:24:53 lhecking Exp $
+ * $Id: epson.trm,v 1.14 1999/10/01 15:09:10 lhecking Exp $
  *
  */
 
@@ -84,12 +84,12 @@ register_term(tandy_60dpi)
 #ifdef TERM_PROTO
 
 #if defined(EPS180) || defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
-TERM_PUBLIC void EPSONinit __PROTO((void));
-TERM_PUBLIC void EPSONreset __PROTO((void));
-#define EPSONlinetype b_setlinetype
-#define EPSONmove b_move
-#define EPSONvector b_vector
-#define EPSONput_text b_put_text
+TERM_PUBLIC void EPSON_init __PROTO((void));
+TERM_PUBLIC void EPSON_reset __PROTO((void));
+#define EPSON_linetype b_setlinetype
+#define EPSON_move b_move
+#define EPSON_vector b_vector
+#define EPSON_put_text b_put_text
 #define EPSON_text_angle b_text_angle
 
 #if defined(EPS60) || defined(EPSONP) || defined(TANDY60) || defined(OKIDATA)
@@ -101,15 +101,15 @@ TERM_PUBLIC void EPSONreset __PROTO((void));
 #ifdef EPSONP
 #define EPSONXMAX	512
 #define EPSONYMAX	384
-TERM_PUBLIC void EPSONgraphics __PROTO((void));
-TERM_PUBLIC void EPSONtext __PROTO((void));
+TERM_PUBLIC void EPSON_graphics __PROTO((void));
+TERM_PUBLIC void EPSON_text __PROTO((void));
 #endif /* EPSONP */
 #endif /* four drivers */
 #endif /* all five */
 
 #ifdef EPS180
-TERM_PUBLIC void EPS180graphics __PROTO((void));
-TERM_PUBLIC void EPS180text __PROTO((void));
+TERM_PUBLIC void EPS180_graphics __PROTO((void));
+TERM_PUBLIC void EPS180_text __PROTO((void));
 #define EPSON180VCHAR		FNT13X25_VCHAR
 #define EPSON180HCHAR		FNT13X25_HCHAR
 #define EPSON180VTIC		18
@@ -123,28 +123,28 @@ TERM_PUBLIC void EPS180text __PROTO((void));
 /* make the total dimensions 8 inches by 5 inches */
 #define EPS60XMAX	480
 #define EPS60YMAX	360
-TERM_PUBLIC void EPS60graphics __PROTO((void));
+TERM_PUBLIC void EPS60_graphics __PROTO((void));
 #ifdef TANDY60
-TERM_PUBLIC void TANDY60text __PROTO((void));
+TERM_PUBLIC void TANDY60_text __PROTO((void));
 #endif /* TANDY60 */
 #ifdef OKIDATA
-TERM_PUBLIC void OKIDATAtext __PROTO((void));
+TERM_PUBLIC void OKIDATA_text __PROTO((void));
 #endif /* OKIDATA */
 #ifdef EPS60
-TERM_PUBLIC void EPS60text __PROTO((void));
+TERM_PUBLIC void EPS60_text __PROTO((void));
 #endif /* EPS60 */
 #endif /* all three */
 
 #ifdef NEC
-TERM_PUBLIC void NECoptions __PROTO((void));
-TERM_PUBLIC void NECinit __PROTO((void));
-TERM_PUBLIC void NECgraphics __PROTO((void));
-TERM_PUBLIC void NECtext __PROTO((void));
-TERM_PUBLIC void NEClinetype __PROTO((int linetype));
-TERM_PUBLIC void NECreset __PROTO((void));
-#define NECmove b_move
-#define NECvector b_vector
-#define NECput_text b_put_text
+TERM_PUBLIC void NEC_options __PROTO((void));
+TERM_PUBLIC void NEC_init __PROTO((void));
+TERM_PUBLIC void NEC_graphics __PROTO((void));
+TERM_PUBLIC void NEC_text __PROTO((void));
+TERM_PUBLIC void NEC_linetype __PROTO((int linetype));
+TERM_PUBLIC void NEC_reset __PROTO((void));
+#define NEC_move b_move
+#define NEC_vector b_vector
+#define NEC_put_text b_put_text
 #define NEC_text_angle b_text_angle
 #define NECXMAX	400
 #define NECYMAX	320
@@ -155,14 +155,14 @@ TERM_PUBLIC void NECreset __PROTO((void));
 #endif /* NEC */
 
 #ifdef STARC
-TERM_PUBLIC void STARCinit __PROTO((void));
-TERM_PUBLIC void STARCgraphics __PROTO((void));
-TERM_PUBLIC void STARCtext __PROTO((void));
-TERM_PUBLIC void STARClinetype __PROTO((int linetype));
-TERM_PUBLIC void STARCreset __PROTO((void));
-#define STARCmove b_move
-#define STARCvector b_vector
-#define STARCput_text b_put_text
+TERM_PUBLIC void STARC_init __PROTO((void));
+TERM_PUBLIC void STARC_graphics __PROTO((void));
+TERM_PUBLIC void STARC_text __PROTO((void));
+TERM_PUBLIC void STARC_linetype __PROTO((int linetype));
+TERM_PUBLIC void STARC_reset __PROTO((void));
+#define STARC_move b_move
+#define STARC_vector b_vector
+#define STARC_put_text b_put_text
 #define STARC_text_angle b_text_angle
 #define STARCXMAX	512
 #define STARCYMAX	384
@@ -192,12 +192,12 @@ static void epson_dump __PROTO((void));
 #define EPSONYLAST (EPSONYMAX - 1)
 
 TERM_PUBLIC void
-EPSONinit()
+EPSON_init()
 {
 }
 
 TERM_PUBLIC void
-EPSONgraphics()
+EPSON_graphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (EPSONXMAX * xsize),
@@ -206,7 +206,7 @@ EPSONgraphics()
 
 
 TERM_PUBLIC void
-EPSONtext()
+EPSON_text()
 {
     epson_dump();
     b_freebitmap();
@@ -214,7 +214,7 @@ EPSONtext()
 
 
 TERM_PUBLIC void
-EPSONreset()
+EPSON_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -250,7 +250,7 @@ epson_dump()
    routines to build up a bit map in memory. */
 /* by Russell Lang, rjl@monu1.cc.monash.edu.au */
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
-/* NECinit changes gpoutfile to binary mode for PC's */
+/* NEC_init changes gpoutfile to binary mode for PC's */
 
 /* Add a Monochrome NEC printer (for faster speed and line types) jdc */
 
@@ -281,7 +281,7 @@ static struct gen_table NEC_opts[] =
 };
 
 TERM_PUBLIC void
-NECoptions()
+NEC_options()
 {
     /* default */
     if (END_OF_COMMAND) {
@@ -320,12 +320,12 @@ NECoptions()
 }
 
 TERM_PUBLIC void
-NECinit()
+NEC_init()
 {
 }
 
 TERM_PUBLIC void
-NECgraphics()
+NEC_graphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (NECXMAX * xsize),
@@ -333,7 +333,7 @@ NECgraphics()
 }
 
 TERM_PUBLIC void
-NECtext()
+NEC_text()
 {
     if (NECmode == 'd') {
 	nec_draft_dump();
@@ -344,7 +344,7 @@ NECtext()
 }
 
 TERM_PUBLIC void
-NEClinetype(linetype)
+NEC_linetype(linetype)
 int linetype;
 {
     if (NECmode == 'c') {
@@ -359,7 +359,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-NECreset()
+NEC_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -497,12 +497,12 @@ static unsigned int STARCcolor[] = { 1, 8, 4, 2, 10, 12, 6, 14 };
 static unsigned int STARCpcolor[] = { 0, 2, 1, 4 };
 
 TERM_PUBLIC void
-STARCinit()
+STARC_init()
 {
 }
 
 TERM_PUBLIC void
-STARCgraphics()
+STARC_graphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (STARCXMAX * xsize),
@@ -511,14 +511,14 @@ STARCgraphics()
 
 
 TERM_PUBLIC void
-STARCtext()
+STARC_text()
 {
     STARC_dump();
     b_freebitmap();
 }
 
 TERM_PUBLIC void
-STARClinetype(linetype)
+STARC_linetype(linetype)
 int linetype;
 {
     if (linetype >= 6)
@@ -529,7 +529,7 @@ int linetype;
 
 
 TERM_PUBLIC void
-STARCreset()
+STARC_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -582,7 +582,7 @@ static void eps180_dump __PROTO((void));
 #define EPS180YLAST (EPS180YMAX - 1)
 
 TERM_PUBLIC void
-EPS180graphics()
+EPS180_graphics()
 {
     b_charsize(FNT13X25);
     b_makebitmap((unsigned int) (EPS180XMAX * xsize),
@@ -591,7 +591,7 @@ EPS180graphics()
 
 
 TERM_PUBLIC void
-EPS180text()
+EPS180_text()
 {
     eps180_dump();
     b_freebitmap();
@@ -636,7 +636,7 @@ static void eps60_dump __PROTO((void));
 #define EPS60YLAST (EPS60YMAX - 1)
 
 TERM_PUBLIC void
-EPS60graphics()
+EPS60_graphics()
 {
     b_charsize(FNT5X9);
     b_makebitmap((unsigned int) (EPS60XMAX * xsize),
@@ -645,7 +645,7 @@ EPS60graphics()
 
 
 TERM_PUBLIC void
-EPS60text()
+EPS60_text()
 {
     eps60_dump();
     b_freebitmap();
@@ -685,7 +685,7 @@ eps60_dump()
 
 
 TERM_PUBLIC void
-TANDY60text()
+TANDY60_text()
 {
 #ifdef PC
     fputs("Inserting Tandy/IBM mode conversion codes\n", stderr);
@@ -709,7 +709,7 @@ TANDY60text()
 static void okidata_dump __PROTO((void));
 
 TERM_PUBLIC void
-OKIDATAtext()
+OKIDATA_text()
 {
     okidata_dump();
     b_freebitmap();
@@ -793,9 +793,9 @@ okidata_dump()
 TERM_TABLE_START(epson180_driver)
     "epson_180dpi", "Epson LQ-style 180-dot per inch (24 pin) printers",
     EPS180XMAX, EPS180YMAX, EPSON180VCHAR, EPSON180HCHAR,
-    EPSON180VTIC, EPSON180HTIC, options_null, EPSONinit, EPSONreset,
-    EPS180text, null_scale, EPS180graphics, EPSONmove, EPSONvector,
-    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    EPSON180VTIC, EPSON180HTIC, options_null, EPSON_init, EPSON_reset,
+    EPS180_text, null_scale, EPS180_graphics, EPSON_move, EPSON_vector,
+    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epson180_driver)
 
@@ -807,9 +807,9 @@ TERM_TABLE_END(epson180_driver)
 TERM_TABLE_START(epson60_driver)
     "epson_60dpi", "Epson-style 60-dot per inch printers",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-    EPS60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
+    EPS60_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
+    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epson60_driver)
 
@@ -821,9 +821,9 @@ TERM_TABLE_END(epson60_driver)
 TERM_TABLE_START(epsonlx_driver)
     "epson_lx800", "Epson LX-800, Star NL-10, NX-1000, PROPRINTER ...",
     EPSONXMAX, EPSONYMAX, EPSONVCHAR, EPSONHCHAR,
-    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-    EPSONtext, null_scale, EPSONgraphics, EPSONmove, EPSONvector,
-    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
+    EPSON_text, null_scale, EPSON_graphics, EPSON_move, EPSON_vector,
+    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(epsonlx_driver)
 
@@ -835,9 +835,9 @@ TERM_TABLE_END(epsonlx_driver)
     TERM_TABLE_START(nec_driver)
     "nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
     NECXMAX, NECYMAX, NECVCHAR, NECHCHAR,
-    NECVTIC, NECHTIC, NECoptions, NECinit, NECreset,
-    NECtext, null_scale, NECgraphics, NECmove, NECvector,
-    NEClinetype, NECput_text, NEC_text_angle,
+    NECVTIC, NECHTIC, NEC_options, NEC_init, NEC_reset,
+    NEC_text, null_scale, NEC_graphics, NEC_move, NEC_vector,
+    NEC_linetype, NEC_put_text, NEC_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(nec_driver)
 
@@ -849,9 +849,9 @@ TERM_TABLE_END(nec_driver)
 TERM_TABLE_START(okidata_driver)
     "okidata", "OKIDATA 320/321 Standard",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-    OKIDATAtext, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
+    OKIDATA_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
+    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(okidata_driver)
 
@@ -863,9 +863,9 @@ TERM_TABLE_END(okidata_driver)
 TERM_TABLE_START(starc_driver)
     "starc", "Star Color Printer",
     STARCXMAX, STARCYMAX, STARCVCHAR, STARCHCHAR,
-    STARCVTIC, STARCHTIC, options_null, STARCinit, STARCreset,
-    STARCtext, null_scale, STARCgraphics, STARCmove, STARCvector,
-    STARClinetype, STARCput_text, STARC_text_angle,
+    STARCVTIC, STARCHTIC, options_null, STARC_init, STARC_reset,
+    STARC_text, null_scale, STARC_graphics, STARC_move, STARC_vector,
+    STARC_linetype, STARC_put_text, STARC_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(starc_driver)
 
@@ -877,9 +877,9 @@ TERM_TABLE_END(starc_driver)
 TERM_TABLE_START(tandy60_driver)
     "tandy_60dpi", "Tandy DMP-130 series 60-dot per inch graphics",
     EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
-    EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
-    TANDY60text, null_scale, EPS60graphics, EPSONmove, EPSONvector,
-    EPSONlinetype, EPSONput_text, EPSON_text_angle,
+    EPSONVTIC, EPSONHTIC, options_null, EPSON_init, EPSON_reset,
+    TANDY60_text, null_scale, EPS60_graphics, EPSON_move, EPSON_vector,
+    EPSON_linetype, EPSON_put_text, EPSON_text_angle,
     null_justify_text, do_point, do_arrow, set_font_null, 0, TERM_BINARY
 TERM_TABLE_END(tandy60_driver)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pbm.trm,v 1.15 1999/08/07 17:19:13 lhecking Exp $
+ * $Id: pbm.trm,v 1.16 1999/08/24 11:24:56 lhecking Exp $
  *
  */
 
@@ -67,17 +67,17 @@ register_term(pbm_driver)
 #endif
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void PBMoptions __PROTO((void));
-TERM_PUBLIC void PBMinit __PROTO((void));
-TERM_PUBLIC void PBMreset __PROTO((void));
-TERM_PUBLIC void PBMsetfont __PROTO((void));
-TERM_PUBLIC void PBMgraphics __PROTO((void));
-TERM_PUBLIC void PBMmonotext __PROTO((void));
-TERM_PUBLIC void PBMgraytext __PROTO((void));
-TERM_PUBLIC void PBMcolortext __PROTO((void));
-TERM_PUBLIC void PBMtext __PROTO((void));
-TERM_PUBLIC void PBMlinetype __PROTO((int linetype));
-TERM_PUBLIC void PBMpoint __PROTO((unsigned int x, unsigned int y, int point));
+TERM_PUBLIC void PBM_options __PROTO((void));
+TERM_PUBLIC void PBM_init __PROTO((void));
+TERM_PUBLIC void PBM_reset __PROTO((void));
+TERM_PUBLIC void PBM_setfont __PROTO((void));
+TERM_PUBLIC void PBM_graphics __PROTO((void));
+TERM_PUBLIC void PBM_monotext __PROTO((void));
+TERM_PUBLIC void PBM_graytext __PROTO((void));
+TERM_PUBLIC void PBM_colortext __PROTO((void));
+TERM_PUBLIC void PBM_text __PROTO((void));
+TERM_PUBLIC void PBM_linetype __PROTO((int linetype));
+TERM_PUBLIC void PBM_point __PROTO((unsigned int x, unsigned int y, int point));
 #endif /* TERM_PROTO */
 
 /* make XMAX and YMAX a multiple of 8 */
@@ -117,7 +117,7 @@ static struct gen_table PBM_opts[] =
 };
 
 TERM_PUBLIC void
-PBMoptions()
+PBM_options()
 {
     pbm_font = 1;
     pbm_mode = 0;
@@ -189,14 +189,14 @@ PBMoptions()
 
 
 TERM_PUBLIC void
-PBMinit()
+PBM_init()
 {
-    PBMsetfont();		/* HBB 980226: call it here! */
+    PBM_setfont();		/* HBB 980226: call it here! */
 }
 
 
 TERM_PUBLIC void
-PBMreset()
+PBM_reset()
 {
 #ifdef VMS
     fflush_binary();
@@ -205,7 +205,7 @@ PBMreset()
 
 
 TERM_PUBLIC void
-PBMsetfont()
+PBM_setfont()
 {
     switch (pbm_font) {
     case 1:
@@ -234,7 +234,7 @@ PBMsetfont()
 
 
 TERM_PUBLIC void
-PBMgraphics()
+PBM_graphics()
 {
     int numplanes = 1;
 
@@ -263,7 +263,7 @@ PBMgraphics()
 
 
 static void
-PBMmonotext()
+PBM_monotext()
 {
     register int x, j, row;
 
@@ -282,7 +282,7 @@ PBMmonotext()
 }
 
 static void
-PBMgraytext()
+PBM_graytext()
 {
     register int x, j, row;
     register int i, value;
@@ -323,7 +323,7 @@ P5\n\
 }
 
 static void
-PBMcolortext()
+PBM_colortext()
 {
     register int x, j, row;
     register int i;
@@ -368,24 +368,24 @@ PBMcolortext()
 }
 
 TERM_PUBLIC void
-PBMtext()
+PBM_text()
 {
     switch (pbm_mode) {
     case 0:
-	PBMmonotext();
+	PBM_monotext();
 	break;
     case 1:
-	PBMgraytext();
+	PBM_graytext();
 	break;
     case 2:
-	PBMcolortext();
+	PBM_colortext();
 	break;
     }
 }
 
 
 TERM_PUBLIC void
-PBMlinetype(linetype)
+PBM_linetype(linetype)
 int linetype;
 {
     switch (pbm_mode) {
@@ -406,7 +406,7 @@ int linetype;
 }
 
 TERM_PUBLIC void
-PBMpoint(x, y, point)
+PBM_point(x, y, point)
 unsigned int x, y;
 int point;
 {
@@ -420,18 +420,18 @@ int point;
 
 #ifdef TERM_TABLE
 
-#define PBMmove b_move
-#define PBMvector b_vector
-#define PBMtext_angle b_text_angle
-#define PBMput_text b_put_text
+#define PBM_move b_move
+#define PBM_vector b_vector
+#define PBM_text_angle b_text_angle
+#define PBM_put_text b_put_text
 
 TERM_TABLE_START(pbm_driver)
     "pbm", "Portable bitmap [small medium large] [monochrome gray color]",
     PBM_XMAX, PBM_YMAX, PBM_VCHAR,
-    PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
-    PBMinit, PBMreset, PBMtext, null_scale,
-    PBMgraphics, PBMmove, PBMvector, PBMlinetype,
-    PBMput_text, PBMtext_angle, null_justify_text, PBMpoint,
+    PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBM_options,
+    PBM_init, PBM_reset, PBM_text, null_scale,
+    PBM_graphics, PBM_move, PBM_vector, PBM_linetype,
+    PBM_put_text, PBM_text_angle, null_justify_text, PBM_point,
     do_arrow, set_font_null,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
