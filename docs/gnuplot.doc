@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.229 2004/07/03 06:08:22 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.230 2004/07/05 03:48:33 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -574,9 +574,9 @@ C
  contain four columns, with a text field in column 3:
 
    1.000 2.000 "Third column is all of this text" 4.00
- 
+
  Text fields can be positioned within a 2-D or 3-D plot using the commands:
-   
+
    plot 'datafile' using 1:2:4 with labels
    splot 'datafile using 1:2:3:4 with labels
 
@@ -3069,7 +3069,7 @@ C ... and restart the table:
  In this case the entry in the first row of column 2 will be used for the 
  key entry of the plot constructed from dividing column 2 by column 3.
  The entry in the first row of column 3 will be ignored.
- 
+
 5 xticlabels
 ?using xticlabels
 ?plot using xticlabels
@@ -4232,8 +4232,7 @@ C ... and restart the table:
  integers in the range from 2 (linear) to 10.
 
  `levels`--- Selection of contour levels,  controlled by `auto` (default),
- `discrete`, `incremental`, and <n>, number of contour levels, limited to
-  MAX_DISCRETE_LEVELS as defined in plot.h (30 is standard.)
+ `discrete`, `incremental`, and <n>, number of contour levels.
 
  For `auto`, <n> specifies a nominal number of levels; the actual number will
  be adjusted to give simple labels. If the surface is bounded by zmin and zmax,
@@ -7222,11 +7221,11 @@ C ... and restart the table:
  `plot` command must specify a single input data source (e.g. one column of 
  the input file), possibly with associated tic values or key titles.
  Three styles of histogram layout are currently supported. 
- 
+
        set style histogram clustered {gap <gapsize>}
        set style histogram rowstacked
        set style histogram columnstacked
- 
+
  The default style corresponds to `set style histogram clustered gap 2`. 
  Each set of parallel data values is collected into a group of boxes clustered
  at the x-axis coordinate corresponding to their sequential position (row #)
@@ -7319,7 +7318,6 @@ C ... and restart the table:
  using the same coloring for multiple histograms
        plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
             newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
- 
 
 5 filledcurves
 ?commands set style filledcurves
