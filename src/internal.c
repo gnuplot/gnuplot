@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.21 2004/10/27 21:54:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.22 2004/11/01 01:17:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -1290,5 +1290,6 @@ sprintf_specifier(const char* format)
 	int_error(NO_CARET,
 		  "sprintf_specifier: no format specifier\n");
 
+    return INTGR; /* Can't happen, but the compiler doesn't realize that */
 }
 #endif
