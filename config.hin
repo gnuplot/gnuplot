@@ -348,3 +348,9 @@
 /*  Define if you want to have Petr Mikulik's fancy pm3d.  */
 #undef PM3D
 
+/*  Define if you want to have Uli Gruenebaum's filledboxes style.  */
+#undef USE_ULIG_FILLEDBOXES
+
+/*  Define if you want to have Uli Gruenebaum's relative boxwidth.  */
+#undef USE_ULIG_RELATIVE_BOXWIDTH
+

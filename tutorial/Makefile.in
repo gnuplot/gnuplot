@@ -66,6 +66,7 @@ CPP = @CPP@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 DEPDIR = @DEPDIR@
+DVIPS = @DVIPS@
 EMACS = @EMACS@
 GNUPLOT_X11 = @GNUPLOT_X11@
 LASERGNU = @LASERGNU@
@@ -75,30 +76,31 @@ LINUXSUID = @LINUXSUID@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 PDFLATEX = @PDFLATEX@
+PLAINTEX = @PLAINTEX@
 TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
+TROFF = @TROFF@
 TUTORIAL = @TUTORIAL@
 U = @U@
 VERSION = @VERSION@
 install_sh = @install_sh@
 
+# $Header: /cvsroot/gnuplot/gnuplot/tutorial/Makefile.am,v 1.11 2001/10/09 12:23:59 amai Exp $
+
 
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-PLT_SOURCES = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
+PLT_files = eg1.plt eg2.plt eg3.plt eg4.plt eg5.plt eg6.plt linepoin.plt 
 
-EXTRA_DIST = Makefile.am.in $(PLT_SOURCES) \
-header.tex makefile.dst tutorial.tex eg3.dat
-
-
-CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.ps eg1.tex \
-eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
+EXTRA_DIST = $(PLT_files) \
+              header.tex tutorial.tex eg3.dat
 
 
-DVIPS = dvips
-LATEX = @LATEX@
+CLEANFILES = tutorial.aux tutorial.dvi tutorial.log tutorial.pdf tutorial.ps \
+             eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex
 
-SUFFIXES = .dvi .plt .tex .ps
+
+SUFFIXES = .dvi .pdf .plt .ps .tex
 subdir = tutorial
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../config.h
@@ -116,7 +118,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .dvi .plt .tex .ps
+.SUFFIXES: .dvi .pdf .plt .ps .tex
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --foreign tutorial/Makefile
 
@@ -183,7 +185,7 @@ mostlyclean-am:  mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-generic mostlyclean-am clean-local
+clean-am:  clean-generic mostlyclean-am
 
 clean: clean-am
 
@@ -223,6 +225,12 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) tutorial
 
+tutorial.pdf: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
+	tutorial.tex header.tex
+	@echo Building LaTeX tutorial
+	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
+	TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) tutorial
+
 .dvi.ps:
 	$(DVIPS) -o $@ $<
 
@@ -233,18 +241,6 @@ tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoin.tex \
 	else \
 	  gnuplot $< ; \
 	fi
-
-clean-local:
-	@test "$(top_srcdir)" = "$(top_builddir)" || rm -f eg?.dat
-
-Makefile.am: Makefile.am.in
-	rm -f $@ $@t
-	sed -n '1,/^##plt-files-begin/p' Makefile.am.in > $@t
-	echo PLT_SOURCES = *.plt | fmt | (tr '\012' @; echo ) \
-	  |sed 's/@$$/%/;s/@/ \\@/g;' | tr @% '\012 ' >> $@t
-	sed -n '/^##plt-files-end/,$$p' $< >> $@t
-	chmod a-w $@t
-	mv $@t $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
