@@ -1,3 +1,8 @@
+2002-07-04  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* pm3d/contrib/pm3dConvertToImage.awk: Fix for compressing several
+	images in one postscript file.
+
 2002-07-03  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/plot3d.c: Fallback to PM3DSURFACE style for 2 or 4 columns is no
@@ -693,7 +698,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/03 08:44:01 $).
+	last modification date (from the tag $Date: 2002/07/03 08:47:10 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

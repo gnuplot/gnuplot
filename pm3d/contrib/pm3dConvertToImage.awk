@@ -1,7 +1,7 @@
 # pm3dConvertToImage.awk
 # Written by Petr Mikulik, mikulik@physics.muni.cz
 # Code of pm3dImage contributed by Dick Crawford
-# Version: 3. 10. 2001
+# Version: 4. 7. 2002
 #
 # This awk script tries to compress maps in a postscript file created by pm3d
 # or gnuplot with pm3d splotting mode. If the input data formed a rectangular
@@ -14,13 +14,15 @@
 # or
 #    your_shell>awk -f pm3dConvertToImage.awk <map.ps >image.ps
 #
-# Distribution policy: this script belongs to the pm3d and gnuplot programs.
+# Distribution policy: this script belongs to the distribution of pm3d and
+# gnuplot programs.
 #
 # Notes:
-#    - no usage of run length encoding etc.; but if anybody has this written
-#      in awk, then do not hesitate to contribute
+#    - no use of run length encoding etc --- you are welcome to contribute
+#      an awk implementation
 #
 # History of changes:
+#    - 4.  7. 2002 Petr Mikulik: Fix for compressing several images in one file.
 #    - 3. 10. 2001 Petr Mikulik: Replaced "stroke" by "Stroke" in the "/g"
 #      definition - fixes conversion of colour images.
 #    - 16. 5. 2000 Petr Mikulik and Dick Crawford: The first version.
@@ -32,7 +34,7 @@ BEGIN {
 err = "/dev/stderr"
 
 if (ARGC!=1) {
-  print "pm3dConvertToImage.awk --- (c) Petr Mikulik, Brno. Version 16. 5. 2000" >err
+  print "pm3dConvertToImage.awk --- (c) Petr Mikulik, Brno. Version 4. 7. 2002" >err
   print "Compression of matrix-like pm3d .ps files into 256 levels image. See also" >err
   print "header of this script for more info." >err
   print "Usage:\n\t[stdout | ] awk -f pm3dConvertToImage.awk [<inp_file.ps] >out_file.ps" >err
@@ -90,13 +92,14 @@ pm3d_images++
 # initialize variables for the image description
 pm3dline = 0
 scans = 1
+row[scans] = ""
 x2 = -29999.123; y2 = -29999.123
 next
 }
 
 
 ########################################
-# Outside pm3d map regin.
+# Outside pm3d map region.
 
 !inside_pm3d_map {
 if ($1 == "%%Creator:")
