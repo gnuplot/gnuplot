@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.112 2003/02/18 16:19:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.113 2003/03/13 06:17:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2820,6 +2820,25 @@ set_pm3d()
 	    case S_PM3D_NOIMPLICIT: /* "noi$mplicit" */
 	    case S_PM3D_EXPLICIT: /* "e$xplicit" */
 		pm3d.implicit = PM3D_EXPLICIT;
+		continue;
+	    case S_PM3D_WHICH_CORNER: /* "corners2color" */
+		c_token++;
+		if (equals(c_token, "mean"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
+		else if (equals(c_token, "geomean"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_GEOMEAN;
+		else if (equals(c_token, "median"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_MEDIAN;
+		else if (equals(c_token, "c1"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_C1;
+		else if (equals(c_token, "c2"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_C2;
+		else if (equals(c_token, "c3"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_C3;
+		else if (equals(c_token, "c4"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_C4;
+		else
+		    int_error(c_token,"expecting 'mean', 'geomean', 'median', 'c1', 'c2', 'c3' or 'c4'");
 		continue;
 	    } /* switch over pm3d lookup table */
 	    int_error(c_token,"invalid pm3d option");

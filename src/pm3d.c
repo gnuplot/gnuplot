@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.37 2002/10/09 08:58:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.38 2002/10/20 21:19:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -49,14 +49,50 @@ pm3d_struct pm3d = {
 #endif
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
-    PM3D_IMPLICIT		/* implicit */
+    PM3D_IMPLICIT,		/* implicit */
+    PM3D_WHICHCORNER_MEAN	/* color from which corner(s) */
 };
 
 /* Internal prototypes for this module */
+static double geomean4 __PROTO((double, double, double, double));
+static double median4 __PROTO((double, double, double, double));
 static void pm3d_plot __PROTO((struct surface_points *, char));
 static void pm3d_option_at_error __PROTO((void));
 static void pm3d_rearrange_part __PROTO((struct iso_curve *, const int, struct iso_curve ***, int *));
 static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
+
+/*
+ * Utility routines.
+ */
+
+/* Geometrical mean = pow( prod(x_i > 0) x_i, 1/N )
+ */
+static double
+geomean4 (double x1, double x2, double x3, double x4)
+{
+    if (x1 <= 0) x1 = 1;
+    if (x2 > 0) x1 *= x2;
+    if (x3 > 0) x1 *= x3;
+    if (x4 > 0) x1 *= x4;
+    return pow(x1, 0.25);
+}
+
+
+/* Median: sort values, and then: for N odd, it is the middle value; for N even,
+ * it is mean of the two middle values.
+ */
+static double
+median4 (double x1, double x2, double x3, double x4)
+{
+    double tmp;
+    /* sort them: x1 < x2 and x3 < x4 */
+    if (x1 > x2) { tmp = x2; x2 = x1; x1 = tmp; }
+    if (x3 > x4) { tmp = x3; x3 = x4; x4 = tmp; }
+    /* sum middle numbers */
+    tmp = (x1 < x3) ? x3 : x1;
+    tmp += (x2 < x4) ? x2 : x4;
+    return tmp * 0.5;
+}
 
 
 /*
@@ -258,6 +294,7 @@ pm3d_plot(this_plot, at_which_z)
     struct iso_curve **scan_array;
     int scan_array_n;
     double avgC, gray;
+    double cb1, cb2, cb3, cb4;
     gpdPoint corners[4];
 #ifdef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
@@ -413,11 +450,28 @@ pm3d_plot(this_plot, at_which_z)
 #endif
 		/* get the gray as the average of the corner z positions (note: log already in)
 		   I always wonder what is faster: d*0.25 or d/4? Someone knows? -- 0.25 (joze) */
-		if (color_from_column)
+		if (color_from_column) {
 		    /* color is set in plot3d.c:get_3ddata() */
-		    avgC = (pointsA[i].CRD_COLOR + pointsA[i1].CRD_COLOR + pointsB[ii].CRD_COLOR + pointsB[ii1].CRD_COLOR) * 0.25;
-		else
-		    avgC = (z2cb(pointsA[i].z) + z2cb(pointsA[i1].z) + z2cb(pointsB[ii].z) + z2cb(pointsB[ii1].z)) * 0.25;
+		    cb1 = pointsA[i].CRD_COLOR;
+		    cb2 = pointsA[i1].CRD_COLOR;
+		    cb3 = pointsB[ii].CRD_COLOR;
+		    cb4 = pointsB[ii1].CRD_COLOR;
+		} else {
+		    cb1 = z2cb(pointsA[i].z);
+		    cb2 = z2cb(pointsA[i1].z);
+		    cb3 = z2cb(pointsB[ii].z);
+		    cb4 = z2cb(pointsB[ii1].z);
+		}
+		switch (pm3d.which_corner_color) {
+		    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
+		    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
+		    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
+		    case PM3D_WHICHCORNER_C1: avgC = cb1; break;
+		    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
+		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;
+		    case PM3D_WHICHCORNER_C4: avgC = cb4; break;
+		    default: int_error(NO_CARET, "cannot be here");
+		}
 		/* transform z value to gray, i.e. to interval [0,1] */
 		gray = cb2gray(avgC);
 #if 0
@@ -549,6 +603,7 @@ pm3d_reset(void)
     pm3d.hidden3d_tag = 0;
     pm3d.solid = 0;
     pm3d.implicit = PM3D_IMPLICIT;
+    pm3d.which_corner_color = PM3D_WHICHCORNER_MEAN;
 }
 
 

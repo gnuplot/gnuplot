@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.62 2003/02/16 00:07:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.63 2003/02/18 16:19:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -751,6 +751,14 @@ set ticscale %g %g\n",
 	else fputs(" nohidden3d", fp);
     fputs((pm3d.solid ? " solid" : " transparent"), fp);
     fputs((PM3D_IMPLICIT == pm3d.implicit ? " implicit" : " explicit"), fp);
+    fputs(" corners2color ", fp);
+    switch (pm3d.which_corner_color) {
+	case PM3D_WHICHCORNER_MEAN:    fputs("mean", fp); break;
+	case PM3D_WHICHCORNER_GEOMEAN: fputs("geomean", fp); break;
+	case PM3D_WHICHCORNER_MEDIAN:  fputs("median", fp); break;
+	default: /* PM3D_WHICHCORNER_C1 ... _C4 */
+	     fprintf(fp, "c%i", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
+    }
     if (!pm3d.where[0]) fputs("\nunset pm3d", fp);
     fputs("\n", fp);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.15 2002/07/07 18:15:55 mikulik Exp $
+ * $Id: pm3d.h,v 1.16 2002/10/20 21:19:52 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -71,10 +71,28 @@
 #define PM3D_CLIP_1IN '1'
 #define PM3D_CLIP_4IN '4'
 
+/*
+  is pm3d plotting style implicit or explicit?
+*/
 typedef enum {
     PM3D_EXPLICIT = 0,
     PM3D_IMPLICIT = 1
 } PM3D_IMPL_MODE;
+
+/*
+  from which corner take the color?
+*/
+typedef enum {
+    /* keep the following order of PM3D_WHICHCORNER_C1 .. _C4 */
+    PM3D_WHICHCORNER_C1 = 0, 	/* corner 1: first scan, first point   */
+    PM3D_WHICHCORNER_C2 = 1, 	/* corner 2: first scan, second point  */
+    PM3D_WHICHCORNER_C3 = 2, 	/* corner 3: second scan, first point  */
+    PM3D_WHICHCORNER_C4 = 3,	/* corner 4: second scan, second point */
+    /* now in any order */
+    PM3D_WHICHCORNER_MEAN    = 4, /* average color from all 4 corners */
+    PM3D_WHICHCORNER_GEOMEAN = 5, /* geometrical mean of 4 corners */
+    PM3D_WHICHCORNER_MEDIAN  = 6, /* median of 4 corner */
+} PM3D_WHICH_CORNERS2COLOR;
 
 /*
   structure defining all properties of pm3d plotting mode
@@ -93,6 +111,8 @@ typedef struct {
   PM3D_IMPL_MODE implicit;
 			/* 1: [default] draw ALL surfaces with pm3d
 			   0: only surfaces specified with 'with pm3d' */
+  PM3D_WHICH_CORNERS2COLOR which_corner_color;
+			/* default: average color from all 4 points */ 
 } pm3d_struct;
 
 

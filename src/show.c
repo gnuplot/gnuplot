@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.101 2003/02/16 00:08:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.102 2003/02/18 16:19:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -2159,7 +2159,14 @@ static void show_pm3d()
     } else {
 	fputs("\tsurface is transparent for borders, tics and labels\n", stderr);
     }
-    fprintf(stderr,"\t%s", PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit");
+    fprintf(stderr,"\tpm3d style is %s\n", PM3D_IMPLICIT == pm3d.implicit ? "implicit" : "explicit");
+    fprintf(stderr,"\tquadrangle color according to ");
+    switch (pm3d.which_corner_color) {
+	case PM3D_WHICHCORNER_MEAN: fputs("averaged 4 corners\n", stderr); break;
+	case PM3D_WHICHCORNER_GEOMEAN: fputs("geometrical mean of 4 corners\n", stderr); break;
+	case PM3D_WHICHCORNER_MEDIAN: fputs("median of 4 corners\n", stderr); break;
+	default: fprintf(stderr, "corner %i\n", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
+    }
 }
 
 #endif

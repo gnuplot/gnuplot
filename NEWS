@@ -41,6 +41,7 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8j]
+* NEW pm3d option corners2color
 * NEW PM3D support for pstricks terminal
 
 [3.8i]

@@ -1,3 +1,9 @@
+2003-03-13  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/pm3d.h src/pm3d.c src/tables.h src/tables.c src/save.c
+	src/set.c src/show.c demo/pm3d.dem docs/gnuplot.doc: New pm3d option
+	'corners2color'.
+
 2003-03-13  Ethan Merritt <merritt@u.washington.edu>
 
 	* set.c: Consolidate set_{blrt}margin into a single routine, break out

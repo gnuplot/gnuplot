@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.163 2003/02/18 16:23:05 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.164 2003/03/04 05:18:23 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2664,6 +2664,7 @@ C ... and restart the table:
 ?data-file using
 ?datafile using
 ?using
+?help using
  The most common datafile modifier is `using`.
 
  Syntax:
@@ -5691,12 +5692,14 @@ C ... and restart the table:
 ?help pm3d
 ?set pm3d clip1in
 ?set pm3d clip4in
- pm3d is a [new] type of `splot` mode for drawing color/gray maps and
- surfaces.  It can be used for plotting gridded as well as non-gridded data.
- The main power of the pm3d algorithm (see also my program pm3d) is that it
- can draw maps or surfaces from large data sets without preprocessing even
- when the data are non-gridded and the scans do not have same number of
- points, thus it produces no artefacts.  Currently supported terminals are:
+ pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
+ color/gray maps and surfaces.  It uses a pm3d algorithm which allows to plot
+ gridded as well as non-gridded data without preprocessing, even when the data
+ scans do not have the same number of points.
+
+ Drawing of color surfaces is available on terminals supporting filled colored
+ polygons with color mapping specified by `palette`. Currently supported
+ terminals include
 
    Screen terminals:
      OS/2 Presentation Manager
@@ -5708,42 +5711,49 @@ C ... and restart the table:
      PostScript
      pslatex, pstex, epslatex
      gif, png, jpeg
-     Xfig
+     (x)fig
      tgif
      cgm
      pdf
      svg
 
- You are welcome to implement the support for other terminals.
+ Let us first describe how a map/surface is drawn.  The input data come from an
+ evaluated function or from an `splot data file`.  Each surface consists of a
+ sequence of separate scans (isolines).  The pm3d algorithm fills the region
+ between two neighbouring points in one scan with another two points in the
+ next scan by a gray (or color) according to z-values (or according to an
+ additional 'color' column, see `help using`) of these 4 corners; default is
+ averaging but this can be changed by option `corners2color`.  In order to get
+ a reasonable surface, the neighbouring scans should not cross and the number
+ of points in the neighbouring scans should not differ too much; of course, the
+ best plot is with scans having same number of points.  No other requirements
+ (e.g. the data must be gridded) are needed.  Another advantage is that the
+ pm3d algorithm does not draw anything outside of the input (measured or
+ calculated) region.
 
- The pm3d algorithm fills the region between two neighbouring points in one
- scan with another two points in the next scan by a gray (or color) according
- to the average of the z data (or an additional 'color' column, see `splot`)
- in these four points.  From this follows, that the neighbouring scans should
- not cross and the number of points in the neighbouring scans should not
- differ too much (you see --- scans can have different number of points).
- No other requirements (e.g.  the data must be gridded) are needed.  Another
- advantage is that the algorithm does not draw anything outside of the input
- (measured or calculated) region.
+ Surface coloring works with the following input data:
 
- 1. function splot or data splot with one ore three data columns:
-     The gray is obtained by mapping the averaged z coordinate of the four
-     corners of the quadrangle into the range [min_color_z,max_color_z]
-     providing range of grays [0:1].  This value can be used directly as the
-     gray for gray maps.  The normalized gray value can be further mapped into
-     a color.  See `set palette` for the complete description.
- 2. data splot with two ore four data columns:
-     The gray is obtained by using the LAST coordinate instead of the z value.
+ 1. splot of function or of data file with one or three data columns: The gray
+ is obtained by mapping the averaged (or `corners2color`) z-coordinate of the
+ four corners of the above-specified quadrangle into the range
+ [min_color_z,max_color_z] of `zrange` or `cbrange` providing range of grays
+ [0:1].  This value can be used directly as the gray for gray maps.  The
+ normalized gray value can be further mapped into a color---see `set palette`
+ for the complete description.
 
- The pm3d mode requires a terminal supporting filled colored polygons and
- palettes of smooth colors.  See above for the list of currently available
- terminals.
+ 2. splot of data file with two or four data columns: The gray/color is
+ obtained by `using` the last-column coordinate instead of the z-value, thus
+ allowing the color and the z-coordinate be mutually independent.  This can be
+ used for 4d data drawing.
 
- Notes:
-    1. The term 'scan' referenced above is used more among physicists then the
-       the term 'iso_curve' in gnuplot documentation and sources.  You measure
-       maps recording one scan after another scan, that's why.
-    2. Two-dimensional color (or gray) map is obtained by `set view map`.
+ Two other notes:
+
+ 1. The term 'scan' referenced above is used more among physicists than the
+ term 'iso_curve' referenced in gnuplot documentation and sources.  You measure
+ maps recorded one scan after another scan, that's why.
+
+ 2. Two-dimensional color (or gray) map (i.e., not surface) is obtained by `set
+ view map` or `set pm3d map`.
 
  Syntax:
        set pm3d
@@ -5753,32 +5763,36 @@ C ... and restart the table:
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
+                  { corners2color { mean|geomean|median|c1|c2|c3|c4 } }
                   { hidden3d <linestyle> | nohidden3d }
                   { transparent | solid }
-                  { map }
                   { implicit | explicit }
+                  { map }
                 }
        show pm3d
        unset pm3d
 
- `set pm3d` (i.e. without options) sets up the default values.
+ Setting `set pm3d` (i.e. without options) sets up the default values.
  Otherwise, the options can be given in any order.
 
- pm3d can be drawn at the base or top (color or gray map) or as surface
- (color or gray surface).  This is defined by the `at` option with a string
- of up to 6 combinations of `b`, `t` and `s`.  For instance, `at b` plots at
- bottom only, `at st` plots firstly surface, then top, `at bstbst`...
+ Color surface can be drawn at the base or top (then it is a gray/color planar
+ map) or at z-coordinates of surface points (gray/color surface).  This is
+ defined by the `at` option with a string of up to 6 combinations of `b`, `t`
+ and `s`. For instance, `at b` plots at bottom only, `at st` plots firstly
+ surface and then top map, while `at bstbst` will never by seriously used.
 
  Colored quadrangles are plotted one after another.  When plotting surfaces
- (`at s`), the later overlaps the previous ones.  You may try to switch
- between `scansforward` and `scansbackward` to change whether the first scan
- of the data is plotted first or last. The default is `scansautomatic` where
- gnuplot makes a guess about the scan direction.
+ (`at s`), the later quadrangles overlap (overdraw) the previous ones.
+ (Gnuplot is not virtual reality tool to calculate intersections of filled
+ polygon meshes.)  You may try to switch between `scansforward` and
+ `scansbackward` to force the first scan of the data to be plotted first or
+ last.  The default is `scansautomatic` where gnuplot makes a guess about scans
+ order.
 
- If two subsequent scans do not have the same number of points, then it has to
- be decided whether to start taking points for quadrangles from the beginning
- of both scans (`flush begin`), from their ends (`flush end`) or to center
- them (`flush center`). Note, that `flush (center|end)` are incompatible with
+ If two subsequent scans do not have same number of points, then it has to be
+ decided whether to start taking points for quadrangles from the beginning of
+ both scans (`flush begin`), from their ends (`flush end`) or to center them
+ (`flush center`).  Note, that `flush (center|end)` are incompatible with
  `scansautomatic`: if you specify `flush center` or `flush end` and
  `scansautomatic` is set, it is silently switched to `scansforward`.
 
@@ -5787,19 +5801,29 @@ C ... and restart the table:
  where there are not enough points in either of the scan. This can be used to
  draw a smooth map boundary.
 
- Clipping with respect to the x,y coordinates can be done in two ways.
- `clip1in`:  all 4 points of the quadrangle must be defined and at least 1
- point of the quadrangle must be in the x and y ranges. `clip4in`: all 4
- points of the quadrangle must be in the x and y ranges.
+ Clipping with respect to x, y coordinates of quadrangles can be done in two
+ ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
+ 1 point of the quadrangle must lie in x and y ranges.  `clip4in`: all 4
+ points of each quadrangle must lie in x and y ranges.
 
- The above clipping works fine for plotting maps.  For surfaces, clipping with
- respect to the z coordinate could find some use too (something like "clipz1in"
- and "clipz4in").  But nobody has needed this feature until now, so it's not
- available.
+ There is a single gray/color value associated to each drawn pm3d quadrangle
+ (no smooth color change among vertices).  The value is calculated from
+ z-coordinates from the surrounding corners according to `corners2color
+ <option>`. The options 'mean' (default), 'geomean' and 'median' produce
+ various kinds of surface color smoothing, which may not be desired for pixel
+ images or for maps with sharp and intense peaks.  Then options 'c1', 'c2', 'c3'
+ or 'c4' can get handy to associate quadrangle color with the z-coordinate of
+ either of the 4 corners, depending on the drawing direction.  There is no
+ smoothing in the latter case, but no color rows are drawn for corners of the
+ two surface-surrounding boundaries opposing to the selected 'c<j>' corner.
+ This reflects the pm3d algorithm not to draw anything outside the measured
+ surface nodes.  Another drawing algorithm, which would draw qudrangles around a
+ given node by taking corners from averaged (x,y)-coordinates of its
+ surrounding 4 nodes, could be implemented in the future.
 
- Notice that the ranges of z-values and color values for surfaces are
- adjustable independently by `set zrange`, `set cbrange`, and `set log`
- for z or cb.  Maps can be adjusted by the cb axis only; see also
+ Notice that ranges of z-values and color-values for surfaces are adjustable
+ independently by `set zrange`, `set cbrange`, as well as `set log` for z or
+ cb.  Maps can be adjusted by the cb-axis only; see also `set view map` and
  `set colorbox`.
 
  The option `hidden3d` takes as the argument a linestyle which must be created
@@ -5826,12 +5850,14 @@ C ... and restart the table:
  `set style data pm3d`; `set style func pm3d`;.
  It is used for backwards compatibility, when `set view map` was not available.
  Take care that you properly use `zrange` and `cbrange` for input data point
- filtering and color range scaling, respectively.
+ filtering and color range scaling, respectively; and also `set (no)surface`
+ seems to have a (side?) effect.
 
  The coloring setup as well as the color box drawing are determined by
  `set palette`.  There can be only one palette for the current plot.  Drawing
  of several surfaces with different palettes can be achieved by `multiplot`
- with fixed `origin` and `size`.
+ with fixed `origin` and `size`; don't forget to use `set palette maxcolors`
+ when your terminal is running out of available colors.
 
  If the option `implicit` is on (which is the default), all surface plots
  will be plotted additionally to the default type, e.g.
@@ -5846,7 +5872,7 @@ C ... and restart the table:
        set style data pm3d
 
  Note that when plotting several plots, they are plotted in the order given
- on the command line. This can be of interest especially for pm3d surfaces
+ on the command line. This can be of interest especially for filled surfaces
  which can overwrite and therefore hide part of earlier plots.
 
  If `with pm3d` is specified in the `splot` command line, then it accepts the
@@ -5856,7 +5882,7 @@ C ... and restart the table:
        set pm3d at s
        splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
 
- See also `set palette`, `set colorbox`, `help x11 pm3d`.
+ See also `set palette`, `set cbrange`, `set colorbox`, `help x11 pm3d`.
 
 3 palette
 ?commands set palette
@@ -5908,11 +5934,11 @@ C ... and restart the table:
  The following options determine the coloring properties.
 
  Figure using this palette can be `gray` or `color`.  For instance, in `pm3d`
- the gray is obtained by mapping the averaged z coordinate of the 4 corners of
- the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
- This value can be used directly as the gray for gray maps.  The color map
- requires a transformation gray --> (R,G,B), i.e. a mapping
- [0:1] --> ([0:1],[0:1],[0:1]).
+ color surfaces the gray of each small spot is obtained by mapping the averaged
+ z-coordinate of the 4 corners of surface quadrangles into the range
+ [min_z,max_z] providing range of grays [0:1]. This value can be used directly
+ as the gray for gray maps. The color map requires a transformation gray -->
+ (R,G,B), i.e. a mapping [0:1] --> ([0:1],[0:1],[0:1]).
 
  Basically two different types of mappings can be used:  Analytic formulae
  to convert gray to color, or discrete mapping tables which are interpolated.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.42 2002/11/26 18:50:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.43 2003/02/18 16:19:50 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -448,6 +448,7 @@ const struct gen_table set_pm3d_tbl[] =
     { "noe$xplicit",	S_PM3D_NOEXPLICIT },
     { "noi$mplicit",	S_PM3D_NOIMPLICIT },
     { "e$xplicit",	S_PM3D_EXPLICIT },
+    { "corners2c$olor",S_PM3D_WHICH_CORNER },
     { NULL, S_PM3D_INVALID }
 };
 
