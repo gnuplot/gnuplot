@@ -2,8 +2,8 @@
 AUTOMAKE_OPTIONS = foreign 1.2h
 
 ##m4-files-begin
-EXTRA_DIST = README Makefile.am.in beos.m4 msdos.m4 next.m4 search-hdr.m4 \
-search-lib.m4 select.m4 
+EXTRA_DIST = README Makefile.am.in apple.m4 beos.m4 msdos.m4 next.m4 \
+search-hdr.m4 search-lib.m4 select.m4 
 ##m4-files-end
 
 Makefile.am: Makefile.am.in
