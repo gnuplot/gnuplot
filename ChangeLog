@@ -1,3 +1,9 @@
+2002-01-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/history.c: Fix for "history !first_command_in_history".
+
+	* src/command.c: Fix for "history !load".
+
 2001-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (boundary): Moved calls to set the axis endpoints
