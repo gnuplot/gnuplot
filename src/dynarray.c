@@ -67,7 +67,7 @@ dynarray *array;
 
     if (array->end >= array->size)
 	extend_dynarray(array, array->increment);
-    return (array->v + array->entry_size * (array->end++));
+    return (void *)((char *)(array->v) + array->entry_size * (array->end++));
 }
 
 void
