@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.13 1999/08/07 17:21:09 lhecking Exp $
+ * $Id: setshow.h,v 1.14 1999/08/08 17:05:12 lhecking Exp $
  *
  */
 
@@ -247,25 +247,10 @@ void show_command __PROTO((void));
 enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
 void show_version __PROTO((FILE *fp));
-void show_version_long __PROTO((void));
 char *conv_text __PROTO((const char *s));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
-
-/* */
-#define SETSHOWMSG \
-"valid set options:  [] = choose one, {} means optional 'all',\n\n\
-\t'all',  'angles',  'arrow',  'autoscale',  'bar', 'border',\n\
-\t'boxwidth', 'clip', 'cntrparam', 'contour',  'data',  'dgrid3d',\n\
-\t'dummy', 'encoding', 'format', 'function',  'grid',  'hidden',\n\
-\t'isosamples', 'key', 'label', 'linestyle', 'loadpath', 'locale',\n\
-\t'logscale', 'mapping', 'margin', 'missing', 'offsets', 'origin',\n\
-\t'output', 'plot', 'parametric', 'pointsize', 'polar', '[rtuv]range',\n\
-\t'samples', 'size', 'terminal', 'tics', 'timestamp', 'timefmt', 'title',\n\
-\t'variables', 'version', 'view', '[xyz]{2}label', '[xyz]{2}range',\n\
-\t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis',\n\
-\t'[xyz]data',   'zero', 'zeroaxis'"
 
 #endif /* GNUPLOT_SETSHOW_H */
