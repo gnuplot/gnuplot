@@ -1,9 +1,9 @@
 #
-# $Id: polar.dem,v 1.4 1995/03/27 18:07:43 drd Exp $
+# $Id: polar.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
 #
 # Show some of the new polar capabilities.
 #
-set noborder
+unset border
 set clip
 set polar
 set xtics axis nomirror
@@ -43,7 +43,7 @@ butterfly(x)=exp(cos(x))-2*cos(4*x)+sin(x/12)**5
 set samples 800
 pause 0 "This is a big one (many samples), be patient..."
 set title "Butterfly"
-set nokey
+unset key
 plot butterfly(t)
 pause -1 "Hit return to continue"
 

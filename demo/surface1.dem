@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.5 1995/04/21 12:49:06 drd Exp $
+# $Id: surface1.dem,v 1.4 1999/03/12 21:48:06 lhecking Exp $
 #
 set samples 21
 set isosample 11
@@ -16,8 +16,8 @@ set xrange [-10:10]
 set yrange [-10:10]
 splot x*y
 pause -1 "Hit return to continue (1)"
-set noarrow
-set nolabel
+unset arrow
+unset label
 set grid
 splot x**2+y**2, x**2-y**2
 pause -1 "Hit return to continue (2)"
@@ -38,11 +38,11 @@ set title "3D gnuplot demo ( ticslevel = 0.5 )"
 rep
 pause -1 "Hit return to continue (7)"
 set title "3D gnuplot demo"
-set nogrid
+unset grid
 splot x*y with points
 pause -1 "Hit return to continue (8)"
-set noxtics
-set noytics
+unset xtics
+unset ytics
 set xrange [-1:1]
 set yrange [-1:1]
 set title "Surfaces with no grid or tics"
@@ -56,7 +56,7 @@ set log z
 set title "Surfaces with z log scale"
 splot x**2*y**2 + 2, x**2*y**4 + 2, x**4*y**2 + 2
 pause -1 "Hit return to continue (10)"
-set nolog z
+unset log z
 set xtics autofreq
 set ytics autofreq
 set xrange [-1:1]
@@ -86,21 +86,21 @@ set label 1 "This is equal to 1" at -5,-2,1.5 centre
 set arrow 1 from -5,-2.1,1.4 to 0,0,1
 splot [-12:12.01] [-12:12.01] sinc(u,v)
 pause -1 "Hit return to continue (15)"
-set noarrow
+unset arrow
 set ztics autofreq
-set nolabel
+unset label
 set log
 set auto
 set title "This has logarithmic scale"
 splot [x=1:15] [y=1:15] x**2+y**2
 pause -1 "Hit return to continue (16)"
-set nolog
+unset log
 set xrange [0:15]
 set yrange [0:15]
 set auto
 #set zrange [-0.6:0.7]
 set ticslevel 0
-set data style lines
+set style data lines
 set title "Data grid plotting"
 set parametric
 splot "glass.dat"
@@ -109,7 +109,7 @@ splot "glass.dat" using 3:2:1
 pause -1 "Hit return to continue (18)"
 set zrange [-1.2:1.2]
 set ticslevel 0.5
-set noparametric
+unset parametric
 splot "glass.dat" using 1, "glass.dat" using 2, "glass.dat" using 3
 pause -1 "Hit return to continue (19)"
 set param
@@ -119,7 +119,7 @@ splot "glass.dat"
 pause -1 "Hit return to continue (20)"
 
 # mandelbrot demo
-set nopar
+unset par
 set mapp cart
 set view 60,30,1,1
 set auto
@@ -145,4 +145,4 @@ set auto
 set xlabel "" 0,0
 set ylabel "" 0,0
 set zlabel "" 0,0
-set nohidden
+unset hidden

@@ -1,5 +1,5 @@
 #
-# $Id: discrete.dem,v 1.3 1994/03/30 01:28:36 alex Exp $
+# $Id: discrete.dem,v 1.1.1.1 1998/04/15 19:16:41 lhecking Exp $
 #
 #
 set contour
@@ -21,6 +21,6 @@ pause -1 "Hit return to continue"
 
 #restore defaults
 set title ""
-set nocontour
+unset contour
 set cntrparam levels auto 5
 

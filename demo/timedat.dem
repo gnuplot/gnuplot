@@ -1,5 +1,5 @@
 set title "Fsteps plot\nwith date and time as x-values"
-set data style fsteps
+set style data fsteps
 set xlabel "Date\nTime"
 set timefmt "%d/%m/%y\t%H%M"
 set yrange [ 0 : ]

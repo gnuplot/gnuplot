@@ -1,5 +1,5 @@
 #
-# $Id: simple.dem,v 1.2 1993/09/27 17:11:48 alex Exp $
+# $Id: simple.dem,v 1.1.1.1 1998/04/15 19:16:42 lhecking Exp $
 #
 # Requires data files "[123].dat" from this directory,
 # so change current working directory to this directory before running.

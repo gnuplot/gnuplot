@@ -1,5 +1,5 @@
 #
-# $Id: mgr.dem,v 1.4 1997/01/05 22:03:11 drd Exp $
+# $Id: mgr.dem,v 1.2 1998/12/07 22:08:02 lhecking Exp $
 #
 pause 0 "Watch some  cubic splines"
 set samples 50
@@ -35,7 +35,7 @@ pause -1 "Accentuate the relative changes with a log-scale <CR>"
 set logscale y
 replot
 pause -1 "Now approximate the data with a bezier curve between the endpoints<CR>"
-set nologscale y
+unset logscale y
 plot "silver.dat" t "experimental" w errorb,\
                "" smooth sbezier t "bezier"
 pause -1 "You would rather use log-scales ? <CR>"
@@ -45,7 +45,7 @@ plot "silver.dat" t "rate" w errorb, \
 #
 pause -1 "Errorbar demo <CR>"
 set samples 100
-set nologscale
+unset logscale
 set xlabel "Resistance [Ohm]"
 set ylabel "Power [W]"
 set title "UM1-Cell Power"
@@ -64,7 +64,7 @@ pause -1 "X as well? <CR>"
 set logscale xy
 plot [1:50] "battery.dat" t "Power" w xyerr, n(x) t "Theory" w lines
 pause -1 "If you like bars without tics <CR>"
-set nologscale
+unset logscale
 set bars small
 plot [0:50] "battery.dat" t "Power" with xyerrorbars, n(x) t "Theory" w lines
 pause -1 "X-Bars only <CR>"

@@ -1,10 +1,10 @@
 set parametric
 set hidden3d
-set nokey
+unset key
 set xrange [0:8]
 set yrange [-4:4]
 set zrange [-2:2]
-set data style line
+set style data line
 set title "Demo of multiple mesh per file capability - Digitized Blue Whale"
 splot "whale.dat"
 pause -1 "Press Return"
@@ -13,6 +13,7 @@ set xlabel "Mesh or Network 0"
 splot "whale.dat" index 0
 pause -1 "Press Return"
 
+set autoscale z
 set xlabel "Mesh or Network 6"
 set autoscale z
 splot "whale.dat" index 6 using 3:2:1 
@@ -43,6 +44,6 @@ pause -1 "Press Return"
 
 set title ""
 set xlabel ""
-set nohidden3d
+unset hidden3d
 set auto
-set nopara
+unset para

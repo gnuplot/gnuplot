@@ -1,5 +1,5 @@
 #
-# $Id: bivariat.dem,v 1.2 1993/09/27 17:11:14 alex Exp $
+# $Id: bivariat.dem,v 1.1.1.1 1998/04/15 19:16:41 lhecking Exp $
 #
 # This demo is very slow and requires unusually large stack size.
 # Do not attempt to run this demo under MSDOS.

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.8 1996/12/09 15:58:08 drd Exp $
+# $Id: all.dem,v 1.1.1.1 1998/04/15 19:16:40 lhecking Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
