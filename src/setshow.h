@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.15 1999/08/09 15:58:12 lhecking Exp $
+ * $Id: setshow.h,v 1.16 1999/08/11 18:14:02 lhecking Exp $
  *
  */
 
@@ -50,10 +50,8 @@
 # define TIMEFMT "%d/%m/%y,%H:%M"
 #endif
 
-/*
- * global variables to hold status of 'set' options
- *
- */
+/* default format for tic mark labels */
+#define DEF_FORMAT "%g"
 
 typedef struct {
     char text[MAX_LINE_LEN+1];
@@ -62,27 +60,21 @@ typedef struct {
 } label_struct;
 
 
-extern TBOOLEAN                 multiplot;
+/*
+ * global variables to hold status of 'set' options
+ *
+ */
 
-extern TBOOLEAN			autoscale_r;
-extern TBOOLEAN			autoscale_t;
-extern TBOOLEAN			autoscale_u;
-extern TBOOLEAN			autoscale_v;
-extern TBOOLEAN			autoscale_x;
-extern TBOOLEAN			autoscale_y;
-extern TBOOLEAN			autoscale_z;
-extern TBOOLEAN			autoscale_x2;
-extern TBOOLEAN			autoscale_y2;
-extern TBOOLEAN			autoscale_lt;
-extern TBOOLEAN			autoscale_lu;
-extern TBOOLEAN			autoscale_lv;
-extern TBOOLEAN			autoscale_lx;
-extern TBOOLEAN			autoscale_ly;
-extern TBOOLEAN			autoscale_lz;
-extern double			boxwidth;
-extern TBOOLEAN			clip_points;
-extern TBOOLEAN			clip_lines1;
-extern TBOOLEAN			clip_lines2;
+extern int angles_format;
+extern double ang2rad; /* 1 or pi/180 */
+extern struct arrow_def *first_arrow;
+extern TBOOLEAN autoscale_x, autoscale_y, autoscale_z, autoscale_x2,
+    autoscale_y2;
+extern TBOOLEAN autoscale_r, autoscale_t, autoscale_u, autoscale_v;
+extern TBOOLEAN autoscale_lt, autoscale_lu, autoscale_lv, autoscale_lx,
+    autoscale_ly, autoscale_lz;
+extern double bar_size;
+
 extern struct lp_style_type     border_lp;
 extern int			draw_border;
 #define SOUTH			1 /* 0th bit */
@@ -93,6 +85,13 @@ extern int			draw_border;
 #define border_west		(draw_border & WEST)
 #define border_south		(draw_border & SOUTH)
 #define border_north		(draw_border & NORTH)
+
+extern TBOOLEAN                 multiplot;
+
+extern double			boxwidth;
+extern TBOOLEAN			clip_points;
+extern TBOOLEAN			clip_lines1;
+extern TBOOLEAN			clip_lines2;
 extern TBOOLEAN			draw_surface;
 extern char			dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern char			default_font[]; /* Entry font added by DJL */
@@ -106,7 +105,6 @@ extern int format_is_numeric[];
 
 extern char			key_title[];
 extern enum PLOT_STYLE data_style, func_style;
-extern double bar_size;
 extern struct lp_style_type     work_grid, grid_lp, mgrid_lp;
 extern double     polar_grid_angle; /* angle step in polar grid in radians */
 extern int			key;
@@ -131,8 +129,6 @@ extern TBOOLEAN			parametric;
 extern double			pointsize;
 extern TBOOLEAN			polar;
 extern TBOOLEAN			hidden3d;
-extern int			angles_format;
-extern double			ang2rad; /* 1 or pi/180 */
 extern int			mapping3d;
 extern int			samples;
 extern int			samples_1;
@@ -228,7 +224,6 @@ extern struct ticdef y2ticdef;
 extern TBOOLEAN			tic_in;
 
 extern struct text_label *first_label;
-extern struct arrow_def *first_arrow;
 extern struct linestyle_def *first_linestyle;
 
 extern int lmargin, bmargin,rmargin,tmargin; /* plot border in characters */
@@ -241,6 +236,7 @@ extern char abbrev_day_names[7][8];
 
 /* The set and show commands, in setshow.c */
 void set_command __PROTO((void));
+void unset_command __PROTO((void));
 void reset_command __PROTO((void));
 void show_command __PROTO((void));
 /* and some accessible support functions */
@@ -248,8 +244,10 @@ enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
+void set_lp_properties __PROTO((struct lp_style_type *, int, int, int, double, double));
 void lp_use_properties __PROTO((struct lp_style_type *, int, int));
 void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));
+void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 
 /* string representing missing values, ascii datafiles */
 extern char *missing_val;
