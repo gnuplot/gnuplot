@@ -1,32 +1,65 @@
 2001-09-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	The remainder of Uli Gruenebaum's filled boxes implementation,
+ 	reviewed and massively changed by me.
+
+	* term/win.trm (WIN_boxfill): Renamed from WIN_filledbox.
+  	Parameter `linetype' renamed to `style'.
+	(WIN_boxfill) [USE_ULIG_FILLEDBOXES]: Send a W_fillstyle opcode to
+ 	tell the new code how the interior of the rectangle is to be
+ 	filled.
+
+	* src/win/wgraph.c [USE_ULIG_FILLEDBOXES] (halftone_bitmaps,
+ 	halftone_num, halftone_brush, halftone_bitdata, halftone_bitmap,
+ 	pattern_bitmaps, pattern_num, pattern_brush, pattern_bitdata,
+ 	pattern_bitmap, brushes_initialized): New file-scope variables to
+ 	implement fillbox extension.
+	(MakePens) [USE_ULIG_FILLEDBOXES]: Create GDI brushes for filling.
+	(DestroyPens) [USE_ULIG_FILLEDBOXES]: Delete brushes here.
+	(drawgraph) [USE_ULIG_FILLEDBOXES]: Implement drawing of filled
+ 	boxes. W_fillstyle gives the style, a W_move specifies the top
+ 	left corner, and the (x,y) pair sent with the W_boxfill specifies
+ 	the width and height of the box.
+
+	* src/win/wgnuplot.mnu: Added menu entry for filledboxes style.
+
+	* src/win/wgnuplib.h (WGNUPLOTVERSION): Increased to reflect API
+ 	extension.
+	(W_boxfill): Renamed from W_filledbox.
+	(W_fillstyle): New operation token; used to transmit fill type and
+ 	parameter before a W_boxfill.
+
+	* src/graphics.c [USE_ULIG_FILLEDBOXES] (plot_boxes): Reindented.
+
+2001-09-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* src/util.c: Add #include "datafile.h" to pull in prototype of
  	J. Van Zandt's new df_showdata() function.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* configure.in docs/Makefile.in: Check for PlainTeX, dvips
-	 as well
+	* configure.in docs/Makefile.in: Check for PlainTeX, dvips as
+ 	well.
 
 2001-09-18  Lars Hecking  <lhecking@nmrc.ucc.ie
 
 	* demo/prob.dem, demo.prob2.dem, demo/random.dem, demo/stat.inc:
-	Remove "non-commercial" clause by permission of the original author,
-	Jos van der Woude.
+ 	Remove "non-commercial" clause by permission of the original
+ 	author, Jos van der Woude.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* lisp/Makefile.in lisp/configure.in lisp/configure:
-	Some more checks; get additional targets to work
+	* lisp/Makefile.in lisp/configure.in lisp/configure: Some more
+ 	checks; get additional targets to work.
 
 2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* doc/.cvsignore docs/psdoc/.cvsignorelisp/.cvsignore:
-	Add missing entries
+	* doc/.cvsignore docs/psdoc/.cvsignorelisp/.cvsignore: Add missing
+ 	entries.
 
 2001-09-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
-	* config/makefile.os2: Add missing dependency
+	* config/makefile.os2: Add missing dependency.
 
 2001-09-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
