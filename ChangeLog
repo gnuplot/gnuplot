@@ -3,6 +3,8 @@
 	* term/pdf.trm:  Allow "lw" as an abbreviation for "linewidth"
 	* term/post.trm: Make dash styles 6 and 7 a bit more distinctive
 	* term/emf.trm:  Add option 'set term emf {linewidth <factor>}'
+	* term/gd.trm:   Solid fill with density < 1 was not working with 
+			 rgb colors.  Trivial fix.
 
 	* src/graphics.c (boundary): When estimating the length and height
 	of xlabel, increase the number of lines by one if we're in enhanced text

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.58 2004/12/31 06:12:56 sfeam Exp $
+ * $Id: gd.trm,v 1.59 2005/02/01 11:28:52 broeker Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -277,10 +277,9 @@ static int PNG_FillPattern __PROTO((int fillpar));
 static int
 PNG_FillSolid(int fillpar)
 {
-    int rgb = png_state.rgb_table[png_state.linetype + 3];
-    int red   = (rgb >> 16) & 0xff;
-    int green = (rgb >> 8) & 0xff;
-    int blue  = rgb & 0xff;
+    int red   = (png_state.rgb >> 16) & 0xff;
+    int green = (png_state.rgb >> 8) & 0xff;
+    int blue  = png_state.rgb & 0xff;
 
     double fact = (double)(100 - fillpar) * 0.01;
 
