@@ -613,7 +613,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -795,6 +795,7 @@ defaults to radians.
 * imag::                        
 * invnorm::                     
 * int::                         
+* lambertw::                    
 * lgamma::                      
 * log::                         
 * log10::                       
@@ -1146,7 +1147,7 @@ number.
 The `invnorm(x)` function returns the inverse normal distribution function of
 the real part of its argument.
 
-@node int, lgamma, invnorm, Functions
+@node int, lambertw, invnorm, Functions
 @subsubsection int
 
 @c ?expressions functions int
@@ -1158,7 +1159,20 @@ the real part of its argument.
 The `int(x)` function returns the integer part of its argument, truncated
 toward zero.
 
-@node lgamma, log, int, Functions
+@node lambertw, lgamma, int, Functions
+@subsubsection lambertw
+
+@c ?expressions functions lambertw
+@c ?functions lambertw
+@cindex lambertw
+@findex lambertw
+
+
+The lambertw function returns the value of the principal branch of
+Lambert's W function, which is defined by the equation (W(z)*exp(W(z))=z. 
+z must be a real number with z >= -exp(-1).
+
+@node lgamma, log, lambertw, Functions
 @subsubsection lgamma
 
 @c ?expressions functions lgamma
@@ -4143,7 +4157,7 @@ the `set` command to see the default values that the various options take.
 
 
 The @ref{save} command saves user-defined functions, variables, the `set
-term` status, all `set` options, or all of these, plus the last `plot `
+term` status, all `set` options, or all of these, plus the last @ref{plot}
 (`splot`) command to the specified file.
 
 Syntax:
@@ -4252,6 +4266,7 @@ when the variable was initially defined.
 * parametric_::                 
 * pm3d::                        
 * palette::                     
+* color_box::                   
 * pointsize::                   
 * polar::                       
 * rmargin::                     
@@ -6100,6 +6115,7 @@ Syntax:
                             @{linewidth | lw <line_width>@}
                             @{pointtype | pt <point_type>@}
                             @{pointsize | ps <point_size>@}
+                             @{palette@}
       set nolinestyle
       show style line
 
@@ -6169,7 +6185,7 @@ line and q(x) using small triangles connected by a green line.
 creates a surface plot using smooth colors according @ref{palette}. Note, that
 this works only on few terminals.
 
-see also @ref{palette}, @ref{pm3d}
+See also @ref{palette}, @ref{pm3d}.
 
 
 @node lmargin, loadpath, linestyle, set-show
@@ -6961,17 +6977,22 @@ when the data are non-gridded and the scans do not have same number of
 points---thus it produces no artefacts.  Currently supported terminals are:
 
 @example
+  Screen terminals:
     OS/2 Presentation Manager
     X11
     Linux VGA (vgagl)
     GGI
-    Win
+    Windows
+  Files:
     PostScript
     pslatex, pstex, epslatex
     GIF
     Xfig
+    tgif
 
 @end example
+
+(You are welcome to implement the support for other terminals, e.g. png.)
 
 The pm3d algorithm fills the region between two neighbouring points in one 
 scan with another two points in the next scan by a gray (or colour) according 
@@ -6988,31 +7009,34 @@ This value can be used directly as the gray for gray maps. The gray value can
 be mapped into a colour. See @ref{palette} for the complete description. 
 
 The pm3d mode requires a terminal supporting filled coloured polygons and
-palettes of smooth colours. See @ref{palette} for the list of currently 
-available terminals.
+palettes of smooth colours. See above for the list of currently available
+terminals.
 
 Notes: 
 @example
    1. What I call scan, it is called iso_curve in gnuplot sources. I am 
       physicist and we measure maps taking one scan after another scan, 
-      that's why 
+      that's why.
    2. Map is obtained by `set view 180,0,1.25; set yrange [*:*] reverse`, 
       plus something more. This can be easily switched on by using
-      `set pm3d map`.
+      `set pm3d map`. Use @ref{pm3d} before switching to 2d plots.
    3. If you find this help unclear, then your assistance is welcome.
       Similarly, any feedback for the code is welcome as well as the
-      required terminal entries for other terminals, like X11
+      required terminal entries (pm3d support) for other terminals.
+   4. pm3d mode has been developed by Petr Mikulik. It has been greatly
+      improved and support for many new terminals has been added since the
+      first public release as a gnuplot patch in March 1999.  Major
+      contributions by Johannes Zellner are very appreciated.
 
 @end example
 
-pm3d mode has been developed by Petr Mikulik.  It is currently in a
-development stage and distributed as a patch to the current gnuplot beta
-sources.  Please read the READMEs enclosed with the pm3d patch distribution.
-You may find the current version of the patch and snapshots at my web page:
+Please read the READMEs enclosed with the pm3d patch distribution.  
+You may find snapshots at my web page:
 @example
         http://www.sci.muni.cz/~mikulik/gnuplot.html#pm3d
-
 @end example
+
+and you should also run pm3d/demo/Demo.gp.
 
 Syntax:
 @example
@@ -7027,8 +7051,8 @@ Syntax:
                  @{ transparent | solid @}
                  @{ map @}
                @}
-      set nopm3d
       show pm3d
+      unset pm3d
 
 @end example
 
@@ -7111,10 +7135,10 @@ the reversed y axis and rotated ylabel.
 The colouring setup as well as the colour box drawing are determinated by @ref{palette}. Maybe in future there could be a possibility of using more palettes, 
 which will add new option `set pm3d palette <n>`.
 
-see also @ref{palette}, @ref{pm3d}, `help vgagl`
+See also @ref{palette}, `help colorbox`, @ref{pm3d}, `help vgagl`.
 
 
-@node palette, pointsize, pm3d, set-show
+@node palette, color_box, pm3d, set-show
 @subsection palette
 
 @c ?commands set palette
@@ -7130,11 +7154,9 @@ polygons, colour histograms, colour gradient background, and whatever it is or
 it will be implemented...  Here it stands for a palette of smooth "continuous"
 colours or grays, but let's call it just a palette.
 
-Colour palettes, or requires terminal entries for filled colour 
-polygons and palettes of smooth colours, are currently available for
-`*** fig, ggi, gif, pm, postscript, pslatex, pstex, linux vgagl, win, x11 ***`
-terminals. You are welcome to implement it for other terminals, e.g. png.
-
+Colour palettes, or requires terminal entries for filled colour polygons and
+palettes of smooth colours, are currently available for terminals listed in
+@ref{pm3d}.
 
 Syntax:
 @example
@@ -7145,11 +7167,6 @@ Syntax:
                  @{ positive | negative @}
                  @{ nops_allcF | ps_allcF @}
                  @{ maxcolors <maxcolors> @}
-                 @{ nocb | cbdefault | cbuser @}
-                 @{ cbvertical | set cbhorizontal @}
-                 @{ origin x, y @}
-                 @{ size x, y @}
-                 @{ noborder | bdefault | border [line style] @}
                @}
       show palette
       show palette palette <n>
@@ -7221,46 +7238,70 @@ etc. Proposed usage: `set pm3d palette <n>`, `set contour ... filled palette
 <n>`, etc.
 
 
-*** Color box properties ***
+@node color_box, pointsize, palette, set-show
+@subsection color box
+
+@c ?commands set colorbox
+@c ?commands show colorbox
+@c ?set colorbox
+@c ?show colorbox
+@cindex colorbox
+
 
 The colour scheme, i.e. the gradient of the smooth colour with min_z and max_z
-values of pm3d, is drawn in a colour box unless `nocb`.  Its position can be
-`cbdefault` or `cbuser`.  If the latter is specified the values as given
-with the @ref{origin} and @ref{size} subcommands are used.
+values of @ref{pm3d}'s @ref{palette}, is drawn in a colour box unless `unset colorbox`.  Its
 
-`cbvertical` and `cbhorizontal` switches the orientation of the colour
+@example
+      set colorbox
+      set colorbox @{
+                 @{ vertical | horizontal @}
+                 @{ default | user @}
+                 @{ origin x, y @}
+                 @{ size x, y @}
+                 @{ noborder | bdefault | border [line style] @}
+               @}
+      show colorbox
+      unset colorbox
+
+@end example
+
+Colorbox position can be `default` or `user`.  If the latter is specified the
+values as given with the @ref{origin} and @ref{size} subcommands are used.
+
+`vertical` and `horizontal` switches the orientation of the colour
 gradient.
 
-`origin x, y` and `size x, y` are used only in combination with the `cbuser`
+`origin x, y` and `size x, y` are used only in combination with the `user`
 option. The x and y values must be given in screen coordinates (as everything
 else did not seem to make sense) that is between [0 - 1]. Try for example:
 @example
-    set pal cbh cbuser origin .1,.02 size .8,.04
+    set colorbox horiz user origin .1,.02 size .8,.04
 @end example
 
 which will draw a horizontal gradient somewhere at the bottom of the graph.
 
 @ref{border} turns the border on (this is the default). `noborder` turns the border
-off. If an positive integer argument is given after @ref{border}, it is used as
-a line style tag which is used for drawing the border, e.g.:
+off. If an positive integer argument is given after @ref{border}, it is used as a
+line style tag which is used for drawing the border, e.g.:
 @example
     set style line 2604 linetype -1 linewidth .4
-    set pal border 2604
+    set colorbox border 2604
 @end example
 
 will use line style `2604`, a thin line with the default border color (-1)
 for drawing the border. `bdefault` (which is the default) will use the default
 border line style for drawing the border of the color box.
 
-Currently for horizontal color boxes (cbhorizontal) the labels are drawn
+Currently for horizontal color boxes (horizontal) the labels are drawn
 above the box, if the box is at the bottom of the graph, and below the
 box, if the box is at the top of the graph. If someone does not like this,
 he/she could yet add more options for controlling how the box is drawn!
 
-see also @ref{pm3d}, @ref{pm3d}, `help vgagl`, `help set style line`
+See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`, 
+`help set style line`.
 
 
-@node pointsize, polar, palette, set-show
+@node pointsize, polar, color_box, set-show
 @subsection pointsize
 
 @c ?commands set pointsize
@@ -8030,6 +8071,7 @@ to you, depending on its output format.
 * imagen::                      
 * kyo::                         
 * latex::                       
+* linux::                       
 * mf::                          
 * mp::                          
 * mgr::                         
@@ -8042,7 +8084,6 @@ to you, depending on its output format.
 * qms::                         
 * regis::                       
 * rgip::                        
-* sun::                         
 * tek410x::                     
 * table::                       
 * tek40::                       
@@ -9352,7 +9393,7 @@ The `kyo` and `prescribe` terminal drivers support the Kyocera laser printer.
 The only difference between the two is that `kyo` uses "Helvetica" whereas
 `prescribe` uses "Courier".  There are no options."
 
-@node latex, mf, kyo, terminal
+@node latex, linux, kyo, terminal
 @subsubsection latex
 
 @c ?commands set terminal emtex
@@ -9430,7 +9471,24 @@ The other label -- account for long ticlabels:
 
 @end example
 
-@node mf, mp, latex, terminal
+@node linux, mf, latex, terminal
+@subsubsection linux
+
+@c ?commands set terminal linux
+@c ?set terminal linux
+@c ?set term linux
+@c ?terminal linux
+@c ?term linux
+@cindex linux
+@tmindex linux
+
+
+The `linux` driver has no additional options to specify.  It looks at the
+environment variable GSVGAMODE for the default mode; if not set, it uses
+1024x768x256 as default mode or, if that is not possible, 640x480x16
+(standard VGA)."
+
+@node mf, mp, linux, terminal
 @subsubsection mf
 
 @c ?commands set terminal mf
@@ -10224,7 +10282,7 @@ Syntax:
 
 @end example
 
-@node rgip, sun, regis, terminal
+@node rgip, tek410x, regis, terminal
 @subsubsection rgip
 
 @c ?commands set terminal rgip
@@ -10268,22 +10326,7 @@ Example:
 
 puts six graphs on a page in three rows of two in portrait orientation."
 
-@node sun, tek410x, rgip, terminal
-@subsubsection sun
-
-@c ?commands set terminal sun
-@c ?set terminal sun
-@c ?set term sun
-@c ?terminal sun
-@c ?term sun
-@cindex sun
-@tmindex sun
-
-
-The `sun` terminal driver supports the SunView window system.  It has no
-options."
-
-@node tek410x, table, sun, terminal
+@node tek410x, table, rgip, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x

@@ -1,10 +1,13 @@
 Makefile
 allterm.h
 doc2gih
+doc2ipf
+doc2ms
 doc2rtf
 doc2tex
 gnuplot.gih
 gnuplot.html
+gnuplot.ipf
 gnuplot.ms
 gnuplot.rtf
 gnuplot.tex
