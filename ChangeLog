@@ -1,3 +1,17 @@
+2004-02-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/time.c [!USE_SYSTEM_TIME] (gstrptime): Replace
+	implementation of %s format.  Now reads in a double-precision
+	number and uses gnuplot's own ggmtime() routine instead of library
+	function gmtime().  This should fix SF bug #885279 "Reading '%s'
+	timefmt is not 64 bit safe".
+	(CHECK_SPACE, COPY_STRING, FORMAT_STRING): Macros moved inside
+	function xstrftime() they belong to.  Changed to use do {...} 
+	while(0) pattern.  #undef them after use.
+ 	(xstrftime): Changed return type to size_t to avoid warnings.
+	(LETTER, NOTHING): Macros moved into function gstrptime() they
+	belong to. #undef them after use.
+
 2004-02-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.os2: Add SELECT_TYPE_ARG* definitions.
@@ -13,45 +27,46 @@
 
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/os2/gclient.c: Let the color sequence of the first 5 line types
-	be the same as in postscript.
+	* src/os2/gclient.c: Let the color sequence of the first 5 line
+	types be the same as in postscript.
 
-	* src/term.c (do_point): Let sequence of the 6 defined point types be
-	the same as in postscript, png and x11.
-
-2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
-
-	* NEWS src/plot.c src/win/winmain.c src/win/pgnuplot.c term/win.trm:
-	Let gnuplot on Windows accept the '-persist' command line option
-	(preferred synonym to '-noend' and '/noend').
+	* src/term.c (do_point): Let sequence of the 6 defined point types
+	be the same as in postscript, png and x11.
 
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.cyg config/makefile.mgw: Missing copy of file VERSION
-	into the latexing directory.
+	* NEWS src/plot.c src/win/winmain.c src/win/pgnuplot.c
+	term/win.trm: Let gnuplot on Windows accept the '-persist' command
+	line option (preferred synonym to '-noend' and '/noend').
+
+2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.cyg config/makefile.mgw: Missing copy of file
+	VERSION into the latexing directory.
 
 2004-02-01  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/gd.trm term/post.trm term/pdf.trm term/svg.trm: 
-	In the rare case of a request to draw a line or polygon-fill with 
-	LT_NODRAW or LT_BACKGROUND it makes more sense to set the color to white
-	than to black.  The x11 terminal already behaves this way.
+	* term/gd.trm term/post.trm term/pdf.trm term/svg.trm: In the rare
+	case of a request to draw a line or polygon-fill with LT_NODRAW or
+	LT_BACKGROUND it makes more sense to set the color to white than
+	to black.  The x11 terminal already behaves this way.
 
 2004-01-25  Ethan Merritt  <merritt@u.washington.edu>
 
-	* term/gd.trm docs/gnuplot.doc: Take default font for gdlib terminals
-	(png jpeg) from environmental variable GNUPLOT_DEFAULT_GDFONT.
+	* term/gd.trm docs/gnuplot.doc: Take default font for gdlib
+	terminals (png jpeg) from environmental variable
+	GNUPLOT_DEFAULT_GDFONT.
 
 2004-01-20  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* docs/Makefile.in: gnuplot.tex needs to be latexed 3 times (it contains
-	multipage toc).
+	* docs/Makefile.in: gnuplot.tex needs to be latexed 3 times (it
+	contains multipage toc).
 
 2004-01-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Copy file
-	VERSION into the latexing directory (setting TEXINPUTS from within
-	Makefile does not portably work).
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2:
+	Copy file VERSION into the latexing directory (setting TEXINPUTS
+	from within Makefile does not portably work).
 
 2004-01-17  Ethan Merritt  <merritt@u.washington.edu>
 

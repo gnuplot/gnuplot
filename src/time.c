@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.13 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.14 2001/09/05 02:16:48 vanzandt Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -140,7 +140,7 @@ static int gdysize __PROTO((int yr));
 
 static int mndday[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-static int xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm));
+static size_t xstrftime __PROTO((char *buf, size_t bufsz, const char *fmt, struct tm * tm));
 
 /* days in year */
 static int
@@ -163,9 +163,9 @@ int yr;
 
 char *
 gstrptime(s, fmt, tm)
-char *s;
-char *fmt;
-struct tm *tm;
+    char *s;
+    char *fmt;
+    struct tm *tm;
 {
     int yday, date;
 
@@ -202,8 +202,10 @@ struct tm *tm;
 	case 'b':		/* abbreviated month name */
 	    {
 		int m;
+
 		for (m = 0; m < 12; ++m)
-		    if (strncasecmp(s, abbrev_month_names[m], strlen(abbrev_month_names[m])) == 0) {
+		    if (strncasecmp(s, abbrev_month_names[m],
+				    strlen(abbrev_month_names[m])) == 0) {
 			s += strlen(abbrev_month_names[m]);
 			goto found_abbrev_mon;
 		    }
@@ -218,8 +220,10 @@ struct tm *tm;
 	case 'B':		/* full month name */
 	    {
 		int m;
+
 		for (m = 0; m < 12; ++m)
-		    if (strncasecmp(s, full_month_names[m], strlen(full_month_names[m])) == 0) {
+		    if (strncasecmp(s, full_month_names[m],
+				    strlen(full_month_names[m])) == 0) {
 			s += strlen(full_month_names[m]);
 			goto found_full_mon;
 		    }
@@ -291,6 +295,7 @@ struct tm *tm;
 	 */
 
 	case 's':
+#if 0 /* HBB 20040213: comment this out, but keep it around for now */
 	    {
 		/* time_t when; */
 		int when;
@@ -301,7 +306,21 @@ struct tm *tm;
 		*tm = *tmwhen;
 		break;
 	    }
-
+#else
+	    /* HBB 20040213: New version of this.  64-bit proof and
+	     * more in line with the rest of this module than the
+	     * original one. */
+	    {
+		double when;
+		/* offset from UNIX epoch (1970) to gnuplot epoch */
+		static const long epoch_offset
+		    = (long)((ZERO_YEAR - 1970) * 365.25) * DAY_SEC;
+		
+		when = strtod (s, &s) - epoch_offset;
+		ggmtime(tm, when);
+		break;
+	    }		
+#endif
 	default:
 	    int_warn(DATAFILE, "Bad time format in string");
 	}
@@ -394,36 +413,16 @@ double l_clock;
     /* printf("zone: %s - %s\n",tm.tm_zone,xtm->tm_zone); */
 #endif
 
-    return (xstrftime(s, bsz, fmt, &tm));
+    return xstrftime(s, bsz, fmt, &tm);
 }
 
 
-/* some shorthands : check that there is space in the output string
- * Odd-looking defn is dangling-else-safe
- */
-#define CHECK_SPACE(n) if ( (l+(n)) <= bsz) ; else return 0
-
-/* copy a fixed string, checking that there's room */
-#define COPY_STRING(z) CHECK_SPACE(strlen(z)) ; strcpy(s, z)
-
-/* format a string, using default spec if none given
- * w and z are width and zero-flag
- * dw and dz are the defaults for these
- * In fact, CHECK_SPACE(w) is not a sufficient test, since
- * sprintf("%2d", 365) outputs three characters
- */
-
-#define FORMAT_STRING(dz, dw, x)           \
-  if (w==0) { w=(dw); if (!z) z=(dz); }    \
-  CHECK_SPACE(w);                          \
-  sprintf(s, z ? "%0*d" : "%*d", w, (x) )
-
-static int
+static size_t
 xstrftime(str, bsz, fmt, tm)
-char *str;			/* output buffer */
-size_t bsz;			/* space available */
-const char *fmt;
-struct tm *tm;
+    char *str;			/* output buffer */
+    size_t bsz;			/* space available */
+    const char *fmt;
+    struct tm *tm;
 {
     size_t l = 0;			/* chars written so far */
 
@@ -438,10 +437,10 @@ struct tm *tm;
 	    *s++ = *fmt++;
 	    l++;
 	} else {
-
 	    /* set up format modifiers */
 	    int w = 0;
 	    int z = 0;
+
 	    if (*++fmt == '0') {
 		z = 1;
 		++fmt;
@@ -452,6 +451,35 @@ struct tm *tm;
 	    }
 
 	    switch (*fmt++) {
+
+		/* some shorthands : check that there is space in the
+		 * output string. */
+#define CHECK_SPACE(n) do {				\
+		    if ((l+(n)) > bsz) return 0;	\
+		} while (0)
+
+		/* copy a fixed string, checking that there's room */
+#define COPY_STRING(z) do {			\
+		    CHECK_SPACE(strlen(z)) ;	\
+		    strcpy(s, z);		\
+		} while (0)
+		
+		/* format a string, using default spec if none given w
+		 * and z are width and zero-flag dw and dz are the
+		 * defaults for these In fact, CHECK_SPACE(w) is not a
+		 * sufficient test, since sprintf("%2d", 365) outputs
+		 * three characters
+		 */
+#define FORMAT_STRING(dz, dw, x) do {				\
+		    if (w==0) {					\
+			w=(dw);					\
+			if (!z)					\
+			    z=(dz);				\
+		    }						\
+		    CHECK_SPACE(w);				\
+		    sprintf(s, z ? "%0*d" : "%*d", w, (x));	\
+		} while(0)
+
 	    case '%':
 		CHECK_SPACE(1);
 		*s = '%';
@@ -620,8 +648,11 @@ struct tm *tm;
 		s++;
 		l++;
 	    }
-	}
-    }
+#undef CHECK_SPACE
+#undef COPY_STRING
+#undef FORMAT_STRING
+	} /* switch(fmt letter) */
+    } /* if(fmt letter not '%') */
     return (l);
 }
 
@@ -762,17 +793,13 @@ double l_clock;
     return 0;
 }
 
-#define NOTHING
-#define LETTER(L, width, field, extra) \
-  case L: s=read_int(s,width,&tm->field); extra; continue
-
 /* supplemental routine gstrptime() to read a formatted time */
 
 char *
 gstrptime(s, fmt, tm)
-char *s;
-char *fmt;
-struct tm *tm;
+    char *s;
+    char *fmt;
+    struct tm *tm;
 {
     FPRINTF((stderr, "gstrptime(\"%s\", \"%s\")\n", s, fmt));
 
@@ -806,6 +833,13 @@ struct tm *tm;
 		return s - 1;
 	    continue;
 
+#define NOTHING	/* nothing */
+#define LETTER(L, width, field, extra)		\
+	case L:					\
+	    s=read_int(s,width,&tm->field);	\
+	    extra;				\
+	    continue;
+
 	    LETTER('d', 2, tm_mday, NOTHING);
 	    LETTER('m', 2, tm_mon, NOTHING);
 	    LETTER('y', 2, tm_year, NOTHING);
@@ -813,6 +847,8 @@ struct tm *tm;
 	    LETTER('H', 2, tm_hour, NOTHING);
 	    LETTER('M', 2, tm_min, NOTHING);
 	    LETTER('S', 2, tm_sec, NOTHING);
+#undef NOTHING
+#undef LETTER
 
 	default:
 	    int_error(DATAFILE, "incorrect time format character");
