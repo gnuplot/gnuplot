@@ -1,3 +1,8 @@
+2005-04-06  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.c (set_plot_with_palette): Do not set the flag for displaying
+	colorbox for 'splot ... with rgbimage'.
+
 2005-04-06  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/README:  Show call order of enhanced text mode entry points
