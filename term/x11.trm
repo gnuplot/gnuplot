@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.18 1999/06/19 20:30:59 lhecking Exp $
+ * $Id: x11.trm,v 1.19 1999/06/22 11:54:25 lhecking Exp $
  *
  */
 
@@ -404,7 +404,9 @@ X11_init()
 	    devnam.dsc$a_pointer,
 	    &devnam.dsc$w_length, 0
     };
-
+#define CMDLEN 1024
+    char cmdline[CMDLEN], *cmdp;
+    int optindex;
 
     if (!X11_channel) {
 	int one = 1;
@@ -419,9 +421,18 @@ X11_init()
 	struct dsc$descriptor_s pgmdsc =
 	{0, DSC$K_DTYPE_T,
 	 DSC$K_CLASS_S, 0};
-	pgmdsc.dsc$w_length = strlen(X11_command);
-	pgmdsc.dsc$a_pointer = X11_command;
-
+        optindex = 0;
+        strcpy (cmdline, optvec[optindex]);
+        cmdp = cmdline + strlen (optvec[optindex]);
+        while (optvec[++optindex] != NULL) {
+          *cmdp++ = ' ';
+          *cmdp++ = '\"';
+          strcpy (cmdp, optvec[optindex]);
+          cmdp += strlen (optvec[optindex]);
+          *cmdp++ = '\"';
+        }
+	pgmdsc.dsc$w_length = cmdp-cmdline;
+	pgmdsc.dsc$a_pointer = cmdline;
 
 	/* Create a mailbox which will be used as a pipe for commands to the 
 	 * subprocess.  What we'll write to it will be read by the subprocess
