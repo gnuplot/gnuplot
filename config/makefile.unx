@@ -533,7 +533,7 @@ OS2 = makefile.os2 os2/makefile os2/dialogs.c os2/dialogs.h os2/gclient.c \
 
 # Documentation and help files
 DOCS1 = docs/makefile docs/README docs/checkdoc.c docs/doc2gih.c \
-	docs/doc2hlp.c docs/doc2hlp.com docs/doc2ms.c docs/doc2tex.c \
+	docs/doc2hlp.c docs/doc2hlp.vms docs/doc2ms.c docs/doc2tex.c \
 	docs/gnuplot.1 docs/lasergnu.1 docs/toc_entr.sty docs/doc2info.pl \
 	docs/titlepag.ms docs/titlepag.tex docs/makefile.ami \
 	docs/doc2rtf.c

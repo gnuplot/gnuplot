@@ -67,7 +67,7 @@ CSOURCE8 = contour.c specfun.c interpol.c
 # Docs
 #
 DOCS1 = docs/Makefile docs/README docs/checkdoc.c docs/doc2gih.c \
-	docs/doc2hlp.c docs/doc2hlp.com docs/doc2ms.c docs/doc2tex.c \
+	docs/doc2hlp.c docs/doc2hlp.vms docs/doc2ms.c docs/doc2tex.c \
 	docs/gnuplot.1 docs/lasergnu.1 docs/toc_entry.sty \
 	docs/titlepage.ms docs/titlepage.tex
 DOCS2 = docs/gnuplot.doc
