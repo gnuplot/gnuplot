@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.5 2000/11/15 15:51:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.6 2000/11/23 14:14:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -18,6 +18,7 @@ static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.5 2000/11/15 15:51:06 m
 #include <math.h>
 #include <stdio.h>
 #include "color.h"
+#include "getcolor.h"
 #include "stdfn.h"
 
 double
