@@ -1,4 +1,6 @@
 Changes in release 4.0:
+[3.8b]
+* retain backwards compatibility for old syntax
 [3.8a]
 * doc2texi.el, gnuplot.texi added; remove doc2info.c,
   doc2html.c, doc2texi.pl, and fixinfo.el; the info
@@ -10,7 +12,7 @@ Changes in release 4.0:
 [3.7.0.10 - internal only]
 * removed DJGPP version 1 support
 * improved version of stdin wrapper for Win32
-* ongoing work: rewrite of the input parser
+* ongoing work: rewrite of input parser
 * gnuplot now passes the correct return value back to
   the environment
 * FIXED buffering bug in gnuplot_x11
@@ -21,7 +23,6 @@ Changes in release 4.0:
   and 'set linestyle' commands have been removed. They have been
   replaced with 'set style data|function|line'. The 'set nolinestyle'
   command, however, is still available for the time being.
-  The demos have been updated to reflect this change.
 * NEW 'system', 'unset' command
 * INCOMPATIBLE CHANGE: all 'set noVariable' commands have been
   replaced with the new 'unset Variable' command.
@@ -38,6 +39,7 @@ Changes in release 4.0:
 * FIXED reversed 'set {x|y}zeroaxis' behaviour
 * FIXED plotting of test page before line properties are specified completely
 * UPDATED metapost driver
+* better modularisation
 
 [3.7.0.9]
 * moved some declarations to new header files

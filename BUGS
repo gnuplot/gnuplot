@@ -173,6 +173,9 @@ END {
   a protection violation in 'all.dem', on the first plot that tries
   to read a datafile. Heap corruption suspected.
 
+14. In pcl5 mode, the hpgl driver prints a spurious "DI,1DI,0" string in the
+  upper left corner of the plot.
+
 (Moved from old WhatsNew file, needs cleaning up)
 
 BUGS outstanding

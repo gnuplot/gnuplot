@@ -1,3 +1,46 @@
+1999-11-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* config/buildvms.com, config/makefile.286, config/makefile.amg,
+	config/makefile.ami, config/makefile.dj2, config/makefile.emx,
+	config/makefile.g, config/makefile.msc, config/makefile.msw,
+	config/makefile.mto, config/makefile.os2, config/makefile.st,
+	config/makefile.tc, config/makefile.vms, config/makefile.wc,
+	config/makefile.win, config/makefile.ztc: Updated list ob object
+	files, dependencies.
+
+	* docs/Makefile.in: Add AmigaGuide(r) format (commented out for now).
+
+	* src/Makefile.am, src/Makefile.maint: Remove gpltconv.c. Add new
+	files to gnuplot_SOURCES.
+
+	* src/set.c(set_command): Add backwards compatibility for old
+	command syntax.
+
+1999-11-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/doc2x.h, src/alloc.c, src/alloc.h, src/binary.c, src/binary.h,
+	src/bitmap.c, src/bitmap.h, src/command.c, src/command.h,
+	src/contour.c, src/contour.h, src/datafile.c, src/datafile.h,
+	src/eval.c, src/eval.h, src/fit.c, src/fit.h, src/gp_time.h,
+	src/graph3d.c, src/graph3d.h, src/graphics.c, src/graphics.h,
+	src/help.c, src/help.h, src/internal.c, src/internal.h,
+	src/interpol.c, src/interpol.h, src/matrix.c, src/matrix.h,
+	src/misc.c, src/misc.h, src/parse.c, src/parse.h, src/plot.c,
+	src/plot.h, src/plot2d.c, src/plot2d.h, src/plot3d.c, src/plot3d.h,
+	src/protos.h, src/readline.c, src/readline.h, src/save.c, src/save.h,
+	src/scanner.c, src/scanner.h, src/set.c, src/setshow.h, src/show.c,
+	src/specfun.c, src/specfun.h, src/standard.c, src/standard.h,
+	src/stdfn.c, src/stdfn.h, src/tables.c, src/tables.h, src/term.c,
+	src/term_api.h, src/time.c, src/unset.c, src/util.c, src/util.h,
+	src/util3d.c, src/variable.c, src/variable.h, term/gif.trm,
+	term/linux.trm: Further modularisation.
+
+	* src/dynarray.c, src/dynarray.h: New files for generic dynamic
+	array handling.
+
+	* src/hidden3d.c, src/hidden3d.h: Integrate completely rewritten
+	version into gnuplot sources.
+
 1999-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* src/gpltconv.c: Add `set nolinestyle'.
@@ -9,7 +52,7 @@
 	* docs/Makefile.in: Remove all doc2info and doc2html related targets.
 	Use makeinfo for both info and html targets.
 
-	* docs/doc2html.c, docs/doc2info.c,docs/fixinfo.el: Remove. 
+	* docs/doc2html.c, docs/doc2info.c, docs/fixinfo.el: Remove. 
 
 	* src/Makefile.maint: Comment out version.c target.
 
@@ -357,8 +400,6 @@
 
 1999-08-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* demo/*.dem, tutorial/*.plt: Updated to new command syntax.
-
 	* src/Makefile.am, src/Makefile.maint, src/makefile.all: Add new
 	files gpltconv.c and unset.c.
 
@@ -369,7 +410,7 @@
 
 	* src/set.c: Remove all set_no* related cases and functions.
 
-	* src/setshow.h: Updated to refelct changes in set/unset commands.
+	* src/setshow.h: Updated to reflect changes in set/unset commands.
 
 	* src/show.c: Remove show_data() and show_func(). Fixes.
 
@@ -484,8 +525,8 @@
 
 	* src/show.c: Include <sys/utsname>. Functions moved from misc.c.
 
-	* src/show.c(conv_text): Now uses internal, static, malloc'd memory
-	for conversion target.
+	* src/show.c(conv_text): Now uses internal, malloc'd but statically
+	referenced memory for conversion target.
 
 	* term/driver.h: Remove extern references to xsize, ysize.
 
@@ -640,7 +681,7 @@
 	support for obsolete DJGPP version 1.
 
 	* src/Makefile.am, src/Makefile.in, src/Makefile.maint, src/plot.c:
-	Remove suppor for DJGPP version 1.
+	Remove support for DJGPP version 1.
 
 1999-07-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
