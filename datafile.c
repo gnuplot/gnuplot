@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: datafile.c,v 1.11.2.1 1999/08/19 14:41:09 lhecking Exp $";
+static char *RCSid = "$Id: datafile.c,v 1.11.2.2 1999/11/20 17:56:24 lhecking Exp $";
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -252,6 +252,10 @@ extern double min_array[], max_array[];
 static char *df_gets()
 {
     int len = 0;
+
+    /* HBB 20000526: prompt user for inline data, if in interactive mode */
+    if (mixed_data_fp && interactive)
+	fputs("input data ('e' ends) > ", stderr);
 
     if (!fgets(line, max_line_len, data_fp))
 	return NULL;

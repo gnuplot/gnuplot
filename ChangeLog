@@ -1,3 +1,11 @@
+2000-06-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* datafile.c(df_gets): prompt visibly for inline data if in
+	in interactive mode.
+
+	* hidden3d.c: fix long-standing bug in dynamic array
+	Cross_store. Pointers into it have to be replaced by indices.
+
 2000-05-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL, Makefile.in, makefile.all: Updated.
