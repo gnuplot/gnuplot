@@ -8,9 +8,9 @@
 #
 # this needs to be run once in gnuplot directory
 
-dir=$1 && test $dir || dir=.
+dir="$1" && test ${dir} || dir=.
 
-if [ $dir = . ] ; then
+if [ "$dir" = . ] ; then
   mkdirs=false
   backup=true
 else
@@ -18,32 +18,28 @@ else
   backup=false
 fi
 
-for i in `cd $dir;find . \( -name "*.c" -o -name "*.h" -o -name "*.trm" \) -print` ; do
-  sed -e 's/^#\([ 	]*error\)/\1/' \
-      -e 's@^\(#[ 	]*warning.*\)$@/* \1 */@' $dir/$i >.tmp
-  if cmp -s $dir/$i .tmp ; then
-    rm .tmp
-  else
+for i in `cd $dir && find . \( -name "*.c" -o -name "*.h" -o -name "*.trm" \) -print` ; do
+  grep "^#[ 	]*[ew][ar]" ${dir}/${i} >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    # found #error or #warning
+    sed -e 's%^#\([ 	]*error\)%\1%' \
+        -e 's%^\(#[ 	]*warning.*\)$%/* \1 */%' $dir/$i >.tmp
     if $mkdirs ; then
-      dirnew=`echo $i | sed 's@^\./@@'`
-      if echo $dirnew |grep '/' >/dev/null 2>&1 ; then
-        mkdir `echo $dirnew |grep '/' |sed 's@/[^/]*$@@'`
+      dirnew=`echo $i | sed -n 's%^\./\([^/]*\)/.*$%\1%p'`
+      if [ x"$dirnew" != x ]; then
+        mkdir ${dirnew}
       fi
     fi
-    if $backup && [ ! -r $dir/$i.dist ] ; then
+    if $backup && [ ! -r $dir/$i.dist ]; then
       mv $dir/$i $dir/$i.dist
     fi
-    if cmp -s .tmp $i ; then 
-      rm .tmp
+    suffix=`echo $i | awk -F\. '{print $NF}'`
+    if [ $suffix = h ]; then
+      test -r $dir/$i && mv $dir/$i $dir/$i.dist
+      mv .tmp $dir/$i
     else
-      suffix=`echo $i | awk -F\. '{print $NF}'`
-      if [ $suffix = h ]; then
-        test -r $dir/$i && mv $dir/$i $dir/$i.dist
-        mv .tmp $dir/$i
-      else
       mv .tmp $i
-      fi
-      echo fixed $i
     fi
+    echo fixed $i
   fi
 done
