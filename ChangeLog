@@ -1,3 +1,13 @@
+2002-12-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0FAQ, show.c, version.c: Get ready for 3.7.3 release.
+
+2002-12-11  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+
+	* term/djsvga.trm, term/eepic.trm, term/epson.trm, term/fig.trm,
+	term/gif.trm, term/latex.trm, term/mif.trm, term/post.trm,
+	term/pslatex.trm, term/tpic.trm, term/xlib.trm: More of same.
+
 2002-12-04  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/be.trm, term/cgm.trm, term/x11.trm: Fix
