@@ -1,5 +1,5 @@
-		    /* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.12 2002/04/30 14:08:53 broeker Exp $
+/* Hey Emacs this is -*- C -*-
+ * $Id: emf.trm,v 1.13 2002/07/26 16:42:28 mikulik Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -206,6 +206,7 @@ static unsigned int emf_linetype = 1;
 static unsigned int emf_linewidth;	/* line width in plot units */
 static unsigned int emf_dashtype = 0;
 static unsigned long emf_color = 0L;
+static unsigned int emf_colors = EMF_COLORS;
 static unsigned int emf_polyline[EMF_MAX_SEGMENTS];	/* stored polyline coordinates */
 static unsigned int emf_graphics = FALSE;
 static unsigned int emf_dashed = TRUE;
@@ -434,7 +435,7 @@ EMF_options()
 	    continue;
 	}
 	break;
-    }
+    } /* while(!end of command) */
     if (!END_OF_COMMAND && isstring(c_token)) {
 	quote_str(emf_defaultfontname, c_token, MAX_ID_LEN);
 	c_token++;
@@ -445,6 +446,8 @@ EMF_options()
 	emf_defaultfontsize = (int) real(const_express(&a));
     }
     EMF_set_font(NULL);		/* set default font */
+    
+    emf_colors = emf_monochrome ? 1 : EMF_COLORS;
 
     sprintf(term_options, "%s %s \"%s\" %d",
 	    emf_monochrome ? "monochrome" : "color",
@@ -638,7 +641,7 @@ EMF_dashtype(dashtype)
     EMF_flush_polyline();
 
     if (dashtype >= 0)
-	dashtype = (dashtype / EMF_COLORS) % EMF_LINE_TYPES;
+	dashtype = (dashtype / emf_colors) % EMF_LINE_TYPES;
 
     if (dashtype < 1 || !emf_dashed) {	/* solid mode */
 	EMF_SelectObject(EMF_STOCK_OBJECT_BLACK_PEN);
@@ -833,8 +836,8 @@ EMF_reset()
 
 TERM_PUBLIC void 
 EMF_point(x, y, number)
-unsigned int x, y;
-int number;
+    unsigned int x, y;
+    int number;
 {
     int old_dashtype;
     unsigned long old_linecolor;
@@ -843,14 +846,14 @@ int number;
     old_dashtype = emf_dashtype;
     old_linecolor = emf_color;
     EMF_linecolor(number);
-    EMF_dashtype(number % EMF_COLORS);
+    EMF_dashtype(number % emf_colors);
 
     if (number < 0) {		/* draw dot */
 	EMF_move(x, y);
 	EMF_solid_vector(x + 1, y);
 	goto end_points;
     }
-    number = (number / EMF_COLORS) % EMF_POINTS;
+    number = (number / emf_colors) % EMF_POINTS;
 
     switch (number) {
     case 0:			/* draw diamond */
@@ -980,8 +983,8 @@ START_HELP(emf)
 "?terminal emf",
 "?term emf",
 "?emf",
-" The `emf` terminal generates an Enhanced Metafile Format file.  This file format",
-" is the metafile standard on MS Win32 Systems"
+" The `emf` terminal generates an Enhanced Metafile Format file.  This file",
+" format is the metafile standard on MS Win32 Systems"
 "",
 " Syntax:",
 "       set terminal emf {<color>} {solid | dashed}",

@@ -1,13 +1,24 @@
+2003-01-24  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	A patch from Allin Cottrell <cottrell@wfu.edu> to fix unreadable
+ 	low-numbered linetypes in EMF terminal monochrome mode.
+	
+	* term/emf.trm (emf_color): New variable.
+	(EMF_options): Initialize it according to monochrome/colour option
+ 	status.
+	(EMF_dashtype, EMF_point): Use it instead of constan EMF_COLORS.
+	(TERM_HELP): Slightly reformatted for linelength.
+
 2003-01-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* src/plot.c src/set.c docs/gnuplot.doc: Let the default terminal or
-	that (re)set from gnuplot's ini file pushed automatically during
-	gnuplot's startup. Consequently, 'set term pop' will be always defined
-	to be the default terminal on the given platform, unless changed
-	explicitly by 'set term push'.
+	* src/plot.c src/set.c docs/gnuplot.doc: Let the default terminal
+ 	or that (re)set from gnuplot's ini file pushed automatically
+ 	during gnuplot's startup. Consequently, 'set term pop' will be
+ 	always defined to be the default terminal on the given platform,
+ 	unless changed explicitly by 'set term push'.
 
 	* src/misc.h src/misc.c: New routines push_terminal() and
-	pop_terminal().
+ 	pop_terminal().
 
 2003-01-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1766,7 +1777,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/23 13:22:04 $).
+	last modification date (from the tag $Date: 2003/01/24 08:26:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
