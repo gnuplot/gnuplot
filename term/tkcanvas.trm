@@ -60,6 +60,10 @@
 /*
  * extended interactive Tk/Tcl capabilities 
  * Thomas Sefzick, March 1999, t.sefzick@fz-juelich.de
+ *
+ * add the perltk.trm code written by Slaven Rezic <eserte@cs.tu-berlin.de>
+ * 'linewidth' and 'justify text' added, ends of plotted lines are now rounded.
+ * Thomas Sefzick, May 1999, t.sefzick@fz-juelich.de
  */
 
 #include "driver.h"
@@ -78,6 +82,9 @@ TERM_PUBLIC void TK_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TK_vector __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TK_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC void TK_reset __PROTO((void));
+TERM_PUBLIC int TK_justify_text __PROTO((enum JUSTIFY));
+TERM_PUBLIC int TK_set_font __PROTO((char *font));
+TERM_PUBLIC void TK_linewidth __PROTO((double linewidth));
 
 #define TK_XMAX 1000
 #define TK_YMAX 1000
@@ -98,39 +105,57 @@ static int tk_angle = 0;
 static int tk_lastx;
 static int tk_lasty;
 static int tk_color = 0;
+static char tk_anchor[7] = "w";
+static double tk_linewidth = 1.0;
+static int tk_perl = 0;
 static int tk_interactive = 0;
-static char *tk_colors[] = { "black", "gray", "red", "blue", "green", "brown", "magenta", "cyan" };
+static char *tk_colors[] = {"black", "gray", "red", "blue", "green", "brown", "magenta", "cyan"};
 
-/* {ts} 26-mar-99 */
 TERM_PUBLIC void TK_options()
 {
-	if (!END_OF_COMMAND) {
-		if (almost_equals(c_token, "i$nteractive")) {
-			tk_interactive = 1;
-			c_token++;
-		}
+    tk_perl = 0;
+    tk_interactive = 0;
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "p$erltk")) {
+	    tk_perl = 1;
+	    c_token++;
 	}
-	sprintf(term_options, "%s", tk_interactive ? "interactive" : "");
+	if (almost_equals(c_token, "i$nteractive")) {
+	    tk_interactive = 1;
+	    c_token++;
+	}
+    }
+    sprintf(term_options, "%s %s",
+	    tk_perl ? "perltk" : "",
+	    tk_interactive ? "interactive" : "");
 }
-/* {ts} */
 
 TERM_PUBLIC void TK_init()
 {
-    fputs("\
-proc gnuplot can {\n\
-$can delete all\n\
-set cmx [lindex [$can configure -width] 4]\n\
-set cmy [lindex [$can configure -height] 4]\n",
-	  gpoutfile);
-
-    tk_lastx = tk_lasty = tk_color = 0;
 }
-
 
 TERM_PUBLIC void TK_graphics()
 {
+    if (tk_perl) {
+	fputs(
+		 "sub gnuplot {\n"
+		 "my($can) = @_;\n"
+		 "$can->delete('all');\n"
+		 "my $cmx = ($can->configure(-width))[4];\n"
+		 "my $cmy = ($can->configure(-height))[4];\n"
+		 "my $font;\n"
+		 "my $temp;\n",
+		 gpoutfile);
+    } else {
+	fputs(
+		 "proc gnuplot can {\n"
+		 "$can delete all\n"
+		 "set cmx [lindex [$can configure -width] 4]\n"
+		 "set cmy [lindex [$can configure -height] 4]\n",
+		 gpoutfile);
+    }
+    tk_lastx = tk_lasty = tk_color = 0;
 }
-
 
 TERM_PUBLIC void TK_reset()
 {
@@ -142,6 +167,12 @@ int linetype;
     tk_color = (linetype + 2) & 7;
 }
 
+TERM_PUBLIC void TK_linewidth(linewidth)
+double linewidth;
+{
+    tk_linewidth = linewidth;
+}
+
 TERM_PUBLIC void TK_move(x, y)
 unsigned int x, y;
 {
@@ -149,25 +180,6 @@ unsigned int x, y;
     tk_lasty = 1000 - y;
 }
 
-
-TERM_PUBLIC void TK_vector(x, y)
-unsigned int x, y;
-{
-/* {ts} 6-apr-99 */
-	extern double min_array[], max_array[], base_array[], log_base_array[];
-	extern TBOOLEAN log_array[];
-	extern int xleft, xright, ybot, ytop;
-	extern TBOOLEAN is_3d_plot;
-
-	if (tk_interactive && !is_3d_plot) {
-		fprintf(gpoutfile, "set temp [\n");
-	}
-/* {ts} */
-    y = 1000 - y;
-    fprintf(gpoutfile,
-	    "$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",
-	    tk_lastx, tk_lasty, x, y, tk_colors[tk_color]);
-/* {ts} 6-apr-99 */
 #define \
 TK_REAL_VALUE(value,axis) \
 (log_array[axis])\
@@ -180,124 +192,320 @@ TK_X_VALUE(value) \
 TK_Y_VALUE(value) \
 (double)((TK_YMAX-value)-ybot)/(double)(ytop-ybot)
 
-	if (tk_interactive && !is_3d_plot) {
-		fprintf (gpoutfile, "]\n");
-		fprintf (gpoutfile,
-			"$can bind $temp <Button> \"gnuplot_xy $can $temp %f %f %f %f %f %f %f %f",
-			TK_REAL_VALUE(TK_X_VALUE(tk_lastx),FIRST_X_AXIS),
-			TK_REAL_VALUE(TK_Y_VALUE(tk_lasty),FIRST_Y_AXIS),
-			TK_REAL_VALUE(TK_X_VALUE(tk_lastx),SECOND_X_AXIS),
-			TK_REAL_VALUE(TK_Y_VALUE(tk_lasty),SECOND_Y_AXIS),
-			TK_REAL_VALUE(TK_X_VALUE(x),FIRST_X_AXIS),
-			TK_REAL_VALUE(TK_Y_VALUE(y),FIRST_Y_AXIS),
-			TK_REAL_VALUE(TK_X_VALUE(x),SECOND_X_AXIS),
-			TK_REAL_VALUE(TK_Y_VALUE(y),SECOND_Y_AXIS));
-		if (log_array[FIRST_X_AXIS]) {
-			fprintf (gpoutfile, " %f",
-				TK_REAL_VALUE(TK_X_VALUE(0.5*(x+tk_lastx)),FIRST_X_AXIS));
-		} else {
-			fprintf (gpoutfile, " {}");
-		}
-		if (log_array[FIRST_Y_AXIS]) {
-			fprintf (gpoutfile, " %f",
-				TK_REAL_VALUE(TK_Y_VALUE(0.5*(y+tk_lasty)),FIRST_Y_AXIS));
-		} else {
-			fprintf (gpoutfile, " {}");
-		}
-		if (log_array[SECOND_X_AXIS]) {
-			fprintf (gpoutfile, " %f",
-				TK_REAL_VALUE(TK_X_VALUE(0.5*(x+tk_lastx)),SECOND_X_AXIS));
-		} else {
-			fprintf (gpoutfile, " {}");
-		}
-		if (log_array[SECOND_Y_AXIS]) {
-			fprintf (gpoutfile, " %f",
-				TK_REAL_VALUE(TK_Y_VALUE(0.5*(y+tk_lasty)),SECOND_Y_AXIS));
-		} else {
-			fprintf (gpoutfile, " {}");
-		}
-		fprintf (gpoutfile, "\"\n");
+TERM_PUBLIC void TK_vector(x, y)
+unsigned int x, y;
+{
+    extern double min_array[], max_array[], base_array[], log_base_array[];
+    extern TBOOLEAN log_array[];
+    extern int xleft, xright, ybot, ytop;
+    extern TBOOLEAN is_3d_plot;
+
+    if (tk_interactive && !is_3d_plot) {
+	if (tk_perl)
+	    fprintf(gpoutfile, "$can->bind(");
+	else
+	    fprintf(gpoutfile, "$can bind [\n");
+    }
+    y = 1000 - y;
+    if (tk_perl) {
+	fprintf(gpoutfile,
+		"$can->createLine("
+		"$cmx * %d / 1000, "
+		"$cmy * %d / 1000, "
+		"$cmx * %d / 1000, "
+		"$cmy * %d / 1000, -fill => q{%s}, -width => %f, -capstyle => q{round})",
+		tk_lastx, tk_lasty, x, y, tk_colors[tk_color], tk_linewidth);
+    } else {
+	fprintf(gpoutfile,
+		"$can create line "
+		"[expr $cmx * %d /1000] "
+		"[expr $cmy * %d /1000] "
+		"[expr $cmx * %d /1000] "
+		"[expr $cmy * %d /1000] -fill %s -width %f -capstyle round\n",
+		tk_lastx, tk_lasty, x, y, tk_colors[tk_color], tk_linewidth);
+    }
+
+    if (tk_interactive && !is_3d_plot) {
+	if (tk_perl) {
+	    fprintf(gpoutfile,
+		    ", '<Button>' => "
+	    /* Ev('W') not needed here, supplied anyhow, WHY ??? */
+		    "[\\&gnuplot_xy, %f, %f, %f, %f, %f, %f, %f, %f,",
+		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), FIRST_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), FIRST_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), SECOND_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), SECOND_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(x), FIRST_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(y), FIRST_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(x), SECOND_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(y), SECOND_Y_AXIS));
+	    if (log_array[FIRST_X_AXIS]) {
+		fprintf(gpoutfile, " %f,",
+			TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)), FIRST_X_AXIS));
+	    } else {
+		fprintf(gpoutfile, " \"\",");
+	    }
+	    if (log_array[FIRST_Y_AXIS]) {
+		fprintf(gpoutfile, " %f,",
+			TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)), FIRST_Y_AXIS));
+	    } else {
+		fprintf(gpoutfile, " \"\",");
+	    }
+	    if (log_array[SECOND_X_AXIS]) {
+		fprintf(gpoutfile, " %f,",
+			TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)), SECOND_X_AXIS));
+	    } else {
+		fprintf(gpoutfile, " \"\",");
+	    }
+	    if (log_array[SECOND_Y_AXIS]) {
+		fprintf(gpoutfile, " %f",
+			TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)), SECOND_Y_AXIS));
+	    } else {
+		fprintf(gpoutfile, " \"\"");
+	    }
+	    fprintf(gpoutfile, "]);\n");
+	} else {
+	    fprintf(gpoutfile,
+		    "] <Button> "
+		    "\"gnuplot_xy %%W %f %f %f %f %f %f %f %f",
+		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), FIRST_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), FIRST_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(tk_lastx), SECOND_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(tk_lasty), SECOND_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(x), FIRST_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(y), FIRST_Y_AXIS),
+		    TK_REAL_VALUE(TK_X_VALUE(x), SECOND_X_AXIS),
+		    TK_REAL_VALUE(TK_Y_VALUE(y), SECOND_Y_AXIS));
+	    if (log_array[FIRST_X_AXIS]) {
+		fprintf(gpoutfile, " %f",
+			TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)), FIRST_X_AXIS));
+	    } else {
+		fprintf(gpoutfile, " {}");
+	    }
+	    if (log_array[FIRST_Y_AXIS]) {
+		fprintf(gpoutfile, " %f",
+			TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)), FIRST_Y_AXIS));
+	    } else {
+		fprintf(gpoutfile, " {}");
+	    }
+	    if (log_array[SECOND_X_AXIS]) {
+		fprintf(gpoutfile, " %f",
+			TK_REAL_VALUE(TK_X_VALUE(0.5 * (x + tk_lastx)), SECOND_X_AXIS));
+	    } else {
+		fprintf(gpoutfile, " {}");
+	    }
+	    if (log_array[SECOND_Y_AXIS]) {
+		fprintf(gpoutfile, " %f",
+			TK_REAL_VALUE(TK_Y_VALUE(0.5 * (y + tk_lasty)), SECOND_Y_AXIS));
+	    } else {
+		fprintf(gpoutfile, " {}");
+	    }
+	    fprintf(gpoutfile, "\"\n");
 	}
-
-#undef TK_REAL_VALUE
-#undef TK_X_VALUE
-#undef TK_Y_VALUE
-
-/* {ts} */
+    } else {
+	if (tk_perl) {
+	    fprintf(gpoutfile, ";\n");
+	}
+    }
     tk_lastx = x;
     tk_lasty = y;
 }
 
+#undef TK_REAL_VALUE
+#undef TK_X_VALUE
+#undef TK_Y_VALUE
 
 TERM_PUBLIC void TK_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     y = 1000 - y;
-    fprintf(gpoutfile,
-	    "$can create text [expr $cmx * %d /1000] [expr $cmy * %d /1000] -text {%s} -fill %s -anchor w\n",
-	    x, y, str, tk_colors[tk_color]);
+    if (tk_perl) {
+	fprintf(gpoutfile,
+		"$can->createText("
+		"$cmx * %d / 1000, "
+		"$cmy * %d / 1000, "
+		"-text => q{%s}, -fill => q{%s}, -anchor => '%s', "
+		"(defined $font ? (-font => $font) : ()));\n",
+		x, y, str, tk_colors[tk_color], tk_anchor);
+    } else {
+	fprintf(gpoutfile,
+		"eval $can create text "
+		"[expr $cmx * %d /1000] "
+		"[expr $cmy * %d /1000] "
+		"-text {%s} -fill %s -anchor %s"
+		" [expr [info exists font]?\"-font \\$font\":{}]\n",
+		x, y, str, tk_colors[tk_color], tk_anchor);
+    }
+}
+
+TERM_PUBLIC int TK_justify_text(anchor)
+enum JUSTIFY anchor;
+{
+    int return_value;
+
+    switch (anchor) {
+    case RIGHT:
+	strcpy(tk_anchor, "e");
+	return_value = TRUE;
+	break;
+    case CENTRE:
+	strcpy(tk_anchor, "center");
+	return_value = TRUE;
+	break;
+    case LEFT:
+	strcpy(tk_anchor, "w");
+	return_value = TRUE;
+	break;
+    default:
+	strcpy(tk_anchor, "w");
+	return_value = FALSE;
+    }
+    return return_value;
+}
+
+TERM_PUBLIC int TK_set_font(font)
+char *font;
+{
+    if (!font || *font == NUL) {
+	if (tk_perl)
+	    fprintf(gpoutfile, "undef $font;\n");
+	else
+	    fprintf(gpoutfile, "catch {unset $font}\n");
+    } else {
+	char *name;
+	int size = 0, sep;
+	sep = strcspn(font, ",");
+	name = malloc(sep + 1);
+	if (!name)
+	    return FALSE;
+	strncpy(name, font, sep);
+	name[sep] = NUL;
+	if (sep < strlen(font))
+	    sscanf(&(font[sep + 1]), "%d", &size);
+	if (tk_perl) {
+	    fprintf(gpoutfile,
+		    "if ($can->can('fontCreate')) {\n"
+		    "$font = $can->fontCreate(-family => q{%s}",
+		    name);
+	    if (size)
+		fprintf(gpoutfile, ", -size => %d", size);
+	    fprintf(gpoutfile, ");\n}\n");
+	} else {
+	    fprintf(gpoutfile,
+		    "set font [font create -family %s",
+		    name);
+	    if (size)
+		fprintf(gpoutfile, " -size %d", size);
+	    fprintf(gpoutfile, "]\n");
+	}
+    }
+    return TRUE;
 }
 
 TERM_PUBLIC void TK_text()
 {
-/* {ts} 6-apr-99 */
-	extern double min_array[], max_array[];
-	extern int xleft, xright, ybot, ytop;
-	extern TBOOLEAN is_3d_plot;
+    extern double min_array[], max_array[];
+    extern int xleft, xright, ybot, ytop;
+    extern TBOOLEAN is_3d_plot;
+    if (tk_perl) {
+	fputs("};\n", gpoutfile);
 	if (!is_3d_plot) {
-		fputs("}\n", gpoutfile);
-		fputs("proc gnuplot_plotarea {} {\n", gpoutfile);
-		fprintf(gpoutfile,
-			"return {%d %d %d %d}\n",
-			xleft, xright, 1000-ytop, 1000-ybot);
-		fputs("}\n", gpoutfile);
-		fputs("proc gnuplot_axisranges {} {\n", gpoutfile);
-		fprintf(gpoutfile,
-			"return {%f %f %f %f %f %f %f %f}\n",
-			min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS],
-			min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS],
-			min_array[SECOND_X_AXIS], max_array[SECOND_X_AXIS],
-			min_array[SECOND_Y_AXIS], max_array[SECOND_Y_AXIS]);
-		if (tk_interactive) {
-			fputs("}\n", gpoutfile);
-			fputs("proc gnuplot_xy {win id x1s y1s x2s y2s x1e y1e x2e y2e x1m y1m x2m y2m} {\n",
-				gpoutfile);
-			fputs("if {([llength [info commands user_gnuplot_coordinates]])} {\n",
-				gpoutfile);
-			fputs("user_gnuplot_coordinates $win $id $x1s $y1s $x2s $y2s $x1e $y1e $x2e $y2e $x1m $y1m $x2m $y2m\n",
-				gpoutfile);
-			fputs("} else {\n", gpoutfile);
-			fputs("if {[string length $x1m]>0} {puts -nonewline \" $x1m\"} else {puts -nonewline \" [expr 0.5*($x1s+$x1e)]\"}\n",
-				gpoutfile);
-			fputs("if {[string length $y1m]>0} {puts -nonewline \" $y1m\"} else {puts -nonewline \" [expr 0.5*($y1s+$y1e)]\"}\n",
-				gpoutfile);
-			fputs("if {[string length $x2m]>0} {puts -nonewline \" $x2m\"} else {puts -nonewline \" [expr 0.5*($x2s+$x2e)]\"}\n",
-				gpoutfile);
-			fputs("if {[string length $y2m]>0} {puts \" $y2m\"} else {puts \" [expr 0.5*($y2s+$y2e)]\"}\n",
-				gpoutfile);
-			fputs("}\n", gpoutfile);
-		}
+	    fputs("sub gnuplot_plotarea {\n", gpoutfile);
+	    fprintf(gpoutfile,
+		    "return (%d, %d, %d, %d);\n",
+		    xleft, xright, 1000 - ytop, 1000 - ybot);
+	    fputs("};\n", gpoutfile);
+	    fputs("sub gnuplot_axisranges {\n", gpoutfile);
+	    fprintf(gpoutfile,
+		    "return (%f, %f, %f, %f, %f, %f, %f, %f);\n",
+		    min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS],
+		    min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS],
+		    min_array[SECOND_X_AXIS], max_array[SECOND_X_AXIS],
+		    min_array[SECOND_Y_AXIS], max_array[SECOND_Y_AXIS]);
+	    fputs("};\n", gpoutfile);
+	    if (tk_interactive) {
+		fputs("sub gnuplot_xy {\n",
+		      gpoutfile);
+		fputs("my ($win, $x1s, $y1s, $x2s, $y2s, $x1e, $y1e, $x2e, $y2e, $x1m, $y1m, $x2m, $y2m) = @_;\n",
+		      gpoutfile);
+		fputs("if (defined &user_gnuplot_coordinates) {\n",
+		      gpoutfile);
+		fputs("my $id = $win->find('withtag', 'current');\n",
+		      gpoutfile);
+		fputs("user_gnuplot_coordinates $win, $id, $x1s, $y1s, $x2s, $y2s, $x1e, $y1e, $x2e, $y2e, $x1m, $y1m, $x2m, $y2m\n",
+		      gpoutfile);
+		fputs("} else {\n",
+		      gpoutfile);
+		fputs("if (length($x1m)>0) {print \" $x1m\";} else {print \" \", 0.5*($x1s+$x1e);}\n",
+		      gpoutfile);
+		fputs("if (length($y1m)>0) {print \" $y1m\";} else {print \" \", 0.5*($y1s+$y1e);}\n",
+		      gpoutfile);
+		fputs("if (length($x2m)>0) {print \" $x2m\";} else {print \" \", 0.5*($x2s+$x2e);}\n",
+		      gpoutfile);
+		fputs("if (length($y2m)>0) {print \" $y2m\";} else {print \" \", 0.5*($y2s+$y2e);}\n",
+		      gpoutfile);
+		fputs("print \"\\n\"\n",
+		      gpoutfile);
+		fputs("}\n",
+		      gpoutfile);
+		fputs("};\n", gpoutfile);
+	    }
 	}
-/* {ts} */
-    fputs("}\n", gpoutfile);
+    } else {
+	fputs("}\n", gpoutfile);
+	if (!is_3d_plot) {
+	    fputs("proc gnuplot_plotarea {} {\n", gpoutfile);
+	    fprintf(gpoutfile,
+		    "return {%d %d %d %d}\n",
+		    xleft, xright, 1000 - ytop, 1000 - ybot);
+	    fputs("}\n", gpoutfile);
+	    fputs("proc gnuplot_axisranges {} {\n", gpoutfile);
+	    fprintf(gpoutfile,
+		    "return {%f %f %f %f %f %f %f %f}\n",
+		    min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS],
+		    min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS],
+		    min_array[SECOND_X_AXIS], max_array[SECOND_X_AXIS],
+		    min_array[SECOND_Y_AXIS], max_array[SECOND_Y_AXIS]);
+	    fputs("}\n", gpoutfile);
+	    if (tk_interactive) {
+		fputs("proc gnuplot_xy {win x1s y1s x2s y2s x1e y1e x2e y2e x1m y1m x2m y2m} {\n",
+		      gpoutfile);
+		fputs("if {([llength [info commands user_gnuplot_coordinates]])} {\n",
+		      gpoutfile);
+		fputs("set id [$win find withtag current]\n",
+		      gpoutfile);
+		fputs("user_gnuplot_coordinates $win $id $x1s $y1s $x2s $y2s $x1e $y1e $x2e $y2e $x1m $y1m $x2m $y2m\n",
+		      gpoutfile);
+		fputs("} else {\n", gpoutfile);
+		fputs("if {[string length $x1m]>0} {puts -nonewline \" $x1m\"} else {puts -nonewline \" [expr 0.5*($x1s+$x1e)]\"}\n",
+		      gpoutfile);
+		fputs("if {[string length $y1m]>0} {puts -nonewline \" $y1m\"} else {puts -nonewline \" [expr 0.5*($y1s+$y1e)]\"}\n",
+		      gpoutfile);
+		fputs("if {[string length $x2m]>0} {puts -nonewline \" $x2m\"} else {puts -nonewline \" [expr 0.5*($x2s+$x2e)]\"}\n",
+		      gpoutfile);
+		fputs("if {[string length $y2m]>0} {puts \" $y2m\"} else {puts \" [expr 0.5*($y2s+$y2e)]\"}\n",
+		      gpoutfile);
+		fputs("}\n", gpoutfile);
+		fputs("}\n", gpoutfile);
+	    }
+	}
+    }
     fflush(gpoutfile);
 }
-
 
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-/* replaced options_null with TK_options  {ts} 26-mar-99 */
 TERM_TABLE_START(tkcanvas)
-    "tkcanvas", "Tk/Tcl canvas widget [interactive]",
-    TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
-    TK_VTIC, TK_HTIC, TK_options, TK_init, TK_reset,
-    TK_text, null_scale, TK_graphics, TK_move, TK_vector,
-    TK_linetype, TK_put_text, null_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null
+"tkcanvas", "Tk/Tcl canvas widget [perltk] [interactive]",
+TK_XMAX, TK_YMAX, TK_VCHAR, TK_HCHAR,
+TK_VTIC, TK_HTIC, TK_options, TK_init, TK_reset,
+TK_text, null_scale, TK_graphics, TK_move, TK_vector,
+TK_linetype, TK_put_text, null_text_angle,
+TK_justify_text, do_point, do_arrow, TK_set_font,
+NULL, 0, NULL, NULL, NULL, TK_linewidth
 TERM_TABLE_END(tkcanvas)
-
 #undef LAST_TERM
 #define LAST_TERM tkcanvas
 
@@ -313,26 +521,36 @@ START_HELP(tkcanvas)
 "?terminal tkcanvas",
 "?term tkcanvas",
 "?tkcanvas",
-" This terminal driver generates tk canvas widget commands.  To use it, rebuild",
-" `gnuplot` (after uncommenting or inserting the appropriate line in \"term.h\"),",
-" then",
+" This terminal driver generates Tk canvas widget commands based on Tcl/Tk",
+" (default) or Perl.  To use it, rebuild `gnuplot` (after uncommenting or",
+" inserting the appropriate line in \"term.h\"), then",
 "",
-"  gnuplot> set term tkcanvas {interactive}",
+"  gnuplot> set term tkcanvas {perltk} {interactive}",
 "  gnuplot> set output 'plot.file'",
 "",
-" After invoking \"wish\", execute the following sequence of tcl commands:",
+" After invoking \"wish\", execute the following sequence of Tcl/Tk commands:",
 "",
 "  % source plot.file",
 "  % canvas .c",
 "  % pack .c",
 "  % gnuplot .c",
 "",
-" The code generated by `gnuplot` creates a tcl procedure called \"gnuplot\"",
+" Or, for Perl/Tk use a program like this:",
+"",
+"  use Tk;",
+"  my $top = MainWindow->new;",
+"  my $c = $top->Canvas;",
+"  $c->pack();",
+"  do \"plot.pl\";",
+"  gnuplot->($c);",
+"  MainLoop;",
+"",
+" The code generated by `gnuplot` creates a procedure called \"gnuplot\"",
 " that takes the name of a canvas as its argument.  When the procedure is",
 " called, it clears the canvas, finds the size of the canvas and draws the plot",
 " in it, scaled to fit.",
 "",
-" For 2-dimensional plotting (`plot`) two additional tcl procedures are defined:",
+" For 2-dimensional plotting (`plot`) two additional procedures are defined:",
 " \"gnuplot_plotarea\" will return a list containing the borders of the plotting",
 " area \"xleft, xright, ytop, ybot\" in canvas screen coordinates, while the ranges",
 " of the two axes \"x1min, x1max, y1min, y1max, x2min, x2max, y2min, y2max\" in plot",
