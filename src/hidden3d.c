@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.16 1999/11/24 13:04:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.17 1999/12/10 16:52:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -574,7 +574,6 @@ long int crvlen;
 struct lp_style_type *lp;
 int style;
 {
-    p_edge thisedge;
     p_vertex v1 = vlist + vnum1;
     p_vertex v2 = NULL;		/* just in case: initialize... */
     long int vnum2;
