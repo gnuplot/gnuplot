@@ -1,5 +1,5 @@
 /*
- * $Id: mif.trm,v 1.19 2002/07/04 16:37:00 mikulik Exp $
+ * $Id: mif.trm,v 1.20 2002/07/21 12:32:53 mikulik Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -916,7 +916,7 @@ START_HELP(mif)
 " Several options may be set in the MIF 3.00 driver.",
 "",
 " Syntax:",
-"       set terminal mif {colour | monochrome} {polyline | vectors}",
+"       set terminal mif {color | colour | monochrome} {polyline | vectors}",
 "                        {help | ?}",
 "",
 " `colour` plots lines with line types >= 0 in colour (MIF sep. 2--7) and",
