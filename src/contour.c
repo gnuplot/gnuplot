@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.8 1999/11/08 19:24:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.9 1999/11/15 22:21:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -551,22 +551,24 @@ struct poly_struct **p_polys;	/* list of polygons output */
 struct edge_struct **p_edges;	/* list of edges output */
 {
     int i, j, grid_x_max = iso_lines->p_count;
-    struct edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail, *pe_tail1, *pe_tail2, *pe_temp;
+    struct edge_struct *p_edge1, *p_edge2, *edge0, *edge1, *edge2, *pe_tail,
+	   *pe_tail1, *pe_tail2, *pe_temp;
     struct poly_struct *pp_tail, *lower_tri, *upper_tri;
-    struct coordinate GPHUGE *p_vrtx1, GPHUGE * p_vrtx2;	/* HBB 980308: need to tag *each* of them as GPHUGE! */
+    /* HBB 980308: need to tag *each* of them as GPHUGE! */
+    struct coordinate GPHUGE *p_vrtx1, GPHUGE * p_vrtx2;
 
     (*p_polys) = pp_tail = NULL;	/* clear lists */
     (*p_edges) = pe_tail = NULL;
 
     p_vrtx1 = iso_lines->points;	/* first row of vertices */
-    p_edge1 = pe_tail1 = NULL;	/* clear list of edges */
+    p_edge1 = pe_tail = NULL;	/* clear list of edges */
 
     /* Generate edges of first row */
+    /* HBB 19991130: removed effectively unused variable 'pe_tail1' */
     for (j = 0; j < grid_x_max - 1; j++)
-	add_edge(p_vrtx1 + j, p_vrtx1 + j + 1, &p_edge1, &pe_tail1);
+	add_edge(p_vrtx1 + j, p_vrtx1 + j + 1, &p_edge1, &pe_tail);
 
     (*p_edges) = p_edge1;	/* update main list */
-    pe_tail = pe_tail1;
 
 
     /*
@@ -576,10 +578,16 @@ struct edge_struct **p_edges;	/* list of edges output */
      * (pe_tail points on last edge).
      *
      * Temporary pointers:
-     * 1. p_edge2: Top horizontal edge list:       -----------------------  2
-     * 2. pe_tail: middle edge list:              |\  |\  |\  |\  |\  |\  |
+     * 1. p_edge2: Top horizontal edge list:      +-----------------------+ 2
+     * 2. p_tail : end of middle edge list:       |\  |\  |\  |\  |\  |\  |
      *                                            |  \|  \|  \|  \|  \|  \|
-     * 3. p_edge1: Bottom horizontal edge list:    -----------------------  1
+     * 3. p_edge1: Bottom horizontal edge list:   +-----------------------+ 1
+     *
+     * pe_tail2  : end of list beginning at p_edge2
+     * pe_temp   : position inside list beginning at p_edge1
+     * p_edges   : head of the master edge list (part of our output)
+     * p_vrtx1   : start of lower row of input vertices
+     * p_vrtx2   : start of higher row of input vertices
      *
      * The routine generates two triangle            Lower      Upper 1  
      * upper one and lower one:                     | \           ----   
@@ -647,14 +655,21 @@ struct edge_struct **p_edges;	/* list of edges output */
 	    upper_tri = add_poly(edge0, edge1, edge2, p_polys, &pp_tail);
 	}
 
-	if ((*p_edges)) {	/* Chain new edges to main list. */
-	    pe_tail->next = p_edge2;
-	    pe_tail = pe_tail2;
-	} else {
-	    (*p_edges) = p_edge2;
-	    pe_tail = pe_tail2;
+	if (p_edge2) {
+	    /* HBB 19991130 bugfix: if p_edge2 list is empty,
+	     * don't change p_edges list! Crashes by access
+	     * to NULL pointer pe_tail, the second time through,
+	     * otherwise */
+	    if ((*p_edges)) {	/* Chain new edges to main list. */
+		pe_tail->next = p_edge2;
+		pe_tail = pe_tail2;
+	    } else {
+		(*p_edges) = p_edge2;
+		pe_tail = pe_tail2;
+	    }
 	}
 
+	/* this row finished, move list heads up one row: */
 	p_edge1 = p_edge2;
 	p_vrtx1 = p_vrtx2;
     }
