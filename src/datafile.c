@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.10 1999/06/19 20:52:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.11 1999/07/30 19:34:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -219,7 +219,7 @@ static int line_count = 0;	/* line counter */
 
 /* parsing stuff */
 static struct use_spec_s use_spec[NCOL];
-static char df_format[MAX_LINE_LEN+1];
+static char df_format[MAX_LINE_LEN + 1];
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
@@ -299,7 +299,7 @@ char *s;
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
 	    df_column = (df_column_struct *) gp_realloc(df_column,
-			(df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols)) * sizeof(df_column_struct),
+							(df_max_cols += (df_max_cols < 20 ? 20 : df_max_cols)) * sizeof(df_column_struct),
 							"datafile column");
 
 	/* have always skipped spaces at this point */
@@ -568,7 +568,7 @@ int max_using;
     if (ydata_func.at)
 	free(ydata_func.at);
     ydata_func.at = NULL;
-    
+
     if (almost_equals(c_token, "thru$")) {
 	plot_option_thru();
     }
@@ -589,8 +589,6 @@ int max_using;
 	max_line_len = DATA_LINE_BUFSIZ;
 	line = (char *) gp_alloc(max_line_len, "datafile line buffer");
     }
-
-
     /*}}} */
 
     /* filename cannot be static array! */
@@ -605,7 +603,7 @@ int max_using;
 	    pipe_open = TRUE;
     } else
 #endif /* PIPES */
-    /* I don't want to call strcmp(). Does it make a difference? */
+	/* I don't want to call strcmp(). Does it make a difference? */
     if (*filename == '-' && strlen(filename) == 1) {
 	data_fp = lf_top();
 	if (!data_fp)
@@ -674,7 +672,7 @@ plot_option_every()
 {
     struct value a;
 
-    fast_columns = 0;	/* corey@cac */
+    fast_columns = 0;		/* corey@cac */
     /* allow empty fields - every a:b:c::e
      * we have already established the defaults
      */
@@ -768,7 +766,7 @@ int max_using;
     if (!END_OF_COMMAND && !isstring(++c_token)) {
 	struct value a;
 
-	do {		/* must be at least one */
+	do {			/* must be at least one */
 	    if (df_no_use_specs >= max_using)
 		int_error(c_token, "Too many columns in using specification");
 
@@ -780,7 +778,7 @@ int max_using;
 	    } else if (equals(c_token, "(")) {
 		fast_columns = 0;	/* corey@cac */
 		dummy_func = NULL;	/* no dummy variables active */
-		use_spec[df_no_use_specs++].at = perm_at();		/* it will match ()'s */
+		use_spec[df_no_use_specs++].at = perm_at();	/* it will match ()'s */
 	    } else {
 		int col = (int) real(const_express(&a));
 		if (col < -2)
@@ -949,7 +947,7 @@ int max;
 	    /* check we have room for at least 7 columns */
 	    if (df_max_cols < 7)
 		df_column = (df_column_struct *) gp_realloc(df_column,
-			(df_max_cols = 7) * sizeof(df_column_struct),
+							    (df_max_cols = 7) * sizeof(df_column_struct),
 							    "datafile columns");
 
 	    df_no_cols = sscanf(line, df_format,
@@ -1114,7 +1112,6 @@ struct curve_points *this_plot;
  * xmin,ymin, and zmin
  * xmax,ymax, and zmax
  * autoscale_lx, autoscale_ly, and autoscale_lz
- * [ all of these are now part of a struct axis_properties ]
  *
  * does the autoscaling into the array versions (min_array[], max_array[])
  */
@@ -1161,7 +1158,7 @@ struct surface_points *this_plot;
 
     if (df_max_cols < 3 &&
 	!(df_column = (df_column_struct *) gp_realloc(df_column,
-		(df_max_cols = 3) * sizeof(df_column_struct),
+						      (df_max_cols = 3) * sizeof(df_column_struct),
 						      "datafile columns")))
 	int_error(c_token, "Out of store in binary read");
 
@@ -1215,7 +1212,7 @@ struct surface_points *this_plot;
 
 	    /*{{{  autoscaling/clipping */
 	    /*{{{  autoscale/range-check x */
-	    if (used[0] > 0 || !x_props.is_log) {
+	    if (used[0] > 0 || !is_log_x) {
 		if (used[0] < min_array[FIRST_X_AXIS]) {
 		    if (autoscale_lx & 1)
 			min_array[FIRST_X_AXIS] = used[0];
@@ -1232,7 +1229,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  autoscale/range-check y */
-	    if (used[1] > 0 || !y_props.is_log) {
+	    if (used[1] > 0 || !is_log_y) {
 		if (used[1] < min_array[FIRST_Y_AXIS]) {
 		    if (autoscale_ly & 1)
 			min_array[FIRST_Y_AXIS] = used[1];
@@ -1249,7 +1246,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  autoscale/range-check z */
-	    if (used[2] > 0 || !z_props.is_log) {
+	    if (used[2] > 0 || !is_log_z) {
 		if (used[2] < min_array[FIRST_Z_AXIS]) {
 		    if (autoscale_lz & 1)
 			min_array[FIRST_Z_AXIS] = used[2];
@@ -1267,7 +1264,7 @@ struct surface_points *this_plot;
 	    /*}}} */
 
 	    /*{{{  log x */
-	    if (x_props.is_log) {
+	    if (is_log_x) {
 		if (used[0] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1275,12 +1272,12 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[0] = -VERYLARGE;
 		} else
-		    used[0] = log(used[0]) / x_props.log_base_log;
+		    used[0] = log(used[0]) / log_base_log_x;
 	    }
 	    /*}}} */
 
 	    /*{{{  log y */
-	    if (y_props.is_log) {
+	    if (is_log_y) {
 		if (used[1] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1288,12 +1285,12 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[1] = -VERYLARGE;
 		} else
-		    used[1] = log(used[1]) / y_props.log_base_log;
+		    used[1] = log(used[1]) / log_base_log_y;
 	    }
 	    /*}}} */
 
 	    /*{{{  log z */
-	    if (z_props.is_log) {
+	    if (is_log_z) {
 		if (used[2] < 0.0) {
 		    point->type = UNDEFINED;
 		    goto skip;
@@ -1301,7 +1298,7 @@ struct surface_points *this_plot;
 		    point->type = OUTRANGE;
 		    used[2] = -VERYLARGE;
 		} else
-		    used[2] = log(used[2]) / z_props.log_base_log;
+		    used[2] = log(used[2]) / log_base_log_z;
 	    }
 	    /*}}} */
 
@@ -1455,7 +1452,7 @@ check_missing(s)
 char *s;
 {
     if (missing_val != NULL) {
-	 size_t len = strlen(missing_val);
+	size_t len = strlen(missing_val);
 	if (strncmp(s, missing_val, len) == 0 &&
 	    (isspace((int) s[len]) || !s[len])) {
 	    return (1);;	/* store undefined point in plot */
@@ -1464,6 +1461,7 @@ char *s;
     return (0);
 }
 /*}}} */
+
 
 /* formerly in misc.c, but only used here */
 /* check user defined format strings for valid double conversions */

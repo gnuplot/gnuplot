@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.22 1999/07/27 19:44:39 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.23 1999/07/30 19:33:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -59,6 +59,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.22 1999/07/27 19:44:39 l
 
 #include "plot.h"
 #include "setshow.h"
+#include "tables.h"
 #include "fit.h"
 #include "binary.h"
 
@@ -560,6 +561,7 @@ int status;
 static void
 call_command()
 {
+    FILE *fp;
     char *save_file = NULL;
 
     if (!isstring(++c_token))
@@ -579,6 +581,7 @@ call_command()
 static void
 changedir_command()
 {
+    FILE *fp;
     char *save_file = NULL;
 
     if (!isstring(++c_token))
@@ -604,8 +607,8 @@ clear_command()
     if (multiplot && term->fillbox) {
 	unsigned int xx1 = (unsigned int) (xoffset * term->xmax);
 	unsigned int yy1 = (unsigned int) (yoffset * term->ymax);
-	unsigned int width = (unsigned int) (x_props.size * term->xmax);
-	unsigned int height = (unsigned int) (y_props.size * term->ymax);
+	unsigned int width = (unsigned int) (xsize * term->xmax);
+	unsigned int height = (unsigned int) (ysize * term->ymax);
 	(*term->fillbox) (0, xx1, yy1, width, height);
     }
     term_end_plot();
@@ -911,6 +914,7 @@ system_command()
 static void
 pwd_command()
 {
+    FILE *fp;
     char *save_file = NULL;
 
     save_file = (char *) gp_alloc(PATH_MAX, "print current dir");

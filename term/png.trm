@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.19 1999/07/18 17:35:32 lhecking Exp $
+ * $Id: png.trm,v 1.20 1999/07/30 19:06:46 lhecking Exp $
  *
  */
 
@@ -236,8 +236,8 @@ PNG_graphics()
 
     /* rotate plot -90 degrees by reversing XMAX and YMAX and by
        setting b_rastermode to TRUE */
-    b_makebitmap((unsigned int) (PNG_YMAX * y_props.size),
-		 (unsigned int) (PNG_XMAX * x_props.size), numplanes);
+    b_makebitmap((unsigned int) (PNG_YMAX * ysize),
+		 (unsigned int) (PNG_XMAX * xsize), numplanes);
     b_rastermode = TRUE;
 
     if (png_mode != 0)

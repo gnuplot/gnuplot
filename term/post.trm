@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.31 1999/07/18 17:35:33 lhecking Exp $
+ * $Id: post.trm,v 1.32 1999/07/30 19:06:47 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -920,22 +920,22 @@ PS_init()
 	term->xmax = PS_XMAX;
 	term->ymax = PS_YMAX;
 	xmin_t = PS_XMAX * xoffset / (2*PS_SC);
-	xmax_t = PS_XMAX * (x_props.size + xoffset) / (2*PS_SC);
+	xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
 	ymin_t = PS_YMAX * yoffset / (2*PS_SC);
-	ymax_t = PS_YMAX * (y_props.size + yoffset) / (2*PS_SC);
+	ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
     } else if (ps_portrait) {
 	term->xmax = PS_YMAX;
 	term->ymax = PS_XMAX;
 	xmin_t = PS_YMAX * xoffset / PS_SC;
-	xmax_t = PS_YMAX * (x_props.size + xoffset) / PS_SC;
+	xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
 	ymin_t = PS_XMAX * yoffset / PS_SC;
-	ymax_t = PS_XMAX * (y_props.size + yoffset) / PS_SC;
+	ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
     } else {
 	term->xmax = PS_XMAX;
 	term->ymax = PS_YMAX;
 	ymin_t = PS_XMAX * xoffset / PS_SC;
-	ymax_t = PS_XMAX * (x_props.size+xoffset) / PS_SC;
-	xmin_t = PS_YMAX * (1-y_props.size-yoffset) / PS_SC;
+	ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
+	xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
 	xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
     }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.16 1999/06/22 11:54:19 lhecking Exp $
+ * $Id: latex.trm,v 1.17 1999/07/30 19:06:45 lhecking Exp $
  *
  */
 
@@ -272,8 +272,8 @@ LATEX_graphics()
     register struct termentry *t = term;
 
     /* bounding box */
-    int xscale = x_props.size * t->xmax;
-    int yscale = y_props.size * t->ymax;
+    int xscale = xsize * t->xmax;
+    int yscale = ysize * t->ymax;
 
     fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
     if (strcmp(LATEX_font, "doc") != 0) {

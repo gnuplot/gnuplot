@@ -1,5 +1,5 @@
 /*
- * $Id: next.trm,v 1.13 1999/06/22 11:54:21 lhecking Exp $
+ * $Id: next.trm,v 1.14 1999/07/30 19:06:46 lhecking Exp $
  *
  */
 
@@ -636,8 +636,8 @@ char **dict;			/* extra entries for the dictionary */
     NEXTPrintf(NEXTi1, uses_fonts ? "(atend)" : "");
 
     NEXTPrintf("%%%%BoundingBox: %d %d %d %d\n", xoff, yoff,
-	       (int) (x_props.size * width / NEXT_SC + 0.5 + xoff),
-	       (int) (y_props.size * height / NEXT_SC + 0.5 + yoff));
+	       (int) (xsize * width / NEXT_SC + 0.5 + xoff),
+	       (int) (ysize * height / NEXT_SC + 0.5 + yoff));
 
     NEXTPrintf(NEXTi2,
 	       NEXT_color ? "true" : "false",
@@ -1355,8 +1355,8 @@ window_create()
 {
     float width, height;
 
-    width = (x_props.size * (NEXT_XMAX) / NEXT_SC + 0.5 + NEXT_XOFF);
-    height = (y_props.size * (NEXT_YMAX) / NEXT_SC + 0.5 + NEXT_YOFF);
+    width = (xsize * (NEXT_XMAX) / NEXT_SC + 0.5 + NEXT_XOFF);
+    height = (ysize * (NEXT_YMAX) / NEXT_SC + 0.5 + NEXT_YOFF);
 
     NXApp =[EpsViewer new];
   [NXApp windowCreate: width Height:height];

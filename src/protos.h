@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.16 1999/07/27 19:43:33 lhecking Exp $
+ * $Id: protos.h,v 1.17 1999/07/30 19:35:30 lhecking Exp $
  *
  */
 
@@ -191,6 +191,7 @@ void save_variables __PROTO((FILE *fp));
 void save_set __PROTO((FILE *fp));
 void save_all __PROTO((FILE *fp));
 void save_set_all __PROTO((FILE *fp));
+ 
 
 /* Prototypes from file "scanner.c" */
 

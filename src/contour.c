@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.4 1999/06/19 20:52:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.5 1999/07/30 19:37:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -242,7 +242,7 @@ double *cont_levels_list;
 	    z = cont_levels_list[0] + i * cont_levels_list[1];
 	    break;
 	case LEVELS_DISCRETE:
-	    z = z_props.is_log ? log(cont_levels_list[i]) / z_props.log_base_log : cont_levels_list[i];
+	    z = is_log_z ? log(cont_levels_list[i]) / log_base_log_z : cont_levels_list[i];
 	    break;
 	}
 	contour_level = z;
@@ -250,7 +250,7 @@ double *cont_levels_list;
 	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
-	    sprintf(contour_list->label, contour_format, z_props.is_log ? pow(z_props.base_log, z) : z);
+	    sprintf(contour_list->label, contour_format, is_log_z ? pow(base_log_z, z) : z);
 	}
     }
 

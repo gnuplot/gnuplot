@@ -1,5 +1,5 @@
 /*
- * $Id: hp500c.trm,v 1.9 1999/06/19 20:30:50 lhecking Exp $
+ * $Id: hp500c.trm,v 1.10 1999/07/30 19:06:45 lhecking Exp $
  *
  */
 
@@ -104,8 +104,8 @@ TERM_PUBLIC void HP500Ctext __PROTO((void));
 #define HP500C_DPP (hpdj_dpp)	/* dots per pixel */
 #define HP500C_PPI (300/HP500C_DPP)	/* pixel per inch */
 /* make XMAX and YMAX a multiple of 8 */
-#define HP500C_XMAX (8*(unsigned int)(x_props.size*1920/HP500C_DPP/8.0+0.9))
-#define HP500C_YMAX (8*(unsigned int)(y_props.size*1920/HP500C_DPP/8.0+0.9))
+#define HP500C_XMAX (8*(unsigned int)(xsize*1920/HP500C_DPP/8.0+0.9))
+#define HP500C_YMAX (8*(unsigned int)(ysize*1920/HP500C_DPP/8.0+0.9))
 
 /* Courier font with 6 lines per inch */
 #define HP500C_VCHAR (HP500C_PPI/6)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.1 1999/07/30 19:35:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: $"); }
 
 static void save_functions__sub __PROTO((FILE * fp));
 static void save_variables__sub __PROTO((FILE * fp));
-static void save_tics __PROTO((FILE *, int, struct axis_properties *));
+static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef *tdef, TBOOLEAN rotate, const char *text));
 static void save_position __PROTO((FILE * fp, struct position * pos));
 static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, const char *text));
 
@@ -221,11 +221,11 @@ set y2data%s\n",
 		dgrid3d_norm_value);
 
     fprintf(fp, "set dummy %s,%s\n", dummy_var[0], dummy_var[1]);
-    fprintf(fp, "set format x \"%s\"\n", conv_text(x_props.format));
-    fprintf(fp, "set format y \"%s\"\n", conv_text(y_props.format));
-    fprintf(fp, "set format x2 \"%s\"\n", conv_text(x2_props.format));
-    fprintf(fp, "set format y2 \"%s\"\n", conv_text(y2_props.format));
-    fprintf(fp, "set format z \"%s\"\n", conv_text(z_props.format));
+    fprintf(fp, "set format x \"%s\"\n", conv_text(xformat));
+    fprintf(fp, "set format y \"%s\"\n", conv_text(yformat));
+    fprintf(fp, "set format x2 \"%s\"\n", conv_text(x2format));
+    fprintf(fp, "set format y2 \"%s\"\n", conv_text(y2format));
+    fprintf(fp, "set format z \"%s\"\n", conv_text(zformat));
     fprintf(fp, "set angles %s\n",
 	    (angles_format == ANGLES_RADIANS) ? "radians" : "degrees");
 
@@ -341,16 +341,16 @@ set y2data%s\n",
 		this_linestyle->lp_properties.p_size);
     }
     fputs("set nologscale\n", fp);
-    if (x_props.is_log)
-	fprintf(fp, "set logscale x %g\n", x_props.base_log);
-    if (y_props.is_log)
-	fprintf(fp, "set logscale y %g\n", y_props.base_log);
-    if (z_props.is_log)
-	fprintf(fp, "set logscale z %g\n", z_props.base_log);
-    if (x2_props.is_log)
-	fprintf(fp, "set logscale x2 %g\n", x2_props.base_log);
-    if (y2_props.is_log)
-	fprintf(fp, "set logscale y2 %g\n", y2_props.base_log);
+    if (is_log_x)
+	fprintf(fp, "set logscale x %g\n", base_log_x);
+    if (is_log_y)
+	fprintf(fp, "set logscale y %g\n", base_log_y);
+    if (is_log_z)
+	fprintf(fp, "set logscale z %g\n", base_log_z);
+    if (is_log_x2)
+	fprintf(fp, "set logscale x2 %g\n", base_log_x2);
+    if (is_log_y2)
+	fprintf(fp, "set logscale y2 %g\n", base_log_y2);
 
     fprintf(fp, "\
 set offsets %g, %g, %g, %g\n\
@@ -450,7 +450,7 @@ set size ratio %g %g,%g\n\
 set origin %g,%g\n\
 set data style ",
 	    contour_pts,
-	    aspect_ratio, x_props.size, y_props.size,
+	    aspect_ratio, xsize, ysize,
 	    xoffset, yoffset);
 
     switch (data_style) {
@@ -605,24 +605,22 @@ set ticscale %g %g\n",
   fprintf(fp, " \"%s\"\n", conv_text(lab.font)); \
 }
 
-#define SAVE_MINI(name,axisp) \
- switch((axisp).mtics&TICS_MASK) { \
-  case 0: fprintf(fp, "set no%s\n", name); break; \
-  case MINI_AUTO: fprintf(fp, "set %s\n",name); break; \
-  case MINI_DEFAULT: fprintf(fp, "set %s default\n",name); break; \
-  case MINI_USER: fprintf(fp, "set %s %f\n", name, (axisp).mtfreq); break; \
+#define SAVE_MINI(name,m,freq) switch(m&TICS_MASK) { \
+ case 0: fprintf(fp, "set no%s\n", name); break; \
+ case MINI_AUTO: fprintf(fp, "set %s\n",name); break; \
+ case MINI_DEFAULT: fprintf(fp, "set %s default\n",name); break; \
+ case MINI_USER: fprintf(fp, "set %s %f\n", name, freq); break; \
 }
+    SAVE_MINI("mxtics", mxtics, mxtfreq)
+    SAVE_MINI("mytics", mytics, mytfreq)
+    SAVE_MINI("mx2tics", mx2tics, mx2tfreq)
+    SAVE_MINI("my2tics", my2tics, my2tfreq)
 
-    SAVE_MINI("mxtics", x_props);
-    SAVE_MINI("mytics", y_props);
-    SAVE_MINI("mx2tics", x2_props);
-    SAVE_MINI("my2tics", y2_props);
-
-    save_tics(fp, FIRST_X_AXIS, &x_props);
-    save_tics(fp, FIRST_Y_AXIS, &y_props);
-    save_tics(fp, FIRST_Z_AXIS, &z_props);
-    save_tics(fp, SECOND_X_AXIS, &x2_props);
-    save_tics(fp, SECOND_Y_AXIS, &y2_props);
+    save_tics(fp, xtics, FIRST_X_AXIS, &xticdef, rotate_xtics, "x");
+    save_tics(fp, ytics, FIRST_Y_AXIS, &yticdef, rotate_ytics, "y");
+    save_tics(fp, ztics, FIRST_Z_AXIS, &zticdef, rotate_ztics, "z");
+    save_tics(fp, x2tics, SECOND_X_AXIS, &x2ticdef, rotate_x2tics, "x2");
+    save_tics(fp, y2tics, SECOND_Y_AXIS, &y2ticdef, rotate_y2tics, "y2");
 
     SAVE_XYZLABEL("title", title);
 
@@ -638,23 +636,23 @@ set ticscale %g %g\n",
     save_range(fp, U_AXIS, umin, umax, autoscale_u, "u");
     save_range(fp, V_AXIS, vmin, vmax, autoscale_v, "v");
 
-    SAVE_XYZLABEL("xlabel", x_props.label);
-    SAVE_XYZLABEL("x2label", x2_props.label);
+    SAVE_XYZLABEL("xlabel", xlabel);
+    SAVE_XYZLABEL("x2label", x2label);
 
     if (strlen(timefmt)) {
 	fprintf(fp, "set timefmt \"%s\"\n", conv_text(timefmt));
     }
-    save_range(fp, FIRST_X_AXIS, x_props.min, x_props.max, x_props.autoscale, "x");
-    save_range(fp, SECOND_X_AXIS, x2_props.min, x2_props.max, x2_props.autoscale, "x2");
+    save_range(fp, FIRST_X_AXIS, xmin, xmax, autoscale_x2, "x");
+    save_range(fp, SECOND_X_AXIS, x2min, x2max, autoscale_x2, "x2");
 
-    SAVE_XYZLABEL("ylabel", y_props.label);
-    SAVE_XYZLABEL("y2label", y2_props.label);
+    SAVE_XYZLABEL("ylabel", ylabel);
+    SAVE_XYZLABEL("y2label", y2label);
 
-    save_range(fp, FIRST_Y_AXIS, y_props.min, y_props.max, y_props.autoscale, "y");
-    save_range(fp, SECOND_Y_AXIS, y2_props.min, y2_props.max, y2_props.autoscale, "y2");
+    save_range(fp, FIRST_Y_AXIS, ymin, ymax, autoscale_y, "y");
+    save_range(fp, SECOND_Y_AXIS, y2min, y2max, autoscale_y2, "y2");
 
-    SAVE_XYZLABEL("zlabel", z_props.label);
-    save_range(fp, FIRST_Z_AXIS, z_props.min, z_props.max, z_props.autoscale, "z");
+    SAVE_XYZLABEL("zlabel", zlabel);
+    save_range(fp, FIRST_Z_AXIS, zmin, zmax, autoscale_z, "z");
 
     fprintf(fp, "set zero %g\n", zero);
     fprintf(fp, "set lmargin %d\nset bmargin %d\nset rmargin %d\nset tmargin %d\n",
@@ -672,27 +670,29 @@ set ticscale %g %g\n",
 }
 
 static void
-save_tics (fp, axis, axis_p)
+save_tics(fp, where, axis, tdef, rotate, text)
 FILE *fp;
+int where;
 int axis;
-struct axis_properties *axis_p;
+struct ticdef *tdef;
+TBOOLEAN rotate;
+const char *text;
 {
-    int where = axis_p->tics;
 
     if (where == NO_TICS) {
-	fprintf(fp, "set no%stics\n", axis_p->name);
+	fprintf(fp, "set no%stics\n", text);
 	return;
     }
-    fprintf(fp, "set %stics %s %smirror %srotate ", axis_p->name,
+    fprintf(fp, "set %stics %s %smirror %srotate ", text,
 	    (where & TICS_MASK) == TICS_ON_AXIS ? "axis" : "border",
-	    (where & TICS_MIRROR) ? "" : "no", axis_p->rotate_tics ? "" : "no");
-    switch (axis_p->ticdef.type) {
+	    (where & TICS_MIRROR) ? "" : "no", rotate ? "" : "no");
+    switch (tdef->type) {
     case TIC_COMPUTED:{
 	    fputs("autofreq ", fp);
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(fp, "\nset %smtics", axis_p->name);
+	    fprintf(fp, "\nset %smtics", text);
 	    break;
 	}
     case TIC_DAY:{
@@ -701,25 +701,25 @@ struct axis_properties *axis_p;
 	}
     case TIC_SERIES:
 	if (datatype[axis] == TIME) {
-	    if (axis_p->ticdef.def.series.start != -VERYLARGE) {
+	    if (tdef->def.series.start != -VERYLARGE) {
 		char fd[26];
-		gstrftime(fd, 24, timefmt, (double) axis_p->ticdef.def.series.start);
+		gstrftime(fd, 24, timefmt, (double) tdef->def.series.start);
 		fprintf(fp, "\"%s\",", conv_text(fd));
 	    }
-	    fprintf(fp, "%g", axis_p->ticdef.def.series.incr);
+	    fprintf(fp, "%g", tdef->def.series.incr);
 
-	    if (axis_p->ticdef.def.series.end != VERYLARGE) {
+	    if (tdef->def.series.end != VERYLARGE) {
 		char td[26];
-		gstrftime(td, 24, timefmt, (double) axis_p->ticdef.def.series.end);
+		gstrftime(td, 24, timefmt, (double) tdef->def.series.end);
 		fprintf(fp, ",\"%s\"", conv_text(td));
 	    }
 	} else {		/* !TIME */
 
-	    if (axis_p->ticdef.def.series.start != -VERYLARGE)
-		fprintf(fp, "%g,", axis_p->ticdef.def.series.start);
-	    fprintf(fp, "%g", axis_p->ticdef.def.series.incr);
-	    if (axis_p->ticdef.def.series.end != VERYLARGE)
-		fprintf(fp, ",%g", axis_p->ticdef.def.series.end);
+	    if (tdef->def.series.start != -VERYLARGE)
+		fprintf(fp, "%g,", tdef->def.series.start);
+	    fprintf(fp, "%g", tdef->def.series.incr);
+	    if (tdef->def.series.end != VERYLARGE)
+		fprintf(fp, ",%g", tdef->def.series.end);
 	}
 
 	break;
@@ -729,7 +729,7 @@ struct axis_properties *axis_p;
 	    int flag_time;
 	    flag_time = (datatype[axis] == TIME);
 	    fputs(" (", fp);
-	    for (t = axis_p->ticdef.def.user; t != NULL; t = t->next) {
+	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label)
 		    fprintf(fp, "\"%s\" ", conv_text(t->label));
 		if (flag_time) {

@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.15 1999/07/20 15:33:54 lhecking Exp $
+ * $Id: plot.h,v 1.16 1999/07/30 19:35:08 lhecking Exp $
  *
  */
 
@@ -681,6 +681,34 @@ struct linestyle_def {
 	struct linestyle_def *next;	/* pointer to next linestyle in linked list */
 	int tag;			/* identifies the linestyle */
 	struct lp_style_type lp_properties;
+};
+
+/* Tic-mark labelling definition; see set xtics */
+struct ticdef {
+    int type;				/* one of five values below */
+#define TIC_COMPUTED 1			/* default; gnuplot figures them */
+#define TIC_SERIES   2			/* user-defined series */
+#define TIC_USER     3			/* user-defined points */
+#define TIC_MONTH    4		/* print out month names ((mo-1[B)%12)+1 */
+#define TIC_DAY      5			/* print out day of week */
+    union {
+	   struct {			/* for TIC_SERIES */
+		  double start, incr;
+		  double end;		/* ymax, if VERYLARGE */
+	   } series;
+	   struct ticmark *user;	/* for TIC_USER */
+    } def;
+};
+
+/* Defines one ticmark for TIC_USER style.
+ * If label==NULL, the value is printed with the usual format string.
+ * else, it is used as the format string (note that it may be a constant
+ * string, like "high" or "low").
+ */
+struct ticmark {
+    double position;		/* where on axis is this */
+    char *label;			/* optional (format) string label */
+    struct ticmark *next;	/* linked list */
 };
 
 /* Some key global variables */

@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.4 1999/06/22 12:01:15 lhecking Exp $ */
+/* $Id: graphics.h,v 1.5 1999/07/30 19:33:48 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -34,8 +34,6 @@
 
 #ifndef GNUPLOT_GRAPHICS_H
 # define GNUPLOT_GRAPHICS_H
-
-#include "setshow.h"
 
 /* Collect all global vars in one file.
  * The comments may go at a later date,
@@ -86,7 +84,7 @@ extern double time_tic_just __PROTO((int, double));
 extern double make_ltic __PROTO((int, double));
 extern int label_width __PROTO((const char *, int *));
 extern double set_tic __PROTO((double, int));
-extern void setup_tics __PROTO((int, struct axis_properties *, int));
+extern void setup_tics __PROTO((int, struct ticdef *, char *, int));
 void gprintf __PROTO((char *, size_t, char *, double, double));
 /* is this valid use of __P ? */
 typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type ));

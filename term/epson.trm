@@ -1,5 +1,5 @@
 /*
- * $Id: epson.trm,v 1.10 1999/06/19 20:30:48 lhecking Exp $
+ * $Id: epson.trm,v 1.11 1999/07/30 19:06:44 lhecking Exp $
  *
  */
 
@@ -200,8 +200,8 @@ TERM_PUBLIC void
 EPSONgraphics()
 {
     b_charsize(FNT5X9);
-    b_makebitmap((unsigned int) (EPSONXMAX * x_props.size),
-		 (unsigned int) (EPSONYMAX * y_props.size), 1);
+    b_makebitmap((unsigned int) (EPSONXMAX * xsize),
+		 (unsigned int) (EPSONYMAX * ysize), 1);
 }
 
 
@@ -305,8 +305,8 @@ TERM_PUBLIC void
 NECgraphics()
 {
     b_charsize(FNT5X9);
-    b_makebitmap((unsigned int) (NECXMAX * x_props.size),
-		 (unsigned int) (NECYMAX * y_props.size), (NECmode == 'c' ? 4 : 1));
+    b_makebitmap((unsigned int) (NECXMAX * xsize),
+		 (unsigned int) (NECYMAX * ysize), (NECmode == 'c' ? 4 : 1));
 }
 
 TERM_PUBLIC void
@@ -482,8 +482,8 @@ TERM_PUBLIC void
 STARCgraphics()
 {
     b_charsize(FNT5X9);
-    b_makebitmap((unsigned int) (STARCXMAX * x_props.size),
-		 (unsigned int) (STARCYMAX * y_props.size), 4);
+    b_makebitmap((unsigned int) (STARCXMAX * xsize),
+		 (unsigned int) (STARCYMAX * ysize), 4);
 }
 
 
@@ -562,8 +562,8 @@ TERM_PUBLIC void
 EPS180graphics()
 {
     b_charsize(FNT13X25);
-    b_makebitmap((unsigned int) (EPS180XMAX * x_props.size),
-		 (unsigned int) (EPS180YMAX * y_props.size), 1);
+    b_makebitmap((unsigned int) (EPS180XMAX * xsize),
+		 (unsigned int) (EPS180YMAX * ysize), 1);
 }
 
 
@@ -616,8 +616,8 @@ TERM_PUBLIC void
 EPS60graphics()
 {
     b_charsize(FNT5X9);
-    b_makebitmap((unsigned int) (EPS60XMAX * x_props.size),
-		 (unsigned int) (EPS60YMAX * y_props.size), 1);
+    b_makebitmap((unsigned int) (EPS60XMAX * xsize),
+		 (unsigned int) (EPS60YMAX * ysize), 1);
 }
 
 
@@ -741,8 +741,8 @@ okidata_dump()
     fprintf(gpoutfile, "\033%c%c\020\033*eP:\003", '%', '9');	/* set line spacing 16/144" = 8 dots :Turned on single density graphics mode */
     for (j = (b_ysize / 8) - 1; j >= 0; j--) {
 	fputs("\003\016", gpoutfile);
-/*		(void) fputc((char)(b_xsize % 256),gpoutfile); */
-/*		(void) fputc((char)(b_xsize / 256),gpoutfile); */
+/*		(void) fputc((char)(b_xsize%256),gpoutfile); */
+/*		(void) fputc((char)(b_xsize/256),gpoutfile); */
 	for (x = 0; x < b_xsize; x++) {
 	    if ((cur_char = (char)
 		 (bitrev_tbl[(int) (*((*b_p)[j] + x))])) == '\003') {

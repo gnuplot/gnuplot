@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.7 1999/06/22 12:02:25 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.8 1999/07/30 19:37:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -1005,10 +1005,10 @@ struct curve_points *cp;
 		cp->points[j].ylow = sly / (double) k;
 		cp->points[j].type = INRANGE;
 		if (dot != INRANGE) {
-		    if ((cp->points[j].x > x_props.max) || (cp->points[j].x < x_props.min))
+		    if ((cp->points[j].x > xmax) || (cp->points[j].x < xmin))
 			cp->points[j].type = OUTRANGE;
 		    else if (!autoscale_ly) {
-			if ((cp->points[j].y > y_props.max) || (cp->points[j].y < y_props.min))
+			if ((cp->points[j].y > ymax) || (cp->points[j].y < ymin))
 			    cp->points[j].type = OUTRANGE;
 		    } else
 			cp->points[j].type = INRANGE;
@@ -1027,10 +1027,10 @@ struct curve_points *cp;
 	    cp->points[j].ylow = sly / (double) k;
 	    cp->points[j].type = INRANGE;
 	    if (dot != INRANGE) {
-		if ((cp->points[j].x > x_props.max) || (cp->points[j].x < x_props.min))
+		if ((cp->points[j].x > xmax) || (cp->points[j].x < xmin))
 		    cp->points[j].type = OUTRANGE;
 		else if (!autoscale_ly) {
-		    if ((cp->points[j].y > y_props.max) || (cp->points[j].y < y_props.min))
+		    if ((cp->points[j].y > ymax) || (cp->points[j].y < ymin))
 			cp->points[j].type = OUTRANGE;
 		} else
 		    cp->points[j].type = INRANGE;
