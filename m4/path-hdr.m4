@@ -23,7 +23,7 @@ if test "$2" != yes && test "$2" != no; then
 else
   gp_h_list=''
 fi
-for ac_dir in $gp_h_list '' /usr/local/include ; do
+for ac_dir in '' $gp_h_list /usr/local/include ; do
   test x${ac_dir} != x && CPPFLAGS="$gp_save_CPPFLAGS -I${ac_dir}"
   AC_TRY_CPP([#include <$1>], eval "ac_cv_header_$ac_safe=${ac_dir}",
     eval "ac_cv_header_$ac_safe=no")

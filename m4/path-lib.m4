@@ -62,7 +62,7 @@ if test "$3" != yes && test "$3" != no; then
 else
   gp_l_list=''
 fi
-for ac_dir in $gp_l_list '' /usr/local/lib ; do
+for ac_dir in '' $gp_l_list /usr/local/lib ; do
   test x${ac_dir} != x && TERMLIBS="-L${ac_dir} $gp_save_TERMLIBS"
   GP_CHECK_LIB_QUIET($1,$2,$4)
   TERMLIBS="$gp_save_TERMLIBS"
