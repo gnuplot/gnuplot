@@ -1,3 +1,8 @@
+2004-05-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c src/win/wpause.c: Support for "pause mouse" in Windows
+	terminal.
+
 2004-05-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c (boundary): prevent plot from flipping upside-down
@@ -72,7 +77,7 @@
 
 	* docs/gnuplot.doc: Fix description of default format being "% g"
 	instead of "%g".
-	
+
 2004-04-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* docs/gnuplot.doc: New section "Gnuplot-defined variables". Reference

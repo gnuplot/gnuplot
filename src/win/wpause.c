@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wpause.c,v 1.4 2002/12/12 13:14:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: wpause.c,v 1.5 2004/04/13 17:24:14 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -56,6 +56,16 @@ static char *RCSid() { return RCSid("$Id: wpause.c,v 1.4 2002/12/12 13:14:27 bro
 LRESULT CALLBACK WINEXPORT WndPauseProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK WINEXPORT PauseButtonProc(HWND, UINT, WPARAM, LPARAM);
 
+/* We need to hide "OK" and "Cancel" buttons on the pause dialog during
+ * "pause mouse".
+ * The following hack works for Mingw, and should probably for others too; if
+ * you don't like it, then copy the whole definition of TBOOLEAN from syscfg.h.
+ */
+#ifndef TBOOLEAN
+#define TBOOLEAN unsigned char
+#endif
+extern TBOOLEAN paused_for_mouse;
+
 /* Create Pause Class */
 /* called from PauseBox the first time a pause window is created */
 void
@@ -85,6 +95,10 @@ PauseBox(LPPW lppw)
 	int width, height;
 	TEXTMETRIC tm;
 	RECT rect;
+	char *current_pause_title = lppw->Title;
+	static char TITLE_PAUSE_MOUSE[] = "waiting for mouse click";
+	if (paused_for_mouse)
+	    current_pause_title = TITLE_PAUSE_MOUSE;
 
 	if (!lppw->hPrevInstance)
 		CreatePauseClass(lppw);
@@ -118,7 +132,7 @@ PauseBox(LPPW lppw)
          * menu to it, as the 3.5 code did it: */
         | WS_EX_APPWINDOW
 #endif
-        , szPauseClass, lppw->Title,
+        , szPauseClass, current_pause_title,
 /* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
  * want, nor need, a System menu in our Pause windows. Actually, it was
  * emptied manually, in the WM_CREATE handler below, in the original code.
@@ -127,6 +141,8 @@ PauseBox(LPPW lppw)
 		lppw->Origin.x - width/2, lppw->Origin.y - height/2,
 		width, height,
 		lppw->hWndParent, NULL, lppw->hInstance, lppw);
+
+	SendMessage(lppw->hCancel, BM_SETSTYLE, (WPARAM)BS_DEFPUSHBUTTON, (LPARAM)FALSE);
 	ShowWindow(lppw->hWndPause, SW_SHOWNORMAL);
 	BringWindowToTop(lppw->hWndPause);
 	UpdateWindow(lppw->hWndPause);
@@ -179,8 +195,10 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			switch(LOWORD(wParam)) {
 				case IDCANCEL:
 				case IDOK:
+				    if (!paused_for_mouse) { /* ignore OK and Cancel buttons during "pause mouse" */
 					lppw->bPauseCancel = LOWORD(wParam);
 					lppw->bPause = FALSE;
+				    }
 					break;
 			}
 			return(0);
@@ -201,6 +219,9 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		case WM_CREATE:
 			{
+		    	int ws_opts = WS_CHILD | BS_DEFPUSHBUTTON;
+			if (!paused_for_mouse) /* don't show buttons during pausing for mouse or key */
+			    ws_opts |= WS_VISIBLE;
 			/* HBB 981202 HMENU sysmenu = GetSystemMenu(hwnd, FALSE); */
 			lppw = ((CREATESTRUCT FAR *)lParam)->lpCreateParams;
 			SetWindowLong(hwnd, 0, (LONG)lppw);
@@ -213,14 +234,14 @@ WndPauseProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ReleaseDC(hwnd,hdc);
 			middle = ((LPCREATESTRUCT) lParam)->cx / 2;
 			lppw->hOK = CreateWindow((LPSTR)"button", (LPSTR)"OK",
-				WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+				ws_opts,
 					middle - 10*cxChar, 3*cyChar,
 					8*cxChar, 7*cyChar/4,
 					hwnd, (HMENU)IDOK,
 					((LPCREATESTRUCT) lParam)->hInstance, NULL);
 			lppw->bDefOK = TRUE;
 			lppw->hCancel = CreateWindow((LPSTR)"button", (LPSTR)"Cancel",
-				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+				ws_opts,
 					middle + 2*cxChar, 3*cyChar,
 					8*cxChar, 7*cyChar/4,
 					hwnd, (HMENU)IDCANCEL,
