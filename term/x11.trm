@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.46 2002/01/24 08:41:08 joze Exp $
+ * $Id: x11.trm,v 1.47 2002/01/24 10:55:31 joze Exp $
  *
  */
 
@@ -56,9 +56,7 @@ register_term(x11)
 
 #ifdef TERM_PROTO
 int X11_args __PROTO((int argc, char *argv[]));
-#ifdef USE_MOUSE
-TERM_PUBLIC void X11_update_opts __PROTO((void));
-#endif
+
 TERM_PUBLIC void X11_options __PROTO((void));
 TERM_PUBLIC void X11_init __PROTO((void));
 TERM_PUBLIC void X11_graphics __PROTO((void));
@@ -74,34 +72,37 @@ TERM_PUBLIC int X11_text_angle __PROTO((int i));
 TERM_PUBLIC int X11_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void X11_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void X11_fillbox __PROTO((int style, unsigned int x, unsigned y, unsigned int width, unsigned int height));
-#ifdef USE_MOUSE
+
+# ifdef USE_MOUSE
 TERM_PUBLIC int X11_waitforinput __PROTO((void));
 TERM_PUBLIC void X11_set_ruler __PROTO((int, int));
 TERM_PUBLIC void X11_set_cursor __PROTO((int, int, int));
 TERM_PUBLIC void X11_put_tmptext __PROTO((int, const char str[]));
 TERM_PUBLIC void X11_set_clipboard __PROTO((const char[]));
-#endif
+TERM_PUBLIC void X11_update_opts __PROTO((void));
+# endif
 
-#ifdef PM3D
-TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette*));
+# ifdef PM3D
+TERM_PUBLIC int X11_make_palette __PROTO((t_sm_palette *));
 TERM_PUBLIC void X11_set_color __PROTO((double));
-TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint*));
-/* these must match the definitions in gplt_x11.c */
-#define X11_GR_MAKE_PALETTE     'p'
-#define X11_GR_RELEASE_PALETTE  'e'
-#define X11_GR_SET_COLOR        'c'
-#define X11_GR_FILLED_POLYGON   'f'
-#endif
+TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 
-#define X11_XMAX 4096
-#define X11_YMAX 4096
+/* these must match the definitions in gplt_x11.c */
+#  define X11_GR_MAKE_PALETTE     'p'
+#  define X11_GR_RELEASE_PALETTE  'e'
+#  define X11_GR_SET_COLOR        'c'
+#  define X11_GR_FILLED_POLYGON   'f'
+# endif
+
+# define X11_XMAX 4096
+# define X11_YMAX 4096
 
 /* approximations for typical font/screen sizes */
-#define X11_VCHAR (X11_YMAX/25)
-#define X11_HCHAR (X11_XMAX/100)
-#define X11_VTIC (X11_YMAX/100)
-#define X11_HTIC (X11_XMAX/150)
-#endif
+# define X11_VCHAR (X11_YMAX/25)
+# define X11_HCHAR (X11_XMAX/100)
+# define X11_VTIC (X11_YMAX/100)
+# define X11_HTIC (X11_XMAX/150)
+#endif	/* TERM_PROTO */
 
 
 #ifndef TERM_PROTO_ONLY
@@ -143,86 +144,84 @@ static void X11_atexit HANDLER_PROTO;
 typedef enum { hasNoArg, hasArg } OptionArg;
 
 static struct x11opt {
-    const char *option;	/* Name of option */
-    OptionArg arg;	/* Whether option has argument */
-}  X11_cmdopts[] =
-{
-   { "-mono", hasNoArg }, { "-gray", hasNoArg }, { "-clear", hasNoArg },
-   { "-tvtwm", hasNoArg }, { "-pointsize", hasArg },
-   { "-iconic", hasNoArg }, { "-rv", hasNoArg },
-   { "-reverse", hasNoArg }, { "+rv", hasNoArg },
-   { "-synchronous", hasNoArg },
-   { "-display", hasArg }, { "-geometry", hasArg }, { "-bg", hasArg },
-   { "-background", hasArg }, { "-bd", hasArg },
-   { "-bordercolor", hasArg }, { "-bw", hasArg },
-   { "-borderwidth", hasArg }, { "-fg", hasArg },
-   { "-foreground", hasArg }, { "-fn", hasArg }, { "-font", hasArg },
-   { "-name", hasArg },
-   { "-selectionTimeout", hasArg }, { "-title", hasArg },
-   { "-xnllanguage", hasArg }, { "-xrm", hasArg },
-   { "-raise", hasNoArg }, { "-noraise", hasNoArg },
-   { "-persist", hasNoArg }
+    const char *option;		/* Name of option */
+    OptionArg arg;		/* Whether option has argument */
+} X11_cmdopts[] = {
+    { "-mono", hasNoArg}, { "-gray", hasNoArg}, { "-clear", hasNoArg},
+    { "-tvtwm", hasNoArg}, { "-pointsize", hasArg},
+    { "-iconic", hasNoArg}, { "-rv", hasNoArg},
+    { "-reverse", hasNoArg}, { "+rv", hasNoArg},
+    { "-synchronous", hasNoArg},
+    { "-display", hasArg}, { "-geometry", hasArg}, { "-bg", hasArg},
+    { "-background", hasArg}, { "-bd", hasArg},
+    { "-bordercolor", hasArg}, { "-bw", hasArg},
+    { "-borderwidth", hasArg}, { "-fg", hasArg},
+    { "-foreground", hasArg}, { "-fn", hasArg}, { "-font", hasArg},
+    { "-name", hasArg},
+    { "-selectionTimeout", hasArg}, { "-title", hasArg},
+    { "-xnllanguage", hasArg}, { "-xrm", hasArg},
+    { "-raise", hasNoArg}, { "-noraise", hasNoArg},
+    { "-persist", hasNoArg}
 #ifdef USE_MOUSE
-   , { "-noevents", hasNoArg }
+    , { "-noevents", hasNoArg}
 #endif
 };
 
 #define X11_nopts (sizeof(X11_cmdopts) / sizeof(X11_cmdopts[0]))
 
-static FILE *X11_ipc = (FILE*) 0;
+static FILE *X11_ipc = (FILE *) 0;
 #ifdef PIPE_IPC
-#define X11_ipc_back_fd ipc_back_fd /* defined in ipc.h */
+#define X11_ipc_back_fd ipc_back_fd	/* defined in ipc.h */
 #endif
 
-static char **xargv = (char **)NULL;
-static char *optvec[2*X11_nopts+1 + 10 /*reserve a minimum 10 driver opts*/];
+static char **xargv = (char **) NULL;
+/* reserve a minimum 10 driver opts */
+static char *optvec[2 * X11_nopts + 1 + 10];
 # ifdef OS2
 static char X11_default_command[] = "gnuplot_x11.exe";
 # else
 # ifndef GNUPLOT_X11
-    static char X11_default_command[] = "gnuplot_x11";
+static char X11_default_command[] = "gnuplot_x11";
 # else
-    static char X11_default_command[] = GNUPLOT_X11;
+static char X11_default_command[] = GNUPLOT_X11;
 # endif
-# endif /* !OS/2 */
-static char* X11_command = X11_default_command;
-static char* X11_command_parsed = (char*)0;
+# endif	/* !OS/2 */
+static char *X11_command = X11_default_command;
+static char *X11_command_parsed = (char *) 0;
 /* must match the definition in src/gplt_x11.c: */
 static int persist = UNSET;
 static int do_raise = UNSET;
 
-static int parse_driver __PROTO((const char*));
+static int parse_driver __PROTO((const char *));
 
 static int
-parse_driver(const char* cmd)
+parse_driver(const char *cmd)
 {
     int nr = 0;
-    char* ptr;
+    char *ptr;
 
     /* make a copy of cmd, as parsing will modify the string */
     if (X11_command_parsed)
 	free(X11_command_parsed);
     X11_command_parsed = gp_alloc(strlen(cmd) + 1, "x11->parse_driver");
-    strcpy(X11_command_parsed, X11_command),
-    
-    ptr = X11_command_parsed;
+    strcpy(X11_command_parsed, X11_command), ptr = X11_command_parsed;
 
-    while (*ptr != '\0' && nr < sizeof (optvec) / sizeof (char)) {
+    while (*ptr != '\0' && nr < sizeof(optvec) / sizeof(char)) {
 
-        /* Strip whitespace.  Use nulls, so that
+	/* Strip whitespace.  Use nulls, so that
 	 * the previous argument is terminated
-         * automatically.
-         */
-        while ((*ptr == ' ') || (*ptr == '\t') || (*ptr == '\n'))
-            *ptr++ = '\0';
+	 * automatically.
+	 */
+	while ((*ptr == ' ') || (*ptr == '\t') || (*ptr == '\n'))
+	    *ptr++ = '\0';
 
-        if (!(*ptr)) /* don't count the terminating NULL */
-            break;
+	if (!(*ptr))		/* don't count the terminating NULL */
+	    break;
 
-        /* Save the argument. */
+	/* Save the argument. */
 	optvec[nr++] = ptr;
 
-        /* Skip over the argument. */
+	/* Skip over the argument. */
 	while ('\0' != *ptr && ' ' != *ptr && '\t' != *ptr && '\n' != *ptr) {
 	    ptr++;
 	}
@@ -236,22 +235,20 @@ parse_driver(const char* cmd)
  */
 
 int
-X11_args(argc, argv)
-int argc;
-char *argv[];
+X11_args(int argc, char *argv[])
 {
     int nx11 = 0, i = 0, n;
 
-    xargv = (char **) gp_alloc (argc*sizeof(char *), "<xargv>");
+    xargv = (char **) gp_alloc(argc * sizeof(char *), "<xargv>");
 
     if (!xargv) {
-	fputs ("not enough memory to copy argv - quitting\n", stderr);
-	exit (EXIT_FAILURE);
+	fputs("not enough memory to copy argv - quitting\n", stderr);
+	exit(EXIT_FAILURE);
     }
 
     /* We make a copy of the argument vector because
      * argv is modified later. */
-    memcpy (xargv, argv, argc*sizeof(char *));
+    memcpy(xargv, argv, argc * sizeof(char *));
     i += parse_driver(X11_command);
 
     while (++argv, ++xargv, --argc > 0) {
@@ -266,9 +263,9 @@ char *argv[];
 		    optvec[i++] = *++xargv, ++argv;
 		    nx11++;
 		}
-		if (i >= (sizeof (optvec) / sizeof (char))) {
+		if (i >= (sizeof(optvec) / sizeof(char))) {
 		    fprintf(stderr, "warning: X11 options will be truncated\n");
-		    return nx11; /* optvec is full */
+		    return nx11;	/* optvec is full */
 		}
 		nx11++;
 		break;
@@ -294,15 +291,14 @@ enum X11_id {
     X11_OTHER
 };
 
-static struct gen_table X11_opts[] = 
-{
-    { "res$et", X11_RESET },
-    { "dr$iver", X11_DRIVER },
-    { "per$sist", X11_PERSIST },
-    { "noper$sist", X11_NOPERSIST },
-    { "rai$se", X11_RAISE },
-    { "norai$se", X11_NORAISE },
-    { NULL, X11_OTHER }
+static struct gen_table X11_opts[] = {
+    {"res$et", X11_RESET},
+    {"dr$iver", X11_DRIVER},
+    {"per$sist", X11_PERSIST},
+    {"noper$sist", X11_NOPERSIST},
+    {"rai$se", X11_RAISE},
+    {"norai$se", X11_NORAISE},
+    {NULL, X11_OTHER}
 };
 
 TERM_PUBLIC void
@@ -314,7 +310,7 @@ X11_options()
 #endif
 
     while (!END_OF_COMMAND) {
-	switch(lookup_table(&X11_opts[0],c_token)) {
+	switch (lookup_table(&X11_opts[0], c_token)) {
 	case X11_RESET:
 	    X11_atexit HANDLER_PARAMS;	/* tell gnuplot_x11 to shut down */
 	    ++c_token;
@@ -322,7 +318,7 @@ X11_options()
 	case X11_DRIVER:
 	    ++c_token;
 	    if (isstring(c_token)) {
-		char* path;
+		char *path;
 		/* get text */
 		path = gp_alloc(token_len(c_token), "x11->driver");
 		quote_str(path, c_token, token_len(c_token));
@@ -413,22 +409,17 @@ X11_update_opts(void)
 #if defined(VMS) && defined(CRIPPLED_SELECT)
 Error.Incompatible options.
 #endif
-
 /* we do not want to have to duplicate all the code, so we
  * do most of it with macros.
  * PRINT0(format), PRINT1(format, p1), PRINT2(format, p1, p2) etc
  * also  FLUSH0(format), etc, which do an additional flush
  */
-
-
 #ifdef DEFAULT_X11
 /*-----------------------------------------------------------------------------
  *   DEFAULT_X11 popen() pipe IPC
  *---------------------------------------------------------------------------*/
-
 static void
-X11_atexit HANDLER_DECL
-{
+X11_atexit HANDLER_DECL {
     if (X11_ipc) {
 	fputs("R\n", X11_ipc);
 	fclose(X11_ipc);
@@ -441,8 +432,6 @@ X11_atexit HANDLER_DECL
     }
 }
 
-
-
 #ifdef USE_MOUSE
 TERM_PUBLIC int
 X11_waitforinput()
@@ -450,7 +439,7 @@ X11_waitforinput()
 #ifdef PIPE_IPC
     fd_set fds;
     static struct gp_event_t ge;
-    static int l=0;
+    static int l = 0;
     int n;
     int fd = fileno(stdin);
 
@@ -458,44 +447,45 @@ X11_waitforinput()
      *       mouse events are not processed. This is necessary
      *       as on some systems /dev/null is not selectable.
      * TODO: should we close the X11_ipc_back_fd in this case ? */
-    if (X11_ipc_back_fd >= 0) do {
-	FD_ZERO(&fds);
-	FD_SET(fd, &fds);
-	FD_SET(X11_ipc_back_fd, &fds);
-	select(X11_ipc_back_fd+1, SELECT_FD_SET_CAST &fds, 0,
-	    0, (struct timeval*)NULL);
-	if (FD_ISSET(X11_ipc_back_fd, &fds)) {
-	    n=read(X11_ipc_back_fd, (void*)(l+(char*)&ge), sizeof(ge)-l);
-	    if (n == 0) {
-		close(X11_ipc_back_fd);
-		X11_ipc_back_fd = -1;
-		/* don't close X11_ipc, otherwise later writes
-		 * to it will cause a segfault */
-		break;  /* outboard driver has stopped */
+    if (X11_ipc_back_fd >= 0)
+	do {
+	    FD_ZERO(&fds);
+	    FD_SET(fd, &fds);
+	    FD_SET(X11_ipc_back_fd, &fds);
+	    select(X11_ipc_back_fd + 1, SELECT_FD_SET_CAST & fds, 0, 0, (struct timeval *) NULL);
+	    if (FD_ISSET(X11_ipc_back_fd, &fds)) {
+		n = read(X11_ipc_back_fd, (void *) (l + (char *) &ge), sizeof(ge) - l);
+		if (n == 0) {
+		    close(X11_ipc_back_fd);
+		    X11_ipc_back_fd = -1;
+		    /* don't close X11_ipc, otherwise later writes
+		     * to it will cause a segfault */
+		    break;	/* outboard driver has stopped */
+		}
+		l += n;
+		if (l == sizeof(ge)) {
+		    /* note: do_event() may not return (if an
+		     * error occurs), so need to reset l first */
+		    l = 0;
+		    do_event(&ge);
+		}
 	    }
-	    l+=n;
-	    if (l==sizeof(ge)) {
-		/* note: do_event() may not return (if an
-		 * error occurs), so need to reset l first */
-		l=0;
-		do_event(&ge);
-	    }
-	}
-    } while (!FD_ISSET(fd, &fds));
+	} while (!FD_ISSET(fd, &fds));
 #endif /* PIPE_IPC */
-# if 0 
+
+# if 0
 /* HBB 20010620: switching back and forth between X11 and a non-GUI
  * terminal, while stdin is redirected, causes gnuplot to terminate
  * right after it re-enters the X11 terminal --- read() returns a '\0'
  * character once, and then EOF. Switching to <stdio.h>'s getc() fixed
  * that, for me. */
-    if (read(0, &c, 1)!=1)
+    if (read(0, &c, 1) != 1)
 	return EOF;
     else
 	return c;
 # else
     return getc(stdin);
-# endif /* 0/1 */
+# endif	/* 0/1 */
 }
 #endif /* USE_MOUSE */
 
@@ -522,7 +512,7 @@ X11_init()
 	    if (pipe(fdes_back))
 		perror("pipe() failed:");
 	}
-# endif /* PIPE_IPC */
+# endif	/* PIPE_IPC */
 	if (pipe(fdes))
 	    perror("pipe() failed:");
 
@@ -534,15 +524,15 @@ X11_init()
 		dup2(fdes_back[1], 1);	/* stdout to pipe */
 		close(fdes_back[0]);
 	    } else {
-		char** ptr;
+		char **ptr;
 		for (ptr = optvec; ptr && *ptr; ptr++)
-		    /* EMPTY (skip over set arguments) */;
+		    /* EMPTY (skip over set arguments) */ ;
 		/* tell the driver not to supply any events by
 		 * appending "-noevents" to the optvec list. */
 		*ptr = noevents;
-		*++ptr = (char*) 0; /* terminate */
+		*++ptr = (char *) 0;	/* terminate */
 	    }
-# endif /* PIPE_IPC */
+# endif	/* PIPE_IPC */
 	    /* close the write side of the child's forward fd */
 	    close(fdes[1]);
 
@@ -556,20 +546,20 @@ X11_init()
 # ifdef PIPE_IPC
 	/* X11_ipc_out = fdopen(fdes[0], "r"); */
 	if (X11_ipc_back_fd > 0) {
-	    fprintf (stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
-	    fprintf (stderr, "           this is probably a program error.\n");
+	    fprintf(stderr, "(X11_init) warning: unclosed X11_ipc_back_fd.\n");
+	    fprintf(stderr, "           this is probably a program error.\n");
 	    close(X11_ipc_back_fd);
 	}
 	if (X11_ALLOW_EVENTS) {
 	    X11_ipc_back_fd = fdes_back[0];
-	    close(fdes_back[1]); /* the parent doesn't need this */
+	    close(fdes_back[1]);	/* the parent doesn't need this */
 
 	    /* apparently multy-character inputs like escape sequences
 	     * but also mouse-pasted text got buffered and therefore
 	     * didn't trigger the select() function in X11_waitforinput().
 	     * Switching to unbuffered input solved this (although I don't
 	     * really like this solution 23 Jan 2002 (joze) */
-	    setvbuf(stdin, (char*)0, _IONBF, 0);
+	    setvbuf(stdin, (char *) 0, _IONBF, 0);
 	} else {
 	    /* we do not open a bidirectional communication
 	     * for non-tty's by default. If this is desired,
@@ -582,7 +572,7 @@ X11_init()
 	    /* mark X11_ipc_back_fd as unusable */
 	    X11_ipc_back_fd = IPC_BACK_UNUSABLE;
 	}
-# endif /* PIPE_IPC */
+# endif	/* PIPE_IPC */
 	/* close the read side of the parent's forward fd */
 	close(fdes[0]);
 	X11_ipc = fdopen(fdes[1], "w");
@@ -618,13 +608,10 @@ X11_reset()
 
 
 #elif defined(CRIPPLED_SELECT)
-
 /* PLEASE CAN SOMEONE CHECK THAT THIS STILL WORKS !!! */
-
 /*-----------------------------------------------------------------------------
  *   CRIPPLED_SELECT file IPC
  *---------------------------------------------------------------------------*/
-
 static char X11_tmp[32], X11_tmp0[32], X11_shutdown[32];
 static int X11_pid;
 
@@ -663,9 +650,8 @@ X11_reset()
 #define FFLUSH()             fflush(X11_ipc)
 
 static void
-X11_atexit HANDLER_DECL { /* WHAT SHOULD I DO ? */
+X11_atexit HANDLER_DECL {	/* WHAT SHOULD I DO ? */
 }
-
 #elif defined(VMS)
 /*-----------------------------------------------------------------------------
  *   VMS mailbox/spawn IPC - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
@@ -713,10 +699,7 @@ X11_init()
 	unsigned short int *ret_len;
 	int end;
     } item_list = {
-	devnam.dsc$w_length, DVI$_DEVNAM,
-	    devnam.dsc$a_pointer,
-	    &devnam.dsc$w_length, 0
-    };
+    devnam.dsc$w_length, DVI$_DEVNAM, devnam.dsc$a_pointer, &devnam.dsc$w_length, 0};
 #define CMDLEN 1024
     char cmdline[CMDLEN], *cmdp;
     int optindex;
@@ -731,20 +714,20 @@ X11_init()
 	 * This does not work anymore since X11 option passing has been
 	 * changed to use execvp() in the DEFAULT_X11 case
 	 */
-	struct dsc$descriptor_s pgmdsc =
-	{0, DSC$K_DTYPE_T,
-	 DSC$K_CLASS_S, 0};
-        optindex = 0;
-        strcpy (cmdline, optvec[optindex]);
-        cmdp = cmdline + strlen (optvec[optindex]);
-        while (optvec[++optindex] != NULL) {
-          *cmdp++ = ' ';
-          *cmdp++ = '\"';
-          strcpy (cmdp, optvec[optindex]);
-          cmdp += strlen (optvec[optindex]);
-          *cmdp++ = '\"';
-        }
-	pgmdsc.dsc$w_length = cmdp-cmdline;
+	struct dsc$descriptor_s pgmdsc = { 0, DSC$K_DTYPE_T,
+	    DSC$K_CLASS_S, 0
+	};
+	optindex = 0;
+	strcpy(cmdline, optvec[optindex]);
+	cmdp = cmdline + strlen(optvec[optindex]);
+	while (optvec[++optindex] != NULL) {
+	    *cmdp++ = ' ';
+	    *cmdp++ = '\"';
+	    strcpy(cmdp, optvec[optindex]);
+	    cmdp += strlen(optvec[optindex]);
+	    *cmdp++ = '\"';
+	}
+	pgmdsc.dsc$w_length = cmdp - cmdline;
 	pgmdsc.dsc$a_pointer = cmdline;
 
 	/* Create a mailbox which will be used as a pipe for commands to the 
@@ -774,7 +757,8 @@ X11_init()
 	    X11_channel = 0;
 	    os_error(NO_CARET, "lib$spawn failed");
 	}
-    } {
+    }
+    {
 	static int been_here = 0;
 	if (!been_here) {
 	    atexit(X11_atexit);
@@ -832,12 +816,10 @@ X11_reset()
 }
 
 #else /* !VMS */
-You lose.
+    You lose.
 #endif /* !VMS */
 
-
 /* common stuff, using macros defined above */
-
 
 TERM_PUBLIC void
 X11_graphics()
@@ -862,7 +844,7 @@ X11_graphics()
 #endif
     /* send also XID of gnuplot window (<space> then raises it up) */
     if (!windowid) {
-	char* window_env = (char*) getenv("WINDOWID");
+	char *window_env = (char *) getenv("WINDOWID");
 	if (window_env)
 	    sscanf(window_env, "%lu", &windowid);
     }
@@ -892,45 +874,38 @@ X11_text()
 }
 
 TERM_PUBLIC void
-X11_move(x, y)
-unsigned int x, y;
+X11_move(unsigned int x, unsigned int y)
 {
     PRINT2("M%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void
-X11_vector(x, y)
-unsigned int x, y;
+X11_vector(unsigned int x, unsigned int y)
 {
     PRINT2("V%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void
-X11_pointsize(ps)
-double ps;
+X11_pointsize(double ps)
 {
     PRINT2("P7%04d%04d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
 TERM_PUBLIC void
-X11_linewidth(lw)
-double lw;
+X11_linewidth(double lw)
 {
     PRINT1("W%04d\n", (int) lw);
 }
 
 TERM_PUBLIC void
-X11_linetype(lt)
-int lt;
+X11_linetype(int lt)
 {
     PRINT1("L%04d\n", lt);
 }
 
 TERM_PUBLIC void
-X11_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
+X11_put_text(unsigned int x, unsigned int y, const char str[])
 {
     /* badly outrange labels can overflow into text field */
     if (x < 10000 && y < 10000) {
@@ -939,25 +914,21 @@ const char str[];
 }
 
 TERM_PUBLIC int
-X11_text_angle(i)
-int i;
+X11_text_angle(int i)
 {
     PRINT1("A%d\n", i);
     return TRUE;
 }
 
 TERM_PUBLIC int
-X11_justify_text(mode)
-enum JUSTIFY mode;
+X11_justify_text(enum JUSTIFY mode)
 {
     PRINT1("J%04d\n", mode);
     return (TRUE);
 }
 
 TERM_PUBLIC void
-X11_point(x, y, number)
-unsigned int x, y;
-int number;
+X11_point(unsigned int x, unsigned int y, int number)
 {
     if (number >= 0)
 	number %= POINT_TYPES;
@@ -966,9 +937,7 @@ int number;
 }
 
 TERM_PUBLIC void
-X11_fillbox(style, x, y, w, h)
-int style;
-unsigned int x, y, w, h;
+X11_fillbox(int style, unsigned int x, unsigned int y, unsigned int w, unsigned int h)
 {
     if (X11_ipc) {
 	PRINT5("F%04d%04u%04u%04u%04u\n", style, x, y, w, h);
@@ -977,9 +946,7 @@ unsigned int x, y, w, h;
 
 #ifdef USE_MOUSE
 TERM_PUBLIC void
-X11_put_tmptext(i,str)
-int i;
-const char str[];
+X11_put_tmptext(int i, const char str[])
 {
     if (X11_ipc) {
 	PRINT2("t%04d%s\n", i, str);
@@ -988,8 +955,7 @@ const char str[];
 }
 
 TERM_PUBLIC void
-X11_set_ruler(x, y)
-int x, y;
+X11_set_ruler(int x, int y)
 {
     if (X11_ipc) {
 	PRINT2("r%04d%04d\n", x, y);
@@ -998,8 +964,7 @@ int x, y;
 }
 
 TERM_PUBLIC void
-X11_set_cursor(c, x, y)
-int c, x, y;
+X11_set_cursor(int c, int x, int y)
 {
     if (X11_ipc) {
 	PRINT3("u%04d%04d%04d\n", c, x, y);
@@ -1008,8 +973,7 @@ int c, x, y;
 }
 
 TERM_PUBLIC void
-X11_set_clipboard(s)
-const char s[];
+X11_set_clipboard(const char s[])
 {
     if (X11_ipc) {
 	PRINT1("z%s\n", s);
@@ -1021,16 +985,16 @@ const char s[];
 
 #ifdef PM3D
 
-TERM_PUBLIC int X11_make_palette(t_sm_palette *palette)
+TERM_PUBLIC int
+X11_make_palette(t_sm_palette *palette)
 {
     /* TODO: also a check for abs(formula[RGB]) < colorFormulae ?
      *       or is this /certainly/ done here ? */
     if (palette) {
 	if (X11_ipc) {
 	    fprintf(X11_ipc, "%c%c %d %d %d %c %d\n",
-		X11_GR_MAKE_PALETTE, palette->colorMode, palette->formulaR,
-		palette->formulaG, palette->formulaB, palette->positive,
-		palette->use_maxcolors);
+		    X11_GR_MAKE_PALETTE, palette->colorMode, palette->formulaR,
+		    palette->formulaG, palette->formulaB, palette->positive, palette->use_maxcolors);
 	    /* we don't need the rest of the struct (joze) */
 	    fflush(X11_ipc);
 	} else {
@@ -1041,7 +1005,8 @@ TERM_PUBLIC int X11_make_palette(t_sm_palette *palette)
     return 0;
 }
 
-TERM_PUBLIC void X11_set_color(double gray)
+TERM_PUBLIC void
+X11_set_color(double gray)
 {
     fputc(X11_GR_SET_COLOR, X11_ipc);
     PRINT1("%f\n", gray);
@@ -1049,7 +1014,8 @@ TERM_PUBLIC void X11_set_color(double gray)
     return;
 }
 
-TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
+TERM_PUBLIC void
+X11_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
 
@@ -1094,10 +1060,8 @@ TERM_TABLE_START(x11_driver)
     , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
 #endif
 #ifdef PM3D
-    , X11_make_palette,
-    0 /* X11_previous_palette */,
-    X11_set_color,
-    X11_filled_polygon
+    , X11_make_palette, 0 /* X11_previous_palette */ ,
+    X11_set_color, X11_filled_polygon
 #endif
 TERM_TABLE_END(x11_driver)
 
@@ -1118,18 +1082,16 @@ TERM_TABLE_START(X11_driver)
     , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
 #endif
 #ifdef PM3D
-    , X11_make_palette,
-    0 /* X11_previous_palette */,
-    X11_set_color,
-    X11_filled_polygon
+    , X11_make_palette, 0 /* X11_previous_palette */ ,
+    X11_set_color, X11_filled_polygon
 #endif
 TERM_TABLE_END(X11_driver)
 
 #undef LAST_TERM
 #define LAST_TERM x11_driver
 
-#endif /* TERM_TABLE */
-#endif /* TERM_PROTO_ONLY */
+#endif				/* TERM_TABLE */
+#endif				/* TERM_PROTO_ONLY */
 
 
 #ifdef TERM_HELP
@@ -1535,6 +1497,6 @@ START_HELP(x11)
 "%@gnuplot*mincolors:  <integer number>",
 "%@gnuplot*visual:     <visual name>",
 "@end table"
-#endif /* PM3D */
+#endif				/* PM3D */
 END_HELP(x11)
-#endif /* TERM_HELP */
+#endif				/* TERM_HELP */

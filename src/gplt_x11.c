@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.34 2002/01/17 21:07:58 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.35 2002/01/24 08:41:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -179,7 +179,8 @@ Error. Incompatible options.
 #  include <os2.h>
 #  include "os2/dialogs.h"
 # endif
-# define _GPLT_X11		/* define before including mouse.h */
+/* define before including mouse.h */
+# define _GPLT_X11
 # include "gpexecute.h"
 # include "mouse.h"
 # include <unistd.h>
@@ -226,32 +227,34 @@ typedef struct cmap_t {
 #endif
 } cmap_t;
 
-cmap_t cmap;			/* always allocate a default colormap (done in preset()) */
-
+/* always allocate a default colormap (done in preset()) */
+cmap_t cmap;
 
 /* information about one window/plot */
-
 typedef struct plot_struct {
     Window window;
     Pixmap pixmap;
     unsigned int posn_flags;
     int x, y;
     unsigned int width, height;	/* window size */
-    unsigned int gheight;	/* height of the part of the window that contains the graph (i.e., excluding the status line at the bottom if mouse is enabled) */
+    unsigned int gheight;	/* height of the part of the window that
+				 * contains the graph (i.e., excluding the
+				 * status line at the bottom if mouse is
+				 * enabled) */
     unsigned int px, py;
     int ncommands, max_commands;
     char **commands;
     char titlestring[0x40];
 #ifdef USE_MOUSE
-    int button;			/* buttons which are currently pressed         */
-    char str[0xff];		/* last displayed string                       */
-    Time time;			/* time of last button press event             */
+    int button;			/* buttons which are currently pressed */
+    char str[0xff];		/* last displayed string */
+    Time time;			/* time of last button press event */
 #endif
-    int lwidth;			/* this and the following 6 lines declare      */
+    int lwidth;			/* this and the following 6 lines declare */
     int type;			/* variables used during drawing in exec_cmd() */
     int user_width;
     enum JUSTIFY jmode;
-    int angle;		/* 0 = horizontal (default), 1 = vertical      */
+    int angle;			/* 0 = horizontal (default), 1 = vertical */
     int lt;
 #ifdef USE_MOUSE
     TBOOLEAN ruler_on;		/* is ruler on? */
@@ -275,29 +278,6 @@ enum { NOT_AVAILABLE = -1 };
 
 #define SEL_LEN 0xff
 static char selection[SEL_LEN] = "";
-
-#ifndef OS2
-/* sunos 4 uses on_exit() in place of atexit(). If both are missing,
- * we can probably survive since gnuplot_x11 should detect EOF on
- * the pipe. Unfortunately, the handlers take different parameters.
- */
-
-#ifdef NO_ATEXIT
-# define HANDLER_PROTO  __PROTO((int x, void *y))
-# define HANDLER_DECL (x,y) int x; void *y;
-# define HANDLER_PARAMS (0,NULL)
-# ifdef HAVE_ON_EXIT
-#  define atexit(x) on_exit(x, NULL)
-# else
-#  define atexit(x)		/* nowt */
-# endif
-#else /* !NO_ATEXIT */
-# define HANDLER_PROTO __PROTO((void))
-# define HANDLER_DECL   ()
-# define HANDLER_PARAMS ()
-#endif
-
-#endif /* !OS2 */
 
 #endif /* USE_MOUSE */
 
@@ -356,7 +336,7 @@ int is_meta __PROTO((KeySym mod));
 int is_shift __PROTO((KeySym mod));
 #endif
 
-void DrawVerticalString __PROTO((Display* dpy, Drawable d, GC gc, int x, int y, const char* str, int len));
+void DrawVerticalString __PROTO((Display *dpy, Drawable d, GC gc, int x, int y, const char *str, int len));
 void exec_cmd __PROTO((plot_struct *, char *));
 
 static plot_struct *find_plot __PROTO((Window window));
@@ -513,26 +493,26 @@ XSegment Plus[2], Cross[2], Star[4];
 #define stipple_halftone_width 8
 #define stipple_halftone_height 8
 #define stipple_halftone_num 5
-static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] ={
-  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
-  { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },   /* 25% pattern */
-  { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },   /* 50% pattern */
-  { 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd },   /* 75% pattern */
-  { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }    /* solid pattern */
+static const unsigned char stipple_halftone_bits[stipple_halftone_num][8] = {
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },	/* no fill */
+    { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },	/* 25% pattern */
+    { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },	/* 50% pattern */
+    { 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd },	/* 75% pattern */
+    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }	/* solid pattern */
 };
 
 /* pattern stipples for pattern fillstyle */
 #define stipple_pattern_width 8
 #define stipple_pattern_height 8
 #define stipple_pattern_num 7
-static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] ={
-  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },   /* no fill */
-  { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 },   /* diagonal stripes (1) */
-  { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 },   /* diagonal stripes (2) */
-  { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 },   /* diagonal stripes (3) */
-  { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 },   /* diagonal stripes (4) */
-  { 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 },   /* diagonal stripes (5) */
-  { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }    /* diagonal stripes (6) */
+static const unsigned char stipple_pattern_bits[stipple_pattern_num][8] = {
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },	/* no fill */
+    { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 },	/* diagonal stripes (1) */
+    { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 },	/* diagonal stripes (2) */
+    { 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 },	/* diagonal stripes (3) */
+    { 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 },	/* diagonal stripes (4) */
+    { 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 },	/* diagonal stripes (5) */
+    { 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 }	/* diagonal stripes (6) */
 };
 
 Pixmap stipple_halftone[stipple_halftone_num];
@@ -540,16 +520,11 @@ Pixmap stipple_pattern[stipple_pattern_num];
 int stipple_initialized = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
 
-
-/*-----------------------------------------------------------------------------
- *   main program 
- *---------------------------------------------------------------------------*/
-
-
+/*
+ * Main program
+ */
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
 
 #ifdef PIPE_IPC
@@ -565,8 +540,7 @@ char *argv[];
     fcloseall();
 #endif
 
-    FPRINTF((stderr, "gnuplot_X11 starting up\n"));
-
+    FPRINTF((stderr, "starting up\n"));
 
     preset(argc, argv);
 
@@ -627,10 +601,10 @@ char *argv[];
 
 
 #ifdef DEFAULT_X11
-/*-----------------------------------------------------------------------------
- *    DEFAULT_X11 mainloop
- *---------------------------------------------------------------------------*/
 
+/*
+ * DEFAULT_X11 mainloop
+ */
 void
 mainloop()
 {
@@ -700,7 +674,7 @@ mainloop()
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
-	    fprintf(stderr, "gnuplot_x11: select failed. errno:%d\n", errno);
+	    perror("gnuplot_x11: select failed");
 	    EXIT(1);
 	}
 
@@ -739,10 +713,10 @@ mainloop()
 }
 
 #elif defined(CRIPPLED_SELECT)
-/*-----------------------------------------------------------------------------
- *    CRIPPLED_SELECT mainloop
- *---------------------------------------------------------------------------*/
 
+/*
+ * CRIPPLED_SELECT mainloop
+ */
 void
 mainloop()
 {
@@ -784,7 +758,7 @@ mainloop()
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
-	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
+	    perror("gnuplot_x11: select failed");
 	    EXIT(1);
 	}
 
@@ -874,13 +848,11 @@ mainloop()
     }
 }
 #else /* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
-You lose.No mainloop.
+You lose. No mainloop.
 #endif				/* !(DEFAULT_X11 || CRIPPLED_SELECT || VMS */
 
 /* delete a window / plot */
-void
-delete_plot(plot)
-    plot_struct *plot;
+void delete_plot(plot_struct *plot)
 {
     int i;
 
@@ -897,13 +869,13 @@ delete_plot(plot)
 	--windows_open;
     }
 #if USE_ULIG_FILLEDBOXES
-    if( stipple_initialized ) {  /* ULIG */
-        int i;
-        for( i=0; i<stipple_halftone_num; i++ )
-            XFreePixmap( dpy, stipple_halftone[i] );
-        for( i=0; i<stipple_pattern_num; i++ )
-            XFreePixmap( dpy, stipple_pattern[i] );
-        stipple_initialized = 0;
+    if (stipple_initialized) {	/* ULIG */
+	int i;
+	for (i = 0; i < stipple_halftone_num; i++)
+	    XFreePixmap(dpy, stipple_halftone[i]);
+	for (i = 0; i < stipple_pattern_num; i++)
+	    XFreePixmap(dpy, stipple_pattern[i]);
+	stipple_initialized = 0;
     }
 #endif /* USE_ULIG_FILLEDBOXES */
     if (plot->pixmap) {
@@ -922,11 +894,8 @@ delete_plot(plot)
 
 
 /* prepare the plot structure */
-
 void
-prepare_plot(plot, term_number)
-plot_struct *plot;
-int term_number;
+prepare_plot(plot_struct *plot, int term_number)
 {
     int i;
 
@@ -990,7 +959,7 @@ int term_number;
     /* allow releasing of the cmap at the first drawing
      * operation if no palette was allocated until then.
      */
-    plot->angle = 0; /* default is horizontal */
+    plot->angle = 0;		/* default is horizontal */
 #ifdef PM3D
     plot->release_cmap = TRUE;
 #endif
@@ -999,11 +968,8 @@ int term_number;
 }
 
 /* store a command in a plot structure */
-
 void
-store_command(buffer, plot)
-char *buffer;
-plot_struct *plot;
+store_command(char *buffer, plot_struct *plot)
 {
     char *p;
 
@@ -1027,9 +993,10 @@ plot_struct *plot;
 
 int read_input __PROTO((void));
 
-/* Handle input.  Use read instead of fgets because stdio buffering
-* causes trouble when combined with calls to select.
-*/
+/*
+ * Handle input.  Use read instead of fgets because stdio buffering
+ * causes trouble when combined with calls to select.
+ */
 int
 read_input()
 {
@@ -1083,11 +1050,9 @@ gnuplot: X11 aborted.\n", stderr);
     return partial_read;
 }
 
-
-/*-----------------------------------------------------------------------------
- *   record - record new plot from gnuplot inboard X11 driver (Unix)
- *---------------------------------------------------------------------------*/
-
+/*
+ * record - record new plot from gnuplot inboard X11 driver (Unix)
+ */
 int
 record()
 {
@@ -1205,7 +1170,7 @@ record()
 #ifdef PIPE_IPC
 	    if (!pipe_died)
 #endif
-		{
+	    {
 		/* `set cursor' */
 		int c, x, y;
 		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
@@ -1248,7 +1213,7 @@ record()
 #ifdef PIPE_IPC
 	    if (!pipe_died)
 #endif
-		{
+	    {
 		int where;
 		char *second;
 		if (sscanf(buf, "t%4d", &where) != 1)
@@ -1298,7 +1263,7 @@ record()
 #ifdef PIPE_IPC
 	    if (!pipe_died)
 #endif
-		{
+	    {
 		int x, y;
 		DrawRuler(plot);	/* erase previous ruler */
 		sscanf(buf, "r%4d%4d", &x, &y);
@@ -1339,10 +1304,10 @@ record()
 }
 
 #else /* VMS */
-/*-----------------------------------------------------------------------------
- *   record - record new plot from gnuplot inboard X11 driver (VMS)
- *---------------------------------------------------------------------------*/
 
+/*
+ *   record - record new plot from gnuplot inboard X11 driver (VMS)
+ */
 record()
 {
     static plot_struct *plot = plot_array;
@@ -1400,16 +1365,16 @@ record()
 #endif /* VMS */
 
 void
-DrawVerticalString(Display* dpy, Drawable d, GC gc, int xdest, int ydest, const char* str, int len)
+DrawVerticalString(Display *dpy, Drawable d, GC gc, int xdest, int ydest, const char *str, int len)
 {
     int x, y, x2;
     int width = XTextWidth(font, str, len);
     int height = vchar;
-    char* data = (char*)malloc(width * height * sizeof (char));
+    char *data = (char *) malloc(width * height * sizeof(char));
     Pixmap pixmap_src = XCreatePixmap(dpy, root, width, height, 1);
     /* Pixmap pixmap_dest = XCreatePixmap(dpy, root, height, width, 1); */
-    XImage* image_src;
-    XImage* image_dest;
+    XImage *image_src;
+    XImage *image_dest;
     GC bitmapGC = XCreateGC(dpy, pixmap_src, 0, (XGCValues *) 0);
 
     /* set font and colors for the bitmap GC */
@@ -1421,7 +1386,7 @@ DrawVerticalString(Display* dpy, Drawable d, GC gc, int xdest, int ydest, const 
     XDrawImageString(dpy, pixmap_src, bitmapGC, 0, font->ascent, str, len);
 
     /* create XImage's of depth 1 */
-    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height, 1, XYPixmap /* ZPixmap, XYBitmap */);
+    image_src = XGetImage(dpy, pixmap_src, 0, 0, width, height, 1, XYPixmap /* ZPixmap, XYBitmap */ );
     image_dest = XCreateImage(dpy, vis, 1, XYBitmap, 0, data, height, width, 8, 0);
 
     /* copy & rotate from source --> dest */
@@ -1441,21 +1406,17 @@ DrawVerticalString(Display* dpy, Drawable d, GC gc, int xdest, int ydest, const 
     XFreeGC(dpy, bitmapGC);
 }
 
-
-/*-----------------------------------------------------------------------------
+/*
  *   exec_cmd - execute drawing command from inboard driver
- *---------------------------------------------------------------------------*/
-
+ */
 void
-exec_cmd(plot, command)
-    plot_struct *plot;
-    char *command;
+exec_cmd(plot_struct *plot, char *command)
 {
     int x, y, sw, sl;
     char *buffer, *str;
 
     buffer = command;
-    /* fprintf (stderr, "(display) buffer = |%s|\n", buffer); */
+    FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));
 
     /*   X11_vector(x,y) - draw vector  */
     if (*buffer == 'V') {
@@ -1481,29 +1442,29 @@ exec_cmd(plot, command)
 
 	if (1 == plot->angle) {
 	    switch (plot->jmode) {
-		case LEFT:
-		    sw = -sw;
-		    break;
-		case CENTRE:
-		    sw = -sw / 2;
-		    break;
-		case RIGHT:
-		    sw = 0;
-		    break;
+	    case LEFT:
+		sw = -sw;
+		break;
+	    case CENTRE:
+		sw = -sw / 2;
+		break;
+	    case RIGHT:
+		sw = 0;
+		break;
 	    }
 	    /* vertical text, center horizontally about x */
 	    DrawVerticalString(dpy, plot->pixmap, gc, X(x) - vchar / 2, Y(y) + sw, str, sl);
 	} else {
 	    switch (plot->jmode) {
-		case LEFT:
-		    sw = 0;
-		    break;
-		case CENTRE:
-		    sw = -sw / 2;
-		    break;
-		case RIGHT:
-		    sw = -sw;
-		    break;
+	    case LEFT:
+		sw = 0;
+		break;
+	    case CENTRE:
+		sw = -sw / 2;
+		break;
+	    case RIGHT:
+		sw = -sw;
+		break;
 	    }
 	    /* horizontal text */
 	    XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
@@ -1516,48 +1477,59 @@ exec_cmd(plot, command)
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
 #if USE_ULIG_FILLEDBOXES
-		int fillpar, idx;
+	    int fillpar, idx;
 
-                fillpar = style >> 4;  /* upper 3 nibbles contain fillparameter (ULIG) */
-                switch( style & 0xf ) {  /* lower nibble contains fillstyle */
-                case 1: /* style == 1 --> use halftone fill pattern according to filldensity */
-                    idx = (int) ( fillpar * (stipple_halftone_num-1) / 100 );  /* filldensity is from 0..100 percent */
-                    if( idx < 0 ) idx = 0;
-                    if( idx >= stipple_halftone_num ) idx = stipple_halftone_num-1;
-                    XSetStipple( dpy, gc, stipple_halftone[idx] );
-                    XSetFillStyle( dpy, gc, FillOpaqueStippled );
-                    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-                    break;
-                case 2: /* style == 2 --> use fill pattern according to fillpattern */
-                    idx = (int) fillpar;  /* fillpattern is enumerated */
-                    if( idx < 0 ) idx = 0;
-                    if( idx >= stipple_pattern_num ) idx = 0;
-                    XSetStipple( dpy, gc, stipple_pattern[idx] );
-                    XSetFillStyle( dpy, gc, FillOpaqueStippled );
-                    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-                    break;
-                default: /* style == 0 or unknown --> fill with background color */
-                    XSetFillStyle( dpy, gc, FillSolid );
-                    XSetForeground(dpy, gc, plot->cmap->colors[0]);
-                }
+	    /* upper 3 nibbles contain fillparameter (ULIG) */
+	    fillpar = style >> 4;
+
+	    /* lower nibble contains fillstyle */
+	    switch (style & 0xf) {
+	    case 1:
+	    /* style == 1 --> use halftone fill pattern according to filldensity */
+		/* filldensity is from 0..100 percent */
+		idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
+		if (idx < 0)
+		    idx = 0;
+		if (idx >= stipple_halftone_num)
+		    idx = stipple_halftone_num - 1;
+		XSetStipple(dpy, gc, stipple_halftone[idx]);
+		XSetFillStyle(dpy, gc, FillOpaqueStippled);
+		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+		break;
+	    case 2:
+	    /* style == 2 --> use fill pattern according to fillpattern */
+		idx = (int) fillpar;	/* fillpattern is enumerated */
+		if (idx < 0)
+		    idx = 0;
+		if (idx >= stipple_pattern_num)
+		    idx = 0;
+		XSetStipple(dpy, gc, stipple_pattern[idx]);
+		XSetFillStyle(dpy, gc, FillOpaqueStippled);
+		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+		break;
+	    default:
+	    /* style == 0 or unknown --> fill with background color */
+		XSetFillStyle(dpy, gc, FillSolid);
+		XSetForeground(dpy, gc, plot->cmap->colors[0]);
+	    }
 #endif /* USE_ULIG_FILLEDBOXES */
 
-		/* gnuplot has origin at bottom left, but X uses top left
-		 * There may be an off-by-one (or more) error here.
-		 */
-		ytmp += h;	/* top left corner of rectangle to be filled */
-		w *= xscale;
-		h *= yscale;
+	    /* gnuplot has origin at bottom left, but X uses top left
+	     * There may be an off-by-one (or more) error here.
+	     */
+	    ytmp += h;		/* top left corner of rectangle to be filled */
+	    w *= xscale;
+	    h *= yscale;
 #if USE_ULIG_FILLEDBOXES
-		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w+1, h+1);
-                /* reset everything */
-		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-                XSetStipple( dpy, gc, stipple_halftone[0] );
-                XSetFillStyle( dpy, gc, FillSolid );
-#else  /* ! USE_ULIG_FILLEDBOXES */
-		XSetForeground(dpy, gc, plot->cmap->colors[0]);
-		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
-		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w + 1, h + 1);
+	    /* reset everything */
+	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+	    XSetStipple(dpy, gc, stipple_halftone[0]);
+	    XSetFillStyle(dpy, gc, FillSolid);
+#else /* ! USE_ULIG_FILLEDBOXES */
+	    XSetForeground(dpy, gc, plot->cmap->colors[0]);
+	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
+	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 #endif /* USE_ULIG_FILLEDBOXES */
 	}
     }
@@ -1712,7 +1684,7 @@ exec_cmd(plot, command)
 	if (have_pm3d) {	/* ignore, if your X server is not supported */
 	    static XPoint *points = NULL;
 	    static int st_npoints = 0;
-	    static int saved_npoints = -1, saved_i = -1; /* HBB 20010919 */
+	    static int saved_npoints = -1, saved_i = -1;	/* HBB 20010919 */
 	    int i, npoints;
 	    char *ptr = buffer + 1;
 
@@ -1745,7 +1717,7 @@ exec_cmd(plot, command)
 		points = new_points;
 	    }
 
-	    while (*ptr != 'x' && i < npoints) { /* not end-of-line marker */
+	    while (*ptr != 'x' && i < npoints) {	/* not end-of-line marker */
 		sscanf(ptr, "%4d%4d", &x, &y);
 		ptr += 8;
 		points[i].x = X(x);
@@ -1771,13 +1743,11 @@ exec_cmd(plot, command)
     }
 }
 
-/*-----------------------------------------------------------------------------
+/*
  *   display - display a stored plot
- *---------------------------------------------------------------------------*/
-
+ */
 void
-display(plot)
-    plot_struct *plot;
+display(plot_struct *plot)
 {
     int n;
 
@@ -1817,16 +1787,18 @@ display(plot)
 
     XSetFont(dpy, gc, font->fid);
 #if USE_ULIG_FILLEDBOXES
-    XSetFillStyle( dpy, gc, FillSolid );
+    XSetFillStyle(dpy, gc, FillSolid);
 
     /* initialize stipple for filled boxes (ULIG) */
-    if( !stipple_initialized ) {
-      int i;
-      for( i=0; i<stipple_halftone_num; i++ )
-        stipple_halftone[i] = XCreateBitmapFromData( dpy, plot->pixmap, stipple_halftone_bits[i], stipple_halftone_width, stipple_halftone_height );
-      for( i=0; i<stipple_pattern_num; i++ )
-        stipple_pattern[i] = XCreateBitmapFromData( dpy, plot->pixmap, stipple_pattern_bits[i], stipple_pattern_width, stipple_pattern_height );
-      stipple_initialized = 1;
+    if (!stipple_initialized) {
+	int i;
+	for (i = 0; i < stipple_halftone_num; i++)
+	    stipple_halftone[i] =
+		XCreateBitmapFromData(dpy, plot->pixmap, stipple_halftone_bits[i], stipple_halftone_width, stipple_halftone_height);
+	for (i = 0; i < stipple_pattern_num; i++)
+	    stipple_pattern[i] =
+		XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_bits[i], stipple_pattern_width, stipple_pattern_height);
+	stipple_initialized = 1;
     }
 #endif /* USE_ULIG_FILLEDBOXES */
 
@@ -1945,24 +1917,28 @@ RecolorWindow(plot_struct * plot)
     }
 }
 
-/* free all *pm3d* colors (*not* the line colors cmap->colors)
+/*
+ * free all *pm3d* colors (*not* the line colors cmap->colors)
  * of a plot_struct's colormap.  This could be either a private
  * or the default colormap.  Note, that the line colors are not
- * free'd nor even touched. */
+ * free'd nor even touched.
+ */
 void
 FreeColors(plot_struct * plot)
 {
     if (plot->cmap->total && plot->cmap->pixels) {
 	if (plot->cmap->allocated) {
-	    /* fprintf(stderr, "freeing palette colors\n"); */
-	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels, plot->cmap->allocated, 0 /* XXX ??? XXX */ );
+	    FPRINTF((stderr, "freeing palette colors\n"));
+	    XFreeColors(dpy, plot->cmap->colormap, plot->cmap->pixels,
+			plot->cmap->allocated, 0 /* XXX ??? XXX */ );
 	}
 	free(plot->cmap->pixels);
     }
     CmapClear(plot->cmap);
 }
 
-/* free pm3d colors and eventually a private colormap.
+/*
+ * free pm3d colors and eventually a private colormap.
  * set the plot_struct's colormap to the default colormap
  * and the line `colors' to the line colors of the default
  * colormap.
@@ -1992,7 +1968,7 @@ ReallocColors(plot_struct * plot, int n)
     return plot->cmap->pixels;
 }
 
-/**
+/*
  * check if the display supports the visual of type `class'.
  *
  * If multiple visuals of `class' are supported, try to get
@@ -2109,9 +2085,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 
     if (!num_colormaps) {
 	XFree(XListInstalledColormaps(dpy, plot->window, &num_colormaps));
-#if 0
-	fprintf(stderr, "(PaletteMake) num_colormaps = %d\n", num_colormaps);
-#endif
+	FPRINTF((stderr, "(PaletteMake) num_colormaps = %d\n", num_colormaps));
     }
 
     /* TODO */
@@ -2148,9 +2122,7 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		plot->cmap->pixels[plot->cmap->allocated] = xcolor.pixel;
 	    } else {
-#if 0
-		fprintf(stderr, "failed at color %d\n", plot->cmap->allocated);
-#endif
+		FPRINTF((stderr, "failed at color %d\n", plot->cmap->allocated));
 		break;
 	    }
 	}
@@ -2166,11 +2138,9 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 	}
     }
 
-#if 0
-    fprintf(stderr, "(PaletteMake) allocated = %d\n", plot->cmap.allocated);
-    fprintf(stderr, "(PaletteMake) max_colors = %d\n", max_colors);
-    fprintf(stderr, "(PaletteMake) min_colors = %d\n", min_colors);
-#endif
+    FPRINTF((stderr, "(PaletteMake) allocated = %d\n", plot->cmap.allocated));
+    FPRINTF((stderr, "(PaletteMake) max_colors = %d\n", max_colors));
+    FPRINTF((stderr, "(PaletteMake) min_colors = %d\n", min_colors));
 
     if (plot->cmap->allocated < min_colors && !recursion) {
 	ReleaseColormap(plot);
@@ -2266,7 +2236,7 @@ EventuallyDrawMouseAddOns(plot_struct * plot)
 
 
 
-/**
+/*
  * draw a box using the gc with the GXxor function.
  * This can be used to turn on *and off* a box. The
  * corners of the box are annotated with the strings
@@ -2310,7 +2280,7 @@ DrawBox(plot_struct * plot)
 }
 
 
-/**
+/*
  * draw the strings xstr and ystr centered horizontally
  * and vertically at the point x, y. Use the GXxor
  * as usually, so that we can also remove the coords
@@ -2339,16 +2309,18 @@ AnnotatePoint(plot_struct * plot, int x, int y, const char xstr[], const char ys
 
 /* returns the time difference to the last click in milliseconds */
 long int
-SetTime(plot_struct * plot, Time t)
+SetTime(plot_struct *plot, Time t)
 {
-    /* fprintf (stderr, "(SetTime) difftime = %ld\n", t - plot->time); */
     long int diff = t - plot->time;
+
+    FPRINTF((stderr, "(SetTime) difftime = %ld\n", diff));
+
     plot->time = t;
     return diff > 0 ? diff : 0;
 }
 
 unsigned long
-AllocateXorPixel(cmap_t * cmap_ptr)
+AllocateXorPixel(cmap_t *cmap_ptr)
 {
     unsigned long pixel;
     XColor xcolor;
@@ -2409,12 +2381,14 @@ GetGCXorDashed(plot_struct * plot, GC * gc)
 		       JoinMiter /* also: JoinRound, JoinBevel */ );
 }
 
+/*
+ * returns the newly created gc
+ * pixmap: where the gc will be used
+ * mode == 0 --> black on white
+ * mode == 1 --> white on black
+ */
 void
 GetGCBlackAndWhite(plot_struct * plot, GC * ret, Pixmap pixmap, int mode)
-    /* returns the newly created gc      */
-    /* pixmap: where the gc will be used */
-    /* mode == 0 --> black on white      */
-    /* mode == 1 --> white on black      */
 {
     XGCValues values;
     unsigned long mask = 0;
@@ -2585,8 +2559,7 @@ reset_cursor()
  *---------------------------------------------------------------------------*/
 
 static plot_struct *
-find_plot(window)
-Window window;
+find_plot(Window window)
 {
     int plot_number;
     plot_struct *plot = plot_array;
@@ -2607,8 +2580,7 @@ Window window;
 static void update_modifiers __PROTO((unsigned int));
 
 void
-update_modifiers(state)
-unsigned int state;
+update_modifiers(unsigned int state)
 {
     int old_mod_mask;
 
@@ -2624,8 +2596,7 @@ unsigned int state;
 
 
 void
-process_event(event)
-    XEvent *event;
+process_event(XEvent *event)
 {
 #if 0
     static char key_string[0xf];
@@ -2692,14 +2663,14 @@ process_event(event)
 #endif
 		plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
 #if USE_ULIG_FILLEDBOXES
-                if( stipple_initialized ) {  /* ULIG */
-                    int i;
-                    for( i=0; i<stipple_halftone_num; i++ )
-                        XFreePixmap( dpy, stipple_halftone[i] );
-                    for( i=0; i<stipple_pattern_num; i++ )
-                        XFreePixmap( dpy, stipple_pattern[i] );
-                    stipple_initialized = 0;
-                }
+		if (stipple_initialized) {	/* ULIG */
+		    int i;
+		    for (i = 0; i < stipple_halftone_num; i++)
+			XFreePixmap(dpy, stipple_halftone[i]);
+		    for (i = 0; i < stipple_pattern_num; i++)
+			XFreePixmap(dpy, stipple_pattern[i]);
+		    stipple_initialized = 0;
+		}
 #endif /* USE_ULIG_FILLEDBOXES */
 		if (plot->pixmap) {
 		    /* it is the wrong size now */
@@ -3107,9 +3078,7 @@ static XrmOptionDescRec options[] = {
 #define Nopt (sizeof(options) / sizeof(options[0]))
 
 void
-preset(argc, argv)
-int argc;
-char *argv[];
+preset(int argc, char *argv[])
 {
     int Argc = argc;
     char **Argv = argv;
@@ -3673,8 +3642,7 @@ ProcessEvents(Window win)
 }
 
 void
-pr_window(plot)
-plot_struct *plot;
+pr_window(plot_struct *plot)
 {
     char *title = pr_GetR(db, ".title");
     static XSizeHints hints;
@@ -3764,8 +3732,7 @@ pr_persist()
 static struct plot_struct *exported_plot;
 
 void
-export_graph(plot)
-struct plot_struct *plot;
+export_graph(struct plot_struct *plot)
 {
     FPRINTF((stderr, "export_graph(0x%x)\n", plot));
 
@@ -3777,8 +3744,7 @@ struct plot_struct *plot;
 }
 
 void
-handle_selection_event(event)
-XEvent *event;
+handle_selection_event(XEvent *event)
 {
     switch (event->type) {
     case SelectionRequest:
