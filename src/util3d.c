@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.23 2004/09/25 23:33:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.24 2004/11/12 18:13:12 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -162,6 +162,9 @@ mat_mult(
 	    mat_res[i][j] = mat_res_temp[i][j];
 }
 
+#define IN_AXIS_RANGE(val, axis)					\
+	inrange((val), axis_array[axis].min, axis_array[axis].max)
+
 
 /* single edge intersection algorithm */
 /* Given two points, one inside and one outside the plot, return
@@ -195,13 +198,6 @@ edge3d_intersect(
 	iz = oz;
 	oz = z;
     }
-    /* nasty degenerate cases, effectively drawing to an infinity point (?)
-       cope with them here, so don't process them as a "real" OUTRANGE point
-
-       If more than one coord is -VERYLARGE, then can't ratio the "infinities"
-       so drop out by returning the INRANGE point.
-
-       Obviously, only need to test the OUTRANGE point (coordinates) */
 
     /* nasty degenerate cases, effectively drawing to an infinity point (?)
        cope with them here, so don't process them as a "real" OUTRANGE point
@@ -232,15 +228,15 @@ edge3d_intersect(
 	*ez = iz;
 
 	if (ox == -VERYLARGE) {
-	    *ex = axis_array[FIRST_X_AXIS].min;
+	    *ex = AXIS_ACTUAL_MIN(FIRST_X_AXIS);
 	    return;
 	}
 	if (oy == -VERYLARGE) {
-	    *ey = axis_array[FIRST_Y_AXIS].min;
+	    *ey = AXIS_ACTUAL_MIN(FIRST_Y_AXIS);
 	    return;
 	}
 	/* obviously oz is -VERYLARGE and (ox != -VERYLARGE && oy != -VERYLARGE) */
-	*ez = axis_array[FIRST_Z_AXIS].min;
+	*ez = AXIS_ACTUAL_MIN(FIRST_Z_AXIS);
 	return;
     }
     /*
@@ -251,14 +247,14 @@ edge3d_intersect(
 	if (iy == oy) {
 	    /* line parallel to z axis */
 
-	    /* assume inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) && inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) */
+	    /* assume iy in yrange, && ix in xrange */
 	    *ex = ix;		/* == ox */
 	    *ey = iy;		/* == oy */
 
-	    if (inrange(axis_array[FIRST_Z_AXIS].max, iz, oz))
-		*ez = axis_array[FIRST_Z_AXIS].max;
-	    else if (inrange(axis_array[FIRST_Z_AXIS].min, iz, oz))
-		*ez = axis_array[FIRST_Z_AXIS].min;
+	    if (inrange(AXIS_ACTUAL_MAX(FIRST_Z_AXIS), iz, oz))
+		*ez = AXIS_ACTUAL_MAX(FIRST_Z_AXIS);
+	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_Z_AXIS), iz, oz))
+		*ez = AXIS_ACTUAL_MIN(FIRST_Z_AXIS);
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
@@ -268,76 +264,64 @@ edge3d_intersect(
 	if (iz == oz) {
 	    /* line parallel to y axis */
 
-	    /* assume inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max) && inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) */
+	    /* assume iz in zrange && ix in xrange */
 	    *ex = ix;		/* == ox */
 	    *ez = iz;		/* == oz */
 
-	    if (inrange(axis_array[FIRST_Y_AXIS].max, iy, oy))
-		*ey = axis_array[FIRST_Y_AXIS].max;
-	    else if (inrange(axis_array[FIRST_Y_AXIS].min, iy, oy))
-		*ey = axis_array[FIRST_Y_AXIS].min;
+	    if (inrange(AXIS_ACTUAL_MAX(FIRST_Y_AXIS), iy, oy))
+		*ey = AXIS_ACTUAL_MAX(FIRST_Y_AXIS);
+	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_Y_AXIS), iy, oy))
+		*ey = AXIS_ACTUAL_MIN(FIRST_Y_AXIS);
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
 
 	    return;
 	}
+
 	/* nasty 2D slanted line in a yz plane */
 
-	/* does it intersect axis_array[FIRST_Y_AXIS].min edge */
-	if (inrange(axis_array[FIRST_Y_AXIS].min, iy, oy) && axis_array[FIRST_Y_AXIS].min != iy && axis_array[FIRST_Y_AXIS].min != oy) {
-	    z = iz + (axis_array[FIRST_Y_AXIS].min - iy) * ((oz - iz) / (oy - iy));
-	    if (inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-		*ex = ix;
-		*ey = axis_array[FIRST_Y_AXIS].min;
-		*ez = z;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Y_AXIS].max edge */
-	if (inrange(axis_array[FIRST_Y_AXIS].max, iy, oy) && axis_array[FIRST_Y_AXIS].max != iy && axis_array[FIRST_Y_AXIS].max != oy) {
-	    z = iz + (axis_array[FIRST_Y_AXIS].max - iy) * ((oz - iz) / (oy - iy));
-	    if (inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-		*ex = ix;
-		*ey = axis_array[FIRST_Y_AXIS].max;
-		*ez = z;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Z_AXIS].min edge */
-	if (inrange(axis_array[FIRST_Z_AXIS].min, iz, oz) && axis_array[FIRST_Z_AXIS].min != iz && axis_array[FIRST_Z_AXIS].min != oz) {
-	    y = iy + (axis_array[FIRST_Z_AXIS].min - iz) * ((oy - iy) / (oz - iz));
-	    if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-		*ex = ix;
-		*ey = y;
-		*ez = axis_array[FIRST_Z_AXIS].min;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Z_AXIS].max edge */
-	if (inrange(axis_array[FIRST_Z_AXIS].max, iz, oz) && axis_array[FIRST_Z_AXIS].max != iz && axis_array[FIRST_Z_AXIS].max != oz) {
-	    y = iy + (axis_array[FIRST_Z_AXIS].max - iz) * ((oy - iy) / (oz - iz));
-	    if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-		*ex = ix;
-		*ey = y;
-		*ez = axis_array[FIRST_Z_AXIS].max;
-		return;
-	    }
-	}
-    }
+
+#define INTERSECT_PLANE(cut, axis, eff, eff_axis, res_x, res_y, res_z)	\
+	do {								\
+	    if (inrange(cut, i##axis, o##axis)				\
+		&& cut != i##axis					\
+		&& cut != o##axis) {					\
+		eff = (cut - i##axis)					\
+		    * ((o##eff - i##eff) / (o##axis - i##axis))		\
+		    + i##eff;						\
+		if (IN_AXIS_RANGE(eff, eff_axis)) {			\
+		    *ex = res_x;					\
+		    *ey = res_y;					\
+		    *ez = res_z;					\
+		    return;						\
+		}							\
+	    }								\
+	} while (0)
+
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_Y_AXIS), y, z, FIRST_Z_AXIS,
+			ix, AXIS_ACTUAL_MIN(FIRST_Y_AXIS), z);
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_Y_AXIS), y, z, FIRST_Z_AXIS,
+			ix, AXIS_ACTUAL_MAX(FIRST_Y_AXIS), z);
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_Z_AXIS), z, y, FIRST_Y_AXIS,
+			ix, y, AXIS_ACTUAL_MIN(FIRST_Z_AXIS));
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_Z_AXIS), z, y, FIRST_Y_AXIS,
+			ix, y, AXIS_ACTUAL_MAX(FIRST_Z_AXIS));
+    } /* if (ix == ox) */
+
     if (iy == oy) {
 	/* already checked case (ix == ox && iy == oy) */
 	if (oz == iz) {
 	    /* line parallel to x axis */
 
-	    /* assume inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max) && inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) */
+	    /* assume inrange(iz) && inrange(iy) */
 	    *ey = iy;		/* == oy */
 	    *ez = iz;		/* == oz */
 
-	    if (inrange(axis_array[FIRST_X_AXIS].max, ix, ox))
-		*ex = axis_array[FIRST_X_AXIS].max;
-	    else if (inrange(axis_array[FIRST_X_AXIS].min, ix, ox))
-		*ex = axis_array[FIRST_X_AXIS].min;
+	    if (inrange(AXIS_ACTUAL_MAX(FIRST_X_AXIS), ix, ox))
+		*ex = AXIS_ACTUAL_MAX(FIRST_X_AXIS);
+	    else if (inrange(AXIS_ACTUAL_MIN(FIRST_X_AXIS), ix, ox))
+		*ex = AXIS_ACTUAL_MIN(FIRST_X_AXIS);
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
@@ -346,163 +330,82 @@ edge3d_intersect(
 	}
 	/* nasty 2D slanted line in an xz plane */
 
-	/* does it intersect axis_array[FIRST_X_AXIS].min edge */
-	if (inrange(axis_array[FIRST_X_AXIS].min, ix, ox) && axis_array[FIRST_X_AXIS].min != ix && axis_array[FIRST_X_AXIS].min != ox) {
-	    z = iz + (axis_array[FIRST_X_AXIS].min - ix) * ((oz - iz) / (ox - ix));
-	    if (inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-		*ex = axis_array[FIRST_X_AXIS].min;
-		*ey = iy;
-		*ez = z;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_X_AXIS].max edge */
-	if (inrange(axis_array[FIRST_X_AXIS].max, ix, ox) && axis_array[FIRST_X_AXIS].max != ix && axis_array[FIRST_X_AXIS].max != ox) {
-	    z = iz + (axis_array[FIRST_X_AXIS].max - ix) * ((oz - iz) / (ox - ix));
-	    if (inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-		*ex = axis_array[FIRST_X_AXIS].max;
-		*ey = iy;
-		*ez = z;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Z_AXIS].min edge */
-	if (inrange(axis_array[FIRST_Z_AXIS].min, iz, oz) && axis_array[FIRST_Z_AXIS].min != iz && axis_array[FIRST_Z_AXIS].min != oz) {
-	    x = ix + (axis_array[FIRST_Z_AXIS].min - iz) * ((ox - ix) / (oz - iz));
-	    if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max)) {
-		*ex = x;
-		*ey = iy;
-		*ez = axis_array[FIRST_Z_AXIS].min;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Z_AXIS].max edge */
-	if (inrange(axis_array[FIRST_Z_AXIS].max, iz, oz) && axis_array[FIRST_Z_AXIS].max != iz && axis_array[FIRST_Z_AXIS].max != oz) {
-	    x = ix + (axis_array[FIRST_Z_AXIS].max - iz) * ((ox - ix) / (oz - iz));
-	    if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max)) {
-		*ex = x;
-		*ey = iy;
-		*ez = axis_array[FIRST_Z_AXIS].max;
-		return;
-	    }
-	}
-    }
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_X_AXIS), x, z, FIRST_Z_AXIS,
+			AXIS_ACTUAL_MIN(FIRST_X_AXIS), iy, z);
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_X_AXIS), x, z, FIRST_Z_AXIS,
+			AXIS_ACTUAL_MAX(FIRST_X_AXIS), iy, z);
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_Z_AXIS), z, x, FIRST_X_AXIS,
+			x, iy, AXIS_ACTUAL_MIN(FIRST_Z_AXIS));
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_Z_AXIS), z, x, FIRST_X_AXIS,
+			x, iy, AXIS_ACTUAL_MAX(FIRST_Z_AXIS));
+    } /* if(iy==oy) */
+
     if (iz == oz) {
-	/* already checked cases (ix == ox && iz == oz) and (iy == oy && iz == oz) */
+	/* already checked cases (ix == ox && iz == oz) and (iy == oy
+	   && iz == oz) */
 
-	/* nasty 2D slanted line in an xy plane */
+	/* 2D slanted line in an xy plane */
 
-	/* assume inrange(oz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max) */
+	/* assume inrange(oz) */
 
-	/* does it intersect axis_array[FIRST_X_AXIS].min edge */
-	if (inrange(axis_array[FIRST_X_AXIS].min, ix, ox) && axis_array[FIRST_X_AXIS].min != ix && axis_array[FIRST_X_AXIS].min != ox) {
-	    y = iy + (axis_array[FIRST_X_AXIS].min - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-		*ex = axis_array[FIRST_X_AXIS].min;
-		*ey = y;
-		*ez = iz;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_X_AXIS].max edge */
-	if (inrange(axis_array[FIRST_X_AXIS].max, ix, ox) && axis_array[FIRST_X_AXIS].max != ix && axis_array[FIRST_X_AXIS].max != ox) {
-	    y = iy + (axis_array[FIRST_X_AXIS].max - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-		*ex = axis_array[FIRST_X_AXIS].max;
-		*ey = y;
-		*ez = iz;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Y_AXIS].min edge */
-	if (inrange(axis_array[FIRST_Y_AXIS].min, iy, oy) && axis_array[FIRST_Y_AXIS].min != iy && axis_array[FIRST_Y_AXIS].min != oy) {
-	    x = ix + (axis_array[FIRST_Y_AXIS].min - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max)) {
-		*ex = x;
-		*ey = axis_array[FIRST_Y_AXIS].min;
-		*ez = iz;
-		return;
-	    }
-	}
-	/* does it intersect axis_array[FIRST_Y_AXIS].max edge */
-	if (inrange(axis_array[FIRST_Y_AXIS].max, iy, oy) && axis_array[FIRST_Y_AXIS].max != iy && axis_array[FIRST_Y_AXIS].max != oy) {
-	    x = ix + (axis_array[FIRST_Y_AXIS].max - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max)) {
-		*ex = x;
-		*ey = axis_array[FIRST_Y_AXIS].max;
-		*ez = iz;
-		return;
-	    }
-	}
-    }
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_X_AXIS), x, y, FIRST_Y_AXIS,
+			AXIS_ACTUAL_MIN(FIRST_X_AXIS), y, iz);
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_X_AXIS), x, y, FIRST_Y_AXIS,
+			AXIS_ACTUAL_MAX(FIRST_X_AXIS), y, iz);
+	INTERSECT_PLANE(AXIS_ACTUAL_MIN(FIRST_Y_AXIS), y, x, FIRST_X_AXIS,
+			x, AXIS_ACTUAL_MIN(FIRST_Y_AXIS), iz);
+	INTERSECT_PLANE(AXIS_ACTUAL_MAX(FIRST_Y_AXIS), y, x, FIRST_X_AXIS,
+			x, AXIS_ACTUAL_MAX(FIRST_Y_AXIS), iz);
+    } /* if(iz==oz) */
+#undef INTERSECT_PLANE
+
     /* really nasty general slanted 3D case */
 
-    /* does it intersect axis_array[FIRST_X_AXIS].min edge */
-    if (inrange(axis_array[FIRST_X_AXIS].min, ix, ox) && axis_array[FIRST_X_AXIS].min != ix && axis_array[FIRST_X_AXIS].min != ox) {
-	y = iy + (axis_array[FIRST_X_AXIS].min - ix) * ((oy - iy) / (ox - ix));
-	z = iz + (axis_array[FIRST_X_AXIS].min - ix) * ((oz - iz) / (ox - ix));
-	if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) && inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-	    *ex = axis_array[FIRST_X_AXIS].min;
-	    *ey = y;
-	    *ez = z;
-	    return;
-	}
-    }
-    /* does it intersect axis_array[FIRST_X_AXIS].max edge */
-    if (inrange(axis_array[FIRST_X_AXIS].max, ix, ox) && axis_array[FIRST_X_AXIS].max != ix && axis_array[FIRST_X_AXIS].max != ox) {
-	y = iy + (axis_array[FIRST_X_AXIS].max - ix) * ((oy - iy) / (ox - ix));
-	z = iz + (axis_array[FIRST_X_AXIS].max - ix) * ((oz - iz) / (ox - ix));
-	if (inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) && inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-	    *ex = axis_array[FIRST_X_AXIS].max;
-	    *ey = y;
-	    *ez = z;
-	    return;
-	}
-    }
-    /* does it intersect axis_array[FIRST_Y_AXIS].min edge */
-    if (inrange(axis_array[FIRST_Y_AXIS].min, iy, oy) && axis_array[FIRST_Y_AXIS].min != iy && axis_array[FIRST_Y_AXIS].min != oy) {
-	x = ix + (axis_array[FIRST_Y_AXIS].min - iy) * ((ox - ix) / (oy - iy));
-	z = iz + (axis_array[FIRST_Y_AXIS].min - iy) * ((oz - iz) / (oy - iy));
-	if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-	    *ex = x;
-	    *ey = axis_array[FIRST_Y_AXIS].min;
-	    *ez = z;
-	    return;
-	}
-    }
-    /* does it intersect axis_array[FIRST_Y_AXIS].max edge */
-    if (inrange(axis_array[FIRST_Y_AXIS].max, iy, oy) && axis_array[FIRST_Y_AXIS].max != iy && axis_array[FIRST_Y_AXIS].max != oy) {
-	x = ix + (axis_array[FIRST_Y_AXIS].max - iy) * ((ox - ix) / (oy - iy));
-	z = iz + (axis_array[FIRST_Y_AXIS].max - iy) * ((oz - iz) / (oy - iy));
-	if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(z, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
-	    *ex = x;
-	    *ey = axis_array[FIRST_Y_AXIS].max;
-	    *ez = z;
-	    return;
-	}
-    }
-    /* does it intersect axis_array[FIRST_Z_AXIS].min edge */
-    if (inrange(axis_array[FIRST_Z_AXIS].min, iz, oz) && axis_array[FIRST_Z_AXIS].min != iz && axis_array[FIRST_Z_AXIS].min != oz) {
-	x = ix + (axis_array[FIRST_Z_AXIS].min - iz) * ((ox - ix) / (oz - iz));
-	y = iy + (axis_array[FIRST_Z_AXIS].min - iz) * ((oy - iy) / (oz - iz));
-	if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-	    *ex = x;
-	    *ey = y;
-	    *ez = axis_array[FIRST_Z_AXIS].min;
-	    return;
-	}
-    }
-    /* does it intersect axis_array[FIRST_Z_AXIS].max edge */
-    if (inrange(axis_array[FIRST_Z_AXIS].max, iz, oz) && axis_array[FIRST_Z_AXIS].max != iz && axis_array[FIRST_Z_AXIS].max != oz) {
-	x = ix + (axis_array[FIRST_Z_AXIS].max - iz) * ((ox - ix) / (oz - iz));
-	y = iy + (axis_array[FIRST_Z_AXIS].max - iz) * ((oy - iy) / (oz - iz));
-	if (inrange(x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
-	    *ex = x;
-	    *ey = y;
-	    *ez = axis_array[FIRST_Z_AXIS].max;
-	    return;
-	}
-    }
+#define INTERSECT_DIAG(cut, axis, eff, eff_axis, eff2, eff2_axis,	\
+		       res_x, res_y, res_z)				\
+	do {								\
+	    if (inrange(cut, i##axis, o##axis)				\
+		&& cut != i##axis					\
+		&& cut != o##axis) {					\
+		eff = (cut - i##axis)					\
+		    * ((o##eff - i##eff) / (o##axis - i##axis))		\
+		    + i##eff;						\
+		eff2 = (cut - i##axis)					\
+		    * ((o##eff2 - i##eff2) / (o##axis - i##axis))	\
+		    + i##eff2;						\
+		if (IN_AXIS_RANGE(eff, eff_axis)			\
+		    && IN_AXIS_RANGE(eff2, eff2_axis)) {		\
+		    *ex = res_x;					\
+		    *ey = res_y;					\
+		    *ez = res_z;					\
+		    return;						\
+		}							\
+	    }								\
+	} while (0)
+
+    INTERSECT_DIAG(AXIS_ACTUAL_MIN(FIRST_X_AXIS), x,
+		   y, FIRST_Y_AXIS, z, FIRST_Z_AXIS,
+		   AXIS_ACTUAL_MIN(FIRST_X_AXIS), y, z);
+    INTERSECT_DIAG(AXIS_ACTUAL_MAX(FIRST_X_AXIS), x,
+		   y, FIRST_Y_AXIS, z, FIRST_Z_AXIS,
+		   AXIS_ACTUAL_MAX(FIRST_X_AXIS), y, z);
+
+    INTERSECT_DIAG(AXIS_ACTUAL_MIN(FIRST_Y_AXIS), y,
+		   x, FIRST_X_AXIS, z, FIRST_Z_AXIS,
+		   x, AXIS_ACTUAL_MIN(FIRST_Y_AXIS), z);
+    INTERSECT_DIAG(AXIS_ACTUAL_MAX(FIRST_Y_AXIS), y,
+		   x, FIRST_X_AXIS, z, FIRST_Z_AXIS,
+		   x, AXIS_ACTUAL_MAX(FIRST_Y_AXIS), z);
+
+    INTERSECT_DIAG(AXIS_ACTUAL_MIN(FIRST_Z_AXIS), z,
+		   x, FIRST_X_AXIS, y, FIRST_Y_AXIS,
+		   x, y, AXIS_ACTUAL_MIN(FIRST_Z_AXIS));
+    INTERSECT_DIAG(AXIS_ACTUAL_MAX(FIRST_Z_AXIS), z,
+		   x, FIRST_X_AXIS, y, FIRST_Y_AXIS,
+		   x, y, AXIS_ACTUAL_MAX(FIRST_X_AXIS));
+
+#undef INTERSECT_DIAG
+
     /* If we reach here, the inrange point is on the edge, and
      * the line segment from the outrange point does not cross any
      * other edges to get there. In this case, we return the inrange
@@ -532,7 +435,7 @@ two_edge3d_intersect(
     double *lx, double *ly, double *lz)	/* lx[2], ly[2], lz[2]: points where it crosses edges */
 {
     int count;
-    /* global axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max */
+    /* global axis_array[FIRST_{X,Y,Z}_AXIS].{min,max} */
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
     double iz = points[i - 1].z;
@@ -569,6 +472,7 @@ two_edge3d_intersect(
     if (count > 1) {
 	return (FALSE);
     }
+
     if (ox == -VERYLARGE || ix == -VERYLARGE) {
 	if (ix == -VERYLARGE) {
 	    /* swap points so ix/iy/iz don't have a -VERYLARGE component */
@@ -583,7 +487,10 @@ two_edge3d_intersect(
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (ix > axis_array[FIRST_X_AXIS].max && inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) && inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+
+	if (ix > axis_array[FIRST_X_AXIS].max
+	    && IN_AXIS_RANGE(iy, FIRST_Y_AXIS)
+	    && IN_AXIS_RANGE(iz, FIRST_Z_AXIS)) {
 	    lx[0] = axis_array[FIRST_X_AXIS].min;
 	    ly[0] = iy;
 	    lz[0] = iz;
@@ -611,7 +518,9 @@ two_edge3d_intersect(
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (iy > axis_array[FIRST_Y_AXIS].max && inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+	if (iy > axis_array[FIRST_Y_AXIS].max
+	    && IN_AXIS_RANGE(ix, FIRST_X_AXIS)
+	    && IN_AXIS_RANGE(iz, FIRST_Z_AXIS)) {
 	    lx[0] = ix;
 	    ly[0] = axis_array[FIRST_Y_AXIS].min;
 	    lz[0] = iz;
@@ -639,7 +548,9 @@ two_edge3d_intersect(
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (iz > axis_array[FIRST_Z_AXIS].max && inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) && inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
+	if (iz > axis_array[FIRST_Z_AXIS].max
+	    && IN_AXIS_RANGE(ix, FIRST_X_AXIS)
+	    && IN_AXIS_RANGE(iy, FIRST_Y_AXIS)) {
 	    lx[0] = ix;
 	    ly[0] = iy;
 	    lz[0] = axis_array[FIRST_Z_AXIS].min;
@@ -657,44 +568,52 @@ two_edge3d_intersect(
      * Quick outcode tests on the 3d graph volume
      */
 
-    /*
-     * test z coord first --- most surface OUTRANGE points generated between
-     * axis_array[FIRST_Z_AXIS].min and axis_array[FIRST_Z_AXIS].min (i.e. when ticslevel is non-zero)
+    /* test z coord first --- most surface OUTRANGE points generated
+     * between axis_array[FIRST_Z_AXIS].min and baseplane (i.e. when
+     * ticslevel is non-zero)
      */
-    if (GPMAX(iz, oz) < axis_array[FIRST_Z_AXIS].min || GPMIN(iz, oz) > axis_array[FIRST_Z_AXIS].max)
+    if (GPMAX(iz, oz) < axis_array[FIRST_Z_AXIS].min
+	|| GPMIN(iz, oz) > axis_array[FIRST_Z_AXIS].max)
 	return (FALSE);
 
-    if (GPMAX(ix, ox) < axis_array[FIRST_X_AXIS].min || GPMIN(ix, ox) > axis_array[FIRST_X_AXIS].max)
+    if (GPMAX(ix, ox) < axis_array[FIRST_X_AXIS].min
+	|| GPMIN(ix, ox) > axis_array[FIRST_X_AXIS].max)
 	return (FALSE);
 
-    if (GPMAX(iy, oy) < axis_array[FIRST_Y_AXIS].min || GPMIN(iy, oy) > axis_array[FIRST_Y_AXIS].max)
+    if (GPMAX(iy, oy) < axis_array[FIRST_Y_AXIS].min
+	|| GPMIN(iy, oy) > axis_array[FIRST_Y_AXIS].max)
 	return (FALSE);
 
-    /*
-     * Special horizontal/vertical, etc. cases are checked and remaining
-     * slant lines are checked separately.
+    /* Special horizontal/vertical, etc. cases are checked and
+     * remaining slant lines are checked separately.
      *
-     * The slant line intersections are solved using the parametric form
-     * of the equation for a line, since if we test x/y/z min/max planes explicitly
-     * then e.g. a  line passing through a corner point (x_min,y_min,z_min)
-     * actually intersects all 3 planes and hence further tests would be required
-     * to anticipate this and similar situations.
-     */
+     * The slant line intersections are solved using the parametric
+     * form of the equation for a line, since if we test x/y/z min/max
+     * planes explicitly then e.g. a line passing through a corner
+     * point (x_min,y_min,z_min) actually intersects all 3 planes and
+     * hence further tests would be required to anticipate this and
+     * similar situations. */
 
-    /*
-     * Can have case (ix == ox && iy == oy && iz == oz) as both points OUTRANGE
-     */
+    /* Can have case (ix == ox && iy == oy && iz == oz) as both points
+     * OUTRANGE */
     if (ix == ox && iy == oy && iz == oz) {
-	/* but as only define single outrange point, can't intersect 3D graph volume */
+	/* but as only define single outrange point, can't intersect
+	 * 3D graph volume */
 	return (FALSE);
     }
+
     if (ix == ox) {
 	if (iy == oy) {
 	    /* line parallel to z axis */
 
-	    /* x and y coords must be in range, and line must span both axis_array[FIRST_Z_AXIS].min and axis_array[FIRST_Z_AXIS].max */
-	    /* note that spanning axis_array[FIRST_Z_AXIS].min implies spanning axis_array[FIRST_Z_AXIS].max as both points OUTRANGE */
-	    if (!inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) || !inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
+	    /* x and y coords must be in range, and line must span
+	     * both FIRST_Z_AXIS->min and ->max.
+	     * 
+	     * note that spanning FIRST_Z_AXIS->min implies spanning
+	     * ->max as both points OUTRANGE */
+
+	    if (!IN_AXIS_RANGE(ix, FIRST_X_AXIS)
+		|| !IN_AXIS_RANGE(iy, FIRST_Y_AXIS)) {
 		return (FALSE);
 	    }
 	    if (inrange(axis_array[FIRST_Z_AXIS].min, iz, oz)) {
@@ -712,10 +631,8 @@ two_edge3d_intersect(
 	}
 	if (iz == oz) {
 	    /* line parallel to y axis */
-
-	    /* x and z coords must be in range, and line must span both axis_array[FIRST_Y_AXIS].min and axis_array[FIRST_Y_AXIS].max */
-	    /* note that spanning axis_array[FIRST_Y_AXIS].min implies spanning axis_array[FIRST_Y_AXIS].max, as both points OUTRANGE */
-	    if (!inrange(ix, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) || !inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+	    if (!IN_AXIS_RANGE(ix, FIRST_X_AXIS)
+		|| !IN_AXIS_RANGE(iz, FIRST_Z_AXIS)) {
 		return (FALSE);
 	    }
 	    if (inrange(axis_array[FIRST_Y_AXIS].min, iy, oy)) {
@@ -731,9 +648,10 @@ two_edge3d_intersect(
 	    } else
 		return (FALSE);
 	}
-	/* nasty 2D slanted line in a yz plane */
 
-	if (!inrange(ox, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max))
+
+	/* nasty 2D slanted line in a yz plane */
+	if (!IN_AXIS_RANGE(ox, FIRST_X_AXIS))
 	    return (FALSE);
 
 	t[0] = (axis_array[FIRST_Y_AXIS].min - iy) / (oy - iy);
@@ -766,23 +684,21 @@ two_edge3d_intersect(
 	ly[1] = iy + t_max * (oy - iy);
 	lz[1] = iz + t_max * (oz - iz);
 
-	/*
-	 * Can only have 0 or 2 intersection points -- only need test one coord
-	 */
-	if (inrange(ly[0], axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) &&
-	    inrange(lz[0], axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+	/* Can only have 0 or 2 intersection points -- only need test
+	 * one coord */
+	if (IN_AXIS_RANGE(ly[0], FIRST_Y_AXIS)
+	    && IN_AXIS_RANGE(lz[0], FIRST_Z_AXIS)) {
 	    return (TRUE);
 	}
 	return (FALSE);
     }
+
     if (iy == oy) {
 	/* already checked case (ix == ox && iy == oy) */
 	if (oz == iz) {
 	    /* line parallel to x axis */
-
-	    /* y and z coords must be in range, and line must span both axis_array[FIRST_X_AXIS].min and axis_array[FIRST_X_AXIS].max */
-	    /* note that spanning axis_array[FIRST_X_AXIS].min implies spanning axis_array[FIRST_X_AXIS].max, as both points OUTRANGE */
-	    if (!inrange(iy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) || !inrange(iz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+	    if (!IN_AXIS_RANGE(iy, FIRST_Y_AXIS)
+		|| !IN_AXIS_RANGE(iz, FIRST_Z_AXIS)) {
 		return (FALSE);
 	    }
 	    if (inrange(axis_array[FIRST_X_AXIS].min, ix, ox)) {
@@ -800,7 +716,7 @@ two_edge3d_intersect(
 	}
 	/* nasty 2D slanted line in an xz plane */
 
-	if (!inrange(oy, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max))
+	if (!IN_AXIS_RANGE(oy, FIRST_Y_AXIS))
 	    return (FALSE);
 
 	t[0] = (axis_array[FIRST_X_AXIS].min - ix) / (ox - ix);
@@ -836,18 +752,19 @@ two_edge3d_intersect(
 	/*
 	 * Can only have 0 or 2 intersection points -- only need test one coord
 	 */
-	if (inrange(lx[0], axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) &&
-	    inrange(lz[0], axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+	if (IN_AXIS_RANGE(lx[0], FIRST_X_AXIS)
+	    && IN_AXIS_RANGE(lz[0], FIRST_Z_AXIS)) {
 	    return (TRUE);
 	}
 	return (FALSE);
     }
     if (iz == oz) {
-	/* already checked cases (ix == ox && iz == oz) and (iy == oy && iz == oz) */
+	/* already checked cases (ix == ox && iz == oz) and (iy == oy
+	   && iz == oz) */
 
 	/* nasty 2D slanted line in an xy plane */
 
-	if (!inrange(oz, axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max))
+	if (!IN_AXIS_RANGE(oz, FIRST_Z_AXIS))
 	    return (FALSE);
 
 	t[0] = (axis_array[FIRST_X_AXIS].min - ix) / (ox - ix);
@@ -883,8 +800,8 @@ two_edge3d_intersect(
 	/*
 	 * Can only have 0 or 2 intersection points -- only need test one coord
 	 */
-	if (inrange(lx[0], axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) &&
-	    inrange(ly[0], axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)) {
+	if (IN_AXIS_RANGE(lx[0], FIRST_X_AXIS) 
+	    && IN_AXIS_RANGE(ly[0], FIRST_Y_AXIS)) {
 	    return (TRUE);
 	}
 	return (FALSE);
@@ -944,9 +861,9 @@ two_edge3d_intersect(
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
-    if (inrange(lx[0], axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max) &&
-	inrange(ly[0], axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max) &&
-	inrange(lz[0], axis_array[FIRST_Z_AXIS].min, axis_array[FIRST_Z_AXIS].max)) {
+    if (IN_AXIS_RANGE(lx[0], FIRST_X_AXIS) 
+	&& IN_AXIS_RANGE(ly[0], FIRST_Y_AXIS)
+	&& IN_AXIS_RANGE(lz[0], FIRST_Z_AXIS)) {
 	return (TRUE);
     }
     return (FALSE);

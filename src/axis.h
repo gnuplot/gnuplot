@@ -1,5 +1,5 @@
 /*
- * $Id: axis.h,v 1.39 2004/10/20 20:14:17 sfeam Exp $
+ * $Id: axis.h,v 1.40 2004/10/22 01:30:51 sfeam Exp $
  *
  */
 
@@ -427,6 +427,17 @@ do {									\
     } else								\
 	this->range_is_reverted = (this->range_flags & RANGE_REVERSE);	\
 } while(0)
+
+/* HBB NEW 20050316: macros to always access the actual minimum, even
+ * if 'set view map' or something else flipped things around behind
+ * our back */
+#define AXIS_ACTUAL_MIN(axis)				\
+    (axis_array[axis].range_flags & RANGE_REVERSE	\
+     ? axis_array[axis].max : axis_array[axis].min)
+
+#define AXIS_ACTUAL_MAX(axis)				\
+    (axis_array[axis].range_flags & RANGE_REVERSE	\
+     ? axis_array[axis].min : axis_array[axis].max)
 
 /* HBB 20000725: new macro, built upon ULIG's SAVE_WRITEBACK(axis),
  * but easier to use. Code like this occured twice, in plot2d and

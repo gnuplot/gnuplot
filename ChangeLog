@@ -1,3 +1,19 @@
+2005-03-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (AXIS_ACTUAL_MAX, AXIS_ACTUAL_MIN): New macros to
+	access range endpoints correctly, even if 'set view map' has mixed
+	up the internal status.
+
+	* src/util3d.c (IN_AXIS_RANGE): New macro, equivalent to calling
+	inrange() with the two endpoints of any given axis' range.  Makes
+	code a bit more readable.
+	(edge3d_intersect): New local macros INTERSECT_PLANE,
+	INTERSECT_DIAG to centralize lots of very similar code blocks.
+	Implement fix for clipping of -VERYLARGE points in the presence of
+	'set view map' reversed ranges, by using new axis.h macros.
+	(two_edge3d_intersect): Use new macro IN_AXIS_RANGE, reindent, for
+	readability.
+	
 2005-03-15  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.c (set_plot_with_palette): Fix displaying colorbox also for
