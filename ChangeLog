@@ -1,3 +1,12 @@
+2001-12-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/color.c: Fine tuning of the default color box size and
+	position (take in/out/mirror/scale of tics into account). Remove
+	the obsolete code of PUT_ZMINMAX_AROUND used before the cb-axis
+	has been implemented.
+
+	* src/pm3d.c: Remove obsolete comments.
+
 2001-12-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Routine do_event(): Disable event processing for 
@@ -22,8 +31,7 @@
 
 	* src/plot3d.c (eval_3dplots): Dito.
 
-	* src/misc.c (lp_parse): codestyle fixes.
-	
+	* src/misc.c (lp_parse): Codestyle fixes.
 
 2001-12-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -52,7 +60,7 @@
 
 	* src/eval.c src/fit.c src/plot.c src/os2/gclient.c
 	config/makefile.os2: Abandon EMX non-standard signal processing
-	model. Also avoid calling PM-term functions if it's not running
+	model. Also avoid calling PM-term functions if it's not running.
 
 2001-11-29  Petr Mikulik  <mikulik@physics.muni.cz>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.22 2001/10/10 14:27:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.23 2001/10/26 12:58:38 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -9,23 +9,16 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.22 2001/10/10 14:27:55 bro
  * Petr Mikulik, since December 1998
  * Copyright: open source as much as possible
  * 
- * What is here: #defines, global variables and declaration of routines for 
- * colours---required by the pm3d splotting mode and coloured filled contours.
- *
-]*/
-
-
-/*
- *
  * What is here:
  *   - Global variables declared in .h are initialized here
  *   - Palette routines
  *   - Colour box drawing
  *
- */
+ * This file is used only if PM3D is defined.
+ *
+]*/
 
 
-/** NOTICE: currently, this file is included only if PM3D is defined **/
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -44,7 +37,7 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.22 2001/10/10 14:27:55 bro
 #include "term_api.h"
 #include "util3d.h"
 #include "alloc.h"
-/* need to access used_pm3d_zmin, used_pm3d_zmax; */
+/* need to access used_pm3d_zmin, used_pm3d_zmax */
 
 /* COLOUR MODES - GLOBAL VARIABLES */
 
@@ -78,15 +71,10 @@ int supply_extended_color_specs = 0;
 /* Corners of the colour box. */
 unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
 
-/* #define PUT_ZMINMAX_AROUND - the old system of printing zmin,max labels around */
-
 /* Internal prototype declarations: */
 
 static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
 static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
-#ifdef PUT_ZMINMAX_AROUND
-static float color_box_text_displacement __PROTO((const char *str, int just));
-#endif
 void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, struct lp_style_type grid));
 
 /********************************************************************
@@ -448,7 +436,7 @@ cbtick_callback(axis, place, text, grid)
     if (text) {
 	if (color_box.rotation == 'h') {
 	    unsigned int y3 = cb_y_from - (term->v_char);
-	    y3 -= (int)( (term->v_tic) * (ticscale >= 0 && !tic_in ? ticscale : 1) * (tic_in ? 0.3 : 1.3 ) );
+	    if (len > 0) y3 -= len; /* add outer tics len */
 #if 1
 	    if (term->justify_text)
 		term->justify_text(CENTRE);
@@ -458,7 +446,7 @@ cbtick_callback(axis, place, text, grid)
 #endif
 	} else {
 	    unsigned int x3 = cb_x_to + (term->h_char);
-	    x3 += (int)( (term->h_tic) * (ticscale >= 0 && !tic_in ? ticscale : 1) * (tic_in ? 0.3 : 1.3) );
+	    if (len > 0) x3 += len; /* add outer tics len */
 #if 1
 	    if (term->justify_text)
 		term->justify_text(LEFT);
@@ -483,24 +471,6 @@ cbtick_callback(axis, place, text, grid)
     }
 }
 
-#ifdef PUT_ZMINMAX_AROUND
-static float
-color_box_text_displacement(const char *str, int just)
-{
-    if (JUST_TOP) {
-	if (just && strchr(str, '^') != NULL)	/* adjust it = sth like JUST_TOP */
-	    return 1.15;	/* the string contains upper index, so shift the string down */
-	else
-	    return 0.6;
-    } else {
-	if (strchr(str, '_') != NULL)	/* adjust it = sth like JUST_BOT */
-	    return 1.0;		/* the string contains lower index, so shift the string up */
-	else
-	    return 0.75;
-    }
-}
-#endif
-
 /*
    Finally the main colour smooth box drawing routine
  */
@@ -508,9 +478,6 @@ void
 draw_color_smooth_box()
 {
     double tmp;
-#ifdef PUT_ZMINMAX_AROUND
-    char s[64];
-#endif
     FILE *out = postscript_gpoutfile;	/* either gpoutfile or PSLATEX_auxfile */
 
     if (color_box.where == SMCOLOR_BOX_NO)
@@ -543,8 +510,22 @@ draw_color_smooth_box()
 	if (cb_y_from == cb_y_to || cb_x_from == cb_x_to) { /* map, i.e. plot with "set view 0,0 or 180,0" */
 	    dz = Y_AXIS.max - Y_AXIS.min;
 	    /* note: [0.04 0.25; 0.18 0.25] were the values before cbaxis */
-	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, &cb_x_from, &cb_y_from);
+	    map3d_xy(X_AXIS.max + dx * 0.025, Y_AXIS.min, base_z, & cb_x_from, &cb_y_from);
 	    map3d_xy(X_AXIS.max + dx * 0.075, Y_AXIS.max, ceiling_z, &cb_x_to, &cb_y_to);
+	}
+	/* now corrections for outer tics */
+	if (color_box.rotation == 'v') {
+	    int len = (tic_in ? -1 : 1) * ticscale * (term->h_tic); /* positive for outer tics */
+	    if (len > 0) {
+		if (CB_AXIS.ticmode & TICS_MIRROR) {
+		    cb_x_from += len;
+		    cb_x_to += len;
+		}
+		if (axis_array[FIRST_Y_AXIS].ticmode & TICS_MIRROR) {
+		    cb_x_from += len;
+		    cb_x_to += len;
+		}
+	    }
 	}
     }
 
@@ -583,64 +564,6 @@ draw_color_smooth_box()
 	    term_apply_lp_properties(&border_lp);
 	}
 
-#ifdef PUT_ZMINMAX_AROUND
-    /* And finally place text of min z and max z below and above wrt
-       colour box, respectively.
-       This is no more needed after the implementation of cbaxis, but we let it
-       here for studying purposes.
-     */
-
-    tmp = AXIS_DE_LOG_VALUE(COLOR_AXIS, CB_AXIS.min);
-#if 0
-    sprintf(s, "%g", tmp);
-#else /* format the label using `set format z` */
-    gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring, axis_array[FIRST_Z_AXIS].log_base, tmp);
-#endif
-    if (color_box.rotation == 'v') {
-	if (term->justify_text)
-	    term->justify_text(LEFT);
-	tmp = color_box_text_displacement(s, JUST_TOP);
-	(term->put_text) (cb_x_from, cb_y_from - term->v_char * tmp, s);
-    } else {
-	if (term->justify_text)
-	    term->justify_text(CENTRE);
-	if (cb_y_to > term->ymax / 2) {
-	    /* color box is somewhere at the top, draw the text below */
-	    tmp = color_box_text_displacement(s, JUST_TOP);
-	    (term->put_text) (cb_x_from, cb_y_from - term->v_char * tmp, s);
-	} else {
-	    /* color box is somewhere at the bottom, draw the text above */
-	    tmp = color_box_text_displacement(s, JUST_BOT);
-	    (term->put_text) (cb_x_from, cb_y_to + term->v_char * tmp, s);
-	}
-    }
-
-    tmp = AXIS_DE_LOG_VALUE(COLOR_AXIS, CB_AXIS.max);
-#if 0
-    sprintf(s, "%g", tmp);
-#else
-    gprintf(s, sizeof(s), axis_array[FIRST_Z_AXIS].formatstring,
-	    axis_array[FIRST_Z_AXIS].log_base, tmp);
-#endif
-    if (color_box.rotation == 'v') {
-	/* text was eventually already left-justified above */
-	tmp = color_box_text_displacement(s, JUST_BOT);
-	(term->put_text) (cb_x_from, cb_y_to + term->v_char * tmp, s);
-    } else {
-	if (term->justify_text)
-	    term->justify_text(CENTRE);
-	if (cb_y_to > term->ymax / 2) {
-	    tmp = color_box_text_displacement(s, JUST_TOP);
-	    /* color box is somewhere at the top, draw the text below */
-	    (term->put_text) (cb_x_to, cb_y_from - term->v_char * tmp, s);
-	} else {
-	    tmp = color_box_text_displacement(s, JUST_BOT);
-	    /* color box is somewhere at the top, draw the text below */
-	    (term->put_text) (cb_x_to, cb_y_to + term->v_char * tmp, s);
-	}
-    }
-#endif /* PUT_ZMINMAX_AROUND */
-
     /* draw tics */
     if (axis_array[COLOR_AXIS].ticmode) {
 	term_apply_lp_properties(&border_lp); /* border linetype */
@@ -654,8 +577,9 @@ draw_color_smooth_box()
 	setup_tics(COLOR_AXIS, 20);
 	gen_tics(COLOR_AXIS, cbtick_callback );
 
-	/* FIXME HBB 20011010: does this really make sense? : */
-	CB_AXIS.log = FALSE; /* disable cb-axis log, if set by the above */
+	/* log(cb) may have been set above if log(z), but log(cb) is not allowed 
+	   elsewhere unless somebody implements independent z and cb axes */
+	CB_AXIS.log = FALSE;
     }
 
     /* write the colour box label */
@@ -682,5 +606,3 @@ draw_color_smooth_box()
 
 
 #endif /* PM3D */
-
-/* eof color.c */
