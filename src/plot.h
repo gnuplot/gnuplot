@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.21 1999/09/24 15:36:50 lhecking Exp $
+ * $Id: plot.h,v 1.22 1999/10/01 14:54:34 lhecking Exp $
  *
  */
 
@@ -741,7 +741,7 @@ extern const char bug_email[];
 extern const char help_email[];
 
 /* Windows needs to redefine stdin/stdout functions */
-#ifdef _Windows
+#if defined(_Windows) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
 #endif
 
