@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.18 1999/09/14 15:25:06 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.19 1999/09/21 18:25:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -76,15 +76,18 @@ static double largest_polar_circle;
  * index with FIRST_X_AXIS etc
  * global because used in gen_tics, which graph3d also uses
  */
-char ticfmt[8][MAX_ID_LEN+1];	/* HBB 990106: fix buffer overrun */
-int timelevel[8];
-double ticstep[8];
+static char ticfmt[8][MAX_ID_LEN+1];
+static int timelevel[8];
+static double ticstep[8];
 
 double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
 int auto_array[AXIS_ARRAY_SIZE];
 TBOOLEAN log_array[AXIS_ARRAY_SIZE];
 double base_array[AXIS_ARRAY_SIZE];
 double log_base_array[AXIS_ARRAY_SIZE];
+
+/* HBB 990829 FIXME: this is never modified at all !?? */
+char default_font[MAX_ID_LEN+1] = "";	/* Entry font added by DJL */
 
 /* Define the boundary of the plot
  * These are computed at each call to do_plot, and are constant over
@@ -161,6 +164,10 @@ static void map_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
 			      double *m, int *p));
+static double make_ltic __PROTO((int, double));
+static double time_tic_just __PROTO((int, double));
+static void timetic_format __PROTO((int, double, double));
+
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -1122,8 +1129,8 @@ int y;
 }
 /*}}} */
 
-/*{{{  timetic_fmt() */
-void
+/*{{{  timetic_format() */
+static void
 timetic_format(axis, amin, amax)
 int axis;
 double amin, amax;
@@ -3622,7 +3629,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 }
 
 /* justify ticplace to a proper date-time value */
-double
+static double
 time_tic_just(level, ticplace)
 int level;
 double ticplace;
@@ -3679,7 +3686,7 @@ double ticplace;
 }
 
 /* make smalltics for time-axis */
-double
+static double
 make_ltic(tlevel, incr)
 int tlevel;
 double incr;

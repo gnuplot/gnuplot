@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.c,v 1.9 1999/06/14 19:19:45 lhecking Exp $
+ * $Id: datafile.h,v 1.1 1999/06/17 14:26:35 lhecking Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -37,19 +37,7 @@
 #ifndef GNUPLOT_DATAFILE_H
 # define GNUPLOT_DATAFILE_H
 
-/* public variables client might access */
-
-/* how many using columns were specified */
-extern int df_no_use_specs;
-extern int df_line_number;
-/* suggested x value if none given */
-extern int df_datum;
-/* is this a matrix splot */
-extern TBOOLEAN df_matrix;
-extern int df_eof;
-extern int df_timecol[];
-/* this is a binary file */
-extern TBOOLEAN df_binary;
+/* #if... / #include / #define collection: */
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */
@@ -59,10 +47,35 @@ extern TBOOLEAN df_binary;
 # endif
 #endif
 
+/* Variables of datafile.c needed by other modules: */
+
+/* how many using columns were specified */
+extern int df_no_use_specs;
+
+/* suggested x value if none given */
+extern int df_datum;
+
+/* is this a matrix splot */
+extern TBOOLEAN df_matrix;
+
+/* this is a binary file */
+extern TBOOLEAN df_binary;
+extern int df_eof;
+extern int df_line_number;
+extern int df_timecol[];
+extern struct udft_entry ydata_func; /* HBB 990829: moved from command.h */
+
+/* Prototypes of functions exported by datafile.c */
+
 int df_open __PROTO((int));
 int df_readline __PROTO((double [], int));
 void df_close __PROTO((void));
 int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *));
+
+void f_dollars __PROTO((union argument *x));
+void f_column  __PROTO((void));
+void f_valid   __PROTO((void));
+void f_timecolumn   __PROTO((void));
 
 #endif /* GNUPLOT_DATAFILE_H */

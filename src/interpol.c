@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.9 1999/08/07 17:21:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.10 1999/09/24 15:36:50 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -170,7 +170,6 @@ typedef double five_diag[5];
 static int next_curve __PROTO((struct curve_points * plot, int *curve_start));
 static int num_curves __PROTO((struct curve_points * plot));
 static double *cp_binomial __PROTO((int points));
-GP_INLINE static double s_pow __PROTO((double base, unsigned int exponent));
 static void eval_bezier __PROTO((struct curve_points * cp, int first_point,
 				 int num_points, double sr, coordval * px,
 				 coordval *py, double *c));
@@ -291,43 +290,6 @@ int points;
  * the double values holding the next x and y coordinates.
  * (MGR 1992)
  */
-
-/*
- * well, this routine runs faster with the 68040 striptease FPU
- * and it handles zeroes correctly - there had been some trouble with TC
- */
-
-GP_INLINE static double
-s_pow(base, exponent)
-double base;
-unsigned int exponent;
-{
-    double y;
-
-    if (exponent == 0)
-	return (1.0);
-    if (base == 0.0)
-	return (0.0);
-
-    /* consider i in binary = abcd
-     * x^i = x^(8a+4b+2c+d) = x^8a * x^4b * x^2b * x^d
-     *                      = a?x^2^2^2:1 * b?x^2^2:1 + ...
-     * so for each bit in exponent, square x, multiplying it into accumulator
-     *
-     */
-
-    y = 1;
-    while (exponent) {
-	if (exponent & 1)
-	    y *= base;
-	base *= base;
-	/* if exponent was signed, this could be trouble ! */
-	exponent >>= 1;
-    }
-
-    return (y);
-}
-
 
 static void
 eval_bezier(cp, first_point, num_points, sr, px, py, c)
@@ -967,7 +929,7 @@ struct curve_points *cp;
 {
     int first_point, num_points;
     int i, j, k;
-    double x, y, sux, slx, suy, sly;
+    double x = 0., y = 0., sux = 0., slx = 0., suy = 0., sly = 0.;
     enum coord_type dot;
 
 
@@ -985,7 +947,7 @@ struct curve_points *cp;
 		sly = cp->points[i].ylow;
 		dot = INRANGE;
 		if (cp->points[i].type != INRANGE)
-		    dot = UNDEFINED;	/* This means somthing other than usual *//* just signal to check if INRANGE */
+		    dot = UNDEFINED;	/* This means something other than usual *//* just signal to check if INRANGE */
 		k = 1;
 	    } else if (cp->points[i].x == x) {
 		y += cp->points[i].y;

@@ -193,7 +193,10 @@ int main (int argc, char *argv[])
 	LPTSTR  psCmdLine = NULL;
 	BOOL    bSuccess = FALSE;
 	
-	/* HBB 19990325, to allow pgnuplot < script > output.gif */
+#if !defined(_O_BINARY) && defined(O_BINARY)
+# define _O_BINARY O_BINARY
+# define _setmode setmode /* this is for BC4.5 ... */
+#endif
 	_setmode(fileno(stdout), _O_BINARY);
 
 	/* CRS: create the new command line, passing all of the command

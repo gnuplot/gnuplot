@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.5 1999/06/11 11:18:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.6 1999/06/19 20:52:04 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -36,6 +36,112 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.5 1999/06/11 11:18:53 lheck
 
 
 #include "plot.h"
+
+/* HBB 990829: the following was moved here, from plot.c, where is
+ * wasn't used, anyway... */
+
+struct udvt_entry udv_pi = { NULL, "pi", FALSE };
+/* first in linked list */
+struct udvt_entry *first_udv = &udv_pi;
+struct udft_entry *first_udf = NULL;
+
+/* The table of built-in functions */
+struct ft_entry GPFAR ft[] =
+{
+    /* internal functions: */
+    {"push", (FUNC_PTR) f_push},
+    {"pushc", (FUNC_PTR) f_pushc},
+    {"pushd1", (FUNC_PTR) f_pushd1},
+    {"pushd2", (FUNC_PTR) f_pushd2},
+    {"pushd", (FUNC_PTR) f_pushd},
+    {"call", (FUNC_PTR) f_call},
+    {"calln", (FUNC_PTR) f_calln},
+    {"lnot", (FUNC_PTR) f_lnot},
+    {"bnot", (FUNC_PTR) f_bnot},
+    {"uminus", (FUNC_PTR) f_uminus},
+    {"lor", (FUNC_PTR) f_lor},
+    {"land", (FUNC_PTR) f_land},
+    {"bor", (FUNC_PTR) f_bor},
+    {"xor", (FUNC_PTR) f_xor},
+    {"band", (FUNC_PTR) f_band},
+    {"eq", (FUNC_PTR) f_eq},
+    {"ne", (FUNC_PTR) f_ne},
+    {"gt", (FUNC_PTR) f_gt},
+    {"lt", (FUNC_PTR) f_lt},
+    {"ge", (FUNC_PTR) f_ge},
+    {"le", (FUNC_PTR) f_le},
+    {"plus", (FUNC_PTR) f_plus},
+    {"minus", (FUNC_PTR) f_minus},
+    {"mult", (FUNC_PTR) f_mult},
+    {"div", (FUNC_PTR) f_div},
+    {"mod", (FUNC_PTR) f_mod},
+    {"power", (FUNC_PTR) f_power},
+    {"factorial", (FUNC_PTR) f_factorial},
+    {"bool", (FUNC_PTR) f_bool},
+    {"dollars", (FUNC_PTR) f_dollars},	/* for using extension */
+    {"jump", (FUNC_PTR) f_jump},
+    {"jumpz", (FUNC_PTR) f_jumpz},
+    {"jumpnz", (FUNC_PTR) f_jumpnz},
+    {"jtern", (FUNC_PTR) f_jtern},
+
+/* standard functions: */
+    {"real", (FUNC_PTR) f_real},
+    {"imag", (FUNC_PTR) f_imag},
+    {"arg", (FUNC_PTR) f_arg},
+    {"conjg", (FUNC_PTR) f_conjg},
+    {"sin", (FUNC_PTR) f_sin},
+    {"cos", (FUNC_PTR) f_cos},
+    {"tan", (FUNC_PTR) f_tan},
+    {"asin", (FUNC_PTR) f_asin},
+    {"acos", (FUNC_PTR) f_acos},
+    {"atan", (FUNC_PTR) f_atan},
+    {"atan2", (FUNC_PTR) f_atan2},
+    {"sinh", (FUNC_PTR) f_sinh},
+    {"cosh", (FUNC_PTR) f_cosh},
+    {"tanh", (FUNC_PTR) f_tanh},
+    {"int", (FUNC_PTR) f_int},
+    {"abs", (FUNC_PTR) f_abs},
+    {"sgn", (FUNC_PTR) f_sgn},
+    {"sqrt", (FUNC_PTR) f_sqrt},
+    {"exp", (FUNC_PTR) f_exp},
+    {"log10", (FUNC_PTR) f_log10},
+    {"log", (FUNC_PTR) f_log},
+    {"besj0", (FUNC_PTR) f_besj0},
+    {"besj1", (FUNC_PTR) f_besj1},
+    {"besy0", (FUNC_PTR) f_besy0},
+    {"besy1", (FUNC_PTR) f_besy1},
+    {"erf", (FUNC_PTR) f_erf},
+    {"erfc", (FUNC_PTR) f_erfc},
+    {"gamma", (FUNC_PTR) f_gamma},
+    {"lgamma", (FUNC_PTR) f_lgamma},
+    {"ibeta", (FUNC_PTR) f_ibeta},
+    {"igamma", (FUNC_PTR) f_igamma},
+    {"rand", (FUNC_PTR) f_rand},
+    {"floor", (FUNC_PTR) f_floor},
+    {"ceil", (FUNC_PTR) f_ceil},
+
+    {"norm", (FUNC_PTR) f_normal},	/* XXX-JG */
+    {"inverf", (FUNC_PTR) f_inverse_erf},	/* XXX-JG */
+    {"invnorm", (FUNC_PTR) f_inverse_normal},	/* XXX-JG */
+    {"asinh", (FUNC_PTR) f_asinh},
+    {"acosh", (FUNC_PTR) f_acosh},
+    {"atanh", (FUNC_PTR) f_atanh},
+
+    {"column", (FUNC_PTR) f_column},	/* for using */
+    {"valid", (FUNC_PTR) f_valid},	/* for using */
+    {"timecolumn", (FUNC_PTR) f_timecolumn},	/* for using */
+
+    {"tm_sec", (FUNC_PTR) f_tmsec},	/* for timeseries */
+    {"tm_min", (FUNC_PTR) f_tmmin},	/* for timeseries */
+    {"tm_hour", (FUNC_PTR) f_tmhour},	/* for timeseries */
+    {"tm_mday", (FUNC_PTR) f_tmmday},	/* for timeseries */
+    {"tm_mon", (FUNC_PTR) f_tmmon},	/* for timeseries */
+    {"tm_year", (FUNC_PTR) f_tmyear},	/* for timeseries */
+    {"tm_wday", (FUNC_PTR) f_tmwday},	/* for timeseries */
+    {"tm_yday", (FUNC_PTR) f_tmyday},	/* for timeseries */
+
+    {NULL, NULL}
+};
 
 
 struct udvt_entry *

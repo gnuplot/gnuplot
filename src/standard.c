@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.4 1999/06/11 11:18:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.5 1999/06/11 18:54:15 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -35,11 +35,9 @@ static char *RCSid() { return RCSid("$Id: standard.c,v 1.4 1999/06/11 11:18:58 l
 ]*/
 
 #include "plot.h"
-#include "setshow.h" /* for ang2rad */
+#include "setshow.h"		/* for ang2rad (HBB 990826: and 'zero' */
+#include "internal.h"		/* HBB 990826: for 'stack' and 's_p' */
 
-extern struct value stack[STACK_DEPTH];
-extern int s_p;
-extern double zero;
 
 static double jzero __PROTO((double x));
 static double pzero __PROTO((double x));

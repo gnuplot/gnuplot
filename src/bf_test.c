@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.2 1999/06/10 19:59:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.3 1999/06/17 14:29:03 lhecking Exp $"); }
 #endif
 
 
@@ -25,9 +25,10 @@ static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.2 1999/06/10 19:59:18 lh
 #define GPFAR /**/
 #include "binary.h"
 #include "alloc.h"
+#include "help.h"		/* HBB 990828: FreeHelp() prototype */
+#include "util.h"		/* HBB 990828: int_error() prototype */
 
-void int_error __PROTO((int dummy, const char *error_text));
-float function __PROTO((int p, double x, double y));
+static float function __PROTO((int p, double x, double y));
 
 
 typedef struct {
@@ -36,9 +37,9 @@ typedef struct {
 } range;
 
 #define NUM_PLOTS 2
-range TheRange[] = {{-3,3,-2,2},
-                    {-3,3,-3,3},
-                    {-3,3,-3,3}};/* Sampling rate causes this to go from -3:6*/
+static range TheRange[] = {{-3,3,-2,2},
+			   {-3,3,-3,3},
+			   {-3,3,-3,3}}; /* Sampling rate causes this to go from -3:6*/
 
 /*---- Stubs to make this work without including huge libraries ----*/
 void
@@ -65,7 +66,8 @@ function(p, x, y)
 int p;
 double x, y;
 {
-    float t;
+    float t = 0;			/* HBB 990828: initialize */
+
     switch (p) {
     case 0:
 	t = 1.0 / (x * x + y * y + 1.0);

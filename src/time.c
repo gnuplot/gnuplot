@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.6 1999/06/22 11:57:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.7 1999/07/05 13:12:51 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -81,11 +81,26 @@ extern int ftime(struct timeb *);
 # define WEEK_SEC	604800.0
 # define DAY_SEC		86400.0
 
-/*forward decls */
-extern char *abbrev_month_names[];
-extern char *full_month_names[];
-extern char *abbrev_day_names[];
-extern char *full_day_names[];
+/* HBB 990826: moved definitions up here, to avoid 'extern' where
+ * it is neither wanted nor needed */
+char *abbrev_month_names[] =
+{ "jan", "feb", "mar", "apr", "may", "jun", "jul",
+  "aug", "sep", "oct", "nov", "dec"
+};
+
+char *full_month_names[] =
+{ "January", "February", "March", "April", "May",
+  "June", "July", "August", "September", "October",
+  "November", "December"
+};
+
+char *abbrev_day_names[] =
+{ "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
+
+char *full_day_names[] =
+{ "Sunday", "Monday", "Tuesday", "Wednesday",
+  "Thursday", "Friday", "Saturday"
+};
 
 #else /* TEST_TIME */
 
@@ -797,26 +812,6 @@ struct tm *tm;
 
 
 #ifdef TEST_TIME
-
-char *abbrev_month_names[] =
-{ "jan", "feb", "mar", "apr", "may", "jun", "jul",
-  "aug", "sep", "oct", "nov", "dec"
-};
-
-char *full_month_names[] =
-{ "January", "February", "March", "April", "May",
-  "June", "July", "August", "September", "October",
-  "November", "December"
-};
-
-char *abbrev_day_names[] =
-{ "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
-
-char *full_day_names[] =
-{ "Sunday", "Monday", "Tuesday", "Wednesday",
-  "Thursday", "Friday", "Saturday"
-};
-
 
 /* either print current time using supplied format, or read
  * supplied time using supplied format

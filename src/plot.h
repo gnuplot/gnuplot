@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.20 1999/09/14 15:27:41 lhecking Exp $
+ * $Id: plot.h,v 1.21 1999/09/24 15:36:50 lhecking Exp $
  *
  */
 
@@ -146,7 +146,6 @@ typedef int TBOOLEAN;
 
 
 #define MAX_AT_LEN 150		/* max number of entries in action table */
-#define STACK_DEPTH 100
 #define NO_CARET (-1)
 
 #ifdef DOS16
@@ -371,8 +370,6 @@ typedef double coordval;
 # define is_comment(c) ((c) == '#')
 # define is_system(c) ((c) == '!')
 #endif /* not VMS */
-
-#define top_of_stack stack[s_p]
 
 #ifndef RETSIGTYPE
 /* assume ANSI definition by default */
@@ -729,13 +726,7 @@ extern char *replot_line;
 extern struct lexical_unit *token;
 extern int token_table_size;
 extern int inline_num;
-extern struct ft_entry GPFAR ft[];	/* from plot.c */
-extern struct udft_entry *first_udf;
-extern struct udvt_entry *first_udv;
 extern TBOOLEAN interactive;
-extern char *infile_name;
-extern FILE *gpoutfile;
-extern const char *user_homedir;
 extern const char *user_shell;
 #if defined(ATARI) || defined(MTOS)
 extern const char *user_gnuplotpath;
@@ -798,7 +789,12 @@ extern const char help_email[];
 #include "command.h"
 #include "datafile.h"
 #include "graphics.h"
+#include "graph3d.h"		/* HBB 990826: new file */
+#include "internal.h"		/* HBB 990826: new file */
+#include "misc.h"		/* HBB 990826: new file */
 #include "parse.h"
+#include "plot2d.h"		/* HBB 990826: new file */
+#include "plot3d.h"		/* HBB 990826: new file */
 #include "util.h"
 #include "util3d.h"
 
@@ -817,5 +813,16 @@ extern const char help_email[];
 #else
 # define LP_DUMP(lp)
 #endif
+
+/* #if... / #include / #define collection: */
+
+/* Type definitions */
+
+/* Variables of plot.c needed by other modules: */
+
+/* Prototypes of functions exported by plot.c */
+
+void interrupt_setup __PROTO((void));
+void gp_expand_tilde __PROTO((char **));
 
 #endif /* GNUPLOT_PLOT_H */

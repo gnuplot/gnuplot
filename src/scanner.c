@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.10 1999/06/30 12:04:45 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.11 1999/07/09 21:03:26 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -306,7 +306,7 @@ int current;
     char *atari_tmpfile;
 # endif				/* !AMIGA_AC_5 */
     char *str, *pgm, *rest = NULL;
-    size_t pgm_len, rest_len;
+    size_t pgm_len, rest_len = 0;
 
 # ifdef VMS
     int chan, one = 1;
@@ -398,7 +398,7 @@ int current;
 static void
 substitute(strp, str_lenp, current)
 char **strp;
-int *str_lenp;
+size_t *str_lenp;
 int current;
 {
     int_error(t_num, "substitution not supported by %s", OS);

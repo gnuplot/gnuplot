@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.13 1999/08/07 17:21:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.14 1999/09/21 18:24:56 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -51,6 +51,8 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.13 1999/08/07 17:21:30 l
  */
 
 #include "plot.h"
+#include "graph3d.h"		/* HBB 990826: new file */
+#include "hidden3d.h"
 #include "setshow.h"
 
 static int p_height;
@@ -60,25 +62,24 @@ static int key_entry_height;	/* bigger of t->v_size, pointsize*t->v_tick */
 int suppressMove = 0;		/* to prevent moveto while drawing contours */
 
 /*
- * hidden_line_type_above, hidden_line_type_below - controls type of lines
- *   for above and below parts of the surface.
  * hidden_no_update - if TRUE lines will be hidden line removed but they
  *   are not assumed to be part of the surface (i.e. grid) and therefore
  *   do not influence the hidings.
  * hidden_active - TRUE if hidden lines are to be removed.
  */
 int hidden_active = FALSE;
-int hidden_no_update;		/* HBB 980324: made this visible despite LITE */
+int hidden_no_update;		
 
 /* LITE defines a restricted memory version for MS-DOS, which doesn't
  * use the routines in hidden3d.c
  */
 
-#ifndef LITE
-int hidden_line_type_above, hidden_line_type_below;
-#endif /* LITE */
+/* HBB 990826: hidden_line_type\(above|below\) were unused --> purged */
 
 double xscale3d, yscale3d, zscale3d;
+
+static void map3d_xy __PROTO((double x, double y, double z, unsigned int *xt, unsigned int *yt));
+/* static int map3d_z __PROTO((double x, double y, double z)); */
 
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
@@ -187,13 +188,12 @@ static int ktitle_lines = 0;
  * min3d_z:max3d_z  - apart from arrows, perhaps
  */
 
-double ceiling_z, floor_z, base_z;
+double floor_z;
+static double ceiling_z, base_z;
 
-/* and some bodges while making the change */
-#define min3d_z min_array[FIRST_Z_AXIS]
-#define max3d_z max_array[FIRST_Z_AXIS]
+/* HBB 990826: {min|max}3d_z #defines, and transform_matrix typedef
+ * moved to grahp3d.h */
 
-typedef double transform_matrix[4][4];
 transform_matrix trans_mat;
 
 static double xaxis_y, yaxis_x, zaxis_x, zaxis_y;
@@ -232,13 +232,6 @@ setlinestyle(style)
 struct lp_style_type style;
 {
     term_apply_lp_properties(&style);
-
-#ifndef LITE
-    if (hidden3d) {
-	hidden_line_type_above = style.l_type;
-	hidden_line_type_below = style.l_type;
-    }
-#endif /* LITE */
 }
 
 /* And the functions to map from user 3D space to terminal coordinates */
@@ -273,6 +266,7 @@ unsigned int *xt, *yt;
 
 
 
+#if 0 /* HBB 990829: unused! --> commented out */
 /* And the functions to map from user 3D space to terminal z coordinate */
 int
 map3d_z(x, y, z)
@@ -297,6 +291,7 @@ double x, y, z;
     zt = ((int) (res * 16384 / w));
     return zt;
 }
+#endif /* commented out */
 
 /* borders of plotting area */
 /* computed once on every call to do_plot */
@@ -744,13 +739,6 @@ int pcount;			/* count of plots in linked list */
 	    int lkey = (key != 0 && this_plot->title && this_plot->title[0]);
 	    term_apply_lp_properties(&(this_plot->lp_properties));
 
-#ifndef LITE
-	    if (hidden3d) {
-		hidden_line_type_above = this_plot->lp_properties.l_type;
-		hidden_line_type_below = this_plot->lp_properties.l_type + 1;
-	    }
-#endif /* not LITE */
-
 	    if (lkey) {
 		key_text(xl, yl, this_plot->title);
 	    }
@@ -837,8 +825,6 @@ int pcount;			/* count of plots in linked list */
 #ifndef LITE
 	if (hidden3d) {
 	    hidden_no_update = TRUE;
-	    hidden_line_type_above = this_plot->lp_properties.l_type + (hidden3d ? 2 : 1);
-	    hidden_line_type_below = this_plot->lp_properties.l_type + (hidden3d ? 2 : 1);
 	}
 #endif /* not LITE */
 
@@ -890,11 +876,6 @@ int pcount;			/* count of plots in linked list */
 		if (label_contours && cntrs->isNewLevel) {
 		    (*t->linetype) (linetypeOffset++);
 		    if (key) {
-
-#ifndef LITE
-			if (hidden3d)
-			    hidden_line_type_below = hidden_line_type_above = linetypeOffset - 1;
-#endif /* not LITE */
 
 			key_text(xl, yl, cntrs->label);
 

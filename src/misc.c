@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.16 1999/06/19 20:52:06 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.17 1999/07/30 19:34:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -35,7 +35,11 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.16 1999/06/19 20:52:06 lhec
 ]*/
 
 #include "plot.h"
+#include "misc.h"		/* HBB 990826: new file */
 #include "setshow.h"
+
+/* name of command file; NULL if terminal */
+char *infile_name = NULL;
 
 static int lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE * fp));
@@ -44,20 +48,20 @@ static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *coun
 /* State information for load_file(), to recover from errors
  * and properly handle recursive load_file calls
  */
-typedef struct lf_state_struct LFS;
-struct lf_state_struct {
+typedef struct lf_state_struct {
     FILE *fp;			/* file pointer for load file */
     char *name;			/* name of file */
     TBOOLEAN interactive;	/* value of interactive flag on entry */
     TBOOLEAN do_load_arg_substitution;	/* likewise ... */
     int inline_num;		/* inline_num on entry */
-    LFS *prev;			/* defines a stack */
+    struct lf_state_struct *prev;			/* defines a stack */
     char *call_args[10];	/* args when file is 'call'ed instead of 'load'ed */
-} *lf_head = NULL;		/* NULL if not in load_file */
+}  LFS;
+static LFS *lf_head = NULL;		/* NULL if not in load_file */
 
 /* these two could be in load_file, except for error recovery */
-extern TBOOLEAN do_load_arg_substitution;
-extern char *call_args[10];
+static TBOOLEAN do_load_arg_substitution = FALSE;
+static char *call_args[10] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 /*
  * cp_alloc() allocates a curve_points structure that can hold 'num'

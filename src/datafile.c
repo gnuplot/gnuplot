@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.11 1999/07/30 19:34:08 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.12 1999/08/07 17:21:30 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -140,6 +140,7 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.11 1999/07/30 19:34:08 
 /*}}} */
 
 #include "plot.h"
+#include "datafile.h"
 #include "binary.h"
 #include "setshow.h"
 
@@ -178,6 +179,11 @@ TBOOLEAN df_matrix = FALSE;	/* is this a matrix splot */
 int df_eof = 0;
 int df_timecol[NCOL];
 TBOOLEAN df_binary = FALSE;	/* this is a binary file */
+
+/* jev -- the 'thru' function --- NULL means no dummy vars active */
+/* HBB 990829: moved this here, from command.c */
+struct udft_entry ydata_func;
+
 
 /* private variables */
 
@@ -328,17 +334,25 @@ char *s;
 /*
  * optimizations by Corey Satten, corey@cac.washington.edu
  */
-	    if (fast_columns == 0 ||
-		df_no_use_specs > 0 && (use_spec[0].column == dfncp1 ||
-					df_no_use_specs > 1 && (use_spec[1].column == dfncp1 ||
-								df_no_use_specs > 2 &&
-								(use_spec[2].column == dfncp1 ||
-								 df_no_use_specs > 3 &&
-								 (use_spec[3].column == dfncp1 ||
-								  df_no_use_specs > 4 &&
-								  (use_spec[4].column == dfncp1 ||
-								   df_no_use_specs > 5))))) ||
-		df_no_use_specs == 0) {
+	    if ((fast_columns == 0)
+			|| (df_no_use_specs == 0)
+			|| (df_no_use_specs > 0)
+			&& (use_spec[0].column == dfncp1
+				|| df_no_use_specs > 1
+				&& (use_spec[1].column == dfncp1
+					|| df_no_use_specs > 2
+					&& (use_spec[2].column == dfncp1
+						|| df_no_use_specs > 3
+						&& (use_spec[3].column == dfncp1
+							|| df_no_use_specs > 4
+							&& (use_spec[4].column == dfncp1
+								|| df_no_use_specs > 5
+								)
+							)
+						)
+					)
+				)
+			) {
 
 #ifndef NO_FORTRAN_NUMS
 		count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);

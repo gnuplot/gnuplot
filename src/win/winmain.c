@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.1 1999/03/26 22:11:17 lhecking Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.2 1999/07/27 19:42:16 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -95,16 +95,18 @@ LPSTR szMenuName;
 #define HELPFILE "wgnuplot.hlp"
 #endif
 
+#if 0 /* HBB 990914: new names, and now decl'd in plot.h... */
 extern char version[];
 extern char patchlevel[];
 extern char date[];
+#endif /* 1/0 */
 /*extern char *authors[];*/
 char *authors[]={
                  "Colin Kelly",
                  "Thomas Williams"
                 };
  
-extern char gnuplot_copyright[];
+/* extern char gnuplot_copyright[]; */ /* HBB 990914: now decl'd in plot.h */
 void WinExit(void);
 int gnu_main(int argc, char *argv[], char *env[]);
 
@@ -219,7 +221,7 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	textwin.AboutText = (LPSTR)farmalloc(1024);
 	CheckMemory(textwin.AboutText);
 	sprintf(textwin.AboutText,"Version %s\nPatchlevel %s\nLast Modified %s\n%s\n%s, %s and many others",
-		version, patchlevel, date, gnuplot_copyright, authors[1], authors[0]);
+		gnuplot_version, gnuplot_patchlevel, gnuplot_date, gnuplot_copyright, authors[1], authors[0]);
 	textwin.AboutText = (LPSTR)farrealloc(textwin.AboutText, _fstrlen(textwin.AboutText)+1);
 	CheckMemory(textwin.AboutText);
 

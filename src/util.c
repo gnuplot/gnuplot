@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.15 1999/07/18 17:36:57 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.16 1999/07/20 15:28:27 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -545,7 +545,7 @@ va_dcl
 
 #ifdef VA_START
     VA_START(args, str);
-# if HAVE_VFPRINTF || _LIBC
+# if defined(HAVE_VFPRINTF) || _LIBC
     vfprintf(stderr, str, args);
 # else
     _doprnt(str, args, stderr);
@@ -601,7 +601,7 @@ va_dcl
 
 #ifdef VA_START
     VA_START(args, str);
-# if HAVE_VFPRINTF || _LIBC
+# if defined(HAVE_VFPRINTF) || _LIBC
     vfprintf(stderr, str, args);
 # else
     _doprnt(str, args, stderr);
@@ -647,7 +647,7 @@ va_dcl
     fputs("warning: ", stderr);
 #ifdef VA_START
     VA_START(args, str);
-# if HAVE_VFPRINTF || _LIBC
+# if defined(HAVE_VFPRINTF) || _LIBC
     vfprintf(stderr, str, args);
 # else
     _doprnt(str, args, stderr);

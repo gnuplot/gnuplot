@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.18 1999/08/11 18:09:11 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.19 1999/09/24 15:40:13 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -35,6 +35,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.18 1999/08/11 18:09:11 lh
 ]*/
 
 #include "plot.h"
+#include "plot2d.h"		/* HBB 990826: new file */
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
@@ -66,20 +67,8 @@ static struct udft_entry plot_func;
  * these are given symbolic names in plot.h
  */
 
-/* Deleted from setshow.h and renamed */
-extern FILE *gpoutfile;
-
 /* if user specifies [10:-10] we use [-10:10] internally, and swap at end */
 int reverse_range[AXIS_ARRAY_SIZE];
-
-/* info from datafile module */
-extern int df_datum;
-extern int df_line_number;
-extern int df_no_use_specs;
-extern int df_eof;
-extern int df_timecol[];
-extern TBOOLEAN df_binary;
-
 
 /*
  * IMHO, code is getting too cluttered with repeated chunks of
@@ -265,7 +254,7 @@ struct curve_points *this_plot;
  */
 {
     int i /* num. points ! */ , j;
-    int max_cols, min_cols;	/* allowed range of column numbers */
+    int max_cols, min_cols;    /* allowed range of column numbers */
     double v[NCOL];
     int storetoken = this_plot->token;
 
@@ -795,7 +784,7 @@ eval_plots()
 	    define();
 	} else {
 	    int x_axis = 0, y_axis = 0;
-	    int specs;
+	    int specs = 0;
 
 	    /* for datafile plot, record datafile spec for title */
 	    int start_token = c_token, end_token;
@@ -1090,7 +1079,7 @@ eval_plots()
 
 	/* call the controlled variable t, since x_min can also mean
 	 * smallest x */
-	double t_min, t_max, t_step;
+	double t_min = 0., t_max = 0., t_step = 0.;
 
 	if (parametric || polar) {
 	    if (!(uses_axis[FIRST_X_AXIS] & 1)) {

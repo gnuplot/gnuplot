@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.4 1999/06/11 11:18:55 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.5 1999/06/11 18:54:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -36,6 +36,7 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.4 1999/06/11 11:18:55 l
 
 
 #include "plot.h"
+#include "internal.h"		/* HBB 990826: new file */
 
 /* some machines have trouble with exp(-x) for large x
  * if MINEXP is defined at compile time, use gp_exp(x) instead,
@@ -56,9 +57,10 @@ TBOOLEAN undefined;
 
 static void int_check __PROTO((struct value * v));
 
-struct value stack[STACK_DEPTH];
-
-int s_p = -1;			/* stack pointer */
+/* The stack this operates on */
+static struct value stack[STACK_DEPTH];
+static int s_p = -1;		/* stack pointer */
+#define top_of_stack stack[s_p]
 
 
 /*

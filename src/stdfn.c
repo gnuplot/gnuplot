@@ -1,7 +1,6 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.4 1999/06/10 19:59:19 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.5 1999/06/19 20:55:05 lhecking Exp $"); }
 #endif
-
 
 /* GNUPLOT - stdfn.c */
 
@@ -416,7 +415,7 @@ size_t n;
  * based in misc.c(instring) */
 size_t
 gp_strcspn(str1, str2)
-const char *str1, str2;
+const char *str1, *str2;
 {
     char *s;
     size_t pos;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.8 1999/06/22 11:56:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.9 1999/07/20 15:27:48 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -186,6 +186,19 @@ char *path;
 
 }
 
+/* not set or shown directly, but controlled by 'set locale'
+ * defined in national.h
+ */
+
+char full_month_names[12][32] =
+{ FMON01, FMON02, FMON03, FMON04, FMON05, FMON06, FMON07, FMON08, FMON09, FMON10, FMON11, FMON12 };
+char abbrev_month_names[12][8] =
+{ AMON01, AMON02, AMON03, AMON04, AMON05, AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12 };
+
+char full_day_names[7][32] =
+{ FDAY0, FDAY1, FDAY2, FDAY3, FDAY4, FDAY5, FDAY6 };
+char abbrev_day_names[7][8] =
+{ ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
 
 char *
 locale_handler(action, newlocale)

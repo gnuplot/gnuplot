@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.6 1999/06/14 19:19:46 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.7 1999/06/19 20:52:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.6 1999/06/14 19:19:46 lhec
 #include "help.h"
 #include <setjmp.h>
 
-RETSIGTYPE fpe __PROTO((int an_int));
+static RETSIGTYPE fpe __PROTO((int an_int));
 static void extend_at __PROTO((void));
 static union argument *add_action __PROTO((enum operators sf_index));
 static void express __PROTO((void));
@@ -75,7 +75,7 @@ static jmp_buf fpe_env;
 
 #define dummy (struct value *) 0
 
-RETSIGTYPE
+static RETSIGTYPE
 fpe(an_int)
 int an_int;
 {

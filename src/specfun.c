@@ -1,7 +1,6 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.3 1999/06/11 11:18:58 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.4 1999/06/11 18:54:14 lhecking Exp $"); }
 #endif
-
 
 /* GNUPLOT - specfun.c */
 
@@ -44,11 +43,8 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.3 1999/06/11 11:18:58 lh
  */
 
 #include "plot.h"
-
-
-extern struct value stack[STACK_DEPTH];
-extern int s_p;
-extern double zero;
+#include "internal.h"		/* HBB 990826: for 'stack' and 's_p' */
+#include "setshow.h"		/* HBB 990826: for 'zero' */
 
 #define ITMAX   200
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.11 1999/08/07 17:21:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.12 1999/08/11 18:09:41 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -35,6 +35,7 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.11 1999/08/07 17:21:32 lh
 ]*/
 
 #include "plot.h"
+#include "plot3d.h"		/* HBB 990826: new file */
 #include "setshow.h"
 #include "binary.h"
 #include "matrix.h"
@@ -65,22 +66,6 @@ static struct udft_entry plot_func;
 
 /* some file-wide variables to store which axis we are using */
 static int x_axis, y_axis, z_axis;
-
-
-/* Deleted from setshow.h and renamed */
-extern FILE *gpoutfile;
-
-/* info from datafile module */
-extern int df_datum;
-extern int df_line_number;
-extern int df_no_use_specs;
-extern int df_eof;
-extern int df_timecol[];
-extern TBOOLEAN df_matrix;
-
-
-/* From plot2d.c */
-extern int reverse_range[];
 
 /*
  * IMHO, code is getting too cluttered with repeated chunks of

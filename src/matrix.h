@@ -1,4 +1,4 @@
-/* $Id: matrix.h,v 1.4 1998/04/14 00:16:01 drd Exp $ */
+/* $Id: matrix.h,v 1.2 1999/06/09 12:08:44 lhecking Exp $ */
 
 /*  NOTICE: Change of Copyright Status
  *
@@ -52,7 +52,6 @@ EXT int     *ivec __PROTO((int n));
 EXT double  **matr __PROTO((int r, int c));
 EXT void    free_matr __PROTO((double **m));
 EXT double  *redim_vec __PROTO((double **v, int n));
-EXT void    redim_ivec __PROTO((int **v, int n));
 EXT void    solve __PROTO((double **a, int n, double **b, int m));
 EXT void    Givens __PROTO((double **C, double *d, double *x,
 			double *r, int N, int n, int want_r)); 

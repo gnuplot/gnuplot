@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.9 1999/08/08 17:03:00 lhecking Exp $ */
+/* $Id: command.h,v 1.10 1999/09/24 15:35:59 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -45,7 +45,6 @@
  * The ultimate target is of course to eliminate global vars.
  */
 
-extern struct udft_entry ydata_func;
 extern struct udft_entry *dummy_func;
 extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
@@ -59,7 +58,7 @@ extern char HelpFile[];         /* patch for do_help  - AP */
 # endif                         /* DJGPP */
 # ifdef __TURBOC__
 #  ifndef _Windows
-extern unsigned _stklen = 16394;        /* increase stack size */
+/* HBB 990914: the 'extern unsigned __stklen' was wrong, here */
 extern char HelpFile[];         /* patch for do_help  - DJL */
 #  endif                        /* _Windows */
 # endif                         /* TURBOC */
@@ -89,7 +88,7 @@ extern int num_tokens, c_token;
 #define CAPTURE_FILENAME_AND_FOPEN(mode) \
   m_quote_capture(&save_file,c_token,c_token); \
   gp_expand_tilde(&save_file); \
-  fp = strcmp(save_file, "-") ? fopen(save_file, (mode)) : stdout;
+  fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, (mode)) : stdout;
 
 /**/
 void call_command __PROTO((void));
@@ -120,6 +119,17 @@ void reset_command __PROTO((void));
 void set_command __PROTO((void));
 void show_command __PROTO((void));
 void unset_command __PROTO((void));
+
+/* Prototypes for functions exported by command.c */
+void extend_input_line __PROTO((void));
+void extend_token_table __PROTO((void));
+int com_line __PROTO((void));
+int do_line __PROTO((void));
+#ifdef VMS                     /* HBB 990829: used only on VMS */
+void done __PROTO((int status));
+#endif
+void define __PROTO((void));
+void bail_to_command_line __PROTO((void));
 
 /**/
 #endif /* GNUPLOT_COMMAND_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.1 1999/08/17 15:53:38 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -37,13 +37,6 @@ static char *RCSid() { return RCSid("$Id: $"); }
 #include "plot.h"
 #include "setshow.h"
 #include "tables.h"
-
-/* From plot2d.c */
-extern struct curve_points *first_plot;
-/* From plot3d.c */
-extern struct surface_points *first_3dplot;
-/* From set.c */
-extern int range_flags[];
 
 static void unset_angles __PROTO((void));
 static void unset_arrow __PROTO((void));

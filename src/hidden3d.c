@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.9 1999/07/09 21:04:51 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.10 1999/08/11 18:14:24 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -54,30 +54,8 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.9 1999/07/09 21:04:51 l
 #include "tables.h"
 
 /* TODO (HBB's notes, just in case you're interested):
- * + fix all the problems I annotated by a 'FIXME' comment
- * + Find out which value EPSILON should have, and why
- * + Ask gnuplot-beta for a suitable way of concentrating
- *   all those 'VERYSMALL', 'EPSILON', and other numbers
- *   into one, consistent scheme, possibly based on
- *   <float.h>. E.g., I'd say that for most applications,
- *   the best 'epsilon' is either DBL_EPS or its square root.
- * + redo all the profiling, esp. to find out if TEST_GRIDCHECK = 1
- *   actually gains some speed, and if it is worth the memory
- *   spent to store the bit masks
- *   -> seems not improve speed at all, at least for my standard
- *   test case (mandd.gpl) it even slows it down by ~ 10%
- * + Evaluate the speed/memory comparison for storing vertex
- *   indices instead of (double) floating point constants
- *   to store {x|y}{min|max}
- * + remove those of my comments that are now pointless
- * + indent all that code
- * + try to really understand that 'hl_buffer' stuff...
- * + get rid of hardcoded things like sizeof(short) == 4,
- *   those 0x7fff terms and all that.
- * + restructure the hl_buffer storing method to make it more efficient
- * + Try to cut the speed decrease of this code rel. to the old hidden
- *   hidden line removal. (For 'mandd.gpl', it costs an overall
- *   factor of 9 compared with my older versions of gnuplot!)
+ * 990826: nothing left to do with this version. It's gonna be
+ * replaced with a new one, instead ...
  */
 
 /*************************/
@@ -191,25 +169,18 @@ static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.9 1999/07/09 21:04:51 l
 /* Variables to hold configurable values. This is meant to prepare for
  * making these settable by the user via 'set hidden [option]...' */
 
-int hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
-long hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
-int hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
-int hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
-int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
+static int hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
+static long hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
+static int hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
+static int hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
+static int hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 
 /* The functions to map from user 3D space into normalized -1..1 */
 #define map_x3d(x) ((x-min_array[FIRST_X_AXIS])*xscale3d-1.0)
 #define map_y3d(y) ((y-min_array[FIRST_Y_AXIS])*yscale3d-1.0)
 #define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
 
-extern int suppressMove;
-extern int xmiddle, ymiddle, xscaler, yscaler;
-extern double floor_z;
-
-extern int hidden_no_update, hidden_active;
-extern int hidden_line_type_above, hidden_line_type_below;
-
-extern double trans_mat[4][4];
+/* HBB 990826: moved all the external references to graph3d.h */
 
 /* Bitmap of the screen.  The array for each x value is malloc-ed as needed */
 /* HBB 961111: started parametrisation of type t_pnt, to prepare change from
@@ -2654,9 +2625,7 @@ struct Polygon GPHUGE *p;
     free_Cross_store = 0;
 
     /* now mark the area as being filled in the bitmap. */
-    /* HBB 971115: Yes, I do know that xmin_hl is unsigned, and the
-     * first test is thus useless. But I'd like to keep it anyway ;-) */
-    if (xmin_hl < 0 || xmax_hl > XREDUCE(xright) - XREDUCE(xleft))
+    if ( xmax_hl > XREDUCE(xright) - XREDUCE(xleft))
 	graph_error("Logic error #3 in hidden line");
     /* HBB 961110: lclint wanted these: */
     assert(ymin_hl != 0);

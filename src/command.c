@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.28 1999/09/21 18:24:38 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.29 1999/09/24 15:35:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -78,6 +78,10 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.28 1999/09/21 18:24:38 l
 # include <readline/history.h>
 #endif
 
+#if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) && !defined(_Windows)
+unsigned _stklen = 16394;        /* increase stack size */
+#endif /* MSDOS && TURBOC */
+
 #ifdef OS2
 extern int PM_pause(char *);            /* term/pm.trm */
 extern int ExecuteMacro(char *, int);   /* plot.c */
@@ -143,10 +147,6 @@ TBOOLEAN screen_ok;
 char *input_line;
 size_t input_line_len;
 int inline_num;			/* input line number */
-
-/* jev -- for passing data thru user-defined function */
-/* NULL means no dummy vars active */
-struct udft_entry ydata_func;
 
 struct udft_entry *dummy_func;
 
@@ -1130,6 +1130,16 @@ struct dsc$descriptor_s line_desc =
 $DESCRIPTOR(help_desc, Help);
 $DESCRIPTOR(helpfile_desc, "GNUPLOT$HELP");
 
+/* HBB 990829: confirmed this to be used on VMS, only --> moved into
+ * the VMS-specific section */
+void
+done(status)
+int status;
+{
+    term_reset();
+    exit(status);
+}
+
 /* please note that the vms version of read_line doesn't support variable line
    length (yet) */
 
@@ -1855,12 +1865,3 @@ winsystem(char *s)
 }
 #endif /* _Windows */
 
-
-/* is this really only ever used on VMS ? */
-void
-done(status)
-int status;
-{
-    term_reset();
-    exit(status);
-}

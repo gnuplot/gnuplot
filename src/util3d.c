@@ -1,7 +1,6 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.3 1999/06/11 11:18:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.4 1999/06/11 18:53:17 lhecking Exp $"); }
 #endif
-
 
 /* GNUPLOT - util3d.c */
 
@@ -48,24 +47,12 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.3 1999/06/11 11:18:59 lhe
 
 #include "plot.h"
 #include "setshow.h"
+#include "graph3d.h"		/* HBB 990826: new file */
 
-extern int hidden_active;	/* HBB 980324: hidden_no_update was unused here */
+/* HBB 990826: all that stuff referenced from other modules is now
+ * exported in graph3d.h, instead of being listed here */
 
-/* ACCESS THINGS THAT OUGHT TO BE HIDDEN IN hidden3d.c - perhaps we
- * can move the relevant code into hidden3d.c sometime
- */
-
-/* Bitmap of the screen.  The array for each x value is malloc-ed as needed */
-
-extern int suppressMove;
-
-/* for convenience while converting to use these arrays */
-#define min3d_z min_array[FIRST_Z_AXIS]
-#define max3d_z max_array[FIRST_Z_AXIS]
-
-typedef double transform_matrix[4][4];
-
-void
+static void
 mat_unit(mat)
 transform_matrix mat;
 {
@@ -79,6 +66,7 @@ transform_matrix mat;
 		mat[i][j] = 0.0;
 }
 
+#if 0 /* HBB 990829: unused --> commented out */
 void
 mat_trans(tx, ty, tz, mat)
 double tx, ty, tz;
@@ -89,6 +77,7 @@ transform_matrix mat;
     mat[3][1] = ty;
     mat[3][2] = tz;
 }
+#endif /* commented out */
 
 void
 mat_scale(sx, sy, sz, mat)
@@ -119,6 +108,7 @@ transform_matrix mat;
     mat[2][2] = cos_teta;
 }
 
+#if 0 /* HBB 990829: unused --> commented out */
 void
 mat_rot_y(teta, mat)
 double teta;
@@ -136,6 +126,7 @@ transform_matrix mat;
     mat[2][0] = sin_teta;
     mat[2][2] = cos_teta;
 }
+#endif /* commented out */
 
 void
 mat_rot_z(teta, mat)

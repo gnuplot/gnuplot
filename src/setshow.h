@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.17 1999/08/17 15:49:29 lhecking Exp $
+ * $Id: setshow.h,v 1.18 1999/08/24 11:23:25 lhecking Exp $
  *
  */
 
@@ -71,7 +71,7 @@ extern struct arrow_def *first_arrow;
 extern TBOOLEAN autoscale_x, autoscale_y, autoscale_z, autoscale_x2,
     autoscale_y2;
 extern TBOOLEAN autoscale_r, autoscale_t, autoscale_u, autoscale_v;
-extern TBOOLEAN autoscale_lt, autoscale_lu, autoscale_lv, autoscale_lx,
+extern TBOOLEAN autoscale_lu, autoscale_lv, autoscale_lx,
     autoscale_ly, autoscale_lz;
 extern double bar_size;
 
@@ -94,7 +94,6 @@ extern TBOOLEAN			clip_lines1;
 extern TBOOLEAN			clip_lines2;
 extern TBOOLEAN			draw_surface;
 extern char			dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
-extern char			default_font[]; /* Entry font added by DJL */
 extern char			xformat[];
 extern char			yformat[];
 extern char			zformat[];
@@ -169,7 +168,6 @@ extern int			contour_levels;
 extern double			zero; /* zero threshold, not 0! */
 extern int			levels_kind;
 extern double			*levels_list;
-extern int			max_levels;
 
 extern int			dgrid3d_row_fineness;
 extern int			dgrid3d_col_fineness;
@@ -228,12 +226,6 @@ extern struct linestyle_def *first_linestyle;
 
 extern int lmargin, bmargin,rmargin,tmargin; /* plot border in characters */
 
-extern char full_month_names[12][32];
-extern char abbrev_month_names[12][8];
-
-extern char full_day_names[7][32];
-extern char abbrev_day_names[7][8];
-
 /* The set and show commands, in setshow.c */
 void set_command __PROTO((void));
 void unset_command __PROTO((void));
@@ -244,7 +236,6 @@ enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
-void lp_use_properties __PROTO((struct lp_style_type *, int, int));
 void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));
 void delete_linestyle __PROTO((struct linestyle_def *, struct linestyle_def *));
 

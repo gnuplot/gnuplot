@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.14 1999/07/27 19:43:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.15 1999/09/14 15:25:05 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -69,9 +69,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.14 1999/07/27 19:43:32 lheck
 
 /* Just temporary */
 #if defined(VA_START) && defined(ANSI_C)
-void Dblfn __PROTO((const char *fmt, ...));
+static void Dblfn __PROTO((const char *fmt, ...));
 #else
-void Dblfn __PROTO(());
+static void Dblfn __PROTO(());
 #endif
 #define Dblf  Dblfn
 #define Dblf2 Dblfn
@@ -172,8 +172,6 @@ static double startup_lambda = 0, lambda_down_factor = LAMBDA_DOWN_FACTOR, lambd
 
 static RETSIGTYPE ctrlc_handle __PROTO((int an_int));
 static void ctrlc_setup __PROTO((void));
-static void printmatrix __PROTO((double **C, int m, int n));
-static void print_matrix_and_vectors __PROTO((double **C, double *d, double *r, int m, int n));
 static marq_res_t marquardt __PROTO((double a[], double **alpha, double *chisq,
 				     double *lambda));
 static TBOOLEAN analyze __PROTO((double a[], double **alpha, double beta[],
@@ -187,6 +185,9 @@ static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 static TBOOLEAN is_empty __PROTO((char *s));
 static TBOOLEAN is_variable __PROTO((char *s));
 static double getdvar __PROTO((const char *varname));
+static int getivar __PROTO((const char *varname));
+static void setvar __PROTO((char *varname, struct value data));
+static char *get_next_word __PROTO((char **s, char *subst)); 
 static double createdvar __PROTO((char *varname, double value));
 static void splitpath __PROTO((char *s, char *p, char *f));
 static void backup_file __PROTO((char *, const char *));
@@ -298,45 +299,7 @@ error_ex()
     bail_to_command_line();
 }
 
-
-/*****************************************************************
-    New utility routine: print a matrix (for debugging the alg.)
-*****************************************************************/
-static void
-printmatrix(C, m, n)
-double **C;
-int m, n;
-{
-    int i, j;
-
-    for (i = 0; i < m; i++) {
-	for (j = 0; j < n - 1; j++)
-	    Dblf2("%.8g |", C[i][j]);
-	Dblf2("%.8g\n", C[i][j]);
-    }
-    Dblf("\n");
-}
-
-/**************************************************************************
-    Yet another debugging aid: print matrix, with diff. and residue vector
-**************************************************************************/
-static void
-print_matrix_and_vectors(C, d, r, m, n)
-double **C;
-double *d, *r;
-int m, n;
-{
-    int i, j;
-
-    for (i = 0; i < m; i++) {
-	for (j = 0; j < n; j++)
-	    Dblf2("%8g ", C[i][j]);
-	Dblf3("| %8g | %8g\n", d[i], r[i]);
-    }
-    Dblf("\n");
-}
-
-
+/* HBB 990829: removed the debug print routines */
 /*****************************************************************
     Marquardt's nonlinear least squares fit
 *****************************************************************/
@@ -384,7 +347,6 @@ double *lambda;
 	for (i = 0; i < num_params; i++)
 	    for (j = 0; j < i; j++)
 		C[num_data + i][j] = 0, C[num_data + j][i] = 0;
-	/*printmatrix(C, num_data+num_params, num_params); */
 	return analyze_ret ? OK : ERROR;
     }
     /* once converged, free dynamic allocated vars */
@@ -412,13 +374,10 @@ double *lambda;
 	/* ... and low part of tmp_d */
 	tmp_d[num_data + i] = 0;
     }
-    /* printmatrix(tmp_C, num_data+num_params, num_params); */
 
     /* FIXME: residues[] isn't used at all. Why? Should it be used? */
 
     Givens(tmp_C, tmp_d, da, residues, num_params + num_data, num_params, 1);
-    /*print_matrix_and_vectors (tmp_C, tmp_d, residues,
-       num_params+num_data, num_params); */
 
     /* check if trial did ameliorate sum of squares */
 
@@ -609,7 +568,7 @@ fit_interrupt()
 		    (void) Gcomplex(&v, a[i], 0.0);
 		    setvar(par_name[i], v);
 		}
-		strcpy(input_line, tmp);
+		sprintf(input_line, tmp);
 		(void) do_line();
 	    }
 	}
@@ -751,12 +710,10 @@ double a[];
 
 	/* compute covar[][] directly from C */
 	Givens(C, 0, 0, 0, num_data, num_params, 0);
-	/*printmatrix(C, num_params, num_params); */
 
 	/* Use lower square of C for covar */
 	covar = C + num_data;
 	Invert_RtR(C, covar, num_params);
-	/*printmatrix(covar, num_params, num_params); */
 
 	/* calculate unscaled parameter errors in dpar[]: */
 	dpar = vec(num_params);
@@ -874,7 +831,7 @@ char *s;
 /*****************************************************************
     get next word of a multi-word string, advance pointer
 *****************************************************************/
-char *
+static char *
 get_next_word(s, subst)
 char **s;
 char *subst;
@@ -922,7 +879,7 @@ init_fit()
 	    Set a GNUPLOT user-defined variable
 ******************************************************************/
 
-void
+static void
 setvar(varname, data)
 char *varname;
 struct value data;
@@ -954,7 +911,7 @@ struct value data;
 /*****************************************************************
     Read INTGR Variable value, return 0 if undefined or wrong type
 *****************************************************************/
-int
+static int
 getivar(varname)
 const char *varname;
 {
@@ -1675,10 +1632,10 @@ kbhit()
  * Print msg to stderr and log file
  */
 #if defined(VA_START) && defined(ANSI_C)
-void
+static void
 Dblfn(const char *fmt, ...)
 #else
-void
+static void
 Dblfn(fmt, va_alist)
 const char *fmt;
 va_dcl
@@ -1688,7 +1645,7 @@ va_dcl
     va_list args;
 
     VA_START(args, fmt);
-# if HAVE_VFPRINTF || _LIBC
+# if defined(HAVE_VFPRINTF) || _LIBC
     vfprintf(STANDARD, fmt, args);
     vfprintf(log_f, fmt, args);
 # else

@@ -1,4 +1,4 @@
-/* $Id: fit.h,v 1.2 1999/06/09 12:08:44 lhecking Exp $ */
+/* $Id: fit.h,v 1.3 1999/06/19 20:52:46 lhecking Exp $ */
 
 /*  NOTICE: Change of Copyright Status
  *
@@ -29,18 +29,16 @@
  */
 
 
-#ifndef FIT_H		/* avoid multiple inclusions */
-#define FIT_H
+#ifndef GNUPLOT_FIT_H		/* avoid multiple inclusions */
+#define GNUPLOT_FIT_H
+
+/* #if... / #include / #define collection: */
 
 /* compatible with gnuplot philosophy */
 #define STANDARD stderr
 
 /* Suffix of a backup file */
 #define BACKUP_SUFFIX ".old"
-
-extern char fitbuf[];
-
-extern void error_ex __PROTO((void));
 
 /*****************************************************************
     Useful macros
@@ -50,4 +48,18 @@ extern void error_ex __PROTO((void));
 #define Eex2(a,b)   {sprintf (fitbuf+9, (a),(b));     error_ex ();}
 #define Eex3(a,b,c) {sprintf (fitbuf+9, (a),(b),(c)); error_ex ();}
 
-#endif /* FIT_H */
+/* Type definitions */
+
+/* Exported Variables of fit.c */
+
+extern char fitbuf[];
+
+/* Prototypes of functions exported by fit.c */
+
+extern void error_ex __PROTO((void));
+void init_fit __PROTO((void));
+void update __PROTO((char *pfile, char *npfile));
+void fit_command __PROTO((void));
+size_t wri_to_fil_last_fit_cmd __PROTO((FILE *fp));
+
+#endif /* GNUPLOT_FIT_H */

@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.5 1999/07/30 19:33:48 lhecking Exp $ */
+/* $Id: graphics.h,v 1.6 1999/08/07 17:21:09 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -36,18 +36,14 @@
 # define GNUPLOT_GRAPHICS_H
 
 /* Collect all global vars in one file.
- * The comments may go at a later date,
- * but are needed for reference now
- *
- * Maybe this should be split into separate files
- * for 2d/3d/parser/other?
+ * HBB 990829: *Don't!* 
+ * The comment below holds ... Lars
  *
  * The ultimate target is of course to eliminate global vars.
  * If possible. Over time. Maybe.
  */
 
 extern int xleft, xright, ybot, ytop;
-
 extern double xscale3d, yscale3d, zscale3d;
 
 /* Formerly in plot2d.c; where they don't belong */
@@ -56,6 +52,7 @@ extern int auto_array[AXIS_ARRAY_SIZE];
 extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
 extern double base_array[AXIS_ARRAY_SIZE];
 extern double log_base_array[AXIS_ARRAY_SIZE];
+extern char   default_font[];	/* Entry font added by DJL */
 
 /* for convenience while converting to use these arrays */
 #define x_min3d min_array[FIRST_X_AXIS]
@@ -67,7 +64,6 @@ extern double log_base_array[AXIS_ARRAY_SIZE];
 
 /* format for date/time for reading time in datafile */
 extern char timefmt[];
-
 extern int datatype[];
 
 /* function prototypes */
@@ -78,10 +74,7 @@ extern void graph_error __PROTO((const char *, ...));
 extern void graph_error __PROTO(());
 #endif
 extern void fixup_range __PROTO((int, const char *));
-extern void timetic_format __PROTO((int, double, double));
 extern void do_plot __PROTO((struct curve_points *, int));
-extern double time_tic_just __PROTO((int, double));
-extern double make_ltic __PROTO((int, double));
 extern int label_width __PROTO((const char *, int *));
 extern double set_tic __PROTO((double, int));
 extern void setup_tics __PROTO((int, struct ticdef *, char *, int));

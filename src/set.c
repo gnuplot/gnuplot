@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.23 1999/08/24 11:23:13 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.24 1999/09/14 15:25:54 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -44,7 +44,6 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.23 1999/08/24 11:23:13 lheck
 #include "stdfn.h"
 #include "setshow.h"
 #include "tables.h"
-#include "national.h"
 #include "alloc.h"
 
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
@@ -76,7 +75,6 @@ TBOOLEAN autoscale_r = DTRUE;
 TBOOLEAN autoscale_t = DTRUE;
 TBOOLEAN autoscale_u = DTRUE;
 TBOOLEAN autoscale_v = DTRUE;
-TBOOLEAN autoscale_lt = DTRUE;
 TBOOLEAN autoscale_lu = DTRUE;
 TBOOLEAN autoscale_lv = DTRUE;
 TBOOLEAN autoscale_lx = DTRUE;
@@ -98,7 +96,6 @@ TBOOLEAN clip_lines1 = TRUE;
 TBOOLEAN clip_lines2 = FALSE;
 TBOOLEAN draw_surface = TRUE;
 char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
-char default_font[MAX_ID_LEN+1] = "";	/* Entry font added by DJL */
 char xformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char yformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char zformat[MAX_ID_LEN+1] = DEF_FORMAT;
@@ -144,12 +141,12 @@ double log_base_log_y = 0.0;
 double log_base_log_z = 0.0;
 double log_base_log_x2 = 0.0;
 double log_base_log_y2 = 0.0;
-FILE *gpoutfile;
 char *outstr = NULL;		/* means "STDOUT" */
 TBOOLEAN parametric = FALSE;
 double pointsize = 1.0;
+
 int encoding;
-const char *encoding_names[] = { "default", "iso_8859_1", "cp437", "cp850", NULL };
+
 TBOOLEAN polar = FALSE;
 TBOOLEAN hidden3d = FALSE;
 TBOOLEAN label_contours = TRUE;	/* different linestyles are used for contours when set */
@@ -213,7 +210,7 @@ int contour_levels = 5;
 double zero = ZERO;		/* zero threshold, not 0! */
 int levels_kind = LEVELS_AUTO;
 double *levels_list;		/* storage for z levels to draw contours at */
-int max_levels = 0;		/* contour level capacity, before enlarging */
+static int max_levels = 0;	/* contour level capacity, before enlarging */
 
 int dgrid3d_row_fineness = 10;
 int dgrid3d_col_fineness = 10;
@@ -281,17 +278,9 @@ int tmargin = -1;
 /* string representing missing values in ascii datafiles */
 char *missing_val = NULL;
 
-/* date&time language conversions */
-/* extern struct dtconv *dtc; *//* HBB 980317: unused and not defined anywhere !? */
-
 /*** other things we need *****/
 
 /* input data, parsing variables */
-
-/* From plot2d.c */
-extern struct curve_points *first_plot;
-/* From plot3d.c */
-extern struct surface_points *first_3dplot;
 
 int key_hpos = TRIGHT;		/* place for curve-labels, corner or outside */
 int key_vpos = TTOP;		/* place for curve-labels, corner or below */
@@ -308,21 +297,6 @@ char timefmt[25] = TIMEFMT;
  * oh well, make first six compatible with FIRST_X_AXIS, etc
  */
 int datatype[DATATYPE_ARRAY_SIZE];
-
-/* not set or shown directly, but controlled by 'set locale'
- * defined in national.h
- */
-
-char full_month_names[12][32] =
-{ FMON01, FMON02, FMON03, FMON04, FMON05, FMON06, FMON07, FMON08, FMON09, FMON10, FMON11, FMON12 };
-char abbrev_month_names[12][8] =
-{ AMON01, AMON02, AMON03, AMON04, AMON05, AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12 };
-
-char full_day_names[7][32] =
-{ FDAY0, FDAY1, FDAY2, FDAY3, FDAY4, FDAY5, FDAY6 };
-char abbrev_day_names[7][8] =
-{ ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
-
 
 static void set_angles __PROTO((void));
 static void set_arrow __PROTO((void));
@@ -484,7 +458,6 @@ reset_command()
     autoscale_z = DTRUE;
     autoscale_x2 = DTRUE;
     autoscale_y2 = DTRUE;
-    autoscale_lt = DTRUE;
     autoscale_lu = DTRUE;
     autoscale_lv = DTRUE;
     autoscale_lx = DTRUE;
@@ -3273,7 +3246,7 @@ struct linestyle_def *prev, *this;
  * auxiliary functions for the `set linestyle` command
  */
 
-void
+static void
 lp_use_properties(lp, tag, pointflag)
 struct lp_style_type *lp;
 int tag, pointflag;

@@ -1,5 +1,5 @@
 /*
- * $Id: help.h,v 1.9 1998/03/22 22:31:45 drd Exp $
+ * $Id: help.h,v 1.2 1999/06/09 12:07:19 lhecking Exp $
  *
  */
 
@@ -41,12 +41,19 @@
 
 #include "ansichek.h"
 
+#include "plot.h"		/* HBB 990828: for TBOOLEAN */
+
 /* Exit status returned by help() */
 #define	H_FOUND		0	/* found the keyword */
 #define	H_NOTFOUND	1	/* didn't find the keyword */
 #define	H_ERROR		(-1)	/* didn't find the help file */
 
-int help __PROTO((char *keyword, char *path, int *subtopics));
-void FreeHelp __PROTO((void));	/* use this if you need memory */
+/* Prototypes from file "help.c" */
+
+int  help __PROTO((char *keyword, char *path, TBOOLEAN *subtopics));
+void FreeHelp __PROTO((void));
+void StartOutput __PROTO((void));
+void OutLine __PROTO((const char *line));
+void EndOutput __PROTO((void));
 
 #endif /* GNUPLOT_HELP_H */
