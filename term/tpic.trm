@@ -1,5 +1,5 @@
 /*
- * $Id: tpic.trm,v 1.19 1998/04/14 00:18:12 drd Exp $
+ * $Id: tpic.trm,v 1.9 1999/01/12 19:17:13 lhecking Exp $
  */
 
 /* GNUPLOT - tpic.trm */
@@ -962,6 +962,6 @@ START_HELP(tpic)
 " Specify own positioning (top here):",
 "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 " The other label -- account for long ticlabels:",
-"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'"
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
 END_HELP(tpic)
 #endif /* TERM_TABLE */

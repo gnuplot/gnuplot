@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.9 1998/12/15 20:21:36 lhecking Exp $
+ * $Id: latex.trm,v 1.9.2.1 1999/08/19 14:17:37 lhecking Exp $
  *
  */
 
@@ -862,11 +862,6 @@ START_HELP(latex)
 " in the latexsym package, which is part of the base distribution and thus part",
 " of any LaTeX implementation.  Please do not forget to use this package.",
 "",
-" Points are drawn with the LaTex commands \\Diamond and \\Box.  These",
-" commands do no longer belong to the LaTeX2e core, but are included in the",
-" latexsym-package in the base distribution, and are hence part of all LaTeX",
-" implementations. Please do not forget to use this package.",
-"",
 " Examples:",
 " About label positioning:",
 " Use gnuplot defaults (mostly sensible, but sometimes not really best):",
@@ -876,6 +871,6 @@ START_HELP(latex)
 " Specify own positioning (top here):",
 "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 " The other label -- account for long ticlabels:",
-"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'"
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'"
 END_HELP(latex)
 #endif /* TERM_TABLE */

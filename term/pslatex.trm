@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.15.2.5 2001/05/31 11:12:45 broeker Exp $
+ * $Id: pslatex.trm,v 1.15.2.6 2002/03/17 14:10:01 broeker Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -668,7 +668,7 @@ START_HELP(pslatex)
 " Specify own positioning (top here):",
 "        set xlabel '[t]{\\LaTeX\\ -- $ \\gamma $}'",
 " The other label -- account for long ticlabels:",
-"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'",
+"        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}}'",
 "",
 " Linewidths and pointsizes may be changed with `set linestyle`."
 END_HELP(pslatex)

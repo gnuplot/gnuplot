@@ -1,5 +1,5 @@
 /*
- * $Id: xlib.trm,v 1.12 1998/04/14 00:18:16 drd Exp $
+ * $Id: xlib.trm,v 1.7 1998/11/25 21:09:11 lhecking Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -162,7 +162,7 @@ START_HELP(xlib)
 "?term xlib",
 "?xlib",
 " The `xlib` terminal driver supports the X11 Windows System.  It generates",
-" gnulib_x11 commands.  `set term x11` behaves similarly to `set terminal xlib;",
+" gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;",
 " set output \"|gnuplot_x11\"`.  `xlib` has no options, but see `x11`."
 END_HELP(xlib)
 #endif
