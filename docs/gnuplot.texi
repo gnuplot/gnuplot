@@ -9248,6 +9248,7 @@ to you, depending on its output format.
 * Openstep_(next)::             
 * pbm::                         
 * dospc::                       
+* pdf::                         
 * png_(OLD)::                   
 * postscript_::                 
 * pslatex_and_pstex::           
@@ -9258,6 +9259,7 @@ to you, depending on its output format.
 * rgip::                        
 * sun::                         
 * sun_::                        
+* svg::                         
 * tek410x::                     
 * tek410x_::                    
 * table::                       
@@ -12146,7 +12148,7 @@ Examples:
 
 @end example
 
-@node dospc, png_(OLD), pbm, terminal
+@node dospc, pdf, pbm, terminal
 @subsubsection dospc
 
 @c ?commands set terminal dospc
@@ -12161,26 +12163,32 @@ Examples:
 The `dospc` terminal driver supports PCs with arbitrary graphics boards,
 which will be automatically detected.  It should be used only if you are
 not using the gcc or Zortec C/C++ compilers."
+
+@node pdf, png_(OLD), dospc, terminal
+@subsubsection pdf
+
+@c ?commands set terminal pdf
+@c ?set terminal pdf
+@c ?set term pdf
+@c ?terminal pdf
+@c ?term pdf
+@cindex pdf
+@tmindex pdf
+
+
+This terminal produces files in the Adobe Portable Document Format
+(PDF), useable for printing or display with tools like Acrobat Reader
+
+Syntax:
 @example
-   "1 pdf
-   "?commands set terminal pdf
-   "?set terminal pdf
-   "?set term pdf
-   "?terminal pdf
-   "?term pdf
-   "?pdf
-   " This terminal produces files in the Adobe Portable Document Format
-   " (PDF), useable for printing or display with tools like Acrobat Reader
-   "
-   " Syntax:
-   "       set terminal pdf @{fname "<font>"@} @{fsize <fontsize>@}
-   "
-   " where <font> is the name of the default font to use (default Helvetica)
-   " and <fontsize> is the font size (in points, default 12)"
+      set terminal pdf @{fname "<font>"@} @{fsize <fontsize>@}
 
 @end example
 
-@node png_(OLD), postscript_, dospc, terminal
+where <font> is the name of the default font to use (default Helvetica)
+and <fontsize> is the font size (in points, default 12)"
+
+@node png_(OLD), postscript_, pdf, terminal
 @subsubsection png (OLD)
 
 @c ?commands set terminal png (old)
@@ -12808,7 +12816,7 @@ puts six graphs on a page in three rows of two in portrait orientation."
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
 
-@node sun_, tek410x, sun, terminal
+@node sun_, svg, sun, terminal
 @subsubsection sun
 
 @c ?commands set terminal sun
@@ -12822,27 +12830,33 @@ options."
 
 The `sun` terminal driver supports the SunView window system.  It has no
 options."
+
+@node svg, tek410x, sun_, terminal
+@subsubsection svg
+
+@c ?commands set terminal svg
+@c ?set terminal svg
+@c ?set term svg
+@c ?terminal svg
+@c ?term svg
+@cindex svg
+@tmindex svg
+
+
+This terminal produces files in the W3C Scalable Vector Graphics format.
+
+Syntax:
 @example
-   "1 svg
-   "?commands set terminal svg
-   "?set terminal svg
-   "?set term svg
-   "?terminal svg
-   "?term svg
-   "?svg
-   " This terminal produces files in the W3C Scalable Vector Graphics format.
-   "
-   " Syntax:
-   "       set terminal svg @{size <x> <y>@}
-   "                        @{fname "<font>"@} @{fsize <fontsize>@}
-   "
-   " where <x> and <y> are the size of the SVG plot to generate,
-   " <font> is the name of the default font to use (default Arial) and
-   " <fontsize> is the font size (in points, default 12)"
+      set terminal svg @{size <x> <y>@}
+                       @{fname "<font>"@} @{fsize <fontsize>@}
 
 @end example
 
-@node tek410x, tek410x_, sun_, terminal
+where <x> and <y> are the size of the SVG plot to generate,
+<font> is the name of the default font to use (default Arial) and
+<fontsize> is the font size (in points, default 12)"
+
+@node tek410x, tek410x_, svg, terminal
 @subsubsection tek410x
 
 @c ?commands set terminal tek410x
@@ -13383,9 +13397,9 @@ The vgagl driver uses the first *available* vga mode from the following list:
  - G1152x864x256
  - G1360x768x256
  - G1600x1200x256
+
 @end example
 
-"
 
 @node VWS, windows, vgagl, terminal
 @subsubsection VWS
@@ -16307,7 +16321,7 @@ gnuplot-mode for GNU emacs and XEmacs. This version is based on
 the gnuplot.el file by Gershon Elber.
 While the gnuplot CVS repository has its own copy the most recent
 version of this package is available from
-@uref{http://feff.phys.washington.edu/~ravel/gnuplot/,http://feff.phys.washington.edu/~ravel/gnuplot
+@uref{http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/,http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/
 }
 
 
