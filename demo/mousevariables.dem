@@ -1,5 +1,5 @@
 #
-# $Id: mousevariables.dem,v 1.5 2004/05/03 18:22:59 sfeam Exp $
+# $Id: mousevariables.dem,v 1.6 2004/10/26 04:30:50 sfeam Exp $
 #
 # Demonstrate use of user variables 
 # MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2
@@ -72,5 +72,9 @@ reset
 set title "Echo keystrokes in plot window\nTerminate with <enter> or <tab>"
 plot sin(13*besj0(x))/x
 load "keystroke.dem"
+reset
+set label 1 "DONE" at 0,.1
+set yrange [0:.2]
+plot 0
 
 reset

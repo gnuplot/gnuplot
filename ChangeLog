@@ -1,3 +1,8 @@
+2005-01-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/mousevariables.dem demo/keystroke.dem: Fix incorrect termination
+	logic in the keystroke demo.
+
 2005-01-11  Harald Harders  <h.harders@tu-bs.de>
 
 	Apply updated SourceForge patch #1023783
