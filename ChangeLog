@@ -1,3 +1,10 @@
+2004-10-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.cyg config/config.mgw config/config.os2: Added #defines
+	EAM_DATASTRINGS and EAM_HISTOGRAMS.
+
+	* src/makefile.all: Added breaders.$(O) to COREOBJS.
+
 2004-10-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/x11.trm (X11_graphics): Initialize font-tracking variable at the

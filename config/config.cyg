@@ -17,6 +17,12 @@
 /* Define if this system uses a 32-bit DOS extender (djgpp/emx). */
 /* #undef DOS32 */
 
+/* Define to allow string-handling in datafiles. */
+#define EAM_DATASTRINGS 1
+
+/* Define to enable histograms plot style. */
+#define EAM_HISTOGRAMS 1
+
 /* Define if color information should be passed for each vertex. */
 #undef EXTENDED_COLOR_SPECS
 
