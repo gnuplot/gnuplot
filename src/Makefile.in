@@ -101,7 +101,7 @@ AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
 bitmap.h command.c command.h contour.c datafile.c datafile.h eval.c fit.c \
 fit.h graph3d.c graphics.c graphics.h help.c help.h hidden3d.c internal.c \
-interpol.c matrix.c matrix.h misc.c national.h parse.c plot.c plot.h \
+interpol.c matrix.c matrix.h misc.c national.h parse.c parse.h plot.c plot.h \
 plot2d.c plot3d.c protos.h readline.c scanner.c set.c setshow.h show.c \
 specfun.c standard.c stdfn.c stdfn.h syscfg.h term.c term.h time.c util.c \
 util.h util3d.c util3d.h variable.c variable.h version.c
@@ -132,12 +132,12 @@ rgipgnu win x11.opt $(OTHER_SOURCES)
 O = o
 T = $(top_srcdir)/term/
 
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
-datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
-hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) parse.$(O) \
-plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) scanner.$(O) set.$(O) \
-show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) time.$(O) \
-util.$(O) util3d.$(O) variable.$(O)
+COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) cmd.$(O) command.$(O) \
+contour.$(O) datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) \
+help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) \
+parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) scanner.$(O) \
+set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) term.$(O) \
+time.$(O) util.$(O) util3d.$(O) variable.$(O)
 
 
 # List of terminal driver sources
