@@ -111,18 +111,6 @@ extern char HelpFile[80] ;      /* patch for do_help  - DJL */
 # define STDOUT 1
 #endif
 
-#ifndef HELPFILE
-# if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
-#  define HELPFILE "gnuplot.gih"
-# else
-#  if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5)
-#   define HELPFILE "S:gnuplot.gih"
-#  else
-#   define HELPFILE "docs/gnuplot.gih"	/* changed by makefile */
-#  endif /* AMIGA_SC_6_1 || AMIGA_AC_5 */
-# endif /* MSDOS || OS2 || DOS386 */
-#endif				/* HELPFILE */
-
 #ifdef _Windows
 # include <windows.h>
 # ifdef __MSC__
