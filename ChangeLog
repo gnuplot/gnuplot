@@ -5,7 +5,8 @@
 
 2004-07-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* demo/Makefile.am.in: Add labelplot.pdb to Makefile.am target.
+	* demo/Makefile.am.in: Add labelplot.pdb and nearmap.csv to
+	Makefile.am target.
 
 2004-07-19  Ethan Merritt  <merritt@u.washington.edu>
 
