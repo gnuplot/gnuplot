@@ -1,5 +1,5 @@
 /*
- * $Id: variable.h,v 1.2 1999/06/09 12:07:44 lhecking Exp $
+ * $Id: variable.h,v 1.3 1999/06/14 19:22:42 lhecking Exp $
  *
  */
 
@@ -84,7 +84,6 @@ extern char *loadpath_handler __PROTO((int, char *));
 extern char *locale_handler __PROTO((int, char *));
 
 #define init_loadpath()    loadpath_handler(ACTION_INIT,NULL)
-#define show_loadpath()    loadpath_handler(ACTION_SHOW,NULL)
 #define set_loadpath(path) loadpath_handler(ACTION_SET,(path))
 #define get_loadpath()     loadpath_handler(ACTION_GET,NULL)
 #define save_loadpath()    loadpath_handler(ACTION_SAVE,NULL)
@@ -95,7 +94,6 @@ extern char *locale_handler __PROTO((int, char *));
 #define INITIAL_LOCALE ("C")
 
 #define init_locale()      locale_handler(ACTION_INIT,NULL)
-#define show_locale()      locale_handler(ACTION_SHOW,NULL)
 #define set_locale(path)   locale_handler(ACTION_SET,(path))
 #define get_locale()       locale_handler(ACTION_GET,NULL)
 #define save_locale()      locale_handler(ACTION_SAVE,NULL)
