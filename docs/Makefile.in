@@ -61,14 +61,16 @@ INSTALL_DATA = @INSTALL_DATA@
 CC     = @CC@
 CPP    = @CPP@
 DEFS   = @DEFS@
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 CPPFLAGS = @CPPFLAGS@
 CFLAGS = @CFLAGS@
 INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/term -I.
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
-LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(CFLAGS) $(LDFLAGS) -o $@
 
 .c.o:
 	$(COMPILE) -c $<
@@ -94,23 +96,23 @@ PDFLATEX = @PDFLATEX@
 # substitute your DVI to PostScript conversion program here
 DVIPS = @DVIPS@
 
-T = ${srcdir}/../term
-CORETERM = $(T)/aed.trm $(T)/ai.trm $(T)/amiga.trm $(T)/apollo.trm \
-$(T)/atariaes.trm $(T)/atarivdi.trm $(T)/be.trm $(T)/cgi.trm $(T)/cgm.trm \
-$(T)/corel.trm $(T)/debug.trm $(T)/djsvga.trm $(T)/dumb.trm $(T)/dxf.trm \
-$(T)/dxy.trm $(T)/eepic.trm $(T)/emf.trm $(T)/emxvga.trm $(T)/epslatex.trm \
-$(T)/epson.trm $(T)/excl.trm $(T)/fg.trm $(T)/fig.trm $(T)/gif.trm \
-$(T)/gnugraph.trm $(T)/gpic.trm $(T)/gpr.trm $(T)/grass.trm $(T)/hp26.trm \
-$(T)/hp2648.trm $(T)/hp500c.trm $(T)/hpgl.trm $(T)/hpljii.trm $(T)/hppj.trm \
-$(T)/imagen.trm $(T)/iris4d.trm $(T)/kyo.trm $(T)/latex.trm $(T)/linux.trm \
-$(T)/mac.trm $(T)/metafont.trm $(T)/metapost.trm $(T)/mgr.trm $(T)/mif.trm \
-$(T)/multitos.trm $(T)/next.trm $(T)/openstep.trm $(T)/pbm.trm $(T)/pc.trm \
-$(T)/pdf.trm $(T)/pm.trm $(T)/png.trm $(T)/post.trm $(T)/pslatex.trm \
-$(T)/pstricks.trm $(T)/qms.trm $(T)/regis.trm $(T)/rgip.trm $(T)/sun.trm \
-$(T)/svg.trm $(T)/t410x.trm $(T)/table.trm $(T)/tek.trm $(T)/texdraw.trm \
-$(T)/tgif.trm $(T)/tkcanvas.trm $(T)/tpic.trm $(T)/unixpc.trm \
-$(T)/unixplot.trm $(T)/v384.trm $(T)/vws.trm $(T)/win.trm $(T)/x11.trm \
-$(T)/xlib.trm
+T = $(top_srcdir)/term/
+CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
+$(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm $(T)cgm.trm \
+$(T)corel.trm $(T)debug.trm $(T)djsvga.trm $(T)dumb.trm $(T)dxf.trm \
+$(T)dxy.trm $(T)eepic.trm $(T)emf.trm $(T)emxvga.trm $(T)epslatex.trm \
+$(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm $(T)gd.trm $(T)ggi.trm \
+$(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm $(T)grass.trm \
+$(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm $(T)hpgl.trm $(T)hpljii.trm \
+$(T)hppj.trm $(T)imagen.trm $(T)iris4d.trm $(T)jpeg.trm $(T)kyo.trm \
+$(T)latex.trm $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
+$(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)openstep.trm \
+$(T)pbm.trm $(T)pc.trm $(T)pdf.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
+$(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm $(T)rgip.trm \
+$(T)sun.trm $(T)svg.trm $(T)t410x.trm $(T)table.trm $(T)tek.trm \
+$(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm $(T)tpic.trm $(T)unixpc.trm \
+$(T)unixplot.trm $(T)v384.trm $(T)vgagl.trm $(T)vws.trm $(T)win.trm \
+$(T)x11.trm $(T)xlib.trm
 
 DIST_COMMON = README Makefile.in
 
@@ -126,16 +128,16 @@ makefile.dst titlepag.ms titlepag.tex toc_entr.sty old psdoc
 
 CLEANFILES = doc2tex gnuplot.tex gnuplot.dvi gnuplot.aux gnuplot.log \
 gnuplot.toc gnuplot.pdf gnuplot.ps gpcard.dvi gpcard.log gpcard.ps alldoc2gih \
-doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.html gnuplot.info* doc2ipf \
-gnuplot.ipf doc2ms gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf \
+doc2gih gnuplot.gih doc2hlp gnuplot.hlp gnuplot.html gnuplot.info* gnuplot.out \
+doc2ipf gnuplot.ipf doc2ms gnuplot.ms doc2rnh gnuplot.rnh doc2rtf gnuplot.rtf \
 gnuplot.nroff checkdoc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
 allterm.h: $(CORETERM)
 	@echo "Building allterm.h"
-	@cat $(top_srcdir)/term/*.trm > allterm.c
-	$(CPP) -I$(top_srcdir)/term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
+	@cat ../config.h $(CORETERM) > allterm.c
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
 	  sed '/^ *$$/d;/^#/d' > allterm.h
 	@rm -f allterm.c
 
