@@ -593,7 +593,9 @@ int count;
 	    top_margin = y2label_textheight;
 
 	top_margin += x2tic_height + x2tic_textheight;
-/* FIXME: what is this additional space reservation for??? */
+	/* x2tic_height and x2tic_textheight are computed as only the
+	 *     relevant heights, but they nonetheless need a blank
+	 *     space above them  */
 	if (top_margin > x2tic_height)
 	    top_margin += (int) (t->v_char);
 
@@ -845,6 +847,11 @@ int count;
 	xleft += (timelabel_textwidth > ylabel_textwidth ? timelabel_textwidth : ylabel_textwidth)
 	    + ytic_width + ytic_textwidth;
 
+	/* make sure xleft is wide enough for a negatively
+	 * x-offset horizontal timestamp
+	 */
+	if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
+	xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
 	if (xleft == (t->xmax) * xoffset) {
 	    /* make room for end of xtic or x2tic label */
 	    xleft += (int) ((t->h_char) * 2);
@@ -854,11 +861,6 @@ int count;
     } else
 	xleft += (int) (lmargin * (t->h_char));
 
-    /* make sure xleft is wide enough for a negatively
-     * x-offset horizontal timestamp
-     */
-    if (!vertical_timelabel && xleft - ytic_width - ytic_textwidth < -(int) (timelabel.xoffset * (t->h_char)))
-	xleft = ytic_width + ytic_textwidth - (int) (timelabel.xoffset * (t->h_char));
     /*  end of xleft calculation }}} */
 
 
@@ -942,8 +944,6 @@ int count;
 		/* too tall */
 		ytop = ybot + required * (xright - xleft);
 	    } else {
-		/* HBB: y2label_x wasn't defined yet, and would be
-		 * overwritten later */
 		xright = xleft + (ytop - ybot) / required;
 	    }
 	}
@@ -973,18 +973,14 @@ int count;
     if (tmargin < 0 && x2tics & TICS_ON_BORDER && vertical_x2tics) {
 	widest_tic = 0;		/* reset the global variable ... */
 	gen_tics(SECOND_X_AXIS, &x2ticdef, 0, 0, 0.0, widest2d_callback);
-/* HBB: redid this: remove rough guess value first. Among other reasons,
- * I suspected the '-4 lines' of the original code to be in error, as the
- * original calc. of x2tic_textheight uses *5* lines */
 	ytop += x2tic_textheight;
-/* Now compute a new one and use that instead: */
+	/* Now compute a new one and use that instead: */
 	x2tic_textheight = (int) ((t->h_char) * (widest_tic));
 	ytop -= x2tic_textheight;
     }
     if (bmargin < 0 && xtics & TICS_ON_BORDER && vertical_xtics) {
 	widest_tic = 0;		/* reset the global variable ... */
 	gen_tics(FIRST_X_AXIS, &xticdef, 0, 0, 0.0, widest2d_callback);
-/* HBB: same changes as for tmargin/ytop above */
 	ybot -= xtic_textheight;
 	xtic_textheight = (int) ((t->h_char) * widest_tic);
 	ybot += xtic_textheight;
