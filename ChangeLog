@@ -9,7 +9,7 @@
 
 	* src/set.c src/unset.c: Call gp_strdup() rather than strdup() as
 	otherwise the test in ./configure is pointless, and gnuplot fails
-	to link.
+	to link on systems without strdup().
 
 	* term/x11.trm: Redefine VMS-only macro to allow if/then/else
 	constructs: GO(x) = do {} while (0)
