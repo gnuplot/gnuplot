@@ -1,5 +1,5 @@
 /*
- * $Id: doc2x.h,v 1.5 1999/10/01 14:15:48 lhecking Exp $
+ * $Id: doc2x.h,v 1.6 1999/11/08 19:24:52 lhecking Exp $
  *
  */
 
@@ -39,21 +39,6 @@
 # define DOCS_DOC2X_H
 
 #include "stdfn.h"		/* HBB 990828: safe_strncpy() prototype */
-
-#if 0 /* HBB 991022: stdfn.h reads in plot.h. already defines TBOOLEAN */
-/* TRUE or FALSE */
-typedef int TBOOLEAN;
-
-#ifdef TRUE
-# undef TRUE
-#endif
-#define TRUE 1
-
-#ifdef FALSE
-# undef FALSE
-#endif
-#define FALSE 0
-#endif
 
 /* Various defines and macros */
 #ifndef MAX_LINE_LEN
