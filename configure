@@ -5062,8 +5062,8 @@ rm -f conftest*
 fi
 
 
-echo $ac_n "checking for CPPFLAGS variable""... $ac_c" 1>&6
-echo "configure:5067: checking for CPPFLAGS variable" >&5
+echo $ac_n "checking CPPFLAGS variable""... $ac_c" 1>&6
+echo "configure:5067: checking CPPFLAGS variable" >&5
 if eval "test \"`echo '$''{'gp_cv_prog_make_cppflags'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5071,8 +5071,8 @@ else
 fi
 
 echo "$ac_t""$gp_cv_prog_make_cppflags" 1>&6
-echo $ac_n "checking for TERMLIBS variable""... $ac_c" 1>&6
-echo "configure:5076: checking for TERMLIBS variable" >&5
+echo $ac_n "checking TERMLIBS variable""... $ac_c" 1>&6
+echo "configure:5076: checking TERMLIBS variable" >&5
 if eval "test \"`echo '$''{'gp_cv_prog_make_termlibs'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
