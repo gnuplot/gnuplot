@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.96 2004/01/11 20:06:57 sfeam Exp $
+ * $Id: x11.trm,v 1.97 2004/02/18 21:40:35 sfeam Exp $
  *
  */
 
@@ -1978,8 +1978,6 @@ START_HELP(x11)
 "?set term x11 pm3d_resources",
 "?x11 pm3d_resources",
 "?pm3d_resources",
-"?help x11 pm3d_resources",
-"?help x11 pm3d",
 " Choosing the appropriate visual class and number of colors is a crucial",
 " point in X11 applications and a bit awkward, since X11 supports six visual",
 " types in different depths.",
