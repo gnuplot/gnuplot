@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.40 2002/07/02 19:36:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.41 2002/07/11 10:24:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1305,10 +1305,6 @@ df_3dmatrix(this_plot, need_palette)
 	    df_column[0].datum = ct ? ct[col] : col;
 	    df_column[2].datum = dmatrix[row][col];
 
-#ifdef PM3D
-	    if (df_no_use_specs != 4)
-		used[3] = used[2]; /* 3 parameters of `using` => color-value equals z-value */
-#endif
 	    /*{{{  pass through using spec */
 	    for (i = 0; i < use_spec_34; ++i) {
 		int column = use_spec[i].column;
@@ -1330,6 +1326,10 @@ df_3dmatrix(this_plot, need_palette)
 		    used[i] = df_column[column - 1].datum;
 	    }
 	    /*}}} */
+#ifdef PM3D
+	    if (df_no_use_specs != 4)
+		used[3] = used[2]; /* 3 parameters of `using` => 4th color-value equals z-value */
+#endif
 
 	    point->type = INRANGE;	/* so far */
 
