@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.65 2002/11/27 20:45:35 lhecking Exp $
+ * $Id: x11.trm,v 1.66 2002/12/07 18:39:23 lhecking Exp $
  *
  */
 
@@ -1584,12 +1584,14 @@ START_HELP(x11)
 "@end table"
 #ifdef PM3D
 , "",
-"2 pm3d_resources",
+"2 x11 pm3d_resources",
 "?commands set terminal x11 pm3d_resources",
 "?set terminal x11 pm3d_resources",
 "?set term x11 pm3d_resources",
 "?x11 pm3d_resources",
 "?pm3d_resources",
+"?help x11 pm3d_resources",
+"?help x11 pm3d",
 " Choosing the appropriate visual class and number of colors is a crucial",
 " point in X11 applications and a bit awkward, since X11 supports six visual",
 " types in different depths.",
