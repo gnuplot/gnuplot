@@ -1,5 +1,5 @@
 /*
- * $Id: svg.trm,v 1.22 2002/12/17 13:32:56 lhecking Exp $
+ * $Id: svg.trm,v 1.23 2003/03/06 17:15:29 broeker Exp $
  *
  */
 
@@ -966,22 +966,15 @@ SVG_set_color(double gray)
 TERM_PUBLIC void
 SVG_filled_polygon(int points, gpiPoint* corners)
 {
+    int i;
     SVG_GroupFilledOpen();
-
-    if (4 != points) {
-	fprintf(stderr,
-	       	"** ERROR SVG_filled_polygon supports only 4 points (file %s, line %d)",
-	       	__FILE__, __LINE__);
-	return;
-    }
-
     fputs("\t\t<polygon ", gpoutfile);
     SVG_StyleFillColor();
-    fprintf(gpoutfile, " points = '%d,%d %d,%d %d,%d %d,%d'/>\n",
-	    corners[0].x, term->ymax - corners[0].y,
-	    corners[1].x, term->ymax - corners[1].y,
-	    corners[2].x, term->ymax - corners[2].y,
-	    corners[3].x, term->ymax - corners[3].y);
+    fputs(" points = '", gpoutfile);
+    for (i = 0; i < points; i++)
+        fprintf(gpoutfile, "%d,%d%s", 
+	    corners[i].x, term->ymax - corners[i].y, (i % 16 == 15 ? "\n" : " "));
+    fputs("'/>\n", gpoutfile);
 }
 
 /*------------------------------------------------------------------------------------------------------------------------------------
