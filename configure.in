@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.82 2000/03/28 21:27:40 lhecking Exp $
+dnl $Id: configure.in,v 1.83 2000/03/30 14:13:23 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.82 $)
+AC_REVISION($Revision: 1.83 $)
 
 VERSION="`cat $srcdir/VERSION`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
@@ -121,6 +121,12 @@ dnl use mouse for x11 interface
 AC_ARG_ENABLE(mouse,dnl
 [  --enable-mouse          enable mouse for the x11 terminal (EXPERIMENTAL)],,
 test -z "$enable_mouse" && enable_mouse=no
+)dnl
+
+dnl new Enhanced Metafile Format driver
+AC_ARG_ENABLE(emf,dnl
+[  --enable-emf            enable Enhanced Metafile Format driver (EXPERIMENTAL)],,
+test -z "$enable_emf" && enable_emf=no
 )dnl
 
 dnl use a different x11 driver name ?
@@ -481,6 +487,11 @@ if test "$enable_mouse" = yes; then
             [ Define if you want to have mouse support for the x11 terminal. ])
 fi
 
+if test "$enable_emf" = yes; then
+  AC_DEFINE(USE_EMF_DRIVER, 1,
+            [ Define if you want to use the experimental Enhanced Metafile Format driver. ])
+fi
+
 dnl Substitute variables
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
@@ -517,6 +528,9 @@ else
   TUTORIAL=tutorial
 fi
 AC_SUBST(TUTORIAL)
+
+dnl for pdf format docs
+AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile
@@ -582,6 +596,9 @@ if test "$with_row_help" = yes; then
 else
   AC_MSG_RESULT([  Sort help/subtopic tables by column])
 fi
+
+test "$enable_emf" = yes &&\
+  AC_MSG_RESULT([  Enable Enhanced Metafile Format terminal (EXPERIMENTAL)])
 
 test "$enable_iris" = yes && \
   AC_MSG_RESULT([  Enable IRIS terminal])
