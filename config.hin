@@ -51,7 +51,7 @@
 /* Define if this is an MSDOS system with djgpp.  */
 #undef MSDOS
 
-/* Define if you do not want to read .gnuplotrc in the current directory.  */
+/* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
 /* Define if you do not have the atexit function.  */
@@ -173,6 +173,9 @@
 
 /* Define if you have the <sys/systeminfo.h> header file.  */
 #undef HAVE_SYS_SYSTEMINFO_H
+
+/* Define if you have the <sys/utsname.h> header file.  */
+#undef HAVE_SYS_UTSNAME_H
 
 /* Define if you have the <termios.h> header file.  */
 #undef HAVE_TERMIOS_H

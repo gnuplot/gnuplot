@@ -57,9 +57,9 @@ AC_ARG_WITH(png,dnl
 with_png=yes
 )dnl
 
-dnl Use the .gnuplotrc file
+dnl Use .gnuplot file in current directory
 AC_ARG_WITH(cwdrc,dnl
-[  --with-cwdrc            check current directory for .gnuplotrc file,
+[  --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons],
 if test "$withval" = no; then AC_DEFINE(NOCWDRC) fi, AC_DEFINE(NOCWDRC)
 )dnl
@@ -160,6 +160,7 @@ dnl
 AC_CHECK_HEADERS(sys/bsdtypes.h sys/select.h)
 AC_CHECK_HEADERS(sys/systeminfo.h, AC_CHECK_FUNCS(sysinfo))
 AC_CHECK_HEADER(sys/types.h, , AC_DEFINE(NO_SYS_TYPES_H))
+AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(libc.h malloc.h)
 AC_CHECK_HEADERS(termios.h, ,AC_CHECK_HEADERS(sgtty.h))
 dnl

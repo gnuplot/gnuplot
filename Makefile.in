@@ -386,6 +386,9 @@ uninstall:
 command.o: command.c fit.h help.h setshow.h
 	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 
+show.o: show.c plot.h setshow.h
+	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
+
 term.o: term.c term.h $(CORETERM)
 	$(CC) -c $(TERMFLAGS) $(INCLUDES) $(CPPFLAGS) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
 

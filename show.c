@@ -582,6 +582,10 @@ show_two()
 	else if (almost_equals(c_token,"ve$rsion")) {
 		show_version();
 		c_token++;
+		if (almost_equals(c_token,"l$ong")) {
+		       show_version_long();
+		       c_token++;
+		}
 	}
 	else if (almost_equals(c_token,"xr$ange")) {
 		(void) putc('\n',stderr);
@@ -1527,6 +1531,82 @@ show_version()
 	fprintf(stderr, "\n");
 	fprintf(stderr, "\n\tSend comments and requests for help to %s", help_email);
 	fprintf(stderr, "\n\tSend bugs, suggestions and mods to %s\n", bug_email);
+}
+
+void
+show_version_long ()
+{
+#ifdef HAVE_SYS_UTSNAME_H
+	struct utsname uts;
+
+	/* something is fundamentally wrong if this fails ... */
+	if (uname (&uts) > -1) {
+		puts ("");
+#ifdef _AIX
+		printf ("System: %s %s.%s", uts.sysname, uts.version, uts.release);
+#elif defined (SCO)
+		printf ("System: SCO %s", uts.release);
+#else
+		printf ("System: %s %s", uts.sysname, uts.release);
+#endif
+	}
+	else {
+		puts ("");
+		puts (OS);
+	}
+
+#else /* ! HAVE_SYS_UTSNAME_H */
+
+	puts ("");
+	puts (OS);
+
+#endif /* HAVE_SYS_UTSNAME_H */
+
+	puts ("\nCompile options:");
+
+	puts (
+#ifdef READLINE
+	      "+READLINE  "
+#else
+	      "-READLINE  "
+#endif
+
+#ifdef GNU_READLINE
+	      "+GNU_READLINE  "
+#else
+	      "-GNU_READLINE  "
+#endif
+
+#ifdef HAVE_LIBGD
+	      "+LIBGD  "
+#else
+	      "-LIBGD  "
+#endif
+
+#ifdef HAVE_LIBPNG
+	      "+LIBPNG  "
+#else
+	      "-LIBPNG  "
+#endif
+
+#ifdef LINUXVGA
+	      "+LINUXVGA  "
+#endif
+
+#ifdef NOCWDRC
+	      "+NOCWDRC  "
+#else
+	      "-NOCWDRC  "
+#endif
+
+#ifdef X11
+	      "+X11  "
+#endif
+	      );
+
+	printf ("HELPFILE=\"%s\"\n", HELPFILE);
+	printf ("CONTACT=<%s>\n", bug_email);
+	printf ("HELPMAIL=<%s>\n", help_email);
 }
 
 static void

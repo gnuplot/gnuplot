@@ -1,56 +1,45 @@
 /*
- * $Id: setshow.h,v 1.37 1997/05/19 08:10:20 drd Exp $
+ * $Id: setshow.h,v 1.39 1998/04/14 00:16:18 drd Exp $
  *
  */
 
 /* GNUPLOT - setshow.h */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- *
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
+
+/* for show_version_long() */
+#ifdef HAVE_SYS_UTSNAME_H
+#include <sys/utsname.h>
+#endif
 
 #ifndef DEFAULT_TIMESTAMP_FORMAT
 #define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
@@ -89,6 +78,7 @@ extern double			boxwidth;
 extern TBOOLEAN			clip_points;
 extern TBOOLEAN			clip_lines1;
 extern TBOOLEAN			clip_lines2;
+extern struct lp_style_type     border_lp;
 extern int			draw_border;
 #define SOUTH			1 /* 0th bit */
 #define WEST			2 /* 1th bit */
@@ -112,7 +102,7 @@ extern int format_is_numeric[];
 extern char			key_title[];
 extern enum PLOT_STYLE data_style, func_style;
 extern double bar_size;
-extern int			grid, grid_linetype, mgrid_linetype;
+extern struct lp_style_type     work_grid, grid_lp, mgrid_lp;
 extern double     polar_grid_angle; /* angle step in polar grid in radians */
 extern int			key;
 extern struct position key_user_pos; /* user specified position for key */
@@ -120,7 +110,7 @@ extern int 			key_vpos, key_hpos, key_just;
 extern double       key_swidth, key_vert_factor; /* user specified vertical spacing multiplier */
 extern double                   key_width_fix; /* user specified additional (+/-) width of key titles */
 extern TBOOLEAN			key_reverse;  /* key back to front */
-extern int			key_box;  /* linetype round box < -2 = none */
+extern struct lp_style_type 	key_box;  /* linetype round box < -2 = none */
 extern TBOOLEAN			is_log_x, is_log_y, is_log_z;
 extern double			base_log_x, base_log_y, base_log_z;
 				/* base, for computing pow(base,x) */
@@ -196,10 +186,10 @@ extern int			encoding;
 extern char			*encoding_names[];
 
 /* -3 for no axis, or linetype */
-extern int xzeroaxis;
-extern int yzeroaxis;
-extern int x2zeroaxis;
-extern int y2zeroaxis;
+extern struct lp_style_type xzeroaxis;
+extern struct lp_style_type yzeroaxis;
+extern struct lp_style_type x2zeroaxis;
+extern struct lp_style_type y2zeroaxis;
 
 extern int xtics;
 extern int ytics;
@@ -256,6 +246,7 @@ void show_command __PROTO((void));
 enum PLOT_STYLE get_style __PROTO((void));
 TBOOLEAN load_range __PROTO((int axis, double *a, double *b, int autosc));
 void show_version __PROTO((void));
+void show_version_long __PROTO((void));
 char * conv_text __PROTO((char *s, char *t));
 void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag ));
 
