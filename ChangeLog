@@ -1,3 +1,9 @@
+2004-12-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/ggi.trm (GGI_fillbox GGI_set_color): Implement color selection
+	by RGB values. Implement filled boxes.  The GGI project seems moribund,
+	so support of other new gnuplot features like polygons is unlikely.
+
 2004-12-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/mouse.c: Remove unused routine event_print().

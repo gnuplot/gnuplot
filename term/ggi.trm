@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: ggi.trm,v 1.20 2004/12/21 19:59:24 sfeam Exp $
+ * $Id: ggi.trm,v 1.21 2004/12/22 00:41:58 sfeam Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -620,14 +620,7 @@ GGI_fillbox(
     unsigned int x, unsigned int y,
     unsigned int w, unsigned int h)
 {
-    /* when is this called ? */
-    /* ULIG: the style parameter is now used for the fillboxes style
-     * (not implemented here), see the documentation */
-
-#if 0
-    fprintf(stderr, "(GGI_fillbox) style, x, y, w, y = %d, %d, %d, %d, %d\n",
-	style, x, y, w, h);
-#endif
+    ggiDrawBox(GGIvisual, x, GGI_y((int)(y+h)), w, h);
 }
 
 TERM_PUBLIC void
@@ -1432,7 +1425,16 @@ GGI_previous_palette()
 TERM_PUBLIC void
 GGI_set_color(struct t_colorspec *colorspec)
 {
+    ggi_color rgb;
     double gray = colorspec->value;
+
+    if (colorspec->type == TC_RGB) {
+	rgb.r = ((colorspec->lt >> 16) & 0xff) * (65535./255.);
+	rgb.g = ((colorspec->lt >> 8) & 0xff) * (65535./255.);
+	rgb.b = ((colorspec->lt) & 0xff) * (65535./255.);
+	ggiSetGCForeground(GGIvisual, ggiMapColor(GGIvisual,&rgb));
+    }
+    
     if (colorspec->type != TC_FRAC)
 	return;
 
