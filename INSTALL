@@ -39,9 +39,9 @@ File location defaults
 
 PREFIX                          /usr/local
 gnuplot                         PREFIX/bin
-gnuplot_x11                     PREFIX/lib/gnuplot/$VERSION
+gnuplot_x11                     PREFIX/libexec/gnuplot/$VERSION
 gnuplot.1                       PREFIX/man/man1
-gnuplot.gih                     PREFIX/share
+gnuplot.gih                     PREFIX/share/gnuplot/$VERSION
 
    The only files where the runtime location is defined at compile time are
 gnuplot.gih and show.c. This is important if gnuplot is not installed by running
@@ -52,12 +52,14 @@ several different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/share.
+   gnuplot will look for the online help file, gnuplot.gih, in
+   /gnuplot/share/gnuplot/$VERSION.
    Attention: This option affects the location of *all* installed files!
 
  o with configure's --datadir= option, eg.
    ./configure --datadir='/gnuplot/docs'
-   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/docs.
+   gnuplot will look for the online help file, gnuplot.gih, in
+   /gnuplot/docs/gnuplot/$VERSION.
 
  o at make time, eg.
    make HELPFILE='/gnuplot/docs/gnuplot.gih'
@@ -87,11 +89,11 @@ can be controlled in different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/4.0/gnuplot_x11.
+   gnuplot_x11 will be installed as /gnuplot/libexec/gnuplot/4.0/gnuplot_x11.
    Attention: This affects the location of *all* installed files!
 
- o with configure's --libdir= option, eg.
-   ./configure --libdir='/gnuplot/lib'
+ o with configure's --libexecdir= option, eg.
+   ./configure --libexecdir='/gnuplot/lib'
    gnuplot_x11 will be installed as /gnuplot/lib/gnuplot/4.0/gnuplot_x11
 
  o at make time, eg.
@@ -140,11 +142,12 @@ $ ./configure --help
 			  [PREFIX]
   --bindir=DIR            user executables in DIR [EPREFIX/bin]
 			  The gnuplot binary is installed this directory
+  --libexecdir=DIR        program executables in DIR [EPREFIX/libexec]
+			  gnuplot_x11 goes into $libexecdir/gnuplot/<version>.
   --datadir=DIR           Read-only architecture-independent data in DIR
                           [PREFIX/share]. The gnuplot help file is installed
                           in this directory.
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
-			  gnuplot_x11 goes into $libdir/gnuplot/<version>.
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
   --with-x          (*)   use the X Window System
