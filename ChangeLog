@@ -1,3 +1,8 @@
+2001-12-04  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* src/fit.c: Fix buffer overflows regarding env vars
+	used for fitting.
+
 2001-12-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Put #ifdef PM3D around pm3d-only

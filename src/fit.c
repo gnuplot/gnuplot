@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.28 2001/08/22 14:15:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.29 2001/12/01 13:08:59 amai Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -143,8 +143,8 @@ static int max_params;
 static double epsilon = 1e-5;	/* convergence limit */
 static int maxiter = 0;		/* HBB 970304: maxiter patch */
 
-static char fit_script[128];
-static char logfile[128] = "fit.log";
+static char fit_script[256];
+static char logfile[256] = "fit.log";
 static const char *FIXED = "# FIXED";
 static const char *GNUFITLOG = "FIT_LOG";
 static const char *FITLIMIT = "FIT_LIMIT";
@@ -1317,16 +1317,26 @@ fit_command()
 	printf("Lambda scaling factors reset:  %g\n", lambda_up_factor);
     }
     *fit_script = NUL;
-    if ((tmp = getenv(FITSCRIPT)) != NULL)
-	strcpy(fit_script, tmp);
+    if ((tmp = getenv(FITSCRIPT)) != NULL) {
+	safe_strncpy(fit_script, tmp, sizeof(fit_script));
+    }
 
     tmp = getenv(GNUFITLOG);	/* open logfile */
     if (tmp != NULL) {
 	char *tmp2 = &tmp[strlen(tmp) - 1];
-	if (*tmp2 == '/' || *tmp2 == '\\')
-	    sprintf(logfile, "%s%s", tmp, logfile);
-	else
-	    strcpy(logfile, tmp);
+	char buf[sizeof(logfile)];
+	
+	if (*tmp2 == '/' || *tmp2 == '\\') {
+	    safe_strncpy(buf, tmp, sizeof(logfile));
+	    if (sizeof(logfile)-strlen(buf) <= strlen(logfile)) {
+	       Eex2("Path too long for log-file %s", tmp);
+	    }
+	    strcat(buf, logfile);
+	    strcpy(logfile, buf); 
+	}
+	else {
+	    safe_strncpy(logfile, tmp, sizeof(logfile));
+	}
     }
     if (!log_f && /* div */ !(log_f = fopen(logfile, "a")))
 	Eex2("could not open log-file %s", logfile);
@@ -1640,4 +1650,3 @@ va_dcl
 #endif /* VA_START */
 
 }
-
