@@ -387,7 +387,7 @@ command.o: command.c fit.h help.h setshow.h
 	$(CC) -c $(CPPFLAGS) $(DEFS) $(INCLUDES) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 
 term.o: term.c term.h $(CORETERM)
-	$(CC) -c $(TERMFLAGS) $(CPPFLAGS) $(INCLUDES) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
+	$(CC) -c $(TERMFLAGS) $(INCLUDES) $(CPPFLAGS) -I./term -I$(top_srcdir)/term $(DEFS) $(CFLAGS) $<
 
 version.o: version.c
 	$(CC) -c -DCONTACT=\"$(EMAIL)\" $(CPPFLAGS) $(DEFS) $(CFLAGS) $<
@@ -471,13 +471,14 @@ realclean: distclean
 # LGH: Kludge alert - just make it work somehow
 distdir = gnuplot
 top_distdir = $(distdir)
+version=beta347
 
 # LGH: Need to change this if not using GNU tar
 dist: distdir
 	-mv $(distdir)/docs/makefile.dst $(distdir)/docs/makefile
 	-mv $(distdir)/docs/latextut/makefile.dst $(distdir)/docs/latextut/makefile
 	-chmod -R a+r $(distdir)
-	GZIP=$(GZIP) $(TAR) chozf $(distdir).tar.gz $(distdir)
+	GZIP=$(GZIP) $(TAR) chozf $(distdir)-$(version).tar.gz $(distdir)
 	-rm -rf $(distdir)
 
 distdir: $(DISTFILES)
