@@ -40,8 +40,9 @@ HELPFILE=$(datadir)/gnuplot.gih
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
 
-CC     = @CC@
+CC = @CC@
 CPPFLAGS = @CPPFLAGS@
 DEFS  = @DEFS@
 INCLUDES = -I. -I$(top_srcdir)
@@ -78,7 +79,7 @@ LIBS = @LIBS@
 XLIBS = @X_LIBRARIES@
 
 # Where to send email about bugs and comments (locally)
-EMAIL=bug-gnuplot@dartmouth.edu
+EMAIL = bug-gnuplot@dartmouth.edu
 
 # Lasergnu is a handy shell script for creating a plot from the
 # command line and sending it directly to the printer. It currently
@@ -133,7 +134,7 @@ ACLOCAL = @ACLOCAL@
 AUTOCONF = @AUTOCONF@
 AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
-ACCONFIG = acconfig.h
+ACLOCAL_AMFLAGS = -I m4
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 CONFIG_HEADER_IN = config.hin
 CONFIG_HEADER = config.h
@@ -282,7 +283,7 @@ ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
 	README.3p2 README.3p3 README.3p4 README.3p5 README.ami README.emx \
 	README.fit README.gnu README.iso README.mf README.nex README.os2 \
 	README.pic README.pro README.win README.x11 README.xli WhatsNew \
-	$(ACCONFIG) acinclude.m4 $(ACLOCAL_M4) amiga.c buildvms.com \
+	acconfig.h $(ACLOCAL_M4) amiga.c buildvms.com \
 	commitvers $(CONFIG_HEADER_IN) configure configure.in corgraph.asm \
 	corplot.c ctrl87.c ctrl87.h descrip.mms errorfix.sh genopt.com \
 	gnuplot.def gnuplot.el gnuplot.opt gnuplot.prj header.mac \
@@ -293,13 +294,14 @@ ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
 	makefile.os2 makefile.os9 makefile.r makefile.st makefile.tc \
 	makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc \
 	missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
-	strftime.c upd_make.sh vms.c $(T)README 
+	strftime.c upd_make.sh vms.c m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
+	m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4 $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
 	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2html.c $(D)doc2info.c \
 	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
-	$(D)doc2texi.pl $(D)/doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
+	$(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
 	$(D)makefile.dst $(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
 	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
@@ -320,7 +322,7 @@ $(COREOBJS) : plot.h protos.h stdfn.h
 
 help.$(O) misc.$(O) : help.h
 
-protos.h: alloc.h
+protos.h : alloc.h
 
 graphics.$(O) graph3d.$(O) misc.$(O) plot.$(O) set.$(O) show.$(O) term.$(O) : setshow.h
 
@@ -354,7 +356,7 @@ install: all $(LASERGNU)
 	@LINUXSUID@
 
 lasergnu_install: lasergnu docs/lasergnu.1
-	$(INSTALL_PROGRAM) $(srcdir)/lasergnu $(bindir)/lasergnu
+	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
 	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/man1/lasergnu.1
 
 lasergnu_noinstall:
@@ -418,27 +420,28 @@ $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
-	  && CONFIG_FILES=$@ CONFIG_HEADERS= \
-	  $(SHELL) ./config.status
+	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): configure.in
-	cd $(srcdir) && $(ACLOCAL)
+$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
+		m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4
+	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
-config.status: $(srcdir)/configure
+config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
 $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
 
 $(CONFIG_HEADER): stamp-h
-stamp-h: $(top_builddir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
+	@:
+stamp-h: $(srcdir)/$(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	cd $(top_builddir) \
-	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER):$(CONFIG_HEADER_IN) \
+	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER)
 	   $(SHELL) ./config.status
 	@echo timestamp > stamp-h
 
-$(top_builddir)/$(CONFIG_HEADER_IN): stamp-h.in
-$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG)
+$(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
 	cd $(top_srcdir) && $(AUTOHEADER)
 	@echo timestamp > $(srcdir)/stamp-h.in
 
@@ -452,7 +455,7 @@ DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/ps \
-	  os2 term win
+	  m4 os2 term win
 
 clean:
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~

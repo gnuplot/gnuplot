@@ -71,6 +71,7 @@ CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
 	   $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm \
 	   $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
+
 CSOURCE8 = bf_test.c gplt_x11.c
 
 NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
@@ -84,7 +85,7 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/bigger.tiff \
 	   $(N)English.lproj/gnuview.nib/data.classes \
 	   $(N)English.lproj/gnuview.nib/data.nib \
-	   $(N)English.lproj/gnuview.nib/smaller.tiff \
+	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
@@ -119,7 +120,7 @@ ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
 	README.3p2 README.3p3 README.3p4 README.3p5 README.ami README.emx \
 	README.fit README.gnu README.iso README.mf README.nex README.os2 \
 	README.pic README.pro README.win README.x11 README.xli WhatsNew \
-	$(ACCONFIG) acinclude.m4 $(ACLOCAL_M4) amiga.c buildvms.com \
+	acconfig.h $(ACLOCAL_M4) amiga.c buildvms.com \
 	commitvers $(CONFIG_HEADER_IN) configure configure.in corgraph.asm \
 	corplot.c ctrl87.c ctrl87.h descrip.mms errorfix.sh genopt.com \
 	gnuplot.def gnuplot.el gnuplot.opt gnuplot.prj header.mac \
@@ -130,7 +131,8 @@ ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
 	makefile.os2 makefile.os9 makefile.r makefile.st makefile.tc \
 	makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc \
 	missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
-	strftime.c upd_make.sh vms.c $(T)README 
+	strftime.c upd_make.sh vms.c m4/msdos.m4 m4/next.m4 m4/search-hdr.m4 \
+	m4/search-lib.m4 m4/select-types.m4 m4/stringize.m4 $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
@@ -138,7 +140,7 @@ DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
 	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
 	$(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
 	$(D)makefile.dst $(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
-	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)/xref.h
+	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
 DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
