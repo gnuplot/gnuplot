@@ -1,5 +1,5 @@
 #
-# $Id: makefile.mgw,v 1.9 2001/03/07 10:06:23 mikulik Exp $
+# $Id: makefile.mgw,v 1.10 2001/03/12 16:56:27 mikulik Exp $
 #
 # GNUPLOT Makefile for MinGW32 and Cygwin/MinGW32 on WinNT and Win95/98/..
 #
@@ -158,9 +158,10 @@ L=docs/latex/
 M=../demo/
 
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
 
-all:	 wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe gnuplot.ps gnuplot.pdf
+all:	 wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe \
+	 gnuplot.ps gnuplot.pdf
 
 
 # include the 'core makefile template'
@@ -187,6 +188,9 @@ LDLIBS = -lkernel32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -ladvapi3
 
 wgnuplot.exe: $(OBJS) $(WINOBJS) win/wgnuplot.def wgplt_res.o texticon.ico grpicon.ico
 	$(LD) $(LDFLAGS) $(LDFLAGS2) -mwindows -o $@ $(OBJS) $(WINOBJS) wgplt_res.o $(LDLIBS) $(TERMLIBS)
+
+pgnuplot.exe: win/pgnuplot.c
+	gcc -O2 -s -o pgnuplot.exe win/pgnuplot.c -luser32
 
 # rules
 

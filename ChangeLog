@@ -1,3 +1,7 @@
+2001-04-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/makefile.mgw: compile also pgnuplot.c.
+
 2001-04-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/axis.c (gen_tics): Re-do yesterday's fix in a different
