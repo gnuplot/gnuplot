@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.16 1999/07/30 19:37:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.17 1999/08/07 17:21:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -858,6 +858,9 @@ eval_plots()
 	    }
 	    /* look for axes/axis */
 
+	    x_axis = FIRST_X_AXIS;
+	    y_axis = FIRST_Y_AXIS;
+
 	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
 		if (parametric && xparam)
 		    int_error(c_token, "previous parametric function not fully specified");
@@ -880,11 +883,7 @@ eval_plots()
 		    ++c_token;
 		} else
 		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
-	    } else {
-		x_axis = FIRST_X_AXIS;
-		y_axis = FIRST_Y_AXIS;
 	    }
-
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
@@ -953,7 +952,7 @@ eval_plots()
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords for lt and pt are optional
 	     */
-	    LP_PARSE(this_plot->lp_properties, 1, this_plot->plot_style & 2,
+	    lp_parse(&this_plot->lp_properties, 1, this_plot->plot_style & 2,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */
