@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.93 2000/11/23 18:17:11 lhecking Exp $
+dnl $Id: configure.in,v 1.94 2000/11/24 15:44:29 mikulik Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.93 $)
+AC_REVISION($Revision: 1.94 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -584,9 +584,22 @@ if test "$enable_ggi" = yes; then
 	    AC_DEFINE(USE_GGI_DRIVER, 1,
 		[ Define if you want to use the experimental ggi driver. ])
 	    GGI_SUPPORT=yes
-	],
-	[dnl action if lib was not found
-	    AC_MSG_RESULT(no)
+	]
+    )
+fi
+
+dnl check if libggiwmh and ggi/wmh.h are found
+if test "$GGI_SUPPORT" = yes; then
+    AC_CHECK_LIB(ggiwmh, ggiWmhInit,
+	[dnl action if libggiwmh is found
+	    AC_CHECK_HEADER(ggi/wmh.h,
+		[dnl action if ggi/wmh.h is found
+		    TERMLIBS="$TERMLIBS -lggiwmh"
+		    AC_DEFINE(HAVE_GGI_WMH_H, 1,
+			[ Define if ggi/wmh.h is there. ]
+		    )
+		]
+	    )
 	]
     )
 fi

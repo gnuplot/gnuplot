@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.8 2000/12/04 20:41:50 joze Exp $
+ * $Id: ggi.trm,v 1.9 2000/12/04 21:14:42 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -40,6 +40,17 @@
  *   event / mouse processing & double-buffering
  *   by Johannes Zellner <johannes@zellner.org>
  *   pm3d support by Johannes Zellner <johannes@zellner.org> (Oct. 2000)
+ *
+ *   TODO:
+ *
+ *   	- reimplement wmh (if it's available)
+ *   	- implement window title using wmh (if it's available)
+ *   	- check for availability of two frames, and if not
+ *   	  do it with one frame. (will eventually not do
+ *   	  with mouse/event reporting)
+ *   	- check if libxmi is available and if so, use
+ *   	  it to draw filled polygons.
+ *   	- enable cursors using blits.
  */
 
 #include "driver.h"
@@ -54,8 +65,11 @@ register_term(ggi)
 #ifdef USE_MOUSE
 #  include <ggi/ggi-unix.h>
 #endif
-/* #include <ggi/gii.h> */
-/* #include <ggi/wmh.h> */
+
+#ifdef HAVE_GGI_WMH_H
+#   include <ggi/wmh.h>
+static TBOOLEAN GGI_use_whm = 0;
+#endif
 
 TERM_PUBLIC void GGI_graphics __PROTO((void));
 TERM_PUBLIC void GGI_set_size __PROTO((void));
@@ -188,7 +202,9 @@ static ggi_pixel GGI_smooth_colors[GGI_PM3D_COLORS];
 #endif
 static unsigned int GGIx,GGIy;
 static unsigned int GGIwidth, GGIheight, GGIymax;
+#if 0
 static unsigned int Xenv;
+#endif
 static int GGI_frames =
 #ifdef USE_MOUSE
 2
@@ -256,11 +272,13 @@ TERM_PUBLIC void GGI_graphics()
     int i, j;
     int display_frame = ggiGetDisplayFrame(GGIvisual);
 #endif
+#if 0
     if(!Xenv)
     {
 	init_ggi_driver();
 	return;
     }
+#endif
     ggiSetGCForeground(GGIvisual,GGIblack);
 #ifdef USE_MOUSE
     /* write to the currently not displayed buffer */
@@ -330,9 +348,12 @@ TERM_PUBLIC void GGI_init()
     int success = 0;
     ggi_mode mode;
 
-    if(ggiInit()) { }
-    if(NULL==(GGIvisual=ggiOpen(NULL)))
+    if (0 != ggiInit()) {/* ignore */}
+
+    if (NULL == (GGIvisual = ggiOpen(NULL))) {
+	/* TODO: abort a bit more gracefully */
 	ggiExit();
+    }
 
     if (strlen(GGI_mode_spec)) {
 	/* user specified mode */
@@ -374,12 +395,23 @@ TERM_PUBLIC void GGI_init()
     ggiSetDisplayFrame(GGIvisual, 0);
 #endif
 
-    Xenv=!ggiInit();
+#ifdef HAVE_GGI_WMH_H
+    /* Initialize WMH extension */
+    if (ggiWmhInit() != 0 || ggiWmhAttach(GGIvisual) < 0) {
+	GGI_use_whm = 0;
+    } else {
+	GGI_use_whm = 1;
+	ggiWmhAllowResize(GGIvisual, 100, 50, 2000, 2000, 10, 10);
+	ggiWmhSetTitle(GGIvisual, "GGI Gnuplot Driver");
+	ggiWmhSetIconTitle(GGIvisual, "Gnuplot");
+    }
+#endif
 
     /*
      * if(!(Xenv=!ggiWmhAttach(GGIvisual))) ggiWmhDetach(GGIvisual);
      * else Xenv=!ggiWmhSetTitle(GGIvisual,"GGI Gnuplot Driver");
      */
+#if 0
     if(!Xenv)
     {
 	/*
@@ -389,8 +421,9 @@ TERM_PUBLIC void GGI_init()
 	ggiClose(GGIvisual);
 	ggiExit();
 	GGIvisual=NULL;
-    }
-    else init_ggi_driver();
+    } else
+#endif
+	init_ggi_driver();
 #ifdef USE_MOUSE
     GGI_mouse_x = 0;
     GGI_mouse_y = 0;
@@ -465,13 +498,13 @@ TERM_PUBLIC void GGI_reset()
 {
     if(GGIvisual!=NULL)
     {
-	/*
-	 * if(Xenv)
-	 * {
-	 *     ggiWmhDetach(GGIvisual);
-	 *     ggiWmhExit();
-	 * }
-	 */
+#if HAVE_WMH_H
+	if(GGI_use_whm) {
+	    ggiWmhDetach(GGIvisual);
+	    ggiWmhExit();
+	    GGI_use_whm = 0;
+	}
+#endif
 	ggiClose(GGIvisual); 
 	ggiExit();
 	GGIvisual=NULL;
@@ -520,7 +553,6 @@ unsigned int x, y, w, h;
 #endif
 }
 
-/* Wait for a key to be pressed and exit graphics mode if running in console mode. */
 TERM_PUBLIC void
 GGI_text()
 {
@@ -528,12 +560,16 @@ GGI_text()
 #ifdef USE_MOUSE
     /* now display the buffer which was just written */
     ggiSetDisplayFrame(GGIvisual, ggiGetWriteFrame(GGIvisual));
-#endif
-    if(Xenv) return;
+    return;
+#else
+    /* Wait for a key to be pressed and exit graphics mode if
+     * running in console mode. */
+    /* TODO: return immediately, if in X */
     ggiGetc(GGIvisual);
     ggiClose(GGIvisual);
     ggiExit();
     GGIvisual=NULL;
+#endif
 }
 
 TERM_PUBLIC void GGI_vector(x,y)
@@ -844,7 +880,28 @@ GGI_dispatch_event(event)
 	    gp_ev.par1 = GGI_from_button(event->pbutton.button);
 	    gp_ev.par2 = GGI_SetTime(&(event->pbutton.time));
 	    break;
+#ifdef HAVE_GGI_WMH_H
+	case evCommand:
+	    /* [-- resizing --] */
+	    if (GGI_use_whm) {
+		/* fprintf(stderr, "(GGI_dispatch_event) \n"); */
+		if (event->cmd.code==GGICMD_REQUEST_SWITCH) {
+		    /*
+		     * ggi_cmddata_switchrequest *req;
+		     * req = &(event->cmd.data);
+		     * ggi_resize(GGIvisual, &(req->mode));
+		     */
+		    /*
+		     * while( ggiEventPoll(GGIvisual, emAll, &tv) ) {
+		     *     ggiEventRead(GGIvisual, event, emAll);
+		     * }
+		     */
+		}
+	    }
+	    break;
+#endif
 	default:
+	    /* fprintf(stderr, "(GGI_dispatch_event) unhandled event\n"); */
 	    break;
     }
     do_event(&gp_ev);
@@ -1126,8 +1183,11 @@ GGI_waitforinput()
 	int fd = fileno(stdin);
 	int i, j;
 	do {
-	    ggi_event_mask mask = ggiGetEventMask(GGIvisual);
 	    int n;
+
+	    ggi_event_mask mask = emAll; /* TODO: choose a more selective mask */
+	    ggiSetEventMask(GGIvisual, mask);
+
 	    FD_ZERO(&fds);
 	    FD_SET(fd, &fds); /* listen to stdin */
 
