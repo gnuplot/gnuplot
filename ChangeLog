@@ -1,3 +1,9 @@
+2001-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/datafile.c (f_column): Added missing implementation of
+ 	'column(-2)' in using expressions.  Removed offset by one of value
+ 	held in "column" variable to de-obfuscate the code a bit.
+
 2001-11-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* NEWS: Lots of additional fixes and new features mentioned, and
