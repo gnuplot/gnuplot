@@ -1,3 +1,9 @@
+2003-01-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/axis.h: Removed patch 2003-01-25 about of the changed definition
+	of AUTOSCALE_FIXMIN and AUTOSCALE_FIXMAX. The bug of reversed y-axis,
+	"set autoscale fix" and mouse zooming seems to be more tricky.
+
 2003-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c: Fix typo HAVE_GD_TTY to HAVE_GD_TTF.
@@ -1787,7 +1793,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/25 10:35:30 $).
+	last modification date (from the tag $Date: 2003/01/25 11:27:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
