@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: history.c,v 1.1 1999/11/24 12:56:13 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - history.c */
@@ -360,7 +360,8 @@ do_history_list(FILE * out_stream)
 void
 write_history_n(const int n, const char *filename)
 {
-    int error_code = history_list_save(n, filename);
+    /* dicard error code */
+    (void) history_list_save(n, filename);
 }
 
 char *
@@ -432,7 +433,9 @@ history_find_all(char *cmd)
 	/* fprintf (stdout, "Was gefunden %d\n", found); */
 	if (found == 0) {
 	    int idx = where_history() + history_base;
+#if 0
 	    HIST_ENTRY *he_found = current_history();
+#endif
 	    ret_val++;		/* DEBUG if (ret_val > 5) return (ret_val); */
 	    /* fprintf (stdout, "%d: %s\n", idx, he_found->line); */
 	    if (idx > 0) {

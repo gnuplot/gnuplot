@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.8 1999/09/24 15:36:12 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.42 2000/02/05 19:56:41 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -91,8 +91,25 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.8 1999/09/24 15:36:12 l
    defining NOEXPORT over-rides the default
  */
 
+/* Petr Mikulik and Johannes Zellner: added mouse support (October 1999)
+ * Implementation and functionality is based on os2/gclient.c; see mousing.c
+ * Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>: merged two versions
+ * of mouse patches. (November 1999) (See also mouse.[ch]).
+ */
+
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
+#endif
+
+#ifdef USE_MOUSE
+#define USE_NONBLOCKING_STDOUT
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#endif
+/* for mouse_setting_t mouse_setting in mouse.h */
+#   define _GPLT_X11
 #endif
 
 #ifdef EXPORT_SELECTION
@@ -118,6 +135,13 @@ Error. Incompatible options.
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
+
+#ifdef USE_MOUSE
+#   include <X11/cursorfont.h>
+#else
+#   define XC_crosshair 34
+#endif
+
 
 #include <signal.h>
 
@@ -158,12 +182,39 @@ Error. Incompatible options.
 # endif				/* __DECC */
 # define EXIT(status) sys$delprc(0,0)	/* VMS does not drop itself */
 #else
+# if defined(USE_MOUSE) && !defined(OS2)
+# define EXIT(status)                          \
+    do {                                       \
+	gp_exec_event(GE_pending, 0, 0, 0, 0); \
+	close(1);                              \
+	close(0);                              \
+	exit(status);                          \
+    } while (0)
+# else
 # define EXIT(status) exit(status)
+# endif
 #endif
 
 #ifdef OSK
 # define EINTR	E_ILLFNC
 #endif
+
+
+#ifdef USE_MOUSE
+
+#if defined(OS2) && !defined(GNUPMDRV)
+  #define INCL_DOSPROCESS
+  #define INCL_DOSSEMAPHORES
+  #include <os2.h>
+  #include "os2/dialogs.h"
+#endif
+
+unsigned long gnuplotXID = 0; /* WINDOWID of gnuplot */
+#include "mouse.h"
+#include "mousecmn.h"
+#include "gpexecute.inc"
+#endif /* USE_MOUSE */
+
 
 /* information about one window/plot */
 
@@ -173,10 +224,71 @@ typedef struct plot_struct {
     unsigned int posn_flags;
     int x, y;
     unsigned int width, height;	/* window size */
-    unsigned int px, py;	/* pointsize */
+    unsigned int gheight;       /* height of the part of the window that contains the graph (i.e., excluding the status line at the bottom if mouse is enabled) */
+    unsigned int px, py;
     int ncommands, max_commands;
     char **commands;
+    char titlestring[0x40];
+#ifdef USE_MOUSE
+    Window msgwin;
+    int  button;    /* buttons which are currently pressed      */
+#if 0
+    int  pointer_x; /* current pointer position                 */
+    int  pointer_y;
+#endif
+    char str[0xff]; /* last displayed string                    */
+    Time time;      /* time of last button press event          */
+#endif
+    int lwidth,type,user_width;    /* this and the following 3 lines declare */
+    enum JUSTIFY jmode;            /* variables used during drawing in exec_cmd() */
+    int lt;
+#ifdef USE_MOUSE
+    TBOOLEAN ruler_on;       /* is ruler on? */
+    int ruler_x, ruler_y;    /* coordinates of ruler */
+    TBOOLEAN zoombox_on;              /* is zoombox on? */
+    int zoombox_x1, zoombox_y1, zoombox_x2, zoombox_y2;  /* coordinates of zoombox as last drawn */
+    char zoombox_str1a[64], zoombox_str1b[64], zoombox_str2a[64], zoombox_str2b[64];   /* strings to be drawn at corners of zoombox ; 1/2 indicate corner; a/b indicate above/below */
+    TBOOLEAN resizing;       /* TRUE while waiting for an acknowledgement of resize */
+#endif
 } plot_struct;
+
+#ifdef USE_MOUSE
+enum { NOT_AVAILABLE = -1 };
+static char selection[0xff] = "";
+
+#ifndef OS2
+/* sunos 4 uses on_exit() in place of atexit(). If both are missing,
+ * we can probably survive since gnuplot_x11 should detect EOF on
+ * the pipe. Unfortunately, the handlers take different parameters.
+ */
+
+#ifdef NO_ATEXIT
+# define HANDLER_PROTO  __PROTO((int x, void *y))
+# define HANDLER_DECL (x,y) int x; void *y;
+# define HANDLER_PARAMS (0,NULL)
+# ifdef HAVE_ON_EXIT
+#  define atexit(x) on_exit(x, NULL)
+# else
+#  define atexit(x)		/* nowt */
+# endif
+#else /* !NO_ATEXIT */
+# define HANDLER_PROTO __PROTO((void))
+# define HANDLER_DECL   ()
+# define HANDLER_PARAMS ()
+#endif
+
+#endif /* !OS2 */
+
+#endif /* USE_MOUSE */
+
+#ifdef USE_MOUSE
+ #define GRAPH_HEIGHT(plot)  ((plot)->gheight)
+ #define PIXMAP_HEIGHT(plot)  ((plot)->gheight + vchar)
+ /* note: PIXMAP_HEIGHT is the height of the plot including the status line, even if the latter is not enabled right now */
+#else
+ #define GRAPH_HEIGHT(plot)  ((plot)->height)
+ #define PIXMAP_HEIGHT(plot)  ((plot)->height)
+#endif
 
 void store_command __PROTO((char *line, plot_struct * plot));
 void prepare_plot __PROTO((plot_struct * plot, int term_number));
@@ -188,7 +300,36 @@ void process_event __PROTO((XEvent * event));	/* from Xserver */
 void mainloop __PROTO((void));
 
 void display __PROTO((plot_struct * plot));
+void UpdateWindow __PROTO((plot_struct* plot));
+#ifdef USE_MOUSE
+void DrawRuler __PROTO((plot_struct* plot));
+void EventuallyDrawMouseAddOns __PROTO((plot_struct* plot));
+void DrawBox __PROTO((plot_struct* plot));
+void AnnotatePoint __PROTO((plot_struct* plot, int x, int y, const char[], const char[]));
+void DrawLine __PROTO((plot_struct* plot, int x1, int y1, int x2, int y2));
+#if 0
+void DrawEllipse __PROTO((plot_struct* plot, int x, int y, unsigned int a, unsigned int b));
+void DrawCircle __PROTO((plot_struct* plot, int x, int y, unsigned int r));
+#endif
+void DrawStringAt __PROTO((plot_struct* plot, int x, int y, char* str));
+void SetPointer __PROTO((plot_struct* plot, int x, int y));
+long int SetTime __PROTO((plot_struct* plot, Time t));
+void GetGCXor __PROTO((GC* gc, Window window));
+void GetGCXorDashed __PROTO((GC* gc, Window window));
+void GetGCBlackAndWhite __PROTO((GC* gc, Pixmap pixmap, int mode));
+int SplitAt __PROTO((char** args, int maxargs, char* buf, char splitchar));
+void DisplayMessageAt __PROTO((plot_struct* plot, char* msg, int x, int y));
+void xfree(void* fred);
+void EraseCoords __PROTO((plot_struct* plot));
+void DrawCoords __PROTO((plot_struct* plot, const char *s));
+void DisplayCoords __PROTO((plot_struct * plot, const char *s));
+int is_control __PROTO((KeySym mod));
+int is_meta __PROTO((KeySym mod));
+int is_shift __PROTO((KeySym mod));
+void exec_cmd __PROTO((plot_struct *, char*));
+#endif
 
+static plot_struct* find_plot __PROTO((Window window));
 void reset_cursor __PROTO((void));
 
 void preset __PROTO((int argc, char *argv[]));
@@ -199,7 +340,8 @@ void pr_font __PROTO((void));
 void pr_geometry __PROTO((void));
 void pr_pointsize __PROTO((void));
 void pr_width __PROTO((void));
-Window pr_window __PROTO((unsigned int flags, int x, int y, unsigned int width, unsigned height));
+Window pr_window __PROTO((plot_struct* plot));
+void ProcessEvents __PROTO((Window win));
 void pr_raise __PROTO((void));
 void pr_persist __PROTO((void));
 
@@ -221,10 +363,9 @@ char dashes[Ndashes][5];
 
 #define MAX_WINDOWS 16
 
-#define XC_crosshair 34
-
 
 struct plot_struct plot_array[MAX_WINDOWS];
+struct plot_struct *current_plot = NULL;
 
 
 Display *dpy;
@@ -232,10 +373,19 @@ int scr;
 Window root;
 Visual *vis;
 GC gc = (GC) 0;
+GC gc_xor = (GC) 0;
+GC gc_xor_dashed = (GC) 0;
 XFontStruct *font;
-int do_raise = 1, persist = 0;
-KeyCode q_keycode;
+/* must match the definition in term/x11.trm: */
+enum { UNSET = -1, no = 0, yes = 1 };
+int do_raise = yes, persist = no;
 Cursor cursor;
+Cursor cursor_default;
+#ifdef USE_MOUSE
+Cursor cursor_exchange;
+Cursor cursor_sizing;
+Cursor cursor_zooming;
+#endif
 
 int windows_open = 0;
 
@@ -254,6 +404,9 @@ int cx = 0, cy = 0, vchar;
 double xscale, yscale, pointsize;
 #define X(x) (int) ((x) * xscale)
 #define Y(y) (int) ((4095-(y)) * yscale)
+#define RevX(x) (((x)+0.5)/xscale)
+#define RevY(y) (4095-((y)+0.5)/yscale)
+/* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
 #define Nbuf 1024
 char buf[Nbuf], **commands = (char **) 0;
@@ -281,7 +434,9 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+    int getfl;
+#endif
 
 #ifdef OSK
     /* malloc large blocks, otherwise problems with fragmented mem */
@@ -297,7 +452,23 @@ char *argv[];
     preset(argc, argv);
 
 /* set up the alternative cursor */
-    cursor = XCreateFontCursor(dpy, XC_crosshair);
+    cursor_default = XCreateFontCursor(dpy, XC_crosshair);
+    cursor = cursor_default;
+#ifdef USE_MOUSE
+    /* create cursors for the splot actions */
+    cursor_exchange = XCreateFontCursor(dpy, XC_exchange);
+    cursor_sizing = XCreateFontCursor(dpy, XC_sizing);
+    /* arrow, top_left_arrow, left_ptr, sb_left_arrow, sb_right_arrow,
+     * plus, pencil, draft_large, right_ptr, draft_small */
+    cursor_zooming = XCreateFontCursor(dpy, XC_draft_small);
+#endif
+
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+    /* set up nonblocking stdout */
+    getfl = fcntl(1, F_GETFL); /* get current flags */
+    fcntl(1, F_SETFL, getfl | O_NONBLOCK);
+    signal(SIGPIPE, pipe_died_handler);
+#endif
 
     mainloop();
 
@@ -348,8 +519,20 @@ mainloop()
     struct timeval timeout, *timer = (struct timeval *) 0;
     fd_set tset;
 
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+    int out;
+    out = fileno(stdout);
+#endif
+
     X11_ipc = stdin;
     in = fileno(X11_ipc);
+
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+    if (out > in)
+	nfds = ((cn > out) ? cn : out) + 1;
+    else
+#endif
+	nfds = ((cn > in) ? cn : in) + 1;
 
 #ifdef ISC22
 /* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
@@ -385,21 +568,29 @@ mainloop()
 	    FD_SET(in, &tset);
 	}
 
-	nfds = (cn > in) ? cn + 1 : in + 1;
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+	if (buffered_output_pending && !pipe_died) {
+	    /* check, if stdout becomes writable */
+	    FD_SET(out, &tset);
+	}
+#endif
 
 	nf = select(nfds, SELECT_FD_SET_CAST &tset, 0, 0, timer);
 
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
-	    fprintf(stderr, "gnuplot: select failed. errno:%d\n", errno);
+	    fprintf(stderr, "gnuplot_x11: select failed. errno:%d\n", errno);
 	    EXIT(1);
 	}
 
 	if (nf > 0)
 	    XNoOp(dpy);
 
-	if (FD_ISSET(cn, &tset)) {
+	if (XPending(dpy)) {
+#if 0
+	       if (FD_ISSET(cn, &tset)) { }
+#endif
 	    /* used to use CheckMaskEvent() but that cannot receive
 	     * maskable events such as ClientMessage. So now we do
 	     * one event, then return to the select.
@@ -422,9 +613,13 @@ mainloop()
 	    if (!record())	/* end of input */
 		return;
 	}
+#if defined(USE_NONBLOCKING_STDOUT) && !defined(OS2)
+	if (!pipe_died && (FD_ISSET(out, &tset) || buffered_output_pending)) {
+	    gp_exec_event(GE_pending, 0, 0, 0, 0);
+	}
+#endif
     }
 }
-
 
 #elif defined(CRIPPLED_SELECT)
 /*-----------------------------------------------------------------------------
@@ -603,7 +798,6 @@ plot_struct *plot;
 int term_number;
 {
     int i;
-    char *term_name;
 
     for (i = 0; i < plot->ncommands; ++i)
 	free(plot->commands[i]);
@@ -618,26 +812,51 @@ int term_number;
 	plot->y = gY;
 	plot->width = gW;
 	plot->height = gH;
+	plot->pixmap = None;
+#ifdef USE_MOUSE
+	plot->gheight = gH;
+	plot->resizing = FALSE;
+	plot->str[0] = '\0';
+	plot->zoombox_on = FALSE;
+#endif
     }
     if (!plot->window) {
-	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
+	plot->window = pr_window(plot);
 	++windows_open;
 
 	/* append the X11 terminal number (if greater than zero) */
 
 	if (term_number) {
-	    char new_name[60];
-	    XFetchName(dpy, plot->window, &term_name);
-	    FPRINTF((stderr, "Window title is %s\n", term_name));
-
-	    sprintf(new_name, "%.55s%3d", term_name, term_number);
+	    char new_name[0xf];
+	    sprintf(plot->titlestring, "%.55s%3d",
+		plot->titlestring, term_number);
 	    FPRINTF((stderr, "term_number  is %d\n", term_number));
 
-	    XStoreName(dpy, plot->window, new_name);
+	    XStoreName(dpy, plot->window, plot->titlestring);
 
 	    sprintf(new_name, "gplt%3d", term_number);
 	    XSetIconName(dpy, plot->window, new_name);
 	}
+#ifdef USE_MOUSE
+	/**
+	 * set all mouse parameters
+	 * to a well-defined state.
+	 */
+	plot->msgwin = (Window) 0;
+	plot->button = 0;
+#if 0
+	plot->pointer_x = NOT_AVAILABLE;
+	plot->pointer_y = NOT_AVAILABLE;
+#endif
+	plot->x = NOT_AVAILABLE;
+	plot->y = NOT_AVAILABLE;
+	if (plot->str[0]!='\0') {
+	    /* if string was non-empty last time, initialize it as almost empty: one space, to prevent window resize */
+	    plot->str[0] = ' ';
+	    plot->str[1] = '\0';
+	}
+	plot->time = 0; /* XXX how should we initialize this ? XXX */
+#endif
     }
 /* We don't know that it is the same window as before, so we reset the
  * cursors for all windows and then define the cursor for the active
@@ -645,7 +864,6 @@ int term_number;
  */
     reset_cursor();
     XDefineCursor(dpy, plot->window, cursor);
-
 }
 
 /* store a command in a plot structure */
@@ -693,6 +911,7 @@ read_input ()
 	buf_offset = 0;
 
     if (! buffered_input_available) {
+/* fcntl(fd,F_SETFL,O_NONBLOCK); */
 	total_chars = read (fd, rdbuf, rdbuf_size);
 	buffered_input_available = 1;
 	partial_read = 0;
@@ -746,27 +965,199 @@ record()
 	switch (*buf) {
 	case 'G':		/* enter graphics mode */
 	    {
-		int plot_number = atoi(buf + 1);    /* 0 if none specified */
-
-		if (plot_number < 0 || plot_number >= MAX_WINDOWS)
-		    plot_number = 0;
-
+		int plot_number;
+#ifndef USE_MOUSE
+		sscanf(buf, "G%d", &plot_number);
+#else
+#ifdef OS2
+		sscanf(buf, "G%d %lu %li", &plot_number, &gnuplotXID, &ppidGnu);
+#else
+		sscanf(buf, "G%d %lu", &plot_number, &gnuplotXID);
+#endif
+#endif
 		FPRINTF((stderr, "plot for window number %d\n", plot_number));
 		plot = plot_array + plot_number;
 		prepare_plot(plot, plot_number);
-		continue;
+		current_plot = plot;
+#ifdef USE_MOUSE
+#ifdef OS2
+		if (!input_from_PM_Terminal) { /* get shared memory */
+		  sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu );
+		  if (DosGetNamedSharedMem(&input_from_PM_Terminal, mouseShareMemName, PAG_WRITE))
+		    DosBeep(1440L,1000L); /* indicates error */
+		  semInputReady = 0;
+		}
+#endif
+		/* show a message in the wm's title bar that the
+		 * graph will be redrawn. This might be useful
+		 * for slow redrawing (large plots). The title
+		 * string is reset to the default at the end of
+		 * display(). We should make this configurable!
+		 */
+		if (plot->window) {
+		    char msg[0xff];
+		    strcpy(msg, plot->titlestring);
+		    strcat(msg, " drawing ...");
+		    XStoreName(dpy, plot->window, msg);
+		}
+#endif
+		/* continue; */
 	    }
+	    break;
+	case 'N': /* just update the plot number */
+	    {
+		int itmp;
+		if (sscanf(buf, "N%d", &itmp))
+		    current_plot = plot_array + itmp;
+	    }
+	    break;
 	case 'E':		/* leave graphics mode / suspend */
 	    display(plot);
+#ifdef USE_MOUSE
+	    if (plot == current_plot) {
+		gp_exec_event(GE_plotdone, 0, 0, 0, 0); /* notify main program */
+	    }
+#endif
 	    return 1;
 	case 'R':		/* leave x11 mode */
 	    reset_cursor();
 	    return 0;
+
+	case 'X': /* tell the driver about do_raise /  persist */
+	    {
+		int tmp_do_raise, tmp_persist;
+		if (2 == sscanf(buf, "X%d%d", &tmp_do_raise, &tmp_persist)) {
+		    if (UNSET != tmp_do_raise) {
+			do_raise = tmp_do_raise;
+		    }
+		    if (UNSET != tmp_persist) {
+			persist = tmp_persist;
+		    }
+		}
+	    }
+	    return 1;
+
+#ifdef USE_MOUSE
+	case 'u':
+	    {
+		/* `set cursor' */
+		int c,x,y;
+		sscanf(buf, "u%4d%4d%4d", &c, &x, &y);
+		switch (c) {
+		    case -2:  /* warp pointer */
+#if 0
+			fprintf(stderr, "(record) warp pointer\n");
+			fprintf(stderr, "    %d %d %d\n", c, x, y);
+#endif
+			XWarpPointer(dpy, None /* src_w */,
+			    plot->window /* dest_w */, 0, 0, 0, 0, X(x), Y(y));
+		    case -1:  /* zoombox */
+			plot->zoombox_x1 = plot->zoombox_x2 = X(x);
+			plot->zoombox_y1 = plot->zoombox_y2 = Y(y);
+			plot->zoombox_on = TRUE;
+			DrawBox(plot);
+#if 0
+			cursor = cursor_default;
+			XDefineCursor(dpy, plot->window, cursor);
+#endif
+		        break;
+		    case 0:  /* standard cross-hair cursor */
+			cursor = cursor_default;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 1:  /* cursor during rotation */
+			cursor = cursor_exchange;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 2:  /* cursor during scaling */
+			cursor = cursor_sizing;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		    case 3:  /* cursor during zooming */
+			cursor = cursor_zooming;
+			XDefineCursor(dpy, plot->window, cursor);
+			break;
+		}
+		if (c>=0 && plot->zoombox_on) {
+		    /* erase zoom box */
+		    DrawBox(plot);
+		    plot->zoombox_on=FALSE;
+		}
+		return 1;
+	    }
+
+	case 't':
+	    {
+		int where;
+		char *second;
+		if (sscanf(buf, "t%4d", &where)!=1) return 1;
+	        buf[strlen(buf)-1]=0;  /* remove trailing \n */
+	        switch (where) {
+	            case 0:
+			DisplayCoords(plot,buf+5);
+			break;
+		    case 1:
+			second = strchr(buf+5, '\r'); 
+			if (second == NULL) {
+			    *(plot->zoombox_str1a) = '\0';
+			    *(plot->zoombox_str1b) = '\0';
+			    break;
+			}
+			*second = 0; second++;
+			if (plot->zoombox_on) DrawBox(plot);
+			strcpy(plot->zoombox_str1a, buf+5);
+			strcpy(plot->zoombox_str1b, second);
+			if (plot->zoombox_on) DrawBox(plot);
+			break;
+		    case 2:
+			second = strchr(buf+5, '\r'); 
+			if (second == NULL) {
+			    *(plot->zoombox_str2a) = '\0';
+			    *(plot->zoombox_str2b) = '\0';
+			    break;
+			}
+			*second = 0; second++;
+			if (plot->zoombox_on) DrawBox(plot);
+			strcpy(plot->zoombox_str2a, buf+5);
+			strcpy(plot->zoombox_str2b, second);
+			if (plot->zoombox_on) DrawBox(plot);
+			break;
+		}
+		return 1;
+	    }
+
+	case 'r':
+	    {
+	        int x,y;
+		DrawRuler(plot); /* erase previous ruler */
+		sscanf(buf, "r%4d%4d", &x, &y);
+		if (x<0) plot->ruler_on = FALSE;
+		else {
+		    plot->ruler_on = TRUE;
+		    plot->ruler_x = x;
+		    plot->ruler_y = y;
+		}
+		DrawRuler(plot); /* draw new one */
+		return 1;
+	    }
+
+	case 'z':
+#ifdef EXPORT_SELECTION
+	    export_graph(plot);
+#endif
+	    XStoreBytes(dpy, buf+1, strlen(buf+1)-1);
+	    XFlush(dpy);
+	    return 1;
+#endif
 	default:
 	    store_command(buf, plot);
 	    continue;
 	}
     }
+    if (feof(X11_ipc) || ferror(X11_ipc))
+	return 0;
+    else
+	return 1;
 }
 
 #else /* VMS */
@@ -794,6 +1185,7 @@ record()
 	    FPRINTF((stderr, "plot for window number %d\n", plot_number));
 	    plot = plot_array + plot_number;
 	    prepare_plot(plot, plot_number);
+	    current_plot = plot;
 	    break;
 	}
     case 'E':			/* leave graphics mode */
@@ -831,65 +1223,19 @@ record()
 
 
 /*-----------------------------------------------------------------------------
- *   display - display a stored plot
+ *   exec_cmd - execute drawing command from inboard driver
  *---------------------------------------------------------------------------*/
 
 void
-display(plot)
+exec_cmd(plot,command)
 plot_struct *plot;
+char *command;
 {
-    int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
-    int user_width = 1;		/* as specified by plot...linewidth */
+    int x, y, sw, sl;
     char *buffer, *str;
-    enum JUSTIFY jmode;
 
-    FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
-
-    if (plot->ncommands == 0)
-	return;
-
-    /* set scaling factor between internal driver & window geometry */
-    xscale = plot->width / 4096.0;
-    yscale = plot->height / 4096.0;
-
-    /* initial point sizes, until overridden with P7xxxxyyyy */
-    px = (int) (xscale * pointsize);
-    py = (int) (yscale * pointsize);
-
-    /* create new pixmap & GC */
-    if (gc)
-	XFreeGC(dpy, gc);
-
-    if (!plot->pixmap) {
-	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n", plot - plot_array, plot->width,
-		 plot->height, D));
-	plot->pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
-    }
-    gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
-
-    XSetFont(dpy, gc, font->fid);
-
-    /* set pixmap background */
-    XSetForeground(dpy, gc, colors[0]);
-    XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, plot->height);
-    XSetBackground(dpy, gc, colors[0]);
-
-    if (!plot->window) {
-	plot->window = pr_window(plot->posn_flags, plot->x, plot->y, plot->width, plot->height);
-	++windows_open;
-    }
-    /* top the window but don't put keyboard or mouse focus into it. */
-    if (do_raise)
-	XMapRaised(dpy, plot->window);
-
-    /* momentarily clear the window first if requested */
-    if (Clear) {
-	XClearWindow(dpy, plot->window);
-	XFlush(dpy);
-    }
-    /* loop over accumulated commands from inboard driver */
-    for (n = 0; n < plot->ncommands; n++) {
-	buffer = plot->commands[n];
+	buffer = command;
+	/* fprintf (stderr, "(display) buffer = |%s|\n", buffer); */
 
 	/*   X11_vector(x,y) - draw vector  */
 	if (*buffer == 'V') {
@@ -909,7 +1255,7 @@ plot_struct *plot;
 	    sl = strlen(str) - 1;
 	    sw = XTextWidth(font, str, sl);
 
-	    switch (jmode) {
+	    switch (plot->jmode) {
 	    case LEFT:
 		sw = 0;
 		break;
@@ -923,7 +1269,7 @@ plot_struct *plot;
 
 	    XSetForeground(dpy, gc, colors[2]);
 	    XDrawString(dpy, plot->pixmap, gc, X(x) + sw, Y(y) + vchar / 3, str, sl);
-	    XSetForeground(dpy, gc, colors[lt + 3]);
+	    XSetForeground(dpy, gc, colors[plot->lt + 3]);
 	} else if (*buffer == 'F') {	/* fill box */
 	    int style, xtmp, ytmp, w, h;
 
@@ -937,44 +1283,45 @@ plot_struct *plot;
 		h *= yscale;
 		XSetForeground(dpy, gc, colors[0]);
 		XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
-		XSetForeground(dpy, gc, colors[lt + 3]);
+		XSetForeground(dpy, gc, colors[plot->lt + 3]);
 	    }
 	}
 	/*   X11_justify_text(mode) - set text justification mode  */
 	else if (*buffer == 'J')
-	    sscanf(buffer, "J%4d", (int *) &jmode);
+	    sscanf(buffer, "J%4d", (int *) &plot->jmode);
 
-	/*  X11_linewidth(width) - set line width */
+	/*  X11_linewidth(plot->lwidth) - set line width */
 	else if (*buffer == 'W')
-	    sscanf(buffer + 1, "%4d", &user_width);
+	    sscanf(buffer + 1, "%4d", &plot->user_width);
 
-	/*   X11_linetype(type) - set line type  */
+	/*   X11_linetype(plot->type) - set line type  */
 	else if (*buffer == 'L') {
-	    sscanf(buffer, "L%4d", &lt);
-	    lt = (lt % 8) + 2;
+	    sscanf(buffer, "L%4d", &plot->lt);
+	    plot->lt = (plot->lt % 8) + 2;
 	    /* default width is 0 {which X treats as 1} */
-	    width = widths[lt] ? user_width * widths[lt] : user_width;
-	    if (dashes[lt][0]) {
-		type = LineOnOffDash;
-		XSetDashes(dpy, gc, 0, dashes[lt], strlen(dashes[lt]));
+	    plot->lwidth = widths[plot->lt] ? plot->user_width * widths[plot->lt] : plot->user_width;
+	    if (dashes[plot->lt][0]) {
+		plot->type = LineOnOffDash;
+		XSetDashes(dpy, gc, 0, dashes[plot->lt], strlen(dashes[plot->lt]));
 	    } else {
-		type = LineSolid;
+		plot->type = LineSolid;
 	    }
-	    XSetForeground(dpy, gc, colors[lt + 3]);
-	    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
+	    XSetForeground(dpy, gc, colors[plot->lt + 3]);
+	    XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 	}
 	/*   X11_point(number) - draw a point */
 	else if (*buffer == 'P') {
+	    int point;
 	    /* linux sscanf does not like %1d%4d%4d" with Oxxxxyyyy */
 	    /* sscanf(buffer, "P%1d%4d%4d", &point, &x, &y); */
 	    point = buffer[1] - '0';
 	    sscanf(buffer + 2, "%4d%4d", &x, &y);
 	    if (point == 7) {
 		/* set point size */
-		px = (int) (x * xscale * pointsize);
-		py = (int) (y * yscale * pointsize);
+		plot->px = (int) (x * xscale * pointsize);
+		plot->py = (int) (y * yscale * pointsize);
 	    } else {
-		if (type != LineSolid || width != 0) {	/* select solid line */
+		if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
 		    XSetLineAttributes(dpy, gc, 0, LineSolid, CapButt, JoinBevel);
 		}
 		switch (point) {
@@ -982,16 +1329,16 @@ plot_struct *plot;
 		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
 		    break;
 		case 1:	/* do diamond */
-		    Diamond[0].x = (short) X(x) - px;
+		    Diamond[0].x = (short) X(x) - plot->px;
 		    Diamond[0].y = (short) Y(y);
-		    Diamond[1].x = (short) px;
-		    Diamond[1].y = (short) -py;
-		    Diamond[2].x = (short) px;
-		    Diamond[2].y = (short) py;
-		    Diamond[3].x = (short) -px;
-		    Diamond[3].y = (short) py;
-		    Diamond[4].x = (short) -px;
-		    Diamond[4].y = (short) -py;
+		    Diamond[1].x = (short) plot->px;
+		    Diamond[1].y = (short) -plot->py;
+		    Diamond[2].x = (short) plot->px;
+		    Diamond[2].y = (short) plot->py;
+		    Diamond[3].x = (short) -plot->px;
+		    Diamond[3].y = (short) plot->py;
+		    Diamond[4].x = (short) -plot->px;
+		    Diamond[4].y = (short) -plot->py;
 
 		    /*
 		     * Should really do a check with XMaxRequestSize()
@@ -1000,30 +1347,30 @@ plot_struct *plot;
 		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
 		    break;
 		case 2:	/* do plus */
-		    Plus[0].x1 = (short) X(x) - px;
+		    Plus[0].x1 = (short) X(x) - plot->px;
 		    Plus[0].y1 = (short) Y(y);
-		    Plus[0].x2 = (short) X(x) + px;
+		    Plus[0].x2 = (short) X(x) + plot->px;
 		    Plus[0].y2 = (short) Y(y);
 		    Plus[1].x1 = (short) X(x);
-		    Plus[1].y1 = (short) Y(y) - py;
+		    Plus[1].y1 = (short) Y(y) - plot->py;
 		    Plus[1].x2 = (short) X(x);
-		    Plus[1].y2 = (short) Y(y) + py;
+		    Plus[1].y2 = (short) Y(y) + plot->py;
 
 		    XDrawSegments(dpy, plot->pixmap, gc, Plus, 2);
 		    break;
 		case 3:	/* do box */
-		    XDrawRectangle(dpy, plot->pixmap, gc, X(x) - px, Y(y) - py, (px + px), (py + py));
+		    XDrawRectangle(dpy, plot->pixmap, gc, X(x) - plot->px, Y(y) - plot->py, (plot->px + plot->px), (plot->py + plot->py));
 		    XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
 		    break;
 		case 4:	/* do X */
-		    Cross[0].x1 = (short) X(x) - px;
-		    Cross[0].y1 = (short) Y(y) - py;
-		    Cross[0].x2 = (short) X(x) + px;
-		    Cross[0].y2 = (short) Y(y) + py;
-		    Cross[1].x1 = (short) X(x) - px;
-		    Cross[1].y1 = (short) Y(y) + py;
-		    Cross[1].x2 = (short) X(x) + px;
-		    Cross[1].y2 = (short) Y(y) - py;
+		    Cross[0].x1 = (short) X(x) - plot->px;
+		    Cross[0].y1 = (short) Y(y) - plot->py;
+		    Cross[0].x2 = (short) X(x) + plot->px;
+		    Cross[0].y2 = (short) Y(y) + plot->py;
+		    Cross[1].x1 = (short) X(x) - plot->px;
+		    Cross[1].y1 = (short) Y(y) + plot->py;
+		    Cross[1].x2 = (short) X(x) + plot->px;
+		    Cross[1].y2 = (short) Y(y) - plot->py;
 
 		    XDrawSegments(dpy, plot->pixmap, gc, Cross, 2);
 		    break;
@@ -1031,62 +1378,640 @@ plot_struct *plot;
 		    {
 			short temp_x, temp_y;
 
-			temp_x = (short) (1.33 * (double) px + 0.5);
-			temp_y = (short) (1.33 * (double) py + 0.5);
+			temp_x = (short) (1.33 * (double) plot->px + 0.5);
+			temp_y = (short) (1.33 * (double) plot->py + 0.5);
 
 			Triangle[0].x = (short) X(x);
 			Triangle[0].y = (short) Y(y) - temp_y;
 			Triangle[1].x = (short) temp_x;
-			Triangle[1].y = (short) 2 *py;
+			Triangle[1].y = (short) 2 *plot->py;
 			Triangle[2].x = (short) -(2 * temp_x);
 			Triangle[2].y = (short) 0;
 			Triangle[3].x = (short) temp_x;
-			Triangle[3].y = (short) -(2 * py);
+			Triangle[3].y = (short) -(2 * plot->py);
 
 			XDrawLines(dpy, plot->pixmap, gc, Triangle, 4, CoordModePrevious);
 			XDrawPoint(dpy, plot->pixmap, gc, X(x), Y(y));
 		    }
 		    break;
 		case 6:	/* do star */
-		    Star[0].x1 = (short) X(x) - px;
+		    Star[0].x1 = (short) X(x) - plot->px;
 		    Star[0].y1 = (short) Y(y);
-		    Star[0].x2 = (short) X(x) + px;
+		    Star[0].x2 = (short) X(x) + plot->px;
 		    Star[0].y2 = (short) Y(y);
 		    Star[1].x1 = (short) X(x);
-		    Star[1].y1 = (short) Y(y) - py;
+		    Star[1].y1 = (short) Y(y) - plot->py;
 		    Star[1].x2 = (short) X(x);
-		    Star[1].y2 = (short) Y(y) + py;
-		    Star[2].x1 = (short) X(x) - px;
-		    Star[2].y1 = (short) Y(y) - py;
-		    Star[2].x2 = (short) X(x) + px;
-		    Star[2].y2 = (short) Y(y) + py;
-		    Star[3].x1 = (short) X(x) - px;
-		    Star[3].y1 = (short) Y(y) + py;
-		    Star[3].x2 = (short) X(x) + px;
-		    Star[3].y2 = (short) Y(y) - py;
+		    Star[1].y2 = (short) Y(y) + plot->py;
+		    Star[2].x1 = (short) X(x) - plot->px;
+		    Star[2].y1 = (short) Y(y) - plot->py;
+		    Star[2].x2 = (short) X(x) + plot->px;
+		    Star[2].y2 = (short) Y(y) + plot->py;
+		    Star[3].x1 = (short) X(x) - plot->px;
+		    Star[3].y1 = (short) Y(y) + plot->py;
+		    Star[3].x2 = (short) X(x) + plot->px;
+		    Star[3].y2 = (short) Y(y) - plot->py;
 
 		    XDrawSegments(dpy, plot->pixmap, gc, Star, 4);
 		    break;
 		}
-		if (type != LineSolid || width != 0) {	/* select solid line */
-		    XSetLineAttributes(dpy, gc, width, type, CapButt, JoinBevel);
+		if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
+		    XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
 		}
 	    }
 	}
+
+}
+
+/*-----------------------------------------------------------------------------
+ *   display - display a stored plot
+ *---------------------------------------------------------------------------*/
+
+void
+display(plot)
+plot_struct *plot;
+{
+    int n;
+
+    FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
+
+    if (plot->ncommands == 0)
+	return;
+
+    /* set scaling factor between internal driver & window geometry */
+    xscale = plot->width / 4096.0;
+    yscale = GRAPH_HEIGHT(plot) / 4096.0;
+
+    /* initial point sizes, until overridden with P7xxxxyyyy */
+    plot->px = (int) (xscale * pointsize);
+    plot->py = (int) (yscale * pointsize);
+
+    /* create new pixmap & GC */
+    if (!plot->pixmap) {
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n",
+		plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), D));
+	plot->pixmap = XCreatePixmap(dpy, root,
+	    plot->width, PIXMAP_HEIGHT(plot), D);
     }
 
-    /* set new pixmap as window background */
-    XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
+    if (gc)
+	XFreeGC(dpy, gc);
 
-    /* trigger exposure of background pixmap */
-    XClearWindow(dpy, plot->window);
+    gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
+
+    XSetFont(dpy, gc, font->fid);
+
+    /* set pixmap background */
+    XSetForeground(dpy, gc, colors[0]);
+    XFillRectangle(dpy, plot->pixmap, gc, 0, 0, plot->width, PIXMAP_HEIGHT(plot)+vchar);
+    XSetBackground(dpy, gc, colors[0]);
+
+    if (!plot->window) {
+	plot->window = pr_window(plot);
+	++windows_open;
+    }
+    /* top the window but don't put keyboard or mouse focus into it. */
+    if (do_raise)
+	XMapRaised(dpy, plot->window);
+
+    /* momentarily clear the window first if requested */
+    if (Clear) {
+	XClearWindow(dpy, plot->window);
+	XFlush(dpy);
+    }
+    /* loop over accumulated commands from inboard driver */
+    for (n = 0; n < plot->ncommands; n++) {
+	exec_cmd(plot, plot->commands[n]);
+    }
 
 #ifdef EXPORT_SELECTION
     export_graph(plot);
 #endif
 
-    XFlush(dpy);
+    UpdateWindow(plot);
+#ifdef USE_MOUSE
+    if (plot->window) {
+	/* restore default window title */
+	XStoreName(dpy, plot->window, plot->titlestring);
+    }
+#endif
 }
+
+void
+UpdateWindow(plot_struct* plot)
+{
+#ifdef USE_MOUSE
+    XEvent event;
+#endif
+
+    if (!plot->pixmap) {
+	/* create a black background pixmap */
+	FPRINTF((stderr, "Create pixmap %d : %dx%dx%d\n",
+		plot - plot_array, plot->width, PIXMAP_HEIGHT(plot), D));
+	plot->pixmap = XCreatePixmap(dpy, root,
+	    plot->width, PIXMAP_HEIGHT(plot), D);
+	if (gc)
+	    XFreeGC(dpy, gc);
+	gc = XCreateGC(dpy, plot->pixmap, 0, (XGCValues *) 0);
+	XSetFont(dpy, gc, font->fid);
+	/* set pixmap background */
+	XSetForeground(dpy, gc, colors[0]);
+	XFillRectangle(dpy, plot->pixmap, gc, 0, 0,
+	    plot->width, PIXMAP_HEIGHT(plot)+vchar);
+	XSetBackground(dpy, gc, colors[0]);
+    }
+    XSetWindowBackgroundPixmap(dpy, plot->window, plot->pixmap);
+    XClearWindow(dpy, plot->window);
+
+#ifdef USE_MOUSE
+    EventuallyDrawMouseAddOns(plot);
+
+    XFlush(dpy);
+
+    /* XXX discard expose events. This is a kludge for
+     * preventing the event dispatcher calling UpdateWindow()
+     * and the latter again generating expose events, which
+     * again would trigger the event dispatcher ... (joze) XXX */
+    while (XCheckWindowEvent(dpy, plot->window, ExposureMask, &event))
+	/* EMPTY */;
+#endif
+}
+
+
+#ifdef USE_MOUSE
+
+static int
+ErrorHandler(Display* display, XErrorEvent* error_event)
+{
+    plot_struct* plot = find_plot((Window) error_event->resourceid);
+#if 0
+    if (plot) {
+	fprintf(stderr, "(ErrorHandler) found plot window\n");
+    } else {
+	fprintf(stderr, "(ErrorHandler) found plot window\n");
+    }
+#endif
+    gp_exec_event(GE_reset, 0, 0, 0, 0);
+    if (plot) {
+	delete_plot(plot);
+    }
+    return 0;
+}
+
+void
+DrawRuler(plot_struct* plot)
+{
+    if (plot->ruler_on) {
+	int x = X(plot->ruler_x);
+	int y = Y(plot->ruler_y);
+	if (!gc_xor) {
+	    /* create a gc for `rubberbanding' (well ...) */
+	    GetGCXor(&gc_xor, plot->pixmap);
+	}
+	/* vertical line */
+	XDrawLine(dpy, plot->window, gc_xor, x, 0, x, GRAPH_HEIGHT(plot));
+	/* horizontal line */
+	XDrawLine(dpy, plot->window, gc_xor, 0, y, plot->width, y);
+    }
+}
+
+void
+EventuallyDrawMouseAddOns(plot_struct* plot)
+{
+    DrawRuler(plot);
+    if (plot->zoombox_on) DrawBox(plot);
+    DrawCoords(plot, plot->str);
+    /*
+	TODO more ...
+    */
+}
+
+
+
+/**
+ * draw a box using the gc with the GXxor function.
+ * This can be used to turn on *and off* a box. The
+ * corners of the box are annotated with the strings
+ * stored in the plot structure.
+ */
+void
+DrawBox(plot_struct* plot)
+{
+    int width;
+    int height;
+    int X0 = plot->zoombox_x1;
+    int Y0 = plot->zoombox_y1;
+    int X1 = plot->zoombox_x2;
+    int Y1 = plot->zoombox_y2;
+
+    if (!gc_xor_dashed) {
+	GetGCXorDashed(&gc_xor_dashed, plot->window);
+    }
+
+    if (X1 < X0) {
+	int tmp = X1;
+	X1 = X0;
+	X0 = tmp;
+    }
+
+    if (Y1 < Y0) {
+	int tmp = Y1;
+	Y1 = Y0;
+	Y0 = tmp;
+    }
+
+    width = X1 - X0;
+    height = Y1 - Y0;
+
+    XDrawRectangle(dpy, plot->window, gc_xor_dashed, X0, Y0, width, height);
+
+    if (plot->zoombox_str1a[0] || plot->zoombox_str1b[0])
+	AnnotatePoint(plot, plot->zoombox_x1, plot->zoombox_y1, plot->zoombox_str1a, plot->zoombox_str1b);
+    if (plot->zoombox_str2a[0] || plot->zoombox_str2b[0])
+	AnnotatePoint(plot, plot->zoombox_x2, plot->zoombox_y2, plot->zoombox_str2a, plot->zoombox_str2b);
+}
+
+
+/**
+ * draw the strings xstr and ystr centered horizontally
+ * and vertically at the point x, y. Use the GXxor
+ * as usually, so that we can also remove the coords
+ * later.
+ */
+void
+AnnotatePoint(plot_struct* plot, int x, int y, const char xstr[], const char ystr[])
+{
+    int ylen, xlen;
+    int xwidth, ywidth;
+
+    xlen = strlen(xstr);
+    xwidth = XTextWidth(font, xstr, xlen);
+
+    ylen = strlen(ystr);
+    ywidth = XTextWidth(font, ystr, ylen);
+
+    /* horizontal centering disabled (joze) */
+#if 0
+    {
+	int width;
+	width = xwidth > ywidth ? xwidth : ywidth;
+	x -= width / 2;
+    }
+#endif
+
+    if (!gc_xor) {
+	GetGCXor(&gc_xor, plot->window);
+    }
+    XDrawString(dpy, plot->window, gc_xor, x, y - 3, xstr, xlen);
+    XDrawString(dpy, plot->window, gc_xor, x, y + vchar, ystr, ylen);
+}
+
+void
+DrawEllipse(plot_struct* plot, int x, int y,
+    unsigned int a, unsigned int b)
+{
+    if (!gc_xor) {
+	GetGCXor(&gc_xor, plot->window);
+    }
+    XDrawArc(dpy, plot->window, gc_xor,
+	x - a, y - b, 2 * a, 2 * b, 0, 23040 /* 360 deg */);
+}
+
+#if 0
+void
+DrawCircle(plot_struct* plot, int x, int y, unsigned int r)
+{
+    DrawEllipse(plot, x, y, r, r);
+}
+
+void
+DrawLine(plot_struct* plot, int x1, int y1, int x2, int y2)
+{
+    if (!gc_xor) {
+	GetGCXor(&gc_xor, plot->window);
+    }
+    XDrawLine(dpy, plot->window, gc_xor, x1, y1, x2, y2);
+}
+#endif
+
+void
+DrawStringAt(plot_struct* plot, int x, int y, char* str)
+{
+    if (!gc_xor) {
+	GetGCXor(&gc_xor, plot->window);
+    }
+    XDrawString(dpy, plot->window, gc_xor, x, y, str, strlen(str));
+}
+
+
+#if 0
+void
+SetPointer(plot_struct* plot, int x, int y)
+{
+    plot->pointer_x = x;
+    plot->pointer_y = y;
+}
+#endif
+
+/* returns the time difference to the last click in milliseconds */
+long int
+SetTime(plot_struct* plot, Time t)
+{
+    /* fprintf (stderr, "(SetTime) difftime = %ld\n", t - plot->time); */
+    long int diff = t - plot->time;
+    plot->time = t;
+    return diff > 0 ? diff : 0;
+}
+
+
+
+
+
+void
+GetGCXor(GC* gc, Window window)
+    /* returns the newly created gc      */
+    /* window: where the gc will be used */
+{
+    XGCValues values;
+    unsigned long mask = 0;
+
+    mask = GCForeground | GCBackground | GCFunction | GCFont;
+    values.foreground = WhitePixel(dpy, scr);
+    values.background = BlackPixel(dpy, scr);
+    values.function = GXxor;
+    values.font = font->fid;
+
+    *gc = XCreateGC(dpy, window, mask, &values);
+
+}
+
+void
+GetGCXorDashed(GC* gc, Window window)
+{
+    GetGCXor(gc, window);
+    XSetLineAttributes(dpy, *gc,
+	0, /* line width, X11 treats 0 as a `thin' line */
+	LineOnOffDash, /* also: LineDoubleDash */
+	CapNotLast,    /* also: CapButt, CapRound, CapProjecting */
+	JoinMiter      /* also: JoinRound, JoinBevel */);
+}
+
+void
+GetGCBlackAndWhite(GC* gc, Pixmap pixmap, int mode)
+    /* returns the newly created gc      */
+    /* pixmap: where the gc will be used */
+    /* mode == 0 --> black on white      */
+    /* mode == 1 --> white on black      */
+{
+    XGCValues values;
+    unsigned long mask = 0;
+
+    mask = GCForeground | GCBackground | GCFont | GCFunction;
+    if (!mode) {
+	values.foreground = BlackPixel(dpy, scr);
+	values.background = WhitePixel(dpy, scr);
+    } else {
+	/**
+	 * swap colors
+	 */
+	values.foreground = WhitePixel(dpy, scr);
+	values.background = BlackPixel(dpy, scr);
+    }
+    values.function = GXcopy;
+    values.font = font->fid;
+
+    *gc = XCreateGC(dpy, pixmap, mask, &values);
+}
+
+/**
+ * split a string at `splitchar'.
+ */
+int
+SplitAt(char** args, int maxargs, char* buf, char splitchar)
+{
+    int argc = 0;
+
+    while (*buf != '\0' && argc < maxargs) {
+
+        if ((*buf == splitchar))
+            *buf++ = '\0';
+
+        if (!(*buf)) /* don't count the terminating NULL */
+            break;
+
+        /* Save the argument.  */
+        *args++ = buf;
+        argc++;
+
+        /* Skip over the argument */
+        while ((*buf != '\0') && (*buf != splitchar))
+            buf++;
+    }
+
+    *args = '\0'; /* terminate */
+    return argc;
+}
+
+void
+xfree(void* fred)
+{
+    if (fred)
+	free(fred);
+}
+
+/* leave the following there, we'll need it probably later for pm3d (joze) */
+#if 0
+/**
+ * display a message in a subwindow at x, y.
+ * If -1 == x, display the message window centered
+ * on the parent.
+ */
+void
+DisplayMessageAt(plot_struct* plot, char* msg, int sub_x, int sub_y)
+{
+    static GC gc = (GC) NULL; /* gc for drawing */
+    static GC clear_gc = (GC) NULL; /* gc for clearing the pixmap */
+    Pixmap pixmap = XCreatePixmap(dpy, root, plot->width, plot->height, D);
+    /* int font_height = font->max_bounds.ascent + font->max_bounds.descent; */
+    int font_height = vchar;
+    int y = 1.5 * font_height;
+    int padding = 10;
+    int i;
+    int max_width = 0;
+    char* msg_cpy = strdup(msg); /* SplitAt writes to msg */
+
+    char* argv[0x40]; /* up to 64 lines, should be sufficient */
+    int argc = SplitAt(argv, sizeof (argv), msg_cpy, '\n');
+
+    if (!gc) {
+
+	/* only if we're the first time in here ...  */
+
+	/* first we create a gc for clearing the pixmap */
+	GetGCBlackAndWhite(&clear_gc, pixmap, 1);
+
+	/* get a simple gc with a high contrast */
+	GetGCBlackAndWhite(&gc, pixmap, 0);
+    }
+
+    /* clear pixmap */
+    XFillRectangle(dpy, pixmap, clear_gc, 0, 0, plot->width, plot->height);
+
+    if (!plot->window) {
+	plot->window = pr_window(plot);
+	++windows_open;
+    }
+
+    /* top the window but don't put keyboard or mouse focus into it. */
+    if (do_raise)
+	XMapRaised(dpy, plot->window);
+
+    for (i = 0; i < argc; i++) {
+	int len = strlen(argv[i]);
+	int width = XTextWidth(font, argv[i], len);
+	if (width > max_width)
+	    max_width = width;
+	XDrawString(dpy, pixmap, gc, padding, y, argv[i], len);
+	y += font_height * 1.2;
+    }
+
+    if (!plot->msgwin) {
+
+	int width = max_width + 2 * padding;
+	int height = y;
+
+	if (width > plot->width) {
+	    width = plot->width;
+	    sub_x = 0;
+	} else if (sub_x < 0) {
+	    sub_x = (plot->width - width) / 2;
+	}
+	if (height > plot->height) {
+	    height = plot->height;
+	    sub_y = 0;
+	} else if (sub_y < 0) {
+	    sub_y = (plot->height - height) / 2;
+	}
+
+	/* create subwindow */
+	plot->msgwin = XCreateSimpleWindow(
+	    dpy,                         /* display                    */
+	    plot->window,                /* parent                     */
+	    sub_x, sub_y, width, height, /* x, y, width, height        */
+	    1,                           /* border width               */
+	    BlackPixel(dpy, scr),        /* (unsigned long) border     */
+	    WhitePixel(dpy, scr)         /* (unsigned long) background */);
+
+	XMapWindow(dpy, plot->msgwin);
+    }
+
+    /* set new pixmap as window background */
+    XSetWindowBackgroundPixmap(dpy, plot->msgwin, pixmap);
+
+    /* trigger exposure of background pixmap */
+    XClearWindow(dpy, plot->msgwin);
+
+    xfree(msg_cpy);
+
+    /*
+    XFlush(dpy);
+    */
+}
+#endif
+
+/* erase the last displayed position string */
+void
+EraseCoords(plot_struct* plot)
+{
+    if (!gc_xor) {
+	GetGCXor(&gc_xor, plot->window);
+    }
+
+    if (plot->str[0]) {
+	XDrawString(dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1,
+	    plot->str, strlen(plot->str));
+    }
+
+    /*
+    XFlush(dpy);
+    */
+}
+
+
+
+void
+DrawCoords(plot_struct* plot, const char *str)
+{
+    if (!gc_xor) {
+        GetGCXor(&gc_xor, plot->window);
+    }
+
+    if (str[0]!=0)
+	XDrawString
+	    (dpy, plot->window, gc_xor, 1, plot->gheight + vchar - 1, str, strlen(str));
+
+    /*
+       XFlush(dpy);
+     */
+}
+
+
+/* display text (e.g. mouse position) in the lower left corner of the window. */
+void
+DisplayCoords(plot_struct* plot, const char *s)
+{
+    /* first, erase old text */
+    EraseCoords(plot);
+
+    if (s[0] == 0) {
+	/* no new text? */
+	if (plot->height > plot->gheight) {
+	    /* and window has space for text? then make it smaller, unless we're already doing a resize: */
+	    if (!plot->resizing) {
+		XResizeWindow(dpy, plot->window, plot->width, plot->gheight);
+		plot->resizing = TRUE;
+	    }
+	}
+    } else {
+	/* so we do have new text */
+	if (plot->height == plot->gheight) {
+	    /* window not large enough? then make it larger, unless we're already doing a resize: */
+	    if (!plot->resizing) {
+		XResizeWindow(dpy, plot->window, plot->width, plot->gheight+vchar);
+		plot->resizing = TRUE;
+	    }
+        }
+    }
+
+    /* finally, draw the new text: */
+    DrawCoords(plot, s);
+
+    /* and save it, for later erasing: */
+    strcpy(plot->str, s);
+}
+
+
+int
+is_control(KeySym mod)
+{
+    return (XK_Control_R == mod || XK_Control_L == mod);
+}
+
+int
+is_meta(KeySym mod)
+{
+    /* we make no difference between alt and meta */
+    return (XK_Meta_R == mod || XK_Meta_L == mod
+	|| XK_Alt_R == mod || XK_Alt_L == mod);
+}
+
+int
+is_shift(KeySym mod)
+{
+    return (XK_Shift_R == mod || XK_Shift_L == mod);
+}
+
+#endif
 
 /*---------------------------------------------------------------------------
  *  reset all cursors (since we dont have a record of the previous terminal #)
@@ -1103,7 +2028,7 @@ reset_cursor()
 	 ++plot_number, ++plot) {
 	if (plot->window) {
 	    FPRINTF((stderr, "Window for plot %d exists\n", plot_number));
-	    XUndefineCursor(dpy, plot->window);;
+	    XUndefineCursor(dpy, plot->window);
 	}
     }
 
@@ -1135,27 +2060,97 @@ Window window;
     return NULL;
 }
 
+#ifdef USE_MOUSE
+void
+update_modifiers(state)
+unsigned int state;
+{
+    int old_mod_mask;
+
+    old_mod_mask = modifier_mask;
+    modifier_mask = ( (state&ShiftMask) ? Mod_Shift : 0 )
+                  | ( (state&ControlMask) ? Mod_Ctrl : 0)
+                  | ( (state&Mod1Mask) ? Mod_Alt : 0) ;
+    if (old_mod_mask != modifier_mask) {
+	gp_exec_event(GE_modifier, 0, 0, modifier_mask, 0);
+    }
+}
+#endif
+
+
 void
 process_event(event)
 XEvent *event;
 {
+#if 0
+    static char key_string[0xf];
+#endif
+    plot_struct* plot;
+    KeySym keysym;
+#ifdef USE_MOUSE
+#if 0
+    static int border = 0;
+    static int aspect_ratio = 0;
+    int old_mod_mask = 0;
+#endif
+#endif
     FPRINTF((stderr, "Event 0x%x\n", event->type));
 
     switch (event->type) {
-    case ConfigureNotify:
-	{
-	    plot_struct *plot = find_plot(event->xconfigure.window);
+	case ConfigureNotify:
+	    plot = find_plot(event->xconfigure.window);
 	    if (plot) {
 		int w = event->xconfigure.width, h = event->xconfigure.height;
 
 		/* store settings in case window is closed then recreated */
-		plot->x = event->xconfigure.x;
-		plot->y = event->xconfigure.y;
-		plot->posn_flags = (plot->posn_flags & ~PPosition) | USPosition;
+		/* but: don't do this if both x and y are 0, since some
+		 * (all?) systems set these to zero when only resizing
+		 * (not moving) the window. This does mean that a move to
+		 * (0,0) won't be registered: can we solve that? */
+		if (event->xconfigure.x!=0 || event->xconfigure.y!=0) {
+		    plot->x = event->xconfigure.x;
+		    plot->y = event->xconfigure.y;
+		    plot->posn_flags
+			= (plot->posn_flags & ~PPosition) | USPosition;
+		}
 
-		if (w > 1 && h > 1 && (w != plot->width || h != plot->height)) {
+#ifdef USE_MOUSE
+		/* first, check whether we were waiting
+		 * for completion of a resize */
+		if (plot->resizing) {
+		    /* it seems to be impossible to distinguish between a
+		     * resize caused by our call to XResizeWindow(), and a
+		     * resize started by the user/windowmanager; but we can
+		     * make a good guess which can only fail if the user
+		     * resizes the window while we're also resizing it
+		     * ourselves: */
+		    if (w == plot->width &&
+			(h == plot->gheight || h == plot->gheight+vchar)) {
+			/* most likely, it's a resize for showing/hiding
+			 * the status line: test whether the height is now
+			 * correct; if not, start another resize: */
+			if (w == plot->width
+			    && h == plot->gheight+(plot->str[0]?vchar:0) ) {
+			    plot->resizing = FALSE;
+			} else {
+			    XResizeWindow(dpy, plot->window, plot->width,
+				plot->gheight + (plot->str[0]?vchar:0));
+			}
+			plot->height = h;
+			break;
+		    }
+		    plot->resizing = FALSE;
+		}
+#endif
+
+		if (w > 1 && h > 1 &&
+		    (w != plot->width || h != plot->height)) {
+
 		    plot->width = w;
 		    plot->height = h;
+#ifdef USE_MOUSE
+		    plot->gheight = plot->height - (plot->str[0]?vchar:0);
+#endif
 		    plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
 		    if (plot->pixmap) {
 			/* it is the wrong size now */
@@ -1167,23 +2162,338 @@ XEvent *event;
 		}
 	    }
 	    break;
-	}
     case KeyPress:
-	if (event->xkey.keycode == q_keycode) {
-	    plot_struct *plot = find_plot(event->xkey.window);
-	    if (plot)
-		delete_plot(plot);
+	plot = find_plot(event->xkey.window);
+#if 0
+	if (0 == XLookupString(&(event->xkey), key_string, sizeof(key_string),
+		(KeySym*) NULL, (XComposeStatus*) NULL))
+	    key_string[0]=0;
+#endif
+
+#ifdef USE_MOUSE
+#if 0
+	plot->pointer_x = event->xkey.x;
+	plot->pointer_y = event->xkey.y;
+#endif
+	if (plot->msgwin) {
+	    /**
+	     * if the help window is displayed, any key
+	     * removes the help window and restores the
+	     * plot.
+	     */
+	    XDestroyWindow(dpy, plot->msgwin);
+	    plot->msgwin = (Window) 0;
+	    UpdateWindow(plot);
+	    return; /* no further event processing */
+	}
+
+#endif
+	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
+#ifdef USE_MOUSE
+	update_modifiers(event->xkey.state);
+
+	if (!modifier_mask)  {
+#endif
+	    switch (keysym) {
+#ifdef USE_MOUSE
+		case ' ':
+		    if (gnuplotXID) {
+			XMapRaised(dpy, gnuplotXID);
+			XSetInputFocus(dpy, gnuplotXID, 0 /*revert*/, CurrentTime);
+			XFlush(dpy);
+		    }
+		    return;
+#endif
+		case 'q':
+		    /* close X window */
+		    if (plot)
+			delete_plot(plot);
+		    return;
+		default:
+		    break;
+	    } /* switch (keysym) */
+#ifdef USE_MOUSE
+	} /* if (!modifier_mask) */
+
+	switch (keysym) {
+
+#define KNOWN_KEYSYMS(gp_keysym)                                             \
+		if (plot == current_plot) {                                  \
+		    gp_exec_event(GE_keypress,                               \
+			(int)RevX(event->xkey.x), (int)RevY(event->xkey.y),  \
+			gp_keysym, 0);                                       \
+		}                                                            \
+		return;
+
+	    case XK_BackSpace:
+		KNOWN_KEYSYMS(GP_BackSpace);
+	    case XK_Tab:
+		KNOWN_KEYSYMS(GP_Tab);
+	    case XK_Linefeed:
+		KNOWN_KEYSYMS(GP_Linefeed);
+	    case XK_Clear:
+		KNOWN_KEYSYMS(GP_Clear);
+	    case XK_Return:
+		KNOWN_KEYSYMS(GP_Return);
+	    case XK_Pause:
+		KNOWN_KEYSYMS(GP_Pause);
+	    case XK_Scroll_Lock:
+		KNOWN_KEYSYMS(GP_Scroll_Lock);
+#ifdef XK_Sys_Req
+	    case XK_Sys_Req:
+		KNOWN_KEYSYMS(GP_Sys_Req);
+#endif
+	    case XK_Escape:
+		KNOWN_KEYSYMS(GP_Escape);
+	    case XK_Insert:
+		KNOWN_KEYSYMS(GP_Insert);
+	    case XK_Delete:
+		KNOWN_KEYSYMS(GP_Delete);
+	    case XK_Home:
+		KNOWN_KEYSYMS(GP_Home);
+	    case XK_Left:
+		KNOWN_KEYSYMS(GP_Left);
+	    case XK_Up:
+		KNOWN_KEYSYMS(GP_Up);
+	    case XK_Right:
+		KNOWN_KEYSYMS(GP_Right);
+	    case XK_Down:
+		KNOWN_KEYSYMS(GP_Down);
+	    case XK_Prior: /* XXX */
+		KNOWN_KEYSYMS(GP_PageUp);
+	    case XK_Next: /* XXX */
+		KNOWN_KEYSYMS(GP_PageDown);
+	    case XK_End:
+		KNOWN_KEYSYMS(GP_End);
+	    case XK_Begin:
+		KNOWN_KEYSYMS(GP_Begin);
+	    case XK_KP_Space:
+		KNOWN_KEYSYMS(GP_KP_Space);
+	    case XK_KP_Tab:
+		KNOWN_KEYSYMS(GP_KP_Tab);
+	    case XK_KP_Enter:
+		KNOWN_KEYSYMS(GP_KP_Enter);
+	    case XK_KP_F1:
+		KNOWN_KEYSYMS(GP_KP_F1);
+	    case XK_KP_F2:
+		KNOWN_KEYSYMS(GP_KP_F2);
+	    case XK_KP_F3:
+		KNOWN_KEYSYMS(GP_KP_F3);
+	    case XK_KP_F4:
+		KNOWN_KEYSYMS(GP_KP_F4);
+#ifdef XK_KP_Home
+	    case XK_KP_Home:
+		KNOWN_KEYSYMS(GP_KP_Home);
+#endif
+#ifdef XK_KP_Left
+	    case XK_KP_Left:
+		KNOWN_KEYSYMS(GP_KP_Left);
+#endif
+#ifdef XK_KP_Up
+	    case XK_KP_Up:
+		KNOWN_KEYSYMS(GP_KP_Up);
+#endif
+#ifdef XK_KP_Right
+	    case XK_KP_Right:
+		KNOWN_KEYSYMS(GP_KP_Right);
+#endif
+#ifdef XK_KP_Down
+	    case XK_KP_Down:
+		KNOWN_KEYSYMS(GP_KP_Down);
+#endif
+#ifdef XK_KP_Page_Up
+	    case XK_KP_Page_Up:
+		KNOWN_KEYSYMS(GP_KP_Page_Up);
+#endif
+#ifdef XK_KP_Page_Down
+	    case XK_KP_Page_Down:
+		KNOWN_KEYSYMS(GP_KP_Page_Down);
+#endif
+#ifdef XK_KP_End
+	    case XK_KP_End:
+		KNOWN_KEYSYMS(GP_KP_End);
+#endif
+#ifdef XK_KP_Begin
+	    case XK_KP_Begin:
+		KNOWN_KEYSYMS(GP_KP_Begin);
+#endif
+#ifdef XK_KP_Insert
+	    case XK_KP_Insert:
+		KNOWN_KEYSYMS(GP_KP_Insert);
+#endif
+#ifdef XK_KP_Delete
+	    case XK_KP_Delete:
+		KNOWN_KEYSYMS(GP_KP_Delete);
+#endif
+	    case XK_KP_Equal:
+		KNOWN_KEYSYMS(GP_KP_Equal);
+	    case XK_KP_Multiply:
+		KNOWN_KEYSYMS(GP_KP_Multiply);
+	    case XK_KP_Add:
+		KNOWN_KEYSYMS(GP_KP_Add);
+	    case XK_KP_Separator:
+		KNOWN_KEYSYMS(GP_KP_Separator);
+	    case XK_KP_Subtract:
+		KNOWN_KEYSYMS(GP_KP_Subtract);
+	    case XK_KP_Decimal:
+		KNOWN_KEYSYMS(GP_KP_Decimal);
+	    case XK_KP_Divide:
+		KNOWN_KEYSYMS(GP_KP_Divide);
+
+	    case XK_KP_0:
+		KNOWN_KEYSYMS(GP_KP_0);
+	    case XK_KP_1:
+		KNOWN_KEYSYMS(GP_KP_1);
+	    case XK_KP_2:
+		KNOWN_KEYSYMS(GP_KP_2);
+	    case XK_KP_3:
+		KNOWN_KEYSYMS(GP_KP_3);
+	    case XK_KP_4:
+		KNOWN_KEYSYMS(GP_KP_4);
+	    case XK_KP_5:
+		KNOWN_KEYSYMS(GP_KP_5);
+	    case XK_KP_6:
+		KNOWN_KEYSYMS(GP_KP_6);
+	    case XK_KP_7:
+		KNOWN_KEYSYMS(GP_KP_7);
+	    case XK_KP_8:
+		KNOWN_KEYSYMS(GP_KP_8);
+	    case XK_KP_9:
+		KNOWN_KEYSYMS(GP_KP_9);
+
+	    case XK_F1:
+		KNOWN_KEYSYMS(GP_F1);
+	    case XK_F2:
+		KNOWN_KEYSYMS(GP_F2);
+	    case XK_F3:
+		KNOWN_KEYSYMS(GP_F3);
+	    case XK_F4:
+		KNOWN_KEYSYMS(GP_F4);
+	    case XK_F5:
+		KNOWN_KEYSYMS(GP_F5);
+	    case XK_F6:
+		KNOWN_KEYSYMS(GP_F6);
+	    case XK_F7:
+		KNOWN_KEYSYMS(GP_F7);
+	    case XK_F8:
+		KNOWN_KEYSYMS(GP_F8);
+	    case XK_F9:
+		KNOWN_KEYSYMS(GP_F9);
+	    case XK_F10:
+		KNOWN_KEYSYMS(GP_F10);
+	    case XK_F11:
+		KNOWN_KEYSYMS(GP_F11);
+	    case XK_F12:
+		KNOWN_KEYSYMS(GP_F12);
+
+
+	    default:
+		if (plot == current_plot) {
+		    KNOWN_KEYSYMS((int) keysym);
+		}
+		break;
+	}
+#endif
+	break;
+    case KeyRelease:
+#ifdef USE_MOUSE
+	update_modifiers(event->xkey.state);
+#endif
+	keysym = XKeycodeToKeysym(dpy, event->xkey.keycode, 0);
+	switch (keysym) {
+	    case XK_Shift_L:
+	    case XK_Shift_R:
+	    case XK_Control_L:
+	    case XK_Control_R:
+	    case XK_Meta_L:
+	    case XK_Meta_R:
+	    case XK_Alt_L:
+	    case XK_Alt_R:
+		plot = find_plot(event->xkey.window);
+		cursor = cursor_default;
+		XDefineCursor(dpy, plot->window, cursor);
 	}
 	break;
     case ClientMessage:
 	if (event->xclient.message_type == WM_PROTOCOLS &&
 	    event->xclient.format == 32 &&
 	    event->xclient.data.l[0] == WM_DELETE_WINDOW) {
-	    plot_struct *plot = find_plot(event->xclient.window);
-	    if (plot)
+	    plot = find_plot(event->xclient.window);
+	    if (plot) {
 		delete_plot(plot);
+	    }
 	}
 	break;
+#ifdef USE_MOUSE
+    case Expose:
+	/*
+	 * we need to handle expose events here, because
+	 * there might stuff like rulers which has to
+	 * be redrawn. Well. It's not really hard to handle
+	 * this. Note that the x and y fields are not used
+	 * to update the pointer pos because the pointer
+	 * might be on another window which generates the
+	 * expose events. (joze)
+	 */
+	plot = find_plot(event->xexpose.window);
+	if (!event->xexpose.count) {
+	    /* XXX jitters display while resizing */
+	    UpdateWindow(plot);
+	}
+	break;
+    case MotionNotify:
+	update_modifiers(event->xmotion.state);
+	plot = find_plot(event->xmotion.window);
+	{
+	    Window root,child;
+	    int root_x,root_y,pos_x,pos_y;
+	    unsigned int keys_buttons;
+	    if (!XQueryPointer(dpy,event->xmotion.window,&root,&child,&root_x,&root_y,&pos_x,&pos_y,&keys_buttons)) break;
+
+	    if (plot == current_plot) {
+		gp_exec_event(GE_motion, (int)RevX(pos_x), (int)RevY(pos_y), 0, 0);
+	    }
+
+	    if (plot->zoombox_on) {
+		DrawBox(plot);
+		plot->zoombox_x2 = pos_x;
+		plot->zoombox_y2 = pos_y;
+		DrawBox(plot);
+	    }
+	}
+	break;
+    case ButtonPress:
+	plot = find_plot(event->xbutton.window);
+	update_modifiers(event->xbutton.state);
+	{
+	    if (plot == current_plot) {
+		gp_exec_event(GE_buttonpress,
+		    (int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
+		    event->xbutton.button, 0);
+	    }
+
+	    /* must be done *after* dispatching the button events */
+#if 0
+	    SetPointer(plot, event->xbutton.x, event->xbutton.y);
+#endif
+	}
+	break;
+    case ButtonRelease:
+	plot = find_plot(event->xbutton.window);
+	if (plot == current_plot) {
+
+	    long int doubleclick = SetTime(plot, event->xbutton.time);
+
+	    update_modifiers(event->xbutton.state);
+	    gp_exec_event(GE_buttonrelease,
+		(int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
+		event->xbutton.button, (int) doubleclick );
+	}
+#if 0
+	SetPointer(plot, event->xbutton.x, event->xbutton.y);
+#endif
+	break;
+#endif /* USE_MOUSE */
 #ifdef EXPORT_SELECTION
     case SelectionNotify:
     case SelectionRequest:
@@ -1308,6 +2618,7 @@ gnuplot: X11 aborted.\n", Argv[1]);
 
 /*---open display---------------------------------------------------------*/
 
+    XSetErrorHandler(ErrorHandler);
     dpy = XOpenDisplay(ldisplay);
     if (!dpy) {
 	fprintf(stderr, "\n\
@@ -1321,9 +2632,6 @@ gnuplot: X11 aborted.\n", ldisplay);
     root = DefaultRootWindow(dpy);
     server_defaults = XResourceManagerString(dpy);
 
-/*---get symcode for key q ---*/
-
-    q_keycode = XKeysymToKeycode(dpy, XK_q);
 
 /**** atoms we will need later ****/
 
@@ -1455,9 +2763,12 @@ pr_color()
     double intensity = -1;
     int n;
 
-    pr_GetR(db, ".mono") && On(value.addr) && Mono++;
-    pr_GetR(db, ".gray") && On(value.addr) && Gray++;
-    pr_GetR(db, ".reverseVideo") && On(value.addr) && Rv++;
+    if (pr_GetR(db, ".mono") && On(value.addr))
+	Mono++;
+    if (pr_GetR(db, ".gray") && On(value.addr))
+	Gray++;
+    if (pr_GetR(db, ".reverseVideo") && On(value.addr))
+	Rv++;
 
     if (!Gray && (vis->class == GrayScale || vis->class == StaticGray))
 	Mono++;
@@ -1469,7 +2780,8 @@ pr_color()
 	for (n = 0; n < Ncolors; n++) {
 	    strcpy(option, ".");
 	    strcat(option, color_keys[n]);
-	    (n > 1) && strcat(option, ctype);
+	    if (n > 1)
+		strcat(option, ctype);
 	    v = pr_GetR(db, option)
 		? (char *) value.addr
 		: ((Gray) ? gray_values[n] : color_values[n]);
@@ -1547,7 +2859,8 @@ pr_dashes()
 	    continue;
 	}
 	for (ok = 0, j = 0; j < l; j++) {
-	    v[j] >= '1' && v[j] <= '9' && ok++;
+	    if (v[j] >= '1' && v[j] <= '9')
+		ok++;
 	}
 	if (ok != l || (ok != 2 && ok != 4)) {
 	    fprintf(stderr, "gnuplot: illegal dashes value %s:%s\n", option, v);
@@ -1671,19 +2984,25 @@ pr_width()
 /*-----------------------------------------------------------------------------
  *   pr_window - create window 
  *---------------------------------------------------------------------------*/
+void
+ProcessEvents(Window win)
+{
+    XSelectInput(dpy, win, KeyPressMask | KeyReleaseMask
+	| StructureNotifyMask | PointerMotionMask | PointerMotionHintMask
+	| ButtonPressMask | ButtonReleaseMask | ExposureMask);
+    XSync(dpy, 0);
+}
 
 Window
-pr_window(flags, x, y, width, height)
-unsigned int flags;
-int x, y;
-unsigned int width, height;
+pr_window(plot)
+plot_struct* plot;
 {
     char *title = pr_GetR(db, ".title");
     static XSizeHints hints;
     int Tvtwm = 0;
 
-    Window win = XCreateSimpleWindow(dpy, root, x, y, width, height, BorderWidth,
-				     colors[1], colors[0]);
+    Window win = XCreateSimpleWindow(dpy, root, plot->x, plot->y,
+	plot->width, plot->height, BorderWidth, colors[1], colors[0]);
 
     /* ask ICCCM-compliant window manager to tell us when close window
      * has been chosen, rather than just killing us
@@ -1692,18 +3011,20 @@ unsigned int width, height;
     XChangeProperty(dpy, win, WM_PROTOCOLS, XA_ATOM, 32, PropModeReplace,
 		    (unsigned char *) &WM_DELETE_WINDOW, 1);
 
-    pr_GetR(db, ".clear") && On(value.addr) && Clear++;
-    pr_GetR(db, ".tvtwm") && On(value.addr) && Tvtwm++;
+    if (pr_GetR(db, ".clear") && On(value.addr))
+	Clear++;
+    if (pr_GetR(db, ".tvtwm") && On(value.addr))
+	Tvtwm++;
 
     if (!Tvtwm) {
-	hints.flags = flags;
+	hints.flags = plot->posn_flags;
     } else {
-	hints.flags = (flags & ~USPosition) | PPosition;	/* ? */
+	hints.flags = (plot->posn_flags & ~USPosition) | PPosition;	/* ? */
     }
     hints.x = gX;
     hints.y = gY;
-    hints.width = width;
-    hints.height = height;
+    hints.width = plot->width;
+    hints.height = plot->height;
 
     XSetNormalHints(dpy, win, &hints);
 
@@ -1714,9 +3035,10 @@ unsigned int width, height;
 	wmh.initial_state = IconicState;
 	XSetWMHints(dpy, win, &wmh);
     }
-    XStoreName(dpy, win, ((title) ? title : Class));
+    strcpy(plot->titlestring, (title ? title : Class));
+    XStoreName(dpy, win, plot->titlestring);
 
-    XSelectInput(dpy, win, KeyPressMask | StructureNotifyMask);
+    ProcessEvents(win);
     XMapWindow(dpy, win);
 
     return win;
@@ -1789,7 +3111,8 @@ XEvent *event;
 		FPRINTF((stderr, "Targets request from %d\n", reply.xselection.requestor));
 
 		XChangeProperty(dpy, reply.xselection.requestor,
-				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
+			reply.xselection.property, reply.xselection.target,
+			32, PropModeReplace,
 				(unsigned char *) targets, 2);
 	    } else if (reply.xselection.target == XA_COLORMAP) {
 		Colormap cmap = DefaultColormap(dpy, 0);
@@ -1797,15 +3120,24 @@ XEvent *event;
 		FPRINTF((stderr, "colormap request from %d\n", reply.xselection.requestor));
 
 		XChangeProperty(dpy, reply.xselection.requestor,
-				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
+			reply.xselection.property, reply.xselection.target,
+			32, PropModeReplace,
 				(unsigned char *) &cmap, 1);
 	    } else if (reply.xselection.target == XA_PIXMAP) {
 
 		FPRINTF((stderr, "pixmap request from %d\n", reply.xselection.requestor));
 
 		XChangeProperty(dpy, reply.xselection.requestor,
-				reply.xselection.property, reply.xselection.target, 32, PropModeReplace,
-				(unsigned char *) &(exported_plot->pixmap), 1);
+		    reply.xselection.property, reply.xselection.target,
+		    32, PropModeReplace,
+		    (unsigned char *) &(exported_plot->pixmap), 1);
+#if defined(USE_MOUSE) && !defined(OS2)
+	    } else if (reply.xselection.target == XA_STRING) {
+		/* fprintf(stderr, "XA_STRING request\n"); */
+		XChangeProperty(dpy, reply.xselection.requestor,
+		    reply.xselection.property, reply.xselection.target,
+		    8, PropModeReplace, selection, strlen(selection));
+#endif
 	    } else {
 		reply.xselection.property = None;
 	    }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.35 1999/12/01 22:09:02 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.19 2000/02/04 12:48:12 joze Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -63,12 +63,13 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.35 1999/12/01 22:09:02 l
  *
  */
 
-#include "command.h"
+#include "plot.h"
 #include "alloc.h"
+#include "command.h"
 #include "eval.h"
 #include "fit.h"
+#include "binary.h"
 #include "gp_time.h"
-#include "gp_hist.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot2d.h"
@@ -80,6 +81,10 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.35 1999/12/01 22:09:02 l
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
+
+#ifdef USE_MOUSE
+# include "mouse.h"
+#endif
 
 /* GNU readline
  * Only required by two files directly,
@@ -111,6 +116,10 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 # endif /* USE_MOUSE */
 #endif /* OS2 */
 
+#ifdef USE_MOUSE
+# include "ipc.h"
+#endif
+
 #ifndef _Windows
 # include "help.h"
 #else
@@ -140,7 +149,6 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 /* static prototypes */
 static void command __PROTO((void));
 static int changedir __PROTO((char *path));
-static void replotrequest __PROTO((void));
 static int read_line __PROTO((const char *prompt));
 static void do_system __PROTO((const char *));
 #ifdef AMIGA_AC_5
@@ -173,6 +181,9 @@ __far int num_tokens, c_token;
 #else
 int num_tokens, c_token;
 #endif
+
+static int if_depth = 0;
+static TBOOLEAN if_condition = FALSE;
 
 static int command_exit_status = 0;
 
@@ -269,19 +280,35 @@ static char *input_line_SharedMem = NULL;
 	DosWaitEventSem(semInputReady,SEM_INDEFINITE_WAIT);
 	DosResetEventSem(semInputReady,&u);
 	if (thread_rl_Running) {
-	    if (input_line_SharedMem != NULL && *input_line_SharedMem &&
-	        strstr(input_line_SharedMem,"plot") != NULL && strcmp(term->name,"pm")) {
-		/* avoid plotting if terminal is not Presentation Manager */
-		fprintf(stderr,"\n\tCommand(s) ignored for non-PM terminal\a\n");
+	    if (input_line_SharedMem == NULL || !*input_line_SharedMem)
+		return (0);
+	    if (*input_line_SharedMem=='%') {
+		do_event( (struct gp_event_t*)(input_line_SharedMem+1) ); /* pass terminal's event */
+		input_line_SharedMem[0] = 0; /* discard the whole command line */
+		thread_rl_RetCode = 0;
+		return (0);
+	    }
+	    if (*input_line_SharedMem &&
+	        strstr(input_line_SharedMem,"plot") != NULL &&
+		(strcmp(term->name,"pm") && strcmp(term->name,"x11"))) {
+		/* avoid plotting if terminal is not PM or X11 */
+		fprintf(stderr,"\n\tCommand(s) ignored for other than PM and X11 terminals\a\n");
 		if (interactive) fputs(PROMPT,stderr);
 		input_line_SharedMem[0] = 0; /* discard the whole command line */
 		return (0);
 	    }
+#if 0
+	    fprintf(stderr,"shared mem received: |%s|\n",input_line_SharedMem);
+	    if (*input_line_SharedMem && input_line_SharedMem[strlen(input_line_SharedMem)-1] != '\n') fprintf(stderr,"\n");
+#endif
 	    strcpy(input_line, input_line_SharedMem);
 	    input_line_SharedMem[0] = 0;
 	    thread_rl_RetCode = 0;
 	}
-    if (thread_rl_RetCode)
+	if (thread_rl_RetCode)
+	    return (1);
+#else
+	if (read_line(PROMPT))
 	    return (1);
 #endif /* OS2 */
 #endif /* USE_MOUSE */
@@ -331,6 +358,8 @@ do_line()
 	return (0);
     }
 
+    if_depth = 0;
+    if_condition = TRUE;
     num_tokens = scanner(&input_line, &input_line_len);
     c_token = 0;
     while (c_token < num_tokens) {
@@ -349,6 +378,52 @@ do_line()
     return (0);
 }
 
+
+#ifdef USE_MOUSE
+void
+toggle_display_of_ipc_commands(void)
+{
+    if (mouse_setting.verbose)
+	mouse_setting.verbose = 0;
+    else
+	mouse_setting.verbose = 1;
+}
+
+int
+display_ipc_commands(void)
+{
+    return mouse_setting.verbose;
+}
+
+void
+do_string(s)
+char *s;
+{
+    char *orig_input_line;
+    static char buf[256];
+
+    if (display_ipc_commands())
+	fprintf(stderr, "%s\n", s);
+    orig_input_line=input_line;
+    input_line=buf;
+    strcpy(buf,s);
+    do_line();
+    input_line=orig_input_line;
+}
+
+void
+restore_prompt(void)
+{
+    if (interactive) {
+#if defined(HAVE_LIBREADLINE)
+	rl_forced_update_display();
+#else
+	fputs(PROMPT, stderr);
+	fflush(stderr);
+#endif
+    }
+}
+#endif
 
 void
 define()
@@ -408,6 +483,92 @@ command()
 
     return;
 }
+
+
+#ifdef USE_MOUSE
+
+#define WHITE_AFTER_TOKEN(x) \
+(' ' == input_line[token[x].start_index + token[x].length] \
+|| '\t' == input_line[token[x].start_index + token[x].length] \
+|| '\0' == input_line[token[x].start_index + token[x].length])
+
+/* process the 'bind' command */
+void
+bind_command()
+{
+    char* lhs = (char*) 0;
+    char* rhs = (char*) 0;
+    ++c_token;
+
+    if (!END_OF_COMMAND && equals(c_token,"!")) {
+	bind_remove_all();
+	++c_token;
+	return;
+    }
+
+    /* get left hand side: the key or key sequence */
+    if (!END_OF_COMMAND) {
+	char* first = input_line + token[c_token].start_index;
+	int size = (int) (strchr(first, ' ') - first);
+	if (size < 0) {
+	    size = (int) (strchr(first, '\0') - first);
+	}
+	if (size < 0) {
+	    fprintf(stderr, "(bind_command) %s:%d\n", __FILE__, __LINE__);
+	    return;
+	}
+	lhs = (char*) gp_alloc(size + 1, "bind_command->lhs");
+	if (isstring(c_token)) {
+	    quote_str(lhs, c_token, token_len(c_token));
+	} else {
+	    char* ptr = lhs;
+	    while (!END_OF_COMMAND) {
+		copy_str(ptr, c_token, token_len(c_token) + 1);
+		ptr += token_len(c_token);
+		if (WHITE_AFTER_TOKEN(c_token)) {
+		    break;
+		}
+		++c_token;
+	    }
+	}
+	++c_token;
+    }
+
+    /* get right hand side: the command. allocating the size
+     * of input_line is too big, but shouldn't hurt too much. */
+    if (!END_OF_COMMAND) {
+	rhs = (char*) gp_alloc(strlen(input_line) + 1, "bind_command->rhs");
+	if (isstring(c_token)) {
+	    /* bind <lhs> "..." */
+	    quote_str(rhs, c_token, token_len(c_token));
+	    c_token++;
+	} else {
+	    char* ptr = rhs;
+	    while (!END_OF_COMMAND) {
+		/* bind <lhs> ... ... ... */
+		copy_str(ptr, c_token, token_len(c_token) + 1);
+		ptr += token_len(c_token);
+		if (WHITE_AFTER_TOKEN(c_token)) {
+		    *ptr++ = ' ';
+		    *ptr = '\0';
+		}
+		c_token++;
+	    }
+	}
+    }
+
+    FPRINTF((stderr, "(bind_command) |%s| |%s|\n", lhs, rhs));
+
+#if 0
+    if (!END_OF_COMMAND) {
+	int_error(c_token, "usage: bind \"<lhs>\" \"<rhs>\"");
+    }
+#endif
+
+    /* bind_process() will eventually free lhs / rhs ! */
+    bind_process(lhs, rhs);
+}
+#endif
 
 
 /*
@@ -501,6 +662,11 @@ history_command()
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
 
+    /* external functions in history.c */
+    extern int history_find_all __PROTO((char *cmd));
+    char *history_find __PROTO((char *cmd));
+    void write_history_n __PROTO((const int n, const char *filename));
+
     c_token++;
 
     if (!END_OF_COMMAND && equals(c_token,"?")) {
@@ -563,6 +729,28 @@ history_command()
 #endif /* READLINE && !HAVE_LIBREADLINE */
 }
 
+#define REPLACE_ELSE(tok)             \
+do {                                  \
+    int idx = token[tok].start_index; \
+    token[tok].length = 1;            \
+    input_line[idx++] = ';'; /* e */  \
+    input_line[idx++] = ' '; /* l */  \
+    input_line[idx++] = ' '; /* s */  \
+    input_line[idx++] = ' '; /* e */  \
+} while (0)
+
+#if 0
+#define PRINT_TOKEN(tok)                                                    \
+do {                                                                        \
+    int i;                                                                  \
+    int end_index = token[tok].start_index + token[tok].length;             \
+    for (i = token[tok].start_index; i < end_index && input_line[i]; i++) { \
+	fputc(input_line[i], stderr);                                       \
+    }                                                                       \
+    fputc('\n', stderr);                                                    \
+    fflush(stderr);                                                         \
+} while (0)
+#endif
 
 /* process the 'if' command */
 void
@@ -570,6 +758,8 @@ if_command()
 {
     double exprval;
     struct value t;
+
+    if_depth++;
 
     if (!equals(++c_token, "("))	/* no expression */
 	int_error(c_token, "expecting (expression)");
@@ -582,9 +772,45 @@ if_command()
 	token[c_token].start_index = eolpos + 2;
 	input_line[eolpos + 2] = ';';
 	input_line[eolpos + 3] = NUL;
-    } else
+
+	if_condition = TRUE;
+    } else {
+	while (c_token < num_tokens) {
+	    /* skip over until the next command */
+	    while (!END_OF_COMMAND) {
+		++c_token;
+	    }
+	    if (++c_token < num_tokens && (equals(c_token, "else"))) {
+		/* break if an "else" was found */
+		if_condition = FALSE;
+		--c_token; /* go back to ';' */
+		return;
+	    }
+	}
+	/* no else found */
 	c_token = num_tokens = 0;
-    
+    }
+}
+
+/* process the 'else' command */
+void
+else_command()
+{
+    if (if_depth <= 0) {
+	int_error(c_token, "else without if");
+	return;
+    } else {
+	if_depth--;
+    }
+
+    if (TRUE == if_condition) {
+	/* First part of line was true so
+	 * discard the rest of the line. */
+	c_token = num_tokens = 0;
+    } else {
+	REPLACE_ELSE(c_token);
+	if_condition = TRUE;
+    }
 }
 
 
@@ -612,6 +838,7 @@ load_command()
 }
 
 
+
 /* null command */
 void
 null_command()
@@ -626,16 +853,18 @@ pause_command()
 {
     struct value a;
     int sleep_time, text = 0;
-    char *buf = NULL;
+    char *buf = gp_alloc(MAX_LINE_LEN+1, "pause argument");
 
     c_token++;
+
+    *buf = NUL;
 
     sleep_time = (int) real(const_express(&a));
     if (!(END_OF_COMMAND)) {
 	if (!isstring(c_token))
 	    int_error(c_token, "expecting string");
 	else {
-	    m_quote_capture(&buf, c_token, c_token);
+	    quote_str(buf, c_token, MAX_LINE_LEN);
 	    ++c_token;
 #ifdef _Windows
 	    if (sleep_time >= 0)
@@ -698,8 +927,18 @@ pause_command()
 	} else
 	    (void) fgets(buf, strlen(buf), stdin);
 #else /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
-	(void) fgets(buf, strlen(buf), stdin);
+#ifdef USE_MOUSE
+	if (term->waitforinput) {
+	    /* term->waitforinput() will return,
+	     * if CR was hit */
+	    term->waitforinput();
+	} else {
+#endif
+	(void) fgets(buf, sizeof(buf), stdin);
 	/* Hold until CR hit. */
+#ifdef USE_MOUSE
+	}
+#endif
 #endif
     }
     if (sleep_time > 0)
@@ -720,6 +959,9 @@ plot_command()
 {
     plot_token = c_token++;
     SET_CURSOR_WAIT;
+#ifdef USE_MOUSE
+    plot_mode(MODE_PLOT);
+#endif
     plotrequest();
     SET_CURSOR_ARROW;
 }
@@ -885,6 +1127,9 @@ splot_command()
 {
     plot_token = c_token++;
     SET_CURSOR_WAIT;
+#ifdef USE_MOUSE
+    plot_mode(MODE_SPLOT);
+#endif
     plot3drequest();
     SET_CURSOR_ARROW;
 }
@@ -988,7 +1233,7 @@ invalid_command()
 			      token[c_token].length);
 	    if (rc == 0) {
 		c_token = num_tokens = 0;
-		return (0);
+		return;
 	    }
 	}
     }
@@ -1054,7 +1299,7 @@ char *path;
 
 
 /* used by replot_command() */
-static void
+void
 replotrequest()
 {
     if (equals(c_token, "["))
@@ -1559,7 +1804,7 @@ const char *prompt;
 	    /* so that ^C or int_error during readline() does
 	     * not result in line being free-ed twice */
 	}
-	line = readline((interactive) ? prompt : "");
+	line = readline_ipc((interactive) ? prompt : "");
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
@@ -1881,4 +2126,3 @@ winsystem(char *s)
     return (0);			/* success */
 }
 #endif /* _Windows */
-

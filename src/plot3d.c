@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.15 1999/11/08 19:24:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.16 1999/11/24 13:28:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -114,6 +114,8 @@ do{\
   reverse_range[axis] = 1; \
  } else reverse_range[axis] = (range_flags[axis]&RANGE_REVERSE); \
 }while(0)
+
+int plot3d_num=0;
 
 
 /* get optional [min:max] */
@@ -330,7 +332,6 @@ int *indx;
 double *d;
 {
     int i, imax = -1, j, k;	/* HBB: added initial value, to shut up gcc -Wall */
-
     double large, dummy, temp, **ar, **lim, *limc, *ac, *dp, *vscal;
 
     dp = vscal = vec(n);
@@ -989,10 +990,13 @@ eval_3dplots()
     char *xtitle;
     char *ytitle;
 
+
     /* Reset first_3dplot. This is usually done at the end of this function.
      * If there is an error within this function, the memory is left allocated,
      * since we cannot call sp_free if the list is incomplete
      */
+    if (first_3dplot && plot3d_num>0) sp_free(first_3dplot);
+    plot3d_num=0;
     first_3dplot = NULL;
 
     /* put stuff into arrays to simplify access */
@@ -1640,7 +1644,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	print_3dtable(plot_num);
     else {
 	START_LEAK_CHECK();	/* assert no memory leaks here ! */
-	do_3dplot(first_3dplot, plot_num);
+	do_3dplot(first_3dplot, plot_num, 0);
 	END_LEAK_CHECK();
     }
 
@@ -1650,11 +1654,10 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
 	m_capture(&replot_line, plot_token, c_token - 1);
 	plot_token = -1;
     }
-    sp_free(first_3dplot);
-    first_3dplot = NULL;
+
+    /* record that all went well */
+    plot3d_num=plot_num;
 }
-
-
 
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.26 1999/11/15 22:02:51 lhecking Exp $
+ * $Id: plot.h,v 1.27 1999/11/24 13:31:17 lhecking Exp $
  *
  */
 
@@ -45,6 +45,11 @@
 #include "syscfg.h"
 #include "ansichek.h"
 #include "stdfn.h"
+
+#ifdef USE_MOUSE
+# include "mouse.h"
+#endif
+
 
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
@@ -612,36 +617,43 @@ struct surface_points {
 #define TERM_BINARY           4  /* open output file with "b"       */
 
 struct TERMENTRY {
-	const char *name;
+    const char *name;
 #ifdef WIN16
-	const char GPFAR description[80];  /* to make text go in FAR segment */
+    const char GPFAR description[80];  /* to make text go in FAR segment */
 #else
-	const char *description;
+    const char *description;
 #endif
-	unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
+    unsigned int xmax,ymax,v_char,h_char,v_tic,h_tic;
 
-	void (*options) __PROTO((void));
-	void (*init) __PROTO((void));
-	void (*reset) __PROTO((void));
-	void (*text) __PROTO((void));
-	int (*scale) __PROTO((double, double));
-	void (*graphics) __PROTO((void));
-	void (*move) __PROTO((unsigned int, unsigned int));
-	void (*vector) __PROTO((unsigned int, unsigned int));
-	void (*linetype) __PROTO((int));
-	void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
-/* the following are optional. set term ensures they are not NULL */
-	int (*text_angle) __PROTO((int));
-	int (*justify_text) __PROTO((enum JUSTIFY));
-	void (*point) __PROTO((unsigned int, unsigned int,int));
-	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, TBOOLEAN));
-	int (*set_font) __PROTO((const char *font));
-	void (*pointsize) __PROTO((double)); /* change pointsize */
-	int flags;
-	void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
-	void (*resume)  __PROTO((void)); /* called before plots of multiplot */
-	void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
-   void (*linewidth) __PROTO((double linewidth));
+    void (*options) __PROTO((void));
+    void (*init) __PROTO((void));
+    void (*reset) __PROTO((void));
+    void (*text) __PROTO((void));
+    int (*scale) __PROTO((double, double));
+    void (*graphics) __PROTO((void));
+    void (*move) __PROTO((unsigned int, unsigned int));
+    void (*vector) __PROTO((unsigned int, unsigned int));
+    void (*linetype) __PROTO((int));
+    void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
+    /* the following are optional. set term ensures they are not NULL */
+    int (*text_angle) __PROTO((int));
+    int (*justify_text) __PROTO((enum JUSTIFY));
+    void (*point) __PROTO((unsigned int, unsigned int,int));
+    void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, TBOOLEAN));
+    int (*set_font) __PROTO((const char *font));
+    void (*pointsize) __PROTO((double)); /* change pointsize */
+    int flags;
+    void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
+    void (*resume)  __PROTO((void)); /* called before plots of multiplot */
+    void (*fillbox) __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int)); /* clear in multiplot mode */
+    void (*linewidth) __PROTO((double linewidth));
+#ifdef USE_MOUSE
+    int (*waitforinput) __PROTO((void));     /* used for mouse input */
+    void (*put_tmptext) __PROTO((int, const char []));   /* draws temporary text; int determines where: 0=statusline, 1,2: at corners of zoom box, with \r separating text above and below the point */
+    void (*set_ruler) __PROTO((int, int));    /* set ruler location; x<0 switches ruler off */
+    void (*set_cursor) __PROTO((int, int, int));   /* set cursor style and corner of rubber band */
+    void (*set_clipboard) __PROTO((const char[]));  /* write text into cut&paste buffer (clipboard) */
+#endif
 };
 
 #ifdef WIN16
@@ -669,6 +681,9 @@ struct text_label {
 	int layer;
 	char *text;
 	char *font;
+	int pointstyle; /* joze */
+	double hoffset;
+	double voffset;
 }; /* Entry font added by DJL */
 
 struct arrow_def {
@@ -735,6 +750,11 @@ extern const char *user_shell;
 #if defined(ATARI) || defined(MTOS)
 extern const char *user_gnuplotpath;
 #endif
+
+#ifdef GNUPLOT_HISTORY
+extern long int gnuplot_history_size;
+#endif
+
 /* version.c */
 extern const char gnuplot_version[];
 extern const char gnuplot_patchlevel[];

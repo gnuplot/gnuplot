@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.19 1999/11/15 22:22:27 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.20 1999/11/24 13:24:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -114,8 +114,6 @@ static void boundary3d __PROTO((TBOOLEAN scaling, struct surface_points * plots,
 #if 0				/* not used */
 static double dbl_raise __PROTO((double x, int y));
 #endif
-static void map3d_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, const char *what));
 
 /* put entries in the key */
 static void key_sample_line __PROTO((int xl, int yl));
@@ -200,6 +198,10 @@ static double xaxis_y, yaxis_x, zaxis_x, zaxis_y;
 
 /* the co-ordinates of the back corner */
 static double back_x, back_y;
+
+#ifdef USE_MOUSE
+int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
+#endif
 
 /* the penalty for convenience of using tic_gen to make callbacks
  * to tick routines is that we cant pass parameters very easily.
@@ -440,9 +442,10 @@ static int key_size_left;	/* distance from x to left edge of box */
 static int key_size_right;	/* distance from x to right edge of box */
 
 void
-do_3dplot(plots, pcount)
+do_3dplot(plots, pcount, quick)
 struct surface_points *plots;
 int pcount;			/* count of plots in linked list */
+int quick;			/* !=0 means plot only axes etc., for quick rotation */
 {
     struct termentry *t = term;
     int surface;
@@ -541,13 +544,6 @@ int pcount;			/* count of plots in linked list */
     yscale3d = 2.0 / (y_max3d - y_min3d);
     xscale3d = 2.0 / (x_max3d - x_min3d);
 
-#if defined(USE_MOUSE) && defined(OS2)
-    if (strcmp(term->name, "pm") == 0) {	/* PM 14.5.1999 tell gnupmdrv about new [xleft..ybot] values */
-	extern void PM_write_xleft_ytop();
-	PM_write_xleft_ytop();
-    }
-#endif
-
     term_apply_lp_properties(&border_lp);	/* border linetype */
 
     /* PLACE TITLE */
@@ -583,18 +579,29 @@ int pcount;			/* count of plots in linked list */
 	}
     }
     /* PLACE LABELS */
+    if ((*t->pointsize)) {
+	(*t->pointsize)(pointsize);
+    }
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
+
 	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
 
 	if (this_label->layer)
 	    continue;
 	map3d_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 0, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, CENTRE, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point)(x, y, this_label->pointstyle);
 	}
     }
 
@@ -612,7 +619,7 @@ int pcount;			/* count of plots in linked list */
     }
 
 #ifndef LITE
-    if (hidden3d && draw_surface) {
+    if (hidden3d && draw_surface && !quick) {
 	init_hidden_line_removal();
 	reset_hidden_line_removal();
 	hidden_active = TRUE;
@@ -705,7 +712,7 @@ int pcount;			/* count of plots in linked list */
     /* DRAW SURFACES AND CONTOURS */
 
 #ifndef LITE
-    if (hidden3d && draw_surface)
+    if (hidden3d && draw_surface && !quick)
 	plot3d_hidden(plots, pcount);
 #endif /* not LITE */
 
@@ -747,6 +754,7 @@ int pcount;			/* count of plots in linked list */
    yl -= key_entry_height
 
     this_plot = plots;
+  if (!quick)
     for (surface = 0;
 	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
@@ -976,18 +984,29 @@ int pcount;			/* count of plots in linked list */
     draw_bottom_grid(plots, pcount);
 
     /* PLACE LABELS */
+    if ((*t->pointsize)) {
+	(*t->pointsize)(pointsize);
+    }
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
+
 	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
 
 	if (this_label->layer == 0)
 	    continue;
 	map3d_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 0, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, CENTRE, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point)(x, y, this_label->pointstyle);
 	}
     }
 
@@ -1012,6 +1031,14 @@ int pcount;			/* count of plots in linked list */
     }
 #endif /* not LITE */
 
+#ifdef USE_MOUSE
+    /* finally, store the 2d projection of the x and y axis, to enable zooming by mouse */
+    map3d_xy(x_min3d, y_min3d, base_z, &axis3d_o_x, &axis3d_o_y);
+    map3d_xy(x_max3d, y_min3d, base_z, &axis3d_x_dx, &axis3d_x_dy);
+    axis3d_x_dx -= axis3d_o_x;  axis3d_x_dy -= axis3d_o_y;
+    map3d_xy(x_min3d, y_max3d, base_z, &axis3d_y_dx, &axis3d_y_dy);
+    axis3d_y_dx -= axis3d_o_x;  axis3d_y_dy -= axis3d_o_y;
+#endif
 }
 
 /* plot3d_impulses:
@@ -1856,7 +1883,7 @@ struct lp_style_type grid;
 }
 
 
-static void
+void
 map3d_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;

@@ -67,12 +67,18 @@ extern int hidden_no_update;
 extern transform_matrix trans_mat;
 extern unsigned int move_pos_x, move_pos_y;
 
+#ifdef USE_MOUSE
+extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
+#endif
+
 /* Prototypes from file "graph3d.c" */
 
-void do_3dplot __PROTO((struct surface_points *plots, int pcount));
+void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
 
 void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
+void map3d_position __PROTO((struct position * pos, unsigned int *x,
+				  unsigned int *y, const char *what));
 
 
 #endif /* GNUPLOT_GRAPH3D_H */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.21 1999/11/15 21:59:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.4 2000/01/20 20:46:44 joze Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -87,6 +87,11 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.21 1999/11/15 21:59:05 lhec
 #include "tables.h"
 #include "util.h"
 
+#ifdef USE_MOUSE
+#include "mouse.h"
+static int save_mouse_state = 1;
+#endif
+
 #ifdef _Windows
 FILE *open_printer __PROTO((void));	/* in wprinter.c */
 void close_printer __PROTO((FILE * outfile));
@@ -101,7 +106,7 @@ void close_printer __PROTO((FILE * outfile));
 FILE *gpoutfile;
 
 /* true if terminal has been initialized */
-static TBOOLEAN term_initialised;
+TBOOLEAN term_initialised;
 
 /* true if terminal is in graphics mode */
 static TBOOLEAN term_graphics = FALSE;
@@ -141,6 +146,8 @@ static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
 static int set_font_null __PROTO((const char *s));
 
+#define _TERM_C /* must be defined before including "ipc.h" */
+#include "ipc.h"
 
 #ifdef __ZTC__
 char *ztc_init();
@@ -399,11 +406,17 @@ term_end_plot()
 #endif /* VMS */
 
 	(void) fflush(gpoutfile);
+
+#ifdef USE_MOUSE
+    recalc_statusline();
+    update_ruler();
+#endif
 }
 
 void
 term_start_multiplot()
 {
+
     c_token++;
     FPRINTF((stderr, "term_start_multiplot()\n"));
     if (multiplot)
@@ -411,6 +424,15 @@ term_start_multiplot()
 
     multiplot = TRUE;
     term_start_plot();
+
+#ifdef USE_MOUSE
+    /* save the state of mouse_setting.on and
+     * disable mouse; call UpdateStatusline()
+     * to turn of eventually statusline */
+    save_mouse_state = mouse_setting.on;
+    mouse_setting.on = 0;
+    UpdateStatusline();
+#endif
 }
 
 void
@@ -429,6 +451,13 @@ term_end_multiplot()
     multiplot = FALSE;
 
     term_end_plot();
+#ifdef USE_MOUSE
+    /* restore the state of mouse_setting.on;
+     * call UpdateStatusline() to turn on
+     * eventually statusline */
+    mouse_setting.on = save_mouse_state;
+    UpdateStatusline();
+#endif
 }
 
 
@@ -1609,3 +1638,78 @@ fflush_binary()
     }
 }
 #endif /* VMS */
+
+
+#ifdef USE_MOUSE
+
+#if 0
+void
+fill_gp4mouse (void)
+{
+#ifdef USE_MOUSE
+    extern int xleft, xright, ybot, ytop;
+    extern double min_array[], max_array[];
+    extern int /*TBOOLEAN*/ is_3d_plot;
+#endif
+
+    int rev_xy = 0;
+
+#if 0
+    /* For development purposes: */
+    printf("trm: [xleft,ybot] [xright,ytop] = [%i,%i]..[%i,%i]\n",xleft,ybot,xright,ytop);
+    printf("trm: [xmin,ymin] [xmax,ymax] = [%g,%g]..[%g,%g]\n",xmin,ymin,xmax,ymax);
+    printf("trm: autoscale_x=%i,  _y=%i\n",autoscale_x,autoscale_y);
+    printf("trm: true min,max = [%g,%g]..[%g,%g]\n",min_array[FIRST_X_AXIS],min_array[FIRST_Y_AXIS],max_array[FIRST_X_AXIS],max_array[FIRST_Y_AXIS]);
+    printf("trm: multiplot=%i\n",multiplot);
+    printf("trm: draw_surface=%i\n",draw_surface);
+    printf("trm: draw_contour=%i\n",draw_contour);
+#endif
+
+    gp4mouse.graph = 0;
+    gp4mouse.is_3d = 0;
+    if (!multiplot) {
+      if (is_3d_plot==TRUE) { /* map is for surface_rot_z == 0,90,180,270,360
+			         and for any surface_rot_x */
+	  gp4mouse.graph = 3; /* default (joze) Sun Oct 31 03:05:44 1999 */
+	  gp4mouse.is_3d = 1;
+	  rev_xy = (int)(surface_rot_z+0.5);
+	  if (rev_xy == 0 || rev_xy == 180 || rev_xy == 360)
+		{ gp4mouse.graph = 2; rev_xy = 0; } /* x axis is down, y is aside */
+	  else
+	  if (rev_xy == 90 || rev_xy == 270) /* y axis is down, x is aside */
+		{ gp4mouse.graph = 2; rev_xy = 1; }
+	  }
+	else /* 2d plot or map */
+	  gp4mouse.graph = (polar) ? 1 : 2;
+      }
+    /* printf("trm: gp4mouse.graph=%i\n",0+gp4mouse.graph); */
+    if (!rev_xy) {
+	gp4mouse.xmin = min_array[FIRST_X_AXIS];
+	gp4mouse.ymin = min_array[FIRST_Y_AXIS];
+	gp4mouse.xmax = max_array[FIRST_X_AXIS];
+	gp4mouse.ymax = max_array[FIRST_Y_AXIS];
+	}
+      else {
+	gp4mouse.xmin = min_array[FIRST_Y_AXIS];
+	gp4mouse.ymin = min_array[FIRST_X_AXIS];
+	gp4mouse.xmax = max_array[FIRST_Y_AXIS];
+	gp4mouse.ymax = max_array[FIRST_X_AXIS];
+	}
+    gp4mouse.xleft = xleft;
+    gp4mouse.ybot = ybot;
+    gp4mouse.xright = xright;
+    gp4mouse.ytop = ytop;
+    gp4mouse.is_log_x = is_log_x;
+    gp4mouse.is_log_y = is_log_y;
+    gp4mouse.is_log_z = is_log_z;
+    gp4mouse.base_log_x = base_log_x;
+    gp4mouse.base_log_y = base_log_y;
+    gp4mouse.base_log_z = base_log_z;
+    gp4mouse.log_base_log_x = log_base_log_x;
+    gp4mouse.log_base_log_y = log_base_log_y;
+    gp4mouse.log_base_log_z = log_base_log_z;
+    gp4mouse.has_grid = work_grid.l_type ? 1 : 0;
+}
+#endif
+
+#endif /* USE_MOUSE */

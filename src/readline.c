@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.16 1999/11/08 19:24:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.8 2000/01/21 02:17:45 joze Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -54,15 +54,60 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.16 1999/11/08 19:24:32 
 #include "gp_hist.h"
 #include "util.h"
 
-#if defined(USE_MOUSE) && defined(OS2)
-# define INCL_DOSMEMMGR
-# define INCL_DOSPROCESS
-# include <io.h>
-# include <sys/termio.h>
-# include <termios.h>
-# include <os2.h>
-# include <sys/ioctl.h>
-#endif /* USE_MOUSE in OS/2 PM */
+#if defined(HAVE_LIBREADLINE)
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
+#if defined(USE_MOUSE) && !defined(OS2)
+#include "setshow.h" /* for the variable multiplot */
+static char* line_buffer;
+static int line_complete;
+
+/**
+ * called by libreadline if the input
+ * was typed (not from the ipc).
+ */
+void
+LineCompleteHandler(char* ptr)
+{
+    rl_callback_handler_remove();
+    line_buffer = ptr;
+    line_complete = 1;
+}
+
+int
+getc_wrapper(FILE* fp /* should be stdin, supplied by readline */)
+{
+    if (term && term->waitforinput && interactive)
+	return term->waitforinput();
+    else
+	return getc(fp);
+}
+#endif
+
+#endif /* HAVE_LIBREADLINE */
+
+char*
+readline_ipc(const char* prompt)
+{
+#if defined(USE_MOUSE) && defined(HAVE_LIBREADLINE) && !defined(OS2)
+    /* use readline's alternate interface.
+     * this requires rl_library_version > 2.2
+     * TODO: make a check in configure.in */
+
+    rl_callback_handler_install((char*) prompt, LineCompleteHandler);
+    rl_getc_function = getc_wrapper;
+
+    for (line_complete = 0; !line_complete; /* EMPTY */) {
+	rl_callback_read_char(); /* stdin */
+    }
+    return line_buffer;
+#else
+    return readline((char*) prompt);
+#endif
+}
+
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 
@@ -715,7 +760,15 @@ char *line;
 static int
 ansi_getc()
 {
-    int c = getc(stdin);
+    int c;
+
+#ifdef USE_MOUSE
+    if (term->waitforinput && interactive)
+	c = term->waitforinput();
+    else
+#endif
+    c = getc(stdin);
+
     if (c == 033) {
 	c = getc(stdin);	/* check for CSI */
 	if (c == '[') {

@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.9 1999/11/08 19:24:15 lhecking Exp $ */
+/* $Id: graphics.h,v 1.10 1999/11/15 22:22:28 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -76,6 +76,11 @@ extern void graph_error __PROTO((const char *, ...));
 extern void graph_error __PROTO(());
 #endif
 extern void fixup_range __PROTO((int, const char *));
+int nearest_label_tag(int x, int y, struct termentry* t,
+    void (*map_func)(struct position * pos, unsigned int *x,
+	unsigned int *y, const char *what));
+void get_offsets __PROTO((struct text_label* this_label,
+	struct termentry* t, int* htic, int* vtic));
 extern void do_plot __PROTO((struct curve_points *, int));
 extern int label_width __PROTO((const char *, int *));
 extern double set_tic __PROTO((double, int));
@@ -86,6 +91,8 @@ typedef void (*tic_callback) __PROTO((int, double, char *, struct lp_style_type 
 extern void gen_tics __PROTO((int, struct ticdef *, int, int, double, tic_callback));
 extern void write_multiline __PROTO((unsigned int, unsigned int, char *, enum JUSTIFY, int, int, const char *));
 extern double LogScale __PROTO((double, TBOOLEAN, double, const char *, const char *));
+void map_position __PROTO((struct position * pos, unsigned int *x,
+				  unsigned int *y, const char *what));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
 extern double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif

@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.13 1999/11/08 19:24:14 lhecking Exp $ */
+/* $Id: command.h,v 1.6 2000/01/20 20:46:44 joze Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -93,6 +93,10 @@ extern size_t input_line_len;
   gp_expand_tilde(&save_file); \
   fp = strcmp(save_file, "-") ? loadpath_fopen(save_file, (mode)) : stdout;
 
+#ifdef USE_MOUSE
+void bind_command __PROTO((void));
+void restore_prompt __PROTO((void));
+#endif
 void call_command __PROTO((void));
 void changedir_command __PROTO((void));
 void clear_command __PROTO((void));
@@ -100,6 +104,7 @@ void exit_command __PROTO((void));
 void help_command __PROTO((void));
 void history_command __PROTO((void));
 void if_command __PROTO((void));
+void else_command __PROTO((void));
 void invalid_command __PROTO((void));
 void load_command __PROTO((void));
 void null_command __PROTO((void));
@@ -122,10 +127,17 @@ void extend_input_line __PROTO((void));
 void extend_token_table __PROTO((void));
 int com_line __PROTO((void));
 int do_line __PROTO((void));
+#ifdef USE_MOUSE
+void toggle_display_of_ipc_commands __PROTO((void));
+int display_ipc_commands __PROTO((void));
+void do_string __PROTO((char* s));
+#endif
 #ifdef VMS                     /* HBB 990829: used only on VMS */
 void done __PROTO((int status));
 #endif
 void define __PROTO((void));
+
+void replotrequest __PROTO((void)); /* used in command.c & mouse.c */
 
 /**/
 #endif /* GNUPLOT_COMMAND_H */

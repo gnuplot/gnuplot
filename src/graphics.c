@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.25 1999/11/24 13:24:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.26 1999/12/10 16:51:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -166,8 +166,6 @@ static void ytick2d_callback __PROTO((int axis, double place, char *text,
 				      struct lp_style_type grid));
 static void xtick2d_callback __PROTO((int axis, double place, char *text,
 				      struct lp_style_type grid));
-static void map_position __PROTO((struct position * pos, unsigned int *x,
-				  unsigned int *y, const char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
 			      double *m, int *p));
 static double make_ltic __PROTO((int, double));
@@ -1310,6 +1308,54 @@ int axis, guide;
 }
 /*}}} */
 
+void
+get_offsets(struct text_label* this_label, struct termentry* t,
+    int* htic, int* vtic)
+{
+    if (-1 != this_label->pointstyle) {
+	*htic = (pointsize * t->h_tic * 0.5 * this_label->hoffset);
+	*vtic = (pointsize * t->v_tic * 0.5 * this_label->voffset);
+    } else {
+	*htic = 0;
+	*vtic = 0;
+    }
+}
+
+int
+nearest_label_tag(int xref, int yref, struct termentry* t,
+    void (*map_func)(struct position * pos, unsigned int *x,
+	unsigned int *y, const char *what))
+{
+    double min = -1;
+    int min_tag = -1;
+    double diff_squared;
+    unsigned int x, y;
+    struct text_label *this_label;
+    int xd;
+    int yd;
+
+    for (this_label = first_label; this_label != NULL;
+	 this_label = this_label->next) {
+	map_func(&this_label->place, &x, &y, "label");
+	xd = (int) x - (int) xref;
+	yd = (int) y - (int) yref;
+	diff_squared = xd * xd + yd * yd;
+	if (-1 == min || min > diff_squared) {
+	    /* now we check if we're within a certain
+	     * threshold around the label */
+	    double tic_diff_squared;
+	    int htic, vtic;
+	    get_offsets(this_label, t, &htic, &vtic);
+	    tic_diff_squared = htic * htic + vtic * vtic;
+	    if (diff_squared < tic_diff_squared) {
+		min = diff_squared;
+		min_tag = this_label->tag;
+	    }
+	}
+    }
+
+    return min_tag;
+}
 
 void
 do_plot(plots, pcount)
@@ -1746,18 +1792,29 @@ int pcount;			/* count of plots in linked list */
 	free(str);
     }
 /* PLACE LABELS */
+    if ((*t->pointsize)) {
+	(*t->pointsize)(pointsize);
+    }
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
+
 	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
 
 	if (this_label->layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point)(x, y, this_label->pointstyle);
 	}
     }
 
@@ -2026,18 +2083,29 @@ int pcount;			/* count of plots in linked list */
     }
 
 /* PLACE LABELS */
+    if ((*t->pointsize)) {
+	(*t->pointsize)(pointsize);
+    }
     for (this_label = first_label; this_label != NULL;
 	 this_label = this_label->next) {
+
 	unsigned int x, y;
+	int htic;
+	int vtic;
+
+	get_offsets(this_label, t, &htic, &vtic);
 
 	if (this_label->layer == 0)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
-	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 1, this_label->font);
 	    (*t->text_angle) (0);
 	} else {
-	    write_multiline(x, y, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	    write_multiline(x + htic, y + vtic, this_label->text, this_label->pos, JUST_TOP, 0, this_label->font);
+	}
+	if (-1 != this_label->pointstyle) {
+	    (*t->point)(x, y, this_label->pointstyle);
 	}
     }
 
@@ -4658,7 +4726,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 /*}}} */
 
 /*{{{  map_position */
-static void
+void
 map_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
