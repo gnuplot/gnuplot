@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.9.2.2 1999/10/01 10:36:44 lhecking Exp $
+ * $Id: syscfg.h,v 1.9.2.3 1999/10/16 15:09:54 lhecking Exp $
  *
  */
 
@@ -51,7 +51,7 @@
 /*
  * Define operating system dependent constants [default value]:
  *
- * OS:       [" "] Name of OS plus trailing space
+ * OS:       [""] Name of OS; only required if system has no uname(2) call
  * HELPFILE: ["docs/gnuplot.gih"] Location of helpfile - overridden by Makefile
  * HOME:     ["HOME"] Name of environment variable which points to
  *           the directory where gnuplot's config file is found.
@@ -64,8 +64,8 @@
  */
 
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
-# define OS "Amiga "
 # ifndef __amigaos__
+#  define OS "Amiga"
 #  define HELPFILE "S:gnuplot.gih"
 #  define HOME     "GNUPLOT"
 #  define SHELL    "NewShell"
@@ -83,7 +83,7 @@
 #endif /* Amiga */
 
 #ifdef ATARI
-# define OS      "TOS "
+# define OS      "TOS"
 # define HOME     "GNUPLOT"
 # define PLOTRC   "gnuplot.ini"
 # define SHELL    "gulam.prg"
@@ -98,17 +98,13 @@
 #endif /* Atari */
 
 #ifdef DOS386
-# define OS       "DOS 386 "
+# define OS       "DOS 386"
 # define HELPFILE "gnuplot.gih"
 # define HOME     "GNUPLOT"
 # define PLOTRC   "gnuplot.ini"
 # define SHELL    "\\command.com"
 # define DIRSEP1  '\\'
 #endif /* DOS386 */
-
-#if defined(linux) || defined(__linux)
-# define OS "Linux "
-#endif /* Linux */
 
 #if defined(__NeXT__) || defined(NEXT)
 # ifndef NEXT
@@ -117,7 +113,7 @@
 #endif /* NeXT */
 
 #ifdef OS2
-# define OS       "OS/2 "
+# define OS       "OS/2"
 # define HELPFILE "gnuplot.gih"
 # define HOME     "GNUPLOT"
 # define PLOTRC   "gnuplot.ini"
@@ -126,12 +122,12 @@
 #endif /* OS/2 */
 
 #ifdef OSK
-# define OS    "OS-9 "
+# define OS    "OS-9"
 # define SHELL "/dd/cmds/shell"
 #endif /* OS-9 */
 
 #if defined(vms) || defined(VMS)
-# define OS "VMS "
+# define OS "VMS"
 # ifndef VMS
 #  define VMS
 # endif
@@ -156,7 +152,7 @@
 #  define _Windows
 # endif
 # ifdef WIN32
-#  define OS "MS-Windows 32 bit "
+#  define OS "MS-Windows 32 bit"
 /* introduced by Pedro Mendes, prm@aber.ac.uk */
 #  define far
 /* Fix for broken compiler headers
@@ -164,7 +160,7 @@
  */
 #  define S_IFIFO  _S_IFIFO
 # else
-#  define OS "MS-Windows "
+#  define OS "MS-Windows"
 #  ifndef WIN16
 #   define WIN16
 #  endif
@@ -181,9 +177,9 @@
 # endif
 /* should this be here ? */
 # ifdef MTOS
-#  define OS "TOS & MiNT & MULTITOS & Magic - "
+#  define OS "TOS & MiNT & MULTITOS & Magic -"
 # endif /* MTOS */
-# define OS       "MS-DOS "
+# define OS       "MS-DOS"
 # undef HELPFILE
 # define HELPFILE "gnuplot.gih"
 # define HOME     "GNUPLOT"
@@ -195,23 +191,14 @@
 # endif
 #endif /* MSDOS */
 
-/* Note: may not catch all IBM AIX compilers or SCO compilers */
-/* cc on NetBSD doesn't define unix anymore :-/ */
-#if defined(unix)|| defined(__unix) || defined(_AIX) || defined(__NetBSD__) || defined(SCO)
-# ifndef unix
-#  define unix
-# endif
-# ifndef OS
-#  define OS "Unix "
-# endif
-#endif /* Unix */
-
 /* End OS dependent constants; fall-through defaults
  * for the constants defined above are following.
  */
 
-#ifndef OS
-# define OS " "
+#ifndef HAVE_SYS_UTSNAME
+# ifndef OS
+#  define OS "(unknown)"
+# endif
 #endif
 
 #ifndef HELPFILE
@@ -242,6 +229,8 @@
 /* # define FAQ_LOCATION "http://www.uni-karlsruhe.de/~ig25/gnuplot-faq/" */
 /* #define FAQ_LOCATION "http://www-ihe.etec.uni-karlsruhe.de/mitarbeiter/vonhagen/gnuplot-faq.html" */
 #define FAQ_LOCATION "http://www.ucc.ie/gnuplot/gnuplot-faq.html"
+/* Prepare the transition! Yess! */
+/* #define FAQ_LOCATION "http://www.gnuplot.org/gnuplot-faq.html" */
 #endif
 
 #ifndef CONTACT
