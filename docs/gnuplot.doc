@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.72 2001/08/06 12:09:55 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.73 2001/08/09 15:03:52 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2660,7 +2660,7 @@ C ... and restart the table:
  ("\t"), newline ("\n"), or formfeed ("\f")---between numbers; anything else
  in the input stream must be explicitly skipped.
 
- Note that the use of "\t", "\n", or "\f" or requires use of double-quotes
+ Note that the use of "\t", "\n", or "\f" requires use of double-quotes
  rather than single-quotes.
 
  Examples:
@@ -3014,7 +3014,7 @@ C ... and restart the table:
  This plots sin(x) with impulses:
        plot sin(x) with impulses
 
- This plots x with points, x**2 with the default:
+ This plots x*y with points, x**2 with the default:
        plot x*y w points, x**2 + y**2
 
  This plots tan(x) with the default function style, file "data.1" with lines:
@@ -3770,7 +3770,7 @@ C ... and restart the table:
 
  For `levels discrete`, contours will be generated at z = <z1>, <z2> ... as
  specified; the number of discrete levels sets the number of contour levels.
- In `discrete` mode, any `set cntrparms levels <n>` are ignored.
+ In `discrete` mode, any `set cntrparam levels <n>` are ignored.
 
  For `incremental`, contours are generated at values of z beginning at <start>
  and increasing by <increment>, until the number of contours is reached. <end>
@@ -3901,7 +3901,7 @@ C ... and restart the table:
  where dx and dy are the components of the separation of the grid point from
  each data point.  For some norms that are powers of two, specifically 4, 8,
  and 16, the computation is optimized by using the Euclidean distance in the
- weight calculation, (dx^2+dx^2)^norm/2.  However, any non-negative integer
+ weight calculation, (dx^2+dy^2)^norm/2.  However, any non-negative integer
  can be used.)
 
  The closer the data point is to a grid point, the more effect it has on
@@ -4106,7 +4106,7 @@ C ... and restart the table:
        set format y "%s*10^{%S}"; set ytic(12345)   # "12.345*10^{3}"
        set format y "%s %cg"; set ytic(12345)       # "12.345 kg"
        set format y "%.0P pi"; set ytic(6.283185)   # "2 pi"
-       set format y "%.0P%%"; set ytic(50)          # "50%"
+       set format y "%.0f%%"; set ytic(50)          # "50%"
 
        set log y 2; set format y '%l'; set ytics (1,2,3)
        #displays "1.0", "1.0" and "1.5" (since 3 is 1.5 * 2^1)
@@ -4214,7 +4214,7 @@ C ... and restart the table:
  Suppose the text is "76/12/25 23:11:11".  Then
        set format x                 # defaults to "12/25/76" \n "23:11"
        set format x "%A, %d %b %Y"  # "Saturday, 25 Dec 1976"
-       set format x "%r %d"         # "11:11:11 pm 12/25/76"
+       set format x "%r %D"         # "11:11:11 pm 12/25/76"
 
  Suppose the text is "98/07/06 05:04:03".  Then
        set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
@@ -4746,7 +4746,7 @@ C ... and restart the table:
        set style function linespoints
        plot p(x) lt 1 pt 3, q(x) ls 1
 
- will create a plot of f(x) using the default triangles connected by a red
+ will create a plot of p(x) using the default triangles connected by a red
  line and q(x) using small triangles connected by a green line.
 
        splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l lt pal
@@ -7283,7 +7283,7 @@ C  The `lines` style connects adjacent points with straight line segments.
 
  The special filenames `""` and `"-"` are permitted, as in `plot`.
 
- In brief, `binary` and `matrix` indicate that the the data are in a special
+ In brief, `binary` and `matrix` indicate that the data are in a special
  form, `index` selects which data sets in a multi-data-set file are to be
  plotted, `every` specifies which datalines (subsets) within a single data
  set are to be plotted, and `using` determines how the columns within a single
@@ -7294,7 +7294,7 @@ C  The `lines` style connects adjacent points with straight line segments.
  instead of two.
 
  The `plot` options `thru` and `smooth` are not available for `splot`, but
- `cntrparams` and `dgrid3d` provide limited smoothing cabilities.
+ `cntrparam` and `dgrid3d` provide limited smoothing cabilities.
 
  Data file organization is essentially the same as for `plot`, except that
  each point is an (x,y,z) triple.  If only a single value is provided, it
@@ -7468,7 +7468,7 @@ C  The `lines` style connects adjacent points with straight line segments.
  Additionally, for points in a grid format, `splot` can interpolate points
  having a common amplitude (see `set contour`) and can then connect those
  new points to display contour lines, either directly with straight-line
- segments or smoothed lines (see `set cntrparams`).  Functions are already
+ segments or smoothed lines (see `set cntrparam`).  Functions are already
  evaluated in a grid format, determined by `set isosamples` and `set samples`,
  while file data must either be in a grid format, as described in `data-file`,
  or be used to generate a grid (see `set dgrid3d`).
