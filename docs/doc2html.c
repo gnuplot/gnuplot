@@ -1,25 +1,41 @@
 /*
- * $Id: doc2html.c,v 1.9 1997/07/22 23:24:19 drd Exp $
+ * $Id: doc2html.c,v 1.10 1998/04/14 00:16:58 drd Exp $
  *
  */
 
 /* GNUPLOT - doc2html.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- */
- /*
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
+/*
  * doc2html.c  -- program to convert Gnuplot .DOC format to 
  *        World Wide Web (WWW) HyperText Markup Language (HTML) format
  *
@@ -38,15 +54,8 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#ifndef NO_STDLIB_H
-#include <stdlib.h>
-#endif
-#if !defined(NEXT) && !defined(ATARI)
-#include <malloc.h>
-#endif
+#include "ansichek.h"
+#include "stdfn.h"
 
 #define MAX_LINE_LEN	1024
 #define TRUE 1
@@ -54,8 +63,6 @@
 
 int debug = FALSE;
 char title[256];
-
-#include "ansichek.h"
 
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
@@ -78,10 +85,10 @@ FILE * outfile;
 
     if ( (argc > 3) || (argc == 1) ) {
         fprintf(stderr,"Usage: %s infile outfile\n", argv[0]);
-#ifndef ALL_TERM
-#define ALL_TERM
+#ifndef ALL_TERM_DOC
+#define ALL_TERM_DOC
 #endif
-#define GOT_DRIVER_H
+#define TERM_DRIVER_H
         return(1);
     }
     if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
