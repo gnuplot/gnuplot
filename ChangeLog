@@ -1,3 +1,8 @@
+2004-04-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* INSTALL: Give more complete description of the environmental 
+	variables GNUPLOT_FONTPATH, GNUPLOT_DEFAULT_GDFONT and GDFONTPATH.
+
 2004-04-15  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/version.c (gnuplot_date): Raised for yet another tarball.
