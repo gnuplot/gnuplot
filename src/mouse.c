@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.60 2004/09/01 15:53:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.61 2004/09/11 17:46:02 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1782,7 +1782,6 @@ do_event(struct gp_event_t *ge)
 	FPRINTF((stderr, "(do_event) type       = %d\n", ge->type));
 	FPRINTF((stderr, "           mx, my     = %d, %d\n", ge->mx, ge->my));
 	FPRINTF((stderr, "           par1, par2 = %d, %d\n", ge->par1, ge->par2));
-	FPRINTF((stderr, "           text       = %s\n", ge->text));
     }
 
     switch (ge->type) {
