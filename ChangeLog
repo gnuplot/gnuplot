@@ -1,3 +1,19 @@
+2002-01-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS: Added some text from ANNOUNCE-MOUSE.
+
+	* ANNOUNCE-MOUSE: Added a header to that file with two paragraphs 
+	which are worth saving, in my opinion. That's a technical docs for
+	mouse and its communication.
+
+	* INSTALL: Added section "Running gnuplot on OS/2" from README.os2.
+
+	* docs/old/README.os2: Added a note that this file can be removed.
+
+	* config/makefile.cyg: Added -DHAVE_SLEEP -DNO_SETVBUF.
+
+	* docs/gnuplot.doc: Several small corrections.
+
 2002-01-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Updated to current version.
