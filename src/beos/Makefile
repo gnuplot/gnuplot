@@ -350,7 +350,6 @@ clean :: FORCE
 
 #
 distclean: clean
-	-rm -f Makefile
 
 #	remove just the application from the object folder
 rmapp ::
