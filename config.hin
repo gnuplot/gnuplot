@@ -114,6 +114,9 @@
 /* Define if you have the bzero function.  */
 #undef HAVE_BZERO
 
+/* Define if you have the doprnt function.  */
+#undef HAVE_DOPRNT
+
 /* Define if you have the erf function.  */
 #undef HAVE_ERF
 
@@ -191,6 +194,9 @@
 
 /* Define if you have the tcgetattr function.  */
 #undef HAVE_TCGETATTR
+
+/* Define if you have the vfprintf function.  */
+#undef HAVE_VFPRINTF
 
 /* Define if you have the <errno.h> header file.  */
 #undef HAVE_ERRNO_H
