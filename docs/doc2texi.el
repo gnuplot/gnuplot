@@ -161,10 +161,10 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 * GNUPLOT: (gnuplot).             An Interactive Plotting Program
 @end direntry
 
-@ifinfo
+@ifnottex
 @node Top, gnuplot, (dir), (dir)
 @top Master Menu
-@end ifinfo
+@end ifnottex
 
 @example
                        GNUPLOT
