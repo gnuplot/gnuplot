@@ -1,3 +1,8 @@
+2002-02-21  Johannes Zellner  <johannes@zellner.org>
+
+	* src/pm3d.c: improved 'scans automatic' for the case where all
+	points of some scans are undefined.
+
 2002-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.dj2 (CFLAGS): Added -DHAVE_ATEXIT.  Changed

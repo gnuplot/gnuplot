@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.24 2002/02/16 14:52:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.25 2002/02/18 15:03:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -159,8 +159,6 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
     int i, scan;
     int invert_order = 0;
 
-    scanA = src;
-
     /* loop over scans in one surface
        Scans are linked from this_plot->iso_crvs in the opposite order than
        they are in the datafile.
@@ -172,9 +170,11 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
 
     if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
 	int cnt;
-	if (scanA && (cnt = scanA->p_count - 1) > 0) {
+	int len2 = len;
+	for (scanA = src; scanA && (cnt = scanA->p_count - 1) > 0; scanA = scanA->next, len2--) {
 
 	    int from, i;
+	    TBOOLEAN exit_outer_loop = 0;
 	    vertex vA, vA2;
 
 	    /* ordering within one scan */
@@ -190,33 +190,35 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
 		}
 	    if (from < i) 
 		*invert = (vA2.z > vA.z) ? 0 : 1;
-	    else /* no point defined (searching scans where some pts are defined is ignored) */
-		*invert = 0;
+	    else
+		continue; /* all points were undefined, so check next scan */
 
-	    scanB = scanA->next;
 
-	    /* check the z ordering between scans */
-	    /* find last scan */
-	    if (scanB) {
-		for (i = len - 2; i; i--)
-		    scanB = scanB->next;
-	    }
-	    if (scanB && scanB->p_count) {
-		vertex vB;
-		for (i=0; i<scanB->p_count; i++) /* find 1st non-undefined point */
-		    if (scanB->points[i].type != UNDEFINED) {
-			map3d_xyz(scanB->points[i].x, scanB->points[i].y, scanB->points[i].z, &vB);
-			break;
+	    /* check the z ordering between scans
+	     * Find last scan. If this scan has all points undefined,
+	     * find last but one scan, an so on. */
+
+	    for (; len2 >= 3 && !exit_outer_loop; len2--) {
+		for (scanB = scanA-> next, i = len2 - 2; i && scanB; i--)
+		    scanB = scanB->next; /* skip over to last scan */
+		if (scanB && scanB->p_count) {
+		    vertex vB;
+		    for (i=0; i<scanB->p_count; i++) { /* find 1st non-undefined point */
+			if (scanB->points[i].type != UNDEFINED) {
+			    map3d_xyz(scanB->points[i].x, scanB->points[i].y, scanB->points[i].z, &vB);
+			    if (from<=cnt) {
+				invert_order = (vB.z > vA.z) ? 0 : 1;
+			    }
+			    exit_outer_loop = 1;
+			    break;
+			}
 		    }
-		if (from<=cnt && i<scanB->p_count)
-		    invert_order = (vB.z > vA.z) ? 0 : 1;
-		else /* no point defined in either scan (searching scans where some pts are defined is ignored) */
-		    invert_order = 0;
+		}
 	    }
 	}
     }
 
-    for (scan = len - 1, i = 0; scan >= 0; --scan, i++) {
+    for (scanA = src, scan = len - 1, i = 0; scan >= 0; --scan, i++) {
 	if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
 	    switch (invert_order) {
 	    case 1:
