@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.141 2002/10/21 10:24:17 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.142 2002/10/21 22:37:35 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -6553,10 +6553,10 @@ C ... and restart the table:
        show style function
        show style data
 
+       set style arrow <n> <arrowstyle>
        set style fill <fillstyle>
        set style line <n> <linestyle>
 
- The set style `function` and `data` commands set the default plotting style.
  The types used for all line and point styles (i.e., solid, dash-dot, color,
  etc. for lines; circles, squares, crosses, etc. for points) will be either
  those specified on the `plot` or `splot` command or will be chosen
