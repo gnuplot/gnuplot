@@ -1,3 +1,42 @@
+1998-11-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Remove allterm.h target and dependency.
+
+	* configure: Regenerated.
+
+	* configure.in: Add code to generate terminal driver dependencies in
+	docs/Makefile.in. Remove code to rename of old makefiles.
+
+	* protos.h: Move non-static prototypes from term.c.
+
+	* term.c: Indentation. Move non-static prototypes to protos.h. Avoid
+	compiler warnings about variable shadowing:
+	In term_check_multiplot_okay(), rename interactive f_interactive.
+	In do_arrow(), change test for exact inequality in doubles.
+	In set_term(), rename c_token argument c_token_arg.
+	In init_terminal, rename term env_term.
+	In test_term, rename xmax xmax_t, and ymax ymax_t.
+
+	* docs/Makefile.in: Add TERM_LIST variable for allterm.h dependencies.
+	Use explicit file names instead of makefile variables.
+
+	* docs/makefile, docs/latextut/makefile: Rename makefile.dst, resp.
+
+	* term/*.trm(*_text_angle): Rename argument to text_angle function
+	ang consistently across terminal drivers to avoid compiler warnings.
+
+	* term/fig.trm(FIG_poly_clean): Rename stat fig_stat. In
+	FIG_options, rename tmax tmax_t, xsize xsize_t, ysize ysize_t.
+	In FIG_pointsize, rename pointsize arg_pointsize.
+
+	* term/post.trm: Rename pointsize ptsize. In PS_init, rename
+	xmax xmax_t, ymax ymax_t, xmin xmin_t, ymin ymin_t.
+
+	* term/pslatex.trm(PSLATEX_init): In PS_init, rename xmax xmax_t,
+	ymax ymax_t, xmin xmin_t, ymin ymin_t.
+
+	* term/tpic.trm(TPIC_options): Rename pointsize ptsize.
+
 1998-11-25  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* TODO: Add entry about float/double comparisons.
