@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.9 2001/02/05 11:36:37 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.10 2001/02/06 11:30:58 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -227,7 +227,7 @@ struct GWOPBLK *next, *this;
 
 
 void WDPROC
-GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPSTR str)
+GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, const LPSTR str)
 {
     struct GWOPBLK *this;
     struct GWOP FAR *gwop;

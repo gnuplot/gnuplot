@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.48 2001/01/22 18:30:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.49 2001/02/01 17:56:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -111,7 +111,7 @@ int thread_rl_RetCode = -1; /* return code from readline in a thread */
 #ifndef _Windows
 # include "help.h"
 #else
-static int winsystem __PROTO((char *));
+static int winsystem __PROTO((const char *));
 #endif /* _Windows */
 
 #ifdef _Windows
@@ -2124,7 +2124,7 @@ const char *prompt;
    use, so we will invoke the command interpreter and use it to execute the 
    commands */
 static int
-winsystem(char *s)
+winsystem(const char *s)
 {
     LPSTR comspec;
     LPSTR execstr;

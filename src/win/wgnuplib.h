@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.6 2001/01/16 20:19:36 broeker Exp $
+ * $Id: wgnuplib.h,v 1.7 2001/02/06 11:31:15 mikulik Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -362,7 +362,7 @@ void WDPROC GraphClose(LPGW lpgw);
 void WDPROC GraphStart(LPGW lpgw, double pointsize);
 void WDPROC GraphEnd(LPGW lpgw);
 void WDPROC GraphResume(LPGW lpgw);
-void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, LPSTR str);
+void WDPROC GraphOp(LPGW lpgw, WORD op, WORD x, WORD y, const LPSTR str);
 void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 

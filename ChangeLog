@@ -1,3 +1,28 @@
+2001-02-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Several cleanups suggested by reading an MSVC compilation logfile:
+	
+	* term/win.trm: added prototype for WIN_filledbox, and spread
+ 	warning notices all over the places regarding integer size
+ 	mismatch between the unsigned ints passed into the terminal API
+ 	and the WORD parameter accepted by GraphOp().
+	
+	* src/win/winmain.c (MyVFPrintF): add 'const' qualifier.
+	(MyFPrintF): dito.
+	(MyFPutS): dito.
+
+	* src/win/wtext.h (MyFWrite): added 'const' qualifier.
+ 	(MyPrintF): dito.
+ 	(MyFPutS): dito.
+	(MyVFPrintF): prototype added.
+	(vfprintf): #define added, points to MyVFPrintF.
+
+	* src/win/wgraph.c (GraphOp): added 'const' qualifier to 'str' argument.
+
+	* src/win/wgnuplib.h: dito.
+
+	* src/command.c (winsystem): add 'const' qualifier to argument.
+
 2001-02-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/fit.c (fit_command): Bugfix for 2D fits with a fixed yrange.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: winmain.c,v 1.6 2000/11/01 18:57:34 broeker Exp $";
+static char *RCSid = "$Id: winmain.c,v 1.7 2000/11/09 16:14:38 broeker Exp $";
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -372,7 +372,7 @@ MyFPutC(int ch, FILE *file)
 }
 
 int
-MyFPutS(char *str, FILE *file)
+MyFPutS(const char *str, FILE *file)
 {
 	if (isterm(file)) {
 		TextPutS(&textwin, str);
@@ -391,7 +391,7 @@ MyPutS(char *str)
 	return 0;	/* different from Borland library */
 }
 
-int MyFPrintF(FILE *file, char *fmt, ...)
+int MyFPrintF(FILE *file, const char *fmt, ...)
 {
 int count;
 va_list args;
@@ -407,7 +407,7 @@ va_list args;
 	return count;
 }
 
-int MyVFPrintF(FILE *file, char *fmt, va_list args)
+int MyVFPrintF(FILE *file, const char *fmt, va_list args)
 {
 	int count;
 
@@ -420,7 +420,7 @@ int MyVFPrintF(FILE *file, char *fmt, va_list args)
         return count;
 }
 
-int MyPrintF(char *fmt, ...)
+int MyPrintF(const char *fmt, ...)
 {
 int count;
 char buf[MAXPRINTF];

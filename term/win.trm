@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.19 2001/01/16 20:19:35 broeker Exp $
+ * $Id: win.trm,v 1.20 2001/02/06 11:31:15 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -111,7 +111,7 @@ TERM_PUBLIC int WIN_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void WIN_set_color __PROTO((double gray));
 TERM_PUBLIC void WIN_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif
-
+TERM_PUBLIC void WIN_filledbox __PROTO((int, unsigned int, unsigned int, unsigned int, unsigned int));
 
 
 /* Initialization values - Guess Now Scale later */
@@ -252,23 +252,28 @@ WIN_graphics()
 
 TERM_PUBLIC void
 WIN_move(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
+    /* Notice HBB 20010208: on Win32 platforms, passing int or
+     * unsigned int arguments to GraphOp() might cause problems: int
+     * is 32bits, but GraphOp() args are 16bit WORDS. */
     GraphOp(&graphwin, W_move, x, y, NULL);
 }
 
 TERM_PUBLIC void
 WIN_vector(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_vect, x, y, NULL);
 }
 
 TERM_PUBLIC void
 WIN_linetype(lt)
-int lt;
+    int lt;
 {
     if (lt != WIN_last_linetype) {
+	/* Notice HBB 20010208: --> see WIN_move() */
     	GraphOp(&graphwin, W_line_type, lt, 0, NULL);
 	WIN_last_linetype = lt;
     }
@@ -276,33 +281,36 @@ int lt;
 
 TERM_PUBLIC void
 WIN_put_text(x, y, str)
-unsigned int x, y;
-const char *str;
+    unsigned int x, y;
+    const char *str;
 {
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_put_text, x, y, str);
 }
 
 TERM_PUBLIC int
 WIN_justify_text(mode)
-enum JUSTIFY mode;
+    enum JUSTIFY mode;
 {
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_justify, mode, 0, NULL);
     return (TRUE);
 }
 
 TERM_PUBLIC int
 WIN_text_angle(ang)
-int ang;
+    int ang;
 {
     if (graphwin.rotate)
+	/* Notice HBB 20010208: --> WIN_move() */
 	GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
     return graphwin.rotate;
 }
 
 TERM_PUBLIC void
 WIN_point(x, y, number)
-unsigned int x, y;
-int number;
+    unsigned int x, y;
+    int number;
 {
     /* draw point shapes later to save memory */
     /* size of point symbols */
@@ -311,6 +319,7 @@ int number;
     if (number >= 0)
 	number %= WIN_POINT_TYPES;
     number += 1;
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_dot + number, x, y, NULL);
 }
 
@@ -333,6 +342,7 @@ double s;
      * via sscanf(), leading to crash (by stack overflow?). Alternative:
      * pass it as a scaled-up integer. For the sake of compatibility,
      * pass the string as well. */
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_pointsize, (int) 100 * s, 0, scale);
 #else
     GraphOp(&graphwin, W_pointsize, 0, 0, scale);
@@ -345,6 +355,7 @@ WIN_linewidth(linewidth)
 {
     /* HBB 20000813: New routine */
     WIN_last_linetype = -3;        /* invalidate cached linetype */
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_line_width, (int) 100 * linewidth, 0, NULL);
 }
 
@@ -396,6 +407,7 @@ WIN_set_color(gray)
 {
     /* HBB 20000813: new routine */
     WIN_last_linetype = -3;      /* invalidate cached linetype */
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_pm3d_setcolor, (int) 256*gray, 0, NULL);
 }
 
@@ -407,6 +419,7 @@ WIN_filled_polygon(points, corners)
     /* HBB 20000813: new routine */
     int i;
     
+    /* Notice HBB 20010208: --> WIN_move() */
     for (i=0; i<points; i++)
     	GraphOp(&graphwin, W_pm3d_filled_polygon, corners[i].x, corners[i].y, "p");
     /* finish series: */
@@ -423,6 +436,7 @@ WIN_filledbox(linetype, xleft, ybottom, width, height)
     (void) linetype;  /* unused parameter */
 
     /* split into two ocmmands to squeeze through all the necessary info */
+    /* Notice HBB 20010208: --> WIN_move() */
     GraphOp(&graphwin, W_move, xleft, ybottom, NULL);
     GraphOp(&graphwin, W_filledbox, width, height, NULL);
 }
