@@ -52,9 +52,23 @@ static char *RCSid="$Id: strftime.c,v 1.6 1998/04/14 00:16:24 drd Exp $";
 #include "plot.h"     /* for MAX_LINE_LEN */
 #include "setshow.h"  /* for days/months */
 
-#ifdef TEST_STRFTIME /* test case */
+#ifdef TEST_STRFTIME /* test case; link with stdfn */
 #define strftime _strftime
-#endif
+
+#include "stdfn.h"      /* for safe_strncpy */
+
+#include "national.h"   /* language info for the following, */
+                        /* extracted from set.c */
+
+char full_month_names[12][32] = { FMON01, FMON02, FMON03, FMON04, FMON05,
+FMON06, FMON07, FMON08, FMON09, FMON10, FMON11, FMON12};
+char abbrev_month_names[12][8] = { AMON01, AMON02, AMON03, AMON04, AMON05,
+AMON06, AMON07, AMON08, AMON09, AMON10, AMON11, AMON12};
+
+char full_day_names[7][32] = { FDAY0, FDAY1, FDAY2, FDAY3, FDAY4, FDAY5, FDAY6 };
+char abbrev_day_names[7][8] = { ADAY0, ADAY1, ADAY2, ADAY3, ADAY4, ADAY5, ADAY6 };
+
+#endif /* TEST_STRFTIME */
 
 
 static void fill(from, pto, pmaxsize)
