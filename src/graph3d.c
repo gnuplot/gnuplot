@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.53 2002/01/22 15:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.54 2002/01/25 18:02:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1420,6 +1420,10 @@ plot3d_lines_pm3d(plot)
     double lx[2], ly[2], lz[2];	/* two edge points */
     double z;
 
+#ifdef PM3D
+    /* just a shortcut */
+    int color_from_column = plot->pm3d_color_from_column;
+#endif
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1462,6 +1466,11 @@ plot3d_lines_pm3d(plot)
 			map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 			if (prev == INRANGE) {
+#ifdef PM3D
+			    if (color_from_column)
+				z =  (points[i - step].ylow + points[i].ylow) * .5;
+			    else
+#endif
 			    z =  (points[i - step].z + points[i].z) * .5;
 			    set_color(z2gray(z));
 			    clip_vector(x, y);
@@ -1480,6 +1489,11 @@ plot3d_lines_pm3d(plot)
 				    map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
 				    clip_move(xx0, yy0);
+#ifdef PM3D
+				    if (color_from_column)
+					z =  (points[i - step].ylow + points[i].ylow) * .5;
+				    else
+#endif
 				    z =  (points[i - step].z + points[i].z) * .5;
 				    set_color(z2gray(z));
 				    clip_vector(x, y);
@@ -1503,6 +1517,11 @@ plot3d_lines_pm3d(plot)
 
 				map3d_xy(clip_x, clip_y, clip_z, &xx0, &yy0);
 
+#ifdef PM3D
+				if (color_from_column)
+				    z =  (points[i - step].ylow + points[i].ylow) * .5;
+				else
+#endif
 				z =  (points[i - step].z + points[i].z) * .5;
 				set_color(z2gray(z));
 				clip_vector(xx0, yy0);
@@ -1522,6 +1541,11 @@ plot3d_lines_pm3d(plot)
 
 				    clip_move(x, y);
 				    z =  (points[i - step].z + points[i].z) * .5;
+#ifdef PM3D
+				    if (color_from_column)
+					z =  (points[i - step].ylow + points[i].ylow) * .5;
+				    else
+#endif
 				    set_color(z2gray(z));
 				    clip_vector(xx0, yy0);
 				}
@@ -1592,6 +1616,11 @@ plot3d_points_pm3d(plot, p_type)
     unsigned int x, y;
     struct termentry *t = term;
 
+#ifdef PM3D
+    /* just a shortcut */
+    int color_from_column = plot->pm3d_color_from_column;
+#endif
+
     /* split the bunch of scans in two sets in
      * which the scans are already depth ordered */
     pm3d_rearrange_scan_array(plot,
@@ -1626,6 +1655,11 @@ plot3d_points_pm3d(plot, p_type)
 		    map3d_xy(points[i].x, points[i].y, points[i].z, &x, &y);
 
 		    if (!clip_point(x, y)) {
+#ifdef PM3D
+			if (color_from_column)
+			    set_color(z2gray(points[i].ylow));
+			else
+#endif
 			set_color(z2gray(points[i].z));
 			(*t->point) (x, y, p_type);
 		    }

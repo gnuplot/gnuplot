@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.23 2001/10/26 12:58:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.24 2001/12/16 18:41:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -503,7 +503,9 @@ draw_color_smooth_box()
 	cb_y_to += cb_y_from;
     } else {			/* color_box.where == SMCOLOR_BOX_DEFAULT */
 	double dx = (X_AXIS.max - X_AXIS.min);
-	double dz = CB_AXIS.max - CB_AXIS.min;
+	/* don't use CB_AXIS here, CB_AXIS might be completely
+	 * unrelated to the Z axis 26 Jan 2002 (joze) */
+	double dz = Z_AXIS.max - Z_AXIS.min;
 	/* note: [0.05 0.35; 0.20 0.00] were the values before cbaxis */
 	map3d_xy(X_AXIS.max + dx * 0.03, Y_AXIS.max, base_z + dz * 0.35, &cb_x_from, &cb_y_from);
 	map3d_xy(X_AXIS.max + dx * 0.11, Y_AXIS.max, ceiling_z - dz * 0, &cb_x_to, &cb_y_to);

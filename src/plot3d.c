@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.33 2002/01/25 18:02:09 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.34 2002/01/25 18:27:10 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -121,6 +121,10 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
     sp->contours = NULL;
     sp->iso_crvs = NULL;
     sp->num_iso_read = 0;
+
+#ifdef PM3D
+    sp->pm3d_color_from_column = 0;
+#endif
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
 	int i;
@@ -527,8 +531,11 @@ grid_nongrid_data(this_plot)
 	    z = z / w;
 #endif
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+	    /* TODO joze */
+#if 0
 #ifdef PM3D
 	    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
+#endif
 #endif
 	}
     }
@@ -559,13 +566,20 @@ get_3ddata(this_plot)
     int xdatum = 0;
     int ydatum = 0;
     int i, j;
+#ifdef PM3D
+    double v[4];
+#else
     double v[3];
+#endif
     int pt_in_iso_crv = 0;
     struct iso_curve *this_iso;
 
     if (mapping3d == MAP3D_CARTESIAN) {
+#ifndef PM3D
+	/* do this check only, if we have PM3D / PM3D-COLUMN not compiled in */
 	if (df_no_use_specs == 2)
 	    int_error(this_plot->token, "Need 1 or 3 columns for cartesian data");
+#endif
     } else {
 	if (df_no_use_specs == 1)
 	    int_error(this_plot->token, "Need 2 or 3 columns for polar data");
@@ -573,6 +587,9 @@ get_3ddata(this_plot)
 
     this_plot->num_iso_read = 0;
     this_plot->has_grid_topology = TRUE;
+#ifdef PM3D
+    this_plot->pm3d_color_from_column = 0;
+#endif
 
     /* we ought to keep old memory - most likely case
      * is a replot, so it will probably exactly fit into
@@ -597,8 +614,18 @@ get_3ddata(this_plot)
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
 	double x, y, z;
+#ifdef PM3D
+	double color = HUGE;
+	int pm3d_color_from_column = 0;
+#endif
 
-	while ((j = df_readline(v, 3)) != DF_EOF) {
+	while ((j = df_readline(v,
+#ifdef PM3D
+		    4
+#else
+		    3
+#endif
+		    )) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)
 		break;		/* two blank lines */
 	    if (j == DF_FIRST_BLANK) {
@@ -645,11 +672,25 @@ get_3ddata(this_plot)
 	    switch (mapping3d) {
 	    case MAP3D_CARTESIAN:
 		switch (j) {
+#ifdef PM3D
+		case 2:
+		    /* TODO: could also specify the column number */
+		    pm3d_color_from_column = 1;
+		    color = v[1];
+		    /* FALLTHRU */
+#endif
 		case 1:
 		    x = xdatum;
 		    y = ydatum;
 		    z = v[0];
 		    break;
+#ifdef PM3D
+		case 4:
+		    /* TODO: could also specify the column number */
+		    pm3d_color_from_column = 1;
+		    color = v[3];
+		    /* FALLTHRU */
+#endif
 		case 3:
 		    x = v[0];
 		    y = v[1];
@@ -657,6 +698,7 @@ get_3ddata(this_plot)
 		    break;
 		default:
 		    {
+			/* TODO: pm3d color? (joze) 18 Dez 2000 */
 			int_error(this_plot->token,
 				  "Need 1 or 3 columns - line %d",
 				  df_line_number);
@@ -665,6 +707,7 @@ get_3ddata(this_plot)
 		}
 		break;
 	    case MAP3D_SPHERICAL:
+		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
 		    int_error(this_plot->token, "Need 2 or 3 columns");
 		if (j < 3)
@@ -678,6 +721,7 @@ get_3ddata(this_plot)
 		z = v[2] * sin(v[1]);
 		break;
 	    case MAP3D_CYLINDRICAL:
+		/* TODO: pm3d color? (joze) 18 Dez 2000 */
 		if (j < 2)
 		    int_error(this_plot->token, "Need 2 or 3 columns");
 		if (j < 3)
@@ -712,7 +756,15 @@ get_3ddata(this_plot)
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
-		update_pm3d_zrange(z, NEED_PALETTE(this_plot));
+		assert(0 == this_plot->lp_properties.use_palette);
+		if (0 != pm3d_color_from_column) {
+		    cp->ylow = color; /* abuse ylow for storing the color value */
+		    update_pm3d_zrange(color, NEED_PALETTE(this_plot));
+		} else {
+#endif
+		    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
+#ifdef PM3D
+		}
 #endif
 	    }
 
@@ -722,6 +774,12 @@ get_3ddata(this_plot)
 	come_here_if_undefined:
 	    ++xdatum;
 	}			/* end of whileloop - end of surface */
+
+#ifdef PM3D
+	if (0 != pm3d_color_from_column) {
+	    this_plot->pm3d_color_from_column = pm3d_color_from_column;
+	}
+#endif
 
 	if (xdatum > 0) {
 	    this_plot->num_iso_read++;	/* Update last iso. */
@@ -1024,7 +1082,11 @@ eval_3dplots()
 		this_plot->plot_type = DATA3D;
 		this_plot->plot_style = data_style;
 
+#ifdef PM3D
+		specs = df_open(4);
+#else
 		specs = df_open(3);
+#endif
 		/* parses all datafile-specific modifiers */
 		/* we will load the data after parsing title,with,... */
 

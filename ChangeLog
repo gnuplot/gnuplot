@@ -1,3 +1,10 @@
+2002-01-26  Johannes Zellner  <johannes@zellner.org>
+
+	* src/plot3d.c src/graph3d.c src/graph3d.h src/gp_types.h
+	src/hidden3d.c src/pm3d.c src/pm3d.h src/color.c docs/gnuplot.doc:
+	pm3d coloring from an arbitrary data column for data splots
+	(column 2 or 4)
+
 2002-01-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in: Added 'exit 0' at end.  Without it make stops

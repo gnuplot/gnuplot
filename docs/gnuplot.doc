@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.94 2002/01/25 09:46:29 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.95 2002/01/25 18:02:09 joze Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5464,18 +5464,22 @@ C ... and restart the table:
 
  The pm3d algorithm fills the region between two neighbouring points in one 
  scan with another two points in the next scan by a gray (or colour) according 
- to the average of the z data in these four points.  From this follows, that 
- the neighbouring scans should not cross and the number of points in the
- neighbouring scans should not differ too much (you see --- scans can have 
- different number of points).  No other requirements (e.g.  the data must be
- gridded) are needed.  Another advantage is that the algorithm does not draw 
- anything outside of the input (measured or calculated) region.
+ to the average of the z data (or an additional 'color' column, see `splot`)
+ in these four points.  From this follows, that the neighbouring scans should
+ not cross and the number of points in the neighbouring scans should not
+ differ too much (you see --- scans can have different number of points).
+ No other requirements (e.g.  the data must be gridded) are needed.  Another
+ advantage is that the algorithm does not draw anything outside of the input
+ (measured or calculated) region.
 
- The gray is obtained by mapping the averaged z coordinate of the four corners
- of the quadrangle into the range [min_color_z,max_color_z] providing range of
- grays [0:1].  This value can be used directly as the gray for gray maps.  The
- normalized gray value can be further mapped into a colour.  See `set palette`
- for the complete description. 
+ 1. function splot or data splot with one ore three data columns:
+     The gray is obtained by mapping the averaged z coordinate of the four
+     corners of the quadrangle into the range [min_color_z,max_color_z]
+     providing range of grays [0:1].  This value can be used directly as the
+     gray for gray maps.  The normalized gray value can be further mapped into
+     a colour.  See `set palette` for the complete description. 
+ 2. data splot with two ore four data columns:
+     The gray is obtained by using the LAST coordinate instead of the z value.
 
  The pm3d mode requires a terminal supporting filled coloured polygons and
  palettes of smooth colours.  See above for the list of currently available
@@ -5499,7 +5503,7 @@ C ... and restart the table:
                   { hidden3d <linestyle> | nohidden3d }
                   { transparent | solid }
                   { map }
-                  { implicitly | explicit }
+                  { implicit | explicit }
                 }
        show pm3d
        unset pm3d
@@ -7469,10 +7473,10 @@ C ... and restart the table:
  Data file organization is essentially the same as for `plot`, except that
  each point is an (x,y,z) triple.  If only a single value is provided, it
  will be used for z, the datablock number will be used for y, and the index
- of the data point in the datablock will be used for x.  If two values are
- provided, `gnuplot` gives you an error message.  Three values are interpreted
- as an (x,y,z) triple.  Additional values are generally used as errors, which
- can be used by `fit`.
+ of the data point in the datablock will be used for x.  If two or four values
+ are provided, `gnuplot` uses the last value for calculating the color in
+ pm3d plots.  Three values are interpreted as an (x,y,z) triple.  Additional
+ values are generally used as errors, which can be used by `fit`.
 
  Single blank records separate datablocks in a `splot` datafile; `splot`
  treats datablocks as the equivalent of function y-isolines.  No line will

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.18 2001/12/17 12:10:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.19 2002/01/25 18:02:08 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -47,6 +47,7 @@ pm3d_struct pm3d = {
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
     PM3D_IMPLICIT,		/* implicit */
+    0 				/* use_column */
 };
 
 
@@ -252,6 +253,9 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
     gpiPoint icorners[4];
 #endif
 
+    /* just a shortcut */
+    int color_from_column = this_plot->pm3d_color_from_column;
+
     if (this_plot == NULL)
 	return;
 
@@ -360,7 +364,11 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 #endif
 		/* get the gray as the average of the corner z positions (note: log already in)
 		   I always wonder what is faster: d*0.25 or d/4? Someone knows? -- 0.25 (joze) */
-		avgZ = (pointsA[i].z + pointsA[i + 1].z + pointsB[ii].z + pointsB[ii + 1].z) * 0.25;
+		if (color_from_column)
+		    /* ylow is set in plot3d.c:get_3ddata() */
+		    avgZ = (pointsA[i].ylow + pointsA[i + 1].ylow + pointsB[ii].ylow + pointsB[ii + 1].ylow) * 0.25;
+		else
+		    avgZ = (pointsA[i].z + pointsA[i + 1].z + pointsB[ii].z + pointsB[ii + 1].z) * 0.25;
 		/* transform z value to gray, i.e. to interval [0,1] */
 		gray = z2gray(avgZ);
 		/* print the quadrangle with the given colour */
@@ -395,11 +403,18 @@ pm3d_plot(struct surface_points *this_plot, char at_which_z)
 	    }
 #ifdef EXTENDED_COLOR_SPECS
 	    if (supply_extended_color_specs) {
-		/* the target wants z and gray value */
-		icorners[0].z = pointsA[i].z;
-		icorners[1].z = pointsB[ii].z;
-		icorners[2].z = pointsB[ii + 1].z;
-		icorners[3].z = pointsA[i + 1].z;
+		if (color_from_column) {
+		    icorners[0].z = pointsA[i].ylow;
+		    icorners[1].z = pointsB[ii].ylow;
+		    icorners[2].z = pointsB[ii + 1].ylow;
+		    icorners[3].z = pointsA[i + 1].ylow;
+		} else {
+		    /* the target wants z and gray value */
+		    icorners[0].z = pointsA[i].z;
+		    icorners[1].z = pointsB[ii].z;
+		    icorners[2].z = pointsB[ii + 1].z;
+		    icorners[3].z = pointsA[i + 1].z;
+		}
 		for (i = 0; i < 4; i++) {
 		    icorners[i].spec.gray = z2gray(icorners[i].z);
 		}
@@ -432,6 +447,9 @@ int contours_where;
     double gray;
     struct gnuplot_contours *cntr;
 
+    /* just a shortcut */
+    int color_from_column = this_plot->pm3d_color_from_column;
+
     if (this_plot == NULL || this_plot->contours == NULL)
 	return;
     if (contours_where != CONTOUR_SRF && contours_where != CONTOUR_BASE)
@@ -452,6 +470,9 @@ int contours_where;
 	    /* What is the colour? */
 	    /* get the z-coordinate */
 	    /* transform contour z-coordinate value to gray, i.e. to interval [0,1] */
+	    if (color_from_column)
+		gray = z2gray(cntr->coords[0].ylow);
+	    else
 	    gray = z2gray(cntr->coords[0].z);
 	    set_color(gray);
 	}

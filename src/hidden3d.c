@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.30 2001/08/27 15:02:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.31 2001/11/22 12:25:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -255,8 +255,13 @@ static dynarray qtree;
 #endif /* TEST_QUADTREE*/
 
 /* Prototypes for internal functions of this module. */
+#ifdef PM3D
+static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
+				      int pointtype, int color_from_column));
+#else
 static long int store_vertex __PROTO((struct coordinate GPHUGE *point, 
 				      int pointtype));
+#endif
 static long int make_edge __PROTO((long int vnum1, long int vnum2,
 				   struct lp_style_type *lp,
 				   int style, int next));
@@ -496,9 +501,16 @@ do {									\
 } while (0)
 
 static long int 
-store_vertex (point, pointtype)
+store_vertex (point, pointtype
+#ifdef PM3D
+    , color_from_column
+#endif
+    )
 		 struct coordinate GPHUGE * point;
 		 int pointtype;
+#ifdef PM3D
+		 int color_from_column;
+#endif
 {
 	p_vertex thisvert = nextfrom_dynarray(&vertices);
 	
@@ -508,6 +520,10 @@ store_vertex (point, pointtype)
 		return (-1);
 	}
 	map3d_xyz(point->x, point->y,	point->z, thisvert);
+#ifdef PM3D
+	if (color_from_column)
+	    thisvert->real_z = point->ylow;
+#endif
 
 	return (thisvert - vlist);
 }
@@ -1003,6 +1019,9 @@ build_networks(plots, pcount)
 	 this_plot = this_plot->next_sp, surface++) {
 	long int crvlen = this_plot->iso_crvs->p_count;
 	int pointtype = -1;
+#ifdef PM3D
+	int color_from_column = this_plot->pm3d_color_from_column;
+#endif
 
 	lp = &(this_plot->lp_properties);
 	above = this_plot->lp_properties.l_type;
@@ -1031,7 +1050,11 @@ build_networks(plots, pcount)
 		for (i = 0; i < icrvs->p_count; i++) {
 		    long int thisvertex, basevertex;
 		    
-		    thisvertex = store_vertex(points+i, pointtype);
+		    thisvertex = store_vertex(points+i, pointtype
+#ifdef PM3D
+			, color_from_column
+#endif
+			);
 		
 		    if (thisvertex < 0 || previousvertex < 0) {
 			previousvertex = thisvertex;
@@ -1059,7 +1082,11 @@ build_networks(plots, pcount)
 			    coordval remember_z = points[i].z;
 			    
 			    points[i].z = axis_array[FIRST_Z_AXIS].min;
-			    basevertex = store_vertex(points + i, pointtype);
+			    basevertex = store_vertex(points + i, pointtype
+#ifdef PM3D
+				, color_from_column
+#endif
+				);
 			    points[i].z = remember_z;
 			}
 			if (basevertex > 0)
@@ -1098,7 +1125,11 @@ build_networks(plots, pcount)
 		long int e1, e2, e3;
 		long int pnum;
 
-		thisvertex = store_vertex(points+i, pointtype);
+		thisvertex = store_vertex(points+i, pointtype
+#ifdef PM3D
+		    , color_from_column
+#endif
+		    );
 
 		/* Preset the pointers to the polygons and edges
 		 * belonging to this isoline */
@@ -1243,7 +1274,11 @@ build_networks(plots, pcount)
 			coordval remember_z = points[i].z;
 						
 			points[i].z = axis_array[FIRST_Z_AXIS].min;
-			basevertex = store_vertex(points + i, pointtype);
+			basevertex = store_vertex(points + i, pointtype
+#ifdef PM3D
+			    , color_from_column
+#endif
+			    );
 			points[i].z = remember_z;
 		    }
 		    if (basevertex > 0)
