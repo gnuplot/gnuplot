@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 1.19.2.3 1999/10/01 10:37:23 lhecking Exp $";
+static char *RCSid = "$Id: term.c,v 1.19.2.4 2002/01/26 18:58:03 lhecking Exp $";
 #endif
 
 /* GNUPLOT - term.c */
@@ -112,7 +112,7 @@ extern float xsize, ysize;
 /* internal pointsize for do_point */
 static double term_pointsize;
 
-static int termcomp __PROTO((const generic * a, const generic * b));
+int termcomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
 static void null_linewidth __PROTO((double));
@@ -854,9 +854,10 @@ void list_terms()
     free(line_buffer);
 }
 
-static int
+int
 termcomp(arga, argb)
-    const generic *arga, *argb;
+    SORTFUNC_ARGS arga;
+    SORTFUNC_ARGS argb;
 {
     const int *a = arga;
     const int *b = argb;

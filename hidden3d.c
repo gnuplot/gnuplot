@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: hidden3d.c,v 1.13.2.3 2000/06/08 15:29:03 broeker Exp $";
+static char *RCSid = "$Id: hidden3d.c,v 1.13.2.4 2002/01/31 21:18:22 lhecking Exp $";
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -464,7 +464,7 @@ static GP_INLINE int maybe_build_polygon __PROTO((struct Polygon GPHUGE * p,
 	 int n, long *v, long line, int style, struct lp_style_type * lp,
 	       long next, long next_frag, int id, t_poly_tested tested));
 static void init_polygons __PROTO((struct surface_points * plots, int pcount));
-static int compare_by_zmax __PROTO((const void *p1, const void *p2));
+int compare_by_zmax __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 static void sort_by_zmax __PROTO((void));
 static int obscured __PROTO((struct Polygon GPHUGE * p));
 static GP_INLINE int xy_overlap __PROTO((struct Polygon GPHUGE * a, struct Polygon GPHUGE * b));
@@ -1292,10 +1292,12 @@ int pcount;
     }
 }
 
-static int compare_by_zmax(p1, p2)
-const void *p1, *p2;
+int compare_by_zmax(p1, p2)
+    SORTFUNC_ARGS p1;
+    SORTFUNC_ARGS p2;
 {
-    return (SIGNOF(plist[*(const long *) p2].zmax - plist[*(const long *) p1].zmax));
+    return (SIGNOF(plist[*(const long *) p2].zmax
+		   - plist[*(const long *) p1].zmax));
 }
 
 static void sort_by_zmax()

@@ -1,3 +1,27 @@
+Fri Feb  1 19:05:57 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Changes to avoid function pointer casts and work around HP-UX
+	gcc problem with passing around pointers to static functions.
+	
+	* hidden3d.c (compare_by_zmax): Change argument types to
+ 	SORTFUNC_ARGS.  Made non-static.
+
+	* interpol.c (compare_points): Change argument types to
+ 	SORTFUNC_ARGS.  Made non-static.
+	(sort_points): Don't cast function pointer.
+
+	* term.c (termcomp): Change argument types to
+ 	SORTFUNC_ARGS. Made non-static.
+
+	* graphics.c (histeps_compare): Change argument types to
+ 	SORTFUNC_ARGS. 
+
+	* help.c (sortkeys): Don't cast function pointer.
+	(keycomp): Make argument types SORTFUNC_ARGS. Remove 'static'.
+
+	* plot.h (SORTFUNC_ARGS): Make sure SORTFUNC_ARGS is defined.
+	(sortfunc): No longer used. Definition removed.
+
 2002-01-31  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Add --with-pdf, remove --enable-emf and --enable-epslatex.

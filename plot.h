@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.19.2.2 1999/11/20 17:57:19 lhecking Exp $
+ * $Id: plot.h,v 1.19.2.3 1999/12/09 18:43:40 lhecking Exp $
  *
  */
 
@@ -344,10 +344,9 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((int));
 typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 #endif
 
+/* HBB 20010720: removed 'sortfunc' --- it's no longer used */
 #ifndef SORTFUNC_ARGS
-typedef int (*sortfunc) __PROTO((const generic *, const generic *));
-#else
-typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
+# define SORTFUNC_ARGS const generic *
 #endif
 
 enum operators {

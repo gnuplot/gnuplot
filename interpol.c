@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: interpol.c,v 1.6 1998/11/16 13:09:51 lhecking Exp $";
+static char *RCSid = "$Id: interpol.c,v 1.6.2.1 1999/08/19 14:39:18 lhecking Exp $";
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -188,7 +188,7 @@ static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
 static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
-static int compare_points __PROTO((struct coordinate * p1, struct coordinate * p2));
+int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 
 /*
@@ -923,10 +923,13 @@ struct curve_points *plot;
  * (MGR 1992)
  */
 
-static int compare_points(p1, p2)
-struct coordinate *p1;
-struct coordinate *p2;
+int compare_points(argp1, argp2)
+    SORTFUNC_ARGS argp1;
+    SORTFUNC_ARGS argp2;
 {
+    const struct coordinate *p1 = argp1;
+    const struct coordinate *p2 = argp2;
+
     if (p1->x > p2->x)
 	return (1);
     if (p1->x < p2->x)
@@ -935,7 +938,7 @@ struct coordinate *p2;
 }
 
 void sort_points(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int first_point, num_points;
 
@@ -943,7 +946,7 @@ struct curve_points *plot;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
 	qsort((char *) (plot->points + first_point), num_points,
-	      sizeof(struct coordinate), (sortfunc) compare_points);
+	      sizeof(struct coordinate), compare_points);
 	first_point += num_points;
     }
     return;

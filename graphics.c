@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.9 2001/01/18 14:15:43 broeker Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.10 2001/06/25 16:06:33 broeker Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -145,7 +145,7 @@ void ytick2d_callback __PROTO((int axis, double place, char *text,
 				      struct lp_style_type grid));
 void xtick2d_callback __PROTO((int axis, double place, char *text,
 				      struct lp_style_type grid));
-int histeps_compare __PROTO((const void *p1, const void *p2));
+int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 static void map_position __PROTO((struct position * pos, unsigned int *x,
 					unsigned int *y, char *what));
 static void mant_exp __PROTO((double log_base, double x, int scientific,
@@ -2239,7 +2239,8 @@ static struct curve_points *histeps_current_plot;
  * bug seems to forbid that :-( */
 int
 histeps_compare(p1, p2)
-    const void *p1, *p2;
+    SORTFUNC_ARGS p1;
+    SORTFUNC_ARGS p2;
 {
     double x1=histeps_current_plot->points[*(int *)p1].x;
     double x2=histeps_current_plot->points[*(int *)p2].x;

@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.13.2.3 1999/12/09 18:42:41 lhecking Exp $
+ * $Id: protos.h,v 1.13.2.4 2000/05/07 16:46:56 lhecking Exp $
  *
  */
 
@@ -311,6 +311,7 @@ void int_error __PROTO((char str[], int t_num));
 void int_warn __PROTO((char str[], int t_num));
 void lower_case __PROTO((char *s));
 void squash_spaces __PROTO((char *s));
+char *gp_strdup __PROTO((char *s));
 
 
 /* Prototypes from file "util3d.c" */

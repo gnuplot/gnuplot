@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 1.8.2.2 1999/10/11 21:24:20 lhecking Exp $";
+static char *RCSid = "$Id: help.c,v 1.8.2.3 2002/01/31 21:26:50 lhecking Exp $";
 #endif
 
 /* GNUPLOT - help.c */
@@ -148,7 +148,7 @@ static FILE *helpfp = NULL;
 
 static int LoadHelp __PROTO((char *path));
 static void sortkeys __PROTO((void));
-static int keycomp __PROTO((struct key_s * a, struct key_s * b));
+int keycomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
 static LINEBUF *storeline __PROTO((char *text));
 static LINKEY *storekey __PROTO((char *key));
 static KEY *FindHelp __PROTO((char *keyword));
@@ -350,7 +350,7 @@ static void sortkeys()
     /* sort the array */
     /* note that it only moves objects of size (two pointers + long + int) */
     /* it moves no strings */
-    qsort((char *) keys, keycount, sizeof(KEY), (sortfunc) keycomp);
+    qsort((char *) keys, keycount, sizeof(KEY), keycomp);
 }
 
 /* HBB 20010720: changed to make this match the prototype qsort()
