@@ -152,9 +152,9 @@ void show_command()
     static char GPFAR showmess[] =
     "valid set options:  [] = choose one, {} means optional\n\n\
 \t'all',  'angles',  'arrow',  'autoscale',  'bar', 'border',  'boxwidth',\n\
-\t'clip',  'contour',  'data',  'dgrid3d',  'dummy',  'encoding',\n\
-\t'format', 'function',  'grid',  'hidden',  'isosamples',  'key',\n\
-\t'label', 'linestyle', 'locale', 'logscale', 'mapping', 'margin',\n\
+\t'clip', 'cntrparam', 'contour',  'data',  'dgrid3d',  'dummy',\n\
+\t'encoding', 'format', 'function',  'grid',  'hidden',  'isosamples',\n\
+\t'key', 'label', 'linestyle', 'locale', 'logscale', 'mapping', 'margin',\n\
 \t'missing', 'offsets', 'origin', 'output', 'plot', 'parametric',\n\
 \t'pointsize', 'polar', '[rtuv]range', 'samples', 'size', 'terminal',\n\
 \t'tics', 'timestamp', 'timefmt', 'title', 'variables', 'version',\n\
@@ -217,7 +217,7 @@ static TBOOLEAN
 	show_mapping();
 	c_token++;
     } else if (almost_equals(c_token, "co$ntour") ||
-	       almost_equals(c_token, "cntrp$aram")) {
+	       almost_equals(c_token, "cn$trparam")) {
 	(void) putc('\n', stderr);
 	show_contour();
 	c_token++;
