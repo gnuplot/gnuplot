@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.83 2004/10/05 16:37:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.84 2004/10/17 02:45:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -674,7 +674,7 @@ get_3ddata(struct surface_points *this_plot)
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
-	struct coordinate GPHUGE *cptail; /* Only for VECTOR plots */
+	struct coordinate GPHUGE *cptail = NULL; /* Only for VECTOR plots */
 	double x, y, z;
 	double xtail, ytail, ztail;
 	double color = VERYLARGE;
@@ -751,7 +751,7 @@ get_3ddata(struct surface_points *this_plot)
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
 	    }
 	    cp = local_this_iso->points + xdatum;
-	    
+
 	    if (this_plot->plot_style == VECTOR) {
 		if (j < 6) {
 		    cp->type = UNDEFINED;
@@ -768,9 +768,11 @@ get_3ddata(struct surface_points *this_plot)
 
 	    /* EAM Oct 2004 - Substantially rework this section */
 	    /* now that there are many more plot types.         */
-	    
-	    /* The x, y, z coordinates depend on the mapping type */
 
+	    x = y = z = 0.0;
+	    xtail = ytail = ztail = 0.0;
+
+	    /* The x, y, z coordinates depend on the mapping type */
 	    switch (mapping3d) {
 
 	    case MAP3D_CARTESIAN:
@@ -901,7 +903,7 @@ get_3ddata(struct surface_points *this_plot)
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, NOOP, goto come_here_if_undefined);
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, NOOP, goto come_here_if_undefined);
 	    }
-	    
+
 	    if (dgrid3d) {
 		/* HBB 20010424: in dgrid3d mode, delay log() taking
 		 * and scaling until after the dgrid process. Only for
