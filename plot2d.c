@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot2d.c,v 1.16.2.9 2000/09/22 14:23:49 broeker Exp $";
+static char *RCSid = "$Id: plot2d.c,v 1.16.2.10 2000/10/20 19:01:32 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -324,6 +324,7 @@ struct curve_points *this_plot;
     case BOXES:
 	min_cols = 2;
 	max_cols = 4;
+	break;
 
     default:
 	min_cols = 1;
