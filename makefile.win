@@ -1,0 +1,209 @@
+# make file for Borland C++ 3.1 Windows version
+# The compile and link includes debug flags.  Take them out if you
+# do not want them included  (-y -v -M, /m /s /v /l)
+
+# where to place wgnuplot.hlp helpfile
+HELPFILE = wgnuplot.hlp
+# location of Borland C compiler
+TC = c:\borlandc
+# name of C compiler
+CC = bcc
+# location of TLINK.EXE and BCC.EXE
+BIN = $(TC)\bin\\
+
+# -c means don't link
+# -ml means use large model (large code, large data)
+# -M means produce link map
+# -y means include line numbers for debugger
+# -v means include debug info
+# -w- means ignore warnings and do not report them
+# -w-rvl ignore function must return a value error
+# -Ff=128 means make data object > 128 FAR
+# -W means window application
+# -DREADLINE to use the history/line editing capability. If you want this 
+#    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
+#    section of the linker call.
+CFLAGS = -c -W -ml -M -y -v -w-rvl -w-pro -Ff=128 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA
+TERMFLAGS =
+
+OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
+	internal.obj misc.obj parse.obj plot.obj readline.obj scanner.obj \
+	setshow.obj specfun.obj standard.obj term.obj util.obj version.obj \
+	gnubin.obj binary.obj winmain.obj
+
+CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
+	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
+	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
+CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
+	term\iris4d.trm term\kyo.trm term\latex.trm term/pbm.trm term\win.trm
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
+	term\v384.trm term\x11.trm
+CSOURCE8 = contour.c specfun.c gnubin.c binary.c
+WINDOWS = makefile.win makefile.msw README.win win\wcommon.h \
+	win\wgnuplib.c win\wgnuplib.def win\wgnuplib.h win\wgnuplib.rc\
+	win\wgnuplot.def win\wgnuplot.hpj win\wgnuplot.mnu win\wgnuplot.rc \
+	win\wgraph.c win\winmain.c win\wmenu.c win\wpause.c \
+	win\wprinter.c win\wresourc.h win\wtext.c win\wtext.h \
+	win\geticon.c docs\doc2rtf.c term\win.trm
+
+all: wgnuplot.exe wgnuplot.dll $(HELPFILE) wgnuplot.mnu demo\bf_test.exe
+
+wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
+#	$(BIN)tlink /Twe /c @&&!
+	$(BIN)tlink /Twe /c /m /s /v /l @&&!
+$(TC)\lib\C0Wl +
+bitmap command eval graphics graph3d internal misc parse +
+plot scanner setshow specfun standard term util version contour +
+gnubin binary +
+winmain +
+readline +
+,wgnuplot,wgnuplot, +
+wgnuplot.lib +
+$(TC)\lib\import +
+$(TC)\lib\mathwl +
+$(TC)\lib\cwl, +
+win\wgnuplot.def
+!
+	$(BIN)brc -30 -k -i$(TC)\include win\wgnuplot.rc wgnuplot.exe
+
+# default rules
+
+.c.obj:
+	$(BIN)$(CC) @&&!
+$(CFLAGS)
+! $<
+
+# rules
+
+bitmap.obj: bitmap.c bitmap.h plot.h
+
+command.obj: command.c plot.h setshow.h 
+	$(BIN)$(CC) @&&!
+$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+! command.c
+
+contour.obj: contour.c plot.h
+
+eval.obj: eval.c plot.h
+
+graphics.obj: graphics.c plot.h setshow.h
+
+graph3d.obj: graphics.c plot.h setshow.h
+
+internal.obj: internal.c plot.h
+
+misc.obj: misc.c plot.h setshow.h 
+
+parse.obj: parse.c plot.h
+	$(BIN)$(CC) @&&!
+$(CFLAGS)
+! parse.c
+
+plot.obj: plot.c plot.h setshow.h
+	$(BIN)$(CC) @&&!
+$(CFLAGS)
+! plot.c
+
+readline.obj: readline.c plot.h
+
+scanner.obj: scanner.c plot.h
+
+setshow.obj: setshow.c plot.h setshow.h
+
+specfun.obj: specfun.c
+
+standard.obj: standard.c plot.h
+
+term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7) win\wgnuplib.h
+	$(BIN)$(CC) @&&!
+$(CFLAGS)
+! $(TERMFLAGS) -Iterm term.c
+
+util.obj: util.c plot.h
+
+version.obj: version.c
+
+winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
+	$(BIN)$(CC) @&&!
+$(CFLAGS) -DHELPFILE="$(HELPFILE)"
+! win\winmain.c
+
+wgnuplot.mnu: win\wgnuplot.mnu
+	copy win\wgnuplot.mnu wgnuplot.mnu
+
+
+# different compiler options for DLL's */
+DLLCC = $(BIN)bcc -c -ms! -M -y -v -WD -I$(TC)\include -Iwin
+DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
+
+wgnuplot.lib: wgnuplot.dll
+	$(BIN)implib wgnuplot.lib wgnuplot.dll
+
+wgnuplot.dll: $(DLLOBJS) win/wgnuplib.def win/wgnuplib.rc
+	$(BIN)tlink /c /n /Twd /L$(TC)\lib /m /s /v /l @&&!
+c0ds +
+wgnuplib wtext wmenu wpause wgraph wprinter, +
+wgnuplot.dll, +
+wgnuplib.map, +
+import mathws cws, +
+win\wgnuplib.def
+!
+	$(BIN)brc -30 -i$(TC)\include -t win\wgnuplib.rc wgnuplot.dll
+
+wgnuplib.obj: win/wgnuplib.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wgnuplib.c
+	
+wmenu.obj: win/wmenu.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wmenu.c
+
+wtext.obj: win/wtext.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wtext.c
+	
+wpause.obj: win/wpause.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wpause.c
+	
+wprinter.obj: win/wprinter.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wprinter.c
+	
+wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
+	$(DLLCC) win/wgraph.c
+	
+# convert gnuplot.doc to gnuplot.gih
+$(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
+	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+	$(BIN)hc win\wgnuplot.hpj 
+
+doc2rtf.exe: docs\doc2rtf.c
+	$(BIN)$(CC) -ml -w-pro -I$(TC)\include -L$(TC)\lib docs\doc2rtf.c
+
+# make binary demo files
+demo\bf_test.exe: bf_test.c dbinary.obj
+	$(BIN)$(CC) -edemo\bf_test.exe -w-pro -ml -I$(TC)\include -L$(TC)\lib bf_test.c dbinary.obj
+	cd demo
+	bf_test
+	cd ..
+
+dbinary.obj: binary.c
+	$(BIN)$(CC) -c -w-pro -ml -I$(TC)\include -odbinary.obj binary.c
+
+# clean up temporary files
+clean:
+	del *.obj
+	del wgnuplot.map
+	del win\wgnuplot.res
+	del win\gnuplot.rtf
+	del doc2rtf.exe
+	del win\wgnuplib.res
+	del wgnuplib.map
+	del wgnuplot.lib
+	del demo\bf_test.exe
+	
+veryclean: clean
+	del wgnuplot.exe
+	del wgnuplot.hlp
+	del wgnuplot.mnu
+	del wgnuplot.dll
+	del demo\binary1
+	del demo\binary2
+	del demo\binary3

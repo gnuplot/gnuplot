@@ -1,19 +1,15 @@
 This is the official release of GNUPLOT.3.2.  It is available in either
 a patch or tar archive.  Sites for the retrieval are listed in the
 README.   Below are the modifications and contributors to this release.
-The patch files patch.[1-7] need to be applied with the p1 flag
+The patch file 3_1to3_2.patch needs to be applied with the p1 flag
 
-(with csh or tcsh the following will apply the patches)
-%cd gnuplot
-%foreach f (patch.*)
->patch -p1 <  $f
->end
-
+>cd gnuplot
+>patch -p1 < 3_1to3_2.patch
 
 Thanks  ---  Alex Woo
 
-* Subject: New generic gnuplot_x11.c 
-  Name: Ed Kubatis
+* Subject: New generic gnuplot_x11.c
+  Name: Ed Kubaitis
   Email: ejk@ux2.ncsa.uiuc.edu
 
 * Subject: Hidden Line Removal for Explicit Surfaces and IRIX 4.0 fixes.
@@ -29,11 +25,11 @@ Thanks  ---  Alex Woo
   Email: woo@ames.arc.nasa.gov
 
 * Subject: Pbmplus driver and fix to y log tics.
-  Name: Russell Lang 
-  Email: rjl@monu1.cc.monash.edu.au  
+  Name: Russell Lang
+  Email: rjl@monu1.cc.monash.edu.au
 
 * Subject: NeXT Console Driver.
-  Name: Nick Strobel 
+  Name: Nick Strobel
   Email: strobel@phast.phys.washington.edu
 
 * Subject: Fix GNUTERM environment with disk resident BGI drivers
@@ -46,17 +42,17 @@ Thanks  ---  Alex Woo
 
 * Subject: Fix dump when GNUPLOT$HELP undefined
   Name: Wolfgang J. Moeller
-  Email: moeller@gwdgv1.dnet.gwdg.de 
-  
+  Email: moeller@gwdgv1.dnet.gwdg.de
+
 * Subject: Fix AMIGA segment limits
   Name: Carsten Steger
   Email: stegerc@informatik.tu-muenchen.de
-  
+
 * Subject: Put FAR pointers in bitmap.c and bitmap.h
-  Name: Russell Lang 
-  Email: rjl@monu1.cc.monash.edu.au  
-  
-* Subject: Bug fix to latex.trm 
+  Name: Russell Lang
+  Email: rjl@monu1.cc.monash.edu.au
+
+* Subject: Bug fix to latex.trm
   Name: Rob Cunningham
   Email: rkc@xn.ll.mit.edu
 ----------------------------------------------------------------------------
@@ -81,11 +77,11 @@ Gershon
   Email: luechen@cis.udel.edu
 
 * Subject: CRAY prt, UIUC coordinates.
-  Name: Daniel Lewart
+  Name: Daniel S. Lewart
   Email: d-lewart@uiuc.edu
 
 * Subject: AI device
-  Name:	Ray Ghanbari
+  Name: Ray Ghanbari
   Email: ray@mtl.mit.edu
 
 * Subject: HP_MOTIF on a Snake, X11 for Next
@@ -105,5 +101,5 @@ Gershon
   Email: tkacik@hobbes.cs.gmr.com
 
 * Subject: Amiga port
-  Name: Carsten Steger 
+  Name: Carsten Steger
   Email: stegerc@informatik.tu-muenchen.de

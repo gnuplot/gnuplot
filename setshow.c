@@ -1,10 +1,9 @@
-#ifndef lint
-static char *RCSid = "$Id: setshow.c,v 3.26 92/03/24 22:34:20 woo Exp Locker: woo $";
-#endif
+static char *RCSid = "$Id: setshow.c%v 3.50.1.11 1993/08/10 03:55:03 woo Exp $";
+
 
 /* GNUPLOT - setshow.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -29,13 +28,28 @@ static char *RCSid = "$Id: setshow.c,v 3.26 92/03/24 22:34:20 woo Exp Locker: wo
  *
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
+ *
+ * 19 September 1992  Lawrence Crowl  (crowl@cs.orst.edu)
+ * Added user-specified bases for log scaling.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
@@ -50,46 +64,59 @@ static char *RCSid = "$Id: setshow.c,v 3.26 92/03/24 22:34:20 woo Exp Locker: wo
  * global variables to hold status of 'set' options
  *
  */
-BOOLEAN			autoscale_r	= TRUE;
-BOOLEAN			autoscale_t	= TRUE;
-BOOLEAN			autoscale_u	= TRUE;
-BOOLEAN			autoscale_v	= TRUE;
-BOOLEAN			autoscale_x	= TRUE;
-BOOLEAN			autoscale_y	= TRUE;
-BOOLEAN			autoscale_z	= TRUE;
-BOOLEAN			autoscale_lt	= TRUE;
-BOOLEAN			autoscale_lu	= TRUE;
-BOOLEAN			autoscale_lv	= TRUE;
-BOOLEAN			autoscale_lx	= TRUE;
-BOOLEAN			autoscale_ly	= TRUE;
-BOOLEAN			autoscale_lz	= TRUE;
-BOOLEAN 	  	clip_points	= FALSE;
-BOOLEAN 	  	clip_lines1	= TRUE;
-BOOLEAN 	  	clip_lines2	= FALSE;
-BOOLEAN			draw_border	= TRUE;
-BOOLEAN			draw_surface    = TRUE;
-BOOLEAN			timedate    = FALSE;
+TBOOLEAN		autoscale_r	= TRUE;
+TBOOLEAN		autoscale_t	= TRUE;
+TBOOLEAN		autoscale_u	= TRUE;
+TBOOLEAN		autoscale_v	= TRUE;
+TBOOLEAN		autoscale_x	= TRUE;
+TBOOLEAN		autoscale_y	= TRUE;
+TBOOLEAN		autoscale_z	= TRUE;
+TBOOLEAN		autoscale_lt	= TRUE;
+TBOOLEAN		autoscale_lu	= TRUE;
+TBOOLEAN		autoscale_lv	= TRUE;
+TBOOLEAN		autoscale_lx	= TRUE;
+TBOOLEAN		autoscale_ly	= TRUE;
+TBOOLEAN		autoscale_lz	= TRUE;
+double			boxwidth	= -1.0; /* box width (automatic) */
+TBOOLEAN 		clip_points	= FALSE;
+TBOOLEAN 		clip_lines1	= TRUE;
+TBOOLEAN 		clip_lines2	= FALSE;
+TBOOLEAN		draw_border	= TRUE;
+TBOOLEAN		draw_surface    = TRUE;
+TBOOLEAN		timedate	= FALSE;
 char			dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
 char			xformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char			yformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char			zformat[MAX_ID_LEN+1] = DEF_FORMAT;
-enum			PLOT_STYLE data_style	= POINTS,
-			func_style	= LINES;
-BOOLEAN			grid		= FALSE;
-int				key			= -1;	/* default position */
-double			key_x, key_y, key_z;	/* user specified position for key */
-BOOLEAN			log_x		= FALSE,
-			log_y		= FALSE,
-			log_z		= FALSE;
+enum PLOT_STYLE		data_style	= POINTSTYLE;
+enum PLOT_STYLE		func_style	= LINES;
+TBOOLEAN		grid		= FALSE;
+int			key		= -1;	/* default position */
+double			key_x;
+double			key_y;	/* user specified position for key */
+double			key_z;
+TBOOLEAN		is_log_x	= FALSE;
+TBOOLEAN		is_log_y	= FALSE;
+TBOOLEAN		is_log_z	= FALSE;
+double			base_log_x	= 0.0;
+double			base_log_y	= 0.0;
+double			base_log_z	= 0.0;
+double			log_base_log_x	= 0.0;
+double			log_base_log_y	= 0.0;
+double			log_base_log_z	= 0.0;
 FILE*			outfile;
 char			outstr[MAX_ID_LEN+1] = "STDOUT";
-BOOLEAN			parametric	= FALSE;
-BOOLEAN			polar		= FALSE;
-BOOLEAN			hidden3d	= FALSE;
+TBOOLEAN		parametric	= FALSE;
+TBOOLEAN		polar		= FALSE;
+TBOOLEAN		hidden3d	= FALSE;
+TBOOLEAN		label_contours	= TRUE; /* different linestyles are used for contours when set */
 int			angles_format	= ANGLES_RADIANS;
 int			mapping3d	= MAP3D_CARTESIAN;
-int			samples		= SAMPLES;
-int			iso_samples	= ISO_SAMPLES;
+int			samples		= SAMPLES; /* samples is always equal to samples_1 */
+int			samples_1	= SAMPLES;
+int			samples_2	= SAMPLES;
+int			iso_samples_1	= ISO_SAMPLES;
+int			iso_samples_2	= ISO_SAMPLES;
 float			xsize		= 1.0;  /* scale factor for size */
 float			ysize		= 1.0;  /* scale factor for size */
 float			zsize		= 1.0;  /* scale factor for size */
@@ -98,7 +125,7 @@ float			surface_rot_x   = 60.0;
 float			surface_scale   = 1.0;
 float			surface_zscale  = 1.0;
 int			term		= 0;		/* unknown term is 0 */
-char			term_options[MAX_ID_LEN+1] = "";
+char			term_options[MAX_LINE_LEN+1] = "";
 char			title[MAX_LINE_LEN+1] = "";
 char			xlabel[MAX_LINE_LEN+1] = "";
 char			ylabel[MAX_LINE_LEN+1] = "";
@@ -113,66 +140,87 @@ int			ylabel_xoffset	= 0;
 int			ylabel_yoffset	= 0;
 int			zlabel_xoffset	= 0;
 int			zlabel_yoffset	= 0;
-double			rmin		= -0.0,
-			rmax		=  10.0,
-			tmin		= -5.0,
-			tmax		=  5.0,
-			umin		= -5.0,
-			umax		= 5.0,
-			vmin		= -5.0,
-			vmax		= 5.0,
-			xmin		= -10.0,
-			xmax		= 10.0,
-			ymin		= -10.0,
-			ymax		= 10.0,
-			zmin		= -10.0,
-			zmax		= 10.0;
-double			loff		= 0.0,
-			roff		= 0.0,
-			toff		= 0.0,
-			boff		= 0.0;
+double			rmin		= -0.0;
+double			rmax		=  10.0;
+double			tmin		= -5.0;
+double			tmax		=  5.0;
+double			umin		= -5.0;
+double			umax		= 5.0;
+double			vmin		= -5.0;
+double			vmax		= 5.0;
+double			xmin		= -10.0;
+double			xmax		= 10.0;
+double			ymin		= -10.0;
+double			ymax		= 10.0;
+double			zmin		= -10.0;
+double			zmax		= 10.0;
+double			loff		= 0.0;
+double			roff		= 0.0;
+double			toff		= 0.0;
+double			boff		= 0.0;
 int			draw_contour	= CONTOUR_NONE;
 int			contour_pts	= 5;
 int			contour_kind	= CONTOUR_KIND_LINEAR;
 int			contour_order	= 4;
 int			contour_levels	= 5;
-double			zero = ZERO;			/* zero threshold, not 0! */
+double			zero		= ZERO;	/* zero threshold, not 0! */
+int			levels_kind	= LEVELS_AUTO;
+double			levels_list[MAX_DISCRETE_LEVELS];  /* storage for z levels to draw contours at */
 
-BOOLEAN xzeroaxis = TRUE;
-BOOLEAN yzeroaxis = TRUE;
+int			dgrid3d_row_fineness = 10;
+int			dgrid3d_col_fineness = 10;
+int			dgrid3d_norm_value = 1;
+TBOOLEAN		dgrid3d		= FALSE;
 
-BOOLEAN xtics = TRUE;
-BOOLEAN ytics = TRUE;
-BOOLEAN ztics = TRUE;
+TBOOLEAN 		xzeroaxis	= TRUE;
+TBOOLEAN 		yzeroaxis	= TRUE;
 
-float ticslevel = 0.5;
+TBOOLEAN 		xtics		= TRUE;
+TBOOLEAN 		ytics		= TRUE;
+TBOOLEAN 		ztics		= TRUE;
 
-struct ticdef xticdef = {TIC_COMPUTED};
-struct ticdef yticdef = {TIC_COMPUTED};
-struct ticdef zticdef = {TIC_COMPUTED};
+float 			ticslevel	= 0.5;
 
-BOOLEAN			tic_in		= TRUE;
+struct ticdef		xticdef		= {TIC_COMPUTED};
+struct ticdef		yticdef		= {TIC_COMPUTED};
+struct ticdef		zticdef		= {TIC_COMPUTED};
 
-struct text_label *first_label = NULL;
-struct arrow_def *first_arrow = NULL;
+TBOOLEAN		tic_in		= TRUE;
+
+struct text_label 	*first_label	= NULL;
+struct arrow_def 	*first_arrow	= NULL;
 
 /*** other things we need *****/
+#ifdef _Windows
+#include <string.h>
+#else
+#if !defined(ATARI) && !defined (AMIGA_SC_6_1)
 extern char *strcpy(),*strcat();
-extern int strlen();
+extern int      strlen();
+#endif
+#endif
+
+#if defined(unix) || defined(PIPES)
 extern FILE *popen();
+#endif
 
 /* input data, parsing variables */
 extern struct lexical_unit token[];
 extern char input_line[];
 extern int num_tokens, c_token;
-extern BOOLEAN interactive;	/* from plot.c */
+extern TBOOLEAN interactive;	/* from plot.c */
 
 extern char replot_line[];
 extern struct udvt_entry *first_udv;
-extern BOOLEAN is_3d_plot;
+extern TBOOLEAN is_3d_plot;
 
 extern double magnitude(),real();
 extern struct value *const_express();
+
+#ifdef _Windows
+extern FILE * open_printer();
+extern void close_printer();
+#endif
 
 /******** Local functions ********/
 static void set_xyzlabel();
@@ -186,45 +234,48 @@ static void free_marklist();
 static void load_tic_series();
 static void load_offsets();
 
-static void show_style(), show_range(), show_zero(), show_border();
+static void show_style(), show_range(), show_zero(), show_border(), show_dgrid3d();
 static void show_offsets(), show_output(), show_samples(), show_isosamples();
 static void show_view(), show_size(), show_title(), show_xlabel();
-static void show_angles();
+static void show_angles(), show_boxwidth();
 static void show_ylabel(), show_zlabel(), show_xzeroaxis(), show_yzeroaxis();
 static void show_label(), show_arrow(), show_grid(), show_key();
 static void show_polar(), show_parametric(), show_tics(), show_ticdef();
 static void show_time(), show_term(), show_plot(), show_autoscale(), show_clip();
 static void show_contour(), show_mapping(), show_format(), show_logscale();
-static void show_variables(), show_surface(), show_hidden3d();
+static void show_variables(), show_surface(), show_hidden3d(), show_label_contours();
 static void delete_label();
 static int assign_label_tag();
 static void delete_arrow();
 static int assign_arrow_tag();
-static BOOLEAN set_one(), set_two(), set_three();
-static BOOLEAN show_one(), show_two();
+static TBOOLEAN set_one(), set_two(), set_three();
+static TBOOLEAN show_one(), show_two();
 
 /******** The 'set' command ********/
 void
 set_command()
 {
+static char GPFAR setmess[] =
+	"valid set options:  'angles' '{no}arrow', {no}autoscale', \n\
+	'{no}border', 'boxwidth', '{no}clabel', '{no}clip', 'cntrparam', \n\
+        '{no}contour', 'data style', '{no}dgrid3d', 'dummy', 'format', \n\
+        'function style', '{no}grid', '{no}hidden3d', 'isosamples', '{no}key', \n\
+	'{no}label', '{no}logscale', 'mapping', 'offsets', 'output', \n\
+	'{no}parametric', '{no}polar', 'rrange', 'samples', 'size', \n\
+	'{no}surface', 'terminal', 'tics', 'ticslevel', '{no}time', 'title', \n\
+	'trange', 'urange', 'view', 'vrange', 'xlabel', 'xrange', '{no}xtics', \n\
+	'xmtics', 'xdtics', '{no}xzeroaxis', 'ylabel', 'yrange', '{no}ytics', \n\
+	'ymtics', 'ydtics', '{no}yzeroaxis', 'zero', '{no}zeroaxis', 'zlabel', \n\
+	'zrange', '{no}ztics', 'zmtics', 'zdtics'";
+
     c_token++;
 
     if (!set_one() && !set_two() && !set_three())
-	int_error(
-	"valid set options:  'angles' '{no}arrow', {no}autoscale', \n\
-	'{no}border', '{no}clip', 'cntrparam', '{no}contour', 'data style', \n\
-	'dummy', 'format', 'function style', '{no}grid', '{no}hidden3d', \n\
-	'isosamples', '{no}key', '{no}label', '{no}logscale', 'mapping', \n\
-	'offsets', 'output', '{no}parametric', '{no}polar', 'rrange', \n\
-	'samples', 'size', '{no}surface', 'terminal', 'tics', 'ticslevel', \n\
-	'{no}time', 'title', 'trange', 'urange', 'view', 'vrange', 'xlabel', \n\
-	'xrange', '{no}xtics', '{no}xzeroaxis', 'ylabel', 'yrange', \n\
-	'{no}ytics', '{no}yzeroaxis', 'zero', '{no}zeroaxis', 'zlabel', \n\
-	'zrange', '{no}ztics'", c_token);
+	int_error(setmess, c_token);
 }
 
 /* return TRUE if a command match, FALSE if not */
-static BOOLEAN
+static TBOOLEAN
 set_one()
 {
 	if (almost_equals(c_token,"ar$row")) {
@@ -291,6 +342,14 @@ set_one()
 	    draw_border = FALSE;
 	    c_token++;
 	}
+	else if (almost_equals(c_token,"box$width")) {
+		struct value a;
+		c_token++;
+	    if (END_OF_COMMAND)
+	    	boxwidth = -1.0;
+	    else
+			boxwidth = magnitude(const_express(&a));
+	}
 	else if (almost_equals(c_token,"c$lip")) {
 	    c_token++;
 	    if (END_OF_COMMAND)
@@ -324,13 +383,29 @@ set_one()
 	    c_token++;
 	}
 	else if (almost_equals(c_token,"hi$dden3d")) {
+#ifdef LITE
+		printf(" Hidden Line Removal Not Supported in LITE version\n");
+#else
 	    hidden3d = TRUE;
+#endif /* LITE */
 	    c_token++;
 	}
 	else if (almost_equals(c_token,"nohi$dden3d")) {
+#ifdef LITE
+		printf(" Hidden Line Removal Not Supported in LITE version\n");
+#else
 	    hidden3d = FALSE;
+#endif /* LITE */
 	    c_token++;
 	}
+ 	else if (almost_equals(c_token,"cla$bel")) {
+ 		label_contours = TRUE;
+ 		c_token++;
+ 	}
+ 	else if (almost_equals(c_token,"nocla$bel")) {
+ 		label_contours = FALSE;
+ 		c_token++;
+  	}
 	else if (almost_equals(c_token,"ma$pping3d")) {
 	    c_token++;
 	    if (END_OF_COMMAND)
@@ -375,6 +450,7 @@ set_one()
 		 contour_kind = CONTOUR_KIND_LINEAR;
 		 contour_order = 4;
 		 contour_levels = 5;
+ 		 levels_kind = LEVELS_AUTO;
 	    }
 	    else if (almost_equals(c_token, "p$oints")) {
 		 c_token++;
@@ -392,10 +468,57 @@ set_one()
 		 c_token++;
 		 contour_kind = CONTOUR_KIND_BSPLINE;
 	    }
-	    else if (almost_equals(c_token, "le$vels")) {
-		 c_token++;
-		 contour_levels = (int) real(const_express(&a));
-	    }
+
+   		else if (almost_equals(c_token, "le$vels")) {
+   			int i=0;  /* local counter */
+   			c_token++;
+			/*  RKC: I have modified the next two:
+			 *   to use commas to separate list elements as in xtics
+ 			 *   so that incremental lists start,incr[,end]as in "
+ 			 */
+   			if (almost_equals(c_token, "di$screte")) {
+   			   levels_kind = LEVELS_DISCRETE;
+   			   c_token++;
+ 			   if(END_OF_COMMAND)
+			     int_error("expecting discrete level", c_token);
+ 			   else
+ 			     levels_list[i++] = real(const_express(&a));
+ 			   while(!END_OF_COMMAND){
+ 			     if (!equals(c_token, ","))
+ 			       int_error("expecting comma to separate discrete levels", c_token);
+ 			     c_token++;
+ 			     levels_list[i++] =  real(const_express(&a));
+ 			   }
+   			   contour_levels = i;
+   			}
+   			else if (almost_equals(c_token, "in$cremental")) {
+   			   levels_kind = LEVELS_INCREMENTAL;
+   			   c_token++;
+ 			   levels_list[i++] =  real(const_express(&a));
+ 			   if (!equals(c_token, ","))
+ 			     int_error("expecting comma to separate start,incr levels", c_token);
+ 			   c_token++;
+ 			   if((levels_list[i++] = real(const_express(&a)))==0)
+ 			     int_error("increment cannot be 0", c_token);
+  			   if(!END_OF_COMMAND){
+ 			     if (!equals(c_token, ","))
+ 			       int_error("expecting comma to separate incr,stop levels", c_token);
+ 			     c_token++;
+			     contour_levels = (real(const_express(&a))-levels_list[0])/levels_list[1];
+ 			     }
+   			}
+   			else if (almost_equals(c_token, "au$to")) {
+   				levels_kind = LEVELS_AUTO;
+ 				c_token++;
+ 				if(!END_OF_COMMAND)
+ 					contour_levels = (int) real(const_express(&a));
+ 			}
+ 			else {
+			  if(levels_kind == LEVELS_DISCRETE)
+			    int_error("Levels type is discrete, ignoring new number of contour levels", c_token);
+			    contour_levels = (int) real(const_express(&a));
+			}
+ 		}
 	    else if (almost_equals(c_token, "o$rder")) {
 		 int order;
 		 c_token++;
@@ -408,13 +531,57 @@ set_one()
 		 int_error("expecting 'linear', 'cubicspline', 'bspline', 'points', 'levels' or 'order'", c_token);
 	    c_token++;
 	}
-	else if (almost_equals(c_token,"d$ata")) {
+	else if (almost_equals(c_token,"da$ta")) {
 		c_token++;
 		if (!almost_equals(c_token,"s$tyle"))
 			int_error("expecting keyword 'style'",c_token);
 		data_style = get_style();
 	}
-	else if (almost_equals(c_token,"d$ummy")) {
+	else if (almost_equals(c_token,"dg$rid3d")) {
+		int i;
+		TBOOLEAN was_comma = TRUE;
+		int local_vals[3];
+		struct value a;
+
+		local_vals[0] = dgrid3d_row_fineness;
+		local_vals[1] = dgrid3d_col_fineness;
+		local_vals[2] = dgrid3d_norm_value;
+		c_token++;
+		for (i = 0; i < 3 && !(END_OF_COMMAND);) {
+			if (equals(c_token,",")) {
+				if (was_comma) i++;
+				was_comma = TRUE;
+				c_token++;
+			}
+			else {
+				if (!was_comma)
+					int_error("',' expected",c_token);
+				local_vals[i] = real(const_express(&a));
+				i++;
+				was_comma = FALSE;
+			}
+		}
+
+
+		if (local_vals[0] < 2 || local_vals[0] > 1000)
+			int_error("Row size must be in [2:1000] range; size unchanged",
+				  c_token);
+		if (local_vals[1] < 2 || local_vals[1] > 1000)
+			int_error("Col size must be in [2:1000] range; size unchanged",
+				  c_token);
+		if (local_vals[2] < 1 || local_vals[2] > 100)
+			int_error("Norm must be in [1:100] range; norm unchanged", c_token);
+
+		dgrid3d_row_fineness = local_vals[0];
+		dgrid3d_col_fineness = local_vals[1];
+		dgrid3d_norm_value = local_vals[2];
+		dgrid3d = TRUE;
+	}
+	else if (almost_equals(c_token,"nodg$rid3d")) {
+		c_token++;
+		dgrid3d = FALSE;
+	}
+	else if (almost_equals(c_token,"du$mmy")) {
 		c_token++;
 		if (END_OF_COMMAND)
 			int_error("expecting dummy variable name", c_token);
@@ -430,7 +597,7 @@ set_one()
 		}
 	}
 	else if (almost_equals(c_token,"fo$rmat")) {
-		BOOLEAN setx, sety, setz;
+		TBOOLEAN setx, sety, setz;
 		c_token++;
 		if (equals(c_token,"x")) {
 			setx = TRUE; sety = setz = FALSE;
@@ -489,30 +656,85 @@ set_one()
 		set_nolabel();
 	}
 	else if (almost_equals(c_token,"lo$gscale")) {
-		c_token++;
+	    c_token++;
 	    if (END_OF_COMMAND) {
-		   log_x = log_y = log_z = TRUE;
+		is_log_x = is_log_y = is_log_z = TRUE;
+		base_log_x = base_log_y = base_log_z = 10.0;
+		log_base_log_x = log_base_log_y = log_base_log_z = log(10.0);
 	    } else {
-		   if (chr_in_str(c_token, 'x'))
-		       log_x = TRUE;
-		   if (chr_in_str(c_token, 'y'))
-		       log_y = TRUE;
-		   if (chr_in_str(c_token, 'z'))
-		       log_z = TRUE;
-		   c_token++;
+		TBOOLEAN change_x = FALSE;
+		TBOOLEAN change_y = FALSE;
+		TBOOLEAN change_z = FALSE;
+		if (chr_in_str(c_token, 'x'))
+		    change_x = TRUE;
+		if (chr_in_str(c_token, 'y'))
+		    change_y = TRUE;
+		if (chr_in_str(c_token, 'z'))
+		    change_z = TRUE;
+		c_token++;
+                if (END_OF_COMMAND) {
+		    if (change_x) {
+			is_log_x = TRUE;
+			base_log_x = 10.0;
+			log_base_log_x = log(10.0);
+		    }
+		    if (change_y) {
+			is_log_y = TRUE;
+			base_log_y = 10.0;
+			log_base_log_y = log(10.0);
+		    }
+		    if (change_z) {
+			is_log_z = TRUE;
+			base_log_z = 10.0;
+			log_base_log_z = log(10.0);
+		    }
+		} else {
+		    struct value a;
+		    double newbase = magnitude(const_express(&a));
+		    c_token++;
+		    if (newbase < 1.1)
+			int_error("log base must be >= 1.1; logscale unchanged",
+				c_token);
+		    else {
+			if (change_x) {
+			    is_log_x = TRUE;
+			    base_log_x = newbase;
+			    log_base_log_x = log(newbase);
+			}
+			if (change_y) {
+			    is_log_y = TRUE;
+			    base_log_y = newbase;
+			    log_base_log_y = log(newbase);
+			}
+			if (change_z) {
+			    is_log_z = TRUE;
+			    base_log_z = newbase;
+			    log_base_log_z = log(newbase);
+			}
+		    }
+		}
 	    }
 	}
 	else if (almost_equals(c_token,"nolo$gscale")) {
 	    c_token++;
 	    if (END_OF_COMMAND) {
-		log_x = log_y = log_z = FALSE;
+		is_log_x = is_log_y = is_log_z = FALSE;
 	    } else {
-		if (chr_in_str(c_token, 'x'))
-		    log_x = FALSE;
-		if (chr_in_str(c_token, 'y'))
-		    log_y = FALSE;
-		if (chr_in_str(c_token, 'z'))
-		    log_z = FALSE;
+		if (chr_in_str(c_token, 'x')) {
+		    is_log_x = FALSE;
+		    base_log_x = 0.0;
+		    log_base_log_x = 0.0;
+                }
+		if (chr_in_str(c_token, 'y')) {
+		    is_log_y = FALSE;
+		    base_log_y = 0.0;
+		    log_base_log_y = 0.0;
+                }
+		if (chr_in_str(c_token, 'z')) {
+		    is_log_z = FALSE;
+		    base_log_z = 0.0;
+		    log_base_log_z = 0.0;
+                }
 		c_token++;
 	    }
 	} 
@@ -532,13 +754,13 @@ set_one()
 
 
 /* return TRUE if a command match, FALSE if not */
-static BOOLEAN
+static TBOOLEAN
 set_two()
 {
      char testfile[MAX_LINE_LEN+1];
-#ifdef unix
-     static BOOLEAN pipe_open = FALSE;
-#endif
+#if defined(unix) || defined(PIPES)
+     static TBOOLEAN pipe_open = FALSE;
+#endif /* unix || PIPES */
 
 	if (almost_equals(c_token,"o$utput")) {
 		register FILE *f;
@@ -549,11 +771,16 @@ set_two()
 		if (END_OF_COMMAND) {	/* no file specified */
  			UP_redirect (4);
 			if (outfile != stdout) { /* Never close stdout */
-#ifdef unix
+#if defined(unix) || defined(PIPES)
 				if ( pipe_open ) {
 					(void) pclose(outfile);
 					pipe_open = FALSE;
 				} else
+#endif /* unix || PIPES */
+#ifdef _Windows
+				  if ( !stricmp(outstr,"'PRN'") )
+					close_printer();
+				  else
 #endif
 					(void) fclose(outfile);
 			}
@@ -564,17 +791,36 @@ set_two()
 			int_error("expecting filename",c_token);
 		else {
 			quote_str(testfile,c_token);
-#ifdef unix
+#if defined(unix) || defined(PIPES)
 			if ( *testfile == '|' ) {
 			  if ((f = popen(testfile+1,"w")) == (FILE *)NULL)
 			    os_error("cannot create pipe; output not changed",c_token);
 			  else
 			    pipe_open = TRUE;
 			} else
+#endif /* unix || PIPES */
+#ifdef _Windows
+			if ( !stricmp(outstr,"'PRN'") ) {
+				/* we can't call open_printer() while printer is open, so */
+				close_printer();	/* close printer immediately if open */
+			    outfile = stdout;	/* and reset output to stdout */
+			    term_init = FALSE;
+				(void) strcpy(outstr,"STDOUT");
+			}
+			if ( !stricmp(testfile,"PRN") ) {
+			  if ((f = open_printer()) == (FILE *)NULL)
+			    os_error("cannot open printer temporary file; output may have changed",c_token);
+			} else
 #endif
 			  if ((f = fopen(testfile,"w")) == (FILE *)NULL)
 			    os_error("cannot open file; output not changed",c_token);
 			if (outfile != stdout) /* Never close stdout */
+#if defined(unix) || defined(PIPES)
+			    if( pipe_open ) {
+				(void) pclose(outfile);
+				pipe_open=FALSE;
+			    } else
+#endif /* unix || PIPES */
 				(void) fclose(outfile);
 			outfile = f;
 			term_init = FALSE;
@@ -623,20 +869,22 @@ set_two()
 		yzeroaxis = FALSE;
 	} 
 	else if (almost_equals(c_token,"par$ametric")) {
-	    if (!parametric) {
+		if (!parametric) {
 		   parametric = TRUE;
 		   strcpy (dummy_var[0], "t");
 		   strcpy (dummy_var[1], "y");
-	  	   (void) fprintf(stderr,"\n\tdummy variable is t for curves, u/v for surfaces\n");
+		   if (interactive)
+		     (void) fprintf(stderr,"\n\tdummy variable is t for curves, u/v for surfaces\n");
 	    }
 	    c_token++;
 	}
 	else if (almost_equals(c_token,"nopar$ametric")) {
-	    if (parametric) {
+		if (parametric) {
 		   parametric = FALSE;
 		   strcpy (dummy_var[0], "x");
 		   strcpy (dummy_var[1], "y");
-	  	   (void) fprintf(stderr,"\n\tdummy variable is x for curves, x/y for surfaces\n");
+		   if (interactive)
+		     (void) fprintf(stderr,"\n\tdummy variable is x for curves, x/y for surfaces\n");
 	    }
 	    c_token++;
 	}
@@ -738,6 +986,24 @@ set_two()
 			c_token++;
 		}
 	}
+     else if (almost_equals(c_token,"xmt$ics")) {
+	 xtics = TRUE;
+	 c_token++;
+	 if(xticdef.type == TIC_USER){
+	     free_marklist(xticdef.def.user);
+	     xticdef.def.user = NULL;
+	 }
+	xticdef.type = TIC_MONTH;
+     }
+     else if (almost_equals(c_token,"xdt$ics")) {
+	 xtics = TRUE;
+	 c_token++;
+	 if(xticdef.type == TIC_USER){
+	     free_marklist(xticdef.def.user);
+	     xticdef.def.user = NULL;
+	 }
+	xticdef.type = TIC_DAY;
+     }
      else if (almost_equals(c_token,"xt$ics")) {
 	    xtics = TRUE;
 	    c_token++;
@@ -755,6 +1021,24 @@ set_two()
 	    xtics = FALSE;
 	    c_token++;
 	} 
+     else if (almost_equals(c_token,"ymt$ics")) {
+	 ytics = TRUE;
+	 c_token++;
+	 if(yticdef.type == TIC_USER){
+	     free_marklist(yticdef.def.user);
+	     yticdef.def.user = NULL;
+	 }
+	yticdef.type = TIC_MONTH;
+     }
+     else if (almost_equals(c_token,"ydt$ics")) {
+	 ytics = TRUE;
+	 c_token++;
+	 if(yticdef.type == TIC_USER){
+	     free_marklist(yticdef.def.user);
+	     yticdef.def.user = NULL;
+	 }
+	yticdef.type = TIC_DAY;
+     }
      else if (almost_equals(c_token,"yt$ics")) {
 	    ytics = TRUE;
 	    c_token++;
@@ -772,6 +1056,24 @@ set_two()
 	    ytics = FALSE;
 	    c_token++;
 	} 
+     else if (almost_equals(c_token,"zmt$ics")) {
+	 ztics = TRUE;
+	 c_token++;
+	 if(zticdef.type == TIC_USER){
+	     free_marklist(zticdef.def.user);
+	     zticdef.def.user = NULL;
+	 }
+	zticdef.type = TIC_MONTH;
+     }
+     else if (almost_equals(c_token,"zdt$ics")) {
+	 ztics = TRUE;
+	 c_token++;
+	 if(zticdef.type == TIC_USER){
+	     free_marklist(zticdef.def.user);
+	     zticdef.def.user = NULL;
+	 }
+	zticdef.type = TIC_DAY;
+     }
      else if (almost_equals(c_token,"zt$ics")) {
 	    ztics = TRUE;
 	    c_token++;
@@ -811,16 +1113,23 @@ set_two()
 
 
 /* return TRUE if a command match, FALSE if not */
-static BOOLEAN
+static TBOOLEAN
 set_three()
 {
      if (almost_equals(c_token,"sa$mples")) {
-		register int tsamp;
+		register int tsamp1, tsamp2;
 		struct value a;
 
 		c_token++;
-		tsamp = (int)magnitude(const_express(&a));
-		if (tsamp < 2)
+		tsamp1 = (int)magnitude(const_express(&a));
+		tsamp2 = tsamp1;
+		if (!END_OF_COMMAND) {
+			if (!equals(c_token,","))
+				int_error("',' expected",c_token);
+			c_token++;
+			tsamp2 = (int)magnitude(const_express(&a));
+		}
+		if (tsamp1 < 2 || tsamp2 < 2)
 			int_error("sampling rate must be > 1; sampling unchanged",
 				c_token);
 		else {
@@ -830,16 +1139,25 @@ set_three()
 			first_3dplot = NULL;
 			sp_free(f_3dp);
 
-			samples = tsamp;
+			samples = tsamp1;
+			samples_1 = tsamp1;
+			samples_2 = tsamp2;
 		}
     }
     else if (almost_equals(c_token,"isosa$mples")) {
-		register int tsamp;
+		register int tsamp1, tsamp2;
 		struct value a;
 
 		c_token++;
-		tsamp = (int)magnitude(const_express(&a));
-		if (tsamp < 2)
+		tsamp1 = (int)magnitude(const_express(&a));
+		tsamp2 = tsamp1;
+		if (!END_OF_COMMAND) {
+			if (!equals(c_token,","))
+				int_error("',' expected",c_token);
+			c_token++;
+			tsamp2 = (int)magnitude(const_express(&a));
+		}
+		if (tsamp1 < 2 || tsamp2 < 2)
 			int_error("sampling rate must be > 1; sampling unchanged",
 				c_token);
 		else {
@@ -853,7 +1171,8 @@ set_three()
 			cp_free(f_p);
 			sp_free(f_3dp);
 
-			iso_samples = tsamp;
+			iso_samples_1 = tsamp1;
+			iso_samples_2 = tsamp2;
 		}
     }
     else if (almost_equals(c_token,"si$ze")) {
@@ -897,7 +1216,6 @@ set_three()
 		c_token++;
 		if (!END_OF_COMMAND) {
 			struct value a;
-			int x, y;
 
 			/* We have x,y offsets specified */
 			if (!equals(c_token,","))
@@ -913,7 +1231,7 @@ set_three()
 		c_token++;
 	}
 	else if (almost_equals(c_token,"rr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -926,7 +1244,7 @@ set_three()
 		  autoscale_r = FALSE;
 	}
 	else if (almost_equals(c_token,"tr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -939,7 +1257,7 @@ set_three()
 		  autoscale_t = FALSE;
 	}
 	else if (almost_equals(c_token,"ur$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -953,7 +1271,7 @@ set_three()
 	}
 	else if (almost_equals(c_token,"vi$ew")) {
 		int i;
-		BOOLEAN was_comma = TRUE;
+		TBOOLEAN was_comma = TRUE;
 		double local_vals[4];
 		struct value a;
 
@@ -994,7 +1312,7 @@ set_three()
 		surface_zscale = local_vals[3];
 	}
 	else if (almost_equals(c_token,"vr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -1007,7 +1325,7 @@ set_three()
 		  autoscale_v = FALSE;
 	}
 	else if (almost_equals(c_token,"xr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -1020,7 +1338,7 @@ set_three()
 		  autoscale_x = FALSE;
 	}
 	else if (almost_equals(c_token,"yr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -1033,7 +1351,7 @@ set_three()
 		  autoscale_y = FALSE;
 	}
 	else if (almost_equals(c_token,"zr$ange")) {
-	     BOOLEAN changed;
+	     TBOOLEAN changed;
 		c_token++;
 		if (!equals(c_token,"["))
 			int_error("expecting '['",c_token);
@@ -1074,7 +1392,6 @@ int *xpos,*ypos;
 		}
 		if (!END_OF_COMMAND) {
 			struct value a;
-			int x, y;
 
 			/* We have x,y offsets specified */
 			if (!equals(c_token,","))
@@ -1100,7 +1417,7 @@ set_label()
     char text[MAX_LINE_LEN+1];
     enum JUSTIFY just;
     int tag;
-    BOOLEAN set_text, set_position, set_just;
+    TBOOLEAN set_text, set_position, set_just;
 
     /* get tag */
     if (!END_OF_COMMAND 
@@ -1217,7 +1534,7 @@ set_label()
     } else {
 	   /* adding the label */
 	   new_label = (struct text_label *) 
-		alloc ( (unsigned int) sizeof(struct text_label), "label");
+		alloc ( (unsigned long) sizeof(struct text_label), "label");
 	   if (prev_label != NULL)
 		prev_label->next = new_label; /* add it to end of list */
 	   else 
@@ -1314,7 +1631,7 @@ set_arrow()
     double sx, sy, sz;
     double ex, ey, ez;
     int tag;
-    BOOLEAN set_start, set_end, head = 1;
+    TBOOLEAN set_start, set_end, head = 1;
 
     /* get tag */
     if (!END_OF_COMMAND 
@@ -1432,7 +1749,7 @@ set_arrow()
     } else {
 	   /* adding the arrow */
 	   new_arrow = (struct arrow_def *) 
-		alloc ( (unsigned int) sizeof(struct arrow_def), "arrow");
+		alloc ( (unsigned long) sizeof(struct arrow_def), "arrow");
 	   if (prev_arrow != NULL)
 		prev_arrow->next = new_arrow; /* add it to end of list */
 	   else 
@@ -1530,15 +1847,22 @@ register enum PLOT_STYLE ps;
 	else if (almost_equals(c_token,"i$mpulses"))
 		ps = IMPULSES;
 	else if (almost_equals(c_token,"p$oints"))
-		ps = POINTS;
+		ps = POINTSTYLE;
 	else if (almost_equals(c_token,"linesp$oints"))
 		ps = LINESPOINTS;
 	else if (almost_equals(c_token,"d$ots"))
 		ps = DOTS;
 	else if (almost_equals(c_token,"e$rrorbars"))
 		ps = ERRORBARS;
+	else if (almost_equals(c_token,"b$oxes"))
+		ps = BOXES;
+	else if (almost_equals(c_token,"boxer$rorbars"))
+		ps = BOXERROR;
+	else if (almost_equals(c_token,"s$teps"))
+		ps = STEPS;
 	else
-		int_error("expecting 'lines', 'points', 'linespoints', 'dots', 'impulses', or 'errorbars'",c_token);
+		int_error("expecting 'lines', 'points', 'linespoints', 'dots', 'impulses', \n\
+        'errorbars', 'steps', 'boxes' or 'boxerrorbars'",c_token);
 	c_token++;
 	return(ps);
 }
@@ -1573,7 +1897,7 @@ load_tic_user(tdef)
 
     while (!END_OF_COMMAND) {
 	   /* parse a new ticmark */
-	   tic = (struct ticmark *)alloc(sizeof(struct ticmark), (char *)NULL);
+	   tic = (struct ticmark *)alloc((unsigned long)sizeof(struct ticmark), (char *)NULL);
 	   if (tic == (struct ticmark *)NULL) {
 		  free_marklist(list);
 		  int_error("out of memory for tic mark", c_token);
@@ -1582,7 +1906,7 @@ load_tic_user(tdef)
 	   /* has a string with it? */
 	   if (isstring(c_token)) {
 		  quote_str(temp_string,c_token);
-		  tic->label = alloc((unsigned int)strlen(temp_string)+1, "tic label");
+		  tic->label = alloc((unsigned long)strlen(temp_string)+1, "tic label");
 		  (void) strcpy(tic->label, temp_string);
 		  c_token++;
 	   } else
@@ -1733,12 +2057,12 @@ struct value t;
 }
 
 
-BOOLEAN					/* TRUE if a or b were changed */
+TBOOLEAN					/* TRUE if a or b were changed */
 load_range(a,b)			/* also used by command.c */
 double *a,*b;
 {
 struct value t;
-BOOLEAN changed = FALSE;
+TBOOLEAN changed = FALSE;
 
 	if (equals(c_token,"]"))
 		return(FALSE);
@@ -1764,25 +2088,29 @@ BOOLEAN changed = FALSE;
 void
 show_command()
 {
+    static char GPFAR showmess[] = 
+	"valid show options:  'action_table', 'all', 'angles', 'arrow', \n\
+	'autoscale', 'border', 'boxwidth', 'clip', 'contour', 'data', \n\
+	'dgrid3d', 'dummy', 'format', 'function', 'grid', 'hidden', 'key', \n\
+	'label', 'logscale', 'mapping',  'offsets', 'output', 'plot', \n\
+	'parametric', 'polar', 'rrange', 'samples', 'isosamples', 'view', \n\
+	'size', 'terminal', 'tics', 'ticslevel', 'time', 'title', 'trange', \n\
+	'urange', 'vrange', 'variables', 'version', \n\
+	'xlabel', 'xrange', '{no}xtics', 'xmtics', 'xdtics', '{no}xzeroaxis',\n\
+	'ylabel', 'yrange', '{no}ytics', 'ymtics', 'ydtics', '{no}yzeroaxis',\n\
+ 	'zero', '{no}zeroaxis', 'zlabel', 'zrange', '{no}ztics',\n\
+ 	'zmtics', 'zdtics'";
+
     c_token++;
 
     if (!show_one() && !show_two())
-	int_error(
-	"valid show options:  'action_table', 'all', 'angles', 'arrow', \n\
-	'autoscale', 'border', 'clip', 'contour', 'data', 'dummy', 'format', \n\
-	'function', 'grid', 'hidden', 'key', 'label', 'logscale', 'mapping', \n\
-	'offsets', 'output', 'plot', 'parametric', 'polar', 'rrange', \n\
-	'samples', 'isosamples', 'view', 'size', 'terminal', 'tics', \n\
-	'ticslevel', 'time', 'title', 'trange', 'urange', 'vrange', \n\
-	'variables', 'version', 'xlabel', 'xrange', 'xtics', 'xzeroaxis', \n\
-	'ylabel', 'yrange', 'ytics', 'yzeroaxis', 'zlabel', 'zrange', \n\
-	'ztics', 'zero', 'zeroaxis'", c_token);
+	int_error(showmess, c_token);
 	screen_ok = FALSE;
 	(void) putc('\n',stderr);
 }
 
 /* return TRUE if a command match, FALSE if not */
-static BOOLEAN
+static TBOOLEAN
 show_one()
 {
 	if (almost_equals(c_token,"ac$tion_table") ||
@@ -1815,6 +2143,11 @@ show_one()
 		show_border();
 		c_token++;
 	}
+	else if (almost_equals(c_token,"box$width")) {
+		(void) putc('\n',stderr);
+		show_boxwidth();
+		c_token++;
+	}
 	else if (almost_equals(c_token,"c$lip")) {
 		(void) putc('\n',stderr);
 		show_clip();
@@ -1830,7 +2163,7 @@ show_one()
 		show_contour();
 		c_token++;
 	}
-	else if (almost_equals(c_token,"d$ata")) {
+	else if (almost_equals(c_token,"da$ta")) {
 		c_token++;
 		if (!almost_equals(c_token,"s$tyle"))
 			int_error("expecting keyword 'style'",c_token);
@@ -1838,7 +2171,12 @@ show_one()
 		show_style("data",data_style);
 		c_token++;
 	}
-	else if (almost_equals(c_token,"d$ummy")) {
+	else if (almost_equals(c_token,"dg$rid3d")) {
+		(void) putc('\n',stderr);
+		show_dgrid3d();
+		c_token++;
+	}
+	else if (almost_equals(c_token,"du$mmy")) {
 	  	(void) fprintf(stderr,"\n\tdummy variables are \"%s\" and \"%s\"\n",
 	    				dummy_var[0], dummy_var[1]);
 		c_token++;
@@ -1847,7 +2185,7 @@ show_one()
 		show_format();
 		c_token++;
 	}
-	else if (almost_equals(c_token,"f$unctions")) {
+	else if (almost_equals(c_token,"fu$nctions")) {
 		c_token++;
 		if (almost_equals(c_token,"s$tyle"))  {
 			(void) putc('\n',stderr);
@@ -1938,7 +2276,7 @@ show_one()
 }
 
 /* return TRUE if a command match, FALSE if not */
-static BOOLEAN
+static TBOOLEAN
 show_two()
 {
 	if (almost_equals(c_token,"p$lot")) {
@@ -1981,6 +2319,11 @@ show_two()
 		show_hidden3d();
 		c_token++;
 	}
+ 	else if (almost_equals(c_token,"cla$bel")) {
+ 		(void) putc('\n',stderr);
+ 		show_label_contours();
+ 		c_token++;
+ 	}
 	else if (almost_equals(c_token,"xti$cs")) {
 	    show_tics(TRUE,FALSE,FALSE);
 	    c_token++;
@@ -2071,8 +2414,10 @@ show_two()
 		show_version();
 		show_autoscale();
 		show_border();
+		show_boxwidth();
 		show_clip();
 		show_contour();
+		show_dgrid3d();
 		show_mapping();
 	  	(void) fprintf(stderr,"\tdummy variables are \"%s\" and \"%s\"\n",
 	    				dummy_var[0], dummy_var[1]);
@@ -2093,7 +2438,9 @@ show_two()
 		show_isosamples();
 		show_view();
 		show_surface();
+#ifndef LITE
 		show_hidden3d();
+#endif
 		show_size();
 		show_term();
 		show_tics(TRUE,TRUE,TRUE);
@@ -2135,12 +2482,35 @@ enum PLOT_STYLE style;
 	fprintf(stderr,"\t%s are plotted with ",name);
 	switch (style) {
 		case LINES: fprintf(stderr,"lines\n"); break;
-		case POINTS: fprintf(stderr,"points\n"); break;
+		case POINTSTYLE: fprintf(stderr,"points\n"); break;
 		case IMPULSES: fprintf(stderr,"impulses\n"); break;
 		case LINESPOINTS: fprintf(stderr,"linespoints\n"); break;
 		case DOTS: fprintf(stderr,"dots\n"); break;
 		case ERRORBARS: fprintf(stderr,"errorbars\n"); break;
+		case BOXES: fprintf(stderr,"boxes\n"); break;
+		case BOXERROR: fprintf(stderr,"boxerrorbars\n"); break;
+		case STEPS: fprintf(stderr,"steps\n"); break;
 	}
+}
+
+static void
+show_boxwidth()
+{
+	if (boxwidth<0.0)
+		fprintf(stderr,"\tboxwidth is auto\n");
+	else
+		fprintf(stderr,"\tboxwidth is %g\n",boxwidth);
+}
+static void
+show_dgrid3d()
+{
+	if (dgrid3d)
+		fprintf(stderr,"\tdata grid3d is enabled for mesh of size %dx%d, norm=%d\n",
+			dgrid3d_row_fineness,
+			dgrid3d_col_fineness,
+			dgrid3d_norm_value);
+	else
+		fprintf(stderr,"\tdata grid3d is disabled\n");
 }
 
 static void
@@ -2178,13 +2548,14 @@ show_output()
 static void
 show_samples()
 {
-	fprintf(stderr,"\tsampling rate is %d\n",samples);
+	fprintf(stderr,"\tsampling rate is %d, %d\n",samples_1, samples_2);
 }
 
 static void
 show_isosamples()
 {
-	fprintf(stderr,"\tiso sampling rate is %d\n",iso_samples);
+	fprintf(stderr,"\tiso sampling rate is %d, %d\n",
+		iso_samples_1, iso_samples_2);
 }
 
 static void
@@ -2196,7 +2567,17 @@ show_surface()
 static void
 show_hidden3d()
 {
+#ifdef LITE
+	printf(" Hidden Line Removal Not Supported in LITE version\n");
+#else
 	fprintf(stderr,"\thidden surface is %s\n", hidden3d ? "removed" : "drawn");
+#endif /* LITE */
+}
+
+static void
+show_label_contours()
+{
+	fprintf(stderr,"\tcontour line types are %s\n", label_contours ? "varied & labeled" : "all the same");
 }
 
 static void
@@ -2256,7 +2637,7 @@ show_label(tag)
     int tag;				/* 0 means show all */
 {
     struct text_label *this_label;
-    BOOLEAN showed = FALSE;
+    TBOOLEAN showed = FALSE;
 
     for (this_label = first_label; this_label != NULL;
 	    this_label = this_label->next) {
@@ -2291,7 +2672,7 @@ show_arrow(tag)
     int tag;				/* 0 means show all */
 {
     struct arrow_def *this_arrow;
-    BOOLEAN showed = FALSE;
+    TBOOLEAN showed = FALSE;
 
     for (this_arrow = first_arrow; this_arrow != NULL;
 	    this_arrow = this_arrow->next) {
@@ -2359,7 +2740,7 @@ show_angles()
 
 static void
 show_tics(showx, showy, showz)
-	BOOLEAN showx, showy, showz;
+	TBOOLEAN showx, showy, showz;
 {
     fprintf(stderr,"\ttics are %s, ",(tic_in)? "IN" : "OUT");
     fprintf(stderr,"\tticslevel is %g\n",ticslevel);
@@ -2376,7 +2757,7 @@ show_tics(showx, showy, showz)
 /* called by show_tics */
 static void
 show_ticdef(tics, axis, tdef)
-	BOOLEAN tics;			/* xtics ytics or ztics */
+	TBOOLEAN tics;			/* xtics ytics or ztics */
 	char axis;			/* 'x' 'y' or 'z' */
 	struct ticdef *tdef;	/* xticdef yticdef or zticdef */
 {
@@ -2393,6 +2774,13 @@ show_ticdef(tics, axis, tdef)
 		  fprintf(stderr, "computed automatically\n");
 		  break;
 	   }
+	    case TIC_MONTH: {
+		fprintf(stderr, "Months computed automatically\n");
+		break;
+	   }
+	    case TIC_DAY:{
+		fprintf(stderr, "Days computed automatically\n");
+	    }
 	   case TIC_SERIES: {
 		  if (tdef->def.series.end == VERYLARGE)
 		    fprintf(stderr, "series from %g by %g\n", 
@@ -2434,8 +2822,6 @@ show_time()
 static void
 show_term()
 {
-	char *str;
-
 	fprintf(stderr,"\tterminal type is %s %s\n",
 		term_tbl[term].name, term_options);
 }
@@ -2535,6 +2921,25 @@ show_contour()
 					contour_order, contour_pts);
 				break;
 		}
+		switch (levels_kind) {
+			int i;
+			case LEVELS_AUTO:
+				fprintf(stderr,"\t\t%d automatic levels\n", contour_levels);
+				break;
+			case LEVELS_DISCRETE:
+				fprintf(stderr,"\t\t%d discrete levels at ", contour_levels);
+		                fprintf(stderr, "%g", levels_list[0]);
+				for(i = 1; i < contour_levels; i++)
+					fprintf(stderr,",%g ", levels_list[i]);
+				fprintf(stderr,"\n");
+				break;
+			case LEVELS_INCREMENTAL:
+				fprintf(stderr,"\t\t%d incremental levels starting at %g, step %g, end %g\n",
+					contour_levels, levels_list[0], levels_list[1],
+					levels_list[0]+contour_levels*levels_list[1]);
+				break;
+		}
+		fprintf(stderr,"\t\tcontour line types are %s\n", label_contours ? "varied" : "all the same");
 	}
 }
 
@@ -2548,30 +2953,27 @@ show_format()
 static void
 show_logscale()
 {
-	char *p;
-
-	if (log_x && log_y && log_z)
-		fprintf(stderr,"\tlogscaling all x, y and z axes\n");
-	else {
-		p = (log_x && log_y)			  /* Look for pairs. */
-			 ? "x and y"
-			 :  (log_x && log_z)
-			         ? "x and z"
-			         :  (log_y && log_z)
-					 ? "y and z"
-					 : NULL;
-		if (p != NULL)
-			fprintf(stderr,"\tlogscaling both %s axes\n",p);
-		else {
-			if (log_x)
-				fprintf(stderr,"\tlogscaling x axis\n");
-			if (log_y)
-				fprintf(stderr,"\tlogscaling y axis\n");
-			if (log_z)
-				fprintf(stderr,"\tlogscaling z axis\n");
-			if (!(log_x || log_y || log_z))
-				fprintf(stderr,"\tno logscaling\n");
-		}
+	if (is_log_x) {
+		fprintf(stderr,"\tlogscaling x (base %g)", base_log_x);
+		if (is_log_y && is_log_z)
+			fprintf(stderr,", y (base %g) and z (base %g)\n",
+				base_log_y, base_log_z);
+		else if (is_log_y)
+			fprintf(stderr," and y (base %g)\n", base_log_y);
+		else if (is_log_z)
+			fprintf(stderr," and z (base %g)\n", base_log_z);
+		else
+			fprintf(stderr," only\n");
+	} else if (is_log_y) {
+		fprintf(stderr,"\tlogscaling y (base %g)", base_log_y);
+		if (is_log_z)
+			fprintf(stderr," and z (base %g)\n", base_log_z);
+		else
+			fprintf(stderr," only\n");
+	} else if (is_log_z) {
+		fprintf(stderr,"\tlogscaling z (base %g) only\n", base_log_z);
+	} else {
+		fprintf(stderr,"\tno logscaling\n");
 	}
 }
 
@@ -2596,14 +2998,16 @@ int len;
 	}
 }
 
+char *authors[] = {"Thomas Williams","Colin Kelley"}; /* primary */
 void				/* used by plot.c */
 show_version()
 {
 extern char version[];
 extern char patchlevel[];
 extern char date[];
+extern char copyright[];
 extern char bug_email[];
-static char *authors[] = {"Thomas Williams","Colin Kelley"}; /* primary */
+extern char help_email[];
 int x;
 long time();
 
@@ -2612,7 +3016,7 @@ long time();
 		PROGRAM, OS, version); 
 	fprintf(stderr,"\tpatchlevel %s\n",patchlevel);
      fprintf(stderr, "\tlast modified %s\n", date);
-	fprintf(stderr,"\nCopyright(C) 1986, 1987, 1990, 1991, 1992  %s, %s\n",
-		authors[x],authors[1-x]);
-    fprintf(stderr, "\n\tSend bugs and comments to %s\n", bug_email);
+	fprintf(stderr,"\n\t%s   %s, %s\n", copyright,authors[x],authors[1-x]);
+    fprintf(stderr, "\n\tSend comments and requests for help to %s", help_email);
+    fprintf(stderr, "\n\tSend bugs, suggestions and mods to %s\n", bug_email);
 }

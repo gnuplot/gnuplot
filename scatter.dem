@@ -1,0 +1,61 @@
+#
+# Simple demo to scatter data conversion to grid data.
+#
+
+set title "Simple demo to scatter data conversion to grid data"
+set nohidden3d
+set ticslevel 0.5
+set view 60,30
+set autoscale
+set parametric
+set data style points
+set xlabel "data style point - no dgrid"
+splot "hemisphr.dat"
+pause -1 "Hit return to continue (1)"
+
+set dgrid3d 10,10,1
+set xlabel " data style lines, dgrid3d 10,10,1"
+set data style lines
+splot "hemisphr.dat"
+pause -1 "Hit return to continue (2)"
+
+set dgrid3d ,,4
+set xlabel " data style lines, dgrid3d ,,4 "
+set data style lines
+splot "hemisphr.dat"
+pause -1 "Hit return to continue (3)"
+
+set dgrid3d ,,16
+set xlabel " data style lines, dgrid3d ,,16"
+set data style lines
+splot "hemisphr.dat"
+pause -1 "Hit return to continue (4)"
+
+set contour
+set xlabel "data style lines, dgrid3d ,,16, contour"
+splot "hemisphr.dat"
+pause -1 "Hit return to continue (5)"
+
+set nodgrid3d
+set data style points
+set xlabel "data style points, nodgrid3d"
+splot "scatter2.dat"
+pause -1 "Hit return to continue (6)"
+
+set dgrid3d ,,1
+set xlabel "data style lines, dgrid3d ,,1"
+set data style lines
+splot "scatter2.dat"
+pause -1 "Hit return to continue (7)"
+
+set dgrid3d ,,4
+set xlabel "data style lines, dgrid3d ,,4"
+set data style lines
+splot "scatter2.dat"
+pause -1 "Hit return to continue (8)"
+
+set noparametric
+set nodgrid3d
+set nocontour
+set title ""
+set xlabel ""

@@ -1,0 +1,113 @@
+MetaFont Terminal Driver for GnuPlot (MF.TRM):
+----------------------------------------------
+The new terminal driver creates a input file to the MetaFont program.
+Thus a figure may be used in the TeX document in the same way as a
+character is.
+
+To use the plot in a document the MetaFont program must be run
+with the output file from GnuPlot as input. Thus, the user needs a basic
+knowledge of the font creating prosess and inclusion of a new font in a
+document. However, if the Metafont program are set up properly at the
+local site an unexperienced user could perform the operation without
+much trouble.
+
+The text support is based on a MetaFont character set.
+Currently the Computer Modern Roman font set is input but the
+user are in principal free to chose whatever fonts he/she needs.
+The MetaFont source files for the chosen font must be available.
+Each character is stored in a separate picture variable in MetaFont. These
+variables may be manipulated (rotated, scaled etc.) when characters are
+needed. The drawback is the interpretation time in the MetaFont
+program. On some machines (i.e. PC) the limited amount of memory available
+may also cause problem if too many pictures are stored.
+
+The MetaFont terminal driver MF.TRM is UENCODED and included in this mail.
+Also the "diff" files between an orginal TERM.C and mine are
+UENCODED included. I am afraid there may be several
+differences which are not due to the MetaFont terminal. However, the new
+terminal driver should be included in exactly the same manner as the other.
+
+In TERM.H the only necessary change is :
+
+               #define MF
+
+Please inform me if something  goes wrong. I will then transfer the code
+to an anonymous FTP cite where you can pick it up.
+
+To use the MetaFont terminal driver:
+------------------------------------
+1) In GnuPlot use:   set terminal mf
+                     set output "myfile.mf"
+                          .
+                          .
+                          .
+                     plot ....
+                     exit
+
+
+2) Run MetaFont. Syntax is site dependant:
+
+   On my UNIX I use:   cmmf '\mode=localfont; \mag=1;' input myfile.mf
+   On my PC I use:     mf286 &cm \mode=localfont; \mag=1; input myfile.mf
+
+   Be aware that MetaFont can only handle number less than 4096. Thus if you
+
+   have very high resolution in your localfont and a large picture you will
+   probably get an error message when running metaFont. To solve the
+problem,
+   reduce the resolution or the plot size.
+
+3) Run GfToPk, syntax is
+
+   on my UNIX:   gftpk myfile.xxxgf myfile.pk
+   on my PC:     gftpk myfile.xxx myfile.pk
+
+   where xxx is the resolution (typically 300).
+
+   The version of GfToPk included with unix TeX3.14 probably needs to be
+   compiled with more memory than it is. Third line in GFTOPK.C declares
+   a variable "maxrow". Defining this to 32000 should be sufficient.
+
+4) Copy the files myfile.pk and myfile.tfm to a place where you are sure TeX
+   and the dvi processing programs you use  can find them. (They can
+probably
+   be located in your current working directory)
+
+5) Include in your TeX document the following statement:
+
+      \font\myfont=myfile  % Declares the new font you just have made
+      {\myfont\char0}      % Typeset character with code zero which
+                           % MF.TRM uses as default character
+
+
+
+
+
+HPGL to GnuPlot converter (HPG2GNU):
+-------------------------------------
+I have also written a program which interprets files written in
+Hewlett Packard's plotter language, HPGL, and outputs the graphic
+on an available GnuPlot terminal.
+
+Personally, I have used the program as an link to the MetaFont terminal
+(the orginal version of the program only translated from HPGL to MF).
+This way I am able to design pictures in my favorite graphic drawing
+program,
+export the figures to HPGL files and translate to MetaFont. A lot of new
+symbols (fancy arrows, electronic components, process symbols etc. etc.)
+can thus be  made available to TeX as new font sets without the need to dig
+into the MetaFont manual.
+
+However, the program is now mainly based on code from the GnuPlot
+program and according to the copyright notes should not be distributed.
+
+
+With regard
+
+Paal Hedne
+SINTEF Multiphase Laboratory
+N-7034 Trondheim
+Norway
+
+Tel.: -47-7-591060
+E.mail: Pal.Hedne@termo.unit.no

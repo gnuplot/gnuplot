@@ -1,5 +1,6 @@
 /*
- * $Id: dxf.trm,v 3.26 92/03/24 22:34:49 woo Exp Locker: woo $
+ * $Id: dxf.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT - dxf.trm */
@@ -27,7 +28,7 @@
  * AUTHOR
  *   Florian Hiss  (fhis1231@w204zrz.zrz.tu-berlin.de)
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
 */
 
 #define DXF_UNIT 60.0
@@ -73,7 +74,7 @@ static char *layer_colour[] = {"7","1","2","3","4","5","6"};
 static char *layer_lines[] = {"CONTINUOUS","DASHED","HIDDEN","CENTER","PHANTOM",
 			    "DOT","DASHDOT"};
 
-static BOOLEAN vector_was_last = FALSE;
+static TBOOLEAN vector_was_last = FALSE;
 
 DXF_init()
 {
@@ -87,55 +88,66 @@ DXF_graphics()
 {
 	register struct termentry *t = &term_tbl[term];
 	int i;
+	static char GPFAR dxfi1[] = "\
+999\n\
+%% GNUPLOT: dxf file for AutoCad\n\
+  0\nSECTION\n  2\nHEADER\n\
+  9\n$EXTMIN\n\
+ 10\n0.000\n 20\n0.000\n\
+  9\n$EXTMAX\n\
+ 10\n%-6.3f\n 20\n%-6.3f\n\
+  9\n$LIMMIN\n\
+ 10\n0.000\n 20\n0.000\n\
+  9\n$LIMMAX\n\
+ 10\n%-6.3f\n 20\n%-6.3f\n\
+  9\n$TEXTSTYLE\n  7\n%s\n\
+  9\n$TEXTSIZE\n 40\n%-6.3f\n\
+  9\n$PLINEWID\n 40\n%-6.4f\n\
+  9\n$LTSCALE\n  40\n%-6.3f\n\
+  9\n$COORDS\n 70\n  1\n\
+  9\n$CELTYPE\n 6\nBYLAYER\n\
+  9\n$CLAYER\n  8\n0\n\
+  9\n$CECOLOR\n 62\n   %s\n\
+  9\n$MENU\n  1\nacad\n\
+  0\nENDSEC\n\
+  0\nSECTION\n  2\nTABLES\n";
+static char GPFAR dxfi2[] = "\
+0\nTABLE\n  2\nLTYPE\n 70\n    %d\n\
+0\nLTYPE\n  2\nCONTINUOUS\n 70\n    64\n\
+  3\nSolid line\n 72\n    65\n 73\n      0\n 40\n0.0\n\
+  0\nLTYPE\n  2\nDASHED\n 70\n    64\n\
+  3\n__ __ __ __ __ __ __ __ __ __ __ __ __ __ __\n\
+ 72\n    65\n 73\n     2\n 40\n0.75\n 49\n0.5\n 49\n-0.25\n\
+  0\nLTYPE\n  2\nHIDDEN\n 70\n    64\n\
+  3\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\
+ 72\n    65\n 73\n     2\n 40\n0.375\n 49\n0.25\n 49\n-0.125\n\
+  0\nLTYPE\n  2\nCENTER\n 70\n    64\n\
+  3\n____ _ ____ _ ____ _ ____ _ ____ _ ____ _ ____\n\
+ 72\n    65\n 73\n     4\n 40\n2.0\n 49\n1.25\n 49\n-0.25\n\
+ 49\n0.25\n 49\n-0.25\n\
+  0\nLTYPE\n  2\nPHANTOM\n 70\n    64\n\
+  3\n_____ _ _ _____ _ _ _____ _ _ _____ _ _ ____\n\
+ 72\n    65\n 73\n     6\n 40\n2.5\n 49\n1.25\n\
+ 49\n-0.25\n 49\n0.25\n 49\n-0.25\n 49\n0.25\n 49\n-0.25\n\
+  0\nLTYPE\n  2\nDOT\n 70\n    64\n\
+  3\n...............................................\n\
+ 72\n    65\n 73\n     2\n 40\n0.25\n 49\n0.0\n 49\n-0.25\n\
+  0\nLTYPE\n  2\nDASHDOT\n 70\n    64\n\
+  3\n__ . __ . __ . __ . __ . __ . __ . __ . __ . __\n\
+ 72\n    65\n 73\n     4\n 40\n1.0\n 49\n0.5\n 49\n-0.25\n\
+ 49\n0.0\n 49\n-0.25\n\
+  0\nENDTAB\n";
 
-	fprintf(outfile,"999\n");
-	fprintf(outfile,"%% GNUPLOT: dxf file for AutoCad\n");
-	fprintf(outfile,"  0\nSECTION\n  2\nHEADER\n");
-	fprintf(outfile,"  9\n$EXTMIN\n");
-	fprintf(outfile," 10\n0.000\n 20\n0.000\n");
-	fprintf(outfile,"  9\n$EXTMAX\n");
-	fprintf(outfile," 10\n%-6.3f\n 20\n%-6.3f\n",t->xmax/DXF_UNIT,t->ymax/DXF_UNIT);
-	fprintf(outfile,"  9\n$LIMMIN\n");
-	fprintf(outfile," 10\n0.000\n 20\n0.000\n");
-	fprintf(outfile,"  9\n$LIMMAX\n");
-	fprintf(outfile," 10\n%-6.3f\n 20\n%-6.3f\n",t->xmax/DXF_UNIT,t->ymax/DXF_UNIT);
-	fprintf(outfile,"  9\n$TEXTSTYLE\n  7\n%s\n",text_style);
-	fprintf(outfile,"  9\n$TEXTSIZE\n 40\n%-6.3f\n",DXF_TEXTHEIGHT/DXF_UNIT);
-	fprintf(outfile,"  9\n$PLINEWID\n 40\n%-6.4f\n",LINEWIDTH);
-	fprintf(outfile,"  9\n$LTSCALE\n  40\n%-6.3f\n",LT_SCALE);
-	fprintf(outfile,"  9\n$COORDS\n 70\n  1\n");
-	fprintf(outfile,"  9\n$CELTYPE\n 6\nBYLAYER\n"); /* entity line type name */
-	fprintf(outfile,"  9\n$CLAYER\n  8\n0\n"); /* current layer */
-	fprintf(outfile,"  9\n$CECOLOR\n 62\n   %s\n",layer_colour[0]);
-	fprintf(outfile,"  9\n$MENU\n  1\nacad\n");
-	fprintf(outfile,"  0\nENDSEC\n");
-	fprintf(outfile,"  0\nSECTION\n  2\nTABLES\n");
+	fprintf(outfile, dxfi1,
+		t->xmax/DXF_UNIT,t->ymax/DXF_UNIT,
+		t->xmax/DXF_UNIT,t->ymax/DXF_UNIT,
+		text_style,
+		DXF_TEXTHEIGHT/DXF_UNIT,
+		LINEWIDTH,
+		LT_SCALE,
+		layer_colour[0]);
 	/* the linetype table */
-	fprintf(outfile,"0\nTABLE\n  2\nLTYPE\n 70\n    %d\n",DXF_LINE_TYPES);
-	fprintf(outfile,"0\nLTYPE\n  2\nCONTINUOUS\n 70\n    64\n");
-	fprintf(outfile,"  3\nSolid line\n 72\n    65\n 73\n      0\n 40\n0.0\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nDASHED\n 70\n    64\n");
-	fprintf(outfile,"  3\n__ __ __ __ __ __ __ __ __ __ __ __ __ __ __\n");
-	fprintf(outfile," 72\n    65\n 73\n     2\n 40\n0.75\n 49\n0.5\n 49\n-0.25\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nHIDDEN\n 70\n    64\n");
-	fprintf(outfile,"  3\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n");
-	fprintf(outfile," 72\n    65\n 73\n     2\n 40\n0.375\n 49\n0.25\n 49\n-0.125\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nCENTER\n 70\n    64\n");
-	fprintf(outfile,"  3\n____ _ ____ _ ____ _ ____ _ ____ _ ____ _ ____\n");
-	fprintf(outfile," 72\n    65\n 73\n     4\n 40\n2.0\n 49\n1.25\n 49\n-0.25\n");
-	fprintf(outfile," 49\n0.25\n 49\n-0.25\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nPHANTOM\n 70\n    64\n");
-	fprintf(outfile,"  3\n_____ _ _ _____ _ _ _____ _ _ _____ _ _ ____\n");
-	fprintf(outfile," 72\n    65\n 73\n     6\n 40\n2.5\n 49\n1.25\n");
-	fprintf(outfile," 49\n-0.25\n 49\n0.25\n 49\n-0.25\n 49\n0.25\n 49\n-0.25\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nDOT\n 70\n    64\n");
-	fprintf(outfile,"  3\n...............................................\n");
-	fprintf(outfile," 72\n    65\n 73\n     2\n 40\n0.25\n 49\n0.0\n 49\n-0.25\n");
-	fprintf(outfile,"  0\nLTYPE\n  2\nDASHDOT\n 70\n    64\n");
-	fprintf(outfile,"  3\n__ . __ . __ . __ . __ . __ . __ . __ . __ . __\n");
-	fprintf(outfile," 72\n    65\n 73\n     4\n 40\n1.0\n 49\n0.5\n 49\n-0.25\n");
-	fprintf(outfile," 49\n0.0\n 49\n-0.25\n");
-	fprintf(outfile,"  0\nENDTAB\n");
+	fprintf(outfile, dxfi2, DXF_LINE_TYPES);
 	/* the layer table */
 	fprintf(outfile,"  0\nTABLE\n  2\nLAYER\n 70\n   %-d\n",MAX_LAYER);
 	for (i = 1; i <= MAX_LAYER; i++)

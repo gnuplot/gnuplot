@@ -1,0 +1,5 @@
+zrot=(zrot+10)%360
+xrot=(xrot+17)%180
+set view xrot,zrot
+replot
+reread

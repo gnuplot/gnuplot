@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 3.26 92/03/24 22:36:49 woo Exp Locker: woo $
+# $Id: makefile.vms%v 3.50 1993/07/09 05:35:24 woo Exp $
 #
 #
 #
@@ -11,7 +11,7 @@
 #
 
 # NOOP  NO Optimiser
-CFLAGS = /NOOP/define=(NOGAMMA,MEMSET)
+CFLAGS = /NOOP/define=(MEMSET)
 
 # /define=(<terminal>) in TERMFLAGS iff you wish to support <terminal>
 # see other terminal defines in term.h
@@ -20,7 +20,7 @@ TERMFLAGS =
 
 OBJS =  bitmap.obj,command.obj,contour.obj,eval.obj,graphics.obj,graph3d.obj, \
         internal.obj,misc.obj,parse.obj,plot.obj,scanner.obj,setshow.obj, \
-        standard.obj,term.obj,util.obj,version.obj
+        specfun.obj,standard.obj,term.obj,util.obj,version.obj
 
 CSOURCE1 = command.c setshow.c 
 CSOURCE2 = help.c graphics.c graph3d.c internal.c 
@@ -35,7 +35,7 @@ CSOURCE6 = [.term]impcodes.h [.term]imagen.trm [.term]object.h \
 CSOURCE7 = [.term]post.trm [.term]qms.trm [.term]regis.trm [.term]sun.trm \
 	[.term]t410x.trm [.term]tek.trm [.term]unixpc.trm [.term]unixplot.trm \
 	[.term]v384.trm [.term]x11.trm gnuplot_x11.c
-CSOURCE8 = contour.c
+CSOURCE8 = contour.c specfun.c
 
 all :   gnuplot.exe gnuplot.hlp gnuplot.hlb
 

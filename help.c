@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: help.c,v 3.26 92/03/24 22:34:24 woo Exp Locker: woo $";
+static char *RCSid = "$Id: help.c%v 3.50.1.16 1993/08/27 05:04:42 woo Exp $";
 #endif
+
 
 /* GNUPLOT - help.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,20 +31,33 @@ static char *RCSid = "$Id: help.c,v 3.26 92/03/24 22:34:24 woo Exp Locker: woo $
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	 comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
-
-extern int errno;
+#if defined (ATARI)
+#include "plot.h"
+#else
 
 extern int strcmp();
-extern int strlen();
+extern int      strlen();
 extern char *strcpy();
 extern char *strncpy();
 extern char *strcat();
@@ -51,12 +65,32 @@ extern char *strncat();
 extern char *getenv();
 extern FILE *fopen();
 extern char *malloc();
+#endif
+
+#include <errno.h>
+extern int errno;
 
 extern int instring();
 
 #define	SAME	0	/* for strcmp() */
 
 #include "help.h"	/* values passed back */
+
+#if defined(__EMX__) || defined(DJGPP) || defined(DOS386)
+#ifdef MSDOS
+#undef MSDOS	/* we have plenty of memory under __EMX__ or DJGPP */
+#endif
+#ifdef unix
+#undef unix	/* we are not unix */
+#endif
+#endif
+
+#ifdef OS2
+  /* GCC defines unix, but no PAGER, so... */
+#ifdef unix
+#undef unix
+#endif
+#endif  /* OS2 */
 
 /* help -- help subsystem that understands defined keywords
 **
@@ -589,8 +623,25 @@ ShowSubtopics(key, subtopics)
 				*line = '\0';
 				pos = 0;
 			 }
-			 (void) strcat(line, "\t");
-			 (void) strncat(line, start, sublen);
+			 /* adapted by DvdSchaaf */
+			 {
+#define FIRSTCOL	6
+#define COLLENGTH	15
+				int spacelen, ispacelen;
+
+			 	if( pos == 0 )
+					spacelen = FIRSTCOL;
+			 	for( ispacelen = 0;
+					ispacelen < spacelen; ispacelen++ )
+					(void) strcat(line, " ");
+			 	/* commented out *
+			 	(void) strcat(line, "\t");
+			 	*/
+			 	(void) strncat(line, start, sublen);
+			 	spacelen = COLLENGTH - sublen;
+			 	if( spacelen <= 0 )
+					spacelen = 1;
+			 }
 			 pos++;
 			 prev = start;
 		  }
@@ -657,7 +708,7 @@ OutLine(line)
     /* built-in dumb pager */
     /* leave room for prompt line */
     if (pagelines >= SCREENSIZE - 2) {
-	   printf("Press return for more: ");
+	   fprintf(stderr,"Press return for more: ");
 	   do 
 		c = getchar();
 	   while (c != EOF && c != '\n');
@@ -677,4 +728,3 @@ EndOutput()
 	 (void) pclose(outfile);
 #endif
 }
-

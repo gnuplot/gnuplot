@@ -1,6 +1,7 @@
 #ifndef lint
-static char *RCSid = "$Id: checkdoc.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+static char *RCSid = "$Id: checkdoc.c%v 3.38.2.70 1993/02/08 02:19:29 woo Exp woo $";
 #endif
+
 
 /*
  * checkdoc -- check a doc file for correctness of first column. 
@@ -9,7 +10,7 @@ static char *RCSid = "$Id: checkdoc.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
  * First character must be space, digit, or ?, @, #, %, 
  * or line must be empty.
  *
- * usage: checkdoc < docfile
+ * usage: checkdoc [docfile]
  * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
  *
  * Original version by David Kotz used the following one line script!
@@ -24,9 +25,24 @@ static char *RCSid = "$Id: checkdoc.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
 #define TRUE 1
 #define FALSE 0
 
-main()
+main(argc,argv)
+int argc;
+char **argv;
 {
-	convert(stdin,stdout);
+FILE * infile;
+	infile = stdin;
+	if (argc > 2) {
+		fprintf(stderr,"Usage: %s [infile]\n", argv[0]);
+		exit(1);
+	}
+	if (argc == 2) 
+		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for reading\n",
+				argv[0], argv[1]);
+			exit(1);
+		}
+
+	convert(infile, stdout);
 	exit(0);
 }
 
@@ -44,6 +60,10 @@ process_line(line, b)
 	char *line;
 	FILE *b;
 {
+    static long line_no=0;
+
+    line_no++;
+
     switch(line[0]) {		/* control character */
 	   case '?': {			/* interactive help entry */
 		  break;			/* ignore */
@@ -65,7 +85,7 @@ process_line(line, b)
 		  if (isdigit(line[0])) { /* start of section */
 		  		/* ignore */
 		  } else
-			fputs(line,b);    /* output bad line */
+			fprintf(b, "%ld:%s", line_no, line);    /* output bad line */
 		  break;
 	   }
     }

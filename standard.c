@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: standard.c,v 3.26 92/03/24 22:34:37 woo Exp Locker: woo $";
+static char *RCSid = "$Id: standard.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - standard.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,12 +31,6 @@ static char *RCSid = "$Id: standard.c,v 3.26 92/03/24 22:34:37 woo Exp Locker: w
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <math.h>
@@ -53,7 +48,7 @@ extern struct value stack[STACK_DEPTH];
 extern int s_p;
 extern double zero;
 
-struct value *pop(), *complex(), *integer();
+struct value *pop(), *Gcomplex(), *Ginteger();
 
 double magnitude(), angle(), real(), imag();
 
@@ -70,6 +65,215 @@ double magnitude(), angle(), real(), imag();
  * equation.
  * These bessel functions are accurate to about 1e-13
  */
+
+#if defined (ATARI) && defined(__PUREC__)
+/* Sorry. But PUREC bugs here.
+ * These bessel functions are NOT accurate to about 1e-13
+ */
+
+#define PI_ON_FOUR	 0.785398163397448309615661
+#define PI_ON_TWO	 1.570796326794896619231313
+#define THREE_PI_ON_FOUR 2.356194490192344928846982
+#define TWO_ON_PI	 0.636619772367581343075535
+
+static double dzero = 0.0;
+
+/* jzero for x in [0,8]
+ * Index 5849, 19.22 digits precision
+ */
+static double pjzero[] = {
+	 0.493378725179413356181681e+21,
+	-0.117915762910761053603844e+21,
+	 0.638205934107235656228943e+19,
+	-0.136762035308817138686542e+18,
+	 0.143435493914034611166432e+16,
+	-0.808522203485379387119947e+13,
+	 0.250715828553688194555516e+11,
+	-0.405041237183313270636066e+8,
+	 0.268578685698001498141585e+5
+};
+
+static double qjzero[] = {
+	 0.493378725179413356211328e+21,
+	 0.542891838409228516020019e+19,
+	 0.302463561670946269862733e+17,
+	 0.112775673967979850705603e+15,
+	 0.312304311494121317257247e+12,
+	 0.669998767298223967181403e+9,
+	 0.111463609846298537818240e+7,
+	 0.136306365232897060444281e+4,
+	 0.1e+1
+};
+
+/* pzero for x in [8,inf]
+ * Index 6548, 18.16 digits precision
+ */
+static double ppzero[] = {
+	 0.227790901973046843022700e+5,
+	 0.413453866395807657967802e+5,
+	 0.211705233808649443219340e+5,
+	 0.348064864432492703474453e+4,
+	 0.153762019090083542957717e+3,
+	 0.889615484242104552360748e+0
+};
+
+static double qpzero[] = {
+	 0.227790901973046843176842e+5,
+	 0.413704124955104166398920e+5,
+	 0.212153505618801157304226e+5,
+	 0.350287351382356082073561e+4,
+	 0.157111598580808936490685e+3,
+	 0.1e+1
+};
+
+/* qzero for x in [8,inf]
+ * Index 6948, 18.33 digits precision
+ */
+static double pqzero[] = {
+	-0.892266002008000940984692e+2,
+	-0.185919536443429938002522e+3,
+	-0.111834299204827376112621e+3,
+	-0.223002616662141984716992e+2,
+	-0.124410267458356384591379e+1,
+	-0.8803330304868075181663e-2,
+};
+
+static double qqzero[] = {
+	 0.571050241285120619052476e+4,
+	 0.119511315434346136469526e+5,
+	 0.726427801692110188369134e+4,
+	 0.148872312322837565816135e+4,
+	 0.905937695949931258588188e+2,
+	 0.1e+1
+};
+
+
+/* yzero for x in [0,8]
+ * Index 6245, 18.78 digits precision
+ */
+static double pyzero[] = {
+	-0.275028667862910958370193e+20,
+	 0.658747327571955492599940e+20,
+	-0.524706558111276494129735e+19,
+	 0.137562431639934407857134e+18,
+	-0.164860581718572947312208e+16,
+	 0.102552085968639428450917e+14,
+	-0.343637122297904037817103e+11,
+	 0.591521346568688965427383e+8,
+	-0.413703549793314855412524e+5
+};
+
+static double qyzero[] = {
+	 0.372645883898616588198998e+21,
+	 0.419241704341083997390477e+19,
+	 0.239288304349978185743936e+17,
+	 0.916203803407518526248915e+14,
+	 0.261306575504108124956848e+12,
+	 0.579512264070072953738009e+9,
+	 0.100170264128890626566665e+7,
+	 0.128245277247899380417633e+4,
+	 0.1e+1
+};
+
+
+/* jone for x in [0,8]
+ * Index 6050, 20.98 digits precision
+ */
+static double pjone[] = {
+	 0.581199354001606143928051e+21,
+	-0.667210656892491629802094e+20,
+	 0.231643358063400229793182e+19,
+	-0.358881756991010605074364e+17,
+	 0.290879526383477540973760e+15,
+	-0.132298348033212645312547e+13,
+	 0.341323418230170053909129e+10,
+	-0.469575353064299585976716e+7,
+	 0.270112271089232341485679e+4
+};
+
+static double qjone[] = {
+	 0.116239870800321228785853e+22,
+	 0.118577071219032099983711e+20,
+	 0.609206139891752174610520e+17,
+	 0.208166122130760735124018e+15,
+	 0.524371026216764971540673e+12,
+	 0.101386351435867398996705e+10,
+	 0.150179359499858550592110e+7,
+	 0.160693157348148780197092e+4,
+	 0.1e+1
+};
+
+
+/* pone for x in [8,inf]
+ * Index 6749, 18.11 digits precision
+ */
+static double ppone[] = {
+	 0.352246649133679798341724e+5,
+	 0.627588452471612812690057e+5,
+	 0.313539631109159574238670e+5,
+	 0.498548320605943384345005e+4,
+	 0.211152918285396238210572e+3,
+	 0.12571716929145341558495e+1
+};
+
+static double qpone[] = {
+	 0.352246649133679798068390e+5,
+	 0.626943469593560511888834e+5,
+	 0.312404063819041039923016e+5,
+	 0.493039649018108897938610e+4,
+	 0.203077518913475932229357e+3,
+	 0.1e+1
+};
+
+/* qone for x in [8,inf]
+ * Index 7149, 18.28 digits precision
+ */
+static double pqone[] = {
+	 0.351175191430355282253332e+3,
+	 0.721039180490447503928086e+3,
+	 0.425987301165444238988699e+3,
+	 0.831898957673850827325226e+2,
+	 0.45681716295512267064405e+1,
+	 0.3532840052740123642735e-1
+};
+
+static double qqone[] = {
+	 0.749173741718091277145195e+4,
+	 0.154141773392650970499848e+5,
+	 0.915223170151699227059047e+4,
+	 0.181118670055235135067242e+4,
+	 0.103818758546213372877664e+3,
+	 0.1e+1
+};
+
+
+/* yone for x in [0,8]
+ * Index 6444, 18.24 digits precision
+ */
+static double pyone[] = {
+	-0.292382196153296254310105e+20,
+	 0.774852068218683964508809e+19,
+	-0.344104806308411444618546e+18,
+	 0.591516076049007061849632e+16,
+	-0.486331694256717507482813e+14,
+	 0.204969667374566218261980e+12,
+	-0.428947196885524880182182e+9,
+	 0.355692400983052605669132e+6
+};
+
+static double qyone[] = {
+	 0.149131151130292035017408e+21,
+	 0.181866284170613498688507e+19,
+	 0.113163938269888452690508e+17,
+	 0.475517358888813771309277e+14,
+	 0.150022169915670898716637e+12,
+	 0.371666079862193028559693e+9,
+	 0.726914730719888456980191e+6,
+	 0.107269614377892552332213e+4,
+	 0.1e+1
+};
+
+#else
 
 #define PI_ON_FOUR       0.78539816339744830961566084581987572
 #define PI_ON_TWO        1.57079632679489661923131269163975144
@@ -273,44 +477,45 @@ static double qyone[] = {
 	0.1e+1
 };
 
+#endif /* ATARI && __PUREC__ */
 
 f_real()
 {
 struct value a;
-	push( complex(&a,real(pop(&a)), 0.0) );
+	push( Gcomplex(&a,real(pop(&a)), 0.0) );
 }
 
 f_imag()
 {
 struct value a;
-	push( complex(&a,imag(pop(&a)), 0.0) );
+	push( Gcomplex(&a,imag(pop(&a)), 0.0) );
 }
 
 f_arg()
 {
 struct value a;
-	push( complex(&a,angle(pop(&a)), 0.0) );
+	push( Gcomplex(&a,angle(pop(&a)), 0.0) );
 }
 
 f_conjg()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,real(&a),-imag(&a) ));
+	push( Gcomplex(&a,real(&a),-imag(&a) ));
 }
 
 f_sin()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,sin(real(&a))*cosh(imag(&a)), cos(real(&a))*sinh(imag(&a))) );
+	push( Gcomplex(&a,sin(real(&a))*cosh(imag(&a)), cos(real(&a))*sinh(imag(&a))) );
 }
 
 f_cos()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,cos(real(&a))*cosh(imag(&a)), -sin(real(&a))*sinh(imag(&a))));
+	push( Gcomplex(&a,cos(real(&a))*cosh(imag(&a)), -sin(real(&a))*sinh(imag(&a))));
 }
 
 f_tan()
@@ -319,7 +524,7 @@ struct value a;
 register double den;
 	(void) pop(&a);
 	if (imag(&a) == 0.0)
-		push( complex(&a,tan(real(&a)),0.0) );
+		push( Gcomplex(&a,tan(real(&a)),0.0) );
 	else {
 		den = cos(2*real(&a))+cosh(2*imag(&a));
 		if (den == 0.0) {
@@ -327,7 +532,7 @@ register double den;
 			push( &a );
 		}
 		else
-			push( complex(&a,sin(2*real(&a))/den, sinh(2*imag(&a))/den) );
+			push( Gcomplex(&a,sin(2*real(&a))/den, sinh(2*imag(&a))/den) );
 	}
 }
 
@@ -340,13 +545,13 @@ register double alpha, beta, x, y;
 	if (y == 0.0) {
 		if (fabs(x) > 1.0) {
 			undefined = TRUE;
-			push(complex(&a,0.0, 0.0));
+			push(Gcomplex(&a,0.0, 0.0));
 		} else
-			push( complex(&a,asin(x),0.0) );
+			push( Gcomplex(&a,asin(x),0.0) );
 	} else {
 		beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
 		alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
-		push( complex(&a,asin(beta), log(alpha + sqrt(alpha*alpha-1))) );
+		push( Gcomplex(&a,asin(beta), log(alpha + sqrt(alpha*alpha-1))) );
 	}
 }
 
@@ -359,44 +564,60 @@ register double alpha, beta, x, y;
 	if (y == 0.0) {
 		if (fabs(x) > 1.0) {
 			undefined = TRUE;
-			push(complex(&a,0.0, 0.0));
+			push(Gcomplex(&a,0.0, 0.0));
 		} else
-			push( complex(&a,acos(x),0.0) );
+			push( Gcomplex(&a,acos(x),0.0) );
 	} else {
 		alpha = sqrt((x + 1)*(x + 1) + y*y)/2 + sqrt((x - 1)*(x - 1) + y*y)/2;
 		beta  = sqrt((x + 1)*(x + 1) + y*y)/2 - sqrt((x - 1)*(x - 1) + y*y)/2;
-		push( complex(&a,acos(beta), log(alpha + sqrt(alpha*alpha-1))) );
+		push( Gcomplex(&a,acos(beta), log(alpha + sqrt(alpha*alpha-1))) );
 	}
 }
 
 f_atan()
 {
 struct value a;
-register double x, y;
+register double x, y, u, v, w, z;
 	(void) pop(&a);
 	x = real(&a); y = imag(&a);
 	if (y == 0.0)
-		push( complex(&a,atan(x), 0.0) );
+		push( Gcomplex(&a,atan(x), 0.0) );
 	else if (x == 0.0 && fabs(y) == 1.0) {
 		undefined = TRUE;
-		push(complex(&a,0.0, 0.0));
-	} else
-		push( complex(&a,atan(2*x/(1-x*x-y*y)),
-	    		log((x*x+(y+1)*(y+1))/(x*x+(y-1)*(y-1)))/4) );
+		push(Gcomplex(&a,0.0, 0.0));
+	} else {
+	        if (x >= 0) {
+		        u = x;
+			v = y;
+		} else {
+		        u = -x;
+			v = -y;
+		}
+		
+	        z = atan(2*u/(1-u*u-v*v));
+		w = log((u*u+(v+1)*(v+1))/(u*u+(v-1)*(v-1)))/4;
+		if (z < 0)
+		        z = z + 2*PI_ON_TWO;
+		if (x < 0) {
+		        z = -z;
+			w = -w;
+		}
+		push( Gcomplex(&a,0.5*z, w) );
+	}
 }
 
 f_sinh()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,sinh(real(&a))*cos(imag(&a)), cosh(real(&a))*sin(imag(&a))) );
+	push( Gcomplex(&a,sinh(real(&a))*cos(imag(&a)), cosh(real(&a))*sin(imag(&a))) );
 }
 
 f_cosh()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,cosh(real(&a))*cos(imag(&a)), sinh(real(&a))*sin(imag(&a))) );
+	push( Gcomplex(&a,cosh(real(&a))*cos(imag(&a)), sinh(real(&a))*sin(imag(&a))) );
 }
 
 f_tanh()
@@ -405,13 +626,13 @@ struct value a;
 register double den;
 	(void) pop(&a);
 	den = cosh(2*real(&a)) + cos(2*imag(&a));
-	push( complex(&a,sinh(2*real(&a))/den, sin(2*imag(&a))/den) );
+	push( Gcomplex(&a,sinh(2*real(&a))/den, sin(2*imag(&a))/den) );
 }
 
 f_int()
 {
 struct value a;
-	push( integer(&a,(int)real(pop(&a))) );
+	push( Ginteger(&a,(int)real(pop(&a))) );
 }
 
 
@@ -420,11 +641,11 @@ f_abs()
 struct value a;
 	(void) pop(&a);
 	switch (a.type) {
-		case INT:
-			push( integer(&a,abs(a.v.int_val)) );			
+		case INTGR:
+			push( Ginteger(&a,abs(a.v.int_val)) );			
 			break;
 		case CMPLX:
-			push( complex(&a,magnitude(&a), 0.0) );
+			push( Gcomplex(&a,magnitude(&a), 0.0) );
 	}
 }
 
@@ -433,12 +654,12 @@ f_sgn()
 struct value a;
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
-			push( integer(&a,(a.v.int_val > 0) ? 1 : 
+		case INTGR:
+			push( Ginteger(&a,(a.v.int_val > 0) ? 1 : 
 					(a.v.int_val < 0) ? -1 : 0) );
 			break;
 		case CMPLX:
-			push( integer(&a,(a.v.cmplx_val.real > 0.0) ? 1 : 
+			push( Ginteger(&a,(a.v.cmplx_val.real > 0.0) ? 1 : 
 					(a.v.cmplx_val.real < 0.0) ? -1 : 0) );
 			break;
 	}
@@ -452,13 +673,13 @@ register double mag, ang;
 	(void) pop(&a);
 	mag = sqrt(magnitude(&a));
 	if (imag(&a) == 0.0 && real(&a) < 0.0)
-		push( complex(&a,0.0,mag) );
+		push( Gcomplex(&a,0.0,mag) );
 	else
 	{
 		if ( (ang = angle(&a)) < 0.0)
 			ang += 2*Pi;
 		ang /= 2;
-		push( complex(&a,mag*cos(ang), mag*sin(ang)) );
+		push( Gcomplex(&a,mag*cos(ang), mag*sin(ang)) );
 	}
 }
 
@@ -470,7 +691,7 @@ register double mag, ang;
 	(void) pop(&a);
 	mag = exp(real(&a));
 	ang = imag(&a);
-	push( complex(&a,mag*cos(ang), mag*sin(ang)) );
+	push( Gcomplex(&a,mag*cos(ang), mag*sin(ang)) );
 }
 
 
@@ -480,7 +701,7 @@ struct value a;
 register double l10;;
 	(void) pop(&a);
 	l10 = log(10.0);	/***** replace with a constant! ******/
-	push( complex(&a,log(magnitude(&a))/l10, angle(&a)/l10) );
+	push( Gcomplex(&a,log(magnitude(&a))/l10, angle(&a)/l10) );
 }
 
 
@@ -488,7 +709,7 @@ f_log()
 {
 struct value a;
 	(void) pop(&a);
-	push( complex(&a,log(magnitude(&a)), angle(&a)) );
+	push( Gcomplex(&a,log(magnitude(&a)), angle(&a)) );
 }
 
 
@@ -498,11 +719,11 @@ struct value a;
 
 	(void) pop(&a);
 	switch (a.type) {
-		case INT:
-			push( integer(&a,(int)floor((double)a.v.int_val)));			
+		case INTGR:
+			push( Ginteger(&a,(int)floor((double)a.v.int_val)));			
 			break;
 		case CMPLX:
-			push( integer(&a,(int)floor(a.v.cmplx_val.real)));
+			push( Ginteger(&a,(int)floor(a.v.cmplx_val.real)));
 	}
 }
 
@@ -513,33 +734,13 @@ struct value a;
 
 	(void) pop(&a);
 	switch (a.type) {
-		case INT:
-			push( integer(&a,(int)ceil((double)a.v.int_val)));			
+		case INTGR:
+			push( Ginteger(&a,(int)ceil((double)a.v.int_val)));			
 			break;
 		case CMPLX:
-			push( integer(&a,(int)ceil(a.v.cmplx_val.real)));
+			push( Ginteger(&a,(int)ceil(a.v.cmplx_val.real)));
 	}
 }
-
-#ifdef GAMMA
-
-f_gamma()
-{
-extern int signgam;
-register double y;
-struct value a;
-
-	y = GAMMA(real(pop(&a)));
-	if (y > 88.0) {
-		undefined = TRUE;
-		push( integer(&a,0) );
-	}
-	else
-		push( complex(&a,signgam * exp(y),0.0) );
-}
-
-#endif /* GAMMA */
-
 
 /* bessel function approximations */
 double jzero(x)
@@ -738,36 +939,33 @@ double x;
 f_besj0()	
 {
 struct value a;
-double x;
 	(void) pop(&a);
-	if (imag(&a) > zero)
+	if (fabs(imag(&a)) > zero)
 		int_error("can only do bessel functions of reals",NO_CARET);
-	push( complex(&a,rj0(real(&a)),0.0) );
+	push( Gcomplex(&a,rj0(real(&a)),0.0) );
 }
 
 
 f_besj1()	
 {
 struct value a;
-double x;
 	(void) pop(&a);
-	if (imag(&a) > zero)
+	if (fabs(imag(&a)) > zero)
 		int_error("can only do bessel functions of reals",NO_CARET);
-	push( complex(&a,rj1(real(&a)),0.0) );
+	push( Gcomplex(&a,rj1(real(&a)),0.0) );
 }
 
 
 f_besy0()	
 {
 struct value a;
-double x;
 	(void) pop(&a);
-	if (imag(&a) > zero)
+	if (fabs(imag(&a)) > zero)
 		int_error("can only do bessel functions of reals",NO_CARET);
 	if (real(&a) > 0.0)
-		push( complex(&a,ry0(real(&a)),0.0) );
+		push( Gcomplex(&a,ry0(real(&a)),0.0) );
 	else {
-		push( complex(&a,0.0,0.0) );
+		push( Gcomplex(&a,0.0,0.0) );
 		undefined = TRUE ;
 	}
 }
@@ -776,15 +974,13 @@ double x;
 f_besy1()	
 {
 struct value a;
-double x;
 	(void) pop(&a);
-	if (imag(&a) > zero)
+	if (fabs(imag(&a)) > zero)
 		int_error("can only do bessel functions of reals",NO_CARET);
 	if (real(&a) > 0.0)
-		push( complex(&a,ry1(real(&a)),0.0) );
+		push( Gcomplex(&a,ry1(real(&a)),0.0) );
 	else {
-		push( complex(&a,0.0,0.0) );
+		push( Gcomplex(&a,0.0,0.0) );
 		undefined = TRUE ;
 	}
 }
-

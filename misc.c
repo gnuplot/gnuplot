@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 3.26 92/03/24 22:34:30 woo Exp Locker: woo $";
+static char *RCSid = "$Id: misc.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - misc.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -20,7 +21,7 @@ static char *RCSid = "$Id: misc.c,v 3.26 92/03/24 22:34:30 woo Exp Locker: woo $
  * 
  *
  * AUTHORS
- * 
+ *
  *   Original Software:
  *     Thomas Williams,  Colin Kelley.
  * 
@@ -29,27 +30,38 @@ static char *RCSid = "$Id: misc.c,v 3.26 92/03/24 22:34:30 woo Exp Locker: woo $
  *
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ *
  */
 
 #include <stdio.h>
 #include <math.h>
+#ifndef __PUREC__
+#ifndef VMS
+#ifdef AMIGA_AC_5
+#include <exec/types.h>
+#else
+#include <sys/types.h>
+#endif /* AMIGA_AC_5 */
+#else
+#include <types.h>
+#endif
+#endif /* __PUREC__ */
 #include "plot.h"
 #include "setshow.h"
+#ifndef _Windows
 #include "help.h"
-#ifdef __TURBOC__
-#include <graphics.h>
 #endif
 
-#ifndef _IBMR2
+#if !defined(__TURBOC__) && !defined (_IBMR2) && !defined (ATARI) && !defined (AMIGA_SC_6_1) && !defined(OSF1)
 extern char *malloc();
 extern char *realloc();
+#endif
+
+#if defined(__TURBOC__) && (defined(MSDOS) || defined(_Windows))
+#include <alloc.h>		/* for malloc, farmalloc, farrealloc */
+#endif
+#if defined(sequent)
+#include <sys/types.h>          /* typedef long size_t; */
 #endif
 
 extern int c_token;
@@ -61,7 +73,7 @@ extern struct udvt_entry *first_udv;
 
 extern struct at_type *temp_at();
 
-extern BOOLEAN interactive;
+extern TBOOLEAN interactive;
 extern char *infile_name;
 extern int inline_num;
 
@@ -72,37 +84,65 @@ typedef struct lf_state_struct LFS;
 struct lf_state_struct {
     FILE *fp;				/* file pointer for load file */
     char *name;			/* name of file */
-    BOOLEAN interactive;		/* value of interactive flag on entry */
+    TBOOLEAN interactive;		/* value of interactive flag on entry */
     int inline_num;			/* inline_num on entry */
     LFS *prev;				/* defines a stack */
 } *lf_head = NULL;			/* NULL if not in load_file */
 
-static BOOLEAN lf_pop();
+static TBOOLEAN lf_pop();
 static void lf_push();
+FILE *lf_top();
+
 
 /*
  * instead of <strings.h>
  */
+#ifdef _Windows
+#include <string.h>
+#else
+#ifndef AMIGA_SC_6_1
 extern int strcmp();
+#endif /* !AMIGA_SC_6_1 */
+#endif
 
-/*
- * Turbo C realloc does not do the right thing. Here is what it should do.
+/* alloc:
+ * allocate memory 
+ * This is a protected version of malloc. It causes an int_error 
+ * if there is not enough memory, but first it tries FreeHelp() 
+ * to make some room, and tries again. If message is NULL, we 
+ * allow NULL return. Otherwise, we handle the error, using the
+ * message to create the int_error string. Note cp/sp_extend uses realloc,
+ * so it depends on this using malloc().
  */
-#ifdef __TURBOC__
-char *realloc(p, new_size)
-	      void *p;
-	      size_t new_size;
-{
-    void *new_p = alloc(new_size, "TC realloc");
 
-    /* Note p may have less than new_size bytes but in this unprotected
-     * environment this will work.
-     */
-    memcpy(new_p, p, new_size);
-    free(p);
-    return new_p;
+char *
+alloc(size, message)
+	unsigned long size;		/* # of bytes */
+	char *message;			/* description of what is being allocated */
+{
+    char *p;				/* the new allocation */
+    char errbuf[100];		/* error message string */
+
+    p = malloc((size_t)size);
+    if (p == (char *)NULL) {
+#ifndef vms
+#ifndef _Windows
+	   FreeHelp();			/* out of memory, try to make some room */
+#endif
+#endif
+	   p = malloc((size_t)size);		/* try again */
+	   if (p == (char *)NULL) {
+		  /* really out of memory */
+		  if (message != NULL) {
+			 (void) sprintf(errbuf, "out of memory for %s", message);
+			 int_error(errbuf, NO_CARET);
+			 /* NOTREACHED */
+		  }
+		  /* else we return NULL */
+	   }
+    }
+    return(p);
 }
-#endif /* __TURBOC__ */
 
 /*
  * cp_alloc() allocates a curve_points structure that can hold 'num'
@@ -113,13 +153,13 @@ cp_alloc(num)
 	int num;
 {
     struct curve_points *cp;
-    cp = (struct curve_points *) alloc(sizeof(struct curve_points), "curve");
+    cp = (struct curve_points *) alloc((unsigned long)sizeof(struct curve_points), "curve");
     cp->p_max = (num >= 0 ? num : 0);
     if (num > 0) {
-	   cp->points = (struct coordinate *)
-		alloc(num * sizeof(struct coordinate), "curve points");
+	   cp->points = (struct coordinate GPHUGE *)
+		gpfaralloc((unsigned long)num * sizeof(struct coordinate), "curve points");
     } else
-	   cp->points = (struct coordinate *) NULL;
+	   cp->points = (struct coordinate GPHUGE *) NULL;
     cp->next_cp = NULL;
     cp->title = NULL;
     return(cp);
@@ -134,27 +174,27 @@ cp_extend(cp, num)
 	struct curve_points *cp;
 	int num;
 {
-    struct coordinate *new;
+    struct coordinate GPHUGE *new;
 
-#ifdef PC
-    /* Make sure we do not allocate more than 64k (8088 architecture...)
-     * in msdos since we can not address more. Leave some bytes for malloc
-     * maintainance.
+#if (defined(MSDOS) || defined(_Windows))  &&  !defined(WIN32)
+    /* Make sure we do not allocate more than 64k points in msdos since 
+	 * indexing is done with 16-bit int
+	 * Leave some bytes for malloc maintainance.
      */
-    if (num > 65500L / sizeof(struct coordinate))
-	int_error("Can not allocate more than 64k in msdos", NO_CARET);
-#endif /* PC */
+    if (num > 32700)
+		int_error("Array index must be less than 32k in msdos", NO_CARET);
+#endif /* MSDOS */
 
-    if (num == cp->p_max) return;
+    if (num == cp->p_max) return(0);
 
     if (num > 0) {
 	   if (cp->points == NULL) {
-		  cp->points = (struct coordinate *)
-		    alloc(num * sizeof(struct coordinate), "curve points");
+		  cp->points = (struct coordinate GPHUGE *)
+		    gpfaralloc((unsigned long)num * sizeof(struct coordinate), "curve points");
 	   } else {
-		  new = (struct coordinate *)
-		    realloc(cp->points, num * sizeof(struct coordinate));
-		  if (new == (struct coordinate *) NULL) {
+		  new = (struct coordinate GPHUGE *)
+		    gpfarrealloc(cp->points, (unsigned long)num * sizeof(struct coordinate));
+		  if (new == (struct coordinate GPHUGE *) NULL) {
 			 int_error("No memory available for expanding curve points",
 					 NO_CARET);
 			 /* NOTREACHED */
@@ -163,9 +203,9 @@ cp_extend(cp, num)
 	   }
 	   cp->p_max = num;
     } else {
-	   if (cp->points != (struct coordinate *) NULL)
-		free(cp->points);
-	   cp->points = (struct coordinate *) NULL;
+	   if (cp->points != (struct coordinate GPHUGE *) NULL)
+		gpfarfree(cp->points);
+	   cp->points = (struct coordinate GPHUGE *) NULL;
 	   cp->p_max = 0;
     }
 }
@@ -182,7 +222,7 @@ struct curve_points *cp;
 		if (cp->title)
 			free((char *)cp->title);
 		if (cp->points)
-			free((char *)cp->points);
+			gpfarfree((char *)cp->points);
 		free((char *)cp);
 	}
 }
@@ -196,13 +236,13 @@ iso_alloc(num)
 	int num;
 {
     struct iso_curve *ip;
-    ip = (struct iso_curve *) alloc(sizeof(struct iso_curve), "iso curve");
+    ip = (struct iso_curve *) alloc((unsigned long)sizeof(struct iso_curve), "iso curve");
     ip->p_max = (num >= 0 ? num : 0);
     if (num > 0) {
-	   ip->points = (struct coordinate *)
-		alloc(num * sizeof(struct coordinate), "iso curve points");
+	   ip->points = (struct coordinate GPHUGE *)
+		gpfaralloc((unsigned long)num * sizeof(struct coordinate), "iso curve points");
     } else
-	   ip->points = (struct coordinate *) NULL;
+	   ip->points = (struct coordinate GPHUGE *) NULL;
     ip->next = NULL;
     return(ip);
 }
@@ -215,27 +255,27 @@ iso_extend(ip, num)
 	struct iso_curve *ip;
 	int num;
 {
-    struct coordinate *new;
+    struct coordinate GPHUGE *new;
 
-    if (num == ip->p_max) return;
+    if (num == ip->p_max) return(0);
 
-#ifdef PC
-    /* Make sure we do not allocate more than 64k (8088 architecture...)
-     * in msdos since we can not address more. Leave some bytes for malloc
-     * maintainance.
+#if (defined(MSDOS) || defined(_Windows))  &&  !defined(WIN32)
+    /* Make sure we do not allocate more than 64k points in msdos since 
+	 * indexing is done with 16-bit int
+	 * Leave some bytes for malloc maintainance.
      */
-    if (num > 65500L / sizeof(struct coordinate))
-	int_error("Can not allocate more than 64k in msdos", NO_CARET);
-#endif /* PC */
+    if (num > 32700)
+		int_error("Array index must be less than 32k in msdos", NO_CARET);
+#endif /* MSDOS */
 
     if (num > 0) {
 	   if (ip->points == NULL) {
-		  ip->points = (struct coordinate *)
-		    alloc(num * sizeof(struct coordinate), "iso curve points");
+		  ip->points = (struct coordinate GPHUGE *)
+		    gpfaralloc((unsigned long)num * sizeof(struct coordinate), "iso curve points");
 	   } else {
-		  new = (struct coordinate *)
-		    realloc(ip->points, num * sizeof(struct coordinate));
-		  if (new == (struct coordinate *) NULL) {
+		  new = (struct coordinate GPHUGE *)
+		    gpfarrealloc(ip->points, (unsigned long)num * sizeof(struct coordinate));
+		  if (new == (struct coordinate GPHUGE *) NULL) {
 			 int_error("No memory available for expanding curve points",
 					 NO_CARET);
 			 /* NOTREACHED */
@@ -244,9 +284,9 @@ iso_extend(ip, num)
 	   }
 	   ip->p_max = num;
     } else {
-	   if (ip->points != (struct coordinate *) NULL)
-		free(ip->points);
-	   ip->points = (struct coordinate *) NULL;
+	   if (ip->points != (struct coordinate GPHUGE *) NULL)
+		gpfarfree(ip->points);
+	   ip->points = (struct coordinate GPHUGE *) NULL;
 	   ip->p_max = 0;
     }
 }
@@ -260,35 +300,41 @@ struct iso_curve *ip;
 {
 	if (ip) {
 		if (ip->points)
-			free((char *)ip->points);
+			gpfarfree((char *)ip->points);
 		free((char *)ip);
 	}
 }
 
 /*
- * sp_alloc() allocates a surface_points structure that can hold 'num_iso'
- * iso-curves, each of which 'num_samp' samples.
- * if, however num_iso or num_samp is zero no iso curves are allocated.
+ * sp_alloc() allocates a surface_points structure that can hold 'num_iso_1'
+ * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
+ * 'num_samp_1' samples.
+ * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
 struct surface_points *
-sp_alloc(num_samp,num_iso)
-	int num_samp,num_iso;
+sp_alloc(num_samp_1,num_iso_1,num_samp_2,num_iso_2)
+	int num_samp_1,num_iso_1,num_samp_2,num_iso_2;
 {
     struct surface_points *sp;
 
-    sp = (struct surface_points *) alloc(sizeof(struct surface_points), "surface");
+    sp = (struct surface_points *) alloc((unsigned long)sizeof(struct surface_points), "surface");
     sp->next_sp = NULL;
     sp->title = NULL;
     sp->contours = NULL;
     sp->iso_crvs = NULL;
     sp->num_iso_read = 0;
 
-    if (num_iso > 0 && num_samp > 0) {
+    if (num_iso_2 > 0 && num_samp_1 > 0) {
 	int i;
 	struct iso_curve *icrv;
 
-	for (i = 0; i < num_iso; i++) {
-	    icrv = iso_alloc(num_samp);
+	for (i = 0; i < num_iso_1; i++) {
+	    icrv = iso_alloc(num_samp_2);
+	    icrv->next = sp->iso_crvs;
+	    sp->iso_crvs = icrv;
+	}
+	for (i = 0; i < num_iso_2; i++) {
+	    icrv = iso_alloc(num_samp_1);
 	    icrv->next = sp->iso_crvs;
 	    sp->iso_crvs = icrv;
 	}
@@ -299,13 +345,14 @@ sp_alloc(num_samp,num_iso)
 }
 
 /*
- * sp_replace() updates a surface_points structure so it can hold 'num_iso'
- * iso-curves, each of which 'num_samp' samples.
- * if, however num_iso or num_samp is zero no iso curves are allocated.
+ * sp_replace() updates a surface_points structure so it can hold 'num_iso_1'
+ * iso-curves with 'num_samp_2' samples and 'num_iso_2' iso-curves with
+ * 'num_samp_1' samples.
+ * If, however num_iso_2 or num_samp_1 is zero no iso curves are allocated.
  */
-sp_replace(sp,num_samp,num_iso)
+sp_replace(sp,num_samp_1,num_iso_1,num_samp_2,num_iso_2)
 	   struct surface_points *sp;
-	   int num_samp,num_iso;
+	   int num_samp_1,num_iso_1,num_samp_2,num_iso_2;
 {
     int i;
     struct iso_curve *icrv, *icrvs = sp->iso_crvs;
@@ -317,9 +364,14 @@ sp_replace(sp,num_samp,num_iso)
     }
     sp->iso_crvs = NULL;
     
-    if (num_iso > 0 && num_samp > 0) {
-	for (i = 0; i < num_iso; i++) {
-	    icrv = iso_alloc(num_samp);
+    if (num_iso_2 > 0 && num_samp_1 > 0) {
+	for (i = 0; i < num_iso_1; i++) {
+	    icrv = iso_alloc(num_samp_2);
+	    icrv->next = sp->iso_crvs;
+	    sp->iso_crvs = icrv;
+	}
+	for (i = 0; i < num_iso_2; i++) {
+	    icrv = iso_alloc(num_samp_1);
 	    icrv->next = sp->iso_crvs;
 	    sp->iso_crvs = icrv;
 	}
@@ -344,7 +396,7 @@ struct surface_points *sp;
 			while (cntrs) {
 				cntr = cntrs;
 				cntrs = cntrs->next;
-				free(cntr->coords);
+				gpfarfree(cntr->coords);
 				free(cntr);
 			}
 		}
@@ -444,19 +496,30 @@ FILE *fp;
 {
 struct text_label *this_label;
 struct arrow_def *this_arrow;
+char *quote;
 	fprintf(fp,"set terminal %s %s\n", term_tbl[term].name, term_options);
 	fprintf(fp,"set output %s\n",strcmp(outstr,"STDOUT")? outstr : "" );
 	fprintf(fp,"set %sclip points\n", (clip_points)? "" : "no");
 	fprintf(fp,"set %sclip one\n", (clip_lines1)? "" : "no");
 	fprintf(fp,"set %sclip two\n", (clip_lines2)? "" : "no");
 	fprintf(fp,"set %sborder\n",draw_border ? "" : "no");
+	if (boxwidth<0.0)
+		fprintf(fp,"set boxwidth\n");
+	else
+		fprintf(fp,"set boxwidth %g\n",boxwidth);
+	if (dgrid3d)
+		fprintf(fp,"set dgrid3d %d,%d, %d\n",
+			dgrid3d_row_fineness,
+			dgrid3d_col_fineness,
+			dgrid3d_norm_value);
+
 	fprintf(fp,"set dummy %s,%s\n",dummy_var[0], dummy_var[1]);
 	fprintf(fp,"set format x \"%s\"\n", xformat);
 	fprintf(fp,"set format y \"%s\"\n", yformat);
 	fprintf(fp,"set format z \"%s\"\n", zformat);
 	fprintf(fp,"set %sgrid\n", (grid)? "" : "no");
 	switch (key) {
-		case -1 : 
+		case -1 :
 			fprintf(fp,"set key\n");
 			break;
 		case 0 :
@@ -472,10 +535,10 @@ struct arrow_def *this_arrow;
 		fprintf(fp,"set label %d \"%s\" at %g,%g,%g ",
 			   this_label->tag,
 			   this_label->text, this_label->x,
-					     this_label->y,
-					     this_label->z);
+						 this_label->y,
+						 this_label->z);
 		switch(this_label->pos) {
-			case LEFT : 
+			case LEFT :
 				fprintf(fp,"left");
 				break;
 			case CENTRE :
@@ -497,10 +560,9 @@ struct arrow_def *this_arrow;
 			   this_arrow->head ? "" : " nohead");
 	}
 	fprintf(fp,"set nologscale\n");
-	if (log_x||log_y)
-	    fprintf(fp,"set logscale %c%c\n", 
-		log_x ? 'x' : ' ', log_y ? 'y' : ' ');
-	if (log_z) fprintf(fp,"set logscale z\n");
+	if (is_log_x) fprintf(fp,"set logscale x %g\n", base_log_x);
+	if (is_log_y) fprintf(fp,"set logscale y %g\n", base_log_y);
+	if (is_log_z) fprintf(fp,"set logscale z %g\n", base_log_z);
 	fprintf(fp,"set offsets %g, %g, %g, %g\n",loff,roff,toff,boff);
 	fprintf(fp,"set %spolar\n", (polar)? "" : "no");
 	fprintf(fp,"set angles %s\n", (angles_format == ANGLES_RADIANS)?
@@ -508,8 +570,8 @@ struct arrow_def *this_arrow;
 	fprintf(fp,"set %sparametric\n", (parametric)? "" : "no");
 	fprintf(fp,"set view %g, %g, %g, %g\n",
 		surface_rot_x, surface_rot_z, surface_scale, surface_zscale);
-	fprintf(fp,"set samples %d\n",samples);
-	fprintf(fp,"set isosamples %d\n",iso_samples);
+	fprintf(fp,"set samples %d, %d\n",samples_1,samples_2);
+	fprintf(fp,"set isosamples %d, %d\n",iso_samples_1,iso_samples_2);
 	fprintf(fp,"set %ssurface\n",(draw_surface) ? "" : "no");
 	fprintf(fp,"set %scontour",(draw_contour) ? "" : "no");
 	switch (draw_contour) {
@@ -518,6 +580,7 @@ struct arrow_def *this_arrow;
 		case CONTOUR_SRF:  fprintf(fp, " surface\n"); break;
 		case CONTOUR_BOTH: fprintf(fp, " both\n"); break;
 	}
+ 	fprintf(fp,"set %sclabel\n",(label_contours) ? "" : "no");
 	fprintf(fp,"set %shidden3d\n",(hidden3d) ? "" : "no");
 	fprintf(fp,"set cntrparam order %d\n", contour_order);
 	fprintf(fp,"set cntrparam ");
@@ -526,43 +589,80 @@ struct arrow_def *this_arrow;
 		case CONTOUR_KIND_CUBIC_SPL: fprintf(fp, "cubicspline\n"); break;
 		case CONTOUR_KIND_BSPLINE:   fprintf(fp, "bspline\n"); break;
 	}
+	fprintf(fp,"set cntrparam levels ");
+	switch (levels_kind) {
+		int i;
+		case LEVELS_AUTO:
+			fprintf(fp, "auto %d\n", contour_levels);
+			break;
+		case LEVELS_INCREMENTAL:
+			fprintf(fp, "incremental %g,%g,%g\n",
+				levels_list[0], levels_list[1], 
+				levels_list[0]+levels_list[1]*contour_levels);
+			break;
+		case LEVELS_DISCRETE:
+			fprintf(fp, "discrete ");
+		        fprintf(fp, "%g", levels_list[0]);
+			for(i = 1; i < contour_levels; i++)
+				fprintf(fp, ",%g ", levels_list[i]);
+			fprintf(fp, "\n");
+	}
 	fprintf(fp,"set cntrparam points %d\n", contour_pts);
 	fprintf(fp,"set size %g,%g\n",xsize,ysize);
 	fprintf(fp,"set data style ");
 	switch (data_style) {
 		case LINES: fprintf(fp,"lines\n"); break;
-		case POINTS: fprintf(fp,"points\n"); break;
+		case POINTSTYLE: fprintf(fp,"points\n"); break;
 		case IMPULSES: fprintf(fp,"impulses\n"); break;
 		case LINESPOINTS: fprintf(fp,"linespoints\n"); break;
 		case DOTS: fprintf(fp,"dots\n"); break;
 		case ERRORBARS: fprintf(fp,"errorbars\n"); break;
+		case BOXES: fprintf(fp,"boxes\n"); break;
+		case BOXERROR: fprintf(fp,"boxerrorbars\n"); break;
+		case STEPS: fprintf(fp,"steps\n"); break;       /* JG */
 	}
 	fprintf(fp,"set function style ");
 	switch (func_style) {
 		case LINES: fprintf(fp,"lines\n"); break;
-		case POINTS: fprintf(fp,"points\n"); break;
+		case POINTSTYLE: fprintf(fp,"points\n"); break;
 		case IMPULSES: fprintf(fp,"impulses\n"); break;
 		case LINESPOINTS: fprintf(fp,"linespoints\n"); break;
 		case DOTS: fprintf(fp,"dots\n"); break;
 		case ERRORBARS: fprintf(fp,"errorbars\n"); break;
+		case BOXES: fprintf(fp,"boxes\n"); break;
+		case BOXERROR: fprintf(fp,"boxerrorbars\n"); break;
+		case STEPS: fprintf(fp,"steps\n"); break;       /* JG */
 	}
-	fprintf(fp,"set tics %s\n", (tic_in)? "in" : "out");
-	fprintf(fp,"set ticslevel %g\n", ticslevel);
-	save_tics(fp, xtics, 'x', &xticdef);
-	save_tics(fp, ytics, 'y', &yticdef);
-	save_tics(fp, ztics, 'z', &zticdef);
-	fprintf(fp,"set title \"%s\" %d,%d\n",title,title_xoffset,title_yoffset);
+        fprintf(fp,"set %sxzeroaxis\n", (xzeroaxis)? "" : "no");
+        fprintf(fp,"set %syzeroaxis\n", (yzeroaxis)? "" : "no");
+        fprintf(fp,"set tics %s\n", (tic_in)? "in" : "out");
+        fprintf(fp,"set ticslevel %g\n", ticslevel);
+        save_tics(fp, xtics, 'x', &xticdef);
+        save_tics(fp, ytics, 'y', &yticdef);
+        save_tics(fp, ztics, 'z', &zticdef);
+        for (quote = &(title[0]); quote && *quote && (*quote != '"'); quote++)
+            ;
+        fprintf(fp,"set title %c%s%c %d,%d\n",*quote ? '\'' : '"',title,*quote ? '\'' : '"',title_xoffset,title_yoffset);
+	
         if (timedate)
 	    fprintf(fp,"set time %d,%d\n",time_xoffset,time_yoffset);
 	else
 	    fprintf(fp,"set notime\n");
  	fprintf(fp,"set rrange [%g : %g]\n",rmin,rmax);
 	fprintf(fp,"set trange [%g : %g]\n",tmin,tmax);
-	fprintf(fp,"set xlabel \"%s\" %d,%d\n",xlabel,xlabel_xoffset,xlabel_yoffset);
-	fprintf(fp,"set xrange [%g : %g]\n",xmin,xmax);
-	fprintf(fp,"set ylabel \"%s\" %d,%d\n",ylabel,ylabel_xoffset,ylabel_yoffset);
-	fprintf(fp,"set yrange [%g : %g]\n",ymin,ymax);
-	fprintf(fp,"set zlabel \"%s\" %d,%d\n",zlabel,zlabel_xoffset,zlabel_yoffset);
+	fprintf(fp,"set urange [%g : %g]\n",umin,umax);
+	fprintf(fp,"set vrange [%g : %g]\n",vmin,vmax);
+        for (quote = &(xlabel[0]); quote && *quote && (*quote != '"'); quote++)
+            ;
+        fprintf(fp,"set xlabel %c%s%c %d,%d\n",*quote ? '\'' : '"',xlabel,*quote ? '\'' : '"',xlabel_xoffset,xlabel_yoffset);
+        fprintf(fp,"set xrange [%g : %g]\n",xmin,xmax);
+        for (quote = &(ylabel[0]); quote && *quote && (*quote != '"'); quote++)
+            ;
+        fprintf(fp,"set ylabel %c%s%c %d,%d\n",*quote ? '\'' : '"',ylabel,*quote ? '\'' : '"',ylabel_xoffset,ylabel_yoffset);
+        fprintf(fp,"set yrange [%g : %g]\n",ymin,ymax);
+        for (quote = &(zlabel[0]); quote && *quote && (*quote != '"'); quote++)
+            ;
+        fprintf(fp,"set zlabel %c%s%c %d,%d\n",*quote ? '\'' : '"',zlabel,*quote ? '\'' : '"',zlabel_xoffset,zlabel_yoffset);
 	fprintf(fp,"set zrange [%g : %g]\n",zmin,zmax);
 	fprintf(fp,"set %s %c\n", 
 		autoscale_r ? "autoscale" : "noautoscale", 'r');
@@ -578,7 +678,7 @@ struct arrow_def *this_arrow;
 
 save_tics(fp, onoff, axis, tdef)
 	FILE *fp;
-	BOOLEAN onoff;
+	TBOOLEAN onoff;
 	char axis;
 	struct ticdef *tdef;
 {
@@ -588,6 +688,14 @@ save_tics(fp, onoff, axis, tdef)
 		  case TIC_COMPUTED: {
 			 break;
 		  }
+		  case TIC_MONTH:{
+		      fprintf(fp,"\nset %cmtics",axis);
+			break;
+		  }
+		    case TIC_DAY:{
+			fprintf(fp,"\nset %cdtics",axis);
+			break;
+		    }
 		  case TIC_SERIES: {
 		         if (tdef->def.series.end >= VERYLARGE)
 			     fprintf(fp, " %g,%g", tdef->def.series.start,
@@ -649,7 +757,7 @@ load_file(fp, name)
 		  more = TRUE;
 
 		  while (more) {
-			 if (fgets(&(input_line[start]), left, fp) == NULL) {
+			 if (fgets(&(input_line[start]), left, fp) == (char *)NULL) {
 				stop = TRUE; /* EOF in file */
 				input_line[start] = '\0';
 				more = FALSE;	
@@ -684,7 +792,7 @@ load_file(fp, name)
 }
 
 /* pop from load_file state stack */
-static BOOLEAN				/* FALSE if stack was empty */
+static TBOOLEAN				/* FALSE if stack was empty */
 lf_pop()					/* called by load_file and load_file_error */
 {
     LFS *lf;
@@ -712,7 +820,7 @@ lf_push(fp)			/* called by load_file */
 {
     LFS *lf;
     
-    lf = (LFS *)alloc(sizeof(LFS), (char *)NULL);
+    lf = (LFS *)alloc((unsigned long)sizeof(LFS), (char *)NULL);
     if (lf == (LFS *)NULL) {
 	   if (fp != (FILE *)NULL)
 		(void) fclose(fp);		/* it won't be otherwise */
@@ -726,6 +834,12 @@ lf_push(fp)			/* called by load_file */
     lf->prev = lf_head;		/* link to stack */
     lf_head = lf;
 }
+
+FILE *lf_top()		/* used for reread  vsnyder@math.jpl.nasa.gov */
+{   if (lf_head == (LFS *) NULL) return((FILE *)NULL);
+    return(lf_head->fp);
+}
+
 
 load_file_error()			/* called from main */
 {
@@ -814,16 +928,18 @@ register union argument *arg;
 						disp_at(arg->udf_arg->at,level+2); /* recurse! */
 					} else
 						fputs(" (undefined)\n",stderr);
-					}
+					} else
+						(void) putc('\n',stderr);
 					break;
-		  case CALL2:	fprintf(stderr," %s", arg->udf_arg->udf_name);
+		  case CALLN:	fprintf(stderr," %s", arg->udf_arg->udf_name);
 					if(level < 6) {
 					if (arg->udf_arg->at) {
 						(void) putc('\n',stderr);
 						disp_at(arg->udf_arg->at,level+2); /* recurse! */
 					} else
 						fputs(" (undefined)\n",stderr);
-					}
+					} else
+						(void) putc('\n',stderr);
 					break;
 		  case JUMP:
 		  case JUMPZ:
@@ -835,44 +951,4 @@ register union argument *arg;
 					(void) putc('\n',stderr);
 		}
 	}
-}
-
-
-/* alloc:
- * allocate memory 
- * This is a protected version of malloc. It causes an int_error 
- * if there is not enough memory, but first it tries FreeHelp() 
- * to make some room, and tries again. If message is NULL, we 
- * allow NULL return. Otherwise, we handle the error, using the
- * message to create the int_error string. Note cp/sp_extend uses realloc,
- * so it depends on this using malloc().
- */
-
-char *
-alloc(size, message)
-	unsigned int size;				/* # of bytes */
-	char *message;			/* description of what is being allocated */
-{
-    char *p;				/* the new allocation */
-    char errbuf[100];		/* error message string */
-
-    p = malloc(size);
-    if (p == (char *)NULL) {
-#ifndef vms
-	   FreeHelp();			/* out of memory, try to make some room */
-#endif
-	   
-	   p = malloc(size);		/* try again */
-	   if (p == (char *)NULL) {
-		  /* really out of memory */
-		  if (message != NULL) {
-			 (void) sprintf(errbuf, "out of memory for %s", message);
-			 int_error(errbuf, NO_CARET);
-			 /* NOTREACHED */
-		  }
-		  /* else we return NULL */
-	   }
-    }
-
-    return(p);
 }

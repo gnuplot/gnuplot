@@ -1,0 +1,371 @@
+/*
+ * $Id: rgip.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ */
+
+/* GNUPLOT - rgip.trm Uniplex graphics metafile */
+/*
+ * Copyright (C) 1990
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   RGIP metafile
+ *
+ * AUTHORS
+ *   Hans Olav Eggestad
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ */
+
+/*
+ * Original for direct RGIP Metafile output.
+ */
+/* 
+ * Max pixels for X and Y in one window is 10000.
+ */
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#define RGIP_X_MAX 10000
+#define RGIP_Y_MAX 10000
+#define RGIP_XMAX 9900
+#define RGIP_YMAX 9900
+
+#define RGIPDOTS 0
+#define RGIPMARK 1
+#define RGIPTEXT 2
+#define RGIPLINE 3
+#define RGIPPOLY 4
+static char *RGIP_Obj[6] = { "DOTS", "MARK", "TEXT", "LINE", "POLY" };
+
+/* 
+ * RGIP fontsises range from 1 to 8 
+ */
+
+#define RGIP_SC (300)
+#define RGIP_FONTSIZE 1
+#define RGIP_FACES 3
+#define RGIP_FSTYLES 4
+#define RGIP_FSIZES 8
+#define RGIP_HELVETICA 0
+#define RGIP_TIMES 1
+#define RGIP_COURIER 2
+#define RGIP_LINE_WIDTHS 8 /* future, currently invisible and visible 0
+and 1 */
+#define RGIP_LINE_TYPES 8
+#define RGIP_COLORS 16
+#define RGIP_POINT_TYPES 8
+
+
+
+#define RGIP_HTIC (100)
+#define RGIP_VTIC (100)
+#define RGIP_VCHAR (RGIP_FONTSIZE*RGIP_SC) 
+#define RGIP_HCHAR (RGIP_VCHAR*3/7)   
+
+static int RGIP_orgx;		/* absolute-pixel-ORIgin of graph.	*/
+static int RGIP_orgy;
+static int RGIP_posx;		/* current drawing position (lines).	*/
+static int RGIP_posy;
+static int RGIP_inplot;
+static int RGIP_xmax;		/* width of graph in pixels.		*/
+static int RGIP_ymax;		/* height of graph in pixels.		*/
+static int RGIP_blofs;		/* BaseLine OFfSet from bounding box.	*/
+static int RGIP_angle = 0;	/* 0 for horizontal text, 90 for vertical */
+static enum JUSTIFY RGIP_justify = LEFT; /* left/center/right */
+static int RGIP_fface = 2;  /* Times */
+static int RGIP_ftype = 1; /* style roman */
+static int RGIP_fontsize = RGIP_FONTSIZE; /*  */
+static int RGIP_tcol = 7;  /* text color */
+static int RGIP_lsty = 1;  /* line style */
+static int RGIP_lcol = 7;  /* line color */
+static int RGIP_lwid = 1;  /* line width */
+static int RGIP_fsty = 1;  /* fill style */
+static int RGIP_fcol = 7;  /* fill color */
+static int RGIP_mcol = 7;  /* marker color */
+static int RGIP_msty = 1;  /* marker style */
+static int RGIP_msize = 1;  /* marker size */
+
+
+static unsigned char *RGIP_cvts();
+
+
+RGIP_init()
+{
+    RGIP_posx = RGIP_posy = 0;
+
+    RGIP_orgx = (RGIP_X_MAX - RGIP_XMAX) / 2;
+    RGIP_orgy = (RGIP_Y_MAX - RGIP_YMAX) / 2;
+
+}
+
+RGIP_graphics()
+{
+    static int Gnr = 0;
+    struct stat buf;
+    unsigned char *p, fn[128];
+
+    fstat(fileno(outfile),&buf);
+    if ( S_ISREG(buf.st_mode)) {
+	    if (p=(unsigned char *)strchr(outstr,'X')) { /* substitute X with graphnr */
+		if ( ! Gnr ) { /* delete the base file */
+		    sprintf(fn,"%s",&outstr[1]);
+		    fn[strlen(fn)-1]='\0';
+		    unlink(fn);
+		} else {
+        		fputs("%RI_GROUPEND\n", outfile);
+			fclose(outfile);
+		}
+		*p = '\0';
+		sprintf(fn,"%s%1d%s",&outstr[1],++Gnr,p+1);
+	   	fn[strlen(fn)-1]='\0';
+                if ( (outfile = fopen(fn,"w")) == (FILE *)NULL ) {
+                     os_error("cannot reopen file with binary type; output unknown",
+                           NO_CARET);
+                }
+		*p = 'X';  /* put back X */
+            }
+    }
+    fputs("%RGIP_METAFILE: 1.0a\n", outfile);
+    fputs("%RI_GROUPSTART\n", outfile);
+    fputs("%RI_GROUPSTART\n", outfile);
+
+    /* RGIP_linetype(-1); */
+}
+
+RGIP_text()
+{
+}
+
+RGIP_linetype(lt)
+int lt;
+{
+    int pen, pattern;
+
+/*  -2: axis
+ *  -1: border
+ *   0: arrow
+ *   1-7: graph
+*/
+    if ( lt == -2 ) {
+	lt = 1;
+	RGIP_lwid = 3;
+    } else if ( lt == -1 ) {
+	lt = 5;
+	RGIP_lwid = 1;
+    } else {
+	RGIP_lwid = (int) (lt/RGIP_LINE_TYPES);
+	if ( RGIP_lwid <= 0 ) RGIP_lwid = 1;
+    	lt  = (lt % RGIP_LINE_TYPES) + 1;
+    }
+    fputs("%RI_GROUPEND\n", outfile);
+    fputs("%RI_GROUPSTART\n", outfile);
+
+    /* RGIP_lsty  = (lt == 0 || lt == 2) ? 1 : lt; */
+
+    RGIP_lsty = lt;
+}
+
+
+RGIP_move(x,y)
+	unsigned int x,y;
+{
+/*
+    fputs("%RI_GROUPEND\n", outfile);
+    fputs("%RI_GROUPSTART\n", outfile);
+*/
+    RGIP_posx = x;
+    RGIP_posy = y;
+}
+
+
+RGIP_vector(ux,uy)
+	unsigned int ux,uy;
+{
+    /* Create line */
+
+    fprintf(outfile,"%1d %1d %1d %1d",
+        RGIP_posx + RGIP_orgx,
+        RGIP_posy + RGIP_orgy,
+    	ux + RGIP_orgx,
+    	uy + RGIP_orgy);
+
+    fprintf(outfile," %1d %d %1d %s\n", RGIP_lwid, RGIP_lsty,
+        RGIP_lcol, RGIP_Obj[RGIPLINE]);
+
+    RGIP_posx = ux;
+    RGIP_posy = uy;
+    /* RGIP_move(ux, uy); */
+}
+
+
+RGIP_text_angle(angle)
+	int angle;
+{
+    if (RGIP_angle != angle) {
+	   RGIP_angle = angle;	/* record for later use */
+    }
+
+    return(TRUE);
+}
+
+RGIP_justify_text(mode)
+	enum JUSTIFY mode;
+{
+    RGIP_justify = mode;
+    return(TRUE);
+}
+
+static unsigned char *
+RGIP_cvts(str,lcnt)
+	unsigned char		*str;
+	int *lcnt;			/* lines */
+{
+    unsigned char		*cp1;
+    unsigned char		*cp2;
+    static unsigned char	*buf = NULL;
+    int lc = 1;
+
+    lc = 1;
+    /* Free up old buffer, if there is one, get a new one.  Since	*/
+    /* all transformations shorten the string, get a buffer that is	*/
+    /* the same size as the input string.				*/
+
+    if (buf != NULL)
+	 (void) free(buf);
+    buf = (unsigned char *) alloc(strlen(str), "converted label string");
+
+    /* Do the transformations. */
+
+    cp1 = str;
+    cp2 = buf;
+    while (strlen(cp1) > 0) {
+	   switch (*cp1) {
+		    case  '\\' :	/* Escape sequence. */
+			 if (*++cp1 == '\\') {
+				/* Begin new line. */
+				*cp2++ = '\n';
+				lc++;
+				break;
+			 }
+		
+		    /* Fall through to just copy next char out.	*/
+		
+		    default :
+			 *cp2++ = *cp1;
+		    break;
+		}
+	   cp1++;
+    }
+ 
+    *cp2++ = '\n';
+    *cp2 = '\0';
+    *lcnt = lc; 
+    return (buf);
+}
+
+RGIP_put_text(x, y, str)
+	int x,y;				/* reference point of string */
+	unsigned char str[];			/* the text */
+{
+    register struct termentry *t = &term_tbl[term];
+    unsigned char *cvstr, *p;
+    int xlines;		/* lines */
+ 
+    cvstr = RGIP_cvts(str,&xlines);
+
+    x += RGIP_orgx,
+    y += RGIP_orgy;
+
+    if (! RGIP_angle) {  	/* horisontal */
+	y += (int)(t->v_char)*(xlines-2)/2;
+	/* y += (t->v_char)*xlines; */
+	y += (int)(t->v_char)/4;
+    } else {
+	x -= (int)(t->v_char)*(xlines-2)/2;
+	x -= (int)(t->v_char)/4;
+    }
+
+    while ( p=(unsigned char *)strchr(cvstr,'\n' )) {
+	*p = '\0';
+	if (strlen(cvstr)) 
+    	    fprintf(outfile,"%1d %1d %1d  %1d (%s) %1d %1d %1d %1d %s\n",
+            	x,y,RGIP_justify, RGIP_angle*90, cvstr, RGIP_fface, RGIP_ftype,
+            	RGIP_fontsize, RGIP_tcol, RGIP_Obj[RGIPTEXT]);
+	cvstr = ++p;
+	if (RGIP_angle) { 	/* vertical */
+		x += (t->v_char);
+	} else {
+		y -= (t->v_char);
+	}
+    }
+}
+
+
+RGIP_reset()
+{
+    fputs("%RI_GROUPEND\n", outfile);
+    fputs("%RI_GROUPEND\n", outfile);
+}
+
+static void
+RGIP_setfont(sz)
+    int sz;
+{
+    RGIP_fontsize = (int) (sz);
+    if ( RGIP_fontsize < 1 ) RGIP_fontsize = 1;
+    term_tbl[term].v_char = (unsigned int)(RGIP_fontsize*RGIP_SC);
+    term_tbl[term].h_char = (unsigned int)(RGIP_fontsize*RGIP_SC*3/7);
+}
+ 
+RGIP_do_point(x,y,number)
+int x,y;
+int number;
+{
+
+    x += RGIP_orgx,
+    y += RGIP_orgy;
+
+    if (number < 0) {		/* do dot */
+        fprintf(outfile,"%1d %1d %1d %s\n",
+               x,y,RGIP_mcol,RGIP_Obj[RGIPDOTS]);
+	    return;
+	}
+
+	RGIP_msty = (number % RGIP_POINT_TYPES) + 1;
+	RGIP_msize = ((int)(number / RGIP_POINT_TYPES)) + 1;
+
+    fprintf(outfile,"%1d %1d %1d %1d %1d %s\n",
+               x,y,RGIP_msize, RGIP_msty, RGIP_mcol, RGIP_Obj[RGIPMARK]);
+}
+
+RGIP_options()
+{
+	extern struct value *const_express();
+	extern double real();
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		RGIP_fontsize = (int)real(const_express(&a));
+		if ( RGIP_fontsize < 1 ) 
+			RGIP_fontsize = 1;
+		term_tbl[term].v_char = (unsigned int)(RGIP_fontsize*RGIP_SC);
+		term_tbl[term].h_char = (unsigned int)(RGIP_fontsize*RGIP_SC*3/7);
+	}
+	sprintf(term_options,"%d",RGIP_fontsize);
+}

@@ -1,0 +1,21 @@
+#This file will serve as the datafile used in demonstrating the 
+#"plot with steps" option.   Here is a gnuplot input file
+#which uses "plot with steps", inverse error function, normal
+#distribution function, and the inverse normal distribution
+#function.
+set title "Demo of step ploting style"
+plot [0:12][0:13] "steps.dat" with steps, "steps.dat" with points
+
+pause -1 "Hit return for normal distribution function."
+set title "Normal Distribution Function"
+plot [-3:3][0:1] norm(x)
+
+pause -1 "Hit return for inverse error function."
+set title "Inverse Error Function"
+plot [-1:1] inverf(x)
+
+pause -1 "Hit return for inverse normal distribution function."
+set title "Inverse Normal Distribution Function"
+plot [0:1] invnorm(x)
+
+set title ""

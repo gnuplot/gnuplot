@@ -1,113 +1,78 @@
+X11 changes for gnuplot 3.3
+---------------------------
 
-Notes on the new X11 features are attached. 
-
-Ed
-----------------------------------
-Ed Kubaitis (ejk@ux2.cso.uiuc.edu)
-Computing & Communications Services Office - University of Illinois, Urbana
-
-===============================================================================
-Gnuplot_x11 for 3.2
--------------------
-
-New features
+Enhancements
 ------------
-   o CRIPPLED_SELECT build option for SVR3 platforms with incomplete
-     or faulty implementations of BSD select().
 
-   o Xlib only
+   o VMS X11 support (Jehavi Bourvine)
 
-     X11 support no longer requires Athena or Motif libraries and
-     include files. This makes life easier for people on platforms
-     with Open Look only. It also simplifies X11 tailoring on all
-     platforms. Oh yes, and the gnuplot_x11 executable is smaller
-     (~43K instead of ~500K on RS/6000.)
+   o New X11 rendering for 'points' plotting style improves point
+     quality and eliminates the 'X11' terminal type whose only
+     function was to request multi-colored points. (Russell Lang)
 
-     makefile.unx has been edited to remove references to Athena &
-     Motif. Also, with the exception of the HP definition (where it
-     appeared to be intentionally specific to R4) all references to 
-     X11R4 have also been removed since this version should work without 
-     changes on R3, R4, or R5.
+   o tailorable linewidths, dash styles, and point sizes (see
+     the man page)
 
-   o Grayscale handling
+   o Color handling:
 
-     * grayscale displays get monochrome rendering by default
+       - "colorname,intensity" where 0 < intensity < 1
+         For example, 'blue,.5' means a half intensity blue
 
-     * '-gray' option & resource forces grayscale rendering on grayscale
-       or color displays.
+       - hexadecimal RGB colors accepted (needed for HP VUE)
 
-     * '-mono' option forces monochrome rendering on color displays.
+       - Failure to parse/allocate a color defaults to black
+         for that color rather than monochrome for whole plot
 
-     * special grayscale resources (separate from color)
+   o 'set term x11' assumed if '-display' option on command line.
 
-   o Miscellaneous
+Bug Fixes
+---------
 
-     * By default, the window is no longer momentarily cleared when
-       a new plot is displayed. The new plot "silently" replaces the
-       previous one.  I found this useful when running some of the demos, 
-       such as contours.demo, where a plot "adds" a feature to
-       the one before (gnuplot "movies" anyone?;-).
+   o On monochrome servers, any lines plotted before the first label
+     was printed were lost. This lost zero axes and garbled some
+     other plots. (Kenneth H. Carpenter)
 
-       However, a "-clear" command line-option and "gnuplot*clear: on"
-       restores the momentary clear that was there previously.
-
-     * Added ptx_x11 and convex_x11 machine options to makefile.unx.
-
-     * There is an X11FLAGS option (-DOLD_SELECT) for old 4.2 BSD systems
-       (such as SunOS 3.5) which don't have the FD_XXX macros that
-       go with select().
+   o User specified geometry position ignored with some window managers.
+     Negative positions miscalculated. (Mike Coleman)
 
 
-A few words about CRIPPLED_SELECT
----------------------------------
-I closely reviewed four different ways people had devised for dealing with 
-the "select error" problem encountered on some SVR3 platforms. I had one 
-such platform (Sequent Dynix/PTX) available for testing. Unfortunately 3 of 
-the four ways that had been submitted did not work for PTX (which has 
-problems with non-blocking I/O and Unix domain sockets as well as select). 
-The fourth way worked there but it used SV STREAMS and I had no way to 
-verify that it would also work on all the other platforms that encountered 
-the problem.
+Vendor Botch Circumventions
+---------------------------
 
-What was done instead was to use a temporary file instead of a pipe for
-gnuplot->gnuplot_x11 communication when CRIPPLED_SELECT is used. This is 
-like a sledgehammer - crude but (hopefully) robust. It should work on any 
-platform with open(), read(), write(), close(), unlink(), getpid(), and 
-getppid().
+   o New X11FLAGS options:
 
-Response time is not bad with CRIPPLED_SELECT. Timings on an RS/6000 
-for all.demo (hitting RETURN as soon as a plot appears) indicate that 
-CRIPPLED_SELECT only adds an average of .5 seconds to response time, 
-about what one would expect given the 1 second timer used. And curiously, 
-CRIPPLED_SELECT used 30% less CPU than the default mode.
+      - OW_BOTCH circumvents "ld.so: Undefined symbol: __XtInherit"
+        loader errors on Sun Open Windows platforms. (Vivek Khera)
 
-Testing
--------
-The new gnuplot_x11 was tested here on the following platforms:
+      - ISC22 circumvents select() problem with ISC2.2 (Robert Eckardt)
 
-   o IBM RS/6000 AIX 3.1.6 (IBM X11R3)
-   o IBM RS/6000 AIX 3.1.6 (MIT X11R4)
-   o Apollo 400s DomainOS 10.3 (Apollo X11R3)
-   o Sun SPARC SunOS 4.1.1-GFX-Rev2 (X11R?)
-   o Vax BSD 4.3 Reno (X11R5)
-   o Vax Ultrix-32 V3.0 Rev 64 (MIT X11R4)
-   o Sun 3/50 SunOS 3.5 (MIT X11R4)
-   o Sun 3/60 SunOS 4.1 (MIT X11R4)
-   o NeXT (X11 R?)
-   o Convex C2 9.0 OS (MIT X11R5)
-   o Sequent Dynix 3.1 (MIT X11R5)
-   o Sequent Dynix/PTX (MIT X11R5)
-   o Cray 2 - Unicos 5+?
-   o Cray Y-MP - Unicos 5+?
+      - BSD_TYPES pulls select FD_SET definitions from <sys/bsdtypes.h>
+        (Michael Herrmann)
 
-And with the following servers:
+      - ULTRIX_KLUDGE expanded to circumvent missing demo plots at
+        Ultrix 4.1 (chan@holo.iitsg.nrc.ca)
 
-   o NCD 19 monochrome (NCD X11R3)
-   o Visual X-15 monochrome (Visual X11R4)
-   o Sun 3/50 monochrome (MIT X11R4)
-   o IBM XStation 120 grayscale (IBM X11R4)
-   o Visual Turbo X-19 grayscale (Visual X11R4)
-   o IBM XStation 120 color (IBM X11R4)
-   o Sun 3/60 color (MIT X11R4)
-   o IBM XStation 130 1.3 (IBM X11R4)
+   o Random window geometry with Esix X11R3 (Al Bolduc)
+
+
+Miscellaneous
+-------------
+
+   o The man page has been updated to document that background and
+     foreground are not honored for monochrome displays, only -rv
+     and 'gnuplot*reverseVideo:on'.
+
+   o '-tvtwm' command line option and gnuplot*tvtwm resource
+
+     Mike Coleman's fix for user-specified geometry position for
+     other window managers causes tvtwm to use absolute rather
+     then virtual-relative coordinates when the user specifies
+     geometry. This command line option and resource tells
+     gnuplot_x11 to use PPosition (virtual-relative) when a
+     geometry position is requested.
+
+     Unfortunately, negative y positions are off by the size of the
+     window manager title bar. Thus, for example, -0-20 rather than
+     -0-0 is needed to place the lower right corner of the window
+     at the lower right corner of the screen.
 

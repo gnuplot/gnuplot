@@ -1,10 +1,11 @@
 /*
- * $Id: iris4d.trm,v 3.26 92/03/24 22:35:35 woo Exp Locker: woo $
+ * $Id: iris4d.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT - iris4d.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -28,7 +29,7 @@
  *           (Applied Research Corporation) 7/1/89
  *           INTERNET: merritt@iris613.gsfc.nasa.gov
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 
@@ -154,6 +155,7 @@ IRIS4D_graphics()
 
 IRIS4D_text()
 {
+  gflush(); /* flush buffer */
   return; /* enter text from another window!!! */
 }
 

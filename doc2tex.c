@@ -1,6 +1,7 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2tex.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+static char *RCSid = "$Id: doc2tex.c%v 3.38.2.70 1993/02/08 02:19:29 woo Exp woo $";
 #endif
+
 
 /*
  * doc2tex.c  -- program to convert Gnuplot .DOC format to LaTeX document
@@ -8,24 +9,19 @@ static char *RCSid = "$Id: doc2tex.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
  * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
  * Extended by David Kotz to support quotes ("), backquotes, tables.
  *
- * usage:  doc2tex < file.doc > file.tex
+ * usage:  doc2tex [file.doc [file.tex]]
  *
  *   where file.doc is a Gnuplot .DOC file, and file.tex will be an
  *     article document suitable for printing with LaTeX.
  *
  * typical usage for GNUPLOT:
  *
- *   doc2tex < gnuplot.doc > gnuplot.tex 
+ *   doc2tex gnuplot.doc gnuplot.tex 
  *   latex gnuplot.tex ; latex gnuplot.tex
  */
 
-static char rcsid[] = "$Id: doc2tex.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
-
 #include <stdio.h>
 #include <ctype.h>
-#ifdef AMIGA_LC_5_1
-#include <string.h>
-#endif
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
@@ -37,11 +33,33 @@ typedef int boolean;
 boolean intable = FALSE;
 boolean verb = FALSE;
 
-main()
+main(argc,argv)
+int argc;
+char **argv;
 {
-	init(stdout);
-	convert(stdin,stdout);
-	finish(stdout);
+FILE * infile;
+FILE * outfile;
+	infile = stdin;
+	outfile = stdout;
+	if (argc > 3) {
+		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
+		exit(1);
+	}
+	if (argc >= 2) 
+		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for reading\n",
+				argv[0], argv[1]);
+			exit(1);
+		}
+	if (argc == 3)
+		if ( (outfile = fopen(argv[2],"w")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for writing\n",
+				argv[0], argv[2]);
+		}
+	
+	init(outfile);
+	convert(infile,outfile);
+	finish(outfile);
 	exit(0);
 }
 
@@ -49,7 +67,7 @@ main()
 init(b)
 FILE *b;
 {
-	(void) fputs("\\input{titlepage.tex}\n",b);
+	(void) fputs("\\input{titlepag.tex}\n",b);
 }
 
 
@@ -147,17 +165,7 @@ section(line, b)
 	   (void) fputs("\\end{verbatim}\n",b);
 	   verb=FALSE;
     } 
-#ifdef AMIGA_LC_5_1
-    (void) sscanf(line,"%d",&sh_i);
-    strcpy(string,strchr(line,' ')+1);
-    {
-      char *p;
-      p = strchr(string,'\n');
-      if (p != NULL) *p = '\0';
-    }
-#else
     (void) sscanf(line,"%d %[^\n]s",&sh_i,string);
-#endif
     switch(sh_i)
 	 {
 		case 1: 
@@ -221,7 +229,7 @@ static boolean inquote = FALSE;
 				 break;
 			 case '"': 
 				 /* peek at next character: if space, end of quote */
-				 if (*str == NULL || isspace(*str) || ispunct(*str))
+				 if (*str == '\0' || isspace(*str) || ispunct(*str))
 				   (void) fputs("''", file);
 				 else
 				   (void) fputs("``", file);

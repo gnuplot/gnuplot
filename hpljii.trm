@@ -1,10 +1,11 @@
 /*
- * $Id: hpljii.trm,v 3.26 92/03/24 22:34:57 woo Exp Locker: woo $
+ * $Id: hpljii.trm%v 3.50.1.11 1993/08/10 03:55:03 woo Exp $
+ *
  */
 
 /* GNUPLOT - hpljii.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -28,7 +29,7 @@
  *  Russell Lang
  *  Maurice Castro
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 
@@ -82,12 +83,14 @@ static unsigned int b_300ppi_pattern[] = {0xffff, 0x1111,
 HPLJIIoptions()
 {
 char opt[4];
+int parse_error=0;
 
-#define HPDJERROR "expecting dots per inch size 75, 100, 150 or 300"
-	if (!END_OF_COMMAND) {
-		if (token[c_token].length>3)
-			int_error(HPDJERROR,c_token);
-
+	if (END_OF_COMMAND) {
+		term_options[0]='\0';
+	} else {
+		if (token[c_token].length>3) {
+			parse_error=1; /* see below */
+		} else {
 		/* almost_equals() won't accept numbers - use strcmp() instead */
 		capture(opt,c_token,c_token);
 		if (!strcmp(opt,"75")) {
@@ -102,9 +105,11 @@ char opt[4];
 		else if (!strcmp(opt,"300")) {
    			hplj_dpp = 1;
 		} else {
-			int_error(HPDJERROR,c_token);
+		/* error, but set dpi anyway, since term it already set */
+				parse_error=1;
 		}
 		c_token++;
+	}
 	}
 
 	term_tbl[term].xmax = HPLJII_XMAX;
@@ -131,17 +136,18 @@ char opt[4];
 			term_tbl[term].h_tic = 5;
 			break;
 	}
+
+	if( parse_error ) 
+		int_error("expecting dots per inch size 75, 100, 150 or 300",
+				c_token);
 }
 
 
 HPLJIIinit()
 {
-#ifdef vms
+#ifdef REOPEN_BINARY
    reopen_binary();
-#endif /* vms */
-#ifdef PC
-   reopen_binary();
-#endif /* PC */
+#endif /* REOPEN_BINARY */
 }
 
 
@@ -293,7 +299,7 @@ HPDJtext()
 
    fprintf(outfile,"\033*b0M");
    fprintf(outfile,"\033*t%dR", HPLJII_PPI);
-   fprintf(outfile, "\033*r0A");
+   fprintf(outfile, "\033*r1A");
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {

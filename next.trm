@@ -1,7 +1,6 @@
 /*
- * $Id$
+ * $Id: next.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
  *
- * $Log$
  */
 
 /* GNUPLOT - next.trm */
@@ -28,7 +27,7 @@
  * AUTHORS
  *  Nick Strobel from Russell Lang's post.trm
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
  * The 'postscript' driver produces landscape output 10" wide and 7" high.  
  * To get a smaller epsf output use 'set size 0.5,0.5', 
@@ -45,19 +44,19 @@
 #import <dpsclient/dpsclient.h>
 #import <dpsclient/dpsNeXT.h>
 #import <stdlib.h>
-#import "../EpsViewer.h"
+#import "../epsviewe.h"
 
 DPSContext d;
 static void window_create(float width, float height);
 float width,height;	
 float xsize_orig,ysize_orig;  
 
-char next_font[MAX_ID_LEN+1] = "Courier" ; /* name of font */
+char next_font[MAX_ID_LEN+1] = "Helvetica" ; /* name of font */
 int next_fontsize = 14;					 /* size of font in pts */
-BOOLEAN next_portrait = FALSE;				 /* vertical page */
-BOOLEAN next_color = FALSE;
-BOOLEAN init_called = FALSE;
-BOOLEAN initframe_called = FALSE;
+TBOOLEAN next_portrait = FALSE;				 /* vertical page */
+TBOOLEAN next_color = FALSE;
+TBOOLEAN init_called = FALSE;
+TBOOLEAN initframe_called = FALSE;
 
 int next_page=0;			/* page count */
 int next_path_count=0; 	/* count of lines in path */
@@ -161,7 +160,7 @@ NEXT_options()
 		else if (almost_equals(c_token,"d$efault")) {
 			next_portrait=FALSE;
 			next_color=FALSE;
-			strcpy(next_font,"Courier");
+			strcpy(next_font,"Helvetica");
 			next_fontsize = 14;
 			c_token++;
 		}

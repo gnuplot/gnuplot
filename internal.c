@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: internal.c,v 3.26 92/03/24 22:34:29 woo Exp Locker: woo $";
+static char *RCSid = "$Id: internal.c%v 3.50.1.8 1993/07/27 05:37:15 woo Exp $";
 #endif
+
 
 /* GNUPLOT - internal.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,23 +31,19 @@ static char *RCSid = "$Id: internal.c,v 3.26 92/03/24 22:34:29 woo Exp Locker: w
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <math.h>
 #include <stdio.h>
 #include "plot.h"
 
-BOOLEAN undefined;
+TBOOLEAN undefined;
 
+#ifndef AMIGA_SC_6_1
 char *strcpy();
+#endif /* !AMIGA_SC_6_1 */
 
-struct value *pop(), *complex(), *integer();
+struct value *pop(), *Gcomplex(), *Ginteger();
 double magnitude(), angle(), real();
 
 struct value stack[STACK_DEPTH];
@@ -58,7 +55,8 @@ int s_p = -1;   /* stack pointer */
  * System V and MSC 4.0 call this when they wants to print an error message.
  * Don't!
  */
-#ifdef MSDOS
+#ifndef _CRAY
+#if defined(MSDOS) || defined(DOS386)
 #ifdef __TURBOC__
 int matherr()	/* Turbo C */
 #else
@@ -69,17 +67,18 @@ struct exception *x;
 #ifdef apollo
 int matherr(struct exception *x)	/* apollo */
 #else /* apollo */
-#ifdef AMIGA_LC_5_1
-int matherr(x)	/* AMIGA_LC_5_1 */
+#if defined(AMIGA_SC_6_1)||defined(ATARI)&&defined(__GNUC__)||defined(__hpux__)||defined(PLOSS) ||defined(SOLARIS)
+int matherr(x)
 struct exception *x;
 #else    /* Most everyone else (not apollo). */
 int matherr()
-#endif /* AMIGA_LC_5_1 */
+#endif /* AMIGA_SC_6_1 || GCC_ST */
 #endif /* apollo */
 #endif /* MSDOS */
 {
 	return (undefined = TRUE);		/* don't print error message */
 }
+#endif /* not _CRAY */
 
 
 reset_stack()
@@ -152,6 +151,15 @@ union argument *x;
 }
 
 
+f_pushd(x)
+union argument *x;
+{
+struct value param;
+	(void) pop(&param);
+	push(&(x->udf_arg->dummy_values[param.v.int_val]));
+}
+
+
 #define ERR_FUN "undefined function: "
 
 f_call(x)  /* execute a udf */
@@ -174,12 +182,17 @@ struct value save_dummy;
 	udf->dummy_values[0] = save_dummy;
 }
 
-f_call2(x)  /* execute a udf of two variables */
+
+f_calln(x)  /* execute a udf of n variables */
 union argument *x;
 {
 static char err_str[sizeof(ERR_FUN) + MAX_ID_LEN] = ERR_FUN;
 register struct udft_entry *udf;
-struct value save_dummy0, save_dummy1;
+struct value save_dummy[MAX_NUM_VAR];
+
+	int i;
+	int num_pop;
+	struct value num_params;
 
 	udf = x->udf_arg;
 	if (!udf->at) { /* undefined */
@@ -187,21 +200,38 @@ struct value save_dummy0, save_dummy1;
 				udf->udf_name);
 		int_error(err_str,NO_CARET);
 	}
-	save_dummy1 = udf->dummy_values[1];
-	save_dummy0 = udf->dummy_values[0];
-	(void) pop(&(udf->dummy_values[1]));
-	(void) pop(&(udf->dummy_values[0]));
+	for(i=0; i<MAX_NUM_VAR; i++) 
+		save_dummy[i] = udf->dummy_values[i];
+
+	/* if there are more parameters than the function is expecting */
+	/* simply ignore the excess */
+	(void) pop(&num_params);
+
+	if(num_params.v.int_val > MAX_NUM_VAR) {
+		/* pop the dummies that there is no room for */
+		num_pop = num_params.v.int_val - MAX_NUM_VAR;
+		for(i=0; i< num_pop; i++)
+			(void) pop(&(udf->dummy_values[i]));
+
+		num_pop = MAX_NUM_VAR;
+	} else {
+		num_pop = num_params.v.int_val;
+	}
+
+	/* pop parameters we can use */
+	for(i=num_pop-1; i>=0; i--)
+		(void) pop(&(udf->dummy_values[i]));
 
 	execute_at(udf->at);
-	udf->dummy_values[1] = save_dummy1;
-	udf->dummy_values[0] = save_dummy0;
+	for(i=0; i<MAX_NUM_VAR; i++) 
+		udf->dummy_values[i] = save_dummy[i];
 }
 
 
 static int_check(v)
 struct value *v;
 {
-	if (v->type != INT)
+	if (v->type != INTGR)
 		int_error("non-integer passed to boolean operator",NO_CARET);
 }
 
@@ -210,7 +240,7 @@ f_lnot()
 {
 struct value a;
 	int_check(pop(&a));
-	push(integer(&a,!a.v.int_val) );
+	push(Ginteger(&a,!a.v.int_val) );
 }
 
 
@@ -218,7 +248,7 @@ f_bnot()
 {
 struct value a;
 	int_check(pop(&a));
-	push( integer(&a,~a.v.int_val) );
+	push( Ginteger(&a,~a.v.int_val) );
 }
 
 
@@ -234,7 +264,7 @@ f_lor()
 struct value a,b;
 	int_check(pop(&b));
 	int_check(pop(&a));
-	push( integer(&a,a.v.int_val || b.v.int_val) );
+	push( Ginteger(&a,a.v.int_val || b.v.int_val) );
 }
 
 f_land()
@@ -242,7 +272,7 @@ f_land()
 struct value a,b;
 	int_check(pop(&b));
 	int_check(pop(&a));
-	push( integer(&a,a.v.int_val && b.v.int_val) );
+	push( Ginteger(&a,a.v.int_val && b.v.int_val) );
 }
 
 
@@ -251,7 +281,7 @@ f_bor()
 struct value a,b;
 	int_check(pop(&b));
 	int_check(pop(&a));
-	push( integer(&a,a.v.int_val | b.v.int_val) );
+	push( Ginteger(&a,a.v.int_val | b.v.int_val) );
 }
 
 
@@ -260,7 +290,7 @@ f_xor()
 struct value a,b;
 	int_check(pop(&b));
 	int_check(pop(&a));
-	push( integer(&a,a.v.int_val ^ b.v.int_val) );
+	push( Ginteger(&a,a.v.int_val ^ b.v.int_val) );
 }
 
 
@@ -269,7 +299,7 @@ f_band()
 struct value a,b;
 	int_check(pop(&b));
 	int_check(pop(&a));
-	push( integer(&a,a.v.int_val & b.v.int_val) );
+	push( Ginteger(&a,a.v.int_val & b.v.int_val) );
 }
 
 
@@ -278,7 +308,7 @@ f_uminus()
 struct value a;
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			a.v.int_val = -a.v.int_val;
 			break;
 		case CMPLX:
@@ -298,9 +328,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val ==
 						b.v.int_val);
 					break;
@@ -312,7 +342,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (b.v.int_val == a.v.cmplx_val.real &&
 					   a.v.cmplx_val.imag == 0.0);
 					break;
@@ -323,7 +353,7 @@ struct value a, b;
 						b.v.cmplx_val.imag);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -334,9 +364,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val !=
 						b.v.int_val);
 					break;
@@ -348,7 +378,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (b.v.int_val !=
 						a.v.cmplx_val.real ||
 					   a.v.cmplx_val.imag != 0.0);
@@ -360,7 +390,7 @@ struct value a, b;
 						b.v.cmplx_val.imag);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -371,9 +401,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val >
 						b.v.int_val);
 					break;
@@ -384,7 +414,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.cmplx_val.real >
 						b.v.int_val);
 					break;
@@ -393,7 +423,7 @@ struct value a, b;
 						b.v.cmplx_val.real);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -404,9 +434,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val <
 						b.v.int_val);
 					break;
@@ -417,7 +447,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.cmplx_val.real <
 						b.v.int_val);
 					break;
@@ -426,7 +456,7 @@ struct value a, b;
 						b.v.cmplx_val.real);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -437,9 +467,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val >=
 						b.v.int_val);
 					break;
@@ -450,7 +480,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.cmplx_val.real >=
 						b.v.int_val);
 					break;
@@ -459,7 +489,7 @@ struct value a, b;
 						b.v.cmplx_val.real);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -470,9 +500,9 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.int_val <=
 						b.v.int_val);
 					break;
@@ -483,7 +513,7 @@ struct value a, b;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					result = (a.v.cmplx_val.real <=
 						b.v.int_val);
 					break;
@@ -492,7 +522,7 @@ struct value a, b;
 						b.v.cmplx_val.real);
 			}
 	}
-	push(integer(&a,result));
+	push(Ginteger(&a,result));
 }
 
 
@@ -502,27 +532,27 @@ struct value a, b, result;
 	(void) pop(&b);
 	(void) pop(&a);
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
-					(void) integer(&result,a.v.int_val +
+				case INTGR:
+					(void) Ginteger(&result,a.v.int_val +
 						b.v.int_val);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.int_val +
+					(void) Gcomplex(&result,a.v.int_val +
 						b.v.cmplx_val.real,
 					   b.v.cmplx_val.imag);
 			}
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
-					(void) complex(&result,b.v.int_val +
+				case INTGR:
+					(void) Gcomplex(&result,b.v.int_val +
 						a.v.cmplx_val.real,
 					   a.v.cmplx_val.imag);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.cmplx_val.real+
+					(void) Gcomplex(&result,a.v.cmplx_val.real+
 						b.v.cmplx_val.real,
 						a.v.cmplx_val.imag+
 						b.v.cmplx_val.imag);
@@ -538,27 +568,27 @@ struct value a, b, result;
 	(void) pop(&b);
 	(void) pop(&a);		/* now do a - b */
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
-					(void) integer(&result,a.v.int_val -
+				case INTGR:
+					(void) Ginteger(&result,a.v.int_val -
 						b.v.int_val);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.int_val -
+					(void) Gcomplex(&result,a.v.int_val -
 						b.v.cmplx_val.real,
 					   -b.v.cmplx_val.imag);
 			}
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
-					(void) complex(&result,a.v.cmplx_val.real -
+				case INTGR:
+					(void) Gcomplex(&result,a.v.cmplx_val.real -
 						b.v.int_val,
 					    a.v.cmplx_val.imag);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.cmplx_val.real-
+					(void) Gcomplex(&result,a.v.cmplx_val.real-
 						b.v.cmplx_val.real,
 						a.v.cmplx_val.imag-
 						b.v.cmplx_val.imag);
@@ -575,14 +605,14 @@ struct value a, b, result;
 	(void) pop(&a);	/* now do a*b */
 
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
-					(void) integer(&result,a.v.int_val *
+				case INTGR:
+					(void) Ginteger(&result,a.v.int_val *
 						b.v.int_val);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.int_val *
+					(void) Gcomplex(&result,a.v.int_val *
 						b.v.cmplx_val.real,
 						a.v.int_val *
 						b.v.cmplx_val.imag);
@@ -590,14 +620,14 @@ struct value a, b, result;
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
-					(void) complex(&result,b.v.int_val *
+				case INTGR:
+					(void) Gcomplex(&result,b.v.int_val *
 						a.v.cmplx_val.real,
 						b.v.int_val *
 						a.v.cmplx_val.imag);
 					break;
 				case CMPLX:
-					(void) complex(&result,a.v.cmplx_val.real*
+					(void) Gcomplex(&result,a.v.cmplx_val.real*
 						b.v.cmplx_val.real-
 						a.v.cmplx_val.imag*
 						b.v.cmplx_val.imag,
@@ -619,14 +649,14 @@ register double square;
 	(void) pop(&a);	/* now do a/b */
 
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					if (b.v.int_val)
-					  (void) integer(&result,a.v.int_val /
+					  (void) Ginteger(&result,a.v.int_val /
 						b.v.int_val);
 					else {
-					  (void) integer(&result,0);
+					  (void) Ginteger(&result,0);
 					  undefined = TRUE;
 					}
 					break;
@@ -636,27 +666,27 @@ register double square;
 						b.v.cmplx_val.imag*
 						b.v.cmplx_val.imag;
 					if (square)
-						(void) complex(&result,a.v.int_val*
+						(void) Gcomplex(&result,a.v.int_val*
 						b.v.cmplx_val.real/square,
 						-a.v.int_val*
 						b.v.cmplx_val.imag/square);
 					else {
-						(void) complex(&result,0.0,0.0);
+						(void) Gcomplex(&result,0.0,0.0);
 						undefined = TRUE;
 					}
 			}
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					if (b.v.int_val)
 					  
-					  (void) complex(&result,a.v.cmplx_val.real/
+					  (void) Gcomplex(&result,a.v.cmplx_val.real/
 						b.v.int_val,
 						a.v.cmplx_val.imag/
 						b.v.int_val);
 					else {
-						(void) complex(&result,0.0,0.0);
+						(void) Gcomplex(&result,0.0,0.0);
 						undefined = TRUE;
 					}
 					break;
@@ -666,7 +696,7 @@ register double square;
 						b.v.cmplx_val.imag*
 						b.v.cmplx_val.imag;
 					if (square)
-					(void) complex(&result,(a.v.cmplx_val.real*
+					(void) Gcomplex(&result,(a.v.cmplx_val.real*
 						b.v.cmplx_val.real+
 						a.v.cmplx_val.imag*
 						b.v.cmplx_val.imag)/square,
@@ -676,7 +706,7 @@ register double square;
 						b.v.cmplx_val.imag)/
 							square);
 					else {
-						(void) complex(&result,0.0,0.0);
+						(void) Gcomplex(&result,0.0,0.0);
 						undefined = TRUE;
 					}
 			}
@@ -691,12 +721,12 @@ struct value a, b;
 	(void) pop(&b);
 	(void) pop(&a);	/* now do a%b */
 
-	if (a.type != INT || b.type != INT)
+	if (a.type != INTGR || b.type != INTGR)
 		int_error("can only mod ints",NO_CARET);
 	if (b.v.int_val)
-		push(integer(&a,a.v.int_val % b.v.int_val));
+		push(Ginteger(&a,a.v.int_val % b.v.int_val));
 	else {
-		push(integer(&a,0));
+		push(Ginteger(&a,0));
 		undefined = TRUE;
 	}
 }
@@ -711,21 +741,21 @@ register double mag, ang;
 	(void) pop(&a);	/* now find a**b */
 
 	switch(a.type) {
-		case INT:
+		case INTGR:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					count = abs(b.v.int_val);
 					t = 1;
 					for(i = 0; i < count; i++)
 						t *= a.v.int_val;
 					if (b.v.int_val >= 0)
-						(void) integer(&result,t);
+						(void) Ginteger(&result,t);
 					else
 					  if (t != 0)
-					    (void) complex(&result,1.0/t,0.0);
+					    (void) Gcomplex(&result,1.0/t,0.0);
 					  else {
 						 undefined = TRUE;
-						 (void) complex(&result, 0.0, 0.0);
+						 (void) Gcomplex(&result, 0.0, 0.0);
 					  }
 					break;
 				case CMPLX:
@@ -739,13 +769,13 @@ register double mag, ang;
 					mag *= exp(-b.v.cmplx_val.imag*angle(&a));
 					ang = b.v.cmplx_val.real*angle(&a) +
 					      b.v.cmplx_val.imag*log(magnitude(&a));
-					(void) complex(&result,mag*cos(ang),
+					(void) Gcomplex(&result,mag*cos(ang),
 						mag*sin(ang));
 			}
 			break;
 		case CMPLX:
 			switch (b.type) {
-				case INT:
+				case INTGR:
 					if (a.v.cmplx_val.imag == 0.0) {
 						mag = pow(a.v.cmplx_val.real,(double)abs(b.v.int_val));
 						if (b.v.int_val < 0)
@@ -753,7 +783,7 @@ register double mag, ang;
 						    mag = 1.0/mag;
 						  else 
 						    undefined = TRUE;
-						(void) complex(&result,mag,0.0);
+						(void) Gcomplex(&result,mag,0.0);
 					}
 					else {
 						/* not so good, but...! */
@@ -764,7 +794,7 @@ register double mag, ang;
 						  else 
 						    undefined = TRUE;
 						ang = angle(&a)*b.v.int_val;
-						(void) complex(&result,mag*cos(ang),
+						(void) Gcomplex(&result,mag*cos(ang),
 							mag*sin(ang));
 					}
 					break;
@@ -778,7 +808,7 @@ register double mag, ang;
 					mag *= exp(-b.v.cmplx_val.imag*angle(&a));
 					ang = b.v.cmplx_val.real*angle(&a) +
 					      b.v.cmplx_val.imag*log(magnitude(&a));
-					(void) complex(&result,mag*cos(ang),
+					(void) Gcomplex(&result,mag*cos(ang),
 						mag*sin(ang));
 			}
 	}
@@ -795,7 +825,7 @@ register double val;
 	(void) pop(&a);	/* find a! (factorial) */
 
 	switch (a.type) {
-		case INT:
+		case INTGR:
 			val = 1.0;
 			for (i = a.v.int_val; i > 1; i--)  /*fpe's should catch overflows*/
 				val *= i;
@@ -805,7 +835,7 @@ register double val;
 			NO_CARET);
 		}
 
-	push(complex(&a,val,0.0));
+	push(Gcomplex(&a,val,0.0));
 			
 }
 

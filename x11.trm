@@ -1,5 +1,6 @@
 /*
- * $Id: x11.trm,v 3.26 92/03/24 22:35:49 woo Exp Locker: woo $
+ * $Id: x11.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /*
@@ -15,16 +16,18 @@
 #define X11_VTIC (X11_YMAX/100)
 #define X11_HTIC (X11_XMAX/150)
 
-#define X11_nopts 25
+int X11_Display = 0; /* non-zero if '-display' found on command line */
+
+#define X11_nopts 27
 char X11_opts[X11_nopts][20] = {
-   "-mono", "-gray", "-clear",
+   "-mono", "-gray", "-clear", "-tvtwm", "-pointsize",
    "-iconic", "-rv", "-reverse", "+rv", "-synchronous", 
    "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
    "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name", 
    "-selectionTimeout", "-title", "-xnllanguage", "-xrm" 
    };
 int X11_optarg[X11_nopts] = { 
-   0, 0, 0,
+   0, 0, 0, 0, 1,
    0, 0, 0, 0, 0,
    1, 1, 1, 1, 1, 1, 1,
    1, 1, 1, 1, 1, 1, 
@@ -44,6 +47,7 @@ X11_args(argc, argv) int argc; char *argv[]; {
 	 if (!strcmp(*argv, X11_opts[n])) {
 	    strcat(X11_command, " ");
 	    strcat(X11_command, *argv); 
+	    !strcmp(*argv, "-display") && X11_Display++;
 	    if (X11_optarg[n]) {
 	       if (--argc <= 0) return(nx11);
 	       strcat(X11_command, " \"");
@@ -59,15 +63,44 @@ X11_args(argc, argv) int argc; char *argv[]; {
    return(nx11);
    }
 
-#ifndef CRIPPLED_SELECT
 /*-----------------------------------------------------------------------------
- *   use pipe IPC on most platforms
+ *   Three different versions of the remainder of the X11 terminal driver
+ *   are provided to support three different types of IPC with the
+ *   gnuplot_x11 outboard terminal driver:
+ * 
+ *   DEFAULT_X11:      popen() pipe for most un*x platforms
+ *
+ *   CRIPPLED_SELECT : file IPC for un*x platforms with incomplete or faulty
+ *                     implementation of BSD select()
+ *
+ *   VMS :             mailbox/spawn IPC
+ *---------------------------------------------------------------------------*/
+
+#define DEFAULT_X11
+#if defined(VMS) || defined(CRIPPLED_SELECT)
+#undef DEFAULT_X11
+#endif
+#if defined(VMS) && defined(CRIPPLED_SELECT)
+Error. Incompatible options.
+#endif
+
+
+#ifdef DEFAULT_X11
+/*-----------------------------------------------------------------------------
+ *   DEFAULT_X11 popen() pipe IPC
  *---------------------------------------------------------------------------*/
 FILE *popen();
 
 X11_init() { X11_ipc = popen(X11_command, "w"); }
 
-X11_graphics() { fprintf(X11_ipc, "G\n"); }
+X11_graphics() { 
+   fprintf(X11_ipc, "G\n"); 
+   fprintf(X11_ipc, "P7%04d%04d\n", /* size of point symbols */
+	   term_tbl[term].h_tic / 2, term_tbl[term].v_tic / 2); 
+#ifdef ULTRIX_KLUDGE
+   fflush(X11_ipc);
+#endif
+   }
 
 X11_text() { 
    fprintf(X11_ipc, "E\n"); fflush(X11_ipc);
@@ -78,9 +111,34 @@ X11_text() {
 
 X11_reset() { fprintf(X11_ipc, "R\n"); fflush(X11_ipc); pclose(X11_ipc); }
 
-#else   /* CRIPPLED_SELECT */
+X11_move(x,y) unsigned int x,y; { fprintf(X11_ipc, "M%04d%04d\n", x, y); }
+
+X11_vector(x,y) unsigned int x,y; { fprintf(X11_ipc, "V%04d%04d\n", x, y); }
+
+X11_linetype(lt) int lt; { fprintf(X11_ipc, "L%04d\n", lt); }
+
+X11_put_text(x,y,str) unsigned int x,y; char str[]; {
+   fprintf(X11_ipc, "T%04d%04d%s\n", x, y, str);
+   }
+
+X11_justify_text(mode) enum JUSTIFY mode; {
+   fprintf(X11_ipc, "J%04d\n", mode);
+   return(TRUE);
+   }
+
+X11_point(x,y,number) unsigned int x,y; int number; {
+   if (number>=0)
+      number %= POINT_TYPES;
+   number += 1;
+   fprintf(X11_ipc, "P%01d%04d%04d\n", number, x, y);
+   }
+
+#endif /* DEFAULT_X11 */
+
+
+#ifdef CRIPPLED_SELECT
 /*-----------------------------------------------------------------------------
- *   use file IPC on the others
+ *   CRIPPLED_SELECT file IPC
  *---------------------------------------------------------------------------*/
 
 char X11_tmp[32], X11_tmp0[32], X11_shutdown[32];
@@ -93,13 +151,18 @@ X11_init() {
       }
    sprintf(X11_tmp, "/tmp/Gnuplot_%d", X11_pid);
    sprintf(X11_tmp0, "%s-", X11_tmp);
-   sprintf(X11_shutdown,  "echo R >%s",X11_tmp);
+   sprintf(X11_shutdown, "echo R >%s", X11_tmp);
    }
 
 X11_graphics() { 
    X11_ipc = fopen(X11_tmp0, "w"); 
    if (!X11_ipc) { perror(X11_tmp0); system(X11_shutdown); exit(1); }
    fprintf(X11_ipc, "G\n"); 
+   fprintf(X11_ipc, "P7%04d%04d\n", /* size of point symbols */
+	   term_tbl[term].h_tic / 2, term_tbl[term].v_tic / 2); 
+#ifdef ULTRIX_KLUDGE
+   fflush(X11_ipc);
+#endif
    }
 
 X11_text() { 
@@ -113,8 +176,6 @@ X11_text() {
 
 X11_reset() { system(X11_shutdown); }
 
-#endif  /* CRIPPLED_SELECT */ /*---------------------------------------------*/
-
 X11_move(x,y) unsigned int x,y; { fprintf(X11_ipc, "M%04d%04d\n", x, y); }
 
 X11_vector(x,y) unsigned int x,y; { fprintf(X11_ipc, "V%04d%04d\n", x, y); }
@@ -124,7 +185,130 @@ X11_linetype(lt) int lt; { fprintf(X11_ipc, "L%04d\n", lt); }
 X11_put_text(x,y,str) unsigned int x,y; char str[]; {
    fprintf(X11_ipc, "T%04d%04d%s\n", x, y, str);
    }
+
 X11_justify_text(mode) enum JUSTIFY mode; {
    fprintf(X11_ipc, "J%04d\n", mode);
    return(TRUE);
    }
+
+X11_point(x,y,number) unsigned int x,y; int number; {
+   if (number>=0)
+      number %= POINT_TYPES;
+   number += 1;
+   fprintf(X11_ipc, "P%01d%04d%04d\n", number, x, y);
+   }
+#endif /* CRIPPLED_SELECT */
+
+
+#ifdef VMS
+/*-----------------------------------------------------------------------------
+ *   VMS mailbox/spawn IPC - Yehavi Bourvine - YEHAVI@VMS.HUJI.AC.IL
+ *---------------------------------------------------------------------------*/
+
+#include <iodef.h>
+#include <descrip.h>
+#define MAILBOX "PLOT_X11$MAILBOX"
+
+int vaxc$errno;
+static short X11_channel;
+static $DESCRIPTOR(lognamedsc,MAILBOX);
+
+X11_init() {
+
+   /* Create a descriptor for the command. $DESCRIP doesn't work in 
+   this context... */
+   struct { 
+      short size, type; 
+      char *address;
+      } pgmdsc = { strlen(X11_command), 0, X11_command };
+
+
+   /* Create a mailbox which will be used as a pipe for commands to the 
+   subprocess.  What we'll write to it will be read by the subprocess as 
+   its STDIN. */
+   vaxc$errno = sys$crembx(0,&X11_channel,128,128,0,0,&lognamedsc,0);
+   if (!(vaxc$errno)&1) {
+      printf("SYS$CreMbx failed with status=%d\r\n", vaxc$errno);
+      os_error("sys$crembx failed",NO_CARET);
+      }
+
+   /* Assign an I/O channel to it */
+   vaxc$errno = sys$assign(&lognamedsc,&X11_channel,0,0,0);
+   if (!(vaxc$errno & 1)) {
+      printf("SYS$Assign failed with status=%d\r\n", vaxc$errno);
+      os_error("sys$crembx failed",NO_CARET);
+      }
+
+   /* Create a subprocess whose input is this mailbox. */
+   vaxc$errno = lib$spawn(&pgmdsc,&lognamedsc,0,&1,0,0,0,0,0,0,0,0,0);
+   if (!((vaxc$errno) & 1)) {
+      printf("LIB$SPAWN failed with status=%d\r\n", vaxc$errno);
+      os_error("lib$spawn failed",NO_CARET);
+      }
+   }
+
+/*   We use $QIO in order to avoid buffering problems, although it might 
+ *   work  as well with simple Fprintf calls.  */
+
+X11_vmsqiow(buf) char *buf; {
+   int status = sys$qiow(0, X11_channel, IO$_WRITEVBLK, 0, 0, 0, 
+			 buf, strlen(buf), 0, 0, 0, 0);
+   if((status & 0x1) == 0) exit(status);
+   }
+
+char   X11_vmsbuf[512];
+
+X11_graphics() { 
+   sprintf(X11_vmsbuf, "G\n");
+   X11_vmsqiow(X11_vmsbuf);
+   sprintf(X11_vmsbuf, "P7%04d%04d\n", /* size of point symbols */
+	   term_tbl[term].h_tic / 2, term_tbl[term].v_tic / 2); 
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_text() {
+   sprintf(X11_vmsbuf, "E\n");
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_reset() { 
+   sprintf(X11_vmsbuf, "R\n");
+   X11_vmsqiow(X11_vmsbuf);
+   sleep(2);		/* Wait for subprocess to finish */
+   sys$dassgn(X11_channel);
+   }
+
+X11_move(x,y) unsigned int x,y; { 
+   sprintf(X11_vmsbuf, "M%04d%04d\n", x, y);
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_vector(x,y) unsigned int x,y; { 
+   sprintf(X11_vmsbuf, "V%04d%04d\n", x, y);
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_linetype(lt) int lt; { 
+   sprintf(X11_vmsbuf, "L%04d\n", lt);
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_put_text(x,y,str) unsigned int x,y; char str[]; { 
+   sprintf(X11_vmsbuf, "T%04d%04d%s\n", x, y, str);
+   X11_vmsqiow(X11_vmsbuf);
+   }
+
+X11_justify_text(mode) enum JUSTIFY mode; { 
+   sprintf(X11_vmsbuf, "J%04d\n", mode);
+   X11_vmsqiow(X11_vmsbuf);
+   return(TRUE);
+   }
+
+X11_point(x,y,number) unsigned int x,y; int number; {
+   if (number>=0)
+      number %= POINT_TYPES;
+   number += 1;
+   sprintf(X11_vmsbuf, "P%01d%04d%04d\n", number, x, y);
+   X11_vmsqiow(X11_vmsbuf);
+   }
+#endif /* VMS */

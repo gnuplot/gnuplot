@@ -1,5 +1,5 @@
 /*
- * $Id: fig.trm,v 3.26 92/03/24 22:34:53 woo Exp Locker: woo $
+ * $Id: fig.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -26,7 +26,7 @@
  * AUTHORS
  *  Micah Beck, David Kotz
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
  */
 
@@ -38,29 +38,30 @@
  * Original for Fig code output by Micah Beck, 1989
  * Department of Computer Science, Cornell University
  * Updated by David Kotz for gnuplot 2.0
- * More efficient output Ian by Dall
+ * More efficient output by Ian Dall
+ * Updated to FIG 2.1 (with color) format by Vivek Khera
  */
-#include "object.h"                     /* from the TransFig distribution */
-#define FIG_DEFAULT (-1)
-#define FIG_ROMAN_FONT (0)
+#include "object.h"                     /* from the XFig distribution */
+#define FIG_DEFAULT DEFAULT
+#define FIG_ROMAN_FONT (0)	/* actually, the default font */
  
 #ifndef FIG_RES
 /* Must be 80 for the Fig editor, but may be increased if used
  * only by TransFig filters.
- * Represents resolution per inch.
+ * Represents pixels per inch.
  */
-#define FIG_RES         80
+#define FIG_RES         (80)
 #endif
  
 #define FIG_COORD_SYS   2
  
-#define FIG_MAGIC       "#FIG 1.4-TFX"
+#define FIG_MAGIC       "#FIG 2.1"
 #define FIG_HTIC        (5*FIG_RES/80)
 #define FIG_VTIC        (5*FIG_RES/80)
-#define FIG_FONT_S      FIG_DEFAULT
-#define FIG_HCHAR       (6*FIG_RES/80) /* Change if FIG_FONT_S is changed */
-#define FIG_VCHAR       (12*FIG_RES/80) /* Change if FIG_FONT_S is changed */
-#define FIG_ARROW_WIDTH FIG_HTIC
+#define FIG_FONT_S      (10)	/* size in points */
+#define FIG_VCHAR       (FIG_FONT_S*72/FIG_RES) /* height of font in pixels */
+#define FIG_HCHAR       (FIG_VCHAR*6/10) /* this is a guess at the width */
+#define FIG_ARROW_WIDTH (FIG_HTIC/2 + 1)
 #define FIG_ARROW_HEIGHT FIG_HTIC
  
 static long FIG_xbase = FIG_RES/2;
@@ -82,6 +83,8 @@ static int FIG_type;            /* negative types use real lines */
 static float FIG_spacing;       /* length of dash or dot spacing */
 static int FIG_justify;         /* Fig justification T_*_JUSTIFIED */
 static float FIG_angle;         /* Fig text angle 0=horiz, Pi/2=vert */
+static int FIG_use_color = FALSE;	/* do we use color or not? */
+static int FIG_color = DEFAULT;	/* which color to use */
  
 #define FIG_POINT_TYPES POINT_TYPES /* we use the same points */
  
@@ -94,6 +97,24 @@ enum FIG_poly_stat stat;
   FIG_polyvec_stat = FIG_poly_new;
 }
  
+FIG_options()
+{
+	FIG_use_color = FALSE;	/* assumption */
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			FIG_use_color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			FIG_use_color=TRUE;
+			c_token++;
+		}
+	}
+
+	sprintf(term_options,"%s", FIG_use_color ? "color" : "monochrome");
+}
+
 FIG_init()
 {
     FIG_posx = FIG_posy = 0;
@@ -125,14 +146,18 @@ FIG_text()
  
  
 /* Line types for FIG work like this:
+ *  for monochrome:
  *  -2 : solid (border)
- *  -1 : dashed 4 (axes)
+ *  -1 : dotted 4 (axes)
  *   0 : solid (first curve)
  *   1 : dotted 3
  *   2 : dashed 3
  *   3 : dotted 6
  *   4 : dashed 6
  *   ... ...
+ *  for color, cycle through colors. once colors are used up, repeat colors
+ *   but start using dashed lines of different dash length. don't use white
+ *   as a color.
  */
  
 FIG_linetype(linetype)
@@ -143,20 +168,28 @@ FIG_linetype(linetype)
     switch (linetype) {
            case 0:
            case -2: {
-                  FIG_type = 0; /* solid line */
+                  FIG_type = SOLID_LINE;
                   FIG_spacing = 0.0;
+		  if (FIG_use_color) FIG_color = BLACK;
                   break;
            }
            case -1: {
-                  FIG_type = 1; /* dashed */
-                  FIG_spacing = 4.0; /* dash length */
+                  FIG_type = DOTTED_LINE;
+                  FIG_spacing = 4.0; /* gap */
+		  if (FIG_use_color) FIG_color = BLACK;
                   break;
            }
            default: {
-                  linetype = abs(linetype); /* shouldn't be negative anyway */
-                  /* now linetype >= 1 */
+                linetype = abs(linetype); /* shouldn't be negative anyway */
+                /* now linetype >= 1 */
+		if (FIG_use_color) {
+		  FIG_type = (linetype >= WHITE);	/* dashed line */
+		  FIG_color = linetype % WHITE;
+		  FIG_spacing = (linetype / WHITE) * 3;
+		} else { /* monochrome */
                   FIG_type = linetype % 2 + 1; /* dotted, dashed, ... */
                   FIG_spacing = (linetype+1) / 2 * 3;
+		}
                   break;
            }
     }
@@ -183,10 +216,9 @@ FIG_vector(ux,uy)
  
   if (FIG_polyvec_stat != FIG_poly_part)
     {
-      fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+      fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f %d %d %d\n",
               O_POLYLINE, T_POLYLINE,
-              FIG_type, 1, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_spacing,
-              0, 0);
+              FIG_type, 1, FIG_color, 0, FIG_DEFAULT, 0, FIG_spacing, 0,0,0);
       fprintf(outfile, "%d %d",
               FIG_XOFF + FIG_posx, FIG_YMAX + FIG_YOFF - FIG_posy);
       FIG_poly_vec_cnt = 1;
@@ -206,13 +238,13 @@ FIG_vector(ux,uy)
 FIG_arrow(sx, sy, ex, ey, head)
         int sx, sy;     /* start coord */
         int ex, ey;     /* end coord */
-	BOOLEAN head;
+	TBOOLEAN head;
 {
 	FIG_poly_clean(FIG_polyvec_stat);
-        fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+        fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f %d  %d %d\n",
                 O_POLYLINE, T_POLYLINE,
-                FIG_type, 1, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_spacing,
-                head ? 1 : 0, 0);
+                FIG_type, 1, FIG_color, 0, FIG_DEFAULT, 0, FIG_spacing,
+		0, head ? 1 : 0, 0);
         /* arrow line */
 	if ( head )
 	        fprintf(outfile, "%d %d %.3f %.3f %.3f\n",
@@ -233,13 +265,13 @@ FIG_put_text(x, y, str)
 {
   if (strlen(str) == 0) return;
   FIG_poly_clean(FIG_polyvec_stat);
-    y = y - FIG_VCHAR/2;                /* assuming vertical center justified */
+  y -= FIG_VCHAR/2;	/* assuming vertical center justified */
  
     fprintf(outfile, "%d %d %d %d %d %d %d %6.3f %d %d %d %d %d %s\01\n",
                   O_TEXT, FIG_justify,
-                  FIG_ROMAN_FONT, FIG_FONT_S, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_angle,
-                  FIG_DEFAULT, FIG_VCHAR, FIG_HCHAR*strlen(str), FIG_XOFF + x,
-        FIG_YMAX + FIG_YOFF-y, str);
+                  FIG_ROMAN_FONT, FIG_FONT_S, FIG_DEFAULT, FIG_DEFAULT, 0,
+		  FIG_angle, SPECIAL_TEXT, FIG_VCHAR, FIG_HCHAR*strlen(str),
+		  FIG_XOFF + x, FIG_YMAX + FIG_YOFF-y, str);
 }
  
 int FIG_justify_text(mode)
@@ -250,7 +282,7 @@ int FIG_justify_text(mode)
            case CENTRE: FIG_justify = T_CENTER_JUSTIFIED; break;
            case RIGHT: FIG_justify = T_RIGHT_JUSTIFIED; break;
            /* shouldn't happen */
-           default: FIG_justify = T_LEFT_JUSTIFIED; break;
+           default: FIG_justify = T_LEFT_JUSTIFIED; return (FALSE); break;
     }
     return (TRUE);
 }

@@ -1,10 +1,11 @@
 /*
- * $Id: t410x.trm,v 3.26 92/03/24 22:35:44 woo Exp Locker: woo $
+ * $Id: t410x.trm%v 3.50.1.9 1993/08/05 05:38:59 woo Exp $
+ *
  */
 
 /* GNUPLOT - t410x.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -25,7 +26,7 @@
  * AUTHORS
  *   Colin Kelley, Thomas Williams
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 
@@ -163,7 +164,6 @@ T410X_put_text(x, y, str)
 unsigned int x, y;
 char str[];
 {
-	extern int T410X_angle;
 
 	if (T410X_angle == 0) {
 		(void) T410X_move(x, y-T410XVCHAR/2+6);
@@ -181,7 +181,6 @@ char str[];
 T410X_text_angle(ang)
 int ang;
 {
-	extern int T410X_angle;
 
 	T410X_angle = ang;
 	return(TRUE);

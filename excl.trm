@@ -1,0 +1,203 @@
+/*
+ * $Id: excl.trm 3.38.2.18 1992/11/23 21:54:22 woo Exp $
+ *
+ */
+
+/* Copyright (c) 1992 by P. Klosowski at NIST.  All Rights Reserved 
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ ***     $Id: excl.trm 3.38.2.18 1992/11/23 21:54:22 woo Exp $
+     
+  NAME
+     quic
+   PURPOSE
+     QUIC driver for GNUPLOT
+   NOTES
+     
+   HISTORY
+     przemek - Aug 16, 1992: Created.
+***/
+/*
+c               *****************************************
+c               *****************************************
+c               ******                              *****
+c               ******   EXCL command definitions   *****
+c               ******                              *****
+c               *****************************************
+c               *****************************************
+*/
+
+/*  Define ansi command headers, NUL character */
+#define ESC "\033"
+#define GS  "\035"
+#define CSI "\033["
+#define DCS "\033P"
+#define ST  "\033\\"
+
+/*
+page numbers are given per "Talaris EXCL programmer's reference manual" M292 rev.2
+NOTE: EXCL coordinate system places (0,0) at upper left corner of the page
+
+c EXCL commands for initialization
+
+c     TALAMS: set ANSI                                        (p. 162)
+c     TALMOD: set emulation *** EXCL                          (p. 164)
+c     TALPGO: set page orient *** landscape                   (p.  81)
+c     TALFCTL: set paper format *** 8.5x11                    (p.  85)
+c     TALTBM: set top/bot margins  ** in land mode to full pg (p.  73)
+c     TALLRM: set left/right margins                          (p.  75)
+c     PUM:    set units ** units of measure set by TALPRM     (p.  67)
+c     TALASF: Absorb cr/ff/lf/vt   ** ON                      (p. 182)
+c     TALPOP: pop controller params                           (p. 168)
+c     TALPSH: push controller params                          (p. 167)
+c     TALPRM: set units of measure ** to 1/1000 inch          (p.  64)
+c     TALGLT: set line type ** solid                          (p. 211)
+c     TALORG: set page absolute origin ** (0,0) UL corner     (p.  78) 
+c     TALPCW: set page clip window *** for landsc/full page   (p.  84)
+c     TALGLP: line: **pen7x7mil*draw*smear*glyph112*font5279* (p. 208)
+c     TALGLPE: ending for TALGLP command, forcing DRAW mode
+c     TALGBB: bounding box; used only by qdrive               (p. 207)
+c     TALFPO: Force page out  ** clear bitmap                 (p.  95)
+c     TALGDW: graphical draw to hor,vert ** abs  coords       (p. 212)
+c     TALGMV: graphical move to hor,vert ** abs  coords       (p. 213)
+*/
+#define TALAMS  "\033[0*s"
+#define TALMOD  "\033[1;0r"
+#define TALPGO  "\033[1;0p"
+#define TALFCTL "\033[0;3x"
+#define TALTBM  "\033[0;8500 v"
+#define TALLRM  "\033[0;11000v"
+#define PUM     "\033[11h"
+#define TALASF  "\033[1 z"
+#define TALPOP  "\033[*]"
+#define TALPSH  "\033[*["
+#define TALPRM  "\033[3y"
+#define TALGLT  "\033[%s*t"
+#define TALORG  "\033[0;0o"
+#define TALCCNT "\033[1;0u"
+#define TALPCW  "\033[0;8500;11000;0*c"
+#define TALGLP_init  "\033[7;7;8;1;112;5279*w"
+#define TALGLP  "\033[%d;%d;8*w"
+#define TALFPO  "\033[0*F"
+#define TALGDW "\033[0;%d;%d*d"
+#define TALGMV "\033[0;%d;%d*m"
+
+/*  TALPYL: polyline                                        (p. 222)
+**        5;0} list of 16-bit signed integers, encoded, mostly relative
+**        5,1} list of ASCII  absolute coords (if w/o +- signs)(e.g. 315:1222;)
+*/
+
+#define TALPYL  "\033P5;1}"
+
+#define EXCL_XMAX 9000
+#define EXCL_YMAX 6500
+
+#define EXCL_XLAST (EXCL_XMAX - 1)
+#define EXCL_YLAST (EXCL_YMAX - 1)
+
+#define EXCL_VCHAR		120
+#define EXCL_HCHAR		70
+#define EXCL_VTIC		70
+#define EXCL_HTIC		70
+
+EXCL_init()
+{
+  fprintf(outfile,"%s%s%s%s%s%s",
+  	          TALPSH,TALAMS,TALMOD,TALCCNT,TALFCTL,TALASF);
+/*                ^save state   ^setEXCL       ^PaperSize8.5x11       */
+/*                       ^setANSI      ^copyCount1     ^absorbCtlChar */
+  fprintf(outfile, "%s%s%s%s%s%s",
+		  PUM,TALPRM,TALPGO,TALPCW,TALORG,TALGLP_init);
+  fprintf(outfile,                                            TALGLT,"");
+/*                ^setUnits  ^landscape    ^OriginZero        ^SolidLine   */
+/*                    ^Units1/1000" ^pageClip     ^SetLine            */
+}
+
+EXCL_graphics()
+{
+}
+
+EXCL_text()
+{
+	fprintf(outfile,TALFPO );
+	/*              ^pageout  */
+}
+
+
+EXCL_linetype(linetype)
+int linetype;
+{
+/* excl line widths in mils: 4 is mimimum, but too thin; then 
+   7,10,14,17,20,24,27...
+   exclpen=MOD(NPEN,8)*7
+   CSI  exclpen; exclpen; TALGLPE
+*/
+  static char *type[2+9]={ 
+    "", "40;40", "",  "42;42",  "14;21",
+    /*   ....   ----  -- -- --   . . .   */
+     "",  "49;30",  "14;21",         "",  "49;30",  "14;21"
+    /*  same pattern, but thicker..  and thicker       */
+    };
+  static int width[2+9] = {14, 7,    7, 7, 7, 10, 10, 10, 17, 17, 17};
+  if (linetype >= 9)
+    linetype %= 9;
+  fprintf(outfile,TALGLP,width[linetype+2],width[linetype+2]); 
+  /*	          ^width in dots */
+  fprintf(outfile,TALGLT,type[linetype+2]);
+  /*              ^line type     */
+}
+
+
+EXCL_move(x,y)
+int x,y;
+{
+	fprintf(outfile,TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
+/*	                 ^pen up vector*/
+}
+
+
+EXCL_vector(x2,y2)
+int x2,y2;
+{
+	fprintf(outfile,TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
+/*	                 ^pen down vector*/
+}
+
+
+EXCL_put_text(x,y,str)
+unsigned int x,y;
+char str[];
+{
+char ch;
+	EXCL_move(x,y - EXCL_VCHAR/3);
+	ch = *str++;
+	while(ch!='\0') {
+		putc(ch,outfile);
+		ch = *str++;
+	}
+}
+
+EXCL_reset()
+{
+	fprintf(outfile,"%s%s", TALFPO, TALPOP);
+	/*                      ^pageout ^pop  */
+}
+
+
+

@@ -1,0 +1,285 @@
+/*
+ *    pm.trm  --- inboard terminal driver for Presentation Manager
+ *            --- after X-11 driver, by R.W.Fearick 31/1/92.
+ *    v1.1 11/8/92 -- speed things up        
+ */
+
+#include <stdio.h>
+#include <process.h>
+
+/* 
+   include all stuff from os2.h as GNUPLOT uses INT as an enum and
+   this clashes with #defines in os2.h 
+*/
+
+typedef unsigned short USHORT;
+typedef USHORT *PUSHORT;
+typedef void *PVOID ;
+typedef char *PCHAR ;
+
+typedef long LONG;
+typedef LONG *PLONG;
+
+typedef unsigned long ULONG;
+typedef ULONG *PULONG;
+typedef struct
+{
+  ULONG  tib2_ultid;
+  ULONG  tib2_ulpri;
+  ULONG  tib2_version;
+  USHORT tib2_usMCCount;
+  USHORT tib2_fMCForceFlag;
+} TIB2;
+typedef TIB2 *PTIB2;
+
+typedef struct
+{
+  PVOID tib_pexchain;
+  PVOID tib_pstack;
+  PVOID tib_pstacklimit;
+  PTIB2 tib_ptib2;
+  ULONG tib_version;
+  ULONG tib_ordinal;
+} TIB;
+typedef TIB *PTIB;
+
+typedef struct
+{
+  ULONG pib_ulpid;
+  ULONG pib_ulppid;
+  ULONG pib_hmte;
+  PCHAR pib_pchcmd;
+  PCHAR pib_pchenv;
+  ULONG pib_flstatus;
+  ULONG pib_ultype;
+} PIB;
+typedef PIB *PPIB;
+typedef ULONG HEV;
+typedef HEV *PHEV;
+
+ULONG DosCreateEventSem (const char *, PHEV, ULONG, ULONG);
+ULONG DosWaitEventSem (HEV, ULONG);
+ULONG DosGetInfoBlocks (PTIB *, PPIB *);
+ULONG DosSearchPath( ULONG, char*, char*, char*, ULONG ) ;
+
+/* define PM world coordinate limits */
+#define PM_XMAX 4096
+#define PM_YMAX 4096
+
+/* approximations for typical font/screen sizes */
+
+#define PM_VCHAR (PM_YMAX/30) 
+#define PM_HCHAR (PM_XMAX/80) 
+#define PM_VTIC (PM_YMAX/100)
+#define PM_HTIC (PM_XMAX/150)
+
+/* graphics commands */
+#define SET_GRAPHICS    'G'
+#define SET_TEXT        'E'
+#define SET_LINE        'L'
+#define SET_ANGLE       'A'
+#define SET_JUSTIFY     'J'
+#define SET_POINTMODE   'D'
+#define GR_MOVE         'M'
+#define GR_DRAW         'V'
+#define GR_RESET        'R'
+#define GR_TEXT         'T'
+#define GR_PAUSE        'P'
+#define GR_HELP         'H'
+#define PM_nopts 1
+
+static char PM_path[256] = "" ;  /* path for pm program */
+static int  PM_mode      = 0 ;   /* track mode to avoid redraw after hitting break */
+static     HEV hev ;
+
+char PM_opts[PM_nopts][20] = {
+   " "
+   };
+int PM_optarg[PM_nopts] = { 
+   0
+   };
+
+FILE *PM_pipe=NULL, *fopen();
+char PM_command[1024]= "gnuplot_PM -name gnuplot";
+
+
+/*   PM_args - scan gnuplot command line for options */
+
+PM_args(argc, argv) int argc; char *argv[]; {
+   int nPM = 0, n;
+   if( PM_path[0]=='\0' ) getcwd( PM_path, 256 ) ;
+   return(nPM);
+   }
+
+PM_init() 
+    { 
+    static char buffer[1024] ;
+    int pid ;
+    int rc ;
+    PPIB pib ;
+    PTIB tib ;
+    char semname[32] ;
+    char pipename[32] ;
+    char tempname[32] ;
+    if( PM_pipe == NULL ) {
+        strcpy( tempname, "gpXXXXXX" ) ;
+        if( mktemp( tempname ) == NULL ) {
+            fprintf( stderr, "Temp name failure !\n" ) ;
+            abort() ;   
+            }
+        strcpy( semname, "\\sem32\\" ) ;
+        strcpy( pipename, "\\pipe\\" ) ;
+        strcat( semname, tempname ) ;
+        strcat( pipename, tempname ) ;
+        strcat( PM_path, "\\gnupmdrv.exe" ) ;
+        rc = access( PM_path, 0 ) ;
+            /* find exe file */ 
+  
+        if( rc != 0 ) 
+            rc = DosSearchPath( 0x0002, /* search GNUPLOT environment */
+                                "GNUPLOT",
+                                "gnupmdrv.exe",
+                                PM_path,
+                                256 ) ; 
+
+        if( rc != 0 ) 
+            rc = DosSearchPath( 0x0003,  /* then try current directory & path */
+                                "PATH",
+                                "gnupmdrv.exe",
+                                PM_path,
+                                256 ) ; 
+        if( rc != 0 ) {
+            fprintf( stderr, "Can't find gnupmdrv.exe !\n" ) ;
+            abort() ;   
+            }
+                            
+        rc = DosCreateEventSem( semname, &hev, 1, 0 ) ;
+        if( rc != 0 ) {
+            fprintf( stderr, "Can't create semaphore !\n" ) ;
+            abort() ;   
+            }
+        pid=spawnl( P_SESSION|P_DEFAULT, PM_path, "GnuplotPM", tempname, NULL ) ;
+        if( rc == -1 ) {
+            fprintf( stderr, "Can't spawn gnupmdrv.exe !\n" ) ;
+            abort() ;   
+            }
+
+        DosGetInfoBlocks( &tib, &pib ) ;
+        DosWaitEventSem( hev, 10000 ) ;        
+        PM_pipe = fopen( pipename, "r+b" ) ; 
+        if( PM_pipe == NULL ) {
+            fprintf( stderr, "Can't open pipe to gnupmdrv.exe !\n" ) ;
+            abort() ;   
+            }
+        setvbuf( PM_pipe, buffer, _IOFBF, 1024 ) ;
+        pid = pib->pib_ulpid ;
+        fwrite( &pid, 1, 4, PM_pipe ) ;
+        fflush( PM_pipe ) ;
+        }
+    }
+
+PM_reset() {
+        putc( GR_RESET, PM_pipe); 
+        fflush(PM_pipe);
+        }
+
+PM_text() 
+    {
+    if( PM_mode != SET_TEXT ) { 
+        putc( SET_TEXT, PM_pipe); 
+        fflush(PM_pipe);
+        }
+    PM_mode = SET_TEXT ;
+    }
+
+PM_graphics() 
+    { 
+    putc( SET_GRAPHICS, PM_pipe); 
+    PM_mode = SET_GRAPHICS ;
+    }
+
+PM_move(unsigned int x, unsigned int y) 
+    { 
+    putc( GR_MOVE, PM_pipe ) ;
+    fwrite( &x, sizeof(int), 1, PM_pipe ) ;
+    fwrite( &y, sizeof(int), 1, PM_pipe ) ;
+    }
+
+PM_vector(unsigned int x, unsigned int y)
+    { 
+    putc( GR_DRAW, PM_pipe ) ;
+    fwrite( &x, sizeof(int), 1, PM_pipe ) ;
+    fwrite( &y, sizeof(int), 1, PM_pipe ) ;
+    }
+
+PM_linetype(int lt)
+    { 
+    putc( SET_LINE, PM_pipe ) ;
+    fwrite( &lt, sizeof(int), 1, PM_pipe ) ;
+    }
+
+PM_text_angle( int ta)
+    { 
+    putc( SET_ANGLE, PM_pipe ) ;
+    fwrite( &ta, sizeof(int), 1, PM_pipe ) ;
+    return(TRUE) ; 
+    }
+
+PM_put_text(unsigned int x, unsigned int y, char *str) 
+    {
+    int len ;
+    putc( GR_TEXT, PM_pipe ) ;
+    fwrite( &x, sizeof(int), 1, PM_pipe ) ;
+    fwrite( &y, sizeof(int), 1, PM_pipe ) ;
+    len = strlen( str ) + 1 ;
+    fwrite( &len, sizeof(int), 1, PM_pipe ) ;
+    fwrite( str, 1, len, PM_pipe ) ;
+    for( len=sizeof(int)-len%sizeof(int); len > 0 ; len-- )  /* pad rest of int with zeros */
+        putc( '\0', PM_pipe ) ;
+    }
+
+PM_justify_text( enum JUSTIFY mode ) 
+    {
+    putc( SET_JUSTIFY, PM_pipe ) ;
+    fwrite( &mode, sizeof(int), 1, PM_pipe ) ;
+    return(TRUE);
+    }
+
+PM_point( int x, int y, int number )
+/*
+** tell the driver we are plotting a point so it can decide whether to
+** use colour or not
+*/
+    {
+    int mode ;
+    mode=1 ;
+    putc( SET_POINTMODE, PM_pipe ) ;
+    fwrite( &mode, sizeof(int), 1, PM_pipe ) ;
+    do_point( x, y, number ) ;
+    mode = 0 ;
+    putc( SET_POINTMODE, PM_pipe ) ;
+    fwrite( &mode, sizeof(int), 1, PM_pipe ) ;
+    }
+
+PM_pause( char *str )
+/*
+** pause - using message box on PM screen
+*/
+    {
+    int len, cbR, rc ;
+    unsigned long ul ;
+    char buf[256] ;
+    char *bp ;
+
+    if( PM_pipe == NULL ) return 2 ;
+    bp=buf ;
+    putc( GR_PAUSE, PM_pipe ) ;
+    len = strlen( str ) + 1 ;
+    fwrite( &len, sizeof(int), 1, PM_pipe ) ;
+    fwrite( str, 1, len, PM_pipe ) ;
+    for( rc=sizeof(int)-len%sizeof(int); rc > 0 ; rc-- )  /* pad rest of int with zeros */
+        putc( '\0', PM_pipe ) ;
+    fflush(PM_pipe ) ;
+    rc=DosRead( fileno(PM_pipe), &len, sizeof(int), &cbR ) ;
+    return len ;
+    }

@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: term.c,v 3.26 92/03/24 22:34:41 woo Exp Locker: woo $";
+static char *RCSid = "$Id: term.c%v 3.50.1.17 1993/08/27 05:21:33 woo Exp woo $";
 #endif
+
 
 /* GNUPLOT - term.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,35 +31,67 @@ static char *RCSid = "$Id: term.c,v 3.26 92/03/24 22:34:41 woo Exp Locker: woo $
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
+#include <ctype.h>
 #include "plot.h"
 #include "setshow.h"
 #include "term.h"
 #include "bitmap.h"
 #ifdef NEXT
 #include <stdlib.h>
-#include "EpsViewer.h"
+#include "epsviewe.h"
 #endif /* NEXT */
+
+#ifdef _Windows
+#ifdef __MSC__
+#include <malloc.h>
+#else
+#include <alloc.h>
+#endif
+#endif
+
+#if defined(__TURBOC__) && defined(MSDOS)
+#ifndef _Windows
+#include <dos.h>
+#endif
+#endif
 
 /* for use by all drivers */
 #define sign(x) ((x) >= 0 ? 1 : -1)
 #define abs(x) ((x) >= 0 ? (x) : -(x))
-#define max(a,b) ((a) > (b) ? (a) : (b))
-#define min(a,b) ((a) < (b) ? (a) : (b))
 
-BOOLEAN term_init;			/* true if terminal has been initialized */
+#ifndef max	/* GCC uses inline functions */
+#define max(a,b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+TBOOLEAN term_init;			/* true if terminal has been initialized */
 
 extern FILE *outfile;
 extern char outstr[];
-extern BOOLEAN term_init;
+extern TBOOLEAN term_init;
 extern int term;
 extern float xsize, ysize;
 
@@ -67,24 +100,50 @@ extern struct lexical_unit token[];
 extern int num_tokens, c_token;
 extern struct value *const_express();
 
-extern BOOLEAN interactive;
+extern TBOOLEAN interactive;
 
 /*
  * instead of <strings.h>
  */
+
+#if defined(_Windows) || ( defined(__TURBOC__) && defined(MSDOS) )
+# include <string.h>
+#else
+#ifdef ATARI
+#include <string.h>
+#include <math.h>
+#else
+#ifndef AMIGA_SC_6_1
 extern char *strcpy();
-extern int strlen(), strcmp(), strncmp();
+#ifdef ANSI
+extern size_t   strlen();
+#else
+extern int      strlen();
+#endif
+extern int  strcmp(), strncmp();
+#endif /* !AMIGA_SC_6_1 */
+#endif
+#endif
+
 #ifndef AMIGA_AC_5
 extern double sqrt();
 #endif
 
 char *getenv();
 
-#ifdef __TURBOC__
+#if defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)
 char *turboc_init();
 #endif
-#ifdef PC
+
+#ifdef __ZTC__
+char *ztc_init();
+/* #undef TGIF */
+#endif
+
+
+#if defined(MSDOS)||defined(ATARI)||defined(OS2)||defined(_Windows)||defined(DOS386)
 void reopen_binary();
+#define REOPEN_BINARY
 #endif
 #ifdef vms
 char *vms_init();
@@ -95,6 +154,7 @@ void term_pasthru();
 void term_nopasthru();
 void reopen_binary();
 void fflush_binary();
+#define REOPEN_BINARY
 #endif
 
 /* This is needed because the unixplot library only writes to stdout. */
@@ -117,7 +177,7 @@ register struct termentry *t = &term_tbl[term];
      if (number < 0) {		/* do dot */
 	    (*t->move)(x,y);
 	    (*t->vector)(x,y);
-	    return;
+	    return(0);
 	}
 
 	number %= POINT_TYPES;
@@ -207,7 +267,7 @@ int x,y,number;
 do_arrow(sx, sy, ex, ey, head)
 	int sx,sy;			/* start point */
 	int ex, ey;			/* end point (point of arrowhead) */
-	BOOLEAN head;
+	TBOOLEAN head;
 {
     register struct termentry *t = &term_tbl[term];
     int len = (t->h_tic + t->v_tic)/2; /* arrowhead size = avg of tic sizes */
@@ -251,8 +311,32 @@ do_arrow(sx, sy, ex, ey, head)
 #endif
 
 
-#ifdef PC			/* all PC types */
-#include "term/pc.trm"
+#ifndef _Windows
+# ifdef PC			/* all PC types except MS WINDOWS*/
+#  include "term/pc.trm"
+# endif
+#else
+#  include "term/win.trm"
+#endif
+
+#ifdef __ZTC__
+#include "term/fg.trm"
+#endif
+
+#ifdef DJSVGA
+#include "term/djsvga.trm"	/* DJGPP SVGA */
+#endif
+
+#ifdef EMXVGA
+#include "term/emxvga.trm"	/* EMX VGA */
+#endif
+
+#ifdef OS2PM                    /* os/2 presentation manager */
+#include "term/pm.trm"
+#endif
+
+#ifdef ATARI			/* ATARI-ST */
+#include "term/atari.trm"
 #endif
 
 /*
@@ -298,21 +382,33 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/tek.trm"
 #endif
 
+#ifdef OKIDATA
+#define EPSONP
+#endif
+
 #ifdef EPSONP	/* bit map types, EPSON, NEC, PROPRINTER, STAR Color */
 #include "term/epson.trm"
+#endif
+
+#ifdef HP500C  /* HP 500 deskjet Colour */
+#include "term/hp500c.trm"
 #endif
 
 #ifdef HPLJII		/* HP LaserJet II */
 #include "term/hpljii.trm"
 #endif
 
-#ifdef HPLJII /* HP LaserJet III in HPGL mode */
+#ifdef PCL /* HP LaserJet III in HPGL mode */
 #  ifndef HPGL
 #    define HPGL
 #  endif
 #endif
 
-#ifdef FIG				/* Fig 1.4FS Interactive graphics program */
+#ifdef HPPJ		/* HP PaintJet */
+#include "term/hppj.trm"
+#endif
+
+#ifdef FIG			/* Fig 2.1 Interactive graphics program */
 #include "term/fig.trm"
 #include "term/bigfig.trm"
 #endif
@@ -321,12 +417,28 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/gpr.trm"
 #endif /* GPR */
 
+#ifdef GRASS              /* GRASS (geographic info system) monitor */
+#include "term/grass.trm"
+#endif /* GRASS */
+
 #ifdef APOLLO           /* Apollo Graphics Primitive Resource (resizable window) */
 #include "term/apollo.trm"
 #endif /* APOLLO */
 
 #ifdef IMAGEN		/* IMAGEN printer */
 #include "term/imagen.trm"
+#endif
+
+#ifdef MIF			/* Framemaker MIF  driver */
+#include "term/mif.trm"
+#endif
+
+#ifdef MF			/* METAFONT driver */
+#include "term/metafont.trm"
+#endif
+
+#ifdef TEXDRAW
+#include "term/texdraw.trm"
 #endif
 
 #ifdef EEPIC		/* EEPIC (LATEX) type */
@@ -346,6 +458,10 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/latex.trm"
 #endif
 
+#ifdef GPIC		/* GPIC (groff) type */ 
+#include "term/gpic.trm"
+#endif
+
 #ifdef PBM		/* PBMPLUS portable bitmap */
 #include "term/pbm.trm"
 #endif
@@ -358,6 +474,22 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/kyo.trm"
 #endif
 
+/* note: this must come after term/post.trm */
+#ifdef PSLATEX		/* LaTeX with embedded PostScript */
+#include "term/pslatex.trm"
+#endif
+
+#ifdef PSTRICKS
+#include "term/pstricks.trm"
+#endif
+
+#ifdef TPIC		/* TPIC (LATEX) type */
+#include "term/tpic.trm"
+# ifndef LATEX
+#  define LATEX
+# endif
+#endif
+
 #ifdef UNIXPC     /* unix-PC  ATT 7300 or 3b1 machine */
 #include "term/unixpc.trm"
 #endif /* UNIXPC */
@@ -366,9 +498,25 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/aed.trm"
 #endif /* AED */
 
+#ifdef AIFM
+#include "term/ai.trm"
+#endif /* AIFM */
+
+#ifdef COREL
+#include "term/corel.trm"
+#endif /* COREL */
+
 #ifdef CGI
 #include "term/cgi.trm"
 #endif /* CGI */
+
+#ifdef DEBUG
+#include "term/debug.trm"
+#endif /* DEBUG */
+
+#ifdef EXCL
+#include "term/excl.trm"
+#endif /* EXCL */
 
 #ifdef HP2648
 /* also works for HP2647 */
@@ -412,6 +560,14 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/regis.trm"
 #endif /* REGIS */
 
+#ifdef RGIP
+#include "term/rgip.trm"
+#endif /* RGIP UNIPLEX */
+
+#ifdef MGR
+#include "term/mgr.trm"
+#endif /* MGR */
+
 #ifdef SUN
 #include "term/sun.trm"
 #endif /* SUN */
@@ -424,12 +580,21 @@ do_arrow(sx, sy, ex, ey, head)
 #include "term/v384.trm"
 #endif /* V384 */
 
+#ifdef TGIF
+#include "term/tgif.trm"
+#endif /* TGIF */
+
 #ifdef UNIXPLOT
+#ifdef GNUGRAPH
+#include "term/gnugraph.trm"
+#else
 #include "term/unixplot.trm"
+#endif /* GNUGRAPH */
 #endif /* UNIXPLOT */
 
 #ifdef X11
 #include "term/x11.trm"
+#include "term/xlib.trm"
 #endif /* X11 */
 
 #ifdef DXF
@@ -439,7 +604,6 @@ do_arrow(sx, sy, ex, ey, head)
 #ifdef AMIGASCREEN
 #include "term/amiga.trm"
 #endif /* AMIGASCREEN */
-
 
 /* Dummy functions for unavailable features */
 
@@ -511,6 +675,15 @@ struct termentry term_tbl[] = {
 	   AMIGA_justify_text, do_point, do_arrow}
 #endif
 
+#ifdef ATARI
+    ,{"atari", "Atari ST/TT",
+	   ATARI_XMAX, ATARI_YMAX, ATARI_VCHAR, ATARI_HCHAR, 
+	   ATARI_VTIC, ATARI_HTIC, ATARI_options, ATARI_init, ATARI_reset, 
+	   ATARI_text, null_scale, ATARI_graphics, ATARI_move, ATARI_vector, 
+	   ATARI_linetype, ATARI_put_text, ATARI_text_angle, 
+	   null_justify_text, ATARI_point, do_arrow}
+#endif
+
 #ifdef DUMB
     ,{"dumb", "printer or glass dumb terminal",
          DUMB_XMAX, DUMB_YMAX, 1, 1,
@@ -521,7 +694,23 @@ struct termentry term_tbl[] = {
 #endif
 
 #ifdef PC
-#ifdef __TURBOC__
+#ifndef _Windows
+# ifdef __TURBOC__
+#ifdef ATT6300
+    ,{"att", "IBM PC/Clone with AT&T 6300 graphics board",
+	   ATT_XMAX, ATT_YMAX, ATT_VCHAR, ATT_HCHAR,
+	   ATT_VTIC, ATT_HTIC, options_null, ATT_init, ATT_reset,
+	   ATT_text, null_scale, ATT_graphics, ATT_move, ATT_vector,
+	   ATT_linetype, ATT_put_text, ATT_text_angle, 
+	   ATT_justify_text, line_and_point, do_arrow}
+#endif
+
+    ,{"cga", "IBM PC/Clone with CGA graphics board",
+	   CGA_XMAX, CGA_YMAX, CGA_VCHAR, CGA_HCHAR,
+	   CGA_VTIC, CGA_HTIC, options_null, CGA_init, CGA_reset,
+	   CGA_text, null_scale, CGA_graphics, CGA_move, CGA_vector,
+	   CGA_linetype, CGA_put_text, MCGA_text_angle, 
+	   CGA_justify_text, line_and_point, do_arrow}
 
     ,{"egalib", "IBM PC/Clone with EGA graphics board",
 	   EGALIB_XMAX, EGALIB_YMAX, EGALIB_VCHAR, EGALIB_HCHAR,
@@ -529,6 +718,27 @@ struct termentry term_tbl[] = {
 	   EGALIB_text, null_scale, EGALIB_graphics, EGALIB_move, EGALIB_vector,
 	   EGALIB_linetype, EGALIB_put_text, EGALIB_text_angle, 
 	   EGALIB_justify_text, do_point, do_arrow}
+
+    ,{"hercules", "IBM PC/Clone with Hercules graphics board",
+	   HERC_XMAX, HERC_YMAX, HERC_VCHAR, HERC_HCHAR,
+	   HERC_VTIC, HERC_HTIC, options_null, HERC_init, HERC_reset,
+	   HERC_text, null_scale, HERC_graphics, HERC_move, HERC_vector,
+	   HERC_linetype, HERC_put_text, MCGA_text_angle, 
+	   HERC_justify_text, line_and_point, do_arrow}
+
+    ,{"mcga", "IBM PC/Clone with MCGA graphics board",
+	   MCGA_XMAX, MCGA_YMAX, MCGA_VCHAR, MCGA_HCHAR,
+	   MCGA_VTIC, MCGA_HTIC, options_null, MCGA_init, MCGA_reset,
+	   MCGA_text, null_scale, MCGA_graphics, MCGA_move, MCGA_vector,
+	   MCGA_linetype, MCGA_put_text, MCGA_text_angle, 
+	   MCGA_justify_text, line_and_point, do_arrow}
+
+    ,{"svga", "IBM PC/Clone with Super VGA graphics board",
+	   SVGA_XMAX, SVGA_YMAX, SVGA_VCHAR, SVGA_HCHAR,
+	   SVGA_VTIC, SVGA_HTIC, options_null, SVGA_init, SVGA_reset,
+	   SVGA_text, null_scale, SVGA_graphics, SVGA_move, SVGA_vector,
+	   SVGA_linetype, SVGA_put_text, SVGA_text_angle, 
+	   SVGA_justify_text, do_point, do_arrow}
 
     ,{"vgalib", "IBM PC/Clone with VGA graphics board",
 	   VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
@@ -543,43 +753,16 @@ struct termentry term_tbl[] = {
 	   VGA_text, null_scale, VGA_graphics, VGA_move, VGA_vector,
 	   VGAMONO_linetype, VGA_put_text, VGA_text_angle, 
 	   VGA_justify_text, line_and_point, do_arrow}
+#else					/* TURBO */
 
-    ,{"svga", "IBM PC/Clone with Super VGA graphics board",
-	   SVGA_XMAX, SVGA_YMAX, SVGA_VCHAR, SVGA_HCHAR,
-	   SVGA_VTIC, SVGA_HTIC, options_null, SVGA_init, SVGA_reset,
-	   SVGA_text, null_scale, SVGA_graphics, SVGA_move, SVGA_vector,
-	   SVGA_linetype, SVGA_put_text, SVGA_text_angle, 
-	   SVGA_justify_text, do_point, do_arrow}
-
-    ,{"mcga", "IBM PC/Clone with MCGA graphics board",
-	   MCGA_XMAX, MCGA_YMAX, MCGA_VCHAR, MCGA_HCHAR,
-	   MCGA_VTIC, MCGA_HTIC, options_null, MCGA_init, MCGA_reset,
-	   MCGA_text, null_scale, MCGA_graphics, MCGA_move, MCGA_vector,
-	   MCGA_linetype, MCGA_put_text, MCGA_text_angle, 
-	   MCGA_justify_text, line_and_point, do_arrow}
-
-    ,{"cga", "IBM PC/Clone with CGA graphics board",
-	   CGA_XMAX, CGA_YMAX, CGA_VCHAR, CGA_HCHAR,
-	   CGA_VTIC, CGA_HTIC, options_null, CGA_init, CGA_reset,
-	   CGA_text, null_scale, CGA_graphics, CGA_move, CGA_vector,
-	   CGA_linetype, CGA_put_text, MCGA_text_angle, 
-	   CGA_justify_text, line_and_point, do_arrow}
-
-    ,{"hercules", "IBM PC/Clone with Hercules graphics board",
-	   HERC_XMAX, HERC_YMAX, HERC_VCHAR, HERC_HCHAR,
-	   HERC_VTIC, HERC_HTIC, options_null, HERC_init, HERC_reset,
-	   HERC_text, null_scale, HERC_graphics, HERC_move, HERC_vector,
-	   HERC_linetype, HERC_put_text, MCGA_text_angle, 
-	   HERC_justify_text, line_and_point, do_arrow}
 #ifdef ATT6300
-    ,{"att", "IBM PC/Clone with AT&T 6300 graphics board",
+    ,{"att", "AT&T PC/6300 graphics",
 	   ATT_XMAX, ATT_YMAX, ATT_VCHAR, ATT_HCHAR,
 	   ATT_VTIC, ATT_HTIC, options_null, ATT_init, ATT_reset,
 	   ATT_text, null_scale, ATT_graphics, ATT_move, ATT_vector,
 	   ATT_linetype, ATT_put_text, ATT_text_angle, 
-	   ATT_justify_text, line_and_point, do_arrow}
+	   null_justify_text, line_and_point, do_arrow}
 #endif
-#else					/* TURBO */
 
     ,{"cga", "IBM PC/Clone with CGA graphics board",
 	   CGA_XMAX, CGA_YMAX, CGA_VCHAR, CGA_HCHAR,
@@ -588,18 +771,20 @@ struct termentry term_tbl[] = {
 	   CGA_linetype, CGA_put_text, CGA_text_angle, 
 	   null_justify_text, line_and_point, do_arrow}
 
+#ifdef CORONA
+    ,{"corona325", "Corona graphics ???",
+	   COR_XMAX, COR_YMAX, COR_VCHAR, COR_HCHAR,
+	   COR_VTIC, COR_HTIC, options_null, COR_init, COR_reset,
+	   COR_text, null_scale, COR_graphics, COR_move, COR_vector,
+	   COR_linetype, COR_put_text, COR_text_angle, 
+	   null_justify_text, line_and_point, do_arrow}
+#endif					/* CORONA */
+
     ,{"egabios", "IBM PC/Clone with EGA graphics board (BIOS)",
 	   EGA_XMAX, EGA_YMAX, EGA_VCHAR, EGA_HCHAR,
 	   EGA_VTIC, EGA_HTIC, options_null, EGA_init, EGA_reset,
 	   EGA_text, null_scale, EGA_graphics, EGA_move, EGA_vector,
 	   EGA_linetype, EGA_put_text, EGA_text_angle, 
-	   null_justify_text, do_point, do_arrow}
-
-    ,{"vgabios", "IBM PC/Clone with VGA graphics board (BIOS)",
-	   VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
-	   VGA_VTIC, VGA_HTIC, options_null, VGA_init, VGA_reset,
-	   VGA_text, null_scale, VGA_graphics, VGA_move, VGA_vector,
-	   VGA_linetype, VGA_put_text, VGA_text_angle, 
 	   null_justify_text, do_point, do_arrow}
 
 #ifdef EGALIB
@@ -620,25 +805,67 @@ struct termentry term_tbl[] = {
 	   null_justify_text, line_and_point, do_arrow}
 #endif					/* HERCULES */
 
-#ifdef ATT6300
-    ,{"att", "AT&T PC/6300 graphics",
-	   ATT_XMAX, ATT_YMAX, ATT_VCHAR, ATT_HCHAR,
-	   ATT_VTIC, ATT_HTIC, options_null, ATT_init, ATT_reset,
-	   ATT_text, null_scale, ATT_graphics, ATT_move, ATT_vector,
-	   ATT_linetype, ATT_put_text, ATT_text_angle, 
-	   null_justify_text, line_and_point, do_arrow}
-#endif
+    ,{"vgabios", "IBM PC/Clone with VGA graphics board (BIOS)",
+	   VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
+	   VGA_VTIC, VGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, VGA_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+	   null_justify_text, do_point, do_arrow}
 
-#ifdef CORONA
-    ,{"corona325", "Corona graphics ???",
-	   COR_XMAX, COR_YMAX, COR_VCHAR, COR_HCHAR,
-	   COR_VTIC, COR_HTIC, options_null, COR_init, COR_reset,
-	   COR_text, null_scale, COR_graphics, COR_move, COR_vector,
-	   COR_linetype, COR_put_text, COR_text_angle, 
-	   null_justify_text, line_and_point, do_arrow}
-#endif					/* CORONA */
 #endif					/* TURBO */
+#endif					/* _Windows */
 #endif					/* PC */
+
+#ifdef __ZTC__		 /* zortech C flashgraphics for 386 */
+	,{"hercules", "IBM PC/Clone with Hercules graphics board",
+	   HERC_XMAX, HERC_YMAX, HERC_VCHAR, HERC_HCHAR,
+	   HERC_VTIC, HERC_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, HERC_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+
+	,{"egamono", "IBM PC/Clone with monochrome EGA graphics board",
+	   EGA_XMAX, EGA_YMAX, EGA_VCHAR, EGA_HCHAR,
+	   EGA_VTIC, EGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, EGAMONO_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+
+	,{"egalib", "IBM PC/Clone with color EGA graphics board",
+	   EGA_XMAX, EGA_YMAX, EGA_VCHAR, EGA_HCHAR,
+	   EGA_VTIC, EGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, EGA_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+
+	,{"vgalib", "IBM PC/Clone with VGA graphics board",
+	   VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
+	   VGA_VTIC, VGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, VGA_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+
+	,{"vgamono", "IBM PC/Clone with monochrome VGA graphics board",
+	   VGA_XMAX, VGA_YMAX, VGA_VCHAR, VGA_HCHAR,
+	   VGA_VTIC, VGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, VGAMONO_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+
+	,{"svgalib", "IBM PC/Clone with VESA Super VGA graphics board",
+	   SVGA_XMAX, SVGA_YMAX, SVGA_VCHAR, SVGA_HCHAR,
+	   SVGA_VTIC, SVGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, SVGA_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+	   VGA_justify_text, do_point, do_arrow}
+
+	,{"ssvgalib", "IBM PC/Clone with VESA 256 color 1024 by 768 super VGA",
+	   SSVGA_XMAX, SSVGA_YMAX, SSVGA_VCHAR, SSVGA_HCHAR,
+	   SSVGA_VTIC, SSVGA_HTIC, options_null, VGA_init, VGA_reset,
+	   VGA_text, null_scale, SSVGA_graphics, VGA_move, VGA_vector,
+	   VGA_linetype, VGA_put_text, VGA_text_angle, 
+       VGA_justify_text, do_point, do_arrow}
+#endif	/* __ZTC__ */
 
 #ifdef AED
     ,{"aed512", "AED 512 Terminal",
@@ -653,6 +880,15 @@ struct termentry term_tbl[] = {
 	   AED_text, null_scale, AED_graphics, AED_move, AED_vector, 
 	   AED_linetype, AED_put_text, null_text_angle, 
 	   null_justify_text, do_point, do_arrow}
+#endif
+
+#ifdef AIFM
+    ,{"aifm", "Adobe Illustrator 3.0 Format",
+	   AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR, 
+	   AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset, 
+	   AI_text, null_scale, AI_graphics, AI_move, AI_vector, 
+	   AI_linetype, AI_put_text, AI_text_angle, 
+	   AI_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef APOLLO
@@ -682,6 +918,15 @@ struct termentry term_tbl[] = {
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef COREL
+    ,{"corel","EPS format for CorelDRAW",
+     CORELD_XMAX, CORELD_YMAX, CORELD_VCHAR, CORELD_HCHAR,
+     CORELD_VTIC, CORELD_HTIC, COREL_options, COREL_init, COREL_reset,
+     COREL_text, null_scale, COREL_graphics, COREL_move, COREL_vector,
+     COREL_linetype, COREL_put_text, COREL_text_angle,
+     COREL_justify_text, do_point, do_arrow}
+#endif
+
 #ifdef CGI
     ,{"cgi", "SCO CGI drivers (requires CGIDISP or CGIPRNT env variable)",
 	   CGI_XMAX, CGI_YMAX, 0, 0, 
@@ -696,6 +941,24 @@ struct termentry term_tbl[] = {
 	   CGI_text, null_scale, CGI_graphics, CGI_move, CGI_vector, 
 	   CGI_linetype, CGI_put_text, CGI_text_angle, 
 	   CGI_justify_text, CGI_point, do_arrow}
+#endif
+
+#ifdef DEBUG
+    ,{"debug", "debugging driver",
+	   DEBUG_XMAX, DEBUG_YMAX, DEBUG_VCHAR, DEBUG_HCHAR,
+	   DEBUG_VTIC, DEBUG_HTIC, options_null, DEBUG_init, DEBUG_reset,
+	   DEBUG_text, null_scale, DEBUG_graphics, DEBUG_move, DEBUG_vector,
+	   DEBUG_linetype, DEBUG_put_text, null_text_angle, 
+	   DEBUG_justify_text, line_and_point, do_arrow}
+#endif
+
+#ifdef DJSVGA
+    ,{"svga", "IBM PC/Clone with Super VGA graphics board",
+	   DJSVGA_XMAX, DJSVGA_YMAX, DJSVGA_VCHAR, DJSVGA_HCHAR,
+	   DJSVGA_VTIC, DJSVGA_HTIC, options_null, DJSVGA_init, DJSVGA_reset,
+	   DJSVGA_text, null_scale, DJSVGA_graphics, DJSVGA_move, DJSVGA_vector,
+	   DJSVGA_linetype, DJSVGA_put_text, null_text_angle, 
+	   null_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef DXF
@@ -726,13 +989,21 @@ struct termentry term_tbl[] = {
 #endif
 
 #ifdef EMTEX
-   
-    ,{"emtex", "LATEX picture environment with emTeX specials",
+    ,{"emtex", "LaTeX picture environment with emTeX specials",
 	   LATEX_XMAX, LATEX_YMAX, LATEX_VCHAR, LATEX_HCHAR, 
-	   LATEX_VTIC, LATEX_HTIC, options_null, EMTEX_init, EMTEX_reset, 
+	   LATEX_VTIC, LATEX_HTIC, LATEX_options, EMTEX_init, EMTEX_reset, 
 	   EMTEX_text, LATEX_scale, LATEX_graphics, LATEX_move, LATEX_vector, 
 	   LATEX_linetype, LATEX_put_text, LATEX_text_angle, 
 	   LATEX_justify_text, LATEX_point, LATEX_arrow}
+#endif
+
+#ifdef EPS180
+    ,{"epson_180dpi", "Epson LQ-style 180-dot per inch (24 pin) printers",
+	   EPS180XMAX, EPS180YMAX, EPSON180VCHAR, EPSON180HCHAR,
+	   EPSON180VTIC, EPSON180HTIC, options_null, EPSONinit, EPSONreset,
+	   EPS180text, null_scale, EPS180graphics, EPSONmove, EPSONvector,
+	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
+	   null_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef EPS60
@@ -753,19 +1024,47 @@ struct termentry term_tbl[] = {
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef EXCL
+    ,{"excl", "Talaris EXCL Laser printer (also Talaris 1590 and others)",
+	   EXCL_XMAX,EXCL_YMAX, EXCL_VCHAR, EXCL_HCHAR, 
+	   EXCL_VTIC, EXCL_HTIC, options_null, EXCL_init,EXCL_reset, 
+	   EXCL_text, null_scale, EXCL_graphics, EXCL_move, EXCL_vector,
+	   EXCL_linetype,EXCL_put_text, null_text_angle, 
+	   null_justify_text, line_and_point, do_arrow}
+#endif
+
+
 #ifdef FIG
-    ,{"fig", "FIG graphics language: SunView or X graphics editor",
+    ,{"fig", "FIG 2.1 graphics language: SunView or X graphics editor",
 	   FIG_XMAX, FIG_YMAX, FIG_VCHAR, FIG_HCHAR, 
-	   FIG_VTIC, FIG_HTIC, options_null, FIG_init, FIG_reset, 
+	   FIG_VTIC, FIG_HTIC, FIG_options, FIG_init, FIG_reset, 
 	   FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector, 
 	   FIG_linetype, FIG_put_text, FIG_text_angle, 
-	   FIG_justify_text, do_point, FIG_arrow}
-    ,{"bfig", "FIG graphics language: SunView or X graphics editor. Large Graph",
+	   FIG_justify_text, line_and_point, FIG_arrow}
+    ,{"bfig", "FIG 2.1 graphics lang: SunView or X graphics editor. Large Graph",
 	   BFIG_XMAX, BFIG_YMAX, BFIG_VCHAR, BFIG_HCHAR, 
-	   BFIG_VTIC, BFIG_HTIC, options_null, FIG_init, FIG_reset, 
+	   BFIG_VTIC, BFIG_HTIC, FIG_options, FIG_init, FIG_reset, 
 	   FIG_text, null_scale, FIG_graphics, FIG_move, BFIG_vector, 
 	   FIG_linetype, BFIG_put_text, FIG_text_angle, 
-	   FIG_justify_text, do_point, BFIG_arrow}
+	   FIG_justify_text, line_and_point, BFIG_arrow}
+#endif
+
+#ifdef GPIC
+    ,{"gpic", "GPIC -- Produce graphs in groff using the gpic preprocessor",
+	   GPIC_XMAX, GPIC_YMAX, GPIC_VCHAR, GPIC_HCHAR, 
+	   GPIC_VTIC, GPIC_HTIC, GPIC_options, GPIC_init, GPIC_reset, 
+	   GPIC_text, GPIC_scale, GPIC_graphics, GPIC_move, GPIC_vector, 
+	   GPIC_linetype, GPIC_put_text, GPIC_text_angle, 
+	   GPIC_justify_text, line_and_point, GPIC_arrow}
+#endif
+
+#ifdef GRASS
+    ,{"grass", "GRASS Graphics Monitor",
+           GRASS_XMAX, GRASS_YMAX, GRASS_VCHAR, GRASS_HCHAR,
+           GRASS_VTIC, GRASS_HTIC, GRASS_options, GRASS_init, GRASS_reset,
+           GRASS_text, null_scale, GRASS_graphics, GRASS_move, GRASS_vector,
+           GRASS_linetype, GRASS_put_text, GRASS_text_angle,
+           GRASS_justify_text, GRASS_point, GRASS_arrow}
 #endif
 
 #ifdef HP26
@@ -773,8 +1072,8 @@ struct termentry term_tbl[] = {
 	   HP26_XMAX, HP26_YMAX, HP26_VCHAR, HP26_HCHAR,
 	   HP26_VTIC, HP26_HTIC, options_null, HP26_init, HP26_reset,
 	   HP26_text, null_scale, HP26_graphics, HP26_move, HP26_vector,
-	   HP26_linetype, HP26_put_text, null_text_angle, 
-	   null_justify_text, line_and_point, do_arrow}
+	   HP26_linetype, HP26_put_text, HP26_text_angle, 
+	   null_justify_text, HP26_line_and_point, do_arrow}
 #endif
 
 #ifdef HP2648
@@ -793,6 +1092,16 @@ struct termentry term_tbl[] = {
 	   HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
 	   HP75_linetype, HPGL_put_text, HPGL_text_angle, 
 	   null_justify_text, do_point, do_arrow}
+#endif
+
+#ifdef HP500C
+      ,{"hp500c", "HP DeskJet 500c, [75 100 150 300] [rle tiff]",
+       HP500C_75PPI_XMAX, HP500C_75PPI_YMAX, HP500C_75PPI_VCHAR,
+       HP500C_75PPI_HCHAR, HP500C_75PPI_VTIC, HP500C_75PPI_HTIC, HP500Coptions,
+       HP500Cinit, HP500Creset, HP500Ctext, null_scale,
+       HP500Cgraphics, HP500Cmove, HP500Cvector, HP500Clinetype,
+       HP500Cput_text, HP500Ctext_angle, null_justify_text, do_point,
+       do_arrow}
 #endif
 
 #ifdef HPGL
@@ -821,19 +1130,13 @@ struct termentry term_tbl[] = {
        do_arrow}
 #endif
 
-#ifdef HPLJIII
-    ,{"hpljiii_port", "HP laserjet iii (using HPGL plot vectors), portrait mode",
-	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
-	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_PORT_init, HPLJIII_reset,
-	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
-	HPGL_linetype, HPGL_put_text, HPGL_text_angle,
-	null_justify_text, do_point, do_arrow}
-     ,{"hpljiii_land", "HP laserjet iii (using HPGL plot vectors), landscape mode",
-	HPGL_XMAX, HPGL_YMAX, HPGL_VCHAR, HPGL_HCHAR,
-	HPGL_VTIC, HPGL_HTIC, options_null, HPLJIII_LAND_init, HPLJIII_reset,
-	HPGL_text, null_scale, HPGL_graphics, HPGL_move, HPGL_vector,
-	HPGL_linetype, HPGL_put_text, HPGL_text_angle,
-	null_justify_text, do_point, do_arrow}
+#ifdef HPPJ
+    ,{"hppj", "HP PaintJet and HP3630 [FNT5X9 FNT9X17 FNT13X25]",
+       HPPJ_XMAX, HPPJ_YMAX,
+       HPPJ_9x17_VCHAR, HPPJ_9x17_HCHAR, HPPJ_9x17_VTIC, HPPJ_9x17_HTIC,
+       HPPJoptions, HPPJinit, HPPJreset, HPPJtext, null_scale, HPPJgraphics,
+       HPPJmove, HPPJvector, HPPJlinetype, HPPJput_text, HPPJtext_angle,
+       null_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef IMAGEN
@@ -855,13 +1158,13 @@ struct termentry term_tbl[] = {
 #endif
 
 #ifdef KERMIT
-    ,{"kc_tek40xx", "Kermit-MS tek40xx terminal emulator - color",
+    ,{"kc_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - color",
 	   TEK40XMAX,TEK40YMAX,TEK40VCHAR, KTEK40HCHAR, 
 	   TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset, 
 	   KTEK40Ctext, null_scale, KTEK40graphics, TEK40move, TEK40vector, 
 	   KTEK40Clinetype, TEK40put_text, null_text_angle, 
 	   null_justify_text, do_point, do_arrow}
-    ,{"km_tek40xx", "Kermit-MS tek40xx terminal emulator - monochrome",
+    ,{"km_tek40xx", "MS-DOS Kermit Tek4010 terminal emulator - monochrome",
 	   TEK40XMAX,TEK40YMAX,TEK40VCHAR, KTEK40HCHAR, 
 	   TEK40VTIC, TEK40HTIC, options_null, TEK40init, KTEK40reset, 
 	   TEK40text, null_scale, KTEK40graphics, TEK40move, TEK40vector, 
@@ -872,39 +1175,55 @@ struct termentry term_tbl[] = {
 #ifdef LATEX
     ,{"latex", "LaTeX picture environment",
 	   LATEX_XMAX, LATEX_YMAX, LATEX_VCHAR, LATEX_HCHAR, 
-	   LATEX_VTIC, LATEX_HTIC, options_null, LATEX_init, LATEX_reset, 
+	   LATEX_VTIC, LATEX_HTIC, LATEX_options, LATEX_init, LATEX_reset, 
 	   LATEX_text, LATEX_scale, LATEX_graphics, LATEX_move, LATEX_vector, 
 	   LATEX_linetype, LATEX_put_text, LATEX_text_angle, 
 	   LATEX_justify_text, LATEX_point, LATEX_arrow}
 #endif
 
 #ifdef LN03P
-     ,{"ln03", "LN03-plus laser printer in tektronix mode",
-	TEK40XMAX, TEK40YMAX, TEK40VCHAR, TEK40HCHAR,
-	TEK40VTIC, TEK40HTIC, options_null, LN03Pinit, LN03Preset,
-	TEK40text, null_scale, TEK40graphics, TEK40move, TEK40vector,
-	TEK40linetype, TEK40put_text, null_text_angle,
+     ,{"ln03", "LN03-plus laser printer in tektronix (EGM) mode",
+	LN03PXMAX, LN03PYMAX, LN03PVCHAR, LN03PHCHAR,
+	LN03PVTIC, LN03PHTIC, options_null, LN03Pinit, LN03Preset,
+	LN03Ptext, null_scale, TEK40graphics, LN03Pmove, LN03Pvector,
+	LN03Plinetype, LN03Pput_text, null_text_angle,
 	null_justify_text, line_and_point, do_arrow}
 #endif
 
-#ifdef NEC
-    ,{"nec_cp6m", "NEC printer CP6, Epson LQ-800 Monochrome",
-	   NECXMAX, NECYMAX, NECVCHAR, NECHCHAR, 
-	   NECVTIC, NECHTIC, options_null, NECinit, NECreset, 
-	   NECtext, null_scale, NECMgraphics, NECmove, NECvector, 
-	   NECMlinetype, NECput_text, NEC_text_angle, 
-	   null_justify_text, line_and_point, do_arrow}
-    ,{"nec_cp6c", "NEC printer CP6 Color",
-	   NECXMAX, NECYMAX, NECVCHAR, NECHCHAR, 
-	   NECVTIC, NECHTIC, options_null, NECinit, NECreset, 
-	   NECtext, null_scale, NECCgraphics, NECmove, NECvector, 
-	   NECClinetype, NECput_text, NEC_text_angle, 
+#ifdef MF
+    ,{"mf", "Metafont plotting standard",
+	   MF_XMAX, MF_YMAX, MF_VCHAR, MF_HCHAR, 
+       MF_VTIC, MF_HTIC, options_null, MF_init, MF_reset, 
+	   MF_text, MF_scale, MF_graphics, MF_move, MF_vector, 
+	   MF_linetype, MF_put_text, MF_text_angle, 
+	   MF_justify_text, line_and_point, MF_arrow}
+#endif
+
+#ifdef MGR
+    ,{"mgr", "Mgr window system",
+	/* dimensions nominal, replaced during MGR_graphics call */
+	   MGR_XMAX, MGR_YMAX, MGR_VCHAR, MGR_HCHAR, 
+	   MGR_VTIC, MGR_HTIC, options_null, MGR_init, MGR_reset, 
+	   MGR_text, null_scale, MGR_graphics, MGR_move, MGR_vector,
+	   MGR_linetype, MGR_put_text, null_text_angle, 
 	   null_justify_text, do_point, do_arrow}
-    ,{"nec_cp6d", "NEC printer CP6, Epson LQ-800 Draft monochrome",
+#endif
+
+#ifdef MIF
+    ,{"mif", "Frame maker MIF 3.00 format",
+      	MIF_XMAX, MIF_YMAX, MIF_VCHAR, MIF_HCHAR, 
+ 	    MIF_VTIC, MIF_HTIC, MIF_options, MIF_init, MIF_reset, 
+	    MIF_text, null_scale, MIF_graphics, MIF_move, MIF_vector, 
+	    MIF_linetype, MIF_put_text, MIF_text_angle, 
+	    MIF_justify_text, line_and_point, do_arrow}
+#endif
+
+#ifdef NEC
+    ,{"nec_cp6", "NEC printer CP6, Epson LQ-800 [monocrome color draft]",
 	   NECXMAX, NECYMAX, NECVCHAR, NECHCHAR, 
-	   NECVTIC, NECHTIC, options_null, NECinit, NECreset, 
-	   NECdraft_text, null_scale, NECMgraphics, NECmove, NECvector, 
-	   NECMlinetype, NECput_text, NEC_text_angle, 
+	   NECVTIC, NECHTIC, NECoptions, NECinit, NECreset, 
+	   NECtext, null_scale, NECgraphics, NECmove, NECvector, 
+	   NEClinetype, NECput_text, NEC_text_angle, 
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
@@ -915,37 +1234,50 @@ struct termentry term_tbl[] = {
 	   NEXT_text, do_scale, NEXT_graphics, NEXT_move, NEXT_vector, 
 	   NEXT_linetype, NEXT_put_text, NEXT_text_angle, 
 	   NEXT_justify_text, NEXT_point, do_arrow}
-#endif /* The postscript driver with NXImage displaying the postscript on screen */
+#endif /* The PostScript driver with NXImage displaying the PostScript on screen */
+
+#ifdef OKIDATA
+    ,{"okidata", "OKIDATA 320/321 Standard",
+	   EPS60XMAX, EPS60YMAX, EPSONVCHAR, EPSONHCHAR,
+	   EPSONVTIC, EPSONHTIC, options_null, EPSONinit, EPSONreset,
+	   OKIDATAtext, null_scale, EPS60graphics, EPSONmove, EPSONvector,
+	   EPSONlinetype, EPSONput_text, EPSON_text_angle,
+	   null_justify_text, do_point, do_arrow}
+#endif
+
+#ifdef OS2PM
+    ,{"pm", "OS/2 Presentation Manager",
+	   PM_XMAX, PM_YMAX, PM_VCHAR, PM_HCHAR, 
+	   PM_VTIC, PM_HTIC, PM_args, PM_init, PM_reset, 
+	   PM_text, null_scale, PM_graphics, PM_move, PM_vector,
+	   PM_linetype, PM_put_text, PM_text_angle, 
+	   PM_justify_text, PM_point, do_arrow}
+#endif
 
 #ifdef PBM
-    ,{"pbm", "Portable bitmap",
+    ,{"pbm", "Portable bitmap [small medium large] [monochrome gray color]",
        PBM_XMAX, PBM_YMAX, PBM_VCHAR,
        PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
        PBMinit, PBMreset, PBMtext, null_scale,
        PBMgraphics, PBMmove, PBMvector, PBMlinetype,
-       PBMput_text, PBMtext_angle, null_justify_text, line_and_point,
+       PBMput_text, PBMtext_angle, null_justify_text, PBMpoint,
        do_arrow}
-    ,{"pgm", "Portable graymap",
-       PBM_XMAX, PBM_YMAX, PBM_VCHAR,
-       PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
-       PBMinit, PBMreset, PGMtext, null_scale,
-       PGMgraphics, PBMmove, PBMvector, PGMlinetype,
-       PBMput_text, PBMtext_angle, null_justify_text, do_point,
-       do_arrow}
-    ,{"ppm", "Portable pixmap (color)",
-       PBM_XMAX, PBM_YMAX, PBM_VCHAR,
-       PBM_HCHAR, PBM_VTIC, PBM_HTIC, PBMoptions,
-       PBMinit, PBMreset, PPMtext, null_scale,
-       PPMgraphics, PBMmove, PBMvector, PPMlinetype,
-       PBMput_text, PBMtext_angle, null_justify_text, do_point,
-       do_arrow}
+#endif
+
+#ifdef PCL
+ ,{"pcl5", "HP LaserJet III [mode] [font] [point]",
+   PCL_XMAX, PCL_YMAX, HPGL2_VCHAR, HPGL2_HCHAR,
+   PCL_VTIC, PCL_HTIC, PCL_options, PCL_init, PCL_reset,
+   PCL_text, null_scale, PCL_graphics, HPGL2_move, HPGL2_vector,
+   HPGL2_linetype, HPGL2_put_text, HPGL2_text_angle,
+   HPGL2_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef POSTSCRIPT
     ,{"postscript", "PostScript graphics language [mode \042fontname\042 font_size]",
 	   PS_XMAX, PS_YMAX, PS_VCHAR, PS_HCHAR, 
 	   PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
-	   PS_text, do_scale, PS_graphics, PS_move, PS_vector, 
+	   PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
 	   PS_linetype, PS_put_text, PS_text_angle, 
 	   PS_justify_text, PS_point, do_arrow}
 #endif
@@ -965,6 +1297,24 @@ struct termentry term_tbl[] = {
 	PRE_justify_text, line_and_point, do_arrow}
 #endif /* PRESCRIBE */
 
+#ifdef PSLATEX
+    ,{"pslatex", "LaTeX picture environment with PostScript \\specials",
+	PS_XMAX, PS_YMAX, PSLATEX_VCHAR, PSLATEX_HCHAR,
+	PS_VTIC, PS_HTIC, PSLATEX_options, PSLATEX_init, PSLATEX_reset,
+	PSLATEX_text, PSLATEX_scale, PSLATEX_graphics, PS_move, PS_vector,
+	PS_linetype, PSLATEX_put_text, PSLATEX_text_angle,
+	PSLATEX_justify_text, PS_point, do_arrow}
+#endif
+
+#ifdef	PSTRICKS
+    ,{"pstricks", "LaTeX picture environment with PSTricks macros",
+	   PSTRICKS_XMAX, PSTRICKS_YMAX, PSTRICKS_VCHAR, PSTRICKS_HCHAR, 
+	   PSTRICKS_VTIC, PSTRICKS_HTIC, options_null, PSTRICKS_init, PSTRICKS_reset, 
+	   PSTRICKS_text, PSTRICKS_scale, PSTRICKS_graphics, PSTRICKS_move, PSTRICKS_vector, 
+	   PSTRICKS_linetype, PSTRICKS_put_text, PSTRICKS_text_angle, 
+	   PSTRICKS_justify_text, PSTRICKS_point, PSTRICKS_arrow}
+#endif
+    
 #ifdef QMS
     ,{"qms", "QMS/QUIC Laser printer (also Talaris 1200 and others)",
 	   QMS_XMAX,QMS_YMAX, QMS_VCHAR, QMS_HCHAR, 
@@ -977,12 +1327,26 @@ struct termentry term_tbl[] = {
 #ifdef REGIS
     ,{"regis", "REGIS graphics language",
 	   REGISXMAX, REGISYMAX, REGISVCHAR, REGISHCHAR, 
-	   REGISVTIC, REGISHTIC, options_null, REGISinit, REGISreset, 
+	   REGISVTIC, REGISHTIC, REGISoptions, REGISinit, REGISreset, 
 	   REGIStext, null_scale, REGISgraphics, REGISmove, REGISvector,
 	   REGISlinetype, REGISput_text, REGIStext_angle, 
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef RGIP
+    ,{"rgip", "RGIP metafile (Uniplex). Option: fontsize (1-8)",
+	   RGIP_XMAX, RGIP_YMAX, RGIP_VCHAR, RGIP_HCHAR,
+	   RGIP_VTIC, RGIP_HTIC, RGIP_options, RGIP_init, RGIP_reset,
+	   RGIP_text, null_scale, RGIP_graphics, RGIP_move,
+	   RGIP_vector, RGIP_linetype, RGIP_put_text, RGIP_text_angle,
+	   RGIP_justify_text, RGIP_do_point, do_arrow}
+    ,{"uniplex", "RGIP metafile (Uniplex). Option: fontsize (1-8)",
+	   RGIP_XMAX, RGIP_YMAX, RGIP_VCHAR, RGIP_HCHAR,
+	   RGIP_VTIC, RGIP_HTIC, RGIP_options, RGIP_init, RGIP_reset,
+	   RGIP_text, null_scale, RGIP_graphics, RGIP_move,
+	   RGIP_vector, RGIP_linetype, RGIP_put_text, RGIP_text_angle,
+	   RGIP_justify_text, RGIP_do_point, do_arrow}
+#endif
 
 #ifdef SELANAR
     ,{"selanar", "Selanar",
@@ -1047,13 +1411,49 @@ struct termentry term_tbl[] = {
 	   null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef TEXDRAW
+    ,{"texdraw", "LaTeX texdraw environment",
+	   TEXDRAW_XMAX, TEXDRAW_YMAX, TEXDRAW_VCHAR, TEXDRAW_HCHAR,
+	TEXDRAW_VTIC, TEXDRAW_HTIC, options_null, TEXDRAW_init, TEXDRAW_reset,
+	TEXDRAW_text, TEXDRAW_scale, TEXDRAW_graphics, TEXDRAW_move, TEXDRAW_vector,
+	TEXDRAW_linetype, TEXDRAW_put_text, TEXDRAW_text_angle,
+	TEXDRAW_justify_text, TEXDRAW_point, TEXDRAW_arrow}
+#endif
+  
+#ifdef TGIF
+    ,{"tgif", "TGIF X-Window draw tool (file version 10)",
+	   TGIF_XMAX, TGIF_YMAX, TGIF_VCHAR1, TGIF_HCHAR1, 
+	   TGIF_VTIC, TGIF_HTIC, options_null, TGIF_init, TGIF_reset, 
+	   TGIF_text, null_scale, TGIF_graphics, TGIF_move, TGIF_vector, 
+	   TGIF_linetype, TGIF_put_text, TGIF_text_angle, 
+	   TGIF_justify_text, line_and_point, TGIF_arrow}
+#endif
+
+#ifdef TPIC
+    ,{"tpic", "TPIC -- LaTeX picture environment with tpic \\specials",
+	   TPIC_XMAX, TPIC_YMAX, TPIC_VCHAR, TPIC_HCHAR, 
+	   TPIC_VTIC, TPIC_HTIC, TPIC_options, TPIC_init, TPIC_reset, 
+	   TPIC_text, TPIC_scale, TPIC_graphics, TPIC_move, TPIC_vector, 
+	   TPIC_linetype, TPIC_put_text, TPIC_text_angle, 
+	   TPIC_justify_text, TPIC_point, TPIC_arrow}
+#endif
+
 #ifdef UNIXPLOT
+#ifdef GNUGRAPH
+    ,{"unixplot", "GNU plot(1) format [\042fontname\042 font_size]",
+	   UP_XMAX, UP_YMAX, UP_VCHAR, UP_HCHAR,
+	   UP_VTIC, UP_HTIC, UP_options, UP_init, UP_reset,
+	   UP_text, null_scale, UP_graphics, UP_move, UP_vector,
+	   UP_linetype, UP_put_text, UP_text_angle,
+	   UP_justify_text, line_and_point, do_arrow}
+#else
     ,{"unixplot", "Unix plotting standard (see plot(1))",
 	   UP_XMAX, UP_YMAX, UP_VCHAR, UP_HCHAR, 
 	   UP_VTIC, UP_HTIC, options_null, UP_init, UP_reset, 
 	   UP_text, null_scale, UP_graphics, UP_move, UP_vector, 
 	   UP_linetype, UP_put_text, null_text_angle, 
 	   null_justify_text, line_and_point, do_arrow}
+#endif /* GNUGRAPH */
 #endif
 	
 #ifdef UNIXPC
@@ -1063,6 +1463,23 @@ struct termentry term_tbl[] = {
 	   uPC_text, null_scale, uPC_graphics, uPC_move, uPC_vector,
 	   uPC_linetype, uPC_put_text, uPC_text_angle, 
 	   null_justify_text, line_and_point, do_arrow}
+#endif
+
+#ifdef EMXVGA
+#ifdef EMXVESA
+    ,{"vesa", "IBM PC/Clone with VESA SVGA graphics board [vesa mode]",
+	   EMXVGA_XMAX, EMXVGA_YMAX, EMXVGA_VCHAR, EMXVGA_HCHAR,
+	   EMXVGA_VTIC, EMXVGA_HTIC, EMXVESA_options, EMXVESA_init, EMXVESA_reset,
+	   EMXVESA_text, null_scale, EMXVESA_graphics, EMXVGA_move, EMXVGA_vector,
+	   EMXVGA_linetype, EMXVGA_put_text, EMXVGA_text_angle, 
+	   null_justify_text, do_point, do_arrow}
+#endif
+    ,{"vgal", "IBM PC/Clone with VGA graphics board",
+	   EMXVGA_XMAX, EMXVGA_YMAX, EMXVGA_VCHAR, EMXVGA_HCHAR,
+	   EMXVGA_VTIC, EMXVGA_HTIC, options_null, EMXVGA_init, EMXVGA_reset,
+	   EMXVGA_text, null_scale, EMXVGA_graphics, EMXVGA_move, EMXVGA_vector,
+	   EMXVGA_linetype, EMXVGA_put_text, EMXVGA_text_angle, 
+	   null_justify_text, do_point, do_arrow}
 #endif
 
 #ifdef V384
@@ -1083,19 +1500,34 @@ struct termentry term_tbl[] = {
        null_justify_text, line_and_point, do_arrow}
 #endif
 
+#ifdef _Windows
+    ,{"windows", "Microsoft Windows",
+	   WIN_XMAX, WIN_YMAX, WIN_VCHAR, WIN_HCHAR, 
+	   WIN_VTIC, WIN_HTIC, WIN_options, WIN_init, WIN_reset, 
+	   WIN_text, WIN_scale, WIN_graphics, WIN_move, WIN_vector,
+	   WIN_linetype, WIN_put_text, WIN_text_angle, 
+	   WIN_justify_text, WIN_point, do_arrow}
+#endif
+
 #ifdef X11
     ,{"x11", "X11 Window System",
 	   X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR, 
 	   X11_VTIC, X11_HTIC, options_null, X11_init, X11_reset, 
 	   X11_text, null_scale, X11_graphics, X11_move, X11_vector, 
 	   X11_linetype, X11_put_text, null_text_angle, 
-	   X11_justify_text, line_and_point, do_arrow}
-    ,{"X11", "X11 Window System - multi-color points",
+	   X11_justify_text, X11_point, do_arrow}
+    ,{"X11", "X11 Window System (identical to x11)",
 	   X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR, 
 	   X11_VTIC, X11_HTIC, options_null, X11_init, X11_reset, 
 	   X11_text, null_scale, X11_graphics, X11_move, X11_vector, 
 	   X11_linetype, X11_put_text, null_text_angle, 
-	   X11_justify_text, do_point, do_arrow}
+	   X11_justify_text, X11_point, do_arrow}
+   ,{"xlib", "X11 Window System (gnulib_x11 dump)",
+	   Xlib_XMAX, Xlib_YMAX, Xlib_VCHAR, Xlib_HCHAR, 
+	   Xlib_VTIC, Xlib_HTIC, options_null, Xlib_init, Xlib_reset, 
+	   Xlib_text, null_scale, Xlib_graphics, Xlib_move, Xlib_vector, 
+	   Xlib_linetype, Xlib_put_text, null_text_angle, 
+	   Xlib_justify_text, line_and_point, do_arrow}
 #endif
 };
 
@@ -1186,13 +1618,21 @@ change_term(name, length)
    The environment variable GNUTERM is checked first; if that does
    not exist, then the terminal hardware is checked, if possible, 
    and finally, we can check $TERM for some kinds of terminals.
+   A default can be set with -DDEFAULTTERM=myterm in the Makefile
+   or #define DEFAULTTERM myterm in term.h
 */
 /* thanks to osupyr!alden (Dave Alden) for the original GNUTERM code */
 init_terminal()
 {
-    char *term_name = NULL;
     int t;
+#ifdef DEFAULTTERM
+	char *term_name = DEFAULTTERM;
+#else
+    char *term_name = NULL;
+#endif /* DEFAULTTERM */
+#if (defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)) || defined(NEXT) || defined(SUN) || defined(X11)
     char *term = NULL;		/* from TERM environment var */
+#endif
 #ifdef X11
     char *display = NULL;
 #endif
@@ -1202,16 +1642,22 @@ init_terminal()
     gnuterm = getenv("GNUTERM");
     if (gnuterm != (char *)NULL) {
 	 term_name = gnuterm;
-#ifdef __TURBOC__
+#ifndef _Windows
+#if defined(__TURBOC__) && defined(MSDOS)
          get_path();   /* So *_init() can find the BGI driver */
+# endif
 #endif
     }
     else {
-#ifdef __TURBOC__
+#if defined(__TURBOC__) && defined(MSDOS) && !defined(_Windows)
 	   term_name = turboc_init();
 	   term = (char *)NULL; /* shut up turbo C */
 #endif
 	   
+#ifdef __ZTC__
+	  term_name = ztc_init();
+#endif
+
 #ifdef vms
 	   term_name = vms_init();
 #endif
@@ -1230,6 +1676,10 @@ init_terminal()
 		term_name = "sun";
 #endif /* sun */
 
+#ifdef _Windows
+		term_name = "win";
+#endif /* _Windows */
+
 #ifdef GPR
    if (gpr_isa_pad()) term_name = "gpr";       /* find out whether stdout is a DM pad. See term/gpr.trm */
 #else
@@ -1246,10 +1696,16 @@ init_terminal()
 	   display = getenv("DISPLAY");
 	   if (term_name == (char *)NULL && display != (char *)NULL)
 		term_name = "x11";
+	   if (X11_Display)
+		term_name = "x11";
 #endif /* x11 */
 
 #ifdef AMIGASCREEN
 	   term_name = "amiga";
+#endif
+
+#ifdef ATARI
+	   term_name = "atari";
 #endif
 
 #ifdef UNIXPC
@@ -1262,11 +1718,33 @@ init_terminal()
 	   if (getenv("CGIDISP") || getenv("CGIPRNT"))
 	     term_name = "cgi";
 #endif /*CGI */
+
+#if defined(MSDOS) && defined(__EMX__)
+#ifdef EMXVESA
+	   term_name = "vesa";
+#else
+	   term_name = "vgal";
+#endif
+#endif
+
+#ifdef DJGPP
+		term_name = "svga";
+#endif
+
+#ifdef GRASS
+        term_name = "grass";
+#endif
+
+#ifdef OS2
+           term_name = "pm" ;
+            /* EMX compiler has getcwd that can return drive */
+           if( PM_path[0]=='\0' ) _getcwd2( PM_path, 256 ) ;
+#endif /*OS2 */           
     }
 
     /* We have a name, try to set term type */
     if (term_name != NULL && *term_name != '\0') {
-	   t = change_term(term_name, strlen(term_name));
+	   t = change_term(term_name, (int)strlen(term_name));
 	   if (t == -1)
 		fprintf(stderr, "Unknown terminal name '%s'\n", term_name);
 	   else if (t == -2)
@@ -1277,7 +1755,8 @@ init_terminal()
 }
 
 
-#ifdef __TURBOC__
+#ifndef _Windows
+#if defined (__TURBOC__) && defined (MSDOS)
 char *
 turboc_init()
 {
@@ -1323,7 +1802,41 @@ turboc_init()
 	fprintf(stderr,"\tTC Graphics, driver %s  mode %s\n",c1,c2);
   return(term_name);
 }
-#endif /* __TURBOC__ */
+# endif /* __TURBOC__ */
+#endif
+
+#if defined(__ZTC__)
+char *
+ztc_init()
+{
+  int g_mode;
+  char *term_name = NULL;
+
+	g_mode = fg_init();
+
+		  switch (g_mode){
+			case FG_NULL	  :  fprintf(stderr,"Graphics card not detected or not supported.\n");
+								 exit(1);
+			case FG_HERCFULL  :  term_name = "hercules";
+								 break;
+			case FG_EGAMONO   :  term_name = "egamono";
+								 break;
+			case FG_EGAECD	  :  term_name = "egalib";
+								 break;
+			case FG_VGA11	  :  term_name = "vgamono";
+								 break;
+			case FG_VGA12	  :  term_name = "vgalib";
+								 break;
+			case FG_VESA6A	  :  term_name = "svgalib";
+								 break;
+			case FG_VESA5	  :  term_name = "ssvgalib";
+								 break;
+			}
+		fg_term();
+  return(term_name);
+}
+#endif /* __ZTC__ */
+
 
 /*
 	This is always defined so we don't have to have command.c know if it
@@ -1366,7 +1879,7 @@ int caller;
 	break;
 	case 3:
 	/* New terminal in use--put stdout back to original. */
-		closepl();
+		/* closepl(); */  /* This is called by the term. */
 		fflush(stdout);
 		*(stdout) = save_stdout;  /* Copy FILE structure */
 		unixplot = 0;
@@ -1471,7 +1984,9 @@ test_term()
 	y = ymax - t->v_char;
 	for ( i = -2; y > t->v_char; i++ ) {
 		(*t->linetype)(i);
-		(void) sprintf(label,"%d",i);
+		/*	(void) sprintf(label,"%d",i);  Jorgen Lippert
+		lippert@risoe.dk */
+		(void) sprintf(label,"%d",i+1);
 		if ((*t->justify_text)(RIGHT))
 			(*t->put_text)(x,y,label);
 		else
@@ -1501,7 +2016,7 @@ test_term()
 }
 
 
-#ifdef PC
+#if defined(MSDOS)||defined(ATARI)||defined(OS2)||defined(_Windows)||defined(DOS386)
 /* output for some terminal types must be binary to stop non Unix computers
    changing \n to \r\n. 
    If the output is not STDOUT, the following code reopens outfile 
@@ -1511,10 +2026,14 @@ reopen_binary()
 {
 char filename[MAX_ID_LEN+1];
 
-	if (strcmp(outstr,"STDOUT")) {
+	if (outfile!=stdout) {
 		(void) fclose(outfile);
 		(void) strcpy(filename,outstr+1);	/* remove quotes */
 		filename[strlen(filename)-1] = '\0';
+#ifdef _Windows
+		if ( !stricmp(outstr,"'PRN'") )
+			(void) strcpy(filename,win_prntmp);	/* use temp file for windows */
+#endif
 		if ( (outfile = fopen(filename,"wb")) == (FILE *)NULL ) {
 			if ( (outfile = fopen(filename,"w")) == (FILE *)NULL ) {
 				os_error("cannot reopen file with binary type; output unknown",
@@ -1525,6 +2044,24 @@ char filename[MAX_ID_LEN+1];
 					NO_CARET);
 			}
 		}
+#if defined(__TURBOC__) && defined(MSDOS)
+#ifndef _Windows
+		if ( !stricmp(outstr,"'PRN'") )
+		{
+		/* Put the printer into binary mode. */
+		union REGS regs;
+			regs.h.ah = 0x44;	/* ioctl */
+			regs.h.al = 0;		/* get device info */
+			regs.x.bx = fileno(outfile);
+			intdos(&regs, &regs);
+			regs.h.dl |= 0x20;	/* binary (no ^Z intervention) */
+			regs.h.dh = 0;
+			regs.h.ah = 0x44;	/* ioctl */
+			regs.h.al = 1;		/* set device info */
+			intdos(&regs, &regs);
+		}
+#endif
+#endif
 	}
 }
 #endif

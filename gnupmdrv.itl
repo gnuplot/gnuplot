@@ -1,0 +1,294 @@
+.imd dialogs.h
+:userdoc.
+#ifdef GENHELP  /**/
+:docprof toc=1.
+#else
+:prolog.
+:title.Gnushell
+:docprof toc=12.
+:eprolog.
+#endif
+
+#ifdef GENHELP
+:h1 res=5. Extended Help
+:p.This program is a display interface for Gnuplot.
+:p.When it starts up, it spawns a new session which contains 
+the :hp2.GNUPLOT:ehp2. program. This new session provides the usual
+Gnuplot command line.
+#endif
+
+#ifndef GENHELP
+:h1. Options Menu
+:p.This section describes the options available from the :hp2.Options:ehp2. menu.
+#endif
+
+#ifdef GENHELP
+:h1 res=&IDM_FILE.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. The options menu
+#endif
+:i1 id=mfile. Options menu
+:i2 refid=mfile. The options menu
+:p.The :hp2.Options:ehp2. menu enables you to change various options on the
+displayed plot, and to control printing of the plot via the OS/2 print
+system.
+
+#ifdef GENHELP
+:h1 res=&IDM_ABOUT..  Help Menu Help
+#endif
+#ifndef GENHELP
+:h2. About 
+#endif
+:i1 id=mabout. Help menu
+:i2 refid=mabout. About 
+:p.The :hp2.About:ehp2. menu item displays the About box, which
+just identifies the program.
+
+#ifdef GENHELP
+:h1 res=&IDM_FONTS.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Font selection 
+#endif
+:i1 id=mfonts. Options menu
+:i2 refid=mfonts. Fonts 
+:p.The :hp2.Fonts:ehp2. menu item from the :hp2.Options:ehp2.
+pulldown menu enables you to change the font used in the displayed plot. 
+:p.You can also 'drag and drop' a font from a Font Palette onto the Gnushell
+window.
+
+#ifdef GENHELP
+:h1 res=&IDM_PRINT.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Print
+#endif
+:i1 id=mprint. Options menu
+:i2 refid=mprint. Print
+:p.The :hp2.Print:ehp2. menu item from the :hp2.Options:ehp2.
+pulldown menu enables you to print the current window on the default
+printer.
+
+#ifdef GENHELP
+:h1 res=&IDM_PRINTSETUP.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Printer selection
+#endif
+:i1 id=mprint. Options menu
+:i2 refid=mprint. Printers
+:p.The :hp2.Printers:ehp2. menu item from the :hp2.Options:ehp2.
+pulldown menu enables you to select the printer to which
+output is directed.
+
+#ifdef GENHELP
+:h1 res=&IDM_LINES.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Line options
+#endif
+:i1 id=mlines. Options menu
+:i2 refid=mlines. Linetype option
+:p.Selecting the :hp2.Lines:ehp2. menu item from the :hp2.Options:ehp2.
+enables you to choose various options for the lines used for the plots.
+
+#ifdef GENHELP
+:h1 res=&IDM_LINES_THICK.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Thick line option
+#endif
+:i1 id=mlinesth. Options menu
+:i2 refid=mlinesth. Thick line option
+:p.Selecting the :hp2.Thick:ehp2. option of the :hp2.Lines:ehp2.
+menu item toggles the :hp2.thick line:ehp2. option on and off.
+The selection is active if the menu item is checked.
+:p.The thick line option can give better output on high-resolution
+devices like laser printers.
+
+#ifdef GENHELP
+:h1 res=&IDM_LINES_SOLID.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Solid Line option
+#endif
+:i1 id=mlinessol. Options menu
+:i2 refid=mlinessol. Solid lines option
+:p.Selecting the :hp2.Solid:ehp2. option of the :hp2.Lines:ehp2.
+menu item toggles the :hp2.solid line:ehp2. option on and off.
+The selection is active if the menu item is checked.
+:p.If the :hp2.Solid:ehp2. option is not active, curves on graphs will be
+plotted in various styles of broken lines. 
+:p.This option can be combined with the :hp2.Colours.:ehp2. option. 
+When a plot is printed on a printer that does not support colour, the 
+:hp2.Solid:ehp2. option is disabled.
+
+#ifdef GENHELP
+:h1 res=&IDM_COLOURS.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Colours
+#endif
+:i1 id=mcolour. Options menu
+:i2 refid=mcolour. Colours
+:p.Selecting the :hp2.Colours:ehp2. menu item from the :hp2.Options:ehp2.
+pulldown menu causes lines used for graphs to be plotted in various
+colours. This is the default option for plotting on the screen.
+It can be combined with the :hp2.Lines:ehp2. option. 
+
+#ifdef GENHELP
+:h1 res=&IDM_PAUSEOPT.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Pause options
+#endif
+:i1 id=mpauseopt. Options menu
+:i2 refid=mpauseopt. Pause option
+:p.Selecting the :hp2.Pause mode:ehp2. menu item from the :hp2.Options:ehp2.
+menu enables you to choose how the Gnuplot 'pause' command is handled.
+
+#ifdef GENHELP
+:h1 res=&IDM_PAUSEDLG.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Pause options
+#endif
+:i1 id=mpausedlg. Options menu
+:i2 refid=mpausedlg. Pause with dialog box
+:p.Selecting the :hp2.Dialog box:ehp2. menu item from the :hp2.Pause options:ehp2.
+menu causes the Gnuplot 'pause' command to print a message in a dialog box,
+and wait for you to end the dialog before continuing.
+
+#ifdef GENHELP
+:h1 res=&IDM_PAUSEBTN.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Pause options
+#endif
+:i1 id=mpausebtn. Options menu
+:i2 refid=mpausebtn. Pause with menu item
+:p.Selecting the :hp2.Menu bar:ehp2. menu item from the :hp2.Pause options:ehp2.
+menu causes the Gnuplot 'pause' command to enable the :hp2.Continue:ehp2.
+menu item. 
+:p.Plotting will be resumed when this item is selected.
+:p.Any text message is ignored.
+
+#ifdef GENHELP
+:h1 res=&IDM_PAUSEGNU.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Pause options
+#endif
+:i1 id=mpausegnu. Options menu
+:i2 refid=mpausegnu. Pause in Gnuplot
+:p.Selecting the :hp2.Gnuplot:ehp2. menu item from the :hp2.Pause options:ehp2.
+menu causes the Gnuplot 'pause' command to be handled by the Gnuplot
+program.
+:p.In order to resume plotting, you will have to select the Gnuplot command line
+window, and press the enter key.
+ 
+
+#ifdef GENHELP
+:h1 res=&IDM_SAVE.. Options Menu Help
+#endif
+#ifndef GENHELP
+:h2. Save option
+#endif
+:i1 id=msave. Options menu
+:i1 refid=msave. gnushell.ini
+:i2 refid=msave. Save settings
+:p.Selecting the :hp2.Save settings:ehp2. menu item from the :hp2.Options:ehp2.
+pulldown menu causes the current line, colour and font options to be saved.
+The positions and sizes of the windows are also saved.
+:p.The data is saved in the file :hp2.gnushell.ini:ehp2. file in the 
+program&csq.s working directory. You can delete the file if you want to restore
+all settings to their default values. (This file is created even if
+no settings are saved.) 
+
+#ifdef GENHELP
+:h1 res=&IDM_COMMAND.. Gnuplot Menu Help
+#endif
+#ifndef GENHELP
+:h2. The Gnuplot menu
+#endif
+:i1 id=mgnu. Gnuplot menu
+:i1 refid=mgnu. Moving to GNUPLOT window
+:p.Selecting the :hp2.Gnuplot:ehp2. menu item causes the GNUPLOT
+command window to be brought to the foreground. The same result can be
+be obtained by pressing the ESC key when the Gnushell window is active.
+
+ 
+#ifdef GENHELP
+:h1 res=&ID_QPRINT.. Printer setup dialog box help
+#else
+:h2. Printer setup
+#endif
+:i1 id=qprint. Printing
+:p.This dialog box enables you to setup the printer.
+:p.The printer that output will be sent to is indicated in the 
+:hp2.Current printer:ehp2. field. You can select a different
+printer by using the :hp2.Printers:ehp2. item of the :hp2.Options:ehp2.
+menu.
+:p.The setup can be selected by clicking on the :hp2.OK:ehp2. button.
+:p.The setup can be cancelled by selecting :hp2.Cancel:ehp2. .
+:p.If your printer driver supports printing to a file, the
+:hp2.Print to file named:ehp2. field will not be greyed out. In this case,
+you may enter a filename here for sending output to a file rather than to 
+a printer. Some printer drivers also support this option from the
+printer setup dialog box accessible with the :hp2.Set printer:ehp2.
+option. You may choose either method. Some printer drivers (e.g. Postscript)
+will not overwrite a file if you use the second method.
+:p.The area of the page in which the plot will be displayed is
+indicated. You can change this by selecting the :hp2.Set Page:ehp2. button.
+You can then adjust the area with the mouse, and click on button 1
+to select the new area. Another way of doing this is by typing
+the appropriate data into the entry windows which give the size of the
+plot area, either in centimeters or relative to the page size. 
+:p.If you wish to adjust the default behaviour of the printer,
+choose the :hp2.Job properties:ehp2. option. This will bring up your
+printer setup dialog box. This is part of the printer driver, and the 
+features you can adjust will depend on your printer. You can generally
+use this to swich between landscape and portrait mode, for instance.
+Note that some drivers might not have any options.
+ 
+#ifdef GENHELP
+:h1 res=&IDD_QUERYPRINT.. Printer selection dialog box help
+#else
+:h2. Printer selection
+#endif
+:i1 id=qprinters. Printing
+:p.This dialog box enables you to select the printer on which
+your output will appear.
+:p.Choose a printer from the displayed list. The chosen printer
+is highlighted.
+:p.The printer is selected by clicking on the :hp2.OK:ehp2. button.
+:p.The new selection is ignored by selecting :hp2.Cancel:ehp2. .
+
+#ifdef GENHELP
+:h1 res=&IDD_PAUSEBOX.. Pause dialog box help
+#else
+:h2. Puase
+#endif
+:i1 id=pausebox. Pause
+:p.This dialog box is (optionally) displayed when a 
+'pause -1 <text>' command is issued to Gnuplot.
+Plotting is paused until you:
+:p.Select :hp2.Continue:ehp2. to resume plotting.
+:p.Select :hp2.Cancel:ehp2. to cancel plotting and return to the Gnuplot
+command line.
+
+#ifdef GENHELP
+:h1 res=&IDD_FONTS.. Fonts dialog box help
+#else
+:h2. Font selection
+#endif
+:i1 id=fonts. Font selection
+:p.This dialog box enables you to change the font used on the displayed plot.
+:p.The font is selected by clicking on the :hp2.OK:ehp2. button.
+:p.The new selection is ignored by selecting :hp2.Cancel:ehp2. .
+:p.Choose a font from the displayed list. The chosen font
+is previwed in the :hp2.Example:ehp2. window.
+ 
+
+:euserdoc.

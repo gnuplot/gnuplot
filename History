@@ -1,49 +1,10 @@
 
-		     GNUPLOT 3.2 RELEASE NOTES
-
-This describes changes to gnuplot since version 3.0.
-
-Highlights: 
------------
-Version 3.1 (also known as version 3.0, patchlevel 1) was a bugfix
-release.  In particular, it corrected the y logscale error.
-Version 3.2 also fixes a number of bugs but contains two major
-changes.  The X11 support, in particular, gnuplot_x11.c was completely
-rewritten to rely solely on X11 intrinsics and no widget libraries.
-This should hopefully make it more portable.  The other major change
-is hidden line removal for explicit 3D surfaces.  
-
-This release was deliberately limited in scope in order to
-release a new X11 driver and have some hidden line removal capability
-quickly.  Version 3.3 will be a much larger modification.
-
-
-                            ACKNOWLEDGEMENTS
-
-- New generic gnuplot_x11.c, Ed Kubatis <ejk@ux2.ncsa.uiuc.edu>
-- Hidden Line Removal for Explicit Surfaces and IRIX 4.0 fixes,
-  Gershon Elber <gershon@gr.utah.edu>
-- Table Terminal Driver, Kevin Russo <russo@rudedog.nrl.navy.mil>
-- PCL5 driver fixes (HPGL page eject),datafile pipe and README,
-  Alex Woo <woo@ames.arc.nasa.gov>
-- Pbmplus driver & fix to ylog tics, Put FAR pointers in bitmap.c and bitmap.h
-  Russell Lang <rjl@monu1.cc.monash.edu.au>
-- NeXT Console Driver, Nick Strobel <strobel@phast.phys.washington.edu>
-- Fix GNUTERM environment with disk resident BGI drivers,
-  Craig Johnston <johnston@maxwell.ee.washington.edu>
-- Fix tables for troff in doc2ms, Michael Schuh <schuh@ames.arc.nasa.gov>
-- Fix dump when GNUPLOT$HELP undefined, 
-  Wolfgang J. Moeller <moeller@gwdgv1.dnet.gwdg.de>
-- Fix AMIGA segment limits, Carsten Steger <stegerc@informatik.tu-muenchen.de>
-- Bug fix to latex.trm, Rob Cunningham <rkc@xn.ll.mit.edu>
-
-=========================================================================
-		     GNUPLOT 3.0 RELEASE NOTES
+                     GNUPLOT 3.0 RELEASE NOTES
 
 This describes changes to gnuplot since version 2.02 (ie, 2.0
-patchlevel 2). 
+patchlevel 2).
 
-Highlights: 
+Highlights:
 -----------
 Gnuplot now handles surfaces as well. A new command names 'splot' (for
 surface plot) has been added for that purpose. A number of new 'set'
@@ -65,7 +26,7 @@ New 'using x:y{:z}' format (NOT COMPATIBLE WITH GNUPLOT 2.02).
 
 Data file plotting (for both curves and surfaces) does not require
 setting samples (and isosamples for surfaces) any more. Size is
-increased on the fly, without affecting the sample rate of functions. 
+increased on the fly, without affecting the sample rate of functions.
 
 New makefile scheme for unix, that supports lots of flavors.
 
@@ -89,7 +50,7 @@ A 'gnuplot' mode for emacs in the file gnuplot.el.
 
 SGI device was improved.
 
-New option to 'set arrow' called 'nohead'. 
+New option to 'set arrow' called 'nohead'.
 
 List of all new commands:
 -------------------------
@@ -144,7 +105,7 @@ Alex Woo (woo@ra-next.arc.nasa.gov).
 - XDF device by Florian Hiss (fhis1231@w204zrz.zrz.tu-berlin.de).
 - HP Desk Jet device, overlay support for BCC and more efficient help
 and pc.trm for MSDOS by Maurice Castro and Russell Lang
-(rjl@monu1.cc.monash.edu.au). 
+(rjl@monu1.cc.monash.edu.au).
 - New makefile scheme by Roque Donizete De Oliveira and David Kotz
 (oliveria@caen.engin.umich.edu and David.Kotz@Dartmouth.edu).
 - The 3d extensions, contouring, Super VGA device, and bringing this new
@@ -173,9 +134,9 @@ Beta testers:
 
                      GNUPLOT 2.0 RELEASE NOTES
 
-New terminal drivers: ATT6300, Roland DXY800A, EEPIC, emTeX, EPSON LX-800, 
-EPSON 60dpi, Fig, HP2648, HPGL, HP LaserJet, Imagen, Kermit-MS Tektronix 
-emulator, LaTeX, MCGA, NEC CP6 pinwriter, POSTSCRIPT, Proprinter, Star color 
+New terminal drivers: ATT6300, Roland DXY800A, EEPIC, emTeX, EPSON LX-800,
+EPSON 60dpi, Fig, HP2648, HPGL, HP LaserJet, Imagen, Kermit-MS Tektronix
+emulator, LaTeX, MCGA, NEC CP6 pinwriter, POSTSCRIPT, Proprinter, Star color
 printer, Tandy DMP-130, Tektronix 410x, SUN, VGA, X11.
 
 Additions:
@@ -189,13 +150,13 @@ the key.  The 'with' option can now specify line type and point type.
 
 Command 'pause'.
 
-Command 'replot' allows the addition of extra plots. 
+Command 'replot' allows the addition of extra plots.
 
 Command 'save' now saves all the 'set' options, including the last
 plot command.
 
 Command 'set autoscale' now accepts autoscaling on the x axis for data
-files. The default is autoscaling on both axes. 
+files. The default is autoscaling on both axes.
 
 Command 'set noclip' disables clipping of points near the border. 'set
 clip' reenables clipping. The default used to be 'clip', and is now
@@ -206,15 +167,15 @@ Formerly, the line stopped at the last in-range data point.
 Numerical labelling at tic marks on x and y axes.  Command 'set
 format' allows the format of the tic mark labels to be altered.
 Commands 'set xtics' and 'set ytics' allow for alphanumeric labels and
-arbitrary tic positions. 
+arbitrary tic positions.
 
 Command 'set grid' adds a grid between the tic marks.
 
 Improved key gives sample point or line types.  Key can be disabled
-with the 'set nokey'. Key can be positioned anywhere. 
+with the 'set nokey'. Key can be positioned anywhere.
 
 Command 'set label' allows the placement of arbitrary text labels and
-arrows. 
+arrows.
 
 Command 'set polar' for polar plots.
 
@@ -259,7 +220,7 @@ compile with the above additions!
 
 Bug fixes include:
 ------------------
-Bug involving functions plotted on a logarithmic x axis is fixed. 
+Bug involving functions plotted on a logarithmic x axis is fixed.
 
 Errors inside of loaded files now clean up and close files properly.
 
@@ -269,7 +230,7 @@ Tics are now place inside the borders (some were outside).
 
 Reverse axes now work properly.
 
-Command 'set output ""' used to crash.  
+Command 'set output ""' used to crash.
 
 VMS was closing stdout, so 'set output' code changed to avoid closing
 it.  VMS version of gnuplot now performs a SET TERM/NOWRAP itself.
@@ -286,15 +247,15 @@ The Unix PC, polar, pause, and offset additions were by John Campbell.
 (CAMPBELL@NAUVAX.bitnet)
 The Turbo C additions were by Bill Wilson.
 (WILSON@NAUVAX.bitnet)
-Some of the labelling improvements and combining of these additions 
+Some of the labelling improvements and combining of these additions
 were by Russell Lang.
 (rjl@monu1.cc.monash.oz.au)
 The LaTeX driver, the help system, and some of the labelling
-improvements were by David Kotz. 
+improvements were by David Kotz.
 (David.Kotz@Dartmouth.edu)
 And of course, the vast majority of the program is by Colin Kelley
 and Thomas Williams.
-(info-gnuplot@ames.arc.nasa.gov)
+(info-gnuplot@dartmouth.edu)
 
 =======================================================================
 
@@ -318,7 +279,7 @@ ternary operator (?:) also does not evaluate the unused operand.  This
 change allows for the definition of recursive functions, e.g. a
 synonym for the ! factorial operator:
 
-	fact(x) = (x<=1) ? 1 : x*fact(x-1)
+        fact(x) = (x<=1) ? 1 : x*fact(x-1)
 
 GNUPLOT now has a much better memory allocation scheme, replacing most
 fixed-size arrays with malloc()'d linked lists.  There is no longer

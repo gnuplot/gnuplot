@@ -1,10 +1,11 @@
 /*
- * $Id: eepic.trm,v 3.26 92/03/24 22:34:51 woo Exp Locker: woo $
+ * $Id: eepic.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT - eepic.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -26,7 +27,7 @@
  * AUTHORS
  *   David Kotz
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 /*
@@ -66,7 +67,7 @@ static int eepic_angle=0;
 
 /* POINTS */
 #define EEPIC_POINT_TYPES 12	/* we supply more point types */
-static char *EEPIC_points[] = {
+static char GPFAR * GPFAR EEPIC_points[] = {
     "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Diamond$}}",
     "\\makebox(0,0){$+$}",
     "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Box$}}",
@@ -79,7 +80,7 @@ static char *EEPIC_points[] = {
 
 /* LINES */
 #define EEPIC_NUMLINES 5		/* number of linetypes below */
-static char *EEPIC_lines[] = {
+static char GPFAR * GPFAR EEPIC_lines[] = {
     "\\thicklines \\path",			/* -2 border */
     "\\thinlines \\drawline[-50]",		/* -1 axes */
     "\\thinlines \\path",			/*  0 solid thin  */
@@ -94,7 +95,7 @@ static char *EEPIC_lines[] = {
     "\\thinlines \\dashline[-10]{20}[6]"
 */
 static int EEPIC_type;		/* current line type */
-static BOOLEAN EEPIC_inline = FALSE; /* are we in the middle of a line */
+static TBOOLEAN EEPIC_inline = FALSE; /* are we in the middle of a line */
 static void EEPIC_endline();	/* terminate any line in progress */
 static int EEPIC_linecount = 0; /* number of points in line so far */
 #define EEPIC_LINEMAX 50		/* max value for linecount */
@@ -218,7 +219,7 @@ EEPIC_endline()
 
 EEPIC_arrow(sx,sy, ex,ey, head)
 	int sx,sy, ex,ey;
-	BOOLEAN head;
+	TBOOLEAN head;
 {
     best_latex_arrow(sx,sy, ex,ey, 2, head); /* call latex routine */
 

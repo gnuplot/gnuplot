@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 3.26 92/03/24 22:34:25 woo Exp Locker: woo $";
+static char *RCSid = "$Id: graphics.c%v 3.50.1.9 1993/08/05 05:38:59 woo Exp $";
 #endif
+
 
 /* GNUPLOT - graphics.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -29,32 +30,52 @@ static char *RCSid = "$Id: graphics.c,v 3.26 92/03/24 22:34:25 woo Exp Locker: w
  *
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ *
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
+#if !defined(u3b2)
 #include <time.h>
+#endif
 #include "plot.h"
 #include "setshow.h"
 
+#if defined(DJGPP)||defined(sun386)
+#define time_t unsigned long
+#endif
+
+#ifndef AMIGA_SC_6_1
 extern char *strcpy(),*strncpy(),*strcat(),*ctime();
+#endif /* !AMIGA_SC_6_1 */
 char *tdate;
 #ifdef AMIGA_AC_5
 time_t dated;
 #else
-#ifdef VMS
-time_t dated,time();
-#else
-long dated,time();
+#if defined(apollo) || defined(sequent) || defined(u3b2) || defined(alliant) || defined(sun386)
+#include <sys/types.h> /* typedef long time_t; */
 #endif
+time_t dated; /* ,time(); */
+#include <time.h>
 #endif
 
 void plot_impulses();
@@ -62,8 +83,13 @@ void plot_lines();
 void plot_points();
 void plot_dots();
 void plot_bars();
+void plot_boxes();
 void edge_intersect();
-BOOLEAN two_edge_intersect();
+TBOOLEAN two_edge_intersect();
+
+void plot_steps();			/* JG */
+void edge_intersect_steps();     	/* JG */
+TBOOLEAN two_edge_intersect_steps();	/* JG */
 
 /* for plotting error bars */
 #define ERRORBARTIC (t->h_tic/2) /* half the width of error bar tic mark */
@@ -109,28 +135,30 @@ static double xscale, yscale;
  */
 #ifndef sun386
 /* (DFK) Use 10^x if logscale is in effect, else x */
-#define CheckLog(log, x) ((log) ? pow(10., (x)) : (x))
+#define CheckLog(is_log, base_log, x) ((is_log) ? pow(base_log, (x)) : (x))
 #else
 static double
-CheckLog(log, x)
-     BOOLEAN log;
+CheckLog(is_log, base_log, x)
+     TBOOLEAN is_log;
+     double base_log;
      double x;
 {
-  if (log)
-    return(pow(10., x));
+  if (is_log)
+    return(pow(base_log, x));
   else
     return(x);
 }
 #endif /* sun386 */
 
 double
-LogScale(coord, islog, what, axis)
+LogScale(coord, is_log, log_base_log, what, axis)
 	double coord;			/* the value */
-	BOOLEAN islog;			/* is this axis in logscale? */
+	TBOOLEAN is_log;			/* is this axis in logscale? */
+        double log_base_log;		/* if so, the log of its base */
 	char *what;			/* what is the coord for? */
 	char *axis;			/* which axis is this for ("x" or "y")? */
 {
-    if (islog) {
+    if (is_log) {
 	   if (coord <= 0.0) {
 		  char errbuf[100];		/* place to write error message */
 		(void) sprintf(errbuf,"%s has %s coord of %g; must be above 0 for log scale!",
@@ -139,7 +167,7 @@ LogScale(coord, islog, what, axis)
 		  (void) fflush(outfile);
 		  int_error(errbuf, NO_CARET);
 	   } else
-		return(log10(coord));
+		return(log(coord)/log_base_log);
     }
     return(coord);
 }
@@ -147,13 +175,29 @@ LogScale(coord, islog, what, axis)
 /* borders of plotting area */
 /* computed once on every call to do_plot */
 boundary(scaling)
-	BOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
+	TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
 {
     register struct termentry *t = &term_tbl[term];
-    xleft = (t->h_char)*12;
+    /* luecken@udel.edu modifications 
+       sizes the plot according to the presence of labels, title,... */
+    if (strlen(ylabel) == 0)
+        xleft = (t->h_char)*8;
+    else
+        xleft = (t->h_char)*10;
     xright = (scaling ? 1 : xsize) * (t->xmax) - (t->h_char)*2 - (t->h_tic);
-    ybot = (t->v_char)*7/2 + 1;
-    ytop = (scaling ? 1 : ysize) * (t->ymax) - (t->v_char)*5/2 - 1;
+    if ((strlen(xlabel) != 0) || timedate)
+        if ((*t->text_angle)(1))
+            ybot = (t->v_char)*5/2 + 1;
+        else
+            ybot = (t->v_char)*7/2 + 1;	/* allow space for time at bottom */
+    else
+        ybot = (t->v_char)*3/2 + 1;
+    if ( (strlen(title) != 0) || timedate ||
+      ((strlen(ylabel) != 0) && ((*t->text_angle)(1) == FALSE)) )
+        ytop = (scaling ? 1 : ysize) * (t->ymax) - (t->v_char)*3/2 - 1;
+    else
+        ytop = (scaling ? 1 : ysize) * (t->ymax) - (t->v_char)/2 - 1;
+    (void)(*t->text_angle)(0);
 }
 
 
@@ -172,9 +216,10 @@ double val;
 }
 
 
-double make_tics(tmin,tmax,logscale)
+double make_tics(tmin,tmax,logscale,base_log)
 double tmin,tmax;
-BOOLEAN logscale;
+TBOOLEAN logscale;
+double base_log;
 {
 register double xr,xnorm,tics,tic,l10;
 
@@ -182,7 +227,7 @@ register double xr,xnorm,tics,tic,l10;
 	
 	l10 = log10(xr);
 	if (logscale) {
-		tic = dbl_raise(10.0,(l10 >= 0.0 ) ? (int)l10 : ((int)l10-1));
+		tic = dbl_raise(base_log,(l10 >= 0.0 ) ? (int)l10 : ((int)l10-1));
 		if (tic < 1.0)
 			tic = 1.0;
 	} else {
@@ -213,7 +258,8 @@ register int xl, yl;
 double xtemp, ytemp;
 struct text_label *this_label;
 struct arrow_def *this_arrow;
-BOOLEAN scaling;
+TBOOLEAN scaling;
+
 
 /* store these in variables global to this file */
 /* otherwise, we have to pass them around a lot */
@@ -249,7 +295,7 @@ BOOLEAN scaling;
 
 /* SETUP RANGES, SCALES AND TIC PLACES */
     if (ytics && yticdef.type == TIC_COMPUTED) {
-	   ytic = make_tics(y_min,y_max,log_y);
+	   ytic = make_tics(y_min,y_max,is_log_y,base_log_y);
     
 	   if (autoscale_ly) {
 		  if (y_min < y_max) {
@@ -264,7 +310,7 @@ BOOLEAN scaling;
     }
 
     if (xtics && xticdef.type == TIC_COMPUTED) {
-	   xtic = make_tics(x_min,x_max,log_x);
+	   xtic = make_tics(x_min,x_max,is_log_x,base_log_x);
 	   
 	   if (autoscale_lx) {
 		  if (x_min < x_max) {
@@ -289,11 +335,7 @@ BOOLEAN scaling;
 		term_init = TRUE;
 	}
 	screen_ok = FALSE;
-#ifdef AMIGA_LC_5_1
-     scaling = (*t->scale)((double)xsize, (double)ysize);
-#else
-     scaling = (*t->scale)(xsize, ysize);
-#endif
+	scaling = (*t->scale)(xsize, ysize);
 	(*t->graphics)();
 
      /* now compute boundary for plot (xleft, xright, ytop, ybot) */
@@ -312,12 +354,14 @@ BOOLEAN scaling;
 		xaxis_y = ybot;				/* save for impulse plotting */
 	else if (xaxis_y >= ytop)
 		xaxis_y = ytop ;
-	else if (xzeroaxis && !log_y) {
+	else if (xzeroaxis && !is_log_y) {
 		(*t->move)(xleft,xaxis_y);
 		(*t->vector)(xright,xaxis_y);
+	} else if (is_log_y){
+		xaxis_y = ybot;
 	}
 
-	if (yzeroaxis && !log_x && yaxis_x >= xleft && yaxis_x < xright ) {
+	if (yzeroaxis && !is_log_x && yaxis_x >= xleft && yaxis_x < xright ) {
 		(*t->move)(yaxis_x,ybot);
 		(*t->vector)(yaxis_x,ytop);
 	}
@@ -340,6 +384,14 @@ BOOLEAN scaling;
 
 			  break;
 		   }
+		    case TIC_MONTH:{
+			draw_month_ytics();
+			break;
+		    }
+		    case TIC_DAY: {
+			draw_day_ytics();
+			break;
+		    }
 		   case TIC_SERIES: {
 			  draw_series_ytics(yticdef.def.series.start, 
 							yticdef.def.series.incr, 
@@ -374,6 +426,14 @@ BOOLEAN scaling;
 
 			  break;
 		   }
+		    case TIC_MONTH: {
+			draw_month_xtics();
+			break;
+		    }
+		    case TIC_DAY : {
+			draw_day_xtics();
+			break;
+		    }
 		   case TIC_SERIES: {
 			  draw_series_xtics(xticdef.def.series.start, 
 							xticdef.def.series.incr, 
@@ -464,33 +524,26 @@ BOOLEAN scaling;
 
 		x = time_xoffset * t->h_char;
 		y = time_yoffset * t->v_char;
-		dated = time( (long *) 0);
+		dated = time( (time_t *) 0);
 		tdate = ctime( &dated);
 		tdate[24]='\0';
+		(void)(*t->justify_text)(LEFT);
 		if ((*t->text_angle)(1)) {
-			if ((*t->justify_text)(CENTRE)) {
-				(*t->put_text)(x+(t->v_char),
-						 y+ybot+4*(t->v_char), tdate);
-			}
-			else {
-				(*t->put_text)(x+(t->v_char),
-						 y+ybot+4*(t->v_char)-(t->h_char)*strlen(ylabel)/2, 
-						 tdate);
-			}
+			(void)(*t->text_angle)(0);
+			(*t->put_text)(x, y+ytop+(t->v_char), tdate);
 		}
 		else {
-			(void)(*t->justify_text)(LEFT);
+			(void)(*t->text_angle)(0);
 			(*t->put_text)(x,
 						 y+ybot-3*(t->v_char), tdate);
 		}
-		(void)(*t->text_angle)(0);
 	}
 
 /* PLACE LABELS */
     for (this_label = first_label; this_label!=NULL;
 			this_label=this_label->next ) {
-	     xtemp = LogScale(this_label->x, log_x, "label", "x");
-	     ytemp = LogScale(this_label->y, log_y, "label", "y");
+	     xtemp = LogScale(this_label->x, is_log_x, log_base_log_x, "label", "x");
+	     ytemp = LogScale(this_label->y, is_log_y, log_base_log_y, "label", "y");
 		if ((*t->justify_text)(this_label->pos)) {
 			(*t->put_text)(map_x(xtemp),map_y(ytemp),this_label->text);
 		}
@@ -518,10 +571,10 @@ BOOLEAN scaling;
     (*t->linetype)(0);	/* arrow line type */
     for (this_arrow = first_arrow; this_arrow!=NULL;
 	    this_arrow = this_arrow->next ) {
-	   int sx = map_x(LogScale(this_arrow->sx, log_x, "arrow", "x"));
-	   int sy = map_y(LogScale(this_arrow->sy, log_y, "arrow", "y"));
-	   int ex = map_x(LogScale(this_arrow->ex, log_x, "arrow", "x"));
-	   int ey = map_y(LogScale(this_arrow->ey, log_y, "arrow", "y"));
+	   int sx = map_x(LogScale(this_arrow->sx, is_log_x, log_base_log_x, "arrow", "x"));
+	   int sy = map_y(LogScale(this_arrow->sy, is_log_y, log_base_log_y, "arrow", "y"));
+	   int ex = map_x(LogScale(this_arrow->ex, is_log_x, log_base_log_x, "arrow", "x"));
+	   int ey = map_y(LogScale(this_arrow->ey, is_log_y, log_base_log_y, "arrow", "y"));
 	   
 	   (*t->arrow)(sx, sy, ex, ey, this_arrow->head);
     }
@@ -533,14 +586,20 @@ BOOLEAN scaling;
 	    yl = ytop - (t->v_tic) - (t->v_char);
 	}
 	if (key == 1) {
-	    xl = map_x( LogScale(key_x, log_x, "key", "x") );
-	    yl = map_y( LogScale(key_y, log_y, "key", "y") );
+	    xl = map_x( LogScale(key_x, is_log_x, log_base_log_x, "key", "x") );
+	    yl = map_y( LogScale(key_y, is_log_y, log_base_log_y, "key", "y") );
 	}
 
 	this_plot = plots;
 	for (curve = 0; curve < pcount; this_plot = this_plot->next_cp, curve++) {
+		int oldkey = key;
+
 		(*t->linetype)(this_plot->line_type);
-		if (key != 0) {
+
+		if (this_plot->title && !*this_plot->title) {
+		    key = 0;
+		} else {
+		if (key != 0 && this_plot->title) {
 			if ((*t->justify_text)(RIGHT)) {
 				(*t->put_text)(xl,
 					yl,this_plot->title);
@@ -552,10 +611,11 @@ BOOLEAN scaling;
 							 yl,this_plot->title);
 			}
 		}
+		}
 
 		switch(this_plot->plot_style) {
 		    case IMPULSES: {
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->move)(xl+(t->h_char),yl);
 				  (*t->vector)(xl+4*(t->h_char),yl);
 			   }
@@ -563,15 +623,23 @@ BOOLEAN scaling;
 			   break;
 		    }
 		    case LINES: {
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->move)(xl+(int)(t->h_char),yl);
 				  (*t->vector)(xl+(int)(4*(t->h_char)),yl);
 			   }
 			   plot_lines(this_plot);
 			   break;
 		    }
-		    case POINTS: {
-			   if (key != 0) {
+/* JG */	    case STEPS: {
+			   if (key != 0 && this_plot->title) {
+				  (*t->move)(xl+(int)(t->h_char),yl);
+				  (*t->vector)(xl+(int)(4*(t->h_char)),yl);
+			   }
+			   plot_steps(this_plot);
+			   break;
+		    }
+		    case POINTSTYLE: {
+			   if (key != 0 && this_plot->title) {
 				  (*t->point)(xl+2*(t->h_char),yl,
 						    this_plot->point_type);
 			   }
@@ -580,14 +648,14 @@ BOOLEAN scaling;
 		    }
 		    case LINESPOINTS: {
 			   /* put lines */
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->move)(xl+(t->h_char),yl);
 				  (*t->vector)(xl+4*(t->h_char),yl);
 			   }
 			   plot_lines(this_plot);
 
 			   /* put points */
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->point)(xl+2*(t->h_char),yl,
 						    this_plot->point_type);
 			   }
@@ -595,22 +663,22 @@ BOOLEAN scaling;
 			   break;
 		    }
 		    case DOTS: {
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->point)(xl+2*(t->h_char),yl, -1);
 			   }
 			   plot_dots(this_plot);
 			   break;
 		    }
 		    case ERRORBARS: {
-			   if (key != 0) {
+			   if (key != 0 && this_plot->title) {
 				  (*t->point)(xl+2*(t->h_char),yl,
 						    this_plot->point_type);
 			   }
 			   plot_points(this_plot);
 
-			   /* for functions, just like POINTS */
+			   /* for functions, just like POINTSTYLE */
 			   if (this_plot->plot_type == DATA) {
-				  if (key != 0) {
+				  if (key != 0 && this_plot->title) {
 					 (*t->move)(xl+(t->h_char),yl);
 					 (*t->vector)(xl+4*(t->h_char),yl);
 					 (*t->move)(xl+(t->h_char),yl+ERRORBARTIC);
@@ -622,8 +690,32 @@ BOOLEAN scaling;
 			   }
 			   break;
 		    }
+			case BOXERROR: {
+			   if (this_plot->plot_type == DATA) {
+				  if (key != 0 && this_plot->title) {
+					 (*t->move)(xl+(t->h_char),yl+ERRORBARTIC);
+					 (*t->vector)(xl+(t->h_char),yl-ERRORBARTIC);
+					 (*t->move)(xl+4*(t->h_char),yl+ERRORBARTIC);
+					 (*t->vector)(xl+4*(t->h_char),yl-ERRORBARTIC);
+				  }
+				  plot_bars(this_plot);
+			   }
+			}
+			/* no break */
+		    case BOXES: {
+			   if (key != 0 && this_plot->title) {
+				  (*t->move)(xl+(t->h_char),yl);
+				  (*t->vector)(xl+4*(t->h_char),yl);
+			   }
+			   plot_boxes(this_plot,xaxis_y);
+			   break;
+		    }
+
 		}
-		yl = yl - (t->v_char);
+		if (key && this_plot->title) {
+		    yl = yl - (t->v_char);
+		}
+		key = oldkey;
 	}
 	(*t->text)();
 	(void) fflush(outfile);
@@ -744,6 +836,78 @@ plot_lines(plot)
     }
 }
 
+/* XXX - JG  */
+/* plot_steps:				
+ * Plot the curves in STEPS style
+ */
+void
+plot_steps(plot)
+struct curve_points *plot;
+{
+    int i;				/* point index */
+    int x,y;				/* point in terminal coordinates */
+    struct termentry *t = &term_tbl[term];
+    enum coord_type prev = UNDEFINED;	/* type of previous point */
+    double ex, ey;			/* an edge point */
+    double lx[2], ly[2];		/* two edge points */
+    int xprev, yprev;			/* previous point coordinates */
+
+    for (i = 0; i < plot->p_count; i++) {
+	   switch (plot->points[i].type) {
+		  case INRANGE: {
+			 x = map_x(plot->points[i].x);
+			 y = map_y(plot->points[i].y);
+
+			 if (prev == INRANGE) {
+				(*t->vector)(x,yprev);
+				(*t->vector)(x,y);
+			 } else if (prev == OUTRANGE) {
+				/* from outrange to inrange */
+				if (!clip_lines1) {
+				    (*t->move)(x,y);
+				} else {		/* find edge intersection */
+				    edge_intersect_steps(plot->points, i, &ex, &ey);
+				    (*t->move)(map_x(ex), map_y(ey));
+				    (*t->vector)(x,map_y(ey));
+				    (*t->vector)(x,y);
+				}
+			 } else {		/* prev == UNDEFINED */
+				(*t->move)(x,y);
+				(*t->vector)(x,y);
+			 }
+			 break;
+		  }
+		  case OUTRANGE: {
+			 if (prev == INRANGE) {
+				/* from inrange to outrange */
+				if (clip_lines1) {
+				    edge_intersect_steps(plot->points, i, &ex, &ey);
+				    (*t->vector)(map_x(ex), yprev);
+				    (*t->vector)(map_x(ex), map_y(ey));
+				}
+			 } else if (prev == OUTRANGE) {
+				/* from outrange to outrange */
+				if (clip_lines2) {
+				    if (two_edge_intersect_steps(plot->points, i, lx, ly)) {
+					   (*t->move)(map_x(lx[0]), map_y(ly[0]));
+					   (*t->vector)(map_x(lx[1]), map_y(ly[0]));
+					   (*t->vector)(map_x(lx[1]), map_y(ly[1]));
+				    }
+				}
+			 }
+			 break;
+		  }
+		  default:		/* just a safety */
+		  case UNDEFINED: {
+			 break;
+		  }
+	   }
+	   prev  = plot->points[i].type;
+	   xprev = x;
+	   yprev = y;
+    }
+}
+
 /* plot_bars:
  * Plot the curves in ERRORBARS style
  *  we just plot the bars; the points are plotted in plot_points
@@ -757,7 +921,7 @@ plot_bars(plot)
     double x;				/* position of the bar */
     double ylow, yhigh;		/* the ends of the bars */
     unsigned int xM, ylowM, yhighM; /* the mapped version of above */
-    BOOLEAN low_inrange, high_inrange;
+    TBOOLEAN low_inrange, high_inrange;
     int tic = ERRORBARTIC;
     
     for (i = 0; i < plot->p_count; i++) {
@@ -808,8 +972,99 @@ plot_bars(plot)
     }
 }
 
+/* plot_boxes:
+ * Plot the curves in BOXES style
+ */
+void
+plot_boxes(plot,xaxis_y)
+	struct curve_points *plot;
+	int xaxis_y;
+{
+    int i;				/* point index */
+    int xl,xr,yt;			/* point in terminal coordinates */
+	double dxl,dxr,dyt;
+    struct termentry *t = &term_tbl[term];
+    enum coord_type prev = UNDEFINED; /* type of previous point */
+
+    for (i = 0; i < plot->p_count; i++) {
+	   switch (plot->points[i].type) {
+		  case OUTRANGE:
+		  case INRANGE: {
+			if (plot->points[i].z<0.0) {
+			   if (boxwidth<0.0) {
+					/* calculate width */
+					if (prev!=UNDEFINED)
+						dxl = (plot->points[i-1].x - plot->points[i].x)/2.0;
+					else
+						dxl = 0.0;
+					if (i < plot->p_count-1) {
+						if (plot->points[i+1].type!=UNDEFINED)
+							dxr = (plot->points[i+1].x - plot->points[i].x)/2.0;
+						else
+							dxr = -dxl;
+					}
+					else {
+						dxr = -dxl;
+					}
+					if (prev==UNDEFINED)
+						dxl = -dxr;
+				}
+				else {
+					dxr = boxwidth/2.0;
+					dxl = -dxr;
+				}
+			}
+			else {
+				dxr = plot->points[i].z/2.0;
+				dxl = -dxr;
+			}
+
+			dxl= plot->points[i].x+dxl;
+			dxr= plot->points[i].x+dxr;
+			dyt= plot->points[i].y;
+
+			/* clip to border */
+			if ((y_min < y_max  && dyt < y_min)
+				|| (y_max < y_min  && dyt > y_min))
+			   dyt = y_min;
+			if ((y_min < y_max  && dyt > y_max)
+				|| (y_max<y_min  && dyt < y_max))
+			   dyt = y_max;
+			if ((x_min < x_max  && dxr < x_min)
+				|| (x_max < x_min  && dxr > x_min))
+			   dxr = x_min;
+			if ((x_min < x_max  && dxr > x_max)
+				|| (x_max<x_min  && dxr < x_max))
+			   dxr = x_max;
+			if ((x_min < x_max  && dxl < x_min)
+				|| (x_max < x_min  && dxl > x_min))
+			   dxl = x_min;
+			if ((x_min < x_max  && dxl > x_max)
+				|| (x_max<x_min  && dxl < x_max))
+			   dxl = x_max;
+
+			xl= map_x(dxl);
+			xr= map_x(dxr);
+			yt = map_y(dyt);
+
+			(*t->move)(xl,xaxis_y);
+			(*t->vector)(xl,yt);
+			(*t->vector)(xr,yt);
+			(*t->vector)(xr,xaxis_y);
+			(*t->vector)(xl,xaxis_y);
+			break;
+		  }
+		  default:		/* just a safety */
+		  case UNDEFINED: {
+			 break;
+		  }
+	   }
+	   prev = plot->points[i].type;
+    }
+}
+
 /* plot_points:
- * Plot the curves in POINTS style
+ * Plot the curves in POINTSTYLE style
  */
 void
 plot_points(plot)
@@ -860,7 +1115,7 @@ plot_dots(plot)
  */
 void
 edge_intersect(points, i, ex, ey)
-	struct coordinate *points; /* the points array */
+	struct coordinate GPHUGE *points; /* the points array */
 	int i;				/* line segment from point i-1 to point i */
 	double *ex, *ey;		/* the point where it crosses an edge */
 {
@@ -995,6 +1250,123 @@ edge_intersect(points, i, ex, ey)
     return;
 }
 
+/* XXX - JG  */
+/* single edge intersection algorithm for "steps" curves */
+/* 
+ * Given two points, one inside and one outside the plot, return
+ * the point where an edge of the plot intersects the line segments
+ * forming the step between the two points. 
+ *
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
+ * (x2,y1)->(x2,y2). 
+ */
+void
+edge_intersect_steps(points, i, ex, ey)
+	struct coordinate *points; /* the points array */
+	int i;				/* line segment from point i-1 to point i */
+	double *ex, *ey;		/* the point where it crosses an edge */
+{
+    /* global x_min, x_max, y_min, x_max */
+    double ax = points[i-1].x;
+    double ay = points[i-1].y;
+    double bx = points[i].x;
+    double by = points[i].y;
+
+    if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
+	    if (inrange(ay,y_min,y_max)) {
+		*ey = ay;
+		if (ax > x_max)
+			*ex = x_max;
+		else			/* x < x_min */
+			*ex = x_min;
+	    } else {
+	    	*ex = bx;
+		if (ay > y_max)     
+			*ey = y_max;
+		else			/* y < y_min */
+			*ey = y_min;
+	    }
+    } else {				/* from INRANGE to OUTRANGE */
+	    if (inrange(bx,x_min,x_max)) {
+		*ex = bx;
+		if (by > y_max)
+			*ey = y_max;
+		else			/* y < y_min */
+			*ey = y_min;
+	    } else {
+	    	*ey = ay;
+		if (bx > x_max)     
+			*ex = x_max;
+		else			/* x < x_min */
+			*ex = x_min;
+	    }
+    }
+    return;
+}
+
+/* XXX - JG  */
+/* double edge intersection algorithm for "steps" plot */
+/* Given two points, both outside the plot, return the points where an 
+ * edge of the plot intersects the line segments forming a step 
+ * by the two points. There may be zero, one, two, or an infinite number
+ * of intersection points. (One means an intersection at a corner, infinite
+ * means overlaying the edge itself). We return FALSE when there is nothing
+ * to draw (zero intersections), and TRUE when there is something to 
+ * draw (the one-point case is a degenerate of the two-point case and we do 
+ * not distinguish it - we draw it anyway).
+ *
+ * Recall that if P1 = (x1,y1) and P2 = (x2,y2), the step from  
+ * P1 to P2 is drawn as two line segments: (x1,y1)->(x2,y1) and 
+ * (x2,y1)->(x2,y2). 
+ */
+TBOOLEAN				/* any intersection? */
+two_edge_intersect_steps(points, i, lx, ly)
+	struct coordinate *points; /* the points array */
+	int i;				/* line segment from point i-1 to point i */
+	double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
+{
+    /* global x_min, x_max, y_min, x_max */
+    double ax = points[i-1].x;
+    double ay = points[i-1].y;
+    double bx = points[i].x;
+    double by = points[i].y;
+
+    if ( max(ax,bx) < x_min || min(ax,bx) > x_max || 
+         max(ay,by) < y_min || min(ay,by) > y_max ||
+         ( (ay  > y_max || ay < y_min)            &&
+           (bx  > x_max || bx < x_min)  ) ) {
+	return(FALSE);				
+    } else if (inrange(ay,y_min,y_max) && inrange(bx,x_min,x_max)) {	/* corner of step inside plotspace */
+    	*ly++ = ay;
+	if (ax < x_min) 
+		*lx++ = x_min;
+	else 
+		*lx++ = x_max;
+
+	*lx++ = bx;
+	if (by < x_min) 
+		*ly++ = y_min;
+	else 
+		*ly++ = y_max;
+
+	return(TRUE);
+    } else if (inrange(ay,y_min,y_max)) {	/* cross plotspace in x-direction */
+	*lx++ = x_min;
+	*ly++ = ay;
+	*lx++ = x_max;
+	*ly++ = ay;
+	return(TRUE);
+    } else if (inrange(ax,x_min,x_max)) {	/* cross plotspace in y-direction */
+	*lx++ = bx;
+	*ly++ = y_min;
+	*lx++ = bx;
+	*ly++ = y_max;
+	return(TRUE);
+    } else
+	return(FALSE);
+}
+
 /* double edge intersection algorithm */
 /* Given two points, both outside the plot, return
  * the points where an edge of the plot intersects the line segment defined 
@@ -1005,9 +1377,9 @@ edge_intersect(points, i, ex, ey)
  * draw (the one-point case is a degenerate of the two-point case and we do 
  * not distinguish it - we draw it anyway).
  */
-BOOLEAN				/* any intersection? */
+TBOOLEAN				/* any intersection? */
 two_edge_intersect(points, i, lx, ly)
-	struct coordinate *points; /* the points array */
+	struct coordinate GPHUGE *points; /* the points array */
 	int i;				/* line segment from point i-1 to point i */
 	double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
@@ -1017,7 +1389,7 @@ two_edge_intersect(points, i, lx, ly)
     double bx = points[i].x;
     double by = points[i].y;
     double x, y;			/* possible intersection point */
-    BOOLEAN intersect = FALSE;
+    TBOOLEAN intersect = FALSE;
 
     if (by == ay) {
 	   /* horizontal line */
@@ -1148,9 +1520,9 @@ polar_xform (plots, pcount)
      struct curve_points *this_plot;
      int curve;			/* loop var, for curves */
      register int i, p_cnt;	/* loop/limit var, for points */
-     struct coordinate *pnts;	/* abbrev. for points array */
+     struct coordinate GPHUGE *pnts;	/* abbrev. for points array */
 	double x, y;			/* new cartesian value */
-	BOOLEAN anydefined = FALSE;
+	TBOOLEAN anydefined = FALSE;
 	double d2r;
 
 	if(angles_format == ANGLES_DEGREES){
@@ -1256,7 +1628,7 @@ draw_ytics(start, incr, end)
 	for (ticplace = start; ticplace <= end; ticplace +=incr) {
 		if ( inrange(ticplace,ticmin,ticmax) )
 			ytick(ticplace, yformat, incr, 1.0);
-		if (log_y && incr == 1.0) {
+		if (is_log_y && incr == 1.0) {
 			/* add mini-ticks to log scale ticmarks */
 		    int lstart, linc;
 		    if ((end - start) >= 10)
@@ -1274,8 +1646,8 @@ draw_ytics(start, incr, end)
 			lstart = 2; /* 9 per decade */
 			linc = 1;
 		    }
-		    for (ltic = lstart; ltic <= 9; ltic += linc) {
-				lticplace = ticplace+log10((double)ltic);
+		    for (ltic = lstart; ltic < (int)base_log_y; ltic += linc) {
+				lticplace = ticplace+log((double)ltic)/log_base_log_y;
 				if ( inrange(lticplace,ticmin,ticmax) )
 					ytick(lticplace, "\0", incr, 0.5);
 		    }
@@ -1306,8 +1678,9 @@ draw_xtics(start, incr, end)
 
 	for (ticplace = start; ticplace <= end; ticplace +=incr) {
 		if ( inrange(ticplace,ticmin,ticmax) )
-			xtick(ticplace, xformat, incr, 1.0);
-		if (log_x && incr == 1.0) {
+			if(!polar || ticplace == start || ticplace == end) 
+				xtick(ticplace, xformat, incr, 1.0);
+		if (is_log_x && incr == 1.0) {
 			/* add mini-ticks to log scale ticmarks */
 		    int lstart, linc;
 		    if ((end - start) >= 10)
@@ -1325,8 +1698,8 @@ draw_xtics(start, incr, end)
 			lstart = 2; /* 9 per decade */
 			linc = 1;
 		    }
-		    for (ltic = lstart; ltic <= 9; ltic += linc) {
-				lticplace = ticplace+log10((double)ltic);
+		    for (ltic = lstart; ltic < (int)base_log_x; ltic += linc) {
+				lticplace = ticplace+log((double)ltic)/log_base_log_x;
 				if ( inrange(lticplace,ticmin,ticmax) )
 					xtick(lticplace, "\0", incr, 0.5);
 			}
@@ -1341,13 +1714,15 @@ draw_series_ytics(start, incr, end)
 {
 	double ticplace, place;
 	double ticmin, ticmax;	/* for checking if tic is almost inrange */
-	double spacing = log_y ? log10(incr) : incr;
+	double spacing = is_log_y ? log(incr)/log_base_log_y : incr;
 
 	if (end == VERYLARGE)
-		end = max(CheckLog(log_y, y_min), CheckLog(log_y, y_max));
+		end = max(CheckLog(is_log_y, base_log_y, y_min),
+			  CheckLog(is_log_y, base_log_y, y_max));
 	else
 	  /* limit to right side of plot */
-	  end = min(end, max(CheckLog(log_y, y_min), CheckLog(log_y, y_max)));
+	  end = min(end, max(CheckLog(is_log_y, base_log_y, y_min),
+			     CheckLog(is_log_y, base_log_y, y_max)));
 
 	/* to allow for rounding errors */
 	ticmin = min(y_min,y_max) - SIGNIF*incr;
@@ -1355,7 +1730,7 @@ draw_series_ytics(start, incr, end)
 	end = end + SIGNIF*incr; 
 
 	for (ticplace = start; ticplace <= end; ticplace +=incr) {
-	    place = (log_y ? log10(ticplace) : ticplace);
+	    place = (is_log_y ? log(ticplace)/log_base_log_y : ticplace);
 	    if ( inrange(place,ticmin,ticmax) )
 		 ytick(place, yformat, spacing, 1.0);
 	}
@@ -1369,13 +1744,15 @@ draw_series_xtics(start, incr, end)
 {
 	double ticplace, place;
 	double ticmin, ticmax;	/* for checking if tic is almost inrange */
-	double spacing = log_x ? log10(incr) : incr;
+	double spacing = is_log_x ? log(incr)/log_base_log_x : incr;
 
 	if (end == VERYLARGE)
-		end = max(CheckLog(log_x, x_min), CheckLog(log_x, x_max));
+		end = max(CheckLog(is_log_x, base_log_x, x_min),
+			  CheckLog(is_log_x, base_log_x, x_max));
 	else
 	  /* limit to right side of plot */
-	  end = min(end, max(CheckLog(log_x, x_min), CheckLog(log_x, x_max)));
+	  end = min(end, max(CheckLog(is_log_x, base_log_x, x_min),
+			     CheckLog(is_log_x, base_log_x, x_max)));
 
 	/* to allow for rounding errors */
 	ticmin = min(x_min,x_max) - SIGNIF*incr;
@@ -1383,12 +1760,85 @@ draw_series_xtics(start, incr, end)
 	end = end + SIGNIF*incr; 
 
 	for (ticplace = start; ticplace <= end; ticplace +=incr) {
-	    place = (log_x ? log10(ticplace) : ticplace);
+	    place = (is_log_x ? log(ticplace)/log_base_log_x : ticplace);
 	    if ( inrange(place,ticmin,ticmax) )
 		 xtick(place, xformat, spacing, 1.0);
 	}
 }
+char GPFAR * GPFAR month[]={
+    "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+};
+draw_month_ytics()
+{ 
+    long l_tickplace,l_incr,l_end,m_calc;
 
+    l_tickplace = (long)y_min;
+    if((double)l_tickplace<y_min)l_tickplace++;
+    l_end=(double)y_max;
+    l_incr=(l_end-l_tickplace+1)/12;
+    if(l_incr<1)l_incr=1;
+    while(l_tickplace<=l_end)
+    {
+	m_calc = (l_tickplace-1)%12;
+	if(m_calc<0)m_calc += 12;
+	ytick((double)l_tickplace,month[m_calc],(double)l_incr,1.0);
+	l_tickplace += l_incr;
+    }
+}
+draw_month_xtics()
+{
+    long l_tickplace,l_incr,l_end,m_calc;
+
+    l_tickplace = (long)x_min;
+    if((double)l_tickplace<x_min)l_tickplace++;
+    l_end=(double)x_max;
+    l_incr=(l_end-l_tickplace+1)/12;
+    if(l_incr<1)l_incr=1;
+    while(l_tickplace<=l_end)
+    {
+	m_calc = (l_tickplace-1)%12;
+	if(m_calc<0)m_calc += 12;
+	xtick((double)l_tickplace,month[m_calc],(double)l_incr,1.0);
+	l_tickplace += l_incr;
+    }
+}
+char *day[]={
+    "Sun","Mon","Tue","Wed","Thu","Fri","Sat"
+};
+draw_day_ytics()
+{ 
+    long l_tickplace,l_incr,l_end,m_calc;
+
+    l_tickplace = (long)y_min;
+    if((double)l_tickplace<y_min)l_tickplace++;
+    l_end=(double)y_max;
+    l_incr=(l_end-l_tickplace+1)/14;
+    if(l_incr<1)l_incr=1;
+    while(l_tickplace<=l_end)
+    {
+	m_calc = l_tickplace%7;
+	if(m_calc<0)m_calc += 7;
+	ytick((double)l_tickplace,day[m_calc],(double)l_incr,1.0);
+	l_tickplace += l_incr;
+    }
+}
+draw_day_xtics()
+{ 
+    long l_tickplace,l_incr,l_end,m_calc;
+
+    l_tickplace = (long)x_min;
+    if((double)l_tickplace<x_min)l_tickplace++;
+    l_end=(double)x_max;
+    l_incr=(l_end-l_tickplace+1)/14;
+    if(l_incr<1)l_incr=1;
+    while(l_tickplace<=l_end)
+    {
+	m_calc = l_tickplace%7;
+	if(m_calc<0)m_calc += 7;
+	xtick((double)l_tickplace,day[m_calc],(double)l_incr,1.0);
+	l_tickplace += l_incr;
+    }
+}
 /* DRAW_SET_YTICS: draw a user tic set, y axis */
 draw_set_ytics(list)
 	struct ticmark *list;	/* list of tic marks */
@@ -1398,7 +1848,8 @@ draw_set_ytics(list)
     /* global x_min, x_max, xscale, y_min, y_max, yscale */
 
     while (list != NULL) {
-	   ticplace = (log_y ? log10(list->position) : list->position);
+	   ticplace = (is_log_y ? log(list->position)/log_base_log_y
+				: list->position);
 	   if ( inrange(ticplace, y_min, y_max) 		/* in range */
 		  || NearlyEqual(ticplace, y_min, incr)	/* == y_min */
 		  || NearlyEqual(ticplace, y_max, incr))	/* == y_max */
@@ -1417,7 +1868,8 @@ draw_set_xtics(list)
     /* global x_min, x_max, xscale, y_min, y_max, yscale */
 
     while (list != NULL) {
-	   ticplace = (log_x ? log10(list->position) : list->position);
+	   ticplace = (is_log_x ? log(list->position)/log_base_log_x
+				: list->position);
 	   if ( inrange(ticplace, x_min, x_max) 		/* in range */
 		  || NearlyEqual(ticplace, x_min, incr)	/* == x_min */
 		  || NearlyEqual(ticplace, x_max, incr))	/* == x_max */
@@ -1445,7 +1897,13 @@ ytick(place, text, spacing, ticscale)
 	   if( !polar){
 	     (*t->move)(xleft, map_y(place));
 	     (*t->vector)(xright, map_y(place));
-           }
+           } else {   /* put a circular grid for polar -- not clipped! */
+             int i;
+		(*t->move)(map_x(ZERO), map_y(place));
+		for( i=0; i <= 360; i++)
+		   (*t->vector)( map_x(place*sin( (double) DEG2RAD*i)),
+			map_y(place*cos( (double) DEG2RAD*i)) );
+		}
 	   (*t->linetype)(-2); /* border linetype */
     }
     if (tic_in) {
@@ -1476,7 +1934,8 @@ ytick(place, text, spacing, ticscale)
 	 text = yformat;
     
     if( polar){
-      (void) sprintf(ticlabel, text, CheckLog(log_y,fabs( place)+rmin));
+      (void) sprintf(ticlabel, text,
+		CheckLog(is_log_y, base_log_y, fabs( place)+rmin));
       if ((*t->justify_text)(RIGHT)) {
 	   (*t->put_text)(map_x(ZERO)-(t->h_char),
 				   map_y(place), ticlabel);
@@ -1486,7 +1945,7 @@ ytick(place, text, spacing, ticscale)
 	 }
     } else {
     
-      (void) sprintf(ticlabel, text, CheckLog(log_y, place));
+      (void) sprintf(ticlabel, text, CheckLog(is_log_y, base_log_y, place));
       if ((*t->justify_text)(RIGHT)) {
 	   (*t->put_text)(xleft-(t->h_char),
 				   map_y(place), ticlabel);
@@ -1511,9 +1970,23 @@ xtick(place, text, spacing, ticscale)
 	place = CheckZero(place,spacing); /* to fix rounding error near zero */
     if (grid) {
            (*t->linetype)(-1);  /* axis line type */
-           if( !polar){
+           if( !polar){  /* do not place a rectangular grid */
 	     (*t->move)(map_x(place), ybot);
 	     (*t->vector)(map_x(place), ytop);
+           } else { /* angular lines only for start and stop */
+	     int i;
+	     for( i=0; i < 360; i+=10){
+		 (*t->move)(map_x(ZERO),map_y(ZERO) );
+		 (*t->vector)(map_x(-place*cos((double) DEG2RAD*i)),
+			 map_y(-place*sin( (double)DEG2RAD*i)));
+		 if( i%90 == 0){
+			 (void) sprintf(ticlabel, "%d", i);
+		 (*t->put_text)(map_x(-1.05*place*cos((double) DEG2RAD*i))
+			 +(t->h_char)*strlen(ticlabel)/2,
+			 map_y(-1.05*place*sin( (double)DEG2RAD*i))
+				 , ticlabel);
+		 }
+	     }
            }
 	   (*t->linetype)(-2); /* border linetype */
     }
@@ -1544,7 +2017,7 @@ xtick(place, text, spacing, ticscale)
 	 text = xformat;
 
     if(polar){
-      (void) sprintf(ticlabel, text, CheckLog(log_x, fabs(place)+rmin));
+      (void) sprintf(ticlabel, text, CheckLog(is_log_x, base_log_x, fabs(place)+rmin));
       if ((*t->justify_text)(CENTRE)) {
 	   (*t->put_text)(map_x(place),
 				   map_y(ZERO)-(t->v_char), ticlabel);
@@ -1554,7 +2027,7 @@ xtick(place, text, spacing, ticscale)
 	 }
     }else{
 
-      (void) sprintf(ticlabel, text, CheckLog(log_x, place));
+      (void) sprintf(ticlabel, text, CheckLog(is_log_x, base_log_x, place));
       if ((*t->justify_text)(CENTRE)) {
 	   (*t->put_text)(map_x(place),
 				   ybot-(t->v_char), ticlabel);

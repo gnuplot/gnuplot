@@ -1,0 +1,92 @@
+# make file for DJGPP and ndmake 4.5
+
+# problems using DJGPP 1.08 as at 6 Oct 1992
+#   1. signal(SIGFPE,...)  not working.   
+#      floating point exceptions TERMINATE gnuplot.
+#      This is because signal is defined as signal(){} !!!
+#   2. graphics sometimes draws the x axis in the wrong place
+
+# The above problems make gnuplot UNUSABLE under DJGPP at present.
+
+# where to place gnuplot.gih helpfile
+HELPFILE = gnuplot.gih
+
+# compiler
+CCDIR = c:\gcc\bin
+CC = $(CCDIR)\gcc
+# include directory
+INCLUDE =-Ic:/gcc/include
+
+CFLAGS = -DMSDOS -DDJGPP -DREADLINE
+TERMFLAGS = -DDJSVGA
+LINKOPT = -lm -lpc -lgr
+
+CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atari.trm \
+	term/bigfig.trm term/cgi.trm term/djsvga.trm term/dumb.trm \
+	term/dxf.trm term/dxy.trm \
+	term/debug.trm term/eepic.trm term/epson.trm term/fig.trm  \
+	term/hp26.trm term/hp2648.trm term/hpgl.trm  \
+	term/hpljii.trm term/metafont.trm\
+	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c 
+CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
+	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
+	term/pbm.trm term/pc.trm 
+CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
+	term/t410x.trm term/tek.trm term/texdraw.trm term/unixpc.trm \
+	term/unixplot.trm term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
+OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o
+OBJ2 =	help.o internal.o misc.o parse.o plot.o readline.o
+OBJ3 =	scanner.o setshow.o specfun.o standard.o term.o util.o
+OBJ4 =	version.o gnubin.o binary.o
+
+OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
+
+.c.o:  
+	$(CC) -c $(CFLAGS) $(INCLUDE) $<
+
+all: gp32.exe $(HELPFILE)
+
+gp32.exe : $(OBJS)
+	@>gcclink.rsp $(OBJS)
+	$(CC) -o gp32 @gcclink.rsp $(LINKOPT)
+	copy /b $(CCDIR)\go32.exe+gp32 gp32.exe
+
+
+command.o: command.c plot.h setshow.h help.h
+	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
+
+term.o: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm term.c
+
+$(OBJS): plot.h
+
+command.o help.o misc.o: help.h
+
+command.o graphics.o graph3d.o misc.o plot.o setshow.o term.o: setshow.h
+
+bitmap.o term.o: bitmap.h
+
+# convert gnuplot.doc to gnuplot.gih
+$(HELPFILE): doc2gih.exe docs\gnuplot.doc
+	doc2gih docs\gnuplot.doc $(HELPFILE)
+
+doc2gih.exe: docs\doc2gih.c
+	$(CC) $(CFLAGS) $(INCLUDE) -o doc2gih docs/doc2gih.c
+	copy /b $(CCDIR)\go32.exe+doc2gih doc2gih.exe
+
+
+# clean target - remove all temp files, but leave executable intact
+# needed when changing configuration (model or overlaying)
+
+clean:
+	del *.o
+	del gp32
+	del doc2gih
+
+# realclean target - remove all files created by the makefile
+
+realclean: clean
+	del gp32.exe
+	del doc2gih.exe
+	del gnuplot.gih
+

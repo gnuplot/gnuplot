@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: eval.c,v 3.26 92/03/24 22:34:32 woo Exp Locker: woo $";
+static char *RCSid = "$Id: eval.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - eval.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,12 +31,24 @@ static char *RCSid = "$Id: eval.c,v 3.26 92/03/24 22:34:32 woo Exp Locker: woo $
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
@@ -48,7 +61,7 @@ extern struct udft_entry *first_udf;
 extern struct at_type at;
 extern struct lexical_unit token[];
 
-struct value *integer();
+struct value *Ginteger();
 
 
 
@@ -67,10 +80,10 @@ register struct udvt_entry **udv_ptr = &first_udv;
 	}
 
 	*udv_ptr = (struct udvt_entry *)
-	  alloc((unsigned int)sizeof(struct udvt_entry), "value");
+	  alloc((unsigned long)sizeof(struct udvt_entry), "value");
 	(*udv_ptr)->next_udv = NULL;
 	copy_str((*udv_ptr)->udv_name,t_num);
-	(*udv_ptr)->udv_value.type = INT;	/* not necessary, but safe! */
+	(*udv_ptr)->udv_value.type = INTGR;	/* not necessary, but safe! */
 	(*udv_ptr)->udv_undef = TRUE;
 	return(*udv_ptr);
 }
@@ -82,19 +95,20 @@ int t_num; /* index to token[] */
 {
 register struct udft_entry **udf_ptr = &first_udf;
 
+	int i;
 	while (*udf_ptr) {
 		if (equals(t_num,(*udf_ptr)->udf_name))
 			return(*udf_ptr);
 		udf_ptr = &((*udf_ptr)->next_udf);
 	}
      *udf_ptr = (struct udft_entry *)
-	  alloc((unsigned int)sizeof(struct udft_entry), "function");
+	  alloc((unsigned long)sizeof(struct udft_entry), "function");
 	(*udf_ptr)->next_udf = (struct udft_entry *) NULL;
 	(*udf_ptr)->definition = NULL;
 	(*udf_ptr)->at = NULL;
 	copy_str((*udf_ptr)->udf_name,t_num);
-	(void) integer(&((*udf_ptr)->dummy_values[0]), 0);
-	(void) integer(&((*udf_ptr)->dummy_values[1]), 0);
+	for(i=0; i<MAX_NUM_VAR; i++)
+		(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
 	return(*udf_ptr);
 }
 

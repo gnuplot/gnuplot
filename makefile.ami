@@ -1,5 +1,6 @@
 #
-# $Id: makefile.ami,v 3.26 92/03/24 22:36:54 woo Exp Locker: woo $
+# $Id: makefile.ami%v 3.50 1993/07/09 05:35:24 woo Exp $
+#
 #
 #
 #   Makefile for the Amiga             Pat R. Empleo
@@ -15,7 +16,7 @@
 # where to install help file gnuplot.gih
 HELPDEST=GNUPLOT:docs/gnuplot.gih
 # Where to send email about bugs and comments (locally)
-EMAIL="bug-gnuplot@ames.arc.nasa.gov"
+EMAIL="bug-gnuplot@dartmouth.edu"
 
 #
 # Manx Aztec C v5.2 compiler options
@@ -23,13 +24,13 @@ EMAIL="bug-gnuplot@ames.arc.nasa.gov"
 # -DVFORK  We use this switch to invoke fexecv()
 #
 CC     = cc
-CFLAGS = -DVFORK -DNOGAMMA -DMEMSET -DMEMCPY -DAMIGA_AC_5 -fa -sab -wosw -MR
+CFLAGS = -mcd -DVFORK -DNOGAMMA -DMEMSET -DMEMCPY -DAMIGA_AC_5 -fa -sab -wosw -MR
 
 #
 # Manx Aztec C v5.2 linker options
 #
 LD   = ln
-LIBS = -lma -lc
+LIBS = -lmal -lc
 
 #
 # Terminal (device) support --- see term.h
@@ -39,15 +40,15 @@ TERMFLAGS = -Iterm
 #
 # List of object files except term.o, version.o
 #
-OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
-	   internal.o misc.o parse.o plot.o scanner.o \
-	   setshow.o standard.o util.o  
+OBJS = binary.o bitmap.o command.o contour.o eval.o gnubin.o graphics.o \
+	   graph3d.o help.o internal.o misc.o parse.o plot.o scanner.o \
+	   setshow.o specfun.o standard.o util.o  
 
 #
 # List of sources
 #
-CSOURCE1 = command.c setshow.c 
-CSOURCE2 = help.c graphics.c graph3d.c internal.c 
+CSOURCE1 = binary.c command.c setshow.c 
+CSOURCE2 = help.c gnubin.c graphics.c graph3d.c internal.c 
 CSOURCE3 = misc.c eval.c parse.c plot.c readline.c scanner.c standard.c 
 CSOURCE4 = bitmap.c term.c util.c version.c
 CSOURCE5 = term/amiga.trm term/aed.trm term/cgi.trm term/dumb.trm term/dxf.trm \
@@ -58,8 +59,8 @@ CSOURCE6 = term/impcodes.h term/imagen.trm term/object.h \
 	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm 
 CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
 	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
-	term/v384.trm term/x11.trm term/bigfig.trm term/vws.trm gnuplot_x11.c
-CSOURCE8 = contour.c
+	term/v384.trm term/x11.trm term/bigfig.trm term/vws.trm gplt_x11.c
+CSOURCE8 = contour.c specfun.c
 
 #
 # Docs

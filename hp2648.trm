@@ -1,10 +1,11 @@
 /*
- * $Id: hp2648.trm,v 3.26 92/03/24 22:34:55 woo Exp Locker: woo $
+ * $Id: hp2648.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT -  hp2648.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -26,7 +27,7 @@
  * AUTHORS
  *  Russell Lang
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 

@@ -1,6 +1,7 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2hlp.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+static char *RCSid = "$Id: doc2hlp.c 3.38.2.6 1992/11/14 02:25:48 woo Exp $";
 #endif
+
 
 /*
  * doc2hlp.c  -- program to convert Gnuplot .DOC format to 
@@ -10,7 +11,7 @@ static char *RCSid = "$Id: doc2hlp.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
  * @, #, or %.
  * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
  *
- * usage:  doc2hlp < file.doc > file.hlp
+ * usage:  doc2hlp [file.doc [file.hlp]]
  *
  * Original version by David Kotz used the following one line script!
  * sed '/^[?@#%]/d' file.doc > file.hlp
@@ -23,9 +24,31 @@ static char *RCSid = "$Id: doc2hlp.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
 #define TRUE 1
 #define FALSE 0
 
-main()
+main(argc,argv)
+int argc;
+char **argv;
 {
-	convert(stdin,stdout);
+FILE * infile;
+FILE * outfile;
+	infile = stdin;
+	outfile = stdout;
+	if (argc > 3) {
+		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
+		exit(1);
+	}
+	if (argc >= 2) 
+		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for reading\n",
+				argv[0], argv[1]);
+			exit(1);
+		}
+	if (argc == 3)
+		if ( (outfile = fopen(argv[2],"w")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for writing\n",
+				argv[0], argv[2]);
+		}
+	
+	convert(infile,outfile);
 	exit(0);
 }
 

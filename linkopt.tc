@@ -1,9 +1,0 @@
-c:\tc\lib\C0l +
-bitmap command eval graphics graph3d help internal misc parse +
-plot scanner setshow standard term util version contour +
-egavgaf hercf cgaf attf +
-,gnuplot,gnuplot, +
-c:\tc\lib\emu +
-c:\tc\lib\mathl +
-c:\tc\lib\cl +
-c:\tc\lib\graphics

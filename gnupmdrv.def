@@ -1,0 +1,14 @@
+NAME        GnuShell WINDOWAPI
+
+DESCRIPTION 'Gnuplot shell'
+
+STUB        'OS2STUB.EXE'
+CODE        MOVEABLE
+DATA        MOVEABLE MULTIPLE
+
+HEAPSIZE  1024
+STACKSIZE 32768
+
+
+
+    

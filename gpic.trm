@@ -1,0 +1,234 @@
+/*
+ * $Id: gpic.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ */
+
+/* GNUPLOT - gpic.trm -*-C-*- */
+/*
+ * Copyright (C) 1993   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ */
+
+/*
+ * This terminal driver supports:
+ *   The GPIC graphics language for groff
+ *
+ * AUTHOR
+ *  Sigfrid Lundberg
+ *
+ * send your comments or suggestions to (siglun@volterra.teorekol.lu.se).
+ * 
+ */
+
+
+#define GPIC_PTS_PER_INCH (72.27)
+#define GPIC_DOTS_PER_INCH (300)	
+#define GPIC_UNIT (GPIC_PTS_PER_INCH/GPIC_DOTS_PER_INCH) /* dot size in pt */
+
+/* 5 inches wide by 3 inches high (default) */
+#define GPIC_XMAX (5*GPIC_DOTS_PER_INCH)  
+#define GPIC_YMAX (3*GPIC_DOTS_PER_INCH)  
+
+#define GPIC_HTIC (5*GPIC_DOTS_PER_INCH/72)
+#define GPIC_VTIC (5*GPIC_DOTS_PER_INCH/72)
+#define GPIC_HCHAR (GPIC_DOTS_PER_INCH*53/10/72)
+#define GPIC_VCHAR (GPIC_DOTS_PER_INCH*11/72)	
+#define GPIC_coord(x) ((float)x)/((float)GPIC_DOTS_PER_INCH)
+
+static float GPIC_x, GPIC_y;
+static unsigned int GPIC_posx;
+static unsigned int GPIC_posy;
+static unsigned int GPIC_ltype;
+enum JUSTIFY GPIC_justify=LEFT;
+static int GPIC_angle=0;
+
+/* for DOTS point style */
+
+#define GPIC_NUMLINES 6		/* number of linetypes below */
+static char *GPIC_lines[] = {
+    "thickness 1.0",			/* -2 border */
+    "", 		/* -1 axes */
+    "",			/*  0 solid thin  */
+    "dotted",
+    "dashed 0.05",			/*  1 solid thick */
+    "dashed 0.075",			/*  2 solid Thick */
+};
+
+
+static int GPIC_type;		/* current line type */
+static TBOOLEAN GPIC_inline = FALSE; /* are we in the middle of a line */
+static int GPIC_linecount = 0; /* number of points in line so far */
+
+
+GPIC_options()
+{
+  float x,y;
+  struct value a;
+  extern struct value *const_express();
+  extern double real();
+
+  GPIC_x=0;
+  GPIC_y=0;
+
+  if (!END_OF_COMMAND) {
+    x = real(const_express(&a));
+    if (!END_OF_COMMAND) {
+      y = real(const_express(&a));
+      GPIC_x = x;
+      GPIC_y = y;
+    }
+  }
+
+  sprintf(term_options, "Origin is at (%f,%f)",GPIC_x,GPIC_y);
+
+}
+
+GPIC_init()
+{
+  GPIC_linetype(-1);
+  fprintf(outfile, ".\\\"GNUPLOT: GROFF picture using the gpic preprocessor\n");
+}
+
+
+GPIC_scale(xs, ys)
+     double xs, ys;			/* scaling factors */
+{
+  register struct termentry *t = &term_tbl[term];
+
+  /* we change the table for use in graphics.c and GPIC_graphics */
+  t->xmax = (unsigned int)(GPIC_XMAX * xs);
+  t->ymax = (unsigned int)(GPIC_YMAX * ys);
+
+  return(TRUE);
+}
+
+
+GPIC_graphics()
+{
+  register struct termentry *t = &term_tbl[term];
+
+  fprintf(outfile, ".PS %f %f\n",GPIC_coord(t->xmax),
+	  GPIC_coord(t->ymax));
+  fprintf(outfile,"x=%f; y=%f\n",GPIC_x, GPIC_y);
+}
+
+
+GPIC_text()
+{
+  GPIC_close_line();
+  fprintf(outfile, ".PE\n");
+}
+
+GPIC_linetype(linetype)
+     int linetype;
+{
+  if (linetype >= GPIC_NUMLINES-2)
+    linetype %= (GPIC_NUMLINES-2);
+  GPIC_ltype = linetype;
+}
+
+GPIC_close_line()
+{
+  if(GPIC_linecount>0) {
+    fprintf(outfile,"; reset linewid\n");
+    GPIC_linecount = 0;
+  }
+}
+
+GPIC_move(x,y)
+     unsigned int x,y;
+{
+  GPIC_close_line();
+  fprintf(outfile,"move to (x+%f,y+%f)\n",GPIC_coord(x),GPIC_coord(y));
+  GPIC_linecount = 1;
+}
+
+
+GPIC_vector(ux,uy)
+     unsigned int ux,uy;
+{
+  if(GPIC_linecount==1) {
+    fprintf(outfile,"line %s to (x+%f,y+%f)",
+	    GPIC_lines[GPIC_ltype+2],
+	    GPIC_coord(ux),GPIC_coord(uy));
+  } else {
+    fprintf(outfile," \\\n");
+    fprintf(outfile,"   then to (x+%f,y+%f)",GPIC_coord(ux),GPIC_coord(uy));
+  }
+  GPIC_linecount++;
+}
+
+
+GPIC_arrow(sx,sy, ex,ey, head)
+	int sx,sy, ex,ey;
+	TBOOLEAN head;
+{
+  GPIC_close_line();
+  if(head) {
+    fprintf(outfile,"arrowhead=7; arrow from x+%f,y+%f to x+%f,y+%f\n",
+	    GPIC_coord(sx),GPIC_coord(sy),GPIC_coord(ex),GPIC_coord(ey));
+  } else { 
+    fprintf(outfile,"line from x+%f,y+%f to x+%f,y+%f\n",
+	    GPIC_coord(sx),GPIC_coord(sy),GPIC_coord(ex),GPIC_coord(ey));
+  }
+}
+
+
+GPIC_put_text(x, y, str)
+	int x,y;				/* reference point of string */
+	char str[];			/* the text */
+{
+  GPIC_close_line();
+  fprintf(outfile, "\"%s\" ",str);
+  switch(GPIC_justify) {
+  case LEFT: {
+    fprintf(outfile,"ljust ");
+    break;
+  }
+  case CENTRE: {
+    fprintf(outfile," ");
+    break;
+  }
+  case RIGHT: {
+    fprintf(outfile,"rjust ");
+    break;
+  }
+  }
+  fprintf(outfile,"at x+%f,y+%f\n",GPIC_coord(x),GPIC_coord(y));
+}
+
+
+
+int GPIC_justify_text(mode)
+	enum JUSTIFY mode;
+{
+  GPIC_justify = mode;
+  return (TRUE);
+}
+
+int GPIC_text_angle(angle)
+	int angle;
+{
+  GPIC_close_line();
+  return (FALSE);
+}
+
+GPIC_reset()
+{
+  fflush(outfile);
+}
+
+
+
+
+
+
+

@@ -1,0 +1,241 @@
+/*
+ * $Id: pslatex.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ */
+
+/* GNUPLOT - pslatex.trm */
+/*
+ * Copyright (C) 1990 - 1993   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *     latex with embedded postscript
+ *
+ * AUTHORS
+ *  George Phillips
+ *  Russell Lang
+ *  David Kotz
+ * 
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ */
+
+/* Driver by George Phillips */
+
+#define PSLATEX_XMAX (5*720)
+#define PSLATEX_YMAX (3*720)
+
+/* 10 pt char is about 10 pts high (say) */
+#define PSLATEX_VCHAR (100)
+/* 10 pt char is about 6 pts wide (say) */
+#define PSLATEX_HCHAR (60)
+
+static int PSLATEX_angle;
+static int PSLATEX_justify;
+static int PSLATEX_rotate = TRUE;
+
+struct text_command {
+    int x, y, angle, justify;
+    char* label;
+    struct text_command* next;
+};
+
+static struct text_command* PSLATEX_labels;
+
+PSLATEX_options()
+{
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "d$efault")) {
+	    ps_color = FALSE;
+	    PSLATEX_rotate = TRUE;
+	    c_token++;
+	}
+    }
+
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "c$olor")) {
+	    ps_color = TRUE;
+	    c_token++;
+	}
+    }
+
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "m$onochrome")) {
+	    ps_color = FALSE;
+	    c_token++;
+	}
+    }
+
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "r$otate")) {
+	    PSLATEX_rotate = TRUE;
+	    c_token++;
+	}
+    }
+
+    if (!END_OF_COMMAND) {
+	if (almost_equals(c_token, "n$orotate")) {
+	    PSLATEX_rotate = FALSE;
+	    c_token++;
+	}
+    }
+
+    sprintf(term_options, "%s %s", ps_color ? "color" : "monochrome",
+	PSLATEX_rotate ? "rotate" : "norotate");
+}
+
+PSLATEX_init()
+{
+    /* reset PostScript driver variables */
+    ps_portrait = TRUE;
+    ps_eps = FALSE;
+    ps_color = FALSE;
+
+    fprintf(outfile, "%% GNUPLOT: LaTeX picture with Postscript\n");
+    fprintf(outfile, "\\setlength{\\unitlength}{0.1bp}\n");
+    fprintf(outfile, "\\special{!\n");
+    PS_init();
+    fprintf(outfile, "}\n");
+
+    PSLATEX_angle = 0;
+    PSLATEX_justify = 0;
+    PSLATEX_labels = 0;
+}
+
+PSLATEX_scale(xs, ys)
+double xs, ys;
+{
+    register struct termentry *t = &term_tbl[term];
+
+    t->xmax = (unsigned int)(PSLATEX_XMAX * xs);
+    t->ymax = (unsigned int)(PSLATEX_YMAX * ys);
+
+    return TRUE;
+}
+
+PSLATEX_graphics()
+{
+    struct termentry *t = &term_tbl[term];
+
+    fprintf(outfile, "\\begin{picture}(%d,%d)(0,0)\n", t->xmax, t->ymax);
+
+    fprintf(outfile, "\\special{\"\n");
+    PS_graphics();
+    /* thwart the translation done by PS_graphics() */
+	fprintf(outfile, "%f %f translate\n",
+		-PS_XOFF * (float)PS_SC, -PS_YOFF * (float)PS_SC);
+    PSLATEX_labels = (struct text_command *)NULL;
+}
+
+PSLATEX_put_text(x, y, str)
+int x, y;
+char str[];
+{
+    struct text_command* tc;
+
+    /* ignore empty strings */
+    if (str[0] == '\0')
+	return(0);
+	
+    tc = (struct text_command*)alloc(sizeof(struct text_command),"pslatex");
+    tc->x = x;
+    tc->y = y;
+    tc->label = (char *)alloc(strlen(str) + 1,"pslatex");
+    strcpy(tc->label, str);
+    tc->justify = PSLATEX_justify;
+    tc->angle = PSLATEX_angle;
+
+    tc->next = PSLATEX_labels;
+    PSLATEX_labels = tc;
+}
+
+PSLATEX_justify_text(mode)
+enum JUSTIFY mode;
+{
+    PSLATEX_justify = mode;
+    return TRUE;
+}
+
+int PSLATEX_text_angle(angle)
+int angle;
+{
+    /* rotated text is put in a short stack, and optionally uses 
+     * postscript specials depending on PSLATEX_rotate */
+    PSLATEX_angle = angle;
+    return TRUE;
+}
+
+
+PSLATEX_reset()
+{
+}
+
+PSLATEX_text()
+{
+    struct text_command* tc;
+
+    PS_text();
+    fprintf(outfile, "}\n");
+
+    for (tc = PSLATEX_labels; tc != (struct text_command*)NULL; tc = tc->next) {
+	fprintf(outfile, "\\put(%d,%d){", tc->x, tc->y);
+	switch (tc->angle) {
+	case 0:
+	    switch (tc->justify) {
+	    case LEFT:
+		fprintf(outfile, "\\makebox(0,0)[l]{%s}", tc->label);
+		break;
+	    case CENTRE:
+		fprintf(outfile, "\\makebox(0,0){%s}", tc->label);
+		break;
+	    case RIGHT:
+		fprintf(outfile, "\\makebox(0,0)[r]{%s}", tc->label);
+		break;
+	    }
+	    break;
+	case 1: /* put text in a short stack */
+	    if (PSLATEX_rotate) {
+	        fprintf(outfile, "%%\n\\special{ps: gsave currentpoint currentpoint translate\n");
+	        fprintf(outfile, "270 rotate neg exch neg exch translate}%%\n");
+	    }
+	    switch (tc->justify) {
+	    case LEFT:
+		fprintf(outfile, "\\makebox(0,0)[lb]{\\shortstack{%s}}",
+			tc->label);
+		break;
+	    case CENTRE:
+		fprintf(outfile, "\\makebox(0,0)[b]{\\shortstack{%s}}",
+			tc->label);
+		break;
+	    case RIGHT:
+		fprintf(outfile, "\\makebox(0,0)[lt]{\\shortstack{%s}}",
+			tc->label);
+		break;
+	    }
+	    if (PSLATEX_rotate) {
+	        fprintf(outfile, "%%\n\\special{ps: currentpoint grestore moveto}%%\n");
+	    }
+	}
+	fprintf(outfile, "}\n");
+    }
+
+    while (PSLATEX_labels) {
+	tc = PSLATEX_labels->next;
+	free(PSLATEX_labels->label);
+	free(PSLATEX_labels);
+	PSLATEX_labels = tc;
+    }
+
+    fprintf(outfile, "\\end{picture}\n");
+}

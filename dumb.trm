@@ -1,5 +1,6 @@
 /*
- * $Id: dumb.trm,v 3.26 92/03/24 22:34:48 woo Exp Locker: woo $
+ * $Id: dumb.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT - dumb.trm */
@@ -27,7 +28,7 @@
  *   Francois Pinard, 91-04-03
  *           INTERNET: pinard@iro.umontreal.ca
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
  */
 
@@ -84,7 +85,7 @@ DUMB_init()
   if (dumb_matrix)
     free(dumb_matrix);
 
-  dumb_matrix = alloc (dumb_xmax * dumb_ymax * 2, "dumb terminal");
+  dumb_matrix = alloc ((unsigned long)dumb_xmax * dumb_ymax * 2, "dumb terminal");
 
   dumb_priority = dumb_matrix + dumb_xmax * dumb_ymax;
 }
@@ -273,7 +274,6 @@ int x, y;
 char *str;
 {
   int length;
-  int delta;
 
   length = strlen(str);
   if (x + length > dumb_xmax)

@@ -1,10 +1,11 @@
 /*
- * $Id: regis.trm,v 3.26 92/03/24 22:35:42 woo Exp Locker: woo $
+ * $Id: regis.trm%v 3.38.2.122 1993/04/30 00:31:45 woo Exp woo $
+ *
  */
 
 /* GNUPLOT - regis.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -26,7 +27,7 @@
  * AUTHORS
  *  Colin Kelley, Thomas Williams
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 
@@ -40,6 +41,10 @@
 #define REGISHCHAR		9
 #define REGISVTIC		8
 #define REGISHTIC		6
+
+#define TRUE 1
+#define FALSE 0
+static int REGIS16color=FALSE;
 
 int REGISang = 0;
 
@@ -56,7 +61,7 @@ REGISinit()
 /* thanks to calmasd!dko (Dan O'Neill) for adding S(E) for vt125s */
 REGISgraphics()
 {
-	fprintf(outfile,"\033[2J\033P1pS(C0)S(E)");
+    fprintf(outfile,"\033[2J\033P1pS(C0)S(E)");
 /*                   1      2      3	4   5
 	1. clear screen
 	2. enter ReGIS graphics
@@ -81,27 +86,49 @@ REGISlinetype(linetype)
 int     linetype;
 {
       /* This will change color in order G,R,B,G-dot,R-dot,B-dot */
+
+static int in_16_map[15+2] = {7,7,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+static int lt_16_map[15+2] = {1,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 static int in_map[9 + 2] = {2, 2, 3, 2, 1, 3, 2, 1, 3, 2, 1};
 static int lt_map[9 + 2] = {1, 4, 1, 1, 1, 4, 4, 4, 6, 6, 6};
-
-	if (linetype >= 9)
-		linetype %= 9;
-	fprintf(outfile, "W(I%d)", in_map[linetype + 2]);
-	fprintf(outfile, "W(P%d)", lt_map[linetype + 2]);
+   
+   	if(!REGIS16color)
+   	{	if (linetype >= 9)
+   			linetype %= 9;
+   		fprintf(outfile, "W(I%d)\n", in_map[linetype + 2]);
+   		fprintf(outfile, "W(P%d)\n", lt_map[linetype + 2]);
+   	}
+   	else
+   	{	if(linetype >=15)
+   			linetype %= 15;
+   		fprintf(outfile, "W(I%d)\n", in_16_map[linetype + 2]);
+   		fprintf(outfile, "W(P%d)\n", lt_16_map[linetype + 2]);
+   	}
 }
 
+
+
+/*
+** The \n was added in the functions below (and above) in order to not cause
+** a buffer overflow in devices that can't deal with long line lengths.
+** The DEC vt-340 doesn't need this, but Reflection 4, a vt-340 emulator
+** for PC's under MS-DOS and Microsoft Windows does need it.
+** Also needed for DECterm, a vt-340 emulator for use with Motif 1.0
+** on Open/VMS.
+** NGB 9/13/93
+*/
 
 REGISmove(x,y)
 int x,y;
 {
-	fprintf(outfile,"P[%d,%d]",x,REGISYLAST-y,x,REGISYLAST-y);
+	fprintf(outfile,"P[%d,%d]\n",x,REGISYLAST-y,x,REGISYLAST-y);
 }
 
 
 REGISvector(x,y)
 int x,y;
 {
-	fprintf(outfile,"v[]v[%d,%d]",x,REGISYLAST - y);
+	fprintf(outfile,"v[]v[%d,%d]\n",x,REGISYLAST - y);
 /* the initial v[] is needed to get the first pixel plotted */
 }
 
@@ -123,6 +150,7 @@ char *str;
 		str++;
 	}
 	(void) putc('\'',outfile);
+	(void) putc('\n',outfile);
 }
 
 
@@ -131,9 +159,9 @@ int ang;
 {
 	REGISang = ang;
 	if (ang == 1)
-		fputs("T(D90,S1)",outfile);
+		fputs("T(D90,S1)\n",outfile);
 	else
-		fputs("T(D0,S1)",outfile);
+		fputs("T(D0,S1)\n",outfile);
 	return TRUE;
 }
 
@@ -141,5 +169,18 @@ int ang;
 REGISreset()
 {
 	fprintf(outfile,"\033[2J\033[24;1H");
+}
+
+REGISoptions()
+{	int i=0;
+   	struct value a;
+   	extern struct value *const_express();
+   	extern double real();
+   
+   	if(!END_OF_COMMAND)
+   	{	i=(int)real(const_express(&a));
+   	}
+   	REGIS16color= (i==16);
+   	sprintf(term_options,"%s",REGIS16color?"16":"4");
 }
 

@@ -1,0 +1,95 @@
+GNUPLOT 3.3 for OS/2 v 2.0
+==========================
+
+1) Introduction
+===============
+
+This file discusses the version of GNUPLOT 3.3 implemented for OS/2 2.0.
+
+The command line interface of GNUPLOT is retained, while graphics output is
+plotted in a Presentation Manager Window. The GNUPLOT command line
+appears in another text-mode window on the screen.
+
+The PM window has facilities for printing the plot on the default printer,
+for changing the fonts used on the plot, and for switching between different
+ways of plotting the lines (with colour, as dot/dashed lines, or both).
+
+The command line window offers the usual GNUPLOT interface. Both Unix-style
+and DOS-style editing keys are supported.
+
+The GNUPLOT program was compiled with the emx version of the GNU compiler.
+It supports the shell command (type 'exit' to return to GNUPLOT), can pipe
+datafiles through external commands using '<', and supports command-line
+substitution. It runs the full set of demonstration programs supplied in
+the GNUPLOT source code distribution without problems.
+
+The GNUPLOT 3.3 port to OS/2 differs slightly from the 3.2 port, in that
+the PM driver is started from GNUPLOT, rather than the other way round.
+This means that the program name will have to be changed in the program
+object that runs GNUPLOT, if you install 3.3 over 3.2.
+This change does however make the GNUPLOT command line accessible to programs
+that pipe commands to GNUPLOT.
+
+
+2) Running GNUPLOT
+==================
+
+GNUPLOT can be run from the command line of an OS/2 session (preferrably
+a windowed command session, so that the command line and the displayed
+graph can be viewed at the same time), or can be set up as a program object
+in the WPS.
+
+GNUPLOT starts up as a command line session which accepts the usual
+GNUPLOT input. The Presentation Manager window for graphics display
+is only opened when the first 'plot' or 'splot' command is entered.
+
+If GNUPLOT is set up as a program object, it can be configured for
+'drag and drop' in the usual way, by specifying '%*' as the program
+parameter.
+
+The PM window has facilities for printing the plot, for changing
+the fonts used in the plot, and so on. These of course are handled
+through the usual PM interface.
+In addition, you can 'drop' a font onto the window to change the font.
+
+The usual GNUPLOT commands can also be used to produce output on
+supported devices.
+
+Settings and the positions and sizes of the windows can be saved in
+the file gnushell.ini. This file is saved in the program's working
+directory; several different directories can be set up (as program
+objects) with different options, if you wish.
+
+GNUPLOT can be run with the PM display window maximised: clicking on
+the 'GNUPLOT' menu item (or pressing 'ESC') will bring the GNUPLOT
+window to the foreground; it will disappear again when plotting begins.
+
+GNUPLOT itself communicates with the PM display window (which is a
+separate program) through a named pipe. Plotting commands are sent to
+the PM window which produces the plot when all commands have been received.
+
+3) The port of GNUPLOT to OS/2
+==============================
+
+Changes to the code have been kept minimal. Besides the obvious addition
+of the PM driver code, the following are the major changes:
+
+1) Addition of code in readline.c to map keypad keys to editing functions,
+   to duplicate the MS-DOS mode of editing the command line. (See GNUPLOT manual,
+   page 2.)
+
+The rest of the changes are associated with defining the use of the OS2
+conditional value, and setting system-dependent stuff like names, signal
+handling, and end-of-line handling (LF vs CR+LF).
+
+See the file patches.os2 for changes to the GNUPLOT source.
+
+4) gnupmdrv.exe
+===============
+
+Gnupmdrv.exe is the 'outboard' driver for GNUPLOT. It is a multithreaded
+PM program.
+
+Roger Fearick
+fearick@physci.uct.ac.za
+5 November 1992

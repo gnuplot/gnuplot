@@ -1,0 +1,63 @@
+#
+# $Id: poldat.dem%v 3.38.2.88 1993/03/04 01:47:16 woo Exp woo $
+#
+#
+set size .8,1.0
+set time
+set clip
+set grid
+set noborder
+set noparam
+set title "Antenna Pattern"
+set xlabel "Azimuth"
+set ylabel "dBSM"
+set data style line
+set angles degrees
+set polar
+set yrange [-220:220]
+set rrange [-200:60]
+plot "polar.dat" using 1:5,"antenna.dat"
+pause -1 "Hit return to continue"
+set nogrid
+set nopolar
+set title "Primitive Smith Chart"
+set nokey
+set xlabel "Impedance or Admittance Coordinates"
+set para
+set nogrid
+set rrange [-0 : 10]
+set trange [-pi : pi]
+set xrange [-1:1]
+set yrange [-1:1]
+tv(t,r) = sin(t)/(1+r)
+tu(t,r) = (cos(t) +r)/(1+r)
+cu(t,x) = 1 + cos(t)/x
+cv(t,x) = (1+ sin(t))/x
+plot cu(t,.1),cv(t,.1),cu(t,.1),-cv(t,.1),\
+cu(t,1),cv(t,1),cu(t,1),-cv(t,1),\
+cu(t,10),cv(t,10),cu(t,10),-cv(t,10),\
+tu(t,.1),tv(t,.1),\
+tu(t,.5),tv(t,.5),\
+tu(t,1),tv(t,1),\
+tu(t,5),tv(t,5),\
+tu(t,10),tv(t,10),\
+cu(t,.5),cv(t,.5),cu(t,.5),-cv(t,.5),\
+tu(t,0),tv(t,0)
+#cu(t,5),cv(t,5),cu(t,5),-cv(t,5)
+pause -1 "Hit return to continue"
+set noparam
+set key
+set size 1.0,1.0
+set notime
+set title "" 0,0
+set xlabel "" 0,0
+set ylabel "" 0,0
+set data style points
+set angles radians
+set nopolar
+set yrange [-10:10]
+set rrange [0:10]
+set auto
+set noparam
+set border
+set nogrid

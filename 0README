@@ -1,0 +1,147 @@
+Gnuplot is a command-line driven interactive function plotting utility
+for UNIX, MSDOS, and VMS platforms.  The software is copyrighted but
+freely distributed (i.e., you don't have to pay for it).  It was
+originally intended as graphical program which would allow scientists
+and students to visualize mathematical functions and data.  Gnuplot
+supports many different types of terminals, plotters, and printers
+(including many color devices, and pseudo-devices like LaTeX) and is
+easily extensible to include new devices.  [ The "GNU" in gnuplot is
+NOT related to the Free Software Foundation, the naming is just a
+coincidence (and a long story). Thus gnuplot is not covered by the Gnu
+copyleft, but rather by its own copyright statement, included in all
+source code files.]
+
+Gnuplot handles both curves (2 dimensions) and surfaces (3
+dimensions). Surfaces can be plotted as a mesh fitting the specified
+function, floating in the 3-d coordinate space, or as a contour plot
+on the x-y plane. For 2-d plots, there are also many plot styles,
+including lines, points, lines with points, error bars, and impulses
+(crude bar graphs). Graphs may be labeled with arbitrary labels and
+arrows, axes labels, a title, date and time, and a key.  The interface
+includes command-line editing and history on most platforms.
+
+The new gnuplot user should begin by reading the general information
+available by typing `help` after running gnuplot. Then read about the
+`plot` command (type `help plot`).  The manual for gnuplot (which is a
+nicely formatted version of the on-line help information) can be
+printed either with TeX, troff or nroff.  Look at the docs/Makefile
+for the appropriate option.
+
+                      Help and Bug Reports
+
+Additional help can be obtained from the USENET newsgroup
+        comp.graphics.gnuplot.
+This newsgroup is the first place to ask for routine help.  It is is
+gatewayed to a mailing list info-gnuplot@dartmouth.edu.  If you cannot
+obtain a USENET feed and wish to join the above mailing list (or get
+yourself off), mail to
+        info-gnuplot-request@dartmouth.edu.
+Please do not ask to sign up if you can read comp.graphics.gnuplot.
+
+Note that since gnuplot has nothing to do with the GNU project, please
+don't ask them for help or information about gnuplot; also, please
+don't ask us about GNU stuff.
+
+There is another list specifically for documented bug reports
+and the submissions of fixes and modifications, bug-gnuplot@dartmouth.edu.
+To join this list send mail to bug-gnuplot-request@dartmouth.edu.
+
+"bug-gnuplot" is NOT an appropriate place to ask questions on how to
+solve a gnuplot problem or even to report a bug that you haven't
+investigated personally.  It is far more likely you'll get the help
+you need for this kind of problem from comp.graphics.gnuplot.
+
+"bug-gnuplot" is appropriate for turning in a formal bug report
+that does not require timely action.  In other words, if you spend
+time and investigate a bug, and especially if you fix a bug, then
+send it to bug-report and your fix will be considered for the next
+release of gnuplot.  Fixes should be in ``diff -c'' format done
+against the most current official version of gnuplot or the latest
+alpha or beta release of the next version.  All major modifications
+should include documentation and a demo file.  Finally, it is
+much easier to integrate smaller stepwise modifications rather
+than one gigantic diff file which represented months of changes.
+All messages to bug-gnuplot should include the machine you are using, the
+operating system and it's version, plotting devices, and the version
+of gnuplot that you are running.
+
+                   Where to get updates to GNUPLOT
+
+Congratulations on getting this version of GNUPLOT! Unfortunately, it
+may not be the most recent version ("you never know where this version
+has been!"). You can be sure that it IS the most recent version by
+checking one of the official distribution sites, guaranteed to be kept
+up to date (of course, if you got this file from one of those sites,
+you don't need to check!).
+
+To hear automatically about future releases (and other GNUPLOT news),
+read the newsgroup; see above.
+
+At the time of this writing, the following are the official
+distribution sites and transfer instructions. Note that
+prep.ai.mit.edu is NOT an official site, and may not be up to date.
+Also, comp.sources.misc is usually a month or so behind us.
+
+Date: Fri Aug 27 05:21:33 GMT 1993
+
+
+Version: 3.5
+
+In general, GNUPLOT 3.5 is available as the file gnuplot3.5.tar.Z.
+There will patches to bring 3.4 to 3.5 as well called gp34to35.shar.Z.
+(Version 3.3 was skipped because of possible confusion
+with the numerous BETA releases.)  It will be made available to simtel20 
+and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1 and
+OS/2 2.0 executables.
+
+Also, some sites will have gpdoc_ps.zip which contains
+PostScript versions of the manuals and tutorials.
+
+Please obtain gnuplot from the site
+nearest you.
+
+USENET users:
+
+    GNUPLOT 3.5 will posted to comp.sources.misc.
+
+
+NORTH AMERICA:
+
+     Anonymous ftp to ftp.dartmouth.edu (129.170.16.4)
+     Fetch
+        pub/gnuplot/gnuplot3.5.tar.Z
+     in binary mode.
+
+     Users without ftp capability can obtain it through a mail ftp
+     server. Send a mail message saying 'help' to
+     BITFTP@pucc.princeton.edu for instructions. For a uuencoded
+     copy of the gnuplot sources (compressed tar file), send this
+     message to BITFTP@pucc.princeton.edu:
+         FTP DARTMOUTH.EDU UUENCODE
+         USER ANONYMOUS
+         CD pub/gnuplot
+         BINARY
+         GET gnuplot3.5.tar.Z
+         QUIT
+
+
+AUSTRALIA:
+
+     Anonymous ftp to monu1.cc.monash.edu.au (130.194.1.101).
+     Fetch pub/gnuplot3.5.tar.Z in binary mode.
+
+
+EUROPE:
+
+     Anonymous ftp to irisa.irisa.fr (131.254.2.3).
+     Fetch pub/gnuplot3.5.tar.Z in binary mode.
+
+----
+
+     DISCLAIMER - This product is not related in any way to
+     Pixar or any other commercial venture.
+
+----
+
+                                        -Thomas Williams-
+                                        -Alex Woo-

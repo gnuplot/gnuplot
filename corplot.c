@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: corplot.c,v 3.26 92/03/24 22:36:10 woo Exp Locker: woo $";
+static char *RCSid = "$Id: corplot.c,v 3.37 1992/05/28 03:31:19 woo Exp $";
 #endif
+
 
 /* GNUPLOT - corplot.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,16 +31,31 @@ static char *RCSid = "$Id: corplot.c,v 3.26 92/03/24 22:36:10 woo Exp Locker: wo
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 #include <stdio.h>
 #include <process.h>
 #include <dos.h>
+#if defined(ATARI) && defined(__PUREC__)
+#include <plot.h>
+#endif
 
 #define BOUNDARY 32768
 #define segment(addr) (FP_SEG(m) + ((FP_OFF(m)+15) >> 4));

@@ -1,0 +1,160 @@
+This version of gnuplot represents the work of many people.  For a more
+complete list read the RCS log on the top of makefile.unx.  This version
+originally was centered on Jos Van Woude's probability functions,
+Don Tabor's discrete contour levels and Rob Cunningham's binary file
+IO capability.  It has grown tremendously.  Russell Lang and Maurice
+Castro added MS-Windows capability and much more.  Roger Fearick
+added OS/2 capabilility.  Alexander Lehmann and Hans-Edgar Koechling
+greatly improved Atari support. (There are also an OS-9 and PC-9801 versions
+of 3.2 and a Mac version of 3.0 and a multiple plot on a page mod
+which were not integrated into this release.)  Eric Youngdale replaced the
+explicit function hidden line removal routines with a more general
+implicit bitmap (which requires more memory).  Gershon Elber fixed
+many 3D bugs and added the "dgrid3d" option which takes allows
+scattered data to be contoured.  Ed Kubaitis reworked the X11 support.
+In addition, many more devices are now provided.  We have
+always added device drivers because we have no way to debug most of
+them and only by including them into the package we obtain feedback.
+
+In addition, we have begun a contrib subdirectory which contains
+external library, programs, and mods which help in the use of
+Gnuplot.  Many of the diffs are now out of date and will take
+some work to implement.
+
+These contributions are not in any particular order.
+
+* Subject: Special Functions for Probability Densities
+  Name: Jos van der Woude
+  Email: jvdwoude@hut.nl
+
+* Subject: Discrete Contour Levels
+  Name: Don Taber
+  Email: news@solitary.stanford.edu,dbt@victoria.risc.rockwell.com
+
+* Subject: LN03p (Graphic Enhance Mode) Driver and REGIS fixes
+  Name: Hung-chi Lihn
+  Email: lihn@ssrl01.slac.stanford.edu
+
+* Subject: LESS-like additions to READLINE capability
+  Name:    Michal Tomczak, Tom Tkacik
+  Email: ntomczak@vm.ucs.ualberta.ca,tkacik@hobbes.cs.gmr.com
+
+* Subject: doc2texinfo : Converts Gnuplot .doc files to Texinfo format.
+  Name: George Ferguson
+  Email: ferguson@cs.rochester.edu
+
+* Subject: Atari ST (gcc 1.40) version  and PureC version
+  Name: Alexander Lehmann, Hans-Edgar Koechling
+  Email: alexlehm@iti.informatik.th-darmstadt.de,
+        koechling@nvdv.e-technik.uni-stuttgart.dpe.de
+
+* Subject: ISO 8869/1 character sets
+  Name: Marius Olafsson
+  Email: marius@rhi.hi.is
+
+* Subject: HP PaintJet Driver
+  Name: Dan Merget
+  Email: danm@hpnmdlc0.sr.hp.com
+
+* Subject: Improvements to HP PCL driver
+  Name: Timothy Collins, Tom Swiler, Alex Woo
+  Email: kaph6@solx1.central.susx.ac.uk,tom@silica.mse.ufl.edu
+
+* Subject: plot "file" thru f(x) for transforming datafiles
+  Name: Jack Veenstra
+  Email: veenstra@cs.rochester.edu
+
+* Subject: improvement to HPGL driver
+  Name: Craig Johnston
+  Email: johnston@maxwell.ee.washington.edu
+
+* Subject: X11 mods
+  Name: Ed Kubaitis, Yehavi Bourvine
+  Email: ejk@ux2.ncsa.uiuc.edu, YEHAVI@vms.huji.ac.il
+
+* Subject: Binary File IO
+  Name: Rob Cunningham, Jos van der Woude
+  Email: rkc@xn.ll.mit.edu,jvdwoude@hut.nl
+
+* Subject: Improved Hidden Line Removal & LITE flag
+  Name: Eric Youngdale
+  Email: eric@tantalus.nrl.navy.mil
+
+* Subject: xlib driver & test programs in contrib
+  Name: Gregg Hanna
+  Email: gregor@kafka.saic.com
+
+* Subject: MS-Windows, boxes and boxerror styles, plot using accepts
+           columns in any order, plus many, many improvements
+  Name: Russell Lang, Maurice Castro
+  Email: rjl@monu1.cc.monash.edu.au, maurice@bruce.cs.monash.edu.au
+
+* Subject: OS/2 version
+  Name: Roger Fearick
+  Email: fearick@physci.uct.ac.za
+
+* Subject: scatter to grid mods "set dgrid3d", plus fixes
+  Name: Gershon Elber scatter to grid mods
+  Email: gershon@cs.utah.edu
+
+* Subject: Notitle option to remove entry in key
+  Name: R. Shouman
+  Email: rshouman@hermes.chpc.utexas.edu
+
+* Subject: Misc. Bug Fixes, new get_data, many improvements
+  Name: Daniel S. Lewart
+  Email: d-lewart@uiuc.edu
+
+
+* Subject: H Olav Eggestad RGIP Uniplex driver (POSIX) and Imagen driver
+  Name: Hans Olav Eggestad
+  Email: olav@jordforsk.nlh.no
+
+* Subject: New plotstyle "steps" for discrete functions
+  Name: John Grosh
+  Email: jgrosh@brl.mil
+
+
+* Subject: CorelDraw! driver (subset of EPS)
+  Name: Chris Parks
+  Email: parks@physics.purdue.edu
+
+* Subject: PSTRICKS  driver (for TeX)
+  Name: Ray Toy
+  Email: toy@soho.crd.ge.com
+
+* Subject: Framemaker MIF 3.0 driver
+  Name: Olof Franksson
+  Email: olof@ikaros.fysik4.kth.se
+
+* Subject: Apollo mods
+  Name:  Jim Richardson
+  Email: jimr@maths.su.oz.au
+
+* Subject: TGIF driver
+  Name: Neal Holtz
+  Email: nholtz@civeng.carleton.ca
+
+* Subject: TPIC specials driver (TeX)
+  Name: Honoo Suzuki
+  Email: honoo@nc.titech.ac.jp
+
+* Subject: Log to any base capability
+  Name: Lawrence Crowl
+  Email: crowl@cs.orst.edu
+
+* Subject: Talaris EXCL driver
+  Name: P. Klosowski
+  Email: przemek@rrdstrad.nist.gov
+
+* Subject: New LaTeX Driver
+  Name: Xiaoguang Zhang
+  Email: zhang@whbws.ms.ornl.gov
+
+* Subject: TeXdraw driver (eepic derivative)
+  Name: Khun Yee Fung
+  Email: clipper@csd.uwo.ca
+
+* Subject: debug and hp2623a driver, fixes
+  Name: Bruce Lueckenoff
+  Email: luecken@udel.edu

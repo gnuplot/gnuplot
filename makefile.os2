@@ -1,0 +1,104 @@
+#
+# $Id: makefile.os2%v 3.50 1993/07/09 05:35:24 woo Exp $
+#
+# Make file for use with emx 0.8e (gcc2.2.2) and nmake
+# for compiling for OS/2 2.0
+# usage: nmake  OR dmake -r  -B
+# (file has blanks instead of real tabs, doesn't use dmake.ini)
+# 
+
+# where to place gnuplot.gih helpfile
+HELPFILE = gnuplot.gih
+
+CFLAGS = -c -O2 -DOS2 -DGETCWD -DREADLINE -DPIPES
+
+# see other terminal defines in term.h
+TERMFLAGS = 
+
+
+OBJS = 	bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
+	help.o internal.o misc.o parse.o plot.o readline.o specfun.o \
+	scanner.o setshow.o standard.o term.o util.o version.o \
+        binary.o gnubin.o
+
+CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
+	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
+	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
+CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
+	term\iris4d.trm term\kyo.trm term\latex.trm term/pbm.trm term\pm.trm 
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
+	term\v384.trm term\x11.trm
+CSOURCE8 = contour.c
+
+# default rules
+.c.o:
+	gcc $(CFLAGS) -o $*.o $*.c
+
+gnuplot.exe: $(OBJS)
+        gcc -o gnuplot.exe $(OBJS) -los2
+
+
+bitmap.o: bitmap.c bitmap.h plot.h
+
+binary.o: binary.c plot.h
+
+gnubin.o: gnubin.c plot.h
+
+command.o: command.c plot.h setshow.h help.h
+
+contour.o: contour.c plot.h
+
+eval.o: eval.c plot.h
+
+graphics.o: graphics.c plot.h setshow.h
+
+graph3d.o: graph3d.c plot.h setshow.h
+
+help.o: help.c plot.h help.h
+
+internal.o: internal.c plot.h
+
+misc.o: misc.c plot.h setshow.h
+
+parse.o: parse.c plot.h
+
+plot.o: plot.c plot.h setshow.h
+
+readline.o: readline.c
+
+scanner.o: scanner.c plot.h
+
+setshow.o: setshow.c plot.h setshow.h
+
+specfun.o: specfun.c plot.h
+
+standard.o: standard.c plot.h
+
+term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	gcc $(CFLAGS) $(TERMFLAGS) -Iterm -o term.o term.c
+
+util.o: util.c plot.h
+
+version.o: version.c
+
+all: gnuplot.exe $(HELPFILE)
+
+# convert gnuplot.doc to gnuplot.gih
+doc2gih.exe: docs\doc2gih.c
+	gcc -o doc2gih.exe  docs/doc2gih.c
+
+$(HELPFILE): doc2gih.exe docs\gnuplot.doc
+	doc2gih docs\gnuplot.doc $(HELPFILE)
+
+clean:
+	del *.o
+
+# realclean target - remove all files created by the makefile
+
+realclean: clean
+	del gnuplot.exe
+	del doc2gih.exe
+	del gnuplot.gih
+
+

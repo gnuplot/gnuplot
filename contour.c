@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: contour.c,v 3.26 92/03/24 22:35:54 woo Exp Locker: woo $";
+static char *RCSid = "$Id: contour.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - contour.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -24,12 +25,24 @@ static char *RCSid = "$Id: contour.c,v 3.26 92/03/24 22:35:54 woo Exp Locker: wo
  *   Original Software:
  *       Gershon Elber
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
@@ -46,6 +59,9 @@ static char *RCSid = "$Id: contour.c,v 3.26 92/03/24 22:35:54 woo Exp Locker: wo
 #define INTERP_CUBIC     1                           /* Cubic spline interp. */
 #define APPROX_BSPLINE   2                         /* Bspline interpolation. */
 
+#define LEVELS_AUTO			0		/* How contour levels are set */
+#define LEVELS_INCREMENTAL	1		/* user specified start & incremnet */
+#define LEVELS_DISCRETE		2		/* user specified discrete levels */
 #define ACTIVE   1                    /* Status of edges at certain Z level. */
 #define INACTIVE 2
 
@@ -67,30 +83,33 @@ static char *RCSid = "$Id: contour.c,v 3.26 92/03/24 22:35:54 woo Exp Locker: wo
 #define abs(x)  ((x) > 0 ? (x) : (-(x)))
 #define sqr(x)  ((x) * (x))
 
+#ifndef AMIGA_AC_5
+extern double sqrt();
+#endif /* not AMIGA_AC_5 */
 typedef double tri_diag[3];         /* Used to allocate the tri-diag matrix. */
 typedef double table_entry[4];	       /* Cubic spline interpolation 4 coef. */
 
 struct vrtx_struct {
-    double X, Y, Z;                       /* The coordinates of this vertex. */
-    struct vrtx_struct *next;                             /* To chain lists. */
+	double X, Y, Z;                       /* The coordinates of this vertex. */
+	struct vrtx_struct *next;                             /* To chain lists. */
 };
 
 struct edge_struct {
-    struct poly_struct *poly[2];   /* Each edge belongs to up to 2 polygons. */
-    struct vrtx_struct *vertex[2]; /* The two extreme points of this vertex. */
-    struct edge_struct *next;                             /* To chain lists. */
-    int status, /* Status flag to mark edges in scanning at certain Z level. */
+	struct poly_struct *poly[2];   /* Each edge belongs to up to 2 polygons. */
+	struct vrtx_struct *vertex[2]; /* The two extreme points of this vertex. */
+	struct edge_struct *next;                             /* To chain lists. */
+	int status, /* Status flag to mark edges in scanning at certain Z level. */
 	boundary;                   /* True if this edge is on the boundary. */
 };
 
 struct poly_struct {
-    struct edge_struct *edge[3];           /* As we do triangolation here... */
-    struct poly_struct *next;                             /* To chain lists. */
+	struct edge_struct *edge[3];           /* As we do triangolation here... */
+	struct poly_struct *next;                             /* To chain lists. */
 };
 
 struct cntr_struct {	       /* Contours are saved using this struct list. */
-    double X, Y;                          /* The coordinates of this vertex. */
-    struct cntr_struct *next;                             /* To chain lists. */
+	double X, Y;                          /* The coordinates of this vertex. */
+	struct cntr_struct *next;                             /* To chain lists. */
 };
 
 static int test_boundary;    /* If TRUE look for contours on boundary first. */
@@ -103,6 +122,8 @@ static int num_of_z_levels = DEFAULT_NUM_OF_ZLEVELS;  /* # Z contour levels. */
 static int num_approx_pts = DEFAULT_NUM_APPROX_PTS;/* # pts per approx/inter.*/
 static int bspline_order = DEFAULT_BSPLINE_ORDER;   /* Bspline order to use. */
 static int interp_kind = INTERP_NOTHING;  /* Linear, Cubic interp., Bspline. */
+static int levels_kind = LEVELS_AUTO;  /* auto, incremental, discrete */
+
 
 static void gen_contours();
 static int update_all_edges();
@@ -135,57 +156,77 @@ static eval_bspline();
  * Entry routine to this whole set of contouring module.
  */
 struct gnuplot_contours *contour(num_isolines, iso_lines,
-				 ZLevels, approx_pts, kind, order1)
+				 ZLevels, approx_pts, int_kind, order1,
+				 levels_kind, levels_list)
 int num_isolines;
 struct iso_curve *iso_lines;
-int ZLevels, approx_pts, kind, order1;
+int ZLevels, approx_pts, int_kind, order1;
+int levels_kind;
+double *levels_list;
 {
-    int i;
-    struct poly_struct *p_polys, *p_poly;
-    struct edge_struct *p_edges, *p_edge;
-    struct vrtx_struct *p_vrts, *p_vrtx;
-    double x_min, y_min, z_min, x_max, y_max, z_max, z, dz, z_scale = 1.0;
+	int i;
+	struct poly_struct *p_polys, *p_poly;
+	struct edge_struct *p_edges, *p_edge;
+	struct vrtx_struct *p_vrts, *p_vrtx;
+	double x_min, y_min, z_min, x_max, y_max, z_max, z, dz;
+ 	struct gnuplot_contours *save_contour_list;
 
-    num_of_z_levels = ZLevels;
-    num_approx_pts = approx_pts;
-    bspline_order = order1 - 1;
-    interp_kind = kind;
+	num_of_z_levels = ZLevels;
+	num_approx_pts = approx_pts;
+	bspline_order = order1 - 1;
+	interp_kind = int_kind;
 
-    contour_list = NULL;
+	contour_list = NULL;
 
-    if (interp_kind == INTERP_CUBIC) calc_hermit_table();
+	if (interp_kind == INTERP_CUBIC) calc_hermit_table();
 
-    gen_triangle(num_isolines, iso_lines, &p_polys, &p_edges, &p_vrts,
+	gen_triangle(num_isolines, iso_lines, &p_polys, &p_edges, &p_vrts,
 		&x_min, &y_min, &z_min, &x_max, &y_max, &z_max);
-    dz = (z_max - z_min) / (num_of_z_levels+1);
-    /* Step from z_min+dz upto z_max-dz in num_of_z_levels times. */
-    z = z_min + dz;
-    crnt_cntr_pt_index = 0;
+	crnt_cntr_pt_index = 0;
 
-    for (i=0; i<num_of_z_levels; i++, z += dz) {
-	contour_level = z;
-	gen_contours(p_edges, z + dz * SHIFT_Z_EPSILON, x_min, x_max,
-							y_min, y_max);
-    }
+	dz = (z_max - z_min) / (num_of_z_levels + 1);
+	z = z_min;
+	for (i = 0; i < num_of_z_levels; i++) {
+		switch(levels_kind) {
+			case LEVELS_AUTO:
+				/* Step from z_min+dz upto z_max-dz in num_of_z_levels times. */
+				z += dz;
+				break;
+			case LEVELS_INCREMENTAL:
+				z = levels_list[0] + i * levels_list[1];
+				break;
+			case LEVELS_DISCRETE:
+				z = levels_list[i];
+				break;
+		}
+		contour_level = z;
+ 		save_contour_list = contour_list;
+		gen_contours(p_edges, z + dz * SHIFT_Z_EPSILON, x_min, x_max,
+								y_min, y_max);
+ 		if(contour_list != save_contour_list) {
+ 			contour_list->isNewLevel = 1;
+ 			sprintf(contour_list->label, "%8.3g", z);
+ 		}
+	}
 
-    /* Free all contouring related temporary data. */
-    while (p_polys) {
+	/* Free all contouring related temporary data. */
+	while (p_polys) {
 	p_poly = p_polys -> next;
 	free (p_polys);
 	p_polys = p_poly;
-    }
-    while (p_edges) {
+	}
+	while (p_edges) {
 	p_edge = p_edges -> next;
 	free (p_edges);
 	p_edges = p_edge;
-    }
-    while (p_vrts) {
+	}
+	while (p_vrts) {
 	p_vrtx = p_vrts -> next;
 	free (p_vrts);
 	p_vrts = p_vrtx;
-    }
+	}
 
-    if (interp_kind == INTERP_CUBIC) free(hermit_table);
+	if (interp_kind == INTERP_CUBIC) free(hermit_table);
 
     return contour_list;
 }
@@ -217,11 +258,11 @@ end_crnt_cntr()
 {
     int i;
     struct gnuplot_contours *cntr = (struct gnuplot_contours *)
-					alloc(sizeof(struct gnuplot_contours),
+					alloc((unsigned long)sizeof(struct gnuplot_contours),
 					      "gnuplot_contour");
 
-    cntr->coords = (struct coordinate *) alloc(sizeof(struct coordinate) *
-							  crnt_cntr_pt_index,
+    cntr->coords = (struct coordinate GPHUGE *) gpfaralloc((unsigned long)sizeof(struct coordinate) *
+							  ( unsigned long)crnt_cntr_pt_index,
 					       "contour coords");
     for (i=0; i<crnt_cntr_pt_index; i++) {
 	cntr->coords[i].x = crnt_cntr[i * 2];
@@ -232,6 +273,7 @@ end_crnt_cntr()
 
     cntr->next = contour_list;
     contour_list = cntr;
+ 	contour_list->isNewLevel = 0;
 
     crnt_cntr_pt_index = 0;
 }
@@ -410,7 +452,7 @@ int *in_middle;
     }
     else {
 	*in_middle = TRUE;
-	p_cntr = (struct cntr_struct *) alloc(sizeof(struct cntr_struct),
+	p_cntr = (struct cntr_struct *) alloc((unsigned long)sizeof(struct cntr_struct),
 							"contour cntr_struct");
 	p_cntr -> X = p_edge -> vertex[1] -> X * t +
 		     p_edge -> vertex[0] -> X * (1-t);
@@ -527,14 +569,14 @@ double *x_min, *y_min, *z_min, *x_max, *y_max, *z_max;
 static struct vrtx_struct *gen_vertices(grid_x_max, points,
 				      x_min, y_min, z_min, x_max, y_max, z_max)
 int grid_x_max;
-struct coordinate *points;
+struct coordinate GPHUGE *points;
 double *x_min, *y_min, *z_min, *x_max, *y_max, *z_max;
 {
     int i;
     struct vrtx_struct *p_vrtx, *pv_tail, *pv_temp;
 
     for (i=0; i<grid_x_max; i++) {/* Get a point and generate the structure. */
-        pv_temp = (struct vrtx_struct *) alloc(sizeof(struct vrtx_struct),
+        pv_temp = (struct vrtx_struct *) alloc((unsigned long)sizeof(struct vrtx_struct),
 						"contour vertex");
 	pv_temp -> X = points[i].x;
 	pv_temp -> Y = points[i].y;
@@ -572,7 +614,7 @@ struct edge_struct **pe_tail;
     struct edge_struct *p_edge, *pe_temp;
 
     for (i=0; i<grid_x_max-1; i++) {         /* Generate grid_x_max-1 edges: */
-	pe_temp = (struct edge_struct *) alloc(sizeof(struct edge_struct),
+	pe_temp = (struct edge_struct *) alloc((unsigned long)sizeof(struct edge_struct),
 						"contour edge");
 	pe_temp -> vertex[0] = p_vrtx;              /* First vertex of edge. */
 	p_vrtx = p_vrtx -> next;                     /* Skip to next vertex. */
@@ -608,7 +650,7 @@ struct edge_struct **pe_tail;
     struct edge_struct *p_edge, *pe_temp;
 
     /* Gen first (|). */
-    pe_temp = (struct edge_struct *) alloc(sizeof(struct edge_struct),
+    pe_temp = (struct edge_struct *) alloc((unsigned long)sizeof(struct edge_struct),
 							"contour edge");
     pe_temp -> vertex[0] = p_vrtx2;                 /* First vertex of edge. */
     pe_temp -> vertex[1] = p_vrtx1;                /* Second vertex of edge. */
@@ -617,7 +659,7 @@ struct edge_struct **pe_tail;
     /* Advance in vrtx list grid_x_max-1 times, and gen. 2 edges /| for each.*/
     for (i=0; i<grid_x_max-1; i++) {
 	/* The / edge. */
-	pe_temp = (struct edge_struct *) alloc(sizeof(struct edge_struct),
+	pe_temp = (struct edge_struct *) alloc((unsigned long)sizeof(struct edge_struct),
 							"contour edge");
 	pe_temp -> vertex[0] = p_vrtx1;             /* First vertex of edge. */
 	pe_temp -> vertex[1] = p_vrtx2 -> next;    /* Second vertex of edge. */
@@ -625,7 +667,7 @@ struct edge_struct **pe_tail;
 	*pe_tail = (*pe_tail) -> next;       /* And continue to last record. */
 
 	/* The | edge. */
-	pe_temp = (struct edge_struct *) alloc(sizeof(struct edge_struct),
+	pe_temp = (struct edge_struct *) alloc((unsigned long)sizeof(struct edge_struct),
 							"contour edge");
 	pe_temp -> vertex[0] = p_vrtx2 -> next;     /* First vertex of edge. */
 	pe_temp -> vertex[1] = p_vrtx1 -> next;    /* Second vertex of edge. */
@@ -677,7 +719,7 @@ struct poly_struct **pp_tail;
     /* Advance in vrtx list grid_x_max-1 times, and gen. 2 polys for each. */
     for (i=0; i<grid_x_max-1; i++) {
 	/* The Upper. */
-	pp_temp = (struct poly_struct *) alloc(sizeof(struct poly_struct),
+	pp_temp = (struct poly_struct *) alloc((unsigned long)sizeof(struct poly_struct),
 							"contour poly");
 	/* Now update polys about its edges, and edges about the polygon. */
 	pp_temp -> edge[0] = p_edge_middle -> next;
@@ -694,7 +736,7 @@ struct poly_struct **pp_tail;
 	}
 
 	/* The Lower. */
-	pp_temp = (struct poly_struct *) alloc(sizeof(struct poly_struct),
+	pp_temp = (struct poly_struct *) alloc((unsigned long)sizeof(struct poly_struct),
 							"contour poly");
 	/* Now update polys about its edges, and edges about the polygon. */
 	pp_temp -> edge[0] = p_edge_middle;
@@ -795,7 +837,7 @@ int contr_kind;
         tx2 = (-tx2);   /* Inverse the vector as we need opposite direction. */
         ty2 = (-ty2);
     }
-    else return;			/* Only one point (???) - ignore it. */
+    else return(0);			/* Only one point (???) - ignore it. */
 
     switch (contr_kind) {
 	case OPEN_CONTOUR:
@@ -821,11 +863,10 @@ struct cntr_struct *p_cntr;
 double z_level, x_min, x_max,  y_min, y_max;
 int contr_kind;
 {
-    int num_pts, i, order = bspline_order;
-    struct cntr_struct *pc_temp;
+    int num_pts, order = bspline_order;
 
     num_pts = count_contour(p_cntr);         /* Number of points in contour. */
-    if (num_pts < 2) return;     /* Cannt do nothing if empty or one points! */
+    if (num_pts < 2) return(0);     /* Can't do nothing if empty or one points! */
     /* Order must be less than number of points in curve - fix it if needed. */
     if (order > num_pts - 1) order = num_pts - 1;
 
@@ -907,9 +948,9 @@ double t_min, t_max, tx1, ty1, tx2, ty2;
     double dt, *tangents_x, *tangents_y;
     int i;
 
-    tangents_x = (double *) alloc((unsigned) (sizeof(double) * n),
+    tangents_x = (double *) alloc((unsigned long) (sizeof(double) * n),
 						"contour c_s_intr");
-    tangents_y = (double *) alloc((unsigned) (sizeof(double) * n),
+    tangents_y = (double *) alloc((unsigned long) (sizeof(double) * n),
 						"contour c_s_intr");
 
     if (n > 1) prepare_spline_interp(tangents_x, tangents_y, p_cntr, n,
@@ -917,7 +958,7 @@ double t_min, t_max, tx1, ty1, tx2, ty2;
     else {
 	free((char *) tangents_x);
 	free((char *) tangents_y);
-	return;
+	return(0);
     }
 
     dt = (t_max-t_min)/(n-1);
@@ -946,7 +987,7 @@ static calc_hermit_table()
     int i;
     double t, dt;
 
-    hermit_table = (table_entry *) alloc ((unsigned) (sizeof(table_entry) *
+    hermit_table = (table_entry *) alloc ((unsigned long) (sizeof(table_entry) *
 						(num_approx_pts + 1)),
 						"contour hermit table");
     t = 0;
@@ -1020,9 +1061,9 @@ double t_min, t_max, tx1, ty1, tx2, ty2;
     tri_diag *m;		   /* The tri-diagonal matrix is saved here. */
     struct cntr_struct *p;
 
-    m = (tri_diag *) alloc((unsigned) (sizeof(tri_diag) * n),
+    m = (tri_diag *) alloc((unsigned long) (sizeof(tri_diag) * n),
 						"contour tri_diag");
-    r = (double *) alloc((unsigned) (sizeof(double) * n),
+    r = (double *) alloc((unsigned long) (sizeof(double) * n),
 						"contour tri_diag2");
     n--;
 
@@ -1186,9 +1227,9 @@ double *x, *y;
     int i, p;
     double ti, tikp, *dx, *dy;      /* Copy p_cntr into it to make it faster. */
 
-    dx = (double *) alloc((unsigned) (sizeof(double) * (order + j)),
+    dx = (double *) alloc((unsigned long) (sizeof(double) * (order + j)),
 						"contour b_spline");
-    dy = (double *) alloc((unsigned) (sizeof(double) * (order + j)),
+    dy = (double *) alloc((unsigned long) (sizeof(double) * (order + j)),
 						"contour b_spline");
     /* Set the dx/dy - [0] iteration step, control points (p==0 iterat.): */
     for (i=j-order; i<=j; i++) {
@@ -1237,4 +1278,7 @@ int contour_kind, num_of_points, order, i;
 	default: /* Should never happen */
 	    return 1.0;
     }
+#ifdef sequent
+	return 1.0;
+#endif
 }

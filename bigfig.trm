@@ -1,5 +1,5 @@
 /*
- * $Id: bigfig.trm,v 3.26 92/03/24 22:35:50 woo Exp Locker: woo $
+ * $Id: bigfig.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -26,7 +26,7 @@
  * AUTHORS
  *  Micah Beck, David Kotz
  *
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
  */
  
@@ -36,21 +36,21 @@
  * Updated by David Kotz for gnuplot 2.0
  * More efficient output by Ian Dall
  * Increased size of plot by Ian Dall
+ * Updated to FIG 2.1 (with color) by Vivek Khera
  */
  
 #define BFIG_HTIC       (7*FIG_RES/80)
 #define BFIG_VTIC       (7*FIG_RES/80)
-#define BFIG_HCHAR      (9*FIG_RES/80)
-#define BFIG_FONT_S     (16)
-#define BFIG_VCHAR      ((BFIG_FONT_S)*FIG_RES/80)  /* height in pixels of font
-        */
+#define BFIG_FONT_S     (16)	/* size in points */
+#define BFIG_VCHAR      (BFIG_FONT_S*72/FIG_RES) /* height in pixels of font */
+#define BFIG_HCHAR      (BFIG_VCHAR*6/10) /* this is a guess at the width */
  
-#define BFIG_ARROW_WIDTH BFIG_HTIC
+#define BFIG_ARROW_WIDTH (BFIG_HTIC/2 + 1)
 #define BFIG_ARROW_HEIGHT BFIG_HTIC
  
  
  
-/* 7 inches wide by 5 inches high */
+/* 8 inches wide by 5 inches high */
 #define BFIG_XMAX (8 * FIG_RES)
 #define BFIG_YMAX (5 * FIG_RES)
  
@@ -65,10 +65,9 @@ BFIG_vector(ux,uy)
  
   if (FIG_polyvec_stat != FIG_poly_part)
     {
-      fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+      fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f %d %d %d\n",
               O_POLYLINE, T_POLYLINE,
-              FIG_type, 1, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_spacing,
-              0, 0);
+              FIG_type, 1, FIG_color, 0, FIG_DEFAULT, 0, FIG_spacing, 0,0,0);
       fprintf(outfile, "%d %d",
               BFIG_XOFF + FIG_posx, BFIG_YMAX + BFIG_YOFF - FIG_posy);
       FIG_poly_vec_cnt = 1;
@@ -84,23 +83,21 @@ BFIG_vector(ux,uy)
   FIG_posy = y;
 }
  
- 
- 
- 
+
 BFIG_arrow(sx, sy, ex, ey, head)
         int sx, sy;     /* start coord */
         int ex, ey;     /* end coord */
-	BOOLEAN head;
+	TBOOLEAN head;
 {
 	FIG_poly_clean(FIG_polyvec_stat);
-        fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+        fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f %d  %d %d\n",
                 O_POLYLINE, T_POLYLINE,
-                FIG_type, 1, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_spacing,
-                head ? 1 : 0, 0);
+                FIG_type, 1, FIG_color, 0, FIG_DEFAULT, 0, FIG_spacing,
+		0, head ? 1 : 0, 0);
         /* arrow line */
 	if ( head )
-		fprintf(outfile, "%d %d %.3f %.3f %.3f\n",
-                	0, 0, 1.0,
+	        fprintf(outfile, "%d %d %.3f %.3f %.3f\n",
+        	        0, 0, 1.0,
 			(double)BFIG_ARROW_WIDTH, (double)BFIG_ARROW_HEIGHT);
         fprintf(outfile, "%d %d %d %d 9999 9999\n",
                 BFIG_XOFF + sx, BFIG_YOFF + BFIG_YMAX - sy,
@@ -109,19 +106,18 @@ BFIG_arrow(sx, sy, ex, ey, head)
         FIG_posx = ex;
         FIG_posy = ey;
 }
- 
+
 BFIG_put_text(x, y, str)
         int x, y;
         char *str;
 {
   if (strlen(str) == 0) return;
   FIG_poly_clean(FIG_polyvec_stat);
-    y = y - BFIG_VCHAR/2;               /* assuming vertical center justified */
+  y -= FIG_VCHAR/2;	/* assuming vertical center justified */
  
     fprintf(outfile, "%d %d %d %d %d %d %d %6.3f %d %d %d %d %d %s\01\n",
                   O_TEXT, FIG_justify,
-                  FIG_ROMAN_FONT, BFIG_FONT_S, FIG_DEFAULT, FIG_DEFAULT, FIG_DEFAULT, FIG_angle,
-                  1, BFIG_VCHAR, BFIG_HCHAR*strlen(str), BFIG_XOFF + x,
-        BFIG_YMAX + BFIG_YOFF-y, str);
+                  FIG_ROMAN_FONT, BFIG_FONT_S, FIG_DEFAULT, FIG_DEFAULT, 0,
+		  FIG_angle, SPECIAL_TEXT, BFIG_VCHAR, BFIG_HCHAR*strlen(str),
+		  BFIG_XOFF + x, BFIG_YMAX + BFIG_YOFF-y, str);
 }
- 

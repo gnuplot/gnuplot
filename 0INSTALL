@@ -1,0 +1,247 @@
+The GNUPLOT source code and executables may be copied and/or modified
+freely as long as the copyright messages are left intact.
+
+See the History file for changes to GNUPLOT.
+
+Compilation instructions are near the end of this file.
+
+GNUPLOT has been tested on Sun3's and Sun4's (SunOS 4.0.3 and 4.1.1),
+a VAX 6410 (VMS 5.2), Commodore Amiga's (KS/WB 1.3 and 2.0, SAS/C 6.2
+and Aztec C beta 5.2a), IBM PC XT's and AT's (MS-DOS 3.3/5.0 BC++
+3.1/TC++ 1.0 MSC 7.0), IRIS 4D/70G and 4D/25G with MIPS C, NeXT with
+gnu C 1.34, DECStation 5000/200PXG (ULTRIX V4.1), AT&T 3B1 (version
+3.51m with cc and gcc 1.39), and Apollo's (DomainOS SR10.3 BSD4.3
+with C compiler 68K Rev 6.7(316)).  The code is written with
+portability in mind.  GNUPLOT has not been tested on Pyramid 90x.
+
+There is a mailing list for gnuplot users. Note, however, that the
+newsgroup 
+	comp.graphics.gnuplot 
+is identical to the mailing list (they
+both carry the same set of messages). We prefer that you read the
+messages through that newsgroup, to subscribing to the mailing list.
+(If you can read that newsgroup, and are already on the mailing list,
+please send a message info-gnuplot-request@dartmouth.edu, asking to be
+removed from the mailing list.)
+
+The address for mailing to list members is
+	   info-gnuplot@dartmouth.edu
+and for mailing administrative requests is 
+	   info-gnuplot-request@dartmouth.edu
+The mailing list for bug reports is 
+	   bug-gnuplot@dartmouth.edu
+The list of those interested in beta-test versions is
+	   info-gnuplot-beta@dartmouth.edu
+
+[Please tell us the version and machine on which your bug occurred.]
+
+
+
+                       PREPROCESSOR #DEFINES
+
+These #defines should be checked before compilation (see the makefiles):
+define      file            note
+------      ----            --------
+NOVFORK     Makefile        define if you don't have the vfork() system call
+GAMMA       Makefile        define if you've got gamma(3)
+MEMCPY      Makefile        define if your bcopy() is called memcpy()
+MEMSET      Makefile        define if you have memset() but not bzero()
+NOCOPY      Makefile        define if you've don't have a memcpy() by any name
+bcopy()     plot.h          define if you've got a memcpy() by some OTHER name
+                              (see example in plot.h)
+PC          Makefile        define if compiling on a PClone
+MSDOS       Makefile        define if compiling under MSDOS;
+                              automatically defined by Microsoft C 5.10
+HELPFILE    Makefile        name including path of gnuplot.gih file.
+VERYLARGE   plot.h          define to be largest coordinate number.
+SHELL       plot.h          default shell to spawn if SHELL environment
+                              variable not found at run-time
+NOCWDRC     Makefile        define to inhibit check of ./.gnuplot
+READLINE    Makefile        define if you want command-line editing
+
+Valid TERMFLAGS defines.  These defines are used to include the
+various plotting terminals, printers, and protocols that a given version
+of gnuplot can access:
+
+define      file            note
+------      ----            --------
+TERMFLAGS   Makefile        the set of terminals you want, from below
+            or term.h
+
+   AED         AED 512 and AED 767
+   AIFM        Adobe Illustrator Format
+   AMIGASCREEN Amiga custom screen
+   APOLLO      Apollo Graphics Primitive Resource (resizable window)
+   ATT6300     PC with AT&T 6300 graphics
+   BITGRAPH    BBN BitGraph
+   CGI         SCO CGI
+   COREL       COREL! Draw Format
+   CORONA      PC with Corona graphics 325
+   DXY800A     Roland DXY800A plotter
+   DUMB        Printer or glass dumb terminal
+   DXF         AutoCad (Release 10.x) dxf file format
+   EEPIC       EEPIC-extended LaTeX driver, for EEPIC users
+   EGALIB      PC with EGA/VGA graphics.
+   EMTEX       LaTeX picture environment with emTeX specials
+   EPS180      Epson-LQ style 24-pin 180-dot per inch printers
+   EPS60       Epson-style 60-dot per inch printers
+   EPSONP      Epson LX-800, Star NL-10, NX-1000 and lots of others
+   EXCL        Talaris EXCL laser printer format
+   FIG         Fig graphics language (requires object.h from TransFig)
+   GPR         Apollo Graphics Primitive Resource (fixed-size window)
+   HERCULES    IBM PC/Clone with Hercules graphics board
+   HP2648      HP2648, HP2647
+   HP26        HP2623A and maybe others
+   HP500C      HP Deskjet 500 C and maybe other Color Deskjets
+   HP75        HP7580, and probably other HPs
+   HPGL        HP7475 and (hopefully) lots of others
+   HPLJII      HP Laserjet II
+   HPPJ        HP PaintJet
+   IMAGEN      Imagen laser printers (300dpi) (requires -Iterm also)
+   IRIS4D      IRIS4D series computer
+   KERMIT      MS-DOS Kermit Tektronix 4010 emulator
+   LATEX       LaTeX picture environment
+   MF          Metafont Format
+   MIF         FrameMaker MIF 3.00 Format
+   NEC         NEC CP6 pinwriter printer
+   NEXT        NeXTStep Window System (only grey scale)
+   OS2PM       OS/2 Presentation Manager
+   PBM         PBMPLUS pbm, pgm, ppm formats
+   PCL         HP PCL5 (actually  HPGL/2)
+   POSTSCRIPT  PostScript
+   PRESCRIBE   Kyocera Laser printer
+   PSLATEX     Postscript graphics, LaTeX labels and titles
+   PSTRICKS    PSTRICKS 0.91 format
+   QMS         QMS/QUIC laserprinter (Talaris 1200 and others)
+   REGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
+   RGIP        Redwood Graphics Interface Protocol
+   SELANAR     Selanar
+   STARC       Star Color Printer
+   SUN         Sun Microsystems Workstation
+   T410X       Tektronix 4106, 4107, 4109 and 420x terminals
+   TANDY60     Tandy DMP-130 series 60-dot per inch graphics
+   TEK         Tektronix 4010, and probably others
+   TEXDRAW     TeXDraw format (for LaTeX)
+   TGIF        TGIF X11 Drawing Tool
+   TPIC        Tpic specials for TeX
+   UNIXPC      unixpc (ATT 3b1 or ATT 7300)
+   UNIXPLOT    unixplot
+   V384        Vectrix 384 and tandy color printer
+   VTTEK       VT like Tektronix 4010 emulator
+   X11         X11R4 window system
+
+
+These #defines are defined automatically by various compilers, some
+gnuplot routines check these defines to implement features found in the
+various environments:
+
+define        note
+------        --------
+AMIGA_AC_5    defined for Manx Aztec C 5.2a on the Amiga
+AMIGA_SC_6_1  defined for SAS/C 6.1 or later versions on the Amiga
+apollo        defined by Apollo's C compilers.
+_CRAY         defined by CRAY's C compiler.
+__TURBOC__    defined automatically by  Borland C++ 3.x
+unix          defined by most unix C compilers.
+vms           (and VMS) defined by VAX-11 C under VMS.
+__ZTC__       Zortech C compiler under MSDOS.
+_Windows      defined by Borland C++ 3.0 compiling for MS-Windows
+
+
+                             TO COMPILE
+
+under UNIX:
+To compile do:
+  Copy makefile.unx to Makefile
+      cp makefile.unx Makefile
+  Look through the Makefile to see if you need to make any changes.
+  See especially the HELPDEST and TERMFLAGS variables.  Edit if needed.
+  Alternatively, all these variables may be set as command line arguments to
+  'make'. For example:
+
+        make <MACHINE> HELPDEST='/usr/um/misc/lib/gnuplot.gih' \
+                DEST='/usr/um/misc/bin' READLINE=
+
+  Edit term.h, to include/exclude terminals
+  Type
+      make
+  For further instructions.
+  If that works, try
+      make install
+  For further instructions.
+
+under VMS:
+  To compile:
+     copy makefile.vms makefile.
+     make
+  Or if you don't have a suitable make:
+     @buildvms
+  To tell gnuplot where to find the help library:
+      $ define gnuplot$help disk:[directory]gnuplot.hlb
+  Alternatively (and preferably) put the help in the main system help library.
+
+under AmigaDOS:
+Using Aztec C 5.2a
+      make -f makefile.ami
+Using SAS/C 6.1 or later versions
+      smake -f makefile.amg
+
+Using Microsoft C 7.0 and compiling for MS-Windows
+      copy makefile.msw makefile
+      nmake
+  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
+  in the windows directory.
+
+under MSDOS:
+Using Microsoft C 7.0.
+      copy makefile.msc makefile
+      nmake 
+
+Using Borland C++ 3.1 and compiling for MS-Windows
+      copy makefile.win makefile
+  Edit makefile to change TC.
+      make
+  Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
+  in the windows directory.
+
+Using Borland C++ 3.0
+      copy makefile.tc makefile
+  Edit makefile to change TC, BIN, BGI, BGIOBJ. You may also want to turn
+  off overlays (See manual for more on overlays).
+      make
+
+
+The file gnuplot.gih is needed for help on the PC.
+If the file gnuplot.gih is not in the default directory, then use:
+    set GNUHELP={full path name of gnuplot.gih}
+
+
+                         ENVIRONMENT VARIABLES
+
+See 'help environment'.
+
+If the environment variable GNUTERM is found, it is used as the terminal
+type. Otherwise, in some cases the variable TERM will be used, or the
+hardware may be automatically detected.
+
+The PC version looks for the environment variable GNUPLOT to contain
+the name of the directory from which to load the initialization file
+GNUPLOT.INI.  See the help on 'start_up' for more information.
+
+HOME is examined as a directory where a .gnuplot startup file might be
+found. See help on "start-up".
+
+If defined, the environment variable GNUHELP is used for the name
+of the .gih help file, otherwise HELPFILE (defined in makefile or
+plot.c) is used.
+
+The VMS version looks for the logical name GNUPLOT$HELP to locate
+the help library.
+
+The CGI drivers need the CGIPATH environment variable to set the path
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment
+variables to set the output devices.
+
+The CGI drivers need the CGIPATH environment variable to set the path
+to the CGI agents, and the CGIDISP and/or CGIPRNT environment
+variables to set the output devices.

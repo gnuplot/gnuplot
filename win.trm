@@ -1,0 +1,244 @@
+/* GNUPLOT - term/win.trm */
+/*
+ * Copyright (C) 1992   Maurice Castro, Russell Lang
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
+ *
+ * AUTHORS
+ * 
+ *   Gnuplot for Windows:
+ *       Maurice Castro, Russell Lang
+ * 
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
+ */
+
+
+/* This file implements the terminal and printer display for gnuplot  */
+/* under Microsoft Windows. The code currently compiles only with the */
+/* Borland C++ 3.1 compiler.                                          */
+/*                                                                    */
+/* The modifications to allow Gnuplot to run under Windows were made  */
+/* by Maurice Castro (maurice@bruce.cs.monash.edu.au)                 */
+/* and Russell Lang (rjl@monu1.cc.monash.edu.au)         19 Nov 1992  */
+/*                                                                    */
+
+/* Edit this file with tabstop=4 (vi :se ts=4)                        */
+
+#include <windows.h>
+#include "../win/wgnuplib.h"
+
+extern GW graphwin;
+
+char win_prntmp[256];	/* printer temporary file */
+
+/* Initialization values - Guess Now Scale later */
+#define WIN_XMAX (2400)
+#define WIN_YMAX (1800)
+#define WIN_HCHAR (WIN_XMAX/75) 
+#define WIN_VCHAR (WIN_YMAX/25)
+#define WIN_HTIC (WIN_XMAX/160)
+#define WIN_VTIC WIN_HTIC
+
+/* Interface routines - create list of actions for Windows */
+
+WIN_options()
+{
+	extern struct value *const_express();
+	extern double real();
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"d$efault")) {
+			graphwin.color=TRUE;
+			strcpy(graphwin.fontname,WINFONT);
+			graphwin.fontsize = WINFONTSIZE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"m$onochrome")) {
+			graphwin.color=FALSE;
+			c_token++;
+		}
+		else if (almost_equals(c_token,"c$olor")) {
+			graphwin.color=TRUE;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND && isstring(c_token)) {
+		quote_str(graphwin.fontname,c_token);
+		c_token++;
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have font size specified */
+		struct value a;
+		graphwin.fontsize = (int)real(const_express(&a));
+	}
+
+	if (graphwin.fontname[0] == '\0')
+	  sprintf(term_options,"%s", graphwin.color ? "color" :  "monochrome");
+	else
+	  sprintf(term_options,"%s \"%s\" %d", graphwin.color ? "color" :  "monochrome" ,
+		graphwin.fontname, graphwin.fontsize);
+	if (IsWindow(graphwin.hWndGraph) && IsIconic(graphwin.hWndGraph)) {
+		ShowWindow(graphwin.hWndGraph, SW_SHOWNORMAL);
+	}
+	GraphRedraw(&graphwin);
+}
+
+/* We don't actually do scaling, but we need to fix up the text size
+ * if the user has resized the window */
+int WIN_scale()
+{
+	term_tbl[term].h_char = graphwin.hchar;
+	term_tbl[term].v_char = graphwin.vchar;
+	sprintf(term_options,"%s \"%s\" %d", graphwin.color ? "color" :  "monochrome" ,
+		graphwin.fontname, graphwin.fontsize);
+	return FALSE ;	/* can't be done */
+}
+
+WIN_init()
+{
+	if (!graphwin.hWndGraph) {
+		graphwin.xmax = WIN_XMAX;
+		graphwin.ymax = WIN_YMAX;
+		graphwin.htic = WIN_HTIC;
+		graphwin.vtic = WIN_VTIC;
+		GraphInit(&graphwin);
+		SetClassWord(graphwin.hWndGraph, GCW_HICON, LoadIcon(graphwin.hInstance, "grpicon"));
+		graphwin.resized = FALSE;
+	}
+}
+
+
+WIN_reset()
+{
+}
+
+WIN_text()
+{
+	GraphEnd(&graphwin);
+}
+
+WIN_graphics()
+{
+	GraphStart(&graphwin);
+}
+
+WIN_move(x, y)
+unsigned int x, y;
+{
+	GraphOp(&graphwin, W_move, x, y, NULL);
+}
+
+WIN_vector(x,y)
+unsigned int x, y;
+{
+	GraphOp(&graphwin, W_vect, x, y, NULL);
+}
+
+WIN_linetype(lt)
+int lt;
+{
+	GraphOp(&graphwin, W_line_type, lt, 0, NULL);
+}
+
+WIN_put_text(x,y,str)
+int x, y;
+char *str;
+{
+	GraphOp(&graphwin, W_put_text, x, y, str);
+}
+
+int WIN_justify_text(mode)
+enum JUSTIFY mode;
+{
+	GraphOp(&graphwin, W_justify, mode, 0, NULL);
+    return(TRUE);
+}
+
+int WIN_text_angle(ang)
+int ang;
+{
+	if (graphwin.rotate)
+		GraphOp(&graphwin, W_text_angle, ang, 0, NULL);
+	return graphwin.rotate;
+}
+
+WIN_point(x,y,number)
+int x,y;
+int number;
+{
+	/* draw point shapes later to save memory */
+	graphwin.htic = term_tbl[term].h_tic / 2; 	/* size of point symbols */
+	graphwin.vtic = term_tbl[term].v_tic / 2;
+	if (number>=0)
+		number %= POINT_TYPES;
+	number += 1;
+	GraphOp(&graphwin, W_dot + number, x, y, NULL);
+}
+
+
+/* Windows PRN emulation */
+FILE *
+open_printer()
+{
+char *temp;
+	if ((temp = getenv("TEMP")) == (char *)NULL)
+		*win_prntmp='\0';
+	else  {
+		strncpy(win_prntmp,temp,MAX_ID_LEN-1);
+		/* stop X's in path being converted by mktemp */
+		for (temp=win_prntmp; *temp; temp++)
+			*temp = tolower(*temp);
+		if ( strlen(win_prntmp) && (win_prntmp[strlen(win_prntmp)-1]!='\\') )
+			strcat(win_prntmp,"\\");
+	}
+	strncat(win_prntmp, "_gptmp",MAX_ID_LEN-strlen(win_prntmp));
+	strncat(win_prntmp, "XXXXXX",MAX_ID_LEN-strlen(win_prntmp));
+	mktemp(win_prntmp);
+	return fopen(win_prntmp, "w");
+}
+
+void
+close_printer()
+{
+	fclose(outfile);
+	DumpPrinter(graphwin.hWndGraph, graphwin.Title, win_prntmp);
+}
+
+void
+screen_dump(void)
+{
+	GraphPrint(&graphwin);
+}

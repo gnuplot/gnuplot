@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: readline.c,v 3.26 92/03/24 22:34:35 woo Exp Locker: woo $";
+static char *RCSid = "$Id: readline.c%v 3.50.1.9 1993/08/05 05:38:59 woo Exp $";
 #endif
+
 
 /* GNUPLOT - readline.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,19 +28,38 @@ static char *RCSid = "$Id: readline.c,v 3.26 92/03/24 22:34:35 woo Exp Locker: w
  *   Msdos port and some enhancements:
  *     Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #ifdef READLINE
+#ifdef ATARI
+#include "plot.h"
+#endif
+#ifdef _WINDOWS
+#define _Windows
+#endif
 
 /* a small portable version of GNU's readline */
-
-/* do not need any terminal capabilities except backspace,
+/* this is not the BASH or GNU EMACS version of READLINE due to Copyleft 
+	restrictions */
+/* do not need any terminal capabilities except backspace, */
 /* and space overwrites a character */
 
 /* NANO-EMACS line editing facility */
@@ -65,38 +85,116 @@ static char *RCSid = "$Id: readline.c,v 3.26 92/03/24 22:34:35 woo Exp Locker: w
 #include <ctype.h>
 #include <signal.h>
 
-/* SIGTSTP defines job control */
-/* if there is job control then we need termios.h instead of termio.h */
-#ifdef SIGTSTP
-#define TERMIOS
+#if !defined(MSDOS) && !defined(ATARI) && !defined(_Windows) && !defined(DOS386)
+
+/*
+ * Set up structures using the proper include file
+ */
+#if defined(_IBMR2) || defined(alliant)
+#define SGTTY
 #endif
 
+/*  submitted by Francois.Dagorn@cicb.fr */
+#ifdef SGTTY
+#include <sgtty.h>
+static struct sgttyb orig_termio, rl_termio;
+/* define terminal control characters */
+static struct tchars s_tchars;
+#define VERASE    0
+#define VEOF      1
+#define VKILL     2
+#ifdef TIOCGLTC		 /* available only with the 'new' line discipline */
+static struct ltchars s_ltchars;
+#define VWERASE   3
+#define VREPRINT  4
+#define VSUSP     5
+#endif /* TIOCGLTC */
+#define NCCS      6
 
-#ifndef MSDOS
+#else /* SGTTY */
 
-/* UNIX specific stuff */
-#ifdef TERMIOS
+/* SIGTSTP defines job control */
+/* if there is job control then we need termios.h instead of termio.h */
+/* (Are there any systems with job control that use termio.h?  I hope not.) */
+#ifdef SIGTSTP
+#define TERMIOS
 #include <termios.h>
+/* Added by Robert Eckardt, RobertE@beta.TP2.Ruhr-Uni-Bochum.de */
+#ifdef ISC22
+#ifndef ONOCR			/* taken from sys/termio.h */
+#define ONOCR 0000020	/* true at least for ISC 2.2 */
+#endif 
+#ifndef IUCLC
+#define IUCLC 0001000
+#endif
+#endif /* ISC22 */
+
 static struct termios orig_termio, rl_termio;
 #else
 #include <termio.h>
 static struct termio orig_termio, rl_termio;
-#endif /* TERMIOS */
+/* termio defines NCC instead of NCCS */
+#define NCCS    NCC
+#endif /* SIGTSTP */
+#endif /* SGTTY */
+
+/* ULTRIX defines VRPRNT instead of VREPRINT */
+#ifdef VRPRNT
+#define VREPRINT VRPRNT
+#endif
+
+/* define characters to use with our input character handler */
+static char term_chars[NCCS];
+
 static int term_set = 0;	/* =1 if rl_termio set */
 
-#else
+#define special_getc() ansi_getc()
+static char ansi_getc();
 
-/* MSDOS specific stuff */
-#define getc(stdin) msdos_getch()
+#else /* !MSDOS && !ATARI && !_Windows */
+
+#ifdef _Windows
+#include <windows.h>
+#include "win/wtext.h"
+#include "win/wgnuplib.h"
+extern TW textwin;
+#define TEXTUSER 0xf1
+#define TEXTGNUPLOT 0xf0
+#define special_getc() msdos_getch()
 static char msdos_getch();
+#endif
 
+#if defined(MSDOS) || defined(DOS386)
+/* MSDOS specific stuff */
+#ifdef DJGPP
+#include <pc.h>
+#endif
+#ifdef __EMX__
+#include <conio.h>
+#endif
+#define special_getc() msdos_getch()
+static char msdos_getch();
 #endif /* MSDOS */
 
+#ifdef ATARI
+#include <stdlib.h>
+#ifdef __PUREC__
+#include <tos.h>
+#else
+#include <osbind.h>
+#endif
+#define special_getc() tos_getch()
+static char tos_getch();
+#endif
 
+#endif /* !MSDOS && !ATARI && !_Windows */
+
+#if !defined(ATARI)
 /* is it <string.h> or <strings.h>?   just declare what we need */
-extern int strlen();
+extern int      strlen();
 extern char *strcpy();
-extern char *malloc();
+#endif
+extern char *alloc();	/* we'll use the safe malloc from misc.c */
 
 #define MAXBUF	1024
 #define BACKSPACE 0x08	/* ^H */
@@ -125,13 +223,56 @@ static void copy_line();
 static void set_termio();
 static void reset_termio();
 
+/* user_putc and user_puts should be used in the place of
+ * fputc(ch,stderr) and fputs(str,stderr) for all output
+ * of user typed characters.  This allows MS-Windows to 
+ * display user input in a different color. */
+int
+user_putc(ch)
+int ch;
+{
+	int rv;
+#ifdef _Windows
+	TextAttr(&textwin,TEXTUSER);
+#endif
+	rv = fputc(ch, stderr);
+#ifdef _Windows
+	TextAttr(&textwin,TEXTGNUPLOT);
+#endif
+	return rv;
+}
+
+int
+user_puts(str)
+char *str;
+{
+	int rv;
+#ifdef _Windows
+	TextAttr(&textwin,TEXTUSER);
+#endif
+	rv = fputs(str, stderr);
+#ifdef _Windows
+	TextAttr(&textwin,TEXTGNUPLOT);
+#endif
+	return rv;
+}
+
+/* This function provides a centralized non-destructive backspace capability */
+/* M. Castro */
+
+backspace()
+{
+	user_putc(BACKSPACE);
+}
+	
 char *
 readline(prompt)
 char *prompt;
 {
 
-	char cur_char;
+	unsigned char cur_char;
 	char *new_line;
+	/* unsigned char *new_line; */
 
 	/* set the termio so we can do our own input processing */
 	set_termio();
@@ -145,13 +286,52 @@ char *prompt;
 
 	/* get characters */
 	for(;;) {
-		cur_char = getc(stdin);
-		if(isprint(cur_char)) {
+		cur_char = special_getc();
+#ifdef OS2
+ /* for emx: remap scan codes for cursor keys */
+                if( cur_char == 0 ) {
+                    cur_char = getc(stdin);
+                    switch( cur_char){
+                        case 75:  /* left, map to ^B */
+                            cur_char=2;
+                            break ;
+                        case 77:  /* right, map to ^F */
+                            cur_char=6;
+                            break ;
+                        case 115: /* ctrl left */
+                        case 71:  /* home, map to ^A */
+                            cur_char=1;
+                            break ;
+                        case 116: /* ctrl right */
+                        case 79:  /* end, map to ^E */
+                            cur_char=5;
+                            break ;
+                        case 72:  /* up, map to ^P */
+                            cur_char=16;
+                            break ;
+                        case 80:  /* down, map to ^N */
+                            cur_char=14;
+                            break ;
+                        case 83:  /* delete, map to ^D */
+                            cur_char=4;
+                            break ;
+                        default:  /* ignore */
+                            cur_char=0;
+                            continue ;
+                            }
+                        }
+#endif  /*OS2*/
+		if((isprint(cur_char) 
+#if defined(ATARI) || defined(_Windows) || defined(MSDOS) || defined(DOS386)
+   /* this should be used for all 8bit ASCII machines, I guess */
+				    || ((unsigned char)cur_char > 0x7f)
+#endif
+		                       )&& max_pos<MAXBUF-1) {
 			int i;
 			for(i=max_pos; i>cur_pos; i--) {
 				cur_line[i] = cur_line[i-1];
 			}
-			putc(cur_char, stderr);
+			user_putc(cur_char);
 			cur_line[cur_pos] = cur_char;
 			cur_pos += 1;
 			max_pos += 1;
@@ -161,11 +341,11 @@ char *prompt;
 
 		/* else interpret unix terminal driver characters */
 #ifdef VERASE
-		} else if(cur_char == orig_termio.c_cc[VERASE] ){  /* DEL? */
+		} else if(cur_char == term_chars[VERASE] ){  /* DEL? */
 			if(cur_pos > 0) {
 				int i;
 				cur_pos -= 1;
-				putc(BACKSPACE, stderr);
+				backspace();
 				for(i=cur_pos; i<max_pos; i++)
 					cur_line[i] = cur_line[i+1];
 				max_pos -= 1;
@@ -173,7 +353,7 @@ char *prompt;
 			}
 #endif /* VERASE */
 #ifdef VEOF
-		} else if(cur_char == orig_termio.c_cc[VEOF] ){   /* ^D? */
+		} else if(cur_char == term_chars[VEOF] ){   /* ^D? */
 			if(max_pos == 0) {
 				reset_termio();
 				return((char *)NULL);
@@ -187,37 +367,31 @@ char *prompt;
 			}
 #endif /* VEOF */
 #ifdef VKILL
-		} else if(cur_char == orig_termio.c_cc[VKILL] ){  /* ^U? */
+		} else if(cur_char == term_chars[VKILL] ){  /* ^U? */
 			clear_line(prompt);
 #endif /* VKILL */
 #ifdef VWERASE
-		} else if(cur_char == orig_termio.c_cc[VWERASE] ){  /* ^W? */
+		} else if(cur_char == term_chars[VWERASE] ){  /* ^W? */
 			while((cur_pos > 0) &&
 			      (cur_line[cur_pos-1] == SPACE)) {
 				cur_pos -= 1;
-				putc(BACKSPACE, stderr);
+				backspace();
 			}
 			while((cur_pos > 0) &&
 			      (cur_line[cur_pos-1] != SPACE)) {
 				cur_pos -= 1;
-				putc(BACKSPACE, stderr);
+				backspace();
 			}
 			clear_eoline();
 			max_pos = cur_pos;
 #endif /* VWERASE */
 #ifdef VREPRINT
-		} else if(cur_char == orig_termio.c_cc[VREPRINT] ){  /* ^R? */
+		} else if(cur_char == term_chars[VREPRINT] ){  /* ^R? */
 			putc('\n',stderr); /* go to a fresh line */
 			redraw_line(prompt);
-#else
-#ifdef VRPRNT   /* on Ultrix VREPRINT is VRPRNT */
-		} else if(cur_char == orig_termio.c_cc[VRPRNT] ){  /* ^R? */
-			putc('\n',stderr); /* go to a fresh line */
-			redraw_line(prompt);
-#endif /* VRPRNT */
 #endif /* VREPRINT */
 #ifdef VSUSP
-		} else if(cur_char == orig_termio.c_cc[VSUSP]) {
+		} else if(cur_char == term_chars[VSUSP]) {
 			reset_termio();
 			kill(0, SIGTSTP);
 
@@ -238,24 +412,24 @@ char *prompt;
 			    case 001: /* ^A */
 				while(cur_pos > 0) {
 					cur_pos -= 1;
-					putc(BACKSPACE, stderr);
+					backspace();
 				}
 				break;
 			    case 002: /* ^B */
 				if(cur_pos > 0) {
 					cur_pos -= 1;
-					putc(BACKSPACE, stderr);
+					backspace();
 				}
 				break;
 			    case 005: /* ^E */
 				while(cur_pos < max_pos) {
-					putc(cur_line[cur_pos], stderr);
+					user_putc(cur_line[cur_pos]);
 					cur_pos += 1;
 				}
 				break;
 			    case 006: /* ^F */
 				if(cur_pos < max_pos) {
-					putc(cur_line[cur_pos], stderr);
+					user_putc(cur_line[cur_pos]);
 					cur_pos += 1;
 				}
 				break;
@@ -295,7 +469,7 @@ char *prompt;
 			    case 010: /* ^H */
 				if(cur_pos > 0) {
 					cur_pos -= 1;
-					putc(BACKSPACE, stderr);
+					backspace();
 					for(i=cur_pos; i<max_pos; i++)
 						cur_line[i] = cur_line[i+1];
 					max_pos -= 1;
@@ -321,22 +495,21 @@ char *prompt;
 				while((cur_pos > 0) &&
 				      (cur_line[cur_pos-1] == SPACE)) {
 					cur_pos -= 1;
-					putc(BACKSPACE, stderr);
+					backspace();
 				}
 				while((cur_pos > 0) &&
 				      (cur_line[cur_pos-1] != SPACE)) {
 					cur_pos -= 1;
-					putc(BACKSPACE, stderr);
+					backspace();
 				}
 				clear_eoline();
 				max_pos = cur_pos;
-				break;
 				break;
 			    case '\n': /* ^J */
 			    case '\r': /* ^M */
 				cur_line[max_pos+1] = '\0';
 				putc('\n', stderr);
-				new_line = malloc(strlen(cur_line)+1);
+				new_line = (char *)alloc((unsigned long) (strlen(cur_line)+1), "history");
 				strcpy(new_line,cur_line);
 				reset_termio();
 				return(new_line);
@@ -348,7 +521,7 @@ char *prompt;
 }
 
 /* fix up the line from cur_pos to max_pos */
-/* do not need any terminal capabilities except backspace,
+/* do not need any terminal capabilities except backspace, */
 /* and space overwrites a character */
 static void
 fix_line()
@@ -357,14 +530,14 @@ fix_line()
 
 	/* write tail of string */
 	for(i=cur_pos; i<max_pos; i++)
-		putc(cur_line[i], stderr);
+		user_putc(cur_line[i]);
 
 	/* write a space at the end of the line in case we deleted one */
-	putc(SPACE, stderr);
+	user_putc(SPACE);
 
 	/* backup to original position */
 	for(i=max_pos+1; i>cur_pos; i--)
-		putc(BACKSPACE, stderr);
+		backspace();
 
 }
 
@@ -376,11 +549,11 @@ char *prompt;
 	int i;
 
 	fputs(prompt, stderr);
-	fputs(cur_line, stderr);
+	user_puts(cur_line);
 
 	/* put the cursor where it belongs */
 	for(i=max_pos; i>cur_pos; i--)
-		putc(BACKSPACE, stderr);
+		backspace();
 }
 
 /* clear cur_line and the screen line */
@@ -393,7 +566,7 @@ char *prompt;
 		cur_line[i] = '\0';
 
 	for(i=cur_pos; i>0; i--)
-		putc(BACKSPACE, stderr);
+		backspace();
 
 	for(i=0; i<max_pos; i++)
 		putc(SPACE, stderr);
@@ -417,7 +590,7 @@ char *prompt;
 	for(i=cur_pos; i<max_pos; i++)
 		putc(SPACE, stderr);
 	for(i=cur_pos; i<max_pos; i++)
-		putc(BACKSPACE, stderr);
+		backspace();
 }
 
 /* copy line to cur_line, draw it and set cur_pos and max_pos */
@@ -426,7 +599,7 @@ copy_line(line)
 char *line;
 {
 	strcpy(cur_line, line);
-	fputs(cur_line, stderr);
+	user_puts(cur_line);
 	cur_pos = max_pos = strlen(cur_line);
 }
 
@@ -436,8 +609,8 @@ add_history(line)
 char *line;
 {
 	struct hist *entry;
-	entry = (struct hist *)malloc(sizeof(struct hist));
-	entry->line = malloc((unsigned int)strlen(line)+1);
+	entry = (struct hist *)alloc((unsigned long)sizeof(struct hist),"history");
+	entry->line = alloc((unsigned long)(strlen(line)+1),"history");
 	strcpy(entry->line, line);
 
 	entry->prev = history;
@@ -448,16 +621,55 @@ char *line;
 	history = entry;
 }
 
-#ifdef MSDOS
+
+/* Convert ANSI arrow keys to control characters */
+static char
+ansi_getc()
+{
+  char c = getc(stdin);
+  if (c == 033) {
+    c = getc(stdin); /* check for CSI */
+    if (c == '[') {
+      c = getc(stdin); /* get command character */
+      switch (c) {
+      case 'D': /* left arrow key */
+	c = 002;
+	break;
+      case 'C': /* right arrow key */
+	c = 006;
+	break;
+      case 'A': /* up arrow key */
+	c = 020;
+	break;
+      case 'B': /* down arrow key */
+	c = 016;
+	break;
+      }
+    }
+  }
+  return c;
+}
+
+#if defined(MSDOS) || defined(_Windows) || defined(DOS386)
 
 /* Convert Arrow keystrokes to Control characters: */
 static  char
 msdos_getch()
 {
+#ifdef DJGPP
+	char c;
+	int ch = getkey();
+	c = (ch & 0xff00) ? 0 : ch & 0xff;
+#else
     char c = getch();
+#endif
 
     if (c == 0) {
+#ifdef DJGPP
+	c = ch & 0xff;
+#else
 	c = getch(); /* Get the extended code. */
+#endif
 	switch (c) {
 	    case 75: /* Left Arrow. */
 		c = 002;
@@ -497,12 +709,125 @@ msdos_getch()
 
 #endif /* MSDOS */
 
-/* set termio so we can do our own input processing */
+#ifdef ATARI
+
+/* Convert Arrow keystrokes to Control characters: TOS version */
+
+/* the volatile could be necessary to keep gcc from reordering 
+   the two Super calls
+*/
+#define CONTERM ((/*volatile*/ char *)0x484L)
+
+static void 
+remove_conterm()
+{
+  void *ssp=(void*)Super(0L);
+  *CONTERM &= ~0x8;
+  Super(ssp);
+}
+
+static	char
+tos_getch()
+{
+    long rawkey;
+    char c;
+    int scan_code;
+    void *ssp;
+    static  int init = 1;
+    static  int in_help = 0;
+
+    if (in_help) {
+	switch(in_help) {
+	    case 1:
+	    case 5: in_help++; return 'e';
+	    case 2:
+	    case 6: in_help++; return 'l';
+	    case 3:
+	    case 7: in_help++; return 'p';
+	    case 4: in_help = 0; return 0x0d;
+	    case 8: in_help = 0; return ' ';
+	}
+    }
+
+    if (init) {
+	ssp = (void*)Super(0L);
+	if( !(*CONTERM & 0x8) ) {
+	    *CONTERM |= 0x8;
+	} else {
+	    init=0;
+	}
+	(void)Super(ssp);
+	if( init ) {
+	    atexit(remove_conterm);
+	    init = 0;
+	}
+    }
+
+   (void)Cursconf(1, 0); /* cursor on */
+    rawkey = Cnecin();
+    c = (char)rawkey;
+    scan_code= ((int)(rawkey>>16)) & 0xff;	/* get the scancode */
+    if( rawkey&0x07000000 ) scan_code |= 0x80; 	/* shift or control */
+
+    switch (scan_code) {
+	case 0x62:				/* HELP		*/
+	    if (max_pos==0) {
+		in_help = 1;
+		return 'h';
+	    } else {
+		return 0;
+	    }
+	case 0xe2:				/* shift HELP	*/
+	    if (max_pos==0) {
+		in_help = 5;
+		return 'h';
+	    } else {
+		return 0;
+	    }
+	case 0x48: /* Up Arrow */
+	    return 0x10; /* ^P */
+	case 0x50: /* Down Arrow */
+	    return 0x0e; /* ^N */
+	case 0x4b: /* Left Arrow */
+	    return 0x02; /* ^B */
+	case 0x4d: /* Right Arrow */
+	    return 0x06; /* ^F */
+	case 0xcb: /* Shift Left Arrow */
+	case 0xf3: /* Ctrl Left Arrow (TOS-bug ?) */
+	case 0x47: /* Home */
+	    return 0x01; /* ^A */
+	case 0xcd: /* Shift Right Arrow */
+	case 0xf4: /* Ctrl Right Arrow (TOS-bug ?) */
+	case 0xc7: /* Shift Home */
+	case 0xf7: /* Crtl Home */
+	    return 0x05; /* ^E */
+	case 0x61: /* Undo - redraw line */
+	    return 0x0c; /* ^L */
+	default:
+	    if (c == 0x1b) return 0x15; /* ESC becomes ^U */
+	    if (c == 0x7f) return 0x04; /* Del becomes ^D */
+	    break;
+    }
+
+    return c;
+}
+
+#endif /* ATARI */
+
+  /* set termio so we can do our own input processing */
 static void
 set_termio()
 {
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(ATARI) && !defined(_Windows) && !defined(DOS386)
+/* set termio so we can do our own input processing */
+/* and save the old terminal modes so we can reset them later */
 	if(term_set == 0) {
+		/*
+		 * Get terminal modes.
+		 */
+#ifdef SGTTY
+		ioctl(0, TIOCGETP, &orig_termio);
+#else  /* SGTTY */
 #ifdef TERMIOS
 #ifdef TCGETS
 		ioctl(0, TCGETS, &orig_termio);
@@ -512,24 +837,79 @@ set_termio()
 #else
 		ioctl(0, TCGETA, &orig_termio);
 #endif /* TERMIOS */
+#endif /* SGTTY */
+
+		/*
+		 * Save terminal modes
+		 */
 		rl_termio = orig_termio;
 
+		/*
+		 * Set the modes to the way we want them
+		 *  and save our input special characters
+		 */
+#ifdef SGTTY
+		rl_termio.sg_flags |= CBREAK;
+		rl_termio.sg_flags &= ~(ECHO|XTABS);
+		ioctl(0, TIOCSETN, &rl_termio);
+
+		ioctl(0, TIOCGETC, &s_tchars);
+		term_chars[VERASE]   = orig_termio.sg_erase;
+		term_chars[VEOF]     = s_tchars.t_eofc;
+		term_chars[VKILL]    = orig_termio.sg_kill;
+#ifdef TIOCGLTC
+		ioctl(0, TIOCGLTC, &s_ltchars);
+		term_chars[VWERASE]  = s_ltchars.t_werasc;
+		term_chars[VREPRINT] = s_ltchars.t_rprntc;
+		term_chars[VSUSP]    = s_ltchars.t_suspc;
+
+		/* disable suspending process on ^Z */
+		s_ltchars.t_suspc = 0;
+		ioctl(0, TIOCSLTC, &s_ltchars);
+#endif /* TIOCGLTC */
+#else  /* SGTTY */
 		rl_termio.c_iflag &= ~(BRKINT|PARMRK|INPCK|IUCLC|IXON|IXOFF);
 		rl_termio.c_iflag |=  (IGNBRK|IGNPAR);
 
-		rl_termio.c_oflag &= ~(ONOCR);
+		/* rl_termio.c_oflag &= ~(ONOCR); Costas Sphocleous Irvine,CA */
 
 		rl_termio.c_lflag &= ~(ICANON|ECHO|ECHOE|ECHOK|ECHONL|NOFLSH);
+#ifdef OS2
+ /* for emx: remove default terminal processing */
+                rl_termio.c_lflag &= ~(IDEFAULT);
+#endif /* OS2 */
 		rl_termio.c_lflag |=  (ISIG);
-
 		rl_termio.c_cc[VMIN] = 1;
 		rl_termio.c_cc[VTIME] = 0;
 
-#ifdef VSUSP
+#ifndef VWERASE
+#define VWERASE 3
+#endif
+		term_chars[VERASE]   = orig_termio.c_cc[VERASE];
+		term_chars[VEOF]     = orig_termio.c_cc[VEOF];
+		term_chars[VKILL]    = orig_termio.c_cc[VKILL];
+#ifdef TERMIOS
+		term_chars[VWERASE]  = orig_termio.c_cc[VWERASE];
+#ifdef VREPRINT
+		term_chars[VREPRINT] = orig_termio.c_cc[VREPRINT];
+#else
+#ifdef VRPRNT
+		term_chars[VRPRNT] = orig_termio.c_cc[VRPRNT];
+#endif
+#endif
+		term_chars[VSUSP]    = orig_termio.c_cc[VSUSP];
+
 		/* disable suspending process on ^Z */
 		rl_termio.c_cc[VSUSP] = 0;
-#endif /* VSUSP */
+#endif /* TERMIOS */
+#endif /* SGTTY */
 
+		/*
+		 * Set the new terminal modes.
+		 */
+#ifdef SGTTY
+		ioctl(0, TIOCSLTC, &s_ltchars);
+#else
 #ifdef TERMIOS
 #ifdef TCSETSW
 		ioctl(0, TCSETSW, &rl_termio);
@@ -539,16 +919,26 @@ set_termio()
 #else
 		ioctl(0, TCSETAW, &rl_termio);
 #endif /* TERMIOS */
+#endif /* SGTTY */
 		term_set = 1;
 	}
-#endif /* MSDOS */
+#endif /* !MSDOS && !ATARI && !defined(_Windows) */
 }
-
+  
 static void
 reset_termio()
 {
-#ifndef MSDOS
+#if !defined(MSDOS) && !defined(ATARI) && !defined(_Windows) && !defined(DOS386)
+/* reset saved terminal modes */
 	if(term_set == 1) {
+#ifdef SGTTY
+		ioctl(0, TIOCSETN, &orig_termio);
+#ifdef TIOCGLTC
+		/* enable suspending process on ^Z */
+		s_ltchars.t_suspc = term_chars[VSUSP];
+		ioctl(0, TIOCSLTC, &s_ltchars);
+#endif /* TIOCGLTC */
+#else  /* SGTTY */
 #ifdef TERMIOS
 #ifdef TCSETSW
 		ioctl(0, TCSETSW, &orig_termio);
@@ -558,8 +948,9 @@ reset_termio()
 #else
 		ioctl(0, TCSETAW, &orig_termio);
 #endif /* TERMIOS */
+#endif /* SGTTY */
 		term_set = 0;
 	}
-#endif /* MSDOS */
+#endif /* !MSDOS && !ATARI && !_Windows */
 }
 #endif /* READLINE */

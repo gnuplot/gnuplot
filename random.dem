@@ -1,0 +1,37 @@
+#
+# $Id: random.demo 3.38.2.32 1992/12/04 18:33:59 woo Exp $
+#
+# random.dem
+#
+# Lattice test for random numbers;
+# If you can see any patterns in this plot, the random number generator
+# is not very good.
+#
+# Permission granted to distribute freely for non-commercial purposes only
+#
+# Copyright (c) 1991, Jos van der Woude, jvdwoude@hut.nl
+save set "defaults.ini"
+seed = 1317
+seed = rand(seed)
+set nokey
+set xrange [0: 1]
+set yrange [0: 1]
+set zrange [0: 1]
+set title "Lattice test for random numbers"
+set xlabel "rand(n) ->"
+set ylabel "rand(n + 1) ->"
+set zlabel "rand(n + 2) ->"
+set format x "%3.2f"
+set format y "%3.2f"
+set format z "%3.2f"
+set tics
+set sample 1000
+set function style dots
+set parametric
+plot rand(1), rand(1)
+pause -1 "Hit return to continue"
+pause 0 "3D plot ahead, one moment please ..."
+set sample 50
+splot rand(1), rand(1), rand(1)
+pause -1 "Hit return to continue"
+load "defaults.ini"

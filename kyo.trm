@@ -1,5 +1,6 @@
 /*
- * $Id: kyo.trm,v 3.26 92/03/24 22:35:36 woo Exp Locker: woo $
+ * $Id: kyo.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* Prescribe (KYOCERA) driver - Michael Waldor */

@@ -1,6 +1,7 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2gih.c,v 3.26 92/03/25 04:53:29 woo Exp Locker: woo $";
+static char *RCSid = "$Id: doc2gih.c%v 3.38.2.70 1993/02/08 02:19:29 woo Exp woo $";
 #endif
+
 
 /*
  * doc2gih.c  -- program to convert Gnuplot .DOC format to gnuplot
@@ -10,7 +11,7 @@ static char *RCSid = "$Id: doc2gih.c,v 3.26 92/03/25 04:53:29 woo Exp Locker: wo
  * a leading @, #, or %.
  * Modified by Russell Lang from hlp2ms.c by Thomas Williams 
  *
- * usage:  doc2gih < file.doc > file.gih
+ * usage:  doc2gih [file.doc [file.gih]]
  *
  * Original version by David Kotz used the following one line script!
  * sed '/^[0-9@#%]/d' file.doc > file.gih
@@ -32,7 +33,7 @@ FILE * outfile;
 	infile = stdin;
 	outfile = stdout;
 	if (argc > 3) {
-		fprintf(stderr,"Usage: %s infile outfile\n", argv[0]);
+		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
 		exit(1);
 	}
 	if (argc >= 2) 

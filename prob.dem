@@ -1,0 +1,792 @@
+#
+# $Id: prob.demo 3.38.2.32 1992/12/04 18:33:59 woo Exp $
+#
+# Demo Statistical Functions version 2.3
+#
+# Permission granted to distribute freely for non-commercial purposes only
+#
+# Copyright (c) 1991, 1992 Jos van der Woude, jvdwoude@hut.nl
+
+pause 0 "                   Statistical Library Demo, version 2.3"
+pause 0 ""
+pause 0 "          Copyright (c) 1991, 1992, Jos van de Woude, jvdwoude@hut.nl"
+pause 0 "Permission granted to distribute freely for non-commercial purposes only"
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 ""
+pause 0 "NOTE: contains 54 plots and consequently takes a lot of time to run"
+pause 0 "                      Press Ctrl-C to exit right now"
+pause -1 "                      Press Return to start demo ..."
+
+save set "defaults.ini"
+load "stat.inc"
+
+# Arcsinus PDF and CDF
+r = 2.0
+mu = 0.0
+sigma = r / sqrt2
+xmin = -r
+xmax = r
+ymax = 1.1 * r #No mode
+set nokey
+set zeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 200
+set title "arcsin PDF with r = 2.0"
+plot arcsin(x)
+pause -1 "Hit return to continue"
+set title "arcsin CDF with r = 2.0"
+set yrange [0 : 1.1]
+plot carcsin(x)
+pause -1 "Hit return to continue"
+
+# Beta PDF and CDF
+#p = 0.5; q = 0.7
+#mu = p / (p + q)
+#sigma = sqrt(p**q) / ((p + q ) * sqrt(p + q + 1.0))
+#xmin = 0.0
+#xmax = 1.0
+#Mode of beta PDF used
+#ymax = (p < 1.0 || q < 1.0) ? 2.0 : 1.1 * beta((p - 1.0)/(p + q - 2.0))
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "beta PDF"
+plot [0:1] [0:5] p = 0.5, q = 0.7, beta(x) title "p = 0.5, q = 0.7", \
+                 p = 5.0, q = 3.0, beta(x) title "p = 5.0, q = 3.0", \
+                 p = 0.5, q = 2.5, beta(x) title "p = 0.5, q = 2.5"
+pause -1 "Hit return to continue"
+set title "incomplete beta CDF"
+plot [0:1] [0:1.1] p = 0.5, q = 0.7, cbeta(x) title "p = 0.5, q = 0.7", \
+                   p = 5.0, q = 3.0, cbeta(x) title "p = 5.0, q = 3.0", \
+                   p = 0.5, q = 2.5, cbeta(x) title "p = 0.5, q = 2.5"
+pause -1 "Hit return to continue"
+
+# Binomial PDF and CDF
+n = 25; p = 0.15
+mu = n * p
+sigma = sqrt(n * p * (1.0 - p))
+xmin = int(mu - 4.0 * sigma)
+xmin = xmin < 0 ? 0 : xmin
+xmax = int(mu + 4.0 * sigma)
+ymax = 1.1 * binom(mu) #Mode of normal PDF used
+xinc = ceil((xmax - xmin) / 10)
+xinc = xinc > 1 ? xinc : 1
+set nokey
+set nozeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "k ->"
+set ylabel "probability density ->"
+set xtics xmin + 0.499, xinc, xmax
+set ytics 0, ymax / 10, ymax
+set format x "%2.0f"
+set format y "%3.2f"
+set sample (xmax - xmin) + 1
+set title "binomial PDF with n = 25, p = 0.15"
+plot binom(x) with steps
+pause -1 "Hit return to continue"
+set title "binomial CDF with n = 25, p = 0.15"
+set yrange [0 : 1.1]
+set ytics 0, 1.1 / 10.5, 1.1
+plot cbinom(x) with steps
+pause -1 "Hit return to continue"
+
+# Cauchy PDF and CDF
+#a = 0.0; b = 2.0
+#cauchy PDF has no moments
+#xmin = a - 4.0 * b
+#xmax = a + 4.0 * b
+#ymax = 1.1 * cauchy(a) #Mode of cauchy PDF used
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "cauchy PDF"
+plot [-15:15] [0:0.2] a = 0, b = 2, cauchy(x) title "a = 0, b = 2", \
+                      a = 0, b = 4, cauchy(x) title "a = 0, b = 4"
+pause -1 "Hit return to continue"
+set title "cauchy CDF"
+plot [-30:30] [0:1.1] a = 0, b = 2, ccauchy(x) title "a = 0, b = 2", \
+                      a = 0, b = 4, ccauchy(x) title "a = 0, b = 4"
+pause -1 "Hit return to continue"
+
+# Chi-square PDF and CDF
+#df1 = 4.0
+#mu = df1
+#sigma = sqrt(2.0 * df1)
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#ymax = 1.1 * (df1 > 2.0 ? chi(df1 - 2.0) : 1.0) #Mode of chi PDF used
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "chi-square PDF"
+plot [0:15] [0:0.2] df1 = 4, chi(x) title "df = 4", \
+                    df1 = 6, chi(x) title "df = 6", \
+                    df1 = 8, chi(x) title "df = 8"
+pause -1 "Hit return to continue"
+set title "chi-square CDF"
+plot [0:15] [0:1.1] df1 = 4, cchi(x) title "df = 4", \
+                    df1 = 6, cchi(x) title "df = 6", \
+                    df1 = 8, cchi(x) title "df = 8"
+pause -1 "Hit return to continue"
+
+# Erlang PDF and CDF
+#lambda = 1.0; n = 2.0
+#mu = n / lambda
+#sigma = sqrt(n) / lambda
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#ymax = n < 2.0 ? 1.0 : 1.1 * erlang((n - 1.0) / lambda) #Mode of erlang PDF used
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "erlang PDF"
+plot [0:10] [0:1] lambda = 1, n = 2, erlang(x) title "lambda = 1, n = 2", \
+                  lambda = 2, n = 2, erlang(x) title "lambda = 2, n = 2"
+pause -1 "Hit return to continue"
+set title "erlang CDF"
+plot [0:10] [0:1.1] lambda = 1, n = 2, cerlang(x) title "lambda = 1, n = 2", \
+                    lambda = 2, n = 2, cerlang(x) title "lambda = 2, n = 2"
+pause -1 "Hit return to continue"
+
+# Thanks to mrb2j@kelvin.seas.Virginia.EDU for telling us about this.
+# Extreme (Gumbel extreme value) PDF and CDF
+#alpha = 0.5; u = 1.0
+#mu = u + (0.577215665/alpha)   # Euler's constant
+#sigma = pi/(sqrt(6.0)*alpha)
+#xmin = mu - 4.0 * sigma
+#xmax = mu + 4.0 * sigma
+#ymax = 1.1 * extreme(u) #Mode of extreme PDF used
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "extreme PDF"
+plot [-10:10] [0:0.4] alpha = 0.5, u = 1.0, extreme(x) title "alpha = 0.5, u = 1.0", \
+                      alpha = 1.0, u = 0.0, extreme(x) title "alpha = 1.0, u = 0.0"
+pause -1 "Hit return to continue"
+set title "extreme CDF"
+plot [-10:10] [0:1.1] alpha = 0.5, u = 1.0, cextreme(x) title "alpha = 0.5, u = 1.0", \
+                      alpha = 1.0, u = 0.0, cextreme(x) title "alpha = 1.0, u = 0.0"
+pause -1 "Hit return to continue"
+
+# F PDF and CDF
+#df1 = 5.0; df2 = 9.0
+#mu = df2 < 2.0 ? 1.0 : df2 / (df2 - 2.0)
+#sigma = df2 < 4.0 ? 1.0 : mu * sqrt(2.0 * (df1 + df2 - 2.0) / (df1 * (df2 - 4.0)))
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#Mode of F PDF used
+#ymax = df1 < 3.0 ? 1.0 : 1.1 * f((df1 / 2.0 - 1.0) / (df1 / 2.0 + df1 / df2))
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0 : ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "F PDF"
+plot [0:4] [0:0.8] df1 = 5.0, df2 = 9.0, f(x) title "df1 = 5, df2 = 9", \
+                   df1 = 7.0, df2 = 6.0, f(x) title "df1 = 7, df2 = 6"
+pause -1 "Hit return to continue"
+set title "F CDF"
+plot [0:4] [0:1.1] df1 = 5.0, df2 = 9.0, cf(x) title "df1 = 5, df2 = 9", \
+                   df1 = 7.0, df2 = 6.0, cf(x) title "df1 = 7, df2 = 6"
+pause -1 "Hit return to continue"
+
+# Gamma PDF and incomplete gamma CDF
+#rho = 0.5; lambda = 1.0
+#mu = rho / lambda
+#sigma = sqrt(rho) / lambda
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#ymax = rho < 1.0 ? 2.0 : 1.1 * g((rho - 1.0) / lambda) #Mode of gamma pdf used
+set key
+set zeroaxis
+#set xrange [xmin: xmax]
+#set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "gamma PDF"
+plot [0:5] [0:1.5] rho = 0.5, lambda = 1.0, g(x) title "rho = 0.5, lambda = 1.0", \
+                   rho = 1.0, lambda = 1.0, g(x) title "rho = 1.0, lambda = 1.0", \
+                   rho = 2.0, lambda = 2.0, g(x) title "rho = 2.0, lambda = 2.0"
+pause -1 "Hit return to continue"
+set title "incomplete gamma CDF (lambda == 1.0)"
+plot [0:5] [0:1.1] rho = 0.5, cgamma(x) title "rho = 0.5", \
+                   rho = 1.0, cgamma(x) title "rho = 1.0", \
+                   rho = 2.0, cgamma(x) title "rho = 2.0"
+pause -1 "Hit return to continue"
+
+# Geometric PDF and CDF
+p = 0.4
+mu = (1.0 - p) / p
+sigma = sqrt(mu / p)
+xmin = int(mu - 4.0 * sigma)
+xmin = xmin < 0 ? 0 : xmin
+xmax = int(mu + 4.0 * sigma)
+xinc = ceil((xmax - xmin) / 10)
+xinc = xinc > 1 ? xinc : 1
+ymax = 1.1 * geometric(mu - 1/p) #mode of gamma PDF used
+set nokey
+set nozeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "k ->"
+set ylabel "probability density ->"
+set xtics xmin + 0.499, xinc, xmax
+set ytics 0, ymax / 10, ymax
+set format x "%2.0f"
+set format y "%3.2f"
+set sample (xmax - xmin) + 1
+set title "geometric PDF with p = 0.4"
+plot geometric(x) with steps
+pause -1 "Hit return to continue"
+set title "geometric CDF with p = 0.4"
+set yrange [0 : 1.1]
+set ytics 0, 1.1 / 10.5, 1.1
+plot cgeometric(x) with steps
+pause -1 "Hit return to continue"
+
+# Half normal PDF and CDF
+mu = sqrt2invpi
+sigma = 1.0
+s = sigma*sqrt(1.0 - 2.0/pi)
+xmin = 0.0
+xmax = mu + 4.0 * s
+ymax = 1.1 * halfnormal(0) #Mode of half normal PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "half normal PDF, sigma = 1.0"
+plot halfnormal(x)
+pause -1 "Hit return to continue"
+set title "half normal CDF, sigma = 1.0"
+set yrange [0:1.1]
+plot chalfnormal(x)
+pause -1 "Hit return to continue"
+
+# Hypergeometric PDF and CPF
+nn = 75; mm = 25; n = 10
+p = real(mm) / nn
+mu = n * p
+sigma = sqrt(real(nn - n) / (nn - 1.0) * n * p * (1.0 - p))
+xmin = int(mu - 4.0 * sigma)
+xmin = xmin < 0 ? 0 : xmin
+xmax = int(mu + 4.0 * sigma)
+xinc = ceil((xmax - xmin) / 10)
+xinc = xinc > 1 ? xinc : 1
+ymax = 1.1 * hypgeo(mu) #mode of binomial PDF used
+set nokey
+set nozeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "k ->"
+set ylabel "probability density ->"
+set xtics xmin + 0.499, xinc, xmax
+set ytics 0, ymax / 10, ymax
+set format x "%2.0f"
+set format y "%3.2f"
+set sample (xmax - xmin) + 1
+set title "hypergeometric PDF with nn = 75, mm = 25, n = 10"
+plot hypgeo(x) with steps
+pause -1 "Hit return to continue"
+set yrange [0 : 1.1]
+set ytics 0, 1.1 / 10.5, 1.1
+set title "hypergeometric CDF with nn = 75, mm = 25, n = 10"
+plot chypgeo(x) with steps
+pause -1 "Hit return to continue"
+
+# Laplace PDF
+a = 0.0; b = 1.0
+mu = a
+sigma = sqrt(2.0) * b
+xmin = mu - 4.0 * sigma
+xmax = mu + 4.0 * sigma
+ymax = 1.1 * laplace(a) #Mode of laplace PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "laplace (or double exponential) PDF with a = 0, b = 1"
+plot laplace(x)
+pause -1 "Hit return to continue"
+set title "laplace (or double exponential) CDF with a = 0, b = 1"
+set yrange [0: 1.1]
+plot claplace(x)
+pause -1 "Hit return to continue"
+
+# Logistic PDF and CDF
+a = 0.0; lambda = 2.0
+mu = a
+sigma = pi / (sqrt(3.0) * lambda)
+xmin = mu - 4.0 * sigma
+xmax = mu + 4.0 * sigma
+ymax = 1.1 * logistic(mu) #Mode of logistic PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set nokey
+set zeroaxis
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "logistic PDF with a = 0, lambda = 2"
+plot logistic(x)
+pause -1 "Hit return to continue"
+set title "logistic CDF with a = 0, lambda = 2"
+set yrange [0: 1.1]
+plot clogistic(x)
+pause -1 "Hit return to continue"
+
+# Lognormal PDF and CDF
+mu = 1.0; sigma = 0.5
+m = exp(mu + 0.5 * sigma**2)
+s = sqrt(exp(2.0 * mu + sigma**2) * (2.0 * exp(sigma) - 1.0))
+xmin = m - 4.0 * s
+xmin = xmin < 0 ? 0 : xmin
+xmax = m + 4.0 * s
+ymax = 1.1 * lognormal(exp(mu - sigma**2)) #Mode of lognormal PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.2f"
+set sample 100
+set title "lognormal PDF with mu = 1.0, sigma = 0.5"
+plot lognormal(x)
+pause -1 "Hit return to continue"
+set title "lognormal CDF with mu = 1.0, sigma = 0.5"
+set yrange [0: 1.1]
+plot clognormal(x)
+pause -1 "Hit return to continue"
+
+# Maxwell PDF
+#a = 0.1
+#mu = 2.0 / sqrt(pi) / a
+#sigma = sqrt(3.0 - 8.0/pi) / a
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#ymax = 1.1 * maxwell(1.0 / a) #Mode of maxwell PDF used
+set key
+set zeroaxis
+#set xrange[xmin: xmax]
+#set yrange[0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "maxwell PDF"
+plot [0:6] [0:1.4] a = 1.5, maxwell(x) title "a = 1.5", \
+                   a = 1.0, maxwell(x) title "a = 1.0", \
+                   a = 0.5, maxwell(x) title "a = 0.5"
+pause -1 "Hit return to continue"
+set title "maxwell CDF"
+plot [0:6] [0:1.1] a = 1.5, cmaxwell(x) title "a = 1.5", \
+                   a = 1.0, cmaxwell(x) title "a = 1.0", \
+                   a = 0.5, cmaxwell(x) title "a = 0.5"
+pause -1 "Hit return to continue"
+
+# Negative binomial PDF and CDF
+r = 8; p = 0.4
+mu = r * (1.0 - p) / p
+sigma = sqrt(mu / p)
+xmin = int(mu - 4.0 * sigma)
+xmin = xmin < 0 ? 0 : xmin
+xmax = int(mu + 4.0 * sigma)
+xinc = ceil((xmax - xmin) / 10)
+xinc = xinc > 1 ? xinc : 1
+ymax = 1.1 * negbin(mu - 1.0/p) #mode of gamma PDF used
+set nokey
+set nozeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "k ->"
+set ylabel "probability density ->"
+set xtics xmin + 0.499, xinc, xmax
+set ytics 0, ymax / 10, ymax
+set format x "%2.0f"
+set format y "%3.2f"
+set sample (xmax - xmin) + 1
+set title "negative binomial (or pascal or polya) PDF with r = 8, p = 0.4"
+plot negbin(x) with steps
+pause -1 "Hit return to continue"
+set yrange [0 : 1.1]
+set ytics 0, 1.1 / 10.5, 1.1
+set title "negative binomial (or pascal or polya) CDF with r = 8, p = 0.4"
+plot cnegbin(x) with steps
+pause -1 "Hit return to continue"
+
+# Negative exponential PDF and CDF
+lambda = 2.0
+mu = 1.0 / lambda
+sigma = 1.0 / lambda
+xmax =  mu + 4.0 * sigma
+ymax = lambda #No mode
+set nokey
+set zeroaxis
+set xrange [0: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.1f"
+set sample 100
+set title "negative exponential (or exponential) PDF with lambda = 2.0"
+plot nexp(x)
+pause -1 "Hit return to continue"
+set title "negative exponential (or exponential) CDF with lambda = 2.0"
+set yrange [0: 1.1]
+plot cnexp(x)
+pause -1 "Hit return to continue"
+
+# Normal PDF and CDF
+#mu = 0.0; sigma = 1.0
+#xmin = mu - 4.0 * sigma
+#xmax = mu + 4.0 * sigma
+#ymax = 1.1 * normal(mu) #Mode of normal PDF used
+set key
+set zeroaxis
+#set xrange [xmin: xmax]
+#set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 100
+set title "normal (also called gauss or bell-curved) PDF"
+plot [-4:4] [0:1] mu = 0, sigma = 1.0, normal(x) title "mu = 0, sigma = 1.0", \
+                  mu = 2, sigma = 0.5, normal(x) title "mu = 2, sigma = 0.5", \
+                  mu = 1, sigma = 2.0, normal(x) title "mu = 1, sigma = 2.0"
+pause -1 "Hit return to continue"
+set title "normal (also called gauss or bell-curved) CDF"
+plot [-4:4] [0:1.1] mu = 0, sigma = 1.0, cnormal(x) title "mu = 0, sigma = 1.0", \
+                    mu = 2, sigma = 0.5, cnormal(x) title "mu = 2, sigma = 0.5", \
+                    mu = 1, sigma = 2.0, cnormal(x) title "mu = 1, sigma = 2.0"
+pause -1 "Hit return to continue"
+
+# Pareto PDF and CDF
+a = 1.0; b = 3.0
+mu = a * b / (b - 1.0)
+sigma = a * sqrt(b) / (sqrt(b - 2.0) * (b - 1.0))
+xmin = mu - 4.0 * sigma
+xmin = xmin < 0 ? 0 : xmin
+xmax = mu + 4.0 * sigma
+ymax = 1.1 * pareto(a) #mode of pareto PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.1f"
+set sample 500
+set title "pareto PDF with a = 1, b = 3"
+plot pareto(x)
+pause -1 "Hit return to continue"
+set title "pareto CDF with a = 1, b = 3"
+set yrange [0: 1.1]
+plot cpareto(x)
+pause -1 "Hit return to continue"
+
+# Poisson PDF and CDF
+mu = 4.0
+sigma = sqrt(mu)
+xmin = int(mu - 4.0 * sigma)
+xmin = xmin < 0 ? 0 : xmin
+xmax = int(mu + 4.0 * sigma)
+xinc = ceil((xmax - xmin) / 10)
+xinc = xinc > 1 ? xinc : 1
+ymax = 1.1 * poisson(mu) #mode of poisson PDF used
+set nokey
+set nozeroaxis
+set xrange [xmin : xmax]
+set yrange [0 : ymax]
+set xlabel "k ->"
+set ylabel "probability density ->"
+set xtics xmin + 0.499, xinc, xmax
+set ytics 0, ymax / 10, ymax
+set format x "%2.0f"
+set format y "%3.2f"
+set sample (xmax - xmin) + 1
+set title "poisson PDF with mu = 4.0"
+plot poisson(x) with steps
+pause -1 "Hit return to continue"
+set yrange [0 : 1.1]
+set ytics 0, 1.1 / 10.5, 1.1
+set title "poisson CDF with mu = 4.0"
+plot cpoisson(x) with steps
+pause -1 "Hit return to continue"
+
+# Rayleigh PDF and CDF
+lambda = 2.0
+mu = 0.5 * sqrt(pi / lambda)
+sigma = sqrt((1.0 - pi / 4.0) / lambda)
+xmax = mu + 4.0 * sigma
+ymax = 1.1 * rayleigh(1.0 / sqrt(2.0 * lambda)) #Mode of rayleigh PDF used
+set nokey
+set zeroaxis
+set xrange [0: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.1f"
+set sample 100
+set title "rayleigh PDF with lambda = 2.0"
+plot rayleigh(x)
+pause -1 "Hit return to continue"
+set title "rayleigh CDF with lambda = 2.0"
+set yrange [0: 1.1]
+plot crayleigh(x)
+pause -1 "Hit return to continue"
+
+# Sine PDF and CDF
+#a = 3.0; n = 2
+#mu = a / 2.0
+#sigma = sqrt(a * a / 3.0 * (1.0 - 3.0 / (2.0 * n * n * pi * pi)) - mu * mu)
+#xmin = 0.0
+#xmax = a
+#ymax = 1.1 * 2.0 / a #Mode of sine PDF used
+set key
+set zeroaxis
+#set xrange [xmin: xmax]
+#set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.1f"
+set sample 100
+set title "sine PDF"
+plot [0:2] [0:1.1] a = 2.0, n = 1, sine(x) title "a = 2.0, n = 1", \
+                   a = 2.0, n = 3, sine(x) title "a = 2.0, n = 3"
+pause -1 "Hit return to continue"
+set title "sine CDF"
+plot [0:2] [0:1.1] a = 2.0, n = 1, csine(x) title "a = 2.0, n = 1", \
+                   a = 2.0, n = 3, csine(x) title "a = 2.0, n = 3"
+pause -1 "Hit return to continue"
+
+# t PDF and CDF
+df1 = 3.0
+mu = 0.0
+sigma = df1 > 2.0 ? sqrt(df1 / (df1 - 2.0)) : 1.0
+xmin = mu - 4.0 * sigma
+xmax = mu + 4.0 * sigma
+ymax = 1.1 * t(mu) #Mode of t PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "t PDF with df1 = 3.0"
+plot t(x)
+pause -1 "Hit return to continue"
+set title "t CDF with df1 = 3.0"
+set yrange [0: 1.1]
+plot ct(x)
+pause -1 "Hit return to continue"
+
+# Thanks to efrank@upenn5.hep.upenn.edu for telling us about this
+# triangular PDF and CDF
+m = 3.0
+g = 2.0
+mu = m
+sigma = g/sqrt(6.0)
+xmin = m - g
+xmax = m + g
+ymax = 1.1 * triangular(m) #Mode of triangular PDF used
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.1f"
+set format y "%.2f"
+set sample 100
+set title "triangular PDF with m = 3.0, g = 2.0"
+plot triangular(x)
+pause -1 "Hit return to continue"
+set title "triangular CDF with m = 3.0, g = 2.0"
+set yrange [0: 1.1]
+plot ctriangular(x)
+pause -1 "Hit return to continue"
+
+# Uniform PDF and CDF
+a = -2.0; b= 2.0
+mu = (a + b) / 2.0
+sigma = (b - a) / sqrt(12.0)
+xmin = a
+xmax = b
+ymax = 1.1 * uniform(mu) #No mode
+set nokey
+set zeroaxis
+set xrange [xmin: xmax]
+set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.2f"
+set sample 100
+set title "uniform PDF with a = -2.0, b = 2.0"
+plot uniform(x)
+pause -1 "Hit return to continue"
+set title "uniform CDF with a = -2.0, b = 2.0"
+set yrange [0: 1.1]
+plot cuniform(x)
+pause -1 "Hit return to continue"
+
+# Weibull PDF and CDF
+#lambda = 1.0; n = 1.5
+#mu = lambda**(-1.0 / n) * gamma(1.0 / n) / n
+#sigma = sqrt(2.0 * lambda**(-2.0 / n) * gamma(2.0 / n) / n - mu * mu)
+#xmin = mu - 4.0 * sigma
+#xmin = xmin < 0 ? 0 : xmin
+#xmax = mu + 4.0 * sigma
+#Mode of weibull PDF used
+#ymax = 1.1 * (n > 1.0 ? weibull(((n - 1.0) / (lambda * n))**(1.0 / n)) : 2.0)
+set key
+set zeroaxis
+#set xrange [xmin : xmax]
+#set yrange [0: ymax]
+set xlabel "x ->"
+set ylabel "probability density ->"
+set xtics
+set ytics
+set format x "%.2f"
+set format y "%.1f"
+set sample 100
+set title "weibull PDF"
+plot [0:2] [0:1.5] lambda = 1, n = 0.5, weibull(x) title "lambda = 1, n = 0.5", \
+                   lambda = 1, n = 1.0, weibull(x) title "lambda = 1, n = 1.0", \
+                   lambda = 1, n = 2.0, weibull(x) title "lambda = 1, n = 2.0", \
+                   lambda = 3, n = 2.0, weibull(x) title "lambda = 3, n = 2.0"
+pause -1 "Hit return to continue"
+set title "weibull CDF"
+plot [0:3] [0:1.2] lambda = 1, n = 0.5, cweibull(x) title "lambda = 1, n = 0.5", \
+                   lambda = 1, n = 1.0, cweibull(x) title "lambda = 1, n = 1.0", \
+                   lambda = 1, n = 2.0, cweibull(x) title "lambda = 1, n = 2.0", \
+                   lambda = 3, n = 2.0, cweibull(x) title "lambda = 3, n = 2.0"
+load "defaults.ini"

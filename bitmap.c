@@ -1,11 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: bitmap.c,v 3.26 92/03/24 22:34:39 woo Exp Locker: woo $";
+static char *RCSid = "$Id: bitmap.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
 
 
 /* GNUPLOT - bitmap.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,12 +27,24 @@ static char *RCSid = "$Id: bitmap.c,v 3.26 92/03/24 22:34:39 woo Exp Locker: woo
  *     Ronald J. Hartranft <rjh2@ns.cc.lehigh.edu>
  *     Russell Lang <rjl@monu1.cc.monash.edu.au>
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 /*
@@ -68,7 +80,7 @@ unsigned int b_hbits;			/* actual bits in char horizontally */
 unsigned int b_vchar;			/* height of characters */
 unsigned int b_vbits;			/* actual bits in char vertically */
 unsigned int b_angle;			/* rotation of text */
-char_box b_font[FNT_CHARS];		/* the current font */
+char_box b_font[FNT_CHARS];	/* the current font */
 unsigned int b_pattern[] = {0xffff, 0x1111,
 	0xffff, 0x5555, 0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f};
 int b_maskcount = 0;
@@ -77,7 +89,7 @@ unsigned int b_lastx, b_lasty;	/* last pixel set - used by b_line */
 #define IN(i,size)  ((unsigned)i < (unsigned)size)
 
 /* 5x9 font, bottom row first, left pixel in lsb */
-char_row FAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
+char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,0x0004,000000,0x0004,0x0004,0x0004,0x0004,0x0004},
   /*"*/  {000000,000000,000000,000000,000000,000000,0x000a,0x000a,0x000a},
@@ -177,7 +189,7 @@ char_row FAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
 };
 
 /* 9x17 font, bottom row first, left pixel in lsb */
-char_row FAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
+char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,000000,000000,0x0010,000000,000000,000000,0x0010,
@@ -373,7 +385,7 @@ char_row FAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
 };
 
 /* 13x25 font, bottom row first, left pixel in lsb */
-char_row FAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
+char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000},
@@ -794,11 +806,11 @@ unsigned int x, y, planes;
   b_angle = 0;
   b_rastermode = 0;
   /* allocate row pointers */
-  b_p = (bitmap *)alloc( rows * sizeof(pixels *), "bitmap row buffer");
+  b_p = (bitmap *)alloc( (unsigned long)rows * sizeof(pixels *), "bitmap row buffer");
   bzero(b_p, rows * sizeof(pixels *));
   for (j = 0; j < rows; j++) {
     /* allocate bitmap buffers */
-    (*b_p)[j] = (pixels *)alloc(x * sizeof(pixels),(char *)NULL);
+    (*b_p)[j] = (pixels *)alloc((unsigned long)x * sizeof(pixels),(char *)NULL);
     if ((*b_p)[j] == (pixels *)NULL) {
 		b_freebitmap();  /* free what we have already allocated */
 		int_error("out of memory for bitmap buffer", NO_CARET);
@@ -951,7 +963,7 @@ unsigned int angle;
 	for ( i = 0; i < b_vbits; i++ ) {
 		fc = *( b_font[j] + i );
 		if ( c == '_' ) {	/* treat underline specially */
-			if ( fc  ) {	/* this this the underline row ? *?
+			if ( fc  ) {	/* this this the underline row ? */
 				/* draw the under line for the full h_char width */
 				for ( k = ( b_hbits - b_hchar )/2;
 					k < ( b_hbits + b_hchar )/2; k++ ) {

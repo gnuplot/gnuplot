@@ -1,11 +1,11 @@
 
-		   A tutorial on explicit/parametric
-				   and
-		    everything you did not dare to ask
-				  about
-			   curves and surfaces
-				    in
-				  gnuplot
+                   A tutorial on explicit/parametric
+                                   and
+                    everything you did not dare to ask
+                                  about
+                           curves and surfaces
+                                    in
+                                  gnuplot
 
 Several types of curves and surface are supported in gnuplot. Of those
 not every operation is supported for every curve or surface type and it
@@ -79,15 +79,15 @@ parametric surfaces, gnuplot must be informed to handle them by issuing
 
 The curve polar form takes the obvious extensions in the surface world.
 The first possible extension is spherical coordinate system, while the
-second is the cylinderical one. These modes currently work for data files
-only and both requires two parameters, teta and phi for mapping onto the
-unit sphere, and teta and z form mapping on a unit radius cylinder as follow:
+second is the cylindrical one. These modes currently work for data files
+only and both requires two parameters, theta and phi for mapping onto the
+unit sphere, and theta and z form mapping on a unit radius cylinder as follow:
 
-	Spherical coord.			Cylin. coord.
-	----------------			-------------
-	x = cos( theta ) * cos( phi )		x = cos( theta )
-	y = sin( theta ) * cos( phi )		y = sin( theta )
-	z = sin( phi )				z = z
+        Spherical coord.                        Cylin. coord.
+        ----------------                        -------------
+        x = cos( theta ) * cos( phi )           x = cos( theta )
+        y = sin( theta ) * cos( phi )           y = sin( theta )
+        z = sin( phi )                          z = z
 
 This subject brings us back to non planar curves. When surfaces are displayed
 under gnuplot, isocurves are actually getting plotted. An isocurve is a
@@ -102,6 +102,5 @@ surface cross isolines are drawn as well. Seven isolines with five points
 each will be automatically created and drawn for grid type data. If
 however, isolines of different length are found in the data, it is
 tagged as nongrid surface and in fact is nothing more than a collection
-of three dimensional curves. only the provided data is plotted in that
-case (see world.demo for a such an example).
-
+of three dimensional curves. Only the provided data is plotted in that
+case (see world.dem for such an example).

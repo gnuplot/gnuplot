@@ -1,0 +1,36 @@
+#
+# $Id: discrete.dem%v 3.38.2.45 1993/01/11 04:11:27 woo Exp woo $
+#
+#
+set contour
+set title "Demo of specifying discrete contour levels  -  default contours"
+splot x*y
+
+#set discrete levels
+set cntrparam levels discrete 0, 15, 75
+set title "3 discrete contours at 0 15 & 75"
+replot
+
+#show contour setting
+show contour
+pause -1 "show demo, hit return"
+
+#save settings
+save set 'temp.set'
+pause -1 "settings saved to temp.set, hit return"
+
+#set incremental levels
+set cntrp level incr -20, 5, 9
+set title "9 incremental contours starting at -20, stepping by 5"
+replot
+
+#bring back save settings
+load 'temp.set'
+pause -1 "saved setting restored, hit return"
+replot
+
+#restore defaults
+set title ""
+set nocontour
+set cntrparam levels auto 5
+

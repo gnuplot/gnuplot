@@ -1,0 +1,148 @@
+/* GNUPLOT - mgr.trm */
+/*
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Mgr window system, color display
+ *
+ * AUTHOR
+ *  Vincent Broman, broman@nosc.mil
+ */
+
+#undef ESC
+#include <term.h>	/* from Mgr, not gnuplot */
+
+
+#define MGR_XMAX 640
+#define MGR_YMAX 400
+#define MGR_VCHAR 16
+#define MGR_HCHAR 8
+#define MGR_VTIC 4
+#define MGR_HTIC 4
+
+static int MGR_border = 5;
+static int MGR_winnbr = 0;
+
+static int MGR_rowcount = 24;
+static int MGR_winwidth = MGR_XMAX;
+static int MGR_winheight = MGR_YMAX;
+static int MGR_vchar = MGR_VCHAR;
+static int MGR_hchar = MGR_HCHAR;
+
+
+MGR_init()
+{
+char res[300];
+int winnbr;
+int w, h, bor;
+
+	m_setup( 0);
+	m_ttyset();
+
+	m_getinfo( G_SYSTEM);
+	if( m_gets( res) && sscanf( res, "%*s%d%d%d", &w, &h, &bor) == 3)
+		MGR_border = bor;
+
+	m_newwin( 0, 0, MGR_winwidth+2*MGR_border, MGR_winheight+2*MGR_border);
+	if( m_gets( res) && sscanf( res, "%d", &winnbr) == 1)
+		MGR_winnbr = winnbr;
+		/* if no alt window is created, then the main window is used */
+		/* and if size is different, term_tbl updated later */
+	m_selectwin( MGR_winnbr);
+	m_setmode( M_ABS);
+
+	m_getinfo( G_FONT);
+	if( m_gets( res) && sscanf( res, "%d %d", &w, &h) == 2) {
+		MGR_vchar = h;
+		MGR_hchar = w;
+	}
+	m_ttyreset();
+
+	term_tbl[term].v_char = MGR_vchar;
+	term_tbl[term].h_char = MGR_hchar;
+	term_tbl[term].v_tic = MGR_vchar / 4;
+	term_tbl[term].h_tic = MGR_hchar / 2;
+
+	m_selectwin( 0);
+	m_flush();
+}
+
+
+MGR_graphics()
+{
+char res[32];
+int c, r, w, h;
+
+	m_selectwin( MGR_winnbr);
+	m_setmode( M_ACTIVATE);
+	m_clear();
+
+	/* we permit the user to reshape the window arbitrarily.
+	   do_plot calls boundary to recheck the term_tbl for each plot */
+	m_ttyset();
+	m_getinfo( G_WINSIZE);
+	if( m_gets( res) && sscanf( res, "%d %d", &c, &r) == 2)
+		MGR_rowcount = r;
+	m_getinfo( G_COORDS);
+	if( m_gets( res) && sscanf( res, "%d %d %d %d", &c, &r, &w, &h) == 4) {
+		term_tbl[term].xmax = MGR_winwidth = w;
+		term_tbl[term].ymax = MGR_winheight = h;
+	}
+	m_ttyreset();
+	m_flush();
+}
+
+
+MGR_text()
+{
+	m_go( 0, 0);
+	m_aligntext();
+	if( MGR_winnbr == 0)
+		m_move( 0, MGR_rowcount - 1);
+	m_selectwin( 0);
+	m_flush();
+}
+
+
+MGR_linetype( linetype)
+int     linetype;
+{
+/*
+ * this mapping of colors is intended for a color sun on which
+ * colors 0-23 are defined, 0 is white, 1 is black.
+ */
+	m_linecolor( B_SRC, (linetype < 0)? 1: (2 + (linetype % 22)));
+}
+
+
+MGR_move( x, y)
+int x, y;
+{
+	m_go( x, MGR_winheight - 1 - y);
+}
+
+
+MGR_vector( x, y)
+int x, y;
+{
+	m_draw( x, MGR_winheight - 1 - y);
+}
+
+
+MGR_put_text( x, y, str)
+int x, y;
+char *str;
+{
+	MGR_move( x, y - MGR_vchar/2);
+	m_aligntext();
+	m_printstr( str);
+}
+
+
+MGR_reset()
+{
+	m_destroywin( MGR_winnbr);
+	MGR_winnbr = 0;
+	m_setmode( M_ACTIVATE);
+	m_flush();
+}

@@ -1,0 +1,60 @@
+SOME NOTES ON GNUPLOT ON THE AMIGA ...
+
+
+
+Environment Variables:
+
+   GNUFONT   You can say "setenv GNUFONT <Fontname>/<Pointsize>" to get the
+             font of your liking on the screen, e.g.:
+             "setenv GNUFONT sapphire/14".
+             Otherwise gnuplot will select the default-font you chose with
+             "Preferences".
+
+   GNUHELP   Allows you to define a pathname for the gnuplot help file.  For
+             example, "setenv GNUHELP TEX:gnuplot.gih"
+
+   GNUPLOT   Your current directory is searched for the file ".gnuplot".
+             If you say "setenv GNUPLOT <Path>" (without the filename!)
+             gnuplot will look for it there.
+
+   GNUTERM   You can define a default driver with "setenv GNUTERM <driver>".
+             A good choice is "setenv GNUTERM amiga" :^)
+
+   SHELL     If you don't like "NewShell" as your shell, you can say
+             "setenv SHELL <Shell>".
+
+
+Stack Size:
+
+   A stack size of at least 25000 bytes should be used while running gnuplot.
+   If you use recursive functions, e.g. like in "bivariat.dem", you will have
+   to increase your stack size accordingly. Otherwise gnuplot will exit with
+   a run time error.
+
+
+
+--------------------------   SAS/C 6.1 VERSION   -----------------------------
+
+
+Default paths/directories:
+
+   Gnuplot looks for the file "gnuplot.gih" in your "S:"-directory unless you
+   specify the full pathname including the filename via "setenv GNUHELP".
+
+
+
+
+---------------------------   AZTEC C VERSION   ------------------------------
+
+Default paths/directories:
+
+   Gnuplot looks for the "gnuplot.gih" file in "GNUPLOT:docs/gnuplot.gih" if
+   GNUHELP is not defined.   This is defined in the makefile (makefile.ami).
+
+
+Terminal Drivers:
+
+   The Aztec C version can now use the "amiga.trm" driver written by
+   Carsten Steger.  Under KS/WB 2.0, a custom screen will be used with a size
+   specified by the Prefs/Overscan program.
+

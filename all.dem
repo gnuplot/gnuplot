@@ -1,0 +1,92 @@
+#
+# $Id: all.dem%v 3.38.2.80 1993/02/20 18:34:10 woo Exp woo $
+#
+# Executes ALL demos in this directory, in functionality order.
+#
+
+pause 0 "******************** file simple.dem ********************"
+load "simple.dem"
+
+pause 0 "******************** file controls.dem ********************"
+load "controls.dem"
+
+pause 0 "******************** file electron.dem ********************"
+load "electron.dem"
+
+pause 0 "******************** file using.dem ********************"
+load "using.dem"
+
+pause 0 "******************** file errorbar.dem ********************"
+load "errorbar.dem"
+
+pause 0 "******************** file param.dem ********************"
+load "param.dem"
+
+#save settings
+save set 'temp.set'
+pause -1 "settings saved to temp.set, hit return"
+
+pause 0 "******************** file polar.dem ********************"
+load "polar.dem"
+
+pause 0 "******************** file poldat.dem ********************"
+load "poldat.dem"
+
+#bring back save settings
+load 'temp.set'
+pause -1 "saved setting restored, hit return"
+
+pause 0 "******************** file surface1.dem ********************"
+load "surface1.dem"
+
+pause 0 "******************** file surface2.dem ********************"
+load "surface2.dem"
+
+pause 0 "******************** file contours.dem ********************"
+load "contours.dem"
+
+pause 0 "******************** file discrete.dem ********************"
+load "discrete.dem"
+
+pause 0 "******************** file hidden.dem ********************"
+load "hidden.dem"
+
+pause 0 "******************** file world.dem ********************"
+load "world.dem"
+
+pause 0 "******************** file prob.dem ********************"
+load "prob.dem"
+
+pause 0 "******************** file prob2.dem ********************"
+load "prob2.dem"
+
+pause 0 "******************** file random.dem ********************"
+load "random.dem"
+
+pause 0 "******************** file spline.dem ********************"
+load "spline.dem"
+
+pause 0 "******************** file binary.dem ********************"
+load "binary.dem"
+
+pause 0 "******************** file steps.dem ********************"
+load "steps.dem"
+
+pause 0 "******************** file scatter.dem ********************"
+load "scatter.dem"
+
+pause 0 "******************** file singulr.dem ********************"
+load "singulr.dem"
+
+pause 0 "******************** file airfoil.dem ********************"
+load "airfoil.dem"
+
+pause 0 "******************** file multimsh.dem ********************"
+load "multimsh.dem"
+
+pause 0 "******************** file bivariat.dem ********************"
+load "bivariat.dem"
+
+pause 0 "******************** file animate.dem ********************"
+load "animate.dem"
+

@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: scanner.c,v 3.26 92/03/24 22:34:36 woo Exp Locker: woo $";
+static char *RCSid = "$Id: scanner.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - scanner.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,12 +31,24 @@ static char *RCSid = "$Id: scanner.c,v 3.26 92/03/24 22:34:36 woo Exp Locker: wo
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 #include <stdio.h>
@@ -78,7 +91,9 @@ extern struct lexical_unit token[MAX_TOKENS];
 
 static int t_num;	/* number of token I'm working on */
 
+#ifndef AMIGA_SC_6_1
 char *strcat(), *strcpy(), *strncpy();
+#endif /* !AMIGA_SC_6_1 */
 
 /*
  * scanner() breaks expression[] into lexical units, storing them in token[].
@@ -88,22 +103,22 @@ char *strcat(), *strcpy(), *strncpy();
  *
  *	 Scanning is performed by following rules:
  *
- *		Current char	token should contain
+ *	Current char	token should contain
  *     -------------    -----------------------
- *		1.  alpha		all following alpha-numerics
- *		2.  digit		0 or more following digits, 0 or 1 decimal point,
- *						  0 or more digits, 0 or 1 'e' or 'E',
- *						  0 or more digits.
- *		3.  ^,+,-,/		only current char
- *		    %,~,(,)
- *		    [,],;,:,
- *		    ?,comma
- *		4.  &,|,=,*		current char; also next if next is same
- *		5.  !,<,>		current char; also next if next is =
- *		6.  ", '		all chars up until matching quote
- *        7.  #          this token cuts off scanning of the line (DFK).
+ *	1.  alpha,_	all following alpha-numerics
+ *	2.  digit	0 or more following digits, 0 or 1 decimal point,
+ *				0 or more digits, 0 or 1 'e' or 'E',
+ *				0 or more digits.
+ *	3.  ^,+,-,/	only current char
+ *	    %,~,(,)
+ *	    [,],;,:,
+ *	    ?,comma
+ *	4.  &,|,=,*	current char; also next if next is same
+ *	5.  !,<,>	current char; also next if next is =
+ *	6.  ", '	all chars up until matching quote
+ *	7.  #		this token cuts off scanning of the line (DFK).
  *
- *		white space between tokens is ignored
+ *			white space between tokens is ignored
  */
 scanner(expression)
 char expression[];
@@ -126,7 +141,8 @@ again:
 			substitute(&expression[current],MAX_LINE_LEN - current);
 			goto again;
 		}
-		if (isalpha(expression[current])) {
+		/* allow _ to be the first character of an identifier */
+		if (isalpha(expression[current]) || expression[current] == '_') {
 			SCAN_IDENTIFIER;
 		} else if (isdigit(expression[current]) || expression[current] == '.'){
 			token[t_num].is_token = FALSE;
@@ -135,11 +151,21 @@ again:
 		} else if (expression[current] == LBRACE) {
 			token[t_num].is_token = FALSE;
 			token[t_num].l_val.type = CMPLX;
+#ifdef __PUREC__
+			{ char	l[80];
+			if ((sscanf(&expression[++current],"%lf,%lf%[ }]s",
+				&token[t_num].l_val.v.cmplx_val.real,
+				&token[t_num].l_val.v.cmplx_val.imag,
+				&l)	!= 3) || (!strchr(l, RBRACE))  )
+					int_error("invalid complex constant",t_num);
+			}
+#else
 			if ((sscanf(&expression[++current],"%lf , %lf %c",
 				&token[t_num].l_val.v.cmplx_val.real,
 				&token[t_num].l_val.v.cmplx_val.imag,
 				&brace) != 3) || (brace != RBRACE))
 					int_error("invalid complex constant",t_num);
+#endif
 			token[t_num].length += 2;
 			while (expression[++current] != RBRACE) {
 				token[t_num].length++;
@@ -215,7 +241,7 @@ long atol();
 register long lval;
 
 	token[t_num].is_token = FALSE;
-	token[t_num].l_val.type = INT;		/* assume unless . or E found */
+	token[t_num].l_val.type = INTGR;		/* assume unless . or E found */
 	while (isdigit(str[count]))
 		count++;
 	if (str[count] == '.') {
@@ -238,7 +264,7 @@ register long lval;
 		while (isdigit(str[++count]))
 			;
 	}
-	if (token[t_num].l_val.type == INT) {
+	if (token[t_num].l_val.type == INTGR) {
  		lval = atol(str);
 		if ((token[t_num].l_val.v.int_val = lval) != lval)
 			int_error("integer overflow; change to floating point",t_num);
@@ -249,26 +275,7 @@ register long lval;
 	return(count);
 }
 
-
-#ifdef MSDOS
-
-#ifdef __ZTC__
-substitute(char *str,int max)
-#else
-substitute()
-#endif
-{
-	int_error("substitution not supported by MS-DOS!",t_num);
-}
-
-#else /* MSDOS */
-#ifdef AMIGA_LC_5_1
-substitute()
-{
-	int_error("substitution not supported by AmigaDOS!",t_num);
-}
-
-#else /* AMIGA_LC_5_1 */
+#if defined(unix) || defined(vms) || defined(PIPES) || (defined(ATARI) && defined(__PUREC__))
 
 substitute(str,max)			/* substitute output from ` ` */
 char *str;
@@ -280,7 +287,12 @@ register FILE *f;
 #ifdef AMIGA_AC_5
 int fd;
 #else
+#if defined(ATARI) && defined(__PUREC__)
+char	*atari_tmpfile;
+char	*atari_pgm[MAX_LINE_LEN+100];
+#else
 FILE *popen();
+#endif /* ATARI && PUREC */
 #endif
 static char pgm[MAX_LINE_LEN+1],output[MAX_LINE_LEN+1];
 
@@ -311,11 +323,24 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
    	if ((f = fopen(MAILBOX,"r")) == NULL)
    		os_error("mailbox open failed",NO_CARET);
 #else /* vms */
+#if defined(ATARI) && defined(__PUREC__)
+		if (system(NULL) == 0)
+			os_error("no command shell");
+		if ((strlen(atari_tmpfile) + strlen(pgm) + 5) > MAX_LINE_LEN+100)
+			os_error("sorry, command to long");
+		atari_tmpfile = tmpnam(NULL);
+		strcpy(atari_pgm, pgm);
+		strcat(atari_pgm, " >> ");
+		strcat(atari_pgm, atari_tmpfile);
+		system(atari_pgm);
+		if ((f = fopen(atari_tmpfile, "r")) == NULL)
+#else
 #ifdef AMIGA_AC_5
   	if ((fd = open(pgm,"O_RDONLY")) == -1)
 #else
   	if ((f = popen(pgm,"r")) == NULL)
 #endif
+#endif	/* ATARI && PUREC */
   		os_error("popen failed",NO_CARET);
 #endif /* vms */
 
@@ -326,7 +351,12 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 #ifdef AMIGA_AC_5
 			(void) close(fd);
 #else
+#if defined(ATARI) && defined(__PUREC__)
+			(void) fclose(f);
+			(void) unlink(atari_tmpfile);
+#else
 			(void) pclose(f);
+#endif /* ATARI && PUREC */
 #endif
 			int_error("substitution overflow", t_num);
 		}
@@ -334,8 +364,14 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 #ifdef AMIGA_AC_5
 	(void) close(fd);
 #else
+#if defined(ATARI) && defined(__PUREC__)
+	(void) fclose(f);
+	(void) unlink(atari_tmpfile);
+#else
 	(void) pclose(f);
+#endif /* ATARI && PUREC */
 #endif
+
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
 	(void) strncpy(output+i,last+1,MAX_LINE_LEN-i);
@@ -343,5 +379,17 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	(void) strcpy(str,output);				/* now replace ` ` with output */
 	screen_ok = FALSE;
 }
-#endif /* AMIGA_LC_5_1 */
-#endif /* MS-DOS */
+
+#else /* unix || vms || PIPES || ATARI && PUREC */
+
+#ifdef __ZTC__
+substitute(char *str,int max)
+#else
+substitute()
+#endif
+{
+	char line[100];
+
+	int_error( strcat(strcpy(line,"substitution not supported by "),OS),t_num);
+}
+#endif /* unix || vms || PIPES || ATARI && PUREC */

@@ -1,0 +1,32 @@
+#
+#	demo to rotate whale image
+#	Where gnuplot.rot is a gnuplot command file containing something like
+#
+#	  zrot=(zrot+10)%360
+#	  set view xrot,zrot
+#	  replot
+#	  reread
+#
+#	The 'reread' command causes the current gnu command file to be reset 
+#	to its starting point before further commands are read from it.  Since
+#	the 'reread' command is in 'gnuplot.rot', the above four commands are
+#	repeated indefinitely, causing the image to rotate about the Z axis.
+#
+set parametric
+set hidden3d
+set nokey
+set xrange [0:8]
+set yrange [-4:4]
+set zrange [-2:2]
+set data style line
+set title "Demo of animation capability - Digitized Blue Whale"
+xrot=60
+zrot=0
+splot "whale.dat"
+pause -1 "Under MS-DOS, a carriage return is needed to invoke reread"
+load "gnuplot.rot"
+set title ""
+set autosc
+set nohidden
+set nopara
+set key

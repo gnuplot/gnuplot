@@ -1,0 +1,233 @@
+/* GNUPLOT - emxvga.trm */
+/*
+ * Copyright (C) 1993
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  vgal
+ *  vesa
+ *
+ * AUTHORS
+ *  Russell Lang
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ */
+
+/* VGA driver using EMX/GCC for DOS */
+#include <graph.h>
+#include <conio.h>
+#include <dos.h>
+
+int emx_startx, emx_starty;
+int emx_xlast, emx_ylast;
+int emx_color;
+int emx_angle;
+int emx_vmode = 0;
+#ifdef EMXVESA
+int emx_vesamode = G640x480x256;
+#endif
+
+#define EMXVGA_XMAX 640
+#define EMXVGA_YMAX 480
+
+#define EMXVGA_XLAST (EMXVGA_XMAX - 1)
+#define EMXVGA_YLAST (EMXVGA_YMAX - 1)
+
+#define EMXVGA_VCHAR FNT5X9_VCHAR
+#define EMXVGA_HCHAR FNT5X9_HCHAR
+#define EMXVGA_VTIC 4
+#define EMXVGA_HTIC 4
+
+#define EMXNUMCOLOR 15
+static int emx_colors[EMXNUMCOLOR] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+
+
+EMXVGA_init()
+{
+union REGS r;
+	r.h.ah = 0x0f;
+	_int86(0x10, &r, &r);
+	emx_vmode = r.h.al;	/* save old video mode */
+	/* Get the screen size: */
+	if (!g_mode(G_MODE_VGA_L))
+		int_error("Couldn't select graphics mode",NO_CARET);
+	emx_xlast = g_xsize - 1;
+    	term_tbl[term].xmax = emx_xlast + 1;
+	emx_ylast = g_ysize - 1;
+    	term_tbl[term].ymax = emx_ylast + 1;
+	g_mode(G_MODE_OFF);
+}
+
+EMXVGA_graphics()
+{
+/* don't use g_mode() here - gmode(G_MODE_OFF) doesn't clean up */
+union REGS r;
+	r.h.ah = 0x00;
+	r.h.al = 19;		/* VGA 320x200x256 mode */
+	_int86(0x10, &r, &r);
+}
+
+EMXVGA_text()
+{
+/* don't use g_mode() here - gmode(G_MODE_OFF) doesn't clean up */
+union REGS r;
+int ch;
+	ch = getch();
+	r.h.ah = 0x00;
+	r.h.al = emx_vmode;	/* old video mode */
+	_int86(0x10, &r, &r);
+	if (ch == 3)
+		int_error("Interrupt",NO_CARET);
+}
+
+EMXVGA_reset()
+{
+}
+
+#ifdef EMXVESA
+/* untested */
+EMXVESA_options()
+{
+	extern struct value *const_express();
+	extern double real();
+
+	if (!END_OF_COMMAND) {
+		if (almost_equals(c_token,"d$efault")) {
+			emx_vesamode = G640x480x256;
+			c_token++;
+		}
+	}
+
+	if (!END_OF_COMMAND) {
+		/* We have a vesa mode specified */
+		struct value a;
+		emx_vesamode = (int)real(const_express(&a));
+	}
+
+	sprintf(term_options,"%d",emx_vesamode);
+}
+
+EMXVESA_init()
+{
+	if (!g_mode(emx_vesamode))
+		int_error("Couldn't select graphics mode",NO_CARET);
+	emx_xlast = g_xsize - 1;
+    	term_tbl[term].xmax = emx_xlast + 1;
+	emx_ylast = g_ysize - 1;
+    	term_tbl[term].ymax = emx_ylast + 1;
+	g_mode(GTEXT);
+}
+
+EMXVESA_graphics()
+{
+	g_mode(emx_vesamode);
+}
+
+EMXVESA_text()
+{
+int ch;
+	ch = getch();
+	g_mode(GTEXT);
+	if (ch == 3)
+		int_error("Interrupt",NO_CARET);
+}
+
+EMXVESA_reset()
+{
+}
+#endif
+
+
+EMXVGA_linetype(linetype)
+int linetype;
+{
+	if (linetype >= 13)
+		linetype %= 13;
+	emx_color = emx_colors[linetype+2];
+}
+
+EMXVGA_move(x,y)
+unsigned int x,y;
+{
+	emx_startx = x;
+	emx_starty = y;
+}
+
+
+EMXVGA_vector(x,y)
+unsigned int x,y;
+{
+	g_line(emx_startx,emx_ylast-emx_starty,x,emx_ylast-y,emx_color);
+	emx_startx = x;
+	emx_starty = y;
+}
+
+
+int EMXVGA_text_angle(ang)
+int ang;
+{
+	emx_angle=ang;
+	return TRUE;
+}
+
+
+EMXVGA_putc(x,y,c,angle)
+unsigned int x,y;
+char c;
+int angle;
+{
+int i,j,k;
+unsigned int pixelon;
+	i = (int)(c) - 32;
+	for (j=0; j<FNT5X9_VBITS; j++) {
+		for (k=0; k<FNT5X9_HBITS; k++) {
+			pixelon = (((unsigned int)(fnt5x9[i][j])) >> k & 1);
+			if (pixelon) {
+				switch(angle) {
+					case 0 : g_set(x+k,y-j,emx_color);
+							break;
+					case 1 : g_set(x-j,y-k,emx_color);
+							break;
+				}
+			}
+		}
+	}
+}
+
+
+EMXVGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+	switch(emx_angle) {
+		case 0 : y -= EMXVGA_VCHAR/2;
+				break;
+		case 1 : x += EMXVGA_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		EMXVGA_putc(x,emx_ylast-y,str[i],emx_angle);
+		switch(emx_angle) {
+			case 0 : x+=EMXVGA_HCHAR ;
+					break;
+			case 1 : y+=EMXVGA_HCHAR ;
+					break;
+		}
+	}
+}
+

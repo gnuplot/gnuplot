@@ -1,10 +1,11 @@
 /*
- * $Id: gpr.trm,v 3.26 92/03/24 22:35:00 woo Exp Locker: woo $
+ * $Id: gpr.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ *
  */
 
 /* GNUPLOT - gpr.trm */
 /*
- * Copyright (C) 1990, 1991, 1992   
+ * Copyright (C) 1990 - 1993   
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -27,7 +28,7 @@
  *  Michael Aramini
  *  Roque D Oliveira , oliveria@caen.engin.umich.edu
  * 
- * send your comments or suggestions to (info-gnuplot@ames.arc.nasa.gov).
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  * 
  */
 #include <apollo/base.h>
@@ -56,7 +57,7 @@ int               gpr_ang=0;            /* text angle, 0=horizontal, 1=vertical 
 enum JUSTIFY      gpr_justify=LEFT;     /* text is flush left */
 
 static status_$t  status;
-unsigned int      DEBUG    = 0;         /* set it to 1 when debugging program */
+unsigned int      Debug    = 0;         /* set it to 1 when debugging program */
 
 
 static void check(messagex)
@@ -109,7 +110,7 @@ GPR_init()
   screen_size_r_width    = (float) display_characteristics.x_window_size;    /*x_window_size in pixels */
   screen_size_r_height   = (float) display_characteristics.y_window_size;    /*y_window_size in pixels */
   hi_plane  = display_characteristics.n_planes - 1;  
-  if(DEBUG) printf("width=%f height=%f \n",screen_size_r_width,screen_size_r_height);
+  if(Debug) printf("width=%f height=%f \n",screen_size_r_width,screen_size_r_height);
 
   dm_bitmap_size.x_size = 1280;
   dm_bitmap_size.y_size = 1024;
@@ -147,7 +148,7 @@ GPR_graphics()
   gpr_$clear((gpr_$pixel_value_t)0, &status);  /* black */
   check("in gpr_$clear");
 
-  if(DEBUG) 
+  if(Debug) 
    {
     marker_size = (short) 10;  
 
@@ -185,7 +186,7 @@ GPR_graphics()
     
     gpr_$set_draw_value((gpr_$pixel_value_t)7, &status);  /* white */
     check("in gpr_$set_draw_value");
-   } /* end if(DEBUG) */
+   } /* end if(Debug) */
 
 }
 
@@ -265,7 +266,7 @@ char str[];              /* the text */
 
   gpr_$coordinate_t locx,locy,marker_size;
 
-  if(DEBUG) 
+  if(Debug) 
    {
     locx = (short) x;
     locy = (short) (GPR_YMAX -1 - y);
@@ -295,13 +296,13 @@ char str[];              /* the text */
           {
            case gpr_$up :           /* vertical */
                {
-                if(DEBUG) printf("LEFT and up , str=%s\n",str);
+                if(Debug) printf("LEFT and up , str=%s\n",str);
                 break;
                }
            case gpr_$right :        /* horizontal */
                {
                 ygpr = ygpr + str_size_in_pixels.y_size/2;
-                if(DEBUG) printf("LEFT and right, str=%s \n",str);
+                if(Debug) printf("LEFT and right, str=%s \n",str);
                 break;
                }
           }
@@ -316,14 +317,14 @@ char str[];              /* the text */
                {
                 xgpr = xgpr + str_size_in_pixels.x_size/2;
                 ygpr = ygpr + str_size_in_pixels.y_size/2;
-                if(DEBUG) printf("CENTRE and up, str=%s \n",str);
+                if(Debug) printf("CENTRE and up, str=%s \n",str);
                 break;
                }
            case gpr_$right :        /* horizontal */
                {
                 xgpr = xgpr - str_size_in_pixels.x_size/2;
                 ygpr = ygpr + str_size_in_pixels.y_size/2;
-                if(DEBUG) printf("CENTRE and right, str=%s \n",str);
+                if(Debug) printf("CENTRE and right, str=%s \n",str);
                 break;
                }
           }
@@ -336,14 +337,14 @@ char str[];              /* the text */
            case gpr_$up :           /* vertical */
                {
                 ygpr = ygpr + str_size_in_pixels.y_size;
-                if(DEBUG) printf("RIGHT and up, str=%s \n",str);
+                if(Debug) printf("RIGHT and up, str=%s \n",str);
                 break;
                }
            case gpr_$right :        /* horizontal */
                {
                 xgpr = xgpr - str_size_in_pixels.x_size;
                 ygpr = ygpr + str_size_in_pixels.y_size/2;
-                if(DEBUG) printf("RIGHT and right, str=%s \n",str);
+                if(Debug) printf("RIGHT and right, str=%s \n",str);
                 break;
                }
           }

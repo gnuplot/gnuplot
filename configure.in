@@ -1,0 +1,80 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl configure.in for gnuplot 3.5 on Unix.
+dnl Send any mail about this file to David MacKenzie <djm@gnu.ai.mit.edu>.
+dnl
+AC_INIT(graphics.c)
+
+dnl Programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+
+dnl Optional features.
+AC_WITH(no-readline, , AC_DEFINE(READLINE))
+AC_WITH(cwdrc, , AC_DEFINE(NOCWDRC))
+AC_SUBST(LASERGNU)
+AC_WITH(lasergnu, LASERGNU=lasergnu_install, LASERGNU=lasergnu_noinstall)
+
+dnl X Window System files.
+AC_SUBST(X_INCLUDES)
+AC_SUBST(X_LIBRARIES)
+AC_SUBST(PROGS)
+AC_FIND_X
+if test -z "$x_includes" || test -z "$x_libraries"; then
+  X_INCLUDES= X_LIBRARIES= PROGS=
+else
+  X_INCLUDES="-I$x_includes" X_LIBRARIES="-L$x_libraries -lX11"
+  PROGS=gnuplot_x11
+  AC_DEFINE(X11)
+fi
+
+dnl Operating systems.
+dnl FIXME AC_DEFINE(ISC22)
+dnl FIXME AC_DEFINE(KSR)
+echo checking for NeXT
+AC_PROGRAM_EGREP(yes,
+[#ifdef __NeXT__
+  yes
+#endif
+], AC_DEFINE(NEXT) AC_DEFINE(NeXT))
+echo checking for OSF/1
+AC_HEADER_CHECK(sys/bkmac.h, AC_DEFINE(OSF1) AC_DEFINE(_OSF_SOURCE))
+echo checking for Solaris
+AC_HEADER_CHECK(libgenIO.h, AC_DEFINE(SOLARIS))
+
+dnl Header files.
+AC_HEADER_CHECK(sys/bsdtypes.h, AC_DEFINE(BSD_TYPES))
+AC_HEADER_CHECK(sys/select.h, , AC_DEFINE(OLD_SELECT))
+
+have_hdr=
+AC_HEADER_CHECK(termios.h, AC_DEFINE(TERMIOS) have_hdr=1)
+if test -z "$have_hdr"; then
+  AC_HEADER_CHECK(sgtty.h, AC_DEFINE(SGTTY))
+fi
+
+dnl Functions.
+dnl gamma is called lgamma on apollos.
+AC_FUNC_CHECK(lgamma, AC_DEFINE(GAMMA, lgamma), AC_DEFINE(GAMMA, gamma))
+AC_FUNC_CHECK(getcwd, AC_DEFINE(GETCWD))
+AC_FUNC_CHECK(memcpy, AC_DEFINE(MEMCPY))
+AC_FUNC_CHECK(memset, AC_DEFINE(MEMSET))
+AC_FUNC_CHECK(setlocale, AC_DEFINE(XPG3_LOCALE))
+AC_FUNC_CHECK(setlinebuf, AC_DEFINE(UNIX))
+
+dnl On SVR3.
+dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
+
+dnl Libraries.
+dnl -lsocket is needed on SVR4.
+AC_HAVE_LIBRARY(socket, LIBS="$LIBS -lsocket")
+
+dnl How do we detect the Ultrix X libraries?
+dnl Or is it really a server (run-time) problem?
+dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
+
+dnl Define always.
+dnl vfork is obsolete, and often broken.
+AC_DEFINE(NOVFORK)
+dnl Some systems do not predefine this.
+AC_DEFINE(unix)
+
+AC_OUTPUT(Makefile docs/Makefile docs/latextut/Makefile)

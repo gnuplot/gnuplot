@@ -1,0 +1,6 @@
+[OPTIONS]
+TITLE=gnuplot
+[FILES]
+gnuplot.rtf
+[CONFIG]
+BrowseButtons()

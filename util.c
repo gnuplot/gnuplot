@@ -1,10 +1,11 @@
 #ifndef lint
-static char *RCSid = "$Id: util.c,v 3.26 92/03/24 22:34:43 woo Exp Locker: woo $";
+static char *RCSid = "$Id: util.c%v 3.50 1993/07/09 05:35:24 woo Exp $";
 #endif
+
 
 /* GNUPLOT - util.c */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,12 +31,6 @@ static char *RCSid = "$Id: util.c,v 3.26 92/03/24 22:34:43 woo Exp Locker: woo $
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
  * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
  */
 
 #include <ctype.h>
@@ -44,14 +39,16 @@ static char *RCSid = "$Id: util.c,v 3.26 92/03/24 22:34:43 woo Exp Locker: woo $
 #include <errno.h>
 #include "plot.h"
 
-BOOLEAN screen_ok;
+TBOOLEAN screen_ok;
 	/* TRUE if command just typed; becomes FALSE whenever we
 		send some other output to screen.  If FALSE, the command line
 		will be echoed to the screen before the ^ error message. */
 
 #ifndef vms
-#ifndef __ZTC__
+#if !defined(__ZTC__) && !defined(__PUREC__)
+#if !defined(__MSC__)
 extern int errno;
+#endif
 extern int sys_nerr;
 extern char *sys_errlist[];
 #endif
@@ -59,12 +56,20 @@ extern char *sys_errlist[];
 
 extern char input_line[];
 extern struct lexical_unit token[];
+#ifdef _Windows
+extern jmp_buf far env;	/* from plot.c */
+#else
 extern jmp_buf env;	/* from plot.c */
+#endif
 extern int inline_num;		/* from command.c */
-extern BOOLEAN interactive;	/* from plot.c */
+extern TBOOLEAN interactive;	/* from plot.c */
 extern char *infile_name;	/* from plot.c */
 
+#ifdef sequent
+extern char *index();
+#else
 extern char *strchr();
+#endif
 
 #ifndef AMIGA_AC_5
 extern double sqrt(), atan2();
@@ -166,7 +171,8 @@ isletter(t_num)
 int t_num;
 {
 	return(token[t_num].is_token &&
-			(isalpha(input_line[token[t_num].start_index])));
+			((isalpha(input_line[token[t_num].start_index]))||
+			 (input_line[token[t_num].start_index] == '_')));
 }
 
 
@@ -174,24 +180,29 @@ int t_num;
  * is_definition() returns TRUE if the next tokens are of the form
  *   identifier =
  *		-or-
- *   identifier ( identifer ) =
+ *   identifier ( identifer {,identifier} ) =
  */
 is_definition(t_num)
 int t_num;
 {
-	return (isletter(t_num) &&
-			(equals(t_num+1,"=") ||			/* variable */
-			(equals(t_num+1,"(") &&		/* function */
-			 isletter(t_num+2)   &&
-			 equals(t_num+3,")") &&
-			 equals(t_num+4,"=") ) ||
-			(equals(t_num+1,"(") &&		/* function with */
-			 isletter(t_num+2)   &&		/* two variables */
-			 equals(t_num+3,",") &&
-			 isletter(t_num+4)   &&
-			 equals(t_num+5,")") &&
-			 equals(t_num+6,"=") )
-		));
+	/* variable? */
+	if(isletter(t_num) && equals(t_num+1,"="))
+		return 1;
+
+	/* function? */
+	/* look for dummy variables */
+	if(isletter(t_num) && equals(t_num+1,"(") && isletter(t_num+2)) {
+		t_num += 3;  /* point past first dummy */
+		while(equals(t_num,",")) {
+			if(!isletter(++t_num))
+				return 0;
+			t_num += 1;
+		}
+		return(equals(t_num,")") && equals(t_num+1,"="));
+	}
+
+	/* neither */
+	return 0;
 }
 
 
@@ -295,7 +306,7 @@ register char *s;
 	if (*str)		/* previous pointer to malloc'd memory there */
 		free(*str);
 	e = token[end].start_index + token[end].length;
-	*str = alloc((unsigned int)(e - token[start].start_index + 1), "string");
+	*str = alloc((unsigned long)(e - token[start].start_index + 1), "string");
      s = *str;
      for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
 	  *s++ = input_line[i];
@@ -317,7 +328,7 @@ register char *s;
 	if (*str)		/* previous pointer to malloc'd memory there */
 		free(*str);
 	e = token[end].start_index + token[end].length-1;
-	*str = alloc((unsigned int)(e - token[start].start_index + 1), "string");
+	*str = alloc((unsigned long)(e - token[start].start_index + 1), "string");
      s = *str;
     for (i = token[start].start_index + 1; i < e && input_line[i] != '\0'; i++)
 	 *s++ = input_line[i];
@@ -342,9 +353,15 @@ double r;
 	if ( i > 3 ) i = 0;
 
 	sprintf( s[j], "%g", r );
+#ifdef sequent
+	if ( index( s[j], '.' ) == NULL &&
+	     index( s[j], 'e' ) == NULL &&
+	     index( s[j], 'E' ) == NULL )
+#else
 	if ( strchr( s[j], '.' ) == NULL &&
 	     strchr( s[j], 'e' ) == NULL &&
 	     strchr( s[j], 'E' ) == NULL )
+#endif
 		strcat( s[j], ".0" );
 
 	return s[j];
@@ -355,7 +372,7 @@ FILE *fp;
 struct value *val;
 {
 	switch(val->type) {
-		case INT:
+		case INTGR:
 			fprintf(fp,"%d",val->v.int_val);
 			break;
 		case CMPLX:
@@ -378,7 +395,7 @@ real(val)		/* returns the real part of val */
 struct value *val;
 {
 	switch(val->type) {
-		case INT:
+		case INTGR:
 			return((double) val->v.int_val);
 		case CMPLX:
 			return(val->v.cmplx_val.real);
@@ -394,7 +411,7 @@ imag(val)		/* returns the imag part of val */
 struct value *val;
 {
 	switch(val->type) {
-		case INT:
+		case INTGR:
 			return(0.0);
 		case CMPLX:
 			return(val->v.cmplx_val.imag);
@@ -411,7 +428,7 @@ magnitude(val)		/* returns the magnitude of val */
 struct value *val;
 {
 	switch(val->type) {
-		case INT:
+		case INTGR:
 			return((double) abs(val->v.int_val));
 		case CMPLX:
 			return(sqrt(val->v.cmplx_val.real*
@@ -431,7 +448,7 @@ angle(val)		/* returns the angle of val */
 struct value *val;
 {
 	switch(val->type) {
-		case INT:
+		case INTGR:
 			return((val->v.int_val > 0) ? 0.0 : Pi);
 		case CMPLX:
 			if (val->v.cmplx_val.imag == 0.0) {
@@ -450,7 +467,7 @@ struct value *val;
 
 
 struct value *
-complex(a,realpart,imagpart)
+Gcomplex(a,realpart,imagpart)
 struct value *a;
 double realpart, imagpart;
 {
@@ -462,11 +479,11 @@ double realpart, imagpart;
 
 
 struct value *
-integer(a,i)
+Ginteger(a,i)
 struct value *a;
 int i;
 {
-	a->type = INT;
+	a->type = INTGR;
 	a->v.int_val = i;
 	return(a);
 }
@@ -587,7 +604,7 @@ squash_spaces(s)
 {
   register char *r = s;		/* reading point */
   register char *w = s;		/* writing point */
-  BOOLEAN space = FALSE;		/* TRUE if we've already copied a space */
+  TBOOLEAN space = FALSE;		/* TRUE if we've already copied a space */
 
   for (w = r = s; *r != '\0'; r++) {
 	 if (isspace(*r)) {
@@ -604,4 +621,3 @@ squash_spaces(s)
   }
   *w = '\0';				/* null terminate string */
 }
-

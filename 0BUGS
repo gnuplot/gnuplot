@@ -1,0 +1,13 @@
+1. The hidden line algorithm is not perfect.  The back of the object
+can bleed through to the front.  We should put in a option of not
+drawing the back at all.
+
+2. The list of available devices is often longer than the length of
+a screen.  This output should be sent through a pager.
+
+3. On some devices, such as X11, there can only be one active plotting
+window.
+
+4. In the Atari version, windows are not currently supported.  This
+means gnuplot 3.4 will not run with MultiAES.  We hope to correct
+this shortly in gpcontrb.tar.z.

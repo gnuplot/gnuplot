@@ -1,0 +1,298 @@
+/*
+ * $Id: pstricks.trm%v 3.50 1993/07/09 05:35:24 woo Exp $
+ */
+
+/* GNUPLOT - pstricks.trm */
+/*
+ * Copyright (C) 1990 - 1993
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   The PSTricks macros for LaTeX.
+ *
+ * AUTHORS
+ *   David Kotz
+ *
+ *   Raymond Toy	toy@soho.crd.ge.com
+ *	Modified the eepic.trm file to use PSTricks macros instead.
+ *
+ * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
+ *
+ */
+
+/*
+ *  This file contains the PSTricks terminal driver, intended for use with the
+ *  pstricks.sty macro package for LaTeX. This is an alternative to the
+ *  eepic and latex driver. You need pstricks.sty, and, of course, a printer
+ *  that understands PostScript.  Ghostscript understands Postscript too.
+ *
+ *  PSTricks is available via anonymous ftp from the /pub directory
+ *  at Princeton.EDU.  This driver comes definitely does not come close to
+ *  using the full capability of the PSTricks package.
+ */
+
+#define PSTRICKS_PTS_PER_INCH (72.27)
+#define DOTS_PER_INCH (300)		/* resolution of printer we expect to use */
+#define PSTRICKS_UNIT (PSTRICKS_PTS_PER_INCH/DOTS_PER_INCH)	/* dot size in pt */
+
+/* 5 inches wide by 3 inches high (default) */
+#define PSTRICKS_XMAX (5*DOTS_PER_INCH)	/* (PSTRICKS_PTS_PER_INCH/PSTRICKS_UNIT*5.0) */
+#define PSTRICKS_YMAX (3*DOTS_PER_INCH)	/* (PSTRICKS_PTS_PER_INCH/PSTRICKS_UNIT*3.0) */
+
+#define PSTRICKS_HTIC (5*DOTS_PER_INCH/72)	/* (5./PSTRICKS_UNIT) */
+#define PSTRICKS_VTIC (5*DOTS_PER_INCH/72)	/* (5./PSTRICKS_UNIT) */
+#define PSTRICKS_HCHAR (DOTS_PER_INCH*53/10/72)	/* (5.3/PSTRICKS_UNIT) */
+#define PSTRICKS_VCHAR (DOTS_PER_INCH*11/72)	/* (11./PSTRICKS_UNIT) */
+
+static unsigned int PSTRICKS_posx;
+static unsigned int PSTRICKS_posy;
+enum JUSTIFY    PSTRICKS_justify = LEFT;
+static int      PSTRICKS_angle = 0;
+
+#define	PSTRICKS_TINY_DOT	0.25	/* A tiny dot, in points */
+
+/* POINTS */
+#define PSTRICKS_POINT_TYPES 12		/* we supply more point types */
+static char  GPFAR * GPFAR PSTRICKS_points[] =
+{
+    "\\psset{dotstyle=square, dotangle=45}",
+    "\\psset{dotstyle=+}",
+    "\\psset{dotstyle=square}",
+    "\\psset{dotstyle=+, dotangle=45}",
+    "\\psset{dotstyle=triangle}",
+    "\\psset{dotstyle=pentagon}",
+    "\\psset{dotstyle=o}",
+    "\\psset{dotstyle=square*, dotangle=45}",
+    "\\psset{dotstyle=square*}",
+    "\\psset{dotstyle=triangle*}",
+    "\\psset{dotstyle=pentagon*}",
+    "\\psset{dotstyle=*}",
+};
+
+/* LINES */
+#define PSTRICKS_NUMLINES 6		/* number of linetypes below */
+static char  GPFAR * GPFAR PSTRICKS_lines[] =
+{
+    "\\psset{linewidth=0.35pt,linestyle=solid}",		/* -2 border		*/
+    "\\psset{linewidth=0.3pt,linestyle=dotted,dotsep=1pt}",	/* -1 axes, grid	*/
+    "\\psset{linewidth=0.35pt,linestyle=solid}",		/*  0 solid thin	*/
+    "\\psset{linewidth=0.35pt,linestyle=dashed,dash=5pt 3pt}",	/*  1 dashed		*/
+    "\\psset{linewidth=0.35pt,linestyle=dotted,dotsep=3pt}",	/*  2 dotted		*/
+    "\\psset{linewidth=0.35pt,linestyle=dashed,dash=10pt 3pt}"	/*  3 long dash	*/
+};
+
+static int      PSTRICKS_type;		/* current line type */
+static TBOOLEAN  PSTRICKS_inline = FALSE;/* are we in the middle of a line */
+static void     PSTRICKS_endline();	/* terminate any line in progress */
+static int      PSTRICKS_linecount = 0;	/* number of points in line so far */
+
+#define PSTRICKS_LINEMAX 50		/* max value for linecount */
+
+PSTRICKS_init()
+{
+    PSTRICKS_posx = PSTRICKS_posy = 0;
+    PSTRICKS_linetype(-1);
+    fprintf(outfile, "%% GNUPLOT: LaTeX picture using PSTRICKS macros\n");
+    fprintf(outfile, "\\psset{unit=%fpt}\n", PSTRICKS_UNIT);
+    fprintf(outfile, "\\psset{arrowsize=3pt 3.2 1.4 .3}\n");
+}
+
+
+PSTRICKS_scale(xs, ys)
+    double          xs, ys;		/* scaling factors */
+{
+    register struct termentry *t = &term_tbl[term];
+
+    /* we change the table for use in graphics.c and PSTRICKS_graphics */
+    t->xmax = (unsigned int) (PSTRICKS_XMAX * xs);
+    t->ymax = (unsigned int) (PSTRICKS_YMAX * ys);
+
+    return (TRUE);
+}
+
+PSTRICKS_graphics()
+{
+    register struct termentry *t = &term_tbl[term];
+
+    fprintf(outfile, "\\begin{pspicture}(0,0)(%d,%d)\n", t->xmax, t->ymax);
+    fprintf(outfile, "\\tenrm\n");
+}
+
+
+PSTRICKS_text()
+{
+    PSTRICKS_endline();
+    fprintf(outfile, "\\end{pspicture}\n");
+}
+
+
+PSTRICKS_linetype(linetype)
+    int             linetype;
+{
+    PSTRICKS_endline();
+
+    if (linetype >= PSTRICKS_NUMLINES - 2)
+	linetype %= (PSTRICKS_NUMLINES - 2);
+
+    PSTRICKS_type = linetype;
+}
+
+
+
+PSTRICKS_move(x, y)
+    unsigned int    x, y;
+{
+    PSTRICKS_endline();
+
+    PSTRICKS_posx = x;
+    PSTRICKS_posy = y;
+}
+
+
+PSTRICKS_point(x, y, number)		/* version of line_and_point */
+    unsigned int    x, y;
+    int             number;		/* type of point */
+{
+    PSTRICKS_move(x, y);
+
+    /* Print the character defined by 'number'; number < 0 means
+	  to use a dot, otherwise one of the defined points. */
+
+    if (number < 0) {
+	fprintf(outfile, "\\qdisk(%d,%d){%fpt}\n",
+		x, y, PSTRICKS_TINY_DOT);
+    } else {
+	fprintf(outfile, "%s\\psdots(%d,%d)\n",
+		PSTRICKS_points[number % PSTRICKS_POINT_TYPES],
+		x, y);
+    }
+}
+
+
+PSTRICKS_vector(ux, uy)
+    unsigned int    ux, uy;
+{
+    if (!PSTRICKS_inline) {
+	PSTRICKS_inline = TRUE;
+
+	/* Start a new line. This depends on line type */
+	fprintf(outfile, "%s\\psline(%u,%u)",
+		PSTRICKS_lines[PSTRICKS_type + 2],
+		PSTRICKS_posx, PSTRICKS_posy);
+	PSTRICKS_linecount = 1;
+    } else {
+	/*
+	 * Even though we are in middle of a path,
+	 * we may want to start a new path command.
+	 * If they are too long then latex will choke.
+	 */
+	if (PSTRICKS_linecount++ >= PSTRICKS_LINEMAX) {
+	    fprintf(outfile, "\n");
+	    fprintf(outfile, "%s\\psline(%u,%u)",
+		    PSTRICKS_lines[PSTRICKS_type + 2],
+		    PSTRICKS_posx, PSTRICKS_posy);
+	    PSTRICKS_linecount = 1;
+	}
+    }
+    fprintf(outfile, "(%u,%u)", ux, uy);
+    PSTRICKS_posx = ux;
+    PSTRICKS_posy = uy;
+}
+
+static void
+PSTRICKS_endline()
+{
+    if (PSTRICKS_inline) {
+	fprintf(outfile, "\n");
+	PSTRICKS_inline = FALSE;
+    }
+}
+
+
+PSTRICKS_arrow(sx, sy, ex, ey, head)
+    int             sx, sy, ex, ey;
+    TBOOLEAN         head;
+{
+    fprintf(outfile, "\\psline[linestyle=solid]%s(%d,%d)(%d,%d)\n",
+	    head ? "{->}" : "",
+	    sx, sy, ex, ey);
+
+    PSTRICKS_posx = ex;
+    PSTRICKS_posy = ey;
+}
+
+
+PSTRICKS_put_text(x, y, str)
+    int             x, y;		/* reference point of string */
+    char            str[];		/* the text */
+{
+    PSTRICKS_endline();
+
+    fprintf(outfile, "\\rput");
+
+    /* Set justification */
+
+    switch (PSTRICKS_justify) {
+    case LEFT:
+	fprintf(outfile, "[l]");
+	break;
+    case CENTRE:
+	break;
+    case RIGHT:
+	fprintf(outfile, "[r]");
+	break;
+    }
+
+    /* Set text angle */
+
+    switch (PSTRICKS_angle) {
+    case 0:
+	break;
+    case 1:
+	fprintf(outfile, "{L}");
+	break;
+    }
+
+    /* Set reference position and text */
+
+    fprintf(outfile, "(%d,%d){%s}\n", x, y, str);
+
+}
+
+
+
+int 
+PSTRICKS_justify_text(mode)
+    enum JUSTIFY    mode;
+{
+    PSTRICKS_justify = mode;
+    return (TRUE);
+}
+
+int 
+PSTRICKS_text_angle(angle)
+    int             angle;
+{
+    PSTRICKS_angle = angle;
+    return (TRUE);
+}
+
+PSTRICKS_reset()
+{
+    PSTRICKS_endline();
+    PSTRICKS_posx = PSTRICKS_posy = 0;
+}
+

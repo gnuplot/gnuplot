@@ -1,5 +1,5 @@
 #
-# $Id: world.cor,v 3.26 92/03/24 22:32:28 woo Exp Locker: woo $
+# $Id: world.cor%v 3.38.2.70 1993/02/08 02:17:40 woo Exp woo $
 #
 # Gnuplot world correspondences.  Feel free to check for and update
 # your site; especially if it represents a new location or you
@@ -37,9 +37,9 @@
 -84 34         # Atlanta, Georgia
 -84 42         # Univ. of Michigan, Ann Arbor, Michigan
 -86 39         # UCS Indiana (?)
+-88 40         # University of Illinois, Urbana-Champaign, Illinois
 -88 42         # Arlington Heights, Illinois
 -88 42         # Northwestern University, Evanston, Illinois
--90 43         # UIUCS, Urabana, Illinois (?)
 -92 30         # Lafayette, Louisiana
 -93 45         # Eagan, Minnesota
 -95 30         # Houston, Texas

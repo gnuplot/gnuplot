@@ -1,11 +1,11 @@
 /*
- * $Id: setshow.h,v 3.26 92/03/24 22:34:15 woo Exp Locker: woo $
+ * $Id: setshow.h%v 3.50 1993/07/09 05:35:24 woo Exp $
  *
  */
 
 /* GNUPLOT - setshow.h */
 /*
- * Copyright (C) 1986, 1987, 1990, 1991, 1992   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986 - 1993   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -30,56 +30,76 @@
  *
  *   Gnuplot 3.0 additions:
  *       Gershon Elber and many others.
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@ames.arc.nasa.gov.
- * This is a mailing list; to join it send a note to 
- *  info-gnuplot-request@ames.arc.nasa.gov.  
- * Send bug reports to
- *  bug-gnuplot@ames.arc.nasa.gov.
+ *
+ * There is a mailing list for gnuplot users. Note, however, that the
+ * newsgroup 
+ *	comp.graphics.gnuplot 
+ * is identical to the mailing list (they
+ * both carry the same set of messages). We prefer that you read the
+ * messages through that newsgroup, to subscribing to the mailing list.
+ * (If you can read that newsgroup, and are already on the mailing list,
+ * please send a message info-gnuplot-request@dartmouth.edu, asking to be
+ * removed from the mailing list.)
+ *
+ * The address for mailing to list members is
+ *	   info-gnuplot@dartmouth.edu
+ * and for mailing administrative requests is 
+ *	   info-gnuplot-request@dartmouth.edu
+ * The mailing list for bug reports is 
+ *	   bug-gnuplot@dartmouth.edu
+ * The list of those interested in beta-test versions is
+ *	   info-gnuplot-beta@dartmouth.edu
  */
 
 /*
  * global variables to hold status of 'set' options
  *
  */
-extern BOOLEAN			autoscale_r;
-extern BOOLEAN			autoscale_t;
-extern BOOLEAN			autoscale_u;
-extern BOOLEAN			autoscale_v;
-extern BOOLEAN			autoscale_x;
-extern BOOLEAN			autoscale_y;
-extern BOOLEAN			autoscale_z;
-extern BOOLEAN			autoscale_lt;
-extern BOOLEAN			autoscale_lu;
-extern BOOLEAN			autoscale_lv;
-extern BOOLEAN			autoscale_lx;
-extern BOOLEAN			autoscale_ly;
-extern BOOLEAN			autoscale_lz;
-extern BOOLEAN			clip_points;
-extern BOOLEAN			clip_lines1;
-extern BOOLEAN			clip_lines2;
-extern BOOLEAN			draw_border;
-extern BOOLEAN			draw_surface;
-extern BOOLEAN			timedate;
+extern TBOOLEAN			autoscale_r;
+extern TBOOLEAN			autoscale_t;
+extern TBOOLEAN			autoscale_u;
+extern TBOOLEAN			autoscale_v;
+extern TBOOLEAN			autoscale_x;
+extern TBOOLEAN			autoscale_y;
+extern TBOOLEAN			autoscale_z;
+extern TBOOLEAN			autoscale_lt;
+extern TBOOLEAN			autoscale_lu;
+extern TBOOLEAN			autoscale_lv;
+extern TBOOLEAN			autoscale_lx;
+extern TBOOLEAN			autoscale_ly;
+extern TBOOLEAN			autoscale_lz;
+extern double			boxwidth;
+extern TBOOLEAN			clip_points;
+extern TBOOLEAN			clip_lines1;
+extern TBOOLEAN			clip_lines2;
+extern TBOOLEAN			draw_border;
+extern TBOOLEAN			draw_surface;
+extern TBOOLEAN			timedate;
 extern char			dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 extern char			xformat[];
 extern char			yformat[];
 extern char			zformat[];
 extern enum PLOT_STYLE data_style, func_style;
-extern BOOLEAN			grid;
+extern TBOOLEAN			grid;
 extern int			key;
 extern double			key_x, key_y, key_z; /* user specified position for key */
-extern BOOLEAN			log_x, log_y, log_z;
+extern TBOOLEAN			is_log_x, is_log_y, is_log_z;
+extern double			base_log_x, base_log_y, base_log_z;
+				/* base, for computing pow(base,x) */
+extern double			log_base_log_x, log_base_log_y, log_base_log_z;
+				/* log of base, for computing logbase(base,x) */
 extern FILE*			outfile;
 extern char			outstr[];
-extern BOOLEAN			parametric;
-extern BOOLEAN			polar;
-extern BOOLEAN			hidden3d;
+extern TBOOLEAN			parametric;
+extern TBOOLEAN			polar;
+extern TBOOLEAN			hidden3d;
 extern int			angles_format;
 extern int			mapping3d;
 extern int			samples;
-extern int			iso_samples;
+extern int			samples_1;
+extern int			samples_2;
+extern int			iso_samples_1;
+extern int			iso_samples_2;
 extern float			xsize; /* scale factor for size */
 extern float			ysize; /* scale factor for size */
 extern float			zsize; /* scale factor for size */
@@ -108,18 +128,26 @@ extern double			tmin, tmax, umin, umax, vmin, vmax;
 extern double			xmin, xmax, ymin, ymax, zmin, zmax;
 extern double			loff, roff, toff, boff;
 extern int			draw_contour;
+extern TBOOLEAN      label_contours;
 extern int			contour_pts;
 extern int			contour_kind;
 extern int			contour_order;
 extern int			contour_levels;
 extern double			zero; /* zero threshold, not 0! */
+extern int			levels_kind;
+extern double		levels_list[MAX_DISCRETE_LEVELS];
 
-extern BOOLEAN xzeroaxis;
-extern BOOLEAN yzeroaxis;
+extern int			dgrid3d_row_fineness;
+extern int			dgrid3d_col_fineness;
+extern int			dgrid3d_norm_value;
+extern TBOOLEAN			dgrid3d;
 
-extern BOOLEAN xtics;
-extern BOOLEAN ytics;
-extern BOOLEAN ztics;
+extern TBOOLEAN xzeroaxis;
+extern TBOOLEAN yzeroaxis;
+
+extern TBOOLEAN xtics;
+extern TBOOLEAN ytics;
+extern TBOOLEAN ztics;
 
 extern float ticslevel;
 
@@ -127,7 +155,7 @@ extern struct ticdef xticdef;
 extern struct ticdef yticdef;
 extern struct ticdef zticdef;
 
-extern BOOLEAN			tic_in;
+extern TBOOLEAN			tic_in;
 
 extern struct text_label *first_label;
 extern struct arrow_def *first_arrow;
@@ -137,5 +165,5 @@ extern void set_command();
 extern void show_command();
 /* and some accessible support functions */
 extern enum PLOT_STYLE get_style();
-extern BOOLEAN load_range();
+extern TBOOLEAN load_range();
 extern void show_version();

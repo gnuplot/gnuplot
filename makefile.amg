@@ -1,47 +1,69 @@
-# Makefile for SAS/C 5.10 on the Amiga
+# Makefile for SAS/C 6.1 on the Amiga
 #
-# $Id: makefile.amg,v 3.26 92/03/24 22:36:53 woo Exp Locker: woo $
+# $Id: makefile.amg%v 3.50 1993/07/09 05:35:24 woo Exp $
 #
 #
 
-CC = lc
+CC = sc
 
-# Remove '-fi' if you don't want to use the better Commodore math-routines.
-# If you do so, you'll have to change 'lcmieee.lib' to 'lcm.lib' in
-# "linkopt.amg"
-CFLAGS = -b0 -dAMIGA_LC_5_1 -dNOGAMMA -dMEMSET -dMEMCPY -j85i -j88i -fi
+# Remove 'MATH=IEEE' if you don't want to use the better Commodore
+# math-routines. If you do so, you'll have to change 'scmieee.lib'
+# to 'scm.lib' in "linkopt.amg" and likewise on the bf_test target
+# line below.
+
+OFLAGS = OPT OPTGO OPTPEEP NOOPTINL NOOPTINLOCAL
+DEFS   = DEF=AMIGA_SC_6_1 DEF=MEMCPY
+COPTS  = DATA=FAR MATH=IEEE IGN=84+85+88+94+100+154+161+217+304
+CFLAGS = $(COPTS) $(DEFS) $(OFLAGS)
 
 .c.o:
 	$(CC) $(CFLAGS) $<
 
-OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
-	internal.o misc.o parse.o plot.o scanner.o setshow.o \
-	standard.o term.o util.o version.o
+OBJS = binary.o bitmap.o command.o contour.o eval.o gnubin.o graph3d.o \
+	graphics.o help.o internal.o misc.o parse.o plot.o scanner.o \
+	setshow.o specfun.o standard.o term.o util.o version.o 
 
-CSOURCE1 = command.c setshow.c 
-CSOURCE2 = help.c graphics.c graph3d.o internal.c 
+CSOURCE1 = bf_test.c binary.c command.c setshow.c 
+CSOURCE2 = help.c gnubin.c graphics.c graph3d.o internal.c 
 CSOURCE3 = misc.c eval.c parse.c plot.c scanner.c standard.c 
 CSOURCE4 = bitmap.c term.c util.c version.c
-CSOURCE5 = term/aed.trm term/cgi.trm term/dumb.trm term/dxy.trm \
-	term/eepic.trm term/epson.trm term/fig.trm term/hp26.trm \
-	term/hp2648.trm term/hpgl.trm term/hpljii.trm term/vws.trm
-CSOURCE6 = term/impcodes.h term/imagen.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm \
-	term/amiga.trm
-CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
-	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
-	term/v384.trm term/x11.trm gnuplot_x11.c
-CSOURCE8 = contour.c
+CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm term/atari.trm \
+	term/bigfig.trm term/cgi.trm term/corel.trm \
+	term/djsvga.trm term/dumb.trm \
+	term/dxf.trm term/dxy.trm \
+	term/debug.trm term/eepic.trm term/epson.trm term/excl.trm \
+	term/fig.trm term/hp26.trm term/hp2648.trm term/hpgl.trm  \
+	term/hpljii.trm term/metafont.trm\
+	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c 
+CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
+	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
+	term/pbm.trm term/pc.trm 
+CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
+	term/rgip.trm term/sun.trm\
+	term/t410x.trm term/tek.trm term/texdraw.trm term/tgif.h\
+	term/tgif.trm term/tpic.trm \
+	term/unixpc.trm term/unixplot.trm \
+	term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
+CSOURCE8 = contour.c specfun.c
+
+
+all: gnuplot demo/bf_test
 
 gnuplot: $(OBJS)
-	blink with linkopt.amg
+	slink with linkopt.amg
 
+demo/bf_test: bf_test.o binary.o
+	slink from lib:c.o bf_test.o binary.o to demo/bf_test\
+	lib lib:scmieee.lib lib:scnb.lib
+	@echo "*N*NRun bf_test in demo subdirectory to make binary demo files*N"
+
+bf_test.o: bf_test.c
+binary.o: binary.c plot.h
 bitmap.o: bitmap.c bitmap.h plot.h
 command.o: command.c plot.h setshow.h help.h
 contour.o: contour.c plot.h
 eval.o: eval.c plot.h
-graph3d.o: graph3d.c plot.h setshow.h
-graphics.o: graphics.c plot.h setshow.h
+gnubin.o: gnubin.c plot.h setshow.h
 help.o: help.c plot.h help.h
 internal.o: internal.c plot.h
 misc.o: misc.c plot.h setshow.h help.h
@@ -49,7 +71,16 @@ parse.o: parse.c plot.h
 plot.o: plot.c plot.h setshow.h
 scanner.o: scanner.c plot.h
 setshow.o: setshow.c plot.h setshow.h
+specfun.o: specfun.c plot.h
 standard.o: standard.c plot.h
-term.o: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 util.o: util.c plot.h
 version.o: version.c
+
+graph3d.o: graph3d.c plot.h setshow.h
+	$(CC) CODE=FAR $(CFLAGS) $<
+
+graphics.o: graphics.c plot.h setshow.h
+	$(CC) CODE=FAR $(CFLAGS) $<
+
+term.o: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(CC) CODE=FAR $(CFLAGS) $<

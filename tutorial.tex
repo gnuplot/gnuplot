@@ -1,4 +1,4 @@
-% 
+%
 % Tutorial for GNUPLOT plotting program, for LaTeX users
 % David Kotz (David.Kotz@Dartmouth.edu)
 % Duke University Computer Science Department
@@ -12,7 +12,7 @@
 
 \begin{document}
 
-\title{\LaTeX\ and the GNUPLOT Plotting 
+\title{\LaTeX\ and the GNUPLOT Plotting
 Program\thanks{This document describes GNUPLOT version 3.0. All plots
 in this document were made with that version of GNUPLOT.} }
 \author{David Kotz \\ \verb+David.Kotz@Dartmouth.edu+}
@@ -113,7 +113,7 @@ to make it look a little better.
   \begin{center}
     \input{eg1}
   \end{center}
-  \caption{A first example: $y=sin(x)$} 
+  \caption{A first example: $y=sin(x)$}
   \label{eg1}
 \end{figure}
 
@@ -158,7 +158,7 @@ the {\tt set size} command. This is the size of the area used by the
 plot, {\em including} space for the labels.  In the first example,
 this size was the default 5 inches by 3 inches. By specifying the
 scaling factors of 1 (or 5/5) and 1.3333 (or 4/3), we obtain the
-desired plot size. 
+desired plot size.
 
 We have requested that the format used by the $x$- and $y$-axis tic
 mark labels be in \LaTeX\ math mode. This makes the labels look a
@@ -237,7 +237,7 @@ linespoints} styles use a different line style for each curve on the
 plot (in this example the dots have different spacing). The
 style {\tt impulses} draws a perpendicular from each point to the
 $x$-axis. Finally, the {\tt errorbars} style can draw error bars at
-each data point (see the GNUPLOT manual). 
+each data point (see the GNUPLOT manual).
 
 \paragraph{Example 4:} In the above plots of $\sin(x)$, it would make
 more sense to label the axis in units of $\pi$. The position and
@@ -339,7 +339,7 @@ line and point types available in Figure~\ref{linepoint}.
 
 \boxfigure{htbp}{\fullboxwidth}{
   \begin{center}
-    \input{linepoint}
+    \input{linepoin}
   \end{center}
   \caption{All of the line and point types in the \LaTeX\ driver.}
   \label{linepoint}
@@ -357,7 +357,7 @@ and the output of GNUPLOT should be directed to a file, for example,
 \end{verbatim}
 This may be anything you like but it should have a {\tt .tex} extension,
 of course. Then the size of the plot should be given. For example, the
-command 
+command
 \begin{verbatim}
     set size 1,2
 \end{verbatim}
@@ -379,7 +379,7 @@ then be used in a \LaTeX\ document, \eg,
     \end {figure}
 \end{verbatim}
 \currentspace
-This puts the plot into a figure. 
+This puts the plot into a figure.
 
 You will also want to read about the following commands: {\tt set
 title, set xlabel, set ylabel, set key, set label, set xtics, set
@@ -420,7 +420,7 @@ to GNUPLOT.
 Please contact me at \verb+David.Kotz@Dartmouth.edu+ with any comments you may
 have on GNUPLOT's \LaTeX\ driver. For general GNUPLOT questions, send
 mail to the GNUPLOT mailing list
-(\verb+pixar!info-gnuplot@ucbvax.berkeley.edu+). 
+(\verb+info-gnuplot@dartmouth.edu+).
 
 
 \end{document}

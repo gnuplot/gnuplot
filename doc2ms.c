@@ -1,6 +1,7 @@
 #ifndef lint
-static char *RCSid = "$Id: doc2ms.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
+static char *RCSid = "$Id: doc2ms.c%v 3.38.2.70 1993/02/08 02:19:29 woo Exp woo $";
 #endif
+
 
 /*
  * doc2ms.c  -- program to convert Gnuplot .DOC format to *roff -ms document
@@ -12,23 +13,22 @@ static char *RCSid = "$Id: doc2ms.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
  * Modified to become doc2ms by David Kotz (David.Kotz@Dartmouth.edu) 12/89
  * Added table and backquote support.
  *
- * usage:  doc2ms < file.doc > file.ms
+ * usage:  doc2ms [file.doc [file.ms]]
  *
  *   where file.doc is a VMS .DOC file, and file.ms will be a [nt]roff
  *     document suitable for printing with nroff -ms or troff -ms
  *
  * typical usage for GNUPLOT:
  *
- *   doc2ms < gnuplot.doc | troff -ms
+ *   doc2ms gnuplot.doc | tbl | eqn | troff -ms
+ *
+ * or
+ *
+ *   doc2ms gnuplot.doc | groff -ms -et >gnuplot.ps
  */
-
-static char rcsid[] = "$Id: doc2ms.c,v 3.26 1992/03/25 04:53:29 woo Exp woo $";
 
 #include <stdio.h>
 #include <ctype.h>
-#ifdef AMIGA_LC_5_1
-#include <string.h>
-#endif
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
@@ -41,11 +41,33 @@ typedef int boolean;
 
 static boolean intable = FALSE;
 
-main()
+main(argc,argv)
+int argc;
+char **argv;
 {
-	init(stdout);
-	convert(stdin,stdout);
-	finish(stdout);
+FILE * infile;
+FILE * outfile;
+	infile = stdin;
+	outfile = stdout;
+	if (argc > 3) {
+		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
+		exit(1);
+	}
+	if (argc >= 2) 
+		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for reading\n",
+				argv[0], argv[1]);
+			exit(1);
+		}
+	if (argc == 3)
+		if ( (outfile = fopen(argv[2],"w")) == (FILE *)NULL) {
+			fprintf(stderr,"%s: Can't open %s for writing\n",
+				argv[0], argv[2]);
+		}
+	
+	init(outfile);
+	convert(infile,outfile);
+	finish(outfile);
 	exit(0);
 }
 
@@ -56,7 +78,7 @@ FILE *b;
     /* in nroff, increase line length by 8 and don't adjust lines */
     (void) fputs(".if n \\{.nr LL +8m\n.na \\}\n",b);
     (void) fputs(".nr PO +0.3i\n",b);
-    (void) fputs(".so titlepage.ms\n",b);
+    (void) fputs(".so titlepag.ms\n",b);
     (void) fputs(".pn 1\n",b);
     (void) fputs(".bp\n",b);
     (void) fputs(".ta 1.5i 3.0i 4.5i 6.0i 7.5i\n",b);
@@ -117,7 +139,7 @@ process_line(line, b)
 			 case ' ': {
 				/* verbatim mode */
 				fputs(".br\n",b); 
-				fputs(line+1,b); 
+				putms_verb(line+1,b); 
 				fputs(".br\n",b);
 				break;
 			 }
@@ -162,17 +184,7 @@ section(line, b)
     static int old = 1;
 
   
-#ifdef AMIGA_LC_5_1
-    (void) sscanf(line,"%d",&sh_i);
-    strcpy(string,strchr(line,' ')+1);
-    {
-      char *p;
-      p = strchr(string,'\n');
-      if (p != NULL) *p = '\0';
-    }
-#else
     (void) sscanf(line,"%d %[^\n]s",&sh_i,string);
-#endif
     
     (void) fprintf(b,".sp %d\n",(sh_i == 1) ? LINE_SKIP : LINE_SKIP-1);
     
@@ -232,6 +244,26 @@ putms(s, file)
 			 break;
 		  }
 	   }
+	   s++;
+    }
+}
+
+/*
+ * convert a verbatim line to troff input style, i.e. convert "\" to "\\"
+ * (added by Alexander Lehmann 01/30/93)
+ */
+
+putms_verb(s, file)
+	char *s;
+	FILE *file;
+{
+    static boolean inquote = FALSE;
+
+    while (*s != '\0') {
+	   if (*s == '\\') {
+		 fputc('\\', file);
+	   }
+	   fputc(*s, file);
 	   s++;
     }
 }

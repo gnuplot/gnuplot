@@ -1,5 +1,5 @@
 /*
- * $Id: impcodes.h,v 3.26 92/03/24 22:35:32 woo Exp Locker: woo $
+ * $Id: impcodes.h%v 3.50 1993/07/09 05:35:24 woo Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 #define	imP_DRAW_PATH	234
 #define	imP_BITMAP	235
 #define	imP_SET_MAGN	236
+#define	imP_SET_DRAW_PATTERN	237
 
 #define	imP_EOF	255
 
