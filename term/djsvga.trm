@@ -135,6 +135,7 @@ char DJSVGA_fontname[MAX_ID_LEN + 1] = "@:pc8x14.fnt";	/* EGA bios font */
 static GrContext *DJSVGA_context = 0;	/* save screen for suspend/resume */
 static char *dj_textsave = 0;	/* for text-screen-saving */
 static int dj_cursorx, dj_cursory;
+static int dj_width, dj_height;
 #ifdef GRX21
 static double dj_linewidth;	/* store linewidth assignments here */
 #endif
@@ -150,6 +151,8 @@ TERM_PUBLIC void DJSVGA_init()
     /* HBB: save textscreen contents and cursor-position */
     dj_textsave = gp_alloc(ScreenRows() * ScreenCols() * 2, "djsvga term scrbuf");
     ScreenRetrieve(dj_textsave);
+    dj_width = ScreenRows();
+    dj_height = ScreenCols();
     ScreenGetCursor(&dj_cursory, &dj_cursorx);
     GrSetMode(GR_default_graphics);
     GrSetRGBcolorMode();
@@ -230,7 +233,7 @@ __inline__
 TERM_PUBLIC void DJSVGA_text()
 {
     (void) getkey();
-    GrSetMode(GR_default_text, 0, 0);
+    GrSetMode(GR_width_height_text, dj_width, dj_height);
     ScreenUpdate(dj_textsave);	/* HBB: restore text screen */
     ScreenSetCursor(dj_cursory, dj_cursorx);
 }
