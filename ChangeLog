@@ -1,3 +1,22 @@
+1999-12-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0FAQ: Updated to latest version from Juergen.
+
+1999-12-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/contour.c(gen_triangle): Fix coredump in contour code.
+
+	* src/contour.c(add_edge): Clipping of contour input datapoints that
+	are outside fixed ranges.
+
+1999-12-02  Shusuke Nisiyama  <shu@athena.qe.eng.hokudai.ac.jp>
+
+	* src/graphics.c: Implement vector style clipping for 2D plots.
+
+1999-12-02  Reality is a point of view  <gjohnson@dream.season.com>
+
+	* term/png.trm: Issue "too many colours" warning only once.
+
 1999-12-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Do not use gd library by default, only when
