@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.39 2000/02/11 19:18:37 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.40 2000/03/28 21:27:40 lhecking Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -108,8 +108,7 @@ C
  work, but "command c a" will fail.
 
  Commands may extend over several input lines by ending each line but the last
- with a backslash (\).  Also, any line ending with a comma is treated as a
- continuation line. The backslash or comma must be the _last_ character on each
+ with a backslash (\).  The backslash must be the _last_ character on each
  line.  The effect is as if the backslash and newline were not there.  That
  is, no white space is implied, nor is a comment terminated.  Therefore,
  commenting out a continued line comments out the entire command (see
@@ -215,7 +214,8 @@ C
 
  14. The `call` command: `load` with arguments.
 
- 15. More flexible `range` commands with `reverse` and `writeback` keywords.
+ 15. More flexible `range` commands with `reverse`, `writeback`, and `restore`
+ keywords.
 
  16. `set encoding` for multi-lingual encoding.
 
@@ -5630,8 +5630,8 @@ C  The `lines` style connects adjacent points with straight line segments.
  it requires four columns of data.  It also draws a small arrowhead at the
  end of the vector.
 
- The `vector` style is still experimental: it doesn't get clipped properly
- and other things may also be wrong with it.  Use it at your own risk.
+ `set clip one` and `set clip two` affect drawing vectors.
+ Please see `set clip`.
 4 xerrorbars
 ?commands set style xerrorbars
 ?set style xerrorbars
@@ -6284,13 +6284,16 @@ C  The `lines` style connects adjacent points with straight line segments.
 ?commands show xrange
 ?set xrange
 ?show xrange
+?writeback
+?restore
 ?xrange
  The `set xrange` command sets the horizontal range that will be displayed.
  A similar command exists for each of the other axes, as well as for the
  polar radius r and the parametric variables t, u, and v.
 
  Syntax:
-       set xrange [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback}
+       set xrange { [{{<min>}:{<max>}}] {{no}reverse} {{no}writeback} }
+                  | restore
        show xrange
 
  where <min> and <max> terms are constants, expressions or an asterisk to set
@@ -6310,12 +6313,13 @@ C  The `lines` style connects adjacent points with straight line segments.
  the buffers that would be filled by `set xrange`.  This is useful if you wish
  to plot several functions together but have the range determined by only
  some of them.  The `writeback` operation is performed during the `plot`
- execution, so it must be specified before that command.  For example,
+ execution, so it must be specified before that command.  To restore,
+ the last saved horizontal range use `set xrange restore`.  For example,
 
        set xrange [-10:10]
        set yrange [] writeback
        plot sin(x)
-       set noautoscale y
+       set yrange restore
        replot x/2
 
  results in a yrange of [-1:1] as found only from the range of sin(x); the
