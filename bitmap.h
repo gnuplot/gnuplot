@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.11 1998/03/22 22:31:19 drd Exp $ */
+/* $Id: bitmap.h,v 1.1.1.2 1998/04/15 19:22:07 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -81,6 +81,19 @@ extern char_box b_font[FNT_CHARS];		/* the current font */
 extern unsigned int b_pattern[];
 extern int b_maskcount;
 extern unsigned int b_lastx, b_lasty;	/* last pixel set - used by b_line */
+
+/* RGB colour table moved out of gif.trm */
+/*
+ * Common RGB color table for use by all devices.
+ * It's a subset of the 216-color Web palette.
+ */
+#define WEB_N_COLORS 99
+struct rgb
+{
+    unsigned char r, g, b;
+};
+
+extern struct rgb web_color_rgbs[];
 
 
 /* Prototypes from file "bitmap.c" */
