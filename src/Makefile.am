@@ -70,10 +70,10 @@ include makefile.all
 # end makefile.all
 term$U.o: $(CORETERM)
 
-install-exec-local: $(EXTRA_PROGRAMS)
+install-exec-local: $(GNUPLOT_X11)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)
-	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	@list='$(GNUPLOT_X11)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
 	  ; then \
@@ -85,7 +85,7 @@ install-exec-local: $(EXTRA_PROGRAMS)
 
 uninstall-local:
 	@$(NORMAL_UNINSTALL)
-	@list='$(EXTRA_PROGRAMS)'; for p in $$list; do \
+	@list='$(GNUPLOT_X11)'; for p in $$list; do \
 	  f=`echo $$p|sed 's/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
 	  echo " rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f"; \
 	  rm -f $(DESTDIR)$(pkglibexecdir)/$(PKG_MAJOR)/$$f; \
