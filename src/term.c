@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.13 1999/07/30 19:37:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.14 1999/08/07 17:21:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -382,6 +382,7 @@ term_end_plot()
 void
 term_start_multiplot()
 {
+    c_token++;
     FPRINTF((stderr, "term_start_multiplot()\n"));
     if (multiplot)
 	term_end_multiplot();
@@ -393,6 +394,7 @@ term_start_multiplot()
 void
 term_end_multiplot()
 {
+    c_token++;
     FPRINTF((stderr, "term_end_multiplot()\n"));
     if (!multiplot)
 	return;
