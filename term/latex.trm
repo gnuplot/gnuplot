@@ -1,5 +1,5 @@
 /*
- * $Id: latex.trm,v 1.20 1999/10/01 15:09:12 lhecking Exp $
+ * $Id: latex.trm,v 1.21 1999/10/29 18:39:40 lhecking Exp $
  *
  */
 
@@ -609,15 +609,16 @@ int x1, x2, y1, y2;
 		    x1, y1, xinc, yinc, numdots, LATEX_DOT);
 
 	/* how much is left over, as a fraction of dotspace? */
-	if (xinc != 0.0)	/* xinc must be nonzero */
+	if (xinc != 0.0) {	/* xinc must be nonzero */
 	    if (lastx >= 0)
 		LATEX_left = ABS(x2 - lastx) / ABS(xinc);
 	    else
 		LATEX_left += ABS(x2 - x1) / ABS(xinc);
-	else if (lasty >= 0)
-	    LATEX_left = ABS(y2 - lasty) / ABS(yinc);
-	else
-	    LATEX_left += ABS(y2 - y1) / ABS(yinc);
+	} else
+	    if (lasty >= 0)
+		LATEX_left = ABS(y2 - lasty) / ABS(yinc);
+	    else
+		LATEX_left += ABS(y2 - y1) / ABS(yinc);
     }
 
     LATEX_needsdot = (LATEX_left > 0);
