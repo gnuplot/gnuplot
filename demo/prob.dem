@@ -1,5 +1,5 @@
 #
-# $Id: prob.dem,v 1.6 2001/09/18 11:12:05 lhecking Exp $
+# $Id: prob.dem,v 1.7 2003/10/28 05:35:54 sfeam Exp $
 #
 # Demo Statistical Functions version 2.3
 #
@@ -780,4 +780,5 @@ plot [0:3] [0:1.2] lambda = 1, n = 0.5, cweibull(x) title "lambda = 1, n = 0.5",
                    lambda = 1, n = 1.0, cweibull(x) title "lambda = 1, n = 1.0", \
                    lambda = 1, n = 2.0, cweibull(x) title "lambda = 1, n = 2.0", \
                    lambda = 3, n = 2.0, cweibull(x) title "lambda = 3, n = 2.0"
+pause -1 "Hit return to continue"
 reset

@@ -1,3 +1,10 @@
+2004-02-13  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/prob.dem demo/prob2.dem: pause(-1) after final plot
+
+	* term/svg.trm term/post.trm: Rearrange things slightly so that
+	the output code is less ugly (cleanup of my 1 Feb 2004 patch).
+
 2004-02-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/makefile.nt (makefile.nt, config.h): Copy makefile.nt and

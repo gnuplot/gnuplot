@@ -1,5 +1,5 @@
 #
-# $Id: prob2.dem,v 1.6 2003/10/28 05:35:54 sfeam Exp $
+# $Id: prob2.dem,v 1.7 2003/12/16 04:46:20 sfeam Exp $
 #
 # Demo Statistical Approximations version 1.1
 #
@@ -350,4 +350,5 @@ set arrow from mu + 0.5, normal(mu + sigma) \
 set label "mu" at mu + 1, ymax / 10
 set label "sigma" at mu + 1 + sigma, normal(mu + sigma)
 plot poisson(x), normal(x - 0.5)
+pause -1 "Hit return to continue"
 reset
