@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.101 2004/04/13 17:23:55 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.102 2004/05/17 04:35:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1580,18 +1580,19 @@ plot_impulses(plot, yaxis_x, xaxis_y)
 
     for (i = 0; i < plot->p_count; i++) {
 	switch (plot->points[i].type) {
-	case INRANGE:{
+	case INRANGE:
+	    x = map_x(plot->points[i].x);
+	    y = map_y(plot->points[i].y);
+	    break;
+	case OUTRANGE:
+	    if (!inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
+		continue;
+	    {
+		double clipped_y = plot->points[i].y;
+
 		x = map_x(plot->points[i].x);
-		y = map_y(plot->points[i].y);
-		break;
-	    }
-	case OUTRANGE:{
-		if (!inrange(plot->points[i].x, X_AXIS.min, X_AXIS.max))
-		    continue;
-		x = map_x(plot->points[i].x);
-		y = plot->points[i].y;
-		cliptorange(y, Y_AXIS.min, Y_AXIS.max);
-		y = map_y(y);
+		cliptorange(clipped_y, Y_AXIS.min, Y_AXIS.max);
+		y = map_y(clipped_y);
 
 		break;
 	    }

@@ -1,5 +1,9 @@
 2004-05-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/graphics.c (plot_impulses): Fix bug in clipping of impulses
+	for out-of-range points.  Was using an integer value to store a
+	floating-point temporary number.
+
 	* src/plot2d.c (print_table): Make the table terminal output two
 	blank lines at the end of each curve_points structure, to allow
 	selection of individual datasets via the 'index' option.
