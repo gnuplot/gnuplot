@@ -12,6 +12,15 @@ gnuplot.ms
 gnuplot.rtf
 gnuplot.tex
 gnuplot.texi
+gnuplot.cp
+gnuplot.fn
+gnuplot.vr
+gnuplot.tp
+gnuplot.ky
+gnuplot.pg
+gnuplot.cm
+gnuplot.op
+gnuplot.tm
 *.aux
 *.dvi
 *.log

@@ -1,5 +1,9 @@
 2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
+	* .cvsignore docs/.cvsignore: Add entries
+
+2001-09-05  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
 	* src/Makefile.am tutorial/Makefile.am: fixes to make
 	automake 1.5 happy. Should work as well with automake 1.4
 
