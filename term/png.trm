@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.21 1999/08/07 17:19:13 lhecking Exp $
+ * $Id: png.trm,v 1.22 1999/08/24 11:24:56 lhecking Exp $
  *
  */
 
@@ -44,6 +44,8 @@
  * AUTHORS
  *  Alexander Lehmann
  *                      derived from pbm.trm by Russell Lang
+ *
+ *  Eric S. Raymond    update for pnglib-1.0.3; transparency.
  *
  * send your comments or suggestions to (info-gnuplot@dartmouth.edu).
  *
@@ -100,14 +102,14 @@ TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int point));
 
 static int png_font = 1;	/* small font */
 static int png_mode = 0;	/* 0:monochrome 1:gray 2:color */
+static int png_transparent = 0; /* generate transparent first color */
 
 /* 7=black, 0=white */
 static int png_gray[] = { 7, 1, 6, 5, 4, 3, 2, 1, 7 };	/* grays  */
-/* bit3=!intensify, bit2=!red, bit1=!green, bit0=!blue */
-static int png_color_table[] ={ 15, 8, 3, 5, 6, 4, 2, 1, 11, 13, 14 };	/* colors */
-static png_color png_palette[16];
+static png_color png_palette[WEB_N_COLORS];
 
 enum PNG_id {
+    PNG_TRANSPARENT,
     PNG_SMALL, PNG_MEDIUM, PNG_LARGE,
     PNG_MONOCHROME, PNG_GRAY, PNG_COLOR,
     PNG_OTHER
@@ -115,6 +117,7 @@ enum PNG_id {
 
 static struct gen_table PNG_opts[] =
 {
+    { "t$ransparent", PNG_TRANSPARENT },
     { "s$mall", PNG_SMALL },
     { "me$dium", PNG_MEDIUM },
     { "l$arge", PNG_LARGE },
@@ -128,13 +131,15 @@ static struct gen_table PNG_opts[] =
 TERM_PUBLIC void
 PNG_options()
 {
-    png_font = 1;
-    png_mode = 0;
+    png_font = 1; /* small */
+    png_mode = 2; /* color */
 
     term_options[0] = NUL;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PNG_opts[0],c_token)) {
+	case PNG_TRANSPARENT:
+	    png_transparent = 1;
 	case PNG_SMALL:
 	    png_font = 1;
 	    c_token++;
@@ -197,6 +202,10 @@ PNG_options()
 	strcat(term_options, " monochrome");
 	break;
     }
+
+    if (png_transparent)
+	strcat(term_options, " transparent");
+
 }
 
 
@@ -285,9 +294,9 @@ PNG_text()
     register int i, value;
     png_bytep prow;
     int mask, plane1, plane2, plane3, plane4;
-    int red, green, blue;
     png_text pngtext, *pngtext_copy;
     char text[100];
+    png_byte pal_trans[1];
 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png_ptr) {
@@ -312,12 +321,11 @@ PNG_text()
 	b_freebitmap();
 	return;
     }
+
+#ifdef __OLD_PNGLIB__  /* deprecated and no longer necessary */ 
     png_info_init(info_ptr);
-    /* According the libpng documentation, this function
-     * is internal os of 0.95, and should not be used.
-     * The necessary initialisation is done by
-     * png_create_write_struct().
     png_write_init(png_ptr); */
+#endif /* __OLD_PNGLIB__ */
 
     png_init_io(png_ptr, gpoutfile);
 
@@ -330,7 +338,8 @@ PNG_text()
     if (png_mode == 2) {
 	info_ptr->valid |= PNG_INFO_PLTE;
 	info_ptr->palette = png_palette;
-	info_ptr->num_palette = 16;
+	info_ptr->num_palette = sizeof(png_palette)/sizeof(png_palette[0]);
+	fprintf (stderr, "DEBUG: no cols = %d\n", info_ptr->num_palette);
     }
     if (png_mode != 0) {
 	info_ptr->valid |= PNG_INFO_sBIT;
@@ -347,20 +356,20 @@ PNG_text()
     if (png_mode == 0)
 	png_set_invert_mono(png_ptr);
 
-    if (png_mode == 2)
-	for (i = 0; i < 16; i++) {
-	    red = (i & 4) ? 1 : 3;
-	    green = (i & 2) ? 1 : 3;
-	    blue = (i & 1) ? 1 : 3;
-	    if (i & 8) {
-		red--;
-		green--;
-		blue--;
-	    }
-	    png_palette[i].red = red * 85;
-	    png_palette[i].green = green * 85;
-	    png_palette[i].blue = blue * 85;
+    if (png_mode == 2) {
+	if (png_transparent) {
+	    info_ptr->valid |= PNG_INFO_tRNS;
+	    info_ptr->num_trans = 1;
+	    pal_trans[0] = 0;
+	    info_ptr->trans=pal_trans;
 	}
+
+	for (i = 0; i < WEB_N_COLORS; i++) {
+	    png_palette[i].red = web_color_rgbs[i].r;
+	    png_palette[i].green = web_color_rgbs[i].g;
+	    png_palette[i].blue = web_color_rgbs[i].b;
+	}
+    }
     sprintf(text, "gnuplot %sversion %s patchlevel %s",
 	    OS, gnuplot_version, gnuplot_patchlevel);
 
@@ -426,15 +435,31 @@ PNG_text()
     b_freebitmap();
 }
 
+/* _linetype(lt)  Called to set the line type before text is displayed or
+ * line(s) plotted.  This procedure should select a pen color or line
+ * style if the device has these capabilities.  
+ * lt is an integer from -2 to 0 or greater.  
+ * An lt of -2 is used for the border of the plot.
+ * An lt of -1 is used for the X and Y axes.  
+ * lt 0 and upwards are used for plots 0 and upwards.
+ * If _linetype() is called with lt greater than the available line types, 
+ * it should map it to one of the available line types.
+ * Most drivers provide 9 different linetypes (lt is 0 to 8).
+ */
 TERM_PUBLIC void
 PNG_linetype(linetype)
 int linetype;
 {
     switch (png_mode) {
     case 2:
-	if (linetype >= 9)
-	    linetype %= 9;
-	b_setvalue(png_color_table[linetype + 2]);
+	if (linetype == -1 || linetype == -2)
+	    linetype = 1;
+	else {
+	    linetype += 3;
+	    if (linetype >= WEB_N_COLORS)
+		linetype %= WEB_N_COLORS;
+	}
+	b_setvalue(linetype);
 	break;
     case 1:
 	if (linetype >= 7)
@@ -494,11 +519,16 @@ START_HELP(png)
 " you will need  the third-party libraries \"libpng\" and \"zlib\"; both are",
 " available at ftp://ftp.uu.net/graphics/png.  `png` has two options.",
 "",
+" By default, the `gif` terminal driver uses a shared Web-friendy palette.",
 " Syntax:",
 "       set terminal png {small | medium | large}",
+"                        { transparent }",
 "                        {monochrome | gray | color}",
 "",
-" The defaults are small (fontsize) and monochrome.  Default size of the output",
-" is 640*480 pixel."
+" The defaults are small (fontsize) and color.  Default size of the output",
+" is 640*480 pixel. ",
+"",
+" `transparent` instructs the driver to generate transparent PNGs.  The first",
+" color will be the transparent one."
 END_HELP(png)
 #endif /* TERM_HELP */

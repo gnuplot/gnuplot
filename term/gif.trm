@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.22 1999/08/07 17:19:11 lhecking Exp $
+ * $Id: gif.trm,v 1.23 1999/08/24 11:24:54 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -84,16 +84,13 @@
  *
  * find out about gd from http://www.boutell.com/gd/
  *
- * We recommend to use gd library version 1.3 because it uses Run Length
- * Encoding (RLE) instead of LZW compression.
+ * We recommend to use gd library version 1.3 or 1.4 because it uses
+ * Run Length Encoding (RLE) instead of LZW compression. LZW compression
+ * is licensed by UNISYS.
  *
- * [Update: as of version 1.3, gd does not use any more UNISYS licensed
- *  code. The gnuplot team may decide to include this version some day.]
- *
- * [Further update: as of version 1.6, gd creates png files instead of
- *  gif. Also, version 1.5 should not be used because of licensing
- *  problems. More information in the README.1ST file from the source
- *  distribution.]
+ * Gd library versions before 1.3, and gd library 1.5 are subject to
+ * the Unisys license. Use at your own risk. From version 1.6 on, gd
+ * library creates png files instead of gif.
  *
  */
 
@@ -128,8 +125,8 @@ extern gdFontPtr gdFontTiny;  /* 5x8 */
 #define GREG_YMAX 480
 
 
-int GIF_XMAX = GREG_XMAX;
-int GIF_YMAX = GREG_YMAX;
+static int GIF_XMAX = GREG_XMAX;
+static int GIF_YMAX = GREG_YMAX;
 
 
 #define GIF_FONT_SMALL 1
@@ -172,111 +169,6 @@ static struct {
 
 #define GIF_USE_TRANSPARENT 1
 #define GIF_USE_INTERLACE   2
-
-static unsigned int gif_color_rgbs[] =
-{
-    0xffffff,			/* background: white         */
-    0x000000,			/*    borders: black         */
-    0x404040,			/* x & y axes: grey          */
-    0xff0000,			/*   color 01: red           */
-    0x00c000,			/*   color 02: dark green    */
-    0x0080ff,			/*   color 03: dark blue     */
-    0xc000ff,			/*   color 04: dark magenta  */
-    0xc0ff40,			/*   color 05: yellow        */
-    0xc04000,			/*   color 06: orange        */
-    0x40ff80,			/*   color 07: sea green     */
-    0x2020c0,			/*   color 08: royal blue    */
-    0x8000c0,			/*   color 09: dark violet   */
-    /* please note: these colors are optimized for web216 compatibility */
-    0x006080,			/* DeepSkyBlue4 */
-    0x008000,			/* green4 */
-    0x008040,			/* SpringGreen4 */
-    0x008080,			/* dark cyan, turquoise4 */
-    0x00c060,			/* SpringGreen3 */
-    0x00c0c0,			/* cyan3, turquoise3 */
-    0x00ff00,			/* green */
-    0x208020,			/* forest green */
-    0x306080,			/* SteelBlue4 */
-    0x404040,			/* grey25-31 */
-    0x408000,			/* chartreuse4 */
-    0x000080,			/* dark blue, navy blue */
-    0x806000,			/* DarkGoldenrod4 */
-    0x806010,			/* goldenrod4 */
-    0x806060,			/* pink4 */
-    0x806080,			/* plum4 */
-    0x0000c0,			/* medium blue */
-    0x0000ff,			/* blue */
-    0x006000,			/* dark green */
-    0x40c080,			/* SeaGreen3 */
-    0x60a0c0,			/* SkyBlue3 */
-    0x60c000,			/* chartreuse3 */
-    0x60c0a0,			/* medium aquamarine */
-    0x800000,			/* dark red */
-    0x800080,			/* dark magenta */
-    0x602080,			/* DarkOrchid4 */
-    0x606060,			/* dim grey */
-    0x00ffff,			/* cyan1, turquoise1 */
-    0x202020,			/* grey13-18 */
-    0x204040,			/* dark slate grey */
-    0x204080,			/* RoyalBlue4 */
-    0x608020,			/* olive drab */
-    0x608060,			/* DarkSeaGreen4 */
-    0x608080,			/* LightBlue4, PaleTurquoise4 */
-    0x808040,			/* LightGoldenrod4, khaki4 */
-    0x808080,			/* grey51-56 */
-    0xa0a0a0,			/* dark grey, grey63-68 */
-    0xa0d0e0,			/* light blue */
-    0xc02020,			/* firebrick3 */
-    0xc06000,			/* DarkOrange3 */
-    0x80c0e0,			/* sky blue */
-    0xc060c0,			/* orchid3 */
-    0xc08000,			/* orange3 */
-    0xc08060,			/* LightSalmon3 */
-    0xff4000,			/* orange red */
-    0xff4040,			/* brown1, tomato */
-    0x80c0ff,			/* light sky blue */
-    0xff8060,			/* salmon */
-    0xff8080,			/* light coral */
-    0xc0a000,			/* gold3 */
-    0xc0c0c0,			/* grey76-81, honeydew3, ivory3, snow3 */
-    0xc0ffc0,			/* DarkSeaGreen1 */
-    0xff0000,			/* red */
-    0xff00ff,			/* magenta */
-    0xff80a0,			/* PaleVioletRed1 */
-    0xff80ff,			/* orchid1 */
-    0xc0c0a0,			/* LemonChiffon3 */
-    0xff6060,			/* IndianRed1 */
-    0xff8000,			/* dark orange */
-    0xffa000,			/* orange */
-    0x80e0e0,			/* CadetBlue2, DarkSlateGray2 */
-    0xa0e0e0,			/* pale turquoise */
-    0xa0ff20,			/* green yellow */
-    0xc00000,			/* red3 */
-    0xc000c0,			/* magenta3 */
-    0xa02020,			/* brown */
-    0xa020ff,			/* purple */
-    0x802000,			/* OrangeRed4 */
-    0x802020,			/* brown4 */
-    0x804000,			/* DarkOrange4 */
-    0x804020,			/* sienna4 */
-    0x804080,			/* orchid4 */
-    0x8060c0,			/* MediumPurple3 */
-    0x8060ff,			/* SlateBlue1 */
-    0x808000,			/* yellow4 */
-    0xa080ff,			/* MediumPurple1 */
-    0xc06080,			/* PaleVioletRed3 */
-    0xc0c000,			/* yellow3 */
-    0xff8040,			/* sienna1 */
-    0xffa040,			/* tan1 */
-    0xffa060,			/* sandy brown */
-    0xffa070,			/* light salmon */
-    0xffc020,			/* goldenrod1 */
-    0xffc0c0,			/* RosyBrown1, pink */
-    0xffff00,			/* yellow */
-    0xffff80,			/* khaki1 */
-    0xffffc0			/* lemon chiffon */
-};
-#define GIF_N_DEFAULT_COLORS (sizeof(gif_color_rgbs)/sizeof(gif_color_rgbs[0]))
 
 enum GIF_id {
     GIF_TRANSPARENT, GIF_INTERLACE,
@@ -476,10 +368,13 @@ GIF_graphics()
     gif_state.height = (int) (ysize * GIF_YMAX - 1);
     gif_state.charw = term->h_char;	/* gif_state.font->w; */
     gif_state.charh = term->v_char;	/* gif_state.font->h; */
-    for (i = gif_state.n_colors; i < GIF_N_DEFAULT_COLORS; i++)
-	gif_state.rgb_table[i] = gif_color_rgbs[i];
-    if (gif_state.n_colors < GIF_N_DEFAULT_COLORS)
-	gif_state.n_colors = GIF_N_DEFAULT_COLORS;
+    for (i = gif_state.n_colors; i < WEB_N_COLORS; i++)
+	gif_state.rgb_table[i] = 
+	    (web_color_rgbs[i].r << 16) |
+	    (web_color_rgbs[i].g << 8) |
+	    web_color_rgbs[i].b;
+    if (gif_state.n_colors < WEB_N_COLORS)
+	gif_state.n_colors = WEB_N_COLORS;
     for (i = 0; i < gif_state.n_colors; i++) {
 	rgb = gif_state.rgb_table[i];
 	gif_state.color_table[i] =
@@ -608,7 +503,7 @@ GIF_set_font(const char *fontname)
 
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
-    name[sep]=NUL;
+    name[sep] = NUL;
 
     if (!strcmp(fontname,"small"))
 	font = gdFontSmall;
@@ -662,6 +557,8 @@ START_HELP(gif)
 "?gif",
 " The `gif` terminal driver generates output in GIF format.  It uses Thomas",
 " Boutell's gd library, which is available from http://www.boutell.com/gd/",
+"",
+" By default, the `gif` terminal driver uses a shared Web-friendy palette.",
 "",
 " Syntax:",
 "       set terminal gif {transparent} {interlace}",
