@@ -4,59 +4,125 @@
 
 
 COMMANDS:
-
--- add 'set view map' patch from sf (solves problems with "macro"-like
-'set pm3d map' and correctly positions titles and labels for a map).
-(Waiting --- does Hans-Bernhard or somebody else want to change anything
-there?)
-
--- styles for arrow heads by Harald (it's a new feature, but works fine)?
+=========
 
 -- pm3d doesn't work for concave data, concave in the sense of valid data
   per scan, where single scans are interrupted by invalid data points. (joze)
   * Petr: what do you mean? Example?
 
--- let 'binary' data files can have 4 columns to allow drawing textures
-efficiently
-
 
 DOCUMENTATION:
+==============
 
 -- BUGS file should be updated.
 
--- gnuplot.doc should have sections "new in 3.7.1, 2, 3" and "new in 4.0";
-the NEWS file could server as a basis.
+-- gnuplot.doc
+	- should have sections "new in 3.7.1, 2, 3" and "new in 4.0";
+	  the NEWS file could serve as a basis
+	- better document that you need a blank line in between scans
+	  for 3D (many people ask why pm3d plots nothing...)
 
--- Update in docs/old/*
+-- titlepage.sty:
+	- update people contributing to this gnuplot version,
+	- update gnuplot version and the corresponding dates
+
 Recently I've moved importants things from README.os2 into gnuplot.doc and
 INSTALL; those other README.{x11, win, xli, nex} should be
 dispersed similarly. Who can do it?
 
-Also, README.{3d, pic, mf} should be edited into gnuplot.doc and removed.
-Who has some knowledge about this?
-
-I propose to keep those History and ChangeLog-like files in this directory
-(or moved to src), maybe change them and concatenate them into single
-ChangeLog / History file.
-
--- FAQ should be updated
+-- docs/old/README.3d
+-- docs/old/README.fit
+  These should be be edited and pasted into gnuplot.doc and then removed.
 
 -- update tutorial/
 
--- documentation for all X11 command line switches (joze)
+-- FAQ should be updated
+   Where is the original source for this? It should be ready to add
+   mouse-, hotkey- and pm3d-related questions.
+
 
 TERMINALS:
+==========
 
--- see above about docs/old/README.*
+Amiga:
+  -- update its docs from docs/old/README.ami, then delete this file
 
--- pstricks? There is an old bug/patch request on sourceforge, can 
-somebody comment on it?
+CGM:
+  -- implement filledboxes
 
--- windows terminal:
-	-- rotated text is not supported
-	-- colored text (textcolor.dem does not pass correctly)
+Emx:
+  -- update its docs from docs/old/README.emx, then delete this file
 
--- Mac, Apple, MacOS support to be added
+GIF:
+  -- Patch 400540 Export scale information for a GIF output.
+	Any sense to add this patch, or close it without adding?
+
+(g)pic:
+  -- update its docs from docs/old/README.pic, then delete this file
+
+Metafont:
+  -- update its docs from docs/old/README.mf, then delete this file
+
+NeXTstep:
+  -- update its docs from docs/old/README.nex, then delete this file
+
+PBM:
+  -- Patch 592230 Better colors for PBM.
+	Can somebody comment on this?
+  
+Postscript:
+  -- Patch 400372 Enables LaTeX psfrag labels in the postscript terminal
+  -- Patch 401009 Enables LaTeX psfrag labels in postscript (updated for 3.8c)
+	Can somebody comment on this? Can these patches be still applied?
+
+Pstricks:
+  -- Patch 559611 color + variable pointsize in pstricks
+	Can somebody comment on this?
+
+Windows:
+  -- update its docs from docs/old/README.win, then delete this file
+  -- rotated text is not supported
+	demo/textrotate.dem does not pass correctly
+  -- palette colored text is not supported
+	demo/textcolor.dem does not pass correctly
+  -- windows driver does not report font size to windows.trm, thus
+     character widht and height are quite useless numbers
+  -- update wgnuplot menus
+  -- repaire the linetype bug in wgraph.c --- crash for
+		set style fill solid border
+		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
+	or
+		set style fill solid noborder
+		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
+	or
+		set style fill empty
+		plot [-2.5:4.5] 100/(1.0+x*x) with boxes lt -1
+  -- windows "Pause -1": it works very strange if you press <enter> while 
+	having the mouse cursor out of the graph window. Mainly users running
+	demos complain about this. This bug is associated to BUG 561418 
+	"(MS Windows) 100% CPU Usage during pause", and to HBB 20001217's note
+	about WaitMessage(); in wpause.c.
+
+X11:
+  -- update its docs from docs/old/README.x11, then delete this file
+  -- documentation for all X11 command line switches (joze)
+
+Xlib:
+  -- update its docs from docs/old/README.xli, then delete this file
+
+Mac, Apple, MacOS
+   -- support to be added, or at least information to the AquaDriver
+   et al?
+
+
+OTHER BUGS:
+===========
+
+-- INF number in gnuplot binary file crashes gnuplot
+
+
+TERMINALS, GENERAL COMMENTS:
+============================
 
 -- verify that terminals don't reset options (I've checked a lot, but 
 should be tested again)
@@ -67,10 +133,9 @@ sequences for the main terminal drivers (joze)
 -- Also unify fill color sequence and fill pattern sequence;
    choose fill patterns to be optimal for monochrome output (EAM)
 
--- implement filledboxes for cgm
-
 
 GNUPLOT LIBRARY:
+================
 
 Make a library (e.g. usr/local/gnuplot/scripts/, .../gnuplot/bin) of 
 (a) gnuplot scripts, and (b) shell scripts relevant for gnuplot:
@@ -81,12 +146,34 @@ and default setup after "reset"
 -- move pm3d/contrib/* files into the proposed gnuplot library, then remove
 pm3d/contrib and pm3d/ from cvs
 
+I.e., the last point is the main question: where to put pm3d/contrib/* files?
+
 
 WEB:
+====
 
 -- gnuplot needs a "professional" web page
 
-VMS:
+
+INSTALLATION --- BUGS:
+======================
+
+-- automake or autoconf generates broken src/makefile.in: it fails on platforms
+with .exe extension of executables. It needs to run "sed" or something like
+that to replace
+	noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@
+by
+	noinst_PROGRAMS = bf_test$(EXEEXT) @GNUPLOT_X11@$(EXEEXT)
+
+
+INSTALLATION --- LINUX:
+=======================
+
+-- add .spec file and a 'make' target to create RPM file?
+
+
+INSTALLATION --- VMS:
+=====================
 
 -- bring configure.vms in sync with current configure.in
 
