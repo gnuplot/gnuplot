@@ -115,22 +115,23 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 	$(M)timedat.dem $(M)using.dat $(M)using.dem $(M)vector.dem \
 	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
-ETC = 00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README CodeStyle Copyright History \
-	Makefile.in Projects README.3d README.3p1 README.3p2 README.3p3 \
-	README.3p4 README.3p5 README.ami README.emx README.fit README.gnu \
-	README.iso README.mf README.nex README.os2 README.pic README.pro \
-	README.win README.x11 README.xli WhatsNew $(ACCONFIG) acinclude.m4 \
-	$(ACLOCAL_M4) amiga.c buildvms.com commitvers $(CONFIG_HEADER_IN) \
-	configure configure.in corgraph.asm corplot.c ctrl87.c ctrl87.h \
-	descrip.mms errorfix.sh genopt.com gnuplot.def gnuplot.el gnuplot.opt \
-	gnuplot.prj header.mac hrcgraph.asm install-sh intergra.x11 lasergnu \
-	lineproc.mac linkopt.vms linkopt.ztc make_vms.com makefile.286 \
-	makefile.all makefile.amg makefile.ami makefile.dj2 makefile.djg \
-	makefile.emx makefile.g makefile.msc makefile.msw makefile.mto \
-	makefile.nt makefile.os2 makefile.os9 makefile.r makefile.st \
-	makefile.tc makefile.unx makefile.vms makefile.wc makefile.win \
-	makefile.ztc missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu \
-	stamp-h.in strftime.c upd_make.sh vms.c $(T)README 
+ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
+	Copyright History Makefile.in Projects README.3d README.3p1 \
+	README.3p2 README.3p3 README.3p4 README.3p5 README.ami README.emx \
+	README.fit README.gnu README.iso README.mf README.nex README.os2 \
+	README.pic README.pro README.win README.x11 README.xli WhatsNew \
+	$(ACCONFIG) acinclude.m4 $(ACLOCAL_M4) amiga.c buildvms.com \
+	commitvers $(CONFIG_HEADER_IN) configure configure.in corgraph.asm \
+	corplot.c ctrl87.c ctrl87.h descrip.mms errorfix.sh genopt.com \
+	gnuplot.def gnuplot.el gnuplot.opt gnuplot.prj header.mac \
+	hrcgraph.asm install-sh intergra.x11 lasergnu lineproc.mac \
+	linkopt.vms linkopt.ztc make_vms.com makefile.286 makefile.all \
+	makefile.amg makefile.ami makefile.dj2 makefile.djg makefile.emx \
+	makefile.g makefile.msc makefile.msw makefile.mto makefile.nt \
+	makefile.os2 makefile.os9 makefile.r makefile.st makefile.tc \
+	makefile.unx makefile.vms makefile.wc makefile.win makefile.ztc \
+	missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
+	strftime.c upd_make.sh vms.c $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
