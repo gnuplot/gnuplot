@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.14 2000/11/20 19:48:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.15 2000/11/21 14:15:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1469,7 +1469,7 @@ event_motion(struct gp_event_t *ge)
 
     if (is_3d_plot
 #ifdef PM3D
-	&& !pm3d_map_rotate_ylabel /* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
+	&& !pm3d.map /* Rotate the surface if it is 3D graph and "set pm3d map" was not used. */
 #endif
        ) {
 

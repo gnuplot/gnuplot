@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.13 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.14 2000/11/22 10:04:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1011,10 +1011,15 @@ static void
 unset_pm3d()
 {
     c_token++;
-    if (pm3d.where[0]=='b' && !pm3d.where[1]) /* unset reversed y axis from 'set pm3d map' */
-	axis_array[FIRST_Y_AXIS].range_flags &= ~RANGE_REVERSE;
+    if (pm3d.map) {
+	axis_array[FIRST_Y_AXIS].range_flags &= ~RANGE_REVERSE; /* unset reversed y axis */
+	draw_surface = TRUE;	/* set surface */
+	surface_rot_x = 60.0;	/* set view 60,30,1.3 */
+	surface_rot_z = 30;
+	surface_scale = 1.0;
+    }
     pm3d.where[0] = 0;
-    pm3d_map_rotate_ylabel = 0;  /* trick for rotating ylabel */
+    pm3d.map = 0;  /* trick for rotating ylabel */
 #ifdef X11
     if (!strcmp(term->name, "x11")) {
 	extern void X11_unset_pm3d __PROTO((void)); /* defined in x11.trm */

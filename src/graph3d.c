@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.34 2000/11/02 17:52:16 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.35 2000/11/03 01:15:05 joze Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2090,14 +2090,14 @@ draw_3d_graphbox(plot, plot_num)
 		y1 += Y_AXIS.label.yoffset * t->v_char;
 		/* write_multiline mods it */
 #ifdef PM3D
-		if (pm3d_map_rotate_ylabel)
+		if (pm3d.map)
 		    (*t->text_angle)(1);
 #endif
 		write_multiline(x1, y1, Y_AXIS.label.text,
 				CENTRE, JUST_TOP, 0,
 				Y_AXIS.label.font);
 #ifdef PM3D
-		if (pm3d_map_rotate_ylabel)
+		if (pm3d.map)
 		    (*t->text_angle)(0);
 	    }
 #endif

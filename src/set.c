@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.43 2000/11/22 10:04:25 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.44 2000/11/22 16:11:32 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2276,7 +2276,7 @@ set_colorbox()
 		continue;
 	    }
 #if 0
-	    /* obsolete -- used 'unset colorbox' instead */
+	    /* obsolete -- use 'unset colorbox' instead */
 	    /* color box where: no box */
 	    if (equals(c_token, "no")) {
 		color_box.where = SMCOLOR_BOX_NO;
@@ -2351,6 +2351,7 @@ set_colorbox()
 	    }
 	    int_error(c_token,"invalid colorbox option");
 	} /* end of while over colorbox options */
+    if (color_box.where == SMCOLOR_BOX_NO) color_box.where = SMCOLOR_BOX_DEFAULT;
     }
 }
 
@@ -2458,7 +2459,7 @@ set_pm3d()
 		surface_rot_z = 0;
 		surface_scale = 1.3;
 		axis_array[FIRST_Y_AXIS].range_flags |= RANGE_REVERSE; /* set yrange reverse */
-		pm3d_map_rotate_ylabel = 1;  /* trick for rotating ylabel */
+		pm3d.map = 1;  /* trick for rotating ylabel */
 		continue;
 	    }
 	    if (almost_equals(c_token, "hi$dden3d")) {

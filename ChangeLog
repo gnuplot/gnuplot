@@ -1,7 +1,14 @@
+2000-11-23  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/pm3d.h graph3d.c mouse.c pm3d.c save.c set.c show.c unset.c
+	docs/gnuplot.doc:
+	  1. changed variable 'pm3d_map_rotate_ylabel' to field 'pm3d.map';
+	  2. implemented 'save' of 'pm3d', 'palette' and 'colorbox'.
+
 2000-11-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/set.c: suppose 'set pm3d at s' if pm3d was not used until now
-	and 'set pm3d not-at-option' was used
+	and 'set pm3d not-at-option' was used.
 
 2000-11-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

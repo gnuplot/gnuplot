@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.4 2000/11/02 19:07:16 lhecking Exp $
+ * $Id: pm3d.h,v 1.5 2000/11/22 10:04:25 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -77,6 +77,8 @@
 */
 typedef struct {
   char where[7];	/* base, top, surface */
+  char map;		/* set to 1 during 'set pm3d map' (workaround for
+			   non-existing 2D map plot) */
   char flush;   	/* left, right, center */
   char direction;	/* forward, backward */
   char clip;		/* 1in, 4in */
@@ -96,9 +98,6 @@ extern pm3d_struct pm3d;
 The following two are used in z2gray(), and for labeling draw_color_smooth_box()
 */
 extern double used_pm3d_zmin, used_pm3d_zmax;
-
-/* trick for rotating the ylabel in 'set pm3d map' */
-extern int pm3d_map_rotate_ylabel;
 
 /****
   Declaration of routines

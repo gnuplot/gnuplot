@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.46 2000/11/15 15:51:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.47 2000/11/22 10:04:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1634,8 +1634,8 @@ static void show_colorbox()
 	fprintf(stderr,"drawn at DEFAULT position\n");
     } else if (color_box.where == SMCOLOR_BOX_USER ) {
 	fprintf(stderr,"drawn at USER position:\n");
-	fprintf(stderr,"\t\torigin: %f, %f\n", color_box.xorigin, color_box.yorigin);
-	fprintf(stderr,"\t\tsize  : %f, %f\n", color_box.xsize  , color_box.ysize  );
+	fprintf(stderr,"\t\torigin: %g, %g\n", color_box.xorigin, color_box.yorigin);
+	fprintf(stderr,"\t\tsize  : %g, %g\n", color_box.xsize  , color_box.ysize  );
     } else {
 	/* should *never* happen */
 	fprintf(stderr, "%s:%d please report this bug to <johannes@zellner.org>\n", __FILE__, __LINE__);

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.51 2000/11/07 23:31:33 joze Exp $
+C RCS $Id: gnuplot.doc,v 1.52 2000/11/22 10:04:24 mikulik Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -5554,7 +5554,7 @@ C ... and restart the table:
 ?colorbox
 
  The colour scheme, i.e. the gradient of the smooth colour with min_z and max_z
- values of `pm3d`'s `palette`, is drawn in a colour box unless `unset colorbox`.  Its
+ values of `pm3d`'s `palette`, is drawn in a colour box unless `unset colorbox`.
 
        set colorbox
        set colorbox {

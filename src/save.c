@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.18 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.19 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -51,6 +51,9 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.18 2000/10/31 19:59:31 joze
 #include "term_api.h"
 #include "util.h"
 #include "variable.h"
+#ifdef PM3D
+# include "pm3d.h"
+#endif
 
 static void save_functions__sub __PROTO((FILE *));
 static void save_variables__sub __PROTO((FILE *));
@@ -744,6 +747,52 @@ set ticscale %g %g\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
     fprintf(fp, "set locale \"%s\"\n", get_locale());
+
+#ifdef PM3D
+    if (pm3d.map) fputs("set pm3d map\n", fp);
+	else if (pm3d.where[0]) fprintf(fp, "set pm3d at %s\n", pm3d.where);
+    fputs("set pm3d ", fp);
+    switch (pm3d.direction) {
+    case PM3D_SCANS_AUTOMATIC: fputs("scansautomatic", fp); break;
+    case PM3D_SCANS_FORWARD: fputs("scansforward", fp); break;
+    case PM3D_SCANS_BACKWARD: fputs("scansbackward", fp); break;
+    }
+    fputs(" flush ", fp);
+    switch (pm3d.flush) {
+    case PM3D_FLUSH_CENTER: fputs("center", fp); break;
+    case PM3D_FLUSH_BEGIN: fputs("begin", fp); break;
+    case PM3D_FLUSH_END: fputs("end", fp); break;
+    }
+    fputs(" zrange [", fp);
+    if (pm3d.pm3d_zmin) fprintf(fp,"%g:",pm3d.zmin);
+	else fputs("*:", fp);
+    if (pm3d.pm3d_zmax) fprintf(fp,"%g]",pm3d.zmax);
+	else fputs("*]", fp);
+    if (pm3d.hidden3d_tag) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
+	else fputs(" nohidden3d", fp);
+    fputs( (pm3d.solid ? " solid" : " transparent"), fp);
+    if (!pm3d.where[0]) fputs("\nunset pm3d", fp);
+    fputs("\n", fp);
+
+    fprintf(fp, "set palette %s rgbformulae %d,%d,%d %stive %sps_allcF maxcolors %d\n",
+	sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY ? "gray" : "color",
+	sm_palette.formulaR, sm_palette.formulaG, sm_palette.formulaB,
+	sm_palette.positive ? "posi" : "nega",
+	sm_palette.ps_allcF ? "" : "no",
+	sm_palette.use_maxcolors);
+
+    if (color_box.where != SMCOLOR_BOX_NO)
+	fprintf(fp,"set colorbox %s\n", color_box.where==SMCOLOR_BOX_DEFAULT ? "default" : "user");
+    fprintf(fp, "set colorbox %sal origin %g,%g size %g,%g ",
+	color_box.rotation ==  'v' ? "vertic" : "horizont",
+	color_box.xorigin, color_box.yorigin,
+	color_box.xsize, color_box.ysize);
+    if (color_box.border == 0) fputs("noborder", fp);
+	else if (color_box.border_lt_tag < 0) fputs("bdefault", fp);
+		 else fprintf(fp, "border %d", color_box.border_lt_tag);
+    if (color_box.where == SMCOLOR_BOX_NO) fputs("\nunset colorbox\n", fp);
+	else fputs("\n", fp);
+#endif
 
     fputs("set loadpath ", fp);
     {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.8 2000/11/20 08:07:40 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.9 2000/11/20 09:47:07 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -52,9 +52,6 @@ pm3d_struct pm3d = {
 
 /* global variables */
 double used_pm3d_zmin, used_pm3d_zmax;
-
-/* trick for rotating the ylabel in 'set pm3d map' */
-int pm3d_map_rotate_ylabel = 0;
 
 /****************************************************************/
 /* Now the routines which are really those exactly for pm3d.c
@@ -454,6 +451,7 @@ void
 pm3d_reset(void)
 {
     pm3d.where[0] = 0;
+    pm3d.map = 0;
     pm3d.flush = PM3D_FLUSH_BEGIN;
     pm3d.direction = PM3D_SCANS_AUTOMATIC;
     pm3d.clip = PM3D_CLIP_1IN;
