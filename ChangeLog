@@ -1,3 +1,14 @@
+2005-03-02  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/unset.c (unset_historysize): Rearrange #ifdefs for GNUPLOT_HISTORY
+	to prevent compiler warnings about unused function definitions.
+
+	* src/term.h term/post.h term/post.trm: Introduce a statement 
+	'#define PSLATEX_DRIVER' into post.h that controls whether or not the
+	pslatex/epslatex terminal code is built.  Add #ifdef PSLATEX_DRIVER
+	in appropriate places.  Without this it was impossible to build gnuplot
+	with post.trm but not pslatex.trm.
+
 2005-02-28  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pslatex.trm: EPSLATEX_set_color must be protected by #ifdef PM3D.

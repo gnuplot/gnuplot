@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.27 2004/12/31 23:02:46 sfeam Exp $
+ * $Id: term.h,v 1.28 2005/02/09 11:43:10 mikulik Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -56,10 +56,11 @@
 # include "dumb.trm"		/* dumb terminal */
 # include "post.trm"		/* postscript */
 # include "table.trm"		/* built-in, but used for the documentation */
-# if !(defined(OS2) || defined(MSDOS) || defined(_Windows) || defined(ATARI) || defined(MTOS) || defined(AMIGA))
-#  include "regis.trm"		/* regis graphics */
-#  include "tek.trm"		/* a Tek 4010 and others including VT-style */
-# endif
+
+#ifdef GP_ENH_EST
+# include "estimate.trm"	/* used for enhanced text processing */
+#endif
+
 # ifdef X11
 #  include "x11.trm"		/* X Window system */
 # endif				/* X11 */
@@ -399,7 +400,9 @@
 #include "latex.trm"
 
 /* latex/tex with picture in postscript */
+#ifdef PSLATEX_DRIVER	/* set in post.h */
 #include "pslatex.trm"
+#endif
 
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"

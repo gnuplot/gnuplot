@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.146 2005/02/16 21:46:45 sfeam Exp $
+ * $Id: post.trm,v 1.147 2005/02/18 21:39:17 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1053,6 +1053,7 @@ PS_options()
 	    term->flags &= ~TERM_ENHANCED_TEXT;
 	    ++c_token;
 	    break;
+#ifdef PSLATEX_DRIVER
 	case EPSLATEX_STANDALONE:
 	    if (ps_params->terminal != PSTERM_EPSLATEX)
 		int_error(c_token,
@@ -1140,6 +1141,7 @@ PS_options()
 	    ps_params->oldstyle = FALSE;
 	    c_token++;
 	    break;
+#endif
 	case PS_MONOCHROME:
 	    ps_params->color = FALSE;
 	    c_token++;
@@ -1443,6 +1445,7 @@ PS_options()
     strcat(term_options,tmp_term_options);
 #endif /* PM3D */
 
+#ifdef PSLATEX_DRIVER
     if ((ps_params->terminal == PSTERM_PSTEX) ||
 	(ps_params->terminal == PSTERM_PSLATEX)) {
 	sprintf(tmp_term_options, "%s %s ",
@@ -1461,6 +1464,7 @@ PS_options()
 	    sprintf(tmp_term_options, "noheader ");
 	strcat(term_options,tmp_term_options);
     }
+#endif
 
     if (ps_params->terminal == PSTERM_POSTSCRIPT)
 	sprintf(tmp_term_options,"\"%s\" %d%s ",
@@ -2194,6 +2198,7 @@ NULL };
     timedate=asctime(localtime(&now));
     timedate[strlen(timedate)-1]='\0';
 
+#ifdef PSLATEX_DRIVER
     /* Set files for (e)ps(la)tex terminals */
     switch (ps_params->terminal) {
     case PSTERM_EPSLATEX:
@@ -2205,6 +2210,7 @@ NULL };
 	break;
     default:; /* do nothing, just avoid a compiler warning */
     }
+#endif
 
     if (ps_params->psformat == PSTERM_EPS)
 	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gppsfile);
@@ -2357,11 +2363,14 @@ PS_init()
     case PSTERM_POSTSCRIPT:
 	gppsfile = gpoutfile;
 	break;
+    default:
+#ifdef PSLATEX_DRIVER
+	PSTEX_reopen_output();
+	break;
     case PSTERM_EPSLATEX:
 	EPSLATEX_reopen_output();
+#endif
 	break;
-    default:
-	PSTEX_reopen_output();
     }
 
     PS_common_init(ps_params->terminal == PSTERM_POSTSCRIPT,
