@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.94 2004/12/01 21:10:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.95 2004/12/21 08:09:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -715,7 +715,7 @@ set ticscale %g %g\n",
         save_position(fp, &(lab.offset));			\
 	fprintf(fp, " font \"%s\"", conv_text(lab.font));	\
 	save_textcolor(fp, &(lab.textcolor));			\
-	fprintf(fp, "\n");					\
+	fprintf(fp, "%s\n", (lab.noenhanced)?" noenhanced":"");	\
     }
 
     SAVE_AXISLABEL_OR_TITLE("", "title", title);

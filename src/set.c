@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.161 2004/12/06 06:46:27 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.162 2004/12/21 08:09:35 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3778,6 +3778,16 @@ set_xyzlabel(label_struct *label)
 	if (almost_equals(c_token,"off$set")) {
 	    c_token++;
 	/* You didn't used to have to say "offset" before giving the values */
+	}
+
+	if (almost_equals(c_token,"noenh$anced")) {
+	    c_token++;
+	    label->noenhanced = TRUE;
+	    continue;
+	} else if (almost_equals(c_token,"enh$anced")) {
+	    c_token++;
+	    label->noenhanced = FALSE;
+	    continue;
 	}
 
 	if (!isstring(c_token) && !got_offsets) {

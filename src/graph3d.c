@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.108 2004/12/31 23:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.109 2005/01/04 19:44:49 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -690,12 +690,14 @@ do_3dplot(
 	    x = (unsigned int) ((xleft + xright) / 2 + tmpx);
 	    y = (unsigned int) (ytop + tmpy + titlelin * (t->h_char));
     	}
+	ignore_enhanced(title.noenhanced);
 	apply_pm3dcolor(&(title.textcolor),t);
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
 	 * But which terminal understands that? It seems vertical justification does
 	 * not work... */
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
 	reset_textcolor(&(title.textcolor),t);
+	ignore_enhanced(FALSE);
     }
 
     /* PLACE TIMEDATE */
@@ -2336,11 +2338,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    map3d_position_r(&(X_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 	    x1 += tmpx; /* user-defined label offset */
 	    y1 += tmpy;
+	    ignore_enhanced(X_AXIS.label.noenhanced);
 	    apply_pm3dcolor(&(X_AXIS.label.textcolor),t);
 	    write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
 			    X_AXIS.label.font);
 	    reset_textcolor(&(X_AXIS.label.textcolor),t);
+	    ignore_enhanced(FALSE);
 #ifdef USE_GRID_LAYERS
 	    }
 #endif
@@ -2446,11 +2450,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		if (splot_map == TRUE)
 		    (*t->text_angle)(TEXT_VERTICAL);
 		/* write_multiline mods it */
+		ignore_enhanced(Y_AXIS.label.noenhanced);
 		apply_pm3dcolor(&(Y_AXIS.label.textcolor),t);
 		write_multiline(x1, y1, Y_AXIS.label.text,
 				h_just, v_just, angle,
 				Y_AXIS.label.font);
 		reset_textcolor(&(Y_AXIS.label.textcolor),t);
+		ignore_enhanced(FALSE);
 		/* revert from vertical y-label for maps */
 		if (splot_map == TRUE)
 		    (*t->text_angle)(0);
@@ -2519,11 +2525,13 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	x += tmpx;
 	y += tmpy;
 
+	ignore_enhanced(Z_AXIS.label.noenhanced);
 	apply_pm3dcolor(&(Z_AXIS.label.textcolor),t);
 	write_multiline(x, y, Z_AXIS.label.text,
 			CENTRE, CENTRE, 0,
 			Z_AXIS.label.font);
 	reset_textcolor(&(Z_AXIS.label.textcolor),t);
+	ignore_enhanced(FALSE);
     }
 }
 

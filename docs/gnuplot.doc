@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.267 2004/12/01 21:10:30 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.268 2004/12/21 08:09:31 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8717,7 +8717,7 @@ C ... and restart the table:
 
  Syntax:
        set title {"<title-text>"} {offset <offset>} {"<font>{,<size>}"}
-                 {{textcolor | tc} {lt <line_type> | default}}
+                 {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
        show title
 
  If <offset> is specified the title is moved by the given offset where
@@ -8732,6 +8732,9 @@ C ... and restart the table:
  the units of the font <size> depend upon which terminal is used.
 
  `textcolor lt <n>` sets the text color to that of line type <n>.
+
+ `noenhanced` requests that the title not be processed by the enhanced text
+ mode parser, even if enhanced text mode is currently active.
 
  `set title` with no parameters clears the title.
 
@@ -8966,7 +8969,7 @@ C ... and restart the table:
 
  Syntax:
        set xlabel {"<label>"} {offset <offset>} {font "<font>{,<size>}"}
-                  {{textcolor | tc} {lt <line_type> | default}}
+                  {{textcolor | tc} {lt <line_type> | default}} {{no}enhanced}
        show xlabel
 
  The same syntax applies to `x2label`, `ylabel`, `y2label`, `zlabel` and
@@ -8985,6 +8988,9 @@ C ... and restart the table:
  of the font <size> depend upon which terminal is used.
 
  `textcolor lt <n>` sets the text color to that of line type <n>.
+
+ `noenhanced` requests that the label text not be processed by the enhanced text
+ mode parser, even if enhanced text mode is currently active.
 
  To clear a label, put no options on the command line, e.g., "`set y2label`".
 

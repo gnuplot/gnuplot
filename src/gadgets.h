@@ -151,6 +151,7 @@ typedef struct {
     char font[MAX_LINE_LEN+1];
     struct position offset;
     struct t_colorspec textcolor;
+    TBOOLEAN noenhanced;	/* Don't apply enhanced text mode */
 } label_struct;
 #define EMPTY_LABELSTRUCT {"", "", {character, character, character, 0.0, 0.0, 0.0}, {0,0,0.0}}
 

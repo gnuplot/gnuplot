@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.140 2004/12/31 23:02:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.141 2005/01/04 19:44:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1312,6 +1312,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* YLABEL */
     if (*axis_array[FIRST_Y_AXIS].label.text) {
+	ignore_enhanced(axis_array[FIRST_Y_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
@@ -1338,10 +1339,12 @@ do_plot(struct curve_points *plots, int pcount)
 			    axis_array[FIRST_Y_AXIS].label.font);
 	}
 	reset_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
     }
 
     /* Y2LABEL */
     if (*axis_array[SECOND_Y_AXIS].label.text) {
+	ignore_enhanced(axis_array[SECOND_Y_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
@@ -1366,6 +1369,7 @@ do_plot(struct curve_points *plots, int pcount)
 			    axis_array[SECOND_Y_AXIS].label.font);
 	}
 	reset_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
     }
 
     /* XLABEL */
@@ -1378,11 +1382,13 @@ do_plot(struct curve_points *plots, int pcount)
 	x = (xright + xleft) / 2 +  tmpx;
 	y = xlabel_y - t->v_char / 2;   /* HBB */
 
+	ignore_enhanced(axis_array[FIRST_X_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
 			CENTRE, JUST_TOP, 0,
 			axis_array[FIRST_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	ignore_enhanced(FALSE);
     }
 
     /* PLACE TITLE */
@@ -1394,9 +1400,11 @@ do_plot(struct curve_points *plots, int pcount)
 	x = (xleft + xright) / 2 + tmpx;
 	y = title_y - t->v_char / 2;
 
+	ignore_enhanced(title.noenhanced);
 	apply_pm3dcolor(&(title.textcolor), t);
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
 	reset_textcolor(&(title.textcolor), t);
+	ignore_enhanced(FALSE);
     }
 
     /* X2LABEL */
@@ -1408,10 +1416,12 @@ do_plot(struct curve_points *plots, int pcount)
 	/* we worked out y-coordinate in boundary() */
 	x = (xright + xleft) / 2 + tmpx;
 	y = x2label_y - t->v_char / 2 - 1;
+	ignore_enhanced(axis_array[SECOND_X_AXIS].label.noenhanced);
 	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
 	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
 			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	ignore_enhanced(FALSE);
     }
 
     /* PLACE TIMEDATE */
