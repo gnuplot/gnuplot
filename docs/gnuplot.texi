@@ -2852,10 +2852,11 @@ Syntax:
 
 @end example
 
-<time> may be any integer constant or expression.  Choosing -1 will wait
-until a carriage return is hit, zero (0) won't pause at all, and a positive
-integer will wait the specified number of seconds.  `pause 0` is synonymous
-with @ref{print}.
+<time> may be any constant or expression.  Choosing -1 will wait until a 
+carriage return is hit, zero (0) won't pause at all, and a positive number
+will wait the specified number of seconds.  The time is rounded to an integer
+number of seconds if subsecond time resolution is not supported by the given
+platform.  `pause 0` is synonymous with @ref{print}. 
 
 Note: Since @ref{pause} communicates with the operating system rather than the
 graphics, it may behave differently with different device drivers (depending
@@ -4297,6 +4298,7 @@ when the variable was initially defined.
 * cntrparam::                   
 * contour::                     
 * data_style::                  
+* decimalsign::                 
 * dgrid3d::                     
 * dummy::                       
 * encoding::                    
@@ -5308,7 +5310,7 @@ create an appropriate grid.  See @ref{dgrid3d} for more information.
 and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html,contours with User Defined Levels.}
 
-@node data_style, dgrid3d, contour, set-show
+@node data_style, decimalsign, contour, set-show
 @subsection data style
 
 @c ?commands set style data
@@ -5329,7 +5331,46 @@ Syntax:
 See @ref{style} for the choices.  If no choice is given, the choices are
 listed.  `show style data` shows the current default data plotting style.
 
-@node dgrid3d, dummy, data_style, set-show
+@node decimalsign, dgrid3d, data_style, set-show
+@subsection decimalsign
+
+@c ?commands set decimalsign
+@c ?commands show decimalsign
+@c ?commands unset decimalsign
+@c ?set decimalsign
+@c ?show decimalsign
+@c ?unset decimalsign
+@cindex decimalsign
+@opindex decimalsign
+
+
+The @ref{decimalsign} command selects a decimal sign for numbers printed
+into tic labels or @ref{label} strings.  
+
+Syntax:
+@example
+      set decimalsign @{<value>@}
+      unset decimalsign
+      show decimalsign
+
+@end example
+
+The argument <value> is the string to be used in place of the usual
+decimal point. Typical choices include the period, '.', and the comma,
+',', but others may be useful, too.  If you omit the <value> argument,
+the decimal separator is not modified from the usual default, which is
+a period.  Unsetting decimalsign has the same effect as omitting
+<value>.
+
+Example:
+
+If you're in Germany, you probably want:
+@example
+      set decimalsign ','
+
+@end example
+
+@node dgrid3d, dummy, decimalsign, set-show
 @subsection dgrid3d
 
 @c ?commands set dgrid3d
@@ -5523,7 +5564,9 @@ Characters not preceded by "%" are printed verbatim.  Thus you can include
 spaces and labels in your format string, such as "%g m", which will put " m"
 after each number.  If you want "%" itself, double it: "%g %%".
 
-See also @ref{xtics} for more information about tic labels.
+See also @ref{xtics} for more information about tic labels, and 
+@ref{decimalsign} for how to use non-default decimal separators in numbers
+printed this way.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/electron/electron.html,See demo. }
 
 @menu
@@ -6171,7 +6214,8 @@ display more than one distinct <value> with a single label, several
 pairs of <label text> and <value> may be given. Note that <value> is
 treated as a constant expression, i.e. if it contains variables, the
 label text will not change if the variable values are modified,
-later on.
+later on.  The @ref{decimalsign} option, if active, overrides the
+decimal separator character of numbers entered into label texts.
 
 By default, the text is placed flush left against the point x,y,z.  To adjust
 the way the label is positioned with respect to the point x,y,z, add the
@@ -11095,6 +11139,7 @@ if the `-display` command line option is used.
 Syntax:
 @example
    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
+   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise]
 
 @end example
 
@@ -11119,6 +11164,11 @@ shut down the connection to the previous driver. Example:
     gnuplot> set term x11 driver "gnuplot_x11_38a"
 
 @end example
+
+The gnuplot outboard driver, gnuplot_x11, is searched in a default place
+chosen when the program is compiled.  You can override that by defining
+the environment variable GNUPLOT_DRIVER_DIR to point to a different
+location
 
 Plot windows will automatically be closed at the end of the session
 unless the `-persist` option was given.
@@ -11193,7 +11243,7 @@ than 0 and less than or equal to ten) used as a scaling factor for point
 sizes.  For example, `-pointsize 2` uses points twice the default size, and
 `-pointsize 0.5` uses points half the normal size.
 
-The `-noevents` switch disables all mouse and key event processing (execpt
+The `-noevents` switch disables all mouse and key event processing (except
 for `q` and `<space>` for closing the window). This is useful for programs
 which use the x11 driver independent of the gnuplot main program.
 
@@ -13328,7 +13378,7 @@ Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
 
 
 @menu
-* Old_bugs::			
+* Old_bugs::                    
 @end menu
 
 @node Old_bugs,  , Bugs, Bugs
