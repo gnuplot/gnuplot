@@ -3,6 +3,8 @@
 	* term/png.trm: Back out Eric and HBB's changes (back to 16 colours,
 	no transparency).
 
+	* term/tkcanvas.trm: More fixes by Thomas Sefzick and Matt Willis.
+
 1999-10-19  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* graph3d.c(boundary3d): Fix division by zero problem.
