@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.46 2002/02/28 09:36:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.47 2002/03/18 18:19:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -246,12 +246,8 @@ plot3drequest()
     AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
     AXIS_INIT3D(U_AXIS, 1, 0);
     AXIS_INIT3D(V_AXIS, 1, 0);
-    /* will set CB_AXIS.min / CB_AXIS.max to VERYLARGE / -VERYLARGE
-     * respectively, which is used and assumed in pm3d.c:set_pm3d_zminmax() */
 #ifdef PM3D
     AXIS_INIT3D(COLOR_AXIS, 0, 1);
-    g_non_pm3d_min =  VERYLARGE;
-    g_non_pm3d_max = -VERYLARGE;
 #endif
 
     if (!term)			/* unknown */
@@ -545,10 +541,11 @@ grid_nongrid_data(this_plot)
 	    z = z / w;
 #endif
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
-	    /* TODO joze */
-#if 0
-	    /* FIXME HBB 20020301: why is this not activated??? */
-	    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
+#ifdef PM3D
+	    if (this_plot->pm3d_color_from_column)
+		int_error(NO_CARET, "Gridding of the color column is not implemented");
+	    else
+		STORE_WITH_LOG_AND_UPDATE_RANGE(points->color, z, points->type, COLOR_AXIS, NOOP, continue);
 #endif
 	}
     }
@@ -761,7 +758,7 @@ get_3ddata(this_plot)
 		z = v[1];
 		break;
 	    default:
-		int_error(NO_CARET, "Internal error : Unknown mapping type");
+		int_error(NO_CARET, "Internal error: Unknown mapping type");
 		return;
 	    }
 
@@ -783,11 +780,11 @@ get_3ddata(this_plot)
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
 #ifdef PM3D
-		if (pm3d_color_from_column) {
-		    cp->color = color; 
-		    update_pm3d_zrange(color, NEED_PALETTE(this_plot));
-		} else {
-		    update_pm3d_zrange(z, NEED_PALETTE(this_plot));
+		if (NEED_PALETTE(this_plot)) {
+		    if (pm3d_color_from_column)
+			STORE_WITH_LOG_AND_UPDATE_RANGE(cp->color, color, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
+		    else
+			STORE_WITH_LOG_AND_UPDATE_RANGE(cp->color, z, cp->type, COLOR_AXIS, NOOP, goto come_here_if_undefined);
 		}
 #endif
 	    }
@@ -992,8 +989,8 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
 					    value_axis, NOOP, NOOP);
 #ifdef PM3D
-	    if (z_axis == value_axis)
-		update_pm3d_zrange(temp, need_palette);
+	    if (need_palette)
+		STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].color, temp, points[i].type, COLOR_AXIS, NOOP, NOOP);
 #endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;

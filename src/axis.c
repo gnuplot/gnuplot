@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.28 2002/02/28 09:36:44 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.29 2002/03/18 18:19:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -157,11 +157,6 @@ AXIS_INDEX z_axis = FIRST_Z_AXIS;
 
 /* decimal sign */
 char *decimalsign = NULL;
-
-#ifdef PM3D
-/* needed for autoscaling of the color axis */
-double g_non_pm3d_min = 0, g_non_pm3d_max = 0;
-#endif
 
 /* --------- internal prototypes ------------------------- */
 static double dbl_raise __PROTO((double x, int y));
@@ -1822,45 +1817,6 @@ some_grid_selected()
 }
 
 
-
-/* Needed for autoscaling of the color axis. */
-
-void
-update_pm3d_zrange(value, pal)
-    double value;
-    TBOOLEAN pal;
-{
-#ifdef PM3D
-    if (CB_AXIS.log && value < 0.0)
-	/* ignore negative points on log axis */
-	return;
-    if (pal) {
-	if (value < CB_AXIS.min) {
-	    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
-		CB_AXIS.min = value;
-	}
-	if (value > CB_AXIS.max) {
-	    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
-		CB_AXIS.max = value;
-	}
-    } else {
-	if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	    if (value < g_non_pm3d_min)
-		g_non_pm3d_min = value;
-	}
-	if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	    if (value > g_non_pm3d_max)
-		g_non_pm3d_max = value;
-	}
-    }
-#else  /* PM3D */
-    /* Nothing to do.  Just avoid warnings, and quit: */
-    (void) value;
-    (void) pal;
-#endif
-}
-
-
 #ifdef PM3D
 /*
    Check and set the cb-range for use by pm3d.
@@ -1869,37 +1825,23 @@ update_pm3d_zrange(value, pal)
 int
 set_pm3d_zminmax()
 {
+#if 0
+    printf("ENTER set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
+    printf("ENTER set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
+#endif
     if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	double cb = g_non_pm3d_min;
-	if (cb < CB_AXIS.min) /* unused cb is usually VERYLARGE */
-	    CB_AXIS.min = cb;
-	    if (CB_AXIS.min >= VERYLARGE)
-	    /* fallback, happens for "splot ... binary" and for "with ... palette */
+	/* -VERYLARGE according to AXIS_INI3D */
+	if (CB_AXIS.min >= VERYLARGE)
 	    CB_AXIS.min = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.min);
-	    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
-    } else {
-	/* Negative z: Call graph_error(), thus stop by an error message
-	 * without any plot as in the case of other negative-range-and-log
-	 * axes. Note that another possibility is to return 0 to make a plot
-	 * with disabled pm3d, but this is not useful.
-	 */
-	CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_min, "color axis");
     }
+    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
 
     if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	/* CB_AXIS.min has been initialized to -VERYLARGE
-	 * in plot3d.c:plot3drequest() */
-	double cb = g_non_pm3d_max;
-	if (cb > CB_AXIS.max) /* unused cb is usually -VERYLARGE */
-	    CB_AXIS.max = cb;
-	    if (CB_AXIS.max <= -VERYLARGE)
-	/* fallback, happens for "splot ... binary" and for "with ... palette */
+	/* -VERYLARGE according to AXIS_INI3D */
+	if (CB_AXIS.max <= -VERYLARGE)
 	    CB_AXIS.max = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.max);
-	    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
-    } else {
-	/* Negative z: see above */
-	CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_max, "color axis");
     }
+    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
 
     if (CB_AXIS.min == CB_AXIS.max) {
 	int_error(NO_CARET, "cannot display empty color axis range");
@@ -1912,11 +1854,10 @@ set_pm3d_zminmax()
 	CB_AXIS.min = tmp;
     }
 #if 0
-    printf("set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
+    printf("EXIT  set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
+    printf("EXIT  set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
 #endif
     return 1;
 }
 
 #endif /* PM3D */
-
