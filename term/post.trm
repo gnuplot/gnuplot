@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.127 2004/09/09 17:33:52 sfeam Exp $
+ * $Id: post.trm,v 1.128 2004/09/13 17:37:26 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2922,6 +2922,27 @@ TERM_PUBLIC void PS_previous_palette()
 
 #endif /* PM3D */
 
+/*
+ * The reason for having a PostScript-specific wrapper for do_arrow
+ * is that post.trm draws dotted lines for monochrome output, and
+ * dotted arrowheads are ugly.  So in that case we call do_arrow twice,
+ * the second time to retrace the head with the line style forced to solid.
+ */
+TERM_PUBLIC void PS_arrow (
+    unsigned int sx, unsigned int sy,
+    unsigned int ex, unsigned int ey,
+    int head)
+{
+    do_arrow( sx, sy, ex, ey, head );
+    if (!ps_solid && head != 0) {
+	fprintf(gpoutfile, "/SaveState Solid def /Solid true def\n");
+	PS_linetype(PS_linetype_last-3);
+	do_arrow( sx, sy, ex, ey, -head );
+	fprintf(gpoutfile, "/Solid SaveState def\n");
+	PS_linetype(PS_linetype_last-3);
+    }
+}
+
 static void
 delete_ps_fontfile(struct ps_fontfile_def *prev, struct ps_fontfile_def *this)
 {
@@ -3167,7 +3188,7 @@ TERM_TABLE_START(post_driver)
     PS_VTIC, PS_HTIC, PS_options, PS_init, PS_reset, 
     PS_text, null_scale, PS_graphics, PS_move, PS_vector, 
     PS_linetype, PS_put_text, PS_text_angle, 
-    PS_justify_text, PS_point, do_arrow, PS_set_font, PS_pointsize,
+    PS_justify_text, PS_point, PS_arrow, PS_set_font, PS_pointsize,
     TERM_BINARY|TERM_IS_POSTSCRIPT /*flags*/, 
     0 /*suspend*/, 0 /*resume*/, PS_fillbox, PS_linewidth
 #ifdef USE_MOUSE

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.83 2004/08/21 20:58:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.84 2004/08/31 13:25:04 persquare Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1013,7 +1013,7 @@ static void
 do_arrow(
     unsigned int sx, unsigned int sy,	/* start point */
     unsigned int ex, unsigned int ey,	/* end point (point of arrowhead) */
-    int head)
+    int headstyle)
 {
     struct termentry *t = term;
     float len_tic = ((double) (t->h_tic + t->v_tic)) / 2.0;
@@ -1026,6 +1026,7 @@ do_arrow(
     gpiPoint filledhead[5];
 #endif
     int xm = 0, ym = 0;
+    int head = (head < 0) ? -headstyle : headstyle;
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,
@@ -1128,6 +1129,10 @@ do_arrow(
 	    }
 	}
     }
+
+    if (headstyle < 0)
+	return;
+    
     /* Draw the line for the arrow. */
     if ( (head == 2) &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )

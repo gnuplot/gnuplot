@@ -6,6 +6,14 @@
 	combination of two.  Thanks to Daniel Sebald for identifying that it
 	needed an update.
 
+	* src/term.c (do_arrow): Interpret (head < 0) as "draw arrowhead only".
+	This allows us to retrace the arrowhead in a different linestyle if
+	necessary.
+
+	* term/post.trm (PS_arrow): Add a wrapper for the do_arrow() routine
+	so that if the current linestyle is dashed we can retrace the arrowhead
+	with a solid line. Addresses bug report #963213.
+
 2004-09-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c: Rework the layout of the df_bin_default_columns
