@@ -1,5 +1,8 @@
 2004-03-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/gplt_x11.c: References to pipe_died must be surrounded by
+	#ifdef PIPE_IPC.
+
 	* config/config.os2: #undefine HAVE_STDBOOL_H and HAVE__BOOL.
 
 2004-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.90 2004/03/24 02:20:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.91 2004/03/24 19:28:21 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -3437,7 +3437,11 @@ process_event(XEvent *event)
 		}
 		return;
 	    case 'm': /* Toggle mouse display, but only if we control the window here */
-		if (plot != current_plot || pipe_died) {
+		if (plot != current_plot
+#ifdef PIPE_IPC
+		    || pipe_died
+#endif
+		   ) {
 		    plot->mouse_on = !(plot->mouse_on);
 		    DisplayCoords(plot,plot->mouse_on ? " " : "");
 		}
@@ -3705,7 +3709,11 @@ process_event(XEvent *event)
 	    if (!XQueryPointer(dpy, event->xmotion.window, &root, &child, &root_x, &root_y, &pos_x, &pos_y, &keys_buttons))
 		break;
 
-	    if (plot == current_plot && !pipe_died) {
+	    if (plot == current_plot
+#ifdef PIPE_IPC
+		&& !pipe_died
+#endif
+	       ) {
 		Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
