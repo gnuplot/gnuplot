@@ -1,8 +1,0 @@
-/*
- * The JPEG terminal is handled by gd.trm
- * This file is just a place-holder to facilitate
- * auto-generation of the help files.
- */
-#define   HAVE_JPEG
-#define   JPEG_HELP_ONLY
-#include "gd.trm"
