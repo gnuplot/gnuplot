@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.74 2002/08/30 20:18:26 sfeam Exp $
+ * $Id: post.trm,v 1.75 2002/09/02 21:03:28 mikulik Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -157,9 +157,11 @@ static TBOOLEAN ps_rounded = FALSE;	/* rounded linecaps and linejoins */
 struct ps_fontfile_def {
     struct ps_fontfile_def *next;/* pointer to next fontfile in linked list */
     char *fontfile_name;
+    char *fontfile_fullname;
 };
 struct ps_fontfile_def *first_ps_fontfile = NULL;
 static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
+TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 
 
 
@@ -788,6 +790,21 @@ PS_options()
                 quote_str(new_ps_fontfile->fontfile_name, 
                           c_token, token_len(c_token));
                 gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
+		if (!deleteentry) {
+#if defined(PIPES)
+		    if ( *(new_ps_fontfile->fontfile_name) != '<' ) {
+#endif
+			new_ps_fontfile->fontfile_fullname = 
+			    fontpath_fullname(new_ps_fontfile->fontfile_name);
+			if (!new_ps_fontfile->fontfile_fullname)
+			    int_error(c_token, "Font file '%s' not found",
+				      new_ps_fontfile->fontfile_name);
+#if defined(PIPES)
+		    } else
+			new_ps_fontfile->fontfile_fullname = NULL;
+#endif
+
+		}
                 new_ps_fontfile->next = NULL;
   
                 if (first_ps_fontfile) {
@@ -866,6 +883,12 @@ PS_options()
 	struct ps_fontfile_def *curr_ps_fontfile = first_ps_fontfile;
 	unsigned int totlength = 0;
 	char *running;
+
+	if (interactive) {
+	    fprintf(stderr,"\n");
+	    PS_load_fontfiles(FALSE);
+	    fprintf(stderr,"\n");
+	}
 	
 	while (curr_ps_fontfile) {
 	    totlength += strlen(curr_ps_fontfile->fontfile_name) + 
@@ -918,7 +941,8 @@ static unsigned int ps_common_xoff, ps_common_yoff;
 
 
 TERM_PUBLIC void
-PS_load_fontfiles()
+PS_load_fontfiles(doload)
+     TBOOLEAN doload;
 {
     struct ps_fontfile_def *current_ps_fontfile=first_ps_fontfile;
     while (current_ps_fontfile) {
@@ -926,7 +950,6 @@ PS_load_fontfiles()
 	FILE *ffont;
 	char line[256];
 	char ext[4];
-	char *fullname = NULL;
 	char cmd[256];
 	char *fontname = NULL;
 #if defined(PIPES)
@@ -936,8 +959,10 @@ PS_load_fontfiles()
 	ext[0] = '\0';
 	cmd[0] = '\0';
 
-	fprintf(gpoutfile,"%%BeginProcSet: %s\n",
-		current_ps_fontfile->fontfile_name);
+	if (doload)
+	    fprintf(gpoutfile,"%%BeginProcSet: %s\n",
+		    current_ps_fontfile->fontfile_name);
+
 	/* get filename extension if no pipe (if pipe *ext=='\0') */
 #if defined(PIPES)
 	if ( *(current_ps_fontfile->fontfile_name) != '<' ) {
@@ -952,9 +977,7 @@ PS_load_fontfiles()
 	    /* make extension lowercase for comparison */
 	    lower_case(ext);
 	    
-	    /* get fullname of fontfile */
-	    fullname = fontpath_fullname(current_ps_fontfile->fontfile_name);
-	    if (!fullname)
+	    if (!current_ps_fontfile->fontfile_fullname)
 		int_error(NO_CARET, "Font file '%s' not found",
 			  current_ps_fontfile->fontfile_name);
 #if defined(PIPES)
@@ -964,7 +987,8 @@ PS_load_fontfiles()
 #if defined(PIPES)
 	    /* Pipe is given */
 	    ispipe = TRUE;
-	    ffont = popen( current_ps_fontfile->fontfile_name + 1, "r" );
+	    strcpy(cmd,current_ps_fontfile->fontfile_name + 1);
+	    ffont = popen(cmd, "r" );
 	    if ( !ffont )
 		int_error(NO_CARET, "Could not execute pipe '%s'",
 			  current_ps_fontfile->fontfile_name + 1 );
@@ -976,9 +1000,10 @@ PS_load_fontfiles()
 	    ispipe = TRUE;
 	    envcmd = getenv("GNUPLOT_TTFTOPFA");
 	    if (envcmd != NULL)
-		sprintf(cmd,envcmd,fullname);
+		sprintf(cmd,envcmd,current_ps_fontfile->fontfile_fullname);
 	    else
-		sprintf(cmd,"ttftopfa -a -e %s - 2>/dev/null",fullname);
+		sprintf(cmd,"ttf2pt1 -a -e -W 0 %s -",
+			current_ps_fontfile->fontfile_fullname);
 	    if (strlen(cmd) == 0)
 		int_error(NO_CARET, 
 			  "No command for automatic font conversion ttf->pfa defined");
@@ -997,9 +1022,10 @@ PS_load_fontfiles()
 	    ispipe = TRUE;
 	    envcmd = getenv("GNUPLOT_PFBTOPFA");
 	    if (envcmd != NULL)
-		sprintf(cmd,envcmd,fullname);
+		sprintf(cmd,envcmd,current_ps_fontfile->fontfile_fullname);
 	    else
-		sprintf(cmd,"pfbtops %s 2>/dev/null",fullname);
+		sprintf(cmd,"pfbtops %s",
+			current_ps_fontfile->fontfile_fullname);
 	    if (strlen(cmd) == 0)
 		int_error(NO_CARET, 
 			  "No command for automatic font conversion pfb->pfa defined");
@@ -1018,7 +1044,10 @@ PS_load_fontfiles()
 		int_warn(NO_CARET, 
 			 "Font file '%s' has unknown extension. Assume it is a pfa file", 
 			 current_ps_fontfile->fontfile_name);
-	    ffont = fopen(fullname, "r");
+	    ffont = fopen(current_ps_fontfile->fontfile_fullname, "r");
+	    if (!ffont)
+		int_error(NO_CARET, "Font file '%s' not found",
+			  current_ps_fontfile->fontfile_name);
 	}
 	/* read the file */
 	while (fgets(line,255,ffont)) {
@@ -1026,7 +1055,6 @@ PS_load_fontfiles()
 	    if ( (linesread == 0) && 
 		 (strstr(line,"%!PS-AdobeFont") != line) &&
 		 (strstr(line,"%!FontType1") != line) ) {
-		printf("%s\n",line);
 #if defined(PIPES)
 		if ( ispipe )
 		    int_warn(NO_CARET,
@@ -1045,9 +1073,34 @@ PS_load_fontfiles()
 		strcpy(fontname,strstr(line+1,"/")+1);
 		fnende = strstr(fontname," ");
 		*fnende = '\0';
+		/* Print font name */
+		if (!doload) {
+		    if (interactive) {
+			if (current_ps_fontfile->fontfile_fullname)
+			    fprintf(stderr, 
+				    "Font file '%s' contains the font '%s'. Location:\n   %s\n",
+				    current_ps_fontfile->fontfile_name, 
+				    fontname,
+				    current_ps_fontfile->fontfile_fullname);
+			else
+			    fprintf(stderr, 
+				    "Pipe '%s' contains the font '%s'.\n",
+				    current_ps_fontfile->fontfile_name, 
+				    fontname);
+		    }
+#if defined(PIPES)
+		    /* Stop reading font file in order to save time */
+		    /* This does not work for pipes because they give the */
+		    /* error message 'broken pipe' */
+		    if ( !ispipe )
+#endif
+			break;
+		}
 	    }
 
-	    fputs(line,gpoutfile);
+	    if (doload)
+		fputs(line,gpoutfile);
+
 	    ++linesread;
 	}
 #if defined(PIPES)
@@ -1073,14 +1126,12 @@ PS_load_fontfiles()
 		int_error(NO_CARET, "Font file '%s' is empty",
 			  current_ps_fontfile->fontfile_name);
 	}
-	fputs("%%EndProcSet\n",gpoutfile);
-	if (fullname) {
-	    free(fullname);
-	    fullname = NULL;
-	}
+	if (doload)
+	    fputs("%%EndProcSet\n",gpoutfile);
+
 	/* Computer Modern Symbol font with corrected baseline if the
 	 * font CMEX10 is embedded */
-	if ( fontname && (strcmp(fontname,"CMEX10") == 0) ) {
+	if ( doload && fontname && (strcmp(fontname,"CMEX10") == 0) ) {
 	    fputs("%%BeginProcSet: CMEX10-Baseline\n",gpoutfile);
 	    fputs("/CMEX10-Baseline /CMEX10 findfont [1 0 0 1 0 1] makefont\n",
 		  gpoutfile);
@@ -1440,7 +1491,7 @@ NULL };
 	while (*dict)
 	    fputs(*(dict++), gpoutfile);	
 
-    PS_load_fontfiles();
+    PS_load_fontfiles(TRUE);
 
     if (uses_fonts)
 	PS_RememberFont(ps_font, 1);
@@ -2961,10 +3012,23 @@ START_HELP(post)
 " list is used. See `set fontpath` for more details.",
 "",
 " For using the encapsulated font file you have to specify the font name",
-" (which normally is not the same as the file name). When using pfa or pfb",
-" fonts, you can find it out by looking into the font file. There is a line",
-" similar to \"/FontName /CMR8 def\". The middle string without the slash",
-" is the fontname, here \"CMR8\".",
+" (which normally is not the same as the file name). When embedding a",
+" font file by using the `fontfile` option in interactive mode, the ",
+" font name is printed on the screen. E.g.",
+"    Font file 'p052004l.pfb' contains the font 'URWPalladioL-Bold'. Location:",
+"    /usr/lib/X11/fonts/URW/p052004l.pfb",
+"",
+" When using pfa or pfb fonts, you can also find it out by looking into the",
+" font file. There is a line similar to \"/FontName /URWPalladioL-Bold def\".",
+" The middle string without the slash is the fontname, here",
+" \"URWPalladioL-Bold\".",
+" For TrueType fonts, this is not so easy since the font name is stored in a",
+" binary format. In addition, they often have spaces in the font names which",
+" is not supported by Type 1 fonts (in which a TrueType is converted on the",
+" fly). The font names are changed in order to eliminate the spaces in the",
+" fontnames. The easiest way to find out which font name is generated for",
+" use with Gnuplot, start Gnuplot in interactive mode and type in",
+" \"set terminal postscript fontfile '<filename.ttf>'\".",
 "",
 " For converting font files to pfa format the conversion tool has to read",
 " the font from a file and write it to standard output.",
@@ -2994,7 +3058,7 @@ START_HELP(post)
 " If the build in conversion does not",
 " work, the conversion command can be changed by the environment variable",
 " GNUPLOT_TTFTOPFA. For usage with ttf2pt1 it may be set to",
-" \"ttf2pt1 -a -e %s - 2>/dev/null\". Here again, `%s` stands for the",
+" \"ttf2pt1 -a -e -W 0 %s - \". Here again, `%s` stands for the",
 " file name.",
 "",
 " For special purposes you also can use a pipe (if available for your",

@@ -1,3 +1,8 @@
+2002-09-03  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/post.trm: (Harald Harders) Report FontName of embedded fonts.
+	* term/gd.trm: Do vertical justification based on full character cell.
+
 2002-09-02  Harald Harders  <h.harders@tu-bs.de>
 
 	* NEWS demo/fontfile.dem docs/gnuplot.doc docs/psdoc/Makefile
@@ -1051,7 +1056,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/02 21:03:13 $).
+	last modification date (from the tag $Date: 2002/09/02 21:05:18 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
