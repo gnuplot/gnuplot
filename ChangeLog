@@ -1,3 +1,17 @@
+2001-10-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.c (gen_tics): Renamed local variable `ticmin' to
+ 	`internal_min', to match its twin `internal_max' in one block.
+  	Don't round internal_{max|min} outwards if ticstep is ridiculously
+ 	large. This effectively turned off tic position clipping, and
+ 	would lead to coordinate overflow in terminal drivers.
+
+	* term/debug.trm (DEBUG_arrow): Corrected type of argument `head'
+ 	to TBOOLEAN.
+
+	* term/gif.trm (GIF_make_palette): Fix incorrect call of debug macro
+	FPRINTF().
+
 2001-10-01  Slaven Rezic  <slaven.rezic@berlin.de>
 
 	* term/tkcanvas.trm: No more warnings if running with perl -w. Take
