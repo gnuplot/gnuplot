@@ -88,7 +88,7 @@ void putrnh __PROTO((char *s, FILE * file));
 void putrnh_ __PROTO((char *s, FILE * file));
 void finish __PROTO((FILE * b));
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 1;
 
 /* We are using the fgets() replacement from termdoc.c */

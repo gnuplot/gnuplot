@@ -65,7 +65,7 @@
 #define TRUE 1
 #define FALSE 0
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 0;
 
 /* In termdoc.c */

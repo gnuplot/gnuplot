@@ -58,7 +58,7 @@
 #include "stdfn.h"
 #include "xref.h"
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 0;
 
 /* We are using the fgets() replacement from termdoc.c */

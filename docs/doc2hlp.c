@@ -63,7 +63,7 @@ static char *RCSid = "$Id: doc2hlp.c,v 1.15 1998/04/14 00:16:58 drd Exp $";
 #define TRUE 1
 #define FALSE 0
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 1;
 
 void convert __PROTO((FILE * a, FILE * b));

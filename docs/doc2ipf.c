@@ -63,7 +63,7 @@ static char *RCSid = "$Id: doc2ipf.c,v 1.20 1998/04/14 00:16:59 drd Exp $";
 #define TRUE 1
 #define FALSE 0
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 0;
 
 /* We are using the fgets() replacement from termdoc.c */

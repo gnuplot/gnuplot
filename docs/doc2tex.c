@@ -79,7 +79,7 @@ void section __PROTO((char *line, FILE * b));
 void puttex __PROTO((char *str, FILE * file));
 void finish __PROTO((FILE * b));
 
-/* Replace the previous */
+/* Replace the previous #ifdef */
 int single_top_level = 0;
 
 /* We are using the fgets() replacement from termdoc.c */

@@ -64,7 +64,7 @@ char title[256];
 void convert __PROTO((FILE *, FILE *));
 void process_line __PROTO((char *, FILE *));
 
-/* Replase the previous #ifdef */
+/* Replace the previous #ifdef */
 int single_top_level = 0;
 
 /* We are using the fgets() replacement from termdoc.c */
