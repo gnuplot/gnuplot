@@ -37,8 +37,10 @@ VPATH = @srcdir@
 
 HELPFILE=$(datadir)/gnuplot.gih
 
+DESTDIR = 
+
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 
@@ -138,6 +140,8 @@ ACLOCAL_AMFLAGS = -I m4
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 CONFIG_HEADER_IN = config.hin
 CONFIG_HEADER = config.h
+CONFIG_CLEAN_FILES =
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 GZIP = --best
 TAR = tar
 ####################################################################
@@ -331,7 +335,7 @@ DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
 LISP =  $(E)ChangeLog $(E)Makefile.dst $(E)Makefile.in $(E)README \
 	$(E)aclocal.m4 $(E)configure $(E)configure.in $(E)dot.el \
 	$(E)dotemacs $(E)gnuplot-gui.el $(E)gnuplot.el $(E)gpelcard.tex \
-	$(E)info-look.20.2.el $(E)info-look.20.3.el $(E)old/gnuplot.el
+	$(E)info-look.20.2.el $(E)info-look.20.3.el $(E)gnuplot.el.old
 
 #########################################################################
 # Simple Dependencies
@@ -365,9 +369,9 @@ OBJS = $(COREOBJS) @NEXTOBJS@
 ################################################################
 
 install: all $(LASERGNU)
-	$(srcdir)/mkinstalldirs $(bindir)
-	$(srcdir)/mkinstalldirs $(datadir)
-	$(srcdir)/mkinstalldirs $(mandir)/man1
+	$(mkinstalldirs) $(bindir)
+	$(mkinstalldirs) $(datadir)
+	$(mkinstalldirs) $(mandir)/man1
 	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
 	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
 	test ! -f beos/gnuplot_be || $(INSTALL_PROGRAM) beos/gnuplot_be $(bindir)/gnuplot_be
@@ -376,6 +380,8 @@ install: all $(LASERGNU)
 	@LINUXSUID@
 
 lasergnu_install: lasergnu docs/lasergnu.1
+	$(mkinstalldirs) $(bindir)
+	$(mkinstalldirs) $(mandir)/man1
 	$(INSTALL_SCRIPT) $(srcdir)/lasergnu $(bindir)/lasergnu
 	$(INSTALL_DATA) $(srcdir)/docs/lasergnu.1 $(mandir)/man1/lasergnu.1
 
@@ -435,13 +441,6 @@ $(COREOBJS) version.o bf_test.o : $(CONFIG_HEADER)
 
 ################################################################
 # Autoconfig rules
-#
-# I have enabled these rules, because missing autoconf and
-# automake tools are now detected by configure and dealt with.
-
-# This rule is disabled because we have no Makefile.am
-#$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-#	cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile
 
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
@@ -480,26 +479,26 @@ DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS) $(LISP)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
 	  NeXT/English.lproj/gnuview.nib beos demo docs docs/latextut \
-	docs/old docs/psdoc lisp lisp/old m4 os2 term win
+	docs/old docs/psdoc lisp m4 os2 term win
 
 clean:
 	-rm -f gnuplot gnuplot_x11 bf_test *.o core *~
 	-rm -f gnuplot.exe gnuplot_x11.exe bf_test.exe
 	-rm -f demo/binary? demo/temp.set demo/defaults.ini demo/fit.log \
 	  demo/soundfit.par
-	cd beos && $(MAKE) $(MFLAGS) clean
-	cd docs && $(MAKE) $(MFLAGS) clean
-	cd lisp && $(MAKE) $(MFLAGS) clean
+	-cd beos && $(MAKE) $(MFLAGS) clean
+	-cd docs && $(MAKE) $(MFLAGS) clean
+	-cd lisp && $(MAKE) $(MFLAGS) clean
 
 mostlyclean: clean
 
 distclean: clean
-	cd beos && $(MAKE) $(MFLAGS) distclean
-	cd docs && $(MAKE) $(MFLAGS) distclean
-	cd lisp && $(MAKE) $(MFLAGS) distclean
+	-cd beos && $(MAKE) $(MFLAGS) distclean
+	-cd docs && $(MAKE) $(MFLAGS) distclean
+	-cd lisp && $(MAKE) $(MFLAGS) distclean
 	-rm -f Makefile config.status config.cache $(CONFIG_HEADER) \
 	  config.log stamp-h
-	test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
+	@test "$(srcdir)" = "$(top_builddir)" || rm -rf docs term
 
 realclean: distclean
 	-rm -f TAGS docs/TAGS
