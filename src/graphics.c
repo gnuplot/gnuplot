@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.139 2004/12/05 08:04:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.140 2004/12/31 23:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -235,14 +235,14 @@ find_maxl_keys(struct curve_points *plots, int count, int *kcnt)
     this_plot = plots;
     for (curve = 0; curve < count; this_plot = this_plot->next, curve++) {
 	if (this_plot->title && !this_plot->title_is_suppressed) {
-	    ignore_enhanced_text = this_plot->title_no_enhanced;
+	    ignore_enhanced(this_plot->title_no_enhanced);
 	    len = estimate_strlen(this_plot->title);
 	    if (len != 0) {
 		cnt++;
 		if (len > mlen)
 		    mlen = len;
 	    }
-	    ignore_enhanced_text = 0;
+	    ignore_enhanced(FALSE);
 	}
 #ifdef EAM_HISTOGRAMS
 	/* Check for new histogram here and save space for divider */
@@ -1545,7 +1545,7 @@ do_plot(struct curve_points *plots, int pcount)
 	if (this_plot->title && !*this_plot->title) {
 	    localkey = FALSE;
 	} else {
-	    ignore_enhanced_text = this_plot->title_no_enhanced == 1;
+	    ignore_enhanced(this_plot->title_no_enhanced);
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title && !this_plot->title_is_suppressed) {
 		key_count++;
@@ -1553,7 +1553,7 @@ do_plot(struct curve_points *plots, int pcount)
 		    yl = keybox.yb + yl_ref + key_entry_height/2 - yl;
 		do_key_sample(this_plot, key, this_plot->title, t, xl, yl);
 	    }
-	ignore_enhanced_text = 0;
+	    ignore_enhanced(FALSE);
 	}
 
 	/* and now the curves, plus any special key requirements */

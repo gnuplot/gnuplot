@@ -1,3 +1,12 @@
+2005-01-04  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/term.c src/term_api.h: Instead of exporting ignore_enhanced_text
+	from term.c as a global TBOOLEAN, provide a wrapper routine
+	ignore_enhanced(TBOOLEAN flag);
+
+	* src/graphics.c (do_plot) src/graph3d.c (do_3dplot): Call new routine
+	ignore_enhanced() rather than directly setting a variable inside term.c.
+
 2005-01-04  Bastian Maerkisch  <bmaerkisch@web.de>
 
 	* src/os2/gclient.c: Contains my attempt to implement pattern filling

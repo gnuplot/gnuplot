@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.107 2004/11/22 01:38:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.108 2004/12/31 23:02:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -898,9 +898,9 @@ do_3dplot(
 	    if (lkey) {
 	    	/* EAM - force key text to black, then restore */
 		(*t->linetype)(LT_BLACK);
-		ignore_enhanced_text = this_plot->title_no_enhanced == 1;
+		ignore_enhanced(this_plot->title_no_enhanced);
 		key_text(xl, yl, this_plot->title);
-		ignore_enhanced_text = 0;
+		ignore_enhanced(FALSE);
 		term_apply_lp_properties(&(this_plot->lp_properties));
 	    }
 

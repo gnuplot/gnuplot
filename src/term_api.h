@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.38 2004/12/31 06:12:55 sfeam Exp $
+ * $Id: term_api.h,v 1.39 2004/12/31 23:02:46 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -351,7 +351,7 @@ void test_term __PROTO((void));
 
 /* flag: don't use enhanced output methods --- for output of
  * filenames, which usually looks bad using subscripts */
-extern TBOOLEAN ignore_enhanced_text;
+void ignore_enhanced __PROTO((TBOOLEAN flag));
 
 #ifdef LINUXVGA
 void LINUX_setup __PROTO((void));

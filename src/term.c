@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.92 2004/12/01 21:10:38 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.93 2004/12/31 23:02:46 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -133,9 +133,6 @@ TBOOLEAN term_initialised;
 /* true if in multiplot mode */
 TBOOLEAN multiplot = FALSE;
 
-/* flag variable to disable enhanced output of filenames, mainly */
-TBOOLEAN ignore_enhanced_text = FALSE;
-
 /* text output encoding, for terminals that support it */
 enum set_encoding_id encoding;
 /* table of encoding names, for output of the setting */
@@ -185,6 +182,9 @@ static TBOOLEAN term_force_init = FALSE;
 
 /* internal pointsize for do_point */
 static double term_pointsize=1;
+
+/* flag variable to disable enhanced output of filenames, mainly */
+static TBOOLEAN ignore_enhanced_text = FALSE;
 
 /* Internal prototypes: */
 
@@ -2560,4 +2560,10 @@ int len;
 	len = strlen(text);
 
     return len;
+}
+
+void
+ignore_enhanced(TBOOLEAN flag)
+{
+    ignore_enhanced_text = flag;
 }
