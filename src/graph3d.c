@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.26.2.11 2000/10/29 15:37:35 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.33 2000/11/01 18:57:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -106,7 +106,6 @@ WHICHGRID whichgrid = ALLGRID;
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot, /* FIXME PM3D: */ int p_type));
-static void plot3d_dots __PROTO((struct surface_points * plot));
 #ifdef PM3D
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));

@@ -42,6 +42,7 @@
 #include "pm3d.h"
 #include "graphics.h"
 #include "term_api.h"
+#include "util3d.h"
 /* need to access used_pm3d_zmin, used_pm3d_zmax; */
 
 /* COLOUR MODES - GLOBAL VARIABLES */
@@ -143,7 +144,8 @@ make_palette(void)
        in the future, i.e. multiplots with various colour schemes?
      */
 #endif
-    sm_palette.color = malloc( sm_palette.colors * sizeof(rgb_color) );
+    sm_palette.color = gp_alloc(sm_palette.colors * sizeof(rgb_color),
+				"pm3d palette color");
 
     for (i = 0; i < sm_palette.colors; i++) {
 	gray = (double)i / (sm_palette.colors - 1); /* rescale to [0;1] */
@@ -189,7 +191,7 @@ static void filled_polygon ( int points, gpdPoint *corners )
 {
     int i;
     gpiPoint *icorners;
-    icorners = malloc(points * sizeof(gpiPoint));
+    icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon corners");
     for (i = 0; i < points; i++)
 	map3d_xy(corners[i].x, corners[i].y, corners[i].z,
 	    &icorners[i].x, &icorners[i].y);
@@ -208,12 +210,13 @@ static void filled_polygon ( int points, gpdPoint *corners )
  * This is the only routine which supportes extended
  * color specs currently.
  */
-void
-filled_quadrangle(gpdPoint *corners
 #ifdef EXTENDED_COLOR_SPECS
-    , gpiPoint* icorners
+void
+filled_quadrangle(gpdPoint *corners, gpiPoint *icorners)
+#else
+void 
+filled_quadrangle(gpdPoint *corners)
 #endif
-		 )
 {
     int i;
 #ifndef EXTENDED_COLOR_SPECS
@@ -252,7 +255,7 @@ void filled_polygon_3dcoords ( int points, struct coordinate GPHUGE *coords )
 {
     int i;
     gpiPoint *icorners;
-    icorners = malloc(points * sizeof(gpiPoint));
+    icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon3d corners");
     for (i = 0; i < points; i++)
 	map3d_xy(coords[i].x, coords[i].y, coords[i].z,
 	    &icorners[i].x, &icorners[i].y);
@@ -274,7 +277,7 @@ void filled_polygon_3dcoords_zfixed ( int points, struct coordinate GPHUGE *coor
 {
     int i;
     gpiPoint *icorners;
-    icorners = malloc(points * sizeof(gpiPoint));
+    icorners = gp_alloc(points * sizeof(gpiPoint), "filled_polygon_zfix corners");
     for (i = 0; i < points; i++)
 	map3d_xy(coords[i].x, coords[i].y, z,
 	    &icorners[i].x, &icorners[i].y);

@@ -1,5 +1,5 @@
 /*
- * $Id: hidden3d.h,v 1.4 2000/10/31 19:59:31 joze Exp $
+ * $Id: hidden3d.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - hidden3d.h */
@@ -53,7 +53,6 @@
 void set_hidden3doptions __PROTO((void));
 void show_hidden3doptions __PROTO((void));
 void save_hidden3doptions __PROTO((FILE *fp));
-void map3d_xyz __PROTO((double x, double y, double z, p_vertex v));
 #ifndef LITE
 void init_hidden_line_removal __PROTO((void));
 void reset_hidden_line_removal __PROTO((void));

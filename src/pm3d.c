@@ -122,7 +122,7 @@ pm3d_rearrange_part(struct iso_curve* src, const int len, struct iso_curve*** de
        Scans are sorted in scan_array according to pm3d.direction (this can
        be PM3D_SCANS_FORWARD or PM3D_SCANS_BACKWARD).
      */
-    scan_array = *dest = malloc(len * sizeof(scanA));
+    scan_array = *dest = gp_alloc(len * sizeof(scanA), "pm3d scan array");
 
     if (pm3d.direction == PM3D_SCANS_AUTOMATIC) {
 	int cnt;

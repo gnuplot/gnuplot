@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.9 2000/11/01 20:37:47 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.10 2000/11/02 15:13:38 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -581,14 +581,14 @@ do_zoom(double xmin, double ymin, double x2min, double y2min, double xmax, doubl
 {
     struct t_zoom *z;
     if (zoom_head == NULL) {	/* queue not yet created, thus make its head */
-	zoom_head = malloc(sizeof(struct t_zoom));
+	zoom_head = gp_alloc(sizeof(struct t_zoom), "mouse zoom history head");
 	zoom_head->prev = NULL;
 	zoom_head->next = NULL;
     }
     if (zoom_now == NULL)
 	zoom_now = zoom_head;
     if (zoom_now->next == NULL) {	/* allocate new item */
-	z = malloc(sizeof(struct t_zoom));
+	z = gp_alloc(sizeof(struct t_zoom), "mouse zoom history element");
 	z->prev = zoom_now;
 	z->next = NULL;
 	zoom_now->next = z;

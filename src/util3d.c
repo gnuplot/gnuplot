@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.11 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.12 2000/11/01 18:57:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -49,7 +49,7 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.11 2000/10/31 19:59:31 jo
 
 #include "axis.h"
 #include "hidden3d.h"
-/*  #include "setshow.h" */
+#include "pm3d.h"
 #include "term_api.h"
 
 /* HBB 990826: all that stuff referenced from other modules is now

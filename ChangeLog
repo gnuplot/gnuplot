@@ -1,3 +1,27 @@
+2000-02-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/color.c (make_palette, filled_polygon)
+	(filled_polygon_3dcoords, filled_polygon_3dcoords_zfixed):
+	use gp_alloc(), not malloc()
+	* src/command.c (winsystem): dito.
+	* src/gpexecute.inc (gpe_front, gpe_push): dito.
+	* src/mouse.c (do_zoom): dito
+	* src/pm3d.c (pm3d_rearrange_part): dito.
+	
+	* src/color.h: __PROTO()'ize all the prototypes.
+
+	* src/color.c: include util3d.h for map3d_xyz()
+
+	* src/color.c (filled_quadrangle): move #ifdef
+ 	EXTENDED_COLOR_SPECS to outside the function definition.
+	* src/color.h: dito.
+	
+	* src/graph3d.c: remove plot3d_dots prototype
+
+	* src/hidden3d.h: remove map3d_xyz prototype
+
+	* src/util3d.c: include pm3d.h for set_color()
+
 2000-11-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gadgets.c (draw_clip_line): fixed bug in argument ordering

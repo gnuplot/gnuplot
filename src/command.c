@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.42 2000/10/31 19:59:30 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.43 2000/11/01 18:57:27 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2165,7 +2165,8 @@ winsystem(char *s)
 	/* attempt to run the windows/dos program via windows */
 	if (WinExec(s, SW_SHOWNORMAL) <= 32) {
 	    /* attempt to run it as a dos program from command line */
-	    execstr = (char *) malloc(strlen(s) + strlen(comspec) + 6);
+	    execstr = gp_alloc(strlen(s) + strlen(comspec) + 6,
+			       "winsystem cmdline");
 	    strcpy(execstr, comspec);
 	    strcat(execstr, " /c ");
 	    strcat(execstr, s);

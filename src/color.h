@@ -215,7 +215,7 @@ extern color_box_struct color_box;
   Make the colour palette. Return 0 on success
   Put number of allocated colours into sm_palette.colors
 */
-int make_palette();
+int make_palette __PROTO((void));
 
 /*
    Set the colour on the terminal
@@ -223,41 +223,41 @@ int make_palette();
    so there is not much to do here---well, except for reversing the gray
    according to sm_palette.positive == SMPAL_POSITIVE or SMPAL_NEGATIVE
 */
-void set_color ( double gray );
+void set_color __PROTO(( double gray ));
 
 #if 0
 /*
    Makes mapping from real 3D coordinates to 2D terminal coordinates,
    then draws filled polygon
 */
-static void filled_polygon ( int points, gpdPoint *corners );
+static void filled_polygon __PROTO((int points, gpdPoint *corners));
 #endif
 
 /*
    The routine above for 4 points explicitly
 */
-void filled_quadrangle(gpdPoint *corners
 #ifdef EXTENDED_COLOR_SPECS
-    , gpiPoint* icorners
+void filled_quadrangle __PROTO((gpdPoint *corners, gpiPoint* icorners));
+#else
+void filled_quadrangle __PROTO((gpdPoint *corners));
 #endif
-    );
 
 /*
    Makes mapping from real 3D coordinates, passed as coords array,
    to 2D terminal coordinates, then draws filled polygon
 */
-void filled_polygon_3dcoords ( int points, struct coordinate *coords );
+void filled_polygon_3dcoords __PROTO((int points, struct coordinate *coords));
 
 /*
    Makes mapping from real 3D coordinates, passed as coords array, but at z coordinate
    fixed (base_z, for instance) to 2D terminal coordinates, then draws filled polygon
 */
-void filled_polygon_3dcoords_zfixed ( int points, struct coordinate GPHUGE *coords, double z );
+void filled_polygon_3dcoords_zfixed __PROTO((int points, struct coordinate GPHUGE *coords, double z));
 
 /*
   Draw colour smooth box
 */
-void draw_color_smooth_box();
+void draw_color_smooth_box __PROTO((void));
 
 
 /* in getcolor.c */

@@ -153,7 +153,7 @@ void gp_execute(char *s)
 gpe_fifo_t*
 gpe_init(void)
 {
-    gpe_fifo_t* base = malloc(sizeof(gpe_fifo_t));
+    gpe_fifo_t* base = gp_alloc(sizeof(gpe_fifo_t), "gpexec fifo base");
     /* fprintf(stderr, "(gpe_init) \n"); */
     assert(base);
     base->next = (gpe_fifo_t*) 0;
@@ -165,7 +165,7 @@ gpe_push(gpe_fifo_t** base, struct gp_event_t* ge)
 {
     buffered_output_pending++;
     if ((*base)->prev) {
-	gpe_fifo_t* new = malloc(sizeof(gpe_fifo_t));
+	gpe_fifo_t* new = gp_alloc(sizeof(gpe_fifo_t), "gpexec fifo next");
 	/* fprintf(stderr, "(gpe_push) \n"); */
 	assert(new);
 	(*base)->prev->next = new;
