@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.69 2003/03/21 17:47:17 mikulik Exp $
+ * $Id: x11.trm,v 1.70 2003/05/11 00:29:08 sfeam Exp $
  *
  */
 
@@ -481,6 +481,10 @@ X11_waitforinput()
 		     * error occurs), so need to reset l first */
 		    l = 0;
 		    do_event(&ge);
+		    if (ge.type == GE_fontprops) {
+		    	FPRINTF((stderr,"X11_waitforinput: break on GE_fontprops\n"));
+			return(GE_fontprops);
+		    }
 		}
 	    }
 	} while (!FD_ISSET(fd, &fds));
@@ -898,10 +902,16 @@ X11_graphics()
 	last_encoding = encoding;
     }
 
-    /* EAM 20-Aug 2002 - Force default font before start of plot */
+    /* Force default font at start of plot */
     X11_set_default_font(); 
     X11_set_font("");
-
+#ifdef USE_MOUSE
+    /* EAM June 2003 - Flush the set font command through the pipe */
+    /* to gnuplot_x11, then wait for it to return the resulting    */
+    /* font size information (v_char and h_char).                  */
+    FFLUSH();
+    X11_waitforinput();
+#endif
 }
 
 TERM_PUBLIC void

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.36 2003/05/06 17:09:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.37 2003/06/09 13:25:25 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -1751,6 +1751,12 @@ do_event(struct gp_event_t *ge)
 	break;
     case GE_reset:
 	event_reset(ge);
+	break;
+    case GE_fontprops:
+	term->h_char = ge->par1;
+	term->v_char = ge->par2;
+	FPRINTF((stderr, "mouse do_event: font hchar %d vchar %d\n",
+		ge->par1,ge->par2));
 	break;
     default:
 	fprintf(stderr, "%s:%d protocol error\n", __FILE__, __LINE__);

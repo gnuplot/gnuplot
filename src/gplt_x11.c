@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.57 2003/04/25 03:23:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.58 2003/05/23 16:09:47 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -470,7 +470,11 @@ static Bool Mono = 0, Gray = 0, Rv = 0, Clear = 0;
 static char Name[64] = "gnuplot";
 static char Class[64] = "Gnuplot";
 
-static int cx = 0, cy = 0, vchar;
+static int cx = 0, cy = 0;
+
+/* Font characteristics held locally but sent back via pipe to x11.trm */
+static int vchar,hchar;
+
 /* Speficy negative values as indicator of uninitialized state */
 static double xscale = -1.;
 static double yscale = -1.;
@@ -1052,7 +1056,6 @@ read_input()
 	buf_offset = 0;
 
     if (!buffered_input_available) {
-/* fcntl(fd,F_SETFL,O_NONBLOCK); */
 	total_chars = read(fd, rdbuf, rdbuf_size);
 	buffered_input_available = 1;
 	partial_read = 0;
@@ -1426,6 +1429,28 @@ record()
 	    }
 	    return 1;
 #endif
+#ifdef USE_MOUSE
+	case 'Q':		
+	    /* Set default font immediately and return size through pipe */
+	    if (buf[1] == 'D') {
+		int scaled_hchar, scaled_vchar;
+		char *c = &(buf[strlen(buf)-1]);
+		while (*c <= ' ') *c-- = '\0';
+		strncpy(default_font,&buf[2],strlen(&buf[2])+1);
+		pr_font(NULL);
+		/* EAM FIXME - this is all out of order; initialization doesnt */
+		/*             happen until term->graphics() is called.        */
+		xscale = (plot->width > 0) ? plot->width / 4096. : gW / 4096.;
+		yscale = (plot->height > 0) ? plot->height / 4096. : gH / 4096.;
+		scaled_hchar = (1.0/xscale) * hchar;
+		scaled_vchar = (1.0/yscale) * vchar;
+		FPRINTF((stderr,"gplt_x11: preset default font to %s hchar = %d vchar = %d \n", 
+			default_font, scaled_hchar, scaled_vchar));
+		gp_exec_event(GE_fontprops, 0, 0, scaled_hchar, scaled_vchar);
+	        continue;
+	    }
+	    /* fall through */
+#endif
 	default:
 	    store_command(buf, plot);
 	    continue;
@@ -1631,7 +1656,6 @@ exec_cmd(plot_struct *plot, char *command)
     else if (*buffer == 'M')
 	sscanf(buffer, "M%4d%4d", &cx, &cy);
 
-    /* EAM - Aug 2002 I hope 'Q' wasn't reserved for another use!   */
     /* change default font (QD) encoding (QE) or current font (QF)  */
     else if (*buffer == 'Q') {
 	char *c;
@@ -1657,7 +1681,7 @@ exec_cmd(plot_struct *plot, char *command)
 		c = &(buffer[strlen(buffer)-1]);
 		while (*c <= ' ') *c-- = '\0';
 		strncpy(default_font,&buffer[2],strlen(&buffer[2])+1);
-		FPRINTF((stderr,"gnuplot_x11: set default_font to \"%s\"\n",default_font));
+		FPRINTF((stderr,"gnuplot_x11: exec_cmd() set default_font to \"%s\"\n",default_font));
 		break;
 	}
     }
@@ -3663,7 +3687,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 #endif /* PM3D */
 
     pr_geometry();
-    pr_font(NULL);		/* set default font */
+    pr_font(NULL);		/* set current font to default font */
     pr_color(&cmap);		/* set colors for default colormap */
     pr_width();
     pr_dashes();
@@ -3953,9 +3977,12 @@ gnuplot: no useable font - X11 aborted.\n", FallbackFont);
 	} else
 	    fontname = FallbackFont;
     }
-    FPRINTF((stderr,"gnuplot_x11: set font %s\n",fontname));
 
     vchar = font->ascent + font->descent;
+    hchar = XTextWidth(font, "0123456789", 10) / 10;
+
+    FPRINTF((stderr,"gnuplot_x11: pr_font() set font %s, vchar %d hchar %d\n",
+		fontname,vchar,hchar));
 }
 
 /*-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.91 2003/05/17 05:59:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.92 2003/06/16 04:34:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1168,19 +1168,23 @@ do_plot(plots, pcount)
     if (Y_AXIS.min == Y_AXIS.max)
 	int_error(NO_CARET, "y_min should not equal y_max!");
 
+    /* EAM June 2003 - Although the comment below implies that font dimensions
+     * are known after term_init(), this is not true at least for the X11
+     * driver.  X11 fonts are not set until an actual display window is
+     * opened, and that happens in term->graphics(), which is called from
+     * term_start_plot().
+     */
     term_init();		/* may set xmax/ymax */
+    term_start_plot();
 
     /* compute boundary for plot (xleft, xright, ytop, ybot)
      * also calculates tics, since xtics depend on xleft
-     * but xleft depends on ytics. Boundary calculations
-     * depend on term->v_char etc, so terminal must be
-     * initialised.
+     * but xleft depends on ytics. Boundary calculations depend
+     * on term->v_char etc, so terminal must be initialised first.
      */
     boundary(plots, pcount);
 
     screen_ok = FALSE;
-
-    term_start_plot();
 
 /* DRAW TICS AND GRID */
     if (grid_layer == 0 || grid_layer == -1)

@@ -1,4 +1,18 @@
-2003-06-15  Ethan Merritt <merritt@u.washington.edu>
+2003-06-19  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c src/graphics.c src/mouse.c src/mousecmn.h term/x11.trm
+	Use existing mouse communication pipe to send X11 font characteristics 
+	back from gnuplot_x11 to x11.trm. This allows gnuplot to lay out the 
+	plot with v_char and h_char sizes that are correct for the current 
+	default X11 font. This patch slightly changes the timing of initial
+	operations over the pipe, and adds a FFLUSH(), so there is a remote 
+	possibility that it also fixes a reported problem in which gnuplot_x11
+	eats CPU cycles while supposedly idle. This patch should have no effect
+	if gnuplot is configured with --disable-mouse.
+
+	* term/pslatex.trm: Escape % to %% inside printf() statement.
+
+2003-06-18  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/gd.h: Fix FPRINTF typo.
 
