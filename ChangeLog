@@ -1,3 +1,42 @@
+1999-06-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Add test for strcspn().
+
+	* src/Makefile.am: stdfn.c not required for gnuplot_x11 anymore.
+
+	* src/Makefile.maint, src/show.c, src/version.c: Rename version to
+	gnuplot_version, rename patchlevel and date accordingly.
+
+	* src/binary.c, src/bitmap.c, src/command.c, src/contour.c,
+	src/datafile.c, src/eval.c, src/fit.c, src/graphics.c, src/hidden3d.c,
+	src/misc.c, src/parse.c, src/plot2d.c, src/plot3d.c, src/readline.c,
+	src/scanner.c, src/set.c, src/setshow.h, src/util.c, src/util.h:
+	Don't cast first arg to gp_alloc() and second arg to gp_realloc().
+	Change some declarations from int to size_t, add const qualifiers.
+
+	* src/fit.c, src/fit.h: New variadic function Dblfn() to replace
+	Dblf*() defines.
+
+	* src/gplt_x11.c: Back to use strncpy() instead of safe_strncpy(), so
+	that we don't need to link with stdfn.o.
+
+	* src/help.c: Use strcspn() instead of instring(). Fix bug in row
+	sorting part in ShowSubtopics().
+
+	* src/matrix.c: Include plot.h.
+
+	* src/misc.c: Remove instring() function.
+
+	* src/plot.c, src/plot.h: Replace IO_ERROR/IO_SUCCESS with
+	EXIT_FAILURE/EXIT_SUCCESS, resp.
+
+	* src/protos.h: Add prototype for gp_strcspn().
+
+	* src/stdfn.c, src/stdfn.h: Add new function gp_strcspn() as
+	replacement for instring().
+
+	* term/*.trm: Prepare function definitions for transition to ANSI C.
+
 1999-06-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Add check for strdup().
@@ -19,14 +58,22 @@
 
 	* src/graphics.c(write_multiline): Do not mangle the char *text
 	argument. With this change, write_multiline() can operate on text
-	strings directly without the need to use temporary storage.
+	strings directly without the need to use temporary storage. Let it
+	return directly if text string is NULL or empty.
 
 	* src/graphics.c(label_width): Make char lab[] dynamic.
 
-	* src/help.c, src/misc.c, src/plot.c, src/variable.c: Use new
-	gp_strdup() function.
+	* src/help.c, src/misc.c, src/plot.c, src/readline.c, src/term.c,
+	src/variable.c: Use new gp_strdup() function.
+
+	* src/help.c(ShowSubtopics): Fix bug in M. Gardner's help formatting
+	patch.
 
 	* src/util.c: New gp_strdup() function, uses strdup() if available.
+
+1999-06-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/hidden3d.c: Fix bug in 3d plot positioning.
 
 1999-06-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -49,7 +96,7 @@
 
 	* src/protos.h: Move graphics.c function prototypes to graphics.h.
 
-	* src/variable.h: Remove superflous ';'.
+	* src/variable.h: Remove superfluous ';'.
 
 1999-06-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
