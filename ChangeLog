@@ -1,3 +1,7 @@
+2004-06-16  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/save.c: Save log cb axis (bugfix).
+
 2004-06-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Do not start zooming during 'pause mouse'.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.74 2004/04/07 11:14:50 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.75 2004/04/13 17:23:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -485,6 +485,7 @@ set y2data%s\n",
     SAVE_LOG(SECOND_X_AXIS);
     SAVE_LOG(SECOND_Y_AXIS);
     SAVE_LOG(FIRST_Z_AXIS );
+    SAVE_LOG(COLOR_AXIS );
 #undef SAVE_LOG
 
     /* FIXME */
