@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.50 2002/09/27 00:12:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.51 2002/09/30 00:52:22 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -1657,10 +1657,6 @@ exec_cmd(plot_struct *plot, char *command)
  *	2) write text to (*current_gc), rather than to gc, so that text color can be set
  *	   using pm3d mappings.
  */
-#ifdef EAM_OLD_CODE
-	/* switch to text color */
-	XSetForeground(dpy, gc, plot->cmap->colors[2]);
-#endif
 
 	switch (plot->jmode) {
 	    case LEFT:
@@ -1674,7 +1670,10 @@ exec_cmd(plot_struct *plot, char *command)
 		break;
 	}
 
-	if (plot->angle != 0) {
+ 	/* EAM - empty string causes DrawRotated to crash, and is pointless anyhow */
+	if (sl == 0)
+	    ;
+	else if (plot->angle != 0) {
 	    /* rotated text */
 	    DrawRotated(dpy, plot->pixmap, *current_gc, X(x), Y(y),
 		    str, sl, plot->angle, plot->jmode);
@@ -1684,10 +1683,6 @@ exec_cmd(plot_struct *plot, char *command)
 		    X(x) + sw, Y(y) + vchar / 3, str, sl);
 	}
 
-#ifdef EAM_OLD_CODE
-	/* restore line color */
-	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-#endif
     } else if (*buffer == 'F') {	/* fill box */
 	int style, xtmp, ytmp, w, h;
 
