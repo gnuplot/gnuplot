@@ -325,8 +325,8 @@ void clip_put_text_just __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VE
 void clip_move __PROTO((unsigned int x, unsigned int y));
 void clip_vector __PROTO((unsigned int x, unsigned int y));
 
-/* Common routines for setting text color from t_colorspec */
-void apply_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
+/* Common routines for setting line or text color from t_colorspec */
+void apply_pm3dcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
 void reset_textcolor __PROTO((const struct t_colorspec *tc, const struct termentry *t));
 
 extern fill_style_type default_fillstyle;

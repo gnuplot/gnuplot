@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.50 2004/11/01 01:17:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.51 2004/11/22 00:43:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -428,7 +428,7 @@ cbtick_callback(
 			 &offsetx, &offsety, "cbtics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	if (color_box.rotation == 'h') {
 	    int y3 = cb_y_from - (term->v_char);
 	    if (len > 0) y3 -= len; /* add outer tics len */
@@ -600,7 +600,7 @@ draw_color_smooth_box(int plot_mode)
     /* write the colour box label */
     if (*CB_AXIS.label.text) {
 	int x, y;
-	apply_textcolor(&(CB_AXIS.label.textcolor),term);
+	apply_pm3dcolor(&(CB_AXIS.label.textcolor),term);
 	if (color_box.rotation == 'h') {
 	    int len = ticscale * (tic_in ? 1 : -1) * (term->v_tic);
 

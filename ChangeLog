@@ -27,6 +27,10 @@
 	* src/graphics.c: Check for is_plot_with_palette() and modify layout of
 	2D plots to include colorbox if it returns TRUE.
 
+	* src/color.c src/gadgets.c src/gadgets.h src/graph3d.c src/graphics.c:
+	Rename apply_textcolor() to be apply_pm3dcolor(), since it is usable for
+	any plot element requiring a palette-based color.
+
 2004-11-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (add_key_entry): Make sure all fields of newly

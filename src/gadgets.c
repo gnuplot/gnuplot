@@ -379,10 +379,10 @@ clip_vector(unsigned int x, unsigned int y)
     move_pos_y = y;
 }
 
-/* Common routines for setting text color from t_colorspec */
+/* Common routines for setting text or line color from t_colorspec */
 
 void
-apply_textcolor(const struct t_colorspec *tc, const struct termentry *t)
+apply_pm3dcolor(const struct t_colorspec *tc, const struct termentry *t)
 {
     if (tc->type == TC_DEFAULT) {
 	(*t->linetype)(LT_BLACK);
@@ -490,7 +490,7 @@ write_label(unsigned int x, unsigned int y, struct text_label *this_label)
 	int htic, vtic;
 	int justify = JUST_TOP;	/* This was the 2D default; 3D had CENTRE */
 
-	apply_textcolor(&(this_label->textcolor),term);
+	apply_pm3dcolor(&(this_label->textcolor),term);
 
 	get_offsets(this_label, term, &htic, &vtic);
 	if (this_label->rotate && (*term->text_angle) (this_label->rotate)) {

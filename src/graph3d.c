@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.105 2004/11/21 05:40:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.106 2004/11/22 00:43:04 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -690,7 +690,7 @@ do_3dplot(
 	    x = (unsigned int) ((xleft + xright) / 2 + tmpx);
 	    y = (unsigned int) (ytop + tmpy + titlelin * (t->h_char));
     	}
-	apply_textcolor(&(title.textcolor),t);
+	apply_pm3dcolor(&(title.textcolor),t);
 	/* PM: why there is JUST_TOP and not JUST_BOT? We should draw above baseline!
 	 * But which terminal understands that? It seems vertical justification does
 	 * not work... */
@@ -2336,7 +2336,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	    map3d_position_r(&(X_AXIS.label.offset), &tmpx, &tmpy, "graphbox");
 	    x1 += tmpx; /* user-defined label offset */
 	    y1 += tmpy;
-	    apply_textcolor(&(X_AXIS.label.textcolor),t);
+	    apply_pm3dcolor(&(X_AXIS.label.textcolor),t);
 	    write_multiline(x1, y1, X_AXIS.label.text,
 			    CENTRE, JUST_TOP, 0,
 			    X_AXIS.label.font);
@@ -2446,7 +2446,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 		if (splot_map == TRUE)
 		    (*t->text_angle)(TEXT_VERTICAL);
 		/* write_multiline mods it */
-		apply_textcolor(&(Y_AXIS.label.textcolor),t);
+		apply_pm3dcolor(&(Y_AXIS.label.textcolor),t);
 		write_multiline(x1, y1, Y_AXIS.label.text,
 				h_just, v_just, angle,
 				Y_AXIS.label.font);
@@ -2519,7 +2519,7 @@ draw_3d_graphbox(struct surface_points *plot, int plot_num, WHICHGRID whichgrid)
 	x += tmpx;
 	y += tmpy;
 
-	apply_textcolor(&(Z_AXIS.label.textcolor),t);
+	apply_pm3dcolor(&(Z_AXIS.label.textcolor),t);
 	write_multiline(x, y, Z_AXIS.label.text,
 			CENTRE, CENTRE, 0,
 			Z_AXIS.label.font);
@@ -2589,7 +2589,7 @@ xtick_callback(
 	TERMCOORD(&v2, x2, y2);
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	clip_put_text_just(x2+offsetx, y2+offsety, text,
 			   just, JUST_TOP,
 			   axis_array[axis].ticdef.font);
@@ -2665,7 +2665,7 @@ ytick_callback(
 	}
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	TERMCOORD(&v2, x2, y2);
 	clip_put_text_just(x2+offsetx, y2+offsety, text, 
 			   just, JUST_TOP,
@@ -2727,7 +2727,7 @@ ztick_callback(
 	    x1 -= (term->h_tic) * ticscale;
         /* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), term);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), term);
 	clip_put_text_just(x1+offsetx, y1+offsety, text,
 			   RIGHT, JUST_CENTRE,
 			   axis_array[axis].ticdef.font);

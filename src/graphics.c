@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.134 2004/11/12 07:14:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.135 2004/11/22 00:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1307,7 +1307,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* YLABEL */
     if (*axis_array[FIRST_Y_AXIS].label.text) {
-	apply_textcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[FIRST_Y_AXIS].label.textcolor),t);
 	/* we worked out x-posn in boundary() */
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    double tmpx, tmpy;
@@ -1337,7 +1337,7 @@ do_plot(struct curve_points *plots, int pcount)
 
     /* Y2LABEL */
     if (*axis_array[SECOND_Y_AXIS].label.text) {
-	apply_textcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[SECOND_Y_AXIS].label.textcolor),t);
 	/* we worked out coordinates in boundary() */
 	if ((*t->text_angle) (TEXT_VERTICAL)) {
 	    double tmpx, tmpy;
@@ -1373,7 +1373,7 @@ do_plot(struct curve_points *plots, int pcount)
 	x = (xright + xleft) / 2 +  tmpx;
 	y = xlabel_y - t->v_char / 2;   /* HBB */
 
-	apply_textcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
+	apply_pm3dcolor(&(axis_array[FIRST_X_AXIS].label.textcolor), t);
 	write_multiline(x, y, axis_array[FIRST_X_AXIS].label.text,
 			CENTRE, JUST_TOP, 0,
 			axis_array[FIRST_X_AXIS].label.font);
@@ -1389,7 +1389,7 @@ do_plot(struct curve_points *plots, int pcount)
 	x = (xleft + xright) / 2 + tmpx;
 	y = title_y - t->v_char / 2;
 
-	apply_textcolor(&(title.textcolor), t);
+	apply_pm3dcolor(&(title.textcolor), t);
 	write_multiline(x, y, title.text, CENTRE, JUST_TOP, 0, title.font);
 	reset_textcolor(&(title.textcolor), t);
     }
@@ -1403,7 +1403,7 @@ do_plot(struct curve_points *plots, int pcount)
 	/* we worked out y-coordinate in boundary() */
 	x = (xright + xleft) / 2 + tmpx;
 	y = x2label_y - t->v_char / 2 - 1;
-	apply_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
+	apply_pm3dcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
 	write_multiline(x, y, axis_array[SECOND_X_AXIS].label.text, CENTRE,
 			JUST_TOP, 0, axis_array[SECOND_X_AXIS].label.font);
 	reset_textcolor(&(axis_array[SECOND_X_AXIS].label.textcolor),t);
@@ -4092,7 +4092,7 @@ xtick2d_callback(
 		       &offsetx_d, &offsety_d, "xtics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(x+(int)offsetx_d, tic_text+(int)offsety_d, text,
 			tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
@@ -4170,7 +4170,7 @@ ytick2d_callback(
 		       &offsetx_d, &offsety_d, "ytics");
 	/* User-specified different color for the tics text */
 	if (axis_array[axis].ticdef.textcolor.lt != TC_DEFAULT)
-	    apply_textcolor(&(axis_array[axis].ticdef.textcolor), t);
+	    apply_pm3dcolor(&(axis_array[axis].ticdef.textcolor), t);
 	write_multiline(tic_text+(int)offsetx_d, y+(int)offsety_d, text, 
 			tic_hjust, tic_vjust, rotate_tics,
 			axis_array[axis].ticdef.font);
@@ -4450,7 +4450,7 @@ place_histogram_titles()
 	    y = xlabel_y;
 	    x += (int)xoffset_d;
 	    y += (int)yoffset_d + 0.25 * term->v_char;
-	    apply_textcolor(&hist->title.textcolor,term);
+	    apply_pm3dcolor(&hist->title.textcolor,term);
 	    write_multiline(x, y, hist->title.text, 
 			    CENTRE, JUST_BOT, 0, hist->title.font);
 	    reset_textcolor(&hist->title.textcolor,term);
