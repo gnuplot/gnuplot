@@ -1,3 +1,12 @@
+2004-08-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* demo/histograms.dem: Revise bmargin settings to work with the revised
+	bmargin handling in graphics.c (2004-07-25).
+
+	* src/plot2d.c (eval_plots): Fixed bug in "newhistogram 'title' ..."
+	that caused the title to be ignored if there were no other options
+	specified.
+
 2004-08-13  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* src/term.c (enhanced_recursion): Pass unescaped backslash character

@@ -25,7 +25,7 @@ set style histogram cluster gap 1
 set style fill solid border -1
 set boxwidth 0.9
 set xtic rotate by -45
-set bmargin 6
+#set bmargin 10 
 plot 'immigration.dat' using 6:xtic(1) ti col, '' u 12 ti col, '' u 13 ti col, '' u 14 ti col
 #
 pause -1 "<cr> to change the gap between clusters"
@@ -143,7 +143,7 @@ set style fill solid noborder
 set boxwidth 0.95
 unset xtics
 set xtics rotate by -45
-set xlabel "(note: histogram titles have specified offset relative to X-axis label)" 0,-3
+set xlabel "(note: histogram titles have specified offset relative to X-axis label)" 0,-2
 set ytics
 set grid y
 set auto y

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.75 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.76 2004/08/10 03:55:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1160,6 +1160,7 @@ eval_plots()
 	    int previous_token;
 	    c_token++;
 	    histogram_sequence = -1;
+	    histogram_title[0] = '\0';
 
 	    if (histogram_rightmost > 0)
 		newhist_start = histogram_rightmost + 2;
@@ -1172,10 +1173,8 @@ eval_plots()
 
 		/* Store title in temporary variable and then copy into the */
 		/* new histogram structure when it is allocated.            */
-		if (isstring(c_token)) {
+		if (isstring(c_token) && !(histogram_title[0]))
 		    quote_str(&histogram_title[0], c_token++, sizeof(histogram_title));
-		} else
-		    histogram_title[0] = '\0';
 
 		/* Allow explicit starting color or pattern for this histogram */
 		lp_parse(&lp, TRUE, FALSE, lp.l_type, 0);
