@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.14 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: hpgl.trm,v 1.15 2002/08/29 04:10:08 sfeam Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -2681,14 +2681,14 @@ START_HELP(hpgl)
 " `color` is for multi-pen (i.e. color) plots, and <number_of_pens> is",
 " the number of pens (i.e. colors) used in color plots. `monochrome` is for",
 " one (e.g. black) pen plots. `solid` draws all lines as solid lines, or",
-" 'dashed' will draw lines with different dashed and dotted line patterns.",
+" `dashed` will draw lines with different dashed and dotted line patterns.",
 " <font> is `stick`, `univers`, `cg_times`, `zapf_dingbats`, `antique_olive`,",
 " `arial`, `courier`, `garamond_antigua`, `letter_gothic`, `cg_omega`,",
 " `albertus`, `times_new_roman`, `clarendon`, `coronet`, `marigold`,",
 " `truetype_symbols`, or `wingdings`. <fontsize> is the font size in points.",
 " The point type selection can be the standard default set by specifying",
-" nopspoints, or the same set of point types found in the postscript terminal",
-" by specifying pspoints.",
+" `nopspoints`, or the same set of point types found in the postscript terminal",
+" by specifying `pspoints`.",
 "",
 " Note that built-in support of some of these options is printer device",
 " dependent. For instance, all the fonts are supposedly supported by the HP",

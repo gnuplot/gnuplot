@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.51 2002/11/27 20:45:35 lhecking Exp $
+ * $Id: cgm.trm,v 1.52 2002/12/02 05:16:25 sfeam Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1668,7 +1668,7 @@ START_HELP(cgm)
 " The first part of a Computer Graphics Metafile, the metafile description,",
 " includes a font table.  In the picture body, a font is designated by an",
 " index into this table.  By default, this terminal generates a table with",
-" the following 16 fonts, plus six more with `italic` replaced by",
+" the following 35 fonts, plus six more with `italic` replaced by",
 " `oblique`, or vice-versa (since at least the Microsoft Office and Corel",
 " Draw CGM import filters treat `italic` and `oblique` as equivalent):",
 "@start table - first is interactive cleartext form",

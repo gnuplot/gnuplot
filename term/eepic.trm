@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.19 2002/07/26 16:42:28 mikulik Exp $
+ * $Id: eepic.trm,v 1.20 2002/12/13 14:58:38 lhecking Exp $
  *
  */
 
@@ -613,7 +613,7 @@ START_HELP(eepic)
 " 'dashed' will allow dashed line types; without this option, only solid lines",
 " with varying thickness will be used.",
 " 'dashed' and 'color' are mutually exclusive; if 'color' is specified, then 'dashed'",
-" will be ignored",
+" will be ignored.",
 " 'rotate' will enable true rotated text (by 90 degrees). Otherwise, rotated text",
 " will be typeset with letters stacked above each other. If you use this option",
 " you must include \\usepackage{graphicx} in the preamble.",
@@ -634,7 +634,7 @@ START_HELP(eepic)
 " are too close. (I do not know if that is a general problem with the tpic specials,",
 " or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)",
 " The default size of an eepic plot is 5x3 inches, which can be scaled ",
-" by 'set size a,b'",
+" by 'set size a,b'.",
 " Points, among other things, are drawn using the LaTeX commands \"\\Diamond\",",
 " \"\\Box\", etc.  These commands no longer belong to the LaTeX2e core; they are",
 " included in the latexsym package, which is part of the base distribution and",
