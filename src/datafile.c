@@ -519,16 +519,14 @@ int max_using;
 
     assert(max_using <= NCOL);
 
-    if (!filename)
-	filename = (char *) gp_alloc (token_len(c_token)+1, "data file name");
-
-    if (is_notempty(c_token)) {
-	if (token_len(c_token) != strlen(filename))
-	    filename = gp_realloc (filename, token_len(c_token)+1, "data file name");
-	quote_str(filename, c_token, token_len(c_token));
-    } else
-	if (!filename[0]) /* empty name means re-use last one */
+    /* empty name means re-use last one */
+    if (isstring(c_token) && token_len(c_token) == 2) {
+	if (!filename[0])
 	    int_error(c_token, "No previous filename");
+    } else {
+	filename = gp_realloc(filename, token_len(c_token)-1, "datafile name");
+	quote_str(filename, c_token, token_len(c_token)-1);
+    }
 
     name_token = c_token++;
 
@@ -672,7 +670,7 @@ int max_using;
 	}
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    if (df_binary)
-		int_error(NO_CARET,"Format string meaningless with binary data");
+		int_error(NO_CARET, "Format string meaningless with binary data");
 
 	    quote_str(df_format, c_token, MAX_LINE_LEN);
 	    if (!valid_format(df_format))
@@ -695,7 +693,7 @@ int max_using;
     /*}}} */
 
     /* filename cannot be static array! */
-    gp_expand_tilde (&filename, MAX_LINE_LEN+1);
+    gp_expand_tilde (&filename);
 
 /*{{{  open file */
 #if defined(PIPES)
