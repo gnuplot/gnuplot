@@ -800,6 +800,20 @@ double a[];
 	free(dpar);
     }
 
+    /* HBB 990220: re-imported this snippet from older versions. Finally,
+     * some user noticed that it *is* necessary, after all. Not even
+     * Carsten Grammes himself remembered what it was for... :-(
+     * The thing is: the value of the last parameter is not reset to
+     * its original one after the derivatives have been calculated
+     */
+    /* restore last parameter's value (not done by calculate) */
+    {
+	struct value val;
+	Gcomplex (&val, a[num_params-1], 0.0);
+	setvar (par_name[num_params-1], val);
+	free(dpar);
+    }
+
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
     (void) marquardt(a, C, &chisq, &lambda);
