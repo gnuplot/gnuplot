@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.93 2004/11/10 16:16:48 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.94 2004/12/01 21:10:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -798,6 +798,8 @@ set ticscale %g %g\n",
 	case PM3D_WHICHCORNER_MEAN:    fputs("mean", fp); break;
 	case PM3D_WHICHCORNER_GEOMEAN: fputs("geomean", fp); break;
 	case PM3D_WHICHCORNER_MEDIAN:  fputs("median", fp); break;
+	case PM3D_WHICHCORNER_MIN:     fputs("min", fp); break;
+	case PM3D_WHICHCORNER_MAX:     fputs("max", fp); break;
 	default: /* PM3D_WHICHCORNER_C1 ... _C4 */
 	     fprintf(fp, "c%i", pm3d.which_corner_color - PM3D_WHICHCORNER_C1 + 1);
     }

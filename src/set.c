@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.160 2004/12/05 08:04:43 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.161 2004/12/06 06:46:27 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2926,6 +2926,10 @@ set_pm3d()
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_GEOMEAN;
 		else if (equals(c_token, "median"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_MEDIAN;
+		else if (equals(c_token, "min"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_MIN;
+		else if (equals(c_token, "max"))
+		    pm3d.which_corner_color = PM3D_WHICHCORNER_MAX;
 		else if (equals(c_token, "c1"))
 		    pm3d.which_corner_color = PM3D_WHICHCORNER_C1;
 		else if (equals(c_token, "c2"))

@@ -1,8 +1,9 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
-* NEW linetype colors via "lt {palette {frac <val> | cb <val>}}
-* NEW linetype colors via "lt {rgbcolor {"name" | "#RRGGBB}}
+* NEW suboptions "set pm3d corners2color min|max"
+* NEW linetype colors via "lt {palette {frac <val> | cb <val>}}"
+* NEW linetype colors via "lt {rgbcolor {"name" | "#RRGGBB"}}"
 * NEW palette and rgb linetype colors apply to all 2D and 3D plot elements
 * NEW user defined variables can contain strings
 * NEW expression evaluation can manipulate and return strings

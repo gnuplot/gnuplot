@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.48 2004/07/02 23:58:39 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.49 2004/11/22 00:43:05 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -115,6 +115,28 @@ median4 (double x1, double x2, double x3, double x4)
     tmp = (x1 < x3) ? x3 : x1;
     tmp += (x2 < x4) ? x2 : x4;
     return tmp * 0.5;
+}
+
+
+/* Minimum of 4 numbers.
+ */
+static double
+minimum4 (double x1, double x2, double x3, double x4)
+{
+    x1 = GPMIN(x1, x2);
+    x3 = GPMIN(x3, x4);
+    return GPMIN(x1, x3);
+}
+
+
+/* Maximum of 4 numbers.
+ */
+static double
+maximum4 (double x1, double x2, double x3, double x4)
+{
+    x1 = GPMAX(x1, x2);
+    x3 = GPMAX(x3, x4);
+    return GPMAX(x1, x3);
 }
 
 
@@ -493,6 +515,8 @@ pm3d_plot(struct surface_points *this_plot, int at_which_z)
 		    case PM3D_WHICHCORNER_MEAN: avgC = (cb1 + cb2 + cb3 + cb4) * 0.25; break;
 		    case PM3D_WHICHCORNER_GEOMEAN: avgC = geomean4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_MEDIAN: avgC = median4(cb1, cb2, cb3, cb4); break;
+		    case PM3D_WHICHCORNER_MIN: avgC = minimum4(cb1, cb2, cb3, cb4); break;
+		    case PM3D_WHICHCORNER_MAX: avgC = maximum4(cb1, cb2, cb3, cb4); break;
 		    case PM3D_WHICHCORNER_C1: avgC = cb1; break;
 		    case PM3D_WHICHCORNER_C2: avgC = cb2; break;
 		    case PM3D_WHICHCORNER_C3: avgC = cb3; break;

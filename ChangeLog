@@ -1,3 +1,8 @@
+2004-12-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/pm3d.h src/pm3d.c src/save.c src/set.c
+	src/show.c: New suboptions 'set pm3d corners2color min|max'.
+
 2004-12-20  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/fig.trm (FIG_put_text) term/gd.trm (PNG_put_text, ENHGD_FLUSH):
@@ -7,20 +12,20 @@
 
 2004-12-20  Bastian Maerkisch  <bmaerkisch@web.de>
 
-	* pm.trm (PM_set_color): Reflect recent changes of parameters in term
-	entries.
+	* term/pm.trm (PM_set_color): Reflect recent changes of parameters in
+	term entries.
 
-	* gnupmdrv.h gclient.c: gnupmdrv.c and gclient.c both used to define
-	variable bWidelLines, but it should be the same one. This patch adds
-	an 'external' declaration in gnupmdrv.h, and removes the definition
-	from gclient.c.
+	* src/os2/gnupmdrv.h src/os2/gclient.c: gnupmdrv.c and gclient.c both
+	used to define variable bWidelLines, but it should be the same one.
+	This patch adds an 'external' declaration in gnupmdrv.h, and removes
+	the definition from gclient.c.
 
-	* gclient.c: Within GnuplotPM  "Options->Gnuplot docs...", it did not
-	open gnuplot.inf when using NewView, a widely used view.exe
+	* src/os2/gclient.c: Within GnuplotPM  "Options->Gnuplot docs...", it
+	did not open gnuplot.inf when using NewView, a widely used view.exe
 	replacement. Replaced the fixed sized buffer solution with code using
 	a dynamic buffer.
 
-	* gclient.c: This fixes text rotation for the pm terminal. The
+	* src/os2/gclient.c: This fixes text rotation for the pm terminal. The
 	variable bHorz, which used to indicate horizontal text, has now been
 	removed completely. Now pm terminal behaves similar to the postscript
 	terminal.

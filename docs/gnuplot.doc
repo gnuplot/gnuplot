@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.266 2004/11/30 08:21:56 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.267 2004/12/01 21:10:30 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -6832,7 +6832,7 @@ C ... and restart the table:
                   { flush { begin | center | end } }
                   { ftriangles | noftriangles }
                   { clip1in | clip4in }
-                  { corners2color { mean|geomean|median|c1|c2|c3|c4 } }
+                  { corners2color { mean|geomean|median|min|max|c1|c2|c3|c4 } }
                   { hidden3d <linestyle> | nohidden3d }
                   { implicit | explicit }
                   { map }
@@ -6878,7 +6878,8 @@ C ... and restart the table:
  (no smooth color change among vertices).  The value is calculated from
  z-coordinates from the surrounding corners according to `corners2color
  <option>`.  The options 'mean' (default), 'geomean' and 'median' produce
- various kinds of surface color smoothing.  This may not be desired for pixel
+ various kinds of surface color smoothing, while options 'min' and 'max' choose
+ minimal or maximal value, respectively. This may not be desired for pixel
  images or for maps with sharp and intense peaks, in which case the options
  'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
  based on the z-coordinate of only one corner.  Some experimentation may be
