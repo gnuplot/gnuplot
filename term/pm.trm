@@ -1,5 +1,5 @@
 /*
- * $Id: pm.trm,v 1.27 2001/10/26 12:58:38 mikulik Exp $
+ * $Id: pm.trm,v 1.28 2001/12/01 13:09:00 amai Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -174,7 +174,6 @@ static FILE *PM_savepipe = NULL;
 
 int PM_pause __PROTO((char *str));
 void PM_intc_cleanup(void);
-void PM_setup(void);
 static void PM_reset_opts(void);
 static void PM_query(void);
 static void PM_make_servername(char *);
@@ -202,7 +201,7 @@ PM_init()
 	PM_make_servername(tempname);
 	strcpy(pipename, "\\pipe\\");
 	strcat(pipename, tempname);
-//        sprintf( pipename, "\\pipe\\gpServ%d", PM_plot_number ) ;
+/*        sprintf( pipename, "\\pipe\\gpServ%d", PM_plot_number ) ; */
 	DosGetInfoBlocks(&tib, &pib);
 	PM_pipe = fopen(pipename, "r+b");
 	if (PM_pipe != NULL) {
@@ -211,14 +210,14 @@ PM_init()
 	    fwrite(&pid, 1, 4, PM_pipe);
 	    fflush(PM_pipe);
 	    /* set new options */
-//            PM_reset_opts() ;
+/*            PM_reset_opts() ; */
 	}
     }
     /* else we start up term here */
     if (PM_pipe == NULL) {
 	if (PM_termmode & 2) {
 	    PM_make_servername(tempname);
-//            sprintf( tempname, "gpServ%d", PM_plot_number ) ;
+/*            sprintf( tempname, "gpServ%d", PM_plot_number ) ; */
 	} else {
 	    static int gpid = 0;
 	    gpid++;
@@ -430,8 +429,10 @@ PM_text()
     if (PM_mode != SET_TEXT) {
 	putc(SET_TEXT, PM_pipe);
 	fflush(PM_pipe);
-//        keep_term_initialised = term_initialised ;
-//        term_initialised = FALSE ; /* need to force init */
+#if 0
+        keep_term_initialised = term_initialised ;
+        term_initialised = FALSE ; /* need to force init */
+#endif
     }
     PM_mode = SET_TEXT;
 #ifdef USE_MOUSE
@@ -604,6 +605,7 @@ PM_abortplot()
     bail_to_command_line();
 }
 
+
 void
 PM_intc_cleanup(void)
 {
@@ -612,54 +614,6 @@ PM_intc_cleanup(void)
     PM_must_abort = 1;
 }
 
-void
-PM_setup(void)
-/*
-** Initial terminal setup
-*/
-{
-    char *envpath;
-    PPIB pib;
-    PTIB tib;
-    char path[256], *p;
-    DosGetInfoBlocks(&tib, &pib);
-    DosQueryModuleName(pib->pib_hmte, 256, path);
-    if (PM_path[0] == NUL) {
-	strcpy(PM_path, path);
-	p = strrchr(PM_path, '\\');
-	if (p != NULL)
-	    *p = NUL;
-	else {
-	    p = strrchr(PM_path, ':');
-	    if (p != NULL)
-		*(p + 1) = NUL;
-	}
-	if (p == NULL)
-	    _getcwd2(PM_path, 256);
-    }
-    if (getenv("GNUHELP") == NULL) {
-	int n = strlen("GNUHELP") + strlen(PM_path) + strlen("gnuplot.gih") + 3;
-	envpath = (char *) malloc(n);
-	if (envpath != NULL) {
-	    strcpy(envpath, "GNUHELP");
-	    strcat(envpath, "=");
-	    strcat(envpath, PM_path);
-	    strcat(envpath, "/");
-	    strcat(envpath, "gnuplot.gih");
-	    putenv(envpath);
-	}
-    }
-    if (getenv("GNUPLOT") == NULL) {
-	int n = strlen("GNUPLOT") + strlen(PM_path) + 2;
-	envpath = (char *) malloc(n);
-	if (envpath != NULL) {
-	    strcpy(envpath, "GNUPLOT");
-	    strcat(envpath, "=");
-	    strcat(envpath, PM_path);
-	    putenv(envpath);
-	}
-    }
-}
 
 int
 PM_pause(char *str)
