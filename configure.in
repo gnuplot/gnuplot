@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.128 2003/02/06 11:22:39 lhecking Exp $
+dnl $Id: configure.in,v 1.129 2003/02/18 16:19:47 broeker Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -248,7 +248,7 @@ dnl Use builtin readline or GNU readline
 AC_ARG_WITH(readline,dnl
 [  --with-readline         use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library
+  --with-readline=gnu     use the GNU readline library (4.2 or newer required)
   --with-readline=DIR     Specify the location of GNU readline],,
   test -z "$with_readline" && with_readline=yes)
 
@@ -818,6 +818,8 @@ if test "$with_readline" != no; then
     if test "$enable_history_file" = yes; then
         AC_MSG_RESULT([    enable history file])
     fi
+
+    AC_MSG_WARN([Please see INSTALL for a required readline bugfix.])
 
   else
     AC_MSG_RESULT([  Use builtin minimal readline])

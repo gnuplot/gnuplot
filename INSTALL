@@ -163,7 +163,7 @@ $ ./configure --help
   --with-xmi[=DIR]        ggi's xmi support for pm3d (EXPERIMENTAL)
   --with-readline   (*)   use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
-  --with-readline=gnu     use the GNU readline library
+  --with-readline=gnu     use the GNU readline library (4.2 or newer required)
   --with-readline=DIR     Specify the location of GNU readline
   --enable-history-file   use history file (requires GNU readline)
   --with-plot[=DIR]       use the Unix plot library
@@ -473,6 +473,12 @@ or linker.
   --with-readline=gnu
 
    Use the GNU readline library instead of gnuplot's builtin readline.
+   Version 4.2 or better is required.
+
+   Please note that there is a bug in GNU readline up to and including 4.3
+   that makes gnuplot exit if the terminal window is resized. A fix is
+   described at
+   http://sourceforge.net/tracker/index.php?func=detail&aid=608874&group_id=2055&atid=102055 .
 
   --with-readline[=DIR]
 
