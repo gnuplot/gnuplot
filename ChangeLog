@@ -1,3 +1,29 @@
+1999-02-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h, configure.in, gplt_x11.c, stdfn.h, m4/select.m4:
+	New AC_FUNC_SELECT macro and related changes.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* plot.c: Fix typo.
+
+	* term.h: Reintroduce long-lost EEPIC define. Spotted by
+	Aaron Naiman <naiman@gematria.jct.ac.il>
+
+1999-02-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* makefile.os2: Patch, fixes.
+
+1999-02-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* makefile.amg: Improved makefile for Amiga SAS/C 6.5x.
+
+1999-02-04  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Adds a few specific comments to the effect that
+	commands pertaining to the x2 and y2 axes are not applicable to
+	"splot"s.
+ 
 1999-02-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all, docs/Makefile.in: Add and use fixinfo.el
