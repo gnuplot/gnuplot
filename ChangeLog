@@ -9,6 +9,10 @@
 
 	* src/plot3d.c (get_3ddata): Add missing #ifdef EAM_DATASTRINGS.
 
+	* configure.in: If --disable-datastrings is selected, then turn off 
+	histogram support also since it is crippled without the 
+	datastrings code.
+
 2004-10-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines
