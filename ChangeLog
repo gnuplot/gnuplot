@@ -1,3 +1,10 @@
+1999-09-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graph3d.c, graphics.c: write_multiline() is not modifying its
+	char *text argument anymore, so that no temporary strings must
+	be allocated before calling write_multiline(). Backported from
+	gnuplot-current.
+
 1999-09-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* FAQ: Updated.

@@ -15,8 +15,9 @@ Changes in release 3.7.1:
 * Bug fix for surface plots and bnegative ticslevel
 * Bug fix for multiline labels
 * Bug fix for multiplot and eps output
-* Better makefile for Amiga SAS/c
+* Improved makefile for Amiga SAS/C
 * Bug fixed with exit/quit in batch mode
+* Return proper exit status
 * Buffering bug in X11 driver fixed
 * Embedding document font is now default font in latex output
 * Y2K: "%y" date format interpretation is now in line with
