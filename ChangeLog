@@ -1,3 +1,48 @@
+1998-07-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL, 0README, configure.in: Fix typos, small changes.
+
+	* docs/Makefile.in, docs/latextut/Makefile.in: Fixes for building
+	outside source directory, cleanup. Add target for tutorial.ps.
+
+	* Makefile.in: In Makefile target, change INCLUDES= to CPPFLAGS=.
+
+	* scanner.c: Add include files for VMS. Old patch by Lucas Hart
+	<hartl@ucs.orst.edu>.
+
+	* docs/*.c, docs/gnuplot.doc: Update copyright statement.
+
+	* docs/doc2rnh.c: New file, help file format for VMS. Old patch by
+	Lucas Hart <hartl@ucs.orst.edu>. Target was already in Makefile.in.
+
+	* vms.c: Include plot.h, make mbxbname static. Old patch by
+	Lucas Hart <hartl@ucs.orst.edu>.
+
+	* Makefile.in, makefile.all: Add doc2rnh.c to DOCS1 variable.
+
+1998-07-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Add missing --without-PACKAGE description in section
+	about --with-PACKAGE.
+
+	* Makefile.in: (Bug fix) No directory prefix for CONFIG_HEADER_IN.
+	If build dir != src dir, configure/make picks up the correct prefix.
+	automatically. Add makefile.wc to ETC variable. Final fix for dist
+	target.
+
+	* configure.in: Set CPPFLAGS and X_LIBRARIES in test for X Window
+	System files. Remove test for -lnsl/-lsocket. Add code to cache
+	and use CPPFLAGS and TERMLIBS. Bug fix in libreadline test error msg.
+
+	* configure: Regenerated.
+
+	* graphics.c (gprintf): Add klugde to use snprintf() where available.
+	Add new 2nd arg (size_t count) to function signature.
+
+	* makefile.all: Add makefile.wc to ETC variable.
+
+	* makefile.nt: Portability patch by Stefan Schroepfer <scr@iis.fhg.de>.
+
 1998-07-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* graphics.c, util3d.c: Grid clipping patch by HBB.
@@ -11,7 +56,7 @@
 	* configure.in: Change AC_PATH_X to AC_PATH_XTRA, add check
 	for snprintf().
 
-	* config.hin, configure: regenerated.
+	* config.hin, configure: Regenerated.
 
 	* 0INSTALL, 0README: Additions, inspired by Lucas Hart 
 	<hartl@ucs.orst.edu>.
