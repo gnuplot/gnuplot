@@ -1,13 +1,13 @@
 2002-08-24  Ethan Merritt <merritt@u.washington.edu>
 
-	* `set xtics rotate by <ang>` allows text rotation in tic labels.
-	src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
-	src/unset.c docs/gnuplot.doc
+	* src/axis.c src/axis.h src/graphics.c src/save.c src/set.c src/show.c
+	src/unset.c docs/gnuplot.doc: Allow text rotation by artibitrary angle
+	in tic labels `set xtics rotate by <ang>`.
 
 2002-08-24  Ethan Merritt <merritt@u.washington.edu>
 
-	* term/post.trm: stricter parsing of font names to insure that
-	legal PostScript is generated and that font size is correct.
+	* term/post.trm: Detect and modify non-PostScript font names to insure 
+	that legal PostScript is generated and that font size is correct.
 
 2002-08-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -954,7 +954,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/24 21:11:35 $).
+	last modification date (from the tag $Date: 2002/08/24 22:04:12 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
