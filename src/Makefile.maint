@@ -1,0 +1,22 @@
+# -*-Makefile-*-
+# Makefile fragment to generate makefile.all
+
+# Non-core sources and version.c
+noncoresrc = amiga.c bf_test.c corplot.c ctrl87.c gplt_x11.c os9.c \
+strftime.c version.c vms.c
+
+coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))
+
+coreterm := $(shell cd ../term && echo *.trm)
+
+makefile.all: Makefile.maint
+	@echo "# $@ generated automatically by GNU make" >$@
+	@echo >>$@
+	@echo '# List of core object files except version.$$(O)' >>$@
+	@echo COREOBJS = $(coresrc:.c=.'$$(O)') \
+	 | fmt | (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' \
+	 | tr @% '\012\012' >>$@
+	@echo "# List of terminal driver sources" >>$@
+	@echo CORETERM = $(patsubst %.trm,$$\(T\)%.trm,$(coreterm)) \
+	 | fmt | (tr '\012' @; echo) | sed 's/@$$/%/;s/@/ \\@/g' \
+	 | tr @% '\012\012' >>$@
