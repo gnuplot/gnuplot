@@ -5085,8 +5085,6 @@ or, if you didn't specify a relative boxwidth before,
 @opindex clabel
 
 
-@cindex noclabel
-
 `gnuplot` will vary the linetype used for each contour level when clabel is
 set.  When this option on (the default), a legend labels each linestyle with
 the z level it represents.  It is not possible at present to separate the
@@ -10534,21 +10532,20 @@ To create multiline labels, use \\shortstack, for example
 
 @end example
 
-The driver produces two different files, one for the LaTeX part and one for
-the eps part of the figure. 
-The name of the LaTeX file is derived from the name of
-the eps file given on the @ref{output} command; it is determined by replacing
-the trailing `.eps` (actually just the final extent in the file name---and
-the option will be turned off if there is no extent) with `.tex` in the output
-file name.  Remember to close the @ref{file} before leaving `gnuplot`.
+The driver produces two different files, one for the eps part of the figure
+and one for the LaTeX part. The name of the eps file is taken from the
+@ref{output} command. The name of the LaTeX file is derived by replacing
+the file extension (normally `.eps`) with `.tex` instead.
 There is no LaTeX output if no output file is given!
-In your LaTeX documents use '\\input@{filename@}' for inclusion of the figure.
-The `.eps` file is included by the command \\includegraphics@{...@}, thus
-include \\usepackage@{graphicx@} in the preamble!
-Via 'epstopdf' (contained e.g. in the teTeX package, requires ghostscript)
-pdf files can made out of the eps files. If the graphics package is properly
-configured, the LaTeX files can also be processed by pdflatex without
-changes, and the pdf files are included instead of the eps files."
+Remember to close the @ref{file} before leaving `gnuplot`.
+
+In your LaTeX documents use '\\input@{filename@}' to include the figure.
+The `.eps` file is included by the command \\includegraphics@{...@}, so you
+must also include \\usepackage@{graphicx@} in the LaTeX preamble.
+
+Pdf files can be made from the eps file using 'epstopdf'. If the graphics
+package is properly configured, the LaTeX files can also be processed by
+pdflatex without changes, using the pdf files instead of the eps files."
 
 @node epson-180dpi, excl, epslatex, terminal
 @subsubsection epson-180dpi
@@ -15885,8 +15882,6 @@ it is not unreasonable to set `zero` to 0.0.
 @cindex zeroaxis
 @opindex zeroaxis
 
-
-@cindex nozeroaxis
 
 The x axis may be drawn by @ref{xzeroaxis} and removed by @ref{xzeroaxis}.
 Similar commands behave similarly for the y, x2, and y2 axes.
