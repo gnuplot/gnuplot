@@ -1,3 +1,25 @@
+2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Integrated SF patch #976546 by Stephane Barbaray, with some
+	additional changes by me.
+	
+	* term/emf.trm: Reindented.  Ancient hacks for NeXT and <assert.h>
+	purged.
+	(EMF_PX2HM): Changed to 26.37.
+	(EMF_HCHAR, EMF_VCHAR): Changed by factors 0.6 and 1.3,
+	respectively.
+	(EMF_set_font): Multiply recomputed values for h_char and v_char
+	by 0.6 and 1.3, respectively.
+	(EMF_setfont): Output correct font struct size with some fields
+	previously missing.
+	(EMF_graphics): Divide by EMF_PX2HM instead of 20.  Make reference
+	device 1024x768 pixels, 270x200 mm.
+	(EMF_put_text): Use ExtTextOutA instead of ExtTextOutW, include
+	array of offsets
+	(EMF_point): Disable special treatment of negative point types,
+	i.e. dots --- why?
+	(EMF_set_pointsize): Don't divide base size by 2.
+
 2004-07-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/win/wtext.c (WndTextProc): Fix bug introduced during
