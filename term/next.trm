@@ -1216,7 +1216,7 @@ PStext termTitle:(in char *) title;
 @end
 
 
-@ implementation GnuTermDriver
+@implementation GnuTermDriver
 
 - init
 {
