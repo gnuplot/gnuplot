@@ -589,7 +589,7 @@ void set_command()
     c_token++;
 
     if (!set_one() && !set_two() && !set_three())
-	int_error(setmess, c_token);
+	int_error(c_token, setmess);
 }
 
 /* return TRUE if a command match, FALSE if not */
@@ -630,7 +630,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	PROCESS_AUTO_LETTER(autoscale_x2, "x2", "x2mi$n", "x2ma$x")
 	PROCESS_AUTO_LETTER(autoscale_y2, "y2", "y2mi$n", "y2ma$x")
 	else
-	    int_error("Invalid range", c_token);
+	    int_error(c_token, "Invalid range");
     } else if (almost_equals(c_token,"noau$toscale")) {
 	c_token++;
 	if (END_OF_COMMAND) {
@@ -691,7 +691,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	else if (almost_equals(c_token, "t$wo"))
 	    clip_lines2 = TRUE;
 	else
-	    int_error("expecting 'points', 'one', or 'two'", c_token);
+	    int_error(c_token, "expecting 'points', 'one', or 'two'");
 	c_token++;
     } else if (almost_equals(c_token,"noc$lip")) {
 	c_token++;
@@ -707,7 +707,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	else if (almost_equals(c_token, "t$wo"))
 	    clip_lines2 = FALSE;
 	else
-	    int_error("expecting 'points', 'one', or 'two'", c_token);
+	    int_error(c_token, "expecting 'points', 'one', or 'two'");
 	c_token++;
     } else if (almost_equals(c_token,"hi$dden3d")) {
 #ifdef LITE
@@ -745,7 +745,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	else if (almost_equals(c_token, "cy$lindrical"))
 	    mapping3d = MAP3D_CYLINDRICAL;
 	else
-	    int_error("expecting 'cartesian', 'spherical', or 'cylindrical'", c_token);
+	    int_error(c_token, "expecting 'cartesian', 'spherical', or 'cylindrical'");
 	c_token++;
     } else if (almost_equals(c_token,"co$ntour")) {
 	c_token++;
@@ -760,7 +760,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    else if (almost_equals(c_token, "bo$th"))
 		draw_contour = CONTOUR_BOTH;
 	    else
-		int_error("expecting 'base', 'surface', or 'both'", c_token);
+		int_error(c_token, "expecting 'base', 'surface', or 'both'");
 	    c_token++;
 	}
     } else if (almost_equals(c_token,"noco$ntour")) {
@@ -800,13 +800,13 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		levels_kind = LEVELS_DISCRETE;
 		c_token++;
 		if(END_OF_COMMAND)
-		    int_error("expecting discrete level", c_token);
+		    int_error(c_token, "expecting discrete level");
 		else
 		    levels_list[i++] = real(const_express(&a));
 
 		while(!END_OF_COMMAND) {
 		    if (!equals(c_token, ","))
-			int_error("expecting comma to separate discrete levels", c_token);
+			int_error(c_token, "expecting comma to separate discrete levels");
 		    c_token++;
 		    if (i == max_levels)
 		        levels_list = 
@@ -821,13 +821,13 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		c_token++;
 		levels_list[i++] = real(const_express(&a));
 		if (!equals(c_token, ","))
-		    int_error("expecting comma to separate start,incr levels", c_token);
+		    int_error(c_token, "expecting comma to separate start,incr levels");
 		c_token++;
 		if((levels_list[i++] = real(const_express(&a))) == 0)
-		    int_error("increment cannot be 0", c_token);
+		    int_error(c_token, "increment cannot be 0");
 		if(!END_OF_COMMAND) {
 		    if (!equals(c_token, ","))
-			int_error("expecting comma to separate incr,stop levels", c_token);
+			int_error(c_token, "expecting comma to separate incr,stop levels");
 		    c_token++;
 		    /* need to round up, since 10,10,50 is 5 levels, not four,
 		     * but 10,10,49 is four
@@ -841,7 +841,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		    contour_levels = (int) real(const_express(&a));
 	    } else {
 		if(levels_kind == LEVELS_DISCRETE)
-		    int_error("Levels type is discrete, ignoring new number of contour levels", c_token);
+		    int_error(c_token, "Levels type is discrete, ignoring new number of contour levels");
 		contour_levels = (int) real(const_express(&a));
 	    }
 	} else if (almost_equals(c_token, "o$rder")) {
@@ -849,14 +849,14 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    c_token++;
 	    order = (int) real(const_express(&a));
 	    if ( order < 2 || order > 10 )
-		int_error("bspline order must be in [2..10] range.", c_token);
+		int_error(c_token, "bspline order must be in [2..10] range.");
 		contour_order = order;
 	} else
-	    int_error("expecting 'linear', 'cubicspline', 'bspline', 'points', 'levels' or 'order'", c_token);
+	    int_error(c_token, "expecting 'linear', 'cubicspline', 'bspline', 'points', 'levels' or 'order'");
     } else if (almost_equals(c_token,"da$ta")) {
 	c_token++;
 	if (!almost_equals(c_token,"s$tyle"))
-	    int_error("expecting keyword 'style'",c_token);
+	    int_error(c_token, "expecting keyword 'style'");
 	data_style = get_style();
     } else if (almost_equals(c_token,"dg$rid3d")) {
 	int i;
@@ -875,7 +875,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		c_token++;
 	    } else {
 		if (!was_comma)
-		    int_error("',' expected",c_token);
+		    int_error(c_token, "',' expected");
 		local_vals[i] = real(const_express(&a));
 		i++;
 		was_comma = FALSE;
@@ -883,13 +883,11 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	}
 
 	if (local_vals[0] < 2 || local_vals[0] > 1000)
-	    int_error("Row size must be in [2:1000] range; size unchanged",
-		      c_token);
+	    int_error(c_token, "Row size must be in [2:1000] range; size unchanged");
 	if (local_vals[1] < 2 || local_vals[1] > 1000)
-	    int_error("Col size must be in [2:1000] range; size unchanged",
-		      c_token);
+	    int_error(c_token, "Col size must be in [2:1000] range; size unchanged");
 	if (local_vals[2] < 1 || local_vals[2] > 100)
-	    int_error("Norm must be in [1:100] range; norm unchanged", c_token);
+	    int_error(c_token, "Norm must be in [1:100] range; norm unchanged");
 
 	dgrid3d_row_fineness = local_vals[0];
 	dgrid3d_col_fineness = local_vals[1];
@@ -906,7 +904,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    missing_val = NULL;
 	} else {
 	    if (!isstring(c_token))
-		int_error("Expected missing-value string", c_token);
+		int_error(c_token, "Expected missing-value string");
 	    m_quote_capture(&missing_val, c_token, c_token);
 	    c_token++;
 	}
@@ -918,14 +916,14 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
     } else if (almost_equals(c_token,"du$mmy")) {
 	c_token++;
 	if (END_OF_COMMAND)
-	    int_error("expecting dummy variable name", c_token);
+	    int_error(c_token, "expecting dummy variable name");
 	else {
 	    if (!equals(c_token,","))
 		copy_str(dummy_var[0],c_token++, MAX_ID_LEN);
 	    if (!END_OF_COMMAND && equals(c_token,",")) {
 		c_token++;
 		if (END_OF_COMMAND)
-		    int_error("expecting second dummy variable name", c_token);
+		    int_error(c_token, "expecting second dummy variable name");
 		copy_str(dummy_var[1],c_token++, MAX_ID_LEN);
 	    }
 	}
@@ -979,7 +977,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    }
 	} else {
 	    if (!isstring(c_token))
-		int_error("expecting format string",c_token);
+		int_error(c_token, "expecting format string");
 	    else {
 		if (setx) {
 		    quote_str(xformat,c_token, MAX_ID_LEN);
@@ -1007,7 +1005,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
     } else if (almost_equals(c_token,"fu$nction")) {
 	c_token++;
 	if (!almost_equals(c_token,"s$tyle"))
-	    int_error("expecting keyword 'style'",c_token);
+	    int_error(c_token, "expecting keyword 'style'");
 	func_style = get_style();
     } else if (almost_equals(c_token,"la$bel")) {
 	c_token++;
@@ -1052,8 +1050,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 		struct value a;
 		newbase = magnitude(const_express(&a));
 		if (newbase < 1.1)
-		    int_error("log base must be >= 1.1; logscale unchanged",
-		c_token);
+		    int_error(c_token, "log base must be >= 1.1; logscale unchanged");
 	    }
 	    log_newbase = log(newbase);
 
@@ -1153,7 +1150,7 @@ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 	    c_token++;
 	    encoding = ENCODING_CP_850;
 	} else {
-	    int_error("expecting one of 'default', 'iso_8859_1', 'cp437' or 'cp850'", c_token);
+	    int_error(c_token, "expecting one of 'default', 'iso_8859_1', 'cp437' or 'cp850'");
 	}
     } else
 	return(FALSE);  /* no command match */
@@ -1168,7 +1165,7 @@ set_two()
 {
     if (almost_equals(c_token,"o$utput")) {
 	if (multiplot) {
-	    int_error("you can't change the output in multiplot mode", c_token);
+	    int_error(c_token, "you can't change the output in multiplot mode");
 	}
 
 	c_token++;
@@ -1179,7 +1176,7 @@ set_two()
 		outstr = NULL; /* means STDOUT */
 	    }
 	} else if (!isstring(c_token)) {
-	    int_error("expecting filename",c_token);
+	    int_error(c_token, "expecting filename");
 	} else {
 	    /* on int_error, we'd like to remember that this is allocated */
 	    static char *testfile = NULL;
@@ -1202,7 +1199,7 @@ set_two()
 	} else {
 	    xoffset = real(const_express(&s));
 	    if (!equals(c_token,","))
-		int_error("',' expected",c_token);
+		int_error(c_token, "',' expected");
 	    c_token++;
 	    yoffset = real(const_express(&s));
 	} 
@@ -1255,7 +1252,7 @@ set_two()
 	    free(ss);
 	    ++c_token;
 	} else {
-	    int_error("Expected string", c_token);
+	    int_error(c_token, "Expected string");
 	}
     } else if (almost_equals(c_token,"loa$dpath")) {
 	char *assemble = NULL;
@@ -1278,7 +1275,7 @@ set_two()
 		free(ss);
 		++c_token;
 	    } else {
-		int_error("Expected string", c_token);
+		int_error(c_token, "Expected string");
 	    }
 	}
 	if (assemble) {
@@ -1394,7 +1391,7 @@ else if (almost_equals(c_token, string)) { \
 	    c_token++;
 	    ang2rad = DEG2RAD;
 	} else
-	    int_error("expecting 'radians' or 'degrees'", c_token);
+	    int_error(c_token, "expecting 'radians' or 'degrees'");
 
 	if (polar && autoscale_t) {
 	    /* set trange if in polar mode and no explicit range */
@@ -1746,12 +1743,12 @@ set_three()
 	tsamp2 = tsamp1;
 	if (!END_OF_COMMAND) {
 	    if (!equals(c_token,","))
-		int_error("',' expected",c_token);
+		int_error(c_token, "',' expected");
 	    c_token++;
 	    tsamp2 = (int)magnitude(const_express(&a));
 	}
 	if (tsamp1 < 2 || tsamp2 < 2)
-	    int_error("sampling rate must be > 1; sampling unchanged",c_token);
+	    int_error(c_token, "sampling rate must be > 1; sampling unchanged");
 	else {
 	    register struct surface_points *f_3dp = first_3dplot;
 
@@ -1771,12 +1768,12 @@ set_three()
 	tsamp2 = tsamp1;
 	if (!END_OF_COMMAND) {
 	    if (!equals(c_token,","))
-		int_error("',' expected",c_token);
+		int_error(c_token, "',' expected");
 	    c_token++;
 	    tsamp2 = (int)magnitude(const_express(&a));
 	}
 	if (tsamp1 < 2 || tsamp2 < 2)
-	    int_error("sampling rate must be > 1; sampling unchanged",c_token);
+	    int_error(c_token, "sampling rate must be > 1; sampling unchanged");
 	else {
 	    register struct curve_points *f_p = first_plot;
 	    register struct surface_points *f_3dp = first_3dplot;
@@ -1833,7 +1830,7 @@ set_three()
 	}
     } else if (almost_equals(c_token,"t$erminal")) {
 	if (multiplot) {
- 	    int_error("You can't change the terminal in multiplot mode", c_token);
+ 	    int_error(c_token, "You can't change the terminal in multiplot mode");
 	}
 
 	c_token++;
@@ -1920,7 +1917,7 @@ set_three()
 		c_token++;
 	    } else {
 		if (!was_comma)
-		    int_error("',' expected",c_token);
+		    int_error(c_token, "',' expected");
 		local_vals[i] = real(const_express(&a));
 		i++;
 		was_comma = FALSE;
@@ -1928,13 +1925,13 @@ set_three()
 	}
 
 	if (local_vals[0] < 0 || local_vals[0] > 180)
-	    int_error("rot_x must be in [0:180] degrees range; view unchanged", c_token);
+	    int_error(c_token, "rot_x must be in [0:180] degrees range; view unchanged");
 	if (local_vals[1] < 0 || local_vals[1] > 360)
-	    int_error("rot_z must be in [0:360] degrees range; view unchanged", c_token);
+	    int_error(c_token, "rot_z must be in [0:360] degrees range; view unchanged");
 	if (local_vals[2] < 1e-6)
-	    int_error("scale must be > 0; view unchanged", c_token);
+	    int_error(c_token, "scale must be > 0; view unchanged");
 	if (local_vals[3] < 1e-6)
-	    int_error("zscale must be > 0; view unchanged", c_token);
+	    int_error(c_token, "zscale must be > 0; view unchanged");
 
 	surface_rot_x = local_vals[0];
 	surface_rot_z = local_vals[1];
@@ -1945,10 +1942,10 @@ set_three()
 /* to save replicated code, define a macro */
 #define PROCESS_RANGE(AXIS,STRING, MIN, MAX, AUTO) \
 else if (almost_equals(c_token, STRING)) { \
- if (!equals(++c_token,"[")) int_error("expecting '['",c_token); \
+ if (!equals(++c_token,"[")) int_error(c_token, "expecting '['"); \
  c_token++; \
  AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
- if (!equals(c_token,"]")) int_error("expecting ']'",c_token); \
+ if (!equals(c_token,"]")) int_error(c_token, "expecting ']'"); \
  c_token++; \
  if (almost_equals(c_token, "rev$erse")) { \
    ++c_token; range_flags[AXIS] |= RANGE_REVERSE;\
@@ -2195,7 +2192,7 @@ label_struct *label;
 	++c_token;		/* skip it */
 
     if (!isstring(c_token))
-	int_error("Expected font", c_token);
+	int_error(c_token, "Expected font");
 
     quote_str(label->font, c_token, MAX_LINE_LEN);
     c_token++;
@@ -2236,7 +2233,7 @@ static void set_label()
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
 	if (tag <= 0)
-	    int_error("tag must be > zero", c_token);
+	    int_error(c_token, "tag must be > zero");
     } else
 	tag = assign_label_tag();	/* default next tag */
 
@@ -2262,7 +2259,7 @@ static void set_label()
 	} else if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	} else
-	    int_error("bad syntax in set label", c_token);
+	    int_error(c_token, "bad syntax in set label");
 	c_token++;
 	set_just = TRUE;
     }
@@ -2284,7 +2281,7 @@ static void set_label()
 	&& !equals(c_token, "front") && !equals(c_token, "back")
 	&& !equals(c_token, "font")) {
 	if (set_just)
-	    int_error("only one justification is allowed", c_token);
+	    int_error(c_token, "only one justification is allowed");
 	if (almost_equals(c_token, "l$eft")) {
 	    just = LEFT;
 	} else if (almost_equals(c_token, "c$entre")
@@ -2293,7 +2290,7 @@ static void set_label()
 	} else if (almost_equals(c_token, "r$ight")) {
 	    just = RIGHT;
 	} else
-	    int_error("bad syntax in set label", c_token);
+	    int_error(c_token, "bad syntax in set label");
 
 	c_token++;
 	set_just = TRUE;
@@ -2306,7 +2303,7 @@ static void set_label()
 	} else if (almost_equals(c_token, "norot$ate")) {
 	    rotate = FALSE;
 	} else
-	    int_error("bad syntax in set label", c_token);
+	    int_error(c_token, "bad syntax in set label");
 
 	c_token++;
 	set_rot = TRUE;
@@ -2317,14 +2314,14 @@ static void set_label()
 	!equals(c_token, "front") && !equals(c_token, "back")) {
 	c_token++;
 	if (END_OF_COMMAND)
-	    int_error("font name and size expected", c_token);
+	    int_error(c_token, "font name and size expected");
 	if (isstring(c_token)) {
 	    font = gp_alloc (token_len(c_token)+1, "text_label->font");
 	    quote_str(font, c_token, token_len(c_token));
 	    /* get 'name,size', no further check */
 	    set_font = TRUE;
 	} else
-	    int_error("'fontname,fontsize' expected", c_token);
+	    int_error(c_token, "'fontname,fontsize' expected");
 
 	c_token++;
     }				/* Entry font added by DJL */
@@ -2337,13 +2334,13 @@ static void set_label()
     }
     if(!END_OF_COMMAND && equals(c_token, "front")) {
 	if (set_layer)
-	    int_error("only one of front or back expected", c_token);
+	    int_error(c_token, "only one of front or back expected");
 	layer = 1;
 	c_token++;
 	set_layer = TRUE;
     }
     if (!END_OF_COMMAND)
-	int_error("extraenous or out-of-order arguments in set label", c_token);
+	int_error(c_token, "extraenous or out-of-order arguments in set label");
 
     /* OK! add label */
     if (first_label != NULL) {	/* skip to last label */
@@ -2404,7 +2401,7 @@ static void set_nolabel()
 	/* get tag */
 	tag = (int) real(const_express(&a));
 	if (!END_OF_COMMAND)
-	    int_error("extraneous arguments to set nolabel", c_token);
+	    int_error(c_token, "extraneous arguments to set nolabel");
 	for (this_label = first_label, prev_label = NULL;
 	     this_label != NULL;
 	     prev_label = this_label, this_label = this_label->next) {
@@ -2413,7 +2410,7 @@ static void set_nolabel()
 		return;		/* exit, our job is done */
 	    }
 	}
-	int_error("label not found", c_token);
+	int_error(c_token, "label not found");
     }
 }
 
@@ -2484,7 +2481,7 @@ static void set_arrow()
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
 	if (tag <= 0)
-	    int_error("tag must be > zero", c_token);
+	    int_error(c_token, "tag must be > zero");
     } else
 	tag = assign_arrow_tag();	/* default next tag */
 
@@ -2501,7 +2498,7 @@ static void set_arrow()
     if (!END_OF_COMMAND && equals(c_token, "from")) {
 	c_token++;
 	if (END_OF_COMMAND)
-	    int_error("start coordinates expected", c_token);
+	    int_error(c_token, "start coordinates expected");
 	/* get coordinates */
 	get_position(&spos);
 	set_start = TRUE;
@@ -2515,7 +2512,7 @@ static void set_arrow()
     if (!END_OF_COMMAND && equals(c_token, "to")) {
 	c_token++;
 	if (END_OF_COMMAND)
-	    int_error("end coordinates expected", c_token);
+	    int_error(c_token, "end coordinates expected");
 	/* get coordinates */
 	get_position(&epos);
 	set_end = TRUE;
@@ -2528,10 +2525,10 @@ static void set_arrow()
     /* get start position - what the heck, either order is ok */
     if (!END_OF_COMMAND && equals(c_token, "from")) {
 	if (set_start)
-	    int_error("only one 'from' is allowed", c_token);
+	    int_error(c_token, "only one 'from' is allowed");
 	c_token++;
 	if (END_OF_COMMAND)
-	    int_error("start coordinates expected", c_token);
+	    int_error(c_token, "start coordinates expected");
 	/* get coordinates */
 	get_position(&spos);
 	set_start = TRUE;
@@ -2562,7 +2559,7 @@ static void set_arrow()
     loc_lp.pointflag = 0;	/* standard value for arrows, don't use points */
 
     if (!END_OF_COMMAND)
-	int_error("extraneous or out-of-order arguments in set arrow", c_token);
+	int_error(c_token, "extraneous or out-of-order arguments in set arrow");
 
     /* OK! add arrow */
     if (first_arrow != NULL) {	/* skip to last arrow */
@@ -2622,7 +2619,7 @@ static void set_noarrow()
 	/* get tag */
 	tag = (int) real(const_express(&a));
 	if (!END_OF_COMMAND)
-	    int_error("extraneous arguments to set noarrow", c_token);
+	    int_error(c_token, "extraneous arguments to set noarrow");
 	for (this_arrow = first_arrow, prev_arrow = NULL;
 	     this_arrow != NULL;
 	     prev_arrow = this_arrow, this_arrow = this_arrow->next) {
@@ -2631,7 +2628,7 @@ static void set_noarrow()
 		return;		/* exit, our job is done */
 	    }
 	}
-	int_error("arrow not found", c_token);
+	int_error(c_token, "arrow not found");
     }
 }
 
@@ -2692,7 +2689,7 @@ static void set_linestyle()
 	/* must be a tag expression! */
 	tag = (int) real(const_express(&a));
 	if (tag <= 0)
-	    int_error("tag must be > zero", c_token);
+	    int_error(c_token, "tag must be > zero");
     } else
 	tag = assign_linestyle_tag();	/* default next tag */
 
@@ -2702,7 +2699,7 @@ static void set_linestyle()
     LP_PARSE(loc_lp, 0, 1, tag - 1, tag - 1);
 
     if (!END_OF_COMMAND)
-	int_error("extraneous or out-of-order arguments in set linestyle", c_token);
+	int_error(c_token, "extraneous or out-of-order arguments in set linestyle");
 
     /* OK! add linestyle */
     if (first_linestyle != NULL) {	/* skip to last linestyle */
@@ -2745,7 +2742,7 @@ static void set_nolinestyle()
 	/* get tag */
 	tag = (int) real(const_express(&a));
 	if (!END_OF_COMMAND)
-	    int_error("extraneous arguments to set nolinestyle", c_token);
+	    int_error(c_token, "extraneous arguments to set nolinestyle");
 	for (this = first_linestyle, prev = NULL;
 	     this != NULL;
 	     prev = this, this = this->next) {
@@ -2754,7 +2751,7 @@ static void set_nolinestyle()
 		return;		/* exit, our job is done */
 	    }
 	}
-	int_error("linestyle not found", c_token);
+	int_error(c_token, "linestyle not found");
     }
 }
 
@@ -2824,7 +2821,7 @@ int tag, pointflag;
     }
 
     /* tag not found: */
-    int_error("linestyle not found", NO_CARET);
+    int_error(NO_CARET,"linestyle not found", NO_CARET);
 }
 
 /* ======================================================== */
@@ -2881,10 +2878,10 @@ enum PLOT_STYLE /* not static; used by command.c */ get_style()
     else if (almost_equals(c_token, "can$dlesticks"))
 	ps = CANDLESTICKS;
     else {
-	int_error("expecting 'lines', 'points', 'linespoints', 'dots', \
-'impulses',\n'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps', \
-'histeps',\n'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector', \
-'financebars', 'candlesticks'", c_token);
+	int_error(c_token, "expecting 'lines', 'points', 'linespoints', \
+'dots', 'impulses',\n'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', \
+'fsteps', 'histeps',\n'boxes', 'boxerrorbars', 'boxxyerrorbars', 'vector', \
+'financebars', 'candlesticks'");
 	return LINES;		/* keep gcc -Wuninitialised happy */
     }
     c_token++;
@@ -2923,7 +2920,7 @@ struct ticdef *tdef;
 	tic = (struct ticmark *) gp_alloc((unsigned long) sizeof(struct ticmark), (char *) NULL);
 	if (tic == (struct ticmark *) NULL) {
 	    free_marklist(list);
-	    int_error("out of memory for tic mark", c_token);
+	    int_error(c_token, "out of memory for tic mark");
 	}
 	/* syntax is  (  ['format'] value , ... )
 	 * but for timedata, the value itself is a string, which
@@ -2961,7 +2958,7 @@ struct ticdef *tdef;
 
     if (END_OF_COMMAND || !equals(c_token, ")")) {
 	free_marklist(list);
-	int_error("expecting right parenthesis )", c_token);
+	int_error(c_token, "expecting right parenthesis )");
     }
     c_token++;
 
@@ -3017,17 +3014,17 @@ struct ticdef *tdef;
 	    end = VERYLARGE;
 	else {
 	    if (!equals(c_token, ","))
-		int_error("expecting comma to separate incr,end", c_token);
+		int_error(c_token, "expecting comma to separate incr,end");
 	    c_token++;
 	    GET_NUM_OR_TIME(end, axis);
 	}
 	if (!END_OF_COMMAND)
-	    int_error("tic series is defined by [start,]increment[,end]", c_token);
+	    int_error(c_token, "tic series is defined by [start,]increment[,end]");
 
 	if (start < end && incr <= 0)
-	    int_error("increment must be positive", incr_token);
+	    int_error(incr_token, "increment must be positive");
 	if (start > end && incr >= 0)
-	    int_error("increment must be negative", incr_token);
+	    int_error(incr_token, "increment must be negative");
 	if (start > end) {
 	    /* put in order */
 	    double numtics;
@@ -3088,7 +3085,7 @@ TBOOLEAN autosc;
     if (equals(c_token, "]"))
 	return (autosc);
     if (END_OF_COMMAND) {
-	int_error("starting range value or ':' or 'to' expected", c_token);
+	int_error(c_token, "starting range value or ':' or 'to' expected");
     } else if (!equals(c_token, "to") && !equals(c_token, ":")) {
 	if (equals(c_token, "*")) {
 	    autosc |= 1;
@@ -3099,7 +3096,7 @@ TBOOLEAN autosc;
 	}
     }
     if (!equals(c_token, "to") && !equals(c_token, ":"))
-	int_error("':' or keyword 'to' expected", c_token);
+	int_error(c_token, "':' or keyword 'to' expected");
     c_token++;
     if (!equals(c_token, "]")) {
 	if (equals(c_token, "*")) {
@@ -3194,7 +3191,7 @@ struct position *pos;
     pos->scalex = type;
     GET_NUMBER_OR_TIME(pos->x, axes, FIRST_X_AXIS);
     if (!equals(c_token, ","))
-	int_error("Expected comma", c_token);
+	int_error(c_token, "Expected comma");
     ++c_token;
     get_position_type(&type, &axes);
     pos->scaley = type;
@@ -3242,7 +3239,7 @@ char *lcl;
     if (setlocale(LC_TIME, lcl))
 	safe_strncpy(cur_locale, lcl, sizeof(cur_locale));
     else
-	int_error("Locale not available", c_token);
+	int_error(c_token, "Locale not available");
 
     /* we can do a *lot* better than this ; eg use system functions
      * where available; create values on first use, etc

@@ -80,7 +80,7 @@ int t_num;			/* index to token[] */
      */
 
     if (standard(t_num))
-	int_warn("Warning : udf shadowed by built-in function of the same name", t_num);
+	int_warn(t_num, "Warning : udf shadowed by built-in function of the same name");
 
     /* create and return a new udf slot */
 

@@ -1035,7 +1035,7 @@ void f_besj0()
 struct value a;
 	(void) pop(&a);
 	if (fabs(imag(&a)) > zero)
-		int_error("can only do bessel functions of reals",NO_CARET);
+		int_error(NO_CARET, "can only do bessel functions of reals");
 	push( Gcomplex(&a,rj0(real(&a)),0.0) );
 }
 
@@ -1045,7 +1045,7 @@ void f_besj1()
 struct value a;
 	(void) pop(&a);
 	if (fabs(imag(&a)) > zero)
-		int_error("can only do bessel functions of reals",NO_CARET);
+		int_error(NO_CARET, "can only do bessel functions of reals");
 	push( Gcomplex(&a,rj1(real(&a)),0.0) );
 }
 
@@ -1055,7 +1055,7 @@ void f_besy0()
 struct value a;
 	(void) pop(&a);
 	if (fabs(imag(&a)) > zero)
-		int_error("can only do bessel functions of reals",NO_CARET);
+		int_error(NO_CARET, "can only do bessel functions of reals");
 	if (real(&a) > 0.0)
 		push( Gcomplex(&a,ry0(real(&a)),0.0) );
 	else {
@@ -1070,7 +1070,7 @@ void f_besy1()
 struct value a;
 	(void) pop(&a);
 	if (fabs(imag(&a)) > zero)
-		int_error("can only do bessel functions of reals",NO_CARET);
+		int_error(NO_CARET, "can only do bessel functions of reals");
 	if (real(&a) > 0.0)
 		push( Gcomplex(&a,ry1(real(&a)),0.0) );
 	else {

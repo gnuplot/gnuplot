@@ -817,7 +817,7 @@ unsigned int x, y, planes;
 	(*b_p)[j] = (pixels *) gp_alloc((unsigned long) x * sizeof(pixels), (char *) NULL);
 	if ((*b_p)[j] == (pixels *) NULL) {
 	    b_freebitmap();	/* free what we have already allocated */
-	    int_error("out of memory for bitmap buffer", NO_CARET);
+	    int_error(NO_CARET, "out of memory for bitmap buffer");
 	}
 	memset((*b_p)[j], 0, x * sizeof(pixels));
     }
@@ -950,7 +950,7 @@ unsigned int size;
 	    b_font[j] = &fnt13x25[j][0];
 	break;
     default:
-	int_error("Unknown character size", NO_CARET);
+	int_error(NO_CARET, "Unknown character size");
     }
 }
 

@@ -497,7 +497,7 @@ void set_hidden3doptions()
 	hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 	c_token++;
 	if (!END_OF_COMMAND)
-	    int_error("No further options allowed after 'defaults'", c_token);
+	    int_error(c_token, "No further options allowed after 'defaults'");
 	return;
     }
     if (almost_equals(c_token, "off$set")) {
@@ -550,7 +550,7 @@ void set_hidden3doptions()
 	hiddenHandleBentoverQuadrangles = 0;
     }
     if (!END_OF_COMMAND) {
-	int_error("No such option to hidden3d (or wrong order)", c_token);
+	int_error(c_token, "No such option to hidden3d (or wrong order)");
     }
 }
 

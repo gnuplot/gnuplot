@@ -129,7 +129,7 @@ int num;
        * Leave some bytes for malloc maintainance.
      */
     if (num > 32700)
-	int_error("Array index must be less than 32k in msdos", NO_CARET);
+	int_error(NO_CARET, "Array index must be less than 32k in msdos");
 #endif /* MSDOS */
 
     if (num == cp->p_max)
@@ -206,7 +206,7 @@ int num;
        * Leave some bytes for malloc maintainance.
      */
     if (num > 32700)
-	int_error("Array index must be less than 32k in msdos", NO_CARET);
+	int_error(NO_CARET, "Array index must be less than 32k in msdos");
 #endif /* 16bit (Win)Doze */
 
     if (num > 0) {
@@ -361,7 +361,7 @@ FILE *fp;
 	fputs("#    EOF\n", fp);	/* human readable ASCII file.   */
 	(void) fclose(fp);	/*                        (JFi) */
     } else
-	os_error("Cannot open save file", c_token);
+	os_error(c_token, "Cannot open save file");
 }
 
 
@@ -374,7 +374,7 @@ FILE *fp;
 	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
-	os_error("Cannot open save file", c_token);
+	os_error(c_token, "Cannot open save file");
 }
 
 
@@ -387,7 +387,7 @@ FILE *fp;
 	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
-	os_error("Cannot open save file", c_token);
+	os_error(c_token, "Cannot open save file");
 }
 
 
@@ -408,7 +408,7 @@ FILE *fp;
 	fputs("#    EOF\n", fp);
 	(void) fclose(fp);
     } else
-	os_error("Cannot open save file", c_token);
+	os_error(c_token, "Cannot open save file");
 }
 
 /*
@@ -1059,14 +1059,8 @@ TBOOLEAN can_do_args;
     do_load_arg_substitution = can_do_args;
 
     if (fp == (FILE *) NULL) {
-	/* HBB 980311: alloc() it, to save valuable stack space: */
-	/* LH  980528: uhm, HBB, you implemented a perfect memory
-	 * leak, because os_error() doesn't return! */
-	char *errbuf = gp_alloc(BUFSIZ, "load_file errorstring");
-	(void) sprintf(errbuf, "Cannot open %s file '%s'",
-		       can_do_args ? "call" : "load", name);
-	os_error(errbuf, c_token);
-	free(errbuf);
+	os_error(c_token, "Cannot open %s file '%s'",
+		 can_do_args ? "call" : "load", name);
     } else if (fp == stdin) {
 	/* DBT 10-6-98  go interactive if "-" named as load file */
 	interactive = TRUE; 
@@ -1096,7 +1090,7 @@ TBOOLEAN can_do_args;
 
 /*              if (c_token >= num_tokens && aix > 9) */
 	    if (c_token >= num_tokens && aix > 10)
-		int_error("too many arguments for CALL <file>", ++c_token);
+		int_error(++c_token, "too many arguments for CALL <file>");
 	}
 	while (!stop) {		/* read all commands in file */
 	    /* read one command */
@@ -1231,7 +1225,7 @@ FILE *fp;
     if (lf == (LFS *) NULL) {
 	if (fp != (FILE *) NULL)
 	    (void) fclose(fp);	/* it won't be otherwise */
-	int_error("not enough memory to load file", c_token);
+	int_error(c_token, "not enough memory to load file");
     }
     lf->fp = fp;		/* save this file pointer */
     lf->name = infile_name;	/* save current name */

@@ -179,14 +179,14 @@ struct value *valptr;
     register int tkn = c_token;
 
     if (END_OF_COMMAND)
-	int_error("constant expression required", c_token);
+	int_error(c_token, "constant expression required");
 
     /* div - no dummy variables in a constant expression */
     dummy_func = NULL;
 
     evaluate_at(temp_at(), valptr);	/* run it and send answer back */
     if (undefined) {
-	int_error("undefined value", tkn);
+	int_error(tkn, "undefined value");
     }
     return (valptr);
 }
@@ -327,15 +327,15 @@ static void factor()
 	c_token++;
 	express();
 	if (!equals(c_token, ")"))
-	    int_error("')' expected", c_token);
+	    int_error(c_token, "')' expected");
 	c_token++;
     } else if (equals(c_token, "$")) {
 	struct value a;
 	if (!isanumber(++c_token))
-	    int_error("Column number expected", c_token);
+	    int_error(c_token, "Column number expected");
 	convert(&a, c_token++);
 	if (a.type != INTGR || a.v.int_val < 0)
-	    int_error("Positive integer expected", c_token);
+	    int_error(c_token, "Positive integer expected");
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
 	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */
@@ -359,7 +359,7 @@ static void factor()
 		    }
 		}
 		if (!equals(c_token, ")"))
-		    int_error("')' expected", c_token);
+		    int_error(c_token, "')' expected");
 		c_token++;
 		(void) add_action(value);
 	    } else {
@@ -380,7 +380,7 @@ static void factor()
 		    call_type = (int) CALLN;
 		}
 		if (!equals(c_token, ")"))
-		    int_error("')' expected", c_token);
+		    int_error(c_token, "')' expected");
 		c_token++;
 		add_action(call_type)->udf_arg = add_udf(tok);
 	    }
@@ -419,7 +419,7 @@ static void factor()
     }
     /* end if letter */
     else
-	int_error("invalid expression ", c_token);
+	int_error(c_token, "invalid expression ");
 
     /* add action code for ! (factorial) operator */
     while (equals(c_token, "!")) {
@@ -448,7 +448,7 @@ static void xterms()
 	argptr1 = add_action(JTERN);
 	express();
 	if (!equals(c_token, ":"))
-	    int_error("expecting ':'", c_token);
+	    int_error(c_token, "expecting ':'");
 	c_token++;
 	savepc2 = at->a_count;
 	argptr2 = add_action(JUMP);

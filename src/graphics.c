@@ -303,7 +303,7 @@ char *text;
 {
     multiplot = FALSE;
     term_end_plot();
-    int_error(text, NO_CARET);
+    int_error(NO_CARET, text);
 }
 
 /*}}} */
@@ -413,7 +413,7 @@ char *axis_name;
 	    /* (to something empty) ==> we're in trouble */
 	    char msg_buffer[MAX_LINE_LEN + 1];
 	    sprintf(msg_buffer, "Can't plot with an empty %s range!", axis_name);
-	    int_error(msg_buffer, c_token);	/* never returns */
+	    int_error(c_token, msg_buffer);	/* never returns */
 	}
     }
 }
@@ -1335,9 +1335,9 @@ int pcount;			/* count of plots in linked list */
      * should have widened empty ranges before we get here.
      */
     if (x_min == x_max)
-	int_error("x_min should not equal x_max!", NO_CARET);
+	int_error(NO_CARET, "x_min should not equal x_max!");
     if (y_min == y_max)
-	int_error("y_min should not equal y_max!", NO_CARET);
+	int_error(NO_CARET, "y_min should not equal y_max!");
 
     term_init();		/* may set xmax/ymax */
 
@@ -4209,7 +4209,7 @@ double log_base, x;		/* we print one number in a number of different formats */
 	    }
 	    /*}}} */
 	default:
-	    int_error("Bad format character", NO_CARET);
+	    int_error(NO_CARET, "Bad format character");
 	}
 	/*}}} */
     }

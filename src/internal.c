@@ -99,13 +99,13 @@ warning:  internal error--stack not empty!\n\
           (function called with too many parameters?)\n");
 }
 
-#define BAD_DEFAULT default: int_error("interal error : type neither INT or CMPLX", NO_CARET); return;
+#define BAD_DEFAULT default: int_error(NO_CARET, "interal error : type neither INT or CMPLX"); return;
 
 struct value *pop(x)
 struct value *x;
 {
     if (s_p < 0)
-	int_error("stack underflow (function call with missing parameters?)", NO_CARET);
+	int_error(NO_CARET, "stack underflow (function call with missing parameters?)");
     *x = stack[s_p--];
     return (x);
 }
@@ -115,23 +115,19 @@ void push(x)
 struct value *x;
 {
     if (s_p == STACK_DEPTH - 1)
-	int_error("stack overflow", NO_CARET);
+	int_error(NO_CARET, "stack overflow");
     stack[++s_p] = *x;
 }
 
 
-#define ERR_VAR "undefined variable: "
-
 void f_push(x)
 union argument *x;		/* contains pointer to value to push; */
 {
-    static char err_str[sizeof(ERR_VAR) + MAX_ID_LEN] = ERR_VAR;
     struct udvt_entry *udv;
 
     udv = x->udv_arg;
     if (udv->udv_undef) {	/* undefined */
-	(void) strcpy(&err_str[sizeof(ERR_VAR) - 1], udv->udv_name);
-	int_error(err_str, NO_CARET);
+	int_error(NO_CARET, "undefined variable: %s", udv->udv_name);
     }
     push(&(udv->udv_value));
 }
@@ -167,20 +163,15 @@ union argument *x;
 }
 
 
-#define ERR_FUN "undefined function: "
-
 void f_call(x)			/* execute a udf */
 union argument *x;
 {
-    static char err_str[sizeof(ERR_FUN) + MAX_ID_LEN] = ERR_FUN;
     register struct udft_entry *udf;
     struct value save_dummy;
 
     udf = x->udf_arg;
     if (!udf->at) {		/* undefined */
-	(void) strcpy(&err_str[sizeof(ERR_FUN) - 1],
-		      udf->udf_name);
-	int_error(err_str, NO_CARET);
+	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
     }
     save_dummy = udf->dummy_values[0];
     (void) pop(&(udf->dummy_values[0]));
@@ -193,7 +184,6 @@ union argument *x;
 void f_calln(x)			/* execute a udf of n variables */
 union argument *x;
 {
-    static char err_str[sizeof(ERR_FUN) + MAX_ID_LEN] = ERR_FUN;
     register struct udft_entry *udf;
     struct value save_dummy[MAX_NUM_VAR];
 
@@ -203,9 +193,7 @@ union argument *x;
 
     udf = x->udf_arg;
     if (!udf->at) {		/* undefined */
-	(void) strcpy(&err_str[sizeof(ERR_FUN) - 1],
-		      udf->udf_name);
-	int_error(err_str, NO_CARET);
+	int_error(NO_CARET, "undefined function: %s", udf->udf_name);
     }
     for (i = 0; i < MAX_NUM_VAR; i++)
 	save_dummy[i] = udf->dummy_values[i];
@@ -239,7 +227,7 @@ static void int_check(v)
 struct value *v;
 {
     if (v->type != INTGR)
-	int_error("non-integer passed to boolean operator", NO_CARET);
+	int_error(NO_CARET, "non-integer passed to boolean operator");
 }
 
 
@@ -791,7 +779,7 @@ void f_mod()
     (void) pop(&a);		/* now do a%b */
 
     if (a.type != INTGR || b.type != INTGR)
-	int_error("can only mod ints", NO_CARET);
+	int_error(NO_CARET, "can only mod ints");
     if (b.v.int_val)
 	push(Ginteger(&a, a.v.int_val % b.v.int_val));
     else {
@@ -925,7 +913,7 @@ void f_factorial()
 	    val *= i;
 	break;
     default:
-	int_error("factorial (!) argument must be an integer", NO_CARET);
+	int_error(NO_CARET, "factorial (!) argument must be an integer");
 	return;			/* avoid gcc -Wall warning about val */
     }
 

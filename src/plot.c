@@ -728,9 +728,9 @@ static void get_user_env ()
 
 	    assert(homelen <= PATH_MAX);
 	    user_homedir = (const char *) gp_alloc(homelen, "user homedir");
-	    safe_strncpy((char *)user_homedir, env_home, homelen);
+	    strcpy((char *)user_homedir, env_home);
 	} else
-	    int_warn("no HOME found", NO_CARET);
+	    int_warn(NO_CARET, "no HOME found");
     }
 
     /* Hhm ... what about VMS? */
@@ -746,7 +746,7 @@ static void get_user_env ()
 
 	shell_len += strlen(env_shell);
 	user_shell = (const char *) gp_alloc(shell_len, "user shell");
-	safe_strncpy((char *)user_shell, env_shell, shell_len);
+	strcpy((char *)user_shell, env_shell);
     }
 
 #if defined(ATARI) || defined(MTOS)
@@ -757,7 +757,7 @@ static void get_user_env ()
 	    size_t gpplen = strlen(env_gpp) + 1;
 
 	    user_gnuplotpath = (const char *) gp_alloc(gpplen, "user gnuplotpath");
-	    safe_strncpy((char *)user_gnuplotpath, env_gpp, gpplen);
+	    strcpy((char *)user_gnuplotpath, env_gpp);
 	}
     }
 #endif
@@ -783,7 +783,7 @@ size_t pathsize;
 	    strncpy (*pathp, user_homedir, strlen(user_homedir));
         }
         else
-	    int_warn ("HOME not set - cannot expand tilde", NO_CARET);
+	    int_warn (NO_CARET, "HOME not set - cannot expand tilde");
     }
 }
 

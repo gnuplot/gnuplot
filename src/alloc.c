@@ -130,7 +130,7 @@ void *x;
 	if ( ((unsigned char *)(p+1))[p->requested_size] != CHECKSUM_CHAR)
 	{
 		fprintf(stderr, "Heap corruption at end of block for %-60s\n", p->use);
-		int_error("Argh !", NO_CARET);
+		int_error(NO_CARET, "Argh !");
 	}
 }		
 
@@ -150,7 +150,7 @@ void check_pointer_in_block(void *block, void *p, int size, char *file, int line
 	{
 		fprintf(stderr, "argh - pointer %p outside block %p->%p for %s at %s:%d\n",
 		  p, block, (char *)block + f->requested_size, f->use, file, line);
-		int_error("argh - pointer misuse !", NO_CARET);
+		int_error(NO_CARET, "argh - pointer misuse !");
 	}
 }
 
@@ -164,7 +164,7 @@ char *usage;
 	TRACE_ALLOC(("gp_alloc %d for %s\n", (int) size, usage?usage:"<unknown>"));
 	
 	p=malloc(total_size);
-	if (!p) int_error("Out of memory", NO_CARET);
+	if (!p) int_error(NO_CARET, "Out of memory");
 
 	bytes_allocated += size;
 	
@@ -190,7 +190,7 @@ char *usage;
 
 		p = realloc(p, total);
 
-		if (!p) int_error("Out of memory", NO_CARET);
+		if (!p) int_error(NO_CARET, "Out of memory");
 
 		TRACE_ALLOC(("gp_realloc %d for %s (was %d)\n",
 		  (int)size, usage?usage:"<unknown>", p->requested_size));
@@ -269,7 +269,6 @@ gp_alloc(size, message)
 	char *message;			/* description of what is being allocated */
 {
     char *p;				/* the new allocation */
-    char errbuf[100];		/* error message string */
 
 #ifndef NO_GIH
     p = GP_FARMALLOC(size);
@@ -280,8 +279,7 @@ gp_alloc(size, message)
 	   if (p == (char *)NULL) {
 		  /* really out of memory */
 		  if (message != NULL) {
-			 (void) sprintf(errbuf, "out of memory for %s", message);
-			 int_error(errbuf, NO_CARET);
+			 int_error(NO_CARET, "out of memory for %s", message);
 			 /* NOTREACHED */
 		  }
 		  /* else we return NULL */
@@ -305,7 +303,6 @@ gp_realloc(p, size, message)
 	char *message;			/* description of what is being allocated */
 {
     char *res;				/* the new allocation */
-    char errbuf[100];		/* error message string */
 
     /* realloc(NULL,x) is meant to do malloc(x), but doesn't always */
     if (!p)
@@ -320,8 +317,7 @@ gp_realloc(p, size, message)
 	   if (res == (char *)NULL) {
 		  /* really out of memory */
 		  if (message != NULL) {
-			 (void) sprintf(errbuf, "out of memory for %s", message);
-			 int_error(errbuf, NO_CARET);
+			 int_error(NO_CARET, "out of memory for %s", message);
 			 /* NOTREACHED */
 		  }
 		  /* else we return NULL */

@@ -102,8 +102,8 @@ extern int df_eof;
 extern int df_timecol[];
 extern TBOOLEAN df_binary;
 
-#define Inc_c_token if (++c_token >= num_tokens)	\
-                        int_error ("Syntax error", c_token);
+#define Inc_c_token if (++c_token >= num_tokens) \
+  int_error (c_token, "Syntax error");
 
 
 /*
@@ -143,7 +143,7 @@ do {\
   c_token++; \
   auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]);\
   if (!equals(c_token, "]"))\
-   int_error("']' expected", c_token);\
+   int_error(c_token, "']' expected");\
   c_token++;\
  }\
 } while (0)
@@ -190,7 +190,7 @@ do { if (reverse_range[AXIS]) { \
      }\
      if (log_array[AXIS]) { \
       if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
-       int_error(LOG_MSG(WHICH), NO_CARET); \
+       int_error(NO_CARET, LOG_MSG(WHICH)); \
       min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
       max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
    } \
@@ -208,7 +208,7 @@ void plotrequest()
     int dummy_token = -1;
 
     if (!term)			/* unknown */
-	int_error("use 'set term' to set terminal type first", c_token);
+	int_error(c_token, "use 'set term' to set terminal type first");
 
     is_3d_plot = FALSE;
 
@@ -242,7 +242,7 @@ void plotrequest()
 
 	    auto_array[axis] = load_range(axis, &min_array[axis], &max_array[axis], auto_array[axis]);
 	    if (!equals(c_token, "]"))
-		int_error("']' expected", c_token);
+		int_error(c_token, "']' expected");
 	    c_token++;
 	}			/* end of scope of 'axis' */
     }				/* first '[' */
@@ -345,10 +345,8 @@ struct curve_points *this_plot;
 	switch (j) {
 	default:
 	    {
-		char message[80];
-		sprintf(message, "internal error : df_readline returned %d : datafile line %d", j, df_line_number);
 		df_close();
-		int_error(message, c_token);
+		int_error(c_token, "internal error : df_readline returned %d : datafile line %d", j, df_line_number);
 	    }
 	case DF_UNDEFINED:
 	    /* bad result from extended using expression */
@@ -370,10 +368,9 @@ struct curve_points *this_plot;
 
 	case 0:		/* not blank line, but df_readline couldn't parse it */
 	    {
-		char message[80];
-		sprintf(message, "Bad data on line %d", df_line_number);
 		df_close();
-		int_error(message, this_plot->token);
+		int_error(this_plot->token,
+			  "Bad data on line %d", df_line_number);
 	    }
 
 	case 1:
@@ -406,7 +403,7 @@ struct curve_points *this_plot;
 	    else
 		switch (this_plot->plot_style) {
 		default:
-		    int_warn("This plot style not work with 3 cols. Setting to yerrorbars", storetoken);
+		    int_warn(storetoken, "This plot style not work with 3 cols. Setting to yerrorbars");
 		    this_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
@@ -444,8 +441,7 @@ struct curve_points *this_plot;
 
 	    switch (this_plot->plot_style) {
 	    default:
-		int_warn("This plot style does not work with 4 cols. Setting to yerrorbars",
-			 storetoken);
+		int_warn(storetoken, "This plot style does not work with 4 cols. Setting to yerrorbars");
 		this_plot->plot_style = YERRORBARS;
 		/* fall through */
 
@@ -488,7 +484,7 @@ struct curve_points *this_plot;
 	    {			/* x, y, ylow, yhigh, width  or  x open low high close */
 		switch (this_plot->plot_style) {
 		default:
-		    int_warn("Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars", storetoken);
+		    int_warn(storetoken, "Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars");
 		    this_plot->plot_style = BOXERROR;
 		    /*fall through */
 
@@ -511,7 +507,7 @@ struct curve_points *this_plot;
 	    /* x, y, xlow, xhigh, ylow, yhigh */
 	    switch (this_plot->plot_style) {
 	    default:
-		int_warn("This plot style not work with 6 cols. Setting to xyerrorbars", storetoken);
+		int_warn(storetoken, "This plot style not work with 6 cols. Setting to xyerrorbars");
 		this_plot->plot_style = XYERRORBARS;
 		/*fall through */
 	    case XYERRORLINES:
@@ -782,7 +778,7 @@ static void eval_plots()
      */
     while (TRUE) {
 	if (END_OF_COMMAND)
-	    int_error("function to plot expected", c_token);
+	    int_error(c_token, "function to plot expected");
 
 	if (is_definition(c_token)) {
 	    define();
@@ -798,7 +794,7 @@ static void eval_plots()
 	    if (isstring(c_token)) {	/* data file to plot */
 
 		if (parametric && xparam)
-		    int_error("previous parametric function not fully specified", c_token);
+		    int_error(c_token, "previous parametric function not fully specified");
 
 		if (*tp_ptr)
 		    this_plot = *tp_ptr;
@@ -814,7 +810,7 @@ static void eval_plots()
 		/* this parses data-file-specific modifiers only */
 		/* we'll sort points when we know style, if necessary */
 		if (df_binary)
-		    int_error("2d binary files not yet supported", c_token);
+		    int_error(c_token, "2d binary files not yet supported");
 
 		this_plot->token = end_token = c_token - 1;	/* include modifiers in default title */
 
@@ -846,7 +842,7 @@ static void eval_plots()
 	    if (almost_equals(c_token, "s$mooth")) {
 
 		if (END_OF_COMMAND)
-		    int_error("expecting smooth parameter", c_token);
+		    int_error(c_token, "expecting smooth parameter");
 		else {
 		    c_token++;
 		    if (almost_equals(c_token, "u$nique"))
@@ -860,7 +856,7 @@ static void eval_plots()
 		    else if (almost_equals(c_token, "s$bezier"))
 			this_plot->plot_smooth = SBEZIER;
 		    else
-			int_error("expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'", c_token);
+			int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
 		}
 		this_plot->plot_style = LINES;
 		c_token++;	/* skip format */
@@ -869,7 +865,7 @@ static void eval_plots()
 
 	    if (almost_equals(c_token, "ax$es") || almost_equals(c_token, "ax$is")) {
 		if (parametric && xparam)
-		    int_error("previous parametric function not fully specified", c_token);
+		    int_error(c_token, "previous parametric function not fully specified");
 
 		if (equals(++c_token, "x1y1")) {
 		    x_axis = FIRST_X_AXIS;
@@ -888,7 +884,7 @@ static void eval_plots()
 		    y_axis = FIRST_Y_AXIS;
 		    ++c_token;
 		} else
-		    int_error("axes must be x1y1, x1y2, x2y1 or x2y2", c_token);
+		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
 	    } else {
 		x_axis = FIRST_X_AXIS;
 		y_axis = FIRST_Y_AXIS;
@@ -909,12 +905,12 @@ static void eval_plots()
 		}
 		if (datatype[x_axis] == TIME) {
 		    if (specs < 2)
-			int_error("Need full using spec for x time data", c_token);
+			int_error(c_token, "Need full using spec for x time data");
 		    df_timecol[0] = 1;
 		}
 		if (datatype[y_axis] == TIME) {
 		    if (specs < 1)
-			int_error("Need using spec for y time data", c_token);
+			int_error(c_token, "Need using spec for y time data");
 		    df_timecol[y_axis] = 1;	/* need other cols, but I'm lazy */
 		}
 		uses_axis[x_axis] |= 1;		/* separate record of datafile and func */
@@ -927,7 +923,7 @@ static void eval_plots()
 	    if (almost_equals(c_token, "t$itle")) {
 		if (parametric) {
 		    if (xparam)
-			int_error("\"title\" allowed only after parametric function fully specified", c_token);
+			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
 		    else if (xtitle != NULL)
 			xtitle[0] = '\0';	/* Remove default title . */
 		}
@@ -935,7 +931,7 @@ static void eval_plots()
 		if (isstring(c_token)) {
 		    m_quote_capture(&(this_plot->title), c_token, c_token);
 		} else {
-		    int_error("expecting \"title\" for plot", c_token);
+		    int_error(c_token, "expecting \"title\" for plot");
 		}
 		c_token++;
 	    } else if (almost_equals(c_token, "not$itle")) {
@@ -951,7 +947,7 @@ static void eval_plots()
 
 	    if (almost_equals(c_token, "w$ith")) {
 		if (parametric && xparam)
-		    int_error("\"with\" allowed only after parametric function fully specified", c_token);
+		    int_error(c_token, "\"with\" allowed only after parametric function fully specified");
 		this_plot->plot_style = get_style();
 	    }
 	    /* pick up line/point specs
@@ -981,7 +977,7 @@ static void eval_plots()
 			/* am: not a single line of data (point to be more precise)
 			   has been found. So don't issue a misleading warning like
 			   "x range is invalid" but stop here! */
-			int_error("no data point found in specified file", c_token);
+			int_error(c_token, "no data point found in specified file");
 		}
 
 		/* sort */
@@ -1022,7 +1018,7 @@ static void eval_plots()
     }
 
     if (parametric && xparam)
-	int_error("parametric function not fully specified", NO_CARET);
+	int_error(NO_CARET, "parametric function not fully specified");
 
 
 /*** Second Pass: Evaluate the functions ***/
@@ -1040,7 +1036,7 @@ static void eval_plots()
     if (!parametric && !polar) {
 	if (min_array[FIRST_X_AXIS] == VERYLARGE ||
 	    max_array[FIRST_X_AXIS] == -VERYLARGE)
-	    int_error("x range is invalid", c_token);
+	    int_error(c_token, "x range is invalid");
 	/* check that xmin -> xmax is not too small */
 	fixup_range(FIRST_X_AXIS, "x");
 
@@ -1048,7 +1044,7 @@ static void eval_plots()
 	    /* some data plots with x2 */
 	    if (min_array[SECOND_X_AXIS] == VERYLARGE ||
 		max_array[SECOND_X_AXIS] == -VERYLARGE)
-		int_error("x2 range is invalid", c_token);
+		int_error(c_token, "x2 range is invalid");
 	    /* check that x2min -> x2max is not too small */
 	    fixup_range(SECOND_X_AXIS, "x2");
 	} else if (auto_array[SECOND_X_AXIS]) {
@@ -1083,7 +1079,7 @@ static void eval_plots()
 do{ assert(!polar && !parametric); \
  if (log_array[AXIS]) {\
   if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0)\
-   int_error("x/x2 range must be greater than 0 for log scale!", NO_CARET);\
+   int_error(NO_CARET, "x/x2 range must be greater than 0 for log scale!");\
   t_min = log(min_array[AXIS])/log_base_array[AXIS]; t_max = log(max_array[AXIS])/log_base_array[AXIS];\
  } else {\
   t_min = min_array[AXIS]; t_max = max_array[AXIS];\
@@ -1209,18 +1205,18 @@ do{ assert(!polar && !parametric); \
        happen, if you type "plot x=5", since x=5 is a variable assignment */
 
     if (plot_num == 0 || first_plot == NULL) {
-	int_error("no functions or data to plot", c_token);
+	int_error(c_token, "no functions or data to plot");
     }
     if (uses_axis[FIRST_X_AXIS]) {
 	if (max_array[FIRST_X_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_X_AXIS] == VERYLARGE)
-	    int_error("all points undefined!", NO_CARET);
+	    int_error(NO_CARET, "all points undefined!");
 	FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
     }
     if (uses_axis[SECOND_X_AXIS]) {
 	if (max_array[SECOND_X_AXIS] == -VERYLARGE ||
 	    min_array[SECOND_X_AXIS] == VERYLARGE)
-	    int_error("all points undefined!", NO_CARET);
+	    int_error(NO_CARET, "all points undefined!");
 	FIXUP_RANGE_FOR_LOG(SECOND_X_AXIS, x2);
     } else {
 	assert(uses_axis[FIRST_X_AXIS]);
@@ -1240,14 +1236,14 @@ do{ assert(!polar && !parametric); \
     if (uses_axis[FIRST_Y_AXIS]) {
 	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_Y_AXIS] == VERYLARGE)
-	    int_error("all points undefined!", NO_CARET);
+	    int_error(NO_CARET, "all points undefined!");
 	fixup_range(FIRST_Y_AXIS, "y");
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
     }				/* else we want to copy y2 range, but need to fix it up first */
     if (uses_axis[SECOND_Y_AXIS]) {
 	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
 	    min_array[SECOND_Y_AXIS] == VERYLARGE)
-	    int_error("all points undefined!", NO_CARET);
+	    int_error(NO_CARET, "all points undefined!");
 	fixup_range(SECOND_Y_AXIS, "y2");
 	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {

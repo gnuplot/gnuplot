@@ -1227,7 +1227,7 @@ void do_fit()
 	}
 	autorange_x = load_range(FIRST_X_AXIS, &min_x, &max_x, autorange_x);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
     }
     /* ... and y */
@@ -1243,7 +1243,7 @@ void do_fit()
 	}
 	autorange_y = load_range(FIRST_Y_AXIS, &min_y, &max_y, autorange_y);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
     }
     /* HBB 980401: new: allow restricting the z range as well */
@@ -1253,10 +1253,10 @@ void do_fit()
 	zrange_token = c_token++;
 	if (isletter(c_token))
 	    /* do *not* allow the z range being given with a variable name */
-	    int_error("Can't re-name dependent variable", c_token);
+	    int_error(c_token, "Can't re-name dependent variable");
 	autorange_z = load_range(FIRST_Z_AXIS, &min_z, &max_z, autorange_z);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
 #if 0 /* HBB 981210: move this to a later point */
     } else {
@@ -1302,7 +1302,7 @@ void do_fit()
 
     columns = df_open(4);	/* up to 4 using specs allowed */
     if (columns == 1)
-	int_error("Need 2 to 4 using specs", c_token);
+	int_error(c_token, "Need 2 to 4 using specs");
 
     /* The following patch was made by Remko Scharroo, 25-Mar-1999
      * We need to check if one of the columns is time data, like
@@ -1310,19 +1310,19 @@ void do_fit()
 
     if (datatype[FIRST_X_AXIS] == TIME) {
         if (columns < 2)
-            int_error("Need full using spec for x time data", c_token);
+            int_error(c_token, "Need full using spec for x time data");
         df_timecol[0] = 1;
     }
     if (datatype[FIRST_Y_AXIS] == TIME) {
         if (columns < 1)
-            int_error("Need using spec for y time data", c_token);
+            int_error(c_token, "Need using spec for y time data");
         df_timecol[1] = 1;
     }
     /* HBB 990326: added this check. Just in case some wants to fit
      * time/date data depending on two other variables ... */
     if (datatype[FIRST_Z_AXIS] == TIME) {
       if (columns < 4)
-	int_error("Need full using spec for z time data", c_token);
+	int_error(c_token, "Need full using spec for z time data");
       else
 	df_timecol[2] = 1;
     }
@@ -1332,13 +1332,13 @@ void do_fit()
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
     if ((dummy_y >= 0) && (columns < 4))
-	int_error("Can't re-name 'y' in a one-variable fit", dummy_y);
+	int_error(dummy_y, "Can't re-name 'y' in a one-variable fit");
 
     /* HBB 981210: two range specs mean different things, depending
      * on wether this is a 2D or 3D fit */
     if (columns<4) {
       if (zrange_token != -1)
-	int_error("Three range-specs not allowed in on-variable fit", zrange_token);
+	int_error(zrange_token, "Three range-specs not allowed in on-variable fit");
       else {
 	/* 2D fit, 2 ranges: second range is for *z*, not y: */
 	autorange_z = autorange_y;
@@ -1515,7 +1515,7 @@ void do_fit()
     max_params = MAX_PARAMS;	/* HBB 971023: make this resizeable */
 
     if (!equals(c_token, "via"))
-	int_error("Need via and either parameter list or file", c_token);
+	int_error(c_token, "Need via and either parameter list or file");
 
     a = vec(max_params);
     par_name = (fixstr *) gp_alloc((max_params + 1) * sizeof(fixstr), "fit param");

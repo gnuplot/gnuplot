@@ -145,20 +145,20 @@ int *expressionlenp;
 			    &token[t_num].l_val.v.cmplx_val.real,
 			    &token[t_num].l_val.v.cmplx_val.imag,
 			    &l) != 3) || (!strchr(l, RBRACE)))
-		    int_error("invalid complex constant", t_num);
+		    int_error(t_num, "invalid complex constant");
 	    }
 #else
 	    if ((sscanf(&expression[++current], "%lf , %lf %c",
 			&token[t_num].l_val.v.cmplx_val.real,
 			&token[t_num].l_val.v.cmplx_val.imag,
 			&brace) != 3) || (brace != RBRACE))
-		int_error("invalid complex constant", t_num);
+		int_error(t_num, "invalid complex constant");
 #endif
 	    token[t_num].length += 2;
 	    while (expression[++current] != RBRACE) {
 		token[t_num].length++;
 		if (expression[current] == NUL)	/* { for vi % */
-		    int_error("no matching '}'", t_num);
+		    int_error(t_num, "no matching '}'");
 	    }
 	} else if (expression[current] == '\'' ||
 		   expression[current] == '\"') {
@@ -214,7 +214,7 @@ int *expressionlenp;
 		    APPEND_TOKEN;
 		break;
 	    default:
-		int_error("invalid character", t_num);
+		int_error(t_num, "invalid character");
 	    }
 	++t_num;		/* next token if not white space */
     }
@@ -262,14 +262,14 @@ char str[];
 	    count++;
 	if (!isdigit((int) str[count])) {
 	    token[t_num].start_index += count;
-	    int_error("expecting exponent", t_num);
+	    int_error(t_num, "expecting exponent");
 	}
 	while (isdigit((int) str[++count]));
     }
     if (token[t_num].l_val.type == INTGR) {
 	lval = atol(str);
 	if ((token[t_num].l_val.v.int_val = lval) != lval)
-	    int_error("integer overflow; change to floating point", t_num);
+	    int_error(t_num, "integer overflow; change to floating point");
     } else {
 	token[t_num].l_val.v.cmplx_val.imag = 0.0;
 	token[t_num].l_val.v.cmplx_val.real = atof(str);
@@ -340,16 +340,16 @@ int current;
 # ifdef VMS
     pgmdsc.dsc$w_length = i;
     if (!((vaxc$errno = sys$crembx(0, &chan, 0, 0, 0, 0, &lognamedsc)) & 1))
-	os_error("sys$crembx failed", NO_CARET);
+	os_error(NO_CARET, "sys$crembx failed");
 
     if (!((vaxc$errno = lib$spawn(&pgmdsc, 0, &lognamedsc, &one)) & 1))
-	os_error("lib$spawn failed", NO_CARET);
+	os_error(NO_CARET, "lib$spawn failed");
 
     if ((f = fopen(MAILBOX, "r")) == NULL)
-	os_error("mailbox open failed", NO_CARET);
+	os_error(NO_CARET, "mailbox open failed");
 # elif (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)
     if (system(NULL) == 0)
-	os_error("no command shell", NO_CARET);
+	os_error(NO_CARET, "no command shell");
     atari_tmpfile = tmpnam(NULL);
     gp_realloc(pgm, pgm_len + 5 + strlen(atari_tmpfile), "command string");
     strcat(pgm, " >> ");
@@ -360,7 +360,7 @@ int current;
     if ((fd = open(pgm, "O_RDONLY")) == -1)
 # else /* everyone else */
     if ((f = popen(pgm, "r")) == NULL)
-	os_error("popen failed", NO_CARET);
+	os_error(NO_CARET, "popen failed");
 # endif /* !VMS */
 
     free(pgm);
@@ -402,10 +402,7 @@ static void substitute(str, max)
 char *str;
 int max;
 {
-    char line[100];
-
-    sprintf(line, "substitution not supported by %s", OS);
-    int_error(line, t_num);
+    int_error(t_num, "substitution not supported by %s", OS);
 }
 
 #endif /* unix || VMS || PIPES || ATARI && PUREC */

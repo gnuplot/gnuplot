@@ -156,7 +156,7 @@ void show_command()
     c_token++;
 
     if (!show_one() && !show_two())
-	int_error(showmess, c_token);
+	int_error(c_token, showmess);
     screen_ok = FALSE;
     (void) putc('\n', stderr);
 }
@@ -178,7 +178,7 @@ static TBOOLEAN
 	if (!END_OF_COMMAND) {
 	    tag = (int) real(const_express(&a));
 	    if (tag <= 0)
-		int_error("tag must be > zero", c_token);
+		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n', stderr);
 	show_arrow(tag);
@@ -214,7 +214,7 @@ static TBOOLEAN
     } else if (almost_equals(c_token, "da$ta")) {
 	c_token++;
 	if (!almost_equals(c_token, "s$tyle"))
-	    int_error("expecting keyword 'style'", c_token);
+	    int_error(c_token, "expecting keyword 'style'");
 	(void) putc('\n', stderr);
 	show_style("data", data_style);
 	c_token++;
@@ -338,7 +338,7 @@ static TBOOLEAN
 	if (!END_OF_COMMAND) {
 	    tag = (int) real(const_express(&a));
 	    if (tag <= 0)
-		int_error("tag must be > zero", c_token);
+		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n', stderr);
 	show_label(tag);
@@ -350,7 +350,7 @@ static TBOOLEAN
 	if (!END_OF_COMMAND) {
 	    tag = (int) real(const_express(&a));
 	    if (tag <= 0)
-		int_error("tag must be > zero", c_token);
+		int_error(c_token, "tag must be > zero");
 	}
 	(void) putc('\n', stderr);
 	show_linestyle(tag);
@@ -970,7 +970,7 @@ int tag;			/* 0 means show all */
 	}
     }
     if (tag > 0 && !showed)
-	int_error("label not found", c_token);
+	int_error(c_token, "label not found");
 }
 
 static void show_arrow(tag)
@@ -996,7 +996,7 @@ int tag;			/* 0 means show all */
 	}
     }
     if (tag > 0 && !showed)
-	int_error("arrow not found", c_token);
+	int_error(c_token, "arrow not found");
 }
 
 static void show_linestyle(tag)
@@ -1018,7 +1018,7 @@ int tag;			/* 0 means show all */
 	}
     }
     if (tag > 0 && !showed)
-	int_error("linestyle not found", c_token);
+	int_error(c_token, "linestyle not found");
 }
 
 static void show_grid()
@@ -1070,7 +1070,7 @@ char *name;
 	fprintf(stderr, "\tminor %stics are drawn with %d subintervals between major xtic marks\n", name, (int) minifreq);
 	break;
     default:
-	int_error("Unknown minitic type in show_mtics()", NO_CARET);
+	int_error(NO_CARET, "Unknown minitic type in show_mtics()");
     }
 }
 
@@ -1271,7 +1271,7 @@ int rotate_tics;
 	    break;
 	}
     default:{
-	    int_error("unknown ticdef type in show_ticdef()", NO_CARET);
+	    int_error(NO_CARET, "unknown ticdef type in show_ticdef()");
 	    /* NOTREACHED */
 	}
     }

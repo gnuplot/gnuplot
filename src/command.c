@@ -185,7 +185,7 @@ int plot_token;			/* start of 'plot' command */
 TBOOLEAN is_3d_plot = FALSE;
 
 #define Inc_c_token if (++c_token >= num_tokens)	\
-                        int_error ("Syntax error", c_token);
+                        int_error (c_token, "Syntax error");
 
 /* support for dynamic size of input line */
 void extend_input_line()
@@ -300,7 +300,7 @@ int do_line()
 	    if (equals(c_token, ";"))
 		c_token++;
 	    else
-		int_error("';' expected", c_token);
+		int_error(c_token, "';' expected");
 	}
     }
     return (0);
@@ -325,13 +325,13 @@ void define()
 	    copy_str(c_dummy_var[dummy_num++], c_token, MAX_ID_LEN);
 	} while (equals(c_token + 1, ",") && (dummy_num < MAX_NUM_VAR));
 	if (equals(c_token + 1, ","))
-	    int_error("function contains too many parameters", c_token + 2);
+	    int_error(c_token + 2, "function contains too many parameters");
 	c_token += 3;		/* skip (, dummy, ) and = */
 	if (END_OF_COMMAND)
-	    int_error("function definition expected", c_token);
+	    int_error(c_token, "function definition expected");
 	udf = dummy_func = add_udf(start_token);
 	if ((at_tmp = perm_at()) == (struct at_type *) NULL)
-	    int_error("not enough memory for function", start_token);
+	    int_error(start_token, "not enough memory for function");
 	if (udf->at)		/* already a dynamic a.t. there */
 	    free((char *) udf->at);	/* so free it first */
 	udf->at = at_tmp;	/* before re-assigning it. */
@@ -408,7 +408,7 @@ static int command()
 	buf[0] = NUL;
 	if (!(END_OF_COMMAND)) {
 	    if (!isstring(c_token))
-		int_error("expecting string", c_token);
+		int_error(c_token, "expecting string");
 	    else {
 		quote_str(buf, c_token, MAX_LINE_LEN);
 		++c_token;
@@ -516,11 +516,11 @@ static int command()
 	 */
 	tmps2[0] = NUL;
 	if (!isstring(++c_token))
-	    int_error("Parameter filename expected", c_token);
+	    int_error(c_token, "Parameter filename expected");
 	quote_str(tmps, c_token++, 80);
 	if (!(END_OF_COMMAND)) {
 	    if (!isstring(c_token))
-		int_error("New parameter filename expected", c_token);
+		int_error(c_token, "New parameter filename expected");
 	    else
 		quote_str(tmps2, c_token++, 80);
 	}
@@ -537,7 +537,7 @@ static int command()
 	SET_CURSOR_ARROW;
     } else if (almost_equals(c_token, "rep$lot")) {
 	if (replot_line[0] == NUL)
-	    int_error("no previous plot", c_token);
+	    int_error(c_token, "no previous plot");
 	c_token++;
 	SET_CURSOR_WAIT;
 	replotrequest();
@@ -569,7 +569,7 @@ static int command()
     } else if (almost_equals(c_token, "sa$ve")) {
 	if (almost_equals(++c_token, "f$unctions")) {
 	    if (!isstring(++c_token))
-		int_error("expecting filename", c_token);
+		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file, strlen(sv_file));
@@ -577,7 +577,7 @@ static int command()
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
 	    if (!isstring(++c_token))
-		int_error("expecting filename", c_token);
+		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file, strlen(sv_file));
@@ -585,7 +585,7 @@ static int command()
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
 	    if (!isstring(++c_token))
-		int_error("expecting filename", c_token);
+		int_error(c_token, "expecting filename");
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file, strlen(sv_file));
@@ -596,12 +596,12 @@ static int command()
 	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    save_all(fopen(sv_file, "w"));
 	} else {
-	    int_error("filename or keyword 'functions', 'variables', or 'set' expected", c_token);
+	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
 	}
 	c_token++;
     } else if (almost_equals(c_token, "l$oad")) {
 	if (!isstring(++c_token))
-	    int_error("expecting filename", c_token);
+	    int_error(c_token, "expecting filename");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
 	    gp_expand_tilde(&sv_file, strlen(sv_file));
@@ -617,7 +617,7 @@ static int command()
 	}
     } else if (almost_equals(c_token, "ca$ll")) {
 	if (!isstring(++c_token))
-	    int_error("expecting filename", c_token);
+	    int_error(c_token, "expecting filename");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
 	    gp_expand_tilde(&sv_file, strlen(sv_file));
@@ -630,7 +630,7 @@ static int command()
 	double exprval;
 	struct value t;
 	if (!equals(++c_token, "("))	/* no expression */
-	    int_error("expecting (expression)", c_token);
+	    int_error(c_token, "expecting (expression)");
 	exprval = real(const_express(&t));
 	if (exprval != 0.0) {
 	    /* fake the condition of a ';' between commands */
@@ -649,12 +649,12 @@ static int command()
 	c_token++;
     } else if (almost_equals(c_token, "cd")) {
 	if (!isstring(++c_token))
-	    int_error("expecting directory name", c_token);
+	    int_error(c_token, "expecting directory name");
 	else {
 	    m_quote_capture(&sv_file, c_token, c_token);
 	    gp_expand_tilde(&sv_file, strlen(sv_file));
 	    if (changedir(sv_file)) {
-		int_error("Can't change to this directory", c_token);
+		int_error(c_token, "Can't change to this directory");
 	    }
 	    c_token++;
 	}
@@ -685,7 +685,7 @@ static int command()
 	    }
 	}
 #endif
-	int_error("invalid command", c_token);
+	int_error(c_token, "invalid command");
     }
     if (sv_file)
 	free(sv_file);
@@ -752,7 +752,7 @@ char *path;
 void replotrequest()
 {
     if (equals(c_token, "["))
-	int_error("cannot set range with replot", c_token);
+	int_error(c_token, "cannot set range with replot");
 
     /* do not store directly into the replot_line string, until the
      * new plot line has been successfully plotted. This way,
@@ -888,7 +888,7 @@ int toplevel;			/* not used for VMS version */
     help_desc.dsc$w_length = strlen(Help);
     if ((vaxc$errno = lbr$output_help(lib$put_output, 0, &help_desc,
 				      &helpfile_desc, 0, lib$get_input)) != SS$_NORMAL)
-	os_error("can't open GNUPLOT$HELP", NO_CARET);
+	os_error(NO_CARET, "can't open GNUPLOT$HELP");
 }
 
 # endif				/* NO_GIH */
@@ -896,7 +896,7 @@ int toplevel;			/* not used for VMS version */
 static void do_shell()
 {
     if ((vaxc$errno = lib$spawn()) != SS$_NORMAL) {
-	os_error("spawn error", NO_CARET);
+	os_error(NO_CARET, "spawn error");
     }
 }
 
@@ -912,7 +912,7 @@ static void do_system()
     line_desc.dsc$a_pointer = &input_line[1];
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
-	os_error("spawn error", NO_CARET);
+	os_error(NO_CARET, "spawn error");
 
     (void) putc('\n', stderr);
 }
@@ -1085,7 +1085,7 @@ int toplevel;
 	    break;
 	}
     default:{			/* defensive programming */
-	    int_error("Impossible case in switch", NO_CARET);
+	    int_error(NO_CARET, "Impossible case in switch");
 	    /* NOTREACHED */
 	}
     }
@@ -1235,7 +1235,7 @@ static void do_shell()
 #  else
 		if (spawnl(P_WAIT, user_shell, NULL) == -1)
 #  endif			/* !(_Windows || DJGPP) */
-		    os_error("unable to spawn shell", NO_CARET);
+		    os_error(NO_CARET, "unable to spawn shell");
     }
 }
 
@@ -1245,7 +1245,7 @@ static void do_shell()
 {
     if (user_shell) {
 	if (system(user_shell))
-	    os_error("system() failed", NO_CARET);
+	    os_error(NO_CARET, "system() failed");
     }
     (void) putc('\n', stderr);
 }
@@ -1256,7 +1256,7 @@ static void do_shell()
 {
     if (user_shell) {
 	if (system(user_shell) == -1)
-	    os_error("system() failed", NO_CARET);
+	    os_error(NO_CARET, "system() failed");
 
     }
     (void) putc('\n', stderr);
@@ -1274,7 +1274,7 @@ static void do_shell()
     if (user_shell) {
 	if (system(safe_strncpy(&exec[sizeof(EXEC) - 1], user_shell,
 				sizeof(exec) - sizeof(EXEC) - 1)))
-	    os_error("system() failed", NO_CARET);
+	    os_error(NO_CARET, "system() failed");
     }
     (void) putc('\n', stderr);
 }

@@ -372,7 +372,7 @@ static void extend_cur_line()
     new_line = gp_realloc(cur_line, line_len + MAXBUF, NULL);
     if (!new_line) {
 	reset_termio();
-	int_error("Can't extend readline length", NO_CARET);
+	int_error(NO_CARET, "Can't extend readline length");
     }
     cur_line = new_line;
     line_len += MAXBUF;

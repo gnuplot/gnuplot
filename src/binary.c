@@ -213,7 +213,7 @@ register int nl, nh;
     register float GPFAR *vec;
 
     if (!(vec = (float GPFAR *) gp_alloc((unsigned long) (nh - nl + 1) * sizeof(float), NULL))) {
-	int_error("not enough memory to create vector", NO_CARET);
+	int_error(NO_CARET, "not enough memory to create vector");
 	return NULL;		/* Not reached */
     }
     return (vec - nl);
@@ -292,7 +292,7 @@ register int nrl, nrh, ncl, nch;
     for (i = nrl; i <= nrh; i++) {
 	if (!(m[i] = (float GPFAR *) gp_alloc((unsigned long) (nch - ncl + 1) * sizeof(float), NULL))) {
 	    free_matrix(m, nrl, i - 1, ncl, nch);
-	    int_error("not enough memory to create matrix", NO_CARET);
+	    int_error(NO_CARET, "not enough memory to create matrix");
 	    return NULL;
 	}
 	m[i] -= ncl;
@@ -338,7 +338,7 @@ register int srh, sch;
 	for (i = nrl; i <= nrh; i++) {	/* Copy and extend rows */
 	    if (!(m[i] = extend_vector(m[i], ncl, nch, sch))) {
 		free_matrix(m, nrl, nrh, ncl, sch);
-		int_error("not enough memory to extend matrix", NO_CARET);
+		int_error(NO_CARET, "not enough memory to extend matrix");
 		return NULL;
 	    }
 	}
@@ -346,7 +346,7 @@ register int srh, sch;
     for (i = nrh + 1; i <= srh; i++) {
 	if (!(m[i] = (float GPFAR *) gp_alloc((unsigned long) (nch - ncl + 1) * sizeof(float), NULL))) {
 	    free_matrix(m, nrl, i - 1, nrl, sch);
-	    int_error("not enough memory to extend matrix", NO_CARET);
+	    int_error(NO_CARET, "not enough memory to extend matrix");
 	    return NULL;
 	}
 	m[i] -= ncl;
@@ -376,7 +376,7 @@ register int srh, sch;
 	for (i = nrl; i <= srh; i++)
 	    if (!(m[i] = retract_vector(m[i], ncl, nch, sch))) { {	/* Shrink rows */
 		    free_matrix(m, nrl, srh, ncl, sch);
-		    int_error("not enough memory to retract matrix", NO_CARET);
+		    int_error(NO_CARET, "not enough memory to retract matrix");
 		    return NULL;
 	    }
 	    }

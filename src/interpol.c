@@ -132,8 +132,8 @@ extern double base_array[AXIS_ARRAY_SIZE];
 extern double log_base_array[AXIS_ARRAY_SIZE];
 
 
-#define Inc_c_token if (++c_token >= num_tokens)	\
-int_error ("Syntax error", c_token);
+#define Inc_c_token if (++c_token >= num_tokens) \
+  int_error (c_token, "Syntax error");
 
 
 /*
@@ -548,13 +548,13 @@ int num_points;			/* to determine end in plot->points */
 				   "spline matrix");
 
     if (num_points < 4)
-	int_error("Can't calculate approximation splines, need at least 4 points", NO_CARET);
+	int_error(NO_CARET, "Can't calculate approximation splines, need at least 4 points");
 
     this_points = (plot->points) + first_point;
 
     for (i = 0; i <= num_points - 1; i++)
 	if (this_points[i].z <= 0)
-	    int_error("Can't calculate approximation splines, all weights have to be > 0", NO_CARET);
+	    int_error(NO_CARET, "Can't calculate approximation splines, all weights have to be > 0");
 
     m = (five_diag *) gp_alloc((num_points - 2) * sizeof(five_diag), "spline help matrix");
 
@@ -627,7 +627,7 @@ int num_points;			/* to determine end in plot->points */
 	free(m);
 	free(xp);
 	free(yp);
-	int_error("Can't calculate approximation splines", NO_CARET);
+	int_error(NO_CARET, "Can't calculate approximation splines");
     }
     sc[0][2] = 0;
     for (i = 1; i <= num_points - 2; i++)
@@ -683,7 +683,7 @@ int first_point, num_points;
     int i;
 
     if (num_points < 3)
-	int_error("Can't calculate splines, need at least 3 points", NO_CARET);
+	int_error(NO_CARET, "Can't calculate splines, need at least 3 points");
 
     this_points = (plot->points) + first_point;
 
@@ -744,7 +744,7 @@ int first_point, num_points;
 	free(m);
 	free(xp);
 	free(yp);
-	int_error("Can't calculate cubic splines", NO_CARET);
+	int_error(NO_CARET, "Can't calculate cubic splines");
     }
     sc[0][2] = 0;
     for (i = 1; i <= num_points - 2; i++)

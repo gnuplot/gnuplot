@@ -95,8 +95,8 @@ extern int df_eof;
 extern int df_timecol[];
 extern TBOOLEAN df_matrix;
 
-#define Inc_c_token if (++c_token >= num_tokens)	\
-                        int_error ("Syntax error", c_token);
+#define Inc_c_token if (++c_token >= num_tokens) \
+  int_error (c_token, "Syntax error");
 
 /* From plot2d.c */
 extern int reverse_range[];
@@ -143,7 +143,7 @@ do {\
   c_token++; \
   auto_array[axis] = load_range(axis,&min_array[axis], &max_array[axis], auto_array[axis]);\
   if (!equals(c_token, "]"))\
-   int_error("']' expected", c_token);\
+   int_error(c_token, "']' expected");\
   c_token++;\
  }\
 } while (0)
@@ -191,7 +191,7 @@ do { if (reverse_range[AXIS]) { \
      }\
      if (log_array[AXIS]) { \
       if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0) \
-       int_error(RANGE_MSG(WHICH), NO_CARET); \
+       int_error(NO_CARET, RANGE_MSG(WHICH)); \
       min_array[AXIS] = log(min_array[AXIS])/log_base_array[AXIS]; \
       max_array[AXIS] = log(max_array[AXIS])/log_base_array[AXIS];  \
     } \
@@ -223,7 +223,7 @@ void plot3drequest()
     autoscale_lz = autoscale_z;
 
     if (!term)			/* unknown */
-	int_error("use 'set term' to set terminal type first", c_token);
+	int_error(c_token, "use 'set term' to set terminal type first");
 
     if (equals(c_token, "[")) {
 	c_token++;
@@ -240,7 +240,7 @@ void plot3drequest()
 	changed = parametric ? load_range(U_AXIS, &umin, &umax, autoscale_lu) :
 			load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
 	/* if (changed) */
 	if (parametric)
@@ -265,7 +265,7 @@ void plot3drequest()
 	changed = parametric ? load_range(V_AXIS, &vmin, &vmax, autoscale_lv) :
 			load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
 	/* if (changed) */
 	if (parametric)
@@ -281,7 +281,7 @@ void plot3drequest()
 	    c_token++;
 	    autoscale_lx = load_range(FIRST_X_AXIS, &xmin, &xmax, autoscale_lx);
 	    if (!equals(c_token, "]"))
-		int_error("']' expected", c_token);
+		int_error(c_token, "']' expected");
 	    c_token++;
 	}
 	/* set optional y ranges */
@@ -289,7 +289,7 @@ void plot3drequest()
 	    c_token++;
 	    autoscale_ly = load_range(FIRST_Y_AXIS, &ymin, &ymax, autoscale_ly);
 	    if (!equals(c_token, "]"))
-		int_error("']' expected", c_token);
+		int_error(c_token, "']' expected");
 	    c_token++;
 	}
     }				/* parametric */
@@ -297,7 +297,7 @@ void plot3drequest()
 	c_token++;
 	autoscale_lz = load_range(FIRST_Z_AXIS, &zmin, &zmax, autoscale_lz);
 	if (!equals(c_token, "]"))
-	    int_error("']' expected", c_token);
+	    int_error(c_token, "']' expected");
 	c_token++;
     }
     CHECK_REVERSE(FIRST_X_AXIS);
@@ -352,7 +352,7 @@ double *d;
 	    if ((temp = fabs(*ac++)) > large)
 		large = temp;
 	if (large == 0.0)
-	    int_error("Singular matrix in LU-DECOMP", NO_CARET);
+	    int_error(NO_CARET, "Singular matrix in LU-DECOMP");
 	*dp++ = 1 / large;
     }
     ar = a;
@@ -685,10 +685,10 @@ struct surface_points *this_plot;
 
     if (mapping3d == MAP3D_CARTESIAN) {
 	if (df_no_use_specs == 2)
-	    int_error("Need 1 or 3 columns for cartesian data", this_plot->token);
+	    int_error(this_plot->token, "Need 1 or 3 columns for cartesian data");
     } else {
 	if (df_no_use_specs == 1)
-	    int_error("Need 2 or 3 columns for polar data", this_plot->token);
+	    int_error(this_plot->token, "Need 2 or 3 columns for polar data");
     }
 
     this_plot->num_iso_read = 0;
@@ -777,16 +777,16 @@ struct surface_points *this_plot;
 		    break;
 		default:
 		    {
-			char msg[80];
-			sprintf(msg, "Need 1 or 3 columns - line %d", df_line_number);
-			int_error(msg, this_plot->token);
+			int_error(this_plot->token,
+				  "Need 1 or 3 columns - line %d",
+				  df_line_number);
 			return;	/* avoid gcc -Wuninitialised for x,y,z */
 		    }
 		}
 		break;
 	    case MAP3D_SPHERICAL:
 		if (j < 2)
-		    int_error("Need 2 or 3 columns", this_plot->token);
+		    int_error(this_plot->token, "Need 2 or 3 columns");
 		if (j < 3)
 		    v[2] = 1;	/* default radius */
 		if (angles_format == ANGLES_DEGREES) {
@@ -799,7 +799,7 @@ struct surface_points *this_plot;
 		break;
 	    case MAP3D_CYLINDRICAL:
 		if (j < 2)
-		    int_error("Need 2 or 3 columns", this_plot->token);
+		    int_error(this_plot->token, "Need 2 or 3 columns");
 		if (j < 3)
 		    v[2] = 1;	/* default radius */
 		if (angles_format == ANGLES_DEGREES) {
@@ -810,7 +810,7 @@ struct surface_points *this_plot;
 		z = v[1];
 		break;
 	    default:
-		int_error("Internal error : Unknown mapping type", NO_CARET);
+		int_error(NO_CARET, "Internal error : Unknown mapping type");
 		return;
 	    }
 
@@ -949,7 +949,7 @@ do{\
   t_min = tmin; t_max = tmax;\
  } else if (log_array[AXIS]) {\
   if (min_array[AXIS] <= 0.0 || max_array[AXIS] <= 0.0)\
-   int_error("x/x2 range must be greater than 0 for log scale!", NO_CARET);\
+   int_error(NO_CARET, "x/x2 range must be greater than 0 for log scale!");\
   t_min = log(min_array[AXIS])/log_base_array[AXIS]; t_max = log(max_array[AXIS])/log_base_array[AXIS];\
  } else {\
   t_min = min_array[AXIS]; t_max = max_array[AXIS];\
@@ -1012,7 +1012,7 @@ static void eval_3dplots()
      */
     while (TRUE) {
 	if (END_OF_COMMAND)
-	    int_error("function to plt3d expected", c_token);
+	    int_error(c_token, "function to plt3d expected");
 
 	start_token = c_token;
 
@@ -1026,7 +1026,7 @@ static void eval_3dplots()
 
 		/*{{{  data file */
 		if (parametric && crnt_param != 0)
-		    int_error("previous parametric function not fully specified", c_token);
+		    int_error(c_token, "previous parametric function not fully specified");
 
 		if (!some_data_files) {
 		    if (autoscale_lx & 1) {
@@ -1065,14 +1065,12 @@ static void eval_3dplots()
 
 		if (datatype[FIRST_X_AXIS] == TIME) {
 		    if (specs < 3)
-			int_error("Need full using spec for x time data",
-				  c_token);
+			int_error(c_token, "Need full using spec for x time data");
 		    df_timecol[0] = 1;
 		}
 		if (datatype[FIRST_Y_AXIS] == TIME) {
 		    if (specs < 3)
-			int_error("Need full using spec for y time data",
-				  c_token);
+			int_error(c_token, "Need full using spec for y time data");
 		    df_timecol[1] = 1;
 		}
 		if (datatype[FIRST_Z_AXIS] == TIME) {
@@ -1134,12 +1132,12 @@ static void eval_3dplots()
 	    }
 	    if (almost_equals(c_token, "t$itle")) {
 		/*                      if (!isstring(++c_token))
-		   int_error("Expected title", c_token);
+		   int_error(c_token, "Expected title");
 		   m_quote_capture(&(this_plot->title), c_token, c_token);
 		 */
 		if (parametric) {
 		    if (crnt_param != 0)
-			int_error("\"title\" allowed only after parametric function fully specified", c_token);
+			int_error(c_token, "\"title\" allowed only after parametric function fully specified");
 		    else {
 			if (xtitle != NULL)
 			    xtitle[0] = NUL;	/* Remove default title . */
@@ -1150,7 +1148,7 @@ static void eval_3dplots()
 		if (isstring(++c_token))
 		    m_quote_capture(&(this_plot->title), c_token, c_token);
 		else
-		    int_error("expecting \"title\" for plot", c_token);
+		    int_error(c_token, "expecting \"title\" for plot");
 		/* end of new method */
 		++c_token;
 	    } else if (almost_equals(c_token, "not$itle")) {
@@ -1298,7 +1296,7 @@ static void eval_3dplots()
 
 
     if (parametric && crnt_param != 0)
-	int_error("parametric function not fully specified", NO_CARET);
+	int_error(NO_CARET, "parametric function not fully specified");
 
 
 /*** Second Pass: Evaluate the functions ***/
@@ -1330,11 +1328,11 @@ static void eval_3dplots()
 
 	    if (min_array[FIRST_X_AXIS] == VERYLARGE ||
 		max_array[FIRST_X_AXIS] == -VERYLARGE) {
-		int_error("x range is invalid", c_token);
+		int_error(c_token, "x range is invalid");
 	    }
 	    if (min_array[FIRST_Y_AXIS] == VERYLARGE ||
 		max_array[FIRST_Y_AXIS] == -VERYLARGE) {
-		int_error("y range is invalid", c_token);
+		int_error(c_token, "y range is invalid");
 	    }
 	    /* check that xmin -> xmax is not too small */
 	    fixup_range(FIRST_X_AXIS, "x");
@@ -1364,8 +1362,7 @@ static void eval_3dplots()
 	    if (is_log_x) {
 		if (min_array[FIRST_X_AXIS] <= 0.0 ||
 		    max_array[FIRST_X_AXIS] <= 0.0)
-		    int_error("x range must be greater than 0 for log scale!",
-			      NO_CARET);
+		    int_error(NO_CARET, "x range must be greater than 0 for log scale!");
 		u_min = log(min_array[FIRST_X_AXIS]) / log_base_log_x;
 		u_max = log(max_array[FIRST_X_AXIS]) / log_base_log_x;
 	    } else {
@@ -1376,8 +1373,7 @@ static void eval_3dplots()
 	    if (is_log_y) {
 		if (min_array[FIRST_Y_AXIS] <= 0.0 ||
 		    max_array[FIRST_Y_AXIS] <= 0.0) {
-		    int_error("y range must be greater than 0 for log scale!",
-			      NO_CARET);
+		    int_error(NO_CARET, "y range must be greater than 0 for log scale!");
 		}
 		v_min = log(min_array[FIRST_Y_AXIS]) / log_base_log_y;
 		v_max = log(max_array[FIRST_Y_AXIS]) / log_base_log_y;
@@ -1391,8 +1387,7 @@ static void eval_3dplots()
 
 	if (samples_1 < 2 || samples_2 < 2 || iso_samples_1 < 2 ||
 	    iso_samples_2 < 2) {
-	    int_error("samples or iso_samples < 2. Must be at least 2.",
-		      NO_CARET);
+	    int_error(NO_CARET, "samples or iso_samples < 2. Must be at least 2.");
 	}
 	/* start over */
 	this_plot = first_3dplot;
@@ -1549,7 +1544,7 @@ static void eval_3dplots()
        * variable assignment
      */
     if (plot_num == 0 || first_3dplot == NULL) {
-	int_error("no functions or data to plot", c_token);
+	int_error(c_token, "no functions or data to plot");
     }
     if (min_array[FIRST_X_AXIS] == VERYLARGE ||
 	max_array[FIRST_X_AXIS] == -VERYLARGE ||
@@ -1557,7 +1552,7 @@ static void eval_3dplots()
 	max_array[FIRST_Y_AXIS] == -VERYLARGE ||
 	min_array[FIRST_Z_AXIS] == VERYLARGE ||
 	max_array[FIRST_Z_AXIS] == -VERYLARGE)
-	int_error("All points undefined", NO_CARET);
+	int_error(NO_CARET, "All points undefined");
 
     fixup_range(FIRST_X_AXIS, "x");
     fixup_range(FIRST_Y_AXIS, "y");
@@ -1591,7 +1586,7 @@ if(range_flags[axis]&RANGE_WRITEBACK) \
     WRITEBACK(FIRST_Z_AXIS, zmin, zmax);
 
     if (plot_num == 0 || first_3dplot == NULL) {
-	int_error("no functions or data to plot", c_token);
+	int_error(c_token, "no functions or data to plot");
     }
     /* Creates contours if contours are to be plotted as well. */
 

@@ -434,7 +434,7 @@ int *rows, *cols;
 
 	if (*cols && c != *cols) {
 	    /* its not regular */
-	    int_error("Matrix does not represent a grid", NO_CARET);
+	    int_error(NO_CARET, "Matrix does not represent a grid");
 	}
 	*cols = c;
 
@@ -448,7 +448,7 @@ int *rows, *cols;
 
 	    for (i = 0; i < c; ++i) {
 		if (df_column[i].good != DF_GOOD)
-		    int_error("Bad number in matrix", NO_CARET);
+		    int_error(NO_CARET, "Bad number in matrix");
 
 		row[i] = (float) df_column[i].datum;
 	    }
@@ -528,7 +528,7 @@ int max_using;
 	quote_str(filename, c_token, token_len(c_token));
     } else
 	if (!filename[0]) /* empty name means re-use last one */
-	    int_error("No previous filename", c_token);
+	    int_error(c_token, "No previous filename");
 
     name_token = c_token++;
 
@@ -552,7 +552,7 @@ int max_using;
 	struct value a;
 
 	if (df_binary)
-	    int_error("Binary file format does not allow more than one surface per file", c_token);
+	    int_error(c_token, "Binary file format does not allow more than one surface per file");
 
 	++c_token;
 	df_lower_index = (int) real(const_express(&a));
@@ -560,13 +560,13 @@ int max_using;
 	    ++c_token;
 	    df_upper_index = (int) magnitude(const_express(&a));
 	    if (df_upper_index < df_lower_index)
-		int_error("Upper index should be bigger than lower index", c_token);
+		int_error(c_token, "Upper index should be bigger than lower index");
 
 	    if (equals(c_token, ":")) {
 		++c_token;
 		df_index_step = (int) magnitude(const_express(&a));
 		if (df_index_step < 1)
-		    int_error("Index step must be positive", c_token);
+		    int_error(c_token, "Index step must be positive");
 	    }
 	} else
 	    df_upper_index = df_lower_index;
@@ -585,7 +585,7 @@ int max_using;
 	if (!equals(++c_token, ":")) {
 	    everypoint = (int) real(const_express(&a));
 	    if (everypoint < 1)
-		int_error("Expected positive integer", c_token);
+		int_error(c_token, "Expected positive integer");
 	}
 	/* if it fails on first test, no more tests will succeed. If it
 	 * fails on second test, next test will succeed with correct c_token
@@ -593,28 +593,28 @@ int max_using;
 	if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	    everyline = (int) real(const_express(&a));
 	    if (everyline < 1)
-		int_error("Expected positive integer", c_token);
+		int_error(c_token, "Expected positive integer");
 	}
 	if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	    firstpoint = (int) real(const_express(&a));
 	    if (firstpoint < 0)
-		int_error("Expected non-negative integer", c_token);
+		int_error(c_token, "Expected non-negative integer");
 	}
 	if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	    firstline = (int) real(const_express(&a));
 	    if (firstline < 0)
-		int_error("Expected non-negative integer", c_token);
+		int_error(c_token, "Expected non-negative integer");
 	}
 	if (equals(c_token, ":") && !equals(++c_token, ":")) {
 	    lastpoint = (int) real(const_express(&a));
 	    if (lastpoint < firstpoint)
-		int_error("Last point must not be before first point", c_token);
+		int_error(c_token, "Last point must not be before first point");
 	}
 	if (equals(c_token, ":")) {
 	    ++c_token;
 	    lastline = (int) real(const_express(&a));
 	    if (lastline < firstline)
-		int_error("Last line must not be before first line", c_token);
+		int_error(c_token, "Last line must not be before first line");
 	}
     }
     /*}}} */
@@ -651,7 +651,7 @@ int max_using;
 
 	    do {		/* must be at least one */
 		if (df_no_use_specs >= max_using)
-		    int_error("Too many columns in using specification", c_token);
+		    int_error(c_token, "Too many columns in using specification");
 
 		if (equals(c_token, ":")) {
 		    /* empty specification - use default */
@@ -665,18 +665,18 @@ int max_using;
 		} else {
 		    int col = (int) real(const_express(&a));
 		    if (col < -2)
-			int_error("Column must be >= -2", c_token);
+			int_error(c_token, "Column must be >= -2");
 		    use_spec[df_no_use_specs++].column = col;
 		}
 	    } while (equals(c_token, ":") && ++c_token);
 	}
 	if (!END_OF_COMMAND && isstring(c_token)) {
 	    if (df_binary)
-		int_error("Format string meaningless with binary data", NO_CARET);
+		int_error(NO_CARET,"Format string meaningless with binary data");
 
 	    quote_str(df_format, c_token, MAX_LINE_LEN);
 	    if (!valid_format(df_format))
-		int_error("Please use a double conversion %lf", c_token);
+		int_error(c_token, "Please use a double conversion %lf");
 
 	    c_token++;		/* skip format */
 	}
@@ -701,7 +701,7 @@ int max_using;
 #if defined(PIPES)
     if (*filename == '<') {
 	if ((data_fp = popen(filename + 1, "r")) == (FILE *) NULL)
-	    os_error("cannot create pipe for data", name_token);
+	    os_error(name_token, "cannot create pipe for data");
 	else
 	    pipe_open = TRUE;
     } else
@@ -713,20 +713,16 @@ int max_using;
 	    data_fp = stdin;
 	mixed_data_fp = TRUE;	/* don't close command file */
     } else {
-	char msg[MAX_LINE_LEN+1];
 #ifdef HAVE_SYS_STAT_H
 	struct stat statbuf;
 
 	if ((stat(filename, &statbuf) > -1) &&
 	    !S_ISREG(statbuf.st_mode) && !S_ISFIFO(statbuf.st_mode)) {
-	    sprintf(msg, "\"%s\" is not a regular file or pipe", filename);
-	    os_error(msg, name_token);
+	    os_error(name_token, "\"%s\" is not a regular file or pipe", filename);
 	}
 #endif /* HAVE_SYS_STAT_H */
 	if ((data_fp = loadpath_fopen(filename, df_binary ? "rb" : "r")) == (FILE *) NULL) {
-	    /* one day we will have proper printf-style error reporting fns */
-	    sprintf(msg, "can't read data file \"%s\"", filename);
-	    os_error(msg, name_token);
+	    os_error(name_token, "can't read data file \"%s\"", filename);
 	}
     }
 /*}}} */
@@ -967,7 +963,7 @@ int max;
 		} else if (column == 0) {
 		    v[output] = df_datum;	/* using 0 */
 		} else if (column <= 0)		/* really < -2, but */
-		    int_error("internal error: column <= 0 in datafile.c", NO_CARET);
+		    int_error(NO_CARET, "internal error: column <= 0 in datafile.c");
 		else if (df_timecol[output]) {
 		    struct tm tm;
 		    if (column > df_no_cols ||
@@ -1024,7 +1020,7 @@ int max;
 int df_2dbinary(this_plot)
 struct curve_points *this_plot;
 {
-    int_error("Binary file format for 2d data not yet defined", NO_CARET);
+    int_error(NO_CARET, "Binary file format for 2d data not yet defined");
     return 0;			/* keep compiler happy */
 }
 /*}}} */
@@ -1103,7 +1099,7 @@ struct surface_points *this_plot;
 
     if (df_binary) {
 	if (!fread_matrix(data_fp, &dmatrix, &nr, &nc, &rt, &ct))
-	    int_error("Binary file read error: format unknown!", NO_CARET);
+	    int_error(NO_CARET, "Binary file read error: format unknown!");
 	/* fread_matrix() drains the file */
 	df_eof = 1;
     } else {
@@ -1116,18 +1112,18 @@ struct surface_points *this_plot;
     }
 
     if (nc == 0 || nr == 0)
-	int_error("Read grid of zero height or zero width", NO_CARET);
+	int_error(NO_CARET, "Read grid of zero height or zero width");
 
     this_plot->plot_type = DATA3D;
     this_plot->has_grid_topology = TRUE;
 
     if (df_no_use_specs != 0 && df_no_use_specs != 3)
-	int_error("Current implementation requires full using spec", NO_CARET);
+	int_error(NO_CARET, "Current implementation requires full using spec");
 
     if (df_max_cols < 3 &&
 	!(df_column = (df_column_struct *) gp_realloc(df_column, (df_max_cols = 3) * sizeof(df_column_struct), "datafile columns"))
 	)
-	int_error("Out of store in binary read", c_token);
+	int_error(c_token, "Out of store in binary read");
 
     df_no_cols = 3;
     df_column[0].good = df_column[1].good = df_column[2].good = DF_GOOD;
@@ -1382,7 +1378,7 @@ char *fmt;			/* format string */
     while (isspace(*p))
 	p++;
     if (!strlen(p))
-	int_error("Empty time-data format", NO_CARET);
+	int_error(NO_CARET, "Empty time-data format");
     cnt++;
     for (i = 0; i < strlen(p) - 1; i++) {
 	if (isspace(p[i]) && !isspace(p[i + 1]))

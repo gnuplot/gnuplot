@@ -239,7 +239,7 @@ char *dest;
 #if defined(PIPES)
 	if (*dest == '|') {
 	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
-		    os_error("cannot create pipe; output not changed", c_token);
+		    os_error(c_token, "cannot create pipe; output not changed");
 		else
 		    pipe_open = TRUE;
 	} else
@@ -255,7 +255,7 @@ char *dest;
 	}
 	if (stricmp(dest, "PRN") == 0) {
 	    if ((f = open_printer()) == (FILE *) NULL)
-		os_error("cannot open printer temporary file; output may have changed", c_token);
+		os_error(c_token, "cannot open printer temporary file; output may have changed");
 	} else
 #endif
 
@@ -266,7 +266,7 @@ char *dest;
 		f = fopen(dest, "w");
 
 	    if (f == (FILE *) NULL)
-		os_error("cannot open file; output not changed", c_token);
+		os_error(c_token, "cannot open file; output not changed");
 	}
 	term_close_output();
 	gpoutfile = f;
@@ -281,7 +281,7 @@ void term_init()
     FPRINTF((stderr, "term_init()\n"));
 
     if (!term)
-	int_error("No terminal defined", NO_CARET);
+	int_error(NO_CARET, "No terminal defined");
 
     /* check if we have opened the output file in the wrong mode
      * (text/binary), if set term comes after set output
@@ -500,9 +500,9 @@ TBOOLEAN f_interactive;
      */
 
     if (term->flags & TERM_CANNOT_MULTIPLOT)
-	int_error("This terminal does not support multiplot", NO_CARET);
+	int_error(NO_CARET, "This terminal does not support multiplot");
     else
-	int_error("Must set output to a file or put all multiplot commands on one input line", NO_CARET);
+	int_error(NO_CARET, "Must set output to a file or put all multiplot commands on one input line");
 }
 
 void do_point(x, y, number)
@@ -873,12 +873,11 @@ int c_token_arg;
     char *input_name;
 
     if (!token[c_token_arg].is_token)
-	int_error("terminal name expected", c_token_arg);
+	int_error(c_token_arg, "terminal name expected");
     input_name = input_line + token[c_token_arg].start_index;
     t = change_term(input_name, token[c_token_arg].length);
     if (!t)
-	int_error("unknown or ambiguous terminal type; type just 'set terminal' for a list",
-		  c_token_arg);
+	int_error(c_token_arg, "unknown or ambiguous terminal type; type just 'set terminal' for a list");
 
     /* otherwise the type was changed */
 
@@ -1334,11 +1333,9 @@ void reopen_binary()
 #  endif
 	if ((gpoutfile = fopen(filename, "wb")) == (FILE *) NULL) {
 	    if ((gpoutfile = fopen(filename, "w")) == (FILE *) NULL) {
-		os_error("cannot reopen file with binary type; output unknown",
-			 NO_CARET);
+		os_error(NO_CARET, "cannot reopen file with binary type; output unknown");
 	    } else {
-		os_error("cannot reopen file with binary type; output reset to ascii",
-			 NO_CARET);
+		os_error(NO_CARET, "cannot reopen file with binary type; output reset to ascii");
 	    }
 	}
 #  if defined(__TURBOC__) && defined(MSDOS)
