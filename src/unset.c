@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.35 2002/07/23 20:07:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.36 2002/08/16 08:11:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1298,7 +1298,7 @@ static void
 unset_timestamp()
 {
     unset_axislabel_or_title(&timelabel);
-    timelabel_rotate = FALSE;
+    timelabel_rotate = 0;
     timelabel_bottom = TRUE;
 }
 

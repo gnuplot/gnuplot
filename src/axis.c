@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.30 2002/03/23 21:28:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.31 2002/04/05 17:15:51 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1267,17 +1267,34 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
     if (axis_array[axis].ticmode) {
 	/* set the globals needed by the _callback() function */
 
-	if (axis_array[axis].tic_rotate && (*t->text_angle) (1)) {
+	if (axis_array[axis].tic_rotate == TEXT_VERTICAL 
+	    && (*t->text_angle)(TEXT_VERTICAL)) {
 	    tic_hjust = axis_is_vertical
 		? CENTRE
 		: (axis_is_second ? LEFT : RIGHT);
 	    tic_vjust = axis_is_vertical
 		? (axis_is_second ? JUST_TOP : JUST_BOT)
 		: JUST_CENTRE;
-	    rotate_tics = 1;
+	    rotate_tics = TEXT_VERTICAL;
 	    /* FIXME HBB 20000501: why would we want this? */
 	    if (axis == FIRST_Y_AXIS)
 		(*ticlabel_position) += t->v_char / 2;
+	/* EAM - allow rotation by arbitrary angle in degrees      */
+	/*       Justification of ytic labels is a problem since   */
+	/*	 the position is already [mis]corrected for length */
+	} else if (axis_array[axis].tic_rotate
+		   && (*t->text_angle)(axis_array[axis].tic_rotate)) {
+	    switch (axis) {
+	    case FIRST_Y_AXIS:		/* EAM Purely empirical shift - is there a better? */
+	    				*ticlabel_position += t->h_char * 2.5;
+	    				tic_hjust = RIGHT; break;
+	    case SECOND_Y_AXIS:		tic_hjust = LEFT;  break;
+	    case FIRST_X_AXIS:		tic_hjust = LEFT;  break;
+	    case SECOND_X_AXIS:		tic_hjust = LEFT;  break;
+	    default:			tic_hjust = LEFT;  break;
+	    }
+	    tic_vjust = JUST_CENTRE;
+	    rotate_tics = axis_array[axis].tic_rotate;
 	} else {
 	    tic_hjust = axis_is_vertical
 		? (axis_is_second ? LEFT : RIGHT)

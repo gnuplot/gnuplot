@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.19 2002/07/02 17:35:19 mikulik Exp $
+ * $Id: axis.h,v 1.20 2002/07/11 10:24:06 mikulik Exp $
  *
  */
 
@@ -216,7 +216,7 @@ typedef struct axis {
 /* ticmark control variables */
     int ticmode;		/* tics on border/axis? mirrored? */
     struct ticdef ticdef;	/* tic series definition */
-    TBOOLEAN tic_rotate;	/* ticmarks rotated (vertical text)? */
+    int tic_rotate;		/* ticmarks rotated by this angle */
     TBOOLEAN gridmajor;		/* Grid lines wanted on major tics? */
     TBOOLEAN gridminor;		/* Grid lines for minor tics? */
     int minitics;		/* minor tic mode (none/auto/user)? */
@@ -246,8 +246,8 @@ typedef struct axis {
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
-	FALSE, FALSE, FALSE,    /* tic_rotate, grid{major,minor} */	    \
-	MINI_DEFAULT, 10,	/* tic_rotate, minitics, mtic_freq */	    \
+	0, FALSE, FALSE, 	/* tic_rotate, grid{major,minor} */	    \
+	MINI_DEFAULT, 10,	/* minitics, mtic_freq */		    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
 	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
 }

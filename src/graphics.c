@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.69 2002/07/23 18:53:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.70 2002/07/26 16:42:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -320,11 +320,11 @@ boundary(plots, count)
 
     /* figure out which rotatable items are to be rotated
      * (ylabel and y2label are rotated if possible) */
-    int vertical_timelabel = can_rotate && timelabel_rotate;
-    int vertical_xtics = can_rotate && axis_array[FIRST_X_AXIS].tic_rotate;
-    int vertical_x2tics = can_rotate && axis_array[SECOND_X_AXIS].tic_rotate;
-    int vertical_ytics = can_rotate && axis_array[FIRST_Y_AXIS].tic_rotate;
-    int vertical_y2tics = can_rotate && axis_array[SECOND_Y_AXIS].tic_rotate;
+    int vertical_timelabel = can_rotate ? timelabel_rotate : 0;
+    int vertical_xtics  = can_rotate ? axis_array[FIRST_X_AXIS].tic_rotate : 0;
+    int vertical_x2tics = can_rotate ? axis_array[SECOND_X_AXIS].tic_rotate : 0;
+    int vertical_ytics  = can_rotate ? axis_array[FIRST_Y_AXIS].tic_rotate : 0;
+    int vertical_y2tics = can_rotate ? axis_array[SECOND_Y_AXIS].tic_rotate : 0;
 
     lkey = key;			/* but we may have to disable it later */
 
@@ -1322,7 +1322,7 @@ do_plot(plots, pcount)
 	unsigned int x = time_x;
 	unsigned int y = time_y;
 	time(&now);
-	/* there is probably now way to find out in advance how many
+	/* there is probably no way to find out in advance how many
 	 * chars strftime() writes */
 	str = gp_alloc(MAX_LINE_LEN + 1, "timelabel.text");
 	strftime(str, MAX_LINE_LEN, timelabel.text, localtime(&now));

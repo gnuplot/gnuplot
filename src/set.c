@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.88 2002/08/01 12:05:14 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.89 2002/08/16 08:11:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -1766,7 +1766,7 @@ set_label()
 	/* get rotation (added by RCC) */
 	if (! set_rot) {
 	    if (almost_equals(c_token, "rot$ate")) {
-		rotate = 90;
+		rotate = TEXT_VERTICAL;
 		c_token++;
 		set_rot = TRUE;
 		if (equals(c_token, "by")) {
@@ -3323,10 +3323,15 @@ set_tic_prop(axis)
 	    ++c_token;
 	}
 	if (almost_equals(c_token, "ro$tate")) {
-	    axis_array[axis].tic_rotate = TRUE;
+	    axis_array[axis].tic_rotate = TEXT_VERTICAL;
 	    ++c_token;
+	    if (equals(c_token, "by")) {
+		struct value a;
+	    	c_token++;
+		axis_array[axis].tic_rotate = (int)real(const_express(&a));
+	    }
 	} else if (almost_equals(c_token, "noro$tate")) {
-	    axis_array[axis].tic_rotate = FALSE;
+	    axis_array[axis].tic_rotate = 0;
 	    ++c_token;
 	}
 	if (almost_equals(c_token, "au$tofreq")) {	/* auto tic interval */
