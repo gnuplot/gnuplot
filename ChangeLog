@@ -8,6 +8,7 @@
 	if the tic step is at least one unit long.
 	(time_tic_just): Remove superfluous update of local variable just
 	before exit from function.
+	(setup_tics): Handle reverted time/date axes correctly.
 
 2004-03-22  Ethan Merritt  <merritt@u.washington.edu>
 	

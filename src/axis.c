@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.39 2004/03/15 12:37:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.40 2004/03/23 12:58:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -812,7 +812,7 @@ setup_tics(axis, max)
     /* HBB 20011204: moved this up --- round_outward() needs
      * timelevel[axis], too */
     if (this->is_timedata && ticdef->type == TIC_SERIES)
-	quantize_time_tics(axis, tic, this->max - this->min, 20);
+	quantize_time_tics(axis, tic, fabs(this->max - this->min), 20);
 
     if (autoextend_min) 
 	this->min = round_outward(axis, ! (this->min < this->max), this->min);
