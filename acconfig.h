@@ -47,7 +47,7 @@
 /* Define if this is an MSDOS system with djgpp.  */
 #undef MSDOS
 
-/* Define if you do not want to read .gnuplotrc in the current directory.  */
+/* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
 /* Define if you do not have the atexit function.  */
