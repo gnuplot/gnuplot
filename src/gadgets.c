@@ -262,8 +262,6 @@ clip_put_text_just(x, y, str, just, vert_just)
     JUSTIFY just;
     VERT_JUSTIFY vert_just;
 {
-    register struct termentry *t = term;
-
     if (clip_point(x, y))
 	return;
     
