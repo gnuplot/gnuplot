@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.42 2004/02/15 20:29:56 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.43 2004/03/11 18:28:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -321,7 +321,7 @@ pm3d_plot(this_plot, at_which_z)
 #endif
 
     /* just a shortcut */
-    int color_from_column = this_plot->pm3d_color_from_column;
+    TBOOLEAN color_from_column = this_plot->pm3d_color_from_column;
 
     if (this_plot == NULL)
 	return;

@@ -1,3 +1,14 @@
+2004-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graph3d.c (plot3d_lines_pm3d, plot3d_points_pm3d,
+	get_surface_cbminmax): Make local copy of
+	plot->pm3d_color_from_column a TBOOLEAN.
+
+	* src/pm3d.c (pm3d_plot): Likewise.
+
+	* src/hidden3d.c (in_front): Simplify by removing almost-boolean
+	local variables v{1,2}_inside_p.
+
 2004-03-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/hiddden3d.c: Must not do arithmetic using TBOOLEANs!!!

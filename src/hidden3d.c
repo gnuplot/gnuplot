@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.37 2002/09/27 00:12:25 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.38 2004/03/29 18:31:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -1686,8 +1686,6 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	     * point where the edge goes through the polygon, by
 	     * interpolation. */
 	    double v1_rel_pplane, v2_rel_pplane;
-	    /* Flags: are edge vertices found inside the triangle? */
-	    unsigned int v1_inside_p, v2_inside_p;
 	    /* Orientation of polygon wrt. to the eye: front or back side
 	     * visible? */
 	    coordval polyfacing;
@@ -1885,15 +1883,10 @@ in_front(edgenum, vnum1, vnum2, firstpoly)
 	     * inside the 2D triangle: */
 
 	    /* search for any one bits (--> they mean 'outside') */
-	    v1_inside_p = ~ (classification[0]
-			     | classification[1]
-			     | classification[2]);
-	    /* properly distribute the two bits to v2_in_p and v1_in_p: */
-	    v2_inside_p = (v1_inside_p >> 1) & 0x1;
-	    v1_inside_p = v1_inside_p & 0x1;
+	    if (! (classification[0]
+		   | classification[1]
+		   | classification[2])) {
 
-
-	    if ((v1_inside_p) && (v2_inside_p)) {
 		/* Edge is completely inside the polygon's 2D
 		 * projection. Unlike Ammeraal, I have to check for
 		 * edges penetrating polygons, as well. */

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.84 2003/12/19 01:31:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.85 2004/03/11 18:28:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1526,7 +1526,7 @@ plot3d_lines_pm3d(plot)
     double z;
 
     /* just a shortcut */
-    int color_from_column = plot->pm3d_color_from_column;
+    TBOOLEAN color_from_column = plot->pm3d_color_from_column;
 
 #ifndef LITE
 /* These are handled elsewhere.  */
@@ -1712,7 +1712,7 @@ plot3d_points_pm3d(plot, p_type)
     struct termentry *t = term;
 
     /* just a shortcut */
-    int color_from_column = plot->pm3d_color_from_column;
+    TBOOLEAN color_from_column = plot->pm3d_color_from_column;
 
     /* split the bunch of scans in two sets in
      * which the scans are already depth ordered */
@@ -2890,7 +2890,7 @@ get_surface_cbminmax(plot, cbmin, cbmax)
     double *cbmin, *cbmax;
 {
     int i, curve = 0;
-    int color_from_column = plot->pm3d_color_from_column; /* just a shortcut */
+    TBOOLEAN color_from_column = plot->pm3d_color_from_column; /* just a shortcut */
     coordval cb;
     struct iso_curve *icrvs = plot->iso_crvs;
     struct coordinate GPHUGE *points;
