@@ -16,6 +16,7 @@ set cblabel "Luminosity" 0,1
 #
 splot 'nearmap.csv' using 5:6:7:11 with points pt 6 ps 3 pal notitle, \
       ''            using 5:6:7:11 with points pt 7 ps 2 pal notitle, \
-      '' using 5:6:7:2 with labels font "arial,9" left point pt 0 offset 4,0 notitle
+      '' using 5:6:7:2 with labels font "Helvetica,9" left \
+	   point pt 0 offset 4,0 notitle
 #
 pause -1
