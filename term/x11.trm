@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.89 2003/12/13 00:01:40 sfeam Exp $
+ * $Id: x11.trm,v 1.90 2003/12/17 00:56:49 sfeam Exp $
  *
  */
 
@@ -210,8 +210,10 @@ static int do_raise = UNSET;
  * once per plot by the gnuplot_x11<->x11.trm font information query.
  */
 static TBOOLEAN default_font_size_known = FALSE;
-static TBOOLEAN IPC_LOCK = FALSE;
 static TBOOLEAN X11_MOUSE_FEEDBACK = TRUE;
+#endif
+#ifdef PIPE_IPC
+static TBOOLEAN IPC_LOCK = FALSE;
 #endif
 
 static int parse_driver __PROTO((const char *));

@@ -1,3 +1,9 @@
+2003-12-21  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/x11.trm: Add missing #ifdef PIPE_IPC.
+
+	* term/pm.trm: Remove useless declaration.
+
 2003-12-19  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Sodipodi didn't care that the namespace URL was junk,
