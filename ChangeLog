@@ -1,3 +1,7 @@
+1999-11-01  Berthold Hoellmann  <hoel@germanlloyd.org>
+
+	* docs/Makefile.in: Fix pdf target for compiling outside source dir.
+
 1999-10-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Fix compile/link on NeXT without side effects ...
