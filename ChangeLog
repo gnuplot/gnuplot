@@ -1,3 +1,35 @@
+1999-02-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all, docs/Makefile.in: Add and use fixinfo.el
+	script to fix gnuplot.info file.
+
+	* docs/fixinfo.el: To fix the gnuplot.info file until doc2info
+	has been fixed. By Denis Kosygin <kosygin@cims.nyu.edu>.
+
+1999-02-03  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Correct some over-long lines in the original
+	patch to the function writeup, and it adds warnings to the
+	"set margin" and "set xtic" writeups telling about the effects of
+	"set xtics axis" if the axis is too close to the border.
+
+1999-02-03  "Pepin, Joseph D (Joe), GOVMK"  <joepepin@att.com> 
+
+	* graph3d.c, graphics.c, plot.h, set.c, show.c, docs/gnuplot.doc:
+	Patch to introduce layers (front, back) for labels and arrows.
+
+1999-02-03  Hirofumi Fujii  <Hirofumi.Fujii@kek.jp>
+
+	* term/cgm.trm: Several bugfixes:
+	(1) The parameter list length of the CGM record is including padding
+	length (must NOT include the padding length).
+	(2) The format of 'color table' (class 5 id 34) is wrong. The first
+	element is the starting index (usually 0), NOT the number of colors.
+	(3) The format of 'font table' (class 1 id 13) is wrong. This is the
+	list of 'String Fixed Data'. Do NOT include the total length.
+	(4) Transparency (class 3 id 4) is set to 'off' but I think it is
+	better to set 'on' because sometimes character cells are overlapping.
+
 1999-02-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* lisp/*: Updated to newest revision.
