@@ -38,6 +38,7 @@ C
 1 gnuplot
 2 Copyright
 ?copyright
+?license
        Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 
  Permission to use, copy, and distribute this software and its
@@ -1699,6 +1700,13 @@ C ... and restart the table:
  weighted when comparing the observed sum of deviations and the expected sum
  of deviations.
 
+ At the conclusion `fit` reports 'stdfit', the standard deviation of the fit,
+ which is the rms of the residuals, and the variance of the residuals, also
+ called 'reduced chisquare' when the data points are weighted.  The number of
+ degrees of freedom (the number of data points minus the number of fitted
+ parameters) is used in these estimates because the parameters used in
+ calculating the residuals of the datapoints were obtained from the same data.
+
  To estimate confidence levels for the parameters, one can use the minimum
  chisquare obtained from the fit and chisquare statistics to determine the
  value of chisquare corresponding to the desired confidence level, but
@@ -1741,19 +1749,24 @@ C ... and restart the table:
  estimating an average standard deviation rather than using a weight of 1
  makes WSSR a dimensionless variable, as chisquare is by definition.
 
- Once the fit iteration has stopped, it will display information which can
- be used to evaluate the fit.  The 'sum of squares residuals', also called
- 'chisquare', is the WSSR between the data and your fitted function; `fit` has
- minimized that.  To quickly test if your fit went well, check that this is
- about the same as the number of data points minus the number of parameters
- (all this is only valid if you supplied data errors, and the number of data
- points is large enough).  For details on this, look up the 'Chi-squared
- distribution' in your favourite statistics textbook.
+ Each fit iteration will display information which can be used to evaluate
+ the progress of the fit.  (An '*' indicates that it did not find a smaller
+ WSSR and is trying again.)  The 'sum of squares of residuals', also called
+ 'chisquare', is the WSSR between the data and your fitted function; `fit`
+ has minimized that.  At this stage, with weighted data, chisquare is expected
+ to approach the number of degrees of freedom (data points minus parameters).
+ The WSSR can be used to calculate the reduced chisquare (WSSR/ndf) or stdfit,
+ the standard deviation of the fit, sqrt(WSSR/ndf).  Both of these are
+ reported for the final WSSR.
 
- The reduced chisquare is not reported, but is readily calculated as above.
- If you have weighted your data points and find the reduced chisquare to be
- about 1.0, there are additional tests, beyond the scope of this overview,
- for determining how well the model fits the data.
+ If the data are unweighted, stdfit is the rms value of the deviation of the
+ data from the fitted function, in user units.
+
+ If you supplied valid data errors, the number of data points is large enough,
+ and the model is correct, the reduced chisquare should be about unity.  (For
+ details, look up the 'chi-squared distribution' in your favourite statistics
+ reference.)  If so, there are additional tests, beyond the scope of this
+ overview, for determining how well the model fits the data.
 
  A reduced chisquare much larger than 1.0 may be due to incorrect data error
  estimates, data errors not normally distributed, systematic measurement
@@ -5909,12 +5922,12 @@ C ... and restart the table:
  `autofreq` option is given; otherwise they may be specified in either of
  two forms:
 
- The <start>, <incr>, <end> form specifies that a series of tics will be
- plotted on the axis between the values <start> and <end> with an increment of
- <incr>.  If <end> is not given, it is assumed to be infinity.  The increment
- may be negative.  If neither <start> nor <end> is given, <start> is assumed
- to be negative infinity, <end> is assumed to be positive infinity, and the
- tics will be drawn at integral multiples of <step>.  If the axis is
+ The implicit <start>, <incr>, <end> form specifies that a series of tics will
+ be plotted on the axis between the values <start> and <end> with an increment
+ of <incr>.  If <end> is not given, it is assumed to be infinity.  The
+ increment may be negative.  If neither <start> nor <end> is given, <start> is
+ assumed to be negative infinity, <end> is assumed to be positive infinity,
+ and the tics will be drawn at integral multiples of <step>.  If the axis is
  logarithmic, the increment will be used as a multiplicative factor.
 
  Examples:
@@ -5928,15 +5941,14 @@ C ... and restart the table:
  Make tics at 1, 100, 1e4, 1e6, 1e8.
        set logscale x; set xtics 1,100,10e8
 
- The ("<label>" <pos>, ...) form allows arbitrary tic positions or non-numeric
- tic labels.  A set of tics is a set of positions, each with its own optional
- label.  Note that the label is a string enclosed by quotes, and may be a
- constant string, such as "hello", or contain formatting information for the
- tic number (which is the same as the position), such as "%3f clients".  See
- `set format` for more information about this case.  The label may be made
- empty by specifying it as an empty string.  If no string is given, the
- default label (numerical) is used.  In this form, the tics do not need to be
- listed in numerical order.
+ The explicit ("<label>" <pos>, ...) form allows arbitrary tic positions or
+ non-numeric tic labels.  A set of tics is a set of positions, each with its
+ own optional label.  Note that the label is a string enclosed by quotes.  It
+ may be a constant string, such as "hello", may contain formatting information
+ for converting the position into its label, such as "%3f clients", or may be
+ empty, "".  See `set format` for more information.  If no string is given,
+ the default label (numerical) is used.  In this form, the tics do not need to
+ be listed in numerical order.
 
  Examples:
        set xtics ("low" 0, "medium" 50, "high" 100)
@@ -6528,6 +6540,13 @@ C ... and restart the table:
  repositories.
 1 Bugs
 ?bugs
+ Floating point exceptions (floating point number too large/small, divide by
+ zero, etc.) may occasionally be generated by user defined functions.  Some of
+ the demos in particular may cause numbers to exceed the floating point range.
+ Whether the system ignores such exceptions (in which case `gnuplot` labels
+ the corresponding point as undefined) or aborts `gnuplot` depends on the
+ compiler/runtime environment.
+
  The bessel functions do not work for complex arguments.
 
  The gamma function does not work for complex arguments.
