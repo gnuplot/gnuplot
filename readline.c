@@ -240,11 +240,6 @@ FILE *fp;
 # endif				/* OSK */
 
 # if defined(ATARI) || defined(MTOS)
-#  ifdef __PUREC__
-#   include <tos.h>
-#  else				/* not __PUREC__ */
-#   include <osbind.h>
-#  endif			/* not __PUREC__ */
 #  define special_getc() tos_getch()
 char tos_getch();
 # endif				/* ATARI || MTOS */
