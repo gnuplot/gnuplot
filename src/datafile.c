@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.37 2002/03/23 21:28:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.38 2002/03/26 20:31:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -327,7 +327,6 @@ df_tokenise(s)
     df_no_cols = 0;
 
     while (*s) {
-
 	/* check store - double max cols or add 20, whichever is greater */
 	if (df_max_cols <= df_no_cols)
 	    df_column = (df_column_struct *) gp_realloc(df_column,
@@ -1212,8 +1211,9 @@ df_2dbinary(this_plot)
  * does the autoscaling into the array versions (min_array[], max_array[]) */
 
 int
-df_3dmatrix(this_plot)
+df_3dmatrix(this_plot, need_palette)
     struct surface_points *this_plot;
+    int need_palette;
 {
     float GPFAR *GPFAR * dmatrix, GPFAR * rt, GPFAR * ct;
     int nr, nc;
@@ -1323,7 +1323,7 @@ df_3dmatrix(this_plot)
 #ifdef PM3D
 	    /* there should be `color' instead of used[2], when this is
 	     * implemented for binary files */
-	    if (NEED_PALETTE(this_plot))
+	    if (need_palette)
 		STORE_WITH_LOG_AND_UPDATE_RANGE(point->CRD_COLOR, used[2], point->type, COLOR_AXIS, NOOP, goto skip);
 #endif
 
