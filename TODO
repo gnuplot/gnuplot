@@ -45,7 +45,6 @@ ChangeLog / History file.
 
 -- documentation for all X11 command line switches (joze)
 
-
 TERMINALS:
 
 -- see above about docs/old/README.*
@@ -64,6 +63,9 @@ should be tested again)
 
 -- unify color and pointtype sequence, alias similar line and point type
 sequences for the main terminal drivers (joze)
+
+-- Also unify fill color sequence and fill pattern sequence;
+   choose fill patterns to be optimal for monochrome output (EAM)
 
 -- implement filledboxes for cgm
 

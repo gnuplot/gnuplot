@@ -8,8 +8,8 @@ Changes in release 4.0:
 * NEW terminal names now sorted alphabetically
 * NEW "with palette" also for points
 * NEW plotstyle "with filledcurves"
-* NEW plot style "with filledboxes", controlled by new
-  "set style filling" options (needs --enable-filledboxes)
+* NEW plotstyles boxes and candlesticks can be filled under control of
+  "set style fill" options (needs --enable-filledboxes)
 * NEW "set boxwidth <number> relative"
 * NEW options to FIG terminal driver
 * NEW parse errors in datafile reading now show the culprit
