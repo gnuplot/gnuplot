@@ -31,7 +31,10 @@ noelcs:
 pdf: gpelcard.pdf
 ps: gpelcard.ps
 
-install: install-els install-elcs
+install-data-hook: @INSTALL_LISP@
+
+install-lisp: install-els install-elcs
+install-nolisp:
 
 install-els: $(ELS)
 	$(mkinstalldirs) $(DESTDIR)$(lispdir)
@@ -45,6 +48,12 @@ install-elcs: $(ELCS)
 	@for p in $(ELCS) ; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(lispdir)/$$p; \
+	done
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	@for p in $(ELCS) $(ELS) ; do \
+	  rm -f $(DESTDIR)$(lispdir)/$$p; \
 	done
 
 distclean-local:

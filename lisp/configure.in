@@ -24,14 +24,17 @@ AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
 
 if test "$EMACS" = no; then
   LISPFILES=noelcs
+  INSTALL_LISP=install-nolisp
 else
   LISPFILES=elcs
+  INSTALL_LISP=install-lisp
 fi
 
 AC_ARG_WITH(lisp-files,dnl
 [  --without-lisp-files    do not build emacs lisp files],
   [if test "$with_lisp_files" = no; then
      LISPFILES=noelcs
+     INSTALL_LISP=install-nolisp
    fi])
 
 # need to copy some stuff if we compile outside the source disrectory
@@ -100,5 +103,6 @@ AC_MSG_RESULT([$info_look])
 
 AC_SUBST(INFO_LOOK_ELC)
 AC_SUBST(LISPFILES)
+AC_SUBST(INSTALL_LISP)
 
 AC_OUTPUT(Makefile)
