@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.8 1999/09/24 15:38:17 lhecking Exp $ */
+/* $Id: tables.c,v 1.9 1999/10/21 21:05:57 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -33,7 +33,12 @@
 ]*/
 
 #include "plot.h"
+#include "command.h"
+#include "fit.h"
+#include "setshow.h"
 #include "tables.h"
+#include "term_api.h"
+#include "util.h"
 
 /* gnuplot commands */
 
@@ -307,6 +312,14 @@ struct gen_table set_key_tbl[] =
     { NULL, KEY_INVALID }
 };
 
+struct gen_table show_style_tbl[] =
+{
+    { "d$ata", SHOW_STYLE_DATA },
+    { "f$unction", SHOW_STYLE_FUNCTION },
+    { "l$ine", SHOW_STYLE_LINE },
+    { NULL, SHOW_STYLE_INVALID }
+};
+
 struct gen_table plotstyle_tbl[] =
 {
     { "l$ines", LINES },
@@ -336,12 +349,12 @@ struct gen_table plotstyle_tbl[] =
 };
 
 int
-lookup_table(tbl, token)
+lookup_table(tbl, find_token)
 struct gen_table *tbl;
-int token;
+int find_token;
 {
     while (tbl->key) {
-	if (almost_equals(token, tbl->key))
+	if (almost_equals(find_token, tbl->key))
 	    return tbl->value;
 	tbl++;
     }
@@ -349,12 +362,12 @@ int token;
 }
 
 parsefuncp_t
-lookup_ftable(ftbl, token)
+lookup_ftable(ftbl, find_token)
 struct gen_ftable *ftbl;
-int token;
+int find_token;
 {
     while (ftbl->key) {
-	if (almost_equals(token, ftbl->key))
+	if (almost_equals(find_token, ftbl->key))
 	    return ftbl->value;
 	ftbl++;
     }

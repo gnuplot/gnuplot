@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.8 1999/09/24 15:38:18 lhecking Exp $ */
+/* $Id: tables.h,v 1.9 1999/10/21 21:05:57 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -114,6 +114,11 @@ enum set_key_id {
     KEY_SAMPLEN, KEY_SPACING, KEY_WIDTH, KEY_TITLE
 };
 
+enum show_style_id {
+    SHOW_STYLE_INVALID,
+    SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE
+};
+
 extern struct gen_table command_tbl[];
 extern struct gen_table plot_tbl[];
 extern struct gen_table plot_axes_tbl[];
@@ -122,6 +127,7 @@ extern struct gen_table save_tbl[];
 extern struct gen_table set_tbl[];
 extern struct gen_table set_key_tbl[];
 extern struct gen_table set_hidden3d_tbl[];
+extern struct gen_table show_style_tbl[];
 extern struct gen_table plotstyle_tbl[];
 
 extern struct gen_ftable command_ftbl[];
