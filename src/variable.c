@@ -22,7 +22,9 @@
  * char *loadpath_handler (int, char *)
  *
  */
-char *loadpath_handler(int action, char *path)
+char *loadpath_handler(action, path)
+int action;
+char *path;
 {
     /* loadpath variable
      * the path elements are '\0' separated (!)
@@ -68,12 +70,13 @@ char *loadpath_handler(int action, char *path)
 	    int elen = last - envptr;
 	    int plen = strlen(path);
 	    if (loadpath != NULL && envptr != NULL) {
-		/* because we are prepending, and because realloc()
-		 * preserves only up to the minimum of old and new
-		 * length, we copy the env part, if any, to the
-		 * beginning before realloc()
-		 */
-		safe_strncpy(loadpath,envptr,elen+1);
+		/* we are prepending a path name; because
+		 * realloc() preserves only the contents up
+		 * to the minimum of old and new size, we move
+		 * the part to be preserved to the beginning
+		 * of the string; use memmove() because strings
+		 * may overlap */
+		memmove(loadpath,envptr,elen+1);
 	    }
 	    loadpath = gp_realloc(loadpath,elen+1+plen+1, "expand loadpath");
 	    /* now move env part back to the end to make space for
