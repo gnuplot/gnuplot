@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.72 2005/03/05 04:58:04 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.73 2005/03/06 01:15:58 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1853,7 +1853,7 @@ df_readline(double v[], int max)
 			case CT_ZTICLABEL:	axis = FIRST_Z_AXIS;  axcol = 2; break;
 #ifdef PM3D
 			/* EAM FIXME - I have no idea which column to set for cbtic */
-			case CT_CBTICLABEL:	axis = COLOR_AXIS; break;
+			case CT_CBTICLABEL:	axis = COLOR_AXIS; axcol =3; break;
 #endif
 		    }
 		    /* FIXME EAM - Trap special case of only a single 'using' column. */

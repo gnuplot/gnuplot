@@ -1,3 +1,8 @@
+2005-03-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/datafile.c (df_readline) src/misc.c (parse_colorspec): 
+	Clean up code to remove the remaining 2 compiler warnings in current cvs.
+
 2005-03-05  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/post.trm (PS_options): Patch #1121971. Avoid external 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.64 2005/02/27 05:39:20 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.65 2005/03/03 04:09:48 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -977,7 +977,7 @@ parse_colorspec(struct t_colorspec *tc, int options)
 	char *color;
 	int rgbtriple;
 	c_token++;
-	if (END_OF_COMMAND || !(color = try_to_get_string()))
+	if (!(color = try_to_get_string()))
 	    int_error(c_token, "expected a color name or a string of form \"#RRGGBB\"");
 	if ((rgbtriple = lookup_table_nth(pm3d_color_names_tbl, color)) >= 0)
 	    rgbtriple = pm3d_color_names_tbl[rgbtriple].value;
