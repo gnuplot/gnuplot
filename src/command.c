@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.32 1999/10/29 18:47:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.33 1999/11/08 19:24:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -68,6 +68,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.32 1999/10/29 18:47:16 l
 #include "eval.h"
 #include "fit.h"
 #include "gp_time.h"
+#include "gp_hist.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot2d.h"
@@ -678,7 +679,6 @@ pause_command()
 		(void) fgets(buf, strlen(buf), stdin);
 	    }
 	} else if (strcmp(term->name, "atari") == 0) {
-	    char *readline(char *);
 	    char *line = readline("");
 	    if (line)
 		free(line);
@@ -686,7 +686,6 @@ pause_command()
 	    (void) fgets(buf, strlen(buf), stdin);
 #elif defined(ATARI)
 	if (strcmp(term->name, "atari") == 0) {
-	    char *readline(char *);
 	    char *line = readline("");
 	    if (line)
 		free(line);
@@ -1381,7 +1380,6 @@ help_command()
     start = ++c_token;
 
     /* find the end of the help command */
-/*    for (start = c_token; !(END_OF_COMMAND); c_token++); */
     while (!(END_OF_COMMAND))
 	c_token++;
 
