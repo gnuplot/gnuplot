@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
-AUTOMAKE_OPTIONS = foreign 1.2h
+AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 
 EXTRA_PROGRAMS = gnuplot_x11
 
@@ -43,7 +43,16 @@ gnuplot.def gnuplot.opt gnuplot.prj header.mac hrcgraph.asm intergra.x11 \
 lasergnu lineproc.mac linkopt.vms linkopt.ztc makefile.all os2 pcgraph.asm \
 rgipgnu win $(OTHER_SOURCES)
 
+## we don't need COREOBJS, but CORETERM
+## for the term.o dependencies
+O=o
+T=$(top_srcdir)/term/
+# begin makefile.all
+include makefile.all
+# end makefile.all
+
 # explicit targets
+
 command.o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
 	   setshow.h variable.h fit.h binary.h help.h
 	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
@@ -57,5 +66,21 @@ term.o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
 	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
 
 version.o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
+	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
+
+# de-ANSIfy version
+command._o: command.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h \
+	   setshow.h variable.h fit.h binary.h help.h
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -c $<
+
+show._o: show.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h setshow.h \
+	variable.h
+	$(COMPILE) -DHELPFILE=\"$(HELPFILE)\" -DBINDIR=\"$(bindir)\" -c $<
+
+term._o: term.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h bitmap.h \
+	setshow.h variable.h ../term/driver.h term.h $(CORETERM)
+	$(COMPILE) -I../term -I$(top_srcdir)/term -c $<
+
+version._o: version.c plot.h ansichek.h stdfn.h syscfg.h protos.h alloc.h
 	$(COMPILE) -DCONTACT=\"$(EMAIL)\" -c $<
 
