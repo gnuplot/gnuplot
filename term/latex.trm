@@ -132,7 +132,7 @@ TERM_PUBLIC void EEPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 static int LATEX_posx;
 static int LATEX_posy;
 static int LATEX_fontsize = 10;
-static char LATEX_font[MAX_ID_LEN+1] = "cmr";
+static char LATEX_font[MAX_ID_LEN+1] = "doc";
 static enum JUSTIFY latex_justify = LEFT;
 static int latex_angle = 0;
 
@@ -225,8 +225,7 @@ TERM_PUBLIC void LATEX_options()
 	    strcpy(LATEX_font, "cmr");
 	    c_token++;
 	} else if (almost_equals(c_token, "d$efault")) {
-	    strcpy(LATEX_font, "cmr");
-	    LATEX_fontsize = 10;
+	    strcpy(LATEX_font, "doc");
 	    c_token++;
 	}
     }
@@ -240,8 +239,11 @@ TERM_PUBLIC void LATEX_options()
     term->v_char = (unsigned int) (LATEX_fontsize * DOTS_PER_INCH / 72);
     term->h_char = (unsigned int) (LATEX_fontsize * DOTS_PER_INCH / 144);
 
-    sprintf(term_options, "%s %d", LATEX_font[2] == 't' ? "courier" : "roman",
-	    LATEX_fontsize);
+    if (strcmp(LATEX_font, "doc")==0)
+	strncpy(term_options, "(document specific font)",MAX_LINE_LEN);
+    else
+	sprintf(term_options, "%s %d", LATEX_font[2] == 't' ? "courier" : "roman",
+		LATEX_fontsize);
 }
 
 
@@ -270,12 +272,13 @@ TERM_PUBLIC void LATEX_graphics()
     int xscale = xsize * t->xmax;
     int yscale = ysize * t->ymax;
 
-    fprintf(gpoutfile, "\
-\\begin{picture}(%d,%d)(0,0)\n\
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
+    if (strcmp(LATEX_font, "doc") != 0) {
+        fprintf(gpoutfile, "\
 \\font\\gnuplot=%s10 at %dpt\n\
 \\gnuplot\n",
-	    xscale, yscale,
-	    LATEX_font, LATEX_fontsize);
+		LATEX_font, LATEX_fontsize);
+    }
 }
 
 
@@ -835,9 +838,10 @@ START_HELP(latex)
 " The `latex` and `emtex` drivers allow two options.",
 "",
 " Syntax:",
-"       set terminal latex | emtex {courier | roman} {<fontsize>}",
+"       set terminal latex | emtex {courier | roman | default} {<fontsize>}",
 "",
-" `fontsize` may be any size you specify.  The default is 10-point Roman.",
+" `fontsize` may be any size you specify.  The default is for the plot to",
+" inherit its font setting from the embedding document.",
 "",
 " Unless your driver is capable of building fonts at any size (e.g. dvips),",
 " stick to the standard 10, 11 and 12 point sizes.",
