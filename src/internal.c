@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.22 2004/11/01 01:17:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.23 2004/11/03 07:27:03 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -112,7 +112,6 @@ f_push(union argument *x)
     push(&(udv->udv_value));
 }
 
-#ifdef GP_ISVAR
 /* JSR - Like f_push but pushes the defined/undefined status of the argument */
 void
 f_pushv(union argument *x)
@@ -127,7 +126,6 @@ f_pushv(union argument *x)
     else
         push(Ginteger(&a, 1));
 }
-#endif  /*GP_ISVAR*/
 
 
 void

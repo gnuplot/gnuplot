@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.20 2004/10/27 21:54:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.21 2004/11/10 23:30:30 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -968,7 +968,6 @@ f_ceil(union argument *arg)
 #undef pop
 #endif
 
-#ifdef GP_ISVAR
 /* JSR - Check to see if a variable is defined */
 /* Returns 1 if the varibale is defined, 0 if not */
 /* If a constant is passed then returns the constant, i.e. isvar(10)=10 */
@@ -986,7 +985,6 @@ f_isvar(union argument *arg)
     push(Ginteger(&a, a.v.int_val));
 
 }
-#endif  /*GP_ISVAR*/
 
 /* bessel function approximations */
 static double

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.23 2004/12/05 08:04:42 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.24 2005/03/05 04:52:14 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -94,9 +94,7 @@ const struct ft_entry GPFAR ft[] =
     {"pushd1",  f_pushd1},
     {"pushd2",  f_pushd2},
     {"pushd",  f_pushd},
-#ifdef GP_ISVAR
     {"pushv", f_pushv},
-#endif  /*GP_ISVAR*/
     {"call",  f_call},
     {"calln",  f_calln},
     {"lnot",  f_lnot},
@@ -167,9 +165,7 @@ const struct ft_entry GPFAR ft[] =
     {"rand",  f_rand},
     {"floor",  f_floor},
     {"ceil",  f_ceil},
-#ifdef GP_ISVAR
     {"defined",  f_isvar},       /* isvar function */
-#endif  /*GP_ISVAR*/
 
     {"norm",  f_normal},	/* XXX-JG */
     {"inverf",  f_inverse_erf},	/* XXX-JG */

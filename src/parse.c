@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.31 2004/12/06 19:15:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.32 2004/12/15 13:31:31 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -80,10 +80,8 @@ static int is_builtin_function __PROTO((int t_num));
 static struct at_type *at = NULL;
 static int at_size = 0;
 
-#ifdef GP_ISVAR
 /* isvar - When this variable is true PUSH operations become PUSHV */
 static TBOOLEAN push_vars = TRUE;
-#endif
 
 static void
 convert(struct value *val_ptr, int t_num)
@@ -303,14 +301,12 @@ parse_primary_expression()
 	    num_params.type = INTGR;
 
 	    if (whichfunc) {
-#ifdef GP_ISVAR
 		/* Check to see if it is isvar */
 		/* Is so then turn off normal variable pushing */
                 /* Push variable definition state instead */
 		if (strcmp(ft[whichfunc].f_name,"defined")==0) {
 			push_vars=FALSE;
 		}
-#endif  /*GP_ISVAR*/
 
 		/* it's a standard function */
 		c_token += 2;	/* skip fnc name and '(' */
@@ -335,9 +331,8 @@ parse_primary_expression()
 		(void) add_action(whichfunc);
 
 		 /* Turn normal variable pushing back on */
-#ifdef GP_ISVAR
 		push_vars=TRUE;
-#endif
+
 	    } else {
 		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
@@ -390,11 +385,9 @@ parse_primary_expression()
 	    }
 	    /* its a variable, with no dummies active - div */
 	} else {
-#ifdef GP_ISVAR
             if (push_vars == FALSE)
 		add_action(PUSHV)->udv_arg = add_udv(c_token);
 	    else
-#endif
 		add_action(PUSH)->udv_arg = add_udv(c_token);
 
 	    c_token++;

@@ -3,6 +3,13 @@
 	* src/datafile.c (df_readline): Plug a memory leak caused by evaluating
 	a string-valued expression inside a "using" specification.
 
+	* configure.in /config/config.amg /config/config.cyg /config/config.mgw
+	/config/config.os2 /src/eval.c /src/eval.h /src/internal.c
+	/src/internal.h /src/parse.c /src/standard.c /src/standard.h:
+
+	Remove configuration option --disable-defined-var.
+	Remove the #ifdef GP_ISVAR ... #endif bracketing the corresponding code.
+
 2005-03-04  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c: Introduce a defined constant MAX_TOKEN_LENGTH

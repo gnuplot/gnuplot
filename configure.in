@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.161 2005/03/03 04:09:46 sfeam Exp $
+dnl $Id: configure.in,v 1.162 2005/03/05 05:40:20 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -759,16 +759,6 @@ fi
 
 TERMLIBS="$VGAGLLIB $TERMLIBS"
 
-dnl isvar function patch
-AC_ARG_ENABLE(isvar,dnl
-[  --disable-defined-var         disable defined(var) function ],,
-  test -z "$enable_defined_var" && enable_defined_var=yes)
-
-if test "$enable_defined_var" = yes; then
-     AC_DEFINE(GP_ISVAR, 1,
-               [ Define to enable defined(variable) test. ])
-fi
-
 dnl thin plate splines patch
 AC_ARG_ENABLE(thin-splines,dnl
 [  --enable-thin-splines   enable thin plate splines],
@@ -1037,10 +1027,6 @@ fi
 
 if test "$enable_pm3d" = yes; then
   AC_MSG_RESULT([  Enable pm3d])
-fi
-
-if test "$enable_defined_var" = yes; then
-  AC_MSG_RESULT([  Enable defined(variable) test])
 fi
 
 if test "$enable_thin_splines" = yes; then

@@ -39,9 +39,6 @@
 /* Define to allow 'fit' to create parameter error variables. */
 #define GP_FIT_ERRVARS 1
 
-/* Define to enable defined(variable) test. */
-#define GP_ISVAR 1
-
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp. */
 /* #undef GRX21 */
 
