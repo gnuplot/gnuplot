@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.21 2004/04/13 17:23:52 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.22 2004/07/01 17:10:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -815,7 +815,6 @@ struct rgb web_color_rgbs[] =
  */
 
 
-#if USE_ULIG_FILLEDBOXES
 /* bitmaps used for filled boxes style (ULIG) */
 
 #define fill_bitmap_width 8
@@ -845,7 +844,6 @@ static unsigned char fill_pattern_bitmaps[fill_pattern_num][8] ={
    ,{ 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 } /* diagonal stripes (9) */
 #endif
 };
-#endif /* USE_ULIG_FILLEDBOXES */
 
 /*
  * set pixel (x, y, value) to value value (this can be 1/0 or a color number).
@@ -1234,8 +1232,6 @@ b_boxfill(
     unsigned int w, unsigned int h)
 {
     unsigned int ix, iy;
-
-#if USE_ULIG_FILLEDBOXES
     int pixcolor, actpix, pat, mask, idx, bitoffs, shiftcnt;
     unsigned char *fillbitmap;
 
@@ -1288,17 +1284,6 @@ b_boxfill(
 	}
     }
 
-#else  /* ! USE_ULIG_FILLEDBOXES */
-
-    /* HBB 20010817: provide 'classical' implementation instead: */
-    (void) style;			/* unused */
-    for(iy = y + h - 1; iy >= y; iy-- ) { /* box height */
-	for(ix = x + w - 1; ix >= x; ix-- ) { /* box width */
-	    b_setpixel(ix, iy, 0);
-	}
-    }
-
-#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 

@@ -138,7 +138,6 @@ TBOOLEAN parametric = FALSE;
 TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
 #endif
 
-/* EAM Sep 2002 - EMPTY fillstyle valid even if USE_ULIG_FILLEDBOXES is not selected */
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
 
 #ifdef PM3D

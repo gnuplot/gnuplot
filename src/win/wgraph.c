@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.38 2004/05/27 06:59:38 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: wgraph.c,v 1.39 2004/07/01 17:10:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -133,7 +133,6 @@ int wginitstyle[WGDEFSTYLE] = {PS_SOLID, PS_DASH, PS_DOT, PS_DASHDOT, PS_DASHDOT
 #define GWOPMAX 4096
 
 
-#if USE_ULIG_FILLEDBOXES
 /* bitmaps for filled boxes (ULIG) */
 /* zeros represent the foreground color and ones represent the background color */
 /* FIXME HBB 20010916: *never* extern in a C source! */
@@ -187,7 +186,6 @@ static BITMAP pattern_bitdata[pattern_num];
 static HBITMAP pattern_bitmap[pattern_num];
 
 static TBOOLEAN brushes_initialized = FALSE;
-#endif /* USE_ULIG_FILLEDBOXES */
 
 
 /* ================================== */
@@ -516,7 +514,6 @@ MakePens(LPGW lpgw, HDC hdc)
 			lpgw->colorbrush[i] = CreateSolidBrush(lpgw->colorpen[i].lopnColor);
 	}
 
-#if USE_ULIG_FILLEDBOXES
 	/* build pattern brushes for filled boxes (ULIG) */
 	if( ! brushes_initialized ) {
 		int i;
@@ -547,7 +544,6 @@ MakePens(LPGW lpgw, HDC hdc)
 
 		brushes_initialized = TRUE;
 	}
-#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 /* Undo effect of MakePens(). To be called just before the window is closed. */
@@ -561,7 +557,6 @@ DestroyPens(LPGW lpgw)
 	for (i=0; i<WGNUMPENS+2; i++)
 		DeleteObject(lpgw->colorbrush[i]);
 
-#if USE_ULIG_FILLEDBOXES
 	/* delete brushes used for boxfilling (ULIG) */
 	if( brushes_initialized ) {
 		int i;
@@ -576,7 +571,6 @@ DestroyPens(LPGW lpgw)
 		}
 		brushes_initialized = FALSE;
 	}
-#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 /* ================================== */
@@ -790,10 +784,8 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
     unsigned int ngwop=0;
     BOOL isColor;
     double line_width = 1.0;
-#if USE_ULIG_FILLEDBOXES
     unsigned int fillstyle = 0.0;
     int idx;
-#endif /*  USE_ULIG_FILLEDBOXES */
 
     if (lpgw->locked)
 	return;
@@ -910,7 +902,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    }
 	break;
 
-#if USE_ULIG_FILLEDBOXES
 	case W_fillstyle:
 	    /* HBB 20010916: new entry, needed to squeeze the many
 	     * parameters of a filled box call through the bottlneck
@@ -918,13 +909,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	     * struct GWOP, respectively. */
 	    fillstyle = curptr->x;
 	    break;
-#endif /* USE_ULIG_FILLEDBOXES */
 
 	case W_boxfill:   /* ULIG */
 
 	    assert (polyi == 1);
 
-#if USE_ULIG_FILLEDBOXES
 	    /* NOTE: the x and y passed with this call are the width and
 	     * height of the box, actually. The left corner was stored into
 	     * ppt[0] by a preceding W_move, and the style was memorized
@@ -961,19 +950,6 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	    xdash -= rl;
 	    ydash -= rb - 1;
 	    PatBlt(hdc, ppt[0].x, ppt[0].y, xdash, ydash, PATCOPY);
-#else /* ! USE_ULIG_FILLEDBOXES */
-	    {
-		RECT rect;
-
-		rect.left = ppt[0].x;
-		rect.bottom = ppt[0].y;
-		rect.right = ppt[0].x + xdash;
-		rect.top = ppt[0].y - ydash;
-
-		SetBkColor(hdc,lpgw->background);
-		FillRect(hdc, &rect, lpgw->hbrush);
-	    }
-#endif /* USE_ULIG_FILLEDBOXES */
 	    polyi = 0;
 	    break;
 	case W_text_angle:

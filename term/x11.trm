@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.132 2005/02/14 10:19:17 mikulik Exp $
+ * $Id: x11.trm,v 1.133 2005/02/24 23:17:36 sfeam Exp $
  *
  */
 
@@ -1502,12 +1502,8 @@ X11_filled_polygon(int points, gpiPoint *corners)
      * number of points by one.
      */
     int_cache[0] = points;
-#if USE_ULIG_FILLEDBOXES
     int_cache[1] = corners->style;
     byte_remaining = 2*sizeof(int_cache[0]);
-#else
-    byte_remaining = sizeof(int_cache[0]);
-#endif
     point_remaining = points + 1;
     i_corner = 0;
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.146 2005/02/16 05:17:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.147 2005/03/02 20:35:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -84,9 +84,7 @@ static void show_autoscale __PROTO((void));
 static void show_bars __PROTO((void));
 static void show_border __PROTO((void));
 static void show_boxwidth __PROTO((void));
-#if USE_ULIG_FILLEDBOXES
 static void show_fillstyle __PROTO((void));
-#endif /* USE_ULIG_FILLEDBOXES */
 static void show_clip __PROTO((void));
 static void show_contour __PROTO((void));
 static void show_dgrid3d __PROTO((void));
@@ -1157,7 +1155,6 @@ show_boxwidth()
 }
 
 
-#if USE_ULIG_FILLEDBOXES
 /* process 'show fillstyle' command */
 static void
 show_fillstyle()
@@ -1190,7 +1187,6 @@ show_fillstyle()
 	break;
     }
 }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 
 /* process 'show clip' command */
@@ -1392,7 +1388,6 @@ show_style()
 	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
 	break;
-#if USE_ULIG_FILLEDBOXES
     case SHOW_STYLE_FILLING:
 	show_fillstyle();
 	c_token++;
@@ -1403,7 +1398,6 @@ show_style()
 	c_token++;
 	break;
 #endif
-#endif /* USE_ULIG_FILLEDBOXES */
     case SHOW_STYLE_ARROW:
 	c_token++;
 	CHECK_TAG_GT_ZERO;
@@ -1414,9 +1408,7 @@ show_style()
 	show_styles("Data",data_style);
 	show_styles("Functions", func_style);
 	show_linestyle(0);
-#if USE_ULIG_FILLEDBOXES
 	show_fillstyle();
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef EAM_HISTOGRAMS
 	show_histogram();
 #endif

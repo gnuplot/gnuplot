@@ -442,12 +442,6 @@
 /* #undef USE_MOUSE */
 /* Don't change it here -- this define is set in config/makefile.cyg. */
 
-/* Define if you want to have Uli Gruenebaum's filledboxes style. */
-#define USE_ULIG_FILLEDBOXES 1
-
-/* Define if you want to have Uli Gruenebaum's relative boxwidth. */
-#define USE_ULIG_RELATIVE_BOXWIDTH 1
-
 /* Define if you want to support files in binary format. */
 #define BINARY_DATA_FILE 1
 

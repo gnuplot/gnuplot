@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.63 2004/11/27 02:38:37 sfeam Exp $
+ * $Id: cgm.trm,v 1.64 2005/02/01 11:28:52 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -99,18 +99,14 @@ TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y,
 				    int number));
-#ifdef USE_ULIG_FILLEDBOXES
 TERM_PUBLIC void CGM_fillbox __PROTO((int style, unsigned int x1, unsigned int y1,
 				unsigned int width, unsigned int height));
-#endif
 #ifdef PM3D
 TERM_PUBLIC int CGM_make_palette __PROTO((t_sm_palette *palette));
 TERM_PUBLIC void CGM_set_color __PROTO((t_colorspec *));
 #endif
 
-#if defined(USE_ULIG_FILLEDBOXES) || defined(PM3D)
-    TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
-#endif
+TERM_PUBLIC void CGM_filled_polygon __PROTO((int points, gpiPoint *corner));
 
 TERM_PUBLIC void CGM_set_pointsize __PROTO((double size));
 
@@ -910,7 +906,6 @@ CGM_linecolor(int linecolor)
     CGM_write_int_record(5, 14, 2, (int *) &cgm_color);
 }
 
-#ifdef USE_ULIG_FILLEDBOXES
 TERM_PUBLIC void
 CGM_fillbox(
      int style,
@@ -970,7 +965,6 @@ CGM_fillbox(
     CGM_filled_polygon(5, corner);
     cgm_next.interior_style = 1; /* solid */
 }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 TERM_PUBLIC void
 CGM_linewidth(double width)
@@ -1113,7 +1107,6 @@ CGM_set_color(t_colorspec *colorspec)
 }
 #endif /* PM3D */
 
-#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 TERM_PUBLIC void
 CGM_filled_polygon(int points, gpiPoint *corner)
 {
@@ -1142,8 +1135,6 @@ CGM_filled_polygon(int points, gpiPoint *corner)
 	 CGM_solid_vector(corner[i].x, corner[i].y);
     CGM_flush_polygon();
 }
-
-#endif /* PM3D || FILLEDBOXES */
 
 static void
 CGM_flush_polyline()
@@ -1678,11 +1669,7 @@ TERM_TABLE_START(cgm_driver)
     TERM_BINARY,		/* various flags */
     NULL,			/* after one plot of multiplot */
     NULL,			/* before subsequent plot of multiplot */
-#ifdef USE_ULIG_FILLEDBOXES
     CGM_fillbox,
-#else
-    NULL,			/* fillbox: clear part of multiplot */
-#endif
     CGM_linewidth
 #ifdef USE_MOUSE
     , NULL, NULL, NULL, NULL, NULL

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.49 2005/01/05 19:37:26 broeker Exp $
+ * $Id: svg.trm,v 1.50 2005/02/14 10:19:17 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -63,9 +63,7 @@ TERM_PUBLIC void SVG_previous_palette __PROTO((void));
 TERM_PUBLIC void SVG_set_color __PROTO((t_colorspec *));
 #endif /* PM3D */
 
-#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 TERM_PUBLIC void SVG_filled_polygon __PROTO((int, gpiPoint *));
-#endif
 
 TERM_PUBLIC void ENHsvg_OPEN __PROTO((char *, double, double, TBOOLEAN, TBOOLEAN, int));
 TERM_PUBLIC void ENHsvg_FLUSH __PROTO((void));
@@ -141,9 +139,7 @@ static void SVG_GroupFilledClose __PROTO ((void));
 static void SVG_StyleColor __PROTO((const char*));
 static void SVG_StyleFillColor __PROTO((void));
 static void SVG_local_reset __PROTO((void));
-#if USE_ULIG_FILLEDBOXES
 static void SVG_DefineFillPattern __PROTO((int fillpat));
-#endif
 static void SVG_MoveForced __PROTO((unsigned int x, unsigned int y));
 
 /* Points to source of requested embedded font */
@@ -315,7 +311,6 @@ SVG_StyleFillColor()
     SVG_StyleColor("fill");
 }
 
-#if USE_ULIG_FILLEDBOXES
 static void
 SVG_DefineFillPattern(int fillpat)
 {
@@ -372,7 +367,6 @@ SVG_DefineFillPattern(int fillpat)
 	fputs("\t\t</pattern>\n" "\t</defs>\n", gpoutfile);
     }
 }
-#endif
 
 static void
 SVG_MoveForced(unsigned int x, unsigned int y)
@@ -1029,7 +1023,6 @@ SVG_previous_palette()
 
 #endif /* PM3D */
 
-#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 /*------------------------------------------------------------------------------------------------------------------------------------
 	SVG_filled_polygon
 ------------------------------------------------------------------------------------------------------------------------------------*/
@@ -1040,14 +1033,12 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     int fillpar = corners->style >> 4;
     int style = corners->style &= 0xf;
 
-#if USE_ULIG_FILLEDBOXES
     if (style == FS_PATTERN) {
 	/* make sure the pattern is defined (with the current stroke color)
 	 * must be defined AFTER the current group is opened with the color
 	 * attribute set, as the patterns use 'currentColor' */
 	SVG_DefineFillPattern(fillpar);
     }
-#endif
 
     SVG_GroupFilledOpen();
     fputs("\t\t<polygon ", gpoutfile);
@@ -1077,7 +1068,6 @@ SVG_filled_polygon(int points, gpiPoint* corners)
     fputs("'/>\n", gpoutfile);
 }
 
-#endif /* PM3D || USE_ULIG_FILLEDBOXES */
 
 /* Enhanced text mode support starts here */
 

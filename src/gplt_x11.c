@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.128 2005/02/23 01:32:36 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.129 2005/02/24 23:17:35 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -629,7 +629,6 @@ static Atom WM_PROTOCOLS, WM_DELETE_WINDOW;
 static XPoint Diamond[5], Triangle[4];
 static XSegment Plus[2], Cross[2], Star[4];
 
-#if USE_ULIG_FILLEDBOXES
 /* pixmaps used for filled boxes (ULIG) */
 /* FIXME EAM - These data structures are a duplicate of the ones in bitmap.c */
 
@@ -646,15 +645,10 @@ static const char stipple_pattern_bits[stipple_pattern_num][8] = {
    ,{ 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 } /* diagonal stripes (5) */
    ,{ 0x11, 0x11, 0x22, 0x22, 0x44, 0x44, 0x88, 0x88 } /* diagonal stripes (6) */
    ,{ 0x88, 0x88, 0x44, 0x44, 0x22, 0x22, 0x11, 0x11 } /* diagonal stripes (7) */
-#if (0)
-   ,{ 0x03, 0x0C, 0x30, 0xC0, 0x03, 0x0C, 0x30, 0xC0 } /* diagonal stripes (8) */
-   ,{ 0xC0, 0x30, 0x0C, 0x03, 0xC0, 0x30, 0x0C, 0x03 } /* diagonal stripes (9) */
-#endif
 };
 
 static Pixmap stipple_pattern[stipple_pattern_num];
 static int stipple_initialized = 0;
-#endif /* USE_ULIG_FILLEDBOXES */
 
 #ifdef X11_POLYLINE
 static XPoint *polyline = NULL;
@@ -1063,14 +1057,14 @@ delete_plot(plot_struct *plot)
 	plot->window = None;
 	--windows_open;
     }
-#if USE_ULIG_FILLEDBOXES
+
     if (stipple_initialized) {	/* ULIG */
 	int i;
 	for (i = 0; i < stipple_pattern_num; i++)
 	    XFreePixmap(dpy, stipple_pattern[i]);
 	stipple_initialized = 0;
     }
-#endif /* USE_ULIG_FILLEDBOXES */
+
     if (plot->pixmap) {
 	XFreePixmap(dpy, plot->pixmap);
 	plot->pixmap = None;
@@ -2092,7 +2086,6 @@ exec_cmd(plot_struct *plot, char *command)
 	int style, xtmp, ytmp, w, h;
 
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
-#if USE_ULIG_FILLEDBOXES
 	    int fillpar, idx;
 	    XColor xcolor, bgnd;
 	    float dim;
@@ -2138,7 +2131,6 @@ exec_cmd(plot_struct *plot, char *command)
 		XSetFillStyle(dpy, gc, FillSolid);
 		XSetForeground(dpy, gc, plot->cmap->colors[0]);
 	    }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 	    /* gnuplot has origin at bottom left, but X uses top left
 	     * There may be an off-by-one (or more) error here.
@@ -2146,16 +2138,10 @@ exec_cmd(plot_struct *plot, char *command)
 	    ytmp += h;		/* top left corner of rectangle to be filled */
 	    w *= xscale;
 	    h *= yscale;
-#if USE_ULIG_FILLEDBOXES
 	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w + 1, h + 1);
 	    /* reset everything */
 	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 	    XSetFillStyle(dpy, gc, FillSolid);
-#else /* ! USE_ULIG_FILLEDBOXES */
-	    XSetForeground(dpy, gc, plot->cmap->colors[0]);
-	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w, h);
-	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-#endif /* USE_ULIG_FILLEDBOXES */
 	}
     }
     /*   X11_justify_text(mode) - set text justification mode  */
@@ -2420,12 +2406,10 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    sscanf(ptr, "%4d", &npoints);
 
-#if USE_ULIG_FILLEDBOXES
 	    if (npoints > 0) {
 		ptr += 4;
 		sscanf(ptr, "%4d", &style);
 	    }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 	    /* HBB 20010919: Implement buffer overflow protection by
 	     * breaking up long lines */
@@ -2464,20 +2448,14 @@ exec_cmd(plot_struct *plot, char *command)
 
 	    if (i >= npoints) {
 		/* only do the call if list is complete by now */
-#if USE_ULIG_FILLEDBOXES
 		int fillpar, idx;
-#endif
 
 #else /* BINARY_X11_POLYGON */
 
 	    static TBOOLEAN transferring = 0;
 	    static unsigned char *iptr;
-#if USE_ULIG_FILLEDBOXES
 	    static int int_cache[2];
 #define style int_cache[1]
-#else
-	    static int int_cache[1];
-#endif
 #define npoints int_cache[0]
 	    static unsigned i_remaining;
 	    unsigned short i_buffer;
@@ -2518,9 +2496,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    /* The number of points was just read.  Now set up points array and continue. */
 		    if (swap_endian) {
 			byteswap((char *)&npoints, sizeof(npoints));
-#if USE_ULIG_FILLEDBOXES
 			byteswap((char *)&style, sizeof(style));
-#endif
 		    }
 		    if (npoints > st_npoints) {
 			XPoint *new_points = realloc(points, npoints*2*sizeof(int));
@@ -2541,11 +2517,9 @@ exec_cmd(plot_struct *plot, char *command)
 	    if (!i_remaining) {
 
 		int i;
-#if USE_ULIG_FILLEDBOXES
 		int fillpar, idx;
 		XColor xcolor, bgnd;
 		float dim;
-#endif
 
 		transferring = 0;
 
@@ -2567,7 +2541,6 @@ exec_cmd(plot_struct *plot, char *command)
 
 #endif /* BINARY_X11_POLYGON */
 
-#if USE_ULIG_FILLEDBOXES
 		/* Load selected pattern or fill into a separate gc */
 		if (!fill_gc)
 		    fill_gc = XCreateGC(dpy,plot->window,0,0);
@@ -2616,7 +2589,6 @@ exec_cmd(plot_struct *plot, char *command)
 		    XSetFillStyle(dpy, *current_gc, FillSolid);
 		    break;
 		}
-#endif
 
 		XFillPolygon(dpy, plot->pixmap, *current_gc, points, npoints,
 			     Nonconvex, CoordModeOrigin);
@@ -2633,9 +2605,7 @@ exec_cmd(plot_struct *plot, char *command)
 #else /* BINARY_X11_POLYGON */
 
 	    }
-#if USE_ULIG_FILLEDBOXES
 #undef style
-#endif
 #undef npoints
 
 #endif /* BINARY_X11_POLYGON */
@@ -3142,7 +3112,6 @@ display(plot_struct *plot)
     if (font)
       gpXSetFont(dpy, gc, font->fid);
 
-#if USE_ULIG_FILLEDBOXES
     XSetFillStyle(dpy, gc, FillSolid);
 
     /* initialize stipple for filled boxes (ULIG) */
@@ -3154,7 +3123,6 @@ display(plot_struct *plot)
 				stipple_pattern_width, stipple_pattern_height);
 	stipple_initialized = 1;
     }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 #ifdef PM3D
     /* Always initialize a gc_pm3d, in case we need it for a single rgb color */
@@ -4168,14 +4136,14 @@ process_configure_notify_event(XEvent *event)
 		plot->gheight = plot->height;
 #endif
 	    plot->posn_flags = (plot->posn_flags & ~PSize) | USSize;
-#if USE_ULIG_FILLEDBOXES
+
 	    if (stipple_initialized) {
 		int i;
 		for (i = 0; i < stipple_pattern_num; i++)
 			XFreePixmap(dpy, stipple_pattern[i]);
 		stipple_initialized = 0;
 	    }
-#endif /* USE_ULIG_FILLEDBOXES */
+
 	    if (plot->pixmap) {
 		/* it is the wrong size now */
 		FPRINTF((stderr, "Free pixmap %d\n", 0));

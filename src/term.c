@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.101 2005/02/09 11:43:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.102 2005/02/14 10:19:08 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1882,7 +1882,6 @@ test_term()
     }
     (*t->put_text) (x, y, "linewidth");
 
-#ifdef USE_ULIG_FILLEDBOXES
     /* test fill patterns */
     x = xmax_t * 0.5;
     y = 0;
@@ -1905,7 +1904,6 @@ test_term()
 	(*t->put_text)(x+xl/2, y+yl+t->v_char*0.5, label);
 	x += xl * 1.5;
     }
-#endif
 
 #ifdef PM3D
     {

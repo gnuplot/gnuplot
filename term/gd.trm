@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.60 2005/02/19 03:39:18 sfeam Exp $
+ * $Id: gd.trm,v 1.61 2005/02/19 05:37:32 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -269,7 +269,6 @@ typedef struct {
 
 static PNG_BRUSH PNG_brush[MAXLINEWIDTH+1];
 
-#if USE_ULIG_FILLEDBOXES
 typedef struct {
     gdImagePtr im;
     unsigned int last_rgb;
@@ -393,7 +392,6 @@ PNG_FillPattern(int fillpar)
     gdImageSetTile(png_state.image, PNG_fill_tile.im);
     return (int)gdTiled;
 }
-#endif
 
 static void
 PNG_PointX(unsigned int x, unsigned int y)
@@ -821,12 +819,10 @@ PNG_reset()
 	    gdImageDestroy(PNG_brush[i].im);
 	PNG_brush[i].im = 0;
     }
-#if USE_ULIG_FILLEDBOXES
     if (PNG_fill_tile.im) {
 	gdImageDestroy(PNG_fill_tile.im);
 	PNG_fill_tile.im = (gdImagePtr)0;
     }
-#endif
 }
 
 #ifdef PM3D
@@ -978,7 +974,6 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
 	gd_corners[i].y = Y(corners[i].y);
     }
 
-#if USE_ULIG_FILLEDBOXES
     switch (corners->style & 0xf) {
 	case FS_EMPTY: /* fill with background color */
 	    color = png_state.color_table[0];
@@ -993,7 +988,6 @@ void PNG_filled_polygon(int points, gpiPoint *corners)
 	    color = png_state.color;
 	    break;
     }
-#endif
 
     gdImageFilledPolygon(png_state.image, gd_corners, points, color);
 
@@ -1022,7 +1016,6 @@ PNG_boxfill(
     unsigned int x1, y1, x2, y2;
     int          color;
 
-#if USE_ULIG_FILLEDBOXES
     /* fillpar:
      * - solid   : 0 - 100
      * - pattern : 0 - 100
@@ -1033,9 +1026,7 @@ PNG_boxfill(
 
     switch (style) {
 	case FS_EMPTY: /* fill with background color */
-#endif
 	    color = png_state.color_table[0];
-#if USE_ULIG_FILLEDBOXES
 	    break;
 	case FS_SOLID: /* solid fill */
 	    color = PNG_FillSolid(fillpar);
@@ -1048,7 +1039,6 @@ PNG_boxfill(
 	    color = png_state.color;
 	    break;
     }
-#endif
 
     x1 = x;
     x2 = x + width - 1;

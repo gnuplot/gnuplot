@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.41 2005/01/08 15:37:22 mikulik Exp $
+ * $Id: term_api.h,v 1.42 2005/01/08 16:08:59 mikulik Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -109,7 +109,6 @@ typedef struct arrow_style_type {    /* contains all Arrow properties */
 # define DEFAULT_LP_STYLE_TYPE {0, 0, 0, 1.0, 1.0}
 #endif
 
-/* EAM Sep 2002 - define fillstyle structure whether or not USE_ULIG_FILLEDBOXES */
 typedef struct fill_style_type {
     int fillstyle;
     int filldensity;

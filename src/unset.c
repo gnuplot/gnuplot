@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.75 2005/03/02 19:44:57 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.76 2005/03/02 20:35:36 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -73,9 +73,7 @@ static void unset_bars __PROTO((void));
 static void unset_border __PROTO((void));
 
 static void unset_boxwidth __PROTO((void));
-#if USE_ULIG_FILLEDBOXES
 static void unset_fillstyle __PROTO((void));
-#endif /* USE_ULIG_FILLEDBOXES */
 static void unset_clabel __PROTO((void));
 static void unset_clip __PROTO((void));
 static void unset_cntrparam __PROTO((void));
@@ -655,7 +653,6 @@ unset_boxwidth()
 }
 
 
-#if USE_ULIG_FILLEDBOXES
 /* process 'unset fill' command */
 static void
 unset_fillstyle()
@@ -665,7 +662,6 @@ unset_fillstyle()
     default_fillstyle.fillpattern = 0;
     default_fillstyle.border_linetype = LT_UNDEFINED;
 }
-#endif /* USE_ULIG_FILLEDBOXES */
 
 
 /* process 'unset clabel' command */
@@ -1247,9 +1243,7 @@ unset_style()
 	func_style = LINES;
 	while (first_linestyle != NULL)
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
-#if USE_ULIG_FILLEDBOXES
 	unset_fillstyle();
-#endif
 #ifdef EAM_HISTOGRAMS
 	unset_histogram();
 #endif
@@ -1271,12 +1265,10 @@ unset_style()
 	    delete_linestyle((struct linestyle_def *) NULL, first_linestyle);
 	c_token++;
 	break;
-#if USE_ULIG_FILLEDBOXES
     case SHOW_STYLE_FILLING:
 	unset_fillstyle();
 	c_token++;
 	break;
-#endif /* USE_ULIG_FILLEDBOXES */
 #ifdef EAM_HISTOGRAMS
     case SHOW_STYLE_HISTOGRAM:
 	unset_histogram();
@@ -1288,11 +1280,7 @@ unset_style()
 	c_token++;
 	break;
     default:
-#if USE_ULIG_FILLEDBOXES
 	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
-#else
-	int_error(c_token, "expecting 'data', 'function', 'line', 'fill' or 'arrow'");
-#endif /* USE_ULIG_FILLEDBOXES */
     }
 }
 
@@ -1585,9 +1573,7 @@ reset_command()
 #ifdef BINARY_DATA_FILE
     df_unset_datafile_binary();
 #endif
-#if USE_ULIG_FILLEDBOXES
     unset_fillstyle();
-#endif
 #ifdef EAM_HISTOGRAMS
     unset_histogram();
 #endif

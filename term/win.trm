@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: win.trm,v 1.34 2004/10/19 00:24:10 sfeam Exp $
+ * $Id: win.trm,v 1.35 2004/11/27 02:38:39 sfeam Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -415,9 +415,7 @@ WIN_boxfill(
 {
     /* split into two commands to squeeze through all the necessary info */
     /* Notice HBB 20010208: --> WIN_move() */
-#if USE_ULIG_FILLEDBOXES
     GraphOp(&graphwin, W_fillstyle, style, 0, NULL);
-#endif /* USE_ULIG_FILLEDBOXES */
     GraphOp(&graphwin, W_move, xleft, ybottom, NULL);
     GraphOp(&graphwin, W_boxfill, width, height, NULL);
 }

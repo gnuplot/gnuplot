@@ -13,10 +13,23 @@
 	terminals, but add estimate.trm if it is enabled.
 
 	* configure.in src/graphics.c src/plot2d.c src/save.c src/set.c
-	src/show.c src/unset.c src/plot2d.h: Remove configuration option
-	--disable-relative-boxwidth. 
-	Remove the #ifdef USE_ULIG_RELATIVE_BOXWIDTH / #endif brackets around
+	src/show.c src/unset.c src/plot2d.h:
+
+	Remove configuration option --disable-relative-boxwidth. 
+	Remove the #ifdef USE_ULIG_RELATIVE_BOXWIDTH ... #endif brackets around
 	code that implements it.
+
+	* config/config.amg config/config.cyg config/config.mgw config/config.nt
+	config/config.os2 configure.in src/bitmap.c src/datafile.c src/gadgets.c
+	src/gplt_x11.c src/gp_types.h src/graphics.c src/misc.c src/plot2d.c
+	src/save.c src/show.c src/term_api.h src/term.c src/unset.c
+	src/win/wgraph.c term/aquaterm.trm term/cgm.trm term/fig.trm term/gd.trm
+	term/mif.trm term/pdf.trm term/post.trm term/svg.trm term/win.trm
+	term/x11.trm:
+
+	Remove configuration option --disable-filledboxes
+	Remove the #ifdef USE_ULIG_FILLEDBOXES ... #endif brackets around code
+	that implements it.
 
 2005-02-28  Ethan Merritt  <merritt@u.washington.edu>
 

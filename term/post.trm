@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.147 2005/02/18 21:39:17 sfeam Exp $
+ * $Id: post.trm,v 1.148 2005/03/02 19:44:57 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -583,7 +583,6 @@ static const char GPFAR * GPFAR PS_header2[] = {
 /* filled box : usage   x1 y1 x2 y2 BoxFill */
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
 
-#if USE_ULIG_FILLEDBOXES
 "/Density {\n",
 "  /Fillden exch def\n",
 "  currentrgbcolor\n",
@@ -630,8 +629,6 @@ static const char GPFAR * GPFAR PS_header2[] = {
 "    } if\n",
 "    stroke grestore } def\n",
 "%\n",
-
-#endif /* USE_ULIG_FILLEDBOXES */
 
 #define EAM_PSLEVEL2
 /*
@@ -2779,14 +2776,11 @@ PS_fillbox(
     unsigned int x1, unsigned int y1,
     unsigned int width, unsigned int height)
 {
-#if USE_ULIG_FILLEDBOXES
     double filldens;
     int pattern;
-#endif /* USE_ULIG_FILLEDBOXES */
 
     PS_FLUSH_PATH;
 
-#if USE_ULIG_FILLEDBOXES
     switch(style & 0xf) {
 
     case FS_SOLID:
@@ -2845,9 +2839,6 @@ PS_fillbox(
     default: /* style == 0 or unknown --> fill with background color */
         fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
     }
-#else  /* USE_ULIG_FILLEDBOXES */
-        fprintf(gppsfile, "%d %d %d %d BoxFill\n", x1, y1, width, height);
-#endif /* USE_ULIG_FILLEDBOXES */
 
     PS_relative_ok = FALSE;
     PS_linewidth_last = PS_linetype_last =  -1;

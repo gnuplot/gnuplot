@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: mif.trm,v 1.26 2004/04/13 17:24:35 broeker Exp $
+ * $Id: mif.trm,v 1.27 2004/07/01 17:10:33 broeker Exp $
  */
 
 /* GNUPLOT -- mif.trm */
@@ -389,7 +389,6 @@ MIF_boxfill(int style, unsigned int x1, unsigned int y1,
 {
     int fill_pattern;
 
-#if USE_ULIG_FILLEDBOXES
     int fillpar = style >> 4;
     style &= 0xf;
     switch (style) {
@@ -401,10 +400,6 @@ MIF_boxfill(int style, unsigned int x1, unsigned int y1,
 	case FS_PATTERN:fill_pattern = mif_fill_patterns[fillpar % 8];
 			break;
     }
-#else
-    style = MIF_FILL_NONE;
-    fill_pattern = 7;
-#endif
 
     /* Object preamble */
     fprintf(gpoutfile, "\t<Rectangle <GroupID %d> %s\n",

@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.27 2004/10/19 03:26:14 sfeam Exp $
+ * $Id: gp_types.h,v 1.28 2004/10/26 04:30:51 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -105,10 +105,8 @@ typedef enum PLOT_STYLE {
 #ifdef EAM_DATASTRINGS
     , LABELPOINTS  = 23*PLOT_STYLE_BITS + 0
 #endif
-#ifdef USE_ULIG_FILLEDBOXES
 #ifdef EAM_HISTOGRAMS
     , HISTOGRAMS   = 24*PLOT_STYLE_BITS + PLOT_STYLE_HAS_FILL
-#endif
 #endif
 #ifdef WITH_IMAGE
     , IMAGE        = 25*PLOT_STYLE_BITS + 0

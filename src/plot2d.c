@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.92 2005/02/24 20:14:17 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.93 2005/03/02 20:35:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1656,7 +1656,6 @@ eval_plots()
 		int_error(NO_CARET,"2D plots cannot color by Z value; please use splot instead");
 #endif
 
-#ifdef USE_ULIG_FILLEDBOXES
 	    /* Similar argument for check that all fill styles were set */
 	    if (this_plot->plot_style & PLOT_STYLE_HAS_FILL) {
 		if (! set_fillstyle)
@@ -1671,7 +1670,6 @@ eval_plots()
 		&& this_plot->fill_properties.fillstyle == FS_EMPTY)
 		    this_plot->fill_properties.fillstyle = FS_SOLID;
 	    }
-#endif
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;

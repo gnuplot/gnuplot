@@ -415,12 +415,6 @@
 /* Define if you want to have mouse support for the x11 terminal. */
 /* #undef USE_MOUSE */
 
-/* Define if you want to have Uli Gruenebaum's filledboxes style. */
-#undef USE_ULIG_FILLEDBOXES
-
-/* Define if you want to have Uli Gruenebaum's relative boxwidth. */
-#undef USE_ULIG_RELATIVE_BOXWIDTH
-
 /* Version number of package */
 /* #undef VERSION */
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.47 2005/02/17 20:48:00 sfeam Exp $
+ * $Id: pdf.trm,v 1.48 2005/02/18 21:40:32 sfeam Exp $
  */
 
 /*------------------------------
@@ -64,9 +64,7 @@ TERM_PUBLIC void PDF_set_color __PROTO((t_colorspec *));
 TERM_PUBLIC void PDF_image __PROTO((unsigned, unsigned, coordval *, gpiPoint *, t_imagecolor));
 #endif
 
-#if defined(PM3D) || defined(USE_ULIG_FILLEDBOXES)
 TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
-#endif
 
 /* To support "set term png enhanced" */
 TERM_PUBLIC void ENHPDF_put_text __PROTO((unsigned int x, unsigned int y, const char *str));
@@ -123,11 +121,9 @@ static short PDF_Pen_RealID __PROTO ((int));
 static void PDF_PathOpen __PROTO ((void));
 static void PDF_PathClose __PROTO ((void));
 static void PDF_SetFont __PROTO ((void));
-#if USE_ULIG_FILLEDBOXES
 static void PDF_DefinePatterns __PROTO((void));
 enum { PDF_patterns = 7 };
 static int PDF_patternHandles[PDF_patterns];
-#endif
 
 #ifndef HAVE_NODASH_LIBPDF
 /* Description of dash patterns (same as those in post.trm) */
@@ -205,7 +201,7 @@ PDF_SetFont ()
 
 }
 
-#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
+#if !HAVE_OLD_LIBPDF
 static void
 PDF_DefinePatterns()
 {
@@ -476,7 +472,7 @@ PDF_init ()
     strcpy(PDF_fontNameCur, PDF_fontNameDef);
     PDF_fontSizeCur = PDF_fontSizeDef;
 
-#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
+#if !HAVE_OLD_LIBPDF
     PDF_DefinePatterns();
 #endif
 
@@ -1198,8 +1194,6 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	PDF_filled_polygon(4, corner);
 }
 
-#if defined(USE_ULIG_FILLEDBOXES) || defined(PM3D)
-
 TERM_PUBLIC void
 PDF_filled_polygon(int points, gpiPoint* corners)
 {
@@ -1231,7 +1225,7 @@ PDF_filled_polygon(int points, gpiPoint* corners)
 		PDF_setrgbcolor_fill(myPDF, red, green, blue);
 	    }
 	    break;
-#if USE_ULIG_FILLEDBOXES && !HAVE_OLD_LIBPDF
+#if !HAVE_OLD_LIBPDF
 	case FS_PATTERN:
 	    fillpar = fillpar % (PDF_patterns + 1) /* 0 == white */;
 	    switch (fillpar) {
@@ -1255,8 +1249,6 @@ PDF_filled_polygon(int points, gpiPoint* corners)
     PDF_fill(myPDF);
     PDF_restore(myPDF);
 }
-
-#endif
 
 #ifdef PM3D
 

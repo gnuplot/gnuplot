@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.151 2005/02/24 20:14:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.152 2005/03/02 20:35:34 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2989,7 +2989,6 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		yt = map_y(dyt);
 		yb = xaxis_y;
 
-#if USE_ULIG_FILLEDBOXES
 #ifdef EAM_HISTOGRAMS
 		if (plot->plot_style == HISTOGRAMS
 		&& (histogram_opts.type == HT_STACKED_IN_LAYERS
@@ -3038,14 +3037,13 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 		    if (plot->fill_properties.border_linetype != LT_UNDEFINED)
 			(*t->linetype)(plot->fill_properties.border_linetype);
 		}
-#endif /* USE_ULIG_FILLEDBOXES */
 
 		(*t->move) (xl, yb);
 		(*t->vector) (xl, yt);
 		(*t->vector) (xr, yt);
 		(*t->vector) (xr, yb);
 		(*t->vector) (xl, yb);
-#if USE_ULIG_FILLEDBOXES
+
 		if( t->fillbox && plot->fill_properties.border_linetype != LT_UNDEFINED) {
 		    (*t->linetype)(plot->lp_properties.l_type);
 #ifdef PM3D
@@ -3053,7 +3051,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			apply_pm3dcolor(&plot->lp_properties.pm3d_color,t);
 #endif
 		}
-#endif
+
 		break;
 	    }			/* case OUTRANGE, INRANGE */
 
@@ -3364,7 +3362,6 @@ plot_c_bars(struct curve_points *plot)
 	xhighM = map_x(dxr);
 	}
 
-#ifdef USE_ULIG_FILLEDBOXES
 	/* EAM Sep 2001 use term->fillbox() code if present */
 	if (term->fillbox) {
 	    int ymin, ymax;
@@ -3388,7 +3385,6 @@ plot_c_bars(struct curve_points *plot)
 		    (unsigned int)(xlowM), (unsigned int)(ymin),
 		    (unsigned int)(xhighM-xlowM), (unsigned int)(ymax-ymin) );
 	}
-#endif
 
 	/* Draw whiskers and an open box */
 	    (*t->move)   (xM, ylowM);
@@ -4561,7 +4557,6 @@ do_key_sample(
 #endif
 
     /* draw sample depending on bits set in plot_style */
-#if USE_ULIG_FILLEDBOXES
     if (this_plot->plot_style & PLOT_STYLE_HAS_FILL
 	&& t->fillbox) {
 	struct fill_style_type *fs = &this_plot->fill_properties;
@@ -4594,20 +4589,20 @@ do_key_sample(
 		apply_pm3dcolor(&this_plot->lp_properties.pm3d_color,t);
 #endif
 	}
-    } else
-#endif
-	if (this_plot->plot_style == VECTOR && t->arrow) {
+
+    } else if (this_plot->plot_style == VECTOR && t->arrow) {
 	    apply_head_properties(&(this_plot->arrow_properties));
 	    curr_arrow_headlength = -1;
 	    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
 			this_plot->arrow_properties.head);
-	} else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
+
+    } else if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
 		   || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
 		       && this_plot->plot_type == DATA)) {
 	    /* errors for data plots only */
 	    (*t->move) (xl + key_sample_left, yl);
 	    (*t->vector) (xl + key_sample_right, yl);
-	}
+    }
 
     if ((this_plot->plot_type == DATA)
 	&& (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
@@ -4635,7 +4630,6 @@ do_key_sample(
 static int
 style_from_fill(struct fill_style_type *fs)
 {
-#ifdef USE_ULIG_FILLEDBOXES
     int fillpar, style;
 
     switch( fs->fillstyle ) {
@@ -4652,9 +4646,6 @@ style_from_fill(struct fill_style_type *fs)
 	style = FS_EMPTY;
 	break;
     }
-#else
-    int style = FS_EMPTY;
-#endif
 
     return style;
 }

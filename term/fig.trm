@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.48 2004/12/03 13:31:10 broeker Exp $
+ * $Id: fig.trm,v 1.49 2004/12/21 00:50:07 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1009,13 +1009,10 @@ FIG_boxfill(
     unsigned int x, unsigned int y,
     unsigned int w, unsigned int h)
 {
-#if USE_ULIG_FILLEDBOXES
     int pen_color, fill_color, fill_style, fill_dens;
-#endif
 
     FIG_poly_clean(FIG_polyvec_stat);
 
-#if USE_ULIG_FILLEDBOXES
     switch( style & 0xf ) {
     case FS_SOLID:
 	/* style == 1 --> filled with intensity according to filldensity */
@@ -1055,7 +1052,6 @@ FIG_boxfill(
             fill_style, FIG_line.style_val, FIG_line.join_style,
             FIG_line.cap_style, FIG_line.radius, 0, 0, 5,
             x, y, x+w, y, x+w, y-h, x, y-h, x, y );
-#endif /* USE_ULIG_FILLEDBOXES */
 }
 
 #ifdef PM3D

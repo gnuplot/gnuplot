@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaterm.trm,v 1.12 2004/12/31 06:12:56 sfeam Exp $
+ * $Id: aquaterm.trm,v 1.13 2005/02/14 10:19:08 mikulik Exp $
  *
  */
 
@@ -458,7 +458,6 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
   /* Save current color */
   [adapter getColorRed:&r green:&g blue:&b];
 
-#if USE_ULIG_FILLEDBOXES
   /* fillpar:
    * - solid   : 0 - 100
    * - pattern : 0 - 100
@@ -491,9 +490,7 @@ AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, un
   default:
     break;
   }
-#else
-  /* FIXME: Actions here? */
-#endif
+
   NSRect scaledRect = NSMakeRect(x1/AQUA_RESOLUTION, y1/AQUA_RESOLUTION, width/AQUA_RESOLUTION, height/AQUA_RESOLUTION);
   [adapter eraseRect:scaledRect];
   [adapter addFilledRect:scaledRect];

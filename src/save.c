@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.100 2005/02/16 05:17:41 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.101 2005/03/02 20:35:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -248,10 +248,8 @@ set y2data%s\n",
 	fprintf(fp, "set boxwidth %g %s\n", boxwidth,
 		(boxwidth_is_absolute) ? "absolute" : "relative");
 
-#if USE_ULIG_FILLEDBOXES
     fprintf(fp, "set style fill ");
     save_fillstyle(fp, &default_fillstyle);
-#endif
 
     if (dgrid3d)
 	fprintf(fp, "set dgrid3d %d,%d, %d\n",
@@ -1012,7 +1010,6 @@ save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 void
 save_fillstyle(FILE *fp, const struct fill_style_type *fs)
 {
-#if USE_ULIG_FILLEDBOXES
     switch(fs->fillstyle) {
     case FS_SOLID:
 	fprintf(fp, " solid %.2f ", fs->filldensity / 100.0);
@@ -1030,7 +1027,6 @@ save_fillstyle(FILE *fp, const struct fill_style_type *fs)
 	fprintf(fp, "border\n");
     else
 	fprintf(fp, "border %d\n",fs->border_linetype+1);
-#endif
 }
 
 void
