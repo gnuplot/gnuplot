@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot.c,v 1.18 1998/12/09 15:24:14 lhecking Exp $";
+static char *RCSid = "$Id: plot.c,v 1.18.2.1 1999/08/19 14:37:07 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot.c */
@@ -525,7 +525,7 @@ char **argv;
 
 		while (!com_line());
 
-		/* interactive = FALSE; /* should this be here? */
+		/* interactive = FALSE; */ /* should this be here? */
 
 	    } else
 		load_file(fopen(*argv, "r"), *argv, FALSE);
