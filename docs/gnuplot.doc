@@ -1270,9 +1270,6 @@ C ... and restart the table:
  the name of the command (and backquotes) on the command line.  Some
  implementations also support pipes;  see `plot data-file special-filenames`.
 
- Newlines in the output produced by the spawned command are replaced with
- blanks.
-
  Command-line substitution can be used anywhere on the `gnuplot` command
  line, except inside strings delimited by single quotes.
 

@@ -376,8 +376,8 @@ int current;
 	if ((c = getc(f)) == EOF)
 	    break;
 # endif /* !AMIGA_AC_5 */
-	/* newlines become blanks */
-	(*strp)[current++] = ((c == '\n') ? ' ' : c); 
+	if (c != '\n' && c != '\r')
+	    (*strp)[current++] = c;
 	if (current == *str_lenp)
 	    extend_input_line();
     }
