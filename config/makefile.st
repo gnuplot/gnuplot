@@ -1,5 +1,5 @@
 #
-# $Id: makefile.st,v 1.19 1998/04/14 00:15:56 drd Exp $
+# $Id: makefile.st,v 1.2 1999/05/31 18:38:58 lhecking Exp $
 #
 # GNUPLOT Makefile for GCC-ST 1.x and 2.x
 # in a cross development environment (unix) or a native TOS environment
@@ -71,7 +71,7 @@ OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
          plot.o readline.o scanner.o set.o show.o specfun.o \
          standard.o stdfn.o term.o util.o version.o binary.o fit.o \
          matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o \
-         variable.o
+         variable.o save.o unset.o
 
 # path prefix for the term subdirectory
 TERM=term$(SL)
@@ -119,6 +119,7 @@ plot.o:      plot.c plot.h fit.h setshow.h fnproto.h
 plot2d.o:    plot2d.c plot.h setshow.h fit.h binary.h help.h
 plot3d.o:    plot3d.c plot.h setshow.h binary.h help.h
 readline.o:  readline.c
+save.o:      save.c plot.h setshow.h
 scanner.o:   scanner.c plot.h
 show.o:      set.c plot.h setshow.h
 		$(CC) -o $@ $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
@@ -128,6 +129,7 @@ standard.o:  standard.c plot.h
 stdfn.o:     stdfn.c sstdfn.h
 term.o:      term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS) $(TERMFLAGS) -Iterm term.c
+unset.o:     unset.c plot.h setshow.h tables.h
 util.o:      util.c plot.h
 variable.o:  variable.c plot.h variable.h
 version.o:   version.c

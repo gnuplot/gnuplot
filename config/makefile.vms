@@ -1,17 +1,18 @@
 #
-# $Id: makefile.vms,v 1.4 1999/06/30 12:11:06 lhecking Exp $
+# $Id: makefile.vms,v 1.5 1999/07/09 20:58:44 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
 # use with the MAKE that was posted by Tony Ivanov (tony@gvgpvd.GVG.TEK.COM)
 # in comp.os.vms on 5 December 1988
 #
-# Modified 23 June 1999 to work with mmk; it should also work with mms.
+# Modified 23 June 1999 to work with MMK; it should also work with MMS.
 # John.Hasstedt@sunysb.edu.
 #
 # You can define a macro on the command line to specify the compiler, either
 # VAXC or GNUC; if you do not specify either, it uses DECC.  If you are
-# compiling on Alpha, you should also define __ALPHA__ (mmk does this for you).
+# compiling on Alpha, you should also define __ALPHA__ (MMK does this for you,
+# for MMS, use MMS/DESCRIP=MAKEFILE.VMS/MACRO=__ALPHA__).
 
 ########### COMPILE OPTIONS ###########
 
@@ -40,9 +41,9 @@ WHICHRTL=DECCRTL
 PREFIXALL=/prefix=all
 CRTL_SHARE=
 .IFDEF __ALPHA__
-EXTRADEFS=,HAVE_UNISTD_H,HAVE_SLEEP,HAVE_GETCWD,HAVE_STRCSPN,HAVE_LGAMMA
+EXTRADEFS=,HAVE_SLEEP,HAVE_GETCWD,HAVE_LGAMMA,HAVE_UNISTD_H
 .ELSE
-EXTRADEFS=,HAVE_UNISTD_H,HAVE_SLEEP,HAVE_GETCWD,HAVE_STRCSPN
+EXTRADEFS=,HAVE_SLEEP,HAVE_GETCWD,HAVE_UNISTD_H
 EXTRAOBJ=
 EXTRALIB=
 .ENDIF
@@ -65,7 +66,7 @@ TERMFLAGS = /include=[-.term]
 OBJS1 = alloc.$(O),binary.$(O),bitmap.$(O),command.$(O),contour.$(O),datafile.$(O),eval.$(O),
 OBJS2 = fit.$(O),graphics.$(O),graph3d.$(O),help.$(O),hidden3d.$(O),internal.$(O),interpol.$(O),
 OBJS3 = matrix.$(O),misc.$(O),parse.$(O),plot.$(O),plot2d.$(O),plot3d.$(O),scanner.$(O),set.$(O),
-OBJS4 = show.$(O),specfun.$(O),standard.$(O),stdfn.$(O),term.$(O),time.$(O),util.$(O),util3d.$(O),version.$(O),vms.$(O),variable.$(O)
+OBJS4 = show.$(O),specfun.$(O),standard.$(O),stdfn.$(O),term.$(O),time.$(O),util.$(O),util3d.$(O),version.$(O),vms.$(O),variable.$(O),save.$(O),tables.$(O),unset.$(O)
 OBJS = $(OBJS1)$(OBJS2)$(OBJS3)$(OBJS4)$(EXTRAOBJ)
 
 CSOURCE1 = command.c set.c show.c variable.c

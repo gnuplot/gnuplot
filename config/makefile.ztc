@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.ztc,v 1.2 1999/05/31 18:38:57 lhecking Exp $
 #
 # GNUPLOT Makefile for Zortech C++ 3.x
 #
@@ -24,8 +24,8 @@ CC=ztc
 OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
 OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj util.obj
-OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj
-OBJ5 =  datafile.obj alloc.obj variable.obj
+OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj tables.obj
+OBJ5 =  datafile.obj alloc.obj variable.obj save.obj unset.obj
 
 OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
 
@@ -71,6 +71,8 @@ help.obj: help.c plot.h help.h
 
 internal.obj: internal.c plot.h
 
+interpol.obj: interpol.c plot.h setshow.h
+
 misc.obj: misc.c plot.h setshow.h help.h
 
 parse.obj: parse.c plot.h
@@ -80,6 +82,8 @@ plot.obj: plot.c plot.h setshow.h
 	$(CC) $(CFLAGS) plot.c
 
 readline.obj: readline.c
+
+save.obj: save.c plot.h setshow.h
 
 scanner.obj: scanner.c plot.h
 
@@ -93,11 +97,13 @@ standard.obj: standard.c plot.h
 
 stdfn.obj: stdfn.c stdfn.h
 
-interpol.obj: interpol.c plot.h setshow.h
+tables.obj: tables.c plot.h tables.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) $(CFLAGS) $(TERMFLAGS) -Iterm -I. term.c
+
+unset.obj: unset.c plot.h setshow.h tables.h
 
 util.obj: util.c plot.h
 

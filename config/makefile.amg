@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.29 1998/04/14 00:15:50 drd Exp $
+# $Id: makefile.amg,v 1.3 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -118,14 +118,14 @@ term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURC
 
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
        eval.o fit.o graph3d.o graphics.o help.o hidden3d.o internal.o \
-       interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o scanner.o \
-       set.o show.o specfun.o standard.o stdfn.o term.o time.o util.o \
-       util3d.o variable.o version.o
+       interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o save.o \
+       scanner.o set.o show.o specfun.o standard.o stdfn.o tables.o term.o \
+       time.o unset.o util.o util3d.o variable.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.o internal.c
-CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c \
-	standard.c stdfn.c variable.c
+CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c save.c scanner.c \
+	standard.c stdfn.c tables.c variable.c
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
 CSOURCE5 = $(TERMDIR)/aed.trm $(TERMDIR)/ai.trm $(TERMDIR)/amiga.trm \
 	   $(TERMDIR)/apollo.trm $(TERMDIR)/atariaes.trm \
@@ -243,12 +243,15 @@ parse.o: parse.c plot.h help.h
 plot.o: plot.c plot.h setshow.h
 plot2d.o: plot2d.c plot.h setshow.h fit.h binary.h help.h
 plot3d.o: plot3d.c plot.h setshow.h binary.h help.h
+save.o: save.c plot.h setshow.h
 scanner.o: scanner.c plot.h
 show.o: show.c plot.h setshow.h
 specfun.o: specfun.c plot.h
 standard.o: standard.c plot.h
 stdfn.o: stdfn.c stdfn.h
+tables.o: tables.c plot.h tables.h
 time.o: time.c plot.h setshow.h
+unset.o: unset.c plot.h setshow.h tables.h
 util.o: util.c plot.h
 util3d.o: util3d.c plot.h setshow.h
 variable.o: variable.c plot.h variable.h

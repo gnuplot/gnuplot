@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.wc,v 1.2 1999/05/31 18:38:58 lhecking Exp $
 #
 # GNUPLOT Makefile for Watcom C 9.5a
 #
@@ -53,7 +53,7 @@ OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =  help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
 OBJ3 =  scanner.obj set.obj show.obj specfun.obj standard.obj term.obj time.obj util.obj
 OBJ4 =  version.obj binary.obj interpol.obj fit.obj matrix.obj variable.obj
-OBJ5 =  datafile.obj alloc.obj hidden3d.obj util3d.obj
+OBJ5 =  datafile.obj alloc.obj hidden3d.obj util3d.obj tables.obj save.obj unset.obj 
 
 OBJS = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
 
@@ -129,6 +129,8 @@ plot.obj: plot.c plot.h setshow.h
 
 readline.obj: readline.c
 
+save.obj: save.c plot.h setshow.h
+
 scanner.obj: scanner.c plot.h
 
 set.obj: set.c plot.h setshow.h
@@ -142,9 +144,13 @@ standard.obj: standard.c plot.h
 
 interpol.obj: interpol.c plot.h setshow.h
 
+tables.obj: tables.c plot.h tables.h
+
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
         $(BIN)$(CC) $(CFLAGS) $(TERMFLAGS) -DDEFAULTTERM="dospc" -Iterm term.c
+
+unset.obj: unset.c plot.h setshow.h tables.h
 
 util.obj: util.c plot.h
 

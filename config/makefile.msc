@@ -1,5 +1,5 @@
 #
-# $Id: makefile.msc,v 1.17 1998/04/14 00:15:52 drd Exp $
+# $Id: makefile.msc,v 1.2 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for use with Microsoft C  Version 5.10
 #  and Microsoft Program Maintenance Utility  Version 4.07
@@ -37,7 +37,7 @@ OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	plot3d.obj readline.obj scanner.obj set.obj show.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj pcgraph.obj hrcgraph.obj \
 	corgraph.obj specfun.obj binary.obj interpol.obj fit.obj matrix.obj \
-	datafile.obj alloc.obj variable.obj
+	datafile.obj alloc.obj variable.obj save.obj tables.obj unset.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -110,6 +110,8 @@ plot.obj: plot.c plot.h setshow.h
 
 readline.obj: readline.c
 
+save.obj: save.c plot.h setshow.h
+
 scanner.obj: scanner.c plot.h
 
 set.obj: set.c plot.h setshow.h
@@ -125,8 +127,12 @@ specfun.obj: specfun.c plot.h
 
 interpol.obj: interpol.c plot.h setshow.h
 
+tables.obj: tables.c plot.h tables.h
+
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) $(CFLAGS) $(TERMFLAGS) /Iterm term.c
+
+unset.obj: unset.c plot.h setshow.h tables.h
 
 util.obj: util.c plot.h
 

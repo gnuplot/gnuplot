@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.286,v 1.2 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #   and Phar Lap LITE286 DOS extender
@@ -38,9 +38,10 @@ OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
 OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj util.obj
 OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj
+OBJ5 =  save.obj unset.obj
 BGIFILES = cga.bgi egavga.bgi herc.bgi att.bgi
 
-OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4)
+OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -109,6 +110,8 @@ plot.obj: plot.c plot.h setshow.h
 
 readline.obj: readline.c
 
+save.obj: save.c plot.h ansichek.h stdfn.h syscfg.h
+
 scanner.obj: scanner.c plot.h
 
 set.obj: set.c plot.h setshow.h
@@ -126,6 +129,8 @@ stdfn.obj: stdfn.c stdfn.h
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(LITECC) $(CFLAGS) $(TERMFLAGS) -Iterm -I. term.c
+
+unset.obj: unset.c plot.h ansichek.h stdfn.h syscfg.h
 
 util.obj: util.c plot.h
 
