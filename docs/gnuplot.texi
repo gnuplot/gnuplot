@@ -635,6 +635,9 @@ and `gnuplot` will ignore the rest of the line.  It will not have this effect
 inside quotes, inside numbers (including complex numbers), inside command
 substitutions, etc.  In short, it works anywhere it makes sense to work.
 
+See also `set datafile commentschars` for specifying comment characters in
+data files.
+
 @node Coordinates, Environment, Comments, gnuplot
 @section Coordinates
 
@@ -1045,7 +1048,7 @@ expects its argument to be in radians.
 
 The `erf(x)` function returns the error function of the real part of its
 argument.  If the argument is a complex value, the imaginary component is
-ignored.
+ignored.  See @ref{erfc}, @ref{inverf}, and @ref{norm}.
 
 @node erfc, exp, erf, Functions
 @subsubsection erfc
@@ -1058,7 +1061,7 @@ ignored.
 
 The `erfc(x)` function returns 1.0 - the error function of the real part of
 its argument.  If the argument is a complex value, the imaginary component is
-ignored.
+ignored.  See `erf`, @ref{inverf}, and @ref{norm}.
 
 @node exp, floor, erfc, Functions
 @subsubsection exp
@@ -1123,7 +1126,7 @@ complex, the imaginary components are ignored.
 
 
 The `inverf(x)` function returns the inverse error function of the real part
-of its argument.
+of its argument.   See `erf` and @ref{invnorm}.
 
 @node igamma, imag, inverf, Functions
 @subsubsection igamma
@@ -1160,7 +1163,7 @@ number.
 
 
 The `invnorm(x)` function returns the inverse normal distribution function of
-the real part of its argument.
+the real part of its argument.  See @ref{norm}.
 
 @node int, lambertw, invnorm, Functions
 @subsubsection int
@@ -1210,7 +1213,7 @@ imaginary component is ignored.
 
 
 The `log(x)` function returns the natural logarithm (base `e`) of its
-argument.
+argument.  See @ref{log10}.
 
 @node log10, norm, log, Functions
 @subsubsection log10
@@ -1233,7 +1236,7 @@ The `log10(x)` function returns the logarithm (base 10) of its argument.
 
 
 The `norm(x)` function returns the normal distribution function (or Gaussian)
-of the real part of its argument.
+of the real part of its argument.   See @ref{invnorm}, `erf` and @ref{erfc}.
 
 @node rand, real, norm, Functions
 @subsubsection rand
@@ -3975,9 +3978,10 @@ where <style> is either `lines`, `points`, `linespoints`, `impulses`,
 `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or @ref{pm3d}. Some
 of these styles require additional information. See `plotting styles` for
 details of each style.  `fill` is relevant only to certain 2D plots
-(currently `boxes` and `candlesticks`).  Note that `filledcurves` and @ref{pm3d} 
-can take an additional option not listed above (the latter only when used in 
-the `splot` command)---see their help or examples below for more details.
+(currently `boxes` `boxxyerrorbars` and `candlesticks`).  
+Note that `filledcurves` and @ref{pm3d} can take an additional option not 
+listed above (the latter only when used in the `splot` command)---see 
+their help or examples below for more details.
 
 Default styles are chosen with the `set style function` and `set style data`
 commands.
@@ -4266,13 +4270,15 @@ See also
 @cmindex reset
 
 
-The @ref{reset} command causes all options that can be set with the `set`
-command to take on their default values.  The only exceptions are that the
-terminal set with `set term` and the output file set with @ref{output} are
-left unchanged.  This command is useful, e.g., to restore the default
-settings at the end of a command file, or to return to a defined state after
-lots of settings have been changed within a command file.  Please refer to
-the `set` command to see the default values that the various options take.
+The @ref{reset} command causes all graph-related options that can be set with the
+`set` command to take on their default values.  This command is useful, e.g.,
+to restore the default graph settings at the end of a command file, or to
+return to a defined state after lots of settings have been changed within a
+command file.  Please refer to the `set` command to see the default values
+that the various options take.
+
+The following `set` commands do not change the graph status and are thus left
+unchanged: the terminal set with `set term`, the output file set with @ref{output} and directory paths set with @ref{loadpath} and @ref{fontpath}.
 
 @node save, set-show, reset, Commands
 @section save
@@ -5452,13 +5458,15 @@ This form of the command is deprecated. Please see `set style data`.
 @subsection datafile 
 
 @c ?set datafile
+@c ?show datafile
 The `set datafile` command options control interpretation of fields read from
-input data files by the `plot`, `splot`, and `fit` commands.  Two such
+input data files by the `plot`, `splot`, and `fit` commands.  Three such
 options are currently implemented.
 
 @menu
 * set_datafile_missing::        
 * set_datafile_separator::      
+* set_datafile_commentschars::  
 @end menu
 
 @node set_datafile_missing, set_datafile_separator, datafile_, datafile_
@@ -5532,7 +5540,7 @@ non-parsible string of characters found where a numerical value is expected
 will be treated as missing data.
 
 
-@node set_datafile_separator,  , set_datafile_missing, datafile_
+@node set_datafile_separator, set_datafile_commentschars, set_datafile_missing, datafile_
 @subsubsection set datafile separator
 
 @c ?set datafile separator
@@ -5560,6 +5568,50 @@ Examples:
 @example
       # Input file contains comma-separated values fields
       set datafile separator ","
+
+@end example
+
+@node set_datafile_commentschars,  , set_datafile_separator, datafile_
+@subsubsection set datafile commentschars
+
+@c ?set datafile commentschars
+@cindex commentschars
+
+The `set datafile commentschars` command allows you to tell `gnuplot` what
+characters are used in a data file to denote comments.  Gnuplot will ignore
+rest of the line behind the specified characters if either of them is the
+first non-blank character on the line.
+
+Syntax:
+@example
+      set datafile commentschars @{"<string>"@}
+      show datafile commentschars
+      unset commentschars
+
+@end example
+
+Default value of the string is "#!" on VMS and "#" otherwise.
+
+Then, the following line in a data file is completely ignored
+@example
+    # 1 2 3 4
+@end example
+
+but the following
+@example
+    1 # 3 4
+@end example
+
+produces rather unexpected plot unless
+@example
+    set datafile missing '#'
+@end example
+
+is specified as well.
+
+Example:
+@example
+      set datafile commentschars "#!%"
 
 @end example
 
@@ -6361,8 +6413,8 @@ Please see `plot title` and @ref{with} for more information.
 
 Syntax:
 @example
-      set key @{  left | right | top | bottom | outside | below
-               | <position>@}
+      set key @{on|off@} @{default@}
+              @{left | right | top | bottom | outside | below | <position>@}
               @{Left | Right@} @{@{no@}reverse@}
               @{samplen <sample_length>@} @{spacing <vertical_spacing>@}
               @{width <width_increment>@}
@@ -6381,6 +6433,9 @@ By default the key is placed in the upper right corner of the graph.  The
 keywords `left`, `right`, `top`, `bottom`, `outside` and `below` may be used
 to place the key in the other corners inside the graph or to the right
 (outside) or below the graph.  They may be given alone or combined.
+
+Plots may be drawn with no visible key by requesting 'set key off' or
+'unset key'.
 
 Justification of the labels within the key is controlled by `Left` or `Right`
 (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -6423,9 +6478,9 @@ An explicitly given title is typeset using enhanced text properties on
 terminals supporting this, see @ref{postscript} for more details.
 This default behavior can be switched off by the `noenhanced` option.
 
-The defaults for @ref{key} are `right`, `top`, `Right`, `noreverse`, `samplen
-4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype> is the
-same as that used for the plot borders.  Entering @ref{key} with no options
+The defaults for @ref{key} are `on`, `right`, `top`, `Right`, `noreverse`,
+`samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype>
+is the same as that used for the plot borders.  Entering `set key default` 
 returns the key to its default configuration.
 
 The <position> can be a simple x,y,z as in previous versions, but these can
@@ -6469,7 +6524,7 @@ Examples:
 
 This places the key at the default location:
 @example
-      set key
+      set key default
 
 @end example
 
@@ -7417,6 +7472,7 @@ more curves to the current plot and you want to edit the whole command now.
 @c ?commands show pm3d
 @c ?set pm3d
 @c ?set pm3d at b
+@c ?set pm3d map
 @c ?show pm3d
 @cindex pm3d
 @opindex pm3d
@@ -7426,7 +7482,7 @@ more curves to the current plot and you want to edit the whole command now.
 @c ?set pm3d clip1in
 @c ?set pm3d clip4in
 pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
-color/gray maps and surfaces.  It uses a pm3d algorithm which allows to plot
+color/gray maps and surfaces.  It uses a pm3d algorithm which allows plotting
 gridded as well as non-gridded data without preprocessing, even when the data
 scans do not have the same number of points.
 
@@ -7458,38 +7514,44 @@ evaluated function or from an @ref{file}.  Each surface consists of a
 sequence of separate scans (isolines).  The pm3d algorithm fills the region
 between two neighbouring points in one scan with another two points in the
 next scan by a gray (or color) according to z-values (or according to an
-additional 'color' column, see @ref{using}) of these 4 corners; default is
-averaging but this can be changed by option `corners2color`.  In order to get
-a reasonable surface, the neighbouring scans should not cross and the number
-of points in the neighbouring scans should not differ too much; of course, the
-best plot is with scans having same number of points.  No other requirements
-(e.g. the data must be gridded) are needed.  Another advantage is that the
-pm3d algorithm does not draw anything outside of the input (measured or
-calculated) region.
+additional 'color' column, see @ref{using}) of these 4 corners; by default
+the 4 corner values are averaged, but this can be changed by the option 
+`corners2color`.  In order to get a reasonable surface, the neighbouring scans
+should not cross and the number of points in the neighbouring scans should not
+differ too much; of course, the best plot is with scans having same number of
+points.  There are no other requirements (e.g. the data need not be gridded).
+Another advantage is that the pm3d algorithm does not draw anything outside of
+the input (measured or calculated) region.
 
 Surface coloring works with the following input data:
 
-1. splot of function or of data file with one or three data columns: The gray
-is obtained by mapping the averaged (or `corners2color`) z-coordinate of the
-four corners of the above-specified quadrangle into the range
-[min_color_z,max_color_z] of @ref{zrange} or @ref{cbrange} providing range of grays
-[0:1].  This value can be used directly as the gray for gray maps.  The
-normalized gray value can be further mapped into a color---see @ref{palette}
+1. splot of function or of data file with one or three data columns: The 
+gray/color scale is obtained by mapping the averaged (or `corners2color`) 
+z-coordinate of the four corners of the above-specified quadrangle into the 
+range [min_color_z,max_color_z] of @ref{zrange} or @ref{cbrange} providing a gray value
+in the range [0:1].  This value can be used directly as the gray for gray maps.
+The normalized gray value can be further mapped into a color---see @ref{palette}
 for the complete description.
 
-2. splot of data file with two or four data columns: The gray/color is
+2. splot of data file with two or four data columns: The gray/color value is
 obtained by @ref{using} the last-column coordinate instead of the z-value, thus
 allowing the color and the z-coordinate be mutually independent.  This can be
 used for 4d data drawing.
 
-Two other notes:
+Other notes:
 
 1. The term 'scan' referenced above is used more among physicists than the
 term 'iso_curve' referenced in gnuplot documentation and sources.  You measure
 maps recorded one scan after another scan, that's why.
 
-2. Two-dimensional color (or gray) map (i.e., not surface) is obtained by `set
-view map` or `set pm3d map`.
+2. The 'gray' or 'color' scale is a linear mapping of a continuous variable
+onto a smoothly varying palette of colors. The mapping is shown in a 
+rectangle next to the main plot. This documentation refers to this as a
+"colorbox", and refers to the indexing variable as lying on the colorbox axis.
+See `set colorbox`, @ref{cbrange}.
+
+3. To use pm3d coloring to generate a two-dimensional plot rather than a 3D 
+surface, use `set view map` or `set pm3d map`.
 
 Syntax:
 @example
@@ -7542,23 +7604,28 @@ draw a smooth map boundary.
 
 Clipping with respect to x, y coordinates of quadrangles can be done in two
 ways.  `clip1in`: all 4 points of each quadrangle must be defined and at least
-1 point of the quadrangle must lie in x and y ranges.  `clip4in`: all 4
-points of each quadrangle must lie in x and y ranges.
+1 point of the quadrangle must lie in the x and y ranges.  `clip4in`: all 4
+points of each quadrangle must lie in the x and y ranges.
 
 There is a single gray/color value associated to each drawn pm3d quadrangle
 (no smooth color change among vertices).  The value is calculated from
 z-coordinates from the surrounding corners according to `corners2color
-<option>`. The options 'mean' (default), 'geomean' and 'median' produce
-various kinds of surface color smoothing, which may not be desired for pixel
-images or for maps with sharp and intense peaks.  Then options 'c1', 'c2', 'c3'
-or 'c4' can get handy to associate quadrangle color with the z-coordinate of
-either of the 4 corners, depending on the drawing direction.  There is no
-smoothing in the latter case, but no color rows are drawn for corners of the
-two surface-surrounding boundaries opposing to the selected 'c<j>' corner.
-This reflects the pm3d algorithm not to draw anything outside the measured
-surface nodes.  Another drawing algorithm, which would draw qudrangles around a
-given node by taking corners from averaged (x,y)-coordinates of its
-surrounding 4 nodes, could be implemented in the future.
+<option>`.  The options 'mean' (default), 'geomean' and 'median' produce
+various kinds of surface color smoothing.  This may not be desired for pixel
+images or for maps with sharp and intense peaks, in which case the options
+'c1', 'c2', 'c3' or 'c4' can be used instead to assign the quadrangle color
+based on the z-coordinate of only one corner.  Some experimentation may be
+needed to determine which corner corresponds to 'c1', as the orientation
+depends on the drawing direction.  Because the pm3d algorithm does not extend
+the colored surface outside the range of the input data points, the 'c<j>'
+coloring options will result in pixels along two edges of the grid not
+contributing to the color of any quadrangle.  For example, applying the pm3d
+algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
+a look) produces only (4-1)x(4-1)=9 colored rectangles.
+
+Another drawing algorithm, which would draw qudrangles around a given node
+by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
+while using node's color, could be implemented in the future.
 
 Notice that ranges of z-values and color-values for surfaces are adjustable
 independently by @ref{zrange}, @ref{cbrange}, as well as `set log` for z or
@@ -7636,7 +7703,8 @@ altitudes:
 
 @end example
 
-See also @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}.
+See also @ref{palette}, @ref{cbrange}, `set colorbox`, @ref{pm3d}
+and definitely `demo/pm3d.dem`.
 
 
 @node palette, pointsize, pm3d, set-show
@@ -7681,6 +7749,7 @@ Syntax:
       show palette
       show palette palette <n>
       show palette gradient
+      show palette fit2rgbformulae
       show palette rgbformulae
       show palette colornames
 
@@ -7707,6 +7776,11 @@ to convert gray to color, or discrete mapping tables which are interpolated.
 @ref{rgbformulae} and `functions` use analytic formulae whereas @ref{defined} and
 @ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript
 output to a minimum.
+
+The command `show palette fit2rgbformulae` finds the best matching @ref{rgbformulae} for the current @ref{palette}. Naturally, it makes sense
+to use it for non-rgbformulae palettes. This command can be found useful
+mainly for external programs using the same rgbformulae definition of palettes
+as gnuplot, like zimg.
 
 `set palette gray` switches to a gray only palette.  @ref{rgbformulae}, @ref{defined},
 @ref{file} and `functions` switch to a color mapping.  `set palette color` is an
@@ -7797,6 +7871,12 @@ Use `positive` and `negative` to invert the figure colors.
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
+Note that it is possible to find a set of the best matching rgbformulae for any
+other color scheme by the command
+@example
+   show palette fit2rgbformulae
+
+@end example
 
 @node defined, functions_, rgbformulae, palette
 @subsubsection defined
@@ -8849,6 +8929,10 @@ The box width and height are determined from the x and y errors in the same
 way as they are for the `xyerrorbars` style---either from xlow to xhigh and
 from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
 y+ydelta , depending on how many data columns are provided.
+
+If filled-box support is present, then the interior of the boxes is drawn 
+according to the current fillstyle.  See `set style fill` and `boxes` for 
+details.  Alternatively a new fillstyle may be specified in the plot command.
 
 
 @noindent --- CANDLESTICKS ---
@@ -10786,7 +10870,8 @@ Syntax:
 @end example
 
 PNG images are created using libgd, with optional support for TrueType
-fonts via libfreetype. Version 1.8 or greater of libgd is required.
+and Adobe Type 1 fonts via libfreetype. Version 1.8 or greater of libgd
+is required.
 
 `transparent` instructs the driver to generate transparent PNGs.  The first
 color will be the transparent one. Default is `notransparent`.
@@ -10799,11 +10884,14 @@ Five basic fonts are supported directly by the gd library. These are
 `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled
 or rotated (pure horizontal or vertical text only).
 
-If gnuplot was built with support for TrueType fonts, they may be
-selected using the `font <face> @{<pointsize>@}` option. <face> is either 
-the full pathname to a TrueType font file, or a font face name searched
-for using the GDFONTPATH environmental variable. TrueType fonts are fully
-scalable and may be rotated through any angle.
+If gnuplot was built with support for TrueType (*.ttf) or Adobe Type 1 
+(*.pfa) fonts, they may be selected using the 'font <face> @{<pointsize>@}' 
+option. <face> is either the full pathname to the font file, or a font 
+face name that is assumed to be the first part of a filename in one of the 
+directories listed in the GDFONTPATH environmental variable. That is, 
+'set term png font "Face"' will look for a font file named either 
+<somedirectory>/Face.ttf or <somedirectory>/Face.pfa. Both TrueType and 
+Adobe Type 1 fonts are fully scalable and may be rotated through any angle.
 
 The size <x,y> is given in pixels---it defaults to 640x480.  The number of
 pixels can be also modified by scaling with the @ref{size} command.
@@ -10975,23 +11063,23 @@ The current version of the `gif` driver does not support animated GIFs."
 @node Gnugraph(GNU_plotutils), gpic, gif, terminal
 @subsubsection Gnugraph(GNU plotutils)
 
-@c ?commands set terminal unixplot
-@c ?set terminal unixplot
-@c ?set term unixplot
-@c ?terminal unixplot
-@c ?term unixplot
-@cindex unixplot
-@tmindex unixplot
+@c ?commands set terminal gnugraph
+@c ?set terminal gnugraph
+@c ?set term gnugraph
+@c ?terminal gnugraph
+@c ?term gnugraph
+@cindex gnugraph
+@tmindex gnugraph
 
 
-The `unixplot` driver produces device-independent output in the GNU plot
+The `gnugraph` driver produces device-independent output in the GNU plot
 graphics language.  The default size of the PostScript results generated by
 "plot2ps" is 5 x 3 inches; this can be increased up to about 8.25 x 8.25 by
 @ref{size}.
 
 Syntax:
 @example
-      set terminal unixplot @{"<fontname>"@} @{<fontsize>@}
+      set terminal gnugraph @{"<fontname>"@} @{<fontsize>@}
                             @{type <pt>@} @{size "<size>"@}
 
 @end example
@@ -11006,12 +11094,12 @@ in the plotutils documentation.
 
 Examples:
 @example
-      set terminal unixplot type hpgl size "a4"
-      set terminal unixplot size "a4,xoffset=-5mm,yoffset=2.0cm" type pnm
+      set terminal gnugraph type hpgl size "a4"
+      set terminal gnugraph size "a4,xoffset=-5mm,yoffset=2.0cm" type pnm
 
 @end example
 
-There is a non-GNU version of the `unixplot` driver which cannot be compiled
+There is a non-GNU version of the `gnugraph` driver which cannot be compiled
 unless this version is left out."
 
 @node gpic, gpic_, Gnugraph(GNU_plotutils), terminal
@@ -12152,20 +12240,28 @@ Pointsizes may be changed with `set linestyle`."
 @node Openstep_(next), pbm, next, terminal
 @subsubsection Openstep (next)
 
-@c ?commands set terminal next
-@c ?set terminal next
-@c ?set term next
-@c ?terminal next
-@c ?term next
+@c ?commands set terminal openstep
+@c ?set terminal openstep
+@c ?set term openstep
+@c ?terminal openstep
+@c ?term openstep
+@cindex openstep
+
+@cindex OpenStep
+
+@cindex Openstep
+
+/*
 @cindex next
 
 @cindex NeXT
 
+*/
 Several options may be set in the openstep (next) driver.
 
 Syntax:
 @example
-      set terminal next @{<mode>@} @{<type> @} @{<color>@} @{<dashed>@}
+      set terminal openstep @{<mode>@} @{<type> @} @{<color>@} @{<dashed>@}
                  @{"<fontname>"@} @{<fontsize>@} title @{"<newtitle>"@}
 
 @end example
@@ -12181,11 +12277,11 @@ Defaults are  `new`, `monochrome`, `dashed`, "Helvetica", 14pt.
 
 Examples:
 @example
-      set term next default
-      set term next 22
-      set term next color "Times-Roman" 14
-      set term next color "Helvetica" 12 title "MyPlot"
-      set term next old
+      set term openstep default
+      set term openstep 22
+      set term openstep color "Times-Roman" 14
+      set term openstep color "Helvetica" 12 title "MyPlot"
+      set term openstep old
 
 @end example
 
@@ -13400,8 +13496,6 @@ no options."
 @c ?terminal unixplot
 @c ?term unixplot
 @cindex unixplot
-@tmindex unixplot
-
 
 The `unixplot` terminal driver generates output in the Unix "plot" graphics
 language.  It has no options.
@@ -13776,37 +13870,12 @@ appended to the window title and the icon will be labeled `gplt <n>`.
 The active window may distinguished by a change in cursor (from default
 to crosshair.)
 
-X11 fonts:
-A preferred default font may be specified to the x11 driver using
-@example
-     `set term x11 font "<fontspec>"`
-@end example
-
-The driver first queries the X-server for a font of the exact name given,
-for example `set term x11 font "lucidasans-10"`. If this query fails, then
-the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
-and to construct a full X11 font name of the form
-@example
-      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
-@end example
-
-<font> is the base name of the font (e.g. Times or Symbol)
-<size> is the point size (defaults to 12 if not specified)
-<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
-<encoding> is set based on the current character set (help set encoding)
-So `set term x11 font "arial,15,italic"` will be translated to
--*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
-The driver also recognizes some common PostScript font names and
-replaces them with possible X11 or TrueType equivalents.
-This same sequence is used to process font requests from @ref{label}.
-
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
 while that window has input focus, or by choosing `close` from a window
 manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
-
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -13839,6 +13908,47 @@ These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
 set upon initialization and cannot be altered during a `gnuplot` session.
 (except `persist` and `raise`)
+
+
+@noindent --- X11_FONTS ---
+
+@c ?commands set terminal x11 x11_fonts
+@c ?set terminal x11 x11_fonts
+@c ?set term x11 x11_fonts
+@c ?x11 x11_fonts
+@cindex x11_fonts
+
+Upon initial startup, the default font is taken from the X11 resources
+as set in the system or user .Xdefaults file or on the command line.
+
+Example:
+@example
+      gnuplot*font: lucidasans-bold-12
+@end example
+
+A new default font may be specified to the x11 driver from inside
+gnuplot using
+@example
+     `set term x11 font "<fontspec>"`
+@end example
+
+The driver first queries the X-server for a font of the exact name given,
+for example `set term x11 font "lucidasans-10"`. If this query fails, then
+the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+and to construct a full X11 font name of the form
+@example
+      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+@end example
+
+<font> is the base name of the font (e.g. Times or Symbol)
+<size> is the point size (defaults to 12 if not specified)
+<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+<encoding> is set based on the current character set (help set encoding)
+So `set term x11 font "arial,15,italic"` will be translated to
+-*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The driver also recognizes some common PostScript font names and
+replaces them with possible X11 or TrueType equivalents.
+This same sequence is used to process font requests from @ref{label}.
 
 
 @noindent --- COMMAND-LINE_OPTIONS ---
@@ -14122,37 +14232,12 @@ appended to the window title and the icon will be labeled `gplt <n>`.
 The active window may distinguished by a change in cursor (from default
 to crosshair.)
 
-X11 fonts:
-A preferred default font may be specified to the x11 driver using
-@example
-     `set term x11 font "<fontspec>"`
-@end example
-
-The driver first queries the X-server for a font of the exact name given,
-for example `set term x11 font "lucidasans-10"`. If this query fails, then
-the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
-and to construct a full X11 font name of the form
-@example
-      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
-@end example
-
-<font> is the base name of the font (e.g. Times or Symbol)
-<size> is the point size (defaults to 12 if not specified)
-<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
-<encoding> is set based on the current character set (help set encoding)
-So `set term x11 font "arial,15,italic"` will be translated to
--*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
-The driver also recognizes some common PostScript font names and
-replaces them with possible X11 or TrueType equivalents.
-This same sequence is used to process font requests from @ref{label}.
-
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
 while that window has input focus, or by choosing `close` from a window
 manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
-
 
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
@@ -14185,6 +14270,47 @@ These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file ".Xdefaults".  They are
 set upon initialization and cannot be altered during a `gnuplot` session.
 (except `persist` and `raise`)
+
+
+@noindent --- X11_FONTS ---
+
+@c ?commands set terminal x11 x11_fonts
+@c ?set terminal x11 x11_fonts
+@c ?set term x11 x11_fonts
+@c ?x11 x11_fonts
+@cindex x11_fonts
+
+Upon initial startup, the default font is taken from the X11 resources
+as set in the system or user .Xdefaults file or on the command line.
+
+Example:
+@example
+      gnuplot*font: lucidasans-bold-12
+@end example
+
+A new default font may be specified to the x11 driver from inside
+gnuplot using
+@example
+     `set term x11 font "<fontspec>"`
+@end example
+
+The driver first queries the X-server for a font of the exact name given,
+for example `set term x11 font "lucidasans-10"`. If this query fails, then
+the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+and to construct a full X11 font name of the form
+@example
+      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+@end example
+
+<font> is the base name of the font (e.g. Times or Symbol)
+<size> is the point size (defaults to 12 if not specified)
+<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+<encoding> is set based on the current character set (help set encoding)
+So `set term x11 font "arial,15,italic"` will be translated to
+-*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The driver also recognizes some common PostScript font names and
+replaces them with possible X11 or TrueType equivalents.
+This same sequence is used to process font requests from @ref{label}.
 
 
 @noindent --- COMMAND-LINE_OPTIONS ---
