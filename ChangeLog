@@ -1,5 +1,10 @@
 2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/os2/gclient.c: Fixed vertical and horizontal shifts associated
+	to text angles.
+
+2003-11-28  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* tables.c: Moved definition of test_tbl[] out of #ifdef PM3D.
 
 	* command.c (test_palette_subcommand): Reworked 'test palette' to use

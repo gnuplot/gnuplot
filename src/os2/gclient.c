@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.22 2002/09/30 15:15:20 mikulik Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.23 2002/10/04 08:56:02 mikulik Exp $" ;
 #endif
 
 /****************************************************************************
@@ -185,8 +185,10 @@ static BOOL     bKeepRatio = TRUE ;	//PM
 static BOOL     bNewFont = FALSE ;
 
 static BOOL     bHorz = TRUE ;
-  /* Horizontal or vertical 90deg text. It should be taken away and completely
-     replaced by those 2 variables below. FIXME */
+  /* Horizontal or vertical 90deg text.
+     Now it can be taken away as it was completely replaced by those
+     2 variables below (and bHorz's occurencies put into #if 0).
+     FIXME */
 static double   multLineHor  = 1; /* Horizontal and vertical spacing shifts */
 static double   multLineVert = 0; /* for multiline prints.		    */
 
@@ -2039,7 +2041,7 @@ static void ReadGnu( void* arg )
     POINTL aptl[4] ;
     long lCurCol ;
     long lOldLine = 0 ;
-    BOOL bBW = FALSE ; /* passed frpm print.c ?? */
+    BOOL bBW = FALSE ; /* passed from print.c ?? */
     BOOL bPath = FALSE ;
     BOOL bDots = FALSE ;
     char *szEnv ;
@@ -2378,22 +2380,22 @@ server:
 		    if (t1 < 0) t1 += 360;
 		    switch (t1) {
 			case   0: grdl.x =  1L; grdl.y =  0L;
-				  multLineHor = 0; multLineVert = 1;
+				  multLineHor = 1; multLineVert = 0;
 				  break;
 			case  90: grdl.x =  0L; grdl.y =  1L;
-				  multLineHor = 1; multLineVert = 0;
+				  multLineHor = 0; multLineVert = 1;
 				  break;
 			case 180: grdl.x = -1L; grdl.y =  0L;
 				  multLineHor = -1; multLineVert = 0;
 				  break;
 			case 270: grdl.x =  0L; grdl.y = -1L;
-				  multLineHor = -1; multLineVert = 0;
+				  multLineHor = 0; multLineVert = -1;
 				  break;
 			default:  {
 				  double t = t1 * M_PI/180;
 				  grdl.x = (LONG)(100*cos(t));
 				  grdl.y = (LONG)(100*sin(t));
-				  multLineHor = sin(t); multLineVert = cos(t);
+				  multLineHor = cos(t); multLineVert = sin(t);
                             }
                         }
 		    GpiSetCharAngle(hps, &grdl) ;
