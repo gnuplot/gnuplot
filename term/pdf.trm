@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.42 2004/12/31 06:12:56 sfeam Exp $
+ * $Id: pdf.trm,v 1.43 2005/01/12 00:05:42 sfeam Exp $
  */
 
 /*------------------------------
@@ -87,11 +87,6 @@ TERM_PUBLIC void ENHPDF_FLUSH __PROTO((void));
 #ifdef TERM_BODY
 
 #include <pdflib.h>
-
-#ifdef PM3D
-#   include "getcolor.h"
-/* static t_sm_palette PDF_palette; */ /* Not currently used */
-#endif
 
 static PDF *myPDF = NULL;
 

@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.143 2005/02/09 11:43:12 mikulik Exp $
+ * $Id: post.trm,v 1.144 2005/02/13 18:44:46 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -123,10 +123,6 @@ TERM_PUBLIC char *PS_escape_string __PROTO((char *origstr, char *escapelist));
 #ifdef TERM_BODY
 
 #include "post.h"
-#ifdef PM3D
-# include "getcolor.h"
-# include <stdio.h>
-#endif
 
 #define PS_FLUSH_PATH do {			\
     if (ps_path_count) {			\

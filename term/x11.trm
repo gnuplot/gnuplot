@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.130 2005/01/26 16:14:54 broeker Exp $
+ * $Id: x11.trm,v 1.131 2005/02/13 18:29:51 sfeam Exp $
  *
  */
 
@@ -128,16 +128,8 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 
 #ifdef TERM_BODY
 
-#include <ctype.h>
-#ifdef PM3D
-# include "getcolor.h"
-#endif
-
 #if defined(WITH_IMAGE) || defined(BINARY_X11_POLYGON) || defined(PM3D)
 #include "gplt_x11.h"
-#endif
-#ifdef WITH_IMAGE_BUG
-#include "graphics.h"
 #endif
 
 /* non-zero if '-display' found on command line */

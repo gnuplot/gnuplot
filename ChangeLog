@@ -1,3 +1,15 @@
+2005-02-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/term.c: Added #include "getcolor.h".
+
+	* term/aquaterm.trm term/pdf.trm term/post.trm term/svg.trm: Removed
+	#include "getcolor.h".
+
+	* term/x11.trm: Removed #include "getcolor.h", #ifdef WITH_IMAGE_BUG
+	#include "graphics.h".
+
+	* term/vgagl.trm: Removed #include "driver.h", "pm3d.h", "mousecmn.h".
+
 2005-02-14  Harald Harders  <h.harders@tu-bs.de>
 
 	* term/pslatex.trm: SourceForge patch #1121972 "Improve input encoding
