@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.7 1999/06/14 19:19:46 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.8 1999/06/19 20:52:05 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -2711,7 +2711,6 @@ int pcount;
 {
     long Last, This;
     long i;
-    size_t len;
 
 #if defined(DOS16) || defined(WIN16)
     /* HBB 980309: Ensure that Polygon Structs exactly fit a 64K segment. The
@@ -2725,20 +2724,21 @@ int pcount;
     /* Initialize global variables */
     y_malloc = (2 + (YREDUCE(ytop) >> 4) - (YREDUCE(ybot) >> 4)) * sizeof(t_pnt);
     /* ymin_hl, ymax_hl: */
-    i = XREDUCE(xright) - XREDUCE(xleft);
-    len = i + 1;
-    ymin_hl = (t_hl_extent_y *) gp_alloc(len * sizeof(t_hl_extent_y), "hidden ymin_hl");
-    ymax_hl = (t_hl_extent_y *) gp_alloc(len * sizeof(t_hl_extent_y), "hidden ymax_hl");
-    hl_buffer =
-	(struct Cross GPHUGE * GPHUGE *) gp_alloc(len * sizeof(struct Cross GPHUGE *), "hidden hl_buffer");
-    while (i-- >= 0) {
+    i = sizeof(t_hl_extent_y) * (XREDUCE(xright) - XREDUCE(xleft) + 1);
+    ymin_hl = (t_hl_extent_y *) gp_alloc((unsigned long) i, "hidden ymin_hl");
+    ymax_hl = (t_hl_extent_y *) gp_alloc((unsigned long) i, "hidden ymax_hl");
+    for (i = (XREDUCE(xright) - XREDUCE(xleft)); i >= 0; i--) {
 	ymin_hl[i] = HL_EXTENT_Y_MAX;
 	ymax_hl[i] = 0;
-	hl_buffer[i] = (struct Cross *) NULL;
     }
     /* hl_buffer: */
     /* HBB 980303 new: initialize the global store for Cross structs: */
     init_Cross_store();
+    i = XREDUCE(xright) - XREDUCE(xleft) + 1;
+    hl_buffer =
+        (struct Cross GPHUGE * GPHUGE *) gp_alloc((i * sizeof(struct Cross GPHUGE *)), "hidden hl_buffer");
+     while (--i >= 0)
+	hl_buffer[i] = (struct Cross *) 0;
 
     init_polygons(plots, pcount);
 
