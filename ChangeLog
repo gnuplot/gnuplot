@@ -1,3 +1,14 @@
+2005-02-15  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/save.c src/save.h: New routine save_fillstyle consolidates
+	redundant code to convert a fill_style_type into a text description.
+
+	* src/save.c src/save.h: New routine save_pm3dcolor consolidates
+	redundant code to convert a colorspec struct into a text description.
+
+	* src/save.c (save_set_all save_textcolor) src/show.c (show_linestyle):
+	Call shared routines rather than duplicate code in-line.
+
 2005-02-14  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm (PDF_options PDF_init PDF_dot): Add terminal option

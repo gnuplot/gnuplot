@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.98 2005/02/03 06:47:59 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.99 2005/02/06 05:05:50 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -253,23 +253,8 @@ set y2data%s\n",
 #endif /* USE_ULIG_RELATIVE_BOXWIDTH */
 
 #if USE_ULIG_FILLEDBOXES
-    switch(default_fillstyle.fillstyle) {
-    case FS_SOLID:
-	fprintf(fp, "set style fill solid %f ", default_fillstyle.filldensity / 100.0);
-	break;
-    case FS_PATTERN:
-	fprintf(fp, "set style fill pattern %d ", default_fillstyle.fillpattern);
-	break;
-    default:
-	fprintf(fp, "set style fill empty ");
-	break;
-    }
-    if (default_fillstyle.border_linetype == LT_NODRAW)
-	fprintf(fp, "noborder\n");
-    else if (default_fillstyle.border_linetype == LT_UNDEFINED)
-	fprintf(fp, "border\n");
-    else
-	fprintf(fp, "border %d\n",default_fillstyle.border_linetype+1);
+    fprintf(fp, "set style fill ");
+    save_fillstyle(fp, &default_fillstyle);
 #endif
 
     if (dgrid3d)
@@ -444,36 +429,19 @@ set y2data%s\n",
 	fprintf(fp, "set style line %d ", this_linestyle->tag);
 #ifdef PM3D
 	if (this_linestyle->lp_properties.use_palette) {
-	    fprintf(fp, " linetype");
-	    switch(this_linestyle->lp_properties.pm3d_color.type) {
-	    case TC_LT:   fprintf(fp," %d ", this_linestyle->lp_properties.pm3d_color.lt+1);
-			  break;
-	    case TC_Z:    fprintf(fp," palette z ");
-			  break;
-	    case TC_CB:   fprintf(fp," palette cb %g ", this_linestyle->lp_properties.pm3d_color.value);
-			  break;
-	    case TC_FRAC: fprintf(fp," palette fraction %4.2f ", this_linestyle->lp_properties.pm3d_color.value);
-			  break;
-	    case TC_RGB:  {
-			  const char *color = reverse_table_lookup(pm3d_color_names_tbl,
-						this_linestyle->lp_properties.pm3d_color.lt);
-			  if (color)
-			    fprintf(fp," rgb \"%s\" ", color);
-			  else
-			    fprintf(fp," rgb \"#%6.6x\" ", this_linestyle->lp_properties.pm3d_color.lt);
-			  break;
-			  }
-	    }
+	    if (this_linestyle->lp_properties.pm3d_color.type != TC_LT)
+		fprintf(fp, " linetype");
+	    save_pm3dcolor(fp,&this_linestyle->lp_properties.pm3d_color);
 	} else
 #endif
-	    fprintf(fp, "linetype %d ", this_linestyle->lp_properties.l_type + 1);
-	fprintf(fp, "linewidth %.3f pointtype %d ",
+	    fprintf(fp, " linetype %d", this_linestyle->lp_properties.l_type + 1);
+	fprintf(fp, " linewidth %.3f pointtype %d",
 		this_linestyle->lp_properties.l_width,
 		this_linestyle->lp_properties.p_type + 1);
 	if (this_linestyle->lp_properties.p_size < 0)
-	    fprintf(fp, "pointsize variable\n");
+	    fprintf(fp, " pointsize variable\n");
 	else
-	    fprintf(fp, "pointsize %.3f\n",
+	    fprintf(fp, " pointsize %.3f\n",
 		this_linestyle->lp_properties.p_size);
     }
     fputs("unset style arrow\n", fp);
@@ -1046,10 +1014,43 @@ save_zeroaxis(FILE *fp, AXIS_INDEX axis)
 }
 
 void
+save_fillstyle(FILE *fp, const struct fill_style_type *fs)
+{
+#if USE_ULIG_FILLEDBOXES
+    switch(fs->fillstyle) {
+    case FS_SOLID:
+	fprintf(fp, " solid %.2f ", fs->filldensity / 100.0);
+	break;
+    case FS_PATTERN:
+	fprintf(fp, " pattern %d ", fs->fillpattern);
+	break;
+    default:
+	fprintf(fp, " empty ");
+	break;
+    }
+    if (fs->border_linetype == LT_NODRAW)
+	fprintf(fp, "noborder\n");
+    else if (fs->border_linetype == LT_UNDEFINED)
+	fprintf(fp, "border\n");
+    else
+	fprintf(fp, "border %d\n",fs->border_linetype+1);
+#endif
+}
+
+void
 save_textcolor(FILE *fp, const struct t_colorspec *tc)
 {
     if (tc->type) {
     	fprintf(fp, " textcolor");
+	save_pm3dcolor(fp, tc);
+    }
+}
+
+
+void
+save_pm3dcolor(FILE *fp, const struct t_colorspec *tc)
+{
+    if (tc->type) {
 	switch(tc->type) {
 	case TC_LT:   fprintf(fp," lt %d", tc->lt+1);
 		      break;
