@@ -74,7 +74,7 @@ AC_MSG_CHECKING([for emacs version])
 if test "$EMACS" = no; then
   emacs_version="none found"
 else
-  emacs_version=`$EMACS --version | sed 's/^GNU //' |awk '{print $2}'`
+  emacs_version=`$EMACS --version |sed 's/^GNU //' |awk '/Emacs [[12]]/{print $2}'`
 fi
 AC_MSG_RESULT([$emacs_version])
 vnum=`echo $emacs_version |awk -F\. '{print 100*$1+$2}'`
