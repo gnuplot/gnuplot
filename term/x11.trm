@@ -362,8 +362,8 @@ TERM_PUBLIC void X11_init() {
 
 struct iosb iosb;
 
-char devnam_string[64];
-$DESCRIPTOR(devnam,devnam_string);
+static char devnam_string[64];
+static $DESCRIPTOR(devnam,devnam_string);
 
 struct  {
 	short int	buf_len;
