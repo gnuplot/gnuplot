@@ -217,7 +217,9 @@ if test "$ac_cv_func_pclose" = yes && test "$ac_cv_func_popen" = yes ; then
 fi
 
 dnl arg types for select - works only with ANSI compilers!
-test "$am_cv_prog_cc_stdc" != no && AC_FUNC_SELECT
+if test "$am_cv_prog_cc_stdc" != no; then
+  AC_FUNC_SELECT
+fi
 
 dnl On SVR3.
 dnl FIXME AC_DEFINE(CRIPPLED_SELECT)
@@ -461,9 +463,26 @@ AC_SUBST(NEXTOBJS)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
+dnl Build gnuplot-mode in lisp only
+dnl if a suitable emacs is found
 AC_CHECK_PROGS(EMACS, emacs xemacs, no)
+if test "$EMACS" != no; then
+  config_lisp=lisp
+else
+  config_lisp=
+fi
+AC_CONFIG_SUBDIRS($config_lisp)
+AM_CONDITIONAL(BUILD_LISP_SUBDIR, test x$config_lisp = xlisp)
+
+dnl Build LaTeX tutorial only if
+dnl latex/2e is found
 AC_CHECK_PROGS(LATEX, latex latex2e, no)
-test "$EMACS" != no && AC_CONFIG_SUBDIRS(lisp)
+if test "$LATEX" = no; then
+  TUTORIAL=notutorial
+else
+  TUTORIAL=tutorial
+fi
+AC_SUBST(TUTORIAL)
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile
@@ -533,7 +552,7 @@ test "$enable_rgip" = yes && \
   AC_MSG_RESULT([  Enable RGIP terminal])
 
 test "$EMACS" != no && \
-  AC_MSG_RESULT([  Build lisp files])
+  AC_MSG_RESULT([  Build gnuplot-mode for X/Emacs])
 
 test "$LATEX" != no && \
   AC_MSG_RESULT([  Build LaTeX tutorial])
