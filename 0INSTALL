@@ -233,25 +233,31 @@ OS/2
 ----
 
 To compile under OS/2 (2.x and above) you need the development
-suite EMX 0.9 (including gcc). To build the complete set
-of files you should also have GNUMake and IPFC (Information Presentation
-Facility Compiler; available from the Developer's Toolkit; nowadays it's
-accessible through an IBM website for free!).
+suite EMX 0.9 (including gcc). You should also have
+GNU Make and IBM's IPFC  (Information Presentation Facility Compiler,
+available from the Developer's Toolkit; nowadays it's accessible
+through an IBM website for free!).
 
 At the beginning of Makefile.os2 you will find a configuration
 section where you have to adjust all settings which control the build
 process. Most important is probably to select the terminal devices
 which should be supported. You can create a version offering
 PM graphics as well as X11 support (to use with XFree86).
+Support for these two terminals is provided by additional
+executables.
 Be sure to enable only those devices for which you have the 
-necessary software already installed!
+necessary software already installed. Also ensure that the
+libraries and the sources are all compiled (not) using
+the '-Zmt' flags.
 
-Finally executing 
-  make -f Makefile.os2
+Executing 
+  make -f makefile.os2
+should create a default build while
+  make -f makefile.os2 help
 will show you all pre-defined targets.
 
 See other sections of the manuals for more information about
-installing gnuplot on OS/2.
+installing/using gnuplot on OS/2.
 
 Environment Variables
 =====================
