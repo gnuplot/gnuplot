@@ -1,10 +1,14 @@
+2004-03-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.os2: #undefine HAVE_STDBOOL_H and HAVE__BOOL.
+
 2004-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* config/config.amg config/config.cyg config/config.mgw
 	config/config.nt config/config.os2: Added new macros
 	HAVE_STDBOOL_H and HAVE__BOOL needed by my change to the TBOOLEAN
 	setup in syscfg.h two days ago.
-	
+
 	* src/term.c (curr_arrow_headfilled): Changed type from TBOOLEAN
 	to int, because this variable has more than 2 possible values.
 
@@ -12,18 +16,18 @@
 	declaration accordingly.
 
 2004-03-24  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* src/gplt_x11.c: Change window size immediately on 'm' toggle.
 
 	* term/gd.trm: Update comments on libgd version requirements.
 
 2004-03-23  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* src/gplt_x11.c: If gnuplot exits while "x11 -persist" is active,
 	hand over mousing of last active plot to gnuplot_x11. This fixes
 	the test case provided with bug #921033.  Also, continue to honor
 	'm' key as a toggle for mousing in detached windows.
-	
+
 2004-03-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* configure.in (AC_HEADER_STDBOOL): Added call to this macro.
@@ -46,7 +50,7 @@
 	(setup_tics): Handle reverted time/date axes correctly.
 
 2004-03-22  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* src/term.c src/gplt_x11.c term/gd.trm term/pdf.trm term/x11.trm
 	term/dumb.trm term/post.trm: Revamp the implementation of the '@'
 	character (phantom box) in enhanced text processing.  This fixes
@@ -57,14 +61,14 @@
 	further.
 
 2004-03-21  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* term/svg.trm: Add an enhanced text mode for the svg
 	terminal. It's not perfect, but it works well enough to overcome
 	some of the text formatting limitations in the svg plain text
 	mode.
 
 2004-03-18  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* term/dumb.trm: Fix segfault on 'unset output' while in dumb
 	terminal.
 
@@ -95,7 +99,7 @@
 
 	The fix for SF bug "[905651] Grid and border overlap the plot".
 	This is rather elaborate, unfortunately:
-	
+
 	* src/graph3d.c (USE_GRID_LAYERS): New feature test macro.  Turned
 	on automatically for now. If PM3D is on , this is forced on, too.
 	(whichgrid): Removed global variable.
@@ -136,7 +140,7 @@
 	* docs/gnuplot.doc (pm3d): Removed documentation of no longer
 	existant option.
 	(grid): Document new default layering of 3D grid/boundary.
-	
+
 2004-03-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* tutorial/tutorial.tex tutorial/header.tex: Updates about
@@ -145,7 +149,7 @@
 	* term/gd.trm term/gif.trm: Don't print debugging message.
 
 2004-03-10  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* term/cgm.trm: Revise the conditional code sections so that it is
 	possible to select USE_ULIG_FILLEDBOXES without PM3D.
 
@@ -164,11 +168,11 @@
 
 	* docs/doc2texi.el: Add @dircategory Math to place the gnuplot
 	info file into a suitable place in the master info directory page.
-	
+
 	* docs/gnuplot.texi: Updated accordingly.
-	
+
 2004-03-07  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* src/gplt_x11.c: Selecting linetype -2 worked only because bounds
 	checking was incorrect.  Now treat LT_BACKGROUND, LT_NODRAW, and
 	other negative linetypes as a request for the background color.
@@ -208,7 +212,7 @@
 	help'.
 
 2004-02-27  Ethan Merritt  <merritt@u.washington.edu>
-	
+
 	* term/mif.trm: Revise #ifdef so that it compiles if you select
 	configure --disable-filledboxes
 
