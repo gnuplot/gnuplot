@@ -1,3 +1,37 @@
+1998-12-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0FAQ, 0README, NEWS, configure.in, makefile.dj2, makefile.os9,
+	version.c, term/README: 3.7ise.
+
+	* Makefile.in, makefile.all: Add mac.trm to CORETERM.
+
+1998-12-06  David Schooley  <dcschooley@mediaone.net>
+
+	* term/mac.trm: Added terminal driver for Macintosh.
+
+1998-12-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Update OS/2 gcc optimiser bug entry.
+
+	* 0README: Update distribution sites.
+
+	* TODO: Add png driver entry.
+
+1998-12-05  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE>
+
+	* makefile.os2: Fix OS/2 build (allterm.h related).
+
+1998-12-05  Ian MacPhedran  <Ian_MacPhedran@mackenzie.usask.ca>
+
+	* descrip.mms: VMS build fixes.
+
+1998-12-05  Roger Fearick  <FEARICK@physci.uct.ac.za>
+
+	* protos.h: Fix typo.
+
+	* os2/gclient.c, term/pm.trm: Fix old bug about default help file
+	path, and adjust font metrics in pm driver.
+
 1998-12-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0BUGS: Remove pslatex driver bug entry.

@@ -42,4 +42,8 @@ Lars' list
 - add load path for files/GNUPLOT_LIBRARY env var
 - provide library of replacement functions instead of stdfn.c
 - [Lucas] fix axis ranges, overwritten labels in demos
+- png driver needs update for png versions >=0.95
+  must be backwards compatible (do we want to require png >=0.95? We
+  already require >=0.89; possible compile problems under Irix 6.x which
+  comes with png 0.88/zlib 1.0)
 
