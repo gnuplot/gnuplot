@@ -356,7 +356,7 @@ in the gnuplot distribution, and are referred to here by name.
 Interaction with the current plot via mouse and hotkey input is supported for
 the X11, OS/2, ggi and windows terminals. See `mouse input` for more 
 information on mousing. See @ref{bind} for information on hotkeys. Also see 
-the documentation for indivual mousing terminals `ggi`, `pm`, `windows` and 
+the documentation for individual mousing terminals `ggi`, `pm`, `windows` and 
 `x11`.
 
 Sample script: mousevariables.dem
@@ -475,7 +475,7 @@ hotkeys. See `set term x11 x11_fonts`.
 @subsection Other changes and additions
 
 
-The preferred syntax to undue a command `set <something>` is now 
+The preferred syntax to undo a command `set <something>` is now 
 `unset <something>` rather than `set no<something>`. The older form has been
 deprecated.  Version 3.8 continues to allow the older syntax, but such 
 backwards compatibility may be lost in future versions.
@@ -5987,7 +5987,7 @@ Syntax:
 
 The <filename> argument must be enclosed in single or double quotes.
 
-If no filename ist given or `unset fit` is used the log file is 
+If no filename is given or `unset fit` is used the log file is 
 reset to its default value "fit.log" or the value of the environmental
 variable `FIT_LOG`.
 
@@ -6501,7 +6501,7 @@ Syntax:
 When leaving gnuplot, the value of historysize is used for
 truncating the history to at most that much lines. The default
 is 500.
-"unset historysize" will disable history truncation and thus
+@ref{historysize} will disable history truncation and thus
 allow an infinite number of lines to be written to the history
 file.
 
@@ -6592,8 +6592,8 @@ keywords `left`, `right`, `top`, `bottom`, `outside` and `below` may be used
 to place the key in the other corners inside the graph or to the right
 (outside) or below the graph.  They may be given alone or combined.
 
-Plots may be drawn with no visible key by requesting 'set key off' or
-'unset key'.
+Plots may be drawn with no visible key by requesting `set key off` or
+@ref{key}.
 
 Justification of the labels within the key is controlled by `Left` or `Right`
 (default is `Right`).  The text and sample can be reversed (`reverse`) and a
@@ -7154,7 +7154,7 @@ Syntax:
 @example
       set mouse [doubleclick <ms>] [nodoubleclick] \
                 [[no]zoomcoordinates] \
-                [[no]polarcoordinates] \
+                [[no]polardistance] \
                 [format <string>] \
                 [clipboardformat <int>/<string>] \
                 [mouseformat <int>/<string>] \
@@ -7169,10 +7169,10 @@ which copies the current mouse position to the `clipboard`. If you want that
 to be done by single clicking a value of 0 ms can be used. The default value
 is 300 ms.
 
-The option zoomcoordinates determines if the coordinates of the zoom box are
+The option `zoomcoordinates` determines if the coordinates of the zoom box are
 drawn at the edges while zooming. This is on by default.
 
-The option polarcoordinates determines if the distance to the ruler is also
+The option `polardistance` determines if the distance to the ruler is also
 shown in polar coordinates. This corresponds to the default key binding '5'.
 
 The `format` option takes a fprintf like format string which determines how
@@ -7187,7 +7187,7 @@ is a string this string is used as c format specifier and should contain two
 float specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`. Use
 `set mouse mouseformat ""` to turn this string off again.
 
-The following formats are available (format 5 may only be selected if the
+The following formats are available (format 6 may only be selected if the
 format string was specified already):
 
 @example
@@ -7708,7 +7708,7 @@ The normalized gray value can be further mapped into a color---see @ref{palette}
 for the complete description.
 
 2. splot of data file with two or four data columns: The gray/color value is
-obtained by @ref{using} the last-column coordinate instead of the z-value, thus
+obtained by using the last-column coordinate instead of the z-value, thus
 allowing the color and the z-coordinate be mutually independent.  This can be
 used for 4d data drawing.
 
@@ -7933,7 +7933,7 @@ Syntax:
 Otherwise, the options can be given in any order. @ref{palette} shows the
 current palette properties. `show palette palette <n>` shows RGB triplets for
 the current settings and a palette having <n> discrete colors.  `show palette
-gradient` displays the gradient defining the palette (if apropriate).  @ref{rgbformulae} prints the available fixed gray --> color transformation
+gradient` displays the gradient defining the palette (if appropriate).  @ref{rgbformulae} prints the available fixed gray --> color transformation
 formulas.  `show palette colornames` prints the implemented color names.
 
 The following options determine the coloring properties.
@@ -8251,7 +8251,7 @@ Example:
 @end example
 
 To use gamma correction with interpolated gradients specify intermediate
-gray values with apropriate colors.  Instead of
+gray values with appropriate colors.  Instead of
 
 @example
       set palette defined ( 0 0 0 0, 1 1 1 1 )
@@ -8423,7 +8423,7 @@ and
 @c ?show print
 The `set print` command redirects the output of the `print` command to a file.
 
-Syntax:o
+Syntax:
 @example
       set print
       set print "-"
@@ -8704,7 +8704,7 @@ To draw an arrow without an arrow head and double width, use:
 @end example
 
 @example
- See also 'set arrow' for further examples.
+ See also @ref{arrow} for further examples.
 
 @end example
 
@@ -8791,7 +8791,7 @@ Syntax:
 @end example
 
 See `plotting styles` for the choices.  If no choice is given, the choices are
-listed.  Show style function shows the current default function plotting
+listed.  `show style function` shows the current default function plotting
 style.
 
 @node set_style_line, plotting_styles, set_style_function, style
@@ -9175,6 +9175,7 @@ plots with many points.
 
 @c ?commands set style financebars
 @c ?set style financebars
+@c ?plotting styles financebars
 @c ?style financebars
 @cindex financebars
 
@@ -9430,7 +9431,7 @@ If data are provided in an unsupported mixed form, the @ref{using} filter on the
 if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
 @example
-      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
+      plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorlines
 
 @end example
 
@@ -10948,7 +10949,7 @@ Syntax:
 `landscape` mode and 3x5 or 5x8 inches in `portrait` mode.
 @ref{size} sets (overrides) the size of the drawing
 area to <xsize>*<ysize> in units of inches or centimeters depending on the
-`metric` or `inches` setting in effect.
+`inches` or `metric` setting in effect.
 The latter settings is also used as default units for editing with "xfig".
 
 `pointsmax <max_points>` sets the maximum number of points per polyline.
@@ -11109,7 +11110,8 @@ specified by the environment variable GDFONTPATH and 14pt font size.
 @example
       set terminal png transparent xffffff \\
                        x000000 x202020 x404040 x606060 \\
-                       x808080 xA0A0A0 xC0C0C0 xE0E0E0 \\
+                       x808080 xA0A0A0 xC0C0C0 xE0E0E0
+
 @end example
 
 which uses white for the transparent background, black for borders, dark
@@ -12649,7 +12651,7 @@ component functions are sampled at <samples> points and all points are
 removed from this gradient which can be removed without changing the
 resulting colors by more than <maxdeviation>.  For almost every useful
 palette you may savely leave the defaults of <samples>=2000 and
-<maxdeviation>=0.003 untouched." ,
+<maxdeviation>=0.003 untouched.
 
 `eps` mode generates EPS (Encapsulated PostScript) output, which is just
 regular PostScript with some additional lines that allow the file to be
@@ -12877,7 +12879,7 @@ binary format. In addition, they often have spaces in the font names which
 is not supported by Type 1 fonts (in which a TrueType is converted on the
 fly). The font names are changed in order to eliminate the spaces in the
 fontnames. The easiest way to find out which font name is generated for
-use with Gnuplot, start Gnuplot in interactive mode and type in
+use with gnuplot, start gnuplot in interactive mode and type in
 "set terminal postscript fontfile '<filename.ttf>'".
 
 For converting font files to pfa format the conversion tool has to read
@@ -12935,7 +12937,7 @@ The file "ps_fontfile_doc.tex" in the /docs/psdoc subdirectory of the
 `gnuplot` source distribution contains a table with glyphs of the TeX
 mathfonts.
 
-If the font "CMEX10" is embedded (file "cmex10.pfb") Gnuplot defines
+If the font "CMEX10" is embedded (file "cmex10.pfb") gnuplot defines
 the additional font "CMEX10-Baseline". It is shifted vertically in order
 to fit better to the other glyphs (CMEX10 has its baseline at the top of
 the symbols)."
@@ -14127,7 +14129,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (help set encoding).
+ <encoding> is set based on the current character set (@ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -14356,13 +14358,13 @@ number of colors is 240 (16 are left for line colors).
 
 Gnuplot first starts to allocate the maximal number of colors as stated
 above.  If this fails, the number of colors is reduced by the factor 2
-until gnuplot gets all colors wich are requested. If dividing `maxcolors`
+until gnuplot gets all colors which are requested. If dividing `maxcolors`
 by 2 repeatedly results in a number which is smaller than `mincolors`
 `gnuplot` tries to install a private colormap. In this case the window
 manager is responsible for swapping colormaps when the pointer is moved
 in and out the x11 driver's window.
 
-The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8,
+The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8),
 where num_colormaps is the number of colormaps which are currently used
 by gnuplot (usually 1, if only one x11 window is open).
 
@@ -14497,7 +14499,7 @@ and to construct a full X11 font name of the form
  <size> is the point size (defaults to 12 if not specified)
  <s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`
- <encoding> is set based on the current character set (help set encoding).
+ <encoding> is set based on the current character set (@ref{encoding}).
 @end example
 
 So `set term x11 font "arial,15,italic"` will be translated to
@@ -14726,13 +14728,13 @@ number of colors is 240 (16 are left for line colors).
 
 Gnuplot first starts to allocate the maximal number of colors as stated
 above.  If this fails, the number of colors is reduced by the factor 2
-until gnuplot gets all colors wich are requested. If dividing `maxcolors`
+until gnuplot gets all colors which are requested. If dividing `maxcolors`
 by 2 repeatedly results in a number which is smaller than `mincolors`
 `gnuplot` tries to install a private colormap. In this case the window
 manager is responsible for swapping colormaps when the pointer is moved
 in and out the x11 driver's window.
 
-The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8,
+The default for `mincolors` is maxcolors / (num_colormaps > 1 ? 2 : 8),
 where num_colormaps is the number of colormaps which are currently used
 by gnuplot (usually 1, if only one x11 window is open).
 
@@ -15382,7 +15384,7 @@ on the other axes.
 
 Syntax:
 @example
-      set xlabel @{"<label>"@} @{<xoff>@}@{,<yoff>@} @{"<font>@{,<size>@}"@}
+      set xlabel @{"<label>"@} @{<xoff>@}@{,<yoff>@} @{font "<font>@{,<size>@}"@}
                  @{@{textcolor | tc@} @{lt <line_type> | default@}@}
       show xlabel
 
