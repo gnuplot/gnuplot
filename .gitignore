@@ -27,7 +27,6 @@ _$*
 core
 # CVS default ignores end
 Makefile
-Makefile.in
 config.cache
 config.h
 config.log

@@ -1,1 +1,8 @@
 Makefile
+eg?.tex
+linepoin.tex
+*.aux
+*.log
+*.dvi
+*.pdf
+*.ps
