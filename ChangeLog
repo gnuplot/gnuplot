@@ -1,3 +1,8 @@
+2005-02-10  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graph3d.c (plot3d_lines_pm3d): If the graph specifies a solid rgb
+	color, fall back to single-color routine plot3d_lines.
+
 2005-02-11  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/pm3d.h src/pm3d.c: New global routine is_plot_with_colorbox().

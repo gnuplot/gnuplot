@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.111 2005/02/09 11:43:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.112 2005/02/11 11:37:02 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1579,6 +1579,13 @@ plot3d_lines_pm3d(struct surface_points *plot)
 
     /* just a shortcut */
     TBOOLEAN color_from_column = plot->pm3d_color_from_column;
+
+    /* If plot uses a constant color, set it here and then let plot3d_lines take over */
+    if (plot->lp_properties.use_palette && plot->lp_properties.pm3d_color.type == TC_RGB) {
+	apply_pm3dcolor(&(plot->lp_properties.pm3d_color), term);
+	plot3d_lines(plot);
+	return;
+    }
 
 #ifndef LITE
 /* These are handled elsewhere.  */
