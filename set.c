@@ -1312,7 +1312,13 @@ set_two()
 #define DO_ZEROAX(variable, string,neg) \
 else if (almost_equals(c_token, string)) { \
    ++c_token; if (END_OF_COMMAND) variable.l_type=-1; \
-   else LP_PARSE(variable,1,0,-1,0)\
+   else { \
+      struct value a; \
+      int old_token = c_token;\
+      LP_PARSE(variable,1,0,-1,0); \
+      if (old_token == c_token) \
+         variable.l_type = real(const_express(&a)) - 1; \
+   }\
 } else if (almost_equals(c_token, neg)) { \
    ++c_token; variable.l_type=-3; \
 }
@@ -1463,19 +1469,28 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 			} else break; /* might be a linetype */
 		}
 		if (!END_OF_COMMAND) {
+			struct value a;
+			int old_token = c_token;
+
                         LP_PARSE(grid_lp,1,0,-1,1);
-			if (!work_grid.l_type) work_grid.l_type = GRID_X|GRID_Y;
+			if (c_token == old_token) {/* nothing parseable found... */
+		        	grid_lp.l_type = real(const_express(&a)) - 1;
+			}
+			
+			if (!work_grid.l_type)
+				work_grid.l_type = GRID_X|GRID_Y;
 				/* probably just  set grid <linetype> */
 
 			if (END_OF_COMMAND) {
                                 memcpy(&mgrid_lp,&grid_lp,sizeof(struct lp_style_type));
 			} else {
-			  if (equals(c_token,",")) {
+				if (equals(c_token,",")) 
 			    c_token++;
-			  } else {
-			    int_error("',' expected",c_token);
-			  }
+				old_token = c_token;
 			  LP_PARSE(mgrid_lp,1,0,-1,1);
+				if (c_token == old_token) {
+					mgrid_lp.l_type = real(const_express(&a)) -1;
+				}
 			}
 
 			if (!work_grid.l_type) work_grid.l_type = GRID_X|GRID_Y;
@@ -1503,6 +1518,14 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 			draw_border = 31;
 		} else {
 			draw_border = (int)real(const_express(&a));
+		}
+		/* HBB 980609: add linestyle handling for 'set border...' */
+		/* For now, you have to give a border bitpattern to be able to specify a linestyle. Sorry for this,
+		 * but the gnuplot parser really is too messy for any other solution, currently */
+		if(END_OF_COMMAND) {
+		    set_lp_properties(&border_lp, 0, -2, 0, 1.0, 1.0);
+		} else {
+			LP_PARSE(border_lp, 1, 0, -2, 0);
 		}
 	}
 	else if (almost_equals(c_token,"k$ey")) {
@@ -1560,8 +1583,14 @@ else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; 
 					++c_token;
 					if (END_OF_COMMAND)
 						key_box.l_type=-2;
-					else
+					else {
+						int old_token = c_token;
+						
 						LP_PARSE(key_box,1,0,-2,0);
+						if (old_token == c_token) {
+							key_box.l_type = real(const_express(&a)) -1;
+						}
+					}		
 					--c_token;  /* is incremented after loop */
 				} else if (almost_equals(c_token,"nob$ox")) {
 					key_box.l_type=-3;

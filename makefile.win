@@ -34,7 +34,7 @@ BIN = $(TC)\bin\\
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -y -v -w-rvl -w-pro -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DWIN32 -DNO_GIH -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -y -v -w-rvl -w-pro -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DWIN32 -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
 !else
 CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -DHAVE_STRNICMP -DANSI_C

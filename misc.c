@@ -521,7 +521,8 @@ char str[MAX_LINE_LEN+1];
 	fprintf(fp,"set bar %f\n", bar_size);
 
 	if (draw_border)
-		fprintf(fp,"set border %d\n", draw_border);
+	    /* HBB 980609: handle border linestyle, too */
+		fprintf(fp,"set border %d lt %d lw %.3f\n", draw_border, border_lp.l_type+1, border_lp.l_width);
 	else
 		fprintf(fp, "set noborder\n");
 

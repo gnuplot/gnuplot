@@ -823,6 +823,8 @@ show_border()
 {
 	fprintf(stderr,"\tborder is %sdrawn %d\n", draw_border ? "" : "not ",
 		draw_border);
+	/* HBB 980609: added facilities to specify border linestyle */
+	fprintf(stderr, "\tBorder drawn with linetype %d, linewidth %.3f\n", border_lp.l_type+1, border_lp.l_width);
 }
 
 static void

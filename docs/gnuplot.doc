@@ -1112,7 +1112,9 @@ C ... and restart the table:
  with a letter, but subsequent characters may be letters, digits, "$", or "_".
  Note, however, that the `fit` mechanism uses several variables with names
  that begin "FIT_".  It is safest to avoid using such names.  "FIT_LIMIT",
- however, is one that you may wish to redefine.
+ however, is one that you may wish to redefine. See the documentation
+ on `fit` for details.
+
 
  See `show functions`, `show variables`, and `fit`.
 2 Glossary
@@ -1499,10 +1501,10 @@ C ... and restart the table:
  Once `fit` has finished, the `update` command may be used to store final
  values in a file for subsequent use as a parameter file.   See `update`
  for details.
-3 adjustable_parameters
-?fit adjustable_parameters
+3 adjustable parameters
 ?fit parameters
-?adjustable_parameters
+?fit adjustable_parameters
+?fit_parameters
  There are two ways that `via` can specify the parameters to be adjusted,
  either directly on the command line or indirectly, by referencing a
  parameter file.  The two use different means to set initial values.
@@ -1526,8 +1528,9 @@ C ... and restart the table:
  designate variables as fixed parameters so that their values are reported by
  `fit`.  The keyword `# FIXED` has to appear in exactly this form.
 
-3 beginner's_guide
-?fit beginner's_guide
+3 beginner's guide
+?fit guide
+?fit beginners_guide
 ?fitting
  `fit` is used to find a set of parameters that 'best' fits your data to your
  user-defined function.  The fit is judged on the basis of the the sum of the
@@ -1570,7 +1573,7 @@ C ... and restart the table:
  the next iteration.  The process continues until a preset criterium is met, 
  either (1) the fit has "converged" (the relative change in WSSR is less than
  FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
- (see `fit environment control variables`).  The fit may also be interrupted 
+ (see `fit control variables`).  The fit may also be interrupted 
  and subsequently halted from the keyboard (see `fit`).
 
  Often the function to be fitted will be based on a model (or theory) that
@@ -1588,9 +1591,9 @@ C ... and restart the table:
  However, if all you really want is a smooth curve through your data points,
  the `smooth` option to `plot` may be what you've been looking for rather
  than `fit`.
-3 error_estimates
-?fit error_estimates
-? error_estimate
+3 error estimates
+?fit errors
+?error_estimate
  In `fit`, the term "error" is used in two different contexts, data error
  estimates and parameter error estimates.
 
@@ -1604,8 +1607,8 @@ C ... and restart the table:
 
  The 'statistical overview' describes some of the `fit` output and gives some
  background for the 'practical guidelines'.   
-4 statistical_overview
-?fit error_estimates statistical_overview
+4 statistical overview
+?fit error statistical_overview
 ?statistical_overview
  The theory of non-linear least-squares (NLLS) is generally described in terms
  of a normal distribution of errors, that is, the input data is assumed to be
@@ -1654,8 +1657,8 @@ C ... and restart the table:
  proportional or inversely proportional.  The smaller the magnitudes of the 
  off-diagonal elements, the closer the estimates of the standard deviation 
  of each parameter would be to the aymptotic standard error.
-4 practical_guidelines
-?fit error_estimates practical_guidelines
+4 practical guidelines
+?fit error practical_guidelines
 ?practical_guidelines
 ?guidelines
  If you have a basis for assigning weights to each data point, doing so lets
@@ -1706,20 +1709,17 @@ C ... and restart the table:
  to account for "errors" in the values of x, only in y.  Also, any "outliers"
  (data points outside the normal distribution of the model) will have an
  exaggerated effect on the solution.
-3 fit_environment
-?fit_environment
-?fit environment
-?environment
+3 fit controlling
+?fit control
+?fit_control
  There are a number of `gnuplot` variables that can be defined to affect
  `fit`.  Those which can be defined once `gnuplot` is running are listed
  under 'control_variables' while those defined before starting `gnuplot`
  are listed under 'environment_variables'.
-
-4 control_variables
-? fit control_variables
-? fit_control
-? control_variables
-
+4 control variables
+?fit control variables
+?fit_control variables
+?fit_controlvariables
  The default epsilon limit (1e-5) may be changed by declaring a value for
        FIT_LIMIT
  When the sum of squared residuals changes between two iteration steps by
@@ -1730,20 +1730,34 @@ C ... and restart the table:
        FIT_MAXITER
  A value of 0 (or not defining it at all)  means that there is no limit.
 
+ If you need even more control about the algorithm, and know the 
+ Marquardt-Levenberg algorithm well, there are some more variables to
+ influence it. The startup value of `lambda` is normally calculated
+ automatically from the ML-matrix, but if you want to, you may provide
+ your own one with 
+       FIT_START_LAMBDA
+ Specifying FIT_START_LAMBDA as zero or less will re-enable the automatic
+ selection. The variable
+       FIT_LAMBDA_FACTOR
+ gives the factor by which `lambda` is increased or decreased whenever
+ the chisquared target function increased or decreased significantly.
+ Setting FIT_LAMBDA_FACTOR to zero re-enables the default factor of
+ 10.0.
+
  Oher variables with the FIT_ prefix may be added to `fit`, so it is safer
  not to use that prefix for user-defined variables.
 
- Two variables, FIT_SKIP and FIT_INDEX, were used by earlier releases of
+ The variables FIT_SKIP and FIT_INDEX were used by earlier releases of
  `gnuplot` with a 'fit' patch called `gnufit` and are no longer available.
  The datafile `every` modifier provides the functionality of FIT_SKIP.
  FIT_INDEX was used for multi-branch fitting, but multi-branch fitting of
  one independent variable is now done as a pseudo-3D fit in which the
  second independent variable and `using` are used to specify the branch.
  See `fit multi-branch`.
-4 environment_variables
-?fit_environment
-?environment_variables
-?fit environment_variables
+4 environment variables
+?fit control environment
+?fit_control environment
+?fit_environment_vars
  The environment variables must be defined before `gnuplot` is executed; how
  to do so depends on your operating system.
 
@@ -1780,7 +1794,7 @@ C ... and restart the table:
  variable.  Fitting each branch separately, using the multi-branch solution
  as initial values, may give an indication as to the relative effect of each 
  branch on the joint solution.
-3 Starting_values
+3 starting values
 ?fit starting_values
 ?starting_values
  Nonlinear fitting is not guaranteed to converge to the global optimum (the
@@ -3097,7 +3111,9 @@ C ... and restart the table:
  borders for the `plot` and `splot` commands.
 
  Syntax:
-       set border {<integer>}
+       set border {<integer> { {linestyle | ls <line_style>}
+                               | {linetype | lt <line_type> }
+                                 {linewidth | lw <line_width>} } } 
        set noborder
        show border
 
@@ -3135,6 +3151,10 @@ C ... and restart the table:
 
  The default is 31, which is all four sides for `plot`, and base and z axis
  for `splot`.
+
+ Using the optional <line_style>, <line_type> and <line_width>
+ specifiers, the way the border lines are drawn can be influenced
+ (limited by what the current terminal driver supports).
 
  Various axes or combinations of axes may be added together in the command.
 
@@ -3770,15 +3790,20 @@ C ... and restart the table:
  Syntax:
        set grid {{no}{m}xtics} {{no}{m}ytics} {{no}{m}ztics}
                 {{no}{m}x2tics} {{no}{m}y2tics}
-                {polar {<angle>}} {<major_linetype> {<minor_linetype>}}
+                {polar {<angle>}} 
+                { {linestyle <major_linestyle>}
+                  | {linetype | lt <major_linetype>}
+                    {linewidth | lw <major_linewidth>}
+                  { , {linestyle | ls <minor_linestyle>}
+                      | {linetype | lt <minor_linetype>}
+                        {linewidth | lw <minor_linewidth>} } }
        set nogrid
        show grid
 
- The grid can be enabled and disabled for the major and/or minor tic marks on
- any axis, and the linetype can be specified for major and minor grid lines.
- But note that <major_linetype> and <minor_linetype> are indices in the
- default linetype list provided by the terminal; user-defined linetypes (via
- the `set linestyle` command) are not accessible for grid lines.
+ The grid can be enabled and disabled for the major and/or minor tic
+ marks on any axis, and the linetype and linewidth can be specified
+ for major and minor grid lines, also via a predefined linestyle, as
+ far as the active terminal driver supports this. 
 
  Additionally, a polar grid can be selected for 2-d plots---circles are drawn
  to intersect the selected tics, and radial lines are drawn at definable
@@ -3949,7 +3974,10 @@ C ... and restart the table:
                {Left | Right} {{no}reverse}
                {samplen <sample_length>} {spacing <vertical_spacing>}
                {width <width_increment>}
-               {title "<text>"} {{no}box {<linetype>}}
+               {title "<text>"} 
+               {{no}box { {linestyle | ls <line_style>} 
+                          | {linetype | lt <line_type>}
+                            {linewidth | lw <line_width>}}}
        set nokey
        show key
 
@@ -3960,10 +3988,9 @@ C ... and restart the table:
 
  Justification of the labels within the key is controlled by `Left` or `Right`
  (default is `Right`).  The text and sample can be reversed (`reverse`) and a
- box can be drawn around the key (`box {<linetype>}`) in a specified linetype.
- But note that <linetype> is an index in the default linetype list provided by
- the terminal; user-defined linetypes (via the `set linestyle` command) are
- not accessible for the key box.
+ box can be drawn around the key (`box {...}`) in a specified `linetype`
+ and `linewidth`, or a user-defined `linestyle`. Note that not all
+ terminal drivers support linewidth selection, though.
 
  The length of the sample line can be controlled by `samplen`.  The sample
  length is computed as the sum of the tic length and <sample_length> times the
@@ -5753,23 +5780,20 @@ C ... and restart the table:
  Similar commands behave similarly for the y, x2, and y2 axes.
 
  Syntax:
-       set zeroaxis {<linetype>}
-       set xzeroaxis {<linetype>}
-       set yzeroaxis {<linetype>}
-       set x2zeroaxis {<linetype>}
-       set y2zeroaxis {<linetype>}
-       set nozeroaxis
-       set noxzeroaxis
-       etc.
-       show zeroaxis
-       show xzeroaxis
-       etc.
+       set {x|x2|y|y2|}zeroaxis { {linestyle | ls <line_style>}
+                                  | { linetype | lt <line_type>}
+                                    { linewidth | lw <line_width>}}
+       set no{x|x2|y|y2|}zeroaxis
+       show {x|y|}zeroaxis
 
- By default, these options are off.  The selected zero axis is drawn with a
- line of type <linetype> from the default linetype list provided by the
- terminal; user-defined linetypes (via the `set linestyle` command) are not
- accessible for these axes.  If <linetype> is not specified, any zero axes
- selected will be drawn using the axis linetype (linetype 0).
+
+ By default, these options are off.  The selected zero axis is drawn
+ with a line of type <line_type> and width <line_width> (if supported
+ by the terminal driver currently in use), or a user-defined style
+ <line_style>.
+
+ If no linetype is specified, any zero axes selected will be drawn
+ using the axis linetype (linetype 0).
 
  `set zeroaxis l` is equivalent to `set xzeroaxis l; set yzeroaxis l`. `set
  nozeroaxis` is equivalent to `set noxzeroaxis; set noyzeroaxis`.

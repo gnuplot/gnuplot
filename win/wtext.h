@@ -1,35 +1,38 @@
 /*
- * $Id: wtext.h,v 1.3 1996/09/15 13:08:46 drd Exp $
+ * $Id: wtext.h,v 1.5 1998/04/14 00:18:29 drd Exp $
  */
 
 /* GNUPLOT - win/wtext.h */
-/*
- * Copyright (C) 1992   Russell Lang
+
+/*[
+ * Copyright 1992 - 1993, 1998   Russell Lang
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Russell Lang
- * 
- * Send your comments or suggestions to 
- *  info-gnuplot@dartmouth.edu.
- * This is a mailing list; to join it send a note to 
- *  majordomo@dartmouth.edu.  
- * Send bug reports to
- *  bug-gnuplot@dartmouth.edu.
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 /* redefine functions that can talk to tty devices, to use 
  * implementation in winmain.c/wgnuplot.dll */
