@@ -7,6 +7,8 @@
 	* src/gplt_x11.c (PaletteMake): (Daniel Sebald <daniel.sebald@ieee.org>)
 	Fix another tiny memory leak.
 
+	* src/plot3d.c (get_3ddata): Add missing #ifdef EAM_DATASTRINGS.
+
 2004-10-05  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.cyg config/config.mgw config/config.os2: Added #defines
