@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.6 1999/10/17 19:17:01 lhecking Exp $
+# $Id: surface1.dem,v 1.7 1999/11/08 19:19:15 lhecking Exp $
 #
 set samples 21
 set isosample 11
@@ -74,8 +74,10 @@ replot
 pause -1 "Hit return to continue (13)"
 set title "Sinc function"
 set zrange [-1:1]
-set label 1 "This is equal to 1" at -5,-2,0.75 right
-set arrow 1 from -5,-2.1,0.75 to 0,0,1
+#set label 1 "This is equal to 1" at -5,-2,0.75 right
+#set arrow 1 from -5,-2.1,0.75 to 0,0,1
+set label 1 "This is equal to 1" at 0,3.2,1 left
+set arrow 1 from 0,3,1 to 0,0,1
 sinc(u,v) = sin(sqrt(u**2+v**2)) / sqrt(u**2+v**2)
 splot [-5:5.01] [-5:5.01] sinc(u,v)
 pause -1 "Hit return to continue (14)"
@@ -86,14 +88,82 @@ set label 1 "This is equal to 1" at -5,-2,1.5 centre
 set arrow 1 from -5,-2.1,1.4 to 0,0,1
 splot [-12:12.01] [-12:12.01] sinc(u,v)
 pause -1 "Hit return to continue (15)"
+set title "\"fence plot\" using separate parametric surfaces"
+# A method suggested by Hans-Bernhard Broeker
+# <broeker@physik.rwth-aachen.de>: display a separate parametric
+# surface for each fence.
+set zrange [-1:1]
+set nolabel
 set noarrow
+set xrange [-5:5]; set yrange [-5:5]
+set arrow from 5,-5,-1.2 to 5,5,-1.2 lt -1
+set label 1 "increasing v" at 6,0,-1
+set arrow from 5,6,-1 to 5,5,-1 lt -1
+set label 2 "u=0" at 5,6.5,-1
+set arrow from 5,6,sinc(5,5) to 5,5,sinc(5,5) lt -1
+set label 3 "u=1" at 5,6.5,sinc(5,5)
+set parametric
+set hidden3d
+set isosamples 2,33
+xx=-5; dx=(4.99-(-4.99))/9
+x0=xx; xx=xx+dx
+x1=xx; xx=xx+dx
+x2=xx; xx=xx+dx
+x3=xx; xx=xx+dx
+x4=xx; xx=xx+dx
+x5=xx; xx=xx+dx
+x6=xx; xx=xx+dx
+x7=xx; xx=xx+dx
+x8=xx; xx=xx+dx
+x9=xx; xx=xx+dx
+splot [u=0:1][v=-4.99:4.99] \
+	x0, v, (u<0.5) ? -1 : sinc(x0,v) notitle, \
+	x1, v, (u<0.5) ? -1 : sinc(x1,v) notitle, \
+	x2, v, (u<0.5) ? -1 : sinc(x2,v) notitle, \
+	x3, v, (u<0.5) ? -1 : sinc(x3,v) notitle, \
+	x4, v, (u<0.5) ? -1 : sinc(x4,v) notitle, \
+	x5, v, (u<0.5) ? -1 : sinc(x5,v) notitle, \
+	x6, v, (u<0.5) ? -1 : sinc(x6,v) notitle, \
+	x7, v, (u<0.5) ? -1 : sinc(x7,v) notitle, \
+	x8, v, (u<0.5) ? -1 : sinc(x8,v) notitle, \
+	x9, v, (u<0.5) ? -1 : sinc(x9,v) notitle
+pause -1 "Hit return to continue (16)"
+set title "\"fence plot\" using single parametric surface with undefined points"
+# Another method suggested by Hans-Bernhard Broeker
+# <broeker@physik.rwth-aachen.de>: Use parametric variable u to control
+# x, y, and z.  u=3*fencenumber+remainder, where the remainder selects
+# one of three types of points:
+# 	  remainder=0: x=xmin+fencenumber*dx, y=v, z=zbase
+# 	  remainder=1: x=xmin+fencenumber*dx, y=v, z=f(x,y)
+# 	  remainder=2: x=xmin+fencenumber*dx, y=v, z=1/0 (undefined)
+set parametric
+set nolabel
+set noarrow
+xmin=-4.99; xmax=5; n=10; dx=(xmax-xmin)/(n-1.)
+set isosamples 3*n,33
+zbase=-1
+set arrow from 5,-5,-1.2 to 5,5,-1.2 lt -1
+set label 1 "increasing v" at 6,0,-1
+set arrow from -5,-5,-1.2 to 5,-5,-1.2 lt -1
+set label 2 "increasing u" at 0,-5,-1.5
+set arrow from 5,6,-1 to 5,5,-1 lt -1
+set label 3 "floor(u)%3=0" at 5,6.5,-1
+set arrow from 5,6,sinc(5,5) to 5,5,sinc(5,5) lt -1
+set label 4 "floor(u)%3=1" at 5,6.5,sinc(5,5)
+splot [u=.5:3*n-.5][v=-4.99:4.99] \
+	 xmin+floor(u/3)*dx, v, ((floor(u)%3)==0) ? zbase : \
+			 (((floor(u)%3)==1) ? sinc(xmin+u/3.*dx,v) : 1/0) notitle
+pause -1 "Hit return to continue (17)"
+unset hidden3d; unset parametric; set isosamples 20,20
+set xrange [-1:1]; set yrange [-1:1]
 set ztics autofreq
+set noarrow
 set nolabel
 set log
 set auto
 set title "This has logarithmic scale"
 splot [x=1:15] [y=1:15] x**2+y**2
-pause -1 "Hit return to continue (16)"
+pause -1 "Hit return to continue (18)"
 set nolog
 set xrange [0:15]
 set yrange [0:15]
@@ -104,30 +174,45 @@ set data style lines
 set title "Data grid plotting"
 set parametric
 splot "glass.dat"
-pause -1 "Hit return to continue (17)"
+pause -1 "Hit return to continue (19)"
 splot "glass.dat" using 3:2:1
-pause -1 "Hit return to continue (18)"
+pause -1 "Hit return to continue (20)"
 set zrange [-1.2:1.2]
 set ticslevel 0.5
 set noparametric
+set xlabel "line index within group"
+set ylabel "group index"
 splot "glass.dat" using 1, "glass.dat" using 2, "glass.dat" using 3
-pause -1 "Hit return to continue (19)"
+pause -1 "Hit return to continue (21)"
+set title "splot of part of a data file"
+set xlabel "X axis" -3,-2
+set ylabel "Y axis" 3,-2
+set hidden3d
+splot 'glass.dat' every 2::0::12 with lines
+pause -1 "Hit return to continue (22)"
+set title "splot with \"set pm3d\" (implemented with some terminals)"
+set pm3d
+set hidden3d
+splot 'glass.dat' every 2::0::12 with lines
+pause -1 "Hit return to continue (23)"
+unset hidden3d
+unset pm3d
 set param
-set title "Test of spherical transform"
-set mapp sphe
+set title "Test of spherical coordinates"
+set mapping spherical
 splot "glass.dat"
-pause -1 "Hit return to continue (20)"
+pause -1 "Hit return to continue (24)"
 
 # mandelbrot demo
+set title "Mandelbrot function"
 set noparametric
-set mapp cart
+set mapping cart
 set view 60,30,1,1
 set auto
-set title "" 0,0
 set isosamples 60
 set hidden3d
 compl(a,b)=a*{1,0}+b*{0,1}
 mand(z,a,n) = n<=0 || abs(z)>100 ? 1:mand(z*z+a,a,n-1)+1
 splot [-2:1][-1.5:1.5] mand({0,0},compl(x,y),30)     
-pause -1 "Hit return to continue (21)"
+pause -1 "Hit return to continue (25)"
 reset
