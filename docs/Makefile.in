@@ -64,6 +64,9 @@ allterm.h :
 	@echo Expected to find allterm.h
 	cat $(srcdir)/../term/*.trm > allterm.h
 
+# for debugging
+alldoc: checkdoc dvi gnuplot.ps hlp html info ipf ms nroff rnh rtf
+
 ### [tn]roff documentation
 troff: gnuplot.ms titlepag.ms
 	@if [ "$(srcdir)" = "$(top_builddir)" ] ; then \
@@ -163,6 +166,15 @@ gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 
 doc2info: doc2info.o termdoc.o xref.o
 	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
+
+# this is how to make OS/2 ipfc documentation
+ipf: gnuplot.ipf
+
+gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
+	./doc2ipf $(srcdir)/gnuplot.doc gnulpot.ipf
+
+doc2ipf: doc2ipf.o termdoc.o xref.o
+	$(LINK) doc2ipf.o termdoc.o xref.o $(LIBS)
 
 # this is how to make rtf documentation
 rtf: gnuplot.rtf
