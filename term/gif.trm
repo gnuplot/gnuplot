@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.12.2.5 2000/10/20 19:03:57 lhecking Exp $
+ * $Id: gif.trm,v 1.12.2.6 2002/12/11 19:24:26 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -251,7 +251,7 @@ GIF_options()
 	    if (sscanf(string, "x%lx", &color) != 1) {
 		int_error("invalid color spec, must be xRRGGBB",c_token);
 	    } else if (gif_state.n_colors == GIF_MAX_COLORS) {
-		int_warn("too many colors, ingoring",c_token);
+		int_warn("too many colors, ignoring", c_token);
 		++c_token;
 	    } else {
 		gif_state.rgb_table[gif_state.n_colors++] = color;

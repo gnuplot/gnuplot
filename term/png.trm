@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.11.2.10 1999/12/02 20:40:21 lhecking Exp $
+ * $Id: png.trm,v 1.11.2.11 2000/10/20 19:03:57 lhecking Exp $
  *
  */
 
@@ -158,7 +158,7 @@ PNG_options()
                 int_error("expecting: {small, medium, large},[no]transparent, or {monochrome, gray, color, [xRRGGBB] }", c_token);
 
             if (n_colors >= WEB_N_COLORS) {
-                int_warn("too many colors, ingoring", c_token);
+                int_warn("too many colors, ignoring", c_token);
 		/* Magic number abuse guards against
 		 * "> WEB_N_COLORS warning" scroll fests. */
 		if (!END_OF_COMMAND) {
