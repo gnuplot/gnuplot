@@ -1,3 +1,8 @@
+2005-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (eval_plots): Add a missing #ifdef EAM_DATASTRINGS
+	protection block.
+
 2005-03-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/plot2d.c (eval_plots) src/plot3d.c (eval_3dplots): Don't increment

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.97 2005/03/25 05:01:09 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.98 2005/03/25 07:30:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1672,12 +1672,14 @@ eval_plots()
 		    this_plot->fill_properties.fillstyle = FS_SOLID;
 	    }
 
+#ifdef EAM_DATASTRINGS
 	    /* If we got this far without initializing the label list, do it now */
 	    if (this_plot->plot_style == LABELPOINTS && this_plot->labels == NULL) {
 		this_plot->labels = new_text_label(-1);
 		this_plot->labels->pos = JUST_CENTRE;
 		this_plot->labels->layer = 1;
 	    }
+#endif
 
 	    this_plot->x_axis = x_axis;
 	    this_plot->y_axis = y_axis;
