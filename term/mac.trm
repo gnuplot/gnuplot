@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: mac.trm,v 1.2 1999/06/09 12:04:50 lhecking Exp $
  *
  */
 
@@ -146,7 +146,8 @@ START_HELP(mac)
 " Several options may be set in the 'macintosh' driver.",
 "",
 " Syntax:",
-"      set terminal macintosh {singlewin | multiwin} {vertical | novertical} {size <width>, <height> | default}",
+"      set terminal macintosh {singlewin | multiwin} {vertical | novertical}",
+"                             {size <width>, <height> | default}",
 "",
 " 'singlewin' limits the output to a single window and is useful for animations.",
 " 'multiwin' allows multiple windows.",
