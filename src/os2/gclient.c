@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.30 2004/11/29 11:56:45 mikulik Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.34 2005/01/04 12:56:58 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -86,6 +86,7 @@ static char RCSid[]="$Id: gclient.c,v 1.30 2004/11/29 11:56:45 mikulik Exp $";
 #define INCL_DOSMISC
 #define INCL_DOSQUEUES
 #define INCL_WINSWITCHLIST
+#define INCL_GPIPRIMITIVES
 #include <os2.h>
 #include <string.h>
 #include <stdio.h>
@@ -2471,6 +2472,7 @@ ReadGnu(void* arg)
 		    ptl.x = (LONG) (x + multLineHor * sw + multLineVert * (lVOffset / 4));
 		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));
 		    
+		    GpiSetBackMix(hps, BM_LEAVEALONE);
                     if (bEnhanced)
                         CharStringAt(hps, ptl.x, ptl.y, strlen(str) , str);
                     else
@@ -2594,11 +2596,57 @@ ReadGnu(void* arg)
 		GpiMove(hpsScreen, &pt);
 		pt.x += w;
 		pt.y += h;
-		if (style == 0)
-		    GpiSetColor(hps, CLR_BACKGROUND);
-		else {
-		    /* density and pattern styles are not implemented, */
-		    /* always use the solid current colour */
+
+		switch(style & 0xf) {
+
+		    case FS_SOLID:
+		    {
+			/* style == 1 --> fill with intensity according to filldensity */
+			static const ULONG patternlist[] = {
+			    PATSYM_NOSHADE, PATSYM_DENSE8, PATSYM_DENSE7,
+			    PATSYM_DENSE6, PATSYM_DENSE5, PATSYM_DENSE4,
+			    PATSYM_DENSE3, PATSYM_DENSE2, PATSYM_DENSE1,
+			    PATSYM_SOLID
+			};
+			unsigned pattern;
+
+			pattern = (unsigned) trunc(9*((style >> 4) / 100.0) + 0.5);
+			if (pattern > 10)
+			    pattern = 9; /* only 10 patterns in list */
+			GpiSetMix(hps, FM_OVERPAINT);
+			GpiSetBackMix(hps, BM_OVERPAINT);
+			GpiSetPattern(hps, patternlist[pattern]);
+			break;
+		    }
+
+		    case FS_PATTERN:
+		    {
+			/* style == 2 --> fill with pattern according to fillpattern */
+			/* the upper 3 nibbles of 'style' contain pattern number */
+			static const ULONG patternlist[] = {
+			    PATSYM_NOSHADE, PATSYM_DIAGHATCH,
+			    PATSYM_HATCH, PATSYM_SOLID,
+			    PATSYM_DIAG4, PATSYM_DIAG2,
+			    PATSYM_DIAG3, PATSYM_DIAG1
+			};
+			unsigned pattern;
+
+			pattern = (style >> 4) % 8;
+			GpiSetMix(hps, FM_OVERPAINT);
+			GpiSetBackMix(hps, BM_OVERPAINT);
+			GpiSetPattern(hps, patternlist[pattern]);
+			break;
+		    }
+
+		    case FS_EMPTY:
+		    default:
+		    {
+			/* style == 0 or unknown --> fill with background color */
+			GpiSetMix(hps, FM_OVERPAINT);
+			GpiSetBackMix(hps, BM_OVERPAINT);
+			//GpiSetColor(hps, CLR_BACKGROUND);  // fixes 'with boxes' white on white 
+			GpiSetPattern(hps, PATSYM_SOLID);
+		    }
 		}
 		GpiBox(hps, DRO_FILL, &pt, 0,0);
 		break;
@@ -2850,8 +2898,8 @@ ReadGnu(void* arg)
 		POINTL p;
 
 		BufRead(hRead, &points, sizeof(points), &cbR);
-		/* GpiSetPattern(hps,PATSYM_SOLID); */
-		/* GpiSetBackMix(hps,BM_OVERPAINT); */
+		GpiSetPattern(hps, PATSYM_SOLID);
+		GpiSetBackMix(hps, BM_OVERPAINT);
 		if (pm3d_color>=0)
 		    GpiSetColor(hps, pm3d_color);
 		    /* @@@ FIXME -- UNIMPLEMENTED */
