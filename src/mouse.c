@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.21 2001/08/22 14:15:34 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.22 2001/09/02 16:30:40 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -2107,7 +2107,7 @@ static void
 put_label(char *label, double x, double y)
 {
     char cmd[0xff];
-    sprintf(cmd, "set label \"%s\" at %f,%f %s", label, x, y, mouse_setting.labelopts);
+    sprintf(cmd, "set label \"%s\" at %g,%g %s", label, x, y, mouse_setting.labelopts);
     do_string_replot(cmd);
 }
 
