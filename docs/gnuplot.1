@@ -100,13 +100,19 @@ and background. See the X(1) man page for a description of
 the options.
 In addition to the X Toolkit options:
 .PP
-\fB\-mono\fP forces monochrome rendering on color displays.
+\fB\-clear\fP requests that the window be cleared momentarily before a
+new plot is displayed.
 .PP
 \fB\-gray\fP requests grayscale rendering on grayscale or color displays.
 (Grayscale displays receive monochrome rendering by default.)
 .PP
-\fB\-clear\fP requests that the window be cleared momentarily before a
-new plot is displayed.
+\fB\-mono\fP forces monochrome rendering on color displays.
+.PP
+\fB\-persist\fP lets plot windows survive after main gnuplot program exits.
+.PP
+\fB-raise\fP raises the plot window after each plot.
+.PP
+\fB-noraise\fp does not raise the plot window after each plot.
 .PP
 \fB\-tvtwm\fP requests that geometry specifications
 for position of the window be made relative to the currently displayed
