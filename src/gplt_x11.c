@@ -1,6 +1,8 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.61 2003/06/21 05:32:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.62 2003/06/25 18:01:25 sfeam Exp $"); }
 #endif
+
+#define X11_POLYLINE
 
 /* GNUPLOT - gplt_x11.c */
 
@@ -100,6 +102,10 @@ static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.61 2003/06/21 05:32:45 
 /* X11 support for Petr Mikulik's pm3d 
  * by Johannes Zellner <johannes@zellner.org>
  * (November 1999 - January 2000, Oct. 2000)
+ */
+
+/* Polyline support May 2003 
+ * Ethan Merritt <merritt@u.washington.edu>
  */
 
 #include "syscfg.h"
@@ -545,6 +551,11 @@ static Pixmap stipple_pattern[stipple_pattern_num];
 static int stipple_initialized = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
 
+#ifdef X11_POLYLINE
+static XPoint *polyline = NULL;
+static int polyline_space = 0;
+static int polyline_size = 0;
+#endif
 
 /*
  * Main program
@@ -593,6 +604,12 @@ main(int argc, char *argv[])
 	signal(SIGPIPE, pipe_died_handler);
     }
 # endif
+
+#ifdef X11_POLYLINE
+    polyline_space = 100;
+    polyline = calloc(polyline_space, sizeof(XPoint));
+    if (!polyline) fprintf(stderr,"Panic: cannot allocate polyline\n");
+#endif
 
     mainloop();
 
@@ -1646,15 +1663,41 @@ exec_cmd(plot_struct *plot, char *command)
     buffer = command;
     FPRINTF((stderr, "(display) buffer = |%s|\n", buffer));
 
+#ifdef X11_POLYLINE
+    /*   X11_vector(x,y) - draw vector  */
+    if (*buffer == 'V') {
+	sscanf(buffer, "V%4d%4d", &x, &y);
+	if (polyline_size == 0) {
+	    polyline[polyline_size].x = X(cx);
+	    polyline[polyline_size].y = Y(cy);
+	}
+	if (++polyline_size >= polyline_space) {
+	    polyline_space += 100;
+	    polyline = realloc(polyline, polyline_space * sizeof(XPoint));
+	    if (!polyline) fprintf(stderr,"Panic: cannot realloc polyline\n");
+	}
+	polyline[polyline_size].x = X(x);
+	polyline[polyline_size].y = Y(y);
+	cx = x;
+	cy = y;
+	FPRINTF((stderr, "(display) loading polyline element %d\n",polyline_size));
+	return;
+    } else if (polyline_size > 0) {
+	FPRINTF((stderr, "(display) dumping polyline size %d\n",polyline_size));
+	XDrawLines(dpy, plot->pixmap, *current_gc, polyline, polyline_size+1, CoordModeOrigin);
+	polyline_size = 0;
+    }
+#else
     /*   X11_vector(x,y) - draw vector  */
     if (*buffer == 'V') {
 	sscanf(buffer, "V%4d%4d", &x, &y);
 	XDrawLine(dpy, plot->pixmap, *current_gc, X(cx), Y(cy), X(x), Y(y));
 	cx = x;
 	cy = y;
-    }
+    } else
+#endif
     /*   X11_move(x,y) - move  */
-    else if (*buffer == 'M')
+    if (*buffer == 'M')
 	sscanf(buffer, "M%4d%4d", &cx, &cy);
 
     /* change default font (QD) encoding (QE) or current font (QF)  */
