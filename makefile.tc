@@ -260,6 +260,8 @@ clean:
 realclean: clean
 	del gnuplot.exe
 	del gnuplot.gih
+	del demo\soundfit.par
+	del demo\fit.log
 	del demo\bf_test.exe
 	del demo\bf_test.map
 	del demo\binary1

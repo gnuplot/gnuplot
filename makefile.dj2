@@ -207,6 +207,8 @@ realclean: clean
 	del .\demo\binary1
 	del .\demo\binary2
 	del .\demo\binary3
+	del .\demo\fit.log
+	del .\demo\soundfit.par
 #####
 ##     END OF GNUPLOT 3.6 MAKEFILE FOR DJGPP V2
 #####
