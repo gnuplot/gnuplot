@@ -1,3 +1,8 @@
+2005-03-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c (do_3dplot): Fix 'set pm3d at X; splot...with pm3d at Y'
+	for data files with multiple surfaces.
+
 2005-03-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/datafile.c (df_readline): Allow for embedded whitespace in the

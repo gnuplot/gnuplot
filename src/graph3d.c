@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.114 2005/02/12 05:51:44 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.115 2005/03/17 03:37:42 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -891,6 +891,9 @@ do_3dplot(
 #ifdef PM3D
 	    /* just an abbreviation */
 	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
+	    if (can_pm3d && surface>0 && plots->pm3d_where[0])
+    		/* multiple surfaces in one file: use pm3d_where from the 1st surface if explicitly given */
+		strcpy(this_plot->pm3d_where, plots->pm3d_where);
 	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
 		pm3d_draw_one(this_plot);
 	    }
