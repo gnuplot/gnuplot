@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: plot3d.c,v 1.36 1998/06/18 14:55:14 ddenholm Exp $";
+static char *RCSid = "$Id: plot3d.c,v 1.16 1998/12/10 18:30:52 lhecking Exp $";
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -694,6 +694,15 @@ int pcount;
     int i, curve, surface;
     struct iso_curve *icrvs;
     struct coordinate GPHUGE *points;
+    char *table_format = NULL;
+
+    table_format = gp_alloc(strlen(xformat)+strlen(yformat)+strlen(zformat)+3,
+			    "table format");
+    strcpy(table_format, xformat);
+    strcat(table_format, "\t");
+    strcat(table_format, yformat);
+    strcat(table_format, "\t");
+    strcat(table_format, zformat);
 
     for (surface = 0, this_plot = first_3dplot; surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
@@ -707,10 +716,11 @@ int pcount;
 		fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
 			curve, icrvs->p_count);
 		for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
-		    fprintf(gpoutfile, "%g %g %g %c\n",
+		    fprintf(gpoutfile, table_format,
 			    points[i].x,
 			    points[i].y,
-			    points[i].z,
+			    points[i].z);
+		    fprintf(gpoutfile, "\t%c\n",
 			    points[i].type == INRANGE ? 'i'
 			    : points[i].type == OUTRANGE ? 'o'
 			    : 'u');
@@ -731,8 +741,10 @@ int pcount;
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
 		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label);
-		for (; --count >= 0; ++p)
-		    fprintf(gpoutfile, "%g %g %g\n", p->x, p->y, p->z);
+		for (; --count >= 0; ++p) {
+		    fprintf(gpoutfile, table_format, p->x, p->y, p->z);
+		    putc('\n', gpoutfile);
+		}
 		/* blank line between segments of same contour */
 		putc('\n', gpoutfile);
 		c = c->next;
@@ -740,6 +752,8 @@ int pcount;
 	}
     }
     fflush(gpoutfile);
+
+    free(table_format);
 }
 
 
