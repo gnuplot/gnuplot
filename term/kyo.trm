@@ -200,11 +200,13 @@ TERM_TABLE_END(kyo_driver)
 #ifdef TERM_HELP
 START_HELP(kyo)
 "1 kyo",
+"?commands set terminal kyo",
 "?set terminal kyo",
 "?set term kyo",
 "?terminal kyo",
 "?term kyo",
 "?kyo",
+"?commands set terminal prescribe",
 "?set terminal prescribe",
 "?set term prescribe",
 "?terminal prescribe",

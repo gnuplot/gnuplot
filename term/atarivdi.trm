@@ -433,6 +433,7 @@ TERM_TABLE_END(vdi_driver)
 #ifdef TERM_HELP
 START_HELP(vdi)
 "1 atari ST (via VDI)",
+"?commands set terminal vdi",
 "?set terminal vdi",
 "?set term vdi",
 "?terminal vdi",

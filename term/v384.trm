@@ -190,6 +190,7 @@ TERM_TABLE_END(vx384_driver)
 #ifdef TERM_HELP
 START_HELP(vx384)
 "1 vx384",
+"?commands set terminal vx384",
 "?set terminal vx384",
 "?set term vx384",
 "?terminal vx384",

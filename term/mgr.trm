@@ -227,6 +227,7 @@ TERM_TABLE_END(mgr_driver)
 #ifdef TERM_HELP
 START_HELP(mgr)
 "1 mgr",
+"?commands set terminal mgr",
 "?set terminal mgr",
 "?set term mgr",
 "?terminal mgr",

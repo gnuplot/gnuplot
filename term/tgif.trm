@@ -1366,6 +1366,7 @@ TERM_TABLE_END(tgif_driver)
 #ifdef TERM_HELP
 START_HELP(tgif)
 "1 tgif",
+"?commands set terminal tgif",
 "?set terminal tgif",
 "?set term tgif",
 "?terminal tgif",

@@ -348,6 +348,7 @@ TERM_TABLE_END(sun_driver)
 #ifdef TERM_HELP
 START_HELP(sun)
 "1 sun",
+"?commands set terminal sun",
 "?set terminal sun",
 "?set term sun",
 "?terminal sun",

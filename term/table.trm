@@ -45,6 +45,7 @@
 #ifdef TERM_HELP
 START_HELP(table)
 "1 table",
+"?commands set terminal table",
 "?set terminal table",
 "?set term table",
 "?terminal table",

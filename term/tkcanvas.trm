@@ -173,6 +173,7 @@ TERM_TABLE_END(tkcanvas)
 #ifdef TERM_HELP
 START_HELP(tkcanvas)
 "1 tkcanvas",
+"?commands set terminal tkcanvas",
 "?set terminal tkcanvas",
 "?set term tkcanvas",
 "?terminal tkcanvas",

@@ -478,14 +478,14 @@ TERM_PUBLIC void AI_resume()
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(aifm_driver)
-
      	"aifm", "Adobe Illustrator 3.0 Format",
 	   AI_XMAX, AI_YMAX, AI_VCHAR, AI_HCHAR, 
 	   AI_VTIC, AI_HTIC, AI_options, AI_init, AI_reset, 
 	   AI_text, null_scale, AI_graphics, AI_move, AI_vector, 
 	   AI_linetype, AI_put_text, AI_text_angle, 
 	   AI_justify_text, do_point, do_arrow, AI_set_font,
-	   NULL, 0, AI_suspend, AI_resume}
+	   NULL, 0, AI_suspend, AI_resume
+TERM_TABLE_END(aifm_driver)
 
 #undef LAST_TERM
 #define LAST_TERM aifm_driver
@@ -496,6 +496,7 @@ TERM_TABLE_START(aifm_driver)
 #ifdef TERM_HELP
 START_HELP(aifm)
 "1 aifm",
+"?commands set terminal aifm",
 "?set terminal aifm",
 "?set term aifm",
 "?terminal aifm",

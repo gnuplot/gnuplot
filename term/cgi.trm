@@ -295,11 +295,13 @@ TERM_TABLE_END(hcgi_driver)
 #ifdef TERM_HELP
 START_HELP(cgi)
 "1 cgi",
+"?commands set terminal cgi",
 "?set terminal cgi",
 "?set term cgi",
 "?terminal cgi",
 "?term cgi",
 "?cgi",
+"?commands set terminal hcgi",
 "?set terminal hcgi",
 "?set term hcgi",
 "?terminal hcgi",

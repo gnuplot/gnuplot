@@ -544,6 +544,7 @@ TERM_TABLE_END(gif_driver)
 #ifdef TERM_HELP
 START_HELP(gif)
 "1 gif",
+"?commands set terminal gif",
 "?set terminal gif",
 "?set term gif",
 "?terminal gif",

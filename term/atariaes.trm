@@ -727,6 +727,7 @@ TERM_TABLE_END(atari_driver)
 #ifdef TERM_HELP
 START_HELP(atari)
 "1 atari ST (via AES)",
+"?commands set terminal atari",
 "?set terminal atari",
 "?set term atari",
 "?terminal atari",

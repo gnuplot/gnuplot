@@ -492,6 +492,7 @@ TERM_TABLE_END(mf_driver)
 #ifdef TERM_HELP
 START_HELP(mf)
 "1 mf",
+"?commands set terminal mf",
 "?set terminal mf",
 "?set term mf",
 "?terminal mf",
@@ -518,6 +519,7 @@ START_HELP(mf)
 "",
 " The `mf` terminal has no options.",
 "2 METAFONT Instructions",
+"?commands set terminal mf detailed",
 "?set terminal mf detailed",
 "?set term mf detailed",
 "?mf detailed",

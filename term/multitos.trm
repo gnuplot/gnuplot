@@ -388,6 +388,7 @@ TERM_TABLE_END(mtos_driver)
 #ifdef TERM_HELP
 START_HELP(mtos)
 "1 mtos",
+"?commands set terminal mtos",
 "?set terminal mtos",
 "?set term mtos",
 "?terminal mtos",

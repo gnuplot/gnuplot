@@ -353,6 +353,7 @@ TERM_TABLE_END(dxf_driver)
 #ifdef TERM_HELP
 START_HELP(dxf)
 "1 dxf",
+"?commands set terminal dxf",
 "?set terminal dxf",
 "?set term dxf",
 "?terminal dxf",

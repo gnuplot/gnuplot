@@ -89,15 +89,15 @@ TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number)
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 
-#include "object.h"		/* modified from the XFig distribution */
+#include "object.h"             /* modified from the XFig distribution */
 #define FIG_DEFAULT DEFAULT
 #define FIG_ROMAN_FONT (0)	/* actually, the default font */
-
+ 
 #ifndef FIG_RES
 /* This is now 1200 per inch */
 #define FIG_RES         (1200)
 #endif
-
+ 
 #define FIG_COORD_SYS   2
 #define FIG_ORIENT (FIG_portrait?"Portrait":"Landscape")
 /* Could be "Portrait" */
@@ -105,24 +105,22 @@ TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number)
 /* Could be "Flush Left" */
 #define FIG_UNIT (FIG_inches?"Inches":"Metric")
 /* Could be "Inches" */
-
+ 
 #define FIG_MAGIC       "#FIG 3.1"
 #define FIG_HTIC        (5*FIG_RES/80)
 #define FIG_VTIC        (5*FIG_RES/80)
 #define FIG_FONT_S      (10)	/* size in points */
-#define FIG_MAX_POINTS  99999L	/* almost infinite ;-) */
+#define FIG_MAX_POINTS  99999L /* almost infinite ;-) */
 
-#define FIG_to_pixel_v(s) ((s)*FIG_RES/72*3/4)	/* height of font in pixels */
+#define FIG_to_pixel_v(s) ((s)*FIG_RES/72*3/4) /* height of font in pixels */
 /* This is fudged to enlarge the drawing area, but gives fairly good results */
-#define FIG_to_pixel_h(s) (FIG_to_pixel_v(s)*6/10)	/* this is a guess at the width */
+#define FIG_to_pixel_h(s) (FIG_to_pixel_v(s)*6/10) /* this is a guess at the width */
 
-#define FIG_VCHAR       FIG_to_pixel_v(FIG_FONT_S)	/* just for default, */
-#define FIG_HCHAR       FIG_to_pixel_h(FIG_FONT_S)	/* not really used   */
+#define FIG_VCHAR       FIG_to_pixel_v(FIG_FONT_S) /* just for default, */
+#define FIG_HCHAR       FIG_to_pixel_h(FIG_FONT_S) /* not really used   */
 
-enum FIG_poly_stat {
-    FIG_poly_new, FIG_poly_part
-};
-
+enum FIG_poly_stat {FIG_poly_new, FIG_poly_part};
+ 
 static int FIG_posx;
 static int FIG_posy;
 static long FIG_poly_vec_cnt;
@@ -135,14 +133,14 @@ static double FIG_current_linewidth = 1.;
 
 /* Maximum number of points per POLYLINE. 
    Default 1000 (hardcoded in help section as well) */
-static int FIG_poly_vec_max = 999;	/* JFS */
+static int FIG_poly_vec_max = 999; /* JFS */
 
 static enum FIG_poly_stat FIG_polyvec_stat;
 
 /* 5 inches wide by 3 inches high */
 #define FIG_XMAX (5 * FIG_RES)
 #define FIG_YMAX (3 * FIG_RES)
-
+ 
 #define FIG_XOFF (FIG_RES/4)
 #define FIG_YOFF (FIG_RES/4)
 
@@ -150,25 +148,25 @@ static enum FIG_poly_stat FIG_polyvec_stat;
 #define BFIG_HTIC       (7*FIG_RES/80)
 #define BFIG_VTIC       (7*FIG_RES/80)
 #define BFIG_FONT_S     (16)	/* size in points */
-#define BFIG_VCHAR      FIG_to_pixel_v(BFIG_FONT_S)	/* height in pixels of font */
-#define BFIG_HCHAR      FIG_to_pixel_h(BFIG_FONT_S)	/* this is a guess at the width */
+#define BFIG_VCHAR      FIG_to_pixel_v(BFIG_FONT_S) /* height in pixels of font */
+#define BFIG_HCHAR      FIG_to_pixel_h(BFIG_FONT_S) /* this is a guess at the width */
 
-static F_point *FIG_points = NULL;	/* Array for the collection of points for 
-					   POLYLINE, allocated on demand. */
-static F_line FIG_line;
-
+static  F_point *FIG_points = NULL; /* Array for the collection of points for 
+				       POLYLINE, allocated on demand. */
+static	F_line	FIG_line;
+ 
 /* 8 inches wide by 5 inches high */
 #define BFIG_XMAX (8 * FIG_RES)
 #define BFIG_YMAX (5 * FIG_RES)
-
+ 
 #define BFIG_XOFF (FIG_RES/2)
 #define BFIG_YOFF (FIG_RES/2)
+ 
 
-
-static int FIG_type;		/* negative types use real lines */
-static float FIG_spacing;	/* length of dash or dot spacing */
-static int FIG_justify;		/* Fig justification T_*_JUSTIFIED */
-static float FIG_angle;		/* Fig text angle 0=horiz, Pi/2=vert */
+static int FIG_type;            /* negative types use real lines */
+static float FIG_spacing;       /* length of dash or dot spacing */
+static int FIG_justify;         /* Fig justification T_*_JUSTIFIED */
+static float FIG_angle;         /* Fig text angle 0=horiz, Pi/2=vert */
 static int FIG_use_color = FALSE;	/* do we use color or not? */
 static int FIG_is_big = FALSE;	/* big plot ? */
 static int FIG_color = DEFAULT;	/* which color to use */
@@ -176,232 +174,246 @@ static int FIG_xoff = FIG_XOFF;
 static int FIG_yoff = FIG_YOFF;
 static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
-static int FIG_inches = FALSE;
+static int FIG_inches = FALSE; 
 
 static void FIG_poly_clean __PROTO((enum FIG_poly_stat stat));
 
 
-#define FIG_POINT_TYPES POINT_TYPES	/* we use the same points */
+#define FIG_POINT_TYPES POINT_TYPES /* we use the same points */
 
-
-static void FIG_poly_clean(stat)
+ 
+static void
+  FIG_poly_clean(stat)
 enum FIG_poly_stat stat;
 {
-    int i, j;
-    if (stat == FIG_poly_part) {
+  int i,j;
+  if(stat == FIG_poly_part) {
 	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
-	   O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
-		FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
-	     FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
-		FIG_line.join_style, FIG_line.cap_style, FIG_line.radius,
-		0, 0, FIG_poly_vec_cnt);
+	 O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
+	 FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
+	 FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
+	 FIG_line.join_style, FIG_line.cap_style, FIG_line.radius,
+	 0, 0, FIG_poly_vec_cnt);
 
 	j = 0;
-	for (i = 0; i < FIG_poly_vec_cnt; i++) {
-	    fprintf(gpoutfile, " %d %d", FIG_points[i].x, FIG_points[i].y);
-	    if (j++ > 4 && i != FIG_poly_vec_cnt - 1) {
-		fprintf(gpoutfile, "\n\t");
-		j = 0;		/* JFS */
-	    }
+	for(i=0;i<FIG_poly_vec_cnt;i++)
+	{
+	  fprintf(gpoutfile," %d %d",FIG_points[i].x,FIG_points[i].y);
+	  if (j++ > 4 && i != FIG_poly_vec_cnt-1) {
+		fprintf(gpoutfile,"\n\t"); j = 0; /* JFS */
+	  }
 	}
-	if (j != 0) {
-	    fprintf(gpoutfile, "\n");
-	}
+	if (j != 0) {fprintf(gpoutfile,"\n");}
 	/* Give the memory back to the system because we are done with this 
 	 * polyline. Make sure FIG_points contains NULL afterwards!
 	 */
 	free(FIG_points);
 	FIG_points = NULL;
-    }
-    FIG_polyvec_stat = FIG_poly_new;
+  }
+  FIG_polyvec_stat = FIG_poly_new;
 }
-
+ 
 TERM_PUBLIC void FIG_options()
 {
-    static char *options_list =	/* sun cc does not concat strings */
-    "expecting monochrome, color, small, big, portrait, landscape,\n\
+   static char *options_list = /* sun cc does not concat strings */
+"expecting monochrome, color, small, big, portrait, landscape,\n\
  \t inches, metric, size <number> <number>,  fontsize <number>,\n\
  \t thickness <numer>, depth <number> or pointsmax <number>";
 
-    int parse_error = FALSE;
-    long temp_max;
-    struct value a;
-    unsigned int tmax;
-    double xsize, ysize;
+   int parse_error=FALSE;
+   long temp_max;
+   struct value a;
+   unsigned int tmax;
+   double xsize, ysize;
 
-    FIG_use_color = FALSE;	/* default */
-    FIG_is_big = FALSE;		/* default */
-    FIG_portrait = FALSE;
-    FIG_font_s = 0;
-    FIG_default_thickness = 1;
-    xsize = ysize = 0.;
+   FIG_use_color = FALSE;	/* default */
+   FIG_is_big = FALSE;	/* default */
+   FIG_portrait = FALSE;
+   FIG_font_s = 0;
+   FIG_default_thickness = 1;
+   xsize = ysize = 0.;
 #if METRIC
-    FIG_inches = FALSE;
+   FIG_inches = FALSE;
 #else
-    FIG_inches = TRUE;
+   FIG_inches = TRUE;
 #endif
-    while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "mo$nochrome")) {
-	    FIG_use_color = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "c$olor")
-		   || almost_equals(c_token, "c$olour")) {
-	    FIG_use_color = TRUE;
-	    c_token++;
-	} else if (almost_equals(c_token, "sm$all")) {
-	    FIG_is_big = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "b$ig")) {
-	    FIG_is_big = TRUE;
-	    c_token++;
-	} else if (almost_equals(c_token, "in$ches")) {		/* KB */
-	    FIG_inches = TRUE;
-	    c_token++;
-	} else if (almost_equals(c_token, "me$tric")) {		/* KB */
-	    FIG_inches = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "por$trait")) {	/* KB */
-	    /* KB: Would have preferred "p$ortrait" but that would */
-	    /*     collide with "p$ointsmax" below. */
-	    FIG_portrait = TRUE;
-	    c_token++;
-	} else if (almost_equals(c_token, "l$andscape")) {	/* KB */
-	    FIG_portrait = FALSE;
-	    c_token++;
-	} else if (almost_equals(c_token, "si$ze")) {	/* KB */
-	    c_token++;
+   while (!END_OF_COMMAND) {
+      if (almost_equals(c_token,"mo$nochrome")) {
+         FIG_use_color=FALSE;
+	 c_token++;
+      } else if (almost_equals(c_token, "c$olor")
+		 || almost_equals(c_token, "c$olour")) {
+         FIG_use_color=TRUE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"sm$all")) {
+	 FIG_is_big=FALSE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"b$ig")) {
+	 FIG_is_big=TRUE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"in$ches")) { /* KB */
+	 FIG_inches=TRUE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"me$tric")) { /* KB */
+	 FIG_inches=FALSE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"por$trait")) { /* KB */
+         /* KB: Would have preferred "p$ortrait" but that would */
+         /*     collide with "p$ointsmax" below. */
+         FIG_portrait = TRUE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"l$andscape")) { /* KB */
+         FIG_portrait = FALSE;
+	 c_token++;
+      }
+      else if (almost_equals(c_token,"si$ze")) { /* KB */
+	 c_token++;
+	 if (END_OF_COMMAND) {
+	    int_error("size: 2 numbers expected",c_token);
+         }  else {
+            xsize = real(const_express(&a));
 	    if (END_OF_COMMAND) {
-		int_error("size: 2 numbers expected", c_token);
-	    } else {
-		xsize = real(const_express(&a));
-		if (END_OF_COMMAND) {
-		    int_error("size: 2 numbers expected", c_token);
-		    xsize = 0.;
-		} else {
-		    ysize = real(const_express(&a));
-		}
-		if (xsize < 2. || ysize < 2. || xsize > 99. || ysize > 99.) {
-		    if (xsize != 0. || ysize != 0.)
-			int_error("size: out of range", c_token);
-		    xsize = ysize = 0.;
-		}
+	       int_error("size: 2 numbers expected",c_token);
+	       xsize = 0.;
+            }  else {
+               ysize = real(const_express(&a));
+            }
+            if ( xsize < 2. || ysize < 2. || xsize > 99. || ysize > 99. ) {
+               if ( xsize != 0. || ysize != 0. )
+                  int_error("size: out of range",c_token);
+               xsize = ysize = 0.;
+            }
+         }
+      }
+      else if (almost_equals(c_token,"f$ontsize")) { /* KB */
+	 c_token++;
+	 if (END_OF_COMMAND) {
+	    int_error("fontsize: number expected",c_token);
+         }  else {
+	    FIG_font_s = (int)real(const_express(&a));
+	    if ( FIG_font_s < 5 || FIG_font_s > 36 ) {
+	       int_error("fontsize out of range",c_token-1);
+	       FIG_font_s = 0;
 	    }
-	} else if (almost_equals(c_token, "f$ontsize")) {	/* KB */
-	    c_token++;
-	    if (END_OF_COMMAND) {
-		int_error("fontsize: number expected", c_token);
-	    } else {
-		FIG_font_s = (int) real(const_express(&a));
-		if (FIG_font_s < 5 || FIG_font_s > 36) {
-		    int_error("fontsize out of range", c_token - 1);
-		    FIG_font_s = 0;
-		}
+         }
+      }
+      else if (almost_equals(c_token,"t$hickness")) { /* KB */
+	 c_token++;
+	 if (END_OF_COMMAND)  {
+	    int_error("thickness: number expected",c_token);
+         }  else {
+	    FIG_default_thickness = (int)real(const_express(&a));
+	    if ( FIG_default_thickness < 1 || FIG_default_thickness > 10 )
+	    {
+	       int_error("thickness out of range",c_token-1);
+	       FIG_default_thickness = 1;
 	    }
-	} else if (almost_equals(c_token, "t$hickness")) {	/* KB */
-	    c_token++;
-	    if (END_OF_COMMAND) {
-		int_error("thickness: number expected", c_token);
-	    } else {
-		FIG_default_thickness = (int) real(const_express(&a));
-		if (FIG_default_thickness < 1 || FIG_default_thickness > 10) {
-		    int_error("thickness out of range", c_token - 1);
-		    FIG_default_thickness = 1;
-		}
+         }
+      }
+      else if (almost_equals(c_token,"d$epth")) { /* KB */
+	 c_token++;
+	 if (END_OF_COMMAND) {
+	    int_error("depth: number expected",c_token);
+         }  else {
+	    FIG_depth = (int)real(const_express(&a));
+	    if ( FIG_depth < 0 || FIG_depth > 99 )
+	    {
+	       int_error("depth out of range",c_token-1);
+	       FIG_depth = 10;
 	    }
-	} else if (almost_equals(c_token, "d$epth")) {	/* KB */
-	    c_token++;
-	    if (END_OF_COMMAND) {
-		int_error("depth: number expected", c_token);
+	    FIG_linedepth = FIG_depth;
+         }
+      }
+      else if (almost_equals(c_token,"poi$ntsmax")) { /* JFS */
+	 /* Skip the word and then expect the number ! */
+	 c_token++;
+	 if (END_OF_COMMAND) {
+	    int_error("max. points per polyline: number expected",c_token);
+         }  else {
+	    temp_max = (long)real(const_express(&a));
+	    /* Now check the range for the number */
+	    if ( (temp_max > 1) && ( temp_max < (FIG_MAX_POINTS+ 2)) ) {
+	       /* OK. subtract one to the right number! See other numbers... */
+	       FIG_poly_vec_max = temp_max- 1;
 	    } else {
-		FIG_depth = (int) real(const_express(&a));
-		if (FIG_depth < 0 || FIG_depth > 99) {
-		    int_error("depth out of range", c_token - 1);
-		    FIG_depth = 10;
-		}
-		FIG_linedepth = FIG_depth;
-	    }
-	} else if (almost_equals(c_token, "poi$ntsmax")) {	/* JFS */
-	    /* Skip the word and then expect the number ! */
-	    c_token++;
-	    if (END_OF_COMMAND) {
-		int_error("max. points per polyline: number expected", c_token);
-	    } else {
-		temp_max = (long) real(const_express(&a));
-		/* Now check the range for the number */
-		if ((temp_max > 1) && (temp_max < (FIG_MAX_POINTS + 2))) {
-		    /* OK. subtract one to the right number! See other numbers... */
-		    FIG_poly_vec_max = temp_max - 1;
-		} else {
-		    char t[128];
+	       char t[128];
 
-		    sprintf(t, "pointsmax: number out of range (2,%ld)",
-			    (FIG_MAX_POINTS + 1));
-		    int_error(t, c_token);
-		}
+	       sprintf( t, "pointsmax: number out of range (2,%ld)", 
+		  (FIG_MAX_POINTS+ 1));
+	       int_error( t, c_token);
 	    }
-	} else {
-	    parse_error = TRUE;
-	    int_error(options_list, c_token);
-	}
-    }
+	 }
+      }
+      else {
+	 parse_error=TRUE;
+	 int_error(options_list,c_token);
+      }
+   }
 
-    sprintf(term_options, "%s %s %s %d %s %s %s %d %s %d %s %d",
-	    FIG_use_color ? "color" : "monochrome",
-	    FIG_is_big ? "big" : "small",
-	    "pointsmax",
-	    FIG_poly_vec_max + 1,
-	    FIG_portrait ? "portrait" : "landscape",
-	    FIG_inches ? "inches" : "metric",
-	    "fontsize", (FIG_font_s > 0 ? FIG_font_s :
-			 (FIG_is_big ? BFIG_FONT_S : FIG_FONT_S)),
-	    "thickness", FIG_default_thickness, "depth", FIG_depth);	/* JFS, KB */
-    if (xsize > 0. && ysize > 0.) {
-	if (xsize - (int) xsize == 0. && ysize - (int) ysize == 0.)
-	    sprintf(term_options + strlen(term_options),
-		    " size %d %d", (int) xsize, (int) ysize);
-	else
-	    sprintf(term_options + strlen(term_options),
-		    " size %f %f", xsize, ysize);
-    }
-    if (!FIG_is_big) {
-	if (FIG_font_s == 0)	/* KB */
-	    FIG_font_s = FIG_FONT_S;
-	term->xmax = FIG_XMAX;
-	term->ymax = FIG_YMAX;
-	term->v_tic = FIG_VTIC;
-	term->h_tic = FIG_HTIC;
-	FIG_xoff = FIG_XOFF;
-	FIG_yoff = FIG_YOFF;
-    } else {
-	if (FIG_font_s == 0)	/* KB */
-	    FIG_font_s = BFIG_FONT_S;
-	term->xmax = BFIG_XMAX;
-	term->ymax = BFIG_YMAX;
-	term->v_tic = BFIG_VTIC;
-	term->h_tic = BFIG_HTIC;
-	FIG_xoff = BFIG_XOFF;
-	FIG_yoff = BFIG_YOFF;
-    }
-    if (FIG_portrait) {		/* KB */
-	tmax = term->xmax;
-	term->xmax = term->ymax;
-	term->ymax = tmax;
-    }
-    if (xsize > 0. && ysize > 0.) {
-	if (FIG_inches) {
-	    term->xmax = (unsigned int) (xsize * FIG_RES);
-	    term->ymax = (unsigned int) (ysize * FIG_RES);
-	} else {
-	    term->xmax = (unsigned int) (xsize / 2.54 * FIG_RES);
-	    term->ymax = (unsigned int) (ysize / 2.54 * FIG_RES);
-	}
-    }
-    term->v_char = FIG_to_pixel_v(FIG_font_s);
-    term->h_char = FIG_to_pixel_h(FIG_font_s);
-    FIG_thickness = FIG_default_thickness;
-    if (parse_error) {		/* JFS, KB */
-	int_error(options_list, c_token);
-    }
+   sprintf(term_options,"%s %s %s %d %s %s %s %d %s %d %s %d",
+	FIG_use_color ? "color" : "monochrome",
+	FIG_is_big ? "big" : "small",
+	"pointsmax",
+	FIG_poly_vec_max+ 1,
+	FIG_portrait ? "portrait" : "landscape",
+	FIG_inches ? "inches" : "metric",
+	"fontsize", (FIG_font_s>0 ? FIG_font_s : 
+	    (FIG_is_big?BFIG_FONT_S:FIG_FONT_S)),
+	"thickness", FIG_default_thickness, "depth", FIG_depth); /* JFS, KB */
+   if ( xsize > 0. && ysize > 0. ) {
+      if ( xsize-(int)xsize==0. && ysize-(int)ysize==0. )
+         sprintf(term_options+strlen(term_options),
+           " size %d %d",(int)xsize,(int)ysize);
+      else
+         sprintf(term_options+strlen(term_options),
+           " size %f %f",xsize,ysize);
+   }
+
+   if(!FIG_is_big) {
+      if ( FIG_font_s == 0 ) /* KB */
+         FIG_font_s = FIG_FONT_S;
+      term->xmax  = FIG_XMAX;
+      term->ymax  = FIG_YMAX;
+      term->v_tic = FIG_VTIC;
+      term->h_tic = FIG_HTIC;
+      FIG_xoff    = FIG_XOFF;
+      FIG_yoff    = FIG_YOFF;
+   } else {
+      if ( FIG_font_s == 0 ) /* KB */
+         FIG_font_s = BFIG_FONT_S;
+      term->xmax  = BFIG_XMAX;
+      term->ymax  = BFIG_YMAX;
+      term->v_tic = BFIG_VTIC;
+      term->h_tic = BFIG_HTIC;
+      FIG_xoff    = BFIG_XOFF;
+      FIG_yoff    = BFIG_YOFF;
+   }
+   if ( FIG_portrait ) { /* KB */
+      tmax = term->xmax;
+      term->xmax = term->ymax;
+      term->ymax = tmax;
+   }
+   if ( xsize > 0. && ysize > 0. ) {
+      if ( FIG_inches ) {
+         term->xmax = (unsigned int) (xsize * FIG_RES);
+         term->ymax = (unsigned int) (ysize * FIG_RES);
+      } else {
+         term->xmax = (unsigned int) (xsize/2.54 * FIG_RES);
+         term->ymax = (unsigned int) (ysize/2.54 * FIG_RES);
+      }
+   }
+   term->v_char = FIG_to_pixel_v(FIG_font_s);
+   term->h_char = FIG_to_pixel_h(FIG_font_s);
+   FIG_thickness = FIG_default_thickness;
+   if(parse_error) { /* JFS, KB */
+      int_error(options_list,c_token);
+   }
 }
 
 TERM_PUBLIC void FIG_init()
@@ -419,7 +431,7 @@ TERM_PUBLIC void FIG_init()
     FIG_line.thickness = FIG_thickness;
     FIG_line.fill_style = -1;
     FIG_line.depth = FIG_linedepth;
-    FIG_line.pen_style = 0;
+    FIG_line.pen_style =  0;
     FIG_line.for_arrow = NULL;
     FIG_line.back_arrow = NULL;
     FIG_line.cap_style = 0;
@@ -431,18 +443,18 @@ TERM_PUBLIC void FIG_init()
 
     fprintf(gpoutfile, "%s\n", FIG_MAGIC);
     fprintf(gpoutfile, "%s\n%s\n%s\n%d %d\n", FIG_ORIENT, FIG_JUST,
-	    FIG_UNIT, FIG_RES, FIG_COORD_SYS);
+	FIG_UNIT, FIG_RES, FIG_COORD_SYS);
 }
-
-
+ 
+ 
 TERM_PUBLIC void FIG_graphics()
 {
     FIG_posx = FIG_posy = 0;
     FIG_polyvec_stat = FIG_poly_new;
     /* there is no way to have separate pictures in a FIG file */
 }
-
-
+ 
+ 
 TERM_PUBLIC void FIG_text()
 {
     /* there is no way to have separate pictures in a FIG file */
@@ -450,8 +462,8 @@ TERM_PUBLIC void FIG_text()
     FIG_posx = FIG_posy = 0;
     fflush(gpoutfile);
 }
-
-
+ 
+ 
 /* Line types for FIG work like this:
  *  for monochrome:
  *  -2 : solid (border)
@@ -466,88 +478,86 @@ TERM_PUBLIC void FIG_text()
  *   but start using dashed lines of different dash length. don't use white
  *   as a color.
  */
-
+ 
 TERM_PUBLIC void FIG_linetype(linetype)
-int linetype;			/* expect linetype >= -2 */
+        int linetype;                   /* expect linetype >= -2 */
 {
     int last_FIG_type = FIG_type;
     int last_FIG_spacing = FIG_spacing;
     int last_FIG_color = FIG_color;
     int last_FIG_depth = FIG_linedepth;
     int last_FIG_thickness = FIG_thickness;
-
+    
     FIG_linedepth = FIG_depth;
-    FIG_thickness = FIG_current_linewidth * FIG_default_thickness;
-    if (FIG_thickness < 1)
-	FIG_thickness = 1;
+    FIG_thickness = FIG_current_linewidth*FIG_default_thickness;
+    if ( FIG_thickness < 1 ) 
+       FIG_thickness = 1;
     FIG_color = DEFAULT;
-
-    if (linetype < -2)
-	linetype = -2;
+    
+    if ( linetype < -2 )
+       linetype = -2;
 
     switch (linetype) {
-    case 0:
-    case -2:{
-	    FIG_type = SOLID_LINE;
-	    FIG_spacing = 0.0;
-	    if (FIG_use_color)
-		FIG_color = BLACK;
-	    break;
-	}
-    case -1:{
-	    FIG_type = DOTTED_LINE;
-	    FIG_spacing = 4.0;	/* gap */
-	    if (FIG_use_color)
-		FIG_color = BLACK;
-	    break;
-	}
-    default:{
-	    /* now linetype >= 1 *//* shouldn't be negative anyway */
-	    FIG_linedepth = FIG_depth + linetype / 1000;
-	    linetype %= 1000;
-	    /* Thickness of lines is either included in the linetype */
-	    /* (in Fig units) or the default is scaled with the */
-	    /* current 'linewidth'. */
-	    if ((FIG_thickness = linetype / 100) == 0)
-		FIG_thickness = FIG_current_linewidth * FIG_default_thickness;
-	    if (FIG_thickness < 1)	/* Less than 1 would be invisible */
-		FIG_thickness = 1;
-	    linetype %= 100;
-	    if (FIG_use_color) {
-		FIG_type = (linetype >= WHITE);		/* dashed line */
-		FIG_color = linetype % WHITE;
-		FIG_spacing = (linetype / WHITE) * 3;
-	    } else {		/* monochrome */
-		FIG_type = linetype % 2 + 1;	/* dotted, dashed, ... */
-		FIG_spacing = (linetype + 1) / 2 * 3;
-	    }
-	    break;
-	}
+           case 0:
+           case -2: {
+                  FIG_type = SOLID_LINE;
+                  FIG_spacing = 0.0;
+		  if (FIG_use_color) FIG_color = BLACK;
+                  break;
+           }
+           case -1: {
+                  FIG_type = DOTTED_LINE;
+                  FIG_spacing = 4.0; /* gap */
+		  if (FIG_use_color) FIG_color = BLACK;
+                  break;
+           }
+           default: {
+                /* now linetype >= 1 */ /* shouldn't be negative anyway */
+      	        FIG_linedepth = FIG_depth + linetype/1000;
+      	        linetype %= 1000;
+                /* Thickness of lines is either included in the linetype */
+                /* (in Fig units) or the default is scaled with the */
+                /* current 'linewidth'. */
+      	        if ( (FIG_thickness = linetype / 100) == 0 )
+      	           FIG_thickness = FIG_current_linewidth*FIG_default_thickness;
+                if ( FIG_thickness < 1 ) /* Less than 1 would be invisible */ 
+                   FIG_thickness = 1;
+      	        linetype %= 100;
+ 		if (FIG_use_color) {
+		  FIG_type = (linetype >= WHITE);	/* dashed line */
+		  FIG_color = linetype % WHITE;
+		  FIG_spacing = (linetype / WHITE) * 3;
+		} else { /* monochrome */
+                  FIG_type = linetype % 2 + 1; /* dotted, dashed, ... */
+                  FIG_spacing = (linetype+1) / 2 * 3;
+		}
+                  break;
+           }
     }
     if (FIG_type != last_FIG_type || FIG_spacing != last_FIG_spacing ||
-	FIG_color != last_FIG_color || FIG_linedepth != last_FIG_depth ||
-	FIG_thickness != last_FIG_thickness)
-	FIG_poly_clean(FIG_polyvec_stat);
+        FIG_color != last_FIG_color || FIG_linedepth != last_FIG_depth ||
+        FIG_thickness != last_FIG_thickness)
+      FIG_poly_clean(FIG_polyvec_stat);
 }
-
-TERM_PUBLIC void FIG_move(x, y)
-unsigned int x, y;
+ 
+TERM_PUBLIC void FIG_move(x,y)
+        unsigned int x,y;
 {
     int last_FIG_posx = FIG_posx;
     int last_FIG_posy = FIG_posy;
     FIG_posx = x;
     FIG_posy = y;
     if (FIG_posx != last_FIG_posx || FIG_posy != last_FIG_posy)
-	FIG_poly_clean(FIG_polyvec_stat);
+          FIG_poly_clean(FIG_polyvec_stat);
 }
-
-
-TERM_PUBLIC void FIG_vector(ux, uy)
-unsigned int ux, uy;
+ 
+ 
+TERM_PUBLIC void FIG_vector(ux,uy)
+     unsigned int ux,uy;
 {
-    int x = ux, y = uy;
-
-    if (FIG_polyvec_stat != FIG_poly_part) {
+  int x=ux, y=uy;
+ 
+  if (FIG_polyvec_stat != FIG_poly_part) {
 	FIG_line.pen_color = FIG_color;
 	FIG_line.fill_color = FIG_color;
 	FIG_line.style = FIG_type;
@@ -556,218 +566,212 @@ unsigned int ux, uy;
 	FIG_line.thickness = FIG_thickness;
 	FIG_poly_vec_cnt = 0;
 	/* allocate memory for the first point */
-	FIG_points = (F_point *) gp_realloc(FIG_points, sizeof(F_point), "FIG_points");		/* JFS */
-	FIG_points[FIG_poly_vec_cnt].x = FIG_xoff + FIG_posx;
-	FIG_points[FIG_poly_vec_cnt].y = term->ymax
-	    + FIG_yoff - FIG_posy;
+	FIG_points = ( F_point *) gp_realloc( FIG_points, sizeof( F_point), "FIG_points"); /* JFS */
+	FIG_points[FIG_poly_vec_cnt].x=FIG_xoff + FIG_posx;
+	FIG_points[FIG_poly_vec_cnt].y=term->ymax
+	 + FIG_yoff - FIG_posy;
 
-	FIG_poly_vec_cnt = 1;
-	FIG_polyvec_stat = FIG_poly_part;
+        FIG_poly_vec_cnt = 1;
+        FIG_polyvec_stat = FIG_poly_part;
     }
-    /* allocate memory for the next point */
-    FIG_points = (F_point *) gp_realloc(FIG_points, (FIG_poly_vec_cnt + 1) *
-					sizeof(F_point), "FIG_points");		/* JFS */
-    FIG_points[FIG_poly_vec_cnt].x = FIG_xoff + x;
-    FIG_points[FIG_poly_vec_cnt].y = term->ymax + FIG_yoff - y;
+  /* allocate memory for the next point */
+  FIG_points = ( F_point *) gp_realloc( FIG_points, (FIG_poly_vec_cnt+ 1)* 
+	sizeof( F_point), "FIG_points"); /* JFS */
+  FIG_points[FIG_poly_vec_cnt].x = FIG_xoff +  x;
+  FIG_points[FIG_poly_vec_cnt].y = term->ymax + FIG_yoff - y;
 
-    FIG_poly_vec_cnt++;
-    if (FIG_poly_vec_cnt > FIG_poly_vec_max)
-	FIG_poly_clean(FIG_polyvec_stat);
-
-    FIG_posx = x;
-    FIG_posy = y;
+  FIG_poly_vec_cnt++;
+  if (FIG_poly_vec_cnt > FIG_poly_vec_max)
+    FIG_poly_clean(FIG_polyvec_stat);
+ 
+  FIG_posx = x;
+  FIG_posy = y;
 }
-
-
+ 
+ 
 TERM_PUBLIC void FIG_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy;		/* start coord */
-unsigned int ex, ey;		/* end coord */
-TBOOLEAN head;
+        unsigned int sx, sy;     /* start coord */
+        unsigned int ex, ey;     /* end coord */
+	TBOOLEAN head;
 {
-    FIG_poly_clean(FIG_polyvec_stat);
-    fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
-	    O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
-	    FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
-	    FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
-	    FIG_line.join_style, FIG_line.cap_style, FIG_line.radius,
-	    head ? 1 : 0, 0, 2);
+	FIG_poly_clean(FIG_polyvec_stat);
+        fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
+         O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
+         FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
+         FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
+         FIG_line.join_style, FIG_line.cap_style, FIG_line.radius,
+         head ? 1 : 0, 0, 2);
 
-    /* arrow line */
-    if (head)
-	fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
-		0, 0, 1.0,
-		(double) (term->h_tic / 2 + 1),
-		(double) term->h_tic);
-    fprintf(gpoutfile, "%d %d %d %d\n",
-	    FIG_xoff + sx, FIG_yoff + term->ymax - sy,
-	    FIG_yoff + ex, FIG_yoff + term->ymax - ey);
-
-    FIG_posx = ex;
-    FIG_posy = ey;
+        /* arrow line */
+	if ( head )
+	        fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
+        	        0, 0, 1.0,
+			(double)(term->h_tic/2 + 1),
+			(double)term->h_tic        );
+        fprintf(gpoutfile, "%d %d %d %d\n",
+                FIG_xoff + sx, FIG_yoff + term->ymax - sy,
+		FIG_yoff + ex, FIG_yoff + term->ymax - ey);
+ 
+        FIG_posx = ex;
+        FIG_posy = ey;
 }
-
-
+ 
+ 
 TERM_PUBLIC void FIG_put_text(x, y, str)
-unsigned int x, y;
-char *str;
+        unsigned int x, y;
+        char *str;
 {
-    if (strlen(str) == 0)
-	return;
-    FIG_poly_clean(FIG_polyvec_stat);
-    y -= term->v_char / 2;	/* assuming vertical center justified */
-
+  if (strlen(str) == 0) return;
+  FIG_poly_clean(FIG_polyvec_stat);
+  y -= term->v_char/2;	/* assuming vertical center justified */
+ 
     fprintf(gpoutfile, "%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
-	    O_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
-	    FIG_ROMAN_FONT, (float) FIG_font_s,
-	    FIG_angle, SPECIAL_TEXT, (float) term->v_char,
-	    (float) term->h_char * strlen(str),
-	    FIG_xoff + x, term->ymax + FIG_yoff - y, str);
+                  O_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
+                  FIG_ROMAN_FONT, (float)FIG_font_s,
+		  FIG_angle, SPECIAL_TEXT, (float)term->v_char,
+		  (float)term->h_char*strlen(str),
+		  FIG_xoff + x, term->ymax + FIG_yoff-y, str);
 }
-
+ 
 TERM_PUBLIC int FIG_justify_text(mode)
-enum JUSTIFY mode;
+        enum JUSTIFY mode;
 {
-    switch (mode) {
-    case LEFT:
-	FIG_justify = T_LEFT_JUSTIFIED;
-	break;
-    case CENTRE:
-	FIG_justify = T_CENTER_JUSTIFIED;
-	break;
-    case RIGHT:
-	FIG_justify = T_RIGHT_JUSTIFIED;
-	break;
-	/* shouldn't happen */
-    default:
-	FIG_justify = T_LEFT_JUSTIFIED;
-	return (FALSE);
-	break;
+    switch(mode) {
+           case LEFT: FIG_justify = T_LEFT_JUSTIFIED; break;
+           case CENTRE: FIG_justify = T_CENTER_JUSTIFIED; break;
+           case RIGHT: FIG_justify = T_RIGHT_JUSTIFIED; break;
+           /* shouldn't happen */
+           default: FIG_justify = T_LEFT_JUSTIFIED; return (FALSE); break;
     }
     return (TRUE);
 }
-
+ 
 TERM_PUBLIC int FIG_text_angle(angle)
-int angle;
+        int angle;
 {
     if (angle)
-	FIG_angle = Pi / 2.0;	/* vertical is pi/2 radians */
+         FIG_angle = Pi / 2.0;  /* vertical is pi/2 radians */
     else
-	FIG_angle = 0.0;	/* horizontal */
+         FIG_angle = 0.0;               /* horizontal */
     return (TRUE);
 }
 
-TERM_PUBLIC void FIG_lpoint(x, y, number)
-unsigned int x, y;
+TERM_PUBLIC void FIG_lpoint(x,y,number)
+unsigned int x,y;
 int number;
 {
-    FIG_type = 0;		/* Solid lines for marker outline */
-    if (number % 100 >= 49 && number % 100 < 99) {	/* circles, squares, triangles */
-	int r, d, h, xpc, ypc;
-	int line_color, fill_color, fill_style;
-	int cnum, tnum, color, depth;
+    FIG_type = 0; /* Solid lines for marker outline */
+    if ( number%100 >= 49 && number%100 < 99 ) { /* circles, squares, triangles */
+       int r, d, h, xpc, ypc;
+       int line_color, fill_color, fill_style;
+       int cnum, tnum, color, depth;
 
-	FIG_poly_clean(FIG_polyvec_stat);
-	depth = FIG_linedepth - 1;	/* Above error bars */
-	if (number > 1000)
-	    depth = FIG_depth + number / 1000 - 1;
-	number %= 1000;
-	if (depth < 0)
-	    depth = 0;
-	if (number < 100)
-	    color = FIG_color;
-	else if (FIG_use_color)
-	    color = number / 100 - 1;
-	else if (number / 100 >= WHITE)
-	    color = WHITE;
-	else
-	    color = DEFAULT;
-	number %= 100;
-	cnum = (number + 1) % 10;
-	tnum = (number - 49) / 10;
-	if (cnum < 5)
-	    line_color = (FIG_use_color ? BLACK : DEFAULT);
-	else
-	    line_color = FIG_color;
-	fill_color = color;
-	if (cnum == 0 || cnum == 5)
-	    fill_style = -1;
-	else
-	    fill_style = (cnum % 5) * 5;
-
-	xpc = FIG_xoff + x;
-	ypc = term->ymax + FIG_yoff - y;
-
-	if (tnum == 0) {	/* circle */
-	    r = FIG_current_pointsize * term->v_char / 4 + 1;
-	    fprintf(gpoutfile,
-		    "1 3 %d %d %d %d %d %d %d %6.3f 1 0.000 %d %d %d %d %d %d %d %d\n",
-		    FIG_type, FIG_thickness, line_color,
-		    fill_color, depth, 0, fill_style, FIG_spacing,
-		    xpc, ypc, r, r, xpc, ypc, xpc, ypc - r);
-	} else {
-	    fprintf(gpoutfile, "2 3 %d %d %d %d %d %d %d %6.3f 0 0 0 0 0 ",
-		    FIG_type, FIG_thickness, line_color,
-		    fill_color, depth, 0, fill_style, FIG_spacing);
-
-	    if (tnum == 1) {	/* square */
-		d = FIG_current_pointsize * term->v_char / 4 + 1;
-		fprintf(gpoutfile, "5\n\t%d %d %d %d %d %d %d %d %d %d\n",
-			xpc - d, ypc - d, xpc - d, ypc + d, xpc + d, ypc + d, xpc + d, ypc - d, xpc - d, ypc - d);
-	    } else if (tnum == 2) {	/* diamond */
-		d = FIG_current_pointsize * term->v_char / 3 + 1;
-		fprintf(gpoutfile, "5\n\t%d %d %d %d %d %d %d %d %d %d\n",
-			xpc - d, ypc, xpc, ypc + d, xpc + d, ypc, xpc, ypc - d, xpc - d, ypc);
-	    } else if (tnum == 3) {	/* triangle up */
-		d = FIG_current_pointsize * term->v_char / 3 + 1;
-		h = d * 4 / 7;	/* About d times one 3rd of sqrt(3) */
-		fprintf(gpoutfile, "4\n\t%d %d %d %d %d %d %d %d\n",
-			xpc - d, ypc + h, xpc, ypc - 2 * h, xpc + d, ypc + h, xpc - d, ypc + h);
-	    } else if (tnum == 4) {	/* triangle down */
-		d = FIG_current_pointsize * term->v_char / 3 + 1;
-		h = d * 4 / 7;
-		fprintf(gpoutfile, "4\n\t%d %d %d %d %d %d %d %d\n",
-			xpc - d, ypc - h, xpc, ypc + 2 * h, xpc + d, ypc - h, xpc - d, ypc - h);
-	    }
-	}
-    } else
-	do_point(x, y, number);
+       FIG_poly_clean(FIG_polyvec_stat);
+       depth = FIG_linedepth - 1; /* Above error bars */
+       if ( number > 1000 )
+          depth = FIG_depth + number/1000 - 1;
+       number %= 1000;
+       if ( depth < 0 )
+          depth = 0;
+       if ( number < 100 )
+          color = FIG_color;
+       else if ( FIG_use_color )
+          color = number/100 - 1;
+       else if ( number/100 >= WHITE )
+          color = WHITE;
+       else
+          color = DEFAULT;
+       number %= 100;
+       cnum = (number+1) % 10;
+       tnum = (number-49) / 10;
+       if ( cnum < 5 )
+          line_color = (FIG_use_color ? BLACK : DEFAULT);
+       else
+          line_color = FIG_color;
+       fill_color = color;
+       if ( cnum == 0 || cnum == 5 )
+          fill_style = -1;
+       else
+          fill_style = (cnum%5)*5;
+          
+       xpc = FIG_xoff + x;
+       ypc = term->ymax + FIG_yoff - y;
+       
+       if ( tnum == 0 ) { /* circle */
+    	   r = FIG_current_pointsize*term->v_char/4 + 1;
+    	   fprintf(gpoutfile,
+    	     "1 3 %d %d %d %d %d %d %d %6.3f 1 0.000 %d %d %d %d %d %d %d %d\n",
+    	     FIG_type, FIG_thickness, line_color,
+    	     fill_color, depth, 0, fill_style, FIG_spacing,
+    	     xpc, ypc, r, r, xpc, ypc, xpc, ypc-r);
+       } else {
+          fprintf(gpoutfile,"2 3 %d %d %d %d %d %d %d %6.3f 0 0 0 0 0 ",
+    	     FIG_type, FIG_thickness, line_color,
+    	     fill_color, depth, 0, fill_style, FIG_spacing);
+           
+          if ( tnum == 1 ) { /* square */
+             d = FIG_current_pointsize*term->v_char/4 + 1;
+    	     fprintf(gpoutfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
+    		xpc-d,ypc-d, xpc-d,ypc+d, xpc+d,ypc+d, xpc+d,ypc-d, xpc-d,ypc-d);
+	  }
+	  else if ( tnum == 2 ) { /* diamond */
+             d = FIG_current_pointsize*term->v_char/3 + 1;
+    	     fprintf(gpoutfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
+    		xpc-d,ypc, xpc,ypc+d, xpc+d,ypc, xpc,ypc-d, xpc-d,ypc);
+	  }
+	  else if ( tnum == 3 ) { /* triangle up */
+             d = FIG_current_pointsize*term->v_char/3 + 1;
+             h = d*4/7; /* About d times one 3rd of sqrt(3) */
+    	     fprintf(gpoutfile,"4\n\t%d %d %d %d %d %d %d %d\n",
+    		xpc-d,ypc+h, xpc,ypc-2*h, xpc+d,ypc+h, xpc-d,ypc+h);
+	  }
+	  else if ( tnum == 4 ) { /* triangle down */
+             d = FIG_current_pointsize*term->v_char/3 + 1;
+             h = d*4/7; 
+    	     fprintf(gpoutfile,"4\n\t%d %d %d %d %d %d %d %d\n",
+    		xpc-d,ypc-h, xpc,ypc+2*h, xpc+d,ypc-h, xpc-d,ypc-h);
+	  }
+       }
+    }
+    else
+       do_point(x,y,number);
 }
-
+ 
 TERM_PUBLIC void FIG_pointsize(pointsize)
 double pointsize;
 {
-    FIG_current_pointsize = pointsize;
-    /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
-    do_pointsize(pointsize * FIG_font_s / (double) FIG_FONT_S);
+   FIG_current_pointsize = pointsize;
+   /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
+  do_pointsize(pointsize * FIG_font_s / (double) FIG_FONT_S );
 }
-
+ 
 TERM_PUBLIC void FIG_linewidth(linewidth)
 double linewidth;
 {
-    FIG_current_linewidth = linewidth;
+   FIG_current_linewidth = linewidth;
 }
-
+ 
 TERM_PUBLIC void FIG_reset()
 {
     FIG_poly_clean(FIG_polyvec_stat);
     FIG_posx = FIG_posy = 0;
     fflush(gpoutfile);
 }
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(fig_driver)
-"fig", "FIG 3.1 graphics language: X graphics editor",
-FIG_XMAX, FIG_YMAX, FIG_VCHAR, FIG_HCHAR,
-FIG_VTIC, FIG_HTIC, FIG_options, FIG_init, FIG_reset,
-FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
-FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
-FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
-0 /*flags */ , 0 /*suspend */ , 0 /*resume */ , 0 /*fillbox */ ,
-FIG_linewidth
+   "fig", "FIG 3.1 graphics language: X graphics editor",
+  	   FIG_XMAX, FIG_YMAX, FIG_VCHAR, FIG_HCHAR, 
+  	   FIG_VTIC, FIG_HTIC, FIG_options, FIG_init, FIG_reset, 
+  	   FIG_text, null_scale, FIG_graphics, FIG_move, FIG_vector,
+  	   FIG_linetype, FIG_put_text, FIG_text_angle, FIG_justify_text,
+  	   FIG_lpoint, FIG_arrow, set_font_null, FIG_pointsize,
+           0 /*flags*/, 0 /*suspend*/, 0 /*resume*/, 0 /*fillbox*/, 
+           FIG_linewidth
 TERM_TABLE_END(fig_driver)
+
 #undef LAST_TERM
 #define LAST_TERM fig_driver
 #endif /* TERM_TABLE */
@@ -776,6 +780,7 @@ TERM_TABLE_END(fig_driver)
 #ifdef TERM_HELP
 START_HELP(fig)
 "1 fig",
+"?commands set terminal fig",
 "?set terminal fig",
 "?set term fig",
 "?terminal fig",
@@ -802,7 +807,7 @@ START_HELP(fig)
 " area to <xsize>*<ysize> in units of inches or centimeters depending on the",
 " `inches` or `metric` setting in effect.  `depth` sets the default depth layer",
 " for all lines and text.  The default depth is 10 to leave room for adding",
-" material with \"xfig\" on top of the plot.",
+" material with \"xfig\" on top of the plot.", 
 "",
 " `thickness` sets the default line thickness, which is 1 if not specified.",
 " Overriding the thickness can be achieved by adding a multiple of 100 to the",
@@ -881,508 +886,508 @@ END_HELP(fig)
  */
 
 /*
-   The only difference from version 3.0 to version 3.1 is that the position
-   of the "magnet" has been shifted by 14 Fig units.
-   In the 2.1 and older versions of xfig the grid was in multiples of 5 Fig
-   units, but they were on intervals 4, 9, 14, 19, etc.
-   When version 3.0 was created, coordinates were simply multiplied by the
-   ratio of the resolutions (1200/80 = 15) so values like 4 became 60 instead
-   of 74 ((4+1)*15 - 1).
-
-   This means that figures converted from 2.1 and older files are offset by
-   14 Fig units but new objects entered with version 3.0 are correct.
-
-   In version 3.1 the magnet grid is at intervals 0, 75, 150, etc instead of 
-   -1, 74, 149, etc.
-   Figures from 2.1 and older are correctly converted now and a warning is popped
-   up when you read in a version 3.0 file that says you may have to offset the
-   figure when you load it, using the x and y offsets in the file panel.
-
-   --------------------------------------------------------------------------------
-   Description of the Fig Format Follows
-   --------------------------------------------------------------------------------
-
-   (1) The very first line is a comment line containing the name and version:
-   #FIG 3.1
-
-   The character # at the first column of a line indicates that the line
-   is a comment line which will be ignored.
-
-   (2) The first non-comment line consists of two numbers and two strings:
-
-   int  fig_resolution          (Fig units/inch)
-   string       orientation             ("Landscape" or "Portrait")
-   string       justification           ("Center" or "Flush Left")
-   string       units                   ("Metric" or "Inches")
-   int  coordinate_system       (1: origin is the lower left corner (NOT USED)
-   2: upper left)
-
-   Fig_resolution is the resolution of the figure in the file.
-   Xfig will always write the file with a resolution of 1200ppi so it
-   will scale the figure upon reading it in if its resolution is different
-   from 1200ppi.  Pixels are assumed to be square.
-
-   Xfig will read the orientation string and change the canvas to match
-   either the Landscape or Portrait mode of the figure file.
-
-   The units specification is self-explanatory.
-
-   The coordinate_system variable is ignored - the origin is ALWAYS the
-   upper-left corner.
-
-   ** Coordinates are given in "fig_resolution" units.
-   ** Line thicknesses are given in 1/80 of an inch ("display units").  The
-   minimum line thickness is 0 (no line is drawn) and the maximum is 500.
-   ** dash-lengths/dot-gaps are given in 1/80 of an inch.
-
-
-   (3) The rest of the file contains various objects.  An object can be one
-   of six classes (or types).
-
-   0)   Color pseudo-object.
-   1)   Arc.
-   2)   Ellipse which is a generalization of circle.
-   3)   Polyline which includes polygon and box.
-   4)   Spline which includes closed/open control/interpolated spline.
-   5)   Text.
-   6)   Compound object which is composed of one or more objects.
-
-   In the following elaboration on object formats, every value of Fig
-   output are separated by blank characters or new line ('\n').  The
-   value of the unused parameters will be -1.
-
-   Some fields are described as "enumeration type" or "bit vector"; the
-   values which these fields can take are defined in the header file object.h.
-   The pen_style field is unused.
-   These values may be defined in some future version of Fig.
-
-   The two color fields (pen and fill; pen only, for texts) are
-   defined as follows:
-
-   -1 = Default
-   0 = Black
-   1 = Blue
-   2 = Green
-   3 = Cyan
-   4 = Red
-   5 = Magenta
-   6 = Yellow
-   7 = White
-   8-11 = four shades of blue (dark to lighter)
-   12-14 = three shades of green (dark to lighter)
-   15-17 = three shades of cyan (dark to lighter)
-   18-20 = three shades of red (dark to lighter)
-   21-23 = three shades of magenta (dark to lighter)
-   24-26 = three shades of brown (dark to lighter)
-   27-30 = four shades of pink (dark to lighter)
-   31 = Gold
-
-   values from 32 to 543 (512 total) are user colors and
-   are defined in color pseudo-objects (type 0)
-
-   For WHITE color, the area fill field is defined as follows:
-
-   -1 = not filled
-   0 = black
-   ...  values from 1 to 19 are shades of grey, from darker to lighter
-   20 = white
-   21-40 not used
-   41-56 see patterns for colors, below
-
-   For BLACK or DEFAULT color, the area fill field is defined as follows:
-
-   -1 = not filled
-   0 = white
-   ...  values from 1 to 19 are shades of grey, from lighter to darker
-   20 = black
-   21-40 not used
-   41-56 see patterns for colors, below
-
-   For all other colors, the area fill field is defined as follows:
-
-   -1 = not filled
-   0 = black
-   ...  values from 1 to 19 are "shades" of the color, from darker to lighter.
-   A shade is defined as the color mixed with black
-   20 = full saturation of the color
-   ...  values from 21 to 39 are "tints" of the color from the color to white.
-   A tint is defined as the color mixed with white
-   40 = white
-   41 = 30 degree left diagonal pattern
-   42 = 30 degree right diagonal pattern
-   43 = 30 degree crosshatch
-   44 = 45 degree left diagonal pattern
-   45 = 45 degree right diagonal pattern
-   46 = 45 degree crosshatch
-   47 = bricks
-   48 = circles
-   49 = horizontal lines
-   50 = vertical lines
-   51 = crosshatch
-   52 = fish scales
-   53 = small fish scales
-   54 = octagons
-   55 = horizontal "tire treads"
-   56 = vertical "tire treads"
-
-   The depth field is defined as follows:
-
-   0 ... 999 where larger value means object is deeper than (under)
-   objects with smaller depth
-
-   The line_style field is defined as follows:
-
-   -1 = Default
-   0 = Solid
-   1 = Dashed
-   2 = Dotted
-
-   The style_val field is defined as the length, in 1/80 inches, of the on/off
-   dashes for dashed lines, and the distance between the dots, in 1/80 inches,
-   for dotted lines.
-
-   The join_style field is defined FOR LINES only as follows:
-
-   0 = Miter (the default in xfig 2.1 and earlier)
-   1 = Bevel
-   2 = Round
-
-   The cap_style field is defined FOR LINES, OPEN SPLINES and ARCS only as follows:
-
-   0 = Butt (the default in xfig 2.1 and earlier)
-   1 = Round
-   2 = Projecting
-
-   The arrow_type field is defined for LINES, ARCS and OPEN SPLINES
-   only as follows:
-
-   0 = Stick-type (the default in xfig 2.1 and earlier)
-   1 = Closed triangle:
-   |\
-   |  \
-   |    \
-   |    /
-   |  /
-   |/
-   2 = Closed with "indented" butt:
-   |\
-   \  \
-   \   \
-   \    \
-   /    /
-   /   /
-   /  /
-   |/
-   3 = Closed with "pointed" butt:
-   |\
-   /   \
-   /      \
-   /         \
-   \         /
-   \      /
-   \   /
-   |/
-
-   The arrow_style field is defined for LINES, ARCS and OPEN SPLINES
-   only as follows:
-
-   0 = Hollow (actually filled with white)
-   1 = Filled with pen_color
-
-   (3.0) OBJECT DEFINITION:
-
-   (3.1) Color Pseudo-objects (user-defined colors)
-   This is used to define arbitrary colors beyond the 32 standard colors.
-   The color objects must be defined before any other Fig objects.
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 0)
-   int  color_number            (color number, from 32-543 (512 total))
-   hex string   rgb values              (hexadecimal string describing red,
-   green and blue values (e.g. #330099) )
-
-   (3.2) ARC
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 5)
-   int  sub_type                (0: pie-wedge (closed)
-   1: open ended arc)
-   int  line_style              (enumeration type)
-   int  line_thickness          (1/80 inch)
-   int  pen_color               (enumeration type, pen color)
-   int  fill_color              (enumeration type, fill color)
-   int  depth                   (enumeration type)
-   int  pen_style               (pen style, not used)
-   int  area_fill               (enumeration type, -1 = no fill)
-   float        style_val               (1/80 inch)
-   int  cap_style               (enumeration type)
-   int  direction               (0: clockwise, 1: counterclockwise)
-   int  forward_arrow           (0: no forward arrow, 1: on)
-   int  backward_arrow          (0: no forward arrow, 1: on)
-   float        center_x, center_y      (center of the arc)
-   int  x1, y1                  (Fig units, the 1st point the user entered)
-   int  x2, y2                  (Fig units, the 2nd point)
-   int  x3, y3                  (Fig units, the last point)
-
-   Forward arrow line (Optional; absent if forward_arrow is 0):
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  arrow_type              (enumeration type)
-   int  arrow_style             (enumeration type)
-   float        arrow_thickness         (1/80 inch)
-   float        arrow_width             (Fig units)
-   float        arrow_height            (Fig units)
-
-   Backward arrow line (Optional; absent if backward_arrow is 0):
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  arrow_type              (enumeration type)
-   int  arrow_style             (enumeration type)
-   float        arrow_thickness         (1/80 inch)
-   float        arrow_width             (Fig units)
-   float        arrow_height            (Fig units)
-
-   (3.3) COMPOUND
-
-   A line with object code 6 signifies the start of a compound.
-   There are four more numbers on this line which indicate the
-   upper right corner and the lower left corner of the bounding
-   box of this compound.  A line with object code -6 signifies
-   the end of the compound.  Compound may be nested.
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 6)
-   int  upperright_corner_x     (Fig units)
-   int  upperright_corner_y     (Fig units)
-   int  lowerleft_corner_x      (Fig units)
-   int  lowerleft_corner_y      (Fig units)
-
-   Subsequent lines:
-   objects
-   .
-   .
-
-   Last line:
-   -6
-
-   (3.4) ELLIPSE
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 1)
-   int  sub_type                (1: ellipse defined by radiuses
-   2: ellipse defined by diameters
-   3: circle defined by radius
-   4: circle defined by diameter)
-   int  line_style              (enumeration type)
-   int  thickness               (1/80 inch)
-   int  pen_color               (enumeration type, pen color)
-   int  fill_color              (enumeration type, fill color)
-   int  depth                   (enumeration type)
-   int  pen_style               (pen style, not used)
-   int  area_fill               (enumeration type, -1 = no fill)
-   float        style_val               (1/80 inch)
-   int  direction               (always 1)
-   float        angle                   (radians, the angle of the x-axis)
-   int  center_x, center_y      (Fig units)
-   int  radius_x, radius_y      (Fig units)
-   int  start_x, start_y        (Fig units; the 1st point entered)
-   int  end_x, end_y            (Fig units; the last point entered)
-
-   (3.5) POLYLINE
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 2)
-   int  sub_type                (1: polyline
-   2: box
-   3: polygon
-   4: arc-box)
-   5: imported-picture bounding-box)
-   int  line_style              (enumeration type)
-   int  thickness               (1/80 inch)
-   int  pen_color               (enumeration type, pen color)
-   int  fill_color              (enumeration type, fill color)
-   int  depth                   (enumeration type)
-   int  pen_style               (pen style, not used)
-   int  area_fill               (enumeration type, -1 = no fill)
-   float        style_val               (1/80 inch)
-   int  join_style              (enumeration type)
-   int  cap_style               (enumeration type, only used for POLYLINE)
-   int  radius                  (1/80 inch, radius of arc-boxes)
-   int  forward_arrow           (0: off, 1: on)
-   int  backward_arrow          (0: off, 1: on)
-   int  npoints                 (number of points in line)
-
-   Forward arrow line: same as ARC object
-
-   Backward arrow line: same as ARC object
-
-   Points line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  x1, y1                  (Fig units)
-   int  x2, y2                  (Fig units)
-   .
-   .
-   int  xnpoints ynpoints       (this will be the same as the 1st
-   point for polygon and box)
-
-   PIC line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   boolean      flipped                 orientation = normal (0) or flipped (1)
-   char file[]                  name of picture file to import
-
-   (3.6) SPLINE
-
-   First line:
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object_code             (always 3)
-   int  sub_type                (0: open spline
-   1: closed spline
-   2: open interpolated spline
-   3: closed interpolated spline)
-   int  line_style              (See the end of this section)
-   int  thickness               (1/80 inch)
-   int  pen_color               (enumeration type, pen color)
-   int  fill_color              (enumeration type, fill color)
-   int  depth                   (enumeration type)
-   int  pen_style               (pen style, not used)
-   int  area_fill               (enumeration type, -1 = no fill)
-   float        style_val               (1/80 inch)
-   int  cap_style               (enumeration type, only used for open splines)
-   int  forward_arrow           (0: off, 1: on)
-   int  backward_arrow          (0: off, 1: on)
-   int  npoints                 (number of control points in spline)
-
-   Forward arrow line: same as ARC object
-
-   Backward arrow line: same as ARC object
-
-   Points line: same as POLYLINE object
-
-   Control points line (absent if sub_type is 0 or 1):
-   Control points of interpolated spline.  There are two control
-   points for each knots.  A section i, of the spline is drawn
-   using Bezier cubic with the following four points:
-   (x ,y ), (rx ,ry ), (lx        , ly   ), (x   , y   ).
-   i  i     i   i      i+1    i+1     i+1   i+1
-   For closed interpolated spline the last pair of control points,
-   (lxnpoints,lynpoints) and (rxnpoints,rynpoints) (which can be ignored),
-   are the same as (lx1,ly1) and (rx1,ry1) respectively.
-
-   type name                    (brief description)
-   ---- ----                    -------------------
-   float        lx1, ly1                (Fig units)
-   float        rx1, ry1                (Fig units)
-   float        lx2, ly2                (Fig units)
-   float        rx2, ry2                (Fig units)
-   .
-   .
-   float        lxnpoints, lynpoints    (Fig units)
-   float        rxnpoints, rynpoints    (Fig units)
-
-   (3.7) TEXT
-   type name                    (brief description)
-   ---- ----                    -------------------
-   int  object                  (always 4)
-   int  sub_type                (0: Left justified
-   1: Center justified
-   2: Right justified)
-   int  color                   (enumeration type)
-   int  depth                   (enumeration type)
-   int  pen_style               (enumeration , not used)
-   int  font                    (enumeration type)
-   float        font_size               (font size in points)
-   float        angle                   (radians, the angle of the text)
-   int  font_flags              (bit vector)
-   float        height                  (Fig units)
-   float        length                  (Fig units)
-   int  x, y                    (Fig units, coordinate of the origin
-   of the string.  If sub_type = 0, it is
-   the lower left corner of the string.
-   If sub_type = 1, it is the lower
-   center.  Otherwise it is the lower
-   right corner of the string.)
-   char string[]                (ASCII characters; starts after a blank
-   character following the last number and
-   ends before the sequence '\001'.  This
-   sequence is not part of the string.
-   Characters above octal 177 are
-   represented by \xxx where xxx is the
-   octal value.  This permits Fig files to
-   be edited with 7-bit editors and sent
-   by e-mail without data loss.
-   Note that the string may contain '\n'.)
-
-   The font_flags field is defined as follows:
-
-   Bit  Description
-
-   0    Rigid text (text doesn't scale when scaling compound objects)
-   1    Special text (for LaTeX)
-   2    PostScript font (otherwise LaTeX font is used)
-   3    Hidden text
-
-   The font field is defined as follows:
-
-   For font_flags bit 2 = 0 (LaTeX fonts):
-
-   0    Default font
-   1    Roman
-   2    Bold
-   3    Italic
-   4    Sans Serif
-   5    Typewriter
-
-   For font_flags bit 3 = 1 (PostScript fonts):
-
-   -1   Default font
-   0    Times Roman
-   1    Times Italic
-   2    Times Bold
-   3    Times Bold Italic
-   4    AvantGarde Book
-   5    AvantGarde Book Oblique
-   6    AvantGarde Demi
-   7    AvantGarde Demi Oblique
-   8    Bookman Light
-   9    Bookman Light Italic
-   10   Bookman Demi
-   11   Bookman Demi Italic
-   12   Courier
-   13   Courier Oblique
-   14   Courier Bold
-   15   Courier Bold Oblique
-   16   Helvetica
-   17   Helvetica Oblique
-   18   Helvetica Bold
-   19   Helvetica Bold Oblique
-   20   Helvetica Narrow
-   21   Helvetica Narrow Oblique
-   22   Helvetica Narrow Bold
-   23   Helvetica Narrow Bold Oblique
-   24   New Century Schoolbook Roman
-   25   New Century Schoolbook Italic
-   26   New Century Schoolbook Bold
-   27   New Century Schoolbook Bold Italic
-   28   Palatino Roman
-   29   Palatino Italic
-   30   Palatino Bold
-   31   Palatino Bold Italic
-   32   Symbol
-   33   Zapf Chancery Medium Italic
-   34   Zapf Dingbats
- */
+The only difference from version 3.0 to version 3.1 is that the position
+of the "magnet" has been shifted by 14 Fig units.
+In the 2.1 and older versions of xfig the grid was in multiples of 5 Fig
+units, but they were on intervals 4, 9, 14, 19, etc.
+When version 3.0 was created, coordinates were simply multiplied by the
+ratio of the resolutions (1200/80 = 15) so values like 4 became 60 instead
+of 74 ((4+1)*15 - 1).
+
+This means that figures converted from 2.1 and older files are offset by
+14 Fig units but new objects entered with version 3.0 are correct.
+
+In version 3.1 the magnet grid is at intervals 0, 75, 150, etc instead of 
+-1, 74, 149, etc.
+Figures from 2.1 and older are correctly converted now and a warning is popped
+up when you read in a version 3.0 file that says you may have to offset the
+figure when you load it, using the x and y offsets in the file panel.
+
+--------------------------------------------------------------------------------
+Description of the Fig Format Follows
+--------------------------------------------------------------------------------
+
+(1) The very first line is a comment line containing the name and version:
+	#FIG 3.1
+
+    The character # at the first column of a line indicates that the line
+    is a comment line which will be ignored.
+
+(2) The first non-comment line consists of two numbers and two strings:
+
+	int	fig_resolution		(Fig units/inch)
+	string	orientation		("Landscape" or "Portrait")
+	string	justification		("Center" or "Flush Left")
+	string	units			("Metric" or "Inches")
+	int	coordinate_system	(1: origin is the lower left corner (NOT USED)
+					 2: upper left)
+
+    Fig_resolution is the resolution of the figure in the file.
+    Xfig will always write the file with a resolution of 1200ppi so it
+    will scale the figure upon reading it in if its resolution is different
+    from 1200ppi.  Pixels are assumed to be square.
+
+    Xfig will read the orientation string and change the canvas to match
+    either the Landscape or Portrait mode of the figure file.
+
+    The units specification is self-explanatory.
+
+    The coordinate_system variable is ignored - the origin is ALWAYS the
+    upper-left corner.
+
+    ** Coordinates are given in "fig_resolution" units.
+    ** Line thicknesses are given in 1/80 of an inch ("display units").  The
+       minimum line thickness is 0 (no line is drawn) and the maximum is 500.
+    ** dash-lengths/dot-gaps are given in 1/80 of an inch.
+
+
+(3) The rest of the file contains various objects.  An object can be one
+    of six classes (or types).
+
+	0)	Color pseudo-object.
+	1)	Arc.
+	2)	Ellipse which is a generalization of circle.
+	3)	Polyline which includes polygon and box.
+	4)	Spline which includes closed/open control/interpolated spline.
+	5)	Text.
+	6)	Compound object which is composed of one or more objects.
+
+    In the following elaboration on object formats, every value of Fig
+    output are separated by blank characters or new line ('\n').  The
+    value of the unused parameters will be -1.
+
+    Some fields are described as "enumeration type" or "bit vector"; the
+    values which these fields can take are defined in the header file object.h.
+    The pen_style field is unused.
+    These values may be defined in some future version of Fig.
+
+    The two color fields (pen and fill; pen only, for texts) are
+    defined as follows:
+
+	    -1 = Default
+	     0 = Black
+	     1 = Blue
+	     2 = Green
+	     3 = Cyan
+	     4 = Red
+	     5 = Magenta
+	     6 = Yellow
+	     7 = White
+	  8-11 = four shades of blue (dark to lighter)
+	 12-14 = three shades of green (dark to lighter)
+	 15-17 = three shades of cyan (dark to lighter)
+	 18-20 = three shades of red (dark to lighter)
+	 21-23 = three shades of magenta (dark to lighter)
+	 24-26 = three shades of brown (dark to lighter)
+	 27-30 = four shades of pink (dark to lighter)
+	    31 = Gold
+
+	 values from 32 to 543 (512 total) are user colors and
+	 are defined in color pseudo-objects (type 0)
+
+    For WHITE color, the area fill field is defined as follows:
+	
+	-1 = not filled
+	 0 = black
+	...  values from 1 to 19 are shades of grey, from darker to lighter
+	20 = white
+	21-40 not used
+	41-56 see patterns for colors, below
+
+    For BLACK or DEFAULT color, the area fill field is defined as follows:
+	
+	-1 = not filled
+	 0 = white
+	...  values from 1 to 19 are shades of grey, from lighter to darker
+	20 = black
+	21-40 not used
+	41-56 see patterns for colors, below
+
+    For all other colors, the area fill field is defined as follows:
+
+	-1 = not filled
+	 0 = black
+	...  values from 1 to 19 are "shades" of the color, from darker to lighter.
+		A shade is defined as the color mixed with black
+	20 = full saturation of the color
+	...  values from 21 to 39 are "tints" of the color from the color to white.
+		A tint is defined as the color mixed with white
+	40 = white
+	41 = 30 degree left diagonal pattern
+	42 = 30 degree right diagonal pattern
+	43 = 30 degree crosshatch
+	44 = 45 degree left diagonal pattern
+	45 = 45 degree right diagonal pattern
+	46 = 45 degree crosshatch
+	47 = bricks
+	48 = circles
+	49 = horizontal lines
+	50 = vertical lines
+	51 = crosshatch
+	52 = fish scales
+	53 = small fish scales
+	54 = octagons
+	55 = horizontal "tire treads"
+	56 = vertical "tire treads"
+
+    The depth field is defined as follows:
+
+	 0 ... 999 where larger value means object is deeper than (under)
+		   objects with smaller depth
+
+    The line_style field is defined as follows:
+
+	-1 = Default
+	 0 = Solid
+	 1 = Dashed
+	 2 = Dotted
+
+    The style_val field is defined as the length, in 1/80 inches, of the on/off
+    dashes for dashed lines, and the distance between the dots, in 1/80 inches,
+    for dotted lines.
+
+    The join_style field is defined FOR LINES only as follows:
+
+	 0 = Miter (the default in xfig 2.1 and earlier)
+	 1 = Bevel
+	 2 = Round
+
+    The cap_style field is defined FOR LINES, OPEN SPLINES and ARCS only as follows:
+
+	 0 = Butt (the default in xfig 2.1 and earlier)
+	 1 = Round
+	 2 = Projecting
+
+    The arrow_type field is defined for LINES, ARCS and OPEN SPLINES
+    only as follows:
+
+	 0 = Stick-type (the default in xfig 2.1 and earlier)
+	 1 = Closed triangle:
+		|\
+		|  \
+		|    \
+		|    /
+		|  /
+		|/
+	 2 = Closed with "indented" butt:
+		|\
+		\  \
+		 \   \
+		  \    \
+		  /    /
+		 /   /
+		/  /
+		|/
+	 3 = Closed with "pointed" butt:
+		   |\
+		  /   \
+		 /      \
+		/         \
+		\         /
+		 \      /
+		  \   /
+		   |/
+
+    The arrow_style field is defined for LINES, ARCS and OPEN SPLINES
+    only as follows:
+
+	 0 = Hollow (actually filled with white)
+	 1 = Filled with pen_color
+
+(3.0) OBJECT DEFINITION:
+
+    (3.1) Color Pseudo-objects (user-defined colors)
+	  This is used to define arbitrary colors beyond the 32 standard colors.
+	  The color objects must be defined before any other Fig objects.
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 0)
+	int	color_number		(color number, from 32-543 (512 total))
+     hex string	rgb values		(hexadecimal string describing red,
+					 green and blue values (e.g. #330099) )
+
+    (3.2) ARC
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 5)
+	int	sub_type		(0: pie-wedge (closed)
+					 1: open ended arc)
+	int	line_style		(enumeration type)
+	int	line_thickness		(1/80 inch)
+	int	pen_color		(enumeration type, pen color)
+	int	fill_color		(enumeration type, fill color)
+	int	depth			(enumeration type)
+	int	pen_style		(pen style, not used)
+	int	area_fill		(enumeration type, -1 = no fill)
+	float	style_val		(1/80 inch)
+	int	cap_style		(enumeration type)
+	int	direction		(0: clockwise, 1: counterclockwise)
+	int	forward_arrow		(0: no forward arrow, 1: on)
+	int	backward_arrow		(0: no forward arrow, 1: on)
+	float	center_x, center_y	(center of the arc)
+	int	x1, y1			(Fig units, the 1st point the user entered)
+	int	x2, y2			(Fig units, the 2nd point)
+	int	x3, y3			(Fig units, the last point)
+
+    Forward arrow line (Optional; absent if forward_arrow is 0):
+	type	name			(brief description)
+	----	----			-------------------
+	int	arrow_type		(enumeration type)
+	int	arrow_style		(enumeration type)
+	float	arrow_thickness		(1/80 inch)
+	float 	arrow_width		(Fig units)
+	float	arrow_height		(Fig units)
+
+    Backward arrow line (Optional; absent if backward_arrow is 0):
+	type	name			(brief description)
+	----	----			-------------------
+	int	arrow_type		(enumeration type)
+	int	arrow_style		(enumeration type)
+	float	arrow_thickness		(1/80 inch)
+	float	arrow_width		(Fig units)
+	float	arrow_height		(Fig units)
+
+    (3.3) COMPOUND
+
+    A line with object code 6 signifies the start of a compound.
+    There are four more numbers on this line which indicate the
+    upper right corner and the lower left corner of the bounding
+    box of this compound.  A line with object code -6 signifies
+    the end of the compound.  Compound may be nested.
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 6)
+	int	upperright_corner_x	(Fig units)
+	int	upperright_corner_y	(Fig units)
+	int	lowerleft_corner_x	(Fig units)
+	int	lowerleft_corner_y	(Fig units)
+
+    Subsequent lines:
+	objects
+	.
+	.
+
+    Last line:
+	-6
+
+    (3.4) ELLIPSE
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 1)
+	int	sub_type		(1: ellipse defined by radiuses
+					 2: ellipse defined by diameters
+					 3: circle defined by radius
+					 4: circle defined by diameter)
+	int	line_style		(enumeration type)
+	int	thickness		(1/80 inch)
+	int	pen_color		(enumeration type, pen color)
+	int	fill_color		(enumeration type, fill color)
+	int	depth			(enumeration type)
+	int	pen_style		(pen style, not used)
+	int	area_fill		(enumeration type, -1 = no fill)
+	float	style_val		(1/80 inch)
+	int	direction		(always 1)
+	float	angle			(radians, the angle of the x-axis)
+	int	center_x, center_y	(Fig units)
+	int	radius_x, radius_y	(Fig units)
+	int	start_x, start_y	(Fig units; the 1st point entered)
+	int	end_x, end_y		(Fig units; the last point entered)
+
+    (3.5) POLYLINE
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 2)
+	int	sub_type		(1: polyline
+					 2: box
+					 3: polygon
+					 4: arc-box)
+					 5: imported-picture bounding-box)
+	int	line_style		(enumeration type)
+	int	thickness		(1/80 inch)
+	int	pen_color		(enumeration type, pen color)
+	int	fill_color		(enumeration type, fill color)
+	int	depth			(enumeration type)
+	int	pen_style		(pen style, not used)
+	int	area_fill		(enumeration type, -1 = no fill)
+	float	style_val		(1/80 inch)
+	int	join_style		(enumeration type)
+	int	cap_style		(enumeration type, only used for POLYLINE)
+	int	radius			(1/80 inch, radius of arc-boxes)
+	int	forward_arrow		(0: off, 1: on)
+	int	backward_arrow		(0: off, 1: on)
+	int	npoints			(number of points in line)
+
+    Forward arrow line: same as ARC object
+
+    Backward arrow line: same as ARC object
+
+    Points line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	x1, y1			(Fig units)
+	int	x2, y2			(Fig units)
+	  .
+	  .
+	int	xnpoints ynpoints	(this will be the same as the 1st
+					point for polygon and box)
+
+    PIC line:
+	type	name			(brief description)
+	----	----			-------------------
+	boolean	flipped			orientation = normal (0) or flipped (1)
+	char	file[]			name of picture file to import
+
+    (3.6) SPLINE
+
+    First line:
+	type	name			(brief description)
+	----	----			-------------------
+	int	object_code		(always 3)
+	int	sub_type		(0: open spline
+					 1: closed spline
+					 2: open interpolated spline
+					 3: closed interpolated spline)
+	int	line_style		(See the end of this section)
+	int	thickness		(1/80 inch)
+	int	pen_color		(enumeration type, pen color)
+	int	fill_color		(enumeration type, fill color)
+	int	depth			(enumeration type)
+	int	pen_style		(pen style, not used)
+	int	area_fill		(enumeration type, -1 = no fill)
+	float	style_val		(1/80 inch)
+	int	cap_style		(enumeration type, only used for open splines)
+	int	forward_arrow		(0: off, 1: on)
+	int	backward_arrow		(0: off, 1: on)
+	int	npoints			(number of control points in spline)
+
+    Forward arrow line: same as ARC object
+
+    Backward arrow line: same as ARC object
+
+    Points line: same as POLYLINE object
+
+    Control points line (absent if sub_type is 0 or 1):
+	Control points of interpolated spline.  There are two control
+	points for each knots.  A section i, of the spline is drawn
+	using Bezier cubic with the following four points:
+		(x ,y ), (rx ,ry ), (lx	  , ly   ), (x   , y   ).
+		  i  i	    i	i      i+1    i+1     i+1   i+1
+	For closed interpolated spline the last pair of control points,
+	(lxnpoints,lynpoints) and (rxnpoints,rynpoints) (which can be ignored),
+	are the same as (lx1,ly1) and (rx1,ry1) respectively.
+
+	type	name			(brief description)
+	----	----			-------------------
+	float	lx1, ly1		(Fig units)
+	float	rx1, ry1		(Fig units)
+	float	lx2, ly2		(Fig units)
+	float	rx2, ry2		(Fig units)
+	  .
+	  .
+	float	lxnpoints, lynpoints	(Fig units)
+	float	rxnpoints, rynpoints	(Fig units)
+
+    (3.7) TEXT
+	type	name			(brief description)
+	----	----			-------------------
+	int	object 			(always 4)
+	int	sub_type		(0: Left justified
+					 1: Center justified
+					 2: Right justified)
+	int	color			(enumeration type)
+	int	depth			(enumeration type)
+	int	pen_style		(enumeration , not used)
+	int	font 			(enumeration type)
+	float	font_size 		(font size in points)
+	float	angle			(radians, the angle of the text)
+	int	font_flags		(bit vector)
+	float	height			(Fig units)
+	float	length			(Fig units)
+	int	x, y			(Fig units, coordinate of the origin
+					 of the string.  If sub_type = 0, it is
+					 the lower left corner of the string.
+					 If sub_type = 1, it is the lower
+					 center.  Otherwise it is the lower
+					 right corner of the string.)
+	char	string[]		(ASCII characters; starts after a blank
+					 character following the last number and
+					 ends before the sequence '\001'.  This
+					 sequence is not part of the string.
+					 Characters above octal 177 are
+					 represented by \xxx where xxx is the
+					 octal value.  This permits Fig files to
+					 be edited with 7-bit editors and sent
+					 by e-mail without data loss.
+					 Note that the string may contain '\n'.)
+
+    The font_flags field is defined as follows:
+
+	 Bit	Description
+
+	  0	Rigid text (text doesn't scale when scaling compound objects)
+	  1	Special text (for LaTeX)
+	  2	PostScript font (otherwise LaTeX font is used)
+	  3	Hidden text
+
+    The font field is defined as follows:
+
+	For font_flags bit 2 = 0 (LaTeX fonts):
+
+	 0	Default font
+	 1	Roman
+	 2	Bold
+	 3	Italic
+	 4	Sans Serif
+	 5	Typewriter
+
+	For font_flags bit 3 = 1 (PostScript fonts):
+
+	-1	Default font
+	 0	Times Roman
+	 1	Times Italic
+	 2	Times Bold
+	 3	Times Bold Italic
+	 4	AvantGarde Book
+	 5	AvantGarde Book Oblique
+	 6	AvantGarde Demi
+	 7	AvantGarde Demi Oblique
+	 8	Bookman Light
+	 9	Bookman Light Italic
+	10	Bookman Demi
+	11	Bookman Demi Italic
+	12	Courier
+	13	Courier Oblique
+	14	Courier Bold
+	15	Courier Bold Oblique
+	16	Helvetica
+	17	Helvetica Oblique
+	18	Helvetica Bold
+	19	Helvetica Bold Oblique
+	20	Helvetica Narrow
+	21	Helvetica Narrow Oblique
+	22	Helvetica Narrow Bold
+	23	Helvetica Narrow Bold Oblique
+	24	New Century Schoolbook Roman
+	25	New Century Schoolbook Italic
+	26	New Century Schoolbook Bold
+	27	New Century Schoolbook Bold Italic
+	28	Palatino Roman
+	29	Palatino Italic
+	30	Palatino Bold
+	31	Palatino Bold Italic
+	32	Symbol
+	33	Zapf Chancery Medium Italic
+	34	Zapf Dingbats
+*/
 
 #endif

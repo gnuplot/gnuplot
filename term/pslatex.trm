@@ -116,7 +116,7 @@ TERM_PUBLIC void PSLATEX_options()
 
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "c$olor")
-	    || almost_equals(c_token, "c$olour")) {
+	    || almost_equals(c_token,"c$olour")) {
 	    ps_color = TRUE;
 	    c_token++;
 	}
@@ -564,11 +564,13 @@ TERM_TABLE_END(pstex_driver)
 #ifdef TERM_HELP
 START_HELP(pslatex)
 "1 pslatex and pstex",
+"?commands set terminal pslatex",
 "?set terminal pslatex",
 "?set term pslatex",
 "?terminal pslatex",
 "?term pslatex",
 "?pslatex",
+"?commands set terminal pstex",
 "?set terminal pstex",
 "?set term pstex",
 "?terminal pstex",

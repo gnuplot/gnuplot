@@ -588,6 +588,7 @@ TERM_TABLE_END(apollo_driver)
 #ifdef TERM_HELP
 START_HELP(apollo)
 "1 apollo",
+"?commands set terminal apollo",
 "?set terminal apollo",
 "?set term apollo",
 "?terminal apollo",

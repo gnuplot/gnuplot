@@ -365,6 +365,7 @@ TERM_TABLE_END(dumb_driver)
 #ifdef TERM_HELP
 START_HELP(dumb)
 "1 dumb",
+"?commands set terminal dumb",
 "?set terminal dumb",
 "?set term dumb",
 "?terminal dumb",

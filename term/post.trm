@@ -1663,6 +1663,7 @@ TERM_TABLE_END(post_driver)
 #ifdef TERM_HELP
 START_HELP(post)
 "1 postscript",
+"?commands set terminal postscript",
 "?set terminal postscript",
 "?set term postscript",
 "?terminal postscript",
@@ -1725,6 +1726,7 @@ START_HELP(post)
 " free to modify it to your heart's desire.  See the \"editing postscript\"",
 " section for some hints.",
 "2 enhanced postscript",
+"?commands set terminal postscript enhanced",
 "?set terminal postscript enhanced",
 "?set term postscript enhanced",
 "?terminal postscript enhanced",
@@ -1800,6 +1802,7 @@ START_HELP(post)
 " The file \"ps_guide.ps\" in the /docs/ps subdirectory of the `gnuplot` source",
 " distribution contains more examples of the enhanced syntax.",
 "2 editing postscript",
+"?commands set terminal postscript editing",
 "?set terminal postscript editing",
 "?set term postscript editing",
 "?terminal postscript editing",

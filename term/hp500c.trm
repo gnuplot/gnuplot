@@ -515,6 +515,7 @@ TERM_TABLE_END(hp500c_driver)
 #ifdef TERM_HELP
 START_HELP(hp500c)
 "1 hp500c",
+"?commands set terminal hp500c",
 "?set terminal hp500c",
 "?set term hp500c",
 "?terminal hp500c",

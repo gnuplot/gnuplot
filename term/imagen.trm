@@ -873,6 +873,7 @@ TERM_TABLE_END(imagen_driver)
 #ifdef TERM_HELP
 START_HELP(imagen)
 "1 imagen",
+"?commands set terminal imagen",
 "?set terminal imagen",
 "?set term imagen",
 "?terminal imagen",

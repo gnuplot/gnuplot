@@ -470,6 +470,7 @@ TERM_TABLE_END(pc_driver)
 #ifdef TERM_HELP
 START_HELP(dospc)
 "1 dospc",
+"?commands set terminal dospc",
 "?set terminal dospc",
 "?set term dospc",
 "?terminal dospc",

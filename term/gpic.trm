@@ -278,6 +278,7 @@ TERM_TABLE_END(gpic_driver)
 #ifdef TERM_HELP
 START_HELP(gpic)
 "1 gpic",
+"?commands set terminal gpic",
 "?set terminal gpic",
 "?set term gpic",
 "?terminal gpic",

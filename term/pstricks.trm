@@ -568,6 +568,7 @@ TERM_TABLE_END(pstricks_driver)
 #ifdef TERM_HELP
 START_HELP(pstricks)
 "1 pstricks",
+"?commands set terminal pstricks",
 "?set terminal pstricks",
 "?set term pstricks",
 "?terminal pstricks",

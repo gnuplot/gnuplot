@@ -603,6 +603,7 @@ TERM_TABLE_END(grass_driver)
 #ifdef TERM_HELP
 START_HELP(grass)
 "1 grass",
+"?commands set terminal grass",
 "?set terminal grass",
 "?set term grass",
 "?terminal grass",

@@ -185,6 +185,7 @@ TERM_TABLE_END(hp2648_driver)
 #ifdef TERM_HELP
 START_HELP(hp2648)
 "1 hp2648",
+"?commands set terminal hp2648",
 "?set terminal hp2648",
 "?set term hp2648",
 "?terminal hp2648",

@@ -450,6 +450,7 @@ TERM_TABLE_END(gpr_driver)
 #ifdef TERM_HELP
 START_HELP(gpr)
 "1 gpr",
+"?commands set terminal gpr",
 "?set terminal gpr",
 "?set term gpr",
 "?terminal gpr",

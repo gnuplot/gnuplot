@@ -589,11 +589,13 @@ TERM_TABLE_END(uniplex_driver)
 #ifdef TERM_HELP
 START_HELP(rgip)
 "1 rgip",
+"?commands set terminal rgip",
 "?set terminal rgip",
 "?set term rgip",
 "?terminal rgip",
 "?term rgip",
 "?rgip",
+"?commands set terminal uniplex",
 "?set terminal uniplex",
 "?set term uniplex",
 "?terminal uniplex",

@@ -361,6 +361,7 @@ TERM_TABLE_END(eepic_driver)
 #ifdef TERM_HELP
 START_HELP(eepic)
 "1 eepic",
+"?commands set terminal eepic",
 "?set terminal eepic",
 "?set term eepic",
 "?terminal eepic",

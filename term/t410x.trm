@@ -303,6 +303,7 @@ TERM_TABLE_END(tek410x_driver)
 #ifdef TERM_HELP
 START_HELP(tek410x)
 "1 tek410x",
+"?commands set terminal tek410x",
 "?set terminal tek410x",
 "?set term tek410x",
 "?terminal tek410x",

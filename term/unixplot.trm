@@ -168,6 +168,7 @@ TERM_TABLE_END(unixplot_driver)
 #ifdef TERM_HELP
 START_HELP(unixplot)
 "1 unixplot",
+"?comands set terminal unixplot",
 "?set terminal unixplot",
 "?set term unixplot",
 "?terminal unixplot",

@@ -692,6 +692,7 @@ TERM_TABLE_END(hp2623a_driver)
 #ifdef TERM_HELP
 START_HELP(hp2623a)
 "1 hp2623a",
+"?commands set terminal hp2623a",
 "?set terminal hp2623a",
 "?set term hp2623a",
 "?terminal hp2623a",

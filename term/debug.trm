@@ -295,6 +295,7 @@ TERM_TABLE_END(debug_driver)
 #ifdef TERM_HELP
 START_HELP(debug)
 "1 debug",
+"?commands set terminal debug",
 "?set terminal debug",
 "?set term debug",
 "?terminal debug",

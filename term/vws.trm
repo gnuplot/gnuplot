@@ -472,6 +472,7 @@ TERM_TABLE_END(vws_driver)
 #ifdef TERM_HELP
 START_HELP(VWS)
 "1 VWS",
+"?commands set terminal VWS",
 "?set terminal VWS",
 "?set term VWS",
 "?terminal VWS",

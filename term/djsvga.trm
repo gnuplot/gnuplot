@@ -430,6 +430,7 @@ TERM_TABLE_END(djsvga_driver)
 #ifdef TERM_HELP
 START_HELP(svga)
 "1 svga",
+"?commands set terminal svga",
 "?set terminal svga",
 "?set term svga",
 "?terminal svga",

@@ -194,11 +194,13 @@ TERM_TABLE_END(aed767_driver)
 #ifdef TERM_HELP
 START_HELP(aed767)
 "1 aed767",
+"?commands set terminal aed767",
 "?set terminal aed767",
 "?set term aed767",
 "?terminal aed767",
 "?term aed767",
 "?aed767",
+"?commands set terminal aed512",
 "?set terminal aed512",
 "?set term aed512",
 "?terminal aed512",

@@ -1140,11 +1140,13 @@ TERM_TABLE_END(pcl5_driver)
 #ifdef TERM_HELP
 START_HELP(hpgl)
 "1 hpgl",
+"?commands set terminal hpgl",
 "?set terminal hpgl",
 "?set term hpgl",
 "?terminal hpgl",
 "?term hpgl",
 "?hpgl",
+"?commands set terminal pcl5",
 "?set terminal pcl5",
 "?set term pcl5",
 "?terminal pcl5",

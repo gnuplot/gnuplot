@@ -236,13 +236,13 @@ TERM_PUBLIC void REGISoptions()
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(regis_driver)
-
       "regis", "REGIS graphics language",
 	   REGISXMAX, REGISYMAX, REGISVCHAR, REGISHCHAR, 
 	   REGISVTIC, REGISHTIC, REGISoptions, REGISinit, REGISreset, 
 	   REGIStext, null_scale, REGISgraphics, REGISmove, REGISvector,
 	   REGISlinetype, REGISput_text, REGIStext_angle, 
-	   null_justify_text, line_and_point, do_arrow, set_font_null}
+	   null_justify_text, line_and_point, do_arrow, set_font_null
+TERM_TABLE_END(regis_driver)
 
 #undef LAST_TERM
 #define LAST_TERM regis_driver
@@ -252,6 +252,7 @@ TERM_TABLE_START(regis_driver)
 #ifdef TERM_HELP
 START_HELP(regis)
 "1 regis",
+"?commands set terminal regis",
 "?set terminal regis",
 "?set term regis",
 "?terminal regis",

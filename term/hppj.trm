@@ -262,6 +262,7 @@ TERM_TABLE_END(hppj_driver)
 #ifdef TERM_HELP
 START_HELP(hppj)
 "1 hppj",
+"?commands set terminal hppj",
 "?set terminal hppj",
 "?set term hppj",
 "?terminal hppj",

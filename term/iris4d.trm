@@ -296,6 +296,7 @@ TERM_TABLE_END(iris4d_driver)
 #ifdef TERM_HELP
 START_HELP(iris4d)
 "1 iris4d",
+"?commands set terminal iris4d",
 "?set terminal iris4d",
 "?set term iris4d",
 "?terminal iris4d",

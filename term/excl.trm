@@ -249,6 +249,7 @@ TERM_TABLE_END(excl_driver)
 #ifdef TERM_HELP
 START_HELP(excl)
 "1 excl",
+"?commands set terminal excl",
 "?set terminal excl",
 "?set term excl",
 "?terminal excl",

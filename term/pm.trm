@@ -551,6 +551,7 @@ TERM_TABLE_END(PM_driver)
 #ifdef TERM_HELP
 START_HELP(pm)
 "1 pm",
+"?commands set terminal pm",
 "?set terminal pm",
 "?set term pm",
 "?terminal pm",
