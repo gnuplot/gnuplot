@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.32 2000/11/03 17:46:44 lhecking Exp $
+ * $Id: cgm.trm,v 1.33 2000/11/12 23:14:02 vanzandt Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -1303,7 +1303,6 @@ const char str[];
 	 lengths of both vectors are equal to the baseline-to-baseline
 	 distance in plot units. */
       static int orient[4];
-      extern double sin(double), cos(double);
       cgm_current.angle = cgm_next.angle;
 
       orient[0] = (int)cgm_next.char_height*cos(cgm_next.angle+3.1416/2);
