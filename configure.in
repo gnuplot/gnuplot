@@ -269,7 +269,7 @@ if test "$with_readline" != no; then
 
     if test "$with_readline" = gnu; then
       AC_CHECK_LIB(readline, readline,dnl
-       LIBS="$LIBS -lreadline $gp_tcap",, ${gp_tcap})
+       TERMLIBS="$TERMLIBS -lreadline $gp_tcap",, ${gp_tcap})
     else
       gp_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
       if test "$ac_cv_lib_readline_readline" = yes; then
