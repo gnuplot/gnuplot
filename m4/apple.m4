@@ -13,7 +13,7 @@ AC_EGREP_CPP(yes,
 #endif
 ], AC_MSG_RESULT(yes)
    LIBS="$LIBS -framework Foundation -framework AppKit"
-   CFLAGS="$CFLAGS -ObjC",dnl
+   CFLAGS="$CFLAGS -ObjC",
    AC_MSG_RESULT(no))
 ])
 
