@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.35 2002/12/05 01:46:41 sfeam Exp $
+ * $Id: png.trm,v 1.36 2002/12/12 11:10:45 mikulik Exp $
  *
  */
 
@@ -580,7 +580,7 @@ TERM_TABLE_END(png_driver)
 #endif /* TERM_TABLE */
 
 #ifdef TERM_HELP
-START_HELP(png (OLD))
+START_HELP(png_old)
 "1 png (OLD)",
 "?commands set terminal png (old)",
 "?set terminal png (old)",
@@ -610,7 +610,7 @@ START_HELP(png (OLD))
 " 'x00ff00' is green.  The background color is set first, then the border",
 " color, then the X & Y axis color, then the plotting colors.  The maximum",
 " number of colors that can be set is currently 99."
-END_HELP(png (OLD))
+END_HELP(png_old)
 #endif /* TERM_HELP */
 
 #endif /* ifndef HAVE_NEWGD */
