@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: stdfn.c,v 1.1 1998/05/19 18:05:02 ddenholm Exp $";
+static char *RCSid = "$Id: stdfn.c,v 1.7 1998/11/20 12:17:18 lhecking Exp $";
 #endif
 
 
@@ -341,6 +341,39 @@ sleep(delay)
 /*****************************************************************
     portable implementation of strnicmp (hopefully)
 *****************************************************************/
+
+#ifndef HAVE_STRCASECMP
+# ifndef HAVE_STRICMP
+
+/* return (see MSVC documentation and strcasecmp()):
+ *  -1  if str1 < str2
+ *   0  if str1 == str2
+ *   1  if str1 > str2 
+ */
+int
+gp_stricmp(s1, s2)
+    const char *s1;
+    const char *s2;
+{
+    unsigned char c1, c2;
+
+    do {
+	c1 = *s1++;
+	if (islower(c1))
+	    c1 = toupper(c1);
+	c2 = *s2++;
+	if (islower(c2))
+	    c2 = toupper(c2);
+    } while (c1 == c2 && c1 && c2);
+
+    if (c1 == c2)
+	return 0;
+    if (c1 == '\0' || c1 > c2)
+	return 1;
+    return -1;
+}
+# endif /* !HAVE_STRICMP */
+#endif /* !HAVE_STRCASECMP */
 
 #ifndef HAVE_STRNICMP
 # ifndef HAVE_STRNCASECMP
