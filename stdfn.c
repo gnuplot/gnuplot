@@ -384,7 +384,7 @@ size_t n;
 
     ret = strncpy(d, s, n);
     if (strlen(s) >= n)
-	d[n-1] = NUL;
+	d[ n > 0 ? n-1 : 0] = NUL;
 
     return ret;
 }
