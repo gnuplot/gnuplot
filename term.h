@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.12.2.2 1999/08/25 12:17:59 lhecking Exp $
+ * $Id: term.h,v 1.12.2.3 2000/10/20 19:02:58 lhecking Exp $
  *
  */
 
@@ -331,6 +331,12 @@
 /* portable bit map */
 #include "pbm.trm"
 
+/* Adobe Portable Document Format (PDF) */
+/* NOTE THAT PDF REQUIRES A SEPARATE LIBRARY : see term/pdf.trm */
+#ifdef HAVE_LIBPDF
+# include "pdf.trm"
+#endif
+
 /* NOTE THAT PNG REQUIRES A SEPARATE LIBRARY : see term/png.trm */
 #ifdef HAVE_LIBPNG
 # include "png.trm"
@@ -341,6 +347,9 @@
 
 /* QMS laser printers */
 #include "qms.trm"
+
+/* W3C Scalable Vector Graphics file */
+#include "svg.trm"
 
 /* built-in, but used for the documentation */
 #include "table.trm"

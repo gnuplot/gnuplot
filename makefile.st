@@ -1,5 +1,5 @@
 #
-# $Id: makefile.st,v 1.19 1998/04/14 00:15:56 drd Exp $
+# $Id: makefile.st,v 1.5 1998/10/09 14:31:33 lhecking Exp $
 #
 
 #
@@ -79,7 +79,8 @@ TERM=term$(SL)
 
 TERMS = $(TERM)atariaes.trm $(TERM)dumb.trm $(TERM)eepic.trm $(TERM)epson.trm \
 	$(TERM)hpgl.trm $(TERM)hpljii.trm $(TERM)hppj.trm $(TERM)latex.trm \
-	$(TERM)pbm.trm $(TERM)post.trm $(TERM)texdraw.trm
+	$(TERM)pbm.trm $(TERM)pdf.trm $(TERM)post.trm $(TERM)svg.trm \
+	$(TERM)texdraw.trm
 
 all: gnuplot.prg $(HELPFILE) demo$(SL)bf_test.tos
 

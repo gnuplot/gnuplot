@@ -1,0 +1,634 @@
+/*Hello, Emacs! this is -*-C-*- ! */
+/*------------------------------------------------------------------------------------------------------------------------------------
+	GNUPLOT - svg.trm
+
+	This file is included by ../term.c.
+
+	This terminal driver supports:
+		W3C Scalable Vector Graphics
+
+	AUTHOR
+
+		Amedeo Farello
+		afarello@libero.it
+
+	HEAVILY MODIFIED by 
+
+		Hans-Bernhard Br"oker
+		broeker@physik.rwth-aachen.de
+
+------------------------------------------------------------------------------------------------------------------------------------*/
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term (svg)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void SVG_options __PROTO ((void));
+TERM_PUBLIC void SVG_init __PROTO ((void));
+TERM_PUBLIC void SVG_graphics __PROTO ((void));
+TERM_PUBLIC void SVG_text __PROTO ((void));
+TERM_PUBLIC void SVG_linetype __PROTO ((int linetype));
+TERM_PUBLIC void SVG_move __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void SVG_vector __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void SVG_put_text __PROTO ((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void SVG_reset __PROTO ((void));
+TERM_PUBLIC int SVG_justify_text __PROTO ((enum JUSTIFY mode));
+TERM_PUBLIC int SVG_text_angle __PROTO ((int ang));
+TERM_PUBLIC void SVG_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
+TERM_PUBLIC int SVG_set_font __PROTO ((char *font));
+/* TERM_PUBLIC void SVG_pointsize __PROTO((double pointsize)); */
+/* TERM_PUBLIC void SVG_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height)); */
+TERM_PUBLIC void SVG_linewidth __PROTO ((double linewidth));
+
+#define SVG_XMAX	600
+#define SVG_YMAX	480
+
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+struct SVG_PEN
+{
+    double width;
+    char color[8];
+};
+
+unsigned int SVG_xSize = SVG_XMAX;	/* plot horizontal size */
+unsigned int SVG_ySize = SVG_YMAX;	/* plot vertical size*/
+
+unsigned int SVG_xLast = UINT_MAX;	/* current pen horizontal position*/
+unsigned int SVG_yLast = UINT_MAX;	/* current pen vertical position*/
+
+int SVG_LineType = -3;	/* current line type*/
+double SVG_LineWidth = 1.0;	/* current line width*/
+int SVG_TextAngle = 0;	/* current text orientation*/
+enum JUSTIFY SVG_TextJust = LEFT;	/* current text justification*/
+
+char SVG_fontNameDef[MAX_ID_LEN + 1] = "Arial";	/* default text font family*/
+double SVG_fontSizeDef = 12;	/* default text size*/
+char SVG_fontNameCur[MAX_ID_LEN + 1] = "Arial";	/* current text font family*/
+double SVG_fontSizeCur = 12;	/* current text size*/
+TBOOLEAN SVG_groupIsOpen = FALSE; /* open group flag*/
+TBOOLEAN SVG_pathIsOpen = FALSE; /* open path flag*/
+unsigned int SVG_path_count = 0;	/* size of current path*/
+struct SVG_PEN SVG_pens[16];	/* pen descriptors*/
+
+int SVG_fontAscent = 0;	/* estimated current font ascent*/
+int SVG_fontDescent = 0;	/* estimated current font descent*/
+int SVG_fontLeading = 0;	/* estimated current font leading*/
+int SVG_fontAvWidth = 0;	/* estimated current font char average width*/
+
+static short SVG_Pen_RealID __PROTO ((int));
+static void SVG_PathOpen __PROTO ((void));
+static void SVG_PathClose __PROTO ((void));
+static void SVG_PathLimit __PROTO ((void));
+static void SVG_GroupOpen __PROTO ((void));
+static void SVG_GroupClose __PROTO ((void));
+static void SVG_SetFont __PROTO ((char *name, double size));
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_Pen_RealID
+------------------------------------------------------------------------------------------------------------------------------------*/
+static short 
+SVG_Pen_RealID (inPenCode)
+    int inPenCode;
+{
+    if (inPenCode >= 13)
+	inPenCode %= 13;	/* normalize pen code*/
+    if (inPenCode < -2)
+	inPenCode = -2;
+
+    return (inPenCode + 2);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_GroupOpen
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_GroupOpen ()
+{
+    if (!SVG_groupIsOpen)     {
+	fprintf (gpoutfile,
+		 "<g style=\"fill:none; stroke:%s; stroke-width:%.2f\">\n",
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+		 SVG_pens[SVG_Pen_RealID (SVG_LineType)].width);
+
+	SVG_groupIsOpen = TRUE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_GroupClose
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_GroupClose ()
+{
+    if (SVG_groupIsOpen)
+      {
+	  fprintf (gpoutfile, "</g>\n");
+	  SVG_groupIsOpen = FALSE;
+      }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathOpen
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathOpen ()
+{
+    if (!SVG_pathIsOpen) {
+	fprintf (gpoutfile, "\t<path d=\"");
+	SVG_pathIsOpen = TRUE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathClose
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathClose ()
+{
+    if (SVG_pathIsOpen) {
+	fprintf (gpoutfile, "\"></path>\n");
+	SVG_path_count = 0;
+	SVG_pathIsOpen = FALSE;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_PathLimit
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_PathLimit ()
+{
+    if (SVG_path_count >= 10) {	/* avoid excessive line length*/
+	fprintf (gpoutfile, "\n\t\t");
+	SVG_path_count = 0;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_SetFont
+------------------------------------------------------------------------------------------------------------------------------------*/
+static void
+SVG_SetFont (char *name, double size)
+{
+    strcpy (SVG_fontNameCur, name);
+    SVG_fontSizeCur = size;
+
+/* since we cannot interrogate SVG about text properties and according
+ * to SVG 1.0 W3C Candidate Recommendation 2 August 2000 the
+ * "line-height" of the 'text' element is defined to be equal to the
+ * 'font-size' (!), we have to to define font properties in a less
+ * than optimal way */
+
+    SVG_fontAscent = (int) (SVG_fontSizeCur * 1.00);	/* estimated current font ascent*/
+    SVG_fontDescent = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font descent*/
+    SVG_fontLeading = (int) (SVG_fontSizeCur * 0.25);	/* estimated current font leading*/
+    SVG_fontAvWidth = (int) (SVG_fontSizeCur * 0.70);	/* estimated current font char average width*/
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_options
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_options ()
+{
+    struct value a;
+
+    if (!END_OF_COMMAND) {	/* get terminal size*/
+	if (almost_equals (c_token, "s$ize")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error("expecting x size", c_token);
+	    SVG_xSize = (unsigned int) real (const_express (&a));
+	    if (SVG_xSize < 2 || SVG_xSize > 8192)
+		int_error("x size out of range", c_token);
+
+	    if (END_OF_COMMAND)
+		int_error("expecting y size", c_token);
+	    SVG_ySize = (unsigned int) real (const_express (&a));
+	    if (SVG_ySize < 2 || SVG_ySize > 8192)
+		int_error("y size out of range", c_token);
+	}
+    }
+
+    if (!END_OF_COMMAND) {	/* get default font family name*/
+	if (almost_equals (c_token, "fn$ame"))  {
+	    c_token++;
+
+	    if (!END_OF_COMMAND && isstring (c_token)) {
+		quote_str (SVG_fontNameDef, c_token, MAX_ID_LEN);
+		c_token++;
+	    } else
+		int_error("fname: expecting font name", c_token);
+	}
+    }
+
+    if (!END_OF_COMMAND) {	/* get default font size*/
+	if (almost_equals (c_token, "fs$ize")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error("fsize: expecting font size", c_token);
+	    SVG_fontSizeDef = real (const_express (&a));
+	}
+    }
+
+    if (!END_OF_COMMAND)
+	 int_error("unexpected text at end of command", c_token);
+
+    /* Save options back into options string in normalized format */
+    sprintf(term_options, "size %d %d fname '%s'  fsize %g",
+	    SVG_xSize, SVG_ySize, SVG_fontNameDef, SVG_fontSizeDef);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_init
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_init ()
+{
+    /* setup pens*/
+    SVG_pens[0].width = SVG_LineWidth;
+    sprintf (SVG_pens[0].color, "black");	/* black*/
+    SVG_pens[1].width = SVG_LineWidth;
+    sprintf (SVG_pens[1].color, "gray");	/* medium gray*/
+    SVG_pens[2].width = SVG_LineWidth;
+    sprintf (SVG_pens[2].color, "red");
+    SVG_pens[3].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[3].color, "#%2.2X%2.2X%2.2X", 0, 209, 0); */	/* green*/
+    sprintf (SVG_pens[3].color, "green");
+    SVG_pens[4].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[4].color, "#%2.2X%2.2X%2.2X", 74, 77, 201); */	/* blue*/
+    sprintf (SVG_pens[4].color, "blue");	/* blue*/
+    SVG_pens[5].width = SVG_LineWidth;
+    /* sprintf (SVG_pens[5].color, "#%2.2X%2.2X%2.2X", 173, 0, 0); */	/* brick*/
+    sprintf (SVG_pens[5].color, "cyan");
+    SVG_pens[6].width = SVG_LineWidth;
+    sprintf (SVG_pens[6].color, "#%2.2X%2.2X%2.2X", 21, 117, 69);	/* pine green*/
+    SVG_pens[7].width = SVG_LineWidth;
+    sprintf (SVG_pens[7].color, "#%2.2X%2.2X%2.2X", 0, 0, 148);	/* navy*/
+    SVG_pens[8].width = SVG_LineWidth;
+    sprintf (SVG_pens[8].color, "#%2.2X%2.2X%2.2X", 255, 153, 0);	/* orange*/
+    SVG_pens[9].width = SVG_LineWidth;
+    sprintf (SVG_pens[9].color, "#%2.2X%2.2X%2.2X", 0, 153, 161);	/* green blue*/
+    SVG_pens[10].width = SVG_LineWidth;
+    sprintf (SVG_pens[10].color, "#%2.2X%2.2X%2.2X", 214, 214, 69);	/* olive*/
+    SVG_pens[11].width = SVG_LineWidth;
+    sprintf (SVG_pens[11].color, "#%2.2X%2.2X%2.2X", 163, 145, 255);	/* cornflower*/
+    SVG_pens[12].width = SVG_LineWidth;
+    sprintf (SVG_pens[12].color, "#%2.2X%2.2X%2.2X", 255, 204, 0);	/* gold*/
+    SVG_pens[13].width = SVG_LineWidth;
+    sprintf (SVG_pens[13].color, "#%2.2X%2.2X%2.2X", 214, 0, 120);	/* mulberry*/
+    SVG_pens[14].width = SVG_LineWidth;
+    sprintf (SVG_pens[14].color, "#%2.2X%2.2X%2.2X", 171, 214, 0);	/* green yellow*/
+    SVG_pens[15].width = SVG_LineWidth;
+    sprintf (SVG_pens[15].color, "#%2.2X%2.2X%2.2X", 222, 0, 186);	/* red violet*/
+
+    SVG_LineType = -3;
+
+/* set xmax, ymax*/
+
+    term->xmax = SVG_xSize;
+    term->ymax = SVG_ySize;
+
+/* set current font*/
+
+    SVG_SetFont (SVG_fontNameDef, SVG_fontSizeDef);
+
+/* set h_char, v_char*/
+
+    term->h_char = SVG_fontAvWidth;
+    term->v_char = (SVG_fontAscent + SVG_fontDescent + SVG_fontLeading);
+
+/* set h_tic, v_tic*/
+
+    term->h_tic = term->v_char / 2;
+    term->v_tic = term->v_char / 2;
+
+/* write file header*/
+
+    fprintf (gpoutfile,
+	     "<?xml version=\"1.0\" standalone=\"no\"?>\n"
+	     "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20001102//EN\" \"svg-20001102.dtd\">\n"
+	     "<svg width=\"%u\" height=\"%u\">\n\n"
+	     "<desc>Produced by GNUPLOT (svg.trm written by Amedeo Farello - afarello@libero.it)</desc>\n\n",
+	     term->xmax, term->ymax);
+
+    /* definitions of point symbols */
+    /* FIXME: SVG scales linewidth along with the marker itself, and
+     * there seems to be no way to avoid that without copying the
+     * marker definition into the file, rather than referencing a
+     * defined one :-( That would make for much larger files */
+
+       
+    fprintf (gpoutfile,
+	     "<defs>\n"
+	     /* dot: */
+	     "\t<circle id=\"gpDot\" r=\"1\"></circle>\n"
+	     /* diamond: */
+	     "\t<path id=\"gpPt0\" style=\"stroke-width:%.3f\" d=\"M-1,0 L0,-1 L1,0 L0 1 z\"></path>\n"
+	     /* cross: */
+	     "\t<path id=\"gpPt1\" style=\"stroke-width:%.3f\" d=\"M-1,0 h2 M0,-1 v2\"></path>\n"
+	     /* square: */
+	     "\t<path id=\"gpPt2\" style=\"stroke-width:%.3f\" d=\"M-1,-1 h2 v2 h-2 z\"></path>\n"
+	     /* triangle: */
+	     "\t<path id=\"gpPt3\" style=\"stroke-width:%.3f\" d=\"M0,1.33 L-1.33,-0.67 L1.33,-0.67 z\"></path>\n"
+	     /* 6-pointed star: */
+	     "\t<path id=\"gpPt4\" style=\"stroke-width:%.3f\" d=\"M-1,0 L1,0 M0,-1 L0,1 M-1,-1 L1,1 M-1,1 L1,-1\"></path>\n"
+	     "</defs>\n"
+	     , 2.0 / term->h_tic
+	     , 2.0 / term->h_tic
+	     , 2.0 / term->h_tic
+	     , 2.0 / term->h_tic
+	     , 2.0 / term->h_tic
+	);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_graphics
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_graphics ()
+{
+    /* fprintf (gpoutfile, "<svg>\n"); --- disabled HBB 20001116*/
+
+    SVG_groupIsOpen = FALSE;
+    SVG_pathIsOpen = FALSE;
+
+/* reset position*/
+
+    SVG_xLast = SVG_yLast = UINT_MAX;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_text ()
+{
+    SVG_PathClose ();
+    SVG_GroupClose ();
+
+    /* fprintf (gpoutfile, "</svg>\n\n"); --- disabled HBB 20001116 */
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_reset
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_reset ()
+{
+    fprintf (gpoutfile, "</svg>\n\n");
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_linetype
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_linetype (int linetype)
+{
+    if (linetype != SVG_LineType) {
+	SVG_PathClose ();
+	SVG_GroupClose ();
+	SVG_LineType = linetype;
+	SVG_GroupOpen ();
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_linewidth - verificare
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_linewidth (double linewidth)
+{
+    if (linewidth != SVG_LineWidth) {
+	short k;
+
+	SVG_LineWidth = linewidth;
+
+	for (k = 0; k < 16; k++)
+	    SVG_pens[k].width = SVG_LineWidth;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_move
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_move (unsigned int x, unsigned int y)
+{
+    if (x != SVG_xLast || y != SVG_yLast)  {
+	SVG_PathOpen ();
+
+	fprintf (gpoutfile, "M%u,%u ", x, term->ymax - y);
+	SVG_path_count++;
+
+	SVG_PathLimit ();
+
+	SVG_xLast = x;
+	SVG_yLast = y;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_vector
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_vector (unsigned int x, unsigned int y)
+{
+    if (x != SVG_xLast || y != SVG_yLast) {
+	SVG_PathOpen ();
+
+	fprintf (gpoutfile, "L%u,%u ", x, term->ymax - y);
+	SVG_path_count++;
+
+	SVG_PathLimit ();
+
+	SVG_xLast = x;
+	SVG_yLast = y;
+    }
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_point
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_point (unsigned int x, unsigned int y, int number)
+{
+    SVG_PathClose ();
+    
+    if (number < 0) {		/* do dot */
+	fprintf (gpoutfile,
+		 "\t<use xlink:href=\"#gpDot\" x=\"%u\" y=\"%u\"></use>\n",
+		 x, term->ymax - y);
+
+    } else {			/* draw a point symbol */
+	fprintf (
+	    gpoutfile,
+	    "\t<use xlink:href=\"#gpPt%1u\" transform=\"translate(%u,%u) scale(%.2f)\"></use>\n"
+	    , number % 5, x, term->ymax - y
+	    , term_pointsize * term->h_tic / 2
+	    );
+    }
+    SVG_xLast = x;
+    SVG_yLast = y;
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_justify_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_justify_text (enum JUSTIFY mode)
+{
+    SVG_TextJust = mode;
+    return (TRUE);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_text_angle
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_text_angle (int ang)
+{
+    if (ang == 0 || ang == 1) {
+	SVG_TextAngle = ang;
+	return (TRUE);
+    }
+
+    return (FALSE);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_put_text
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC void
+SVG_put_text (unsigned int x, unsigned int y, char *str)
+{
+    char *alignment;
+    int h = x, v = y;
+    
+    SVG_PathClose ();
+
+/* horizontal justification*/
+
+    switch (SVG_TextJust) {
+    case LEFT:
+	alignment = "start";
+	break;
+    case CENTRE:
+	alignment = "middle";
+	break;
+    case RIGHT:
+    default:   /* can't happen, just to make gcc happy */
+	alignment = "end";
+	break;
+    }
+
+/* vertical justification*/
+
+    switch (SVG_TextAngle) {
+    case 1:
+	h += (SVG_fontAscent - SVG_fontDescent) / 2;
+	break;		/* vertical text*/
+    default:
+	v -= (SVG_fontAscent - SVG_fontDescent) / 2;
+	break;		/* orizontal text*/
+    }
+
+/* define text position and attributes*/
+
+    fprintf (gpoutfile, "\t<g transform=\"translate(%d,%d)%s\" \
+style=\"stroke:none; fill:%s; font-family:%s; font-size:%.2f; text-anchor:%s\">\n",
+	     h, term->ymax - v,
+	     SVG_TextAngle ? " rotate(-90)" : "",
+	     SVG_pens[SVG_Pen_RealID (SVG_LineType)].color,
+	     SVG_fontNameCur, SVG_fontSizeCur, alignment);
+
+/* output text*/
+
+    fprintf (gpoutfile, "\t\t<text>%s</text>\n\t</g>\n", str);
+}
+
+/*------------------------------------------------------------------------------------------------------------------------------------
+	SVG_set_font
+------------------------------------------------------------------------------------------------------------------------------------*/
+TERM_PUBLIC int
+SVG_set_font (char *font)
+{
+    if (strlen (font) > 0) {	/* if available, parse the font specification ("fontname,fontsize")*/
+	short index;
+	char *token,
+	    seps[] = ",", *buffer = (char *) malloc (strlen (font) + 1);
+
+	if (buffer == NULL)
+	    return (FALSE);
+	strcpy (buffer, font);
+
+	for (token = strtok (buffer, seps), index = 1;
+	     token != NULL; token = strtok (NULL, seps), index++
+	    ) {
+	    switch (index) {
+	    case 1:
+		strcpy (SVG_fontNameCur, token);
+		break;	/* font name*/
+	    case 2:
+		SVG_fontSizeCur = atoi (token);
+		break;	/* font size*/
+	    default:
+		break;
+	    }
+	}
+
+	free (buffer);
+    } else {			/* otherwise simply reset the default font*/
+	strcpy (SVG_fontNameCur, SVG_fontNameDef);
+	SVG_fontSizeCur = SVG_fontSizeDef;
+    }
+
+    return (TRUE);
+}
+
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START (svg_driver)
+    "svg", "W3C Scalable Vector Graphics driver",
+    0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
+    0 /* vtic */ , 0 /* htic */ ,
+    SVG_options, SVG_init, SVG_reset, SVG_text, null_scale, SVG_graphics,
+    SVG_move, SVG_vector, SVG_linetype, SVG_put_text, SVG_text_angle,
+    SVG_justify_text, SVG_point, do_arrow, SVG_set_font, do_pointsize,
+    TERM_CAN_MULTIPLOT,
+    0 /* suspend */, 0 /* resume */ , 0 /* fillbox */ , SVG_linewidth
+TERM_TABLE_END (svg_driver)
+#undef LAST_TERM
+#define LAST_TERM svg_driver
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+    START_HELP (svg)
+    "1 svg",
+    "?commands set terminal svg",
+    "?set terminal svg",
+    "?set term svg",
+    "?terminal svg",
+    "?term svg",
+    "?svg",
+    " This terminal produces files in the W3C Scalable Vector Graphics format.",
+    "",
+    " Syntax:",
+    "       set terminal svg {size <x> <y>}",
+    "                        {fname \"<font>\"} {fsize <fontsize>}",
+    "",
+    " where <x> and <y> are the size of the SVG plot to generate,",
+    " <font> is the name of the default font to use (default Arial) and",
+    " <fontsize> is the font size (in points, default 12)"
+    END_HELP (svg)
+#endif

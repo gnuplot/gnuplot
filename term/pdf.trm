@@ -1,0 +1,951 @@
+/*Hello, Emacs, this is -*-C-*- ! */
+/*------------------------------
+	GNUPLOT - pdf.trm
+
+	This file is included by ../term.c.
+
+	This driver uses PDFlib from www.pdflib.com
+
+	Author:
+
+		Hans-Bernhard Br"oker
+		broeker@physik.rwth-aachen.de
+
+	Licence: see the gnuplot copyright (to be merged into here...)
+
+	Options: can #define PDF_DONT_COMPRESS to avoid PDF output
+	generated being compressed (by the 'deflate' algorithm as used
+	in 'zip' or 'gzip'). That helps in debugging.
+
+------------------------------*/
+
+/* CODEME: Add patterned lines (?). Implement the PM3D stuff.  */
+
+#include "driver.h"
+
+#ifdef TERM_REGISTER
+register_term (pdf)
+#endif
+
+#ifdef TERM_PROTO
+TERM_PUBLIC void PDF_options __PROTO ((void));
+TERM_PUBLIC void PDF_init __PROTO ((void));
+TERM_PUBLIC void PDF_graphics __PROTO ((void));
+TERM_PUBLIC void PDF_text __PROTO ((void));
+TERM_PUBLIC void PDF_linetype __PROTO ((int linetype));
+TERM_PUBLIC void PDF_move __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void PDF_vector __PROTO ((unsigned int x, unsigned int y));
+TERM_PUBLIC void PDF_put_text __PROTO ((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC void PDF_reset __PROTO ((void));
+TERM_PUBLIC int PDF_justify_text __PROTO ((enum JUSTIFY mode));
+TERM_PUBLIC int PDF_text_angle __PROTO ((int ang));
+TERM_PUBLIC void PDF_point __PROTO ((unsigned int x, unsigned int y, int pointstyle));
+TERM_PUBLIC int PDF_set_font __PROTO ((char *font));
+TERM_PUBLIC void PDF_boxfill __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
+TERM_PUBLIC void PDF_linewidth __PROTO ((double linewidth));
+
+#define PDF_NUM_POINTTYPES 75	/* number of point symbol types not counting the dot */
+
+#define PDF_RESOLUTION  (20)	/* number of terminal pixels per pt */
+#define PDF_XMAX	(5*72*PDF_RESOLUTION) /* 5 inches, 72 pt/inch */
+#define PDF_YMAX	(3*72*PDF_RESOLUTION) /* 3 inches, 72 pt/inch */
+
+#endif /* TERM_PROTO */
+
+#ifndef TERM_PROTO_ONLY
+#ifdef TERM_BODY
+
+#include <pdflib.h>
+
+PDF *myPDF = NULL;
+
+unsigned int PDF_xLast = UINT_MAX;	/* current pen horizontal position*/
+unsigned int PDF_yLast = UINT_MAX;	/* current pen vertical position*/
+
+int PDF_LineType = -3;		/* current line type*/
+double PDF_LineWidth = 1.0;	/* current line width*/
+int PDF_TextAngle = 0;		/* current text orientation*/
+enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
+
+char PDF_fontNameDef[MAX_ID_LEN + 1] = "Helvetica"; /* default text font family*/
+double PDF_fontSizeDef = 6;	/* default text size*/
+char PDF_fontNameCur[MAX_ID_LEN + 1] = "Helvetica"; /* current text font family*/
+double PDF_fontSizeCur = 6;	/* current text size*/
+
+TBOOLEAN PDF_pageIsOpen = FALSE; /* already started a page ?? */
+TBOOLEAN PDF_pathIsOpen = FALSE; /* open path flag*/
+
+int PDF_fontAscent = 0;		/* estimated current font ascent*/
+int PDF_fontDescent = 0;	/* estimated current font descent*/
+int PDF_fontLeading = 0;	/* estimated current font leading*/
+int PDF_fontAvWidth = 0;	/* estimated current font char average width*/
+
+static short PDF_Pen_RealID __PROTO ((int));
+static void PDF_PathOpen __PROTO ((void));
+static void PDF_PathClose __PROTO ((void));
+static void PDF_SetFont __PROTO ((void));
+
+/*------------------------ helper functions -------------------*/
+
+static short 
+PDF_Pen_RealID (inPenCode)
+    int inPenCode;
+{
+    if (inPenCode >= 13)
+	inPenCode %= 13;	/* normalize pen code*/
+    if (inPenCode < -2)
+	inPenCode = -2;
+
+    return (inPenCode + 2);
+}
+
+/* Functions to ensure that as many move() and vector() calls as
+ * possible get converted into a single long 'path', before closing it
+ * with a stroke or similar command. */
+static void
+PDF_PathOpen ()
+{
+    PDF_pathIsOpen = TRUE;
+}
+
+static void
+PDF_PathClose ()
+{
+    if (PDF_pathIsOpen) {
+	PDF_stroke(myPDF);
+
+	PDF_pathIsOpen = FALSE;
+    }
+}
+
+/* Helper function to deal with switching over to a newly selected
+ * font.  For now, this does not try to embed fonts into the PDF
+ * file. This relies on the user restricting herself to the 14
+ * 'classical' fonts built into every valid PDF reader application */
+static void
+PDF_SetFont ()
+{
+    int font_handle = PDF_findfont(myPDF, PDF_fontNameCur, "host", 0);
+
+    PDF_setfont(myPDF, font_handle, PDF_fontSizeCur * PDF_RESOLUTION);
+
+    /* Ask PDFlib for the actual numbers */
+    PDF_fontAscent = (int) (PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "ascender", 0));	
+    PDF_fontDescent = (int) (- PDF_RESOLUTION * PDF_fontSizeCur * PDF_get_value(myPDF, "descender", 0));	
+    PDF_fontLeading = (int) (PDF_RESOLUTION * PDF_fontSizeCur * 0.25); 
+    
+    /* Assume this particular string is a somewhat reasonable typical
+     * output, for getting at the average character width */
+    PDF_fontAvWidth = (int)
+	(PDF_RESOLUTION * PDF_stringwidth(myPDF, "01234567890123456789",
+					  font_handle, PDF_fontSizeCur)
+	 / 20.0);
+}
+
+/*------------------- the terminal entry functions --------------------*/
+
+
+TERM_PUBLIC void
+PDF_options ()
+{
+    struct value a;
+
+    if (!END_OF_COMMAND) {	/* get default font family name*/
+	if (almost_equals (c_token, "fn$ame"))  {
+	    c_token++;
+
+	    if (!END_OF_COMMAND && isstring (c_token)) {
+		quote_str (PDF_fontNameDef, c_token, MAX_ID_LEN);
+		c_token++;
+	    } else
+		int_error("fname: expecting font name", c_token);
+	}
+    }
+
+    if (!END_OF_COMMAND) {	/* get default font size*/
+	if (almost_equals (c_token, "fs$ize")) {
+	    c_token++;
+
+	    if (END_OF_COMMAND)
+		int_error("fsize: expecting font size", c_token);
+	    PDF_fontSizeDef = real (const_express (&a));
+	}
+    }
+
+    if (!END_OF_COMMAND)
+	 int_error("unexpected text at end of command", c_token);
+
+    /* Save options back into options string in normalized format */
+    sprintf(term_options, "fname '%s'  fsize %g",
+	    PDF_fontNameDef, PDF_fontSizeDef);
+}
+
+
+TERM_PUBLIC void
+PDF_init ()
+{
+    static TBOOLEAN PDFlib_booted = FALSE;
+    
+    if (!PDFlib_booted) {
+	PDF_boot();
+	PDFlib_booted = TRUE;
+    }
+
+    if (!myPDF)
+	myPDF = PDF_new();
+
+    /*open new PDF file */ 
+    if (PDF_open_fp(myPDF, gpoutfile) == -1)
+	int_error("Error:cannot open PDF file .\n", NO_CARET);
+
+#ifdef PDF_DONT_COMPRESS
+    /* for easier debugging of the output, turn off PDF stream
+     * compression */
+    PDF_set_value(myPDF, "compress", 0);
+#endif
+
+    PDF_set_info(myPDF,"Creator","gnuplot-3.8e");
+    PDF_set_info(myPDF,"Author","Hans-Bernhard Broeker"); /* FIXME: put in username? */
+    PDF_set_info(myPDF,"Title","gnuplot diagram"); /* FIXME: use 'set title', if any ? */
+    
+    PDF_LineType = -3;
+
+    /* set current font to default */
+    strcpy(PDF_fontNameCur, PDF_fontNameDef);
+    PDF_fontSizeCur = PDF_fontSizeDef;
+
+    /* Have to start the first page now, in order to know the actual
+     * size of the selected font */
+    PDF_graphics();
+
+    /* set h_char, v_char*/
+    term->h_char = PDF_fontAvWidth;
+    term->v_char = (PDF_fontAscent + PDF_fontDescent + PDF_fontLeading);
+
+    /* set h_tic, v_tic*/
+    term->h_tic = term->v_tic = 3 * PDF_RESOLUTION;
+
+    /* initialize terminal's pointsize from "set pointsize" value */
+    term_pointsize = pointsize;	
+}
+
+
+TERM_PUBLIC void
+PDF_graphics ()
+{
+    if (PDF_pageIsOpen) 
+	return;			/* already open --> nothing to do */
+
+    PDF_pathIsOpen = FALSE;
+    PDF_xLast = PDF_yLast = UINT_MAX;
+
+    /* set xmax, ymax*/
+    term->xmax = PDF_XMAX * xsize;
+    term->ymax = PDF_YMAX * ysize;
+    
+    PDF_begin_page(myPDF, (double)term->xmax / PDF_RESOLUTION,
+		   (double)term->ymax / PDF_RESOLUTION);
+    PDF_scale(myPDF, 1.0/PDF_RESOLUTION, 1.0/PDF_RESOLUTION);
+    if (title.text && title.text[0])
+	/* a title has been set --> use it as the bookmark name, too */
+	PDF_add_bookmark(myPDF, title.text, 0, 1);
+    PDF_pageIsOpen = TRUE;
+
+    PDF_SetFont();
+}
+
+
+TERM_PUBLIC void
+PDF_text ()
+{
+    PDF_PathClose();
+    PDF_end_page(myPDF);
+    PDF_pageIsOpen = FALSE;
+}
+
+
+TERM_PUBLIC void
+PDF_reset ()
+{
+    assert(PDF_pageIsOpen == FALSE);
+    PDF_close(myPDF);
+    PDF_delete(myPDF);
+    myPDF = NULL;
+}
+
+
+TERM_PUBLIC void
+PDF_linetype (int linetype)
+{
+    if (linetype != PDF_LineType) {
+	int real_linetype = PDF_Pen_RealID(linetype);
+	struct rgb *this_color = web_color_rgbs + 1 + real_linetype;
+
+	PDF_PathClose ();
+	PDF_LineType = linetype;
+	
+	PDF_setrgbcolor(myPDF, this_color->r / 255.0,
+			this_color->g / 255.0, this_color->b / 255.0);
+    }
+}
+
+
+TERM_PUBLIC void
+PDF_linewidth (double linewidth)
+{
+    PDF_PathClose();
+    PDF_LineWidth = PDF_RESOLUTION * linewidth / 4.0;
+    PDF_setlinewidth(myPDF, PDF_LineWidth);
+}
+
+
+TERM_PUBLIC void
+PDF_move (unsigned int x, unsigned int y)
+{
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)  
+	return;
+
+    PDF_PathOpen ();
+    PDF_moveto(myPDF, x, y);
+
+    PDF_xLast = x;
+    PDF_yLast = y;
+}
+
+
+TERM_PUBLIC void
+PDF_vector (unsigned int x, unsigned int y)
+{
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast) 
+	return;
+
+    PDF_PathOpen ();
+    PDF_lineto(myPDF, x, y);
+
+    PDF_xLast = x;
+    PDF_yLast = y;
+}
+
+/* Helper function. Many symbols have an additional dot in their
+ * center, so isolate its drawing into a separate function. */
+static GP_INLINE void
+PDF_dot (unsigned int x, unsigned int y)
+{
+    /* Imitate PS's way of creating a small dot by a zero-length line
+     * segment with rounded endpoints */
+    PDF_setlinecap(myPDF, 1); /* rounded ends */
+    PDF_moveto(myPDF, x, y);
+    PDF_lineto(myPDF, x, y);
+    PDF_stroke(myPDF);
+}
+    
+
+TERM_PUBLIC void
+PDF_point (unsigned int x, unsigned int y, int number)
+{
+    PDF_PathClose ();
+    PDF_save(myPDF);
+
+    if (number < 0) {
+	/* Like the PostScript driver, treat all negative numbers as
+         * 'with dots'. */
+	PDF_dot(x, y);
+    } else {
+	/* Change coordinate system so the point symbols themselves
+	 * can be drawn without depending on position or size (-->
+	 * better compression and less coding for gnuplot) */
+	/* NB: I use the do_pointsize() default implementation, which
+	 * just stores the last set pointsize into `term_pointsize',
+	 * to avoid introducing another static driver-local variable
+	 * */
+	PDF_translate(myPDF, x, y);
+	PDF_scale(myPDF, term->h_tic / 2.0 * term_pointsize,
+		  term->v_tic / 2.0 * term_pointsize);
+	/* Correct linewidth to counter the scaling effect --- assume
+	 * h_tic is usable, to avoid having to average h_ and v_tic */
+	PDF_setlinewidth(myPDF,
+			 PDF_LineWidth / (term->h_tic / 2.0 * term_pointsize));
+	switch (number %= PDF_NUM_POINTTYPES) {
+	case 0:			/* Plus */
+	    PDF_moveto(myPDF, -1, 0);
+	    PDF_lineto(myPDF, 1, 0);
+	    PDF_moveto(myPDF, 0, -1);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_stroke(myPDF);
+	    break;
+	case 2:			/* Star */
+	    PDF_moveto(myPDF, -1, 0);
+	    PDF_lineto(myPDF, 1, 0);
+	    PDF_moveto(myPDF, 0, -1);
+	    PDF_lineto(myPDF, 0, 1);
+	    /* FALLTHROUGH */
+	case 1:			/* Cross */
+	    PDF_moveto(myPDF, -1, -1);
+	    PDF_lineto(myPDF, 1, 1);
+	    PDF_moveto(myPDF, 1, -1);
+	    PDF_lineto(myPDF, -1, 1);
+	    PDF_stroke(myPDF);
+	    break;
+
+/* For each x = 0..5, 4 shapes are defined: 
+ * 3 + 2*x --> hollow symbol with a dot at its center
+ * 4 + 2*x --> solid symbol filled in linetype's color
+ * 63 + x  --> hollow symbol without the center dot 
+ * 69 + x  --> symbol filled with white --> opaque symbol */
+ 
+	case 63+0:		/* BoxEmpty */
+	case 3+2*0:		/* Box */
+	    PDF_moveto(myPDF, -1, -1);
+	    PDF_lineto(myPDF, 1, -1);
+	    PDF_lineto(myPDF, 1, 1);
+	    PDF_lineto(myPDF, -1, 1);
+	    PDF_closepath_stroke(myPDF);
+	    if (number == 3) PDF_dot(0,0);
+	    break;
+	case 69+0:		/* BoxWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*0:		/* BoxFilled */
+	    PDF_moveto(myPDF, -1, -1);
+	    PDF_lineto(myPDF, 1, -1);
+	    PDF_lineto(myPDF, 1, 1);
+	    PDF_lineto(myPDF, -1, 1);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+	case 63+1:		/* CircleEmpty */
+	case 3+2*1:		/* Circle */
+	    PDF_circle(myPDF, 0, 0, 1);
+	    PDF_stroke(myPDF);
+	    if (number == 5) PDF_dot(0,0);
+	    break;
+	case 69+1:		/* CircleWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*1:		/* CircleFilled */
+	    PDF_circle(myPDF, 0, 0, 1);
+	    PDF_fill_stroke(myPDF);
+	    break;
+
+	case 63+2:		/* TriangleUpEmpty */
+	case 3+2*2:		/* TriangleUp */
+	    PDF_moveto(myPDF, 0, 1.12);
+	    PDF_lineto(myPDF, -1, -0.5);
+	    PDF_lineto(myPDF, 1, -0.5);
+	    PDF_closepath_stroke(myPDF);
+	    if (number == 7) PDF_dot(0,0);
+	    break;
+	case 69+2:		/* TriangleUpWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*2:			/* TriangleUpFilled */
+	    PDF_moveto(myPDF, 0, 1.12);
+	    PDF_lineto(myPDF, -1, -0.5);
+	    PDF_lineto(myPDF, 1, -0.5);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+	case 63+3:		/* TriangleDownEmpty */
+	case 3+2*3:		/* TriangleDown */
+	    PDF_moveto(myPDF, 0, -1.12);
+	    PDF_lineto(myPDF, -1, 0.5);
+	    PDF_lineto(myPDF, 1, 0.5);
+	    PDF_closepath_stroke(myPDF);
+	    if (number == 9) PDF_dot(0,0);
+	    break;
+	case 69+3:		/* TriangleDownWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*3:		/* TriangleDownFilled */
+	    PDF_moveto(myPDF, 0, -1.12);
+	    PDF_lineto(myPDF, -1, 0.5);
+	    PDF_lineto(myPDF, 1, 0.5);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+	case 63+4:		/* DiamondEmpty */
+	case 3+2*4:		/* Diamond */
+	    PDF_moveto(myPDF, 0, -1);
+	    PDF_lineto(myPDF, 1, 0);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_lineto(myPDF, -1, 0);
+	    PDF_closepath_stroke(myPDF);
+	    if (number == 11) PDF_dot(0,0);
+	    break;
+	case 69+4:		/* DiamondWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*4:		/* DiamondFilled */
+	    PDF_moveto(myPDF, 0, -1);
+	    PDF_lineto(myPDF, 1, 0);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_lineto(myPDF, -1, 0);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+	case 63+5:		/* PentagonEmpty */
+	case 3+2*5:		/* Pentagon */
+	    PDF_moveto(myPDF, 0, 1);
+	    PDF_lineto(myPDF, -0.95, 0.31);
+	    PDF_lineto(myPDF, -0.58, -0.81);
+	    PDF_lineto(myPDF, +0.58, -0.81);
+	    PDF_lineto(myPDF, +0.95, 0.31);
+	    PDF_closepath_stroke(myPDF);
+	    if (number == 13) PDF_dot(0,0);
+	    break;
+	case 69+5:		/* PentagonWhitefilled */
+	    PDF_setgray_fill(myPDF, 1);
+	    /* FALLTHROUGH */
+	case 4+2*5:		/* PentagonFilled */
+	    PDF_moveto(myPDF, 0, 1);
+	    PDF_lineto(myPDF, -0.95, 0.31);
+	    PDF_lineto(myPDF, -0.58, -0.81);
+	    PDF_lineto(myPDF, +0.58, -0.81);
+	    PDF_lineto(myPDF, +0.95, 0.31);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+	    
+/* 15 + (0..15): circles with varying parts of'em filled. The added
+ * number is a bit-pattern of the 4 quadrants: 1 signals a quadrant
+ * filled */
+	case 15+0:
+	    PDF_moveto(myPDF, 0, 0);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_arc(myPDF, 0, 0, 1, 90, 360+90);
+	    PDF_closepath_stroke(myPDF);
+	    break;
+
+/* Generalize common code into a macro... */
+#define CIRCLE_SINGLE_PIESLICE(x, y, angle1, angle2)		\
+	    PDF_moveto(myPDF, 0, 0);				\
+	    PDF_lineto(myPDF, (x), (y));			\
+	    PDF_arc(myPDF, 0, 0, 1, (angle1), (angle2));	\
+	    PDF_lineto(myPDF, 0, 0);				\
+	    PDF_closepath(myPDF);				\
+	    PDF_fill_stroke(myPDF);				\
+	    PDF_arc(myPDF, 0, 0, 1, (angle2), (angle1) + 360);	\
+	    PDF_stroke(myPDF);					\
+	    break;
+
+#define CIRCLE_SINGLE_QUADRANT(x, y, angle)			\
+	    CIRCLE_SINGLE_PIESLICE(x, y, angle, angle+90);
+	case 15+1:
+	    CIRCLE_SINGLE_QUADRANT(1, 0, 0);
+	case 15+2:
+	    CIRCLE_SINGLE_QUADRANT(0, 1, 90);
+	case 15+4:
+	    CIRCLE_SINGLE_QUADRANT(-1, 0, 180);
+	case 15+8:
+	    CIRCLE_SINGLE_QUADRANT(0, -1, 270);
+#undef CIRCLE_SINGLE_QUADRANT
+
+#define CIRCLE_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
+	    CIRCLE_SINGLE_PIESLICE(x, y, angle, angle+180)
+	case 15+3:	
+	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
+	case 15+6:
+	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
+	case 15+12:
+	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(-1, 0, 180);
+	case 15+9:
+	    CIRCLE_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
+#undef CIRCLE_TWO_NEIGHBOR_QUADRANTS
+	  
+#define CIRCLE_TWO_OPPOSING_QUADRANTS(x, y, angle)		\
+	    PDF_moveto(myPDF, 0, 0);				\
+	    PDF_lineto(myPDF, x, y);				\
+	    PDF_arc(myPDF, 0, 0, 1, angle, angle + 90);		\
+	    PDF_lineto(myPDF, 0, 0);				\
+	    PDF_fill_stroke(myPDF);				\
+	    PDF_moveto(myPDF, 0, 0);				\
+	    PDF_lineto(myPDF, -x, -y);				\
+	    PDF_arc(myPDF, 0, 0, 1, angle + 180, angle + 270);	\
+	    PDF_lineto(myPDF, 0, 0);				\
+	    PDF_fill_stroke(myPDF);				\
+	    PDF_arc(myPDF, 0, 0, 1, angle + 90, angle + 360);	\
+	    PDF_stroke(myPDF);					\
+	    break;
+	case 15+5:
+	    CIRCLE_TWO_OPPOSING_QUADRANTS(1, 0, 0);
+	case 15+10:
+	    CIRCLE_TWO_OPPOSING_QUADRANTS(0, 1, 90);
+#undef CIRCLE_TWO_OPPOSING_QUADRANTS
+	    
+#define CIRCLE_THREE_QUADRANTS(x, y, angle)			\
+	    CIRCLE_SINGLE_PIESLICE(x, y, angle, angle+270)
+	case 15+7:
+	    CIRCLE_THREE_QUADRANTS(1, 0, 0);	    
+	case 15+14:
+	    CIRCLE_THREE_QUADRANTS(0, 1, 90);	    
+	case 15+13:
+	    CIRCLE_THREE_QUADRANTS(-1, 0, 180);	    
+	case 15+11:
+	    CIRCLE_THREE_QUADRANTS(0, -1, 270);	    
+#undef CIRCLE_THREE_QUADRANTS
+#undef CIRCLE_SINGLE_PIESLICE
+
+	case 15+15:		
+	    PDF_circle(myPDF, 0, 0, 1);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+
+/*************************************************************************/
+/* 31 + (0..15): squares with different quadrants of them filled in. */
+/*************************************************************************/
+/*************************************************************************/
+/* 47 + (0..15): diamonds with filled quadrants as given by bit pattern  */
+/*   Diamonds are drawn as squares rotated by 45 degrees, so can use
+ * fall-through from diamond to squares, and re-use some macros. */
+/*************************************************************************/
+	case 47+0:
+	    PDF_rotate(myPDF, 45);
+	    /* FALLTHROUGH */
+	case 31+0:
+	    PDF_moveto(myPDF, 0, 0);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_lineto(myPDF, -1, 1);
+	    PDF_lineto(myPDF, -1, -1);
+	    PDF_lineto(myPDF, 1, -1);
+	    PDF_lineto(myPDF, 1, 1);
+	    PDF_lineto(myPDF, 0, 1);
+	    PDF_stroke(myPDF);
+	    break;
+
+	case 47+15:
+	    PDF_rotate(myPDF, 45);
+	    /* FALLTHROUGH */
+	case 31+15:		
+	    PDF_moveto(myPDF, -1, 1);
+	    PDF_lineto(myPDF, -1, -1);
+	    PDF_lineto(myPDF, 1, -1);
+	    PDF_lineto(myPDF, 1, 1);
+	    PDF_closepath_fill_stroke(myPDF);
+	    break;
+
+/* macros defining shapes of the partly filled symbols. Done by
+ * rotating the starting point (x0, y0) by 90 degrees or 45 degrees
+ * (with length adjustment).  The rotations can be done without
+ * trigonometric function calls, since their values are known:
+ * cos(90)=0, sin(90)=1, cos(45)=sin(45)=1/sqrt(2).  A good compiler
+ * should be able to optimize away all the local variables and
+ * loops...  */
+
+#define SQUARE_SINGLE_PIESLICE(x0, y0, quadrants)			\
+	    {								\
+		int quadrant = 0;					\
+		int x= x0, y=y0;					\
+		PDF_moveto(myPDF, 0, 0);				\
+		PDF_lineto(myPDF, x, y);				\
+		/* poor man's rotation by 45 and 90 degrees around the	\
+		 * square's outline. */					\
+		while (quadrant++ < quadrants) {			\
+		    int dummy;						\
+		    PDF_lineto(myPDF, x-y, x+y);			\
+		    dummy = x; x = -y; y = dummy;			\
+		}							\
+		PDF_lineto(myPDF, x, y);				\
+		PDF_closepath_fill_stroke(myPDF);			\
+		PDF_moveto(myPDF, x, y);				\
+		while (quadrant++ <= 4) {				\
+		    int dummy;						\
+		    PDF_lineto(myPDF, x-y, x+y);			\
+		    dummy = x; x = -y; y = dummy;			\
+		}							\
+		PDF_lineto(myPDF, x, y);				\
+		PDF_stroke(myPDF);					\
+	    }								\
+	    break;
+
+#define SQUARE_TWO_OPPOSING_QUADRANTS(x0, y0, angle)	\
+	    {						\
+		int x = x0, y = y0, dummy;		\
+		int counter = 0;			\
+							\
+		while (counter++ < 2) {			\
+		    PDF_moveto(myPDF, 0, 0);		\
+		    PDF_lineto(myPDF, x, y);		\
+		    PDF_lineto(myPDF, x-y, x+y);	\
+		    dummy = x; x = -y; y = dummy;	\
+		    PDF_lineto(myPDF, x, y);		\
+		    PDF_closepath_fill_stroke(myPDF);	\
+							\
+		    PDF_moveto(myPDF, x, y);		\
+		    PDF_lineto(myPDF, x-y, x+y);	\
+		    dummy = x; x = -y; y = dummy;	\
+		    PDF_lineto(myPDF, x, y);		\
+		    PDF_stroke(myPDF);			\
+		}					\
+		break;					\
+	    }
+
+/* Macros for diamonds just prepend the rotation and then call those
+ * for squares: */
+#define DIAMOND_SINGLE_PIESLICE(x, y, quadrants)	\
+	    PDF_rotate(myPDF, 45);			\
+	    SQUARE_SINGLE_PIESLICE(x, y, quadrants);
+#define DIAMOND_TWO_OPPOSING_QUADRANTS(x, y, angle)	\
+	    PDF_rotate(myPDF, 45);			\
+	    SQUARE_TWO_OPPOSING_QUADRANTS(x, y, angle);
+
+/* ... and now all the individual cases. The 'angle' arguments' are
+ * purely for the sake of easing cut'n'paste with the circle case */
+#define SQUARE_SINGLE_QUADRANT(x, y, angle)			\
+	    SQUARE_SINGLE_PIESLICE(x, y, 1);
+	case 31+1:
+	    SQUARE_SINGLE_QUADRANT(1, 0, 0);
+	case 31+2:
+	    SQUARE_SINGLE_QUADRANT(0, 1, 90);
+	case 31+4:
+	    SQUARE_SINGLE_QUADRANT(-1, 0, 180);
+	case 31+8:
+	    SQUARE_SINGLE_QUADRANT(0, -1, 270);
+#undef SQUARE_SINGLE_QUADRANT
+
+#define SQUARE_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
+	    SQUARE_SINGLE_PIESLICE(x, y, 2)
+	case 31+3:	
+	    SQUARE_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
+	case 31+6:
+	    SQUARE_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
+	case 31+12:
+	    SQUARE_TWO_NEIGHBOR_QUADRANTS(-1, 0, 180);
+	case 31+9:
+	    SQUARE_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
+#undef SQUARE_TWO_NEIGHBOR_QUADRANTS
+	  
+	case 31+5:
+	    SQUARE_TWO_OPPOSING_QUADRANTS(1, 0, 0);
+	case 31+10:
+	    SQUARE_TWO_OPPOSING_QUADRANTS(0, 1, 90);
+	    
+#define SQUARE_THREE_QUADRANTS(x, y, angle)			\
+	    SQUARE_SINGLE_PIESLICE(x, y, 3)
+	case 31+7:
+	    SQUARE_THREE_QUADRANTS(1, 0, 0);	    
+	case 31+14:
+	    SQUARE_THREE_QUADRANTS(0, 1, 90);	    
+	case 31+13:
+	    SQUARE_THREE_QUADRANTS(-1, 0, 180);	    
+	case 31+11:
+	    SQUARE_THREE_QUADRANTS(0, -1, 270);	    
+#undef SQUARE_THREE_QUADRANTS
+
+#define DIAMOND_SINGLE_QUADRANT(x, y, angle)			\
+	    DIAMOND_SINGLE_PIESLICE(x, y, 1)
+	case 47+1:
+	    DIAMOND_SINGLE_QUADRANT(1, 0, 0);
+	case 47+2:
+	    DIAMOND_SINGLE_QUADRANT(0, 1, 90);
+	case 47+4:
+	    DIAMOND_SINGLE_QUADRANT(-1, 0, 180);
+	case 47+8:
+	    DIAMOND_SINGLE_QUADRANT(0, -1, 270);
+#undef DIAMOND_SINGLE_QUADRANT
+
+#define DIAMOND_TWO_NEIGHBOR_QUADRANTS(x, y, angle)		\
+	    DIAMOND_SINGLE_PIESLICE(x, y, 2)
+	case 47+3:	
+	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(1, 0, 0);
+	case 47+6:
+	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(0, 1, 90);
+	case 47+12:
+	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(-1, 0, 180);
+	case 47+9:
+	    DIAMOND_TWO_NEIGHBOR_QUADRANTS(0, -1, 270);
+#undef DIAMOND_TWO_NEIGHBOR_QUADRANTS
+	  
+
+	case 47+5:
+	    DIAMOND_TWO_OPPOSING_QUADRANTS(1, 0, 0);
+	case 47+10:
+	    DIAMOND_TWO_OPPOSING_QUADRANTS(0, 1, 90);
+#undef DIAMOND_TWO_OPPOSING_QUADRANTS
+#undef SQUARE_TWO_OPPOSING_QUADRANTS
+	    
+#define DIAMOND_THREE_QUADRANTS(x, y, angle)			\
+	    DIAMOND_SINGLE_PIESLICE(x, y, 3)
+	case 47+7:
+	    DIAMOND_THREE_QUADRANTS(1, 0, 0);	    
+	case 47+14:
+	    DIAMOND_THREE_QUADRANTS(0, 1, 90);	    
+	case 47+13:
+	    DIAMOND_THREE_QUADRANTS(-1, 0, 180);	    
+	case 47+11:
+	    DIAMOND_THREE_QUADRANTS(0, -1, 270);	    
+#undef DIAMOND_THREE_QUADRANTS
+#undef DIAMOND_SINGLE_PIESLICE
+#undef SQUARE_SINGLE_PIESLICE
+
+	default:
+	    {
+	    char temp[64];
+	    sprintf(temp, "PDF: unknown point type number %d", number);
+	    int_warn(temp,NO_CARET);
+	    }
+	}	
+    }
+
+    PDF_restore(myPDF);
+    PDF_xLast = x;
+    PDF_yLast = y;
+}
+
+
+TERM_PUBLIC int
+PDF_justify_text (enum JUSTIFY mode)
+{
+    PDF_TextJust = mode;
+    return (TRUE);
+}
+
+
+TERM_PUBLIC int
+PDF_text_angle (int ang)
+{
+    if (ang == 0 || ang == 1) {
+	/* FIXME: need to do this in a different way? */
+	PDF_TextAngle = ang;
+	return (TRUE);
+    }
+
+    return (FALSE);
+}
+
+
+TERM_PUBLIC void
+PDF_put_text (unsigned int x, unsigned int y, char *str)
+{
+    char *alignment = NULL;
+    double h = x, v = y;
+    
+    PDF_PathClose ();
+
+    /* horizontal justification*/
+    switch (PDF_TextJust) {
+    case LEFT:
+	alignment = "left";
+	break;
+    case CENTRE:
+	alignment = "center";
+	break;
+    case RIGHT:
+	alignment = "right";
+	break;
+    }
+
+    /* vertical justification*/
+    switch (PDF_TextAngle) {
+    case 1:
+	h += (PDF_fontAscent - PDF_fontDescent) / 2;
+	break;		/* vertical text*/
+    default:
+	v -= (PDF_fontAscent - PDF_fontDescent) / 2;
+	break;		/* horizontal text*/
+    }
+
+    if (PDF_TextAngle) {
+	PDF_save(myPDF);
+	PDF_rotate(myPDF, 90);
+	PDF_show_boxed(myPDF, str, v , -h, 0, 0, alignment, NULL);
+	PDF_restore(myPDF);
+    } else {
+	PDF_show_boxed(myPDF, str, h , v, 0, 0, alignment, NULL);
+    }
+
+}
+
+
+TERM_PUBLIC int
+PDF_set_font (char *font)
+{
+    if (strlen (font) > 0) {	/* if available, parse the font specification ("fontname,fontsize")*/
+	short index;
+	char *token,
+	    seps[] = ",", *buffer = (char *) malloc (strlen (font) + 1);
+
+	if (buffer == NULL)
+	    return (FALSE);
+	strcpy (buffer, font);
+
+	for (token = strtok (buffer, seps), index = 1;
+	     token != NULL; token = strtok (NULL, seps), index++
+	    ) {
+	    switch (index) {
+	    case 1:
+		strcpy (PDF_fontNameCur, token);
+		break;	/* font name*/
+	    case 2:
+		PDF_fontSizeCur = atoi (token);
+		break;	/* font size*/
+	    default:
+		break;
+	    }
+	}
+
+	free (buffer);
+    } else {			/* otherwise simply reset the default font*/
+	strcpy (PDF_fontNameCur, PDF_fontNameDef);
+	PDF_fontSizeCur = PDF_fontSizeDef;
+    }
+
+
+    PDF_PathClose();
+    PDF_SetFont();
+    return (TRUE);
+}
+
+TERM_PUBLIC void
+PDF_boxfill(int style, unsigned int x1, unsigned int y1,
+	    unsigned int width, unsigned int height)
+{
+    (void) style;		/* unused */
+    PDF_PathClose();
+    PDF_save(myPDF);
+    PDF_setgray(myPDF, 1);
+    PDF_moveto(myPDF, x1, y1);
+    PDF_lineto(myPDF, x1+width, y1);
+    PDF_lineto(myPDF, x1+width, y1+height);
+    PDF_lineto(myPDF, x1, y1+height);
+    PDF_fill(myPDF);
+    PDF_restore(myPDF);
+}
+    
+#endif /* TERM_BODY */
+
+#ifdef TERM_TABLE
+TERM_TABLE_START (pdf_driver)
+    "pdf", "PDF (Portable Document File) file driver",
+    0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
+    0 /* vtic */ , 0 /* htic */ ,
+    PDF_options, PDF_init, PDF_reset, PDF_text, null_scale, PDF_graphics,
+    PDF_move, PDF_vector, PDF_linetype, PDF_put_text, PDF_text_angle,
+    PDF_justify_text, PDF_point, do_arrow, PDF_set_font, do_pointsize,
+    TERM_BINARY,
+    0 /* suspend */, 0 /* resume */ , PDF_boxfill, PDF_linewidth
+TERM_TABLE_END (pdf_driver)
+#undef LAST_TERM
+#define LAST_TERM pdf_driver
+#endif /* TERM_TABLE */
+
+#endif /* TERM_PROTO_ONLY */
+
+#ifdef TERM_HELP
+    START_HELP (pdf)
+    "1 pdf",
+    "?commands set terminal pdf",
+    "?set terminal pdf",
+    "?set term pdf",
+    "?terminal pdf",
+    "?term pdf",
+    "?pdf",
+    " This terminal produces files in the Adobe Portable Document Format",
+    " (PDF), useable for printing or display with tools like Acrobat Reader",
+    "",
+    " Syntax:",
+    "       set terminal pdf {fname \"<font>\"} {fsize <fontsize>}",
+    "",
+    " where <font> is the name of the default font to use (default Helvetica)",
+    " and <fontsize> is the font size (in points, default 12)"
+    END_HELP (pdf)
+#endif

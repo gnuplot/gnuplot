@@ -1,7 +1,10 @@
 
-# $Id: makefile.r,v 1.7 1998/04/14 00:15:55 drd Exp $
+# $Id: makefile.r,v 1.1 1998/12/09 17:24:30 lhecking Exp $
 #
 # $Log: makefile.r,v $
+# Revision 1.1  1998/12/09 17:24:30  lhecking
+# Moved from ../..
+#
 # Revision 1.7  1998/04/14 00:15:55  drd
 # HBB, Lars : latest mega monster patches. (Yes, this was supposed
 #             to be frozen...)
@@ -749,9 +752,9 @@ CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
 	term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
 	term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
-	term/pbm.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm
+	term/pbm.trm term/pdf.trm term/pslatex.trm term/gpic.trm term/gnugraph.trm
 CSOURCE7 = term/post.trm term/pstricks.trm term/qms.trm term/regis.trm \
-	term/rgip.trm term/sun.trm \
+	term/rgip.trm term/sun.trm term/svg.trm \
 	term/t410x.trm term/tek.trm term/texdraw.trm term/tgif.h \
 	term/tgif.trm term/tpic.trm \
 	term/unixpc.trm term/unixplot.trm \

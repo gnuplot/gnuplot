@@ -87,7 +87,8 @@ TERM  = term$(SL)
 TERMS = $(TERM)atariaes.trm $(TERM)atarivdi.trm $(TERM)multitos.trm \
         $(TERM)dumb.trm $(TERM)eepic.trm \
         $(TERM)epson.trm $(TERM)hpgl.trm $(TERM)hpljii.trm $(TERM)hppj.trm \
-        $(TERM)latex.trm $(TERM)pbm.trm $(TERM)post.trm $(TERM)texdraw.trm
+        $(TERM)latex.trm $(TERM)pbm.trm $(TERM)pdf.trm $(TERM)post.trm \
+	$(TERM)svg.trm $(TERM)texdraw.trm
 
 all: gnuplot.tos gnuplt30.tos gpltsfp.tos $(HELPFILE) $(TEXFILE) demo$(SL)binary1
 

@@ -1,5 +1,5 @@
 ;
-;  $Id: gnuplot.prj,v 1.7 1998/04/14 00:15:21 drd Exp $
+;  $Id: gnuplot.prj,v 1.1.1.2 1998/04/22 13:37:12 lhecking Exp $
 ;
 ; gnuplot.prj - this project can be used for both PureC and TurboC on the
 ; Atari. It is currently set up for PureC, but if you change all lines
@@ -47,7 +47,7 @@ stdfn		(stdfn.c, stdfn.h)
 term		(term.c, bitmap.h, plot.h, setshow.h, term.h,
 		 term\atari.trm, term\dumb.trm, term\eepic.trm,
 		 term\epson.trm, term\hpgl.trm, term\hpljii.trm,
-		 term\hppj.trm, term\latex.trm, term\pbm.trm,
+		 term\hppj.trm, term\latex.trm, term\pbm.trm, term\pdf.trm,
 		 term\post.trm, term\texdraw.trm, term\tgif.h,
 		 term\tgif.trm, term\tpic.trm)
 util		(util.c, plot.h)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.16 1998/04/14 00:15:50 drd Exp $
+# $Id: makefile.ami,v 1.5 1998/09/25 15:22:15 lhecking Exp $
 #
 #
 #
@@ -59,8 +59,9 @@ CSOURCE5 = term/amiga.trm term/aed.trm term/cgi.trm term/dumb.trm term/dxf.trm \
 	term/hp26.trm term/hp2648.trm term/hpgl.trm term/hpljii.trm \
 	term/apollo.trm term/gpr.trm
 CSOURCE6 = term/impcodes.h term/imagen.trm term/object.h \
-	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pc.trm 
-CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
+	term/iris4d.trm term/kyo.trm term/latex.trm term/pbm.trm term/pdf.trm \
+	term/pc.trm 
+CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm term/svg.trm \
 	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
 	term/v384.trm term/x11.trm term/bigfig.trm term/vws.trm gplt_x11.c
 CSOURCE8 = contour.c specfun.c interpol.c

@@ -1,6 +1,6 @@
 # Makefile for SAS/C 6.1 or better on the Amiga
 #
-# $Id: makefile.amg,v 1.8.2.1 1999/08/19 14:39:00 lhecking Exp $
+# $Id: makefile.amg,v 1.8.2.2 2000/10/20 19:37:32 lhecking Exp $
 #
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
@@ -126,10 +126,10 @@ CSOURCE6 = term/gpic.trm term/gpr.trm term/grass.trm term/hp26.trm \
 	term/hppj.trm term/imagen.trm term/impcodes.h term/iris4d.trm \
 	term/kyo.trm term/latex.trm term/linux.trm term/mac.trm \
 	term/metafont.trm term/mgr.trm term/mif.trm term/multitos.trm \
-	term/next.trm term/object.h term/pbm.trm term/pc.trm
+	term/next.trm term/object.h term/pbm.trm term/pdf.trm term/pc.trm
 CSOURCE7 = term/pm.trm term/png.trm term/post.trm term/pslatex.trm \
 	term/pstricks.trm term/qms.trm term/regis.trm term/rgip.trm \
-	term/sun.trm term/t410x.trm term/table.trm term/tek.trm \
+	term/sun.trm term/svg.trm term/t410x.trm term/table.trm term/tek.trm \
 	term/texdraw.trm term/tgif.trm term/tkcanvas.trm term/tpic.trm \
 	term/unixpc.trm term/unixplot.trm term/v384.trm term/vws.trm \
 	term/win.trm term/x11.trm term/xlib.trm

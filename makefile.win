@@ -98,8 +98,8 @@ CSOURCE5 = term\aed.trm term\cgi.trm term\cgm.trm term\debug.trm \
 	term\fg.trm term\fig.trm term\ggi.trm term\hp26.trm \
 	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
 CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
-	term\iris4d.trm term\kyo.trm term\latex.trm term/pbm.trm term\win.trm
-CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+	term\iris4d.trm term\kyo.trm term\latex.trm term\pbm.trm term\pdf.trm term\win.trm
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm term\svg.trm \
 	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
 	term\v384.trm term\x11.trm
 CSOURCE8 = contour.c specfun.c binary.c interpol.obj

@@ -36,8 +36,8 @@ CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
         term/apollo.trm term/gpr.trm term/hppj.trm term/compact.c 
 CSOURCE6 = term/impcodes.h term/imagen.trm term/next.trm term/object.h \
         term/iris4d.trm term/kyo.trm term/latex.trm term/mif.trm \
-        term/pbm.trm term/pc.trm 
-CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
+        term/pbm.trm term/pdf.trm term/pc.trm 
+CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm term/svg.trm \
         term/t410x.trm term/tek.trm term/texdraw.trm term/unixpc.trm \
         term/unixplot.trm term/v384.trm term/vws.trm term/x11.trm term/xlib.trm
 OBJ1 =  bitmap.o command.o contour.o eval.o graphics.o graph3d.o hidden3d.o util3d.o
