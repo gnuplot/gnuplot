@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par temp.set
+CLEANFILES = binary1 binary2 binary3 defaults.ini fit.log soundfit.par \
+temp.set fontfile.ps fontfile_latex.ps
 
 BINARY_FILES = binary1 binary2 binary3
 
@@ -47,7 +48,8 @@ fit.dem hidden.dem mgr.dem multimsh.dem multiplt.dem param.dem pm3d.dem \
 polar.dem poldat.dem prob.dem prob2.dem random.dem scatter.dem simple.dem \
 singulr.dem spline.dem steps.dem surface1.dem surface2.dem timedat.dem \
 using.dem vector.dem world.dem density.fnc hexa.fnc line.fnc reflect.fnc \
-stat.inc sound.par sound2.par start.par gnuplot.rot 
+stat.inc sound.par sound2.par start.par gnuplot.rot fontfile.dem \
+fontfile_latex.dem
 ##m4-files-end
 
 Makefile.am: Makefile.am.in
