@@ -279,9 +279,11 @@ int strnicmp __PROTO((char *, char *, int));
 
 #ifndef GP_GETCWD
 # if defined(HAVE_GETCWD)
-#  define GP_GETCWD(path,len) getcwd (path, len)
-# elif defined (OS2)
-#  define GP_GETCWD(path,len) _getcwd2 (path, len)
+#   if defined(__EMX__)
+#     define GP_GETCWD(path,len) _getcwd2 (path, len)
+#   else
+#     define GP_GETCWD(path,len) getcwd (path, len)
+#   endif /* __EMX__ */
 # else
 #  define GP_GETCWD(path,len) getwd (path)
 # endif

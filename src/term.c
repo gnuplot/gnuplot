@@ -154,6 +154,11 @@ void fflush_binary();
 # endif
 #endif
 
+#ifdef __EMX__
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 /* This is needed because the unixplot library only writes to stdout. */
 #if defined(UNIXPLOT) || defined(GNUGRAPH)
 static FILE save_stdout;
@@ -307,18 +312,12 @@ void term_init()
 	    fputs("Cannot reopen output file in binary", stderr);
 	/* and carry on, hoping for the best ! */
     }
-#ifdef OS2
-    else if (!outstr && !interactive && (term->flags & TERM_BINARY)) {
-	/* binary (eg gif) to stdout in a non-interactive session */
-	fflush(stdout);		// _fsetmode requires an empty buffer
 
-	_fsetmode(stdout, "b");
-    }
-#elif defined(MSDOS) || defined (_Windows)
-# if defined(MSDOS)
-    else if (!outstr && !interactive && (term->flags & TERM_BINARY))
-# elif defined(_Windows)
+#if defined(MSDOS) || defined (_Windows) || defined(OS2)
+# ifdef _Windows
     else if (!outstr && (term->flags & TERM_BINARY))
+# else
+    else if (!outstr && !interactive && (term->flags & TERM_BINARY))
 # endif
     {
         /* binary to stdout in non-interactive session... */
