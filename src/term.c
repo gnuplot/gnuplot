@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.48 2002/11/01 20:14:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.49 2002/12/13 13:25:29 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -660,6 +660,10 @@ write_multiline(x, y, text, hor, vert, angle, font)
     if (!p)
 	return;
 
+    /* EAM 9-Feb-2003 - Set font before calculating sizes */
+    if (font && *font)
+	(*t->set_font) (font);
+
     if (vert != JUST_TOP) {
 	/* count lines and adjust y */
 	int lines = 0;		/* number of linefeeds - one fewer than lines */
@@ -672,9 +676,6 @@ write_multiline(x, y, text, hor, vert, angle, font)
 	else
 	    y += (vert * lines * t->v_char) / 2;
     }
-    if (font && *font)
-	(*t->set_font) (font);
-
 
     for (;;) {			/* we will explicitly break out */
 
@@ -690,8 +691,10 @@ write_multiline(x, y, text, hor, vert, angle, font)
 	    else
 		(*t->put_text) (x - fix, y, text);
 	}
-	if (angle)
+	if (angle == TEXT_VERTICAL)
 	    x += t->v_char;
+	else if (-angle == TEXT_VERTICAL)
+	    x -= t->v_char;
 	else
 	    y -= t->v_char;
 
@@ -705,7 +708,6 @@ write_multiline(x, y, text, hor, vert, angle, font)
 	text = p + 1;
     }				/* unconditional branch back to the for(;;) - just a goto ! */
 
-    /* EAM 29-Aug2002 - tell driver to use default font (no longer a global default) */
     if (font && *font)
 	(*t->set_font) ("");
 

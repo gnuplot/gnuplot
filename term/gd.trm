@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.21 2002/12/18 17:38:52 lhecking Exp $
+ * $Id: gd.trm,v 1.22 2003/01/28 21:19:13 lhecking Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -159,17 +159,10 @@ static int PNG_YMAX = GREG_YMAX;
 static const int PNG_POINT_SCALE = 3;
 static int PNG_ps = 3;
 
-
-#define PNG_FONT_SMALL 0
-#ifdef PNG_FONT_SMALL
+/* This will be the default font */
 # define gdfont gdFontSmall
 # define PNG_VCHAR 12
 # define PNG_HCHAR 6
-#else
-# define gdfont gdFontMediumBold
-# define PNG_VCHAR 13
-# define PNG_HCHAR 7
-#endif
 
 #define PNG_VTIC (GREG_YMAX/100)
 #define PNG_HTIC (GREG_XMAX/150)
@@ -486,32 +479,32 @@ PNG_options()
 	    break;
 	case PNG_TINY:
 	    png_state.default_font=gdFontTiny;
-	    term->v_char = (unsigned int)(8);
-	    term->h_char = (unsigned int)(5);
+	    term->v_char = png_state.default_font->h;
+	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_SMALL:
 	    png_state.default_font = gdFontSmall;
-	    term->v_char = (unsigned int)(12);
-	    term->h_char = (unsigned int)(6);
+	    term->v_char = png_state.default_font->h;
+	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_MEDIUM:
 	    png_state.default_font = gdFontMediumBold;
-	    term->v_char = (unsigned int)(13);
-	    term->h_char = (unsigned int)(7);
+	    term->v_char = png_state.default_font->h;
+	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_LARGE:
 	    png_state.default_font = gdFontLarge;
-	    term->v_char = (unsigned int)(16);
-	    term->h_char = (unsigned int)(8);
+	    term->v_char = png_state.default_font->h;
+	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_GIANT:
 	    png_state.default_font=gdFontGiant;
-	    term->v_char = (unsigned int)(15);
-	    term->h_char = (unsigned int)(9);
+	    term->v_char = png_state.default_font->h;
+	    term->h_char = png_state.default_font->w;
 	    ++c_token;
 	    break;
 	case PNG_FONT:
@@ -1247,16 +1240,27 @@ PNG_set_font(const char *fontname)
 	png_state.ttfsize = png_state.default_ttfsize;
     }
 
-    /* DEBUG
-    if (*png_state.ttffont)
-    	fprintf(stderr,"Selecting font %s\n",png_state.ttffont);
-    else
-    	fprintf(stderr,"Selecting font %s\n",name);
-    DEBUG */
-
     png_state.font  = font;
     png_state.charw = font->w;
     png_state.charh = font->h;
+
+/* EAM 9-Feb-2003 Make new font size visible to higher level routines like write_multiline */
+    term->h_char = font->w;
+    term->v_char = font->h;
+#ifdef HAVE_GD_TTF
+    /* Find approximate character width and height of selected TTF font */
+    if (*png_state.ttffont) {
+    	int brect[8];
+	char *err;
+	err = gdImageStringFT(NULL, &brect[0], 0, 
+		png_state.ttffont, (double)png_state.ttfsize,
+		0.0, 0, 0, "f00000000g");
+	if (!err) {
+	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
+	    term->v_char = 1.1 * (float)(brect[1] - brect[7]) + 0.5;
+	}
+    }
+#endif
 
     return TRUE;
 }
