@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.250 2004/10/23 04:19:40 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.251 2004/10/24 02:59:56 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8206,6 +8206,17 @@ C ... and restart the table:
 ?set terminal
 ?set term
 ?show terminal
+?show term
+?set terminal push
+?set term push
+?terminal push
+?term push
+?push
+?set terminal pop
+?set term pop
+?terminal pop
+?term pop
+?pop
  `gnuplot` supports many different graphics devices.  Use `set terminal` to
  tell `gnuplot` what kind of output to generate. Use `set output` to redirect
  that output to a file or device.
