@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.57 2002/11/03 20:47:00 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.58 2002/11/26 18:50:00 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -871,15 +871,19 @@ save_tics(fp, axis)
 	    break;
 	}
     case TIC_SERIES:
-	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) 
+	if (axis_array[axis].ticdef.def.series.start != -VERYLARGE) {
 	    SAVE_NUM_OR_TIME(fp,
 			     (double) axis_array[axis].ticdef.def.series.start,
 			     axis);
-	fprintf(fp, ",%g,", axis_array[axis].ticdef.def.series.incr);
-	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) 
+	    putc(',', fp);
+	}
+	fprintf(fp, "%g", axis_array[axis].ticdef.def.series.incr);
+	if (axis_array[axis].ticdef.def.series.end != VERYLARGE) {
+	    putc(',', fp);
 	    SAVE_NUM_OR_TIME(fp,
 			     (double) axis_array[axis].ticdef.def.series.end,
 			     axis);
+	}
 	break;
 
     case TIC_USER:{
