@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.12 2002/03/11 12:27:57 broeker Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.13 2002/03/11 16:09:00 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -466,9 +466,9 @@ struct lp_style_type grid;
  */
 
 static void boundary(scaling, plots, count)
-TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
-struct curve_points *plots;
-int count;
+    TBOOLEAN scaling;		/* TRUE if terminal is doing the scaling */
+    struct curve_points *plots;
+    int count;
 {
     int ytlen;
     int yticlin = 0, y2ticlin = 0, timelin = 0;
@@ -588,7 +588,8 @@ int count;
     /* compute ytop from the various components
      *     unless tmargin is explicitly specified  */
 
-    ytop = (int) ((ysize + yoffset) * (t->ymax));
+    /* HBB 20020426: fix round-off bug --- in 3.8 since 20010118 ;-[ */
+    ytop = (int) (0.5 + (ysize + yoffset) * (t->ymax));
 
     if (tmargin < 0) {
 	int top_margin = x2label_textheight + title_textheight;
@@ -673,7 +674,7 @@ int count;
     /* compute ybot from the various components
      *     unless bmargin is explicitly specified  */
 
-    ybot = (int) ((t->ymax) * yoffset);
+    ybot = (int) (0.5 + (t->ymax) * yoffset);
 
     if (bmargin < 0) {
 	ybot += xtic_height + xtic_textheight;
@@ -849,7 +850,7 @@ int count;
     /* compute xleft from the various components
      *     unless lmargin is explicitly specified  */
 
-    xleft = (int) ((t->xmax) * xoffset);
+    xleft = (int) (0.5 + (t->xmax) * xoffset);
 
     if (lmargin < 0) {
 	xleft += (timelabel_textwidth > ylabel_textwidth ? timelabel_textwidth : ylabel_textwidth)
@@ -910,7 +911,7 @@ int count;
     /* compute xright from the various components
      *     unless rmargin is explicitly specified  */
 
-    xright = (int) ((t->xmax) * (xsize + xoffset));
+    xright = (int) (0.5 + (t->xmax) * (xsize + xoffset));
 
     if (rmargin < 0) {
 	/* xright -= y2label_textwidth + y2tic_width + y2tic_textwidth; */

@@ -1,3 +1,9 @@
+2002-04-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c (boundary): Fix rounding errors in multiplot
+ 	placement by adding 0.5 to ytop, ybot, xleft and xright initial
+ 	values.
+
 2002-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* misc.c (save_set_all): Fix quoting of 'set missing' save text.
