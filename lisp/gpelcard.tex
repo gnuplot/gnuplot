@@ -1,8 +1,8 @@
 
-%% Time-stamp: <2000/11/29 18:46:58 bruce>
+%% Time-stamp: <2002/05/17 08:38:49 bruce>
 
-%% This document is copyright (C) 1998 Bruce Ravel <ravel@phys.washington.edu>
-%% This page covers version 0.5g of gnuplot-mode.
+%% This document is copyright (C) 1998-2002 Bruce Ravel <ravel@phys.washington.edu>
+%% This page covers version 0.5r of gnuplot-mode.
 
 %% This document is distributed in the hope that it will be useful,
 %% but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,8 +36,8 @@
 {\begin{Sbox}\begin{minipage}}%
   {\end{minipage}\end{Sbox}\fbox{\TheSbox}}
 
-\def\version{{0.5m}}
-\def\revised{{29 November, 2000}}
+\def\version{{0.5r}}
+\def\revised{{17 May, 2002}}
 \def\file#1{{\texttt{`#1'}}}
 \def\key#1{{\textrm \leavevmode\hbox{%
   \raise0.4pt\hbox{$\langle$}\kern-.08em\vtop{%
@@ -90,7 +90,7 @@
       \vspace{0.01\textheight}
       {\Large Quick Reference for}\\
       \vspace{0.007\textheight}
-      {\Large gnuplot mode}
+      {\Large gnuplot-mode}
       \vspace{0.01\textheight}
     \end{center}
   \end{Boxedminipage}
@@ -98,24 +98,24 @@
 
 \vspace{3ex}
 
-This card describes the features of gnuplot mode for Emacs.  Gnuplot
-mode is intended for composing scripts for the \textsc{gnuplot}
-plotting program.  It offers functions for sending commands or entire
-scripts to the \textsc{gnuplot} program as well as various functions
-to aid in composing scripts.  It works with any version of
-\textsc{gnuplot} from 3.5 to 3.8.  See the comments in the file
-\file{gnuplot.el} for instructions on installing gnuplot mode.
+This card describes the features of gnuplot-mode for Emacs.
+Gnuplot-mode is intended for composing scripts for the
+\textsc{gnuplot} plotting program.  It offers functions for sending
+commands or entire scripts to the \textsc{gnuplot} program as well as
+various functions to aid in composing scripts.  It works with any
+version of \textsc{gnuplot} from 3.5 to 3.8.  See the comments in the
+file \file{gnuplot.el} for instructions on installing gnuplot-mode.
 
 \vspace{2ex}
 
 \begin{minipage}[h]{\linewidth}
   \begin{center}
-    \centerline{{\large\textbf{gnuplot mode key sequences}}}
+    \centerline{{\large\textbf{gnuplot-mode key sequences}}}
     \vspace{0.2ex}
     \begin{tabular}[h]{cl}
       \hline \hline
       \\[-1ex]
-      \multicolumn{2}{l}{~\quad\textbf{Gnuplot mode buffer}}\\[0.5ex]
+      \multicolumn{2}{l}{~\quad\textbf{Gnuplot-mode buffer}}\\[0.5ex]
       \textrm{key} & \quad description \\
       \hline
       \texttt{C-c C-l} & send a line to gnuplot \\
@@ -128,14 +128,15 @@ to aid in composing scripts.  It works with any version of
       \texttt{C-c C-i} & insert filename at point \\
       \texttt{C-c C-j} & jump to next statement \\
       \texttt{C-c C-n} & negate set option at point \\
-      \texttt{C-c C-c} & set arguments of command at point \\
+      \texttt{C-c C-c} & comment region \\
+      \texttt{C-c C-o} & set arguments of command at point \\
       \texttt{S-mouse-2} & set arguments of command under mouse \\
       \texttt{C-c C-h} & get help from the gnuplot info file \\
       \texttt{C-c C-e} & look at the gnuplot process buffer \\
       & \\[-1.5ex]
       \texttt{C-c C-k} & kill the gnuplot process \\
-      \texttt{C-c C-u} & submit a bug report about gnuplot mode \\
-      \texttt{C-c C-z} & customize gnuplot mode \\
+      \texttt{C-c C-u} & submit a bug report about gnuplot-mode \\
+      \texttt{C-c C-z} & customize gnuplot-mode \\
       \hline
       \\[-1ex]
       \multicolumn{2}{l}{~\quad\textbf{Gnuplot process buffer}}\\[0.5ex]
@@ -161,16 +162,16 @@ to aid in composing scripts.  It works with any version of
 
 \vfill
 
-\begin{Boxedminipage}{0.98\linewidth}
+\begin{Boxedminipage}{1.05\linewidth}
   \begin{center}
     \footnotesize{Gnuplot-mode homepage} \\
     \scriptsize{%%
-      \texttt{http://feff.phys.washington.edu/\char126ravel/software/gnuplot/}}
+      \texttt{http://feff.phys.washington.edu/\char126ravel/software/gnuplot-mode/}}
   \end{center}
 \end{Boxedminipage}
 \begin{flushleft}
   {\footnotesize
-    This page {\copyright} 1998 Bruce Ravel \hfill revised \revised \\
+    This page {\copyright} 1998-2002 Bruce Ravel \hfill revised \revised \\
     \texttt{<ravel@phys.washington.edu>} \\ %% \hfill printed \today \\
     This page covers version {\version} of gnuplot-mode.
 
@@ -221,9 +222,9 @@ gnuplot-mode.
   be fully supported.
 \item[Customizing variables] \hfill \\
   The graphical customization tool for variables can be invoked using
-  \texttt{C-c C-z}.  Descriptions of the variables relevant to gnuplot
-  mode can be obtained by using \texttt{gnuplot} as the regular
-  expression for \texttt{M-x apropos}.
+  \texttt{C-c C-z}.  Descriptions of the variables relevant to
+  gnuplot-mode can be obtained by using \texttt{gnuplot} as the
+  regular expression for \texttt{M-x apropos}.
 \item[On-line help] \hfill \\
   Keyword completion and on-line help require that the
   \textsc{gnuplot} info file be available and that the info-look
@@ -274,9 +275,10 @@ gnuplot-mode.
   `gnuplot-get-help' displays the info file, either 'frame, 'window,
   or nil}
 %
-\variable{gnuplot-echo-command-line-flag}{nil}{If lines that you send to
-  gnuplot from the gnuplot mode buffer are not appearing at the
-  gnuplot prompt in the process buffer, set this to t.}
+\variable{gnuplot-echo-command-line-flag}{t}{If lines that you send to
+  gnuplot from the gnuplot-mode buffer are not appearing at the
+  gnuplot prompt in the process buffer, set this to nil and restart
+  emacs.}
 %
 \variable{gnuplot-delay}{0.01}{Time in seconds to allow the gnuplot
   display to update.  Increase this number if the prompts and lines
@@ -285,6 +287,8 @@ gnuplot-mode.
 \variable{gnuplot-quote-character}{'}{Quotation character used when
   inserting a filename into the script (single, double, or no quote).}
 
+\variable{gnuplot-buffer-max-size}{1000}{The maximum size in lines of
+the gnuplot buffer.  Excess lines are trimmed.  0 means to never trim.}
 
 %%\vspace{1ex}
 \begin{center}
@@ -447,7 +451,7 @@ used.}
   \end{Boxedminipage}
 \end{center}
 
-\noindent These are various faces defined for use with gnuplot mode.
+\noindent These are various faces defined for use with gnuplot-mode.
 \vspace{2ex}
 
 %

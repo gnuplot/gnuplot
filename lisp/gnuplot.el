@@ -1,12 +1,12 @@
 ;;;; gnuplot.el -- drive gnuplot from within emacs
 
-;; Copyright (C) 1998 Phil Type and Bruce Ravel, 1999-2001 Bruce Ravel
+;; Copyright (C) 1998 Phil Type and Bruce Ravel, 1999-2002 Bruce Ravel
 
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    May 30, 2001
-;; Version:    0.5q
+;; Updated:    May 17, 2002
+;; Version:    0.5r
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -53,7 +53,8 @@
 ;;    C-c C-f       send a file to gnuplot
 ;;    C-c C-i       insert filename at point
 ;;    C-c C-n       negate set option on current line
-;;    C-c C-c       set arguments for command at point
+;;    C-c C-c       comment region
+;;    C-c C-o       set arguments for command at point
 ;;   S-mouse-2      set arguments for command under mouse cursor
 ;;    C-c C-h       read the gnuplot info file
 ;;    C-c C-e       show-gnuplot-buffer
@@ -265,6 +266,12 @@
 ;;        speedbar clicking
 ;;  0.5q  May 30 2001 <BR> added font-lock bindings for words associated
 ;;        with plotting
+;;  0.5r  Oct 17 2001 <BR> Incorporate two suggestions by <RF>, bind
+;;        C-c C-c to comment-region and C-c C-o to the GUI, also make
+;;        C-c C-l respect continuation lines
+;;        April 12, 2002 <BR> added feature to trim length of gnuplot
+;;        process buffer  May 17 2002 Altered Makefile.in to install
+;;        .el files along with .elc files as suggested by <KG>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty       <DB> (numerous corrections)
@@ -274,6 +281,9 @@
 ;;                            contributed a bug fix regarding shutting
 ;;                            down the gnuplot process, improvement to
 ;;                            `gnuplot-send-line-and-forward')
+;;    Robert Fenk       <RF> (suggested respecting continuation lines)
+;;    Kai Groﬂjohann    <KG> (install .el's with .elc's in Makefile.in)
+;;    Michael Karbach   <MK> (suggested trimming the gnuplot process buffer)
 ;;    Alex Chan Libchen <AL> (suggested font-lock for plotting words)
 ;;    Kuang-Yu Liu      <KL> (pointed out buggy dependence on font-lock)
 ;;    Hrvoje Niksic     <HN> (help with defcustom arguments for insertions)
@@ -360,7 +370,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/software/gnuplot-mode/")
-(defconst gnuplot-version "0.5q")
+(defconst gnuplot-version "0.5r")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -525,6 +535,15 @@ buffer in advance of its prompt.  Increase this number if the
 prompts and lines are displayed out of order."
   :group 'gnuplot
   :type 'number)
+(defcustom gnuplot-buffer-max-size 1000
+  "*The maximum size in lines of the gnuplot process buffer.
+Each time text is written in the gnuplot process buffer, lines are
+trimmed from the beginning of the buffer so that the buffer is this
+many lines long.  The lines are deleted after the most recent lines
+were interpretted by gnuplot.  Setting to 0 turns off this feature
+(i.e. no lines get trimmed)."
+  :group 'gnuplot
+  :type 'integer)
 (defcustom gnuplot-quote-character "\'"
   "*Quotation character used for inserting quoted strings.
 Gnuplot can use single or double quotes.  If you prefer to have the
@@ -590,7 +609,8 @@ you're not using that musty old thing, are you..."
     ()
   (setq gnuplot-mode-map (make-sparse-keymap))
   (define-key gnuplot-mode-map "\C-c\C-b" 'gnuplot-send-buffer-to-gnuplot)
-  (define-key gnuplot-mode-map "\C-c\C-c" 'gnuplot-gui-set-options-and-insert)
+  (define-key gnuplot-mode-map "\C-c\C-c" 'comment-region) ; <RF>
+  (define-key gnuplot-mode-map "\C-c\C-o" 'gnuplot-gui-set-options-and-insert)
   (define-key gnuplot-mode-map "\C-c\C-d" 'gnuplot-show-version)
   (define-key gnuplot-mode-map "\C-c\C-e" 'gnuplot-show-gnuplot-buffer)
   (define-key gnuplot-mode-map "\C-c\C-f" 'gnuplot-send-file-to-gnuplot)
@@ -1442,10 +1462,6 @@ static char *help_btn[] = {
        (listp gnuplot-buffer-xpm) (listp gnuplot-doc-xpm)
        (listp gnuplot-help-xpm)))
 
-(defun foo ()
-  (interactive)
-  (message "%S" (selected-frame)))
-
 
 (defun gnuplot-make-toolbar-function ()
   (if (and gnuplot-xemacs-p gnuplot-all-buttons-defined)
@@ -1670,15 +1686,27 @@ useful for function in `gnuplot-after-plot-hook'."
 
 (defun gnuplot-send-line-to-gnuplot ()
   "Sends the current line to the gnuplot program.
+Respects continuation lines.
 This sets `gnuplot-recently-sent' to 'line."
   (interactive)
   (cond ((equal major-mode 'gnuplot-mode)
 	 (let ((start (save-excursion (beginning-of-line)   (point-marker)))
-	       (end   (save-excursion (beginning-of-line 2) (point-marker))))
+	       end
+	       ;(end   (save-excursion (beginning-of-line 2) (point-marker)))
+	       )
+           (save-excursion
+	     (goto-char start)
+	     (end-of-line)
+	     (backward-char 1)
+	     (while (looking-at "\\\\")	; go to end of last continuation line
+	       (end-of-line 2)
+	       (backward-char 1))
+	     (beginning-of-line 2)
+	     (setq end (point-marker)))
 	   (if (not (string-match "\\`\\s-*\\'"
 				  (buffer-substring-no-properties start end)))
-	       (gnuplot-send-region-to-gnuplot start end 'line)))
-	 t)
+	       (gnuplot-send-region-to-gnuplot start end 'line))
+	   end))
 	(t
 	 (message "You can only send lines in gnuplot-mode buffers to gnuplot.")
 	 nil)))
@@ -1688,13 +1716,15 @@ This sets `gnuplot-recently-sent' to 'line."
 ;; to do repeatedly without incurring RSI. 8^)
 (defun gnuplot-send-line-and-forward (&optional num)
   "Call `gnuplot-send-line-to-gnuplot' and move forward 1 line.
-You can use a numeric prefix to send more than one line.  Blank lnes and
+You can use a numeric prefix to send more than one line.  Blank lines and
 lines with only comments are skipped when moving forward."
   (interactive "p")
-  (while (> num 0)
-    (gnuplot-send-line-to-gnuplot)
-    (gnuplot-forward-script-line 1)
-    (setq num (1- num))))
+  (let (end)
+    (while (> num 0)
+      (setq end (gnuplot-send-line-to-gnuplot))
+      (goto-char end)
+      (gnuplot-forward-script-line 1)
+      (setq num (1- num)))))
 
 
 (defun gnuplot-forward-script-line (&optional num) ; <SE>
@@ -1770,6 +1800,21 @@ file visited by the script buffer."
 		     "in the gnuplot process buffer"))))
 
 
+(defun gnuplot-trim-gnuplot-buffer ()
+  "Trim lines form the beginning of the *gnuplot* buffer.
+This keeps that buffer from growing excessively in size.  Normally,
+this function is attached to `gnuplot-after-plot-hook'"
+  (if (> gnuplot-buffer-max-size 0)
+      (save-excursion
+	(set-buffer gnuplot-buffer)
+	(let ((nlines (count-lines (point-min) (point-max)))
+	      (kill-whole-line t))
+	  (while (> nlines gnuplot-buffer-max-size)
+	    (goto-char (point-min))
+	    (kill-line)
+	    (setq nlines (1- nlines)))
+	  (goto-char (point-max)) ))))
+(add-hook 'gnuplot-after-plot-hook 'gnuplot-trim-gnuplot-buffer nil nil)
 
 
 ;;; --- functions controlling the gnuplot process
@@ -2474,7 +2519,8 @@ a list:
   	  (require 'gnuplot-gui)
   	(error nil)))
   (setq gnuplot-first-call nil		; a few more details ...
-	gnuplot-comint-recent-buffer (current-buffer))
+	gnuplot-comint-recent-buffer (current-buffer)
+        comint-process-echoes        gnuplot-echo-command-line-flag)
   (run-hooks 'gnuplot-mode-hook)
   ;; the first time we need to figure out which gnuplot we are running
   (if gnuplot-program-version

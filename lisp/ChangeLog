@@ -1,4 +1,17 @@
 
+May 17 2002 Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5r
+        * handle continuation lines better
+	* C-c C-c now for comment region, C-c C-o for GUI
+	* trim gnuplot buffer + customize vble controlling max buffer
+	  length
+	* Altered Makefile.in to install .el files along with .elc
+	  files
+
+May 30 2001 Bruce Ravel  <ravel@phys.washington.edu>
+        * gnuplot.el: Version 0.5q
+	* added font-lock bindings for words associated with plotting
+
 Apr 15 2001 Bruce Ravel  <ravel@phys.washington.edu>
 	* gnuplot.el: Version 0.5p
 	* fixed the fix for the serious bug in how speedbar and
