@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.22 2000/11/20 20:31:36 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.23 2000/11/21 11:48:16 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -471,7 +471,14 @@ char Name[64] = "gnuplot";
 char Class[64] = "Gnuplot";
 
 int cx = 0, cy = 0, vchar;
-double xscale, yscale, pointsize;
+/* Speficy negative values as indicator of uninitialized state */
+double xscale=-1.;
+double yscale=-1.;
+double pointsize=-1.;
+/* Avoid a crash upon using uninitialized variables from
+   above and avoid unnecessary calls to display().
+   Probably this is not the best fix ... */
+#define Call_display(plot) if (xscale<0.) display(plot);
 #define X(x) (int) ((x) * xscale)
 #define Y(y) (int) ((4095-(y)) * yscale)
 #define RevX(x) (((x)+0.5)/xscale)
@@ -479,7 +486,8 @@ double xscale, yscale, pointsize;
 /* note: the 0.5 term in RevX(x) and RevY(y) compensates for the round-off in X(x) and Y(y) */
 
 #define Nbuf 1024
-char buf[Nbuf], **commands = (char **) 0;
+char buf[Nbuf];
+char **commands = (char **) 0;
 static int buffered_input_available = 0;
 
 FILE *X11_ipc;
@@ -499,11 +507,13 @@ XSegment Plus[2], Cross[2], Star[4];
  *   main program 
  *---------------------------------------------------------------------------*/
 
+
 int
 main(argc, argv)
 int argc;
 char *argv[];
 {
+
 #if defined(USE_MOUSE) && !defined(OS2)
     int getfl;
 #endif
@@ -2765,6 +2775,7 @@ XEvent *event;
     case EnterNotify:
 	plot = find_plot(event->xcrossing.window);
 	if (plot == current_plot) {
+	    Call_display(plot);
 	    gp_exec_event(GE_motion, (int) RevX(event->xcrossing.x), (int) RevY(event->xcrossing.y), 0, 0);
 	}
 	if (plot->zoombox_on) {
@@ -2784,6 +2795,7 @@ XEvent *event;
 	    if (!XQueryPointer(dpy,event->xmotion.window,&root,&child,&root_x,&root_y,&pos_x,&pos_y,&keys_buttons)) break;
 
 	    if (plot == current_plot) {
+	        Call_display(plot);
 		gp_exec_event(GE_motion, (int) RevX(pos_x), (int) RevY(pos_y), 0, 0);
 	    }
 
@@ -2800,6 +2812,7 @@ XEvent *event;
 	update_modifiers(event->xbutton.state);
 	{
 	    if (plot == current_plot) {
+	        Call_display(plot);
 		gp_exec_event(GE_buttonpress,
 		    (int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
 		    event->xbutton.button, 0);
@@ -2813,6 +2826,7 @@ XEvent *event;
 	    long int doubleclick = SetTime(plot, event->xbutton.time);
 
 	    update_modifiers(event->xbutton.state);
+	    Call_display(plot);
 	    gp_exec_event(GE_buttonrelease,
 		(int)RevX(event->xbutton.x), (int)RevY(event->xbutton.y),
 		event->xbutton.button, (int) doubleclick );
