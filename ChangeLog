@@ -1,3 +1,13 @@
+2000-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Test for gdImageGif() instead of gdImageCreate().
+	Better diagnostics for missing gd and png library.
+
+	* src/axis.c: Change RCS id tag to function.
+
+	* src/gpexecute.inc(gpe_init,gpe_push): Use malloc() instead of
+	gp_alloc() to avoid linking with additional modules.
+
 2000-11-03  Hans-Bernhard Broeker  <broeker@acaxp6.physik.rwth-aachen.de>
 
 	* src/syscfg.h: repeated block of code moved to here.  JMP_BUF:
