@@ -1,6 +1,10 @@
 Changes in release 3.7.1:
 [3.7.0.10]
 * removed DJGPP version 1 support
+* improved version of stdin wrapper for Win32
+* FIXED buffering bug in gnuplot_x11
+* NEW `system' command
+* FIXED crash in 16bit Windows
 
 [3.7.0.9]
 * moved some declarations to new header files
