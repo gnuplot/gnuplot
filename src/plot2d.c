@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.100 2005/03/26 18:45:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.101 2005/03/28 05:48:55 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1472,7 +1472,11 @@ eval_plots()
 			break;
 		    }
 		    c_token++;
+#ifdef GP_STRING_VARS
 		    if (isstring(c_token) || isstringvar(c_token))
+#else
+		    if (isstring(c_token))
+#endif
 			try_to_get_string(); /* ignore optionally given title string */
 		    this_plot->title_is_suppressed = TRUE;
 		    if (xtitle != NULL)

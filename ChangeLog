@@ -1,5 +1,10 @@
 2005-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/plot3d.c (eval_3dplots) [!GP_STRING_VARS]: Don't call
+	isstringvar() if feature disabled.
+
+	* src/plot2d.c (eval_plots) [!GP_STRING_VARS]: Likewise.
+
 	* src/show.c (show_command): Fix display of 'zeroaxis' settings
 	reported by error message.
 

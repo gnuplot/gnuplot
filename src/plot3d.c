@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.98 2005/03/25 07:30:45 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.99 2005/03/29 08:07:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1350,7 +1350,12 @@ eval_3dplots()
 			break;
 		    }
 		    c_token++;
+#ifdef GP_STRING_VARS
 		    if (isstring(c_token) || isstringvar(c_token))
+#else
+		    if (isstring(c_token))
+#endif
+		    
 			try_to_get_string(); /* ignore optionally given title string */
 		    if (xtitle != NULL)
 			xtitle[0] = '\0';
