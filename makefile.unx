@@ -172,7 +172,7 @@ CFLAGS = $(COPTS) $(OPTIONS)
 # -DAPOLLO      Apollo Graphics Primitive Resource (window resize after replot)
 # -DGPR         Apollo Graphics Primitive Resource (fixed-size window)
 # -DCGI         SCO CGI
-# -DIRIS4D      IRIS4D series computer
+# -DIRIS        IRIS4D series computer
 # -DSUN         Sun Microsystems Workstation
 # -DLINUXVGA	Linux PC with SuperVGA library
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
