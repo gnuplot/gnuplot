@@ -1,47 +1,16 @@
 /*
- * $Id: xlib.trm,v 1.9 1999/06/22 11:54:25 lhecking Exp $
+ * $Id: xlib.trm,v 1.10 2002/12/13 14:59:07 lhecking Exp $
  */
 
 /* GNUPLOT - xlib.trm */
 
-/*[
- * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
- *
- * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted,
- * provided that the above copyright notice appear in all copies and
- * that both that copyright notice and this permission notice appear
- * in supporting documentation.
- *
- * Permission to modify the software is granted, but not the right to
- * distribute the complete modified source code.  Modifications are to
- * be distributed as patches to the released version.  Permission to
- * distribute binaries produced by compiling modified sources is granted,
- * provided you
- *   1. distribute the corresponding source modifications from the
- *    released version in the form of a patch file along with the binaries,
- *   2. add special version identification to distinguish your version
- *    in addition to the base release version number,
- *   3. provide your name and address as the primary contact for the
- *    support of your modified version, and
- *   4. retain our contact information in regard to use of the base
- *    software.
- * Permission to distribute the released version of the source code along
- * with corresponding source modifications in the form of a patch file is
- * granted with same provisions 2 through 4 for binary distributions.
- *
- * This software is provided "as is" without express or implied warranty
- * to the extent permitted by applicable law.
-]*/
-
 /*
  * xlib.trm - inboard terminal driver for X11 (dumps gnuplot_x11 commands)
  *
- * To be used with gnulib_x11.
- */
-
-/*
- * adapted to new terminal layout by Stefan Bodewig (Dec. 1995)
+ * New implementation November 2003
+ * Xlib_init() sets up the output channels, but otherwise all work is done
+ * by the main x11.trm driver routines.
+ * Ethan A Merritt <merritt@u.washington.edu>
  */
 
 #include "driver.h"
@@ -52,24 +21,6 @@ register_term(xlib)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void Xlib_init __PROTO((void));
-TERM_PUBLIC void Xlib_graphics __PROTO((void));
-TERM_PUBLIC void Xlib_text __PROTO((void));
-TERM_PUBLIC void Xlib_reset __PROTO((void));
-TERM_PUBLIC void Xlib_move __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void Xlib_vector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void Xlib_linetype __PROTO((int lt));
-TERM_PUBLIC void Xlib_put_text __PROTO((unsigned int x, unsigned int y, const char str[]));
-TERM_PUBLIC int Xlib_justify_text __PROTO((enum JUSTIFY mode));
-
-#define Xlib_XMAX 4096
-#define Xlib_YMAX 4096
-
-/* approximations for typical font/screen sizes */
-#define Xlib_VCHAR (Xlib_YMAX/25)
-#define Xlib_HCHAR (Xlib_XMAX/100)
-#define Xlib_VTIC (Xlib_YMAX/100)
-#define Xlib_HTIC (Xlib_XMAX/150)
-
 #define GOT_XLIB_PROTO
 #endif
 
@@ -79,68 +30,14 @@ TERM_PUBLIC int Xlib_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void
 Xlib_init()
 {
-    /* empty */
-}
+    /* x11.trm thinks it is writing to a private pipe, but here we */
+    /* set it to use the channel opened by 'set output <file>`     */
+    X11_ipc = gpoutfile;
 
-TERM_PUBLIC void
-Xlib_graphics()
-{
-    fputs("G\n", gpoutfile);
-}
-
-TERM_PUBLIC void
-Xlib_text()
-{
-    fputs("E\n", gpoutfile);
-    fflush(gpoutfile);
-#ifdef ULTRIX_KLUDGE
-    fputs("E\n", gpoutfile);
-    fflush(gpoutfile);
+#ifdef PIPE_IPC
+    /* There is, of course, no mouse feedback */
+    ipc_back_fd = IPC_BACK_UNUSABLE;
 #endif
-}
-
-TERM_PUBLIC void
-Xlib_reset()
-{
-    fputs("R\n", gpoutfile);
-    fflush(gpoutfile);
-}
-
-TERM_PUBLIC void
-Xlib_move(x, y)
-unsigned int x, y;
-{
-    fprintf(gpoutfile, "M%04d%04d\n", x, y);
-}
-
-TERM_PUBLIC void
-Xlib_vector(x, y)
-unsigned int x, y;
-{
-    fprintf(gpoutfile, "V%04d%04d\n", x, y);
-}
-
-TERM_PUBLIC void
-Xlib_linetype(lt)
-int lt;
-{
-    fprintf(gpoutfile, "L%04d\n", lt);
-}
-
-TERM_PUBLIC void
-Xlib_put_text(x, y, str)
-unsigned int x, y;
-const char str[];
-{
-    fprintf(gpoutfile, "T%04d%04d%s\n", x, y, str);
-}
-
-TERM_PUBLIC int
-Xlib_justify_text(mode)
-enum JUSTIFY mode;
-{
-    fprintf(gpoutfile, "J%04d\n", mode);
-    return (TRUE);
 }
 
 #endif
@@ -148,11 +45,21 @@ enum JUSTIFY mode;
 #ifdef TERM_TABLE
 TERM_TABLE_START(xlib_driver)
     "xlib", "X11 Window System (gnulib_x11 dump)",
-    Xlib_XMAX, Xlib_YMAX, Xlib_VCHAR, Xlib_HCHAR,
-    Xlib_VTIC, Xlib_HTIC, options_null, Xlib_init, Xlib_reset,
-    Xlib_text, null_scale, Xlib_graphics, Xlib_move, Xlib_vector,
-    Xlib_linetype, Xlib_put_text, null_text_angle,
-    Xlib_justify_text, line_and_point, do_arrow, set_font_null
+    X11_XMAX, X11_YMAX, X11_VCHAR, X11_HCHAR,
+    X11_VTIC, X11_HTIC, X11_options, Xlib_init, X11_reset,
+    X11_text, null_scale, X11_graphics, X11_move, X11_vector,
+    X11_linetype, X11_put_text, X11_text_angle,
+    X11_justify_text, X11_point, do_arrow, X11_set_font,
+    X11_pointsize, TERM_CAN_MULTIPLOT|TERM_INIT_ON_REPLOT,
+    X11_text /* suspend can use same routine */ , 0 /* resume */ ,
+    X11_fillbox, X11_linewidth
+#ifdef USE_MOUSE
+    , X11_waitforinput, X11_put_tmptext, X11_set_ruler, X11_set_cursor, X11_set_clipboard
+#endif
+#ifdef PM3D
+    , X11_make_palette, 0 /* X11_previous_palette */ ,
+    X11_set_color, X11_filled_polygon
+#endif
 TERM_TABLE_END(xlib_driver)
 
 #undef LAST_TERM
@@ -171,7 +78,9 @@ START_HELP(xlib)
 "?term xlib",
 "?xlib",
 " The `xlib` terminal driver supports the X11 Windows System.  It generates",
-" gnuplot_x11 commands. `set term x11` behaves similarly to `set terminal xlib;",
-" set output \"|gnuplot_x11\"`.  `xlib` has no options, but see `x11`."
+" gnuplot_x11 commands, but sends them to the output file specified by",
+" `set output '<filename>'. `set term x11` is equivalent to",
+" `set terminal xlib; set output \"|gnuplot_x11 -noevents\"`.",
+" `xlib` takes the same set of options as `x11`."
 END_HELP(xlib)
 #endif

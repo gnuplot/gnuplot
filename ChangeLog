@@ -1,3 +1,8 @@
+2003-11-17  Ethan Merritt <merritt@u.washington.edu>
+
+	* term/xlib.trm src/term.h: Update xlib device to use the actual
+	x11 driver routines, so the output will be identical.
+
 2003-11-14  Ethan Merritt <merritt@u.washington.edu>
 
 	* term/post.trm: Fix bug in enhanced text overprint mode;
