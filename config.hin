@@ -246,12 +246,6 @@
 /*  Define if you are using the GNU readline library.  */
 #undef HAVE_LIBREADLINE
 
-/*  Define if you are using the GNU readline library.  */
-#undef HAVE_LIBREADLINE
-
-/*  Define if you want to use the included readline function.  */
-#undef READLINE
-
 /*  Define if you want to use the history feature with GNU readline.  */
 #undef GNUPLOT_HISTORY
 
@@ -264,17 +258,11 @@
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
 
-/*  Define if you want to use the GNU version of the Unix plot library.  */
-#undef GNUGRAPH
-
-/*  Define if your libplot.a is from GNU plotutils.  */
+/*  Define if your libplot.a is from GNU plotutils. Define as 2 if your GNU plotutils version is 2.2 or greater. */
 #undef GNU_PLOTUTILS
 
 /*  Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
-
-/*  Define if you have the png library.  */
-#undef HAVE_LIBPNG
 
 /*  Define if you have the png library.  */
 #undef HAVE_LIBPNG
