@@ -248,6 +248,7 @@ Major contributors (alphabetic order):
 	"ai"
 	"amiga"
 	"apollo"
+	"aquaterm"
 	"atariaes"
 	"atarivdi"
 	"be"
