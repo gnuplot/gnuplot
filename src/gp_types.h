@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.9 2001/08/27 15:02:14 broeker Exp $
+ * $Id: gp_types.h,v 1.10 2001/09/08 00:50:01 mikulik Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -97,6 +97,7 @@ typedef enum PLOT_STYLE {
 #endif /* USE_ULIG_FILLEDBOXES */
 #ifdef PM3D
     , FILLEDCURVES = 21*(1<<3) + PLOT_STYLE_HAS_LINE
+    , PM3DSURFACE  = 22*(1<<3) + 0
 #endif
 } PLOT_STYLE;
 

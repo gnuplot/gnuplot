@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.70 2002/01/06 16:31:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.71 2002/01/22 15:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2616,6 +2616,14 @@ set_pm3d()
 	    }
 	    if (almost_equals(c_token, "noso$lid") || almost_equals(c_token, "tr$ansparent")) {
 		pm3d.solid = 0;
+		continue;
+	    }
+	    if (almost_equals(c_token, "i$mplicit") || almost_equals(c_token, "noe$xplicit")) {
+		pm3d.implicit = PM3D_IMPLICIT;
+		continue;
+	    }
+	    if (almost_equals(c_token, "noi$mplicit") || almost_equals(c_token, "e$xplicit")) {
+		pm3d.implicit = PM3D_EXPLICIT;
 		continue;
 	    }
 	    int_error(c_token,"invalid pm3d option");

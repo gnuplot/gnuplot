@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.93 2002/01/23 13:12:48 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.94 2002/01/25 09:46:29 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5499,6 +5499,7 @@ C ... and restart the table:
                   { hidden3d <linestyle> | nohidden3d }
                   { transparent | solid }
                   { map }
+                  { implicitly | explicit }
                 }
        show pm3d
        unset pm3d
@@ -5575,6 +5576,22 @@ C ... and restart the table:
  The colouring setup as well as the colour box drawing are determinated by
  `set palette`. Maybe in future there could be a possibility of using more
  palettes, which will add new option `set pm3d palette <n>`.
+
+ If the option `implicit` is on (which is the default), all surface plots
+ will be plotted additionally to the default type, e.g.
+       splot 'fred.dat' w l, 'lola.dat' w l
+ would give both plots additionally a pm3d surface.
+ If the option `implicit` is off (or `explicit` is on) only plots specified
+ by the `with pm3d` attribute are plotted with a pm3d surface, e.g.:
+       splot 'fred.dat' w l, 'lola.dat' w pm3d
+ would plot 'fred.dat' with lines (and only lines) and 'lola.dat' with
+ a pm3d surface.
+ If `explicit` is on, you can also switch to the default style `pm3d`, e.g.:
+       set style data pm3d
+
+ Note that when plotting several plots, they're plotted in the order given
+ on the command line. This can be of interest especially for pm3d surfaces
+ which can overwrite and therefore hide part of earlier plots.
 
  See also `help palette`, `help colorbox`, `help x11 pm3d`, `help vgagl`.
 

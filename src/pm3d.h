@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.6 2000/11/23 08:35:39 mikulik Exp $
+ * $Id: pm3d.h,v 1.7 2001/03/19 14:52:23 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -71,6 +71,11 @@
 #define PM3D_CLIP_1IN '1'
 #define PM3D_CLIP_4IN '4'
 
+typedef enum {
+    PM3D_EXPLICIT = 0,
+    PM3D_IMPLICIT = 1
+} PM3D_IMPL_MODE;
+
 /*
   structure defining all properties of pm3d plotting mode
   (except for the properties of the smooth colour box, see color_box instead)
@@ -86,6 +91,9 @@ typedef struct {
 			   this linestyle (which must naturally present). */
   int solid;            /* if this is != 0, border tics and labels might be
 			   hidden by the surface */
+  PM3D_IMPL_MODE implicit;
+			/* 1: [default] draw ALL surfaces with pm3d
+			   0: only surfaces specified with 'with pm3d' */
 } pm3d_struct;
 
 
@@ -100,7 +108,7 @@ int set_pm3d_zminmax __PROTO((void));
 void pm3d_plot __PROTO((struct surface_points * plot, char at_which_z));
 void filled_color_contour_plot __PROTO((struct surface_points *plot, int contours_where));
 void pm3d_reset __PROTO((void));
-void pm3d_draw_all __PROTO((struct surface_points* plots, int pcount));
+void pm3d_draw_one __PROTO((struct surface_points* plots));
 double z2gray __PROTO((double z));
 void
 pm3d_rearrange_scan_array __PROTO((struct surface_points* this_plot,

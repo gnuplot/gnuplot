@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.35 2002/01/24 13:55:27 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.36 2002/01/25 14:19:54 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -620,6 +620,9 @@ set style data ",
     case CANDLESTICKS:
 	fputs("candlesticks\n", fp);
 	break;
+    case PM3DSURFACE:
+	fputs("pm3d\n", fp);
+	break;
     }
     
     /* FIXME HBB 20010816: Useless code duplication. Outputting the
@@ -836,7 +839,8 @@ set ticscale %g %g\n",
     }
     if (pm3d.hidden3d_tag) fprintf(fp," hidden3d %d", pm3d.hidden3d_tag);
 	else fputs(" nohidden3d", fp);
-    fputs( (pm3d.solid ? " solid" : " transparent"), fp);
+    fputs((pm3d.solid ? " solid" : " transparent"), fp);
+    fputs((PM3D_IMPLICIT == pm3d.implicit ? " implicit" : " explicit"), fp);
     if (!pm3d.where[0]) fputs("\nunset pm3d", fp);
     fputs("\n", fp);
 

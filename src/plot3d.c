@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.31 2001/12/13 17:31:44 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.32 2001/12/14 14:22:45 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -71,9 +71,17 @@ TBOOLEAN dgrid3d = FALSE;
 
 /* static prototypes */
 
+#ifdef PM3D
+static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
+					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
+					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use,
+					       TBOOLEAN is_pm3d));
+static void update_pm3d_zrange __PROTO((double value, TBOOLEAN is_pm3d));
+#else
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
 					       AXIS_INDEX iso_axis, double iso_min, double iso_step, int num_iso_to_use,
 					       AXIS_INDEX sam_axis, double sam_min, double sam_step, int num_sam_to_use));
+#endif
 static void get_3ddata __PROTO((struct surface_points * this_plot));
 static void print_3dtable __PROTO((int pcount));
 static void eval_3dplots __PROTO((void));
@@ -233,6 +241,7 @@ plot3drequest()
     AXIS_INIT3D(FIRST_Z_AXIS, 0, 1);
     AXIS_INIT3D(U_AXIS, 1, 0);
     AXIS_INIT3D(V_AXIS, 1, 0);
+    AXIS_INIT3D(COLOR_AXIS, 0, 1);
 
     if (!term)			/* unknown */
 	int_error(c_token, "use 'set term' to set terminal type first");
@@ -282,6 +291,25 @@ double h;
     }
 }
 
+#endif
+
+#ifdef PM3D
+static void
+update_pm3d_zrange(double value, TBOOLEAN is_pm3d)
+{
+    if (is_pm3d) {
+	if (value < CB_AXIS.min) {
+	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MIN) // XXX ??? */
+	    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
+		CB_AXIS.min = value;
+	}
+	if (value > CB_AXIS.max) {
+	    /* if (axis_array[FIRST_Z_AXIS].autoscale & AUTOSCALE_MAX) // XXX ??? */
+	    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
+		CB_AXIS.max = value;
+	}
+    }
+}
 #endif
 
 static void
@@ -498,6 +526,9 @@ grid_nongrid_data(this_plot)
 	    z = z / w;
 #endif
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points->z, z, points->type, z_axis, NOOP, continue);
+#ifdef PM3D
+	    update_pm3d_zrange(z, PM3DSURFACE == this_plot->plot_style);
+#endif
 	}
     }
 
@@ -679,6 +710,9 @@ get_3ddata(this_plot)
 		cp->z = z;
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+#ifdef PM3D
+		update_pm3d_zrange(z, PM3DSURFACE == this_plot->plot_style);
+#endif
 	    }
 
 	    /* some may complain, but I regard this as the correct use
@@ -824,12 +858,18 @@ static void
 calculate_set_of_isolines(value_axis, cross, this_iso,
 			  iso_axis, iso_min, iso_step, num_iso_to_use,
 			  sam_axis, sam_min, sam_step, num_sam_to_use
+#ifdef PM3D
+			  , is_pm3d
+#endif
 			  )
     AXIS_INDEX iso_axis, sam_axis, value_axis;
     struct iso_curve **this_iso;
     TBOOLEAN cross;
     double iso_min, iso_step, sam_min, sam_step;
     int num_iso_to_use, num_sam_to_use;
+#ifdef PM3D
+    TBOOLEAN is_pm3d;
+#endif
 {
     int i, j;
     struct coordinate GPHUGE *points = (*this_iso)->points;
@@ -869,6 +909,10 @@ calculate_set_of_isolines(value_axis, cross, this_iso,
 	    points[i].type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(points[i].z, temp, points[i].type,
 					    value_axis, NOOP, NOOP);
+#ifdef PM3D
+	    if (z_axis == value_axis)
+		update_pm3d_zrange(temp, is_pm3d);
+#endif
 	}
 	(*this_iso)->p_count = num_sam_to_use;
 	*this_iso = (*this_iso)->next;
@@ -1186,7 +1230,13 @@ eval_3dplots()
 
 	    }
 
-	    if (crnt_param == 0) {
+	    if (crnt_param == 0
+#ifdef PM3D
+		&& this_plot->plot_style != PM3DSURFACE
+		/* don't increment the default line/point properties if
+		 * this_plot is an EXPLICIT pm3d surface plot */
+#endif
+		) {
 		if (this_plot->plot_style & PLOT_STYLE_HAS_POINT)
 		    point_num += 1 + (draw_contour != 0) + (hidden3d != 0);
 		line_num += 1 + (draw_contour != 0) + (hidden3d != 0);
@@ -1405,7 +1455,11 @@ eval_3dplots()
 					      v_axis, v_min, v_isostep,
 					      num_iso_to_use,
 					      u_axis, u_min, u_step,
-					      num_sam_to_use);
+					      num_sam_to_use
+#ifdef PM3D
+					      , PM3DSURFACE == this_plot->plot_style
+#endif
+					      );
 
 		    if (!hidden3d) {
 			num_iso_to_use = iso_samples_1;
@@ -1415,7 +1469,11 @@ eval_3dplots()
 						  u_axis, u_min, u_isostep,
 						  num_iso_to_use,
 						  v_axis, v_min, v_step,
-						  num_sam_to_use);
+						  num_sam_to_use
+#ifdef PM3D
+						  , PM3DSURFACE == this_plot->plot_style
+#endif
+						  );
 		    }
 		    /*}}} */
 		}		/* end of ITS A FUNCTION TO PLOT */

@@ -1,3 +1,10 @@
+2002-01-25  Johannes Zellner  <johannes@zellner.org>
+
+	* src/pm3d.h src/pm3d.c src/set.c src/show.c src/save.c
+	src/graph3d.c src/misc.c src/pm3d.c src/pm3d.h src/plot3d.c
+	src/gp_types.h src/graphics.c src/tables.c docs/gnuplot.doc:
+	pm3d option 'explicit / implicit' and related functionality
+
 2002-01-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/save.c (save_set_all): Removed unused variable. Fixed highly

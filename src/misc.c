@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.34 2002/01/06 16:31:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.35 2002/01/07 15:40:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -423,14 +423,14 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
 \t'histeps', 'filledcurves', 'boxes', 'filledboxes', 'boxerrorbars',\n\
 \t'boxxyerrorbars', 'vectors', 'financebars', 'candlesticks',\n\
-\t'errorlines', 'xerrorlines', 'yerrorlines', 'xyerrorlines'");
+\t'errorlines', 'xerrorlines', 'yerrorlines', 'xyerrorlines', 'pm3d'");
 #else  /* USE_ULIG_FILLEDBOXES*/
 	int_error(c_token,"\
 expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 \t'yerrorbars', 'xerrorbars', 'xyerrorbars', 'steps', 'fsteps',\n\
 \t'histeps', 'filledcurves', 'boxes', 'boxerrorbars', 'boxxyerrorbars',\n\
 \t'vector', 'financebars', 'candlesticks', 'errorlines', 'xerrorlines',\n\
-\t'yerrorlines', 'xyerrorlines'");
+\t'yerrorlines', 'xyerrorlines', 'pm3d'");
 #endif /* USE_ULIG_FILLEDBOXES */
 	ps = LINES;
     }

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.17 2001/12/16 18:41:28 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.18 2001/12/17 12:10:12 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -46,6 +46,7 @@ pm3d_struct pm3d = {
     PM3D_CLIP_1IN,		/* clipping: at least 1 point in the ranges */
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
+    PM3D_IMPLICIT,		/* implicit */
 };
 
 
@@ -60,9 +61,10 @@ pm3d_struct pm3d = {
 int
 set_pm3d_zminmax()
 {
-    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
-	CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
-    else {
+    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
+	if (PM3D_IMPLICIT == pm3d.implicit)
+	    CB_AXIS.min = axis_array[FIRST_Z_AXIS].min;
+    } else {
 	/* Negative z: Call graph_error(), thus stop by an error message
 	 * without any plot as in the case of other negative-range-and-log
 	 * axes. Note that another possibility is to return 0 to make a plot
@@ -73,9 +75,10 @@ set_pm3d_zminmax()
 				   CB_AXIS.set_min, 
 				   "color axis");
     }
-    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
-	CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
-    else {
+    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
+	if (PM3D_IMPLICIT == pm3d.implicit)
+	    CB_AXIS.max = axis_array[FIRST_Z_AXIS].max;
+    } else {
 	/* Negative z: see above */
 	CB_AXIS.max = 
 	    axis_log_value_checked(FIRST_Z_AXIS,
@@ -472,36 +475,36 @@ pm3d_reset(void)
     pm3d.clip = PM3D_CLIP_1IN;
     pm3d.hidden3d_tag = 0;
     pm3d.solid = 0;
+    pm3d.implicit = PM3D_IMPLICIT;
 }
 
-/* DRAW PM3D ALL COLOUR SURFACES */
+/* DRAW /ONE/ PM3D COLOUR SURFACE */
 void
-pm3d_draw_all(struct surface_points *plots, int pcount)
+pm3d_draw_one(struct surface_points *plot)
 {
     int i = 0;
-    int surface;
-    struct surface_points *this_plot = NULL;
+
+    if (!pm3d.where[0]) {
+	return;
+    }
 
     /* for pm3dCompress.awk */
     if (postscript_gpoutfile)
 	fprintf(gpoutfile, "%%pm3d_map_begin\n");
 
     for (; pm3d.where[i]; i++) {
-	this_plot = plots;
-	for (surface = 0; surface < pcount; this_plot = this_plot->next_sp, surface++)
-	    pm3d_plot(this_plot, pm3d.where[i]);
+	pm3d_plot(plot, pm3d.where[i]);
     }
 
-    if (strchr(pm3d.where, 'C') != NULL)
+    if (strchr(pm3d.where, 'C') != NULL) {
 	/* !!!!! CONTOURS, UNDOCUMENTED
 	   !!!!! LATER CHANGE TO STH LIKE (if_filled_contours_requested)
 	   !!!!! ... */
-	for (this_plot = plots; this_plot; this_plot = this_plot->next_sp) {
-	    if (draw_contour & CONTOUR_SRF)
-		filled_color_contour_plot(this_plot, CONTOUR_SRF);
-	    if (draw_contour & CONTOUR_BASE)
-		filled_color_contour_plot(this_plot, CONTOUR_BASE);
-	}
+	if (draw_contour & CONTOUR_SRF)
+	    filled_color_contour_plot(plot, CONTOUR_SRF);
+	if (draw_contour & CONTOUR_BASE)
+	    filled_color_contour_plot(plot, CONTOUR_BASE);
+    }
 
     /* for pm3dCompress.awk */
     if (postscript_gpoutfile)

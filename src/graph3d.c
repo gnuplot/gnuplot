@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.52 2001/11/26 09:18:17 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.53 2002/01/22 15:52:24 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -652,18 +652,17 @@ do_3dplot(plots, pcount, quick)
 	    palette = 1;
 	}
 	if (palette)
-	    can_pm3d = set_pm3d_zminmax() && !make_palette() && term->set_color;
+ 	    can_pm3d = set_pm3d_zminmax() && !make_palette() && term->set_color;
 	if (can_pm3d) {
 	    axis_checked_extend_empty_range(COLOR_AXIS, "All points of colorbox value undefined");
 	    axis_revert_and_unlog_range(COLOR_AXIS);
 	    /* draw the colour surfaces */
 	    if (pm3d.where[0]) {
-	    if (pm3d.solid) {
-		whichgrid = BACKGRID;
-		draw_3d_graphbox(plots, pcount);
+		if (pm3d.solid) {
+		    whichgrid = BACKGRID;
+		    draw_3d_graphbox(plots, pcount);
+		}
 	    }
-	    pm3d_draw_all(plots, pcount);
-	}
 	    /* draw colour box */
 	    draw_color_smooth_box();
 	} /* can_pm3d */
@@ -856,6 +855,9 @@ do_3dplot(plots, pcount, quick)
 #ifdef PM3D
 	    /* just an abbreviation */
 	    TBOOLEAN use_palette = can_pm3d && this_plot->lp_properties.use_palette;
+	    if (can_pm3d && PM3D_IMPLICIT == pm3d.implicit) {
+		pm3d_draw_one(this_plot);
+	    }
 #endif
 
 	    if (draw_surface) {
@@ -868,6 +870,7 @@ do_3dplot(plots, pcount, quick)
 		key_text(xl, yl, this_plot->title);
 		ignore_enhanced_text = 0;
 	    }
+
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
 #if USE_ULIG_FILLEDBOXES
@@ -978,6 +981,13 @@ do_3dplot(plots, pcount, quick)
 
 		break;
 
+#ifdef PM3D
+	    case PM3DSURFACE:
+		if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
+		    pm3d_draw_one(this_plot);
+		}
+		break;
+#endif
 
 	    }			/* switch(plot-style) */
 
@@ -1036,6 +1046,10 @@ do_3dplot(plots, pcount, quick)
 		    case DOTS:
 			key_sample_point(xl, yl, -1);
 			break;
+#ifdef PM3D
+		    case PM3DSURFACE: /* ignored */
+			break;
+#endif
 		    }
 		    NEXT_KEY_LINE();
 		}
@@ -1085,6 +1099,10 @@ do_3dplot(plots, pcount, quick)
 			    case DOTS:
 				key_sample_point(xl, yl, -1);
 				break;
+#ifdef PM3D
+			    case PM3DSURFACE: /* ignored */
+				break;
+#endif
 			    }	/* switch */
 
 			    NEXT_KEY_LINE();
@@ -1135,6 +1153,10 @@ do_3dplot(plots, pcount, quick)
 		    case DOTS:
 			cntr3d_dots(cntrs);
 			break;
+#ifdef PM3D
+		    case PM3DSURFACE: /* ignored */
+			break;
+#endif
 		    } /*switch */
 
 		    cntrs = cntrs->next;
