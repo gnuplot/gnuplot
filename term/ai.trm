@@ -170,26 +170,26 @@ TERM_PUBLIC void AI_options()
 TERM_PUBLIC void AI_init()
 {
 	ai_page = 0;
-	fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-1.2\n");
-	fprintf(outfile,"%%%%Creator: Adobe Illustrator(TM) 3.2\n");
-	fprintf(outfile,"%%%%TrueCreator: gnuplot 3.6 ai terminal\n");
-	fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", AI_XOFF,AI_YOFF,
+	fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-1.2\n");
+	fprintf(gpoutfile,"%%%%Creator: Adobe Illustrator(TM) 3.2\n");
+	fprintf(gpoutfile,"%%%%TrueCreator: gnuplot 3.6 ai terminal\n");
+	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", AI_XOFF,AI_YOFF,
 		(int)((AI_XMAX)/AI_SC+0.5+AI_XOFF), 
 		(int)((AI_YMAX)/AI_SC+0.5+AI_YOFF) );
-	fprintf(outfile,"%%%%Template:\n");
-	fprintf(outfile,"%%%%EndComments\n");
-	fprintf(outfile,"%%%%EndProlog\n");
+	fprintf(gpoutfile,"%%%%Template:\n");
+	fprintf(gpoutfile,"%%%%EndComments\n");
+	fprintf(gpoutfile,"%%%%EndProlog\n");
 }
 
 
 TERM_PUBLIC void AI_graphics()
 {
 	ai_page++;
-/*	fprintf(outfile,"%%%%Page: %d %d\n",ai_page,ai_page);*/
-	fprintf(outfile,"0 G\n");
-	fprintf(outfile,"1 j\n");
-	fprintf(outfile,"1 J\n");
-	fprintf(outfile,"u\n");
+/*	fprintf(gpoutfile,"%%%%Page: %d %d\n",ai_page,ai_page);*/
+	fprintf(gpoutfile,"0 G\n");
+	fprintf(gpoutfile,"1 j\n");
+	fprintf(gpoutfile,"1 J\n");
+	fprintf(gpoutfile,"u\n");
 	ai_path_count = 0;
 	ai_stroke = FALSE;
 }
@@ -198,14 +198,14 @@ TERM_PUBLIC void AI_graphics()
 TERM_PUBLIC void AI_text()
 {
 	if (ai_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
 		ai_stroke = FALSE;
 	}
 	while (ai_subgroup_level) {
-		fprintf(outfile,"U\n");
+		fprintf(gpoutfile,"U\n");
 		ai_subgroup_level--;
 	}
-	fprintf(outfile,"U\n");
+	fprintf(gpoutfile,"U\n");
 	ai_path_count = 0;
 	ai_multiplot_group = 0;
 }
@@ -213,8 +213,8 @@ TERM_PUBLIC void AI_text()
 
 TERM_PUBLIC void AI_reset()
 {
-	fprintf(outfile,"%%%%Trailer\n");
-/*	fprintf(outfile,"%%%%Pages: %d\n",ai_page);*/
+	fprintf(gpoutfile,"%%%%Trailer\n");
+/*	fprintf(gpoutfile,"%%%%Pages: %d\n",ai_page);*/
 }
 
 
@@ -222,11 +222,11 @@ TERM_PUBLIC void AI_linetype(linetype)
 int linetype;
 {
 	if (ai_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
 		ai_stroke = FALSE;
 	}
 	if (ai_subgroup_level) {
-		fprintf(outfile,"U\n");
+		fprintf(gpoutfile,"U\n");
 		ai_subgroup_level--;
 	}
 	if (linetype == -2 && multiplot) {
@@ -236,7 +236,7 @@ int linetype;
 		*/
 		switch (ai_multiplot_group) {
 			case 0:
-				fprintf(outfile,"u\n");
+				fprintf(gpoutfile,"u\n");
 				ai_subgroup_level++;
 				ai_multiplot_group = 1;
 				break;
@@ -245,118 +245,118 @@ int linetype;
 				break;
 			case 2:
 				ai_multiplot_group = 1;
-				fprintf(outfile,"U\n");
-				fprintf(outfile,"u\n");
+				fprintf(gpoutfile,"U\n");
+				fprintf(gpoutfile,"u\n");
 				break;
 			}
 	}
 	if (linetype == -2 && !multiplot) {
 		if (ai_multiplot_group) {
-			fprintf(outfile,"U\n");
+			fprintf(gpoutfile,"U\n");
 			ai_subgroup_level--;
 			ai_multiplot_group = 0;
 		}	
 	}
-	fprintf(outfile,"u\n");
+	fprintf(gpoutfile,"u\n");
 	ai_subgroup_level++;
 	
 	switch(linetype) {
-		case -2 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC*2.0);
+		case -2 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC*2.0);
 				if (ai_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-					fprintf(outfile,"[] 0 d\n");
+					fprintf(gpoutfile,"[] 0 d\n");
 				}
 				break;
 				
-		case -1 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC/2.0);
+		case -1 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC/2.0);
 				if (ai_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-					fprintf(outfile,"[1 2] 0 d\n");
+					fprintf(gpoutfile,"[1 2] 0 d\n");
 				}
 				break;
 				
-		case 0 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 0 :  fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"1 0 1 0 K\n");
+					fprintf(gpoutfile,"1 0 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[] 0 d\n");
+					fprintf(gpoutfile,"[] 0 d\n");
 				}
 				break;
 				
-		case 1 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 1 :  fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"1 1 0 0 K\n");
+					fprintf(gpoutfile,"1 1 0 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[4 2] 0 d\n");
+					fprintf(gpoutfile,"[4 2] 0 d\n");
 				}
 				break;
 				
-		case 2 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 2 :  fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0 1 1 0 K\n");
+					fprintf(gpoutfile,"0 1 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 3] 0 d\n");
+					fprintf(gpoutfile,"[2 3] 0 d\n");
 				}
 				break;
 				
-		case 3 :  fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 3 :  fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0 1 0 0 K\n");
+					fprintf(gpoutfile,"0 1 0 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[1 1.5] 0 d\n");
+					fprintf(gpoutfile,"[1 1.5] 0 d\n");
 				}
 				break;
 				
-		case 4 :  fprintf(outfile,"%f w\n",AI_LW/AI_SC);
+		case 4 :  fprintf(gpoutfile,"%f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"1 0 0 0 K\n");
+					fprintf(gpoutfile,"1 0 0 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[5 2 1 2] 0 d\n");
+					fprintf(gpoutfile,"[5 2 1 2] 0 d\n");
 				}
 				break;
 				
-		case 5 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 5 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0 0 1 0 K\n");
+					fprintf(gpoutfile,"0 0 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[4 3 1 3] 0 d\n");
+					fprintf(gpoutfile,"[4 3 1 3] 0 d\n");
 				}
 				break;
 				
-		case 6 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 6 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 4] 0 d\n");
+					fprintf(gpoutfile,"[2 2 2 4] 0 d\n");
 				}
 				break;
 				
-		case 7 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 7 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0 0.7 1 0 K\n");
+					fprintf(gpoutfile,"0 0.7 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 2 2 4] 0 d\n");
+					fprintf(gpoutfile,"[2 2 2 2 2 4] 0 d\n");
 				}
 				break;
 				
-		case 8 : fprintf(outfile,"%.2f w\n",AI_LW/AI_SC);
+		case 8 : fprintf(gpoutfile,"%.2f w\n",AI_LW/AI_SC);
 				if (ai_color) {
-					fprintf(outfile,"0.5 0.5 0.5 0 K\n");
+					fprintf(gpoutfile,"0.5 0.5 0.5 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 2 2 2 2 4] 0 d\n");
+					fprintf(gpoutfile,"[2 2 2 2 2 2 2 4] 0 d\n");
 				}
 				break;
 		}
@@ -368,8 +368,8 @@ int linetype;
 TERM_PUBLIC void AI_move(x,y)
 unsigned int x,y;
 {
-	if (ai_stroke) fprintf(outfile,"S\n");
-	fprintf(outfile,"%.2f %.2f m\n", x/AI_SC, y/AI_SC);
+	if (ai_stroke) fprintf(gpoutfile,"S\n");
+	fprintf(gpoutfile,"%.2f %.2f m\n", x/AI_SC, y/AI_SC);
 	ai_path_count += 1;
 	ai_stroke = TRUE;
 }
@@ -378,11 +378,11 @@ unsigned int x,y;
 TERM_PUBLIC void AI_vector(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"%.2f %.2f l\n", x/AI_SC, y/AI_SC);
+	fprintf(gpoutfile,"%.2f %.2f l\n", x/AI_SC, y/AI_SC);
 	ai_path_count += 1;
 	ai_stroke = TRUE;
 	if (ai_path_count >= 400) {
-		fprintf(outfile,"S\n%.2f %.2f m\n",x/AI_SC,y/AI_SC);
+		fprintf(gpoutfile,"S\n%.2f %.2f m\n",x/AI_SC,y/AI_SC);
 		ai_path_count = 0;
 	}
 }
@@ -394,35 +394,35 @@ char *str;
 {
 char ch;
 	if (ai_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
 		ai_stroke = FALSE;
 	}
 	switch(ai_justify) {
-		case LEFT :   fprintf(outfile,"/_%s %d 0 0 0 z\n",ai_font,ai_fontsize);
+		case LEFT :   fprintf(gpoutfile,"/_%s %d 0 0 0 z\n",ai_font,ai_fontsize);
 			break;
-		case CENTRE : fprintf(outfile,"/_%s %d 0 0 1 z\n",ai_font,ai_fontsize);
+		case CENTRE : fprintf(gpoutfile,"/_%s %d 0 0 1 z\n",ai_font,ai_fontsize);
 			break;
-		case RIGHT :  fprintf(outfile,"/_%s %d 0 0 2 z\n",ai_font,ai_fontsize);
+		case RIGHT :  fprintf(gpoutfile,"/_%s %d 0 0 2 z\n",ai_font,ai_fontsize);
 			break;
 	}
 	if (ai_ang==0) {
-		fprintf(outfile,"[ 1 0 0 1 %.2f %.2f] e\n",
+		fprintf(gpoutfile,"[ 1 0 0 1 %.2f %.2f] e\n",
 			x/AI_SC,y/AI_SC - ai_fontsize/3.0);
 	}
 	else {
-		fprintf(outfile,"[ 0 1 -1 0 %.2f %.2f] e\n",
+		fprintf(gpoutfile,"[ 0 1 -1 0 %.2f %.2f] e\n",
 			x/AI_SC - ai_fontsize/3.0,y/AI_SC);
 	}
 		
-	putc('(',outfile);
+	putc('(',gpoutfile);
 	ch = *str++;
 	while(ch!='\0') {
 		if ( (ch=='(') || (ch==')') || (ch=='\\') )
-			putc('\\',outfile);
-		putc(ch,outfile);
+			putc('\\',gpoutfile);
+		putc(ch,gpoutfile);
 		ch = *str++;
 	}
-	fprintf(outfile,") t\nT\n");
+	fprintf(gpoutfile,") t\nT\n");
 	ai_path_count = 0;
 }
 

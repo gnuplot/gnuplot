@@ -96,10 +96,10 @@ static char *tk_colors[] = {"black","gray","red","blue","green","brown","magenta
    
 TERM_PUBLIC void TK_init()
 {
-	fprintf(outfile,"proc gnuplot can {\n");
-	fprintf(outfile,"$can delete all\n");
-	fprintf(outfile,"set cmx [lindex [$can configure -width] 4]\n");
-	fprintf(outfile,"set cmy [lindex [$can configure -height] 4]\n");
+	fprintf(gpoutfile,"proc gnuplot can {\n");
+	fprintf(gpoutfile,"$can delete all\n");
+	fprintf(gpoutfile,"set cmx [lindex [$can configure -width] 4]\n");
+	fprintf(gpoutfile,"set cmy [lindex [$can configure -height] 4]\n");
 	tk_lastx = tk_lasty = tk_color = 0;
 }
 
@@ -131,7 +131,7 @@ TERM_PUBLIC void TK_vector(x,y)
 unsigned int x,y;
 {
 	y = 1000 - y;
-	fprintf(outfile,"$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",tk_lastx,tk_lasty,x,y,tk_colors[tk_color]);
+	fprintf(gpoutfile,"$can create line [expr $cmx * %d /1000] [expr $cmy * %d /1000] [expr $cmx * %d /1000] [expr $cmy * %d /1000] -fill %s\n",tk_lastx,tk_lasty,x,y,tk_colors[tk_color]);
         tk_lastx = x;
         tk_lasty = y;
 }
@@ -142,13 +142,13 @@ unsigned int x, y;
 char *str;
 {
 	y = 1000 - y;
-	fprintf(outfile,"$can create text [expr $cmx * %d /1000] [expr $cmy * %d /1000] -text {%s} -fill %s -anchor w\n",x,y,str,tk_colors[tk_color]);
+	fprintf(gpoutfile,"$can create text [expr $cmx * %d /1000] [expr $cmy * %d /1000] -text {%s} -fill %s -anchor w\n",x,y,str,tk_colors[tk_color]);
 }
 
 TERM_PUBLIC void TK_text()
 {
-	fprintf(outfile,"}\n");
-	fflush(outfile);
+	fprintf(gpoutfile,"}\n");
+	fflush(gpoutfile);
 }
 
 

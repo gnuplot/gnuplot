@@ -98,7 +98,7 @@ TERM_PUBLIC void DXY_init()
 TERM_PUBLIC void DXY_graphics()
 {
 	/* HOME, Character size 3 */
-	fprintf(outfile,"H\nS3\n");
+	fprintf(gpoutfile,"H\nS3\n");
 }
 
 
@@ -114,13 +114,13 @@ TERM_PUBLIC void DXY_linetype(linetype)
 int linetype;
 {
     /* select pen */
-	fprintf(outfile,"J%d\n",(linetype+2)%8+1);
+	fprintf(gpoutfile,"J%d\n",(linetype+2)%8+1);
 	switch(linetype) {
 	   case -1 :  /* use dotted line for axis */
-	   	    fprintf(outfile,"L1\nB50\n");
+	   	    fprintf(gpoutfile,"L1\nB50\n");
 			break;
 	   default :  /* use solid line for all others */
-			fprintf(outfile,"L0\n");
+			fprintf(gpoutfile,"L0\n");
 	    		break;
    	}
 }
@@ -129,14 +129,14 @@ int linetype;
 TERM_PUBLIC void DXY_move(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"M%d,%d\n",x,y);
+	fprintf(gpoutfile,"M%d,%d\n",x,y);
 }
 
 
 TERM_PUBLIC void DXY_vector(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"D%d,%d\n",x,y);
+	fprintf(gpoutfile,"D%d,%d\n",x,y);
 }
 
 
@@ -150,7 +150,7 @@ char *str;
 	else
 		/* horiz */
 		DXY_move(x,y - DXY_VCHAR/4);
-	fprintf(outfile,"P%s\n",str);
+	fprintf(gpoutfile,"P%s\n",str);
 }
 
 
@@ -158,7 +158,7 @@ TERM_PUBLIC int DXY_text_angle(ang)
 int ang;
 {
 	dxy_angle = ang;
-	fprintf(outfile,"Q%d\n",ang);
+	fprintf(gpoutfile,"Q%d\n",ang);
 	return TRUE;
 }
 
@@ -166,7 +166,7 @@ int ang;
 TERM_PUBLIC void DXY_reset()
 {
 	/* Home pen */
-	fprintf(outfile,"H\n");
+	fprintf(gpoutfile,"H\n");
 }
 
 #endif /* TERM_BODY */

@@ -515,13 +515,13 @@ static void CGM_write_char_record(class, cgm_id, numbytes, data)
   CGM_write_code(class, cgm_id, padded_length);
   short_len = numbytes;
   if (numbytes < 255)
-    fwrite(&short_len, 1, 1, outfile); /* write true length */
+    fwrite(&short_len, 1, 1, gpoutfile); /* write true length */
   else
     {
-      fwrite(&flag, 1, 1, outfile);
+      fwrite(&flag, 1, 1, gpoutfile);
       CGM_write_int(numbytes);
     }
-  fwrite(data, 1, numbytes + pad, outfile); /* write string */
+  fwrite(data, 1, numbytes + pad, gpoutfile); /* write string */
 }
 
 static void CGM_write_int_record(class, cgm_id, numbytes, data)
@@ -556,13 +556,13 @@ static void CGM_write_mixed_record(class, cgm_id, numint, int_data,
 
   short_len = numchar;
   if (numchar < 255)
-    fwrite(&short_len, 1, 1, outfile); /* write string length */
+    fwrite(&short_len, 1, 1, gpoutfile); /* write string length */
   else
     {
-      fwrite(&flag, 1, 1, outfile);
+      fwrite(&flag, 1, 1, gpoutfile);
       CGM_write_int(numchar);
     }
-  fwrite(char_data, 1, numchar + pad, outfile); /* write string */
+  fwrite(char_data, 1, numchar + pad, gpoutfile); /* write string */
 }
 
 /*
@@ -612,7 +612,7 @@ static void CGM_write_int(value)
   u.c[0] = (value >> 8) & 255;	/* convert to network order */
   u.c[1] = value & 255;
 
-  fwrite(&u.s, 1, 2, outfile);
+  fwrite(&u.s, 1, 2, gpoutfile);
 }
 
 	/* Draw a dashed line to (ux,uy).  CGM has linestyles, but

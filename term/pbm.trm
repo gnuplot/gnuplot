@@ -212,14 +212,14 @@ static void PBMmonotext()
 {
   register int x,j,row;
 
-   fprintf(outfile,"P4\n");
-   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
+   fprintf(gpoutfile,"P4\n");
+   fprintf(gpoutfile,"%u %u\n", b_ysize, b_xsize);
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {
       row = (b_ysize/8)-1;
       for (j = row; j >= 0; j--) {
-         (void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+         (void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
       }
    }
 
@@ -232,9 +232,9 @@ static void PBMgraytext()
   register int i,value;
   int mask, plane1, plane2, plane3;
 
-   fprintf(outfile,"P5\n");
-   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
-   fprintf(outfile,"%u\n",255);
+   fprintf(gpoutfile,"P5\n");
+   fprintf(gpoutfile,"%u %u\n", b_ysize, b_xsize);
+   fprintf(gpoutfile,"%u\n",255);
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {
@@ -251,7 +251,7 @@ static void PBMgraytext()
             if (plane1 & mask)  value-=36;
             if (plane2 & mask)  value-=73;
             if (plane3 & mask)  value-=146;
-            (void) fputc( (char)(value), outfile );
+            (void) fputc( (char)(value), gpoutfile );
             mask>>=1;
          }
       }
@@ -267,9 +267,9 @@ static void PBMcolortext()
   int mask, plane1, plane2, plane3, plane4;
   int red, green, blue;
 
-   fprintf(outfile,"P6\n");
-   fprintf(outfile,"%u %u\n", b_ysize, b_xsize);
-   fprintf(outfile,"%u\n",255);
+   fprintf(gpoutfile,"P6\n");
+   fprintf(gpoutfile,"%u %u\n", b_ysize, b_xsize);
+   fprintf(gpoutfile,"%u\n",255);
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {
@@ -289,9 +289,9 @@ static void PBMcolortext()
             }
 	    /* HBB: '85' is exactly 255/3, so this spans the full
 	     * range of colors in three steps: */
-            (void) fputc( (char)(red*85), outfile );
-            (void) fputc( (char)(green*85), outfile );
-            (void) fputc( (char)(blue*85), outfile );
+            (void) fputc( (char)(red*85), gpoutfile );
+            (void) fputc( (char)(green*85), gpoutfile );
+            (void) fputc( (char)(blue*85), gpoutfile );
             mask>>=1;
          }
       }

@@ -189,14 +189,14 @@ TERM_PUBLIC void IMAGEN_init()
     t->xmax = (unsigned int)(IMAGEN_xmax);
     t->ymax = (unsigned int)(IMAGEN_ymax);
 
-    fputs("@document(language impress, paper a4)", outfile);
+    fputs("@document(language impress, paper a4)", gpoutfile);
 
     if (IMAGEN_portrait) {
-    	putc(imP_SET_ABS_V, outfile);
+    	putc(imP_SET_ABS_V, gpoutfile);
     	IMAGEN_putwd(3520);
     }
-    putc(imP_SET_HV_SYSTEM, outfile);
-    putc(((IMAGEN_portrait?3:0)<<5)|(3<<3)|(IMAGEN_portrait?0:5), outfile);
+    putc(imP_SET_HV_SYSTEM, gpoutfile);
+    putc(((IMAGEN_portrait?3:0)<<5)|(3<<3)|(IMAGEN_portrait?0:5), gpoutfile);
 
     /* sprintf(font, "cour%02d", IMAGEN_FONTSIZE); */
     IMAGEN_mapsinit();
@@ -206,9 +206,9 @@ TERM_PUBLIC void IMAGEN_init()
 
     IMAGEN_text_angle(0);
 
-    putc(imP_SET_ABS_H, outfile);
+    putc(imP_SET_ABS_H, gpoutfile);
     IMAGEN_putwd(0);
-    putc(imP_SET_ABS_V, outfile);
+    putc(imP_SET_ABS_V, gpoutfile);
     IMAGEN_putwd(0);
 
     IMAGEN_linetype(-1);
@@ -232,7 +232,7 @@ static void IM_page()
 	/* fprintf(stderr,"graphics, draw path\n"); */
 	IMAGEN_draw_path();
     }
-	putc(imP_ENDPAGE, outfile);
+	putc(imP_ENDPAGE, gpoutfile);
 }
 
 TERM_PUBLIC void IMAGEN_graphics()
@@ -342,8 +342,8 @@ int lt;
 
     lastlinetype = lt;	
 
-    putc(imP_SET_PEN, outfile);
-    putc(pen, outfile);
+    putc(imP_SET_PEN, gpoutfile);
+    putc(pen, gpoutfile);
     IMP_set_draw_pattern(lt,pen);
 }
 
@@ -388,7 +388,7 @@ static void IMAGEN_draw_path()
 /*    unsigned int pos; */
     register int i;
 
-    putc(imP_CREATE_PATH, outfile);
+    putc(imP_CREATE_PATH, gpoutfile);
     IMAGEN_putwd(IM_vecpos);
     for (i=0;i<IM_vecpos;i++) {
 	/*
@@ -401,8 +401,8 @@ static void IMAGEN_draw_path()
     IM_vecpos = 0;
     /* Draw path with black pen. */
 
-    putc(imP_DRAW_PATH, outfile);
-    putc(15, outfile);
+    putc(imP_DRAW_PATH, gpoutfile);
+    putc(15, gpoutfile);
 
     /* Set current position to end of line. */
 
@@ -415,11 +415,11 @@ IMAGEN_setpos(ux, uy)
 {
     /* Set x and y position (for text), also set beginning-of-line. */
 
-    putc(imP_SET_ABS_H, outfile);
+    putc(imP_SET_ABS_H, gpoutfile);
     IMAGEN_putwd(ux + IMAGEN_orgx);
-    putc(imP_SET_ABS_V, outfile);
+    putc(imP_SET_ABS_V, gpoutfile);
     IMAGEN_putwd(uy + IMAGEN_orgy);
-    putc(imP_SET_BOL, outfile);
+    putc(imP_SET_BOL, gpoutfile);
     if (IMAGEN_angle == 1)
 	 IMAGEN_putwd(uy + IMAGEN_orgx); /* vertical */
     else
@@ -436,8 +436,8 @@ TERM_PUBLIC int IMAGEN_text_angle(angle)
     }
     if (IMAGEN_angle != angle) {
 	   IMAGEN_angle = angle;	/* record for later use */
-	   putc(imP_SET_ADV_DIRS, outfile);
-	   putc(angle == 0 ? 0 : 7, outfile); /* 0=>horiz : 7=>vert */
+	   putc(imP_SET_ADV_DIRS, gpoutfile);
+	   putc(angle == 0 ? 0 : 7, gpoutfile); /* 0=>horiz : 7=>vert */
     }
 
     return(TRUE);
@@ -584,7 +584,7 @@ TERM_PUBLIC void IMAGEN_put_text(x, y, str)
     	}
 
     	IMAGEN_setpos(sx, sy);
-    	fputs((char *)cvstr, outfile);
+    	fputs((char *)cvstr, gpoutfile);
 	cvstr = ++p;
 	if (IMAGEN_angle) { 	/* vertical */
 		x += IMAGEN_hchar;
@@ -601,7 +601,7 @@ TERM_PUBLIC void IMAGEN_reset()
 	/* fprintf(stderr,"reset, draw path\n"); */
 	IMAGEN_draw_path();
     }
-    putc(imP_EOF, outfile);
+    putc(imP_EOF, gpoutfile);
 }
 
 static void
@@ -609,8 +609,8 @@ IMAGEN_putwd(w)
 unsigned int w;
 {
 	/* fprintf(stderr,"%1u\n",w); */
-	putc(w>>8, outfile);
-	putc(w, outfile);
+	putc(w>>8, gpoutfile);
+	putc(w, gpoutfile);
 }
 
 static void
@@ -619,13 +619,13 @@ IMAGEN_createfamily(c, sz)
 	int		sz;
 {
 
-    putc(imP_CREATE_FAMILY_TABLE, outfile);
-    putc(sz, outfile);
-    putc(1, outfile);
-    putc(1, outfile);
-    /* putc(0, outfile); */
-    fputs(c, outfile);
-    putc(0, outfile);
+    putc(imP_CREATE_FAMILY_TABLE, gpoutfile);
+    putc(sz, gpoutfile);
+    putc(1, gpoutfile);
+    putc(1, gpoutfile);
+    /* putc(0, gpoutfile); */
+    fputs(c, gpoutfile);
+    putc(0, gpoutfile);
 }
 
 static void
@@ -644,11 +644,11 @@ IMAGEN_setfont(sz)
     IMAGEN_blofs = IMAGEN_hchar / 3;
 	term->v_char = IMAGEN_hchar;
 	term->h_char = IMAGEN_wchar;
-    putc(imP_SET_FAMILY, outfile);
-    putc(sz, outfile);
-    putc(imP_SET_SP, outfile);
+    putc(imP_SET_FAMILY, gpoutfile);
+    putc(sz, gpoutfile);
+    putc(imP_SET_SP, gpoutfile);
     IMAGEN_putwd(IMAGEN_wchar);
-    putc(imP_SET_IL, outfile);
+    putc(imP_SET_IL, gpoutfile);
     IMAGEN_putwd(IMAGEN_hchar);
 }
 
@@ -657,14 +657,14 @@ IMP_set_draw_pattern(pattern,sz)
 int pattern, sz;
 {
 	int i /*,j */ ;
-	putc(imP_SET_DRAW_PATTERN, outfile);
-	putc(0,outfile);
-	putc(imP_SET_DRAW_PATTERN, outfile);
+	putc(imP_SET_DRAW_PATTERN, gpoutfile);
+	putc(0,gpoutfile);
+	putc(imP_SET_DRAW_PATTERN, gpoutfile);
 	/* if ( strlen(IMPdrpattern[pattern]) == 1 ) {
-		putc(type,outfile);
+		putc(type,gpoutfile);
 		return;
 	} */ 
-	putc(strlen(IMPdrpattern[pattern]),outfile);
+	putc(strlen(IMPdrpattern[pattern]),gpoutfile);
 	for ( i=0;i<strlen(IMPdrpattern[pattern]);i++) {
 		IMAGEN_putwd(IMPdrpattern[pattern][i]*sz);
 	}
@@ -837,7 +837,7 @@ int name;
         if ( map[i] ) j++; 
     } 
     *p = j; 
-    for (i=0;i<3;i++) putc(s[i],outfile); 
+    for (i=0;i<3;i++) putc(s[i],gpoutfile); 
  
     s[3] = 1;
     for (j=0;j<127;j++) { 
@@ -846,7 +846,7 @@ int name;
             *p++ = j; 
             *p++ = map[j] >> 8; 
             *p   = map[j] & 255;
-            for (i=0;i<4;i++) putc(s[i],outfile); 
+            for (i=0;i<4;i++) putc(s[i],gpoutfile); 
         } 
     } 
 } 

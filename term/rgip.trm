@@ -204,37 +204,37 @@ TERM_PUBLIC void RGIP_graphics()
     }
 
     if ( ! Gnr || RGIP_plot_nr >= ( RGIP_win_horiz * RGIP_win_verti )) {
-    	fstat(fileno(outfile),&buf);
+    	fstat(fileno(gpoutfile),&buf);
     	if ( S_ISREG(buf.st_mode)) {
 	    if ( outstr && (p=(unsigned char *)strchr(outstr,'X')) ){ /* substitute X with graphnr */
 		if ( ! Gnr ) { /* delete the base file */
 		    unlink(outstr); /* should we close it first ? ? ? */
 		} else {
-        		fputs("%RI_GROUPEND\n", outfile);
-			fclose(outfile);
+        		fputs("%RI_GROUPEND\n", gpoutfile);
+			fclose(gpoutfile);
 		}
 		*p = '\0';
 		sprintf(fn,"%s%1d%s",outstr,++Gnr,p+1);
-                if ( (outfile = fopen(fn,"w")) == (FILE *)NULL ) {
+                if ( (gpoutfile = fopen(fn,"w")) == (FILE *)NULL ) {
                      os_error("cannot reopen file with binary type; output unknown",
                            NO_CARET);
                 }
 		*p = 'X';  /* put back X */
             }
     	}
-	fputs("%RGIP_METAFILE: 1.0a\n", outfile);
-	fputs("%RI_GROUPSTART\n", outfile);
-	fprintf(outfile,"0 0 %d %d SetWindow\n", 
+	fputs("%RGIP_METAFILE: 1.0a\n", gpoutfile);
+	fputs("%RI_GROUPSTART\n", gpoutfile);
+	fprintf(gpoutfile,"0 0 %d %d SetWindow\n", 
 		(RGIP_portrait)?RGIP_Y_MAX : RGIP_X_MAX,
 		(RGIP_portrait)?RGIP_X_MAX : RGIP_Y_MAX);
-	fprintf(outfile,"100 100 %d %d 10 1 7 1 8 BOX\n", 
+	fprintf(gpoutfile,"100 100 %d %d 10 1 7 1 8 BOX\n", 
 		(RGIP_portrait) ? RGIP_YMAX : RGIP_XMAX,
 		(RGIP_portrait) ? RGIP_XMAX : RGIP_YMAX);
 	RGIP_plot_nr = 0;
     } else {
-    	fputs("%RI_GROUPEND\n", outfile);
+    	fputs("%RI_GROUPEND\n", gpoutfile);
     }
-    fputs("%RI_GROUPSTART\n", outfile);
+    fputs("%RI_GROUPSTART\n", gpoutfile);
     RGIP_plot_nr++;
     /* Gnr++; */
     tmpx = RGIP_orgX + ((RGIP_plot_nr - 1) % RGIP_win_horiz) * RGIP_winx;
@@ -275,8 +275,8 @@ int lt;
 	RGIP_lwid *= 2;
     	lt  = (lt % RGIP_LINE_TYPES) + 1;
     }
-    fputs("%RI_GROUPEND\n", outfile);
-    fputs("%RI_GROUPSTART\n", outfile);
+    fputs("%RI_GROUPEND\n", gpoutfile);
+    fputs("%RI_GROUPSTART\n", gpoutfile);
 
     /* RGIP_lsty  = (lt == 0 || lt == 2) ? 1 : lt; */
 
@@ -288,8 +288,8 @@ TERM_PUBLIC void RGIP_move(x,y)
 	unsigned int x,y;
 {
 /*
-    fputs("%RI_GROUPEND\n", outfile);
-    fputs("%RI_GROUPSTART\n", outfile);
+    fputs("%RI_GROUPEND\n", gpoutfile);
+    fputs("%RI_GROUPSTART\n", gpoutfile);
 */
     if ( RGIP_vecpos ) {
 	RGIP_write_poly();
@@ -324,16 +324,16 @@ void RGIP_write_poly()
 {
     register int i;
 
-    putc ('[',outfile);
+    putc ('[',gpoutfile);
     for (i=0;i<RGIP_vecpos;i++) {
-	if ( ! (i%8)) putc ('\n',outfile);
-	fprintf (outfile," %1d",RGIP_xvector[i]);
-	fprintf (outfile," %1d",RGIP_yvector[i]);
+	if ( ! (i%8)) putc ('\n',gpoutfile);
+	fprintf (gpoutfile," %1d",RGIP_xvector[i]);
+	fprintf (gpoutfile," %1d",RGIP_yvector[i]);
     }
     RGIP_vecpos = 0;
-    putc (']',outfile);
+    putc (']',gpoutfile);
 
-    fprintf(outfile," %1d %d %1d %1d %1d %s\n", RGIP_lwid, RGIP_lsty,
+    fprintf(gpoutfile," %1d %d %1d %1d %1d %s\n", RGIP_lwid, RGIP_lsty,
         RGIP_lcol, RGIP_fsty, RGIP_fcol, RGIP_Obj[RGIPPOLY]);
 
     /*
@@ -451,7 +451,7 @@ TERM_PUBLIC void RGIP_put_text(x, y, str)
     while ( (p=(unsigned char *)strchr(cvstr,'\n' )) ){
 	*p = '\0';
 	if (strlen(cvstr)) 
-    	    fprintf(outfile,"%1d %1d %1d  %1d (%s) %1d %1d %1d %1d %s\n",
+    	    fprintf(gpoutfile,"%1d %1d %1d  %1d (%s) %1d %1d %1d %1d %s\n",
             	x,y,RGIP_justify, RGIP_angle*90, cvstr, RGIP_fface, RGIP_ftype,
             	RGIP_fontsize, RGIP_tcol, RGIP_Obj[RGIPTEXT]);
 	cvstr = ++p;
@@ -469,8 +469,8 @@ TERM_PUBLIC void RGIP_reset()
     if ( RGIP_vecpos ) {
 	RGIP_write_poly();
     }
-    fputs("%RI_GROUPEND\n", outfile);
-    /* fputs("%RI_GROUPEND\n", outfile); */
+    fputs("%RI_GROUPEND\n", gpoutfile);
+    /* fputs("%RI_GROUPEND\n", gpoutfile); */
 }
 
 /* static void
@@ -493,7 +493,7 @@ int number;
     y += RGIP_orgy;
 
     if (number < 0) {		/* do dot */
-        fprintf(outfile,"%1d %1d %1d %s\n",
+        fprintf(gpoutfile,"%1d %1d %1d %s\n",
                x,y,RGIP_mcol,RGIP_Obj[RGIPDOTS]);
 	    return;
 	}
@@ -501,7 +501,7 @@ int number;
 	RGIP_msty = (number % RGIP_POINT_TYPES) + 1;
 	RGIP_msize = ((int)(number / RGIP_POINT_TYPES)) + 1;
 
-    fprintf(outfile,"%1d %1d %1d %1d %1d %s\n",
+    fprintf(gpoutfile,"%1d %1d %1d %1d %1d %s\n",
                x,y,RGIP_msize, RGIP_msty, RGIP_mcol, RGIP_Obj[RGIPMARK]);
 }
 

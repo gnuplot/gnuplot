@@ -78,47 +78,47 @@ TERM_PUBLIC int Xlib_justify_text __PROTO((enum JUSTIFY mode));
 
 TERM_PUBLIC void Xlib_init() { ; }
 
-TERM_PUBLIC void Xlib_graphics() { fprintf(outfile, "G\n"); }
+TERM_PUBLIC void Xlib_graphics() { fprintf(gpoutfile, "G\n"); }
 
 TERM_PUBLIC void Xlib_text()
 { 
-  fprintf(outfile, "E\n"); fflush(outfile);
+  fprintf(gpoutfile, "E\n"); fflush(gpoutfile);
 #ifdef ULTRIX_KLUDGE
-  fprintf(outfile, "E\n"); fflush(outfile);
+  fprintf(gpoutfile, "E\n"); fflush(gpoutfile);
 #endif
 }
 
-TERM_PUBLIC void Xlib_reset() { fprintf(outfile, "R\n"); fflush(outfile); }
+TERM_PUBLIC void Xlib_reset() { fprintf(gpoutfile, "R\n"); fflush(gpoutfile); }
 
 TERM_PUBLIC void Xlib_move(x,y)
      unsigned int x,y;
 {
-  fprintf(outfile, "M%04d%04d\n", x, y);
+  fprintf(gpoutfile, "M%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void Xlib_vector(x,y)
      unsigned int x,y;
 {
-  fprintf(outfile, "V%04d%04d\n", x, y);
+  fprintf(gpoutfile, "V%04d%04d\n", x, y);
 }
 
 TERM_PUBLIC void Xlib_linetype(lt)
      int lt;
 {
-  fprintf(outfile, "L%04d\n", lt);
+  fprintf(gpoutfile, "L%04d\n", lt);
 }
 
 TERM_PUBLIC void Xlib_put_text(x,y,str)
      unsigned int x,y;
      char str[];
 {
-  fprintf(outfile, "T%04d%04d%s\n", x, y, str);
+  fprintf(gpoutfile, "T%04d%04d%s\n", x, y, str);
 }
 
 TERM_PUBLIC int Xlib_justify_text(mode)
      enum JUSTIFY mode;
 {
-  fprintf(outfile, "J%04d\n", mode);
+  fprintf(gpoutfile, "J%04d\n", mode);
   return(TRUE);
 }
 

@@ -145,7 +145,7 @@ TERM_PUBLIC void TEXDRAW_init()
 {
   TEXDRAW_posx = TEXDRAW_posy = 0;
   TEXDRAW_linetype(-1);
-  fprintf(outfile, "%% GNUPLOT: LaTeX using TEXDRAW macros\n");
+  fprintf(gpoutfile, "%% GNUPLOT: LaTeX using TEXDRAW macros\n");
 }
 
 TERM_PUBLIC void TEXDRAW_graphics()
@@ -162,7 +162,7 @@ static char GPFAR tdg1[] = "\
 \\setunitscale %2.2f\n\
 \\linewd %d\n\
 \\textref h:L v:C\n";
-  fprintf(outfile, tdg1, 
+  fprintf(gpoutfile, tdg1, 
 	TEXDRAW_scalefactor,
 	TEXDRAW_lines[2]);
   TEXDRAW_last_type = 0;
@@ -172,7 +172,7 @@ static char GPFAR tdg1[] = "\
 TERM_PUBLIC void TEXDRAW_text()
 {
   TEXDRAW_endline();
-  fprintf(outfile, "\\end{texdraw}\n");
+  fprintf(gpoutfile, "\\end{texdraw}\n");
 }
 
 TERM_PUBLIC void TEXDRAW_linetype(linetype)
@@ -203,14 +203,14 @@ int number;
 
   /* Print the character defined by 'number'; number < 0 means
         to use a dot, otherwise one of the defined points. */
-  fprintf(outfile, "\\move (%d %d)\n",
+  fprintf(gpoutfile, "\\move (%d %d)\n",
 	  (int)((double) x * TEXDRAW_xscale),
 	  (int)((double) y * TEXDRAW_yscale));
   if (TEXDRAW_last_justify != CENTRE) {
-    fprintf(outfile, "\\textref h:C v:C ");
+    fprintf(gpoutfile, "\\textref h:C v:C ");
     TEXDRAW_last_justify = CENTRE;
   }
-  fprintf(outfile, "%s\n",
+  fprintf(gpoutfile, "%s\n",
 	  (number < 0 ?
 	   TEXDRAW_TINY_DOT :
 	   TEXDRAW_points[number % TEXDRAW_POINT_TYPES]));
@@ -225,10 +225,10 @@ unsigned int ux, uy;
     /* Start a new line. This depends on line type */
     if (TEXDRAW_type != TEXDRAW_last_type){
       if (TEXDRAW_lines[TEXDRAW_type+2] != TEXDRAW_lines[TEXDRAW_last_type+2])
-	fprintf(outfile, "\\linewd %d\n", TEXDRAW_lines[TEXDRAW_type + 2]);
+	fprintf(gpoutfile, "\\linewd %d\n", TEXDRAW_lines[TEXDRAW_type + 2]);
       TEXDRAW_last_type = TEXDRAW_type;
     }
-    fprintf(outfile, "\\path (%d %d)",
+    fprintf(gpoutfile, "\\path (%d %d)",
 	    (int)((double) TEXDRAW_posx * TEXDRAW_xscale),
 	    (int)((double) TEXDRAW_posy * TEXDRAW_yscale));
     TEXDRAW_linecount = 1;
@@ -239,11 +239,11 @@ unsigned int ux, uy;
      * If they are too long then latex will choke.
      */
     if (TEXDRAW_linecount++ >= TEXDRAW_LINEMAX) {
-      fprintf(outfile, "\n\\cpath ");
+      fprintf(gpoutfile, "\n\\cpath ");
       TEXDRAW_linecount = 1;
     }
   }
-  fprintf(outfile, "(%d %d)",
+  fprintf(gpoutfile, "(%d %d)",
 	  (int)((double) ux * TEXDRAW_xscale),
 	  (int)((double) uy * TEXDRAW_yscale));
   TEXDRAW_posx = ux;
@@ -253,7 +253,7 @@ unsigned int ux, uy;
 static void TEXDRAW_endline()
 {
   if (TEXDRAW_inline) {
-    fprintf(outfile, "\n");
+    fprintf(gpoutfile, "\n");
     TEXDRAW_inline = FALSE;
   }
 }
@@ -268,7 +268,7 @@ TBOOLEAN head;
     text = 'a';
   else
     text = 'l';
-  fprintf(outfile, "\\move (%d %d)\\%cvec (%d %d)",
+  fprintf(gpoutfile, "\\move (%d %d)\\%cvec (%d %d)",
 	  (int)((double) sx * TEXDRAW_xscale),
 	  (int)((double) sy * TEXDRAW_yscale),
 	  text,
@@ -286,7 +286,7 @@ char str[];			/* the text */
 
   TEXDRAW_endline();
 
-  fprintf(outfile, "\\move (%d %d)",
+  fprintf(gpoutfile, "\\move (%d %d)",
 	  (int)((double) x * TEXDRAW_xscale),
 	  (int)((double) y * TEXDRAW_yscale));
 
@@ -298,13 +298,13 @@ char str[];			/* the text */
   if (TEXDRAW_last_justify != TEXDRAW_justify) {
     TEXDRAW_last_justify = TEXDRAW_justify;
     if (TEXDRAW_justify == LEFT)
-      fprintf(outfile, "\\textref h:L v:C ");
+      fprintf(gpoutfile, "\\textref h:L v:C ");
     else if (TEXDRAW_justify == CENTRE)
-      fprintf(outfile, "\\textref h:C v:C ");
+      fprintf(gpoutfile, "\\textref h:C v:C ");
     else if (TEXDRAW_justify == RIGHT)
-      fprintf(outfile, "\\textref h:R v:C ");
+      fprintf(gpoutfile, "\\textref h:R v:C ");
   }
-  fprintf(outfile, "\\%ctext{%s}\n", text, str);
+  fprintf(gpoutfile, "\\%ctext{%s}\n", text, str);
 }
 
 

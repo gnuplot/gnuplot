@@ -188,7 +188,7 @@ enum FIG_poly_stat stat;
 {
   int i,j;
   if(stat == FIG_poly_part) {
-	fprintf(outfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
+	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
 	 O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
 	 FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
 	 FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
@@ -198,12 +198,12 @@ enum FIG_poly_stat stat;
 	j = 0;
 	for(i=0;i<FIG_poly_vec_cnt;i++)
 	{
-	  fprintf(outfile," %d %d",FIG_points[i].x,FIG_points[i].y);
+	  fprintf(gpoutfile," %d %d",FIG_points[i].x,FIG_points[i].y);
 	  if (j++ > 4 && i != FIG_poly_vec_cnt-1) {
-		fprintf(outfile,"\n\t"); j = 0; /* JFS */
+		fprintf(gpoutfile,"\n\t"); j = 0; /* JFS */
 	  }
 	}
-	if (j != 0) {fprintf(outfile,"\n");}
+	if (j != 0) {fprintf(gpoutfile,"\n");}
 	/* Give the memory back to the system because we are done with this 
 	 * polyline. Make sure FIG_points contains NULL afterwards!
 	 */
@@ -441,8 +441,8 @@ TERM_PUBLIC void FIG_init()
     FIG_line.pic = NULL;
     FIG_line.next = NULL;
 
-    fprintf(outfile, "%s\n", FIG_MAGIC);
-    fprintf(outfile, "%s\n%s\n%s\n%d %d\n", FIG_ORIENT, FIG_JUST,
+    fprintf(gpoutfile, "%s\n", FIG_MAGIC);
+    fprintf(gpoutfile, "%s\n%s\n%s\n%d %d\n", FIG_ORIENT, FIG_JUST,
 	FIG_UNIT, FIG_RES, FIG_COORD_SYS);
 }
  
@@ -460,7 +460,7 @@ TERM_PUBLIC void FIG_text()
     /* there is no way to have separate pictures in a FIG file */
     FIG_poly_clean(FIG_polyvec_stat);
     FIG_posx = FIG_posy = 0;
-    fflush(outfile);
+    fflush(gpoutfile);
 }
  
  
@@ -595,7 +595,7 @@ TERM_PUBLIC void FIG_arrow(sx, sy, ex, ey, head)
 	TBOOLEAN head;
 {
 	FIG_poly_clean(FIG_polyvec_stat);
-        fprintf(outfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
+        fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %d\n",
          O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
          FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
          FIG_line.pen_style, FIG_line.fill_style, FIG_line.style_val,
@@ -604,11 +604,11 @@ TERM_PUBLIC void FIG_arrow(sx, sy, ex, ey, head)
 
         /* arrow line */
 	if ( head )
-	        fprintf(outfile, "%d %d %.3f %.3f %.3f\n",
+	        fprintf(gpoutfile, "%d %d %.3f %.3f %.3f\n",
         	        0, 0, 1.0,
 			(double)(term->h_tic/2 + 1),
 			(double)term->h_tic        );
-        fprintf(outfile, "%d %d %d %d\n",
+        fprintf(gpoutfile, "%d %d %d %d\n",
                 FIG_xoff + sx, FIG_yoff + term->ymax - sy,
 		FIG_yoff + ex, FIG_yoff + term->ymax - ey);
  
@@ -625,7 +625,7 @@ TERM_PUBLIC void FIG_put_text(x, y, str)
   FIG_poly_clean(FIG_polyvec_stat);
   y -= term->v_char/2;	/* assuming vertical center justified */
  
-    fprintf(outfile, "%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
+    fprintf(gpoutfile, "%d %d %d %d %d %d %6.3f %6.3f %d %6.3f %6.3f %d %d %s\\001\n",
                   O_TEXT, FIG_justify, FIG_color, 0, FIG_DEFAULT,
                   FIG_ROMAN_FONT, (float)FIG_font_s,
 		  FIG_angle, SPECIAL_TEXT, (float)term->v_char,
@@ -699,36 +699,36 @@ int number;
        
        if ( tnum == 0 ) { /* circle */
     	   r = FIG_current_pointsize*term->v_char/4 + 1;
-    	   fprintf(outfile,
+    	   fprintf(gpoutfile,
     	     "1 3 %d %d %d %d %d %d %d %6.3f 1 0.000 %d %d %d %d %d %d %d %d\n",
     	     FIG_type, FIG_thickness, line_color,
     	     fill_color, depth, 0, fill_style, FIG_spacing,
     	     xpc, ypc, r, r, xpc, ypc, xpc, ypc-r);
        } else {
-          fprintf(outfile,"2 3 %d %d %d %d %d %d %d %6.3f 0 0 0 0 0 ",
+          fprintf(gpoutfile,"2 3 %d %d %d %d %d %d %d %6.3f 0 0 0 0 0 ",
     	     FIG_type, FIG_thickness, line_color,
     	     fill_color, depth, 0, fill_style, FIG_spacing);
            
           if ( tnum == 1 ) { /* square */
              d = FIG_current_pointsize*term->v_char/4 + 1;
-    	     fprintf(outfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
+    	     fprintf(gpoutfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
     		xpc-d,ypc-d, xpc-d,ypc+d, xpc+d,ypc+d, xpc+d,ypc-d, xpc-d,ypc-d);
 	  }
 	  else if ( tnum == 2 ) { /* diamond */
              d = FIG_current_pointsize*term->v_char/3 + 1;
-    	     fprintf(outfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
+    	     fprintf(gpoutfile,"5\n\t%d %d %d %d %d %d %d %d %d %d\n",
     		xpc-d,ypc, xpc,ypc+d, xpc+d,ypc, xpc,ypc-d, xpc-d,ypc);
 	  }
 	  else if ( tnum == 3 ) { /* triangle up */
              d = FIG_current_pointsize*term->v_char/3 + 1;
              h = d*4/7; /* About d times one 3rd of sqrt(3) */
-    	     fprintf(outfile,"4\n\t%d %d %d %d %d %d %d %d\n",
+    	     fprintf(gpoutfile,"4\n\t%d %d %d %d %d %d %d %d\n",
     		xpc-d,ypc+h, xpc,ypc-2*h, xpc+d,ypc+h, xpc-d,ypc+h);
 	  }
 	  else if ( tnum == 4 ) { /* triangle down */
              d = FIG_current_pointsize*term->v_char/3 + 1;
              h = d*4/7; 
-    	     fprintf(outfile,"4\n\t%d %d %d %d %d %d %d %d\n",
+    	     fprintf(gpoutfile,"4\n\t%d %d %d %d %d %d %d %d\n",
     		xpc-d,ypc-h, xpc,ypc+2*h, xpc+d,ypc-h, xpc-d,ypc-h);
 	  }
        }
@@ -755,7 +755,7 @@ TERM_PUBLIC void FIG_reset()
 {
     FIG_poly_clean(FIG_polyvec_stat);
     FIG_posx = FIG_posy = 0;
-    fflush(outfile);
+    fflush(gpoutfile);
 }
 #endif /* TERM_BODY */
 

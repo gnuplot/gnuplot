@@ -62,7 +62,7 @@
 /*
 Unixplot library writes to stdout.  A fix was put in place by
 ..!arizona!naucse!jdc to let set term and set output redirect
-stdout.  All other terminals write to outfile.
+stdout.  All other terminals write to gpoutfile.
 */
 
 /* This is a device independent format, so the output should look
@@ -177,7 +177,11 @@ TERM_PUBLIC void UP_init()
 	openpl();
 	space(0,0,UP_SCREENX-1,UP_SCREENY-1);
 	fontname(up_font);
+#ifdef GNU_PLOTUTILS
+	fontsize((int)((up_fontsize / 72.0 * 8.0) * (UP_SCREENY-1)));
+#else
 	fontsize(up_fontsize);
+#endif
 }
 
 
@@ -242,7 +246,11 @@ char str[];
 TERM_PUBLIC int UP_text_angle(ang)
 int ang;
 {
+#ifdef GNU_PLOTUTILS
+	textangle(90*ang);
+#else
 	rotate(0,0,90*ang);
+#endif
 	return TRUE;
 }
 

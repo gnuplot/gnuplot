@@ -136,7 +136,7 @@ TERM_PUBLIC void GPIC_options()
 TERM_PUBLIC void GPIC_init()
 {
   GPIC_linetype(-1);
-  fprintf(outfile, ".\\\"GNUPLOT: GROFF picture using the gpic preprocessor\n");
+  fprintf(gpoutfile, ".\\\"GNUPLOT: GROFF picture using the gpic preprocessor\n");
 }
 
 
@@ -145,16 +145,16 @@ TERM_PUBLIC void GPIC_graphics()
 {
   register struct termentry *t = term;
 
-  fprintf(outfile, ".PS %f %f\n",GPIC_coord(t->xmax),
+  fprintf(gpoutfile, ".PS %f %f\n",GPIC_coord(t->xmax),
 	  GPIC_coord(t->ymax));
-  fprintf(outfile,"x=%f; y=%f\n",GPIC_x, GPIC_y);
+  fprintf(gpoutfile,"x=%f; y=%f\n",GPIC_x, GPIC_y);
 }
 
 
 TERM_PUBLIC void GPIC_text()
 {
   GPIC_close_line();
-  fprintf(outfile, ".PE\n");
+  fprintf(gpoutfile, ".PE\n");
 }
 
 TERM_PUBLIC void GPIC_linetype(linetype)
@@ -168,7 +168,7 @@ TERM_PUBLIC void GPIC_linetype(linetype)
 void GPIC_close_line()
 {
   if(GPIC_linecount>0) {
-    fprintf(outfile,"; reset linewid\n");
+    fprintf(gpoutfile,"; reset linewid\n");
     GPIC_linecount = 0;
   }
 }
@@ -177,7 +177,7 @@ TERM_PUBLIC void GPIC_move(x,y)
      unsigned int x,y;
 {
   GPIC_close_line();
-  fprintf(outfile,"move to (x+%f,y+%f)\n",GPIC_coord(x),GPIC_coord(y));
+  fprintf(gpoutfile,"move to (x+%f,y+%f)\n",GPIC_coord(x),GPIC_coord(y));
   GPIC_linecount = 1;
 }
 
@@ -186,12 +186,12 @@ TERM_PUBLIC void GPIC_vector(ux,uy)
      unsigned int ux,uy;
 {
   if(GPIC_linecount==1) {
-    fprintf(outfile,"line %s to (x+%f,y+%f)",
+    fprintf(gpoutfile,"line %s to (x+%f,y+%f)",
 	    GPIC_lines[GPIC_ltype+2],
 	    GPIC_coord(ux),GPIC_coord(uy));
   } else {
-    fprintf(outfile," \\\n");
-    fprintf(outfile,"   then to (x+%f,y+%f)",GPIC_coord(ux),GPIC_coord(uy));
+    fprintf(gpoutfile," \\\n");
+    fprintf(gpoutfile,"   then to (x+%f,y+%f)",GPIC_coord(ux),GPIC_coord(uy));
   }
   GPIC_linecount++;
 }
@@ -203,10 +203,10 @@ TERM_PUBLIC void GPIC_arrow(sx,sy, ex,ey, head)
 {
   GPIC_close_line();
   if(head) {
-    fprintf(outfile,"arrowhead=7; arrow from x+%f,y+%f to x+%f,y+%f\n",
+    fprintf(gpoutfile,"arrowhead=7; arrow from x+%f,y+%f to x+%f,y+%f\n",
 	    GPIC_coord(sx),GPIC_coord(sy),GPIC_coord(ex),GPIC_coord(ey));
   } else { 
-    fprintf(outfile,"line from x+%f,y+%f to x+%f,y+%f\n",
+    fprintf(gpoutfile,"line from x+%f,y+%f to x+%f,y+%f\n",
 	    GPIC_coord(sx),GPIC_coord(sy),GPIC_coord(ex),GPIC_coord(ey));
   }
 }
@@ -217,22 +217,22 @@ TERM_PUBLIC void GPIC_put_text(x, y, str)
 	char str[];			/* the text */
 {
   GPIC_close_line();
-  fprintf(outfile, "\"%s\" ",str);
+  fprintf(gpoutfile, "\"%s\" ",str);
   switch(GPIC_justify) {
   case LEFT: {
-    fprintf(outfile,"ljust ");
+    fprintf(gpoutfile,"ljust ");
     break;
   }
   case CENTRE: {
-    fprintf(outfile," ");
+    fprintf(gpoutfile," ");
     break;
   }
   case RIGHT: {
-    fprintf(outfile,"rjust ");
+    fprintf(gpoutfile,"rjust ");
     break;
   }
   }
-  fprintf(outfile,"at x+%f,y+%f\n",GPIC_coord(x),GPIC_coord(y));
+  fprintf(gpoutfile,"at x+%f,y+%f\n",GPIC_coord(x),GPIC_coord(y));
 }
 
 
@@ -253,7 +253,7 @@ TERM_PUBLIC int GPIC_text_angle(angle)
 
 TERM_PUBLIC void GPIC_reset()
 {
-  fflush(outfile);
+  fflush(gpoutfile);
 }
 
 #endif /* TERM_BODY */

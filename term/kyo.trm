@@ -83,24 +83,24 @@ enum JUSTIFY pre_justify=LEFT;	/* text is flush left */
 
 TERM_PUBLIC void PRE_init()
 {
-  (void) fprintf(outfile,"!R! RES;\n") ;
+  (void) fprintf(gpoutfile,"!R! RES;\n") ;
   /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
   /* SPO: landscape format */
   /* STM, SLM set top, left margin*/
   /* Font: bold Helvetica (proportional font) */
-  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
-  (void) fprintf(outfile,"FTMD 15; FONT 29; SCPI 9;\n") ;
+  (void) fprintf(gpoutfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
+  (void) fprintf(gpoutfile,"FTMD 15; FONT 29; SCPI 9;\n") ;
 }
 
 TERM_PUBLIC void KYO_init()
 {
-  (void) fprintf(outfile,"!R! RES;\n") ;
+  (void) fprintf(gpoutfile,"!R! RES;\n") ;
   /* UNIT: units are dots, 300 dots = 1 in = 72 pt */
   /* SPO: landscape format */
   /* STM, SLM set top, left margin */
   /* Font: Courier (fixed width font) */
-  (void) fprintf(outfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
-  (void) fprintf(outfile,"FTMD 15; FONT 17; SCPI 10;\n") ;
+  (void) fprintf(gpoutfile,"PAGE; UNIT D; SPO L; STM 280; SLM 440;\n") ;
+  (void) fprintf(gpoutfile,"FTMD 15; FONT 17; SCPI 10;\n") ;
 }
 
 TERM_PUBLIC void PRE_graphics()
@@ -109,7 +109,7 @@ TERM_PUBLIC void PRE_graphics()
 
 TERM_PUBLIC void PRE_text()			/* eject page after each plot */
 {
-  (void) fprintf(outfile,"PAGE;\n") ; 
+  (void) fprintf(gpoutfile,"PAGE;\n") ; 
 }
 
 TERM_PUBLIC void PRE_linetype(linetype)
@@ -118,19 +118,19 @@ int linetype ;
   /* actually choose pendiameter */
   if (linetype < 0) linetype = -linetype;
   else linetype = 3;
-  (void) fprintf(outfile,"SPD %d;\n", linetype) ;
+  (void) fprintf(gpoutfile,"SPD %d;\n", linetype) ;
 }
  
 TERM_PUBLIC void PRE_move(x,y)
 unsigned int x,y ;
 {
-  (void) fprintf(outfile,"MAP %1d,%1d;\n",x,PRE_YMAX-y) ;
+  (void) fprintf(gpoutfile,"MAP %1d,%1d;\n",x,PRE_YMAX-y) ;
 }
  
 TERM_PUBLIC void PRE_vector(x,y)
 unsigned int x,y ;
 {
-  (void) fprintf(outfile,"DAP %1d, %1d;\n",x,PRE_YMAX-y) ;
+  (void) fprintf(gpoutfile,"DAP %1d, %1d;\n",x,PRE_YMAX-y) ;
 }
  
 TERM_PUBLIC void PRE_put_text(x, y, str)
@@ -140,10 +140,10 @@ char *str;
   PRE_move(x,y);
   switch(pre_justify){
   case RIGHT:
-    (void) fprintf(outfile,"RTXT \"%s\", B;\n",str) ;
+    (void) fprintf(gpoutfile,"RTXT \"%s\", B;\n",str) ;
     break;
   default:
-    (void) fprintf(outfile,"TEXT \"%s\", B;\n",str) ;
+    (void) fprintf(gpoutfile,"TEXT \"%s\", B;\n",str) ;
   }
 }
  
@@ -163,7 +163,7 @@ enum JUSTIFY mode;
 
 TERM_PUBLIC void PRE_reset()
 {
-  (void) fprintf(outfile,"PAGE; RES; EXIT;\n");
+  (void) fprintf(gpoutfile,"PAGE; RES; EXIT;\n");
 }
 
 #endif /* TERM_BODY */

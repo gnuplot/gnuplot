@@ -51,7 +51,7 @@
 /*
 Unixplot library writes to stdout.  A fix was put in place by
 ..!arizona!naucse!jdc to let set term and set output redirect
-stdout.  All other terminals write to outfile.
+stdout.  All other terminals write to gpoutfile.
 */
 
 /*

@@ -154,16 +154,16 @@ TERM_PUBLIC void DUMB_text ()
 {
   int x, y, l;
 
-  putc ('\f', outfile);
+  putc ('\f', gpoutfile);
   for (y = dumb_ymax - 1; y >= 0; y--)
     {
       for (l = dumb_xmax; l > 0 && DUMB_PIXEL (l - 1, y) == ' '; l--)
        ;
       for (x = 0; x < l; x++)
-       putc (DUMB_PIXEL (x, y), outfile);
-      if (dumb_feed || y>0) putc('\n', outfile);
+       putc (DUMB_PIXEL (x, y), gpoutfile);
+      if (dumb_feed || y>0) putc('\n', gpoutfile);
     }
-  fflush (outfile);
+  fflush (gpoutfile);
 }
 
 

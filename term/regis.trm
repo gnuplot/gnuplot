@@ -97,7 +97,7 @@ static int REGISang = 0;
 
 TERM_PUBLIC void REGISinit()
 {
-	fprintf(outfile,"\033[r\033[24;1H");
+	fprintf(gpoutfile,"\033[r\033[24;1H");
 /*                   1     2
 	1. reset scrolling region
 	2. locate cursor on bottom line
@@ -108,7 +108,7 @@ TERM_PUBLIC void REGISinit()
 /* thanks to calmasd!dko (Dan O'Neill) for adding S(E) for vt125s */
 TERM_PUBLIC void REGISgraphics()
 {
-    fprintf(outfile,"\033[2J\033P1pS(C0)S(E)T(A0)\n");
+    fprintf(gpoutfile,"\033[2J\033P1pS(C0)S(E)T(A0)\n");
 /*                   1      2      3    4   5
         1. clear screen
         2. enter ReGIS graphics
@@ -122,7 +122,7 @@ TERM_PUBLIC void REGISgraphics()
 
 TERM_PUBLIC void REGIStext()
 {
-	fprintf(outfile,"\033\\\033[24;1H");
+	fprintf(gpoutfile,"\033\\\033[24;1H");
 /*	                   1    2
 	1. Leave ReGIS graphics mode
  	2. locate cursor on last line of screen
@@ -143,14 +143,14 @@ static int lt_map[9 + 2] = {1, 4, 1, 1, 1, 4, 4, 4, 6, 6, 6};
    	if(!REGIS16color)
    	{	if (linetype >= 9)
    			linetype %= 9;
-   		fprintf(outfile, "W(I%d)\n", in_map[linetype + 2]);
-   		fprintf(outfile, "W(P%d)\n", lt_map[linetype + 2]);
+   		fprintf(gpoutfile, "W(I%d)\n", in_map[linetype + 2]);
+   		fprintf(gpoutfile, "W(P%d)\n", lt_map[linetype + 2]);
    	}
    	else
    	{	if(linetype >=15)
    			linetype %= 15;
-   		fprintf(outfile, "W(I%d)\n", in_16_map[linetype + 2]);
-   		fprintf(outfile, "W(P%d)\n", lt_16_map[linetype + 2]);
+   		fprintf(gpoutfile, "W(I%d)\n", in_16_map[linetype + 2]);
+   		fprintf(gpoutfile, "W(P%d)\n", lt_16_map[linetype + 2]);
    	}
 }
 
@@ -169,14 +169,14 @@ static int lt_map[9 + 2] = {1, 4, 1, 1, 1, 4, 4, 4, 6, 6, 6};
 TERM_PUBLIC void REGISmove(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"P[%d,%d]\n",x,REGISYLAST-y);
+	fprintf(gpoutfile,"P[%d,%d]\n",x,REGISYLAST-y);
 }
 
 
 TERM_PUBLIC void REGISvector(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"v[]v[%d,%d]\n",x,REGISYLAST - y);
+	fprintf(gpoutfile,"v[]v[%d,%d]\n",x,REGISYLAST - y);
 /* the initial v[] is needed to get the first pixel plotted */
 }
 
@@ -190,15 +190,15 @@ char *str;
 		REGISmove(x-REGISVCHAR/2-1,y);
 	else
 		REGISmove(x,y+REGISVCHAR/2-1);
-	(void) putc('T',outfile); (void) putc('\'',outfile);
+	(void) putc('T',gpoutfile); (void) putc('\'',gpoutfile);
 	while (*str) {
-		(void) putc(*str,outfile);
+		(void) putc(*str,gpoutfile);
 		if (*str == '\'')
-			(void) putc('\'',outfile);	/* send out another one */
+			(void) putc('\'',gpoutfile);	/* send out another one */
 		str++;
 	}
-	(void) putc('\'',outfile);
-	(void) putc('\n',outfile);
+	(void) putc('\'',gpoutfile);
+	(void) putc('\n',gpoutfile);
 }
 
 
@@ -207,16 +207,16 @@ int ang;
 {
 	REGISang = ang;
 	if (ang == 1)
-		fputs("T(D90,S1)\n",outfile);
+		fputs("T(D90,S1)\n",gpoutfile);
 	else
-		fputs("T(D0,S1)\n",outfile);
+		fputs("T(D0,S1)\n",gpoutfile);
 	return TRUE;
 }
 
 
 TERM_PUBLIC void REGISreset()
 {
-	fprintf(outfile,"\033[2J\033[24;1H");
+	fprintf(gpoutfile,"\033[2J\033[24;1H");
 }
 
 TERM_PUBLIC void REGISoptions()

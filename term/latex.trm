@@ -240,9 +240,9 @@ TERM_PUBLIC void LATEX_init()
     emtex = FALSE;
 #endif
     LATEX_posx = LATEX_posy = 0;
-    fprintf(outfile, "%% GNUPLOT: LaTeX picture\n");
-    fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
-    fprintf(outfile, 
+    fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture\n");
+    fprintf(gpoutfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
+    fprintf(gpoutfile, 
 		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
     LATEX_linetype(-1);
 	LATEX_size =0;
@@ -256,9 +256,9 @@ TERM_PUBLIC void LATEX_graphics()
 	int xscale = xsize * t->xmax;
 	int yscale = ysize * t->ymax;
 
-    fprintf(outfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
-    fprintf(outfile, "\\font\\gnuplot=%s10 at %dpt\n", LATEX_font, LATEX_fontsize);
-    fprintf(outfile, "\\gnuplot\n");
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", xscale, yscale);
+    fprintf(gpoutfile, "\\font\\gnuplot=%s10 at %dpt\n", LATEX_font, LATEX_fontsize);
+    fprintf(gpoutfile, "\\gnuplot\n");
 }
 
 
@@ -266,7 +266,7 @@ TERM_PUBLIC void LATEX_text()
 {
     LATEX_flushrule();
     LATEX_flushdot();
-    fprintf(outfile, "\\end{picture}\n");
+    fprintf(gpoutfile, "\\end{picture}\n");
     LATEX_posx = LATEX_posy = 0; /* current position */
     LATEX_moved = TRUE;	/* pen is up after move */
 }
@@ -293,12 +293,12 @@ TERM_PUBLIC void LATEX_linetype(linetype)
 
     /* If different from current size, redefine \plotpoint */
     if (size != LATEX_size) {
-	   fprintf(outfile, 
+	   fprintf(gpoutfile, 
 			 "\\sbox{\\plotpoint}{\\rule[%.3fpt]{%.3fpt}{%.3fpt}}%%\n",
 			 -size/2, size, size);
 #ifdef EMTEX
         if (emtex)         /* change line width */
-		fprintf(outfile, "\\special{em:linewidth %.1fpt}%%\n", size);
+		fprintf(gpoutfile, "\\special{em:linewidth %.1fpt}%%\n", size);
 #endif
     }
     
@@ -327,7 +327,7 @@ TERM_PUBLIC void LATEX_point(x,y, number)		/* version of line_and_point */
     
     /* Print the character defined by 'number'; number < 0 means 
 	  to use a dot, otherwise one of the defined points. */
-    fprintf(outfile, "\\put(%d,%d){%s}\n", x, y, 
+    fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y, 
 		  (number < 0 ? LATEX_TINY_DOT
 		   : LATEX_points[number % LATEX_POINT_TYPES]));
 }
@@ -369,7 +369,7 @@ LATEX_solid_line(x1,x2, y1,y2)
 	   if (LATEX_moved) {
 		  LATEX_flushrule();
 		  /* plot a dot */
-		  fprintf(outfile, "\\put(%u,%u){%s}\n", x1, y1, LATEX_DOT);
+		  fprintf(gpoutfile, "\\put(%u,%u){%s}\n", x1, y1, LATEX_DOT);
 	   }
     } else {
 	   code = (LATEX_moved ? 0 : 1); /* no combine after move */
@@ -392,13 +392,13 @@ LATEX_solid_line(x1,x2, y1,y2)
 			length = x*LATEX_UNIT;
 			inc = (x == ABS(dx) ? 1 : GPMAX(1,ABS(dy)/TINY_STEP+0.5));
 			if (inc == 1) {
-	 	     fprintf(outfile,"\\put(%u,%.2f){\\rule{%.3fpt}{%.3fpt}}\n",
+	 	     fprintf(gpoutfile,"\\put(%u,%.2f){\\rule{%.3fpt}{%.3fpt}}\n",
 			 (x2>=x1? x1 : x2), ((float)y1+y2-LATEX_dotsize)/2,
 			 length, LATEX_dotsize*LATEX_UNIT);
 			} else {
 			  dy = dy/inc;
 			  dx = (dx-sign(dx)*x)/(inc-1);
-fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n",
+fprintf(gpoutfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n",
 			   (dx>=0.0? (float)x1 : x1-x), 
 			   (float)y1-(ABS(dy)-offset)/2, 
 			   dx, dy, inc, length, ABS(dy)*LATEX_UNIT);
@@ -408,7 +408,7 @@ fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n"
 			dx = sign(dx) * x;
 			dx = (float)x2 - x1 - dx;
 			dy = (float)y2 - y1;
-fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){2}{\\rule{%.3fpt}{%.3fpt}}\n",
+fprintf(gpoutfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){2}{\\rule{%.3fpt}{%.3fpt}}\n",
 			 (dx>=0.0? (float)x1 : x1-x), (float)y1-LATEX_dotsize/2,
 			 dx, dy, x*LATEX_UNIT, LATEX_dotsize*LATEX_UNIT);
     			LATEX_moved = TRUE;
@@ -420,13 +420,13 @@ fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){2}{\\rule{%.3fpt}{%.3fpt}}\n",
 			length = y*LATEX_UNIT;
 			inc = (y == ABS(dy) ? 1 : GPMAX(1,ABS(dx)/TINY_STEP+0.5));
 			if (inc == 1) {
-		     fprintf(outfile,"\\put(%.2f,%u){\\rule{%.3fpt}{%.3fpt}}\n",
+		     fprintf(gpoutfile,"\\put(%.2f,%u){\\rule{%.3fpt}{%.3fpt}}\n",
 			 ((float)x1+x2-LATEX_dotsize)/2, (y2>=y1? y1 : y2),
 			 LATEX_dotsize*LATEX_UNIT, length);
 			} else {
 			  dx = dx/inc;
 			  dy = (dy-sign(dy)*y)/(inc-1);
-fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n",
+fprintf(gpoutfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n",
 			   (float)x1-(ABS(dx)-offset)/2, 
 			   (dy>=0? (float)y1 : y1-y), 
 			   dx, dy, inc, ABS(dx)*LATEX_UNIT, length);
@@ -436,7 +436,7 @@ fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){%u}{\\rule{%.3fpt}{%.3fpt}}\n"
 			dx = (float)x2 - x1;
 			dy = sign(dy) * y;
 			dy = (float)y2 - y1 - dy;
-fprintf(outfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){2}{\\rule{%.3fpt}{%.3fpt}}\n",
+fprintf(gpoutfile,"\\multiput(%.2f,%.2f)(%.3f,%.3f){2}{\\rule{%.3fpt}{%.3fpt}}\n",
 			 (float)x1-LATEX_dotsize/2, (dy>=0.0? (float)y1 : y1-y),
 			 dx, dy, LATEX_dotsize*LATEX_UNIT, y*LATEX_UNIT);
     			LATEX_moved = TRUE;
@@ -497,10 +497,10 @@ LATEX_rule(code, x,y, width, height)
 
 	   /* if very small use canned dot */
 	   if (lastw < LATEX_dotsize || lasth < LATEX_dotsize)
-		fprintf(outfile, "\\put(%.1f,%.1f){%s}\n",	   
+		fprintf(gpoutfile, "\\put(%.1f,%.1f){%s}\n",	   
 			   lastx, lasty, LATEX_DOT);
 	   else
-		fprintf(outfile, "\\put(%.1f,%.1f){\\rule[%.3fpt]{%.3fpt}{%.3fpt}}\n",
+		fprintf(gpoutfile, "\\put(%.1f,%.1f){\\rule[%.3fpt]{%.3fpt}{%.3fpt}}\n",
 			   lastx, lasty, -LATEX_dotsize*LATEX_UNIT/2,
 			   lastw*LATEX_UNIT, lasth*LATEX_UNIT);
     }
@@ -529,7 +529,7 @@ LATEX_dot_line(x1,x2, y1,y2)
     if (x1 == x2 && y1 == y2) {
 	   if (LATEX_moved)
 		/* plot a dot */
-		fprintf(outfile, "\\put(%u,%u){%s}\n", x1, y1, LATEX_DOT);
+		fprintf(gpoutfile, "\\put(%u,%u){%s}\n", x1, y1, LATEX_DOT);
     } else {
 	   float dotspace = LATEX_dotspace / LATEX_UNIT;
 	   float x,y;			/* current position */
@@ -557,10 +557,10 @@ LATEX_dot_line(x1,x2, y1,y2)
 		   lasty = y, y += yinc)
 		numdots++;
 	   if (numdots == 1)
-		fprintf(outfile, "\\put(%.2f,%.2f){%s}\n",
+		fprintf(gpoutfile, "\\put(%.2f,%.2f){%s}\n",
 		   lastx, lasty, LATEX_DOT);
 	   else if (numdots > 0)
-		fprintf(outfile, "\\multiput(%u,%u)(%.3f,%.3f){%u}{%s}\n",
+		fprintf(gpoutfile, "\\multiput(%u,%u)(%.3f,%.3f){%u}{%s}\n",
 			   x1, y1, xinc, yinc, numdots, LATEX_DOT);
 
 	   /* how much is left over, as a fraction of dotspace? */
@@ -585,7 +585,7 @@ static void
 LATEX_flushdot()
 {
     if (LATEX_needsdot) 
-	 fprintf(outfile, "\\put(%d,%d){%s}\n", 
+	 fprintf(gpoutfile, "\\put(%d,%d){%s}\n", 
 		    LATEX_posx, LATEX_posy, LATEX_DOT);
     LATEX_needsdot = FALSE;
 }
@@ -619,12 +619,12 @@ void best_latex_arrow(sx,sy, ex,ey, who, head)
 
     if (dx == 0) {
 	   /* vertical arrow */
-	   fprintf(outfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
+	   fprintf(gpoutfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
 			 sx, sy, head ? "vector":"line", 
 			 sign(ey-sy), ABS(ey-sy));
     } else if (dy == 0) {
 	   /* horizontal arrow */
-	   fprintf(outfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
+	   fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
 			 sx, sy, head ? "vector":"line",
 			 sign(ex-sx), ABS(ex-sx));
     } else {
@@ -646,7 +646,7 @@ void best_latex_arrow(sx,sy, ex,ey, who, head)
 	   /* now we have the best slope arrow */
 	   /* maybe it's exactly the right slope! */
 	   if (minerror == 0.0)	/* unlikely but possible */
-		fprintf(outfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
+		fprintf(gpoutfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
 			   sx, sy, head ? "vector" : "line",
 			   bestslope->dx*sign(ex-sx), bestslope->dy*sign(ey-sy),
 			   ABS(ex-sx));
@@ -670,7 +670,7 @@ void best_latex_arrow(sx,sy, ex,ey, who, head)
 #endif /* EEPIC */
 		  /* and then draw an arrowhead (a short vector) there */
 			if (head)
-		  		fprintf(outfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+		  		fprintf(gpoutfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
 				ex, ey, 
 				bestslope->dx*sign(ex-sx), bestslope->dy*sign(ey-sy));
 	   }
@@ -691,12 +691,12 @@ TERM_PUBLIC void LATEX_put_text(x, y, str)
     for (flag=FALSE,i=0; str[i] && !flag;)
         flag = (str[i++] == '\\') && (str[i++] == '\\');
 
-    fprintf(outfile, "\\put(%d,%d)", x, y);
+    fprintf(gpoutfile, "\\put(%d,%d)", x, y);
     if (flag)
-        fprintf(outfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n",
+        fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n",
             justify[latex_justify], str);
     else
-        fprintf(outfile, "{\\makebox(0,0)%s{%s}}\n",
+        fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n",
             justify[latex_justify], str);
 }
 
@@ -730,9 +730,9 @@ TERM_PUBLIC void EMTEX_init()
 {
     emtex=TRUE;
     LATEX_posx = LATEX_posy = 0;
-    fprintf(outfile, "%% GNUPLOT: LaTeX picture with emtex specials\n");
-    fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
-    fprintf(outfile, 
+    fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture with emtex specials\n");
+    fprintf(gpoutfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
+    fprintf(gpoutfile, 
 		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
     LATEX_linetype(-1);
 }
@@ -747,7 +747,7 @@ TERM_PUBLIC void EMTEX_reset()
 
 TERM_PUBLIC void EMTEX_text()
 {
-    fprintf(outfile, "\\end{picture}\n");
+    fprintf(gpoutfile, "\\end{picture}\n");
 }
 
 
@@ -757,9 +757,9 @@ EMTEX_solid_line(x1,x2, y1,y2)
 {
     /* emtex special solid line */
 	if (LATEX_moved)
-		fprintf(outfile, "\\put(%d,%d){\\special{em:moveto}}\n", x1, y1);
+		fprintf(gpoutfile, "\\put(%d,%d){\\special{em:moveto}}\n", x1, y1);
 	if ( (x1!=x2) || (y1!=y2) )
-		fprintf(outfile, "\\put(%d,%d){\\special{em:lineto}}\n", x2, y2);
+		fprintf(gpoutfile, "\\put(%d,%d){\\special{em:lineto}}\n", x2, y2);
     LATEX_posx = x2;
     LATEX_posy = y2;
     LATEX_moved = FALSE;

@@ -144,11 +144,11 @@ TERM_PUBLIC void TEK40graphics()
 #ifdef VMS
 	term_pasthru();
 #endif /* VMS */
-	fprintf(outfile,"\033\014");
+	fprintf(gpoutfile,"\033\014");
 /*                   1
 	1. clear screen
 */
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 	sleep(1);  
 	/* sleep 1 second to allow screen time to clear on real 
 	   tektronix terminals */
@@ -157,10 +157,10 @@ TERM_PUBLIC void TEK40graphics()
 TERM_PUBLIC void TEK40text()
 {
 #ifdef VMS
-       (void) fflush(outfile);		/* finish the graphics */
+       (void) fflush(gpoutfile);		/* finish the graphics */
 #endif
 	TEK40move(0,12);
-	fprintf(outfile,"\037");
+	fprintf(gpoutfile,"\037");
 /*                   1
 	1. into alphanumerics
 */
@@ -178,7 +178,7 @@ int linetype;
 TERM_PUBLIC void TEK40move(x,y)
 unsigned int x,y;
 {
-	(void) putc('\035', outfile);	/* into graphics */
+	(void) putc('\035', gpoutfile);	/* into graphics */
 	TEK40vector(x,y);
 }
 
@@ -186,10 +186,10 @@ unsigned int x,y;
 TERM_PUBLIC void TEK40vector(x,y)
 unsigned int x,y;
 {
-	(void) putc((HY | (y & UPPER5)>>5), outfile);
-	(void) putc((LY | (y & LOWER5)), outfile);
-	(void) putc((HX | (x & UPPER5)>>5), outfile);
-	(void) putc((LX | (x & LOWER5)), outfile);
+	(void) putc((HY | (y & UPPER5)>>5), gpoutfile);
+	(void) putc((LY | (y & LOWER5)), gpoutfile);
+	(void) putc((HX | (x & UPPER5)>>5), gpoutfile);
+	(void) putc((LX | (x & LOWER5)), gpoutfile);
 }
 
 
@@ -198,7 +198,7 @@ unsigned int x,y;
 char str[];
 {
 	TEK40move(x,y-11);
-	fprintf(outfile,"\037%s\n",str);
+	fprintf(gpoutfile,"\037%s\n",str);
 }
 
 
@@ -242,10 +242,10 @@ TERM_PUBLIC void TEK40reset()
 TERM_PUBLIC void BG_text()
 {
 #ifdef VMS
-       (void) fflush(outfile);		/* finish the graphics */
+       (void) fflush(gpoutfile);		/* finish the graphics */
 #endif
 	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
-	fprintf(outfile,"\037");
+	fprintf(gpoutfile,"\037");
 /*                   1
 	1. into alphanumerics
 */
@@ -257,7 +257,7 @@ unsigned int x,y;
 char str[];
 {
 	BG_move(x,y-11);
-	fprintf(outfile,"\037%s\n",str);
+	fprintf(gpoutfile,"\037%s\n",str);
 }
 
 
@@ -279,7 +279,7 @@ TERM_PUBLIC void KTEK40graphics()
         term_mode_tek();
 	term_pasthru();
 #endif /* VMS */
-	fprintf(outfile,"\033\014");
+	fprintf(gpoutfile,"\033\014");
 /*                   1
 	1. clear screen
 */
@@ -310,7 +310,7 @@ int linetype;
 {
 	if (linetype >= 13)
 		linetype %= 13;
-	fprintf(outfile,"%s",kermit_color[linetype+2]);
+	fprintf(gpoutfile,"%s",kermit_color[linetype+2]);
 }
 
 
@@ -324,12 +324,12 @@ int linetype;
 {
 	if (linetype >= 6)
 		linetype %= 6;
-	fprintf(outfile,"\033%c",kerm_linetype[linetype+2]);
+	fprintf(gpoutfile,"\033%c",kerm_linetype[linetype+2]);
 }
 
 TERM_PUBLIC void KTEK40reset()
 {
-	fprintf(outfile,"\030\n");  /* turn off Tek emulation */
+	fprintf(gpoutfile,"\030\n");  /* turn off Tek emulation */
 #ifdef VMS
 	term_mode_native();
 #endif /* VMS */
@@ -345,7 +345,7 @@ TERM_PUBLIC void KTEK40reset()
 
 TERM_PUBLIC void SEL_init()
 {
-	fprintf(outfile,"\033\062");
+	fprintf(gpoutfile,"\033\062");
 /*					1
 	1. set to ansi mode
 */
@@ -354,7 +354,7 @@ TERM_PUBLIC void SEL_init()
 
 TERM_PUBLIC void SEL_graphics()
 {
-	fprintf(outfile,"\033[H\033[J\033\061\033\014");
+	fprintf(gpoutfile,"\033[H\033[J\033\061\033\014");
 /*                   1           2       3
 	1. clear ANSI screen
 	2. set to TEK mode
@@ -369,10 +369,10 @@ TERM_PUBLIC void SEL_graphics()
 TERM_PUBLIC void SEL_text()
 {
 #ifdef VMS
-       (void) fflush(outfile);		/* finish the graphics */
+       (void) fflush(gpoutfile);		/* finish the graphics */
 #endif
 	TEK40move(0,12);
-	fprintf(outfile,"\033\062");
+	fprintf(gpoutfile,"\033\062");
 /*                   1
 	1. into ANSI mode
 */
@@ -383,7 +383,7 @@ TERM_PUBLIC void SEL_text()
 
 TERM_PUBLIC void SEL_reset()
 {
-	fprintf(outfile,"\033\061\033\012\033\062\033[H\033[J");
+	fprintf(gpoutfile,"\033\061\033\012\033\062\033[H\033[J");
 /*                   1        2       3      4
 1       set tek mode
 2       clear screen
@@ -397,8 +397,8 @@ TERM_PUBLIC void SEL_reset()
 
 TERM_PUBLIC void VTTEK40init()
 {
-        fprintf(outfile,"\033[?38h");
-        fflush(outfile);
+        fprintf(gpoutfile,"\033[?38h");
+        fflush(gpoutfile);
         sleep(1);
         /* sleep 1 second to allow screen time to clear on some terminals */
 #ifdef VMS
@@ -408,8 +408,8 @@ TERM_PUBLIC void VTTEK40init()
 
 TERM_PUBLIC void VTTEK40reset()
 {
-        fprintf(outfile,"\033[?38l");
-        fflush(outfile);
+        fprintf(gpoutfile,"\033[?38l");
+        fflush(gpoutfile);
         sleep(1);
         /* sleep 1 second to allow screen time to clear on some terminals */
 #ifdef VMS
@@ -428,7 +428,7 @@ int linetype;
 {
         if (linetype >= 10)
                 linetype %= 10;
-        fprintf(outfile,"\033%c",vt_linetype[linetype+2]);
+        fprintf(gpoutfile,"\033%c",vt_linetype[linetype+2]);
         last_vt_linetype = linetype;
 }
 
@@ -449,12 +449,12 @@ char str[];
 
 TERM_PUBLIC void LN03Pinit()
 {
-	fprintf(outfile,"\033[?38h");
+	fprintf(gpoutfile,"\033[?38h");
 }
 
 TERM_PUBLIC void LN03Preset()
 {
-	fprintf(outfile,"\033[?38l");
+	fprintf(gpoutfile,"\033[?38l");
 }
 #endif /* LN03P */
 

@@ -181,17 +181,17 @@ TERM_PUBLIC void HPPJtext()
     int numBytes;	/* Number of run-length coded bytes to output */
     int numReps;	/* Number of times the current byte is repeated */
 
-    fprintf(outfile, "\033E\033*t%dR\033*r%dS", HPPJ_DPI, HPPJ_YMAX);
-    fprintf(outfile, "\033*b0X\033*b0Y\033*r%dU", HPPJ_PLANES);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 90, 88, 85, 0);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 53,  8, 14, 1);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  3, 26, 22, 2);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  4,  4, 29, 3);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 53,  5, 25, 4);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  2, 22, 64, 5);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 89, 83, 13, 6);
-    fprintf(outfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  4,  4,  6, 7);
-    fprintf(outfile, "\033*b1M\033*r1A");
+    fprintf(gpoutfile, "\033E\033*t%dR\033*r%dS", HPPJ_DPI, HPPJ_YMAX);
+    fprintf(gpoutfile, "\033*b0X\033*b0Y\033*r%dU", HPPJ_PLANES);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 90, 88, 85, 0);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 53,  8, 14, 1);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  3, 26, 22, 2);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  4,  4, 29, 3);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 53,  5, 25, 4);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  2, 22, 64, 5);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI", 89, 83, 13, 6);
+    fprintf(gpoutfile, "\033*v%dA\033*v%dB\033*v%dC\033*v%dI",  4,  4,  6, 7);
+    fprintf(gpoutfile, "\033*b1M\033*r1A");
 
     /* dump bitmap in raster mode using run-length encoding */
     for ( x = HPPJ_XMAX - 1 ; x >= 0 ; --x ) {
@@ -206,15 +206,15 @@ TERM_PUBLIC void HPPJtext()
                     numBytes += 2;
                 }
             }
-            fprintf(outfile, "\033*b%d", numBytes);
-            (void) fputc((char)(plane < HPPJ_PLANES - 1 ? 'V' : 'W'), outfile);
+            fprintf(gpoutfile, "\033*b%d", numBytes);
+            (void) fputc((char)(plane < HPPJ_PLANES - 1 ? 'V' : 'W'), gpoutfile);
 
             /* Print remainder of column */
             numReps = 0;
             for ( y = maxRow ; y >= minRow ; --y ) {
                 if ( y == minRow || *((*b_p)[y]+x) != *((*b_p)[y-1]+x) ) {
-                    (void) fputc( (char)(numReps), outfile );
-                    (void) fputc( (char)(*((*b_p)[y]+x)), outfile );
+                    (void) fputc( (char)(numReps), gpoutfile );
+                    (void) fputc( (char)(*((*b_p)[y]+x)), gpoutfile );
                     numReps = 0;
                 } else {
                     numReps++;
@@ -222,7 +222,7 @@ TERM_PUBLIC void HPPJtext()
             }
         }
     }
-    fprintf(outfile, "\033*r1B\033E");
+    fprintf(gpoutfile, "\033*r1B\033E");
 
     b_freebitmap();
 }

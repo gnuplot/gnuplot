@@ -102,7 +102,7 @@ int DEBUG_ylast;
 
 TERM_PUBLIC void DEBUG_init()
 {
-	fprintf(outfile,"init\n");
+	fprintf(gpoutfile,"init\n");
 	DEBUG_linetype_last = -3;
 }
 
@@ -110,13 +110,13 @@ TERM_PUBLIC void DEBUG_init()
 TERM_PUBLIC void DEBUG_graphics()
 {
 	DEBUG_xlast = DEBUG_ylast=0;
-	fprintf(outfile,"graphics\n");
+	fprintf(gpoutfile,"graphics\n");
 }
 
 
 TERM_PUBLIC void DEBUG_text()
 {
-	fprintf(outfile,"text\n");
+	fprintf(gpoutfile,"text\n");
 }
 
 
@@ -125,11 +125,11 @@ int linetype;
 {
 	/*
 	if (linetype != DEBUG_linetype_last){
-		fprintf(outfile,"l%d",linetype);
+		fprintf(gpoutfile,"l%d",linetype);
 		DEBUG_linetype_last = linetype;
 	}
 	*/
-	fprintf(outfile,"line %d\n",linetype);
+	fprintf(gpoutfile,"line %d\n",linetype);
 }
 
 
@@ -138,12 +138,12 @@ unsigned int x,y;
 {
 	/*
 	if (x != DEBUG_xlast || y != DEBUG_ylast){
-		fprintf(outfile,"mm");
+		fprintf(gpoutfile,"mm");
 		DEBUG_xlast = x;
 		DEBUG_ylast = y;
 	}
 	*/
-	fprintf(outfile,"move %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
+	fprintf(gpoutfile,"move %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
 	DEBUG_xlast = x;
 	DEBUG_ylast = y;
 }
@@ -154,12 +154,12 @@ unsigned int x,y;
 {
 	/*
 	if (x != DEBUG_xlast || y != DEBUG_ylast){
-		fprintf(outfile,"vv");
+		fprintf(gpoutfile,"vv");
 		DEBUG_xlast = x;
 		DEBUG_ylast = y;
 	}
 	*/
-	fprintf(outfile,"vect %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
+	fprintf(gpoutfile,"vect %d, %d\t(%d, %d)\n",x,y,x-DEBUG_xlast,y-DEBUG_ylast);
 	DEBUG_xlast = x;
 	DEBUG_ylast = y;
 }
@@ -171,48 +171,48 @@ char *str;
 {
 	/*
 	DEBUG_move(x,y);
-	fprintf(outfile,"tx%s\r",str);
+	fprintf(gpoutfile,"tx%s\r",str);
 	*/
-	fprintf(outfile,"put_text calls:");
+	fprintf(gpoutfile,"put_text calls:");
 	DEBUG_move(x,y);
-	fprintf(outfile,"put_text '%s'\n",str);
+	fprintf(gpoutfile,"put_text '%s'\n",str);
 }
 
 
 
 TERM_PUBLIC void DEBUG_reset()
 {
-	fprintf(outfile,"reset");
+	fprintf(gpoutfile,"reset");
 }
 
 TERM_PUBLIC int DEBUG_justify_text(mode)
 enum JUSTIFY mode;
 {
-	fprintf(outfile,"justify ");
+	fprintf(gpoutfile,"justify ");
 	switch(mode){
 		case (CENTRE):
-			fprintf(outfile,"centre");
+			fprintf(gpoutfile,"centre");
 			break;
 		case (RIGHT):
-			fprintf(outfile,"right");
+			fprintf(gpoutfile,"right");
 			break;
 		default:
 		case (LEFT):
-			fprintf(outfile,"left");
+			fprintf(gpoutfile,"left");
 			break;
 	}
-	fprintf(outfile,"\n");
+	fprintf(gpoutfile,"\n");
 	return(TRUE);
 }
 
 TERM_PUBLIC int DEBUG_text_angle(angle)
 	int angle;
 {
-	fprintf(outfile,"text_angle %d:", angle);
+	fprintf(gpoutfile,"text_angle %d:", angle);
 	switch(angle) {
-		case 0: fprintf(outfile, ": horizontal\n"); break;
-		case 1: fprintf(outfile, ": upwards\n"); break;
-		default: fprintf(outfile, ": \a*undefined*\n"); break;
+		case 0: fprintf(gpoutfile, ": horizontal\n"); break;
+		case 1: fprintf(gpoutfile, ": upwards\n"); break;
+		default: fprintf(gpoutfile, ": \a*undefined*\n"); break;
 	}
 	return TRUE;
 }
@@ -221,21 +221,21 @@ TERM_PUBLIC void DEBUG_point(x, y, pointstyle)
 	unsigned int x, y;
 	int pointstyle;
 {
-	fprintf(outfile,"point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
+	fprintf(gpoutfile,"point at (%ud,%ud), pointstyle %d\n", x, y, pointstyle);
 }
 
 TERM_PUBLIC void DEBUG_arrow(sx, sy, ex, ey, head)
 	unsigned int sx, sy, ex, ey;
 	int head;
 {
-	fprintf(outfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
+	fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
 	        sx, sy, ex, ey, head ? "with" : "without");
 }
 
 TERM_PUBLIC int DEBUG_set_font(font)
 	char *font;
 {
-	fprintf(outfile, "set font to \"%s\"\n",
+	fprintf(gpoutfile, "set font to \"%s\"\n",
 	       font ? (*font ? font : "\aempty string!" ) : "\aNULL string!");
 	return TRUE;
 }
@@ -243,30 +243,30 @@ TERM_PUBLIC int DEBUG_set_font(font)
 TERM_PUBLIC void DEBUG_pointsize(pointsize)
 	double pointsize;
 {
-	fprintf(outfile, "set pointsize to %lf\n", pointsize);
+	fprintf(gpoutfile, "set pointsize to %lf\n", pointsize);
 }
 
 TERM_PUBLIC void DEBUG_suspend(void)
 {
-	fprintf(outfile, "suspended terminal driver\n");
+	fprintf(gpoutfile, "suspended terminal driver\n");
 }
 
 TERM_PUBLIC void DEBUG_resume(void)
 {
-	fprintf(outfile, "resumed terminal driver\n");
+	fprintf(gpoutfile, "resumed terminal driver\n");
 }
 
 TERM_PUBLIC void DEBUG_fillbox(style, x1, y1, width, height)
 	int style;
 	unsigned int x1, y1, width, height;
 {
-	fprintf(outfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
+	fprintf(gpoutfile, "fillbox/clear at (%ud,%ud), area (%ud,%ud), style %d)\n",
 	        x1, y1, width, height, style);
 }
 
 TERM_PUBLIC void DEBUG_linewidth(double linewidth)
 {
-	fprintf(outfile, "set linewidth %lf\n", linewidth);
+	fprintf(gpoutfile, "set linewidth %lf\n", linewidth);
 }
 
 

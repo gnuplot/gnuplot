@@ -184,72 +184,72 @@ PSTRICKS_init()
 {
     PSTRICKS_posx = PSTRICKS_posy = 0;
     PSTRICKS_linetype(-1);
-    fprintf(outfile, "%% GNUPLOT: LaTeX picture using PSTRICKS macros\n");
+    fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture using PSTRICKS macros\n");
 }
 
 
 TERM_PUBLIC void
 PSTRICKS_graphics()
 {
-    fprintf(outfile, "%% Define new PST objects, if not already defined\n");
+    fprintf(gpoutfile, "%% Define new PST objects, if not already defined\n");
 
-    fprintf(outfile, "\\ifx\\PSTloaded\\undefined\n");
-    fprintf(outfile, "\\def\\PSTloaded{t}\n");
+    fprintf(gpoutfile, "\\ifx\\PSTloaded\\undefined\n");
+    fprintf(gpoutfile, "\\def\\PSTloaded{t}\n");
 
-    fprintf(outfile, "\\psset{arrowsize=.01 3.2 1.4 .3}\n");
-    fprintf(outfile, "\\psset{dotsize=.01}\n");
+    fprintf(gpoutfile, "\\psset{arrowsize=.01 3.2 1.4 .3}\n");
+    fprintf(gpoutfile, "\\psset{dotsize=.01}\n");
 
-    fprintf(outfile, "\\catcode`@=11\n\n");
+    fprintf(gpoutfile, "\\catcode`@=11\n\n");
 
     /* Define line type objects */
-    fprintf(outfile, "\\newpsobject{PST@Border}{psline}{linewidth=.0015,linestyle=solid}\n");
-    fprintf(outfile, "\\newpsobject{PST@Axes}{psline}{linewidth=.0015,linestyle=dotted,dotsep=.004}\n");
-    fprintf(outfile, "\\newpsobject{PST@Solid}{psline}{linewidth=.0015,linestyle=solid}\n");
-    fprintf(outfile, "\\newpsobject{PST@Dashed}{psline}{linewidth=.0015,linestyle=dashed,dash=.01 .01}\n");
-    fprintf(outfile, "\\newpsobject{PST@Dotted}{psline}{linewidth=.0025,linestyle=dotted,dotsep=.008}\n");
-    fprintf(outfile, "\\newpsobject{PST@LongDash}{psline}{linewidth=.0015,linestyle=dashed,dash=.02 .01}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Border}{psline}{linewidth=.0015,linestyle=solid}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Axes}{psline}{linewidth=.0015,linestyle=dotted,dotsep=.004}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Solid}{psline}{linewidth=.0015,linestyle=solid}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Dashed}{psline}{linewidth=.0015,linestyle=dashed,dash=.01 .01}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Dotted}{psline}{linewidth=.0025,linestyle=dotted,dotsep=.008}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@LongDash}{psline}{linewidth=.0015,linestyle=dashed,dash=.02 .01}\n");
 
     /* Define point objects */
     
 #ifdef	OLD_PST
     /* PSTricks version 0.91 had x and diamond dot types */
-    fprintf(outfile, "\\newpsobject(PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond}\n");
-    fprintf(outfile, "\\newpsobject(PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=x}\n");
+    fprintf(gpoutfile, "\\newpsobject(PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond}\n");
+    fprintf(gpoutfile, "\\newpsobject(PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=diamond*}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=x}\n");
 #else
     /* Newer versions use rotated plus and square to get the x and diamond dots */
-    fprintf(outfile, "\\newpsobject{PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square,dotangle=45}\n");
-    fprintf(outfile, "\\newpsobject{PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*,dotangle=45}\n");
-    fprintf(outfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+,dotangle=45}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Diamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square,dotangle=45}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Filldiamond}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*,dotangle=45}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Cross}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+,dotangle=45}\n");
 #endif
 
-    fprintf(outfile, "\\newpsobject{PST@Plus}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+}\n");
-    fprintf(outfile, "\\newpsobject{PST@Square}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square}\n");
-    fprintf(outfile, "\\newpsobject{PST@Circle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=o}\n");
-    fprintf(outfile, "\\newpsobject{PST@Triangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle}\n");
-    fprintf(outfile, "\\newpsobject{PST@Pentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillsquare}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillcircle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Filltriangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle*}\n");
-    fprintf(outfile, "\\newpsobject{PST@Fillpentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon*}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Plus}{psdots}{linewidth=.001,linestyle=solid,dotstyle=+}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Square}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Circle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=o}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Triangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Pentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Fillsquare}{psdots}{linewidth=.001,linestyle=solid,dotstyle=square*}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Fillcircle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=*}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Filltriangle}{psdots}{linewidth=.001,linestyle=solid,dotstyle=triangle*}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Fillpentagon}{psdots}{linewidth=.001,linestyle=solid,dotstyle=pentagon*}\n");
 
     /* Define arrow object */
-    fprintf(outfile, "\\newpsobject{PST@Arrow}{psline}{linewidth=.001,linestyle=solid}\n");
+    fprintf(gpoutfile, "\\newpsobject{PST@Arrow}{psline}{linewidth=.001,linestyle=solid}\n");
 
-    fprintf(outfile, "\\catcode`@=12\n\n");
-    fprintf(outfile, "\\fi\n");
+    fprintf(gpoutfile, "\\catcode`@=12\n\n");
+    fprintf(gpoutfile, "\\fi\n");
 
     /* Set the scaled plot size, if it's not a unit plot */
     if (!PST_unit_plot) {
-	fprintf(outfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
+	fprintf(gpoutfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
 		5.0 * PSTRICKS_xscale,
 		5.0 * PSTRICKS_xscale,
 		3.0 * PSTRICKS_yscale);
     }
     
-    fprintf(outfile, "\\pspicture(0,0)(1,1)\n");
-    fprintf(outfile, "\\ifx\\nofigs\\undefined\n");
-    fprintf(outfile, "\\catcode`@=11\n\n");
+    fprintf(gpoutfile, "\\pspicture(0,0)(1,1)\n");
+    fprintf(gpoutfile, "\\ifx\\nofigs\\undefined\n");
+    fprintf(gpoutfile, "\\catcode`@=11\n\n");
 }
 
 
@@ -257,9 +257,9 @@ TERM_PUBLIC void
 PSTRICKS_text()
 {
     PSTRICKS_endline();
-    fprintf(outfile, "\\catcode`@=12\n");
-    fprintf(outfile, "\\fi\n");
-    fprintf(outfile, "\\endpspicture\n");
+    fprintf(gpoutfile, "\\catcode`@=12\n");
+    fprintf(gpoutfile, "\\fi\n");
+    fprintf(gpoutfile, "\\endpspicture\n");
 }
 
 
@@ -301,12 +301,12 @@ int number;
 	  to use a dot, otherwise one of the defined points. */
 
     if (number < 0) {
-	fprintf(outfile, "\\qdisk(%.4f,%.4f){%.4f}\n",
+	fprintf(gpoutfile, "\\qdisk(%.4f,%.4f){%.4f}\n",
 		x / PSTRICKS_XMAX,
 		y / PSTRICKS_YMAX,
 		PSTRICKS_TINY_DOT);
     } else {
-	fprintf(outfile, "%s(%.4f,%.4f)\n",
+	fprintf(gpoutfile, "%s(%.4f,%.4f)\n",
 		PSTRICKS_points[number % PSTRICKS_POINT_TYPES],
 		x / PSTRICKS_XMAX,
 		y / PSTRICKS_YMAX);
@@ -323,7 +323,7 @@ unsigned uy;
 	PSTRICKS_inline = TRUE;
 
 	/* Start a new line. This depends on line type */
-	fprintf(outfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+	fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
 		PSTRICKS_posx, PSTRICKS_posy);
 	PSTRICKS_linecount = 1;
     } else {
@@ -333,22 +333,22 @@ unsigned uy;
 	 * If they are too long then latex will choke.
 	 */
 	if (PSTRICKS_linecount++ >= PSTRICKS_LINEMAX) {
-/*	    fprintf(outfile, "\n"); */
-	    fprintf(outfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+/*	    fprintf(gpoutfile, "\n"); */
+	    fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
 		    PSTRICKS_posx, PSTRICKS_posy);
 	    PSTRICKS_linecount = 1;
 	}
     }
     PSTRICKS_posx = ux / PSTRICKS_XMAX;
     PSTRICKS_posy = uy / PSTRICKS_YMAX;
-    fprintf(outfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
+    fprintf(gpoutfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
 }
 
 static void
 PSTRICKS_endline()
 {
     if (PSTRICKS_inline) {
-	fprintf(outfile, "\n");
+	fprintf(gpoutfile, "\n");
 	PSTRICKS_inline = FALSE;
     }
 }
@@ -362,7 +362,7 @@ unsigned int ex;
 unsigned int ey;
 TBOOLEAN head;
 {
-    fprintf(outfile, "\\PST@Arrow%s(%.4f,%.4f)(%.4f,%.4f)\n",
+    fprintf(gpoutfile, "\\PST@Arrow%s(%.4f,%.4f)(%.4f,%.4f)\n",
 	    head ? "{->}" : "",
 	    sx / PSTRICKS_XMAX,
 	    sy / PSTRICKS_YMAX,
@@ -478,18 +478,18 @@ char str[];
     /* Skip this if the string is empty */
 
     if (strlen(str) > 0) {
-	fprintf(outfile, "\\rput");
+	fprintf(gpoutfile, "\\rput");
 
 	/* Set justification */
 
 	switch (PSTRICKS_justify) {
 	case LEFT:
-	    fprintf(outfile, "[l]");
+	    fprintf(gpoutfile, "[l]");
 	    break;
 	case CENTRE:
 	    break;
 	case RIGHT:
-	    fprintf(outfile, "[r]");
+	    fprintf(gpoutfile, "[r]");
 	    break;
 	}
 
@@ -499,13 +499,13 @@ char str[];
 	case 0:
 	    break;
 	case 1:
-	    fprintf(outfile, "{L}");
+	    fprintf(gpoutfile, "{L}");
 	    break;
 	}
 
 	/* Set reference position and text */
 
-	fprintf(outfile, "(%.4f,%.4f)",
+	fprintf(gpoutfile, "(%.4f,%.4f)",
 		    x / PSTRICKS_XMAX,
 		    y / PSTRICKS_YMAX);
 	if (PST_hack_text) {
@@ -514,9 +514,9 @@ char str[];
 	    /* Hack leading numbers to something nice for TeX */
 	    
 	    hack = PSTRICKS_hack_text(str);
-	    fprintf(outfile, "{%s}\n", hack);
+	    fprintf(gpoutfile, "{%s}\n", hack);
 	} else {
-	    fprintf(outfile, "{%s}\n", str);
+	    fprintf(gpoutfile, "{%s}\n", str);
 	}
     }
 }

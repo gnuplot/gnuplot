@@ -256,7 +256,7 @@ void PNGtext()
   png_info_init(info_ptr);
   png_write_init(png_ptr);
 
-  png_init_io(png_ptr, outfile);
+  png_init_io(png_ptr, gpoutfile);
 
   info_ptr->width=b_ysize;
   info_ptr->height=b_xsize;

@@ -145,13 +145,13 @@ c     TALGMV: graphical move to hor,vert ** abs  coords       (p. 213)
 
 TERM_PUBLIC void EXCL_init()
 {
-  fprintf(outfile,"%s%s%s%s%s%s",
+  fprintf(gpoutfile,"%s%s%s%s%s%s",
   	          TALPSH,TALAMS,TALMOD,TALCCNT,TALFCTL,TALASF);
 /*                ^save state   ^setEXCL       ^PaperSize8.5x11       */
 /*                       ^setANSI      ^copyCount1     ^absorbCtlChar */
-  fprintf(outfile, "%s%s%s%s%s%s",
+  fprintf(gpoutfile, "%s%s%s%s%s%s",
 		  PUM,TALPRM,TALPGO,TALPCW,TALORG,TALGLP_init);
-  fprintf(outfile,                                            TALGLT,"");
+  fprintf(gpoutfile,                                            TALGLT,"");
 /*                ^setUnits  ^landscape    ^OriginZero        ^SolidLine   */
 /*                    ^Units1/1000" ^pageClip     ^SetLine            */
 }
@@ -162,7 +162,7 @@ TERM_PUBLIC void EXCL_graphics()
 
 TERM_PUBLIC void EXCL_text()
 {
-	fprintf(outfile,TALFPO );
+	fprintf(gpoutfile,TALFPO );
 	/*              ^pageout  */
 }
 
@@ -184,9 +184,9 @@ int linetype;
   static int width[2+9] = {14, 7,    7, 7, 7, 10, 10, 10, 17, 17, 17};
   if (linetype >= 9)
     linetype %= 9;
-  fprintf(outfile,TALGLP,width[linetype+2],width[linetype+2]); 
+  fprintf(gpoutfile,TALGLP,width[linetype+2],width[linetype+2]); 
   /*	          ^width in dots */
-  fprintf(outfile,TALGLT,type[linetype+2]);
+  fprintf(gpoutfile,TALGLT,type[linetype+2]);
   /*              ^line type     */
 }
 
@@ -194,7 +194,7 @@ int linetype;
 TERM_PUBLIC void EXCL_move(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
+	fprintf(gpoutfile,TALGMV, 1000 + x, EXCL_YLAST + 1000 - y);
 /*	                 ^pen up vector*/
 }
 
@@ -202,7 +202,7 @@ unsigned int x,y;
 TERM_PUBLIC void EXCL_vector(x2,y2)
 unsigned int x2,y2;
 {
-	fprintf(outfile,TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
+	fprintf(gpoutfile,TALGDW, 1000 + x2, EXCL_YLAST + 1000 - y2);
 /*	                 ^pen down vector*/
 }
 
@@ -215,14 +215,14 @@ char ch;
 	EXCL_move(x,y - EXCL_VCHAR/3);
 	ch = *str++;
 	while(ch!='\0') {
-		putc(ch,outfile);
+		putc(ch,gpoutfile);
 		ch = *str++;
 	}
 }
 
 TERM_PUBLIC void EXCL_reset()
 {
-	fprintf(outfile,"%s%s", TALFPO, TALPOP);
+	fprintf(gpoutfile,"%s%s", TALFPO, TALPOP);
 	/*                      ^pageout ^pop  */
 }
 

@@ -113,11 +113,11 @@ per inch */
 
 
 
-#define HP500C_PUSH_CURSOR fprintf(outfile,"\033&f0S") /* Save current
+#define HP500C_PUSH_CURSOR fprintf(gpoutfile,"\033&f0S") /* Save current
 cursor position */
-#define HP500C_POP_CURSOR fprintf(outfile,"\033&f1S") /* Restore
+#define HP500C_POP_CURSOR fprintf(gpoutfile,"\033&f1S") /* Restore
 cursor position */
-#define HP500C_COURIER fprintf(outfile,"\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D")
+#define HP500C_COURIER fprintf(gpoutfile,"\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D")
 /* be sure to use courier font with 6lpi and 10cpi */
 
 static int HPcompress __PROTO((unsigned char *op, unsigned char *oe, unsigned char *cp));
@@ -410,11 +410,11 @@ TERM_PUBLIC void HP500Ctext()
   
   oe = obuf;
   
-  fprintf(outfile,"\033*t%dR", HP500C_PPI);
-  fprintf(outfile, "\033*r1A");
-  fprintf(outfile,"\033*b%1dM",HP_COMP_MODE);
-  fprintf(outfile, "\033*r%dS",b_ysize);
-  fprintf(outfile,"\033*r-3U");
+  fprintf(gpoutfile,"\033*t%dR", HP500C_PPI);
+  fprintf(gpoutfile, "\033*r1A");
+  fprintf(gpoutfile,"\033*b%1dM",HP_COMP_MODE);
+  fprintf(gpoutfile, "\033*r%dS",b_ysize);
+  fprintf(gpoutfile,"\033*r-3U");
   
   
   /* dump bitmap in raster mode */
@@ -434,10 +434,10 @@ TERM_PUBLIC void HP500Ctext()
       count = HPnocompress(obuf,oe,cbuf);
       break;
     }
-    fprintf(outfile, "\033*b%dV", count);
+    fprintf(gpoutfile, "\033*b%dV", count);
     ce = cbuf;
     while(count--)
-      fputc(*ce++,outfile);
+      fputc(*ce++,gpoutfile);
     oe = obuf;
     
     for (j = row; j >=0; j-- ) {
@@ -456,10 +456,10 @@ TERM_PUBLIC void HP500Ctext()
       
     }
     
-    fprintf(outfile, "\033*b%dV", count);
+    fprintf(gpoutfile, "\033*b%dV", count);
     ce = cbuf;
     while(count--)
-      fputc(*ce++,outfile);
+      fputc(*ce++,gpoutfile);
     oe = obuf;
     
     for (j = row; j >=0; j-- ) {
@@ -476,20 +476,20 @@ TERM_PUBLIC void HP500Ctext()
       count = HPnocompress(obuf,oe,cbuf);
       break;
     }
-    fprintf(outfile, "\033*b%dW", count);
+    fprintf(gpoutfile, "\033*b%dW", count);
     ce = cbuf;
     while(count--)
-      fputc(*ce++,outfile);
+      fputc(*ce++,gpoutfile);
     oe = obuf;
     
   }
-  fprintf(outfile, "\033*rbC");
+  fprintf(gpoutfile, "\033*rbC");
   free(cbuf);
   free(obuf);  
   b_freebitmap();
   
 #ifndef VMS  /* most vms spoolers add a formfeed character */
-  fprintf(outfile,"\f");
+  fprintf(gpoutfile,"\f");
 #endif /* !VMS */
 }
 

@@ -664,18 +664,18 @@ TERM_PUBLIC void PCL_init ()
  * Reset printer, set to one copy, orientation of user's choice.
  * Make the change to the new orientation all at once.
  */
-    fprintf (outfile, "\033E\033&l1X%s\n", PCL_mode->command);
+    fprintf (gpoutfile, "\033E\033&l1X%s\n", PCL_mode->command);
     t->xmax = PCL_mode->xmax;
     t->ymax = PCL_mode->ymax;
 }
 
 TERM_PUBLIC void HPGL_graphics()
 {
-	fputs("\033.Y\n\033.I81;;17:\033.N;19:\033.M500:\n",outfile);
+	fputs("\033.Y\n\033.I81;;17:\033.N;19:\033.M500:\n",gpoutfile);
 /*	       1
 	1. enable eavesdropping
 */
-	fprintf(outfile,
+	fprintf(gpoutfile,
 	"IN;%s\nSC0,%d,0,%d;\nSR%f,%f;\n",
 	((encoding == ENCODING_CP_850)||(encoding == ENCODING_ISO_8859_1)) ? 
                 "CA7;" : "",
@@ -697,13 +697,13 @@ TERM_PUBLIC void HPGL2_graphics ()
  * SP - Select pen
  * SD - Set default font
  */
-    fprintf (outfile, "INSP1SD1,%d,2,%d,",
+    fprintf (gpoutfile, "INSP1SD1,%d,2,%d,",
 	     HPGL2_font->symbol_set, HPGL2_font->spacing);
     if (HPGL2_font->spacing)
-	fprintf (outfile, "4,%f,", HPGL2_font->height);
+	fprintf (gpoutfile, "4,%f,", HPGL2_font->height);
     else
-	fprintf (outfile, "3,%f,", HPGL2_font->pitch);
-    fprintf (outfile, "5,%d,6,%d,7,%d\n", HPGL2_font->posture,
+	fprintf (gpoutfile, "3,%f,", HPGL2_font->pitch);
+    fprintf (gpoutfile, "5,%d,6,%d,7,%d\n", HPGL2_font->posture,
 	     HPGL2_font->stroke_weight, HPGL2_font->typeface);
 /*
  * Control variables
@@ -719,14 +719,14 @@ TERM_PUBLIC void PCL_graphics ()
 /*
  * Enter HPGL/2 graphics mode
  */
-    fputs ("\033%0B", outfile);
+    fputs ("\033%0B", gpoutfile);
     HPGL2_graphics ();
 }
 
 TERM_PUBLIC void HPGL_text ()
 {
     if (HPGL_eject == 0) {
-	 fputs ("PUSP0;\033.Z\n\0", outfile);
+	 fputs ("PUSP0;\033.Z\n\0", gpoutfile);
 /*		 1 2   3
 	1. pen up
 	2. park pen
@@ -735,7 +735,7 @@ TERM_PUBLIC void HPGL_text ()
     }
     else
     {
-         fputs ("PUSP0;PG;\033.Z\n\0", outfile);
+         fputs ("PUSP0;PG;\033.Z\n\0", gpoutfile);
 /*		 1 2   3  4
 	1. pen up
 	2. park pen
@@ -753,26 +753,26 @@ void HPGL2_text ()
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
     if (HPGL2_in_pe) {
-	fputs (";\n", outfile);
+	fputs (";\n", gpoutfile);
 	HPGL2_in_pe = 0;
     }
 /*
  * Pen up, park pen
  */
-    fputs ("PUSP0;", outfile);
+    fputs ("PUSP0;", gpoutfile);
 }
 #endif
 
 TERM_PUBLIC void PCL_text ()
 {
     if (HPGL2_in_pe) {
-	fputs (";\n", outfile);
+	fputs (";\n", gpoutfile);
 	HPGL2_in_pe = 0;
     }
 /*
  * Go into PCL mode and eject the page
  */
-    fputs ("\033%1A\033&l0H\n\0", outfile);
+    fputs ("\033%1A\033&l0H\n\0", gpoutfile);
 }
 
 TERM_PUBLIC void HPGL_linetype (linetype)
@@ -782,7 +782,7 @@ TERM_PUBLIC void HPGL_linetype (linetype)
     linetype = (linetype + 2) % HPGL_numpen + 1;
 /* only select pen if necessary */
     if (HPGL_pentype != linetype) {
-	fprintf (outfile, "PU;\nSP%d;\n", linetype);
+	fprintf (gpoutfile, "PU;\nSP%d;\n", linetype);
 	HPGL_pentype = linetype;
 	HPGL_penstate = UP;
     }
@@ -795,7 +795,7 @@ TERM_PUBLIC void HPGL2_linetype (linetype)
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
     if (HPGL2_in_pe) {
-	fputs (";\n", outfile);
+	fputs (";\n", gpoutfile);
 	HPGL2_in_pe = 0;
     }
 /*
@@ -805,19 +805,19 @@ TERM_PUBLIC void HPGL2_linetype (linetype)
 	linetype = linetype % (HPGL2_LINETYPES * HPGL2_PENWIDTHS);
     if (linetype != HPGL_pentype) {
 	if (linetype >= 0) {
-	    fprintf (outfile, "PW%sLT%s",
+	    fprintf (gpoutfile, "PW%sLT%s",
 		     HPGL2_pw[linetype / HPGL2_LINETYPES],
 		     HPGL2_lt[linetype % HPGL2_LINETYPES]);
 	} else if (linetype == -2)
 /*
  * Borders and tics
  */
-	    fprintf (outfile, "PW.2LT");
+	    fprintf (gpoutfile, "PW.2LT");
 	else if (linetype == -1)
 /*
  * Axes and grids
  */
-	    fprintf (outfile, "PW.1LT1,.25");
+	    fprintf (gpoutfile, "PW.1LT1,.25");
 	HPGL_pentype = linetype;
     }
 }
@@ -834,27 +834,27 @@ TERM_PUBLIC void HPGL_put_text (x, y, str)
 	if (encoding == ENCODING_CP_850)
 	{
 		unsigned char *s;
-		fputs("LB", outfile);
+		fputs("LB", gpoutfile);
 		for (s=(unsigned char *)str; *s; ++s)
 			if (*s >= 128 && hpgl_cp_850[*s - 128][0])
-				fputs(hpgl_cp_850[*s - 128], outfile);
+				fputs(hpgl_cp_850[*s - 128], gpoutfile);
 			else
-				putc(*s, outfile);
-		fputs("\003\n", outfile);
+				putc(*s, gpoutfile);
+		fputs("\003\n", gpoutfile);
 	}
 	else if (encoding == ENCODING_ISO_8859_1)
 	{
 		unsigned char *s;
-		fputs("LB", outfile);
+		fputs("LB", gpoutfile);
 		for (s=(unsigned char *)str; *s; ++s)
 			if (*s >= 128 && hpgl_iso_8859_1[*s - 128][0])
-				fputs(hpgl_iso_8859_1[*s - 128], outfile);
+				fputs(hpgl_iso_8859_1[*s - 128], gpoutfile);
 			else
-				putc(*s, outfile);
-		fputs("\003\n", outfile);
+				putc(*s, gpoutfile);
+		fputs("\003\n", gpoutfile);
 	}
 	else
-    fprintf (outfile, "LB%s\003\n", str);
+    fprintf (gpoutfile, "LB%s\003\n", str);
 }
 
 TERM_PUBLIC void HPGL2_put_text (x, y, str)
@@ -874,13 +874,13 @@ TERM_PUBLIC void HPGL2_put_text (x, y, str)
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
     if (HPGL2_in_pe) {
-	fputs (";\n", outfile);
+	fputs (";\n", gpoutfile);
 	HPGL2_in_pe = 0;
     }
 /*
  * Print the text string
  */
-    fprintf (outfile, "LB%s\003\n", str);
+    fprintf (gpoutfile, "LB%s\003\n", str);
     HPGL2_lost = 1;
 }
 /*
@@ -893,7 +893,7 @@ TERM_PUBLIC void HPGL_move (x, y)
                     y;
 {
     if (HPGL_x != x || HPGL_y != y) {		/* only move if necessary */
-	fprintf (outfile, "PU;PA%d,%d;\n", x, y);
+	fprintf (gpoutfile, "PU;PA%d,%d;\n", x, y);
 	HPGL_penstate = UP;
 	HPGL_x = x;
 	HPGL_y = y;
@@ -905,10 +905,10 @@ TERM_PUBLIC void HPGL_vector (x, y)
                     y;
 {
     if (HPGL_penstate != DOWN) {
-	fprintf (outfile, "PD;PA%d,%d;\n", x, y);
+	fprintf (gpoutfile, "PD;PA%d,%d;\n", x, y);
 	HPGL_penstate = DOWN;
     } else
-	fprintf (outfile, "PA%d,%d;\n", x, y);
+	fprintf (gpoutfile, "PA%d,%d;\n", x, y);
     HPGL_x = x;
     HPGL_y = y;
 }
@@ -922,18 +922,18 @@ TERM_PUBLIC void HPGL2_move (x, y)
     if (HPGL2_in_pe) {
 	dx = x - HPGL_x;
 	dy = y - HPGL_y;
-	fputs ("<", outfile);
+	fputs ("<", gpoutfile);
     } else {
 #if HPGL2_BASE64
-	fputs ("PE<", outfile);
+	fputs ("PE<", gpoutfile);
 #else
-	fputs ("PE7<", outfile);
+	fputs ("PE7<", gpoutfile);
 #endif
 	if (HPGL2_lost) {
 	    dx = x;
 	    dy = y;
 	    HPGL2_lost = 0;
-	    fputs ("=", outfile);
+	    fputs ("=", gpoutfile);
 	} else {
 	    dx = x - HPGL_x;
 	    dy = y - HPGL_y;
@@ -946,7 +946,7 @@ TERM_PUBLIC void HPGL2_move (x, y)
 #endif
     HPGL2_encode (dx);
     HPGL2_encode (dy);
-    fputs("\n",outfile);
+    fputs("\n",gpoutfile);
     HPGL_x = x;
     HPGL_y = y;
 }
@@ -962,15 +962,15 @@ TERM_PUBLIC void HPGL2_vector (x, y)
 	dy = y - HPGL_y;
     } else {
 #if HPGL2_BASE64
-	fputs ("PE", outfile);
+	fputs ("PE", gpoutfile);
 #else
-	fputs ("PE7", outfile);
+	fputs ("PE7", gpoutfile);
 #endif
 	if (HPGL2_lost) {
 	    dx = x;
 	    dy = y;
 	    HPGL2_lost = 0;
-	    fputs ("=", outfile);
+	    fputs ("=", gpoutfile);
 	} else {
 	    dx = x - HPGL_x;
 	    dy = y - HPGL_y;
@@ -983,14 +983,14 @@ TERM_PUBLIC void HPGL2_vector (x, y)
  * relative vector of 0,0.
  */
     if (HPGL_penstate == UP) {
-	fputc ((char) HPGL2_HIGH_OFFS, outfile);
-	fputc ((char) HPGL2_HIGH_OFFS, outfile);
+	fputc ((char) HPGL2_HIGH_OFFS, gpoutfile);
+	fputc ((char) HPGL2_HIGH_OFFS, gpoutfile);
 	HPGL_penstate = DOWN;
     }
 #endif
     HPGL2_encode (dx);
     HPGL2_encode (dy);
-    fputs("\n",outfile);
+    fputs("\n",gpoutfile);
     HPGL_x = x;
     HPGL_y = y;
 }
@@ -1009,9 +1009,9 @@ TERM_PUBLIC void HPGL2_encode (d)
 	c = d & HPGL2_MASK;
 	d >>= HPGL2_BITS;
 	if (d > 0)
-	    fputc ((char) (c + HPGL2_LOW_OFFS), outfile);
+	    fputc ((char) (c + HPGL2_LOW_OFFS), gpoutfile);
 	else
-	    fputc ((char) (c + HPGL2_HIGH_OFFS), outfile);
+	    fputc ((char) (c + HPGL2_HIGH_OFFS), gpoutfile);
     } while (d > 0);
 }
 
@@ -1023,12 +1023,12 @@ TERM_PUBLIC int HPGL_text_angle (ang)
 /*
  *  Vertical
  */
-	fprintf (outfile, "DI0,1;\n");
+	fprintf (gpoutfile, "DI0,1;\n");
     else
 /*
  * Horizontal
  */
-	fprintf (outfile, "DI1,0;\n");
+	fprintf (gpoutfile, "DI1,0;\n");
     return TRUE;
 }
 
@@ -1039,19 +1039,19 @@ TERM_PUBLIC int HPGL2_text_angle (ang)
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
     if (HPGL2_in_pe) {
-	fputs (";", outfile);
+	fputs (";", gpoutfile);
 	HPGL2_in_pe = 0;
     }
     if (ang == 1)
 /*
  *  Vertical
  */
-	fprintf (outfile, "DI0,1");
+	fprintf (gpoutfile, "DI0,1");
     else
 /*
  * Horizontal
  */
-	fprintf (outfile, "DI1,0");
+	fprintf (gpoutfile, "DI1,0");
     HPGL_ang = ang;
     return TRUE;
 }
@@ -1071,7 +1071,7 @@ void HPGL2_reset ()
  * Advance a page
  * End with ";"
  */
-    fputs ("SP0PG;\n", outfile);
+    fputs ("SP0PG;\n", gpoutfile);
 }
 #endif
 
@@ -1081,7 +1081,7 @@ TERM_PUBLIC void PCL_reset ()
  * Return to PCL mode
  * Printer reset (conditional eject)
  */
-    fputs ("\033%0A\033E\n", outfile);
+    fputs ("\033%0A\033E\n", gpoutfile);
 }
 
 TERM_PUBLIC int HPGL2_justify_text (just)
@@ -1091,18 +1091,18 @@ TERM_PUBLIC int HPGL2_justify_text (just)
  * If in Polyline Encoded command, leave Polyline Encoded command
  */
     if (HPGL2_in_pe) {
-	fputs (";\n", outfile);
+	fputs (";\n", gpoutfile);
 	HPGL2_in_pe = 0;
     }
     switch (just) {
     case LEFT:
-	fputs ("LO1", outfile);
+	fputs ("LO1", gpoutfile);
 	break;
     case CENTRE:
-	fputs ("LO4", outfile);
+	fputs ("LO4", gpoutfile);
 	break;
     case RIGHT:
-	fputs ("LO7", outfile);
+	fputs ("LO7", gpoutfile);
 	break;
     default:
 	return 0;

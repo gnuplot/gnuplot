@@ -153,8 +153,8 @@ TERM_PUBLIC void EEPIC_init()
 {
     EEPIC_posx = EEPIC_posy = 0;
     EEPIC_linetype(-1);
-    fprintf(outfile, "%% GNUPLOT: LaTeX picture using EEPIC macros\n");
-    fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", EEPIC_UNIT);
+    fprintf(gpoutfile, "%% GNUPLOT: LaTeX picture using EEPIC macros\n");
+    fprintf(gpoutfile, "\\setlength{\\unitlength}{%fpt}\n", EEPIC_UNIT);
 }
 
 
@@ -162,15 +162,15 @@ TERM_PUBLIC void EEPIC_graphics()
 {
     register struct termentry *t = term;
 
-    fprintf(outfile, "\\begin{picture}(%d,%d)(0,0)\n", t->xmax, t->ymax);
-    fprintf(outfile, "\\footnotesize\n");
+    fprintf(gpoutfile, "\\begin{picture}(%d,%d)(0,0)\n", t->xmax, t->ymax);
+    fprintf(gpoutfile, "\\footnotesize\n");
 }
 
 
 TERM_PUBLIC void EEPIC_text()
 {
     EEPIC_endline();
-    fprintf(outfile, "\\end{picture}\n");
+    fprintf(gpoutfile, "\\end{picture}\n");
 }
 
 
@@ -205,7 +205,7 @@ TERM_PUBLIC void EEPIC_point(x,y, number)		/* version of line_and_point */
     
     /* Print the character defined by 'number'; number < 0 means 
 	  to use a dot, otherwise one of the defined points. */
-    fprintf(outfile, "\\put(%d,%d){%s}\n", x, y, 
+    fprintf(gpoutfile, "\\put(%d,%d){%s}\n", x, y, 
 		  (number < 0 ? EEPIC_TINY_DOT
 		   : EEPIC_points[number % EEPIC_POINT_TYPES]));
 }
@@ -218,7 +218,7 @@ TERM_PUBLIC void EEPIC_vector(ux,uy)
 	   EEPIC_inline = TRUE;
 
 	   /* Start a new line. This depends on line type */
-	   fprintf(outfile, "%s(%u,%u)", 
+	   fprintf(gpoutfile, "%s(%u,%u)", 
 			 EEPIC_lines[EEPIC_type+2], 
 			 EEPIC_posx, EEPIC_posy);
 	   EEPIC_linecount = 1;
@@ -228,14 +228,14 @@ TERM_PUBLIC void EEPIC_vector(ux,uy)
 	    * If they are too long then latex will choke.
 	    */
 	   if (EEPIC_linecount++ >= EEPIC_LINEMAX) {
-		  fprintf(outfile, "\n");
-		  fprintf(outfile, "%s(%u,%u)", 
+		  fprintf(gpoutfile, "\n");
+		  fprintf(gpoutfile, "%s(%u,%u)", 
 				EEPIC_lines[EEPIC_type+2], 
 				EEPIC_posx, EEPIC_posy);
 		  EEPIC_linecount = 1;
 	   }
     }
-    fprintf(outfile, "(%u,%u)", ux,uy);
+    fprintf(gpoutfile, "(%u,%u)", ux,uy);
     EEPIC_posx = ux;
     EEPIC_posy = uy;
 }
@@ -244,7 +244,7 @@ void
 EEPIC_endline()
 {
     if (EEPIC_inline) {
-	   fprintf(outfile, "\n");
+	   fprintf(gpoutfile, "\n");
 	   EEPIC_inline = FALSE;
     }
 }
@@ -267,22 +267,22 @@ TERM_PUBLIC void EEPIC_put_text(x, y, str)
 {
     EEPIC_endline();
 
-    fprintf(outfile, "\\put(%d,%d)",x,y);
+    fprintf(gpoutfile, "\\put(%d,%d)",x,y);
     switch(eepic_angle) {  
  	   case 0: {
 		  switch(eepic_justify) {
 			 case LEFT: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0)[l]{%s}}\n", str);
 				break;
 			 }
 			 case CENTRE: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0){%s}}\n", str);
 				break;
 			 }
 			 case RIGHT: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0)[r]{%s}}\n", str);
 				break;
 			 }
@@ -292,17 +292,17 @@ TERM_PUBLIC void EEPIC_put_text(x, y, str)
 	   case 1: {			/* put text in a short stack */
 		  switch(eepic_justify) {
 			 case LEFT: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0)[lb]{\\shortstack{%s}}}\n", str);
 				break;
 			 }
 			 case CENTRE: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0)[l]{\\shortstack{%s}}}\n", str);
 				break;
 			 }
 			 case RIGHT: {
-				fprintf(outfile,
+				fprintf(gpoutfile,
 					   "{\\makebox(0,0)[lt]{\\shortstack{%s}}}\n", str);
 				break;
 			 }

@@ -181,7 +181,7 @@ static char GPFAR dxfi2[] = "\
  49\n0.0\n 49\n-0.25\n\
   0\nENDTAB\n";
 
-	fprintf(outfile, dxfi1,
+	fprintf(gpoutfile, dxfi1,
 		t->xmax/DXF_UNIT,t->ymax/DXF_UNIT,
 		t->xmax/DXF_UNIT,t->ymax/DXF_UNIT,
 		text_style,
@@ -190,24 +190,24 @@ static char GPFAR dxfi2[] = "\
 		(double)LT_SCALE,
 		layer_colour[0]);
 	/* the linetype table */
-	fprintf(outfile, dxfi2, DXF_LINE_TYPES);
+	fprintf(gpoutfile, dxfi2, DXF_LINE_TYPES);
 	/* the layer table */
-	fprintf(outfile,"  0\nTABLE\n  2\nLAYER\n 70\n   %-d\n",MAX_LAYER);
+	fprintf(gpoutfile,"  0\nTABLE\n  2\nLAYER\n 70\n   %-d\n",MAX_LAYER);
 	for (i = 1; i <= MAX_LAYER; i++)
-		fprintf(outfile,"  0\nLAYER\n  2\n%s\n 70\n   64\n62\n   %s\n  6\n%s\n",
+		fprintf(gpoutfile,"  0\nLAYER\n  2\n%s\n 70\n   64\n62\n   %s\n  6\n%s\n",
 			layer_name[i-1],layer_colour[i-1],layer_lines[i-1]);
-	fprintf(outfile,"  0\nENDTAB\n0\nENDSEC\n");
+	fprintf(gpoutfile,"  0\nENDTAB\n0\nENDSEC\n");
 	/* no blocks for insertion */
-	fprintf(outfile,"  0\nSECTION\n  2\nBLOCKS\n  0\nENDSEC\n");
+	fprintf(gpoutfile,"  0\nSECTION\n  2\nBLOCKS\n  0\nENDSEC\n");
 	/* start the entity section */
-	fprintf(outfile,"  0\nSECTION\n");
-	fprintf(outfile,"  2\nENTITIES\n");
+	fprintf(gpoutfile,"  0\nSECTION\n");
+	fprintf(gpoutfile,"  2\nENTITIES\n");
 }
 
 TERM_PUBLIC void DXF_text()
 {
-	if (vector_was_last) fprintf(outfile,"  0\nSEQEND\n");
-	fprintf(outfile,"  0\nENDSEC\n  0\nEOF\n");
+	if (vector_was_last) fprintf(gpoutfile,"  0\nSEQEND\n");
+	fprintf(gpoutfile,"  0\nENDSEC\n  0\nEOF\n");
 }
 
 TERM_PUBLIC void DXF_linetype(linetype)
@@ -223,13 +223,13 @@ TERM_PUBLIC void DXF_move(x, y)
 {
 	DXF_posx = x;
 	DXF_posy = y;
-	if (vector_was_last) fprintf(outfile,"  0\nSEQEND\n");
+	if (vector_was_last) fprintf(gpoutfile,"  0\nSEQEND\n");
 	vector_was_last = FALSE;
-	fprintf(outfile,"  0\nPOLYLINE\n  8\n%s\n 66\n   1\n",layer_name[dxf_linetype]);
-	fprintf(outfile,"  6\n%s\n",layer_lines[dxf_linetype]);
-	fprintf(outfile,"  0\nVERTEX\n  8\n%s\n",layer_name[dxf_linetype]);
-	fprintf(outfile,"  6\n%s\n",layer_lines[dxf_linetype]);
-	fprintf(outfile," 10\n%-6.3f\n 20\n%-6.3f\n 30\n0.000\n",DXF_posx/DXF_UNIT,DXF_posy/DXF_UNIT);
+	fprintf(gpoutfile,"  0\nPOLYLINE\n  8\n%s\n 66\n   1\n",layer_name[dxf_linetype]);
+	fprintf(gpoutfile,"  6\n%s\n",layer_lines[dxf_linetype]);
+	fprintf(gpoutfile,"  0\nVERTEX\n  8\n%s\n",layer_name[dxf_linetype]);
+	fprintf(gpoutfile,"  6\n%s\n",layer_lines[dxf_linetype]);
+	fprintf(gpoutfile," 10\n%-6.3f\n 20\n%-6.3f\n 30\n0.000\n",DXF_posx/DXF_UNIT,DXF_posy/DXF_UNIT);
 }
 
 TERM_PUBLIC void DXF_vector(ux, uy)
@@ -238,9 +238,9 @@ TERM_PUBLIC void DXF_vector(ux, uy)
 	DXF_posx = ux;
 	DXF_posy = uy;
 	vector_was_last = TRUE;
-	fprintf(outfile,"  0\nVERTEX\n  8\n%s\n",layer_name[dxf_linetype]);
-	fprintf(outfile,"  6\n%s\n",layer_lines[dxf_linetype]);
-	fprintf(outfile,"  10\n%-6.3f\n  20\n%-6.3f\n  30\n0.000\n",
+	fprintf(gpoutfile,"  0\nVERTEX\n  8\n%s\n",layer_name[dxf_linetype]);
+	fprintf(gpoutfile,"  6\n%s\n",layer_lines[dxf_linetype]);
+	fprintf(gpoutfile,"  10\n%-6.3f\n  20\n%-6.3f\n  30\n0.000\n",
 					DXF_posx/DXF_UNIT,DXF_posy/DXF_UNIT);
 }
 
@@ -258,9 +258,9 @@ TERM_PUBLIC void DXF_put_text(x, y, str)
 
 	stl = 0; while (str[stl] != '\0') ++stl; /* get string length */
 
-	if (vector_was_last) fprintf(outfile,"  0\nSEQEND\n");
+	if (vector_was_last) fprintf(gpoutfile,"  0\nSEQEND\n");
 	vector_was_last = FALSE;
-	fprintf(outfile,"  0\nTEXT\n  8\n%s\n",layer_name[TEXT_LAYER]);
+	fprintf(gpoutfile,"  0\nTEXT\n  8\n%s\n",layer_name[TEXT_LAYER]);
 	if (dxf_angle != 90.0)
 	{
 	   switch (dxf_justify)
@@ -299,15 +299,15 @@ TERM_PUBLIC void DXF_put_text(x, y, str)
 			     break;
 	    }
 	}
-	fprintf(outfile," 10\n%-6.3f\n 20\n%-6.3f\n 30\n0.000\n",
+	fprintf(gpoutfile," 10\n%-6.3f\n 20\n%-6.3f\n 30\n0.000\n",
 				xleftpos/DXF_UNIT,yleftpos/DXF_UNIT);
-	fprintf(outfile," 40\n%-6.3f\n  1\n%s\n 50\n%-6.3f\n",
+	fprintf(gpoutfile," 40\n%-6.3f\n  1\n%s\n 50\n%-6.3f\n",
 			DXF_TEXTHEIGHT/DXF_UNIT,str,dxf_angle);
-	fprintf(outfile,"  7\n%s\n",text_style);
+	fprintf(gpoutfile,"  7\n%s\n",text_style);
 	if (dxf_justify != LEFT)
 	{
-		fprintf(outfile," 72\n%d\n",dxf_justify);
-		fprintf(outfile," 11\n%-6.3f\n 21\n%-6.3f\n 31\n0.000\n",
+		fprintf(gpoutfile," 72\n%d\n",dxf_justify);
+		fprintf(gpoutfile," 11\n%-6.3f\n 21\n%-6.3f\n 31\n0.000\n",
 				xrightpos/DXF_UNIT,yrightpos/DXF_UNIT);
 	}
 }

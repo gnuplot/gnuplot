@@ -86,7 +86,7 @@ TERM_PUBLIC void HP2648reset __PROTO((void));
 
 TERM_PUBLIC void HP2648init()
 {
-	fprintf(outfile,"\033*m1m1n136,1cZ");
+	fprintf(gpoutfile,"\033*m1m1n136,1cZ");
 /*                   1     2 3     4
 	1. mode
 	2. textsize=1
@@ -98,7 +98,7 @@ TERM_PUBLIC void HP2648init()
 
 TERM_PUBLIC void HP2648graphics()
 {
-	fprintf(outfile,"\033*dacZ");
+	fprintf(gpoutfile,"\033*dacZ");
 /*                   1     23
 	1. mode
 	2. clear grahics screen
@@ -116,14 +116,14 @@ TERM_PUBLIC void HP2648linetype(linetype)
 int linetype;
 {
 	static int hpline[] = {1,7,1,4,5,6,8,9,10,7,2};
-	fprintf(outfile,"\033*m%dbZ",hpline[(linetype+2)%11]);
+	fprintf(gpoutfile,"\033*m%dbZ",hpline[(linetype+2)%11]);
 }
 
 
 TERM_PUBLIC void HP2648move(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"\033*paf%d,%dZ",x,y);
+	fprintf(gpoutfile,"\033*paf%d,%dZ",x,y);
     /*               1     23     4
 	1	plot mode
 	2	"pen up"
@@ -136,7 +136,7 @@ unsigned int x,y;
 TERM_PUBLIC void HP2648vector(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"\033*pbf%d,%dZ",x,y);
+	fprintf(gpoutfile,"\033*pbf%d,%dZ",x,y);
     /*                     1 
 	1	"pen down"
 	*/
@@ -148,14 +148,14 @@ unsigned int x, y;
 char *str;
 {
 	HP2648move(x,y-HP2648VCHAR/2 + 1);
-	fprintf(outfile,"\033*l%s\n",str);
+	fprintf(gpoutfile,"\033*l%s\n",str);
 }
 
 
 TERM_PUBLIC int HP2648_text_angle(ang)
 int ang;
 {
-	fprintf(outfile,"\033*m%dnZ\n",ang+1);
+	fprintf(gpoutfile,"\033*m%dnZ\n",ang+1);
 	return TRUE;
 }
 	

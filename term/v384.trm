@@ -95,28 +95,28 @@ TERM_PUBLIC void V384_reset __PROTO((void));
 
 TERM_PUBLIC void V384_init()
 {
-	fprintf(outfile,"%c%c  G0   \n",27,18);
-	fprintf(outfile,"Q 0 8\n");
-	fprintf(outfile,"0 0 0\n");
-	fprintf(outfile,"255 0 0\n");
-	fprintf(outfile,"0 255 0\n");
-	fprintf(outfile,"0 0 255\n");
-	fprintf(outfile,"0 255 255\n");
-	fprintf(outfile,"255 0 255\n");
-	fprintf(outfile,"255 255 0\n");
-	fprintf(outfile,"255 255 255\n");
+	fprintf(gpoutfile,"%c%c  G0   \n",27,18);
+	fprintf(gpoutfile,"Q 0 8\n");
+	fprintf(gpoutfile,"0 0 0\n");
+	fprintf(gpoutfile,"255 0 0\n");
+	fprintf(gpoutfile,"0 255 0\n");
+	fprintf(gpoutfile,"0 0 255\n");
+	fprintf(gpoutfile,"0 255 255\n");
+	fprintf(gpoutfile,"255 0 255\n");
+	fprintf(gpoutfile,"255 255 0\n");
+	fprintf(gpoutfile,"255 255 255\n");
 }
 
 
 TERM_PUBLIC void V384_graphics()
 {
-	fprintf(outfile,"%c%c E0 RE N 65535\n",27,18);
+	fprintf(gpoutfile,"%c%c E0 RE N 65535\n",27,18);
 }
 
 
 TERM_PUBLIC void V384_text()
 {
-	fprintf(outfile,"%c%c\n",27,17);
+	fprintf(gpoutfile,"%c%c\n",27,17);
 }
 
 
@@ -137,21 +137,21 @@ static int color[]= {
 		linetype=6;
 	else
 		linetype %= 5;
-	fprintf(outfile,"C %d\n",color[linetype]);
+	fprintf(gpoutfile,"C %d\n",color[linetype]);
 }
 
 
 TERM_PUBLIC void V384_move(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"M %d %d\n",x+20,y);
+	fprintf(gpoutfile,"M %d %d\n",x+20,y);
 }
 
 
 TERM_PUBLIC void V384_vector(x,y)
 unsigned int x,y;
 {
-	fprintf(outfile,"L %d %d\n",x+20,y);
+	fprintf(gpoutfile,"L %d %d\n",x+20,y);
 }
 
 
@@ -160,7 +160,7 @@ unsigned int x, y;
 char str[];
 {
 	V384_move (x, y + V384_VCHAR/2);
-	fprintf (outfile, "$%s\n", str);
+	fprintf (gpoutfile, "$%s\n", str);
 }
 
 

@@ -112,11 +112,11 @@ TERM_PUBLIC void HPDJtext __PROTO((void));
 #define HPLJII_HCHAR (HPLJII_PPI/10) /* Courier font with 10 caracters
                                         per inch */
 
-#define HPLJII_PUSH_CURSOR fprintf(outfile,"\033&f0S") /* Save current
+#define HPLJII_PUSH_CURSOR fprintf(gpoutfile,"\033&f0S") /* Save current
                   cursor position */
-#define HPLJII_POP_CURSOR fprintf(outfile,"\033&f1S") /* Restore
+#define HPLJII_POP_CURSOR fprintf(gpoutfile,"\033&f1S") /* Restore
                   cursor position */
-#define HPLJII_COURIER fprintf(outfile,"\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D")
+#define HPLJII_COURIER fprintf(gpoutfile,"\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D")
          /* be sure to use courier font with 6lpi and 10cpi */
 
 void HPLJIIputc __PROTO((unsigned int x, unsigned int y, char c, int angle));
@@ -214,24 +214,24 @@ TERM_PUBLIC void HPLJIItext()
 {
   register int x,j,row;
 
-   fprintf(outfile,"\033*t%dR", HPLJII_PPI);
+   fprintf(gpoutfile,"\033*t%dR", HPLJII_PPI);
    HPLJII_POP_CURSOR;
-   fprintf(outfile, "\033*r1A");
+   fprintf(gpoutfile, "\033*r1A");
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {
       row = (b_ysize/8)-1;
-      fprintf(outfile, "\033*b0m%dW", b_ysize/8);
+      fprintf(gpoutfile, "\033*b0m%dW", b_ysize/8);
       for (j = row; j >= 0; j--) {
-         (void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+         (void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
       }
    }
-   fprintf(outfile, "\033*rB");
+   fprintf(gpoutfile, "\033*rB");
 
    b_freebitmap();
 
 #ifndef VMS  /* most vms spoolers add a formfeed character */
-   fprintf(outfile,"\f");
+   fprintf(gpoutfile,"\f");
 #endif /* !VMS */
 }
 
@@ -263,9 +263,9 @@ char *str;
          HPLJII_POP_CURSOR;
          HPLJII_PUSH_CURSOR;
          /* (0,0) is the upper left point of the paper */
-         fprintf(outfile, "\033*p%+dx%+dY", x*HPLJII_DPP
+         fprintf(gpoutfile, "\033*p%+dx%+dY", x*HPLJII_DPP
                                          ,  (HPLJII_YMAX-y-1)*HPLJII_DPP );
-         fputs(str, outfile);
+         fputs(str, gpoutfile);
 /*       for (; *str; ++str, x += HPLJII_HCHAR)
             HPLJIIputc (x, y, *str, b_angle);*/
          break;
@@ -290,9 +290,9 @@ char c;
    HPLJII_POP_CURSOR;
    HPLJII_PUSH_CURSOR;
    /* (0,0) is the upper left point of the paper */
-   fprintf(outfile, "\033*p%+dx%+dY", x*HPLJII_DPP
+   fprintf(gpoutfile, "\033*p%+dx%+dY", x*HPLJII_DPP
                                    ,  (HPLJII_YMAX-y-1)*HPLJII_DPP );
-   fputc(c, outfile);
+   fputc(c, gpoutfile);
 }
 
 
@@ -342,24 +342,24 @@ TERM_PUBLIC void HPDJtext()
 {
   register int x,j,row;
 
-   fprintf(outfile,"\033*b0M");
-   fprintf(outfile,"\033*t%dR", HPLJII_PPI);
-   fprintf(outfile, "\033*r1A");
+   fprintf(gpoutfile,"\033*b0M");
+   fprintf(gpoutfile,"\033*t%dR", HPLJII_PPI);
+   fprintf(gpoutfile, "\033*r1A");
 
    /* dump bitmap in raster mode */
    for (x = b_xsize-1; x >= 0; x--) {
       row = (b_ysize/8)-1;
-      fprintf(outfile, "\033*b%dW", b_ysize/8);
+      fprintf(gpoutfile, "\033*b%dW", b_ysize/8);
       for (j = row; j >= 0; j--) {
-         (void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+         (void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
       }
    }
-   fprintf(outfile, "\033*rbC");
+   fprintf(gpoutfile, "\033*rbC");
 
    b_freebitmap();
 
 #ifndef VMS  /* most vms spoolers add a formfeed character */
-   fprintf(outfile,"\f");
+   fprintf(gpoutfile,"\f");
 #endif /* !VMS */
 }
 

@@ -221,12 +221,12 @@ HP26_Buffer_Node *the_buff;
 	buff_y = the_buff->y;
 	isa_move = the_buff->isa_move;
 	if (HP26_in_text){
-		fputs("\033*dT", outfile);
+		fputs("\033*dT", gpoutfile);
 		HP26_in_text = FALSE;
 	}
 	if (HP26_linetype_current != the_buff->linetype
 	    && (the_buff->next > 1 || !isa_move[0])){
-		fprintf(outfile,"\033*m%dB",the_buff->linetype);
+		fprintf(gpoutfile,"\033*m%dB",the_buff->linetype);
 		HP26_linetype_current = the_buff->linetype;
 	}
 	/* try to compress the stream */
@@ -236,15 +236,15 @@ HP26_Buffer_Node *the_buff;
 	}
 
 	/* start escape sequence */
-	fputs("\033*p",outfile);
+	fputs("\033*p",gpoutfile);
 	/* initialize the state:  binary short incremental or binary absolute */
 	delta_x = buff_x[0] - HP26_pen_x;
 	delta_y = buff_y[0] - HP26_pen_y;
 	if (qualified(delta_x, delta_y)){
-		fputc('j', outfile);
+		fputc('j', gpoutfile);
 		bin_short = TRUE;
 	}else{
-		fputc('i', outfile);
+		fputc('i', gpoutfile);
 		bin_short = FALSE;
 	}
 	/* now work through the list */
@@ -285,42 +285,42 @@ HP26_Buffer_Node *the_buff;
 		}
 		if (qualified(delta_x,delta_y)){
 			if (!bin_short){
-				fputc ('j',outfile);
+				fputc ('j',gpoutfile);
 				bin_short = TRUE;
 			}
 			if (isa_move[i])
-				fputc ('a',outfile);
-			fputc(short_encode(delta_x), outfile);
-			fputc(short_encode(delta_y), outfile);
+				fputc ('a',gpoutfile);
+			fputc(short_encode(delta_x), gpoutfile);
+			fputc(short_encode(delta_y), gpoutfile);
 		}else{
 			half_dx = (delta_x + (delta_x>0 ? 1 : -1))/2;
 			half_dy = (delta_y + (delta_y>0 ? 1 : -1))/2;
 			if (bin_short && qualified(half_dx,half_dy)){
 				if (isa_move[i])
-					fputc('a',outfile);
-				fputc(short_encode(half_dx), outfile);
-				fputc(short_encode(half_dy), outfile);
+					fputc('a',gpoutfile);
+				fputc(short_encode(half_dx), gpoutfile);
+				fputc(short_encode(half_dy), gpoutfile);
 				if (isa_move[i])
-					fputc('a',outfile);
-				fputc(short_encode(delta_x - half_dx), outfile);
-				fputc(short_encode(delta_y - half_dy), outfile);
+					fputc('a',gpoutfile);
+				fputc(short_encode(delta_x - half_dx), gpoutfile);
+				fputc(short_encode(delta_y - half_dy), gpoutfile);
 			}else{ 
 				if (bin_short){
 					bin_short = FALSE;
-					fputc('i',outfile);
+					fputc('i',gpoutfile);
 				}
 				if (isa_move[i])
-					fputc('a',outfile);
-				fputc(bin_encode_hi(buff_x[i]), outfile);
-				fputc(bin_encode_lo(buff_x[i]), outfile);
-				fputc(bin_encode_hi(buff_y[i]), outfile);
-				fputc(bin_encode_lo(buff_y[i]), outfile);
+					fputc('a',gpoutfile);
+				fputc(bin_encode_hi(buff_x[i]), gpoutfile);
+				fputc(bin_encode_lo(buff_x[i]), gpoutfile);
+				fputc(bin_encode_hi(buff_y[i]), gpoutfile);
+				fputc(bin_encode_lo(buff_y[i]), gpoutfile);
 			}
 		}
 	}	/* end for.. */
 	/* the term doesn't seem to mind leaving this out */
 	/* finish the escape sequence */
-	fputc ('Z',outfile);
+	fputc ('Z',gpoutfile);
 	/* set these for next time */
 	HP26_pen_x = buff_x[the_buff->next - 1];
 	HP26_pen_y = buff_y[the_buff->next - 1];
@@ -419,19 +419,19 @@ TERM_PUBLIC void HP26_init()
 	HP26_buff = HP26_gnu_map[10];	/* set to an unlikely linetype */
 	HP26_linetype_current = 0;	/* set to force a linetype change */
 	HP26_angle = 1;			/* left to right, default */
-	fputs("\033*mp1m2a2Q",outfile);
+	fputs("\033*mp1m2a2Q",gpoutfile);
 	/*           1 2 3 4
 	1.  make text upright
 	2.  select text size 1
 	3.  make SET the default drawing op
 	4.  left justify text */
-	fflush (outfile);
+	fflush (gpoutfile);
 }
 
 
 TERM_PUBLIC void HP26_graphics()
 {
-	fputs("\033*daflsC", outfile);
+	fputs("\033*daflsC", gpoutfile);
 	/*           12345
 	1.  clear graphics display
 	2.  shut off the alphanumeric display 
@@ -468,11 +468,11 @@ TERM_PUBLIC void HP26_text()
 			if ((HP26_gnu_map[j])->linetype == curr)
 				HP26_flush(HP26_gnu_map[j]);
 	}
-	fputs("\033*deT",outfile);
+	fputs("\033*deT",gpoutfile);
 	/*           12
 	1. turn on the alphanumeric display
 	2. back to text mode */
-	fflush(outfile);
+	fflush(gpoutfile);
 	/* informational:  tells how many points compressed, how
 	   many NOP's of each type, and how many times a buffer
 	   overflowed during this plot */
@@ -511,7 +511,7 @@ TERM_PUBLIC int HP26_text_angle (ang)
 int ang;
 {
 	HP26_angle = ang + 1;
-	fprintf(outfile,"\033*m%dN",HP26_angle);
+	fprintf(gpoutfile,"\033*m%dN",HP26_angle);
 	return(TRUE);
 }
 
@@ -525,18 +525,18 @@ char *str;
 	if (!strlen(str))
 		return;
 	else{
-		fputs("\033*d", outfile);
+		fputs("\033*d", gpoutfile);
 		if (!HP26_in_text){
-			fputc('s', outfile);
+			fputc('s', gpoutfile);
 			HP26_in_text = TRUE;
 		}
 		sprintf(rel_str,"%d,%dP",x - HP26_cursor_x, y - HP26_cursor_y);
 		sprintf(abs_str,"%d,%dO", x, y);
 		if (strlen(rel_str) < strlen(abs_str))
-			fputs(rel_str, outfile);
+			fputs(rel_str, gpoutfile);
 		else
-			fputs(abs_str, outfile);
-		fputs(str, outfile);
+			fputs(abs_str, gpoutfile);
+		fputs(str, gpoutfile);
 		HP26_pen_x = HP26_cursor_x = x;
 		HP26_pen_y = HP26_cursor_y = y;
 	}
@@ -547,7 +547,7 @@ char *str;
 		tmp->isa_move[tmp->next] = TRUE;
 		tmp->next++;
 		HP26_flush(tmp);
-		fprintf(outfile,"\033*l%s\r",str);
+		fprintf(gpoutfile,"\033*l%s\r",str);
 	*/
 	return;
 }

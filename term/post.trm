@@ -107,7 +107,7 @@ TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
 #ifdef TERM_BODY
 /* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
 
-#define PS_FLUSH_PATH if (ps_path_count) { fprintf(outfile, "stroke "); ps_path_count = 0; }
+#define PS_FLUSH_PATH if (ps_path_count) { fprintf(gpoutfile, "stroke "); ps_path_count = 0; }
 
 static char *PS_RememberFont __PROTO((char *fname, int reencode));
 static void ENHPS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
@@ -403,7 +403,7 @@ static char GPFAR * GPFAR PS_header[] = {
 
 /* opaque closed figures w/o the point in the middle (added by Dick Crawford) */
 
-"/Opaque { gsave closepath 1 setgray fill grestore 0 setgray closepath } def\n"
+"/Opaque { gsave closepath 1 setgray fill grestore 0 setgray closepath } def\n",
 
 /* Diamond */
 "/DiaW { stroke [] 0 setdash vpt add M\n",
@@ -514,7 +514,7 @@ int can_reencode;
 	}
 
 	if (can_reencode && recode)
-	{	fprintf(outfile,"/%s %s",fname, recode);
+	{	fprintf(gpoutfile,"/%s %s",fname, recode);
 		return NULL;
 	}
 	else
@@ -822,21 +822,21 @@ NULL };
 	ps_page = 0;
 
 	if (!encap)
-		fprintf(outfile,"%%!PS-Adobe-2.0\n");
+		fprintf(gpoutfile,"%%!PS-Adobe-2.0\n");
 	else
-		fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+		fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
 
-	if (outstr) fprintf(outfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
+	if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );             /*  JFi  */
 	time(&now);
-	fprintf(outfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
+	fprintf(gpoutfile, psi1, version, patchlevel, asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
 
-	fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
+	fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", xoff + bb_xmin, yoff + bb_ymin, xoff + bb_xmax, yoff + bb_ymax);
 
-	fprintf(outfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
+	fprintf(gpoutfile,"%%%%Orientation: %s\n", ps_portrait ? "Portrait" : "Landscape");
 
 	if (!encap)
-		fprintf(outfile,"%%%%Pages: (atend)\n");
-	fprintf(outfile, psi2,
+		fprintf(gpoutfile,"%%%%Pages: (atend)\n");
+	fprintf(gpoutfile, psi2,
 		ps_color ? "true" : "false",
 		ps_solid ? "true" : "false",
 		PS_LW,			/* line width */
@@ -847,17 +847,17 @@ NULL };
 
 	if (uses_fonts && (encoding == ENCODING_ISO_8859_1)) {
 		for (i=0; PS_iso_8859_1_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_iso_8859_1_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_iso_8859_1_encoding[i]);
 		}
 	}
 	if (uses_fonts && (encoding == ENCODING_CP_437)) {       /* JFi */
 		for (i=0; PS_cp_437_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_cp_437_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_cp_437_encoding[i]);
 		}
 	}
 	if (uses_fonts && (encoding == ENCODING_CP_850)) {       /* JFi */
 		for (i=0; PS_cp_850_encoding[i] != NULL; i++) {
-			fprintf(outfile,"%s",PS_cp_850_encoding[i]);
+			fprintf(gpoutfile,"%s",PS_cp_850_encoding[i]);
 		}
 	}
 /*        Duplicate code! 
@@ -866,17 +866,17 @@ NULL };
 */
 
 	for ( i=0; PS_header[i] != NULL; i++)
-		fprintf(outfile,"%s",PS_header[i]);
+		fprintf(gpoutfile,"%s",PS_header[i]);
 	if (ps_duplex_option)
-		fprintf(outfile, "statusdict begin %s setduplexmode end\n",
+		fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
 				ps_duplex_state ? "true" : "false");
 	PS_RememberFont(ps_font, 1);
 
 	if (dict)
 		while (*dict)
-			fputs(*(dict++), outfile);	
+			fputs(*(dict++), gpoutfile);	
 
-	fprintf(outfile,"end\n%%%%EndProlog\n");
+	fprintf(gpoutfile,"end\n%%%%EndProlog\n");
 }
 
 /* the init fn for the postscript driver */
@@ -930,17 +930,17 @@ static char GPFAR psg1[] = "0 setgray\nnewpath\n";
 struct termentry *t = term;
 	ps_page++;
 	if (!ps_common_encap)
-		fprintf(outfile,"%%%%Page: %d %d\n",ps_page,ps_page);
-	fprintf(outfile,"gnudict begin\ngsave\n");
-	fprintf(outfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
-	fprintf(outfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
+		fprintf(gpoutfile,"%%%%Page: %d %d\n",ps_page,ps_page);
+	fprintf(gpoutfile,"gnudict begin\ngsave\n");
+	fprintf(gpoutfile,"%d %d translate\n",ps_common_xoff, ps_common_yoff);
+	fprintf(gpoutfile,"%.3f %.3f scale\n", (ps_eps ? 0.5 : 1.0)/PS_SC,
 	                                     (ps_eps ? 0.5 : 1.0)/PS_SC);
 	if (!ps_common_portrait) {
-	    fprintf(outfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
+	    fprintf(gpoutfile,"90 rotate\n0 %d translate\n", (int)(-PS_YMAX));
 	}
-	fprintf(outfile, psg1);
+	fprintf(gpoutfile, psg1);
 	if (ps_common_uses_fonts)
-		fprintf(outfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
+		fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n", ps_font, (t->v_char) );
 	ps_path_count = 0;
 	PS_relative_ok = FALSE;
 	PS_pen_x = PS_pen_y = -4000;
@@ -952,7 +952,7 @@ struct termentry *t = term;
 TERM_PUBLIC void PS_text()
 {
 	ps_path_count = 0;
-	fprintf(outfile,"stroke\ngrestore\nend\nshowpage\n");
+	fprintf(gpoutfile,"stroke\ngrestore\nend\nshowpage\n");
 	/* fprintf(stderr,"taken %d times\n",PS_taken); */
 	/* informational:  tells how many times it was "cheaper"
 	   to do a relative moveto or lineto rather than an
@@ -962,7 +962,7 @@ TERM_PUBLIC void PS_text()
 
 TERM_PUBLIC void PS_reset()
 {
-	fprintf(outfile,"%%%%Trailer\n");
+	fprintf(gpoutfile,"%%%%Trailer\n");
 
 /*      I think the following commands should be executed 
         `if (ps_common_uses_fonts)`. So I changed the next line. 
@@ -970,18 +970,18 @@ TERM_PUBLIC void PS_reset()
 
 /*	if (!ps_common_uses_fonts) {  */                             /* JFi */
 	if (ps_common_uses_fonts) {
-		fprintf(outfile,"%%%%DocumentFonts: ");
+		fprintf(gpoutfile,"%%%%DocumentFonts: ");
 		while (PS_DocFonts) {
 		    struct PS_FontName *fnp;
 			fnp = PS_DocFonts->next;
-			fprintf(outfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
+			fprintf(gpoutfile, "%s%s", PS_DocFonts->name, fnp ? " " : "\n");
 			free(PS_DocFonts->name);
 			free(PS_DocFonts);
 			PS_DocFonts=fnp;
 		}
 	}
 	if (!ps_common_encap)
-		fprintf(outfile,"%%%%Pages: %d\n",ps_page);
+		fprintf(gpoutfile,"%%%%Pages: %d\n",ps_page);
 }
 
 
@@ -1000,7 +1000,7 @@ int linetype;
 	if (PS_linetype_last == linetype) return;
 #endif
 	PS_linetype_last = linetype;
-	fprintf(outfile,"LT%c\n", "ba012345678"[linetype]);
+	fprintf(gpoutfile,"LT%c\n", "ba012345678"[linetype]);
 	ps_path_count = 0;
 }
 
@@ -1008,7 +1008,7 @@ int linetype;
 TERM_PUBLIC void PS_linewidth (linewidth)
 double linewidth;
 {
-        fprintf(outfile,"%.3f UL\n",linewidth);
+        fprintf(gpoutfile,"%.3f UL\n",linewidth);
 
 /*  
   Documentation of the 'change linewidth' strategy of the postscript terminal:
@@ -1037,7 +1037,7 @@ double linewidth;
 TERM_PUBLIC void PS_pointsize (pointsize)
 double pointsize;
 {
-        fprintf(outfile,"%.3f UP\n",pointsize);
+        fprintf(gpoutfile,"%.3f UP\n",pointsize);
 
 /*  
   Documentation of the 'change pointsize' strategy of the postscript terminal:
@@ -1076,10 +1076,10 @@ unsigned int x,y;
 	sprintf(abso, "%d %d M\n", x, y);
 	sprintf(rel, "%d %d R\n", dx, dy);
 	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, outfile);
+		fputs(rel, gpoutfile);
 		PS_taken++;
 	}else
-		fputs(abso, outfile);
+		fputs(abso, gpoutfile);
 	PS_relative_ok = TRUE;
 	ps_path_count += 1;
 
@@ -1098,16 +1098,16 @@ unsigned int x,y;
 	sprintf(abso, "%d %d L\n", x, y);
 	sprintf(rel, "%d %d V\n", dx, dy);
 	if (strlen(rel) < strlen(abso) && PS_relative_ok){
-		fputs(rel, outfile);
+		fputs(rel, gpoutfile);
 		PS_taken++;
 	}else
-		fputs(abso, outfile);
+		fputs(abso, gpoutfile);
 	PS_relative_ok = TRUE;
 	ps_path_count += 1;
 	PS_pen_x = x;
 	PS_pen_y = y;
 	if (ps_path_count >= 400) {
-		fprintf(outfile,"currentpoint stroke M\n");
+		fprintf(gpoutfile,"currentpoint stroke M\n");
 		ps_path_count = 0;
 	}
 }
@@ -1121,26 +1121,26 @@ char ch;
 	if (!strlen(str)) return;
 	PS_move(x,y);
 	if (ps_ang != 0)
-		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 M\n"
+		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 M\n"
 			,ps_ang*90);
-	putc('(',outfile);
+	putc('(',gpoutfile);
 	ch = *str++;
 	while(ch!='\0') {
 		if ( (ch=='(') || (ch==')') || (ch=='\\') )
-			putc('\\',outfile);
-		putc(ch,outfile);
+			putc('\\',gpoutfile);
+		putc(ch,gpoutfile);
 		ch = *str++;
 	}
 	switch(ps_justify) {
-		case LEFT : fprintf(outfile,") Lshow\n");
+		case LEFT : fprintf(gpoutfile,") Lshow\n");
 			break;
-		case CENTRE : fprintf(outfile,") Cshow\n");
+		case CENTRE : fprintf(gpoutfile,") Cshow\n");
 			break;
-		case RIGHT : fprintf(outfile,") Rshow\n");
+		case RIGHT : fprintf(gpoutfile,") Rshow\n");
 			break;
 	}
 	if (ps_ang != 0)
-		fprintf(outfile,"grestore\n");
+		fprintf(gpoutfile,"grestore\n");
 	ps_path_count = 0;
 	PS_relative_ok = FALSE;
 }
@@ -1171,7 +1171,7 @@ int  size,sep;
         sep=strcspn(font,",");
         strncpy(name,font,sep); name[sep]='\0';
         size=ps_fontsize; sscanf (&(font[sep+1]),"%d",&size);
-        fprintf(outfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+        fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
         PS_RememberFont(name,1 );
         return TRUE;
 }
@@ -1208,7 +1208,7 @@ static char GPFAR * GPFAR pointFNS[] = {"Pnt",  "Pls",   "Crs",    "Star",
 		number = -1;		/* negative types are all 'dot' */
 	else
 		number %= sizeof(pointFNS)/sizeof(pointFNS[0]) -1;
-	fprintf(outfile,"%d %d %s\n", x, y, pointFNS[number+1]);
+	fprintf(gpoutfile,"%d %d %s\n", x, y, pointFNS[number+1]);
 
 	PS_relative_ok = 0;
 	ps_path_count = 0;
@@ -1221,7 +1221,7 @@ unsigned int x1,y1,x2,y2;
 {
 	PS_FLUSH_PATH
 
-	fprintf(outfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
+	fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1,y1, x2,y2);
 
 	PS_relative_ok = 0;
 	PS_linetype_last = -1;
@@ -1265,14 +1265,14 @@ double fontsize, base;
 /* close a postscript string if it has been opened */
 #define ENHPS_FLUSH      \
 {	if (ENHps_opened_string)  \
-	{	fputs(")]\n", outfile);   \
+	{	fputs(")]\n", gpoutfile);   \
 		ENHps_opened_string = FALSE; \
 	}                         \
 }
 
 #define ENHPS_OPEN	\
 {	if (!ENHps_opened_string) \
-	{ fprintf(outfile, "[(%s) %.1f %.1f %s %s (",  \
+	{ fprintf(gpoutfile, "[(%s) %.1f %.1f %s %s (",  \
 		  fontname, fontsize, base, \
  		  widthflag ? "true" : "false",  \
  		  showflag ? "true" : "false");  \
@@ -1392,7 +1392,7 @@ double fontsize, base;
 						if (recode && recodestring)
 						{
 							ENHPS_FLUSH
-							fprintf(outfile, "/%s %s", localfontname, recodestring);
+							fprintf(gpoutfile, "/%s %s", localfontname, recodestring);
 						}
 					}
 					else
@@ -1440,8 +1440,8 @@ double fontsize, base;
 				/*{{{  an escape and print it */
 				/* special cases */
 				ENHPS_OPEN
-				fputc('\\', outfile);
-				fputc(*p, outfile);
+				fputc('\\', gpoutfile);
+				fputc(*p, gpoutfile);
 				break;
 				/*}}}*/
 		
@@ -1452,22 +1452,22 @@ double fontsize, base;
 				if (p[1]=='\\' || p[1]=='(' || p[1]==')')
 				{
 					ENHPS_OPEN
-					fputc('\\', outfile);
+					fputc('\\', gpoutfile);
 				}
 				else if (p[1] >= '0' && p[1] <= '7')
 				{
 					/* up to 3 octal digits */
 					ENHPS_OPEN
-					fputc('\\', outfile);
-					fputc(p[1], outfile);
+					fputc('\\', gpoutfile);
+					fputc(p[1], gpoutfile);
 					++p;
 					if (p[1] >= '0' && p[1] <= '7')
 					{
-						fputc(p[1], outfile);
+						fputc(p[1], gpoutfile);
 						++p;
 						if (p[1] >= '0' && p[1] <= '7')
 						{
-							fputc(p[1], outfile);
+							fputc(p[1], gpoutfile);
 							++p;
 						}
 					}
@@ -1482,7 +1482,7 @@ double fontsize, base;
 				/*{{{  print it */
 				ENHPS_OPEN
     
-				fputc(*p, outfile);
+				fputc(*p, gpoutfile);
     
 			/*}}}*/
 
@@ -1544,7 +1544,7 @@ char *str;
 
 	if (ps_path_count)
 	{
-		fputs(" stroke\n",outfile);
+		fputs(" stroke\n",gpoutfile);
 		ps_path_count=0;
 		PS_relative_ok=FALSE;
 	}
@@ -1567,10 +1567,10 @@ char *str;
 	PS_move(x,y);
 
 	if (ps_ang != 0)
-		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
+		fprintf(gpoutfile,"currentpoint gsave translate %d rotate 0 0 moveto\n",
 			ps_ang*90);
 
-	fputs("[ ",outfile);
+	fputs("[ ",gpoutfile);
 
 	/* set up the globals */
 	
@@ -1610,20 +1610,20 @@ char *str;
 
 	ENHps_max_height += ENHps_min_height;
 		
-	fprintf(outfile, "] %.1f ", -ENHps_max_height/3);
+	fprintf(gpoutfile, "] %.1f ", -ENHps_max_height/3);
 
 	switch(ps_justify)
 	{
-		case LEFT : fprintf(outfile, "MLshow\n");
+		case LEFT : fprintf(gpoutfile, "MLshow\n");
 			break;
-		case CENTRE : fprintf(outfile, "MCshow\n");
+		case CENTRE : fprintf(gpoutfile, "MCshow\n");
 			break;
-		case RIGHT : fprintf(outfile, "MRshow\n");
+		case RIGHT : fprintf(gpoutfile, "MRshow\n");
 			break;
 	}
 
 	if (ps_ang != 0)
-		fputs("grestore\n", outfile);
+		fputs("grestore\n", gpoutfile);
 	ps_path_count = 0;
 	PS_relative_ok=FALSE;
 }

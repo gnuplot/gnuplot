@@ -131,16 +131,16 @@ TERM_PUBLIC void COREL_options()
 
 TERM_PUBLIC void COREL_init()
 {
-	fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-1.2\n");
-        fprintf(outfile,"%%%%BoundingBox: %d %d %d %d\n", CORELD_XOFF,CORELD_YOFF,
+	fprintf(gpoutfile,"%%!PS-Adobe-2.0 EPSF-1.2\n");
+        fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", CORELD_XOFF,CORELD_YOFF,
                 (int)((corel_xmax)/COREL_SC+0.5+CORELD_XOFF),
                 (int)((corel_ymax)/COREL_SC+0.5+CORELD_YOFF) );
-        fprintf(outfile,"%%%%TemplateBox: %d %d %d %d\n", CORELD_XOFF,CORELD_YOFF,
+        fprintf(gpoutfile,"%%%%TemplateBox: %d %d %d %d\n", CORELD_XOFF,CORELD_YOFF,
                 (int)((corel_xmax)/COREL_SC+0.5+CORELD_XOFF),
                 (int)((corel_ymax)/COREL_SC+0.5+CORELD_YOFF) );
-	fprintf(outfile,"%%%%EndComments\n");
-	fprintf(outfile,"%%%%EndProlog\n");
-        fprintf(outfile,"%%%%BeginSetup\n%%%%EndSetup\n");
+	fprintf(gpoutfile,"%%%%EndComments\n");
+	fprintf(gpoutfile,"%%%%EndProlog\n");
+        fprintf(gpoutfile,"%%%%BeginSetup\n%%%%EndSetup\n");
 }
 
 
@@ -154,7 +154,7 @@ TERM_PUBLIC void COREL_graphics()
 TERM_PUBLIC void COREL_text()
 {
         if (corel_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
                 corel_stroke = FALSE;
 	}
         corel_path_count = 0;
@@ -163,7 +163,7 @@ TERM_PUBLIC void COREL_text()
 
 TERM_PUBLIC void COREL_reset()
 {
-	fprintf(outfile,"%%%%Trailer\n");
+	fprintf(gpoutfile,"%%%%Trailer\n");
 }
 
 
@@ -171,117 +171,117 @@ TERM_PUBLIC void COREL_linetype(linetype)
 int linetype;
 {
         if (corel_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
                 corel_stroke = FALSE;
 	}
 	switch(linetype) {
-                case -2 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case -2 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-                                        fprintf(outfile,"[] 0 d\n");
-                                        fprintf(outfile,"0 j\n0 G\n");
+                                        fprintf(gpoutfile,"[] 0 d\n");
+                                        fprintf(gpoutfile,"0 j\n0 G\n");
 				}
 				break;
 
-                case -1 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case -1 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-					fprintf(outfile,"[1 2] 0 d\n");
-                                        fprintf(outfile,"0 j\n0 G\n");
+					fprintf(gpoutfile,"[1 2] 0 d\n");
+                                        fprintf(gpoutfile,"0 j\n0 G\n");
                                 }
 				break;
 				
-                case 0 :  fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 0 :  fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"1 0 1 0 K\n");
+					fprintf(gpoutfile,"1 0 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 1 :  fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 1 :  fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"1 1 0 0 K\n");
+					fprintf(gpoutfile,"1 1 0 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[4 2] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[4 2] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 2 :  fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 2 :  fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 1 1 0 K\n");
+					fprintf(gpoutfile,"0 1 1 0 K\n");
 				}
 				else {				
-                                        fprintf(outfile,"[2 3] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+                                        fprintf(gpoutfile,"[2 3] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 3 :  fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 3 :  fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 1 0 0 K\n");
+					fprintf(gpoutfile,"0 1 0 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[1 1.5] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[1 1.5] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 4 :  fprintf(outfile,"%f w\n",corel_lw/COREL_SC);
+                case 4 :  fprintf(gpoutfile,"%f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"1 0 0 0 K\n");
+					fprintf(gpoutfile,"1 0 0 0 K\n");
                                 }
 				else {				
-					fprintf(outfile,"[5 2 1 2] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
-                                }
-				break;
-				
-                case 5 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
-                                if (corel_color) {
-					fprintf(outfile,"0 0 1 0 K\n");
-				}
-				else {				
-					fprintf(outfile,"[4 3 1 3] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[5 2 1 2] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 6 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 5 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 0 0 1 K\n");
+					fprintf(gpoutfile,"0 0 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 4] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[4 3 1 3] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 7 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 6 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0 0.7 1 0 K\n");
+					fprintf(gpoutfile,"0 0 0 1 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 2 2 4] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[2 2 2 4] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 				
-                case 8 : fprintf(outfile,"%.2f w\n",corel_lw/COREL_SC);
+                case 7 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
                                 if (corel_color) {
-					fprintf(outfile,"0.5 0.5 0.5 0 K\n");
+					fprintf(gpoutfile,"0 0.7 1 0 K\n");
 				}
 				else {				
-					fprintf(outfile,"[2 2 2 2 2 2 2 4] 0 d\n");
-                                        fprintf(outfile,"2 j\n0 G\n");
+					fprintf(gpoutfile,"[2 2 2 2 2 4] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
+                                }
+				break;
+				
+                case 8 : fprintf(gpoutfile,"%.2f w\n",corel_lw/COREL_SC);
+                                if (corel_color) {
+					fprintf(gpoutfile,"0.5 0.5 0.5 0 K\n");
+				}
+				else {				
+					fprintf(gpoutfile,"[2 2 2 2 2 2 2 4] 0 d\n");
+                                        fprintf(gpoutfile,"2 j\n0 G\n");
                                 }
 				break;
 		}
@@ -292,8 +292,8 @@ int linetype;
 TERM_PUBLIC void COREL_move(x,y)
 unsigned int x,y;
 {
-        if (corel_stroke) fprintf(outfile,"S\n");
-        fprintf(outfile,"%0.2f %0.2f m\n", x/COREL_SC, y/COREL_SC);
+        if (corel_stroke) fprintf(gpoutfile,"S\n");
+        fprintf(gpoutfile,"%0.2f %0.2f m\n", x/COREL_SC, y/COREL_SC);
         corel_path_count += 1;
         corel_stroke = TRUE;
 }
@@ -302,11 +302,11 @@ unsigned int x,y;
 TERM_PUBLIC void COREL_vector(x,y)
 unsigned int x,y;
 {
-        fprintf(outfile,"%.2f %.2f l\n", x/COREL_SC, y/COREL_SC);
+        fprintf(gpoutfile,"%.2f %.2f l\n", x/COREL_SC, y/COREL_SC);
         corel_path_count += 1;
         corel_stroke = TRUE;
         if (corel_path_count >= 400) {
-                fprintf(outfile,"S\n%.2f %.2f m\n",x/COREL_SC,y/COREL_SC);
+                fprintf(gpoutfile,"S\n%.2f %.2f m\n",x/COREL_SC,y/COREL_SC);
                 corel_path_count = 0;
 	}
 }
@@ -318,38 +318,38 @@ char *str;
 {
 char ch;
         if (corel_stroke) {
-		fprintf(outfile,"S\n");
+		fprintf(gpoutfile,"S\n");
                 corel_stroke = FALSE;
 	}
         switch(corel_justify) {
-                case LEFT :   fprintf(outfile,"/_%s %d %d 0 0 z\n",
+                case LEFT :   fprintf(gpoutfile,"/_%s %d %d 0 0 z\n",
                                       corel_font,corel_fontsize,corel_fontsize);
 			break;
-                case CENTRE : fprintf(outfile,"/_%s %d %d 0 1 z\n",
+                case CENTRE : fprintf(gpoutfile,"/_%s %d %d 0 1 z\n",
                                       corel_font,corel_fontsize,corel_fontsize);
 			break;
-                case RIGHT :  fprintf(outfile,"/_%s %d %d 0 2 z\n",
+                case RIGHT :  fprintf(gpoutfile,"/_%s %d %d 0 2 z\n",
                                       corel_font,corel_fontsize,corel_fontsize);
 			break;
 	}
         if (corel_ang==0) {
-                fprintf(outfile,"[1 0 0 1 %.2f %.2f]e\n0 g\n",
+                fprintf(gpoutfile,"[1 0 0 1 %.2f %.2f]e\n0 g\n",
                         x/COREL_SC,y/COREL_SC - corel_fontsize/3.0);
 	}
 	else {
-                fprintf(outfile,"[0 1 -1 0 %.2f %.2f]e\n0 g\n",
+                fprintf(gpoutfile,"[0 1 -1 0 %.2f %.2f]e\n0 g\n",
                         x/COREL_SC - corel_fontsize/3.0,y/COREL_SC);
 	}
 		
-	putc('(',outfile);
+	putc('(',gpoutfile);
 	ch = *str++;
 	while(ch!='\0') {
 		if ( (ch=='(') || (ch==')') || (ch=='\\') )
-			putc('\\',outfile);
-		putc(ch,outfile);
+			putc('\\',gpoutfile);
+		putc(ch,gpoutfile);
 		ch = *str++;
 	}
-        fprintf(outfile,")t\nT\n");
+        fprintf(gpoutfile,")t\nT\n");
         corel_path_count = 0;
 }
 

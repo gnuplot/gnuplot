@@ -5,7 +5,7 @@
 
 /* GNUPLOT - apollo.trm */
 /*
-    Apollo terminal driver for GNUplot.
+    Apollo terminal driver for gnuplot.
 
     Open a pad for the graphics, and use GPR routines.  For additional
     speed, we do the graphics to a separate bitmap, and the blt the
@@ -16,8 +16,8 @@
     trick, it looks funny.
 
     Ray Lischner (uunet!mntgfx!lisch)
-    4 October 1989	file created for GNUplot 1.1
-    26 March 1990	updated for GNUplot 2.0
+    4 October 1989	file created for gnuplot 1.1
+    26 March 1990	updated for gnuplot 2.0
     30 October 1991	fixed minor problem in apollo_tic_sizes
 */
 
@@ -246,7 +246,7 @@ static void apollo_gpr_terminate()
 
     An alternative strategy would be to interpret multiple "set term
     apollo"s to mean create multiple windows.  The user could only
-    access the most recent window because GNUplot has no concept of
+    access the most recent window because gnuplot has no concept of
     multiple terminals.  The user would, in fact, have no way of
     removing old windows because they are still active.  We could try
     catching keyboard events to see if the user presses EXIT, but I do
@@ -379,7 +379,7 @@ TERM_PUBLIC void APOLLO_graphics()
     really does not buy us anything.
 
     I used patterns that do not start with all bits on because
-    GNUplot seems to use lots of short line segments to draw
+    gnuplot seems to use lots of short line segments to draw
     a curve, and this might make a very curvey plot seem like
     a solid line, regardless of pattern.  I don't want to start
     with too many zeros, however, or else the curve might not
@@ -452,7 +452,7 @@ static void apollo_xy_error(char* s, int x, int y, status_$t status)
     if (status.all != status_$ok) apollo_xy_error((s), x, y, status)
 
 /*
-    Note that GNUplot and GPR have reversed ideas of where the Y origin is.
+    Note that gnuplot and GPR have reversed ideas of where the Y origin is.
     This means subtracting the Y coordinate from Y max.
 */
 #define plot_to_gpr(y)		(APOLLO_YMAX - (y))

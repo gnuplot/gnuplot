@@ -100,8 +100,8 @@ static int T410X_angle=0;
 
 TERM_PUBLIC void T410X_init()
 {
-	(void) fprintf(outfile, "\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1");
-	(void) fprintf(outfile, "\033MG1\033RK!\033SK!\033LZ\033%%!1");
+	(void) fprintf(gpoutfile, "\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1");
+	(void) fprintf(gpoutfile, "\033MG1\033RK!\033SK!\033LZ\033%%!1");
 /*
 	 1. set tek mode
 	 2. set character path to 0 (characters placed equal to rotation)
@@ -114,59 +114,59 @@ TERM_PUBLIC void T410X_init()
 	 9. clear the dialog buffer
 	10. set ansi mode
 */
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_reset()
 {
-	(void) fprintf(outfile, "\033%%!0\033LZ\033%%!1");
+	(void) fprintf(gpoutfile, "\033%%!0\033LZ\033%%!1");
 /*
 	1. set tek mode
 	2. clear the dialog buffer
 	3. set ansi mode
 */
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_graphics()
 {
-	(void) fprintf(outfile, "\033%%!0\033\014\033LV0");
+	(void) fprintf(gpoutfile, "\033%%!0\033\014\033LV0");
 /*
 	1. set tek mode
 	2. clear the screen
 	3. set dialog area invisible
 */
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 TERM_PUBLIC void T410X_text()
 {
-	(void) fprintf(outfile, "\033LV1\033%%!1");
+	(void) fprintf(gpoutfile, "\033LV1\033%%!1");
 /*
 	1. set dialog area visible
 	2. set ansi mode
 */
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_move(x, y)
 unsigned int x, y;
 {
-	(void) fprintf(outfile, "\033LF");
+	(void) fprintf(gpoutfile, "\033LF");
 	(void) T410X_encode_x_y(x, y);
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
 TERM_PUBLIC void T410X_vector(x, y)
 unsigned int x, y;
 {
-	(void) fprintf(outfile, "\033LG");
+	(void) fprintf(gpoutfile, "\033LG");
 	(void) T410X_encode_x_y(x, y);
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
@@ -174,11 +174,11 @@ TERM_PUBLIC void T410X_point(x, y, number)
 unsigned int x, y;
 int number;
 {
-	(void) fprintf(outfile, "\033MM");
+	(void) fprintf(gpoutfile, "\033MM");
 	(void) T410X_encode_int(GPMAX(number, 0)%11);
-	(void) fprintf(outfile, "\033LH");
+	(void) fprintf(gpoutfile, "\033LH");
 	(void) T410X_encode_x_y(x, y);
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
@@ -187,19 +187,19 @@ int linetype;
 {
 	switch (linetype) {
 		case -1:
-			(void) fprintf(outfile, "\033ML5");
+			(void) fprintf(gpoutfile, "\033ML5");
 			break;
 		case -2:
-			(void) fprintf(outfile, "\033ML?");
+			(void) fprintf(gpoutfile, "\033ML?");
 			break;
 		default:
-			(void) fprintf(outfile, "\033ML");
+			(void) fprintf(gpoutfile, "\033ML");
 			(void) T410X_encode_int(linetype%14+2);
 			break;
 	}
-	(void) fprintf(outfile, "\033MV");
+	(void) fprintf(gpoutfile, "\033MV");
 	(void) T410X_encode_int(GPMAX(linetype, 0)%8);
-	(void) fflush(outfile);
+	(void) fflush(gpoutfile);
 }
 
 
@@ -210,15 +210,15 @@ char str[];
 
 	if (T410X_angle == 0) {
 		(void) T410X_move(x, y-T410XVCHAR/2+6);
-		(void) fprintf(outfile, "\033MR00");
+		(void) fprintf(gpoutfile, "\033MR00");
 	} else {
 		(void) T410X_move(x+T410XHCHAR/2-6, y);
-		(void) fprintf(outfile, "\033MRE:0");
+		(void) fprintf(gpoutfile, "\033MRE:0");
 	}
-	(void) fprintf(outfile, "\033LT");
+	(void) fprintf(gpoutfile, "\033LT");
 	(void) T410X_encode_int(strlen(str));
-	(void) fputs(str, outfile);
-	(void) fflush(outfile);
+	(void) fputs(str, gpoutfile);
+	(void) fflush(gpoutfile);
 }
 
 TERM_PUBLIC int T410X_text_angle(ang)
@@ -249,11 +249,11 @@ unsigned int x, y;
 	loy = (ly/4)%32 + 96;
 	eb = (ly%4)*4 + lx%4 + 96;
 
-	if (chiy != hiy) (void) putc(hiy, outfile);
-	if (ceb != eb) (void) putc(eb, outfile);
-	if ((cloy!=loy) || (ceb!=eb) || (chix!=hix)) (void) putc(loy, outfile);
-	if (chix != hix) (void) putc(hix, outfile);
-	(void) putc(lox, outfile);
+	if (chiy != hiy) (void) putc(hiy, gpoutfile);
+	if (ceb != eb) (void) putc(eb, gpoutfile);
+	if ((cloy!=loy) || (ceb!=eb) || (chix!=hix)) (void) putc(loy, gpoutfile);
+	if (chix != hix) (void) putc(hix, gpoutfile);
+	(void) putc(lox, gpoutfile);
 
 	chix = hix;
 	chiy = hiy;
@@ -275,9 +275,9 @@ int number;
 
 	if (number >= 0) lo += 16;
 
-	if (hi1 != 64) (void) putc(hi1, outfile);
-	if ((hi2 != 64) || (hi1 != 64)) (void) putc(hi2, outfile);
-	(void) putc(lo, outfile);
+	if (hi1 != 64) (void) putc(hi1, gpoutfile);
+	if ((hi2 != 64) || (hi1 != 64)) (void) putc(hi2, gpoutfile);
+	(void) putc(lo, gpoutfile);
 
 }
 

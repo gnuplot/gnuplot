@@ -184,7 +184,7 @@ TERM_PUBLIC void STARCreset __PROTO((void));
    routines to build up a bit map in memory. */
 /* by Russell Lang, rjl@monu1.cc.monash.edu.au */
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
-/* EPSON_init changes outfile to binary mode on PC's */
+/* EPSON_init changes gpoutfile to binary mode on PC's */
 
 void epson_dump __PROTO((void));
 
@@ -225,12 +225,12 @@ void epson_dump()
   int j;
 	for (j=(b_ysize/8)-1; j>=0; j--) {
 		/* select plotter graphics mode (square pixels) */
-		fprintf(outfile,"\033J\030");	/* line feed 8/72" = 8 dots */
-		fprintf(outfile,"\r\033*\005");
-		(void) fputc((char)(b_xsize%256),outfile);
-		(void) fputc((char)(b_xsize/256),outfile);
+		fprintf(gpoutfile,"\033J\030");	/* line feed 8/72" = 8 dots */
+		fprintf(gpoutfile,"\r\033*\005");
+		(void) fputc((char)(b_xsize%256),gpoutfile);
+		(void) fputc((char)(b_xsize/256),gpoutfile);
 		for (x=0; x<b_xsize; x++) {
-			(void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+			(void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
 		}
 	}
 #ifdef PC
@@ -245,7 +245,7 @@ void epson_dump()
    routines to build up a bit map in memory. */
 /* by Russell Lang, rjl@monu1.cc.monash.edu.au */
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
-/* NECinit changes outfile to binary mode for PC's */
+/* NECinit changes gpoutfile to binary mode for PC's */
 
 /* Add a Monochrome NEC printer (for faster speed and line types) jdc */
 
@@ -344,20 +344,20 @@ int j;
 unsigned int column8;
 unsigned long column24;
 char column3, column2, column1;
-	fprintf(outfile,"\033P\033l\005");  /* 10cpi, left margin 5 char */
+	fprintf(gpoutfile,"\033P\033l\005");  /* 10cpi, left margin 5 char */
 	for (j=(b_ysize/8)-1;j>=0;j--) {
-			fprintf(outfile,"\033J\030");  /* 24/180" line feed */
+			fprintf(gpoutfile,"\033J\030");  /* 24/180" line feed */
 			for (plane=0; plane<b_planes; plane++) {
 				offset=plane*b_psize;
 				if (b_planes>1) {
 				    /* select colour for plane */
-				    fprintf(outfile,"\033r");
-				    (void) fputc((char)necpcolor[plane],outfile);
+				    fprintf(gpoutfile,"\033r");
+				    (void) fputc((char)necpcolor[plane],gpoutfile);
 				}
 				/* select plotter graphics mode (square pixels) */
-				fprintf(outfile,"\r\033*\047");
-				(void) fputc((char)((b_xsize*3)%256),outfile);
-				(void) fputc((char)((b_xsize*3)/256),outfile);
+				fprintf(gpoutfile,"\r\033*\047");
+				(void) fputc((char)((b_xsize*3)%256),gpoutfile);
+				(void) fputc((char)((b_xsize*3)/256),gpoutfile);
 				for (x=0; x<b_xsize; x++) {
 					column8= (unsigned int)(*((*b_p)[j+offset]+x));
 					column24=0;
@@ -372,23 +372,23 @@ char column3, column2, column1;
 					column1 = (char) ( column24      & (long)0xff);
 					column2 = (char) ((column24>>8)  & (long)0xff);
 					column3 = (char) ((column24>>16) & (long)0xff);
-					(void) fputc(column3,outfile);
-					(void) fputc(column2,outfile);
-					(void) fputc(column1,outfile);
-					(void) fputc(column3,outfile);
-					(void) fputc(column2,outfile);
-					(void) fputc(column1,outfile);
-					(void) fputc(column3,outfile);
-					(void) fputc(column2,outfile);
-					(void) fputc(column1,outfile);
+					(void) fputc(column3,gpoutfile);
+					(void) fputc(column2,gpoutfile);
+					(void) fputc(column1,gpoutfile);
+					(void) fputc(column3,gpoutfile);
+					(void) fputc(column2,gpoutfile);
+					(void) fputc(column1,gpoutfile);
+					(void) fputc(column3,gpoutfile);
+					(void) fputc(column2,gpoutfile);
+					(void) fputc(column1,gpoutfile);
 				}
 			}
 	}
-	fprintf(outfile,"\r\033l");
-	(void) fputc('\0',outfile);				/* set left margin to 0 */
+	fprintf(gpoutfile,"\r\033l");
+	(void) fputc('\0',gpoutfile);				/* set left margin to 0 */
 	if (b_planes > 1) {
-		fprintf(outfile,"\033r");
-		(void) fputc('\0',outfile);				/* set color to black */
+		fprintf(gpoutfile,"\033r");
+		(void) fputc('\0',gpoutfile);				/* set color to black */
 	}
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
@@ -404,31 +404,31 @@ void nec_draft_dump()
 unsigned int x;
 unsigned int plane,offset;
 int j;
-	fprintf(outfile,"\033P\033l\005\r");  /* 10cpi, left margin 5 char */
+	fprintf(gpoutfile,"\033P\033l\005\r");  /* 10cpi, left margin 5 char */
 	for (j=(b_ysize/8)-1;j>=0;j--) {
-			fprintf(outfile,"\033J\030");  /* 24/180" line feed */
+			fprintf(gpoutfile,"\033J\030");  /* 24/180" line feed */
 			for (plane=0; plane<b_planes; plane++) {
 				offset=plane*b_psize;
 				if (b_planes>1) {
 				    /* select colour for plane */
-				    fprintf(outfile,"\033r");
-				    (void) fputc((char)necpcolor[plane],outfile);
+				    fprintf(gpoutfile,"\033r");
+				    (void) fputc((char)necpcolor[plane],gpoutfile);
 				}
 				/* select plotter graphics mode (square pixels) */
-				fprintf(outfile,"\r\033*");
-				(void) fputc('\0',outfile);
-				(void) fputc((char)(b_xsize%256),outfile);
-				(void) fputc((char)(b_xsize/256),outfile);
+				fprintf(gpoutfile,"\r\033*");
+				(void) fputc('\0',gpoutfile);
+				(void) fputc((char)(b_xsize%256),gpoutfile);
+				(void) fputc((char)(b_xsize/256),gpoutfile);
 				for (x=0; x<b_xsize; x++) {
-					(void) fputc( (char)(*((*b_p)[j+offset]+x)), outfile );
+					(void) fputc( (char)(*((*b_p)[j+offset]+x)), gpoutfile );
 				}
 			}
 	}
-	fprintf(outfile,"\r\033l");
-	(void) fputc('\0',outfile);				/* set left margin to 0 */
+	fprintf(gpoutfile,"\r\033l");
+	(void) fputc('\0',gpoutfile);				/* set left margin to 0 */
 	if (b_planes > 1) {
-		fprintf(outfile,"\033r");
-		(void) fputc('\0',outfile);				/* set color to black */
+		fprintf(gpoutfile,"\033r");
+		(void) fputc('\0',gpoutfile);				/* set color to black */
 	}
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
@@ -442,7 +442,7 @@ int j;
    routines to build up a bit map in memory. */
 /* Star Color changes made by William Wilson, wew@naucse.cse.nau.edu */
 /* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
-/* STARC_init changes outfile to binary mode on PC's */
+/* STARC_init changes gpoutfile to binary mode on PC's */
 
 void STARC_dump __PROTO((void));
 
@@ -497,26 +497,26 @@ unsigned int x;
 unsigned int plane,offset;
 int j;
 	for (j=(b_ysize/8)-1;j>=0;j--) {
-		fprintf(outfile,"\033J\030");	/* line feed 8/72" = 8 dots */
+		fprintf(gpoutfile,"\033J\030");	/* line feed 8/72" = 8 dots */
 		for (plane=0; plane<b_planes; plane++) {
 			offset=plane*b_psize;
 			if (b_planes>1) {
 				/* select colour for plane */
-				fprintf(outfile,"\033r");
-				(void) fputc((char)STARCpcolor[plane],outfile);
+				fprintf(gpoutfile,"\033r");
+				(void) fputc((char)STARCpcolor[plane],gpoutfile);
 			}
 			/* select plotter graphics mode (square pixels) */
-			fprintf(outfile,"\r\033*\005");
-			(void) fputc((char)(b_xsize%256),outfile);
-			(void) fputc((char)(b_xsize/256),outfile);
+			fprintf(gpoutfile,"\r\033*\005");
+			(void) fputc((char)(b_xsize%256),gpoutfile);
+			(void) fputc((char)(b_xsize/256),gpoutfile);
 			for (x=0; x<b_xsize; x++) {
-				(void) fputc( (char)(*((*b_p)[j+offset]+x)), outfile );
+				(void) fputc( (char)(*((*b_p)[j+offset]+x)), gpoutfile );
 			}
 		}
 	}
 	if (b_planes > 1) {
-		fprintf(outfile,"\033r");
-		(void) fputc('\0',outfile);				/* set color to black */
+		fprintf(gpoutfile,"\033r");
+		(void) fputc('\0',gpoutfile);				/* set color to black */
 	}
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
@@ -554,22 +554,22 @@ void eps180_dump()
 {
   register unsigned int x;
   int j;
-	fprintf(outfile,"\033@\033+\060\033l\005"); /* reset, set line spacing
+	fprintf(gpoutfile,"\033@\033+\060\033l\005"); /* reset, set line spacing
 						       to 24/180", and
 						       move left margin */
 	for (j=(b_ysize/8)-1; j>=0; ) {
 		/* select printer graphics mode '39' */
-		fprintf(outfile,"\r\n\033*'");
-		(void) fputc((char)(b_xsize%256),outfile);
-		(void) fputc((char)(b_xsize/256),outfile);
+		fprintf(gpoutfile,"\r\n\033*'");
+		(void) fputc((char)(b_xsize%256),gpoutfile);
+		(void) fputc((char)(b_xsize/256),gpoutfile);
 		for (x=0; x<b_xsize; x++) {
-		           (void) fputc( (char)(*((*b_p)[j]+x)), outfile );
-  			   (void) fputc( (char)(*((*b_p)[j-1]+x)), outfile );
-			   (void) fputc( (char)(*((*b_p)[j-2]+x)), outfile );
+		           (void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
+  			   (void) fputc( (char)(*((*b_p)[j-1]+x)), gpoutfile );
+			   (void) fputc( (char)(*((*b_p)[j-2]+x)), gpoutfile );
 		}
 	j -= 3;
 	}
-	fprintf(outfile,"\r\n\033@\r\n"); 	/* reset printer */
+	fprintf(gpoutfile,"\r\n\033@\r\n"); 	/* reset printer */
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
 #endif
@@ -605,17 +605,17 @@ void eps60_dump()
 {
   register unsigned int x;
   int j;
-	fprintf(outfile,"\033%c\030",'3'); /* set line spacing 24/216" = 8 dots */
+	fprintf(gpoutfile,"\033%c\030",'3'); /* set line spacing 24/216" = 8 dots */
 	for (j=(b_ysize/8)-1; j>=0; j--) {
 		/* select printer graphics mode 'K' */
-		fprintf(outfile,"\r\n\033K");
-		(void) fputc((char)(b_xsize%256),outfile);
-		(void) fputc((char)(b_xsize/256),outfile);
+		fprintf(gpoutfile,"\r\n\033K");
+		(void) fputc((char)(b_xsize%256),gpoutfile);
+		(void) fputc((char)(b_xsize/256),gpoutfile);
 		for (x=0; x<b_xsize; x++) {
-			(void) fputc( (char)(*((*b_p)[j]+x)), outfile );
+			(void) fputc( (char)(*((*b_p)[j]+x)), gpoutfile );
 		}
 	}
-	fprintf(outfile,"\033%c\044\r\n",'3'); /* set line spacing 36/216" = 1/6" */
+	fprintf(gpoutfile,"\033%c\044\r\n",'3'); /* set line spacing 36/216" = 1/6" */
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
 #endif
@@ -638,12 +638,12 @@ TERM_PUBLIC void TANDY60text()
 	/* Switch to IBM mode, and leave 3 inches above the plot so as
 	   to get rough vertical centring on the page.  Perform the
 	   centring by setting 1" line feeds and issuing 3 of them. */
-	fprintf(outfile, "\033!\033%c%c\n\n\n", '3',216);
+	fprintf(gpoutfile, "\033!\033%c%c\n\n\n", '3',216);
 	eps60_dump();
 	b_freebitmap();
 	/* A form feed must be sent before switching back to Tandy mode,
 	   or else the form setting will be messed up. */
-	fprintf(outfile, "\f\033!");
+	fprintf(gpoutfile, "\f\033!");
 }
 
 
@@ -703,22 +703,22 @@ void okidata_dump()
   int  prev_char;
 
   prev_char = 0;
-	fprintf(outfile,"\033%c%c\020\033*eP:\003",'%','9'); /* set line spacing 16/144" = 8 dots :Turned on single density graphics mode*/
+	fprintf(gpoutfile,"\033%c%c\020\033*eP:\003",'%','9'); /* set line spacing 16/144" = 8 dots :Turned on single density graphics mode*/
 	for (j=(b_ysize/8)-1; j>=0; j--) {
-		fprintf(outfile,"\003\016");
-/*		(void) fputc((char)(b_xsize%256),outfile); */
-/*		(void) fputc((char)(b_xsize/256),outfile); */
+		fprintf(gpoutfile,"\003\016");
+/*		(void) fputc((char)(b_xsize%256),gpoutfile); */
+/*		(void) fputc((char)(b_xsize/256),gpoutfile); */
 		for (x=0; x<b_xsize; x++) {
 		  if ( (cur_char = (char) 
 			(bitrev_tbl[ (int) (*((*b_p)[j]+x))])) == '\003') {
-		    fprintf( outfile, "\003\003");
+		    fprintf( gpoutfile, "\003\003");
 		  }
 		  else {
-		      (void) fputc( (char) cur_char , outfile);
+		      (void) fputc( (char) cur_char , gpoutfile);
 		    }
 		}
 	      }
-	fprintf(outfile,"\003\002\033%c%c\030\r\n",'%','9'); /* Turned off graphics mode: set line spacing 24/144" = 1/6"*/
+	fprintf(gpoutfile,"\003\002\033%c%c\030\r\n",'%','9'); /* Turned off graphics mode: set line spacing 24/144" = 1/6"*/
 #ifdef PC
 	fprintf(stderr,"Print using: COPY /B\n");
 #endif

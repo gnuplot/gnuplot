@@ -297,7 +297,7 @@ static char GPFAR tpic1[] = "\
 
 	tpic_posx = tpic_posy = 0;
 	TPIC_linetype(-1);
-	fprintf(outfile, tpic1,
+	fprintf(gpoutfile, tpic1,
 		tpic_point_types, tpic_numlines - 2,
 		tpic_pointsize, tpic_linewidth, tpic_interval,
 		TPIC_UNIT);
@@ -312,7 +312,7 @@ TERM_PUBLIC void TPIC_reset()
 TERM_PUBLIC void TPIC_text()
 {
 	tpic_endline();
-	fprintf(outfile, "\\end{picture}\n");
+	fprintf(gpoutfile, "\\end{picture}\n");
 }
 
 TERM_PUBLIC void TPIC_graphics()
@@ -321,27 +321,27 @@ TERM_PUBLIC void TPIC_graphics()
 	int left, right, top, bottom; /* margins */
 	static char GPFAR begin[] = "%s\\begin{picture}(%d,%d)(%d,%d)%% %s\n";
 
-	fprintf(outfile, begin, "", t->xmax, t->ymax, 0, 0, "");
+	fprintf(gpoutfile, begin, "", t->xmax, t->ymax, 0, 0, "");
 
 	/* the following is dependent on boundary() function in graphics.c */
 	left = TPIC_HCHAR * 12;
 	right = TPIC_HCHAR * 2 + TPIC_HTIC;
 	bottom = TPIC_VCHAR * 7 / 2 + 1;
 	top = TPIC_VCHAR * 5 / 2 - 1;
-	fprintf(outfile, begin, "%% ", t->xmax - left, t->ymax, left, 0, 
+	fprintf(gpoutfile, begin, "%% ", t->xmax - left, t->ymax, left, 0, 
 		"trim left margin");
-	fprintf(outfile, begin, "%% ", t->xmax - right, t->ymax, 0, 0, 
+	fprintf(gpoutfile, begin, "%% ", t->xmax - right, t->ymax, 0, 0, 
 		"trim right margin");
-	fprintf(outfile, begin, "%% ", t->xmax - left - right, t->ymax, left, 0, 
+	fprintf(gpoutfile, begin, "%% ", t->xmax - left - right, t->ymax, left, 0, 
 		"trim left & right margins");
-	fprintf(outfile, begin, "%% ", t->xmax, t->ymax - top, 0, 0, 
+	fprintf(gpoutfile, begin, "%% ", t->xmax, t->ymax - top, 0, 0, 
 		"trim top margin");
-	fprintf(outfile, begin, "%% ", t->xmax, t->ymax - bottom, 0, bottom, 
+	fprintf(gpoutfile, begin, "%% ", t->xmax, t->ymax - bottom, 0, bottom, 
 		"trim bottom margin");
-	fprintf(outfile, begin, "%% ", t->xmax, t->ymax - top - bottom, 0, bottom,
+	fprintf(gpoutfile, begin, "%% ", t->xmax, t->ymax - top - bottom, 0, bottom,
 		"trim top & bottom margins");
 
-	fprintf(outfile, "\\footnotesize%%\n");
+	fprintf(gpoutfile, "\\footnotesize%%\n");
 }
 
 TERM_PUBLIC void TPIC_move(x,y)
@@ -483,7 +483,7 @@ unsigned int x; unsigned int y; char *str; /* ref point and text */
 	char *justify=NULL;
 
 	tpic_endline();
-	fprintf(outfile, "\\put(%d,%d)", x, y);
+	fprintf(gpoutfile, "\\put(%d,%d)", x, y);
 
 	switch (tpic_angle) {
 	case 0: /* horizontal */
@@ -498,7 +498,7 @@ unsigned int x; unsigned int y; char *str; /* ref point and text */
 			justify = "[r]";
 			break;
 		}
-		fprintf(outfile, "{\\makebox(0,0)%s{%s}}\n", justify, str);
+		fprintf(gpoutfile, "{\\makebox(0,0)%s{%s}}\n", justify, str);
 		break;
 	case 1: /* vertical */
 		/* we can't really write text vertically, but will put the ylabel 
@@ -514,7 +514,7 @@ unsigned int x; unsigned int y; char *str; /* ref point and text */
 			justify = "[lt]";
 			break;
 		}
-		fprintf(outfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n", 
+		fprintf(gpoutfile, "{\\makebox(0,0)%s{\\shortstack{%s}}}\n", 
 			justify, str);
 		break;
 	}
@@ -544,10 +544,10 @@ unsigned int x; unsigned int y; int number;
 	/* Print the character defined by 'number'; number < 0 means 
 	to use a dot, otherwise one of the defined points. */
 
-	fprintf(outfile, "\\put(%d,%d){", x, y); /* start putting */
+	fprintf(gpoutfile, "\\put(%d,%d){", x, y); /* start putting */
 
 	if (number < 0) {
-		fprintf(outfile, "\\rule{.1pt}{.1pt}"); /* tiny dot */
+		fprintf(gpoutfile, "\\rule{.1pt}{.1pt}"); /* tiny dot */
 	} else {
 		number %= tpic_point_types;
 		switch (tpic_point[number].shadestyle) {
@@ -583,7 +583,7 @@ unsigned int x; unsigned int y; int number;
 		(tpic_point[number].function)(size);
 	}
 
-	fprintf(outfile, "}%%\n"); /* end putting */
+	fprintf(gpoutfile, "}%%\n"); /* end putting */
 }
 
 TERM_PUBLIC void TPIC_arrow(sx,sy,ex,ey,head)
@@ -826,9 +826,9 @@ int size; /* no more idea ... with plus & times */
 void tpic_abspath(x,y)
 unsigned int x; unsigned int y; /* absolute coord */
 {
-	fprintf(outfile, "\\put(%u,%u){", x, y); /* start putting */
+	fprintf(gpoutfile, "\\put(%u,%u){", x, y); /* start putting */
 	tpic_path(0, 0);
-	fprintf(outfile, "}%%\n"); /* end putting */
+	fprintf(gpoutfile, "}%%\n"); /* end putting */
 	return;
 }
 
@@ -837,48 +837,48 @@ unsigned int x; unsigned int y; /* absolute coord */
 void tpic_path(x,y)
 int x; int y;
 {
-	fprintf(outfile, "\\special{pa %d %d}", x, y);
+	fprintf(gpoutfile, "\\special{pa %d %d}", x, y);
 	return;
 }
 
 void tpic_flush()
 {
-	fprintf(outfile, "\\special{fp}%%\n");
+	fprintf(gpoutfile, "\\special{fp}%%\n");
 	return;
 }
 
 void tpic_arc(radius)
 int radius; /* actually, draw a full circle */
 {
-	fprintf(outfile, "\\special{ar 0 0 %d %d 0 7}", radius, radius);
+	fprintf(gpoutfile, "\\special{ar 0 0 %d %d 0 7}", radius, radius);
 	return;
 }
 
 void tpic_shade(grayscale)
 double grayscale;
 {
-	fprintf(outfile, "\\special{sh %f}", grayscale);
+	fprintf(gpoutfile, "\\special{sh %f}", grayscale);
 	return;
 }
 
 void tpic_pen(thickness)
 int thickness;
 {
-	fprintf(outfile, "\\special{pn %d}", thickness);
+	fprintf(gpoutfile, "\\special{pn %d}", thickness);
 	return;
 }
 
 void tpic_dottedflush(interval)
 double interval;
 {
-	fprintf(outfile, "\\special{dt %f}%%\n", interval);
+	fprintf(gpoutfile, "\\special{dt %f}%%\n", interval);
 	return;
 }
 
 void tpic_dashedflush(interval)
 double interval;
 {
-	fprintf(outfile, "\\special{da %f}%%\n", interval);
+	fprintf(gpoutfile, "\\special{da %f}%%\n", interval);
 	return;
 }
 
