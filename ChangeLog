@@ -10,6 +10,11 @@
 	src/unset.c (reset_command): New routine reset_hidden3doptions()
 	called by "set hidden defaults" and also by "reset".
 
+	* term/post.trm (PS_set_font ENHPS_set_font) term/pdf.trm (PDF_set_font)
+	term/svg.trm (SVG_set_font): Do not allow the font to be set to "";
+	interpret font requests of the form ",<size>" as a request to rescale
+	the current font to <size>.
+
 2004-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c (df_show_binary): In fprintf(), use "%f" not "%lf" for

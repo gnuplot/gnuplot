@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.37 2004/09/01 15:53:50 mikulik Exp $
+ * $Id: pdf.trm,v 1.38 2004/09/02 02:53:42 sfeam Exp $
  */
 
 /*------------------------------
@@ -1018,36 +1018,19 @@ PDF_put_text (unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC int
 PDF_set_font (const char *font)
 {
-    if (strlen (font) > 0) {	/* if available, parse the font specification ("fontname,fontsize")*/
-	short index;
-	char *token,
-	    seps[] = ",", *buffer = (char *) malloc (strlen (font) + 1);
 
-	if (buffer == NULL)
-	    return (FALSE);
-	strcpy (buffer, font);
-
-	for (token = strtok (buffer, seps), index = 1;
-	     token != NULL; token = strtok (NULL, seps), index++
-	    ) {
-	    switch (index) {
-	    case 1:
-		strcpy (PDF_fontNameCur, token);
-		break;	/* font name*/
-	    case 2:
-		PDF_fontSizeCur = atoi (token);
-		break;	/* font size*/
-	    default:
-		break;
-	    }
-	}
-
-	free (buffer);
-    } else {			/* otherwise simply reset the default font*/
+    if (!font || !(*font)) {
 	strcpy (PDF_fontNameCur, PDF_fontNameDef);
 	PDF_fontSizeCur = PDF_fontSizeDef;
+    } else {
+	int sep = strcspn(font,",");
+	if (sep > 0) {
+	    strncpy(PDF_fontNameCur,font,sep);
+	    PDF_fontNameCur[sep] = NUL;
+	}
+	if (font[sep] == ',')
+	    sscanf(&(font[sep+1]), "%lf", &PDF_fontSizeCur);
     }
-
 
     PDF_PathClose();
     PDF_SetFont();

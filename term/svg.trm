@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.41 2004/08/24 05:02:54 sfeam Exp $
+ * $Id: svg.trm,v 1.42 2004/09/01 15:53:51 mikulik Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -922,34 +922,18 @@ SVG_put_text (unsigned int x, unsigned int y, const char *str)
 TERM_PUBLIC int
 SVG_set_font (const char *font)
 {
-    if (strlen (font) > 0) {	/* if available, parse the font specification ("fontname,fontsize")*/
-	short index;
-	char *token,
-	    seps[] = ",", *buffer = (char *) malloc (strlen (font) + 1);
 
-	if (buffer == NULL)
-	    return (FALSE);
-	strcpy (buffer, font);
-
-	for (token = strtok (buffer, seps), index = 1;
-	     token != NULL; token = strtok (NULL, seps), index++
-	    ) {
-	    switch (index) {
-	    case 1:
-		strcpy (SVG_fontNameCur, token);
-		break;	/* font name*/
-	    case 2:
-		SVG_fontSizeCur = atoi (token);
-		break;	/* font size*/
-	    default:
-		break;
-	    }
-	}
-
-	free (buffer);
-    } else {			/* otherwise simply reset the default font*/
+    if (!font || !(*font)) {
 	strcpy (SVG_fontNameCur, SVG_fontNameDef);
 	SVG_fontSizeCur = SVG_fontSizeDef;
+    } else {
+	int sep = strcspn(font,",");
+	if (sep > 0) {
+	    strncpy(SVG_fontNameCur, font, sep);
+	    SVG_fontNameCur[sep] = NUL;
+	}
+	if (font[sep] == ',')
+	    sscanf(&(font[sep+1]), "%lf", &SVG_fontSizeCur);
     }
 
     return (TRUE);

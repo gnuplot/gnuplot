@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.132 2004/09/16 15:02:47 sfeam Exp $
+ * $Id: post.trm,v 1.133 2004/09/17 19:21:46 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2275,7 +2275,8 @@ TERM_PUBLIC int
 PS_set_font(const char *font)
 {
     char name[32];
-    int  i,size;
+    int  i;
+    float size;
     size_t sep;
 
     if (!font || !(*font))
@@ -2287,9 +2288,13 @@ PS_set_font(const char *font)
 	if (name[i] == ' ') name[i] = '-';
     size = ps_fontsize;
     if (font[sep] == ',')
-	sscanf (&(font[sep+1]),"%d",&size);
-    PS_RememberFont(name,1);
-    fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
+	sscanf (&(font[sep+1]),"%f",&size);
+    if (sep == 0) {
+	fprintf(gpoutfile,"currentfont %d selectfont\n",(int)(size*PS_SC));
+    } else {
+	PS_RememberFont(name,1);
+	fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,(int)(size*PS_SC));
+    }
     term->v_char = (unsigned int)(size*PS_SC);
     term->h_char = (unsigned int)(size*PS_SC*6/10);
     return TRUE;
@@ -2483,11 +2488,13 @@ ENHPS_set_font(const char *font)
 
     if (*font) {
 	size_t sep = strcspn(font,",");
-	strncpy(ps_enh_font,font,sep);
-	ps_enh_font[sep] = NUL;
+	if (sep > 0) {
+	    strncpy(ps_enh_font,font,sep);
+	    ps_enh_font[sep] = NUL;
+	    PS_RememberFont(ps_enh_font, 1);
+	}
 	ps_enh_fontsize = ps_fontsize;
 	sscanf (font+sep+1,"%d",&ps_enh_fontsize);
-	PS_RememberFont(ps_enh_font, 1);
     } else {
 	/* return to defaults */
 	strcpy(ps_enh_font, ps_font);
