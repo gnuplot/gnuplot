@@ -8568,13 +8568,13 @@
 	but we leaves these files alone for the time being for backwards
 	compatibility.
 
-2000-02-06  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
+2000-02-06  Thomas Henlich  <...>
 
 	* term/post.trm: Some programs complain about "Symbol-Oblique".
 	Use "Symbol" instead, because "Symbol-Oblique" is really just a
 	transformed "Symbol" font.
 
-2000-02-04  Thomas Henlich <Thomas.Henlich@mailbox.tu-dresden.de>
+2000-02-04  Thomas Henlich  <...>
 
 	* term/post.trm: Provides an oblique symbol font, e.g.
 	set xlabel 'b' "Symbol-Oblique" gives an oblique (slanted) beta
