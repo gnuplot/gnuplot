@@ -14,6 +14,10 @@
 	so that if the current linestyle is dashed we can retrace the arrowhead
 	with a solid line. Addresses bug report #963213.
 
+	* term/pslatex.trm (PSLATEX_arrow): Piggyback on PS_arrow to apply
+	the same fix for pslatex.  Any other terminals with dashed lines will
+	have to be fixed separately.
+
 2004-09-13  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* src/datafile.c: Rework the layout of the df_bin_default_columns
