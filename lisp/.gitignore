@@ -1,1 +1,8 @@
 Makefile
+config.log
+config.status
+*.aux
+*.dvi
+*.log
+*.pdf
+*.ps

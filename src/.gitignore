@@ -1,3 +1,4 @@
+.deps
 Makefile
 gnuplot
 gnuplot_x11

@@ -26,6 +26,7 @@ _$*
 *.ln
 core
 # CVS default ignores end
+.deps
 Makefile
 config.cache
 config.h
