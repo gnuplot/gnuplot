@@ -646,6 +646,9 @@ X11 driver program in GNUPLOT_DRIVER_DIR.  The default position used
 for the driver is fixed by the build process, so you should only have
 to set this if you moved gnuplot_x11 away from its original location.
 
+GDFONTPATH is the directory where png terminal searches TrueType fonts.
+You should set it to directory where files like arial.ttf exist.
+    
 GNUPLOT_FONTPATH is used by the postscript driver as search path for
 TrueType fonts.
 
