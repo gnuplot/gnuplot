@@ -1,3 +1,25 @@
+2004-07-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Bugfix: caret position of error messages in multiplot modes was
+	wrong.
+	
+	* src/util.c (current_prompt): New variable holding the currently
+	used prompt string.
+	(PRINT_SPACES_UNDER_PROMPT): Use current_prompt instead of global
+	PROMPT macro.  Use a pointer loop instead of a counter.
+	(PRINT_SPACES_UNDER_PROMPT, PRINT_SPACES_UPTO_TOKEN): Enclosed
+	macro body in do .. while(0).
+	(os_error, int_error, int_warn): Use current_prompt instead of
+	global macro PROMPT.
+
+	* src/util.h (current_prompt): Declare.
+
+	* src/command.h (PROMPT): Moved this global macro into command.c.
+
+	* src/command.c (PROMPT): Moved macro to here.
+	(read_line) [VMS]: Update new global variable current_prompt.
+	(read_line) [!VMS]: Likewise.
+
 2004-07-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Code style changes: get rid of register keywords. Don't put

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.97 2004/07/13 14:11:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.98 2004/07/24 23:51:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -89,6 +89,8 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.97 2004/07/13 14:11:22 b
 #ifdef USE_MOUSE
 # include "mouse.h"
 #endif
+
+#define PROMPT "gnuplot> "
 
 #if (defined(MSDOS) || defined(DOS386)) && defined(__TURBOC__) && !defined(_Windows)
 unsigned _stklen = 16394;        /* increase stack size */
@@ -1794,6 +1796,8 @@ read_line(const char *prompt)
     int more, start = 0;
     char expand_prompt[40];
 
+    current_prompt = prompt;	/* HBB NEW 20040727 */
+
     prompt_desc.dsc$w_length = strlen(prompt);
     prompt_desc.dsc$a_pointer = (char *) prompt;
     strcpy(expand_prompt, "_");
@@ -2440,6 +2444,8 @@ read_line(const char *prompt)
     int start = 0;
     TBOOLEAN more = FALSE;
     int last = 0;
+
+    current_prompt = prompt;	/* HBB NEW 20040727 */
 
 # if !defined(READLINE) && !defined(HAVE_LIBREADLINE)
     if (interactive)

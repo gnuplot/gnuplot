@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.29 2004/06/07 05:33:00 sfeam Exp $
+ * $Id: command.h,v 1.30 2004/07/01 17:10:04 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -39,8 +39,6 @@
 
 #include "gp_types.h"
 #include "stdfn.h"
-
-#define PROMPT "gnuplot> "
 
 extern char *input_line;
 
