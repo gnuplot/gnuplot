@@ -1,5 +1,5 @@
 /*
- * $Id: metafont.trm,v 1.14 1998/04/14 00:17:54 drd Exp $
+ * $Id: metafont.trm,v 1.8 1998/12/15 20:21:41 lhecking Exp $
  */
 
 /* GNUPLOT - metafont.trm */
@@ -105,6 +105,9 @@ TERM_PUBLIC void MF_arrow __PROTO((unsigned int sx, unsigned int sy,
 TERM_PUBLIC void MF_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC void MF_reset __PROTO((void));
 
+/* from util.c */
+extern char *gp_strdup __PROTO((char *));
+
 #define GOT_MF_PROTO
 
 #endif /* TERM_PROTO */
@@ -175,7 +178,8 @@ static struct {
 
 
 
-TERM_PUBLIC void MF_init()
+TERM_PUBLIC void
+MF_init()
 {
     MF_char_code = 0;
     MF_ang = 0;
@@ -203,16 +207,18 @@ picture r[];\n\
     fputs("\
 \ndef put_text(expr ts,xstart,ystart,rot,justification) =\n\
   begingroup\n\
-    text_width:=0;text_height:=0;\n\
+    text_width:=0;text_height:=0;text_depth:=0;\n\
     for ind:=0 step 1 until length(ts)-1:\n\
       dec_num:=ASCII substring (ind,ind+1) of ts;\n\
       if unknown r[dec_num]: dec_num:=32; fi\n\
       if dec_num=32: \n\
         text_width:=text_width+wd[65];\n\
-        text_height:=GPMAX(text_height,ht[65]+dp[65]);\n\
+        text_height:=max(text_height,ht[65]);\n\
+        text_depth:=max(text_depth,dp[65]);\n\
       elseif dec_num>=0: \n\
         text_width:=text_width+wd[dec_num];\n\
-        text_height:=GPMAX(text_height,ht[dec_num]+dp[dec_num]);\n\
+        text_height:=max(text_height,ht[dec_num]);\n\
+        text_depth:=max(text_depth,dp[dec_num]);\n\
       fi\n\
     endfor\n\
     if rot=90:\n\
@@ -220,13 +226,13 @@ picture r[];\n\
       elseif justification=2: ynext:=round(ystart-text_width/2);\n\
       else: ynext:=round(ystart-text_width);\n\
       fi\n\
-      xnext:=xstart+text_height/2;\n\
+      xnext:=xstart+(text_height-text_depth)/2;\n\
     else:\n\
       if justification=1: xnext:=xstart;\n\
       elseif justification=2: xnext:=round(xstart-text_width/2);\n\
       else: xnext:=round(xstart-text_width);\n\
       fi\n\
-      ynext:=ystart-text_height/2;\n\
+      ynext:=ystart-(text_height-text_depth)/2;\n\
     fi\n\
     for ind:=0 step 1 until length(ts)-1:\n\
       dec_num:=ASCII substring (ind,ind+1) of ts;\n\
@@ -265,7 +271,7 @@ else: font_coding_scheme:=\n\
   spanish_shriek=oct\"016\"; spanish_query=oct\"017\"; fi\n\
 font_setup;\n\
 input romanu.mf %Roman uppercase.\n\
-input romanl.mf %Roman lowerrcase.\n\
+input romanl.mf %Roman lowercase.\n\
 input greeku.mf %Greek uppercase.\n\
 input romand.mf %Numerals.\n\
 input romanp.mf %Ampersand, question marks, currency sign.\n\
@@ -326,7 +332,8 @@ arrowhead = (-7pt,-2pt){dir30}..(-6pt,0pt)..\
 }
 
 
-TERM_PUBLIC void MF_graphics()
+TERM_PUBLIC void
+MF_graphics()
 {
     register struct termentry *t = term;
 
@@ -338,13 +345,15 @@ TERM_PUBLIC void MF_graphics()
 }
 
 
-TERM_PUBLIC void MF_text()
+TERM_PUBLIC void
+MF_text()
 {
     fputs("endchar;\n", gpoutfile);
 }
 
 
-TERM_PUBLIC int MF_justify_text(mode)
+TERM_PUBLIC int
+MF_justify_text(mode)
 enum JUSTIFY mode;
 {
     MF_justify = mode;
@@ -352,7 +361,8 @@ enum JUSTIFY mode;
 }
 
 
-TERM_PUBLIC int MF_text_angle(ang)
+TERM_PUBLIC int
+MF_text_angle(ang)
 int ang;
 {
     if (ang > 0)
@@ -363,7 +373,8 @@ int ang;
 }
 
 
-TERM_PUBLIC void MF_linetype(linetype)
+TERM_PUBLIC void
+MF_linetype(linetype)
 int linetype;
 {
     if (linetype >= 8)
@@ -383,7 +394,8 @@ int linetype;
 }
 
 
-TERM_PUBLIC void MF_move(x, y)
+TERM_PUBLIC void
+MF_move(x, y)
 unsigned int x, y;
 {
     MF_last_x = x;
@@ -393,7 +405,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void MF_vector(x, y)
+TERM_PUBLIC void
+MF_vector(x, y)
 unsigned int x, y;
 {
     if (MF_is_solid) {
@@ -452,7 +465,8 @@ unsigned int x, y;
 }
 
 
-TERM_PUBLIC void MF_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+MF_arrow(sx, sy, ex, ey, head)
 unsigned int sx, sy, ex, ey;
 TBOOLEAN head;
 {
@@ -469,15 +483,24 @@ TBOOLEAN head;
 }
 
 
-TERM_PUBLIC void MF_put_text(x, y, str)
+TERM_PUBLIC void
+MF_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     int i, j = 0;
+    char *text;
 
-    for (i = 0; i < strlen(str); i++)
-	if (str[i] == '"')
-	    str[i] = '\'';	/* Replace " with ' */
+    /* ignore empty strings */
+    if (!str || !*str)
+	return;
+
+    /* F***. why do drivers need to modify string args? */
+    text = gp_strdup(str);
+
+    for (i = 0; i < strlen(text); i++)
+	if (text[i] == '"')
+	    text[i] = '\'';	/* Replace " with ' */
     switch (MF_justify) {
     case LEFT:
 	j = 1;
@@ -490,11 +513,13 @@ char *str;
 	break;
     }
     fprintf(gpoutfile, "put_text(\"%s\",%da,%db,%d,%d);\n",
-	    str, x, y, MF_ang, j);
+	    text, x, y, MF_ang, j);
+    free(text);
 }
 
 
-TERM_PUBLIC void MF_reset()
+TERM_PUBLIC void
+MF_reset()
 {
     fputs("end.\n", gpoutfile);
 }
@@ -530,7 +555,7 @@ START_HELP(mf)
 "?term mf",
 "?mf",
 "?metafont",
-" The `mf` terminal driver creates a input file to the METAFONT program.  Thus a",
+" The `mf` terminal driver creates an input file to the METAFONT program.  Thus a",
 " figure may be used in the TeX document in the same way as is a character.",
 "",
 " To use a picture in a document, the METAFONT program must be run with the",
@@ -541,7 +566,7 @@ START_HELP(mf)
 "",
 " The text support is based on a METAFONT character set.  Currently the",
 " Computer Modern Roman font set is input, but the user is in principal free to",
-" chose whatever fonts he or she needs.  The METAFONT source files for the",
+" choose whatever fonts he or she needs.  The METAFONT source files for the",
 " chosen font must be available.  Each character is stored in a separate",
 " picture variable in METAFONT.  These variables may be manipulated (rotated,",
 " scaled etc.) when characters are needed.  The drawback is the interpretation",

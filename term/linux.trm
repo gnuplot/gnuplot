@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.8 1998/11/25 21:07:06 lhecking Exp $
+ * $Id: linux.trm,v 1.8.2.1 1999/08/19 14:17:16 lhecking Exp $
  *
  */
 
@@ -94,14 +94,14 @@ TERM_PUBLIC void LINUX_resume __PROTO((void));
 static int linux_vmode = G1024x768x256;		/* default mode */
 static int vgacolor[] = { 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
 static int graphics_on = FALSE;
-vga_modeinfo *modeinfo;
+static vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
-int LINUX_graphics_allowed;
+int LINUX_graphics_allowed; /* also used in vgagl.trm */
 extern void drop_privilege();
 extern void take_privilege();
 
-typedef (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
+typedef int (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
 static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
 				linux_line_func_ptr line_func));
@@ -128,8 +128,21 @@ LINUX_setup(void)
 	pclose(pipe);
 	line[strlen(line) - 1] = '\0';
 	if (strcmp(line, "/dev/console") == 0 ||
-	    (strncmp(line, "/dev/tty", 8) == 0 && isdigit(line[8])))
+	    (strncmp(line, "/dev/tty", 8) == 0
+	     && isdigit((unsigned char) line[8]))) {
 	    LINUX_graphics_allowed = TRUE;
+	} else {
+	    /* check for socket name as set for example by `screen' */
+	    char* sty = getenv("STY");
+	    if (sty) {
+		int n1, n2;
+		if (3 == sscanf(sty, "%d.tty%d.%s", &n1, &n2, line)) {
+		    /* we could check here, if host is the
+		     * same as gethostname() returns. */
+		    LINUX_graphics_allowed = TRUE;
+		}
+	    }
+	}
     }
     if (LINUX_graphics_allowed) {
 	take_privilege();
@@ -147,7 +160,7 @@ TERM_PUBLIC
 void LINUX_options()
 {
     if (!LINUX_graphics_allowed) {
-	int_error("Linux terminal driver not available",NO_CARET);
+	int_error("Linux terminal driver not available", NO_CARET);
     }
     fprintf(stderr, "%s\n", vga_getmodename(linux_vmode));
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.1.2.2 2000/10/20 19:05:11 lhecking Exp $
+ * $Id: epslatex.trm,v 1.1.2.3 2000/11/10 12:46:32 lhecking Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -68,19 +68,17 @@ TERM_PUBLIC void EPSL_fillbox __PROTO((int style, unsigned int x1, unsigned int 
 TERM_PUBLIC void EPSL_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void EPSL_pointsize __PROTO((double ptsize));
 
-/* The PM3D code is unused and unsupported in 3.7.x! It's here so that
- * only one copy needs to be maintained.
- */
-
 #ifdef PM3D
-TERM_PUBLIC int EPSL_make_palette(t_sm_palette *);
-TERM_PUBLIC void EPSL_previous_palette(void);
-TERM_PUBLIC void EPSL_set_color(double);
-TERM_PUBLIC void EPSL_filled_polygon(int, gpiPoint *);
+/* Not needed --- PS terminal version reused:
+TERM_PUBLIC int EPSL_make_palette __PROTO((t_sm_palette *));
+TERM_PUBLIC void EPSL_previous_palette __PROTO((void));
+TERM_PUBLIC void EPSL_set_color __PROTO((double));
+*/
+TERM_PUBLIC void EPSL_filled_polygon __PROTO((int, gpiPoint *));
 #endif
 
-/* changed to 50, but gs now renders terribly slowly to display (x11alpha) !! */
 #define EPSL_SC (50)		/* scale is 1pt = 10 units */
+/* changed to 50, but gs now renders terribly slowly to display (x11alpha) !! */
 #define EPSL_POINT_TYPES 8	/* never used! */
 #define EPSL_XOFF	72	/* page offset in pts */
 #define EPSL_YOFF	72
@@ -104,6 +102,10 @@ TERM_PUBLIC void EPSL_filled_polygon(int, gpiPoint *);
 #define EPSL_FLUSH_PATH \
     if (EPSL_path_count) {fputs("Gpstroke\n",gpoutfile); EPSL_path_count = 0; EPSL_relative_ok = FALSE;}
 
+/* From version.c */
+extern char gnuplot_version[];
+extern char gnuplot_patchlevel[];
+
 static char EPSL_font[MAX_ID_LEN + 1] = "default";	/* name of font */
 static int EPSL_fontsize = 11;	/* size of font in pts */
 
@@ -114,395 +116,395 @@ static int EPSL_path_count = 0;	/* count of lines in path */
 static int EPSL_ang = 0;	/* text angle */
 
 static enum JUSTIFY EPSL_justify = LEFT;	/* text is flush left */
-/*     static int x = 0; */
+/* static int x = 0; */
 
 /* for testing */
 /* 
-   char GPFAR * GPFAR EPSL_header[] = {"(prolog.ps) run\n", NULL}; 
+char GPFAR * GPFAR EPSL_header[] = {"(prolog.ps) run\n", NULL}; 
  */
 
 char GPFAR *GPFAR EPSL_header[] = {
-    " /hpt hpt_ def  \n",
-    " /vpt vpt_ def  \n",
-    " /Gppointsize_ 1 def \n",
-    " /Gplinewidth_ 1 def \n",
-    "  \n",
-    " /ArrowDict 25 dict def  \n",
-    "  \n",
-    " /M /moveto load def  \n",
-    " /L /lineto load def  \n",
-    " /R /rmoveto load def  \n",
-    " /V /rlineto load def  \n",
-    " /ED { exch def} bind def  \n",
-    "  \n",
-    " /Atan {/atan load stopped {pop pop 0} if } def  \n",
-    " /Div {dup 0 eq { pop } { div } ifelse } def  \n",
-    " /Pyth {dup mul exch dup mul add sqrt} def  \n",
-    "  \n",
-    " %Sizes  \n",
-    " /Gpsetlinewidth  \n",
-    " { \n",
-    "   dup \n",
-    " %  /Gplinewidth_ ED %save \n",
-    "   Gplinewidth mul setlinewidth \n",
-    " } def  \n",
-    "  \n",
-    " /Gpsetpointsize   \n",
-    " {  \n",
-    "   dup  \n",
-    "   /Gppointsize_ ED %save \n",
-    "   dup  \n",
-    "   vpt_ mul /vpt ED \n",
-    "   hpt_ mul /hpt ED  \n",
-    " } def  \n",
-    "      \n",
-    " %Color  \n",
-    " /SetHsbColor { Color {sethsbcolor} {pop pop pop} ifelse } def  \n",
-    " /SetCmykColor { Color {setcmykcolor} {pop pop pop pop} ifelse } def  \n",
-    " /SimpleSetColor {6 div 1 1 SetHsbColor} def  \n",
-    " /Black {0 0 0 0 SetCmykColor} def  \n",
-    " /Red {0 SimpleSetColor} def  \n",
-    " /Blue {1 1 0 0 SetCmykColor} def  \n",
-    " /Cyan {1 0 0 0 SetCmykColor} def  \n",
-    " /Magenta {0 1 0 0 SetCmykColor} def \n",
-    "  \n",
-    " %Stroking  \n",
-    " /PathLength@ % z = z + sqrt{(x-xlast)^2 + (y-ylast)^2}  \n",
-    "  {  \n",
-    "    /z   \n",
-    "    z  \n",
-    "    y ylast sub  \n",
-    "    x xlast sub  \n",
-    "    Pyth  \n",
-    "    add  \n",
-    "    def   \n",
-    "    /ylast y def  \n",
-    "    /xlast x def  \n",
-    "  } def  \n",
-    "      \n",
-    "  /PathLength  \n",
-    "  {  \n",
-    "    flattenpath  \n",
-    "    /z 0 def  \n",
-    "    { %move  \n",
-    "      /ystart ED  \n",
-    "      /xstart ED  \n",
-    "      /xlast xstart def  \n",
-    "      /ylast ystart def  \n",
-    "    }  \n",
-    "    { %line  \n",
-    "      /y ED  \n",
-    "      /x ED  \n",
-    "      PathLength@  \n",
-    "    }  \n",
-    "    { %curve  \n",
-    "    }  \n",
-    "    { %close  \n",
-    "      /x xstart def  \n",
-    "      /y ystart def  \n",
-    "      PathLength@   \n",
-    "    }  \n",
-    "    /pathforall load  \n",
-    "    stopped {pop pop pop pop} if  \n",
-    "    z  \n",
-    "  } def  \n",
-    "    \n",
-    " %dotsep DotLine  \n",
-    " /DotLine   \n",
-    " {  \n",
-    "   PathLength /b ED   \n",
-    "   /z ED   \n",
-    "   /y currentlinewidth def   \n",
-    "   /z y z add def   \n",
-    "   [ 0 b b z Div round Div dup 0 le { pop 1 } if] 0 setdash   \n",
-    "   1 setlinecap  \n",
-    " } def  \n",
-    "  \n",
-    " /DashLine   \n",
-    "  {  \n",
-    "    PathLength /b ED   \n",
-    "    /x ED   \n",
-    "    /y ED   \n",
-    "    /z y x add def   \n",
-    "    b y sub z Div round z mul y add b exch Div \n",
-    "    dup  \n",
-    "    y mul /y ED   \n",
-    "    x mul /x ED   \n",
-    "    x 0 gt y 0 gt and   \n",
-    "    { [ y x ] 0 }  \n",
-    "    { [ 1 0 ] 0 }  \n",
-    "    ifelse  \n",
-    "    setdash  \n",
-    "  } def  \n",
-    "  \n",
-    " /DashLineTwo \n",
-    "  {  \n",
-    "    PathLength /b ED   \n",
-    "    /u ED \n",
-    "    /v ED \n",
-    "    /x ED   \n",
-    "    /y ED \n",
-    "    /z y x add u add v add def   \n",
-    "    b y sub z Div round z mul y add b exch Div \n",
-    "    dup  \n",
-    "    y mul /y ED   \n",
-    "    x mul /x ED   \n",
-    "    x 0 gt y 0 gt and   \n",
-    "    { [ y x v u] 0 }  \n",
-    "    { [ 1 0 ] 0 }  \n",
-    "    ifelse  \n",
-    "    setdash  \n",
-    "  } def  \n",
-    "      \n",
-    "  \n",
-    " /DotLineStroke   \n",
-    " {  \n",
-    "   gsave  \n",
-    "     Dashed {currentlinewidth 2 mul DotLine} if  \n",
-    "     stroke  \n",
-    "   grestore  \n",
-    " } def  \n",
-    "    \n",
-    " /SolidLineStroke  \n",
-    " {  \n",
-    "   gsave  \n",
-    "     [] 0 setdash  \n",
-    "     stroke  \n",
-    "   grestore  \n",
-    " } def  \n",
-    "    \n",
-    " /DashLineStroke  \n",
-    " {  \n",
-    "   gsave   \n",
-    "     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul DashLine} if  \n",
-    "     stroke  \n",
-    "   grestore  \n",
-    " } def  \n",
-    "   \n",
-    " /DashDotLineStroke  \n",
-    " {  \n",
-    "   gsave   \n",
-    "     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul 0 Gplinewidth 5 mul DashLineTwo} if  \n",
-    "     stroke  \n",
-    "   grestore  \n",
-    " } def  \n",
-    "    \n",
-    " /DashShortLineStroke  \n",
-    " {  \n",
-    "   gsave   \n",
-    "     Dashed {Gplinewidth 4 mul dup DashLine} if  \n",
-    "     stroke  \n",
-    "   grestore  \n",
-    " } def  \n",
-    "    \n",
-    " /ArrowHead  \n",
-    " {   \n",
-    "   currentlinewidth mul add dup 2 div /w ED  \n",
-    "   mul dup /h ED  \n",
-    "   mul /a ED   \n",
-    "   w neg h moveto   \n",
-    "   0 0 L   \n",
-    "   w h L   \n",
-    "   w neg a neg rlineto   \n",
-    "   gsave fill grestore   \n",
-    " } def  \n",
-    "    \n",
-    "  %/DrawArrowHead {1 dup scale 0.2 1.4 50 3 ArrowHead} def  \n",
-    "  %%%%%  \n",
-    "  %inset length dim num  \n",
-    "  %arrowwidth = dim + num*linewidth  \n",
-    "  %arrowlength = length*arrowwidth  \n",
-    "  %arrowinset = width * inset  \n",
-    "    \n",
-    "  /DrawArrowHead {0.2 1.4 Gplinewidth 3 mul 4 ArrowHead} def  \n",
-    "    \n",
-    "  /Arrow  \n",
-    "  {  \n",
-    "    currentpoint  \n",
-    "    4 2 roll  \n",
-    "    ArrowDict  \n",
-    "    begin  \n",
-    "      /@mtrx matrix currentmatrix def  \n",
-    "      gsave  \n",
-    "        2 copy translate  \n",
-    "        2 index sub neg exch  \n",
-    "        3 index sub exch Atan  \n",
-    "        rotate  \n",
-    "        newpath  \n",
-    "        DrawArrowHead  \n",
-    "        @mtrx setmatrix  \n",
-    "        currentpoint  \n",
-    "      grestore  \n",
-    "    end %ArrowDicht  \n",
-    "    lineto  \n",
-    "    Gpstroke  \n",
-    "  } def  \n",
-    "    \n",
-    "  %axis  \n",
-    "  /LTa   \n",
-    "  {  \n",
-    "    Gpstroke      \n",
-    "    newpath  \n",
-    "    0 setgray  \n",
-    "    /Gpstroke {DotLineStroke newpath} def  \n",
-    "  } def  \n",
-    "    \n",
-    "  %border  \n",
-    "  /LTb  \n",
-    "  {  \n",
-    "    Gpstroke      \n",
-    "    newpath  \n",
-    "    0 setgray  \n",
-    "    /Gpstroke {SolidLineStroke newpath} def  \n",
-    "  } def  \n",
-    "    \n",
-    "  /LT0  \n",
-    "  {  \n",
-    "    Gpstroke      \n",
-    "    newpath  \n",
-    "    Red  \n",
-    "    /Gpstroke {SolidLineStroke newpath} def  \n",
-    "  } def  \n",
-    "    \n",
-    "  /LT1  \n",
-    "  {  \n",
-    "    Gpstroke      \n",
-    "    newpath  \n",
-    "    Blue  \n",
-    "    /Gpstroke {DashLineStroke newpath} def  \n",
-    "  } def  \n",
-    "    \n",
-    "  /LT2   \n",
-    "  {  \n",
-    "    Gpstroke  \n",
-    "    newpath  \n",
-    "    Cyan  \n",
-    "    /Gpstroke {DashShortLineStroke newpath} def  \n",
-    "  } def  \n",
-    "  \n",
-    "  /LT3   \n",
-    "  {  \n",
-    "    Gpstroke  \n",
-    "    newpath  \n",
-    "    Magenta  \n",
-    "    /Gpstroke {DashDotLineStroke newpath} def  \n",
-    "  } def  \n",
-    "    \n",
-    "  /Pnt  \n",
-    "  {  \n",
-    "    gsave   \n",
-    "      [] 0 setdash  \n",
-    "      1 setlinecap   \n",
-    "      Gplinewidth Gppointsize_ mul setlinewidth \n",
-    "      M  \n",
-    "      0 0 V  \n",
-    "      stroke  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /DiaPath  \n",
-    "  {  \n",
-    "      [] 0 setdash  \n",
-    "      Gplinewidth setlinewidth  \n",
-    "      2 copy   \n",
-    "      newpath  \n",
-    "      vpt add moveto  \n",
-    "      hpt neg vpt neg rlineto   \n",
-    "      hpt vpt neg rlineto  \n",
-    "      hpt vpt rlineto   \n",
-    "      hpt neg vpt rlineto  \n",
-    "      closepath  \n",
-    "  } def  \n",
-    "    \n",
-    "  /Dia   \n",
-    "  {   \n",
-    "    gsave  \n",
-    "      DiaPath  \n",
-    "      stroke  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /DaF  \n",
-    "  {  \n",
-    "    gsave  \n",
-    "      DiaPath  \n",
-    "      fill  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /Crc  \n",
-    "  {  \n",
-    "    gsave  \n",
-    "      [] 0 setdash  \n",
-    "      Gplinewidth setlinewidth  \n",
-    "      newpath  \n",
-    "      vpt 0.85 mul 0 360 arc  \n",
-    "      closepath  \n",
-    "      stroke  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "        \n",
-    "    \n",
-    "  /Crs  \n",
-    "  {  \n",
-    "    gsave  \n",
-    "      [] 0 setdash  \n",
-    "      Gplinewidth setlinewidth  \n",
-    "      0 setlinecap  \n",
-    "      newpath  \n",
-    "      vpt sub  \n",
-    "      moveto  \n",
-    "      0 vpt 2 mul rlineto  \n",
-    "      hpt vpt neg rmoveto  \n",
-    "      hpt 2 mul neg 0 rlineto  \n",
-    "      stroke  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /CrX  \n",
-    "  {  \n",
-    "  gsave  \n",
-    "   translate  \n",
-    "   45 rotate  \n",
-    "   0 0 Crs  \n",
-    "  grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /CcF  \n",
-    "  {  \n",
-    "    gsave  \n",
-    "      [] 0 setdash  \n",
-    "      Gplinewidth setlinewidth  \n",
-    "      newpath  \n",
-    "      vpt 0.85 mul 0 360 arc  \n",
-    "      closepath  \n",
-    "      fill  \n",
-    "    grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /Box  \n",
-    "  {  \n",
-    "     gsave  \n",
-    "       translate  \n",
-    "       45 rotate  \n",
-    "       0 0 DiaPath  \n",
-    "       stroke  \n",
-    "     grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /BxF  \n",
-    "  {  \n",
-    "     gsave  \n",
-    "       translate  \n",
-    "       45 rotate  \n",
-    "       0 0 DiaPath  \n",
-    "       fill  \n",
-    "     grestore  \n",
-    "  } def  \n",
-    "    \n",
-    "  /Gpstroke {stroke} def  \n",
-    "  1 setlinecap  \n",
-    "  1 setlinejoin \n",
+" /hpt hpt_ def  \n",
+" /vpt vpt_ def  \n",
+" /Gppointsize_ 1 def \n",
+" /Gplinewidth_ 1 def \n",
+"  \n",
+" /ArrowDict 25 dict def  \n",
+"  \n",
+" /M /moveto load def  \n",
+" /L /lineto load def  \n",
+" /R /rmoveto load def  \n",
+" /V /rlineto load def  \n",
+" /ED { exch def} bind def  \n",
+"  \n",
+" /Atan {/atan load stopped {pop pop 0} if } def  \n",
+" /Div {dup 0 eq { pop } { div } ifelse } def  \n",
+" /Pyth {dup mul exch dup mul add sqrt} def  \n",
+"  \n",
+" %Sizes  \n",
+" /Gpsetlinewidth  \n",
+" { \n",
+"   dup \n",
+" %  /Gplinewidth_ ED %save \n",
+"   Gplinewidth mul setlinewidth \n",
+" } def  \n",
+"  \n",
+" /Gpsetpointsize   \n",
+" {  \n",
+"   dup  \n",
+"   /Gppointsize_ ED %save \n",
+"   dup  \n",
+"   vpt_ mul /vpt ED \n",
+"   hpt_ mul /hpt ED  \n",
+" } def  \n",
+"      \n",
+" %Color  \n",
+" /SetHsbColor { Color {sethsbcolor} {pop pop pop} ifelse } def  \n",
+" /SetCmykColor { Color {setcmykcolor} {pop pop pop pop} ifelse } def  \n",
+" /SimpleSetColor {6 div 1 1 SetHsbColor} def  \n",
+" /Black {0 0 0 0 SetCmykColor} def  \n",
+" /Red {0 SimpleSetColor} def  \n",
+" /Blue {1 1 0 0 SetCmykColor} def  \n",
+" /Cyan {1 0 0 0 SetCmykColor} def  \n",
+" /Magenta {0 1 0 0 SetCmykColor} def \n",
+"  \n",
+" %Stroking  \n",
+" /PathLength@ % z = z + sqrt{(x-xlast)^2 + (y-ylast)^2}  \n",
+"  {  \n",
+"    /z   \n",
+"    z  \n",
+"    y ylast sub  \n",
+"    x xlast sub  \n",
+"    Pyth  \n",
+"    add  \n",
+"    def   \n",
+"    /ylast y def  \n",
+"    /xlast x def  \n",
+"  } def  \n",
+"      \n",
+"  /PathLength  \n",
+"  {  \n",
+"    flattenpath  \n",
+"    /z 0 def  \n",
+"    { %move  \n",
+"      /ystart ED  \n",
+"      /xstart ED  \n",
+"      /xlast xstart def  \n",
+"      /ylast ystart def  \n",
+"    }  \n",
+"    { %line  \n",
+"      /y ED  \n",
+"      /x ED  \n",
+"      PathLength@  \n",
+"    }  \n",
+"    { %curve  \n",
+"    }  \n",
+"    { %close  \n",
+"      /x xstart def  \n",
+"      /y ystart def  \n",
+"      PathLength@   \n",
+"    }  \n",
+"    /pathforall load  \n",
+"    stopped {pop pop pop pop} if  \n",
+"    z  \n",
+"  } def  \n",
+"    \n",
+" %dotsep DotLine  \n",
+" /DotLine   \n",
+" {  \n",
+"   PathLength /b ED   \n",
+"   /z ED   \n",
+"   /y currentlinewidth def   \n",
+"   /z y z add def   \n",
+"   [ 0 b b z Div round Div dup 0 le { pop 1 } if] 0 setdash   \n",
+"   1 setlinecap  \n",
+" } def  \n",
+"  \n",
+" /DashLine   \n",
+"  {  \n",
+"    PathLength /b ED   \n",
+"    /x ED   \n",
+"    /y ED   \n",
+"    /z y x add def   \n",
+"    b y sub z Div round z mul y add b exch Div \n",
+"    dup  \n",
+"    y mul /y ED   \n",
+"    x mul /x ED   \n",
+"    x 0 gt y 0 gt and   \n",
+"    { [ y x ] 0 }  \n",
+"    { [ 1 0 ] 0 }  \n",
+"    ifelse  \n",
+"    setdash  \n",
+"  } def  \n",
+"  \n",
+" /DashLineTwo \n",
+"  {  \n",
+"    PathLength /b ED   \n",
+"    /u ED \n",
+"    /v ED \n",
+"    /x ED   \n",
+"    /y ED \n",
+"    /z y x add u add v add def   \n",
+"    b y sub z Div round z mul y add b exch Div \n",
+"    dup  \n",
+"    y mul /y ED   \n",
+"    x mul /x ED   \n",
+"    x 0 gt y 0 gt and   \n",
+"    { [ y x v u] 0 }  \n",
+"    { [ 1 0 ] 0 }  \n",
+"    ifelse  \n",
+"    setdash  \n",
+"  } def  \n",
+"      \n",
+"  \n",
+" /DotLineStroke   \n",
+" {  \n",
+"   gsave  \n",
+"     Dashed {currentlinewidth 2 mul DotLine} if  \n",
+"     stroke  \n",
+"   grestore  \n",
+" } def  \n",
+"    \n",
+" /SolidLineStroke  \n",
+" {  \n",
+"   gsave  \n",
+"     [] 0 setdash  \n",
+"     stroke  \n",
+"   grestore  \n",
+" } def  \n",
+"    \n",
+" /DashLineStroke  \n",
+" {  \n",
+"   gsave   \n",
+"     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul DashLine} if  \n",
+"     stroke  \n",
+"   grestore  \n",
+" } def  \n",
+"   \n",
+" /DashDotLineStroke  \n",
+" {  \n",
+"   gsave   \n",
+"     Dashed {Gplinewidth 8 mul Gplinewidth 5 mul 0 Gplinewidth 5 mul DashLineTwo} if  \n",
+"     stroke  \n",
+"   grestore  \n",
+" } def  \n",
+"    \n",
+" /DashShortLineStroke  \n",
+" {  \n",
+"   gsave   \n",
+"     Dashed {Gplinewidth 4 mul dup DashLine} if  \n",
+"     stroke  \n",
+"   grestore  \n",
+" } def  \n",
+"    \n",
+" /ArrowHead  \n",
+" {   \n",
+"   currentlinewidth mul add dup 2 div /w ED  \n",
+"   mul dup /h ED  \n",
+"   mul /a ED   \n",
+"   w neg h moveto   \n",
+"   0 0 L   \n",
+"   w h L   \n",
+"   w neg a neg rlineto   \n",
+"   gsave fill grestore   \n",
+" } def  \n",
+"    \n",
+"  %/DrawArrowHead {1 dup scale 0.2 1.4 50 3 ArrowHead} def  \n",
+"  %%%%%  \n",
+"  %inset length dim num  \n",
+"  %arrowwidth = dim + num*linewidth  \n",
+"  %arrowlength = length*arrowwidth  \n",
+"  %arrowinset = width * inset  \n",
+"    \n",
+"  /DrawArrowHead {0.2 1.4 Gplinewidth 3 mul 4 ArrowHead} def  \n",
+"    \n",
+"  /Arrow  \n",
+"  {  \n",
+"    currentpoint  \n",
+"    4 2 roll  \n",
+"    ArrowDict  \n",
+"    begin  \n",
+"      /@mtrx matrix currentmatrix def  \n",
+"      gsave  \n",
+"        2 copy translate  \n",
+"        2 index sub neg exch  \n",
+"        3 index sub exch Atan  \n",
+"        rotate  \n",
+"        newpath  \n",
+"        DrawArrowHead  \n",
+"        @mtrx setmatrix  \n",
+"        currentpoint  \n",
+"      grestore  \n",
+"    end %ArrowDicht  \n",
+"    lineto  \n",
+"    Gpstroke  \n",
+"  } def  \n",
+"    \n",
+"  %axis  \n",
+"  /LTa   \n",
+"  {  \n",
+"    Gpstroke      \n",
+"    newpath  \n",
+"    0 setgray  \n",
+"    /Gpstroke {DotLineStroke newpath} def  \n",
+"  } def  \n",
+"    \n",
+"  %border  \n",
+"  /LTb  \n",
+"  {  \n",
+"    Gpstroke      \n",
+"    newpath  \n",
+"    0 setgray  \n",
+"    /Gpstroke {SolidLineStroke newpath} def  \n",
+"  } def  \n",
+"    \n",
+"  /LT0  \n",
+"  {  \n",
+"    Gpstroke      \n",
+"    newpath  \n",
+"    Red  \n",
+"    /Gpstroke {SolidLineStroke newpath} def  \n",
+"  } def  \n",
+"    \n",
+"  /LT1  \n",
+"  {  \n",
+"    Gpstroke      \n",
+"    newpath  \n",
+"    Blue  \n",
+"    /Gpstroke {DashLineStroke newpath} def  \n",
+"  } def  \n",
+"    \n",
+"  /LT2   \n",
+"  {  \n",
+"    Gpstroke  \n",
+"    newpath  \n",
+"    Cyan  \n",
+"    /Gpstroke {DashShortLineStroke newpath} def  \n",
+"  } def  \n",
+"  \n",
+"  /LT3   \n",
+"  {  \n",
+"    Gpstroke  \n",
+"    newpath  \n",
+"    Magenta  \n",
+"    /Gpstroke {DashDotLineStroke newpath} def  \n",
+"  } def  \n",
+"    \n",
+"  /Pnt  \n",
+"  {  \n",
+"    gsave   \n",
+"      [] 0 setdash  \n",
+"      1 setlinecap   \n",
+"      Gplinewidth Gppointsize_ mul setlinewidth \n",
+"      M  \n",
+"      0 0 V  \n",
+"      stroke  \n",
+"    grestore  \n",
+"  } def  \n",
+"    \n",
+"  /DiaPath  \n",
+"  {  \n",
+"      [] 0 setdash  \n",
+"      Gplinewidth setlinewidth  \n",
+"      2 copy   \n",
+"      newpath  \n",
+"      vpt add moveto  \n",
+"      hpt neg vpt neg rlineto   \n",
+"      hpt vpt neg rlineto  \n",
+"      hpt vpt rlineto   \n",
+"      hpt neg vpt rlineto  \n",
+"      closepath  \n",
+"  } def  \n",
+"    \n",
+"  /Dia   \n",
+"  {   \n",
+"    gsave  \n",
+"      DiaPath  \n",
+"      stroke  \n",
+"    grestore  \n",
+"  } def  \n",
+"    \n",
+"  /DaF  \n",
+"  {  \n",
+"    gsave  \n",
+"      DiaPath  \n",
+"      fill  \n",
+"    grestore  \n",
+"  } def  \n",
+"    \n",
+"  /Crc  \n",
+"  {  \n",
+"    gsave  \n",
+"      [] 0 setdash  \n",
+"      Gplinewidth setlinewidth  \n",
+"      newpath  \n",
+"      vpt 0.85 mul 0 360 arc  \n",
+"      closepath  \n",
+"      stroke  \n",
+"    grestore  \n",
+"  } def  \n",
+"        \n",
+"    \n",
+"  /Crs  \n",
+"  {  \n",
+"    gsave  \n",
+"      [] 0 setdash  \n",
+"      Gplinewidth setlinewidth  \n",
+"      0 setlinecap  \n",
+"      newpath  \n",
+"      vpt sub  \n",
+"      moveto  \n",
+"      0 vpt 2 mul rlineto  \n",
+"      hpt vpt neg rmoveto  \n",
+"      hpt 2 mul neg 0 rlineto  \n",
+"      stroke  \n",
+"    grestore  \n",
+"  } def  \n",
+"    \n",
+"  /CrX  \n",
+"  {  \n",
+"  gsave  \n",
+"   translate  \n",
+"   45 rotate  \n",
+"   0 0 Crs  \n",
+"  grestore  \n",
+"  } def  \n",
+"    \n",
+"  /CcF  \n",
+"  {  \n",
+"    gsave  \n",
+"      [] 0 setdash  \n",
+"      Gplinewidth setlinewidth  \n",
+"      newpath  \n",
+"      vpt 0.85 mul 0 360 arc  \n",
+"      closepath  \n",
+"      fill  \n",
+"    grestore  \n",
+"  } def  \n",
+"    \n",
+"  /Box  \n",
+"  {  \n",
+"     gsave  \n",
+"       translate  \n",
+"       45 rotate  \n",
+"       0 0 DiaPath  \n",
+"       stroke  \n",
+"     grestore  \n",
+"  } def  \n",
+"    \n",
+"  /BxF  \n",
+"  {  \n",
+"     gsave  \n",
+"       translate  \n",
+"       45 rotate  \n",
+"       0 0 DiaPath  \n",
+"       fill  \n",
+"     grestore  \n",
+"  } def  \n",
+"    \n",
+"  /Gpstroke {stroke} def  \n",
+"  1 setlinecap  \n",
+"  1 setlinejoin \n",
     NULL
 };
 
@@ -566,7 +568,8 @@ EPSL_options()
 
     sprintf(term_options, "%s %s \"%s\" %d",
 	    EPSL_color ? "color" : "monochrome",
-	    EPSL_solid ? "solid" : "dashed", EPSL_font, EPSL_fontsize);
+	    EPSL_solid ? "solid" : "dashed",
+	    EPSL_font, EPSL_fontsize);
 }
 
 
@@ -574,8 +577,10 @@ EPSL_options()
 TERM_PUBLIC void
 EPSL_init()
 {
-    char *dotIndex;
+    char *dotIndex=NULL;
     char *name;
+
+    /* Why is EPSL_header global, and psi1, psi2 not? */
 
     static char GPFAR psi1[] = "%%%%Creator: gnuplot %s patchlevel %s\n\
 %%%%CreationDate: %s";
@@ -592,7 +597,6 @@ Gpdict begin\n\
 
     unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
     int i;
-
     term->xmax = EPSL_XMAX;
     term->ymax = EPSL_YMAX;
     xmin_t = EPSL_XMAX * xoffset / (EPSL_SC);
@@ -600,26 +604,27 @@ Gpdict begin\n\
     ymin_t = EPSL_YMAX * yoffset / (EPSL_SC);
     ymax_t = EPSL_YMAX * (yoffset + ysize) / (EPSL_SC);
 
-    fputs("%%!PS-Adobe-3.0 EPSF-3.0\n",gpoutfile);
+    fputs("%%!PS-Adobe-3.0 EPSF-3.0\n", gpoutfile);
     if (outstr)
-	fprintf(gpoutfile, "%%%%Title: (%s)\n", outstr );
+	fprintf(gpoutfile, "%%%%Title: (%s)\n", outstr);
     time(&now);
-    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel, 
-	    asctime(localtime(&now)));
+    fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel, asctime(localtime(&now)));
 
-    fprintf(gpoutfile,"%%%%BoundingBox: %d %d %d %d\n", 
+    fprintf(gpoutfile, "%%%%BoundingBox: %d %d %d %d\n",
 	    EPSL_XOFF + xmin_t, EPSL_XOFF + ymin_t,
 	    EPSL_XOFF + xmax_t, EPSL_YOFF + ymax_t);
 
     fprintf(gpoutfile, psi2,
 	    EPSL_color ? "true" : "false",
 	    EPSL_solid ? "false" : "true",
-	    (double) EPSL_LW,(double) EPSL_POINTSIZE, (double) EPSL_POINTSIZE);
+	    (double) EPSL_LW, (double) EPSL_POINTSIZE, (double) EPSL_POINTSIZE);
 
-    for ( i=0; EPSL_header[i] != NULL; i++)
-	fprintf(gpoutfile,"%s",EPSL_header[i]);
+    for (i = 0; EPSL_header[i] != NULL; i++)
+	fprintf(gpoutfile, "%s", EPSL_header[i]);
 
-    fputs("end\n%%%%EndProlog\n",gpoutfile);
+    fputs("end\n%%%%EndProlog\n", gpoutfile);
+
+    EPSL_texfile = NULL;
 
     if (outstr && (dotIndex = strrchr(outstr, '.'))) {
 	/* assume file name is ending in ".eps" */
@@ -641,13 +646,16 @@ Gpdict begin\n\
 	name = gp_alloc(dotIndex - outstr + 1, "epslatex temp filename");
 	safe_strncpy(name, outstr, dotIndex - outstr + 1);
 	name[dotIndex - outstr] = 0;
-	fprintf(EPSL_texfile,"\
-%%GNUPLOT: LaTeX picture with Postscript\n\
+	fprintf(EPSL_texfile, "%%GNUPLOT: LaTeX picture with Postscript\n\
 \\begin{picture}(0,0)%%\n\
 \\includegraphics{%s}%%\n\
 \\end{picture}%%\n\
 \\setlength{\\unitlength}{%.4fbp}%%\n", name, 1.0 / EPSL_SC);
     }
+#ifdef PM3D
+    /* to optimize output for postscript terminals family */
+    postscript_gpoutfile = gpoutfile;
+#endif
 }
 
 
@@ -656,13 +664,15 @@ EPSL_graphics()
 {
     static char GPFAR psg1[] = "0 setgray\nnewpath\n";
     struct termentry *t = term;
+
     fprintf(gpoutfile, "\
 Gpdict begin\ngsave\n\
 %d %d translate\n\
-%.4f %.4f scale\n",
+%.4f %.4f scale\n\
+%s",
 	    EPSL_XOFF, EPSL_YOFF,
-	    1.0 / EPSL_SC, 1.0 / EPSL_SC);
-    fprintf(gpoutfile, psg1);
+	    1.0 / EPSL_SC, 1.0 / EPSL_SC,
+	    psg1);
     EPSL_pointsize(pointsize);
     EPSL_linewidth(1.0);
     EPSL_path_count = 0;
@@ -681,7 +691,7 @@ TERM_PUBLIC void
 EPSL_text()
 {
     EPSL_FLUSH_PATH;
-    fputs("grestore\nend\nshowpage\n%%%%EOF\n",gpoutfile);
+    fputs("grestore\nend\nshowpage\n%%%%EOF\n", gpoutfile);
     if (EPSL_texfile) {
 	fputs("\\end{picture}%\n\\endinput\n", EPSL_texfile);
     }
@@ -738,6 +748,7 @@ unsigned int x, y;
     int dx, dy;
     /* Make this semi-dynamic and independent of architecture */
     char abso[5 + 2 * INT_STR_LEN], rel[5 + 2 * INT_STR_LEN];
+
     /*if (EPSL_path_count) {EPSL_FLUSH_PATH}; */
     EPSL_FLUSH_PATH;
     dx = x - EPSL_pen_x;
@@ -782,7 +793,7 @@ unsigned int x, y;
     EPSL_pen_x = x;
     EPSL_pen_y = y;
     /* if (ps_path_count >= 400) {
-       fputs("currentpoint stroke M\n",gpoutfile);
+       fprintf(gpoutfile,"currentpoint stroke M\n");
        ps_path_count = 0;
        }
      */
@@ -793,14 +804,13 @@ EPSL_arrow(xstart, ystart, xend, yend, head)
 unsigned int xstart, ystart, xend, yend;
 TBOOLEAN head;
 {
-    fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend,
-	    head ? "Arrow" : "L Gpstroke");
+    fprintf(gpoutfile, "%d %d M\n%d %d %s\n", xstart, ystart, xend, yend, head ? "Arrow" : "L Gpstroke");
 }
 
 TERM_PUBLIC void
 EPSL_put_text(x, y, str)
-unsigned int x, y;
-char *str;
+    unsigned int x, y;
+    char *str;
 {
     if (EPSL_texfile) {
 	fprintf(EPSL_texfile, "\\put(%d,%d){", x, y);
@@ -808,7 +818,7 @@ char *str;
 	    fputs("\\rotatebox{90}{", EPSL_texfile);
 	}
 	if (((str[0] == '{') || (str[0] == '['))) {
-	    fprintf(gpoutfile, "\\makebox(0,0)%s", str);
+	    fprintf(EPSL_texfile, "\\makebox(0,0)%s", str);
 	} else
 	    switch (EPSL_justify) {
 	    case LEFT:
@@ -868,6 +878,7 @@ unsigned int x, y;
 int number;
 {
     static char GPFAR *GPFAR pointFNS[] = { "Pnt", "Dia", "Crc", "Crs", "CrX", "Box", "DaF", "CcF", "BxF" };
+
     EPSL_FLUSH_PATH;
     if (number < 0)
 	number = -1;		/* negative types are all 'dot' */
@@ -885,212 +896,23 @@ EPSL_fillbox(style, x1, y1, x2, y2)
 int style;
 unsigned int x1, y1, x2, y2;
 {
-    EPSL_FLUSH_PATH;
-
-    fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, x2, y2);
+    /* ULIG: the style parameter is now used for the fillboxes style
+    * (not implemented here), see the documentation */
+    EPSL_FLUSH_PATH fprintf(gpoutfile, "%d %d %d %d BoxFill\n", x1, y1, x2, y2);
 
     EPSL_relative_ok = 0;
     EPSL_linetype_last = -1;
 }
 
-
 #ifdef PM3D
 
-/* implementation of pm3dGetColorValue() in the postscript way.
- * Notice that the description, i.e. the part after %, is important 
- * since it is used in `show pm3d' for displaying the analytical formulae.
-*/
-char *( EPSL_PostScriptColorFormulae[] ) = {
-    "/cF0 {pop 0} bind def\t% 0",
-    "/cF1 {pop 0.5} bind def\t% 0.5",
-    "/cF2 {pop 1} bind def\t% 1",
-    "/cF3 {} bind def\t% x",
-    "/cF4 {dup mul} bind def\t% x^2",
-    "/cF5 {dup dup mul mul} bind def\t% x^3",
-    "/cF6 {dup mul dup mul} bind def\t% x^4",
-    "/cF7 {sqrt} bind def\t% sqrt(x)",
-    "/cF8 {sqrt sqrt} bind def\t% sqrt(sqrt(x))",
-    "/cF9 {90 mul sin} bind def\t% sin(90x)",
-    "/cF10 {90 mul cos} bind def\t% cos(90x)",
-    "/cF11 {0.5 sub abs} bind def\t% |x-0.5|",
-    "/cF12 {2 mul 1 sub dup mul} bind def\t% (2x-1)^2",
-    "/cF13 {180 mul sin} bind def\t% sin(180x)",
-    "/cF14 {180 mul cos abs} bind def\t% |cos(180x)|",
-    "/cF15 {360 mul sin} bind def\t% sin(360x)",
-    "/cF16 {360 mul cos} bind def\t% cos(360x)",
-    "/cF17 {360 mul sin abs} bind def\t% |sin(360x)|",
-    "/cF18 {360 mul cos abs} bind def\t% |cos(360x)|",
-    "/cF19 {720 mul sin abs} bind def\t% |sin(720x)|",
-    "/cF20 {720 mul cos abs} bind def\t% |cos(720x)|",
-    "/cF21 {3 mul} bind def\t% 3x",
-    "/cF22 {3 mul 1 sub} bind def\t% 3x-1",
-    "/cF23 {3 mul 2 sub} bind def\t% 3x-2",
-    "/cF24 {3 mul 1 sub abs} bind def\t% |3x-1|",
-    "/cF25 {3 mul 2 sub abs} bind def\t% |3x-2|",
-    "/cF26 {1.5 mul .5 sub} bind def\t% (3x-1)/2",
-    "/cF27 {1.5 mul 1 sub} bind def\t% (3x-2)/2",
-    "/cF28 {1.5 mul .5 sub abs} bind def\t% |(3x-1)/2|",
-    "/cF29 {1.5 mul 1 sub abs} bind def\t% |(3x-2)/2|",
-    "/cF30 {0.32 div 0.78125 sub} def\t% x/0.32-0.78125",
-    "/cF31 {2 mul 0.84 sub} def\t% 2*x-0.84",
-    "/cF32 {dup 0.42 le {4 mul} {dup 0.92 le {-2 mul 1.84 add} {0.08 div 11.5 sub}
- ifelse} ifelse } def\t% 4x;1;-2x+1.84;x/0.08-11.5",
-    "/cF33 {2 mul 0.5 sub abs} def\t% |2*x - 0.5|",
-    "/cF34 {2 mul} def\t% 2*x",
-    "/cF35 {2 mul 0.5 sub} def\t% 2*x - 0.5",
-    "/cF36 {2 mul 1 sub} def\t% 2*x - 1",
-  ""
-};
-
-TERM_PUBLIC int
-EPSL_make_palette (palette)
-t_sm_palette *palette;
-{
-#define R sm_palette.formulaR
-#define G sm_palette.formulaG
-#define B sm_palette.formulaB
-
-    if (palette == NULL) {
-	/* postscript can do continous number of colours */
-	return 0;
-    }
-    
-    /* write header for smooth colours */
-
-    fputs("gsave %% colour palette begin\n",gpoutfile);
-    /* print the definition of R,G,B formulae */
-
-    if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-	fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(R) ]);
-	if (abs(G) != abs(R))
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(G) ]);
-	if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ abs(B) ]);
-    } else {
-	/* all color formulae are written into the output PostScript file */
-	int i = 0;
-	while ( *(EPSL_PostScriptColorFormulae[i]) )
-	    fprintf(gpoutfile, "%s\n",EPSL_PostScriptColorFormulae[ i++ ]);
-    }
-
-    /* now print something like
-       /g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
-    */
-    fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
-	    (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB) ? "true" : "false"
-	);
-    fputs("  /g {dup ",gpoutfile);
-    if (R < 0)
-	fputs("1 exch sub ",gpoutfile); /* negate */
-    fprintf(gpoutfile,"cF%i exch dup ", abs(R));
-    if (G < 0)
-	fputs("1 exch sub ",gpoutfile); /* negate */
-    fprintf(gpoutfile,"cF%i exch ", abs(G));
-    if (R<0 || G<0 || B<0)
-	fputs("\n\t",gpoutfile);
-    if (B < 0)
-	fputs("1 exch sub ",gpoutfile); /* negate */
-
-    fprintf(gpoutfile,"\
-cF%i \
-setrgbcolor} bind def\n\
-  /h {rlineto rlineto rlineto fill} bind def\n\
-  /G {currentrgbcolor 3 index stroke g} bind def\n\
-  /H {h setrgbcolor pop} bind def\n\
-  /F {rlineto fill setrgbcolor pop} bind def\n\
-}{\n\
-  /g {currentgray exch stroke setgray} bind def\n\
-  /h {rlineto rlineto rlineto fill setgray} bind def\n\
-  /G {currentgray exch stroke g} bind def\n\
-  /H {h setgray} bind def\n\
-  /F {rlineto fill setgray} bind def\n\
-} ifelse\n\
-/N {newpath moveto} def\n\
-/f {rlineto fill} bind def\n",
-	    abs(B));
- 
-    return 0;
-#undef R
-#undef G
-#undef B
-}
-
-
-#if 0
-/* caching of color value removed; won't be so efficient for z=const 
- * surfaces/map, but will save a lot of headache (linetype changes 
- * color, for instance)
- */
-double pm3d_last_color;
-/* last choosen colour */
-
-double pm3d_ps_color;
-/* keep here the last set color */
-#endif
-
 TERM_PUBLIC void
-EPSL_set_color (gray)
-double gray;
+EPSL_filled_polygon(points, corners)
+    int points;
+    gpiPoint *corners;
 {
-    /* map [0;1] to interval [16;255] */
-    /* Note: command G puts on stack current colour/gray values to be restored 
-     * afterwards!
-     */
-#if 0
-    pm3d_ps_color = gray;
-    pm3d_last_color = gray;
-#endif
-
-    /* printing the gray with 4 digits and without the leading 0 ... saving
-     * space
-     */
-    if (gray <= 0)
-	fputs("0 G ",gpoutfile);
-    else
-	if (gray >= 1)
-	    fputs("1 G ",gpoutfile);
-	else {
-	    char s[15];
-	    gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
-	    sprintf(s,"%.4g G ",gray);
-	    if (s[0] == '0' && s[1] == '.')
-		fprintf(gpoutfile, "%s", &(s[1]));
-	    else
-		fprintf(gpoutfile, "%s", s);
-	}
-}
-
-TERM_PUBLIC void
-EPSL_filled_polygon (points, corners)
-int points;
-gpiPoint *corners;
-{
-    int i;
-    /* produce lines like:
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
-       .9335 g 9055 29350 N 695 0 V 0 564 V -695 0 f
-    */
-    fprintf(gpoutfile, "%i %i N", corners[0].x, corners[0].y);
-    if (points == 4) /* shorter version */
-        fprintf(gpoutfile, " %i %i %i %i %i %i H\n",
-		corners[3].x-corners[2].x, corners[3].y-corners[2].y,
-		corners[2].x-corners[1].x, corners[2].y-corners[1].y,
-		corners[1].x-corners[0].x, corners[1].y-corners[0].y
-	    );
-    else {
-        for (i = 1; i < points-1; i++)
-            fprintf(gpoutfile, " %i %i V",
-		    corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-        fprintf(gpoutfile, " %i %i F\n",
-		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
-    }
+    PS_filled_polygon(points, corners);
     EPSL_relative_ok = FALSE;
-}
-
-TERM_PUBLIC void
-EPSL_previous_palette()
-{
-    fputs("grestore %% colour palette end\n",gpoutfile);
 }
 
 #endif /* PM3D */
@@ -1098,33 +920,29 @@ EPSL_previous_palette()
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
-#ifndef GOT_POST_PROTO
-#define TERM_PROTO_ONLY
-#include "post.trm"
-#undef TERM_PROTO_ONLY
-#endif
 
 TERM_TABLE_START(epslatex_driver)
-    "epslatex", "LaTeX (Text) and encapsulated PostScript",
-    EPSL_XMAX, EPSL_YMAX, EPSL_VCHAR, EPSL_HCHAR,
-    EPSL_VTIC, EPSL_HTIC, EPSL_options, EPSL_init, EPSL_reset,
-    EPSL_text, null_scale, EPSL_graphics, EPSL_move, EPSL_vector,
-    EPSL_linetype, EPSL_put_text, EPSL_text_angle,
-    EPSL_justify_text, EPSL_point, EPSL_arrow, EPSL_set_font, EPSL_pointsize,
-    0 /*flags */ , 0 /*suspend */ , 0 /*resume */ ,
-    EPSL_fillbox, EPSL_linewidth
+"epslatex",
+"LaTeX (Text) and encapsulated PostScript",
+EPSL_XMAX, EPSL_YMAX, EPSL_VCHAR, EPSL_HCHAR,
+EPSL_VTIC, EPSL_HTIC, EPSL_options, EPSL_init, EPSL_reset,
+EPSL_text, null_scale, EPSL_graphics, EPSL_move, EPSL_vector,
+EPSL_linetype, EPSL_put_text, EPSL_text_angle,
+EPSL_justify_text, EPSL_point, EPSL_arrow, EPSL_set_font, EPSL_pointsize,
+0 /*flags */ , 0 /*suspend */ , 0 /*resume */ , EPSL_fillbox, EPSL_linewidth
 #ifdef PM3D
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0		/* no mouse support for postscript */
+, 0, 0, 0, 0, 0 /* no mouse support for epslatex */
 #endif
-    , EPSL_make_palette, EPSL_previous_palette,	/* write grestore */
-    EPSL_set_color, EPSL_filled_polygon
-#endif /* PM3D */
+, PS_make_palette,
+PS_previous_palette,
+PS_set_color,
+EPSL_filled_polygon
+#endif
 TERM_TABLE_END(epslatex_driver)
 
 #undef LAST_TERM
 #define LAST_TERM epslatex_driver
-
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 

@@ -1,6 +1,5 @@
-/* Hey Emacs this is -*- C -*-
- * 
- * $Id: pstricks.trm,v 1.12 1999/01/12 19:17:05 lhecking Exp $
+/* 
+ * $Id: pstricks.trm,v 1.12.2.1 1999/08/19 14:15:55 lhecking Exp $
  */
 
 /* GNUPLOT - pstricks.trm */
@@ -110,21 +109,19 @@ TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 #ifndef TERM_PROTO_ONLY
 #ifdef TERM_BODY
 static void PSTRICKS_endline __PROTO((void));
-static char *PSTRICKS_hack_text __PROTO((char s[]));
+static char *PSTRICKS_hack_text __PROTO((char *s));
 
-static float PSTRICKS_xscale = 1.0;
-static float PSTRICKS_yscale = 1.0;
 static float PSTRICKS_posx;
 static float PSTRICKS_posy;
-enum JUSTIFY PSTRICKS_justify = LEFT;
+static enum JUSTIFY PSTRICKS_justify = LEFT;
 static int PSTRICKS_angle = 0;
 
 #define	PSTRICKS_TINY_DOT	0.00025		/* A tiny dot */
 
 /* POINTS */
 #define PSTRICKS_POINT_TYPES 12	/* we supply more point types */
-static char *PSTRICKS_points[] =
-{
+
+static char *PSTRICKS_points[] = {
     "\\PST@Diamond",
     "\\PST@Plus",
     "\\PST@Square",
@@ -141,8 +138,8 @@ static char *PSTRICKS_points[] =
 
 /* LINES */
 #define PSTRICKS_NUMLINES 6	/* number of linetypes below */
-static char *PSTRICKS_lines[] =
-{
+
+static char *PSTRICKS_lines[] = {
     "\\PST@Border",
     "\\PST@Axes",
     "\\PST@Solid",
@@ -173,7 +170,8 @@ static int PSTRICKS_linecount = 0;
 static int PST_hack_text = TRUE;	/* Hack text on */
 static int PST_unit_plot = FALSE;	/* Unit-sized plot off */
 
-TERM_PUBLIC void PSTRICKS_options()
+TERM_PUBLIC void
+PSTRICKS_options()
 {
     if (!END_OF_COMMAND) {
 	if (almost_equals(c_token, "no$hacktext")) {
@@ -186,7 +184,8 @@ TERM_PUBLIC void PSTRICKS_options()
     }
 }
 
-TERM_PUBLIC void PSTRICKS_init()
+TERM_PUBLIC void
+PSTRICKS_init()
 {
     PSTRICKS_posx = PSTRICKS_posy = 0;
     PSTRICKS_linetype(-1);
@@ -194,7 +193,8 @@ TERM_PUBLIC void PSTRICKS_init()
 }
 
 
-TERM_PUBLIC void PSTRICKS_graphics()
+TERM_PUBLIC void
+PSTRICKS_graphics()
 {
     fputs("\
 % Define new PST objects, if not already defined\n\
@@ -248,19 +248,25 @@ TERM_PUBLIC void PSTRICKS_graphics()
 
     /* Set the scaled plot size, if it's not a unit plot */
     if (!PST_unit_plot) {
-	fprintf(gpoutfile, "\\psset{unit=%fin,xunit=%fin,yunit=%fin}\n",
-		5.0 * PSTRICKS_xscale,
-		5.0 * PSTRICKS_xscale,
-		3.0 * PSTRICKS_yscale);
+	fputs("\\psset{unit=5.0in,xunit=5.0in,yunit=3.0in}\n", gpoutfile);
     }
-    fputs("\
-\\pspicture(0,0)(1,1)\n\
+    /* HBB 20001027: fix bounding box bug by letting the currently
+     * active 'size' and 'offset' setting influence the area used by
+     * the picture environment */
+    fprintf(gpoutfile, "\
+\\pspicture(%f,%f)(%f,%f)\n\
 \\ifx\\nofigs\\undefined\n\
-\\catcode`@=11\n\n", gpoutfile);
+\\catcode`@=11\n\n",
+	    xoffset,
+	    yoffset,
+	    (xoffset + xsize),
+	    (yoffset + ysize)
+    );
 }
 
 
-TERM_PUBLIC void PSTRICKS_text()
+TERM_PUBLIC void
+PSTRICKS_text()
 {
     PSTRICKS_endline();
     fputs("\
@@ -270,7 +276,8 @@ TERM_PUBLIC void PSTRICKS_text()
 }
 
 
-TERM_PUBLIC void PSTRICKS_linetype(linetype)
+TERM_PUBLIC void
+PSTRICKS_linetype(linetype)
 int linetype;
 {
     PSTRICKS_endline();
@@ -283,7 +290,8 @@ int linetype;
 
 
 
-TERM_PUBLIC void PSTRICKS_move(x, y)
+TERM_PUBLIC void
+PSTRICKS_move(x, y)
 unsigned int x;
 unsigned int y;
 {
@@ -294,7 +302,8 @@ unsigned int y;
 }
 
 
-TERM_PUBLIC void PSTRICKS_point(x, y, number) /* version of line_and_point */
+TERM_PUBLIC void
+PSTRICKS_point(x, y, number) /* version of line_and_point */
 unsigned x;
 unsigned y;
 int number;
@@ -318,7 +327,8 @@ int number;
 }
 
 
-TERM_PUBLIC void PSTRICKS_vector(ux, uy)
+TERM_PUBLIC void
+PSTRICKS_vector(ux, uy)
 unsigned ux;
 unsigned uy;
 {
@@ -326,7 +336,8 @@ unsigned uy;
 	PSTRICKS_inline = TRUE;
 
 	/* Start a new line. This depends on line type */
-	fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+	fprintf(gpoutfile, "%s(%.4f,%.4f)\n",
+		PSTRICKS_lines[PSTRICKS_type + 2],
 		PSTRICKS_posx, PSTRICKS_posy);
 	PSTRICKS_linecount = 1;
     } else {
@@ -336,8 +347,9 @@ unsigned uy;
 	 * If they are too long then latex will choke.
 	 */
 	if (PSTRICKS_linecount++ >= PSTRICKS_LINEMAX) {
-/*	    fprintf(gpoutfile, "\n"); */
-	    fprintf(gpoutfile, "%s(%.4f,%.4f)\n", PSTRICKS_lines[PSTRICKS_type + 2],
+	    /* fprintf(gpoutfile, "\n"); */
+	    fprintf(gpoutfile, "%s(%.4f,%.4f)\n",
+		    PSTRICKS_lines[PSTRICKS_type + 2],
 		    PSTRICKS_posx, PSTRICKS_posy);
 	    PSTRICKS_linecount = 1;
 	}
@@ -347,7 +359,8 @@ unsigned uy;
     fprintf(gpoutfile, "(%.4f,%.4f)\n", PSTRICKS_posx, PSTRICKS_posy);
 }
 
-static void PSTRICKS_endline()
+static void
+PSTRICKS_endline()
 {
     if (PSTRICKS_inline) {
 	putc('\n', gpoutfile);
@@ -356,7 +369,8 @@ static void PSTRICKS_endline()
 }
 
 
-TERM_PUBLIC void PSTRICKS_arrow(sx, sy, ex, ey, head)
+TERM_PUBLIC void
+PSTRICKS_arrow(sx, sy, ex, ey, head)
 unsigned int sx;
 unsigned int sy;
 unsigned int ex;
@@ -390,8 +404,9 @@ TBOOLEAN head;
  */
 
 
-static char *PSTRICKS_hack_text(s)
-char s[];
+static char *
+PSTRICKS_hack_text(s)
+char *s;
 {
     double value;
     char *ends;
@@ -465,7 +480,8 @@ char s[];
     return hack;
 }
 
-TERM_PUBLIC void PSTRICKS_put_text(x, y, str)
+TERM_PUBLIC void
+PSTRICKS_put_text(x, y, str)
 unsigned int x;
 unsigned int y;
 char str[];
@@ -520,21 +536,24 @@ char str[];
 
 
 
-TERM_PUBLIC int PSTRICKS_justify_text(mode)
+TERM_PUBLIC int
+PSTRICKS_justify_text(mode)
 enum JUSTIFY mode;
 {
     PSTRICKS_justify = mode;
     return (TRUE);
 }
 
-TERM_PUBLIC int PSTRICKS_text_angle(ang)
+TERM_PUBLIC int
+PSTRICKS_text_angle(ang)
 int ang;
 {
     PSTRICKS_angle = ang;
     return (TRUE);
 }
 
-TERM_PUBLIC void PSTRICKS_reset()
+TERM_PUBLIC void
+PSTRICKS_reset()
 {
     PSTRICKS_endline();
     PSTRICKS_posx = PSTRICKS_posy = 0;

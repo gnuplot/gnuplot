@@ -1,6 +1,5 @@
 /*
- * $Id: regis.trm,v 1.18 1998/04/14 00:18:06 drd Exp $
- *
+ * $Id: regis.trm,v 1.6 1998/11/25 21:07:58 lhecking Exp $
  */
 
 /* GNUPLOT - regis.trm */
@@ -56,18 +55,18 @@ register_term(regis)
 
 
 #ifdef TERM_PROTO
-TERM_PUBLIC void REGISinit __PROTO((void));
-TERM_PUBLIC void REGISgraphics __PROTO((void));
-TERM_PUBLIC void REGISinit __PROTO((void));
-TERM_PUBLIC void REGISgraphics __PROTO((void));
-TERM_PUBLIC void REGIStext __PROTO((void));
-TERM_PUBLIC void REGISlinetype __PROTO((int linetype));
-TERM_PUBLIC void REGISmove __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void REGISvector __PROTO((unsigned int x, unsigned int y));
-TERM_PUBLIC void REGISput_text __PROTO((unsigned int x, unsigned int y, char *str));
-TERM_PUBLIC int REGIStext_angle __PROTO((int ang));
-TERM_PUBLIC void REGISreset __PROTO((void));
-TERM_PUBLIC void REGISoptions __PROTO((void));
+TERM_PUBLIC void REGIS_init __PROTO((void));
+TERM_PUBLIC void REGIS_graphics __PROTO((void));
+TERM_PUBLIC void REGIS_init __PROTO((void));
+TERM_PUBLIC void REGIS_graphics __PROTO((void));
+TERM_PUBLIC void REGIS_text __PROTO((void));
+TERM_PUBLIC void REGIS_linetype __PROTO((int linetype));
+TERM_PUBLIC void REGIS_move __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void REGIS_vector __PROTO((unsigned int x, unsigned int y));
+TERM_PUBLIC void REGIS_put_text __PROTO((unsigned int x, unsigned int y, char *str));
+TERM_PUBLIC int REGIS_text_angle __PROTO((int ang));
+TERM_PUBLIC void REGIS_reset __PROTO((void));
+TERM_PUBLIC void REGIS_options __PROTO((void));
 
 #define REGISXMAX 800
 #define REGISYMAX 440
@@ -95,7 +94,8 @@ static int REGIS16color = FALSE;
 
 static int REGISang = 0;
 
-TERM_PUBLIC void REGISinit()
+TERM_PUBLIC void
+REGIS_init()
 {
     fputs("\033[r\033[24;1H", gpoutfile);
     /*     1     2
@@ -106,7 +106,8 @@ TERM_PUBLIC void REGISinit()
 
 
 /* thanks to calmasd!dko (Dan O'Neill) for adding S(E) for vt125s */
-TERM_PUBLIC void REGISgraphics()
+TERM_PUBLIC void
+REGIS_graphics()
 {
     fputs("\033[2J\033P1pS(C0)S(E)T(A0)\n", gpoutfile);
     /*     1      2      3    4   5
@@ -116,11 +117,12 @@ TERM_PUBLIC void REGISgraphics()
      * 4. clear graphics screen
      * 5. character set option.
      */
-    (void) REGIStext_angle(0);	/* select text size and angle */
+    (void) REGIS_text_angle(0);	/* select text size and angle */
 }
 
 
-TERM_PUBLIC void REGIStext()
+TERM_PUBLIC void
+REGIS_text()
 {
     fputs("\033\\\033[24;1H", gpoutfile);
     /*     1    2
@@ -130,7 +132,8 @@ TERM_PUBLIC void REGIStext()
 }
 
 
-TERM_PUBLIC void REGISlinetype(linetype)
+TERM_PUBLIC void
+REGIS_linetype(linetype)
 int linetype;
 {
     /* This will change color in order G,R,B,G-dot,R-dot,B-dot */
@@ -165,14 +168,16 @@ int linetype;
 ** NGB 9/13/93
 */
 
-TERM_PUBLIC void REGISmove(x, y)
+TERM_PUBLIC void
+REGIS_move(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "P[%d,%d]\n", x, REGISYLAST - y);
 }
 
 
-TERM_PUBLIC void REGISvector(x, y)
+TERM_PUBLIC void
+REGIS_vector(x, y)
 unsigned int x, y;
 {
     fprintf(gpoutfile, "v[]v[%d,%d]\n", x, REGISYLAST - y);
@@ -181,14 +186,15 @@ unsigned int x, y;
 
 
 /* put_text and text_angle by rjl */
-TERM_PUBLIC void REGISput_text(x, y, str)
+TERM_PUBLIC void
+REGIS_put_text(x, y, str)
 unsigned int x, y;
 char *str;
 {
     if (REGISang == 1)
-	REGISmove(x - REGISVCHAR / 2 - 1, y);
+	REGIS_move(x - REGISVCHAR / 2 - 1, y);
     else
-	REGISmove(x, y + REGISVCHAR / 2 - 1);
+	REGIS_move(x, y + REGISVCHAR / 2 - 1);
     (void) putc('T', gpoutfile);
     (void) putc('\'', gpoutfile);
     while (*str) {
@@ -202,7 +208,8 @@ char *str;
 }
 
 
-TERM_PUBLIC int REGIStext_angle(ang)
+TERM_PUBLIC int
+REGIS_text_angle(ang)
 int ang;
 {
     REGISang = ang;
@@ -214,12 +221,14 @@ int ang;
 }
 
 
-TERM_PUBLIC void REGISreset()
+TERM_PUBLIC void
+REGIS_reset()
 {
     fputs("\033[2J\033[24;1H", gpoutfile);
 }
 
-TERM_PUBLIC void REGISoptions()
+TERM_PUBLIC void
+REGIS_options()
 {
     int i = 0;
     struct value a;
@@ -238,9 +247,9 @@ TERM_PUBLIC void REGISoptions()
 TERM_TABLE_START(regis_driver)
     "regis", "REGIS graphics language",
     REGISXMAX, REGISYMAX, REGISVCHAR, REGISHCHAR,
-    REGISVTIC, REGISHTIC, REGISoptions, REGISinit, REGISreset,
-    REGIStext, null_scale, REGISgraphics, REGISmove, REGISvector,
-    REGISlinetype, REGISput_text, REGIStext_angle,
+    REGISVTIC, REGISHTIC, REGIS_options, REGIS_init, REGIS_reset,
+    REGIS_text, null_scale, REGIS_graphics, REGIS_move, REGIS_vector,
+    REGIS_linetype, REGIS_put_text, REGIS_text_angle,
     null_justify_text, line_and_point, do_arrow, set_font_null
 TERM_TABLE_END(regis_driver)
 
