@@ -170,7 +170,9 @@ example.
 
 Here's a brief description of what each term.c function does:
 
-_options()  Called when terminal type is selected.  
+_options()  Called when terminal type is selected.  Also called by
+'set termoption'. The two cases can be distinguished because on entry
+the value of c_token is either 3 or 2, respectively.
 This procedure should parse options on the command line.  A list of the 
 currently selected options should be stored in term_options[] in a form 
 suitable for use with the set term command.  term_options[] is used by 
@@ -379,6 +381,15 @@ _previous_palette() - Release the palette that the above routine
    own palette. Terminals that use only one palette for the whole plot
    don't need this routine.
 
+The following 3 functions are required for drivers that support enhanced
+text mode. They are called only by the term.c routine enhanced_recursion().
+
+_enhanced_open()   - initialize state variables to process an enhanced text
+		     fragment
+_enhanced_writec() - write (or buffer) a single character of the text fragment
+                     being constructed
+_enhanced_flush()  - finish processing of previous fragment and write it to
+                     the output stream
 
 The following function should be conditioned on IMAGE_DRIVER.  See also:
 src/README for notes about image support.
@@ -430,6 +441,9 @@ routines are made:
       _justify_text(mode)
       _set_font(font)
       _put_text(x,y,text)
+         _enhanced_open(fontname,fontsize,base,width,show,overprint)
+	 _enhanced_writec(char)
+	 _enhanced_flush()
       _arrow(sx,sy,ex,ey)
       _image(M,N,image,corner,color_mode)
     _text()

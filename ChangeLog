@@ -1,3 +1,8 @@
+2005-04-06  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/README:  Show call order of enhanced text mode entry points
+	and mention that 'set termoption' calls into term->options().
+
 2005-04-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c: Allow 'set termoption delay <n>' to change the interframe
