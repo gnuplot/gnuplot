@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pm.trm,v 1.42 2005/05/24 20:54:03 sfeam Exp $
+ * $Id: pm.trm,v 1.43 2005/06/15 09:53:50 mikulik Exp $
  */
 
 /* GNUPLOT - pm.trm */
@@ -115,42 +115,8 @@ TERM_PUBLIC void PM_filled_polygon (int, gpiPoint *);
 #define INCL_DOSMISC
 #define INCL_DOSMODULEMGR
 #include <os2.h>
-
-
-/* graphics commands */
-#define SET_GRAPHICS    'G'
-#define SET_TEXT        'E'
-#define SET_LINE        'L'
-#define SET_FILLBOX	'B'
-#define SET_LINEWIDTH   'W'
-#define SET_ANGLE       'A'
-#define SET_JUSTIFY     'J'
-#define SET_POINTMODE   'D'
-#define SET_FONT        'F'
-#define SET_OPTIONS     'O'
-#define SET_SPECIAL     'o'  /* used for special options */
-#define SET_MENU	'#'
-#define GR_QUERY        'Q'
-#define GR_SUSPEND      'E'	/*'s' */
-#define GR_RESUME       'r'
-#define GR_MOVE         'M'
-#define GR_DRAW         'V'
-#define GR_RESET        'R'
-#define GR_TEXT         'T'
-#define GR_PAUSE        'P'
-#define GR_HELP         'H'
-#define GR_MOUSECAPABLE 'm' /* PM: say gnupmdrv we are mouseable */
-#define PUT_TMPTEXT	't'
-#define SET_RULER	'u'
-#define SET_CURSOR	'c'
-#define SET_CLIPBOARD	'l'
-#ifdef PM3D
-#define GR_MAKE_PALETTE    'p'
-#define GR_RELEASE_PALETTE 'e'
-#define GR_SET_COLOR       'C'
-#define GR_SET_RGBCOLOR	   'b'
-#define GR_FILLED_POLYGON  'f'
-#endif
+#include "os2/pm_msgs.h"
+	
 #define PM_nopts 1
 
 /* path for pm program */

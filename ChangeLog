@@ -1,5 +1,10 @@
 2005-01-15  Bastian Maerkisch  <bmaerkisch@web.de>
 
+	* term/pm.trm src/os2/gclient.c src/os/pm_msgs.h: Move definition of
+	message codes for communication between gnuplot (pm.trm) and gnupmdrv
+	(gclient.c) to a new separate file pm_msgs.h. Replace hard-wired codes
+	in gclient.c by symbolic names.
+
 	* term/pm.trm (PM_set_font): Fix font selection for pm terminal in case
 	of empty font string.
 

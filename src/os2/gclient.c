@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.37 2005/03/26 22:06:51 sfeam Exp $";
+static char RCSid[]="$Id: gclient.c,v 1.38 2005/06/15 09:47:16 mikulik Exp $";
 #endif
 
 /****************************************************************************
@@ -101,6 +101,7 @@ static char RCSid[]="$Id: gclient.c,v 1.37 2005/03/26 22:06:51 sfeam Exp $";
 #include <time.h>
 #include "term_api.h"
 #include "gnupmdrv.h"
+#include "pm_msgs.h"
 
 #define GNUPMDRV
 #include "mousecmn.h"
@@ -239,7 +240,7 @@ static int lCharHeight = 465;
 */
 static int useMouse = 0;
 
-/* gnuplot's PM terminal sends 'm' message from its init routine, which
+/* gnuplot's PM terminal sends GR_MOUSECAPABLE message from its init routine, which
    sets the variable below to 1. Then we are sure that we talk to the
    mouseable terminal and can read the mouseable data from the pipe.
    Non-mouseable versions of PM terminal or non-new-gnuplot programs
@@ -265,7 +266,7 @@ static struct {
 HWND hptrDefault, hptrCrossHair, hptrScaling,
     hptrRotating, hptrZooming, hptrCurrent;
 
-// After passing gpPMmenu in PM_pipe and 'G', it seems not to be possible
+// After passing gpPMmenu in PM_pipe and SET_GRAPHICS, it seems not to be possible
 // to update the menu. Thus this flag is set on and menu is updated
 // afterwards.
 struct t_gpPMmenu gpPMmenu;
@@ -512,7 +513,7 @@ EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
     MousePosToViewport(&mx, &my, mx, my);
 #endif
 
-    /* Graphics part, 'G', required to update menu */
+    /* Graphics part, SET_GRAPHICS, required to update menu */
     if (gpPMmenu_update_req)
 	gpPMmenu_update();
 
@@ -1133,7 +1134,7 @@ WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 
 	cmd_length = strlen(cmd_prefix) + strlen(helpfile);
         gnuplot_path = getenv("GNUPLOT");
-	if (gnuplot_path != NULL) 
+	if (gnuplot_path != NULL)
 	    cmd_length += strlen(gnuplot_path) + 1;
 
 	cmd = (char *)malloc( cmd_length );
@@ -2192,7 +2193,7 @@ ReadGnu(void* arg)
 	    if (breakDrawing) {
 		/* PM: drawing has been stopped(by Ctrl-C)... */
 		hps = 0;	/*     ...thus drawings go to nowhere... */
-		if (*buff == 'E') { /* ...unless 'plot finished' command */
+		if (*buff == SET_TEXT) { /* ...unless 'plot finished' command */
 		    POINTL p;
 		    hps = hpsScreen;  /* drawings back to screen */
 		    breakDrawing = 0;
@@ -2208,7 +2209,7 @@ ReadGnu(void* arg)
 	    }
 
             switch (*buff) {
-	    case 'G' :    /* enter graphics mode */
+	    case SET_GRAPHICS :    /* enter graphics mode */
 	    {
 		if (tidDraw != 0) {
 		    /* already drawing - stop it */
@@ -2235,7 +2236,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'Q' :     /* query terminal info */
+	    case GR_QUERY :     /* query terminal info */
 		/* mouseable gnupmdrv sends greetings to mouseable PM terminal */
 		if (mouseTerminal) {
 		    int i=0xABCD;
@@ -2246,7 +2247,7 @@ ReadGnu(void* arg)
 		DosWrite(hRead, &lCharHeight, sizeof(int), &cbR);
 		break;
 
-	    case 'E' :     /* leave graphics mode(graph completed) */
+	    case SET_TEXT :     /* leave graphics mode(graph completed) */
 		if (bPath) {
 		    GpiEndPath(hps);
 		    GpiStrokePath(hps, 1, 0);
@@ -2260,7 +2261,7 @@ ReadGnu(void* arg)
 		WinPostMsg(hApp, WM_GNUPLOT, 0L, 0L);
 		break;
 
-	    case 'R' :
+	    case GR_RESET :
 		/* gnuplot has reset drivers, allow user to kill this */
 		WinPostMsg(hSysMenu,
 			   MM_SETITEMATTR,
@@ -2274,7 +2275,7 @@ ReadGnu(void* arg)
 		}
 		break;
 
-	    case 'r' :
+	    case GR_RESUME :
 	    {
 		/* resume after multiplot */
 		DosRequestMutexSem(semHpsAccess,(ULONG) SEM_INDEFINITE_WAIT);
@@ -2290,8 +2291,8 @@ ReadGnu(void* arg)
 		/* suspend after multiplot */
 		break;
 
-	    case 'M' :   /* move */
-	    case 'V' :   /* draw vector */
+	    case GR_MOVE :   /* move */
+	    case GR_DRAW :   /* draw vector */
 #ifdef PM3D
 	    {
 		LONG curr_color = -1;
@@ -2347,7 +2348,7 @@ ReadGnu(void* arg)
 #endif
 	    break;
 
-	    case 'P' :   /* pause */
+	    case GR_PAUSE  :   /* pause */
 	    {
 		int len;
 
@@ -2379,7 +2380,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'T' :   /* write text */
+	    case GR_TEXT :   /* write text */
 		/* read x, y, len */
 		if (bPath) {
 		    GpiEndPath(hps);
@@ -2428,7 +2429,7 @@ ReadGnu(void* arg)
 
 		    ptl.x = (LONG) (x + multLineHor * sw + multLineVert * (lVOffset / 4));
 		    ptl.y = (LONG) (y + multLineVert * sw - multLineHor * (lVOffset / 4));
-		    
+		
 		    GpiSetBackMix(hps, BM_LEAVEALONE);
                     if (bEnhanced)
                         CharStringAt(hps, ptl.x, ptl.y, strlen(str) , str);
@@ -2442,11 +2443,11 @@ ReadGnu(void* arg)
 		    break;
 		}
 
-	    case 'J' :   /* justify */
+	    case SET_JUSTIFY :   /* justify */
 		BufRead(hRead, &jmode, sizeof(int), &cbR);
 		break;
 
-	    case 'A' :   /* text angle */
+	    case SET_ANGLE :   /* text angle */
 	    {
 		int ta, t1;
 		GRADIENTL grdl;
@@ -2467,7 +2468,7 @@ ReadGnu(void* arg)
 		    multLineHor = 1;
 		    multLineVert = 0;
 		    break;
-		case  90: 
+		case  90:
 		    grdl.x =  0L;
 		    grdl.y =  1L;
 		    multLineHor = 0;
@@ -2499,7 +2500,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'L' :   /* line type */
+	    case SET_LINE :   /* line type */
 	    {
 		int lt, col;
 
@@ -2537,7 +2538,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'B' :   /* fill box */
+	    case SET_FILLBOX :   /* fill box */
 	    {
 		int style;
 		unsigned int x, y, w, h;
@@ -2601,7 +2602,7 @@ ReadGnu(void* arg)
 			/* style == 0 or unknown --> fill with background color */
 			GpiSetMix(hps, FM_OVERPAINT);
 			GpiSetBackMix(hps, BM_OVERPAINT);
-			//GpiSetColor(hps, CLR_BACKGROUND);  // fixes 'with boxes' white on white 
+			//GpiSetColor(hps, CLR_BACKGROUND);  // fixes 'with boxes' white on white
 			GpiSetPattern(hps, PATSYM_SOLID);
 		    }
 		}
@@ -2609,7 +2610,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'W' :   /* line width */
+	    case SET_LINEWIDTH :   /* line width */
 	    {
 		int lw;
 
@@ -2624,7 +2625,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'D' :   /* points mode */
+	    case SET_POINTMODE :   /* points mode */
 	    {
 		int lt;
 
@@ -2652,7 +2653,7 @@ ReadGnu(void* arg)
 	    }
 	    break;
 
-	    case 'F' :   /* set font */
+	    case SET_FONT :   /* set font */
 	    {
 		int len;
 		char *str;
@@ -2683,7 +2684,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'O' :   /* set options */
+	    case SET_OPTIONS :   /* set options */
 	    {
 		int len;
 		char *str;
@@ -2711,7 +2712,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'o' :   /* set special options */
+	    case SET_SPECIAL :   /* set special options */
 	    {
 		char opt, param;
 		static int prev_bEnhanced = 0;
@@ -2738,7 +2739,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 't' :
+	    case PUT_TMPTEXT :
 	    {  /* put_tmptext(int i, char c[]) term API */
 		/* i = 0 at statusline,
 		   1,2: at corners of zoom box, with \r separating text */
@@ -2770,9 +2771,8 @@ ReadGnu(void* arg)
 	    /* Implementation problems(I haven't understood that from
 	     * .INF doc): what is the difference between
 	     * GpiCreateLogColorTable and GpiCreatePalette? */
-	    case 'p':
+	    case GR_MAKE_PALETTE :
 	    {
-		/* GR_MAKE_PALETTE */
 		char c;
 		int i;
 		int smooth_colors;
@@ -2823,7 +2823,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'e': /* GR_RELEASE_PALETTE */
+	    case GR_RELEASE_PALETTE :
 #if 0 /* REMOVE THIS ROUTINE COMPLETELY! */
 		if (pm3d_hpal) {
 		    GpiDeletePalette(pm3d_hpal);
@@ -2832,7 +2832,8 @@ ReadGnu(void* arg)
 		/* GpiSelectPalette(hps, pm3d_hpal_old); */
 #endif
 		break;
-	    case 'C': /* GR_SET_COLOR */
+
+	    case GR_SET_COLOR :
 	    {
 		unsigned char c;
 
@@ -2841,7 +2842,8 @@ ReadGnu(void* arg)
 		pm3d_rgb_color = -1;
 		break;
 	    }
-	    case 'b': /* GR_SET_RGBCOLOR */
+
+	    case GR_SET_RGBCOLOR :
 	    {
 		int i;
 		BufRead(hRead, &i, sizeof(i), &cbR);
@@ -2849,7 +2851,8 @@ ReadGnu(void* arg)
 		pm3d_color = -1;
 		break;
 	    }
-	    case 'f': /* GR_FILLED_POLYGON */
+
+	    case GR_FILLED_POLYGON :
 	    {
 		int points, x,y, i;
 		LONG curr_color = GpiQueryColor(hps);
@@ -2879,7 +2882,7 @@ ReadGnu(void* arg)
 	    }
 #endif /* PM3D */
 
-	    case 'u' : { /* set_ruler(int x, int y) term API: x<0 switches ruler off */
+	    case SET_RULER : { /* set_ruler(int x, int y) term API: x<0 switches ruler off */
 		int x, y;
 
 		BufRead(hRead, &x, sizeof(x), &cbR);
@@ -2896,7 +2899,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'c' : { /* set_cursor(int c, int x, int y) term API */
+	    case SET_CURSOR : { /* set_cursor(int c, int x, int y) term API */
 		int c, x, y;
 
 		BufRead(hRead, &c, sizeof(x), &cbR);
@@ -2946,7 +2949,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case 'l' : {  /* set_clipboard(const char s[]) term API */
+	    case SET_CLIPBOARD : {  /* set_clipboard(const char s[]) term API */
 		int len;
 		char *s;
 
@@ -2958,7 +2961,7 @@ ReadGnu(void* arg)
 		break;
 	    }
 
-	    case '#' :   /* update menu according to the gnuplot core
+	    case SET_MENU :   /* update menu according to the gnuplot core
 			  * settings, e.g.(un)checking menu items */
 		if (mouseTerminal) {
 		    /* we are connected to mouseable terminal */
@@ -2973,7 +2976,7 @@ ReadGnu(void* arg)
 		}
 		break;
 
-	    case 'm' :
+	    case GR_MOUSECAPABLE :
 		/* notification of being connected to a mouse-enabled terminal */
 		mouseTerminal = 1;
 		break;
@@ -3797,7 +3800,7 @@ UpdateStatusLine(HPS hps, char *text)
 
 
 /*
- * Graphics part 'G' or anything else required to update menu according to
+ * Graphics part SET_GRAPHICS or anything else required to update menu according to
  * the items in gpPMmenu
  */
 static void
