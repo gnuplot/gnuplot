@@ -1,3 +1,43 @@
+1998-12-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Remove entry about truncation of script files on VMS.
+
+	* 0README: Update monash ftp site details.
+
+	* Makefile.in, makefile.all: Add INSTALL.gnu to ETC.
+
+	* configure: Regenerated.
+
+	* configure.in: Add binaries location to configuration summary.
+	Fix compiling under HP-UX.
+
+	* graphics.c: Run through indent.
+
+	* plot.h: Add XOPEN M_LN10 constant.
+
+	* set.c(set_one): Use M_LN10.
+
+	* specfun.c: Revise Lucas' changes and bugfix.
+
+1998-12-07  Juergen v. Hagen  <vonHagen@engr.psu.edu>
+
+	* 0BUGS, 0INSTALL, 0README, NEWS, makefile.mgw, makefile.unx: Updated.
+
+1998-12-07  Lucas Hart  <hartl@ucs.orst.edu>
+
+	* internal.c: More verbose error messages.
+
+	* standard.c(f_log10): Use M_LN10 constant.
+
+	* specfun.c: Expand GP_ERF/ERFC macros inline and add error checking.
+
+	* strftime.c: TEST_STRFTIME code was incomplete.
+
+	* syscfg.h: Add HELPFILE for VMS.
+
+	* demo/mgr.dem: Modify the acspline demo to better illustrate the
+	capabilities of the option.
+
 1998-12-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0FAQ, 0README, NEWS, configure.in, makefile.dj2, makefile.os9,

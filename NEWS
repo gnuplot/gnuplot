@@ -1,12 +1,26 @@
 What's new in 3.7 ?
 
+from 315 to 348
+  makefile.mgw contributed by HBB for compilation under MinGW32
+  "-" means interactive on command line and load file
+  gnuplot no longer faults on Alpha in prob.dem
+  margin and label-positioning works with set ?label offset
+  set ?tics auto resets the tic-marks
+  line widths get copied in M$ Windows terminal when using the
+     copy->clipboard option
+  PSLATEX-terminal: resolves problems with german.sty when " is
+     active character
+  the terminal list gets paged through your preferred pager
+  
+  and many more.
+
 See docs/old/ChangeLog.old and ChangeLog for a list of changes
 
   As always, there are outstanding contributed patches
  that I haven't yet installed (sorry), and half-promises for features
  that I've not had a chance to fulfill.
 
-in this release
+in this release (somwhere between 315 and 347)
   try to improve (and not break too badly) portability
   multiple X11 windows have number in window title, and active window
    has crosshair cursor

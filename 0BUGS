@@ -19,10 +19,7 @@
     Also, writeback with log scales writes back the log of the min/max
     [Status: unknown]
 
- 4. system commands in a script file on VMS get truncated to the
-    length of the last interactive command entered.  Workaround :
-     load 'script.gnu'   # a long comment to pad the line
-    [Status: unknown]
+ 4. 
 
  5. "\n" does not work in the format for the tics in splot
 
@@ -172,7 +169,7 @@ BUGS outstanding
   illegal trailing tab on fig output
   minor tics missing on HPUX ?
   terminal settings get propagated when terminal is changed (now fixed ?)
-  set ?range [] writeback is broken ? certainly for logscales.
+  set ?range [] writeback is broken for logscales.
   source file copyrights are out of date - what should go on new files ?
   to be documented - ms-windows cannot do wide, dashed lines (well, win32 can,
   but...)

@@ -1,33 +1,31 @@
 # To compile gnuplot for WinNT and Win95
 #
-# Make file for microsoft nmake with visual c++ on NT
-# run this on the command line with "nmake -f makefile.nt"
-#
 # Changed for use with MinGW32 by HBB
+# compile the package with make -f makefile.mgw
+# the make utility for MinGW32 can be obtained the MinGW sites
+# 
+# you also need some un*x commands like rm and cp
+# you need the M$ SDK to compile the resource file win/wgnuplot.rc
 #
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
 TOP = .
 
-
-# /c  means don't link
-# /I  means extra include directory
-# /Fm means produce link map
-# /Od means suppress optimizations (esp. for debug)
-# /O2 mans optimize for speed
-# /Zi mean prepare for codeview
-# /G5 means optimize code for pentium
-# /G4 means optimize code for 486
-# /G3 means optimize code for 386
+# -c  means don't link
+# -I  means extra include directory
+# -O2 means optimize for speed
+# -g  means prepare for debugging
+# -mpentium means optimise for Pentium processor
+# -mpentiumpro means optimize for Pentium II and Pro procesors
 
 CC = gcc
 LD = gcc
 CFLAGS = -g -O2 -I$(TOP) -D_Windows -DNO_GIH -DHAVE_STRNICMP -DREADLINE -DGP_INLINE=inline -DHAVE_SLEEP -DANSI_C -DHAVE_GETCWD -DNEAR=
-LDFLAGS = -g # -v -Wl,--verbose
+LDFLAGS = -g
 
 RM = rm -f
-CP = cp -p
+CP = copy
 
 #You'll need the MS Platform SDK, for now. Enter its path here
 MSSDK = f:/mssdk
@@ -38,14 +36,12 @@ RC  = $(MSSDK)/bin/rc
 # see other terminal defines in term.h
 TERMFLAGS = -I$(TOP)/term
 
-
 # macros for makefile.all
 O=o
 T=term/
 D=docs/
 L=docs/latex/
 M=demo/
-
 
 default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
 
@@ -62,7 +58,6 @@ WINDOWS = makefile.win makefile.nt README.win win/wcommon.h \
 	win/winmain.c win/wmenu.c win/wpause.c win/wprinter.c \
 	win/wresourc.h win/wtext.c win/wtext.h win/geticon.c \
 	docs/doc2rtf.c term/win.trm win/grpicon.ico win/texticon.ico
-
 
 # default rules
 .SUFFIXES: .exe .o .c
@@ -153,4 +148,3 @@ realclean: veryclean
 veryclean: clean
 	$(RM) wgnuplot.exe wgnuplot.hlp wgnuplot.mnu wgnuplot.gid
 	$(RM) demo/binary[123] demo/fit.log demo/soundfit.par
-

@@ -42,10 +42,12 @@ gnuplot_x11                     PREFIX/bin
 gnuplot.1                       PREFIX/man/man1
 gnuplot.gih                     PREFIX/share
 
-   The only file where the runtime location is defined at compile time is
-gnuplot.gih. This is important if gnuplot is not installed by running
-'make install'. The default path for the help library, gnuplot.gih, can be
-controlled in several different ways:
+   The only files where the runtime location is defined at compile time are
+gnuplot.gih and show.c. This is important if gnuplot is not installed by running
+'make install'.
+
+   The default path for the help library, gnuplot.gih, can be controlled in
+several different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
@@ -59,6 +61,24 @@ controlled in several different ways:
 
  o at execution time by specifying the helpfile with the environment
    variable GNUHELP (see "Environment Variables" below).
+
+   The default location of the executables can be controlled in different
+ways:
+
+ o with configure's --prefix= option, eg.
+   ./configure --prefix=/gnuplot
+   Attention: This affects the location of *all* installed files!
+
+ o with configure's --bindir= option, eg.
+   ./configure --bindir='/gnuplot/bin'
+
+ o at make time, eg.
+   make GNUPLOT_BINDIR='/gnuplot/bin'
+
+   If the executables are not installed in the default location, files
+written by the `save' command cannot be used as scripts on Un*x platforms.
+There is no way to specify the location of the executables during
+runtime. Other platforms are not affected by this. 
 
    The gnuplot demo files are not installed by default. If desired, they
 should be copied manually to a location of choice.
@@ -79,6 +99,9 @@ $ CC=c89 ./configure
 (C shell)
 $ setenv CC c89
 $ ./configure
+ 
+   Any environment settings for CFLAGS are included into the Makefile,
+so please make sure that these are really needed.
  
    There are several options available for configure that you may want
 to change.  A complete list of options is available through
@@ -211,6 +234,14 @@ Using Borland C++ 3.1 and compiling for MS-Windows
       make
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
+
+Using the MinGW32 port of egcs: you need the Micrsoft SDK for the
+moment.
+      copy makefile.mgw makefile
+  Look through the Makefile to see if you need to make any changes.
+      make 
+      make install
+
 
 MSDOS
 -----

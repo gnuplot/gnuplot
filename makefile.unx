@@ -753,7 +753,7 @@ install:
 	@echo "         make apollo       TARGET=Install "
 	@echo "         make dec          TARGET=Install "
 	@echo "         make hp           TARGET=Install "
-	@echo "         make sun          TARGET=Install HELPDEST='/usr/um/misc/lib' "
+	@echo "         make sun          TARGET=Install HELPDEST='/usr/um/misc/lib BINDIR='/usr/um/misc/bin' "
 	@echo "         make aix32        TARGET=Install MANDEST='/usr/um/misc/man/man1' COPTS='-O' "
 	@echo
 ################################################################
@@ -811,6 +811,10 @@ $(OBJS): plot.h
 
 command.o: command.c binary.h fit.h plot.h
 	$(CC) $(CFLAGS) -c command.c -DHELPFILE=\"$(HELPDEST)/gnuplot.gih\"
+
+show.o: show.c plot.h setshow.h
+	$(CC) $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" -DGNUPLOT_BINDIR=\"$(DEST)\" -c $<
+
 
 command.o help.o misc.o parse.o: help.h
 
