@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.65 2002/04/27 08:07:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.66 2002/07/21 12:32:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -1263,7 +1263,7 @@ do_3dplot(plots, pcount, quick)
      * is really needed anymore, for any terminal, or could this termentry
      * be removed completely? Any future driver won't need it?
      */
-    if (term->previous_palette)
+    if (plot_has_palette && term->previous_palette)
 	term->previous_palette();
 #endif
 

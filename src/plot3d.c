@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.54 2002/07/11 10:24:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.55 2002/07/21 12:32:53 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -75,7 +75,6 @@ TBOOLEAN dgrid3d = FALSE;
 /* static prototypes */
 
 #ifdef PM3D
-static int plot_has_palette; /* current plot needs the color palette */
 static void set_plot_with_palette __PROTO((int plot_num));
 #endif
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
