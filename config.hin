@@ -264,10 +264,13 @@
 /*  Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
 
+/*  Define if you have the <plotcompat.h> header file.  */
+#undef HAVE_PLOTCOMPAT_H
+
 /*  Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
 
-/*  Define if your libplot.a is from GNU plotutils. Define as 2 if your GNU plotutils version is 2.2 or greater. */
+/*  Define if your libplot.a is from GNU plotutils.  */
 #undef GNU_PLOTUTILS
 
 /*  Define if you have Thomas Boutell's gd library.  */
