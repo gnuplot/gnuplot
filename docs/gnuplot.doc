@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.214 2004/04/15 07:43:01 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.215 2004/04/16 02:22:59 cgaylord Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -2564,12 +2564,8 @@ C ... and restart the table:
        every ::5::15    # selects points 5 through 15 in each block
 
  See
-^ <a href="http://www.gnuplot.info/demo/simple.html"> simple plot demos (simple.dem) </a>
- ,
-^ <a href="http://www.gnuplot.info/demo/surfacea.html">Non-parametric splot demos </a>
- , and
-^ <a href="http://www.gnuplot.info/demo/surfaceb.html">Parametric splot demos</a>
- .
+^ <a href="http://www.gnuplot.info/demo/simple.html"> simple plot demos (simple.dem). </a>
+
 4 example datafile
 ?commands plot datafile example
 ?plot datafile example
@@ -3009,10 +3005,6 @@ C ... and restart the table:
  (see `set bars` for details).
 
  If autoscaling is on, the ranges will be adjusted to include the error bars.
- See also
-^ <a href="http://www.gnuplot.info/demo/errorbar.html">
- errorbar demos.
-^ </a>
 
  See `plot using`, `plot with`, and `set style` for more information.
 3 errorlines
@@ -3157,10 +3149,6 @@ C ... and restart the table:
        set timefmt "%d/%m/%y %H:%M"
        plot ["1/6/93 12:00":"5/6/93 12:00"] 'timedata.dat'
 
- See also
-^ <a href="http://www.gnuplot.info/demo/ranges.html">
- ranges demo.
-^ </a>
 3 title
 ?commands plot title
 ?commands splot title
@@ -3327,10 +3315,6 @@ C ... and restart the table:
  This plots two color surfaces at different altitudes:
        splot x*x-y*y with pm3d, x*x+y*y with pm3d at t
 
- See `set style` to change the default styles. See also
-^ <a href="http://www.gnuplot.info/demo/styles.html">
- styles demos.
-^ </a>
 2 print
 ?commands print
 ?print
@@ -3425,10 +3409,7 @@ C ... and restart the table:
  set explicitly to guarantee that the five separate graphs (drawn on top of
  each other in multiplot mode) will have exactly the same axes.  The linetype
  must be specified; otherwise all the plots would be drawn with the same type.
- See also
-^ <a href="http://www.gnuplot.info/demo/animate.html">
- Reread Animation Demo (animate.dem).
-^ </a>
+
 2 reset
 ?commands reset
 ?reset
@@ -3656,10 +3637,7 @@ C ... and restart the table:
 
  To show all arrows (in tag order), use:
        show arrow
- See also 
-^ <a href="http://www.gnuplot.info/demo/arrows.html"> 
- arrows demos.
-^ </a>
+
 3 autoscale
 ?commands set autoscale
 ?commands unset autoscale
@@ -3931,10 +3909,6 @@ C ... and restart the table:
  Draw only the top and right borders for a `plot` and label them as axes:
        unset xtics; unset ytics; set x2tics; set y2tics; set border 12
 
- See also
-^ <a href="http://www.gnuplot.info/demo/borders.html">
- borders demo.
-^ </a>
 3 boxwidth
 ?commands set boxwidth
 ?commands show boxwidth
@@ -5706,10 +5680,7 @@ C ... and restart the table:
  in character units, so the appearance of the graph in the remaining space
  will depend on the screen size of the display device, e.g., perhaps quite
  different on a video display and a printer.
- See also
-^ <a href="http://www.gnuplot.info/demo/multiplot.html">
- multiplot demo (multiplt.dem).
-^ </a>
+
 3 mx2tics
 ?commands set mx2tics
 ?commands unset mx2tics
@@ -7137,10 +7108,7 @@ C ... and restart the table:
  By default the rectangle is empty if (open > close), and filled with three
  vertical bars if (close > open). If filled-boxes support is present, then
  the rectangle is colored according to `set style fill <fillstyle>`.
- See `set bars` and `financebars`.  See also
-^ <a href="http://www.gnuplot.info/demo/finance.html">
- finance demos.
-^ </a>
+ See `set bars` and `financebars`.
 
  Note: To place additional symbols, such as the median value, on a
  box-and-whisker plot requires additional plot commands as in this example:
