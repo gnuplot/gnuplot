@@ -36,11 +36,10 @@ static char *RCSid = "$Id: version.c,v 1.347 1998/06/22 12:24:56 ddenholm Exp $"
 
 #include "plot.h"
 
-char version[] = "3.5 (pre 3.6)";
-/* char version[] = "3.7"; */
-char patchlevel[] = "beta 349";
-char date[] = "Wed Jan  6 15:51:08 BST 1999"; 
-char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
+char version[] = "3.7";
+char patchlevel[] = "0";
+char date[] = "Tue Jan 12 13:48:06 BST 1999"
+char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998, 1999";
 
 char faq_location[] = FAQ_LOCATION;
 char bug_email[] = CONTACT;
