@@ -319,13 +319,13 @@ if test "$with_plot" != no; then
       else
         AC_MSG_RESULT([ - using obsolete GNU graphics library])
         AC_DEFINE(GNUGRAPH)
-      fi dnl old GNU plotlib
+      fi # old GNU plotlib
     else
       AC_MSG_RESULT([ - using GNU plotutils library])
       AC_DEFINE(GNUGRAPH)
       AC_DEFINE(GNU_PLOTUTILS)
-    fi dnl new GNU plotlib
-  fi dnl Unix plotlib
+    fi # new GNU plotlib
+  fi # Unix plotlib
 fi
 dnl end plot
 
