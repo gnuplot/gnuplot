@@ -1068,7 +1068,8 @@ TERM_PUBLIC void PS_move(x, y)
 unsigned int x, y;
 {
     int dx, dy;
-    char abso[20], rel[20];
+    /* Make this semi-dynamic and independent of architecture */
+    char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
     dx = x - PS_pen_x;
     dy = y - PS_pen_y;
     /* can't cancel all null moves--need a move after stroke'ing */
@@ -1092,7 +1093,7 @@ TERM_PUBLIC void PS_vector(x, y)
 unsigned int x, y;
 {
     int dx, dy;
-    char abso[20], rel[20];
+    char abso[5+2*INT_STR_LEN], rel[5+2*INT_STR_LEN];
     dx = x - PS_pen_x;
     dy = y - PS_pen_y;
     if (dx == 0 && dy == 0)
