@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: matrix.c,v 1.14 1997/04/10 02:33:05 drd Exp $";
+static char *RCSid = "$Id: matrix.c,v 1.15 1998/04/14 00:16:01 drd Exp $";
 #endif
 
 /*
@@ -26,10 +26,6 @@ static char *RCSid = "$Id: matrix.c,v 1.14 1997/04/10 02:33:05 drd Exp $";
  */
 
 
-#define MATRIX_MAIN
-
-#include <math.h>
-
 #include "type.h"
 #include "fit.h"
 #include "matrix.h"
@@ -45,9 +41,8 @@ static char *RCSid = "$Id: matrix.c,v 1.14 1997/04/10 02:33:05 drd Exp $";
 /*****************************************************************
     internal prototypes
 *****************************************************************/
-static void lu_decomp __PROTO((double **a, int n, int *indx, double *d));
-static void lu_backsubst __PROTO((double **a, int n, int *indx, double b[]));
 
+static GP_INLINE int fsign(double x);
 
 /*****************************************************************
     first straightforward vector and matrix allocation functions
@@ -64,17 +59,6 @@ int n;
 }
 
 
-int *ivec (n)
-int n;
-{
-    /* allocates a int vector with n elements */
-    int *ip;
-    if( n < 1 )
-	return (int *) NULL;
-    ip = (int *) gp_alloc ( n * sizeof(int), "ivec");
-    return ip;
-}
-
 double **matr (rows, cols)
 int rows;
 int cols;
@@ -86,35 +70,31 @@ int cols;
 
     if ( rows < 1  ||  cols < 1 )
         return NULL;
-    /* allocate pointers to rows */
-    m = (double **) gp_alloc ( rows * sizeof(double *), "matrix pointers");
-    /* allocate rows and set pointers to them */
-    for ( i=0 ; i<rows ; i++ )
-	m[i] = (double *) gp_alloc (cols * sizeof(double), "matrix row");
+    m = (double **) gp_alloc ( rows * sizeof(double *) , "matrix row pointers");
+    m[0] = (double *) gp_alloc ( rows * cols * sizeof(double), "matrix elements");
+    for ( i=1; i<rows ; i++ )
+    	m[i] = m[i-1] + cols;
     return m;
 }
 
 
-void free_matr (m, rows)
+void free_matr (m)
 double **m;
-int rows;
 {
-    register int i;
-    for ( i=0 ; i<rows ; i++ )
-	free ( m[i] );
+    free (m[0]);
     free (m);
 }
 
 
-void redim_vec (v, n)
+double *redim_vec (v, n)
 double **v;
 int n;
 {
-    if ( n < 1 ) {
+    if ( n < 1 ) 
 	*v = NULL;
-	return;
-    }
+    else
     *v = (double *) gp_realloc (*v, n * sizeof(double), "vec");
+    return *v;
 }
 
 void redim_ivec (v, n)
@@ -129,242 +109,160 @@ int n;
 }
 
 
+/* HBB: TODO: is there a better value for 'epsilon'? how to specify
+ * 'inline'?  is 'fsign' really not available elsewhere? use
+ * row-oriented version (p. 309) instead?
+ */
 
-/*****************************************************************
-    Linear equation solution by Gauss-Jordan elimination
-*****************************************************************/
-void solve (a, n, b, m)
-double **a;
-int n;
-double **b;
-int m;
+static GP_INLINE int fsign(x)
+  double x;
 {
-    int     *c_ix, *r_ix, *pivot_ix, *ipj, *ipk,
-	    i, ic=-1, ir=-1, j, k, l, s; /* HBB: added initial vals to shut up gcc -Wall */
-
-    double  large, dummy, tmp, recpiv,
-	    **ar, **rp,
-	    *ac, *cp, *aic, *bic;
-
-    c_ix	= ivec (n);
-    r_ix	= ivec (n);
-    pivot_ix	= ivec (n);
-    memset (pivot_ix, 0, n*sizeof(int));
-
-    for ( i=0 ; i<n ; i++ ) {
-	large = 0.0;
-	ipj = pivot_ix;
-	ar = a;
-	for ( j=0  ;  j<n  ;  j++, ipj++, ar++ )
-	    if (*ipj != 1) {
-		ipk = pivot_ix;
-		ac = *ar;
-		for ( k=0  ;  k<n  ;  k++, ipk++, ac++ )
-		    if ( *ipk ) {
-			if ( *ipk > 1 )
-			    Eex ("Singular matrix")
-		    }
-		    else {
-			if ( (tmp = fabs(*ac)) >= large ) {
-			    large = tmp;
-			    ir = j;
-			    ic = k;
-			}
-		    }
-	    }
-	++(pivot_ix[ic]);
-
-	if ( ic != ir ) {
-	    ac = b[ir];
-	    cp = b[ic];
-	    for ( l=0  ;  l<m  ;  l++, ac++, cp++ )
-		Swap(*ac, *cp)
-	    ac = a[ir];
-            cp = a[ic];
-            for ( l=0  ;  l<n  ;  l++, ac++, cp++ )
-                Swap(*ac, *cp)
-        }
-
-	c_ix[i] = ic;
-        r_ix[i] = ir;
-	if ( *(cp = &(a[ic][ic])) == 0.0 )
-	    Eex ("Singular matrix")
-	recpiv = 1/(*cp);
-	*cp = 1;
-
-	cp = b[ic];
-        for ( l=0 ; l<m ; l++ )
-            *cp++ *= recpiv;
-        cp = a[ic];
-	for ( l=0 ; l<n ; l++ )
-	    *cp++ *= recpiv;
-
-	ar = a;
-	rp = b;
-	for ( s=0 ; s<n ; s++, ar++, rp++ )
-	    if ( s != ic ) {
-		dummy = (*ar)[ic];
-		(*ar)[ic] = 0;
-		ac = *ar;
-		aic = a[ic];
-		for ( l=0 ; l<n ; l++ )
-		    *ac++ -= *aic++ * dummy;
-		cp = *rp;
-		bic = b[ic];
-		for ( l=0 ; l<m ; l++ )
-		    *cp++ -= *bic++ * dummy;
-	    }
-    }
-
-    for ( l=n-1 ; l>=0 ; l-- )
-	if ( r_ix[l] != c_ix[l] )
-	    for ( ar=a, k=0  ;	k<n  ;	k++, ar++ )
-		Swap ((*ar)[r_ix[l]], (*ar)[c_ix[l]])
-
-    free (pivot_ix);
-    free (r_ix);
-    free (c_ix);
+    return( x>0 ? 1 : (x < 0) ? -1 : 0) ;
 }
 
-
 /*****************************************************************
-    LU-Decomposition of a quadratic matrix
+
+     Solve least squares Problem C*x+d=r, |r|=min!, by Given rotations
+     (QR-decomposition). Direct implementation of the algorithm
+     presented in H.R.Schwarz: Numerische Mathematik, 'equation'
+     number (7.33)
+
+     If 'd==NULL', d is not accesed: the routine just computes the QR
+     decomposition of C and exits.
+
+     If 'want_r==0', r is not rotated back (\hat{r} is returned
+     instead).
+
 *****************************************************************/
-static void lu_decomp (a, n, indx, d)
-double **a;
-int n;
-int *indx;
+
+void Givens (C, d, x, r, N, n, want_r)
+double **C;
 double *d;
+double *x;
+double *r;
+int N;
+int n;
+int want_r;
 {
-    int     i, imax=-1, j, k; /* HBB: added initial value, to shut up gcc -Wall */
+    int i, j, k;
+    double w, gamma, sigma, rho, temp;
+    double epsilon=DBL_EPSILON; /* FIXME (?)*/
 
-    double  large, dummy, temp,
-	    **ar, **lim,
-	    *limc, *ac, *dp, *vscal;
-
-    dp = vscal = vec (n);
-    *d = 1.0;
-    for ( ar=a, lim = &(a[n]) ; ar<lim ; ar++ ) {
-	large = 0.0;
-	for ( ac = *ar, limc = &(ac[n]) ; ac<limc ; )
-	    if ( (temp = fabs (*ac++)) > large )
-		large = temp;
-	if ( large == 0.0 )
-	    Eex ("Singular matrix in LU-DECOMP")
-	*dp++ = 1/large;
-    }
-    ar = a;
-    for ( j=0 ; j<n ; j++, ar++ ) {
-	for ( i=0 ; i<j ; i++ ) {
-	    ac = &(a[i][j]);
-	    for ( k=0 ; k<i ; k++ )
-		*ac -= a[i][k] * a[k][j];
-	}
-	large = 0.0;
-	dp = &(vscal[j]);
-	for ( i=j ; i<n ; i++ ) {
-	    ac = &(a[i][j]);
-            for ( k=0 ; k<j ; k++ )
-		*ac -= a[i][k] * a[k][j];
-	    if ( (dummy = *dp++ * fabs(*ac)) >= large ) {
-		large = dummy;
-		imax = i;
+/* 
+ * First, construct QR decomposition of C, by 'rotating away'
+ * all elements of C below the diagonal. The rotations are
+ * stored in place as Givens coefficients rho.
+ * Vector d is also rotated in this same turn, if it exists 
+ */
+    for (j=0; j<n; j++) 
+    	for (i=j+1; i<N; i++) 
+    	    if (C[i][j]) {
+    	    	if (fabs(C[j][j])<epsilon*fabs(C[i][j])) { /* find the rotation parameters */
+    	    	    w=-C[i][j];
+    	    	    gamma=0;
+    	    	    sigma=1;
+    	    	    rho=1;
+		} else {
+		    w=fsign(C[j][j])*sqrt(C[j][j]*C[j][j] + C[i][j]*C[i][j]);
+		    gamma=C[j][j]/w;
+		    sigma=-C[i][j]/w;
+		    rho=(fabs(sigma)<gamma) ? sigma : fsign(sigma)/gamma;
+		}
+		C[j][j]=w;
+		C[i][j]=rho;           /* store rho in place, for later use */
+		for (k=j+1; k<n; k++) {   /* rotation on index pair (i,j) */
+		    temp =    gamma*C[j][k] - sigma*C[i][k];
+		    C[i][k] = sigma*C[j][k] + gamma*C[i][k];
+		    C[j][k] = temp;
+		    
+		}
+		if (d) {               /* if no d vector given, don't use it */
+		    temp = gamma*d[j] - sigma*d[i];  /* rotate d */
+		    d[i] = sigma*d[j] + gamma*d[i];
+		    d[j] = temp;
+	        }
 	    }
+    if (!d)               /* stop here if no d was specified */
+         return;
+
+    for (i=n-1; i>=0; i--) {   /* solve R*x+d=0, by backsubstitution */
+        double s = d[i];
+        r[i] = 0;              /* ... and also set r[i]=0 for i<n */
+        for (k=i+1; k<n; k++) 
+            s+=C[i][k]*x[k];
+	if (C[i][i]==0)
+	  Eex ( "Singular matrix in Givens()");
+        x[i] = - s / C[i][i];
 	}
-	if ( j != imax ) {
-	    ac = a[imax];
-	    dp = *ar;
-	    for ( k=0 ; k<n ; k++, ac++, dp++ )
-		Swap (*ac, *dp);
-	    *d = -(*d);
-	    vscal[imax] = vscal[j];
-	}
-	indx[j] = imax;
-	if ( *(dp = &(*ar)[j]) == 0 )
-	    *dp = WINZIG;
-
-	if ( j != n-1 ) {
-	    dummy = 1/(*ar)[j];
-	    for ( i=j+1 ; i<n ; i++ )
-		a[i][j] *= dummy;
-	}
-    }
-    free (vscal);
-}
-
-
-/*****************************************************************
-    Routine for backsubstitution
-*****************************************************************/
-static void lu_backsubst (a, n, indx, b)
-double **a;
-int n;
-int *indx;
-double b[];
-{
-    int     i, memi = -1, ip, j;
-
-    double  sum, *bp, *bip, **ar, *ac;
-
-    ar = a;
-    for ( i=0 ; i<n ; i++, ar++ ) {
-	ip = indx[i];
-	sum = b[ip];
-	b[ip] = b[i];
-	if (memi >= 0) {
-	    ac = &((*ar)[memi]);
-	    bp = &(b[memi]);
-	    for ( j=memi ; j<=i-1 ; j++ )
-		sum -= *ac++ * *bp++;
-	}
-        else
-	    if ( sum )
-		memi = i;
-	b[i] = sum;
-    }
-    ar--;
-    for ( i=n-1 ; i>=0 ; i-- ) {
-	ac = &(*ar)[i+1];
-	bp = &(b[i+1]);
-	bip = &(b[i]);
-	for ( j=i+1 ; j<n ; j++ )
-	    *bip -= *ac++ * *bp++;
-	*bip /= (*ar--)[i];
+    for (i=n; i<N; i++) 
+    	r[i] = d[i];	     	/* set the other r[i] to d[i] */
+    	
+    if (!want_r)        	/* if r isn't needed, stop here */
+    	return;
+    	
+    /* rotate back the r vector */
+    for (j=n-1; j>=0; j--)
+    	for (i=N-1; i>=0; i--) {
+    	    if ((rho=C[i][j])==1) { 	/* reconstruct gamma, sigma from stored rho */
+    	     	gamma=0;
+    	     	sigma=1;
+    	    } else if (fabs(rho)<1) {
+    	    	sigma=rho; 
+    	    	gamma=sqrt(1-sigma*sigma);
+    	    } else {
+    	    	gamma=1/fabs(rho);
+    	    	sigma=fsign(rho)*sqrt(1-gamma*gamma);
+    	    }
+	    temp = gamma*r[j] + sigma*r[i];	/* rotate back indices (i,j) */
+	    r[i] =-sigma*r[j] + gamma*r[i];
+	    r[j] = temp;
     }
 }
 
 
-/*****************************************************************
-    matrix inversion
-*****************************************************************/
-void inverse (src, dst, n)
-double **src;
-double **dst;
+/* Given a triangular Matrix R, compute (R^T * R)^(-1), by forward
+ * then back substitution
+ * 
+ * R, I are n x n Matrices, I is for the result. Both must already be
+ * allocated.
+ * 
+ * Will only calculate the lower triangle of I, as it is symmetric 
+ */
+
+void Invert_RtR ( R, I, n)
+double **R;
+double **I;
 int n;
 {
-    int i,j;
-    int *indx;
-    double d, *col, **tmp;
+  int i, j, k;
 
-    indx = ivec (n);
-    col = vec (n);
-    tmp = matr (n, n);
-    for ( i=0 ; i<n ; i++ )
-	memcpy (tmp[i], src[i], n*sizeof(double));
+  /* fill in the I matrix, and check R for regularity : */
 
-    lu_decomp (tmp, n, indx, &d);
-
-    for ( j=0 ; j<n ; j++ ) {
-	for ( i=0 ; i<n ; i++ )
-	    col[i] = 0;
-	col[j] = 1;
-	lu_backsubst (tmp, n, indx, col);
-	for ( i=0 ; i<n ; i++ )
-	    dst[i][j] = col[i];
-    }
-    free (indx);
-    free (col);
-    free_matr (tmp, n);
+  for (i=0; i<n; i++) {
+    for (j=0; j<i; j++)  /* upper triangle isn't needed */
+      I[i][j] = 0;
+    I[i][i] = 1;
+    if (! R[i][i])
+      Eex ("Singular matrix in Invert_RtR")
 }
 
+  /* Forward substitution: Solve R^T * B = I, store B in place of I */
 
+  for (k=0; k<n; k++) 
+    for (i=k; i<n; i++) {  /* upper half needn't be computed */
+      double s = I[i][k];
+      for (j=k; j<i; j++)  /* for j<k, I[j][k] always stays zero! */
+	s -= R[j][i] * I[j][k];
+      I[i][k] = s / R[i][i];
+}
+
+  /* Backward substitution: Solve R * A = B, store A in place of B */
+
+  for (k=0; k<n; k++)
+    for (i=n-1; i>=k; i--) {  /* don't compute upper triangle of A */
+      double s = I[i][k];
+      for (j=i+1; j<n; j++)
+	s -= R[i][j] * I[j][k];
+      I[i][k] = s / R[i][i]; 
+    }
+}
