@@ -1,24 +1,44 @@
+2004-02-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	Tagged a patchlevel 1 to incorporate some post-last-minute
+	changes:
+	
+	* PATCHLEVEL: Incremented by 1 for these post-release changes.
+
+	* src/version.c: Updated.
+	
+	* configure.in (X11 handling): Append ${EXEEXT} to gnuplot_x11
+	program name to allow building on X11 platforms that use .exe
+	extensions for programs (Win32, OS/2).
+
+	* config/config.mgw config/config.cyg config/config.os2: Remove
+	'#' lines that aren't actual preprocessor commands.
+
+	* src/win/wgraph.c (GraphStart): Don't grab keyboard focus unless
+	mouse mode is on.
+
 2004-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* demo/electron.dem (3rd plot): Use "set key default" to 
-	get a sensible position of the key.  Without it, it's outside
-	the page and you get terminal driver errors.
+	* demo/electron.dem (3rd plot): Use "set key default" to get a
+	sensible position of the key.  Without it, it's outside the page
+	and you get terminal driver errors.
 
 2004-02-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	Tagged and released version 3.8k.0, which also serves
-	as release candidate #1 for release as version 4.0.
+	Tagged and released version 3.8k.0, which also serves as release
+	candidate #1 for release as version 4.0.
 	
 2004-02-18  Ethan Merritt  <merritt@u.washington.edu>
 	
-	* src/readline.c term/x11.trm:  Patch by Bill Fenner fixing bug
-	#899245, suspend/resume with gnu readline requires us to trap EINTR.
+	* src/readline.c term/x11.trm: Patch by Bill Fenner fixing bug
+	#899245, suspend/resume with gnu readline requires us to trap
+	EINTR.
 
 2004-02-18  Ethan Merritt  <merritt@u.washington.edu>
 
-	* demo/webify.pl demo/Makefile.am.in: 
-	Make output html compliant with 4.0.1 transitional standard.
-	Add enhancedtext.dem to the list of auto-generated html pages.
+	* demo/webify.pl demo/Makefile.am.in: Make output html compliant
+	with 4.0.1 transitional standard.  Add enhancedtext.dem to the
+	list of auto-generated html pages.
 
 2004-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -29,18 +49,18 @@
 
 2004-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Added
+	* config/config.cyg config/config.mgw config/config.os2: Added
 	#undef GP_FIT_ERRVARS and #define GP_ISVAR.
 
-        * src/plot3d.c: Issue a warning when trying to draw surface with pm3d
-        style and there has not been previous "set pm3d".
-        Maybe we could refrain from this requirement in future by adding
-        new field 'pm3d.on' to 'pm3d.where' in 'struct pm3d'.
+        * src/plot3d.c: Issue a warning when trying to draw surface with
+	pm3d style and there has not been previous "set pm3d".  Maybe we
+	could refrain from this requirement in future by adding new field
+	'pm3d.on' to 'pm3d.where' in 'struct pm3d'.
 
 2004-02-15  Ethan Merritt  <merritt@u.washington.edu>
 
-	* src/gplt_x11.c src/plot3d.c src/pm3d.c:
-	Trivial changes to prevent stupid compiler warnings.
+	* src/gplt_x11.c src/plot3d.c src/pm3d.c: Trivial changes to
+	prevent stupid compiler warnings.
 
 2004-02-13  Ethan Merritt  <merritt@u.washington.edu>
 
