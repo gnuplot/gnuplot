@@ -32,8 +32,8 @@ $!-----------------------------------------------------------------
 $! customize CFLAGS for version of VMS, CRTL, and C compiler.
 $!-----------------------------------------------------------------
 $!  these defines work for OpenVMS Alpha v6.2 and DEC C v5.3
-$ CFLAGS = "/define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,HAVE_SLEEP,"-
-  +"''x11'NO_GIH,PIPES,DECCRTL)''pfix'/warnings=disable=ADDRCONSTEXT"
+$ CFLAGS = "/define=(ANSI_C,HAVE_LGAMMA,HAVE_ERF,HAVE_UNISTD_H,HAVE_GETCWD,"-
+ +"HAVE_SLEEP,''x11'NO_GIH,PIPES,DECCRTL)''pfix'"
 $!
 $!-----------------------------------------------------------------
 $!
@@ -107,8 +107,9 @@ $ cc 'CFLAGS' contour.c
 $ cc 'CFLAGS' datafile.c
 $ cc 'CFLAGS' eval.c
 $ cc 'CFLAGS' fit.c
-$ cc 'CFLAGS' graphics.c
 $ cc 'CFLAGS' graph3d.c
+$ cc 'CFLAGS' graphics.c
+$ cc 'CFLAGS' help.c
 $ cc 'CFLAGS' hidden3d.c
 $ cc 'CFLAGS' internal.c
 $ cc 'CFLAGS' interpol.c
@@ -118,33 +119,38 @@ $ cc 'CFLAGS' parse.c
 $ cc 'CFLAGS' plot.c
 $ cc 'CFLAGS' plot2d.c
 $ cc 'CFLAGS' plot3d.c
+$ cc 'CFLAGS' save.c
 $ cc 'CFLAGS' scanner.c
 $ cc 'CFLAGS' set.c
 $ cc 'CFLAGS' show.c
 $ cc 'CFLAGS' specfun.c
 $ cc 'CFLAGS' standard.c
 $ cc 'CFLAGS' stdfn.c
+$ cc 'CFLAGS' tables.c
 $ cc 'cflags' 'TERMFLAGS' term.c
 $ cc 'cflags' time.c
+$ cc 'CFLAGS' unset.c
 $ cc 'CFLAGS' util.c
 $ cc 'CFLAGS' util3d.c
 $ cc 'CFLAGS' variable.c
-$ cc 'CFLAGS' version.c
 $ cc 'CFLAGS' vms.c
+$ cc 'CFLAGS' version.c
 $ if its_gnuc then cc 'CFLAGS' GNU_CC_INCLUDE:[000000]_assert.c
 $!
-$ link/exe=gnuplot -
-bitmap,command,contour,eval,graphics,graph3d,vms,-
-binary,specfun,interpol,fit,matrix,internal,misc,parse,-
-plot,plot2d,plot3d,scanner,set,show,datafile,alloc,-
-standard,stdfn,term,util,version,util3d,hidden3d,time'extralib''LINKOPT'
+$ link/exe=gnuplot.exe -
+bitmap.obj,command.obj,contour.obj,eval.obj,graphics.obj,graph3d.obj,help.obj,-
+vms.obj,binary.obj,specfun.obj,interpol.obj,fit.obj,matrix.obj,internal.obj,-
+misc.obj,parse.obj,plot.obj,plot2d.obj,plot3d.obj,scanner.obj,set.obj,-
+show.obj,datafile.obj,alloc.obj,standard.obj,stdfn.obj,term.obj,util.obj,-
+version.obj,util3d.obj,hidden3d.obj,time.obj,save.obj,unset.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c
 $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'
 $ ren bf_test.exe [.demo]
 $ if .NOT. its_decw  then goto do_docs 
 $!
-$ CC 'CFLAGS' GPLT_X11 stdfn.c
+$ CC 'CFLAGS' GPLT_X11
+$ CC 'CFLAGS' stdfn.c
 $ LINK /exe=GNUPLOT_X11 gplt_x11,stdfn 'extralib''LINKOPT',SYS$INPUT:/OPT
 SYS$SHARE:DECW$XLIBSHR/SHARE
 $!
@@ -153,8 +159,9 @@ $ SET DEF [.DOCS]
 $ if f$locate("ALL_TERM_DOC",CFLAGS).ne.f$length(CFLAGS) then -
 	copy /concatenate [-.term]*.trm []allterm.h
 $ cc 'CFLAGS' /OBJ=doc2rnh.obj/include=([],[-],[-.term]) doc2rnh.c 
+$ cc 'CFLAGS' /OBJ=termdoc.obj/include=([],[-],[-.term]) termdoc.c 
 $ SET DEF [-]		! LINKOPT is defined as being in []
-$ link [.docs]doc2rnh /exe=[.docs]doc2rnh 'extralib''LINKOPT'
+$ link [.docs]doc2rnh.obj,termdoc.obj /exe=[.docs]doc2rnh 'extralib''LINKOPT'
 $ doc2rnh := $sys$disk:[.docs]doc2rnh
 $ doc2rnh [.docs]gnuplot.doc [.docs]gnuplot.rnh
 $ RUNOFF [.docs]gnuplot.rnh
