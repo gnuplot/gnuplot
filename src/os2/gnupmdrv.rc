@@ -59,6 +59,7 @@ BEGIN
             MENUITEM  SEPARATOR
             MENUITEM  "set label...", IDM_MOUSE_FORMAT_LABEL
         END
+        MENUITEM  "~Polar distance", IDM_MOUSE_POLAR_DISTANCE,,
         MENUITEM  SEPARATOR
         MENUITEM   "Zoom\tMB2-MB1",-1,,MIA_DISABLED
         MENUITEM   "~Unzoom\tCtrl/U", IDM_MOUSE_UNZOOM,,MIA_DISABLED

@@ -445,7 +445,6 @@ int count;
      * results if done in (16bit) ints */
     xscaler = ((xright - xleft) * 4L) / 7L;              /* HBB: Magic number alert! */
     yscaler = ((ytop - ybot) * 4L) / 7L;
-
 }
 
 #if 0
@@ -576,6 +575,13 @@ int pcount;			/* count of plots in linked list */
     zscale3d = 2.0 / (ceiling_z - floor_z);
     yscale3d = 2.0 / (y_max3d - y_min3d);
     xscale3d = 2.0 / (x_max3d - x_min3d);
+
+#if defined(USE_MOUSE) && defined(OS2)
+    if (strcmp(term->name, "pm") == 0) { /* PM 14.5.1999 tell gnupmdrv about new [xleft..ybot] values */
+      extern void PM_write_xleft_ytop();
+      PM_write_xleft_ytop();
+    }
+#endif
 
     term_apply_lp_properties(&border_lp);	/* border linetype */
 

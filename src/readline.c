@@ -47,9 +47,11 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
  *   In add_history(), do not store duplicated entries:
  *     Petr Mikulik
  *
- *   added some changes to support mouse input from OS/2 PM window
+ *   April 1999: added some changes to support mouse input from OS/2 PM window
  *   changes marked by USE_MOUSE
  *     Franz Bakan
+ *   May 1999: update by Petr Mikulik: use gnuplot's pid in share mem name;
+ *     get shared mem to input_line_Pointer only once
  *
  */
 
@@ -318,6 +320,7 @@ static void extend_cur_line __PROTO((void));
 
 #if defined(USE_MOUSE)
 char *input_line_Pointer = NULL;
+extern char mouseShareMemName[];
 #endif
 
 /* user_putc and user_puts should be used in the place of
@@ -386,11 +389,13 @@ char *prompt;
 #if defined(USE_MOUSE) && defined(OS2)
     char rbuf[1];		/* buffer for read() */
     struct termios tios;	/* terminal parameter */
+    if (input_line_Pointer == NULL) { /* PM get shared mem only once */
     if (DosGetNamedSharedMem((PVOID) & input_line_Pointer,
-			     "\\SHAREMEM\\PMouse_Input", PAG_WRITE | PAG_READ))
-	fprintf(stderr, "DosGetNamedShareMem_ERROR in readline\n");
+			     mouseShareMemName, PAG_WRITE | PAG_READ))
+	fputs("readline.c: DosGetNamedShareMem ERROR\n",stderr);
     else
 	strcpy(input_line_Pointer, NUL);
+    }
 #endif /* USE_MOUSE */
 
     /* start with a string of MAXBUF chars */
@@ -473,7 +478,7 @@ char *prompt;
 		    cur_char = rbuf[0];
 	    }			/* endif */
 	} else {
-	    if (strlen(input_line_Pointer)) {
+	    if (input_line_Pointer != NULL && strlen(input_line_Pointer)) {
 		strcpy(cur_line, input_line_Pointer);
 		strcpy(input_line_Pointer, "\0");
 		line_len = 0;

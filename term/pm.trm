@@ -102,6 +102,7 @@ TERM_PUBLIC void PM_linewidth __PROTO((double linewidth));
 #define SET_POINTMODE   'D'
 #define SET_FONT        'F'
 #define SET_OPTIONS     'O'
+#define SET_XLEFT_YTOP	'#'
 #define GR_QUERY        'Q'
 #define GR_SUSPEND      'E'	/*'s' */
 #define GR_RESUME       'r'
@@ -414,21 +415,36 @@ TERM_PUBLIC void PM_graphics()
     printf("pm.trm: draw_contour=%i\n",draw_contour);
     */
     {
-    // what the mouse is going over? 2d, 3d graph... disable mouse for multiplot
     int graph_mouse = 0;
+    int rev_xy = 0;
     if (!multiplot) {
-      if (is_3d_plot==TRUE)
-	  graph_mouse = 0; // for future: graph_mouse = 3;
-	else // 2d plot
+      if (is_3d_plot==TRUE) { // map is for surface_rot_z == 0,90,180,270,360
+			      // and for any surface_rot_x
+	  rev_xy = (int)(surface_rot_z+0.5);
+	  if (rev_xy == 0 || rev_xy == 180 || rev_xy == 360)
+		{ graph_mouse = 2; rev_xy = 0; } // x axis is down, y is aside
+	  else
+	  if (rev_xy == 90 || rev_xy == 270) // y axis is down, x is aside
+		{ graph_mouse = 2; rev_xy = 1; }
+	  }
+	else // 2d plot or map
 	  graph_mouse = (polar) ? 1 : 2;
       }
     // printf("pm.trm: graph_mouse=%i\n",0+graph_mouse);
     fwrite(&graph_mouse,sizeof(graph_mouse),1,PM_pipe);
-    }
+    if (!rev_xy) {
     fwrite(&min_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
     fwrite(&min_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
     fwrite(&max_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
     fwrite(&max_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
+	}
+      else {
+	fwrite(&min_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
+	fwrite(&min_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
+	fwrite(&max_array[FIRST_Y_AXIS],sizeof(double),1,PM_pipe);
+	fwrite(&max_array[FIRST_X_AXIS],sizeof(double),1,PM_pipe);
+	}
+    }
     fwrite(&xleft,sizeof(int),1,PM_pipe);
     fwrite(&ybot,sizeof(int),1,PM_pipe);
     fwrite(&xright,sizeof(int),1,PM_pipe);
@@ -444,6 +460,29 @@ TERM_PUBLIC void PM_graphics()
     fflush(PM_pipe);
     PM_mode = SET_GRAPHICS;
 }
+
+#ifdef USE_MOUSE //PM 14.5.1999
+/* Called from graph3d.c: boundary3d after [xleft,xbot] [xright,ytop] has
+ * been calculated for a 3d graph. This is much later than call to
+ * TERM_graphics, contrary to 2d plots, when these coordinates are already
+ * known.
+ */
+void PM_write_xleft_ytop()
+{
+    if (mouseGnupmdrv) { // we are connected to mouseable gnupmdrv
+	extern double base_z, min_array[], max_array[];
+	int xleft_map, xright_map, ybot_map, ytop_map;
+	map3d_xy(min_array[FIRST_X_AXIS],min_array[FIRST_Y_AXIS],base_z, &xleft_map,&ybot_map);
+	map3d_xy(max_array[FIRST_X_AXIS],max_array[FIRST_Y_AXIS],base_z, &xright_map,&ytop_map);
+	putc(SET_XLEFT_YTOP, PM_pipe);
+	fwrite(&xleft_map,sizeof(int),1,PM_pipe);
+	fwrite(&ybot_map,sizeof(int),1,PM_pipe);
+	fwrite(&xright_map,sizeof(int),1,PM_pipe);
+	fwrite(&ytop_map,sizeof(int),1,PM_pipe);
+	fflush(PM_pipe);
+    }
+}
+#endif
 
 TERM_PUBLIC void PM_move(unsigned int x, unsigned int y)
 {

@@ -53,6 +53,7 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
  * Added code to support mouse-input from OS/2 PM window
  * Works with gnuplot's readline routine, it does not work with GNU readline
  * Changes marked by USE_MOUSE
+ * May 1999, update by Petr Mikulik: use gnuplot's pid in share mem name
  *
  */
 
@@ -168,6 +169,7 @@ int inline_num;			/* input line number */
 
 #if defined(USE_MOUSE) && defined(OS2)
 PVOID input_from_PM_Terminal = NULL;
+char mouseShareMemName[40] = "";
 #endif /* USE_MOUSE && OS2 */
 
 struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
@@ -195,11 +197,12 @@ void extend_input_line()
 	input_line[0] = NUL;
 
 #if defined(USE_MOUSE) && defined(OS2)
+	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", getpid() );
 	if (DosAllocSharedMem((PVOID) & input_from_PM_Terminal,
-			      "\\SHAREMEM\\PMouse_Input",
+			      mouseShareMemName,
 			      MAX_LINE_LEN,
 			      PAG_WRITE | PAG_COMMIT))
-	    fprintf(stderr, "DosAllocSharedMem_ERROR\n");
+	    fputs("command.c: DosAllocSharedMem ERROR\n",stderr);
 #endif /* USE_MOUSE && OS2 */
 
     } else {

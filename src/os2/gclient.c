@@ -53,12 +53,13 @@ static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
  * CONTRIBUTIONS:
  *
  *   Petr Mikulik  (see  //PM  labels)
- *       - keep aspect ration on/off
- *       - mouse support (1998, 1999; last change 28. 4. 1999)
- *   For mousing: changed by Petr Mikulik, last change 28. 4. 1999
+ *       - menu item to keep aspect ratio on/off (October 1997)
+ *       - mouse support (1998, 1999); changes made after gnuplot 3.7.0.5:
+ *	    - use gnuplot's pid in the name of shared memory (11. 5. 1999) 
+ *	    - mouse in maps; distance in polar coords (14. 5. 1999)
  *
  *   Franz Bakan  (see  //fraba  labels)
- *       - communication gnupmdrv -> gnuplot (April 1999)
+ *       - communication gnupmdrv -> gnuplot via shared memory (April 1999)
  *
  *
  * Send your comments or suggestions to 
@@ -90,6 +91,7 @@ static char RCSid[]="$Id: gclient.c,v 1.15 1998/03/22 22:34:21 drd Exp $" ;
 #include <io.h>
 #include <fcntl.h>
 #include <math.h>
+#include <float.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <process.h>
@@ -174,6 +176,7 @@ const  char  *( MouseSprintfFormats[ /*nMouseSprintfFormats*/ ] ) = {
 		"[%g:%g]","[%g,%g]","[%g;%g]",
 		"set label \"\" at %g,%g"
 		 };
+static BOOL	bMousePolarDistance = FALSE;
 
 //fraba:
 static BOOL bhave_grid = FALSE ; // for toggling grid by mouse
@@ -308,7 +311,8 @@ static void      LType( int iType ) ;
 static void	TextToClipboard ( PCSZ );
 static void     MousePosToGraphPos ( double *, double *,
 			HWND, SHORT, SHORT, ULONG );
-#define IGNORE_MOUSE !mouseTerminal || bUseMouse==FALSE || lock_mouse || !gp4mouse.graph
+static void	recalc_ruler_pos ();
+#define IGNORE_MOUSE (!mouseTerminal || bUseMouse==FALSE || lock_mouse || !gp4mouse.graph)
   // don't react to mouse in the event handler
 /* //PM: end of new functions related to the mouse processing */
 
@@ -340,6 +344,7 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
             ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
 	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ; //PM
 	    ChangeCheck( hWnd, IDM_USEMOUSE, bUseMouse?IDM_USEMOUSE:0 ) ;    //PM
+	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, bMousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;    //PM
                 // disable close from system menu (close only from gnuplot)
             hApp = WinQueryWindow( hWnd, QW_PARENT ) ; /* temporary assignment.. */
             hSysMenu = WinWindowFromID( hApp, FID_SYSMENU ) ;
@@ -360,10 +365,6 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 		// initialize pointers
 	    hptrDefault = WinQuerySysPointer( HWND_DESKTOP, SPTR_ARROW, FALSE );
 	    hptrCrossHair = WinLoadPointer( HWND_DESKTOP, (ULONG)0, IDP_CROSSHAIR );
-	    if (DosGetNamedSharedMem(&input_from_PM_Terminal, //fraba
-		"\\SHAREMEM\\PMouse_Input",
-		PAG_WRITE))
-	      DosBeep(1440L,1000L); /* indicates error */
             }
             break ;
             
@@ -575,7 +576,7 @@ case WM_MOUSEMOVE:
 //  GpiSetColor( hps, CLR_CYAN );
   GpiSetColor( hps, CLR_BACKGROUND );
   pt.x=xMouseTableOrig; pt.y=yMouseTableOrig; GpiMove(hps,&pt);
-  if (!ruler.on) pt.x+=220; 
+  if (!ruler.on) pt.x += 220; // "ad-hoc" length for clearing the line
     else { RECTL rc; // clear the whole line
 	   GpiQueryPageViewport(hpsScreen,&rc);
 	   pt.x=xMouseTableOrig+rc.xRight;
@@ -586,7 +587,8 @@ case WM_MOUSEMOVE:
   GpiSetColor( hps, COLOR_MOUSE );    // set color of the text
   GpiSetCharMode(hps,CM_MODE1);
 
-  pt.x=xMouseTableOrig+2; pt.y=yMouseTableOrig+2;
+  pt.x = xMouseTableOrig+2;
+  pt.y = yMouseTableOrig+2;
 
   if (ruler.on) { // append this info coming from the ruler position
     char p[255];
@@ -601,6 +603,13 @@ case WM_MOUSEMOVE:
 	  else dy = y - ruler.y;
 	if (mouse_mode==MOUSE_COORDINATES_REAL)
 	sprintf(p,"  ruler: [%g,%g]  distance: %g;%g",ruler.x,ruler.y,dx,dy);
+	// polar coords of distance (axes cannot be logarithmic)
+	if (bMousePolarDistance && !gp4mouse.is_log_x && !gp4mouse.is_log_y) {
+	  double rho = sqrt((x-ruler.x)*(x-ruler.x)+(y-ruler.y)*(y-ruler.y));
+	  double phi = (180/M_PI)*atan2(y-ruler.y,x-ruler.x);
+	  strcat(s,p);
+	  sprintf(p," (%g;%.4gø)",rho,phi);
+	  }
 	}
     strcat(s,p);
     }
@@ -953,6 +962,11 @@ MRESULT WmClientCmdProc(HWND hWnd, ULONG message, MPARAM mp1, MPARAM mp2)
 	case IDM_MOUSE_FORMAT_LABEL:
 	    ChangeCheck( hWnd, ulMouseSprintfFormatItem, SHORT1FROMMP( mp1 ) ) ;
 	    ulMouseSprintfFormatItem = SHORT1FROMMP( mp1 );
+	    return 0L;
+
+	case IDM_MOUSE_POLAR_DISTANCE: // toggle using/not using polar coords of distance
+	    bMousePolarDistance = !bMousePolarDistance ;
+	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, bMousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;
 	    return 0L;
 
 	case IDM_MOUSE_UNZOOM:
@@ -1637,6 +1651,7 @@ static void ReadGnu( void* arg )
     static char *szPauseText = NULL ;
     ULONG ulPause ;
     char *pszPipeName, *pszSemName ;
+    char  mouseShareMemName[40]; //PM
     LONG  commands[4] ;
     HPS hps ;    
     HAB hab ;
@@ -1683,6 +1698,13 @@ server:
            the command buffers */
 
         DosRead( hRead, &ppidGnu, 4, &cbR ) ;
+
+	sprintf( mouseShareMemName, "\\SHAREMEM\\GP%i_Mouse_Input", (int)ppidGnu ); //PM 11.5.1999
+	if (DosGetNamedSharedMem(&input_from_PM_Terminal, //fraba
+		mouseShareMemName,
+		PAG_WRITE))
+	   DosBeep(1440L,1000L); /* indicates error */
+
 //        DosPostEventSem( semStartSeq ) ;         /* once we've got pidGnu */
         WinPostMsg( hApp, WM_GPSTART, 0, 0 ) ;
 
@@ -1741,35 +1763,16 @@ server:
 			  IDM_MOUSE_UNZOOM, FALSE ) ;
 			}
 		      zooming = 0;
-		      if (ruler.on) {
-			// ruler is on, thus recalc its (px,py) from (x,y) for
-			// the current zoom and log axes
-			double P;
-			if (gp4mouse.is_log_x && ruler.x<0)
-			    ruler.px = -1;
-			  else {
-			    P = gp4mouse.is_log_x ?
-				  log(ruler.x) / gp4mouse.log_base_log_x
-				  : ruler.x;
-			    P = (P-gp4mouse.xmin) / (gp4mouse.xmax-gp4mouse.xmin);
-			    P *= gp4mouse.xright-gp4mouse.xleft;
-			    ruler.px = (long)( gp4mouse.xleft + P );
-			    }
-			if (gp4mouse.is_log_y && ruler.y<0)
-			    ruler.py = -1;
-			  else {
-			    P = gp4mouse.is_log_y ?
-				  log(ruler.y) / gp4mouse.log_base_log_y
-				  : ruler.y;
-			    P = (P-gp4mouse.ymin) / (gp4mouse.ymax-gp4mouse.ymin);
-			    P *= gp4mouse.ytop-gp4mouse.ybot;
-			    ruler.py = (long)( gp4mouse.ybot + P );
-			    }
-			}
+		      if (ruler.on) recalc_ruler_pos();
 		      }
                     }
                     break ;
                     
+                case '#' :    /* do_3dplot() and boundary3d() changed [xleft..ytop] */
+		    BufRead(hRead,&gp4mouse.xleft, 4*sizeof(gp4mouse.xleft), &cbR);
+		    if (ruler.on) recalc_ruler_pos();
+                    break ;
+
                 case 'Q' :     /* query terminal info */
 		    //PM mouseable gnupmdrv sends greetings to mouseable PM terminal
 		    if (mouseTerminal) {
@@ -2723,6 +2726,33 @@ if  (gp4mouse.is_log_x) *x = exp( *x * gp4mouse.log_base_log_x );
 if  (gp4mouse.is_log_y) *y = exp( *y * gp4mouse.log_base_log_y );
 
 }
+
+void recalc_ruler_pos()
+ {
+			// ruler is on, thus recalc its (px,py) from (x,y) for
+			// the current zoom and log axes
+			double P;
+			if (gp4mouse.is_log_x && ruler.x<0)
+			    ruler.px = -1;
+			  else {
+			    P = gp4mouse.is_log_x ?
+				  log(ruler.x) / gp4mouse.log_base_log_x
+				  : ruler.x;
+			    P = (P-gp4mouse.xmin) / (gp4mouse.xmax-gp4mouse.xmin);
+			    P *= gp4mouse.xright-gp4mouse.xleft;
+			    ruler.px = (long)( gp4mouse.xleft + P );
+			    }
+			if (gp4mouse.is_log_y && ruler.y<0)
+			    ruler.py = -1;
+			  else {
+			    P = gp4mouse.is_log_y ?
+				  log(ruler.y) / gp4mouse.log_base_log_y
+				  : ruler.y;
+			    P = (P-gp4mouse.ymin) / (gp4mouse.ymax-gp4mouse.ymin);
+			    P *= gp4mouse.ytop-gp4mouse.ybot;
+			    ruler.py = (long)( gp4mouse.ybot + P );
+			    }
+			}
 
 /* //PM: end of new functions related to the mouse processing */
 

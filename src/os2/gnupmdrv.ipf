@@ -170,8 +170,9 @@ functions.
 :h1 res=601. Use Mouse Menu Help
 :i2 refid=mmouse. Use mouse
 :p.Checking this menu item enables the mouse (pointer device) functionality:
-tracing the position over graph, zooming, annotating graph etc. At the moment, 
-mousing works for 2d graphs. It is not available in multiplot mode. 
+tracing the position over graph, zooming, annotating graph etc. for 2d graphs
+and for maps (i.e. `set view` with z-rotation 0,90,180,270 or 360 degrees).
+Mousing is not available in multiplot mode. 
 Except for the functions available from the menu, 
 mouse buttons have the following functions:
 :p.:hp2.MB2:ehp2. presents the zoom rectangle. Press :hp2.MB1:ehp2. to force 
@@ -201,19 +202,26 @@ coordinates.
 :p.Choose here the format for writing the cursor position into clipboard
 (via double click of MB1).
 
-:h1 res=604. Zoom Menu Help
+:h1 res=604. Polar Distance Menu Help
+:i2 refid=mmouse. Polar
+:p.If this menu item is checked, then the distance between the ruler and 
+mouse cursor is printed also in polar coordinates. This is particularly 
+useful for dealing with peaks or other objects in maps. Disabled if x or y
+axis is logarithmic. 
+
+:h1 res=605. Zoom Menu Help
 :i2 refid=mmouse. Zoom
 :p.Well, this menu item does nothing just remembers you to use MB2 to 
 start zooming. So click (=press and release) MB2, move your mouse 
 left and up to select the zooming rectangle. Press MB1 to put the 
 replot command into clipboard, or press ESC to cancel the command.
 
-:h1 res=605. Unzoom Menu Help
+:h1 res=606. Unzoom Menu Help
 :i2 refid=mmouse. Unzoom
 :p.This choise returns back the x and y ranges of the plot before
 the first mouse zoom. 
 
-:h1 res=606. Ruler Menu Help
+:h1 res=607. Ruler Menu Help
 :i2 refid=mmouse. Ruler
 :p.Disables the ruler if it is already on.
 :p.If the ruler has been off, then show it at the current pointer position. 
@@ -221,14 +229,14 @@ For every mouse movement, print the ruler position aside of the current
 pointer position, and show their distance (for linear scale) or ratio 
 (for log scale). 
 
-:h1 res=607. Grid Menu Help
+:h1 res=608. Grid Menu Help
 :i2 refid=mmouse. Grid on/off
 :p.Switches quickly on or off grid of the graph. Equivalent to the command 
 :hp2.set grid; replot:ehp2. or :hp2.set nogrid; replot:ehp2. typed in the 
 gnuplot window. (Actually, gnupmdrv can be compiled with this grid command 
 or with grid at minor tics.)
 
-:h1 res=608. Lin/Log Y Axis Menu Help
+:h1 res=609. Lin/Log Y Axis Menu Help
 :i2 refid=mmouse. lin/log y axis
 :p.Switches quickly between linear and logarithmic y axis. 
 Equivalent to the command :hp2.set log y; replot:ehp2. or 

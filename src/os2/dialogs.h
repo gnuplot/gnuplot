@@ -54,6 +54,7 @@
 #define IDM_MOUSE_FORMAT_LABEL        619
 #define IDM_MOUSE_GRID                621
 #define IDM_MOUSE_LINLOGY     622
+#define IDM_MOUSE_POLAR_DISTANCE      623
 
 #define ID_ABOUT              10
 #define IDD_COLOURS           20
