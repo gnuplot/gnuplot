@@ -57,6 +57,14 @@ VPATH = @srcdir@
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+
+INFO_DEPS = $(srcdir)/gnuplot.info
 
 CC     = @CC@
 CPP    = @CPP@
@@ -224,8 +232,8 @@ pdf: gnuplot.pdf
 
 gnuplot.pdf: gnuplot.tex
 	@if test $(PDFLATEX) != no ; then \
-	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
-	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(PDFLATEX) gnuplot ; \
 	else \
 	  echo pdflatex not found - cannot build pdf file ; \
 	fi
@@ -247,15 +255,15 @@ dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	@if test $(LATEX) != no ; then \
-	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
-	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):$(top_srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	else \
 	  echo "latex not found - cannot build dvi file" ; \
 	fi
 
 gpcard.dvi: gpcard.tex
 	@if test $(PLAINTEX) != no ; then \
-              TEXINPUTS=.:$(srcdir): tex gpcard ; \
+              TEXINPUTS=.:$(srcdir):$(top_srcdir): tex gpcard ; \
 	else \
 	  echo "plaintex not found - cannot build dvi file" ; \
 	fi
@@ -395,18 +403,35 @@ install-info: gnuplot.info
 	  install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnuplot.info || :;\
 	else : ; fi
 
+installcheck:
+
 # uninstall section
 uninstall: uninstall-gih uninstall-info
 
 uninstall-gih:
-	rm -f $(DESTDIR)$(datadir)/gnuplot.gih
+	rm -f $(DESTDIR)$(GIHDIR)/gnuplot.gih
 
 uninstall-info:
+	$(PRE_UNINSTALL)
 	@if (install-info --version && \
-	     install-info --version | fgrep -i -v debian) >/dev/null 2>&1; then \
-	  install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/gnuplot.info; \
-	else : ; fi
-	rm -f $(DESTDIR)$(infodir)/gnuplot.info
+	     install-info --version 2>&1 | sed 1q | grep -i -v debian) >/dev/null 2>&1; then \
+	  list='$(INFO_DEPS)'; \
+	  for file in $$list; do \
+	    relfile=`echo "$$file" | sed 's|^.*/||'`; \
+	    echo " install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/$$relfile"; \
+	    install-info --info-dir=$(DESTDIR)$(infodir) --remove $(DESTDIR)$(infodir)/$$relfile; \
+	  done; \
+	else :; fi
+	@$(NORMAL_UNINSTALL)
+	@list='$(INFO_DEPS)'; \
+	for file in $$list; do \
+	  relfile=`echo "$$file" | sed 's|^.*/||'`; \
+	  relfile_i=`echo "$$relfile" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  (if cd $(DESTDIR)$(infodir); then \
+	     echo " rm -f $$relfile $$relfile-[0-9] $$relfile-[0-9][0-9] $$relfile_i[0-9] $$relfile_i[0-9][0-9])"; \
+	     rm -f $$relfile $$relfile-[0-9] $$relfile-[0-9][0-9] $$relfile_i[0-9] $$relfile_i[0-9][0-9]; \
+	   else :; fi); \
+	done
 
 # for VMS only
 install-vms: gnuplot.hlp
