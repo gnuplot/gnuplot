@@ -208,38 +208,15 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
 /* if this fails on any system, we might use ((void)0) */
 #define NOOP /* */
 
-/* check axis range is not too small -
- * extend if you can (autoscale), else report error
- */
-#ifdef HAVE_CPP_STRINGIFY
-# define STRINGIFY(x) #x 
-# define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
-# define LOG_MSG(x) #x " range must be greater than 0 for log scale!"
-#else
-# define STRINGIFY(x) "x"
-# define RANGE_MSG(x) "x range is less than threshold : `see zero`"
-# define LOG_MSG(x) "x range must be greater than 0 for log scale!"
-#endif
- 
-#define FIXUP_RANGE(AXIS, WHICH) \
-do { if (fabs(max_array[AXIS] - min_array[AXIS]) < zero) { \
-    if (auto_array[AXIS]) { /* widen range */  \
-     fprintf(stderr, "Warning: empty %s range [%g:%g], ", STRINGIFY(WHICH), min_array[AXIS], max_array[AXIS]);      \
-     if (fabs(min_array[AXIS]) < zero) { \
-      if (auto_array[AXIS] & 1) min_array[AXIS] = -1.0; \
-      if (auto_array[AXIS] & 2) max_array[AXIS] = 1.0;   \
-     } else if (max_array[AXIS] < 0) { \
-      if (auto_array[AXIS] & 1) min_array[AXIS] *= 1.1; if (auto_array[AXIS] & 2) max_array[AXIS] *= 0.9;    \
-     } else { if (auto_array[AXIS] & 1) min_array[AXIS] *= 0.9; if (auto_array[AXIS] & 2) max_array[AXIS] *= 1.1;  }  \
-     fprintf(stderr, "adjusting to [%g:%g]\n", min_array[AXIS], max_array[AXIS]);          \
-    } else int_error(RANGE_MSG(WHICH), c_token);   \
-   } \
-}while(0)
-
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
  */
-
+#ifdef HAVE_CPP_STRINGIFY
+# define LOG_MSG(x) #x " range must be greater than 0 for log scale!"
+#else
+# define LOG_MSG(x) "x range must be greater than 0 for log scale!"
+#endif
+ 
 #define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
 do { if (reverse_range[AXIS]) { \
       double temp = min_array[AXIS]; \
@@ -1083,7 +1060,7 @@ static void eval_plots()
 	    max_array[FIRST_X_AXIS] == -VERYLARGE)
 		int_error("x range is invalid", c_token);
 	/* check that xmin -> xmax is not too small */
-	FIXUP_RANGE(FIRST_X_AXIS, x);
+	fixup_range(FIRST_X_AXIS, "x");
 
 	if (uses_axis[SECOND_X_AXIS] & 1) {
 		/* some data plots with x2 */
@@ -1091,7 +1068,7 @@ static void eval_plots()
         	    max_array[SECOND_X_AXIS] == -VERYLARGE)
 			int_error("x2 range is invalid", c_token);
 		/* check that x2min -> x2max is not too small */
-		FIXUP_RANGE(SECOND_X_AXIS, x);
+		fixup_range(SECOND_X_AXIS, "x2");
         } else if (auto_array[SECOND_X_AXIS]) {
 		/* copy x1's range */
 		if (auto_array[SECOND_X_AXIS] & 1)
@@ -1239,9 +1216,9 @@ do{ assert(!polar && !parametric); \
 	/* also fixes up polar&&parametric fn plots */
 	parametric_fixup(first_plot, &plot_num);
 	/* we omitted earlier check for range too small */
-	FIXUP_RANGE(FIRST_X_AXIS, x);
+	fixup_range(FIRST_X_AXIS, "x");
 	if (uses_axis[SECOND_X_AXIS]) {
- 		FIXUP_RANGE(SECOND_X_AXIS, x2);
+		fixup_range(SECOND_X_AXIS, "x2");
 	}
     }
 
@@ -1288,7 +1265,7 @@ do{ assert(!polar && !parametric); \
 	if (max_array[FIRST_Y_AXIS] == -VERYLARGE ||
 	    min_array[FIRST_Y_AXIS] ==  VERYLARGE)
 	   int_error("all points undefined!", NO_CARET);
-	FIXUP_RANGE(FIRST_Y_AXIS, y);
+	fixup_range(FIRST_Y_AXIS, "y");
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);
     } /* else we want to copy y2 range, but need to fix it up first */
 
@@ -1296,7 +1273,7 @@ do{ assert(!polar && !parametric); \
 	if (max_array[SECOND_Y_AXIS] == -VERYLARGE ||
 	    min_array[SECOND_Y_AXIS] ==  VERYLARGE)
 	   int_error("all points undefined!", NO_CARET);
-	FIXUP_RANGE(SECOND_Y_AXIS, y2);
+	fixup_range(SECOND_Y_AXIS, "y2");
 	FIXUP_RANGE_FOR_LOG(SECOND_Y_AXIS, y2);
     } else {
     	assert(uses_axis[FIRST_Y_AXIS]);

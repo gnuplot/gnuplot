@@ -184,35 +184,15 @@ do { if (log_array[AXIS]) { if (VALUE<0.0) {TYPE = UNDEFINED; UNDEF_ACTION; brea
 /* if this fails on any system, we might use ((void)0) */
 #define NOOP /* */
 
-/* check axis range is not too small -
- * extend if you can (autoscale), else report error
- */
-#ifdef HAVE_CPP_STRINGIFY
-# define STRINGIFY(x) #x
-# define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
-#else
-# define STRINGIFY(x) "x"
-# define RANGE_MSG(x) "x range is less than threshold : see `set zero`"
-#endif
-
-#define FIXUP_RANGE(AXIS, WHICH) \
-do { if (fabs(max_array[AXIS] - min_array[AXIS]) < zero) { \
-      if (auto_array[AXIS]) { /* widen range */  \
-       fprintf(stderr, "Warning: empty %s range [%g:%g], ", STRINGIFY(WHICH), min_array[AXIS], max_array[AXIS]);      \
-       if (fabs(min_array[AXIS]) < zero) { \
-        if (auto_array[AXIS] & 1) min_array[AXIS] = -1.0; \
-        if (auto_array[AXIS] & 2) max_array[AXIS] = 1.0;   \
-       } else if (max_array[AXIS] < 0) { \
-        if (auto_array[AXIS] & 1) min_array[AXIS] *= 1.1; if (auto_array[AXIS] & 2) max_array[AXIS] *= 0.9;    \
-       } else { if (auto_array[AXIS] & 1) min_array[AXIS] *= 0.9; if (auto_array[AXIS] & 2) max_array[AXIS] *= 1.1;  }  \
-       fprintf(stderr, "adjusting to [%g:%g]\n", min_array[AXIS], max_array[AXIS]);          \
-      } else int_error(RANGE_MSG(WHICH), c_token);   \
-     } \
-}while(0)
-
 /* check range and take logs of min and max if logscale
  * this also restores min and max for ranges like [10:-10]
  */
+
+#ifdef HAVE_CPP_STRINGIFY
+# define RANGE_MSG(x) #x " range is less than threshold : see `set zero`"
+#else
+# define RANGE_MSG(x) "x range is less than threshold : see `set zero`"
+#endif
 
 #define FIXUP_RANGE_FOR_LOG(AXIS, WHICH) \
 do { if (reverse_range[AXIS]) { \
@@ -1144,8 +1124,8 @@ static void eval_3dplots()
 			}
 			
 			/* check that xmin -> xmax is not too small */
-			FIXUP_RANGE(FIRST_X_AXIS, x);
-			FIXUP_RANGE(FIRST_Y_AXIS, y);
+			fixup_range(FIRST_X_AXIS, "x");
+			fixup_range(FIRST_Y_AXIS, "y");
 			/*}}}*/
 		}
 
@@ -1369,9 +1349,9 @@ static void eval_3dplots()
 	    max_array[FIRST_Z_AXIS] == -VERYLARGE)
 		int_error("All points undefined", NO_CARET);
 
-	FIXUP_RANGE(FIRST_X_AXIS, x);
-	FIXUP_RANGE(FIRST_Y_AXIS, y);
-	FIXUP_RANGE(FIRST_Z_AXIS, z);
+	fixup_range(FIRST_X_AXIS, "x");
+	fixup_range(FIRST_Y_AXIS, "y");
+	fixup_range(FIRST_Z_AXIS, "z");
 	
 	FIXUP_RANGE_FOR_LOG(FIRST_X_AXIS, x);
 	FIXUP_RANGE_FOR_LOG(FIRST_Y_AXIS, y);

@@ -531,12 +531,13 @@ char ss[MAX_LINE_LEN+1], *s, *e;
 	ceiling_z = z_max3d;
     }
 
-/*  This used be x_max3d == x_min3d, but that caused an infinite loop once. */
-    if (fabs(x_max3d - x_min3d) < zero)
+/*  see comment accompanying similar tests of x_min/x_max and y_min/y_max */
+/*  in graphics.c:do_plot(), for history/rationale of these tests */
+    if (x_min3d == x_max3d)
 	graph_error("x_min3d should not equal x_max3d!");
-    if (fabs(y_max3d - y_min3d) < zero)
+    if (y_min3d == y_max3d)
 	graph_error("y_min3d should not equal y_max3d!");
-    if (fabs(z_max3d - z_min3d) < zero)
+    if (z_min3d == z_max3d)
 	graph_error("z_min3d should not equal z_max3d!");
 
 #ifndef LITE
