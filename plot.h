@@ -93,6 +93,9 @@ typedef int TBOOLEAN;
 #define MIN_SRF_POINTS 1000
 
 
+/* Minimum number of chars to represent an integer */
+#define INT_STR_LEN (3*sizeof(int))
+
 /* note that MAX_LINE_LEN, MAX_TOKENS and MAX_AT_LEN do no longer limit the
    size of the input. The values describe the steps in which the sizes are
    extended. */
