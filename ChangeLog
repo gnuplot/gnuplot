@@ -1,3 +1,11 @@
+2005-02-26  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/pm3d.c (set_plot_with_palette): Don't trigger display of the
+	colorbox in 2D plots just because an explicit line color was set.
+
+	* misc.c (parse_fillstyle): accept full keyword "fillstyle" in addition
+	to short form "fs".
+
 2005-02-24  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/graphics.c(plot_c_bars) src/plot2d.c(eval_plots) docs/gnuplot.doc:
