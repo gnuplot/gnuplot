@@ -1,6 +1,6 @@
 % Quick Reference Card for gnuplot 2004
 %
-% $Id: $
+% $Id: gpcard.tex,v 1.3 2004/04/15 13:48:33 mikulik Exp $
 %
 % Format stolen shamelessly from the GNU Emacs reference card
 %**start of header
@@ -995,6 +995,19 @@ function is also supported, as in BASIC.
 
 %\begin{center}
 %\begin{tabular}{|ccl|} \hline
+{
+\catcode`\^=7
+\catcode`\_=8
+\def\ff#1{\hbox{\rm #1}\,}
+\def\fff#1{\hbox{\rm #1}\,}
+\def\sin{\ff{sin}}
+\def\cos{\ff{cos}}
+\def\tan{\ff{tan}}
+\def\sinh{\ff{sinh}}
+\def\cosh{\ff{cosh}}
+\def\tanh{\ff{tanh}}
+\def\log{\fff{log}}
+
 \settabs 5\columns
 \+Function & Arguments & Returns \cr
 \hrule%\hline
@@ -1014,7 +1027,7 @@ function is also supported, as in BASIC.
 \+ cos(x) & radians & $\cos x$, cosine of $x$ \cr
 \+ cosh(x) & radians & $\cosh x$, hyperbolic cosine of $x$ \cr
 \+ erf(x) & any & $\hbox{Erf}(\hbox{real}(x))$,  error function of real($x$) \cr
-\+ erfc(x) & any & $\hbox{Erfc}(\hbox{real}(x))$,  1.0 - error function of real($x$) \cr
+\+ erfc(x) & any & $\hbox{Erfc}(\hbox{real}(x))$,  1.0 $-$ error function of real($x$) \cr
 \+ exp(x) & any & $e^{x}$,  exponential function of $x$ \cr
 \+ floor(x) & any & $\lfloor x \rfloor$,  largest integer not greater
 than $x$ (real part) \cr
@@ -1035,8 +1048,11 @@ than $x$ (real part) \cr
 \+ tan(x) & radians & $\tan x$,  tangent of $x$ \cr
 \+ tanh(x) & radians & $\tanh x$, hyperbolic tangent of $x$\cr
 \hrule % \hline
+}
+
 %\end{tabular}
 %\end{center}
+
 \section{Operators}
 The operators in gnuplot are the same as the corresponding operators
 in the C programming language, except that all operators accept
