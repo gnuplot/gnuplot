@@ -38,7 +38,7 @@ for i in `cd $dir;find . \( -name "*.c" -o -name "*.h" -o -name "*.trm" \) -prin
     else
       suffix=`echo $i | awk -F\. '{print $NF}'`
       if [ $suffix = h ]; then
-        mv $dir/$i $dir/$i.dist
+        test -r $dir/$i && mv $dir/$i $dir/$i.dist
         mv .tmp $dir/$i
       else
       mv .tmp $i
