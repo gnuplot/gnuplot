@@ -1,3 +1,17 @@
+2001-07-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wtext.c (DragFunc): Changed argument of first
+	DragQueryFile() call from 0xffff to (UINT)-1, to work on Win32,
+	and Win16.
+
+2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/interpol.c (cp_implode): Typo fixed. Would set 'x' when it
+ 	was trying to un-log a 'y' value.
+	(cp_approx_spline, gen_interp, cp_tridiag, solve_five_diag):
+ 	Removed casts when assigning pointers coming from gp_alloc.
+  	Re-grouped for() loops a bit.
+
 2001-07-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/graphics.c (xtick2d_callback, ytick2d_callback): Cast arg
