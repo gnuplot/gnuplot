@@ -1,3 +1,44 @@
+1998-10-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in: Reverse order of CPPFLAGS and INCLUDES in COMPILE.
+
+	* Makefile.in, buildvms.com, descrip.mms, makefile.os2, makefile.os9,
+	makefile.unx: gnuplot_x11 is now linked with stdfn.o.
+
+	* command.c, fit.c, gplt_x11.c, help.c, plot.c, scanner.c, strftime.c,
+	docs/doc2html.c, docs/doc2info.c, docs/termdoc.c, term/pc.trm,
+	term/pslatex.trm, term/pstricks.trm: Replace calls to strncpy() and
+	similar code with safe_strncpy().
+
+	* command.c, plot2d.c, plot3d.c, readline.c: Move Atari file
+	inclusion to syscfg.h.
+
+	* corplot.c, scanner.c, standard.c: Simplify #ifdef line.
+
+	* fit.c: Don't use copy_max(). Move to stdfn.c as safe_strncpy().
+	Move Atari file inclusion to syscfg.h. Move Dblf* macros to fit.h.
+	Fix indentation.
+
+	* fit.c, fit.h, misc.c: Patch from Jochen Schuetze <jos@GBF.DE> to
+	save last fit command as comment.
+
+	* fit.h: Moved macros from fit.c. Move function prototypes to protos.h.
+
+	* makefile.tc, makefile.win, plot3d.c, term/hpgl.trm: DOS and dgrid3d
+	patches	from HBB.
+
+	* protos.h: safe_strncpy() prototype from stdfn.c. Prototypes from
+	fit.h.
+
+	* stdfn.c: New function safe_strncpy(), moved from fit.c(copy_max).
+
+	* syscfg.h: Include files for Atari.
+
+	* parse.c, stdfn.h, syscfg.h, term.h: Fix ifdefs.
+
+	* term/amiga.trm, term/cgm.trm, term/djsvga.trm, term/grass.trm,
+	term/next.trm, term/post.trm, term/tgif.trm: Replace '\0' with NUL.
+
 1998-10-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL, 0PORTING: Updated.
