@@ -1,3 +1,8 @@
+2003-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* config/makefile.nt (winmain.obj): Don't repeat HELPFILE
+ 	definition --- already part of CFLAGS.
+
 2003-04-04  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.os2: Support for IPFC 2.1. Use temporary script file

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.10 2002/03/26 17:03:53 broeker Exp $
+# $Id: makefile.nt,v 1.11 2003/02/19 13:54:51 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -125,7 +125,7 @@ term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(CC) $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\"  win\winmain.c
+	$(CC) $(CFLAGS) win\winmain.c
 
 WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 
