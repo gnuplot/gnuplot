@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.7 1999/10/29 18:47:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.8 1999/11/08 19:24:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -583,13 +583,16 @@ f_acos()
 	/* real result */
 	push(Gcomplex(&a, acos(x) / ang2rad, 0.0));
     } else {
-	double alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	double beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	double alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	               + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	double beta = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	              - sqrt((x - 1) * (x - 1) + y * y) / 2;
 	if (beta > 1)
 	    beta = 1;		/* Avoid rounding error problems */
 	else if (beta < -1)
 	    beta = -1;
-	push(Gcomplex(&a, acos(beta) / ang2rad, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
+	push(Gcomplex(&a, (y > 0? -1: 1)*acos(beta) / ang2rad, 
+	                  log(alpha + sqrt(alpha * alpha - 1)) / ang2rad));
     }
 }
 
@@ -707,9 +710,12 @@ f_acosh()
     } else if (y == 0) {
 	push(Gcomplex(&a, log(x + sqrt(x * x - 1)) / ang2rad, 0.0));
     } else {
-	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 + sqrt((x - 1) * (x - 1) + y * y) / 2;
-	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 - sqrt((x - 1) * (x - 1) + y * y) / 2;
-	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, acos(beta) / ang2rad));
+	alpha = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	        + sqrt((x - 1) * (x - 1) + y * y) / 2;
+	beta = sqrt((x + 1) * (x + 1) + y * y) / 2 
+	       - sqrt((x - 1) * (x - 1) + y * y) / 2;
+	push(Gcomplex(&a, log(alpha + sqrt(alpha * alpha - 1)) / ang2rad, 
+	                  (y<0 ? -1 : 1) * acos(beta) / ang2rad));
     }
 }
 
