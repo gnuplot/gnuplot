@@ -1,6 +1,6 @@
 $! generates options file for vms link
 $! p1 is filename and mode to open file (filename/write or filename/append)
-$! p2 is comma-seperated list of files
+$! p2 is comma-separated list of files
 $
 $ open file 'p1'
 $ element=0
