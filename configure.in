@@ -8,9 +8,7 @@ AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
 AC_REVISION($Revision: 1.90 $)
 
-VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/src/version.c|tr -d ' '`
-PATCHLVL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/src/version.c|tr -d ' '`
-VERSION="${VERSION}.${PATCHLVL}"
+VERSION="`cat $srcdir/VERSION`.`cat $srcdir/PATCHLEVEL`"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 
 dnl Optional features.
