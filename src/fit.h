@@ -70,4 +70,4 @@ EXT char    fitbuf[256];
 
 EXT void error_ex __PROTO((void));
 
-#endif
+#endif /* FIT_H */

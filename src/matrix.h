@@ -58,4 +58,4 @@ EXT void    Givens __PROTO((double **C, double *d, double *x,
 			double *r, int N, int n, int want_r)); 
 EXT void    Invert_RtR __PROTO((double **R, double **I, int n));
 
-#endif
+#endif /* MATRIX_H */
