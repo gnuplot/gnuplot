@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.18 2001/09/19 19:12:14 amai Exp $
+# $Id: makefile.os2,v 1.20 2001/09/21 20:51:14 amai Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
@@ -96,7 +96,7 @@ TERMDIR = ..\term
 
 
 # where to place gnuplot.gih helpfile
-HELPFILE = gnuplot.gih
+HELPFILE = $(DOCDIR)\gnuplot.gih
 
 #
 # 3 sets of variables are defined and used to create
@@ -112,7 +112,7 @@ O2 = obj
 O3 = o
 
 # Flags for compiler and linker under OS/2
-OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
+OS2FLAGS = -DOS2
 
 # Flags for compiling with EMX/GCC
 # Special note: -ffloat-store is necessary to avoid some
@@ -206,6 +206,10 @@ CFLAGS += -DPM3D
 CFLAGS2 += -DPM3D
 endif
 
+# TOOLS
+CPP = cpp
+# Don't name this variable "IPFC"!!
+IPF_C = ipfc.exe
 
 # Tools for buildings the docs
 DVIPS    = dvips
@@ -231,10 +235,11 @@ include makefile.all
 # Pre-defined sets of targets:
 #
 all:         runtime demo
-alldocs:     gnuplot.gih gnuplot.inf gnuplot.html gnuplot.info \
-             gnuplot.dvi gnuplot.ps gnuplot.pdf
-runtime:     binaries infomin gnuplot.inf
-infomin:     gnupmdrv.hlp gnuplot.gih
+alldocs:     $(DOCDIR)\gnuplot.gih $(DOCDIR)\gnuplot.inf $(DOCDIR)\gnuplot.html \
+             $(DOCDIR)\gnuplot.info $(DOCDIR)\gnuplot.ps \
+             $(DOCDIR)\gnuplot.pdf
+runtime:     binaries infomin $(DOCDIR)\gnuplot.inf
+infomin:     gnupmdrv.hlp $(DOCDIR)\gnuplot.gih
 demo:        $(M)binary1 $(M)binary2 $(M)binary3
 ifdef X11
 binaries: gnuplot.exe gnupmdrv.exe gnuplot_x11.exe
@@ -266,8 +271,7 @@ gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 	$(CC2) $(LDFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
-	copy $(OS2DIR)\gnupmdrv.ipf .
-	ipfc gnupmdrv.ipf
+	$(IPF_C) $< $@
 
 #
 # Build the X11 outboard driver
@@ -293,37 +297,35 @@ gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 #
 # Don't care about the strange way it's implemented ...
 # Call LaTeX three times to get the toc right.
-gnuplot.dvi: gnuplot.tex
-	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
+$(DOCDIR)\gnuplot.dvi: $(DOCDIR)\gnuplot.tex
+	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_2.tex
 	cd $(DOCDIR) && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex && $(LATEX) gnuplot_2.tex
-	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
+	move $(DOCDIR)\gnuplot_2.dvi $(DOCDIR)\gnuplot.dvi
 	del $(DOCDIR)\gnuplot_2*
-gnuplot.ps: gnuplot.dvi
-	$(DVIPS) -o gnuplot.ps gnuplot.dvi
-gnuplot.pdf: gnuplot.tex
-	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
+$(DOCDIR)\gnuplot.ps: $(DOCDIR)\gnuplot.dvi
+	$(DVIPS) -o $@ $(DOCDIR)\gnuplot.dvi
+$(DOCDIR)\gnuplot.pdf: $(DOCDIR)\gnuplot.tex
+	copy $(DOCDIR)\gnuplot.tex $(DOCDIR)\gnuplot_2.tex
 	cd $(DOCDIR) && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex && $(PDFLATEX) gnuplot_2.tex
-	move $(DOCDIR)\gnuplot_2.pdf gnuplot.pdf
-	del $(DOCDIR)\gnuplot_2*
-gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
-	doc2tex.exe $(DOCDIR)\gnuplot.doc gnuplot.tex
-gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
-	copy $(DOCDIR)\gnuplot.ipf .
-	ipfc /INF gnuplot.ipf
-gnuplot.gih:  $(DOCDIR)\gnuplot.doc doc2gih.exe
-	doc2gih.exe $(DOCDIR)\gnuplot.doc gnuplot.gih
-gnuplot.html: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
+	move $(DOCDIR)\gnuplot_2.pdf $(DOCDIR)\gnuplot.pdf
+$(DOCDIR)\gnuplot.tex:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2tex.exe
+	$(DOCDIR)\doc2tex.exe $(DOCDIR)\gnuplot.doc $@
+$(DOCDIR)\gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
+	$(IPF_C) /INF $< $@
+$(DOCDIR)\gnuplot.gih:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2gih.exe
+	$(DOCDIR)\doc2gih.exe $(DOCDIR)\gnuplot.doc $@
+$(DOCDIR)\gnuplot.html: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
 	$(MAKEINFO) --html -I$(DOCDIR) $(DOCDIR)\gnuplot.texi --no-split --output=$@
-gnuplot.info: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
+$(DOCDIR)\gnuplot.info: $(DOCDIR)\gnuplot.texi $@
 	$(MAKEINFO) -I$(DOCDIR) $(DOCDIR)\gnuplot.texi --no-split --output=$@
-# gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
-#	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$(DOCDIR)\gnuplot.texi
-gnuplot.rtf:  $(DOCDIR)\gnuplot.doc doc2rtf.exe
-	doc2rtf.exe $(DOCDIR)\gnuplot.doc gnuplot.rtf
-gnuplot.ms:   $(DOCDIR)\gnuplot.doc doc2ms.exe
-	doc2ms.exe $(DOCDIR)\gnuplot.doc gnuplot.ms
-$(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc doc2ipf.exe
-	doc2ipf.exe $(DOCDIR)\gnuplot.doc $(DOCDIR)\gnuplot.ipf
+# $(DOCDIR)\gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
+#	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$@
+$(DOCDIR)\gnuplot.rtf:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2rtf.exe
+	$(DOCDIR)\doc2rtf.exe $(DOCDIR)\gnuplot.doc $@
+$(DOCDIR)\gnuplot.ms:   $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ms.exe
+	$(DOCDIR)\doc2ms.exe $(DOCDIR)\gnuplot.doc $@
+$(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2ipf.exe
+	$(DOCDIR)\doc2ipf.exe $(DOCDIR)\gnuplot.doc $@
 # Assume we need A4 format
 gpcard.ps: $(DOCDIR)\gpcard.dvi
 	$(DVIPS) -o gpcard_letter.ps $< 
@@ -335,26 +337,29 @@ $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
 # Tools for converting the documentation from docs\gnuplot.doc
 # in various formats
 #
-doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-            $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
-#
-# To include all terminal documentations in the documentation
-# uncomment the following 2 lines
-# doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-#           $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
+
+# Some dependency - no rule!
+$(DOCDIR)\doc2gih.exe $(DOCDIR)\doc2ipf.exe $(DOCDIR)\doc2html.exe \
+$(DOCDIR)\doc2info.exe $(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
+      $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
+
 
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
-	cd $(TERMDIR) && type *.trm > $@
-doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
+#	cd $(TERMDIR) && type *.trm > $@
+	cd $(DOCDIR) && cat $(TERMDIR)/*.trm > allterm.c
+	cd $(DOCDIR) && $(CPP) -I$(TERMDIR) -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
+      sed -e "/^ *$$/d;/^#/d" > allterm.h
+
+$(DOCDIR)\doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
-doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
+$(DOCDIR)\doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
-doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERM) $(DOCDIR)\allterm.h
+$(DOCDIR)\doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERM) $(DOCDIR)\allterm.h
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
-doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
+$(DOCDIR)\doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
-doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
+$(DOCDIR)\doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERM)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
 #
 # Create binary demo files
@@ -377,7 +382,7 @@ clean:
 	cd $(OS2DIR) && IF EXIST *.$(O2)   DEL *.$(O2)
 	IF EXIST $(OS2DIR)\gnupmdrv.res    DEL $(OS2DIR)\gnupmdrv.res
 	IF EXIST $(DEMODIR)\bf_test.exe    DEL $(DEMODIR)\bf_test.exe
-	IF EXIST doc2*.exe                 DEL doc2*.exe
+	IF EXIST $(DOCDIR)\doc2*.exe       DEL $(DOCDIR)\doc2*.exe
 	IF EXIST $(DOCDIR)\gnuplot.ipf     DEL $(DOCDIR)\gnuplot.ipf
 	IF EXIST core                      DEL core
 	IF EXIST $(DOCDIR)\allterm.h       DEL $(DOCDIR)\allterm.h
