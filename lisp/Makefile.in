@@ -100,7 +100,7 @@ gpelcard.dvi: gpelcard.tex
 all: gnuplot.elc info-look.elc gnuplot-gui.elc
 
 install:
-	$(top_srcdir)/../mkinstalldirs $(lispdir)
+	mkinstalldirs $(lispdir)
 	@for p in *.elc; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \

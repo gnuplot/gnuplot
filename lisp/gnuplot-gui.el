@@ -5,7 +5,7 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu>
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    19 December 1998
-;; Updated:
+;; Updated:    20 March 1999
 ;; Version:    (see gnuplot.el)
 ;; Keywords:   gnuplot, plotting, interactive, GUI
 
@@ -14,9 +14,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; This lisp script is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details about the assumptions
-;; of other lisp scripts similar to this.
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+;;
+;; Permission is granted to distribute copies of this lisp script
+;; provided the copyright notice and this permission are preserved in
+;; all copies.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; send bug reports to the authors (ravel@phys.washington.edu)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,10 +51,15 @@
 ;; -- 'position: two or three comma separated numbers used to denote a
 ;;               position or a tic start/end/increment (see arrow,
 ;;               need a prefix)
-;; -- 'file: field is not behaving properly -- M-tab and ret
+;; -- 'file:     field is not behaving properly -- M-tab and ret
 ;;
-;; command types which are currently unsupported:
-;; -- plot, splot, fit, cntrparam, hidden3d
+;; command types which are currently unsupported or contain mistakes
+;; -- unsupported: plot, splot, fit, cntrparam
+;; -- style: does `set style' mean anything?  Should I prompt for
+;;           function or data?
+;; -- key:   box linetype information missing
+;; -- label: position information missing
+;; -- label: font string handled in overly simple manner
 ;;
 ;; overall:
 ;; -- continuation lines (ugh!)
@@ -175,17 +182,40 @@ as single entries in the menu-buttons."
 
 
 
-;;; data structures containing regarding options in Gnuplot 3.6
+;;; data structures containing regarding options in Gnuplot 3.7
+
+;; various constants used for options that take the same sorts of arguments
+(defconst gnuplot-gui-mtics-list
+  '(("FREQUENCY"   'number " ")
+    ("DEFAULT"     'list " " "default")))
+(defconst gnuplot-gui-data-list
+  '(("DATA TYPE"   'list " " "time")))
+(defconst gnuplot-gui-label-list
+  '(("LABEL"       'string " ")
+    ("POSITION"    'position " " "" 2)
+    ("FONTNAME"    'list " " gnuplot-gui-fontname-list)
+    ("FONTSIZE"    'fontsize " ")))
+(defconst gnuplot-gui-range-list
+  '(("RANGE"       'range (" " . " ") ":")
+    ("REVERSE"     'list " " "reverse" "noreverse")
+    ("WRITEBACK"   'list " " "writeback" "nowriteback")))
+(defconst gnuplot-gui-tics-list
+  '(("WHERE"       'list " " "axis" "border")
+    ("MIRROR"      'list " " "mirror" "nomirror")
+    ("ROTATE"      'list " " "rotate" "norotate")
+    ("SERIES"      'position " " "" 3)
+    ("LABEL ARRAY" 'labels () )))
+(defconst gnuplot-gui-zeroaxis-list
+  '(("LINETYPE"    'number " ")))
 
 (defvar gnuplot-gui-terminal-types nil
   "Associated list of terminal descriptions.
 See the doc-string for `gnuplot-gui-all-types'.")
-
 (setq gnuplot-gui-terminal-types
       (list (cons "aifm"
-		  '(("COLOR"    'list " " "monochrome" "gray" "color")
-		    ("FONTNAME" 'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE" 'fontsize " ")))
+		  '(("COLOR"     'list " " "monochrome" "gray" "color")
+		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
+		    ("FONTSIZE"  'fontsize " ")))
 	    (cons "cgm"
 		  '(("MODE"      'list   " " "landscape" "portrait" "default")
 		    ("COLOR"     'list   " " "color" "monochrome")
@@ -197,66 +227,66 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		     "\"Times Roman\"" "\"Times Roman Italic\""
 		     "\"Times Roman Bold\"" "\"Times Roman Bold Italic\""
 		     "\"Helvetica\"" "\"Roman\"")
-		    ("FONTSIZE" 'fontsize " ")))
+		    ("FONTSIZE"  'fontsize " ")))
 	    (cons "corel"
-		  '(("COLOR"     'list " " "default" "color" "monochrome")
-		    ("FONTNAME"  'list " " "\"SwitzerlandLight\""
+		  '(("COLOR"            'list " " "default" "color" "monochrome")
+		    ("FONTNAME"         'list " " "\"SwitzerlandLight\""
 		     "\"Helvetica\"" "\"Times-Roman\"")
-		    ("FONTSIZE " 'number " ")
-		    ("X-SIZE   " 'number " ")
-		    ("Y-SIZE   " 'number " ")
-		    ("LINEWIDTH" 'number " ")))
+		    ("FONTSIZE "        'number " ")
+		    ("X-SIZE   "        'number " ")
+		    ("Y-SIZE   "        'number " ")
+		    ("LINEWIDTH"        'number " ")))
 	    (cons "dumb"
-		  '(("LINEFEED" 'list   " " "feed" "nofeed")
-		    ("X-SIZE"   'number " ")
-		    ("Y-SIZE"   'number " ")))
+		  '(("LINEFEED"         'list   " " "feed" "nofeed")
+		    ("X-SIZE"           'number " ")
+		    ("Y-SIZE"           'number " ")))
 	    (cons "emtex"
-		  '(("FONTNAME" 'list     " " "courier" "roman")
-		    ("FONTSIZE" 'fontsize " ")))
+		  '(("FONTNAME"         'list     " " "courier" "roman")
+		    ("FONTSIZE"         'fontsize " ")))
 	    (cons "fig"
-		  '(("COLOR"          'list   " " "color" "monochrome")
-		    ("FRAMESIZE"      'list   " " "small" "big")
-		    ("POINTSMAX"      'number " " "pointsmax")
-		    ("ORIENTATION"    'list   " " "landscape" "portrait")
-		    ("UNITS"          'list   " " "metric" "inches")
-		    ("FONT SIZE"      'number " " "fontsize")
-		    ("SIZE"           'pair   (" " . " ") "size")
-		    ("LINE THICKNESS" 'number " " "thickness")
-		    ("LAYER DEPTH"    'number " " "depth")))
+		  '(("COLOR"            'list   " " "color" "monochrome")
+		    ("FRAMESIZE"        'list   " " "small" "big")
+		    ("POINTSMAX"        'number " " "pointsmax")
+		    ("ORIENTATION"      'list   " " "landscape" "portrait")
+		    ("UNITS"            'list   " " "metric" "inches")
+		    ("FONT SIZE"        'number " " "fontsize")
+		    ("SIZE"             'pair   (" " . " ") "size")
+		    ("LINE THICKNESS"   'number " " "thickness")
+		    ("LAYER DEPTH"      'number " " "depth")))
 	    (cons "hp500c"
-		  '(("RESOLUTION"  'list " " "75" "100" "150" "300")
-		    ("COMPRESSION" 'list " " "rle" "tiff")))
+		  '(("RESOLUTION"       'list " " "75" "100" "150" "300")
+		    ("COMPRESSION"      'list " " "rle" "tiff")))
 	    (cons "hpgl"
-		  '(("PENS"     'number " ")
-		    ("EJECT"    'list   " " "eject")))
+		  '(("PENS"             'number " ")
+		    ("EJECT"            'list   " " "eject")))
 	    (cons "hpdj"
-		  '(("RESOLUTION"  'list " " "75" "100" "150" "300")))
+		  '(("RESOLUTION"       'list " " "75" "100" "150" "300")))
 	    (cons "hpljii"
-		  '(("RESOLUTION"  'list " " "75" "100" "150" "300")))
+		  '(("RESOLUTION"       'list " " "75" "100" "150" "300")))
 	    (cons "hppj"
-		  '(("FONT"     'list " " "FNT9X17" "FNT5X9" "FNT13X25")))
+		  '(("FONT"             'list " " "FNT9X17" "FNT5X9" "FNT13X25")))
 	    (cons "imagen"
-		  '(("FONT SIZE" 'number " ")
-		    ("LAYOUT"    'list   " " "portrait" "landscape")
+		  '(("FONT SIZE"        'number " ")
+		    ("LAYOUT"           'list   " " "portrait" "landscape")
 		    ("NUMBER OF GRAPHS" 'range (" " . " ") ",")))
 	    (cons "gpic"
-		  '(("X ORIGIN"   'number " ")
-		    ("Y ORIGIN"   'number " " ",")))
+		  '(("X ORIGIN"         'number " ")
+		    ("Y ORIGIN"         'number " " ",")))
 	    (cons "latex"
-		  '(("FONTNAME" 'list " " "courier" "roman")
-		    ("FONTSIZE" 'fontsize " ")))
+		  '(("FONTNAME"         'list " " "courier" "roman")
+		    ("FONTSIZE"         'fontsize " ")))
 	    (cons "mif"
-		  '(("COLOUR"   'list " " "colour" "monochrome")
-		    ("LINETYPE" 'list " " "polyline" "vectors")))
+		  '(("COLOUR"           'list " " "colour" "monochrome")
+		    ("LINETYPE"         'list " " "polyline" "vectors")))
 	    (cons "nec-cp6"
-		  '(("MODE"     'list " " "monochrome" "colour" "draft")))
+		  '(("MODE"             'list " " "monochrome" "colour" "draft")))
 	    (cons "pbm"
-		  '(("SIZE"      'list " " "small" "medium" "large")
-		    ("COLOR"     'list " " "monochrome" "gray" "color")))
+		  '(("SIZE"             'list " " "small" "medium" "large")
+		    ("COLOR"            'list " " "monochrome" "gray" "color")))
 	    (cons "pcl5L"
-		  '(("MODE"     'list " " "landscape" "portrait")
-		    ("FONTNAME" 'list " " "stick" "univers" "cg_times")
-		    ("FONTSIZE" 'fontsize " ")))
+		  '(("MODE"             'list " " "landscape" "portrait")
+		    ("FONTNAME"         'list " " "stick" "univers" "cg_times")
+		    ("FONTSIZE"         'fontsize " ")))
 	    (cons "png"
 		  '(("SIZE"      'list " " "small" "medium" "large")
 		    ("COLOR"     'list " " "monochrome" "gray" "color")))
@@ -269,33 +299,33 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
 		    ("FONTSIZE"  'fontsize " ")))
 	    (cons "pslatex"
-		  '(("COLOR"    'list " " "monochrome" "color")
-		    ("DASHED"   'list " " "dashed")
-		    ("ROTATION" 'list " " "rotate" "norotate")
-		    ("AUXFILE"  'list " " "auxfile")))
+		  '(("COLOR"     'list " " "monochrome" "color")
+		    ("DASHED"    'list " " "dashed")
+		    ("ROTATION"  'list " " "rotate" "norotate")
+		    ("AUXFILE"   'list " " "auxfile")))
 	    (cons "pstex"
-		  '(("COLOR"    'list " " "monochrome" "color")
-		    ("DASHED"   'list " " "dashed")
-		    ("ROTATION" 'list " " "rotate" "norotate")
-		    ("AUXFILE"  'list " " "auxfile")))
+		  '(("COLOR"     'list " " "monochrome" "color")
+		    ("DASHED"    'list " " "dashed")
+		    ("ROTATION"  'list " " "rotate" "norotate")
+		    ("AUXFILE"   'list " " "auxfile")))
 	    (cons "pstricks"
-		  '(("HACK TEXT"    'list " " "hacktext" "nohacktext")
-		    ("PLOT SCALING" 'list " " "nounit" "unit")))
+		  '(("HACK TEXT"        'list " " "hacktext" "nohacktext")
+		    ("PLOT SCALING"     'list " " "nounit" "unit")))
 	    (cons "regis"
-		  '(("COLOR DEPTH" 'list "4" "16")))
+		  '(("COLOR DEPTH"      'list "4" "16")))
 	    (cons "tgif"
-		  '(("LAYOUT"    'list   " " "portrait" "landscape")
+		  '(("LAYOUT"           'list   " " "portrait" "landscape")
 		    ("NUMBER OF GRAPHS" 'range (" " . " ") ",")
-		    ("LINE TYPE" 'list " " "solid" "dashed")
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
+		    ("LINE TYPE"        'list " " "solid" "dashed")
+		    ("FONTNAME"         'list " " gnuplot-gui-fontname-list)
+		    ("FONTSIZE"         'fontsize " ")))
 	    (cons "tpic"
-		  '(("POINTSIZE" 'number " ")
-		    ("LINEWIDTH" 'number " ")
-		    ("INTERVAL "  'number " ")))
+		  '(("POINTSIZE"        'number " ")
+		    ("LINEWIDTH"        'number " ")
+		    ("INTERVAL "        'number " ")))
 	    (cons "x11"
-		  '(("RESET" 'list " " "reset")
-		    ("TERMINAL NUMBER" 'number " "))) ))
+		  '(("RESET"            'list " " "reset")
+		    ("TERMINAL NUMBER"  'number " "))) ))
 
 (defvar gnuplot-gui-terminal-list nil)
 (setq gnuplot-gui-terminal-list
@@ -308,10 +338,10 @@ See the doc-string for `gnuplot-gui-all-types'.")
       (list (cons "angles"
 		  '(("UNITS" 'list " " "degrees" "radians")))
 	    (cons "arrow"
-		  '(("TAG" 'tag " ")
-		    ("FROM" 'position " " "from" 3)
-		    ("TO"   'position " " "to" 3)
-		    ("HEAD" 'list " " "head" "nohead")
+		  '(("TAG"       'tag " ")
+		    ("FROM"      'position " " "from" 3)
+		    ("TO"        'position " " "to" 3)
+		    ("HEAD"      'list " " "head" "nohead")
 		    ("LINESTYLE" 'number " " "ls")
 		    ("LINETYPE " 'number " " "lt")
 		    ("LINEWIDTH" 'number " " "lw")))
@@ -328,7 +358,13 @@ See the doc-string for `gnuplot-gui-all-types'.")
 	    (cons "bar"
 		  '(("SIZE" 'list " " "small" "large")))
 	    (cons "border"
-		  '(("BORDER CODE" 'number " ")))
+		  '(("BORDER CODE" 'number " ")
+		    ("LINE STYLE"  'list   " " "lines"
+		     "dots" "points" "linespoints")
+		    ("LINESTYLE"   'number " " "ls")
+		    ("LINETYPE"    'number " " "lt")
+		    ("LINEWIDTH"   'number " " "lw")
+		    ))
 	    (cons "boxwidth"
 		  '(("WIDTH" 'number " ")))
 	    (cons "clabel"
@@ -363,12 +399,25 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("POLAR"  'number " " "polar")
 		    ("MAJOR LINETYPE" 'number " ")
 		    ("MINOR LINETYPE" 'number " ")))
-	    ;; (cons "hidden3d"
+	    (cons "hidden3d"
+		  '(("ALGORITHM" 'list " " "defaults"
+                    "offset           # linetype offset"
+		    "nooffset"
+                    "trianglepattern  # bitpattern between 0 and 7"
+		    ;;"trianglepattern 1"
+                    ;;"trianglepattern 2" "trianglepattern 3"
+                    ;;"trianglepattern 4" "trianglepattern 5"
+                    ;;"trianglepattern 6" "trianglepattern 7"
+                    "undefined        # level between 0 and 3"
+		    ;;"undefined 1" "undefined 2" "undefined 3"
+		    "noundefined" "altdiagonal" "noaltdiagonal"
+		    "bentover" "nobentover")))
 	    (cons "isosamples"
 		  '(("ISO_U LINES" 'number " ")
 		    ("ISO_V LINES" 'number " " ",")))
 	    (cons "key"
-		  '(("LOCATION" 'list " " "left" "right" "top" "bottom" "below")
+		  '(("LOCATION" 'list " " "left" "right" "top" "bottom"
+		                          "outside" "below")
 		    ("POSITION"      'position  " " "" 3)
 		    ("JUSTIFICATION" 'list " " "Left" "Right")
 		    ("REVERSE"       'list " " "reverse" "noreverse")
@@ -376,17 +425,24 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		    ("SPACING"       'number " " "spacing")
 		    ("WIDTH"         'number " " "width")
 		    ("TITLE"         'string " " "title ")
-		    ("BOX LINETYPE"  'number " " "box")
+		    ("BOX LINETYPE"  'number " " "box") ;; linetype data
 		    ("NOBOX"         'list " " "nobox")))
 	    (cons "label"
 		  '(("TAG" 'tag " ")
 		    ("LABEL TEXT" 'string " ")
-		    ("POSITION" 'position " " "at" 3)
+		    ("POSITION" 'position " " "at" 3) ;; first, second, graph, screen
 		    ("JUSTIFICATION" 'list " " "left" "right" "center")
 		    ("ROTATE" 'list " " "rotate" "norotate")
-		    ("FONT" 'string " ")))
+		    ("FONT" 'string " "))) ;; font "name,size"
+	    (cons "nolabel"
+		  '(("TAG" 'tag " ")))
 	    (cons "linestyle"
 		  '(("INDEX    " 'number " ")
+		    ("LINE STYLE" 'list " " "boxerrorbars" "boxes"
+		     "boxxyerrorbars" "candlesticks" "dots"
+		     "financebars" "fsteps" "histeps" "impulses"
+		     "lines" "linespoints" "points" "steps" "vector"
+		     "xerrorbars" "xyerrorbars" "yerrorbars")
 		    ("LINETYPE " 'number " " "lt")
 		    ("LINEWIDTH" 'number " " "lw")
 		    ("POINTTYPE" 'number " " "pt")
@@ -416,21 +472,11 @@ See the doc-string for `gnuplot-gui-all-types'.")
 	    (cons "missing"
 		  '(("CHARACTER" 'string " " 1)))
 					; m_tics
-	    (cons "mxtics"
-		  '(("FREQUENCY" 'number " ")
-		    ("DEFAULT"   'list " " "default")))
-	    (cons "mytics"
-		  '(("FREQUENCY" 'number " ")
-		    ("DEFAULT"   'list " " "default")))
-	    (cons "mztics"
-		  '(("FREQUENCY" 'number " ")
-		    ("DEFAULT"   'list " " "default")))
-	    (cons "mx2tics"
-		  '(("FREQUENCY" 'number " ")
-		    ("DEFAULT"   'list " " "default")))
-	    (cons "my2tics"
-		  '(("FREQUENCY" 'number " ")
-		    ("DEFAULT"   'list " " "default")))
+	    (cons "mxtics"  gnuplot-gui-mtics-list)
+	    (cons "mytics"  gnuplot-gui-mtics-list)
+	    (cons "mztics"  gnuplot-gui-mtics-list)
+	    (cons "mx2tics" gnuplot-gui-mtics-list)
+	    (cons "my2tics" gnuplot-gui-mtics-list)
 
 	    (cons "offsets"
 		  '(("LEFT  " 'number " ")
@@ -448,8 +494,10 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		  '(("2D PLOT"    'number " ")
 		    ("3D PLOT"    'number " " ",")))
 	    (cons "size"
-		  '(("ASPECT"     'list " " "square" "ratio" "noratio")
-		    ("SCALE"      'position " " "" 2)))
+		  '(("ASPECT"           'list " " "square" "nosquare"
+		                                  "ratio" "noratio")
+		    ("X-SCALE OR RATIO" 'number " ")
+		    ("Y-SCALE"          'number " " ",")))
 	    (cons "style"
 		  '(("PLOT STYLE" 'list " " "boxerrorbars" "boxes"
 		     "boxxyerrorbars" "candlesticks" "dots"
@@ -469,130 +517,55 @@ See the doc-string for `gnuplot-gui-all-types'.")
 		  '(("FORMAT STRING" 'format " ")
 		    ("WHERE"         'list " " "top" "bottom")
 		    ("ROTATE"        'list " " "rotate" "norotate")
-		    ("POSITION"      'position " " "" 2)
+		    ("X-OFFSET"      'number " ")
+		    ("Y-OFFSET"      'number " " ",")
 		    ("FONTNAME"      'list " " gnuplot-gui-fontname-list)))
 	    (cons "timefmt"
 		  '(("FORMAT STRING" 'string " ")))
 	    (cons "title"
 		  '(("TITLE" 'string " ")))
+	    (cons "view"
+		  '(("X-ROTATION" 'number " ")
+		    ("Z-ROTATION" 'number " " ",")
+		    ("SCALE"      'number " " ",")
+		    ("Z-SCALE"    'number " " ",")))
+	    ;; ("SCALE" 'position " " "," 4)
 					; _data
-	    (cons "xdata"
-		  '(("XDATA"  'list " " "time")))
-	    (cons "ydata"
-		  '(("YDATA"  'list " " "time")))
-	    (cons "zdata"
-		  '(("ZDATA"  'list " " "time")))
-	    (cons "x2data"
-		  '(("X2DATA" 'list " " "time")))
-	    (cons "y2data"
-		  '(("Y2DATA" 'list " " "time")))
+	    (cons "xdata"      gnuplot-gui-data-list)
+	    (cons "ydata"      gnuplot-gui-data-list)
+	    (cons "zdata"      gnuplot-gui-data-list)
+	    (cons "x2data"     gnuplot-gui-data-list)
+	    (cons "y2data"     gnuplot-gui-data-list)
 					; _label
-	    (cons "xlabel"
-		  '(("LABEL"     'string " ")
-		    ("POSITION"  'position " " "" 2)
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
-	    (cons "ylabel"
-		  '(("LABEL"     'string " ")
-		    ("POSITION"  'position " " "" 2)
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
-	    (cons "zlabel"
-		  '(("LABEL"     'string " ")
-		    ("POSITION"  'position " " "" 2)
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
-	    (cons "x2label"
-		  '(("LABEL"     'string " ")
-		    ("POSITION"  'position " " "" 2)
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
-	    (cons "y2label"
-		  '(("LABEL"     'string " ")
-		    ("POSITION"  'position " " "" 2)
-		    ("FONTNAME"  'list " " gnuplot-gui-fontname-list)
-		    ("FONTSIZE"  'fontsize " ")))
+	    (cons "xlabel"     gnuplot-gui-label-list)
+	    (cons "ylabel"     gnuplot-gui-label-list)
+	    (cons "zlabel"     gnuplot-gui-label-list)
+	    (cons "x2label"    gnuplot-gui-label-list)
+	    (cons "y2label"    gnuplot-gui-label-list)
 					; _range, note that the [] syntax for
 					;         the writeback argument is
 					;         not properly supported
-	    (cons "xrange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "yrange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "zrange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "x2range"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "y2range"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "trange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "rrange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "urange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
-	    (cons "vrange"
-		  '(("RANGE"     'range (" " . " ") ":")
-		    ("REVERSE"   'list " " "reverse" "noreverse")
-		    ("WRITEBACK" 'list " " "writeback" "nowriteback")))
+	    (cons "xrange"     gnuplot-gui-range-list)
+	    (cons "yrange"     gnuplot-gui-range-list)
+	    (cons "zrange"     gnuplot-gui-range-list)
+	    (cons "x2range"    gnuplot-gui-range-list)
+	    (cons "y2range"    gnuplot-gui-range-list)
+	    (cons "trange"     gnuplot-gui-range-list)
+	    (cons "rrange"     gnuplot-gui-range-list)
+	    (cons "urange"     gnuplot-gui-range-list)
+	    (cons "vrange"     gnuplot-gui-range-list)
 					; _tics
-	    (cons "xtics"
-		  '(("WHERE"       'list " " "axis" "border")
-		    ("MIRROR"      'list " " "mirror" "nomirror")
-		    ("ROTATE"      'list " " "rotate" "norotate")
-		    ("SERIES"      'position " " "" 3)
-		    ("LABEL ARRAY" 'labels () )))
-	    (cons "ytics"
-		  '(("WHERE"       'list " " "axis" "border")
-		    ("MIRROR"      'list " " "mirror" "nomirror")
-		    ("ROTATE"      'list " " "rotate" "norotate")
-		    ("SERIES"      'position " " "" 3)
-		    ("LABEL ARRAY" 'labels () )))
-	    (cons "ztics"
-		  '(("WHERE"       'list " " "axis" "border")
-		    ("MIRROR"      'list " " "mirror" "nomirror")
-		    ("ROTATE"      'list " " "rotate" "norotate")
-		    ("SERIES"      'position " " "" 3)
-		    ("LABEL ARRAY" 'labels () )))
-	    (cons "x2tics"
-		  '(("WHERE"       'list " " "axis" "border")
-		    ("MIRROR"      'list " " "mirror" "nomirror")
-		    ("ROTATE"      'list " " "rotate" "norotate")
-		    ("SERIES"      'position " " "" 3)
-		    ("LABEL ARRAY" 'labels () )))
-	    (cons "y2tics"
-		  '(("WHERE"       'list " " "axis" "border")
-		    ("MIRROR"      'list " " "mirror" "nomirror")
-		    ("ROTATE"      'list " " "rotate" "norotate")
-		    ("SERIES"      'position " " "" 3)
-		    ("LABEL ARRAY" 'labels () )))
+	    (cons "xtics"      gnuplot-gui-tics-list)
+	    (cons "ytics"      gnuplot-gui-tics-list)
+	    (cons "ztics"      gnuplot-gui-tics-list)
+	    (cons "x2tics"     gnuplot-gui-tics-list)
+	    (cons "y2tics"     gnuplot-gui-tics-list)
 					; zeroaxis
-	    (cons "zeroaxis"
-		  '(("LINETYPE" 'number " ")))
-	    (cons "xzeroaxis"
-		  '(("LINETYPE" 'number " ")))
-	    (cons "yzeroaxis"
-		  '(("LINETYPE" 'number " ")))
-	    (cons "y2zeroaxis"
-		  '(("LINETYPE" 'number " ")))
-	    (cons "x2zeroaxis"
-		  '(("LINETYPE" 'number " ")))
+	    (cons "zeroaxis"   gnuplot-gui-zeroaxis-list)
+	    (cons "xzeroaxis"  gnuplot-gui-zeroaxis-list)
+	    (cons "yzeroaxis"  gnuplot-gui-zeroaxis-list)
+	    (cons "y2zeroaxis" gnuplot-gui-zeroaxis-list)
+	    (cons "x2zeroaxis" gnuplot-gui-zeroaxis-list)
 
 	    (cons "zero"
 		  '(("THRESHOLD" 'number " ")))
@@ -690,19 +663,18 @@ This alist is formed at load time by appending together
 `gnuplot-gui-terminal-types', `gnuplot-gui-set-types' and
 `gnuplot-gui-command-types'.")
 
-;;(defun gnuplot-gui-make-all-types ()
 (setq gnuplot-gui-all-types (append gnuplot-gui-terminal-types
 				    gnuplot-gui-set-types
 				    gnuplot-gui-command-types ))
-;;  )
-;;(add-hook 'gnuplot-mode-hook 'gnuplot-gui-make-all-types)
 
 
 ;;; user interface to the widget-y stuff
 
 (defun gnuplot-gui-mouse-set (event)
   "Use the mouse to begin setting options using a GUI interface.
-EVENT is a mouse event.  Bound to \\[gnuplot-gui-mouse-set]"
+EVENT is a mouse event.  Bound to \\[gnuplot-gui-mouse-set]
+Note that \"plot\", \"splot\", \"fit\", and \"cntrparam\" are not
+currently supported."
   (interactive "@e")
   (when (fboundp 'widget-create)
     (save-excursion
@@ -713,7 +685,9 @@ EVENT is a mouse event.  Bound to \\[gnuplot-gui-mouse-set]"
 (defun gnuplot-gui-set-options-and-insert ()
   "Insert arguments using a GUI interface.
 Determine contents of current line and set up the appropriate GUI frame.
-Bound to \\[gnuplot-gui-set-options-and-insert]"
+Bound to \\[gnuplot-gui-set-options-and-insert]
+Note that \"plot\", \"splot\", \"fit\", and \"cntrparam\" are not
+currently supported."
   (interactive)
   (when (fboundp 'widget-create)
     (let ((begin (save-excursion (beginning-of-line) (point-marker)))
@@ -766,8 +740,7 @@ Bound to \\[gnuplot-gui-set-options-and-insert]"
 		 (gnuplot-gui-set-alist word gnuplot-gui-current-string)
 		 (gnuplot-gui-prompt-for-frame word))
 		((setq wrd (car (all-completions
-				 w '(("plot") ("splot") ("fit")
-				     ("hidden3d") ("cntrparam") ))))
+				 w '(("plot") ("splot") ("fit") ("cntrparam")))))
 		 (message
 		  "Setting arguments for %S is currently unsuported in gnuplot-mode"
 		  wrd))
@@ -1096,17 +1069,27 @@ SAVE-FRAME is non-nil when the widgets are being reset."
     (modify-frame-parameters (selected-frame)
 			     '((title . "Set Gnuplot Options"))) )
   (widget-insert "\nSet options for \"" item "\"  ")
-  (if (string-match "^[xyz]2?tics" item) ; only __tics need the 'labels type
-      (widget-create 'gnuplot-gui-info-link
-		     :tag (concat "info on tic labels")
-		     :help-echo
-		     "Open a frame displaying the info entry for tic labels"
-		     :value "xtics")
-    (widget-create 'gnuplot-gui-info-link
-		   :tag (concat "info on " item)
-		   :help-echo
-		   (format "Open a frame displaying the info entry for %S" item)
-		   :value item))
+  (cond ((string-match "^[xyz]2?tics" item) ; only __tics need the 'labels type
+	 (widget-create 'gnuplot-gui-info-link
+			:tag (concat "info on tic labels")
+			:help-echo
+			"Open a frame displaying the info entry for tic labels"
+			:value "xtics"))
+	((string-match "^no" item)
+	 (let ((it (substring item 2)))
+	   (widget-create 'gnuplot-gui-info-link
+			  :tag (concat "info on " it)
+			  :help-echo
+			  (format "Open a frame displaying the info entry for %S"
+				  item)
+			  :value item) ))
+	(t
+	 (widget-create 'gnuplot-gui-info-link
+			:tag (concat "info on " item)
+			:help-echo
+			(format "Open a frame displaying the info entry for %S"
+				item)
+			:value item)))
   (widget-insert "\n\n")
   (while alist
     (let* ((this    (car   alist))
@@ -1155,8 +1138,9 @@ SAVE-FRAME is non-nil when the widgets are being reset."
 	(gnuplot-gui-labels tag default))
        ;;------------------------------ huh? -------------------
        (t
-	(let ((str (concat "<" (downcase tag) "> (item of undefined type '"
-			   (symbol-name (eval wtype)) ")\n")))
+	(let ((str (concat "<" (downcase tag) "> ('"
+			   (symbol-name (eval wtype))
+			   " arguments are not yet supported)\n")))
 	  (put-text-property 0 (length str) 'face 'gnuplot-gui-error-face str)
 	  (widget-insert str)) )))
     (setq alist (cdr alist)))

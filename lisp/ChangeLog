@@ -1,13 +1,31 @@
 
-Jan 23 1999  Bruce Ravel  <bruce.ravel@nist.gov>
+Mar 21 1999  Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5d
+	* use installation materials provided by Lars Hecking,
+	        maintainer of gnuplot itself
+	* add GUI support for hidden3d
+	* various improvements to the types alists used by the GUI
+	* improved various document strings and the bug reporter function
+
+Feb 15 1999  Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5c
+	* update copyright information and gpelcard.tex
+
+Jan 28 1999  Bruce Ravel  <ravel@phys.washington.edu>
+	* gnuplot.el: Version 0.5b
+	* fixed a bug in gnuplot-kill-gnuplot-buffer
+	* fixed a bug in gnuplot-plot-from-comint
+	* fixed the description of the gnuplot-faces customization group
+
+Jan 23 1999  Bruce Ravel  <ravel@phys.washington.edu>
 	* gnuplot.el: Version 0.5a
 	* send file to gnuplot now uses the "load" command
 	* can plot scripts from the comint buffer using
-	  gnuplot-plot-from-comint or gnuplot-save-and-plot-from-comint.
+	       gnuplot-plot-from-comint or
+               gnuplot-save-and-plot-from-comint.
 	* C-d in comint buffer is more graceful
 
-
-Dec 27 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Dec 27 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.5
 	* preliminary version of interactive graphical system for
@@ -19,7 +37,7 @@ Dec 27 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 	* transparent icons in toolbar
 	* move toolbar code into gnuplot.el
 
-Dec 15 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Dec 15 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4f
 	* defcustom all the insertion submenus
@@ -27,7 +45,7 @@ Dec 15 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 	* Makefile now knows how to determine which version of
 	             info-look to compile
 
-Dec 13 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Dec 13 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4e
 	* deal with the many versions of info-look in the Makefile
@@ -35,14 +53,14 @@ Dec 13 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 	* break insertions menu up into several variables and put
 	          menubar initialization into a function
 
-Dec  9 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Dec  9 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4d
 	* added function gnuplot-setup-info-look and hook variable
 	          gnuplot-info-hook to handle situation of different
 	          versions of the info file.
 
-Nov 30 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Nov 30 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4c
 	* fixed frame behavior
@@ -54,14 +72,14 @@ Nov 30 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 	           dot.el to the distribution to suppress compile-time
 	           warnings
 
-Nov 21 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Nov 21 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4b
 	* Fix bug in line plotting function when line is empty
 	* Add toolbar for XEmacs and file gnuplot-toolbar.el
 	* Allow display of gnuplot process in a separate frame
 
-Nov 18 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Nov 18 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4a
 	* clean up useless buffers left lying around by info-look
@@ -71,7 +89,7 @@ Nov 18 1998  Bruce Ravel  <bruce.ravel@nist.gov>
 	* Added function `gnuplot-send-line-and-forward' and bound it to
 	        C-c C-v.  Mention this in gpelcard
 
-Nov 14 1998  Bruce Ravel  <bruce.ravel@nist.gov>
+Nov 14 1998  Bruce Ravel  <ravel@phys.washington.edu>
 
 	* gnuplot.el: Version 0.4
 	* Added info-look to distribution.  It was taken from the emacs

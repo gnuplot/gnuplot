@@ -3,22 +3,31 @@ This directory contains files for running Gnuplot from within emacs.
 This package was assembled by Bruce Ravel <ravel@phys.washington.edu>.
 See http://feff.phys.washington.edu/~ravel/gnuplot/ for the latest.
 
+
 			       Contents
 			       ========
 
 README               this file
 ChangeLog            a log of changes by version number
 gnuplot.el	     gnuplot mode for emacs
+gnuplot-gui.el       a GUI for setting command arguments interactively
 info-look.20.2.el    programmer's interface to info files, old version
 info-look.20.3.el    programmer's interface to info files, new version
-gnuplot-gui.el       a GUI for setting command arguments interactively
 dot.el               a short lisp file used by the Makefile
 gnuplot.info	     info version of gnuplot 3.6 help
 gpelcard.tex         quick reference card for gnuplot mode (latex)
-        .ps                                                (postscript)
-Makefile	     a simple makefile for compiling the lisp and latex
 dotemacs             example .emacs lines for enabling gnuplot mode
+Makefile.in	\	     
+Makefile.dst	 \    
+aclocal.m4	  \	files inherited from the gnuplot distribution
+configure	   }	for making gnuplot-mode
+configure.in	  /
+install-sh	 /
+mkinstalldirs   /
 
+Soon gnuplot-mode will be included with the gnuplot 3.7 distribution.
+The installation instructions for the free-standing distribution have
+been modified to be consistent with that.
 
 
 			     Installation
@@ -26,16 +35,20 @@ dotemacs             example .emacs lines for enabling gnuplot mode
 
 1.  Unpack the gnuplot.tar.gz and cd to the gnuplot directory.  
 
-2.  Run "make".  If you use XEmacs, run "make EMACS=xemacs".
+2.  Type "configure".
 
-3.  Move the .elc files to a place where emacs can find them, for
-    example /usr/share/emacs/site-lisp or your personal emacs
-    directory.
+3.  Run "make".  If you use XEmacs, run "make EMACS=xemacs" (or change
+    the EMACS variable to "xemacs" in the Makefile, the run "make").
 
-4.  Insert the contents of the `dotemacs' file into your .emacs file
-    or system start-up file to enable gnuplot mode.
+4.  "make install".  This moves the lisp files to the system site_lisp
+    directory, which is appropriate if you are installing as root.  If
+    you are installing as a normal user move the .elc files to a place
+    where emacs, i.e. your personal emacs directory.
 
-5.  The function `gnuplot-info-lookup-symbol' looks at the Gnuplot
+5.  Insert the contents of the `dotemacs' file into your .emacs file
+    or into the system's emacs start-up file to enable gnuplot mode.
+
+6.  The function `gnuplot-info-lookup-symbol' looks at the Gnuplot
     info file that comes with this package or that can be made from
     the Gnuplot distribution.  For that function to work, the file
     gnuplot.info must be placed somewhere where info can find it, for
@@ -44,7 +57,7 @@ dotemacs             example .emacs lines for enabling gnuplot mode
      (add-to-list 'Info-default-directory-list "/path/to/file")
 
 
-Wouldn't it be //great// if Emacs had some kind of interactive package
+Wouldn't it be //great// if Emacs had some kind of systematized package
 installing facility?  I think so, too!  Oh well....
 
 
@@ -52,19 +65,26 @@ installing facility?  I think so, too!  Oh well....
 				NOTES
 				=====
 
-1. There used to be an installation script written in perl.  I am no
-   longer distributing it. 
+1. gnuplot-mode is designed for use with version 3.7 of gnuplot.  It
+   should work very well with any of the 3.6 beta versions.  Only some
+   of the specialized features will not work with version 3.5 -- the
+   GUI interface to setting command arguments is an example.
 
-2. If you do not have the custom library installed, you will get
-   several harmless warnings when compiling gnuplot.el.  Gnuplot-mode
-   will work even without the custom library installed.
+2. There used to be an installation script written in perl.  I am no
+   longer distributing it.  Instead I am using the installation
+   materials from the gnuplot distribution.
 
-3. The file info-look.el provides the on-line help functionality.
-   Using a tool that is a standard part of Emacs is a good idea, but
-   this one gets complicated.  This file became part of Emacs with
-   version 20.  It changed between 20.2 and 20.3.  And it does not
-   come with XEmacs.  What's more, the version from 20.2 has a bug and
-   the newer version does not work with Emacs 19.  So, this
+3. If you do not have the custom library installed, you will get
+   several harmless warnings when compiling gnuplot.el.  Most of
+   gnuplot-mode will work even without the custom library installed.
+
+4. The file info-look.el provides the on-line help functionality.
+   Without it, things like on-line help and keyword completion will
+   not work.  Using a tool that is a standard part of Emacs is a good
+   idea, but this one gets complicated.  This file became part of
+   Emacs with version 20.  It changed between 20.2 and 20.3.  And it
+   does not come with XEmacs.  What's more, the version from 20.2 has
+   a bug and the newer version does not work with Emacs 19.  So, this
    distribution comes with two versions of info-look.el, the version
    from Emacs 20.2 patched to work correctly and the version from
    Emacs 20.3.  Here's what happens when you run make:
@@ -78,25 +98,24 @@ installing facility?  I think so, too!  Oh well....
    d.  If you use Emacs 20.3 or higher, the Makefile won't compile any
        version.
 
-4. The gnuplot-mode distribution comes with a new version of the
-   gnuplot info file.  Use it rather than the old one.  If you
-   really must use the older info file, see the document string for
-   the variable `gnuplot-info-hook'.
-
-5. Some of the functionality of gnuplot-mode requires files other than
-   gnuplot.el.  Care has been taken in gnuplot-mode so that it will
-   continue to function sensibly if any of these pieces are missing.
+5. The gnuplot-mode distribution comes with the version of the gnuplot
+   info file that gets made by gnuplot 3.7.  Use it rather than the
+   old one.  If you really must use the older info file, see the
+   document string for the variable `gnuplot-info-hook'.  If you
+   already have the info file installed on your computer, you will not
+   need the one that comes with gnuplot-mode.
 
 6. The interactive graphical graphical interface to setting command
    arguments contained in gnuplot-gui.el is experimental.  It is
    incomplete and may make mistakes.  Specifically, it does not
-   support arguments for "plot", "splot", "fit", "cntrparam", or
-   "hidden3d" and it does not know how to parse or set comma separated
-   position arguments such as those used to specify arrow or label
-   locations.  It handles all other commands and knows about many
-   terminal types.  Hopefully, you will find it useful.  It *requires*
-   that you are using a version of emacs with the widget library
-   installed or that you have installed it yourself.  Version numbers
-   in the 20's of Emacs and XEmacs ship with the widget library.  For
-   version numbers in the 19's, it can be obtained at
+   support arguments for "plot" (a huge shortcoming!), "splot", "fit",
+   "cntrparam", or "hidden3d" and it does not know how to parse or set
+   comma separated position arguments such as those used to specify
+   arrow or label locations.  It handles all other commands and knows
+   about many terminal types.  Hopefully, you will find it useful.  It
+   *requires* that you are using a version of emacs with the widget
+   library installed or that you have installed it yourself.  Version
+   numbers in the 20's of Emacs and XEmacs ship with the widget
+   library.  For version numbers in the 19's, it can be obtained at
    http://www.dina.kvl.dk/~abraham/custom/
+
