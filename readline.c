@@ -48,9 +48,9 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
  *     Petr Mikulik
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <signal.h>
+/* get prototype for alloc and gpfaralloc */
+#include "plot.h"
 
 #if defined(READLINE) && !defined(GNU_READLINE)
 
@@ -80,11 +80,6 @@ static char *RCSid = "$Id: readline.c,v 1.69 1998/04/14 00:16:12 drd Exp $";
  *
  * all other characters are ignored
  */
-
-#include <signal.h>
-/* get prototype for alloc and gpfaralloc */
-#include "plot.h"
-#include "stdfn.h"
 
 #ifdef __linux__
 /* HBB: to get prototype for ioctl() */

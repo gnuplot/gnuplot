@@ -16,12 +16,7 @@ static char *RCSid = "$Id: bf_test.c,v 1.11 1998/04/14 00:14:48 drd Exp $";
  * as a whole. (I think.)
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "ansichek.h"
-#include "stdfn.h"
+#include "plot.h"
 #define GPFAR /**/
 #include "binary.h"
 #include "alloc.h"

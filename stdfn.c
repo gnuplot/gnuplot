@@ -42,12 +42,7 @@ static char *RCSid = "$Id: stdfn.c,v 1.1 1998/05/19 18:05:02 ddenholm Exp $";
  * - Lars Hecking
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "ansichek.h"
-#include "stdfn.h"
+#include "plot.h"
 
 /*
  * ANSI C functions

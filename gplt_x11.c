@@ -117,10 +117,6 @@ Error. Incompatible options.
 
 #include <signal.h>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #ifdef HAVE_SYS_BSDTYPES_H
 # include <sys/bsdtypes.h>
 #endif /* HAVE_SYS_BSDTYPES_H */
@@ -141,8 +137,7 @@ Error. Incompatible options.
 # define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
 #endif /* not FD_SET */
 
-#include "ansichek.h"
-#include "stdfn.h"
+#include "plot.h"
 
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
 # include <sys/systeminfo.h>
@@ -255,7 +250,6 @@ int cx = 0, cy = 0, vchar;
 double xscale, yscale, pointsize;
 #define X(x) (int) ((x) * xscale)
 #define Y(y) (int) ((4095-(y)) * yscale)
-enum JUSTIFY { LEFT, CENTRE, RIGHT } jmode;
 
 #define Nbuf 1024
 char buf[Nbuf], **commands = (char **) 0;
@@ -753,6 +747,7 @@ plot_struct *plot;
     int n, x, y, sw, sl, lt = 0, width, type, point, px, py;
     int user_width = 1;		/* as specified by plot...linewidth */
     char *buffer, *str;
+    enum JUSTIFY jmode;
 
     FPRINTF((stderr, "Display %d ; %d commands\n", plot - plot_array, plot->ncommands));
 
