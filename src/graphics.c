@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.141 2005/01/04 19:44:53 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.142 2005/01/04 20:12:45 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4706,12 +4706,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
     int i;
     double w_hyp[2], b_hyp;                    /* Hyperlane vector and constant */
     double p_start_corner[2], p_end_corner[2]; /* Points used for computing hyperplane. */
-    int view_port[4];
     unsigned int K = 0, L = 0;                 /* Dimensions of image grid. K = <scan line length>, L = <number of scan lines>. */
     double p_mid_corner[2];                    /* Point representing first corner found, i.e. p(K-1) */
     double delta_x_grid[2] = {0, 0};           /* Spacings between points, two non-orthogonal directions. */
     double delta_y_grid[2] = {0, 0};
     int grid_corner[4] = {-1, -1, -1, -1};     /* The corner pixels of the image. */
+    double view_port_x[2];                     /* Viewable portion of the image. */
+    double view_port_y[2];
+    double view_port_z[2];
+
 
     if (project_points) {
       points = ((struct surface_points *)plot)->iso_crvs->points;
@@ -4730,9 +4733,6 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	fprintf(stderr, ERROR_NOTICE("Image grid must be at least 4 points (2 x 2).\n\n"));
 	return;
     }
-
-    view_port[0] = axis_array[FIRST_X_AXIS].term_lower; view_port[1] = axis_array[FIRST_Y_AXIS].term_lower;
-    view_port[2] = axis_array[FIRST_X_AXIS].term_upper; view_port[3] = axis_array[FIRST_Y_AXIS].term_upper;
 
     /* Check if the pixel data forms a valid rectangular grid for potential image
      * matrix support.  A general grid orientation is considered.  If the grid
@@ -4935,6 +4935,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	return;
     }
 
+    view_port_x[0] = (X_AXIS.autoscale & AUTOSCALE_MIN) ? X_AXIS.min : X_AXIS.set_min;
+    view_port_x[1] = (X_AXIS.autoscale & AUTOSCALE_MAX) ? X_AXIS.max : X_AXIS.set_max;
+    view_port_y[0] = (Y_AXIS.autoscale & AUTOSCALE_MIN) ? Y_AXIS.min : Y_AXIS.set_min;
+    view_port_y[1] = (Y_AXIS.autoscale & AUTOSCALE_MAX) ? Y_AXIS.max : Y_AXIS.set_max;
+    if (project_points) {
+	view_port_z[0] = (Z_AXIS.autoscale & AUTOSCALE_MIN) ? Z_AXIS.min : Z_AXIS.set_min;
+	view_port_z[1] = (Z_AXIS.autoscale & AUTOSCALE_MAX) ? Z_AXIS.max : Z_AXIS.set_max;
+    }
+
     if (rectangular_image) {
 
 	/* There are eight ways that a valid pixel grid can be entered.  Use table
@@ -4983,22 +4992,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 				* have a set direction, but M and N do.)
 				*/
 	    int i_image, i_sub_image = 0;
-	    double d_x_o_2, d_y_o_2;
+	    double d_x_o_2, d_y_o_2, d_z_o_2;
 	    int line_pixel_count = 0;
 
-	    if (project_points) {
-		double x0, x1, x2, y0, y1, y2;
-		map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x0, &y0);
-		map3d_xy_double(points[grid_corner[1]].x, points[grid_corner[1]].y, points[grid_corner[1]].z, &x1, &y1);
-		map3d_xy_double(points[grid_corner[2]].x, points[grid_corner[2]].y, points[grid_corner[2]].z, &x2, &y2);
-		d_x_o_2 = ( (x0 - x1)/(K-1) + (x0 - x2)/(L-1) ) / 2;
-		d_y_o_2 = ( (y0 - y1)/(K-1) + (y0 - y2)/(L-1) ) / 2;
-	    } else {
-		d_x_o_2 = ( (points[grid_corner[0]].x - points[grid_corner[1]].x)/(K-1)
-			    + (points[grid_corner[0]].x - points[grid_corner[2]].x)/(L-1) ) / 2;
-		d_y_o_2 = ( (points[grid_corner[0]].y - points[grid_corner[1]].y)/(K-1)
-			    + (points[grid_corner[0]].y - points[grid_corner[2]].y)/(L-1) ) / 2;
-	    }
+	    d_x_o_2 = ( (points[grid_corner[0]].x - points[grid_corner[1]].x)/(K-1)
+			+ (points[grid_corner[0]].x - points[grid_corner[2]].x)/(L-1) ) / 2;
+	    d_y_o_2 = ( (points[grid_corner[0]].y - points[grid_corner[1]].y)/(K-1)
+			+ (points[grid_corner[0]].y - points[grid_corner[2]].y)/(L-1) ) / 2;
+	    d_z_o_2 = ( (points[grid_corner[0]].z - points[grid_corner[1]].z)/(K-1)
+			+ (points[grid_corner[0]].z - points[grid_corner[2]].z)/(L-1) ) / 2;
 
 	    pixel_1_1 = -1;
 	    pixel_M_N = -1;
@@ -5006,20 +5008,15 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	    /* Step through the points placing them in the proper spot in the matrix array. */
 	    for (i=0, j=line_length, i_image=i_start; i < p_count; i++) {
 
-		double x, y;
-		int x_low, x_high, y_low, y_high;
 		TBOOLEAN visible;
+		double x, y, z, x_low, x_high, y_low, y_high, z_low, z_high;
 
-		if (project_points) {
-		    map3d_xy_double(points[i_image].x, points[i_image].y, points[i_image].z, &x, &y);
-		    x_low = x - d_x_o_2;  x_high = x + d_x_o_2;
-		    y_low = y - d_y_o_2;  y_high = y + d_y_o_2;
-		} else {
-		    x = points[i_image].x;
-		    y = points[i_image].y;
-		    x_low = map_x(x - d_x_o_2);  x_high = map_x(x + d_x_o_2);
-		    y_low = map_y(y - d_y_o_2);  y_high = map_y(y + d_y_o_2);
-		}
+		x = points[i_image].x;
+		y = points[i_image].y;
+		z = points[i_image].z;
+		x_low = x - d_x_o_2;  x_high = x + d_x_o_2;
+		y_low = y - d_y_o_2;  y_high = y + d_y_o_2;
+		z_low = z - d_z_o_2;  z_high = z + d_z_o_2;
 
 		/* Check if a portion of this pixel will be visible.  Do not use the
 		 * points[i].type == INRANGE test because a portion of a pixel can
@@ -5035,21 +5032,13 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		 * in such a way that as soon as one of the tests is true, the conditional
 		 * tests stop.
 		 */
-		if ( i_inrange(x_low, view_port[0], view_port[2]) &&  i_inrange(y_low, view_port[1], view_port[3]) )
+		if ( ( inrange(x_low, view_port_x[0], view_port_x[1]) || inrange(x_high, view_port_x[0], view_port_x[1]) )
+		  && ( inrange(y_low, view_port_y[0], view_port_y[1]) || inrange(y_high, view_port_y[0], view_port_y[1]) )
+		  && ( !project_points || inrange(z_low, view_port_z[0], view_port_z[1]) || inrange(z_high, view_port_z[0], view_port_z[1]) ) )
 		    visible = TRUE;
-		else if ( i_inrange(x_high, view_port[0], view_port[2]) &&  i_inrange(y_low, view_port[1], view_port[3]) )
-		    visible = TRUE;
-		else if ( i_inrange(x_low, view_port[0], view_port[2]) &&  i_inrange(y_high, view_port[1], view_port[3]) )
-		    visible = TRUE;
-		else if ( i_inrange(x_high, view_port[0], view_port[2]) &&  i_inrange(y_high, view_port[1], view_port[3]) )
-		    visible = TRUE;
-		else if ( i_inrange(view_port[0], x_low, x_high) && i_inrange(view_port[1], y_low, y_high) )
-		    visible = TRUE;
-		else if ( i_inrange(view_port[2], x_low, x_high) && i_inrange(view_port[1], y_low, y_high) )
-		    visible = TRUE;
-		else if ( i_inrange(view_port[0], x_low, x_high) && i_inrange(view_port[3], y_low, y_high) )
-		    visible = TRUE;
-		else if ( i_inrange(view_port[2], x_low, x_high) && i_inrange(view_port[3], y_low, y_high) )
+		else if ( ( inrange(view_port_x[0], x_low, x_high) || inrange(view_port_x[1], x_low, x_high) )
+		  && ( inrange(view_port_y[0], y_low, y_high) || inrange(view_port_y[1], y_low, y_high) )
+		  && ( !project_points || inrange(view_port_z[0], z_low, z_high) || inrange(view_port_z[1], z_low, z_high) ) )
 		    visible = TRUE;
 		else
 		    visible = FALSE;
@@ -5061,11 +5050,10 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		if (
 #endif
 		    visible ) {
-
 		    if (pixel_1_1 < 0) {
 			/* First visible point. */
 			pixel_1_1 = i_image;
-			M = 1;
+			M = 0;
 			N = 1;
 			line_pixel_count = 1;
 		    } else {
@@ -5093,7 +5081,7 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		i_image += i_delta_pixel;
 		j--;
 		if (j == 0) {
-		    if (N == 1)
+		    if (M == 0)
 			M = line_pixel_count;
 		    else if ((line_pixel_count > 0) && (line_pixel_count != M)) {
 			fprintf(stderr, ERROR_NOTICE("Visible pixel grid has a scan line shorter than previous scan lines."));
@@ -5125,16 +5113,18 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 		    map3d_xy_double(points[pixel_M_N].x, points[pixel_M_N].y, points[pixel_M_N].z, &x, &y);
 		    corners[1].x = x + fabs(delta_x_grid[0]+delta_x_grid[1])/2;
 		    corners[1].y = y - fabs(delta_y_grid[0]+delta_y_grid[1])/2;
+		    map3d_xy(view_port_x[0], view_port_y[0], view_port_z[0], &corners[2].x, &corners[2].y);
+		    map3d_xy(view_port_x[1], view_port_y[1], view_port_z[1], &corners[3].x, &corners[3].y);
 		} else {
 		    corners[0].x = map_x(points[pixel_1_1].x - fabs(delta_x_grid[0]+delta_x_grid[1])/2);
 		    corners[0].y = map_y(points[pixel_1_1].y + fabs(delta_y_grid[0]+delta_y_grid[1])/2);
 		    corners[1].x = map_x(points[pixel_M_N].x + fabs(delta_x_grid[0]+delta_x_grid[1])/2);
 		    corners[1].y = map_y(points[pixel_M_N].y - fabs(delta_y_grid[0]+delta_y_grid[1])/2);
+		    corners[2].x = map_x(view_port_x[0]);
+		    corners[2].y = map_y(view_port_y[1]);
+		    corners[3].x = map_x(view_port_x[1]);
+		    corners[3].y = map_y(view_port_y[0]);
 		}
-		corners[2].x = view_port[0];
-		corners[2].y = view_port[3];
-		corners[3].x = view_port[2];
-		corners[3].y = view_port[1];
 
 		if ( (pixel_planes == IC_PALETTE) || (pixel_planes == IC_RGB) )
 		    (*term->image) (M, N, image, corners, pixel_planes);
@@ -5155,108 +5145,115 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	if (pixel_planes != IC_RGB) {
 
 	    /* Use sum of vectors to compute the pixel corners with respect to its center. */
-	    struct {double x; double y;} delta_grid[2], delta_pixel[4];
+	    struct {double x; double y; double z;} delta_grid[2], delta_pixel[2];
 	    int j, i_image;
-	    double x0, x1, x2, y0, y1, y2;
 
 	    if (!term->filled_polygon)
 		int_error(NO_CARET, "This terminal does not support filled polygons");
 
-	    if (project_points) {
-		map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x0, &y0);
-		map3d_xy_double(points[grid_corner[1]].x, points[grid_corner[1]].y, points[grid_corner[1]].z, &x1, &y1);
-		map3d_xy_double(points[grid_corner[2]].x, points[grid_corner[2]].y, points[grid_corner[2]].z, &x2, &y2);
-	    } else {
-		x0 = points[grid_corner[0]].x;
-		y0 = points[grid_corner[0]].y;
-		x1 = points[grid_corner[1]].x;
-		y1 = points[grid_corner[1]].y;
-		x2 = points[grid_corner[2]].x;
-		y2 = points[grid_corner[2]].y;
-	    }
-	    delta_grid[0].x = (x1 - x0)/(K-1);
-	    delta_grid[0].y = (y1 - y0)/(K-1);
-	    delta_grid[1].x = (x2 - x0)/(L-1);
-	    delta_grid[1].y = (y2 - y0)/(L-1);
+	    /* Grid spacing in 3D space. */
+	    delta_grid[0].x = (points[grid_corner[1]].x - points[grid_corner[0]].x)/(K-1);
+	    delta_grid[0].y = (points[grid_corner[1]].y - points[grid_corner[0]].y)/(K-1);
+	    delta_grid[0].z = (points[grid_corner[1]].z - points[grid_corner[0]].z)/(K-1);
+	    delta_grid[1].x = (points[grid_corner[2]].x - points[grid_corner[0]].x)/(L-1);
+	    delta_grid[1].y = (points[grid_corner[2]].y - points[grid_corner[0]].y)/(L-1);
+	    delta_grid[1].z = (points[grid_corner[2]].z - points[grid_corner[0]].z)/(L-1);
+
+	    /* Pixel dimensions in the 3D space. */
 	    delta_pixel[0].x = (delta_grid[0].x + delta_grid[1].x) / 2;
 	    delta_pixel[0].y = (delta_grid[0].y + delta_grid[1].y) / 2;
+	    delta_pixel[0].z = (delta_grid[0].z + delta_grid[1].z) / 2;
 	    delta_pixel[1].x = (delta_grid[0].x - delta_grid[1].x) / 2;
 	    delta_pixel[1].y = (delta_grid[0].y - delta_grid[1].y) / 2;
-	    delta_pixel[2].x = -delta_pixel[0].x;
-	    delta_pixel[2].y = -delta_pixel[0].y;
-	    delta_pixel[3].x = -delta_pixel[1].x;
-	    delta_pixel[3].y = -delta_pixel[1].y;
+	    delta_pixel[1].z = (delta_grid[0].z - delta_grid[1].z) / 2;
 
 	    i_image = 0;
 
 	    for (j=0; j < L; j++) {
 
-		double x_line_start, y_line_start;
+		double x_line_start, y_line_start, z_line_start;
 
-		x_line_start = x0 + j * delta_grid[1].x;
-		y_line_start = y0 + j * delta_grid[1].y;
+		x_line_start = points[grid_corner[0]].x + j * delta_grid[1].x;
+		y_line_start = points[grid_corner[0]].y + j * delta_grid[1].y;
+		z_line_start = points[grid_corner[0]].z + j * delta_grid[1].z;
 
 		for (i=0; i < K; i++) {
 
-		    double x, y;
-		    int k;
+		    double x, y, z;
 		    TBOOLEAN corner_in_range[4];
-		    gpiPoint corners[4];
+		    TBOOLEAN pixel_in_view = FALSE, view_in_pixel = FALSE;
+		    struct {double x; double y; double z;} p_corners[4]; /* Parallelogram corners. */
+		    int k;
 
 		    x = x_line_start + i * delta_grid[0].x;
 		    y = y_line_start + i * delta_grid[0].y;
+		    z = z_line_start + i * delta_grid[0].z;
 
-		    if (project_points) {
-			corners[0].x = x + delta_pixel[0].x;
-			corners[0].y = y + delta_pixel[0].y;
-			corners[1].x = x + delta_pixel[1].x;
-			corners[1].y = y + delta_pixel[1].y;
-			corners[2].x = x + delta_pixel[2].x;
-			corners[2].y = y + delta_pixel[2].y;
-			corners[3].x = x + delta_pixel[3].x;
-			corners[3].y = y + delta_pixel[3].y;
-		    } else {
-			corners[0].x = map_x(x + delta_pixel[0].x);
-			corners[0].y = map_y(y + delta_pixel[0].y);
-			corners[1].x = map_x(x + delta_pixel[1].x);
-			corners[1].y = map_y(y + delta_pixel[1].y);
-			corners[2].x = map_x(x + delta_pixel[2].x);
-			corners[2].y = map_y(y + delta_pixel[2].y);
-			corners[3].x = map_x(x + delta_pixel[3].x);
-			corners[3].y = map_y(y + delta_pixel[3].y);
+		    p_corners[0].x = x + delta_pixel[0].x;
+		    p_corners[0].y = y + delta_pixel[0].y;
+		    p_corners[0].z = z + delta_pixel[0].z;
+		    p_corners[1].x = x + delta_pixel[1].x;
+		    p_corners[1].y = y + delta_pixel[1].y;
+		    p_corners[1].z = z + delta_pixel[1].z;
+		    p_corners[2].x = x - delta_pixel[0].x;
+		    p_corners[2].y = y - delta_pixel[0].y;
+		    p_corners[2].z = z - delta_pixel[0].z;
+		    p_corners[3].x = x - delta_pixel[1].x;
+		    p_corners[3].y = y - delta_pixel[1].y;
+		    p_corners[3].z = z - delta_pixel[1].z;
+
+		    /* Check if one of the corners is viewable */
+		    for (k=0; k < 4; k++) {
+			corner_in_range[k] = ( inrange(p_corners[k].x, view_port_x[0], view_port_x[1]) &&
+					       inrange(p_corners[k].y, view_port_y[0], view_port_y[1]) &&
+					       (!project_points || inrange(p_corners[k].z, view_port_z[0], view_port_z[1])) );
+			pixel_in_view |= corner_in_range[k];
 		    }
 
-		    /* If after the above clipping x_low > x_high or y_low > y_high,
-		     * that corresponds to the rectangle being outside the view port.
-		     * Do not plot in that case.
-		     */
-		    for (k=0; k < 4; k++)
-			corner_in_range[k] = ( i_inrange(corners[k].x, view_port[0], view_port[2]) &&
-					       i_inrange(corners[k].y, view_port[1], view_port[3]) );
+		    if (pixel_in_view || view_in_pixel) {
 
-		    corners[0].style = FS_DEFAULT;
+			int N_corners = 0;    /* Number of corners. */
+			gpiPoint corners[5];  /* At most 5 corners. */
 
-		    if (corner_in_range[0] || corner_in_range[1] || corner_in_range[2] || corner_in_range[3]) {
-			set_color( cb2gray(points[i_image].CRD_COLOR) );
-			if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3])
-			    (*term->filled_polygon) (4, corners);
-			else {
-			    /* Clip out one or more of the corners to create triangle, quadrangle or pentagon. */
-			    static short clipping_yet_to_be_added_indicated = 0;
-			    if (!clipping_yet_to_be_added_indicated) {
-				/* Some tricky geometry.  Save until certain this will be in Gnuplot. */
-				fprintf(stderr,"\nNOTICE:  A triangle/quadrangle/pentagon clipping algorithm\n"
-					"         needs to be added for pixels at the boundary.  Image\n"
-					"         may lie outside borders in some instances.\n\n");
-				clipping_yet_to_be_added_indicated = 1;
+			corners[0].style = FS_DEFAULT;
+
+			if (pixel_in_view) {
+			    if (corner_in_range[0] && corner_in_range[1] && corner_in_range[2] && corner_in_range[3]) {
+				int i_corners;
+
+				N_corners = 4;
+
+				for (i_corners=0; i_corners < N_corners; i_corners++) {
+				    if (project_points) {
+					map3d_xy(p_corners[i_corners].x, p_corners[i_corners].y, p_corners[i_corners].z,
+						 &corners[i_corners].x, &corners[i_corners].y);
+				    } else {
+					corners[i_corners].x = map_x(p_corners[i_corners].x);
+					corners[i_corners].y = map_y(p_corners[i_corners].y);
+				    }
+				}
+			    } else {
+				/* Clip out one or more of the corners to create triangle, quadrangle or pentagon. */
+				static short clipping_yet_to_be_added_indicated = 0;
+				if (!clipping_yet_to_be_added_indicated) {
+				    /* Some tricky geometry.  Save until certain this will be in Gnuplot. */
+				    fprintf(stderr,"\nNOTICE:  A triangle/quadrangle/pentagon clipping algorithm\n"
+					    "         needs to be added for pixels at the boundary.  Image\n"
+					    "         may lie outside borders in some instances.\n\n");
+				    clipping_yet_to_be_added_indicated = 1;
+				}
 			    }
-			    (*term->filled_polygon) (4, corners);
+			} else {
+			    /* Could still be visible if any of the four corners of the view port are
+			     * within the parallelogram formed by the pixel.  This is also some tricky
+			     * geometry.  Wait until it is certain that this will be a part of Gnuplot..
+			     */
 			}
-		    } else {
-			/* Could still be visible if any of the four corners of the view port are
-			 * within the parallelogram formed by the pixel.  This is also some tricky
-			 * geometry.  Wait until it is certain that this will be a part of Gnuplot..
-			 */
+
+			if (N_corners >= 3) {
+			    set_color( cb2gray(points[i_image].CRD_COLOR) );
+			    (*term->filled_polygon) (N_corners, corners);
+			}
 		    }
 
 		    i_image++;

@@ -128,6 +128,7 @@ set palette gray
 unset colorbox
 plot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
+reset
 
 print ""
 print "Also, similar to 3d color surface plots, a color box showing the"
@@ -144,13 +145,15 @@ print "even when the input image size becomes large (e.g., 1024 x 1024)"
 print "because the number of pixels on the screen remains about the same"
 print "while much of the hi resolution data is decimated."
 print ""
-unset label 1
-set xrange [-0.5:127.5]
-set yrange [-0.5:127.5]
-set colorbox
+unset key
+set pm3d map
+set xrange [10:117]
+set yrange [10:117]
+set tics out
+set palette gray
 set cbrange [0:255]
 set title "As with 3d color surfaces, a color box may be added to the plot"
-replot
+splot 'blutux.rgb' binary array=128x128 flipy format='%uchar%uchar%uchar' using ($1+$2+$3)/3 with image
 pause -1 "Hit return to continue"
 reset
 
@@ -803,7 +806,7 @@ set lmargin 0
 set view 60, 45, 1, 1
 set label 1 "\"Mirror mirror on the wall,\nwho's the GNUiest penguin of all?\"" at 140,0,40 center
 splot 'blutux.rgb' binary array=128x128 flip=y rot=90d origin=(0,0,0) perp = (1,0,0) format='%uchar' using ($1+$2+$3) with image, \
-      'blutux.rgb' binary array=128x128 flipy rot=90d origin=(+140,+140,0) perp=(0,1,0) format='%uchar' using ($1+$2+$3) with image
+      'blutux.rgb' binary array=128x128 flipy rot=90d origin=(+137,+137,0) perp=(0,1,0) format='%uchar' using ($1+$2+$3) with image
 pause -1 "Hit return to continue"
 reset
 
