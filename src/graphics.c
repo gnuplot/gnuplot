@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.87 2003/03/04 05:18:23 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.88 2003/03/08 17:16:40 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2787,7 +2787,12 @@ plot_vectors(plot)
 	points[0] = plot->points[i];
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
-	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max) && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {
+	
+	if (points[0].type == UNDEFINED)
+	    continue;
+
+	if (inrange(points[1].x, X_AXIS.min, X_AXIS.max)
+	    && inrange(points[1].y, Y_AXIS.min, Y_AXIS.max)) {
 	    /* to inrange */
 	    points[1].type = INRANGE;
 	    x2 = map_x(points[1].x);

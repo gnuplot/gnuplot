@@ -1,7 +1,19 @@
+2003-03-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (eval_plots): Initialize arrow_properties of plot
+ 	with vectors in case of no style options given by the user.
+
+	* src/graphics.c (plot_vectors): Avoid using any coordinates of
+ 	UNDEFINED input points.
+
+	* demo/vector.dem: Use set term push/pop to avoid screen terminal
+ 	dependency.
+	
+
 2003-03-17  Leo Brewin <leo.brewin@sci.monash.edu.au>
 
 	* term/pdf.trm: Tell pdflib to use its built-in font metrics for
-	Symbol and ZapfDingbats fonts, since not all hosts have these.
+ 	Symbol and ZapfDingbats fonts, since not all hosts have these.
 
 2003-03-14  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -12,21 +24,23 @@
 2003-03-13  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* NEWS src/pm3d.h src/pm3d.c src/tables.h src/tables.c src/save.c
-	src/set.c src/show.c demo/pm3d.dem docs/gnuplot.doc: New pm3d option
-	'corners2color'.
+ 	src/set.c src/show.c demo/pm3d.dem docs/gnuplot.doc: New pm3d
+ 	option 'corners2color'.
 
 2003-03-13  Ethan Merritt <merritt@u.washington.edu>
 
-	* set.c: Consolidate set_{blrt}margin into a single routine, break out
-	text_label creation and label option parsing into separate routines so
-	that they can be called separately, general code cleanup.
+	* set.c: Consolidate set_{blrt}margin into a single routine, break
+ 	out text_label creation and label option parsing into separate
+ 	routines so that they can be called separately, general code
+ 	cleanup.
+
 	* unset.c: Consolidate unset_{blrt}margin into a single routine.
 
 2003-03-07  Ethan Merritt <merritt@u.washington.edu>
 
-	* graphics.c: Filled boxes can obscure the x-axis (see for
-	example fillstyle.dem); fix this by retracing the axes at
-	the end of plotting.
+	* graphics.c: Filled boxes can obscure the x-axis (see for example
+ 	fillstyle.dem); fix this by retracing the axes at the end of
+ 	plotting.
 
 2003-03-06  Wilhelm Braunschober  <Wilhelm.Braunschober@t-online.de>
 

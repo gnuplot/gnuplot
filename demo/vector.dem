@@ -11,10 +11,6 @@ print " -2- plotting a vector field on the same graph"
 print " -3- manipulating columns using the '$1,$2' syntax."
 print " the example is taken here from Physics is the display of equipotential"
 print " lines and electrostatic field for a dipole (+q,-q)"
-print "\n Please note that this demo runs only on x11 term, because"
-print " It needs to change term to table and then back to screen,"
-print " and gnuplot currently has no way of saving current terminal."
-pause -1 "<CR> to continue"
 #
       r(x,y)=sqrt(x*x+y*y)
       v1(x,y)=  q1/(r((x-x0),y))
@@ -44,7 +40,6 @@ pause -1 "<CR> to continue"
       ymax=10.
 #
 reset
-set term x11
 set noautoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
@@ -61,22 +56,24 @@ set label "-q" at -1,0 center
 set label "+q" at  1,0 center
 splot vtot(x,y) w l
 pause -1 "Now create a file with equipotential lines <CR> to continue"
+set term push
 set term table
 set out "equipo2.dat"
 rep
 set out
-set term x11
+set term pop
 reset
 plot "equipo2.dat" w l
 pause 0 "Now create a x/y datafile for plotting with vectors "
 pause 0"and display vectors parallel to the electrostatic field"
 pause -1 "<CR> to continue"
 set isosam 31,31
+set term push
 set term table
 set out "field2xy.dat"
 splot vtot(x,y) w l
 set out
-set term x11
+set term pop
 set noautoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]

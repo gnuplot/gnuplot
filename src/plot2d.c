@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.57 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.58 2003/02/16 00:07:37 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1112,8 +1112,7 @@ eval_plots()
 		 * - point spec allowed if style uses points, ie style&2 != 0
 		 * - keywords for lt and pt are optional
 		 */
-		if (this_plot->plot_style == VECTOR)
-		{
+		if (this_plot->plot_style == VECTOR) {
 		    int stored_token = c_token;
 		    struct arrow_style_type arrow;
 
@@ -1128,9 +1127,7 @@ eval_plots()
 			    continue;
 			}
 		    }
-		}
-		else
-		{
+		} else {
 		    int stored_token = c_token;
 		    struct lp_style_type lp;
 
@@ -1148,6 +1145,7 @@ eval_plots()
 			}
 		    }
 		}
+
 		/* Some plots have a fill style as well */
 		if (this_plot->plot_style == BOXES
 		||  this_plot->plot_style == CANDLESTICKS) {
@@ -1186,6 +1184,9 @@ eval_plots()
 	     * the defaults for linewidth and pointsize, call it now
 	     * to define them. */
 	    if (! set_lpstyle) {
+		if (this_plot->plot_style == VECTOR) {
+		    arrow_parse(&this_plot->arrow_properties, TRUE);
+		} 
 		lp_parse(&this_plot->lp_properties, 1,
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			 line_num, point_num);
