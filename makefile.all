@@ -26,6 +26,7 @@
 # T as the prefix for terminals (eg term/ or [.term])
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
+# Q as the prefix for old doc files (eg docs/old)
 # S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
 # N as the prefix for NeXT (eg NeXT/)
@@ -115,12 +116,8 @@ DEMOS = $(M)1.dat $(M)2.dat $(M)3.dat $(M)airfoil.dem $(M)all.dem \
 	$(M)timedat.dem $(M)using.dat $(M)using.dem $(M)vector.dem \
 	$(M)whale.dat $(M)world.cor $(M)world.dat $(M)world.dem
 
-ETC =   00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle \
-	Copyright History Makefile.in Projects README.3d README.3p1 \
-	README.3p2 README.3p3 README.3p4 README.3p5 README.ami README.emx \
-	README.fit README.gnu README.iso README.mf README.nex README.os2 \
-	README.pic README.pro README.win README.x11 README.xli WhatsNew \
-	acconfig.h $(ACLOCAL_M4) amiga.c buildvms.com \
+ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
+	Makefile.in NEWS TODO acconfig.h $(ACLOCAL_M4) amiga.c buildvms.com \
 	commitvers $(CONFIG_HEADER_IN) configure configure.in corgraph.asm \
 	corplot.c ctrl87.c ctrl87.h descrip.mms errorfix.sh genopt.com \
 	gnuplot.def gnuplot.el gnuplot.opt gnuplot.prj header.mac \
@@ -148,8 +145,14 @@ DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)header.tex $(L)linepoin.plt $(L)makefile.dst $(L)tutorial.tex
 DOCS4 = $(S)Makefile $(S)README $(S)ps_file.doc $(S)ps_guide.ps \
 	$(S)ps_symbols.gpi
+DOCS5 = $(Q)ChangeLog.old $(Q)History.old $(Q)README.3d $(Q)README.3p1 \
+	$(Q)README.3p2 $(Q)README.3p3 $(Q)README.3p4 $(Q)README.3p5 \
+	$(Q)README.ami $(Q)README.emx $(Q)README.fit $(Q)README.gnu \
+	$(Q)README.iso $(Q)README.mf $(Q)README.nex $(Q)README.os2 \
+	$(Q)README.pic $(Q)README.pro $(Q)README.win $(Q)README.x11 \
+	$(Q)README.xli
 
-DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4)
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4) $(DOCS5)
 
 #########################################################################
 # Simple Dependencies

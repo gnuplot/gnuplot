@@ -1,3 +1,30 @@
+1998-11-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/old: New directory.
+
+	* History, README.3d, README.3p1, README.3p2, README.3p3, README.3p4,
+	README.3p5, README.ami, README.emx, README.fit, README.gnu,
+	README.iso, README.mf, README.nex, README.os2, README.pic, README.pro,
+	README.win, README.x11, README.xli: Moved to new dir docs/old.
+
+	* Makefile.in, makefile.all: Updated to reflect changes in directory
+	structure (ETC, DOCS5, DOCS).
+
+	* Projects: Renamed TODO.
+
+	* WhatsNew: Renamed NEWS.
+
+	* version.c: Changes history moved to docs/old/ChangeLog.old.
+
+1998-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Added description and workaround for pslatex driver bug.
+
+	* interpol.c: Bugfix for 'smooth acsplines' option with logarithmic
+	x axis by Konrad Bernloehr <bernlohr@ik3.fzk.de>.
+
+	* stdfn.c(safe_strncpy): Bugfix by Lucas Hart <hartl@ucs.orst.edu>.
+
 1998-11-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Document new `--enable-system-time' configure option
@@ -12,7 +39,6 @@
 	'set output' command.
 
 	* specfun.c: Fix #ifdef directive. Reported by Alexander Mai.
-
 
 	* docs/gnuplot.doc: Change 'set output' documentation accordingly.
 
