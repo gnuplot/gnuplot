@@ -1,5 +1,9 @@
 2000-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/eepic.trm: cleaned up some warnings and 'checkdoc' problems.
+
+2000-12-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	* term/eepic.trm: Gabriel Zachmann <zach@igd.fhg.de> added lots of
  	new options to the 'eepic' driver, and fixed some bux while at it.
 	(EEPIC_PTS_PER_INCH): set to 72.27.

@@ -1,6 +1,6 @@
 /* Hello, Emacs! This is -*-C-*- !*/
 /*
- * $Id: eepic.trm,v 1.16 2000/10/31 19:59:32 joze Exp $
+ * $Id: eepic.trm,v 1.17 2000/12/18 20:06:18 broeker Exp $
  *
  */
 
@@ -74,8 +74,6 @@
  */
 
 
-#include <ctype.h>
-
 #include "driver.h"
 
 #ifdef TERM_REGISTER
@@ -83,6 +81,9 @@ register_term(eepic)
 #endif
 
 #ifdef TERM_PROTO
+
+#include <ctype.h>
+
 TERM_PUBLIC void EEPIC_init __PROTO((void));
 TERM_PUBLIC void EEPIC_graphics __PROTO((void));
 TERM_PUBLIC void EEPIC_text __PROTO((void));
@@ -479,7 +480,7 @@ EEPIC_reset()
 TERM_PUBLIC void 
 EEPIC_options()
 {
-    float fontsize;
+    float fontsize = 0;
 
     eepic_color_on =
     eepic_true_rotate = FALSE;
@@ -530,14 +531,15 @@ EEPIC_options()
 	    eepic_pointsize = 2;
 	    c_token++;
 	}
-	if ( isdigit(input_line[token[c_token].start_index]) )
+	if ( isdigit((unsigned char)
+		     input_line[token[c_token].start_index]) )
 	{
 	    /* stolen from pslatex.trm */
 	    struct value a;
 	    fontsize = real(const_express(&a));
 	    if ( fontsize < 1 || fontsize > 100 )
 	    {
-		int_error("font size out of bounds [1..100]", c_token);
+		int_error(c_token, "font size out of bounds [1..100]");
 		fontsize_set = FALSE;
 	    }
 	    else
@@ -598,7 +600,7 @@ START_HELP(eepic)
 " printer driver that supports the \"tpic\" \\specials.  If your printer driver",
 " doesn't support those \\specials, \"eepicemu.sty\" will enable you to use some",
 " of them.",
-" dvips and dvipdfm do support the \"tpic\" \\specials."
+" dvips and dvipdfm do support the \"tpic\" \\specials.",
 "",
 " Syntax:",
 "    set terminal eepic {color, dashed, rotate, small, tiny, default, <fontsize>}",
@@ -614,8 +616,8 @@ START_HELP(eepic)
 " will be ignored",
 " 'rotate' will enable true rotated text (by 90 degrees). Otherwise, rotated text",
 " will be typeset with letters stacked above each other. If you use this option",
-" you must include \\usepackage{graphicx} in the preambel.",
-" 'small' will use \\scriptsize symbols as point markers (Probably doesn't work",
+" you must include \\usepackage{graphicx} in the preamble.",
+" 'small' will use \\scriptsize symbols as point markers (Probably does not work",
 " with TeX, only LaTeX2e). Default is to use the default math size.",
 " 'tiny' uses \\scriptscriptstyle symbols.",
 " 'default' resets all options to their defaults = no color, no dashed lines,",
@@ -626,19 +628,19 @@ START_HELP(eepic)
 " in \\footnotesize.",
 "",
 " Notes:",
-"  Remember to escape the # character (or other chars meaningful to (La-)TeX)",
+" Remember to escape the # character (or other chars meaningful to (La-)TeX)",
 " by \\\\ (2 backslashes).",
-"  It seems that dashed lines become solid lines when the vertices of a plot",
-" are too close. (I don't know if that is a general problem with the tpic specials,",
+" It seems that dashed lines become solid lines when the vertices of a plot",
+" are too close. (I do not know if that is a general problem with the tpic specials,",
 " or if it is caused by a bug in eepic.sty or dvips/dvipdfm.)",
-"  The default size of an eepic plot is 5x3 inches, which can be scaled ",
+" The default size of an eepic plot is 5x3 inches, which can be scaled ",
 " by 'set size a,b'",
-"  Points, among other things, are drawn using the LaTeX commands \"\\Diamond\",",
+" Points, among other things, are drawn using the LaTeX commands \"\\Diamond\",",
 " \"\\Box\", etc.  These commands no longer belong to the LaTeX2e core; they are",
 " included in the latexsym package, which is part of the base distribution and",
 " thus part of any LaTeX implementation. Please do not forget to use this package.",
 " Instead of latexsym, you can also include the amssymb package."
-"   All drivers for LaTeX offer a special way of controlling text positioning:",
+" All drivers for LaTeX offer a special way of controlling text positioning:",
 " If any text string begins with '{', you also need to include a '}' at the",
 " end of the text, and the whole text will be centered both horizontally and",
 " vertically.  If the text string begins with '[', you need to follow this with",
@@ -665,5 +667,3 @@ START_HELP(eepic)
 "        set ylabel '[r]{\\LaTeX\\ -- $ \\gamma $\\rule{7mm}{0pt}'"
 END_HELP(eepic)
 #endif /* TERM_HELP */
-
-
