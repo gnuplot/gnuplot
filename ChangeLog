@@ -1,6 +1,21 @@
+2000-06-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* GNUmakefile, Makefile.am: Move pre-dist target from Makefile.am.
+
+	* configure.in: New --enable-epslatex option. Cleanups.
+
+	* src/term.h: Add epslatex support.
+
+	* term/ggi.trm: New GGI driver, contributed by Cesar Crusius
+	<crusius@leland.stanford.edu>. Support not complete yet.
+	Requires -lgii, -lggi and -lggiwmh for linking.
+
+	* term/epslatex.trm: New terminal driver by Gregor Thalhammer
+	<Gregor.Thalhammer@uibk.ac.at>, updated version from 7th June.
+
 2000-06-09  Johannes Zellner <johannes@zellner.org>
 
-	* save.c: don't close the fp's if it's stdout
+	* src/save.c: don't close the fp's if it's stdout
 
 2000-05-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
