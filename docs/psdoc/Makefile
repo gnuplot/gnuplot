@@ -2,7 +2,7 @@
 # Create ps_symbols.ps
 #
 
-top_srcdir=../..
+top_srcdir = ../..
 
 all: ps_symbols.ps
 
