@@ -1,3 +1,9 @@
+2000-12-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/datafile.c (df_tokenise): recover the original exponent
+ 	letter after addempting parse of FORTRAN-style numbers. Fixes bug
+ 	in parsing time/date input like "01Dec2000".
+
 2000-12-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
         Fix bugs reported by Theo Hopman:

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.22 2000/11/01 18:57:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.23 2000/12/08 17:57:08 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -316,7 +316,7 @@ df_gets()
 /*{{{  static int df_tokenise(s) */
 static int
 df_tokenise(s)
-char *s;
+    char *s;
 {
     /* implement our own sscanf that takes 'missing' into account,
      * and can understand fortran quad format
@@ -409,10 +409,16 @@ char *s;
 	    if (count == 1 &&
 		(s[used] == 'd' || s[used] == 'D' ||
 		 s[used] == 'q' || s[used] == 'Q')) {
+		/* HBB 20001221: avoid breaking parsing of time/date
+		 * strings like 01Dec2000 that would be caused by
+		 * overwriting the 'D' with an 'e'... */
+		char save_char = s[used];
+
 		/* might be fortran double */
 		s[used] = 'e';
 		/* and try again */
 		count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
+		s[used] = save_char;
 	    }
 #endif /* NO_FORTRAN_NUMS */
 #endif /* OSK */
