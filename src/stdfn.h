@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.20 2002/02/21 12:27:37 lhecking Exp $
+ * $Id: stdfn.h,v 1.21 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - stdfn.h */
@@ -136,13 +136,13 @@ double strtod();
 
 /* Deal with varargs functions */
 #if defined(HAVE_VFPRINTF) || defined(HAVE_DOPRNT)
-# ifdef ANSI_C
+# ifdef STDC_HEADERS
 #  include <stdarg.h>
 #  define VA_START(args, lastarg) va_start(args, lastarg)
 # else
 #  include <varargs.h>
 #  define VA_START(args, lastarg) va_start(args)
-# endif /* !ANSI_C */
+# endif /* !STDC_HEADERS */
 #else /* HAVE_VFPRINTF || HAVE_DOPRNT */
 # define va_alist a1, a2, a3, a4, a5, a6, a7, a8
 # define va_dcl char *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.31 2001/12/17 12:10:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.32 2002/01/31 17:00:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -375,7 +375,7 @@ const char *s;
  */
 TBOOLEAN screen_ok;
 
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 void
 os_error(int t_num, const char *str,...)
 #else
@@ -436,7 +436,7 @@ va_dcl
 }
 
 
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 void
 int_error(int t_num, const char *str,...)
 #else
@@ -483,7 +483,7 @@ va_dcl
 }
 
 /* Warn without bailing out to command line. Not a user error */
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 void
 int_warn(int t_num, const char *str,...)
 #else
@@ -531,7 +531,7 @@ va_dcl
 /*{{{  graph_error() */
 /* handle errors during graph-plot in a consistent way */
 /* HBB 20000430: move here, from graphics.c */
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 void
 graph_error(const char *fmt, ...)
 #else

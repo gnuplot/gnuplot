@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.10 2001/08/22 14:15:34 broeker Exp $
+ * $Id: util.h,v 1.11 2001/09/05 02:16:48 vanzandt Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -75,7 +75,7 @@ void m_quote_capture __PROTO((char **, int, int));
 char *gp_strdup __PROTO((const char *));
 
 /* Error message handling */
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 void os_error __PROTO((int, const char *, ...));
 void int_error __PROTO((int, const char *, ...));
 void int_warn __PROTO((int, const char *, ...));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.29 2001/12/01 13:08:59 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.30 2001/12/04 13:49:39 amai Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -73,7 +73,7 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.29 2001/12/01 13:08:59 amai 
 #include "util.h"
 
 /* Just temporary */
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 static void Dblfn __PROTO((const char *fmt, ...));
 #else
 static void Dblfn __PROTO(());
@@ -1622,7 +1622,7 @@ kbhit()
 /*
  * Print msg to stderr and log file
  */
-#if defined(VA_START) && defined(ANSI_C)
+#if defined(VA_START) && defined(STDC_HEADERS)
 static void
 Dblfn(const char *fmt, ...)
 #else
