@@ -55,6 +55,12 @@ static char *RCSid = "$Id: command.c,v 1.126 1998/06/22 12:24:48 ddenholm Exp $"
 #include "fit.h"
 #include "binary.h"
 
+/* GNU readline stuff */
+#ifdef GNU_READLINE
+# include <readline/readline.h>
+# include <readline/history.h>
+#endif
+
 #if defined(MSDOS) || defined(DOS386)
 # ifdef DJGPP
 extern char HelpFile[];		/* patch for do_help  - AP */
