@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.44 1998/04/14 00:16:25 drd Exp $
+ * $Id: term.h,v 1.12 1998/11/30 21:51:24 lhecking Exp $
  *
  */
 
@@ -310,6 +310,7 @@
 
 /* TeX related terminals */
 #define EMTEX
+#define EEPIC
 #include "latex.trm"		/* latex and emtex */
 #include "pslatex.trm"		/* latex/tex with picture in postscript */
 #include "eepic.trm"		/* EEPIC-extended LaTeX driver, for EEPIC users */
