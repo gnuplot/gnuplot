@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: xref.c,v 1.4 1998/10/19 13:19:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: xref.c,v 1.5 1999/06/14 19:17:09 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - xref.c */
@@ -79,7 +79,8 @@ dump_list()
 {
     struct LIST *element = head;
     while (element) {
-	fprintf(stderr, "%p level %d, line %d, \"%s\"\n", element, element->level, element->line, element->string);
+	fprintf(stderr, "%p level %d, line %d, \"%s\"\n", element,
+		element->level, element->line, element->string);
 	element = element->next;
     }
 }
@@ -100,8 +101,7 @@ unsigned int size;
     if (p)
 	return p;
     fprintf(stderr, "Malloc failed\n");
-    exit(1);
-    return NULL;		/* HBB 980317: kill superfluous warnings */
+    exit(EXIT_FAILURE);
 }
 
 /* scan the file and build a list of line numbers where particular levels are */
@@ -115,8 +115,8 @@ FILE *a;
     int lastline = 0;
 
     /* insert a special level 0 listitem
-     * this one is the starting point for the table of contents in the html version
-     * and the Top-Node of the info version.
+     * this one is the starting point for the table of contents in the html
+     * version and the Top-Node of the info version.
      *
      * Added this to support multiple level 1 items.     --SB
      */
@@ -200,7 +200,8 @@ char *s;
 	fprintf(stderr, "Error in lookup(\"%s\")\n", s);
 
 	/* there should a line number, but it is local to parse()  */
-	fprintf(stderr, "Possible missing link character (`) near above line number\n");
+	fprintf(stderr,
+		"Possible missing link character (`) near above line number\n");
 	exit(3);
     }
     l = 0;			/* level */
@@ -304,7 +305,8 @@ char *start, *end, *format;
     curlevel = list->level;
     list = list->next;		/* look at next element before going on */
 
-    if (start != NULL && list != NULL) {	/* don't wrie start if there's no menue at all */
+    if (start != NULL && list != NULL) {
+	/* don't write start if there's no menue at all */
 	inlist = TRUE;
 	fprintf(f, "%s", start);
     }
