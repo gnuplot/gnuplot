@@ -92,6 +92,9 @@
 /* Define if you do not have the <sys/stat.h> header file.  */
 #undef NO_SYS_STAT_H
 
+/* Define if you do not have the <sys/time.h> header file.  */
+#undef NO_SYS_TIME_H
+
 /* Define if you do not have the <sys/types.h> header file.  */
 #undef NO_SYS_TYPES_H
 
@@ -109,6 +112,15 @@
 
 /* Define if you want to use the included readline function.  */
 #undef READLINE
+
+/* Define as the type of the first argument to select.  */
+#undef SELECT_ARGTYPE_1
+
+/* Define as the type of the second, third, and fourth argument to select.  */
+#undef SELECT_ARGTYPE_234
+
+/* Define as the type of the fifth argument to select.  */
+#undef SELECT_ARGTYPE_5
 
 /* Define to the version of the distribution.  */
 #undef VERSION
