@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.33 2004/01/26 04:30:42 sfeam Exp $
+ * $Id: gd.trm,v 1.34 2004/01/27 07:00:53 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -1085,7 +1085,7 @@ PNG_linetype(int type)
     if (type >= (png_state.n_colors - 3))
 	type %= (png_state.n_colors - 3);
     if (type <= L_TYPE_NODRAW)
-	type = -2;
+	type = -3;	/* Draw in background color */
 
     png_state.color = png_state.color_table[type + 3];
     png_state.linetype = type;

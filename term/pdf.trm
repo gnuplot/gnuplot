@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.25 2003/11/13 08:18:18 mikulik Exp $
+ * $Id: pdf.trm,v 1.26 2003/12/01 03:32:02 sfeam Exp $
  */
 
 /*------------------------------
@@ -91,7 +91,7 @@ static PDF *myPDF = NULL;
 static unsigned int PDF_xLast = UINT_MAX; /* current pen horizontal position*/
 static unsigned int PDF_yLast = UINT_MAX; /* current pen vertical position*/
 
-static int PDF_LineType = -3;	/* current line type*/
+static int PDF_LineType = LT_UNDEFINED;	/* current line type*/
 static double PDF_LineWidth = 1.0; /* current line width*/
 static int PDF_TextAngle = 0;		/* current text orientation*/
 static enum JUSTIFY PDF_TextJust = LEFT; /* current text justification*/
@@ -131,7 +131,7 @@ PDF_Pen_RealID (inPenCode)
     if (inPenCode >= 12)
 	inPenCode %= 12;	/* normalize pen code*/
     if (inPenCode <= L_TYPE_NODRAW)
-	inPenCode = -2;
+	inPenCode = -3;
 
     return (inPenCode + 2);
 }
@@ -356,7 +356,7 @@ PDF_init ()
     PDF_set_info(myPDF,"Author","Hans-Bernhard Broeker"); /* FIXME: put in username? */
     PDF_set_info(myPDF,"Title","gnuplot diagram"); /* FIXME: use 'set title', if any ? */
     
-    PDF_LineType = -3;
+    PDF_LineType = LT_UNDEFINED;
 
     /* set current font to default */
     strcpy(PDF_fontNameCur, PDF_fontNameDef);
@@ -429,9 +429,9 @@ PDF_reset ()
 TERM_PUBLIC void
 PDF_linetype (int linetype)
 {
+    linetype = PDF_Pen_RealID(linetype);
     if (linetype != PDF_LineType) {
-	int real_linetype = PDF_Pen_RealID(linetype);
-	struct rgb *this_color = web_color_rgbs + 1 + real_linetype;
+	struct rgb *this_color = web_color_rgbs + 1 + linetype;
 
 	PDF_PathClose ();
 	PDF_LineType = linetype;
@@ -1065,8 +1065,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 	    break;
 	case FS_SOLID:
 	    {
-		int real_linetype = PDF_Pen_RealID(PDF_LineType);
-		struct rgb *this_color = web_color_rgbs + 1 + real_linetype;
+		struct rgb *this_color = web_color_rgbs + 1 + PDF_LineType;
 
 		double fact = (100 - fillpar) * 0.01;
 		double fact_ = (1.0 - fact) / 255.0;
@@ -1145,7 +1144,7 @@ PDF_set_color(double gray)
     PDF_setrgbcolor(myPDF, color.r, color.g, color.b);
     /* mark linetype invalid so that the color will be
      * set, when PDF_linetype() is called */
-    PDF_LineType = -3;
+    PDF_LineType = LT_UNDEFINED;
 }
 
 

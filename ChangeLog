@@ -1,3 +1,10 @@
+2004-02-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/gd.trm term/post.trm term/pdf.trm: In the rare case of a
+	request to draw a line or polygon-fill with LT_NODRAW or LT_BACKGROUND 
+	it makes more sense to set the color to white than to black. 
+	The x11 terminal already behaves this way.
+
 2004-01-25  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm docs/gnuplot.doc: Take default font for gdlib terminals

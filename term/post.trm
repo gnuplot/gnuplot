@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.100 2003/12/16 10:49:49 mikulik Exp $
+ * $Id: post.trm,v 1.101 2003/12/22 05:13:18 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -215,6 +215,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "/PL { stroke userlinewidth setlinewidth\n",
 "      Rounded { 1 setlinejoin 1 setlinecap } if } def\n",
 /* Line Types */
+"/LTw { BL [] 1 1 1 DL } def\n", /* background (white) */
 "/LTb { BL [] 0 0 0 DL } def\n", /* border */
 "/LTa { AL [1 udl mul 2 udl mul] 0 setdash 0 0 0 setrgbcolor } def\n", /* axes */
 "/LT0 { PL [] 1 0 0 DL } def\n",
@@ -1783,9 +1784,10 @@ PS_linetype(linetype)
     int linetype;
 {
     linetype = (linetype % 9) + 2;
-    if (linetype < 0)
-	linetype = 0;
+    if (linetype < 0)	/* LT_NODRAW, LT_BACKGROUND, LT_UNDEFINED */
+	linetype = 11;
     PS_relative_ok = FALSE;
+
 #if 0
     /*  In order to make 'PS_linewidth' work properly, I need to comment
      *  this line out.  Especially in combination with the line width
@@ -1795,7 +1797,7 @@ PS_linetype(linetype)
     if (PS_linetype_last == linetype) return;
 #endif
     PS_linetype_last = linetype;
-    fprintf(gpoutfile,"LT%c\n", "ba012345678"[linetype]);
+    fprintf(gpoutfile,"LT%c\n", "ba012345678w"[linetype]);
     ps_path_count = 0;
 }
 
