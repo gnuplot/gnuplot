@@ -1,5 +1,8 @@
 2002-07-21  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/metapost.trm: Fix wrong indentation in the documentation
+	section.
+
 	* config/makefile.cyg config/makefile.mgw: Fix if .. endif clause for
 	optional PDF terminal.
 
@@ -762,7 +765,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/21 13:07:05 $).
+	last modification date (from the tag $Date: 2002/07/21 13:17:56 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

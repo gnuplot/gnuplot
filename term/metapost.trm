@@ -1,5 +1,5 @@
 /*
- * $Id: metapost.trm,v 1.16 2002/07/10 07:54:24 mikulik Exp $
+ * $Id: metapost.trm,v 1.17 2002/07/10 19:28:05 mikulik Exp $
  */
 
 /* GNUPLOT - metapost.trm */
@@ -948,7 +948,7 @@ START_HELP(mp)
 " but TeX does not.  Note that you must set the environment variable TEX to the",
 " name of your LaTeX executable (normally latex) if you use this option or use",
 " `mpost --tex=<name of LaTeX executable> ...`. Otherwise metapost will try and",
-"  use TeX to process the text and it won't work.",
+" use TeX to process the text and it won't work.",
 "",
 " Changing font sizes in TeX has no effect on the size of mathematics, and there",
 " is no foolproof way to make such a change, except by globally  setting a",
