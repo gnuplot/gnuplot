@@ -184,9 +184,9 @@ Also, comp.sources.misc is usually a month or so behind us.
 Date: Fri Aug 27 05:21:33 GMT 1993
 
 
-Version: 3.7.2
+Version: 3.7.3
 
-In general, GNUPLOT 3.7.2 is available as the file gnuplot-3.7.2.tar.gz.
+In general, GNUPLOT 3.7.3 is available as the file gnuplot-3.7.3.tar.gz.
 Because of the numerous changes since version 3.5, no patch files
 will be available to bring 3.5 to 3.7. But there is a patch relative
 to version 3.7.
@@ -206,7 +206,7 @@ nearest you.
 NORTH AMERICA:
 
      Anonymous ftp to ftp.gnuplot.info:
-     ftp://ftp.gnuplot.info/pub/gnuplot/gnuplot-3.7.2.tar.gz
+     ftp://ftp.gnuplot.info/pub/gnuplot/gnuplot-3.7.3.tar.gz
 
      Alternatively, you can use your web browser to get gnuplot
      from the gnuplot web pages at
@@ -216,7 +216,7 @@ NORTH AMERICA:
 
      Anonymous ftp to ftp.dartmouth.edu. Please try the
      other sites first!
-     ftp://ftp.dartmouth.edu/pub/gnuplot/gnuplot-3.7.2.tar.gz
+     ftp://ftp.dartmouth.edu/pub/gnuplot/gnuplot-3.7.3.tar.gz
 
 [ At time of release, we are not sure whether this service
   is still available. -lh
@@ -228,7 +228,7 @@ NORTH AMERICA:
         open
         cd pub/gnuplot
         mode binary
-        get gnuplot-3.7.2.tar.Z
+        get gnuplot-3.7.3.tar.Z
         quit
 
      If you have some problem, you might need to stick 
@@ -245,16 +245,16 @@ AUSTRALIA:
      http://mirror.aarnet.edu.au/pub/gnuplot/
 
      Anonymous ftp to ftp.cc.monash.edu.au:
-     ftp://ftp.cc.monash.edu.au/pub/gnuplot/gnuplot-3.7.2.tar.gz
+     ftp://ftp.cc.monash.edu.au/pub/gnuplot/gnuplot-3.7.3.tar.gz
 
 
 EUROPE:
 
      Anonymous ftp to ftp.irisa.fr:
-     ftp://ftp.irisa.fr/pub/gnuplot/gnuplot-3.7.2.tar.gz
+     ftp://ftp.irisa.fr/pub/gnuplot/gnuplot-3.7.3.tar.gz
 
      Anonymous ftp to ftp.ucc.ie:
-     ftp://ftp.ucc.ie/pub/gnuplot/gnuplot-3.7.2.tar.gz
+     ftp://ftp.ucc.ie/pub/gnuplot/gnuplot-3.7.3.tar.gz
 
 
 ----

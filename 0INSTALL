@@ -548,12 +548,12 @@ should work, though).
 
   (Bourne shell syntax)
 
-  $ cd gnuplot-3.7.2
+  $ cd gnuplot-3.7.3
   $ CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   or (C shell syntax)
 
-  $ cd gnuplot-3.7.2
+  $ cd gnuplot-3.7.3
   $ env CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   The required compiler options shown here are for System V.2.  For other
@@ -600,11 +600,10 @@ the 'test' command:
 $ gnuplot
 
         G N U P L O T
-        Unix version 3.7
-        patchlevel 1
-        last modified Tue Jan 12 13:48:06 BST 1999
+        Unix version 3.7 patchlevel 2
+        last modified Sat Jan 19 15:23:37 GMT 2002
 
-        Copyright(C) 1986 - 1993, 1998
+        Copyright(C) 1986 - 1993, 1993, 1998 - 2002
         Thomas Williams, Colin Kelley and many others
 
         Send comments and requests for help to info-gnuplot@dartmouth.edu

@@ -1,3 +1,9 @@
+Changes in release 3.7.3:
+* Major: contributed code to re-add gamma, inverse normal, and inverse error
+  function
+* Windows specific fixes
+* Improved metapost driver
+* Numerous bugfixes backported frm development version, see ChangeLog
 Changes in release 3.7.2:
 * Major: we have removed code that was labeled with a non-commercial use
   clause. The effect is that this removes the gamma, inverse normal, and
