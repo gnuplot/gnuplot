@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.79 2004/09/19 23:42:24 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.80 2004/09/27 04:20:35 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1562,8 +1562,8 @@ eval_3dplots()
 			 this_plot->plot_style & PLOT_STYLE_HAS_POINT,
 			 line_num, point_num);
 
-		/* allow old-style syntax too - ignore case lt 3 4 for
-		 * example */
+#ifdef BACKWARDS_COMPATIBLE
+		/* allow old-style syntax - ignore case lt 3 4 for example */
 		if (!equals(c_token, ",") && !END_OF_COMMAND) {
 		    struct value t;
 
@@ -1575,6 +1575,7 @@ eval_3dplots()
 			this_plot->lp_properties.p_type =
 			    (int) real(const_express(&t)) - 1;
 		}
+#endif
 
 	    }
 
