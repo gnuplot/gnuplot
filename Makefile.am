@@ -9,7 +9,7 @@ SUBDIRS = config m4 term src docs man demo tutorial $(d_lisp)
 
 EXTRA_DIST = ANNOUNCE-MOUSE BUGS CodeStyle Copyright FAQ GNUmakefile INSTALL \
 INSTALL.gnu Makefile.maint PATCHLEVEL PGPKEYS PORTING README README.1ST \
-README.exp VERSION configure.vms
+README.exp VERSION configure.vms pm3d
 
 ACLOCAL_AMFLAGS = -I m4
 
