@@ -148,7 +148,7 @@ double base_array[AXIS_ARRAY_SIZE];
 double log_base_array[AXIS_ARRAY_SIZE];
 struct udft_entry *dummy_func;	/* NULL means no dummy vars active */
 
-char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN + 1];	/* current dummy vars */
+char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* current dummy vars */
 
 
 /* support for replot command */
@@ -244,6 +244,24 @@ void set_input_line(char *line, int nchar)
 
 int do_line()
 {
+    /* Line continuation has already been handled
+     * by read_line() */
+    char *inlptr = input_line;
+
+    /* Skip leading whitespace */
+    while (isspace((int)*inlptr))
+	inlptr++;
+
+    if (inlptr != input_line) {
+	/* If there was leading whitespace, copy the actual
+	 * command string to the front. */
+	memmove(input_line,inlptr,strlen(inlptr));
+	/* Terminate resulting string */
+	input_line[strlen(inlptr)] = NUL;
+    }
+
+    FPRINTF((stderr, "Input line: \"%s\"\n",input_line));
+
     /* also used in load_file */
     if (is_system(input_line[0])) {
 	do_system();
@@ -748,10 +766,9 @@ extern lib$spawn();
 
 int vms_len;
 
-unsigned int status[2] =
-{1, 0};
+unsigned int status[2] = {1, 0};
 
-static char Help[MAX_LINE_LEN + 1] = "gnuplot";
+static char Help[MAX_LINE_LEN+1] = "gnuplot";
 
 $DESCRIPTOR(prompt_desc, PROMPT);
 /* temporary fix until change to variable length */
@@ -802,7 +819,7 @@ char *prompt;
 	    prompt_desc.dsc$w_length = strlen(expand_prompt);
 	    prompt_desc.dsc$a_pointer = expand_prompt;
 	    more = 1;
-	    --start;
+	    input_line[start - 1] = ' '; /* old code: --start; */
 	} else {
 	    line_desc.dsc$w_length = strlen(input_line);
 	    line_desc.dsc$a_pointer = input_line;
@@ -829,6 +846,7 @@ int toplevel;			/* not used for VMS version */
 	os_error("can't open GNUPLOT$HELP", NO_CARET);
 }
 
+# endif /* NO_GIH */
 
 static void do_shell()
 {
@@ -836,12 +854,17 @@ static void do_shell()
 	os_error("spawn error", NO_CARET);
     }
 }
-# endif /* NO_GIH */
 
 
 static void do_system()
 {
-    input_line[0] = ' ';	/* an embarrassment, but... */
+/*    input_line[0] = ' ';	an embarrassment, but... */
+
+/* input_line is filled by read_line or load_file, but 
+ * line_desc length is set only by read_line; adjust now
+ */
+    line_desc.dsc$w_length = strlen(input_line) - 1;
+    line_desc.dsc$a_pointer = &input_line[1];
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
 	os_error("spawn error", NO_CARET);
@@ -877,13 +900,13 @@ int toplevel;			/* not used for windows */
  * parses the command line into helpbuf and supplies help for that string.
  * Then, if there are subtopics available for that key, it prompts the user
  * with this string. If more input is given, do_help is called recursively,
- * with argument 0.  Thus a more
- * specific help can be supplied. This can be done repeatedly. If null input
- * is given, the function returns, effecting a backward climb up the tree.
+ * with argument 0.  Thus a more specific help can be supplied. This can be 
+ * done repeatedly.  If null input is given, the function returns, effecting 
+ * a backward climb up the tree.
  * David Kotz (David.Kotz@Dartmouth.edu) 10/89
- * drd - The help buffer is first cleared when called with
- * toplevel=1. This is to fix a bug where help is broken if ^C is pressed
- * whilst in the help.
+ * drd - The help buffer is first cleared when called with toplevel=1. 
+ * This is to fix a bug where help is broken if ^C is pressed whilst in the 
+ * help.
  */
 
 #ifndef NO_GIH
@@ -1309,6 +1332,7 @@ int len;
 #  endif /* !plain DOS */
 # endif /* !READLINE && !GNU_READLINE) */
 
+/* Non-VMS version */
 static int read_line(prompt)
 char *prompt;
 {
@@ -1357,7 +1381,8 @@ char *prompt;
 		    continue;	/* read rest of line, don't print "> " */
 		}
 		if (input_line[last] == '\\') {		/* line continuation */
-		    start = last;
+		    input_line[last] = ' ';
+		    start = last + 1; /* Old code: start = last; */
 		    more = TRUE;
 		} else
 		    more = FALSE;
