@@ -212,8 +212,8 @@ dvi: gnuplot.dvi gpcard.dvi
 
 gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 	@if test $(LATEX) != no ; then \
-	  TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot ; \
-	  TEXINPUTS=.:$(srcdir): $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
+	  TEXINPUTS=.:$(srcdir):${TEXINPUTS}: $(LATEX) gnuplot ; \
 	else \
 	  echo latex not found - cannot build dvi file ; \
 	fi
