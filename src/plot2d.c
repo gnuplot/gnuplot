@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.64 2004/04/13 17:23:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.65 2004/05/20 14:43:47 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -277,7 +277,7 @@ get_data(current_plot)
 	break;
 
     case BOXERROR:
-	min_cols = 4;
+	min_cols = 3;		/* HBB 20040520: fixed, was 4 */
 	max_cols = 5;
 	break;
 
@@ -464,26 +464,30 @@ get_data(current_plot)
 	    case BOXXYERROR:	/* x, y, dx, dy */
 	    case XYERRORLINES:
 	    case XYERRORBARS:
-		store2d_point(current_plot, i++, v[0], v[1], v[0] - v[2],
-			      v[0] + v[2], v[1] - v[3], v[1] + v[3], 0.0);
+		store2d_point(current_plot, i++, v[0], v[1],
+			      v[0] - v[2], v[0] + v[2],
+			      v[1] - v[3], v[1] + v[3], 0.0);
 		break;
 
 
-	    case BOXES:	/* x, y, xmin, xmax */
-		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[1],
-			      v[1], 0.0);
-		break;
-
+	    case BOXES:
 	    case XERRORLINES:
 	    case XERRORBARS:
-		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[1],
-			      v[1], 0.0);
+		/* x, y, xmin, xmax */
+		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3],
+			      v[1], v[1], 0.0);
 		break;
 
 	    case BOXERROR:
-		/* x,y, xleft, xright */
-		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
-			      v[1] - v[2], v[1] + v[2], 0.0);
+		if (boxwidth == -2)
+		    /* x,y, ylow, yhigh --- width automatic */
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
+				  v[2], v[3], -1.0);
+		else
+		    /* x, y, dy, width */
+		    store2d_point(current_plot, i++, v[0], v[1],
+				  v[0] - v[3] / 2, v[0] + v[3] / 2,
+				  v[1] - v[2], v[1] + v[2], 0.0);
 		break;
 
 	    case VECTOR:
@@ -505,8 +509,9 @@ get_data(current_plot)
 		    /*fall through */
 
 		case BOXERROR:	/* x, y, ylow, yhigh, width */
-		    store2d_point(current_plot, i++, v[0], v[1], v[0] - v[4] / 2,
-				  v[0] + v[4] / 2, v[2], v[3], 0.0);
+		    store2d_point(current_plot, i++, v[0], v[1],
+				  v[0] - v[4] / 2, v[0] + v[4] / 2,
+				  v[2], v[3], 0.0);
 		    break;
 
 		case FINANCEBARS: /* x yopen ylow yhigh yclose */
