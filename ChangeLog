@@ -1,5 +1,11 @@
 2003-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/mouse.h src/gp_types.h: Moved enum of MODE_QUERY, MODE_PLOT, and
+	MODE_SPLOT from mouse.h to gp_types.h to be available for non-mousing
+	routines as well.
+
+2003-10-10  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/graphics.c src/graph3d.c: Title of 'set key title' was not
 	placed properly under simultaneous 'set key height'.
 

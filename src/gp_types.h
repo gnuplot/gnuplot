@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.16 2002/09/27 00:12:24 sfeam Exp $
+ * $Id: gp_types.h,v 1.17 2003/07/16 04:17:32 sfeam Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -48,6 +48,10 @@
  * converted most of them into enum's. */
 enum DATA_TYPES {
 	INTGR, CMPLX
+};
+
+enum MODE_PLOT_TYPE {
+	MODE_QUERY, MODE_PLOT, MODE_SPLOT
 };
 
 enum PLOT_TYPE {
