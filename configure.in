@@ -78,6 +78,12 @@ AC_ARG_WITH(linux-vga,dnl
 test -z "$with_linux_vga" && with_linux_vga=yes
 )dnl
 
+dnl Gnuplot history, needs GNU readline
+AC_ARG_ENABLE(history,dnl
+[  --enable-history        enable history (requires GNU readline)],,
+test -z "$enable_history" && enable_history=no
+)dnl
+
 dnl IRIS terminal on IRIS4D series computer
 AC_ARG_ENABLE(iris,dnl
 [  --enable-iris           enable IRIS terminal (IRIS4D only)],,
@@ -235,13 +241,13 @@ if test "$with_readline" != no; then
     if test "$with_readline" = gnu; then
       AC_CHECK_LIB(readline, readline,dnl
        LIBS="$LIBS -lreadline $gp_tcap"
-       AC_DEFINE(GNU_READLINE),,dnl
+       AC_DEFINE(HAVE_LIBREADLINE),,dnl
        ${gp_tcap})dnl readline
     else
       gp_SEARCH_LIBDIRS(readline,readline,[${gp_tcap}])
       if test "$ac_cv_lib_readline_readline" = yes; then
         TERMLIBS="$TERMLIBS $gp_tcap"
-       AC_DEFINE(GNU_READLINE)
+       AC_DEFINE(HAVE_LIBREADLINE)
       fi
     fi
 
@@ -258,6 +264,13 @@ if test "$with_readline" != no; then
         AC_MSG_WARN([found GNU readline library but not history.h])
         AC_MSG_WARN([please add path to history.h to CPPFLAGS in Makefile])
       )dnl history.h
+
+      dnl check if history feature is desired
+      if test "$enable_history" = yes; then
+        gp_SEARCH_HEADERDIRS(readline/tilde.h,dnl
+          AC_DEFINE(GNUPLOT_HISTORY))
+      fi
+
     fi
 
   else # with_readline = yes
@@ -430,6 +443,7 @@ if test "$with_readline" != no; then
   if test "$with_readline" != yes; then
     AC_MSG_RESULT([  Use GNU readline library])
       test -n "$gp_tcap" && AC_MSG_RESULT([    with ${gp_tcap}])
+      test "$enable_history" = yes && AC_MSG_RESULT([    enable history])
   else
     AC_MSG_RESULT([  Use builtin minimal readline])
   fi
