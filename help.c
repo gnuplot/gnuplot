@@ -159,9 +159,7 @@ static TBOOLEAN Ambiguous __PROTO((struct key_s * key, int len));
 /* Help output */
 static void PrintHelp __PROTO((struct key_s * key, int *subtopics));
 static void ShowSubtopics __PROTO((struct key_s * key, int *subtopics));
-static void StartOutput __PROTO((void));
-static void OutLine __PROTO((char *line));
-static void EndOutput __PROTO((void));
+
 #if defined(PIPES)
 static FILE *outfile;		/* for unix pager, if any */
 #endif
@@ -513,31 +511,6 @@ TBOOLEAN *subtopics;		/* (in) - subtopics only? */
     EndOutput();
 }
 
-/* 
- * DBT 10-7-98    have output of list_terms() go thru pager
- * I tried to do the paging the same way PrintHelp() does so as to
- * minimize unintended side effects.  list_terms() had to
- * move to help.c because the paging functions are static here
- */
-extern struct termentry term_tbl[];
-void list_terms()
-{
-    register int i;  
-    int num_terms = term_count();
-    char line_buffer[BUFSIZ];
-
-    StartOutput();
-    sprintf(line_buffer,"\nAvailable terminal types:\n");
-    OutLine(line_buffer);
-
-    for (i = 0; i < term_count(); i++) {
-	sprintf(line_buffer,"  %15s  %s\n",
-		term_tbl[i].name, term_tbl[i].description);
-	OutLine(line_buffer);
-    }
-
-    EndOutput();
-}
 
 /* ShowSubtopics:
  *  Print a list of subtopic names
@@ -643,7 +616,7 @@ TBOOLEAN *subtopics;		/* (out) are there any subtopics */
  * Open a file pointer to a pipe to user's $PAGER, if there is one,
  * otherwise use our own pager.
  */
-static void StartOutput()
+void StartOutput()
 {
 #if defined(PIPES)
     char *pager_name = getenv("PAGER");
@@ -667,7 +640,7 @@ static void StartOutput()
 
 /* write a line of help output  */
 /* line should contain only one \n, at the end */
-static void OutLine(line)
+void OutLine(line)
 char *line;
 {
     int c;			/* dummy input char */
@@ -697,7 +670,7 @@ char *line;
     pagelines++;
 }
 
-static void EndOutput()
+void EndOutput()
 {
 #if defined(PIPES)
     if (outfile != stderr)
