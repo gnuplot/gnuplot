@@ -302,26 +302,28 @@ PDF_linewidth (double linewidth)
 TERM_PUBLIC void
 PDF_move (unsigned int x, unsigned int y)
 {
-    if (x != PDF_xLast || y != PDF_yLast)  {
-	PDF_PathOpen ();
-	PDF_moveto(myPDF, x, y);
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast)  
+	return;
 
-	PDF_xLast = x;
-	PDF_yLast = y;
-    }
+    PDF_PathOpen ();
+    PDF_moveto(myPDF, x, y);
+
+    PDF_xLast = x;
+    PDF_yLast = y;
 }
 
 
 TERM_PUBLIC void
 PDF_vector (unsigned int x, unsigned int y)
 {
-    if (x != PDF_xLast || y != PDF_yLast) {
-	PDF_PathOpen ();
-	PDF_lineto(myPDF, x, y);
+    if (PDF_pathIsOpen && x == PDF_xLast && y == PDF_yLast) 
+	return;
 
-	PDF_xLast = x;
-	PDF_yLast = y;
-    }
+    PDF_PathOpen ();
+    PDF_lineto(myPDF, x, y);
+
+    PDF_xLast = x;
+    PDF_yLast = y;
 }
 
 /* Helper function. Many symbols have an additional dot in their
@@ -909,7 +911,7 @@ PDF_boxfill(int style, unsigned int x1, unsigned int y1,
 
 #ifdef TERM_TABLE
 TERM_TABLE_START (pdf_driver)
-    "pdf", "W3C Scalable Vector Graphics driver",
+    "pdf", "PDF (Portable Document File) file driver",
     0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
     0 /* vtic */ , 0 /* htic */ ,
     PDF_options, PDF_init, PDF_reset, PDF_text, null_scale, PDF_graphics,

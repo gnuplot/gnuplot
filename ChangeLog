@@ -1,3 +1,12 @@
+2001-04-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pdf.trm (PDF_vector, PDF_move): Don't try to avoid moving
+ 	or drawing to the same positions as the 'last' one if the previous
+ 	terminal API call wasn't move/vector --- as judged by the
+ 	open/close status of the PDF "path". This fixes the PDFlib
+ 	exception in electron.dem.
+	(TERM_TABLE_START): Correct terminal one-line description.
+
 2001-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/post.trm (PS_set_font): Move PS_RememberFont() call above
