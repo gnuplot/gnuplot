@@ -386,7 +386,7 @@ Sample script: mousevariables.dem
 @subsection New terminal features
 
 
-`aqua`: New terminal for Mac OS X.
+`aqua`: New terminal for Mac OS X. Requires AquaTerm 1.0 or later.
 
 `epslatex`: New terminal. Prepares eps figures for inclusion in LaTeX documents.
 
@@ -7798,6 +7798,7 @@ terminals include
     Linux VGA (vgagl)
     GGI
     Windows
+    AquaTerm (Mac OS X)
   Files:
     PostScript
     pslatex, pstex, epslatex
@@ -13397,8 +13398,8 @@ This terminal produces files in the W3C Scalable Vector Graphics format.
 Syntax:
 @example
       set terminal svg @{size <x> <y> @{|fixed|dynamic@}@}
-                       @{@{no@}enhanced@}
                        @{fname "<font>"@} @{fsize <fontsize>@}
+                       @{@{no@}enhanced@} @{fontfile <filename>@}
 
 @end example
 
@@ -13415,7 +13416,15 @@ displayed.
 The svg terminal supports an enhanced text mode, which allows font
 and other formatting commands to be embedded in labels and other text
 strings. The enhanced text mode syntax is shared with other gnuplot
-terminal types. See `enhanced` for more details."
+terminal types. See `enhanced` for more details.
+
+SVG allows you to embed fonts directly into an SVG document, or to
+provide a hypertext link to the desired font. The `fontfile` option
+specifies a local file which is copied into the <defs> section of the
+resulting SVG output file.  This file may either itself contain a font,
+or may contain the records necessary to create a hypertext reference to
+the desired font. Gnuplot will look for the requested file using the
+directory list in the GNUPLOT_FONTPATH environmental variable."
 
 @node tek410x, tek410x_, svg, terminal
 @subsubsection tek410x
@@ -14002,7 +14011,9 @@ name of a valid Windows font, and `<fontsize>` is the size of the font in
 points.
 
 Other options may be set with the graph-menu, the initialization file,
-and `set linestyle`.
+and `set linestyle`.  Note that there is one restriction imposed by
+the classic Windows GDI interface: modifiable linewidth only works with
+solid lines, not with dotted or dashed ones.
 /* Does this really belong here? If not, someone move it where it does. */
 
 The Windows version normally terminates immediately as soon as the end of
