@@ -225,7 +225,6 @@ ULONG RexxInterface(PRXSTRING, PUSHORT, PRXSTRING);
 int ExecuteMacro(char *, int);
 void PM_intc_cleanup();
 void PM_setup();
-static void set_input_line(char *, int);
 #endif /* OS2 */
 
 #if defined(ATARI) || defined(MTOS)
@@ -284,14 +283,16 @@ char **argv;
     PC_setup();
 #endif /* MSDOS !Windows */
 /* HBB: Seems this isn't needed any more for DJGPP V2? */
-#if defined(DJGPP) && (DJGPP!=2)	/* HBB: disable all floating point exceptions, just keep running... */
+/* HBB: disable all floating point exceptions, just keep running... */
+#if defined(DJGPP) && (DJGPP!=2)
     _control87(MCW_EM, MCW_EM);
 #endif
 
 #if defined(OS2)
+    int rc;
     if (_osmode == OS2_MODE) {
 	PM_setup();
-	RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
+	rc = RexxRegisterSubcomExe("GNUPLOT", (PFN) RexxInterface, NULL);
     }
 #endif
 
@@ -361,7 +362,7 @@ char **argv;
     /* this was once setlinebuf(). Docs say this is
      * identical to setvbuf(,NULL,_IOLBF,0), but MS C
      * faults this (size out of range), so we try with
-     * size of 1024 instead.
+     * size of 1024 instead. [SAS/C does that, too. -lh]
      * Failing this, I propose we just make the call and
      * ignore the return : its probably not a big deal
      */
@@ -397,6 +398,7 @@ char **argv;
 
     if (interactive)
 	show_version(stderr);
+
 #ifdef VMS
     /* initialise screen management routines for command recall */
     if (status[1] = smg$create_virtual_keyboard(&vms_vkid) != SS$_NORMAL)
@@ -481,6 +483,7 @@ char **argv;
     if (_osmode == OS2_MODE)
 	RexxDeregisterSubcom("GNUPLOT", NULL);
 #endif
+
 #if defined(ATARI) || defined(MTOS)
     if (aesid > -1)
 	atexit(appl_exit);
@@ -509,11 +512,18 @@ int purec_matherr(struct exception *e)
 	c = "(unknown error";
 	break;
     }
-    fprintf(stderr, "math exception : %s\n", c);
-    fprintf(stderr, "    name : %s\n", e->name);
-    fprintf(stderr, "    arg 1: %e\n", e->arg1);
-    fprintf(stderr, "    arg 2: %e\n", e->arg2);
-    fprintf(stderr, "    ret  : %e\n", e->retval);
+    fprintf(stderr, "\
+math exception : %s\n\
+    name : %s\n\
+    arg 1: %e\n\
+    arg 2: %e\n\
+    ret  : %e\n",
+	    c,
+	    e->name);
+	    e->arg1,
+	    e->arg2,
+	    e->retval);
+
     return 1;
 }
 #endif /* (ATARI || MTOS) && PUREC */
@@ -528,8 +538,8 @@ void interrupt_setup()
 
     (void) signal(SIGINT, (sigfunc) inter);
 
-/* ignore pipe errors, this might happen with set output "|head" */
 #ifdef SIGPIPE
+    /* ignore pipe errors, this might happen with set output "|head" */
     (void) signal(SIGPIPE, SIG_IGN);
 #endif /* SIGPIPE */
 }
@@ -578,8 +588,7 @@ static void load_rcfile()
 	    plotrc = fopen(rcfile, "r");
 #if defined(ATARI) || defined(MTOS)
 	    if (plotrc == NULL) {
-		char const *const ext[] =
-		{NULL};
+		char const *const ext[] = { NULL };
 		char *ini_ptr = findfile(PLOTRC, getenv("GNUPLOTPATH"), ext);
 
 		if (ini_ptr)
@@ -593,13 +602,6 @@ static void load_rcfile()
 }
 
 #ifdef OS2
-
-/* Moved from command.c */
-static void set_input_line(char *line, int nchar)
-{
-    safe_strncpy(input_line, line, nchar);
-    input_line[nchar] = NUL;
-}
 
 int ExecuteMacro(char *argv, int namelength)
 {
@@ -634,13 +636,20 @@ ULONG RexxInterface(PRXSTRING rxCmd, PUSHORT pusErr, PRXSTRING rxRc)
 {
     int rc;
     static jmp_buf keepenv;
+    int cmdlen;
+
     memcpy(keepenv, command_line_env, sizeof(jmp_buf));
     if (!setjmp(command_line_env)) {
-	set_input_line(rxCmd->strptr, rxCmd->strlength);
+	/* set variable input_line.
+	 * Watch out for line length of NOT_ZERO_TERMINATED strings ! */
+	cmdlen = rxCmd->strlength + 1;
+	safe_strncpy(input_line, rxCmd->strptr, cmdlen);
+	input_line[cmdlen] = NUL;
+
 	rc = do_line();
 	*pusErr = RXSUBCOM_OK;
 	rxRc->strptr[0] = rc + '0';
-	rxRc->strptr[1] = '\0';
+	rxRc->strptr[1] = NUL;
 	rxRc->strlength = strlen(rxRc->strptr);
     } else {
 	*pusErr = RXSUBCOM_ERROR;
