@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.24 2001/04/12 15:02:30 broeker Exp $
+ * $Id: win.trm,v 1.25 2001/09/18 17:42:40 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -85,7 +85,6 @@ register_term(windows)
 
 #ifdef TERM_PROTO
 TERM_PUBLIC void WIN_options __PROTO((void));
-TERM_PUBLIC int WIN_scale __PROTO((void));
 TERM_PUBLIC void WIN_init __PROTO((void));
 TERM_PUBLIC void WIN_reset __PROTO((void));
 TERM_PUBLIC void WIN_text __PROTO((void));
@@ -198,7 +197,10 @@ WIN_options()
 }
 
 /* We don't actually do scaling, but we need to fix up the text size
- * if the user has resized the window */
+ * if the user has resized the window.
+ * Routine unused -- terminals are not allowed to do their own scale().
+ */
+#if 0
 int
 WIN_scale()
 {
@@ -211,6 +213,7 @@ WIN_scale()
 	    graphwin.fontname, graphwin.fontsize);
     return FALSE;		/* can't be done */
 }
+#endif
 
 TERM_PUBLIC void
 WIN_init()

@@ -1,3 +1,10 @@
+2002-03-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/win.trm: Removed unused WIN_scale(). Terminals are not allowed
+	to do their own scale().
+
+	* term/vws.trm: Removed unused VWS_scale(xs, ys).
+
 2002-02-28  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/axis.h src/axis.c src/datafile.c src/plot3d.h src/plot3d.c

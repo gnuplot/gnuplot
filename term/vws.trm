@@ -1,5 +1,5 @@
 /*
- * $Id: vws.trm,v 1.10 1999/06/19 20:30:58 lhecking Exp $
+ * $Id: vws.trm,v 1.11 1999/06/22 11:54:24 lhecking Exp $
  *
  */
 
@@ -63,7 +63,6 @@ register_term(vws)
 #ifdef TERM_PROTO
 TERM_PUBLIC void VWS_init __PROTO((void));
 TERM_PUBLIC void VWS_reset __PROTO((void));
-TERM_PUBLIC int VWS_scale __PROTO((double xs, double ys));
 TERM_PUBLIC void VWS_graphics __PROTO((void));
 TERM_PUBLIC void VWS_text __PROTO((void));
 TERM_PUBLIC void VWS_move __PROTO((unsigned int x, unsigned int y));
@@ -278,13 +277,6 @@ VWS_reset()
     uis$delete_display(&vd_id);
 }
 
-/****************************************************************************/
-TERM_PUBLIC int
-VWS_scale(xs, ys)
-double xs, ys;
-{
-    return FALSE;
-}
 /****************************************************************************/
 TERM_PUBLIC void
 VWS_graphics()
