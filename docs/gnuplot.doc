@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.155 2003/01/08 16:18:49 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.156 2003/01/09 23:32:22 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -7083,7 +7083,10 @@ C ... and restart the table:
  settings while `set term pop` restores it. This is equivalent to `save term`
  and `load term`, but without accessing the filesystem. Therefore they can be
  used to achieve platform independent restoring of the terminal after printing,
- for instance.
+ for instance. After gnuplot's startup, the default terminal or that from
+ `startup` file is pushed automatically. Therefore portable scripts can rely
+ that `set term pop` restores the default terminal on a given platform unless
+ another terminal has been pushed explicitly.
 
  This document may describe drivers that are not available to you because they
  were not installed, or it may not describe all the drivers that are available

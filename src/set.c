@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.106 2002/12/28 06:13:26 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.107 2003/01/07 22:29:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -3192,9 +3192,6 @@ set_surface()
 static void
 set_terminal()
 {
-    static char *push_term_name = NULL;
-    static char *push_term_opts = NULL;
-
     c_token++;
 
     if (multiplot)
@@ -3208,17 +3205,7 @@ set_terminal()
 
     /* `set term push' */
     if (equals(c_token,"push")) {
-	if (term) {
-	    free(push_term_name);
-	    free(push_term_opts);
-	    push_term_name = gp_strdup(term->name);
-	    push_term_opts = gp_strdup(term_options);
-	    if (interactive)
-		fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
-	} else { 
-	    if (interactive)
-		fputs("\tcurrent terminal type is unknown\n", stderr);
-	}
+	push_terminal(interactive);
 	c_token++;
 	return;
     } /* set term push */
@@ -3235,26 +3222,7 @@ set_terminal()
 
     /* `set term pop' */
     if (equals(c_token,"pop")) {
-	if (push_term_name != NULL) {
-	    char *s;
-	    int i = strlen(push_term_name) + 11;
-	    if (push_term_opts) {
-		/* do_string() does not like backslashes -- thus remove them */
-		for (s=push_term_opts; *s; s++)
-		    if (*s=='\\' || *s=='\n') *s=' ';
-		i += strlen(push_term_opts);
-	    }
-	    s = gp_alloc(i, "pop");
-	    i = interactive;
-	    interactive = 0;
-	    sprintf(s,"set term %s %s", push_term_name, (push_term_opts ? push_term_opts : ""));
-	    do_string(s);
-	    free(s);
-	    interactive = i;
-	    if (interactive)
-		fprintf(stderr,"   restored terminal is %s %s\n", term->name, ((*term_options) ? term_options : ""));
-	} else
-	    fprintf(stderr,"No terminal has been pushed yet\n");
+	pop_terminal();
 	c_token++;
 	return;
     } /* set term pop */

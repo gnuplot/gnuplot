@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.60 2002/10/09 09:21:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.61 2002/10/25 10:06:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -418,6 +418,7 @@ char **argv;
 
     interactive = FALSE;
     init_terminal();		/* can set term type if it likes */
+    push_terminal(0);		/* remember the default terminal */
 
 #ifdef AMIGA_SC_6_1
     if (IsInteractive(Input()) == DOSTRUE)
@@ -678,8 +679,10 @@ load_rcfile()
 #endif /* ATARI || MTOS */
 	}
     }
-    if (plotrc)
+    if (plotrc) {
 	load_file(plotrc, (rcfile==NULL) ? PLOTRC : rcfile, FALSE);
+	push_terminal(0); /* needed if terminal or its options were changed */
+    }
 
     free(rcfile);
 }

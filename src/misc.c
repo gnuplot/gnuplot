@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.45 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.46 2002/12/18 00:56:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -529,6 +529,59 @@ fontpath_fullname(const char *filename)
 	fullname = gp_strdup(filename);
 
     return fullname;
+}
+
+
+/* Push current terminal.
+ * Called 1. in main(), just after init_terminal(),
+ *        2. from load_rcfile(),
+ *        3. anytime by user command "set term push".
+ */
+static char *push_term_name = NULL;
+static char *push_term_opts = NULL;
+
+void
+push_terminal(int is_interactive)
+{
+    if (term) {
+	free(push_term_name);
+	free(push_term_opts);
+	push_term_name = gp_strdup(term->name);
+	push_term_opts = gp_strdup(term_options);
+	if (is_interactive)
+	    fprintf(stderr, "   pushed terminal %s %s\n", push_term_name, push_term_opts);
+    } else { 
+	if (is_interactive)
+	    fputs("\tcurrent terminal type is unknown\n", stderr);
+    }
+}
+
+/* Pop the terminal.
+ * Called anytime by user command "set term pop".
+ */
+void
+pop_terminal()
+{
+    if (push_term_name != NULL) {
+	char *s;
+	int i = strlen(push_term_name) + 11;
+	if (push_term_opts) {
+	    /* do_string() does not like backslashes -- thus remove them */
+	    for (s=push_term_opts; *s; s++)
+		if (*s=='\\' || *s=='\n') *s=' ';
+	    i += strlen(push_term_opts);
+	}
+	s = gp_alloc(i, "pop");
+	i = interactive;
+	interactive = 0;
+	sprintf(s,"set term %s %s", push_term_name, (push_term_opts ? push_term_opts : ""));
+	do_string(s);
+	free(s);
+	interactive = i;
+	if (interactive)
+	    fprintf(stderr,"   restored terminal is %s %s\n", term->name, ((*term_options) ? term_options : ""));
+    } else
+	fprintf(stderr,"No terminal has been pushed yet\n");
 }
 
 
