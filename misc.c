@@ -661,9 +661,6 @@ FILE *fp;
     if (missing_val != NULL)
 	fprintf(fp, "set missing %s\n", missing_val);
 
-    if (multiplot = TRUE)
-	fprintf(fp, "set multiplot\n);
-
     save_hidden3doptions(fp);
     fprintf(fp, "set cntrparam order %d\n", contour_order);
     fprintf(fp, "set cntrparam ");
