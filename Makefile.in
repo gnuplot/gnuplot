@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.9 2000/05/07 16:54:39 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.10 2000/10/20 19:37:31 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -153,6 +153,7 @@ L=$(srcdir)/docs/latextut/
 Q=$(srcdir)/docs/old/
 S=$(srcdir)/docs/psdoc/
 M=$(srcdir)/demo/
+B=$(srcdir)/beos/
 N=$(srcdir)/NeXT/
 P=$(srcdir)/os2/
 W=$(srcdir)/win/
@@ -165,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.9 2000/05/07 16:54:39 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.10 2000/10/20 19:37:31 lhecking Exp $
 #
 ########################################################
 #
@@ -193,6 +194,7 @@ W=$(srcdir)/win/
 # Q as the prefix for old doc files (eg docs/old)
 # S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
+# B as the prefix for Be (eg beos/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
@@ -253,9 +255,9 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/data.nib \
 	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
-BESRC = GPApp.cpp GPApp.h GPBitmap.cpp GPBitmap.h GPView.cpp GPView.h \
-	GPWindow.cpp GPWindow.h Makefile XStringList.cpp XStringList.h \
-	constants.h
+BESRC = $(B)GPApp.cpp $(B)GPApp.h $(B)GPBitmap.cpp $(B)GPBitmap.h \
+	$(B)GPView.cpp $(B)GPView.h $(B)GPWindow.cpp $(B)GPWindow.h \
+	$(B)Makefile $(B)XStringList.cpp $(B)XStringList.h $(B)constants.h
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
@@ -464,8 +466,8 @@ SOURCES = $(HEADERS) $(CSOURCE) $(CSOURCE8) $(CORETERM) $(NEXTSRC) \
 DISTFILES = $(ETC) $(SOURCES) $(DEMOS) $(DOCS)
 
 SUBDIRS = NeXT NeXT/English.lproj NeXT/English.lproj/GnuTerm.nib \
-	  NeXT/English.lproj/gnuview.nib demo docs docs/latextut docs/old \
-	  docs/psdoc m4 os2 term win
+	  NeXT/English.lproj/gnuview.nib beos demo docs docs/latextut \
+	  docs/old docs/psdoc m4 os2 term win
 
 clean:
 	rm -f gnuplot gnuplot_x11 bf_test *.o core *~

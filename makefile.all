@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.28.2.4 2000/05/07 16:54:39 lhecking Exp $
+# $Id: makefile.all,v 1.28.2.5 2000/10/20 19:37:31 lhecking Exp $
 #
 ########################################################
 #
@@ -29,6 +29,7 @@
 # Q as the prefix for old doc files (eg docs/old)
 # S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
+# B as the prefix for Be (eg beos/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
 # W as the prefix for Windows (eg win/)
@@ -89,9 +90,9 @@ NEXTSRC  = $(N)Controller.h $(N)Controller.m $(N)GnuTerm.iconheader \
 	   $(N)English.lproj/gnuview.nib/data.nib \
 	   $(N)English.lproj/gnuview.nib/smaller.tiff
 
-BESRC = GPApp.cpp GPApp.h GPBitmap.cpp GPBitmap.h GPView.cpp GPView.h \
-	GPWindow.cpp GPWindow.h Makefile XStringList.cpp XStringList.h \
-	constants.h
+BESRC = $(B)GPApp.cpp $(B)GPApp.h $(B)GPBitmap.cpp $(B)GPBitmap.h \
+	$(B)GPView.cpp $(B)GPView.h $(B)GPWindow.cpp $(B)GPWindow.h \
+	$(B)Makefile $(B)XStringList.cpp $(B)XStringList.h $(B)constants.h
 
 OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
