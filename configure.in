@@ -1,12 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot 3.7 on Unix.
 dnl
-dnl $Id: configure.in,v 1.89 2000/11/01 20:42:27 lhecking Exp $
+dnl $Id: configure.in,v 1.90 2000/11/02 19:09:24 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
-AC_REVISION($Revision: 1.89 $)
+AC_REVISION($Revision: 1.90 $)
 
 VERSION="`cat $srcdir/VERSION`"
 PATCHLEVEL="`cat $srcdir/PATCHLEVEL`"
@@ -441,8 +441,8 @@ dnl end libplot
 
 dnl check for Tom Boutell's gd library
 if test "$with_gd" != no; then
-  GP_PATH_LIB(gd,gdImageCreate,[$with_gd])
-  if test "$ac_cv_lib_gd_gdImageCreate" = yes; then
+  GP_PATH_LIB(gd,gdImageGif,[$with_gd])
+  if test "$ac_cv_lib_gd_gdImageGif" = yes; then
     GP_PATH_HEADER(gd.h,[$with_gd],
       dnl ACTION-IF-FOUND
       AC_DEFINE(HAVE_LIBGD, 1,
@@ -451,7 +451,8 @@ if test "$with_gd" != no; then
       AC_MSG_WARN([found gd library but not gd.h])
       AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile]))
   else
-    AC_MSG_RESULT([- see term/gif.trm for download details])
+    AC_MSG_RESULT([  GD library not found or cannot create gif images.
+  See term/gif.trm for download details])
   fi
 fi
 dnl end gd
@@ -487,7 +488,8 @@ You lose.
   fi
 
   else
-    AC_MSG_RESULT([- see term/png.trm for download details])
+    AC_MSG_RESULT([  PNG library not found.
+  See term/png.trm for download details])
   fi
 fi
 dnl end png and z
