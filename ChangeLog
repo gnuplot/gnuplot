@@ -1,3 +1,7 @@
+2004-10-08  Petr Tobiska <tobiska@ure.cas.cz>
+
+	* term/metapost.trm (MP_arrow): Handle double-ended arrows also.
+
 2004-10-05  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c (pr_font): Release previous font every time a new one
