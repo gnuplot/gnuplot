@@ -1,3 +1,9 @@
+2005-02-16  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/pdf.trm: Correct the driver docs to say font limitations
+	and font installation instructions must be sought in the pdflib
+	documention.
+
 2005-02-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/variable.c (loadpath_handler, fontpath_handler):

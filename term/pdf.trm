@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: pdf.trm,v 1.44 2005/02/14 10:19:16 mikulik Exp $
+ * $Id: pdf.trm,v 1.45 2005/02/14 20:56:02 sfeam Exp $
  */
 
 /*------------------------------
@@ -1517,10 +1517,11 @@ START_HELP(pdf)
 "",
 " where <font> is the name of the default font to use (default Helvetica)",
 " and <fontsize> is the font size (in points, default 12).",
+" For help on which fonts are available or how to install new ones, please ",
+" see the documentation for your local installation of pdflib.",
 "",
 " The `enhanced` option enables enhanced text processing features",
-" (subscripts, superscripts and mixed fonts). See `enhanced` for more",
-" information. Only the core PDF fonts are supported.",
+" (subscripts, superscripts and mixed fonts). See `enhanced`.",
 "",
 " The width of all lines in the plot can be increased by the factor <n>",
 " specified in `linewidth`.",
