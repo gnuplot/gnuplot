@@ -311,8 +311,10 @@ install: all $(LASERGNU)
 	$(mkinstalldirs) $(bindir)
 	$(mkinstalldirs) $(datadir)
 	$(INSTALL_PROGRAM) gnuplot $(bindir)/gnuplot
-	test ! -f gnuplot_x11 || $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
-	test ! -f beos/gnuplot_be || $(INSTALL_PROGRAM) beos/gnuplot_be $(bindir)/gnuplot_be
+	@test -f gnuplot_x11 && \
+	  $(INSTALL_PROGRAM) gnuplot_x11 $(bindir)/gnuplot_x11
+	@test -f beos/gnuplot_be && \
+	  $(INSTALL_PROGRAM) beos/gnuplot_be $(bindir)/gnuplot_be
 	@LINUXSUID@
 
 lasergnu_install: lasergnu
