@@ -20,20 +20,26 @@ check-local: check-noninteractive
 
 check-interactive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
-	    GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUTERM=$(GNUTERM) \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) ); \
 	fi
 
 check-noninteractive: $(BINARY_FILES)
 	@if test -z "$(GNUTERM)" ; then \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH \
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
 	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	else \
-	  ( bdir=`pwd` ; PATH=$$bdir/../src GNUPLOT_DRIVER_DIR=$$bdir/../src \
-	    GNUTERM=$(GNUTERM) GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
+	  ( bdir=`pwd` ; PATH=$$bdir/../src:$$PATH\
+	    GNUPLOT_DRIVER_DIR=$$bdir/../src \
+	    GNUTERM=$(GNUTERM) \
+	    GNUPLOT_LIB=$(srcdir) $(GNUPLOT) $(DEMO) </dev/null ); \
 	fi
 
 #

@@ -1,3 +1,11 @@
+2004-04-21  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* demo/Makefile.am.in (check-noninteractive, check-interactive):
+	keep the previous $PATH at the end of the one set for running the
+	newly built, not yet installed gnuplot.  Needed to Cygwin binaries
+	can find Cygwin1.dll, even if it's not installed in the Windows
+	DLL path.
+
 2004-04-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.texi: Regenerated.
