@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.65 2003/07/22 17:36:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.66 2003/07/31 15:45:39 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -4029,7 +4029,7 @@ char *fontname;
     if (!font) {
 	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
 	/* We are passed "font<,size><,slant>"                             */
-	char fontspec[128], shortname[64], *fontencoding, slant;
+	char fontspec[128], shortname[64], *fontencoding, slant, *weight;
 	int  fontsize, sep;
 	sep = strcspn(fontname,",");
 	if (sep >= sizeof(shortname))
@@ -4045,6 +4045,10 @@ char *fontname;
 		strstr(&fontname[sep+1],"oblique") ? 'o' :
 		                                     'r' ;
 
+	weight = strstr(&fontname[sep+1],"bold")   ? "bold" :
+		 strstr(&fontname[sep+1],"medium") ? "medium" :
+		                                     "*" ;
+
 	if (!strncmp("Symbol",shortname,6) || !strncmp("symbol",shortname,6))
 	    fontencoding = "*-*";
 	else
@@ -4055,8 +4059,8 @@ char *fontname;
 		encoding == S_ENC_ISO8859_2 ? "iso8859-2" :
 		"*-*" ) ;
 
-	sprintf(fontspec, "-*-%s-*-%c-*-*-%d-*-*-*-*-*-%s",
-		shortname, slant, fontsize, fontencoding
+	sprintf(fontspec, "-*-%s-%s-%c-*-*-%d-*-*-*-*-*-%s",
+		shortname, weight, slant, fontsize, fontencoding
 		);
 	font = XLoadQueryFont(dpy, fontspec);
 

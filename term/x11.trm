@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.77 2003/07/10 19:32:59 sfeam Exp $
+ * $Id: x11.trm,v 1.78 2003/07/22 17:36:32 sfeam Exp $
  *
  */
 
@@ -1340,15 +1340,20 @@ START_HELP(x11)
 "      `set term x11 font \"<fontspec>\"`",
 " The driver first queries the X-server for a font of the exact name given,",
 " for example `set term x11 font \"lucidasans-10\"`. If this query fails, then",
-" the driver tries to interpret <fontspec> as \"<font>,<size>,<slant>\" ",
+" it tries to interpret <fontspec> as \"<font>,<size>,<slant>,<weight>\" ",
 " and to construct a full X11 font name of the form",
-"       -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>",
-" <font> is the base name of the font (e.g. Times or Symbol)",
-" <size> is the point size (defaults to 12 if not specified)",
-" <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
-" <encoding> is set based on the current character set (help set encoding)",
+"       -*-<font>-<weight>-<s>-*-*-<size>-*-*-*-*-*-<encoding>",
+"",
+"  <font> is the base name of the font (e.g. Times or Symbol)",
+"  <size> is the point size (defaults to 12 if not specified)",
+"  <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
+"  <weight> is `medium` or `bold` if explicitly requested, otherwise `*`",
+"  <encoding> is set based on the current character set (help set encoding).",
 " So `set term x11 font \"arial,15,italic\"` will be translated to",
 " -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).",
+" The <size>, <slant>, and <weight> specifications are all optional.",
+" If you do not specify <slant> or <weight> then you will get whatever font ",
+" variant the font server offers first.",
 " The driver also recognizes some common PostScript font names and",
 " replaces them with possible X11 or TrueType equivalents.",
 " This same sequence is used to process font requests from `set label`.",

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.181 2003/07/28 22:57:48 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.182 2003/07/31 16:16:37 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -260,11 +260,17 @@ C
 
 3 PostScript output features
 
- The PostScript driver provides now an oblique symbol font, and allows run-time
+ The PostScript driver now provides an oblique symbol font, and allows run-time
  inclusion of embedded PostScript fonts. It also supports ISO-8859-2 and 
  CP-852 character encodings. See `postscript fontfile`.
 
  Sample script: fontfile.dem
+
+3 X11 output features
+
+ The X-windows driver now allows you to specify fonts, text rotation, and text
+ color.  It also allows interaction with the current plot using the mouse and 
+ hotkeys. See `set term x11 x11_fonts`.
 
 3 Other changes and additions
 
@@ -273,8 +279,8 @@ C
  deprecated.  Version 3.8 continues to allow the older syntax, but such 
  backwards compatibility may be lost in future versions.
 
- Commands of the form `set data <style>` also are deprectated in favor of
- the more general form `set style <something> <options>`.  Many more plot
+ Commands of the form `set <something> <style>` also are deprectated in favor
+ of the more general form `set style <something> <options>`.  Many more plot
  elements now have style options of their own, including arrows, filled
  areas, lines, and points. There are also style settings for input data and
  formatting. Please see `set style`, `set decimalsign`, and `set datafile`.
@@ -285,12 +291,12 @@ C
  all terminals. Please use the `test` command to check default styles and
  plotting capabilities for the currently selected terminal type.
 
- The `set label` command supports associated points, and allow you to 
+ The `set label` command supports associated points, and allows you to 
  specify point style and text style (font, rotation, etc). User variables
  can be included in labels via format specifiers in the label text.
  See `set label`.
 
- New command `set view map` to select 2D projection view of 3d surface plot.
+ New command `set view map` to select 2D projection view of 3D surface plot.
 
  New commands `set term push` and `set term pop`.
 

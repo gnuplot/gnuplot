@@ -1,3 +1,8 @@
+2003-08-04  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c term/x11.trm docs/gnuplot.doc:  Honor explicit request
+	for "bold" or "medium" font weight when parsing X11 font requests.
+
 2003-07-31  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:  Fix incorrect bracketing of switch statement entries
