@@ -661,7 +661,7 @@ int count;
 	 * DBT 11-18-98 resize plot for vertical timelabels too !
 	 */
 	/* offset is subtracted because if . 0, the margin is smaller */
-	timebot_textheight = (int) ((timelin - timelabel.yoffset + 1.5) * (t->v_char));
+	timebot_textheight = (int) ((timelin - timelabel.yoffset) * (t->v_char));
     }
     else
 	timebot_textheight = 0;
@@ -673,8 +673,8 @@ int count;
 
     if (bmargin < 0) {
 	ybot += xtic_height + xtic_textheight;
-	if (timebot_textheight > 0 || xlabel_textheight > 0)
-	    ybot += (timebot_textheight > xlabel_textheight) ? timebot_textheight : xlabel_textheight;
+	if (xlabel_textheight > 0) ybot += xlabel_textheight;
+	if (timebot_textheight > 0) ybot += timebot_textheight;
 	if (ybot == (t->ymax) * yoffset) {
 	    /* make room for the end of rotated ytics or y2tics */
 	    ybot += (int) ((t->h_char) * 2);
@@ -1015,7 +1015,7 @@ int count;
 	}
     } else {
 	if (timelabel_bottom)
-	    time_y = xlabel_y - timebot_textheight + xlabel_textheight;
+	    time_y = ybot - xtic_height - xtic_textheight - xlabel_textheight - timebot_textheight + t->v_char; 
 	else if (ylabel_textheight > 0)
 	    time_y = ylabel_y + timetop_textheight;
 	else
