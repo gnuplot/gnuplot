@@ -1,3 +1,8 @@
+2002-06-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* term/fig.trm: Support for 'set palette maxcolors <n>'. Treat properly
+	the case of color palette and monochrome fig file.
+
 2002-06-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/pdf.trm term/svg.trm: Support for 'set palette maxcolors <n>'.
@@ -647,7 +652,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/06/10 21:11:16 $).
+	last modification date (from the tag $Date: 2002/06/10 21:33:31 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

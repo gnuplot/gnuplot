@@ -59,6 +59,7 @@
  * More options (portrait/landscape, metric/inches, size, fontsize, thickness)
  * plus symbols and depth/thickness by bernlohr@eu1.mpi-hd.mpg.de (KB) Aug 15 1996
  * Added PM3D functionality Ian MacPhedran, April 15 1999
+ * Take into account 'set palette maxcolors' Petr Mikulik, June 11 2002
  */
 
 #include "driver.h"
@@ -1039,7 +1040,7 @@ TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
 
     /* Query to determine palette size */
     if (palette==NULL) {
-	return(FIG_palette_size); /* How big is palette ? */
+	return FIG_palette_size; /* How big is palette ? */
     }
 
     FIG_poly_clean(FIG_polyvec_stat); /* Clean up current data */
@@ -1047,16 +1048,14 @@ TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
     if (FIG_palette_set == FALSE) {
 	/* Create new palette */
 	FIG_palette_set = TRUE;
-	if ((FIG_use_color != TRUE) && (sm_palette.colorMode == SMPAL_COLOR_MODE_RGB)) { /* Force mono palette */
-	    /* NOTE: This is a bad way of doing this, but we have no way
-	       at this time of telling the main program to use grey */
-	    fprintf(stderr,
-		"Attempt to set colour palette in monochrome mode\n");
-	    sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
+	if (FIG_use_color == FALSE || sm_palette.colorMode == SMPAL_COLOR_MODE_GRAY) {
+	    /* Gray palette */
+	    if (FIG_use_color == FALSE && sm_palette.colorMode == SMPAL_COLOR_MODE_RGB)
+		fprintf(stderr,	"Monochrome fig file: using gray palette instead of color\n");
 	    for (i = 0; i < sm_palette.colors; i++) {
-		int j = i * 255 / sm_palette.colors + 0.5;
+		int j = (int)(i * 255.0 / (sm_palette.colors-1) + 0.5);
 		fprintf(gpoutfile, "%d %d #%2.2x%2.2x%2.2x\n",
-		O_COLOR_DEF, (i + FIG_palette_offst),j,j,j);
+		O_COLOR_DEF, (i + FIG_palette_offst), j, j, j);
 	    }
 	} else {
 	    /* Create colour/normal palette */
@@ -1069,9 +1068,9 @@ TERM_PUBLIC int FIG_make_palette(t_sm_palette *palette)
 	    }
 	}
     } else {
-	fprintf(stderr, "Attempt to set palette twice\n");
+	fprintf(stderr, "fig: Attempt to set palette twice\n");
     }
-    return(0);
+    return 0;
 }
 
 /* This doesn't apply for FIG format files
@@ -1082,7 +1081,7 @@ TERM_PUBLIC void FIG_previous_palette()
 
 TERM_PUBLIC void FIG_set_color(double gray)
 {
-    int new_color = (gray <= 0) ? 0 : (int)(gray * FIG_palette_size);
+    int new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
     if (new_color >= FIG_palette_size)
 	new_color = FIG_palette_size - 1;
     if (FIG_palette_set == FALSE) {
@@ -1100,13 +1099,12 @@ TERM_PUBLIC void FIG_filled_polygon(int points, gpiPoint *corners)
     int i,j;
 
     if (FIG_palette_set == FALSE) {
-	fprintf(stderr,"Palette used before set\n"); /* Error condition */
+	fprintf(stderr,"fig: Palette used before set\n"); /* Error condition */
     }
 
     FIG_poly_clean(FIG_polyvec_stat); /* Clean up current data */
 
-    fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t"
-,
+    fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
 	O_POLYLINE, T_POLYGON, FIG_line.style, 0,
 	FIG_color, FIG_color, FIG_line.depth,
 	FIG_line.pen_style, FIG_fill_style, FIG_line.style_val,
