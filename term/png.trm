@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.13 1998/06/18 14:59:23 ddenholm Exp $
+ * $Id: png.trm,v 1.14 1999/05/31 18:33:52 lhecking Exp $
  *
  */
 
@@ -461,6 +461,7 @@ START_HELP(png)
 "       set terminal png {small | medium | large}",
 "                        {monochrome | gray | color}",
 "",
-" The defaults are small (fontsize) and monochrome."
+" The defaults are small (fontsize) and monochrome.  Default size of the output",
+" is 640*480 pixel."
 END_HELP(png)
 #endif /* TERM_HELP */
