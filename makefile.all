@@ -127,9 +127,9 @@ ETC = 00test 0BUGS 0FAQ 0INSTALL 0PORTING 0README CodeStyle Copyright History \
 	makefile.all makefile.amg makefile.ami makefile.dj2 makefile.djg \
 	makefile.emx makefile.g makefile.msc makefile.msw makefile.mto \
 	makefile.nt makefile.os2 makefile.os9 makefile.r makefile.st \
-	makefile.tc makefile.unx makefile.vms makefile.win makefile.ztc \
-	missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu stamp-h.in \
-	strftime.c upd_make.sh vms.c $(T)README 
+	makefile.tc makefile.unx makefile.vms makefile.wc makefile.win \
+	makefile.ztc missing mkdist mkinstalldirs os9.c pcgraph.asm rgipgnu \
+	stamp-h.in strftime.c upd_make.sh vms.c $(T)README 
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
