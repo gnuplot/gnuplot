@@ -1,5 +1,10 @@
 2003-10-17  Petr Mikulik  <mikulik@physics.muni.cz> 
 
+	* docs/old/README.os2: File removed. Information therein were already
+	moved into appropriate places of gnuplot documentation long time ago.
+
+2003-10-17  Petr Mikulik  <mikulik@physics.muni.cz> 
+
 	* demo/animate.dem bivariat.dem borders.dem candlestics.dem discrete.dem
 	fillcrvs.dem fillstyle.dem fontfile.dem fontfile_latex.dem hidden.dem
 	mousevariables.dem multimsh.dem param.dem pm3d.dem pm3dcolors.dem
