@@ -1,13 +1,20 @@
 /*
  * pgnuplot.c -- pipe stdin to wgnuplot
  * 
- * Version 0.3 -- 30 Jun 1999
+ * Version 0.4 -- October 2002
  * 
  * This program is based on pgnuplot.c Copyright (C) 1999 Hans-Bernhard Broeker
  * with substantial modifications Copyright (C) 1999 Craig R. Schardt.
  *
  * The code is released to the public domain.
  *
+ */
+
+/* Changes by Petr Mikulik, October 2002:
+ * Added command line options --version and --help, and consequently dependency
+ * on gnuplot's version.h and version.c.
+ * Compile pgnuplot by:
+ *     gcc -O2 -s -o pgnuplot.exe pgnuplot.c ../version.c -I.. -luser32
  */
 
 /* Comments from original pgnuplot.c */
@@ -125,6 +132,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <windows.h>
+#include "version.h"
 
 #ifndef _O_BINARY
 # define _O_BINARY O_BINARY
@@ -203,12 +211,32 @@ int main (int argc, char *argv[])
 	char    psGnuplotCommandLine[MAX_PATH] = PROGNAME;
 	LPTSTR  psCmdLine;
 	BOOL    bSuccess;
+	int	i;
 	
 #if !defined(_O_BINARY) && defined(O_BINARY)
 # define _O_BINARY O_BINARY
 # define _setmode setmode /* this is for BC4.5 ... */
 #endif
 	_setmode(fileno(stdout), _O_BINARY);
+
+    for (i = 1; i < argc; i++) {
+	if (!argv[i])
+	    continue;
+	if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
+	    printf("gnuplot %s patchlevel %s\n",
+		    gnuplot_version, gnuplot_patchlevel);
+	    return 0;
+	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+	    printf( "Usage: gnuplot [OPTION] [FILE]\n"
+		    "  -V, --version   show gnuplot version\n"
+		    "  -h, --help      show this help\n"
+		    "  -noend, /noend  don't exit after executing FILE\n"
+		    "This is gnuplot %s patchlevel %s\n"
+		    "Report bugs to <info-gnuplot-beta@dartmouth.edu>\n",
+		    gnuplot_version, gnuplot_patchlevel);
+	    return 0;
+	}
+    }
 
 	/* CRS: create the new command line, passing all of the command
 	 * line options to wgnuplot so that it can process them:

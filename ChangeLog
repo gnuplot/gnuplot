@@ -1,5 +1,10 @@
 2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* src/win/plot.c(main) makefile.cyg makefile.mgw: Added --help and
+	--version switches.
+
+2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* src/set.c: Added missing #ifdef PM3D around declaration of 
 	static ... set_palette_... routines.
 
@@ -9,7 +14,7 @@
 
 2002-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* term/post.trm (delete_ps_fontfile): Fix compilation for non-PM3D.
+	* term/post.trm(delete_ps_fontfile): Fix compilation for non-PM3D.
 
 2002-10-09  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -1290,7 +1295,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/09 17:27:28 $).
+	last modification date (from the tag $Date: 2002/10/09 19:24:22 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
