@@ -1,3 +1,7 @@
+2003-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/tables.h src/tables.c: New routine lookup_table_nth.
+
 2003-10-06  Ethan A Merritt <merritt@u.washington.edu>
 
 	* axis.h: The recent (8 Sep) change to define NOOP as 0 caused

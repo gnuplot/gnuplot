@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.44 2003/03/13 14:47:55 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.45 2003/05/17 05:59:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -626,6 +626,22 @@ lookup_ftable(ftbl, find_token)
 	ftbl++;
     }
     return ftbl->value;
+}
+
+/* Returns index of the table tbl whose key matches the beginning of the 
+ * search string search_str.
+ * It returns index into the table or -1 if there is no match.
+ */ 
+int
+lookup_table_nth(tbl, search_str)
+    const struct gen_table *tbl;
+    const char *search_str;
+{
+    int k = -1;
+    while (tbl[++k].key)
+	if (tbl[k].key && !strncmp(search_str, tbl[k].key, strlen(tbl[k].key)))
+	    return k;
+    return -1; /* not found */
 }
 
 /* Returns index of the table tbl whose key matches the beginning of the 
