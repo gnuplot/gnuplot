@@ -1,4 +1,34 @@
-Changes in release 4.0:
+News, changes and fixes in gnuplot version 4.0
+==============================================
+
+Below you find list of news, changes and fixes in gnuplot version 4.0
+and older.
+
+Please see also section "What is New in Version 4.0" in gnuplot documentation
+(files gnuplot.gih, gnuplot.hlp, gnuplot.inf, etc.) available by the command
+    gnuplot> help new
+from gnuplot 4.0. You may find it also in files gnuplot.pdf, gnuplot.html
+or gnuplot.info optionally available in your distribution, or online at
+    http://www.gnuplot.info/docs/gnuplot.html#What_is_New_in_Version_4.0
+
+
+Mouse and hotkey support in screen terminals
+
+  The pm, x11, ggi and windows terminals support interactive work with mouse
+  and hotkeys. The usage of the mouse is mainly self-explanatory. Just type 'h'
+  in the graph window (hereafter we mean either PM, X11, ... terminal window)
+  and a short overview of commands will pop up. The mouse is turned on and off
+  with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
+
+  The coordinates of mouse clicks are exported to variables MOUSE_X, MOUSE_Y,
+  MOUSE_X2, MOUSE_Y2, and MOUSE_BUTTON accessible from the gnuplot command
+  line. This allows gnuplot scripts to alter their behaviour based on
+  interactive mouse input. See 'help mouse variables' and 'help pause mouse',
+  and the example script demo/mousevariables.dem.
+
+
+Brief list of news in gnuplot 4.0:
+
 * CHANGE sample calculated "smooth csplines" only in actual xrange
 * CHANGE 'set term gif' compile-time option to write PNG format instead
 * CHANGE pattern fill styles are uniform across all supporting terminals
@@ -32,22 +62,7 @@ Changes in release 4.0:
 * FIXED pgnuplot for Windows NT/2K/XP
 
 
-Mouse and hotkey support in screen terminals
-********************************************
-
-The pm, x11, ggi and windows terminals support interactive work with mouse
-and hotkeys. The usage of the mouse is mainly self-explanatory.  Just type
-'h' in the graph window (hereafter we mean either PM or X11 terminal window)
-and a short overview of commands will pop up.  The mouse is turned on and
-off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
-
-The coordinates of mouse clicks are exported to variables MOUSE_X, MOUSE_Y,
-MOUSE_X2, MOUSE_Y2, and MOUSE_BUTTON accessible from the gnuplot command 
-line. This allows gnuplot scripts to alter their behaviour based on 
-interactive mouse input. See 'help mouse variables' and 'help pause mouse',
-and the example script demo/mousevariables.dem.
-
-=============================================================================
+Time-organized list of news until gnuplot 4.0:
 
 [3.8k]
 * NEW let gnuplot on windows support -persist option
@@ -428,7 +443,10 @@ CGM terminal mods:
 * bug fixes for save and set lmargin commands
 * better makefile for Amiga SAS/c
 
+
+
 What's new in 3.7 ?
+===================
 
 from 315 to 348
   makefile.mgw contributed by HBB for compilation under MinGW32
