@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.34 2000/03/28 21:28:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.35 2000/03/30 14:01:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -861,7 +861,7 @@ FILE *fp;
 		""
 #endif
 		;
-	    fprintf(stderr, "%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
+	    fprintf(stderr, "%s%s%s%s%s%s%s%s%s%s\n\n", rdline, gnu_rdline,
 		    libgd, libpng, linuxvga, nocwdrc, x11, use_mouse,
 		    unixplot, gnugraph);
 	}

@@ -1,3 +1,6 @@
+2000-05-01  Johannes Zellner <johannes@zellner.org>
+	* corrected the number of format specifiers in a fprintf (src/show.c)
+
 2000-04-30  Johannes Zellner <johannes@zellner.org>
 	* small patch such that zooming of map views works again.
 	This patch apparently got lost during setup of the CVS repository.
