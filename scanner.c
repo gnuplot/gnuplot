@@ -1,26 +1,48 @@
+/* GNUPLOT - scanner.c */
 /*
+ * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
  *
- *    G N U P L O T  --  scanner.c
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
  *
- *  Copyright (C) 1986 Colin Kelley, Thomas Williams
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
  *
- *  You may use this code as you wish if credit is given and this message
- *  is retained.
+ * AUTHORS
+ * 
+ *   Original Software:
+ *     Thomas Williams,  Colin Kelley.
+ * 
+ *   Gnuplot 2.0 additions:
+ *       Russell Lang, Dave Kotz, John Campbell.
  *
- *  Please e-mail any useful additions to vu-vlsi!plot so they may be
- *  included in later releases.
- *
- *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
- */
-/*
- * Modifications for LaTeX and other support by David Kotz, 1988.
- * Department of Computer Science, Duke University, Durham, NC 27706.
- * Mail to dfk@cs.duke.edu.
+ *   Gnuplot 3.0 additions:
+ *       Gershon Elber and many others.
+ * 
+ * Send your comments or suggestions to 
+ *  pixar!info-gnuplot@sun.com.
+ * This is a mailing list; to join it send a note to 
+ *  pixar!info-gnuplot-request@sun.com.  
+ * Send bug reports to
+ *  pixar!bug-gnuplot@sun.com.
  */
 
 #include <stdio.h>
 #include <ctype.h>
 #include "plot.h"
+
+#ifdef AMIGA_AC_5
+#define O_RDONLY	0
+int open(const char * _name, int _mode, ...);
+int close(int);
+#endif
 
 #ifdef vms
 
@@ -34,6 +56,8 @@
 #endif /* vms */
 
 
+#define isident(c) (isalnum(c) || (c) == '_')
+
 #ifndef STDOUT
 #define STDOUT 1
 #endif
@@ -43,16 +67,14 @@
 
 #define APPEND_TOKEN {token[t_num].length++; current++;}
 
-#define SCAN_IDENTIFIER while (isalpha(expression[current + 1]) ||\
-			       isdigit(expression[current + 1]))\
+#define SCAN_IDENTIFIER while (isident(expression[current + 1]))\
 				APPEND_TOKEN
 
 extern struct lexical_unit token[MAX_TOKENS];
 
 static int t_num;	/* number of token I'm working on */
-int comment_pos;			/* position of comment in string (-1 == none) */
 
-char *strcat(), *strcpy();
+char *strcat(), *strcpy(), *strncpy();
 
 /*
  * scanner() breaks expression[] into lexical units, storing them in token[].
@@ -86,8 +108,6 @@ register int current;	/* index of current char in expression[] */
 register int quote;
 char brace;
 
-     comment_pos = -1;		/* initialize to no comment found */
-
 	for (current = t_num = 0;
 	    t_num < MAX_TOKENS && expression[current] != '\0';
 	    current++) {
@@ -104,8 +124,7 @@ again:
 		}
 		if (isalpha(expression[current])) {
 			SCAN_IDENTIFIER;
-		} else if (isdigit(expression[current]) ||
-			   expression[current] == '.') {
+		} else if (isdigit(expression[current]) || expression[current] == '.'){
 			token[t_num].is_token = FALSE;
 			token[t_num].length = get_num(&expression[current]);
 			current += (token[t_num].length - 1);
@@ -120,21 +139,23 @@ again:
 			token[t_num].length += 2;
 			while (expression[++current] != RBRACE) {
 				token[t_num].length++;
-				if (expression[current] == '\0')
+				if (expression[current] == '\0')			/* { for vi % */
 					int_error("no matching '}'", t_num);
 			}
-		} else if (expression[current] == '\'' || expression[current] == '\"') {
+		} else if (expression[current] == '\'' || expression[current] == '\"'){
 			token[t_num].length++;
 			quote = expression[current];
 			while (expression[++current] != quote) {
-				if (expression[current] == '\0')
-					int_error("unmatched quote",t_num);
-				token[t_num].length++;
+				if (!expression[current]) {
+					expression[current] = quote;
+					expression[current+1] = '\0';
+					break;
+				} else
+					token[t_num].length++;
 			}
 		} else switch (expression[current]) {
-		    case '#':		/* DFK: add comments to gnutex */
-		      comment_pos = current; /* remember position */
-		    	 goto endline;	/* ignore the rest of the line */
+		     case '#':		/* DFK: add comments to gnuplot */
+		    	  goto endline; /* ignore the rest of the line */
 			case '^':
 			case '+':
 			case '-':
@@ -154,8 +175,7 @@ again:
 			case '|':
 			case '=':
 			case '*':
-				if (expression[current] ==
-				    expression[current + 1])
+				if (expression[current] == expression[current + 1])
 					APPEND_TOKEN;
 				break;
 			case '!':
@@ -202,7 +222,10 @@ register long lval;
 	}
 	if (str[count] == 'e' || str[count] == 'E') {
 		token[t_num].l_val.type = CMPLX;
-		if (str[++count] == '-')
+/* modified if statement to allow + sign in exponent
+   rjl 26 July 1988 */
+		count++;
+		if (str[count] == '-' || str[count] == '+')
 			count++;
 		if (!isdigit(str[count])) {
 			token[t_num].start_index += count;
@@ -225,12 +248,23 @@ register long lval;
 
 #ifdef MSDOS
 
+#ifdef __ZTC__
+substitute(char *str,int max)
+#else
 substitute()
+#endif
 {
 	int_error("substitution not supported by MS-DOS!",t_num);
 }
 
 #else /* MSDOS */
+#ifdef AMIGA_LC_5_1
+substitute()
+{
+	int_error("substitution not supported by AmigaDOS!",t_num);
+}
+
+#else /* AMIGA_LC_5_1 */
 
 substitute(str,max)			/* substitute output from ` ` */
 char *str;
@@ -239,8 +273,12 @@ int max;
 register char *last;
 register int i,c;
 register FILE *f;
+#ifdef AMIGA_AC_5
+int fd;
+#else
 FILE *popen();
-static char pgm[MAX_LINE_LEN],output[MAX_LINE_LEN];
+#endif
+static char pgm[MAX_LINE_LEN+1],output[MAX_LINE_LEN+1];
 
 #ifdef vms
 int chan;
@@ -269,7 +307,11 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
    	if ((f = fopen(MAILBOX,"r")) == NULL)
    		os_error("mailbox open failed",NO_CARET);
 #else /* vms */
+#ifdef AMIGA_AC_5
+  	if ((fd = open(pgm,"O_RDONLY")) == -1)
+#else
   	if ((f = popen(pgm,"r")) == NULL)
+#endif
   		os_error("popen failed",NO_CARET);
 #endif /* vms */
 
@@ -277,14 +319,25 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	while ((c = getc(f)) != EOF) {
 		output[i++] = ((c == '\n') ? ' ' : c);	/* newlines become blanks*/
 		if (i == max) {
+#ifdef AMIGA_AC_5
+			(void) close(fd);
+#else
 			(void) pclose(f);
+#endif
 			int_error("substitution overflow", t_num);
 		}
 	}
+#ifdef AMIGA_AC_5
+	(void) close(fd);
+#else
 	(void) pclose(f);
+#endif
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
-	(void) strcpy(output+i,last+1);		/* tack on rest of line to output */
+	(void) strncpy(output+i,last+1,MAX_LINE_LEN-i);
+									/* tack on rest of line to output */
 	(void) strcpy(str,output);				/* now replace ` ` with output */
+	screen_ok = FALSE;
 }
+#endif /* AMIGA_LC_5_1 */
 #endif /* MS-DOS */

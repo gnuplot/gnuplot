@@ -35,12 +35,12 @@
  * Mail to mckenney@sri.com.
  */
 
-#include "imPcodes.h"
+#include "impcodes.h"
 
 #define IMAGEN_PTS_PER_INCH (300)
 
-#define IMAGEN_XMAX (10.0 * IMAGEN_PTS_PER_INCH) /* 10.0 inches */
-#define IMAGEN_YMAX (7.5 * IMAGEN_PTS_PER_INCH) /* 7.5 inches */
+#define IMAGEN_XMAX (IMAGEN_PTS_PER_INCH * 10) /* 10.0 inches */
+#define IMAGEN_YMAX (IMAGEN_PTS_PER_INCH * 75 / 10) /* 7.5 inches */
 
 #define IMAGEN_FONTSIZE 12
 
@@ -227,7 +227,7 @@ IMAGEN_cvts(str, width, height)
     h = 1;
     maxw = 0;
     w = 0;
-    while (*cp1 != NULL) {
+    while (strlen(cp1) > 0) {
 	   switch (*cp1) {
 		  case ' ' :		/* Space character. */
 		    *cp2++ = imP_SP;

@@ -1,53 +1,94 @@
-# make file for Turbo C
-# Modified from MSC make by John Campbell and Bill Wilson
+# make file for Borland C++ 2.0/Turbo C++ 1.0/Turbo C 2.0
+# uses Borland proprietry overlay manager
+# Modified from the TurboC makefile by Maurice Castro
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 # location of Turbo C compiler
-# if this is changed then linkopt.tc will need to be edited.
-TC = \tc
-# location of BGI files
-BGI = $(TC)
+# if this is changed then linkopt.tc/linkopt.tco will need to be edited.
+TC = c:\tc
+# name of C compiler
+CC = bcc
+#CC = tcc
+# location of TLINK.EXE and TCC.EXE or BCC.EXE
+BIN = $(TC)\bin\\
+#BIN =
+# location of BGI files,
+# change this line if not in TC directory, i.e. $(TC)\bgi
+BGI = $(TC)\bgi
+# location of bgiobj.exe tool - convertion of BGI to a linkable OBJ file.
+BGIOBJ = $(TC)\bgi\\
+#BGIOBJ =
+
 # -c means don't link, -f means emulate 8087 if not present
 # -ml means use large model (large code, large data)
 # -M means produce link map
 # -y means include line numbers for debugger
 # -v means include debug info
-CFLAGS = -c -f -ml -M -y -v -I$(TC)\include -DMSDOS -DPC
-TERMFLAGS = -DPOSTSCRIPT -DHPGL -DHP75 -DDXY800A -DEPSON -DNEC
+# -w- means ignore warnings and do not report them
+# -DREADLINE to use the history/line editing capability. If you want this 
+#    capability add -DREADLINE to CFLAGS then add 'readline' to linkopt.tc
+#    and to linkopt.tco in the /o section.
+CFLAGS = -c -f -ml -M -y -v -w- -I$(TC)\include -DMSDOS -DPC
+TERMFLAGS =
 
-OBJS = 	command.obj eval.obj graphics.obj help.obj internal.obj \
-	misc.obj parse.obj plot.obj scanner.obj setshow.obj standard.obj \
-	term.obj util.obj version.obj cga.obj egavga.obj herc.obj
+# With Overlay Support
+#OVLY1 = -Y
+#OVLY2 = -Yo
+# Without Overlay Support
+OVLY1 =
+OVLY2 =
 
-CSOURCE5 = term\aed.trm term\dxy.trm term\epson.trm term\font5x7.trm \
-	term\hp26.trm term\hp2648.trm term\hpgl.trm \
-	term\hpljet.trm term\iris4d.trm term\latex.trm 
-CSOURCE6 = term\post.trm term\pc.trm term\qms.trm term\regis.trm \
-	term\tek.trm term\unixpc.trm term\unixplot.trm term\v384.trm \
-	term\imPcodes.h term\imagen.trm term\object.h term\fig.trm
 
+OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
+	help.obj internal.obj misc.obj parse.obj plot.obj readline.obj \
+	scanner.obj setshow.obj standard.obj term.obj util.obj version.obj \
+	cgaf.obj egavgaf.obj hercf.obj attf.obj
+
+CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
+	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
+	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
+CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
+	term\iris4d.trm term\kyo.trm term\latex.trm term\pc.trm 
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
+	term\v384.trm term\x11.trm
+CSOURCE8 = contour.c
 
 all: gnuplot.exe $(HELPFILE)
 
-# use linkopt.tc to avoid command-line overflow
+# use linkopt.tc/linkopt.tco to avoid command-line overflow
 
 gnuplot.exe: $(OBJS) 
-	tlink /m /s /v /l @linkopt.tc
+# With Overlay Support (select one)
+#	$(BIN)tlink /m /s /v /l @linkopt.tco
+#	$(BIN)tlink @linkopt.tco 
+# Without Overlay Support
+#	$(BIN)tlink /m /s /v /l @linkopt.tc
+	$(BIN)tlink @linkopt.tc 
 
 # default rules
 
-.c.obj:  
-	tcc $(CFLAGS) $<
+.c.obj:
+	$(BIN)$(CC) $(OVLY2) $(CFLAGS) $<
+
+# The default for files is to be compiled for overlaying if OVLY1 and 
+# OVLY2 are defined.  plot.c and parse.c are not suitable for overlaying.
+
+bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h help.h
-	tcc $(CFLAGS) -DHELPFILE="$(HELPFILE)" command.c
+	$(BIN)$(CC) $(OVLY2) $(CFLAGS) -DHELPFILE="$(HELPFILE)" command.c
+
+contour.obj: contour.c plot.h
 
 eval.obj: eval.c plot.h
 
 graphics.obj: graphics.c plot.h setshow.h
+
+graph3d.obj: graphics.c plot.h setshow.h
 
 help.obj: help.c plot.h help.h
 
@@ -56,8 +97,12 @@ internal.obj: internal.c plot.h
 misc.obj: misc.c plot.h setshow.h help.h
 
 parse.obj: parse.c plot.h
+	$(BIN)$(CC) $(OVLY1) $(CFLAGS) parse.c
 
 plot.obj: plot.c plot.h setshow.h
+	$(BIN)$(CC) $(OVLY1) $(CFLAGS) plot.c
+
+readline.obj: readline.c
 
 scanner.obj: scanner.c plot.h
 
@@ -65,9 +110,9 @@ setshow.obj: setshow.c plot.h setshow.h
 
 standard.obj: standard.c plot.h
 
-term.obj: term.c plot.h $(CSOURCE5) $(CSOURCE6)
-	tcc $(CFLAGS) $(TERMFLAGS) term.c
-	
+term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	$(BIN)$(CC) $(OVLY2) $(CFLAGS) $(TERMFLAGS) -Iterm term.c
+
 util.obj: util.c plot.h
 
 version.obj: version.c
@@ -77,14 +122,17 @@ $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs\gnuplot.doc $(HELPFILE)
 
 doc2gih.exe: docs\doc2gih.c
-	tcc -I$(TC)\include -L$(TC)\lib docs\doc2gih.c
+	$(BIN)$(CC) -I$(TC)\include -L$(TC)\lib docs\doc2gih.c
 
 # convert Borland Graphics Interface files to object for linking
-cga.obj: $(BGI)\cga.bgi
-	bgiobj $(BGI)\cga
+cgaf.obj: $(BGI)\cga.bgi
+	$(BGIOBJ)bgiobj /F $(BGI)\cga
 
-egavga.obj: $(BGI)\egavga.bgi
-	bgiobj $(BGI)\egavga
+egavgaf.obj: $(BGI)\egavga.bgi
+	$(BGIOBJ)bgiobj /F $(BGI)\egavga
 
-herc.obj: $(BGI)\herc.bgi
-	bgiobj $(BGI)\herc
+hercf.obj: $(BGI)\herc.bgi
+	$(BGIOBJ)bgiobj /F $(BGI)\herc
+
+attf.obj: $(BGI)\att.bgi
+	$(BGIOBJ)bgiobj /F $(BGI)\att

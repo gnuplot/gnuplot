@@ -1,0 +1,7 @@
+FROM LIB:c.o
+     bitmap.o command.o eval.o graphics.o help.o internal.o misc.o parse.o
+     plot.o scanner.o setshow.o standard.o term.o util.o version.o contour.o
+     graph3d.o
+TO gnuplot
+LIB LIB:lcmieee.lib LIB:lcnb.lib
+VERBOSE

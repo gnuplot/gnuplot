@@ -81,10 +81,10 @@ static Scr_type lookup[] = {
 #define uPC_XLAST (uPC_XMAX - 1)
 #define uPC_YLAST (uPC_YMAX - 1)
 
-#define uPC_VCHAR 11
-#define uPC_HCHAR  7
-#define uPC_VTIC   8
-#define uPC_HTIC  12
+#define uPC_VCHAR FNT5X9_VCHAR
+#define uPC_HCHAR FNT5X9_HCHAR
+#define uPC_VTIC  uPC_VCHAR/2  /* Was 8  */
+#define uPC_HTIC  uPC_HCHAR    /* Was 12 */
 
 extern errno, sys_nerr;
 extern char *sys_errlist[];
@@ -122,7 +122,7 @@ uPC_init()
    uw.uw_height = uPC_YMAX;     /* 288 normal--we clobber 12 (top row)*/
    uw.uw_uflags = 1;         /* Creates with no border */
 
-   IfErrOut (ioctl(0, WIOCSETD, &uw), <0, "ioctl failed on", "WIOCSETD");
+   IfErrOut (ioctl(1, WIOCSETD, &uw), <0, "ioctl failed on", "WIOCSETD");
 }
 
 
@@ -144,7 +144,7 @@ uPC_graphics()
    printf ("\033[25;1H");
 
    uPC_ur.ur_dstop = DSTSRC;   /* replace (clear screen). */
-   IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
+   IfErrOut (ioctl(1, WIOCRASTOP, &uPC_ur), <0,
       "ioctl failed", "WIOCRASTOP");
    uPC_ur.ur_dstop = DSTOR;   /* Or in (show text) */
 }
@@ -154,7 +154,7 @@ uPC_text()
 {
 /* This routine will flush the display. */
 
-   IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
+   IfErrOut (ioctl(1, WIOCRASTOP, &uPC_ur), <0,
       "ioctl failed", "WIOCRASTOP");
 }
 
@@ -181,7 +181,7 @@ unsigned int x,y;
 
 /* Was just (*(a)|=(b)) */
 #define uPC_PLOT(a,b)   (uPC_cur_linetype != 0 ? uPC_plot_word (a,b) :\
-                                *(a)|=(b))
+                                (*(a)|=(b)))
 
 uPC_plot_word(a,b)
 Scr_type *a, b;
@@ -422,7 +422,7 @@ unsigned int x,y;
 
 
 #ifdef uPC_NOT_USED
-/* Added by Russell Lang, eln272v@monu1.cc.monash.oz */
+/* Added by Russell Lang, eln272v@monu1.cc.monash.oz
    This placement to the nearest character cell worked, and I'm leaving
    it here so the calculations involved won't be lost!  (jdc)
 */
@@ -467,19 +467,19 @@ uPC_putc (x, y, c, angle)
 unsigned int x, y;
 int c, angle;
 /*
-   Put a character at an x,y location in the bit map (using the font5x7
-   array.  This is mostly just copied from the epson driver.
+   Put a character at an x,y location in the bit map (using the fnt5x9
+   array.  This is mostly just copied from the bitmap.c driver.
 */
 {
    int i, j, k;
    register Scr_type mask, *a;
-   char fc;
+   char_row fc;
    unsigned int pixelon;
 
    i = c - ' ';
-   for(j=0; j < 9; j++) {
-      fc = font5x7[i][j];
-      for (k=0; k < 5; k++) {
+   for (j=0; j<FNT5X9_VBITS; j++) {
+      fc = fnt5x9[i][j];
+      for (k=0; k<FNT5X9_HBITS; k++) {
          pixelon = ((unsigned int)(fc))>>k & 1;
          if (pixelon) {
             switch (angle) {
@@ -522,7 +522,7 @@ int signo;
    struct utdata ut;
 
 /* Reset the window to the right size. */
-   ioctl(0, WIOCSETD, &wreset);   /* 0, not wncur here! */
+   ioctl(1, WIOCSETD, &wreset);   /* 0, not wncur here! */
 
 /* Scroll the screen once. (avoids typing over the same line) */
    fprintf (stderr, "\n");

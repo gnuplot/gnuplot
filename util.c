@@ -1,6 +1,6 @@
 /* GNUPLOT - util.c */
 /*
- * Copyright (C) 1986, 1987, 1990   Thomas Williams, Colin Kelley
+ * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -12,7 +12,7 @@
  * distribute the modified code.  Modifications are to be distributed 
  * as patches to released version.
  *  
- * This software  is provided "as is" without express or implied warranty.
+ * This software is provided "as is" without express or implied warranty.
  * 
  *
  * AUTHORS
@@ -22,9 +22,16 @@
  * 
  *   Gnuplot 2.0 additions:
  *       Russell Lang, Dave Kotz, John Campbell.
+ *
+ *   Gnuplot 3.0 additions:
+ *       Gershon Elber and many others.
  * 
- * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
- * 
+ * Send your comments or suggestions to 
+ *  pixar!info-gnuplot@sun.com.
+ * This is a mailing list; to join it send a note to 
+ *  pixar!info-gnuplot-request@sun.com.  
+ * Send bug reports to
+ *  pixar!bug-gnuplot@sun.com.
  */
 
 #include <ctype.h>
@@ -52,6 +59,32 @@ extern jmp_buf env;	/* from plot.c */
 extern int inline_num;		/* from command.c */
 extern BOOLEAN interactive;	/* from plot.c */
 extern char *infile_name;	/* from plot.c */
+
+extern char *strchr();
+
+#ifndef AMIGA_AC_5
+extern double sqrt(), atan2();
+#endif
+
+/*
+ * chr_in_str() compares the characters in the string of token number t_num
+ * with c, and returns TRUE if a match was found.
+ */
+chr_in_str(t_num, c)
+int t_num;
+char c;
+{
+register int i;
+
+	if (!token[t_num].is_token)
+		return(FALSE);				/* must be a value--can't be equal */
+	for (i = 0; i < token[t_num].length; i++) {
+		if (input_line[token[t_num].start_index+i] == c)
+			return(TRUE);
+		}
+	return FALSE;
+}
+
 
 /*
  * equals() compares string value of token number t_num with str[], and
@@ -147,7 +180,13 @@ int t_num;
 			(equals(t_num+1,"(") &&		/* function */
 			 isletter(t_num+2)   &&
 			 equals(t_num+3,")") &&
-			 equals(t_num+4,"=") )
+			 equals(t_num+4,"=") ) ||
+			(equals(t_num+1,"(") &&		/* function with */
+			 isletter(t_num+2)   &&		/* two variables */
+			 equals(t_num+3,",") &&
+			 isletter(t_num+4)   &&
+			 equals(t_num+5,")") &&
+			 equals(t_num+6,"=") )
 		));
 }
 
@@ -289,26 +328,44 @@ int t_num;
 	*val_ptr = token[t_num].l_val;
 }
 
+static char *num_to_str(r)
+double r;
+{
+	static i = 0;
+	static char s[4][20];
+	int j = i++;
 
+	if ( i > 3 ) i = 0;
+
+	sprintf( s[j], "%g", r );
+	if ( strchr( s[j], '.' ) == NULL &&
+	     strchr( s[j], 'e' ) == NULL &&
+	     strchr( s[j], 'E' ) == NULL )
+		strcat( s[j], ".0" );
+
+	return s[j];
+} 
 
 disp_value(fp,val)
 FILE *fp;
 struct value *val;
 {
-		switch(val->type) {
-			case INT:
-				fprintf(fp,"%d",val->v.int_val);
-				break;
-			case CMPLX:
-				if (val->v.cmplx_val.imag != 0.0 )
-					fprintf(fp,"{%g, %g}",
-						val->v.cmplx_val.real,val->v.cmplx_val.imag);
-				else
-					fprintf(fp,"%g", val->v.cmplx_val.real);
-				break;
-			default:
-				int_error("unknown type in disp_value()",NO_CARET);
-		}
+	switch(val->type) {
+		case INT:
+			fprintf(fp,"%d",val->v.int_val);
+			break;
+		case CMPLX:
+			if (val->v.cmplx_val.imag != 0.0 )
+				fprintf(fp,"{%s, %s}",
+					num_to_str(val->v.cmplx_val.real),
+					num_to_str(val->v.cmplx_val.imag));
+			else
+				fprintf(fp,"%s",
+					num_to_str(val->v.cmplx_val.real));
+			break;
+		default:
+			int_error("unknown type in disp_value()",NO_CARET);
+	}
 }
 
 
@@ -324,6 +381,7 @@ struct value *val;
 	}
 	int_error("unknown type in real()",NO_CARET);
 	/* NOTREACHED */
+	return((double)0.0);
 }
 
 
@@ -337,8 +395,9 @@ struct value *val;
 		case CMPLX:
 			return(val->v.cmplx_val.imag);
 	}
-	int_error("unknown type in real()",NO_CARET);
+	int_error("unknown type in imag()",NO_CARET);
 	/* NOTREACHED */
+	return((double)0.0);
 }
 
 
@@ -347,8 +406,6 @@ double
 magnitude(val)		/* returns the magnitude of val */
 struct value *val;
 {
-	double sqrt();
-
 	switch(val->type) {
 		case INT:
 			return((double) abs(val->v.int_val));
@@ -360,6 +417,7 @@ struct value *val;
 	}
 	int_error("unknown type in magnitude()",NO_CARET);
 	/* NOTREACHED */
+	return((double)0.0);
 }
 
 
@@ -368,8 +426,6 @@ double
 angle(val)		/* returns the angle of val */
 struct value *val;
 {
-	double atan2();
-
 	switch(val->type) {
 		case INT:
 			return((val->v.int_val > 0) ? 0.0 : Pi);
@@ -385,6 +441,7 @@ struct value *val;
 	}
 	int_error("unknown type in angle()",NO_CARET);
 	/* NOTREACHED */
+	return((double)0.0);
 }
 
 

@@ -72,7 +72,7 @@ set ylabel "magnitude of A(jw)"
 set autoscale  y
 plot abs(A(jw))
 
-pause -1 "Hit return"
+pause -1 "Hit return to continue"
 
 # phase frequency response
 set nolog y
@@ -81,7 +81,7 @@ set title "Phase Frequency Response"
 set ylabel "Phase of A(jw) (degrees)"
 plot 180/pi*arg(A(jw))
 
-pause -1 "Hit return"
+pause -1 "Hit return to continue"
 
 # undo what we've done
 set dummy x

@@ -19,7 +19,9 @@ static char rcsid[] = "$Id: doc2tex.c,v 1.1 90/01/11 15:44:06 dfk Exp Locker: df
 
 #include <stdio.h>
 #include <ctype.h>
-#include <strings.h>
+#ifdef AMIGA_LC_5_1
+#include <string.h>
+#endif
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
@@ -108,7 +110,10 @@ process_line(line, b)
 				(void) fputs("\\end{verbatim}\n",b);
 				verb=FALSE;
 			 } 
-			 puttex(line+1,b);
+			 if (line[0] == '\n')
+			   puttex(line,b); /* handle totally blank line */
+			 else
+			   puttex(line+1,b);
 		  }
 		  break;
 	   }
@@ -138,7 +143,17 @@ section(line, b)
 	   (void) fputs("\\end{verbatim}\n",b);
 	   verb=FALSE;
     } 
+#ifdef AMIGA_LC_5_1
+    (void) sscanf(line,"%d",&sh_i);
+    strcpy(string,strchr(line,' ')+1);
+    {
+      char *p;
+      p = strchr(string,'\n');
+      if (p != NULL) *p = '\0';
+    }
+#else
     (void) sscanf(line,"%d %[^\n]s",&sh_i,string);
+#endif
     switch(sh_i)
 	 {
 		case 1: 

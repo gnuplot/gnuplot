@@ -5,7 +5,7 @@
  * Modified by Russell Lang, 2nd October 1989
  * to make vms help level 1 and 2 create the same ms section level.
  *
- * Modified to become doc2ms by David Kotz dfk@cs.duke.edu 12/89
+ * Modified to become doc2ms by David Kotz (David.Kotz@Dartmouth.edu) 12/89
  * Added table and backquote support.
  *
  * usage:  doc2ms < file.doc > file.ms
@@ -22,6 +22,9 @@ static char rcsid[] = "$Id: doc2ms.c,v 1.1 90/01/11 15:43:54 dfk Exp Locker: dfk
 
 #include <stdio.h>
 #include <ctype.h>
+#ifdef AMIGA_LC_5_1
+#include <string.h>
+#endif
 
 #define MAX_NAME_LEN	256
 #define MAX_LINE_LEN	256
@@ -51,11 +54,7 @@ FILE *b;
     (void) fputs(".nr PO +0.3i\n",b);
     (void) fputs(".so titlepage.ms\n",b);
     (void) fputs(".pn 1\n",b);
-    (void) fputs(".ds CH GNUPLOT\n",b);
-    (void) fputs(".ds RH Page %\n",b);
     (void) fputs(".bp\n",b);
-    (void) fputs(".nr PS 12\n",b);
-    (void) fputs(".nr VS 13\n",b);
     (void) fputs(".ta 1.5i 3.0i 4.5i 6.0i 7.5i\n",b);
     (void) fputs("\\&\n.sp 3\n.PP\n",b);
     /* following line commented out by rjl
@@ -124,7 +123,10 @@ process_line(line, b)
 				break;
 			 }
 			 default: {
-				putms(line+1,b); 
+				if (line[0] == '\n')
+				  putms(line,b); /* handle totally blank line */
+				else
+				  putms(line+1,b);
 				break;
 			 }
 			 break;
@@ -155,7 +157,18 @@ section(line, b)
     int sh_i;
     static int old = 1;
 
+  
+#ifdef AMIGA_LC_5_1
+    (void) sscanf(line,"%d",&sh_i);
+    strcpy(string,strchr(line,' ')+1);
+    {
+      char *p;
+      p = strchr(string,'\n');
+      if (p != NULL) *p = '\0';
+    }
+#else
     (void) sscanf(line,"%d %[^\n]s",&sh_i,string);
+#endif
     
     (void) fprintf(b,".sp %d\n",(sh_i == 1) ? LINE_SKIP : LINE_SKIP-1);
     

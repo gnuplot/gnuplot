@@ -4,12 +4,17 @@
 
 set print_banner = on	# Print a banner page unless told otherwise.
 set input_files = ()    # the plot input command files
+set lpr_opts = ()	    # options to lpr
 
-# Default printer set by shell variable LASER.
-if !($?LASER) then
-	set LASER = "imagen018"
+# Default printer set by shell variable PRINTER.
+if (! $?PRINTER) then 
+    if ($?LASER) then
+   	   set PRINTER=$LASER
+    else
+    	   set PRINTER="lw0"
+    endif
 endif
-set printer = (-P$LASER)
+set printer = (-P$PRINTER)
 
 # File for plot commands, and for plot output
 set TMP=/tmp/plot$$
@@ -32,6 +37,7 @@ top:
 		case -b*:	# Do not print a banner page.
 		case -J*:	# Compatible with imprint.
 			set print_banner = off
+    	   	  	set lpr_opts=($lpr_opts -h)
 			shift argv
 			goto top
 
@@ -144,7 +150,7 @@ if ($status == 0 && -e $outfile && ! -z $outfile) then
     	   -D"pagereversal on" \
     	   -D"program lasergnu" $outfile
     else if ($LANG == -Lpostscript) then
-        lpr $printer $outfile
+    	   lpr $lpr_opts $printer $outfile
     endif
 else
     echo "lasergnu: error in plotting or empty plot; nothing printed."

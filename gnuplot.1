@@ -1,10 +1,11 @@
 .\" dummy line
-.TH GNUPLOT 1 "13 February 1990"
+.TH GNUPLOT 1 "31 August 1990"
 .UC 4
 .SH NAME
 gnuplot \- an interactive plotting program
 .SH SYNOPSIS
-.B gnuplot  file ...
+.B gnuplot
+[ X11 options ] [file ...]
 .br
 .SH DESCRIPTION
 .I Gnuplot 
@@ -36,32 +37,43 @@ Support through a generalized graphics driver for
 AED 512,
 AED 767,
 BBN BitGraph,
+Commodore Amiga,
 Roland DXY800A,
 EEPIC,
+EmTeX,
+Epson 60dpi printers,
 Epson LX-800,
 Fig, 
 HP2623,
 HP2648,
 HP75xx,
 HPGL,
-IBM Proprinter,
+HP LaserJet II,
 Imagen,
 Iris 4D,
 Kermit-MS,
+Kyocera laser printer,
 LaTeX,
 NEC CP6 pinwriter,
 PostScript,
 QMS QUIC,
 ReGis (VT125 and VT2xx),
+SCO Xenix CGI,
 Selanar,
+Star color printer,
+Tandy DMP-130 printer,
 Tek 401x,
+Tek 410x,
 Vectrix 384,
-and unixplot.  
+VT like tekronix emulator,
+Unix PC (ATT 3b1 or ATT 7300),
+unixplot,  
+and X11.
 The PC version compiled by Microsoft C
 supports IBM CGA, EGA, VGA, Hercules, ATT 6300,
 and Corona 325 graphics.  
 The PC version compiled by Turbo C
-supports IBM CGA, EGA, MCGA, VGA and Hercules graphics.  
+supports IBM CGA, EGA, MCGA, VGA, Hercules and ATT 6300 graphics.  
 Other devices can be added simply, but will require recompiling.
 .PP
 Shell escapes and command line substitution.
@@ -73,6 +85,43 @@ Output redirection.
 All computations performed in the complex domain.  Just the real part is
 plotted by default, but functions like imag() and abs() and arg() are
 available to override this.
+.SH X11 OPTIONS
+.I Gnuplot 
+provides two terminal types (\fIx11\fP and \fIX11\fP) for use
+with X servers. The \fIX11\fP terminal type provides differing colors as well 
+as shapes for the \fIpoints\fP plotting style. The two types are otherwise 
+identical.  When used with either of these terminal types, \fIgnuplot\fP
+honors all the standard X Toolkit options and resources such as geometry, font,
+foreground and background. See the X(1) man page for a description of
+the options. For color or grayscale displays \fIgnuplot\fP also honors 
+the following resources (shown here with default values):
+.sp
+.B  "gnuplot*textColor: black"
+.br 
+.B  "gnuplot*borderColor: black"
+.br 
+.B  "gnuplot*axisColor: black"
+.br 
+.B  "gnuplot*line1Color: red"
+.br 
+.B  "gnuplot*line2Color: green"
+.br 
+.B  "gnuplot*line3Color: blue"
+.br 
+.B  "gnuplot*line4Color: magenta"
+.br 
+.B  "gnuplot*line5Color: cyan"
+.br 
+.B  "gnuplot*line6Color: sienna"
+.br 
+.B  "gnuplot*line7Color: orange"
+.br 
+.B  "gnuplot*line8Color: coral"
+.br 
+.PP
+The size or aspect ratio of a plot may be changed by resizing the
+.I gnuplot
+window.
 .SH AUTHORS
 Thomas Williams, Pixar Corporation, 
 .br
@@ -84,14 +133,21 @@ Additions for labelling by Russell Lang, Monash University, Australia.
 .br
 (rjl@monu1.cc.monash.edu.au)
 .br
-Further additions by David Kotz, Duke University, North Carolina, USA. 
+Further additions by David Kotz, Dartmouth College, New Hampshire, USA
+(formerly of Duke University, North Carolina, USA).  
 .br
-(dfk@cs.duke.edu)
+(David.Kotz@Dartmouth.edu)
+.br
+X11 support by Ed Kubaitis, University of Illinois, USA.
 .SH BUGS
 The atan() function does not work correctly for complex arguments.
+.br
+The bessel functions do not work for complex arguments.
 .br
 See the 
 .I help bugs
 command in gnuplot.
 .SH SEE ALSO
 See the printed manual or the on-line help for details on specific commands.
+.br
+X(1).

@@ -44,13 +44,13 @@
 #define EEPIC_UNIT (EEPIC_PTS_PER_INCH/DOTS_PER_INCH) /* dot size in pt */
 
 /* 5 inches wide by 3 inches high (default) */
-#define EEPIC_XMAX (unsigned int)(EEPIC_PTS_PER_INCH/EEPIC_UNIT*5.0)
-#define EEPIC_YMAX (unsigned int)(EEPIC_PTS_PER_INCH/EEPIC_UNIT*3.0)
+#define EEPIC_XMAX (5*DOTS_PER_INCH)  /* (EEPIC_PTS_PER_INCH/EEPIC_UNIT*5.0) */
+#define EEPIC_YMAX (3*DOTS_PER_INCH)  /* (EEPIC_PTS_PER_INCH/EEPIC_UNIT*3.0) */
 
-#define EEPIC_HTIC (5./EEPIC_UNIT)
-#define EEPIC_VTIC (5./EEPIC_UNIT)
-#define EEPIC_HCHAR (5.3/EEPIC_UNIT)
-#define EEPIC_VCHAR (11./EEPIC_UNIT)
+#define EEPIC_HTIC (5*DOTS_PER_INCH/72)		/* (5./EEPIC_UNIT) */
+#define EEPIC_VTIC (5*DOTS_PER_INCH/72)		/* (5./EEPIC_UNIT) */
+#define EEPIC_HCHAR (DOTS_PER_INCH*53/10/72)	/* (5.3/EEPIC_UNIT) */
+#define EEPIC_VCHAR (DOTS_PER_INCH*11/72)	/* (11./EEPIC_UNIT) */
 
 static unsigned int EEPIC_posx;
 static unsigned int EEPIC_posy;
@@ -63,9 +63,9 @@ static int eepic_angle=0;
 /* POINTS */
 #define EEPIC_POINT_TYPES 12	/* we supply more point types */
 static char *EEPIC_points[] = {
-    "\\makebox(0,0){$\\Diamond$}",
+    "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Diamond$}}",
     "\\makebox(0,0){$+$}",
-    "\\makebox(0,0){$\\Box$}",
+    "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Box$}}",
     "\\makebox(0,0){$\\times$}",
     "\\makebox(0,0){$\\triangle$}",
     "\\makebox(0,0){$\\star$}",
@@ -92,6 +92,8 @@ static char *EEPIC_lines[] = {
 static int EEPIC_type;		/* current line type */
 static BOOLEAN EEPIC_inline = FALSE; /* are we in the middle of a line */
 static void EEPIC_endline();	/* terminate any line in progress */
+static int EEPIC_linecount = 0; /* number of points in line so far */
+#define EEPIC_LINEMAX 50		/* max value for linecount */
 
 /* ARROWS */
 /* we use the same code as for LATEX */
@@ -107,7 +109,7 @@ EEPIC_init()
 
 
 EEPIC_scale(xs, ys)
-	float xs, ys;			/* scaling factors */
+	double xs, ys;			/* scaling factors */
 {
     register struct termentry *t = &term_tbl[term];
 
@@ -181,9 +183,20 @@ EEPIC_vector(ux,uy)
 	   fprintf(outfile, "%s(%u,%u)", 
 			 EEPIC_lines[EEPIC_type+2], 
 			 EEPIC_posx, EEPIC_posy);
+	   EEPIC_linecount = 1;
+    } else {
+	   /* Even though we are in middle of a path, 
+	    * we may want to start a new path command. 
+	    * If they are too long then latex will choke.
+	    */
+	   if (EEPIC_linecount++ >= EEPIC_LINEMAX) {
+		  fprintf(outfile, "\n");
+		  fprintf(outfile, "%s(%u,%u)", 
+				EEPIC_lines[EEPIC_type+2], 
+				EEPIC_posx, EEPIC_posy);
+		  EEPIC_linecount = 1;
+	   }
     }
-
-    /* add new point to line */
     fprintf(outfile, "(%u,%u)", ux,uy);
     EEPIC_posx = ux;
     EEPIC_posy = uy;
@@ -199,10 +212,11 @@ EEPIC_endline()
 }
 
 
-EEPIC_arrow(sx,sy, ex,ey)
+EEPIC_arrow(sx,sy, ex,ey, head)
 	int sx,sy, ex,ey;
+	BOOLEAN head;
 {
-    best_latex_arrow(sx,sy, ex,ey, 2); /* call latex routine */
+    best_latex_arrow(sx,sy, ex,ey, 2, head); /* call latex routine */
 
     EEPIC_posx = ex;
     EEPIC_posy = ey;

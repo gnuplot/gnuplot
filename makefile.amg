@@ -1,0 +1,51 @@
+# Makefile for SAS/C 5.10 on the Amiga
+
+CC = lc
+
+# Remove '-fi' if you don't want to use the better Commodore math-routines.
+# If you do so, you'll have to change 'lcmieee.lib' to 'lcm.lib' in
+# "linkopt.amg"
+CFLAGS = -b0 -dAMIGA_LC_5_1 -dNOGAMMA -dMEMSET -dMEMCPY -j85i -j88i -fi
+
+.c.o:
+	$(CC) $(CFLAGS) $<
+
+OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
+	internal.o misc.o parse.o plot.o scanner.o setshow.o \
+	standard.o term.o util.o version.o
+
+CSOURCE1 = command.c setshow.c 
+CSOURCE2 = help.c graphics.c graph3d.o internal.c 
+CSOURCE3 = misc.c eval.c parse.c plot.c scanner.c standard.c 
+CSOURCE4 = bitmap.c term.c util.c version.c
+CSOURCE5 = term/aed.trm term/cgi.trm term/dumb.trm term/dxy.trm \
+	term/eepic.trm term/epson.trm term/fig.trm term/hp26.trm \
+	term/hp2648.trm term/hpgl.trm term/hpljii.trm term/vws.trm
+CSOURCE6 = term/impcodes.h term/imagen.trm term/object.h \
+	term/iris4d.trm term/kyo.trm term/latex.trm term/pc.trm \
+	term/amiga.trm
+CSOURCE7 = term/post.trm term/qms.trm term/regis.trm term/sun.trm \
+	term/t410x.trm term/tek.trm term/unixpc.trm term/unixplot.trm \
+	term/v384.trm term/x11.trm gnuplot_x11.c
+CSOURCE8 = contour.c
+
+gnuplot: $(OBJS)
+	blink with linkopt.amg
+
+bitmap.o: bitmap.c bitmap.h plot.h
+command.o: command.c plot.h setshow.h help.h
+contour.o: contour.c plot.h
+eval.o: eval.c plot.h
+graph3d.o: graph3d.c plot.h setshow.h
+graphics.o: graphics.c plot.h setshow.h
+help.o: help.c plot.h help.h
+internal.o: internal.c plot.h
+misc.o: misc.c plot.h setshow.h help.h
+parse.o: parse.c plot.h
+plot.o: plot.c plot.h setshow.h
+scanner.o: scanner.c plot.h
+setshow.o: setshow.c plot.h setshow.h
+standard.o: standard.c plot.h
+term.o: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+util.o: util.c plot.h
+version.o: version.c

@@ -29,6 +29,9 @@
  */
 
 #include <gl.h>
+
+#define IRIS4DRC    ".gnuplot_iris4d"
+
 #define IRIS4D_XMAX 1024
 #define IRIS4D_YMAX 1024
 
@@ -40,14 +43,92 @@
 #define IRIS4D_VTIC (IRIS4D_YMAX/80)
 #define IRIS4D_HTIC (IRIS4D_XMAX/80)
 
+static short colors24bits[][3] =
+{
+    { 85,  85,  85  },  /* 0. BACK GROUND ( DARKGRAY ) */
+    { 0,   0,   0   },  /* 1. BLACK */
+    { 170, 0,   170 },  /* 2. MAGENTA */
+    { 85,  255, 255 },  /* 3. LIGHTCYAN */
+    { 170, 0,   0   },  /* 4. RED */
+    { 0,   170, 0   },  /* 5. GREEN */
+    { 255, 85,  255 },  /* 6. LIGHTMAGENTA */
+    { 255, 255, 85  },  /* 7. YELLOW */
+    { 255, 85,  85  },  /* 8. LIGHTRED */
+    { 85,  255, 85  },  /* 9. LIGHTGREEN */
+    { 0,   170, 170 },  /* 10. CYAN */
+    { 170, 170, 0   },  /* 11. BROWN */
+};
+#define COLOR24_SIZE (sizeof(colors24bits) / (sizeof(short) * 3))
+
+static iris24bits = FALSE;
+
+#define IRIS4D_BACKGROUND	0
+#define IRIS4D_BLACK		1
+#define IRIS4D_MAGENTA		2
+#define IRIS4D_LIGHTCYAN	3
+#define IRIS4D_RED		4
+#define IRIS4D_GREEN		5
+#define IRIS4D_LIGHTMAGENTA	6
+#define IRIS4D_YELLOW		7
+#define IRIS4D_LIGHTRED		8
+#define IRIS4D_LIGHTGREEN	9
+#define IRIS4D_CYAN		10
+#define IRIS4D_BROWN		11
+
+IRIS4D_options()
+{
+  int i = 0;
+  struct value a;
+  extern struct value *const_express();
+  extern double real();
+
+  if (!END_OF_COMMAND) {
+    i = (int) real(const_express(&a));
+  }
+
+  iris24bits = (i == 24);
+
+  sprintf(term_options, "%s",iris24bits ? "24" : "8");
+}
+
 IRIS4D_init()
 {
+  int i;
+  char homedirfile[80], line[80];
+  FILE *f;
+
   foreground();
   winopen("Gnuplot");
-  deflinestyle(1, 0x3FFF); /* Long dash */
+  if (iris24bits)
+  {
+    RGBmode();
+    gconfig();
+  }
+
+  strcat(strcat(strcpy(homedirfile,getenv("HOME")),"/"),IRIS4DRC);
+  if ((f = fopen(IRIS4DRC, "r")) != NULL ||
+      (f = fopen(homedirfile, "r")) != NULL) {
+    int c1, c2, c3;
+    for (i = 0; i < COLOR24_SIZE; i++) {
+      if (fgets(line, 79, f) == NULL ||
+	  sscanf(line, "%d %d %d", &c1, &c2, &c3) != 3)
+	int_error("Iris4d color file terminated prematurely or wrong format.\n", NO_CARET);
+      colors24bits[i][0] = c1;
+      colors24bits[i][1] = c2;
+      colors24bits[i][2] = c3;
+    }
+      
+    fclose(f);
+  }
+  deflinestyle(1, 0x3FFF); /* long dash */
   deflinestyle(2, 0x5555); /* dotted */
   deflinestyle(3, 0x3333); /* short dash */
   deflinestyle(4, 0xB5AD); /* dotdashed */
+  deflinestyle(5, 0x0F0F); /* dashed */
+  deflinestyle(6, 0xBBBB); /* dotdashed */
+  deflinestyle(7, 0x3F3F); /* mid-long dash */
+  deflinestyle(8, 0x7777); /* mid-long dash */
+
   return;
 }
 
@@ -55,7 +136,13 @@ IRIS4D_graphics()
 {
   reshapeviewport();
   ortho2((Coord)0, (Coord)IRIS4D_XMAX, (Coord)0, (Coord)IRIS4D_YMAX);
-  color(WHITE);
+  if (iris24bits)
+    RGBcolor(colors24bits[IRIS4D_BACKGROUND][0],
+	     colors24bits[IRIS4D_BACKGROUND][1],
+	     colors24bits[IRIS4D_BACKGROUND][2]);
+  else
+    color(WHITE);
+
   clear();
   
   return;
@@ -69,11 +156,40 @@ IRIS4D_text()
 IRIS4D_linetype(linetype)
 int linetype;
 {
-  static int pen_color[5] = {1, 2, 3, 4, 5};
-  
-  linetype = linetype % 5;
-  color((Colorindex) pen_color[linetype]);
-  setlinestyle(linetype);
+  static int pen_color_24[11] =
+    {
+      IRIS4D_BLACK,		/* reserved for border and numbers */
+      IRIS4D_MAGENTA,		/* reserved for axis traces */
+      IRIS4D_LIGHTCYAN,
+      IRIS4D_RED,
+      IRIS4D_GREEN,
+      IRIS4D_LIGHTMAGENTA,
+      IRIS4D_YELLOW,
+      IRIS4D_LIGHTRED,
+      IRIS4D_LIGHTGREEN,
+      IRIS4D_CYAN,
+      IRIS4D_BROWN,
+    };
+  static int pen_color[8] = {0 ,1, 4, 5, 6, 1, 2, 4};
+
+  if (iris24bits)
+  {
+    int pencolor = pen_color_24[linetype < 0 ? linetype + 2 : linetype % 9 + 2];
+
+    RGBcolor(colors24bits[pencolor][0],
+	     colors24bits[pencolor][1],
+	     colors24bits[pencolor][2]);
+    /* Make all lines solid (linestyle 0) upto to the ninth. If more than
+     * 9 colors are needed, start to use the different line styles (1 to 8).
+     */
+    setlinestyle(linetype < 9 ? 0 : (linetype + 2) % 8 + 1);
+  }
+  else
+  {
+    linetype = linetype % 8;
+    color((Colorindex) pen_color[linetype]);
+    setlinestyle(linetype);
+  }
   return;
 }
 

@@ -17,7 +17,8 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *   LaTeX pictures
+ *   LaTeX pictures (latex).
+ *   LaTeX pictures with emTeX specials (emtex). 
  *
  * AUTHORS
  *   David Kotz, Russell Lang
@@ -30,8 +31,9 @@
 
 /* the following LATEX driver has been modified by 
    Russell Lang, eln272v@monu1.cc.monash.oz from the
-   GnuTeX 1.3 driver by David Kotz, dfk@cs.duke.edu
-   And further extended by David Kotz  */
+   GnuTeX 1.3 driver by David Kotz, David.Kotz@Dartmouth.edu.
+   Since then it has been further extended by David Kotz.
+   EmTeX driver by Russell Lang. */
 
 
 #define LATEX_PTS_PER_INCH (72.27)
@@ -39,17 +41,17 @@
 #define LATEX_UNIT (LATEX_PTS_PER_INCH/DOTS_PER_INCH) /* dot size in pt */
 
 /* 5 inches wide by 3 inches high (default) */
-#define LATEX_XMAX (unsigned int)(LATEX_PTS_PER_INCH/LATEX_UNIT*5.0)
-#define LATEX_YMAX (unsigned int)(LATEX_PTS_PER_INCH/LATEX_UNIT*3.0)
+#define LATEX_XMAX (5*DOTS_PER_INCH)  /* (LATEX_PTS_PER_INCH/LATEX_UNIT*5.0) */
+#define LATEX_YMAX (3*DOTS_PER_INCH)  /* (LATEX_PTS_PER_INCH/LATEX_UNIT*3.0) */
 
-#define LATEX_HTIC (5./LATEX_UNIT)
-#define LATEX_VTIC (5./LATEX_UNIT)
-#define LATEX_HCHAR (5.3/LATEX_UNIT)
-#define LATEX_VCHAR (11./LATEX_UNIT)
+#define LATEX_HTIC (5*DOTS_PER_INCH/72)		/* (5./LATEX_UNIT) */
+#define LATEX_VTIC (5*DOTS_PER_INCH/72)		/* (5./LATEX_UNIT) */
+#define LATEX_HCHAR (DOTS_PER_INCH*53/10/72)	/* (5.3/LATEX_UNIT) */
+#define LATEX_VCHAR (DOTS_PER_INCH*11/72)	/* (11./LATEX_UNIT) */
 
 static int LATEX_posx;
 static int LATEX_posy;
-enum JUSTIFY latex_justify=LEFT;
+static enum JUSTIFY latex_justify=LEFT;
 static int latex_angle=0;
 
 /* Default line-drawing character */
@@ -60,9 +62,9 @@ static int latex_angle=0;
 /* POINTS */
 #define LATEX_POINT_TYPES 12	/* we supply more point types */
 static char *LATEX_points[] = {
-    "\\makebox(0,0){$\\Diamond$}",
+    "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Diamond$}}",
     "\\makebox(0,0){$+$}",
-    "\\makebox(0,0){$\\Box$}",
+    "\\raisebox{-1.2pt}{\\makebox(0,0){$\\Box$}}",
     "\\makebox(0,0){$\\times$}",
     "\\makebox(0,0){$\\triangle$}",
     "\\makebox(0,0){$\\star$}",
@@ -71,27 +73,35 @@ static char *LATEX_points[] = {
 };
 
 /* LINES */
-static int LATEX_type;		/* negative types use real lines */
+static float LATEX_size = 0;	/* current thick of line in points */
+static float LATEX_dotspace = 0; /* current dotspace of line in points */
 #define LATEX_LINE_TYPES 6	/* number of line types below */
 #define LATEX_THIN_LINE 0	/* the thinnest solid line type */
 static struct {
     float size;			/* size of dot, or thick of line in points */
     float dotspace;			/* inter-dot space in points; 0 for lines */
 } LATEX_lines[] = {
-    {.4, 0},				/* thin solid line */
-    {1.0, 0},				/* thick solid line */
-    {2.0, 0},				/* Thick solid line */
-    {.4, 5},				/* dotted line */
-    {.4, 10},				/* widely dotted line */
-    {.4, 15}				/* really widely dotted line */
+    {.35, 0.0},				/* thin solid line */
+    {.7, 0.0},				/* thick solid line */
+    {1.0, 0.0},				/* Thick solid line */
+    {.5, 5.0},				/* dotted line */
+    {.5, 9.0},				/* widely dotted line */
+    {.5, 13.0}				/* really widely dotted line */
 };
 /* for drawing dotted and solid lines */
 static void LATEX_dot_line();
 static void LATEX_solid_line();
 static void LATEX_rule();
+static void LATEX_flushdot();
 #define LATEX_flushrule() LATEX_rule(2, 0.,0.,0.,0.) /* flush old rule */
 static BOOLEAN LATEX_moved = TRUE;	/* pen is up after move */
 static float LATEX_dotsize;	/* size of LATEX_DOT in units */
+static BOOLEAN LATEX_needsdot = FALSE;/* does dotted line need termination? */
+
+#ifdef EMTEX
+BOOLEAN emtex=FALSE; /* not currently using emtex */
+static void EMTEX_solid_line();
+#endif
 
 /* ARROWS */
 /* the set of non-vertical/non-horizontal LaTeX vector slopes */
@@ -109,15 +119,20 @@ static void best_latex_arrow(); /* figure out the best arrow */
 
 LATEX_init()
 {
+#ifdef EMTEX
+    emtex = FALSE;
+#endif
     LATEX_posx = LATEX_posy = 0;
-    LATEX_linetype(-1);
     fprintf(outfile, "%% GNUPLOT: LaTeX picture\n");
     fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
+    fprintf(outfile, 
+		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
+    LATEX_linetype(-1);
 }
 
 
 LATEX_scale(xs, ys)
-	float xs, ys;			/* scaling factors */
+	double xs, ys;			/* scaling factors */
 {
     register struct termentry *t = &term_tbl[term];
 
@@ -134,43 +149,60 @@ LATEX_graphics()
 
     fprintf(outfile, "\\begin{picture}(%d,%d)(0,0)\n", t->xmax, t->ymax);
     fprintf(outfile, "\\tenrm\n");
-    fprintf(outfile, 
-		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
 }
 
 
 LATEX_text()
 {
     LATEX_flushrule();
+    LATEX_flushdot();
     fprintf(outfile, "\\end{picture}\n");
+    LATEX_posx = LATEX_posy = 0; /* current position */
+    LATEX_moved = TRUE;	/* pen is up after move */
 }
-
 
 LATEX_linetype(linetype)
 	int linetype;
 {
+    float size;
+
     if (linetype >= LATEX_LINE_TYPES)
 	 linetype %= LATEX_LINE_TYPES;
 
+#ifdef EMTEX
+    if (!emtex)
+#endif
     LATEX_flushrule();
+    LATEX_flushdot();
 
-    if (linetype >= 0 && 
-	   LATEX_lines[linetype].size != LATEX_lines[LATEX_type].size) 
-	 /* redefine \plotpoint */
-	 fprintf(outfile, "\\sbox{\\plotpoint}{\\rule[%.3fpt]{%.3fpt}{%.3fpt}}\n",
-		    -LATEX_lines[linetype].size/2,
-		    LATEX_lines[linetype].size,
-		    LATEX_lines[linetype].size);
+    /* Find the new desired line thickness. */
+    /* negative linetypes (for axes) use a thin line */
+    /* only relevant for drawing axes/border in 3d */
+    size = (linetype >= 0 ? LATEX_lines[linetype].size 
+		  : LATEX_lines[LATEX_THIN_LINE].size);
 
-    LATEX_type = linetype;
-    LATEX_dotsize = LATEX_lines[linetype].size / LATEX_UNIT;
+    /* If different from current size, redefine \plotpoint */
+    if (size != LATEX_size) {
+	   fprintf(outfile, 
+			 "\\sbox{\\plotpoint}{\\rule[%.3fpt]{%.3fpt}{%.3fpt}}%%\n",
+			 -size/2, size, size);
+#ifdef EMTEX
+        if (emtex)         /* change line width */
+		fprintf(outfile, "\\special{em:linewidth %.1fpt}%%\n", size);
+#endif
+    }
+    
+    LATEX_size = size;
+    LATEX_dotsize = size / LATEX_UNIT;
+    LATEX_dotspace = (linetype >= 0) ? LATEX_lines[linetype].dotspace : 0;
     LATEX_moved = TRUE;			/* reset */
 }
-
 
 LATEX_move(x,y)
 	unsigned int x,y;
 {
+    LATEX_flushdot();
+
     LATEX_posx = x;
     LATEX_posy = y;
     LATEX_moved = TRUE;			/* reset */
@@ -194,25 +226,18 @@ LATEX_point(x,y, number)		/* version of line_and_point */
 LATEX_vector(ux,uy)
 	unsigned int ux,uy;
 {
-    /* Negative linestyles are straight lines for frame and axes. */
-    /* These are vertical and horizontal lines only. */
-    if (LATEX_type < 0) {
-	   int x=ux, y=uy;
-	   if (x == LATEX_posx) { /* vertical */
-		  fprintf(outfile, "\\put(%d,%d){\\line(0,%d){%d}}\n",
-				LATEX_posx, LATEX_posy, 
-				sign(y - LATEX_posy), abs(y - LATEX_posy));
-	   } else if (y == LATEX_posy) { /* horizontal */
-		  fprintf(outfile, "\\put(%d,%d){\\line(%d,0){%d}}\n",
-				LATEX_posx, LATEX_posy, 
-				sign(x - LATEX_posx), abs(x - LATEX_posx));
-	   }
-    } else {				/* drawing real curves */
-	   if (LATEX_lines[LATEX_type].dotspace == 0.0)
-		LATEX_solid_line(LATEX_posx, (int)ux, LATEX_posy, (int)uy);
+    if (LATEX_dotspace == 0.0) {
+	   /* solid line */
+#ifdef EMTEX
+	   if (emtex)
+		EMTEX_solid_line(LATEX_posx, (int)ux, LATEX_posy, (int)uy);
 	   else
-		LATEX_dot_line(LATEX_posx, (int)ux, LATEX_posy, (int)uy);
-    }
+#endif
+		LATEX_solid_line(LATEX_posx, (int)ux, LATEX_posy, (int)uy);
+    } else
+	 /* dotted line */
+	 LATEX_dot_line(LATEX_posx, (int)ux, LATEX_posy, (int)uy);
+
     LATEX_posx = ux;
     LATEX_posy = uy;
 }
@@ -227,7 +252,7 @@ LATEX_solid_line(x1,x2, y1,y2)
     float x,y;
     int code;				/* possibly combine with previous rule */
 
-    /* we draw a solid line using the thickness for this linetype */
+    /* we draw a solid line using the current line thickness (size) */
     /* we do it with lots of \\rules */
 
     if (x1 == x2 && y1 == y2) { /* zero-length line - just a dot */
@@ -239,9 +264,11 @@ LATEX_solid_line(x1,x2, y1,y2)
     } else {
 	   code = (LATEX_moved ? 0 : 1); /* no combine after move */
 	   if (x1 == x2)		/* vertical line - special case */
-		LATEX_rule(code, (float)x1, (float)y1, LATEX_dotsize, (float)y2-y1);
+		LATEX_rule(code, (double)x1, (double)y1,
+			   LATEX_dotsize, (double)y2-y1);
 	   else if (y1 == y2)	/* horizontal line - special case */
-		LATEX_rule(code, (float)x1, (float)y1, (float)x2-x1, LATEX_dotsize);
+		LATEX_rule(code, (double)x1, (double)y1, (double)x2-x1,
+			   LATEX_dotsize);
 	   else {
 		  slope = ((float)y2-y1)/((float)x2-x1);
 		  if (abs(slope) <= 1.0) {
@@ -287,9 +314,9 @@ LATEX_solid_line(x1,x2, y1,y2)
 static void
 LATEX_rule(code, x,y, width, height)
 	int code;				/* how do we treat this rule? */
-	float x, y;
-	float width;
-	float height;
+	double x, y;
+	double width;
+	double height;
 {  
     static float lastx, lasty;
     static float lastw, lasth;
@@ -301,36 +328,42 @@ LATEX_rule(code, x,y, width, height)
 	 if (width == 0 || height == 0)
 	   return;			/* ignore this rule */
 
-    if (width < 0) {
-	   x += width;
-	   width = -width;
-    }
-    if (height < 0) {
-	   y += height;
-	   height = -height;
-    }
-
     if (valid && combine) {
 	   /* try to combine new rule with old rule */
 	   if ((int)lastx == (int)x && lastw == width) { /* vertical rule */
-		  lasth += height;
-		  return;
+		  if (lasth * height >= 0) { /* same sign */
+			 lasth += height;
+			 return;
+		  }
 	   } else if ((int)lasty == (int)y && lasth == height){ /* horiz rule */
-		  lastw += width;
-		  return;
+		  if (lastw * width >= 0) { /* same sign */
+			 lastw += width;
+			 return;
+		  }
 	   }
 	   /* oh well, output last and remember the new one */
     }
 
-    if (valid)
-	 /* if very small use canned dot */
-	 if (lastw < LATEX_dotsize || lasth < LATEX_dotsize)
-	   fprintf(outfile, "\\put(%d,%d){%s}\n",	   
-			 (int)lastx, (int)lasty, LATEX_DOT);
-	 else
-	   fprintf(outfile, "\\put(%d,%d){\\rule[%.3fpt]{%.3fpt}{%.3fpt}}\n",
-			 (int)lastx, (int)lasty, -LATEX_dotsize*LATEX_UNIT/2,
-			 lastw*LATEX_UNIT, lasth*LATEX_UNIT);
+    if (valid) {
+	   /* output the rule */
+	   if (lastw < 0) {
+		  lastx += lastw;
+		  lastw = -lastw;
+	   }
+	   if (lasth < 0) {
+		  lasty += lasth;
+		  lasth = -lasth;
+	   }
+
+	   /* if very small use canned dot */
+	   if (lastw < LATEX_dotsize || lasth < LATEX_dotsize)
+		fprintf(outfile, "\\put(%d,%d){%s}\n",	   
+			   (int)lastx, (int)lasty, LATEX_DOT);
+	   else
+		fprintf(outfile, "\\put(%d,%d){\\rule[%.3fpt]{%.3fpt}{%.3fpt}}\n",
+			   (int)lastx, (int)lasty, -LATEX_dotsize*LATEX_UNIT/2,
+			   lastw*LATEX_UNIT, lasth*LATEX_UNIT);
+    }
     
     if (flush) {
 	   valid = FALSE;
@@ -346,9 +379,10 @@ LATEX_dot_line(x1,x2, y1,y2)
 	int x1,x2, y1,y2;
 {
     static float LATEX_left;	/* fraction of space left after last dot */
+#ifndef AMIGA_AC_5
     extern double sqrt();
-
-    /* we draw a dotted line using the dot spacing for this linetype */
+#endif
+    /* we draw a dotted line using the current dot spacing */
 
     if (LATEX_moved)
 	 LATEX_left = 1.0;		/* reset after a move */
@@ -359,7 +393,7 @@ LATEX_dot_line(x1,x2, y1,y2)
 		/* plot a dot */
 		fprintf(outfile, "\\put(%u,%u){%s}\n", x1, y1, LATEX_DOT);
     } else {
-	   float dotspace = LATEX_lines[LATEX_type].dotspace / LATEX_UNIT;
+	   float dotspace = LATEX_dotspace / LATEX_UNIT;
 	   float x,y;			/* current position */
 	   float xinc, yinc;	/* increments */
 	   float slope;		/* slope of line */
@@ -375,7 +409,7 @@ LATEX_dot_line(x1,x2, y1,y2)
 		  xinc = dotspace / sqrt(1 + slope*slope) * sign(x2-x1);
 		  yinc = slope * xinc;
 	   }
-
+	   
 	   /* now draw the dotted line */
 	   /* we take into account where we last placed a dot */
 	   for (x=x1 + xinc*(1-LATEX_left), y=y1 + yinc*(1-LATEX_left);
@@ -387,38 +421,51 @@ LATEX_dot_line(x1,x2, y1,y2)
 	   /* how much is left over, as a fraction of dotspace? */
 	   if (xinc != 0.0)			/* xinc must be nonzero */
 		if (lastx >= 0)
-		  LATEX_left = abs(x2 - lastx) / xinc;
+		  LATEX_left = abs(x2 - lastx) / abs(xinc);
 		else
-		  LATEX_left += abs(x2-x1) / xinc;
+		  LATEX_left += abs(x2-x1) / abs(xinc);
 	   else
 		if (lasty >= 0)
-		  LATEX_left = abs(y2 - lasty) / yinc;
+		  LATEX_left = abs(y2 - lasty) / abs(yinc);
 		else
-		  LATEX_left += abs(y2-y1) / yinc;
+		  LATEX_left += abs(y2-y1) / abs(yinc);
     }
+
+    LATEX_needsdot = (LATEX_left > 0);
 
     LATEX_moved = FALSE;
 }
 
-LATEX_arrow(sx,sy, ex,ey)
-	int sx,sy, ex,ey;
+static void
+LATEX_flushdot()
 {
-    best_latex_arrow(sx,sy, ex,ey, 1);
+    if (LATEX_needsdot) 
+	 fprintf(outfile, "\\put(%d,%d){%s}\n", 
+		    LATEX_posx, LATEX_posy, LATEX_DOT);
+    LATEX_needsdot = FALSE;
+}
+
+LATEX_arrow(sx,sy, ex,ey, head)
+	int sx,sy, ex,ey;
+	BOOLEAN head;
+{
+    best_latex_arrow(sx,sy, ex,ey, 1, head);
 
     LATEX_posx = ex;
     LATEX_posy = ey;
 }
 
-static void best_latex_arrow(sx,sy, ex,ey, who)
+static void best_latex_arrow(sx,sy, ex,ey, who, head)
 	int sx,sy, ex,ey;		/* start and end points */
 	int who;				/* 1=LATEX, 2=EEPIC */
+	BOOLEAN head;
 {
     int dx = ex - sx;
     int dy = ey - sy;
     int x, y;				/* points near sx,sy */
     float m;				/* slope of line */
     float arrowslope;		/* slope of arrow */
-    float minerror;			/* best-case error */
+    float minerror = 0;		/* best-case error */
     struct vslope *slope;	/* one of the slopes */
     struct vslope *bestslope;	/* the slope with min error */
     BOOLEAN horiz;			/* was it the horiz line that was best? */
@@ -429,17 +476,20 @@ static void best_latex_arrow(sx,sy, ex,ey, who)
 
     if (dx == 0) {
 	   /* vertical arrow */
-	   fprintf(outfile, "\\put(%d,%d){\\vector(0,%d){%d}}\n",
-			 sx, sy, sign(ey-sy), abs(ey-sy));
+	   fprintf(outfile, "\\put(%d,%d){\\%s(0,%d){%d}}\n",
+			 sx, sy, head ? "vector":"line", 
+			 sign(ey-sy), abs(ey-sy));
     } else if (dy == 0) {
 	   /* horizontal arrow */
-	   fprintf(outfile, "\\put(%d,%d){\\vector(%d,0){%d}}\n",
-			 sx, sy, sign(ex-sx), abs(ex-sx));
+	   fprintf(outfile, "\\put(%d,%d){\\%s(%d,0){%d}}\n",
+			 sx, sy, head ? "vector":"line",
+			 sign(ex-sx), abs(ex-sx));
     } else {
 	   /* Slanted arrow. We'll give it a try.
 	    * we try to find the closest-slope arrowhead.
 	    */
 	   bestslope = NULL;
+	   minerror = 0; /* to shut up turbo C */
 	   m = abs((float)dy/dx); /* the slope we want */
 	   for (slope = LATEX_slopes; slope->dx != 0.0; slope++) {
 		  /* find the slope of the arrow */
@@ -453,24 +503,31 @@ static void best_latex_arrow(sx,sy, ex,ey, who)
 	   /* now we have the best slope arrow */
 	   /* maybe it's exactly the right slope! */
 	   if (minerror == 0.0)	/* unlikely but possible */
-		fprintf(outfile, "\\put(%d,%d){\\vector(%d,%d){%d}}\n",
-			   sx, sy, 
+		fprintf(outfile, "\\put(%d,%d){\\%s(%d,%d){%d}}\n",
+			   sx, sy, head ? "vector" : "line",
 			   bestslope->dx*sign(ex-sx), bestslope->dy*sign(ey-sy),
 			   abs(ex-sx));
 	   else {
 		  /* we draw the line the usual way, with thin lines */
-		  if (who == 1) {
+#ifdef EMTEX
+		  if (emtex) {
 			 LATEX_linetype(LATEX_THIN_LINE);
-			 LATEX_solid_line(sx,ex,sy,ey);
-		  }
+			 EMTEX_solid_line(sx,ex,sy,ey);
+		  } else 
+#endif
+			if (who == 1) {
+			   LATEX_linetype(LATEX_THIN_LINE);
+			   LATEX_solid_line(sx,ex,sy,ey);
+			}
 #ifdef EEPIC
-		  else {
-			 EEPIC_move(sx,sy);
-			 EEPIC_vector(ex,ey);
-		  }
+			else {
+			   EEPIC_move(sx,sy);
+			   EEPIC_vector(ex,ey);
+			}
 #endif /* EEPIC */
 		  /* and then draw an arrowhead (a short vector) there */
-		  fprintf(outfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
+			if (head)
+		  		fprintf(outfile, "\\put(%d,%d){\\vector(%d,%d){0}}\n",
 				ex, ey, 
 				bestslope->dx*sign(ex-sx), bestslope->dy*sign(ey-sy));
 	   }
@@ -552,6 +609,51 @@ int LATEX_text_angle(angle)
 
 LATEX_reset()
 {
+    LATEX_posx = LATEX_posy = 0; /* current position */
+    LATEX_moved = TRUE;	/* pen is up after move */
+}
+
+
+#ifdef EMTEX
+
+EMTEX_init()
+{
+    emtex=TRUE;
+    LATEX_posx = LATEX_posy = 0;
+    fprintf(outfile, "%% GNUPLOT: LaTeX picture with emtex specials\n");
+    fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", LATEX_UNIT);
+    fprintf(outfile, 
+		  "\\ifx\\plotpoint\\undefined\\newsavebox{\\plotpoint}\\fi\n");
+    LATEX_linetype(-1);
+}
+
+
+EMTEX_reset()
+{
+    emtex=FALSE;
     LATEX_posx = LATEX_posy = 0;
 }
 
+
+EMTEX_text()
+{
+    fprintf(outfile, "\\end{picture}\n");
+}
+
+
+static void
+EMTEX_solid_line(x1,x2, y1,y2)
+	int x1,x2, y1,y2;
+{
+    /* emtex special solid line */
+	if (LATEX_moved)
+		fprintf(outfile, "\\put(%d,%d){\\special{em:moveto}}\n", x1, y1);
+	if ( (x1!=x2) || (y1!=y2) )
+		fprintf(outfile, "\\put(%d,%d){\\special{em:lineto}}\n", x2, y2);
+    LATEX_posx = x2;
+    LATEX_posy = y2;
+    LATEX_moved = FALSE;
+}
+
+
+#endif /* EMTEX */

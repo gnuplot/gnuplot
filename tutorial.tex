@@ -1,6 +1,6 @@
 % 
 % Tutorial for GNUPLOT plotting program, for LaTeX users
-% David Kotz (dfk@cs.duke.edu)
+% David Kotz (David.Kotz@Dartmouth.edu)
 % Duke University Computer Science Department
 %
 % NOTE: If LaTeX runs out of memory processing plots,
@@ -13,15 +13,15 @@
 \begin{document}
 
 \title{\LaTeX\ and the GNUPLOT Plotting 
-Program\thanks{This document describes GNUPLOT version 2.0. All plots
+Program\thanks{This document describes GNUPLOT version 3.0. All plots
 in this document were made with that version of GNUPLOT.} }
-\author{David Kotz \\ \verb+dfk@cs.duke.edu+}
-\date{February 10, 1990}
+\author{David Kotz \\ \verb+David.Kotz@Dartmouth.edu+}
+\date{July 3, 1991}
 
 \maketitle
 
 \pagestyle{myheadings}
-\markright{GNUPLOT \LaTeX\ Tutorial Version 2.0}
+\markright{GNUPLOT \LaTeX\ Tutorial Version 3.0}
 
 \currentspace % defined in header.tex
 
@@ -40,10 +40,9 @@ In late 1989 and early 1990 Gnu\TeX\ and a number of other GNUPLOT
 variants were merged together into a new release of GNUPLOT, 2.0. This
 includes, among many other improvements, a \LaTeX\ driver derived from
 the one in Gnu\TeX. Former Gnu\TeX\ users are referred to
-Section~\ref{oldusers} for information about adapting to GNUPLOT 2.0.
-Anyone interested in using GNUPLOT 2.0 with \LaTeX\ should read the
-next section, a tutorial.  GNUPLOT beginners should also read the
-primary GNUPLOT manual. 
+Section~\ref{oldusers} for information about adapting to GNUPLOT.
+Anyone interested in using GNUPLOT with \LaTeX\ should read the next
+section, a tutorial, and the primary GNUPLOT manual.
 
 The reader should note that the \LaTeX\ picture environments output by
 GNUPLOT can be quite large and complicated, and can easily exceed the
@@ -53,9 +52,14 @@ it is wise to use it. Otherwise, keep your plots simple and add
 
 There is also a new EEPIC driver ({\tt eepic}), intended for use with
 the EEPIC macro package for \LaTeX. EEPIC allows for much more
-efficient line-drawing, runs through \LaTeX\ faster, uses less memory,
-and may produce better-looking plots. See Section~\ref{s:eepic} for
-more information.
+efficient line-drawing, runs through \LaTeX\ faster, and uses less
+memory.  See Section~\ref{s:eepic} for more information.
+
+There is a small package of auxiliary files (makefiles and scripts)
+that I find useful for making \LaTeX\ plots with GNUPLOT. This is
+available for \verb+ftp+ as \verb+pub/gnuplot-latex.shar+ from
+\verb+cs.duke.edu+. I can mail copies (see the end of this paper for
+information).
 
 \section{Using GNUPLOT for \LaTeX: a Tutorial}
 
@@ -116,7 +120,7 @@ to make it look a little better.
 Note that GNUPLOT has drawn in the axes, labeled the tic marks for us,
 scaled the $y$ axis automatically, and added a key in the
 upper-right-hand corner (this may be moved with the {\tt set key}
-command).
+command, and removed with {\tt set nokey}).
 
 This is the default line style for the \LaTeX\ driver.  Because of the
 limited picture capabilities of \LaTeX, many dots are required to
@@ -167,11 +171,15 @@ format.
 A title for the plot and labels for the axes were set up in the next
 three commands.  Note that they are processed by \LaTeX\ and so may
 have math mode and other symbols in them. The ylabel may have multiple
-lines, delineated with \verb+\\+.  Once these are set up, they will be
-used for all subsequent plot commands until they are changed. These
-labels are also supported by the other terminal types, but (of course)
-any \LaTeX\ code in the string will not be interpreted. We have also
-defined the range of both $x$ (now $[0,2\pi]$) and $y$ (here $[0,1]$).
+lines, delineated with \verb+\\+.  The ylabel can be moved around with
+optional offset parameters (see {\tt set ylabel} in the GNUPLOT
+manual). Typically, the ylabel needs to be moved to the left to avoid
+interfering with the left-hand side of the plot.  Once these labels
+are set up, they will be used for all subsequent plot commands until
+they are changed. These labels are also supported by the other
+terminal types, but (of course) any \LaTeX\ code in the string will
+not be interpreted. We have also defined the range of both $x$ (now
+$[0,2\pi]$) and $y$ (here $[0,1]$).
 
 So far we have plotted one curve, $y=\sin(x)$, on one plot. In
 GNUPLOT, each {\tt plot} command generates a new plot. If the output
@@ -223,11 +231,13 @@ There is a style called {\tt points} that only plots the symbols at
 data points, and another called {\tt dots} that plots a tiny dot for
 each data point.  The {\tt points} and {\tt linespoints} styles
 produce a different point symbol for each curve on the plot (for up to
-twelve symbols, after which they are re-used). The {\tt lines} and
-{\tt linespoints} styles use a different line style for each curve on
-the plot (in this example the dots have different spacing). Finally,
-the style {\tt impulses} draws a perpendicular from each point to the
-$x$-axis.
+twelve symbols, after which they are re-used; see
+Figure~\ref{linepoint} for a complete list). The {\tt lines} and {\tt
+linespoints} styles use a different line style for each curve on the
+plot (in this example the dots have different spacing). The
+style {\tt impulses} draws a perpendicular from each point to the
+$x$-axis. Finally, the {\tt errorbars} style can draw error bars at
+each data point (see the GNUPLOT manual). 
 
 \paragraph{Example 4:} In the above plots of $\sin(x)$, it would make
 more sense to label the axis in units of $\pi$. The position and
@@ -324,6 +334,17 @@ self-explanatory. This is shown in Figure~\ref{eg6}.
   \label{eg6}
 }
 
+\paragraph{Line and point types:} For reference, we show all of the
+line and point types available in Figure~\ref{linepoint}.
+
+\boxfigure{htbp}{\fullboxwidth}{
+  \begin{center}
+    \input{linepoint}
+  \end{center}
+  \caption{All of the line and point types in the \LaTeX\ driver.}
+  \label{linepoint}
+}
+
 \subsection{Summary --- Use with \LaTeX}
 In summary, to use the \LaTeX\ facilities of GNUPLOT, the first
 command to GNUPLOT should be
@@ -369,17 +390,17 @@ GNUPLOT manual.
 \label{s:eepic}
 EEPIC is a macro package extending the picture environment of \LaTeX.
 If you have the EPIC or EEPIC macros, and your {\tt dvi} translator
-supports the {\em tpic\/} \verb+\special+s, then you have the possible
-capability for better-quality output. With EEPIC pictures, the {\tt
-plot.tex} file will be smaller, \LaTeX\ will run much faster (and need
-much less memory), and the {\tt dvi} file will be smaller.
+supports the {\em tpic\/} \verb+\special+s, then you can save \LaTeX\
+memory.  With EEPIC pictures, the {\tt plot.tex} file will be smaller,
+\LaTeX\ will run much faster (and need much less memory), and the {\tt
+dvi} file will be smaller. The quality of the output is about the
+same. If you change the source, you can generate some more interesting
+line styles.
 
 To use EEPIC, set GNUPLOT's terminal type to {\tt eepic} instead of
 {\tt latex}, and use GNUPLOT as before. The line styles will change.
 Include the file {\tt plot.tex} in your document as before, along with
 the document style options {\tt [epic,eepic]}.
-
-This driver should be considered experimental.
 
 \section{For Former Gnu\TeX\ Users}
 \label{oldusers}
@@ -389,117 +410,17 @@ Former Gnu\TeX\ users may be pleased with many of the new features
 GNUPLOT will {\em not\/} run all Gnu\TeX\ input files unchanged.
 Several Gnu\TeX\ features were not included in GNUPLOT because they
 were specific to the \LaTeX\ driver. I encourage you to use the newer
-GNUPLOT.  A translator is supplied with the GNUPLOT distribution that
-attempts to translate your old Gnu\TeX\ 1.6 input files into GNUPLOT
-2.0 files.
-
-Note also the new EEPIC driver (Section~\ref{s:eepic}).
-
-\subsection{The Differences}
-\begin{itemize}
-\item The {\tt key} command was replaced by the {\tt set key}
-command, and should therefore precede any {\tt plot} commands. A key
-is shown by default, and can be turned off with {\tt set nokey}. The
-position specified is now the top center of the key, instead of the
-bottom center. The titles and styles of the curves are extracted from
-the {\tt plot} command.
-\item The {\tt label} command was replaced by the {\tt set label}
-command. The syntax is slightly different. Left, right, and center
-justification are still available, but only vertical centering is
-possible. Arrows are defined by the reference point of the label and
-an ending point. This allows arbitrary slope arrows to be drawn.
-Since \LaTeX\ limits arrows (vectors) to particular slopes, we draw
-non-standard-slope arrows with the solid plot line type, and then add
-an arrowhead. This will require less memory with the EEPIC driver.
-\item The user-defined style facility, controlled by {\tt set style},
-is completely removed. This was too specific to the \LaTeX\ driver to
-be kept in this GNUPLOT release. The \LaTeX\ driver now supports
-various line types in the {\tt lines} and {\tt linespoints} styles.
-Solid lines are the default, with higher-numbered styles providing
-dotted lines. These solid lines are expensive. Avoid them if you run
-into memory or time difficulties, or try the EEPIC driver. The
-\LaTeX\ driver currently supports 6 point types (numbered 7-12) in
-addition to the 6 original GNUPLOT points (numbered 1-6). This set may
-be extended, so do not depend on wrap-around for point styles over 12. 
-\item Multiple-line xlabels and titles, specified with \verb+\\+, are
-not permitted. They are still allowed in the ylabel. The ylabel {\tt
-skip} parameter, however, is not available, so the ylabel is in a
-fixed position. 
-\item The {\tt set size} command takes a pair of scale factors, rather
-than absolute sizes. The default size is 5 inches wide by 3 inches
-high. In addition, this size is now the size of the entire plot,
-including labels, not just the box defining the plotting area. So you
-need to specify a size a little larger than before, in particular
-wider. The easiest way to convert is to use the translator (see
-below). 
-\item Clipping has been expanded. A {\tt lines}-style curve that
-crossed out of the plotting area used to be cut at the last in-range
-point, to be continued at the next in-range point. Now the curve is
-drawn from the last in-range point to the edge, toward the
-out-of-range point. Similarly for returning from out-of-range to
-in-range. A segment of the curve crossing the plotting area but
-beginning outside and ending outside may also be shown. These are all
-user-controlled. Read about {\tt set clip}.
-\item The default tic label format is ``\%g'', instead of ``\$\%g\$''.
-\item Ten-point roman (\verb+\tenrm+) is the default font for all text
-and symbols in the plot. 
-\item Non-interactive behavior, including error messages, has been
-much improved. Input files may be specified as command-line arguments,
-as well as through redirection.
-\item The help system was completely revamped.
-\item New features (see the GNUPLOT manual):
-  \begin{itemize}
-  \item The {\tt replot} command.
-  \item The {\tt save} command has been expanded.
-  \item The factorial operator.
-  \item The {\tt pause} command.
-  \item The {\tt set dummy} command.
-  \item The {\tt set tics} command.
-  \item The {\tt set xtics} and {\tt set ytics} commands.
-  \item The {\tt set offsets} command.
-  \item The {\tt set grid} command.
-  \item The {\tt set polar} command.
-  \item The {\tt title} option on the {\tt plot} command to
-  specify the title of the curve (for use in the key).
-  \item The line-type and point-type options to the {\tt with} option
-  of the {\tt plot} command. 
-  \item Breaks are specified in data files with blank lines.
-  \item The logical operators now short-circuit, thus 
-\begin{verbatim}
-     x = 4
-     y = (x != 4 && 10/(x-4) < 0) 
-\end{verbatim}
-  gives y a value of false (0), instead of causing an error.
-  \end{itemize}
-
-\end{itemize}
-
-\subsection{The Translator}
-I have provided a translation program, {\tt gnut2p}, to convert gnutex
-files to gnuplot files.  This program does its best, but is not
-perfect. Most of gnutex will translate directly, some things will
-translated easily (such as {\tt set size}), but some things cannot be
-translated (such as {\tt set style}).  This program moves plot
-commands down past the {\tt label} and {\tt key} commands (which
-change into {\tt set label} and {\tt set key} commands). This may move
-it past other commands. If it moves past variable or function
-definitions, {\tt set} commands, or other commands which affect the
-plot command's execution, then the new version will be incorrect. I
-expect this case to be rare; indeed, I generally expect the last lines
-in Gnu\TeX\ input files used with \LaTeX\ to consist of {\tt plot,
-label,} and {\tt key} commands.
-
-The usage of this program is simple: 
-\begin{verbatim}
-   gnut2p infile outfile
-\end{verbatim}
-{\tt infile} is an existing Gnu\TeX\ file, and {\tt outfile} will be
-created as the GNUPLOT equivalent. The errors, warnings, and
-explanatory comments appear on stderr. Any use of line continuation
-will be lost, and some instances of the input style (\eg, white space)
-may be changed.
+GNUPLOT.  A translator is available that attempts to translate your
+old Gnu\TeX\ 1.6 input files into GNUPLOT 3.0 files. You can ftp it
+from \verb+cs.duke.edu+ as \verb+dist/sources/gnuplot/gnut2p.tar.Z+.
+This file also contains directions and a list of changes from Gnu\TeX\
+to GNUPLOT.
 
 \section{Contact}
-Please contact me at dfk@cs.duke.edu with any comments you may have.
+Please contact me at \verb+David.Kotz@Dartmouth.edu+ with any comments you may
+have on GNUPLOT's \LaTeX\ driver. For general GNUPLOT questions, send
+mail to the GNUPLOT mailing list
+(\verb+pixar!info-gnuplot@ucbvax.berkeley.edu+). 
+
 
 \end{document}

@@ -17,7 +17,7 @@
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
- *  hpgl, hp7580b
+ *  hpgl, hp7580b, HP Laserjet III
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams, Russell Lang
@@ -33,8 +33,8 @@
 #define HPGL_YLAST (HPGL_XMAX - 1)
 
 /* HPGL_VCHAR, HPGL_HCHAR  are not used */
-#define HPGL_VCHAR	(int)(HPGL_YMAX*0.032+0.5) /* 3.2% */
-#define HPGL_HCHAR	(int)(HPGL_XMAX*0.012+0.5) /* 1.2% */
+#define HPGL_VCHAR	(HPGL_YMAX/100*32/10) /* 3.2% */
+#define HPGL_HCHAR	(HPGL_XMAX/100*12/10) /* 1.2% */
 #define HPGL_VTIC	(HPGL_YMAX/70)		
 #define HPGL_HTIC	(HPGL_YMAX/70)		
 
@@ -42,20 +42,30 @@ int HPGL_ang = 0;
 
 HPGL_init()
 {
+	fputs("\033.Y\n",outfile);
+/*	       1
+	1. enable eavesdropping
+*/
+}
+
+HPLJIII_PORT_init()
+{
+  	fputs("\033E\033&l1X\033&l0O\033%0B;PW0.15\n",outfile);
+}
+
+HPLJIII_LAND_init()
+{
+	fputs("\033E\033&l1X\033&l1O\033%0B;PW0.15\n",outfile);
 }
 
 
 HPGL_graphics()
 {
-	fputs("\033.Y\n",outfile);
-/*	       1
-	1. enable eavesdropping
-*/
 	fprintf(outfile,
 	"IN;\nSC0,%d,0,%d;\nSR%f,%f;\n",
 		HPGL_XMAX,HPGL_YMAX,
-		((float)(HPGL_HCHAR)*200/3/HPGL_XMAX),
-		((float)(HPGL_VCHAR)*100/2/HPGL_YMAX) );
+		((double)(HPGL_HCHAR)*200/3/HPGL_XMAX),
+		((double)(HPGL_VCHAR)*100/2/HPGL_YMAX) );
 /*	 1    2             3 
 	1. reset to power-up defaults
 	2. set SCaling
@@ -139,3 +149,7 @@ HPGL_reset()
 {
 }
 
+HPLJIII_reset()
+{
+	fputs("\033E\n",outfile);
+}

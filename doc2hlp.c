@@ -40,6 +40,10 @@ process_line(line, b)
 	char *line;
 	FILE *b;
 {
+    static int line_count = 0;
+
+    line_count++;
+
     switch(line[0]) {		/* control character */
 	   case '?': {			/* interactive help entry */
 		  break;			/* ignore */
@@ -62,8 +66,8 @@ process_line(line, b)
 		  if (isdigit(line[0])) { /* start of section */
 			(void) fputs(line,b); 
 		  } else
-		    fprintf(stderr, "unknown control code '%c' in column 1\n", 
-				  line[0]);
+		    fprintf(stderr, "unknown control code '%c' in column 1, line %d\n", 
+				  line[0], line_count);
 		  break;
 	   }
     }

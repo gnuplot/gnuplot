@@ -23,11 +23,12 @@ endif
 
 GPg1_Base equ 0B800h	; Graphics page 1 base address
 
+	extrn _inter:far
+
 _text	segment
 
 	public _PC_line, _PC_color, _PC_mask, _PC_curloc, _PC_puts, _Vmode
 	public _erase, _save_stack, _ss_interrupt
-	extrn _inter:near
 
 pcpixel proc near
 	ror word ptr linemask,1
@@ -205,7 +206,7 @@ save_ss	equ this word - 2
 	mov sp,-1		; here too
 save_sp equ this word - 2
 	sti
-	jmp _inter; now it's safe to call the real routine
+	jmp far ptr _inter; now it's safe to call the real routine
 _ss_interrupt endp
 
 

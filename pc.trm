@@ -1,6 +1,6 @@
 /* GNUPLOT - pc.trm */
 /*
- * Copyright (C) 1990   
+ * Copyright (C) 1990
  *
  * Permission to use, copy, and distribute this software and its
  * documentation for any purpose with or without fee is hereby granted, 
@@ -11,26 +11,27 @@
  * Permission to modify the software is granted, but not the right to
  * distribute the modified code.  Modifications are to be distributed 
  * as patches to released version.
- *  
+ *
  * This software  is provided "as is" without express or implied warranty.
- * 
+ *
  * This file is included by ../term.c.
  *
  * This terminal driver supports:
  *  Under Microsoft C
  *      cga, egabios, egalib, vgabios, hercules, corona325, att
  *  Under Turboc C
- *      egalib, vgalib, vgamono, mcga, cga, hercules
+ *      egalib, vgalib, vgamono, svga, mcga, cga, hercules, att
  *
  * AUTHORS
  *  Colin Kelley, Thomas Williams, William Wilson, Russell Lang
- * 
+ *
  * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
- * 
+ *
  */
 
 #ifdef __TURBOC__
 #include <graphics.h>
+#include <conio.h>
 #include <dos.h>
   int g_driver, g_mode, g_error;
   char far *path;
@@ -50,6 +51,7 @@ get_path()
    }
 }
 
+static struct text_info tinfo;       /* So we can restore starting text mode. */
 #endif
 
 
@@ -61,15 +63,12 @@ static int graphics_on = FALSE;
 int startx, starty;
 
 int pc_angle;
-#define PC_VCHAR 11
-#define PC_HCHAR 7
+#define PC_VCHAR FNT5X9_VCHAR
+#define PC_HCHAR FNT5X9_HCHAR
 
-pause()								/* press any key to continue... */
+pause()		/* press any key to continue... */
 {
-	while (kbhit())
-		(void) getch();				/* flush the keyboard buffer */
-	while (!kbhit())
-		;
+	(void) getch();
 }
 
 
@@ -80,7 +79,9 @@ PC_text()
 		pause();
 	}
 #ifdef __TURBOC__
-	closegraph();
+	restorecrtmode();
+        textmode(tinfo.currmode);
+	clrscr();
 #else
 	Vmode(3);
 #endif
@@ -90,6 +91,8 @@ PC_reset()
 {
 #ifdef __TURBOC__
 	closegraph();
+        textmode(tinfo.currmode);
+	clrscr();
 #endif
 }
 
@@ -105,14 +108,14 @@ FUNC_PTR line_func;
 int i,j,k;
 unsigned int pixelon;
 	i = (int)(c) - 32;
-	for (j=0; j<9; j++) {
-		for (k=0; k<5; k++) {
-			pixelon = (((unsigned int)(font5x7[i][j])) >> k & 1);
+	for (j=0; j<FNT5X9_VBITS; j++) {
+		for (k=0; k<FNT5X9_HBITS; k++) {
+			pixelon = (((unsigned int)(fnt5x9[i][j])) >> k & 1);
 			if (pixelon) {
 				switch(angle) {
-					case 0 : line_func(x+k+1,y-j,x+k+1,y-j);
+					case 0 : (*line_func)(x+k+1,y-j,x+k+1,y-j);
 							break;
-					case 1 : line_func(x-j,y-k-1,x-j,y-k-1);
+					case 1 : (*line_func)(x-j,y-k-1,x-j,y-k-1);
 							break;
 				}
 			}
@@ -292,7 +295,7 @@ int i;
 
 
 /* The following VGA routines are hacked from the above EGA routines
-   They worked on two VGA cards.  
+   They worked on two VGA cards.
    Russell Lang, eln272v@monu1.cc.monash.oz */
 #define VGA_XMAX 640
 #define VGA_YMAX 480
@@ -757,14 +760,59 @@ int line;
 #else /* ifndef __TURBOC__ */
 /* all of the Turbo C routines for the different graphics devices go here */
 
+#define VGA_XMAX 640
+#define VGA_YMAX 480
+
+#define VGA_XLAST (VGA_XMAX - 1)
+#define VGA_YLAST (VGA_YMAX - 1)
+
+#define VGA_VCHAR 10
+#define VGA_HCHAR 8
+#define VGA_VTIC 4
+#define VGA_HTIC 5
+
+#define SVGA_XMAX 640
+#define SVGA_YMAX 480
+
+#define SVGA_VCHAR 10
+#define SVGA_HCHAR 8
+#define SVGA_VTIC 4
+#define SVGA_HTIC 5
+
+static int vga256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+static int *vgacolor;
+
+static int svga_xmax = SVGA_XMAX,
+	   svga_ymax = SVGA_YMAX,
+	   svga_xlast = 639,
+	   svga_ylast = 479;
+
+#define VGA_reset EGALIB_reset
+#define VGA_text EGALIB_text
+#define VGA_move EGALIB_move
+#define VGA_vector EGALIB_vector
+#define VGA_text_angle PC_text_angle
+#define VGA_justify_text PC_justify_text
+
+#define SVGA_reset EGALIB_reset
+#define SVGA_text EGALIB_text
+#define SVGA_move EGALIB_move
+#define SVGA_vector EGALIB_vector
+#define SVGA_text_angle PC_text_angle
+#define SVGA_justify_text PC_justify_text
+#define SVGA_linetype VGA_linetype
+
 int PC_text_angle(ang)
 int ang;
 {
+	int size = svga_ymax > 600 ? 2 : 1;
+
 	pc_angle = ang;
+
 	switch (ang) {
-		case 0 : settextstyle(DEFAULT_FONT,HORIZ_DIR,1);
+		case 0 : settextstyle(DEFAULT_FONT,HORIZ_DIR,size);
 			break;
-		case 1 : settextstyle(DEFAULT_FONT,VERT_DIR,1);
+		case 1 : settextstyle(DEFAULT_FONT,VERT_DIR,size);
 			break;
 	}
 	return TRUE;
@@ -787,33 +835,11 @@ enum JUSTIFY mode;
 	return TRUE;
 }
 
-
-#define VGA_XMAX 640
-#define VGA_YMAX 480
-
-#define VGA_XLAST (VGA_XMAX - 1)
-#define VGA_YLAST (VGA_YMAX - 1)
-
-#define VGA_VCHAR 10
-#define VGA_HCHAR 8
-#define VGA_VTIC 4
-#define VGA_HTIC 5
-
-static int vga256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
-
-static int *vgacolor;
-
-#define VGA_reset EGALIB_reset
-#define VGA_text EGALIB_text
-#define VGA_move EGALIB_move
-#define VGA_vector EGALIB_vector
-#define VGA_text_angle PC_text_angle
-#define VGA_justify_text PC_justify_text
-
 VGA_init()
 {
 	g_driver=VGA;
 	g_mode=2;
+	gettextinfo(&tinfo);
         initgraph(&g_driver,&g_mode,path);
         if(g_driver!=9){
           term=0;
@@ -828,7 +854,7 @@ VGA_init()
                              "graphics driver.");
                      break;
             }
-            
+
 /*          int_error("color VGA board not found",NO_CARET);*/
         }
         if(g_driver==VGA) vgacolor=vga256color;
@@ -838,7 +864,8 @@ VGA_graphics()
 {       g_driver=VGA;
 	g_mode=2;
 	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
 	VGA_justify_text(LEFT);
 }
 
@@ -865,6 +892,88 @@ VGAMONO_linetype(linetype)
 	setlinestyle(4,pattern[linetype+2],1);
 }
 
+static int huge detect_svga(void)
+{
+    return g_mode;
+}
+
+SVGA_init()
+{
+	char *p, name[128], *SVGA = getenv( "SVGA" );
+
+	if (SVGA == NULL)
+		int_error("'SVGA' driver environment variable is not set",
+			  NO_CARET);
+
+	strcpy(name, SVGA);
+	if ((p = strrchr(name, '.')) == NULL ||
+	    sscanf(&p[1], "%d", &g_mode) != 1)
+		int_error("'SVGA' envvar should be of the form 'name.mode'",
+			  NO_CARET);
+
+	*p = 0;
+
+	installuserdriver(name, detect_svga);
+	gettextinfo(&tinfo);
+	g_driver = 0;
+        initgraph(&g_driver,&g_mode,path);
+        if(g_driver<0){
+          term=0;
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+
+        }
+	else
+	    vgacolor=vga256color;
+
+	/* Get the screen size: */
+	svga_xmax = term_tbl[term].xmax = getmaxx() + 1;
+        svga_ymax = term_tbl[term].ymax = getmaxy() + 1;
+	svga_xlast = svga_xmax-1;
+	svga_ylast = svga_ymax-1;
+
+	if (svga_ymax > 600) {		       /* Double the tic/font sizes. */
+		term_tbl[term].h_char = SVGA_HCHAR * 2;
+		term_tbl[term].v_char = SVGA_VCHAR * 2;
+		term_tbl[term].h_tic = SVGA_HTIC * 2;
+		term_tbl[term].v_tic = SVGA_VTIC * 2;
+		settextstyle(DEFAULT_FONT,HORIZ_DIR,2);
+ 	}
+	else
+		settextstyle(DEFAULT_FONT,HORIZ_DIR,1);
+}
+
+SVGA_graphics()
+{
+	graphics_on = TRUE;
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
+	VGA_justify_text(LEFT);
+
+        svga_ymax = getmaxy() + 1;
+	if (svga_ymax > 600)		       /* Double the tic/font sizes. */
+		settextstyle(DEFAULT_FONT,HORIZ_DIR,2);
+	else
+		settextstyle(DEFAULT_FONT,HORIZ_DIR,1);
+}
+
+SVGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,svga_ylast-y,buf);
+}
+
 #define MCGA_XMAX 640
 #define MCGA_YMAX 480
 
@@ -889,6 +998,7 @@ MCGA_init()
 {
 	g_driver=MCGA;
 	g_mode=5;
+	gettextinfo(&tinfo);
         initgraph(&g_driver,&g_mode,path);
         if(g_driver!=2){
           term=0;
@@ -903,15 +1013,14 @@ MCGA_init()
                              "graphics driver.");
                      break;
             }
-            
         }
 }
 
 MCGA_graphics()
-{       g_driver=MCGA;
-	g_mode=5;
+{
 	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
 	MCGA_justify_text(LEFT);
 }
 
@@ -956,6 +1065,7 @@ EGALIB_init()
 {
 	g_driver=EGA;
 	g_mode=1;
+	gettextinfo(&tinfo);
         initgraph(&g_driver,&g_mode,path);
         if(g_driver<3 || g_driver>4){
           term=0;
@@ -970,7 +1080,7 @@ EGALIB_init()
                              "graphics driver.");
                      break;
             }
-            
+
 /*          int_error("color EGA board not found",NO_CARET);*/
         }
         if(g_driver==EGA) egacolor=ega256color;
@@ -980,7 +1090,8 @@ EGALIB_init()
 EGALIB_graphics()
 {
 	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
 	EGALIB_justify_text(LEFT);
 }
 
@@ -990,7 +1101,10 @@ EGALIB_text()
 		graphics_on = FALSE;
 		pause();
 	}
-	closegraph();
+	restorecrtmode();
+        textmode(tinfo.currmode);
+	clrscr();
+	svga_ymax = SVGA_YMAX; /* Since it may double font size if too high. */
 }
 
 EGALIB_linetype(linetype)
@@ -1024,6 +1138,9 @@ char *str;
 EGALIB_reset()
 {
   	closegraph();
+        textmode(tinfo.currmode);
+	clrscr();
+	svga_ymax = SVGA_YMAX; /* Since it may double font size if too high. */
 }
 
 
@@ -1046,6 +1163,7 @@ CGA_init()
 {
 	g_driver=CGA;
 	g_mode=4;
+	gettextinfo(&tinfo);
 	initgraph(&g_driver,&g_mode,path);
           switch (g_driver){
             case -2: fprintf(stderr,"Graphics card not detected.\n");
@@ -1065,9 +1183,8 @@ CGA_init()
 CGA_graphics()
 {
 	graphics_on = TRUE;
-	g_driver=CGA;
-	g_mode=4;
-	initgraph(&g_driver,&g_mode,path);
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
 	CGA_justify_text(LEFT);
 	/*	Vmode(6);*/
 }
@@ -1121,6 +1238,7 @@ HERC_init()
 {
 	g_driver=HERCMONO;
 	g_mode=0;
+	gettextinfo(&tinfo);
   	initgraph(&g_driver,&g_mode,path);
           switch (g_driver){
             case -2: fprintf(stderr,"Graphics card not detected.\n");
@@ -1137,9 +1255,8 @@ HERC_init()
 
 HERC_graphics()
 {
-	g_driver=HERCMONO;
-	g_mode=0;
-	initgraph(&g_driver,&g_mode,path);
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
 	HERC_justify_text(LEFT);
 	graphics_on = TRUE;
 }
@@ -1150,7 +1267,9 @@ HERC_text()
 		graphics_on = FALSE;
 		pause();
 	}
-	closegraph();
+	restorecrtmode();
+        textmode(tinfo.currmode);
+	clrscr();
 }
 
 HERC_linetype(linetype)
@@ -1197,6 +1316,107 @@ char *str;
 	outtextxy(x,HERC_YLAST-y,buf);
 }
 
+
+#ifdef ATT6300
+/* this driver added by rjl@monu1.cc.monash.edu.au */
+
+#define ATT_XMAX 640
+#define ATT_YMAX 400
+
+#define ATT_XLAST (ATT_XMAX - 1)
+#define ATT_YLAST (ATT_YMAX - 1)
+
+#define ATT_VCHAR PC_VCHAR
+#define ATT_HCHAR PC_HCHAR
+#define ATT_VTIC 4
+#define ATT_HTIC 5
+
+#define ATT_text_angle PC_text_angle
+#define ATT_justify_text PC_justify_text
+#define ATT_reset PC_reset
+
+ATT_init()
+{
+	g_driver=ATT400;
+	g_mode=5;
+	gettextinfo(&tinfo);
+  	initgraph(&g_driver,&g_mode,path);
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+}
+
+ATT_graphics()
+{
+	gettextinfo(&tinfo);
+	setgraphmode(getgraphmode());
+	ATT_justify_text(LEFT);
+	graphics_on = TRUE;
+}
+
+ATT_text()
+{
+	if (graphics_on) {
+		graphics_on = FALSE;
+		pause();
+	}
+	restorecrtmode();
+        textmode(tinfo.currmode);
+	clrscr();
+}
+
+ATT_linetype(linetype)
+{
+	if (linetype >= 5)
+		linetype %= 5;
+	setlinestyle(4,pattern[linetype+2],1);
+}
+
+ATT_move(x,y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x > ATT_XLAST)
+		x = ATT_XLAST;
+
+	if (y < 0)
+		y = 0;
+	else if (y > ATT_YLAST)
+		y = ATT_YLAST;
+	moveto(x,getmaxy()-y);
+}
+
+ATT_vector(x,y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x > ATT_XLAST)
+		x = ATT_XLAST;
+	if (y < 0)
+		y = 0;
+	else if (y > ATT_YLAST)
+		y = ATT_YLAST;
+
+	lineto(x,getmaxy()-y);
+}
+
+
+ATT_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,ATT_YLAST-y,buf);
+}
+#endif /* ifdef ATT6300 */
 
 #endif /* ifndef __TURBOC__ */
 

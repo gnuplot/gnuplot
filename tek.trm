@@ -18,6 +18,7 @@
  *
  * This terminal driver supports:
  *  tek40xx, bitgraph, kermit_color_tek40xx, kermit_mono_tek40xx, selanar
+ *  ln03plus
  *
  * AUTHORS
  *   Colin Kelley, Thomas Williams, Russell Lang
@@ -55,6 +56,9 @@ TEK40init()
 
 TEK40graphics()
 {
+#ifdef vms
+	term_pasthru();
+#endif /* vms */
 	fprintf(outfile,"\033\014");
 /*                   1
 	1. clear screen
@@ -72,6 +76,9 @@ TEK40text()
 /*                   1
 	1. into alphanumerics
 */
+#ifdef vms
+	term_nopasthru();
+#endif /* vms */
 }
 
 
@@ -177,6 +184,10 @@ char str[];
 
 KTEK40graphics()
 {
+#ifdef vms
+        term_mode_tek();
+	term_pasthru();
+#endif /* vms */
 	fprintf(outfile,"\033\014");
 /*                   1
 	1. clear screen
@@ -188,6 +199,9 @@ KTEK40Ctext()
 {
 	TEK40text();
 	KTEK40Clinetype(0);  /* change to green */
+#ifdef vms
+	term_nopasthru();
+#endif /* vms */
 }
 
 /* special color linetypes for MS-DOS Kermit v2.31 tektronix emulator */
@@ -225,6 +239,9 @@ int linetype;
 KTEK40reset()
 {
 	fprintf(outfile,"\030\n");  /* turn off Tek emulation */
+#ifdef vms
+	term_mode_native();
+#endif /* vms */
 }
 
 #endif /* KERMIT */
@@ -276,3 +293,67 @@ SEL_reset()
 }
 #endif /* SELANAR */
 
+#ifdef VTTEK
+
+VTTEK40init()
+{
+        fprintf(outfile,"\033[?38h");
+        fflush(outfile);
+        sleep(1);
+        /* sleep 1 second to allow screen time to clear on some terminals */
+#ifdef vms
+        term_mode_tek();
+#endif /* vms */
+}
+
+VTTEK40reset()
+{
+        fprintf(outfile,"\033[?38l");
+        fflush(outfile);
+        sleep(1);
+        /* sleep 1 second to allow screen time to clear on some terminals */
+#ifdef vms
+        term_mode_native();
+#endif /* vms */
+}
+
+/* linetypes for VT-type terminals in tektronix emulator mode */
+/* `=solid, a=fine dots, b=short dashes, c=dash dot,
+   d=long dash dot, h=bold solid, i=bold fine dots, j=bold short dashes,
+   k=bold dash dot, l=bold long dash dot */
+static char *vt_linetype = "`a`abcdhijkl" ;
+static int last_vt_linetype = 0;
+VTTEK40linetype(linetype)
+int linetype;
+{
+        if (linetype >= 10)
+                linetype %= 10;
+        fprintf(outfile,"\033%c",vt_linetype[linetype+2]);
+        last_vt_linetype = linetype;
+}
+
+VTTEK40put_text(x,y,str)
+unsigned int x,y;
+char str[];
+{
+        int linetype;
+        linetype = last_vt_linetype;
+        VTTEK40linetype(0);
+        TEK40put_text(x,y,str);
+        VTTEK40linetype(linetype);
+}
+
+#endif /* VTTEK */
+
+#ifdef LN03P
+
+LN03Pinit()
+{
+	fprintf(outfile,"\033[?38h");
+}
+
+LN03Preset()
+{
+	fprintf(outfile,"\033[?38l");
+}
+#endif LN03P

@@ -1,0 +1,83 @@
+/*
+ *    x11.trm  --- inboard terminal driver for X11
+ */
+
+#define X11_XMAX 4096
+#define X11_YMAX 4096
+
+/* approximations for typical font/screen sizes */
+#define X11_VCHAR (X11_YMAX/25) 
+#define X11_HCHAR (X11_XMAX/100) 
+#define X11_VTIC (X11_YMAX/100)
+#define X11_HTIC (X11_XMAX/150)
+
+#define X11_nopts 22
+char X11_opts[X11_nopts][20] = {
+   "-iconic", "-rv", "-reverse", "+rv", "-synchronous", 
+   "-display", "-geometry", "-bg", "-background", "-bd", "-bordercolor", "-bw",
+   "-borderwidth", "-fg", "-foreground", "-fn", "-font", "-name", 
+   "-selectionTimeout", "-title", "-xnllanguage", "-xrm" 
+   };
+int X11_optarg[X11_nopts] = { 
+   0, 0, 0, 0, 0,
+   1, 1, 1, 1, 1, 1, 1,
+   1, 1, 1, 1, 1, 1, 
+   1, 1, 1, 1
+   };
+
+FILE *X11_pipe, *popen();
+char X11_command[1024]= "gnuplot_x11 -name gnuplot";
+
+
+/*   X11_args - scan gnuplot command line for standard X Toolkit options */
+
+X11_args(argc, argv) int argc; char *argv[]; {
+   int nx11 = 0, n;
+
+   while(++argv, --argc > 0) {
+      for (n=0; n<X11_nopts; n++) {
+	 if (!strcmp(*argv, X11_opts[n])) {
+	    strcat(X11_command, " ");
+	    strcat(X11_command, *argv); 
+	    if (X11_optarg[n]) {
+	       if (--argc <= 0) return(nx11);
+	       strcat(X11_command, " \"");
+	       strcat(X11_command, *++argv); 
+	       strcat(X11_command, "\"");
+	       nx11++;
+	       }
+	    nx11++; break;
+	    }
+	 }
+      if (n == X11_nopts) break; 
+      }
+   return(nx11);
+   }
+
+#ifdef ULTRIX_KLUDGE
+#define X11_ULTRIX_KLUDGE fprintf (X11_pipe, "E\n"); fflush (X11_pipe);
+#else
+#define X11_ULTRIX_KLUDGE 
+#endif
+
+X11_init() { X11_pipe = popen(X11_command, "w"); }
+
+X11_reset() { fprintf(X11_pipe, "R\n"); fflush(X11_pipe); pclose(X11_pipe); }
+
+X11_text() { fprintf(X11_pipe, "E\n"); fflush(X11_pipe); X11_ULTRIX_KLUDGE }
+
+X11_graphics() { fprintf(X11_pipe, "G\n"); }
+
+X11_move(x,y) unsigned int x,y; { fprintf(X11_pipe, "M%04d%04d\n", x, y); }
+
+X11_vector(x,y) unsigned int x,y; { fprintf(X11_pipe, "V%04d%04d\n", x, y); }
+
+X11_linetype(lt) int lt; { fprintf(X11_pipe, "L%04d\n", lt); }
+
+X11_put_text(x,y,str) unsigned int x,y; char str[]; {
+   fprintf(X11_pipe, "T%04d%04d%s\n", x, y, str);
+   }
+X11_justify_text(mode) enum JUSTIFY mode; {
+   fprintf(X11_pipe, "J%04d\n", mode);
+   return(TRUE);
+   }

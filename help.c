@@ -1,3 +1,39 @@
+/* GNUPLOT - help.c */
+/*
+ * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
+ *
+ * AUTHORS
+ * 
+ *   Original Software:
+ *     Thomas Williams,  Colin Kelley.
+ * 
+ *   Gnuplot 2.0 additions:
+ *       Russell Lang, Dave Kotz, John Campbell.
+ *
+ *   Gnuplot 3.0 additions:
+ *       Gershon Elber and many others.
+ * 
+ * Send your comments or suggestions to 
+ *  pixar!info-gnuplot@sun.com.
+ * This is a mailing list; to join it send a note to 
+ *  pixar!info-gnuplot-request@sun.com.  
+ * Send bug reports to
+ *  pixar!bug-gnuplot@sun.com.
+ */
+
 #include <stdio.h>
 
 extern int errno;
@@ -30,6 +66,9 @@ extern int instring();
 ** Much extension by David Kotz for use in gnutex, and then in gnuplot.
 ** Added output paging support, both unix and builtin. Rewrote completely
 ** to read helpfile into memory, avoiding reread of help file. 12/89.
+**
+** Modified by Russell Lang to avoid reading completely into memory
+** if MSDOS defined.  This uses much less memory.  6/91
 **
 ** The help file looks like this (the question marks are really in column 1):
 **
@@ -67,11 +106,14 @@ extern int instring();
 **	int result;		# 0 == success
 **	char *keyword;		# topic to give help on
 **	char *pathname;		# path of help file
-**	result = help(keyword, pathname);
+**      int subtopics;		# set to TRUE if only subtopics to be listed
+**				# returns TRUE if subtopics were found
+**	result = help(keyword, pathname, &subtopics);
 ** Sample:
 **	cmd = "search\n";
 **	helpfile = "/usr/local/lib/program/program.help";
-**	if (help(cmd, helpfile) != H_FOUND)
+**	subtopics = FALSE;
+**	if (help(cmd, helpfile, &subtopics) != H_FOUND)
 **		printf("Sorry, no help for %s", cmd);
 **
 **
@@ -98,6 +140,7 @@ struct line_s {
 typedef struct linkey_s LINKEY;
 struct linkey_s {
     char *key;				/* the name of this key */
+    long pos;			    /* ftell position */
     LINEBUF *text;			/* the text for this key */
     boolean primary;		/* TRUE -> is a primary name for a text block */
     LINKEY *next;			/* the next key in linked list */
@@ -106,18 +149,20 @@ struct linkey_s {
 typedef struct key_s KEY;
 struct key_s {
     char *key;				/* the name of this key */
+    long pos;			    /* ftell position */
     LINEBUF *text;			/* the text for this key */
     boolean primary;		/* TRUE -> is a primary name for a text block */
 };
-static LINKEY *keylist;		/* linked list of keys */
+static LINKEY *keylist = NULL;	/* linked list of keys */
 static KEY *keys = NULL;		/* array of keys */
 static int keycount = 0;		/* number of keys */
+static FILE *helpfp = NULL;
 
 static int LoadHelp();
 static void sortkeys();
 static int keycomp();
 static LINEBUF *storeline();
-static void storekey();
+static LINKEY *storekey();
 static KEY *FindHelp();
 static boolean Ambiguous();
 
@@ -136,24 +181,23 @@ static int pagelines;		/* count for builtin pager */
  * also print available subtopics, if subtopics is TRUE
  */
 help(keyword, path, subtopics)
-	char *keyword;			/* on this topic */
+	char *keyword;		/* on this topic */
 	char *path;			/* from this file */
-	boolean *subtopics;		/* (in) - subtopics only? */
+	boolean *subtopics;	/* (in) - subtopics only? */
 						/* (out) - are there subtopics? */
 {
     static char oldpath[PATHSIZE] = "";	/* previous help file */
-    char *oldpathp = oldpath;	/* pointer to same */
     int status;			/* result of LoadHelp */
-    KEY *key;				/* key that matches keyword */
+    KEY *key;			/* key that matches keyword */
 
     /*
 	** Load the help file if necessary (say, first time we enter this routine,
 	** or if the help file changes from the last time we were called).
-	** Also may occur if in-memory copy was freed. 
+	** Also may occur if in-memory copy was freed.
 	** Calling routine may access errno to determine cause of H_ERROR.
 	*/
     errno = 0;
-    if (strncmp(oldpathp, path, sizeof oldpath) != SAME)
+    if (strncmp(oldpath, path, PATHSIZE) != SAME)
 	 FreeHelp();
     if (keys == NULL) {
 	   status = LoadHelp(path);
@@ -161,11 +205,11 @@ help(keyword, path, subtopics)
 		return(status);
 
 	   /* save the new path in oldpath */
-	   if (strlen(path) < sizeof oldpath)
-		(void) strcpy(oldpathp, path);
+	   if (strlen(path) < PATHSIZE)
+		(void) strcpy(oldpath, path);
 	   else {				/* not enough room in oldpath, sigh */
-		  (void) strncpy(oldpathp, path, sizeof oldpath);
-		  oldpath[sizeof oldpath] = NULL;
+		  (void) strncpy(oldpath, path, PATHSIZE - 1);
+		  oldpath[PATHSIZE - 1] = '\0';
 	   }
     }
 
@@ -182,52 +226,73 @@ help(keyword, path, subtopics)
     return(status);
 }
 
-/* we only read the file once, into memory */
+/* we only read the file once, into memory
+ * except for MSDOS when we don't read all the file -
+ * just the keys and location of the text
+ */
 static int
 LoadHelp(path)
 	char *path;
 {
-    FILE *helpfp = NULL;
+    LINKEY *key;			/* this key */
+    long pos;				/* ftell location within help file */
     char buf[BUFSIZ];		/* line from help file */
     LINEBUF *head;			/* head of text list  */
+    LINEBUF *firsthead = NULL;
     boolean primary;		/* first ? line of a set is primary */
+    boolean flag;
 
     if ((helpfp = fopen(path, "r")) == NULL) {
 	   /* can't open help file, so error exit */
 	   return (H_ERROR);
     }
-    
+
     /*
 	** The help file is open.  Look in there for the keyword.
 	*/
-    (void) fgets(buf, sizeof buf, helpfp);
+    (void) fgets(buf, BUFSIZ - 1, helpfp);
     while (!feof(helpfp)) {
 	   /*
-	    ** Make an entry for each synonym keyword, pointing
-	    ** to same buffer. 
+	    ** Make an entry for each synonym keyword
 	    */
-	   head = storeline( (char *)NULL ); /* make a dummy text entry */
 	   primary = TRUE;
 	   while (buf[0] == KEYFLAG) {
-		  storekey(buf+1, head, primary);	/* store this key */
+		  key = storekey(buf+1);	/* store this key */
+	      key->primary = primary;
+	      key->text = NULL;			/* fill in with real value later */
+	      key->pos = 0;				/* fill in with real value later */
 		  primary = FALSE;
-		  if (fgets(buf, sizeof buf, helpfp) == (char *)NULL)
+		  pos = ftell(helpfp);
+		  if (fgets(buf, BUFSIZ - 1, helpfp) == (char *)NULL)
 		    break;
 	   }
 	   /*
 	    ** Now store the text for this entry.
 	    ** buf already contains the first line of text.
 	    */
-	   while (buf[0] != KEYFLAG) {
+#ifndef MSDOS
+	   firsthead = storeline(buf);
+	   head = firsthead;
+#endif
+	   while ( (fgets(buf, BUFSIZ - 1, helpfp) != (char *)NULL)
+		&& (buf[0] != KEYFLAG) ){
+#ifndef MSDOS
 		  /* save text line */
 		  head->next = storeline(buf);
 		  head = head->next;
-		  if (fgets(buf, sizeof buf, helpfp) == (char *)NULL)
-		    break;
+#endif
 	   }
+	   /* make each synonym key point to the same text */
+	   do {
+	      key->pos = pos;
+	      key->text = firsthead;
+	      flag = key->primary;
+	      key = key->next;
+	   } while ( flag!=TRUE  &&  key!=NULL );
     }
-
+#ifndef MSDOS
     (void) fclose(helpfp);
+#endif
 
     /* we sort the keys so we can use binary search later */
     sortkeys();
@@ -258,16 +323,14 @@ storeline(text)
 }
 
 /* Add this keyword to the keys list, with the given text */
-static void
-storekey(key, buffer, primary)
+static LINKEY *
+storekey(key)
 	char *key;
-	LINEBUF *buffer;
-	boolean primary;
 {
     LINKEY *new;
 
     key[strlen(key)-1] = '\0'; /* cut off \n  */
-    
+
     new = (LINKEY *)malloc(sizeof(LINKEY));
     if (new == NULL)
 	 int_error("not enough memory to store help file", -1);
@@ -275,13 +338,12 @@ storekey(key, buffer, primary)
     if (new->key == NULL)
 	 int_error("not enough memory to store help file", -1);
     (void) strcpy(new->key, key);
-    new->text = buffer;
-    new->primary = primary;
 
     /* add to front of list */
     new->next = keylist;
     keylist = new;
     keycount++;
+	return(new);
 }
 
 /* we sort the keys so we can use binary search later */
@@ -303,19 +365,21 @@ sortkeys()
     /* copy info from list to array, freeing list */
     for (p = keylist, i = 0; p != NULL; p = n, i++) {
 	   keys[i].key = p->key;
+	   keys[i].pos = p->pos;
 	   keys[i].text = p->text;
 	   keys[i].primary = p->primary;
 	   n = p->next;
 	   free( (char *)p );
     }
-    
+
     /* a null entry to terminate subtopic searches */
     keys[keycount].key = NULL;
+    keys[keycount].pos = 0;
     keys[keycount].text = NULL;
 
     /* sort the array */
-    /* note that it only moves objects of size (two pointers) */
-    /* it moves no data */
+    /* note that it only moves objects of size (two pointers + long + int) */
+    /* it moves no strings */
     qsort((char *)keys, keycount, sizeof(KEY), keycomp);
 }
 
@@ -339,16 +403,19 @@ FreeHelp()
 
     for (i = 0; i < keycount; i++) {
 	   free( (char *)keys[i].key );
+	   if (keys[i].primary)   /* only try to release text once! */
 	   for (t = keys[i].text; t != NULL; t = next) {
 		  free( (char *)t->line );
 		  next = t->next;
 		  free( (char *)t );
 	   }
-	   free( (char *)keys[i].text );
     }
     free( (char *)keys );
     keys = NULL;
     keycount = 0;
+#ifdef MSDOS
+    (void) fclose(helpfp);
+#endif
 }
 
 /* FindHelp:
@@ -378,7 +445,7 @@ FindHelp(keyword)
 		    return(key);		/* found!! */
 		}
     }
-    
+
     /* not found, or ambiguous */
     return(NULL);
 }
@@ -440,13 +507,23 @@ PrintHelp(key, subtopics)
 						/* (out) - are there subtopics? */
 {
     LINEBUF *t;
+#ifdef MSDOS
+    char buf[BUFSIZ];		/* line from help file */
+#endif
 
     StartOutput();
 
     if (subtopics == NULL || !*subtopics) {
-	   /* the first linebuf is a dummy, so we skip it */
-	   for (t = key->text->next; t != NULL; t = t->next)
+#ifdef MSDOS
+	   fseek(helpfp,key->pos,0);
+	   while ( (fgets(buf, BUFSIZ - 1, helpfp) != (char *)NULL)
+			&& (buf[0] != KEYFLAG) ) {
+		  OutLine(buf);
+	   }
+#else
+	   for (t = key->text; t != NULL; t = t->next)
 		OutLine(t->line);		/* print text line */
+#endif
     }
 
     ShowSubtopics(key, subtopics);
@@ -596,3 +673,4 @@ EndOutput()
 	 (void) pclose(outfile);
 #endif
 }
+

@@ -1,0 +1,287 @@
+/* GNUPLOT - vws.trm */
+/*
+ * Copyright (C) 1990
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed
+ * as patches to released version.
+ *
+ * This software  is provided "as is" without express or implied warranty.
+ *
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   IRIS terminals
+ *
+ * AUTHORS
+ *   Walter Speth
+ *           BITNET: SPETH@DBNPIB5
+ *
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ *
+ */
+ 
+#define VWS_XMAX   1024
+#define VWS_YMAX   780
+#define VWS_VCHAR  25
+#define VWS_HCHAR  15
+#define VWS_VTIC   10
+#define VWS_HTIC   10
+ 
+#include stdio
+/*
+#include math
+#include ssdef
+*/
+#include descrip
+ 
+#include <uisentry.h>
+#include <uisusrdef.h>
+ 
+ 
+#define DEFAULT_ATTR 0
+#define OVER_ATTR 1
+#define ERAS_ATTR 2
+#define BIS_ATTR 3
+#define COLOR_ATTR 4
+#define TEXT_ATTR 5
+#define LINE_ATTR 6
+#define BACK_ATTR 7
+ 
+ 
+float current_x, current_y;
+ 
+ 
+int vd_id, wd_id;
+int vcm_id;
+ 
+static $DESCRIPTOR(ws_devname, "SYS$WORKSTATION");
+static $DESCRIPTOR(vd_title, "gnuplot");
+ 
+static float x0, y0, xsiz, ysiz,
+             wc_xmin_new, wc_ymin_new, wc_xmax_new, wc_ymax_new,
+             wc_xmin, wc_ymin, wc_xmax, wc_ymax,
+             vd_width, vd_height;
+ 
+VWS_resize_ast()
+{ uis$resize_window(&vd_id, &wd_id, &x0, &y0, &xsiz, &ysiz,
+                     &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
+  replotrequest();
+}
+/****************************************************************************/
+VWS_init()
+ 
+ 
+{
+  int i;
+  int cattr;
+  $DESCRIPTOR(a_font,"DTABER0003WK00PG0001UZZZZ02A000");
+ 
+  vd_width  = 14;
+  vd_height = 10; /* aspect sqrt(2) as DIN A paper */
+ 
+  wc_xmin = 0.0;
+  wc_ymin = 0.0;
+  wc_xmax = (float) VWS_XMAX;
+  wc_ymax = (float) VWS_YMAX;
+ 
+  vcm_id = uis$create_color_map(&8);
+ 
+  vd_id = uis$create_display(&wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax,
+                             &vd_width, &vd_height, &vcm_id);
+ 
+  uis$set_color(&vd_id, &0, &.5, &.5, &.5);
+  uis$set_color(&vd_id, &1, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &2, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &3, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &4, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &5, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &6, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &7, &0.0, &0.0, &0.0);
+ 
+/*
+  uis$set_color(&vd_id, &2, &.2, &.2, &.2);
+  uis$set_color(&vd_id, &3, &.3, &.3, &.3);
+  uis$set_color(&vd_id, &4, &.4, &.4, &.4);
+  uis$set_color(&vd_id, &5, &.5, &.5, &.5);
+  uis$set_color(&vd_id, &6, &.6, &.6, &.6);
+  uis$set_color(&vd_id, &7, &.7, &.7, &.7);
+ 
+/* perhaps better for color terms (which I do not have)
+  uis$set_color(&vd_id, &0, &0.0, &0.0, &0.0);
+  uis$set_color(&vd_id, &1, &0.9, &0.0, &0.0);
+  uis$set_color(&vd_id, &2, &0.0, &0.9, &0.0);
+  uis$set_color(&vd_id, &3, &0.9, &0.9, &0.0);
+  uis$set_color(&vd_id, &4, &0.0, &0.0, &0.9);
+  uis$set_color(&vd_id, &5, &0.9, &0.0, &0.9);
+  uis$set_color(&vd_id, &6, &0.0, &0.9, &0.9);
+  uis$set_color(&vd_id, &7, &0.9, &0.9, &0.9);
+/*
+*/
+  uis$disable_display_list(&vd_id);
+ 
+  wd_id = uis$create_window(&vd_id, &ws_devname, &vd_title,
+                            &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax,
+                            &vd_width, &vd_height);
+ 
+  uis$set_resize_ast(&vd_id, &wd_id, &VWS_resize_ast, &0,
+                     &x0, &y0, &xsiz, &ysiz,
+                     &wc_xmin_new, &wc_ymin_new, &wc_xmax_new, &wc_ymax_new);
+ 
+  uis$set_writing_mode(&vd_id, &DEFAULT_ATTR, &OVER_ATTR, &UIS$C_MODE_OVER);
+  uis$set_writing_mode(&vd_id, &DEFAULT_ATTR, &ERAS_ATTR, &UIS$C_MODE_ERAS);
+  uis$set_writing_mode(&vd_id, &DEFAULT_ATTR, &BIS_ATTR, &UIS$C_MODE_BIS);
+/*
+  for (i=0; i<8; i++) {
+    cattr = COLOR_ATTR+i;
+    uis$set_writing_index(&vd_id, &COPY_ATTR, &cattr, &i);
+    }
+*/
+  uis$set_background_index(&vd_id, &DEFAULT_ATTR, &BACK_ATTR, &0);
+  uis$set_writing_mode(&vd_id, &DEFAULT_ATTR, &TEXT_ATTR, &UIS$C_MODE_OVER);
+  uis$set_font(&vd_id,&TEXT_ATTR,&TEXT_ATTR,&a_font);
+  uis$set_char_size(&vd_id,&TEXT_ATTR,&TEXT_ATTR,&0,
+                    &(float)VWS_HCHAR,&(float)VWS_VCHAR);
+  uis$set_line_style(&vd_id,&LINE_ATTR,&LINE_ATTR,&0xFFFFFFFF);
+}
+ 
+/****************************************************************************/
+ 
+VWS_reset()
+{
+  uis$delete_display(&vd_id);
+}
+/****************************************************************************/
+VWS_scale(xs,ys)
+int xs,ys;
+{
+        return FALSE;
+}
+/****************************************************************************/
+VWS_graphics()
+{
+    uis$erase(&vd_id, &wc_xmin, &wc_ymin, &wc_xmax, &wc_ymax);
+}
+/****************************************************************************/
+VWS_text()
+{
+}
+/****************************************************************************/
+VWS_move(x,y)
+int x,y;
+{
+  current_x= (float)(x);
+  current_y= (float)(y);
+}
+/****************************************************************************/
+VWS_vector(x,y)
+int x,y;
+{ int col;
+  float fx,fy;
+  fx=(float) x;
+  fy=(float) y;
+ 
+      uis$line(&vd_id, &LINE_ATTR,
+               &current_x, &current_y, &fx, &fy);
+      VWS_move (x,y);
+}
+/****************************************************************************/
+VWS_linetype(lt)
+int lt;
+{
+long int lstyle[9]={    0xffffffff,
+                        0Xff00ff00,
+                        0xffffff00,
+                        0xffff0000,
+                        0xf0f0f0f0,
+                        0Xfff0fff0,
+                        0xf000f000,
+                        0xa5a5a5af,
+                        0xf00f00f0 };
+ 
+  switch(lt) {
+case -1: uis$set_line_style(&vd_id,&LINE_ATTR,&LINE_ATTR,&0xFFFFFFFF);
+         uis$set_line_width(&vd_id,&LINE_ATTR,&LINE_ATTR,&1.5);
+         break;
+case -2: uis$set_line_style(&vd_id,&LINE_ATTR,&LINE_ATTR,&0xFFFFFFFF);
+         uis$set_line_width(&vd_id,&LINE_ATTR,&LINE_ATTR,&2.0);
+         break;
+/*
+default:  uis$set_line_style(&vd_id,&LINE_ATTR,&LINE_ATTR,&lstyle[lt % 8]);
+          makes part of curve disappear on my workstation
+*/
+default:  uis$set_line_style(&vd_id,&LINE_ATTR,&LINE_ATTR,&0xFFFFFFFF);
+         uis$set_line_width(&vd_id,&LINE_ATTR,&LINE_ATTR,&1.0);
+}
+}
+ 
+/****************************************************************************/
+static int justify_mode =CENTRE,up;;
+ 
+VWS_put_text(x,y,str)
+int x,y; char* str;
+{
+  float fx,fy, thih, twid;
+ 
+ 
+/* uis$text parameter is descriptor string not character string */
+ 
+  struct dsc$descriptor_s textline = {0,DSC$K_DTYPE_T,DSC$K_CLASS_S,""};
+ 
+ 
+  textline.dsc$a_pointer = str;
+  textline.dsc$w_length = strlen(textline.dsc$a_pointer);
+  uis$measure_text(&vd_id,&TEXT_ATTR,&textline,&twid,&thih);
+  fx=(float)x;
+  fy=(float)y;
+ 
+  switch (justify_mode) {
+  case LEFT : fy+=thih/2.;
+              break;
+  case RIGHT : fy+=thih/2.;
+               fx-=twid;
+              break;
+ 
+  case CENTRE : fy+=thih/2.;
+               fx-=twid/2;
+              break;
+  };
+ 
+  uis$text(&vd_id,&TEXT_ATTR,&textline,&fx,&fy);
+     /* write to Example Viewport window */
+ 
+ 
+}
+/****************************************************************************/
+VWS_text_angle(ang)
+int ang;
+{
+  float degrees;
+  degrees=90.*(up=ang);
+  uis$set_text_slope (&vd_id, &TEXT_ATTR, &TEXT_ATTR, &degrees);
+return TRUE;
+}
+/****************************************************************************/
+VWS_justify_text(mode)
+int mode;
+{ justify_mode=mode;
+return TRUE;
+}
+/****************************************************************************/
+VWS_point(x,y,point)
+int x,y,point;
+{
+do_point(x,y,point);
+}
+/****************************************************************************/
+VWS_arrow(sx,sy,ex,ey)
+int sx,sy,ex,ey;
+{
+do_arrow(sx,sy,ex,ey);
+}

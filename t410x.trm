@@ -1,0 +1,239 @@
+/* GNUPLOT - t410x.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports: Tektronix 410x and 420x series terminals
+ *
+ * AUTHORS
+ *   Colin Kelley, Thomas Williams
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/* Tektronix 410X and 420X driver written by Cary D. Renzema.
+ * email address: caryr@vice.ico.tek.com
+ *
+ * I've tested this driver on the following terminals: 4106, 4107A, 4109
+ * and 4207.  It should work, without editing, on other terminals in the
+ * 410x and 420x families.  It will probably need to be changed to work
+ * on a 4105 (screen size and character rotation are two guesses).  This
+ * file can also be used as a start for a 411x driver.
+ *
+ * Cary R.
+ * April 5, 1990
+ */
+
+#ifdef T410X
+
+#define T410XXMAX 4095
+#define T410XYMAX 3131
+
+#define T410XVCHAR	71
+#define T410XHCHAR	51
+#define T410XVTIC	36
+#define T410XHTIC	36	
+
+static int T410X_angle=0;
+
+T410X_init()
+{
+	(void) fprintf(outfile, "\033%%!0\033MN0\033MCB7C;\033MQ1\033MT1");
+	(void) fprintf(outfile, "\033MG1\033RK!\033SK!\033LZ\033%%!1");
+/*
+	 1. set tek mode
+	 2. set character path to 0 (characters placed equal to rotation)
+	 3. set character size to 59 height
+	 4. set character precision to string
+	 5. set character text index to 1
+	 6. set character write mode to overstrike
+	 7. clear the view
+	 8. clear the segments
+	 9. clear the dialog buffer
+	10. set ansi mode
+*/
+	(void) fflush(outfile);
+}
+
+
+T410X_reset()
+{
+	(void) fprintf(outfile, "\033%%!0\033LZ\033%%!1");
+/*
+	1. set tek mode
+	2. clear the dialog buffer
+	3. set ansi mode
+*/
+	(void) fflush(outfile);
+}
+
+
+T410X_graphics()
+{
+	(void) fprintf(outfile, "\033%%!0\033\014\033LV0");
+/*
+	1. set tek mode
+	2. clear the screen
+	3. set dialog area invisible
+*/
+	(void) fflush(outfile);
+}
+
+T410X_text()
+{
+	(void) fprintf(outfile, "\033LV1\033%%!1");
+/*
+	1. set dialog area visible
+	2. set ansi mode
+*/
+	(void) fflush(outfile);
+}
+
+
+T410X_move(x, y)
+unsigned int x, y;
+{
+	(void) fprintf(outfile, "\033LF");
+	(void) T410X_encode_x_y(x, y);
+	(void) fflush(outfile);
+}
+
+
+T410X_vector(x, y)
+unsigned int x, y;
+{
+	(void) fprintf(outfile, "\033LG");
+	(void) T410X_encode_x_y(x, y);
+	(void) fflush(outfile);
+}
+
+
+T410X_point(x, y, number)
+unsigned int x, y;
+int number;
+{
+	(void) fprintf(outfile, "\033MM");
+	(void) T410X_encode_int(max(number, 0)%11);
+	(void) fprintf(outfile, "\033LH");
+	(void) T410X_encode_x_y(x, y);
+	(void) fflush(outfile);
+}
+
+
+T410X_linetype(linetype)
+int linetype;
+{
+	switch (linetype) {
+		case -1:
+			(void) fprintf(outfile, "\033ML5");
+			break;
+		case -2:
+			(void) fprintf(outfile, "\033ML?");
+			break;
+		default:
+			(void) fprintf(outfile, "\033ML");
+			(void) T410X_encode_int(linetype%14+2);
+			break;
+	}
+	(void) fprintf(outfile, "\033MV");
+	(void) T410X_encode_int(max(linetype, 0)%8);
+	(void) fflush(outfile);
+}
+
+
+T410X_put_text(x, y, str)
+unsigned int x, y;
+char str[];
+{
+	extern int T410X_angle;
+
+	if (T410X_angle == 0) {
+		(void) T410X_move(x, y-T410XVCHAR/2+6);
+		(void) fprintf(outfile, "\033MR00");
+	} else {
+		(void) T410X_move(x+T410XHCHAR/2-6, y);
+		(void) fprintf(outfile, "\033MRE:0");
+	}
+	(void) fprintf(outfile, "\033LT");
+	(void) T410X_encode_int(strlen(str));
+	(void) fputs(str, outfile);
+	(void) fflush(outfile);
+}
+
+T410X_text_angle(ang)
+int ang;
+{
+	extern int T410X_angle;
+
+	T410X_angle = ang;
+	return(TRUE);
+}
+
+/* These last two routines are based on fortran code found in the
+ * 4106/4107/4109/CX PROGRAMMERS manual.
+ */
+
+T410X_encode_x_y(x, y)
+unsigned int x, y;
+{
+	static char chix=0, chiy=0, cloy=0, ceb=0;
+
+	register unsigned int hix, lox, hiy, loy, eb, lx, ly;
+
+	lx = (x <= T410XXMAX) ? x : T410XXMAX;
+	ly = (y <= T410XYMAX) ? y : T410XYMAX;
+
+	hix = lx/128 + 32;
+	lox = (lx/4)%32 + 64;
+	hiy = ly/128 + 32;
+	loy = (ly/4)%32 + 96;
+	eb = (ly%4)*4 + lx%4 + 96;
+
+	if (chiy != hiy) (void) putc(hiy, outfile);
+	if (ceb != eb) (void) putc(eb, outfile);
+	if ((cloy!=loy) || (ceb!=eb) || (chix!=hix)) (void) putc(loy, outfile);
+	if (chix != hix) (void) putc(hix, outfile);
+	(void) putc(lox, outfile);
+
+	chix = hix;
+	chiy = hiy;
+	cloy = loy;
+	ceb = eb;
+}
+
+
+T410X_encode_int(number)
+int number;
+{
+	register unsigned int mag, hi1, hi2, lo;
+
+	mag = abs(number);
+
+	hi1 = mag/1024 + 64;
+	hi2 = (mag/16)%64 + 64;
+	lo = mag%16 + 32;
+
+	if (number >= 0) lo += 16;
+
+	if (hi1 != 64) (void) putc(hi1, outfile);
+	if ((hi2 != 64) || (hi1 != 64)) (void) putc(hi2, outfile);
+	(void) putc(lo, outfile);
+
+}
+
+
+#endif /* T410X */

@@ -10,24 +10,28 @@ HELPFILE = gnuplot.gih
 # /DPC means define symbol PC
 CFLAGS = /c /AL /DPC #/DMSDOS #/Zi #/Od
 
-TERMFLAGS = /DHERCULES /DCORONA /DATT6300 /DEPSON /DPOSTSCRIPT /DHP75 /DHPGL /DDXY800A  /DNEC
+# see other terminal defines in term.h
+TERMFLAGS = 
 
 # /NOE means NO EXTernal Dictionary
 # /EX  means pack EXE file
-# /ST:8000 means stack size 8000 bytes
-LINKFLAGS = /NOE /EX /ST:8000 #/codeview 
+# /ST:10000 means stack size 10000 bytes
+LINKFLAGS = /NOE /EX /ST:10000 #/codeview 
 
-OBJS = 	command.obj eval.obj graphics.obj help.obj internal.obj \
-	misc.obj parse.obj plot.obj scanner.obj setshow.obj standard.obj \
-	term.obj util.obj version.obj pcgraph.obj hrcgraph.obj corgraph.obj
+OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
+	help.obj internal.obj misc.obj parse.obj plot.obj readline.obj \
+	scanner.obj setshow.obj standard.obj term.obj util.obj version.obj \
+	pcgraph.obj hrcgraph.obj corgraph.obj
 
-CSOURCE5 = term\aed.trm term\dxy.trm term\epson.trm term\font5x7.trm \
-	term\hp26.trm term\hp2648.trm term\hpgl.trm \
-	term\hpljet.trm term\iris4d.trm term\latex.trm 
-CSOURCE6 = term\post.trm term\pc.trm term\qms.trm term\regis.trm \
-	term\tek.trm term\unixpc.trm term\unixplot.trm term\v384.trm \
-	term\imPcodes.h term\imagen.trm term\object.h term\fig.trm
-
+CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
+	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
+	term\hp2648.trm term\hpgl.trm term\hpljii.trm 
+CSOURCE6 = term\impcodes.h term\imagen.trm term\object.h \
+	term\iris4d.trm term\kyo.trm term\latex.trm term\pc.trm 
+CSOURCE7 = term\post.trm term\qms.trm term\regis.trm term\sun.trm \
+	term\t410x.trm term\tek.trm term\unixpc.trm term\unixplot.trm \
+	term\v384.trm term\x11.trm
+CSOURCE8 = contour.c
 
 # default rules
 .c.obj:
@@ -42,12 +46,18 @@ corgraph.obj: corgraph.asm header.mac lineproc.mac
 
 hrcgraph.obj: hrcgraph.asm header.mac lineproc.mac
 
+bitmap.obj: bitmap.c bitmap.h plot.h
+
 command.obj: command.c plot.h setshow.h help.h
 	cl $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\" command.c
+
+contour.obj: contour.c plot.h
 
 eval.obj: eval.c plot.h
 
 graphics.obj: graphics.c plot.h setshow.h
+
+graph3d.obj: graphics.c plot.h setshow.h
 
 help.obj: help.c plot.h help.h
 
@@ -59,14 +69,16 @@ parse.obj: parse.c plot.h
 
 plot.obj: plot.c plot.h setshow.h
 
+readline.obj: readline.c
+
 scanner.obj: scanner.c plot.h
 
 setshow.obj: setshow.c plot.h setshow.h
 
 standard.obj: standard.c plot.h
 
-term.obj: term.c plot.h $(CSOURCE5) $(CSOURCE6)
-	cl $(CFLAGS) $(TERMFLAGS) term.c
+term.obj: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+	cl $(CFLAGS) $(TERMFLAGS) /Iterm term.c
 
 util.obj: util.c plot.h
 

@@ -1,39 +1,30 @@
-#------------------------------------------------------------------
-# Makefile for gnut2p
-#   A translation program from Gnutex to GNUPLOT
-#   David Kotz
-#   Duke University
-#   dfk@cs.duke.edu
-#
-# derived from gnutex
-#
+# Makefile for gnuplot LaTeX tutorial
+# To make the manual from scratch, we run latex two times
+all: tutorial.dvi done
 
-# Define this for production version
-CFLAGS=-O -s
-# For the debugging version
-#CFLAGS=-g
+done:
+	latex tutorial
+	echo > done
 
-# Your favorite tags program
-TAGS=etags
-#TAGS=ctags
+# To touch it up after changes:
+remake: tutorial.dvi
 
-OBJS = plot.o scanner.o parse.o command.o eval.o \
-	standard.o internal.o util.o misc.o 
+# Always runs latex, e.g., to get labels right
+force: 
+	latex tutorial
 
-SRC = plot.h command.c eval.c internal.c misc.c \
-	parse.c plot.c scanner.c standard.c util.c
+tutorial.dvi: eg1.tex eg2.tex eg3.tex eg4.tex eg5.tex eg6.tex linepoint.tex \
+	tutorial.tex header.tex
+	latex tutorial
+	rm -f done
 
-gnut2p: $(OBJS)
-	cc $(CFLAGS) $(OBJS) -o gnut2p -lm
+.SUFFIXES: .tex .plt
 
-$(OBJS): plot.h
-
-TAGS: $(SRC)
-	$(TAGS) $(SRC)
+.plt.tex:
+	gnuplot $<
 
 clean:
-	rm -f *.o *~ core
+	rm -f *~ *.log eg?.tex linepoint.tex
 
 spotless:
-	rm -f *.o *~ core gnut2p TAGS
-
+	rm -f *~ *.log *.aux *.dvi eg?.tex linepoint.tex done

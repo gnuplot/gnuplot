@@ -1,0 +1,10 @@
+#!/bin/sh
+mv gnuplot_x11.c gnuplot_x11.c_x
+mv corplot.c corplot.c_pc
+acc -knr -DSYSV -DUSG -DVFORK -DNOCOPY -DGAMMA=gamma -DGETCWD -DX11 \
+-DUNIXPLOT -I/usr/include/X11 -I/usr/include/X11/Xaw *.c \
+-lbsd -lplot -lm -o gnuplot.intergraph
+mv gnuplot_x11.c_x gnuplot_x11.c
+acc -knr -DSYSV -DUSG -DVFORK -DNOCOPY -DGAMMA=gamma -DGETCWD -DX11 \
+-DUNIXPLOT -I/usr/include/X11 -I/usr/include/X11/Xaw gnuplot_x11.c \
+-lXaw -lXmu -lXt -lXext -lX11 -lbsd -lm -o gnuplot_x11.intergraph

@@ -1,4 +1,4 @@
-pcgraph+hrcgraph+corgraph+term+graphics+
+pcgraph+hrcgraph+corgraph+bitmap+term+graphics+graph3d+contour+
 plot+setshow+command+help+internal+misc+
 parse+eval+scanner+standard+util+version
 gnuplot

@@ -1,95 +1,119 @@
+/* GNUPLOT - eval.c */
 /*
+ * Copyright (C) 1986, 1987, 1990, 1991   Thomas Williams, Colin Kelley
  *
- *    G N U P L O T  --  eval.c
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
  *
- *  Copyright (C) 1986 Colin Kelley, Thomas Williams
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software is provided "as is" without express or implied warranty.
+ * 
  *
- *  You may use this code as you wish if credit is given and this message
- *  is retained.
+ * AUTHORS
+ * 
+ *   Original Software:
+ *     Thomas Williams,  Colin Kelley.
+ * 
+ *   Gnuplot 2.0 additions:
+ *       Russell Lang, Dave Kotz, John Campbell.
  *
- *  Please e-mail any useful additions to vu-vlsi!plot so they may be
- *  included in later releases.
- *
- *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+ *   Gnuplot 3.0 additions:
+ *       Gershon Elber and many others.
+ * 
+ * Send your comments or suggestions to 
+ *  pixar!info-gnuplot@sun.com.
+ * This is a mailing list; to join it send a note to 
+ *  pixar!info-gnuplot-request@sun.com.  
+ * Send bug reports to
+ *  pixar!bug-gnuplot@sun.com.
  */
 
 #include <stdio.h>
 #include "plot.h"
 
-extern int c_token,next_value,next_function;
-extern struct udft_entry udft[];
+extern int c_token;
 extern struct ft_entry ft[];
-extern struct vt_entry vt[];
-extern struct at_type *curr_at;
+extern struct udvt_entry *first_udv;
+extern struct udft_entry *first_udf;
+extern struct at_type at;
 extern struct lexical_unit token[];
 
 struct value *integer();
 
 
 
-int add_value(t_num)
+struct udvt_entry *
+add_udv(t_num)  /* find or add value and return pointer */
 int t_num;
 {
-register int i;
+register struct udvt_entry **udv_ptr = &first_udv;
 
 	/* check if it's already in the table... */
 
-	for (i = 0; i < next_value; i++) {
-		if (equals(t_num,vt[i].vt_name))
-			return(i);
+	while (*udv_ptr) {
+		if (equals(t_num,(*udv_ptr)->udv_name))
+			return(*udv_ptr);
+		udv_ptr = &((*udv_ptr)->next_udv);
 	}
-	if (next_value == MAX_VALUES)
-		int_error("user defined constant space full",NO_CARET);
-	copy_str(vt[next_value].vt_name,t_num);
-	vt[next_value].vt_value.type = INT;		/* not necessary, but safe! */
-	vt[next_value].vt_undef = TRUE;
-	return(next_value++);
+
+	*udv_ptr = (struct udvt_entry *)
+	  alloc((unsigned int)sizeof(struct udvt_entry), "value");
+	(*udv_ptr)->next_udv = NULL;
+	copy_str((*udv_ptr)->udv_name,t_num);
+	(*udv_ptr)->udv_value.type = INT;	/* not necessary, but safe! */
+	(*udv_ptr)->udv_undef = TRUE;
+	return(*udv_ptr);
 }
 
 
-add_action(sf_index,arg)
-enum operators sf_index;
-struct value *arg;
-
- /* argument to pass to standard function indexed by sf_index */
+struct udft_entry *
+add_udf(t_num)  /* find or add function and return pointer */
+int t_num; /* index to token[] */
 {
+register struct udft_entry **udf_ptr = &first_udf;
 
-	if ( curr_at->count >= MAX_AT_LEN ) 
+	while (*udf_ptr) {
+		if (equals(t_num,(*udf_ptr)->udf_name))
+			return(*udf_ptr);
+		udf_ptr = &((*udf_ptr)->next_udf);
+	}
+     *udf_ptr = (struct udft_entry *)
+	  alloc((unsigned int)sizeof(struct udft_entry), "function");
+	(*udf_ptr)->next_udf = (struct udft_entry *) NULL;
+	(*udf_ptr)->definition = NULL;
+	(*udf_ptr)->at = NULL;
+	copy_str((*udf_ptr)->udf_name,t_num);
+	(void) integer(&((*udf_ptr)->dummy_values[0]), 0);
+	(void) integer(&((*udf_ptr)->dummy_values[1]), 0);
+	return(*udf_ptr);
+}
+
+
+union argument *
+add_action(sf_index)
+enum operators sf_index;		/* index of p-code function */
+{
+	if (at.a_count >= MAX_AT_LEN)
 		int_error("action table overflow",NO_CARET);
-	curr_at->actions[curr_at->count].index = ((int)sf_index);
-	if (arg != (struct value *)0)
-		curr_at->actions[curr_at->count].arg = *arg;
-	curr_at->count++;
+	at.actions[at.a_count].index = sf_index;
+	return(&(at.actions[at.a_count++].arg));
 }
 
 
 int standard(t_num)  /* return standard function index or 0 */
 {
 register int i;
-	for (i = (int)SF_START; ft[i].ft_name != NULL; i++) {
-		if (equals(t_num,ft[i].ft_name))
+	for (i = (int)SF_START; ft[i].f_name != NULL; i++) {
+		if (equals(t_num,ft[i].f_name))
 			return(i);
 	}
 	return(0);
-}
-
-
-
-int user_defined(t_num)  /* find or add function and return index */
-int t_num; /* index to token[] */
-{
-register int i;
-	for (i = 0; i < next_function; i++) {
-		if (equals(t_num,udft[i].udft_name))
-			return(i);
-	}
-	if (next_function == MAX_UDFS)
-		int_error("user defined function space full",t_num);
-	copy_str(udft[next_function].udft_name,t_num);
-	udft[next_function].definition[0] = '\0';
-	udft[next_function].at.count = 0;
-	(void) integer(&udft[next_function].dummy_value, 0);
-	return(next_function++);
 }
 
  
@@ -97,9 +121,16 @@ register int i;
 execute_at(at_ptr)
 struct at_type *at_ptr;
 {
-register int i;
-	for (i = 0; i < at_ptr->count; i++) {
-		(*ft[at_ptr->actions[i].index].funct)(&(at_ptr->actions[i].arg));
+register int i,index,count,offset;
+
+	count = at_ptr->a_count;
+	for (i = 0; i < count;) {
+		index = (int)at_ptr->actions[i].index;
+		offset = (*ft[index].func)(&(at_ptr->actions[i].arg));
+		if (is_jump(index))
+			i += offset;
+		else
+			i++;
 	}
 }
 
@@ -113,6 +144,6 @@ register int i;
  at_ptr is a pointer to the action table which must be executed (evaluated)
 
  so the iterated line exectues the function indexed by the at_ptr and 
- passes the argument which is pointed to by the arg_ptr 
+ passes the address of the argument which is pointed to by the arg_ptr 
 
 */
