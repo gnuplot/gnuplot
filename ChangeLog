@@ -10,6 +10,10 @@
 	* src/misc.c (get_style): Add new styles 'labels' and 'histograms' to
 	the error message listing possible styles.
 
+	* configure.in: Make --enable-histograms the default.
+
+	* demo/all.dem: Add fillbetween, datastrings, and histograms demos.
+
 2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Integrated SF patch #976546 by Stephane Barbaray, with some
