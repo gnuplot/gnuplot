@@ -1,3 +1,29 @@
+1998-11-30  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
+
+	* makefile.os2: Update various compiler flags.
+
+	* plot.c(ExecuteMacro): Cosmetic changes.
+
+1998-11-30  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* docs/gnuplot.doc: Add documentation for `show version' and fixes.
+
+1998-11-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Remove generic GNU install instructions.
+
+	* TODO: Add more suggestions.
+
+	* bf_test.c: Don't include plot.h, but all other necessary include
+	files.
+
+	* term.h: Fix typo (gpr.h <-> gpr.trm).
+
+	* term/cgm.trm: Remove temporary string.
+
+	* term/excl.trm: Update copyright to the current version by
+	permission of the author, Przemek Klosowski <przemek@nist.gov>.
+
 1998-11-26  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in: Remove allterm.h target and dependency.
@@ -5,7 +31,7 @@
 	* configure: Regenerated.
 
 	* configure.in: Add code to generate terminal driver dependencies in
-	docs/Makefile.in. Remove code to rename of old makefiles.
+	docs/Makefile.in. Remove code to rename old makefiles.
 
 	* protos.h: Move non-static prototypes from term.c.
 
@@ -18,7 +44,8 @@
 	In test_term, rename xmax xmax_t, and ymax ymax_t.
 
 	* docs/Makefile.in: Add TERM_LIST variable for allterm.h dependencies.
-	Use explicit file names instead of makefile variables.
+	Use explicit file names instead of makefile variables. Modify allgih
+	target so that it builds independently from gih target, and vice versa.
 
 	* docs/makefile, docs/latextut/makefile: Rename makefile.dst, resp.
 
