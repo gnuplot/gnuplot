@@ -1,3 +1,38 @@
+1998-08-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* gplt_x11.c, makefile.os2, os2/gclient.c, os2/print.c, term/pm.trm:
+	OS/2 fixes from Alexander Mai <st002279@hrzpub.tu-darmstadt.de>.
+
+	* Makefile.in, misc.c: Modified set angle patch from Juergen von Hagen
+	<vonHagen@engr.psu.edu>.
+
+	* Makefile.in: Add PACKAGE and VERSION variables. Remove version
+	variable.
+
+	* acconfig.h: Add PACKAGE and VERSION variables.
+
+	* acinclude.m4: Remove AM_MISSING_PROG macro.
+
+	* aclocal.m4: Regenerated with aclocal.
+
+	* config.hin: Regenerated with autoheader.
+
+	* configure.in: Add VERSION variable, AM_INIT_AUTOMAKE. Remove
+	AM_MISSING_PROG, AC_PROG_MAKE_SET, AC_PROG_INSTALL. Add configuration
+	summary report.
+
+	* configure: Regenerated with autoconf.
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2html.c,
+	docs/doc2info.c, docs/doc2ipf.c, docs/doc2ms.c, docs/doc2rnh.c,
+	docs/doc2rtf.c, docs/doc2tex.c: #undef TRUE and FALSE before
+	redefining it.
+	
+1998-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* datafile.c (df_tokenise): Fix bug in datafile reading speedup
+	patch. Fix by HBB.
+
 1998-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* readline.c: Fix termios/sgtty logic.
