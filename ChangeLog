@@ -1,3 +1,11 @@
+2004-01-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/configure.in: Remove superfluous file copying commands, now
+	taken care of by auto* tools.
+
+	* src/gplt_x11.c(pr_window): Bugfix: static array must be computable
+	at compile time.
+
 2004-01-07  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/plot.c, term/x11.trm: Set stdin to unbuffered on program entry
