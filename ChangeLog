@@ -1,7 +1,38 @@
-2000-11-23  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Fix GNUPLOT_X11 for the case that no X11 support is
+	available.
+
+	* demo/contours.dem, demo/fit.dem: Add missing closing quotes.
+
+	* docs/Makefile.in: Add DESTDIR support.
+
+	* docs/gnuplot.texi, src/Makefile.in, src/makefile.all, src/version.c:
+	Regenerated.
+
+	* src/Makefile.maint: Add getcolor.c to noncoresrc. Re-enable version.c
+	target.
+
+	* src/getcolor.c: Include getcolor.h.
+
+	* src/graphics.c(nearest_label_tag): Remove duplicate function.
+
+	* src/graphics.c(apply_head_properties): Remove nested extern
+	declarations.
+
+	* readline.c: Include ipc.h for readline_ipc() prototype.
+
+	* src/term_api.h: Add exported variables curr_arrow_headlength and
+	curr_arrow_headangle.
+
+	* src/unset.c: Remove nested extern decalartion of X11_unset_pm3d().
+
+	* term/cgm.trm: Remove nested extern decalartions.
+
+2000-11-23  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
         * src/pm3d.c: Fix incomplete struct pm3d initializer.
 
-2000-11-23  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-11-23  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
         * src/gplt_x11.c: fix some segmentation faults
 
 2000-11-23  Petr Mikulik  <mikulik@physics.muni.cz>
@@ -23,7 +54,7 @@
 
 	* src/plot2d.c (get_data): fix bug in datafile plots 'with boxes'.
 
-2000-11-22  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-11-22  Alexander Mai  <st002279@hrzpub.tu-darmstadt.de>
         * src/gplt_x11.c: fix two crashes (segmentation fault
 	  and floating exception)
 
@@ -98,6 +129,10 @@
 
 	* term/cgm.trm: add pm3d support.
 
+2000-11-10  Gregor Thalhammer  <Gregor.Thalhammer@uibk.ac.at>
+
+	* term/epslatex.trm(EPSL_arrow): Arrows without heads are not drawn.
+
 2000-11-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/gnuplot.opt: added new sourcefiles to the list.
@@ -144,9 +179,16 @@
 
 2000-11-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* configure.in: Check for png_init_io() instead of deprecated and
+	unused png_info_init().
+
 	* demo/Makefile.am.in: Use variables in place of "gnuplot" (GNUPLOT)
 	and "all.dem" (DEMO) to allow more fine-grained control over what is
 	run with "make check". Regenerate Makefile.am.
+
+	* term/epslatex.trm: EPSL_PostScriptColorFormulae and
+	PostScriptColorFormulae from post.trm are the same. Remove the former
+	and reference the latter.
 
 2000-11-06  Ian MacPhedran  <Ian_MacPhedran@engr.USask.Ca>
 
@@ -740,13 +782,14 @@
 	* src/color.c: if is_log_z, then print the non-logged values of z_min
 	and z_max around the color box.
 
-	* src/unset.c: 'unset pm3d' sets the y axis to noreversed if the reversed
-	has been set by 'set pm3d map'.
+	* src/unset.c: 'unset pm3d' sets the y axis to noreversed if the
+	reversed has been set by 'set pm3d map'.
 
-	* pm3d: a trick for rotating the ylabel via 'set pm3d map' (see variable
-	`pm3d_map_rotate_ylabel`). That's needed because gnuplot does not have an
-	option for rotating x,y,z axes labels; once it possesses it, the above 
-	mentioned variable would be replaced by the new one.
+	* pm3d: a trick for rotating the ylabel via 'set pm3d map' (see
+	variable `pm3d_map_rotate_ylabel`). That's needed because gnuplot
+	does not have an option for rotating x,y,z axes labels; once it
+	possesses it, the above mentioned variable would be replaced by the
+	new one.
 
 2000-07-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -800,7 +843,9 @@
 
 2000-06-14  Johannes Zellner  <johannes@zellner.org>
 
-	* src/color.c: modified the postscript color box drawing for user borders
+	* src/color.c: modified the postscript color box drawing for user
+	borders.
+
 	* term/post.trm: repaired the broken pslatex if using `encoding'
 	as proposed by Petr Mikulik.
 
