@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graph3d.c,v 1.106 1998/06/18 14:55:07 ddenholm Exp $";
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.106 1998/06/18 14:55:07 ddenholm Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -397,6 +397,7 @@ int count;
     key_rows = ptitl_cnt;
     key_cols = 1;
     if (key == -1 && key_vpos == TUNDER) {
+      if (ptitl_cnt > 0) {
 	/* calculate max no cols, limited by label-length */
 	key_cols = (int) (xright - xleft) / ((max_ptitl_len + 4) * (t->h_char) + key_sample_width);
 	key_rows = (int) (ptitl_cnt / key_cols) + ((ptitl_cnt % key_cols) > 0);
@@ -404,6 +405,9 @@ int count;
 	key_cols = (int) (ptitl_cnt / key_rows) + ((ptitl_cnt % key_rows) > 0);
 	key_col_wth = (int) (xright - xleft) / key_cols;
 	/* key_rows += ktitle_lines; - messes up key - div */
+      } else {
+	key_rows = key_cols = key_col_wth = 0;
+      }
     }
     /* this should also consider the view and number of lines in
      * xformat || yformat || xlabel || ylabel */
@@ -684,6 +688,9 @@ int pcount;			/* count of plots in linked list */
 	    xl /= 1000;
 	    xl += xleft;
 #else
+	    /* HBB 19990608: why calculate these again? boundary3d has already 
+	     * done it... */
+	    if (ptitl_cnt > 0) {
 	    /* maximise no cols, limited by label-length */
 	    key_cols = (int) (xright - xleft) / key_col_wth;
 	    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
@@ -698,6 +705,7 @@ int pcount;			/* count of plots in linked list */
 	     */
 	    xl = xleft + ((xright - xleft) * key_size_left) / (key_cols * (key_size_left + key_size_right));
 	    yl = yoffset * t->ymax + (key_rows) * key_entry_height + (ktitle_lines + 2) * t->v_char;
+	    }
 #endif
 	} else {
 	    if (key_vpos == TTOP) {
