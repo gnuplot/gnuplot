@@ -1,3 +1,12 @@
+2001-03-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Check for png_init_io() instead of deprecated
+	png_info_init().
+
+	* plot.c(get_data): Add missing break statement.
+
+	* demo/contours.dem, demo/fit.dem, docs/gnuplot.texi: Add missing tics.
+
 2001-02-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* term/emf.trm (EMF_text, EMF_reset): Reset emf_graphics flag to
@@ -21,6 +30,10 @@
 
 	* graphics.c (widest2d_callback, xtick2d_callback): dito
 	(ytick2d_callback): dito.
+
+2000-11-10  Gregor Thalhammer  <Gregor.Thalhammer@uibk.ac.at>
+
+	* term/epslatex.trm(EPSL_arrow): Arrows without heads are not drawn.
 
 2000-10-24  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
