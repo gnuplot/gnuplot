@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.5 1999/09/21 18:49:22 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.6 1999/10/15 16:03:27 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -165,7 +165,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.5 1999/09/21 18:49:22 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.6 1999/10/15 16:03:27 lhecking Exp $
 #
 ########################################################
 #
@@ -299,9 +299,10 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
 	$(D)doc2hlp.c $(D)doc2hlp.com $(D)doc2html.c $(D)doc2info.c \
 	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
-	$(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 $(D)lasergnu.1 \
-	$(D)makefile.dst $(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
-	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)xref.h
+	$(D)doc2texi.el $(D)doc2texi.pl $(D)doc2x.h $(D)gnuplot.1 \
+	$(D)gnuplot.texi $(D)lasergnu.1 $(D)makefile.dst $(D)makefile.ami \
+	$(D)termdoc.c $(D)titlepag.ms $(D)titlepag.tex $(D)toc_entr.sty \
+	$(D)xref.c $(D)xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
 DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
