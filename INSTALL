@@ -579,16 +579,16 @@ binaries you just compiled at the same time).
    To run the demos in a specified file without interaction, one
 can use
 
-$ PATH=..:$PATH ../gnuplot simple.dem </dev/null
+$ PATH=../src:$PATH ../src/gnuplot simple.dem </dev/null
 
    To run all demos non-interactively, use
 
-$ PATH=..:$PATH ../gnuplot all.dem </dev/null
+$ PATH=../src:$PATH ../src/gnuplot all.dem </dev/null
 
    To use a different plotting device than the default (usually X11
 under Unix), use eg.
 
-$ GNUTERM=dumb ../gnuplot all.dem </dev/null
+$ GNUTERM=dumb ../src/gnuplot all.dem </dev/null
 
    To test the capabilities of the terminal you are using, there is
 the 'test' command:
