@@ -53,7 +53,7 @@
  *
  * size (in pixels)
  *
- * font (small,medium,large)
+ * font (tiny,small,medium,large,giant)
  *
  * xrrggbb - sets the next color.  x is the literal character 'x',
  * rrggbb are the red green and blue components in hex.  For example
@@ -70,6 +70,7 @@
  *
  * CONTRIBUTORS
  *  Alfred Reibenschuh <alfred.reibenschuh@cait.co.at> or <fredo@blackbox.at>
+ *  Ben Laurie <ben@algroup.co.uk>
  *
  * send your comments or suggestions to:
  *  info-gnuplot@cs.dartmouth.edu
@@ -110,6 +111,8 @@ TERM_PUBLIC void GIF_reset __PROTO((void));
 extern gdFontPtr gdFontSmall;	/* 6x12 */
 extern gdFontPtr gdFontLarge;	/* 8x16 */
 extern gdFontPtr gdFontMediumBold;	/* 7x13 */
+extern gdFontPtr gdFontGiant;  /* 9x15 */
+extern gdFontPtr gdFontTiny;  /* 5x8 */
 
 
 #define GREG_XMAX 640
@@ -283,11 +286,17 @@ TERM_PUBLIC void GIF_options()
     GIF_font = gdfont;
 
     while (!END_OF_COMMAND) {
-	if (almost_equals(c_token, "t$ransparent")) {
+	if (almost_equals(c_token, "tr$ansparent")) {
 	    gif_state.flags |= GIF_USE_TRANSPARENT;
 	    ++c_token;
 	} else if (almost_equals(c_token, "i$nterlace")) {
 	    gif_state.flags |= GIF_USE_INTERLACE;
+	    ++c_token;
+	} else if (almost_equals(c_token,"ti$ny")) {
+	    GIF_font=gdFontTiny;
+	    gif_font = 0;
+	    term->v_char = (unsigned int)(8);
+	    term->h_char = (unsigned int)(5);
 	    ++c_token;
 	} else if (almost_equals(c_token, "s$mall")) {
 	    GIF_font = gdFontSmall;
@@ -306,6 +315,12 @@ TERM_PUBLIC void GIF_options()
 	    gif_font = 3;
 	    term->v_char = (unsigned int) (16);
 	    term->h_char = (unsigned int) (8);
+	    ++c_token;
+	} else if(almost_equals(c_token,"g$iant")) {
+	    GIF_font=gdFontGiant;
+	    gif_font = 4;
+	    term->v_char = (unsigned int)(15);
+	    term->h_char = (unsigned int)(9);
 	    ++c_token;
 	} else if (almost_equals(c_token, "si$ze")) {
 	    struct value s;
@@ -351,6 +366,9 @@ TERM_PUBLIC void GIF_options()
 	strcat(term_options, "interlace ");
     }
     switch (gif_font) {
+    case 0:
+	strcat(term_options,"tiny ");
+	break;
     case 1:
 	strcat(term_options, "small ");
 	break;
@@ -359,6 +377,9 @@ TERM_PUBLIC void GIF_options()
 	break;
     case 3:
 	strcat(term_options, "large ");
+	break;
+    case 4:
+	strcat(term_options,"giant ");
 	break;
     }
     sprintf(term_options + strlen(term_options),
@@ -524,11 +545,36 @@ TERM_PUBLIC int GIF_text_angle(int ang)
     return TRUE;
 }
 
-/*
- * Local Variables:
- * mode:C
- * End:
- */
+TERM_PUBLIC int GIF_set_font(char *fontname)
+{
+    char name[32];
+    int  sep;
+    gdFontPtr font;
+
+    sep = strcspn(fontname,",");
+    strncpy(name,fontname,sep);
+    name[sep]=NUL;
+
+    if (!strcmp(fontname,"small"))
+	font = gdFontSmall;
+    else if (!strcmp(fontname,"medium"))
+	font = gdFontMediumBold;
+    else if(!strcmp(fontname,"large"))
+	font = gdFontLarge;
+    else if(!strcmp(fontname,"giant"))
+	font = gdFontGiant;
+    else if(!strcmp(fontname,"tiny"))
+	font = gdFontTiny;
+    else
+	font = GIF_font;
+
+    gif_state.charw = font->w;
+    gif_state.charh = font->h;
+
+    gif_state.font = font;
+
+    return TRUE;
+}
 
 #endif /* TERM_BODY */
 #ifdef TERM_TABLE
@@ -539,7 +585,7 @@ TERM_TABLE_START(gif_driver)
     GIF_VTIC, GIF_HTIC, GIF_options, GIF_init, GIF_reset,
     GIF_text, null_scale, GIF_graphics, GIF_move, GIF_vector,
     GIF_linetype, GIF_put_text, GIF_text_angle,
-    null_justify_text, do_point, do_arrow, set_font_null,
+    null_justify_text, do_point, do_arrow, GIF_set_font,
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT | TERM_BINARY
 TERM_TABLE_END(gif_driver)
@@ -564,7 +610,7 @@ START_HELP(gif)
 "",
 " Syntax:",
 "       set terminal gif {transparent} {interlace}",
-"                        {small | medium | large}",
+"                        {tiny | small | medium | large | giant}",
 "                        {size <x>,<y>}",
 "                        {<color0> <color1> <color2> ...}",
 "",
@@ -573,8 +619,8 @@ START_HELP(gif)
 "",
 " `interlace` instructs the driver to generate interlaced GIFs.",
 "",
-" The choice of fonts is `small` (6x12 pixels), `medium` (7x13 Bold) or `large`",
-" (8x16).",
+" The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
+" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels)",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
@@ -607,3 +653,9 @@ START_HELP(gif)
 " The current version of the `gif` driver does not support animated GIFs."
 END_HELP(gif)
 #endif /* TERM_HELP */
+
+/*
+ * Local Variables:
+ * mode:C
+ * End:
+ */
