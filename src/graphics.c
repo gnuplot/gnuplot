@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.53 2001/09/08 00:50:01 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.54 2001/09/18 17:49:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1757,7 +1757,7 @@ gpiPoint *corners;
     filledcurves_opts.closeto = FILLEDCURVES_CLOSED;
     filledcurves_opts.closeto = FILLEDCURVES_Y1;
     */
-    fprintf(stderr,"%s:%li: Closing of filledcurves_opts: until implemented according to the proposed docs --- now set to %i  (points=%i)\n", __FILE__, __LINE__, filledcurves_opts.closeto, points);
+    fprintf(stderr,"%s:%li: Closing of filledcurves_opts: until implemented according to the proposed docs --- now set to %i  (points=%i)\n", __FILE__, (long)__LINE__, filledcurves_opts.closeto, points);
     }
 #endif
 
