@@ -1,3 +1,9 @@
+2002-01-27  Johannes Zellner  <johannes@zellner.org>
+
+	* pm3d/demo/pm3dColumn.gpi: a 90 deg rotated 3d sinc which
+	demonstrates the difference between coloring according to
+	the z value and according to a specific data column.
+
 2002-01-26  Johannes Zellner  <johannes@zellner.org>
 
 	* pm3d/demo/pm3dColumn.gpi: quick demo for the new pm3d features

@@ -1,8 +1,8 @@
 #!/usr/local/bin/gnuplot -persist
 # FILE: "/home/joze/pub/gnuplot/gnuplot-MAIN/pm3d/demo/pm3dColumn.gpi"
-# LAST MODIFICATION: "Sat, 26 Jan 2002 22:47:04 +0100 (joze)"
+# LAST MODIFICATION: "Sun, 27 Jan 2002 17:46:36 +0100 (joze)"
 # (C) 2002 by Johannes Zellner, <johannes@zellner.org>
-# $Id:$
+# $Id: pm3dColumn.gpi,v 1.1 2002/01/26 21:48:13 joze Exp $
 
 sinc(u,v) = sin(sqrt(u**2+v**2)) /sqrt(u**2+v**2)
 
@@ -18,6 +18,16 @@ set title "pm3d explicit mode / coloring according to 4 column"
 set ticslevel 0
 
 set pm3d at s explicit solid
+
 splot 'pm3dColumn.dat' u 1:2:(column(3)+column(-1) / 20.0):3 w pm3d, 3 + sinc(x, y) w l
+pause -1 "Hit return to continue"
+
+set title "coloring according to column 3 (left) and the z-value (right)"
+splot \
+    'pm3dColumn.dat' u 2:(12 - column(3) * 10):1 notitle w lines, \
+    'pm3dColumn.dat' u (-12 + column(3) * 10):2:1:(-12 + column(3) * 10) notitle w pm3d, \
+    'pm3dColumn.dat' u 1:2:(column(3) * 10 - 12) notitle w pm3d
+
+      # 'pm3dColumn.dat' u (1 - column(3)):2:1 notitle w pm3d
 
 pause -1 "Hit return to finish"
