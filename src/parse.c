@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.4 1999/06/11 11:18:56 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.5 1999/06/11 18:54:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -36,7 +36,6 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.4 1999/06/11 11:18:56 lhec
 
 #include <signal.h>
 #include "plot.h"
-#include "command.h"
 #include "help.h"
 #include <setjmp.h>
 

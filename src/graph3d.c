@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.6 1999/06/11 11:18:54 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.7 1999/06/11 18:53:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -78,6 +78,7 @@ int hidden_no_update;		/* HBB 980324: made this visible despite LITE */
 int hidden_line_type_above, hidden_line_type_below;
 #endif /* LITE */
 
+double xscale3d, yscale3d, zscale3d;
 
 static double LogScale __PROTO((double coord, TBOOLEAN is_log,
 				double log_base_log, char *what, char *axis));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.3 1999/06/09 12:13:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.4 1999/06/11 11:18:52 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -64,8 +64,6 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.3 1999/06/09 12:13:28 lhe
 #include "plot.h"
 #include "bitmap.h"
 
-/* forward decls */
-
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
 
 bitmap *b_p = (bitmap *) NULL;	/* global pointer to bitmap */
@@ -82,9 +80,8 @@ unsigned int b_vchar;		/* height of characters */
 unsigned int b_vbits;		/* actual bits in char vertically */
 unsigned int b_angle;		/* rotation of text */
 char_box b_font[FNT_CHARS];	/* the current font */
-unsigned int b_pattern[] =
-{0xffff, 0x1111,
- 0xffff, 0x5555, 0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f};
+unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555, 0x3333, 0x7777,
+			     0x3f3f, 0x0f0f, 0x5f5f };
 int b_maskcount = 0;
 unsigned int b_lastx, b_lasty;	/* last pixel set - used by b_line */
 

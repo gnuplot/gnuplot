@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.12 1999/06/11 11:18:56 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.13 1999/06/11 18:53:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -35,7 +35,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.12 1999/06/11 11:18:56 lhec
 ]*/
 
 #include "plot.h"
-#include "command.h"
 #include "setshow.h"
 
 extern int key_vpos, key_hpos, key_just;
@@ -946,7 +945,7 @@ set ticscale %g %g\n",
     fprintf(fp, "set lmargin %d\nset bmargin %d\nset rmargin %d\nset tmargin %d\n",
 	    lmargin, bmargin, rmargin, tmargin);
 
-    fprintf(fp, "set locale \"%s\"\n", cur_locale);
+    fprintf(fp, "set locale \"%s\"\n", get_locale());
 
     fputs("set loadpath ", fp);
     {
