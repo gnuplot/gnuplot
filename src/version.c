@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: version.c,v 1.22 1999/07/30 19:30:49 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: version.c,v 1.23 1999/08/24 11:22:57 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - version.c */
@@ -40,10 +40,6 @@ const char gnuplot_version[] = "3.7";
 const char gnuplot_patchlevel[] = "0.10";
 const char gnuplot_date[] = "Fri Aug 20 19:41:31 BST 1999";
 const char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1999";
-const char more_info[] = "This is a pre-version of gnuplot 4.0.\
-  The syntax for some commands\n\
-\thas changed, please use the provided `gpltconv' tool to convert\n\
-\tyour old scripts.";
 
 const char faq_location[] = FAQ_LOCATION;
 const char bug_email[] = CONTACT;
