@@ -1,3 +1,7 @@
+2002-05-01  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc: Mention PNG supports pm3d.
+
 2002-04-30  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* configure.in: Quoting and cleanup. Should now work with
@@ -410,7 +414,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/04/30 14:08:53 $).
+	last modification date (from the tag $Date: 2002/04/30 19:16:52 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
