@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.49 2002/02/04 11:53:34 lhecking Exp $
+ * $Id: x11.trm,v 1.50 2002/02/12 16:41:17 broeker Exp $
  *
  */
 
@@ -344,10 +344,10 @@ X11_options()
     }
     sprintf(term_options, "%d driver \"%s\"", X11_plot_number, X11_command);
     if (UNSET != do_raise) {
-	strcat(term_options, (yes == do_raise ? ", raise" : ", noraise"));
+	strcat(term_options, (yes == do_raise ? " raise" : " noraise"));
     }
     if (UNSET != persist) {
-	strcat(term_options, (yes == persist ? ", persist" : ", nopersist"));
+	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
     }
 #ifdef USE_MOUSE
     X11_update_opts();
