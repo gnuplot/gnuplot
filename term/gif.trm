@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.18 1999/06/22 11:54:17 lhecking Exp $
+ * $Id: gif.trm,v 1.19 1999/06/25 17:07:54 lhecking Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -84,8 +84,16 @@
  *
  * find out about gd from http://www.boutell.com/gd/
  *
+ * We recommend to use gd library version 1.3 because it uses Run Length
+ * Encoding (RLE) instead of LZW compression.
+ *
  * [Update: as of version 1.3, gd does not use any more UNISYS licensed
  *  code. The gnuplot team may decide to include this version some day.]
+ *
+ * [Further update: as of version 1.6, gd creates png files instead of
+ *  gif. Also, version 1.5 should not be used because of licensing
+ *  problems. More information in the README.1ST file from the source
+ *  distribution.]
  *
  */
 
