@@ -1,9 +1,13 @@
 1999-09-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* src/term.c(test_term): Fix bug where test pattern is drawn before
+	* FAQ: Updated.
+
+	* term.c(test_term): Fix bug where test pattern is drawn before
 	line properties are fully specified. Combined effort by
 	"Jürgen v.Hagen" <vonhagen@ihefiji.etec.uni-karlsruhe.de> and
 	Dick Crawford <crawford@arete.com>.
+
+	* util.c: Fix quoting bug, minor changes (backported from -current).
 
 1999-09-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
