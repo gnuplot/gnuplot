@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.22 1999/10/01 14:54:34 lhecking Exp $
+ * $Id: plot.h,v 1.23 1999/10/21 21:05:00 lhecking Exp $
  *
  */
 
@@ -42,8 +42,8 @@
 # include "config.h"
 #endif
 
+#include "syscfg.h"
 #include "ansichek.h"
-/* syscfg.h is included by stdfn.h */
 #include "stdfn.h"
 
 #define PROGRAM "G N U P L O T"
@@ -785,6 +785,7 @@ extern const char help_email[];
 # endif
 #endif
 
+#if 0
 #include "protos.h"
 #include "command.h"
 #include "datafile.h"
@@ -797,6 +798,7 @@ extern const char help_email[];
 #include "plot3d.h"		/* HBB 990826: new file */
 #include "util.h"
 #include "util3d.h"
+#endif
 
 /* line/point parsing...
  *
