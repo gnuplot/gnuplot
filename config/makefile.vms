@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.7 1999/10/21 21:04:33 lhecking Exp $
+# $Id: makefile.vms,v 1.8 1999/11/08 19:20:59 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -85,6 +85,7 @@ CSOURCE7 = [-.term]post.trm [-.term]qms.trm [-.term]regis.trm [-.term]sun.trm \
 CSOURCE8 = contour.c specfun.c interpol.c vms.c dynarray.c
 
 all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb
+	@       ! a no-op to suppress a MMS warning
 
 gnuplot.$(X) : $(OBJS) $(EXTRAOBJ)
 	link /exe=gnuplot.$(X) vms.$(O),gnuplot.opt/opt$(EXTRAOBJ)$(EXTRALIB)$(CRTL_SHARE)
@@ -103,17 +104,31 @@ gplt_x11.o : gplt_x11.c
 bf_test.$(X) : bf_test.$(O) binary.$(O) alloc.$(O)
 	link /exe=bf_test.exe bf_test.$(O),binary.$(O),alloc.$(O)
 
+gnuplot.hlb : gnuplot.hlp
+	library/create/help gnuplot.hlb gnuplot.hlp
+
+.IFDEF OLD_HLP
 gnuplot.hlp : doc2hlp.$(X) [-.docs]gnuplot.doc
 	define/user sys$input [-.docs]gnuplot.doc
 	define/user sys$output []gnuplot.hlp
 	run doc2hlp
 
-gnuplot.hlb : gnuplot.hlp
-	library/create/help gnuplot.hlb gnuplot.hlp
-
 doc2hlp.$(X) : [-.docs]doc2hlp.c [-.docs]termdoc.c
 	$(CC) /include=([-.docs],[],[-.term]) [-.docs]doc2hlp.c,[-.docs]termdoc.c
 	link /exe=doc2hlp.$(X) doc2hlp,termdoc$(CRTL_SHARE)
+.ELSE
+gnuplot.hlp : [-.docs]gnuplot.rnh
+	RUNOFF $< /OUTPUT=$@
+
+[-.docs]gnuplot.rnh : [-.docs]doc2rnh.$(X) [-.docs]gnuplot.doc
+	MCR $< [-.docs]gnuplot.doc $@
+
+[-.docs]doc2rnh.$(X) : [-.docs]doc2rnh.$(O) [-.docs]termdoc.$(O)
+	link /exe=$@  $+ $(CRTL_SHARE)
+
+[-.docs]doc2rnh.$(O) [-.docs]termdoc.$(O) : [-.docs]termdoc.c ![-.docs]allterm.h
+	$(CC) /OBJ=$@ $(CFLAGS) /INCLUDE=([],[.TERM]) $*.c
+.ENDIF
 
 term.$(O) : term.h term.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) $(CFLAGS) $(TERMFLAGS) term.c /object=term.$(O)
