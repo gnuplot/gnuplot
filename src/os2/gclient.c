@@ -1,5 +1,5 @@
 #ifdef INCRCSDATA
-static char RCSid[]="$Id: gclient.c,v 1.16 2002/02/15 20:17:35 amai Exp $" ;
+static char RCSid[]="$Id: gclient.c,v 1.17 2002/03/18 18:19:10 broeker Exp $" ;
 #endif
 
 /****************************************************************************
@@ -52,7 +52,7 @@ static char RCSid[]="$Id: gclient.c,v 1.16 2002/02/15 20:17:35 amai Exp $" ;
  *
  * CONTRIBUTIONS:
  *
- *   Petr Mikulik  (see  //PM  labels)
+ *   Petr Mikulik  (see PM labels)
  *       - menu item to keep aspect ratio on/off (October 1997)
  *       - mouse support (1998, 1999); changes made after gnuplot 3.7.0.5:
  *	    - use gnuplot's pid in the name of shared memory (11. 5. 1999) 
@@ -66,7 +66,7 @@ static char RCSid[]="$Id: gclient.c,v 1.16 2002/02/15 20:17:35 amai Exp $" ;
  *	      (October 1999 - January 2000)
  *      - pm3d stuff (since January 1999)
  *
- *   Franz Bakan  (see  //fraba  labels)
+ *   Franz Bakan
  *       - communication gnupmdrv -> gnuplot via shared memory (April 1999)
  *       - date and time on x axis (August 1999)
  *
@@ -110,7 +110,7 @@ static char RCSid[]="$Id: gclient.c,v 1.16 2002/02/15 20:17:35 amai Exp $" ;
 #include "gnupmdrv.h"
 
 #define GNUPMDRV
-#include "mousecmn.h"
+#include "../mousecmn.h"
 
 
 /*==== g l o b a l    d a t a ================================================*/
@@ -322,7 +322,7 @@ static void      LMove( HPS hps, POINTL *p ) ;
 static void      LLine( HPS hps, POINTL *p ) ;
 static void      LType( int iType ) ;
 
-/* //PM: new functions related to the mouse processing */
+/* Functions related to the mouse processing */
 static void	TextToClipboard ( PCSZ );
 static void     GetMousePosViewport ( HWND hWnd, int *mx, int *my );
 static void     MousePosToViewport ( int *x, int *y, SHORT mx, SHORT my );
@@ -361,9 +361,9 @@ static int drop_cookie = 0;
 /* Finally, include the common mousing declarations and routines: */
 #define GNUPMDRV
   /* let mousing.c know whether called from gclient.c or gplt_x11.c */
-#include "gpexecute.h"
+#include "../gpexecute.h"
 
-/* PM: end of new functions related to the mouse processing */
+/* End of new functions related to the mouse processing */
 
 /*==== c o d e ===============================================================*/
 
@@ -627,10 +627,10 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 	    ChangeCheck( hWnd, IDM_LINES_SOLID, bLineTypes?0:IDM_LINES_SOLID ) ;
 	    ChangeCheck( hWnd, IDM_COLOURS, bColours?IDM_COLOURS:0 ) ;
 	    ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
-	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ; /*PM */
-	    ChangeCheck( hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0 ) ;    /*PM */
+	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ;
+	    ChangeCheck( hWnd, IDM_USEMOUSE, useMouse?IDM_USEMOUSE:0 ) ;
 #if 0
-	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, mousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;    /*PM */
+	    ChangeCheck( hWnd, IDM_MOUSE_POLAR_DISTANCE, mousePolarDistance?IDM_MOUSE_POLAR_DISTANCE:0 ) ;
 #endif
 		/* disable close from system menu (close only from gnuplot) */
             hApp = WinQueryWindow( hWnd, QW_PARENT ) ; /* temporary assignment.. */
@@ -662,8 +662,8 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 
         case WM_GPSTART:
 
-		/*PM: show the Mouse menu if connected to mouseable PM terminal */
-	   if (1 || mouseTerminal) /*PM workaround for a bug---SEE "BUGS 2" IN README!!! */
+		/* Show the Mouse menu if connected to mouseable PM terminal */
+	   if (1 || mouseTerminal) /* PM: workaround for a bug---SEE "BUGS 2" IN README!!! */
 /*	   if (mouseTerminal) */
 	     WinEnableMenuItem(
 	       WinWindowFromID( WinQueryWindow( hApp, QW_PARENT ), FID_MENU ),
@@ -833,22 +833,22 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 	    if (( ulCount > 0 ) && (tid != tidDraw)) {
 		/* simple repaint while building plot or metafile */
 		/* use temporary PS                   */
-	      lock_mouse = 1; /*PM (will this help against occassional gnupmdrv crashes?) */
+	      lock_mouse = 1; /* PM: this may help against gnupmdrv crashes */
 	      hps_tmp = WinBeginPaint(hWnd,0,&rectl_tmp );
 	      WinFillRect(hps_tmp,&rectl_tmp,CLR_BACKGROUND);
 	      WinEndPaint(hps_tmp);
 		/* add dirty rectangle to saved rectangle     */
 		/* to be repainted when PS is available again */
 	      WinUnionRect(hab,&rectlPaint,&rectl_tmp,&rectlPaint);
-	      lock_mouse = 0; /*PM */
+	      lock_mouse = 0;
 		iPaintCount ++ ;
 		break ;
 		}
-	    lock_mouse = 1; /*PM */
+	    lock_mouse = 1;
 	    WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
 	    DoPaint( hWnd, hpsScreen ) ;
 	    WinSetRectEmpty( hab, &rectlPaint ) ;
-	    lock_mouse = 0; /*PM */
+	    lock_mouse = 0;
 	    }
 	    break ;
 
@@ -889,7 +889,7 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 
 	case WM_GNUPLOT:
 		/* display the plot */
-	    lock_mouse = 1; /*PM */
+	    lock_mouse = 1;
 	    if( bPopFront ) {
 		SWP swp; /* pop to front only if the window is not minimized */
 		if (  (WinQueryWindowPos( hwndFrame, (PSWP)&swp) == TRUE)
@@ -900,7 +900,7 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 		WinInvalidateRect( hWnd, &rectlPaint, TRUE ) ;
 		iPaintCount = 0 ;
 		}
-	    lock_mouse = 0; /*PM */
+	    lock_mouse = 0;
 	    return 0L ;
 
 	case WM_PAUSEPLOT:
@@ -934,7 +934,7 @@ MRESULT EXPENTRY DisplayClientWndProc(HWND hWnd, ULONG message, MPARAM mp1, MPAR
 	    DosPostEventSem( semPause ) ;
 	    return 0L ;
 
-/* /*PM: new event handles for mouse processing */ */
+/* New event handles for mouse processing */
 
 #if 0 /* already defined */
 case WM_MOUSEMOVE:
@@ -954,8 +954,8 @@ case WM_BUTTON1DBLCLK:
   Note:
   Another solution of getting mouse position (available at any
   method, not just in this handle event) is the following one:
-  ok = WinQueryPointerPos(HWND_DESKTOP, &pt); /* pt contains pos wrt desktop */
-  WinMapWindowPoints(HWND_DESKTOP, hWnd, &pt, 1); /* pt contains pos wrt our hwnd window */
+  ok = WinQueryPointerPos(HWND_DESKTOP, &pt); // pt contains pos wrt desktop
+  WinMapWindowPoints(HWND_DESKTOP, hWnd, &pt, 1); // pt contains pos wrt our hwnd window
   sprintf(s,"[%li,%li]",pt.x,pt.y);
   */
 
@@ -1008,7 +1008,7 @@ case WM_BUTTON3UP: /* WM_BUTTON3DBLCLK: */
   }
   return 0L; /* end of case WM_BUTTON3... */
 
-  /*PM: end of new event handles for mouse processing */
+  /* End of new event handles for mouse processing */
 
 #if 0
        case WM_PRESPARAMCHANGED:
@@ -1133,7 +1133,7 @@ GetMousePosViewport(hWnd,&mx,&my);
             ChangeCheck( hWnd, IDM_FRONT, bPopFront?IDM_FRONT:0 ) ;
             break ;
 
-        case IDM_KEEPRATIO: /*PM */
+        case IDM_KEEPRATIO:
 		/* toggle keep aspect ratio */
 	    bKeepRatio = !bKeepRatio ;
 	    ChangeCheck( hWnd, IDM_KEEPRATIO, bKeepRatio?IDM_KEEPRATIO:0 ) ;
@@ -1232,7 +1232,7 @@ GetMousePosViewport(hWnd,&mx,&my);
             return 0L ;
 
 
-	/*PM Now new mousing stuff: */
+	/* Now new mousing stuff: */
 
 	case IDM_USEMOUSE: /* toggle using/not using mouse cursor tracking */
 	    useMouse = !useMouse ;
@@ -1577,11 +1577,11 @@ BOOL QueryIni( HAB hab )
         lCharWidth = 217 ;
         lCharHeight = 465 ;
         }
-    ulCB = sizeof( bKeepRatio ) ; /*PM --- keep ratio */
+    ulCB = sizeof( bKeepRatio ) ;
     bData = PrfQueryProfileData( hini, APP_NAME, INIKEEPRATIO, &ulOpts, &ulCB ) ;
     if( bData ) bKeepRatio = (BOOL)ulOpts[0] ;
-    /*PM Mousing: */
-    /* ignore reading "Use mouse" --- no good idea to have mouse on by default.
+    /* Mousing: */
+    /* Ignore reading "Use mouse" --- no good idea to have mouse on by default.
        Maybe it was the reason of some crashes (mouse init before draw).
     ulCB = sizeof( useMouse ) ;
     bData = PrfQueryProfileData( hini, APP_NAME, INIUSEMOUSE, &ulOpts, &ulCB ) ;
@@ -1654,9 +1654,9 @@ static void SaveIni( HWND hWnd )
         ulOpts[0] = (ULONG)lCharWidth ;
         ulOpts[1] = (ULONG)lCharHeight ;
         PrfWriteProfileData( hini, APP_NAME, INICHAR, &ulOpts, sizeof(ulOpts) ) ;
-	PrfWriteProfileData( hini, APP_NAME, INIKEEPRATIO, &bKeepRatio, sizeof(bKeepRatio) ) ; /*PM */
-	/*PM mouse stuff */
-	/* ignore reading "Use mouse" --- no good idea to have mouse on by default.
+	PrfWriteProfileData( hini, APP_NAME, INIKEEPRATIO, &bKeepRatio, sizeof(bKeepRatio) ) ;
+	/* Mouse stuff */
+	/* Ignore reading "Use mouse" --- no good idea to have mouse on by default.
 	   Maybe it was the reason of some crashes (mouse init before draw).
 	PrfWriteProfileData( hini, APP_NAME, INIUSEMOUSE, &useMouse, sizeof(useMouse) ) ;
 	*/
@@ -1720,7 +1720,7 @@ static void ThreadDraw( void* arg )
     GpiSetStopDraw( hpsScreen, SDW_OFF ) ;
     GpiSetDrawingMode( hpsScreen, DM_DRAW ) ;
     GpiDrawChain( hpsScreen ) ;
-    DrawRuler(); /*PM */
+    DrawRuler();
     DisplayStatusLine(hpsScreen);
     WinEndPaint( hpsScreen ) ;
     DosReleaseMutexSem( semHpsAccess ) ;
@@ -1744,11 +1744,11 @@ HPS InitScreenPS()
 #if 0 /* Use default background color (the original version) */
     GpiErase(hpsScreen);
     WinQueryWindowRect( hApp, (PRECTL)&rectClient ) ;
-#else /*PM 14.3.2000: Use always white background */
+#else /* PM 14.3.2000: Use always white background */
     WinQueryWindowRect( hApp, (PRECTL)&rectClient ) ;
     WinFillRect(hpsScreen,&rectClient,CLR_WHITE);
 #endif
-    if (bKeepRatio) /*PM */
+    if (bKeepRatio)
     {
     double ratio = 1.560 ;
     double xs = rectClient.xRight - rectClient.xLeft ;
@@ -1760,8 +1760,8 @@ HPS InitScreenPS()
         rectClient.xRight = rectClient.xLeft + (int)(ys*ratio) ;
         }
     }
-    else rectClient.xRight -= 10; /*PM */
-	/* /*PM: why this -10? Otherwise the right axis is too close to */
+    else rectClient.xRight -= 10;
+	/* PM: why this -10? Otherwise the right axis is too close to
 	 the right border. However, this -10 should be taken into account 
 	 for mousing! Or can it be inside a transformation?
 	 */
@@ -2101,9 +2101,9 @@ server:
             usErr=BufRead(hRead,buff, 1, &cbR) ;
             if( usErr != 0 ) break ;
  
-	    if (breakDrawing) { /*PM: drawing has been stopped (by Ctrl-C)... */
-		hps = 0;	/*    ...thus drawings go to nowhere... */
-		if (*buff == 'E') { /*...unless 'plot finished' command */
+	    if (breakDrawing) { /* PM: drawing has been stopped (by Ctrl-C)... */
+		hps = 0;	/*     ...thus drawings go to nowhere... */
+		if (*buff == 'E') { /* ...unless 'plot finished' command */
 		    POINTL p;
 		    hps = hpsScreen;  /* drawings back to screen */
 		    breakDrawing = 0;
@@ -2148,7 +2148,7 @@ server:
 		    break ;
 
 		case 'Q' :     /* query terminal info */
-		    /*PM mouseable gnupmdrv sends greetings to mouseable PM terminal */
+		    /* mouseable gnupmdrv sends greetings to mouseable PM terminal */
 		    if (mouseTerminal) {
 		      int i=0xABCD;
 		      DosWrite( hRead, &i, sizeof(int), &cbR ) ;
@@ -2164,7 +2164,7 @@ server:
                         bPath = FALSE ;
                         }
                     GpiCloseSegment( hps ) ;
-		    DrawRuler(); /*PM */
+		    DrawRuler();
 		    DisplayStatusLine(hps);
 /*                    DosPostEventSem( semDrawDone ) ; */
                     DosReleaseMutexSem( semHpsAccess ) ;
@@ -2610,7 +2610,7 @@ GpiCreatePalette?
 		    GpiSetColor( hps, curr_color);
 		    }
 		    break ;
-#endif /*PM3D */
+#endif /* PM3D */
 
 		case 'u' : {  /* set_ruler(int x, int y) term API: x<0 switches ruler off */
 		    int x, y;
@@ -2692,7 +2692,7 @@ GpiCreatePalette?
 		    break ;
 
 		case 'm' :
-		    /*PM notification of being connected to a mouse-enabled terminal */
+		    /* notification of being connected to a mouse-enabled terminal */
 		    mouseTerminal = 1;
 		    break ;
 
@@ -2808,7 +2808,7 @@ int GetNewFont( HWND hwnd, HPS hps )
  
         pfdFontdlg.cbSize = sizeof(FONTDLG);
         pfdFontdlg.hpsScreen = hps;
- /*   szFamilyname[0] = 0;*/
+ /*   szFamilyname[0] = 0; */
         pfdFontdlg.pszFamilyname = szFamilyname;
         pfdFontdlg.usFamilyBufLen = FACESIZE;
         pfdFontdlg.fl = FNTS_HELPBUTTON | 
@@ -2816,7 +2816,7 @@ int GetNewFont( HWND hwnd, HPS hps )
                         FNTS_OWNERDRAWPREVIEW ; 
         pfdFontdlg.clrFore = CLR_BLACK;
         pfdFontdlg.clrBack = CLR_WHITE;
-        pfdFontdlg.usWeight = FWEIGHT_NORMAL ; /*5 ; */
+        pfdFontdlg.usWeight = FWEIGHT_NORMAL ;
         pfdFontdlg.fAttrs.usCodePage = codepage;
         pfdFontdlg.fAttrs.usRecordLength = sizeof(FATTRS) ;
         }
@@ -3285,7 +3285,7 @@ void LType( int iType )
     }
 
 
-/*PM Now routines for mouse etc. */
+/* Now routines for mouse etc. */
 
 static void TextToClipboard ( PCSZ szTextIn )
 {
