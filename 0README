@@ -39,7 +39,7 @@ Copyright and Porting
 
  See the Copyright file for copyright conditions.
 
- See the History file for changes to GNUPLOT.
+ See the ChangeLog and docs/old/History.old file for changes to GNUPLOT.
 
  Compilation instructions are in the 0INSTALL file. Porting instructions
 are in the 0PORTING file. Compile and testing problems are also in
@@ -62,6 +62,7 @@ of GNUPLOT:
  o DEC AXP 600, A1000A, 3000 (DEC Unix 3.2 4.0, Windows NT 4.0 MSVC++ 4.0)
  o IBM PC and compatibles (MS-DOS 3.3/5.0 BC++3.1/TC++ 1.0 MSC 7.0 DJGPP,
    OS/2 2.x, Linux 2.x SVGA X11/XFree86, Windows NT 4.0)
+ o IBM AIX 4.x
  o CBM Amiga (AmigaOS 1.3, 2.x and 3.x, SAS/C 6.2 and better, Aztec C
    beta 5.2a, gcc; Linux 2.x, NetBSD-1.3.x)
  o IRIS 4D/70G and 4D/25G with MIPS C
@@ -186,7 +187,7 @@ Date: Fri Aug 27 05:21:33 GMT 1993
 Version: 3.5
 
 In general, GNUPLOT 3.5 is available as the file gnuplot3.5.tar.Z.
-There will patches to bring 3.4 to 3.5 as well called gp34to35.shar.Z.
+There will be patches to bring 3.4 to 3.5 as well called gp34to35.shar.Z.
 (Version 3.3 was skipped because of possible confusion
 with the numerous BETA releases.)  It will be made available to simtel20 
 and its mirrors in ZIP format, along with a DOS, MS-Windows 3.1 and

@@ -600,16 +600,17 @@ and rerun configure, or, edit config.h and change
    Note that changing such defines at compile time, eg. via
 'make DEFS=-DHAVE_MEMSET' is wrong, because the DEFS variable in Makefile
 may contain other defines (make DEFS='-DHAVE_CONFIG_H -DHAVE_MEMSET'
-may work, though).
+should work, though).
 
  - HP-UX 9.x
-   It is recommended to use gcc, although the native compiler may
+   It is recommended to use gcc, although the native compiler cc may
   work with warnings.
 
  - HP-UX 10.x
    It is recommended to use the native compiler cc, as problems
-  have been reported when using gcc. This will be looked at in the
-  near future.
+  have been reported when using gcc. In the cases reported, we have
+  yet to establish whether the compiler is at fault, or the compiler
+  setup/configuration is broken.
 
  - IRIX 6.x
    If you want to use the png terminal, you must install your own
@@ -620,10 +621,18 @@ may work, though).
  - MS-DOS
    If ports of common Unix utilities (bash, sed etc) are available,
   gnuplot can be built with DJGPP. Install instructions are the same
-  as under Unix (with configure).
+  as for Unix (with configure).
 
- - SunOS 4.x/System V.2/Ultrix 4.x/M88 SysV.3
-   An ANSI/ISO C compiler is reqiured to compile gnuplot. It is
+ - SunOS 4.x
+   An ANSI/ISO C compiler should be used to compile gnuplot. It is
+  recommended to install gcc. If this is not an option, the system
+  compiler cc can be made to work with Wietse Venema's unproto tool.
+  See entry below for instructions.
+
+  As of 1998-11-18, gnuplot compiles again with the native compiler cc.
+
+ - System V.2/Ultrix 4.x/M88 SysV.3
+   An ANSI/ISO C compiler should be used to compile gnuplot. It is
   recommended to install gcc. If this is not an option, the system
   compiler cc can be made to work with Wietse Venema's unproto tool.
 
@@ -636,17 +645,19 @@ may work, though).
   (Bourne shell syntax)
 
   $ cd gnuplot
-  $ CC='cc -Qpath /full/path/to/unproto/dir' ./configure <options>
+  $ CC='cc -B/full/path/to/unproto/dir/ -tp' ./configure <options>
 
   or (C shell syntax)
 
   prompt (41) cd gnuplot
-  prompt (42) setenv CC 'cc -Qpath /full/path/to/unproto/dir''
+  prompt (42) setenv CC 'cc -B/full/path/to/unproto/dir/ -tp'
   prompt (43) ./configure <options>
 
-  The `-Qpath path' option shown here is for SunOS 4.x. For other
-  platforms, check the unproto documentation. `/full/path/to/unproto/dir'
-  is the full path name of the directory where unproto is installed.
+  The required compiler options shown here are for System V.2.  For other
+  platforms, consult the unproto documentation. `/full/path/to/unproto/dir'
+  is the full path name of the directory where unproto is installed. It is
+  not necessary to "install" unproto, one can just create a subdirectory
+  in gnuplot's source directory and use it from there.
  
 How to test gnuplot
 ===================
@@ -656,7 +667,7 @@ to date. However, the supplied demo files provide a good method of
 testing commonly used features. All command line examples below assume
 Unix Bourne shell syntax.
 
-   The demo files can be run by eg.
+   The demo files can be run interactively by eg.
 
 $ cd gnuplot/demo
 $ ../gnuplot simple.dem
