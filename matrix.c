@@ -41,7 +41,7 @@ static char *RCSid = "$Id: matrix.c,v 1.15 1998/04/14 00:16:01 drd Exp $";
     internal prototypes
 *****************************************************************/
 
-static GP_INLINE int fsign(double x);
+static GP_INLINE int fsign __PROTO((double x));
 
 /*****************************************************************
     first straightforward vector and matrix allocation functions
