@@ -4173,6 +4173,7 @@ tic_callback callback;		/* fn to call to actually do the work */
 	double lmin = min_array[axis], lmax = max_array[axis];
 	double internal_min, internal_max;	/* to allow for rounding errors */
 	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
+	int anyticput = 0;      /* for detection of infinite loop */
 
 	/* gprintf uses log10() of base - log_base_array is log() */
 	double log_base = log_array[axis] ? log10(base_array[axis]) : 1.0;
@@ -4302,6 +4303,15 @@ tic_callback callback;		/* fn to call to actually do the work */
 	/*}}} */
 
 	for (tic = start; tic <= end; tic += step) {
+	    if (anyticput == 2)		/* See below... */
+		break;
+	    if (anyticput && (fabs(tic - start) < DBL_EPSILON)) {
+		/* step is too small.. */
+		anyticput = 2;			/* Don't try again. */
+		tic = end;			/* Put end tic. */
+	    } else
+		anyticput = 1;
+
 	    /*{{{  calc internal and user co-ords */
 	    if (!log_array[axis]) {
 		internal = datatype[axis] == TIME ? time_tic_just(timelevel[axis], tic) : tic;
