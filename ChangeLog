@@ -1,3 +1,39 @@
+1999-03-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/be.trm: Convert tabs to spaces in help text.
+
+1999-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pslatex.trm(PSLATEX_init): Fix off by one error when
+	copying string.
+
+1999-03-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* acconfig.h, configure.in: Remove --enable-system-time from configure
+	and related files.
+
+	* config.hin, configure: Regenerated.
+
+	* time.c: Indentation.
+
+1999-03-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* amiga.c, command.c, fit.c, gplt_x11.c, readline.c, set.c, term.c,
+	vms.c, term/linux.trm: Replace strcmp() and strncmp() with STREQ()
+	and STREQN() macros, respectively.
+
+	* help.c: Test for DOS16 instead of MSDOS.
+
+	* term/latex.trm: Indentation.
+
+1999-03-02  Alois Steindl  <asteindl@mch2ws2.tuwien.ac.at>
+
+	* graphics.c(boundary): Fix problem with negative aspect ratio.
+
+	* term.c(init_term): Fix NEXT initialisation.
+
+	* term/next.trm: Remove erroneous whitespace.
+
 1999-03-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* config.hin, configure: Regenerated.
