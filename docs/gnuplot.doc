@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.165 2003/03/13 14:47:54 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.166 2003/03/14 18:01:14 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -5826,8 +5826,8 @@ C ... and restart the table:
  the colored surface outside the range of the input data points, the 'c<j>'
  coloring options will result in pixels along two edges of the grid not
  contributing to the color of any quadrangle.  For example, applying the pm3d
- algorithm to the 4x4 grid of data points in demo script pm3d.dem produces only
- (4-1)x(4-1)=9 colored rectangles.
+ algorithm to the 4x4 grid of data points in script `demo/pm3d.dem` (please have
+ a look) produces only (4-1)x(4-1)=9 colored rectangles.
 
  Another drawing algorithm, which would draw qudrangles around a given node
  by taking corners from averaged (x,y)-coordinates of its surrounding 4 nodes
@@ -5894,7 +5894,8 @@ C ... and restart the table:
        set pm3d at s
        splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
 
- See also `set palette`, `set cbrange`, `set colorbox`, `help x11 pm3d`.
+ See also `set palette`, `set cbrange`, `set colorbox`, `help x11 pm3d`
+ and definitely `demo/pm3d.dem`.
 
 3 palette
 ?commands set palette

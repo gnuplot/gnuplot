@@ -1,5 +1,12 @@
 2003-03-22  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* docs/gnuplot.doc: Pronounce looking at demo/pm3d.dem.
+
+	* demo/pm3d.dem: In demo of corners2color, transpose positions of
+	'c2' and 'c3'.
+
+2003-03-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* term/post.trm(PS_filled_polygon): Don't call PS_FLUSH_PATH but reset
 	ps_path_count instead (flush is automatic). Fixes broken pm3d map
 	layout (required by pm3dConvert*.awk scripts) due to "stroke\n" in
