@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.5 1999/10/01 14:54:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.6 1999/10/29 18:47:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -42,9 +42,10 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.5 1999/10/01 14:54:36 lh
  *
  */
 
-#include "plot.h"
-#include "internal.h"
 #include "specfun.h"
+
+#include "internal.h"
+#include "setshow.h"	
 #include "util.h"
 
 #define ITMAX   200
@@ -366,7 +367,7 @@ f_rand()
 
 #endif /* BADRAND */
 
-/** ibeta.c
+/* ** ibeta.c
  *
  *   DESCRIB   Approximate the incomplete beta function Ix(a, b).
  *
@@ -467,7 +468,7 @@ double a, b, x;
     return -1.0;
 }
 
-/** igamma.c
+/* ** igamma.c
  *
  *   DESCRIB   Approximate the incomplete gamma function P(a, x).
  *

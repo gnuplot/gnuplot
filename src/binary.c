@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.6 1999/06/22 12:03:47 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.7 1999/10/29 18:50:03 lhecking Exp $"); }
 #endif
 
 /*
@@ -22,9 +22,9 @@ static char *RCSid() { return RCSid("$Id: binary.c,v 1.6 1999/06/22 12:03:47 lhe
  *
  */
 
-#include "plot.h"		/* We have to get TRUE and FALSE */
-#include "alloc.h"
 #include "binary.h"
+
+#include "alloc.h"
 #include "util.h"
 
 /* 

@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: interpol.h,v 1.1 1999/10/01 14:04:19 lhecking Exp $
  *
  */
 
@@ -39,6 +39,8 @@
 # define GNUPLOT_INTERPOL_H
 
 /* #if... / #include / #define collection: */
+
+#include "plot.h"
 
 /* Type definitions */
 

@@ -40,7 +40,8 @@
 
 /* #if... / #include / #define collection: */
 
-/* HBB 990826: moved this here, from plot.h */
+#include "plot.h"
+
 #define STACK_DEPTH 100		/* maximum size of the execution stack */
 
 /* Variables of internal.c needed by other modules: */

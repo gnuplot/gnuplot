@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.2 1999/06/17 14:16:44 lhecking Exp $
+ * $Id: util.h,v 1.3 1999/06/19 20:52:08 lhecking Exp $
  *
  */
 
@@ -37,6 +37,8 @@
 
 #ifndef GNUPLOT_UTIL_H
 # define GNUPLOT_UTIL_H
+
+#include "plot.h"
 
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.6 1999/10/01 14:54:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.7 1999/10/29 18:47:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -34,11 +34,11 @@ static char *RCSid() { return RCSid("$Id: standard.c,v 1.6 1999/10/01 14:54:36 l
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot.h"
+#include "standard.h"
+
 #include "gp_time.h"
 #include "internal.h"
 #include "setshow.h"
-#include "standard.h"
 #include "util.h"
 
 

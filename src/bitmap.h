@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.5 1999/10/01 14:50:07 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.6 1999/10/29 18:49:23 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -34,6 +34,8 @@
 
 #ifndef GNUPLOT_BITMAP_H
 # define GNUPLOT_BITMAP_H
+
+#include "plot.h"
 
 /* allow up to 16 bit width for character array */
 typedef unsigned int char_row;
@@ -74,7 +76,6 @@ extern unsigned int b_rastermode;		/* raster mode rotates -90deg */
 extern unsigned int b_linemask;			/* 16 bit mask for dotted lines */
 extern unsigned int b_angle;			/* rotation of text */
 extern int b_maskcount;
-extern unsigned int b_lastx;	/* last pixel set - used by b_line */
 
 /* RGB colour table moved out of gif.trm */
 /*

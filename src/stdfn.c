@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.5 1999/06/19 20:55:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.6 1999/10/01 14:54:36 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - stdfn.c */
@@ -41,7 +41,7 @@ static char *RCSid() { return RCSid("$Id: stdfn.c,v 1.5 1999/06/19 20:55:05 lhec
  * - Lars Hecking
  */
 
-#include "plot.h"
+#include "stdfn.h"
 
 /*
  * ANSI C functions

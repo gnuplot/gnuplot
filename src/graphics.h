@@ -1,4 +1,4 @@
-/* $Id: graphics.h,v 1.7 1999/10/01 14:54:32 lhecking Exp $ */
+/* $Id: graphics.h,v 1.8 1999/10/17 19:11:55 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -35,6 +35,8 @@
 #ifndef GNUPLOT_GRAPHICS_H
 # define GNUPLOT_GRAPHICS_H
 
+#include "plot.h"
+
 /* Collect all global vars in one file.
  * HBB 990829: *Don't!* 
  * The comment below holds ... Lars
@@ -53,19 +55,6 @@ extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
 extern double base_array[AXIS_ARRAY_SIZE];
 extern double log_base_array[AXIS_ARRAY_SIZE];
 extern char   default_font[];	/* Entry font added by DJL */
-
-/* for convenience while converting to use these arrays */
-#define x_min3d min_array[FIRST_X_AXIS]
-#define x_max3d max_array[FIRST_X_AXIS]
-#define y_min3d min_array[FIRST_Y_AXIS]
-#define y_max3d max_array[FIRST_Y_AXIS]
-#define z_min3d min_array[FIRST_Z_AXIS]
-#define z_max3d max_array[FIRST_Z_AXIS]
-
-/* format for date/time for reading time in datafile */
-extern char timefmt[];
-extern int datatype[];
-
 
 /* From ESR's "Actual code patch" :) */
 /* An exclusion box.  

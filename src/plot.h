@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.23 1999/10/21 21:05:00 lhecking Exp $
+ * $Id: plot.h,v 1.24 1999/10/29 18:52:01 lhecking Exp $
  *
  */
 
@@ -690,11 +690,11 @@ struct ticdef {
 #define TIC_MONTH    4		/* print out month names ((mo-1[B)%12)+1 */
 #define TIC_DAY      5			/* print out day of week */
     union {
+	   struct ticmark *user;	/* for TIC_USER */
 	   struct {			/* for TIC_SERIES */
 		  double start, incr;
 		  double end;		/* ymax, if VERYLARGE */
 	   } series;
-	   struct ticmark *user;	/* for TIC_USER */
     } def;
 };
 
@@ -726,7 +726,6 @@ extern char *replot_line;
 extern struct lexical_unit *token;
 extern int token_table_size;
 extern int inline_num;
-extern TBOOLEAN interactive;
 extern const char *user_shell;
 #if defined(ATARI) || defined(MTOS)
 extern const char *user_gnuplotpath;
@@ -786,16 +785,15 @@ extern const char help_email[];
 #endif
 
 #if 0
-#include "protos.h"
 #include "command.h"
 #include "datafile.h"
 #include "graphics.h"
-#include "graph3d.h"		/* HBB 990826: new file */
-#include "internal.h"		/* HBB 990826: new file */
-#include "misc.h"		/* HBB 990826: new file */
+#include "graph3d.h"
+#include "internal.h"
+#include "misc.h"
 #include "parse.h"
-#include "plot2d.h"		/* HBB 990826: new file */
-#include "plot3d.h"		/* HBB 990826: new file */
+#include "plot2d.h"
+#include "plot3d.h"
 #include "util.h"
 #include "util3d.h"
 #endif
@@ -824,7 +822,13 @@ extern const char help_email[];
 
 /* Prototypes of functions exported by plot.c */
 
+void bail_to_command_line __PROTO((void));
 void interrupt_setup __PROTO((void));
 void gp_expand_tilde __PROTO((char **));
+
+#ifdef LINUXVGA
+void drop_privilege __PROTO((void));
+void take_privilege __PROTO((void));
+#endif /* LINUXVGA */
 
 #endif /* GNUPLOT_PLOT_H */

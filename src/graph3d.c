@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.16 1999/10/21 21:05:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.17 1999/10/29 18:51:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -50,16 +50,16 @@ static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.16 1999/10/21 21:05:18 l
  *
  */
 
-#include "plot.h"
-#include "alloc.h"
 #include "graph3d.h"
+
+#include "alloc.h"
 #include "graphics.h"
 #include "hidden3d.h"
 #include "misc.h"
 #include "setshow.h"
 #include "term_api.h"
-#include "util.h"
 #include "util3d.h"
+#include "util.h"
 
 static int p_height;
 static int p_width;		/* pointsize * t->h_tic */
@@ -114,7 +114,7 @@ static void boundary3d __PROTO((int scaling, struct surface_points * plots,
 #if 0				/* not used */
 static double dbl_raise __PROTO((double x, int y));
 #endif
-static void map_position __PROTO((struct position * pos, unsigned int *x,
+static void map3d_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 
 /* put entries in the key */
@@ -173,12 +173,6 @@ static int ktitle_lines = 0;
 
 
 /* Boundary and scale factors, in user coordinates */
-/* x_min3d, x_max3d, y_min3d, y_max3d, z_min3d, z_max3d are local to this
- * file and are not the same as variables of the same names in other files
- */
-/*static double x_min3d, x_max3d, y_min3d, y_max3d, z_min3d, z_max3d; */
-/* sizes are now set in min_array[], max_array[] from plot.c */
-/* now in graphics.h */
 
 /* There are several z's to take into account - I hope I get these
  * right !
@@ -270,7 +264,26 @@ unsigned int *xt, *yt;
     *yt = (unsigned int) ((res[1] * yscaler / w) + ymiddle);
 }
 
+/* HBB 991021: moved to here, from hidden3d.c */
+/* Two routines to emulate move/vector sequence using line drawing routine. */
+unsigned int move_pos_x, move_pos_y;
 
+void
+clip_move(x, y)
+unsigned int x, y;
+{
+    move_pos_x = x;
+    move_pos_y = y;
+}
+
+void
+clip_vector(x, y)
+unsigned int x, y;
+{
+    draw_clip_line(move_pos_x, move_pos_y, x, y);
+    move_pos_x = x;
+    move_pos_y = y;
+}
 
 #if 0 /* HBB 990829: unused! --> commented out */
 /* And the functions to map from user 3D space to terminal z coordinate */
@@ -577,7 +590,7 @@ int pcount;			/* count of plots in linked list */
 
 	if (this_label->layer)
 	    continue;
-	map_position(&this_label->place, &x, &y, "label");
+	map3d_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -593,8 +606,8 @@ int pcount;			/* count of plots in linked list */
 
 	if (this_arrow->layer)
 	    continue;
-	map_position(&this_arrow->start, &sx, &sy, "arrow");
-	map_position(&this_arrow->end, &ex, &ey, "arrow");
+	map3d_position(&this_arrow->start, &sx, &sy, "arrow");
+	map3d_position(&this_arrow->end, &ex, &ey, "arrow");
 	term_apply_lp_properties(&(this_arrow->lp_properties));
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
     }
@@ -672,7 +685,7 @@ int pcount;			/* count of plots in linked list */
 	yl_ref = yl - ktitle_lines * (t->v_char);
     }
     if (key == 1) {
-	map_position(&key_user_pos, &xl, &yl, "key");
+	map3d_position(&key_user_pos, &xl, &yl, "key");
     }
     if (key && key_box.l_type > -3) {
 	int yt = yl;
@@ -970,7 +983,7 @@ int pcount;			/* count of plots in linked list */
 
 	if (this_label->layer == 0)
 	    continue;
-	map_position(&this_label->place, &x, &y, "label");
+	map3d_position(&this_label->place, &x, &y, "label");
 	if (this_label->rotate && (*t->text_angle) (1)) {
 	    write_multiline(x, y, this_label->text, this_label->pos, CENTRE, 1, this_label->font);
 	    (*t->text_angle) (0);
@@ -986,8 +999,8 @@ int pcount;			/* count of plots in linked list */
 
 	if (this_arrow->layer == 0)
 	    continue;
-	map_position(&this_arrow->start, &sx, &sy, "arrow");
-	map_position(&this_arrow->end, &ex, &ey, "arrow");
+	map3d_position(&this_arrow->start, &sx, &sy, "arrow");
+	map3d_position(&this_arrow->end, &ex, &ey, "arrow");
 	term_apply_lp_properties(&(this_arrow->lp_properties));
 	(*t->arrow) (sx, sy, ex, ey, this_arrow->head);
     }
@@ -1845,7 +1858,7 @@ struct lp_style_type grid;
 
 
 static void
-map_position(pos, x, y, what)
+map3d_position(pos, x, y, what)
 struct position *pos;
 unsigned int *x, *y;
 const char *what;

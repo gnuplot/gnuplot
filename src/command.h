@@ -1,4 +1,4 @@
-/* $Id: command.h,v 1.11 1999/10/01 14:54:30 lhecking Exp $ */
+/* $Id: command.h,v 1.12 1999/10/29 18:49:23 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -34,6 +34,8 @@
 
 #ifndef GNUPLOT_COMMAND_H
 # define GNUPLOT_COMMAND_H
+
+#include "plot.h"
 
 /* Collect all global vars in one file.
  * The comments may go at a later date,
@@ -123,7 +125,6 @@ int do_line __PROTO((void));
 void done __PROTO((int status));
 #endif
 void define __PROTO((void));
-void bail_to_command_line __PROTO((void));
 
 /**/
 #endif /* GNUPLOT_COMMAND_H */

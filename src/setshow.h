@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.18 1999/08/24 11:23:25 lhecking Exp $
+ * $Id: setshow.h,v 1.19 1999/10/01 14:54:36 lhecking Exp $
  *
  */
 
@@ -99,6 +99,11 @@ extern char			yformat[];
 extern char			zformat[];
 extern char			x2format[];
 extern char			y2format[];
+
+/* format for date/time for reading time in datafile */
+extern char timefmt[];
+extern int datatype[];
+
 /* do these formats look like printf or time ? */
 extern int format_is_numeric[];
 
@@ -226,6 +231,10 @@ extern struct linestyle_def *first_linestyle;
 
 extern int lmargin, bmargin,rmargin,tmargin; /* plot border in characters */
 
+/* HBB 19991108 FIXME: this is way off. There is no setshow.c, and
+ * these functions ought to be prototyped in their own .h files, each!
+ * On a related note, all the status variables don't really belong in
+ * here, I think... */
 /* The set and show commands, in setshow.c */
 void set_command __PROTO((void));
 void unset_command __PROTO((void));

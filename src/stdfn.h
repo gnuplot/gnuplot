@@ -1,5 +1,5 @@
 /*
- * $Id: stdfn.h,v 1.6 1999/10/01 14:54:36 lhecking Exp $
+ * $Id: stdfn.h,v 1.7 1999/10/17 19:13:38 lhecking Exp $
  *
  */
 
@@ -316,6 +316,8 @@ int pclose __PROTO((FILE *));
 # define DEBUG_WHERE     /* nought */
 # define FPRINTF(a)      /* nought */
 #endif /* DEBUG */
+
+#include "plot.h"
 
 /* Prototypes from "stdfn.c" */
 

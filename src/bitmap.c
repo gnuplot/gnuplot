@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.9 1999/10/17 19:10:22 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.10 1999/10/29 18:47:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -61,12 +61,15 @@ static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.9 1999/10/17 19:10:22 lhe
  * Russell Lang, 1990
  */
 
-#include "plot.h"
-#include "alloc.h"
 #include "bitmap.h"
+
+#include "alloc.h"
 #include "util.h"
 
 static void b_putc __PROTO((unsigned int, unsigned int, int, unsigned int));
+static void b_setpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static void b_setmaskpixel __PROTO((unsigned int x, unsigned int y, unsigned int value));
+static void b_line __PROTO((unsigned int x1, unsigned int y1, unsigned int x2, unsigned int y2));
 
 bitmap *b_p = (bitmap *) NULL;	/* global pointer to bitmap */
 static unsigned int b_currx, b_curry; /* the current coordinates */
@@ -85,7 +88,7 @@ static char_box b_font[FNT_CHARS]; /* the current font */
 static unsigned int b_pattern[] = { 0xffff, 0x1111, 0xffff, 0x5555,
 				    0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f };
 int b_maskcount = 0;
-unsigned int b_lastx;
+static unsigned int b_lastx;
 static unsigned int b_lasty;	/* last pixel set - used by b_line */
 
 #define IN(i,size)  ((unsigned)i < (unsigned)size)

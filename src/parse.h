@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: parse.h,v 1.1 1999/07/13 19:54:04 lhecking Exp $
  *
  */
 
@@ -38,6 +38,7 @@
 #ifndef PARSE_H
 # define PARSE_H
 
+#include "plot.h"
 
 enum operators {
     /* keep this in line with table in plot.c */

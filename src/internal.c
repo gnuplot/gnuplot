@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.6 1999/10/01 14:54:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.7 1999/10/29 18:47:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -35,9 +35,9 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.6 1999/10/01 14:54:33 l
 ]*/
 
 
-#include "plot.h"
-#include "eval.h"
 #include "internal.h"
+
+#include "eval.h"
 #include "util.h"
 
 /* some machines have trouble with exp(-x) for large x

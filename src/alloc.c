@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: alloc.c,v 1.7 1999/09/14 15:25:05 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: alloc.c,v 1.8 1999/10/29 18:47:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - alloc.c */
@@ -41,8 +41,11 @@ static char *RCSid() { return RCSid("$Id: alloc.c,v 1.7 1999/09/14 15:25:05 lhec
  *
  */
 
-#include "plot.h"
 #include "alloc.h"
+
+#ifndef NO_GIH
+# include "help.h"
+#endif
 #include "util.h"
 
 #if defined(MSDOS) && defined(__TURBOC__) && !defined(DOSX286)
@@ -56,9 +59,7 @@ static char *RCSid() { return RCSid("$Id: alloc.c,v 1.7 1999/09/14 15:25:05 lhec
 # define farrealloc(p,s) GlobalReAllocPtr(p,s,GHND)
 #endif
 
-#ifndef NO_GIH
-# include "help.h"
-#endif
+
 
 #ifndef GP_FARMALLOC
 # ifdef FARALLOC

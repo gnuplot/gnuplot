@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: scanner.c,v 1.12 1999/10/01 14:54:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: scanner.c,v 1.13 1999/10/29 18:47:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - scanner.c */
@@ -34,10 +34,10 @@ static char *RCSid() { return RCSid("$Id: scanner.c,v 1.12 1999/10/01 14:54:35 l
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot.h"
+#include "scanner.h"
+
 #include "alloc.h"
 #include "command.h"
-#include "scanner.h"
 #include "util.h"
 
 static int get_num __PROTO((char str[]));

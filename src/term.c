@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.18 1999/10/01 14:50:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.19 1999/10/29 18:49:24 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -74,7 +74,8 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.18 1999/10/01 14:50:59 lhec
   *                       is not supported.
   */
 
-#include "plot.h"
+#include "term_api.h"
+
 #include "alloc.h"
 #include "bitmap.h"
 #include "command.h"
@@ -82,9 +83,8 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.18 1999/10/01 14:50:59 lhec
 #include "graphics.h"
 #include "help.h"
 #include "parse.h"
-#include "tables.h"
-#include "term_api.h"
 #include "setshow.h"
+#include "tables.h"
 #include "util.h"
 
 #ifdef _Windows
@@ -139,6 +139,7 @@ static void UNKNOWN_null __PROTO((void));
 static void MOVE_null __PROTO((unsigned int, unsigned int));
 static void LINETYPE_null __PROTO((int));
 static void PUTTEXT_null __PROTO((unsigned int, unsigned int, const char *));
+static int set_font_null __PROTO((const char *s));
 
 
 #ifdef __ZTC__
@@ -842,7 +843,7 @@ const char *s;
 }
 
 
-int
+static int
 set_font_null(s)
 const char *s;
 {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.8 1999/10/01 14:54:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.9 1999/10/29 18:47:19 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -35,16 +35,16 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.8 1999/10/01 14:54:34 lhec
 ]*/
 
 #include <signal.h>
+#include <setjmp.h>
 
-#include "plot.h"
+#include "parse.h"
+
 #include "alloc.h"
 #include "command.h"
 #include "eval.h"
+#include "help.h"
 #include "internal.h"
-#include "parse.h"
 #include "util.h"
-
-#include <setjmp.h>
 
 static RETSIGTYPE fpe __PROTO((int an_int));
 static void extend_at __PROTO((void));

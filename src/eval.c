@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.7 1999/10/01 14:54:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.8 1999/10/29 18:47:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -34,21 +34,20 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.7 1999/10/01 14:54:30 lheck
  * to the extent permitted by applicable law.
 ]*/
 
+#include "eval.h"
 
-#include "plot.h"
 #include "alloc.h"
 #include "datafile.h"
-#include "eval.h"
 #include "internal.h"
 #include "parse.h"
 #include "specfun.h"
 #include "standard.h"
 #include "util.h"
 
-/* HBB 990829: the following was moved here, from plot.c, where is
+/* HBB 990829: the following was moved here, from plot.c, where it
  * wasn't used, anyway... */
 
-struct udvt_entry udv_pi = { NULL, "pi", FALSE };
+struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;

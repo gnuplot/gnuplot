@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.16 1999/10/01 14:54:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.17 1999/10/29 18:50:55 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -58,16 +58,14 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.16 1999/10/01 14:54:30 lheck
  * of parameters.
  */
 
+#include "fit.h"
 
 #include <signal.h>
 
-#include "plot.h"
 #include "alloc.h"
 #include "command.h"
 #include "datafile.h"
 #include "eval.h"
-#include "fit.h"
-#include "graphics.h"
 #include "matrix.h"
 #include "misc.h"
 #include "parse.h"

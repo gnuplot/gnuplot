@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: plot2d.h,v 1.1 1999/10/01 14:04:19 lhecking Exp $
  *
  */
 
@@ -37,6 +37,8 @@
 
 #ifndef GNUPLOT_PLOT2D_H
 # define GNUPLOT_PLOT2D_H
+
+#include "plot.h"
 
 /* Variables of plot2d.c needed by other modules: */
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.28 1999/10/29 18:52:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.29 1999/11/03 16:06:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -40,15 +40,14 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.28 1999/10/29 18:52:30 lhec
  * Added user-specified bases for log scaling.
  */
 
-#include "plot.h"
+#include "setshow.h"
+
 #include "alloc.h"
 #include "command.h"
 #include "eval.h"
 #include "gp_time.h"
-#include "graphics.h"
 #include "hidden3d.h"
 #include "parse.h"
-#include "setshow.h"
 #include "tables.h"
 #include "util.h"
 

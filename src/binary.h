@@ -1,4 +1,4 @@
-/* $Id: binary.h,v 1.2 1999/06/09 12:07:18 lhecking Exp $ */
+/* $Id: binary.h,v 1.3 1999/10/29 18:50:22 lhecking Exp $ */
 
 /* GNUPLOT - binary.h */
 
@@ -34,6 +34,8 @@
 
 #ifndef GNUPLOT_BINARY_H
 # define GNUPLOT_BINARY_H
+
+#include "plot.h"
 
 /* Routines for interfacing with command.c */
 float GPFAR *vector __PROTO(( int nl, int nh));

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.24 1999/10/17 19:12:42 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.25 1999/10/29 18:51:45 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -35,8 +35,10 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.24 1999/10/17 19:12:42 lhec
 ]*/
 
 #include <signal.h>
+#include <setjmp.h>
 
 #include "plot.h"
+
 #include "alloc.h"
 #include "command.h"
 #include "eval.h"
@@ -45,8 +47,6 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.24 1999/10/17 19:12:42 lhec
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
-
-#include <setjmp.h>
 
 #if defined(MSDOS) || defined(DOS386) || defined(__EMX__)
 # include <io.h>
@@ -92,6 +92,7 @@ extern int rl_complete_with_tilde_expansion;
 #  endif
 #  ifndef HISTORY_SIZE
 /* Some more or less arbitrary value :) */
+/* Well, should be bigger than that ... */
 #   define HISTORY_SIZE 42
 #  endif
 /* 
@@ -101,7 +102,7 @@ extern int rl_complete_with_tilde_expansion;
  * Depending on your OS you have to make sure that the "$HOME" environment
  * variable exitsts.  You are responsible for valid values.
  */
-char *expanded_history_filename;
+static char *expanded_history_filename;
 
 static void wrapper_for_write_history __PROTO((void));
 
@@ -826,7 +827,7 @@ wrapper_for_write_history()
     /* Alternative code, saves one disk access */
     if (history_is_stifled())
 	unstifle_history();
-    stifle_history (gnuplot_history_size);
+    stifle_history (HISTORY_SIZE);
 
     if (!write_history(expanded_history_filename))
 	fprintf (stderr, "Warning:  Could not write history file !!!\n");

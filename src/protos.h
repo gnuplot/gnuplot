@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.20 1999/09/24 15:39:47 lhecking Exp $
+ * $Id: protos.h,v 1.21 1999/10/01 14:54:35 lhecking Exp $
  *
  */
 
@@ -56,6 +56,10 @@
  * a bit easier.
  * */
 
+#if 0 
+/* HBB 991021: I'm starting to tear the 'one ring to bind them all' to
+ * pieces. As a start, the 'include everything, everywhere' which happens by
+ * every module including protos.h, is taken out */
 #include "alloc.h"
 #include "command.h"
 #include "contour.h"
@@ -80,5 +84,7 @@
 #include "standard.h"
 /* HBB 990828: note the name, keeping our beloved 'term.h' as is :-) */
 #include "term_api.h"
+
+#endif /* 0/1 */
 
 #endif /* GNUPLOT_PROTOS_H */

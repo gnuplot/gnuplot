@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.13 1999/10/01 14:54:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.14 1999/10/29 18:47:19 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -34,20 +34,25 @@ static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.13 1999/10/01 14:54:34 lh
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot.h"
+#include "plot3d.h"
+
 #include "alloc.h"
+#include "binary.h"
 #include "command.h"
 #include "contour.h"
 #include "datafile.h"
-#include "graph3d.h"
 #include "graphics.h"
+#include "graph3d.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot2d.h"
-#include "plot3d.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
+
+#ifdef THIN_PLATE_SPLINES_GRID
+#include "matrix.h"
+#endif
 
 #ifndef _Windows
 # include "help.h"
@@ -295,6 +300,12 @@ plot3drequest()
 }
 
 #ifdef THIN_PLATE_SPLINES_GRID
+
+static double splines_kernel __PROTO((double h));
+/* HBB 991025 FIXME: these don't belong in here --> move to 'matrix' */
+static void lu_decomp __PROTO((double **, int, int *, double *));
+static void lu_backsubst __PROTO((double **, int n, int *, double *));
+
 static double
 splines_kernel(h)
 double h;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.3 1999/10/29 18:47:21 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.4 1999/11/03 16:04:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -34,14 +34,13 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.3 1999/10/29 18:47:21 lhec
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot.h"
+#include "setshow.h"
+
 #include "command.h"
-#include "graphics.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot2d.h"
 #include "plot3d.h"
-#include "setshow.h"
 #include "tables.h"
 #include "term_api.h"
 #include "util.h"
@@ -78,7 +77,6 @@ static void unset_lmargin __PROTO((void));
 static void unset_rmargin __PROTO((void));
 static void unset_tmargin __PROTO((void));
 static void unset_missing __PROTO((void));
-static void unset_multiplot __PROTO((void));
 
 static void unset_mxtics __PROTO((void));
 static void unset_mx2tics __PROTO((void));

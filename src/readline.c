@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: readline.c,v 1.14 1999/10/17 19:13:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: readline.c,v 1.15 1999/10/29 18:47:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - readline.c */
@@ -51,10 +51,20 @@ static char *RCSid() { return RCSid("$Id: readline.c,v 1.14 1999/10/17 19:13:18 
 
 #include <signal.h>
 
-#include "plot.h"
-#include "alloc.h"
 #include "readline.h"
+
+#include "alloc.h"
 #include "util.h"
+
+#if defined(USE_MOUSE) && defined(OS2)
+# define INCL_DOSMEMMGR
+# define INCL_DOSPROCESS
+# include <io.h>
+# include <sys/termio.h>
+# include <termios.h>
+# include <os2.h>
+# include <sys/ioctl.h>
+#endif /* USE_MOUSE in OS/2 PM */
 
 #if defined(READLINE) && !defined(HAVE_LIBREADLINE)
 

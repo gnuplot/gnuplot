@@ -38,6 +38,8 @@
 #ifndef GNUPLOT_MISC_H
 # define GNUPLOT_MISC_H
 
+#include "plot.h"
+
 /* Variables of misc.c needed by other modules: */
 
 extern char *infile_name;

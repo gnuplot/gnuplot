@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: plot3d.h,v 1.1 1999/10/01 14:04:22 lhecking Exp $
  *
  */
 
@@ -37,6 +37,8 @@
 
 #ifndef GNUPLOT_PLOT3D_H
 # define GNUPLOT_PLOT3D_H
+
+#include "plot.h"
 
 /* Variables of plot3d.c needed by other modules: */
 

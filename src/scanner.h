@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: scanner.h,v 1.1 1999/10/01 14:04:20 lhecking Exp $
  *
  */
 
@@ -39,6 +39,8 @@
 # define GNUPLOT_SCANNER_H
 
 /* #if... / #include / #define collection: */
+
+#include "plot.h"
 
 /* Type definitions */
 

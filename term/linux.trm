@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.13 1999/06/19 20:30:52 lhecking Exp $
+ * $Id: linux.trm,v 1.14 1999/06/22 11:54:19 lhecking Exp $
  *
  */
 
@@ -94,10 +94,10 @@ TERM_PUBLIC void LINUX_resume __PROTO((void));
 static int linux_vmode = G1024x768x256;		/* default mode */
 static int vgacolor[] = { 7, 8, 2, 3, 4, 5, 9, 14, 12, 15, 13, 10, 11, 1, 6 };
 static int graphics_on = FALSE;
-vga_modeinfo *modeinfo;
+static vga_modeinfo *modeinfo;
 static int linux_startx, linux_starty, linux_lasty;
 static int linux_angle;
-int LINUX_graphics_allowed;
+static int LINUX_graphics_allowed;
 extern void drop_privilege();
 extern void take_privilege();
 

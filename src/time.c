@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.8 1999/10/01 14:54:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.9 1999/10/29 18:47:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -48,8 +48,8 @@ static char *RCSid() { return RCSid("$Id: time.c,v 1.8 1999/10/01 14:54:36 lheck
  */
 
 
-#include "plot.h"
 #include "gp_time.h"
+
 #include "util.h"
 
 /* build as a standalone test */

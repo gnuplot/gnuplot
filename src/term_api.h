@@ -40,6 +40,8 @@
 
 /* #if... / #include / #define collection: */
 
+#include "plot.h"
+
 /* Type definitions */
 
 /* Variables of term.c needed by other modules: */

@@ -1,4 +1,4 @@
-/* $Id: tables.c,v 1.9 1999/10/21 21:05:57 lhecking Exp $ */
+/* $Id: tables.c,v 1.10 1999/10/29 18:52:53 lhecking Exp $ */
 
 /* GNUPLOT - tables.c */
 
@@ -32,11 +32,11 @@
  * to the extent permitted by applicable law.
 ]*/
 
-#include "plot.h"
+#include "tables.h"
+
 #include "command.h"
 #include "fit.h"
 #include "setshow.h"
-#include "tables.h"
 #include "term_api.h"
 #include "util.h"
 
@@ -80,6 +80,8 @@ struct gen_ftable command_ftbl[] =
 };
 
 /* 'plot' and 'splot' */
+/* HBB 990829: unused, yet? */
+/* Lars 991108: yes, because the 'plot' parser is a real bitch :( */
 struct gen_table plot_tbl[] =
 {
     { "ax$es", P_AXES },

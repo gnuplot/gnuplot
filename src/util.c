@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.17 1999/10/01 14:54:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.18 1999/10/29 18:47:21 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -34,12 +34,11 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.17 1999/10/01 14:54:37 lhec
  * to the extent permitted by applicable law.
 ]*/
 
-
-#include "plot.h"
-#include "alloc.h"
-#include "command.h"
-#include "misc.h"
 #include "util.h"
+
+#include "alloc.h"
+#include "misc.h"
+#include "setshow.h"		/* for month names etc */
 
 static char *num_to_str __PROTO((double r));
 static void parse_esc __PROTO((char *instr));
@@ -515,6 +514,12 @@ int i;
             fprintf(stderr, "\"%s\", line %d: ", infile_name, inline_num); \
         else fprintf(stderr, "line %d: ", inline_num); \
  }
+
+/* TRUE if command just typed; becomes FALSE whenever we
+ * send some other output to screen.  If FALSE, the command line
+ * will be echoed to the screen before the ^ error message.
+ */
+TBOOLEAN screen_ok;
 
 #if defined(VA_START) && defined(ANSI_C)
 void

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.13 1999/10/01 14:54:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.14 1999/10/29 18:47:17 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -139,11 +139,11 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.13 1999/10/01 14:54:30 
  */
 /*}}} */
 
-#include "plot.h"
-#include "alloc.h"
-#include "binary.h"
-#include "command.h"
 #include "datafile.h"
+
+#include "alloc.h"
+#include "command.h"
+#include "binary.h"
 #include "gp_time.h"
 #include "graphics.h"
 #include "internal.h"
@@ -344,15 +344,15 @@ char *s;
  */
 	    if ((fast_columns == 0)
 			|| (df_no_use_specs == 0)
-			|| (df_no_use_specs > 0)
+					|| ((df_no_use_specs > 0)
 			&& (use_spec[0].column == dfncp1
-				|| df_no_use_specs > 1
+									|| (df_no_use_specs > 1
 				&& (use_spec[1].column == dfncp1
-					|| df_no_use_specs > 2
+													|| (df_no_use_specs > 2
 					&& (use_spec[2].column == dfncp1
-						|| df_no_use_specs > 3
+																	|| (df_no_use_specs > 3
 						&& (use_spec[3].column == dfncp1
-							|| df_no_use_specs > 4
+																					|| (df_no_use_specs > 4
 							&& (use_spec[4].column == dfncp1
 								|| df_no_use_specs > 5
 								)
@@ -360,6 +360,11 @@ char *s;
 						)
 					)
 				)
+															)
+													)
+											)
+									)
+							)
 			) {
 
 #ifndef NO_FORTRAN_NUMS

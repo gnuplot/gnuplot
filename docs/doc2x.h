@@ -1,5 +1,5 @@
 /*
- * $Id: doc2x.h,v 1.4 1999/07/09 20:59:42 lhecking Exp $
+ * $Id: doc2x.h,v 1.5 1999/10/01 14:15:48 lhecking Exp $
  *
  */
 
@@ -40,6 +40,7 @@
 
 #include "stdfn.h"		/* HBB 990828: safe_strncpy() prototype */
 
+#if 0 /* HBB 991022: stdfn.h reads in plot.h. already defines TBOOLEAN */
 /* TRUE or FALSE */
 typedef int TBOOLEAN;
 
@@ -52,6 +53,7 @@ typedef int TBOOLEAN;
 # undef FALSE
 #endif
 #define FALSE 0
+#endif
 
 /* Various defines and macros */
 #ifndef MAX_LINE_LEN

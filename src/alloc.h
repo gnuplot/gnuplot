@@ -1,4 +1,4 @@
-/* $Id: alloc.h,v 1.3 1999/06/17 14:26:18 lhecking Exp $ */
+/* $Id: alloc.h,v 1.4 1999/09/14 15:25:05 lhecking Exp $ */
 
 /* GNUPLOT - alloc.h */
 
@@ -34,6 +34,12 @@
 
 #ifndef GNUPLOT_ALLOC_H
 # define GNUPLOT_ALLOC_H
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include "stdfn.h"
 
 /* prototypes from "alloc.c". This file figures out if the free hack is needed
  * and redefines free if necessary.

@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.1 1999/06/17 14:26:35 lhecking Exp $
+ * $Id: datafile.h,v 1.2 1999/10/01 14:54:30 lhecking Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -38,6 +38,8 @@
 # define GNUPLOT_DATAFILE_H
 
 /* #if... / #include / #define collection: */
+
+#include "plot.h"
 
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */

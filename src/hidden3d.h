@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: hidden3d.h,v 1.1 1999/10/01 14:04:18 lhecking Exp $
  *
  */
 
@@ -40,15 +40,13 @@
 
 /* #if... / #include / #define collection: */
 
+#include "plot.h"
+
 /* Type definitions */
 
 /* Variables of hidden3d.c needed by other modules: */
 
 /* Prototypes of functions exported by hidden3d.c */
-
-/* HBB 990826 FIXME: these should be moved back to clip_move, perhaps */
-void clip_move __PROTO((unsigned int x, unsigned int y));
-void clip_vector __PROTO((unsigned int x, unsigned int y));
 
 void set_hidden3doptions __PROTO((void));
 void show_hidden3doptions __PROTO((void));

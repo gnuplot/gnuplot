@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.31 1999/10/17 19:11:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.32 1999/10/29 18:47:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -63,9 +63,8 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.31 1999/10/17 19:11:14 l
  *
  */
 
-#include "plot.h"
-#include "alloc.h"
 #include "command.h"
+#include "alloc.h"
 #include "eval.h"
 #include "fit.h"
 #include "gp_time.h"
@@ -150,11 +149,6 @@ static void getparms __PROTO((char *, char **));
 struct lexical_unit *token;
 int token_table_size;
 
-/* TRUE if command just typed; becomes FALSE whenever we
- * send some other output to screen.  If FALSE, the command line
- * will be echoed to the screen before the ^ error message.
- */
-TBOOLEAN screen_ok;
 
 char *input_line;
 size_t input_line_len;
@@ -587,27 +581,6 @@ if_command()
 }
 
 
-/* process invalid commands and, on OS/2, REXX commands */
-void
-invalid_command()
-{
-#ifdef OS2
-    if (_osmode == OS2_MODE) {
-	if (token[c_token].is_token) {
-	    int rc;
-	    rc = ExecuteMacro(input_line + token[c_token].start_index,
-			      token[c_token].length);
-	    if (rc == 0) {
-		c_token = num_tokens = 0;
-		return (0);
-	    }
-	}
-    }
-#endif
-    int_error(c_token, "invalid command");
-}
-
-
 /* process the 'load' command */
 void
 load_command()
@@ -995,6 +968,27 @@ update_command()
     update(opfname, npfname);
     free(npfname);
     free(opfname);
+}
+
+
+/* process invalid commands and, on OS/2, REXX commands */
+void
+invalid_command()
+{
+#ifdef OS2
+    if (_osmode == OS2_MODE) {
+	if (token[c_token].is_token) {
+	    int rc;
+	    rc = ExecuteMacro(input_line + token[c_token].start_index,
+			      token[c_token].length);
+	    if (rc == 0) {
+		c_token = num_tokens = 0;
+		return (0);
+	    }
+	}
+    }
+#endif
+    int_error(c_token, "invalid command");
 }
 
 

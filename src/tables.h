@@ -1,4 +1,4 @@
-/* $Id: tables.h,v 1.9 1999/10/21 21:05:57 lhecking Exp $ */
+/* $Id: tables.h,v 1.10 1999/10/29 18:52:53 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -34,6 +34,9 @@
 
 #ifndef GNUPLOT_TABLES_H
 #define GNUPLOT_TABLES_H
+
+#include "plot.h"
+
 
 typedef void (*parsefuncp_t) __PROTO((void));
 
