@@ -1,3 +1,8 @@
+2001-01-03  Johannes Zellner  <johannes@zellner.org>
+
+	* term/post.trm:  PS_make_palette() made it working with
+	negative palette values R/G/B.
+
 2000-12-26  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm,configure.in: pm3d for ggi using the

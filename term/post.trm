@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.49 2000/12/06 12:38:54 mikulik Exp $
+ * $Id: post.trm,v 1.50 2000/12/06 15:22:44 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -1912,11 +1912,11 @@ fputs("/pm3dround {maxcolors 0 gt {maxcolors mul floor maxcolors div} if} def\n"
 
 /* print the definition of R,G,B formulae */
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", R, ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(R), ps_math_color_formulae[ 2*abs(R) ], ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", G, ps_math_color_formulae[ 2*abs(G) ], ps_math_color_formulae[ 2*abs(G)+1 ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(G), ps_math_color_formulae[ 2*abs(G) ], ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", B, ps_math_color_formulae[ 2*abs(B) ], ps_math_color_formulae[ 2*abs(B)+1 ]);
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n", abs(B), ps_math_color_formulae[ 2*abs(B) ], ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
