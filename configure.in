@@ -13,7 +13,7 @@ AC_PREREQ(2.1)
 AC_REVISION($Revision: 1.90 $)
 AC_INIT(graphics.c)
 VERSION=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
-AM_INIT_AUTOMAKE(gnuplot, "$VERSION")
+AM_INIT_AUTOMAKE(gnuplot, $VERSION)
 AC_CONFIG_HEADER(config.h:config.hin)
 
 
@@ -26,7 +26,7 @@ dnl Optional features.
 
 dnl Do not use the included readline function
 AC_ARG_WITH(readline,dnl
-[  --without-readline      do not use the included readline function],
+[  --without-readline      do not use the included readline function],,
   AC_DEFINE(READLINE)
 )dnl
 
@@ -34,7 +34,7 @@ dnl The GNU readline library
 AC_ARG_WITH(gnu-readline,dnl
 [  --with-gnu-readline     use the GNU readline version
   --with-gnu-readline=PATH        Specify the location of libreadline],,
-with_gnu_readline=no
+test -z "$with_gnu_readline" && with_gnu_readline=no
 )dnl
 
 dnl The gif terminal with Tom Boutell's gd library
@@ -42,7 +42,7 @@ AC_ARG_WITH(gd,dnl
 [  --with-gd               enable gif terminal with Tom Boutell's gd library
                           (requires GD library)
   --with-gd=PATH                  Specify the location of libgd],,
-with_gd=yes
+test -z "$with_gd" && with_gd=yes
 )dnl
 
 dnl The Portable Network Graphics (png) terminal
@@ -50,14 +50,14 @@ AC_ARG_WITH(png,dnl
 [  --with-png              enable png terminal
                           (requires libpng and libz)
   --with-png=PATH                 Specify the location of libpng],,
-with_png=yes
+test -z "$with_png" && with_png=yes
 )dnl
 
 dnl Use .gnuplot file in current directory
 AC_ARG_WITH(cwdrc,dnl
 [  --with-cwdrc            check current directory for .gnuplot file,
                           normally disabled for security reasons],
-if test "$withval" = no; then AC_DEFINE(NOCWDRC) fi, AC_DEFINE(NOCWDRC)
+test "$withval" = no && AC_DEFINE(NOCWDRC), AC_DEFINE(NOCWDRC)
 )dnl
 
 dnl Install the lasergnu printer script
@@ -71,7 +71,7 @@ dnl The Linux console driver
 AC_ARG_WITH(linux-vga,dnl
 [  --without-linux-vga     do not use the Linux console driver
                           (requires Linux SVGAlib /usr/lib/libvga)],,
-with_linux_vga=yes
+test -z "$with_linux_vga" && with_linux_vga=yes
 )dnl
 
 dnl configure.in body
@@ -295,8 +295,8 @@ dnl Or is it really a server (run-time) problem?
 dnl FIXME AC_DEFINE(ULTRIX_KLUDGE)
 
 dnl Cached variables
-AC_CACHE_CHECK(CPPFLAGS variable,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
-AC_CACHE_CHECK(TERMLIBS variable,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
+AC_CACHE_CHECK(CPPFLAGS,gp_cv_prog_make_cppflags,gp_cv_prog_make_cppflags="$CPPFLAGS")
+AC_CACHE_CHECK(TERMLIBS,gp_cv_prog_make_termlibs,gp_cv_prog_make_termlibs="$TERMLIBS")
 
 dnl Substitute variables
 AC_SUBST(PACKAGE)
@@ -330,11 +330,11 @@ fi
 dnl Report configuration
 echo "
 
-Configuration summary for $PACKAGE $VERSION
+** Configuration summary for $PACKAGE $VERSION:
 
   Where is the help file?                    $datadir/gnuplot.gih"
-test "$with_gd" != no             && echo "  Enable generation of GIF files."
-test "$with_png" != no            && echo "  Enable generation of PNG files."
+test "$ac_cv_header_gd_h" = yes   && echo "  Enable generation of GIF files."
+test "$ac_cv_header_zlib_h" = yes && echo "  Enable generation of PNG files."
 test "$with_cwdrc" = yes && echo "  Check current directory for .gnuplot file."
 if test -f "$with_gnu_readline"; then
                                      echo "  Use GNU readline library."
