@@ -1,3 +1,8 @@
+1999-10-01  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* 0INSTALL, make_vms.com: Make VMS builds easier and add note
+	about make_vms.com.
+
 1999-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* fit.c: Backported some fixes from -current, including the time
