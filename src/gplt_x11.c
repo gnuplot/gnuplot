@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.44 2002/07/26 16:42:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.45 2002/08/21 21:42:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -350,7 +350,7 @@ static void preset __PROTO((int argc, char *argv[]));
 static char *pr_GetR __PROTO((XrmDatabase db, char *resource));
 static void pr_color __PROTO((cmap_t * cmap_ptr));
 static void pr_dashes __PROTO((void));
-static void pr_font __PROTO((void));
+static void pr_font __PROTO((char * fontname));
 static void pr_geometry __PROTO((void));
 static void pr_pointsize __PROTO((void));
 static void pr_width __PROTO((void));
@@ -365,6 +365,8 @@ static void handle_selection_event __PROTO((XEvent * event));
 #endif
 
 #define FallbackFont "fixed"
+enum set_encoding_id encoding = S_ENC_DEFAULT; /* EAM - mirrored from core code by 'QE' */
+static char default_font[64] = { '\0' };
 
 #define Nwidths 10
 static unsigned int widths[Nwidths] = { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1451,6 +1453,33 @@ exec_cmd(plot_struct *plot, char *command)
     /*   X11_move(x,y) - move  */
     else if (*buffer == 'M')
 	sscanf(buffer, "M%4d%4d", &cx, &cy);
+
+    /* EAM - Aug 2002 I hope 'Q' wasn't reserved for another use!   */
+    /* change default font (QD) encoding (QE) or current font (QF)  */
+    else if (*buffer == 'Q') {
+	char *c;
+	switch (buffer[1]) {
+	case 'F':
+		/* Strip out just the font name */
+		c = &(buffer[strlen(buffer)-1]);
+		while (*c <= ' ') *c-- = '\0';
+	    	pr_font(&buffer[2]);
+		XSetFont(dpy,gc,font->fid);
+		break;
+	case 'E':
+		/* Save the requested font encoding */
+		sscanf(buffer,"QE%d",&encoding);
+		FPRINTF((stderr,"gnuplot_x11: changing encoding to %d\n",encoding));
+		break;
+	case 'D':
+		/* Save the request default font */
+		c = &(buffer[strlen(buffer)-1]);
+		while (*c <= ' ') *c-- = '\0';
+		strncpy(default_font,&buffer[2],strlen(&buffer[2])+1);
+		FPRINTF((stderr,"gnuplot_x11: set default_font to \"%s\"\n",default_font));
+		break;
+	}
+    }
 
     /*   X11_put_text(x,y,str) - draw text   */
     else if (*buffer == 'T') {
@@ -3434,7 +3463,7 @@ gnuplot: X11 aborted.\n", ldisplay);
 #endif /* PM3D */
 
     pr_geometry();
-    pr_font();
+    pr_font(NULL);		/* set default font */
     pr_color(&cmap);		/* set colors for default colormap */
     pr_width();
     pr_dashes();
@@ -3628,15 +3657,88 @@ pr_dashes()
  *---------------------------------------------------------------------------*/
 
 static void
-pr_font()
+pr_font( fontname )
+char *fontname;
 {
-    char *fontname = pr_GetR(db, ".font");
+    XFontStruct *previous_font = font;
+
+    if (!fontname || !(*fontname))
+	fontname = default_font;
+
+    if (!fontname || !(*fontname))
+	fontname = pr_GetR(db, ".font");
 
     if (!fontname)
 	fontname = FallbackFont;
     font = XLoadQueryFont(dpy, fontname);
+
+    if (!font) {
+	/* EAM 19-Aug-2002 Try to construct a plausible X11 full font spec */
+	/* We are passed "font<,size><,slant>"                             */
+	char fontspec[128], shortname[32], *fontencoding, slant;
+	int  fontsize, sep;
+	sep = strcspn(fontname,",");
+	strncpy(shortname,fontname,sep);
+	shortname[sep] = '\0';
+	fontsize = 12;		/* FIXME EAM - is there a better default? */
+	sscanf( &(fontname[sep+1]),"%d",&fontsize);
+	   
+	slant = strstr(&fontname[sep+1],"italic")  ? 'i' :
+		strstr(&fontname[sep+1],"oblique") ? 'o' :
+		                                     'r' ;
+
+	if (!strncmp("Symbol",shortname,6) || !strncmp("symbol",shortname,6))
+	    fontencoding = "*-*";
+	else
+	    fontencoding = (
+		encoding == S_ENC_CP437     ? "dosencoding-cp437" :
+		encoding == S_ENC_CP850     ? "dosencoding-cp850" :
+		encoding == S_ENC_ISO8859_1 ? "iso8859-1" :
+		encoding == S_ENC_ISO8859_2 ? "iso8859-2" :
+		"*-*" ) ;
+
+	snprintf(fontspec, sizeof(fontspec), "-*-%s-*-%c-*-*-%d-*-*-*-*-*-%s",
+		shortname, slant, fontsize, fontencoding
+		);
+	font = XLoadQueryFont(dpy, fontspec);
+
+	if (!font) {
+	    /* Try to decode some common PostScript font names */
+	    if (!strcmp("Times-Bold",shortname) || !strcmp("times-bold",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-times-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Times-Roman",shortname) || !strcmp("times-roman",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-times-medium-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Times-Italic",shortname) || !strcmp("times-italic",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-times-medium-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Times-BoldItalic",shortname) || !strcmp("times-bolditalic",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-times-bold-i-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Bold",shortname) || !strcmp("helvetica-bold",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-helvetica-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Oblique",shortname) || !strcmp("helvetica-oblique",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-helvetica-medium-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-BoldOblique",shortname) || !strcmp("helvetica-boldoblique",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-helvetica-bold-o-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    } else if (!strcmp("Helvetica-Narrow-Bold",shortname) || !strcmp("helvetica-narrow-bold",shortname)) {
+		snprintf(fontspec, sizeof(fontspec), 
+			"-*-arial narrow-bold-r-*-*-%d-*-*-*-*-*-%s", fontsize, fontencoding);
+	    }
+	    font = XLoadQueryFont(dpy, fontspec);
+	}
+
+    }
+    
     if (!font) {
 	fprintf(stderr, "\ngnuplot: can't load font '%s'\n", fontname);
+	font = previous_font;
+    }
+    if (!font) {
 	fprintf(stderr, "gnuplot: using font '%s' instead.\n", FallbackFont);
 	font = XLoadQueryFont(dpy, FallbackFont);
 	if (!font) {
@@ -3644,8 +3746,11 @@ pr_font()
 gnuplot: can't load font '%s'\n\
 gnuplot: no useable font - X11 aborted.\n", FallbackFont);
 	    EXIT(1);
-	}
+	} else
+	    fontname = FallbackFont;
     }
+    FPRINTF((stderr,"gnuplot_x11: set font %s\n",fontname));
+
     vchar = font->ascent + font->descent;
 }
 

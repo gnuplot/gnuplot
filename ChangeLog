@@ -1,3 +1,11 @@
+2002-08-25  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c term/x11.trm: Add support for selecting x11 fonts.
+	The syntax is `set term x11 font "<fontspec>"` where <fontspec> is
+	either a full x11 font names or a string "<font>,<size>,<slant>".
+	Some attempt is made to recognize PostScript font names and substitute
+	a TTF equivalent if the initial request fails.
+
 2002-08-25  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c: Added 'include "gp_hist.h".
@@ -977,7 +985,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/25 15:18:32 $).
+	last modification date (from the tag $Date: 2002/08/25 16:13:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

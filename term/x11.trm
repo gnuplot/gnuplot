@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.58 2002/05/29 10:41:06 joze Exp $
+ * $Id: x11.trm,v 1.59 2002/07/26 16:42:29 mikulik Exp $
  *
  */
 
@@ -61,6 +61,7 @@ TERM_PUBLIC void X11_options __PROTO((void));
 TERM_PUBLIC void X11_init __PROTO((void));
 TERM_PUBLIC void X11_graphics __PROTO((void));
 TERM_PUBLIC void X11_text __PROTO((void));
+TERM_PUBLIC int  X11_set_font __PROTO((const char * fontname));
 TERM_PUBLIC void X11_reset __PROTO((void));
 TERM_PUBLIC void X11_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void X11_vector __PROTO((unsigned int x, unsigned int y));
@@ -115,6 +116,7 @@ TERM_PUBLIC void X11_filled_polygon __PROTO((int, gpiPoint *));
 static int X11_Display = 0;
 
 static void X11_atexit __PROTO((void));
+static void X11_set_default_font __PROTO((void));
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
@@ -292,6 +294,7 @@ enum X11_id {
     X11_NOPERSIST,
     X11_RAISE,
     X11_NORAISE,
+    X11_FONT,
     X11_OTHER
 };
 
@@ -304,6 +307,8 @@ static struct gen_table X11_opts[] = {
     {"noper$sist", X11_NOPERSIST},
     {"rai$se", X11_RAISE},
     {"norai$se", X11_NORAISE},
+    {"font",   X11_FONT},
+    {"fn$ame", X11_FONT},
     {NULL, X11_OTHER}
 };
 
@@ -358,6 +363,10 @@ X11_options()
 	    do_raise = no;
 	    c_token++;
 	    break;
+	case X11_FONT:
+	    quote_str( default_font, ++c_token, sizeof(default_font) );
+	    c_token++;
+	    break;
 	case X11_OTHER:
 	default:
 	    X11_plot_number = (int) real(const_express(&a));
@@ -383,6 +392,11 @@ X11_options()
     }
     if (UNSET != persist) {
 	strcat(term_options, (yes == persist ? " persist" : " nopersist"));
+    }
+    if (*default_font) {
+	strcat(term_options, " font \"");
+	strcat(term_options, default_font);
+	strcat(term_options, "\"");
     }
 #ifdef USE_MOUSE
     X11_update_opts();
@@ -584,7 +598,7 @@ X11_init()
 	    ipc_back_fd = fdes_back[0];
 	    close(fdes_back[1]);	/* the parent doesn't need this */
 
-	    /* apparently multy-character inputs like escape sequences
+	    /* apparently multi-character inputs like escape sequences
 	     * but also mouse-pasted text got buffered and therefore
 	     * didn't trigger the select() function in X11_waitforinput().
 	     * Switching to unbuffered input solved this (although I don't
@@ -860,6 +874,7 @@ X11_graphics()
 #ifdef USE_MOUSE
     static unsigned long windowid = 0;
 #endif
+    static enum set_encoding_id last_encoding = S_ENC_DEFAULT;
 
     BEFORE_GRAPHICS;		/* kludge for crippled select */
 
@@ -891,6 +906,16 @@ X11_graphics()
 #ifdef ULTRIX_KLUDGE
     fflush(X11_ipc);
 #endif
+
+    if (encoding != last_encoding) {
+	PRINT1("QE%d\n",encoding);
+	last_encoding = encoding;
+    }
+
+    /* EAM 20-Aug 2002 - Force default font before start of plot */
+    X11_set_default_font(); 
+    X11_set_font("");
+
 }
 
 TERM_PUBLIC void
@@ -964,6 +989,19 @@ TERM_PUBLIC void
 X11_point(unsigned int x, unsigned int y, int number)
 {
     PRINT3("P%d %d %d\n", number, x, y);
+}
+
+TERM_PUBLIC int
+X11_set_font(const char *fontname)
+{
+    PRINT1("QF%s\n", fontname?fontname:"");
+    return( TRUE );
+}
+
+void
+X11_set_default_font()
+{
+    PRINT1("QD%s\n",default_font);
 }
 
 TERM_PUBLIC void
@@ -1082,7 +1120,7 @@ TERM_TABLE_START(x11_driver)
     X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset,
     X11_text, null_scale, X11_graphics, X11_move, X11_vector,
     X11_linetype, X11_put_text, X11_text_angle,
-    X11_justify_text, X11_point, do_arrow, set_font_null,
+    X11_justify_text, X11_point, do_arrow, X11_set_font,
     X11_pointsize, TERM_CAN_MULTIPLOT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
@@ -1104,7 +1142,7 @@ TERM_TABLE_START(X11_driver)
     X11_VTIC, X11_HTIC, X11_options, X11_init, X11_reset,
     X11_text, null_scale, X11_graphics, X11_move, X11_vector,
     X11_linetype, X11_put_text, X11_text_angle,
-    X11_justify_text, X11_point, do_arrow, set_font_null,
+    X11_justify_text, X11_point, do_arrow, X11_set_font,
     X11_pointsize, TERM_CAN_MULTIPLOT,
     X11_text /* suspend can use same routine */ , 0 /* resume */ ,
     X11_fillbox, X11_linewidth
@@ -1143,7 +1181,7 @@ START_HELP(x11)
 #ifdef USE_X11_DRIVER /* HBB 20020214: Disabled X11_DRIVER */
 "    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]",
 #else
-"    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise]",
+"    set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]",
 #endif    
 "",
 " Multiple plot windows are supported: `set terminal x11 <n>` directs the",
@@ -1151,6 +1189,24 @@ START_HELP(x11)
 " appended to the window title and the icon will be labeled `gplt <n>`.",
 " The active window may distinguished by a change in cursor (from default",
 " to crosshair.)",
+"",
+" X11 fonts:",
+" A preferred default font may be specified to the x11 driver using",
+"      `set term x11 font \"<fontspec>\"`",
+" The driver first queries the X-server for a font of the exact name given,",
+" for example `set term x11 font \"lucidasans-10\"`. If this query fails, then",
+" the driver tries to interpret <fontspec> as \"<font>,<size>,<slant>\" ",
+" and to construct a full X11 font name of the form",
+"       -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>",
+" <font> is the base name of the font (e.g. Times or Symbol)",
+" <size> is the point size (defaults to 12 if not specified)",
+" <s> is `i` if <slant>==\"italic\" `o` if <slant>==\"oblique\" `r` otherwise",
+" <encoding> is set based on the current character set (help set encoding)",
+" So `set term x11 font \"arial,15,italic\"` will be translated to",
+" -*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).",
+" The driver also recognizes some common PostScript font names and",
+" replaces them with possible X11 or TrueType equivalents.",
+" This same sequence is used to process font requests from `set label`.",
 "",
 " Plot windows remain open even when the `gnuplot` driver is changed to a",
 " different device.  A plot window can be closed by pressing the letter q",
@@ -1170,7 +1226,7 @@ START_HELP(x11)
 " The gnuplot outboard driver, gnuplot_x11, is searched in a default place",
 " chosen when the program is compiled.  You can override that by defining",
 " the environment variable GNUPLOT_DRIVER_DIR to point to a different",
-" location",    
+" location.",    
 "",
 " Plot windows will automatically be closed at the end of the session",
 " unless the `-persist` option was given.",
