@@ -35,8 +35,8 @@
  * to the extent permitted by applicable law.
 ]*/
 
-#ifndef PLOT_H
-#define PLOT_H
+#ifndef GNUPLOT_PLOT_H
+# define GNUPLOT_PLOT_H
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -870,4 +870,4 @@ if (allow_ls && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls" ))
    LP_DUMP(lp); \
 }
  
-#endif /* not PLOT_H */
+#endif /* GNUPLOT_PLOT_H */
