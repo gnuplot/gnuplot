@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.14 1999/06/17 14:17:33 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.15 1999/06/19 20:50:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -40,38 +40,73 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.14 1999/06/17 14:17:33 lhec
  * Added user-specified bases for log scaling.
  */
 
-
 #include "plot.h"
 #include "setshow.h"
 
 #define DEF_FORMAT   "%g"	/* default format for tic mark labels */
 #define SIGNIF (0.01)		/* less than one hundredth of a tic mark */
 
-
 /* input data, parsing variables */
 
+static struct show_entry {
+    const char *show_name;
+    enum show_id id;
+} show_tbl[] = 
+{
+    { "ac$tion_table", SHOW_ACTIONTABLE },
+    { "at", SHOW_ACTIONTABLE },
+    { "ar$row", SHOW_ARROW },
+    { "au$toscale", SHOW_AUTOSCALE },
+    { "b$ars", SHOW_BARS },
+    { "bor$der", SHOW_BORDER },
+    { "box$width", SHOW_BOXWIDTH },
+    { "c$lip", SHOW_CLIP },
+    { "ma$pping", SHOW_MAPPING },
+    { "co$ntour", SHOW_CONTOUR },
+    { "cn$trparam", SHOW_CNTRPARAM },
+    { "da$ta", SHOW_DATA },
+    { "dg$rid3d", SHOW_DGRID3D },
+    { "du$mmy", SHOW_DUMMY },
+    { "fo$rmat", SHOW_FORMAT },
+    { "fu$nctions", SHOW_FUNCTIONS },
+    { "lo$gscale", SHOW_LOGSCALE },
+    { "of$fsets", SHOW_OFFSETS },
+    { "ma$rgin", SHOW_MARGIN },
+    { "o$utput", SHOW_OUTPUT },
+    { "tit$le", SHOW_TITLE },
+    { "mis$sing", SHOW_MISSING },
+    { "xl$abel", SHOW_XLABEL },
+    { "x2l$abel", SHOW_X2LABEL },
+    { "yl$abel", SHOW_YLABEL },
+    { "y2l$abel", SHOW_Y2LABEL },
+    { "zl$abel", SHOW_ZLABEL },
+    { "keyt$itle", SHOW_KEYTITLE },
+    { "xda$ta", SHOW_XDATA },
+    { "yda$ta", SHOW_YDATA },
+    { "x2da$ta", SHOW_X2DATA },
+    { "y2da$ta", SHOW_Y2DATA },
+    { "zda$ta", SHOW_ZDATA },
+    { "timef$mt", SHOW_TIMEFMT },
+    { "loca$le", SHOW_LOCALE },
+    { "loa$dpath", SHOW_LOADPATH },
+    { "xzero$axis", SHOW_XZEROAXIS },
+    { "yzero$axis", SHOW_YZEROAXIS },
+    { "zeroa$xis", SHOW_ZEROAXIS },
+    { "la$bel", SHOW_LABEL },
+    { "li$nestyle", SHOW_LINESTYLE },
+    { "ls", SHOW_LINESTYLE },
+    { "g$rid", SHOW_GRID },
+    { "mxt$ics", SHOW_MXTICS },
+    { "myt$ics", SHOW_MYTICS },
+    { "mzt$ics", SHOW_MZTICS },
+    { "mx2t$ics", SHOW_MX2TICS },
+    { "my2t$ics", SHOW_MY2TICS },
+    { "k$ey", SHOW_KEY }
+};
+
+#define NSHOWS (sizeof(show_tbl) / sizeof(show_tbl[0]))
+
 extern TBOOLEAN is_3d_plot;
-
-/* From version.c, used in show_version () */
-extern char gnuplot_version[];
-extern char gnuplot_patchlevel[];
-extern char gnuplot_date[];
-extern char gnuplot_copyright[];
-extern char faq_location[];
-extern char bug_email[];
-extern char help_email[];
-
-#if defined(ATARI) || defined(MTOS)
-/* plot.c */
-extern const char *user_gnuplotpath;
-#endif
-
-#ifndef TIMEFMT
-#define TIMEFMT "%d/%m/%y,%H:%M"
-#endif
-/* format for date/time for reading time in datafile */
-
-
 
 /******** Local functions ********/
 
@@ -126,6 +161,7 @@ static TBOOLEAN show_two __PROTO((void));
 static void show_timefmt __PROTO((void));
 static void show_missing __PROTO((void));
 static void show_datatype __PROTO((const char *name, int axis));
+static enum show_id lookup_show __PROTO((int));
 
 /* following code segment appears over and over again */
 
@@ -161,75 +197,93 @@ show_command()
     (void) putc('\n', stderr);
 }
 
+#define CHECK_TAG_GT_ZERO \
+  tag = 0; c_token++; \
+  if (!END_OF_COMMAND) { \
+    tag = (int) real(const_express(&a)); \
+    if (tag <= 0) \
+      int_error(c_token, "tag must be > zero"); \
+  } \
+  (void) putc('\n', stderr);
+  
 /* return TRUE if a command match, FALSE if not */
 static TBOOLEAN
 show_one()
 {
-    if (almost_equals(c_token, "ac$tion_table") ||
-	equals(c_token, "at")) {
+    struct value a;
+    int tag;
+
+    switch(lookup_show(c_token)) {
+    case SHOW_ACTIONTABLE:
 	c_token++;
 	show_at();
 	c_token++;
-    } else if (almost_equals(c_token, "ar$row")) {
-	struct value a;
-	int tag = 0;
-
-	c_token++;
-	if (!END_OF_COMMAND) {
-	    tag = (int) real(const_express(&a));
-	    if (tag <= 0)
-		int_error(c_token, "tag must be > zero");
-	}
+	break;
+    case SHOW_ARROW: {
+	CHECK_TAG_GT_ZERO;
 	(void) putc('\n', stderr);
 	show_arrow(tag);
-    } else if (almost_equals(c_token, "au$toscale")) {
+	break;
+    }
+    case SHOW_AUTOSCALE:
 	(void) putc('\n', stderr);
 	show_autoscale();
 	c_token++;
-    } else if (almost_equals(c_token, "b$ars")) {
+	break;
+    case SHOW_BARS:
 	(void) putc('\n', stderr);
 	show_bars();
 	c_token++;
-    } else if (almost_equals(c_token, "bor$der")) {
+	break;
+    case SHOW_BORDER:
 	(void) putc('\n', stderr);
 	show_border();
 	c_token++;
-    } else if (almost_equals(c_token, "box$width")) {
+	break;
+    case SHOW_BOXWIDTH:
 	(void) putc('\n', stderr);
 	show_boxwidth();
 	c_token++;
-    } else if (almost_equals(c_token, "c$lip")) {
+	break;
+    case SHOW_CLIP:
 	(void) putc('\n', stderr);
 	show_clip();
 	c_token++;
-    } else if (almost_equals(c_token, "ma$pping")) {
+	break;
+    case SHOW_MAPPING:
 	(void) putc('\n', stderr);
 	show_mapping();
 	c_token++;
-    } else if (almost_equals(c_token, "co$ntour") ||
-	       almost_equals(c_token, "cn$trparam")) {
+	break;
+    case SHOW_CONTOUR:
+    case SHOW_CNTRPARAM:
 	(void) putc('\n', stderr);
 	show_contour();
 	c_token++;
-    } else if (almost_equals(c_token, "da$ta")) {
+	break;
+    case SHOW_DATA:
 	c_token++;
 	if (!almost_equals(c_token, "s$tyle"))
 	    int_error(c_token, "expecting keyword 'style'");
 	(void) putc('\n', stderr);
 	show_style("data", data_style);
 	c_token++;
-    } else if (almost_equals(c_token, "dg$rid3d")) {
+	break;
+    case SHOW_DGRID3D:
 	(void) putc('\n', stderr);
 	show_dgrid3d();
 	c_token++;
-    } else if (almost_equals(c_token, "du$mmy")) {
+	break;
+    case SHOW_DUMMY:
 	(void) fprintf(stderr, "\n\tdummy variables are \"%s\" and \"%s\"\n",
 		       dummy_var[0], dummy_var[1]);
 	c_token++;
-    } else if (almost_equals(c_token, "fo$rmat")) {
+	break;
+    case SHOW_FORMAT:
 	show_format();
 	c_token++;
-    } else if (almost_equals(c_token, "fu$nctions")) {
+	break;
+    case SHOW_FUNCTIONS:
 	c_token++;
 	if (almost_equals(c_token, "s$tyle")) {
 	    (void) putc('\n', stderr);
@@ -237,153 +291,175 @@ show_one()
 	    c_token++;
 	} else
 	    show_functions();
-    } else if (almost_equals(c_token, "lo$gscale")) {
+	break;
+    case SHOW_LOGSCALE:
 	(void) putc('\n', stderr);
 	show_logscale();
 	c_token++;
-    } else if (almost_equals(c_token, "of$fsets")) {
+	break;
+    case SHOW_OFFSETS:
 	(void) putc('\n', stderr);
 	show_offsets();
 	c_token++;
-    } else if (almost_equals(c_token, "ma$rgin")) {
+	break;
+    case SHOW_MARGIN:
 	(void) putc('\n', stderr);
 	show_margin();
 	c_token++;
-    } else if (almost_equals(c_token, "o$utput")) {
+	break;
+    case SHOW_OUTPUT:
 	(void) putc('\n', stderr);
 	show_output();
 	c_token++;
-    } else if (almost_equals(c_token, "tit$le")) {
+	break;
+    case SHOW_TITLE:
 	(void) putc('\n', stderr);
 	show_xyzlabel("title", &title);
 	c_token++;
-    } else if (almost_equals(c_token, "mis$sing")) {
+	break;
+    case SHOW_MISSING:
 	(void) putc('\n', stderr);
 	show_missing();
 	c_token++;
-    } else if (almost_equals(c_token, "xl$abel")) {
+	break;
+    case SHOW_XLABEL:
 	(void) putc('\n', stderr);
 	show_xyzlabel("xlabel", &xlabel);
 	c_token++;
-    } else if (almost_equals(c_token, "x2l$abel")) {
+	break;
+    case SHOW_X2LABEL:
 	(void) putc('\n', stderr);
 	show_xyzlabel("x2label", &x2label);
 	c_token++;
-    } else if (almost_equals(c_token, "yl$abel")) {
+	break;
+    case SHOW_YLABEL:
 	(void) putc('\n', stderr);
 	show_xyzlabel("ylabel", &ylabel);
 	c_token++;
-    } else if (almost_equals(c_token, "y2l$abel")) {
+	break;
+    case SHOW_Y2LABEL:
 	(void) putc('\n', stderr);
 	show_xyzlabel("y2label", &y2label);
 	c_token++;
-    } else if (almost_equals(c_token, "zl$abel")) {
+	break;
+    case SHOW_ZLABEL:
 	(void) putc('\n', stderr);
 	show_xyzlabel("zlabel", &zlabel);
 	c_token++;
-    } else if (almost_equals(c_token, "keyt$itle")) {
+	break;
+    case SHOW_KEYTITLE:
 	(void) putc('\n', stderr);
 	show_keytitle();
 	c_token++;
-    } else if (almost_equals(c_token, "xda$ta")) {
+	break;
+    case SHOW_XDATA:
 	(void) putc('\n', stderr);
 	show_datatype("xdata", FIRST_X_AXIS);
 	c_token++;
-    } else if (almost_equals(c_token, "yda$ta")) {
+	break;
+    case SHOW_YDATA:
 	(void) putc('\n', stderr);
 	show_datatype("ydata", FIRST_Y_AXIS);
 	c_token++;
-    } else if (almost_equals(c_token, "x2da$ta")) {
+	break;
+    case SHOW_X2DATA:
 	(void) putc('\n', stderr);
 	show_datatype("x2data", SECOND_X_AXIS);
 	c_token++;
-    } else if (almost_equals(c_token, "y2da$ta")) {
+	break;
+    case SHOW_Y2DATA:
 	(void) putc('\n', stderr);
 	show_datatype("y2data", SECOND_Y_AXIS);
 	c_token++;
-    } else if (almost_equals(c_token, "zda$ta")) {
+	break;
+    case SHOW_ZDATA:
 	(void) putc('\n', stderr);
 	show_datatype("zdata", FIRST_Z_AXIS);
 	c_token++;
-    } else if (almost_equals(c_token, "timef$mt")) {
+	break;
+    case SHOW_TIMEFMT:
 	(void) putc('\n', stderr);
 	show_timefmt();
 	c_token++;
-    } else if (almost_equals(c_token, "loca$le")) {
+	break;
+    case SHOW_LOCALE:
 	(void) putc('\n', stderr);
 	show_locale();
 	c_token++;
-    } else if (almost_equals(c_token, "loa$dpath")) {
+	break;
+    case SHOW_LOADPATH:
 	(void) putc('\n', stderr);
 	show_loadpath();
 	c_token++;
-    } else if (almost_equals(c_token, "xzero$axis")) {
+	break;
+    case SHOW_XZEROAXIS:
 	(void) putc('\n', stderr);
 	show_xzeroaxis();
 	c_token++;
-    } else if (almost_equals(c_token, "yzero$axis")) {
+	break;
+    case SHOW_YZEROAXIS:
 	(void) putc('\n', stderr);
 	show_yzeroaxis();
 	c_token++;
-    } else if (almost_equals(c_token, "zeroa$xis")) {
+	break;
+    case SHOW_ZEROAXIS:
 	(void) putc('\n', stderr);
 	show_xzeroaxis();
 	show_yzeroaxis();
 	c_token++;
-    } else if (almost_equals(c_token, "la$bel")) {
-	struct value a;
-	int tag = 0;
-
-	c_token++;
-	if (!END_OF_COMMAND) {
-	    tag = (int) real(const_express(&a));
-	    if (tag <= 0)
-		int_error(c_token, "tag must be > zero");
-	}
-	(void) putc('\n', stderr);
+	break;
+    case SHOW_LABEL: {
+	CHECK_TAG_GT_ZERO;
 	show_label(tag);
-    } else if (almost_equals(c_token, "li$nestyle") || equals(c_token, "ls")) {
-	struct value a;
-	int tag = 0;
-
-	c_token++;
-	if (!END_OF_COMMAND) {
-	    tag = (int) real(const_express(&a));
-	    if (tag <= 0)
-		int_error(c_token, "tag must be > zero");
-	}
-	(void) putc('\n', stderr);
+	break;
+    }
+    case SHOW_LINESTYLE: {
+	CHECK_TAG_GT_ZERO;
 	show_linestyle(tag);
-    } else if (almost_equals(c_token, "g$rid")) {
+	break;
+    }
+    case SHOW_GRID:
 	(void) putc('\n', stderr);
 	show_grid();
 	c_token++;
-    } else if (almost_equals(c_token, "mxt$ics")) {
+	break;
+    case SHOW_MXTICS:
 	(void) putc('\n', stderr);
 	show_mtics(mxtics, mxtfreq, "x");
 	c_token++;
-    } else if (almost_equals(c_token, "myt$ics")) {
+	break;
+    case SHOW_MYTICS:
 	(void) putc('\n', stderr);
 	show_mtics(mytics, mytfreq, "y");
 	c_token++;
-    } else if (almost_equals(c_token, "mzt$ics")) {
+	break;
+    case SHOW_MZTICS:
 	(void) putc('\n', stderr);
 	show_mtics(mztics, mztfreq, "z");
 	c_token++;
-    } else if (almost_equals(c_token, "mx2t$ics")) {
+	break;
+    case SHOW_MX2TICS:
 	(void) putc('\n', stderr);
 	show_mtics(mx2tics, mx2tfreq, "x2");
 	c_token++;
-    } else if (almost_equals(c_token, "my2t$ics")) {
+	break;
+    case SHOW_MY2TICS:
 	(void) putc('\n', stderr);
 	show_mtics(my2tics, my2tfreq, "y2");
 	c_token++;
-    } else if (almost_equals(c_token, "k$ey")) {
+	break;
+    case SHOW_KEY:
 	(void) putc('\n', stderr);
 	show_key();
 	c_token++;
-    } else
-	return (FALSE);
+	break;
+    case SHOW_INVALID:
+    case SHOW_NULL:
+    default:
+	return FALSE;
+	break;
+    } /* switch() */
+
     return TRUE;
 }
 
@@ -1794,4 +1870,19 @@ show_missing()
 	fputs("\tNo string is interpreted as missing data\n", stderr);
     else
 	fprintf(stderr, "\t\"%s\" is interpreted as missing value\n", missing_val);
+}
+
+static enum show_id
+lookup_show(token)
+int token;
+{
+    int i = 0;
+
+    while (i < NSHOWS) {
+	if (almost_equals(token, show_tbl[i].show_name))
+	    return show_tbl[i].id;
+	i++;
+    }
+
+    return SHOW_INVALID;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.8 1999/06/14 19:23:21 lhecking Exp $
+ * $Id: setshow.h,v 1.9 1999/06/19 20:52:07 lhecking Exp $
  *
  */
 
@@ -47,9 +47,14 @@
 #include "variable.h"
 
 #ifndef DEFAULT_TIMESTAMP_FORMAT
-#define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y" /* asctime() format */
+/* asctime() format */
+# define DEFAULT_TIMESTAMP_FORMAT "%a %b %d %H:%M:%S %Y"
 #endif
  
+#ifndef TIMEFMT
+# define TIMEFMT "%d/%m/%y,%H:%M"
+#endif
+
 /*
  * global variables to hold status of 'set' options
  *
@@ -267,5 +272,21 @@ extern char *missing_val;
 \t'variables', 'version', 'view', '[xyz]{2}label', '[xyz]{2}range',\n\
 \t'{m}[xyz]{2}tics', '[xyz]{2}[md]tics', '[xyz]{2}zeroaxis',\n\
 \t'[xyz]data',   'zero', 'zeroaxis'"
+
+/* */
+enum show_id {
+    SHOW_INVALID,
+    SHOW_NULL,
+    SHOW_ACTIONTABLE, SHOW_ARROW, SHOW_AUTOSCALE, SHOW_BARS, SHOW_BORDER,
+    SHOW_BOXWIDTH, SHOW_CLIP, SHOW_MAPPING, SHOW_CONTOUR, SHOW_CNTRPARAM,
+    SHOW_DATA, SHOW_DGRID3D, SHOW_DUMMY, SHOW_FORMAT, SHOW_FUNCTIONS,
+    SHOW_LOGSCALE, SHOW_OFFSETS, SHOW_MARGIN, SHOW_OUTPUT, SHOW_TITLE,
+    SHOW_MISSING, SHOW_XLABEL, SHOW_X2LABEL, SHOW_YLABEL, SHOW_Y2LABEL,
+    SHOW_ZLABEL, SHOW_KEYTITLE, SHOW_XDATA, SHOW_YDATA, SHOW_X2DATA,
+    SHOW_Y2DATA, SHOW_ZDATA, SHOW_TIMEFMT, SHOW_LOCALE, SHOW_LOADPATH,
+    SHOW_XZEROAXIS, SHOW_YZEROAXIS, SHOW_ZEROAXIS, SHOW_LABEL, SHOW_LINESTYLE,
+    SHOW_LS, SHOW_GRID, SHOW_MXTICS, SHOW_MYTICS, SHOW_MZTICS, SHOW_MX2TICS,
+    SHOW_MY2TICS, SHOW_KEY
+};
 
 #endif /* GNUPLOT_SETSHOW_H */
