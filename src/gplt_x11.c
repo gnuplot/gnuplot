@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.18 2000/11/01 18:57:28 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.19 2000/11/03 17:40:02 joze Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -986,6 +986,8 @@ read_input()
 	buffered_input_available = 1;
 	partial_read = 0;
 	rdbuf_offset = 0;
+	if (total_chars == 0)
+	    return -2;
 	if (total_chars < 0)
 	    return -1;
     }
@@ -1029,6 +1031,8 @@ record()
 
     while (1) {
 	int status = read_input();
+	if (status == -2)
+	    return 0;
 	if (status != 0)
 	    return status;
 
