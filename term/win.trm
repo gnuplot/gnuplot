@@ -1,5 +1,8 @@
-/* GNUPLOT - term/win.trm */
+/*
+ * $Id: $
+ */
 
+/* GNUPLOT - win.trm */
 
 /*[
  * Copyright 1992 - 1993, 1998

@@ -1,8 +1,8 @@
 /*
- *    pm.trm  --- inboard terminal driver for Presentation Manager
- *            --- after X-11 driver, by R.W.Fearick 31/1/92.
- *    v1.1 11/8/92 -- speed things up        
+ * $Id: $
  */
+
+/* GNUPLOT - pm.trm */
 
 /*[
  * Copyright 1992, 1993, 1998
@@ -33,6 +33,12 @@
  * This software is provided "as is" without express or implied warranty
  * to the extent permitted by applicable law.
 ]*/
+
+/*
+ *    pm.trm  --- inboard terminal driver for Presentation Manager
+ *            --- after X-11 driver, by R.W.Fearick 31/1/92.
+ *    v1.1 11/8/92 -- speed things up
+ */
 
 #include "driver.h"
 
