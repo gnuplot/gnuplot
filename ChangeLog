@@ -1,3 +1,8 @@
+2005-03-29  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/pm3d.c (set_plot_with_palette): Add a missing #ifdef
+	WITH_IMAGE conditional.
+
 2005-03-27  Ethan Merritt  <merritt@u.washington.edu>
 
 	* NEWS configure.in term/gd.trm: Allow storage of a sequence of plots
@@ -12,10 +17,10 @@
 
 	SourceForge patch #1090199 "Extend hotkeys to all open plot windows"
 
-	Implement new option "bind all <key> <command>" that extends hotkeys
-	to inactive plot windows in addition to the active window.
-	The code is general, although currently only the x11 terminal tracks the
-	ID of multiple windows in order to report who is who.
+	Implement new option "bind all <key> <command>" that extends
+	hotkeys to inactive plot windows in addition to the active window.
+	The code is general, although currently only the x11 terminal
+	tracks the ID of multiple windows in order to report who is who.
 
 	* src/command.c (bind_command): New keyword "bind {all$windows} ..."
 
@@ -39,7 +44,8 @@
 	* src/os2/gclient.c src/win/wgraph.c:
 	Add extra parameter for window ID in all calls to gp_exec_event().
 
-	* docs/gnuplot.doc: Document new command option "bind all <key> <command>".
+	* docs/gnuplot.doc: Document new command option "bind all <key>
+	<command>".
 
 	* src/mouse.c (event_buttonpress) term/x11.trm (X11_waitforinput):
 	Do not terminate "pause mouse key" on mouse button clicks. This allows
@@ -49,14 +55,14 @@
 
 	SourceForge patch #1120626 (contributed by Frank Maas).
 	
-	* src/plot2d.c (histogram_range_fiddling): 
-	When processing histograms, allow auto-scaling of either end of the
-	X-range individually.
+	* src/plot2d.c (histogram_range_fiddling): When processing
+	histograms, allow auto-scaling of either end of the X-range
+	individually.
 
 2005-03-25  Ethan Merritt  <merritt@u.washington.edu>
 
-	* config/makefile.amg config/term_pc.h docs/Makefile.in sec/makefile.all:
-	Remove dependencies involving table.trm.
+	* config/makefile.amg config/term_pc.h docs/Makefile.in
+	sec/makefile.all: Remove dependencies involving table.trm.
 
 	* term/table.trm: Remove this file.
 
