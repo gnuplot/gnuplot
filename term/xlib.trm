@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: xlib.trm,v 1.13 2003/11/24 17:04:29 mikulik Exp $
+ * $Id: xlib.trm,v 1.14 2004/07/01 17:10:35 broeker Exp $
  */
 
 /* GNUPLOT - xlib.trm */
@@ -46,9 +46,8 @@ Xlib_text()
 {
     PRINT0("E\n");
     FFLUSH();
-    X11_ipc = 0;
 #ifdef PIPE_IPC
-    ipc_back_fd = IPC_BACK_CLOSED;
+    ipc_back_fd = IPC_BACK_UNUSABLE;
 #endif
 
 }

@@ -1,3 +1,8 @@
+2004-08-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/xlib.trm (Xlib_text): Leave output file open so that it is
+	possible to plot multiple frames without another 'set term xlib'.
+
 2004-08-23  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc: Fix misprints in gnuplot manual (#14).
