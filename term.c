@@ -114,6 +114,7 @@ static double term_pointsize;
 
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
+static void null_linewidth __PROTO((double));
 
 void do_point __PROTO((unsigned int x, unsigned int y, int number));
 void do_pointsize __PROTO((double size));
