@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.25 2002/02/13 17:59:36 broeker Exp $
+ * $Id: tables.h,v 1.26 2002/02/14 21:14:36 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -129,6 +129,33 @@ enum set_key_id {
     S_KEY_HEIGHT, S_KEY_TITLE
 };
 
+#ifdef PM3D
+enum set_colorbox_id {
+    S_COLORBOX_INVALID,
+    S_COLORBOX_VERTICAL, S_COLORBOX_HORIZONTAL,
+    S_COLORBOX_DEFAULT, S_COLORBOX_USER,
+    S_COLORBOX_BORDER, S_COLORBOX_BDEFAULT, S_COLORBOX_NOBORDER,
+    S_COLORBOX_ORIGIN, S_COLORBOX_SIZE
+};
+
+enum set_palette_id {
+    S_PALETTE_INVALID,
+    S_PALETTE_POSITIVE, S_PALETTE_NEGATIVE,
+    S_PALETTE_GRAY, S_PALETTE_COLOR, S_PALETTE_RGBFORMULAE,
+    S_PALETTE_NOPS_ALLCF, S_PALETTE_PS_ALLCF, S_PALETTE_MAXCOLORS
+};
+
+enum set_pm3d_id {
+    S_PM3D_INVALID,
+    S_PM3D_AT,
+    S_PM3D_SCANSFORWARD, S_PM3D_SCANSBACKWARD, S_PM3D_SCANS_AUTOMATIC,
+    S_PM3D_FLUSH, S_PM3D_CLIP_1IN, S_PM3D_CLIP_4IN,
+    S_PM3D_MAP, S_PM3D_HIDDEN, S_PM3D_NOHIDDEN,
+    S_PM3D_SOLID, S_PM3D_NOTRANSPARENT, S_PM3D_NOSOLID, S_PM3D_TRANSPARENT,
+    S_PM3D_IMPLICIT, S_PM3D_NOEXPLICIT, S_PM3D_NOIMPLICIT, S_PM3D_EXPLICIT
+};
+#endif
+
 enum show_style_id {
     SHOW_STYLE_INVALID,
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE
@@ -158,6 +185,11 @@ extern const struct gen_table plot_smooth_tbl[];
 extern const struct gen_table save_tbl[];
 extern const struct gen_table set_tbl[];
 extern const struct gen_table set_key_tbl[];
+#ifdef PM3D
+extern const struct gen_table set_colorbox_tbl[];
+extern const struct gen_table set_palette_tbl[];
+extern const struct gen_table set_pm3d_tbl[];
+#endif
 extern const struct gen_table set_hidden3d_tbl[];
 extern const struct gen_table show_style_tbl[];
 extern const struct gen_table plotstyle_tbl[];

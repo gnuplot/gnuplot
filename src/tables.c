@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.30 2002/02/14 21:14:36 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.31 2002/02/15 08:44:37 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -367,6 +367,61 @@ const struct gen_table set_key_tbl[] =
     { "ti$tle", S_KEY_TITLE },
     { NULL, S_KEY_INVALID }
 };
+
+#ifdef PM3D
+/* 'set colorbox' options */
+const struct gen_table set_colorbox_tbl[] =
+{
+    { "v$ertical",	S_COLORBOX_VERTICAL },
+    { "h$orizontal",	S_COLORBOX_HORIZONTAL },
+    { "def$ault",	S_COLORBOX_DEFAULT },
+    { "u$ser",		S_COLORBOX_USER },
+    { "bo$rder",	S_COLORBOX_BORDER },
+    { "bd$efault",	S_COLORBOX_BDEFAULT },
+    { "nobo$rder",	S_COLORBOX_NOBORDER },
+    { "o$rigin",	S_COLORBOX_ORIGIN },
+    { "s$ize",		S_COLORBOX_SIZE },
+    { NULL, S_COLORBOX_INVALID }
+};
+
+/* 'set palette' options */
+const struct gen_table set_palette_tbl[] =
+{
+    { "pos$itive",	S_PALETTE_POSITIVE },
+    { "neg$ative",	S_PALETTE_NEGATIVE },
+    { "gray",		S_PALETTE_GRAY },
+    { "col$or",		S_PALETTE_COLOR },
+    { "rgb$formulae",	S_PALETTE_RGBFORMULAE },
+    { "nops_allcF",	S_PALETTE_NOPS_ALLCF },
+    { "ps_allcF",	S_PALETTE_PS_ALLCF },
+    { "maxc$olors",	S_PALETTE_MAXCOLORS },
+    { NULL, S_PALETTE_INVALID }
+};
+
+/* 'set pm3d' options */
+const struct gen_table set_pm3d_tbl[] =
+{
+    { "at",		S_PM3D_AT },
+    { "scansfor$ward",	S_PM3D_SCANSFORWARD },
+    { "scansback$ward", S_PM3D_SCANSBACKWARD },
+    { "scansauto$matic",S_PM3D_SCANS_AUTOMATIC },
+    { "fl$ush",		S_PM3D_FLUSH },
+    { "clip1$in",	S_PM3D_CLIP_1IN },
+    { "clip4$in",	S_PM3D_CLIP_4IN },
+    { "map", 		S_PM3D_MAP },
+    { "hi$dden3d",	S_PM3D_HIDDEN },
+    { "nohi$dden3d",	S_PM3D_NOHIDDEN },
+    { "so$lid",		S_PM3D_SOLID },
+    { "notr$ansparent",	S_PM3D_NOTRANSPARENT },
+    { "noso$lid",	S_PM3D_NOSOLID },
+    { "tr$ansparent",	S_PM3D_TRANSPARENT },
+    { "i$mplicit",	S_PM3D_IMPLICIT },
+    { "noe$xplicit",	S_PM3D_NOEXPLICIT },
+    { "noi$mplicit",	S_PM3D_NOIMPLICIT },
+    { "e$xplicit",	S_PM3D_EXPLICIT },
+    { NULL, S_PM3D_INVALID }
+};
+#endif
 
 const struct gen_table show_style_tbl[] =
 {

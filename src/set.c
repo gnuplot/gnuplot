@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.77 2002/02/15 09:22:15 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.78 2002/02/18 15:03:34 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2333,28 +2333,25 @@ set_palette()
 	sm_palette.use_maxcolors = 0;
     }
     else { /* go through all options of 'set palette' */
-	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
+	for ( ; !END_OF_COMMAND; c_token++ ) {
+	    switch (lookup_table(&set_palette_tbl[0],c_token)) {
 	    /* positive and negative picture */
-	    if (almost_equals(c_token, "pos$itive")) {
+	    case S_PALETTE_POSITIVE: /* "pos$itive" */
 		sm_palette.positive = SMPAL_POSITIVE;
 		continue;
-	    }
-	    if (almost_equals(c_token, "neg$ative")) {
+	    case S_PALETTE_NEGATIVE: /* "neg$ative" */
 		sm_palette.positive = SMPAL_NEGATIVE;
 		continue;
-	    }
 	    /* Now the options that determine the palette of smooth colours */
 	    /* gray or rgb-coloured */
-	    if (equals(c_token, "gray")) {
+	    case S_PALETTE_GRAY: /* "gray" */
 		sm_palette.colorMode = SMPAL_COLOR_MODE_GRAY;
 		continue;
-	    }
-	    if (almost_equals(c_token, "col$or")) {
+	    case S_PALETTE_COLOR: /* "col$or" */
 		sm_palette.colorMode = SMPAL_COLOR_MODE_RGB;
 		continue;
-	    }
 	    /* rgb color mapping formulae: rgb$formulae r,g,b (three integers) */
-	    if (almost_equals(c_token, "rgb$formulae")) {
+	    case S_PALETTE_RGBFORMULAE: { /* "rgb$formulae" */
 		struct value a;
 		int i;
 		c_token++;
@@ -2378,16 +2375,14 @@ set_palette()
 		continue;
 	    } /* rgbformulae */
 	    /* ps_allcF: write all rgb formulae into PS file? */
-	    if (equals(c_token, "nops_allcF")) {
+	    case S_PALETTE_NOPS_ALLCF: /* "nops_allcF" */
 		sm_palette.ps_allcF = 0;
 		continue;
-	    }
-	    if (equals(c_token, "ps_allcF")) {
+	    case S_PALETTE_PS_ALLCF: /* "ps_allcF" */
 		sm_palette.ps_allcF = 1;
 		continue;
-	    }
 	    /* max colors used */
-	    if (almost_equals(c_token, "maxc$olors")) {
+	    case S_PALETTE_MAXCOLORS: { /* "maxc$olors" */
 		struct value a;
 		int i;
 		c_token++;
@@ -2396,8 +2391,9 @@ set_palette()
 		sm_palette.use_maxcolors = i;
 		continue;
 	    }
+	    } /* switch over palette lookup table */
 	    int_error(c_token,"invalid palette option");
-	} /* end of while over palette options */
+	} /* end of while !end of command over palette options */
     }
 }
 
@@ -2415,36 +2411,25 @@ set_colorbox()
 	color_box.border_lt_tag = -1; /* use default border */
     }
     else { /* go through all options of 'set colorbox' */
-	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
+	for ( ; !END_OF_COMMAND; c_token++ ) {
+	    switch (lookup_table(&set_colorbox_tbl[0],c_token)) {
 	    /* vertical or horizontal color gradient */
-	    if (almost_equals(c_token, "v$ertical")) {
+	    case S_COLORBOX_VERTICAL: /* "v$ertical" */
 		color_box.rotation = 'v';
 		continue;
-	    }
-	    if (almost_equals(c_token, "h$orizontal")) {
+	    case S_COLORBOX_HORIZONTAL: /* "h$orizontal" */
 		color_box.rotation = 'h';
 		continue;
-	    }
-#if 0
-	    /* obsolete -- use 'unset colorbox' instead */
-	    /* color box where: no box */
-	    if (equals(c_token, "no")) {
-		color_box.where = SMCOLOR_BOX_NO;
-		continue;
-	    }
-#endif
 	    /* color box where: default position */
-	    if (almost_equals(c_token, "def$ault")) {
+	    case S_COLORBOX_DEFAULT: /* "def$ault" */
 		color_box.where = SMCOLOR_BOX_DEFAULT;
 		continue;
-	    }
 	    /* color box where: position by user */
-	    if (almost_equals(c_token, "u$ser")) {
+	    case S_COLORBOX_USER: /* "u$ser" */
 		color_box.where = SMCOLOR_BOX_USER;
 		continue;
-	    }
 	    /* border of the color box */
-	    if (almost_equals(c_token, "bo$rder")) {
+	    case S_COLORBOX_BORDER: /* "bo$rder" */
 
 		color_box.border = 1;
 		c_token++;
@@ -2457,19 +2442,17 @@ set_colorbox()
 			color_box.border_lt_tag = 0;
 			int_error(c_token, "tag must be strictly positive (see `help set style line')");
 		    }
-		    --c_token; /* why ? (joze) */
+		    --c_token;
 		}
 		continue;
-	    }
-	    if (almost_equals(c_token, "bd$efault")) {
+	    case S_COLORBOX_BDEFAULT: /* "bd$efault" */
 		color_box.border_lt_tag = -1; /* use default border */
 		continue;
-	    }
-	    if (almost_equals(c_token, "nob$order")) {
+	    case S_COLORBOX_NOBORDER: /* "nobo$rder" */
 		color_box.border = 0;
 		continue;
-	    }
-	    if (almost_equals(c_token, "o$rigin")) {
+	    /* colorbox origin */
+	    case S_COLORBOX_ORIGIN: /* "o$rigin" */
 		c_token++;
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
@@ -2483,8 +2466,8 @@ set_colorbox()
 		    c_token--;
 		} 
 		continue;
-	    }
-	    if (almost_equals(c_token, "s$ize")) {
+	    /* colorbox size */
+	    case S_COLORBOX_SIZE: /* "s$ize" */
 		c_token++;
 		if (END_OF_COMMAND) {
 		    int_error(c_token, "expecting screen value [0 - 1]");
@@ -2498,10 +2481,11 @@ set_colorbox()
 		    c_token--;
 		} 
 		continue;
-	    }
+	    } /* switch over colorbox lookup table */
 	    int_error(c_token,"invalid colorbox option");
-	} /* end of while over colorbox options */
-    if (color_box.where == SMCOLOR_BOX_NO) color_box.where = SMCOLOR_BOX_DEFAULT;
+	} /* end of while !end of command over colorbox options */
+    if (color_box.where == SMCOLOR_BOX_NO) /* default: draw at default position */
+	color_box.where = SMCOLOR_BOX_DEFAULT;
     }
 }
 
@@ -2516,28 +2500,27 @@ set_pm3d()
 	pm3d_reset(); /* sets pm3d.where to 0; setting 'at s' below */
     }
     else { /* go through all options of 'set pm3d' */
-	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
-	    if (equals(c_token, "at")) {
+	for ( ; !END_OF_COMMAND; c_token++ ) {
+	    switch (lookup_table(&set_pm3d_tbl[0],c_token)) {
+	    /* where to plot */
+	    case S_PM3D_AT: /* "at" */
 		c_token++;
 		if (get_pm3d_at_option(&pm3d.where[0]))
 		    return; /* error */
+		c_token--;
 		continue;
-	    }  /* at */
 	    /* forward and backward drawing direction */
-	    if (almost_equals(c_token, "scansfor$ward")) {
+	    case S_PM3D_SCANSFORWARD: /* "scansfor$ward" */
 		pm3d.direction = PM3D_SCANS_FORWARD;
 		continue;
-	    }
-	    if (almost_equals(c_token, "scansback$ward")) {
+	    case S_PM3D_SCANSBACKWARD: /* "scansback$ward" */
 		pm3d.direction = PM3D_SCANS_BACKWARD;
 		continue;
-	    }
-	    if (almost_equals(c_token, "scansauto$matic")) {
+	    case S_PM3D_SCANS_AUTOMATIC: /* "scansauto$matic" */
 		pm3d.direction = PM3D_SCANS_AUTOMATIC;
 		continue;
-	    }
 	    /* flush scans: left, right or center */
-	    if (almost_equals(c_token, "fl$ush")) {
+	    case S_PM3D_FLUSH:  /* "fl$ush" */
 		c_token++;
 		if (almost_equals(c_token, "b$egin"))
 		    pm3d.flush = PM3D_FLUSH_BEGIN;
@@ -2545,20 +2528,18 @@ set_pm3d()
 		    pm3d.flush = PM3D_FLUSH_CENTER;
 		else if (almost_equals(c_token, "e$nd"))
 		    pm3d.flush = PM3D_FLUSH_END;
-		else int_error(c_token,"expecting flush 'begin', 'center' or 'end'");
+		else
+		    int_error(c_token,"expecting flush 'begin', 'center' or 'end'");
 		continue;
-	    }
 	    /* clipping method */
-	    if (almost_equals(c_token, "clip1$in")) {
+	    case S_PM3D_CLIP_1IN: /* "clip1$in" */
 		pm3d.clip = PM3D_CLIP_1IN;
 		continue;
-	    }
-	    if (almost_equals(c_token, "clip4$in")) {
+	    case S_PM3D_CLIP_4IN: /* "clip4$in" */
 		pm3d.clip = PM3D_CLIP_4IN;
 		continue;
-	    }
 	    /* setup everything for plotting a map */
-	    if (equals(c_token, "map")) {
+	    case S_PM3D_MAP: /* "map" */
 		pm3d.where[0] = 'b'; pm3d.where[1] = 0; /* set pm3d at b */
 		draw_surface = FALSE;        /* set nosurface */
 		draw_contour = CONTOUR_NONE; /* set nocontour */
@@ -2568,48 +2549,47 @@ set_pm3d()
 		axis_array[FIRST_Y_AXIS].range_flags |= RANGE_REVERSE; /* set yrange reverse */
 		pm3d.map = 1;  /* trick for rotating ylabel */
 		continue;
-	    }
-	    if (almost_equals(c_token, "hi$dden3d")) {
+	    /* pm3d-specific hidden line overwrite */
+	    case S_PM3D_HIDDEN: { /* "hi$dden3d" */
 		struct value a;
 		c_token++;
 		pm3d.hidden3d_tag = real(const_express(&a));
+		--c_token;
 		if (pm3d.hidden3d_tag <= 0) {
 		    pm3d.hidden3d_tag = 0;
 		    int_error(c_token,"tag must be strictly positive (see `help set style line')");
 		}
-		--c_token; /* why ? (joze) */
+		}
 		continue;
-	    }
-	    if (almost_equals(c_token, "nohi$dden3d")) {
+	    case S_PM3D_NOHIDDEN: /* "nohi$dden3d" */
 		pm3d.hidden3d_tag = 0;
 		continue;
-	    }
-	    if (almost_equals(c_token, "so$lid") || almost_equals(c_token, "notr$ansparent")) {
+	    case S_PM3D_SOLID: /* "so$lid" */
+	    case S_PM3D_NOTRANSPARENT: /* "notr$ansparent" */
 		pm3d.solid = 1;
 		continue;
-	    }
-	    if (almost_equals(c_token, "noso$lid") || almost_equals(c_token, "tr$ansparent")) {
+	    case S_PM3D_NOSOLID: /* "noso$lid" */
+	    case S_PM3D_TRANSPARENT: /* "tr$ansparent" */
 		pm3d.solid = 0;
 		continue;
-	    }
-	    if (almost_equals(c_token, "i$mplicit") || almost_equals(c_token, "noe$xplicit")) {
+	    case S_PM3D_IMPLICIT: /* "i$mplicit" */
+	    case S_PM3D_NOEXPLICIT: /* "noe$xplicit" */
 		pm3d.implicit = PM3D_IMPLICIT;
 		continue;
-	    }
-	    if (almost_equals(c_token, "noi$mplicit") || almost_equals(c_token, "e$xplicit")) {
+	    case S_PM3D_NOIMPLICIT: /* "noi$mplicit" */
+	    case S_PM3D_EXPLICIT: /* "e$xplicit" */
 		pm3d.implicit = PM3D_EXPLICIT;
 		continue;
-	    }
+	    } /* switch over pm3d lookup table */
 	    int_error(c_token,"invalid pm3d option");
-	} /* end of while over pm3d options */
+	} /* end of while !end of command over pm3d options */
 	if (PM3D_SCANS_AUTOMATIC == pm3d.direction
 	    && PM3D_FLUSH_BEGIN != pm3d.flush) {
 	    pm3d.direction = PM3D_SCANS_FORWARD;
-	    /* Petr Mikulik said that he wants no warning message here (joze) */
-#if 0
-	    fprintf(stderr, "pm3d: `scansautomatic' and %s are incompatible\n",
-		PM3D_FLUSH_END == pm3d.flush ? "`flush end'": "`flush center'");
-	    fprintf(stderr, "      setting scansforward\n");
+#if 1
+	    fprintf(stderr, "pm3d: `scansautomatic' and `flush %s' are incompatible\n",
+		PM3D_FLUSH_END == pm3d.flush ? "end": "center");
+	    fprintf(stderr, "   => setting `scansforward'\n");
 #endif
 	}
     }
