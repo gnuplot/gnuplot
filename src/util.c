@@ -149,19 +149,6 @@ int t_num;
 }
 
 
-/* Returns TRUE if the string of token t_num is not empty
- * If the length of a token is 2, it consists only of "" or ''
- */
-int is_notempty(t_num)
-int t_num;
-{
-    if (!isstring(t_num))
-	return FALSE;
-
-    return (token[t_num].is_token && token_len(t_num) > 2);
-}
-
-
 /*
  * is_definition() returns TRUE if the next tokens are of the form
  *   identifier =
@@ -203,9 +190,9 @@ int max;
 {
     register int i = 0;
     register int start = token[t_num].start_index;
-    register int count;
+    register int count = token[t_num].length;
 
-    if ((count = token[t_num].length) >= max) {
+    if (count >= max) {
 	count = max - 1;
 	FPRINTF((stderr, "str buffer overflow in copy_str"));
     }
@@ -493,7 +480,7 @@ int i;
 #if defined(VA_START) && defined(ANSI_C)
 void os_error (int t_num, char *str, ...)
 #else
-void os_error(t_num, str, va_alist)
+void os_error (t_num, str, va_alist)
 int t_num;
 char *str;
 va_dcl
@@ -521,7 +508,7 @@ va_dcl
 
 #ifdef VA_START
     VA_START (args, str);
-# if HAVE_VPRINTF || _LIBC
+# if HAVE_VFPRINTF || _LIBC
     vfprintf (stderr, str, args);
 # else
     _doprnt (str, args, stderr);
@@ -548,7 +535,7 @@ va_dcl
 
 
 #if defined(VA_START) && defined(ANSI_C)
-void int_error int t_num, char *str, ...)
+void int_error (int t_num, char *str, ...)
 #else
 void int_error (t_num, str, va_alist)
 int t_num;
@@ -576,7 +563,7 @@ va_dcl
 
 #ifdef VA_START
     VA_START (args, str);
-# if HAVE_VPRINTF || _LIBC
+# if HAVE_VFPRINTF || _LIBC
     vfprintf (stderr, str, args);
 # else
     _doprnt (str, args, stderr);
@@ -594,7 +581,7 @@ va_dcl
 #if defined(VA_START) && defined(ANSI_C)
 void int_warn (int t_num, char *str, ...)
 #else
-void int_warn(t_num, str, va_alist)
+void int_warn (t_num, str, va_alist)
 int t_num;
 char str[];
 va_dcl
@@ -621,7 +608,7 @@ va_dcl
     fputs("warning: ", stderr);
 #ifdef VA_START
     VA_START (args, str);
-# if HAVE_VPRINTF || _LIBC
+# if HAVE_VFPRINTF || _LIBC
     vfprintf (stderr, str, args);
 # else
     _doprnt (str, args, stderr);
@@ -638,11 +625,11 @@ va_dcl
 void lower_case(s)
 char *s;
 {
-    register char *p = s;
+    register unsigned char *p = s;
 
     while (*p != NUL) {
-	if (isupper((int)*p))
-	    *p = tolower((int)*p);
+	if (isupper(*p))
+	    *p = tolower(*p);
 	p++;
     }
 }
