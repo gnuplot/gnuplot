@@ -1,3 +1,18 @@
+2001-05-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (SHOW_FORMAT): Argument renamed to `_axis', to avoid
+ 	possible K&R preprocessor substitution inside string constant.
+	(show_command) Plugged some parse errors from 'set' options that
+ 	don't have a 'show' equivalent, yet. 'historysize', 'multiplot'
+ 	and 'termoptions' are rejected as invalid.  'show data style' is
+ 	mapped to 'show style data', and #ifdef'ed BACKWARDS_COMPATIBLE.
+  	'show [lrbt]margin' made equivalent to 'show margin'. 'show
+ 	mcbtics' was simply forgotten during the colorbox axis-ification,
+ 	it seems.
+	
+	* src/axis.c (axis_checked_extend_empty_range): For axis with one
+ 	fixed and one autoscaled endpoint, widen only the autoscaled one.
+
 2001-05-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/mouse.c (MousePosToGraphPosReal): Fix for Sourceforge 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.52 2001/03/19 14:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.53 2001/04/03 16:14:46 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -178,7 +178,7 @@ show_command()
 \t'[xyz,cb]{2}[md]tics', '[xyz]{2}zeroaxis', '[xyz,cb]data',\n\
 \t'zero', 'zeroaxis'";
 
-    int token_found;
+    enum set_id token_found; 
     struct value a;
     int tag =0;
 
@@ -188,7 +188,7 @@ show_command()
 
     /* rationalize c_token advancement stuff a bit: */
     if (token_found != S_INVALID)
-    c_token++;
+	c_token++;
 
     switch(token_found) {
     case S_ACTIONTABLE:
@@ -289,9 +289,15 @@ show_command()
     case S_OFFSETS:
 	show_offsets();
 	break;
+
+    case S_LMARGIN:		/* HBB 20010525: handle like 'show margin' */
+    case S_RMARGIN:
+    case S_TMARGIN:
+    case S_BMARGIN:
     case S_MARGIN:
 	show_margin();
 	break;
+
     case S_OUTPUT:
 	show_output();
 	break;
@@ -330,6 +336,17 @@ show_command()
     case S_VIEW:
 	show_view();
 	break;
+#ifdef BACKWARDS_COMPATIBLE
+    case S_DATA:
+	/* HBB 20010525: re-implement old 'show data style' command */
+	/* FIXME: 'show function style' is gone completely */
+	if (almost_equals(c_token, "st$yle")) {
+	    show_styles("data", data_style);
+	    c_token++;
+	} else 
+	    int_error(c_token, "keyword 'style' expected after 'show data'");
+	break;
+#endif
     case S_STYLE:
 	show_style();
 	break;
@@ -371,6 +388,11 @@ show_command()
     case S_MZTICS:
 	show_mtics(FIRST_Z_AXIS);
 	break;
+#ifdef PM3D
+    case S_MCBTICS:
+	show_mtics(COLOR_AXIS);
+	break;
+#endif
     case S_MX2TICS:
 	show_mtics(SECOND_X_AXIS);
 	break;
@@ -534,6 +556,46 @@ show_command()
 	show_tics(FALSE, FALSE, FALSE, FALSE, TRUE);
 #endif
 	break;
+
+#ifdef BACKWARDS_COMPATIBLE
+	/* HBB 20010522: avoid triggering the 'default' parse error
+	 * message for these commands --- they don't really exist, and
+	 * shouldn't cause that message to appear */
+    case S_NOMX2TICS:
+    case S_NOMXTICS:
+    case S_NOMY2TICS:
+    case S_NOMYTICS:
+    case S_NOMZTICS:
+    case S_NOCBTICS:
+    case S_NOMCBTICS:
+    case S_NOCBDTICS:
+    case S_NOCBMTICS:
+    case S_NOX2DTICS:
+    case S_NOX2MTICS:
+    case S_NOX2TICS:
+    case S_NOXDTICS:
+    case S_NOXMTICS:
+    case S_NOXTICS:
+    case S_NOY2DTICS:
+    case S_NOY2MTICS:
+    case S_NOY2TICS:
+    case S_NOYDTICS:
+    case S_NOYMTICS:
+    case S_NOYTICS:
+    case S_NOZDTICS:
+    case S_NOZMTICS:
+    case S_NOZTICS:
+	int_error(c_token,
+		  "'show' does not accept the 'no...' type of 'set' options");
+	/* FALLTHROUGH into S_INVALID! */
+#endif /* BACKWARDS_COMPATIBLE */
+
+	/* HBB 20010525: 'set commands' that don't have an
+	 * accompanying 'show' version, for no particular reason: */
+    case S_HISTORYSIZE:
+    case S_MULTIPLOT:
+    case S_TERMOPTIONS:
+	/* FIXME: for now, fall through into 'invalid' case */
 
     case S_INVALID:
 	int_error(c_token, showmess);
@@ -1154,9 +1216,9 @@ show_format()
     SHOW_ALL_NL;
 
     fprintf(stderr, "\ttic format is:\n");
-#define SHOW_FORMAT(axis)					\
-    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_defaults[axis].name,	\
-	    conv_text(axis_array[axis].formatstring));
+#define SHOW_FORMAT(_axis)						\
+    fprintf(stderr, "\t  %s-axis: \"%s\"\n", axis_defaults[_axis].name,	\
+	    conv_text(axis_array[_axis].formatstring));
     SHOW_FORMAT(FIRST_X_AXIS );
     SHOW_FORMAT(FIRST_Y_AXIS );
     SHOW_FORMAT(SECOND_X_AXIS);

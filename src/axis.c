@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.11 2001/04/10 17:16:30 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.12 2001/04/11 14:40:18 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -310,8 +310,12 @@ axis_checked_extend_empty_range(axis,mesg)
 		: FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
 	    fprintf(stderr, "Warning: empty %s range [%g:%g], ",
 		    axis_defaults[axis].name, dmin, dmax);
-	    axis_array[axis].min -= widen;
-	    axis_array[axis].max += widen;
+	    /* HBB 20010525: correctly handle single-ended
+	     * autoscaling, too: */
+	    if (axis_array[axis].autoscale & 1)
+		axis_array[axis].min -= widen;
+	    if (axis_array[axis].autoscale & 2)
+		axis_array[axis].max += widen;
 	    fprintf(stderr, "adjusting to [%g:%g]\n",
 		    axis_array[axis].min, axis_array[axis].max);
 	} else {
