@@ -1,5 +1,5 @@
 /*
- * $Id: term.h,v 1.5.2.4 2000/10/22 13:50:51 joze Exp $
+ * $Id: term.h,v 1.9 2000/10/31 19:59:31 joze Exp $
  */
 
 /* GNUPLOT - term.h */
@@ -277,9 +277,7 @@
 #include "dxf.trm"
 
 /* Enhanced Metafile Format driver */
-#ifdef USE_EMF_DRIVER
-# include "emf.trm"
-#endif
+#include "emf.trm"
 
 /* Roland DXY800A plotter */
 /* #include "dxy.trm" */
@@ -382,10 +380,8 @@
 /* latex/tex with picture in postscript */
 #include "pslatex.trm"
 
-#ifdef USE_EPSLATEX_DRIVER
 /* new epslatex driver */
 #include "epslatex.trm"
-#endif
 
 /* EEPIC-extended LaTeX driver, for EEPIC users */
 #include "eepic.trm"
