@@ -72,7 +72,7 @@ TERM_PUBLIC void CGM_dashtype __PROTO((int dashtype));
 TERM_PUBLIC void CGM_linewidth __PROTO((double width));
 TERM_PUBLIC void CGM_put_text __PROTO((unsigned int x, unsigned int y, 
 				       char *str));
-TERM_PUBLIC int CGM_text_angle __PROTO((int angle));
+TERM_PUBLIC int CGM_text_angle __PROTO((int ang));
 TERM_PUBLIC int CGM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void CGM_point __PROTO((unsigned int x, unsigned int y, 
 				    int number));
@@ -739,15 +739,15 @@ TERM_PUBLIC void CGM_put_text(x, y, str)
   cgm_posx = cgm_posy = -2000;
 }
 
-TERM_PUBLIC int CGM_text_angle(vertical)
-	int vertical;
+TERM_PUBLIC int CGM_text_angle(ang)
+	int ang;
 {
   if(cgm_rotate)
     {
-      cgm_vert_text_requested = vertical;
+      cgm_vert_text_requested = ang;
       return TRUE;
     }
-  return vertical?FALSE:TRUE;
+  return ang?FALSE:TRUE;
 }
 
 TERM_PUBLIC int CGM_justify_text(mode)

@@ -216,7 +216,7 @@ char str[];
 	(void) T410X_move(x + T410XHCHAR / 2 - 6, y);
 	fputs("\033MRE:0", gpoutfile);
     }
-    (void) fprintf(gpoutfile, "\033LT", gpoutfile);
+    (void) fputs("\033LT", gpoutfile);
     (void) T410X_encode_int(strlen(str));
     (void) fputs(str, gpoutfile);
     (void) fflush(gpoutfile);

@@ -508,9 +508,9 @@ TERM_PUBLIC void GIF_put_text(unsigned int x, unsigned int y, char* string)
  * If ang = 0 then text is horizontal.  If ang = 1 then text is vertically
  * upwards.  Returns TRUE if text can be rotated, FALSE otherwise.
  */
-TERM_PUBLIC int GIF_text_angle(int angle)
+TERM_PUBLIC int GIF_text_angle(int ang)
 {
-    gif_state.angle = angle;
+    gif_state.angle = ang;
     return TRUE;
 }
 

@@ -64,7 +64,7 @@ TERM_PUBLIC void MTOS_text(void);
 TERM_PUBLIC void MTOS_move(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_vector(unsigned int x, unsigned int y);
 TERM_PUBLIC void MTOS_linetype(int lt);
-TERM_PUBLIC int MTOS_text_angle(int ta);
+TERM_PUBLIC int MTOS_text_angle(int ang);
 TERM_PUBLIC void MTOS_put_text(unsigned int x, unsigned int y, char *str);
 TERM_PUBLIC int  MTOS_justify_text(enum JUSTIFY mode);
 TERM_PUBLIC void MTOS_point(unsigned int x, unsigned int y, int number);
@@ -244,11 +244,11 @@ TERM_PUBLIC void MTOS_linetype(int lt)
 	write(handle, &lt_1, SIZE);
 }
 
-TERM_PUBLIC int MTOS_text_angle(int ta)
+TERM_PUBLIC int MTOS_text_angle(int ang)
 { 
 	short ta_1, buff;
 
-	ta_1 = (short)ta;
+	ta_1 = (short)ang;
 	buff = (short)SET_ANGLE;
 	write(handle, &buff, SIZE);
 	write(handle, &ta_1, SIZE);

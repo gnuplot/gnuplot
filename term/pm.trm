@@ -55,7 +55,7 @@ TERM_PUBLIC void PM_graphics __PROTO((void));
 TERM_PUBLIC void PM_linetype __PROTO((int lt));
 TERM_PUBLIC void PM_move __PROTO((unsigned int x,unsigned int y));
 TERM_PUBLIC void PM_vector __PROTO((unsigned int x,unsigned int y));
-TERM_PUBLIC int  PM_text_angle __PROTO((int ta));
+TERM_PUBLIC int  PM_text_angle __PROTO((int ang));
 TERM_PUBLIC void PM_put_text __PROTO((unsigned int x,unsigned int y,char *str));
 TERM_PUBLIC int  PM_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PM_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -391,10 +391,10 @@ TERM_PUBLIC void PM_linetype(int lt)
     fwrite( &lt, sizeof(int), 1, PM_pipe ) ;
     }
 
-TERM_PUBLIC int PM_text_angle( int ta)
+TERM_PUBLIC int PM_text_angle( int ang)
     { 
     putc( SET_ANGLE, PM_pipe ) ;
-    fwrite( &ta, sizeof(int), 1, PM_pipe ) ;
+    fwrite( &ang, sizeof(int), 1, PM_pipe ) ;
     return(TRUE) ; 
     }
 

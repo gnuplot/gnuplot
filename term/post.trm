@@ -82,7 +82,7 @@ TERM_PUBLIC int PS_set_font __PROTO((char * font));
 TERM_PUBLIC int ENHPS_set_font __PROTO((char * font));
 TERM_PUBLIC void PS_fillbox __PROTO((int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height));
 TERM_PUBLIC void PS_linewidth __PROTO((double linewidth)); /* JFi [linewidth] */
-TERM_PUBLIC void PS_pointsize __PROTO((double pointsize)); /* JFi [pointsize] */
+TERM_PUBLIC void PS_pointsize __PROTO((double ptsize)); /* JFi [pointsize] */
 
 #define PS_POINT_TYPES 8
 #define PS_XOFF	50	/* page offset in pts */
@@ -886,34 +886,34 @@ NULL };
 /* the init fn for the postscript driver */
 TERM_PUBLIC void PS_init()
 {
-	unsigned int xmin, ymin, xmax, ymax;
+	unsigned int xmin_t, ymin_t, xmax_t, ymax_t;
 
 	if (ps_eps)
 	{
 		term->xmax = PS_XMAX;
 		term->ymax = PS_YMAX;
-		xmin = PS_XMAX * xoffset / (2*PS_SC);
-		xmax = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
-		ymin = PS_YMAX * yoffset / (2*PS_SC);
-		ymax = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
+		xmin_t = PS_XMAX * xoffset / (2*PS_SC);
+		xmax_t = PS_XMAX * (xsize + xoffset) / (2*PS_SC);
+		ymin_t = PS_YMAX * yoffset / (2*PS_SC);
+		ymax_t = PS_YMAX * (yoffset + ysize) / (2*PS_SC);
 	}
 	else if (ps_portrait)
 	{
 		term->xmax = PS_YMAX;
 		term->ymax = PS_XMAX;
-		xmin = PS_YMAX * xoffset / PS_SC;
-		xmax = PS_YMAX * (xsize + xoffset) / PS_SC;
-		ymin = PS_XMAX * yoffset / PS_SC;
-		ymax = PS_XMAX * (ysize + yoffset) / PS_SC;
+		xmin_t = PS_YMAX * xoffset / PS_SC;
+		xmax_t = PS_YMAX * (xsize + xoffset) / PS_SC;
+		ymin_t = PS_XMAX * yoffset / PS_SC;
+		ymax_t = PS_XMAX * (ysize + yoffset) / PS_SC;
 	}
 	else
 	{
 		term->xmax = PS_XMAX;
 		term->ymax = PS_YMAX;
-		ymin = PS_XMAX * xoffset / PS_SC;
-		ymax = PS_XMAX * (xsize+xoffset) / PS_SC;
-		xmin = PS_YMAX * (1-ysize-yoffset) / PS_SC;
-		xmax = PS_YMAX * (1-yoffset) / PS_SC;
+		ymin_t = PS_XMAX * xoffset / PS_SC;
+		ymax_t = PS_XMAX * (xsize+xoffset) / PS_SC;
+		xmin_t = PS_YMAX * (1-ysize-yoffset) / PS_SC;
+		xmax_t = PS_YMAX * (1-yoffset) / PS_SC;
 	}
 
 	/* for enhanced postscript, copy ps_font to ps_enh_font
@@ -923,7 +923,7 @@ TERM_PUBLIC void PS_init()
 	ps_enh_fontsize = ps_fontsize;
 	
 	PS_common_init(ps_eps, ps_portrait, 1, PS_XOFF, PS_YOFF,
-	   xmin, ymin, xmax, ymax,
+	   xmin_t, ymin_t, xmax_t, ymax_t,
 	   (term->put_text == ENHPS_put_text) ? ENHPS_header : NULL);
 }
 
@@ -1038,10 +1038,10 @@ double linewidth;
 }
 
 
-TERM_PUBLIC void PS_pointsize (pointsize)
-double pointsize;
+TERM_PUBLIC void PS_pointsize (ptsize)
+double ptsize;
 {
-        fprintf(gpoutfile,"%.3f UP\n",pointsize);
+        fprintf(gpoutfile,"%.3f UP\n",ptsize);
 
 /*  
   Documentation of the 'change pointsize' strategy of the postscript terminal:

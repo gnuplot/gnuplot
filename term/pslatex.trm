@@ -62,7 +62,7 @@ TERM_PUBLIC void PSLATEX_init __PROTO((void));
 TERM_PUBLIC void PSLATEX_graphics __PROTO((void));
 TERM_PUBLIC void PSLATEX_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
 TERM_PUBLIC int PSLATEX_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int PSLATEX_text_angle __PROTO((int angle));
+TERM_PUBLIC int PSLATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSLATEX_reset __PROTO((void));
 TERM_PUBLIC void PSLATEX_text __PROTO((void));
 TERM_PUBLIC void PSLATEX_move __PROTO((unsigned int x, unsigned int y));
@@ -247,19 +247,19 @@ TERM_PUBLIC void PSLATEX_init()
     }
 
 	{
-		unsigned int xmin = xoffset * PSLATEX_XMAX / PS_SC;
-		unsigned int xmax = (xoffset+xsize) * PSLATEX_XMAX / PS_SC;
-		unsigned int ymin = yoffset * PSLATEX_YMAX / PS_SC;
-		unsigned int ymax = (yoffset+ysize) * PSLATEX_YMAX / PS_SC;
+		unsigned int xmin_t = xoffset * PSLATEX_XMAX / PS_SC;
+		unsigned int xmax_t = (xoffset+xsize) * PSLATEX_XMAX / PS_SC;
+		unsigned int ymin_t = yoffset * PSLATEX_YMAX / PS_SC;
+		unsigned int ymax_t = (yoffset+ysize) * PSLATEX_YMAX / PS_SC;
 
 		if (PSLATEX_auxFile) {
 			FILE *tmp = gpoutfile;
 			gpoutfile = PSLATEX_auxFile;
-			PS_common_init(1,1,0, 0,0, xmin, ymin, xmax, ymax, NULL);
+			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 			gpoutfile = tmp;
 		} else {
 			fprintf(gpoutfile, "\\special{!\n");
-			PS_common_init(1,1,0, 0,0, xmin, ymin, xmax, ymax, NULL);
+			PS_common_init(1,1,0, 0,0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
 			fprintf(gpoutfile, "}\n");
 		}
 	}
@@ -332,12 +332,12 @@ enum JUSTIFY mode;
     return TRUE;
 }
 
-TERM_PUBLIC int PSLATEX_text_angle(angle)
-int angle;
+TERM_PUBLIC int PSLATEX_text_angle(ang)
+int ang;
 {
     /* rotated text is put in a short stack, and optionally uses 
      * postscript specials depending on PSLATEX_rotate */
-    PSLATEX_angle = angle;
+    PSLATEX_angle = ang;
     return TRUE;
 }
 

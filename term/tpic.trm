@@ -95,7 +95,7 @@ TERM_PUBLIC void TPIC_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void TPIC_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void TPIC_linetype __PROTO((int linetype));
 TERM_PUBLIC void TPIC_put_text __PROTO((unsigned int x, unsigned int y, char *str)); /* ref point and text */
-TERM_PUBLIC int TPIC_text_angle __PROTO((int angle));
+TERM_PUBLIC int TPIC_text_angle __PROTO((int ang));
 TERM_PUBLIC int TPIC_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void TPIC_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC void TPIC_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
@@ -253,12 +253,12 @@ static /*GPFAR*/ tpic_line_info GPFAR tpic_line[] = {
 TERM_PUBLIC void TPIC_options() /* get size options */
 {
 	struct value a;
-	int pointsize, linewidth;
+	int ptsize, linewidth;
 	double interval;
 
 	if (!END_OF_COMMAND) {
-		pointsize = (int)real(const_express(&a));
-		if (pointsize > 0) tpic_pointsize = pointsize;
+		ptsize = (int)real(const_express(&a));
+		if (ptsize > 0) tpic_pointsize = ptsize;
 	}
 
 	if (!END_OF_COMMAND) {
@@ -522,10 +522,10 @@ unsigned int x; unsigned int y; char *str; /* ref point and text */
 	}
 }
 
-TERM_PUBLIC int TPIC_text_angle(angle)
-int angle;
+TERM_PUBLIC int TPIC_text_angle(ang)
+int ang;
 {
-	tpic_angle = angle;
+	tpic_angle = ang;
 	return(TRUE);
 }
 

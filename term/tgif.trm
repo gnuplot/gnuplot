@@ -82,7 +82,7 @@ TERM_PUBLIC void TGIF_move __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void TGIF_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void TGIF_linetype __PROTO((int linetype));
 TERM_PUBLIC void TGIF_put_text __PROTO((unsigned int ux, unsigned int uy, char *str)); /* ref point and text */
-TERM_PUBLIC int  TGIF_text_angle __PROTO((int angle));
+TERM_PUBLIC int  TGIF_text_angle __PROTO((int ang));
 TERM_PUBLIC int  TGIF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void TGIF_point __PROTO((unsigned int ux, unsigned int uy, int number));
 TERM_PUBLIC void TGIF_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
@@ -603,10 +603,10 @@ if(strlen(str)==0) return;
 } /* TGIF_put_text */
 /*}}}  */
 /***************************************************************************/
-TERM_PUBLIC int TGIF_text_angle(angle)
-int angle;
+TERM_PUBLIC int TGIF_text_angle(ang)
+int ang;
 {
-uActAngle = uTextAngle[angle];      /* 0=waag.  1=senkrecht */
+uActAngle = uTextAngle[ang];      /* 0=waag.  1=senkrecht */
 return (TRUE);
 } /* TGIF_text_angle */
 

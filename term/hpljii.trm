@@ -119,7 +119,7 @@ TERM_PUBLIC void HPDJtext __PROTO((void));
 #define HPLJII_COURIER fprintf(gpoutfile,"\033(0N\033(s0p10.0h12.0v0s0b3T\033&l6D")
          /* be sure to use courier font with 6lpi and 10cpi */
 
-void HPLJIIputc __PROTO((unsigned int x, unsigned int y, char c, int angle));
+void HPLJIIputc __PROTO((unsigned int x, unsigned int y, char c, int ang));
 static int hplj_dpp=4;
 /* bm_pattern not appropriate for 300ppi graphics */
 #ifndef GOT_300_PATTERN
@@ -279,11 +279,11 @@ char *str;
 }
 
 #ifdef PROTOTYPES
-void HPLJIIputc(unsigned int x, unsigned int y, char c, int angle)
+void HPLJIIputc(unsigned int x, unsigned int y, char c, int ang)
 #else
-void HPLJIIputc(x,y,c,angle)
+void HPLJIIputc(x,y,c,ang)
 unsigned int x,y;
-int angle;
+int ang;
 char c;
 #endif
 {

@@ -96,7 +96,7 @@ TERM_PUBLIC void LATEX_point __PROTO((unsigned int x, unsigned int y, int number
 TERM_PUBLIC void LATEX_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void LATEX_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
 TERM_PUBLIC int LATEX_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int LATEX_text_angle __PROTO((int angle));
+TERM_PUBLIC int LATEX_text_angle __PROTO((int ang));
 TERM_PUBLIC void LATEX_reset __PROTO((void));
 
 #ifdef EMTEX
@@ -709,13 +709,13 @@ TERM_PUBLIC int LATEX_justify_text(mode)
     return (TRUE);
 }
 
-TERM_PUBLIC int LATEX_text_angle(angle)
-	int angle;
+TERM_PUBLIC int LATEX_text_angle(ang)
+	int ang;
 {
     /* we can't really write text vertically, but this will 
 	  put the ylabel centred at the left of the plot, and
 	  then we'll make a \shortstack */
-    latex_angle = angle;
+    latex_angle = ang;
     return (TRUE);
 }
 

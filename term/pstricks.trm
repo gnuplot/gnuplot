@@ -95,7 +95,7 @@ TERM_PUBLIC void PSTRICKS_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void PSTRICKS_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
 TERM_PUBLIC void PSTRICKS_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
 TERM_PUBLIC int PSTRICKS_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int angle));
+TERM_PUBLIC int PSTRICKS_text_angle __PROTO((int ang));
 TERM_PUBLIC void PSTRICKS_reset __PROTO((void));
 
 #define PSTRICKS_XMAX 10000.0
@@ -532,10 +532,10 @@ enum JUSTIFY mode;
 }
 
 TERM_PUBLIC int 
-PSTRICKS_text_angle(angle)
-int angle;
+PSTRICKS_text_angle(ang)
+int ang;
 {
-    PSTRICKS_angle = angle;
+    PSTRICKS_angle = ang;
     return (TRUE);
 }
 

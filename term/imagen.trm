@@ -74,7 +74,7 @@ TERM_PUBLIC void IMAGEN_text __PROTO((void));
 TERM_PUBLIC void IMAGEN_linetype __PROTO((int lt));
 TERM_PUBLIC void IMAGEN_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void IMAGEN_vector __PROTO((unsigned int ux, unsigned int uy));
-TERM_PUBLIC int IMAGEN_text_angle __PROTO((int angle));
+TERM_PUBLIC int IMAGEN_text_angle __PROTO((int ang));
 TERM_PUBLIC int IMAGEN_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void IMAGEN_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
 TERM_PUBLIC void IMAGEN_reset __PROTO((void));
@@ -426,18 +426,18 @@ IMAGEN_setpos(ux, uy)
 	 IMAGEN_putwd(ux + IMAGEN_orgx); /* horizontal */
 }
 
-TERM_PUBLIC int IMAGEN_text_angle(angle)
-	int angle;
+TERM_PUBLIC int IMAGEN_text_angle(ang)
+	int ang;
 {
     
     if ( IM_vecpos ) {
 	/* fprintf(stderr,"text_angle, draw path\n"); */
 	IMAGEN_draw_path();
     }
-    if (IMAGEN_angle != angle) {
-	   IMAGEN_angle = angle;	/* record for later use */
+    if (IMAGEN_angle != ang) {
+	   IMAGEN_angle = ang;	/* record for later use */
 	   putc(imP_SET_ADV_DIRS, gpoutfile);
-	   putc(angle == 0 ? 0 : 7, gpoutfile); /* 0=>horiz : 7=>vert */
+	   putc(ang == 0 ? 0 : 7, gpoutfile); /* 0=>horiz : 7=>vert */
     }
 
     return(TRUE);

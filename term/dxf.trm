@@ -66,7 +66,7 @@ TERM_PUBLIC void DXF_linetype __PROTO((int linetype));
 TERM_PUBLIC void DXF_move __PROTO((unsigned int x, unsigned int y));
 TERM_PUBLIC void DXF_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void DXF_put_text __PROTO((unsigned int x, unsigned int y, char str[]));
-TERM_PUBLIC int DXF_text_angle __PROTO((int angle));
+TERM_PUBLIC int DXF_text_angle __PROTO((int ang));
 TERM_PUBLIC int DXF_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void DXF_reset __PROTO((void));
 #define DXF_XMAX (120.0 * DXF_UNIT)
@@ -312,11 +312,11 @@ TERM_PUBLIC void DXF_put_text(x, y, str)
 	}
 }
 
-TERM_PUBLIC int DXF_text_angle(angle)
-	int angle;
+TERM_PUBLIC int DXF_text_angle(ang)
+	int ang;
 {
 	dxf_angle = 0.0;
-	if (angle == 1) dxf_angle = 90.0;
+	if (ang == 1) dxf_angle = 90.0;
 	return(TRUE);
 }
 

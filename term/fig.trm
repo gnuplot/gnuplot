@@ -77,8 +77,8 @@ TERM_PUBLIC void FIG_vector __PROTO((unsigned int ux, unsigned int uy));
 TERM_PUBLIC void FIG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
 TERM_PUBLIC void FIG_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 TERM_PUBLIC int FIG_justify_text __PROTO((enum JUSTIFY mode));
-TERM_PUBLIC int FIG_text_angle __PROTO((int angle));
-TERM_PUBLIC void FIG_pointsize __PROTO((double pointsize));
+TERM_PUBLIC int FIG_text_angle __PROTO((int ang));
+TERM_PUBLIC void FIG_pointsize __PROTO((double arg_pointsize));
 TERM_PUBLIC void FIG_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void FIG_reset __PROTO((void));
 TERM_PUBLIC void FIG_lpoint __PROTO((unsigned int x, unsigned int y, int number));
@@ -176,18 +176,18 @@ static int FIG_font_s = FIG_FONT_S;
 static int FIG_portrait = FALSE;
 static int FIG_inches = FALSE; 
 
-static void FIG_poly_clean __PROTO((enum FIG_poly_stat stat));
+static void FIG_poly_clean __PROTO((enum FIG_poly_stat fig_stat));
 
 
 #define FIG_POINT_TYPES POINT_TYPES /* we use the same points */
 
  
 static void
-  FIG_poly_clean(stat)
-enum FIG_poly_stat stat;
+  FIG_poly_clean(fig_stat)
+enum FIG_poly_stat fig_stat;
 {
   int i,j;
-  if(stat == FIG_poly_part) {
+  if(fig_stat == FIG_poly_part) {
 	fprintf(gpoutfile, "%d %d %d %d %d %d %d %d %d %9.3f %d %d %d %d %d %ld\n\t",
 	 O_POLYLINE, FIG_line.type, FIG_line.style, FIG_line.thickness,
 	 FIG_line.pen_color, FIG_line.fill_color, FIG_line.depth,
@@ -200,10 +200,10 @@ enum FIG_poly_stat stat;
 	{
 	  fprintf(gpoutfile," %d %d",FIG_points[i].x,FIG_points[i].y);
 	  if (j++ > 4 && i != FIG_poly_vec_cnt-1) {
-		fprintf(gpoutfile,"\n\t"); j = 0; /* JFS */
+		fputs("\n\t",gpoutfile); j = 0; /* JFS */
 	  }
 	}
-	if (j != 0) {fprintf(gpoutfile,"\n");}
+	if (j != 0) {fputs("\n",gpoutfile);}
 	/* Give the memory back to the system because we are done with this 
 	 * polyline. Make sure FIG_points contains NULL afterwards!
 	 */
@@ -223,15 +223,15 @@ TERM_PUBLIC void FIG_options()
    int parse_error=FALSE;
    long temp_max;
    struct value a;
-   unsigned int tmax;
-   double xsize, ysize;
+   unsigned int tmax_t;
+   double xsize_t, ysize_t;
 
    FIG_use_color = FALSE;	/* default */
    FIG_is_big = FALSE;	/* default */
    FIG_portrait = FALSE;
    FIG_font_s = 0;
    FIG_default_thickness = 1;
-   xsize = ysize = 0.;
+   xsize_t = ysize_t = 0.;
 #if METRIC
    FIG_inches = FALSE;
 #else
@@ -277,17 +277,17 @@ TERM_PUBLIC void FIG_options()
 	 if (END_OF_COMMAND) {
 	    int_error("size: 2 numbers expected",c_token);
          }  else {
-            xsize = real(const_express(&a));
+            xsize_t = real(const_express(&a));
 	    if (END_OF_COMMAND) {
 	       int_error("size: 2 numbers expected",c_token);
-	       xsize = 0.;
+	       xsize_t = 0.;
             }  else {
-               ysize = real(const_express(&a));
+               ysize_t = real(const_express(&a));
             }
-            if ( xsize < 2. || ysize < 2. || xsize > 99. || ysize > 99. ) {
-               if ( xsize != 0. || ysize != 0. )
+            if ( xsize_t < 2. || ysize_t < 2. || xsize_t > 99. || ysize_t > 99. ) {
+               if ( xsize_t != 0. || ysize_t != 0. )
                   int_error("size: out of range",c_token);
-               xsize = ysize = 0.;
+               xsize_t = ysize_t = 0.;
             }
          }
       }
@@ -366,13 +366,13 @@ TERM_PUBLIC void FIG_options()
 	"fontsize", (FIG_font_s>0 ? FIG_font_s : 
 	    (FIG_is_big?BFIG_FONT_S:FIG_FONT_S)),
 	"thickness", FIG_default_thickness, "depth", FIG_depth); /* JFS, KB */
-   if ( xsize > 0. && ysize > 0. ) {
-      if ( xsize-(int)xsize==0. && ysize-(int)ysize==0. )
+   if ( xsize_t > 0. && ysize_t > 0. ) {
+      if ( xsize_t-(int)xsize_t==0. && ysize_t-(int)ysize_t==0. )
          sprintf(term_options+strlen(term_options),
-           " size %d %d",(int)xsize,(int)ysize);
+           " size %d %d",(int)xsize_t,(int)ysize_t);
       else
          sprintf(term_options+strlen(term_options),
-           " size %f %f",xsize,ysize);
+           " size %f %f",xsize_t,ysize_t);
    }
 
    if(!FIG_is_big) {
@@ -395,17 +395,17 @@ TERM_PUBLIC void FIG_options()
       FIG_yoff    = BFIG_YOFF;
    }
    if ( FIG_portrait ) { /* KB */
-      tmax = term->xmax;
+      tmax_t = term->xmax;
       term->xmax = term->ymax;
-      term->ymax = tmax;
+      term->ymax = tmax_t;
    }
-   if ( xsize > 0. && ysize > 0. ) {
+   if ( xsize_t > 0. && ysize_t > 0. ) {
       if ( FIG_inches ) {
-         term->xmax = (unsigned int) (xsize * FIG_RES);
-         term->ymax = (unsigned int) (ysize * FIG_RES);
+         term->xmax = (unsigned int) (xsize_t * FIG_RES);
+         term->ymax = (unsigned int) (ysize_t * FIG_RES);
       } else {
-         term->xmax = (unsigned int) (xsize/2.54 * FIG_RES);
-         term->ymax = (unsigned int) (ysize/2.54 * FIG_RES);
+         term->xmax = (unsigned int) (xsize_t/2.54 * FIG_RES);
+         term->ymax = (unsigned int) (ysize_t/2.54 * FIG_RES);
       }
    }
    term->v_char = FIG_to_pixel_v(FIG_font_s);
@@ -646,10 +646,10 @@ TERM_PUBLIC int FIG_justify_text(mode)
     return (TRUE);
 }
  
-TERM_PUBLIC int FIG_text_angle(angle)
-        int angle;
+TERM_PUBLIC int FIG_text_angle(ang)
+        int ang;
 {
-    if (angle)
+    if (ang)
          FIG_angle = Pi / 2.0;  /* vertical is pi/2 radians */
     else
          FIG_angle = 0.0;               /* horizontal */
@@ -737,12 +737,12 @@ int number;
        do_point(x,y,number);
 }
  
-TERM_PUBLIC void FIG_pointsize(pointsize)
-double pointsize;
+TERM_PUBLIC void FIG_pointsize(arg_pointsize)
+double arg_pointsize;
 {
-   FIG_current_pointsize = pointsize;
+   FIG_current_pointsize = arg_pointsize;
    /* Bug-fix by hkeller@gwdg.de and K.B.: set pointsize for do_point() */
-  do_pointsize(pointsize * FIG_font_s / (double) FIG_FONT_S );
+  do_pointsize(arg_pointsize * FIG_font_s / (double) FIG_FONT_S );
 }
  
 TERM_PUBLIC void FIG_linewidth(linewidth)
