@@ -8,6 +8,8 @@ Changes in release 3.7.1:
 * duplicate functions removed
 * FIXED definition of ANSI_C on autoconf platforms
 * FIXED argument passing to gnuplot_x11 on VMS
+* NEW `save' command now accepts "-" as filename, "saving" to stdout
+* driver for OpenStep/MacOS X server now complete
 [3.7.0.8]
 * embedding document font is now default font in latex output
 * static limits for user defined function and variable names removed

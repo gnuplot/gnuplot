@@ -1,3 +1,15 @@
+1999-07-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc, src/command.c: Allow "-" for stdout as filename
+	in `save' command.
+
+	* src/protos.h, src/term.c, src/version.c: More const qualifiers.
+
+1999-07-04  Albert Chin-A-Young  <china@thewrittenword.com>
+
+	* src/command.c, src/time.c: Bring "%y" date format interpretation
+	in line with Open Group recommendations wrt Y2K.
+
 1999-06-29  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
 
 	* config/makefile.vms: More improvements.
