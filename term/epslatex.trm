@@ -1,5 +1,5 @@
 /*
- * $Id: epslatex.trm,v 1.15 2002/08/30 20:18:25 sfeam Exp $
+ * $Id: epslatex.trm,v 1.16 2002/10/17 19:06:19 mikulik Exp $
  */
 
 /* GNUPLOT - epslatex.trm */
@@ -953,7 +953,7 @@ TERM_TABLE_END(epslatex_driver)
 #endif /* TERM_PROTO_ONLY */
 
 #ifdef TERM_HELP
-START_HELP(post)
+START_HELP(epslatex)
 "1 epslatex",
 "?commands set terminal epslatex",
 "?set terminal epslatex",
@@ -1006,5 +1006,5 @@ START_HELP(post)
 " pdf files can made out of the eps files. If the graphics package is properly",
 " configured, the LaTeX files can also be processed by pdflatex without",
 " changes, and the pdf files are included instead of the eps files."
-END_HELP(post)
+END_HELP(epslatex)
 #endif
