@@ -2,8 +2,8 @@
 # Makefile fragment to generate makefile.all and update version.c
 
 # Non-core sources and version.c
-noncoresrc = amiga.c bf_test.c corplot.c ctrl87.c gplt_x11.c os9.c \
-strftime.c version.c vms.c
+noncoresrc = amiga.c ansi2knr.c bf_test.c corplot.c ctrl87.c gplt_x11.c \
+os9.c strftime.c version.c vms.c
 
 coresrc := $(filter-out $(noncoresrc),$(wildcard *.c))
 
@@ -16,7 +16,6 @@ patchlevel := $(shell cat ../PATCHLEVEL)
 date := $(shell date)
 
 makefile.all: Makefile.maint
-	@echo Making $@
 	@echo "# $@ generated automatically by GNU make" >$@t
 	@echo >>$@t
 	@echo '# List of core object files except version.$$(O)' >>$@t
@@ -34,7 +33,9 @@ version.c: ../VERSION ../PATCHLEVEL Makefile.maint
 	@vn=`sed -n 's/.*version.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
 	pl=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' ./version.c|tr -d ' '`; \
 	dt=`sed -n 's/.*date.*"\(.*\)".*/\1/p' ./version.c`; \
-	if [ "$(version)" != $$vn -o "$(patchlevel)" != $$pl -o "$$date" != "$$dt" ]; then \
+	if [ "$(version)" != $$vn -o \
+	     "$(patchlevel)" != $$pl -o \
+	     "$$date" != "$$dt" ]; then \
 	  sed -e '/^char version/ s/"[^"]*"/"@VERS@"/' \
 	      -e '/^char patchlevel/ s/"[^"]*"/"@PLVL@"/' \
 	      -e '/^char date/ s/"[^"]*"/"@DATE@"/' \
