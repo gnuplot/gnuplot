@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.60 2002/03/30 14:05:43 broeker Exp $
+ * $Id: post.trm,v 1.61 2002/04/30 14:08:53 broeker Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -161,7 +161,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def } def\n",
 /* Dash or Color Line */
 "/DL { Color {setrgbcolor Solid {pop []} if 0 setdash }\n",
-" {pop pop pop Solid {pop []} if 0 setdash} ifelse } def\n",
+" {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse } def\n",
 /* Border Lines */
 "/BL { stroke userlinewidth 2 mul setlinewidth } def\n",
 /* Axes Lines */
