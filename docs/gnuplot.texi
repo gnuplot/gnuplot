@@ -2976,11 +2976,17 @@ can select one data point from the record). Records beginning with `#`
 Each data point represents an (x,y) pair. For `plot`s with error bars or
 error bars with lines (see @ref{errorbars} or @ref{errorlines}),
 each data point is (x,y,ydelta), (x,y,ylow,yhigh),
-(x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). In all
-cases, the numbers on each record of a data file must be separated by
-white space (one or more blanks or tabs), unless a format specifier is
-provided by the @ref{using} option. This white space divides each record 
-into columns.
+(x,y,xdelta), (x,y,xlow,xhigh), or (x,y,xlow,xhigh,ylow,yhigh). 
+
+In all cases, the numbers of each record of a data file must be separated
+by white space (one or more blanks or tabs) unless a format specifier is 
+provided by the @ref{using} option. This white space divides each record into 
+columns. However, whitespace inside a pair of double quotes is ignored when
+counting columns, so the following datafile line has three columns:
+@example
+      1.0 "second column" 3.0
+
+@end example
 
 Data may be written in exponential format with the exponent preceded by the
 letter e, E, d, D, q, or Q.
@@ -3330,7 +3336,7 @@ resulting points are then connected by straight line segments.
 
 A special filename of `'-'` specifies that the data are inline; i.e., they
 follow the command.  Only the data follow the command; `plot` options like
-filters, titles, and line styles remain on the 'plot' command line.  This is
+filters, titles, and line styles remain on the `plot` command line.  This is
 similar to << in unix shell script, and $DECK in VMS DCL.  The data are
 entered as though they are being read from a file, one data point per record.
 The letter "e" at the start of the first column terminates data entry.  The
@@ -3876,9 +3882,10 @@ The line title and sample can be omitted from the key by using the keyword
 `notitle`.  A null title (`title ''`) is equivalent to `notitle`.  If only
 the sample is wanted, use one or more blanks (`title ' '`).
 
-By default the line title is the function or file name as it appears on the
-`plot` command.  If it is a file name, any datafile modifiers specified will
-be included in the default title.
+If `key autotitles` is set (which is the default) and neither `title` nor
+`notitle` are specified the line title is the function name or the file name as
+it appears on the `plot` command.  If it is a file name, any datafile modifiers
+specified will be included in the default title.
 
 The layout of the key itself (position, title justification, etc.) can be
 controlled by @ref{key}.  Please see @ref{key} for details.
@@ -3940,7 +3947,7 @@ where <style> is either `lines`, `points`, @ref{linespoints}, @ref{impulses},
 @ref{dots}, @ref{steps}, @ref{fsteps}, @ref{histeps}, @ref{errorbars}, @ref{xerrorbars},
 @ref{yerrorbars}, @ref{xyerrorbars}, @ref{errorlines}, @ref{xerrorlines}, @ref{yerrorlines},
 @ref{xyerrorlines}, @ref{boxes}, @ref{filledboxes}, @ref{filledcurves}, @ref{boxerrorbars},
-@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vector} or @ref{pm3d}. Some 
+@ref{boxxyerrorbars}, @ref{financebars}, @ref{candlesticks}, @ref{vectors} or @ref{pm3d}. Some 
 of these styles require additional information. See `set style <style>` for
 details of each style.  Note that @ref{filledcurves} and @ref{pm3d} can take an 
 additional option not listed above (the latter only when used in the `splot`
@@ -6113,6 +6120,7 @@ Syntax:
               @{samplen <sample_length>@} @{spacing <vertical_spacing>@}
               @{width <width_increment>@}
               @{height <height_increment>@}
+              @{@{no@}autotitles@}
               @{title "<text>"@} @{@{no@}enhanced@}
               @{@{no@}box @{ @{linestyle | ls <line_style>@}
                          | @{linetype | lt <line_type>@}
@@ -6154,6 +6162,11 @@ The <height_increment> is a number of character heights to be added to or
 subtracted from the height of the key box.  This is useful mainly when you are
 putting a box around the key, otherwise it can be used to adjust the vertical
 shift of automatically chosen key position by <height_increment>/2.
+
+All plotted curves of `plot`s and `splot`s are titled according to the 
+default option `autotitles`. The automatic generation of titles can be 
+suppressed by `noautotitles`; then only those titles explicitly defined 
+by `(s)plot ... title ...` will be drawn.
 
 A title can be put on the key (`title "<text>"`)---see also `syntax` for the
 distinction between text in single- or double-quotes.  The key title uses the
@@ -6262,11 +6275,9 @@ Syntax:
       set label @{<tag>@} 
                 @{ @{"<label text>"@{,<value>@}@} @{, ...@}@} @}
                 @{at <position>@}
-                @{<justification>@} @{norotate | rotate @{by <degrees>@}@} 
-@end example
-
-		 @{font "<name>@{,<size>@}"@}
-@example
+                @{left | center | right@}
+                @{norotate | rotate @{by <degrees>@}@} 
+                @{font "<name>@{,<size>@}"@}
                 @{front | back@}
                 @{textcolor <colorspec>@}
                 @{point <pointstyle> @{offset x, y@} | nopoint@}
@@ -6289,7 +6300,7 @@ The <label text> can optionally contain numbers, generated by
 replacement of printf()-like format specifiers contained in <label
 text>.  The number to be used is given by the <value> following the
 text.  The same formatting capilities as for tic labels are
-available.  See the help on 'format specifiers' for details. To
+available.  See the help on `format specifiers` for details. To
 display more than one distinct <value> with a single label, several
 pairs of <label text> and <value> may be given. Note that <value> is
 treated as a constant expression, i.e. if it contains variables, the
@@ -6299,7 +6310,7 @@ decimal separator character of numbers entered into label texts.
 
 By default, the text is placed flush left against the point x,y,z.  To adjust
 the way the label is positioned with respect to the point x,y,z, add the
-parameter <justification>, which may be `left`, `right` or `center`,
+justification parameter, which may be `left`, `right` or `center`,
 indicating that the point is to be at the left, right or center of the text.
 Labels outside the plotted boundaries are permitted but may interfere with
 axis labels or other text.
@@ -6308,6 +6319,10 @@ If `rotate` is given, the label is written vertically (if the terminal can do
 so, of course).  If `rotate by <degrees>` is given, conforming terminals will
 try to write the text at the specified angle; non-conforming terminals will
 treat this as vertical text.
+
+Font and its size can be chosen explicitly by `font "<name>@{,<size>@}"` if the
+terminal supports font settings.  Otherwise default font of the terminal will
+be used.
 
 If `front` is given, the label is written on top of the graphed data. If
 `back` is given (the default), the label is written underneath the graphed
@@ -6397,7 +6412,7 @@ To set a label on a graph with a timeseries on the x axis, use, for example:
 @end example
 
 To display a freshly fitted parameter on the plot with the data and the
-fitted function, do this after the 'fit', but before the 'plot':
+fitted function, do this after the `fit`, but before the `plot`:
 @example
       set label 'a = %3.5g',par_a     at 30, 15
       set label 'b = %s*10^%S',par_b  at 30, 20
@@ -6454,7 +6469,7 @@ Syntax:
 The line and point types are taken from the default types for the terminal
 currently in use.  The line width and point size are multipliers for the
 default width and size (but note that <point_size> here is unaffected by
-the multiplier given on 'set pointsize').
+the multiplier given on @ref{pointsize}).
 
 The defaults for the line and point types is the index.  The defaults for
 the width and size are both unity.
@@ -6466,9 +6481,9 @@ Not all terminals support the `linewidth` and @ref{pointsize} features; if
 not supported, the option will be ignored.
 
 Note that this feature is not completely implemented; linestyles defined by
-this mechanism may be used with 'plot', 'splot', 'replot', and 'set arrow',
+this mechanism may be used with `plot`, `splot`, @ref{replot}, and @ref{arrow},
 but not by other commands that allow the default index to be used, such as
-'set grid'.
+`set grid`.
 
 If gnuplot was built with pm3d support, the special keyword @ref{palette} is
 allowed as `linetype` for splots (the 2d `plot` command ignores @ref{palette}).
@@ -8064,7 +8079,7 @@ please see @ref{errorlines} and @ref{errorbars}.
 * linespoints::                 
 * points::                      
 * steps::                       
-* vector::                      
+* vectors::                     
 * xerrorbars::                  
 * xyerrorbars::                 
 * yerrorbars::                  
@@ -8402,7 +8417,7 @@ the points.  See @ref{pointsize} for its usage.
 The `points` style displays a small symbol at each point.  The command @ref{pointsize} may be used to change the size of the points.  See @ref{pointsize}
 for its usage.
 
-@node steps, vector, points, style
+@node steps, vectors, points, style
 @subsubsection steps
 
 @c ?commands set style steps
@@ -8417,22 +8432,22 @@ See also
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html,steps demo.
 }
 
-@node vector, xerrorbars, steps, style
-@subsubsection vector
+@node vectors, xerrorbars, steps, style
+@subsubsection vectors
 
-@c ?commands set style vector
-@c ?set style vector
-@c ?style vector
-@cindex vector
+@c ?commands set style vectors
+@c ?set style vectors
+@c ?style vectors
+@cindex vectors
 
-The @ref{vector} style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
+The @ref{vectors} style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
 it requires four columns of data.  It also draws a small arrowhead at the
 end of the vector.
 
 `set clip one` and `set clip two` affect drawing vectors.
 Please see @ref{clip}.
 
-@node xerrorbars, xyerrorbars, vector, style
+@node xerrorbars, xyerrorbars, vectors, style
 @subsubsection xerrorbars
 
 @c ?commands set style xerrorbars
@@ -8625,6 +8640,10 @@ in some operating systems.
 
 Several terminals have additional options.  For example, see `dumb`,
 `iris4d`, `hpljii` or `postscript`.
+The options used by a previous invocation `set term <term> <options>` of a
+given `<term>` are remembered, thus subsequent `set term <term>` does
+not reset them.  This helps in printing, for instance, when switching
+among different terminals---previous options don't have to be repeated.
 
 The command `set term push` remembers the current terminal including its
 settings while `set term pop` restores it. This is equivalent to `save term`
@@ -8672,7 +8691,7 @@ to you, depending on its output format.
 * mgr::                         
 * mif::                         
 * pbm::                         
-* png::                         
+* png_(OLD)::                   
 * postscript::                  
 * pslatex_and_pstex::           
 * pstricks::                    
@@ -9433,21 +9452,21 @@ printer and the 1590.  It has no options."
 @c ?terminal fig
 @c ?term fig
 @cindex fig
-@tmindex fig
 
+@cindex xfig
 
 The `fig` terminal device generates output in the Fig graphics language.
 
 Syntax:
 @example
-      set terminal fig @{monochrome | color@} @{small | big@}
-                       @{pointsmax <max_points>@}
+      set terminal fig @{monochrome | color@}
                        @{landscape | portrait@}
+                       @{small | big | size <xsize> <ysize>@}
                        @{metric | inches@}
+                       @{pointsmax <max_points>@}
                        @{solid | dashed@}
                        @{fontsize <fsize>@}
-                       @{textnormal | @{textspecial texthidden textrigid@} @}
-                       @{size <xsize> <ysize>@}
+                       @{textnormal | @{textspecial texthidden textrigid@}@}
                        @{thickness <units>@}
                        @{depth <layer>@}
                        @{version <number>@}
@@ -9456,21 +9475,28 @@ Syntax:
 
 `monochrome` and `color` determine whether the picture is black-and-white or
 `color`.  `small` and `big` produce a 5x3 or 8x5 inch graph in the default
-`landscape` mode and 3x5 or 5x8 inches in `portrait` mode.  <max_points>
-sets the maximum number of points per polyline.  Default units for editing
-with "xfig" may be `metric` or `inches`. 'solid' inhibts automatic usage
-of dashed lines when solid linestyles are used up, which otherwise occurs.
+`landscape` mode and 3x5 or 5x8 inches in `portrait` mode.
+@ref{size} sets (overrides) the size of the drawing
+area to <xsize>*<ysize> in units of inches or centimeters depending on the
+`metric` or `inches` setting in effect.
+The latter settings is also used as default units for editing with "xfig".
+
+`pointsmax <max_points>` sets the maximum number of points per polyline.
+
+`solid` inhibits automatic usage of `dash`ed lines when solid linestyles are
+used up, which otherwise occurs.
 
 `fontsize` sets the size of the text font to <fsize> points.  `textnormal`
 resets the text flags and selects postscript fonts, `textspecial` sets the
 text flags for LaTeX specials, `texthidden` sets the hidden flag and
-`textrigid` the rigid flag.  @ref{size} sets (overrides) the size of the drawing
-area to <xsize>*<ysize> in units of inches or centimeters depending on the
-`inches` or `metric` setting in effect.  `depth` sets the default depth
-layer for all lines and text.  The default depth is 10 to leave room for
-adding material with "xfig" on top of the plot.  'version' sets the format
-version of the generated fig output. Currently only versions 3.1 and 3.2 are
-supported.
+`textrigid` the rigid flag. 
+
+`depth` sets the default depth layer for all lines and text.  The default
+depth is 10 to leave room for adding material with "xfig" on top of the
+plot.
+
+@ref{version} sets the format version of the generated fig output. Currently
+only versions 3.1 and 3.2 are supported.
 
 `thickness` sets the default line thickness, which is 1 if not specified.
 Overriding the thickness can be achieved by adding a multiple of 100 to the
@@ -9545,11 +9571,11 @@ To plot the error bars on top of the circles use
 
 The `gif` terminal driver generates output in GIF format.  It uses Thomas
 Boutell's gd library, which is available from http://www.boutell.com/gd/
+Support for GIF output was removed from the gd library beginning with 
+version 1.6; newer versions support PNG output instead.
 
 >>> This copy of gnuplot was configured to produce PNG images <<<
 >>> instead of GIF images when 'set term gif' is selected.    <<<
-
-By default, the `gif` terminal driver uses a shared Web-friendy palette.
 
 Syntax:
 @example
@@ -10507,7 +10533,7 @@ Syntax:
 
 `colour` plots lines with line types >= 0 in colour (MIF sep. 2--7) and
 `monochrome` plots all line types in black (MIF sep. 0).
-`polyline` plots curves as continuous curves and `vectors` plots curves as
+`polyline` plots curves as continuous curves and @ref{vectors} plots curves as
 collections of vectors.
 @ref{help} and `?` print online help on standard error output---both print a
 short description of the usage; @ref{help} also lists the options;
@@ -10521,7 +10547,7 @@ Examples:
 
 @end example
 
-@node pbm, png, mif, terminal
+@node pbm, png_(OLD), mif, terminal
 @subsubsection pbm
 
 @c ?commands set terminal pbm
@@ -10563,8 +10589,8 @@ Examples:
 
 @end example
 
-@node png, postscript, pbm, terminal
-@subsubsection png
+@node png_(OLD), postscript, pbm, terminal
+@subsubsection png (OLD)
 
 @c ?commands set terminal png
 @c ?set terminal png
@@ -10575,11 +10601,10 @@ Examples:
 @tmindex png
 
 
-The `png` terminal driver supports Portable Network Graphics.  To compile it,
-you will need  the third-party libraries "libpng" and "zlib"; both are
-available at http://www.cdrom.com/pub/png/.  `png` has four options.
-
-By default, the `png` terminal driver uses a shared Web-friendy palette.
+The `png` terminal driver supports Portable Network Graphics.  This old 
+version of the png driver requires the third-party libraries "libpng" 
+and "zlib".  There is a newer png driver, with many more features, that
+is preferred if you have libgd version 1.8 or newer.
 
 Syntax:
 @example
@@ -10606,7 +10631,7 @@ Each <color> must be of the form 'xrrggbb', where x is the literal character
 color, then the X & Y axis color, then the plotting colors.  The maximum
 number of colors that can be set is currently 99."
 
-@node postscript, pslatex_and_pstex, png, terminal
+@node postscript, pslatex_and_pstex, png_(OLD), terminal
 @subsubsection postscript
 
 @c ?commands set terminal postscript
@@ -10649,6 +10674,9 @@ page---don't set this if your printer can't do it);
 default, butt caps and mitered joins;
 `"<fontname>"` is the name of a valid PostScript font; and `<fontsize>` is
 the size of the font in PostScript points.
+In addition to the standard postscript fonts, an oblique version of the
+Symbol font, useful for mathematics, is defined. It is called"
+"Symbol-Oblique".
 
 `default` mode sets all options to their defaults: `landscape`, `monochrome`,
 `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, "Helvetica" and
@@ -10673,10 +10701,10 @@ Examples:
 
 @end example
 
-Linewidths and pointsizes may be changed with @ref{linestyle}.
+Linewidths and pointsizes may be changed with `set style line`.
 
 The `postscript` driver supports about 70 distinct pointtypes, selectable
-through the `pointtype` option on `plot` and @ref{linestyle}.
+through the `pointtype` option on `plot` and `set style line`.
 
 Several possibly useful files about `gnuplot`'s PostScript are included
 in the /docs/ps subdirectory of the `gnuplot` distribution and at the
@@ -10689,7 +10717,7 @@ showing what the octal codes produce with text and symbol fonts) and
 of a PostScript file written by `gnuplot`).
 
 A PostScript file is editable, so once `gnuplot` has created one, you are
-free to modify it to your heart's desire.  See the "editing postscript"
+free to modify it to your heart's desire.  See the `editing postscript`
 section for some hints.
 
 
@@ -10796,6 +10824,7 @@ distribution contains more examples of the enhanced syntax.
 @c ?term postscript editing
 @cindex editing_postscript
 
+@c ?editing postscript
 The PostScript language is a very complex language---far too complex to
 describe in any detail in this document.  Nevertheless there are some things
 in a PostScript file written by `gnuplot` that can be changed without risk of
@@ -11432,7 +11461,7 @@ if the `-display` command line option is used.
 Syntax:
 @example
    set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
-   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise]
+   set terminal x11 [reset] [<n>] [[no]persist] [[no]raise] [font <fontspec>]
 
 @end example
 
@@ -11441,6 +11470,30 @@ output to plot window number n.  If n>0, the terminal number will be
 appended to the window title and the icon will be labeled `gplt <n>`.
 The active window may distinguished by a change in cursor (from default
 to crosshair.)
+
+X11 fonts:
+A preferred default font may be specified to the x11 driver using
+@example
+     `set term x11 font "<fontspec>"`
+@end example
+
+The driver first queries the X-server for a font of the exact name given,
+for example `set term x11 font "lucidasans-10"`. If this query fails, then
+the driver tries to interpret <fontspec> as "<font>,<size>,<slant>" 
+and to construct a full X11 font name of the form
+@example
+      -*-<font>-*-<s>-*-*-<size>-*-*-*-*-*-<encoding>
+@end example
+
+<font> is the base name of the font (e.g. Times or Symbol)
+<size> is the point size (defaults to 12 if not specified)
+<s> is `i` if <slant>=="italic" `o` if <slant>=="oblique" `r` otherwise
+<encoding> is set based on the current character set (help set encoding)
+So `set term x11 font "arial,15,italic"` will be translated to
+-*-arial-*-i-*-*-15-*-*-*-*-*-iso8859-1 (assuming default encoding).
+The driver also recognizes some common PostScript font names and
+replaces them with possible X11 or TrueType equivalents.
+This same sequence is used to process font requests from @ref{label}.
 
 Plot windows remain open even when the `gnuplot` driver is changed to a
 different device.  A plot window can be closed by pressing the letter q
@@ -11461,7 +11514,7 @@ shut down the connection to the previous driver. Example:
 The gnuplot outboard driver, gnuplot_x11, is searched in a default place
 chosen when the program is compiled.  You can override that by defining
 the environment variable GNUPLOT_DRIVER_DIR to point to a different
-location
+location.
 
 Plot windows will automatically be closed at the end of the session
 unless the `-persist` option was given.
@@ -12570,7 +12623,7 @@ commands control the major tics on the y, z, x2 and y2 axes.
 
 Syntax:
 @example
-      set xtics @{axis | border@} @{@{no@}mirror@} @{@{no@}rotate@}
+      set xtics @{axis | border@} @{@{no@}mirror@} @{@{no@}rotate @{by <ang>@}@}
                 @{  autofreq
                  | <incr>
                  | <start>, <incr> @{,<end>@}
@@ -12592,7 +12645,8 @@ opposite border.  `nomirror` does what you think it does.
 
 `rotate` asks `gnuplot` to rotate the text through 90 degrees, which will be
 done if the terminal driver in use supports text rotation.  `norotate`
-cancels this.
+cancels this. `rotate by <ang>` asks for rotation by <ang> degrees, supported
+by some terminal types.
 
 The defaults are `border mirror norotate` for tics on the x and y axes, and
 `border nomirror norotate` for tics on the x2 and y2 axes.  For the z axis,
