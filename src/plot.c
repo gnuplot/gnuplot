@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.13 1999/06/14 19:24:36 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.14 1999/06/17 14:20:06 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -563,7 +563,7 @@ char **argv;
 	    if (aesid > -1)
 		atexit(appl_exit);
 #endif
-	    return (IO_ERROR);	/* exit on non-interactive error */
+	    exit(EXIT_FAILURE);	/* exit on non-interactive error */
 	}
     }
 
@@ -623,7 +623,7 @@ char **argv;
     if (aesid > -1)
 	atexit(appl_exit);
 #endif
-    return (IO_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 #if (defined(ATARI) || defined(MTOS)) && defined(__PUREC__)

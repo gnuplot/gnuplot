@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.9 1999/06/14 19:24:57 lhecking Exp $
+ * $Id: plot.h,v 1.10 1999/06/17 14:19:42 lhecking Exp $
  *
  */
 
@@ -487,8 +487,7 @@ struct lexical_unit {	/* produced by scanner */
 
 struct udft_entry {				/* user-defined function table entry */
 	struct udft_entry *next_udf; 		/* pointer to next udf in linked list */
-/*	char udf_name[MAX_ID_LEN+1]; */		/* name of this function entry */
-	char *udf_name;
+	char *udf_name;				/* name of this function entry */
 	struct at_type *at;			/* pointer to action table to execute */
 	char *definition; 			/* definition of function as typed */
 	struct value dummy_values[MAX_NUM_VAR];	/* current value of dummy variables */
@@ -497,8 +496,7 @@ struct udft_entry {				/* user-defined function table entry */
 
 struct udvt_entry {			/* user-defined value table entry */
 	struct udvt_entry *next_udv; /* pointer to next value in linked list */
-/*	char udv_name[MAX_ID_LEN+1]; *//* name of this value entry */
-	char *udv_name;
+	char *udv_name;			/* name of this value entry */
 	TBOOLEAN udv_undef;		/* true if not defined yet */
 	struct value udv_value;	/* value it has */
 };
@@ -519,7 +517,7 @@ struct at_entry {			/* action table entry */
 
 
 struct at_type {
-	int a_count;				/* count of entries in .actions[] */
+	int a_count;			/* count of entries in .actions[] */
 	struct at_entry actions[MAX_AT_LEN];
 		/* will usually be less than MAX_AT_LEN is malloc()'d copy */
 };
@@ -533,7 +531,7 @@ typedef int (*FUNC_PTR) __PROTO((union argument *arg));
 #endif
 
 struct ft_entry {		/* standard/internal function table entry */
-	char *f_name;		/* pointer to name of this function */
+	const char *f_name;	/* pointer to name of this function */
 	FUNC_PTR func;		/* address of function to call */
 };
 
@@ -579,10 +577,10 @@ struct curve_points {
 	enum PLOT_SMOOTH plot_smooth;
 	char *title;
 	struct lp_style_type lp_properties;
- 	int p_max;					/* how many points are allocated */
-	int p_count;					/* count of points in points */
-	int x_axis;					/* FIRST_X_AXIS or SECOND_X_AXIS */
-	int y_axis;					/* FIRST_Y_AXIS or SECOND_Y_AXIS */
+ 	int p_max;			/* how many points are allocated */
+	int p_count;			/* count of points in points */
+	int x_axis;			/* FIRST_X_AXIS or SECOND_X_AXIS */
+	int y_axis;			/* FIRST_Y_AXIS or SECOND_Y_AXIS */
 	struct coordinate GPHUGE *points;
 };
 
@@ -596,8 +594,8 @@ struct gnuplot_contours {
 
 struct iso_curve {
 	struct iso_curve *next;
- 	int p_max;					/* how many points are allocated */
-	int p_count;					/* count of points in points */
+ 	int p_max;			/* how many points are allocated */
+	int p_count;			/* count of points in points */
 	struct coordinate GPHUGE *points;
 };
 
@@ -651,13 +649,13 @@ struct TERMENTRY {
 	void (*move) __PROTO((unsigned int, unsigned int));
 	void (*vector) __PROTO((unsigned int, unsigned int));
 	void (*linetype) __PROTO((int));
-	void (*put_text) __PROTO((unsigned int, unsigned int,char*));
+	void (*put_text) __PROTO((unsigned int, unsigned int, const char*));
 /* the following are optional. set term ensures they are not NULL */
 	int (*text_angle) __PROTO((int));
 	int (*justify_text) __PROTO((enum JUSTIFY));
 	void (*point) __PROTO((unsigned int, unsigned int,int));
 	void (*arrow) __PROTO((unsigned int, unsigned int, unsigned int, unsigned int, int));
-	int (*set_font) __PROTO((char *font));
+	int (*set_font) __PROTO((const char *font));
 	void (*pointsize) __PROTO((double)); /* change pointsize */
 	int flags;
 	void (*suspend) __PROTO((void)); /* called after one plot of multiplot */
@@ -711,12 +709,12 @@ struct linestyle_def {
 
 /* Tic-mark labelling definition; see set xtics */
 struct ticdef {
-    int type;				/* one of three values below */
-#define TIC_COMPUTED 1		/* default; gnuplot figures them */
-#define TIC_SERIES 2		/* user-defined series */
-#define TIC_USER 3			/* user-defined points */
-#define TIC_MONTH 4		/* print out month names ((mo-1[B)%12)+1 */
-#define TIC_DAY 5		/* print out day of week */
+    int type;				/* one of five values below */
+#define TIC_COMPUTED 1			/* default; gnuplot figures them */
+#define TIC_SERIES   2			/* user-defined series */
+#define TIC_USER     3			/* user-defined points */
+#define TIC_MONTH    4		/* print out month names ((mo-1[B)%12)+1 */
+#define TIC_DAY      5			/* print out day of week */
     union {
 	   struct {			/* for TIC_SERIES */
 		  double start, incr;
@@ -737,30 +735,6 @@ struct ticmark {
     struct ticmark *next;	/* linked list */
 };
 
-/*
- * SS$_NORMAL is "normal completion", STS$M_INHIB_MSG supresses
-
- * printing a status message.
- * SS$_ABORT is the general abort status code.
- from:	Martin Minow
-	decvax!minow
- */
-#ifdef VMS
-# include		<ssdef.h>
-# include		<stsdef.h>
-# define	IO_SUCCESS	(SS$_NORMAL | STS$M_INHIB_MSG)
-# define	IO_ERROR	SS$_ABORT
-#endif /* VMS */
-
-
-#ifndef	IO_SUCCESS	/* DECUS or VMS C will have defined these already */
-# define	IO_SUCCESS	0
-#endif
-
-#ifndef	IO_ERROR
-# define	IO_ERROR	1
-#endif
-
 /* Some key global variables */
 /* plot.c */
 extern TBOOLEAN interactive;
@@ -769,7 +743,7 @@ extern TBOOLEAN noinputfiles;
 extern struct termentry *term;/* from term.c */
 extern TBOOLEAN undefined;		/* from internal.c */
 extern char *input_line;		/* from command.c */
-extern int input_line_len;
+extern size_t input_line_len;
 extern char *replot_line;
 extern struct lexical_unit *token;
 extern int token_table_size;
