@@ -4008,7 +4008,7 @@ char *dest, *format;
 size_t count;
 double log_base, x;		/* we print one number in a number of different formats */
 {
-    char temp[MAX_LINE_LEN];
+    char temp[MAX_LINE_LEN + 1];
     char *t;
 
     for (;;) {

@@ -1525,7 +1525,7 @@ void do_fit()
 	TBOOLEAN fixed;
 	double tmp_par;
 	char c, *s;
-	char sstr[MAX_LINE_LEN];
+	char sstr[MAX_LINE_LEN+1];
 	FILE *f;
 
 	quote_str(sstr, c_token++, MAX_LINE_LEN);
