@@ -274,11 +274,16 @@ if test "$with_gnu_readline" != no; then
      ${gp_tcap})dnl readline
   else
     if test ! -f $with_gnu_readline ; then
-      if test ! -f ${with_gnu_readline}/libreadline.a ; then
-        AC_MSG_ERROR([No such file $with_gnu_readline])
+      if test ! -f ${with_gnu_readline}/lib/libreadline.a ; then
+        if test ! -f ${with_gnu_readline}/libreadline.a ; then
+          AC_MSG_ERROR([GNU readline library not found])
+        else
+          AC_MSG_RESULT([using ${with_gnu_readline}/libreadline.a])
+          LIBS="$LIBS ${with_gnu_readline}/libreadline.a $gp_tcap"
+        fi
       else
-        AC_MSG_RESULT([using ${with_gnu_readline}/libreadline.a])
-        LIBS="$LIBS ${with_gnu_readline}/libreadline.a $gp_tcap"
+        AC_MSG_RESULT([using ${with_gnu_readline}/lib/libreadline.a])
+        LIBS="$LIBS ${with_gnu_readline}/lib/libreadline.a $gp_tcap"
       fi
     else
       AC_MSG_RESULT([using ${with_gnu_readline}])
