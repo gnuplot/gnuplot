@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.17 1999/08/07 17:21:31 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.18 1999/08/11 18:09:11 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -38,6 +38,7 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.17 1999/08/07 17:21:31 lh
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
+#include "tables.h"
 
 #ifndef _Windows
 # include "help.h"
@@ -263,7 +264,8 @@ struct curve_points *this_plot;
  * it will later be moved passed title/with/linetype/pointtype
  */
 {
-    register int i /* num. points ! */ , j, col;
+    int i /* num. points ! */ , j;
+    int max_cols, min_cols;	/* allowed range of column numbers */
     double v[NCOL];
     int storetoken = this_plot->token;
 
@@ -273,40 +275,55 @@ struct curve_points *this_plot;
     case XYERRORLINES:
     case XYERRORBARS:
     case BOXXYERROR:
-	col = 7;
+	min_cols = 4;
+	max_cols = 7;
+	break;
+
+    case FINANCEBARS:
+    case CANDLESTICKS:
+	min_cols = max_cols = 5;
 	break;
 
     case BOXERROR:
-    case FINANCEBARS:
-    case CANDLESTICKS:
-	col = 5;
+	min_cols = 4;
+	max_cols = 5;
+	break;
+
+    case VECTOR:
+	min_cols = max_cols = 4;
 	break;
 
     case XERRORLINES:
     case YERRORLINES:
     case XERRORBARS:
     case YERRORBARS:
-    case VECTOR:
-	col = 4;
+	min_cols = 3;
+	max_cols = 4;
 	break;
 
     case BOXES:
-	col = 4;
+	min_cols = 2;
+	max_cols = 4;
 	break;
 
     default:
-	col = 2;
+	min_cols = 1;
+	max_cols = 2;
+	break;
     }
 
-    if (this_plot->plot_smooth == ACSPLINES)
-	col = 3;
+    if (this_plot->plot_smooth == SMOOTH_ACSPLINES)
+	max_cols = 3;
 
-    if (df_no_use_specs > col)
-	fputs("warning : too many using specs for this style\n", stderr);
+    if (df_no_use_specs > max_cols)
+	int_error(NO_CARET, "Too many using specs for this style");
+
+    if (df_no_use_specs > 0 && df_no_use_specs < min_cols)
+	int_error(NO_CARET, "Not enough columns for this style");
 
     i = 0;
-    while ((j = df_readline(v, col)) != DF_EOF) {
-	/* j <= col */
+    while ((j = df_readline(v, max_cols)) != DF_EOF) {
+	/* j <= max_cols */
 
 	if (i >= this_plot->p_max) {
 	    /*
@@ -374,7 +391,7 @@ struct curve_points *this_plot;
 
 	case 3:
 	    /* x, y, ydelta OR x, y, xdelta OR x, y, width */
-	    if (this_plot->plot_smooth == ACSPLINES)
+	    if (this_plot->plot_smooth == SMOOTH_ACSPLINES)
 		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1],
 			      v[1], v[2]);
 	    else
@@ -798,7 +815,7 @@ eval_plots()
 		}
 		this_plot->plot_type = DATA;
 		this_plot->plot_style = data_style;
-		this_plot->plot_smooth = NONE;
+		this_plot->plot_smooth = SMOOTH_NONE;
 
 		specs = df_open(NCOL);	/* up to NCOL cols */
 		/* this parses data-file-specific modifiers only */
@@ -840,18 +857,27 @@ eval_plots()
 		    int_error(c_token, "expecting smooth parameter");
 		else {
 		    c_token++;
-		    if (almost_equals(c_token, "u$nique"))
-			this_plot->plot_smooth = UNIQUE;
-		    else if (almost_equals(c_token, "a$csplines"))
-			this_plot->plot_smooth = ACSPLINES;
-		    else if (almost_equals(c_token, "c$splines"))
-			this_plot->plot_smooth = CSPLINES;
-		    else if (almost_equals(c_token, "b$ezier"))
-			this_plot->plot_smooth = BEZIER;
-		    else if (almost_equals(c_token, "s$bezier"))
-			this_plot->plot_smooth = SBEZIER;
-		    else
+		    switch(lookup_table(&plot_smooth_tbl[0],c_token)) {
+		    case SMOOTH_ACSPLINES:
+			this_plot->plot_smooth = SMOOTH_ACSPLINES;
+			break;
+		    case SMOOTH_BEZIER:
+			this_plot->plot_smooth = SMOOTH_BEZIER;
+			break;
+		    case SMOOTH_CSPLINES:
+			this_plot->plot_smooth = SMOOTH_CSPLINES;
+			break;
+		    case SMOOTH_SBEZIER:
+			this_plot->plot_smooth = SMOOTH_SBEZIER;
+			break;
+		    case SMOOTH_UNIQUE:
+			this_plot->plot_smooth = SMOOTH_UNIQUE;
+			break;
+		    case SMOOTH_NONE:
+		    default:
 			int_error(c_token, "expecting 'unique', 'acsplines', 'csplines', 'bezier' or 'sbezier'");
+			break;
+		    }
 		}
 		this_plot->plot_style = LINES;
 		c_token++;	/* skip format */
@@ -981,27 +1007,27 @@ eval_plots()
 		/* sort */
 		switch (this_plot->plot_smooth) {
 		/* sort and average, if the style requires */
-		case UNIQUE:
-		case CSPLINES:
-		case ACSPLINES:
-		case SBEZIER:
+		case SMOOTH_UNIQUE:
+		case SMOOTH_CSPLINES:
+		case SMOOTH_ACSPLINES:
+		case SMOOTH_SBEZIER:
 		    sort_points(this_plot);
 		    cp_implode(this_plot);
-		case NONE:
-		case BEZIER:
+		case SMOOTH_NONE:
+		case SMOOTH_BEZIER:
 		default:
 		    break;
 		}
 		switch (this_plot->plot_smooth) {
 		/* create new data set by evaluation of
 		 * interpolation routines */
-		case CSPLINES:
-		case ACSPLINES:
-		case BEZIER:
-		case SBEZIER:
+		case SMOOTH_CSPLINES:
+		case SMOOTH_ACSPLINES:
+		case SMOOTH_BEZIER:
+		case SMOOTH_SBEZIER:
 		    gen_interp(this_plot);
-		case NONE:
-		case UNIQUE:
+		case SMOOTH_NONE:
+		case SMOOTH_UNIQUE:
 		default:
 		    break;
 		}
