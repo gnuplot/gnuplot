@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: help.c,v 1.11 1999/11/08 19:24:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: help.c,v 1.12 1999/11/15 22:22:46 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - help.c */
@@ -140,7 +140,7 @@ static FILE *helpfp = NULL;
 
 static int LoadHelp __PROTO((char *path));
 static void sortkeys __PROTO((void));
-static int keycomp __PROTO((struct key_s * a, struct key_s * b));
+int keycomp __PROTO((SORTFUNC_ARGS a, SORTFUNC_ARGS b));
 static LINEBUF *storeline __PROTO((char *text));
 static LINKEY *storekey __PROTO((char *key));
 static KEY *FindHelp __PROTO((char *keyword));
@@ -345,13 +345,22 @@ sortkeys()
     /* sort the array */
     /* note that it only moves objects of size (two pointers + long + int) */
     /* it moves no strings */
-    qsort((char *) keys, (size_t)keycount, sizeof(KEY), (sortfunc) keycomp);
+    /* HBB 20010720: removed superfluous, potentially dangerous casts */
+    qsort(keys, keycount, sizeof(KEY), keycomp);
 }
 
-static int
-keycomp(a, b)
-KEY *a, *b;
+/* HBB 20010720: changed to make this match the prototype qsort()
+ * really expects. Casting function pointers, as we did before, is
+ * illegal! */
+/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
+int
+keycomp(arg1, arg2)
+    SORTFUNC_ARGS arg1;
+    SORTFUNC_ARGS arg2;
 {
+    const KEY *a = arg1;
+    const KEY *b = arg2;
+
     return (strcmp(a->key, b->key));
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.17 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.18 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -80,6 +80,14 @@ unsigned int cb_x_from, cb_x_to, cb_y_from, cb_y_to;
 
 /* #define PUT_ZMINMAX_AROUND - the old system of printing zmin,max labels around */
 
+/* Internal prototype declarations: */
+
+static void draw_inside_color_smooth_box_postscript __PROTO((FILE * out));
+static void draw_inside_color_smooth_box_bitmap __PROTO((FILE * out));
+#ifdef PUT_ZMINMAX_AROUND
+static float color_box_text_displacement __PROTO((const char *str, int just));
+#endif
+void cbtick_callback __PROTO((AXIS_INDEX axis, double place, char *text, struct lp_style_type grid));
 
 /********************************************************************
   ROUTINES
@@ -350,6 +358,8 @@ FILE * out;
     int i, xy, xy2, xy_from, xy_to;
     double xy_step, gray;
     gpiPoint corners[4];
+    
+    (void) out;			/* to avoid "unused parameter" warning */
     if (color_box.rotation == 'v') {
 	corners[0].x = corners[3].x = cb_x_from;
 	corners[1].x = corners[2].x = cb_x_to;
@@ -386,6 +396,8 @@ FILE * out;
     }
 }
 
+/* Notice HBB 20010720: would be static, but HP-UX gcc bug forbids
+ * this, for now */
 void
 cbtick_callback(axis, place, text, grid)
     AXIS_INDEX axis;
@@ -402,6 +414,7 @@ cbtick_callback(axis, place, text, grid)
 #if 0
     printf("cbtick_callback:  place=%g\ttext=\"%s\"\tgrid.l_type=%i\n",place,text,grid.l_type);
 #endif
+    (void) axis;		/* to avoid 'unused' warning */
 
     /* calculate tic position */
     if (color_box.rotation == 'h') {

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.19 2001/01/16 20:56:09 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.20 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -201,7 +201,7 @@ static int solve_five_diag __PROTO((five_diag m[], double r[], double x[], int n
 static spline_coeff *cp_approx_spline __PROTO((struct curve_points * plot, int first_point, int num_points));
 static spline_coeff *cp_tridiag __PROTO((struct curve_points * plot, int first_point, int num_points));
 static void do_cubic __PROTO((struct curve_points * plot, spline_coeff * sc, int first_point, int num_points, struct coordinate * dest));
-static int compare_points __PROTO((struct coordinate * p1, struct coordinate * p2));
+int compare_points __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 
 /*
@@ -870,11 +870,18 @@ struct curve_points *plot;
  * (MGR 1992)
  */
 
-static int
-compare_points(p1, p2)
-struct coordinate *p1;
-struct coordinate *p2;
+/* HBB 20010720: To avoid undefined behaviour that would be caused by
+ * casting functions pointers around, changed arguments to what
+ * qsort() *really* wants */
+/* HBB 20010720: removed 'static' to avoid HP-sUX gcc bug */
+int
+compare_points(arg1, arg2)
+    SORTFUNC_ARGS arg1;
+    SORTFUNC_ARGS arg2;
 {
+    struct coordinate const *p1 = arg1;
+    struct coordinate const *p2 = arg2;
+
     if (p1->x > p2->x)
 	return (1);
     if (p1->x < p2->x)
@@ -884,15 +891,17 @@ struct coordinate *p2;
 
 void
 sort_points(plot)
-struct curve_points *plot;
+    struct curve_points *plot;
 {
     int first_point, num_points;
 
     first_point = 0;
     while ((num_points = next_curve(plot, &first_point)) > 0) {
 	/* Sort this set of points, does qsort handle 1 point correctly? */
-	qsort((char *) (plot->points + first_point), (size_t)num_points,
-	      sizeof(struct coordinate), (sortfunc) compare_points);
+	/* HBB 20010720: removed casts -- they don't help a thing, but
+	 * may hide problems */
+	qsort(plot->points + first_point, num_points,
+	      sizeof(struct coordinate), compare_points);
 	first_point += num_points;
     }
     return;

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.48 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.49 2001/06/25 15:31:12 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -140,7 +140,7 @@ static int widest_tic;
 void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
-int histeps_compare __PROTO((const void *p1, const void *p2));
+int histeps_compare __PROTO((SORTFUNC_ARGS p1, SORTFUNC_ARGS p2));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
@@ -240,6 +240,9 @@ widest2d_callback(axis, place, text, grid)
     char *text;
     struct lp_style_type grid;
 {
+    (void) axis;		/* avoid "unused parameter" warnings */
+    (void) place;
+    (void) grid;
     if (text) {			/* minitics have no text at all */
 	int len = label_width(text, NULL);
 	if (len > widest_tic)
@@ -1829,7 +1832,8 @@ static struct curve_points *histeps_current_plot;
  * bug seems to forbid that :-( */
 int
 histeps_compare(p1, p2)
-    const void *p1, *p2;
+    SORTFUNC_ARGS p1;
+    SORTFUNC_ARGS p2;
 {
     double x1=histeps_current_plot->points[*(int *)p1].x;
     double x2=histeps_current_plot->points[*(int *)p2].x;
@@ -3254,6 +3258,8 @@ xtick2d_callback(axis, place, text, grid)
     int ticsize = tic_direction * (int) (t->v_tic) * (text ? ticscale : miniticscale);
     unsigned int x = map_x(place);
 
+    (void) axis;		/* avoid "unused parameter" warning */
+
     if (grid.l_type > L_TYPE_NODRAW) {
 	term_apply_lp_properties(&grid);
 	if (polar_grid_angle) {
@@ -3327,6 +3333,8 @@ ytick2d_callback(axis, place, text, grid)
     /* minitick if text is NULL - v_tic is unsigned */
     int ticsize = tic_direction * (int) (t->h_tic) * (text ? ticscale : miniticscale);
     unsigned int y = map_y(place);
+
+    (void) axis;		/* avoid "unused parameter" warning */
 
     if (grid.l_type > L_TYPE_NODRAW) {
 	term_apply_lp_properties(&grid);

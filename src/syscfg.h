@@ -1,5 +1,5 @@
 /*
- * $Id: syscfg.h,v 1.17 2001/02/23 18:09:25 broeker Exp $
+ * $Id: syscfg.h,v 1.18 2001/02/28 16:39:00 broeker Exp $
  */
 
 /* GNUPLOT - syscfg.h */
@@ -472,10 +472,10 @@ typedef RETSIGTYPE (*sigfunc)__PROTO((void));
 # define JMP_BUF jmp_buf
 #endif
 
+/* HBB 20010720: removed 'sortfunc' --- it's no longer used */
+/* FIXME HBB 20010720: Where is SORTFUNC_ARGS supposed to be defined?  */
 #ifndef SORTFUNC_ARGS
-typedef int (*sortfunc) __PROTO((const generic *, const generic *));
-#else
-typedef int (*sortfunc) __PROTO((SORTFUNC_ARGS, SORTFUNC_ARGS));
+#define SORTFUNC_ARGS const generic *
 #endif
 
 /* Macros for string concatenation */
