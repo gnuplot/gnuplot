@@ -120,7 +120,7 @@ old psdoc
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(EXTRA_DIST)
 
-allterm.h : $(CORETERM)
+allterm.h: $(CORETERM)
 	@echo Building allterm.h
 	@cat $(top_srcdir)/term/*.trm > allterm.c
 	$(CPP) -I$(top_srcdir)/term -DTERM_DRIVER_H -DTERM_HELP allterm.c | \
@@ -190,12 +190,16 @@ doc2ms.o: doc2ms.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2ms.c
 
 ### html
-html : gnuplot.html
+html: gnuplot.html
 
-gnuplot.html : doc2html $(srcdir)/gnuplot.doc
+# an alternative to doc2html; needs GNU texinfo-4.0 or better
+#gnuplot.html: $(srcdir)/gnuplot.texi $(srcdir)/gnuplot.doc
+#	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
+
+gnuplot.html: doc2html $(srcdir)/gnuplot.doc
 	./doc2html $(srcdir)/gnuplot.doc gnuplot.html
 
-doc2html : doc2html.o termdoc.o xref.o
+doc2html: doc2html.o termdoc.o xref.o
 	$(LINK) doc2html.o termdoc.o xref.o $(LDFLAGS) $(LIBS)
 
 doc2html.o: doc2html.c allterm.h
