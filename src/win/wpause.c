@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wpause.c,v 1.8 1998/03/22 22:35:29 drd Exp $";
+static char *RCSid = "$Id: wpause.c,v 1.1 1999/03/26 22:11:19 lhecking Exp $";
 #endif
 
 /* GNUPLOT - win/wpause.c */
@@ -116,8 +116,15 @@ PauseBox(LPPW lppw)
 		(WNDPROC)MakeProcInstance((FARPROC)PauseButtonProc ,hdllInstance);
 #endif
 #endif
-	lppw->hWndPause = CreateWindowEx(WS_EX_DLGMODALFRAME, 
-		szPauseClass, lppw->Title,
+	lppw->hWndPause = CreateWindowEx(
+        WS_EX_DLGMODALFRAME | WS_EX_TOPMOST
+#ifdef WS_EX_APPWINDOW
+        /* HBB 20001217: put the pause window into the taskbar, and make
+         * float on top of everything. This is cleaner than adding a window
+         * menu to it, as the 3.5 code did it: */
+        | WS_EX_APPWINDOW
+#endif
+        , szPauseClass, lppw->Title,
 /* HBB 981202: WS_POPUPWINDOW would have WS_SYSMENU in it, but we don't
  * want, nor need, a System menu in our Pause windows. Actually, it was
  * emptied manually, in the WM_CREATE handler below, in the original code.
@@ -133,11 +140,16 @@ PauseBox(LPPW lppw)
 	lppw->bPause = TRUE;
 	lppw->bPauseCancel = IDCANCEL;
 	while (lppw->bPause)
-    		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-			/* wait until window closed */
-        		TranslateMessage(&msg);
-        		DispatchMessage(&msg);
-        	}
+	    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
+		/* wait until window closed */
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+		/* HBB 20001217: inserted waiting to reduce CPU load
+		 * of the pause window. Using GetMessage might be
+		 * preferrable, but that breaks its operation, for
+		 * reasons I don't really understand :-( */
+		WaitMessage();
+	    }
 	DestroyWindow(lppw->hWndPause);
 #ifndef WIN32
 #ifndef __DLL__
