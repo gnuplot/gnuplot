@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.74 2002/10/21 10:24:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.75 2002/11/01 20:14:31 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2368,7 +2368,9 @@ draw_3d_graphbox(plot, plot_num)
 		/* revert from vertical y-label for maps */
 		if (splot_map == TRUE)
 		    (*t->text_angle)(0);
+#ifdef PM3D /* FIXME */
 	    }
+#endif
 	}
     }
 

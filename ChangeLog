@@ -1,4 +1,8 @@
-2002-11-05  Shigeharu TAKENO  <shige@iee.niit.ac.jp>
+2002-11-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/graph3d.c(xtick_callback): Remove extra } when #ifndef PM3D.
+
+2002-11-05  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
 	* docs/gnuplot.doc, term/atariaes.trm, term/atarivdi.trm: Fix more
 	misprints.
@@ -1428,7 +1432,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/04 14:59:49 $).
+	last modification date (from the tag $Date: 2002/11/05 16:47:37 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
