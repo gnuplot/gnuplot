@@ -1,3 +1,33 @@
+2002-05-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc: Fix misc. typos, reported by Shigeharu TAKENO.
+
+	* lisp/*: Update to gnuplot-mode 0.5r.
+
+	* src/unset.c: Define reset_colorbox() static.
+
+	* term/metapost.trm: Patch by Dirk Krause, which includes a previous
+	patch by Phillip Wood. New features:
+	o A "la$tex" option to switch to LaTeX.
+	  In LaTeX mode no \setfont... instructions pointing to "cmr10"
+	  are written. Font setup is done in the preamble.
+	o An "a4$paper" option to pass the [a4paper] option
+	  to the document class. By default this option is not written.
+	o The "ps$nfss", "psnfss-v$ersion7" and "nops$nfss" options
+	  to include \usepackage instructions for PSNFSS 8, older version
+	  or no PSNFSS.
+	o The "pro$logues n" (n must be replaced by the number you want)
+	  and "nopr$ologues" options to add a "prologues:=2;" line to the
+	  output. When using metapost to produce standalone images,
+	  "prologues:=2;" causes metapost to include font information into
+	  the EPS output.
+
+2002-05-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* specfun.c: Add new implementation of lngamma(), inverse_normal_func(),
+	inverse_error_func(), based on CEPHES library, and NIST. Contributed
+	by Dietmar Warning.
+
 2002-05-16  Johannes Zellner  <johannes@zellner.org>
 
 	* term/gd.trm, term/linux.trm: added prototypes, removed unused
@@ -447,7 +477,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/16 21:25:46 $).
+	last modification date (from the tag $Date: 2002/05/16 21:29:17 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
