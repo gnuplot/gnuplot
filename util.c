@@ -52,13 +52,9 @@ static void parse_esc __PROTO((char *instr));
  * chr_in_str() compares the characters in the string of token number t_num
  * with c, and returns TRUE if a match was found.
  */
-#ifdef PROTOTYPES
-int chr_in_str(int t_num, char c)
-#else
 int chr_in_str(t_num, c)
 int t_num;
-char c;
-#endif
+int c;
 {
     register int i;
 
