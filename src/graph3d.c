@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.37 2000/11/23 14:14:37 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.38 2000/12/20 19:29:23 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -125,12 +125,13 @@ static void check_corner_height __PROTO((struct coordinate GPHUGE * point,
 static void setup_3d_box_corners __PROTO((void));
 static void draw_3d_graphbox __PROTO((struct surface_points * plot,
 				      int plot_count));
-static void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
-				    struct lp_style_type grid));
-static void ytick_callback __PROTO((AXIS_INDEX, double place, char *text,
-				    struct lp_style_type grid));
-static void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
-				    struct lp_style_type grid));
+/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
+void xtick_callback __PROTO((AXIS_INDEX, double place, char *text,
+			     struct lp_style_type grid));
+void ytick_callback __PROTO((AXIS_INDEX, double place, char *text,
+			     struct lp_style_type grid));
+void ztick_callback __PROTO((AXIS_INDEX, double place, char *text,
+			     struct lp_style_type grid));
 
 static int find_maxl_cntr __PROTO((struct gnuplot_contours * contours, int *count));
 static int find_maxl_keys3d __PROTO((struct surface_points *plots, int count, int *kcnt));
@@ -2162,12 +2163,16 @@ draw_3d_graphbox(plot, plot_num)
     }
 }
 
-static void
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
+
+void
 xtick_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;	/* linetype or -2 for none */
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;	/* linetype or -2 for none */
 {
     vertex v1, v2;
     double scale = (text ? ticscale : miniticscale);
@@ -2234,7 +2239,7 @@ struct lp_style_type grid;	/* linetype or -2 for none */
     }
 }
 
-static void
+void
 ytick_callback(axis, place, text, grid)
 AXIS_INDEX axis;
 double place;
@@ -2304,7 +2309,7 @@ struct lp_style_type grid;
     }
 }
 
-static void
+void
 ztick_callback(axis, place, text, grid)
 AXIS_INDEX axis;
 double place;

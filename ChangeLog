@@ -1,3 +1,16 @@
+2001-01-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* INSTALL [HP-UX 10.x]: change recommendations regarding GCC on
+	HP-UX 10.x and higher.
+
+	* src/graph3d.c (xtick_callback, ytick_callback, ztick_callback):
+ 	remove 'static' attribute to avoid bug in HP-UX assembler. This
+ 	was the root of the long-standing compilation problems with GCC on
+ 	HP-UX 10 and higher.
+
+	* src/graphics.c (widest2d_callback, xtick2d_callback): dito
+	(ytick2d_callback): dito.
+
 2001-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/term.h: add testing of THREEDKIT macro before activating

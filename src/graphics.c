@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.41 2000/12/05 19:03:02 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.42 2001/01/16 20:21:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -136,9 +136,10 @@ static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots, int
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
 
-static void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
-static void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
-static void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+/* HBB 20010118: these should be static, but can't --- HP-UX assembler bug */
+void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 
 static void get_arrow __PROTO((struct arrow_def* arrow, unsigned int* sx, unsigned int* sy, unsigned int* ex, unsigned int* ey));
 static void map_position_double __PROTO((struct position* pos, double* x, double* y, const char* what));
@@ -227,13 +228,16 @@ int count, *kcnt;
 /* we determine widest tick label by getting gen_ticks to call this
  * routine with every label
  */
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
 
-static void
+void
 widest2d_callback(axis, place, text, grid)
-AXIS_INDEX axis;
-double place;
-char *text;
-struct lp_style_type grid;
+    AXIS_INDEX axis;
+    double place;
+    char *text;
+    struct lp_style_type grid;
 {
     if (text) {			/* minitics have no text at all */
 	int len = label_width(text, NULL);
@@ -3156,9 +3160,13 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     return (FALSE);
 }
 
+/* HBB 20010118: all the *_callback() functions made non-static. This
+ * is necessary to work around a bug in HP's assembler shipped with
+ * HP-UX 10 and higher, if GCC tries to use it */
+
 /* display a x-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void
+void
 xtick2d_callback(axis, place, text, grid)
 AXIS_INDEX axis;
 double place;
@@ -3232,7 +3240,7 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 
 /* display a y-axis ticmark - called by gen_ticks */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
-static void
+void
 ytick2d_callback(axis, place, text, grid)
 AXIS_INDEX axis;
 double place;
