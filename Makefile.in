@@ -215,7 +215,7 @@ CSOURCE = alloc.c binary.c bitmap.c command.c contour.c datafile.c eval.c \
 	  util.c util3d.c version.c
 
 HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
-	  matrix.h national.h plot.h protos.h setshow.h stdfn.h term.h
+	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
 	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
