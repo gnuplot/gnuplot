@@ -1,3 +1,11 @@
+2004-04-14  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* FAQ: Updated for gnuplot 4.0.
+
+	* pm3d/README: Updated.
+
+	* lisp/gpelcard.tex: Corrected "pm3d" instead of "mouse".
+
 2004-04-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/version.c: Activate "RELEASE_VERSION" code by inserting a
@@ -67,7 +75,7 @@
 	* src/fit.c (Dblfn): Re-initialize va_args between uses.  Needed
 	to be C standard compliant and survive running on Linux/AMD64.
 	(Fixes SF bug #932162).
-	
+
 2004-04-08  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/readline.c: Revert patch from 2003-05-10 "Allow <tab>
