@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.12 2002/01/21 15:23:50 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.13 2002/01/21 15:31:52 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -76,7 +76,7 @@ TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
 
 LIBS = @LIBS@
-XLIBS = @X_LIBRARIES@
+XLIBS = @LIBRARIES_FOR_X@
 
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
@@ -166,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.12 2002/01/21 15:23:50 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.13 2002/01/21 15:31:52 lhecking Exp $
 #
 ########################################################
 #
