@@ -1,4 +1,4 @@
-/* $Id: $ */
+/* $Id: tables.h,v 1.1 1999/08/07 17:19:50 lhecking Exp $ */
 
 /* GNUPLOT - tables.h */
 
@@ -8,7 +8,7 @@
 /* The basic structure */
 struct gen_table {
     const char *key;
-    int value; /* will be function address */
+    int value;
 };
 
 /* gnuplot commands */
@@ -21,8 +21,67 @@ enum command_id {
     CMD_SHOW, CMD_SPLOT, CMD_SYSTEM, CMD_TEST, CMD_TESTTIME, CMD_UPDATE
 };
 
-/* options for save command */
+/* options for 'save' command */
 enum save_id { SAVE_INVALID, SAVE_FUNCS, SAVE_SET, SAVE_VARS };
+
+/* options for 'show' and 'set' commands
+ * this is rather big, we might be better off with a hash table */
+
+enum set_id {
+    S_INVALID,
+    S_ACTIONTABLE, S_ALL, S_ANGLES,
+    S_ARROW, S_NOARROW, S_AUTOSCALE, S_NOAUTOSCALE, S_BARS, S_NOBARS,
+    S_BORDER, S_NOBORDER,
+    S_BOXWIDTH,
+    S_CLABEL, S_NOCLABEL, S_CLIP, S_NOCLIP,
+    S_CNTRPARAM,
+    S_CONTOUR, S_NOCONTOUR,
+    S_DATA,
+    S_DGRID3D, S_NODGRID3D,
+    S_DUMMY, S_ENCODING, S_FORMAT, S_FUNCTIONS,
+    S_GRID, S_NOGRID, S_HIDDEN3D, S_NOHIDDEN3D,
+    S_ISOSAMPLES,
+    S_KEY, S_NOKEY, S_KEYTITLE, S_NOKEYTITLE, S_LABEL, S_NOLABEL,
+    S_LINESTYLE, S_NOLINESTYLE, S_LOADPATH, S_NOLOADPATH,
+    S_LOCALE,
+    S_LOGSCALE, S_NOLOGSCALE,
+    S_MAPPING, S_MARGIN,
+    S_MISSING, S_NOMISSING, S_MULTIPLOT, S_NOMULTIPLOT,
+    S_MX2TICS, S_NOMX2TICS, S_MXTICS, S_NOMXTICS,
+    S_MY2TICS, S_NOMY2TICS, S_MYTICS, S_NOMYTICS,
+    S_MZTICS, S_NOMZTICS,
+    S_OFFSETS, S_NOOFFSETS,
+    S_ORIGIN, S_OUTPUT,
+    S_PARAMETRIC, S_NOPARAMETRIC,
+    S_PLOT, S_POINTSIZE,
+    S_POLAR, S_NOPOLAR,
+    S_RRANGE, S_SAMPLES, S_SIZE,
+    S_SURFACE, S_NOSURFACE,
+    S_TERMINAL, S_TICS, S_TIMEFMT,
+    S_TIMESTAMP, S_NOTIMESTAMP,
+    S_TITLE, S_TRANGE, S_URANGE, S_VARIABLES, S_VERSION, S_VIEW, S_VRANGE,
+
+    S_X2DATA, S_X2DTICS, S_NOX2DTICS, S_X2LABEL, S_X2MTICS, S_NOX2MTICS,
+    S_X2RANGE, S_X2TICS, S_NOX2TICS,
+    S_XDATA, S_XDTICS, S_NOXDTICS, S_XLABEL, S_XMTICS, S_NOXMTICS, S_XRANGE,
+    S_XTICS, S_NOXTICS,
+
+    S_Y2DATA, S_Y2DTICS, S_NOY2DTICS, S_Y2LABEL, S_Y2MTICS, S_NOY2MTICS,
+    S_Y2RANGE, S_Y2TICS, S_NOY2TICS,
+    S_YDATA, S_YDTICS, S_NOYDTICS, S_YLABEL, S_YMTICS, S_NOYMTICS, S_YRANGE,
+    S_YTICS, S_NOYTICS,
+
+    S_ZDATA, S_ZDTICS, S_NOZDTICS, S_ZLABEL, S_ZMTICS, S_NOZMTICS, S_ZRANGE,
+    S_ZTICS, S_NOZTICS,
+
+    S_ZERO, S_ZEROAXIS, S_NOZEROAXIS,
+    S_XZEROAXIS, S_NOXZEROAXIS, S_X2ZEROAXIS, S_NOX2ZEROAXIS,
+    S_YZEROAXIS, S_NOYZEROAXIS, S_Y2ZEROAXIS, S_NOY2ZEROAXIS
+};
+
+extern struct gen_table command_tbl[];
+extern struct gen_table save_tbl[];
+extern struct gen_table set_tbl[];
 
 /* Function prototypes */
 int lookup_table __PROTO((struct gen_table *, int));
