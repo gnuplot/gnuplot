@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.57 2002/09/02 21:03:21 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.58 2002/09/09 18:00:16 joze Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -278,6 +278,7 @@ main(argc, argv)
 int argc;
 char **argv;
 {
+    int i;
 #ifdef LINUXVGA
     LINUX_setup();		/* setup VGA before dropping privilege DBT 4/5/99 */
     drop_privilege();
@@ -349,6 +350,28 @@ char **argv;
     rl_complete_with_tilde_expansion = 1;
     rl_terminal_name = getenv("TERM");
 #endif
+
+    for (i = 1; i < argc; i++) {
+	if (!argv[i])
+	    continue;
+	if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
+	    printf("gnuplot %s patchlevel %s\n",
+		    gnuplot_version, gnuplot_patchlevel);
+	    return 0;
+	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-?")
+	       	|| !strcmp(argv[i], "--help") || !strcmp(argv[i], "-help")) {
+	    printf( "Usage: gnuplot [OPTION]... [FILE]\n"
+#ifdef X11
+		    "for X11 options see 'help X11->command-line-options'\n"
+#endif
+		    "  -V, --version\n"
+		    "  -h, --help\n"
+		    "gnuplot %s patchlevel %s\n"
+		    "Report bugs to <info-gnuplot-beta@dartmouth.edu>\n",
+		    gnuplot_version, gnuplot_patchlevel);
+	    return 0;
+	}
+    }
 
 #ifdef X11
     {

@@ -1,3 +1,7 @@
+2002-09-09  Johannes Zellner  <johannes@zellner.org>
+
+	* src/plot.c: added --help / --version switches
+
 2002-10-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Format for string of zoomed coordinates changed to %.12g
@@ -1237,7 +1241,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/08 19:15:54 $).
+	last modification date (from the tag $Date: 2002/10/08 19:29:26 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
