@@ -49,7 +49,7 @@ INCLUDES = -I. -I$(top_srcdir)
 CFLAGS = @CFLAGS@
 LDFLAGS = @LDFLAGS@
 
-COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
 
 # This stuff is obsolete now. Use the appropriate configure options!
@@ -375,8 +375,8 @@ uninstall:
 gnuplot: $(OBJS) version.o
 	$(LINK) $(OBJS) version.o $(TERMLIBS) $(TERMXLIBS) $(LIBS)
 
-gnuplot_x11: gplt_x11.o
-	$(LINK) gplt_x11.o $(XLIBS) $(LIBS)
+gnuplot_x11: gplt_x11.o stdfn.o
+	$(LINK) gplt_x11.o stdfn.o $(XLIBS) $(LIBS)
 
 docs/allterm.h: $(CORETERM)
 	cat $(T)*.trm > docs/allterm.h
