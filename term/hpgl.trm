@@ -1,5 +1,5 @@
 /*
- * $Id: hpgl.trm,v 1.7 1998/12/14 18:39:49 lhecking Exp $
+ * $Id: hpgl.trm,v 1.7.2.1 1999/12/03 18:31:25 lhecking Exp $
  */
 
 /* GNUPLOT - hpgl.trm */
@@ -2654,10 +2654,10 @@ START_HELP(hpgl)
 " `extended` for (36\" X 55\") displays (almost a legal size ratio).",
 " `color` is for multi-pen (i.e. color) plots, and <number_of_pens> is",
 " the number of pens (i.e. colors) used in color plots. `monochrome` is for",
-" one (e.g. black) pen plots. 'solid' draws all lines as solid lines, or",
+" one (e.g. black) pen plots. `solid` draws all lines as solid lines, or",
 " 'dashed' will draw lines with different dashed and dotted line patterns.",
 " <font> is `stick`, `univers`, `cg_times`, `zapf_dingbats`, `antique_olive`,",
-" `arial`, `courier`, `garamond_antigua`, `letter_gothic`, cg_omega`,",
+" `arial`, `courier`, `garamond_antigua`, `letter_gothic`, `cg_omega`,",
 " `albertus`, `times_new_roman`, `clarendon`, `coronet`, `marigold`,",
 " `truetype_symbols`, or `wingdings`. <fontsize> is the font size in points.",
 " The point type selection can be the standard default set by specifying",
