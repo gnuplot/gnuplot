@@ -222,6 +222,9 @@
 /* Define to 1 if you have the `snprintf' function. */
 /* #undef HAVE_SNPRINTF */
 
+/* Define to 1 if stdbool.h conforms to C99. */
+#define HAVE_STDBOOL_H 1
+
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
 
@@ -335,6 +338,9 @@
 
 /* Define to 1 if you have the <vgagl.h> header file. */
 /* #undef HAVE_VGAGL_H */
+
+/* Define to 1 if the system has the type `_Bool'. */
+#define HAVE__BOOL 1
 
 /* Define if you want to use the IRIS terminal on IRIS4D series computers. */
 /* #undef IRIS */

@@ -1,5 +1,10 @@
 2004-03-25  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* config/config.amg config/config.cyg config/config.mgw
+	config/config.nt config/config.os2: Added new macros
+	HAVE_STDBOOL_H and HAVE__BOOL needed by my change to the TBOOLEAN
+	setup in syscfg.h two days ago.
+	
 	* src/term.c (curr_arrow_headfilled): Changed type from TBOOLEAN
 	to int, because this variable has more than 2 possible values.
 
