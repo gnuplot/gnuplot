@@ -1,8 +1,15 @@
+1998-12-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* gplt_x11.c, term/hpljii.trm, term/latex.trm, term/metafont.trm,
+	term/mif.trm, term/pbm.trm, pstricks.trm: Fix typos.
+
+	* show.c(show_one): Map show cntrparam to show contour.
+
+	* version.c: Remove comment. Beta 349.
+
 1998-12-14  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* term/*.trm: Indentation, use fputs for static strings.
-
-	* version.c: Beta349.
 
 1998-12-14  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -80,8 +87,7 @@
 
 	* configure: Regenerated.
 
-	* configure.in: Add binaries location to configuration summary.
-	Fix configuring under HP-UX.
+	* configure.in: Fix configuring under HP-UX.
 
 	* graphics.c: Run through indent.
 
