@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.106 1998/06/18 14:55:07 ddenholm Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.4 1999/06/09 12:05:43 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -505,12 +505,13 @@ int pcount;			/* count of plots in linked list */
     mat_scale(surface_scale / 2.0, surface_scale / 2.0, surface_scale / 2.0, mat);
     mat_mult(trans_mat, trans_mat, mat);
 
+#if 0 /* HBB 19990609: this is *not* the way to implement 'set view' <z_scale> */
     /* modify min_z/max_z so it will zscale properly. */
     ztemp = (z_max3d - z_min3d) / (2.0 * surface_zscale);
     temp = (z_max3d + z_min3d) / 2.0;
     z_min3d = temp - ztemp;
     z_max3d = temp + ztemp;
-
+#endif
 
     /* The extrema need to be set even when a surface is not being
      * drawn.   Without this, gnuplot used to assume that the X and
@@ -576,7 +577,7 @@ int pcount;			/* count of plots in linked list */
     boundary3d(scaling, plots, pcount);
 
     /* SCALE FACTORS */
-    zscale3d = 2.0 / (ceiling_z - floor_z);
+    zscale3d = 2.0 / (ceiling_z - floor_z) * surface_zscale;
     yscale3d = 2.0 / (y_max3d - y_min3d);
     xscale3d = 2.0 / (x_max3d - x_min3d);
 
