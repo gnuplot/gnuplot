@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.15 1999/06/19 20:52:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.16 1999/06/22 12:00:47 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -353,14 +353,14 @@ command()
 		gstrptime(string, format, &tm);
 		secs = gtimegm(&tm);
 		fprintf(stderr, "internal = %f - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
+			secs, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
 			tm.tm_yday);
 		memset(&tm, 0, sizeof(tm));
 		ggmtime(&tm, secs);
 		gstrftime(string, strlen(string), format, secs);
 		fprintf(stderr, "convert back \"%s\" - %d/%d/%d::%d:%d:%d , wday=%d, yday=%d\n",
-			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year,
+			string, tm.tm_mday, tm.tm_mon + 1, tm.tm_year % 100,
 			tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_wday,
 			tm.tm_yday);
 		free(string);
@@ -555,7 +555,8 @@ command()
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file);
-		save_functions(fopen(sv_file, "w"));
+		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		save_functions(fp);
 	    }
 	} else if (almost_equals(c_token, "v$ariables")) {
 	    if (!isstring(++c_token))
@@ -563,7 +564,8 @@ command()
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file);
-		save_variables(fopen(sv_file, "w"));
+		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		save_variables(fp);
 	    }
 	} else if (almost_equals(c_token, "s$et")) {
 	    if (!isstring(++c_token))
@@ -571,12 +573,14 @@ command()
 	    else {
 		m_quote_capture(&sv_file, c_token, c_token);
 		gp_expand_tilde(&sv_file);
-		save_set(fopen(sv_file, "w"));
+		fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+		save_set(fp);
 	    }
 	} else if (isstring(c_token)) {
 	    m_quote_capture(&sv_file, c_token, c_token);
 	    gp_expand_tilde(&sv_file);
-	    save_all(fopen(sv_file, "w"));
+	    fp = strcmp(sv_file, "-") ? fopen(sv_file, "w") : stdout;
+	    save_all(fp);
 	} else {
 	    int_error(c_token, "filename or keyword 'functions', 'variables', or 'set' expected");
 	}

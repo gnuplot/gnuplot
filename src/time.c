@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: time.c,v 1.5 1999/06/11 11:18:59 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: time.c,v 1.6 1999/06/22 11:57:44 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - time.c */
@@ -226,6 +226,13 @@ struct tm *tm;
 
 	case 'y':		/* year number */
 	    s = read_int(s, 2, &tm->tm_year);
+	    /* In line with the current UNIX98 specification by
+	     * The Open Group and major Unix vendors,
+	     * two-digit years 69-99 refer to the 20th century, and
+	     * values in the range 00-68 refer to the 21st century.
+	     */
+	    if (tm->tm_year <= 68)
+		tm->tm_year += 100;
 	    date++;
 	    tm->tm_year += 1900;
 	    break;
