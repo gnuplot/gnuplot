@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.96 2003/07/16 04:17:32 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.97 2003/10/10 10:33:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -148,6 +148,9 @@ static void map_position_double __PROTO((struct position* pos, double* x, double
 static void map_position_r __PROTO((struct position* pos, double* x, double* y, const char* what));
 
 static int find_maxl_keys __PROTO((struct curve_points *plots, int count, int *kcnt));
+
+static void do_key_sample __PROTO((struct curve_points *this_plot, legend_key *key, 
+				   char *title,  struct termentry *t, int xl, int yl));
 
 /* for plotting error bars
  * half the width of error bar tic mark
@@ -1375,85 +1378,7 @@ do_plot(plots, pcount)
 		/* don't write filename or function enhanced */
 	    if (localkey && this_plot->title) {
 		key_count++;
-
-		/* EAM - force key text to black, then restore */ 
-		    (*t->linetype)(LT_BLACK);
-
-		if (key->just == JLEFT) {
-		    (*t->justify_text) (LEFT);
-		    (*t->put_text) (xl + key_text_left, yl, this_plot->title);
-		} else {
-		    if ((*t->justify_text) (RIGHT)) {
-			(*t->put_text) (xl + key_text_right, yl, this_plot->title);
-		    } else {
-			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
-			if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
-			    i_inrange(x, xleft, xright))
-			    (*t->put_text) (x, yl, this_plot->title);
-		    }
-		}
-		/* EAM - restore plot line type */
-		    (*t->linetype)(this_plot->lp_properties.l_type); 
-
-		/* draw sample depending on bits set in plot_style */
-#if USE_ULIG_FILLEDBOXES
-		if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES && t->fillbox) {
-		    int style;
-		    struct fill_style_type *fs = &this_plot->fill_properties;
-		    switch(fs->fillstyle) {
-			case FS_SOLID:
-			    style = (fs->filldensity << 4) + FS_SOLID;
-			    break;
-			case FS_PATTERN:
-			    style = (fs->fillpattern << 4) + FS_PATTERN;
-			    break;
-			default: style = FS_EMPTY;
-		    }
-		    (*t->fillbox)( style,
-				  xl + key_sample_left, yl - key_entry_height/4, 
-				  key_sample_right - key_sample_left,
-				  key_entry_height/2);
-		    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-			(*t->linetype)(fs->border_linetype);
-		    if (fs->border_linetype != LT_NODRAW) {
-			(*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
-			(*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
-			(*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
-			(*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
-			(*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
-		    }
-		    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
-			(*t->linetype)(this_plot->lp_properties.l_type);
-		} else
-#endif
-		if (this_plot->plot_style == VECTOR && t->arrow) {
-		    apply_head_properties(&(this_plot->arrow_properties));
-		    curr_arrow_headlength = -1;
-		    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
-				this_plot->arrow_properties.head);
-		} else
-
-		if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
-		    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-			&& this_plot->plot_type == DATA)) {
-		    /* errors for data plots only */
-		    (*t->move) (xl + key_sample_left, yl);
-		    (*t->vector) (xl + key_sample_right, yl);
-		} 
-		/* oops - doing the point sample now breaks postscript
-		 * terminal for example, which changes current line style
-		 * when drawing a point, but does not restore it.
-		 * We simply draw the point sample after plotting
-		 */
-
-		if ((this_plot->plot_type == DATA)
-		    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
-		    && (bar_size > 0.0)) {
-		    (*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
-		    (*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
-		    (*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
-		    (*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
-		}
+		do_key_sample(this_plot, key, this_plot->title, t, xl, yl);
 	    }
 	ignore_enhanced_text = 0;
 	}
@@ -4041,4 +3966,95 @@ plot_border()
 	} else {
 	    (*term->move) (xleft, ybot);
 	}
+}
+
+/*
+ * Make this code a subroutine, rather than in-line, so that it can eventually be
+ * shared by other callers. It would be nice to share it with the 3d code also,
+ * but as of now the two code sections are not very parallel.
+ * EAM Nov 2003
+ */
+
+static void
+do_key_sample(struct curve_points *this_plot, legend_key *key, char *title, struct termentry *t, int xl, int yl)
+{
+	/* Draw key text in black */ 
+	    (*t->linetype)(LT_BLACK);
+
+	if (key->just == JLEFT) {
+	    (*t->justify_text) (LEFT);
+	    (*t->put_text) (xl + key_text_left, yl, title);
+	} else {
+	    if ((*t->justify_text) (RIGHT)) {
+		(*t->put_text) (xl + key_text_right, yl, title);
+	    } else {
+		int x = xl + key_text_right - (t->h_char) * strlen(title);
+		if (key->hpos == TOUT || key->vpos == TUNDER ||	/* HBB 990327 */
+		    i_inrange(x, xleft, xright))
+		    (*t->put_text) (x, yl, title);
+	    }
+	}
+	/* Draw sample in same color as the corresponding plot */
+	    (*t->linetype)(this_plot->lp_properties.l_type); 
+
+	/* draw sample depending on bits set in plot_style */
+#if USE_ULIG_FILLEDBOXES
+	if (this_plot->plot_style & PLOT_STYLE_HAS_BOXES && t->fillbox) {
+	    int style;
+	    struct fill_style_type *fs = &this_plot->fill_properties;
+	    switch(fs->fillstyle) {
+		case FS_SOLID:
+		    style = (fs->filldensity << 4) + FS_SOLID;
+		    break;
+		case FS_PATTERN:
+		    style = (fs->fillpattern << 4) + FS_PATTERN;
+		    break;
+		default: style = FS_EMPTY;
+	    }
+	    (*t->fillbox)( style,
+			  xl + key_sample_left, yl - key_entry_height/4, 
+			  key_sample_right - key_sample_left,
+			  key_entry_height/2);
+	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+		(*t->linetype)(fs->border_linetype);
+	    if (fs->border_linetype != LT_NODRAW) {
+		(*t->move)  (xl + key_sample_left,  yl - key_entry_height/4);
+		(*t->vector)(xl + key_sample_right, yl - key_entry_height/4);
+		(*t->vector)(xl + key_sample_right, yl + key_entry_height/4);
+		(*t->vector)(xl + key_sample_left,  yl + key_entry_height/4);
+		(*t->vector)(xl + key_sample_left,  yl - key_entry_height/4);
+	    }
+	    if (fs->fillstyle != FS_EMPTY && fs->border_linetype != LT_UNDEFINED)
+		(*t->linetype)(this_plot->lp_properties.l_type);
+	} else
+#endif
+	if (this_plot->plot_style == VECTOR && t->arrow) {
+	    apply_head_properties(&(this_plot->arrow_properties));
+	    curr_arrow_headlength = -1;
+	    (*t->arrow)(xl + key_sample_left, yl, xl + key_sample_right, yl,
+			this_plot->arrow_properties.head);
+	} else
+
+	if ((this_plot->plot_style & PLOT_STYLE_HAS_LINE)
+	    || ((this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+		&& this_plot->plot_type == DATA)) {
+	    /* errors for data plots only */
+	    (*t->move) (xl + key_sample_left, yl);
+	    (*t->vector) (xl + key_sample_right, yl);
+	} 
+
+	if ((this_plot->plot_type == DATA)
+	    && (this_plot->plot_style & PLOT_STYLE_HAS_ERRORBAR)
+	    && (bar_size > 0.0)) {
+	    (*t->move) (xl + key_sample_left, yl + ERRORBARTIC);
+	    (*t->vector) (xl + key_sample_left, yl - ERRORBARTIC);
+	    (*t->move) (xl + key_sample_right, yl + ERRORBARTIC);
+	    (*t->vector) (xl + key_sample_right, yl - ERRORBARTIC);
+	}
+
+	/* oops - doing the point sample now would break the postscript
+	 * terminal for example, which changes current line style
+	 * when drawing a point, but does not restore it.
+	 * We must wait, then draw the point sample after plotting
+	 */
 }
