@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.85 2004/03/11 18:28:43 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.86 2004/03/30 11:49:24 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -667,7 +667,8 @@ do_3dplot(plots, pcount, quick)
 
     /* DRAW GRID AND BORDER */
     /* Original behaviour: draw entire grid in back, if 'set grid back': */
-    if (grid_layer == 0)
+    /* HBB 20040331: but not if in hidden3d mode */
+    if (!hidden3d && grid_layer == 0)
 	draw_3d_graphbox(plots, pcount, ALLGRID);
 
 #ifdef PM3D
@@ -683,9 +684,9 @@ do_3dplot(plots, pcount, quick)
 
 #ifdef USE_GRID_LAYERS
     if (!hidden3d && (grid_layer == -1))
-	/* Draw the back part now, per default, but not if hidden3d is
-	 * in use, because that relies on all isolated lines being
-	 * output after all surfaces have been defined. */
+	/* Default layering mode.  Draw the back part now, but not if
+	 * hidden3d is in use, because that relies on all isolated
+	 * lines being output after all surfaces have been defined. */
 	draw_3d_graphbox(plots, pcount, BACKGRID);
 #endif /* USE_GRID_LAYERS */
 
