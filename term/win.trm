@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.20 2001/02/06 11:31:15 mikulik Exp $
+ * $Id: win.trm,v 1.21 2001/02/08 16:44:36 broeker Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -368,25 +368,25 @@ WIN_linewidth(linewidth)
 TERM_PUBLIC void
 WIN_put_tmptext ( int i, const char str[] )
 {
-    Graph_put_tmptext( i, str );
+    Graph_put_tmptext(&graphwin, i, str );
 }
 
 TERM_PUBLIC void
 WIN_set_ruler ( int x, int y )
 {
-    Graph_set_ruler( x, y );
+    Graph_set_ruler(&graphwin, x, y );
 }
 
 TERM_PUBLIC void
 WIN_set_cursor ( int c, int x, int y )
 {
-    Graph_set_cursor( c, x, y );
+    Graph_set_cursor(&graphwin, c, x, y );
 }
 
 TERM_PUBLIC void
 WIN_set_clipboard ( const char s[] )
 {
-    Graph_set_clipboard( s );
+    Graph_set_clipboard(&graphwin, s);
 }
 
 #endif /* USE_MOUSE */

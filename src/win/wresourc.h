@@ -1,5 +1,5 @@
 /*
- * $Id: wresourc.h,v 1.6 1998/03/22 22:35:30 drd Exp $
+ * $Id: wresourc.h,v 1.1 1999/03/26 22:11:22 lhecking Exp $
  */
 
 /* GNUPLOT - win/wresourc.h */
@@ -110,4 +110,9 @@
 #define LS_COLORSTYLE 207
 #define LS_COLORWIDTH 208
 #define LS_DEFAULT 209
+
+/* HBB 20010208: cursors for mouse-enabled wgnuplot */
+#define IDC_CROSSHAIR  221
+#define IDC_SCALING    222
+#define IDC_ROTATING   223
 

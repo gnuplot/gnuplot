@@ -1,3 +1,58 @@
+2001-02-09  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/win/wgraph.c (ruler, zoombox): struct element 'on' made
+ 	TBOOLEAN.
+	(hptrDefault and friends): Uncommented Petr's suggestion, changed
+ 	type.
+	(GetMousePosViewport and friends): Internal prototypes updated.
+	(all over the place): Removed commented-out code blocks dealing
+ 	with the 'numsolid' and dynamic pen creation changes, for good.
+	(all over the place): changed // comments to /* ... */
+	(LoadCursors): New function. Loads cursor images from the system
+ 	or the resource file so cursor can change shape as different mouse
+ 	operations take place.
+	(DestroyCursors): New function, not implemented yet. Unloads all
+ 	the cursors registered by LoadCursors, to free the resources.
+	(drawgraph): Removed mouse_hdc initialization.
+	(Wnd_exec_event): New function, may no longer be needed. A wrapper
+ 	around gp_exec_event that records mouse position before calling
+ 	it.
+	(Wnd_refresh_zoombox): New function, used to be a code block in
+ 	WndGraphProc().
+	(WndGraphProc): Mouse position querying moved to helper functions
+ 	Wnd_exec_event and Wnd_refresh_zoombox --- only do the query if
+ 	the result is needed.  Put an #ifdef USE_MOUSE around the code
+ 	added by Petr.
+	(WndGraphProc) [WM_CREATE]: call LoadCursors().
+	(WndGraphProc) [WM_DESTORY]: call DestroyCursors().
+	(Graph_set_cursor): Added LPGW parameter, implemented by
+ 	translating OS/2 sample code into Windows API calls.
+	(Graph_set_ruler): dito.
+	(Graph_put_tmptext): dito --- but implementation not complete,
+ 	yet.
+	(Graph_set_clipboard): Added LPGW parameter. Not implemented, yet.
+	(GetMousePosViewport): Added LPGW parameter. Removed Macros
+ 	WIN_XMAX and WIN_YMAX: query lpgw instead. Removed debugging
+ 	fprintf() to file.
+	(DisplayStatusLine): Added LPGW parameter. Implementation
+ 	rewritten almost from scratch, needing a new TBOOLEAN flag 'erase'
+ 	because of Windows API limitations.
+	(UpdateStatusLine): Added LPGW parameter.
+	(DrawRuler): Added LPGW parameter, turned OS/2 code outline into
+	Windows API implementation.
+	(DrawZoomBox): dito.
+
+	* term/win.trm (WIN_put_tmptext): pass LPGW pointer to graphwin
+ 	struct as additional parameter.
+	(WIN_set_ruler): dito.
+	(WIN_set_cursor): dito.
+	(WIN_set_clipboard): dito.
+
+	* src/win/wresourc.h (IDC_CROSSHAIR, IDC_SCALING, IDC_ROTATINT):
+ 	added resource identifier macros for mouse cursors.
+	
+	* src/win/wgnuplib.h: Updated prototypes of mouse functions.
+	
 2001-02-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Several cleanups suggested by reading an MSVC compilation logfile:

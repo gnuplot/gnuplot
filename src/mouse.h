@@ -1,5 +1,5 @@
 /*
- * $Id: mouse.h,v 1.7 2000/11/01 18:57:33 broeker Exp $
+ * $Id: mouse.h,v 1.8 2000/11/01 20:37:48 joze Exp $
  */
 
 /* GNUPLOT - mouse.h */
@@ -69,6 +69,7 @@ typedef struct mouse_setting_t {
     char labelopts[0xff];  /* label options                               */
 } mouse_setting_t;
 
+/* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
 #if defined(_MOUSE_C) || defined(_GPLT_X11)
 mouse_setting_t mouse_setting = {
     1, 300 /* ms */, 1, 0, 0, 0, 0, "% #g", "pointstyle 1"
@@ -90,6 +91,7 @@ extern mouse_setting_t mouse_setting;
 
 enum { MODE_QUERY, MODE_PLOT, MODE_SPLOT };
 
+/* FIXME HBB 20010207: Codestyle violation, again. */
 #ifdef _MOUSE_C
 /* the following table must match exactly the
  * enum's of GP_ and end with a NULL pointer! */
@@ -185,6 +187,7 @@ enum {
     MOUSE_COORDINATES_ALT    /* alternative format as specified by the user */
 };
 
+/* FIXME HBB 20010207: Codestyle violation: these should be in mouse.c! */
 #if defined(_MOUSE_C)
     long mouse_mode = MOUSE_COORDINATES_REAL;
     long clipboard_mode = MOUSE_COORDINATES_REAL;

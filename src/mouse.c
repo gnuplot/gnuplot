@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.16 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.17 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -47,7 +47,7 @@ static char *RCSid() { return RCSid("$Id: mouse.c,v 1.16 2000/11/23 08:35:39 mik
 #include "stdfn.h"
 #include "gp_types.h"
 
-#define _MOUSE_C
+#define _MOUSE_C		/* FIXME HBB 20010207: violates Codestyle */
 #ifdef USE_MOUSE		/* comment out whole file, otherwise... */
 
 #include "mouse.h"
@@ -1474,7 +1474,6 @@ event_motion(struct gp_event_t *ge)
 	TBOOLEAN redraw = FALSE;
 
 	if (button & (1 << 1)) {
-
 	    /* dragging with button 1 -> rotate */
 #if 0				/* HBB 20001109: what's rint()? */
 	    surface_rot_x = rint(zero_rot_x + 180.0 * mouse_y / term->ymax);
@@ -1493,9 +1492,7 @@ event_motion(struct gp_event_t *ge)
 	    if (surface_rot_z < 0)
 		surface_rot_z += 360;
 	    redraw = TRUE;
-
 	} else if (button & (1 << 2)) {
-
 	    /* dragging with button 2 -> scale or changing ticslevel.
 	     * we compare the movement in x and y direction, and
 	     * change either scale or zscale */
@@ -1528,7 +1525,7 @@ event_motion(struct gp_event_t *ge)
 	    start_x = mouse_x;
 	    start_y = mouse_y;
 	    redraw = TRUE;
-	}
+	} /* if (mousebutton 2 is down) */
 
 	if (!ALMOST2D) {
 	    turn_ruler_off();
@@ -1546,7 +1543,7 @@ event_motion(struct gp_event_t *ge)
 		needreplot = TRUE;
 	    }
 	}
-    }
+    } /* if (3D plot) */
 
 
     if (ALMOST2D) {

@@ -1,5 +1,5 @@
 /*
- * $Id: wgnuplib.h,v 1.7 2001/02/06 11:31:15 mikulik Exp $
+ * $Id: wgnuplib.h,v 1.8 2001/02/08 16:44:36 broeker Exp $
  */
 
 /* GNUPLOT - win/wgnuplib.h */
@@ -367,10 +367,10 @@ void WDPROC GraphPrint(LPGW lpgw);
 void WDPROC GraphRedraw(LPGW lpgw);
 
 #ifdef USE_MOUSE
-void WDPROC Graph_set_cursor ( int c, int x, int y );
-void WDPROC Graph_set_ruler ( int x, int y );
-void WDPROC Graph_put_tmptext( int i, const char str[] );
-void WDPROC Graph_set_clipboard ( const char s[] );
+void WDPROC Graph_set_cursor (LPGW lpgw, int c, int x, int y );
+void WDPROC Graph_set_ruler (LPGW lpgw, int x, int y );
+void WDPROC Graph_put_tmptext(LPGW lpgw, int i, const char str[] );
+void WDPROC Graph_set_clipboard (LPGW lpgw, const char s[] );
 #endif
 
 /* ================================== */
