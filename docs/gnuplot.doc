@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.216 2004/04/17 17:26:14 cgaylord Exp $
+C RCS $Id: gnuplot.doc,v 1.217 2004/04/18 02:32:56 cgaylord Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -3425,6 +3425,7 @@ errorbar demos.
  set explicitly to guarantee that the five separate graphs (drawn on top of
  each other in multiplot mode) will have exactly the same axes.  The linetype
  must be specified; otherwise all the plots would be drawn with the same type.
+ See animate.dem in demo directory for an animated example.
 
 2 reset
 ?commands reset
