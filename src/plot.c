@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.18 1999/07/30 19:34:50 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.19 1999/08/07 17:21:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -771,12 +771,10 @@ char **pathp;
 	int_error(NO_CARET, "Cannot expand empty path");
 
     if ((*pathp)[0] == '~' && (*pathp)[1] == DIRSEP1) {
-
 	if (user_homedir) {
 	    size_t n = strlen(*pathp);
 
-	    *pathp = gp_realloc(*pathp, n - 1 + strlen(user_homedir), "tilde expansion");
-
+	    *pathp = gp_realloc(*pathp, n + strlen(user_homedir), "tilde expansion");
 	    /* include null at end ... */
 	    memmove(*pathp + strlen(user_homedir) - 1, *pathp, n + 1);
 	    strncpy(*pathp, user_homedir, strlen(user_homedir));
