@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.12 2000/11/23 17:12:40 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.13 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -131,17 +131,25 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
 	int cnt;
 	if (scanA && (cnt = scanA->p_count - 1) > 0) {
 
+	    int from, i;
 	    vertex vA, vA2;
 
 	    /* ordering within one scan */
-	    /* amai: I get a crash here - we sometimes submit UNDEFINED points here :-(
-	       FIXME!!! */
-	    map3d_xyz(scanA->points[0].x, scanA->points[0].y, scanA->points[0].z, &vA);
-	    map3d_xyz(scanA->points[cnt].x, scanA->points[cnt].y, scanA->points[cnt].z, &vA2);
-	    if (vA2.z > vA.z)
+	    for (from=0; from<=cnt; from++) /* find 1st non-undefined point */
+		if (scanA->points[from].type != UNDEFINED) {
+		    map3d_xyz(scanA->points[from].x, scanA->points[from].y, scanA->points[from].z, &vA);
+		    break;
+		}
+	    for (i=cnt; i>from; i--) /* find the last non-undefined point */
+		if (scanA->points[from].type != UNDEFINED) {
+		    map3d_xyz(scanA->points[i].x, scanA->points[i].y, scanA->points[i].z, &vA2);
+		    break;
+		}
+	    if (from < i) 
+		*invert = (vA2.z > vA.z) ? 0 : 1;
+	    else /* no point defined (searching scans where some pts are defined is ignored) */
 		*invert = 0;
-	    else
-		*invert = 1;
+
 	    scanB = scanA->next;
 
 	    /* check the z ordering between scans */
@@ -152,11 +160,15 @@ pm3d_rearrange_part(struct iso_curve *src, const int len, struct iso_curve ***de
 	    }
 	    if (scanB && scanB->p_count) {
 		vertex vB;
-		map3d_xyz(scanB->points[0].x, scanB->points[0].y, scanB->points[0].z, &vB);
-		if (vB.z > vA.z)
+		for (i=0; i<scanB->p_count; i++) /* find 1st non-undefined point */
+		    if (scanB->points[i].type != UNDEFINED) {
+			map3d_xyz(scanB->points[i].x, scanB->points[i].y, scanB->points[i].z, &vB);
+			break;
+		    }
+		if (from<=cnt && i<scanB->p_count)
+		    invert_order = (vB.z > vA.z) ? 0 : 1;
+		else /* no point defined in either scan (searching scans where some pts are defined is ignored) */
 		    invert_order = 0;
-		else
-		    invert_order = 1;
 	    }
 	}
     }

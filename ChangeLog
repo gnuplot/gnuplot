@@ -1,3 +1,7 @@
+2000-12-05  Petr Mikulik  <mikulik@physics.muni.cz>
+
+        * src/pm3d.c: take care about undefined points in PM3D_SCANS_AUTOMATIC
+
 2000-12-04  Johannes Zellner  <johannes@zellner.org>
 
 	* term/ggi.trm: copy the ggi options to term_options
