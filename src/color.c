@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.8 2000/11/15 15:51:06 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.9 2000/11/20 09:47:07 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -41,7 +41,7 @@ static char *RCSid() { return RCSid("$Id: color.c,v 1.8 2000/11/15 15:51:06 miku
 #include "getcolor.h"
 
 #include "axis.h"
-/* #include "setshow.h" */
+#include "gadgets.h"
 #include "graphics.h"
 #include "graph3d.h"
 #include "pm3d.h"
@@ -409,7 +409,6 @@ void draw_color_smooth_box ()
   unsigned int x_from, x_to, y_from, y_to;
   double tmp;
   char s[64];
-  extern double base_z, ceiling_z; /* defined in graph3d.c */
   FILE *out = postscript_gpoutfile; /* either gpoutfile or PSLATEX_auxfile */
 
   if (color_box.where == SMCOLOR_BOX_NO)
@@ -470,7 +469,6 @@ void draw_color_smooth_box ()
       term_apply_lp_properties(&lp);
     }  else {
       /* black solid colour should be chosen, so it's border linetype */
-      extern struct lp_style_type border_lp;
       term_apply_lp_properties(&border_lp);
     }
     (term->move) (x_from,y_from);
@@ -482,7 +480,6 @@ void draw_color_smooth_box ()
     /* Ugly */
     /*Set line properties to some value, this also draws lines in postscript terminals!*/
     {
-      extern struct lp_style_type border_lp;
       term_apply_lp_properties(&border_lp);
     }
   }

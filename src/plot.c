@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.38 2000/11/01 20:37:48 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.39 2000/11/03 11:44:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: plot.c,v 1.38 2000/11/01 20:37:48 joze
 #include "command.h"
 #include "eval.h"
 #include "fit.h"
+#include "gpexecute.h"
 #include "gp_hist.h"
 #include "misc.h"
 #include "readline.h"
@@ -139,7 +140,7 @@ const char *user_gnuplotpath = NULL;
 #endif
 
 #ifdef X11
-extern int X11_args __PROTO((int, char **));
+extern int X11_args __PROTO((int, char **)); /* FIXME: defined in term/x11.trm */
 #endif
 
 /* patch to get home dir, see command.c */
@@ -296,7 +297,6 @@ char **argv;
     int rc;
     if (_osmode == OS2_MODE) {
 #ifdef USE_MOUSE
-	extern HEV semInputReady;
 	char semInputReadyName[40];
 	sprintf( semInputReadyName, "\\SEM32\\GP%i_Input_Ready", getpid() );
 	rc = DosCreateEventSem(semInputReadyName,&semInputReady,0,0);

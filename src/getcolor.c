@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.4 2000/11/02 19:07:16 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.5 2000/11/15 15:51:06 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -19,8 +19,6 @@ static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.4 2000/11/02 19:07:16 l
 #include <stdio.h>
 #include "color.h"
 #include "stdfn.h"
-
-extern t_sm_palette sm_palette;
 
 double
 GetColorValueFromFormula (int formula, double x)

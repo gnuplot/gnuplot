@@ -131,6 +131,8 @@ void gp_execute(char *s)
 
 #else /* !OS2 */
 
+int buffered_output_pending = 0;
+
 static gpe_fifo_t*
 gpe_init(void)
 {

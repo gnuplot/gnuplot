@@ -65,7 +65,7 @@ typedef struct gpe_fifo_t {
     struct gp_event_t ge;
     struct gpe_fifo_t* next;
 } gpe_fifo_t;
-static int buffered_output_pending = 0;
+extern int buffered_output_pending;
 RETSIGTYPE pipe_died_handler __PROTO((int signum));
 #endif /* !OS2 */
 

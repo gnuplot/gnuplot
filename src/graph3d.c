@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.35 2000/11/03 01:15:05 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.36 2000/11/23 08:35:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -212,10 +212,7 @@ static int ktitle_lines = 0;
  */
 
 double floor_z;
-#ifndef PM3D /* used in color.c */
-static
-#endif
-double ceiling_z, base_z;
+double ceiling_z, base_z;	/* made exportable for PM3D */
 
 transform_matrix trans_mat;
 

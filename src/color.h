@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.5 2000/11/02 19:07:16 lhecking Exp $
+ * $Id: color.h,v 1.6 2000/11/15 15:51:06 mikulik Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -233,7 +233,8 @@ void set_color __PROTO(( double gray ));
    Makes mapping from real 3D coordinates to 2D terminal coordinates,
    then draws filled polygon
 */
-static void filled_polygon __PROTO((int points, gpdPoint *corners));
+/* HBB 20001109: removed 'static' --- doesn't make sense in headers */
+void filled_polygon __PROTO((int points, gpdPoint *corners));
 #endif
 
 /*

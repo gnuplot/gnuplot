@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.9 2000/11/20 09:47:07 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.10 2000/11/23 08:35:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -21,14 +21,16 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.9 2000/11/20 09:47:07 mikul
 
 #ifdef PM3D
 
+#include "pm3d.h"
+
+#include "alloc.h"
 #include "axis.h"
 #include "graph3d.h"
-#include "pm3d.h"
-#include "setshow.h" /* for surface_rot_z */
-#include "term_api.h" /* for lp_use_properties() */
+#include "hidden3d.h"		/* p_vertex & map3d_xyz() */
+#include "plot3d.h"
+#include "setshow.h"		/* for surface_rot_z */
+#include "term_api.h"		/* for lp_use_properties() */
 
-#include "hidden3d.h" /* p_vertex & map3d_xyz() */
-#include "alloc.h"
 
 
 /********************************************************************/
@@ -56,10 +58,6 @@ double used_pm3d_zmin, used_pm3d_zmax;
 /****************************************************************/
 /* Now the routines which are really those exactly for pm3d.c
 */
-
-/* declare variables and routines from external files */
-extern struct surface_points *first_3dplot;
-
 
 /*
    Check and set the z-range for use by pm3d
@@ -223,7 +221,6 @@ pm3d_plot(struct surface_points* this_plot, char at_which_z)
     int scan_array_n;
     double avgZ, gray;
     gpdPoint corners[4];
-    extern double base_z, ceiling_z; /* defined in graph3d.c */
 #ifdef EXTENDED_COLOR_SPECS
     gpiPoint icorners[4];
 #endif
@@ -412,7 +409,6 @@ void filled_color_contour_plot ( this_plot, contours_where )
     int contours_where;
 {
     double gray;
-    extern double base_z; /* defined in graph3d.c */
     struct gnuplot_contours *cntr;
 
     if (this_plot == NULL || this_plot->contours == NULL)
@@ -468,7 +464,6 @@ void pm3d_draw_all(struct surface_points* plots, int pcount)
 {
     int i = 0;
     int surface;
-    extern FILE *gpoutfile;
     struct surface_points *this_plot = NULL;
 
     /* for pm3dCompress.awk */
