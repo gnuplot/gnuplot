@@ -1,3 +1,24 @@
+1999-02-23  Lars Hecking  <lhecking@nmrc.ucc.ie>, Xavier Pianet <xavier@xingo.com>
+
+	* Makefile.in, configure.in, makefile.all, term.h: Integrate changes
+	for port to BeOS.
+
+	* beos/GPApp.cpp, beos/GPApp.h, beos/GPBitmap.cpp, beos/GPBitmap.h,
+	beos/GPView.cpp, beos/GPView.h, beos/GPWindow.cpp, beos/GPWindow.h,
+	beos/XStringList.cpp, beos/XStringList.h, beos/constants.h,
+	beos/makefile, demo/dobedo, m4/beos.m4, term/be.trm:
+	New files for BeOS port.
+
+	* aclocal.m4, configure, config.hin: Regenerated.
+
+1999-02-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* configure.in: Rearrange header tests, add check for <sys/ioctl.h>.
+	Rearrange function tests. Remove superfluous subshell in terminal
+	driver list creation.
+
+	* readline.c: Use HAVE_SYS_IOCTL_H instead of platform symbols.
+
 1999-02-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* gplt_x11.c(main): Fix long-standing typo in debug FPRINTF statement.
@@ -61,7 +82,7 @@
 	be drawn in another colour than the corresponing sample lines on the
 	"test" page if the width of linestyle 1 was changed.
 
-1999-02-14  "Pepin, Joseph D (Joe), GOVMK"  <joepepin@att.com>
+1999-02-14  "Joseph D. Pepin"  <joepepin@att.com>
 
 	* term/x11.trm: Patch to exit the bin/sh process after it has parsed
 	the command line.
@@ -111,7 +132,7 @@
 	"set margin" and "set xtic" writeups telling about the effects of
 	"set xtics axis" if the axis is too close to the border.
 
-1999-02-03  "Pepin, Joseph D (Joe), GOVMK"  <joepepin@att.com> 
+1999-02-03  "Joseph D. Pepin"  <joepepin@att.com> 
 
 	* graph3d.c, graphics.c, plot.h, set.c, show.c, docs/gnuplot.doc:
 	Patch to introduce layers (front, back) for labels and arrows.
