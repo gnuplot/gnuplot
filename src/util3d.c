@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.22 2004/09/01 15:53:49 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.23 2004/09/25 23:33:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1039,7 +1039,6 @@ map3d_xy(
     *yt = (unsigned int) ((res[1] * yscaler / w) + ymiddle);
 }
 
-#ifdef WITH_IMAGE
 /* Function to map from user 3D space to normalized 'camera' view
  * space, and from there directly to terminal coordinates */
 void
@@ -1070,7 +1069,6 @@ map3d_xy_double(
     *xt = ((res[0] * xscaler / w) + xmiddle);
     *yt = ((res[1] * yscaler / w) + ymiddle);
 }
-#endif
 
 #else /* REPLICATE_CODE_FOR_BACKWARD_COMPATIBLE_ROUNDING */
 
