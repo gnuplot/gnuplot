@@ -337,13 +337,13 @@ char *s;
 			    df_no_use_specs > 5))))) ||
 			    df_no_use_specs == 0) {
 			
-#ifdef FORTRAN_NUMS
+#ifndef NO_FORTRAN_NUMS
 				count = sscanf(s, "%lf%n", &df_column[df_no_cols].datum, &used);
 #else
 				while (isspace(*s)) ++s;
 				count = *s ? 1 : 0;
 				df_column[df_no_cols].datum = atof(s);
-#endif /* FORTRAN_NUMS */
+#endif /* NO_FORTRAN_NUMS */
 				}
 			else {
 				/* skip any space at start of column */
@@ -357,7 +357,7 @@ char *s;
 			 * is only safe if count is 1
 			 */
 			 
-#ifdef FORTRAN_NUMS
+#ifndef NO_FORTRAN_NUMS
 			if (count==1 &&
 			    (s[used]=='d' || s[used]=='D' || s[used]=='q' || s[used]=='Q')
 			   ) {
@@ -366,8 +366,8 @@ char *s;
 				/* and try again */
 				count = sscanf(s, "%lf", &df_column[df_no_cols].datum);
 			}
-#endif /* FORTRAN_NUMS */
-#endif
+#endif /* NO_FORTRAN_NUMS */
+#endif /* OSK */
 			df_column[df_no_cols].good = count==1 ? DF_GOOD : DF_BAD;
 		}
 
