@@ -339,6 +339,9 @@
 /*  Define if you have libgd version 1.2 - 1.4  */
 #undef HAVE_GIF
 
+/*  libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT  */
+#undef gdImageStringFT
+
 /*  Define if TrueType font support in libgd  */
 #undef HAVE_TTF
 

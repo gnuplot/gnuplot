@@ -76,6 +76,8 @@ Alexander Lehmann
 @item
 Alexander Mai
 @item
+Petr Mikulik
+@item
 Carsten Steger
 @item
 Tom Tkacik
@@ -89,7 +91,7 @@ James R. Van Zandt
 Johannes Zellner
 @end itemize
 
-@c ^<h2>  Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley<p>
+@c ^<h2>  Copyright (C) 1986 - 1993, 1998 - 2002   Thomas Williams, Colin Kelley<p>
 @c ^   Mailing list for comments: info-gnuplot@@dartmouth.edu <p>
 @c ^   Mailing list for bug reports: bug-gnuplot@@dartmouth.edu<p>
 @c ^</h2><p>
@@ -5357,8 +5359,7 @@ usual axes commands, i.e. `set/unset/show` with @ref{cbrange}, `[m]cbtics`,
 `unset colorbox` resets the default parameters for the colorbox and switches
 the colorbox off.
 
-See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help vgagl`,
-`help set style line`.
+See also @ref{pm3d}, @ref{palette}, @ref{pm3d}, `help set style line`.
 
 
 @node contour, data_style, color_box, set-show
@@ -7556,7 +7557,7 @@ altitudes:
 
 @end example
 
-See also @ref{palette}, `set colorbox`, @ref{pm3d}, `help vgagl`.
+See also @ref{palette}, `set colorbox`, @ref{pm3d}.
 
 
 @node palette, pointsize, pm3d, set-show
@@ -12291,8 +12292,8 @@ size.
 Fonts listed by `fontfile` or `fontfile add` encapsulate the font
 definitions of the listed font from a postscript Type 1 or TrueType font
 file directly into the gnuplot output postscript file. Thus, the enclosed
-font can be used in labels, titles, etc. See the section `postscript
-fontfile` for more details.
+font can be used in labels, titles, etc. See the section
+`postscript fontfile` for more details.
 With `fontfile delete` a fontfile is deleted from the list of embedded
 files.
 
@@ -13328,6 +13329,7 @@ printers.  It has no options."
 @c ?set term vgagl
 @c ?terminal vgagl
 @c ?term vgagl
+@c ?help vgagl
 @cindex vgagl
 @tmindex vgagl
 
@@ -13938,7 +13940,7 @@ to a '16' dotted line.
 , "
 
 
-@noindent --- PM3D_RESOURCES ---
+@noindent --- X11 PM3D_RESOURCES ---
 
 @c ?commands set terminal x11 pm3d_resources
 @c ?set terminal x11 pm3d_resources
@@ -13946,6 +13948,8 @@ to a '16' dotted line.
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
+@c ?help x11 pm3d_resources
+@c ?help x11 pm3d
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
@@ -14291,7 +14295,7 @@ to a '16' dotted line.
 , "
 
 
-@noindent --- PM3D_RESOURCES ---
+@noindent --- X11 PM3D_RESOURCES ---
 
 @c ?commands set terminal x11 pm3d_resources
 @c ?set terminal x11 pm3d_resources
@@ -14299,6 +14303,8 @@ to a '16' dotted line.
 @c ?x11 pm3d_resources
 @cindex pm3d_resources
 
+@c ?help x11 pm3d_resources
+@c ?help x11 pm3d
 Choosing the appropriate visual class and number of colors is a crucial
 point in X11 applications and a bit awkward, since X11 supports six visual
 types in different depths.
@@ -16330,7 +16336,7 @@ may be located via the official distribution site:
 @uref{http://www.gnuplot.info,http://www.gnuplot.info
 }
 
-Please e-mail any bugs to bug-gnuplot mailinglist (see @ref{Seeking-assistance})
+Please e-mail any bugs to bug-gnuplot mailing list (see @ref{Seeking-assistance}).
 
 
 @menu
