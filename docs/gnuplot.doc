@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.245 2004/10/13 22:23:58 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.246 2004/10/19 03:26:13 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -285,7 +285,7 @@ C
  Not all terminal types support these options, however.  The enhanced text
  mode previously available for the postscript and pm terminals has been
  extended to other terminal types as well.  Terminal types currently supported
- include dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
+ include aqua, dumb, jpeg, pdf, pm, png, postscript, and x11. See `enhanced text`.
 
  Sample scripts: textcolor.dem textrotate.dem
 
