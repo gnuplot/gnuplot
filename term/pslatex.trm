@@ -1,5 +1,5 @@
 /*
- * $Id: pslatex.trm,v 1.26 2000/02/11 19:24:03 lhecking Exp $
+ * $Id: pslatex.trm,v 1.27 2000/03/30 14:08:21 lhecking Exp $
  */
 
 /* GNUPLOT - pslatex.trm */
@@ -101,6 +101,7 @@ static char *PSLATEX_auxname;
 static FILE *PSLATEX_auxfile;
 
 static TBOOLEAN PSLATEX_output = TRUE;	/* do we write LaTeX? */
+static int PSLATEX_fontsize = 0;
 
 struct text_command {
     int x, y, angle, justify;
@@ -177,9 +178,10 @@ PSLATEX_options()
 	case PSLATEX_OTHER:
 	default:
 	    /* We have font size specified */
-	    ps_fontsize = (int) real(const_express(&a));
-	    term->v_char = (unsigned int) (ps_fontsize * PS_SC);
-	    term->h_char = (unsigned int) (ps_fontsize * PS_SC / 2);
+	    /* Copied from latex.trm */
+	    PSLATEX_fontsize = (int) real(const_express(&a));
+	    term->v_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 60);
+	    term->h_char = (unsigned int) (PSLATEX_fontsize * DOTS_PER_INCH / 120);
 	    break;
 	}
     }
@@ -191,6 +193,11 @@ PSLATEX_options()
 	    ps_solid ? "solid" : "dashed",
 	    PSLATEX_rotate ? "rotate" : "norotate",
 	    PSLATEX_useAuxFile ? " auxfile" : "");
+    if (PSLATEX_fontsize) {
+      char fs[8] = "";
+      sprintf(fs," %d", PSLATEX_fontsize);
+      strcat(term_options, fs);
+    }
 }
 
 TERM_PUBLIC void
@@ -412,6 +419,13 @@ PSLATEX_text()
     } else {
 	PS_text();
 	fputs("}}%\n", gpoutfile);
+    }
+
+    if (PSLATEX_fontsize) {
+      if (PSLATEX_output)
+	fprintf(gpoutfile, "\\fontsize{%d}{\\baselineskip}\\selectfont\n",
+		PSLATEX_fontsize);
+      /* Should have an else clause here to handle pstex equivalent */
     }
 
     for (tc = PSLATEX_labels; tc != (struct text_command *) NULL; tc = tc->next) {
@@ -647,8 +661,8 @@ START_HELP(pslatex)
 "",
 " <color> is either `color` or `monochrome`.  <dashed> is either `dashed`",
 " or `solid`.  <rotate> is either `rotate` or `norotate` and determines",
-" if the y-axis label is rotated.  <font_size> is used to scale the font",
-" from its usual size.",
+" if the y-axis label is rotated.  <font_size> is the size (in pts) of the",
+" desired font.",
 "",
 " If `auxfile` is specified, it directs the driver to put the PostScript",
 " commands into an auxiliary file instead of directly into the LaTeX file.",
