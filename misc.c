@@ -1,37 +1,38 @@
 #ifndef lint
-static char *RCSid = "$Id: misc.c,v 1.75 1997/11/25 23:02:56 drd Exp $";
+static char *RCSid = "$Id: misc.c,v 1.78 1998/03/22 23:31:21 drd Exp $";
 #endif
 
-
 /* GNUPLOT - misc.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- *
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- *
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 #include <math.h>
 
@@ -206,14 +207,14 @@ void iso_extend(ip, num)
 {
     if (num == ip->p_max) return;
 
-#if (defined(MSDOS) || defined(_Windows))  &&  !defined(WIN32)
+#if defined(DOS16) || defined(WIN16)
     /* Make sure we do not allocate more than 64k points in msdos since 
 	 * indexing is done with 16-bit int
 	 * Leave some bytes for malloc maintainance.
      */
     if (num > 32700)
 		int_error("Array index must be less than 32k in msdos", NO_CARET);
-#endif /* MSDOS */
+#endif /* 16bit (Win)Doze */
 
     if (num > 0) {
 	   if (ip->points == NULL) {
@@ -425,6 +426,33 @@ FILE *fp;
 static void save_version(fp)
 FILE *fp;
 {
+#if 1 /* HBB 980311: reduce DATA size: move these string tables to FAR mem */
+        /* don't use tabs in an ASCII file */
+     static char GPFAR version_string []=
+        "#    %s\n"
+        "#    %sversion %s\n"
+        "#    patchlevel %s\n"
+        "#    last modified %s\n"
+        "#\n"
+        "#    %s\n"
+        "#    Thomas Williams, Colin Kelley and many others\n"
+        "#\n"
+        "#    Send comments and requests for help to %s\n"
+        "#    Send bugs, suggestions and mods to %s\n"
+        "#\n"
+     ;
+     fprintf(fp, version_string,
+        PROGRAM,
+        OS, version,
+        patchlevel,
+        date,
+
+        gnuplot_copyright,
+
+        help_email,
+        bug_email
+      );
+#else
         /* don't use tabs in an ASCII file */
         fprintf(fp, "#    %s\n",PROGRAM);
         fprintf(fp, "#    %sversion %s\n", OS, version);
@@ -437,6 +465,7 @@ FILE *fp;
         fprintf(fp, "#    Send comments and requests for help to %s\n", help_email);
         fprintf(fp, "#    Send bugs, suggestions and mods to %s\n", bug_email);
         fprintf(fp, "#\n");
+#endif
 }
 
 static void save_functions__sub(fp)
@@ -474,6 +503,7 @@ struct text_label *this_label;
 struct arrow_def *this_arrow;
 struct linestyle_def *this_linestyle;
 char str[MAX_LINE_LEN+1];
+
 	/* opinions are split as to whether we save term and outfile
 	 * as a compromise, we output them as comments !
 	 */
@@ -658,7 +688,7 @@ char str[MAX_LINE_LEN+1];
  	else
 	 	fprintf(fp,"set noclabel\n");
 
-	fprintf(fp,"set %shidden3d\n",(hidden3d) ? "" : "no");
+	save_hidden3doptions(fp);
 	fprintf(fp,"set cntrparam order %d\n", contour_order);
 	fprintf(fp,"set cntrparam ");
 	switch (contour_kind) {
@@ -827,9 +857,9 @@ static void save_tics(fp, where, axis, tdef, rotate, text)
 			break;
 		    }
 		  case TIC_SERIES:
-			 if ( datatype[axis] == TIME ) {
-			 	if (tdef->def.series.start != -VERYLARGE) {
-   				char fd[26];
+			if ( datatype[axis] == TIME ) {
+				if (tdef->def.series.start != -VERYLARGE) {
+				char fd[26];
 					gstrftime(fd,24,timefmt,(double)tdef->def.series.start);
 					fprintf(fp, "\"%s\",", conv_text(str,fd));
 				}
@@ -882,7 +912,7 @@ static void save_position(fp, pos)
 FILE *fp;
 struct position *pos;
 {
-	static char *msg[]={"first_axes ","second axes ", "graph ", "screen "};
+        static char *msg[]={"first_axes ","second axes ", "graph ", "screen "};
 
 	assert(first_axes==0 && second_axes==1 && graph==2 && screen==3);
 	
@@ -907,10 +937,12 @@ void load_file(fp, name, can_do_args)
     do_load_arg_substitution = can_do_args;
 
     if (fp == (FILE *)NULL) {
-	   char errbuf[BUFSIZ];
+           /* HBB 980311: alloc() it, to save valuable stack space: */
+           char *errbuf = gp_alloc(BUFSIZ, "load_file errorstring");
 	   (void) sprintf(errbuf, "Cannot open %s file '%s'",
 			  can_do_args ? "call" : "load", name);
 	   os_error(errbuf, c_token);
+           free(errbuf);
     } else {
 	   /* go into non-interactive mode during load */
 	   /* will be undone below, or in load_file_error */
@@ -981,8 +1013,9 @@ void load_file(fp, name, can_do_args)
 			 *input_line='\0';
 			 while( *rl ) {
 			    register int aix;
-                            if (*rl == '$' &&  
-				(aix = *(++rl)) && aix >= '0' && aix <= '9') {
+                            if (*rl == '$'  
+				&& ((aix = *(++rl)) != 0) /* HBB 980308: quiet BCC warning */
+			        && aix >= '0' && aix <= '9') {
                                if (call_args[aix -= '0']) {
 				  len = strlen(call_args[aix]);
 				  while(input_line_len-il<len+1) {
@@ -1213,7 +1246,9 @@ int count, *kcnt;
 	mlen = cnt = 0;
 	this_plot = plots;
 	for (curve = 0; curve < count; this_plot = this_plot->next_cp, curve++)
-		if (this_plot->title && (len = /*assign*/ strlen(this_plot->title))) {
+		if (this_plot->title
+		    && ((len = /*assign*/ strlen(this_plot->title)) != 0) /* HBB 980308: quiet BCC warning */
+		    ) {
 			cnt++;
 			if (len > mlen) 
 				mlen = strlen(this_plot->title);

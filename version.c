@@ -1,57 +1,39 @@
 #ifndef lint
-static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
+static char *RCSid = "$Id: version.c,v 1.343 1998/03/22 23:31:31 drd Exp $";
 #endif
 
 /* GNUPLOT - version.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
  * Permission to use, copy, and distribute this software and its
- * documentation for any purpose with or without fee is hereby granted, 
- * provided that the above copyright notice appear in all copies and 
- * that both that copyright notice and this permission notice appear 
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
  * in supporting documentation.
  *
  * Permission to modify the software is granted, but not the right to
- * distribute the modified code.  Modifications are to be distributed 
- * as patches to released version.
- *  
- * This software is provided "as is" without express or implied warranty.
- * 
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
  *
- * AUTHORS
- * 
- *   Original Software:
- *     Thomas Williams,  Colin Kelley.
- * 
- *   Gnuplot 2.0 additions:
- *       Russell Lang, Dave Kotz, John Campbell.
- *
- *   Gnuplot 3.0 additions:
- *       Gershon Elber and many others.
- * 
- *   Gnuplot 3.4 additions:
- *       Alex Woo and many others.
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
- *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
+
 
 /*
  * The rcs log will be removed for `real' releases
@@ -64,6 +46,25 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  * do not agree with the one in the log. I hope to fix this some time soon.
  *
  * $Log: version.c,v $
+ * Revision 1.343  1998/03/22  23:31:31  drd
+ * hbb: compile on win16 ; latest and greatest hidden3d stuff
+ *
+ * Revision 1.342  1998/03/22  22:32:24  drd
+ * drd: update copyright statements on most files. There are still a
+ *      few files (obscure terminal drivers) copyright others. Maybe
+ *      we have to drop these, or at least list the files which
+ *      cannot be redistributed with a modified gnuplot.
+ *      (Or maybe it is okay to include these files unchanged in an
+ *       otherwise modified gnuplot ?)
+ *
+ * Revision 1.341  1997/12/16  23:01:05  drd
+ * Lars Hecking: 0PORTING, 0README, 0INSTALL
+ * HBB: latest hidden3d stuff
+ *      off-by-one error in long-line datafiles
+ * gas@SLAC.stanford.edu : fix for \" inside "strings"
+ * Hans-Martin Keller : fix for fault in contour stuff
+ * Niels Provos : VMS stuff
+ *
  * Revision 1.340  1997/11/25  23:03:09  drd
  * Alexander Mai: fix show output for non-auto x range
  * Konrad Bernloehr: fixes for logscale tics
@@ -1599,9 +1600,9 @@ static char *RCSid = "$Id: version.c,v 1.340 1997/11/25 23:03:09 drd Exp $";
  */
 
 char version[] = "3.5 (pre 3.6)";
-char patchlevel[] = "beta 340";
-char date[] = "Tue Nov 25 22:57:44 GMT 1997"; 
-char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1997";
+char patchlevel[] = "beta 343";
+char date[] = "Sun Mar 22 23:21:22 GMT 1998"; 
+char gnuplot_copyright[] = "Copyright(C) 1986 - 1993, 1998";
 
 
 /* override in Makefile */

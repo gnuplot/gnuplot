@@ -1,45 +1,38 @@
 #ifndef lint
-static char    *RCSid = "$Id: plot2d.c,v 1.50 1997/07/23 23:16:32 drd Exp $";
+static char    *RCSid = "$Id: plot2d.c,v 1.51 1998/03/22 22:31:57 drd Exp $";
 #endif
 
-
 /* GNUPLOT - plot2d.c */
-/*
- * Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
- * 
- * Permission to use, copy, and distribute this software and its documentation
- * for any purpose with or without fee is hereby granted, provided that the
- * above copyright notice appear in all copies and that both that copyright
- * notice and this permission notice appear in supporting documentation.
- * 
- * Permission to modify the software is granted, but not the right to distribute
- * the modified code.  Modifications are to be distributed as patches to
- * released version.
- * 
- * This software is provided "as is" without express or implied warranty.
- * 
- * 
- * formerly part of command.c
- * 
- * There is a mailing list for gnuplot users. Note, however, that the
- * newsgroup 
- *	comp.graphics.apps.gnuplot 
- * is identical to the mailing list (they
- * both carry the same set of messages). We prefer that you read the
- * messages through that newsgroup, to subscribing to the mailing list.
- * (If you can read that newsgroup, and are already on the mailing list,
- * please send a message to majordomo@dartmouth.edu, asking to be
- * removed from the mailing list.)
+
+/*[
+ * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
- * The address for mailing to list members is
- *	   info-gnuplot@dartmouth.edu
- * and for mailing administrative requests is 
- *	   majordomo@dartmouth.edu
- * The mailing list for bug reports is 
- *	   bug-gnuplot@dartmouth.edu
- * The list of those interested in beta-test versions is
- *	   info-gnuplot-beta@dartmouth.edu
- */
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and
+ * that both that copyright notice and this permission notice appear
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the complete modified source code.  Modifications are to
+ * be distributed as patches to the released version.  Permission to
+ * distribute binaries produced by compiling modified sources is granted,
+ * provided you
+ *   1. distribute the corresponding source modifications from the
+ *    released version in the form of a patch file along with the binaries,
+ *   2. add special version identification to distinguish your version
+ *    in addition to the base release version number,
+ *   3. provide your name and address as the primary contact for the
+ *    support of your modified version, and
+ *   4. retain our contact information in regard to use of the base
+ *    software.
+ * Permission to distribute the released version of the source code along
+ * with corresponding source modifications in the form of a patch file is
+ * granted with same provisions 2 through 4 for binary distributions.
+ *
+ * This software is provided "as is" without express or implied warranty
+ * to the extent permitted by applicable law.
+]*/
 
 #include <math.h>
 #include <ctype.h>

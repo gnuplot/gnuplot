@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.61 1997/11/25 23:03:25 drd Exp $
+C RCS $Id: gnuplot.doc,v 1.62 1997/12/16 23:01:31 drd Exp $
 C 10 October 1997
 C Copyright (C) 1986 - 1993, 1997   Thomas Williams, Colin Kelley
 C
@@ -3550,24 +3550,102 @@ C ... and restart the table:
 ?show hidden3d
 ?hidden3d
 ?nohidden3d
- The `set hidden3d` command enables hidden line removal for explicit surface
- plotting (see `splot`).
+ The `set hidden3d` command enables hidden line removal for surface
+ plotting (see `splot`). Some optional features of the underlying
+ algorithm can also be controlled using this command.
 
  Syntax:
-       set hidden3d
+       set hidden3d {defaults}
+       set hidden3d {{offset <offset>} | {nooffset}}
+                    {trianglepattern <bitpattern>}
+                    {{undefined <level>} | {noundefined}}
+                    {{no}altdiagonal}
+                    {{no}bentover}
        set nohidden3d
        show hidden3d
 
- Hidden line removal may be used for both explicit functions and for explicit
- data.  It now works for parametric surfaces as well.  This mode is meaningful
- only when surfaces are `splot`ted `with lines`.
+ In contrast to the usual display in gnuplot, hidden line removal
+ actually treats the given function or data grids as real surfaces that
+ can't be seen through, so parts behind the surface will be hidden by
+ it. For this to be possible, the surface needs to have 'grid
+ structure' (see `help splot datafile` about this), and it has to be
+ drawn `with lines` or `with linespoints`.
 
- When this flag is set, both the hidden portion of the surface and possibly
- its hidden contours (see `set contour`) as well as the hidden grid will be
- removed.  Each surface has its hidden parts removed with respect to itself
- and to other surfaces, if more than one surface is plotted.  But contours
- drawn on the surface (`set contour surface`) don't seem to work.  Labels and
- arrows are always visible and are unaffected.
+ When this flag is set, both the hidden portion of the surface and
+ possibly its contours drawn on the base (see `set contour`) as well as
+ the grid will be hidden. Each surface has its hidden parts removed
+ with respect to itself and to other surfaces, if more than one surface
+ is plotted.  Contours drawn on the surface (`set contour surface`)
+ don't work.  Labels and arrows are always visible and are
+ unaffected. The key is also never hidden by the surface.
+
+ The algorithm used to remove the hidden parts of the surfaces has some
+ additional features controllable by this command. Specifying
+ `defaults` will set them all to their default settings, as detailed
+ below. If `defaults` is not given, only explicitly specified options
+ will be influenced: all others will keep their previous values, so
+ you can turn on/off hidden line removal via `set {no}hidden3d`,
+ without modifying the set of options you chose.
+
+ The first option, `offset`, influences the linestyle used for lines on
+ the 'back' side. Normally, they are drawn in a linestyle one index
+ number higher than the one used for the front, to make the two sides
+ of the surface distinguishable. You can specify a different line style
+ offset to add instead of the default 1, by `offset <offset>`. Option
+ `nooffset` stands for `offset 0`, making the two sides of the surface
+ use the same linestyle.
+
+ Next comes the option 'trianglepattern <bitpattern>'. This gives a
+ number between 0 and 7, interpreted as a bit pattern. Each bit decides
+ on the visibility of one edge of the triangles each surface is split
+ up into.  Bit 0 is for the 'horizontal' edges of the grid, Bit 1 for
+ the 'vertical' ones, and Bit 2 for the diagonals that split each cell
+ of the original grid into two triangles. The default pattern is 3,
+ making all horizontal and vertical lines visible, but not the
+ diagonals. You may want to choose 7 to see those diagonals as well.
+
+ Using the `undefined <level>` option, you can decide what the
+ algorithm is to do with data points that are undefined (missing data,
+ or undefined function values), or exceed the given x-, y- or
+ z-ranges. Such points can either be plotted nevertheless, or taken out
+ of the input data set. All surface elements touching a point that's
+ taken out will be taken out as well, thus creating a hole in the
+ surface. At <level> 3, equivalent to option `noundefined`, no points
+ will be thrown away at all. This may produce all kinds of problems
+ elsewhere, so you should avoid this. <level> 2 will throw away
+ undefined points, but keep the out-of-range ones. <level> 1, the
+ default, will get rid of out-of-range points as well.
+
+ By specifying `noaltdiagonal`, you can override the default handling
+ of a special case can occur if `undefined` is active (i.e. <level> is
+ not 3). Each cell of the grid structured input surface will be divided
+ in two triangles along one of its diagonals. Normally, all these
+ diagonals have the same orientation relative to the grid. Now, if
+ exactly one of the four cell corners is excluded by the `undefined`
+ handler, and this is on the usual diagonal, both triangles will be
+ excluded. If the default setting of `altdiagonal` is active, the other
+ diagonal will be chosen for this cell instead, minimizing the size of
+ the hole in the surface.
+
+ The `bentover` option controls what happens to another special case,
+ this time in conjunction with the `trianglepattern`. For rather crumpy
+ surfaces, it can happen that the two triangles a surface cell is
+ divided into are seen from opposite sides (i.e. the original
+ quadrangle is 'bent over'), as illustrated in the following ASCII art:
+
+        C----B
+        |\   |     original quadrangle:  A--B
+        | \  |                           | /|
+        | /\ |                           |/ |
+        |/  \|                           C--D
+        A    D
+
+ If the diagonal edges of the surface cells aren't generally made
+ visible by bit 2 of the <bitpattern> there, the edge CB above wouldn't
+ be drawn at all, normally, making the resulting display hard to
+ understand. Therefore, the default option of `bentover` will turn it
+ visible in this case. If you don't want that, you may give
+ `nobentover` instead.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html"> Hidden Line Removal Demo</a> and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html"> Complex Hidden Line Demo. </a>
 3 isosamples

@@ -1,10 +1,10 @@
-/* $Id: type.h,v 1.2 1994/03/22 14:26:20 alex Exp $ */
+/* $Id: type.h,v 1.3 1998/03/22 22:32:18 drd Exp $ */
 
 /*
  *	Header file: commonly used types
  *
  *
- *	Copyright of this module:   Carsten Grammes, 1993
+ *	Copyright of this module:   Carsten Grammes, 1993, 1998
  *      Experimental Physics, University of Saarbruecken, Germany
  *
  *      Internet address: ph12hucg@rz.uni-sb.de

@@ -1,5 +1,5 @@
 /*
- * $Id: doc2rtf.c,v 1.14 1997/07/22 23:24:21 drd Exp $
+ * $Id: doc2rtf.c,v 1.15 1998/03/22 23:31:53 drd Exp $
  *
  */
 
@@ -117,7 +117,7 @@ convert(a,b)
 
 	/* close final page and generate trailer */
 	fprintf(b,"}{\\plain \\page}\n");
-	fprintf(b,"}\n");
+  /* fprintf(b,"}\n"); */ /* HBB: HACK ALERT: only without this, hc31 works */
     list_free();
 }
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: bf_test.c,v 1.9 1997/05/27 01:28:45 drd Exp $";
+static char *RCSid = "$Id: bf_test.c,v 1.10 1998/03/22 22:31:18 drd Exp $";
 #endif
 
 
@@ -9,6 +9,11 @@ static char *RCSid = "$Id: bf_test.c,v 1.9 1997/05/27 01:28:45 drd Exp $";
  *
  * Copyright (c) 1992 Robert K. Cunningham, MIT Lincoln Laboratory
  *
+ */
+
+/* Note that this file is not compiled into gnuplot, and so
+ * its more-restrictive copyright need not apply to gnuplot
+ * as a whole. (I think.)
  */
 
 #ifdef HAVE_CONFIG_H

@@ -1,6 +1,10 @@
+
+The Gnuplot Plotting Utility
+****************************
+
 Gnuplot is a command-line driven interactive function plotting utility
-for UNIX, MSDOS, and VMS platforms.  The software is copyrighted but
-freely distributed (i.e., you don't have to pay for it).  It was
+for UNIX, MSDOS, VMS, and many other platforms.  The software is copyrighted
+but freely distributed (i.e., you don't have to pay for it).  It was
 originally intended as graphical program which would allow scientists
 and students to visualize mathematical functions and data.  Gnuplot
 supports many different types of terminals, plotters, and printers
@@ -27,24 +31,100 @@ nicely formatted version of the on-line help information) can be
 printed either with TeX, troff or nroff.  Look at the docs/Makefile
 for the appropriate option.
 
-                      Help and Bug Reports
+ The GNUPLOT source code and executables may be copied and/or modified
+freely as long as the copyright messages are left intact.
 
-Additional help can be obtained from the USENET newsgroup
-        comp.graphics.apps.gnuplot.
-This newsgroup is the first place to ask for routine help.  It is is
-gatewayed to a mailing list info-gnuplot@dartmouth.edu.  If you cannot
-obtain a USENET feed and wish to join the above mailing list (or get
-yourself off), mail 'subscribe info-gnuplot' to
-        majordomo@dartmouth.edu
-Please do not ask to sign up if you can read comp.graphics.apps.gnuplot.
-There is also a daily digest form info-gnuplot-digest if you prefer.
+Copyright and Porting
+=====================
 
-Note that since gnuplot has nothing to do with the GNU project, please
+ See the Copyright file for copyright conditions.
+
+ See the History file for changes to GNUPLOT.
+
+ Compilation instructions are in the 0INSTALL file. Porting instructions
+are in the 0PORTING file.
+
+ The code for GNUPLOT was written with portability in mind; however, the
+new features incorporated in v3.6 were developed with ANSI-C compliant
+compilers, and it was deemed expedient to restrict the development effort
+to that environment, with the consequence that systems that could build
+previous GNUPLOT releases may require some source modifications.  GNUPLOT
+has been tested on the following systems (incomplete), but be aware that
+this list is not necessarily up to date with regard to the current version
+of GNUPLOT:
+
+ o Sun3, sun4c, sun4m, sun4u (SunOS 4.03, SunOS 4.1.x, Solaris 2.5.1)
+ o uVAX 3100 (VMS 5.4, 5.5, 6.0, 6.1)
+ o VAX 6410 (VMS 5.2)
+ o DECStation 5000/200PXG (ULTRIX V4.1)
+ o DEC AXP 3400 (VMS/OpenVMS 1.5, 6.2)
+ o DEC AXP 600, A1000A, 3000 (DEC Unix 3.2 4.0, Windows NT 4.0 MSVC++ 4.0)
+ o IBM PC and compatibles (MS-DOS 3.3/5.0 BC++3.1/TC++ 1.0 MSC 7.0 DJGPP,
+   OS/2 2.x, Linux 2.x SVGA X11/XFree86, Windows NT 4.0)
+ o CBM Amiga (AmigaOS 1.3, 2.x and 3.x, SAS/C 6.2 and better, Aztec C
+   beta 5.2a, gcc)
+ o IRIS 4D/70G and 4D/25G with MIPS C
+ o NeXT with gnu C 1.34
+ o AT&T 3B1 (version 3.51m with cc and gcc 1.39)
+ o Apollo's (DomainOS SR10.3 BSD4.3 with C compiler 68K Rev 6.7(316))
+ o HP 300 (m68k) and HP 700 (PA-RISC) (HP-UX 9.x)
+ o SGI Challenge and O2 (Irix 6.2, 6.3)
+
+ GNUPLOT has not been tested on Pyramid 90x. You can expect that gnuplot
+will compile more or less out of the box on any system which has a newer
+(2.x) version of the GNU C compiler gcc.
+
+
+Help and Bug Reports
+********************
+
+ Note that since gnuplot has nothing to do with the GNU project, please
 don't ask them for help or information about gnuplot; also, please
 don't ask us about GNU stuff.
 
-There is another list specifically for documented bug reports
-and the submissions of fixes and modifications, bug-gnuplot@dartmouth.edu.
+ Please tell us the version and machine on which your bug occurred.
+
+ Also, please use meaningful email subjects, and particularly avoid
+using a subject of 'help' to info-gnuplot since majordomo bounces
+these to the list owner as suspected admin requests.
+
+Usenet
+======
+
+Additional help can be obtained from the USENET newsgroup
+        comp.graphics.apps.gnuplot.
+This newsgroup is the first place to ask for routine help.  It is
+gatewayed (and thus identical!) to a mailing list
+        info-gnuplot@dartmouth.edu.
+ We prefer that you read the messages through that newsgroup, to subscribing
+to the mailing list.  (If you can read that newsgroup, and are already on the
+mailing list, please send a message to majordomo@dartmouth.edu, asking to be
+removed from the mailing list.)
+
+Mailing Lists
+=============
+
+ Administrative requests should be sent to
+	   majordomo@dartmouth.edu.
+
+info-gnuplot
+------------
+
+ If you cannot obtain a USENET feed and wish to join the above mailing
+list (or get yourself off), mail 'subscribe info-gnuplot' to
+        majordomo@dartmouth.edu
+Please do not ask to sign up if you can read comp.graphics.apps.gnuplot.
+
+ The address for mailing to list members is
+	   info-gnuplot@dartmouth.edu
+
+bug-gnuplot
+-----------
+
+ There is a list specifically for documented bug reports and the
+submissions of fixes and modifications,
+        bug-gnuplot@dartmouth.edu.
+
 To join this list send 'subscribe bug-gnuplot' to majordomo@dartmouth.edu.
 Note you do not need to join this list to report bugs. You'd only want
 to join if you wish to actively become involved in gnuplot development.
@@ -69,7 +149,20 @@ should include the machine you are using, the
 operating system and it's version, plotting devices, and the version
 of gnuplot that you are running.
 
-                   Where to get updates to GNUPLOT
+info-gnuplot-beta
+-----------------
+
+ The list of those interested in beta-test versions is
+	   info-gnuplot-beta@dartmouth.edu
+
+info-gnuplot-digest
+-------------------
+
+ There is a daily digest of info-gnuplot available: ask majordomo
+to subscribe to info-gnuplot-digest.
+
+Where to get Updates to GNUPLOT
+===============================
 
 Congratulations on getting this version of GNUPLOT! Unfortunately, it
 may not be the most recent version ("you never know where this version
