@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    April 11 1999
-;; Version:    0.5f
+;; Updated:    May 27 1999
+;; Version:    0.5g
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -218,16 +218,23 @@
 ;;        to the distribution.  Fixed a defface bug.  Added
 ;;        `gnuplot-keywords-when' allowing deferral of parsing the
 ;;        info file.
+;;  0.5g  May 27 1999 <BR> Fixed font-locking of strings and
+;;        comments.  Figure out gnuplot-version number from startup
+;;        message and set `gnuplot-echo-command-line-flag'
+;;        accordingly.  Added `gnuplot-program-version' variable.
+;;        Check that font-lock is actually a feature, as suggested by
+;;        <KL>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
-;;    David Batty <DB> (numerous corrections)
-;;    Laurent Bonnaud <LB> (suggestions regarding font-lock rules)
+;;    David Batty      <DB> (numerous corrections)
+;;    Laurent Bonnaud  <LB> (suggestions regarding font-lock rules)
 ;;    Markus Dickebohm <MD> (suggested `gnuplot-send-line-and-forward')
-;;    Stephen Eglan <SE> (suggested the use of info-look)
-;;    Hrvoje Niksic (help with defcustom arguments for insertions)
-;;    Michael Sanders <MS> (help with the info-look interface)
-;;    Jinwei Shen <JS> (suggested functionality in comint buffer)
-;;    Holger Wenzel <HW> (suggested using `gnuplot-keywords-when')
+;;    Stephen Eglan    <SE> (suggested the use of info-look)
+;;    Kuang-Yu Liu     <KL> (pointed out buggy dependence on font-lock)
+;;    Hrvoje Niksic    <HN> (help with defcustom arguments for insertions)
+;;    Michael Sanders  <MS> (help with the info-look interface)
+;;    Jinwei Shen      <JS> (suggested functionality in comint buffer)
+;;    Holger Wenzel    <HW> (suggested using `gnuplot-keywords-when')
 ;;  and especially to Lars Hecking <LH> for including gnuplot-mode
 ;;  with the gnuplot 3.7-beta distribution and for providing me with
 ;;  installation materials
@@ -240,11 +247,10 @@
 ;;    executed properly.  Alas I am not sure how gnuplot signals its
 ;;    errors.
 ;; 2. improve plot, splot, fit in GUI
+;;
 ;;; Bugs:
 ;;
 ;; -- indentation is not quite right (but close)
-;; -- how do I know a priori the correct value for
-;;    gnuplot-echo-command-line-flag?
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Code:
@@ -303,7 +309,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5f")
+(defconst gnuplot-version "0.5g")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -398,6 +404,7 @@ useful for functions included in `gnuplot-after-plot-hook'.")
   "*The name of the gnuplot executable."
   :group 'gnuplot
   :type 'string)
+(defvar gnuplot-program-version nil)
 (defcustom gnuplot-process-name "gnuplot"
   "Name given to the gnuplot buffer and process."
   :group 'gnuplot
@@ -440,13 +447,16 @@ The values are
 		(const :tag "Separate window" window)
 		(const :tag "This window"     nil)))
 
-(defcustom gnuplot-echo-command-line-flag nil
-  "*Non-nil means to echo the gnuplot command line in the gnuplot buffer.
-The need for this varies from setup to setup.  If lines that you send
-to gnuplot from the `gnuplot-mode' buffer are not appearing at the
-gnuplot prompt in the process buffer, set this to nil.  Changing this
-will not change the echoing in a currently existing comint buffer, but
-it will take effect the next time you use gnuplot within emacs."
+(defcustom gnuplot-echo-command-line-flag t
+  "*This sets the fall-back value of `comint-process-echos'.
+If `gnuplot-mode' cannot figure out what version number of gnuplot
+this is, then the value of this variable will be used for
+`comint-process-echos'.  It seems that gnuplot 3.5 wants this to be
+nil and 3.7 wants it to be t.  If lines that you send to gnuplot from
+the `gnuplot-mode' buffer are not appearing at the gnuplot prompt in
+the process buffer, try toggling it.  Also see the document string for
+`comint-process-echos'.  If you change this, kill the gnuplot process
+and start it again."
   :group 'gnuplot
   :type 'boolean)
 (defcustom gnuplot-insertions-show-help-flag nil
@@ -522,6 +532,7 @@ you're not using that musty old thing, are you..."
   (setq gnuplot-mode-map (make-sparse-keymap))
   (define-key gnuplot-mode-map "\C-c\C-b" 'gnuplot-send-buffer-to-gnuplot)
   (define-key gnuplot-mode-map "\C-c\C-c" 'gnuplot-gui-set-options-and-insert)
+  (define-key gnuplot-mode-map "\C-c\C-d" 'gnuplot-show-version)
   (define-key gnuplot-mode-map "\C-c\C-e" 'gnuplot-show-gnuplot-buffer)
   (define-key gnuplot-mode-map "\C-c\C-f" 'gnuplot-send-file-to-gnuplot)
   (define-key gnuplot-mode-map "\C-c\C-h" 'gnuplot-info-lookup-symbol)
@@ -571,6 +582,7 @@ you're not using that musty old thing, are you..."
 	"---"
 	["Customize gnuplot"        gnuplot-customize t]
 	["Kill gnuplot"             gnuplot-kill-gnuplot-buffer t]
+	["Gnuplot version"          gnuplot-show-version t]
 	;;["Submit bug report"        gnuplot-bug-report t]
 	))
 
@@ -1405,13 +1417,15 @@ operators are punctuation characters.")
 ;; These regular expressions treat the gnuplot vocabulary as complete
 ;; words.  Although gnuplot will recognise unique abbreviations, these
 ;; regular expressions will not."
-(if (not (fboundp 'hilit-set-mode-patterns))
+(if (featurep 'font-lock)		; <KL>
     (setq gnuplot-font-lock-keywords
-	  (list				; comments
+	  (list
+					; comments
 	   '("#.*$" . font-lock-comment-face)
-					; titles and file names
-	   '("['\"][^'\"\n]*['\"]"
-	     . font-lock-string-face)
+					; quoted things
+	   ;'("['\"]\\([^'\"\n]*\\)['\"]"
+	   ;  1 font-lock-string-face)
+	   '("'[^'\n]*'?" . font-lock-string-face)
 					; stuff in brackets, sugg. by <LB>
 	   '("\\[\\([^]]+\\)\\]"
 	     1 font-lock-reference-face)
@@ -1436,13 +1450,10 @@ operators are punctuation characters.")
 		  "valid"
 		  "\\)\\>")
 		 font-lock-function-name-face)
-					; plot -- also highlight thing plotted
-	   '("\\<\\(s?plot\\).+['\"]\\([^'\"\n]*\\)['\"]"
-	     (1 font-lock-keyword-face)
-	     (2 font-lock-string-face nil t))
-	   '("\\<\\(s?plot\\)\\s-+\\([^'\" ]+\\)[) \n,\\\\]"
-	     (1 font-lock-keyword-face)
-	     (2 font-lock-variable-name-face nil t))
+					; (s)plot -- also thing (s)plotted
+	   '("\\<s?plot\\>" . font-lock-keyword-face)
+	   '("\\<s?plot\\s-+\\([^'\" ]+\\)[) \n,\\\\]"
+	     1 font-lock-variable-name-face)
 					; other common commands
 					; miscellaneous commands
 	   (cons (concat "\\<\\("
@@ -1454,14 +1465,12 @@ operators are punctuation characters.")
 	  gnuplot-font-lock-keywords-1 gnuplot-font-lock-keywords
 	  gnuplot-font-lock-keywords-2 gnuplot-font-lock-keywords) )
 
-(if gnuplot-xemacs-p
+(if (and gnuplot-xemacs-p (featurep 'font-lock))
     (put 'gnuplot-mode 'font-lock-defaults
 	 '((gnuplot-font-lock-keywords
 	    gnuplot-font-lock-keywords-1
 	    gnuplot-font-lock-keywords-2)
-	   nil nil
-	   ((?_ . "w"))
-	   beginning-of-defun)))
+	   t t ((?_ . "w")) )))
 
 ;; these two lines get rid of an annoying compile time error
 ;; message.  that function gets non-trivially defalias-ed in
@@ -1652,7 +1661,8 @@ file visited by the script buffer."
 This sets font-lock and keyword completion in the comint/gnuplot
 buffer.  Further customization is possible via
 `gnuplot-comint-setup-hook'."
-  (if (not (fboundp 'hilit-set-mode-patterns))
+  ;;(if (not (fboundp 'hilit-set-mode-patterns))
+  (if (featurep 'font-lock)
       (progn
 	(make-variable-buffer-local 'font-lock-defaults)
 	(setq font-lock-defaults '(gnuplot-font-lock-keywords t t))
@@ -1677,19 +1687,34 @@ buffer.  Further customization is possible via
 	(message "Starting gnuplot plotting program...")
 	(setq gnuplot-buffer (make-comint gnuplot-process-name gnuplot-program)
 	      gnuplot-process (get-process gnuplot-process-name))
+	;; need to give emacs enough time to display gnuplot start-up
+	;; message so I can determine gnuplot's version number
+	(sleep-for 0.2) (sit-for 0)
 	(process-kill-without-query gnuplot-process nil)
 	(save-excursion
 	  (set-buffer gnuplot-buffer)
 	  (make-local-hook 'kill-buffer-hook)
 	  (add-hook 'kill-buffer-hook 'gnuplot-close-down nil t)
 	  (gnuplot-comint-start-function)
-	  (setq comint-process-echoes gnuplot-echo-command-line-flag)
+
           (make-local-variable 'comint-output-filter-functions)
           (setq comint-output-filter-functions
                 (append comint-output-filter-functions
                         '(comint-postoutput-scroll-to-bottom
                           gnuplot-protect-prompt-fn)))
-	(message "Starting gnuplot plotting program...Done")))))
+	(message "Starting gnuplot plotting program...Done")
+	(save-excursion
+	  (set-buffer gnuplot-buffer)
+ 	  (goto-char (point-min))
+	  (if (search-forward "version" (point-max) t)
+	      (progn
+		(cond ((looking-at "\\s-*3.7")
+		       (setq comint-process-echoes t
+			     gnuplot-program-version "3.7"))
+		      (t
+		       (setq comint-process-echoes nil
+			     gnuplot-program-version "3.5") )))
+	    (setq comint-process-echoes gnuplot-echo-command-line-flag))) ))))
 
 (defun gnuplot-protect-prompt-fn (string)
   "Prevent the Gnuplot prompt from being deleted or overwritten.
@@ -2153,7 +2178,7 @@ web page for more details.
 
 			    ------O------
 
-There are several known shortcomings of `gnuplot-mode', version 0.5f.
+There are several known shortcomings of `gnuplot-mode', version 0.5g.
 Many of the shortcomings involve the graphical interface (refered to
 as the GUI) to setting arguments to plot options.  Here is a list:
 
@@ -2247,6 +2272,11 @@ following in your .emacs file:
   (switch-to-buffer gnuplot-gnuplot-buffer)
   (gnuplot-mode))
 
+(defun gnuplot-show-version ()
+  "Show version number in echo area"
+  (interactive)
+  (message "gnuplot-mode %s -- report bugs with %S" gnuplot-version
+	   (substitute-command-keys "\\[gnuplot-bug-report]")))
 
 ;;; That's it! ----------------------------------------------------------------
 
