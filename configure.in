@@ -364,7 +364,11 @@ AC_MSG_CHECKING([terminal driver sources])
  |(tr '\012' @; echo) |sed 's/@$/%/;s/@/ \\@/g' |tr @% '\012\012' >termlist
 TERM_LIST=termlist
 AC_SUBST_FILE(TERM_LIST)
-AC_MSG_RESULT([list created])
+if test -s termlist ; then
+   AC_MSG_RESULT([list created])
+else
+   AC_MSG_RESULT([cannot create list - you may need to edit docs/Makefile])
+fi
 
 dnl How do we detect the Ultrix X libraries?
 dnl Or is it really a server (run-time) problem?
