@@ -452,14 +452,11 @@ AC_SUBST(TERMXLIBS)
 
 
 dnl Report configuration
-eval gp_bindir=$bindir
-test $gp_bindir = NONE/bin && gp_bindir=/usr/local/bin
 eval gp_datadir=$datadir
 test $gp_datadir = NONE/share && gp_datadir=/usr/local/share
 AC_MSG_RESULT([
 ** Configuration summary for $PACKAGE $VERSION:
 
-  Where are the binaries?           $gp_bindir
   Where is the help file?           $gp_datadir/gnuplot.gih
 ])
 test "$ac_cv_header_gd_h" = yes && \
