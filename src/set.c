@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.42 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.43 2000/11/22 10:04:25 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2362,8 +2362,7 @@ set_pm3d()
     c_token++;
 
     if (END_OF_COMMAND) { /* assume default settings */
-	pm3d_reset();
-	strcpy(pm3d.where,"s"); /* draw at surface */
+	pm3d_reset(); /* sets pm3d.where to 0; setting 'at s' below */
     }
     else { /* go through all options of 'set pm3d' */
 	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
@@ -2498,6 +2497,8 @@ set_pm3d()
 #endif
 	}
     }
+    if (!pm3d.where[0]) /* default: draw at surface */
+	strcpy(pm3d.where,"s");
 }
 #endif
 

@@ -1,3 +1,8 @@
+2000-11-22  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/set.c: suppose 'set pm3d at s' if pm3d was not used until now
+	and 'set pm3d not-at-option' was used
+
 2000-11-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/util.c (graph_error): don't call int_error(). Can't do that
