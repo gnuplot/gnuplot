@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.6 1999/11/03 16:05:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.7 1999/11/08 19:24:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -49,12 +49,12 @@ static char *RCSid() { return RCSid("$Id: save.c,v 1.6 1999/11/03 16:05:35 lheck
 const char *encoding_names[] = {
   "default", "iso_8859_1", "cp437", "cp850", NULL };
 
-static void save_functions__sub __PROTO((FILE * fp));
-static void save_variables__sub __PROTO((FILE * fp));
-static void save_tics __PROTO((FILE * fp, int where, int axis, struct ticdef *tdef, TBOOLEAN rotate, const char *text));
-static void save_position __PROTO((FILE * fp, struct position * pos));
-static void save_range __PROTO((FILE * fp, int axis, double min, double max, int autosc, const char *text));
-static void save_set_all __PROTO((FILE *fp));
+static void save_functions__sub __PROTO((FILE *));
+static void save_variables__sub __PROTO((FILE *));
+static void save_tics __PROTO((FILE *, int, int, struct ticdef *, TBOOLEAN, const char *));
+static void save_position __PROTO((FILE *, struct position *));
+static void save_range __PROTO((FILE *, int, double, double, TBOOLEAN, const char *));
+static void save_set_all __PROTO((FILE *));
 
 #define SAVE_NUM_OR_TIME(fp, x, axis) \
 do{if (datatype[axis]==TIME) { \
