@@ -1,3 +1,19 @@
+2002-10-25  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* win/winmain.h win/winmain.c(kill_pending_Pause_dialog(void)): New
+	routine. Kills pending "Pause" dialog box on Windows. Called from
+	bail_from_command_line().
+
+	* command.h command.c(call_kill_pending_Pause_dialog(void)): New
+	routine. Calls win/winmain.c: kill_pending_Pause_dialog().
+
+	* plot.c(bail_to_command_line): On Windows, call 
+	kill_pending_Pause_dialog() when you bail to command line. Needed if
+	gnuplot encounters a (re)plotting error when Pause dialog is displayed 
+	(e.g. due to very small ranges in mouse zoom or log axis for negative 
+	values in data file). Otherwise the Pause dialog stays on the desktop
+	until you quit gnuplot.
+
 2002-10-21  Ethan Merritt  <merritt@u.washington.edu>
 
         * NEWS, docs/gnuplot.doc: Add reference to current `set style fill`
@@ -1371,7 +1387,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/21 10:24:17 $).
+	last modification date (from the tag $Date: 2002/10/22 01:30:04 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

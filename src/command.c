@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.64 2002/07/20 15:01:41 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.65 2002/10/20 21:19:50 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -2319,5 +2319,11 @@ winsystem(const char *s)
     /* regardless of the reality return OK - the consequences of */
     /* failure include shutting down Windows */
     return (0);			/* success */
+}
+
+void
+call_kill_pending_Pause_dialog()
+{
+    kill_pending_Pause_dialog();
 }
 #endif /* _Windows */

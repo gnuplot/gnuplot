@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.59 2002/10/08 20:41:32 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.60 2002/10/09 09:21:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -265,6 +265,9 @@ take_privilege()
 void
 bail_to_command_line()
 {
+#ifdef _Windows
+    call_kill_pending_Pause_dialog();
+#endif
     LONGJMP(command_line_env, TRUE);
 }
 

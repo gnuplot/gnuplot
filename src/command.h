@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.22 2002/03/30 13:15:21 broeker Exp $
+ * $Id: command.h,v 1.23 2002/10/20 21:19:50 mikulik Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -90,6 +90,11 @@ extern char HelpFile[];         /* patch for do_help  - DJL */
 #else
 # define SET_CURSOR_WAIT        /* nought, zilch */
 # define SET_CURSOR_ARROW       /* nought, zilch */
+#endif
+
+/* wrapper for calling kill_pending_Pause_dialog() from win/winmain.c */
+#ifdef _Windows
+void call_kill_pending_Pause_dialog(void);
 #endif
 
 /* input data, parsing variables */

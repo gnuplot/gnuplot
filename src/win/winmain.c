@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: winmain.c,v 1.9 2002/03/09 11:33:09 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: winmain.c,v 1.10 2002/03/10 18:54:52 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - win/winmain.c */
@@ -118,6 +118,21 @@ Pause(LPSTR str)
 {
 	pausewin.Message = str;
 	return (PauseBox(&pausewin) == IDOK);
+}
+
+void
+kill_pending_Pause_dialog (void)
+{
+	if (pausewin.bPause == FALSE) /* no Pause dialog displayed */
+	    return;
+	/* Pause dialog displayed, thus kill it */
+	DestroyWindow(pausewin.hWndPause);
+#ifndef WIN32
+#ifndef __DLL__
+	FreeProcInstance((FARPROC)pausewin.lpfnPauseButtonProc);
+#endif
+#endif
+	pausewin.bPause = FALSE;
 }
 
 /* atexit procedure */

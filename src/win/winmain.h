@@ -1,5 +1,5 @@
 /*
- * $Id: winmain.h,v 1.1 2000/07/25 14:33:31 hbb Exp $
+ * $Id: winmain.h,v 1.1 2000/11/09 16:15:26 broeker Exp $
  */
 
 /* GNUPLOT - win/winmain.h */
@@ -64,5 +64,6 @@ extern LPSTR winhelpname;
 
 int Pause __PROTO((LPSTR str));
 void screen_dump __PROTO((void));
+void kill_pending_Pause_dialog __PROTO((void));
 
 #endif /* GNUPLOT_WINMAIN_H */
