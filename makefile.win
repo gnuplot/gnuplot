@@ -1,36 +1,67 @@
 # make file for Borland C++ 3.1 Windows version
-# and Win32 using Borland C++ 4 (4.52 is known to work)
-# CAVEAT: may not work correctly with BC 5 due to changes in flags
+# and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
+# or Borland C++ Builder 1 (newer versions may work as well)
+#
+# This makefile may need some editing before it can be used. Check
+# BCC installation path, the WIN32 and RUNTIME_LIB flags, in particular.
+#
 # The compile and link includes debug flags.  Take them out if you
 # do not want them included  (-y -v -M, /m /s /v /l)
+#
+# New 991003: WIN32=1 build makes the helpers (doc2rtf, bf_test) as Win32
+#             console applications, instead of plain DOS programs. This
+#             way, it also works with those compilers missing a DOS option.
 
 # where to place wgnuplot.hlp helpfile
 HELPFILE = wgnuplot.hlp
+
 # location of Borland C compiler
-TC = d:\bc45
+TC = d:\bc31
+
+# location of TLINK.EXE and BCC.EXE
+BIN = $(TC)\bin\\
+
+#The full path name of the help compiler. For BC++:
+HC = $(BIN)\hc
+# this comes with C++ Builder 1.0 (but doesn't seem to work):
+#HC = $(TC)\help\tools\hcw /c /e
+# or you can use the 'help workshop' available directly from MS:
+#HC = h:\mssdk\bin\hcw /c/e
+
 # WIN32=1 for Win32s or Win32 (--> '95 or NT)
 # new: allow '-DWIN32=1' on make command line to take effect:
 !if "$(WIN32)"==""
 WIN32=0
 !endif
 
+# Uncomment _this_ for BC++ 4.52 (or others that give linker errors for
+# the 'errno' variable)... :
+RUNTIME_LIBRARY=cw32.lib
+
+# ... or this for more modern ones (like C++Builder 1.0) -- it's the
+# properly multithreading one:
+#RUNTIME_LIBRARY=cw32mt.lib
+
 !if $(WIN32)
-# name of C compiler
-# bcc32a is the pentium-scheduling compiler in BC 4.52
-!if $(PENTIUM)
-CC = bcc32a
-PROCESSOR_OPT = -5
-!else
+
+# 32bit Windows compilation.
 CC = bcc32
 PROCESSOR_OPT =
-!endif
-CCAUX = bcc
+DEFINE_HELPFILE = -DHELPFILE=\"$(HELPFILE)\"
+
+# For BC++ 4.52, you may try this version with Pentium scheduling
+# optimization. NB: bcc32a in 4.52 increased in bugginess quite
+# a bit more than in program speed :-(
+#CC = bcc32a
+#PROCESSOR_OPT = -5
+
 !else
+
+# 16bit compilation:
 CC = bcc
-CCAUX = bcc
+DEFINE_HELPFILE = -DHELPFILE="$(HELPFILE)"
+
 !endif
-# location of TLINK.EXE and BCC.EXE
-BIN = $(TC)\bin\\
 
 # -c means don't link
 # -ml means use large model (large code, large data)
@@ -46,7 +77,7 @@ BIN = $(TC)\bin\\
 #    section of the linker call.
 !if $(WIN32)
 CFLAGS = -c -W -M -G -y -v -w-rvl -w-use -w-par -w-aus -w-pro $(PROCESSOR_OPT) -I$(TC)\include -Iwin -DREADLINE=1 -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
-CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DHAVE_STRNICMP -DANSI_C
+CAUXFLAGS = -tWC -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DWIN32 -DWINDOWS_NO_GUI -DHAVE_STRNICMP -DANSI_C
 !else
 CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE=1 -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS=1 -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
@@ -119,7 +150,7 @@ readline +
 fit matrix datafile alloc util3d hidden3d time +
 ,wgnupl32,wgnupl32, +
 $(TC)\lib\import32 +
-$(TC)\lib\cw32, +
+$(TC)\lib\$(RUNTIME_LIBRARY), +
 win\wgnupl32.def, wgnupl32.res
 !
 
@@ -138,7 +169,7 @@ $(CFLAGS)
 bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h fit.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+        $(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! command.c
 
@@ -181,7 +212,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+        $(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! show.c
 
@@ -205,7 +236,7 @@ util3d.obj: util3d.c plot.h setshow.h
 version.obj: version.c
 
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
-	$(BIN)$(CC) -DHELPFILE=\"$(HELPFILE)\" @&&!
+        $(BIN)$(CC) $(DEFINE_HELPFILE) @&&!
 $(CFLAGS)
 ! win\winmain.c
 
@@ -254,13 +285,13 @@ wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	
 # convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): win\gnuplot.rtf
-	$(BIN)hc win\wgnuplot.hpj 
+	$(HC) win\wgnuplot.hpj
 
 win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 
 doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
+	$(BIN)$(CC) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
 $(CAUXFLAGS)
@@ -269,7 +300,7 @@ $(CAUXFLAGS)
 
 # make binary demo files
 demo\bf_test.exe: bf_test.c dbinary.obj dalloc.obj
-	$(BIN)$(CCAUX) -edemo\bf_test.exe @&&!
+	$(BIN)$(CC) -edemo\bf_test.exe @&&!
 $(CAUXFLAGS)
 -L$(TC)\lib
 ! bf_test.c dbinary.obj dalloc.obj
@@ -278,18 +309,19 @@ $(CAUXFLAGS)
 	cd ..
 
 dalloc.obj: alloc.c
-	$(BIN)$(CCAUX) -c @&&!
+	$(BIN)$(CC) -c @&&!
 $(CAUXFLAGS)
 ! -odalloc.obj alloc.c
 
 dbinary.obj: binary.c
-	$(BIN)$(CCAUX) -c @&&!
+	$(BIN)$(CC) -c @&&!
 $(CAUXFLAGS)
 ! -odbinary.obj binary.c
 
 # clean up temporary files
 clean:
 	del *.obj
+	del win\*.obj
 	del wgnuplot.map
 	del win\wgnuplot.res
 	del wgnupl32.map
@@ -300,6 +332,8 @@ clean:
 	del win\wgnuplib.res
 	del wgnuplib.map
 	del wgnuplot.lib
+	del bf_test.map
+	del demo\bf_test.map
 	del demo\bf_test.exe
 	
 realclean: veryclean
@@ -307,6 +341,7 @@ realclean: veryclean
 veryclean: clean
 	del wgnuplot.exe
 	del wgnuplot.hlp
+	del win\wgnuplot.hlp
 	-attrib -h wgnuplot.gid
 	del wgnuplot.gid
 	del wgnuplot.mnu
@@ -315,3 +350,5 @@ veryclean: clean
 	del demo\binary1
 	del demo\binary2
 	del demo\binary3
+	del demo\fit.log
+	del demo\soundfit.par

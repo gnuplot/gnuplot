@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.120 1998/04/14 00:16:06 drd Exp $
+ * $Id: plot.h,v 1.19 1998/12/22 19:42:28 lhecking Exp $
  *
  */
 
@@ -735,7 +735,7 @@ extern struct udft_entry *dummy_func;
 extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];	/* from setshow.c */
 
 /* Windows needs to redefine stdin/stdout functions */
-#ifdef _Windows
+#if defined(_Windows) && !defined(WINDOWS_NO_GUI)
 # include "win/wtext.h"
 #endif
 
