@@ -26,6 +26,7 @@
 # T as the prefix for terminals (eg term/ or [.term])
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
+# S as the prefix for postscript docs (eg docs/ps)
 # M as the prefix for demos (eg demo/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
@@ -143,8 +144,10 @@ DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \
 	$(L)eg4.plt $(L)eg5.plt $(L)eg6.plt \
 	$(L)header.tex $(L)linepoin.plt $(L)makefile.dst $(L)tutorial.tex
+DOCS4 = $(S)README $(S)ps_file.doc $(S)ps_guide.ps $(S)ps_symbols.gpi \
+	$(S)ps_symbols.ps
 
-DOCS  = $(DOCS1) $(DOCS2) $(DOCS3)
+DOCS  = $(DOCS1) $(DOCS2) $(DOCS3) $(DOCS4)
 
 #########################################################################
 # Simple Dependencies
