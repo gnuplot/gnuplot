@@ -1,3 +1,8 @@
+2004-03-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (fit): Clarify behaviour in case no "using"
+	specification was given.
+
 2004-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/standard.c (f_tanh): Added extra code to return an exact 1.0
