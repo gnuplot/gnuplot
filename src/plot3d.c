@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.48 2002/03/23 21:28:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.49 2002/03/26 20:31:04 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -857,78 +857,83 @@ get_3ddata(this_plot)
 
 static void
 print_3dtable(pcount)
-int pcount;
+    int pcount;
 {
     register struct surface_points *this_plot;
-    int i, curve, surface;
-    struct iso_curve *icrvs;
-    struct coordinate GPHUGE *points;
-    char *table_format = NULL;
-    char *pcat;
+    int i, surface;
+    struct coordinate GPHUGE *point;
+    char *buffer = gp_alloc(150, "print_3dtable output buffer");
 
-    table_format = gp_alloc(strlen(axis_array[FIRST_X_AXIS].formatstring)
-			    +strlen(axis_array[FIRST_Y_AXIS].formatstring)
-			    +strlen(axis_array[FIRST_Z_AXIS].formatstring)
-			    +6,
-			    "table format");
-    strcpy(table_format, axis_array[FIRST_X_AXIS].formatstring);
-    strcat(table_format, " ");
-    strcat(table_format, axis_array[FIRST_Y_AXIS].formatstring);
-    strcat(table_format, " ");
-    strcat(table_format, axis_array[FIRST_Z_AXIS].formatstring);
-    pcat = &table_format[strlen(table_format)];
-
-    for (surface = 0, this_plot = first_3dplot; surface < pcount;
+    for (surface = 0, this_plot = first_3dplot;
+	 surface < pcount;
 	 this_plot = this_plot->next_sp, surface++) {
 	fprintf(gpoutfile, "\n#Surface %d of %d surfaces\n", surface, pcount);
-	icrvs = this_plot->iso_crvs;
-	curve = 0;
 
 	if (draw_surface) {
-	    strcpy(pcat," %c\n");
+	    struct iso_curve *icrvs;
+	    int curve;
+
 	    /* only the curves in one direction */
-	    while (icrvs && curve < this_plot->num_iso_read) {
+	    for (curve = 0, icrvs = this_plot->iso_crvs;
+		 icrvs && curve < this_plot->num_iso_read;
+		 icrvs = icrvs->next, curve++) {
 		fprintf(gpoutfile, "\n#IsoCurve %d, %d points\n#x y z type\n",
 			curve, icrvs->p_count);
-		for (i = 0, points = icrvs->points; i < icrvs->p_count; i++) {
-		    fprintf(gpoutfile, table_format,
-			    points[i].x,
-			    points[i].y,
-			    points[i].z,
-			    points[i].type == INRANGE ? 'i'
-			    : points[i].type == OUTRANGE ? 'o'
-			    : 'u');
-		}
-		icrvs = icrvs->next;
-		curve++;
-	    }
+		for (i = 0, point = icrvs->points;
+		     i < icrvs->p_count;
+		     i++, point++) {
+		    /* HBB 20020405: new macro to use the 'set format'
+		     * in their full flexibility */
+#define OUTPUT_NUMBER(field, axis)					\
+		    gprintf(buffer, 150, axis_array[axis].formatstring,	\
+			    1.0, point->field);				\
+		    fputs(buffer, gpoutfile);				\
+		    fputc(' ', gpoutfile);
+		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
+		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
+		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
+		    fprintf(gpoutfile, "%c\n", 
+			    point->type == INRANGE
+			    ? 'i' : point->type == OUTRANGE
+			    ? 'o' : 'u');
+		} /* for(point) */
+	    } /* for(icrvs) */
 	    putc('\n', gpoutfile);
-	}
+	} /* if(draw_surface) */
+
 	if (draw_contour) {
 	    int number = 0;
 	    struct gnuplot_contours *c = this_plot->contours;
-	    strcpy(pcat,"\n");
+
 	    while (c) {
 		int count = c->num_pts;
-		struct coordinate GPHUGE *p = c->coords;
+		struct coordinate GPHUGE *point = c->coords;
+
 		if (c->isNewLevel)
-		    /* dont display count - contour split across chunks */
+		    /* don't display count - contour split across chunks */
 		    /* put # in case user wants to use it for a plot */
 		    /* double blank line to allow plot ... index ... */
-		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n", number++, c->label);
-		for (; --count >= 0; ++p)
-		    fprintf(gpoutfile, table_format, p->x, p->y, p->z);
+		    fprintf(gpoutfile, "\n# Contour %d, label: %s\n",
+			    number++, c->label);
+
+		for (; --count >= 0; ++point) {
+		    OUTPUT_NUMBER(x, FIRST_X_AXIS);
+		    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
+		    OUTPUT_NUMBER(z, FIRST_Z_AXIS);
+		    putc('\n', gpoutfile);
+		}
 
 		/* blank line between segments of same contour */
 		putc('\n', gpoutfile);
 		c = c->next;
-	    }
-	}
-    }
+	    } /* while (contour) */
+	} /* if (draw_contour) */
+    } /* for(surface) */
     fflush(gpoutfile);
 
-    free(table_format);
+    free(buffer);
 }
+#undef OUTPUT_NUMBER
 
 /* HBB 20000501: code isolated from eval_3dplots(), where practically
  * identical code occured twice, for direct and crossing isolines,

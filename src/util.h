@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.11 2001/09/05 02:16:48 vanzandt Exp $
+ * $Id: util.h,v 1.12 2002/03/07 16:22:37 lhecking Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -54,6 +54,9 @@
  */
 extern TBOOLEAN screen_ok;
 
+/* decimal sign */
+extern char *decimalsign;
+
 /* Functions exported by util.c: */
 
 /* Command parsing helpers: */
@@ -73,6 +76,9 @@ void m_quote_capture __PROTO((char **, int, int));
 
 /* HBB 20010726: IMHO this one belongs into alloc.c: */
 char *gp_strdup __PROTO((const char *));
+
+/* HBB 20020405: moved this here, from axis.[ch] */
+void gprintf __PROTO((char *, size_t, char *, double, double));
 
 /* Error message handling */
 #if defined(VA_START) && defined(STDC_HEADERS)

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.48 2002/01/06 16:31:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.49 2002/02/02 12:03:31 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -755,27 +755,20 @@ current points %d\n\n",
 }
 #endif /* not used */
 
+		  
+
 static void
 print_table(current_plot, plot_num)
     struct curve_points *current_plot;
     int plot_num;
 {
     int i, curve;
-    char *table_format = NULL;
-
-    /* The data format is determined by the format of the axis labels.
-     * See 'set format'.  Patch by Don Taber
-     */
-    table_format = gp_alloc(strlen(axis_array[FIRST_X_AXIS].formatstring)
-			    + strlen(axis_array[FIRST_Y_AXIS].formatstring)
-			    + 5, "table format");
-    strcpy(table_format, axis_array[FIRST_X_AXIS].formatstring);
-    strcat(table_format, " ");
-    strcat(table_format, axis_array[FIRST_Y_AXIS].formatstring);
-    strcat(table_format, " %c\n");
+    char *buffer = gp_alloc(150, "print_table: output buffer");
 
     for (curve = 0; curve < plot_num;
 	 curve++, current_plot = current_plot->next) {
+	struct coordinate GPHUGE *point = NULL;
+
 	fprintf(gpoutfile, "#Curve %d, %d points\n#x y",
 		curve, current_plot->p_count);
 	switch (current_plot->plot_style) {
@@ -796,50 +789,64 @@ print_table(current_plot, plot_num)
 	    break;
 	case FINANCEBARS:
 	case CANDLESTICKS:
+	    fprintf(gpoutfile, "open ylow yhigh yclose");
 	default:
 	    /* ? */
 	    break;
 	}
 
 	fprintf(gpoutfile, " type\n");
-	for (i = 0; i < current_plot->p_count; i++) {
-	    fprintf(gpoutfile, "%g %g",
-		    current_plot->points[i].x,
-		    current_plot->points[i].y);
+	for (i = 0, point = current_plot->points;
+	     i < current_plot->p_count;
+	     i++, point++) {
+	    /* HBB 20020405: new macro to use the 'set format' string
+	     * specifiers, as it has been documented for ages, but
+	     * never actually done. */
+#define OUTPUT_NUMBER(field, axis)				\
+	    gprintf(buffer, 150, axis_array[axis].formatstring,	\
+		    1.0, point->field);				\
+	    fputs(buffer, gpoutfile);				\
+	    fputc(' ', gpoutfile);
+
+	    /* FIXME HBB 20020405: had better use the real x/x2 axes
+               of this plot */
+	    OUTPUT_NUMBER(x, FIRST_X_AXIS);
+	    OUTPUT_NUMBER(y, FIRST_Y_AXIS);
+
 	    switch (current_plot->plot_style) {
 	    case BOXES:
 #if USE_ULIG_FILLEDBOXES
 	    case FILLEDBOXES:
 #endif /* USE_ULIG_FILLEDBOXES */
 	    case XERRORBARS:
-		fprintf(gpoutfile, " %g %g",
-			current_plot->points[i].xlow,
-			current_plot->points[i].xhigh);
-		break;
-	    case BOXERROR:
-	    case YERRORBARS:
-		fprintf(gpoutfile, " %g %g",
-			current_plot->points[i].ylow,
-			current_plot->points[i].yhigh);
+		OUTPUT_NUMBER(xlow, FIRST_X_AXIS);
+		OUTPUT_NUMBER(xhigh, FIRST_X_AXIS);
+		/* Hmmm... shouldn't this write out width field of box
+		 * plots, too, if stored? */
 		break;
 	    case BOXXYERROR:
 	    case XYERRORBARS:
-		fprintf(gpoutfile, " %g %g %g %g",
-			current_plot->points[i].xlow,
-			current_plot->points[i].xhigh,
-			current_plot->points[i].ylow,
-			current_plot->points[i].yhigh);
+		OUTPUT_NUMBER(xlow, FIRST_X_AXIS);
+		OUTPUT_NUMBER(xhigh, FIRST_X_AXIS);
+		/* FALLTHROUGH */
+	    case BOXERROR:
+	    case YERRORBARS:
+		OUTPUT_NUMBER(ylow, FIRST_Y_AXIS);
+		OUTPUT_NUMBER(yhigh, FIRST_Y_AXIS);
 		break;
 	    case FINANCEBARS:
 	    case CANDLESTICKS:
+		OUTPUT_NUMBER(ylow, FIRST_Y_AXIS);
+		OUTPUT_NUMBER(yhigh, FIRST_Y_AXIS);
+		OUTPUT_NUMBER(z, FIRST_Y_AXIS);
 	    default:
 		/* ? */
 		break;
 	    }
 	    fprintf(gpoutfile, " %c\n",
-		    current_plot->points[i].type == INRANGE ? 'i'
-		    : current_plot->points[i].type == OUTRANGE ? 'o'
-		    : 'u');
+		    current_plot->points[i].type == INRANGE
+		    ? 'i' : current_plot->points[i].type == OUTRANGE
+		    ? 'o' : 'u');
 	}
 	fputc('\n', gpoutfile);
     }
@@ -848,8 +855,9 @@ print_table(current_plot, plot_num)
     fputc('\n', gpoutfile);
     fflush(gpoutfile);
 
-    free(table_format);
+    free(buffer);
 }
+#undef OUTPUT_NUMBER
 
 /* HBB 20010610: mnemonic names for the bits stored in 'uses_axis' */
 typedef enum e_uses_axis {

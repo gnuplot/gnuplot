@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.16 2002/03/18 18:19:10 broeker Exp $
+ * $Id: axis.h,v 1.17 2002/03/23 21:28:23 mikulik Exp $
  *
  */
 
@@ -320,9 +320,6 @@ extern AXIS_INDEX x_axis, y_axis, z_axis;
 #define CB_AXIS axis_array[COLOR_AXIS]
 #endif
 
-/* decimal sign */
-extern char *decimalsign;
-
 /* -------- macros using these variables: */
 
 /* Macros to map from user to terminal coordinates and back */
@@ -611,7 +608,6 @@ char * copy_or_invent_formatstring __PROTO((AXIS_INDEX));
 double quantize_normal_tics __PROTO((double, int));
 void setup_tics __PROTO((AXIS_INDEX, int));
 void gen_tics __PROTO((AXIS_INDEX, /* int, */ tic_callback));
-void gprintf __PROTO((char *, size_t, char *, double, double));
 void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));

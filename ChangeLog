@@ -1,3 +1,29 @@
+Fri Apr  5 18:38:06 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/plot2d.c (print_table): Implemented usage of 'set format'
+ 	strings by 'set term table' output columns. This has been
+ 	documented forever, but never correctly implemented yet.  An
+ 	earlier attempt was incomplete.  Now calls gprintf() to do the
+ 	actual work, so gnuplot's extended format specifiers like
+ 	'%s*10^{%S}' also work in table output.  Also added treatment of
+ 	CANDLESTICKS and FINANCEBARS plot styles.
+
+	* src/plot3d.c (print_3dtable): Likewise, except that the 3D case
+ 	had been working to some extent, already.  But it didn't support
+ 	format specifiers other than the standard C ones.
+
+	* src/axis.c (gprintf, mant_exp, decimalsign): Two functions and
+ 	one global variable move away from here, into util.c.  These used
+ 	to be private to the axis module, but are now used by other parts
+ 	of the program, too.
+
+	* src/util.h, src/util.c, * src/axis.h: Likewise.
+
+2002-04-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc (set margin): Added a small note about the lack
+ 	of effect of margin settings upon 3D plots.
+
 2002-03-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Massively edited contribution from Lutz Maibaum:
@@ -257,7 +283,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/03/30 13:15:18 $).
+	last modification date (from the tag $Date: 2002/03/30 14:05:43 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
