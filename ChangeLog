@@ -1,3 +1,10 @@
+2004-10-23  Ethan Merritt  <merritt@u.washington.edu>
+
+	* docs/gnuplot.doc: Reorganize the docs to give a separate section to
+	the list of terminal types. This change is not visible to the internal
+	'help' command, but improves the usability of the pdf and tex-based
+	documentation.
+
 2004-10-22  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: A very preliminary update of the "What's New"

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.249 2004/10/22 01:30:50 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.250 2004/10/23 04:19:40 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -250,7 +250,7 @@ C
 
  `pdf`: New terminal exporting Adobe Portable Document Format. Requires libpdf.
 
- `png` and `jpeg`: Support for GIF< PNG and JPEG image output is provided by a
+ `png` and `jpeg`: Support for GIF, PNG and JPEG image output is provided by a
  new driver via libgd. The new driver supports many more features than the
  old png driver, including TrueType fonts. Requires libgd.
 
@@ -8200,15 +8200,12 @@ C ... and restart the table:
  drawn on the surface, depending on the `set contour` option. `unset surface;
  set contour base` is useful for displaying contours on the grid base.  See
  also `set contour`.
-^ <h2> Terminal Types </h2>
 3 terminal
 ?commands set terminal
 ?commands show terminal
 ?set terminal
 ?set term
 ?show terminal
-?terminal
-?term
  `gnuplot` supports many different graphics devices.  Use `set terminal` to
  tell `gnuplot` what kind of output to generate. Use `set output` to redirect
  that output to a file or device.
@@ -8224,8 +8221,8 @@ C ... and restart the table:
  give `set terminal` first, because some terminals set a flag which is needed
  in some operating systems.
 
- Several terminals have additional options.  For example, see `dumb`,
- `iris4d`, `hpljii` or `postscript`.
+ Several terminals have many additional options.  For example, see `png`,
+ or `postscript`.
  The options used by a previous invocation `set term <term> <options>` of a
  given `<term>` are remembered, thus subsequent `set term <term>` does
  not reset them.  This helps in printing, for instance, when switching
@@ -8240,10 +8237,7 @@ C ... and restart the table:
  that `set term pop` restores the default terminal on a given platform unless
  another terminal has been pushed explicitly.
 
- This document may describe drivers that are not available to you because they
- were not installed, or it may not describe all the drivers that are available
- to you, depending on its output format.
-<4 -- all terminal stuff is pulled from the .trm files
+ For a complete list of available terminal types, see `terminal`.
 3 termoption
 ?commands set termoption
 ?set termoption
@@ -9686,6 +9680,20 @@ C ... and restart the table:
  on VMS systems, since they use file-versioning.]
 
  Please see `fit` for more information.
+1 Terminal types
+^ <h2> Terminal Types </h2>
+2 terminal
+?terminal
+?term
+ Gnuplot supports a large number of output formats. These are selected by
+ choosing an appropriate terminal type, possibly with additional modifying
+ options. See `set terminal`.
+
+ This document may describe terminal types that are not available to you
+ because they were not configured or installed on your system. To see a list of
+ terminals available on a particular gnuplot installation, type 'set terminal'
+ with no modifiers.
+<4 -- all terminal stuff is pulled from the .trm files
 1 Graphical User Interfaces
 ?graphical user interfaces
 ?gui's
