@@ -1,3 +1,13 @@
+2004-01-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/command.c (test_palette_subcommand, test_time_subcommand):
+	Made static; added missing local prototype.
+	(test_palette_subcommand): Changed static const int "colors" to an
+	enum to make it eligible as an array size under C90.  Renamed to
+	"test_palette_colors" to avoid global name space contamination.
+	Made several local string constant variables 'static', and removed
+	a superfluous one. Reindented.
+
 2004-01-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* demo/Makefile.am.in: Add webify.pl to distribution.

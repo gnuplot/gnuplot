@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.87 2003/11/30 11:19:33 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.88 2003/12/01 08:33:42 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -136,6 +136,9 @@ static int changedir __PROTO((char *path));
 static char* fgets_ipc __PROTO((char* dest, int len));
 static int read_line __PROTO((const char *prompt));
 static void do_system __PROTO((const char *));
+static void test_palette_subcommand __PROTO((void));
+static void test_time_subcommand __PROTO((void));
+
 #ifdef AMIGA_AC_5
 static void getparms __PROTO((char *, char **));
 #endif
@@ -1317,33 +1320,33 @@ system_command()
  * note 2: due to the call to load_file(), the rest of the current command
  *	   line after 'test palette ;' is discarded
  */
-void
+static void
 test_palette_subcommand()
 {
 #ifndef PM3D
     int_error(c_token, "'test palette' requires pm3d support built-in");
 #else
-    const int colors = 256;
-    double gray, z[colors];
-    rgb_color rgb1[colors];
+    enum {test_palette_colors = 256};
+
+    double gray, z[test_palette_colors];
+    rgb_color rgb1[test_palette_colors];
     int i;
-    const char pre1[] = "\
+    static const char pre1[] = "\
 reset;set multi;\
 uns border;uns key;uns xtics;uns ytics;\
 se tic out;se cbtic 0,0.1,1; se cbtic nomirr;\
 se xr[0:1];se yr[0:1];se zr[0:1];se cbr[0:1];\
 se pm3d map;set colorbox hor user orig 0.08,0.07 size 0.79,0.12;";
-    const char pre2[] = "splot 1/0;\n\n\n";
+    static const char pre2[] = "splot 1/0;\n\n\n";
 	/* note: those \n's are because of x11 terminal problems with blocking pipe */
-    const char pre3[] = "\
+    static const char pre3[] = "\
 se size 1,0.8;se orig 0,0.2;uns pm3d;\
 se key outside;se grid;se tics in;se xtics 0,0.1;se ytics 0,0.1;\
 se tit'R,G,B profiles of the current color palette';";
-    const char post[] = "\
+    static const char post[] = "\
 \n\n\nuns multi;se orig 0,0;se size 1,1;\n"; /* no final 'reset' in favour of mousing */
     int can_pm3d = (term->make_palette && term->set_color);
-    char default_order[] = "rgb";
-    char *order = default_order;
+    char *order = "rgb";
     char *save_replot_line;
     TBOOLEAN save_is_3d_plot;
     FILE *f = tmpfile();
@@ -1352,6 +1355,7 @@ se tit'R,G,B profiles of the current color palette';";
     /* parse optional option */
     if (!END_OF_COMMAND) {
 	int err = (token[c_token].length != 3);
+
 	order = input_line + token[c_token].start_index;
 	if (!err) {
 	    err += (memchr(order, 'r', 3) == NULL);
@@ -1364,52 +1368,70 @@ se tit'R,G,B profiles of the current color palette';";
     }
     if (!f)
 	int_error(NO_CARET, "cannot write temporary file");
+
     /* generate r,g,b curves */
-    for (i = 0; i < colors; i++) {
+    for (i = 0; i < test_palette_colors; i++) {
 	/* colours equidistantly from [0,1] */
-	z[i] = (double)i / (colors - 1); 
+	z[i] = (double)i / (test_palette_colors - 1); 
 	/* needed, since printing without call to set_color()*/
 	gray = (sm_palette.positive == SMPAL_NEGATIVE) ? 1-z[i] : z[i];
 	rgb1_from_gray(gray, &rgb1[i]);
     }
+
     /* commands to setup the test palette plot */
     enable_reset_palette = 0;
     save_replot_line = gp_strdup(replot_line);
     save_is_3d_plot = is_3d_plot;
     fputs(pre1, f);
-    if (can_pm3d) fputs(pre2, f);
+    if (can_pm3d)
+	fputs(pre2, f);
     fputs(pre3, f);
     /* put inline data of the r,g,b curves */
     fputs("p", f);
     for (i=0; i<strlen(order); i++) {
-	if (i > 0) fputs(",", f);
+	if (i > 0)
+	    fputs(",", f);
 	fputs("'-'tit'", f);
 	switch (order[i]) {
-	    case 'r': fputs("red'w l 1", f); break;
-	    case 'g': fputs("green'w l 2", f); break;
-	    case 'b': fputs("blue'w l 3", f); break;
-	}
-    }
+	case 'r':
+	    fputs("red'w l 1", f);
+	    break;
+	case 'g':
+	    fputs("green'w l 2", f);
+	    break;
+	case 'b':
+	    fputs("blue'w l 3", f);
+	    break;
+	} /* switch(order[i]) */
+    } /* for (i) */
     fputs("\n", f);
     for (i = 0; i < 3; i++) {
 	int k, c = order[i];
-	for (k = 0; k < colors; k++) {
-	    double rgb = (c=='r') ? rgb1[k].r : ((c=='g') ? rgb1[k].g : rgb1[k].b);
+
+	for (k = 0; k < test_palette_colors; k++) {
+	    double rgb = (c=='r')
+		? rgb1[k].r :
+		((c=='g') ? rgb1[k].g : rgb1[k].b);
+
 	    fprintf(f, "%0.4f\t%0.4f\n", z[k], rgb);
-    }
+	}
 	fputs("e\n", f);
     }
     fputs(post, f);
+
     /* save current gnuplot 'set' status because of the tricky set's for our temporary testing plot */
     save_set(f);
+
     /* execute all commands from the temporary file */
     rewind(f);
     load_file(f, NULL, FALSE); /* note: it does fclose(f) */
+
     /* enable reset_palette() and restore replot line */
     enable_reset_palette = 1;
     free(replot_line);
     replot_line = save_replot_line;
     is_3d_plot = save_is_3d_plot;
+
     /* further, input_line[] and token[] now destroyed! */
     c_token = num_tokens = 0;
 #endif /* PM3D */
@@ -1420,7 +1442,7 @@ se tit'R,G,B profiles of the current color palette';";
  *	test time 'format' 'string'
  * to assist testing of time routines
  */
-void
+static void
 test_time_subcommand()
 {
     char *format = NULL;
@@ -2174,7 +2196,7 @@ const char *prompt;
 	leftover = 0;
 	/* If it's not an EOF */
 	if (line && *line) {
-#ifdef HAVE_LIBREADLINE
+#  ifdef HAVE_LIBREADLINE
 	    HIST_ENTRY *temp;
 
 	    /* Must always be called at this point or
@@ -2185,9 +2207,9 @@ const char *prompt;
 	    if (temp == 0 || strcmp(temp->line, line) != 0)
 		add_history(line);
 
-#else /* !HAVE_LIBREADLINE */
+#  else /* !HAVE_LIBREADLINE */
 	    add_history(line);
-#endif
+#  endif
 	}
     }
     if (line) {
