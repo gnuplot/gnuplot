@@ -26,7 +26,7 @@
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 4.0 organized by: Lars Hecking
+          Version 4.1 organized by: Hans-Bernhard Broeker
 
  Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 
@@ -42,7 +42,7 @@ Major contributors (alphabetic order):
 
 @c ^ <h2> An Interactive Plotting Program </h2><p>
 @c ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-@c ^ <h2>   Version 4.0 organized by Hans-Bernhard Broeker and others</h2><p>
+@c ^ <h2>   Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
 @c ^ <h2>Major contributors (alphabetic order):</h2>
 
 @itemize @bullet

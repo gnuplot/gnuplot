@@ -7,7 +7,7 @@ An Interactive Plotting Program
 .AU
 Thomas Williams & Colin Kelley
 .br
-   Version 4.0 organized by: Lars Hecking
+   Version 4.1 organized by: Hans-Bernhard Broeker
 .br
    Major contributors (alphabetic order):
 .br
@@ -77,7 +77,7 @@ This manual was prepared by Dick Crawford.
 .LP
 .nr HM 1.2i
 .ds CH
-.ds LH GNUPLOT 4.0
+.ds LH GNUPLOT 4.1
 .ds RH %
 .\".nr PS 12
 .\".nr VS 13

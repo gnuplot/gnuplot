@@ -1,3 +1,15 @@
+\2004-07-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* PATCHLEVEL, VERSION: Changed to version 4.1, patchlevel 0.
+
+	* src/version.c (gnuplot_version, gnuplot_patchlevel,
+	gnuplot_date): Updated by regenerating the file.
+
+	* docs/gnuplot.doc, docs/titlepag.ms, docs/doc2texi.el: Update
+	number in the title pages.
+
+	* docs/gnuplot.texi: Regenerated.
+
 2004-07-01  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/fit.c: #include gp_time.h is now necessary.

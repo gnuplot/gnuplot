@@ -172,7 +172,7 @@ If PATTERN is omitted, it defaults to \"[ \\f\\t\\n\\r\\v]+\"."
 
             An Interactive Plotting Program
              Thomas Williams & Colin Kelley
-          Version 4.0 organized by: Lars Hecking
+          Version 4.1 organized by: Hans-Bernhard Broeker
 
  Copyright (C) 1986 - 1993, 1998, 2004   Thomas Williams, Colin Kelley
 

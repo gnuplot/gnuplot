@@ -1,10 +1,10 @@
-C RCS $Id: gnuplot.doc,v 1.225 2004/06/21 03:54:49 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.226 2004/06/30 20:01:52 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
 ^ <h2> An Interactive Plotting Program </h2><p>
 ^ <h2>  Thomas Williams & Colin Kelley</h2><p>
-^ <h2>   Version 4.0 organized by Hans-Bernhard Broeker and others</h2><p>
+^ <h2>   Version 4.1 organized by Hans-Bernhard Broeker and others</h2><p>
 ^ <h2>Major contributors (alphabetic order):</h2>
 ^<ul><h3>
 ^<li>  Hans-Bernhard Broeker
