@@ -1,7 +1,7 @@
 #
-# $Id: $
+# $Id: borders.dem,v 1.4 2003/10/17 15:02:21 mikulik Exp $
 #
-set nogrid
+unset grid
 set xlab "Demonstration of different borders"
 bb=0
 set border bb

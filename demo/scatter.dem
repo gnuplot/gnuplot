@@ -1,16 +1,16 @@
 #
-# $Id: $
+# $Id: scatter.dem,v 1.6 2003/10/17 15:02:21 mikulik Exp $
 #
 # Simple demo of scatter data conversion to grid data.
 #
 
 set title "Simple demo of scatter data conversion to grid data"
-set nohidden3d
+unset hidden3d
 set ticslevel 0.5
 set view 60,30
 set autoscale
 set parametric
-set data style points
+set style data points
 set xlabel "data style point - no dgrid"
 set key box
 splot "hemisphr.dat"
@@ -18,19 +18,19 @@ pause -1 "Hit return to continue (1)"
 
 set dgrid3d 10,10,1
 set xlabel " data style lines, dgrid3d 10,10,1"
-set data style lines
+set style data lines
 splot "hemisphr.dat"
 pause -1 "Hit return to continue (2)"
 
 set dgrid3d ,,4
 set xlabel " data style lines, dgrid3d ,,4 "
-set data style lines
+set style data lines
 splot "hemisphr.dat"
 pause -1 "Hit return to continue (3)"
 
 set dgrid3d ,,16
 set xlabel " data style lines, dgrid3d ,,16"
-set data style lines
+set style data lines
 splot "hemisphr.dat"
 pause -1 "Hit return to continue (4)"
 
@@ -39,8 +39,8 @@ set xlabel "data style lines, dgrid3d ,,16, contour"
 splot "hemisphr.dat"
 pause -1 "Hit return to continue (5)"
 
-set nodgrid3d
-set data style points
+unset dgrid3d
+set style data points
 set xlabel "data style points, nodgrid3d"
 splot "scatter2.dat"
 pause -1 "Hit return to continue (6)"
@@ -48,13 +48,13 @@ pause -1 "Hit return to continue (6)"
 set key nobox
 set dgrid3d ,,1
 set xlabel "data style lines, dgrid3d ,,1"
-set data style lines
+set style data lines
 splot "scatter2.dat"
 pause -1 "Hit return to continue (7)"
 
 set dgrid3d ,,4
 set xlabel "data style lines, dgrid3d ,,4"
-set data style lines
+set style data lines
 splot "scatter2.dat"
 pause -1 "Hit return to continue (8)"
 reset

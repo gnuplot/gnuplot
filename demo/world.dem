@@ -1,18 +1,18 @@
 #
-# $Id: world.dem,v 1.6 2000/11/01 18:57:24 broeker Exp $
+# $Id: world.dem,v 1.7 2001/12/09 19:03:29 lhecking Exp $
 #
 #
 set title "Gnuplot Correspondences"
-set nokey
-set noborder
-set noyzeroaxis
-set noxtics
-set noytics
+unset key
+unset border
+unset yzeroaxis
+unset xtics
+unset ytics
 #
 # plot world map and correspondent locations as a +
 plot 'world.dat' with lines 3 4, 'world.cor' with points 1 2
 set title ""
-set key
+set key on
 set border
 set yzeroaxis
 set xtics
@@ -46,8 +46,8 @@ splot cos(u)*cos(v),-cos(u)*sin(v),sin(u) with lines 5 6,\
 'world.dat' u 1:2:(1.001) with lines 3 4, 'world.cor' with points 1 2
 pause -1 "Hit return to continue"
 
-set noarrow
-set nohidden
+unset arrow
+unset hidden
 
 #
 # plot a '3D version using cylindrical coordinate system' of the world.

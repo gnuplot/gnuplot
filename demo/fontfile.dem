@@ -1,5 +1,5 @@
 #
-# $Id: fontfile.dem,v 1.2 2002/09/06 17:36:25 sfeam Exp $
+# $Id: fontfile.dem,v 1.3 2003/10/17 15:02:21 mikulik Exp $
 #
 # This file demonstrates new features in gnuplot 3.8i
 # -1- loading fontfiles for postscript output
@@ -26,7 +26,7 @@ set terminal push
 set terminal postscript enhanced linewidth 2 'Times-Roman' 22 \
     fontfile 'p052003l.pfb' fontfile 'p052023l.pfb'
 set output 'fontfile.ps'
-set noautoscale
+unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 #

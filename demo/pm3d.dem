@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: pm3d.dem,v 1.9 2003/10/17 15:02:21 mikulik Exp $
 #
 # demo for pm3d splotting
 #
@@ -190,7 +190,7 @@ set autoscale cb
 set title "color box is on by default at a certain position"
 set samples 20; set isosamples 20
 set autoscale
-set key
+set key on
 set pm3d
 set pm3d at s
 set view 60,30
@@ -381,7 +381,7 @@ set xrange [0:3]
 set yrange [0:3]
 set cbrange [0:9]
 f(x,y)=2*x+y
-unset key
+set key off
 unset xtics
 unset ytics
 

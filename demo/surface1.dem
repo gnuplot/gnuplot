@@ -1,5 +1,5 @@
 #
-# $Id: surface1.dem,v 1.8 2001/06/30 19:58:22 vanzandt Exp $
+# $Id: surface1.dem,v 1.9 2001/12/09 19:03:29 lhecking Exp $
 #
 set samples 21
 set isosample 11
@@ -16,8 +16,8 @@ set xrange [-10:10]
 set yrange [-10:10]
 splot x*y
 pause -1 "Hit return to continue (1)"
-set noarrow
-set nolabel
+unset arrow
+unset label
 set grid
 splot x**2+y**2, x**2-y**2
 pause -1 "Hit return to continue (2)"
@@ -38,11 +38,11 @@ set title "3D gnuplot demo ( ticslevel = 0.5 )"
 rep
 pause -1 "Hit return to continue (7)"
 set title "3D gnuplot demo"
-set nogrid
+unset grid
 splot x*y with points
 pause -1 "Hit return to continue (8)"
-set noxtics
-set noytics
+unset xtics
+unset ytics
 set xrange [-1:1]
 set yrange [-1:1]
 set title "Surfaces with no grid or tics"
@@ -56,7 +56,7 @@ set log z
 set title "Surfaces with z log scale"
 splot x**2*y**2 + 2, x**2*y**4 + 2, x**4*y**2 + 2
 pause -1 "Hit return to continue (10)"
-set nolog z
+unset log z
 set xtics autofreq
 set ytics autofreq
 set xrange [-1:1]
@@ -91,8 +91,8 @@ set title "\"fence plot\" using separate parametric surfaces"
 # <broeker@physik.rwth-aachen.de>: display a separate parametric
 # surface for each fence.
 set zrange [-1:1]
-set nolabel
-set noarrow
+unset label
+unset arrow
 set xrange [-5:5]; set yrange [-5:5]
 set arrow from 5,-5,-1.2 to 5,5,-1.2 lt -1
 set label 1 "increasing v" at 6,0,-1
@@ -135,8 +135,8 @@ set title "\"fence plot\" using single parametric surface with undefined points"
 # 	  remainder=1: x=xmin+fencenumber*dx, y=v, z=f(x,y)
 # 	  remainder=2: x=xmin+fencenumber*dx, y=v, z=1/0 (undefined)
 set parametric
-set nolabel
-set noarrow
+unset label
+unset arrow
 xmin=-4.99; xmax=5; n=10; dx=(xmax-xmin)/(n-1.)
 set isosamples 3*n,33
 zbase=-1
@@ -155,20 +155,20 @@ pause -1 "Hit return to continue (17)"
 unset hidden3d; unset parametric; set isosamples 20,20
 set xrange [-1:1]; set yrange [-1:1]
 set ztics autofreq
-set noarrow
-set nolabel
+unset arrow
+unset label
 set log
 set auto
 set title "This has logarithmic scale"
 splot [x=1:15] [y=1:15] x**2+y**2
 pause -1 "Hit return to continue (18)"
-set nolog
+unset log
 set xrange [0:15]
 set yrange [0:15]
 set auto
 #set zrange [-0.6:0.7]
 set ticslevel 0
-set data style lines
+set style data lines
 set title "Data grid plotting"
 set parametric
 splot "glass.dat"
@@ -177,7 +177,7 @@ splot "glass.dat" using 3:2:1
 pause -1 "Hit return to continue (20)"
 set zrange [-1.2:1.2]
 set ticslevel 0.5
-set noparametric
+unset parametric
 set xlabel "line index within group"
 set ylabel "group index"
 splot "glass.dat" using 1, "glass.dat" using 2, "glass.dat" using 3
@@ -203,7 +203,7 @@ pause -1 "Hit return to continue (24)"
 
 # mandelbrot demo
 set title "Mandelbrot function"
-set noparametric
+unset parametric
 set mapping cartesian
 set view 60,30,1,1
 set auto

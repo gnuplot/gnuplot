@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: vector.dem,v 1.6 2003/10/17 15:02:21 mikulik Exp $
 #
 # This file demonstrates new features in gnuplot 3.6
 # -1- saving contour lines as a gnuplottable file
@@ -43,12 +43,12 @@ print " lines and electrostatic field for a dipole (+q,-q)"
       ymax=10.
 #
 reset
-set noautoscale
+unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31
 set view 0, 0, 1, 1
-set nosurface
+unset surface
 set contour base
 set cntrparam order 4
 set cntrparam linear
@@ -78,7 +78,7 @@ set out "field2xy.dat"
 splot vtot(x,y) w l
 set out
 set term pop
-set noautoscale
+unset autoscale
 set xr [xmin:xmax]
 set yr [ymin:ymax]
 set isosam 31,31

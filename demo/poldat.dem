@@ -1,5 +1,5 @@
 #
-# $Id: poldat.dem,v 1.5 2002/02/17 20:41:51 mikulik Exp $
+# $Id: poldat.dem,v 1.6 2003/10/17 15:02:21 mikulik Exp $
 #
 #
 set size square
@@ -7,10 +7,10 @@ set time
 set clip
 set xtics axis nomirror
 set ytics axis nomirror
-set nogrid
-set nopolar
+unset grid
+unset polar
 set title "Primitive Smith Chart"
-set nokey
+unset key
 set xlabel "Impedance or Admittance Coordinates"
 set para
 set rrange [-0 : 10]
@@ -36,12 +36,12 @@ pause -1 "Hit return to continue"
 set angles degrees
 set polar
 set grid polar 15.
-set noborder
-set noparam
+unset border
+unset param
 set title "Antenna Pattern"
 set xlabel "Azimuth"
 set ylabel "dBSM"
-set data style line
+set style data line
 set yrange [-220:220]
 set xrange [-220:220]
 set trange [-pi:pi]

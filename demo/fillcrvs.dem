@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: fillcrvs.dem,v 1.2 2003/10/17 15:02:21 mikulik Exp $
 #
 ### Demo for 'with filledcurves'
 
@@ -18,7 +18,7 @@ plot [-10:10] [-5:3] \
 	(x>3.5 ? x/3-3 : 1/0) with filledcurve y2
 pause -1
 
-set key
+set key on
 set title "Intersection of two parabolas"
 plot x*x with filledcurves, 50-x*x with filledcurves, x*x with line 1
 pause -1
@@ -42,7 +42,7 @@ pause -1
 reset
 set title "Let's smile with parametric filled curves"
 set size square
-unset key
+set key off
 unset border
 unset xtics
 unset ytics

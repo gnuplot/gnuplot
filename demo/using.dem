@@ -1,5 +1,5 @@
 #
-# $Id: using.dem,v 1.4 1999/10/17 19:17:01 lhecking Exp $
+# $Id: using.dem,v 1.5 1999/11/08 19:19:15 lhecking Exp $
 #
 # Requires data file "using.dat" from this directory,
 # so change current working directory to this directory before running.
@@ -20,6 +20,6 @@ set label "(Weekend)" at 5,25 center
 plot 'using.dat' using 3:4 title "Logged in" with impulses,\
      'using.dat' using 3:5 t "Load average" with points,\
      'using.dat' using 3:6 t "%CPU used" with lines
-set nolabel
+unset label
 pause -1 "Hit return to continue"
 reset
