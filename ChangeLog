@@ -1,9 +1,33 @@
 1998-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* acconfig.h, ansichek.h, hidden3d, plot2d.c, plot3d.c, docs/doc2x.h:
+	Rename HAVE_CPP_STRINGIFY to HAVE_STRINGIZE.
+
+	* acinclude.m4: Deprecated, removed.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Replace gp_PROG_CPP_STRINGIFY with AC_C_STRINGIZE
+	from current autoconf CVS repository. Rename gp_CHECK_LIB_PATH to
+	gp_SEARCH_LIBDIRS and gp_CHECK_HEADER to gp_SEARCH_HEADERDIRS.
+
+	* contour.c: Change function prototypes to K&R for compatibility.
+
+	* m4/msdos.m4, m4/next.m4, m4/search-hdr.m4, m4/search-lib.m4,
+	m4/select-types.m4, m4/stringize.m4: New files to store macros
+	from deprecated acinclude.m4 file.
+
+	* Makefile.in: Add INSTALL_SCRIPT and ACLOCAL_AMFLAGS variables,
+	remove ACCONFIG variable. Add new m4 macros to ETC variable. Add
+	m4 to SUBDIRS. Clean up.
+
+	* makefile.all: Remove stray backslash from NEXTSRC variable. Add
+	m4 files to ETC and fix typos.
+
 	* docs/*.c: More cleaning up. Add exit() statements in main()
 	function, remove unused vars, fix potential buffer overflows.
 
-	* term/rgip.trm: Fix unterminated string.
+	* term/rgip.trm: Splice unterminated strings.
 
 1998-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
