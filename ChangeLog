@@ -1,3 +1,8 @@
+2003-02-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* demo/fillbox.dem: Update to changed syntax of filled boxplots
+	and fill styles.
+
 2003-02-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/post.trm (PS_vector): Fix bug in moveto in the previous patch.
