@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.46 2002/09/02 21:03:27 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.47 2002/10/21 10:24:19 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -857,7 +857,7 @@ TBOOLEAN head;
 #ifdef PM3D
     gpiPoint filledhead[5];
 #endif
-    int xm, ym;
+    int xm = 0, ym = 0;
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,

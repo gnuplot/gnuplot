@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.73 2002/10/20 21:19:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.74 2002/10/21 10:24:18 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -2297,8 +2297,7 @@ draw_3d_graphbox(plot, plot_num)
 
 		if (splot_map) { /* case 'set view map' */
 		    /* copied from ytick_callback(): baseline of tics labels */
-		    vertex v1, v2, len;
-		    double scale = ticscale * (tic_in ? 1 : -1);
+		    vertex v1, v2;
 		    map3d_xyz(yaxis_x, mid_y, base_z, &v1);
 		    if (Y_AXIS.ticmode & TICS_ON_AXIS
 			    && !X_AXIS.log

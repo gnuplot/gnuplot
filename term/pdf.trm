@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.14 2002/10/25 16:37:55 sfeam Exp $
+ * $Id: pdf.trm,v 1.15 2002/10/29 03:17:49 sfeam Exp $
  */
 
 /*------------------------------
@@ -76,7 +76,7 @@ TERM_PUBLIC void PDF_filled_polygon __PROTO((int, gpiPoint *));
 
 #ifdef PM3D
 #   include "getcolor.h"
-static t_sm_palette PDF_palette;
+/* static t_sm_palette PDF_palette; */ /* Not currently used */
 #endif
 
 static PDF *myPDF = NULL;

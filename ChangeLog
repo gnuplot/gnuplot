@@ -1,3 +1,9 @@
+2002-11-01  Ethan Merritt  <merritt@u.washington.edu>
+
+        * src/axis.c src/gadgets.c src/graph3d.c src/term.c term/pdf.trm: 
+	Remove unused variables and add #include statements to pick up missing
+	function prototypes. This fixes current crop of warnings from gcc -Wall.
+
 2002-10-31  Ethan Merritt  <merritt@u.washington.edu>
 
         * prepare: Fix capitalization of 'Makefile.in' in prepare script.
@@ -1407,7 +1413,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/10/29 03:17:48 $).
+	last modification date (from the tag $Date: 2002/10/31 20:01:54 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
