@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.124 2004/09/24 21:42:19 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.125 2004/10/11 12:55:45 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -136,7 +136,7 @@ static void plot_vectors __PROTO((struct curve_points * plot));
 static void plot_f_bars __PROTO((struct curve_points * plot));
 static void plot_c_bars __PROTO((struct curve_points * plot));
 
-static void place_labels __PROTO((struct text_label * listhead, int layer));
+static void place_labels __PROTO((struct text_label * listhead, int layer, TBOOLEAN clip));
 static void place_arrows __PROTO((int layer));
 static void place_grid __PROTO((void));
 
@@ -1184,7 +1184,7 @@ place_arrows(int layer)
 }
 
 static void
-place_labels(struct text_label *listhead, int layer)
+place_labels(struct text_label *listhead, int layer, TBOOLEAN clip)
 {
     struct text_label *this_label;
     unsigned int x, y;
@@ -1197,6 +1197,22 @@ place_labels(struct text_label *listhead, int layer)
 	if (this_label->layer != layer)
 	    continue;
 	map_position(&this_label->place, &x, &y, "label");
+
+	if (clip) {
+	    if (this_label->place.scalex == first_axes)
+		if (!(inrange(this_label->place.x, axis_array[FIRST_X_AXIS].min, axis_array[FIRST_X_AXIS].max)))
+		    continue;
+	    if (this_label->place.scalex == second_axes)
+		if (!(inrange(this_label->place.x, axis_array[SECOND_X_AXIS].min, axis_array[SECOND_X_AXIS].max)))
+		    continue;
+	    if (this_label->place.scaley == first_axes)
+		if (!(inrange(this_label->place.y, axis_array[FIRST_Y_AXIS].min, axis_array[FIRST_Y_AXIS].max)))
+		    continue;
+	    if (this_label->place.scaley == second_axes)
+		if (!(inrange(this_label->place.y, axis_array[SECOND_Y_AXIS].min, axis_array[SECOND_Y_AXIS].max)))
+		    continue;
+
+	}
 
 	write_label(x, y, this_label);
     }
@@ -1411,7 +1427,7 @@ do_plot(struct curve_points *plots, int pcount)
     }
 
     /* PLACE LABELS */
-    place_labels( first_label, 0 );
+    place_labels( first_label, 0, FALSE );
 
     /* PLACE ARROWS */
     place_arrows( 0 );
@@ -1603,7 +1619,7 @@ do_plot(struct curve_points *plots, int pcount)
 
 #ifdef EAM_DATASTRINGS
 	case LABELPOINTS:
-	    place_labels( this_plot->labels->next, 1);
+	    place_labels( this_plot->labels->next, 1, TRUE);
 	    break;
 #endif
 #ifdef WITH_IMAGE
@@ -1642,7 +1658,7 @@ do_plot(struct curve_points *plots, int pcount)
 	plot_border();
 
     /* PLACE LABELS */
-    place_labels( first_label, 1 );
+    place_labels( first_label, 1, FALSE );
 
 #ifdef EAM_HISTOGRAMS
 /* PLACE HISTOGRAM TITLES */
