@@ -1,3 +1,14 @@
+2002-12-04  Ethan Merritt  <merritt@u.washington.edu>
+
+        * docs/gnuplot.doc: Alphabetize and re-organize 'set style' options.
+	  The layout could use more work to make the html and tex-derived
+	  documentation come out right.
+	* docs/doc2texi.el: Add gd.trm and jpeg.trm to the list of files
+	  searched while generating documentation.
+        * term/png.trm: Modify documentation/help tags to distinguish new
+	  and old png drivers.
+        * term/post.trm: Delete extraneous documentation/help tag.
+
 2002-12-03  Ethan Merritt  <merritt@u.washington.edu>
 
         * term/gd.trm: Prevent buffer overflow on really long font names.
@@ -1493,7 +1504,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/02 10:55:12 $).
+	last modification date (from the tag $Date: 2002/12/03 19:38:12 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

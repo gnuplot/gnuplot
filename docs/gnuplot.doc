@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.145 2002/11/26 18:50:01 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.146 2002/11/27 20:45:34 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2361,13 +2361,13 @@ C ... and restart the table:
        every 2:2        # selects every other point in every other block
        every ::5::15    # selects points 5 through 15 in each block
 
-^ See
+ See
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/simple/simple.html"> simple plot demos (simple.dem) </a>
-^ ,
+ ,
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfacea/surfacea.html">Non-parametric splot demos </a>
-^ , and
+ , and
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/surfaceb/surfaceb.html">Parametric splot demos</a>
-^ .
+ .
 4 example datafile
 ?commands plot datafile example
 ?plot datafile example
@@ -2528,7 +2528,9 @@ C ... and restart the table:
  x-value are replaced by a single point having the average y-value.  The
  resulting points are then connected by straight line segments.
 ^ See this
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html"> demos </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/mgr/mgr.html">
+ demos
+^ </a>
 ^ web page.
 5 frequency
 ?commands plot datafile smooth frequency
@@ -2755,7 +2757,9 @@ C ... and restart the table:
  However, if you want to leave text in your data files, it is safer to put the
  comment character (#) in the first column of the text lines.
 ^ See also the web page
-^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/using/using.html"> Feeble using demos. </a>
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/using/using.html">
+ Feeble using demos.
+^ </a>
 3 errorbars
 ?commands plot errorbars
 ?commands splot errorbars
@@ -3438,7 +3442,10 @@ C ... and restart the table:
 
  To show all arrows (in tag order), use:
        show arrow
-^ See also <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> arrows demos. </a>
+ See also 
+^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/arrows/arrows.html"> 
+ arrows demos.
+^ </a>
 3 autoscale
 ?commands set autoscale
 ?commands unset autoscale
@@ -3753,41 +3760,6 @@ C ... and restart the table:
 
  or, if you didn't specify a relative boxwidth before,
        set boxwidth 2
-3 fill
-?commands set style fill
-?commands show style fill
-?set style fill
-?show style fill
-?fillstyle
- The `set style fill` command is used to set the style of boxes
- or candlesticks.
-
- Syntax:
-       set style fill {empty | solid {<density>} | pattern {<n>}}
-                      {border {<linetype>} | noborder}
-
- The default fillstyle is `empty`.
-
- The `solid` option causes filling with a solid color, if the terminal
- supports that. The <density> parameter specifies the intensity of the 
- fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
- the inner area is of the same color as the border of the box. 
- Some terminal types can vary the density continuously; others implement 
- only a few levels of partial fill.  If no <density> parameter is given, 
- it defaults to 1.
-
- The `pattern` option causes filling to be done with a fill pattern supplied
- by the terminal driver.  The kind and number of available fill patterns 
- depend on the terminal driver.  If multiple datasets using filled boxes are 
- plotted, the pattern cycles through all available pattern types, starting
- from pattern <n>, much as the line type cycles for multiple line plots.
-
- The `empty` option causes filled boxes not to be filled. This is the default.
- It is equivalent to the `solid` option with a <density> parameter of zero.
-
- By default, `border`, the box is bounded by a solid line of the current
- linetype. `border <lt>` specifies that a border is to be drawn using
- linetype <lt>. `noborder` specifies that no bounding lines are drawn.
 3 clabel
 ?commands set clabel
 ?commands unset clabel
@@ -3971,6 +3943,63 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/discrete/discrete.html">
  contours with user defined levels demo (discrete.dem).
 ^ </a>
+3 color box
+?commands set colorbox
+?commands show colorbox
+?commands unset colorbox
+?set colorbox
+?show colorbox
+?unset colorbox
+?colorbox
+
+ The color scheme, i.e. the gradient of the smooth color with min_z and
+ max_z values of `pm3d`'s `palette`, is drawn in a color box unless `unset
+ colorbox`.
+
+       set colorbox
+       set colorbox {
+                  { vertical | horizontal }
+                  { default | user }
+                  { origin x, y }
+                  { size x, y }
+                  { noborder | bdefault | border [line style] }
+                }
+       show colorbox
+       unset colorbox
+
+ Colorbox position can be `default` or `user`.  If the latter is specified the
+ values as given with the `origin` and `size` subcommands are used.
+
+ `vertical` and `horizontal` switches the orientation of the color
+ gradient.
+
+ `origin x, y` and `size x, y` are used only in combination with the `user`
+ option. The x and y values must be given in screen coordinates (as everything
+ else did not seem to make sense) that is between [0 - 1]. Try for example:
+     set colorbox horiz user origin .1,.02 size .8,.04
+ which will draw a horizontal gradient somewhere at the bottom of the graph.
+
+ `border` turns the border on (this is the default). `noborder` turns the border
+ off. If an positive integer argument is given after `border`, it is used as a
+ line style tag which is used for drawing the border, e.g.:
+     set style line 2604 linetype -1 linewidth .4
+     set colorbox border 2604
+ will use line style `2604`, a thin line with the default border color (-1)
+ for drawing the border. `bdefault` (which is the default) will use the default
+ border line style for drawing the border of the color box.
+
+ The axis of the color box is called `cb` and it is controlled by means of the
+ usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
+ `format cb`, `grid [m]cb`, `cblabel`, and perhaps even `cbdata`, `[no]cbdtics`,
+ `[no]cbmtics`.
+
+ `set colorbox` without any parameter switches the position to default.
+ `unset colorbox` resets the default parameters for the colorbox and switches
+ the colorbox off.
+
+ See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`,
+ `help set style line`.
+
 3 contour
 ?commands set contour
 ?commands unset contour
@@ -4031,20 +4060,60 @@ C ... and restart the table:
  contours with user defined levels demo (discrete.dem).
 ^ </a>
 3 data style
-?commands set style data
-?commands show style data
-?set style data
-?show style data
-?data style
- The `set style data` command changes the default plotting style for data
- plots.
+ This form of the command is deprecated. Please see `set style data`.
+3 datafile 
+?set datafile
+?set datafile missing
+?missing
+ The `set datafile missing` command allows you to tell `gnuplot` what character
+ string is used in a data file to denote missing data.  Exactly how this missing
+ value will be treated depends on the `using` specifier on the {`s`}`plot` 
+ command.
 
  Syntax:
-       set style data <style-choice>
-       show style data
+       set datafile missing {"<string>"}
+       show datafile missing
 
- See `set style` for the choices.  If no choice is given, the choices are
- listed.  `show style data` shows the current default data plotting style.
+ Example:
+       set datafile missing "?"
+       set style data lines
+       plot '-'
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
+       plot '-' using 1:2
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
+       plot '-' using 1:($2)
+          1 10
+          2 20
+          3 ?
+          4 40
+          5 50
+          e
+
+ The first `plot` will recognize only the first datum in the "3 ?" line.  It
+ will use the single-datum-on-a-line convention that the line number is "x"
+ and the datum is "y", so the point will be plotted (in this case erroneously)
+ at (2,3).
+
+ The second `plot` will correctly ignore the middle line.  The plotted line
+ will connect the points at (2,20) and (4,40).
+
+ The third `plot` will also correctly ignore the middle line, but the plotted
+ line will not connect the points at (2,20) and (4,40).
+
+ There is no default character for `missing`, but in many cases any
+ non-parsible string of characters found where a numerical value is expected
+ will be treated as missing data.
+
 3 decimalsign
 ?commands set decimalsign
 ?commands show decimalsign
@@ -4500,21 +4569,7 @@ C ... and restart the table:
  Suppose the text is "98/07/06 05:04:03".  Then
        set format x "%1y/%2m/%3d %01H:%02M:%03S"  # "98/ 7/  6 5:04:003"
 3 function style
-?commands set style function
-?commands show style function
-?set style function
-?show style function
-?function style
- The `set style function` command changes the default plotting style for
- function plots.
-
- Syntax:
-       set style function <style-choice>
-       show style function
-
- See `set style` for the choices.  If no choice is given, the choices are
- listed.  `show function style` shows the current default function plotting
- style.
+ This form of the command is deprecated. Please see `set style function`.
 3 functions
 ?commands show functions
 ?show functions
@@ -5025,163 +5080,6 @@ C ... and restart the table:
  point on a 3D splot colored using pm3d:
        set label 'text' at 0,0,5.5 tc palette z
 
-3 linestyle
-?commands set style line
-?commands unset style line
-?commands show style line
-?set style line
-?unset style line
-?show style line
-?linestyle
-?help set style line
-^ <a name="linetype">
-^ <a name="linewidth">
- Each terminal has a default set of line and point types, which can be seen
- by using the command `test`.  `set style line` defines a set of line types
- and widths and point types and sizes so that you can refer to them later by
- an index instead of repeating all the information at each invocation.
-
- Syntax:
-       set style line <index> {linetype  | lt <line_type>}
-                              {linewidth | lw <line_width>}
-                              {pointtype | pt <point_type>}
-                              {pointsize | ps <point_size>}
-                              {palette}
-       unset style line
-       show style line
-
- The line and point types are taken from the default types for the terminal
- currently in use.  The line width and point size are multipliers for the
- default width and size (but note that <point_size> here is unaffected by
- the multiplier given on `set pointsize`).
-
- The defaults for the line and point types is the index.  The defaults for
- the width and size are both unity.
-
- Linestyles created by this mechanism do not replace the default styles;
- both may be used.
-
- Not all terminals support the `linewidth` and `pointsize` features; if
- not supported, the option will be ignored.
-
- Note that this feature is not completely implemented; linestyles defined by
- this mechanism may be used with `plot`, `splot`, `replot`, and `set arrow`,
- but not by other commands that allow the default index to be used, such as
- `set grid`.
-
- If gnuplot was built with pm3d support, the special keyword `palette` is
- allowed as `linetype` for splots (the 2d `plot` command ignores `palette`).
- In this case the line color is chosen from a smooth palette which was
- set previously with the command `set palette`.  The color value corresponds
- to the z-value (elevation) of the splot.
-
- Example:
- Suppose that the default lines for indices 1, 2, and 3 are red, green, and
- blue, respectively, and the default point shapes for the same indices are a
- square, a cross, and a triangle, respectively.  Then
-
-       set style line 1 lt 2 lw 2 pt 3 ps 0.5
-
- defines a new linestyle that is green and twice the default width and a new
- pointstyle that is a half-sized triangle.  The commands
-
-       set style function lines
-       plot f(x) lt 3, g(x) ls 1
-
- will create a plot of f(x) using the default blue line and a plot of g(x)
- using the user-defined wide green line.  Similarly the commands
-
-       set style function linespoints
-       plot p(x) lt 1 pt 3, q(x) ls 1
-
- will create a plot of p(x) using the default triangles connected by a red
- line and q(x) using small triangles connected by a green line.
-
-       splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
-
- creates a surface plot using smooth colors according to `palette`. Note,
- that this works only on some terminals.
-
- See also `set palette`, `set pm3d`.
-
-3 arrowstyle
-?commands set style arrow
-?commands unset style arrow
-?commands show style arrow
-?set style arrow
-?unset style arrow
-?show style arrow
-?arrowstyle
-?help set style arrow
-^ <a name="arrowtype">
-^ <a name="arrowwidth">
- Each terminal has a default set of arrow and point types, which can be seen
- by using the command `test`.  `set style arrow` defines a set of arrow types
- and widths and point types and sizes so that you can refer to them later by
- an index instead of repeating all the information at each invocation.
-
- Syntax:
-       set style arrow <index> {nohead | head | heads}
-                               {size <length>,<angle>{,<backangle>}}
-                               {filled | empty | nofilled}
-                               {front | back}
-                               { {linestyle | ls <line_style>}
-                                 | {linetype | lt <line_type>}
-                                   {linewidth | lw <line_width} }
-       unset style arrow
-       show style arrow
-
- <index> is an integer that identifies the arrowstyle.
-
- Specifying `nohead` produces arrows drawn without a head---a line segment.
- This gives you yet another way to draw a line segment on the plot.  By
- default, arrows have one head. Specifying `heads` draws arrow heads on both
- ends of the line.
-
- Head size can be controlled by `size <length>,<angle>` or 
- `size <length>,<angle>,<backangle>` where `<length>` defines length of each 
- branch of the arrow head and `<angle>` the angle (in degrees) they make with 
- the arrow. `<Length>` is in x-axis units; this can be
- changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
- see `coordinates` for details.
- `<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
- `<backangle>` is the angle (in degrees) the back branches make with the 
- arrow (in the same direction as `<angle>`).
- The `fig` terminal has a restricted backangle function. It supports three
- different angles. There are two thresholds: Below 70 degrees, the arrow head
- gets an indented back angle. Above 110 degrees, the arrow head has an acute
- back angle. Between these thresholds, the back line is straight.
-
- Specifying `filled` produces filled arrow heads (if heads are used). 
- Filling is supported on filled-polygon capable terminals, see `help pm3d`
- for their list, otherwise the arrow heads are closed but not filled.
- The same result (closed but not filled arrow head) is reached by specifying
- `empty`.
- Further, filling and outline is obviously not supported on terminals drawing
- arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
- or `tgif`. 
-
- The line style may be selected from a user-defined list of line styles 
- (see `set style line`) or may be defined here by providing values for 
- `<line_type>` (an index from the default list of styles) and/or 
- `<line_width>` (which is a  multiplier for the default width).
-
- Note, however, that if a user-defined line style has been selected, its
- properties (type and width) cannot be altered merely by issuing another
- `set style arrow` command with the appropriate index and `lt` or `lw`.
-
- If `front` is given, the arrows are written on top of the graphed data. If
- `back` is given (the default), the arrow is written underneath the graphed
- data.  Using `front` will prevent a arrow from being obscured by dense data.
-
- Examples:
-
- To draw an arrow without an arrow head and double width, use:
-       set style arrow 1 nohead lw 2
-       set arrow arrowstyle 1
-
-  See also 'set arrow' for further examples.
-
 3 lmargin
 ?commands set lmargin
 ?set lmargin
@@ -5340,57 +5238,6 @@ C ... and restart the table:
  labels will be included in either the margin calculation or the calculation
  of the positions of other text to be written in the margin.  This can lead
  to tic labels overwriting other text if the axis is very close to the border.
-3 missing
-?set datafile
-?set datafile missing
-?missing
- The `set datafile missing` command allows you to tell `gnuplot` what character
- string is used in a data file to denote missing data.  Exactly how this missing
- value will be treated depends on the `using` specifier on the {`s`}`plot` 
- command.
-
- Syntax:
-       set datafile missing {"<string>"}
-       show datafile missing
-
- Example:
-       set datafile missing "?"
-       set style data lines
-       plot '-'
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       plot '-' using 1:2
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-       plot '-' using 1:($2)
-          1 10
-          2 20
-          3 ?
-          4 40
-          5 50
-          e
-
- The first `plot` will recognize only the first datum in the "3 ?" line.  It
- will use the single-datum-on-a-line convention that the line number is "x"
- and the datum is "y", so the point will be plotted (in this case erroneously)
- at (2,3).
-
- The second `plot` will correctly ignore the middle line.  The plotted line
- will connect the points at (2,20) and (4,40).
-
- The third `plot` will also correctly ignore the middle line, but the plotted
- line will not connect the points at (2,20) and (4,40).
-
- There is no default character for `missing`.
-
 3 mouse
 ?commands unset mouse
 ?set mouse
@@ -6164,7 +6011,6 @@ C ... and restart the table:
 ?commands set palette functions
 ?set palette functions
 ?palette functions
-?functions
  Use `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` to define three formulae
  for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
  on the variable `gray` which will take values in [0,1] and should also
@@ -6277,63 +6123,6 @@ C ... and restart the table:
 
  You may manually change the postscript output from gray to color and vice
  versa and change the definition of <maxcolors>.
-
-3 color box
-?commands set colorbox
-?commands show colorbox
-?commands unset colorbox
-?set colorbox
-?show colorbox
-?unset colorbox
-?colorbox
-
- The color scheme, i.e. the gradient of the smooth color with min_z and
- max_z values of `pm3d`'s `palette`, is drawn in a color box unless `unset
- colorbox`.
-
-       set colorbox
-       set colorbox {
-                  { vertical | horizontal }
-                  { default | user }
-                  { origin x, y }
-                  { size x, y }
-                  { noborder | bdefault | border [line style] }
-                }
-       show colorbox
-       unset colorbox
-
- Colorbox position can be `default` or `user`.  If the latter is specified the
- values as given with the `origin` and `size` subcommands are used.
-
- `vertical` and `horizontal` switches the orientation of the color
- gradient.
-
- `origin x, y` and `size x, y` are used only in combination with the `user`
- option. The x and y values must be given in screen coordinates (as everything
- else did not seem to make sense) that is between [0 - 1]. Try for example:
-     set colorbox horiz user origin .1,.02 size .8,.04
- which will draw a horizontal gradient somewhere at the bottom of the graph.
-
- `border` turns the border on (this is the default). `noborder` turns the border
- off. If an positive integer argument is given after `border`, it is used as a
- line style tag which is used for drawing the border, e.g.:
-     set style line 2604 linetype -1 linewidth .4
-     set colorbox border 2604
- will use line style `2604`, a thin line with the default border color (-1)
- for drawing the border. `bdefault` (which is the default) will use the default
- border line style for drawing the border of the color box.
-
- The axis of the color box is called `cb` and it is controlled by means of the
- usual axes commands, i.e. `set/unset/show` with `cbrange`, `[m]cbtics`,
- `format cb`, `grid [m]cb`, `cblabel`, and perhaps even `cbdata`, `[no]cbdtics`,
- `[no]cbmtics`.
-
- `set colorbox` without any parameter switches the position to default.
- `unset colorbox` resets the default parameters for the colorbox and switches
- the colorbox off.
-
- See also `help pm3d`, `help palette`, `help x11 pm3d`, `help vgagl`,
- `help set style line`.
 
 3 pointsize
 ?commands set pointsize
@@ -6544,9 +6333,10 @@ C ... and restart the table:
 ?set style
 ?show style
 ^ <a name="set style <style>">
- Default styles are chosen with the `set style function` and `set style data`
- commands.  See `plot with` for information about how to override the default
- plotting style for individual functions and data sets.
+ Default plotting styles are chosen with the `set style data` and 
+ `set style function` commands.  See `plot with` for information about how to
+ override the default plotting style for individual functions and data sets.
+ See `plotting styles` for a complete list of styles.
 
  Syntax:
        set style function <style>
@@ -6554,9 +6344,241 @@ C ... and restart the table:
        show style function
        show style data
 
+ Default styles for specific plotting elements may also be set.
+
+ Syntax:
        set style arrow <n> <arrowstyle>
        set style fill <fillstyle>
        set style line <n> <linestyle>
+
+4 set style arrow
+?commands set style arrow
+?commands unset style arrow
+?commands show style arrow
+?set style arrow
+?unset style arrow
+?show style arrow
+?arrowstyle
+?help set style arrow
+^ <a name="arrowtype">
+^ <a name="arrowwidth">
+ Each terminal has a default set of arrow and point types, which can be seen
+ by using the command `test`.  `set style arrow` defines a set of arrow types
+ and widths and point types and sizes so that you can refer to them later by
+ an index instead of repeating all the information at each invocation.
+
+ Syntax:
+       set style arrow <index> {nohead | head | heads}
+                               {size <length>,<angle>{,<backangle>}}
+                               {filled | empty | nofilled}
+                               {front | back}
+                               { {linestyle | ls <line_style>}
+                                 | {linetype | lt <line_type>}
+                                   {linewidth | lw <line_width} }
+       unset style arrow
+       show style arrow
+
+ <index> is an integer that identifies the arrowstyle.
+
+ Specifying `nohead` produces arrows drawn without a head---a line segment.
+ This gives you yet another way to draw a line segment on the plot.  By
+ default, arrows have one head. Specifying `heads` draws arrow heads on both
+ ends of the line.
+
+ Head size can be controlled by `size <length>,<angle>` or 
+ `size <length>,<angle>,<backangle>` where `<length>` defines length of each 
+ branch of the arrow head and `<angle>` the angle (in degrees) they make with 
+ the arrow. `<Length>` is in x-axis units; this can be
+ changed by `first`, `second`, `graph` or `screen` before the `<length>`; 
+ see `coordinates` for details.
+ `<Backangle>` only takes effect when `filled` or `empty` is also used. Then, 
+ `<backangle>` is the angle (in degrees) the back branches make with the 
+ arrow (in the same direction as `<angle>`).
+ The `fig` terminal has a restricted backangle function. It supports three
+ different angles. There are two thresholds: Below 70 degrees, the arrow head
+ gets an indented back angle. Above 110 degrees, the arrow head has an acute
+ back angle. Between these thresholds, the back line is straight.
+
+ Specifying `filled` produces filled arrow heads (if heads are used). 
+ Filling is supported on filled-polygon capable terminals, see `help pm3d`
+ for their list, otherwise the arrow heads are closed but not filled.
+ The same result (closed but not filled arrow head) is reached by specifying
+ `empty`.
+ Further, filling and outline is obviously not supported on terminals drawing
+ arrows by their own specific routines, like `metafont`, `metapost`, `latex` 
+ or `tgif`. 
+
+ The line style may be selected from a user-defined list of line styles 
+ (see `set style line`) or may be defined here by providing values for 
+ `<line_type>` (an index from the default list of styles) and/or 
+ `<line_width>` (which is a  multiplier for the default width).
+
+ Note, however, that if a user-defined line style has been selected, its
+ properties (type and width) cannot be altered merely by issuing another
+ `set style arrow` command with the appropriate index and `lt` or `lw`.
+
+ If `front` is given, the arrows are written on top of the graphed data. If
+ `back` is given (the default), the arrow is written underneath the graphed
+ data.  Using `front` will prevent a arrow from being obscured by dense data.
+
+ Examples:
+
+ To draw an arrow without an arrow head and double width, use:
+       set style arrow 1 nohead lw 2
+       set arrow arrowstyle 1
+
+  See also 'set arrow' for further examples.
+
+4 set style data
+?commands set style data
+?commands show style data
+?set style data
+?show style data
+?data style
+ The `set style data` command changes the default plotting style for data
+ plots.
+
+ Syntax:
+       set style data <plotting-style>
+       show style data
+
+ See `plotting styles` for the choices.  If no choice is given, the choices are
+ listed.  `show style data` shows the current default data plotting style.
+4 set style fill
+?commands set style fill
+?commands show style fill
+?set style fill
+?show style fill
+?fillstyle
+ The `set style fill` command is used to set the style of boxes
+ or candlesticks.
+
+ Syntax:
+       set style fill {empty | solid {<density>} | pattern {<n>}}
+                      {border {<linetype>} | noborder}
+
+ The default fillstyle is `empty`.
+
+ The `solid` option causes filling with a solid color, if the terminal
+ supports that. The <density> parameter specifies the intensity of the 
+ fill color. At a <density> of 0.0, the box is empty, at <density> of 1.0, 
+ the inner area is of the same color as the current linetype. 
+ Some terminal types can vary the density continuously; others implement 
+ only a few levels of partial fill.  If no <density> parameter is given, 
+ it defaults to 1.
+
+ The `pattern` option causes filling to be done with a fill pattern supplied
+ by the terminal driver.  The kind and number of available fill patterns 
+ depend on the terminal driver.  If multiple datasets using filled boxes are 
+ plotted, the pattern cycles through all available pattern types, starting
+ from pattern <n>, much as the line type cycles for multiple line plots.
+
+ The `empty` option causes filled boxes not to be filled. This is the default.
+ It is equivalent to the `solid` option with a <density> parameter of zero.
+
+ By default, `border`, the box is bounded by a solid line of the current
+ linetype. `border <lt>` specifies that a border is to be drawn using
+ linetype <lt>. `noborder` specifies that no bounding lines are drawn.
+4 set style function
+?commands set style function
+?commands show style function
+?set style function
+?show style function
+?function style
+ The `set style function` command changes the default plotting style for
+ function plots.
+
+ Syntax:
+       set style function <plotting-style>
+       show style function
+
+ See `plotting styles` for the choices.  If no choice is given, the choices are
+ listed.  Show style function shows the current default function plotting
+ style.
+4 set style line
+?commands set style line
+?commands unset style line
+?commands show style line
+?set style line
+?unset style line
+?show style line
+?linestyle
+?help set style line
+^ <a name="linetype">
+^ <a name="linewidth">
+ Each terminal has a default set of line and point types, which can be seen
+ by using the command `test`.  `set style line` defines a set of line types
+ and widths and point types and sizes so that you can refer to them later by
+ an index instead of repeating all the information at each invocation.
+
+ Syntax:
+       set style line <index> {linetype  | lt <line_type>}
+                              {linewidth | lw <line_width>}
+                              {pointtype | pt <point_type>}
+                              {pointsize | ps <point_size>}
+                              {palette}
+       unset style line
+       show style line
+
+ The line and point types are taken from the default types for the terminal
+ currently in use.  The line width and point size are multipliers for the
+ default width and size (but note that <point_size> here is unaffected by
+ the multiplier given on `set pointsize`).
+
+ The defaults for the line and point types is the index.  The defaults for
+ the width and size are both unity.
+
+ Linestyles created by this mechanism do not replace the default styles;
+ both may be used.
+
+ Not all terminals support the `linewidth` and `pointsize` features; if
+ not supported, the option will be ignored.
+
+ Note that this feature is not completely implemented; linestyles defined by
+ this mechanism may be used with `plot`, `splot`, `replot`, and `set arrow`,
+ but not by other commands that allow the default index to be used, such as
+ `set grid`.
+
+ If gnuplot was built with pm3d support, the special keyword `palette` is
+ allowed as `linetype` for splots (the 2d `plot` command ignores `palette`).
+ In this case the line color is chosen from a smooth palette which was
+ set previously with the command `set palette`.  The color value corresponds
+ to the z-value (elevation) of the splot.
+
+ Example:
+ Suppose that the default lines for indices 1, 2, and 3 are red, green, and
+ blue, respectively, and the default point shapes for the same indices are a
+ square, a cross, and a triangle, respectively.  Then
+
+       set style line 1 lt 2 lw 2 pt 3 ps 0.5
+
+ defines a new linestyle that is green and twice the default width and a new
+ pointstyle that is a half-sized triangle.  The commands
+
+       set style function lines
+       plot f(x) lt 3, g(x) ls 1
+
+ will create a plot of f(x) using the default blue line and a plot of g(x)
+ using the user-defined wide green line.  Similarly the commands
+
+       set style function linespoints
+       plot p(x) lt 1 pt 3, q(x) ls 1
+
+ will create a plot of p(x) using the default triangles connected by a red
+ line and q(x) using small triangles connected by a green line.
+
+       splot sin(sqrt(x*x+y*y))/sqrt(x*x+y*y) w l pal
+
+ creates a surface plot using smooth colors according to `palette`. Note,
+ that this works only on some terminals.
+
+ See also `set palette`, `set pm3d`.
+
+4 plotting styles
+?plotting styles
+
+ The commands `set style data` and `set style function` change the 
+ default plotting style for subsequent `plot` and `splot` commands.
 
  The types used for all line and point styles (i.e., solid, dash-dot, color,
  etc. for lines; circles, squares, crosses, etc. for points) will be either
@@ -6598,9 +6620,11 @@ C ... and restart the table:
 
  For more information about error bars with and without lines,
  please see `plot errorlines` and `plot errorbars`.
-4 boxerrorbars
+
+5 boxerrorbars
 ?commands set style boxerrorbars
 ?set style boxerrorbars
+?plotting styles boxerrorbars
 ?style boxerrorbars
 ?boxerrorbars
  The `boxerrorbars` style is only relevant to 2-d data plotting.  It is a
@@ -6620,9 +6644,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
  errorbar demo.
 ^ </a>
-4 boxes
+5 boxes
 ?commands set style boxes
 ?set style boxes
+?plotting styles boxes
 ?style boxes
 ?boxes
  The `boxes` style is only relevant to 2-d plotting.  It draws a box centered
@@ -6679,9 +6704,10 @@ C ... and restart the table:
  x11, windows, pm, postscript, fig, pbm, png, gif, hpdj, hppj, hpljii, hp500c,
  jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
  tandy_60dpi. The BeOS driver (`be`) is untested.
-4 filledcurves
+5 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
+?plotting styles filledcurves
 ?style filledcurves
 ?filledcurves
  The `filledcurves` style is only relevant to 2-d plotting. It draws either
@@ -6715,9 +6741,10 @@ C ... and restart the table:
  If the values of <a>, <x>, <y> are out of the drawing boundary, then they
  are moved to the graph boundary. Then the actually filled area in the case
  of option xy=<x>,<y> will depend on xrange and yrange.
-4 boxxyerrorbars
+5 boxxyerrorbars
 ?commands set style boxxyerrorbars
 ?set style boxxyerrorbars
+?plotting styles boxxyerrorbars
 ?style boxxyerrorbars
 ?boxxyerrorbars
  The `boxxyerrorbars` style is only relevant to 2-d data plotting.  It is a
@@ -6727,9 +6754,10 @@ C ... and restart the table:
  way as they are for the `xyerrorbars` style---either from xlow to xhigh and
  from ylow to yhigh, or from x-xdelta to x+xdelta and from y-ydelta to
  y+ydelta , depending on how many data columns are provided.
-4 candlesticks
+5 candlesticks
 ?commands set style candlesticks
 ?set style candlesticks
+?plotting styles candlesticks
 ?style candlesticks
 ?candlesticks
  The `candlesticks` style can be used for 2-d data plotting of financial
@@ -6760,14 +6788,15 @@ C ... and restart the table:
         ''         using 1:4:4:4:4 with candlesticks lt -1 notitle
 
   See `set bars` and `set style fill`.
-4 dots
+5 dots
 ?commands set style dots
 ?set style dots
+?plotting styles dots
 ?style dots
 ?dots
  The `dots` style plots a tiny dot at each point; this is useful for scatter
  plots with many points.
-4 financebars
+5 financebars
 ?commands set style financebars
 ?set style financebars
 ?style financebars
@@ -6784,9 +6813,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/finance/finance.html">
  finance demo.
 ^ </a>
-4 fsteps
+5 fsteps
 ?commands set style fsteps
 ?set style fsteps
+?plotting styles fsteps
 ?style fsteps
 ?fsteps
  The `fsteps` style is only relevant to 2-d plotting.  It connects consecutive
@@ -6796,9 +6826,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
  steps demo.
 ^ </a>
-4 histeps
+5 histeps
 ?commands set style histeps
 ?set style histeps
+?plotting styles histeps
 ?style histeps
 ?histeps
  The `histeps` style is only relevant to 2-d plotting.  It is intended for
@@ -6817,24 +6848,27 @@ C ... and restart the table:
 
  `histeps` is only a plotting style; `gnuplot` does not have the ability to
  create bins and determine their population from some data set.
-4 impulses
+5 impulses
 ?commands set style impulses
 ?set style impulses
+?plotting styles impulses
 ?style impulses
 ?impulses
  The `impulses` style displays a vertical line from the x axis (not the graph
  border), or from the grid base for `splot`, to each point.
-4 lines
+5 lines
 ?commands set style lines
 ?set style lines
+?plotting styles lines
 ?style lines
 ?lines
  The `lines` style connects adjacent points with straight line segments.
  See also `linetype`, `linewidth`, and `linestyle`.
-4 linespoints
+5 linespoints
 ?commands set style linespoints
 ?commands set style lp
 ?set style linespoints
+?plotting styles linespoints
 ?set style lp
 ?style linespoints
 ?style lp
@@ -6846,17 +6880,19 @@ C ... and restart the table:
  the points.  See `set pointsize` for its usage.
 
  `linespoints` may be abbreviated `lp`.
-4 points
+5 points
 ?commands set style points
 ?set style points
+?plotting styles points
 ?style points
 ?points
  The `points` style displays a small symbol at each point.  The command `set
  pointsize` may be used to change the size of the points.  See `set pointsize`
  for its usage.
-4 steps
+5 steps
 ?commands set style steps
 ?set style steps
+?plotting styles steps
 ?style steps
 ?steps
  The `steps` style is only relevant to 2-d plotting.  It connects consecutive
@@ -6866,9 +6902,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/steps/steps.html">
  steps demo.
 ^ </a>
-4 vectors
+5 vectors
 ?commands set style vectors
 ?set style vectors
+?plotting styles vectors
 ?style vectors
 ?vectors
  The `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
@@ -6877,9 +6914,10 @@ C ... and restart the table:
 
  `set clip one` and `set clip two` affect drawing vectors.
  Please see `set clip`.
-4 xerrorbars
+5 xerrorbars
 ?commands set style xerrorbars
 ?set style xerrorbars
+?plotting styles xerrorbars
 ?style xerrorbars
 ?xerrorbars
  The `xerrorbars` style is only relevant to 2-d data plots.  `xerrorbars` is
@@ -6888,9 +6926,10 @@ C ... and restart the table:
  (x+xdelta,y), depending on how many data columns are provided.  A tic mark
  is placed at the ends of the error bar (unless `set bars` is used---see
  `set bars` for details).
-4 xyerrorbars
+5 xyerrorbars
 ?commands set style xyerrorbars
 ?set style xyerrorbars
+?plotting styles xyerrorbars
 ?style xyerrorbars
 ?xyerrorbars
  The `xyerrorbars` style is only relevant to 2-d data plots.  `xyerrorbars` is
@@ -6906,9 +6945,11 @@ C ... and restart the table:
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-4 yerrorbars
+5 yerrorbars
 ?commands set style yerrorbars
 ?commands set style errorbars
+?plotting styles yerrorbars
+?plotting styles errorbars
 ?set style yerrorbars
 ?set style errorbars
 ?style yerrorbars
@@ -6924,9 +6965,10 @@ C ... and restart the table:
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/errorbar/errorbar.html">
  errorbar demo.
 ^ </a>
-4 xerrorlines
+5 xerrorlines
 ?commands set style xerrorlines
 ?set style xerrorlines
+?plotting styles xerrorlines
 ?style xerrorlines
 ?xerrorlines
  The `xerrorlines` style is only relevant to 2-d data plots.
@@ -6935,9 +6977,10 @@ C ... and restart the table:
  to (xhigh,y) or from (x-xdelta,y) to (x+xdelta,y), depending on how
  many data columns are provided. A tic mark is placed at the ends of
  the error bar (unless `set bars` is used---see `set bars` for details).
-4 xyerrorlines
+5 xyerrorlines
 ?commands set style xyerrorlines
 ?set style xyerrorlines
+?plotting styles xyerrorlines
 ?style xyerrorlines
 ?xyerrorlines
  The `xyerrorlines` style is only relevant to 2-d data plots.
@@ -6954,9 +6997,11 @@ C ... and restart the table:
  if the data are of the form (x,y,xdelta,ylow,yhigh), then you can use
 
        plot 'data' using 1:2:($1-$3):($1+$3):4:5 with xyerrorbars
-4 yerrorlines
+5 yerrorlines
 ?commands set style yerrorlines
 ?commands set style errorlines
+?plotting styles yerrorlines
+?plotting styles errorlines
 ?set style yerrorlines
 ?set style errorlines
 ?style yerrorlines
