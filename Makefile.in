@@ -72,15 +72,15 @@ NEXTOBJS = @NEXTOBJS@
 PACKAGE = @PACKAGE@
 TERMLIBS = @TERMLIBS@
 TERMXLIBS = @TERMXLIBS@
+TUTORIAL = @TUTORIAL@
 U = @U@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign 1.2h
 
-SUBDIRS = config demo m4 term src docs man tutorial lisp
+@BUILD_LISP_SUBDIR_TRUE@d_lisp = lisp
 
-# Remove this file here (it is created via configure), not from within intl.
-# DISTCLEANFILES = intl/libintl.h
+SUBDIRS = config demo m4 term src docs man tutorial $(d_lisp)
 
 EXTRA_DIST = BUGS FAQ GNUmakefile INSTALL PORTING README CodeStyle Copyright INSTALL.gnu Makefile.maint PGPKEYS README.1ST djconfig.sh
 
@@ -99,6 +99,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
+DIST_SUBDIRS =  config demo m4 term src docs man tutorial lisp
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
@@ -287,7 +288,7 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-	for subdir in $(SUBDIRS); do \
+	for subdir in $(DIST_SUBDIRS); do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
@@ -297,6 +298,7 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-hook
 info-am:
 info: info-recursive
 dvi-am:
@@ -370,6 +372,10 @@ install uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+dist-hook:
+	@for dir in `find $(distdir) -type d -name CVS -print`; do \
+	  rm -rf $$dir; done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
