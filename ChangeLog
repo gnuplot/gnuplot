@@ -4,6 +4,7 @@
  	mant_exp() introduced Jan 21st this year, for %l and %L formats.
   	Helps to avoid problems where people use %L even though the
  	logbase is 10.
+	(setup_tics): Corrected determination of 'fixmin' and 'fixmax'.
 
 2001-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
