@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.20 2001/09/21 20:51:14 amai Exp $
+# $Id: makefile.os2,v 1.23 2001/12/01 13:08:59 amai Exp $
 #
 # GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
@@ -338,8 +338,8 @@ $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
 #
 
 # Some dependency - no rule!
-$(DOCDIR)\doc2gih.exe $(DOCDIR)\doc2ipf.exe $(DOCDIR)\doc2html.exe \
-$(DOCDIR)\doc2info.exe $(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
+$(DOCDIR)\doc2gih.exe $(DOCDIR)\doc2ipf.exe $(DOCDIR)\doc2info.exe \
+$(DOCDIR)\doc2tex.exe $(DOCDIR)\doc2rtf.exe: \
       $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
 
 
