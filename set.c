@@ -40,8 +40,8 @@ static char *RCSid = "$Id: set.c,v 1.65 1998/03/22 23:31:24 drd Exp $";
  * Added user-specified bases for log scaling.
  */
 
-#include <math.h>
 #include "plot.h"
+#include "stdfn.h"
 #include "setshow.h"
 #include "national.h"
 
