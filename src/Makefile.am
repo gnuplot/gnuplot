@@ -4,14 +4,15 @@ AUTOMAKE_OPTIONS = ansi2knr foreign 1.2h
 # Where to send email about bugs and comments (locally)
 EMAIL = bug-gnuplot@dartmouth.edu
 
-# Help file location
+# Default help file location
 HELPFILE=$(datadir)/gnuplot.gih
+
+# There is probably no need to edit anything below this line
 
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot @GNUPLOT_X11@
 noinst_PROGRAMS = bf_test gpltconv
 
-# There is probably no need to edit anything below this line
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
@@ -22,8 +23,6 @@ interpol.c matrix.c matrix.h misc.c national.h parse.c parse.h plot.c plot.h \
 plot2d.c plot3d.c protos.h readline.c save.c scanner.c set.c setshow.h show.c \
 specfun.c standard.c stdfn.c stdfn.h syscfg.h tables.c tables.h term.c term.h \
 time.c unset.c util.c util.h util3d.c util3d.h variable.c variable.h version.c
-
-EXTRA_gnuplot_SOURCES = @NEXTOBJS@
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
 
