@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.9 2002/03/05 17:20:57 broeker Exp $
+# $Id: makefile.nt,v 1.10 2002/03/26 17:03:53 broeker Exp $
 #
 # GNUPLOT Makefile Microsoft Visual C++ and nmake on WinNT and Win95/98/..
 
@@ -8,8 +8,8 @@
 #	nmake -f ..\config\makefile.nt
 #
 
-# John Bollinger 4 March 2002 bbands@yahoo.com 
-#
+# John Bollinger bbands@yahoo.com
+# 4 March 2002 bbands@yahoo.com
 # Added png support with zlib and libpng as subs of .\src
 # libpng and zlib can be downloaded from ftp://ftp.uu.net/graphics/png
 # Added pdf support with pdflib as a sub of .\src
@@ -24,6 +24,8 @@
 #	Find and run VCVARS32.BAT
 #	Then from ..\src nmake -f ..\config\makefile.nt
 #
+# 15 February 2003: Added support for compiling pgnuplot
+#                   Cleaned up clean and veryclean
 
 # where to place gnuplot.gih helpfile
 HELPFILE = wgnuplot.hlp
@@ -68,7 +70,7 @@ T=..\\term\\
 D=..\\docs\\
 M=..\\demo\\
 
-default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe
+default: wgnuplot.exe $(HELPFILE) wgnuplot.mnu $(M)bf_test.exe pgnuplot.exe
 
 !INCLUDE makefile.all
 
@@ -122,9 +124,10 @@ wgnuplot.res :  win\wgnuplot.rc win\wgnuplib.rc win\wresourc.h texticon.ico grpi
 term.obj: term.c term.h plot.h setshow.h bitmap.h $(CORETERM)
 	$(CC) $(CFLAGS) $(TERMFLAGS) term.c
 
-WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 winmain.obj: win\winmain.c win\wgnuplib.h win\wtext.h plot.h
 	$(CC) $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\"  win\winmain.c
+
+WINDEPS = win\wgnuplib.h win\wcommon.h win\wresourc.h
 
 wgnuplib.obj: win\wgnuplib.c $(WINDEPS)
 	$(CC) $(CFLAGS) win\wgnuplib.c
@@ -146,6 +149,9 @@ wgraph.obj: win\wgraph.c $(WINDEPS)
 
 wgnuplot.mnu: win\wgnuplot.mnu
 	copy win\wgnuplot.mnu wgnuplot.mnu
+
+pgnuplot.exe: win\pgnuplot.c
+	cl /nologo /O2 win\pgnuplot.c /I. /link /NODEFAULTLIB:LIBC.lib version.obj user32.lib
 
 # extract icons from wgnuplot.rc
 texticon.ico: grpicon.ico
@@ -178,22 +184,26 @@ dbinary.obj: binary.c
 
 # clean up temporary files
 clean:
-	if exist config.h del config.h
 	if exist *.obj del *.obj
 	if exist *.ico del *.ico
 	if exist wgnuplot.res del wgnuplot.res
 	if exist win\gnuplot.rtf del win\gnuplot.rtf
+	if exist win\wgnuplot.hlp del win\wgnuplot.hlp
 	if exist ..\demo\bf_test.exe del ..\demo\bf_test.exe
 	if exist linkopt1.msw del linkopt1.msw
 	if exist doc2rtf.exe del doc2rtf.exe
 	if exist geticon.exe del geticon.exe
+	if exist GNUPLOT del GNUPLOT
 
 veryclean: clean
 	if exist wgnuplot.exe del wgnuplot.exe
 	if exist wgnuplot.hlp del wgnuplot.hlp
 	if exist wgnuplot.mnu del wgnuplot.mnu
+	if exist pgnuplot.exe del pgnuplot.exe
 	if exist ..\demo\binary1 del ..\demo\binary1
 	if exist ..\demo\binary2 del ..\demo\binary2
 	if exist ..\demo\binary3 del ..\demo\binary3
 	if exist ..\demo\fit.log del ..\demo\fit.log
 	if exist ..\demo\soundfit.par del ..\demo\soundfit.par
+	if exist config.h del config.h
+	if exist makefile.nt del makefile.nt
