@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.24 2000/03/28 21:28:47 lhecking Exp $
+ * $Id: x11.trm,v 1.25 2000/03/30 14:04:31 lhecking Exp $
  *
  */
 
@@ -396,11 +396,10 @@ X11_waitforinput()
 	FD_ZERO(&fds);
 	FD_SET(fd, &fds);
 	FD_SET(X11_ipc_back_fd, &fds);
-	select(X11_ipc_back_fd+1, &fds, (fd_set*)NULL,
-	    (fd_set*)NULL, (struct timeval*)NULL);
+	select(X11_ipc_back_fd+1, SELECT_FD_SET_CAST &fds, 0,
+	    0, (struct timeval*)NULL);
 	if (FD_ISSET(X11_ipc_back_fd, &fds)) {
 	    n=read(X11_ipc_back_fd, (void*)(l+(char*)&ge), sizeof(ge)-l);
-#ifndef OS2
 	    if (n == 0) {
 		close(X11_ipc_back_fd);
 		X11_ipc_back_fd = -1;
@@ -408,7 +407,6 @@ X11_waitforinput()
 		 * to it will cause a segfault */
 		break;  /* outboard driver has stopped */
 	    }
-#endif
 	    l+=n;
 	    if (l==sizeof(ge)) {
 		/* note: do_event() may not return (if an

@@ -1,4 +1,8 @@
 2000-05-01  Johannes Zellner <johannes@zellner.org>
+	* removed a superfluous ifndef(OS2) in term/x11.trm
+	* added a SELECT_FD_SET_CAST in term/x11.trm
+
+2000-05-01  Johannes Zellner <johannes@zellner.org>
 	* corrected the number of format specifiers in a fprintf (src/show.c)
 
 2000-04-30  Johannes Zellner <johannes@zellner.org>
