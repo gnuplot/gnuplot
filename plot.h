@@ -48,12 +48,24 @@
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/* Define operating system name, shell, and OS specific defines */
+/* Define operating system dependent constants [default value]:
+ *
+ * OS:       [" "] Name of OS plus trailing space
+ * HOME:     [HOME] Name of environment variable which points to
+ *           the directory where gnuplot's config file/s are found.
+ * SHELL:    ["/bin/sh"] Name, and in some cases, full path to the shell
+ *           that is used to run external commands.
+ * PATHSEP1: ['/'] Primary character which separates path elements.
+ * PATHSEP2: ['\0'] Secondary character which separates path elements.
+ *        
+ */
 
 #if defined(AMIGA_SC_6_1) || defined(AMIGA_AC_5) || defined(__amigaos__)
 # define OS "Amiga "
 # ifndef __amigaos__
-#  define SHELL "NewShell"
+#  define HOME     "GNUPLOT"
+#  define SHELL    "NewShell"
+#  define PATHSEP2 ':'
 # endif
 # ifndef AMIGA
 #  define AMIGA
@@ -62,11 +74,18 @@
 
 #ifdef ATARI
 # define OS "TOS "
+# define HOME  "GNUPLOT"
 # define SHELL "gulam.prg"
+# define PATHSEP1 '\\'
+# ifdef MTOS
+#  define PATHSEP2 '/'
+# endif
 #endif /* Atari */
 
 #ifdef DOS386
 # define OS "DOS 386 "
+# define HOME  "GNUPLOT"
+# define PATHSEP1 '\\'
 #endif /* DOS386 */
 
 #ifdef linux
@@ -79,7 +98,9 @@
 
 #ifdef OS2
 # define OS "OS/2 "
+# define HOME  "GNUPLOT"
 # define SHELL "c:\\cmd.exe"
+# define PATHSEP1 '\\'
 #endif /* OS/2 */
 
 #ifdef OSK
@@ -92,6 +113,7 @@
 #  define VMS
 # endif
 # define OS "VMS "
+# define HOME "sys$login:"
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  error Please /define either VAXCRTL or DECCRTL
 # endif
@@ -113,9 +135,12 @@
 #  endif
 #  define OS "MS-Windows "
 # endif /* WIN32 */
+# define HOME  "GNUPLOT"
+# define PATHSEP1 '\\'
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
+# define HOME "GNUPLOT"
 # if !defined(DOS32) && !defined(DOS16)
 #  define DOS16
 # endif
@@ -123,6 +148,7 @@
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
 # define OS "MS-DOS "
+# define PATHSEP1 '\\'
 #endif /* MSDOS */
 
 #if defined(__unix__) || defined(unix)
@@ -150,15 +176,33 @@
 # define OS "Unix "
 #endif /* SCO */
 
+/* End OS dependent constants */
+
 #ifndef OS
-# define OS ""
+# define OS " "
+#endif
+
+#ifndef HOME
+# define HOME "HOME"
 #endif
 
 #ifndef SHELL
 # define SHELL "/bin/sh"    /* used if SHELL env variable not set */
 #endif
 
-/* End OS section */
+#ifndef PATHSEP1
+# define PATHSEP1 '/'
+#endif
+
+#ifndef PATHSEP2
+# define PATHSEP2 NUL
+#endif
+
+#if defined(unix) || defined(AMIGA) || defined(OSK)
+# define PLOTRC ".gnuplot"
+#else /* ! unix || AMIGA || OSK */
+# define PLOTRC "gnuplot.ini"
+#endif /* ! unix || AMIGA || OSK */
 
 /* Overriden by Makefile */
 /* Define helpfile location */
@@ -371,6 +415,15 @@ typedef double coordval;
 
 #define GPMAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define GPMIN(a,b) ( (a) < (b) ? (a) : (b) )
+
+/* Moved from binary.h, command.c, graph3d.c, graphics.c, interpol.c,
+ * plot2d.c, plot3d.c, util3d.c ...
+ */
+#ifndef inrange
+# define inrange(z,min,max) \
+   (((min)<(max)) ? (((z)>=(min)) && ((z)<=(max))) : \
+                    (((z)>=(max)) && ((z)<=(min))))
+#endif
 
 /* There is a bug in the NEXT OS. This is a workaround. Lookout for
  * an OS correction to cancel the following dinosaur
