@@ -364,7 +364,6 @@ TERM_PUBLIC void PM_text()
 
 TERM_PUBLIC void PM_graphics() 
     { 
-    int cbR, rc, iC[2] ;
     putc( SET_GRAPHICS, PM_pipe); 
     fflush( PM_pipe ) ; 
     PM_mode = SET_GRAPHICS ;

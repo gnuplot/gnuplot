@@ -271,7 +271,7 @@ void g_string (x0,y0,color,angle,s)
   while (s[k])
     {
       for (i=0;i<8;i++) for (j=0;j<8;j++)
-        g_set (x+ca*j-sa*i,y+ca*i+sa*j,(font[s[k]][i]&(1<<(7-j)))?color:0) ;
+        g_set (x+ca*j-sa*i,y+ca*i+sa*j,(font[(int)s[k]][i]&(1<<(7-j)))?color:0) ;
       k++ ; x+=ca*8 ; y+=sa*8 ;
     }
 }
