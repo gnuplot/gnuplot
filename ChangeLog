@@ -1,5 +1,10 @@
 2003-01-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* doc/gnuplot.doc: Remove duplication of hypertext labels "set encoding"
+	and "plotting styles".
+
+2003-01-08  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/makefile.mgw config/makefile.cyg config/makefile.os2: Update
 	-D... symbols for the changed syntax of gd/png/jpeg/gif checks.
 	
@@ -1689,7 +1694,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2003/01/07 22:31:11 $).
+	last modification date (from the tag $Date: 2003/01/08 16:12:22 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

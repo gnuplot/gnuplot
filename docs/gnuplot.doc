@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.153 2002/12/16 14:17:39 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.154 2002/12/19 15:57:04 lhecking Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -4245,7 +4245,6 @@ C ... and restart the table:
 
  The second example sets the second variable to s.
 3 encoding
-^ <a name="set encoding"></a>
 ?commands set encoding
 ?commands show encoding
 ?set encoding
@@ -6583,7 +6582,6 @@ C ... and restart the table:
 
 4 plotting styles
 ?plotting styles
-^ <a name="plotting styles"></a>
 
  The commands `set style data` and `set style function` change the 
  default plotting style for subsequent `plot` and `splot` commands.
