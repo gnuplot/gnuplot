@@ -1,3 +1,49 @@
+1999-10-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/plot.c: Rename GNUPLOT_HISTORY_FILE to "~/.gnuplot_history".
+
+	* src/syscfg.h: Fix for missing unix define on NetBSD.
+
+1999-10-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/gnuplot.doc: Remove superfluous spaces in loadpath and
+	splot_overview entries.
+
+	* lisp/acinclude.m4: Reverse order of -q and -batch command line
+	options	for Emacs invocation.
+
+	* src/help.c(ShowSubtopics): Better formatting of long subtopic
+	index entries. Another bugfix in COLUMN_HELP code.
+
+	* term/pslatex.trm: Add some comments, streamline code, rename
+	variables. Fix segfault when `auxfile' option is unused.
+
+1999-10-11  "Eric S. Raymond"  <esr@thyrsus.com>
+
+	* demo/airfoil.dem, demo/animate.dem, demo/binary.dem,
+	demo/controls.dem, demo/electron.dem, demo/fit.dem, demo/hidden.dem,
+	demo/mgr.dem, demo/param.dem, demo/polar.dem, demo/prob.dem,
+	demo/prob2.dem, demo/scatter.dem, demo/simple.dem, demo/spline.dem,
+	demo/steps.dem, demo/surface1.dem, demo/surface2.dem, demo/timedat.dem,
+	demo/using.dem: Demo directory cleanup patch. Box a bunch of legends
+	and use reset instead of ad-hoc set statements.
+
+	* docs/gnuplot.doc, src/command.c, src/misc.c: Lines ending with ","
+	are treated as continuation lines.
+
+	* src/graphics.c, src/graphics.h: Introduce exclusion box for keys.
+
+1999-10-11  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/bitmap.c, term/png.trm: Fix some shortcomings of ESR's png
+	patches.
+
+	* src/plot2d.c: Bugfix for logscale plots with unused y2 axis.
+
+1999-10-11  Thomas Sefzick  <t.sefzick@fz-juelich.de>
+
+	* term/tkcanvas.trm: Bugfix, comments added.
+	
 1999-10-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: Add pdf target.
