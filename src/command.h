@@ -1,4 +1,4 @@
-/* $Id: $ */
+/* $Id: command.h,v 1.1 1999/06/11 18:55:51 lhecking Exp $ */
 
 /* GNUPLOT - command.h */
 
@@ -45,24 +45,42 @@
  * The ultimate target is of course to eliminate global vars.
  */
 
+extern struct udft_entry ydata_func;
+extern struct udft_entry *dummy_func;
+extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+
 /* Formerly in plot.h */
 #define AXIS_ARRAY_SIZE 10
 
-/* Formerly in command.c */
-/* jev -- for passing data thru user-defined function */
-/* NULL means no dummy vars active */
-WHERE struct udft_entry ydata_func;
+#ifndef STDOUT
+# define STDOUT 1
+#endif
 
-WHERE struct udft_entry *dummy_func;
+#if defined(MSDOS) || defined(DOS386)
+# ifdef DJGPP
+extern char HelpFile[];         /* patch for do_help  - AP */
+# endif                         /* DJGPP */
+# ifdef __TURBOC__
+#  ifndef _Windows
+extern unsigned _stklen = 16394;        /* increase stack size */
+extern char HelpFile[];         /* patch for do_help  - DJL */
+#  endif                        /* _Windows */
+# endif                         /* TURBOC */
+#endif /* MSDOS */
 
-/* current dummy vars */
-WHERE char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+#ifdef _Windows
+# define SET_CURSOR_WAIT SetCursor(LoadCursor((HINSTANCE) NULL, IDC_WAIT))
+# define SET_CURSOR_ARROW SetCursor(LoadCursor((HINSTANCE) NULL, IDC_ARROW))
+#else
+# define SET_CURSOR_WAIT        /* nought, zilch */
+# define SET_CURSOR_ARROW       /* nought, zilch */
+#endif
 
 /* input data, parsing variables */
 #ifdef AMIGA_SC_6_1
-__far int num_tokens, c_token;
+extern __far int num_tokens, c_token;
 #else
-int num_tokens, c_token;
+extern int num_tokens, c_token;
 #endif
 
 #endif /* GNUPLOT_COMMAND_H */

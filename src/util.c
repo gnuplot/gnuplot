@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.8 1999/06/09 12:13:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.9 1999/06/11 11:18:59 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -37,13 +37,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.8 1999/06/09 12:13:32 lheck
 
 #include "plot.h"
 #include "setshow.h"		/* for month names etc */
-
-
-/* TRUE if command just typed; becomes FALSE whenever we
- * send some other output to screen.  If FALSE, the command line
- * will be echoed to the screen before the ^ error message.
- */
-TBOOLEAN screen_ok;
 
 static char *num_to_str __PROTO((double r));
 static void parse_esc __PROTO((char *instr));
@@ -192,7 +185,7 @@ int t_num;
  */
 void
 copy_str(str, t_num, max)
-char str[];
+char *str;
 int t_num;
 int max;
 {
@@ -225,7 +218,7 @@ int t_num;
  */
 void
 quote_str(str, t_num, max)
-char str[];
+char *str;
 int t_num;
 int max;
 {
@@ -255,7 +248,7 @@ int max;
  */
 void
 capture(str, start, end, max)
-char str[];
+char *str;
 int start, end;
 int max;
 {

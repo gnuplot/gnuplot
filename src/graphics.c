@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.9 1999/06/11 11:18:54 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.10 1999/06/11 18:53:14 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -36,7 +36,6 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.9 1999/06/11 11:18:54 l
 
 
 #include "plot.h"
-#include "command.h"
 #include "setshow.h"
 
 /* key placement is calculated in boundary, so we need file-wide variables
@@ -80,6 +79,22 @@ static double largest_polar_circle;
 char ticfmt[8][MAX_ID_LEN+1];	/* HBB 990106: fix buffer overrun */
 int timelevel[8];
 double ticstep[8];
+
+double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
+int auto_array[AXIS_ARRAY_SIZE];
+TBOOLEAN log_array[AXIS_ARRAY_SIZE];
+double base_array[AXIS_ARRAY_SIZE];
+double log_base_array[AXIS_ARRAY_SIZE];
+
+/* Define the boundary of the plot
+ * These are computed at each call to do_plot, and are constant over
+ * the period of one do_plot. They actually only change when the term
+ * type changes and when the 'set size' factors change.
+ * - no longer true, for 'set key out' or 'set key under'. also depend
+ * on tic marks and multi-line labels.
+ * They are shared with graph3d.c since we want to use its draw_clip_line()
+ */
+int xleft, xright, ybot, ytop;
 
 static int xlablin, x2lablin, ylablin, y2lablin, titlelin, xticlin, x2ticlin;
 
@@ -1113,21 +1128,17 @@ timetic_format(axis, amin, amax)
 int axis;
 double amin, amax;
 {
-    struct tm tmin, tmax;
+    struct tm t_min, t_max;
 
     *ticfmt[axis] = 0;		/* make sure we strcat to empty string */
 
-    ggmtime(&tmin, (double) time_tic_just(timelevel[axis], amin));
-    ggmtime(&tmax, (double) time_tic_just(timelevel[axis], amax));
-    /*
-       if ( tmax.tm_year == tmin.tm_year && 
-       tmax.tm_mon == tmin.tm_mon && 
-       tmax.tm_mday == tmin.tm_mday ) {
-     */
-    if (tmax.tm_year == tmin.tm_year &&
-	tmax.tm_yday == tmin.tm_yday) {
+    ggmtime(&t_min, (double) time_tic_just(timelevel[axis], amin));
+    ggmtime(&t_max, (double) time_tic_just(timelevel[axis], amax));
+
+    if (t_max.tm_year == t_min.tm_year &&
+	t_max.tm_yday == t_min.tm_yday) {
 	/* same day, skip date */
-	if (tmax.tm_hour != tmin.tm_hour) {
+	if (t_max.tm_hour != t_min.tm_hour) {
 	    strcpy(ticfmt[axis], "%H");
 	}
 	if (timelevel[axis] < 3) {
@@ -1139,7 +1150,7 @@ double amin, amax;
 	    strcat(ticfmt[axis], ":%S");
 	}
     } else {
-	if (tmax.tm_year != tmin.tm_year) {
+	if (t_max.tm_year != t_min.tm_year) {
 	    /* different years, include year in ticlabel */
 	    /* check convention, day/month or month/day */
 	    if (strchr(timefmt, 'm') < strchr(timefmt, 'd')) {
@@ -1147,7 +1158,7 @@ double amin, amax;
 	    } else {
 		strcpy(ticfmt[axis], "%d/%m/%");
 	    }
-	    if (((int) (tmax.tm_year / 100)) != ((int) (tmin.tm_year / 100))) {
+	    if (((int) (t_max.tm_year / 100)) != ((int) (t_min.tm_year / 100))) {
 		strcat(ticfmt[axis], "Y");
 	    } else {
 		strcat(ticfmt[axis], "y");

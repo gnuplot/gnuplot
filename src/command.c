@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.12 1999/06/11 11:18:52 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.13 1999/06/11 18:53:13 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -58,9 +58,6 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.12 1999/06/11 11:18:52 l
  */
 
 #include "plot.h"
-#define MAIN_C
-#include "command.h"
-#undef MAIN_C
 #include "setshow.h"
 #include "fit.h"
 #include "binary.h"
@@ -74,32 +71,23 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.12 1999/06/11 11:18:52 l
 # include <readline/history.h>
 #endif
 
-#if defined(USE_MOUSE) && defined(OS2)
-#define INCL_DOSMEMMGR
-#include <os2.h>
-#endif /* USE_MOUSE &&  OS2 */
-
-#if defined(MSDOS) || defined(DOS386)
-# ifdef DJGPP
-extern char HelpFile[];		/* patch for do_help  - AP */
-# endif				/* DJGPP */
-# ifdef __TURBOC__
-#  ifndef _Windows
-extern unsigned _stklen = 16394;	/* increase stack size */
-extern char HelpFile[];		/* patch for do_help  - DJL */
-#  endif			/* _Windows */
-# endif				/* TURBOC */
-#endif /* MSDOS */
+#ifdef OS2
+extern int PM_pause(char *);            /* term/pm.trm */
+extern int ExecuteMacro(char *, int);   /* plot.c */
+extern TBOOLEAN CallFromRexx;           /* plot.c */
+# ifdef USE_MOUSE
+PVOID input_from_PM_Terminal = NULL;
+char mouseShareMemName[40] = "";
+#  define INCL_DOSMEMMGR
+#  include <os2.h>
+# endif /* USE_MOUSE */
+#endif /* OS2 */
 
 #ifndef _Windows
 # include "help.h"
 #else
 static int winsystem __PROTO((char *));
 #endif /* _Windows */
-
-#ifndef STDOUT
-# define STDOUT 1
-#endif
 
 #ifdef _Windows
 # include <windows.h>
@@ -116,28 +104,10 @@ extern void screen_dump(void);	/* in term/win.trm */
 extern int Pause(LPSTR mess);	/* in winmain.c */
 #endif /* _Windows */
 
-#ifdef _Windows
-# define SET_CURSOR_WAIT SetCursor(LoadCursor((HINSTANCE) NULL, IDC_WAIT))
-# define SET_CURSOR_ARROW SetCursor(LoadCursor((HINSTANCE) NULL, IDC_ARROW))
-#else
-# define SET_CURSOR_WAIT	/* nought, zilch */
-# define SET_CURSOR_ARROW	/* nought, zilch */
-#endif
-
-#ifdef OS2
-extern int PM_pause(char *);            /* term/pm.trm */
-extern int ExecuteMacro(char *, int);   /* plot.c */
-extern TBOOLEAN CallFromRexx;           /* plot.c */
-#endif /* OS2 */
-
 #ifdef VMS
 int vms_vkid;			/* Virtual keyboard id */
 int vms_ktid;			/* key table id, for translating keystrokes */
 #endif /* VMS */
-
-/* Used by vws.trm */
-void replotrequest __PROTO((void));
-
 
 /* static prototypes */
 static int command __PROTO((void));
@@ -146,25 +116,31 @@ static void do_shell __PROTO((void));
 static void do_help __PROTO((int toplevel));
 static void do_system __PROTO((void));
 static int changedir __PROTO((char *path));
-
-
-/* plot.c */
-extern const char *user_shell;
-#if defined(ATARI) || defined(MTOS)
-extern const char *user_gnuplotpath;
+#ifdef AMIGA_AC_5
+static void getparms __PROTO((char *, char **));
 #endif
 
 struct lexical_unit *token;
 int token_table_size;
 
+/* TRUE if command just typed; becomes FALSE whenever we
+ * send some other output to screen.  If FALSE, the command line
+ * will be echoed to the screen before the ^ error message.
+ */
+TBOOLEAN screen_ok;
+
 char *input_line;
 int input_line_len;
 int inline_num;			/* input line number */
 
-#if defined(USE_MOUSE) && defined(OS2)
-PVOID input_from_PM_Terminal = NULL;
-char mouseShareMemName[40] = "";
-#endif /* USE_MOUSE && OS2 */
+/* jev -- for passing data thru user-defined function */
+/* NULL means no dummy vars active */
+struct udft_entry ydata_func;
+
+struct udft_entry *dummy_func;
+
+/* current dummy vars */
+char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 /* support for replot command */
 char *replot_line;
@@ -173,8 +149,12 @@ int plot_token;			/* start of 'plot' command */
 /* If last plot was a 3d one. */
 TBOOLEAN is_3d_plot = FALSE;
 
-#define Inc_c_token if (++c_token >= num_tokens)	\
-                        int_error (c_token, "Syntax error");
+/* input data, parsing variables */
+#ifdef AMIGA_SC_6_1
+__far int num_tokens, c_token;
+#else
+int num_tokens, c_token;
+#endif
 
 /* support for dynamic size of input line */
 void
@@ -673,6 +653,10 @@ command()
 	       almost_equals(c_token, "q$uit")) {
 	/* graphics will be tidied up in main */
 	return (1);
+#if 0
+    } else if(equals_alias(c_token) == 0) {
+	/* expand alias; set num_tokens to 0; reprocess */
+#endif
     } else if (!equals(c_token, ";")) {		/* null statement */
 #ifdef OS2
 	if (_osmode == OS2_MODE) {
@@ -703,6 +687,7 @@ int status;
     term_reset();
     exit(status);
 }
+
 
 static int
 changedir(path)
@@ -910,8 +895,8 @@ int toplevel;			/* not used for VMS version */
 				      &helpfile_desc, 0, lib$get_input)) != SS$_NORMAL)
 	os_error(NO_CARET, "can't open GNUPLOT$HELP");
 }
-
 # endif				/* NO_GIH */
+
 
 static void
 do_shell()
@@ -920,6 +905,7 @@ do_shell()
 	os_error(NO_CARET, "spawn error");
     }
 }
+
 
 static void
 do_system()
@@ -938,12 +924,10 @@ do_system()
     (void) putc('\n', stderr);
 
 }
-
 #endif /* VMS */
 
 
 #ifdef _Windows
-
 # ifdef NO_GIH
 static void
 do_help(toplevel)
@@ -962,6 +946,7 @@ int toplevel;			/* not used for windows */
 }
 # endif				/* NO_GIH */
 #endif /* _Windows */
+
 
 /*
  * do_help: (not VMS, although it would work) Give help to the user. It
@@ -1118,19 +1103,13 @@ int toplevel;
 }
 #endif /* !NO_GIH */
 
-
 #ifndef VMS
-
-# ifdef AMIGA_AC_5
-static char *parms[80];
-static char strg0[256];
-static void getparms __PROTO((char *, char **));
-# endif
 
 static void
 do_system()
 {
 # ifdef AMIGA_AC_5
+    static char *parms[80];
     getparms(input_line + 1, parms);
     fexecv(parms[0], parms);
 # elif (defined(ATARI) && defined(__GNUC__))
@@ -1172,9 +1151,8 @@ getparms(command, parms)
 char *command;
 char **parms;
 {
-    register int i = 0;		/* A bunch of indices */
-    register int j = 0;
-    register int k = 0;
+    static char strg0[256];
+    register int i = 0, j = 0, k = 0;		/* A bunch of indices */
 
     while (*(command + j) != NUL) {	/* Loop on string characters */
 	parms[k++] = strg0 + i;

@@ -1,4 +1,4 @@
-/* $Id: $ */
+/* $Id: graphics.h,v 1.1 1999/06/11 18:55:51 lhecking Exp $ */
 
 /* GNUPLOT - graphics.h */
 
@@ -43,33 +43,23 @@
  * for 2d/3d/parser/other?
  *
  * The ultimate target is of course to eliminate global vars.
+ * If possible. Over time. Maybe.
  */
 
 /* Formerly in plot.h */
 #define AXIS_ARRAY_SIZE 10
 
-/* Formerly in graphics.c */
-/* Define the boundary of the plot
- * These are computed at each call to do_plot, and are constant over
- * the period of one do_plot. They actually only change when the term
- * type changes and when the 'set size' factors change.
- * - no longer true, for 'set key out' or 'set key under'. also depend
- * on tic marks and multi-line labels.
- * They are shared with graph3d.c since we want to use its draw_clip_line()
- */
-WHERE int xleft, xright, ybot, ytop;
+extern int xleft, xright, ybot, ytop;
+
+extern double xscale3d, yscale3d, zscale3d;
 
 
-/* Formerly in graph3d.c */
-double xscale3d, yscale3d, zscale3d;
-
-
-/* Formerly in plot2d.c */
-WHERE double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-WHERE int auto_array[AXIS_ARRAY_SIZE];
-WHERE TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-WHERE double base_array[AXIS_ARRAY_SIZE];
-WHERE double log_base_array[AXIS_ARRAY_SIZE];
+/* Formerly in plot2d.c; where they don't belong */
+extern double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
+extern int auto_array[AXIS_ARRAY_SIZE];
+extern TBOOLEAN log_array[AXIS_ARRAY_SIZE];
+extern double base_array[AXIS_ARRAY_SIZE];
+extern double log_base_array[AXIS_ARRAY_SIZE];
 
 /* for convenience while converting to use these arrays */
 #define x_min3d min_array[FIRST_X_AXIS]
@@ -79,20 +69,9 @@ WHERE double log_base_array[AXIS_ARRAY_SIZE];
 #define z_min3d min_array[FIRST_Z_AXIS]
 #define z_max3d max_array[FIRST_Z_AXIS]
 
-
-/* Formerly in set.c */
-
-#ifndef TIMEFMT
-# define TIMEFMT "%d/%m/%y\n%H:%M"
-#endif
-
-/* array of datatypes (x in 0,y in 1,z in 2,..(rtuv)) */
-/* not sure how rtuv come into it ?
- * oh well, make first six compatible with FIRST_X_AXIS, etc
- */
-WHERE int datatype[DATATYPE_ARRAY_SIZE];
-
 /* format for date/time for reading time in datafile */
-WHERE char timefmt[25] INITVAL (TIMEFMT);
+extern char timefmt[];
+
+extern int datatype[];
 
 #endif /* GNUPLOT_GRAPHICS_H */
