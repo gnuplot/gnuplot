@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: specfun.c,v 1.8 1998/12/10 18:30:35 lhecking Exp $";
+static char *RCSid = "$Id: specfun.c,v 1.8.2.1 2001/12/09 19:01:24 lhecking Exp $";
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -119,111 +119,10 @@ static double lngamma __PROTO((double z));
 static double lgamneg __PROTO((double z));
 static double lgampos __PROTO((double z));
 
-/**
- * from statlib, Thu Jan 23 15:02:27 EST 1992 ***
- *
- * This file contains two algorithms for the logarithm of the gamma function.
- * Algorithm AS 245 is the faster (but longer) and gives an accuracy of about
- * 10-12 significant decimal digits except for small regions around X = 1 and
- * X = 2, where the function goes to zero.
- * The second algorithm is not part of the AS algorithms.   It is slower but
- * gives 14 or more significant decimal digits accuracy, except around X = 1
- * and X = 2.   The Lanczos series from which this algorithm is derived is
- * interesting in that it is a convergent series approximation for the gamma
- * function, whereas the familiar series due to De Moivre (and usually wrongly
- * called Stirling's approximation) is only an asymptotic approximation, as
- * is the true and preferable approximation due to Stirling.
- * 
- * Uses Lanczos-type approximation to ln(gamma) for z > 0. Reference: Lanczos,
- * C. 'A precision approximation of the gamma function', J. SIAM Numer.
- * Anal., B, 1, 86-96, 1964. Accuracy: About 14 significant digits except for
- * small regions in the vicinity of 1 and 2.
- * 
- * Programmer: Alan Miller CSIRO Division of Mathematics & Statistics
- * 
- * Latest revision - 17 April 1988
- * 
- * Additions: Translated from fortran to C, code added to handle values z < 0.
- * The global variable signgam contains the sign of the gamma function.
- * 
- * IMPORTANT: The signgam variable contains garbage until AFTER the call to
- * lngamma().
- * 
- * Permission granted to distribute freely for non-commercial purposes only
- * Copyright (c) 1992 Jos van der Woude, jvdwoude@hut.nl
- */
-
-/* Local data, not visible outside this file 
-   static double   a[] =
-   {
-   0.9999999999995183E+00,
-   0.6765203681218835E+03,
-   -.1259139216722289E+04,
-   0.7713234287757674E+03,
-   -.1766150291498386E+03,
-   0.1250734324009056E+02,
-   -.1385710331296526E+00,
-   0.9934937113930748E-05,
-   0.1659470187408462E-06,
-   };   */
-
-/* from Ray Toy */
-static double GPFAR a[] =
-{
-    .99999999999980993227684700473478296744476168282198,
-    676.52036812188509856700919044401903816411251975244084,
-    -1259.13921672240287047156078755282840836424300664868028,
-    771.32342877765307884865282588943070775227268469602500,
-    -176.61502916214059906584551353999392943274507608117860,
-    12.50734327868690481445893685327104972970563021816420,
-    -.13857109526572011689554706984971501358032683492780,
-    .00000998436957801957085956266828104544089848531228,
-    .00000015056327351493115583383579667028994545044040,
-};
-
-static double lgamneg(z)
-double z;
-{
-    double tmp;
-
-    /* Use reflection formula, then call lgampos() */
-    tmp = sin(z * PI);
-
-    if (fabs(tmp) < MACHEPS) {
-	tmp = 0.0;
-    } else if (tmp < 0.0) {
-	tmp = -tmp;
-	signgam = -1;
-    }
-    return LNPI - lgampos(1.0 - z) - log(tmp);
-
-}
-
-static double lgampos(z)
-double z;
-{
-    double sum;
-    double tmp;
-    int i;
-
-    sum = a[0];
-    for (i = 1, tmp = z; i < 9; i++) {
-	sum += a[i] / tmp;
-	tmp++;
-    }
-
-    return log(sum) + LNSQRT2PI - z - 6.5 + (z - 0.5) * log(z + 6.5);
-}
-
 static double lngamma(z)
 double z;
 {
-    signgam = 1;
-
-    if (z <= 0.0)
-	return lgamneg(z);
-    else
-	return lgampos(z);
+  printf("Sorry, your libc does not contain lgammma()...\n");
 }
 
 # define GAMMA(x) lngamma ((x))
@@ -712,164 +611,16 @@ void f_inverse_erf()
 static double inverse_normal_func(p)
 double p;
 {
-    /* 
-       Source: This routine was derived (using f2c) from the 
-       FORTRAN subroutine MDNRIS found in 
-       ACM Algorithm 602 obtained from netlib.
+  printf("Sorry, function removed due to license issues :(\n");
 
-       MDNRIS code contains the 1978 Copyright 
-       by IMSL, INC. .  Since MDNRIS has been 
-       submitted to netlib it may be used with 
-       the restriction that it may only be 
-       used for noncommercial purposes and that
-       IMSL be acknowledged as the copyright-holder
-       of the code.
-     */
-
-    /* Initialized data */
-    static double eps = 1e-10;
-    static double g0 = 1.851159e-4;
-    static double g1 = -.002028152;
-    static double g2 = -.1498384;
-    static double g3 = .01078639;
-    static double h0 = .09952975;
-    static double h1 = .5211733;
-    static double h2 = -.06888301;
-    static double sqrt2 = 1.414213562373095;
-
-    /* Local variables */
-    static double a, w, x;
-    static double sd, wi, sn, y;
-
-    /* Note: 0.0 < p < 1.0 */
-
-    /* p too small, compute y directly */
-    if (p <= eps) {
-	a = p + p;
-	w = sqrt(-(double) log(a + (a - a * a)));
-
-	/* use a rational function in 1.0 / w */
-	wi = 1.0 / w;
-	sn = ((g3 * wi + g2) * wi + g1) * wi;
-	sd = ((wi + h2) * wi + h1) * wi + h0;
-	y = w + w * (g0 + sn / sd);
-	y = -y * sqrt2;
-    } else {
-	x = 1.0 - (p + p);
-	y = inverse_error_func(x);
-	y = -sqrt2 * y;
-    }
-    return (y);
+  return 0;
 }
 
 
 static double inverse_error_func(p)
 double p;
 {
-    /* 
-       Source: This routine was derived (using f2c) from the 
-       FORTRAN subroutine MERFI found in 
-       ACM Algorithm 602 obtained from netlib.
+  printf("Sorry, function removed due to license issues :(\n");
 
-       MDNRIS code contains the 1978 Copyright 
-       by IMSL, INC. .  Since MERFI has been 
-       submitted to netlib, it may be used with 
-       the restriction that it may only be 
-       used for noncommercial purposes and that
-       IMSL be acknowledged as the copyright-holder
-       of the code.
-     */
-
-
-
-    /* Initialized data */
-    static double a1 = -.5751703;
-    static double a2 = -1.896513;
-    static double a3 = -.05496261;
-    static double b0 = -.113773;
-    static double b1 = -3.293474;
-    static double b2 = -2.374996;
-    static double b3 = -1.187515;
-    static double c0 = -.1146666;
-    static double c1 = -.1314774;
-    static double c2 = -.2368201;
-    static double c3 = .05073975;
-    static double d0 = -44.27977;
-    static double d1 = 21.98546;
-    static double d2 = -7.586103;
-    static double e0 = -.05668422;
-    static double e1 = .3937021;
-    static double e2 = -.3166501;
-    static double e3 = .06208963;
-    static double f0 = -6.266786;
-    static double f1 = 4.666263;
-    static double f2 = -2.962883;
-    static double g0 = 1.851159e-4;
-    static double g1 = -.002028152;
-    static double g2 = -.1498384;
-    static double g3 = .01078639;
-    static double h0 = .09952975;
-    static double h1 = .5211733;
-    static double h2 = -.06888301;
-
-    /* Local variables */
-    static double a, b, f, w, x, y, z, sigma, z2, sd, wi, sn;
-
-    x = p;
-
-    /* determine sign of x */
-    if (x > 0)
-	sigma = 1.0;
-    else
-	sigma = -1.0;
-
-    /* Note: -1.0 < x < 1.0 */
-
-    z = fabs(x);
-
-    /* z between 0.0 and 0.85, approx. f by a 
-       rational function in z  */
-
-    if (z <= 0.85) {
-	z2 = z * z;
-	f = z + z * (b0 + a1 * z2 / (b1 + z2 + a2
-				     / (b2 + z2 + a3 / (b3 + z2))));
-
-	/* z greater than 0.85 */
-    } else {
-	a = 1.0 - z;
-	b = z;
-
-	/* reduced argument is in (0.85,1.0), 
-	   obtain the transformed variable */
-
-	w = sqrt(-(double) log(a + a * b));
-
-	/* w greater than 4.0, approx. f by a 
-	   rational function in 1.0 / w */
-
-	if (w >= 4.0) {
-	    wi = 1.0 / w;
-	    sn = ((g3 * wi + g2) * wi + g1) * wi;
-	    sd = ((wi + h2) * wi + h1) * wi + h0;
-	    f = w + w * (g0 + sn / sd);
-
-	    /* w between 2.5 and 4.0, approx. 
-	       f by a rational function in w */
-
-	} else if (w < 4.0 && w > 2.5) {
-	    sn = ((e3 * w + e2) * w + e1) * w;
-	    sd = ((w + f2) * w + f1) * w + f0;
-	    f = w + w * (e0 + sn / sd);
-
-	    /* w between 1.13222 and 2.5, approx. f by 
-	       a rational function in w */
-	} else if (w <= 2.5 && w > 1.13222) {
-	    sn = ((c3 * w + c2) * w + c1) * w;
-	    sd = ((w + d2) * w + d1) * w + d0;
-	    f = w + w * (c0 + sn / sd);
-	}
-    }
-    y = sigma * f;
-    return (y);
+  return 0;
 }
