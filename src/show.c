@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.131 2004/07/13 14:03:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.132 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -1421,7 +1421,7 @@ static void
 show_styles(const char *name, enum PLOT_STYLE style)
 {
     fprintf(stderr, "\t%s are plotted with ", name);
-    save_data_func_style(stderr, (char *)name, style);
+    save_data_func_style(stderr, name, style);
 }
 
 
@@ -1659,7 +1659,6 @@ static void
 show_key()
 {
     legend_key *key = &keyT;
-    char *str = gp_alloc(30, "show_key");
 
     SHOW_ALL_NL;
 
@@ -1670,7 +1669,9 @@ show_key()
     }
 
     switch (key->flag) {
-    case KEY_AUTO_PLACEMENT:
+    case KEY_AUTO_PLACEMENT: {
+	char *str = gp_alloc(30, "show_key");
+
 	if (key->vpos == TUNDER) {
 	    strcpy(str, "below");
 	} else if (key->vpos == TTOP) {
@@ -1692,6 +1693,7 @@ show_key()
 \tkey is ON, position: %s\n", str);
 	free(str);
 	break;
+    }
     case KEY_USER_PLACEMENT:
 	fputs("\tkey is at ", stderr);
 	show_position(&key->user_pos);
@@ -1699,33 +1701,34 @@ show_key()
 	break;
     }
 
-	fprintf(stderr, "\
+    fprintf(stderr, "\
 \tkey is %s justified, %sreversed, %sinverted, %senhanced and ",
-		key->just == JLEFT ? "left" : "right",
-		key->reverse ? "" : "not ",
-		key->invert ? "" : "not ",
-		key->enhanced ? "" : "not ");
-	if (key->box.l_type > L_TYPE_NODRAW)
-	    fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
-		    key->box.l_type + 1, key->box.l_width);
-	else
-	    fprintf(stderr, "not boxed\n");
-	fprintf(stderr, "\
+	    key->just == JLEFT ? "left" : "right",
+	    key->reverse ? "" : "not ",
+	    key->invert ? "" : "not ",
+	    key->enhanced ? "" : "not ");
+    if (key->box.l_type > L_TYPE_NODRAW)
+	fprintf(stderr, "boxed\n\twith linetype %d, linewidth %.3f\n",
+		key->box.l_type + 1, key->box.l_width);
+    else
+	fprintf(stderr, "not boxed\n");
+
+    fprintf(stderr, "\
 \tsample length is %g characters\n\
 \tvertical spacing is %g characters\n\
 \twidth adjustment is %g characters\n\
 \theight adjustment is %g characters\n\
 \tcurves are%s automatically titled %s\n\
 \tkey title is \"%s\"\n",
-		    key->swidth,
-		    key->vert_factor,
-		    key->width_fix,
-		    key->height_fix,
-                    key->auto_titles ? "" : " not",
-		    key->auto_titles == FILENAME_KEYTITLES ? "with filename" :
-		    key->auto_titles == COLUMNHEAD_KEYTITLES ? "with column header" : "",
-		    key->title);
-
+	    key->swidth,
+	    key->vert_factor,
+	    key->width_fix,
+	    key->height_fix,
+	    key->auto_titles ? "" : " not",
+	    key->auto_titles == FILENAME_KEYTITLES ? "with filename" :
+	    key->auto_titles == COLUMNHEAD_KEYTITLES
+	    ? "with column header" : "",
+	    key->title);
 }
 
 

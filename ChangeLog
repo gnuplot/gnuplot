@@ -1,3 +1,15 @@
+2004-07-30  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_key): Fix memory leak by making the variable in
+	question a local to the switch case that uses it.
+	(show_styles): Remove const-ness modifying cast.
+
+	* src/save.c (save_data_func_style): Marked pointer argument
+	'which' as const.
+
+	* src/save.h (save_data_func_style): Prototype updated
+	accordingly.
+	
 2004-07-29  Ethan Merritt  <merritt@u.washington.edu>
 
 	* docs/gnuplot.doc: Fix the alphabetical order of plot style

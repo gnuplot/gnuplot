@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.81 2004/07/13 14:11:24 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.82 2004/07/25 12:25:01 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -1013,7 +1013,7 @@ save_textcolor(FILE *fp, const struct t_colorspec *tc)
 }
 
 void
-save_data_func_style(FILE *fp, char *which, enum PLOT_STYLE style)
+save_data_func_style(FILE *fp, const char *which, enum PLOT_STYLE style)
 {
     switch (style) {
     case LINES:
@@ -1060,7 +1060,7 @@ save_data_func_style(FILE *fp, char *which, enum PLOT_STYLE style)
 #ifdef PM3D
     case FILLEDCURVES:
 	fputs("filledcurves ", fp);
-	if (!strcmp(which,"data") || !strcmp(which,"Data"))
+	if (!strcmp(which, "data") || !strcmp(which, "Data"))
 	    filledcurves_options_tofile(&filledcurves_opts_data, fp);
 	else
 	    filledcurves_options_tofile(&filledcurves_opts_func, fp);

@@ -1,5 +1,5 @@
 /*
- * $Id: save.h,v 1.7 2004/04/13 17:24:00 broeker Exp $
+ * $Id: save.h,v 1.8 2004/07/13 14:11:24 broeker Exp $
  */
 
 /* GNUPLOT - save.h */
@@ -55,6 +55,6 @@ void save_set __PROTO((FILE *fp));
 void save_term __PROTO((FILE *fp));
 void save_all __PROTO((FILE *fp));
 void save_range __PROTO((FILE *, AXIS_INDEX));
-void save_data_func_style __PROTO((FILE *, char *, enum PLOT_STYLE));
+void save_data_func_style __PROTO((FILE *, const char *, enum PLOT_STYLE));
 
 #endif /* GNUPLOT_SAVE_H */
