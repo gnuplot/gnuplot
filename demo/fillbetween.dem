@@ -15,6 +15,7 @@ set style fill pattern 2
 set title "Fill area between two curves (pattern fill)"
 replot
 pause -1 "Hit return to continue"
+set title "Fill area between two curves (above/below)"
 set style fill solid 1.0 noborder
 set xrange [250:500]
 set auto y
