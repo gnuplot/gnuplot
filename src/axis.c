@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.24 2001/12/04 19:10:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.25 2002/02/13 17:59:36 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -890,18 +890,23 @@ int y;
  * to the automatic calculation one day
  */
 
+/* HBB 20020220: Changed to use value itself as first argument, not
+ * log10(value).  Done to allow changing the calculation method
+ * to avoid numerical problems */
 double
-quantize_normal_tics(l10, guide)
-     double l10;
+quantize_normal_tics(arg, guide)
+     double arg;
      int guide;
 {
-    double xnorm, tics, posns;
+    /* order of magnitude of argument: */
+    double power = dbl_raise(10.0, floor(log10(arg))); 
+    double xnorm = arg / power;	/* approx number of decades */
+    double posns = guide / xnorm; /* approx number of tic posns per decade */
+    double tics;
 
-    int fl = (int) floor(l10);
-    xnorm = pow(10.0, l10 - fl);	/* approx number of decades */
-
-    posns = guide / xnorm;	/* approx number of tic posns per decade */
-
+    /* FIXME HBB 20020220: Looking at these, I would normally expect
+     * to see posns*tics to be always about the same size. But we
+     * rather suddenly drop from 2.0 to 1.0 at tic step 0.5. Why? */
     if (posns > 40)
 	tics = 0.05;		/* eg 0, .05, .10, ... */
     else if (posns > 20)
@@ -925,7 +930,7 @@ quantize_normal_tics(l10, guide)
 	 */
 	tics = ceil(xnorm);
 
-    return (tics * dbl_raise(10.0, fl));
+    return (tics * power);
 }
 
 /*}}} */
@@ -942,7 +947,7 @@ make_tics(axis, guide)
     register double xr, tic;
 
     xr = fabs(axis_array[axis].min - axis_array[axis].max);
-    tic = quantize_normal_tics(log10(xr), guide);
+    tic = quantize_normal_tics(xr, guide);
     /* FIXME HBB 20010831: disabling this might allow short log axis
      * to receive better ticking... */
     if (axis_array[axis].log && tic < 1.0)
@@ -953,6 +958,50 @@ make_tics(axis, guide)
     else
 	return tic;
 }
+
+/*{{{ quantize_duodecimal_tics */
+/* HBB 20020220: New function, to be used to properly tic axes with a
+ * duodecimal reference, as used in times (60 seconds, 60 minuts, 24
+ * hours, 12 months). Derived from quantize_normal_tics(). The default
+ * guide is assumed to be 12, here, not 20 */
+double
+quantize_duodecimal_tics(arg, guide)
+     double arg;
+     int guide;
+{
+    /* order of magnitude of argument: */
+    double power = dbl_raise(12.0, floor(log(arg)/log(12.0))); 
+    double xnorm = arg / power;	/* approx number of decades */
+    double posns = guide / xnorm; /* approx number of tic posns per decade */
+
+    if (posns > 24)
+	return power / 24;	/* half a smaller unit --- shouldn't happen */
+    else if (posns > 12)
+	return power / 12;	/* one smaller unit */
+    else if (posns > 6)
+	return power / 6;	/* 2 smaller units = one-6th of a unit */
+    else if (posns > 4)
+	return power / 4;	/* 3 smaller units = quarter unit */
+    else if (posns > 2)
+	return power / 2;	/* 6 smaller units = half a unit */
+    else if (posns > 1)
+	return power;		/* 0, 1, 2, ..., 11 */
+    else if (posns > 0.5)
+	return power * 2;		/* 0, 2, 4, ..., 10 */
+    else if (posns > 1.0/3)
+	return power * 3;		/* 0, 3, 6, 9 */
+    else
+	/* getting desperate... the ceil is to make sure we
+	 * go over rather than under - eg plot [-10:10] x*x
+	 * gives a range of about 99.999 - tics=xnorm gives
+	 * tics at 0, 99.99 and 109.98  - BAD !
+	 * This way, inaccuracy the other way will round
+	 * up (eg 0->100.0001 => tics at 0 and 101
+	 * I think latter is better than former
+	 */
+	return power * ceil(xnorm);
+}
+/*}}} */
 
 /* HBB 20010831: newly isolated subfunction. Used to be part of
  * make_tics() */
@@ -967,37 +1016,33 @@ quantize_time_tics(axis, tic, xr, guide)
     double tic, xr;
     int guide;
 {
-#if 0 /* FIXME HBB 20010831: unused ! ??? */
-    struct tm ftm, etm;
-
-    /* this is not fun */
-    ggmtime(&ftm, (double) axis_array[axis].min);
-    ggmtime(&etm, (double) axis_array[axis].max);
-#endif
+    int guide12 = guide * 3 / 5; /* --> 12 for default of 20 */
 
     timelevel[axis] = TIMELEVEL_SECONDS;
-    if (tic > 20) {
+    if (tic > 5) {
 	/* turn tic into units of minutes */
-	tic = quantize_normal_tics(log10(xr / 60.0), guide) * 60;
+	tic = quantize_duodecimal_tics(xr / 60.0, guide12) * 60;
 	timelevel[axis] = TIMELEVEL_MINUTES;
     }
-    if (tic > 20 * 60) {
+    if (tic > 5 * 60) {
 	/* turn tic into units of hours */
-	tic = quantize_normal_tics(log10(xr / 3600.0), guide) * 3600;
+	tic = quantize_duodecimal_tics(xr / 3600.0, guide12) * 3600;
 	timelevel[axis] = TIMELEVEL_HOURS;
     }
+#if 0
     if (tic > 2 * 3600) {
 	/* need some tickling */
-	tic = quantize_normal_tics(log10(xr / (3 * 3600.0)), guide) * 3 * 3600;
+	tic = quantize_normal_tics(xr / (3 * 3600.0), guide) * 3 * 3600;
     }
-    if (tic > 6 * 3600) {
+#endif
+    if (tic > 3600) {
 	/* turn tic into units of days */
-	tic = quantize_normal_tics(log10(xr / DAY_SEC), guide) * DAY_SEC;
+        tic = quantize_duodecimal_tics(xr / DAY_SEC, guide12) * DAY_SEC;
 	timelevel[axis] = TIMELEVEL_DAYS;
     }
-    if (tic > 3 * DAY_SEC) {
+    if (tic > 2 * DAY_SEC) {
 	/* turn tic into units of weeks */
-	tic = quantize_normal_tics(log10(xr / WEEK_SEC), guide) * WEEK_SEC;
+	tic = quantize_normal_tics(xr / WEEK_SEC, guide) * WEEK_SEC;
 	if (tic < WEEK_SEC) {	/* force */
 	    tic = WEEK_SEC;
 	}
@@ -1005,22 +1050,26 @@ quantize_time_tics(axis, tic, xr, guide)
     }
     if (tic > 3 * WEEK_SEC) {
 	/* turn tic into units of month */
-	tic = quantize_normal_tics(log10(xr / MON_SEC), guide) * MON_SEC;
+	tic = quantize_normal_tics(xr / MON_SEC, guide) * MON_SEC;
 	if (tic < MON_SEC) {	/* force */
 	    tic = MON_SEC;
 	}
 	timelevel[axis] = TIMELEVEL_MONTHS;
     }
+#if 0
     if (tic > 2 * MON_SEC) {
 	/* turn tic into units of month */
-	tic = quantize_normal_tics(log10(xr / (3 * MON_SEC)), guide) * 3 * MON_SEC;
+	tic = quantize_normal_tics(xr / (3 * MON_SEC), guide) * 3 * MON_SEC;
     }
-    if (tic > 6 * MON_SEC) {
+#endif
+    if (tic > MON_SEC) {
 	/* turn tic into units of years */
-	tic = quantize_normal_tics(log10(xr / YEAR_SEC), guide) * YEAR_SEC;
+	tic = quantize_duodecimal_tics(xr / YEAR_SEC, guide12) * YEAR_SEC;
+#if 0
 	if (tic < (YEAR_SEC / 2)) {
 	    tic = YEAR_SEC / 2;
 	}
+#endif
 	timelevel[axis] = TIMELEVEL_YEARS;
     }
     return (tic);
@@ -1478,33 +1527,35 @@ time_tic_just(level, ticplace)
     if (level <= TIMELEVEL_SECONDS) {
 	return (ticplace);
     }
-    ggmtime(&tm, (double) ticplace);
-    if (level > TIMELEVEL_SECONDS) { /* units of minutes */
-	if (tm.tm_sec > 50)
+    ggmtime(&tm, ticplace);
+    if (level >= TIMELEVEL_MINUTES) { /* units of minutes */
+	if (tm.tm_sec > 55)
 	    tm.tm_min++;
 	tm.tm_sec = 0;
     }
-    if (level > TIMELEVEL_MINUTES) { /* units of hours */
-	if (tm.tm_min > 50)
+    if (level >= TIMELEVEL_HOURS) { /* units of hours */
+	if (tm.tm_min > 55)
 	    tm.tm_hour++;
 	tm.tm_min = 0;
     }
-    if (level > TIMELEVEL_HOURS) { /* units of days */
-	if (tm.tm_hour > 14) {
+    if (level >= TIMELEVEL_DAYS) { /* units of days */
+	if (tm.tm_hour > 22) {
 	    tm.tm_hour = 0;
 	    tm.tm_mday = 0;
 	    tm.tm_yday++;
-	    ggmtime(&tm, (double) gtimegm(&tm));
+	    ggmtime(&tm, gtimegm(&tm));
+#if 0
 	} else if (tm.tm_hour > 7) {
 	    tm.tm_hour = 12;
 	} else if (tm.tm_hour > 3) {
 	    tm.tm_hour = 6;
 	} else {
 	    tm.tm_hour = 0;
+#endif /* 0 */
 	}
     }
     /* skip it, I have not bothered with weekday so far */
-    if (level > TIMELEVEL_WEEKS) {		/* units of month */
+    if (level >= TIMELEVEL_MONTHS) {/* units of month */
 	if (tm.tm_mday > 25) {
 	    tm.tm_mon++;
 	    if (tm.tm_mon > 11) {
@@ -1514,13 +1565,16 @@ time_tic_just(level, ticplace)
 	}
 	tm.tm_mday = 1;
     }
+#if 0
     if (level > TIMELEVEL_MONTHS) {
-	if (tm.tm_mon >= 7)
+	if (tm.tm_mon >= 11)
 	    tm.tm_year++;
 	tm.tm_mon = 0;
     }
-    ticplace = (double) gtimegm(&tm);
-    ggmtime(&tm, (double) gtimegm(&tm));
+#endif
+    
+    ticplace = gtimegm(&tm);
+    ggmtime(&tm, gtimegm(&tm));
     return (ticplace);
 }
 

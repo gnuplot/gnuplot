@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.20 2001/08/31 17:56:35 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.21 2002/01/31 16:57:02 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -223,8 +223,10 @@ struct iso_curve *iso_lines;
 	dz = fabs(z_max - z_min);
 	if (dz == 0)
 	    return NULL;	/* empty z range ? */
-	/* what is the deeper sense of this ? (joze) */
-	dz = quantize_normal_tics(log10(dz), ((int) contour_levels + 1) * 2);
+	/* Find a tic step that will generate approximately the
+	 * desired number of contour levels. The "* 2" is historical.
+	 * */
+	dz = quantize_normal_tics(dz, ((int) contour_levels + 1) * 2);
 	z = floor(z_min / dz) * dz;
 	num_of_z_levels = (int) floor((z_max - z) / dz);
     }
