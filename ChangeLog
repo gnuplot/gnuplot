@@ -1,3 +1,51 @@
+1999-05-11  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* lisp/Makefile.in: Add empty uninstall target.
+
+	* src/readline.c: Fix indentation of USE_MOUSE statements.
+
+	* term/post.trm(PS_options): No c_token++ after
+	real(const_express(&a)). Suggested by Petr Mikulik.
+
+1999-05-11  Dick Crawford  <u600256@gamma.lanl.gov>
+
+	* src/graphics.c: Fix for y-position of the timestamp.
+
+1999-05-10  Alexander Mai  <st002279@HRzpUB.tu-darmstadt.DE
+
+	* config/makefile.os2: Minor updates and corrections.
+
+	* src/misc.c(load_file): Fix for "gnuplot doesn't exit on
+	quit/exit in non-interactive mode".
+
+1999-05-09  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* src/plot.h: MAX_DISCRETE_LEVELS removed.
+
+	* src/set.c (set_one): Allocate and enlarge levels_list array
+	dynamically.
+
+	* src/setshow.h: levels_list is now dynamic.
+
+1999-05-08  James R. Van Zandt  <jrv@vanzandt.mv.com>
+
+	* docs/gnuplot.doc: Command substitution will not work within a
+	string surrounded by single quotes.  Show an example of command
+	substitution within a quoted string.
+
+	* src/command.c, src/protos.h: scanner() now takes two args.
+
+	* src/scanner.c (scanner): Command substitution works
+	within a string surrounded by double quotes.
+
+	* src/scanner.c (scanner): Add one level of indirection to input
+	parameter, so the array that holds the expression can be
+	reallocated if necessary.
+
+	* src/scanner.c: substitute() can dynamically enlarge the array
+	that holds the input line.  Static arrays converted to dynamic
+	arrays.
+ 
 1999-05-05  Peter Hackenberg  <phackenberg@aip.de>
 
 	* term/fig.trm: Quote `\`, fix linestyle 201 to give a solid line,

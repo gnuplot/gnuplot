@@ -241,4 +241,8 @@ should also be followed for simple assignments, ie. in for (;;) loops.
 Unary operators should be writen as usual, ie i++.
 
 
+No C++ style comments (//).
+No comments on #ifdef/#ifndef lines.
+
+
 [more to come]
