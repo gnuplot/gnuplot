@@ -1,3 +1,7 @@
+2005-04-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* docs/gnuplot.doc: Remove blanks from whitespace-only lines.
+
 2005-04-01  Juergen Wieferink <wieferink@freenet.de>
 
 	* docs/doc2tex.c: Handle levels 5 and 6 of documentation text as
