@@ -450,17 +450,15 @@ AC_SUBST(NEXTOBJS)
 AC_SUBST(TERMLIBS)
 AC_SUBST(TERMXLIBS)
 
-dnl ac_subdir_list=lisp
-dnl AC_CONFIG_SUBDIRS([$ac_subdir_list])
-AM_PATH_LISPDIR
-EMACS=`basename $EMACS`
+AC_CHECK_PROGS(EMACS, emacs xemacs, no)
+AC_CHECK_PROGS(LATEX, latex latex2e, no)
+test "$EMACS" != no && AC_CONFIG_SUBDIRS(lisp)
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile
            config/Makefile
            demo/Makefile
            docs/Makefile
-           lisp/Makefile
            m4/Makefile
            man/Makefile
            src/Makefile
@@ -522,6 +520,12 @@ test "$enable_mgr" = yes && \
 
 test "$enable_rgip" = yes && \
   AC_MSG_RESULT([  Enable RGIP terminal])
+
+test "$EMACS" != no && \
+  AC_MSG_RESULT([  Build lisp files])
+
+test "$LATEX" != no && \
+  AC_MSG_RESULT([  Build LaTeX tutorial])
 
 test "$no_x" != yes && \
   AC_MSG_RESULT([  Use the X Window System
