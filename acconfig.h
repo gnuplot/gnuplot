@@ -29,17 +29,11 @@
 /* Define if the C preprocessor understands ANSI stringification.  */
 #undef HAVE_CPP_STRINGIFY
 
-/* Define if you have the lgamma function.  */
-#undef HAVE_LGAMMA
-
 /* Define if you have Thomas Boutell's gd library.  */
 #undef HAVE_LIBGD
 
 /* Define if you have the png library.  */
 #undef HAVE_LIBPNG
-
-/* Define if you do not have the strncasecmp function.  */
-#undef HAVE_STRNCASECMP
 
 /* Define if this is a Linux system with SuperVGA library.  */
 #undef LINUXVGA
