@@ -49,6 +49,10 @@ int close(int);
 #include <descrip.h>
 #define MAILBOX "PLOT$MAILBOX"
 #define pclose(f) fclose(f)
+#ifdef __DECC
+#include <lib$routines.h>    /* avoid some IMPLICITFNC warnings */
+#include <starlet.h>
+#endif  /* __DECC */
 #endif /* VMS */
 
 
