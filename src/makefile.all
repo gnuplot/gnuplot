@@ -2,11 +2,12 @@
 
 # List of core object files except version.$(O)
 COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
-datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
-hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) parse.$(O) \
-plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) save.$(O) scanner.$(O) \
-set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) \
-term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
+datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) \
+help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) \
+parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) save.$(O) \
+scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) \
+tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) \
+variable.$(O)
 
 # List of terminal driver sources
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \

@@ -94,21 +94,21 @@ HELPFILE = $(datadir)/gnuplot.gih
 
 EXTRA_PROGRAMS = gnuplot_x11
 bin_PROGRAMS = gnuplot @GNUPLOT_X11@
-noinst_PROGRAMS = bf_test gpltconv
+noinst_PROGRAMS = bf_test
 
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
 gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
-bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h eval.c \
-eval.h fit.c fit.h gp_time.h graph3d.c graph3d.h graphics.c graphics.h help.c \
-help.h hidden3d.c hidden3d.h internal.c internal.h interpol.c interpol.h \
-matrix.c matrix.h misc.c misc.h national.h parse.c parse.h plot.c plot.h \
-plot2d.c plot2d.h plot3d.c plot3d.h protos.h readline.c readline.h save.c \
-save.h scanner.c scanner.h set.c setshow.h show.c specfun.c specfun.h \
-standard.c standard.h stdfn.c stdfn.h syscfg.h tables.c tables.h template.h \
-term_api.h term.c term.h time.c unset.c util.c util.h util3d.c util3d.h \
-variable.c variable.h version.c
+bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h \
+dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_time.h graph3d.c graph3d.h \
+graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h internal.c \
+internal.h interpol.c interpol.h matrix.c matrix.h misc.c misc.h national.h \
+parse.c parse.h plot.c plot.h plot2d.c plot2d.h plot3d.c plot3d.h protos.h \
+readline.c readline.h save.c save.h scanner.c scanner.h set.c setshow.h \
+show.c specfun.c specfun.h standard.c standard.h stdfn.c stdfn.h syscfg.h \
+tables.c tables.h template.h term_api.h term.c term.h time.c unset.c util.c \
+util.h util3d.c util3d.h variable.c variable.h version.c
 
 
 gnuplot_LDADD = $(TERMLIBS) $(TERMXLIBS)
@@ -118,8 +118,6 @@ gnuplot_x11_SOURCES = gplt_x11.c
 gnuplot_x11_LDADD = $(XLIBS)
 
 bf_test_SOURCES = bf_test.c binary.c alloc.c
-
-gpltconv_SOURCES = gpltconv.c
 
 @BUILD_SRC_BEOS_SUBDIR_TRUE@d_beos = @BUILD_SRC_BEOS_SUBDIR_TRUE@beos
 
@@ -137,11 +135,12 @@ O = o
 T = $(top_srcdir)/term/
 
 COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
-datafile.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) help.$(O) \
-hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) parse.$(O) \
-plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) save.$(O) scanner.$(O) \
-set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) tables.$(O) \
-term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) variable.$(O)
+datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) \
+help.$(O) hidden3d.$(O) internal.$(O) interpol.$(O) matrix.$(O) misc.$(O) \
+parse.$(O) plot.$(O) plot2d.$(O) plot3d.$(O) readline.$(O) save.$(O) \
+scanner.$(O) set.$(O) show.$(O) specfun.$(O) standard.$(O) stdfn.$(O) \
+tables.$(O) term.$(O) time.$(O) unset.$(O) util.$(O) util3d.$(O) \
+variable.$(O)
 
 
 # List of terminal driver sources
@@ -183,9 +182,9 @@ bf_test_LDADD = $(LDADD)
 bf_test_DEPENDENCIES = 
 bf_test_LDFLAGS = 
 am_gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o command$U.o \
-contour$U.o datafile$U.o eval$U.o fit$U.o graph3d$U.o graphics$U.o \
-help$U.o hidden3d$U.o internal$U.o interpol$U.o matrix$U.o misc$U.o \
-parse$U.o plot$U.o plot2d$U.o plot3d$U.o readline$U.o save$U.o \
+contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o graph3d$U.o \
+graphics$U.o help$U.o hidden3d$U.o internal$U.o interpol$U.o matrix$U.o \
+misc$U.o parse$U.o plot$U.o plot2d$U.o plot3d$U.o readline$U.o save$U.o \
 scanner$U.o set$U.o show$U.o specfun$U.o standard$U.o stdfn$U.o \
 tables$U.o term$U.o time$U.o unset$U.o util$U.o util3d$U.o variable$U.o \
 version$U.o
@@ -196,17 +195,12 @@ am_gnuplot_x11_OBJECTS =  gplt_x11$U.o
 gnuplot_x11_OBJECTS =  $(am_gnuplot_x11_OBJECTS)
 gnuplot_x11_DEPENDENCIES = 
 gnuplot_x11_LDFLAGS = 
-am_gpltconv_OBJECTS =  gpltconv$U.o
-gpltconv_OBJECTS =  $(am_gpltconv_OBJECTS)
-gpltconv_LDADD = $(LDADD)
-gpltconv_DEPENDENCIES = 
-gpltconv_LDFLAGS = 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CFLAGS = @CFLAGS@
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES =  $(bf_test_SOURCES) $(gnuplot_SOURCES) \
-$(gnuplot_x11_SOURCES) $(gpltconv_SOURCES)
+$(gnuplot_x11_SOURCES)
 DIST_COMMON =  Makefile.am Makefile.in ansi2knr.1 ansi2knr.c
 
 
@@ -215,8 +209,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 GZIP_ENV = --best
 DIST_SUBDIRS =  beos
 DEP_FILES =  .deps/alloc.P .deps/bf_test.P .deps/binary.P .deps/bitmap.P \
-.deps/command.P .deps/contour.P .deps/datafile.P .deps/eval.P \
-.deps/fit.P .deps/gplt_x11.P .deps/gpltconv.P .deps/graph3d.P \
+.deps/command.P .deps/contour.P .deps/datafile.P .deps/dynarray.P \
+.deps/eval.P .deps/fit.P .deps/gplt_x11.P .deps/graph3d.P \
 .deps/graphics.P .deps/help.P .deps/hidden3d.P .deps/internal.P \
 .deps/interpol.P .deps/matrix.P .deps/misc.P .deps/parse.P .deps/plot.P \
 .deps/plot2d.P .deps/plot3d.P .deps/readline.P .deps/save.P \
@@ -224,8 +218,8 @@ DEP_FILES =  .deps/alloc.P .deps/bf_test.P .deps/binary.P .deps/bitmap.P \
 .deps/standard.P .deps/stdfn.P .deps/tables.P .deps/term.P .deps/time.P \
 .deps/unset.P .deps/util.P .deps/util3d.P .deps/variable.P \
 .deps/version.P
-SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(gnuplot_x11_SOURCES) $(gpltconv_SOURCES)
-OBJECTS = $(am_bf_test_OBJECTS) $(am_gnuplot_OBJECTS) $(am_gnuplot_x11_OBJECTS) $(am_gpltconv_OBJECTS)
+SOURCES = $(bf_test_SOURCES) $(gnuplot_SOURCES) $(gnuplot_x11_SOURCES)
+OBJECTS = $(am_bf_test_OBJECTS) $(am_gnuplot_OBJECTS) $(am_gnuplot_x11_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -318,10 +312,6 @@ gnuplot: $(gnuplot_OBJECTS) $(gnuplot_DEPENDENCIES)
 gnuplot_x11: $(gnuplot_x11_OBJECTS) $(gnuplot_x11_DEPENDENCIES)
 	@rm -f gnuplot_x11
 	$(LINK) $(gnuplot_x11_LDFLAGS) $(gnuplot_x11_OBJECTS) $(gnuplot_x11_LDADD) $(LIBS)
-
-gpltconv: $(gpltconv_OBJECTS) $(gpltconv_DEPENDENCIES)
-	@rm -f gpltconv
-	$(LINK) $(gpltconv_LDFLAGS) $(gpltconv_OBJECTS) $(gpltconv_LDADD) $(LIBS)
 .c.o:
 	$(COMPILE) -c $<
 alloc_.c: alloc.c $(ANSI2KNR)
@@ -338,14 +328,14 @@ contour_.c: contour.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/contour.c; then echo $(srcdir)/contour.c; else echo contour.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > contour_.c
 datafile_.c: datafile.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/datafile.c; then echo $(srcdir)/datafile.c; else echo datafile.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > datafile_.c
+dynarray_.c: dynarray.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/dynarray.c; then echo $(srcdir)/dynarray.c; else echo dynarray.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > dynarray_.c
 eval_.c: eval.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/eval.c; then echo $(srcdir)/eval.c; else echo eval.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > eval_.c
 fit_.c: fit.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/fit.c; then echo $(srcdir)/fit.c; else echo fit.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > fit_.c
 gplt_x11_.c: gplt_x11.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gplt_x11.c; then echo $(srcdir)/gplt_x11.c; else echo gplt_x11.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gplt_x11_.c
-gpltconv_.c: gpltconv.c $(ANSI2KNR)
-	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/gpltconv.c; then echo $(srcdir)/gpltconv.c; else echo gpltconv.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > gpltconv_.c
 graph3d_.c: graph3d.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/graph3d.c; then echo $(srcdir)/graph3d.c; else echo graph3d.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > graph3d_.c
 graphics_.c: graphics.c $(ANSI2KNR)
@@ -403,7 +393,7 @@ variable_.c: variable.c $(ANSI2KNR)
 version_.c: version.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/version.c; then echo $(srcdir)/version.c; else echo version.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > version_.c
 alloc_.o bf_test_.o binary_.o bitmap_.o command_.o contour_.o \
-datafile_.o eval_.o fit_.o gplt_x11_.o gpltconv_.o graph3d_.o \
+datafile_.o dynarray_.o eval_.o fit_.o gplt_x11_.o graph3d_.o \
 graphics_.o help_.o hidden3d_.o internal_.o interpol_.o matrix_.o \
 misc_.o parse_.o plot_.o plot2d_.o plot3d_.o readline_.o save_.o \
 scanner_.o set_.o show_.o specfun_.o standard_.o stdfn_.o tables_.o \
