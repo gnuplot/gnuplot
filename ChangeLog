@@ -9,6 +9,10 @@
 	Options are not yet implemented -- this is let as a homework
 	for somebody else.
 
+	* term/x11.trm: Don't crash on X11_ipc overflow when "too many"
+	vertices passed into X11_filled_polygon(). This should be properly 
+	fixed by an X11 programmer according to the hint therein.
+
 2001-09-07 Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/mouse.c: Use %g format instead of %f when placing labels by

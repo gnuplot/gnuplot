@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.35 2001/06/20 19:25:29 broeker Exp $
+ * $Id: x11.trm,v 1.36 2001/06/28 09:58:40 amai Exp $
  *
  */
 
@@ -1004,6 +1004,20 @@ TERM_PUBLIC void X11_set_color(double gray)
 TERM_PUBLIC void X11_filled_polygon(int points, gpiPoint *corners)
 {
     int i;
+    /* FIXME - volunteer? */
+    if (points > 101) {
+	fprintf(stderr,
+	    "YOUR HOMEWORK: CANNOT PASS SO MUCH POLYGON POINTS THROUGH X11_IPC. "
+	    "YOU ARE WELCOME TO PROVIDE A PATCH. THE BEST WOULD BE A "
+	    "BINARY PROTOCOL FOR X11 TERMINAL, SIMILARLY TO THE OS/2
+	    "pm.trm.\n".);
+	/* OTHER HINT: send the polygon data in chunks of X11_buffer_size until
+	   all data are sent; but the PM_filled_polygon() is the best solution
+	   anyway.
+	 */
+	return;
+    }
+    /* END OF FIXME - volunteer? */
     fputc(X11_GR_FILLED_POLYGON, X11_ipc);
     PRINT1("%04d", points);
     for (i = 0; i < points; i++)
