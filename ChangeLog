@@ -1,3 +1,7 @@
+1998-05-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* set.c: Fix axis width in lp_style_type. HBB and Lars Hecking.
+
 1998-05-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* plot3d.c: Fix "title" option for "splot" under parametric mode.
