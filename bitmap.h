@@ -1,4 +1,4 @@
-/* $Id: bitmap.h,v 1.1.1.2.2.1 1999/09/29 13:48:16 lhecking Exp $ */
+/* $Id: bitmap.h,v 1.1.1.2.2.2 1999/11/30 15:07:49 lhecking Exp $ */
 
 /* GNUPLOT - bitmap.h */
 
@@ -32,6 +32,8 @@
  * to the extent permitted by applicable law.
 ]*/
 
+#ifndef GNUPLOT_BITMAP_H
+# define GNUPLOT_BITMAP_H
 
 /* allow up to 16 bit width for character array */
 typedef unsigned int char_row;
@@ -113,3 +115,5 @@ void b_move __PROTO((unsigned int x, unsigned int y));
 void b_vector __PROTO((unsigned int x, unsigned int y));
 void b_put_text __PROTO((unsigned int x, unsigned int y, char *str));
 int b_text_angle __PROTO((int ang));
+
+#endif /* GNUPLOT_BITMAP_H */

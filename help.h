@@ -1,5 +1,5 @@
 /*
- * $Id: help.h,v 1.9 1998/03/22 22:31:45 drd Exp $
+ * $Id: help.h,v 1.1.1.2 1998/04/15 19:22:34 lhecking Exp $
  *
  */
 
@@ -35,6 +35,8 @@
  * to the extent permitted by applicable law.
 ]*/
 
+#ifndef GNUPLOT_HELP_H
+# define GNUPLOT_HELP_H
 
 #include "ansichek.h"
 
@@ -45,3 +47,5 @@
 
 int help __PROTO((char *keyword, char *path, int *subtopics));
 void FreeHelp __PROTO((void));	/* use this if you need memory */
+
+#endif /* GNUPLOT_HELP_H */
