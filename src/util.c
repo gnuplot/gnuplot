@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.46 2004/07/27 09:08:49 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.47 2004/07/29 08:58:03 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -701,7 +701,7 @@ gprintf(
 do {						\
     const char *p;				\
 						\
-    if (!p)					\
+    if (!current_prompt)			\
 	break;					\
     for (p = current_prompt; *p != '\0'; p++)	\
 	(void) fputc(' ', stderr);		\
