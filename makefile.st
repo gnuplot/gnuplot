@@ -122,6 +122,7 @@ plot3d.o:    plot3d.c plot.h setshow.h binary.h help.h
 readline.o:  readline.c
 scanner.o:   scanner.c plot.h
 show.o:      set.c plot.h setshow.h
+		$(CC) -o $@ $(CFLAGS) -DHELPFILE=\"$(HELPFILE)\" $<
 set.o:       show.c plot.h setshow.h
 specfun.o:   plot.h specfun.c
 standard.o:  standard.c plot.h

@@ -130,6 +130,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
+	$(BIN)$(CC) $(CFLAGS) -DHELPFILE="$(HELPFILE)" show.c
 
 specfun.obj: specfun.c
 

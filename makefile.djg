@@ -72,6 +72,9 @@ $(EXENAME).exe : $(OBJS)
 command.o: command.c plot.h setshow.h help.h
 	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" command.c
 
+show.o: show.c plot.h setshow.h
+	$(CC) -c $(CFLAGS) $(INCLUDE) -DHELPFILE=\"$(HELPFILE)\" show.c
+
 term.o: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(CC) -c $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm term.c
 

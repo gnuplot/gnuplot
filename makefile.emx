@@ -135,7 +135,7 @@ set.o: set.c plot.h setshow.h
 	$(CCC)
 
 show.o: show.c plot.h setshow.h
-	$(CCC)
+	$(CCC) -DHELPFILE=\"$(HELPFILE)\"
 
 specfun.o: specfun.c plot.h
 	$(CCC)

@@ -115,6 +115,7 @@ scanner.obj: scanner.c plot.h
 set.obj: set.c plot.h setshow.h
 
 show.obj: show.c plot.h setshow.h
+	$(CC) $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\" show.c
 
 standard.obj: standard.c plot.h
 
