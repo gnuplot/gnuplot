@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.120 2004/08/10 04:21:22 sfeam Exp $
+ * $Id: post.trm,v 1.121 2004/08/13 06:13:20 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -147,7 +147,7 @@ static int  ps_enh_fontsize;
 
 static TBOOLEAN ps_portrait = FALSE;				 /* vertical page */
 static TBOOLEAN ps_color = FALSE;
-static TBOOLEAN ps_level2 = TRUE;		/*  Use level 2 pattern-fill */
+static TBOOLEAN ps_level1 = FALSE;		/*  Limit output to PostScript level 1 */
 static TBOOLEAN ps_blacktext = FALSE;           /*  text always black  */
 static TBOOLEAN ps_solid = FALSE;   		/*  use solid lines */
 static float ps_dash_length = 1.0;   /*  scale factor for dash-dot patterns  */
@@ -550,8 +550,8 @@ static const char GPFAR * GPFAR PS_header[] = {
  * /languagelevel where
  *   {pop languagelevel} {1} ifelse
  *   2 lt
- *      {/PSLevel2 false def}
- *      {/PSLevel2 true def}
+ *      {/PSLevel1 true def}
+ *      {/PSLevel1 false def}
  *   ifelse
  */
 #ifdef EAM_PSLEVEL2
@@ -643,7 +643,7 @@ static const char GPFAR * GPFAR PS_header[] = {
 "} def\n",
 
 "%\n% Now test for support of Level 2 code\n%\n",
-"Level2 {Level2PatternFill} {Level1PatternFill} ifelse\n%\n",
+"Level1 {Level1PatternFill} {Level2PatternFill} ifelse\n%\n",
 
 #endif /* EAM_PSLEVEL2 */
 
@@ -788,7 +788,7 @@ enum PS_id {
 #ifdef PM3D
     PS_PALFUNCPARAM,
 #endif /* PM3D */
-    PS_AI,
+    PS_LEVEL1,
     PS_OTHER
 };
 
@@ -821,7 +821,7 @@ static struct gen_table PS_opts[] =
 #ifdef PM3D
     { "palf$uncparam", PS_PALFUNCPARAM },
 #endif /* PM3D */
-    { "ai", PS_AI },
+    { "level1", PS_LEVEL1 },
     { NULL, PS_OTHER }
 };
 
@@ -831,7 +831,7 @@ PS_options()
 {
     struct value a;
     char *ps_fontfile_char = NULL;
-    ps_level2 = TRUE;
+    ps_level1 = FALSE;
 
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&PS_opts[0],c_token)) {
@@ -845,8 +845,8 @@ PS_options()
 	    ps_eps = FALSE;
 	    c_token++;
 	    break;
-	case PS_AI:
-	    ps_level2 = FALSE;
+	case PS_LEVEL1:
+	    ps_level1 = TRUE;
 	    c_token++;
 	    break;
 	case PS_EPSF:
@@ -856,7 +856,7 @@ PS_options()
 	    break;
 	case PS_DEFAULT:
 	    ps_portrait = FALSE;
-	    ps_level2 = TRUE;
+	    ps_level1 = FALSE;
 	    ps_eps = FALSE;
 	    ps_color = FALSE;
 	    ps_blacktext = FALSE;
@@ -1110,7 +1110,7 @@ PS_options()
 #endif /* PM3D */
 	                 "   %s \"%s\" %d%s ",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
-	    ps_level2 ? "" : "ai",
+	    ps_level1 ? "level1" : "",
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
 	    ps_blacktext ? "blacktext" : "colortext",
@@ -1379,7 +1379,7 @@ PS_common_init(
 /Blacktext %s def\n\
 /Solid %s def\n\
 /Landscape %s def\n\
-/Level2 %s def\n\
+/Level1 %s def\n\
 /gnulinewidth %.3f def\n\
 /userlinewidth gnulinewidth def\n\
 /vshift %d def\n\
@@ -1790,7 +1790,7 @@ NULL };
 	    ps_blacktext ? "true" : "false",
 	    ps_solid ? "true" : "false",
 	    ps_portrait ? "false" : "true",
-	    ps_level2 ? "true" : "false",
+	    ps_level1 ? "true" : "false",
 	    PS_LW*ps_linewidth_factor,	/* line width */
 	    (int)(t->v_char)/(-3),	/* shift for vertical centring */
 	    PS_SC*ps_dash_length,	/* dash length */
@@ -2974,10 +2974,10 @@ START_HELP(post)
 "",
 " By default the generated PostScript code uses language features that were",
 " introduced in PostScript Level 2, notably pattern-fill of irregular objects",
-" such as filledcurves.  However, not all PostScript viewers support these",
-" features. In particular, older version of Adobe Illustrator may require",
-" the `ai` flag to be set. This flag can be toggled later by editing a single",
-" line in the PostScript output file.",
+" such as filledcurves.  The `level1` option substitutes PostScript Level 1",
+" approximations of these features. This may be required by some old printers",
+" and by some old versions of Adobe Illustrator. This flag can be toggled",
+" later by editing a single line in the PostScript output file.",
 "",
 " `rounded` sets line caps and line joins to be rounded; `butt` is the",
 " default, butt caps and mitered joins;",
