@@ -1342,7 +1342,7 @@ double fontsize, base;
 						while (*++p == ' ');
 					}
 					localfontname = p;
-					while ((ch = *p) > ' ' && ch != '=')
+					while ((ch = *p) > ' ' && ch != '=' && ch != '*')
 						++p;
 					save = *(savepos=p);
 					if (ch == '=')
@@ -1355,6 +1355,22 @@ double fontsize, base;
 						
 						if (f)
 							f *= PS_SC;  /* remember the scaling */
+						else
+							f = fontsize;
+						
+						ENHPS_DEBUG(("Font size %.1f\n", f))
+						/*}}}*/
+					}
+					else if (ch == '*')
+					{
+						*p++ = '\0';				
+						/*{{{  get optional font size scale factor*/
+						ENHPS_DEBUG(("Calling strtod(\"%s\") ...", p))
+						f = (float)strtod(p, &p);
+						ENHPS_DEBUG(("Returned %.1f and \"%s\"\n", f, p))
+						
+						if (f)
+							f *= fontsize;  /* apply the scale factor */
 						else
 							f = fontsize;
 						
@@ -1738,9 +1754,10 @@ START_HELP(post)
 "",
 " Braces can be used to place multiple-character text where a single character",
 " is expected (e.g., 2^{10}).  To change the font and/or size, use the full",
-" form:  {/[fontname][=fontsize] text}   (For example, {/Symbol=20 G} is a ",
-" 20 point GAMMA).  (The '/' character MUST be the first character after the",
-" '{'.)",
+" form:  {/[fontname][=fontsize | *fontscale] text}.  Thus {/Symbol=20 G} is a",
+" 20-point GAMMA) and {/*0.75 K} is a K at three-quarters of whatever fontsize"
+" is currently in effect.  (The '/' character MUST be the first character after",
+" the '{'.)",
 "",
 " If the encoding vector has been changed by `set encoding`, the default",
 " encoding vector can be used instead by following the slash with a dash.  This",
