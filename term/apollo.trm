@@ -19,6 +19,10 @@
     4 October 1989	file created for gnuplot 1.1
     26 March 1990	updated for gnuplot 2.0
     30 October 1991	fixed minor problem in apollo_tic_sizes
+
+    As of 13 January 1999, this file has been placed in the
+    public domain by Ray Lischner.
+
 */
 
 /*
