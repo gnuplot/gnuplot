@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.11.2.8 1999/11/30 15:08:44 lhecking Exp $
+ * $Id: png.trm,v 1.11.2.9 1999/12/01 19:19:09 lhecking Exp $
  *
  */
 
@@ -159,6 +159,12 @@ PNG_options()
 
             if (n_colors >= WEB_N_COLORS) {
                 int_warn("too many colors, ingoring", c_token);
+		/* Magic number abuse guards against
+		 * "> WEB_N_COLORS warning" scroll fests. */
+		if (!END_OF_COMMAND) {
+		    while (!END_OF_COMMAND)
+			++c_token; --c_token;
+		}
             } else {
                 web_color_rgbs[n_colors].r = rgb_color[0];
                 web_color_rgbs[n_colors].g = rgb_color[1];
