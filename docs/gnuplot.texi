@@ -343,7 +343,7 @@ plot), putting a title on it and a box around it, and more.  See @ref{key}.
 
 7. Multiplots on a single logical page with @ref{multiplot}.
 
-8. `Enhanced postscript` driver with super/subscripts and font changes.
+8. @ref{postscript} driver with super/subscripts and font changes.
 (This was a separate driver (`enhpost`) that was available as a patch for
 3.5.)
 
@@ -714,6 +714,10 @@ a list of directories separated by a platform-specific path separator,
 eg. ':' on Unix, or ';' on DOS/Windows/OS/2/Amiga platforms. The contents
 of GNUPLOT_LIB are appended to the @ref{loadpath} variable, but not saved
 with the @ref{save} and `save set` commands.
+
+Several gnuplot terminal drivers access TrueType fonts via the gd library.
+For these drivers the font search path is controlled by the environmental
+variable GDFONTPATH.
 
 @node Expressions, Glossary, Environment, gnuplot
 @section Expressions
@@ -1619,7 +1623,7 @@ that begin "FIT_".  It is safest to avoid using such names.  "FIT_LIMIT",
 however, is one that you may wish to redefine. See the documentation
 on `fit` for details.
 
-See @ref{functions}, @ref{variables}, and `fit`.
+See `show functions`, @ref{variables}, and `fit`.
 
 
 @node Glossary, Plotting, Expressions, gnuplot
@@ -1815,7 +1819,7 @@ the @ref{using} filter of the `plot`, @ref{replot}, `splot` and `fit` commands.
 Semicolons are used to separate commands given on a single command line.
 
 Braces are used in text to be specially processed by some terminals, like
-`postscript`.  They are also used to denote complex numbers: @{3,2@} = 3 + 2i.
+@ref{postscript}.  They are also used to denote complex numbers: @{3,2@} = 3 + 2i.
 
 Text may be enclosed in single- or double-quotes.  Backslash processing of
 sequences like \n (newline) and \345 (octal character code) is performed for
@@ -1848,7 +1852,7 @@ Filenames may be entered with either single- or double-quotes.  In this
 manual the command examples generally single-quote filenames and double-quote
 other string tokens for clarity.
 
-At present you should not embed \n inside @{@} when using the `enhanced postscript`
+At present you should not embed \n inside @{@} when using the @ref{postscript}
 terminal.
 
 The EEPIC, Imagen, Uniplex, LaTeX, and TPIC drivers allow a newline to be
@@ -1933,7 +1937,7 @@ versions may not be complete.  Indeed, on some systems there may be no
 commands at all listed under this heading.
 
 Note that in most cases unambiguous abbreviations for command names and their
-options are permissible, i.e., "`p f(x) w l`" instead of "`plot f(x) with
+options are permissible, i.e., "`p f(x) w li`" instead of "`plot f(x) with
 lines`".
 
 In the syntax descriptions, braces (@{@}) denote optional arguments and a
@@ -2298,7 +2302,7 @@ which is also solved along with more general NLLS problems by the iterative
 procedure that `gnuplot` uses.  `fit` attempts to find the minimum by doing
 a search.  Each step (iteration) calculates WSSR with a new set of parameter
 values.  The Marquardt-Levenberg algorithm selects the parameter values for
-the next iteration.  The process continues until a preset criterium is met,
+the next iteration.  The process continues until a preset criterion is met,
 either (1) the fit has "converged" (the relative change in WSSR is less than
 FIT_LIMIT), or (2) it reaches a preset iteration count limit, FIT_MAXITER
 (see @ref{variables}).  The fit may also be interrupted
@@ -2761,7 +2765,7 @@ Syntax:
 
 <condition> will be evaluated.  If it is true (non-zero), then the command(s)
 of the <command-line> will be executed.  If <condition> is false (zero), then
-the entire <command-line> is ignored until the next occurence of `else`.
+the entire <command-line> is ignored until the next occurrence of `else`.
 Note that use of `;` to allow multiple commands on the same line will
 _not_ end the conditionalized commands.
 
@@ -3578,7 +3582,7 @@ the first element on a line is a time with an embedded space, the y value
 should be specified as column three.
 
 It should be noted that `plot 'file'`, `plot 'file' using 1:2`, and `plot
-'file' using ($1):($2)` can be subtly different: 1) if `file` has some lines
+'file' using ($1):($2)` can be subtly different: 1) if @ref{file} has some lines
 with one column and some with two, the first will invent x values when they
 are missing, the second will quietly ignore the lines with one column, and
 the third will store an undefined value for lines with one point (so that in
@@ -3961,7 +3965,7 @@ point type, up to the maximum number of available types.  All terminal
 drivers support at least six different point types, and re-use them, in
 order, if more are required.  The LaTeX driver supplies an additional six
 point types (all variants of a circle), and thus will only repeat after 12
-curves are plotted with points.  The PostScript drivers (`postscript`)
+curves are plotted with points.  The PostScript drivers (@ref{postscript})
 supplies a total of 64.
 
 If you wish to choose the line or point type for a single plot, <line_type>
@@ -3984,7 +3988,7 @@ the index of the desired style.
 
 If gnuplot was built with @ref{pm3d} support, the special keyword @ref{palette} is
 allowed for smooth color change of lines, points and dots in splots. The
-color is choosen from a smooth palette which was set previously with the
+color is chosen from a smooth palette which was set previously with the
 command @ref{palette}. The color value corresponds to the z-value of the
 point coordinates or to the color coordinate if specified by the 4th parameter
 in @ref{using}. The 2d `plot` command ignores this option.
@@ -4267,7 +4271,7 @@ Syntax:
 
 @end example
 
-where <option> is @ref{functions}, @ref{variables}, @ref{terminal} or `set`. If
+where <option> is `functions`, @ref{variables}, @ref{terminal} or `set`. If
 no option is used, `gnuplot` saves functions, variables, `set`
 options and the last `plot` (`splot`) command.
 
@@ -4821,7 +4825,9 @@ See also
 @opindex bars
 
 
-The @ref{bars} command controls the tics at the ends of error bars.
+The @ref{bars} command controls the tics at the ends of error bars,
+and also the width of the boxes in plot styles candlestick and 
+financebars.
 
 Syntax:
 @example
@@ -5048,11 +5054,11 @@ The `set style filling` command is used to set the fillstyle of boxes in the
 
 Syntax: 
 @example
-      set style filling @{empty | solid @{<density>@} | pattern @{<number>@}@}
+      set style filling @{empty | @{b@}solid @{<density>@} | @{b@}pattern @{<number>@}@}
 
 @end example
 
-The defaule fillstyle is `solid 1.0`.
+The default fillstyle is `solid 1.0`.
 
 The `solid` option causes filling with a solid color, if the terminal 
 supports that. The <density> parameter specifies the intensity
@@ -5063,10 +5069,16 @@ color of the box border continuously, or by dithering, depending on
 the terminal driver. If no <density> parameter is given, a default of
 1.0 is used, automatically.
 
+The `bsolid` option is identical to `solid` except that the box border is
+drawn in black.
+
 The `pattern` option causes filling to be done with a fill pattern supplied
 by the terminal driver. <pattern> is the pattern number, starting at 0. 
 The kind and number of available fill patterns depend on the terminal driver. 
 If no <pattern> number is given, a default of 0 is assumed.
+
+The `bpattern` option is identical to `pattern` except that the box border is
+drawn in black.
 
 The `empty` option causes filled boxes not to be filled, after all. This
 makes the @ref{filledboxes} style equivalent to simple @ref{boxes}. It is equivalent
@@ -5590,7 +5602,7 @@ Syntax:
 
 Note that encoding is not supported by all terminal drivers and that
 the device must be able to produce the desired non-standard characters.
-PostScript terminal is supporting all of the encodings. OS/2 Presentation
+The PostScript and X11 terminals support all encodings. OS/2 Presentation
 Manager switches automatically to codepage 912 for `iso_8859_2`.
 
 @node format, function_style, encoding, set-show
@@ -5815,7 +5827,7 @@ style.
 
 @c ?commands show functions
 @c ?show functions
-The @ref{functions} command lists all user-defined functions and their
+The `show functions` command lists all user-defined functions and their
 definitions.
 
 Syntax:
@@ -6173,7 +6185,7 @@ distinction between text in single- or double-quotes.  The key title uses the
 same justification as do the plot titles.
 
 An explicitly given title is typeset using enhanced text properties on
-terminals supporting this, see `enhanced postscript` for more details.
+terminals supporting this, see @ref{postscript} for more details.
 This default behavior can be switched off by the `noenhanced` option.
 
 The defaults for @ref{key} are `right`, `top`, `Right`, `noreverse`, `samplen
@@ -6299,7 +6311,7 @@ appropriate tag, and specify the parts of the label to be changed.
 The <label text> can optionally contain numbers, generated by
 replacement of printf()-like format specifiers contained in <label
 text>.  The number to be used is given by the <value> following the
-text.  The same formatting capilities as for tic labels are
+text.  The same formatting capabilities as for tic labels are
 available.  See the help on `format specifiers` for details. To
 display more than one distinct <value> with a single label, several
 pairs of <label text> and <value> may be given. Note that <value> is
@@ -6321,8 +6333,8 @@ try to write the text at the specified angle; non-conforming terminals will
 treat this as vertical text.
 
 Font and its size can be chosen explicitly by `font "<name>@{,<size>@}"` if the
-terminal supports font settings.  Otherwise default font of the terminal will
-be used.
+terminal supports font settings.  Otherwise the default font of the terminal 
+will be used.
 
 If `front` is given, the label is written on top of the graphed data. If
 `back` is given (the default), the label is written underneath the graphed
@@ -6331,13 +6343,16 @@ data.  Using `front` will prevent a label from being obscured by dense data.
 `Textcolor <colorspec>` changes the color of the label text. `<colorspec>` is
 either a linetype or a mapping onto the pm3d color palette (available only in
 `splot`), see @ref{palette}.
-`textcolor` may be abbreviated `tc`.
-`tc default` resets the text color to its default state.
-`tc lt <n>` sets the text color to that of line type <n>.
-`tc palette z` selects a palette color corresponding to the label z position.
-`tc palette cb <val>` selects a color corresponding to <val> on the colorbar axis.
-`tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
-the mapping [0:1] to grays/colors of the @ref{palette}.
+@example
+   `textcolor` may be abbreviated `tc`.
+   `tc default` resets the text color to its default state.
+   `tc lt <n>` sets the text color to that of line type <n>.
+   `tc palette z` selects a palette color corresponding to the label z position.
+   `tc palette cb <val>` selects a color corresponding to <val> on the colorbar.
+   `tc palette fraction <val>`, with 0<=val<=1, selects a color corresponding to
+       the mapping [0:1] to grays/colors of the @ref{palette}.
+
+@end example
 
 If a <pointstyle> is given, using keywords `lw`, `pt` and `ps`, see @ref{style}, 
 a point with the given style and color of the given line type is plotted at
@@ -6487,7 +6502,7 @@ but not by other commands that allow the default index to be used, such as
 
 If gnuplot was built with pm3d support, the special keyword @ref{palette} is
 allowed as `linetype` for splots (the 2d `plot` command ignores @ref{palette}).
-In this case the line color is choosen from a smooth palette which was
+In this case the line color is chosen from a smooth palette which was
 set previously with the command @ref{palette}.  The color value corresponds
 to the z-value (elevation) of the splot.
 
@@ -6847,11 +6862,11 @@ ticslevel.
 
 Mousing is not available in multiplot mode. If multiplot is disabled using
 @ref{multiplot} though,  the mouse will be turned on again and acts on the
-last plot (like replot do).
+last plot (like replot does).
 
 X11 specific implementation details: Mouse support is turned on by default if
-standard input comes from a terminal (tty). Mouse support is turned off, if
-standard input does not come from a tty e.g. a pipe. If you want to use mouse
+standard input comes from a terminal (tty). Mouse support is turned off if
+standard input does not come from a tty, e.g. a pipe. If you want to use mouse
 support while writing to gnuplot from a pipe, the mouse must be turned on
 *before* starting the x11 driver, e.g. immediately after startup with the
 explicit command @ref{mouse}. Beware: on some UNIX flavours, special input
@@ -6872,7 +6887,7 @@ Syntax:
 
 @end example
 
-The doubleclick resolution is given in miliseconds and used for Button 1
+The doubleclick resolution is given in milliseconds and used for Button 1
 which copies the current mouse position to the `clipboard`. If you want that
 to be done by single clicking a value of 0 ms can be used. The default value
 is 300 ms.
@@ -6911,7 +6926,7 @@ format string was specified already):
 
 Choose the option `labels` to get real gnuplot labels on Button 2. (The
 default is `nolabels` which makes Button 2 drawing only temporary annotations
-at the mouse positions). The labes are drawn with the current setting of
+at the mouse positions). The labels are drawn with the current setting of
 `mouseformat`. `labeloptions` controls which options are passed to the 
 @ref{label} command. The default is "pointstyle 1" which will plot a small
 plus at the label position.  Note that the pointsize is taken from the 
@@ -7500,12 +7515,12 @@ equivalent to these user commands:
 Notice that *now* the ylabel is rotated by an internal 'set pm3d map' switch,
 as far as no user option is available to rotate x,y,z labels explicitly.
 Furthermore, the graph area is smaller than that of 2D graphs (some more
-white space than I would expect like). Thus could be solved if someone (why
+white space than I would like). Thus could be solved if someone (why
 not you?!) likes to implement a 2d layout for 3d maps, e.g. 'set view map').
 Please use @ref{pm3d} to correctly get rid of the pm3d setup, notably the
 reversed y axis and rotated ylabel.
 
-The coloring setup as well as the color box drawing are determinated by
+The coloring setup as well as the color box drawing are determined by
 @ref{palette}.  There can be only one palette for the current plot.  Drawing
 of several surfaces with different palettes can be achieved by @ref{multiplot}
 with fixed @ref{origin} and @ref{size}.
@@ -7565,7 +7580,7 @@ polygons, color histograms, color gradient background, and whatever it is
 or it will be implemented...  Here it stands for a palette of smooth
 "continuous" colors or grays, but let's call it just a palette.
 
-Color palettes, or requires terminal entries for filled color polygons and
+Color palettes require terminal entries for filled color polygons and
 palettes of smooth colors, are currently available for terminals listed in
 @ref{pm3d}. The range of color values are adjustable independently by 
 @ref{cbrange} and `set log cb`. The whole color palette is 
@@ -7576,20 +7591,31 @@ Syntax:
       set palette
       set palette @{
                  @{ gray | color @}
-                 @{ rgbformulae <r>,<g>,<b> @}
+                 @{   rgbformulae <r>,<g>,<b>  
+                   | defined @{ ( <gray1> <color1> @{, <grayN> <colorN>@}... ) @}
+                   | file '<filename>' @{datafile-modifiers@}
+                   | functions <R>,<G>,<B>
+                 @}
+                 @{ model @{ RGB | HSV | CMY | YIQ | XYZ @} 
                  @{ positive | negative @}
                  @{ nops_allcF | ps_allcF @}
                  @{ maxcolors <maxcolors> @}
+                 @{ gamma <gamma> @}
                @}
       show palette
       show palette palette <n>
+      show palette gradient
+      show palette rgbformulae
+      show palette colornames
 
 @end example
 
 @ref{palette} (i.e. without options) sets up the default values.
 Otherwise, the options can be given in any order. @ref{palette} shows the
 current palette properties. `show palette palette <n>` shows RGB triplets for
-the current settings and a palette having <n> discrete colors.
+the current settings and a palette having <n> discrete colors.  `show palette
+gradient` displays the gradient defining the palette (if apropriate).  @ref{rgbformulae} prints the available fixed gray --> color transformation
+formulaes.  `show palette colornames` prints the implemented color names.
 
 The following options determine the coloring properties.
 
@@ -7597,15 +7623,80 @@ Figure using this palette can be `gray` or `color`.  For instance, in @ref{pm3d}
 the gray is obtained by mapping the averaged z coordinate of the 4 corners of
 the quadrangle into the range [min_z,max_z] providing range of grays [0:1].
 This value can be used directly as the gray for gray maps.  The color map
-requires a transformation gray->(R,G,B), i.e.  a mapping
-[0:1]->([0:1],[0:1],[0:1]).  Therefore three suitable mapping functions have 
-to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
-mapping functions are listed by @ref{palette}.  Default is `7,5,15`, some 
-other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative numbers, like
-`3,-11,-6`, mean inverted color (i.e.  1-gray passed into the formula, see 
-also `positive` and `negative` options below).
+requires a transformation gray --> (R,G,B), i.e. a mapping
+[0:1] --> ([0:1],[0:1],[0:1]).  
 
-Some nice schemes:
+Basically two different types of mappings can be used:  Analytic formulae
+to convert gray to color, or discrete mapping tables which are interpolated.
+@ref{rgbformulae} and `functions` use analytic formulae whereas @ref{defined} and
+@ref{file} use interpolated tables.  @ref{rgbformulae} reduces the size of postscript
+output to a minimum.
+
+`set palette gray` switches to a gray only palette.  @ref{rgbformulae}, @ref{defined},
+@ref{file} and `functions` switch to a color mapping.  `set palette color` is an 
+easy way to switch back from the gray palette to the last color mapping.
+
+Most terminals support only discrete number of colors (e.g. 256 colors in 
+gif).  All entries of the palette remaining after the default gnuplot linetype
+colors declaration are allocated for pm3d by default.  Then @ref{multiplot} could
+fail if there are no more color positions in the terminal available.  Then you
+should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
+This option can also be used to separate levels of z=constant in discrete
+steps, thus to emulate filled contours. Default value of 0 stays for
+allocating all remaining entries in the terminal palette or for to use exact
+mapping to RGB.
+
+Automatic gamma correction via `set palette gamma <gamma>` can be done for
+gray maps only (`set palette gray`).  Gamma is ignored for color mappings.
+
+RGB color space might not be the most useful color space to work in.  For 
+that reason you may change the color space with `model` to one of `RGB`, 
+`HSV`, `CMY`, `YIQ` and `XYZ`.  Using color names for @ref{defined} tables and a
+color space other than RGB will result in funny colors.  All explanation have
+been written for RGB color space, so please note, that `R` can be `H`, `C`, 
+`Y`, or `X`, depending on the actual color space (`G` and `B` accordingly). 
+
+All values for all color spaces are limited to [0,1]!
+
+RGB stands for Red, Green and Blue;  CMY stands for Cyan, Magenta and Yellow;
+HSV stands for Hue, Saturation, and Value;  YIQ is the color model used by 
+the U.S. Commercial Color Television Broadcasting, it is basically an RGB
+recoding with downward compatibility for black and white television;
+XYZ are the three primary colors of the color model defined by the 'Commission
+Internationale de l'Eclairage' (CIE).
+For more information on color models see:
+@uref{http://www.cs.rit.edu/~ncs/color/glossary.htm,http://www.cs.rit.edu/~ncs/color/glossary.htm
+}
+and
+@uref{http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html,http://cs.fit.edu/wds/classes/cse5255/cse5255/davis/index.html
+}
+
+
+@menu
+* rgbformulae::                 
+* defined::                     
+* functions_::                  
+* file::                        
+* gamma-correction::            
+* postscript::                  
+@end menu
+
+@node rgbformulae, defined, palette, palette
+@subsubsection rgbformulae
+
+@c ?commands set palette rgbformulae
+@c ?set palette rgbformulae
+@c ?palette rgbformulae
+@cindex rgbformulae
+
+For @ref{rgbformulae} three suitable mapping functions have 
+to be chosen.  This is done via `rgbformulae <r>,<g>,<b>`.  The available 
+mapping functions are listed by @ref{rgbformulae}.  Default is 
+`7,5,15`, some other examples are `3,11,6`, `21,23,3` or `3,23,21`.  Negative
+numbers, like `3,-11,-6`, mean inverted color (i.e.  1-gray passed into the
+formula, see also `positive` and `negative` options below).
+
+Some nice schemes in RGB color space
 @example
    7,5,15   ... traditional pm3d (black-blue-red-yellow)
    3,11,6   ... green-red-violet
@@ -7617,12 +7708,245 @@ Some nice schemes:
 
 @end example
 
+A full color palette in HSV color space
+@example
+   3,2,2    ... red-yellow-green-cyan-blue-magenta-red
+
+@end example
+
+Please note that even if called @ref{rgbformulae} the formulaes might actually
+determine the <H>,<S>,<V> or <X>,<Y>,<Z> or ... color components as usual.
+
 Use `positive` and `negative` to invert the figure colors.
 ^ <a name="positive"></a>
 ^ <a name="negative"></a>
 
+
+@node defined, functions_, rgbformulae, palette
+@subsubsection defined
+
+@c ?commands set palette defined
+@c ?set palette defined
+@c ?palette defined
+@cindex defined
+
+Gray-to-rgb mapping can be manualy set by use of @ref{defined}:  A color gradient
+is defined and used to give the rgb values.  Such a  gradient is a piecewise
+linear mapping from gray values in [0,1] to the RGB space [0,1]x[0,1]x[0,1].
+You have to specify the gray values and the corresponding RGB values in 
+between a linear interpolation shall take place:
+
+Syntax:
+@example
+      set palette  defined @{ ( <gray1> <color1> @{, <grayN> <colorN>@}... ) @}
+
+@end example
+
+<grayX> are gray values which are mapped to [0,1] and <colorX> are the 
+corresponding rgb colors.  The color can be specified in three different 
+ways:  
+
+@example
+     <color> :=  @{ <r> <g> <b> | '<color-name>' | '#rrggbb' @}
+
+@end example
+
+Either by three numbers (each in [0,1]) for red, green and blue, separated by
+whitespace, or the name of the color in quotes or X style color specifiers
+also in quotes.  You may freely mix the three types in a gradient definition,
+but the named color "red" will be something strange if RGB is not selected
+as color space.  Use `show palette colornames` for a list of known color 
+names.
+
+Please note, that even if written as <r>, this might actually be the
+<H> component in HSV color space or <X> in CIE-XYZ space, or ...
+depending on the selected color model.
+
+The <gray> values have to form an ascending sequence of real numbers; the
+sequence will be automatically rescaled to [0,1].
+
+@ref{defined} (without a gradient definition in braces) switches to 
+RGB color space and uses a preset full-spectrum color gradient.
+Use `show palette gradient` to display the gradient.
+
+Examples:
+
+To produce a gray palette (useless but instructive) use:
+@example
+     set palette model RGB 
+     set pallette defined ( 0 "black", 1 "white" )
+
+@end example
+
+To produce a blue yellow red palette use (all equivalent):
+@example
+      set palette defined ( 0 "blue", 1 "yellow", 2 "red" )
+      set palette defined ( 0 0 0 1, 1 1 1 0, 2 1 0 0 )
+      set palette defined ( 0 "#0000ff", 1 "#ffff00", 2 "ff0000" )
+
+@end example
+
+To produce some rainbow-like palette use:
+@example
+      set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )
+
+@end example
+
+Full color spectrum within HSV color space:
+@example
+      set palette model HSV
+      set palette defined ( 0 0 1 1, 1 1 1 1 )
+      set palette defined ( 0 0 1 0, 1 0 1 1, 6 0.8333 1 1, 7 0.8333 0 1)
+
+@end example
+
+To produce a palette with few colors only use:
+@example
+      set palette model RGB maxcolors 4
+      set palette defined ( 0 "blue", 1 "green", 2 "yellow", 3 "red" ) 
+
+@end example
+
+'Traffic light' palette (non-smooth color jumps at gray = 1/3 and 2/3).
+@example
+      set palette model RGB
+      set palette defined (0 "dark-green", 1 "green", 1 "yellow", \
+                           2 "dark-yellow", 2 "red", 3 "dark-red" ) 
+
+@end example
+
+
+@node functions_, file, defined, palette
+@subsubsection functions
+
+@c ?commands set palette functions
+@c ?set palette functions
+@c ?palette functions
+@cindex functions
+@opindex functions
+
+
+Use `set palette functions <Rexpr>, <Gexpr>, <Bexpr>` to define three formulae
+for the R(gray), G(gray) and B(gray) mapping.  The three formulae may depend
+on the variable `gray` which will take values in [0,1] and should also 
+produce values in [0,1].
+Please note that <Rexpr> might be a formula for the H-value if HSV color
+space has been choosen (same for all other formulae and color spaces).
+
+Examples:
+
+To produce a full color palette use:
+@example
+      set palette model HSV functions gray, 1, 1 
+
+@end example
+
+A nice black to gold palette:
+@example
+      set palette model XYZ functions gray**0.35, gray**0.5, gray**0.8
+
+@end example
+
+A gamma-corrected black and white palette
+@example
+      gamma = 2.2
+      color(gray) = gray**(1./gamma)
+      set palette model RGB functions color(gray), color(gray), color(gray) 
+
+@end example
+
+
+@node file, gamma-correction, functions_, palette
+@subsubsection file
+
+@c ?commands set palette file
+@c ?set palette file
+@c ?palette file
+@cindex file
+
+@ref{file} is basically a `set palette defined (<gradient>)` where
+<gradient> is read from a datafile.  Either 4 columns (gray,R,G,B) or
+just three columns (R,G,B) have to be selected via the @ref{using} data file
+modifier.  In the three column case, the line number will be used as gray.
+The gray range is automatically rescaled to [0,1].  The file is read as a 
+normal data file, so all datafile modifiers can be used.
+Please note, that `R` might actually be e.g. `H` if HSV color space is 
+selected.
+
+As usual <filename> may be `'-'` which means that the data follow the command
+inline and are terminated by a single `e` on a line of its own. 
+
+Use `show palette gradient` to display the gradient.
+
+Examples:
+
+Read in a palette of RGB triples each in range [0,255]:
+@example
+      set palette file 'some-palette' using ($1/255):($2/255):($3/255)
+
+@end example
+
+Equidistant rainbow (blue-green-yellow-red) palette:
+@example
+      set palette model RGB file "-" 
+      0 0 1
+      0 1 0
+      1 1 0
+      1 0 0
+      e
+
+@end example
+
+
+@node gamma-correction, postscript, file, palette
+@subsubsection gamma-correction
+
+@c ?commands set palette gamma-correction
+@c ?set palette gamma-correction
+@c ?palette gamma-correction
+@cindex gamma-correction
+
+For gray mappings gamma correction can be turned on by `set palette gamma
+<gamma>`.  <gamma> defaults to 1.5 which is quite suitable for most 
+terminals.
+
+For color mappings no automatic gamma correction is done by gnuplot.  But 
+you may easily implement gamma correction, here an example for a gray scale
+image by use of explicit functions for the red, green and blue component
+with slightly different values of gamma
+
+Example:
+@example
+      set palette model RGB
+      set palette functions gray**0.64, gray**0.67, gray**0.70
+ 
+@end example
+
+To use gamma correction with interpolated gradients specify intermediate
+gray values with apropriate colors.  Instead of
+
+@example
+      set palette defined ( 0 0 0 0, 1 1 1 1 )
+
+@end example
+
+use e.g.
+
+@example
+     set palette defined ( 0 0 0 0, 0.5 .73 .73 .73, 1 1 1 1 )
+
+@end example
+
+or even more intermediate points until the linear interpolation fits the
+"gamma corrected" interpolation well enough.
+
+
+@node postscript,  , gamma-correction, palette
+@subsubsection postscript
+
+@c ?palette postscript
 In order to reduce the size of postscript files, the gray value and not all
-three calculated r,g,b values is written in the file.  Therefore the 
+three calculated r,g,b values are written to the file.  Therefore the 
 analytical formulae are coded directly in the postscript language as a header
 just before the pm3d drawing, see /g and /cF definitions.  Usually, it makes
 sense to write therein definitions of only the 3 formulae used.  But for
@@ -7653,15 +7977,8 @@ by the enclosed awk script `pm3dConvertToImage.awk`.  Usage:
 
 @end example
 
-Most terminals support only discrete number of colors (e.g. 256 colors in 
-gif).  All entries of the palette remaining after the default gnuplot linetype
-colors declaration are allocated for pm3d by default.  Then @ref{multiplot} could
-fail if there are no more color positions in the terminal available.  Then you
-should use `set palette maxcolors <maxcolors>` with a reasonably small value. 
-This option can also be used to separate levels of z=constant in discrete
-steps, thus to emulate filled contours. Default value of 0 stays for
-allocating all remaining entries in the terminal palette or for to use exact
-mapping to RGB.
+You may manually change the postscript output from gray to color and vice
+versa and change the definition of <maxcolors>.
 
 
 @node color_box, pointsize, palette, set-show
@@ -8290,7 +8607,7 @@ box-and-whisker plot requires additional plot commands as in this example:
 @end example
 
 @example
- See also @ref{bars} and `set style filling`.
+ See @ref{bars} and `set style filling`.
 
 @end example
 
@@ -8596,7 +8913,7 @@ Syntax:
 
 @end example
 
-The surface is drawn with the style specifed by @ref{with}, or else the
+The surface is drawn with the style specified by @ref{with}, or else the
 appropriate style, data or function.
 
 Whenever @ref{surface} is issued, `splot` will not draw points or lines
@@ -8639,7 +8956,7 @@ give @ref{terminal} first, because some terminals set a flag which is needed
 in some operating systems.
 
 Several terminals have additional options.  For example, see `dumb`,
-`iris4d`, `hpljii` or `postscript`.
+`iris4d`, `hpljii` or @ref{postscript}.
 The options used by a previous invocation `set term <term> <options>` of a
 given `<term>` are remembered, thus subsequent `set term <term>` does
 not reset them.  This helps in printing, for instance, when switching
@@ -8692,7 +9009,7 @@ to you, depending on its output format.
 * mif::                         
 * pbm::                         
 * png_(OLD)::                   
-* postscript::                  
+* postscript_::                 
 * pslatex_and_pstex::           
 * pstricks::                    
 * qms::                         
@@ -9934,7 +10251,7 @@ nopspoints, or the same set of point types found in the postscript terminal
 by specifying pspoints.
 
 Note that built-in support of some of these options is printer device
-dependendent. For instance, all the fonts are supposedly supported by the HP
+dependent. For instance, all the fonts are supposedly supported by the HP
 Laserjet IV, but only a few (e.g. univers, stick) may be supported by the HP
 Laserjet III and the Designjet 750C. Also, color obviously won't work on the
 the laserjets since they are monochrome devices.
@@ -10589,7 +10906,7 @@ Examples:
 
 @end example
 
-@node png_(OLD), postscript, pbm, terminal
+@node png_(OLD), postscript_, pbm, terminal
 @subsubsection png (OLD)
 
 @c ?commands set terminal png
@@ -10631,7 +10948,7 @@ Each <color> must be of the form 'xrrggbb', where x is the literal character
 color, then the X & Y axis color, then the plotting colors.  The maximum
 number of colors that can be set is currently 99."
 
-@node postscript, pslatex_and_pstex, png_(OLD), terminal
+@node postscript_, pslatex_and_pstex, png_(OLD), terminal
 @subsubsection postscript
 
 @c ?commands set terminal postscript
@@ -10643,7 +10960,7 @@ number of colors that can be set is currently 99."
 @tmindex postscript
 
 
-Several options may be set in the `postscript` driver.
+Several options may be set in the @ref{postscript} driver.
 
 Syntax:
 @example
@@ -10654,6 +10971,7 @@ Syntax:
                               @{linewidth | lw <LW>@}
                               @{<duplexing>@}
                               @{rounded | butt@}
+                              @{palfuncparam <samples>@{,<maxdeviation>@}@}
                               @{"<fontname>"@} @{<fontsize>@}
 
 @end example
@@ -10682,6 +11000,16 @@ Symbol font, useful for mathematics, is defined. It is called"
 `dashed`, `dl 1.0`, `lw 1.0`, `defaultplex`, `noenhanced`, "Helvetica" and
 14pt.  Default size of a PostScript plot is 10 inches wide and 7 inches high.
 
+`palfuncparam` is only available if compiled with @ref{pm3d} support.  It controls
+how `set palette functions` are encoded as gradients in the output.
+Analytic color component functions (set via `set palette functions`) are
+encoded as linear interpolated gradients in the postscript output:  The color
+component functions are sampled at <samples> points and all points are
+removed from this gradient which can be removed without changing the
+resulting colors by more than <maxdeviation>.  For almost every useful
+palette you may savely leave the defaults of <samples>=2000 and
+<maxdeviation>=0.003 untouched." ,
+
 `eps` mode generates EPS (Encapsulated PostScript) output, which is just
 regular PostScript with some additional lines that allow the file to be
 imported into a variety of other applications.  (The added lines are
@@ -10703,21 +11031,21 @@ Examples:
 
 Linewidths and pointsizes may be changed with `set style line`.
 
-The `postscript` driver supports about 70 distinct pointtypes, selectable
+The @ref{postscript} driver supports about 70 distinct pointtypes, selectable
 through the `pointtype` option on `plot` and `set style line`.
 
 Several possibly useful files about `gnuplot`'s PostScript are included
 in the /docs/ps subdirectory of the `gnuplot` distribution and at the
 distribution sites.  These are "ps_symbols.gpi" (a `gnuplot` command file
 that, when executed, creates the file "ps_symbols.ps" which shows all the
-symbols available through the `postscript` terminal), "ps_guide.ps" (a
+symbols available through the @ref{postscript} terminal), "ps_guide.ps" (a
 PostScript file that contains a summary of the enhanced syntax and a page
 showing what the octal codes produce with text and symbol fonts) and
 "ps_file.doc" (a text file that contains a discussion of the organization
 of a PostScript file written by `gnuplot`).
 
 A PostScript file is editable, so once `gnuplot` has created one, you are
-free to modify it to your heart's desire.  See the `editing postscript`
+free to modify it to your heart's desire.  See the @ref{postscript}
 section for some hints.
 
 
@@ -10843,7 +11171,7 @@ The organization of a PostScript file written by `gnuplot` is discussed in
 the text file "ps_file.doc" in the docs/ps subdirectory of the gnuplot
 source distribution."
 
-@node pslatex_and_pstex, pstricks, postscript, terminal
+@node pslatex_and_pstex, pstricks, postscript_, terminal
 @subsubsection pslatex and pstex
 
 @c ?commands set terminal pslatex
@@ -10887,7 +11215,7 @@ them.  The name of the auxiliary PostScript file is derived from the name of
 the TeX file given on the @ref{output} command; it is determined by replacing
 the trailing `.tex` (actually just the final extent in the file name) with
 `.ps` in the output file name, or, if the TeX file has no extension, `.ps`
-is appended.  Remember to close the `output file` before leaving `gnuplot`.
+is appended.  Remember to close the @ref{file} before leaving `gnuplot`.
 The `.ps` is included into the `.tex` file by a \\special@{psfile=...@} command.
 If you would rather prefer \\includegraphics@{...@}, then use the `epslatex`
 terminal.
