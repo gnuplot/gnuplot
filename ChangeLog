@@ -1,3 +1,16 @@
+Wed Sep 11 16:56:58 2002  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/set.c (load_tic_user): Make sure ticdef.def.user is
+ 	initialized.  Fixes bug #607839.  Moved assignment of ticdef.type
+ 	here.
+	(add_tic_user): Made 'static', local prototype added.  Superfluous
+ 	casts and checks removed. Removed assignment of ticdef.type
+	(free_marklist): Moved local variable `freeable' into block.
+  	Removed pointless casts.
+
+	* src/axis.h (add_tic_user): Removed prototype that never belonged
+ 	here.
+
 2002-09-03  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/gplt_x11.c: avoid use of snprintf()
@@ -1076,7 +1089,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/09/09 18:00:04 $).
+	last modification date (from the tag $Date: 2002/09/09 20:39:04 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.93 2002/09/02 18:15:31 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.94 2002/09/02 21:03:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -151,6 +151,7 @@ static void get_position_type __PROTO((enum position_type * type, int *axes));
 static void set_xyzlabel __PROTO((label_struct * label));
 static void load_tics __PROTO((AXIS_INDEX axis));
 static void load_tic_user __PROTO((AXIS_INDEX axis));
+static void add_tic_user __PROTO((AXIS_INDEX, char * label, double position)); 
 static void free_marklist __PROTO((struct ticmark * list));
 static void load_tic_series __PROTO((AXIS_INDEX axis));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
@@ -2790,18 +2791,21 @@ check_palette_grayscale()
 }
 
 
-#define SCAN_RGBFORMULA(formula) do { \
-    c_token++; \
-    i = (int)real(const_express(&a)); \
-    if ( abs(i) >= sm_palette.colorFormulae ) \
-      int_error( c_token, \
-        "color formula out of range (use `show palette rgbformulae' to display the range)");\
-    formula = i; } while(0)
+#define SCAN_RGBFORMULA(formula) do {								       \
+    c_token++;											       \
+    i = (int) real(const_express(&a));								       \
+    if (abs(i) >= sm_palette.colorFormulae)							       \
+	int_error(c_token,									       \
+		  "color formula out of range (use `show palette rgbformulae' to display the range)"); \
+    formula = i;										       \
+} while(0)
 
-#define CHECK_TRANSFORM  do { if (transform_defined)  \
-   int_error( c_token,  \
-   "Use either `rgbformulae`, `defined`, `file` or `formulae`." );  \
-   transform_defined = 1; }  while(0)
+#define CHECK_TRANSFORM  do {							  \
+    if (transform_defined)							  \
+	int_error(c_token,							  \
+		  "Use either `rgbformulae`, `defined`, `file` or `formulae`." ); \
+    transform_defined = 1;							  \
+}  while(0)
 
 /* Process 'set palette' command */
 static void
@@ -2843,6 +2847,7 @@ set_palette()
 	    /* rgb color mapping formulae: rgb$formulae r,g,b (3 integers) */
 	    case S_PALETTE_RGBFORMULAE: { /* "rgb$formulae" */
 		int i;
+
 		CHECK_TRANSFORM;
 		SCAN_RGBFORMULA( sm_palette.formulaR );
 		if (!equals(c_token,",")) { c_token--; continue; }
@@ -2870,7 +2875,7 @@ set_palette()
 		--c_token; 
 		continue;
 	    }
-	    case S_PALETTE_FUNCTIONS : { /* "func$tions" */
+	    case S_PALETTE_FUNCTIONS: { /* "func$tions" */
 	        CHECK_TRANSFORM;
 		set_palette_function();
 		sm_palette.colorMode = SMPAL_COLOR_MODE_FUNCTIONS;
@@ -2878,8 +2883,9 @@ set_palette()
 		--c_token;
 		continue;
 	    }
-	    case S_PALETTE_MODEL : { /* "mo$del" */
+	    case S_PALETTE_MODEL: { /* "mo$del" */
 	        int model;
+
 		++c_token;
 		if (END_OF_COMMAND)
 		    int_error( c_token, "Expected color model." );
@@ -2900,6 +2906,7 @@ set_palette()
 	    case S_PALETTE_MAXCOLORS: { /* "maxc$olors" */
 		struct value a;
 		int i;
+
 		c_token++;
 		i = (int)real(const_express(&a));
 		if (i<0) int_error(c_token,"non-negative number required");
@@ -2910,11 +2917,11 @@ set_palette()
 	    } /* switch over palette lookup table */
 	    int_error(c_token,"invalid palette option");
 	} /* end of while !end of command over palette options */
-    }
+    } /* else(arguments found) */
 
     if (named_color && sm_palette.cmodel != C_MODEL_RGB && interactive)
-      int_warn( NO_CARET, 
-      "Named colors will produce strange results if not in color mode RGB." );
+	int_warn(NO_CARET, 
+		 "Named colors will produce strange results if not in color mode RGB." );
 }
 
 #undef CHECK_TRANSFORM
@@ -3845,7 +3852,7 @@ set_tic_prop(axis)
 /* set {x/y/z}label {label_text} {x}{,y} */
 static void
 set_xyzlabel(label)
-label_struct *label;
+    label_struct *label;
 {
     c_token++;
     if (END_OF_COMMAND) {	/* no label specified */
@@ -3985,7 +3992,7 @@ assign_linestyle_tag()
  */
 void
 delete_linestyle(prev, this)
-struct linestyle_def *prev, *this;
+    struct linestyle_def *prev, *this;
 {
     if (this != NULL) {		/* there really is something to delete */
 	if (prev != NULL)	/* there is a previous linestyle */
@@ -3999,7 +4006,7 @@ struct linestyle_def *prev, *this;
 /* For set [xy]tics... command */
 static void
 load_tics(axis)
-AXIS_INDEX axis;
+    AXIS_INDEX axis;
 {
     if (equals(c_token, "(")) {	/* set : TIC_USER */
 	c_token++;
@@ -4016,17 +4023,18 @@ AXIS_INDEX axis;
  */
 static void
 load_tic_user(axis)
-AXIS_INDEX axis;
+    AXIS_INDEX axis;
 {
     char temp_string[MAX_LINE_LEN];
     char *ticlabel;
     double ticposition;
 
     /* Free any old tic labels */
-    if (axis_array[axis].ticdef.type == TIC_USER) {
+    if (axis_array[axis].ticdef.type == TIC_USER) 
 	free_marklist(axis_array[axis].ticdef.def.user);
-	axis_array[axis].ticdef.def.user = NULL;
-    }
+
+    axis_array[axis].ticdef.type = TIC_USER;
+    axis_array[axis].ticdef.def.user = NULL;
 
     while (!END_OF_COMMAND) {
 	/* syntax is  (  ['format'] value , ... )
@@ -4047,7 +4055,7 @@ AXIS_INDEX axis;
 	GET_NUM_OR_TIME(ticposition, axis);
 
 	/* add to list */
-	add_tic_user( axis, ticlabel, ticposition );
+	add_tic_user(axis, ticlabel, ticposition);
 
 	/* expect "," or ")" here */
 	if (!END_OF_COMMAND && equals(c_token, ","))
@@ -4067,18 +4075,17 @@ AXIS_INDEX axis;
 /*
  * Add a single tic mark, with label, to the list for this axis.
  */
-void
+/* HBB 20020911: added 'static' */
+static void
 add_tic_user(axis,label,position)
-AXIS_INDEX axis;
-double position;
-char *label;
+    AXIS_INDEX axis;
+    double position;
+    char *label;
 {
-    struct ticmark *tic = NULL;		/* new ticmark */
+    struct ticmark *tic;		/* new ticmark */
 
     /* Make a new ticmark */
-    tic = (struct ticmark *) gp_alloc(sizeof(struct ticmark), (char *) NULL);
-    if (tic == (struct ticmark *) NULL)
-	int_error(c_token, "out of memory for tic mark");
+    tic = gp_alloc(sizeof(struct ticmark), "add_tic_user: ticmark");
     if (label && *label) {
 	tic->label = gp_alloc(strlen(label) + 1, "tic label");
 	(void) strcpy(tic->label, label);
@@ -4087,24 +4094,20 @@ char *label;
     tic->position = position;
 
     /* Insert this tic at head of tic list for this axis */
-    axis_array[axis].ticdef.type = TIC_USER;
     tic->next = axis_array[axis].ticdef.def.user;
     axis_array[axis].ticdef.def.user = tic;
-    
 }
 
 static void
 free_marklist(list)
-struct ticmark *list;
+    struct ticmark *list;
 {
-    register struct ticmark *freeable;
-
     while (list != NULL) {
-	freeable = list;
+	register struct ticmark *freeable = list;
 	list = list->next;
 	if (freeable->label != NULL)
-	    free((char *) freeable->label);
-	free((char *) freeable);
+	    free(freeable->label);
+	free(freeable);
     }
 }
 
