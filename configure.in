@@ -188,7 +188,7 @@ dnl configure's HAVE_XXXX defines are translated into NO_XXXX for ANSI
 dnl headers and functions
 AC_HEADER_STDC
 
-dnl ANSI headers
+dnl Standard headers
 AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
   time.h sys/time.h sys/timeb.h sys/types.h)
 dnl other
@@ -220,7 +220,7 @@ AC_EGREP_HEADER(time_t,time.h,dnl
 AC_TYPE_SIGNAL
  
 
-dnl Functions. ANSI first, then others
+dnl Functions. Standard first, then others
 
 dnl sunos 4 has on_exit() in place of atexit()
 AC_CHECK_FUNCS(atexit on_exit memcpy memmove memset bcopy bzero setvbuf \
@@ -245,9 +245,10 @@ dnl check for installed linux vgalib
 if test "$with_linux_vga" = yes; then
   AC_MSG_CHECKING(for linux vga library)
   AC_CHECK_LIB(vga, vga_init,
-    AC_DEFINE(LINUXVGA)
-    LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
-    TERMLIBS="$TERMLIBS -lvga",with_linux_vga=no)
+    [AC_DEFINE(LINUXVGA)
+     LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
+     TERMLIBS="$TERMLIBS -lvga"],dnl
+    with_linux_vga=no)
 fi
 
 dnl GNU readline and the required terminal library
@@ -275,6 +276,8 @@ if test "$with_gnu_readline" != no; then
   else
     if test ! -f $with_gnu_readline ; then
       AC_MSG_ERROR([No such file $with_gnu_readline])
+    else
+      AC_MSG_RESULT([using ${with_gnu_readline}])
     fi
 
     LIBS="$LIBS $with_gnu_readline $gp_tcap"
@@ -512,7 +515,7 @@ test "$enable_unixpc" = yes && \
   AC_MSG_RESULT([  Enable unixpc terminal (ATT 3b1 or ATT 7300).])
 
 test "$enable_system_time" = yes && \
-  AC_MSG_RESULT([  Use system time routines in timce.c.])
+  AC_MSG_RESULT([  Use system time routines in time.c.])
 
 test "$no_x" != yes && \
   AC_MSG_RESULT([  Use the X Window System.
