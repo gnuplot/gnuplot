@@ -1,3 +1,38 @@
+2000-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* doc/makefile.ami, docs/makefile.dst: Remove duplicate RCS id's.
+
+	* m4/Makefile.am.in, term/Makefile.am.in: $< is not portable.
+	Use Makefile.am.in explicitly.
+
+2000-01-20  Markus Schwarzenberg  <schwarzb@imsdd.fhg.de>
+
+	* src/plot.c(wrapper_for_write_history): write_history() returns
+	zero on success.
+
+1999-12-20  John Hasstedt  <manager@nuclear.physics.sunysb.edu>
+
+	* config/buildvms.com, config/makefile.vms: Fix directory
+	references.
+
+	* src/command.c(history_command): History functions are only defined
+	if readline is available.
+
+	* src/gnuplot.opt: Add new files.
+
+1999-12-15  Pieter-Tjerk de Boer  <ptdeboer@cs.utwente.nl>
+
+	* src/save.c(save_set_all): Fix typo in save xrange.
+
+1999-12-13  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/plot.c: Add missing variable gnuplot_history_size, use instead
+	of HISTORY_SIZE.
+
+1999-12-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/dynarray.c: FIx compile error.
+
 1999-12-10  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/gnuplot.doc: Add help entry "aspect ratio" to "set size".
