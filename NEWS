@@ -1,6 +1,7 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
+* NEW automatic variable $# expanded to number of arguments after "call"
 * NEW reading of (almost) arbitrary image binary files
 * NEW plot styles "with image" and "with rgbimage"
 * NEW plot style "with labels" reads text data along with X/Y/Z coordinates

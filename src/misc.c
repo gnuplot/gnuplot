@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.55 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.56 2004/09/01 15:53:48 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -166,28 +166,26 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
     } else {
 	/* go into non-interactive mode during load */
 	/* will be undone below, or in load_file_error */
+	int argc = 0; /* number arguments passed by "call" */
 	interactive = FALSE;
 	inline_num = 0;
 	infile_name = name;
 
 	if (can_do_args) {
-	    int aix = 0;
-	    while (++c_token < num_tokens && aix <= 9) {
+ 	    while (c_token < num_tokens && argc <= 9) {
 		if (isstring(c_token))
-		    m_quote_capture(&call_args[aix++], c_token, c_token);
+ 		    m_quote_capture(&call_args[argc++], c_token, c_token);
 		else
-		    m_capture(&call_args[aix++], c_token, c_token);
+ 		    m_capture(&call_args[argc++], c_token, c_token);
+		c_token++;
 	    }
-
-/*         A GNUPLOT "call" command can have up to _10_ arguments named "$0"
-   to "$9".  After reading the 10th argument (i.e.: "$9") the variable
-   'aix' contains the value '10' because of the 'aix++' construction
-   in '&call_args[aix++]'.  So I think the following test of 'aix'
-   should be done against '10' instead of '9'.                (JFi) */
-
-/*              if (c_token >= num_tokens && aix > 9) */
-	    if (c_token >= num_tokens && aix > 10)
-		int_error(++c_token, "too many arguments for CALL <file>");
+	    /* Gnuplot "call" command can have up to 10 arguments named "$0"
+	       to "$9". After reading the 10th argument (i.e., "$9") the
+	       variable 'argc' equals 10.
+	       Also, "call" must be the last command on the command line.
+	    */
+ 	    if (c_token < num_tokens)
+		int_error(++c_token, "too many arguments for 'call <file>'");
 	}
 	while (!stop) {		/* read all commands in file */
 	    /* read one command */
@@ -240,8 +238,18 @@ load_file(FILE *fp, char *name, TBOOLEAN can_do_args)
 			int aix;
 			if (*rl == '$'
 			    && ((aix = *(++rl)) != 0)	/* HBB 980308: quiet BCC warning */
-			    &&aix >= '0' && aix <= '9') {
+			    && ((aix >= '0' && aix <= '9') || aix == '#')) {
+			    if (aix == '#') {
+				/* replace $# by number of passed arguments */
+				len = argc < 10 ? 1 : 2; /* argc can be 0 .. 10 */
+				while (input_line_len - il < len + 1) {
+				    extend_input_line();
+				}
+				sprintf(input_line + il, "%i", argc);
+				il += len;
+			    } else
 			    if (call_args[aix -= '0']) {
+				/* replace $n for n=0..9 by the passed argument */
 				len = strlen(call_args[aix]);
 				while (input_line_len - il < len + 1) {
 				    extend_input_line();

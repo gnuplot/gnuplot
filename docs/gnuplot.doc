@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.239 2004/09/15 11:13:03 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.240 2004/09/17 05:01:12 sfeam Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1798,12 +1798,12 @@ C ... and restart the table:
  scanned for the sequence `$` (dollar-sign) followed by a digit (0--9).  If
  found, the sequence is replaced by the corresponding parameter from the
  `call` command line.  If the parameter was specified as a string in the
- `call` line, it is substituted without its enclosing quotes.  `$` followed by
- any character other than a digit will be that character.  E.g. use `$$` to
- get a single `$`.  Providing more than ten parameters on the `call` command
- line will cause an error.  A parameter that was not provided substitutes as
- nothing.  Files being `call`ed may themselves contain `call` or `load`
- commands.
+ `call` line, it is substituted without its enclosing quotes.  Sequence `$#`
+ is replaced by the number of passed parameters.  `$` followed by any character
+ will be that character; e.g. use `$$` to get a single `$`.  Providing more
+ than ten parameters on the `call` command line will cause an error.  A
+ parameter that was not provided substitutes as nothing.  Files being `call`ed
+ may themselves contain `call` or `load` commands.
 
  The `call` command _must_ be the last command on a multi-command line.
 
@@ -1817,13 +1817,13 @@ C ... and restart the table:
  Example:
 
  If the file 'calltest.gp' contains the line:
-       print "p0=$0 p1=$1 p2=$2 p3=$3 p4=$4 p5=$5 p6=$6 p7=x$7x"
+       print "argc=$# p0=$0 p1=$1 p2=$2 p3=$3 p4=$4 p5=$5 p6=$6 p7=x$7x"
 
  entering the command:
        call 'calltest.gp' "abcd" 1.2 + "'quoted'" -- "$2"
 
  will display:
-       p0=abcd p1=1.2 p2=+ p3='quoted' p4=- p5=- p6=$2 p7=xx
+       argc=7 p0=abcd p1=1.2 p2=+ p3='quoted' p4=- p5=- p6=$2 p7=xx
 
  NOTE: there is a clash in syntax with the datafile `using` callback
  operator.  Use `$$n` or `column(n)` to access column n from a datafile inside

@@ -1,3 +1,8 @@
+2004-09-17  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/misc.c: New automatic variable $# gets
+	expanded to number of arguments after "call <file>". SF patch 943749.
+
 2004-09-16  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/set.c (set_timestamp set_xyzlabel) src/save.c (save_set_all)
