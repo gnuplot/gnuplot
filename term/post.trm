@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.21.2.1 1999/08/19 14:16:33 lhecking Exp $
+ * $Id: post.trm,v 1.21.2.2 1999/11/20 17:59:46 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -439,6 +439,12 @@ static char GPFAR * GPFAR PS_header[] = {
 
 /* filled box : usage   x1 y1 x2 y2 BoxFill */
 "/BoxFill { gsave Rec 1 setgray fill grestore } def\n",
+
+/* oblique symbol font, e.g. set xlabel 'b' "Symbol-Oblique"
+   gives an oblique (slanted) beta character */
+"/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont\n",
+"dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall\n",
+"currentdict end definefont\n",
 
 NULL
 };
