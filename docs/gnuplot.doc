@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.203 2004/02/13 01:16:39 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.204 2004/02/23 13:27:13 broeker Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -1403,6 +1403,7 @@ C ... and restart the table:
 3 bind
 ?commands bind
 ?bind
+?help bind
  The `bind` allows defining or redefining a hotkey, i.e. a sequence of gnuplot
  commands which will be executed when a certain key or key sequence is pressed
  while the driver's window has the input focus. Note that `bind` is only
@@ -2308,6 +2309,7 @@ C ... and restart the table:
 2 if
 ?commands if
 ?if
+?help if
  The `if` command allows commands to be executed conditionally.
 
  Syntax:
@@ -2850,6 +2852,7 @@ C ... and restart the table:
 ?data-file using
 ?datafile using
 ?using
+?help using
  The most common datafile modifier is `using`.
 
  Syntax:
@@ -5230,6 +5233,7 @@ C ... and restart the table:
 ?unset label
 ?show label
 ?label
+?help label
 ?nolabel
  Arbitrary labels can be placed on the plot using the `set label` command.
 
@@ -5522,6 +5526,7 @@ C ... and restart the table:
 ?set mouse
 ?unset mouse
 ?mouse
+?help mouse
 ?nomouse
  The command `set mouse` enables mouse actions. Currently the pm, x11, ggi and
  windows terminals are mouse enhanced. There are two mouse modes. The 2d-graph
@@ -5921,6 +5926,7 @@ C ... and restart the table:
 ?set pm3d
 ?show pm3d
 ?pm3d
+?help pm3d
  pm3d is an `splot` style for drawing palette-mapped 3d and 4d data as
  color/gray maps and surfaces.  It uses a pm3d algorithm which allows plotting
  gridded as well as non-gridded data without preprocessing, even when the data
@@ -6131,6 +6137,7 @@ C ... and restart the table:
 ?set palette
 ?show palette
 ?palette
+?help palette
  Palette is a color storage for use by `pm3d`, filled color contours or
  polygons, color histograms, color gradient background, and whatever it is
  or it will be implemented...  Here it stands for a palette of smooth
@@ -6772,6 +6779,7 @@ C ... and restart the table:
 ?set style data
 ?show style data
 ?data style
+?help set style data
  The `set style data` command changes the default plotting style for data
  plots.
 
@@ -6840,6 +6848,7 @@ C ... and restart the table:
 ?unset style line
 ?show style line
 ?linestyle
+?help set style line
 ^ <a name="linetype"></a>
 ^ <a name="linewidth"></a>
  Each terminal has a default set of line and point types, which can be seen

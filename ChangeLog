@@ -1,3 +1,8 @@
+2004-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* docs/gnuplot.doc term/x11.trm: Added missing labels for hypertext
+	references.
+
 2004-02-24  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/config.amg config/config.cyg config/config.mgw
