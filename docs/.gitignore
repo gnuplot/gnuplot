@@ -1,6 +1,8 @@
 Makefile
 allterm.h
+checkdoc
 doc2gih
+doc2hlp
 doc2ipf
 doc2ms
 doc2rtf

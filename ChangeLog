@@ -1,4 +1,8 @@
-2001-09-13  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2001-09-18  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+
+	* doc/.cvsignore docs/psdoc/.cvsignore: Add missing entries
+
+2001-09-17  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
 
 	* config/makefile.os2: Add missing dependency
 
