@@ -1,3 +1,119 @@
+Changes in release 4.0:
+* CHANGE sample calculated "smooth csplines" only in actual xrange
+* NEW set size ratio now works for splots, too
+* NEW grid options: {layerdefault | front | back}
+* NEW plot option "smooth frequency"
+* NEW terminal names now sorted alphabetically
+* NEW "linetype palette" also for points
+* NEW (incomplete) plotstyle "with filledcurves"
+* NEW plot style "with filledboxes", controlled by new
+  "set style filling" options (needs --enable-filledboxes)
+* NEW "set boxwidth <number> relative"
+* NEW options to FIG terminal driver
+* NEW parse errors in datafile reading now show the culprit
+* FIXED interaction of "set xtics <incr>"  with time/date axes
+* FIXED candlesticks now ignore order of high/low entries
+* FIXED keeping old arrow options if new "set" command modifies it
+* FIXED undoing a mouse zoom that started from autoscaled axis
+* FIXED contour line colours in pm3d's "linetype palette" mode
+* FIXED PostScript stack pollution caused by "Symbol Oblique" patch
+* FIXED warnings from perl -w in tkcanvas terminal output
+* FIXED dgrid3d floating point exception
+* FIXED logscaled colorbox axis
+* FIXED pgnuplot for Windows NT/2K/XP
+
+[3.8g]
+* CHANGE use either two or five minitic steps, never 4 (in logscale)
+* CHANGE reject candlesticks/financebars plots of to few colums --- warn
+  and then plot with "points", instead
+* NEW Hotkeys to access keyboard in MS Windows version
+* NEW set style [data | function] filledcurves [options]
+      plot ... with filledcurves [options]
+* NEW autoscale options: `fix`, `keepfix`
+* NEW some more fancy 3D demo plots
+* NEW mouse support and PM3D are now enabled by default
+* NEW more point symbol types in Windows terminal
+* FIXED PostScript font reencoding for non-default fonts
+* FIXED dgrid for logscaled axes
+* FIXED tic generation for axes that have |min/max| very close to 1
+* FIXED several "impossible" parse erros in "show" command.
+* FIXED bounding box of PSLatex generated .eps files
+* (attempted) FIX: X11 deadlocks caused by stdio buffering vs. select()
+* FIXED baseline of "histeps" plots with logscaled or shifted y axis.
+* FIXED document spherical coordinates by reference to latitude/longitude
+* FIXED warn about missing HOME directory only in interactive mode
+* FIXED tpic terminal coordinate handling
+
+[3.8f]
+* NEW pipes under Windows (if compiled by MingW)
+* NEW PDF terminal driver --- needs PDFlib
+* NEW SVG terminal driver
+* NEW epslatex & EMF terminal drivers now always built in
+* NEW PM3D support for CGM, GGI and tgif terminals
+* NEW PM3D "set palette maxcolors" support for X11 and PostScript
+* NEW special maths function lambertw()
+* NEW axis for the color box
+* NEW encodings ISO-8859-2 and CP-852 for PostScript terminal
+* NEW PM terminal uses codepage 912 for	iso_8859_2 encoding
+* NEW "index" option for "matrix" type datafiles
+* NEW commands 'set term push' and 'set term pop'
+* NEW much extended EEPIC terminal driver
+* NEW implement "clear" for Windows and OS/2
+* NEW option "picsize" for PNG terminal
+* NEW mouse support for MS Windows
+* FIXED endless loop if both 'set timefmt' & 'set xtics <incr>'
+* FIXED detection of too new gd library without GIF support
+* FIXED interaction of autoscaling and "set size ratio"
+* FIXED PM3D allocated too many colors for multiplots
+* FIXED key sample line types in contour plots
+* FIXED timefmt parsing of "01Dec2000" vs. Fortran doubles
+* FIXED MS Windows pause box eating 100% CPU
+* FIXED ooold problem with HP-UX GCC breaking tic positioning
+* FIXED positioning of multiplots
+* FIXED correct rounding of exponents for %[SLT] --- needs %s to come first
+* FIXED ticmarks for very short axes (max - min < DBL_EPS)
+* FIXED "show ticslevel" and "show ticscale"
+* FIXED parse errors after "set xdata time"
+* FIXED MSDOS file corruption if re-opening same "set output"
+* FIXED reject many-column plot styles when plotting a function
+
+[3.8e]
+* NEW Major new featrue "pm3d" for color-coded plotting (formerly a
+  branch version).
+* NEW set label can print numbers into the label text
+* NEW hidden3d allows non-grid datasets to be part of the plot
+* NEW hidden3d works with contour lines
+* NEW overprinting feature for PostScript revised
+* NEW Windows terminal now has linewidth support from inside gnuplot
+* NEW table terminal will output additional colums some plot styles
+* FIXED hidden3d display of tics and axes
+
+[3.8d]
+* NEW <Space> in Windows graph window beams focus to text window
+* NEW point sample and offset options for "set label" 
+* NEW relative endpoints and choosable head shapes for "set arrow"
+* NEW interactive inline data input now has a prompt
+* NEW terminal driver epslatex --- like pslatex
+* NEW terminal driver GGI
+* NEW experimental driver for Enhanced Metafile Format (EMF)
+* NEW %s timefmt for reading seconds since the epoch
+* FIXED Pslatex actually changes the fontsize
+* FIXED PSTRICKS and EEPIC bounding box
+* FIXED output of filenames in enhanced-text terminals
+* FIXED reading of ~/.Xdefaults
+* FIXED block mouse-generated replot if inline data in use
+* FIXED 3D clipping of "key below" or "outside" samples
+* FIXED zeroaxes bug introduced by vector clipping
+* FIXED bug with "smooth unique" inrange/outrange conditions
+* FIXED autoscale writeback bug (see BUGS entry 3)
+* FIXED png parser bug
+* FIXED buggy `show m[xyz][2]tics' command
+* FIXED bug in `show key' if key is boxed
+* FIXED building on VMS
+* FIXED bug in 3d plot introduced by mouse code 
+* terminal-dependent configuration of GNU readline
+* updated FIG terminal driver to new file format version
+
 CGM terminal mods:
 * NEW: files are now compliant with MIL-D-28003A.
 * NEW: Standard font table now includes the standard WebCGM fonts and
@@ -11,40 +127,6 @@ CGM terminal mods:
 * FIXED: Font height handling (e.g. crowded keys)
 * FIXED: "solid" option.
 * FIXED: linewidth changes were sometimes applied to the wrong lines.
-
-Changes in release 4.0:
-* NEW experimental driver for Enhanced Metafile Format,
-  configure with --enable-emf
-* NEW set label can print numbers into the label text
-* FIXED bug in 3d plot introduced by mouse code (using variables
-  before initialisation)
-* FIXED 3d key clipping
-* FIXED zeroaxes bug introduced by vector clipping
-* FIXED bug with "smooth unique" inrange/outrange conditions
-* FIXED autoscale writeback bug (see BUGS entry 3)
-* FIXED png parser bug
-* FIXED buggy `show m[xyz][2]tics' command
-* FIXED bug in `show key' if key is boxed
-* FIXED building on VMS
-* terminal-dependent configuration of GNU readline
-
-[3.8g]
-* NEW grid options: {layerdefault | front | back}
-* NEW set style [data | function] filledcurves [options]
-      plot ... with filledcurves [options]
-* NEW autoscale options: `fix`, `keepfix`
-
-[3.8f]
-* NEW axis for the color box
-* NEW pipes under Windows (if compiled by MingW)
-
-[3.8e]
-* NEW mouse support for Windows
-
-[3.8d]
-* NEW commands 'set term push' and 'set term pop'
-* NEW CP-852 encoding 
-* NEW PM terminal uses codepage 912 for	iso_8859_2 encoding
 
 [3.8c]
 * NEW mouse support for OS/2 and X11

@@ -1,3 +1,8 @@
+2001-11-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* NEWS: Lots of additional fixes and new features mentioned, and
+	some entries moved to the correct release they came with.
+
 2001-10-31  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/axis.h src/axis.c src/graphics.c src/save.c src/set.c
@@ -1282,7 +1287,7 @@
 	
 2001-03-02  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
-	* src/term.h [HAVE_LIBPNG]: Include new PDF terminal driver.
+	* src/term.h [HAVE_LIBPDF]: Include new PDF terminal driver.
 
 2001-03-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
