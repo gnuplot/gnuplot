@@ -48,11 +48,13 @@
 #define PROGRAM "G N U P L O T"
 #define PROMPT "gnuplot> "
 
-/* Define operating system dependent constants [default value]:
+/*
+ * Define operating system dependent constants [default value]:
  *
  * OS:      [" "] Name of OS plus trailing space
  * HOME:    [HOME] Name of environment variable which points to
- *          the directory where gnuplot's config file/s are found.
+ *          the directory where gnuplot's config file is found.
+ * PLOTRC:  [".gnuplot"] Name of the gnuplot startup file.
  * SHELL:   ["/bin/sh"] Name, and in some cases, full path to the shell
  *          that is used to run external commands.
  * DIRSEP1: ['/'] Primary character which separates path components.
@@ -75,6 +77,7 @@
 #ifdef ATARI
 # define OS "TOS "
 # define HOME  "GNUPLOT"
+# define PLOTRC "gnuplot.ini"
 # define SHELL "gulam.prg"
 # define DIRSEP1 '\\'
 # ifdef MTOS
@@ -85,6 +88,7 @@
 #ifdef DOS386
 # define OS "DOS 386 "
 # define HOME  "GNUPLOT"
+# define PLOTRC "gnuplot.ini"
 # define DIRSEP1 '\\'
 #endif /* DOS386 */
 
@@ -99,6 +103,7 @@
 #ifdef OS2
 # define OS "OS/2 "
 # define HOME  "GNUPLOT"
+# define PLOTRC "gnuplot.ini"
 # define SHELL "c:\\cmd.exe"
 # define DIRSEP1 '\\'
 #endif /* OS/2 */
@@ -114,6 +119,7 @@
 # endif
 # define OS "VMS "
 # define HOME "sys$login:"
+# define PLOTRC "gnuplot.ini"
 # if !defined(VAXCRTL) && !defined(DECCRTL)
 #  error Please /define either VAXCRTL or DECCRTL
 # endif
@@ -136,19 +142,24 @@
 #  define OS "MS-Windows "
 # endif /* WIN32 */
 # define HOME  "GNUPLOT"
+# define PLOTRC "gnuplot.ini"
 # define DIRSEP1 '\\'
 #endif /* _WINDOWS */
 
 #if defined(MSDOS) && !defined(_Windows)
-# define HOME "GNUPLOT"
 # if !defined(DOS32) && !defined(DOS16)
 #  define DOS16
 # endif
 # ifdef MTOS
 #  define OS "TOS & MiNT & MULTITOS & Magic - "
 # endif /* MTOS */
+# define HOME "GNUPLOT"
+# define PLOTRC "gnuplot.ini"
 # define OS "MS-DOS "
 # define DIRSEP1 '\\'
+# ifdef __DJGPP__
+#  define DIRSEP2 '/'
+# endif
 #endif /* MSDOS */
 
 #if defined(__unix__) || defined(unix)
@@ -176,7 +187,9 @@
 # define OS "Unix "
 #endif /* SCO */
 
-/* End OS dependent constants */
+/* End OS dependent constants; fall-through defaults
+ * for the constants defined above are following.
+ */
 
 #ifndef OS
 # define OS " "
@@ -184,6 +197,10 @@
 
 #ifndef HOME
 # define HOME "HOME"
+#endif
+
+#ifndef PLOTRC
+# define PLOTRC ".gnuplot"
 #endif
 
 #ifndef SHELL
@@ -198,14 +215,7 @@
 # define DIRSEP2 NUL
 #endif
 
-#if defined(unix) || defined(AMIGA) || defined(OSK)
-# define PLOTRC ".gnuplot"
-#else /* ! unix || AMIGA || OSK */
-# define PLOTRC "gnuplot.ini"
-#endif /* ! unix || AMIGA || OSK */
-
-/* Overriden by Makefile */
-/* Define helpfile location */
+/* Define helpfile location - overriden by Makefile */
 #ifndef HELPFILE
 # if defined( MSDOS ) || defined( OS2 ) || defined(DOS386)
 #  define HELPFILE "gnuplot.gih"
@@ -221,6 +231,7 @@
 #ifndef CONTACT
 # define CONTACT "bug-gnuplot@dartmouth.edu"
 #endif
+
 #ifndef HELPMAIL
 # define HELPMAIL "info-gnuplot@dartmouth.edu"
 #endif
@@ -228,12 +239,6 @@
 #define SAMPLES 100		/* default number of samples for a plot */
 #define ISO_SAMPLES 10		/* default number of isolines per splot */
 #define ZERO	1e-8		/* default for 'zero' set option */
-
-#if defined(X11) || !defined(X_DISPLAY_MISSING)
-# ifndef X11
-#  define X11
-# endif
-#endif
 
 #ifndef TERM
 /* default terminal is "unknown"; but see init_terminal */
