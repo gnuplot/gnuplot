@@ -70,19 +70,19 @@ help:
 #
 
 # these definitions are used by makefile.all
-T=term/
-D=docs/
+T=../term/
+D=../docs/
 L=$(D)latextut/
-M=demo/
+M=../demo/
 
 #
 # Definitions valid for all targets on OS/2
 #
 
 OS2DIR  = os2
-DOCDIR  = docs
-DEMODIR = demo
-TERMDIR = term
+DOCDIR  = ../docs
+DEMODIR = ../demo
+TERMDIR = ../term
 
 OS2TERMS= $(TERMDIR)\pm.trm
 ifdef X11
@@ -145,7 +145,7 @@ endif
 #
 # Settings for the terminals to be included
 #
-TERMFLAGS = -I. -I$(T)
+TERMFLAGS = -I.. -I$(T)
 
 # All terminals available via #defines should be listed below
 # Some terminals can be en/disabled in the configuration at the

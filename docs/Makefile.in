@@ -30,7 +30,7 @@ bindir = @bindir@
 datadir = @datadir@
 infodir = @infodir@
 srcdir = @srcdir@
-top_builddir = .
+top_builddir = ..
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 
@@ -41,7 +41,7 @@ INSTALL_DATA = @INSTALL_DATA@
 CC     = @CC@
 DEFS   = @DEFS@
 CFLAGS = @CFLAGS@
-INCLUDES = -I.. -I$(srcdir)/.. -I$(srcdir)/../term -I.
+INCLUDES = -I.. -I$(top_srcdir)/src -I$(top_srcdir)/../term -I.
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
@@ -210,7 +210,11 @@ info: gnuplot.info
 
 gnuplot.info: doc2info $(srcdir)/gnuplot.doc
 	./doc2info $(srcdir)/gnuplot.doc gnuplot.info
-	$(EMACS) --batch -l $(srcdir)/fixinfo.el
+	if test "$(EMACS)" != no; then \
+	  $(EMACS) --batch -l $(srcdir)/fixinfo.el; \
+	else \
+	  @echo No emacs found - cannot fix info file; \
+	fi
 
 doc2info: doc2info.o termdoc.o xref.o
 	$(LINK) doc2info.o termdoc.o xref.o $(LIBS)
@@ -244,9 +248,6 @@ doc2rnh: doc2rnh.o termdoc.o
 
 # end doc2xxx section
 
-tutorial: latextut/tutorial.tex
-	cd latextut && $(MAKE) $(MFLAGS)
-
 # this is how to check the gnuplot.doc file
 check: checkdoc $(srcdir)/gnuplot.doc
 	@./checkdoc < $(srcdir)/gnuplot.doc; \
@@ -278,6 +279,7 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = docs
 
+
 distdir: $(DISTFILES)
 	distdir=`cd $(distdir) && pwd`
 	@for file in $(DISTFILES); do \
@@ -304,16 +306,18 @@ clean:
 	  doc2rnh gnuplot.rnh \
 	  doc2rtf gnuplot.rtf \
 	  gnuplot.nroff checkdoc *.o core a.out allterm.h
-	cd latextut && $(MAKE) $(MFLAGS) clean
 
 mostlyclean: clean
 
 distclean: clean
-	cd latextut && $(MAKE) $(MFLAGS) distclean
 	-rm -f Makefile
 
 realclean: distclean
 	-rm -f TAGS
+
+Makefile: Makefile.in ../config.status
+	cd .. \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 ### Dependencies - do not edit!
 
@@ -322,33 +326,33 @@ realclean: distclean
 # (but then we have to change all the other makefiles). Plus then
 # we cannot make some doc2* filters use allterm.h and others use term.h
 
-TERM_H = $(srcdir)/../term.h
+TERM_H = $(top_srcdir)/src/term.h
 
-checkdoc.o: checkdoc.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-alldoc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2gih.o: doc2gih.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2hlp.o: doc2hlp.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2html.o: doc2html.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2info.o: doc2info.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ipf.o: doc2ipf.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2ms.o: doc2ms.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-doc2rnh.o: doc2rnh.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2rtf.o: doc2rtf.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h $(TERM_H)
-doc2tex.o: doc2tex.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h allterm.h
-termdoc.o: termdoc.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h
-xref.o: xref.c ../config.h $(srcdir)/../ansichek.h \
-		$(srcdir)/../stdfn.h doc2x.h xref.h
+checkdoc.o: checkdoc.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
+alldoc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
+doc2gih.o: doc2gih.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2hlp.o: doc2hlp.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2html.o: doc2html.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
+doc2info.o: doc2info.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2ipf.o: doc2ipf.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2ms.o: doc2ms.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
+doc2rnh.o: doc2rnh.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2rtf.o: doc2rtf.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h $(TERM_H)
+doc2tex.o: doc2tex.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h allterm.h
+termdoc.o: termdoc.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h
+xref.o: xref.c ../config.h $(top_srcdir)/src/ansichek.h \
+		$(top_srcdir)/src/stdfn.h doc2x.h xref.h
 
 #the end

@@ -3,14 +3,15 @@ dnl configure.in for gnuplot 3.7 on Unix.
 dnl
 dnl $Id: configure.in,v 1.90 1998/06/18 14:52:55 ddenholm Exp $
 dnl
+AC_INIT(src/graphics.c)
+AM_CONFIG_HEADER(config.h:config.hin)
 AC_PREREQ(2.13)
 AC_REVISION($Revision: 1.90 $)
-AC_INIT(graphics.c)
-VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
-PATCHLVL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/version.c|tr -d ' '`
+
+VERSION=`sed -n 's/.*version.*"\(.*\)".*/\1/p' $srcdir/src/version.c|tr -d ' '`
+PATCHLVL=`sed -n 's/.*patchlevel.*"\(.*\)".*/\1/p' $srcdir/src/version.c|tr -d ' '`
 VERSION="${VERSION}.${PATCHLVL}"
 AM_INIT_AUTOMAKE(gnuplot, $VERSION)
-AC_CONFIG_HEADER(config.h:config.hin)
 
 dnl Optional features.
 
@@ -456,10 +457,15 @@ EMACS=`basename $EMACS`
 
 dnl Write Makefiles and configuration header
 AC_OUTPUT([Makefile
-           beos/Makefile
+           config/Makefile
+           demo/Makefile
            docs/Makefile
-           docs/latextut/Makefile
-           lisp/Makefile], \
+           lisp/Makefile
+           m4/Makefile
+           man/Makefile
+           src/Makefile
+           term/Makefile
+           tutorial/Makefile], \
           [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h
           ])
 

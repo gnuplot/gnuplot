@@ -79,9 +79,9 @@ HELPDEST = S:
 #
 
 # Where related files reside
-DOCDIR  = docs
-DEMODIR = demo
-TERMDIR = term
+DOCDIR  = /docs
+DEMODIR = /demo
+TERMDIR = /term
 
 # Merge compiler flags
 CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
