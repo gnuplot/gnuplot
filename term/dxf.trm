@@ -1,5 +1,5 @@
 /*
- * $Id: dxf.trm,v 1.10 1999/10/01 15:09:10 lhecking Exp $
+ * $Id: dxf.trm,v 1.11 2002/07/26 16:42:28 mikulik Exp $
  *
  */
 
@@ -73,8 +73,14 @@ TERM_PUBLIC void DXF_reset __PROTO((void));
 
 #define DXF_XMAX (120.0 * DXF_UNIT)
 #define DXF_YMAX (80.0 * DXF_UNIT)
+#if 0 /* HBB 20030626: old version */
 #define DXF_HTIC (0.01 * DXF_XMAX)	/* 1.0 percent */
 #define DXF_VTIC (0.01 * DXF_YMAX)	/* 1.0 percent */
+#else
+/* HBB 20030626: make them have the same length in DXF_UNITs ! */
+# define DXF_HTIC (2.0 * DXF_UNIT)
+# define DXF_VTIC (2.0 * DXF_UNIT) 
+#endif
 #define DXF_HCHAR (0.014 * DXF_XMAX)	/* 1.4 percent */
 #define DXF_VCHAR (0.026 * DXF_YMAX)	/* 2.6 percent */
 #endif /* TERM_PROTO */

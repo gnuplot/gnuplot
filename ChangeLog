@@ -1,3 +1,8 @@
+2003-06-26  Hans-Bernhard Broeker <broeker@physi.rwth-aachen.de>
+
+	* term/dxf.trm (DXF_HTIC, DXF_VTIC):  Fixed definitions so 'set
+	size ratio' can work.
+
 2003-06-25  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/term_api.h src/command.c term/x11.trm: Define a flag
