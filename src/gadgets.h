@@ -321,10 +321,9 @@ extern enum PLOT_STYLE func_style;
 
 extern TBOOLEAN parametric;
 
-/* FIXME HBB 20010806: not modified anywhere, used only by
- * draw_clip_line() --- it's essentially a compile-time only
- * option. */
+#if 0 /* UNUSED */
 extern TBOOLEAN suppressMove;
+#endif 
 
 /* Functions exported by gadgets.c */
 

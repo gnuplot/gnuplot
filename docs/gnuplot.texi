@@ -127,6 +127,7 @@ Johannes Zellner
 * Command-line-editing::        
 * Comments::                    
 * Coordinates::                 
+* Datastrings::                 
 * Environment::                 
 * Expressions::                 
 * Glossary::                    
@@ -693,7 +694,7 @@ The Atari version of readline defines some additional key aliases:
       Ctrl Home       - same as ^E.
       Esc             - same as ^U.
       Help            - @ref{help} plus return.
-      Ctrl Help       - `help `.
+      Ctrl Help       - @ref{help}.
 
 @end example
 
@@ -711,7 +712,7 @@ substitutions, etc.  In short, it works anywhere it makes sense to work.
 See also `set datafile commentschars` for specifying comment characters in
 data files.
 
-@node Coordinates, Environment, Comments, gnuplot
+@node Coordinates, Datastrings, Comments, gnuplot
 @section Coordinates
 
 @cindex coordinates
@@ -743,7 +744,59 @@ be given as a quoted time string according to the @ref{timefmt} format string.
 See @ref{xdata} and @ref{timefmt}.  `gnuplot` will also accept an integer
 expression, which will be interpreted as seconds from 1 January 2000.
 
-@node Environment, Expressions, Coordinates, gnuplot
+@node Datastrings, Environment, Coordinates, gnuplot
+@section Datastrings
+
+@cindex datastrings
+
+The configuration option --enable-datastrings (currently EXPERIMENTAL) allows
+gnuplot to read and process text fields in datafiles. A text field consists 
+of either an arbitrary string of printable characters containing no whitespace
+or an arbitrary string of characters, possibly including whitespace, delimited
+by double quotes. The following sample line from a datafile is interpreted to
+contain four columns, with a text field in column 3:
+
+@example
+  1.000 2.000 "Third column is all of this text" 4.00
+
+@end example
+
+Text fields can be positioned within a 2-D or 3-D plot using the commands:
+
+@example
+  plot 'datafile' using 1:2:4 with labels
+  splot 'datafile using 1:2:3:4 with labels
+
+@end example
+
+A column of text data can also be used to label the ticmarks along one or more
+of the plot axes. The example below plots a line through a series of points
+with (X,Y) coordinates taken from columns 3 and 4 of the input datafile.
+However, rather than generating regularly spaced tics along the x axis
+labeled numerically, gnuplot will position a tic mark along the x axis at the
+X coordinate of each point and label the tic mark with text taken from column
+1 of the input datafile.
+
+@example
+  set xtics
+  plot 'datafile' using 3:4:xticlabels(1) with linespoints
+
+@end example
+
+There is also an option that will interpret the first entry in a column of
+input data as a text field, and use it as the key title for data plotted from
+that column. The example given below will use the first entry in column 2 to
+generate a title in the key box, while processing the remainder of columns 
+2 and 4 to draw the required line:
+
+@example
+  plot 'datafile' using 1:(f($2)/$4) title 2 with lines
+
+@end example
+
+See `set style labels`, `using xticlabels`, `plot title`, @ref{using}.
+
+@node Environment, Expressions, Datastrings, gnuplot
 @section Environment
 
 @cindex environment
@@ -3961,6 +4014,78 @@ comment character (#) in the first column of the text lines.
 @uref{http://www.gnuplot.info/demo/using.html,Feeble using demos.
 }
 
+If gnuplot is built with configuration option --enable-datastrings, then
+additional modifiers to @ref{using} can specify handling of text fields in the 
+datafile. See `datastrings`, `using xticlabels`, `using title`.
+
+
+@noindent --- USING TITLE ---
+
+@c ?using title
+@c ?plot using title
+If gnuplot is built with configuration option --enable-datastrings, then
+the first entry of a column of the input data file can be used as a string
+to provide the plot title in the key box.  The column containing specified
+is independent of the column[s] used for the plot itself.
+
+@example
+   plot 'data' using 1:($2/$3) title 2 
+
+@end example
+
+In this case the entry in the first row of column 2 will be used for the 
+key entry of the plot constructed from dividing column 2 by column 3.
+The entry in the first row of column 3 will be ignored.
+
+
+
+@noindent --- XTICLABELS ---
+
+@c ?using xticlabels
+@c ?plot using xticlabels
+If gnuplot is built with configuration option --enable-datastrings, then
+a column of the input data file can be used to label axis tic marks in a 2-D
+plot command. The format of such a plot command is
+
+@example
+  plot 'datafile' using <xcol>:<ycol>:xticlabels(<labelcol>) with <plotstyle>
+
+@end example
+
+The `xticlabels(<val>)` option must be the final entry of the @ref{using} column 
+specifications. For each point which has a valid pair of X,Y coordinates,
+the text field found in column <labelcol> is added to the list of xtic labels
+at the same X coordinate as the point it belongs to. `xticlabels(<labelcol>)`
+may be shortened to `xtic(<labelcol>)`.
+
+
+@noindent --- X2TICLABELS ---
+
+@c ?using x2ticlabels
+@c ?plot using x2ticlabels
+See plot using xticlabels.
+
+
+@noindent --- YTICLABELS ---
+
+@c ?using yticlabels
+@c ?plot using yticlabels
+See plot using xticlabels.
+
+
+@noindent --- Y2TICLABELS ---
+
+@c ?using y2ticlabels
+@c ?plot using y2ticlabels
+See plot using xticlabels.
+
+
+@noindent --- ZTICLABELS ---
+
+@c ?using zticlabels
+@c ?plot using zticlabels
+See plot using xticlabels.
+
 @node errorbars, errorlines, data-file, plot
 @subsection errorbars
 
@@ -4304,9 +4429,9 @@ Syntax:
 @end example
 
 where <style> is either `lines`, `points`, `linespoints`, `impulses`,
-`dots`, `steps`, `fsteps`, `histeps`, @ref{errorbars}, `xerrorbars`,
+`dots`, `steps`, `fsteps`, `histeps`, @ref{errorbars}, `labels`, `xerrorbars`,
 `yerrorbars`, `xyerrorbars`, @ref{errorlines}, `xerrorlines`, `yerrorlines`,
-`xyerrorlines`, `boxes`, `filledcurves`, `boxerrorbars`,
+`xyerrorlines`, `boxes`, `histograms`, `filledcurves`, `boxerrorbars`,
 `boxxyerrorbars`, `financebars`, `candlesticks`, `vectors` or @ref{pm3d}. Some
 of these styles require additional information. See `plotting styles` for
 details of each style.  `fill` is relevant only to certain 2D plots
@@ -5349,7 +5474,7 @@ Draw only the top and right borders for a `plot` and label them as axes:
 
 
 The @ref{boxwidth} command is used to set the default width of boxes in the
-`boxes`, `boxerrorbars` and `candlesticks` styles.
+`boxes`, `boxerrorbars`, `candlesticks` and `histogram` styles.
 
 Syntax:
 @example
@@ -5569,11 +5694,7 @@ data.)  This option is relevant for `bspline` mode only.  Allowed values are
 integers in the range from 2 (linear) to 10.
 
 `levels`--- Selection of contour levels,  controlled by `auto` (default),
-`discrete`, `incremental`, and <n>, number of contour levels, limited to
-@example
- MAX_DISCRETE_LEVELS as defined in plot.h (30 is standard.)
-
-@end example
+`discrete`, `incremental`, and <n>, number of contour levels.
 
 For `auto`, <n> specifies a nominal number of levels; the actual number will
 be adjusted to give simple labels. If the surface is bounded by zmin and zmax,
@@ -6770,10 +6891,11 @@ Syntax:
       set key @{on|off@} @{default@}
               @{left | right | top | bottom | outside | below | <position>@}
               @{Left | Right@} @{@{no@}reverse@}
+              @{@{no@}invert@}
               @{samplen <sample_length>@} @{spacing <vertical_spacing>@}
               @{width <width_increment>@}
               @{height <height_increment>@}
-              @{@{no@}autotitles@}
+              @{@{no@}autotitle @{columnheader@}@}
               @{title "<text>"@} @{@{no@}enhanced@}
               @{@{no@}box @{ @{linestyle | ls <line_style>@}
                          | @{linetype | lt <line_type>@}
@@ -6796,6 +6918,12 @@ Justification of the labels within the key is controlled by `Left` or `Right`
 box can be drawn around the key (`box @{...@}`) in a specified `linetype`
 and `linewidth`, or a user-defined `linestyle`. Note that not all
 terminal drivers support linewidth selection, though.
+
+By default the first plot label is at the top of the key and successive labels
+are entered below it. The `invert` option causes the first label to be placed
+at the bottom of the key, with successive labels entered above it. This option
+is useful to force the vertical ordering of labels in the key to match the
+order of box types in a stacked histogram.
 
 The length of the sample line can be controlled by `samplen`.  The sample
 length is computed as the sum of the tic length and <sample_length> times the
@@ -6824,6 +6952,14 @@ default option `autotitles`. The automatic generation of titles can be
 suppressed by `noautotitles`; then only those titles explicitly defined
 by `(s)plot ... title ...` will be drawn.
 
+The `set key autotitle columnheader` option is available if gnuplot was built
+with --enable-datastrings. This command causes the first entry in each column
+of plotted data to be interpreted as a text string and used as a title for
+the corresponding plot. If the quantity being plotted is a function of data
+from several columns, gnuplot may be confused as to which column to draw the
+title from. In this case it is necessary to specify the column explicitly in
+the plot command, e.g. `plot "datafile" using (($2+$3)/$4) title 3 with lines`.
+
 A title can be put on the key (`title "<text>"`)---see also `syntax` for the
 distinction between text in single- or double-quotes.  The key title uses the
 same justification as do the plot titles.
@@ -6833,9 +6969,9 @@ terminals supporting this, see `enhanced text` for more details.
 This default behavior can be switched off by the `noenhanced` option.
 
 The defaults for @ref{key} are `on`, `right`, `top`, `Right`, `noreverse`,
-`samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  The default <linetype>
-is the same as that used for the plot borders.  Entering `set key default` 
-returns the key to its default configuration.
+`noinvert`, `samplen 4`, `spacing 1.25`, `title ""`, and `nobox`.  
+The default <linetype> is the same as that used for the plot borders.
+Entering `set key default` returns the key to its default configuration.
 
 The <position> can be a simple x,y,z as in previous versions, but these can
 be preceded by one of four keywords (`first`, `second`, `graph`, `screen`)
@@ -8804,6 +8940,7 @@ Syntax:
 @example
       set style arrow <n> <arrowstyle>
       set style fill <fillstyle>
+      set style histogram <histogram style options>
       set style line <n> <linestyle>
 
 @end example
@@ -8938,8 +9075,8 @@ listed.  `show style data` shows the current default data plotting style.
 @c ?show style fill
 @cindex fillstyle
 
-The `set style fill` command is used to set the style of boxes
-or candlesticks.
+The `set style fill` command is used to set the style of boxes,
+histograms or candlesticks.
 
 Syntax:
 @example
@@ -9110,6 +9247,10 @@ function `plot`s. Neither `boxes`, `filledcurves` nor any
 of the `steps` styles can be used with `splot`s. If an inappropriate style
 is specified, it will be changed to `points`.
 
+The above caveat does not apply to `plot with labels`, for which the third
+column specifies a data source rather than coordinate information.
+See `set style labels`.
+
 For 2-d data with more than two columns, `gnuplot` is picky about the
 allowed @ref{errorbars} and @ref{errorlines} styles. The @ref{using} option on the
 `plot` command can be used to set up the correct columns for the style
@@ -9117,7 +9258,7 @@ you want. (In this discussion, "column" will be used to refer both to
 a column in the data file and an entry in the @ref{using} list.)
 
 For three columns, only `xerrorbars`, `yerrorbars` (or @ref{errorbars}),
-`xerrorlines`, `yerrorlines` (or @ref{errorlines}), `boxes` 
+`xerrorlines`, `yerrorlines` (or @ref{errorlines}), `boxes`,
 and `boxerrorbars` are allowed. If another plot style is used, the style
 will be changed to `yerrorbars`. The `boxerrorbars` style will
 calculate the boxwidth automatically.
@@ -9238,6 +9379,139 @@ jpeg, nec_cp6, epson_180dpi, epson_60dpi, epson_lx800, okidata, starc and
 tandy_60dpi. The BeOS driver (`be`) is untested.
 
 
+@noindent --- HISTOGRAMS ---
+
+@c ?commands set style histograms
+@c ?set style histograms
+@c ?style histograms
+@cindex histograms
+
+The `histograms` style is only relevant to 2-d plotting.  It produces a bar
+chart from a sequence of data columns in parallel. Each element of the 
+`plot` command must specify a single input data source (e.g. one column of 
+the input file), possibly with associated tic values or key titles.
+Three styles of histogram layout are currently supported. 
+
+@example
+      set style histogram clustered @{gap <gapsize>@}
+      set style histogram rowstacked
+      set style histogram columnstacked
+
+@end example
+
+The default style corresponds to `set style histogram clustered gap 2`. 
+Each set of parallel data values is collected into a group of boxes clustered
+at the x-axis coordinate corresponding to their sequential position (row #)
+in the selected datafile columns.  Thus if <n> datacolumns are selected, the
+first cluster is centered about x=1, and contains <n> boxes whose heights are
+taken from the first entry in the corresponding <n> data columns. This
+is followed by a gap and then a second cluster of boxes centered about x=2
+corresponding to the second entry in the respective data columns, and so on.
+The default gap width of 2 indicates that the empty space between clusters is
+equivalent to the width of 2 boxes.  All boxes derived from any one column
+are given the same fill color and/or pattern (see `set style fill`).
+
+Each cluster of boxes is derived from a single row of the input data file.
+It is common in such input files that the first element of each row is a
+label. Labels from this column may be placed along the x-axis underneath
+the appropriate cluster of boxes with the `xticlabels` option to @ref{using}.
+
+Two styles of stacked histogram are supported, chosen by the command
+`set style histogram @{rowstacked|columnstacked@}`.  In these styles the data
+values from the selected columns are collected into stacks of boxes.
+The default stacking mode is `rowstacked`.
+
+The `rowstacked` style places a box resting on the x-axis for each
+data value in the first selected column; the first data value results in 
+a box a x=1, the second at x=2, and so on.  Boxes corresponding to the
+second and subsequent data columns are layered on top of these, resulting
+in a stack of boxes at x=1 representing the first data value from each
+column, a stack of boxes at x=2 representing the second data value from
+each column, and so on.  All boxes derived from any one column are given the 
+same fill color and/or pattern (see `set style fill`).
+
+The `columnstacked` style is similar, except that each stack of boxes is
+built up from a single data column. Each data value from the first specified
+column yields a box in the stack at x=1, each data value from the second
+specified column yields a box in the stack at x=2, and so on.  In this style
+the color of each box is taken from the row number, rather than the column
+number, of the corresponding data field.
+
+Box widths may be modified using the @ref{boxwidth} command.
+Box fill styles may be set using the `set style fill` command.
+
+Examples:
+
+To plot a data file containing multiple columns of data as a histogram
+of clustered boxes (the default style):
+
+@example
+      set boxwidth 0.9 relative
+      set style data histograms
+      set style fill solid 1.0 border -1
+      plot 'file.dat' using 2, '' using 4, '' using 3 
+
+@end example
+
+This will produce a plot with clusters of three boxes (vertical bars) centered
+at each integral value on the x axis. If the first column of the input file
+contains labels, they may be placed along the x-axis using the variant command
+
+@example
+      plot 'file.dat' using 2, '' using 4, '' using 3:xticlabels(1) 
+
+@end example
+
+To plot the same data as a rowstacked histogram:
+
+@example
+      set style histogram rows
+      plot 'file.dat' using 2, '' using 4, '' using 3:xtic(1) 
+
+@end example
+
+This will produce a plot in which each vertical bar contains a stack of three
+segments, corresponding in height to the values found in columns 2, 4 and 3
+of the datafile.
+
+Finally, the commands
+
+@example
+      set style histogram columnstacked
+      plot 'file.dat' using 2, '' using 4, '' using 3 
+
+@end example
+
+will produce three vertical stacks. The stack at x=1 will contain a box for
+each entry in column 2 of the datafile.  The stack at x=2 will contain a box
+for each parallel entry in column 4 of the datafile, and the stack at x=3 a
+box for each entry of column 3.  
+
+More than one set of histograms can appear in a single plot. In this case you
+can force a gap between them, and a separate label for each set, by using the
+`newhistogram @{ "title" @} @{ <linestyle> @}` plot command.  For example
+@example
+      set style histogram  cluster
+      plot newhistogram "Set A", 'a' using 1, '' using 2, '' using 3, \
+           newhistogram "Set B", 'b' using 1, '' using 2, '' using 3
+
+@end example
+
+The labels "Set A" and "Set B" will appear beneath the respective sets of 
+histograms, under the overall x axis label.
+
+The newhistogram command can also be used to force histogram coloring to
+begin with a specific color (linetype). By default colors will continue to
+increment successively even across histogram boundaries. Here is an example
+using the same coloring for multiple histograms
+@example
+      plot newhistogram "Set A" lt 4, 'a' using 1, '' using 2, '' using 3, \
+           newhistogram "Set B" lt 4, 'b' using 1, '' using 2, '' using 3
+
+@end example
+
+
+
 @noindent --- FILLEDCURVES ---
 
 @c ?commands set style filledcurves
@@ -9246,10 +9520,12 @@ tandy_60dpi. The BeOS driver (`be`) is untested.
 @c ?style filledcurves
 @cindex filledcurves
 
-The `filledcurves` style is only relevant to 2-d plotting. It draws either
-the current curve closed and filled, or the region between the current curve
-and a given axis, horizontal or vertical line, or a point, filled with the
-current drawing color.
+The `filledcurves` style is only relevant to 2-d plotting. Three variants
+are possible. The default is `closed`, which treats the curve itself as a
+closed polygon. The second option is to fill the area between the curve and
+a given axis, horizontal or vertical line, or a point.
+The third option requires three columns of input data: the x coordinate and
+two corresponding y coordinates; the area between the two curves is filled.
 
 Syntax:
 
@@ -9262,7 +9538,7 @@ Syntax:
 where the option can be
 
 @example
-    [closed | @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
+    [closed | @{above | below@} @{x1 | x2 | y1 | y2@}[=<a>] | xy=<x>,<y>]
 
 @end example
 
@@ -9276,6 +9552,13 @@ The area is filled between the current curve and
     filledcurves xy=10,20 ... point 10,20 of x1,y1 axes (arc-like shape).
 
 @end example
+
+The `above` and `below` options apply only to commands of the form
+@example
+    ... filledcurves above @{x1|x2|y1|y2@}=<val>
+@end example
+
+and limit the filled area to one side of the bounding line.
 
 Note: filling is supported on filled-polygon capable terminals, see help of
 @ref{pm3d} for their list.
@@ -9442,6 +9725,39 @@ create bins and determine their population from some data set.
 
 The `impulses` style displays a vertical line from the x axis (not the graph
 border), or from the grid base for `splot`, to each point.
+
+
+@noindent --- LABELS ---
+
+@c ?commands set style labels
+@c ?set style labels
+@c ?plotting styles labels
+@c ?style labels
+@cindex labels
+
+The `labels` style is available only if gnuplot is built with configuration 
+option --enable-datastrings. For a 2-D plot with labels you must specify
+3 input data columns; the text string found in the third column is printed at
+the X and Y coordinates generated by the first two column specifiers. The 
+font, color, rotation angle and other properties of the printed text may be
+specified as additional command options (see @ref{label}). The example below
+will generate a 2-D plot with text labels taken from column 4 of the input
+file (`tc lt 2` is shorthand for `textcolor linetype 2`, which is green).
+
+@example
+  plot 'datafile' using 1:(0.5 * $2):4 with labels font "arial,11" tc lt 2
+
+@end example
+
+The `labels` style can also be used in 3-D plots. In this case four input
+column specifiers are required, corresponding to X Y Z and text.
+
+@example
+  splot 'datafile' using 1:2:3:4 with labels
+
+@end example
+
+See also `datastrings`, `set style data`.
 
 
 @noindent --- LINES ---

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.53 2004/07/03 06:08:48 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.54 2004/07/05 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -202,9 +202,6 @@ enum COLUMN_TYPE { CT_DEFAULT, CT_STRING, CT_KEYLABEL,
 /* public variables client might access */
 
 int df_no_use_specs;		/* how many using columns were specified */
-#ifdef EAM_DATASTRINGS
-int df_no_tic_specs;		/* except ticlabel columns are counted here */
-#endif
 #ifdef EAM_HISTOGRAMS
 struct curve_points *df_current_plot; /* set before calling df_readline() */
 #endif
@@ -247,6 +244,10 @@ static TBOOLEAN df_pipe_open = FALSE;
 static TBOOLEAN mixed_data_fp = FALSE; /* inline data */
 static char *df_filename;	/* name of data file */
 
+#ifdef EAM_DATASTRINGS
+static int df_no_tic_specs;		/* except ticlabel columns are counted here */
+#endif
+
 #ifndef MAXINT			/* should there be one already defined ? */
 # ifdef INT_MAX			/* in limits.h ? */
 #  define MAXINT INT_MAX
@@ -288,7 +289,7 @@ typedef struct df_column_struct {
     char *position;
 } df_column_struct;
 
-       df_column_struct *df_column = NULL;	/* we'll allocate space as needed */
+static df_column_struct *df_column = NULL;	/* we'll allocate space as needed */
 static int df_max_cols = 0;	/* space allocated */
 static int df_no_cols;		/* cols read */
 static int fast_columns;	/* corey@cac optimization */
@@ -1856,7 +1857,7 @@ df_set_key_title(struct curve_points *plot)
     plot->title = gp_strdup(df_key_title);
 }
 
-void
+static void
 df_parse_string_field(char *string, char *field)
 {
     char temp_string[64];

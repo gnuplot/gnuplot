@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.52 2004/07/02 23:58:35 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.53 2004/07/08 19:26:16 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -58,6 +58,8 @@ char *infile_name = NULL;
 
 static TBOOLEAN lf_pop __PROTO((void));
 static void lf_push __PROTO((FILE *));
+static void arrow_use_properties __PROTO((struct arrow_style_type *arrow, int tag));
+static char *recursivefullname __PROTO((const char *path, const char *filename, TBOOLEAN recursive));
 
 /* A copy of the declaration from set.c */
 /* There should only be one declaration in a header file. But I do not know
@@ -915,13 +917,11 @@ parse_fillstyle(struct fill_style_type *fs, int def_style, int def_density, int 
  * the current context [ie not when doing a  set style arrow command]
  */
 
-void
+static void
 arrow_use_properties(struct arrow_style_type *arrow, int tag)
 {
-    /*  This function looks for an arrowstyle defined by 'tag' and copies
-     *  its data into the structure 'ap'.
-     */
-
+    /*  This function looks for an arrowstyle defined by 'tag' and
+     *  copies its data into the structure 'ap'. */
     struct arrowstyle_def *this;
 
     this = first_arrowstyle;

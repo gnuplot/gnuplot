@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.16 2004/07/01 17:10:09 broeker Exp $
+ * $Id: util.h,v 1.17 2004/07/03 06:08:50 sfeam Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -60,7 +60,9 @@ extern char *decimalsign;
 /* Functions exported by util.c: */
 
 /* Command parsing helpers: */
+#if 0 /* UNUSED */
 int chr_in_str __PROTO((int, int));
+#endif
 int equals __PROTO((int, const char *));
 int almost_equals __PROTO((int, const char *));
 int isstring __PROTO((int));

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: gd.trm,v 1.43 2004/07/02 23:58:40 sfeam Exp $
+ * $Id: gd.trm,v 1.44 2004/07/08 19:26:13 sfeam Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -803,12 +803,12 @@ PNG_show_current_palette()
 #endif
 
 /*
-How this works:
-Gray interval [0;1] will be mapped to interval [0;sm_palette.colors-1]
-those r,g,b components are mapped by the array below
-palette.offset equals 0 since png_smooth_color[0..colors] are from ColorAllocate
+How this works: Gray interval [0;1] will be mapped to interval
+[0;sm_palette.colors-1] those r,g,b components are mapped by the array
+below palette.offset equals 0 since png_smooth_color[0..colors] are
+from ColorAllocate
 */
-int png_smooth_color[ gdMaxColors ];
+static int png_smooth_color[gdMaxColors];
   /* chooser from the colour palette */
   /* TODO: how to recover from a multiplot with two colour pm3d maps?
      They must use the same palette! Or palette size must be

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.114 2004/07/04 23:58:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.115 2004/07/05 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -4280,7 +4280,7 @@ free_histlist(struct histogram_style *hist)
     }
 }
 
-void
+static void
 place_histogram_titles()
 {
     histogram_style *hist = &histogram_opts;
@@ -4394,26 +4394,26 @@ do_key_sample(
  * This limits the number of styles to 16 and the fill parameter's
  * values to the range 0...4095, which seems acceptable.
  */
-int
+static int
 style_from_fill(struct fill_style_type *fs)
 {
 #ifdef USE_ULIG_FILLEDBOXES
     int fillpar, style;
 
-	switch( fs->fillstyle ) {
-	case FS_SOLID:
-		fillpar = fs->filldensity;
-		style = ((fillpar & 0xfff) << 4) + FS_SOLID;
-		break;
-	case FS_PATTERN:
-		fillpar = fs->fillpattern;
-		style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
-		break;
-	default:
-		/* solid fill with background color */
-		style = FS_EMPTY;
-		break;
-	}
+    switch( fs->fillstyle ) {
+    case FS_SOLID:
+	fillpar = fs->filldensity;
+	style = ((fillpar & 0xfff) << 4) + FS_SOLID;
+	break;
+    case FS_PATTERN:
+	fillpar = fs->fillpattern;
+	style = ((fillpar & 0xfff) << 4) + FS_PATTERN;
+	break;
+    default:
+	/* solid fill with background color */
+	style = FS_EMPTY;
+	break;
+    }
 #else
     int style = FS_EMPTY;
 #endif

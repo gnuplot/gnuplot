@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.105 2004/07/06 02:44:08 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.107 2004/07/08 23:31:10 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -357,6 +357,7 @@ static void delete_plot __PROTO((plot_struct *));
 
 static int record __PROTO((void));
 static void process_event __PROTO((XEvent *));	/* from Xserver */
+static void process_configure_notify_event __PROTO((XEvent *event));
 
 static void mainloop __PROTO((void));
 
@@ -382,7 +383,7 @@ static void DrawCoords __PROTO((plot_struct *, const char *));
 static void DisplayCoords __PROTO((plot_struct *, const char *));
 
 static TBOOLEAN is_meta __PROTO((KeySym));
-static char* __PROTO((getMultiTabConsoleSwitchCommand(unsigned long *)));
+static char* getMultiTabConsoleSwitchCommand __PROTO((unsigned long *));
 #endif
 
 static void DrawRotated __PROTO((plot_struct *, Display *, GC,

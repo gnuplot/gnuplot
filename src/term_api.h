@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.30 2004/07/01 17:10:08 broeker Exp $
+ * $Id: term_api.h,v 1.31 2004/07/02 23:58:40 sfeam Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -328,10 +328,11 @@ void term_apply_lp_properties __PROTO((struct lp_style_type *lp));
 void term_check_multiplot_okay __PROTO((TBOOLEAN));
 
 void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
-GP_INLINE int term_count __PROTO((void));
+#if 0 /* UNUSED */
+int term_count __PROTO((void));
+#endif /* UNUSED */
 void list_terms __PROTO((void));
 struct termentry *set_term __PROTO((int));
-struct termentry *change_term __PROTO((const char *name, int length));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.20 2004/04/13 17:24:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.21 2004/07/01 17:10:09 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -202,7 +202,7 @@ struct path_table {
 
 #if defined(OS2) && !defined(FONTPATHSET)
 #  define FONTPATHSET
-const struct path_table fontpath_tbl[] =
+static const struct path_table fontpath_tbl[] =
 {
     { "$(BOOTDIR)/PSFONTS" },
     /* X11 */
@@ -213,7 +213,7 @@ const struct path_table fontpath_tbl[] =
 
 #if defined(_Windows) && !defined(FONTPATHSET)
 #  define FONTPATHSET
-const struct path_table fontpath_tbl[] =
+static const struct path_table fontpath_tbl[] =
 {
     { "$(windir)\\fonts" },
     /* Ghostscript */
@@ -229,7 +229,7 @@ const struct path_table fontpath_tbl[] =
 
 #if defined(_Macintosh) && !defined(FONTPATHSET)
 #  define FONTPATHSET
-const struct path_table fontpath_tbl[] =
+static const struct path_table fontpath_tbl[] =
 {
     { "/System/Library/Fonts!" },
     { "/Library/Fonts!" },
@@ -240,7 +240,7 @@ const struct path_table fontpath_tbl[] =
 
 #if defined(VMS) && !defined(FONTPATHSET)
 #  define FONTPATHSET
-const struct path_table fontpath_tbl[] =
+static const struct path_table fontpath_tbl[] =
 {
     { "SYS$COMMON:[SYSFONT]!" },
     { NULL }
@@ -249,7 +249,7 @@ const struct path_table fontpath_tbl[] =
 
 /* Fallback: Should work for unix */
 #ifndef FONTPATHSET
-const struct path_table fontpath_tbl[] =
+static const struct path_table fontpath_tbl[] =
 {
     /* teTeX */
     { "$`kpsexpand '$TEXMFMAIN'`/fonts/type1!" },

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.135 2004/07/04 13:16:03 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.136 2004/07/05 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -67,7 +67,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.135 2004/07/04 13:16:03 broe
 #ifdef PM3D
 #include "pm3d.h"
 #include "getcolor.h"
-palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
+static palette_color_mode pm3d_last_set_palette_mode = SMPAL_COLOR_MODE_NONE;
 #endif
 
 #include <ctype.h>		/* for isdigit() */
@@ -4480,7 +4480,7 @@ parse_label_options( struct text_label *this_label )
 #ifdef EAM_HISTOGRAMS
 /* <histogramstyle> = {clustered {gap <n>} | rowstacked | columnstacked} */
 /*                    {title <title_options>}                            */
-void
+static void
 parse_histogramstyle( histogram_style *hs, 
 		t_histogram_type def_type,
 		int def_gap)

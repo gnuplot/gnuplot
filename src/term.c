@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.77 2004/07/02 23:58:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.78 2004/07/04 17:27:19 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -189,8 +189,9 @@ static double term_pointsize=1;
 
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
-static void null_linewidth __PROTO((double));
+static struct termentry *change_term __PROTO((const char *name, int length));
 
+static void null_linewidth __PROTO((double));
 static void do_point __PROTO((unsigned int x, unsigned int y, int number));
 static void do_pointsize __PROTO((double size));
 static void line_and_point __PROTO((unsigned int x, unsigned int y, int number));
@@ -215,12 +216,15 @@ static char *enhanced_cur_text;
 static double enhanced_fontscale;
 static char enhanced_escape_format[16];
 static double enhanced_max_height, enhanced_min_height;
-char * enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
-	     char *fontname, double fontsize, double base,
-	     TBOOLEAN widthflag, TBOOLEAN showflag, int overprint));
+
+static char *enhanced_recursion __PROTO((char *p, TBOOLEAN brace,
+					 char *fontname, double fontsize,
+					 double base, TBOOLEAN widthflag,
+					 TBOOLEAN showflag, int overprint));
 static void enh_err_check __PROTO((const char *str));
+/* note: c is char, but must be declared int due to K&R compatibility. */
 static void do_enh_writec __PROTO((int c));
-  /* note: c is char, but must be declared int due to an old K&R ANSI-C strict HP cc */
+
 
 
 #ifdef __ZTC__
@@ -1133,14 +1137,16 @@ static struct termentry term_tbl[] =
 
 };
 
-#define TERMCOUNT (sizeof(term_tbl)/sizeof(term_tbl[0]))
+#define TERMCOUNT (sizeof(term_tbl) / sizeof(term_tbl[0]))
 
+#if 0 /* UNUSED */
 /* mainly useful for external code */
-GP_INLINE int
+int
 term_count()
 {
     return TERMCOUNT;
 }
+#endif
 
 void
 list_terms()
@@ -1205,7 +1211,7 @@ set_term(int c_token_arg)
  * returns NULL for unknown or ambiguous, otherwise is terminal
  * driver pointer
  */
-struct termentry *
+static struct termentry *
 change_term(const char *name, int length)
 {
     int i;
@@ -2022,7 +2028,7 @@ do_enh_writec(int c)
  *              (overprinted text is centered horizontally on underprinted text
  */
 
-char *
+static char *
 enhanced_recursion(
     char *p,
     TBOOLEAN brace,

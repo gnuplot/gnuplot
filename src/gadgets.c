@@ -132,7 +132,9 @@ enum PLOT_STYLE func_style = LINES;
 
 TBOOLEAN parametric = FALSE;
 
+#if 0 /* UNUSED */
 TBOOLEAN suppressMove = FALSE;	/* to prevent moveto while drawing contours */
+#endif
 
 /* EAM Sep 2002 - EMPTY fillstyle valid even if USE_ULIG_FILLEDBOXES is not selected */
 fill_style_type default_fillstyle = { FS_EMPTY, 100, 0, LT_UNDEFINED } ;
@@ -214,7 +216,9 @@ draw_clip_line(int x1, int y1, int x2, int y2)
      * curves, but as soon as the contour curve moves outside the
      * boundary, you get overpainting instead, as the contour curve
      * walks along the border. Or worse artefacts.  */
+#if 0 /* UNUSED */
     if (!suppressMove)
+#endif
 	(*t->move) (x1, y1);
     (*t->vector) (x2, y2);
 }

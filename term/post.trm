@@ -1,5 +1,5 @@
 /* Hello, Emacs: this is -*-C-*- !
- * $Id: post.trm,v 1.110 2004/07/01 17:10:33 broeker Exp $
+ * $Id: post.trm,v 1.111 2004/07/02 23:56:52 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -131,10 +131,10 @@ static int ps_palfunc_samples = 2000;        /* setable via "palf$uncparam" */
 static double ps_palfunc_deviation = 0.003;  /* terminal option */
 static void make_interpolation_code __PROTO((void));
 static void make_color_model_code __PROTO((void));
-static char * save_space __PROTO(( double gray ));
-static void write_component_array __PROTO(( const char *text, gradient_struct *grad, int cnt, int offset ));
-static void write_gradient_definition __PROTO(( gradient_struct *gradient, int cnt ));
-static void write_color_space __PROTO(( t_sm_palette *palette ));
+static char * save_space __PROTO((double gray));
+static void write_component_array __PROTO((const char *text, gradient_struct *grad, int cnt, int offset));
+static void write_gradient_definition __PROTO((gradient_struct *gradient, int cnt));
+static void write_color_space __PROTO((t_sm_palette *palette));
 static void make_palette_formulae __PROTO((void));
 #endif /* PM3D */
 
@@ -170,8 +170,11 @@ struct ps_fontfile_def {
     char *fontfile_name;
     char *fontfile_fullname;
 };
-struct ps_fontfile_def *first_ps_fontfile = NULL;
+static struct ps_fontfile_def *first_ps_fontfile = NULL;
+
 static void delete_ps_fontfile __PROTO((struct ps_fontfile_def *, struct ps_fontfile_def *));
+static void PS_make_header __PROTO((t_sm_palette *palette));
+
 TERM_PUBLIC void PS_load_fontfile __PROTO((struct ps_fontfile_def *,TBOOLEAN));
 TERM_PUBLIC void PS_load_fontfiles __PROTO((TBOOLEAN));
 
@@ -945,7 +948,7 @@ PS_options()
                 gp_expand_tilde(&(new_ps_fontfile->fontfile_name));
 		if (!deleteentry) {
 #if defined(PIPES)
-		    if ( *(new_ps_fontfile->fontfile_name) != '<' ) {
+		    if (*(new_ps_fontfile->fontfile_name) != '<') {
 #endif
 			new_ps_fontfile->fontfile_fullname =
 			    fontpath_fullname(new_ps_fontfile->fontfile_name);
@@ -966,7 +969,7 @@ PS_options()
 			while (lf->prev)
 			    lf=lf->prev;
 		    }
-		    if ( (lf && lf->interactive) || interactive)
+		    if ((lf && lf->interactive) || interactive)
 			/* if (interactive) { */
 			PS_load_fontfile(new_ps_fontfile,FALSE);
 		}
@@ -1018,7 +1021,7 @@ PS_options()
 	    ++c_token;
 	    ps_palfunc_samples = (int)real(const_express(&a));
 	    if (ps_palfunc_samples < 2) ps_palfunc_samples = 2;
-	    if ( !END_OF_COMMAND && equals(c_token, ",") ) {
+	    if (!END_OF_COMMAND && equals(c_token, ",")) {
 	        ++c_token;
 		ps_palfunc_deviation = fabs(real(const_express(&a)));
 		if (ps_palfunc_deviation >= 1)
@@ -1126,10 +1129,10 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 
 	/* get filename extension if no pipe (if pipe *ext=='\0') */
 #if defined(PIPES)
-	if ( *(current_ps_fontfile->fontfile_name) != '<' ) {
+	if (*(current_ps_fontfile->fontfile_name) != '<') {
 	    /* Filename is given */
 #endif
-	    if ( strlen(current_ps_fontfile->fontfile_name) > 3 )
+	    if (strlen(current_ps_fontfile->fontfile_name) > 3)
 		strcpy(ext, current_ps_fontfile->fontfile_name +
 		       strlen(current_ps_fontfile->fontfile_name) - 3);
 	    else
@@ -1144,18 +1147,18 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 #if defined(PIPES)
 	}
 #endif
-	if ( strlen(ext) == 0 ) {
+	if (strlen(ext) == 0) {
 #if defined(PIPES)
 	    /* Pipe is given */
 	    ispipe = TRUE;
 	    strcpy(cmd,current_ps_fontfile->fontfile_name + 1);
-	    ffont = popen(cmd, "r" );
-	    if ( !ffont )
+	    ffont = popen(cmd, "r");
+	    if (!ffont)
 		int_error(NO_CARET, "Could not execute pipe '%s'",
-			  current_ps_fontfile->fontfile_name + 1 );
+			  current_ps_fontfile->fontfile_name + 1);
 #endif
 	}
-	else if ( strcmp(ext,"ttf") == 0 ) {
+	else if (strcmp(ext,"ttf") == 0) {
 	    /* TrueType */
 #if defined(PIPES)
 	    ispipe = TRUE;
@@ -1170,14 +1173,14 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 			  "No command for automatic font conversion ttf->pfa defined");
 	    else {
 		ffont = popen(cmd,"r");
-		if ( !ffont )
+		if (!ffont)
 		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
 	    }
 #else
 	    os_error(NO_CARET,
 		     "Automatic font conversion ttf->pfa not supported");
 #endif
-	} else if ( strcmp(ext,"pfb") == 0 ) {
+	} else if (strcmp(ext,"pfb") == 0) {
 	    /* PFB */
 #if defined(PIPES)
 	    ispipe = TRUE;
@@ -1192,7 +1195,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 			  "No command for automatic font conversion pfb->pfa defined");
 	    else {
 		ffont = popen(cmd,"r");
-		if ( !ffont )
+		if (!ffont)
 		    int_error(NO_CARET,"Could not execute command '%s'", cmd);
 	    }
 #else
@@ -1201,7 +1204,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 #endif
 	} else {
 	    /* PFA */
-	    if ( strcmp(ext,"pfa") != 0 )
+	    if (strcmp(ext,"pfa") != 0)
 		int_warn(NO_CARET,
 			 "Font file '%s' has unknown extension. Assume it is a pfa file",
 			 current_ps_fontfile->fontfile_name);
@@ -1213,11 +1216,11 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	/* read the file */
 	while (fgets(line,255,ffont)) {
 	    /* test file format */
-	    if ( (linesread == 0) &&
+	    if ((linesread == 0) &&
 		 (strstr(line,"%!PS-AdobeFont") != line) &&
-		 (strstr(line,"%!FontType1") != line) ) {
+		 (strstr(line,"%!FontType1") != line)) {
 #if defined(PIPES)
-		if ( ispipe )
+		if (ispipe)
 		    int_warn(NO_CARET,
 			     "Command '%s' seems not to generate PFA data",
 			     cmd);
@@ -1251,7 +1254,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 		    /* Stop reading font file in order to save time */
 		    /* This does not work for pipes because they give the */
 		    /* error message 'broken pipe' */
-		    if ( !ispipe )
+		    if (!ispipe)
 #endif
 			break;
 		}
@@ -1263,9 +1266,9 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 	    ++linesread;
 	}
 #if defined(PIPES)
-	if ( ispipe ) {
+	if (ispipe) {
 	    int exitcode;
-	    if ( (exitcode = pclose(ffont)) != 0 )
+	    if ((exitcode = pclose(ffont)) != 0)
 		int_error(NO_CARET,
 			  "Command '%s' generated error, exitcode is %d",
 			  cmd, exitcode);
@@ -1276,7 +1279,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 
 	if (linesread == 0) {
 #if defined(PIPES)
-	    if ( ispipe )
+	    if (ispipe)
 		int_error(NO_CARET,
 			  "Command '%s' generates empty output",
 			  cmd);
@@ -1290,7 +1293,7 @@ PS_load_fontfile(struct ps_fontfile_def *current_ps_fontfile, TBOOLEAN doload)
 
 	/* Computer Modern Symbol font with corrected baseline if the
 	 * font CMEX10 is embedded */
-	if ( doload && fontname && (strcmp(fontname,"CMEX10") == 0) ) {
+	if (doload && fontname && (strcmp(fontname,"CMEX10") == 0)) {
 	    fputs("%%BeginProcSet: CMEX10-Baseline\n",gpoutfile);
 	    fputs("/CMEX10-Baseline /CMEX10 findfont [1 0 0 1 0 1] makefont\n",
 		  gpoutfile);
@@ -1732,7 +1735,7 @@ NULL };
     else
 	fputs("%!PS-Adobe-2.0 EPSF-2.0\n", gpoutfile);
 
-    if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr );   /*  JFi  */
+    if (outstr) fprintf(gpoutfile, "%%%%Title: %s\n", outstr);   /*  JFi  */
     time(&now);
     fprintf(gpoutfile, psi1, gnuplot_version, gnuplot_patchlevel,
 	    asctime(localtime(&now)), uses_fonts ? "(atend)" : "");
@@ -1778,7 +1781,7 @@ NULL };
 	}
     }
 
-    for ( i = 0; PS_header[i] != NULL; i++)
+    for (i = 0; PS_header[i] != NULL; i++)
 	fprintf(gpoutfile,"%s",PS_header[i]);
     if (ps_duplex_option)
 	fprintf(gpoutfile, "statusdict begin %s setduplexmode end\n",
@@ -1862,7 +1865,7 @@ gnudict begin\ngsave\n\
     fprintf(gpoutfile, psg1);
     if (ps_common_uses_fonts)
 	fprintf(gpoutfile, "(%s) findfont %d scalefont setfont\n",
-		ps_font, (t->v_char) );
+		ps_font, (t->v_char));
     ps_path_count = 0;
     PS_relative_ok = FALSE;
     PS_pen_x = PS_pen_y = -4000;
@@ -2097,7 +2100,7 @@ PS_put_text(unsigned int x, unsigned int y, const char *str)
     putc('(',gpoutfile);
     ch = *str++;
     while(ch!='\0') {
-	if ( (ch=='(') || (ch==')') || (ch=='\\') )
+	if ((ch=='(') || (ch==')') || (ch=='\\'))
 	    putc('\\',gpoutfile);
 	putc(ch,gpoutfile);
 	ch = *str++;
@@ -2156,7 +2159,7 @@ PS_set_font(const char *font)
     size = ps_fontsize;
     if (font[sep] == ',')
 	sscanf (&(font[sep+1]),"%d",&size);
-    PS_RememberFont(name,1 );
+    PS_RememberFont(name,1);
     fprintf(gpoutfile,"/%s findfont %d scalefont setfont\n",name,size*PS_SC);
     term->v_char = (unsigned int)(size*PS_SC);
     term->h_char = (unsigned int)(size*PS_SC*6/10);
@@ -2216,14 +2219,14 @@ PS_fillbox(
     PS_FLUSH_PATH;
 
 #if USE_ULIG_FILLEDBOXES
-    switch( style & 0xf ) {
+    switch(style & 0xf) {
 
     case FS_SOLID:
 	/* style == 1 --> fill with intensity according to filldensity */
         filldens = (style >> 4) / 100.0;
-        if( filldens < 0.0 )
+        if(filldens < 0.0)
 	    filldens = 0.0;
-        if( filldens > 1.0 )
+        if(filldens > 1.0)
 	    filldens = 1.0;
         fprintf(gpoutfile, "%.3f %d %d %d %d BoxColFill\n",
 		filldens, x1,y1, width,height);
@@ -2475,22 +2478,22 @@ static void make_palette_formulae()
 /* print the definition of R,G,B formulae */
   fputs("/InterpolatedColor false def\n",gpoutfile);
 if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
-    fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+    fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
 	     abs(R), ps_math_color_formulae[ 2*abs(R) ],
 	     ps_math_color_formulae[ 2*abs(R)+1 ]);
     if (abs(G) != abs(R))
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
 	       abs(G), ps_math_color_formulae[ 2*abs(G) ],
 	       ps_math_color_formulae[ 2*abs(G)+1 ]);
     if ((abs(B) != abs(R)) && (abs(B) != abs(G)))
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
 	       abs(B), ps_math_color_formulae[ 2*abs(B) ],
 	       ps_math_color_formulae[ 2*abs(B)+1 ]);
     }
   else { /* all color formulae are written into the output PostScript file */
     int i = 0;
-    while ( *(ps_math_color_formulae[2*i]) ) {
-      fprintf( gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
+    while (*(ps_math_color_formulae[2*i])) {
+      fprintf(gpoutfile, "/cF%i {%s} bind def\t%% %s\n",
 	       i, ps_math_color_formulae[ 2*i ],
 	       ps_math_color_formulae[ 2*i+1 ]);
       i++;
@@ -2503,110 +2506,128 @@ if (sm_palette.ps_allcF == 0) { /* print only those 3 used formulae */
 
 
 
-static void make_interpolation_code()
+static void
+make_interpolation_code()
 {
-  static const char *header[] = {
-    "/grayindex {/gidx 0 def\n",
-    "  {GrayA gidx get grayv ge {exit} if /gidx gidx 1 add def} loop} def\n",
-    "/dgdx {grayv GrayA gidx get sub GrayA gidx 1 sub get\n",
-    "  GrayA gidx get sub div} def \n",
-    "/redvalue {RedA gidx get RedA gidx 1 sub get\n",
-    "  RedA gidx get sub dgdxval mul add} def\n",
-    "/greenvalue {GreenA gidx get GreenA gidx 1 sub get\n",
-    "  GreenA gidx get sub dgdxval mul add} def\n",
-    "/bluevalue {BlueA gidx get BlueA gidx 1 sub get\n",
-    "  BlueA gidx get sub dgdxval mul add} def\n",
-    "/interpolate {\n",
-    "  grayindex grayv GrayA gidx get sub abs 1e-5 le\n",
-    "    {RedA gidx get GreenA gidx get BlueA gidx get}\n",
-    "    {/dgdxval dgdx def redvalue greenvalue bluevalue} ifelse} def\n",
-    NULL,
-  };
-  int i;
-  for( i=0; header[i]!=NULL; ++i ) {
-    fputs( header[i], gpoutfile );
-  }
-}
-
-
-static void make_color_model_code()
-{
-    /* Postscript version of the color space transformations in getcolor.c */
     static const char *header[] = {
-"/HSV2RGB {",
-"  exch dup 0.0 eq {pop exch pop dup dup} % achromatic gray\n",
-"  { /HSVs exch def /HSVv exch def 6.0 mul dup floor dup 3 1 roll sub\n ",
-"    /HSVf exch def /HSVi exch cvi def /HSVp HSVv 1.0 HSVs sub mul def\n",
-"	 /HSVq HSVv 1.0 HSVs HSVf mul sub mul def \n",
-"	 /HSVt HSVv 1.0 HSVs 1.0 HSVf sub mul sub mul def\n",
-"	 /HSVi HSVi 6 mod def 0 HSVi eq {HSVv HSVt HSVp}\n",
-"	 {1 HSVi eq {HSVq HSVv HSVp}{2 HSVi eq {HSVp HSVv HSVt}\n",
-"	 {3 HSVi eq {HSVp HSVq HSVv}{4 HSVi eq {HSVt HSVp HSVv}\n",
-"	 {HSVv HSVp HSVq} ifelse} ifelse} ifelse} ifelse} ifelse\n",
-"  } ifelse} def\n",
-"/Constrain {\n",
-"  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def\n",
-"/YIQ2RGB {\n",
-"  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll\n",
-"  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll\n",
-"  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def\n",
-"/CMY2RGB {",
-"  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def\n",
-"/XYZ2RGB {",
-"  3 copy -0.9017 mul exch -0.1187 mul add exch 0.0585 mul exch add\n",
-"  Constrain 4 1 roll 3 copy -0.0279 mul exch 1.999 mul add exch\n",
-"  -0.9844 mul add Constrain 5 1 roll -0.2891 mul exch -0.5338 mul add\n",
-"  exch 1.91 mul exch add Constrain 3 1 roll} def\n",
-"/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {\n",
-"  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}\n",
-"  if} ifelse} ifelse} ifelse} def\n",
-        NULL,
+	"/grayindex {/gidx 0 def\n",
+	"  {GrayA gidx get grayv ge {exit} if /gidx gidx 1 add def} loop} def\n",
+	"/dgdx {grayv GrayA gidx get sub GrayA gidx 1 sub get\n",
+	"  GrayA gidx get sub div} def \n",
+	"/redvalue {RedA gidx get RedA gidx 1 sub get\n",
+	"  RedA gidx get sub dgdxval mul add} def\n",
+	"/greenvalue {GreenA gidx get GreenA gidx 1 sub get\n",
+	"  GreenA gidx get sub dgdxval mul add} def\n",
+	"/bluevalue {BlueA gidx get BlueA gidx 1 sub get\n",
+	"  BlueA gidx get sub dgdxval mul add} def\n",
+	"/interpolate {\n",
+	"  grayindex grayv GrayA gidx get sub abs 1e-5 le\n",
+	"    {RedA gidx get GreenA gidx get BlueA gidx get}\n",
+	"    {/dgdxval dgdx def redvalue greenvalue bluevalue} ifelse} def\n",
+	NULL,
     };
     int i;
-    for( i=0; header[i]!=NULL; ++i ) {
-        fputs( header[i], gpoutfile );
+
+    for(i=0; header[i]!=NULL; ++i) {
+	fputs(header[i], gpoutfile);
     }
 }
 
 
-static char *save_space( double gray )
+static void
+make_color_model_code()
+{
+    /* Postscript version of the color space transformations in getcolor.c */
+    static const char *header[] = {
+	"/HSV2RGB {",
+	"  exch dup 0.0 eq {pop exch pop dup dup} % achromatic gray\n",
+	"  { /HSVs exch def /HSVv exch def 6.0 mul dup floor dup 3 1 roll sub\n ",
+	"    /HSVf exch def /HSVi exch cvi def /HSVp HSVv 1.0 HSVs sub mul def\n",
+	"	 /HSVq HSVv 1.0 HSVs HSVf mul sub mul def \n",
+	"	 /HSVt HSVv 1.0 HSVs 1.0 HSVf sub mul sub mul def\n",
+	"	 /HSVi HSVi 6 mod def 0 HSVi eq {HSVv HSVt HSVp}\n",
+	"	 {1 HSVi eq {HSVq HSVv HSVp}{2 HSVi eq {HSVp HSVv HSVt}\n",
+	"	 {3 HSVi eq {HSVp HSVq HSVv}{4 HSVi eq {HSVt HSVp HSVv}\n",
+	"	 {HSVv HSVp HSVq} ifelse} ifelse} ifelse} ifelse} ifelse\n",
+	"  } ifelse} def\n",
+	"/Constrain {\n",
+	"  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def\n",
+	"/YIQ2RGB {\n",
+	"  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll\n",
+	"  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll\n",
+	"  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def\n",
+	"/CMY2RGB {",
+	"  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def\n",
+	"/XYZ2RGB {",
+	"  3 copy -0.9017 mul exch -0.1187 mul add exch 0.0585 mul exch add\n",
+	"  Constrain 4 1 roll 3 copy -0.0279 mul exch 1.999 mul add exch\n",
+	"  -0.9844 mul add Constrain 5 1 roll -0.2891 mul exch -0.5338 mul add\n",
+	"  exch 1.91 mul exch add Constrain 3 1 roll} def\n",
+	"/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {\n",
+	"  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}\n",
+	"  if} ifelse} ifelse} ifelse} def\n",
+        NULL,
+    };
+    int i;
+
+    for(i=0; header[i]!=NULL; ++i) {
+        fputs(header[i], gpoutfile);
+    }
+}
+
+
+static char
+*save_space(double gray)
 {
     /* printing the gray with 4 digits and without the leading 0
      * ... saving space */
     static char s[40];
 
     gray = 0.0001*(int)(gray*10000+0.5); /* round it to 4 digits */
-    sprintf( s, "%.4g", gray );
-    if ( s[0] == '0' && s[1] == '.' )
+    sprintf(s, "%.4g", gray);
+    if (s[0] == '0' && s[1] == '.')
         return &(s[1]);  /* strip leading 0 */
     else
         return s;
 }
 
 
-static void write_color_space( t_sm_palette *palette )
+static void
+write_color_space(t_sm_palette *palette)
 {
     /* write something like
      *   /ColorSpace (HSV) def
      * depending on the selcted cmodel in palette */
-    fputs( "/ColorSpace ", gpoutfile );
-    switch( palette->cmodel ) {
-      case C_MODEL_RGB: fputs( "(RGB)", gpoutfile ); break;
-      case C_MODEL_HSV: fputs( "(HSV)", gpoutfile ); break;
-      case C_MODEL_CMY: fputs( "(CMY)", gpoutfile ); break;
-      case C_MODEL_YIQ: fputs( "(YIQ)", gpoutfile ); break;
-      case C_MODEL_XYZ: fputs( "(XYZ)", gpoutfile ); break;
-      default:
+    fputs("/ColorSpace ", gpoutfile);
+    switch(palette->cmodel) {
+    case C_MODEL_RGB:
+	fputs("(RGB)", gpoutfile);
+	break;
+    case C_MODEL_HSV:
+	fputs("(HSV)", gpoutfile);
+	break;
+    case C_MODEL_CMY:
+	fputs("(CMY)", gpoutfile);
+	break;
+    case C_MODEL_YIQ:
+	fputs("(YIQ)", gpoutfile);
+	break;
+    case C_MODEL_XYZ:
+	fputs("(XYZ)", gpoutfile);
+	break;
+    default:
 	fprintf(stderr,"%s:%d ooops: Unkown color model '%c'. Will be RGB\n",
-		__FILE__, __LINE__, (char)(palette->cmodel) );
-	fputs( "(RGB)", gpoutfile ); break;
+		__FILE__, __LINE__, (char)(palette->cmodel));
+	fputs("(RGB)", gpoutfile);
+	break;
     }
-    fputs( " def\n", gpoutfile );
+    fputs(" def\n", gpoutfile);
 }
 
 
-static void write_component_array( const char *text, gradient_struct *grad,
-				   int cnt, int offset )
+static void
+write_component_array(const char *text, gradient_struct *grad,
+		      int cnt, int offset)
 {
     /*  write someting like
      *     /RedA [ 0 .1 .2 .3 .35 .3 .2 .1 0 0 0 ] def
@@ -2614,33 +2635,39 @@ static void write_component_array( const char *text, gradient_struct *grad,
      */
     int i=0, len=0;
     char *val;
-    fprintf( gpoutfile, "/%s [", text );
+
+    fprintf(gpoutfile, "/%s [", text);
     len = strlen(text) + 4;
-    for( i=0; i<cnt; ++i) {
+    for(i=0; i<cnt; ++i) {
         char *ref = (char*)(&(grad[i]));
+
 	ref += offset;
-        val = save_space( *((double*)(ref)) );
-	len += strlen(val)+1;
-	if( len>77 ) { fputs("\n  ",gpoutfile); len = strlen(val)+3; }
-	fprintf(gpoutfile, "%s ", val );
+        val = save_space(*((double*) (ref)));
+	len += strlen(val) + 1;
+	if(len > 77) {
+	    fputs("\n  ",gpoutfile);
+	    len = strlen(val) + 3;
+	}
+	fprintf(gpoutfile, "%s ", val);
     }
     fputs("] def\n", gpoutfile);
 }
 
 
-static void write_gradient_definition( gradient_struct *gradient, int cnt )
+static void
+write_gradient_definition(gradient_struct *gradient, int cnt)
 {
     /* some strange pointer acrobatic here, but it seems to work... */
-    char *ref = (char*)(&(gradient[0]));
-    int p = (char*)(&(gradient[0].pos)) - ref;
-    int r = (char*)(&(gradient[0].col.r)) - ref;
-    int g = (char*)(&(gradient[0].col.g)) - ref;
-    int b = (char*)(&(gradient[0].col.b)) - ref;
+    char *ref = (char*) (gradient);
+    int p = (char*) (&(gradient[0].pos)) - ref;
+    int r = (char*) (&(gradient[0].col.r)) - ref;
+    int g = (char*) (&(gradient[0].col.g)) - ref;
+    int b = (char*) (&(gradient[0].col.b)) - ref;
 
-    write_component_array( "GrayA", gradient, cnt, p );
-    write_component_array( "RedA", gradient, cnt, r );
-    write_component_array( "GreenA", gradient, cnt, g );
-    write_component_array( "BlueA", gradient, cnt, b );
+    write_component_array("GrayA", gradient, cnt, p);
+    write_component_array("RedA", gradient, cnt, r);
+    write_component_array("GreenA", gradient, cnt, g);
+    write_component_array("BlueA", gradient, cnt, b);
 }
 
 
@@ -2652,50 +2679,51 @@ PS_make_header(t_sm_palette *palette)
     fprintf(gpoutfile, "/maxcolors %i def\n", sm_palette.use_maxcolors);
     make_color_model_code();
 
-    switch( sm_palette.colorMode ) {
-      case SMPAL_COLOR_MODE_GRAY:
+    switch(sm_palette.colorMode) {
+    case SMPAL_COLOR_MODE_GRAY:
 	break;  /* nothing to do form gray */
-      case SMPAL_COLOR_MODE_RGB:
+    case SMPAL_COLOR_MODE_RGB:
 	make_palette_formulae();
 	break;
-      case SMPAL_COLOR_MODE_FUNCTIONS: {
+    case SMPAL_COLOR_MODE_FUNCTIONS: {
 	int cnt=0;
 	gradient_struct *gradient;
-	fputs("/InterpolatedColor true def\n",gpoutfile);
+
+	fputs("/InterpolatedColor true def\n", gpoutfile);
 	make_interpolation_code();
-	gradient = approximate_palette( palette, ps_palfunc_samples,
-					ps_palfunc_deviation, &cnt );
-	write_gradient_definition( gradient, cnt );
-	free( gradient );
+	gradient = approximate_palette(palette, ps_palfunc_samples,
+				       ps_palfunc_deviation, &cnt);
+	write_gradient_definition(gradient, cnt);
+	free(gradient);
 	break;
-      }
-      case SMPAL_COLOR_MODE_GRADIENT:
-	fputs("/InterpolatedColor true def\n",gpoutfile);
+    }
+    case SMPAL_COLOR_MODE_GRADIENT:
+	fputs("/InterpolatedColor true def\n", gpoutfile);
 	make_interpolation_code();
-	write_gradient_definition( palette->gradient, palette->gradient_num );
+	write_gradient_definition(palette->gradient, palette->gradient_num);
 	break;
-      default:
-	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'\n",
-		 __FILE__, __LINE__, (char)(sm_palette.colorMode) );
+    default:
+	fprintf(stderr, "%s:%d ooops: Unknown color mode '%c'\n",
+		 __FILE__, __LINE__, (char)(sm_palette.colorMode));
     }
     fputs("/pm3dround {maxcolors 0 gt {dup 1 ge\n", gpoutfile);
     fputs("\t{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def\n", gpoutfile);
-    fprintf( gpoutfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma );
-    write_color_space( palette );
+    fprintf(gpoutfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma);
+    write_color_space(palette);
 
 /* Now print something like
-/g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
+   /g {dup cF7 exch dup cF5 exch cF15 setrgbcolor} bind def
 */
 #define R sm_palette.formulaR
 #define G sm_palette.formulaG
 #define B sm_palette.formulaB
 
     fprintf(gpoutfile,"Color %s and { %% COLOUR vs. GRAY map\n",
-	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false" );
+	    (sm_palette.colorMode!=SMPAL_COLOR_MODE_GRAY) ? "true":"false");
     fputs("  InterpolatedColor { %% Interpolation vs. RGB-Formula\n", gpoutfile);
     fputs("    /g {stroke pm3dround /grayv exch def interpolate\n", gpoutfile);
     fputs("        SelectSpace setrgbcolor} bind def\n", gpoutfile);
-    fputs("  }{\n", gpoutfile );
+    fputs("  }{\n", gpoutfile);
     fputs("  /g {stroke pm3dround dup ", gpoutfile);
     if (R < 0)
 	fputs("1 exch sub ", gpoutfile); /* negate */
@@ -2709,7 +2737,7 @@ PS_make_header(t_sm_palette *palette)
 	fputs("1 exch sub ", gpoutfile); /* negate */
     fprintf(gpoutfile,"cF%i Constrain ", abs(B));
     fputs("\n       SelectSpace setrgbcolor} bind def\n", gpoutfile);
-    fputs("  } ifelse\n", gpoutfile );
+    fputs("  } ifelse\n", gpoutfile);
     fputs("}{\n", gpoutfile);
     fputs("  /g {stroke pm3dround pm3dGamma exp setgray} bind def\n", gpoutfile);
     fputs("} ifelse\n", gpoutfile);
@@ -2735,12 +2763,12 @@ TERM_PUBLIC void PS_set_color (double gray)
 {
 /* map [0;1] to gray/colors */
     if (gray <= 0)
-	fputs( "0 g ", gpoutfile );
+	fputs("0 g ", gpoutfile);
     else {
 	if (gray >= 1)
-	    fputs( "1 g ", gpoutfile );
+	    fputs("1 g ", gpoutfile);
 	else
-	    fprintf( gpoutfile, "%s g ", save_space(gray) );
+	    fprintf(gpoutfile, "%s g ", save_space(gray));
     }
     PS_relative_ok = FALSE; /* "M" required because "g" forces stroke (??) */
 }
@@ -2766,13 +2794,13 @@ TERM_PUBLIC void PS_filled_polygon (int points, gpiPoint *corners)
 		corners[i].x-corners[i-1].x, corners[i].y-corners[i-1].y);
 	fprintf(gpoutfile,"\n");
 
-	switch( style & 0xf ) {
+	switch(style & 0xf) {
 	
 	case FS_SOLID:
 	    filldens = (style >> 4) / 100.0;
-	    if( filldens < 0.0 )
+	    if(filldens < 0.0)
 		filldens = 0.0;
-	    if( filldens > 1.0 )
+	    if(filldens > 1.0)
 		filldens = 1.0;
 	    fprintf(gpoutfile, "%.1f PolyFill\n", filldens);
 	    break;

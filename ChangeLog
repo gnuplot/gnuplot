@@ -1,3 +1,78 @@
+2004-07-13  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/show.c (show_version): Removed text about backwards
+	compatibility of pre-4.0 syntax from startup message.
+
+	* term/x11.trm (transmit_gradient): Made static.  Missing
+	prototype added.
+
+	* term/post.trm: General CodeStyle cleanup.
+	(ps_fontfile_def): Made static.
+	(PS_make_header): made static.
+
+	* term/gd.trm (png_smooth_color): Made static.
+
+	* src/variable.c (fontpath_tbl): All 5 instances made static.
+
+	* src/util.h (chr_in_str): Unused, prototype commented out.
+
+	* src/util.c (chr_in_str): Unused, commented out.
+
+	* src/term_api.h (change_term): Removed prototype from here.
+
+	* src/term.c (enhanced_recursion): Made static.
+	(change_term): Made static. Prototype moved here from term_api.h.
+	(term_count): Unused, commented out.  Removed GP_INLINE flag.
+
+	* src/specfun.c (merror, erf): Made static.
+
+	* src/set.c (pm3d_last_set_palette_mode): Made static.
+	(parse_histogramstyle): Made static.
+
+	* src/save.h: Added missing #include "axis.h".
+
+	* src/save.c: Moved #include "axis.h" to header.
+
+	* src/plot2d.c (histogram_range_fiddling): Made static.
+
+	* src/mouse.c (usual_special_keys): Made static.
+
+	* src/misc.c (recursivefullname): Added missing prototypes.
+	(arrow_use_properties): Made static. Moved prototype here, from
+	misc.h.
+	
+	* src/graphics.c (place_histogram_titles, style_from_fill): Made
+	static.
+
+	* src/gplt_x11.c (process_configure_notify_event): Added missing
+	prototype.
+	(getMultiTabConsoleSwitchCommand): Fixed used of __PROTO() macro
+	in prototype.
+
+	* src/getcolor.h: Added missing #include "color.h".
+	(color_components_from_gray, calculate_color_from_rgb_formulae,
+	color_to_str, str_to_color, rgb255_from_gray): Removed prototypes.
+
+	* src/getcolor.c: Removed #include "color.h" --- done in
+	getcolor.h now.  Massive reindentation and CodeStyle cleanup.
+	(color_components_from_gray, color_to_str, str_to_color): Made
+	static.  Prototypes moved in here, from getcolor.h.
+	(calculate_color_from_formulae): Added missing prototype.
+	(rgb255_from_gray): Unused, commented out.
+
+	* src/gadgets.h (suppressMove):  Unused, commented out.
+
+	* src/gadgets.c (suppressMove): Unused, commented out.
+	(draw_clip_line): Usage of suppressMove commented out.
+
+	* src.fit.c(log_axis_restriction): Added missing prototype.
+	
+	* src/datafile.c (df_no_tic_specsm, df_column,
+	df_parse_string_field): Made static.
+
+	* src/command.c (capture_filename_and_pfopen): Added missing
+	prototype.
+	
 2004-07-10  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/unset.c (unset_mtics): Renamed to unset_minitics, for
@@ -29,6 +104,18 @@
 	* configure.in: Make --enable-histograms the default.
 
 	* demo/all.dem: Add fillbetween, datastrings, and histograms demos.
+
+2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/pdf.trm (PDF_init): Call PDF_open_file() instead of
+	no longer existing function PDF_open_fp().
+
+	* demo/datastrings.dem, demo/starmap.dem: Replaced Windows-only
+	font name Arial by Helvetica.
+
+	* docs/gnuplot.doc: Remove whitespace-only lines.
+	(contour): Remove outdated info on limited number of contour
+	lines.
 
 2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

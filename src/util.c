@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.43 2004/07/03 06:08:50 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.44 2004/07/09 20:22:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -61,6 +61,7 @@ char *decimalsign = NULL;
 
 static void mant_exp __PROTO((double, double, TBOOLEAN, double *, int *, const char *));
 
+#if 0 /* UNUSED */
 /*
  * chr_in_str() compares the characters in the string of token number t_num
  * with c, and returns TRUE if a match was found.
@@ -78,7 +79,7 @@ chr_in_str(int t_num, int c)
     }
     return FALSE;
 }
-
+#endif
 
 /*
  * equals() compares string value of token number t_num with str[], and

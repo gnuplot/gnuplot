@@ -1,5 +1,5 @@
 /*
- * $Id: getcolor.h,v 1.6 2004/05/26 11:17:42 mikulik Exp $
+ * $Id: getcolor.h,v 1.7 2004/07/01 17:10:04 broeker Exp $
  */
 
 /* GNUPLOT - getcolor.h */
@@ -26,6 +26,7 @@
 #ifdef PM3D
 
 #include "syscfg.h"
+#include "color.h"
 
 enum color_models_id {
     C_MODEL_RGB = 'r',
@@ -36,22 +37,14 @@ enum color_models_id {
 };
 
 
-/* main gray --> color mapping */
-void color_components_from_gray __PROTO(( double gray, rgb_color *color ));
 /* main gray --> rgb color mapping */
 void rgb1_from_gray __PROTO(( double gray, rgb_color *color ));
 void rgb255_from_rgb1 __PROTO(( rgb_color rgb1, rgb255_color *rgb255 ));
-void rgb255_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
 /* main gray --> rgb color mapping as above, with take care of palette maxcolors */
 void rgb1maxcolors_from_gray __PROTO(( double gray, rgb_color *color ));
 void rgb255maxcolors_from_gray __PROTO(( double gray, rgb255_color *rgb255 ));
 
-/* used by x11.trm to avoid 'set palette funct R(g),G(g),B(g)' problems */
-int calculate_color_from_formulae __PROTO(( double, rgb_color * ));
-
 /* used to (de-)serialize color/gradient information */
-char *color_to_str __PROTO(( rgb_color col, char *buf ));
-void str_to_color __PROTO(( char *buf, rgb_color *col ));
 char *gradient_entry_to_str __PROTO(( gradient_struct *gs ));
 void str_to_gradient_entry __PROTO(( char *s, gradient_struct *gs ));
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.42 2004/07/01 17:10:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.43 2004/07/02 05:03:30 sfeam Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -192,6 +192,7 @@ static TBOOLEAN fit_interrupt __PROTO((void));
 static TBOOLEAN regress __PROTO((double a[]));
 static void show_fit __PROTO((int i, double chisq, double last_chisq, double *a,
 			      double lambda, FILE * device));
+static void log_axis_restriction __PROTO((FILE *log_f, AXIS_INDEX axis));
 static TBOOLEAN is_empty __PROTO((char *s));
 static TBOOLEAN is_variable __PROTO((char *s));
 static double getdvar __PROTO((const char *varname));

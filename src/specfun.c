@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.27 2004/04/13 17:24:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.28 2004/07/01 17:10:07 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -156,7 +156,7 @@ Copyright 1984, 1987 by Stephen L. Moshier
 Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 */
 
-int             merror = 0;
+static int merror = 0;
 
 /* Notice: the order of appearance of the following messages cannot be bound
  * to error codes defined in mconf.h or math.h or similar, as these files are
@@ -1773,7 +1773,7 @@ erfc(double a)
  *
  */
 
-double
+static double
 erf(double x)
 {
 

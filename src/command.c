@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.95 2004/06/21 03:54:49 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.96 2004/07/01 17:10:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -131,6 +131,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 
 
 /* static prototypes */
+static FILE* capture_filename_and_pfopen __PROTO((char **save_file, char *mode));
 static void command __PROTO((void));
 static int changedir __PROTO((char *path));
 static char* fgets_ipc __PROTO((char* dest, int len));

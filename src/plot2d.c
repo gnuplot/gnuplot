@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.72 2004/07/04 23:58:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.73 2004/07/05 03:49:21 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -773,7 +773,7 @@ store2d_point(
 /* Since the stored x values for histogrammed data do not correspond exactly */
 /* to the eventual x coordinates, we need to modify the x axis range bounds. */
 /* Also the two stacked histogram modes need adjustment of the y axis bounds.*/
-void
+static void
 histogram_range_fiddling(struct curve_points *plot)
 {
     double xlow, xhigh, yhigh;

@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.114 2004/07/01 17:10:35 broeker Exp $
+ * $Id: x11.trm,v 1.115 2004/07/02 23:58:55 sfeam Exp $
  *
  */
 
@@ -137,6 +137,7 @@ static enum JUSTIFY X11_last_justification = LEFT;
 
 static void X11_atexit __PROTO((void));
 static void X11_set_default_font __PROTO((void));
+static void transmit_gradient __PROTO((gradient_struct *gradient, int cnt));
 
 /* Merged the old char X11_opts[] and int X11_optarg[]
  * into one array of structs.
@@ -414,9 +415,9 @@ X11_options()
 	    if (END_OF_COMMAND)
 		int_error(c_token, "expecting font name");
 	    if (isstring(c_token))
-		quote_str( X11_default_font, c_token, sizeof(X11_default_font) );
+		quote_str(X11_default_font, c_token, sizeof(X11_default_font));
 	    else
- 		copy_str( X11_default_font, c_token, sizeof(X11_default_font) );
+ 		copy_str(X11_default_font, c_token, sizeof(X11_default_font));
 	    c_token++;
 	    if (set_font) duplication=TRUE;
 	    set_font = TRUE;
@@ -993,7 +994,7 @@ X11_init()
 do { \
    char buffer[512]; int status; struct iosb iosb;\
    sprintf x; \
-   if (strlen(buffer) >= MBXMXMSG )  { \
+   if (strlen(buffer) >= MBXMXMSG)  { \
      printf("buffer contents (%d char) catenated to mailbox size (%d bytes)\n", \
      strlen(buffer), MBXMXMSG); \
      buffer[MBXMXMSG-1] = '\0';\
@@ -1004,12 +1005,12 @@ do { \
    if((status & SS$_NORMAL) != SS$_NORMAL) exit(status); \
  } while (0)
 
-#define PRINT0(fmt)          GO( (buffer, fmt) )
-#define PRINT1(fmt,p1)       GO( (buffer, fmt,p1) )
-#define PRINT2(fmt,p1,p2)    GO( (buffer, fmt,p1,p2) )
-#define PRINT3(fmt,p1,p2,p3) GO( (buffer, fmt,p1,p2,p3) )
-#define PRINT4(fmt,p1,p2,p3,p4) GO( (buffer, fmt,p1,p2,p3,p4) )
-#define PRINT5(fmt,p1,p2,p3,p4,p5) GO( (buffer, fmt,p1,p2,p3,p4,p5) )
+#define PRINT0(fmt)          GO((buffer, fmt))
+#define PRINT1(fmt,p1)       GO((buffer, fmt,p1))
+#define PRINT2(fmt,p1,p2)    GO((buffer, fmt,p1,p2))
+#define PRINT3(fmt,p1,p2,p3) GO((buffer, fmt,p1,p2,p3))
+#define PRINT4(fmt,p1,p2,p3,p4) GO((buffer, fmt,p1,p2,p3,p4))
+#define PRINT5(fmt,p1,p2,p3,p4,p5) GO((buffer, fmt,p1,p2,p3,p4,p5))
 
 #define FFLUSH()		/* nowt */
 #define BEFORE_GRAPHICS		/* nowt */
@@ -1230,7 +1231,7 @@ X11_set_font(const char *fontname)
 {
 /*  PRINT1("QF%s\n", fontname?fontname:""); */
     strncpy(X11_next_font_used,fontname?fontname:"",sizeof(X11_next_font_used)-1);
-    return( TRUE );
+    return(TRUE);
 }
 
 static void
@@ -1289,62 +1290,64 @@ X11_set_clipboard(const char s[])
 #ifdef PM3D
 
 
-static void transmit_gradient( gradient_struct *gradient, int cnt )
+static void
+transmit_gradient(gradient_struct *gradient, int cnt)
 {
     int i = 0;
-    fprintf( X11_ipc, "%d", cnt );
-    for( i=0; i<cnt; i++ ) {
+
+    fprintf(X11_ipc, "%d", cnt);
+    for(i=0; i<cnt; i++) {
         /* this %50 *must* match the corresponding %50 in gplt_x11.c  */
-        if( i%50 == 0 ) {
-	    fputs( "\n", X11_ipc );
-	    fflush( X11_ipc );
+        if(i%50 == 0) {
+	    fputs("\n", X11_ipc);
+	    fflush(X11_ipc);
 	}
-	fprintf( X11_ipc, "%s", gradient_entry_to_str( &(gradient[i]) ) );
+	fprintf(X11_ipc, "%s", gradient_entry_to_str(&(gradient[i])));
     }
-    fputs( "\n", X11_ipc );
+    fputs("\n", X11_ipc);
 }
 
 
 TERM_PUBLIC int
 X11_make_palette(t_sm_palette *palette)
 {
-    if( !palette ) {
+    if(!palette) {
         return 0;
     }
 
-    if( !X11_ipc ) {
+    if(!X11_ipc) {
 	    fprintf(stderr, "(X11_make_palette) 0 == X11_ipc\n");
 	    return -1;
 	}
 
-    fprintf( X11_ipc, "%c %c %c %c %d\n",
+    fprintf(X11_ipc, "%c %c %c %c %d\n",
 	     X11_GR_MAKE_PALETTE, (char)(palette->colorMode),
 	     (char)(palette->positive), (char)(palette->cmodel),
-	     palette->use_maxcolors );
+	     palette->use_maxcolors);
 
-    switch( palette->colorMode ) {
+    switch(palette->colorMode) {
     case SMPAL_COLOR_MODE_GRAY:
-        fprintf( X11_ipc,"%g\n", palette->gamma );
+        fprintf(X11_ipc,"%g\n", palette->gamma);
         break;
     case SMPAL_COLOR_MODE_RGB:
-        fprintf( X11_ipc, "%d %d %d\n", palette->formulaR,
-		 palette->formulaG, palette->formulaB );
+        fprintf(X11_ipc, "%d %d %d\n", palette->formulaR,
+		 palette->formulaG, palette->formulaB);
 	break;
     case SMPAL_COLOR_MODE_GRADIENT:
-        transmit_gradient( palette->gradient, palette->gradient_num );
+        transmit_gradient(palette->gradient, palette->gradient_num);
 	break;
     case SMPAL_COLOR_MODE_FUNCTIONS: {
         int cnt=0;
 	gradient_struct *gradient;
-	gradient = approximate_palette( palette, 500, 0.01, &cnt );
-	transmit_gradient( gradient, cnt );
+	gradient = approximate_palette(palette, 500, 0.01, &cnt);
+	transmit_gradient(gradient, cnt);
 	break;
     }
     default:
-        fprintf( stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
-		 __FILE__, __LINE__, (char)(palette->colorMode) );
+        fprintf(stderr, "%s:%d ooops: Unknown colorMode '%c'.\n",
+		 __FILE__, __LINE__, (char)(palette->colorMode));
     }
-    fflush( X11_ipc );
+    fflush(X11_ipc);
     return 0;
 }
 
