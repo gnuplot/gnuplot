@@ -22,7 +22,13 @@ TOP = .
 CC = cl /c
 LD = link
 CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=$(HELPFILE) /DGP_INLINE=__inline /DANSI_C -DHAVE_GETCWD
-LDFLAGS = /subsystem:windows /nologo /MACHINE:I386 /MAP:GNUPLOT
+!IF "$(PROCESSOR_ARCHITECTURE)" == "ALPHA"
+MACHINE = ALPHA
+!ELSEIF "$(PROCESSOR_ARCHITECTURE)" == "x86"
+MACHINE = IX86
+# definitions for other architectures to be inserted here
+!ENDIF
+LDFLAGS = /subsystem:windows /nologo /MACHINE:$(MACHINE) /MAP:GNUPLOT
 
 # see other terminal defines in term.h
 TERMFLAGS = /I$(TOP)\\term
