@@ -1,3 +1,8 @@
+2003-12-05  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Leave current window unchanged when closing old window
+	using the 'set term x11 <old> close' command.
+
 2003-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/svg.trm: Add conditional code to make svg output compatible with
