@@ -1,3 +1,7 @@
+2005-01-07  Mike Sutton  <mws116@usa.com>
+
+	* term/gd.trm: New terminal option {rounded|butt} controls line caps.
+
 2005-01-07  Daniel Sebald  <daniel.sebald@ieee.org>
 
 	* term/gd.trm: Addtional processing of animated gifs to bring

@@ -208,6 +208,7 @@ static struct {
     int flags;
     int linetype;
     int linewidth;
+    TBOOLEAN capbutt;  /* use capbutt on lines with GD2, 20051205 MWS*/
     int ttfsize;
     char ttffont[64];
     gdFontPtr default_font;
@@ -237,7 +238,7 @@ enum PNG_id {
     PNG_SIZE,
     PNG_ENHANCED, PNG_NOENHANCED,
     PNG_TRUECOLOR, PNG_NOTRUECOLOR,
-    PNG_LINEWIDTH,
+    PNG_LINEWIDTH, PNG_BUTT, PNG_ROUNDED,
     GIF_ANIMATE, GIF_DELAY, GIF_LOOP, GIF_NOOPT, GIF_OPT,
     PNG_OTHER
 };
@@ -278,6 +279,8 @@ static struct gen_table PNG_opts[] =
     { "noopt$imize", GIF_NOOPT },
     { "opt$imize", GIF_OPT }, /* end of gif animation options */
     { "lw", PNG_LINEWIDTH },
+    { "butt", PNG_BUTT},
+    { "round$ed", PNG_ROUNDED},
     { NULL, PNG_OTHER }
 };
 
@@ -581,6 +584,7 @@ PNG_options()
 	png_state.justify = CENTRE;
 	png_state.TrueColor = FALSE;
 	PNG_linewidth_factor = 1.0;
+	png_state.capbutt = FALSE;/* to preserve previous default behavior */
     } else {
 	/* FIXME EAM - these should never happen! */
 	if (!png_state.default_font) {
@@ -798,6 +802,16 @@ PNG_options()
 	    gif_anim_option = 1;
 	    break;
 
+	case PNG_BUTT:
+	    png_state.capbutt = TRUE;
+	    c_token++;
+	    break;
+
+	case PNG_ROUNDED:
+	    png_state.capbutt = FALSE;
+	    c_token++;
+	    break;
+
 	case PNG_OTHER:
 	default:
 	    /* not "size" */
@@ -933,6 +947,11 @@ PNG_options()
     if (PNG_linewidth_factor != 1.0)
 	sprintf(term_options + strlen(term_options),
 	    "linewidth %3.1f ", PNG_linewidth_factor);
+
+    if (png_state.capbutt) {
+	sprintf(term_options + strlen(term_options),
+	    "butt ");
+    }
 
     if (png_state.animate) {
 	sprintf(term_options + strlen(term_options),
@@ -1333,6 +1352,7 @@ PNG_vector(unsigned int x, unsigned int y)
     } else {
 	if (png_state.linewidth == 1) {
 #if (GD2_VERS >= 2) && defined(gdAntiAliased) 
+	    png_state.image->thick = 1;
 	    gdImageSetAntiAliased(png_state.image, png_state.color);
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), gdAntiAliased);
@@ -1340,7 +1360,15 @@ PNG_vector(unsigned int x, unsigned int y)
 	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
 			x, Y(y), png_state.color);
 #endif
-	} else {
+#if (GD2_VERS >= 2)
+	} else if (png_state.capbutt){
+
+	    png_state.image->thick = png_state.linewidth;
+	    gdImageLine(png_state.image, png_state.x, Y(png_state.y),
+			x, Y(y), png_state.color);
+#endif
+	}else{
+
 	    /* EAM - Implement linewidth by selecting a pre-defined brush */
 	    /* The tricky bit is re-coloring the brush to the current color */
 	    lw   = png_state.linewidth;
@@ -1956,7 +1984,7 @@ START_HELP(png)
 " Syntax:",
 "       set terminal png ",
 "              {{no}transparent} {{no}interlace}",
-"              {{no}truecolor}",
+"              {{no}truecolor} {rounded|butt}",
 "              {tiny | small | medium | large | giant}",
 "              {font <face> {<pointsize>}}",
 "              {size <x>,<y>} {{no}crop}",
@@ -1972,6 +2000,12 @@ START_HELP(png)
 "",
 " `interlace` instructs the driver to generate interlaced PNGs.",
 " Default is `nointerlace`.",
+"",
+" `butt` instructs the driver to use a line drawing method that does",
+" not overshoot the desired end point of a line.  This setting is only",
+" applicable for line widths greater than 1.  This setting is most useful when",
+" drawing horizontal or vertical lines.  Default is `rounded`.",
+" Version 2.0 or greater of libgd is required.",
 "",
 " PNG plots may be conveniently viewed by piping the output to the",
 " 'display' program from the ImageMagick package as follows:",
