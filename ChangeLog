@@ -1,3 +1,10 @@
+1998-10-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* docs/*.c: More cleaning up. Add exit() statements in main()
+	function, remove unused vars, fix potential buffer overflows.
+
+	* term/rgip.trm: Fix unterminated string.
+
 1998-10-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* acinclude.m4: In gp_CHECK_LIB_QUIET, add TERMXLIBS to LIBS during
@@ -6,14 +13,33 @@
 
 	* aclocal.m4, configure: Regenerated.
 
-	* command.c: Fix preprocessor directives syntax for BC++ 4.5.
+	* command.c: Fix preprocessor directive syntax for BC++ 4.5.
+
+	* fit.c, fit.h, matrix.c: Don't include type.h, remove comment.
+
+	* Makefile.in, makefile.all: Remove type.h from HEADERS. Add doc2x.h
+	to DOCS1.
+
+	* misc.c: Fix typos.
+
+	* type.h: Obsolete file removed.
+
+	* docs/Makefile.in: Fix alldoc ,clean, html targets and dependencies.
+	Compile doc2html with -DALL_TERM_DOC. Print gpcard.ps to file
+	instead of printer.
+
+	* docs/docs2x.h: New file.
+
+	* docs/*.[ch]: Move definitions to new file doc2x.h and include
+	doc2x.h.
+
+	* term/apollo.trm: Change in help part.
 
 1998-10-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* contour.c: Indentation, nested comments removed.
 
-	* misc.c(save_set_all): Add 3D mapping, missing, multiplot to
-	saved variables.
+	* misc.c(save_set_all): Add 3D mapping, missing to saved variables.
 
 	* show.c: Add 'bar' to showmess[].
 
