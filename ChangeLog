@@ -1,3 +1,36 @@
+1998-10-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* contour.c, term.c: Fix FPRINTF calls.
+
+	* graphics.c: Fix comments.
+
+	* makefile.os2: Final fixes to reflect changes in docs/Makefile.in.
+
+	* misc.c(save_tics): Rename time variable to flag_time to prevent
+	global variable shadowing.
+
+	* set.c: Make references to first_plot and first_3dplot global.
+
+	* show.c(show_version_long): Reformat output.
+
+	* stdfn.h: Add VMS exit codes. Reformatting, define HAVE_SLEEP
+	unconditionally under VMS.
+
+	* docs/Makefile.in: Add new alldoc target for debugging purposes.
+	Add ipf target.
+
+	* docs/README: Cleanup and fixes.
+
+	* docs/checkdoc.c, docs/doc2gih.c, docs/doc2hlp.c, docs/doc2info.c,
+	docs/doc2ipf.c, docs/doc2ms.c: Final fixes to reflect changes in
+	Makefile.in.
+
+	* term/mif.trm, term/png.trm, term/post.trm: Make references to
+	version and patchlevel global to eliminate "nested extern declaration"
+	compiler warnings.
+
+	* term/x11.trm(VMS X11_init): Make declarations static.
+
 1998-10-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* Makefile.in, makefile.all: Add xref.h to DOCS1. Small changes.
@@ -60,7 +93,7 @@
 	* aclocal.m4, configure: Regenerated.
 
 	* configure.in: Rewrite tests for termcap and readline. Remove
-	obsolete AC_SUBST(TERMFLAFGS). Add `-mieee' to CFLAGS for gcc
+	obsolete AC_SUBST(TERMFLAGS). Add `-mieee' to CFLAGS for gcc
 	under OSF/1 Digital Unix to prevent core dump in demo files.
 
 	* command.c: Define some macros for Windows. Remove spurious else
