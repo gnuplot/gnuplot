@@ -1,4 +1,4 @@
-/* $Id: binary.h,v 1.4 1998/03/22 22:31:18 drd Exp $ */
+/* $Id: binary.h,v 1.2 1999/06/09 12:07:18 lhecking Exp $ */
 
 /* GNUPLOT - binary.h */
 
@@ -44,9 +44,9 @@ float GPFAR * GPFAR *extend_matrix __PROTO(( float GPFAR * GPFAR *a, int nrl, in
 float GPFAR * GPFAR *retract_matrix __PROTO(( float GPFAR * GPFAR *a, int nrl, int nrh, int ncl, int nch, int srh, int sch));
 void free_matrix __PROTO((float GPFAR * GPFAR *m, unsigned nrl, unsigned nrh, unsigned ncl, unsigned nch));
 void free_vector __PROTO((float GPFAR *vec, int nl, int nh));
-int is_binary_file __PROTO(( FILE *fp));
+int is_binary_file __PROTO((FILE *fp));
 int fread_matrix __PROTO((FILE *fin, float GPFAR * GPFAR * GPFAR *ret_matrix, int *nr, int *nc, float GPFAR * GPFAR *row_title, float GPFAR * GPFAR *column_title));
-int fwrite_matrix __PROTO(( FILE *fout, float GPFAR * GPFAR *m, int nrl, int nrh, int ncl, int nch, float GPFAR *row_title, float GPFAR *column_title));
+int fwrite_matrix __PROTO((FILE *fout, float GPFAR * GPFAR *m, int nrl, int nrh, int ncl, int nch, float GPFAR *row_title, float GPFAR *column_title));
 float GPFAR * GPFAR *convert_matrix __PROTO((float GPFAR *a, int nrl, int nrh, int ncl, int nch));
 void free_convert_matrix __PROTO((float GPFAR* GPFAR *b, int nrl, int nrh, int ncl, int nch));
 
