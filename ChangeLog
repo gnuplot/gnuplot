@@ -1,3 +1,23 @@
+2001-06-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/x11.trm (X11_waitforinput): Call getc() instead of read(),
+ 	to avoid problems with buffering of stdio streams.
+
+	* src/command.c (fgets_ipc): Fix EOF checking error. Replaced
+ 	pointer arithmetics by array indexing. Made this function active
+ 	regardless of USE_MOUSE status, moving the #ifdef inside it.
+	(read_line): Simplification: just call fgets_ipc, no matter what
+ 	USE_MOUSE is. Let that function decide whether mouse support stuff
+ 	is needed.
+
+	* src/gadgets.c (clip_point): Cast coordinates to int in
+ 	comparison to the boundaries, since those are signed too, and they
+ 	might actually be negative, sometimes. Fixes wrong clipping for
+ 	negative 'set offset' parameters.
+
+	* src/gp_types.h: Parenthesize bitmasks in plot style enum values,
+ 	to quench a compiler warning.
+
 2001-06-19  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/show.c: remove duplicated show for historysize.
