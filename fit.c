@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: fit.c,v 1.58 1998/04/14 00:15:19 drd Exp $";
+static char *RCSid = "$Id: fit.c,v 1.23 1999/01/06 15:50:16 lhecking Exp $";
 #endif
 
 /*
@@ -789,6 +789,19 @@ double a[];
 
 	free(dpar);
     }
+
+    /* HBB 990220: re-imported this snippet from older versions. Finally,
+     * some user noticed that it *is* necessary, after all. Not even
+     * Carsten Grammes himself remembered what it was for... :-(
+     * The thing is: the value of the last parameter is not reset to
+     * its original one after the derivatives have been calculated
+     */
+    /* restore last parameter's value (not done by calculate) */
+    {
+	struct value val;
+	Gcomplex (&val, a[num_params-1], 0.0);
+	setvar (par_name[num_params-1], val);
+     }
 
     /* call destructor for allocated vars */
     lambda = -2;		/* flag value, meaning 'destruct!' */
