@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: graphics.c,v 1.24.2.1 1999/08/19 14:39:42 lhecking Exp $";
+static char *RCSid = "$Id: graphics.c,v 1.24.2.2 1999/09/15 15:30:29 lhecking Exp $";
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1755,7 +1755,9 @@ int pcount;			/* count of plots in linked list */
 			(*t->put_text) (xl + key_text_right, yl, s);
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(s);
-			if (key_hpos == TOUT || inrange(x, xleft, xright))
+			if (key_hpos == TOUT ||
+			    key_vpos == TUNDER || /* HBB 990327 */
+			    inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, s);
 		    }
 		}
@@ -1808,6 +1810,7 @@ int pcount;			/* count of plots in linked list */
 		    } else {
 			int x = xl + key_text_right - (t->h_char) * strlen(this_plot->title);
 			if (key_hpos == TOUT ||
+			    key_vpos == TUNDER || /* HBB 990327 */
 			    i_inrange(x, xleft, xright))
 			    (*t->put_text) (x, yl, this_plot->title);
 		    }
