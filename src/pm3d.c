@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.34 2002/04/27 08:07:35 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.35 2002/06/05 21:58:51 joze Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -45,8 +45,7 @@ pm3d_struct pm3d = {
     PM3D_CLIP_1IN,		/* clipping: at least 1 point in the ranges */
     0,				/* no pm3d hidden3d is drawn */
     0,				/* solid (off by default, that means `transparent') */
-    PM3D_IMPLICIT,		/* implicit */
-    0 				/* use_column */
+    PM3D_IMPLICIT		/* implicit */
 };
 
 /* Internal prototypes for this module */
