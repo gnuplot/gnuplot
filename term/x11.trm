@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.102 2004/03/23 05:40:48 sfeam Exp $
+ * $Id: x11.trm,v 1.103 2004/03/23 05:55:00 sfeam Exp $
  *
  */
 
@@ -1236,7 +1236,7 @@ TERM_PUBLIC void
 X11_set_ruler(int x, int y)
 {
     if (X11_ipc) {
-	PRINT2("r%04d%04d\n", x, y);
+	PRINT2("r%04d%04d\n", x < 9999 ? x : 9999, y < 9999 ? y : 9999);
 	FFLUSH();
     }
 }
