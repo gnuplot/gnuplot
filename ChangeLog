@@ -1,6 +1,7 @@
 2002-07-08  Petr Mikulik  <mikulik@physics.muni.cz>
 
-	* pm3d/contrib/pm3dConvertToImage.awk: Don't fail on empty map.
+	* pm3d/contrib/pm3dConvertToImage.awk: Don't fail on empty map. Treat
+	properly both cases of scans_in_x.
 
 2002-07-07  Petr Mikulik  <mikulik@physics.muni.cz>
 
@@ -716,7 +717,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/07 18:15:55 $).
+	last modification date (from the tag $Date: 2002/07/08 12:38:14 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

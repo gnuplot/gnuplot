@@ -22,7 +22,8 @@
 #      an awk implementation
 #
 # History of changes:
-#    - 8.  7. 2002 Petr Mikulik: Don't fail on empty map.
+#    - 8.  7. 2002 Petr Mikulik: Don't fail on empty map. Treat properly both
+#      cases of scans_in_x.
 #    - 4.  7. 2002 Petr Mikulik: Fix for compressing several images in one file.
 #    - 3. 10. 2001 Petr Mikulik: Replaced "stroke" by "Stroke" in the "/g"
 #      definition - fixes conversion of colour images.
@@ -35,7 +36,7 @@ BEGIN {
 err = "/dev/stderr"
 
 if (ARGC!=1) {
-  print "pm3dConvertToImage.awk --- (c) Petr Mikulik, Brno. Version 4. 7. 2002" >err
+  print "pm3dConvertToImage.awk --- (c) Petr Mikulik, Brno. Version 8. 7. 2002" >err
   print "Compression of matrix-like pm3d .ps files into 256 levels image. See also" >err
   print "header of this script for more info." >err
   print "Usage:\n\t[stdout | ] awk -f pm3dConvertToImage.awk [<inp_file.ps] >out_file.ps" >err
@@ -138,10 +139,14 @@ print "%pm3d_image_begin"
 if (x1 > x2) { x1+=cell_x; x2+=cell_x; } # align offset of the image corner by the cell dimension
 if (y1 > y2) { y1+=cell_y; y2+=cell_y; }
 
-scalex=(x2-x1)*(grid_x/(grid_x-1))
-scaley=(y2-y1)*(grid_y/(grid_y-1))
+#ORIGINAL:
+scalex = (grid_x <= 1) ? cell_x : (x2-x1)*(grid_x/(grid_x-1))
+scaley = (grid_y <= 1) ? cell_y : (y2-y1)*(grid_y/(grid_y-1))
 
-print "[ " x1 " " y1 " 0 " scalex " " scaley " " grid_x " " grid_y " ] pm3dImage"
+if (scans_in_x)
+    print "[ " x1 " " y1 " 90 " scaley " -" scalex " " grid_y " " grid_x " ] pm3dImage"
+else
+    print "[ " x1 " " y1 " 0 " scalex " " scaley " " grid_x " " grid_y " ] pm3dImage"
 
 if (scan_pts*scans != pm3dline) {
   print "ERROR: pm3d image is not grid, exiting." >err
@@ -182,7 +187,7 @@ if (pm3dline==1) { # first point of the map
 
 if (pm3dline==2) { # determine whether data are scans in x or in y
     if (y1==y2) { # y=const, scan in x
-	scan_in_x = 1;
+	scans_in_x = 0;
 	if (x1==x2) { 
 	    print "ERROR: First two points are identical?! Exiting." >err
 	    error=1
@@ -194,11 +199,11 @@ if (pm3dline==2) { # determine whether data are scans in x or in y
 		error=1
 		exit(5)
 	}
-	scan_in_x = 0;
+	scans_in_x = 1;
     }
 }
 
-if ( pm3dline>2 && ((scan_in_x && y2!=y2last) || (!scan_in_x && x2!=x2last)) ) {
+if ( pm3dline>2 && ((!scans_in_x && y2!=y2last) || (scans_in_x && x2!=x2last)) ) {
 	if (scans==1) scan_pts = pm3dline-1
 	scans++
 	row[scans] = ""
