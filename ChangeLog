@@ -4,6 +4,12 @@
  	from Petr that allows linetypes to be set for labels and relaxes
 	the syntax for that command a lot.
 
+2001-11-10  Petr Mikulik  <mikulik@physics.muni.cz>
+	* src/gadgets.h src/mouse.h src/graph3d.c src/graphics.c src/save.c
+	src/set.c src/show.c docs/gnuplot.doc NEWS: 'set label' with any
+	line type (colour), point type and point size; further allow any
+	order of options.
+
 2001-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/datafile.c (f_column): Added missing implementation of
