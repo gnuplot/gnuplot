@@ -1,7 +1,18 @@
+1999-09-29  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* bitmap.c, bitmap.h: RGB colour table moved from term/gif.trm.
+
+	* term/driver.h: Fix typo.
+
+	* term/gif.trm, term/png.trm: Remove unused vars.
+
 1999-09-29  "Eric S. Raymond"  <esr@thyrsus.com>
 
 	* term/png.trm: Add transparency support for color images. Update
 	for pnglib-1.0.3.
+
+	* term/gif.trm, term/png.trm: Remove RGB colour table from gif.trm,
+	let both drivers share the table in bitmap.c.
 
 1999-09-28  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
