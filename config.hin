@@ -96,6 +96,9 @@
 /* Define if you have the snprintf function.  */
 #undef HAVE_SNPRINTF
 
+/* Define if you have the strcasecmp function.  */
+#undef HAVE_STRCASECMP
+
 /* Define if you have the strchr function.  */
 #undef HAVE_STRCHR
 
@@ -107,6 +110,9 @@
 
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
+
+/* Define if you have the stricmp function.  */
+#undef HAVE_STRICMP
 
 /* Define if you have the strncasecmp function.  */
 #undef HAVE_STRNCASECMP
@@ -222,6 +228,9 @@
 /*  Define if you are using the X11 window system.  */
 #undef X11
 
+/*  Define the default x11 driver name.  */
+#undef GNUPLOT_X11
+
 /*  Define if this is an MSDOS system.  */
 #undef MSDOS
 
@@ -296,4 +305,7 @@
 
 /*  Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
+
+/*  Define if you want to have mouse support for the x11 terminal.  */
+#undef USE_MOUSE
 

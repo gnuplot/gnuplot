@@ -116,6 +116,7 @@ Alex Woo
 * Introduction::                
 * Seeking-assistance::          
 * What's_New_in_version_3.7::   
+* bind::                        
 * Batch/Interactive_Operation::  
 * Command-line-editing::        
 * Comments::                    
@@ -317,7 +318,7 @@ datafile plots.  If email-ing to info-gnuplot, please state whether or not
 you are subscribed to the list, so that users who use news will know to email
 a reply to you.  There is a form for such postings on the WWW site.
 
-@node What's_New_in_version_3.7, Batch/Interactive_Operation, Seeking-assistance, gnuplot
+@node What's_New_in_version_3.7, bind, Seeking-assistance, gnuplot
 @section What's New in version 3.7
 
 @cindex new-features
@@ -394,7 +395,104 @@ combined and stored for further use.  See `set style line`.
 26. Text (labels, tic labels, and the time stamp) can be written vertically
 by those terminals capable of doing so.
 
-@node Batch/Interactive_Operation, Command-line-editing, What's_New_in_version_3.7, gnuplot
+@node bind, Batch/Interactive_Operation, What's_New_in_version_3.7, gnuplot
+@section bind
+
+@c ?commands bind
+@cindex bind
+
+The @ref{bind} command allows to (re-)define a sequence of gnuplot commands
+which will be executed when a certain key or key sequence is pressed
+while the driver's window has the input focus.
+Note that @ref{bind} is only available if gnuplot was compiled with mouse
+support and it is used by all mouse-capable terminals.
+Bindings overwrite the builtin bindings (like in every real editor),
+except <space> and 'q' which cannot be rebound.
+Mouse Buttons cannot be rebound.
+
+Note that multikey-bindings with modifiers have to be quoted.
+
+Syntax:
+@example
+      bind [<key-sequence>] ["<gnuplot commands>"]
+      bind!
+
+@end example
+
+Examples:
+
+- set bindings:
+
+@example
+    bind a "replot"
+    bind "ctrl-a" "plot x*x"
+    bind "ctrl-alt-a" 'print "great"'
+    bind Home "set view 60,30; replot"
+
+@end example
+
+- show bindings:
+@example
+    bind "ctrl-a"          # shows the binding for ctrl-a
+    bind                   # shows all bindings
+
+@end example
+
+- remove bindings:
+@example
+    bind "ctrl-alt-a" ""   # removes binding for ctrl-alt-a
+                             (note that builtins cannot be removed)
+    bind!                  # installs default (builtin) bindings
+
+@end example
+
+- bind a key to toggle something:
+@example
+  v=0
+  bind "ctrl-r" "v=v+1;if(v%2)set term x11 noraise; else set term x11 raise"
+
+@end example
+
+Modifiers (ctrl / alt) are case insensitive, keys not:
+@example
+    ctrl-alt-a == CtRl-alT-a
+    ctrl-alt-a != ctrl-alt-A
+
+@end example
+
+List of modifiers (alt == meta):
+@example
+    ctrl, alt
+
+@end example
+
+List of supported special keys:
+
+@example
+   "BackSpace", "Tab", "Linefeed", "Clear", "Return", "Pause", "Scroll_Lock",
+   "Sys_Req", "Escape", "Delete", "Home", "Left", "Up", "Right", "Down",
+   "PageUp", "PageDown", "End", "Begin",
+
+@end example
+
+@example
+   "KP_Space", "KP_Tab", "KP_Enter", "KP_F1", "KP_F2", "KP_F3", "KP_F4",
+   "KP_Home", "KP_Left", "KP_Up", "KP_Right", "KP_Down", "KP_PageUp",
+   "KP_PageDown", "KP_End", "KP_Begin", "KP_Insert", "KP_Delete", "KP_Equal",
+   "KP_Multiply", "KP_Add", "KP_Separator", "KP_Subtract", "KP_Decimal",
+   "KP_Divide",
+
+@end example
+
+@example
+   "KP_1" - "KP_9", "F1" - "F12"
+
+@end example
+
+see also @ref{mouse} and @ref{if}.
+
+
+@node Batch/Interactive_Operation, Command-line-editing, bind, gnuplot
 @section Batch/Interactive Operation
 
 @cindex batch/interactive
@@ -2611,14 +2709,15 @@ The @ref{if} command allows commands to be executed conditionally.
 
 Syntax:
 @example
-      if (<condition>) <command-line>
+      if (<condition>) <command-line> [; else if (<condition>) ...; else ...]
 
 @end example
 
 <condition> will be evaluated.  If it is true (non-zero), then the command(s)
 of the <command-line> will be executed.  If <condition> is false (zero), then
-the entire <command-line> is ignored.  Note that use of `;` to allow multiple
-commands on the same line will _not_ end the conditionalized commands.
+the entire <command-line> is ignored until the next occurence of `else`.
+Note that use of `;` to allow multiple commands on the same line will
+_not_ end the conditionalized commands.
 
 Examples:
 @example
@@ -2638,6 +2737,14 @@ but
 @end example
 
 will not display anything.
+
+else:
+@example
+      v=0
+      v=v+1; if (v%2) print "2" ; else if (v%3) print "3"; else print "fred"
+@end example
+
+(repeat the last line repeatedly!)
 
 See @ref{reread} for an example of how @ref{if} and @ref{reread} can be used together to
 perform a loop.
@@ -4092,6 +4199,7 @@ when the variable was initially defined.
 * functions::                   
 * grid::                        
 * hidden3d::                    
+* historysize::                 
 * isosamples::                  
 * key::                         
 * label::                       
@@ -4103,6 +4211,7 @@ when the variable was initially defined.
 * mapping::                     
 * margin::                      
 * missing::                     
+* mouse::                       
 * multiplot::                   
 * mx2tics::                     
 * mxtics::                      
@@ -5432,7 +5541,7 @@ major gridlines is used.  The default polar angle is 30 degrees.
 Z grid lines are drawn on the back of the plot.  This looks better if a
 partial box is drawn around the plot---see @ref{border}.
 
-@node hidden3d, isosamples, grid, set-show
+@node hidden3d, historysize, grid, set-show
 @subsection hidden3d
 
 @c ?commands set hidden3d
@@ -5552,7 +5661,36 @@ want that, you may choose `nobentover` instead.
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/hidden/hidden.html,Hidden Line Removal Demo} and
 @uref{http://www.nas.nasa.gov/~woo/gnuplot/singulr/singulr.html,Complex Hidden Line Demo. }
 
-@node isosamples, key, hidden3d, set-show
+@node historysize, isosamples, hidden3d, set-show
+@subsection historysize
+
+@c ?commands set historysize
+@c ?set historysize
+@c ?set nohistorysize
+@cindex historysize
+@opindex historysize
+
+
+@cindex nohistorysize
+
+Note: the command @ref{historysize} is only available when
+compiled with the gnu readline.
+
+Syntax:
+@example
+      set historysize <int>
+      unset historysize
+
+@end example
+
+When leaving gnuplot, the value of historysize is used for
+truncating the history to at most that much lines. The default
+is 500.
+"unset historysize" will disable history truncation and thus
+allow an infinite number of lines to be written to the history
+file.
+
+@node isosamples, key, historysize, set-show
 @subsection isosamples
 
 @c ?commands set isosamples
@@ -5760,7 +5898,7 @@ Syntax:
 @example
       set label @{<tag>@} @{"<label_text>"@} @{at <position>@}
                 @{<justification>@} @{@{no@}rotate@} @{font "<name>@{,<size>@}"@}
-                @{front | back@}
+                @{front | back@} @{pointstyle <style> | nopointstyle@}
       set nolabel @{<tag>@}
       show label
 
@@ -5789,6 +5927,13 @@ so, of course).
 If `front` is given, the label is written on top of the graphed data. If
 `back` is given (the default), the label is written underneath the graphed
 data.  Using `front` will prevent a label from being obscured by dense data.
+
+If `pointstyle` is given, a point with the given style is plotted at
+the label position and the text of the label is displaced slightly.
+The size of the point depends on the setting of @ref{pointsize}. This
+option is used by default for placing labels in mouse enhanced terminals.
+Use `nopointstyle` to turn off the drawing of a point near the label
+(this is the default).
 
 If one (or more) axis is timeseries, the appropriate coordinate should be
 given as a quoted time string according to the @ref{timefmt} format string.  See
@@ -6144,7 +6289,7 @@ labels will be included in either the margin calculation or the calculation
 of the positions of other text to be written in the margin.  This can lead
 to tic labels overwriting other text if the axis is very close to the border.
 
-@node missing, multiplot, margin, set-show
+@node missing, mouse, margin, set-show
 @subsection missing
 
 @c ?commands set missing
@@ -6205,7 +6350,124 @@ line will not connect the points at (2,20) and (4,40).
 
 There is no default character for @ref{missing}.
 
-@node multiplot, mx2tics, missing, set-show
+
+@node mouse, multiplot, missing, set-show
+@subsection mouse
+
+@c ?commands set nomouse
+@c ?set mouse
+@c ?set nomouse
+@cindex mouse
+@opindex mouse
+
+
+@cindex nomouse
+
+The command @ref{mouse} enables mouse actions. Currently only the
+X11 and pm driver are mouse enhanced. There are two mouse modes.
+The 2d-graph mode works for 2d graphs and for maps (i.e. splots with 
+@ref{view} having z-rotation 0, 90, 180, 270 or 360 degrees) and it
+allows tracing the position over graph, zooming, annotating graph etc.
+For 3d graphs `splot`, the view and scaling of the graph can be changed
+with mouse buttons 1 and 2. If additionally to these buttons the modifier
+<ctrl> is hold down, the coordinate system only is rotated which is
+useful for large data sets. A vertical motion of Button 2 with the
+shift key hold down changes the ticslevel.
+Mousing is not available in multiplot mode.  If multiplot is disabled
+using @ref{multiplot} though,  the mouse will be turned on again and
+acts on the last plot (like replot do).
+
+Syntax:
+@example
+      set mouse [doubleclick <ms>] [nodoubleclick] \
+                [[no]zoomcoordinates] \
+                [[no]polarcoordinates] \
+                [format <string>] \
+                [clipboardformat <int>/<string>] \
+                [mouseformat <int>/<string>] \
+                [[no]labels] [labeloptions <string>] \
+                [[no]zoomjump] [[no]verbose]
+      unset mouse
+
+@end example
+
+The doubleclick resolution is given in millieseconds and used
+for Button 1 which copies the current mouse position to the
+`clipboard`. If you want that to be done by single clicking
+a value of 0 ms can be used. The default value is 300 ms.
+
+The option zoomcoordinates determines if the coordinates of
+the zoom box are drawn at the edges while zooming. (on by default)
+
+The option polarcoordinates determines if the distance to the
+ruler is also shown in polar coordinates. This corresponds to
+the default key binding '5'.
+
+The `format` option takes a fprintf like format string which
+determines how floating point numbers are printed to the drivers
+window and the clipboard. The default is "% #g".
+
+`clipboardformat` and `mouseformat` are used for formatting the text
+on Button1 and Button2 actions -- copying the coordinates to the
+clipboard and temporaryly annotating the mouse position. This
+corresponds to the key bindings '1', '2', '3', '4' (see the
+drivers's help window). If the argument is a string this string
+is used as c format specifier and should contain two float
+specifiers, e.g. `set mouse mouseformat "mouse = %5.2g, %10.2f"`.
+Use `set mouseformat ""` to turn this string off again.
+
+The following formats are available (format 5 may only be selected
+if the format string was specified already):
+
+@example
+ 0   real coordinates in  brackets e.g. [1.23, 2.45]
+ 1   real coordinates w/o brackets e.g.  1.23, 2.45
+ 2   x == timefmt                       [(as set by @ref{timefmt}), 2.45]
+ 3   x == date                          [31. 12. 1999, 2.45]
+ 4   x == time                          [23:59, 2.45]
+ 5   x == date / time                   [31. 12. 1999 23:59, 2.45]
+ 6   alt. format, specified as string   ""
+
+@end example
+
+Choose the option `labels` to get real gnuplot labels on Button 2.
+(The default is `nolabels` which makes Button 2 drawing only
+@example
+ temporary annotations at the mouse positions). The labes are
+@end example
+
+drawn with the current setting of `mouseformat`. `labeloptions`
+controls which options are passed to the @ref{label} command.
+The default is "pointstyle 1" which will plot a small plus at
+the label position.  Note that the pointsize is taken from the
+@ref{pointsize} command.
+Labels can be removed by holding the Ctrl-Key down while clicking
+with Button 2 on the label's point. The threshold for how close
+you must be to the label is also determined by the @ref{pointsize}.
+
+If the option `zoomjump` is on, the mouse pointer will be automatically
+offset a small distance after starting a zoom region with button 3.
+This can be useful to avoid a tiny (or even empty) zoom region.
+`zoomjump` is off by default.
+
+If the option `verbose` is turned on the communication commands are 
+shown during execution. This option can also be toggled by hitting `6`
+in the driver's window. `verbose` is off by default.
+
+Press 'h' in the driver's window for a short summary of the
+mouse and key bindings.  This will also display user defined
+bindings (see @ref{bind}).
+
+Press 'q' in the driver's window to close the window. This key
+cannot be overridden with the @ref{bind} command.
+
+User defined `hotkeys` can be defined using the @ref{bind} command.
+(see @ref{bind}).  Note, that user defined `hotkeys` may override
+the default bindings.
+
+see also @ref{bind} and @ref{label}.
+
+@node multiplot, mx2tics, mouse, set-show
 @subsection multiplot
 
 
@@ -9368,7 +9630,7 @@ if the `-display` command line option is used.
 
 Syntax:
 @example
-      set terminal x11 @{reset@} @{<n>@}
+   set terminal x11 [reset] [<n>] [driver <path>] [[no]persist] [[no]raise]
 
 @end example
 
@@ -9385,8 +9647,24 @@ manager menu.  All plot windows can be closed by specifying @ref{reset}, which
 actually terminates the subprocess which maintains the windows (unless
 `-persist` was specified).
 
+The option `driver` can be used to specify a driver different from the
+default driver `gnuplot_x11`. This options is thought mainly for developers
+who are working on new driver features. Note that changing the driver will
+shut down the connection to the previous driver. Example:
+@example
+    gnuplot> set term x11 driver "gnuplot_x11_38a"
+
+@end example
+
 Plot windows will automatically be closed at the end of the session
 unless the `-persist` option was given.
+
+The options `persist` and `raise` are unset by default, which means that
+the defaults (persist == no and raise == yes) or the command line options
+-persist / -raise or the Xresources are taken.  If [no]persist or
+[no]raise are specified, they will override command line options and
+Xresources.  Setting one of these options takes place immediately, so
+the behaviour of an already running driver can be modified.
 
 The size or aspect ratio of a plot may be changed by resizing the `gnuplot`
 window.
@@ -9403,6 +9681,7 @@ A number of other `gnuplot` options are available for the `x11` terminal.
 These may be specified either as command-line options when `gnuplot` is
 invoked or as resources in the configuration file "/.Xdefaults".  They are
 set upon initialization and cannot be altered during a `gnuplot` session.
+(except `persist` and `raise`)
 
 
 @noindent --- COMMAND-LINE_OPTIONS ---
@@ -9415,7 +9694,8 @@ set upon initialization and cannot be altered during a `gnuplot` session.
 
 In addition to the X Toolkit options, the following options may be specified
 on the command line when starting `gnuplot` or as resources in your
-".Xdefaults" file:
+".Xdefaults" file (note that `raise` and `persist` can be overridden
+later by `set term x11 [no]raise [no]persist)`:
 
 @example
  `-clear`   requests that the window be cleared momentarily before a
