@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: util.h,v 1.1 1999/06/14 19:21:31 lhecking Exp $
  *
  */
 
@@ -44,37 +44,38 @@
  */
 extern TBOOLEAN screen_ok;
 
-int chr_in_str __PROTO((int, int));
-int equals __PROTO((int, char *));
-int almost_equals __PROTO((int, char *));
-int isstring __PROTO((int));
-int isanumber __PROTO((int));
-int isletter __PROTO((int));
-int is_definition __PROTO((int));
-void copy_str __PROTO((char *, int, int));
-int token_len __PROTO((int));
-void quote_str __PROTO((char *, int, int));
-void capture __PROTO((char *, int, int, int));
-void m_capture __PROTO((char **, int, int));
-void m_quote_capture __PROTO((char **, int, int));
-void convert __PROTO((struct value *, int));
-void disp_value __PROTO((FILE *, struct value *));
-double real __PROTO((struct value *));
-double imag __PROTO((struct value *));
-double magnitude __PROTO((struct value *));
-double angle __PROTO((struct value *));
-struct value * Gcomplex __PROTO((struct value *, double, double));
-struct value * Ginteger __PROTO((struct value *, int));
+extern int chr_in_str __PROTO((int, int));
+extern int equals __PROTO((int, const char *));
+extern int almost_equals __PROTO((int, const char *));
+extern int isstring __PROTO((int));
+extern int isanumber __PROTO((int));
+extern int isletter __PROTO((int));
+extern int is_definition __PROTO((int));
+extern void copy_str __PROTO((char *, int, int));
+extern int token_len __PROTO((int));
+extern void quote_str __PROTO((char *, int, int));
+extern void capture __PROTO((char *, int, int, int));
+extern void m_capture __PROTO((char **, int, int));
+extern void m_quote_capture __PROTO((char **, int, int));
+extern char *gp_strdup __PROTO((const char *));
+extern void convert __PROTO((struct value *, int));
+extern void disp_value __PROTO((FILE *, struct value *));
+extern double real __PROTO((struct value *));
+extern double imag __PROTO((struct value *));
+extern double magnitude __PROTO((struct value *));
+extern double angle __PROTO((struct value *));
+extern struct value * Gcomplex __PROTO((struct value *, double, double));
+extern struct value * Ginteger __PROTO((struct value *, int));
 #if defined(VA_START) && defined(ANSI_C)
-void os_error __PROTO((int, char *, ...));
-void int_error __PROTO((int, char *, ...));
-void int_warn __PROTO((int, char *, ...));
+extern void os_error __PROTO((int, const char *, ...));
+extern void int_error __PROTO((int, const char *, ...));
+extern void int_warn __PROTO((int, const char *, ...));
 #else
-void os_error ();
-void int_error ();
-void int_warn ();
+extern void os_error __PROTO(());
+extern void int_error __PROTO(());
+extern void int_warn __PROTO(());
 #endif
-void lower_case __PROTO((char *));
-void squash_spaces __PROTO((char *));
+extern void lower_case __PROTO((char *));
+extern void squash_spaces __PROTO((char *));
 
 #endif /* GNUPLOT_UTIL_H */
