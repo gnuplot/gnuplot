@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: variable.c,v 1.14 2002/02/21 12:27:37 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: variable.c,v 1.15 2002/09/02 21:03:28 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - variable.c */
@@ -322,24 +322,26 @@ fontpath_handler(action, path)
 		last = fontpath + len;
 		/* convert all PATHSEPs to \0 */
 		PATHSEP_TO_NUL(fontpath);
-	    } else {
+	    }
+#if defined(HAVE_DIRENT_H)
+	    else {
 		/* set hardcoded paths */
 		const struct path_table *curr_fontpath = fontpath_tbl;
 
 		while (curr_fontpath->dir) {
 		    char *currdir = NULL;
 		    char *envbeg = NULL;
-#if defined(PIPES)
+#  if defined(PIPES)
 		    char *cmdbeg = NULL;
-#endif
+#  endif
 		    TBOOLEAN subdirs = FALSE;
 
 		    currdir = gp_strdup( curr_fontpath->dir );
 
 		    while ( (envbeg=strstr(currdir, "$(")) 
-#if defined(PIPES)
+#  if defined(PIPES)
 			    || (cmdbeg=strstr( currdir, "$`" ))
-#endif 
+#  endif 
 			    ) {
 			/* Read environment variables */
 			if (envbeg) {
@@ -362,7 +364,7 @@ fontpath_handler(action, path)
 			    free(currdir);
 			    currdir = tmpdir;
 			}
-#if defined(PIPES)
+#  if defined(PIPES)
 			/* Read environment variables */
 			else if (cmdbeg) {
 			    char *tmpdir = NULL;
@@ -392,7 +394,7 @@ fontpath_handler(action, path)
 			    free(currdir);
 			    currdir = tmpdir;
 			}
-#endif
+#  endif
 		    }
 
 		    if ( currdir[strlen(currdir)-1] == '!' ) {
@@ -436,6 +438,7 @@ fontpath_handler(action, path)
 		if (fontpath)
 		    PATHSEP_TO_NUL(fontpath);
 	    }
+#endif /* HAVE_DIRENT_H */
 		
 	}			/* else: already initialised; int_warn (?) */
 	/* point to env portion of fontpath */

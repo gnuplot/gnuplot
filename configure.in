@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.114 2002/05/15 21:06:27 lhecking Exp $
+dnl $Id: configure.in,v 1.115 2002/05/29 20:26:51 lhecking Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -82,8 +82,8 @@ AC_HEADER_STDC
 
 dnl Header files
 dnl ANSI/ISO C, POSIX, others
-AC_CHECK_HEADERS(errno.h float.h limits.h locale.h math.h stdlib.h string.h \
-  time.h sys/time.h sys/types.h \
+AC_CHECK_HEADERS(dirent.h errno.h float.h limits.h locale.h math.h stdlib.h \
+  string.h time.h sys/time.h sys/types.h \
   sys/bsdtypes.h sys/ioctl.h sys/param.h sys/select.h sys/socket.h \
   sys/stat.h sys/systeminfo.h sys/timeb.h sys/utsname.h \
   libc.h malloc.h poll.h sgtty.h termios.h values.h

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.38 2002/09/02 21:03:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.39 2002/09/06 17:36:28 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -34,8 +34,6 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.38 2002/09/02 21:03:18 miku
  * to the extent permitted by applicable law.
 ]*/
 
-#include <dirent.h>
-
 #include "misc.h"
 
 #include "alloc.h"
@@ -46,6 +44,11 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.38 2002/09/02 21:03:18 miku
 #include "tables.h"
 #include "util.h"
 #include "variable.h"
+
+#ifdef HAVE_DIRENT_H
+#include <sys/types.h>
+#include <dirent.h>
+#endif
 
 /* name of command file; NULL if terminal */
 char *infile_name = NULL;
@@ -403,9 +406,11 @@ recursivefullname(path, filename, recursive)
      TBOOLEAN recursive;
 {
     char *fullname = NULL;
+#ifdef HAVE_DIRENT_H
     struct dirent *direntry;
     struct stat buf;
     DIR *dir;
+#endif
     FILE *fp;
 
     /* length of path, dir separator, filename, \0 */
@@ -422,7 +427,9 @@ recursivefullname(path, filename, recursive)
 	fullname = NULL;
     } /* else */
 
+    /* FIXME HH 20020915: implement recursive directory search for MSC */
     if (recursive) {
+#ifdef HAVE_DIRENT_H
 	dir = opendir(path);
 	if (dir) {
 	    while ((direntry=readdir(dir))!=NULL) {
@@ -447,9 +454,14 @@ recursivefullname(path, filename, recursive)
 		    if (fullname != NULL)
 			break;
 		} /* if */
+		free(fulldir);
 	    } /* while */
 	    closedir(dir);
 	} /* if */
+#else
+	int_warn(NO_CARET,"Recursive directory search not supported\n\t('%s!')",
+		 path);
+#endif
     } /* if */
 
     return fullname;

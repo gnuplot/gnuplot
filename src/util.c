@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.34 2002/04/05 17:15:51 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.35 2002/09/02 21:03:27 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -34,9 +34,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.34 2002/04/05 17:15:51 broe
  * to the extent permitted by applicable law.
 ]*/
 
-#include <sys/types.h>
-#include <dirent.h>
-
 #include "util.h"
 
 #include "alloc.h"
@@ -46,6 +43,11 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.34 2002/04/05 17:15:51 broe
 #include "plot.h"
 /*  #include "setshow.h" */		/* for month names etc */
 #include "term_api.h"		/* for term_end_plot() used by graph_error() */
+
+#ifdef HAVE_DIRENT_H
+#include <sys/types.h>
+#include <dirent.h>
+#endif
 
 /* Exported (set-table) variables */
 
@@ -1022,15 +1024,21 @@ char *instr;
 }
 
 
+/* FIXME HH 20020915: This function does nothing if dirent.h not available. */
+/* But it must check for the existance of the directory */
 TBOOLEAN 
 existdir (name)
      const char *name;
 {
+#ifdef HAVE_DIRENT_H
     DIR *dp;
     if (! (dp = opendir(name) ) )
 	return FALSE;
     
     closedir(dp);
     return TRUE;
+#else
+    return FALSE;
+#endif
 }
 
