@@ -42,57 +42,50 @@
  */
 
 #ifndef ANSI_CHECK_H
-#define ANSI_CHECK_H
+# define ANSI_CHECK_H
 
-#if defined(__STDC__) && __STDC__
-# ifndef ANSI_C
-#  define ANSI_C
-# endif /* ANSI_C */
-#endif /* __STDC__ */
+# ifndef HAVE_CONFIG_H
+/* Only relevant for systems which don't run configure */
+
+#  if defined(__STDC__) && __STDC__
+#   ifndef ANSI_C
+#    define ANSI_C
+#   endif
+#  endif /* __STDC__ */
 
 /* are all these compiler tests necessary ? - can the makefiles not
  * just set ANSI_C ?
  */
 
-#ifndef HAVE_CONFIG_H
-# if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
-#  ifndef PROTOTYPES
-#   define PROTOTYPES
-#  endif
-#  ifndef HAVE_STRINGIZE
-/* must encapsulate HAVE_STRINGIZE to avoid having it defined
- * on autoconfiscated platforms where it's unavailable
- */ 
-#   define HAVE_STRINGIZE
-#  endif
-# endif /* ANSI_C ... */
-#endif /* !HAVE_CONFIG_H */
+#  if defined(ANSI_C) || defined(__TURBOC__) || defined (__PUREC__) || defined (__ZTC__) || defined (_MSC_VER) || (defined(OSK) && defined(_ANSI_EXT))
+#   ifndef PROTOTYPES
+#    define PROTOTYPES
+#   endif
+#   ifndef HAVE_STRINGIZE
+#    define HAVE_STRINGIZE
+#   endif
+#  endif /* ANSI_C ... */
 
 /* used to be __P but it was just too difficult to guess whether
  * standard headers define it. It's not as if the defn is
  * particularly difficult to do ourselves...
  */
-
-#ifdef PROTOTYPES
-# define __PROTO(proto) proto
-#else
-# define __PROTO(proto) ()
-#endif
+#  ifdef PROTOTYPES
+#   define __PROTO(proto) proto
+#  else
+#   define __PROTO(proto) ()
+#  endif
 
 
 /* generic pointer type. For old compilers this has to be changed to char *,
-   but I don't know if there are any CC's that support void and not void * */
-
-#define generic void
-
-/* undef const for old compilers */
-#ifndef HAVE_CONFIG_H
-/* Don't do this on autoconf'd platforms
- * where ANSI_C is not defined anymore!
+ * but I don't know if there are any CC's that support void and not void *
  */
-# ifndef ANSI_C
-#  define const
-# endif
-#endif /* !HAVE_CONFIG_H */
+#  define generic void
+
+#  ifndef ANSI_C
+#   define const
+#  endif
+
+# endif /* !HAVE_CONFIG_H */
 
 #endif /* ANSI_CHECK_H */
