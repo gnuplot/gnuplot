@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.143 2005/01/10 14:19:10 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.144 2005/01/12 04:41:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -2876,9 +2876,8 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			else if (! boxwidth_is_absolute)
 			    dxl = (plot->points[i-1].x - plot->points[i].x) * boxwidth / 2.0;
 #endif /* USE_RELATIVE_BOXWIDTH */
-			else /* shouldn't happen, as graphics.c was supposed to */
-			     /* handle this case and then set points[i].z to 0 */
-			    dxl = boxwidth / 2.0;
+			else /* Hits here on 3 column BOXERRORBARS */
+			    dxl = -boxwidth / 2.0;
 		    else
 			dxl = 0.0;
 
@@ -2890,7 +2889,7 @@ plot_boxes(struct curve_points *plot, int xaxis_y)
 			    else if (! boxwidth_is_absolute)
 				dxr = (plot->points[i+1].x - plot->points[i].x) * boxwidth / 2.0;
 #endif /* USE_RELATIVE_BOXWIDTH */
-			    else /* shouldn't happen */
+			    else /* Hits here on 3 column BOXERRORBARS */
 				dxr = boxwidth / 2.0;
 			else
 			    dxr = -dxl;

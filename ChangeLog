@@ -1,3 +1,9 @@
+2005-02-01  Ethan Merritt  <merritt@u.washington.edu>
+
+	* src/graphics.c (plot_boxes): Plot with boxerrorbars and three columns
+	of input data hit a rare code path that set the boxwidth wrong in some
+	cases. Fixes bug #1101409.
+
 2005-02-01  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/time.c (xstrftime): Shift reply range of %I and %l time
