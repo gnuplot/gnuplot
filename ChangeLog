@@ -1,5 +1,8 @@
 2004-05-27  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* term/post.trm (PS_make_header): Change definition of /pm3dround to fix
+	color mapping with 'set palette maxcolors'.
+
 	* src/win/wgraph.c (drawgraph): Change call from rgb255_from_gray() to
 	rgb255maxcolors_from_gray(). Fixes color mapping with 'set palette
 	maxcolors'.

@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.106 2004/05/09 14:35:04 mikulik Exp $
+ * $Id: post.trm,v 1.107 2004/05/17 05:28:11 sfeam Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -2584,10 +2584,8 @@ PS_make_header(t_sm_palette *palette)
 	fprintf( stderr, "%s:%d ooops: Unknown color mode '%c'\n",
 		 __FILE__, __LINE__, (char)(sm_palette.colorMode) );
     }
-    fputs("/maxcolorsLast {maxcolors 1 sub maxcolors div} def\n", gpoutfile);
-    fputs("/pm3dround {maxcolors 0 gt {dup maxcolorsLast ge {pop 1}\n",
-	  gpoutfile);
-    fputs( "{maxcolors mul floor maxcolors div} ifelse} if} def\n", gpoutfile);
+    fputs("/pm3dround {maxcolors 0 gt {dup 1 ge\n", gpoutfile);
+    fputs("\t{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def\n", gpoutfile);
     fprintf( gpoutfile, "/pm3dGamma 1.0 %g div def\n", sm_palette.gamma );
     write_color_space( palette );
 
