@@ -69,6 +69,8 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
 #include "stdfn.h"
 #include "doc2x.h"
 
+extern boolean single_top_level;
+
 #define LINE_SKIP		3
 #define DSR_RM		70
 
@@ -92,6 +94,8 @@ char **argv;
     FILE *outfile;
     infile = stdin;
     outfile = stdout;
+
+    single_top_level = TRUE;
 
     if (argc > 3) {
 	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
@@ -173,9 +177,9 @@ FILE *b;
 	}
 #if 0
 /* 'C' is taken care of by termdoc.c */
-         case 'C': {                  /*  new Comment designator */
-                break;                        /* ignore */
-         }
+    case 'C':{			/*  new Comment designator */
+	    break;		/* ignore */
+	}
 #endif
     case '\n':			/* empty text line */
     case ' ':{			/* normal text line */
@@ -243,7 +247,7 @@ FILE *b;
 	    break;
 	}
     default:{
-	    if (isdigit((int)line[0])) {	/* start of section */
+	    if (isdigit((int) line[0])) {	/* start of section */
 
 /* some HELP text is surrounded by table flags */
 /* doc2rnh will ignore the flags */
@@ -317,14 +321,12 @@ FILE *file;
     (void) fputs(s, file);
 }
 
-/*
- * Change blanks in section heading to underscore for legibility in 
- * on-line HELP menus.  Modeled after doc2tex and doc2ms section 
- * heading conversions.
+/* 
+ * LBR$OUTPUT_HELP treats spaces and "/"s as list separators for topics,
+ * but they are used in gnuplot.doc for the printed docs; convert to
+ * "_" and "|"   Modeled after section heading conversions in doc2tex 
+ * and doc2ms. 
  *
- * Header starts at [2], so just check for blanks not to be converted
- * at end of string.
- * 
  */
 
 void putrnh_(s, file)
@@ -335,18 +337,28 @@ FILE *file;
 
     s_len = strlen(s);
 
-    for (i = s_len - 1; i > 2; i--) {
+    for (i = s_len - 1; i > 2; i--) {	/* any trailing spaces to drop? */
 	if (s[i] != ' ') {
 	    last_chr = i;
 	    break;
 	}
     }
 
-    for (i = 0; i <= s_len; i++) {
-	if ((i > 2) && (i < last_chr) && (s[i] == ' '))
-	    (void) fputc('_', file);
-	else
+    for (i = 0; i <= last_chr; i++) {
+	if (i > 2) {
+	    switch (s[i]) {
+	    case ' ':
+		(void) fputc('_', file);
+		break;
+	    case '/':
+		(void) fputc('|', file);
+		break;
+	    default:
+		(void) fputc(s[i], file);
+	    }
+	} else {
 	    (void) fputc(s[i], file);
+	}
     }
 }
 
