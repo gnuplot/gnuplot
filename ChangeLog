@@ -1,3 +1,25 @@
+2003-07-22  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/parse.c src/parse.h: Add a new function get_udv(key) that can
+	search for user-defined variables even if the key is not a token in
+	the current command line.
+
+	* src/mouse.c: When mousing is active, each mouse click in the current
+	plot window will update the current value of user-defined variables
+	MOUSE_BUTTON MOUSE_X MOUSE_Y MOUSE_X2 MOUSE_Y2. In combination with
+	Jaime Reed's patch below, this allows gnuplot scripts to test for the
+	presence and result of mouse input.
+
+	* src/gplt_x11.c term/x11.trm: Continue processing mouse activity for
+	all displayed X11 windows.  This is necessarily done in gnuplot_x11,
+	since gnuplot discards the old scaling information each time it starts
+	a new plot. The mouse position is updated in the window itself.
+	There is dummy code in gplt_x11.c that logs mouse clicks to stderr, but
+	ideally it should be fed to some higher-level process (e.g. Octave).
+
+	* docs/gnuplot.doc demo/mousevariables.dem: Document new mousing
+	behaviour and provide a sample script that uses it.
+
 2003-07-22  Jaime Reed <jaime2003@users.sourceforge.net>
 
 	* src/parse.c src/eval.h src/eval.c src/standard.c src/standard.h
