@@ -1,13 +1,14 @@
 #
-# $Id: makefile.os2,v 1.15 2000/11/24 15:44:31 mikulik Exp $
+# $Id: makefile.os2,v 1.16 2001/09/17 19:40:20 amai Exp $
 #
-# GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
+# GNUPLOT Makefile for use on OS/2 2.x and above
 # using emx 0.9 (and above) and GNUMake
 #
-# last modification date: 19990602
+# last modification date: (see CVS Id)
 #
 
-# We depend on using cmd.exe (or a compatible one)
+# We depend on using cmd.exe (or a compatible one) and the
+# standard OS/2 tools set.
 SHELL=cmd.exe
 
 #
@@ -39,7 +40,7 @@ VESA=1
 
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
-# as opposed to a production build since we lower the optimization level
+# as compared to a production build since we lower the optimization level
 # DEBUG=1
 
 # MOUSE support for PM and X11 terminals
@@ -139,18 +140,19 @@ endif
 #
 ifdef DEBUG
 CFLAGS  = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -Zmt
-LFLAGS  = -g -Zmt
+LDFLAGS  = -g -Zmt -Zcrtdll
 CFLAGS2 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall              -O0 -Zmt -Zomf
-LFLAGS2 = -g -Zmt -Zsys -Zomf
+#LDFLAGS2 = -g -Zmt         -Zsys -Zomf
+LDFLAGS2 = -g -Zmt -Zcrtdll -Zomf
 CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0 -I.
-LFLAGS3 = -g
+LDFLAGS3 = -g      -Zcrtdll
 else
-CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -m486 -Wall -Wno-unused -Wno-comment -Zmt
-LFLAGS  = -s -Zmt -Zcrtdll
-CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -m486 -Wall -Wno-unused              -Zmt -Zomf
-LFLAGS2 = -s -Zmt -Zcrtdll -Zomf
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment -I.
-LFLAGS3 = -s -Zcrtdll
+CFLAGS  = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -mpentium -Wall -Wno-unused -Wno-comment -Zmt
+LDFLAGS  = -s -Zmt -Zcrtdll
+CFLAGS2 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -mpentium -Wall -Wno-unused              -Zmt -Zomf
+LDFLAGS2 = -s -Zmt -Zcrtdll -Zomf
+CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -mpentium -Wall -Wno-unused -Wno-comment -I.
+LDFLAGS3 = -s      -Zcrtdll
 endif
 
 #
@@ -196,6 +198,13 @@ CFLAGS += -DPM3D
 CFLAGS2 += -DPM3D
 endif
 
+
+# Tools for buildings the docs
+DVIPS    = dvips
+LATEX    = latex
+PDFLATEX = vlatex
+PLAINTEX = tex
+
 #
 # Default Rules
 #
@@ -232,7 +241,7 @@ OBJS = $(COREOBJS) version.$(O)
 term.$(O): $(OS2TERM) term.h
 
 gnuplot.exe: $(OBJS)
-	$(CC) -o $@ $(OBJS) $(TERMLIBS) $(LIBS) $(LFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(TERMLIBS) $(LIBS)
 
 #
 # Build the PM outboard driver
@@ -249,7 +258,7 @@ OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) 
          $(OS2DIR)\dialogs.$(O2) gpexecute.$(O2)
 
 gnupmdrv.exe: $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
-	$(CC2) $(LFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
+	$(CC2) $(LDFLAGS2) -o $@ $(OS2OBJ) $(OS2DIR)\gnupmdrv.res $(OS2DIR)\gnupmdrv.def
 
 gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 	copy $(OS2DIR)\gnupmdrv.ipf .
@@ -260,20 +269,16 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 #
 
 # X11 libraries
-X11LIBS = -lX11 -lsocket -Zcrtdll
+X11LIBS = -lX11 -lsocket -Zbsd-signals -Zcrtdll
 # X11 includes
-X11INCLUDES = -I$(X11ROOT)/xfree86/include
-X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
+X11INCLUDES = -I$(X11ROOT)/XFree86/include
+X11FLAGS= -Zmt
 ifdef MOUSE
 X11FLAGS += -DUSE_MOUSE
 endif
 
-ifdef PM3D
 gnuplot_x11.exe: gplt_x11.o gpexecute.o getcolor.o
-else
-gnuplot_x11.exe: gplt_x11.o gpexecute.o 
-endif
-	$(CC) $(LFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
+	$(CC) $(LDFLAGS) $(X11FLAGS) $(EMXSPECIFIC) -o $@ $^ $(X11LIBS)
 
 gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 	$(CC) $(CFLAGS) $(X11FLAGS) $(EMXSPECIFIC) $(X11INCLUDES) -c -o $@ $<
@@ -281,18 +286,22 @@ gplt_x11.o: gplt_x11.c mouse.h gpexecute.h
 #
 # Create documentation in various formats
 #
-# Change the call to LaTeX if the "latex2e" is not appropiate for you
-# (and don't care about the strange way it's implemented ...)
-# Call LaTeX/2e three times to get the toc right.
+# Don't care about the strange way it's implemented ...
+# Call LaTeX three times to get the toc right.
 gnuplot.dvi: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
-	cd $(DOCDIR) & latex2e gnuplot_2.tex & latex2e gnuplot_2.tex & latex2e gnuplot_2.tex
+	cd $(DOCDIR) & $(LATEX) gnuplot_2.tex & $(LATEX) gnuplot_2.tex & $(LATEX) gnuplot_2.tex
 	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
+	del $(DOCDIR)\gnuplot_2*
+gnuplot.ps: gnuplot.dvi
+	$(DVIPS) -o gnuplot.ps gnuplot.dvi
+gnuplot.pdf: gnuplot.tex
+	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
+	cd $(DOCDIR) & $(PDFLATEX) gnuplot_2.tex & $(PDFLATEX) gnuplot_2.tex & $(PDFLATEX) gnuplot_2.tex
+	move $(DOCDIR)\gnuplot_2.pdf gnuplot.pdf
 	del $(DOCDIR)\gnuplot_2*
 gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
 	doc2tex $(DOCDIR)\gnuplot.doc gnuplot.tex
-gnuplot.ps: gnuplot.dvi
-	dvips -o gnuplot.ps gnuplot.dvi
 gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
 	copy $(DOCDIR)\gnuplot.ipf .
 	ipfc /INF gnuplot.ipf
@@ -305,16 +314,17 @@ gnuplot.info: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
 # gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
 #	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$(DOCDIR)\gnuplot.texi
 gnuplot.rtf:  $(DOCDIR)\gnuplot.doc doc2rtf.exe
-	doc2rtf $(DOCDIR)\gnuplot.doc gnuplot.rtf
+	doc2rtf.exe $(DOCDIR)\gnuplot.doc gnuplot.rtf
 gnuplot.ms:   $(DOCDIR)\gnuplot.doc doc2ms.exe
-	doc2ms $(DOCDIR)\gnuplot.doc gnuplot.ms
+	doc2ms.exe $(DOCDIR)\gnuplot.doc gnuplot.ms
 $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc doc2ipf.exe
-	doc2ipf $(DOCDIR)\gnuplot.doc $(DOCDIR)\gnuplot.ipf
+	doc2ipf.exe $(DOCDIR)\gnuplot.doc $(DOCDIR)\gnuplot.ipf
+# Assume we need A4 format
 gpcard.ps: $(DOCDIR)\gpcard.dvi
-	dvips -o gpcard_letter.ps $< 
+	$(DVIPS) -o gpcard_letter.ps $< 
 	psresize -pletter -Pa4 gpcard_letter.ps $@
 $(DOCDIR)\gpcard.dvi: $(DOCDIR)\gpcard.tex
-	cd $(DOCDIR) & tex386 gpcard.tex
+	cd $(DOCDIR) & $(PLAINTEX) gpcard.tex
 
 #
 # Tools for converting the documentation from docs\gnuplot.doc
@@ -387,3 +397,4 @@ veryclean: clean
 	cd $(DOCDIR)  & IF EXIST *.aux   DEL *.aux
 	cd $(DOCDIR)  & IF EXIST *.toc   DEL *.toc
 	cd $(DEMODIR) & IF EXIST binary? DEL binary?
+
