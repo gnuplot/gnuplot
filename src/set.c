@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.76 2002/02/14 21:14:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.77 2002/02/15 09:22:15 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -2518,21 +2518,9 @@ set_pm3d()
     else { /* go through all options of 'set pm3d' */
 	for ( ; !END_OF_COMMAND && !equals(c_token,";"); c_token++ ) {
 	    if (equals(c_token, "at")) {
-		char* c;
 		c_token++;
-		if (token[c_token].length >= sizeof(pm3d.where)) {
-		    int_error(c_token,"ignoring so many redrawings");
-		    return /* (TRUE) */;
-		}
-		memcpy(pm3d.where, input_line + token[c_token].start_index, token[c_token].length);
-		pm3d.where[ token[c_token].length ] = 0;
-		for (c = pm3d.where; *c; c++) {
-		    if (*c != 'C') /* !!!!! CONTOURS, UNDOCUMENTED, THIS LINE IS TEMPORARILY HERE !!!!! */
-			if (*c != PM3D_AT_BASE && *c != PM3D_AT_TOP && *c != PM3D_AT_SURFACE) {
-			    int_error(c_token,"parameter to pm3d requires combination of characters b,s,t\n\t(drawing at bottom, surface, top)");
-			    return /* (TRUE) */;
-			}
-		}
+		if (get_pm3d_at_option(&pm3d.where[0]))
+		    return; /* error */
 		continue;
 	    }  /* at */
 	    /* forward and backward drawing direction */

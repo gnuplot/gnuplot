@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.9 2002/01/26 17:55:08 joze Exp $
+ * $Id: pm3d.h,v 1.10 2002/02/13 22:58:18 mikulik Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -106,6 +106,7 @@ extern pm3d_struct pm3d;
   Declaration of routines
 ****/
 
+int get_pm3d_at_option __PROTO((char *pm3d_where));
 int set_pm3d_zminmax __PROTO((void));
 void pm3d_plot __PROTO((struct surface_points * plot, char at_which_z));
 void filled_color_contour_plot __PROTO((struct surface_points *plot, int contours_where));

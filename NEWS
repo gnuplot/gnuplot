@@ -38,6 +38,7 @@ off with the hotkey 'm'. See 'help mouse' and 'help bind' for more details.
 
 
 [3.8i]
+* NEW splot ... with pm3d [at option]
 * CHANGE pause supports subsecond time resolution (on systems supporting it)
 * CHANGE "configure --with-x11-driver" and "set term x11 driver" removed.
 * CHANGE gnuplot_x11 now goes to $pkglibdir/$version, not $bindir

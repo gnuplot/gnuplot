@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.10 2000/11/23 14:14:37 broeker Exp $
+ * $Id: graph3d.h,v 1.11 2002/01/26 17:55:07 joze Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -99,6 +99,7 @@ typedef struct surface_points {
 
 #ifdef PM3D
     int pm3d_color_from_column;
+    char pm3d_where[7];		/* explicitly given base, top, surface */
 #endif
     
 } surface_points;

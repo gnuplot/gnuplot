@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.23 2002/02/15 14:03:50 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.24 2002/02/16 14:52:54 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -29,7 +29,7 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.23 2002/02/15 14:03:50 miku
 #include "plot3d.h"
 #include "setshow.h"		/* for surface_rot_z */
 #include "term_api.h"		/* for lp_use_properties() */
-
+#include "command.h"		/* for c_token */
 
 
 /*
@@ -539,14 +539,17 @@ pm3d_reset(void)
 
 
 /* 
- * Draw (one) PM3D color surface
+ * Draw (one) PM3D color surface.
  */
 void
 pm3d_draw_one(struct surface_points *plot)
 {
     int i = 0;
+    char *where = plot->pm3d_where[0] ? plot->pm3d_where : pm3d.where;
+	/* Draw either at 'where' option of the given surface or at pm3d.where
+	 * global option. */
 
-    if (!pm3d.where[0]) {
+    if (!where[0]) {
 	return;
     }
 
@@ -554,11 +557,11 @@ pm3d_draw_one(struct surface_points *plot)
     if (postscript_gpoutfile)
 	fprintf(gpoutfile, "%%pm3d_map_begin\n");
 
-    for (; pm3d.where[i]; i++) {
-	pm3d_plot(plot, pm3d.where[i]);
+    for (; where[i]; i++) {
+	pm3d_plot(plot, where[i]);
     }
 
-    if (strchr(pm3d.where, 'C') != NULL) {
+    if (strchr(where, 'C') != NULL) {
 	/* !!!!! FILLED COLOR CONTOURS, *UNDOCUMENTED*
 	   !!!!! LATER CHANGE TO STH LIKE 
 	   !!!!!   (if_filled_contours_requested)
@@ -582,5 +585,46 @@ pm3d_draw_one(struct surface_points *plot)
     if (term->previous_palette)
 	term->previous_palette();
 }
+
+
+/* Display an error message for the routine get_pm3d_at_option() below.
+ */
+static void pm3d_option_at_error __PROTO((void));
+
+static void
+pm3d_option_at_error(void)
+{
+    int_error(c_token,"parameter to `pm3d at` requires combination of up to 6 characters b,s,t\n\t(drawing at bottom, surface, top)");
+}
+
+
+/* Read the option for 'pm3d at' command.
+ * Used by 'set pm3d at ...' or by 'splot ... with pm3d at ...'.
+ * If no option given, then returns empty string, otherwise copied there.
+ * The string is unchanged on error, and 1 is returned.
+ * On success, 0 is returned.
+ */
+int
+get_pm3d_at_option(char *pm3d_where)
+{
+    char* c;
+    if (END_OF_COMMAND || token[c_token].length >= sizeof(pm3d_where)) {
+	pm3d_option_at_error();
+	return 1;
+    }
+    memcpy(pm3d_where, input_line + token[c_token].start_index, token[c_token].length);
+    pm3d_where[ token[c_token].length ] = 0;
+    /* verify the parameter */
+    for (c = pm3d_where; *c; c++) {
+	if (*c != 'C') /* !!!!! CONTOURS, UNDOCUMENTED, THIS LINE IS TEMPORARILY HERE !!!!! */
+	    if (*c != PM3D_AT_BASE && *c != PM3D_AT_TOP && *c != PM3D_AT_SURFACE) {
+		pm3d_option_at_error();
+		return 1;
+	}
+    }
+    c_token++;
+    return 0;
+}
+
 
 #endif

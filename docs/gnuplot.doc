@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.99 2002/02/13 17:59:35 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.100 2002/02/14 16:42:07 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2987,9 +2987,11 @@ C ... and restart the table:
  `dots`, `steps`, `fsteps`, `histeps`, `errorbars`, `xerrorbars`,
  `yerrorbars`, `xyerrorbars`, `errorlines`, `xerrorlines`, `yerrorlines`,
  `xyerrorlines`, `boxes`, `filledboxes`, `filledcurves`, `boxerrorbars`,
- `boxxyerrorbars`, `financebars`, `candlesticks` or `vector`. Some of these
- styles require additional information. See `set style <style>` for details
- of each style.
+ `boxxyerrorbars`, `financebars`, `candlesticks`, `vector` or `pm3d`. Some 
+ of these styles require additional information. See `set style <style>` for
+ details of each style.  Note that `filledcurves` and `pm3d` can take an 
+ additional option not listed above (the latter only when used in the `splot`
+ command)---see their help or examples below for more details.
 
  Default styles are chosen with the `set style function` and `set style data`
  commands.
@@ -3074,6 +3076,9 @@ C ... and restart the table:
 
  This plots a surface with color lines:
        splot x*x-y*y with line palette
+
+ This plots two color surfaces at different altitudes:
+       splot x*x-y*y with pm3d, x*x+y*y with pm3d at t
 
  See `set style` to change the default styles.
 ^ <a href="http://www.nas.nasa.gov/~woo/gnuplot/styles/styles.html"> Styles demos. </a>
@@ -5632,6 +5637,12 @@ C ... and restart the table:
  Note that when plotting several plots, they are plotted in the order given
  on the command line. This can be of interest especially for pm3d surfaces
  which can overwrite and therefore hide part of earlier plots.
+
+ If 'with pm3d' is specified in the `splot` command line, then it accepts the
+ 'at' option.  The following plots three color surfaces at different altitudes:
+       set border 4095
+       set pm3d at s
+       splot 10*x with pm3d at b, x*x-y*y, x*x+y*y with pm3d at t
 
  See also `set palette`, `set colorbox`, `help x11 pm3d`, `help vgagl`.
 

@@ -1,3 +1,10 @@
+2002-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS docs/gnuplot.doc src/graph3d.h src/plot3d.c src/pm3d.c
+	src/pm3d.h src/set.c: Allow plotting surfaces at different altitudes
+	in one graph by explicitly specifying 'at <where>' in the 'splot'
+	command, e.g. "splot ... with pm3d [at option]".
+
 2002-02-18  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* demo/fillbox.dem: New demo for filled boxes plotting style.

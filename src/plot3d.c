@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.42 2002/02/16 14:52:54 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.43 2002/02/16 15:03:11 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -130,6 +130,7 @@ int num_samp_1, num_iso_1, num_samp_2, num_iso_2;
 
 #ifdef PM3D
     sp->pm3d_color_from_column = 0;
+    sp->pm3d_where[0] = 0;
 #endif
 
     if (num_iso_2 > 0 && num_samp_1 > 0) {
@@ -1301,6 +1302,16 @@ eval_3dplots()
 			    int_warn(c_token, "This plot style is only for datafiles , reverting to \"points\"");
 			    this_plot->plot_style = POINTSTYLE;
 			}
+#ifdef PM3D
+		    if (data_style & PM3DSURFACE) {
+			if (equals(c_token, "at")) {
+			/* option 'with pm3d [at ...]' is explicitly specified */
+			c_token++;
+			if (get_pm3d_at_option(&this_plot->pm3d_where[0]))
+			    return; /* error */
+			}
+		    }
+#endif
 		    set_with = TRUE;
 		    continue;
 		}
