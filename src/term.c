@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.89 2004/10/29 06:45:37 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.90 2004/11/08 06:46:01 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -1056,13 +1056,15 @@ do_arrow(
     gpiPoint filledhead[5];
 #endif
     int xm = 0, ym = 0;
-    int head = (head < 0) ? -headstyle : headstyle;
+
+    /* negative headstyle means draw heads only, no shaft */
+    t_arrow_head head = (t_arrow_head)((headstyle < 0) ? -headstyle : headstyle);
 
     /* Calculate and draw arrow heads.
      * Draw no head for arrows with length = 0, or, to be more specific,
      * length < DBL_EPSILON, because len_arrow will almost always be != 0.
      */
-    if (head && fabs(len_arrow) >= DBL_EPSILON) {
+    if ((head != NOHEAD) && fabs(len_arrow) >= DBL_EPSILON) {
 	int x1, y1, x2, y2;
 	if (curr_arrow_headlength <= 0) {
 	    /* arrow head with the default size */
@@ -1112,7 +1114,8 @@ do_arrow(
 	    filledhead[4].x = ex + xm;
 	    filledhead[4].y = ey + ym;
 	    filledhead->style = FS_OPAQUE;
-	    (*t->filled_polygon) (5, filledhead);
+	    if (t->filled_polygon)
+		(*t->filled_polygon) (5, filledhead);
 	}
 #endif
 	/* draw outline of forward arrow head */
@@ -1127,7 +1130,7 @@ do_arrow(
 	    (*t->vector) (ex, ey);
 	    (*t->vector) (ex + x2, ey + y2);
 	}
-	if (head == 2) { /* backward arrow head */
+	if (head == BOTH_HEADS) { /* backward arrow head */
 #ifdef PM3D
 	    if (curr_arrow_headfilled==2) {
 		/* draw filled backward arrow head */
@@ -1142,7 +1145,8 @@ do_arrow(
 		filledhead[4].x = sx - xm;
 		filledhead[4].y = sy - ym;
 		filledhead->style = FS_OPAQUE;
-		(*t->filled_polygon) (5, filledhead);
+		if (t->filled_polygon)
+		    (*t->filled_polygon) (5, filledhead);
 	    }
 #endif
 	    /* draw outline of backward arrow head */
@@ -1164,12 +1168,12 @@ do_arrow(
 	return;
     
     /* Draw the line for the arrow. */
-    if ( (head == 2) &&
+    if ( (head == BOTH_HEADS) &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
 	(*t->move) (sx - xm, sy - ym);
     else
 	(*t->move) (sx, sy);
-    if ( head &&
+    if ( (head != NOHEAD) &&
 	 (fabs(len_arrow) >= DBL_EPSILON) && (curr_arrow_headfilled!=0) )
 	(*t->vector) (ex + xm, ey + ym);
     else
@@ -1829,18 +1833,24 @@ test_term()
     /* test some arrows */
     (*t->linewidth) (1.0);
     (*t->linetype) (0);
-    x = xmax_t / 3;
-    y = ymax_t / 3;
+    x = xmax_t * .375;
+    y = ymax_t * .250;
+    xl = t->h_tic * 7;
+    yl = t->v_tic * 7;
+    i = curr_arrow_headfilled;
+    curr_arrow_headfilled = 0;
+    (*t->arrow) (x, y, x + xl, y, END_HEAD);
+    curr_arrow_headfilled = 1;
+    (*t->arrow) (x, y, x - xl, y, END_HEAD);
+    curr_arrow_headfilled = 2;
+    (*t->arrow) (x, y, x, y + yl, END_HEAD);
+    curr_arrow_headfilled = 3;
+    (*t->arrow) (x, y, x, y - yl, END_HEAD);
+    curr_arrow_headfilled = i;
     xl = t->h_tic * 5;
     yl = t->v_tic * 5;
-    (*t->arrow) (x, y, x + xl, y, TRUE);
-    (*t->arrow) (x, y, x + xl / 2, y + yl, TRUE);
-    (*t->arrow) (x, y, x, y + yl, TRUE);
-    (*t->arrow) (x, y, x - xl / 2, y + yl, FALSE);
-    (*t->arrow) (x, y, x - xl, y, TRUE);
-    (*t->arrow) (x, y, x - xl, y - yl, TRUE);
-    (*t->arrow) (x, y, x, y - yl, TRUE);
-    (*t->arrow) (x, y, x + xl, y - yl, TRUE);
+    (*t->arrow) (x - xl, y - yl, x + xl, y + yl, BOTH_HEADS);
+    (*t->arrow) (x - xl, y + yl, x + xl, y - yl, NOHEAD);
 
     /* test line widths */
     (void) (*t->justify_text) (LEFT);

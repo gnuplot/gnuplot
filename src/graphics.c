@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.131 2004/10/22 01:30:52 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.132 2004/11/08 07:41:59 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -5085,6 +5085,9 @@ plot_image_or_update_axes(void *plot, t_imagecolor pixel_planes, TBOOLEAN projec
 	    struct {double x; double y;} delta_grid[2], delta_pixel[4];
 	    int j, i_image;
 	    double x0, x1, x2, y0, y1, y2;
+
+	    if (!term->filled_polygon)
+		int_error(NO_CARET, "This terminal does not support filled polygons");
 
 	    if (project_points) {
 		map3d_xy_double(points[grid_corner[0]].x, points[grid_corner[0]].y, points[grid_corner[0]].z, &x0, &y0);
