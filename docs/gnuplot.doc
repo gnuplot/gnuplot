@@ -5584,10 +5584,11 @@ C ... and restart the table:
  opposite border.  `nomirror` does what you think it does.  `rotate` asks
  `gnuplot` to rotate the text through 90 degrees, if the underlying terminal
  driver supports text rotation.  `norotate` cancels this.  The defaults are
- `border mirror norotate` for tics on the x, y, x2, and y2 axes.  For the
- z axis, the the `{axis | border}` option is not available and the default
- is `nomirror`.  If you do want to mirror the z-axis tics, you might want
- to create a bit more room for them with `set border`.
+ `border mirror norotate` for tics on the x and y axes, and `border nomirror
+ norotate` for tics on the x2 and y2 axes.  For the z axis, the the `{axis |
+ border}` option is not available and the default is `nomirror`.  If you do
+ want to mirror the z-axis tics, you might want to create a bit more room for
+ them with `set border`.
 
  The positions of the tics may be specified in either of two forms:
 
@@ -5883,7 +5884,7 @@ C ... and restart the table:
 
  By default `splot` draws the xy plane completely below the plotted data.
  The offset between the lowest ztic and the xy plane can be changed by `set
- ticslevel`.  The orientation of an `splot` projection is controlled by 
+ ticslevel`.  The orientation of a `splot` projection is controlled by 
  `set view`.  See `set view` and `set ticslevel` for more information.
 
  The syntax for setting ranges on the `splot` command is the same as for
