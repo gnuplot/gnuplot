@@ -1,3 +1,10 @@
+2004-03-04  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/axis.h (STORE_WITH_LOG_AND_UPDATE_RANGE): Added check
+	against infinities and NaNs.  Most paths were already blocked, but
+	modern systems can have "inf" and "nan" right in the datafile,
+	which wasn't tested against.
+
 2004-03-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (fit): Clarify behaviour in case no "using"
