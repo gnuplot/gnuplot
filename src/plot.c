@@ -358,8 +358,8 @@ int argc;
 char **argv;
 {
 #ifdef LINUXVGA
+    LINUX_setup();      /* setup VGA before dropping privilege DBT 4/5/99 */
     drop_privilege();
-    LINUX_setup();
 #endif
 /* make sure that we really have revoked root access, this might happen if
    gnuplot is compiled without vga support but is installed suid by mistake */
