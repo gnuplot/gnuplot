@@ -1,3 +1,10 @@
+2004-10-11  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/mouse.c (apply_zoom): Fix for reversed y-range in zoom by mouse and
+	"set view map".
+
+	* src/graphics.c (do_plot): Better warning for trying to use pm3d in a 2d plot.
+
 2004-10-08  Petr Tobiska <tobiska@ure.cas.cz>
 
 	* term/metapost.trm (MP_arrow): Handle double-ended arrows also.
