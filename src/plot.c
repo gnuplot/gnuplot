@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.46 2001/12/01 13:08:59 amai Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.47 2002/01/07 08:18:39 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -674,18 +674,16 @@ load_rcfile()
     FILE *plotrc = NULL;
     char *rcfile = NULL;
 
-    /* len of homedir + directory separator + len of file name + \0 */
-    rcfile = (char *) gp_alloc((user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1, "rcfile");
-
 #ifdef NOCWDRC
     /* inhibit check of init file in current directory for security reasons */
 #else
-    rcfile = PLOTRC;
     plotrc = fopen(PLOTRC, "r");
 #endif /* !NOCWDRC */
 
     if (plotrc == NULL) {
 	if (user_homedir) {
+	    /* len of homedir + directory separator + len of file name + \0 */
+	    rcfile = (char *) gp_alloc((user_homedir ? strlen(user_homedir) : 0) + 1 + strlen(PLOTRC) + 1, "rcfile");
 	    strcpy(rcfile, user_homedir);
 	    PATH_CONCAT(rcfile, PLOTRC);
 	    plotrc = fopen(rcfile, "r");
@@ -702,7 +700,7 @@ load_rcfile()
 	}
     }
     if (plotrc)
-	load_file(plotrc, rcfile, FALSE);
+	load_file(plotrc, (rcfile==NULL) ? PLOTRC : rcfile, FALSE);
 
     free(rcfile);
 }
