@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.16 1999/07/09 21:04:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.17 1999/07/13 19:53:55 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -505,6 +505,12 @@ char **argv;
 	init_locale();
 	load_rcfile();
 	init_fit();		/* Initialization of fitting module */
+	reset_axis_properties(&x_props, "x", TICS_ON_BORDER | TICS_MIRROR);
+	reset_axis_properties(&y_props, "y", TICS_ON_BORDER | TICS_MIRROR);
+	/* no mirror by default */
+	reset_axis_properties(&z_props, "z", TICS_ON_BORDER);
+	reset_axis_properties(&x2_props, "x2", NO_TICS);
+	reset_axis_properties(&y2_props, "y2", NO_TICS);
 
 	if (interactive && term != 0) {		/* not unknown */
 #if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
