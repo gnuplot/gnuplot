@@ -213,7 +213,7 @@ static int line_count = 0;	/* line counter */
 
 /* parsing stuff */
 static struct use_spec_s use_spec[NCOL];
-static char df_format[MAX_LINE_LEN + 1];
+static char df_format[MAX_LINE_LEN+1];
 
 /* rather than three arrays which all grow dynamically, make one
  * dynamic array of this structure
@@ -241,8 +241,8 @@ extern char timefmt[];		/* I would rather not need this, but ... */
 /* jev -- for passing data thru user-defined function */
 extern struct udft_entry ydata_func;
 extern struct udft_entry *dummy_func;
-extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN + 1];
-extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN + 1];
+extern char dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
+extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 extern double min_array[], max_array[];
 /*}}} */
@@ -348,12 +348,15 @@ char *s;
 #endif /* NO_FORTRAN_NUMS */
 	    } else {
 		/* skip any space at start of column */
-		while (isspace((int)*s))
+		/* HBB tells me that the cast must be to
+		 * unsigned char instead of int. */
+		while (isspace((unsigned char)*s))
 		    ++s;
 		count = *s ? 1 : 0;
 		/* skip chars to end of column */
-		for (used = 0; !isspace((int)*s) && (*s != NUL); ++used, ++s)
-		    ;
+		used = 0;
+		while (!isspace((unsigned char)*s) && (*s != NUL))
+		    ++s;
 	    }
 
 	    /* it might be a fortran double or quad precision.
@@ -467,11 +470,15 @@ int max_using;
  */
 
 {
-    static char filename[MAX_LINE_LEN + 1] = "";
+    /* now allocated dynamically */
+    static char *filename = NULL;
     int i;
     int name_token;
 
     fast_columns = 1;		/* corey@cac */
+
+    if (!filename)
+	filename = (char *) gp_alloc (MAX_LINE_LEN+1, "data file name");
 
     /*{{{  close file if necessary */
     if (data_fp)
@@ -518,12 +525,13 @@ int max_using;
     /* empty name means re-use last one */
 
     {
-	char name[MAX_LINE_LEN + 1];
+	char name[MAX_LINE_LEN+1];
 	quote_str(name, c_token, MAX_LINE_LEN);
 	if (name[0])
-	    strcpy(filename, name);
-	else if (!filename[0])
-	    int_error("No previous filename", c_token);
+	    safe_strncpy (filename, name, MAX_LINE_LEN+1);
+	else
+	    if (!filename[0])
+		int_error("No previous filename", c_token);
     }
     name_token = c_token++;
 
@@ -689,32 +697,8 @@ int max_using;
 
     /*}}} */
 
-/*{{{ tilde-expand filename */
-    /* This should be a function
-     * TODO: rewrite as a function and
-     * do it at a lower level,
-     * eliminate duplicate code elsewhere,
-     * see if we can use GNU readline for this
-     * if we compile with readline. */
-    if (filename[0] == '~' && filename[1] == DIRSEP1) {
-	char *tmp_home = getenv(HOME);
-	if (tmp_home) {
-	    /* Do we have enough space for the expansion? */
-	    if (strlen(filename) + strlen(tmp_home) < sizeof(filename)) {
-		memmove (filename + strlen(tmp_home) - 1, filename, strlen(filename));
-		strncpy (filename, tmp_home, strlen(tmp_home));
-	    }
-	    else {
-		/* Urgh - find better solution */
-		fprintf(stderr,"(%s:%d) Not enough space to expand $HOME\n",__FILE__,__LINE__);
-	    }
-	}
-	else {
-	    /* HOME env var not set - cannot expand */
-	    fprintf(stderr,"(%s:%d) $HOME not set - cannot expand tilde\n",__FILE__,__LINE__);
-	}
-    }
-    /*}}} */
+    /* filename cannot be static array! */
+    gp_expand_tilde (filename, MAX_LINE_LEN+1);
 
 /*{{{  open file */
 #if defined(PIPES)
