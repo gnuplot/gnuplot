@@ -1564,44 +1564,47 @@ show_version_long ()
 
 	puts ("\nCompile options:");
 
-        {
-          char readline[] =
+	{
+	  const char *readline, *gnu_readline, *libgd, *libpng, *linuxvga,
+		     *nocwdrc, *x11;
+
+	  readline =
 #ifdef READLINE
 	      "+READLINE  "
 #else
 	      "-READLINE  "
 #endif
-             , gnu_readline[] =
+             , gnu_readline =
 #ifdef GNU_READLINE
 	      "+GNU_READLINE  "
 #else
 	      "-GNU_READLINE  "
 #endif
-             , libgd[] =
+             , libgd =
 #ifdef HAVE_LIBGD
 	      "+LIBGD  "
 #else
 	      "-LIBGD  "
 #endif
-             , libpng[] =
+             , libpng =
 #ifdef HAVE_LIBPNG
 	      "+LIBPNG  "
 #else
 	      "-LIBPNG  "
 #endif
-             , linuxvga[] =
+             , linuxvga =
 #ifdef LINUXVGA
 	      "+LINUXVGA  "
 #else
               ""
 #endif
-             , nocwdrc[] =
+             , nocwdrc =
 #ifdef NOCWDRC
 	      "+NOCWDRC  "
 #else
 	      "-NOCWDRC  "
 #endif
-             , x11[] =
+             , x11 =
 
 #ifdef X11
 	      "+X11  "
@@ -1609,7 +1612,7 @@ show_version_long ()
               ""
 #endif
           ;
-          printf("%s%s%s%s%s%s\n", readline, gnu_readline, libgd, libpng,
+          printf("%s%s%s%s%s%s%s\n", readline, gnu_readline, libgd, libpng,
                linuxvga, nocwdrc, x11);
         }
 
