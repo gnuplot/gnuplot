@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.10 2002/07/21 12:32:53 mikulik Exp $
+ * $Id: gd.trm,v 1.11 2002/07/26 16:42:29 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -207,9 +207,11 @@ static struct {
 
 #define PNG_USE_TRANSPARENT 1
 #define PNG_USE_INTERLACE   2
+#define PNG_USE_CROP        4
 
 enum PNG_id {
     PNG_TRANSPARENT, PNG_INTERLACE,
+    PNG_CROP, PNG_NOCROP,
     /* Font size */
     PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
     PNG_FONT,
@@ -226,6 +228,8 @@ static struct gen_table PNG_opts[] =
 {
     { "tr$ansparent", PNG_TRANSPARENT },
     { "i$nterlace", PNG_INTERLACE },
+    { "crop", PNG_CROP },
+    { "nocrop", PNG_NOCROP },
     { "ti$ny", PNG_TINY },
     { "s$mall", PNG_SMALL },
     { "m$edium", PNG_MEDIUM },
@@ -452,6 +456,14 @@ PNG_options()
 	    png_state.flags |= PNG_USE_INTERLACE;
 	    ++c_token;
 	    break;
+	case PNG_CROP:
+	    png_state.flags |= PNG_USE_CROP;
+	    ++c_token;
+	    break;
+	case PNG_NOCROP:
+	    png_state.flags &= ~PNG_USE_CROP;
+	    ++c_token;
+	    break;
 	case PNG_TINY:
 	    PNG_font=gdFontTiny;
 	    png_font = 0;
@@ -591,6 +603,10 @@ PNG_options()
     if (png_state.flags & PNG_USE_INTERLACE) {
 	strcat(term_options, "interlace ");
     }
+    if (!(png_state.flags & PNG_USE_CROP)) {
+	strcat(term_options, "no");
+    }
+    strcat(term_options, "crop ");
     switch (png_font) {
     case 0:
 	strcat(term_options,"tiny ");
@@ -891,6 +907,39 @@ PNG_graphics()
 TERM_PUBLIC void
 PNG_text()
 {
+    if (png_state.flags & PNG_USE_CROP) {
+	/* PM 23. 8. 2002: crop the image around its bounding box */
+	int x, y, x1, y1, x2, y2, flag;
+	int bg = png_state.color_table[0]; /* index of the background color */
+	gdImagePtr im_crop;
+	for (flag=0, x1=0; x1 < gdImageSX(png_state.image)-1; x1++) {
+	    for (y=0; y < gdImageSY(png_state.image); y++)
+		if (gdImageGetPixel(png_state.image, x1, y) != bg) { flag = 1; break; }
+	    if (flag) break;
+	}
+	for (flag=0, x2=gdImageSX(png_state.image)-1; x2 >= x1; x2--) {
+	    for (y=0; y < gdImageSY(png_state.image); y++)
+		if (gdImageGetPixel(png_state.image, x2, y) != bg) { flag = 1; break; }
+	    if (flag) break;
+	}
+	for (flag=0, y1=0; y1 < gdImageSY(png_state.image)-1; y1++) {
+	    for (x=x1; x <= x2; x++)
+		if (gdImageGetPixel(png_state.image, x, y1) != bg) { flag = 1; break; };
+	    if (flag) break;
+	}
+	for (flag=0, y2=gdImageSY(png_state.image)-1; y2 >= y1; y2--) {
+	    for (x=x1; x <= x2; x++)
+		if (gdImageGetPixel(png_state.image, x, y2) != bg) { flag = 1; break; };
+	    if (flag) break;
+	}
+	x = x2 - x1 + 1; /* width */
+	y = y2 - y1 + 1; /* height */
+	im_crop = gdImageCreate(x,y);
+	gdImagePaletteCopy(im_crop, png_state.image);
+	gdImageCopy(im_crop, png_state.image, 0, 0, x1, y1, x, y);
+	gdImageDestroy(png_state.image);
+	png_state.image = im_crop;
+    }
     if (png_state.flags & PNG_USE_INTERLACE)
 	gdImageInterlace(png_state.image, 1);
     gdImagePng(png_state.image, gpoutfile);
@@ -1263,6 +1312,7 @@ START_HELP(png)
 "",
 " Syntax:",
 "       set terminal png {transparent} {interlace}",
+"                        {{no}crop}",
 "                        {tiny | small | medium | large | giant}",
 "                        {font FACE {<pointsize>}}",
 "                        {size <x>,<y>}",
@@ -1281,6 +1331,8 @@ START_HELP(png)
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
+" The image can be cropped around visible pixel area by `crop`; then the image",
+" be smaller than the specified size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
