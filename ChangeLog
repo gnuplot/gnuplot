@@ -1,3 +1,9 @@
+2004-11-11  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/svg.trm (ENHsvg_writec): Escape character & to be &amp; in
+	output stream. '<' and '&' are the only escaped characters so far,
+	and only in enhanced text mode.
+
 2004-11-12  Dietmar Warning  <warning@danalyse.de>
 
 	* src/specfun.c (inverse_error_func): Replace obsolete attribution of 

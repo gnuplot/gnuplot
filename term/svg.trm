@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: svg.trm,v 1.42 2004/09/01 15:53:51 mikulik Exp $
+ * $Id: svg.trm,v 1.43 2004/09/30 05:44:00 sfeam Exp $
  */
 
 /*------------------------------------------------------------------------------------------------------------------------------------
@@ -1181,12 +1181,19 @@ ENHsvg_writec(int c)
 	return;
     }
 
-    /* Escape SVG reserved characters. Are there any besides '<'? */
+    /* Escape SVG reserved characters. Are there any besides '<' and '&' ? */
     switch (c) {
     case '<':
 		*enhanced_cur_text++ = '&';
 		*enhanced_cur_text++ = 'l';
 		*enhanced_cur_text++ = 't';
+		*enhanced_cur_text++ = ';';
+		break;
+    case '&':
+		*enhanced_cur_text++ = '&';
+		*enhanced_cur_text++ = 'a';
+		*enhanced_cur_text++ = 'm';
+		*enhanced_cur_text++ = 'p';
 		*enhanced_cur_text++ = ';';
 		break;
     default:
