@@ -1,3 +1,11 @@
+2002-07-20  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* NEWS src/show.c docs/gnuplot.doc: New option 'add2history' for
+	'show plot'.
+
+	* src/command.c: Separate chained (s)plot + replot command sequence
+	as displayed by 'show plot' by ", " instead of ",". 
+
 2002-07-10  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* term/ggi.trm: Minor changes in the documentation.
@@ -737,7 +745,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/07/10 19:28:05 $).
+	last modification date (from the tag $Date: 2002/07/10 19:46:15 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

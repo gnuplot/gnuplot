@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.77 2002/03/30 13:15:21 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.78 2002/04/29 13:37:02 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -510,6 +510,12 @@ show_command()
 #endif
     case S_PLOT:
 	show_plot();
+	if (!END_OF_COMMAND) {
+	    if (almost_equals(c_token, "a$dd2history")) {
+		c_token++;
+		add_history(replot_line);
+	    }
+	}
 	break;
     case S_VARIABLES:
 	show_variables();

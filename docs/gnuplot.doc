@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.115 2002/05/22 11:35:43 lhecking Exp $
+C RCS $Id: gnuplot.doc,v 1.116 2002/07/02 17:35:39 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001   Thomas Williams, Colin Kelley et al.
 C
@@ -2094,7 +2094,7 @@ C ... and restart the table:
  available is printed on the screen.
 2 history
 ?history
- 'history' command lists or saves previous entries in the history of the 
+ `history` command lists or saves previous entries in the history of the
  command line editing, or executes an etry.
 
  Here you find 'usage by examples':
@@ -2235,6 +2235,7 @@ C ... and restart the table:
             "data.1" using (tan($2)):($3/$4) smooth csplines \
                      axes x1y2 notitle with lines 5
 
+ See also `show plot`.
 3 data-file
 ?commands plot datafile
 ?plot datafile
@@ -3156,6 +3157,9 @@ C ... and restart the table:
 
  See also `command-line-editing` for ways to edit the last `plot` (`splot`)
  command.
+
+ See also `show plot` to show the whole current plotting command, and the
+ possibility to copy it into the `history`.
 2 reread
 ?commands reread
 ?reread
@@ -5558,6 +5562,15 @@ C ... and restart the table:
  and `set vrange`, or by specifying the range on the `plot` or `splot`
  commands.  Currently the default range for these parametric variables is
  [-5:5].  Setting the ranges to something more meaningful is expected.
+3 plot
+?commands show plot
+?show plot
+ The `show plot` command shows the current plotting command as it results
+ from the last `plot` and/or `splot` and possible subsequent `replot` commands.
+
+ In addition, the `show plot add2history` command adds this current plot
+ command into the `history`. It is useful if you have used `replot` to add
+ more curves to the current plot and you want to edit the whole command now.
 3 pm3d
 ?commands set pm3d
 ?commands show pm3d
@@ -7671,7 +7684,9 @@ C ... and restart the table:
  are limited to `lines`, `points`, `linespoints`, `dots`, and `impulses`;  the
  error-bar capabilities of `plot` are not available for `splot`.
 
- The datafile options have more differences.
+ The `datafile` options have more differences.
+
+ See also `show plot`.
 3 data-file
 ?commands splot datafile
 ?splot datafile
