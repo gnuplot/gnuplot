@@ -1,5 +1,8 @@
 2004-02-18  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Added
+	#undef GP_FIT_ERRVARS and #define GP_ISVAR.
+
         * src/plot3d.c: Issue a warning when trying to draw surface with pm3d
         style and there has not been previous "set pm3d".
         Maybe we could refrain from this requirement in future by adding
