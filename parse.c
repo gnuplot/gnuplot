@@ -320,10 +320,10 @@ static void factor()
 			int_error("Positive integer expected", c_token);
 		add_action(DOLLARS)->v_arg = a;
 	} else if (isanumber(c_token)) {
-	        /* work around HP-UX 9.10 cc limitation ... */
-#if defined(__hpux) && !defined(__GCC__)
-	        struct value foo = add_action(PUSHC)->v_arg;
-		convert (&foo, c_token);
+		/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */
+#if defined(__hpux) && defined(__hp9000s300) && !defined(__GNUC__)
+                union argument *foo = add_action (PUSHC);
+                convert (&(foo->v_arg), c_token);
 #else
 		convert(&(add_action(PUSHC)->v_arg), c_token);
 #endif
