@@ -1,5 +1,5 @@
 /*
- * $Id: pdf.trm,v 1.18 2003/02/11 06:08:01 sfeam Exp $
+ * $Id: pdf.trm,v 1.19 2003/03/17 19:35:12 sfeam Exp $
  */
 
 /*------------------------------
@@ -122,8 +122,8 @@ static short
 PDF_Pen_RealID (inPenCode)
     int inPenCode;
 {
-    if (inPenCode >= 13)
-	inPenCode %= 13;	/* normalize pen code*/
+    if (inPenCode >= 12)
+	inPenCode %= 12;	/* normalize pen code*/
     if (inPenCode <= L_TYPE_NODRAW)
 	inPenCode = -2;
 

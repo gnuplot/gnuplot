@@ -2,6 +2,7 @@
 
 	* src/bitmap.c term/pdf.trm: Revise the order of colors slightly
 	to maximize contrast between successive plots (affects gd.trm also).
+
 	* src/term.c: Add linewidth and fill patterns to terminal test.
 
 2003-03-26  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
