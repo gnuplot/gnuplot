@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.26 1999/10/29 18:47:20 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.27 1999/11/08 19:22:16 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -408,14 +408,21 @@ static void set_nolinestyle __PROTO((void));
 
 /* following code segment appears over and over again */
 #define GET_NUM_OR_TIME(store,axis) \
-do{if ( datatype[axis] == TIME && isstring(c_token) ) { \
-    char ss[80]; struct tm tm; \
-    quote_str(ss,c_token, 80); ++c_token; \
-    if (gstrptime(ss,timefmt,&tm)) store = (double) gtimegm(&tm); else store = 0;\
-   } else {\
-    struct value value; \
-    store = real(const_express(&value));\
-  }}while(0)
+ do { \
+  if (datatype[axis] == TIME && isstring(c_token) ){ \
+   char ss[80]; \
+   struct tm tm; \
+   quote_str(ss,c_token, 80); \
+   ++c_token; \
+   if (gstrptime(ss,timefmt,&tm)) \
+    store = (double) gtimegm(&tm); \
+   else \
+    store = 0; \
+  } else { \
+   struct value value; \
+   store = real(const_express(&value)); \
+  } \
+ }while(0)
 
 /******** The 'reset' command ********/
 void
@@ -978,9 +985,11 @@ set_command()
 	    int_error(c_token, setmess);
 	    break;
 	}
+
 #ifdef BACKWARDS_COMPATIBLE
     }
 #endif
+
 }
 
 
@@ -1206,9 +1215,9 @@ struct arrow_def *prev, *this;
 
 /* save on replication with a macro */
 #define PROCESS_AUTO_LETTER(AUTO, STRING,MIN,MAX) \
-else if (equals(c_token, STRING))       { AUTO = DTRUE; ++c_token; } \
-else if (almost_equals(c_token, MIN)) { AUTO |= 1;    ++c_token; } \
-else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
+ else if (equals(c_token, STRING))       { AUTO = DTRUE; ++c_token; } \
+ else if (almost_equals(c_token, MIN)) { AUTO |= 1;    ++c_token; } \
+ else if (almost_equals(c_token, MAX)) { AUTO |= 2;    ++c_token; }
 
 /* process 'set autoscale' command */
 static void
@@ -1620,8 +1629,13 @@ set_format()
 /* process 'set grid' command */
 
 #define GRID_MATCH(string, neg, mask) \
-if (almost_equals(c_token, string)) { work_grid.l_type |= mask; ++c_token; } \
-else if (almost_equals(c_token, neg)) { work_grid.l_type &= ~(mask); ++c_token; }
+ if (almost_equals(c_token, string)) { \
+  work_grid.l_type |= mask; \
+  ++c_token; \
+ } else if (almost_equals(c_token, neg)) { \
+  work_grid.l_type &= ~(mask); \
+  ++c_token; \
+ }
 
 static void
 set_grid()
@@ -2264,8 +2278,13 @@ set_mapping()
 /* FIXME - merge set_*margin() functions */
 
 #define PROCESS_MARGIN(MARGIN) \
-    c_token++; if (END_OF_COMMAND) MARGIN = -1; \
-    else { struct value a; MARGIN = real(const_express(&a)); }
+ c_token++; \
+ if (END_OF_COMMAND) \
+  MARGIN = -1; \
+ else { \
+  struct value a; \
+  MARGIN = real(const_express(&a)); \
+ }
 
 /* process 'set bmargin' command */
 static void
@@ -2801,17 +2820,17 @@ set_ydata()
 }
 
 #define PROCESS_AXIS_DATA(AXIS) \
-    c_token++; \
-    if(END_OF_COMMAND) { \
-	datatype[AXIS] = FALSE; \
-    } else { \
-	if (almost_equals(c_token,"t$ime")) { \
-	    datatype[AXIS] = TIME; \
-	} else { \
-	    datatype[AXIS] = FALSE; \
-	} \
-	c_token++; \
-    }
+ c_token++; \
+ if(END_OF_COMMAND) { \
+  datatype[AXIS] = FALSE; \
+ } else { \
+  if (almost_equals(c_token,"t$ime")) { \
+   datatype[AXIS] = TIME; \
+  } else { \
+    datatype[AXIS] = FALSE; \
+  } \
+  c_token++; \
+ }
 
 /* process 'set zdata' command */
 static void
@@ -2840,22 +2859,27 @@ set_y2data()
 /* FIXME - merge set_*range() functions into one */
 
 #define PROCESS_RANGE(AXIS,MIN,MAX,AUTO) \
-    if (!equals(++c_token,"[")) \
-	int_error(c_token, "expecting '['"); \
-    c_token++; \
-    AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
-    if (!equals(c_token,"]")) \
-	int_error(c_token, "expecting ']'"); \
-    c_token++; \
-    if (almost_equals(c_token, "rev$erse")) { \
-	++c_token; range_flags[AXIS] |= RANGE_REVERSE; \
-    } else if (almost_equals(c_token, "norev$erse")) { \
-	++c_token; range_flags[AXIS] &= ~RANGE_REVERSE; \
-    } if (almost_equals(c_token, "wr$iteback")) { \
-	++c_token; range_flags[AXIS] |= RANGE_WRITEBACK; \
-    } else if (almost_equals(c_token, "nowri$teback")) { \
-	++c_token; range_flags[AXIS] &= ~RANGE_WRITEBACK; \
-    }
+ if (!equals(++c_token,"[")) \
+  int_error(c_token, "expecting '['"); \
+ c_token++; \
+ AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
+ if (!equals(c_token,"]")) \
+  int_error(c_token, "expecting ']'"); \
+ c_token++; \
+ if (almost_equals(c_token, "rev$erse")) { \
+  ++c_token; \
+  range_flags[AXIS] |= RANGE_REVERSE; \
+ } else if (almost_equals(c_token, "norev$erse")) { \
+  ++c_token; \
+  range_flags[AXIS] &= ~RANGE_REVERSE; \
+ } \
+ if (almost_equals(c_token, "wr$iteback")) { \
+  ++c_token; \
+  range_flags[AXIS] |= RANGE_WRITEBACK; \
+ } else if (almost_equals(c_token, "nowri$teback")) { \
+  ++c_token; \
+  range_flags[AXIS] &= ~RANGE_WRITEBACK; \
+ }
 
 /* process 'set xrange' command */
 static void
@@ -2932,16 +2956,16 @@ set_vrange()
 /* FIXME - merge *zeroaxis() functions into one */
 
 #define PROCESS_ZEROAXIS(ZAXIS) \
-    c_token++; \
-    if (END_OF_COMMAND) \
-	ZAXIS.l_type = -1; \
-    else { \
-	struct value a; \
-	int old_token = c_token; \
-	lp_parse(&ZAXIS,1,0,-1,0); \
-	if (old_token == c_token) \
-	    ZAXIS.l_type = real(const_express(&a)) - 1; \
-    }
+ c_token++; \
+  if (END_OF_COMMAND) \
+   ZAXIS.l_type = -1; \
+  else { \
+   struct value a; \
+   int old_token = c_token; \
+   lp_parse(&ZAXIS,1,0,-1,0); \
+   if (old_token == c_token) \
+    ZAXIS.l_type = real(const_express(&a)) - 1; \
+  }
 
 /* process 'set xzeroaxis' command */
 static void
@@ -3612,14 +3636,19 @@ char *format;
  */
 
 #define GET_NUMBER_OR_TIME(store,axes,axis) \
-do{if (axes >= 0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
-    char ss[80]; struct tm tm; \
-    quote_str(ss,c_token, 80); ++c_token; \
-    if (gstrptime(ss,timefmt,&tm)) store = (double) gtimegm(&tm); \
-   } else {\
-    struct value value; \
-    store = real(const_express(&value));\
-  }}while(0)
+ do { \
+  if (axes >= 0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
+   char ss[80]; \
+   struct tm tm; \
+   quote_str(ss,c_token, 80); \
+   ++c_token; \
+   if (gstrptime(ss,timefmt,&tm)) \
+    store = (double) gtimegm(&tm); \
+  } else { \
+   struct value value; \
+   store = real(const_express(&value)); \
+  } \
+ } while(0)
 
 
 /* get_position_type - for use by get_position().
