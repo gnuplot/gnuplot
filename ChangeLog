@@ -1,3 +1,21 @@
+1998-11-09  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Document new `--enable-system-time' configure option
+	and fixes.
+
+	* gplt_x11.c: Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+	for OS/2 to close open files on first initialisation.
+
+	* makefile.os2: Patches by Alexander Mai.
+
+	* set.c(set_two): Skip leading whitespace in argument to
+	'set output' command.
+
+	* specfun.c: Fix #ifdef directive. Reported by Alexander Mai.
+
+
+	* docs/gnuplot.doc: Change 'set output' documentation accordingly.
+
 1998-11-06  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Updated pointer to unproto.

@@ -122,6 +122,7 @@ $ ./configure --help
   --enable-iris           enable IRIS terminal (IRIS4D only)
   --enable-sun            enable sunview terminal (Sun only)
   --enable-unixpc         enable unixpc terminal (ATT 3b1 or ATT 7300)
+  --enable-system-time    use the system time routines in time.c
   --with-x (*)            Use the X Window System
 
  Options marked with (*) are on by default, ie. these features or packages
@@ -281,7 +282,8 @@ to set the output devices.
 
  If using dynamically linked executables with the X11 Window System, it
 may be necessary to define LD_LIBRARY_PATH - see man ld for details.
-
+It is, however, prefered to use the appropriate linker options, eg.
+-R under Solaris, or -rpath under DEC Unix and Irix.
 
 Basic Installation
 ******************
@@ -473,7 +475,7 @@ About --with-PACKAGE[=PATH]
 
  Every `--with-PACKAGE' option sets a `with_package' variable in
 configure.  Depending on how `--with-PACKAGE' was invoked, there are
-only a few possible values for the `with_package' variable:
+only three different possible values for the `with_package' variable:
 
  Option                   $with_package
 ----------------------------------------
@@ -490,8 +492,8 @@ for with-PACKAGE options used by gnuplot's configure are `--with-gd',
 `--with-png'. The corresponding package variables are `with_gd',
 and `with_png'.
 
- For gnuplot, configure uses the macros `gp_CHECK_LIB_PATH' and
-`gp_CHECK_HEADER' to search for libraries and includes, resp.  These
+ For gnuplot, configure uses the macros `gp_SEARCH_LIBDIRS' and
+`gp_SEARCH_HEADERDIRS' to search for libraries and includes, resp.  These
 macros are different from the standard GNU autoconf macros for this purpose,
 `AC_CHECK_LIB' and `AC_CHECK_HEADER/S' (see autoconf manual). The
 gp_XXX macros are closely tied to gnuplot, and cannot be used for other
@@ -514,7 +516,7 @@ directories, depending on the PATH specified with `--with-PACKAGE=PATH':
  Using the default linker path as the first search directory has one
 big, but not so obvious advantage: if all libraries are in the same
 directory, the path to the first library specified with --with-PACKAGE
-is added to the linker path with an `-L' option.  The library searched
+is added to the linker path with a `-L' option.  The library searched
 for with the next --with-PACKAGE option will now be found faster, because
 only one additional directory is checked.  This is also true for header files.
 
@@ -540,8 +542,8 @@ directories, depending on the PATH specified with `--with-PACKAGE=PATH':
  o the PATH directory, trailing `/lib/libPACKAGE.a' stripped off and
    `/include' added
 
- Caveat: the `gp_CHECK_HEADER' macro should only be used after the
-corresponding `gp_CHECK_LIB_PATH' macro to take full advantage of the
+ Caveat: the `gp_SEARCH_HEADERDIRS' macro should only be used after the
+corresponding `gp_SEARCH_LIBDIRS' macro to take full advantage of the
 search algorithm.  This is a reasonable assumption nevertheless, because
 it allows for structuring configure.in so that the test for a header file
 is skipped if the corresponding library is not found.
@@ -612,7 +614,8 @@ may work, though).
  - IRIX 6.x
    If you want to use the png terminal, you must install your own
   versions of libpng and zlib. The versions supplied with the OS
-  are too old.
+  are too old. Note that you need be very careful to select the
+  correct compiler options/ABI's.
 
  - MS-DOS
    If ports of common Unix utilities (bash, sed etc) are available,
