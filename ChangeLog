@@ -9,6 +9,9 @@
 	src/set.c (set_tic_prop): Continue replacement of isstring +
 	m_quote_capture with try_to_get_string().
 
+	* src/command.c (history_command): Code cleanup; convert to use
+	try_to_get_string(). Code is still full of little memory leaks.
+
 	* term/post.trm: Fix '%' characters in output format.
 	
 2004-08-08  Ethan Merritt  <merritt@u.washington.edu>

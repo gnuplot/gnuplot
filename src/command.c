@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.101 2004/08/09 00:51:29 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.102 2004/08/09 18:07:18 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -683,6 +683,7 @@ exit_command()
 
 
 /* process the 'history' command
+ * FIXME: chock full of memory leaks
  */
 void
 history_command()
@@ -691,7 +692,7 @@ history_command()
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
-    int append = 0;    /* rewrite output file or append it */
+    TBOOLEAN append = FALSE;    /* rewrite output file or append it */
 
     c_token++;
 
@@ -741,25 +742,24 @@ history_command()
 	}
 	c_token++;
     } else {
-	char zerofile[] = "";
+	TBOOLEAN quiet = FALSE;
 	if (!END_OF_COMMAND && almost_equals(c_token,"q$uiet")) {
 	    /* option quiet to suppress history entry numbers */
-	    name = &zerofile[0];
+	    quiet = TRUE;
 	    c_token++;
 	}
 	/* show history entries */
 	if (!END_OF_COMMAND && isanumber(c_token)) {
 	    n = (int)real(const_express(&a));
 	}
-	if (!END_OF_COMMAND && isstring(c_token)) {
-	    m_quote_capture(&name, c_token, c_token);
-	    c_token++;
+	if ((name = try_to_get_string())) {
 	    if (!END_OF_COMMAND && almost_equals(c_token, "ap$pend")) {
-		append = 1;
+		append = TRUE;
 		c_token++;
 	    }
 	}
-	write_history_n(n, name, (append ? "a" : "w"));
+	write_history_n(n, (quiet ? "" : name), (append ? "a" : "w"));
+	free(name);
     }
 #else
     c_token++;
