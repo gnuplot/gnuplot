@@ -1,5 +1,5 @@
 /*
- * $Id: post.trm,v 1.33 1999/08/07 17:19:13 lhecking Exp $
+ * $Id: post.trm,v 1.34 1999/08/24 11:24:56 lhecking Exp $
  */
 
 /* GNUPLOT - post.trm */
@@ -670,11 +670,15 @@ PS_options()
     sprintf(default_font,"%s,%d",ps_font,ps_fontsize);
     /* default_font holds the font and size set at 'set term' */
     /* Entry font added by DJL */
-    sprintf(term_options,"%s %senhanced %s text %s\n     %s (length * %.1f) linewidth %.1f %s \"%s\" %d",
+    /* HBB 19990823: fixed the options string. It violated the 'save
+     * loadable output' rule */
+    sprintf(term_options,"%s %senhanced %s %s \\\n"
+	                 "   %s dashlength %.1f linewidth %.1f %s \\\n"
+	                 "   \"%s\" %d",
 	    ps_eps ? "eps" : (ps_portrait ? "portrait" : "landscape"),
 	    term->put_text == ENHPS_put_text ? "" : "no",
 	    ps_color ? "color" : "monochrome",
-	    ps_blacktext ? "always black" : "can be colored",
+	    ps_blacktext ? "blacktext" : "colortext",
 	    ps_solid ? "solid" : "dashed",
 	    ps_dash_length,
 	    ps_linewidth_factor,
