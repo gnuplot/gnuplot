@@ -144,12 +144,6 @@ Error. Incompatible options.
 # define FD_ZERO(p)      memset((char *)(p),'\0',sizeof(*(p)))
 #endif /* not FD_SET */
 
-#ifdef FD_SET_T_IS_INT
-# define fd_set_t int
-#else
-# define fd_set_t fd_set
-#endif
-
 #if defined(HAVE_SYS_SYSTEMINFO_H) && defined(HAVE_SYSINFO)
 # include <sys/systeminfo.h>
 # define SYSINFO_METHOD "sysinfo"
@@ -379,7 +373,8 @@ void mainloop()
 	XFlush(dpy);
 
 	tset = rset;
-	nf = select(nfds, (fd_set_t *) & tset, (fd_set_t *) 0, (fd_set_t *) 0, timer);
+	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
+		     gp_fd_set_p0, gp_timeval_p timer);
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
@@ -442,7 +437,8 @@ void mainloop()
     while (1) {
 	XFlush(dpy);		/* see above */
 	tset = rset;
-	nf = select(nfds, &tset, (fd_set *) 0, (fd_set *) 0, timer);
+	nf = select((gp_nfds_t)nfds, gp_fd_set_p &tset, gp_fd_set_p 0,
+		    gp_fd_set_p 0, gp_timeval_p timer);
 	if (nf < 0) {
 	    if (errno == EINTR)
 		continue;
