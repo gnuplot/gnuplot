@@ -1,5 +1,5 @@
 /*
- * $Id: ggi.trm,v 1.1.2.6 2000/10/31 14:48:19 joze Exp $
+ * $Id: ggi.trm,v 1.7 2000/10/31 20:26:03 joze Exp $
  */
 
 /* GNUPLOT - ggi.trm */
@@ -198,15 +198,18 @@ static int GGI_frames =
 ;
 
 static char GGI_mode_spec[0xff] = "";
+static int GGI_acceleration = 7; /* arbitrary */
 
 enum GGI_id {
     GGI_MODE,
+    GGI_ACCELERATION,
     GGI_OTHER
 };
 
 static struct gen_table GGI_opts[] = 
 {
     { "mo$de", GGI_MODE },
+    { "ac$celeration", GGI_ACCELERATION },
     { NULL, GGI_OTHER }
 };
 
@@ -417,6 +420,20 @@ GGI_options()
 {
     while (!END_OF_COMMAND) {
 	switch(lookup_table(&GGI_opts[0], c_token)) {
+	    case GGI_ACCELERATION:
+		{
+		    int itmp;
+		    struct value a;
+		    c_token++;
+		    itmp = (int) real(const_express(&a));
+		    if (itmp < 1) {
+			fprintf(stderr, "acceleration must be strictly positive!\n");
+		    } else {
+			GGI_acceleration = itmp;
+			fprintf(stderr, "acceleration = %d\n", GGI_acceleration);
+		    }
+		}
+		break;
 	    case GGI_MODE:
 		/* fallthru */
 		c_token++;
@@ -793,8 +810,13 @@ GGI_dispatch_event(event)
 	/* [-- POINTER EVENTS --] */
 	case evPtrRelative:
 	    /* relative motion is not implemented. Should it ? */
-	    fprintf(stderr, "%s:%d report this to <johannes@zellner.org>\n",
-		__FILE__, __LINE__);
+	    /*
+	     * fprintf(stderr, "%s:%d report this to <johannes@zellner.org> %d %d\n",
+	     *     __FILE__, __LINE__, event->pmove.x, event->pmove.y);
+	     */
+	    gp_ev.type  = GE_motion;
+	    GGI_mouse_x += GGI_acceleration * event->pmove.x;
+	    GGI_mouse_y += GGI_acceleration * event->pmove.y;
 	    break;
 	case evPtrAbsolute:
 	    gp_ev.type  = GE_motion;
@@ -1350,14 +1372,26 @@ START_HELP(ggi)
 " The `ggi` driver can run on different targets as X or svgalib",
 "",
 " Syntax:",
-"    set terminal ggi {mode}",
+"    set terminal ggi [acceleration <integer>] [[mode] {mode}]",
 "",
 " In X the window cannot be resized using window manager handles, but the",
-" mode can be given which the mode option, e.g.:",
+" mode can be given with the mode option, e.g.:",
 "  - V1024x768",
 "  - V800x600",
 "  - V640x480",
 "  - V320x200",
-" please refer to the ggi documentation for other modes"
+" please refer to the ggi documentation for other modes. The 'mode' keyword",
+" is optional. It is recommended to select the target by environment variables",
+" as explained in the libggi manual page.  To get DGA on X, you should for",
+" example",
+"    bash> export GGI_DISPLAY=DGA",
+"    csh>  setenv GGI_DISPLAY DGA",
+" 'acceleration' is only used for targets which report relative pointer",
+" motion events (e.g. DGA) and is a strictly positive integer multiplication",
+" factor for the relative distances.  The default for acceleration is 7.",
+" EXAMPLES:",
+"    set term ggi acc 10",
+"    set term ggi acc 1 mode V1024x768",
+"    set term ggi V1024x768"
 END_HELP(ggi)
 #endif
