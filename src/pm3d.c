@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.26 2002/02/21 07:02:06 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.27 2002/02/25 03:10:41 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -58,63 +58,6 @@ static void filled_color_contour_plot  __PROTO((struct surface_points *, int));
 /*
 * Now the routines which are really just those for pm3d.c
 */
-
-/*
-   Check and set the cb-range for use by pm3d.
-   Return 0 on wrong range, otherwise 1.
- */
-int
-set_pm3d_zminmax()
-{
-    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	double cb = get_non_pm3d_min();
-	if (cb < CB_AXIS.min) /* unused cb is usually VERYLARGE */
-	    CB_AXIS.min = cb;
-	    if (CB_AXIS.min >= VERYLARGE)
-	    /* fallback, happens for "splot ... binary" and for "with ... palette */
-	    CB_AXIS.min = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.min);
-	    CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.min, "color axis");
-    } else {
-	/* Negative z: Call graph_error(), thus stop by an error message
-	 * without any plot as in the case of other negative-range-and-log
-	 * axes. Note that another possibility is to return 0 to make a plot
-	 * with disabled pm3d, but this is not useful.
-	 */
-	CB_AXIS.min = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_min, "color axis");
-    }
-
-    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	/* CB_AXIS.min has been initialized to -VERYLARGE
-	 * in plot3d.c:plot3drequest() */
-	double cb = get_non_pm3d_max();
-	if (cb > CB_AXIS.max) /* unused cb is usually -VERYLARGE */
-	    CB_AXIS.max = cb;
-	    if (CB_AXIS.max <= -VERYLARGE)
-	/* fallback, happens for "splot ... binary" and for "with ... palette */
-	    CB_AXIS.max = AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,Z_AXIS.max);
-	    CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.max, "color axis");
-    } else {
-	/* Negative z: see above */
-	CB_AXIS.max = axis_log_value_checked(COLOR_AXIS, CB_AXIS.set_max, "color axis");
-    }
-
-    if (CB_AXIS.min == CB_AXIS.max) {
-	int_error(NO_CARET, "cannot display empty color axis range");
-	return 0;
-    }
-    if (CB_AXIS.min > CB_AXIS.max) {
-	/* exchange min and max values */
-	double tmp = CB_AXIS.max;
-	CB_AXIS.max = CB_AXIS.min;
-	CB_AXIS.min = tmp;
-    }
-#if 0
-    printf("set_pm3d_zminmax:  Z_AXIS.min=%g\t Z_AXIS.max=%g\n",Z_AXIS.min,Z_AXIS.max);
-    printf("set_pm3d_zminmax: CB_AXIS.min=%g\tCB_AXIS.max=%g\n",CB_AXIS.min,CB_AXIS.max);
-#endif
-    return 1;
-}
-
 
 /*
  * Rescale z to cb values. Nothing to do if both z and cb are linear or log of the

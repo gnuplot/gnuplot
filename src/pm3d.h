@@ -1,5 +1,5 @@
 /*
- * $Id: pm3d.h,v 1.11 2002/02/18 15:03:34 mikulik Exp $
+ * $Id: pm3d.h,v 1.12 2002/02/25 03:10:41 broeker Exp $
  */
 
 /* GNUPLOT - pm3d.h */
@@ -107,7 +107,6 @@ extern pm3d_struct pm3d;
 ****/
 
 int get_pm3d_at_option __PROTO((char *pm3d_where));
-int set_pm3d_zminmax __PROTO((void));
 void pm3d_reset __PROTO((void));
 void pm3d_draw_one __PROTO((struct surface_points* plots));
 double z2cb __PROTO((double z));

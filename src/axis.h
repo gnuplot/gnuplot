@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.13 2002/02/13 17:59:36 broeker Exp $
+ * $Id: axis.h,v 1.14 2002/02/25 03:10:40 broeker Exp $
  *
  */
 
@@ -511,6 +511,7 @@ do {							\
  * Do OUT_ACTION or UNDEF_ACTION as appropriate
  * adjust range provided type is INRANGE (ie dont adjust y if x is outrange
  * VALUE must not be same as STORE
+ * Note: not used by COLOR AXIS, see its implementation below
  */
 
 #define STORE_WITH_LOG_AND_UPDATE_RANGE(STORE, VALUE, TYPE, AXIS,	  \
@@ -620,5 +621,17 @@ double get_writeback_min __PROTO((AXIS_INDEX));
 double get_writeback_max __PROTO((AXIS_INDEX));
 void set_writeback_min __PROTO((AXIS_INDEX));
 void set_writeback_max __PROTO((AXIS_INDEX));
+
+
+/* ------------ autoscaling of the color axis */
+#ifdef PM3D
+
+#define NEED_PALETTE(plot) (PM3DSURFACE == (plot)->plot_style || 1 == (plot)->lp_properties.use_palette)
+extern double g_non_pm3d_min, g_non_pm3d_max;
+void update_pm3d_zrange __PROTO((double value, TBOOLEAN need_palette));
+int set_pm3d_zminmax __PROTO((void));
+
+#endif /* PM3D */
+
 
 #endif /* GNUPLOT_AXIS_H */

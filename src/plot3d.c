@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.44 2002/02/18 15:03:34 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.45 2002/02/27 21:19:16 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -75,8 +75,6 @@ TBOOLEAN dgrid3d = FALSE;
 /* static prototypes */
 
 #ifdef PM3D
-static double g_non_pm3d_min;
-static double g_non_pm3d_max;
 static int plot_has_palette; /* current plot needs the color palette */
 static void set_plot_with_palette __PROTO((int plot_num));
 static void calculate_set_of_isolines __PROTO((AXIS_INDEX value_axis, TBOOLEAN cross, struct iso_curve **this_iso,
@@ -311,46 +309,6 @@ double h;
 #endif
 
 #ifdef PM3D
-double
-get_non_pm3d_min()
-{
-    return g_non_pm3d_min;
-}
-
-double
-get_non_pm3d_max()
-{
-    return g_non_pm3d_max;
-}
-
-void
-update_pm3d_zrange(value, pal)
-    double value;
-    TBOOLEAN pal;
-{
-    if (CB_AXIS.log && value < 0.0)
-	/* ignore negative points on log axis */
-	return;
-    if (pal) {
-	if (value < CB_AXIS.min) {
-	    if (CB_AXIS.set_autoscale & AUTOSCALE_MIN)
-		CB_AXIS.min = value;
-	}
-	if (value > CB_AXIS.max) {
-	    if (CB_AXIS.set_autoscale & AUTOSCALE_MAX)
-		CB_AXIS.max = value;
-	}
-    } else {
-	if (CB_AXIS.set_autoscale & AUTOSCALE_MIN) {
-	    if (value < g_non_pm3d_min)
-		g_non_pm3d_min = value;
-	}
-	if (CB_AXIS.set_autoscale & AUTOSCALE_MAX) {
-	    if (value > g_non_pm3d_max)
-		g_non_pm3d_max = value;
-	}
-    }
-}
 
 static void
 set_plot_with_palette(int plot_num)
