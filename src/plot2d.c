@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.34 2000/11/01 18:57:33 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.35 2000/11/22 12:53:29 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -1218,8 +1218,8 @@ eval_plots()
 			struct value a;
 			double t = t_min + i * t_step;
 			/* parametric/polar => NOT a log quantity */
-			double x = (!parametric && !polar &&
-				    X_AXIS.log) ? pow(X_AXIS.base, t) : t;
+			double x = (!parametric && !polar) 
+			    ? AXIS_DE_LOG_VALUE(x_axis, t) : t;
 
 			(void) Gcomplex(&plot_func.dummy_values[0], x, 0.0);
 			evaluate_at(plot_func.at, &a);

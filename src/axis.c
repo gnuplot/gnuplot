@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.3 2000/11/01 18:57:25 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.4 2000/11/03 13:45:15 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -1152,7 +1152,7 @@ gen_tics(axis, grid, callback)
 	    } else {
 		/* log scale => dont need to worry about zero ? */
 		internal = tic;
-		user = pow(axis_array[axis].base, internal);
+		user = AXIS_UNDO_LOG(axis, internal);
 	    }
 	    /*}}} */
 	    if (internal > internal_max)
@@ -1332,7 +1332,7 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, grid_choice,
 		: CENTRE;
 	    tic_vjust = axis_is_vertical
 		? JUST_CENTRE
-		: (axis_is_second ? JUST_TOP : JUST_BOT);
+		: (axis_is_second ? JUST_BOT : JUST_TOP);
 	    rotate_tics = 0;
 	}
 

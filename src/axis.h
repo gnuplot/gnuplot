@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.3 2000/11/01 18:57:27 broeker Exp $
+ * $Id: axis.h,v 1.4 2000/11/02 15:13:38 broeker Exp $
  *
  */
 
@@ -334,53 +334,54 @@ do {								\
  * versions is: dont know we have to support ranges [10:-10] - lets
  * reverse it for now, then fix it at the end.  */
 /* FIXME HBB 20000426: unknown if this distinction makes any sense... */
-#define AXIS_INIT3D(axis, islog_override, infinite)			   \
-do {									   \
-    if ((axis_array[axis].autoscale = axis_array[axis].set_autoscale) == 0 \
-	&& axis_array[axis].set_max < axis_array[axis].set_min) {	   \
-	axis_array[axis].min = axis_array[axis].set_max;		   \
-	axis_array[axis].max = axis_array[axis].set_min;		   \
-        /* we will fix later */						   \
-    } else {								   \
-	axis_array[axis].min =						   \
-	    (infinite && (axis_array[axis].set_autoscale&1))		   \
-	    ? VERYLARGE : axis_array[axis].set_min;			   \
-	axis_array[axis].max =						   \
-	    (infinite && (axis_array[axis].set_autoscale&2))		   \
-	    ? -VERYLARGE : axis_array[axis].set_max;			   \
-    }									   \
-    if (islog_override) {						   \
-	axis_array[axis].log = 0;					   \
-	axis_array[axis].base = 1;					   \
-	axis_array[axis].log_base = 0;					   \
-    } else {								   \
-	axis_array[axis].log_base = log(axis_array[axis].base);		   \
-    }									   \
+#define AXIS_INIT3D(axis, islog_override, infinite)		\
+do {								\
+    AXIS *this = axis_array + axis;				\
+								\
+    if ((this->autoscale = this->set_autoscale) == 0		\
+	&& this->set_max < this->set_min) {			\
+	this->min = this->set_max;				\
+	this->max = this->set_min;				\
+        /* we will fix later */					\
+    } else {							\
+	this->min = (infinite && (this->set_autoscale & 1))	\
+	    ? VERYLARGE : this->set_min;			\
+	this->max = (infinite && (this->set_autoscale & 2))	\
+	    ? -VERYLARGE : this->set_max;			\
+    }								\
+    if (islog_override) {					\
+	this->log = 0;						\
+	this->base = 1;						\
+	this->log_base = 0;					\
+    } else {							\
+	this->log_base = this->log ? log(this->base) : 0;	\
+    }								\
 } while(0)
 
-#define AXIS_INIT2D(axis, infinite)					    \
-do {									    \
-    axis_array[axis].autoscale = axis_array[axis].set_autoscale;	    \
-    axis_array[axis].min = (infinite && (axis_array[axis].set_autoscale&1)) \
-	? VERYLARGE : axis_array[axis].set_min;				    \
-    axis_array[axis].max = (infinite && (axis_array[axis].set_autoscale&2)) \
-	? -VERYLARGE : axis_array[axis].set_max;			    \
-    axis_array[axis].log_base = log(axis_array[axis].base);		    \
+#define AXIS_INIT2D(axis, infinite)			\
+do {							\
+    AXIS *this = axis_array + axis;			\
+							\
+    this->autoscale = this->set_autoscale;		\
+    this->min = (infinite && (this->set_autoscale&1))	\
+	? VERYLARGE : this->set_min;			\
+    this->max = (infinite && (this->set_autoscale&2))	\
+	? -VERYLARGE : this->set_max;			\
+    this->log_base = this->log ? log(this->base) : 0;	\
 } while(0)
 
 /* handle reversed ranges */
-#define CHECK_REVERSE(axis)					\
-do {								\
-    if ((axis_array[axis].autoscale == 0)			\
-	&& (axis_array[axis].max < axis_array[axis].min)	\
-	) {							\
-	double temp = axis_array[axis].min;			\
-	axis_array[axis].min = axis_array[axis].max;		\
-	axis_array[axis].max = temp;				\
-	axis_array[axis].reverse_range = 1;			\
-    } else							\
-	axis_array[axis].reverse_range =			\
-	    (axis_array[axis].range_flags & RANGE_REVERSE);	\
+#define CHECK_REVERSE(axis)						\
+do {									\
+    AXIS *this = axis_array + axis;					\
+									\
+    if ((this->autoscale == 0) && (this->max < this->min)) {		\
+	double temp = this->min;					\
+	this->min = this->max;						\
+	this->max = temp;						\
+	this->reverse_range = 1;					\
+    } else								\
+	this->reverse_range = (this->range_flags & RANGE_REVERSE);	\
 } while(0)
 
 /* HBB 20000725: new macro, built upon ULIG's SAVE_WRITEBACK(axis),

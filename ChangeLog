@@ -1,5 +1,25 @@
 2001-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* src/term.h: add testing of THREEDKIT macro before activating
+ 	VGAGL terminal driver.
+
+	* src/interpol.c (cp_approx_spline, cp_tridiag, do_cubic):
+ 	streamline checks for logscaling and AXIS_UNDO_LOG calls into
+ 	AXIS_DE_LOG_VALUE calls.
+
+	* src/plot2d.c (eval_plots): dito.
+
+	* src/axis.h (AXIS_INIT3D, AXIS_INIT2D, CHECK_REVERSE): new
+ 	macro-local variable 'this' for more readable coding.
+	(AXIS_INIT3D, AXIS_INIT2D): only calculate log_base element if
+ 	logscaling is active for that axis, to avoid SIGFPE.
+
+	* src/axis.c (gen_tics): use AXIS_UNDO_LOG instead of explicit
+ 	coding.
+	(axis_output_tics): fix multiline x-axis label positioning.
+
+2001-01-16  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	New PNG feature from <Juergen.vonHagen@etec.uni-karlsruhe.de>:
 	
 	* term/png.trm (PNG_id, PNG_opts): new option 'picsize' added to
