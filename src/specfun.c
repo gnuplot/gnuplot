@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.23 2003/10/21 19:25:21 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.24 2003/11/18 19:57:39 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -121,7 +121,7 @@ static double erfc __PROTO((double a));
 
 /* Macros to configure routines taken from CEPHES: */
 
-/* UNKnown arithmetic, invokes coefficients given in
+/* Unknown arithmetic, invokes coefficients given in
  * normal decimal format.  Beware of range boundary
  * problems (MACHEP, MAXLOG, etc. in const.c) and
  * roundoff problems in pow.c:
@@ -718,7 +718,7 @@ void f_rand(arg)
 
 /* ** ibeta.c
  *
- *   DESCRIB   Approximate the incomplete beta function Ix(a, b).
+ *   DESCRIBE  Approximate the incomplete beta function Ix(a, b).
  *
  *                           _
  *                          |(a + b)     /x  (a-1)         (b-1)
@@ -766,7 +766,7 @@ ibeta(a, b, x)
     if (x == 0.0 || x == 1.0)
 	return x;
 
-    /* Swap a, b if necessarry for more efficient evaluation */
+    /* Swap a, b if necessary for more efficient evaluation */
     return a < x * (a + b) ? 1.0 - confrac(b, a, 1.0 - x) : confrac(a, b, x);
 }
 
@@ -822,7 +822,7 @@ confrac(a, b, x)
 
 /* ** igamma.c
  *
- *   DESCRIB   Approximate the incomplete gamma function P(a, x).
+ *   DESCRIBE  Approximate the incomplete gamma function P(a, x).
  *
  *                         1     /x  -t   (a-1)
  *             P(a, x) = -_--- * |  e  * t     dt      (a > 0)
@@ -940,7 +940,7 @@ igamma(a, x)
 
 /***********************************************************************
      double ranf(double init)
-                RANDom number generator as a Function
+                Random number generator as a Function
      Returns a random floating point number from a uniform distribution
      over 0 - 1 (endpoints of this interval are not returned) using a
      large integer generator.
@@ -950,7 +950,7 @@ igamma(a, x)
      with Splitting Facilities." ACM Transactions on Mathematical
      Software, 17:98-111 (1991)
 
-               GeNerate LarGe Integer
+               Generate Large Integer
      Returns a random integer following a uniform distribution over
      (1, 2147483562) using the generator.
      This is a transcription from Pascal to Fortran of routine
@@ -1977,7 +1977,7 @@ inverse_error_func(y)
 /* Implementation of Lamberts W-function which is defined as
  * w(x)*e^(w(x))=x
  * Implementation by Gunter Kuhnle, gk@uni-leipzig.de 
- * Algorith originally developed by
+ * Algorithm originally developed by
  * KEITH BRIGGS, DEPARTMENT OF PLANT SCIENCES,
  * e-mail:kmb28@cam.ac.uk
  * http://epidem13.plantsci.cam.ac.uk/~kbriggs/W-ology.html */
