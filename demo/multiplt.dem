@@ -129,6 +129,7 @@ plot \
   zeta=1,y(wnt), \
   zeta=2,y(wnt)
 unset multiplot
+pause -1 "Hit return to continue"
 #
 #  Clean up: reset parameter defaults
 #

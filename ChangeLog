@@ -1,4 +1,18 @@
-2004-09-01  Lars Hecking  <lhecking@users.sourceforge.net>
+2005-08-03  Ethan Merritt  <merritt@u.washington.edu
+
+	Move generation of html demo files into a separate subdirectory.
+
+	* demo/html/index.save demo/html/gnuplot.css: Template files for html.
+
+	* demo/html/Makefile demo/html/webify.pl: Modify webify.pl to accept
+	the "set term" parameters from environmental variable DEMOTERM. Create
+	a separate Makefile just for generation of html pages.  Add special
+	case terminal parameters for several demos.
+
+	* demo/multiplt.dem: Add a missing "pause -1" command so that the
+	webify script works properly.
+
+2004-08-03  Lars Hecking  <lhecking@users.sourceforge.net>
 
 	* docs/Makefile.in: Update CLEANFILES and clean-generic.
 

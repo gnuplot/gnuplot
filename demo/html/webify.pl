@@ -20,6 +20,16 @@
 #   use gpsavediff if available
 #   link to gnuplot.css if available
 #
+# EAM Aug 2005
+# If DEMOTERM is present as an environmental variable, then use
+#    set term DEMOTERM
+# rather than the default terminal settings
+# E.g. (for image demo)
+#    setenv DEMOTERM "png truecolor enhanced font arial 8 transparent size 420,320"
+#    ./webify.pl image
+#
+use Env qw(DEMOTERM GNUPLOT_LIB);
+
 use HTML::Entities;
 
 require "ctime.pl";
@@ -28,12 +38,16 @@ require "ctime.pl";
 	my $plot = 1;
 
 # input and output files
-	open(IN,  "<$ARGV[0].dem") or die "can't open $ARGV[0].dem";
+	open(IN,  "<$GNUPLOT_LIB/$ARGV[0].dem") or die "can't open $GNUPLOT_LIB/$ARGV[0].dem";
 	open(OUT, ">$ARGV[0].html") or die "can't open $ARGV[0].html";
 
 # open pipe to gnuplot and set terminal type
 	open(GNUPLOT, "|gnuplot") or die "can't find gnuplot";
-	print GNUPLOT "set term png enhanced font arial 8 transparent size 420,320\n";
+	if ((defined $ENV{DEMOTERM}) && $DEMOTERM ne "") {
+	    print GNUPLOT "set term $DEMOTERM\n";
+	} else {
+	    print GNUPLOT "set term png enhanced font arial 8 transparent size 420,320\n";
+	}
 	print GNUPLOT "set output \"$ARGV[0].$plot.png\"\n";
 
 # find out if gpsavediff is available in current path
