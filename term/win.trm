@@ -1,5 +1,5 @@
 /*
- * $Id: win.trm,v 1.28 2002/06/10 21:33:31 mikulik Exp $
+ * $Id: win.trm,v 1.29 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT - win.trm */
@@ -503,9 +503,12 @@ START_HELP(windows)
 "",
 " The Windows version normally terminates immediately as soon as the end of",
 " any files given as command line arguments is reached (i.e. in non-interactive",
-" mode). It will also not show the text-window at all, in this mode, only",
-" the plot. By giving the optional argument",
-" `/noend` or `-noend`, you can disable this behaviour.",
+" mode), unless you specify `-` as the last command line option.", 
+" It will also not show the text-window at all, in this mode, only the plot.",
+" By giving the optional argument `-persist` (same as for gnuplot under x11;",
+" former Windows-only options `/noend` or `-noend` are still accepted as well),",
+" will not close gnuplot. Contrary to gnuplot on other operating systems,",
+" gnuplot's interactive command line is accessible after the -persist option.",
 "2 graph-menu",
 "?commands set terminal windows graph-menu",
 "?set terminal windows graph-menu",

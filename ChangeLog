@@ -1,5 +1,11 @@
 2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
 
+	* NEWS src/plot.c src/win/winmain.c src/win/pgnuplot.c term/win.trm:
+	Let gnuplot on Windows accept the '-persist' command line option
+	(preferred synonym to '-noend' and '/noend').
+
+2004-02-12  Petr Mikulik  <mikulik@physics.muni.cz>
+
 	* config/makefile.cyg config/makefile.mgw: Missing copy of file VERSION
 	into the latexing directory.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: $"); }
+static char *RCSid() { return RCSid("$Id: pgnuplot.c,v 1.9 2003/01/28 21:18:49 lhecking Exp $"); }
 #endif
 /*
  * pgnuplot.c -- pipe stdin to wgnuplot
@@ -230,12 +230,15 @@ int main (int argc, char *argv[])
 		    gnuplot_version, gnuplot_patchlevel);
 	    return 0;
 	} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-	    printf( "Usage: gnuplot [OPTION] [FILE]\n"
+	    printf( "Usage: gnuplot [OPTION] [FILE] [-]\n"
 		    "  -V, --version   show gnuplot version\n"
 		    "  -h, --help      show this help\n"
-		    "  -noend, /noend  don't exit after executing FILE\n"
+		    "  -persist        don't close the plot after executing FILE\n"
+		    "  -noend, /noend  like -persist (non-portable Windows-only options)\n"
+		    "  -               allow work in interactive mode after executing FILE\n"
+		    "Only on Windows, -persist and - have the same effect.\n"
 		    "This is gnuplot %s patchlevel %s\n"
-		    "Report bugs to <info-gnuplot-beta@dartmouth.edu>\n",
+		    "Report bugs to <info-gnuplot-beta@lists.sourceforge.net>\n",
 		    gnuplot_version, gnuplot_patchlevel);
 	    return 0;
 	}

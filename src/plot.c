@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.64 2003/12/13 00:56:28 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.65 2004/01/08 05:08:26 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -597,7 +597,8 @@ char **argv;
 	    ++argv;
 	    c_token = NO_CARET;	/* in case of file not found */
 #ifdef _Windows
-	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0)
+	    if (stricmp(*argv, "-noend") == 0 || stricmp(*argv, "/noend") == 0
+	       	|| stricmp(*argv, "-persist") == 0)
 		noend = 1;
 	    else
 #endif
