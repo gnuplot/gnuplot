@@ -1,5 +1,47 @@
+1998-11-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0BUGS: Added description of m[]tics initialisation bug, from
+	Lucas Hart <hartl@ucs.orst.edu>. Changed hidden3d entry and line
+	clipping entry as suggested by HBB. Add error bars in polar plots
+	entry, from Stefan Deutscher <stefand@ibm.net>. Revised entry for
+	contour clipping by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+
+	* Makefile.in: Remove -I./term from term.o target because there are
+	no built sources in term/.
+
+	* ansichek.h: Use #ifndef HAVE_CONFIG_H for code depending on
+	ANSI_C.
+
+	* acconfig.h: Remove ANSI_C.
+
+	* configure.in: Add comment at top. Don't define ANSI_C.
+
+	* graph3d.c(do_3dplot): If "set contour; set nosurface; set noclabel"
+	is used, the items in the key will overwrite one another if more than
+	one function or file is plotted. Bugfix by Don Taber
+	<dtaber@blackrat.risc.rockwell.com>
+	
+	* help.c, term.c: Patch to pipe 'set terminal' output through pager
+	by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+
+	* misc.c: Patch by Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+	to read DOS files under Unix.
+
+	* plot.h: Comment out LP_DEFAULT. Don't use ANSI_C.
+
+	* plot3d.c(printd_3dtable): Add space between "label:" and label in
+	output, patch by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+
+	* protos.h: Updated prototypes for help.c and term.c
+
+	* set.c: New function reset_lp_properties. Replaces LP_DEFAULT
+	initialisation, get's rid of ANSI_C.
+
 1998-11-16  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
+	* 0BUGS: Added description and workaround for contour line clipping
+	bug. Provided by Don Taber <dtaber@blackrat.risc.rockwell.com>.
+ 	
 	* docs/old: New directory.
 
 	* History, README.3d, README.3p1, README.3p2, README.3p3, README.3p4,
@@ -16,9 +58,12 @@
 
 	* version.c: Changes history moved to docs/old/ChangeLog.old.
 
+	* win/wcgraph.c(wginitcolor): Swap entries for red and blue for
+	color consistency as suggested by Stephen Eglen <stephen@cns.ed.ac.uk>.
+
 1998-11-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
-	* 0BUGS: Added description and workaround for pslatex driver bug.
+	* 0BUGS: Add description and workaround for pslatex driver bug.
 
 	* interpol.c: Bugfix for 'smooth acsplines' option with logarithmic
 	x axis by Konrad Bernloehr <bernlohr@ik3.fzk.de>.
@@ -470,7 +515,7 @@
 
 	* graphics.c: Indentation.
 
-	* show.c: Final fixes for merger (see entry from 1990-10-03).
+	* show.c: Final fixes for merger (see entry from 1998-10-03).
 
 	* version.c: Patchlevel pl4.
 
@@ -512,10 +557,9 @@
 
 	* setshow.h: Remove outfile declaration. Fix show_version() prototpe.
 
-	* show.c: Add faq_location. Fix show_version() calls. Merge
-	misc.c(save_version) into show_version(). In show_version_long(),
-	make all output to stderr instead of stdout, use one single call
-	to fprintf().
+	* show.c: Fix show_version() calls. Merge misc.c(save_version) into
+	show_version().	In show_version_long(), use one single call to
+	fprintf().
 
 	* version.c: Add faq_location.
 
@@ -589,7 +633,7 @@
 	initialised with zero. Bug report from Stefan Schroepfer
 	<scr@iis.fhg.de>. Indentation.
 
-	* plot.c(load_rcfile): Bugfix: ~/.gnuplot not read. Report from
+	* plot.c(load_rcfile): Bugfix: ~/.gnuplot not read. Reported by
 	Stefan Schroepfer <scr@iis.fhg.de>.
 
 	* stdfn.h: OS/2 fixes.
@@ -644,7 +688,7 @@
 
 	* win/wgnuplib.def, win/wgnuplot.def: Re-add ^M's at end of line.
 
-	* plot.h: Remove X_DISPLAY_MISSING and re-addX11. Move definition of
+	* plot.h: Remove X_DISPLAY_MISSING and re-add X11. Move definition of
 	PLOTRC into OS specific section.
 
 	* term.h: Remove X_DISPLAY_MISSING.
@@ -851,7 +895,7 @@
 1998-08-20  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* datafile.c (df_tokenise): Fix bug in datafile reading speedup
-	patch. Fix by HBB.
+	patch. By HBB.
 
 1998-08-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -974,7 +1018,7 @@
 1998-07-02  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* gplt_x11.c: Change 0xffffffff to (unsigned long)(-1L).
-	Patch by Markus Dickebohm.
+	Patch by Markus Dickebohm <m.dickebohm@uni-koeln.de>.
 
 1998-07-01  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
@@ -984,7 +1028,7 @@
 	* Makefile.in: New target for show.o, for 'show version long'.
 
 	* acconfig.h, config.hin, configure.in: The correct file name
-	is .gnuplot, and not .gnuplotrc!
+	is .gnuplot, not .gnuplotrc!
 
 	* config.hin: Add HAVE_SYS_UTSNAME_H, for 'show version long'.
 
