@@ -1,4 +1,7 @@
-2000-11-22  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+2000-11-23  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
+        * src/pm3d.c: Fix incomplete struct pm3d initializer.
+
+2000-11-23  Alexander Mai <st002279@hrzpub.tu-darmstadt.de>
         * src/gplt_x11.c: fix some segmentation faults
 
 2000-11-23  Petr Mikulik  <mikulik@physics.muni.cz>

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.10 2000/11/23 08:35:39 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.11 2000/11/23 14:14:37 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - pm3d.c */
@@ -41,6 +41,7 @@ static char *RCSid() { return RCSid("$Id: pm3d.c,v 1.10 2000/11/23 08:35:39 miku
 
 pm3d_struct pm3d = {
     "",                   /* where[6] */
+    0,                    /* no map */
     PM3D_FLUSH_BEGIN,     /* flush */
     PM3D_SCANS_AUTOMATIC, /* scans direction is determined automatically */
     PM3D_CLIP_1IN,        /* clipping: at least 1 point in the ranges */
@@ -131,6 +132,8 @@ pm3d_rearrange_part(struct iso_curve* src, const int len, struct iso_curve*** de
 	    vertex vA, vA2;
 
 	    /* ordering within one scan */
+	    /* amai: I get a crash here - we sometimes submit UNDEFINED points here :-(
+	             FIXME!!! */
 	    map3d_xyz(scanA->points[0].x, scanA->points[0].y, scanA->points[0].z, &vA);
 	    map3d_xyz(scanA->points[cnt].x, scanA->points[cnt].y, scanA->points[cnt].z, &vA2);
 	    if (vA2.z > vA.z)
