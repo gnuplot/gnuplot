@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.4 1999/10/01 14:50:44 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.5 1999/10/29 18:47:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -70,7 +70,7 @@ do{if (datatype[axis]==TIME) { \
   }\
   putc('"', fp);\
  } else {\
-  fprintf(fp,"%g",x);\
+  fprintf(fp,"%#g",x);\
 }} while(0)
 
 
@@ -230,15 +230,14 @@ FILE *fp;
     else
 	fputs("# set output\n", fp);
 
-/* FIXME */
     fprintf(fp, "\
-set %sclip points\n\
-set %sclip one\n\
-set %sclip two\n\
+%sset clip points\n\
+%sset clip one\n\
+%sset clip two\n\
 set bar %f\n",
-	    (clip_points) ? "" : "no",
-	    (clip_lines1) ? "" : "no",
-	    (clip_lines2) ? "" : "no",
+	    (clip_points) ? "" : "un",
+	    (clip_lines1) ? "" : "un",
+	    (clip_lines2) ? "" : "un",
 	    bar_size);
 
     if (draw_border)
@@ -286,7 +285,7 @@ set y2data%s\n",
 	if (polar_grid_angle)	/* set angle already output */
 	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
 	else
-	    fputs("set grid nopolar\n", fp);
+	    fputs("unset grid polar\n", fp);
 	fprintf(fp,
 		"set grid %sxtics %sytics %sztics %sx2tics %sy2tics %smxtics %smytics %smztics %smx2tics %smy2tics lt %d lw %.3f, lt %d lw %.3f\n",
 		work_grid.l_type & GRID_X ? "" : "no",
@@ -381,7 +380,7 @@ set y2data%s\n",
 		this_arrow->lp_properties.l_type + 1,
 		this_arrow->lp_properties.l_width);
     }
-    fputs("unset linestyle\n", fp);
+    fputs("unset style line\n", fp);
     for (this_linestyle = first_linestyle; this_linestyle != NULL;
 	 this_linestyle = this_linestyle->next) {
 	fprintf(fp, "set linestyle %d ", this_linestyle->tag);
@@ -408,24 +407,24 @@ set y2data%s\n",
 set offsets %g, %g, %g, %g\n\
 set pointsize %g\n\
 set encoding %s\n\
-set %spolar\n\
-set %sparametric\n",
+%sset polar\n\
+%sset parametric\n",
 	    loff, roff, toff, boff,
 	    pointsize,
 	    encoding_names[encoding],
-	    (polar) ? "" : "no",
-	    (parametric) ? "" : "no");
+	    (polar) ? "" : "un",
+	    (parametric) ? "" : "un");
     fprintf(fp, "\
 set view %g, %g, %g, %g\n\
 set samples %d, %d\n\
 set isosamples %d, %d\n\
-set %ssurface\n\
-set %scontour",
+%sset surface\n\
+%sset contour",
 	    surface_rot_x, surface_rot_z, surface_scale, surface_zscale,
 	    samples_1, samples_2,
 	    iso_samples_1, iso_samples_2,
-	    (draw_surface) ? "" : "no",
-	    (draw_contour) ? "" : "no");
+	    (draw_surface) ? "" : "un",
+	    (draw_contour) ? "" : "un");
 
     switch (draw_contour) {
     case CONTOUR_NONE:
@@ -500,7 +499,7 @@ set %scontour",
 set cntrparam points %d\n\
 set size ratio %g %g,%g\n\
 set origin %g,%g\n\
-set data style ",
+set style data ",
 	    contour_pts,
 	    aspect_ratio, xsize, ysize,
 	    xoffset, yoffset);
@@ -568,7 +567,7 @@ set data style ",
 	break;
     }
 
-    fputs("set function style ", fp);
+    fputs("set style function ", fp);
     switch (func_style) {
     case LINES:
 	fputs("lines\n", fp);

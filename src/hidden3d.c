@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.11 1999/10/01 14:54:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.12 1999/10/29 18:47:18 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -566,7 +566,7 @@ save_hidden3doptions(fp)
 FILE *fp;
 {
     if (!hidden3d) {
-	fputs("set nohidden3d\n", fp);
+	fputs("unset hidden3d\n", fp);
 	return;
     }
     fprintf(fp,
