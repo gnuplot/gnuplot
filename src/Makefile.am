@@ -55,4 +55,4 @@ T=$(top_srcdir)/term/
 # begin makefile.all
 include makefile.all
 # end makefile.all
-
+term$U.o: $(CORETERM)
