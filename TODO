@@ -1,12 +1,92 @@
+[========================================================================]
+[========= TODO BEFORE RELEASING VERSION 4.0 (EXCEPT BUG FIXES) =========]
+[========================================================================]
 
-[-- TODO BEFORE RELEASING VERSION 4.0 (EXCEPT BUG FIXES) --]
 
-- documentation for all X11 command line switches (joze)
-- similar line and point type sequences for the main terminal drivers (joze)
-- pm3d doesn't work for concave data, concave in the sense of valid data
+COMMANDS:
+
+-- add 'set view map' patch from sf (solves problems with "macro"-like
+'set pm3d map' and correctly positions titles and labels for a map).
+(Waiting --- does Hans-Bernhard or somebody else want to change anything
+there?)
+
+-- styles for arrow heads by Harald (it's a new feature, but works fine)?
+
+-- pm3d doesn't work for concave data, concave in the sense of valid data
   per scan, where single scans are interrupted by invalid data points. (joze)
+  * Petr: what do you mean? Example?
 
-[--]
+-- let 'binary' data files can have 4 columns to allow drawing textures
+efficiently
+
+
+DOCUMENTATION:
+
+-- BUGS file should be updated.
+
+-- gnuplot.doc should have sections "new in 3.7.1, 2, 3" and "new in 4.0";
+the NEWS file could server as a basis.
+
+-- Update in docs/old/*
+Recently I've moved importants things from README.os2 into gnuplot.doc and
+INSTALL; those other README.{x11, win, xli, nex} should be
+dispersed similarly. Who can do it?
+
+Also, README.{3d, pic, mf} should be edited into gnuplot.doc and removed.
+Who has some knowledge about this?
+
+I propose to keep those History and ChangeLog-like files in this directory
+(or moved to src), maybe change them and concatenate them into single
+ChangeLog / History file.
+
+-- FAQ should be updated
+
+-- update tutorial/
+
+-- documentation for all X11 command line switches (joze)
+
+
+TERMINALS:
+
+-- see above about docs/old/README.*
+
+-- pstricks? There is an old bug/patch request on sourceforge, can 
+somebody comment on it?
+
+-- windows terminal:
+	-- rotated text is not supported
+	-- colored text (textcolor.dem does not pass correctly)
+
+-- Mac, Apple, MacOS support to be added
+
+-- verify that terminals don't reset options (I've checked a lot, but 
+should be tested again)
+
+-- unify color and pointtype sequence, alias similar line and point type
+sequences for the main terminal drivers (joze)
+
+
+GNUPLOT LIBRARY:
+
+Make a library (e.g. usr/local/gnuplot/scripts/, .../gnuplot/bin) of 
+(a) gnuplot scripts, and (b) shell scripts relevant for gnuplot:
+
+-- enclose script "gpsavediff" that diff's output of gnuplot's "save" command 
+and default setup after "reset" 
+
+-- move pm3d/contrib/* files into the proposed gnuplot library, then remove
+pm3d/contrib and pm3d/ from cvs
+
+
+WEB:
+
+-- gnuplot needs a "professional" web page
+
+
+[========================================================================]
+[========================================================================]
+[========================================================================]
+
 
 Projects, in no particular order:
 
@@ -59,7 +139,6 @@ Lars' list
   floating-point equality?) and symbolic constants from standard header files.
   LOADS of errors throughout the code, especially in graphics.c
 - autogenerate term.h from config file in text format and/or configure?
-- should gnuplot_x11 be in prefix/libexec???
 - parse "~" in filenames as $HOME
   [PARTIALLY DONE] does not work for cd, set output
   [PARTIALLY DONE] works for all cmds now; plot key shows "~" instead
@@ -86,7 +165,7 @@ Lars' list
 - better documentation format; get rid of the doc2xxx utils
   [SGML. SGML. SGML]
 - update the FAQ!!!!
-  [Being worked on bei Juergen]
+  [Being worked on by Juergen]
   updated version now in archive
 - non-integer time value in 'pause' command
   implement using select() where available, or usleep(); round off
@@ -108,20 +187,6 @@ DONE - no vfprintf simulation for the WText module, yet --> int_error problemati
 WIN32 compile (BC++4.52):
 DONE - problems with the 16bit helper programs doc2help, bf_test (local installation problem suspected)
 -- test run fails: script execution stops as soon as first plot is done.
-
-joze's list:
-- (Petr Mikulik, 20. Nov. 2000): The following code is in unset.c:
-      extern void X11_unset_pm3d __PROTO((void)); /* defined in x11.trm */
-      X11_unset_pm3d();
-  Lars and HBB don't like externs, could you make X11_unset_pm3d() global 
-  somewhere else, in a .h file?
-- (Petr Mikulik, 20. Nov. 2000) I have disabled rotate-and-zoom-by-mouse
-  after  'set pm3d map'. I've noticed
-  some  '#if 0 ... #endif'  and  '(if abs(last X - previous X) < 3)'  code
-  in mouse.c.  It would be nice to switch this on, so that there is no 
-  rotation under effect just after a simple click on the graph window. 
-  Maybe it could go to the same  'if (is_3d_plot and ... !pm3d map) '
-  condition?
 
 Petr Mikulik (info-gnuplot-beta Thu, 02 Mar 2000)
 it would be very convenient to set the values/formulae for columns in 
