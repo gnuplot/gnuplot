@@ -1,5 +1,5 @@
 /*
- * $Id: x11.trm,v 1.56 2002/03/25 14:15:02 mikulik Exp $
+ * $Id: x11.trm,v 1.57 2002/03/26 09:43:00 mikulik Exp $
  *
  */
 
@@ -921,7 +921,7 @@ X11_vector(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 X11_pointsize(double ps)
 {
-    PRINT2("P7%04d%04d\n",	/* size of point symbols */
+    PRINT2("P-2 %d %d\n",	/* size of point symbols */
 	   (int) (term->h_tic * ps * 0.5), (int) (term->v_tic * ps * 0.5));
 }
 
@@ -963,10 +963,7 @@ X11_justify_text(enum JUSTIFY mode)
 TERM_PUBLIC void
 X11_point(unsigned int x, unsigned int y, int number)
 {
-    if (number >= 0)
-	number %= POINT_TYPES;
-    number += 1;
-    PRINT3("P%01d%04d%04d\n", number, x, y);
+    PRINT3("P%d %d %d\n", number, x, y);
 }
 
 TERM_PUBLIC void

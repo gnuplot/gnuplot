@@ -244,7 +244,26 @@ using strlen(text) * h_char.
 _point(x,y,point)  Called to place a point at position (x,y).
 point is -1 or an integer from 0 upwards.  
 At least 6 point types (numbered 0 to 5) are normally provided.  
-Point type -1 is a dot.
+Point type -1 is a dot. 'point' corresponds to (pointtype - 1),
+e.g. 'plot x with points pointtype 2' will call _point(x, y, 1).
+If possible, the driver should support the following 13 point types
+in the given order:
+
+    point  pointtype
+	0          1  plus
+	1          2  X
+	2          3  star
+	3          4  box
+	4          5  box                   filled
+	5          6  circle
+	6          7  circle (disk)         filled
+	7          8  triangle
+	8          9  triangle              filled
+	9         10  upside down triangle
+       10         11  upside down triangle  filled
+       11         12  diamond
+       12         13  diamond               filled
+
 If point is more than the available point types then it should 
 be mapped back to one of the available points.
 Two _point() functions called do_point() and line_and_point() are 

@@ -1,3 +1,28 @@
+2002-05-29  Johannes Zellner  <johannes@zellner.org>
+
+	* term/x11.trm src/gplt_x11.c term/README: first 13 pointtypes like
+	in the postscript driver. --> new point types circle and upside-down
+	triangle and all shapes also filled.
+
+	point  pointtype
+	    0          1  plus
+	    1          2  X
+	    2          3  star
+	    3          4  box
+	    4          5  box                   filled
+	    5          6  circle
+	    6          7  circle (disk)         filled
+	    7          8  triangle
+	    8          9  triangle              filled
+	    9         10  upside down triangle
+	   10         11  upside down triangle  filled
+	   11         12  diamond
+	   12         13  diamond               filled
+
+	* gplt_x11.c: replaced the info 'drawing ...' in the xwindow's title
+	bar by a watch cursor. Removed the message which tells how many pm3d
+	colors could be allocated.
+
 2002-05-23  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* config/makefile.cyg config/makefile.mgw config/makefile.os2: Support
@@ -485,7 +510,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/05/23 18:14:30 $).
+	last modification date (from the tag $Date: 2002/05/23 20:28:35 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

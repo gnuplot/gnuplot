@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.39 2002/02/25 03:10:41 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.40 2002/02/27 21:19:10 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - gplt_x11.c */
@@ -440,6 +440,11 @@ static Cursor cursor_default;
 static Cursor cursor_exchange;
 static Cursor cursor_sizing;
 static Cursor cursor_zooming;
+#ifndef TITLE_BAR_DRAWING_MSG
+static Cursor cursor_waiting;
+static Cursor cursor_save;
+static int button_pressed = 0;
+#endif
 #endif
 
 static int windows_open = 0;
@@ -554,6 +559,10 @@ main(int argc, char *argv[])
     /* arrow, top_left_arrow, left_ptr, sb_left_arrow, sb_right_arrow,
      * plus, pencil, draft_large, right_ptr, draft_small */
     cursor_zooming = XCreateFontCursor(dpy, XC_draft_small);
+#ifndef TITLE_BAR_DRAWING_MSG
+    cursor_waiting = XCreateFontCursor(dpy, XC_watch);
+    cursor_save = (Cursor)0;
+#endif
 #endif
 #ifdef PIPE_IPC
     if (!pipe_died) {
@@ -1094,6 +1103,7 @@ record()
 		}
 #endif
 #ifdef USE_MOUSE
+#ifdef TITLE_BAR_DRAWING_MSG
 		/* show a message in the wm's title bar that the
 		 * graph will be redrawn. This might be useful
 		 * for slow redrawing (large plots). The title
@@ -1106,6 +1116,13 @@ record()
 		    strcat(msg, " drawing ...");
 		    XStoreName(dpy, plot->window, msg);
 		}
+#else
+		if (!button_pressed) {
+		    cursor_save = cursor;
+		    cursor = cursor_waiting;
+		    XDefineCursor(dpy, plot->window, cursor);
+		}
+#endif
 #endif
 		/* continue; */
 	    }
@@ -1566,41 +1583,23 @@ exec_cmd(plot_struct *plot, char *command)
     /*   X11_point(number) - draw a point */
     else if (*buffer == 'P') {
 	int point;
-	/* linux sscanf does not like %1d%4d%4d" with Oxxxxyyyy */
-	/* sscanf(buffer, "P%1d%4d%4d", &point, &x, &y); */
-	point = buffer[1] - '0';
-	sscanf(buffer + 2, "%4d%4d", &x, &y);
-	if (point == 7) {
+	sscanf(buffer + 1, "%d %d %d", &point, &x, &y);
+	if (point == -2) {
 	    /* set point size */
 	    plot->px = (int) (x * xscale * pointsize);
 	    plot->py = (int) (y * yscale * pointsize);
+	} else if (point == -1) {
+	    /* dot */
+	    XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
 	} else {
+	    unsigned char fill = 0;
+	    unsigned char upside_down_fill = 0;
+	    short upside_down_sign = 1;
 	    if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
 		XSetLineAttributes(dpy, *current_gc, 0, LineSolid, CapButt, JoinBevel);
 	    }
-	    switch (point) {
-	    case 0:		/* dot */
-		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
-		break;
-	    case 1:		/* do diamond */
-		Diamond[0].x = (short) X(x) - plot->px;
-		Diamond[0].y = (short) Y(y);
-		Diamond[1].x = (short) plot->px;
-		Diamond[1].y = (short) -plot->py;
-		Diamond[2].x = (short) plot->px;
-		Diamond[2].y = (short) plot->py;
-		Diamond[3].x = (short) -plot->px;
-		Diamond[3].y = (short) plot->py;
-		Diamond[4].x = (short) -plot->px;
-		Diamond[4].y = (short) -plot->py;
-
-		/*
-		 * Should really do a check with XMaxRequestSize()
-		 */
-		XDrawLines(dpy, plot->pixmap, *current_gc, Diamond, 5, CoordModePrevious);
-		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
-		break;
-	    case 2:		/* do plus */
+	    switch (point % 13) {
+	    case 0:		/* do plus */
 		Plus[0].x1 = (short) X(x) - plot->px;
 		Plus[0].y1 = (short) Y(y);
 		Plus[0].x2 = (short) X(x) + plot->px;
@@ -1612,12 +1611,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Plus, 2);
 		break;
-	    case 3:		/* do box */
-		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py, (plot->px + plot->px),
-			       (plot->py + plot->py));
-		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
-		break;
-	    case 4:		/* do X */
+	    case 1:		/* do X */
 		Cross[0].x1 = (short) X(x) - plot->px;
 		Cross[0].y1 = (short) Y(y) - plot->py;
 		Cross[0].x2 = (short) X(x) + plot->px;
@@ -1629,27 +1623,7 @@ exec_cmd(plot_struct *plot, char *command)
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Cross, 2);
 		break;
-	    case 5:		/* do triangle */
-		{
-		    short temp_x, temp_y;
-
-		    temp_x = (short) (1.33 * (double) plot->px + 0.5);
-		    temp_y = (short) (1.33 * (double) plot->py + 0.5);
-
-		    Triangle[0].x = (short) X(x);
-		    Triangle[0].y = (short) Y(y) - temp_y;
-		    Triangle[1].x = (short) temp_x;
-		    Triangle[1].y = (short) 2 *plot->py;
-		    Triangle[2].x = (short) -(2 * temp_x);
-		    Triangle[2].y = (short) 0;
-		    Triangle[3].x = (short) temp_x;
-		    Triangle[3].y = (short) -(2 * plot->py);
-
-		    XDrawLines(dpy, plot->pixmap, *current_gc, Triangle, 4, CoordModePrevious);
-		    XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
-		}
-		break;
-	    case 6:		/* do star */
+	    case 2:		/* do star */
 		Star[0].x1 = (short) X(x) - plot->px;
 		Star[0].y1 = (short) Y(y);
 		Star[0].x2 = (short) X(x) + plot->px;
@@ -1668,6 +1642,84 @@ exec_cmd(plot_struct *plot, char *command)
 		Star[3].y2 = (short) Y(y) - plot->py;
 
 		XDrawSegments(dpy, plot->pixmap, *current_gc, Star, 4);
+		break;
+	    case 3:		/* do box */
+		XDrawRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
+		       	(plot->px + plot->px), (plot->py + plot->py));
+		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
+		break;
+	    case 4:		/* filled box */
+		XFillRectangle(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
+		       	(plot->px + plot->px), (plot->py + plot->py));
+		break;
+	    case 5:		/* circle */
+		XDrawArc(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
+		       	2 * plot->px, 2 * plot->py, 0, 23040 /* 360 * 64 */);
+		XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
+		break;
+	    case 6:		/* filled circle */
+		XFillArc(dpy, plot->pixmap, *current_gc, X(x) - plot->px, Y(y) - plot->py,
+		       	2 * plot->px, 2 * plot->py, 0, 23040 /* 360 * 64 */);
+		break;
+	    case 10:		/* filled upside-down triangle */
+		upside_down_fill = 1;
+		/* FALLTHRU */
+	    case 9:		/* do upside-down triangle */
+		upside_down_sign = (short)-1;
+	    case 8:		/* filled triangle */
+		fill = 1;
+		/* FALLTHRU */
+	    case 7:		/* do triangle */
+		{
+		    short temp_x, temp_y;
+
+		    temp_x = (short) (1.33 * (double) plot->px + 0.5);
+		    temp_y = (short) (1.33 * (double) plot->py + 0.5);
+
+		    Triangle[0].x = (short) X(x);
+		    Triangle[0].y = (short) Y(y) - upside_down_sign * temp_y;
+		    Triangle[1].x = (short) temp_x;
+		    Triangle[1].y = (short) upside_down_sign * 2 * plot->py;
+		    Triangle[2].x = (short) -(2 * temp_x);
+		    Triangle[2].y = (short) 0;
+		    Triangle[3].x = (short) temp_x;
+		    Triangle[3].y = (short) -(upside_down_sign * 2 * plot->py);
+
+		    if ((upside_down_sign == 1 && fill) || upside_down_fill) {
+			XFillPolygon(dpy, plot->pixmap, *current_gc,
+				Triangle, 4, Convex, CoordModePrevious);
+		    } else {
+			XDrawLines(dpy, plot->pixmap, *current_gc, Triangle, 4, CoordModePrevious);
+			XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
+		    }
+		}
+		break;
+	    case 12:		/* filled diamond */
+		fill = 1;
+		/* FALLTHRU */
+	    case 11:		/* do diamond */
+		Diamond[0].x = (short) X(x) - plot->px;
+		Diamond[0].y = (short) Y(y);
+		Diamond[1].x = (short) plot->px;
+		Diamond[1].y = (short) -plot->py;
+		Diamond[2].x = (short) plot->px;
+		Diamond[2].y = (short) plot->py;
+		Diamond[3].x = (short) -plot->px;
+		Diamond[3].y = (short) plot->py;
+		Diamond[4].x = (short) -plot->px;
+		Diamond[4].y = (short) -plot->py;
+
+		/*
+		 * Should really do a check with XMaxRequestSize()
+		 */
+
+		if (fill) {
+		    XFillPolygon(dpy, plot->pixmap, *current_gc,
+			    Diamond, 5, Convex, CoordModePrevious);
+		} else {
+		    XDrawLines(dpy, plot->pixmap, *current_gc, Diamond, 5, CoordModePrevious);
+		    XDrawPoint(dpy, plot->pixmap, *current_gc, X(x), Y(y));
+		}
 		break;
 	    }
 	    if (plot->type != LineSolid || plot->lwidth != 0) {	/* select solid line */
@@ -1833,10 +1885,18 @@ display(plot_struct *plot)
 
     UpdateWindow(plot);
 #ifdef USE_MOUSE
+#ifdef TITLE_BAR_DRAWING_MSG
     if (plot->window) {
 	/* restore default window title */
 	XStoreName(dpy, plot->window, plot->titlestring);
     }
+#else
+    if (!button_pressed) {
+	cursor = cursor_save ? cursor_save : cursor_default;
+	cursor_save = (Cursor)0;
+	XDefineCursor(dpy, plot->window, cursor);
+    }
+#endif
 #endif
 }
 
@@ -2169,7 +2229,10 @@ PaletteMake(plot_struct * plot, t_sm_palette * tpal)
 		unique_colors++;
 	    }
 	}
+#if 0
+	/* removed this as it is annoying */
 	fprintf(stderr, "got %d unique colors.\n", unique_colors);
+#endif
     }
 
     if (plot->window && save_title) {
@@ -2606,6 +2669,7 @@ update_modifiers(unsigned int state)
 	gp_exec_event(GE_modifier, 0, 0, modifier_mask, 0);
     }
 }
+
 #endif
 
 
@@ -3002,6 +3066,9 @@ process_event(XEvent *event)
 	break;
     case ButtonPress:
 	update_modifiers(event->xbutton.state);
+#ifndef TITLE_BAR_DRAWING_MSG
+	button_pressed |= (1 << event->xbutton.button);
+#endif
 	plot = find_plot(event->xbutton.window);
 	if (!plot)
 	    break;
@@ -3013,6 +3080,9 @@ process_event(XEvent *event)
 	}
 	break;
     case ButtonRelease:
+#ifndef TITLE_BAR_DRAWING_MSG
+	button_pressed &= ~(1 << event->xbutton.button);
+#endif
 	plot = find_plot(event->xbutton.window);
 	if (!plot)
 	    break;
@@ -3428,7 +3498,7 @@ pr_color(cmap_t * cmap_ptr)
 
 #ifdef PM3D
 	if (&cmap != cmap_ptr) {
-	    /* for private colormaps: make shure
+	    /* for private colormaps: make sure
 	     * that pixel 0 gets black (joze) */
 	    xcolor.red = 0;
 	    xcolor.green = 0;
