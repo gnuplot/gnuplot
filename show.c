@@ -102,7 +102,7 @@ static void show_encoding __PROTO((void));
 static void show_polar __PROTO((void));
 static void show_parametric __PROTO((void));
 static void show_tics __PROTO((int showx, int showy, int showz, int showx2, int showy2));
-static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, char *text, int rotate_tics));
+static void show_ticdef __PROTO((int tics, int axis, struct ticdef * tdef, char *text, int rotate_tics, char *ticfmt));
 static void show_term __PROTO((void));
 static void show_plot __PROTO((void));
 static void show_autoscale __PROTO((void));
@@ -1155,72 +1155,81 @@ static void show_angles()
 static void show_tics(showx, showy, showz, showx2, showy2)
 TBOOLEAN showx, showy, showz, showx2, showy2;
 {
+    char str[MAX_LINE_LEN+1];
     fprintf(stderr, "\ttics are %s, \
 \tticslevel is %g\n\
-\tticscale is %g and miniticscale is %g\n",
+\tmajor ticscale is %g and minor ticscale is %g\n",
 	    (tic_in ? "IN" : "OUT"),
 	    ticslevel,
 	    ticscale, miniticscale);
 
     if (showx)
-	show_ticdef(xtics, FIRST_X_AXIS, &xticdef, "x", rotate_xtics);
+	show_ticdef(xtics, FIRST_X_AXIS, &xticdef, "x", rotate_xtics,
+        conv_text(str, xformat));
     if (showx2)
-	show_ticdef(x2tics, SECOND_X_AXIS, &x2ticdef, "second x", rotate_x2tics);
+	show_ticdef(x2tics, SECOND_X_AXIS, &x2ticdef, "x2", rotate_x2tics,
+        conv_text(str, x2format));
     if (showy)
-	show_ticdef(ytics, FIRST_Y_AXIS, &yticdef, "y", rotate_ytics);
+	show_ticdef(ytics, FIRST_Y_AXIS, &yticdef, "y", rotate_ytics,
+        conv_text(str, yformat));
     if (showy2)
-	show_ticdef(y2tics, SECOND_Y_AXIS, &y2ticdef, "second y", rotate_y2tics);
+	show_ticdef(y2tics, SECOND_Y_AXIS, &y2ticdef, "y2", rotate_y2tics,
+        conv_text(str, y2format));
     if (showz)
-	show_ticdef(ztics, FIRST_Z_AXIS, &zticdef, "z", rotate_ztics);
+	show_ticdef(ztics, FIRST_Z_AXIS, &zticdef, "z", rotate_ztics,
+        conv_text(str, zformat));
     screen_ok = FALSE;
 }
 
 /* called by show_tics */
-static void show_ticdef(tics, axis, tdef, text, rotate_tics)
+static void show_ticdef(tics, axis, tdef, text, rotate_tics, ticfmt)
 int tics;			/* xtics ytics or ztics */
 int axis;
 struct ticdef *tdef;		/* xticdef yticdef or zticdef */
 char *text;			/* "x", ..., "x2", "y2" */
+char *ticfmt;
 int rotate_tics;
 {
     register struct ticmark *t;
 
-    fprintf(stderr, "\t%s-axis tic labelling is ", text);
+    fprintf(stderr, "\t%s-axis tics:\t", text);
     switch (tics & TICS_MASK) {
     case NO_TICS:
 	fprintf(stderr, "OFF\n");
 	return;
     case TICS_ON_AXIS:
-	fprintf(stderr, "on axis, ");
+	fprintf(stderr, "on axis");
+        if (tics & TICS_MIRROR)
+            fprintf(stderr, " and mirrored %s", (tic_in ? "OUT" : "IN"));
 	break;
     case TICS_ON_BORDER:
-	fprintf(stderr, "on border, ");
+	fprintf(stderr, "on border");
+        if (tics & TICS_MIRROR)
+            fprintf(stderr, " and mirrored on opposite border");
 	break;
     }
 
-    if (tics & TICS_MIRROR)
-	fprintf(stderr, "mirrored on opposite border,\n\t");
-
+    fprintf(stderr,"\n\t  labels are format \"%s\"", ticfmt);
     if (rotate_tics)
-	fprintf(stderr, "labels are rotated in 2D mode, if the terminal allows it\n\t");
+	fprintf(stderr, ", rotated in 2D mode, terminal permitting.\n\t");
     else
-	fprintf(stderr, "labels are not rotated\n\t");
+	fprintf(stderr, " and are not rotated\n\t");
 
     switch (tdef->type) {
     case TIC_COMPUTED:{
-	    fprintf(stderr, "computed automatically\n");
+	    fprintf(stderr, "  intervals computed automatically\n");
 	    break;
 	}
     case TIC_MONTH:{
-	    fprintf(stderr, "Months computed automatically\n");
+	    fprintf(stderr, "  Months computed automatically\n");
 	    break;
 	}
     case TIC_DAY:{
-	    fprintf(stderr, "Days computed automatically\n");
+	    fprintf(stderr, "  Days computed automatically\n");
 	    break;
 	}
     case TIC_SERIES:{
-	    fprintf(stderr, "series");
+	    fprintf(stderr, "  series");
 	    if (tdef->def.series.start != -VERYLARGE) {
 		fprintf(stderr, " from ");
 		SHOW_NUM_OR_TIME(tdef->def.series.start, axis);
@@ -1238,7 +1247,7 @@ int rotate_tics;
 	    int time;
 	    time = (datatype[axis] == TIME);
  */
-	    fprintf(stderr, "list (");
+	    fprintf(stderr, "  list (");
 	    for (t = tdef->def.user; t != NULL; t = t->next) {
 		if (t->label) {
 		    char str[MAX_LINE_LEN+1];
