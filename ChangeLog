@@ -1,3 +1,15 @@
+1998-11-23  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* graphics.c(gen_tics) Modified patch from Jochen Schuetze <jos@GBF.DE>
+	to avoid infinite loop during tic generation.
+
+	* term/aed.trm, term/ai.trm, term/apollo.trm, term/atariaes.trm,
+	term/atarivdi.trm: Indentation.
+
+1998-11-23  David Schooley <dcschooley@mediaone.net>
+
+	* term/table.trm: Add missing register_term statement.
+
 1998-11-21  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* command.c(do_system): No not check system() return value.
