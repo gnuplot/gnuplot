@@ -115,6 +115,9 @@ install:
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	done
 
+# empty uninstall target; could be filled later
+uninstall:
+
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = lisp
