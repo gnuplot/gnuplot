@@ -1,5 +1,5 @@
 /*
- * $Id: protos.h,v 1.11 1999/06/19 20:54:35 lhecking Exp $
+ * $Id: protos.h,v 1.12 1999/06/22 11:59:53 lhecking Exp $
  *
  */
 
@@ -231,7 +231,7 @@ void term_check_multiplot_okay __PROTO((TBOOLEAN));
 
 void list_terms __PROTO((void));
 struct termentry *set_term __PROTO((int));
-struct termentry *change_term __PROTO((char *name, int length));
+struct termentry *change_term __PROTO((const char *name, int length));
 void init_terminal __PROTO((void));
 void test_term __PROTO((void));
 void UP_redirect __PROTO((int called));

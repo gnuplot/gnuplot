@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.9 1999/06/14 19:19:47 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.10 1999/06/22 11:58:38 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -918,7 +918,7 @@ int c_token_arg;
  */
 struct termentry *
 change_term(name, length)
-char *name;
+const char *name;
 int length;
 {
     int i;
