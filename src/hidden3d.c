@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.14 1999/11/08 19:24:30 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.15 1999/11/15 22:21:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -970,7 +970,6 @@ int pcount;
     /* allocate the storage for polygons and edges of the isoline just above
      * the current one, to allow easy access to them from the current isoline
      */
-    max_crvlen;
     north_polygons = gp_alloc(2 * max_crvlen * sizeof(long int),
 			      "hidden nort_polys");
     these_polygons = gp_alloc(2 * max_crvlen * sizeof(long int),
