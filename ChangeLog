@@ -1,3 +1,8 @@
+2003-06-21  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/gplt_x11.c: gnuplot_x11<->x11.trm font info exchange is now
+	working.
+
 2003-06-20  Ethan Merritt <merritt@u.washington.edu>
 
 	* src/gplt_x11.c:
