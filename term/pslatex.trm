@@ -206,37 +206,37 @@ Turning off auxfile option\n", outstr);
     }
     if (PSLATEX_output) {
 	fputs("\
-%% GNUPLOT: LaTeX picture with Postscript\n\
-\\begingroup%%\n\
-  \\makeatletter%%\n\
-  \\newcommand{\\GNUPLOTspecial}{%%\n\
-    \\@sanitize\\catcode`\\%%=14\\relax\\special}%%\n\
-  \\setlength{\\unitlength}{0.1bp}%%\n", gpoutfile);
+% GNUPLOT: LaTeX picture with Postscript\n\
+\\begingroup%\n\
+  \\makeatletter%\n\
+  \\newcommand{\\GNUPLOTspecial}{%\n\
+    \\@sanitize\\catcode`\\%=14\\relax\\special}%\n\
+  \\setlength{\\unitlength}{0.1bp}%\n", gpoutfile);
     } else {
 
 	/* write plain TeX header */
 	fputs("\
-%% GNUPLOT: plain TeX with Postscript\n\
+% GNUPLOT: plain TeX with Postscript\n\
 \\begingroup\n\
   \\catcode`\\@=11\\relax\n\
-  \\def\\GNUPLOTspecial{%%\n\
+  \\def\\GNUPLOTspecial{%\n\
     \\def\\do##1{\\catcode`##1=12\\relax}\\dospecials\n\
-    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%%=14\\relax\\special}%%\n\
-%%\n\
+    \\catcode`\\{=1\\catcode`\\}=2\\catcode\\%=14\\relax\\special}%\n\
+%\n\
 \\expandafter\\ifx\\csname GNUPLOTpicture\\endcsname\\relax\n\
   \\csname newdimen\\endcsname\\GNUPLOTunit\n\
   \\gdef\\GNUPLOTpicture(#1,#2){\\vbox to#2\\GNUPLOTunit\\bgroup\n\
     \\def\\put(##1,##2)##3{\\unskip\\raise##2\\GNUPLOTunit\n\
-      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%%\n\
-    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%%\n\
-    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%%\n\
-    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%%\n\
-    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%%\n\
-    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
-    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%%\n\
-    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%%\n\
-    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%%\n\
-  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%%\n\
+      \\hbox to0pt{\\kern##1\\GNUPLOTunit ##3\\hss}\\ignorespaces}%\n\
+    \\def\\ljust##1{\\vbox to0pt{\\vss\\hbox to0pt{##1\\hss}\\vss}}%\n\
+    \\def\\cjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1\\hss}\\vss}}%\n\
+    \\def\\rjust##1{\\vbox to0pt{\\vss\\hbox to0pt{\\hss ##1}\\vss}}%\n\
+    \\def\\stack##1{\\let\\\\=\\cr\\tabskip=0pt\\halign{\\hfil ####\\hfil\\cr ##1\\crcr}}%\n\
+    \\def\\lstack##1{\\hbox to0pt{\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%\n\
+    \\def\\cstack##1{\\hbox to0pt{\\hss\\vbox to0pt{\\vss\\stack{##1}}\\hss}}%\n\
+    \\def\\rstack##1{\\hbox to0pt{\\vbox to0pt{\\stack{##1}\\vss}\\hss}}%\n\
+    \\vss\\hbox to#1\\GNUPLOTunit\\bgroup\\ignorespaces}%\n\
+  \\gdef\\endGNUPLOTpicture{\\hss\\egroup\\egroup}%\n\
 \\fi\n\
 \\GNUPLOTunit=0.1bp\n", gpoutfile);
     }
@@ -255,7 +255,7 @@ Turning off auxfile option\n", outstr);
 	} else {
 	    fputs("{\\GNUPLOTspecial{!\n", gpoutfile);
 	    PS_common_init(1, 1, 0, 0, 0, xmin_t, ymin_t, xmax_t, ymax_t, NULL);
-	    fputs("}}%%\n", gpoutfile);
+	    fputs("}}%\n", gpoutfile);
 	}
     }
 
@@ -361,7 +361,7 @@ TERM_PUBLIC void PSLATEX_text()
 	gpoutfile = tmp;
     } else {
 	PS_text();
-	fputs("}}%%\n", gpoutfile);
+	fputs("}}%\n", gpoutfile);
     }
 
     for (tc = PSLATEX_labels; tc != (struct text_command *) NULL; tc = tc->next) {
@@ -393,8 +393,8 @@ TERM_PUBLIC void PSLATEX_text()
 	    case 1:		/* put text in a short stack */
 		if (PSLATEX_rotate) {
 		    fputs("\
-%%\n\\special{ps: gsave currentpoint currentpoint translate\n\
-270 rotate neg exch neg exch translate}%%\n", gpoutfile);
+%\n\\special{ps: gsave currentpoint currentpoint translate\n\
+270 rotate neg exch neg exch translate}%\n", gpoutfile);
 		}
 		switch (tc->justify) {
 		case LEFT:
@@ -417,10 +417,10 @@ TERM_PUBLIC void PSLATEX_text()
 		    break;
 		}
 		if (PSLATEX_rotate) {
-		    fputs("%%\n\\special{ps: currentpoint grestore moveto}%%\n", gpoutfile);
+		    fputs("%\n\\special{ps: currentpoint grestore moveto}%\n", gpoutfile);
 		}
 	    }
-	fputs("}%%\n", gpoutfile);
+	fputs("}%\n", gpoutfile);
     }
 
     while (PSLATEX_labels) {
@@ -432,7 +432,7 @@ TERM_PUBLIC void PSLATEX_text()
 
     if (PSLATEX_output) {
 	fputs("\
-\\end{picture}%%\n\
+\\end{picture}%\n\
 \\endgroup\n\
 \\endinput\n", gpoutfile);
     } else {
