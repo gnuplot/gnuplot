@@ -101,7 +101,7 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c binary.h bitmap.c \
 bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h \
 dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_hist.h gp_time.h graph3d.c \
 graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c \
@@ -137,7 +137,7 @@ pcgraph.asm rgipgnu win x11.opt $(OTHER_SOURCES)
 O = o
 T = $(top_srcdir)/term/
 
-COREOBJS = alloc.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
+COREOBJS = alloc.$(O) axis.$(O) binary.$(O) bitmap.$(O) command.$(O) contour.$(O) \
 datafile.$(O) dynarray.$(O) eval.$(O) fit.$(O) graph3d.$(O) graphics.$(O) \
 help.$(O) hidden3d.$(O) history.$(O) internal.$(O) interpol.$(O) \
 matrix.$(O) misc.$(O) mouse.$(O) parse.$(O) plot.$(O) plot2d.$(O) \
@@ -184,7 +184,7 @@ bf_test_OBJECTS =  $(am_bf_test_OBJECTS)
 bf_test_LDADD = $(LDADD)
 bf_test_DEPENDENCIES = 
 bf_test_LDFLAGS = 
-am_gnuplot_OBJECTS =  alloc$U.o binary$U.o bitmap$U.o command$U.o \
+am_gnuplot_OBJECTS =  alloc$U.o axis$U.o binary$U.o bitmap$U.o command$U.o \
 contour$U.o datafile$U.o dynarray$U.o eval$U.o fit$U.o graph3d$U.o \
 graphics$U.o help$U.o hidden3d$U.o history$U.o internal$U.o \
 interpol$U.o matrix$U.o misc$U.o mouse$U.o parse$U.o plot$U.o \

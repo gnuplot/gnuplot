@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.8 2000/03/28 21:31:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.9 2000/03/30 14:11:53 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -36,6 +36,7 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.8 2000/03/28 21:31:53 lhec
 
 #include "setshow.h"
 
+#include "axis.h"
 #include "command.h"
 #include "misc.h"
 #include "parse.h"
@@ -880,17 +881,19 @@ unset_logscale()
 	if (chr_in_str(c_token, 'x')) {
 	    is_log_x = FALSE;
 	    base_log_x = 0.0;
-	    log_base_log_x = 0.0;
+	    /* HBB 20000430 (here and below): these variable don't
+	     * really belong to set/show */
+	    /*  log_base_log_x = 0.0; */
 	}
 	if (chr_in_str(c_token, 'y')) {
 	    is_log_y = FALSE;
 	    base_log_y = 0.0;
-	    log_base_log_y = 0.0;
+	    /*  log_base_log_y = 0.0; */
 	}
 	if (chr_in_str(c_token, 'z')) {
 	    is_log_z = FALSE;
 	    base_log_z = 0.0;
-	    log_base_log_z = 0.0;
+	    /*  log_base_log_z = 0.0; */
 	}
 	c_token++;
     }
@@ -1299,10 +1302,9 @@ static void
 unset_xdata()
 {
     c_token++;
-    datatype[FIRST_X_AXIS] = FALSE;
-    /* eh ? - t and u have nothing to do with x */
-    datatype[T_AXIS] = FALSE;
-    datatype[U_AXIS] = FALSE;
+    axis_is_timedata[FIRST_X_AXIS] = 
+	axis_is_timedata[T_AXIS] =
+	axis_is_timedata[U_AXIS] = FALSE;
 }
 
 
@@ -1311,13 +1313,13 @@ static void
 unset_ydata()
 {
     c_token++;
-    datatype[FIRST_Y_AXIS] = FALSE;
-    datatype[V_AXIS] = FALSE;
+    axis_is_timedata[FIRST_Y_AXIS] = 
+	axis_is_timedata[V_AXIS] = FALSE;
 }
 
 #define PROCESS_AXIS_DATA(AXIS) \
     c_token++; \
-    datatype[AXIS] = FALSE;
+    axis_is_timedata[AXIS] = FALSE;
 
 /* process 'unset zdata' command */
 static void

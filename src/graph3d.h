@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: graph3d.h,v 1.4 2000/05/02 18:01:03 lhecking Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -41,16 +41,10 @@
 
 #include "plot.h"
 
-/* for convenience while converting to use these arrays */
-#define min3d_z min_array[FIRST_Z_AXIS]
-#define max3d_z max_array[FIRST_Z_AXIS]
-#define x_min3d min_array[FIRST_X_AXIS]
-#define x_max3d max_array[FIRST_X_AXIS]
-#define y_min3d min_array[FIRST_Y_AXIS]
-#define y_max3d max_array[FIRST_Y_AXIS]
-#define z_min3d min_array[FIRST_Z_AXIS]
-#define z_max3d max_array[FIRST_Z_AXIS]
-
+/* Function macros to map from user 3D space into normalized -1..1 */
+#define map_x3d(x) ((x-min_array[FIRST_X_AXIS])*xscale3d-1.0)
+#define map_y3d(y) ((y-min_array[FIRST_Y_AXIS])*yscale3d-1.0)
+#define map_z3d(z) ((z-floor_z)*zscale3d-1.0)
 
 /* Type definitions */
 
@@ -64,7 +58,7 @@ extern int xmiddle, ymiddle, xscaler, yscaler;
 extern double floor_z;
 extern int hidden_no_update;
 extern transform_matrix trans_mat;
-extern unsigned int move_pos_x, move_pos_y;
+extern double xscale3d, yscale3d, zscale3d;
 
 #ifdef USE_MOUSE
 extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d_y_dy;
@@ -72,6 +66,7 @@ extern int axis3d_o_x, axis3d_o_y, axis3d_x_dx, axis3d_x_dy, axis3d_y_dx, axis3d
 
 /* Prototypes from file "graph3d.c" */
 
+void do_openglplot __PROTO((struct surface_points *plots, int pcount));
 void do_3dplot __PROTO((struct surface_points *plots, int pcount, int quick));
 
 void clip_move __PROTO((unsigned int x, unsigned int y));

@@ -17,7 +17,7 @@ noinst_PROGRAMS = bf_test
 XLIBS = @LIBRARIES_FOR_X@
 AM_CPPFLAGS = -I../term -I$(top_srcdir)/term -DBINDIR=\"$(bindir)\" -DCONTACT=\"$(EMAIL)\" -DHELPFILE=\"$(HELPFILE)\"
 
-gnuplot_SOURCES = alloc.c alloc.h ansichek.h binary.c binary.h bitmap.c \
+gnuplot_SOURCES = alloc.c alloc.h ansichek.h axis.c axis.h binary.c binary.h bitmap.c \
 bitmap.h command.c command.h contour.c contour.h datafile.c datafile.h \
 dynarray.c dynarray.h eval.c eval.h fit.c fit.h gp_hist.h gp_time.h graph3d.c \
 graph3d.h graphics.c graphics.h help.c help.h hidden3d.c hidden3d.h history.c \

@@ -1,5 +1,5 @@
 /*
- * $Id: setshow.h,v 1.23 1999/12/10 16:55:18 lhecking Exp $
+ * $Id: setshow.h,v 1.24 2000/05/02 18:21:37 lhecking Exp $
  */
 
 /* GNUPLOT - setshow.h */
@@ -73,8 +73,6 @@ extern struct arrow_def *first_arrow;
 extern TBOOLEAN autoscale_x, autoscale_y, autoscale_z, autoscale_x2,
     autoscale_y2;
 extern TBOOLEAN autoscale_r, autoscale_t, autoscale_u, autoscale_v;
-extern TBOOLEAN autoscale_lu, autoscale_lv, autoscale_lx,
-    autoscale_ly, autoscale_lz;
 extern double bar_size;
 
 extern struct lp_style_type     border_lp;
@@ -104,10 +102,6 @@ extern char			y2format[];
 
 /* format for date/time for reading time in datafile */
 extern char timefmt[];
-extern int datatype[];
-
-/* do these formats look like printf or time ? */
-extern int format_is_numeric[];
 
 extern char			key_title[];
 extern enum PLOT_STYLE data_style, func_style;
@@ -123,8 +117,10 @@ extern struct lp_style_type 	key_box;  /* linetype round box < -2 = none */
 extern TBOOLEAN			is_log_x, is_log_y, is_log_z;
 extern double			base_log_x, base_log_y, base_log_z;
 				/* base, for computing pow(base,x) */
+#if 0 /* HBB 20000430: doesn't belong to set/show stuff, really */
 extern double			log_base_log_x, log_base_log_y, log_base_log_z;
 				/* log of base, for computing logbase(base,x) */
+#endif /* 0 */
 extern TBOOLEAN			is_log_x2, is_log_y2;
 extern double			base_log_x2, base_log_y2;
 				/* base, for computing pow(base,x) */
@@ -159,7 +155,6 @@ extern label_struct x2label, y2label;
 
 extern int			timelabel_rotate;
 extern int			timelabel_bottom;
-extern int			range_flags[];
 extern double			rmin, rmax;
 extern double			tmin, tmax, umin, umax, vmin, vmax;
 extern double			xmin, xmax, ymin, ymax, zmin, zmax;
@@ -239,7 +234,6 @@ void reset_command __PROTO((void));
 void show_command __PROTO((void));
 /* and some accessible support functions */
 enum PLOT_STYLE get_style __PROTO((void));
-TBOOLEAN load_range __PROTO((int axis, double *a, double *b, TBOOLEAN autosc));
 void show_version __PROTO((FILE *fp));
 char *conv_text __PROTO((const char *s));
 void lp_parse __PROTO((struct lp_style_type *, int, int, int, int));

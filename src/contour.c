@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.10 1999/12/01 22:09:11 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.11 1999/12/10 16:51:28 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -49,7 +49,7 @@ static char *RCSid() { return RCSid("$Id: contour.c,v 1.10 1999/12/01 22:09:11 l
 #include "contour.h"
 
 #include "alloc.h"
-#include "graphics.h"
+#include "axis.h"
 #include "setshow.h"
 
 #define DEFAULT_NUM_APPROX_PTS 5
@@ -241,7 +241,7 @@ double *cont_levels_list;
 	    z = cont_levels_list[0] + i * cont_levels_list[1];
 	    break;
 	case LEVELS_DISCRETE:
-	    z = is_log_z ? log(cont_levels_list[i]) / log_base_log_z : cont_levels_list[i];
+	    z = AXIS_LOG_VALUE(FIRST_Z_AXIS, cont_levels_list[i]);
 	    break;
 	}
 	contour_level = z;
@@ -249,7 +249,7 @@ double *cont_levels_list;
 	gen_contours(p_edges, z, x_min, x_max, y_min, y_max);
 	if (contour_list != save_contour_list) {
 	    contour_list->isNewLevel = 1;
-	    sprintf(contour_list->label, contour_format, is_log_z ? pow(base_log_z, z) : z);
+	    sprintf(contour_list->label, contour_format, AXIS_DE_LOG_VALUE(FIRST_Z_AXIS,z));
 	}
     }
 
@@ -689,9 +689,9 @@ struct edge_struct **p_edges;	/* list of edges output */
  */
 static void
 calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz_max)
-int num_isolines;		/* number of iso-lines input */
-struct iso_curve *iso_lines;	/* iso-lines input */
-double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;	/* min/max values in/out */
+    int num_isolines;		/* number of iso-lines input */
+    struct iso_curve *iso_lines; /* iso-lines input */
+    double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max; /* min/max values in/out */
 {
     int i, j, grid_x_max;
     struct coordinate GPHUGE *vertex;
@@ -723,6 +723,12 @@ double *xx_min, *yy_min, *zz_min, *xx_max, *yy_max, *zz_max;	/* min/max values i
 	}
 	iso_lines = iso_lines->next;
     }
+    /* HBB 20000426: this code didn't take into account that axes might
+     * be logscaled... */
+    axis_unlog_interval(FIRST_X_AXIS, xx_min, xx_max, 0);
+    axis_unlog_interval(FIRST_Y_AXIS, yy_min, yy_max, 0);
+    axis_unlog_interval(FIRST_Z_AXIS, zz_min, zz_max, 0);
+
     /* 
      * fprintf(stderr," x: %g, %g\n", (*xx_min), (*xx_max));
      * fprintf(stderr," y: %g, %g\n", (*yy_min), (*yy_max));

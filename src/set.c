@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.32 2000/03/28 21:28:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.33 2000/05/02 18:21:37 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -43,6 +43,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.32 2000/03/28 21:28:35 lheck
 #include "setshow.h"
 
 #include "alloc.h"
+#include "axis.h"
 #include "command.h"
 #include "gp_time.h"
 #include "hidden3d.h"
@@ -56,6 +57,8 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.32 2000/03/28 21:28:35 lheck
 #ifdef USE_MOUSE
 #   include "mouse.h"
 #endif
+
+#include <ctype.h>		/* for isdigit() */
 
 #define BACKWARDS_COMPATIBLE
 
@@ -86,11 +89,6 @@ TBOOLEAN autoscale_r = DTRUE;
 TBOOLEAN autoscale_t = DTRUE;
 TBOOLEAN autoscale_u = DTRUE;
 TBOOLEAN autoscale_v = DTRUE;
-TBOOLEAN autoscale_lu = DTRUE;
-TBOOLEAN autoscale_lv = DTRUE;
-TBOOLEAN autoscale_lx = DTRUE;
-TBOOLEAN autoscale_ly = DTRUE;
-TBOOLEAN autoscale_lz = DTRUE;
 
 /* set bars */
 double bar_size = 1.0;
@@ -112,16 +110,6 @@ char yformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char zformat[MAX_ID_LEN+1] = DEF_FORMAT;
 char x2format[MAX_ID_LEN+1] = DEF_FORMAT;
 char y2format[MAX_ID_LEN+1] = DEF_FORMAT;
-
-/* do formats look like times - use FIRST_X_AXIS etc as index
- * - never saved or shown ...
- */
-#if AXIS_ARRAY_SIZE != 10
-/* # error error in initialiser for format_is_numeric */
-# define AXIS_ARRAY_SIZE  AXIS_ARRAY_SIZE_not_defined
-#endif
-
-int format_is_numeric[AXIS_ARRAY_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 enum PLOT_STYLE data_style = POINTSTYLE;
 enum PLOT_STYLE func_style = LINES;
@@ -147,11 +135,6 @@ double base_log_y = 0.0;
 double base_log_z = 0.0;
 double base_log_x2 = 0.0;
 double base_log_y2 = 0.0;
-double log_base_log_x = 0.0;
-double log_base_log_y = 0.0;
-double log_base_log_z = 0.0;
-double log_base_log_x2 = 0.0;
-double log_base_log_y2 = 0.0;
 char *outstr = NULL;		/* means "STDOUT" */
 TBOOLEAN parametric = FALSE;
 double pointsize = 1.0;
@@ -250,8 +233,6 @@ TBOOLEAN rotate_ztics = FALSE;
 TBOOLEAN rotate_x2tics = FALSE;
 TBOOLEAN rotate_y2tics = FALSE;
 
-int range_flags[AXIS_ARRAY_SIZE];	/* = {0,0,...} */
-
 int mxtics = MINI_DEFAULT;
 int mytics = MINI_DEFAULT;
 int mztics = MINI_DEFAULT;
@@ -305,12 +286,6 @@ int key_just = JRIGHT;		/* alignment of key labels, left or right */
 #endif
 /* format for date/time for reading time in datafile */
 char timefmt[25] = TIMEFMT;
-
-/* array of datatypes (x in 0,y in 1,z in 2,..(rtuv)) */
-/* not sure how rtuv come into it ?
- * oh well, make first six compatible with FIRST_X_AXIS, etc
- */
-int datatype[DATATYPE_ARRAY_SIZE];
 
 static void set_angles __PROTO((void));
 static void set_arrow __PROTO((void));
@@ -397,10 +372,10 @@ static void set_zeroaxis __PROTO((void));
 static void get_position __PROTO((struct position * pos));
 static void get_position_type __PROTO((enum position_type * type, int *axes));
 static void set_xyzlabel __PROTO((label_struct * label));
-static void load_tics __PROTO((int axis, struct ticdef * tdef));
-static void load_tic_user __PROTO((int axis, struct ticdef * tdef));
+static void load_tics __PROTO((AXIS_INDEX axis, struct ticdef * tdef));
+static void load_tic_user __PROTO((AXIS_INDEX axis, struct ticdef * tdef));
 static void free_marklist __PROTO((struct ticmark * list));
-static void load_tic_series __PROTO((int axis, struct ticdef * tdef));
+static void load_tic_series __PROTO((AXIS_INDEX axis, struct ticdef * tdef));
 static void load_offsets __PROTO((double *a, double *b, double *c, double *d));
 
 static void set_linestyle __PROTO((void));
@@ -411,28 +386,10 @@ static void reset_lp_properties __PROTO((struct lp_style_type *arg));
 static void lp_use_properties __PROTO((struct lp_style_type *lp, int tag, int pointflag));
 
 static int set_tic_prop __PROTO((int *TICS, int *MTICS, double *FREQ,
-     struct ticdef * tdef, int AXIS, TBOOLEAN * ROTATE, const char *tic_side));
+     struct ticdef * tdef, AXIS_INDEX axis, TBOOLEAN * ROTATE, const char *tic_side));
 
 /* Backwards compatibility ... */
 static void set_nolinestyle __PROTO((void));
-
-/* following code segment appears over and over again */
-#define GET_NUM_OR_TIME(store,axis) \
- do { \
-  if (datatype[axis] == TIME && isstring(c_token) ){ \
-   char ss[80]; \
-   struct tm tm; \
-   quote_str(ss,c_token, 80); \
-   ++c_token; \
-   if (gstrptime(ss,timefmt,&tm)) \
-    store = (double) gtimegm(&tm); \
-   else \
-    store = 0; \
-  } else { \
-   struct value value; \
-   store = real(const_express(&value)); \
-  } \
- }while(0)
 
 /******** The 'reset' command ********/
 void
@@ -440,6 +397,7 @@ reset_command()
 {
     register struct curve_points *f_p = first_plot;
     register struct surface_points *f_3dp = first_3dplot;
+    AXIS_INDEX axis;
 
     c_token++;
     first_plot = NULL;
@@ -476,9 +434,11 @@ reset_command()
     strcpy(zformat, DEF_FORMAT);
     strcpy(x2format, DEF_FORMAT);
     strcpy(y2format, DEF_FORMAT);
-    format_is_numeric[FIRST_X_AXIS] = format_is_numeric[SECOND_X_AXIS] = 1;
-    format_is_numeric[FIRST_Y_AXIS] = format_is_numeric[SECOND_Y_AXIS] = 1;
-    format_is_numeric[FIRST_Z_AXIS] = format_is_numeric[SECOND_Z_AXIS] = 1;
+    for (axis=0; axis<AXIS_ARRAY_SIZE; axis++) {
+      format_is_numeric[axis] = 1;
+      axis_is_timedata[axis] = FALSE;
+      range_flags[axis] = 0;
+    }
     autoscale_r = DTRUE;
     autoscale_t = DTRUE;
     autoscale_u = DTRUE;
@@ -488,11 +448,6 @@ reset_command()
     autoscale_z = DTRUE;
     autoscale_x2 = DTRUE;
     autoscale_y2 = DTRUE;
-    autoscale_lu = DTRUE;
-    autoscale_lv = DTRUE;
-    autoscale_lx = DTRUE;
-    autoscale_ly = DTRUE;
-    autoscale_lz = DTRUE;
     boxwidth = -1.0;
     clip_points = FALSE;
     clip_lines1 = TRUE;
@@ -518,11 +473,6 @@ reset_command()
     base_log_z = 0.0;
     base_log_x2 = 0.0;
     base_log_y2 = 0.0;
-    log_base_log_x = 0.0;
-    log_base_log_y = 0.0;
-    log_base_log_z = 0.0;
-    log_base_log_x2 = 0.0;
-    log_base_log_y2 = 0.0;
     parametric = FALSE;
     polar = FALSE;
     hidden3d = FALSE;
@@ -651,16 +601,6 @@ reset_command()
     key_swidth = 4;
     key_vert_factor = 1;
     key_width_fix = 0;
-    datatype[FIRST_X_AXIS] = FALSE;
-    datatype[FIRST_Y_AXIS] = FALSE;
-    datatype[FIRST_Z_AXIS] = FALSE;
-    datatype[SECOND_X_AXIS] = FALSE;
-    datatype[SECOND_Y_AXIS] = FALSE;
-    datatype[SECOND_Z_AXIS] = FALSE;
-    datatype[R_AXIS] = FALSE;
-    datatype[T_AXIS] = FALSE;
-    datatype[U_AXIS] = FALSE;
-    datatype[V_AXIS] = FALSE;
 
     pointsize = 1.0;
     encoding = S_ENC_DEFAULT;
@@ -1954,12 +1894,6 @@ set_keytitle()
 static void
 set_label()
 {
-    set_label_tag(); /* discard return value */
-}
-
-int
-set_label_tag()
-{
     struct value a;
     struct text_label *this_label = NULL;
     struct text_label *new_label = NULL;
@@ -2177,7 +2111,6 @@ set_label_tag()
 	new_label->hoffset = 1.0;
 	new_label->voffset = 1.0;
     }
-    return tag;
 }				/* Entry font added by DJL */
 
 
@@ -2291,7 +2224,8 @@ set_logscale()
     if (END_OF_COMMAND) {
 	is_log_x = is_log_y = is_log_z = is_log_x2 = is_log_y2 = TRUE;
 	base_log_x = base_log_y = base_log_z = base_log_x2 = base_log_y2 = 10.0;
-	log_base_log_x = log_base_log_y = log_base_log_z = log_base_log_x2 = log_base_log_y2 = M_LN10;
+	/* HBB 20000430: these don't belong to set/show: */
+	/* log_base_log_x = log_base_log_y = log_base_log_z = log_base_log_x2 = log_base_log_y2 = M_LN10; */
     } else {
 	TBOOLEAN change_x = FALSE;
 	TBOOLEAN change_y = FALSE;
@@ -2325,27 +2259,29 @@ set_logscale()
 	if (change_x) {
 	    is_log_x = TRUE;
 	    base_log_x = newbase;
-	    log_base_log_x = log_newbase;
+	    /* HBB 20000430 (here and below) :*base_log* variables
+             * don't really belong to set/show stuff */
+	    /*  log_base_log_x = log_newbase; */ 
 	}
 	if (change_y) {
 	    is_log_y = TRUE;
 	    base_log_y = newbase;
-	    log_base_log_y = log_newbase;
+	    /*  log_base_log_y = log_newbase; */
 	}
 	if (change_z) {
 	    is_log_z = TRUE;
 	    base_log_z = newbase;
-	    log_base_log_z = log_newbase;
+	    /*  log_base_log_z = log_newbase; */
 	}
 	if (change_x2) {
 	    is_log_x2 = TRUE;
 	    base_log_x2 = newbase;
-	    log_base_log_x2 = log_newbase;
+	    /*  log_base_log_x2 = log_newbase; */
 	}
 	if (change_y2) {
 	    is_log_y2 = TRUE;
 	    base_log_y2 = newbase;
-	    log_base_log_y2 = log_newbase;
+	    /*  log_base_log_y2 = log_newbase; */
 	}
     }
 }
@@ -3022,28 +2958,25 @@ set_zero()
 
 /* FIXME - merge set_*data() functions into one */
 
+#define PROCESS_AXIS_DATA(AXIS)						 \
+do {									 \
+    c_token++;								 \
+    if(END_OF_COMMAND) {						 \
+	axis_is_timedata[AXIS] = FALSE;					 \
+    } else {								 \
+	if ( (axis_is_timedata[AXIS] = almost_equals(c_token,"t$ime")) ) \
+	    c_token++;							 \
+    }									 \
+} while (0)
+
 /* process 'set xdata' command */
 static void
 set_xdata()
 {
-    c_token++;
-    if(END_OF_COMMAND) {
-	datatype[FIRST_X_AXIS] = FALSE;
-	/* eh ? - t and u have nothing to do with x */
-	datatype[T_AXIS] = FALSE;
-	datatype[U_AXIS] = FALSE;
-    } else {
-	if (almost_equals(c_token,"t$ime")) {
-	    datatype[FIRST_X_AXIS] = TIME;
-	    datatype[T_AXIS] = TIME;
-	    datatype[U_AXIS] = TIME;
-	} else {
-	    datatype[FIRST_X_AXIS] = FALSE;
-	    datatype[T_AXIS] = FALSE;
-	    datatype[U_AXIS] = FALSE;
-	}
-	c_token++;
-    }
+    PROCESS_AXIS_DATA(FIRST_X_AXIS);
+    /* copy 'x' setting to 't' and 'u' axes: */
+    axis_is_timedata[T_AXIS] = axis_is_timedata[U_AXIS] =
+	axis_is_timedata[FIRST_X_AXIS];
 }
 
 
@@ -3051,34 +2984,11 @@ set_xdata()
 static void
 set_ydata()
 {
-    c_token++;
-    if(END_OF_COMMAND) {
-	datatype[FIRST_Y_AXIS] = FALSE;
-	datatype[V_AXIS] = FALSE;
-    } else {
-	if (almost_equals(c_token,"t$ime")) {
-	    datatype[FIRST_Y_AXIS] = TIME;
-	    datatype[V_AXIS] = TIME;
-	} else {
-	    datatype[FIRST_Y_AXIS] = FALSE;
-	    datatype[V_AXIS] = FALSE;
-	}
-	c_token++;
-    }
+    PROCESS_AXIS_DATA(FIRST_Y_AXIS);
+    /* copy 'y' setting to 'v' axis: */
+    axis_is_timedata[V_AXIS] =
+	axis_is_timedata[FIRST_Y_AXIS];
 }
-
-#define PROCESS_AXIS_DATA(AXIS) \
- c_token++; \
- if(END_OF_COMMAND) { \
-  datatype[AXIS] = FALSE; \
- } else { \
-  if (almost_equals(c_token,"t$ime")) { \
-   datatype[AXIS] = TIME; \
-  } else { \
-    datatype[AXIS] = FALSE; \
-  } \
-  c_token++; \
- }
 
 /* process 'set zdata' command */
 static void
@@ -3106,27 +3016,37 @@ set_y2data()
 
 /* FIXME - merge set_*range() functions into one */
 
-#define PROCESS_RANGE(AXIS,MIN,MAX,AUTO) \
-  if(almost_equals(++c_token,"re$store")) { /* ULIG */ \
-    c_token++; \
-    MIN = get_writeback_min(AXIS); \
-    MAX = get_writeback_max(AXIS); \
-    AUTO = 0; \
-  } else { \
-    if (!equals(c_token,"[")) int_error(c_token,"expecting '[' or 'restore'"); \
-    c_token++; \
-    AUTO = load_range(AXIS,&MIN,&MAX,AUTO); \
-    if (!equals(c_token,"]")) int_error(c_token,"expecting ']'"); \
-    c_token++; \
-    if (almost_equals(c_token, "rev$erse")) { \
-      ++c_token; range_flags[AXIS] |= RANGE_REVERSE;\
-    } else if (almost_equals(c_token, "norev$erse")) { \
-      ++c_token; range_flags[AXIS] &= ~RANGE_REVERSE;\
-    } if (almost_equals(c_token, "wr$iteback")) { \
-      ++c_token; range_flags[AXIS] |= RANGE_WRITEBACK;\
-    } else if (almost_equals(c_token, "nowri$teback")) { \
-      ++c_token; range_flags[AXIS] &= ~RANGE_WRITEBACK;\
-  }}
+#define PROCESS_RANGE(AXIS,MIN,MAX,AUTO)			\
+do {								\
+    if(almost_equals(++c_token,"re$store")) { /* ULIG */	\
+	c_token++;						\
+	MIN = get_writeback_min(AXIS);				\
+	MAX = get_writeback_max(AXIS);				\
+	AUTO = 0;						\
+    } else {							\
+	if (!equals(++c_token,"["))				\
+	    int_error(c_token, "expecting '[' or 'restore'");	\
+	c_token++;						\
+	AUTO = load_range(AXIS,&MIN,&MAX,AUTO);			\
+	if (!equals(c_token,"]"))				\
+	    int_error(c_token, "expecting ']'");		\
+	c_token++;						\
+	if (almost_equals(c_token, "rev$erse")) {		\
+	    ++c_token;						\
+	    range_flags[AXIS] |= RANGE_REVERSE;			\
+	} else if (almost_equals(c_token, "norev$erse")) {	\
+	    ++c_token;						\
+	    range_flags[AXIS] &= ~RANGE_REVERSE;		\
+	}							\
+	if (almost_equals(c_token, "wr$iteback")) {		\
+	    ++c_token;						\
+	    range_flags[AXIS] |= RANGE_WRITEBACK;		\
+	} else if (almost_equals(c_token, "nowri$teback")) {	\
+	    ++c_token;						\
+	    range_flags[AXIS] &= ~RANGE_WRITEBACK;		\
+	}							\
+    }								\
+} while (0)
 
 /* process 'set xrange' command */
 static void
@@ -3294,7 +3214,8 @@ set_zeroaxis()
 
 static int
 set_tic_prop(TICS, MTICS, FREQ, tdef, AXIS, ROTATE, tic_side)
-int *TICS, *MTICS, AXIS;
+int *TICS, *MTICS;
+AXIS_INDEX AXIS;
 double *FREQ;
 struct ticdef *tdef;
 TBOOLEAN *ROTATE;
@@ -3633,7 +3554,7 @@ expecting 'lines', 'points', 'linespoints', 'dots', 'impulses',\n\
 /* For set [xy]tics... command */
 static void
 load_tics(axis, tdef)
-int axis;
+AXIS_INDEX axis;
 struct ticdef *tdef;		/* change this ticdef */
 {
     if (equals(c_token, "(")) {	/* set : TIC_USER */
@@ -3651,7 +3572,7 @@ struct ticdef *tdef;		/* change this ticdef */
  */
 static void
 load_tic_user(axis, tdef)
-int axis;
+AXIS_INDEX axis;
 struct ticdef *tdef;
 {
     struct ticmark *list = NULL;	/* start of list */
@@ -3673,7 +3594,7 @@ struct ticdef *tdef;
 
 	/* has a string with it? */
 	if (isstring(c_token) &&
-	    (datatype[axis] != TIME || isstring(c_token + 1))) {
+	    (!axis_is_timedata[axis] || isstring(c_token + 1))) {
 	    quote_str(temp_string, c_token, MAX_LINE_LEN);
 	    tic->label = gp_alloc(strlen(temp_string) + 1, "tic label");
 	    (void) strcpy(tic->label, temp_string);
@@ -3736,7 +3657,7 @@ struct ticmark *list;
 /* [start,]incr[,end] */
 static void
 load_tic_series(axis, tdef)
-int axis;
+AXIS_INDEX axis;
 struct ticdef *tdef;
 {
     double start, incr, end;
@@ -3823,52 +3744,11 @@ double *a, *b, *c, *d;
     *d = real(const_express(&t));	/* boff value */
 }
 
-TBOOLEAN			/* new value for autosc */
-load_range(axis, a, b, autosc)		/* also used by command.c */
-int axis;
-double *a, *b;
-TBOOLEAN autosc;
-{
-    if (equals(c_token, "]"))
-	return (autosc);
-    if (END_OF_COMMAND) {
-	int_error(c_token, "starting range value or ':' or 'to' expected");
-    } else if (!equals(c_token, "to") && !equals(c_token, ":")) {
-	if (equals(c_token, "*")) {
-	    autosc |= 1;
-	    c_token++;
-        } else if (equals(c_token, "?")) { /* ULIG */
-            *a = get_writeback_min(axis);
-            autosc &= 2;
-            c_token++;
-	} else {
-	    GET_NUM_OR_TIME(*a, axis);
-	    autosc &= 2;
-	}
-    }
-    if (!equals(c_token, "to") && !equals(c_token, ":"))
-	int_error(c_token, "':' or keyword 'to' expected");
-    c_token++;
-    if (!equals(c_token, "]")) {
-	if (equals(c_token, "*")) {
-	    autosc |= 2;
-	    c_token++;
-        } else if (equals(c_token, "?")) { /* ULIG */
-            *b = get_writeback_max(axis);
-            autosc &= 1;
-            c_token++;
-	} else {
-	    GET_NUM_OR_TIME(*b, axis);
-	    autosc &= 1;
-	}
-    }
-    return (autosc);
-}
-
 /* return 1 if format looks like a numeric format
  * ie more than one %{efg}, or %something-else
  */
-
+/* FIXME HBB 20000430: as coded, this will only check the *first*
+ * format string, not all of them. */
 static int
 looks_like_numeric(format)
 char *format;
@@ -3876,34 +3756,12 @@ char *format;
     if (!(format = strchr(format, '%')))
 	return 0;
 
-    while (++format, (*format >= '0' && *format <= '9') || *format == '.');
+    while (++format && (isdigit((unsigned char)*format)
+			|| *format == '.'))
+	/* do nothing */;
 
     return (*format == 'f' || *format == 'g' || *format == 'e');
 }
-
-
-/* parse a position of the form
- *    [coords] x, [coords] y {,[coords] z}
- * where coords is one of first,second.graph,screen
- * if first or second, we need to take datatype into account
- * mixed co-ordinates are for specialists, but it's not particularly
- * hard to implement...
- */
-
-#define GET_NUMBER_OR_TIME(store,axes,axis) \
- do { \
-  if (axes >= 0 && datatype[axes+axis] == TIME && isstring(c_token) ) { \
-   char ss[80]; \
-   struct tm tm; \
-   quote_str(ss,c_token, 80); \
-   ++c_token; \
-   if (gstrptime(ss,timefmt,&tm)) \
-    store = (double) gtimegm(&tm); \
-  } else { \
-   struct value value; \
-   store = real(const_express(&value)); \
-  } \
- } while(0)
 
 
 /* get_position_type - for use by get_position().

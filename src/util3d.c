@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.7 1999/11/08 19:24:35 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.8 2000/02/11 19:13:12 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -47,7 +47,7 @@ static char *RCSid() { return RCSid("$Id: util3d.c,v 1.7 1999/11/08 19:24:35 lhe
 
 #include "util3d.h"
 
-#include "graphics.h"
+#include "axis.h"
 #include "hidden3d.h"
 #include "setshow.h"
 #include "util3d.h"
@@ -446,7 +446,6 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey, *ez;		/* the point where it crosses an edge */
 {
-    /* global x_min3d, x_max3d, y_min3d, y_max3d, min3d_z, max3d_z */
     int count;
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
@@ -505,15 +504,15 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	*ez = iz;
 
 	if (ox == -VERYLARGE) {
-	    *ex = x_min3d;
+	    *ex = min_array[FIRST_X_AXIS];
 	    return;
 	}
 	if (oy == -VERYLARGE) {
-	    *ey = y_min3d;
+	    *ey = min_array[FIRST_Y_AXIS];
 	    return;
 	}
 	/* obviously oz is -VERYLARGE and (ox != -VERYLARGE && oy != -VERYLARGE) */
-	*ez = min3d_z;
+	*ez = min_array[FIRST_Z_AXIS];
 	return;
     }
     /*
@@ -524,14 +523,14 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	if (iy == oy) {
 	    /* line parallel to z axis */
 
-	    /* assume inrange(iy, y_min3d, y_max3d) && inrange(ix, x_min3d, x_max3d) */
+	    /* assume inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) && inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) */
 	    *ex = ix;		/* == ox */
 	    *ey = iy;		/* == oy */
 
-	    if (inrange(max3d_z, iz, oz))
-		*ez = max3d_z;
-	    else if (inrange(min3d_z, iz, oz))
-		*ez = min3d_z;
+	    if (inrange(max_array[FIRST_Z_AXIS], iz, oz))
+		*ez = max_array[FIRST_Z_AXIS];
+	    else if (inrange(min_array[FIRST_Z_AXIS], iz, oz))
+		*ez = min_array[FIRST_Z_AXIS];
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
@@ -541,14 +540,14 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	if (iz == oz) {
 	    /* line parallel to y axis */
 
-	    /* assume inrange(iz, min3d_z, max3d_z) && inrange(ix, x_min3d, x_max3d) */
+	    /* assume inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS]) && inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) */
 	    *ex = ix;		/* == ox */
 	    *ez = iz;		/* == oz */
 
-	    if (inrange(y_max3d, iy, oy))
-		*ey = y_max3d;
-	    else if (inrange(y_min3d, iy, oy))
-		*ey = y_min3d;
+	    if (inrange(max_array[FIRST_Y_AXIS], iy, oy))
+		*ey = max_array[FIRST_Y_AXIS];
+	    else if (inrange(min_array[FIRST_Y_AXIS], iy, oy))
+		*ey = min_array[FIRST_Y_AXIS];
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
@@ -557,43 +556,43 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	}
 	/* nasty 2D slanted line in a yz plane */
 
-	/* does it intersect y_min3d edge */
-	if (inrange(y_min3d, iy, oy) && y_min3d != iy && y_min3d != oy) {
-	    z = iz + (y_min3d - iy) * ((oz - iz) / (oy - iy));
-	    if (inrange(z, min3d_z, max3d_z)) {
+	/* does it intersect min_array[FIRST_Y_AXIS] edge */
+	if (inrange(min_array[FIRST_Y_AXIS], iy, oy) && min_array[FIRST_Y_AXIS] != iy && min_array[FIRST_Y_AXIS] != oy) {
+	    z = iz + (min_array[FIRST_Y_AXIS] - iy) * ((oz - iz) / (oy - iy));
+	    if (inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 		*ex = ix;
-		*ey = y_min3d;
+		*ey = min_array[FIRST_Y_AXIS];
 		*ez = z;
 		return;
 	    }
 	}
-	/* does it intersect y_max3d edge */
-	if (inrange(y_max3d, iy, oy) && y_max3d != iy && y_max3d != oy) {
-	    z = iz + (y_max3d - iy) * ((oz - iz) / (oy - iy));
-	    if (inrange(z, min3d_z, max3d_z)) {
+	/* does it intersect max_array[FIRST_Y_AXIS] edge */
+	if (inrange(max_array[FIRST_Y_AXIS], iy, oy) && max_array[FIRST_Y_AXIS] != iy && max_array[FIRST_Y_AXIS] != oy) {
+	    z = iz + (max_array[FIRST_Y_AXIS] - iy) * ((oz - iz) / (oy - iy));
+	    if (inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 		*ex = ix;
-		*ey = y_max3d;
+		*ey = max_array[FIRST_Y_AXIS];
 		*ez = z;
 		return;
 	    }
 	}
-	/* does it intersect min3d_z edge */
-	if (inrange(min3d_z, iz, oz) && min3d_z != iz && min3d_z != oz) {
-	    y = iy + (min3d_z - iz) * ((oy - iy) / (oz - iz));
-	    if (inrange(y, y_min3d, y_max3d)) {
+	/* does it intersect min_array[FIRST_Z_AXIS] edge */
+	if (inrange(min_array[FIRST_Z_AXIS], iz, oz) && min_array[FIRST_Z_AXIS] != iz && min_array[FIRST_Z_AXIS] != oz) {
+	    y = iy + (min_array[FIRST_Z_AXIS] - iz) * ((oy - iy) / (oz - iz));
+	    if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 		*ex = ix;
 		*ey = y;
-		*ez = min3d_z;
+		*ez = min_array[FIRST_Z_AXIS];
 		return;
 	    }
 	}
-	/* does it intersect max3d_z edge */
-	if (inrange(max3d_z, iz, oz) && max3d_z != iz && max3d_z != oz) {
-	    y = iy + (max3d_z - iz) * ((oy - iy) / (oz - iz));
-	    if (inrange(y, y_min3d, y_max3d)) {
+	/* does it intersect max_array[FIRST_Z_AXIS] edge */
+	if (inrange(max_array[FIRST_Z_AXIS], iz, oz) && max_array[FIRST_Z_AXIS] != iz && max_array[FIRST_Z_AXIS] != oz) {
+	    y = iy + (max_array[FIRST_Z_AXIS] - iz) * ((oy - iy) / (oz - iz));
+	    if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 		*ex = ix;
 		*ey = y;
-		*ez = max3d_z;
+		*ez = max_array[FIRST_Z_AXIS];
 		return;
 	    }
 	}
@@ -603,14 +602,14 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	if (oz == iz) {
 	    /* line parallel to x axis */
 
-	    /* assume inrange(iz, min3d_z, max3d_z) && inrange(iy, y_min3d, y_max3d) */
+	    /* assume inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS]) && inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) */
 	    *ey = iy;		/* == oy */
 	    *ez = iz;		/* == oz */
 
-	    if (inrange(x_max3d, ix, ox))
-		*ex = x_max3d;
-	    else if (inrange(x_min3d, ix, ox))
-		*ex = x_min3d;
+	    if (inrange(max_array[FIRST_X_AXIS], ix, ox))
+		*ex = max_array[FIRST_X_AXIS];
+	    else if (inrange(min_array[FIRST_X_AXIS], ix, ox))
+		*ex = min_array[FIRST_X_AXIS];
 	    else {
 		graph_error("error in edge3d_intersect");
 	    }
@@ -619,43 +618,43 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 	}
 	/* nasty 2D slanted line in an xz plane */
 
-	/* does it intersect x_min3d edge */
-	if (inrange(x_min3d, ix, ox) && x_min3d != ix && x_min3d != ox) {
-	    z = iz + (x_min3d - ix) * ((oz - iz) / (ox - ix));
-	    if (inrange(z, min3d_z, max3d_z)) {
-		*ex = x_min3d;
+	/* does it intersect min_array[FIRST_X_AXIS] edge */
+	if (inrange(min_array[FIRST_X_AXIS], ix, ox) && min_array[FIRST_X_AXIS] != ix && min_array[FIRST_X_AXIS] != ox) {
+	    z = iz + (min_array[FIRST_X_AXIS] - ix) * ((oz - iz) / (ox - ix));
+	    if (inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+		*ex = min_array[FIRST_X_AXIS];
 		*ey = iy;
 		*ez = z;
 		return;
 	    }
 	}
-	/* does it intersect x_max3d edge */
-	if (inrange(x_max3d, ix, ox) && x_max3d != ix && x_max3d != ox) {
-	    z = iz + (x_max3d - ix) * ((oz - iz) / (ox - ix));
-	    if (inrange(z, min3d_z, max3d_z)) {
-		*ex = x_max3d;
+	/* does it intersect max_array[FIRST_X_AXIS] edge */
+	if (inrange(max_array[FIRST_X_AXIS], ix, ox) && max_array[FIRST_X_AXIS] != ix && max_array[FIRST_X_AXIS] != ox) {
+	    z = iz + (max_array[FIRST_X_AXIS] - ix) * ((oz - iz) / (ox - ix));
+	    if (inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+		*ex = max_array[FIRST_X_AXIS];
 		*ey = iy;
 		*ez = z;
 		return;
 	    }
 	}
-	/* does it intersect min3d_z edge */
-	if (inrange(min3d_z, iz, oz) && min3d_z != iz && min3d_z != oz) {
-	    x = ix + (min3d_z - iz) * ((ox - ix) / (oz - iz));
-	    if (inrange(x, x_min3d, x_max3d)) {
+	/* does it intersect min_array[FIRST_Z_AXIS] edge */
+	if (inrange(min_array[FIRST_Z_AXIS], iz, oz) && min_array[FIRST_Z_AXIS] != iz && min_array[FIRST_Z_AXIS] != oz) {
+	    x = ix + (min_array[FIRST_Z_AXIS] - iz) * ((ox - ix) / (oz - iz));
+	    if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS])) {
 		*ex = x;
 		*ey = iy;
-		*ez = min3d_z;
+		*ez = min_array[FIRST_Z_AXIS];
 		return;
 	    }
 	}
-	/* does it intersect max3d_z edge */
-	if (inrange(max3d_z, iz, oz) && max3d_z != iz && max3d_z != oz) {
-	    x = ix + (max3d_z - iz) * ((ox - ix) / (oz - iz));
-	    if (inrange(x, x_min3d, x_max3d)) {
+	/* does it intersect max_array[FIRST_Z_AXIS] edge */
+	if (inrange(max_array[FIRST_Z_AXIS], iz, oz) && max_array[FIRST_Z_AXIS] != iz && max_array[FIRST_Z_AXIS] != oz) {
+	    x = ix + (max_array[FIRST_Z_AXIS] - iz) * ((ox - ix) / (oz - iz));
+	    if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS])) {
 		*ex = x;
 		*ey = iy;
-		*ez = max3d_z;
+		*ez = max_array[FIRST_Z_AXIS];
 		return;
 	    }
 	}
@@ -665,44 +664,44 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
 
 	/* nasty 2D slanted line in an xy plane */
 
-	/* assume inrange(oz, min3d_z, max3d_z) */
+	/* assume inrange(oz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS]) */
 
-	/* does it intersect x_min3d edge */
-	if (inrange(x_min3d, ix, ox) && x_min3d != ix && x_min3d != ox) {
-	    y = iy + (x_min3d - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, y_min3d, y_max3d)) {
-		*ex = x_min3d;
+	/* does it intersect min_array[FIRST_X_AXIS] edge */
+	if (inrange(min_array[FIRST_X_AXIS], ix, ox) && min_array[FIRST_X_AXIS] != ix && min_array[FIRST_X_AXIS] != ox) {
+	    y = iy + (min_array[FIRST_X_AXIS] - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
+		*ex = min_array[FIRST_X_AXIS];
 		*ey = y;
 		*ez = iz;
 		return;
 	    }
 	}
-	/* does it intersect x_max3d edge */
-	if (inrange(x_max3d, ix, ox) && x_max3d != ix && x_max3d != ox) {
-	    y = iy + (x_max3d - ix) * ((oy - iy) / (ox - ix));
-	    if (inrange(y, y_min3d, y_max3d)) {
-		*ex = x_max3d;
+	/* does it intersect max_array[FIRST_X_AXIS] edge */
+	if (inrange(max_array[FIRST_X_AXIS], ix, ox) && max_array[FIRST_X_AXIS] != ix && max_array[FIRST_X_AXIS] != ox) {
+	    y = iy + (max_array[FIRST_X_AXIS] - ix) * ((oy - iy) / (ox - ix));
+	    if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
+		*ex = max_array[FIRST_X_AXIS];
 		*ey = y;
 		*ez = iz;
 		return;
 	    }
 	}
-	/* does it intersect y_min3d edge */
-	if (inrange(y_min3d, iy, oy) && y_min3d != iy && y_min3d != oy) {
-	    x = ix + (y_min3d - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, x_min3d, x_max3d)) {
+	/* does it intersect min_array[FIRST_Y_AXIS] edge */
+	if (inrange(min_array[FIRST_Y_AXIS], iy, oy) && min_array[FIRST_Y_AXIS] != iy && min_array[FIRST_Y_AXIS] != oy) {
+	    x = ix + (min_array[FIRST_Y_AXIS] - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS])) {
 		*ex = x;
-		*ey = y_min3d;
+		*ey = min_array[FIRST_Y_AXIS];
 		*ez = iz;
 		return;
 	    }
 	}
-	/* does it intersect y_max3d edge */
-	if (inrange(y_max3d, iy, oy) && y_max3d != iy && y_max3d != oy) {
-	    x = ix + (y_max3d - iy) * ((ox - ix) / (oy - iy));
-	    if (inrange(x, x_min3d, x_max3d)) {
+	/* does it intersect max_array[FIRST_Y_AXIS] edge */
+	if (inrange(max_array[FIRST_Y_AXIS], iy, oy) && max_array[FIRST_Y_AXIS] != iy && max_array[FIRST_Y_AXIS] != oy) {
+	    x = ix + (max_array[FIRST_Y_AXIS] - iy) * ((ox - ix) / (oy - iy));
+	    if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS])) {
 		*ex = x;
-		*ey = y_max3d;
+		*ey = max_array[FIRST_Y_AXIS];
 		*ez = iz;
 		return;
 	    }
@@ -710,69 +709,69 @@ double *ex, *ey, *ez;		/* the point where it crosses an edge */
     }
     /* really nasty general slanted 3D case */
 
-    /* does it intersect x_min3d edge */
-    if (inrange(x_min3d, ix, ox) && x_min3d != ix && x_min3d != ox) {
-	y = iy + (x_min3d - ix) * ((oy - iy) / (ox - ix));
-	z = iz + (x_min3d - ix) * ((oz - iz) / (ox - ix));
-	if (inrange(y, y_min3d, y_max3d) && inrange(z, min3d_z, max3d_z)) {
-	    *ex = x_min3d;
+    /* does it intersect min_array[FIRST_X_AXIS] edge */
+    if (inrange(min_array[FIRST_X_AXIS], ix, ox) && min_array[FIRST_X_AXIS] != ix && min_array[FIRST_X_AXIS] != ox) {
+	y = iy + (min_array[FIRST_X_AXIS] - ix) * ((oy - iy) / (ox - ix));
+	z = iz + (min_array[FIRST_X_AXIS] - ix) * ((oz - iz) / (ox - ix));
+	if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) && inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+	    *ex = min_array[FIRST_X_AXIS];
 	    *ey = y;
 	    *ez = z;
 	    return;
 	}
     }
-    /* does it intersect x_max3d edge */
-    if (inrange(x_max3d, ix, ox) && x_max3d != ix && x_max3d != ox) {
-	y = iy + (x_max3d - ix) * ((oy - iy) / (ox - ix));
-	z = iz + (x_max3d - ix) * ((oz - iz) / (ox - ix));
-	if (inrange(y, y_min3d, y_max3d) && inrange(z, min3d_z, max3d_z)) {
-	    *ex = x_max3d;
+    /* does it intersect max_array[FIRST_X_AXIS] edge */
+    if (inrange(max_array[FIRST_X_AXIS], ix, ox) && max_array[FIRST_X_AXIS] != ix && max_array[FIRST_X_AXIS] != ox) {
+	y = iy + (max_array[FIRST_X_AXIS] - ix) * ((oy - iy) / (ox - ix));
+	z = iz + (max_array[FIRST_X_AXIS] - ix) * ((oz - iz) / (ox - ix));
+	if (inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) && inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+	    *ex = max_array[FIRST_X_AXIS];
 	    *ey = y;
 	    *ez = z;
 	    return;
 	}
     }
-    /* does it intersect y_min3d edge */
-    if (inrange(y_min3d, iy, oy) && y_min3d != iy && y_min3d != oy) {
-	x = ix + (y_min3d - iy) * ((ox - ix) / (oy - iy));
-	z = iz + (y_min3d - iy) * ((oz - iz) / (oy - iy));
-	if (inrange(x, x_min3d, x_max3d) && inrange(z, min3d_z, max3d_z)) {
+    /* does it intersect min_array[FIRST_Y_AXIS] edge */
+    if (inrange(min_array[FIRST_Y_AXIS], iy, oy) && min_array[FIRST_Y_AXIS] != iy && min_array[FIRST_Y_AXIS] != oy) {
+	x = ix + (min_array[FIRST_Y_AXIS] - iy) * ((ox - ix) / (oy - iy));
+	z = iz + (min_array[FIRST_Y_AXIS] - iy) * ((oz - iz) / (oy - iy));
+	if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	    *ex = x;
-	    *ey = y_min3d;
+	    *ey = min_array[FIRST_Y_AXIS];
 	    *ez = z;
 	    return;
 	}
     }
-    /* does it intersect y_max3d edge */
-    if (inrange(y_max3d, iy, oy) && y_max3d != iy && y_max3d != oy) {
-	x = ix + (y_max3d - iy) * ((ox - ix) / (oy - iy));
-	z = iz + (y_max3d - iy) * ((oz - iz) / (oy - iy));
-	if (inrange(x, x_min3d, x_max3d) && inrange(z, min3d_z, max3d_z)) {
+    /* does it intersect max_array[FIRST_Y_AXIS] edge */
+    if (inrange(max_array[FIRST_Y_AXIS], iy, oy) && max_array[FIRST_Y_AXIS] != iy && max_array[FIRST_Y_AXIS] != oy) {
+	x = ix + (max_array[FIRST_Y_AXIS] - iy) * ((ox - ix) / (oy - iy));
+	z = iz + (max_array[FIRST_Y_AXIS] - iy) * ((oz - iz) / (oy - iy));
+	if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(z, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	    *ex = x;
-	    *ey = y_max3d;
+	    *ey = max_array[FIRST_Y_AXIS];
 	    *ez = z;
 	    return;
 	}
     }
-    /* does it intersect min3d_z edge */
-    if (inrange(min3d_z, iz, oz) && min3d_z != iz && min3d_z != oz) {
-	x = ix + (min3d_z - iz) * ((ox - ix) / (oz - iz));
-	y = iy + (min3d_z - iz) * ((oy - iy) / (oz - iz));
-	if (inrange(x, x_min3d, x_max3d) && inrange(y, y_min3d, y_max3d)) {
+    /* does it intersect min_array[FIRST_Z_AXIS] edge */
+    if (inrange(min_array[FIRST_Z_AXIS], iz, oz) && min_array[FIRST_Z_AXIS] != iz && min_array[FIRST_Z_AXIS] != oz) {
+	x = ix + (min_array[FIRST_Z_AXIS] - iz) * ((ox - ix) / (oz - iz));
+	y = iy + (min_array[FIRST_Z_AXIS] - iz) * ((oy - iy) / (oz - iz));
+	if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 	    *ex = x;
 	    *ey = y;
-	    *ez = min3d_z;
+	    *ez = min_array[FIRST_Z_AXIS];
 	    return;
 	}
     }
-    /* does it intersect max3d_z edge */
-    if (inrange(max3d_z, iz, oz) && max3d_z != iz && max3d_z != oz) {
-	x = ix + (max3d_z - iz) * ((ox - ix) / (oz - iz));
-	y = iy + (max3d_z - iz) * ((oy - iy) / (oz - iz));
-	if (inrange(x, x_min3d, x_max3d) && inrange(y, y_min3d, y_max3d)) {
+    /* does it intersect max_array[FIRST_Z_AXIS] edge */
+    if (inrange(max_array[FIRST_Z_AXIS], iz, oz) && max_array[FIRST_Z_AXIS] != iz && max_array[FIRST_Z_AXIS] != oz) {
+	x = ix + (max_array[FIRST_Z_AXIS] - iz) * ((ox - ix) / (oz - iz));
+	y = iy + (max_array[FIRST_Z_AXIS] - iz) * ((oy - iy) / (oz - iz));
+	if (inrange(x, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(y, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 	    *ex = x;
 	    *ey = y;
-	    *ez = max3d_z;
+	    *ez = max_array[FIRST_Z_AXIS];
 	    return;
 	}
     }
@@ -805,7 +804,7 @@ int i;				/* line segment from point i-1 to point i */
 double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 {
     int count;
-    /* global x_min3d, x_max3d, y_min3d, y_max3d, min3d_z, max3d_z */
+    /* global min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS], min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS], min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS] */
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
     double iz = points[i - 1].z;
@@ -856,12 +855,12 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (ix > x_max3d && inrange(iy, y_min3d, y_max3d) && inrange(iz, min3d_z, max3d_z)) {
-	    lx[0] = x_min3d;
+	if (ix > max_array[FIRST_X_AXIS] && inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) && inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
+	    lx[0] = min_array[FIRST_X_AXIS];
 	    ly[0] = iy;
 	    lz[0] = iz;
 
-	    lx[1] = x_max3d;
+	    lx[1] = max_array[FIRST_X_AXIS];
 	    ly[1] = iy;
 	    lz[1] = iz;
 
@@ -884,13 +883,13 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (iy > y_max3d && inrange(ix, x_min3d, x_max3d) && inrange(iz, min3d_z, max3d_z)) {
+	if (iy > max_array[FIRST_Y_AXIS] && inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	    lx[0] = ix;
-	    ly[0] = y_min3d;
+	    ly[0] = min_array[FIRST_Y_AXIS];
 	    lz[0] = iz;
 
 	    lx[1] = ix;
-	    ly[1] = y_max3d;
+	    ly[1] = max_array[FIRST_Y_AXIS];
 	    lz[1] = iz;
 
 	    return (TRUE);
@@ -912,14 +911,14 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	    oz = z;
 	}
 	/* check actually passes through the 3D graph volume */
-	if (iz > max3d_z && inrange(ix, x_min3d, x_max3d) && inrange(iy, y_min3d, y_max3d)) {
+	if (iz > max_array[FIRST_Z_AXIS] && inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) && inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 	    lx[0] = ix;
 	    ly[0] = iy;
-	    lz[0] = min3d_z;
+	    lz[0] = min_array[FIRST_Z_AXIS];
 
 	    lx[1] = ix;
 	    ly[1] = iy;
-	    lz[1] = max3d_z;
+	    lz[1] = max_array[FIRST_Z_AXIS];
 
 	    return (TRUE);
 	} else {
@@ -932,15 +931,15 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 
     /* 
      * test z coord first --- most surface OUTRANGE points generated between
-     * min3d_z and z_min3d (i.e. when ticslevel is non-zero)
+     * min_array[FIRST_Z_AXIS] and min_array[FIRST_Z_AXIS] (i.e. when ticslevel is non-zero)
      */
-    if (GPMAX(iz, oz) < min3d_z || GPMIN(iz, oz) > max3d_z)
+    if (GPMAX(iz, oz) < min_array[FIRST_Z_AXIS] || GPMIN(iz, oz) > max_array[FIRST_Z_AXIS])
 	return (FALSE);
 
-    if (GPMAX(ix, ox) < x_min3d || GPMIN(ix, ox) > x_max3d)
+    if (GPMAX(ix, ox) < min_array[FIRST_X_AXIS] || GPMIN(ix, ox) > max_array[FIRST_X_AXIS])
 	return (FALSE);
 
-    if (GPMAX(iy, oy) < y_min3d || GPMIN(iy, oy) > y_max3d)
+    if (GPMAX(iy, oy) < min_array[FIRST_Y_AXIS] || GPMIN(iy, oy) > max_array[FIRST_Y_AXIS])
 	return (FALSE);
 
     /*
@@ -965,19 +964,19 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	if (iy == oy) {
 	    /* line parallel to z axis */
 
-	    /* x and y coords must be in range, and line must span both min3d_z and max3d_z */
-	    /* note that spanning min3d_z implies spanning max3d_z as both points OUTRANGE */
-	    if (!inrange(ix, x_min3d, x_max3d) || !inrange(iy, y_min3d, y_max3d)) {
+	    /* x and y coords must be in range, and line must span both min_array[FIRST_Z_AXIS] and max_array[FIRST_Z_AXIS] */
+	    /* note that spanning min_array[FIRST_Z_AXIS] implies spanning max_array[FIRST_Z_AXIS] as both points OUTRANGE */
+	    if (!inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) || !inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 		return (FALSE);
 	    }
-	    if (inrange(min3d_z, iz, oz)) {
+	    if (inrange(min_array[FIRST_Z_AXIS], iz, oz)) {
 		lx[0] = ix;
 		ly[0] = iy;
-		lz[0] = min3d_z;
+		lz[0] = min_array[FIRST_Z_AXIS];
 
 		lx[1] = ix;
 		ly[1] = iy;
-		lz[1] = max3d_z;
+		lz[1] = max_array[FIRST_Z_AXIS];
 
 		return (TRUE);
 	    } else
@@ -986,18 +985,18 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	if (iz == oz) {
 	    /* line parallel to y axis */
 
-	    /* x and z coords must be in range, and line must span both y_min3d and y_max3d */
-	    /* note that spanning y_min3d implies spanning y_max3d, as both points OUTRANGE */
-	    if (!inrange(ix, x_min3d, x_max3d) || !inrange(iz, min3d_z, max3d_z)) {
+	    /* x and z coords must be in range, and line must span both min_array[FIRST_Y_AXIS] and max_array[FIRST_Y_AXIS] */
+	    /* note that spanning min_array[FIRST_Y_AXIS] implies spanning max_array[FIRST_Y_AXIS], as both points OUTRANGE */
+	    if (!inrange(ix, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) || !inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 		return (FALSE);
 	    }
-	    if (inrange(y_min3d, iy, oy)) {
+	    if (inrange(min_array[FIRST_Y_AXIS], iy, oy)) {
 		lx[0] = ix;
-		ly[0] = y_min3d;
+		ly[0] = min_array[FIRST_Y_AXIS];
 		lz[0] = iz;
 
 		lx[1] = ix;
-		ly[1] = y_max3d;
+		ly[1] = max_array[FIRST_Y_AXIS];
 		lz[1] = iz;
 
 		return (TRUE);
@@ -1006,19 +1005,19 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	}
 	/* nasty 2D slanted line in a yz plane */
 
-	if (!inrange(ox, x_min3d, x_max3d))
+	if (!inrange(ox, min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]))
 	    return (FALSE);
 
-	t[0] = (y_min3d - iy) / (oy - iy);
-	t[1] = (y_max3d - iy) / (oy - iy);
+	t[0] = (min_array[FIRST_Y_AXIS] - iy) / (oy - iy);
+	t[1] = (max_array[FIRST_Y_AXIS] - iy) / (oy - iy);
 
 	if (t[0] > t[1]) {
 	    swap = t[0];
 	    t[0] = t[1];
 	    t[1] = swap;
 	}
-	t[2] = (min3d_z - iz) / (oz - iz);
-	t[3] = (max3d_z - iz) / (oz - iz);
+	t[2] = (min_array[FIRST_Z_AXIS] - iz) / (oz - iz);
+	t[3] = (max_array[FIRST_Z_AXIS] - iz) / (oz - iz);
 
 	if (t[2] > t[3]) {
 	    swap = t[2];
@@ -1042,8 +1041,8 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	/*
 	 * Can only have 0 or 2 intersection points -- only need test one coord
 	 */
-	if (inrange(ly[0], y_min3d, y_max3d) &&
-	    inrange(lz[0], min3d_z, max3d_z)) {
+	if (inrange(ly[0], min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) &&
+	    inrange(lz[0], min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	    return (TRUE);
 	}
 	return (FALSE);
@@ -1053,17 +1052,17 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	if (oz == iz) {
 	    /* line parallel to x axis */
 
-	    /* y and z coords must be in range, and line must span both x_min3d and x_max3d */
-	    /* note that spanning x_min3d implies spanning x_max3d, as both points OUTRANGE */
-	    if (!inrange(iy, y_min3d, y_max3d) || !inrange(iz, min3d_z, max3d_z)) {
+	    /* y and z coords must be in range, and line must span both min_array[FIRST_X_AXIS] and max_array[FIRST_X_AXIS] */
+	    /* note that spanning min_array[FIRST_X_AXIS] implies spanning max_array[FIRST_X_AXIS], as both points OUTRANGE */
+	    if (!inrange(iy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) || !inrange(iz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 		return (FALSE);
 	    }
-	    if (inrange(x_min3d, ix, ox)) {
-		lx[0] = x_min3d;
+	    if (inrange(min_array[FIRST_X_AXIS], ix, ox)) {
+		lx[0] = min_array[FIRST_X_AXIS];
 		ly[0] = iy;
 		lz[0] = iz;
 
-		lx[1] = x_max3d;
+		lx[1] = max_array[FIRST_X_AXIS];
 		ly[1] = iy;
 		lz[1] = iz;
 
@@ -1073,19 +1072,19 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	}
 	/* nasty 2D slanted line in an xz plane */
 
-	if (!inrange(oy, y_min3d, y_max3d))
+	if (!inrange(oy, min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]))
 	    return (FALSE);
 
-	t[0] = (x_min3d - ix) / (ox - ix);
-	t[1] = (x_max3d - ix) / (ox - ix);
+	t[0] = (min_array[FIRST_X_AXIS] - ix) / (ox - ix);
+	t[1] = (max_array[FIRST_X_AXIS] - ix) / (ox - ix);
 
 	if (t[0] > t[1]) {
 	    swap = t[0];
 	    t[0] = t[1];
 	    t[1] = swap;
 	}
-	t[2] = (min3d_z - iz) / (oz - iz);
-	t[3] = (max3d_z - iz) / (oz - iz);
+	t[2] = (min_array[FIRST_Z_AXIS] - iz) / (oz - iz);
+	t[3] = (max_array[FIRST_Z_AXIS] - iz) / (oz - iz);
 
 	if (t[2] > t[3]) {
 	    swap = t[2];
@@ -1109,8 +1108,8 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	/*
 	 * Can only have 0 or 2 intersection points -- only need test one coord
 	 */
-	if (inrange(lx[0], x_min3d, x_max3d) &&
-	    inrange(lz[0], min3d_z, max3d_z)) {
+	if (inrange(lx[0], min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) &&
+	    inrange(lz[0], min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	    return (TRUE);
 	}
 	return (FALSE);
@@ -1120,19 +1119,19 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 
 	/* nasty 2D slanted line in an xy plane */
 
-	if (!inrange(oz, min3d_z, max3d_z))
+	if (!inrange(oz, min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS]))
 	    return (FALSE);
 
-	t[0] = (x_min3d - ix) / (ox - ix);
-	t[1] = (x_max3d - ix) / (ox - ix);
+	t[0] = (min_array[FIRST_X_AXIS] - ix) / (ox - ix);
+	t[1] = (max_array[FIRST_X_AXIS] - ix) / (ox - ix);
 
 	if (t[0] > t[1]) {
 	    swap = t[0];
 	    t[0] = t[1];
 	    t[1] = swap;
 	}
-	t[2] = (y_min3d - iy) / (oy - iy);
-	t[3] = (y_max3d - iy) / (oy - iy);
+	t[2] = (min_array[FIRST_Y_AXIS] - iy) / (oy - iy);
+	t[3] = (max_array[FIRST_Y_AXIS] - iy) / (oy - iy);
 
 	if (t[2] > t[3]) {
 	    swap = t[2];
@@ -1156,8 +1155,8 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
 	/*
 	 * Can only have 0 or 2 intersection points -- only need test one coord
 	 */
-	if (inrange(lx[0], x_min3d, x_max3d) &&
-	    inrange(ly[0], y_min3d, y_max3d)) {
+	if (inrange(lx[0], min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) &&
+	    inrange(ly[0], min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS])) {
 	    return (TRUE);
 	}
 	return (FALSE);
@@ -1176,24 +1175,24 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
        diff_z = (oz - iz);
      */
 
-    t[0] = (x_min3d - ix) / (ox - ix);
-    t[1] = (x_max3d - ix) / (ox - ix);
+    t[0] = (min_array[FIRST_X_AXIS] - ix) / (ox - ix);
+    t[1] = (max_array[FIRST_X_AXIS] - ix) / (ox - ix);
 
     if (t[0] > t[1]) {
 	swap = t[0];
 	t[0] = t[1];
 	t[1] = swap;
     }
-    t[2] = (y_min3d - iy) / (oy - iy);
-    t[3] = (y_max3d - iy) / (oy - iy);
+    t[2] = (min_array[FIRST_Y_AXIS] - iy) / (oy - iy);
+    t[3] = (max_array[FIRST_Y_AXIS] - iy) / (oy - iy);
 
     if (t[2] > t[3]) {
 	swap = t[2];
 	t[2] = t[3];
 	t[3] = swap;
     }
-    t[4] = (iz == oz) ? 0.0 : (min3d_z - iz) / (oz - iz);
-    t[5] = (iz == oz) ? 1.0 : (max3d_z - iz) / (oz - iz);
+    t[4] = (iz == oz) ? 0.0 : (min_array[FIRST_Z_AXIS] - iz) / (oz - iz);
+    t[5] = (iz == oz) ? 1.0 : (max_array[FIRST_Z_AXIS] - iz) / (oz - iz);
 
     if (t[4] > t[5]) {
 	swap = t[4];
@@ -1217,9 +1216,9 @@ double *lx, *ly, *lz;		/* lx[2], ly[2], lz[2]: points where it crosses edges */
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
-    if (inrange(lx[0], x_min3d, x_max3d) &&
-	inrange(ly[0], y_min3d, y_max3d) &&
-	inrange(lz[0], min3d_z, max3d_z)) {
+    if (inrange(lx[0], min_array[FIRST_X_AXIS], max_array[FIRST_X_AXIS]) &&
+	inrange(ly[0], min_array[FIRST_Y_AXIS], max_array[FIRST_Y_AXIS]) &&
+	inrange(lz[0], min_array[FIRST_Z_AXIS], max_array[FIRST_Z_AXIS])) {
 	return (TRUE);
     }
     return (FALSE);

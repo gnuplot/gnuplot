@@ -1,5 +1,5 @@
 /*
- * $Id: linux.trm,v 1.14 1999/06/22 11:54:19 lhecking Exp $
+ * $Id: linux.trm,v 1.15 1999/11/08 19:25:28 lhecking Exp $
  *
  */
 
@@ -101,7 +101,7 @@ static int LINUX_graphics_allowed;
 extern void drop_privilege();
 extern void take_privilege();
 
-typedef (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
+typedef int (*linux_line_func_ptr) __PROTO((int x1, int y1, int x2, int y2));
 
 static void LINUX_putc __PROTO((unsigned int x, unsigned int y, int c, int ang,
 				linux_line_func_ptr line_func));

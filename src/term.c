@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.4 2000/01/20 20:46:44 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.23 2000/02/11 19:17:20 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -77,6 +77,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.4 2000/01/20 20:46:44 joze 
 #include "term_api.h"
 
 #include "alloc.h"
+#include "axis.h"
 #include "bitmap.h"
 #include "command.h"
 #include "driver.h"
@@ -209,7 +210,7 @@ int aesid = -1;
  */
 
 #if defined(PIPES)
-static TBOOLEAN pipe_open = FALSE;
+static TBOOLEAN output_pipe_open = FALSE;
 #endif /* PIPES */
 
 static void
@@ -223,9 +224,9 @@ term_close_output()
 	return;
 
 #if defined(PIPES)
-    if (pipe_open) {
+    if (output_pipe_open) {
 	(void) pclose(gpoutfile);
-	pipe_open = FALSE;
+	output_pipe_open = FALSE;
     } else
 #endif /* PIPES */
 #ifdef _Windows
@@ -276,7 +277,7 @@ char *dest;
 	    if ((f = popen(dest + 1, POPEN_MODE)) == (FILE *) NULL)
 		os_error(c_token, "cannot create pipe; output not changed");
 	    else
-		pipe_open = TRUE;
+		output_pipe_open = TRUE;
 	} else
 #endif /* PIPES */
 
@@ -1699,17 +1700,17 @@ fill_gp4mouse (void)
     gp4mouse.ybot = ybot;
     gp4mouse.xright = xright;
     gp4mouse.ytop = ytop;
-    gp4mouse.is_log_x = is_log_x;
-    gp4mouse.is_log_y = is_log_y;
-    gp4mouse.is_log_z = is_log_z;
-    gp4mouse.base_log_x = base_log_x;
-    gp4mouse.base_log_y = base_log_y;
-    gp4mouse.base_log_z = base_log_z;
-    gp4mouse.log_base_log_x = log_base_log_x;
-    gp4mouse.log_base_log_y = log_base_log_y;
-    gp4mouse.log_base_log_z = log_base_log_z;
+    gp4mouse.log_array[FIRST_X_AXIS] = log_array[FIRST_X_AXIS];
+    gp4mouse.log_array[FIRST_Y_AXIS] = log_array[FIRST_Y_AXIS];
+    gp4mouse.log_array[FIRST_Z_AXIS] = log_array[FIRST_Z_AXIS];
+    gp4mouse.base_array[FIRST_X_AXIS] = base_array[FIRST_X_AXIS];
+    gp4mouse.base_array[FIRST_Y_AXIS] = base_array[FIRST_Y_AXIS];
+    gp4mouse.base_array[FIRST_Z_AXIS] = base_array[FIRST_Z_AXIS];
+    gp4mouse.log_base_array[FIRST_X_AXIS] = log_base_array[FIRST_X_AXIS];
+    gp4mouse.log_base_array[FIRST_Y_AXIS] = log_base_array[FIRST_Y_AXIS];
+    gp4mouse.log_base_array[FIRST_Z_AXIS] = log_base_array[FIRST_Z_AXIS];
     gp4mouse.has_grid = work_grid.l_type ? 1 : 0;
 }
-#endif
+#endif /* 0 -- disabled code! */
 
 #endif /* USE_MOUSE */

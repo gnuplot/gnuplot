@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.28 2000/03/30 14:00:14 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.29 2000/05/02 18:41:08 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -37,13 +37,13 @@ static char *RCSid() { return RCSid("$Id: graphics.c,v 1.28 2000/03/30 14:00:14 
 #include "graphics.h"
 
 #include "alloc.h"
+#include "axis.h"
 #include "command.h"
 #include "gp_time.h"
 #include "misc.h"
 #include "setshow.h"
 #include "term_api.h"
 #include "util.h"
-#include "util3d.h"
 
 /* key placement is calculated in boundary, so we need file-wide variables
  * To simplify adjustments to the key, we set all these once [depends on
@@ -69,41 +69,11 @@ static int key_cols;		/* no cols of keys */
 static int key_rows, key_col_wth, yl_ref;
 static struct clipbox keybox;	/* boundaries for key field */
 
-/* penalty for doing tics by callback in gen_tics is need for
- * global variables to communicate with the tic routines
- * Dont need to be arrays for this
- */
-static int tic_start, tic_direction, tic_text, rotate_tics, tic_hjust, tic_vjust, tic_mirror;
-
 /* set by tic_callback - how large to draw polar radii */
 static double largest_polar_circle;
 
-/* either xformat etc or invented time format
- * index with FIRST_X_AXIS etc
- * global because used in gen_tics, which graph3d also uses
- */
-static char ticfmt[8][MAX_ID_LEN+1];
-static int timelevel[8];
-static double ticstep[8];
-
-double min_array[AXIS_ARRAY_SIZE], max_array[AXIS_ARRAY_SIZE];
-int auto_array[AXIS_ARRAY_SIZE];
-TBOOLEAN log_array[AXIS_ARRAY_SIZE];
-double base_array[AXIS_ARRAY_SIZE];
-double log_base_array[AXIS_ARRAY_SIZE];
-
 /* HBB 990829 FIXME: this is never modified at all !?? */
 char default_font[MAX_ID_LEN + 1] = "";	/* Entry font added by DJL */
-
-/* Define the boundary of the plot
- * These are computed at each call to do_plot, and are constant over
- * the period of one do_plot. They actually only change when the term
- * type changes and when the 'set size' factors change.
- * - no longer true, for 'set key out' or 'set key under'. also depend
- * on tic marks and multi-line labels.
- * They are shared with graph3d.c since we want to use its draw_clip_line()
- */
-int xleft, xright, ybot, ytop;
 
 static int xlablin, x2lablin, ylablin, y2lablin, titlelin, xticlin, x2ticlin;
 
@@ -145,20 +115,14 @@ static void edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, in
 static TBOOLEAN two_edge_intersect_steps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));	/* JG */
 static TBOOLEAN two_edge_intersect_fsteps __PROTO((struct coordinate GPHUGE * points, int i, double *lx, double *ly));
 
-static double dbl_raise __PROTO((double x, int y));
 static void boundary __PROTO((TBOOLEAN scaling, struct curve_points * plots, int count));
-static double make_tics __PROTO((int axis, int guide));
 
 /* widest2d_callback keeps longest so far in here */
 static int widest_tic;
 
-static void widest2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
-static void ytick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
-static void xtick2d_callback __PROTO((int axis, double place, char *text, struct lp_style_type grid));
-static void mant_exp __PROTO((double log_base, double x, int scientific, double *m, int *p));
-static double make_ltic __PROTO((int, double));
-static double time_tic_just __PROTO((int, double));
-static void timetic_format __PROTO((int, double, double));
+static void widest2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+static void ytick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
+static void xtick2d_callback __PROTO((AXIS_INDEX, double place, char *text, struct lp_style_type grid));
 
 
 /* for plotting error bars
@@ -213,203 +177,18 @@ f_min(double a, double b)
 static int lkey;
 
 /* First attempt at double axes...
- * x_min etc are now accessed from a global array min_array[], max_array[]
  * put the scale factors into a similar array
- * for convenience in this first attack on double axes, just define x_min etc
- * since code already uses x_min, etc  Eventually it will be done properly
  */
 
 /* arrays now in graphics.h */
 
 static int x_axis = FIRST_X_AXIS, y_axis = FIRST_Y_AXIS;	/* current axes */
 
-static double scale[AXIS_ARRAY_SIZE];	/* scale factors for mapping for each axis */
-
-/* BODGES BEFORE I FIX IT UP */
-#define x_min min_array[x_axis]
-#define x_max max_array[x_axis]
-#define y_min min_array[y_axis]
-#define y_max max_array[y_axis]
-
-/* And the functions to map from user to terminal coordinates */
-/* maps floating point x to screen */
-#define map_x(x) (int)(xleft+(x-min_array[x_axis])*scale[x_axis]+0.5)
-/* same for y */
-#define map_y(y) (int)(ybot +(y-min_array[y_axis])*scale[y_axis]+0.5)
 
 /* (DFK) Watch for cancellation error near zero on axes labels */
 #define CheckZero(x,tic) (fabs(x) < ((tic) * SIGNIF) ? 0.0 : (x))
 #define NearlyEqual(x,y,tic) (fabs((x)-(y)) < ((tic) * SIGNIF))
 /*}}} */
-
-/*{{{  CheckLog() */
-/* (DFK) For some reason, the Sun386i compiler screws up with the CheckLog 
- * macro, so I write it as a function on that machine.
- *
- * Amiga SAS/C 6.2 thinks it will do too much work calling functions in
- * macro arguments twice, thus I inline theese functions. (MGR, 1993)
- * If your compiler doesn't handle those macros correctly, you should
- * also subscribe here. Even without inlining you gain speed with log plots
- */
-#if defined(sun386) || defined(AMIGA_SC_6_1)
-GP_INLINE double
-CheckLog(is_log, base_log, x)
-TBOOLEAN is_log;
-double base_log;
-double x;
-{
-    if (is_log)
-	return (pow(base_log, x));
-    else
-	return (x);
-}
-#else
-/* (DFK) Use 10^x if logscale is in effect, else x */
-#define CheckLog(is_log, base_log, x) ((is_log) ? pow(base_log, (x)) : (x))
-#endif /* sun386 || SAS/C */
-/*}}} */
-
-/*{{{  LogScale() */
-double
-LogScale(coord, is_log, log_base_log, what, axis)
-double coord;			/* the value */
-TBOOLEAN is_log;		/* is this axis in logscale? */
-double log_base_log;		/* if so, the log of its base */
-const char *what;		/* what is the coord for? */
-const char *axis;		/* which axis is this for ("x" or "y")? */
-{
-    if (is_log) {
-	if (coord <= 0.0) {
-	    char errbuf[100];   /* place to write error message */
-	    (void) sprintf(errbuf, "%s has %s coord of %g; must be above 0 for log scale!", what, axis, coord);
-	    graph_error(errbuf);
-	} else
-	    return (log(coord) / log_base_log);
-    }
-    return (coord);
-}
-
-/*}}} */
-
-/*{{{  graph_error() */
-/* handle errors during graph-plot in a consistent way */
-void
-graph_error(text)
-const char *text;
-{
-    multiplot = FALSE;
-    term_end_plot();
-    int_error(NO_CARET, text);
-}
-
-/*}}} */
-
-
-/*{{{  fixup_range() */
-/*
- * === SYNOPSIS ===
- *
- * This function checks whether the data and/or plot range in a given axis
- * is too small (which would cause divide-by-zero and/or infinite-loop
- * problems later on).  If so,
- * - if autoscaling is in effect for this axis, we widen the range
- * - otherwise, we abort with a call to  int_error()  (which prints out
- *   a suitable error message, then (hopefully) aborts this command and
- *   returns to the command prompt or whatever).
- *
- *
- * === HISTORY AND DESIGN NOTES ===
- *
- * 1998 Oct 4, Jonathan Thornburg <jthorn@galileo.thp.univie.ac.at>
- *
- * This function used to be a (long) macro  FIXUP_RANGE(AXIS, WHICH)
- * which was (identically!) defined in  plot2d.c  and  plot3d.c .  As
- * well as now being a function instead of a macro, the logic is also
- * changed:  The "too small" range test no longer depends on 'set zero'
- * and is now properly scaled relative to the data magnitude.
- *
- * The key question in designing this function is the policy for just how
- * much to widen the data range by, as a function of the data magnitude.
- * This is to some extent a matter of taste.  IMHO the key criterion is
- * that (at least) all of the following should (a) not infinite-loop, and
- * (b) give correct plots, regardless of the 'set zero' setting:
- *      plot 6.02e23            # a huge number >> 1 / FP roundoff level
- *      plot 3                  # a "reasonable-sized" number
- *      plot 1.23e-12           # a small number still > FP roundoff level
- *      plot 1.23e-12 * sin(x)  # a small function still > FP roundoff level
- *      plot 1.23e-45           # a tiny number << FP roundoff level
- *      plot 1.23e-45 * sin(x)  # a tiny function << FP roundoff level
- *      plot 0          # or (more commonly) a data file of all zeros
- * That is, IMHO gnuplot should *never* infinite-loop, and it should *never*
- * producing an incorrect or misleading plot.  In contrast, the old code
- * would infinite-loop on most of these examples with 'set zero 0.0' in
- * effect, or would plot the small-amplitude sine waves as the zero function
- * with 'zero' set larger than the sine waves' amplitude.
- *
- * The current code plots all the above examples correctly and without
- * infinite looping.
- *
- *
- * === USAGE ===
- *
- * Arguments:
- * axis = (in) An integer specifying which axis (x1, x2, y1, y2, z, etc)
- *             we should do our stuff for.  We use this argument as an
- *             index into the global arrays  {min,max,auto}_array .  In
- *             practice this argument will typically be one of the constants
- *              {FIRST,SECOND}_{X,Y,Z}_AXIS  defined in plot.h.
- * axis_name --> (in) This argument should point to the character string
- *                    name corresponding to  axis , e.g. "x", "y2", etc.
- *                    We use this (only) in formatting warning/error messages.
- *
- * Global Variables:
- * auto_array[axis] = (in) (defined in command.c) Bit-flags which tell
- *                         [in some manner I don't fully understand :=( ]
- *                         whether and/or how autoscaling is in effect for
- *                         this axis.
- * {min,max}_array = (in out) (defined in command.c) The data ranges which
- *                            this function manipulates.
- * c_token = (in) (defined in plot.h) Used in formatting an error message.
- *
- * Bugs:
- * - If  strlen(axis_name) > strlen("%s") , we may overflow an
- *   error-message buffer, which would be A Bad Thing.  Caveat caller...
- */
-void
-fixup_range(axis, axis_name)
-int axis;
-const char *axis_name;
-{
-#define MAX_AXIS_NAME_LEN	2	/* max legal strlen(axis_name) */
-
-/* These two macro definitions set the range-widening policy: */
-#define FIXUP_RANGE__WIDEN_ZERO_ABS	1.0	/* widen [0:0] by
-						   +/- this absolute amount */
-#define FIXUP_RANGE__WIDEN_NONZERO_REL	0.01	/* widen [nonzero:nonzero] by
-						   -/+ this relative amount */
-
-    double dmin = min_array[axis];
-    double dmax = max_array[axis];
-    if (dmax - dmin == 0.0) {
-	/* empty range */
-	if (auto_array[axis]) {
-	    /* range came from autoscaling ==> widen it */
-	    double widen = (dmax == 0.0)
-		? FIXUP_RANGE__WIDEN_ZERO_ABS : FIXUP_RANGE__WIDEN_NONZERO_REL * dmax;
-	    fprintf(stderr, "Warning: empty %s range [%g:%g], ", axis_name, dmin, dmax);
-	    min_array[axis] -= widen;
-	    max_array[axis] += widen;
-	    fprintf(stderr, "adjusting to [%g:%g]\n", min_array[axis], max_array[axis]);
-	} else {
-	    /* user has explicitly set the range */
-	    /* (to something empty) ==> we're in trouble */
-	    int_error(c_token, "Can't plot with an empty %s range!", axis_name);
-	}
-    }
-}
-
-/*}}} */
-
 
 /*{{{  widest2d_callback() */
 /* we determine widest tick label by getting gen_ticks to call this
@@ -418,7 +197,7 @@ const char *axis_name;
 
 static void
 widest2d_callback(axis, place, text, grid)
-int axis;
+AXIS_INDEX axis;
 double place;
 char *text;
 struct lp_style_type grid;
@@ -927,16 +706,19 @@ int count;
     if (aspect_ratio != 0.0) {
 	double current_aspect_ratio;
 
-	if (aspect_ratio < 0 && (max_array[x_axis] - min_array[x_axis]) != 0.0) {
-	    current_aspect_ratio = -aspect_ratio * fabs((max_array[y_axis] - min_array[y_axis]) /
-							(max_array[x_axis] - min_array[x_axis]));
+	if (aspect_ratio < 0
+	    && (max_array[x_axis] - min_array[x_axis]) != 0.0
+	    ) {
+	    current_aspect_ratio = - aspect_ratio
+		* fabs((max_array[y_axis] - min_array[y_axis]) /
+		       (max_array[x_axis] - min_array[x_axis]));
 	} else
 	    current_aspect_ratio = aspect_ratio;
 
 	/*{{{  set aspect ratio if valid and sensible */
 	if (current_aspect_ratio >= 0.01 && current_aspect_ratio <= 100.0) {
-	    double current = ((double) (ytop - ybot)) / ((double) (xright - xleft));
-	    double required = (current_aspect_ratio * (double) t->v_tic) / ((double) t->h_tic);
+	    double current = ((double) (ytop - ybot)) / (xright - xleft);
+	    double required = (current_aspect_ratio * t->v_tic) / t->h_tic;
 
 	    if (current > required) {
 		/* too tall */
@@ -947,6 +729,7 @@ int count;
 	}
 	/*}}} */
     }
+
     /*{{{  set up x and x2 tics */
     /* we should base the guide on the width of the xtics, but we cannot
      * use widest_tics until tics are set up. Bit of a downer - let us
@@ -1036,11 +819,10 @@ int count;
     (void) (*t->text_angle) (0);
 
     /* needed for map_position() below */
-
-    scale[FIRST_Y_AXIS] = (ytop - ybot) / (max_array[FIRST_Y_AXIS] - min_array[FIRST_Y_AXIS]);
-    scale[FIRST_X_AXIS] = (xright - xleft) / (max_array[FIRST_X_AXIS] - min_array[FIRST_X_AXIS]);
-    scale[SECOND_Y_AXIS] = (ytop - ybot) / (max_array[SECOND_Y_AXIS] - min_array[SECOND_Y_AXIS]);
-    scale[SECOND_X_AXIS] = (xright - xleft) / (max_array[SECOND_X_AXIS] - min_array[SECOND_X_AXIS]);
+    AXIS_SETSCALE(FIRST_Y_AXIS, ybot, ytop);
+    AXIS_SETSCALE(SECOND_Y_AXIS, ybot, ytop);
+    AXIS_SETSCALE(FIRST_X_AXIS, xleft, xright);
+    AXIS_SETSCALE(SECOND_X_AXIS, xleft, xright);
 
     /*{{{  calculate the window in the grid for the key */
     if (lkey == 1 || (lkey == -1 && key_vpos != TUNDER)) {
@@ -1083,204 +865,6 @@ int count;
 
 /*}}} */
 
-/*{{{  dbl_raise() */
-static double
-dbl_raise(x, y)
-double x;
-int y;
-{
-    register int i = abs(y);
-    double val = 1.0;
-
-    while (--i >= 0)
-	val *= x;
-
-    if (y < 0)
-	return (1.0 / val);
-    return (val);
-}
-
-/*}}} */
-
-/*{{{  timetic_format() */
-static void
-timetic_format(axis, amin, amax)
-int axis;
-double amin, amax;
-{
-    struct tm t_min, t_max;
-
-    *ticfmt[axis] = 0;		/* make sure we strcat to empty string */
-
-    ggmtime(&t_min, (double) time_tic_just(timelevel[axis], amin));
-    ggmtime(&t_max, (double) time_tic_just(timelevel[axis], amax));
-
-    if (t_max.tm_year == t_min.tm_year && t_max.tm_yday == t_min.tm_yday) {
-	/* same day, skip date */
-	if (t_max.tm_hour != t_min.tm_hour) {
-	    strcpy(ticfmt[axis], "%H");
-	}
-	if (timelevel[axis] < 3) {
-	    if (strlen(ticfmt[axis]))
-		strcat(ticfmt[axis], ":");
-	    strcat(ticfmt[axis], "%M");
-	}
-	if (timelevel[axis] < 2) {
-	    strcat(ticfmt[axis], ":%S");
-	}
-    } else {
-	if (t_max.tm_year != t_min.tm_year) {
-	    /* different years, include year in ticlabel */
-	    /* check convention, day/month or month/day */
-	    if (strchr(timefmt, 'm') < strchr(timefmt, 'd')) {
-		strcpy(ticfmt[axis], "%m/%d/%");
-	    } else {
-		strcpy(ticfmt[axis], "%d/%m/%");
-	    }
-	    if (((int) (t_max.tm_year / 100)) != ((int) (t_min.tm_year / 100))) {
-		strcat(ticfmt[axis], "Y");
-	    } else {
-		strcat(ticfmt[axis], "y");
-	    }
-
-	} else {
-	    if (strchr(timefmt, 'm') < strchr(timefmt, 'd')) {
-		strcpy(ticfmt[axis], "%m/%d");
-	    } else {
-		strcpy(ticfmt[axis], "%d/%m");
-	    }
-	}
-	if (timelevel[axis] < 4) {
-	    strcat(ticfmt[axis], "\n%H:%M");
-	}
-    }
-}
-
-/*}}} */
-
-/*{{{  set_tic() */
-/* the guide parameter was intended to allow the number of tics
- * to depend on the relative sizes of the plot and the font.
- * It is the approximate upper limit on number of tics allowed.
- * But it did not go down well with the users.
- * A value of 20 gives the same behaviour as 3.5, so that is
- * hardwired into the calls to here. Maybe we will restore it
- * to the automatic calculation one day
- */
-
-double
-set_tic(l10, guide)
-double l10;
-int guide;
-{
-    double xnorm, tics, posns;
-
-    int fl = (int) floor(l10);
-    xnorm = pow(10.0, l10 - fl);	/* approx number of decades */
-
-    posns = guide / xnorm;	/* approx number of tic posns per decade */
-
-    if (posns > 40)
-	tics = 0.05;		/* eg 0, .05, .10, ... */
-    else if (posns > 20)
-	tics = 0.1;		/* eg 0, .1, .2, ... */
-    else if (posns > 10)
-	tics = 0.2;		/* eg 0,0.2,0.4,... */
-    else if (posns > 4)
-	tics = 0.5;		/* 0,0.5,1, */
-    else if (posns > 1)
-	tics = 1;		/* 0,1,2,.... */
-    else if (posns > 0.5)
-	tics = 2;		/* 0, 2, 4, 6 */
-    else
-	/* getting desperate... the ceil is to make sure we
-	 * go over rather than under - eg plot [-10:10] x*x
-	 * gives a range of about 99.999 - tics=xnorm gives
-	 * tics at 0, 99.99 and 109.98  - BAD !
-	 * This way, inaccuracy the other way will round
-	 * up (eg 0->100.0001 => tics at 0 and 101
-	 * I think latter is better than former
-	 */
-	tics = ceil(xnorm);
-
-    return (tics * dbl_raise(10.0, fl));
-}
-
-/*}}} */
-
-/*{{{  make_tics() */
-static double
-make_tics(axis, guide)
-int axis, guide;
-{
-    register double xr, tic, l10;
-
-    xr = fabs(min_array[axis] - max_array[axis]);
-
-    l10 = log10(xr);
-    tic = set_tic(l10, guide);
-    if (log_array[axis] && tic < 1.0)
-	tic = 1.0;
-    if (datatype[axis] == TIME) {
-	struct tm ftm, etm;
-	/* this is not fun */
-	ggmtime(&ftm, (double) min_array[axis]);
-	ggmtime(&etm, (double) max_array[axis]);
-
-	timelevel[axis] = 0;	/* seconds */
-	if (tic > 20) {
-	    /* turn tic into units of minutes */
-	    tic = set_tic(log10(xr / 60.0), guide) * 60;
-	    timelevel[axis] = 1;	/* minutes */
-	}
-	if (tic > 20 * 60) {
-	    /* turn tic into units of hours */
-	    tic = set_tic(log10(xr / 3600.0), guide) * 3600;
-	    timelevel[axis] = 2;	/* hours */
-	}
-	if (tic > 2 * 3600) {
-	    /* need some tickling */
-	    tic = set_tic(log10(xr / (3 * 3600.0)), guide) * 3 * 3600;
-	}
-	if (tic > 6 * 3600) {
-	    /* turn tic into units of days */
-	    tic = set_tic(log10(xr / DAY_SEC), guide) * DAY_SEC;
-	    timelevel[axis] = 3;	/* days */
-	}
-	if (tic > 3 * DAY_SEC) {
-	    /* turn tic into units of weeks */
-	    tic = set_tic(log10(xr / WEEK_SEC), guide) * WEEK_SEC;
-	    if (tic < WEEK_SEC) {	/* force */
-		tic = WEEK_SEC;
-	    }
-	    timelevel[axis] = 4;	/* weeks */
-	}
-	if (tic > 3 * WEEK_SEC) {
-	    /* turn tic into units of month */
-	    tic = set_tic(log10(xr / MON_SEC), guide) * MON_SEC;
-	    if (tic < MON_SEC) {	/* force */
-		tic = MON_SEC;
-	    }
-	    timelevel[axis] = 5;	/* month */
-	}
-	if (tic > 2 * MON_SEC) {
-	    /* turn tic into units of month */
-	    tic = set_tic(log10(xr / (3 * MON_SEC)), guide) * 3 * MON_SEC;
-	}
-	if (tic > 6 * MON_SEC) {
-	    /* turn tic into units of years */
-	    tic = set_tic(log10(xr / YEAR_SEC), guide) * YEAR_SEC;
-	    if (tic < (YEAR_SEC / 2)) {
-		tic = YEAR_SEC / 2;
-	    }
-	    timelevel[axis] = 6;	/* year */
-	}
-    }
-    return (tic);
-}
-
-/*}}} */
-
 void
 get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *vtic)
 {
@@ -1293,53 +877,13 @@ get_offsets(struct text_label *this_label, struct termentry *t, int *htic, int *
     }
 }
 
-int
-nearest_label_tag(int xref, int yref, struct termentry *t,
-		  void (*map_func) (struct position * pos, unsigned int *x, unsigned int *y, const char *what))
-{
-    double min = -1;
-    int min_tag = -1;
-    double diff_squared;
-    unsigned int x, y;
-    struct text_label *this_label;
-    int xd;
-    int yd;
-
-    for (this_label = first_label; this_label != NULL; this_label = this_label->next) {
-	map_func(&this_label->place, &x, &y, "label");
-	xd = (int) x - (int) xref;
-	yd = (int) y - (int) yref;
-	diff_squared = xd * xd + yd * yd;
-	if (-1 == min || min > diff_squared) {
-	    /* now we check if we're within a certain
-	     * threshold around the label */
-	    double tic_diff_squared;
-	    int htic, vtic;
-	    get_offsets(this_label, t, &htic, &vtic);
-	    tic_diff_squared = htic * htic + vtic * vtic;
-	    if (diff_squared < tic_diff_squared) {
-		min = diff_squared;
-		min_tag = this_label->tag;
-	    }
-	}
-    }
-
-    return min_tag;
-}
-
 void
 do_plot(plots, pcount)
 struct curve_points *plots;
 int pcount;			/* count of plots in linked list */
 {
-
-/* BODGES BEFORE I FIX IT UP */
-#define ytic ticstep[y_axis]
-#define xtic ticstep[x_axis]
-
     register struct termentry *t = term;
     register int curve;
-    int axis_zero[AXIS_ARRAY_SIZE];	/* axes in terminal coords for FIRST_X_AXIS, etc */
     register struct curve_points *this_plot = NULL;
     register int xl = 0, yl = 0;	/* avoid gcc -Wall warning */
     register int key_count = 0;
@@ -1349,41 +893,37 @@ int pcount;			/* count of plots in linked list */
     TBOOLEAN scaling;
     char *s, *e;
 
-    /* so that macros for x_min etc pick up correct values
-     * until this is done properly
-     */
-
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
 
 /*      Apply the desired viewport offsets. */
-    if (y_min < y_max) {
-	y_min -= boff;
-	y_max += toff;
+    if (min_array[y_axis] < max_array[y_axis]) {
+	min_array[y_axis] -= boff;
+	max_array[y_axis] += toff;
     } else {
-	y_max -= boff;
-	y_min += toff;
+	max_array[y_axis] -= boff;
+	min_array[y_axis] += toff;
     }
-    if (x_min < x_max) {
-	x_min -= loff;
-	x_max += roff;
+    if (min_array[x_axis] < max_array[x_axis]) {
+	min_array[x_axis] -= loff;
+	max_array[x_axis] += roff;
     } else {
-	x_max -= loff;
-	x_min += roff;
+	max_array[x_axis] -= loff;
+	min_array[x_axis] += roff;
     }
 
     /*
      * In the beginning, this "empty range" test was for exact
-     * equality, eg  y_min == y_max , but that caused an infinite
-     * loop once.  Then the test was changed to check for being
-     * within the 'zero' threshold,  fabs(y_max - y_min) < zero) ,
-     * but that prevented plotting data with ranges below 'zero'.
-     * Now it's an absolute equality test again, since  fixup_range()
-     * should have widened empty ranges before we get here.
-     */
-    if (x_min == x_max)
+     * equality, eg y_min == y_max , but that caused an infinite loop
+     * once.  Then the test was changed to check for being within the
+     * 'zero' threshold, fabs(y_max - y_min) < zero) , but that
+     * prevented plotting data with ranges below 'zero'.  Now it's an
+     * absolute equality test again, since
+     * axis_checked_extend_empty_range() should have widened empty
+     * ranges before we get here.  */
+    if (min_array[x_axis] == max_array[x_axis])
 	int_error(NO_CARET, "x_min should not equal x_max!");
-    if (y_min == y_max)
+    if (min_array[y_axis] == max_array[y_axis])
 	int_error(NO_CARET, "y_min should not equal y_max!");
 
     term_init();		/* may set xmax/ymax */
@@ -1399,6 +939,12 @@ int pcount;			/* count of plots in linked list */
 
     boundary(scaling, plots, pcount);
 
+    /* inform axes about newly found values 'xleft' & Co. */
+    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
+    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
+    axis_set_graphical_range(SECOND_X_AXIS, xleft, xright);
+    axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
+
     screen_ok = FALSE;
 
     term_start_plot();
@@ -1412,6 +958,14 @@ int pcount;			/* count of plots in linked list */
     y_axis = FIRST_Y_AXIS;
 
     /* label first y axis tics */
+    axis_output_tics(FIRST_Y_AXIS, ytics, rotate_ytics, xleft, xright,
+		     &ytic_x, FIRST_X_AXIS, &yticdef, (GRID_Y | GRID_MY),
+		     mytics, mytfreq, ytick2d_callback);
+    /* label first x axis tics */
+    axis_output_tics(FIRST_X_AXIS, xtics, rotate_xtics, ybot, ytop,
+		     &xtic_y, FIRST_Y_AXIS, &xticdef, (GRID_X | GRID_MX),
+		     mxtics, mxtfreq, xtick2d_callback);
+#if 0
     if (ytics) {
 	/* set the globals ytick2d_callback() needs */
 
@@ -1431,7 +985,7 @@ int pcount;			/* count of plots in linked list */
 	else
 	    tic_mirror = -1;	/* no thank you */
 
-	if ((ytics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(0.0, x_min, x_max)) {
+	if ((ytics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(0.0, min_array[x_axis], max_array[x_axis])) {
 	    tic_start = map_x(0.0);
 	    tic_direction = -1;
 	    if (ytics & TICS_MIRROR)
@@ -1448,7 +1002,6 @@ int pcount;			/* count of plots in linked list */
 	(*t->text_angle) (0);	/* reset rotation angle */
 
     }
-    /* label first x axis tics */
     if (xtics) {
 	/* set the globals xtick2d_callback() needs */
 
@@ -1466,7 +1019,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_mirror = ytop;
 	else
 	    tic_mirror = -1;	/* no thank you */
-	if ((xtics & TICS_ON_AXIS) && !log_array[FIRST_Y_AXIS] && inrange(0.0, y_min, y_max)) {
+	if ((xtics & TICS_ON_AXIS) && !log_array[FIRST_Y_AXIS] && inrange(0.0, min_array[y_axis], max_array[y_axis])) {
 	    tic_start = map_y(0.0);
 	    tic_direction = -1;
 	    if (xtics & TICS_MIRROR)
@@ -1485,10 +1038,20 @@ int pcount;			/* count of plots in linked list */
 	gen_tics(FIRST_X_AXIS, &xticdef, work_grid.l_type & (GRID_X | GRID_MX), mxtics, mxtfreq, xtick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
+#endif /* HBB 20000416: test, test */
+
     /* select second mapping */
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;
 
+    axis_output_tics(SECOND_Y_AXIS, y2tics, rotate_y2tics, xright, xleft,
+		     &y2tic_x, SECOND_X_AXIS, &y2ticdef, (GRID_Y2 | GRID_MY2),
+		     my2tics, my2tfreq, ytick2d_callback);
+    axis_output_tics(SECOND_X_AXIS, x2tics, rotate_x2tics, ytop, ybot,
+		     &x2tic_y, SECOND_Y_AXIS, &x2ticdef, (GRID_X2 | GRID_MX2),
+		     mx2tics, mx2tfreq, xtick2d_callback);
+
+#if 0 /* HBB 20000501: use generalized routine for these, too: */
     /* label second y axis tics */
     if (y2tics) {
 	/* set the globals ytick2d_callback() needs */
@@ -1507,7 +1070,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_mirror = xleft;
 	else
 	    tic_mirror = -1;	/* no thank you */
-	if ((y2tics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(0.0, x_min, x_max)) {
+	if ((y2tics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(0.0, min_array[x_axis], max_array[x_axis])) {
 	    tic_start = map_x(0.0);
 	    tic_direction = 1;
 	    if (y2tics & TICS_MIRROR)
@@ -1541,7 +1104,7 @@ int pcount;			/* count of plots in linked list */
 	    tic_mirror = ybot;
 	else
 	    tic_mirror = -1;	/* no thank you */
-	if ((x2tics & TICS_ON_AXIS) && !log_array[SECOND_Y_AXIS] && inrange(0.0, y_min, y_max)) {
+	if ((x2tics & TICS_ON_AXIS) && !log_array[SECOND_Y_AXIS] && inrange(0.0, min_array[y_axis], max_array[y_axis])) {
 	    tic_start = map_y(0.0);
 	    tic_direction = 1;
 	    if (x2tics & TICS_MIRROR)
@@ -1557,10 +1120,11 @@ int pcount;			/* count of plots in linked list */
 	gen_tics(SECOND_X_AXIS, &x2ticdef, work_grid.l_type & (GRID_X2 | GRID_MX2), mx2tics, mx2tfreq, xtick2d_callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
+#endif /* 1/0 HBB 20000501 */
+
     /* select first mapping */
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;
-
 /* RADIAL LINES FOR POLAR GRID */
 
     /* note that draw_clip_line takes unsigneds, but (fortunately)
@@ -1592,58 +1156,38 @@ int pcount;			/* count of plots in linked list */
     x_axis = FIRST_X_AXIS;
     y_axis = FIRST_Y_AXIS;	/* chose scaling */
 
-    if ((y_min >= 0.0 && y_max >= 0.0) || is_log_y)
-	axis_zero[FIRST_Y_AXIS] = ybot;	/* save for impulse plotting */
-    else if (y_min <= 0.0 && y_max <= 0.0)
-	axis_zero[FIRST_Y_AXIS] = ytop;
-    else {
-	axis_zero[FIRST_Y_AXIS] = map_y(0.0);
-	if (xzeroaxis.l_type > -3) {
-	    term_apply_lp_properties(&xzeroaxis);
-	    (*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
-	    (*t->vector) (xright, axis_zero[FIRST_Y_AXIS]);
-	}
+    /* FIXME HBB 20000430: previous version treated log-scaled
+     * y and x axes slightly differently, here: xzeroaxis was set at
+     * ybot, but yzeroaxis would still try to map x=0.0... */
+    if (axis_position_zeroaxis(FIRST_Y_AXIS)
+	&& (xzeroaxis.l_type > -3)) {
+	term_apply_lp_properties(&xzeroaxis);
+	(*t->move) (xleft, axis_zero[FIRST_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[FIRST_Y_AXIS]);
     }
-    if (x_min >= 0.0 && x_max >= 0.0)
-	axis_zero[FIRST_X_AXIS] = xleft;
-    else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[FIRST_X_AXIS] = xright;
-    else {
-	axis_zero[FIRST_X_AXIS] = map_x(0.0);
-	if ((yzeroaxis.l_type > -3) && !is_log_x) {
-	    term_apply_lp_properties(&yzeroaxis);
-	    (*t->move) (axis_zero[FIRST_X_AXIS], ybot);
-	    (*t->vector) (axis_zero[FIRST_X_AXIS], ytop);
-	}
+    if (axis_position_zeroaxis(FIRST_X_AXIS)
+	&& (yzeroaxis.l_type > -3)) {
+	term_apply_lp_properties(&yzeroaxis);
+	(*t->move) (axis_zero[FIRST_X_AXIS], ybot);
+	(*t->vector) (axis_zero[FIRST_X_AXIS], ytop);
     }
 
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;	/* chose scaling */
 
-    if (is_log_y2 || (y_min >= 0.0 && y_max >= 0.0))
-	axis_zero[SECOND_Y_AXIS] = ybot;	/* save for impulse plotting */
-    else if (y_min <= 0.0 && y_max <= 0.0)
-	axis_zero[SECOND_Y_AXIS] = ytop;
-    else {
-	axis_zero[SECOND_Y_AXIS] = map_y(0.0);
-	if (x2zeroaxis.l_type > -3) {
-	    term_apply_lp_properties(&x2zeroaxis);
-	    (*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
-	    (*t->vector) (xright, axis_zero[SECOND_Y_AXIS]);
-	}
+    if (axis_position_zeroaxis(SECOND_Y_AXIS)
+	&& (x2zeroaxis.l_type > -3)) {
+	term_apply_lp_properties(&x2zeroaxis);
+	(*t->move) (xleft, axis_zero[SECOND_Y_AXIS]);
+	(*t->vector) (xright, axis_zero[SECOND_Y_AXIS]);
     }
-    if (y_min >= 0.0 && y_max >= 0.0)
-	axis_zero[SECOND_X_AXIS] = xleft;
-    else if (x_min <= 0.0 && x_max <= 0.0)
-	axis_zero[SECOND_X_AXIS] = xright;
-    else {
-	axis_zero[SECOND_X_AXIS] = map_x(0.0);
-	if ((y2zeroaxis.l_type > -3) && !is_log_x2) {
-	    term_apply_lp_properties(&y2zeroaxis);
-	    (*t->move) (axis_zero[SECOND_X_AXIS], ybot);
-	    (*t->vector) (axis_zero[SECOND_X_AXIS], ytop);
-	}
+    if (axis_position_zeroaxis(SECOND_X_AXIS)
+	&& (y2zeroaxis.l_type > -3)) {
+	term_apply_lp_properties(&y2zeroaxis);
+	(*t->move) (axis_zero[SECOND_X_AXIS], ybot);
+	(*t->vector) (axis_zero[SECOND_X_AXIS], ytop);
     }
+
 
     /* DRAW PLOT BORDER */
     if (draw_border) {
@@ -2077,10 +1621,6 @@ int pcount;			/* count of plots in linked list */
 }
 
 
-/* BODGES */
-#undef ytic
-#undef xtic
-
 /* plot_impulses:
  * Plot the curves in IMPULSES style
  */
@@ -2102,14 +1642,14 @@ int yaxis_x, xaxis_y;
 		break;
 	    }
 	case OUTRANGE:{
-		if (!inrange(plot->points[i].x, x_min, x_max))
+		if (!inrange(plot->points[i].x, min_array[x_axis], max_array[x_axis]))
 		    continue;
 		x = map_x(plot->points[i].x);
-		if ((y_min < y_max && plot->points[i].y < y_min)
-		    || (y_max < y_min && plot->points[i].y > y_min))
-		    y = map_y(y_min);
+		if ((min_array[y_axis] < max_array[y_axis] && plot->points[i].y < min_array[y_axis])
+		    || (max_array[y_axis] < min_array[y_axis] && plot->points[i].y > min_array[y_axis]))
+		    y = map_y(min_array[y_axis]);
 		else
-		    y = map_y(y_max);
+		    y = map_y(max_array[y_axis]);
 
 		break;
 	    }
@@ -2420,20 +1960,19 @@ int *xl, *yl;			/* keeps track of "cursor" position */
 double x, y1, y2;		/* coordinates of vertical line */
 {
     struct termentry *t = term;
-    /* global x_min, x_max, y_min, y_max */
     int xm, y1m, y2m;
 
-    if ((y1 < y_min && y2 < y_min) || (y1 > y_max && y2 > y_max) || x < x_min || x > x_max)
+    if ((y1 < min_array[y_axis] && y2 < min_array[y_axis]) || (y1 > max_array[y_axis] && y2 > max_array[y_axis]) || x < min_array[x_axis] || x > max_array[x_axis])
 	return;
 
-    if (y1 < y_min)
-	y1 = y_min;
-    if (y1 > y_max)
-	y1 = y_max;
-    if (y2 < y_min)
-	y2 = y_min;
-    if (y2 > y_max)
-	y2 = y_max;
+    if (y1 < min_array[y_axis])
+	y1 = min_array[y_axis];
+    if (y1 > max_array[y_axis])
+	y1 = max_array[y_axis];
+    if (y2 < min_array[y_axis])
+	y2 = min_array[y_axis];
+    if (y2 > max_array[y_axis])
+	y2 = max_array[y_axis];
 
     xm = map_x(x);
     y1m = map_y(y1);
@@ -2458,22 +1997,21 @@ int *xl, *yl;			/* keeps track of "cursor" position */
 double x1, x2, y;		/* coordinates of vertical line */
 {
     struct termentry *t = term;
-    /* global x_min, x_max, y_min, y_max */
     int x1m, x2m, ym;
 
-    if ((x1 < x_min && x2 < x_min) ||
-	(x1 > x_max && x2 > x_max) ||
-	 y < y_min || y > y_max)
+    if ((x1 < min_array[x_axis] && x2 < min_array[x_axis]) ||
+	(x1 > max_array[x_axis] && x2 > max_array[x_axis]) ||
+	 y < min_array[y_axis] || y > max_array[y_axis])
 	return;
 
-    if (x1 < x_min)
-	x1 = x_min;
-    if (x1 > x_max)
-	x1 = x_max;
-    if (x2 < x_min)
-	x2 = x_min;
-    if (x2 > x_max)
-	x2 = x_max;
+    if (x1 < min_array[x_axis])
+	x1 = min_array[x_axis];
+    if (x1 > max_array[x_axis])
+	x1 = max_array[x_axis];
+    if (x2 < min_array[x_axis])
+	x2 = min_array[x_axis];
+    if (x2 > max_array[x_axis])
+	x2 = max_array[x_axis];
 
     ym = map_y(y);
     x1m = map_x(x1);
@@ -2521,13 +2059,13 @@ struct curve_points *plot;
 
 	    /* check to see if in xrange */
 	    x = plot->points[i].x;
-	    if (!inrange(x, x_min, x_max))
+	    if (!inrange(x, min_array[x_axis], max_array[x_axis]))
 		continue;
 	    xM = map_x(x);
 
 	    /* check to see if in yrange */
 	    y = plot->points[i].y;
-	    if (!inrange(y, y_min, y_max))
+	    if (!inrange(y, min_array[y_axis], max_array[y_axis]))
 		continue;
 	    yM = map_y(y);
 
@@ -2535,24 +2073,24 @@ struct curve_points *plot;
 	    yhigh = plot->points[i].yhigh;
 	    ylow = plot->points[i].ylow;
 
-	    high_inrange = inrange(yhigh, y_min, y_max);
-	    low_inrange = inrange(ylow, y_min, y_max);
+	    high_inrange = inrange(yhigh, min_array[y_axis], max_array[y_axis]);
+	    low_inrange = inrange(ylow, min_array[y_axis], max_array[y_axis]);
 
 	    /* compute the plot position of yhigh */
 	    if (high_inrange)
 		yhighM = map_y(yhigh);
-	    else if (samesign(yhigh - y_max, y_max - y_min))
-		yhighM = map_y(y_max);
+	    else if (samesign(yhigh - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+		yhighM = map_y(max_array[y_axis]);
 	    else
-		yhighM = map_y(y_min);
+		yhighM = map_y(min_array[y_axis]);
 
 	    /* compute the plot position of ylow */
 	    if (low_inrange)
 		ylowM = map_y(ylow);
-	    else if (samesign(ylow - y_max, y_max - y_min))
-		ylowM = map_y(y_max);
+	    else if (samesign(ylow - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+		ylowM = map_y(max_array[y_axis]);
 	    else
-		ylowM = map_y(y_min);
+		ylowM = map_y(min_array[y_axis]);
 
 	    if (!high_inrange && !low_inrange && ylowM == yhighM)
 		/* both out of range on the same side */
@@ -2562,24 +2100,24 @@ struct curve_points *plot;
 	    xhigh = plot->points[i].xhigh;
 	    xlow = plot->points[i].xlow;
 
-	    high_inrange = inrange(xhigh, x_min, x_max);
-	    low_inrange = inrange(xlow, x_min, x_max);
+	    high_inrange = inrange(xhigh, min_array[x_axis], max_array[x_axis]);
+	    low_inrange = inrange(xlow, min_array[x_axis], max_array[x_axis]);
 
 	    /* compute the plot position of xhigh */
 	    if (high_inrange)
 		xhighM = map_x(xhigh);
-	    else if (samesign(xhigh - x_max, x_max - x_min))
-		xhighM = map_x(x_max);
+	    else if (samesign(xhigh - max_array[x_axis], max_array[x_axis] - min_array[x_axis]))
+		xhighM = map_x(max_array[x_axis]);
 	    else
-		xhighM = map_x(x_min);
+		xhighM = map_x(min_array[x_axis]);
 
 	    /* compute the plot position of xlow */
 	    if (low_inrange)
 		xlowM = map_x(xlow);
-	    else if (samesign(xlow - x_max, x_max - x_min))
-		xlowM = map_x(x_max);
+	    else if (samesign(xlow - max_array[x_axis], max_array[x_axis] - min_array[x_axis]))
+		xlowM = map_x(max_array[x_axis]);
 	    else
-		xlowM = map_x(x_min);
+		xlowM = map_x(min_array[x_axis]);
 
 	    if (!high_inrange && !low_inrange && xlowM == xhighM)
 		/* both out of range on the same side */
@@ -2665,7 +2203,7 @@ struct curve_points *plot;
 
 	    /* check to see if in yrange */
 	    y = plot->points[i].y;
-	    if (!inrange(y, y_min, y_max))
+	    if (!inrange(y, min_array[y_axis], max_array[y_axis]))
 		continue;
 	    yM = map_y(y);
 
@@ -2673,24 +2211,24 @@ struct curve_points *plot;
 	    xhigh = plot->points[i].xhigh;
 	    xlow = plot->points[i].xlow;
 
-	    high_inrange = inrange(xhigh, x_min, x_max);
-	    low_inrange = inrange(xlow, x_min, x_max);
+	    high_inrange = inrange(xhigh, min_array[x_axis], max_array[x_axis]);
+	    low_inrange = inrange(xlow, min_array[x_axis], max_array[x_axis]);
 
 	    /* compute the plot position of xhigh */
 	    if (high_inrange)
 		xhighM = map_x(xhigh);
-	    else if (samesign(xhigh - x_max, x_max - x_min))
-		xhighM = map_x(x_max);
+	    else if (samesign(xhigh - max_array[x_axis], max_array[x_axis] - min_array[x_axis]))
+		xhighM = map_x(max_array[x_axis]);
 	    else
-		xhighM = map_x(x_min);
+		xhighM = map_x(min_array[x_axis]);
 
 	    /* compute the plot position of xlow */
 	    if (low_inrange)
 		xlowM = map_x(xlow);
-	    else if (samesign(xlow - x_max, x_max - x_min))
-		xlowM = map_x(x_max);
+	    else if (samesign(xlow - max_array[x_axis], max_array[x_axis] - min_array[x_axis]))
+		xlowM = map_x(max_array[x_axis]);
 	    else
-		xlowM = map_x(x_min);
+		xlowM = map_x(min_array[x_axis]);
 
 	    if (!high_inrange && !low_inrange && xlowM == xhighM)
 		/* both out of range on the same side */
@@ -2767,24 +2305,24 @@ int xaxis_y;
 		}
 
 		/* clip to border */
-		if ((y_min < y_max && dyt < y_min)
-		    || (y_max < y_min && dyt > y_min))
-		    dyt = y_min;
-		if ((y_min < y_max && dyt > y_max)
-		    || (y_max < y_min && dyt < y_max))
-		    dyt = y_max;
-		if ((x_min < x_max && dxr < x_min)
-		    || (x_max < x_min && dxr > x_min))
-		    dxr = x_min;
-		if ((x_min < x_max && dxr > x_max)
-		    || (x_max < x_min && dxr < x_max))
-		    dxr = x_max;
-		if ((x_min < x_max && dxl < x_min)
-		    || (x_max < x_min && dxl > x_min))
-		    dxl = x_min;
-		if ((x_min < x_max && dxl > x_max)
-		    || (x_max < x_min && dxl < x_max))
-		    dxl = x_max;
+		if ((min_array[y_axis] < max_array[y_axis] && dyt < min_array[y_axis])
+		    || (max_array[y_axis] < min_array[y_axis] && dyt > min_array[y_axis]))
+		    dyt = min_array[y_axis];
+		if ((min_array[y_axis] < max_array[y_axis] && dyt > max_array[y_axis])
+		    || (max_array[y_axis] < min_array[y_axis] && dyt < max_array[y_axis]))
+		    dyt = max_array[y_axis];
+		if ((min_array[x_axis] < max_array[x_axis] && dxr < min_array[x_axis])
+		    || (max_array[x_axis] < min_array[x_axis] && dxr > min_array[x_axis]))
+		    dxr = min_array[x_axis];
+		if ((min_array[x_axis] < max_array[x_axis] && dxr > max_array[x_axis])
+		    || (max_array[x_axis] < min_array[x_axis] && dxr < max_array[x_axis]))
+		    dxr = max_array[x_axis];
+		if ((min_array[x_axis] < max_array[x_axis] && dxl < min_array[x_axis])
+		    || (max_array[x_axis] < min_array[x_axis] && dxl > min_array[x_axis]))
+		    dxl = min_array[x_axis];
+		if ((min_array[x_axis] < max_array[x_axis] && dxl > max_array[x_axis])
+		    || (max_array[x_axis] < min_array[x_axis] && dxl < max_array[x_axis]))
+		    dxl = max_array[x_axis];
 
 		xl = map_x(dxl);
 		xr = map_x(dxr);
@@ -2874,7 +2412,7 @@ struct curve_points *plot;
 	points[0] = plot->points[i];
 	points[1].x = plot->points[i].xhigh;
 	points[1].y = plot->points[i].yhigh;
-	if (inrange(points[1].x, x_min, x_max) && inrange(points[1].y, y_min, y_max)) {
+	if (inrange(points[1].x, min_array[x_axis], max_array[x_axis]) && inrange(points[1].y, min_array[y_axis], max_array[y_axis])) {
 	    /* to inrange */
 	    points[1].type = INRANGE;
 	    x2 = map_x(points[1].x);
@@ -2944,7 +2482,7 @@ struct curve_points *plot;
 
 	/* check to see if in xrange */
 	x = plot->points[i].x;
-	if (!inrange(x, x_min, x_max))
+	if (!inrange(x, min_array[x_axis], max_array[x_axis]))
 	    continue;
 	xM = map_x(x);
 
@@ -2954,24 +2492,24 @@ struct curve_points *plot;
 	yclose = plot->points[i].z;
 	yopen = plot->points[i].y;
 
-	high_inrange = inrange(yhigh, y_min, y_max);
-	low_inrange = inrange(ylow, y_min, y_max);
+	high_inrange = inrange(yhigh, min_array[y_axis], max_array[y_axis]);
+	low_inrange = inrange(ylow, min_array[y_axis], max_array[y_axis]);
 
 	/* compute the plot position of yhigh */
 	if (high_inrange)
 	    yhighM = map_y(yhigh);
-	else if (samesign(yhigh - y_max, y_max - y_min))
-	    yhighM = map_y(y_max);
+	else if (samesign(yhigh - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+	    yhighM = map_y(max_array[y_axis]);
 	else
-	    yhighM = map_y(y_min);
+	    yhighM = map_y(min_array[y_axis]);
 
 	/* compute the plot position of ylow */
 	if (low_inrange)
 	    ylowM = map_y(ylow);
-	else if (samesign(ylow - y_max, y_max - y_min))
-	    ylowM = map_y(y_max);
+	else if (samesign(ylow - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+	    ylowM = map_y(max_array[y_axis]);
 	else
-	    ylowM = map_y(y_min);
+	    ylowM = map_y(min_array[y_axis]);
 
 	if (!high_inrange && !low_inrange && ylowM == yhighM)
 	    /* both out of range on the same side */
@@ -3013,7 +2551,7 @@ struct curve_points *plot;
 
 	/* check to see if in xrange */
 	x = plot->points[i].x;
-	if (!inrange(x, x_min, x_max))
+	if (!inrange(x, min_array[x_axis], max_array[x_axis]))
 	    continue;
 	xM = map_x(x);
 
@@ -3023,24 +2561,24 @@ struct curve_points *plot;
 	yclose = plot->points[i].z;
 	yopen = plot->points[i].y;
 
-	high_inrange = inrange(yhigh, y_min, y_max);
-	low_inrange = inrange(ylow, y_min, y_max);
+	high_inrange = inrange(yhigh, min_array[y_axis], max_array[y_axis]);
+	low_inrange = inrange(ylow, min_array[y_axis], max_array[y_axis]);
 
 	/* compute the plot position of yhigh */
 	if (high_inrange)
 	    yhighM = map_y(yhigh);
-	else if (samesign(yhigh - y_max, y_max - y_min))
-	    yhighM = map_y(y_max);
+	else if (samesign(yhigh - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+	    yhighM = map_y(max_array[y_axis]);
 	else
-	    yhighM = map_y(y_min);
+	    yhighM = map_y(min_array[y_axis]);
 
 	/* compute the plot position of ylow */
 	if (low_inrange)
 	    ylowM = map_y(ylow);
-	else if (samesign(ylow - y_max, y_max - y_min))
-	    ylowM = map_y(y_max);
+	else if (samesign(ylow - max_array[y_axis], max_array[y_axis] - min_array[y_axis]))
+	    ylowM = map_y(max_array[y_axis]);
 	else
-	    ylowM = map_y(y_min);
+	    ylowM = map_y(min_array[y_axis]);
 
 	if (!high_inrange && !low_inrange && ylowM == yhighM)
 	    /* both out of range on the same side */
@@ -3098,7 +2636,6 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
 {
-    /* global x_min, x_max, y_min, x_max */
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
     double ox = points[i].x;
@@ -3133,11 +2670,11 @@ double *ex, *ey;		/* the point where it crosses an edge */
 	    if (oy == -VERYLARGE)
 		return;
 
-	    *ex = x_min;
+	    *ex = min_array[x_axis];
 	    return;
 	}
 	/* obviously oy is -VERYLARGE and ox != -VERYLARGE */
-	*ey = y_min;
+	*ey = min_array[y_axis];
 	return;
     }
     /*
@@ -3146,26 +2683,26 @@ double *ex, *ey;		/* the point where it crosses an edge */
      */
     if (iy == oy) {
 	/* horizontal line */
-	/* assume inrange(iy, y_min, y_max) */
+	/* assume inrange(iy, min_array[y_axis], max_array[y_axis]) */
 	*ey = iy;		/* == oy */
 
-	if (inrange(x_max, ix, ox))
-	    *ex = x_max;
-	else if (inrange(x_min, ix, ox))
-	    *ex = x_min;
+	if (inrange(max_array[x_axis], ix, ox))
+	    *ex = max_array[x_axis];
+	else if (inrange(min_array[x_axis], ix, ox))
+	    *ex = min_array[x_axis];
 	else {
 	    graph_error("error in edge_intersect");
 	}
 	return;
     } else if (ix == ox) {
 	/* vertical line */
-	/* assume inrange(ix, x_min, x_max) */
+	/* assume inrange(ix, min_array[x_axis], max_array[x_axis]) */
 	*ex = ix;		/* == ox */
 
-	if (inrange(y_max, iy, oy))
-	    *ey = y_max;
-	else if (inrange(y_min, iy, oy))
-	    *ey = y_min;
+	if (inrange(max_array[y_axis], iy, oy))
+	    *ey = max_array[y_axis];
+	else if (inrange(min_array[y_axis], iy, oy))
+	    *ey = min_array[y_axis];
 	else {
 	    graph_error("error in edge_intersect");
 	}
@@ -3173,38 +2710,38 @@ double *ex, *ey;		/* the point where it crosses an edge */
     }
     /* slanted line of some kind */
 
-    /* does it intersect y_min edge */
-    if (inrange(y_min, iy, oy) && y_min != iy && y_min != oy) {
-	x = ix + (y_min - iy) * ((ox - ix) / (oy - iy));
-	if (inrange(x, x_min, x_max)) {
+    /* does it intersect min_array[y_axis] edge */
+    if (inrange(min_array[y_axis], iy, oy) && min_array[y_axis] != iy && min_array[y_axis] != oy) {
+	x = ix + (min_array[y_axis] - iy) * ((ox - ix) / (oy - iy));
+	if (inrange(x, min_array[x_axis], max_array[x_axis])) {
 	    *ex = x;
-	    *ey = y_min;
+	    *ey = min_array[y_axis];
 	    return;		/* yes */
 	}
     }
-    /* does it intersect y_max edge */
-    if (inrange(y_max, iy, oy) && y_max != iy && y_max != oy) {
-	x = ix + (y_max - iy) * ((ox - ix) / (oy - iy));
-	if (inrange(x, x_min, x_max)) {
+    /* does it intersect max_array[y_axis] edge */
+    if (inrange(max_array[y_axis], iy, oy) && max_array[y_axis] != iy && max_array[y_axis] != oy) {
+	x = ix + (max_array[y_axis] - iy) * ((ox - ix) / (oy - iy));
+	if (inrange(x, min_array[x_axis], max_array[x_axis])) {
 	    *ex = x;
-	    *ey = y_max;
+	    *ey = max_array[y_axis];
 	    return;		/* yes */
 	}
     }
-    /* does it intersect x_min edge */
-    if (inrange(x_min, ix, ox) && x_min != ix && x_min != ox) {
-	y = iy + (x_min - ix) * ((oy - iy) / (ox - ix));
-	if (inrange(y, y_min, y_max)) {
-	    *ex = x_min;
+    /* does it intersect min_array[x_axis] edge */
+    if (inrange(min_array[x_axis], ix, ox) && min_array[x_axis] != ix && min_array[x_axis] != ox) {
+	y = iy + (min_array[x_axis] - ix) * ((oy - iy) / (ox - ix));
+	if (inrange(y, min_array[y_axis], max_array[y_axis])) {
+	    *ex = min_array[x_axis];
 	    *ey = y;
 	    return;
 	}
     }
-    /* does it intersect x_max edge */
-    if (inrange(x_max, ix, ox) && x_max != ix && x_max != ox) {
-	y = iy + (x_max - ix) * ((oy - iy) / (ox - ix));
-	if (inrange(y, y_min, y_max)) {
-	    *ex = x_max;
+    /* does it intersect max_array[x_axis] edge */
+    if (inrange(max_array[x_axis], ix, ox) && max_array[x_axis] != ix && max_array[x_axis] != ox) {
+	y = iy + (max_array[x_axis] - ix) * ((oy - iy) / (ox - ix));
+	if (inrange(y, min_array[y_axis], max_array[y_axis])) {
+	    *ex = max_array[x_axis];
 	    *ey = y;
 	    return;
 	}
@@ -3237,39 +2774,39 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
 {
-    /* global x_min, x_max, y_min, x_max */
+    /* global min_array[x_axis], max_array[x_axis], min_array[y_axis], max_array[x_axis] */
     double ax = points[i - 1].x;
     double ay = points[i - 1].y;
     double bx = points[i].x;
     double by = points[i].y;
 
     if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
-	if (inrange(ay, y_min, y_max)) {
+	if (inrange(ay, min_array[y_axis], max_array[y_axis])) {
 	    *ey = ay;
-	    if (ax > x_max)
-		*ex = x_max;
-	    else		/* x < x_min */
-		*ex = x_min;
+	    if (ax > max_array[x_axis])
+		*ex = max_array[x_axis];
+	    else		/* x < min_array[x_axis] */
+		*ex = min_array[x_axis];
 	} else {
 	    *ex = bx;
-	    if (ay > y_max)
-		*ey = y_max;
-	    else		/* y < y_min */
-		*ey = y_min;
+	    if (ay > max_array[y_axis])
+		*ey = max_array[y_axis];
+	    else		/* y < min_array[y_axis] */
+		*ey = min_array[y_axis];
 	}
     } else {			/* from INRANGE to OUTRANGE */
-	if (inrange(bx, x_min, x_max)) {
+	if (inrange(bx, min_array[x_axis], max_array[x_axis])) {
 	    *ex = bx;
-	    if (by > y_max)
-		*ey = y_max;
-	    else		/* y < y_min */
-		*ey = y_min;
+	    if (by > max_array[y_axis])
+		*ey = max_array[y_axis];
+	    else		/* y < min_array[y_axis] */
+		*ey = min_array[y_axis];
 	} else {
 	    *ey = ay;
-	    if (bx > x_max)
-		*ex = x_max;
-	    else		/* x < x_min */
-		*ex = x_min;
+	    if (bx > max_array[x_axis])
+		*ex = max_array[x_axis];
+	    else		/* x < min_array[x_axis] */
+		*ex = min_array[x_axis];
 	}
     }
     return;
@@ -3292,39 +2829,39 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *ex, *ey;		/* the point where it crosses an edge */
 {
-    /* global x_min, x_max, y_min, x_max */
+    /* global min_array[x_axis], max_array[x_axis], min_array[y_axis], max_array[x_axis] */
     double ax = points[i - 1].x;
     double ay = points[i - 1].y;
     double bx = points[i].x;
     double by = points[i].y;
 
     if (points[i].type == INRANGE) {	/* from OUTRANGE to INRANG */
-	if (inrange(ax, x_min, x_max)) {
+	if (inrange(ax, min_array[x_axis], max_array[x_axis])) {
 	    *ex = ax;
-	    if (ay > y_max)
-		*ey = y_max;
-	    else		/* y < y_min */
-		*ey = y_min;
+	    if (ay > max_array[y_axis])
+		*ey = max_array[y_axis];
+	    else		/* y < min_array[y_axis] */
+		*ey = min_array[y_axis];
 	} else {
 	    *ey = by;
-	    if (bx > x_max)
-		*ex = x_max;
-	    else		/* x < x_min */
-		*ex = x_min;
+	    if (bx > max_array[x_axis])
+		*ex = max_array[x_axis];
+	    else		/* x < min_array[x_axis] */
+		*ex = min_array[x_axis];
 	}
     } else {			/* from INRANGE to OUTRANGE */
-	if (inrange(by, y_min, y_max)) {
+	if (inrange(by, min_array[y_axis], max_array[y_axis])) {
 	    *ey = by;
-	    if (bx > x_max)
-		*ex = x_max;
-	    else		/* x < x_min */
-		*ex = x_min;
+	    if (bx > max_array[x_axis])
+		*ex = max_array[x_axis];
+	    else		/* x < min_array[x_axis] */
+		*ex = min_array[x_axis];
 	} else {
 	    *ex = ax;
-	    if (by > y_max)
-		*ey = y_max;
-	    else		/* y < y_min */
-		*ey = y_min;
+	    if (by > max_array[y_axis])
+		*ey = max_array[y_axis];
+	    else		/* y < min_array[y_axis] */
+		*ey = min_array[y_axis];
 	}
     }
     return;
@@ -3351,40 +2888,40 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
-    /* global x_min, x_max, y_min, x_max */
+    /* global min_array[x_axis], max_array[x_axis], min_array[y_axis], max_array[x_axis] */
     double ax = points[i - 1].x;
     double ay = points[i - 1].y;
     double bx = points[i].x;
     double by = points[i].y;
 
-    if (GPMAX(ax, bx) < x_min || GPMIN(ax, bx) > x_max ||
-	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max || ((ay > y_max || ay < y_min) && (bx > x_max || bx < x_min))) {
+    if (GPMAX(ax, bx) < min_array[x_axis] || GPMIN(ax, bx) > max_array[x_axis] ||
+	GPMAX(ay, by) < min_array[y_axis] || GPMIN(ay, by) > max_array[y_axis] || ((ay > max_array[y_axis] || ay < min_array[y_axis]) && (bx > max_array[x_axis] || bx < min_array[x_axis]))) {
 	return (FALSE);
-    } else if (inrange(ay, y_min, y_max) && inrange(bx, x_min, x_max)) {	/* corner of step inside plotspace */
+    } else if (inrange(ay, min_array[y_axis], max_array[y_axis]) && inrange(bx, min_array[x_axis], max_array[x_axis])) {	/* corner of step inside plotspace */
 	*ly++ = ay;
-	if (ax < x_min)
-	    *lx++ = x_min;
+	if (ax < min_array[x_axis])
+	    *lx++ = min_array[x_axis];
 	else
-	    *lx++ = x_max;
+	    *lx++ = max_array[x_axis];
 
 	*lx++ = bx;
-	if (by < y_min)
-	    *ly++ = y_min;
+	if (by < min_array[y_axis])
+	    *ly++ = min_array[y_axis];
 	else
-	    *ly++ = y_max;
+	    *ly++ = max_array[y_axis];
 
 	return (TRUE);
-    } else if (inrange(ay, y_min, y_max)) {	/* cross plotspace in x-direction */
-	*lx++ = x_min;
+    } else if (inrange(ay, min_array[y_axis], max_array[y_axis])) {	/* cross plotspace in x-direction */
+	*lx++ = min_array[x_axis];
 	*ly++ = ay;
-	*lx++ = x_max;
+	*lx++ = max_array[x_axis];
 	*ly++ = ay;
 	return (TRUE);
-    } else if (inrange(ax, x_min, x_max)) {	/* cross plotspace in y-direction */
+    } else if (inrange(ax, min_array[x_axis], max_array[x_axis])) {	/* cross plotspace in y-direction */
 	*lx++ = bx;
-	*ly++ = y_min;
+	*ly++ = min_array[y_axis];
 	*lx++ = bx;
-	*ly++ = y_max;
+	*ly++ = max_array[y_axis];
 	return (TRUE);
     } else
 	return (FALSE);
@@ -3411,40 +2948,40 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
-    /* global x_min, x_max, y_min, x_max */
+    /* global min_array[x_axis], max_array[x_axis], min_array[y_axis], max_array[x_axis] */
     double ax = points[i - 1].x;
     double ay = points[i - 1].y;
     double bx = points[i].x;
     double by = points[i].y;
 
-    if (GPMAX(ax, bx) < x_min || GPMIN(ax, bx) > x_max ||
-	GPMAX(ay, by) < y_min || GPMIN(ay, by) > y_max || ((by > y_max || by < y_min) && (ax > x_max || ax < x_min))) {
+    if (GPMAX(ax, bx) < min_array[x_axis] || GPMIN(ax, bx) > max_array[x_axis] ||
+	GPMAX(ay, by) < min_array[y_axis] || GPMIN(ay, by) > max_array[y_axis] || ((by > max_array[y_axis] || by < min_array[y_axis]) && (ax > max_array[x_axis] || ax < min_array[x_axis]))) {
 	return (FALSE);
-    } else if (inrange(by, y_min, y_max) && inrange(ax, x_min, x_max)) {	/* corner of step inside plotspace */
+    } else if (inrange(by, min_array[y_axis], max_array[y_axis]) && inrange(ax, min_array[x_axis], max_array[x_axis])) {	/* corner of step inside plotspace */
 	*lx++ = ax;
-	if (ay < y_min)
-	    *ly++ = y_min;
+	if (ay < min_array[y_axis])
+	    *ly++ = min_array[y_axis];
 	else
-	    *ly++ = y_max;
+	    *ly++ = max_array[y_axis];
 
 	*ly = by;
-	if (bx < x_min)
-	    *lx = x_min;
+	if (bx < min_array[x_axis])
+	    *lx = min_array[x_axis];
 	else
-	    *lx = x_max;
+	    *lx = max_array[x_axis];
 
 	return (TRUE);
-    } else if (inrange(by, y_min, y_max)) {	/* cross plotspace in x-direction */
-	*lx++ = x_min;
+    } else if (inrange(by, min_array[y_axis], max_array[y_axis])) {	/* cross plotspace in x-direction */
+	*lx++ = min_array[x_axis];
 	*ly++ = by;
-	*lx = x_max;
+	*lx = max_array[x_axis];
 	*ly = by;
 	return (TRUE);
-    } else if (inrange(ax, x_min, x_max)) {	/* cross plotspace in y-direction */
+    } else if (inrange(ax, min_array[x_axis], max_array[x_axis])) {	/* cross plotspace in y-direction */
 	*lx++ = ax;
-	*ly++ = y_min;
+	*ly++ = min_array[y_axis];
 	*lx = ax;
-	*ly = y_max;
+	*ly = max_array[y_axis];
 	return (TRUE);
     } else
 	return (FALSE);
@@ -3466,7 +3003,7 @@ struct coordinate GPHUGE *points;	/* the points array */
 int i;				/* line segment from point i-1 to point i */
 double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 {
-    /* global x_min, x_max, y_min, x_max */
+    /* global min_array[x_axis], max_array[x_axis], min_array[y_axis], max_array[x_axis] */
     int count;
     double ix = points[i - 1].x;
     double iy = points[i - 1].y;
@@ -3513,11 +3050,11 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    oy = swap;
 	}
 	/* check actually passes through the graph area */
-	if (ix > x_max && inrange(iy, y_min, y_max)) {
-	    lx[0] = x_min;
+	if (ix > max_array[x_axis] && inrange(iy, min_array[y_axis], max_array[y_axis])) {
+	    lx[0] = min_array[x_axis];
 	    ly[0] = iy;
 
-	    lx[1] = x_max;
+	    lx[1] = max_array[x_axis];
 	    ly[1] = iy;
 #if 0
 	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
@@ -3541,12 +3078,12 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	    oy = swap;
 	}
 	/* check actually passes through the graph area */
-	if (iy > y_max && inrange(ix, x_min, x_max)) {
+	if (iy > max_array[y_axis] && inrange(ix, min_array[x_axis], max_array[x_axis])) {
 	    lx[0] = ix;
-	    ly[0] = y_min;
+	    ly[0] = min_array[y_axis];
 
 	    lx[1] = ix;
-	    ly[1] = y_max;
+	    ly[1] = max_array[y_axis];
 #if 0
 	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
@@ -3564,7 +3101,7 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
      *
      * The slant line intersections are solved using the parametric form
      * of the equation for a line, since if we test x/y min/max planes explicitly
-     * then e.g. a  line passing through a corner point (x_min,y_min) 
+     * then e.g. a  line passing through a corner point (min_array[x_axis],min_array[y_axis]) 
      * actually intersects 2 planes and hence further tests would be required 
      * to anticipate this and similar situations.
      */
@@ -3579,17 +3116,17 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     if (ix == ox) {
 	/* line parallel to y axis */
 
-	/* x coord must be in range, and line must span both y_min and y_max */
-	/* note that spanning y_min implies spanning y_max, as both points OUTRANGE */
-	if (!inrange(ix, x_min, x_max)) {
+	/* x coord must be in range, and line must span both min_array[y_axis] and max_array[y_axis] */
+	/* note that spanning min_array[y_axis] implies spanning max_array[y_axis], as both points OUTRANGE */
+	if (!inrange(ix, min_array[x_axis], max_array[x_axis])) {
 	    return (FALSE);
 	}
-	if (inrange(y_min, iy, oy)) {
+	if (inrange(min_array[y_axis], iy, oy)) {
 	    lx[0] = ix;
-	    ly[0] = y_min;
+	    ly[0] = min_array[y_axis];
 
 	    lx[1] = ix;
-	    ly[1] = y_max;
+	    ly[1] = max_array[y_axis];
 #if 0
 	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
 #endif
@@ -3601,16 +3138,16 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
 	/* already checked case (ix == ox && iy == oy) */
 
 	/* line parallel to x axis */
-	/* y coord must be in range, and line must span both x_min and x_max */
-	/* note that spanning x_min implies spanning x_max, as both points OUTRANGE */
-	if (!inrange(iy, y_min, y_max)) {
+	/* y coord must be in range, and line must span both min_array[x_axis] and max_array[x_axis] */
+	/* note that spanning min_array[x_axis] implies spanning max_array[x_axis], as both points OUTRANGE */
+	if (!inrange(iy, min_array[y_axis], max_array[y_axis])) {
 	    return (FALSE);
 	}
-	if (inrange(x_min, ix, ox)) {
-	    lx[0] = x_min;
+	if (inrange(min_array[x_axis], ix, ox)) {
+	    lx[0] = min_array[x_axis];
 	    ly[0] = iy;
 
-	    lx[1] = x_max;
+	    lx[1] = max_array[x_axis];
 	    ly[1] = iy;
 #if 0
 	    fprintf(stderr, "(%g %g) -> (%g %g)", lx[0], ly[0], lx[1], ly[1]);
@@ -3632,16 +3169,16 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
        diff_y = (oy - iy);
      */
 
-    t[0] = (x_min - ix) / (ox - ix);
-    t[1] = (x_max - ix) / (ox - ix);
+    t[0] = (min_array[x_axis] - ix) / (ox - ix);
+    t[1] = (max_array[x_axis] - ix) / (ox - ix);
 
     if (t[0] > t[1]) {
 	swap = t[0];
 	t[0] = t[1];
 	t[1] = swap;
     }
-    t[2] = (y_min - iy) / (oy - iy);
-    t[3] = (y_max - iy) / (oy - iy);
+    t[2] = (min_array[y_axis] - iy) / (oy - iy);
+    t[3] = (max_array[y_axis] - iy) / (oy - iy);
 
     if (t[2] > t[3]) {
 	swap = t[2];
@@ -3663,15 +3200,13 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     /*
      * Can only have 0 or 2 intersection points -- only need test one coord
      */
-#if 0
-    /* HBB 19990510: this version didn't have the necessary safety
-     * margin to account for limited precision calculations: */
-    if (inrange(lx[0], x_min, x_max) && inrange(ly[0], y_min, y_max))
-#else
     /* FIXME: this is UGLY. Need an 'almost_inrange()' function */
-    if (inrange(lx[0], (x_min - 1e-5 * (x_max - x_min)), (x_max + 1e-5 * (x_max - x_min)))
-	&& inrange(ly[0], (y_min - 1e-5 * (y_max - y_min)), (y_max + 1e-5 * (y_max - y_min))))
-#endif
+    if (inrange(lx[0],
+		(min_array[x_axis] - 1e-5 * (max_array[x_axis] - min_array[x_axis])),
+		(max_array[x_axis] + 1e-5 * (max_array[x_axis] - min_array[x_axis])))
+	&& inrange(ly[0],
+		   (min_array[y_axis] - 1e-5 * (max_array[y_axis] - min_array[y_axis])),
+		   (max_array[y_axis] + 1e-5 * (max_array[y_axis] - min_array[y_axis]))))
     {
 
 #if 0
@@ -3681,164 +3216,6 @@ double *lx, *ly;		/* lx[2], ly[2]: points where it crosses edges */
     }
     return (FALSE);
 }
-
-/* justify ticplace to a proper date-time value */
-static double
-time_tic_just(level, ticplace)
-int level;
-double ticplace;
-{
-    struct tm tm;
-
-    if (level <= 0) {
-	return (ticplace);
-    }
-    ggmtime(&tm, (double) ticplace);
-    if (level > 0) {		/* units of minutes */
-	if (tm.tm_sec > 50)
-	    tm.tm_min++;
-	tm.tm_sec = 0;
-    }
-    if (level > 1) {		/* units of hours */
-	if (tm.tm_min > 50)
-	    tm.tm_hour++;
-	tm.tm_min = 0;
-    }
-    if (level > 2) {		/* units of days */
-	if (tm.tm_hour > 14) {
-	    tm.tm_hour = 0;
-	    tm.tm_mday = 0;
-	    tm.tm_yday++;
-	    ggmtime(&tm, (double) gtimegm(&tm));
-	} else if (tm.tm_hour > 7) {
-	    tm.tm_hour = 12;
-	} else if (tm.tm_hour > 3) {
-	    tm.tm_hour = 6;
-	} else {
-	    tm.tm_hour = 0;
-	}
-    }
-    /* skip it, I have not bothered with weekday so far */
-    if (level > 4) {		/* units of month */
-	if (tm.tm_mday > 25) {
-	    tm.tm_mon++;
-	    if (tm.tm_mon > 11) {
-		tm.tm_year++;
-		tm.tm_mon = 0;
-	    }
-	}
-	tm.tm_mday = 1;
-    }
-    if (level > 5) {
-	if (tm.tm_mon >= 7)
-	    tm.tm_year++;
-	tm.tm_mon = 0;
-    }
-    ticplace = (double) gtimegm(&tm);
-    ggmtime(&tm, (double) gtimegm(&tm));
-    return (ticplace);
-}
-
-/* make smalltics for time-axis */
-static double
-make_ltic(tlevel, incr)
-int tlevel;
-double incr;
-{
-    double tinc = 0.0;
-
-    if (tlevel < 0)
-	tlevel = 0;
-    switch (tlevel) {
-    case 0:
-    case 1:{
-	    if (incr >= 20)
-		tinc = 10;
-	    if (incr >= 60)
-		tinc = 30;
-	    if (incr >= 2 * 60)
-		tinc = 60;
-	    if (incr >= 5 * 60)
-		tinc = 2 * 60;
-	    if (incr >= 10 * 60)
-		tinc = 5 * 60;
-	    if (incr >= 20 * 60)
-		tinc = 10 * 60;
-	    break;
-	}
-    case 2:{
-	    if (incr >= 20 * 60)
-		tinc = 10 * 60;
-	    if (incr >= 3600)
-		tinc = 30 * 60;
-	    if (incr >= 2 * 3600)
-		tinc = 3600;
-	    if (incr >= 5 * 3600)
-		tinc = 2 * 3600;
-	    if (incr >= 10 * 3600)
-		tinc = 5 * 3600;
-	    if (incr >= 20 * 3600)
-		tinc = 10 * 3600;
-	    break;
-	}
-    case 3:{
-	    if (incr > 2 * 3600)
-		tinc = 3600;
-	    if (incr > 4 * 3600)
-		tinc = 2 * 3600;
-	    if (incr > 7 * 3600)
-		tinc = 3 * 3600;
-	    if (incr > 13 * 3600)
-		tinc = 6 * 3600;
-	    if (incr > DAY_SEC)
-		tinc = 12 * 3600;
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    break;
-	}
-    case 4:{			/* week: tic per day */
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    if (incr > 7 * DAY_SEC)
-		tinc = 7 * DAY_SEC;
-	    break;
-	}
-    case 5:{			/* month */
-	    if (incr > 2 * DAY_SEC)
-		tinc = DAY_SEC;
-	    if (incr > 15 * DAY_SEC)
-		tinc = 10 * DAY_SEC;
-	    if (incr > 2 * MON_SEC)
-		tinc = MON_SEC;
-	    if (incr > 6 * MON_SEC)
-		tinc = 3 * MON_SEC;
-	    if (incr > 2 * YEAR_SEC)
-		tinc = YEAR_SEC;
-	    break;
-	}
-    case 6:{			/* year */
-	    if (incr > 2 * MON_SEC)
-		tinc = MON_SEC;
-	    if (incr > 6 * MON_SEC)
-		tinc = 3 * MON_SEC;
-	    if (incr > 2 * YEAR_SEC)
-		tinc = YEAR_SEC;
-	    if (incr > 10 * YEAR_SEC)
-		tinc = 5 * YEAR_SEC;
-	    if (incr > 50 * YEAR_SEC)
-		tinc = 10 * YEAR_SEC;
-	    if (incr > 100 * YEAR_SEC)
-		tinc = 20 * YEAR_SEC;
-	    if (incr > 200 * YEAR_SEC)
-		tinc = 50 * YEAR_SEC;
-	    if (incr > 300 * YEAR_SEC)
-		tinc = 100 * YEAR_SEC;
-	    break;
-	}
-    }
-    return (tinc);
-}
-
 
 void
 write_multiline(x, y, text, hor, vert, angle, font)
@@ -3909,7 +3286,7 @@ const char *font;		/* NULL or "" means use default */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 static void
 xtick2d_callback(axis, place, text, grid)
-int axis;
+AXIS_INDEX axis;
 double place;
 char *text;
 struct lp_style_type grid;	/* linetype or -2 for no grid */
@@ -3983,7 +3360,7 @@ struct lp_style_type grid;	/* linetype or -2 for no grid */
 /* also uses global tic_start, tic_direction, tic_text and tic_just */
 static void
 ytick2d_callback(axis, place, text, grid)
-int axis;
+AXIS_INDEX axis;
 double place;
 char *text;
 struct lp_style_type grid;	/* linetype or -2 */
@@ -4074,586 +3451,6 @@ int *lines;
 }
 
 
-void
-setup_tics(axis, ticdef, format, max)
-int axis;
-struct ticdef *ticdef;
-char *format;
-int max;			/* approx max number of slots available */
-{
-    double tic = 0;		/* HBB: shut up gcc -Wall */
-
-    int fixmin = (auto_array[axis] & 1) != 0;
-    int fixmax = (auto_array[axis] & 2) != 0;
-
-    if (ticdef->type == TIC_SERIES) {
-	ticstep[axis] = tic = ticdef->def.series.incr;
-	fixmin &= (ticdef->def.series.start == -VERYLARGE);
-	fixmax &= (ticdef->def.series.end == VERYLARGE);
-    } else if (ticdef->type == TIC_COMPUTED) {
-	ticstep[axis] = tic = make_tics(axis, max);
-    } else {
-	fixmin = fixmax = 0;	/* user-defined, day or month */
-    }
-
-    if (fixmin) {
-	if (min_array[axis] < max_array[axis])
-	    min_array[axis] = tic * floor(min_array[axis] / tic);
-	else
-	    min_array[axis] = tic * ceil(min_array[axis] / tic);
-    }
-    if (fixmax) {
-	if (min_array[axis] < max_array[axis])
-	    max_array[axis] = tic * ceil(max_array[axis] / tic);
-	else
-	    max_array[axis] = tic * floor(max_array[axis] / tic);
-    }
-    if (datatype[axis] == TIME && format_is_numeric[axis])
-	/* invent one for them */
-	timetic_format(axis, min_array[axis], max_array[axis]);
-    else
-	strcpy(ticfmt[axis], format);
-}
-
-/*{{{  mant_exp - split into mantissa and/or exponent */
-static void
-mant_exp(log_base, x, scientific, m, p)
-double log_base, x;
-int scientific;			/* round to power of 3 */
-double *m;
-int *p;				/* results */
-{
-    int sign = 1;
-    double l10;
-    int power;
-    /*{{{  check 0 */
-    if (x == 0) {
-	if (m)
-	    *m = 0;
-	if (p)
-	    *p = 0;
-	return;
-    }
-    /*}}} */
-    /*{{{  check -ve */
-    if (x < 0) {
-	sign = (-1);
-	x = (-x);
-    }
-    /*}}} */
-
-    l10 = log10(x) / log_base;
-    power = floor(l10);
-    if (scientific) {
-	power = 3 * floor(power / 3.0);
-    }
-    if (m)
-	*m = sign * pow(10.0, (l10 - power) * log_base);
-    if (p)
-	*p = power;
-}
-
-/*}}} */
-
-/*
- * Kludge alert!!
- * Workaround until we have a better solution ...
- * Note: this assumes that all calls to sprintf in gprintf have
- * exactly three args. Lars
- */
-#ifdef HAVE_SNPRINTF
-# define sprintf(str,fmt,arg) \
-    if (snprintf((str),count,(fmt),(arg)) > count) \
-      fprintf (stderr,"%s:%d: Warning: too many digits for format\n",__FILE__,__LINE__)
-#endif
-
-/*{{{  gprintf */
-/* extended s(n)printf */
-void
-gprintf(dest, count, format, log_base, x)
-char *dest, *format;
-size_t count;
-double log_base, x;		/* we print one number in a number of different formats */
-{
-    char temp[MAX_LINE_LEN + 1];
-    char *t;
-
-    for (;;) {
-	/*{{{  copy to dest until % */
-	while (*format != '%')
-	    if (!(*dest++ = *format++))
-		return;		/* end of format */
-	/*}}} */
-
-	/*{{{  check for %% */
-	if (format[1] == '%') {
-	    *dest++ = '%';
-	    format += 2;
-	    continue;
-	}
-	/*}}} */
-
-	/*{{{  copy format part to temp, excluding conversion character */
-	t = temp;
-	*t++ = '%';
-	/* dont put isdigit first since sideeffect in macro is bad */
-	while (*++format == '.' || isdigit((int) *format) || *format == '-' || *format == '+' || *format == ' ')
-	    *t++ = *format;
-	/*}}} */
-
-	/*{{{  convert conversion character */
-	switch (*format) {
-	    /*{{{  x and o */
-	case 'x':
-	case 'X':
-	case 'o':
-	case 'O':
-	    t[0] = *format++;
-	    t[1] = 0;
-	    sprintf(dest, temp, (int) x);
-	    dest += strlen(dest);
-	    break;
-	    /*}}} */
-	    /*{{{  e, f and g */
-	case 'e':
-	case 'E':
-	case 'f':
-	case 'F':
-	case 'g':
-	case 'G':
-	    t[0] = *format++;
-	    t[1] = 0;
-	    sprintf(dest, temp, x);
-	    dest += strlen(dest);
-	    break;
-	    /*}}} */
-	    /*{{{  l */
-	case 'l':
-	    {
-		double mantissa;
-		mant_exp(log_base, x, 0, &mantissa, NULL);
-		t[0] = 'f';
-		t[1] = 0;
-		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  t */
-	case 't':
-	    {
-		double mantissa;
-		mant_exp(1.0, x, 0, &mantissa, NULL);
-		t[0] = 'f';
-		t[1] = 0;
-		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  s */
-	case 's':
-	    {
-		double mantissa;
-		mant_exp(1.0, x, 1, &mantissa, NULL);
-		t[0] = 'f';
-		t[1] = 0;
-		sprintf(dest, temp, mantissa);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  L */
-	case 'L':
-	    {
-		int power;
-		mant_exp(log_base, x, 0, NULL, &power);
-		t[0] = 'd';
-		t[1] = 0;
-		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  T */
-	case 'T':
-	    {
-		int power;
-		mant_exp(1.0, x, 0, NULL, &power);
-		t[0] = 'd';
-		t[1] = 0;
-		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  S */
-	case 'S':
-	    {
-		int power;
-		mant_exp(1.0, x, 1, NULL, &power);
-		t[0] = 'd';
-		t[1] = 0;
-		sprintf(dest, temp, power);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	    /*{{{  c */
-	case 'c':
-	    {
-		int power;
-		mant_exp(1.0, x, 1, NULL, &power);
-		t[0] = 'c';
-		t[1] = 0;
-		power = power / 3 + 6;	/* -18 -> 0, 0 -> 6, +18 -> 12, ... */
-		if (power >= 0 && power <= 12) {
-		    sprintf(dest, temp, "afpnum kMGTPE"[power]);
-		} else {
-		    /* please extend the range ! */
-		    /* name  power   name  power
-		       -------------------------
-		       atto   -18    Exa    18
-		       femto  -15    Peta   15
-		       pico   -12    Tera   12
-		       nano    -9    Giga    9
-		       micro   -6    Mega    6
-		       milli   -3    kilo    3   */
-
-		    /* for the moment, print e+21 for example */
-		    sprintf(dest, "e%+02d", (power - 6) * 3);
-		}
-
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	case 'P':
-	    {
-		t[0] = 'f';
-		t[1] = 0;
-		sprintf(dest, temp, x / M_PI);
-		dest += strlen(dest);
-		++format;
-		break;
-	    }
-	    /*}}} */
-	default:
-	    int_error(NO_CARET, "Bad format character");
-	}
-	/*}}} */
-    }
-}
-
-/*}}} */
-#ifdef HAVE_SNPRINTF
-# undef sprintf
-#endif
-
-
-
-/*{{{  gen_tics */
-/* uses global arrays ticstep[], ticfmt[], min_array[], max_array[],
- * auto_array[], log_array[], log_base_array[]
- * we use any of GRID_X/Y/X2/Y2 and  _MX/_MX2/etc - caller is expected
- * to clear the irrelevent fields from global grid bitmask
- * note this is also called from graph3d, so we need GRID_Z too
- */
-
-void
-gen_tics(axis, def, grid, minitics, minifreq, callback)
-int axis;			/* FIRST_X_AXIS, etc */
-struct ticdef *def;		/* tic defn */
-int grid;			/* GRID_X | GRID_MX etc */
-int minitics;			/* minitics - off/default/auto/explicit */
-double minifreq;		/* frequency */
-tic_callback callback;		/* fn to call to actually do the work */
-{
-    /* separate main-tic part of grid */
-    struct lp_style_type lgrd, mgrd;
-
-    memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
-    memcpy(&mgrd, &mgrid_lp, sizeof(struct lp_style_type));
-    lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 | GRID_Y2 | GRID_Z)) ? grid_lp.l_type : -2;
-    mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 | GRID_MY2 | GRID_MZ)) ? mgrid_lp.l_type : -2;
-
-    if (def->type == TIC_USER) {	/* special case */
-	/*{{{  do user tics then return */
-	struct ticmark *mark = def->def.user;
-	double uncertain = (max_array[axis] - min_array[axis]) / 10;
-	double ticmin = min_array[axis] - SIGNIF * uncertain;
-	double internal_max = max_array[axis] + SIGNIF * uncertain;
-	double log_base = log_array[axis] ? log10(base_array[axis]) : 1.0;
-
-	/* polar labels always +ve, and if rmin has been set, they are
-	 * relative to rmin. position is as user specified, but must
-	 * be translated. I dont think it will work at all for
-	 * log scale, so I shan't worry about it !
-	 */
-	double polar_shift = (polar && !(autoscale_r & 1)) ? rmin : 0;
-
-	for (mark = def->def.user; mark; mark = mark->next) {
-	    char label[64];
-	    double internal = log_array[axis] ? log(mark->position) / log_base_array[axis] : mark->position;
-
-	    internal -= polar_shift;
-
-	    if (!inrange(internal, ticmin, internal_max))
-		continue;
-
-	    if (datatype[axis] == TIME)
-		gstrftime(label, 24, mark->label ? mark->label : ticfmt[axis], mark->position);
-	    else
-		gprintf(label, sizeof(label), mark->label ? mark->label : ticfmt[axis], log_base, mark->position);
-
-	    (*callback) (axis, internal, label, lgrd);
-	}
-
-	return;			/* NO MINITICS FOR USER-DEF TICS */
-	/*}}} */
-    }
-    /* series-tics
-     * need to distinguish user co-ords from internal co-ords.
-     * - for logscale, internal = log(user), else internal = user
-     *
-     * The minitics are a bit of a drag - we need to distinuish
-     * the cases step>1 from step == 1.
-     * If step = 1, we are looking at 1,10,100,1000 for example, so
-     * minitics are 2,5,8, ...  - done in user co-ordinates
-     * If step>1, we are looking at 1,1e6,1e12 for example, so
-     * minitics are 10,100,1000,... - done in internal co-ords
-     */
-
-    {
-	double tic;		/* loop counter */
-	double internal;	/* in internal co-ords */
-	double user;		/* in user co-ords */
-	double start, step, end;
-	double lmin = min_array[axis], lmax = max_array[axis];
-	double internal_min, internal_max;	/* to allow for rounding errors */
-	double ministart = 0, ministep = 1, miniend = 1;	/* internal or user - depends on step */
-	int anyticput = 0;	/* for detection of infinite loop */
-
-	/* gprintf uses log10() of base - log_base_array is log() */
-	double log_base = log_array[axis] ? log10(base_array[axis]) : 1.0;
-
-	if (lmax < lmin) {
-	    /* hmm - they have set reversed range for some reason */
-	    double temp = lmin;
-	    lmin = lmax;
-	    lmax = temp;
-	}
-	/*{{{  choose start, step and end */
-	switch (def->type) {
-	case TIC_SERIES:
-	    if (log_array[axis]) {
-		/* we can tolerate start <= 0 if step and end > 0 */
-		if (def->def.series.end <= 0 || def->def.series.incr <= 0)
-		    return;	/* just quietly ignore */
-		step = log(def->def.series.incr) / log_base_array[axis];
-		if (def->def.series.start <= 0)	/* includes case 'undefined, i.e. -VERYLARGE */
-		    start = step * floor(lmin / step);
-		else
-		    start = log(def->def.series.start) / log_base_array[axis];
-		if (def->def.series.end == VERYLARGE)
-		    end = step * ceil(lmax / step);
-		else
-		    end = log(def->def.series.end) / log_base_array[axis];
-	    } else {
-		start = def->def.series.start;
-		step = def->def.series.incr;
-		end = def->def.series.end;
-		if (start == -VERYLARGE)
-		    start = step * floor(lmin / step);
-		if (end == VERYLARGE)
-		    end = step * ceil(lmax / step);
-	    }
-	    break;
-	case TIC_COMPUTED:
-	    /* round to multiple of step */
-	    start = ticstep[axis] * floor(lmin / ticstep[axis]);
-	    step = ticstep[axis];
-	    end = ticstep[axis] * ceil(lmax / ticstep[axis]);
-	    break;
-	case TIC_MONTH:
-	    start = floor(lmin);
-	    end = ceil(lmax);
-	    step = floor((end - start) / 12);
-	    if (step < 1)
-		step = 1;
-	    break;
-	case TIC_DAY:
-	    start = floor(lmin);
-	    end = ceil(lmax);
-	    step = floor((end - start) / 14);
-	    if (step < 1)
-		step = 1;
-	    break;
-	default:
-	    graph_error("Internal error : unknown tic type");
-	    return;		/* avoid gcc -Wall warning about start */
-	}
-	/*}}} */
-
-	/*{{{  ensure ascending order */
-	if (end < start) {
-	    double temp;
-	    temp = end;
-	    end = start;
-	    start = temp;
-	}
-	step = fabs(step);
-	/*}}} */
-
-	if (minitics) {
-	    /*{{{  figure out ministart, ministep, miniend */
-	    if (minitics == MINI_USER) {
-		/* they have said what they want */
-		if (minifreq <= 0)
-		    minitics = 0;	/* not much else we can do */
-/* 		else if (log_array[axis]) { */
-/* 		    ministart = ministep = step / minifreq * base_array[axis]; */
-/* 		    miniend = step * base_array[axis]; */
-/* 		} else { */
-		ministart = ministep = step / minifreq;
-		miniend = step;
-/* 		} */
-	    } else if (log_array[axis]) {
-		if (step > 1.5) {	/* beware rounding errors */
-		    /*{{{  10,100,1000 case */
-		    /* no more than five minitics */
-		    ministart = ministep = (int) (0.2 * step);
-		    if (ministep < 1)
-			ministart = ministep = 1;
-		    miniend = step;
-		    /*}}} */
-		} else {
-		    /*{{{  2,5,8 case */
-		    miniend = base_array[axis];
-		    if (end - start >= 10)
-			minitics = 0;	/* none */
-		    else if (end - start >= 5) {
-			ministart = 2;
-			ministep = 3;
-		    } else {
-			ministart = 2;
-			ministep = 1;
-		    }
-		    /*}}} */
-		}
-	    } else if (datatype[axis] == TIME) {
-		ministart = ministep = make_ltic(timelevel[axis], step);
-		miniend = step * 0.9;
-	    } else if (minitics == MINI_AUTO) {
-		ministart = ministep = 0.1 * step;
-		miniend = step;
-	    } else
-		minitics = 0;
-
-	    if (ministep <= 0)
-		minitics = 0;	/* dont get stuck in infinite loop */
-	    /*}}} */
-	}
-	/*{{{  a few tweaks and checks */
-	/* watch rounding errors */
-	end += SIGNIF * step;
-	internal_max = lmax + step * SIGNIF;
-	internal_min = lmin - step * SIGNIF;
-
-	if (step == 0)
-	    return;		/* just quietly ignore them ! */
-	/*}}} */
-
-	for (tic = start; tic <= end; tic += step) {
-	    if (anyticput == 2)	/* See below... */
-		break;
-	    if (anyticput && (fabs(tic - start) < DBL_EPSILON)) {
-		/* step is too small.. */
-		anyticput = 2;	/* Don't try again. */
-		tic = end;	/* Put end tic. */
-	    } else
-		anyticput = 1;
-
-	    /*{{{  calc internal and user co-ords */
-	    if (!log_array[axis]) {
-		internal = datatype[axis] == TIME ? time_tic_just(timelevel[axis], tic) : tic;
-		user = CheckZero(internal, step);
-	    } else {
-		/* log scale => dont need to worry about zero ? */
-		internal = tic;
-		user = pow(base_array[axis], internal);
-	    }
-	    /*}}} */
-	    if (internal > internal_max)
-		break;		/* gone too far - end of series = VERYLARGE perhaps */
-	    if (internal >= internal_min) {
-/* continue; *//* maybe minitics!!!. user series starts below min ? */
-
-		/*{{{  draw tick via callback */
-		switch (def->type) {
-		case TIC_DAY:{
-			int d = (long) floor(user + 0.5) % 7;
-			if (d < 0)
-			    d += 7;
-			(*callback) (axis, internal, abbrev_day_names[d], lgrd);
-			break;
-		    }
-		case TIC_MONTH:{
-			int m = (long) floor(user - 1) % 12;
-			if (m < 0)
-			    m += 12;
-			(*callback) (axis, internal, abbrev_month_names[m], lgrd);
-			break;
-		    }
-		default:{	/* comp or series */
-			char label[64];
-			if (datatype[axis] == TIME) {
-			    /* If they are doing polar time plot, good luck to them */
-			    gstrftime(label, 24, ticfmt[axis], (double) user);
-			} else if (polar) {
-			    /* if rmin is set, we stored internally with r-rmin */
-			    /* HBB 990327: reverted to 'pre-Igor' version... */
-#if 1				/* Igor's polar-grid patch */
-			    double r = fabs(user) + (autoscale_r & 1 ? 0 : rmin);
-#else
-			    /* Igor removed fabs to allow -ve labels */
-			    double r = user + (autoscale_r & 1 ? 0 : rmin);
-#endif
-			    gprintf(label, sizeof(label), ticfmt[axis], log_base, r);
-			} else {
-			    gprintf(label, sizeof(label), ticfmt[axis], log_base, user);
-			}
-			(*callback) (axis, internal, label, lgrd);
-		    }
-		}
-		/*}}} */
-
-	    }
-	    if (minitics) {
-		/*{{{  process minitics */
-		double mplace, mtic;
-		for (mplace = ministart; mplace < miniend; mplace += ministep) {
-		    if (datatype[axis] == TIME)
-			mtic = time_tic_just(timelevel[axis] - 1, internal + mplace);
-		    else
-			mtic = internal + (log_array[axis] && step <= 1.5 ? log(mplace) / log_base_array[axis] : mplace);
-		    if (inrange(mtic, internal_min, internal_max) && inrange(mtic, start - step * SIGNIF, end + step * SIGNIF))
-			(*callback) (axis, mtic, NULL, mgrd);
-		}
-		/*}}} */
-	    }
-	}
-    }
-}
-
-/*}}} */
-
 /*{{{  map_position */
 void
 map_position(pos, x, y, what)
@@ -4664,15 +3461,13 @@ const char *what;
     switch (pos->scalex) {
     case first_axes:
 	{
-	    double xx = LogScale(pos->x, log_array[FIRST_X_AXIS], log_base_array[FIRST_X_AXIS],
-				 what, "x");
+	    double xx = axis_log_value_checked(FIRST_X_AXIS, pos->x, what);
 	    *x = xleft + (xx - min_array[FIRST_X_AXIS]) * scale[FIRST_X_AXIS] + 0.5;
 	    break;
 	}
     case second_axes:
 	{
-	    double xx = LogScale(pos->x, log_array[SECOND_X_AXIS], log_base_array[SECOND_X_AXIS],
-				 what, "x");
+	    double xx = axis_log_value_checked(SECOND_X_AXIS, pos->x, what);
 	    *x = xleft + (xx - min_array[SECOND_X_AXIS]) * scale[SECOND_X_AXIS] + 0.5;
 	    break;
 	}
@@ -4691,15 +3486,13 @@ const char *what;
     switch (pos->scaley) {
     case first_axes:
 	{
-	    double yy = LogScale(pos->y, log_array[FIRST_Y_AXIS], log_base_array[FIRST_Y_AXIS],
-				 what, "y");
+	    double yy = axis_log_value_checked(FIRST_Y_AXIS, pos->y, what);
 	    *y = ybot + (yy - min_array[FIRST_Y_AXIS]) * scale[FIRST_Y_AXIS] + 0.5;
 	    return;
 	}
     case second_axes:
 	{
-	    double yy = LogScale(pos->y, log_array[SECOND_Y_AXIS], log_base_array[SECOND_Y_AXIS],
-				 what, "y");
+	    double yy = axis_log_value_checked(SECOND_Y_AXIS, pos->y, what);
 	    *y = ybot + (yy - min_array[SECOND_Y_AXIS]) * scale[SECOND_Y_AXIS] + 0.5;
 	    return;
 	}

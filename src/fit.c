@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.18 1999/11/08 19:24:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.19 2000/03/28 21:15:49 lhecking Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -63,13 +63,14 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.18 1999/11/08 19:24:29 lheck
 #include <signal.h>
 
 #include "alloc.h"
+#include "axis.h" 
 #include "command.h"
 #include "datafile.h"
 #include "eval.h"
 #include "matrix.h"
 #include "misc.h"
 #include "parse.h"
-#include "setshow.h"
+#include "setshow.h"	     
 #include "util.h"
 
 /* Just temporary */
@@ -1176,16 +1177,12 @@ const char *fromfile;
 void
 fit_command()
 {
-    TBOOLEAN autorange_x = 3, autorange_y = 3;	/* yes */
-    /* HBB 980401: new: z range specification */
-    TBOOLEAN autorange_z = 3;
-    double min_x, max_x;	/* range to fit */
-    double min_y, max_y;	/* range to fit */
-    /* HBB 980401: new: z range specification */
-    double min_z, max_z;	/* range to fit */
+/* HBB 20000430: revised this completely, to make it more similar to
+ * what plot3drequest() does */
+
     int dummy_x = -1, dummy_y = -1;	/* eg  fit [u=...] [v=...] */
-    /* HBB 981210: memorize position of possible third [ : ] spec: */
     int zrange_token = -1;
+    TBOOLEAN is_a_3d_fit;
 
     int i;
     double v[4];
@@ -1197,50 +1194,18 @@ fit_command()
     c_token++;
 
     /* first look for a restricted x fit range... */
-
-    if (equals(c_token, "[")) {
-	c_token++;
-	if (isletter(c_token)) {
-	    if (equals(c_token + 1, "=")) {
-		dummy_x = c_token;
-		c_token += 2;
-	    }
-	    /* else parse it as a xmin expression */
-	}
-	autorange_x = load_range(FIRST_X_AXIS, &min_x, &max_x, autorange_x);
-	if (!equals(c_token, "]"))
-	    int_error(c_token, "']' expected");
-	c_token++;
-    }
-    /* ... and y */
-
-    if (equals(c_token, "[")) {
-	c_token++;
-	if (isletter(c_token)) {
-	    if (equals(c_token + 1, "=")) {
-		dummy_y = c_token;
-		c_token += 2;
-	    }
-	    /* else parse it as a ymin expression */
-	}
-	autorange_y = load_range(FIRST_Y_AXIS, &min_y, &max_y, autorange_y);
-	if (!equals(c_token, "]"))
-	    int_error(c_token, "']' expected");
-	c_token++;
-    }
+    
+    /* put stuff into arrays to simplify access */
+    AXIS_INIT3D(FIRST_X_AXIS, xmin, xmax, autoscale_x, 0, 1, 0);
+    AXIS_INIT3D(FIRST_Y_AXIS, ymin, ymax, autoscale_y, 0, 1, 0);
+    AXIS_INIT3D(FIRST_Z_AXIS, zmin, zmax, autoscale_z, 0, 1, 1);
+    
+    PARSE_NAMED_RANGE(FIRST_X_AXIS, dummy_x);
+    PARSE_NAMED_RANGE(FIRST_Y_AXIS, dummy_y);
     /* HBB 980401: new: allow restricting the z range as well */
-    /* ... and z */
-
-    if (equals(c_token, "[")) {
-	zrange_token = c_token++;
-	if (isletter(c_token))
-	    /* do *not* allow the z range being given with a variable name */
-	    int_error(c_token, "Can't re-name dependent variable");
-	autorange_z = load_range(FIRST_Z_AXIS, &min_z, &max_z, autorange_z);
-	if (!equals(c_token, "]"))
-	    int_error(c_token, "']' expected");
-	c_token++;
-    }
+    if (equals(c_token, "[")) 
+      zrange_token = c_token;
+    PARSE_RANGE(FIRST_Z_AXIS);
 
 
     /* now compile the function */
@@ -1276,49 +1241,45 @@ fit_command()
     columns = df_open(4);	/* up to 4 using specs allowed */
     if (columns == 1)
 	int_error(c_token, "Need 2 to 4 using specs");
+    is_a_3d_fit = (columns == 4);
 
     /* The following patch was made by Remko Scharroo, 25-Mar-1999
      * We need to check if one of the columns is time data, like
      * in plot2d and plot3d */
 
-    if (datatype[FIRST_X_AXIS] == TIME) {
+    if (axis_is_timedata[FIRST_X_AXIS]) {
 	if (columns < 2)
 	    int_error(c_token, "Need full using spec for x time data");
 	df_timecol[0] = 1;
     }
-    if (datatype[FIRST_Y_AXIS] == TIME) {
+    if (axis_is_timedata[FIRST_Y_AXIS]) {
 	if (columns < 1)
 	    int_error(c_token, "Need using spec for y time data");
 	df_timecol[1] = 1;
     }
-    /* HBB 990326: added this check. Just in case some wants to fit
-     * time/date data depending on two other variables ... */
-    if (datatype[FIRST_Z_AXIS] == TIME) {
-	if (columns < 4)
-	    int_error(c_token, "Need full using spec for z time data");
-	else
-	    df_timecol[2] = 1;
-    }
+    /* HBB 20000430: No need for such a check for the z axis. That
+     * axis is only used iff columns==4, i.e. the detection method for
+     * 3d fits requires a 4 column 'using', already. */
     /* End of patch by Remko Scharroo */
 
 
     /* HBB 980401: if this is a single-variable fit, we shouldn't have
      * allowed a variable name specifier for 'y': */
-    if ((dummy_y >= 0) && (columns < 4))
+    if ((dummy_y >= 0) && !is_a_3d_fit)
 	int_error(dummy_y, "Can't re-name 'y' in a one-variable fit");
 
     /* HBB 981210: two range specs mean different things, depending
      * on wether this is a 2D or 3D fit */
-    if (columns < 4) {
+    if (!is_a_3d_fit) {
 	if (zrange_token != -1)
 	    int_error(zrange_token, "Three range-specs not allowed in on-variable fit");
 	else {
 	    /* 2D fit, 2 ranges: second range is for *z*, not y: */
-	    autorange_z = autorange_y;
-	    if (autorange_y & 1)
-		min_z = min_y;
-	    if (autorange_y & 2)
-		max_z = max_y;
+	    auto_array[FIRST_Z_AXIS] = auto_array[FIRST_Y_AXIS];
+	    if (auto_array[FIRST_Y_AXIS] & 1)
+		min_array[FIRST_Z_AXIS] = min_array[FIRST_Y_AXIS];
+	    if (auto_array[FIRST_Y_AXIS] & 2)
+		max_array[FIRST_Z_AXIS] = max_array[FIRST_Y_AXIS];
 	}
     }
     /* defer actually reading the data until we have parsed the rest
@@ -1400,7 +1361,8 @@ fit_command()
 		fprintf(STANDARD, "Max. number of data points scaled up to: %d\n",
 			max_data);
 	    }
-	}
+	} /* if (need to extend storage space) */
+
 	switch (i) {
 	case DF_UNDEFINED:
 	case DF_FIRST_BLANK:
@@ -1422,7 +1384,7 @@ fit_command()
 	     * specify a using spec, and the file has 4 columns
 	     */
 	case 4:		/* x, y, z, error */
-	    if (columns == 4)
+	    if (is_a_3d_fit)
 		break;
 	    /* else fall through */
 	case 3:		/* x, z, error */
@@ -1433,21 +1395,26 @@ fit_command()
 	}
 
 	/* skip this point if it is out of range */
-	if (!(autorange_x & 1) && (v[0] < min_x))
+	if (!(auto_array[FIRST_X_AXIS] & 1)
+	    && (v[0] < min_array[FIRST_X_AXIS]))
 	    continue;
-	if (!(autorange_x & 2) && (v[0] > max_x))
+	if (!(auto_array[FIRST_X_AXIS] & 2)
+	    && (v[0] > max_array[FIRST_X_AXIS]))
 	    continue;
-	/* HBB 980401: yrange is only relevant for 3d-fits! */
-	if (columns == 4) {
-	    if (!(autorange_y & 1) && (v[1] < min_y))
+	if (is_a_3d_fit) {
+	    if (!(auto_array[FIRST_Y_AXIS] & 1)
+		&& (v[1] < min_array[FIRST_Y_AXIS]))
 		continue;
-	    if (!(autorange_y & 2) && (v[1] > max_y))
+	    if (!(auto_array[FIRST_Y_AXIS] & 2)
+		&& (v[1] > max_array[FIRST_Y_AXIS]))
 		continue;
 	}
 	/* HBB 980401: check *z* range for all fits */
-	if (!(autorange_z & 1) && (v[2] < min_z))
+	if (!(auto_array[FIRST_Z_AXIS] & 1)
+	    && (v[2] < min_array[FIRST_Z_AXIS]))
 	    continue;
-	if (!(autorange_z & 2) && (v[2] > max_z))
+	if (!(auto_array[FIRST_Z_AXIS] & 2)
+	    && (v[2] > max_array[FIRST_Z_AXIS]))
 	    continue;
 
 	fit_x[num_data] = v[0];
