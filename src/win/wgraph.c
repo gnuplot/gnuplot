@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid = "$Id: wgraph.c,v 1.22 2001/09/19 14:47:02 mikulik Exp $";
+static char *RCSid = "$Id: wgraph.c,v 1.23 2001/10/26 12:58:38 mikulik Exp $";
 #endif
 
 /* GNUPLOT - win/wgraph.c */
@@ -1164,7 +1164,11 @@ drawgraph(LPGW lpgw, HDC hdc, LPRECT rect)
 	if ((unsigned)(curptr - blkptr->gwop) >= GWOPMAX) {
 	    GlobalUnlock(blkptr->hblk);
 	    blkptr->gwop = (struct GWOP FAR *)NULL;
-	    blkptr = blkptr->next;
+	    if ((blkptr = blkptr->next) == NULL)
+		/* If exact multiple of GWOPMAX entries are queued,
+		 * next will be NULL. Only the next GraphOp() call would
+		 * have allocated a new block */
+		return;
 	    if (!blkptr->gwop)
 		blkptr->gwop = (struct GWOP FAR *)GlobalLock(blkptr->hblk);
 	    if (!blkptr->gwop)
