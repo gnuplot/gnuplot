@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: fig.trm,v 1.46 2004/10/19 00:24:08 sfeam Exp $
+ * $Id: fig.trm,v 1.47 2004/11/27 02:38:37 sfeam Exp $
  */
 
 /* GNUPLOT - fig.trm */
@@ -1107,11 +1107,12 @@ TERM_PUBLIC void FIG_previous_palette()
 TERM_PUBLIC void FIG_set_color(t_colorspec *colorspec)
 {
     double gray = colorspec->value;
+    int new_color;
 
     if (colorspec->type != TC_FRAC)
 	return;
 
-    int new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
+    new_color = (gray <= 0) ? 0 : (int)(gray * sm_palette.colors);
     if (new_color >= FIG_palette_size)
 	new_color = FIG_palette_size - 1;
     if (FIG_palette_set == FALSE) {

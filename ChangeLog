@@ -1,3 +1,8 @@
+2004-12-03  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* term/fig.trm (FIG_set_color): Fix a C99-ism. Thanks to Shigeharu
+	Takeno for spotting this.
+
 2004-12-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/gd.trm: Keep track of current rgb values in parallel to the
