@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.10 1999/07/30 19:37:32 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.11 1999/08/07 17:21:32 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -1168,7 +1168,7 @@ eval_3dplots()
 	     * - point spec allowed if style uses points, ie style&2 != 0
 	     * - keywords are optional
 	     */
-	    LP_PARSE(this_plot->lp_properties, 1, this_plot->plot_style & 2,
+	    lp_parse(&this_plot->lp_properties, 1, this_plot->plot_style & 2,
 		     line_num, point_num);
 
 	    /* allow old-style syntax too - ignore case lt 3 4 for example */

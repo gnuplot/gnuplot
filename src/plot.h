@@ -1,5 +1,5 @@
 /*
- * $Id: plot.h,v 1.16 1999/07/30 19:35:08 lhecking Exp $
+ * $Id: plot.h,v 1.17 1999/08/07 17:21:09 lhecking Exp $
  *
  */
 
@@ -812,35 +812,9 @@ extern const char help_email[];
 # define LP_DUMP(lp) \
  fprintf(stderr, \
   "lp_properties at %s:%d : lt: %d, lw: %.3f, pt: %d, ps: %.3f\n", \
-  __FILE__, __LINE__, lp.l_type, lp.l_width, lp.p_type, lp.p_size)
+  __FILE__, __LINE__, lp->l_type, lp->l_width, lp->p_type, lp->p_size)
 #else
 # define LP_DUMP(lp)
 #endif
 
-#define LP_PARSE(lp, allow_ls, allow_point, def_line, def_point) \
-if (allow_ls && (almost_equals(c_token, "lines$tyle") || equals(c_token, "ls" ))) { \
- struct value t; ++c_token; \
- lp_use_properties(&(lp), (int) real(const_express(&t)), allow_point); \
-} else { \
-	if (almost_equals(c_token, "linet$ype") || equals(c_token, "lt" )) { \
-		struct value t; ++c_token; \
-      lp.l_type = (int) real(const_express(&t))-1; \
-   } else lp.l_type = def_line; \
-	if (almost_equals(c_token, "linew$idth") || equals(c_token, "lw" )) { \
-		struct value t; ++c_token; \
-      lp.l_width = real(const_express(&t)); \
-   } else lp.l_width = 1.0; \
-   if ( (lp.pointflag = allow_point) != 0) { \
-	   if (almost_equals(c_token, "pointt$ype") || equals(c_token, "pt" )) { \
-		   struct value t; ++c_token; \
-	lp.p_type = (int) real(const_express(&t))-1; \
-      } else lp.p_type = def_point; \
-	   if (almost_equals(c_token, "points$ize") || equals(c_token, "ps" )) { \
-		   struct value t; ++c_token; \
-	lp.p_size = real(const_express(&t)); \
-      } else lp.p_size = pointsize; /* as in "set pointsize" */ \
-   } else lp.p_size = pointsize; /* give it a value */ \
-   LP_DUMP(lp); \
-}
- 
 #endif /* GNUPLOT_PLOT_H */
