@@ -295,6 +295,7 @@
 # define HAVE_GETCWD 1
 #endif
 
+
 /* Misc platforms */
 #if defined(apollo) || defined(alliant)
 # define NO_LIMITS_H
@@ -304,6 +305,19 @@
 # define NO_LIMITS_H
 # define NO_STRCHR
 #endif
+
+
+/* VMS */
+#ifdef VMS
+extern sys$crembx();
+extern sys$assign();
+extern sys$dassgn();
+extern sys$qio();
+extern sys$qiow();
+extern void lib$signal();
+extern unsigned int lib$spawn();
+#endif
+
 
 /* Autoconf related stuff
  * Transform autoconf defines to gnuplot coding standards
