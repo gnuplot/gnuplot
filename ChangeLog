@@ -1,5 +1,14 @@
 2002-08-27  Ethan Merritt <merritt@u.washington.edu>
 
+	* term/gif.trm term/png.trm: Update TERM_HELP sections
+	so that auto-generation of documentation is consistent. 
+	
+	* term/gd.trm: Add terminal options nointerlace, notransparent, 
+	and retain terminal options across calls to set term. Move
+	default font properties into the per-terminal data structure.
+
+2002-08-27  Ethan Merritt <merritt@u.washington.edu>
+
 	* term/jpeg.trm: Add placeholder file so that auto-generation of
 	documentation includes a section on jpeg.
 
@@ -994,7 +1003,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/08/27 19:33:35 $).
+	last modification date (from the tag $Date: 2002/08/27 21:08:45 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

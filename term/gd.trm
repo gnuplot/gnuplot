@@ -1,5 +1,5 @@
 /*
- * $Id: gd.trm,v 1.11 2002/07/26 16:42:29 mikulik Exp $
+ * $Id: gd.trm,v 1.12 2002/08/23 20:57:02 mikulik Exp $
  * based on gif.trm,v 1.26.2.1 2000/05/01 00:17:20 joze
  */
 
@@ -124,7 +124,6 @@ TERM_PUBLIC int PNG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC void PNG_point __PROTO((unsigned int x, unsigned int y, int number));
 TERM_PUBLIC int PNG_text_angle __PROTO((int ang));
 TERM_PUBLIC void PNG_reset __PROTO((void));
-TERM_PUBLIC void JPEG_text __PROTO((void));
 TERM_PUBLIC int PNG_set_font __PROTO((const char *fontname));
 TERM_PUBLIC void PNG_pointsize __PROTO((double ptsize));
 TERM_PUBLIC void PNG_boxfill(int, unsigned int, unsigned int, unsigned int, unsigned int);
@@ -172,10 +171,6 @@ static int PNG_ps = 3;
 # define PNG_HCHAR 7
 #endif
 
-static gdFontPtr PNG_font;
-static char      PNG_ttffont[64];
-static int       PNG_ttfsize;
-
 #define PNG_VTIC (GREG_YMAX/100)
 #define PNG_HTIC (GREG_XMAX/150)
 
@@ -203,6 +198,9 @@ static struct {
     int linewidth;
     int ttfsize;
     char ttffont[64];
+    gdFontPtr default_font;
+    char      default_ttffont[64];
+    int       default_ttfsize;
 } png_state;
 
 #define PNG_USE_TRANSPARENT 1
@@ -210,7 +208,8 @@ static struct {
 #define PNG_USE_CROP        4
 
 enum PNG_id {
-    PNG_TRANSPARENT, PNG_INTERLACE,
+    PNG_TRANSPARENT, PNG_NOTRANSPARENT,
+    PNG_INTERLACE, PNG_NOINTERLACE,
     PNG_CROP, PNG_NOCROP,
     /* Font size */
     PNG_TINY, PNG_SMALL, PNG_MEDIUM, PNG_LARGE, PNG_GIANT,
@@ -227,7 +226,9 @@ enum PNG_id {
 static struct gen_table PNG_opts[] =
 {
     { "tr$ansparent", PNG_TRANSPARENT },
-    { "i$nterlace", PNG_INTERLACE },
+    { "notr$ansparent", PNG_NOTRANSPARENT },
+    { "inter$lace", PNG_INTERLACE },
+    { "nointer$lace", PNG_NOINTERLACE },
     { "crop", PNG_CROP },
     { "nocrop", PNG_NOCROP },
     { "ti$ny", PNG_TINY },
@@ -436,14 +437,19 @@ PNG_options()
     char *string;
     unsigned long color;
 
+#if (0) /* 24-Aug-2002 The old behaviour was to re-initialize all settings */
     term_options[0] = NUL;
     png_state.n_colors = 0;
     png_state.flags = 0;
     png_font = 2;
-    PNG_font = gdfont;
+    png_state.default_font = gdfont;
     png_state.ttffont[0] = '\0';
-    PNG_ttffont[0] = '\0';
-    PNG_ttfsize = 0;
+    png_state.default_ttffont[0] = '\0';
+    png_state.default_ttfsize = 0;
+#else   /* The new behaviour is to keep previous term options, if any */
+    if (!png_font) png_font = 2;
+    if (!png_state.default_font) png_state.default_font = gdfont;
+#endif
     png_state.justify = CENTRE;
 
     while (!END_OF_COMMAND) {
@@ -452,8 +458,16 @@ PNG_options()
 	    png_state.flags |= PNG_USE_TRANSPARENT;
 	    ++c_token;
 	    break;
+	case PNG_NOTRANSPARENT:
+	    png_state.flags &= ~PNG_USE_TRANSPARENT;
+	    ++c_token;
+	    break;
 	case PNG_INTERLACE:
 	    png_state.flags |= PNG_USE_INTERLACE;
+	    ++c_token;
+	    break;
+	case PNG_NOINTERLACE:
+	    png_state.flags &= ~PNG_USE_INTERLACE;
 	    ++c_token;
 	    break;
 	case PNG_CROP:
@@ -465,35 +479,35 @@ PNG_options()
 	    ++c_token;
 	    break;
 	case PNG_TINY:
-	    PNG_font=gdFontTiny;
+	    png_state.default_font=gdFontTiny;
 	    png_font = 0;
 	    term->v_char = (unsigned int)(8);
 	    term->h_char = (unsigned int)(5);
 	    ++c_token;
 	    break;
 	case PNG_SMALL:
-	    PNG_font = gdFontSmall;
+	    png_state.default_font = gdFontSmall;
 	    png_font = 1;
 	    term->v_char = (unsigned int)(12);
 	    term->h_char = (unsigned int)(6);
 	    ++c_token;
 	    break;
 	case PNG_MEDIUM:
-	    PNG_font = gdFontMediumBold;
+	    png_state.default_font = gdFontMediumBold;
 	    png_font = 2;
 	    term->v_char = (unsigned int)(13);
 	    term->h_char = (unsigned int)(7);
 	    ++c_token;
 	    break;
 	case PNG_LARGE:
-	    PNG_font = gdFontLarge;
+	    png_state.default_font = gdFontLarge;
 	    png_font = 3;
 	    term->v_char = (unsigned int)(16);
 	    term->h_char = (unsigned int)(8);
 	    ++c_token;
 	    break;
 	case PNG_GIANT:
-	    PNG_font=gdFontGiant;
+	    png_state.default_font=gdFontGiant;
 	    png_font = 4;
 	    term->v_char = (unsigned int)(15);
 	    term->h_char = (unsigned int)(9);
@@ -512,7 +526,7 @@ PNG_options()
 	        else
 		    copy_str(png_state.ttffont, c_token, MAX_LINE_LEN);
 		c_token++;
-		strcpy(PNG_ttffont, png_state.ttffont);
+		strcpy(png_state.default_ttffont, png_state.ttffont);
 	        png_state.ttfsize = 8 + 2*png_font;
 		err = gdImageStringFT(NULL, &brect[0], 0, 
 			png_state.ttffont, (double)png_state.ttfsize,
@@ -520,7 +534,7 @@ PNG_options()
 		if (err) {
 			fprintf(stderr,"%s when opening font %s, using default\n",
 				err, png_state.ttffont);
-			png_state.ttffont[0] = PNG_ttffont[0] = '\0';
+			png_state.ttffont[0] = png_state.default_ttffont[0] = '\0';
 		}
 	    }
 #else
@@ -555,7 +569,7 @@ PNG_options()
 #ifdef HAVE_TTF
 	    /* Check for explicit TTF font size */
 	    if (sscanf(string, "%d", &i) == 1 && i > 0 && i < 999) {
-		PNG_ttfsize = i;
+		png_state.default_ttfsize = i;
 		++c_token;
 	        break;
 	    }
@@ -576,17 +590,17 @@ PNG_options()
 
 #ifdef HAVE_TTF
     /* If no explicit TTF font size found, generate default */
-    if (PNG_ttfsize == 0) 
-	PNG_ttfsize = 8 + 2*png_font;
-    png_state.ttfsize = PNG_ttfsize;
+    if (png_state.default_ttfsize == 0) 
+	png_state.default_ttfsize = 8 + 2*png_font;
+    png_state.ttfsize = png_state.default_ttfsize;
 
     /* Find approximate character width of selected TTF font   */
     /* This is needed in order to set appropriate border width */
-    if (*PNG_ttffont) {
+    if (png_state.default_ttffont[0]) {
     	int brect[8];
 	char *err;
 	err = gdImageStringFT(NULL, &brect[0], 0, 
-		PNG_ttffont, (double)PNG_ttfsize,
+		png_state.default_ttffont, (double)png_state.default_ttfsize,
 		0.0, 0, 0, "f00000000g");
 	if (!err) {
 	    term->h_char = .11 * (float)(brect[2] - brect[0]) + 0.5;
@@ -871,7 +885,7 @@ PNG_graphics()
     int i;
     unsigned int rgb;
 
-    png_state.font = PNG_font;
+    png_state.font = png_state.default_font;
     png_state.color = 0;
     png_state.image = gdImageCreate((int) (xsize * PNG_XMAX),
 				    (int) (ysize * PNG_YMAX));
@@ -963,7 +977,6 @@ PNG_move(unsigned int x, unsigned int y)
 TERM_PUBLIC void
 PNG_vector(unsigned int x, unsigned int y)
 {
-    unsigned int rgb;
     int lw;
     int png_linetype_dotted[5];
 
@@ -1208,12 +1221,12 @@ PNG_set_font(const char *fontname)
     char name[32];
     int  sep;
     int  size;
-    gdFontPtr font = PNG_font;
+    gdFontPtr font = png_state.default_font;
 
     sep = strcspn(fontname,",");
     strncpy(name,fontname,sep);
     name[sep] = NUL;
-    size = PNG_ttfsize;
+    size = png_state.default_ttfsize;
     sscanf (&(fontname[sep+1]),"%d",&size);
 
     if (!strcmp(name,"small"))
@@ -1233,8 +1246,8 @@ PNG_set_font(const char *fontname)
     }
     /* Restore initial default font */
     else  {
-	strcpy(png_state.ttffont,PNG_ttffont);
-	png_state.ttfsize = PNG_ttfsize;
+	strcpy(png_state.ttffont,png_state.default_ttffont);
+	png_state.ttfsize = png_state.default_ttfsize;
     }
 
     /* DEBUG
@@ -1262,7 +1275,7 @@ PNG_pointsize(ptsize)
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(png_driver)
-    "png", "PNG format [mode] [fontsize] [font face] [size] [colors]",
+    "png", "PNG images using libgd and TrueType fonts",
     GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
     PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
     PNG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
@@ -1279,7 +1292,7 @@ TERM_TABLE_START(png_driver)
     PNG_boxfill /*EAM - fillbox*/,   
     PNG_linewidth /*EAM - linewidth*/
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0 /* no mouse support for png terminal */
+    , 0, 0, 0, 0, 0 /* no mouse support */
 #endif
 #ifdef PM3D
     , PNG_make_palette,
@@ -1295,44 +1308,47 @@ TERM_TABLE_END(png_driver)
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
+#ifndef JPEG_HELP_ONLY
 #ifdef TERM_HELP
 START_HELP(png)
-"1 png",
+"1 png (NEW)",
 "?commands set terminal png",
 "?set terminal png",
 "?set term png",
 "?terminal png",
 "?term png",
 "?png",
-" EAM May 2001 - This is not the gnuplot 3.7 PNG driver; it is based",
-" on the old GIF/GD driver to get a much wider range of user options.",
-" It uses Thomas Boutell's gd library ( http://www.boutell.com/gd/ )",
-"",
-" By default, the `png` terminal driver uses a shared Web-friendy palette.",
-"",
 " Syntax:",
-"       set terminal png {transparent} {interlace}",
-"                        {{no}crop}",
-"                        {tiny | small | medium | large | giant}",
-"                        {font FACE {<pointsize>}}",
-"                        {size <x>,<y>}",
-"                        {<color0> <color1> <color2> ...}",
+"       set terminal png ",
+"              {{no}transparent} {{no}interlace}",
+"              {tiny | small | medium | large | giant}",
+"              {font <face> {<pointsize>}}",
+"              {size <x>,<y>} {{no}crop}",
+"              {<color0> <color1> <color2> ...}",
+"",
+" PNG images are created using libgd, with optional support for TrueType",
+" fonts via libfreetype. Version 1.8 or greater of libgd is required.",
 "",
 " `transparent` instructs the driver to generate transparent PNGs.  The first",
 " color will be the transparent one.",
 "",
 " `interlace` instructs the driver to generate interlaced PNGs.",
 "",
-" The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
-" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels).",
+" Five basic fonts are supported directly by the gd library. These are",
+" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
+" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
+" or rotated (pure horizontal or vertical text only).",
 "",
-" The font FACE is either the full pathname to a TrueType font file, or a",
-" font face name searched for using the GDFONTPATH environmental variable.",
+" If gnuplot was built with support for TrueType fonts, they may be",
+" selected using the `font <face> {<pointsize}` option. <face> is either ",
+" the full pathname to a TrueType font file, or a font face name searched",
+" for using the GDFONTPATH environmental variable. TrueType fonts are fully",
+" scalable and may be rotated through any angle.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
-" The image can be cropped around visible pixel area by `crop`; then the image",
-" be smaller than the specified size. Default is `nocrop`.",
+" `crop` trims blank space from the edges of the completed plot, resulting",
+" in a smaller final image size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",
@@ -1350,10 +1366,10 @@ START_HELP(png)
 " for the axes, and red, orange, medium aquamarine, thistle 3, light blue, blue,",
 " plum and dark violet for eight plotting colors.",
 "",
-"       set terminal png large font arial size 800,600",
+"       set terminal png font arial 14 size 800,600",
 "",
 " which searches for a TrueType font with face name 'arial' in the directory",
-" specified by the environment variable GDFONTPATH and large (14pt) font size.",
+" specified by the environment variable GDFONTPATH and 14pt font size.",
 "",
 "       set terminal png transparent xffffff \\",
 "                        x000000 x202020 x404040 x606060 \\",
@@ -1363,6 +1379,7 @@ START_HELP(png)
 ""
 END_HELP(png)
 #endif /* TERM_HELP */
+#endif /* JPEG_HELP_ONLY */
 
 /*
  * JPEG support comes almost for free.
@@ -1375,6 +1392,7 @@ register_term(jpeg)
 #endif
 
 #ifdef TERM_PROTO
+TERM_PUBLIC void JPEG_text __PROTO((void));
 #define GOT_NEXT_PROTO
 #endif
 
@@ -1403,7 +1421,7 @@ int quality = 90;
 #ifdef TERM_TABLE
 
 TERM_TABLE_START(jpeg_driver)
-    "jpeg", "JPEG format [fontsize] [font face] [size] [colors]",
+    "jpeg", "JPEG images using libgd and TrueType fonts",
     GREG_XMAX, GREG_YMAX, PNG_VCHAR, PNG_HCHAR,
     PNG_VTIC, PNG_HTIC, PNG_options, PNG_init, PNG_reset,
     JPEG_text, null_scale, PNG_graphics, PNG_move, PNG_vector,
@@ -1415,7 +1433,7 @@ TERM_TABLE_START(jpeg_driver)
     PNG_boxfill /*EAM - fillbox*/,   
     PNG_linewidth /*EAM - linewidth*/
 #ifdef USE_MOUSE
-    , 0, 0, 0, 0, 0 /* no mouse support for png terminal */
+    , 0, 0, 0, 0, 0 /* no mouse support */
 #endif
 #ifdef PM3D
     , PNG_make_palette,
@@ -1445,18 +1463,28 @@ START_HELP(jpeg)
 " Syntax:",
 "       set terminal jpeg ",
 "                        {tiny | small | medium | large | giant}",
-"                        {font FACE {<pointsize>}}",
-"                        {size <x>,<y>}",
+"                        {font <face> {<pointsize>}}",
+"                        {size <x>,<y>} {{no}crop}",
 "                        {<color0> <color1> <color2> ...}",
 "",
-" The choice of fonts is `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`",
-" (7x13 Bold), `large` (8x16) or `giant` (9x15 pixels)",
+" JPEG images are created using libgd, with optional support for TrueType",
+" fonts via libfreetype.",
 "",
-" The font FACE is either the full pathname to a TrueType font file, or a",
-" font face name searched for using the GDFONTPATH environmental variable.",
+" Five basic fonts are supported directly by the gd library. These are",
+" `tiny` (5x8 pixels), `small` (6x12 pixels), `medium`, (7x13 Bold), ",
+" `large` (8x16) or `giant` (9x15 pixels). These fonts cannot be scaled",
+" or rotated (pure horizontal or vertical text only).",
+"",
+" If gnuplot was built with support for TrueType fonts, they may be",
+" selected using the `font <face> {<pointsize}` option. <face> is either ",
+" the full pathname to a TrueType font file, or a font face name searched",
+" for using the GDFONTPATH environmental variable. TrueType fonts are fully",
+" scalable and may be rotated through any angle.",
 "",
 " The size <x,y> is given in pixels---it defaults to 640x480.  The number of",
 " pixels can be also modified by scaling with the `set size` command.",
+" `crop` trims blank space from the edges of the completed plot, resulting",
+" in a smaller final image size. Default is `nocrop`.",
 "",
 " Each color must be of the form 'xrrggbb', where x is the literal character",
 " 'x' and 'rrggbb' are the red, green and blue components in hex.  For example,",

@@ -1,5 +1,5 @@
 /*
- * $Id: png.trm,v 1.32 2001/08/24 15:39:50 broeker Exp $
+ * $Id: png.trm,v 1.33 2001/08/27 15:04:12 broeker Exp $
  *
  */
 
@@ -56,6 +56,10 @@
 /* To compile this terminal driver, you need libpng and zlib, both are
    available at ftp://ftp.uu.net/graphics/png. Remember to add the
    include dirs and libraries to TERMFLAGS and TERMLIBS. */
+
+/* There is a newer PNG driver that requires libgd version 1.8 or greater.
+   If the new driver is used (HAVE_NEWGD) then we should disable this one. */
+#ifndef HAVE_NEWGD
 
 /* The following png drivers use the generic bit mapped graphics
    routines from bitmap.c to build up a bit map in memory.  The driver
@@ -577,18 +581,17 @@ TERM_TABLE_END(png_driver)
 
 #ifdef TERM_HELP
 START_HELP(png)
-"1 png",
+"1 png (OLD)",
 "?commands set terminal png",
 "?set terminal png",
 "?set term png",
 "?terminal png",
 "?term png",
 "?png",
-" The `png` terminal driver supports Portable Network Graphics.  To compile it,",
-" you will need  the third-party libraries \"libpng\" and \"zlib\"; both are",
-" available at http://www.cdrom.com/pub/png/.  `png` has four options.",
-"",
-" By default, the `png` terminal driver uses a shared Web-friendy palette.",
+" The `png` terminal driver supports Portable Network Graphics.  This old ",
+" version of the png driver requires the third-party libraries \"libpng\" ",
+" and \"zlib\".  There is a newer png driver, with many more features, that",
+" is preferred if you have libgd version 1.8 or newer.",
 "",
 " Syntax:",
 "       set terminal png {small | medium | large}",
@@ -610,3 +613,5 @@ START_HELP(png)
 " number of colors that can be set is currently 99."
 END_HELP(png)
 #endif /* TERM_HELP */
+
+#endif /* ifndef HAVE_NEWGD */

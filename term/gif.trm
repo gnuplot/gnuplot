@@ -1,5 +1,5 @@
 /*
- * $Id: gif.trm,v 1.38 2002/06/10 18:53:00 mikulik Exp $
+ * $Id: gif.trm,v 1.39 2002/07/26 16:42:29 mikulik Exp $
  */
 
 /* GNUPLOT -- gif.trm */
@@ -720,13 +720,13 @@ START_HELP(gif)
 "?gif",
 " The `gif` terminal driver generates output in GIF format.  It uses Thomas",
 " Boutell's gd library, which is available from http://www.boutell.com/gd/",
+" Support for GIF output was removed from the gd library beginning with ",
+" version 1.6; newer versions support PNG output instead.",
 #ifdef PNG_FOR_GIF
 "",
 " >>> This copy of gnuplot was configured to produce PNG images <<<",
 " >>> instead of GIF images when 'set term gif' is selected.    <<<",
 #endif
-"",
-" By default, the `gif` terminal driver uses a shared Web-friendy palette.",
 "",
 " Syntax:",
 "       set terminal gif {transparent} {interlace}",
