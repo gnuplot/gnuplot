@@ -1,5 +1,13 @@
 2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
+	* term/pdf.trm (PDF_init): Call PDF_open_file() instead of
+	no longer existing function PDF_open_fp().
+
+	* docs/gnuplot.doc: (contour): Remove outdated info on limited
+	number of contour lines.
+
+2004-07-08  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
 	Integrated SF patch #976546 by Stephane Barbaray, with some
 	additional changes by me.
 	
