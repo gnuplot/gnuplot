@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.54 2001/05/25 13:56:25 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.55 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -590,12 +590,24 @@ show_command()
 	/* FALLTHROUGH into S_INVALID! */
 #endif /* BACKWARDS_COMPATIBLE */
 
-	/* HBB 20010525: 'set commands' that don't have an
-	 * accompanying 'show' version, for no particular reason: */
+#if defined(HAVE_LIBREADLINE) && defined(GNUPLOT_HISTORY)
     case S_HISTORYSIZE:
+	fprintf(stderr,"history size is %li\n", gnuplot_history_size);
+	break;
+#endif
+
     case S_MULTIPLOT:
+	fprintf(stderr,"multiplot mode is %s\n", multiplot ? "on" : "off");
+	break;
+
     case S_TERMOPTIONS:
-	/* FIXME: for now, fall through into 'invalid' case */
+	fprintf(stderr,"Terminal options are '%s'\n",
+		(term_options && *term_options) ? term_options : "[none]");
+	break;
+
+    /* HBB 20010525: 'set commands' that don't have an
+     * accompanying 'show' version, for no particular reason: */
+    /* --- such case now, all implemented. */
 
     case S_INVALID:
 	int_error(c_token, showmess);
