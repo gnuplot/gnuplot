@@ -1,5 +1,5 @@
 /*
- * $Id: tkcanvas.trm,v 1.6 1998/11/25 21:08:25 lhecking Exp $
+ * $Id: tkcanvas.trm,v 1.6.2.1 1999/09/27 16:29:46 lhecking Exp $
  *
  */
 
@@ -61,7 +61,8 @@
  * extended interactive Tk/Tcl capabilities 
  * Thomas Sefzick, March 1999, t.sefzick@fz-juelich.de
  *
- * add the perltk.trm code written by Slaven Rezic <eserte@cs.tu-berlin.de>
+ * added the perltk.trm code written by Slaven Rezic <eserte@cs.tu-berlin.de>,
+ * the variable 'tk_perl' switches between tcl/tk and perltk code.
  * 'linewidth' and 'justify text' added, ends of plotted lines are now rounded.
  * Thomas Sefzick, May 1999, t.sefzick@fz-juelich.de
  */
@@ -150,6 +151,14 @@ TK_init()
 TERM_PUBLIC void
 TK_graphics()
 {
+	/*
+	* the resulting tcl or perl code takes the actual width and height
+	* of the defined canvas and scales the plot to fit.
+	* => NOTE: this makes 'set size' useless !!!
+	* unless the original width and height is taken into account
+	* by some tcl or perl code, that's why the 'gnuplot_plotarea' and
+	* 'gnuplot_axisranges' procedures are supplied.
+	*/
     if (tk_perl) {
 	fputs("\
 sub gnuplot {\n\
@@ -213,13 +222,26 @@ TERM_PUBLIC void
 TK_vector(x, y)
 unsigned int x, y;
 {
+	/*
+	* this is the 1st part of the wrapper around the 'create line' command
+	* used to bind some actions to a line segment:
+	* bind {
+	*      normal create line command
+	*      } gnuplot_xy(some coordinates)
+	*/
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl)
 	    fprintf(gpoutfile, "$can->bind(");
 	else
 	    fprintf(gpoutfile, "$can bind [\n");
     }
+	/*
+	* end of 1st part of wrapper
+	*/
     y = 1000 - y;
+	/*
+	* here is the basic well-known command for plotting a line segment
+	*/
     if (tk_perl) {
 	fprintf(gpoutfile,"\
 $can->createLine(\
@@ -238,6 +260,11 @@ $can create line \
 		tk_lastx, tk_lasty, x, y, tk_colors[tk_color], tk_linewidth);
     }
 
+	/*
+	* this is the 2nd part of the wrapper around the 'create line' command,
+	* it generates a mechanism which calls 'gnuplot_xy' for the line segment
+	* pointed to by the mouse cursor when a mouse button is pressed 
+	*/
     if (tk_interactive && !is_3d_plot) {
 	if (tk_perl) {
 	    /* Ev('W') not needed here, supplied anyhow, WHY ??? */
@@ -320,6 +347,9 @@ $can create line \
 	    fprintf(gpoutfile, ";\n");
 	}
     }
+	/*
+	* end of the wrapper
+	*/
     tk_lastx = x;
     tk_lasty = y;
 }
@@ -347,7 +377,7 @@ $cmy * %d / 1000, \
 eval $can create text \
 [expr $cmx * %d /1000] \
 [expr $cmy * %d /1000] \
--text {%s} -fill %s -anchor %s\
+-text \\{%s\\} -fill %s -anchor %s\
  [expr [info exists font]?\"-font \\$font\":{}]\n",
 		x, y, str, tk_colors[tk_color], tk_anchor);
     }
@@ -422,6 +452,20 @@ $font = $can->fontCreate(-family => q{%s}",
 TERM_PUBLIC void
 TK_text()
 {
+	/*
+	* when switching back to text mode some procedures are generated which
+	* return important information about plotarea size and axis ranges:
+	* 'gnuplot_plotarea' returns the plotarea size in tkcanvas units
+	* 'gnuplot_axisranges' returns the min. and max. values of the axis
+	* these are essentially needed to set the size of the canvas when the
+	* axis scaling is important.
+	* moreover, a procedure 'gnuplot_xy' is created which contains the
+	* actions bound to line segments (see the above 'TK_vector' code):
+	* if the user has defined a procedure named 'user_gnuplot_coordinates'
+	* then 'gnuplot_xy' calls this procedure, otherwise is writes the
+	* coordinates of the line segment the mouse cursor is pointing to
+	* to standard output.
+	*/
     if (tk_perl) {
 	fputs("};\n", gpoutfile);
 	if (!is_3d_plot) {
