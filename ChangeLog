@@ -1,3 +1,7 @@
+2000-11-08  Johannes Zellner  <johannes@zellner.org>
+
+	* docs/gnuplot.doc, pm3d/README: included tgif as supported
+
 2000-11-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* src/specfun.c (f_lambertw): set 'undefined' to TRUE

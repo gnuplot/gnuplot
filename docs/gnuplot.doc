@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.49 2000/11/01 18:57:24 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.50 2000/11/07 14:37:28 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -5325,6 +5325,7 @@ C ... and restart the table:
      pslatex, pstex, epslatex
      GIF
      Xfig
+     tgif
 
  The pm3d algorithm fills the region between two neighbouring points in one 
  scan with another two points in the next scan by a gray (or colour) according 
