@@ -5,8 +5,8 @@
 ;; Author:     Bruce Ravel <ravel@phys.washington.edu> and Phil Type
 ;; Maintainer: Bruce Ravel <ravel@phys.washington.edu>
 ;; Created:    June 28 1998
-;; Updated:    September 9 1999
-;; Version:    0.5j
+;; Updated:    January 10 2000
+;; Version:    0.5k
 ;; Keywords:   gnuplot, plotting
 
 ;; This file is not part of GNU Emacs.
@@ -245,8 +245,11 @@
 ;;        did notget properly loaded (insertion with info toggle on
 ;;        and info button in GUI).
 ;;  0.5j  Sep  9 1999 <BR> Do a more robust check for the gnuplot
-;;        process before killing the gnuplot buffer, ass suggested by
+;;        process before killing the gnuplot buffer, as suggested by
 ;;        <SE>.
+;;  0.5k  Sep 22 1999 <BR> make `gnuplot-send-line-and-forward' skip
+;;        over blank and comment lines as suggested by <SE>.  Jan 10
+;;        2000 Bound C-c C-j to `gnuplot-forward-script-line'.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Acknowledgements:
 ;;    David Batty      <DB> (numerous corrections)
@@ -254,7 +257,8 @@
 ;;    Markus Dickebohm <MD> (suggested `gnuplot-send-line-and-forward')
 ;;    Stephen Eglan    <SE> (suggested the use of info-look,
 ;;                           contributed a bug fix regarding shutting
-;;                           down the gnuplot process)
+;;                           down the gnuplot process, improvement to
+;;                           `gnuplot-send-line-and-forward')
 ;;    Kuang-Yu Liu     <KL> (pointed out buggy dependence on font-lock)
 ;;    Hrvoje Niksic    <HN> (help with defcustom arguments for insertions)
 ;;    Michael Sanders  <MS> (help with the info-look interface)
@@ -334,7 +338,7 @@
 (defconst gnuplot-maintainer-email "ravel@phys.washington.edu")
 (defconst gnuplot-maintainer-url
   "http://feff.phys.washington.edu/~ravel/gnuplot/")
-(defconst gnuplot-version "0.5j")
+(defconst gnuplot-version "0.5k")
 
 (defgroup gnuplot nil
   "Gnuplot-mode for Emacs."
@@ -563,6 +567,7 @@ you're not using that musty old thing, are you..."
   (define-key gnuplot-mode-map "\C-c\C-f" 'gnuplot-send-file-to-gnuplot)
   (define-key gnuplot-mode-map "\C-c\C-h" 'gnuplot-info-lookup-symbol)
   (define-key gnuplot-mode-map "\C-c\C-i" 'gnuplot-insert-filename)
+  (define-key gnuplot-mode-map "\C-c\C-j" 'gnuplot-forward-script-line)
   (define-key gnuplot-mode-map "\C-c\C-k" 'gnuplot-kill-gnuplot-buffer)
   (define-key gnuplot-mode-map "\C-c\C-l" 'gnuplot-send-line-to-gnuplot)
   (define-key gnuplot-mode-map "\C-c\C-n" 'gnuplot-negate-option)
@@ -591,6 +596,7 @@ you're not using that musty old thing, are you..."
 (setq gnuplot-menu
       '("Gnuplot"
 	["Send line to gnuplot"     gnuplot-send-line-to-gnuplot   t]
+	["Send line & move forward" gnuplot-send-line-and-forward (not (eobp))]
 	["Send region to gnuplot"   gnuplot-send-region-to-gnuplot
 	 (gnuplot-mark-active)]
 	["Send buffer to gnuplot"   gnuplot-send-buffer-to-gnuplot t]
@@ -1611,11 +1617,27 @@ This sets `gnuplot-recently-sent' to 'line."
 ;; I chose a very easy to type but slightly non-mnemonic key-binding
 ;; for this (C-c C-v).  It seems like the kind of thing one would want
 ;; to do repeatedly without incurring RSI. 8^)
-(defun gnuplot-send-line-and-forward ()
-  "Call `gnuplot-send-line-to-gnuplot' and move forward one line."
-  (interactive)
-  (gnuplot-send-line-to-gnuplot)
-  (forward-line 1))
+(defun gnuplot-send-line-and-forward (&optional num)
+  "Call `gnuplot-send-line-to-gnuplot' and move forward 1 line.
+You can use a numeric prefix to send more than one line.  Blank lnes and
+lines with only comments are skipped when moving forward."
+  (interactive "p")
+  (while (> num 0)
+    (gnuplot-send-line-to-gnuplot)
+    (gnuplot-forward-script-line 1)
+    (setq num (1- num))))
+
+
+(defun gnuplot-forward-script-line (&optional num) ; <SE>
+  "Move forward my NUM script lines.
+Blank lines and commented lines are not included in the NUM count."
+  (interactive "p")
+  (while (> num 0)
+    (and (not (eobp)) (forward-line 1))
+    (while (and (not (eobp))
+		(looking-at "^\\s-*\\(#\\|$\\)"))
+      (forward-line 1))
+    (setq num (1- num))) )
 
 (defun gnuplot-send-buffer-to-gnuplot ()
   "Sends the entire buffer to the gnuplot program.
