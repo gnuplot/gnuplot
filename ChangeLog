@@ -1,7 +1,10 @@
 2002-01-19  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Remove references to the GP_PATH_* macros.
-	
+
+	* Makefile.in, makefile.all: Remove references to m4/path-hdr.m4 and
+	m4/path-lib.m4.
+
 	* configure.in: General cleanup and bugfixing. Replace all references
 	to GP_PATH_* macros with code that uses generic autoconf macros.
 

@@ -1,6 +1,6 @@
 ############################################################
 #
-# $Id: Makefile.in,v 1.42.2.11 2000/10/24 20:11:16 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.12 2002/01/21 15:23:50 lhecking Exp $
 #
 # GNUPLOT Makefile.in for autoconf (Unix X11 support)
 # Adapted from makefile.unx by djm@gnu.ai.mit.edu
@@ -166,7 +166,7 @@ W=$(srcdir)/win/
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: Makefile.in,v 1.42.2.11 2000/10/24 20:11:16 lhecking Exp $
+# $Id: Makefile.in,v 1.42.2.12 2002/01/21 15:23:50 lhecking Exp $
 #
 ########################################################
 #
@@ -433,8 +433,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4 m4/path-hdr.m4 \
-		m4/path-lib.m4
+$(ACLOCAL_M4): configure.in m4/msdos.m4 m4/next.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
