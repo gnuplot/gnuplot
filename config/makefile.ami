@@ -1,5 +1,5 @@
 #
-# $Id: makefile.ami,v 1.16 1998/04/14 00:15:50 drd Exp $
+# $Id: makefile.ami,v 1.3 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for Manx Aztec C 5.2 beta of better on the Amiga
 # 
@@ -40,11 +40,11 @@ TERMFLAGS = -Iterm -I.
 #
 # List of object files except term.o, version.o
 #
-OBJS = binary.o bitmap.o command.o contour.o eval.o graphics.o \
-	   graph3d.o help.o internal.o misc.o parse.o plot.o plot2d.o \
-	   plot3d.o scanner.o set.o show.o specfun.o standard.o stdfn.o \
-	   util.o interpol.o fit.o matrix.o datafile.o alloc.o variable.o
-
+OBJS = alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
+	eval.o fit.o graphics.o graph3d.o help.o hidden3d.o internal.o \
+	interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
+	save.o scanner.o set.o show.o specfun.o standard.o stdfn.o tables.o \
+	time.o unset.o util.o variable.o
 #
 # List of sources
 #

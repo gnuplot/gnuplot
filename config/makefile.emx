@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.emx,v 1.2 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for use with emx-0.8f/gcc and ndmake 4.5 on MS-DOS
 #
@@ -22,11 +22,11 @@ CFLAGS = -c -O2 -DMSDOS -DDOS32 -DANSI_C -DREADLINE -DHAVE_STRNICMP
 # see other terminal defines in term.h
 TERMFLAGS = -DEMXVGA $(VESA)
 
-OBJS = 	bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
-	help.o internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
-	specfun.o scanner.o set.o show.o standard.o stdfn.o term.o time.o \
-	util.o version.o binary.o interpol.o fit.o matrix.o datafile.o \
-	alloc.o variable.o
+OBJS = 	alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
+	eval.o fit.o graphics.o graph3d.o help.o hidden3d.o internal.o \
+	interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
+	save.o specfun.o scanner.o set.o show.o standard.o stdfn.o tables.o \
+	term.o time.o unset.o util.o util3d.o variable.o version.o
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \

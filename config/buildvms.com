@@ -112,6 +112,7 @@ $ cc 'CFLAGS' bitmap.c
 $ cc 'CFLAGS' command.c
 $ cc 'CFLAGS' contour.c
 $ cc 'CFLAGS' datafile.c
+$ cc 'CFLAGS' dynarray.c
 $ cc 'CFLAGS' eval.c
 $ cc 'CFLAGS' fit.c
 $ cc 'CFLAGS' graph3d.c
@@ -145,11 +146,12 @@ $ cc 'CFLAGS' version.c
 $ if its_gnuc then cc 'CFLAGS' GNU_CC_INCLUDE:[000000]_assert.c
 $!
 $ link/exe=gnuplot.exe -
-bitmap.obj,command.obj,contour.obj,eval.obj,graphics.obj,graph3d.obj,help.obj,-
-vms.obj,binary.obj,specfun.obj,interpol.obj,fit.obj,matrix.obj,internal.obj,-
-misc.obj,parse.obj,plot.obj,plot2d.obj,plot3d.obj,scanner.obj,set.obj,-
-show.obj,datafile.obj,alloc.obj,standard.obj,stdfn.obj,term.obj,util.obj,-
-version.obj,util3d.obj,hidden3d.obj,time.obj,save.obj,unset.obj'extralib''LINKOPT'
+alloc.obj,binary.obj,bitmap.obj,command.obj,contour.obj,dynarray.obj,-
+datafile.obj,eval.obj,fit.obj,graphics.obj,graph3d.obj,help.obj,hidden3d.obj,-
+internal.obj,interpol.obj,matrix.obj,misc.obj,parse.obj,plot.obj,plot2d.obj,-
+plot3d.obj,save.obj,scanner.obj,set.obj,show.obj,specfun.obj,standard.obj,-
+stdfn.obj,term.obj,time.obj,util.obj,util3d.obj,unset.obj,version.obj,-
+vms.obj'extralib''LINKOPT'
 $!
 $ cc 'CFLAGS' bf_test.c
 $ link /exe=bf_test bf_test,binary,alloc 'extralib''LINKOPT'

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.msw,v 1.2 1999/05/31 18:38:59 lhecking Exp $
+# $Id: makefile.msw,v 1.3 1999/09/21 18:05:40 lhecking Exp $
 #
 # GNUPLOT Makefile for Microsoft C  Version 7.0 Windows Version
 #  and Microsoft Program Maintenance Utility  Version 1.20
@@ -38,7 +38,7 @@ OBJS =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
 	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
 	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
 	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj \
-	save.obj tables.obj unset.obj
+	save.obj tables.obj unset.obj dynarray.obj time.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \

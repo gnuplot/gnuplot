@@ -1,5 +1,5 @@
 #
-# $Id: makefile.286,v 1.2 1999/05/31 18:38:59 lhecking Exp $
+# $Id: makefile.286,v 1.3 1999/09/21 18:05:39 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.x
 #   and Phar Lap LITE286 DOS extender
@@ -34,14 +34,16 @@ BGI = $(TC)\bgi
 CFLAGS = -Ff=256 -c -f -ml -w- -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
 TERMFLAGS =
 
-OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
-OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
-OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj util.obj
-OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj variable.obj
-OBJ5 =  save.obj unset.obj
+OBJ1 = alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj
+OBJ2 = dynarray.obj eval.obj fit.obj graph3d.obj graphics.obj help.obj
+OBJ3 = hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj
+OBJ4 = plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj
+OBJ5 = set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj term.obj
+OBJ6 = time.obj unset.obj util.obj util3d.obj variable.obj version.obj
+
 BGIFILES = cga.bgi egavga.bgi herc.bgi att.bgi
 
-OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
+OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
 
 CSOURCE5 = term\aed.trm term\cgi.trm term\dumb.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -79,6 +81,8 @@ gnuplot.def
 .c.obj:
 	$(LITECC) $(CFLAGS) $<
 
+alloc.obj: alloc.c alloc.h plot.h
+
 bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h help.h
@@ -86,19 +90,25 @@ command.obj: command.c plot.h setshow.h help.h
 
 contour.obj: contour.c plot.h
 
+datafile.obj: datafile.h plot.h
+
+dynarray.obj: dynarray.h ploy.h
+
 eval.obj: eval.c plot.h
-
-graphics.obj: graphics.c plot.h setshow.h
-
-graph3d.obj: graphics.c plot.h setshow.h
 
 fit.obj: fit.c fit.h matrix.h plot.h
 
-matrix.obj: matrix.c matrix.h fit.h
+graph3d.obj: graphics.c plot.h setshow.h
+
+graphics.obj: graphics.c plot.h setshow.h
 
 help.obj: help.c plot.h help.h
 
 internal.obj: internal.c plot.h
+
+interpol.obj: interpol.c plot.h setshow.h
+
+matrix.obj: matrix.c matrix.h fit.h
 
 misc.obj: misc.c plot.h setshow.h help.h
 
@@ -120,8 +130,6 @@ show.obj: show.c plot.h setshow.h
 
 specfun.obj: specfun.c
 
-interpol.obj: interpol.c plot.h setshow.h
-
 standard.obj: standard.c plot.h
 
 stdfn.obj: stdfn.c stdfn.h
@@ -129,6 +137,8 @@ stdfn.obj: stdfn.c stdfn.h
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	$(LITECC) $(CFLAGS) $(TERMFLAGS) -Iterm -I. term.c
+
+time.obj:  time.c gp_time.h plot.h
 
 unset.obj: unset.c plot.h ansichek.h stdfn.h syscfg.h
 

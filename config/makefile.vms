@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vms,v 1.6 1999/09/21 18:05:41 lhecking Exp $
+# $Id: makefile.vms,v 1.7 1999/10/21 21:04:33 lhecking Exp $
 #
 # GNUPLOT Makefile for VMS
 #
@@ -63,7 +63,7 @@ TERMFLAGS = /include=[-.term]
 
 ############## okay, that's enough fiddling ###############
 
-OBJS1 = alloc.$(O),binary.$(O),bitmap.$(O),command.$(O),contour.$(O),datafile.$(O),eval.$(O),
+OBJS1 = alloc.$(O),binary.$(O),bitmap.$(O),command.$(O),contour.$(O),datafile.$(O),dynarray.$(O),eval.$(O),
 OBJS2 = fit.$(O),graphics.$(O),graph3d.$(O),help.$(O),hidden3d.$(O),internal.$(O),interpol.$(O),
 OBJS3 = matrix.$(O),misc.$(O),parse.$(O),plot.$(O),plot2d.$(O),plot3d.$(O),scanner.$(O),set.$(O),
 OBJS4 = show.$(O),specfun.$(O),standard.$(O),stdfn.$(O),term.$(O),time.$(O),util.$(O),util3d.$(O),version.$(O),vms.$(O),variable.$(O),save.$(O),tables.$(O),unset.$(O)
@@ -82,7 +82,7 @@ CSOURCE6 = [-.term]impcodes.h [-.term]imagen.trm [-.term]object.h \
 CSOURCE7 = [-.term]post.trm [-.term]qms.trm [-.term]regis.trm [-.term]sun.trm \
 	[-.term]t410x.trm [-.term]tek.trm [-.term]unixpc.trm [-.term]unixplot.trm \
 	[-.term]v384.trm [-.term]x11.trm gplt_x11.c
-CSOURCE8 = contour.c specfun.c interpol.c vms.c
+CSOURCE8 = contour.c specfun.c interpol.c vms.c dynarray.c
 
 all :   gnuplot.$(X) gnuplot_x11.$(X) gnuplot.hlp gnuplot.hlb
 

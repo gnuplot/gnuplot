@@ -1,5 +1,5 @@
 #
-# $Id: $
+# $Id: makefile.g,v 1.2 1999/05/31 18:38:59 lhecking Exp $
 #
 # GNUPLOT Makefile for GRASS, a geographic information system. 
 #
@@ -60,10 +60,11 @@ EXTRA_CFLAGS=$(GTERMFLAGS) $(REGULAR_FLAGS) -DCONTACT=\"$(EMAIL)\" \
 	-DHELPMAIL=\"$(HELPMAIL)\" -DHELPFILE=\"$(HELPDEST)\"
 
 # List of object files (including version.o)
-OBJS = bitmap.o command.o contour.o eval.o graphics.o graph3d.o help.o \
-	internal.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
-	scanner.o set.o show.o specfun.o standard.o term.o util.o binary.o \
-	interpol.o fit.o matrix.o datafile.o alloc.o variable.o version.o
+OBJS = alloc.o binary.o bitmap.o command.o contour.o datafile.o dynarray.o \
+	eval.o fit.o graphics.o graph3d.o help.o internal.o interpol.o \
+	matrix.o misc.o parse.o plot.o plot2d.o plot3d.o readline.o \
+	save.o scanner.o set.o show.o specfun.o standard.o term.o time.o \
+	unset.o util.o util3d.o variable.o version.o
 
 all: $(BIN_MAIN_CMD)/g.gnuplot $(GISBASE)/man/help/g.gnuplot
 

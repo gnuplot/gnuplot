@@ -1,5 +1,5 @@
 #
-# $Id: makefile.os2,v 1.8 1999/07/09 20:58:04 lhecking Exp $
+# $Id: makefile.os2,v 1.9 1999/09/21 18:05:40 lhecking Exp $
 #
 # GNUPLOT Makefile for use on OS/2 3.x and above (might also work for OS/2 2.x)
 # using emx 0.9 (and above) and GNUMake
@@ -275,12 +275,12 @@ gnuplot.inf:  $(DOCDIR)\gnuplot.ipf
 	ipfc /INF gnuplot.ipf
 gnuplot.gih:  $(DOCDIR)\gnuplot.doc doc2gih.exe
 	doc2gih $(DOCDIR)\gnuplot.doc gnuplot.gih
-gnuplot.html: $(DOCDIR)\gnuplot.doc doc2html.exe
-	doc2html $(DOCDIR)\gnuplot.doc gnuplot.html
-gnuplot.info: $(DOCDIR)\gnuplot.doc doc2info.exe
-	doc2info <$(DOCDIR)\gnuplot.doc >gnuplot.info
-gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
-	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$(DOCDIR)\gnuplot.texi
+gnuplot.html: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
+	$(MAKEINFO) --html -I$(DOCDIR) $(DOCDIR)\gnuplot.texi --no-split --output=$@
+gnuplot.info: $(DOCDIR)\gnuplot.texi $(DOCDIR)\gnuplot.doc
+	$(MAKEINFO) -I$(DOCDIR) $(DOCDIR)\gnuplot.texi --no-split --output=$@
+# gnuplot.texi: $(DOCDIR)\gnuplot.doc $(DOCDIR)\doc2texi.pl
+#	perl $(DOCDIR)\doc2texi.pl $(DOCDIR)\gnuplot.doc >$(DOCDIR)\gnuplot.texi
 gnuplot.rtf:  $(DOCDIR)\gnuplot.doc doc2rtf.exe
 	doc2rtf $(DOCDIR)\gnuplot.doc gnuplot.rtf
 gnuplot.ms:   $(DOCDIR)\gnuplot.doc doc2ms.exe
@@ -314,10 +314,6 @@ doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERM
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERMS) $(DOCDIR)\allterm.h
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
-doc2html.exe: $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
-doc2info.exe: $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
 	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
 doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERMS)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.amg,v 1.4 1999/09/21 18:05:40 lhecking Exp $
+# $Id: makefile.amg,v 1.5 1999/10/29 18:41:29 lhecking Exp $
 #
 # GNUPLOT Makefile for SAS/C 6.1 or better on the Amiga
 #
@@ -119,10 +119,10 @@ term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURC
 	$(CC) $(CFLAGS) IDIR=$(TERMDIR) code=f $(GD_INCLUDE) $(PNG_INCLUDE) $(Z_INCLUDE) objname=$@ $<
 
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
-       eval.o fit.o graph3d.o graphics.o help.o hidden3d.o internal.o \
-       interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o save.o \
-       scanner.o set.o show.o specfun.o standard.o stdfn.o tables.o term.o \
-       time.o unset.o util.o util3d.o variable.o version.o
+       dynarray.o eval.o fit.o graph3d.o graphics.o help.o hidden3d.o \
+       internal.o interpol.o matrix.o misc.o parse.o plot.o plot2d.o plot3d.o \
+       save.o scanner.o set.o show.o specfun.o standard.o stdfn.o tables.o \
+       term.o time.o unset.o util.o util3d.o variable.o version.o
 
 CSOURCE1 = alloc.c bf_test.c binary.c bitmap.c command.c set.c show.c
 CSOURCE2 = help.c graphics.c graph3d.o internal.c
@@ -154,7 +154,7 @@ CSOURCE7 = $(TERMDIR)/pm.trm $(TERMDIR)/png.trm $(TERMDIR)/post.trm \
 	   $(TERMDIR)/tpic.trm $(TERMDIR)/unixpc.trm $(TERMDIR)/unixplot.trm \
 	   $(TERMDIR)/v384.trm $(TERMDIR)/vws.trm $(TERMDIR)/win.trm \
 	   $(TERMDIR)/x11.trm $(TERMDIR)/xlib.trm
-CSOURCE8 = contour.c specfun.c amiga.c
+CSOURCE8 = contour.c specfun.c amiga.c dynarray.c
 CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 
 gnuplot: $(OBJS)
@@ -176,13 +176,8 @@ $(DOCDIR)/doc2gih: $(DOCDIR)/doc2gih.c $(DOCDIR)/termdoc.o
 
 html: $(DOCDIR)/gnuplot.html
 
-$(DOCDIR)/gnuplot.html: $(DOCDIR)/doc2html $(DOCDIR)/gnuplot.doc
-	$(DOCDIR)/doc2html $(DOCDIR)/gnuplot.doc $@
-
-$(DOCDIR)/doc2html: $(DOCDIR)/doc2html.c $(DOCDIR)/allterm.h $(DOCDIR)/termdoc.o $(DOCDIR)/xref.o
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC IDIR= IDIR=$(TERMDIR) LINK TO $@ FROM $(DOCDIR)/doc2html.c $(DOCDIR)/termdoc.o $(DOCDIR)/xref.o
-
-tex: $(DOCDIR)/gnuplot.tex
+$(DOCDIR)/gnuplot.html: $(DOCDIR)/gnuplot.texi $(DOCDIR)/gnuplot.doc
+	$(MAKEINFO) --html -I$(srcdir) $(srcdir)/gnuplot.texi --no-split --output=$@
 
 $(DOCDIR)/gnulot.tex: $(DOCDIR)/doc2tex $(DOCDIR)/gnuplot.doc
 	$(DOCDIR)/doc2tex $(DOCDIR)/gnuplot.doc $@
@@ -226,6 +221,7 @@ bitmap.o: bitmap.c bitmap.h plot.h
 command.o: command.c plot.h setshow.h help.h
 contour.o: contour.c plot.h
 datafile.o: datafile.c plot.h fnproto.h binary.h setshow.h
+dynarray.o: dynarray.c dynarray.h alloc.h graphics.h plot.h
 eval.o: eval.c plot.h
 fit.o: fit.c fit.h matrix.h plot.h
 graph3d.o: graph3d.c plot.h setshow.h

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.win,v 1.5 1999/10/01 14:12:11 lhecking Exp $
+# $Id: makefile.win,v 1.6 1999/10/21 21:05:00 lhecking Exp $
 #
 # GNUPLOT Makefile for Borland C++ 3.1 Windows version
 # and Win32 using Borland C++ 4 (or 5? --- 4.52 is known to work)
@@ -101,12 +101,13 @@ CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\incl
 CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS=1 -DHAVE_STRNICMP -DANSI_C
 !endif
 
-OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
-	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
-	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
-	stdfn.obj term.obj util.obj version.obj binary.obj winmain.obj \
-	interpol.obj fit.obj matrix.obj datafile.obj alloc.obj util3d.obj \
-	hidden3d.obj time.obj help.obj variable.obj save.obj unset.obj tables.obj
+OBJS = 	alloc.obj binary.obj bitmap.obj command.obj contour.obj datafile.obj \
+	dynarray.obj eval.obj fit.obj graphics.obj graph3d.obj help.obj \
+	hidden3d.obj internal.obj interpol.obj matrix.obj misc.obj parse.obj \
+	plot.obj plot2d.obj plot3d.obj readline.obj save.obj scanner.obj \
+	set.obj show.obj specfun.obj standard.obj stdfn.obj tables.obj \
+	term.obj time.obj unset.obj util.obj util3d.obj variable.obj \
+	version.obj winmain.obj
 
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
 

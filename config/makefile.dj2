@@ -1,5 +1,5 @@
 # Hello, emacs: this is a -*- Makefile -*-
-# $Id: makefile.dj2,v 1.3 1999/05/31 18:38:59 lhecking Exp $
+# $Id: makefile.dj2,v 1.4 1999/10/01 14:12:11 lhecking Exp $
 #
 # GNUPLOT Makefile for DJGPP version 2 on DOS
 #
@@ -97,7 +97,7 @@ CSOURCES = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 # use makefile.all, instead:
 include makefile.all
 
-OBJS=$(COREOBJS) version.$(O)
+OBJS = $(COREOBJS) version.$(O)
 
 .c.o:  
 	$(CC) -c $(CFLAGS) $(INCLUDE) $<
