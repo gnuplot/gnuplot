@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.125 2005/02/03 05:25:45 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.126 2005/02/13 18:29:50 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -238,7 +238,8 @@ typedef struct axis_scale_t {
 
 typedef struct cmap_t {
     Colormap colormap;
-    unsigned long colors[Ncolors];	/* line colors */
+    unsigned long colors[Ncolors];	/* line colors as pixel values */
+    unsigned long rgbcolors[Ncolors];	/* line colors in rgb format */
 #ifdef             PM3D
     unsigned long xorpixel;	/* line colors */
     int total;
@@ -304,6 +305,8 @@ typedef struct plot_struct {
     int xLast, yLast;
     /* Saved text position  - used by enhanced text mode */
     int xSave, ySave;
+    /* Last rgb color that was set */
+    unsigned long current_rgb;
 
     struct plot_struct *prev_plot;  /* Linked list pointers and number */
     struct plot_struct *next_plot;
@@ -628,18 +631,6 @@ static XSegment Plus[2], Cross[2], Star[4];
 /* pixmaps used for filled boxes (ULIG) */
 /* FIXME EAM - These data structures are a duplicate of the ones in bitmap.c */
 
-/* halftone stipples for solid fillstyle */
-#define stipple_halftone_width 8
-#define stipple_halftone_height 8
-#define stipple_halftone_num 5
-static const char stipple_halftone_bits[stipple_halftone_num][8] = {
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },	/* no fill */
-    { 0x11, 0x44, 0x11, 0x44, 0x11, 0x44, 0x11, 0x44 },	/* 25% pattern */
-    { 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa },	/* 50% pattern */
-    { 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd, 0x77, 0xdd },	/* 75% pattern */
-    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }	/* solid pattern */
-};
-
 /* pattern stipples for pattern fillstyle */
 #define stipple_pattern_width 8
 #define stipple_pattern_height 8
@@ -659,7 +650,6 @@ static const char stipple_pattern_bits[stipple_pattern_num][8] = {
 #endif
 };
 
-static Pixmap stipple_halftone[stipple_halftone_num];
 static Pixmap stipple_pattern[stipple_pattern_num];
 static int stipple_initialized = 0;
 #endif /* USE_ULIG_FILLEDBOXES */
@@ -1074,8 +1064,6 @@ delete_plot(plot_struct *plot)
 #if USE_ULIG_FILLEDBOXES
     if (stipple_initialized) {	/* ULIG */
 	int i;
-	for (i = 0; i < stipple_halftone_num; i++)
-	    XFreePixmap(dpy, stipple_halftone[i]);
 	for (i = 0; i < stipple_pattern_num; i++)
 	    XFreePixmap(dpy, stipple_pattern[i]);
 	stipple_initialized = 0;
@@ -2099,6 +2087,8 @@ exec_cmd(plot_struct *plot, char *command)
 	if (sscanf(buffer + 1, "%4d%4d%4d%4d%4d", &style, &xtmp, &ytmp, &w, &h) == 5) {
 #if USE_ULIG_FILLEDBOXES
 	    int fillpar, idx;
+	    XColor xcolor, bgnd;
+	    float dim;
 
 	    /* upper 3 nibbles contain fillparameter (ULIG) */
 	    fillpar = style >> 4;
@@ -2106,19 +2096,27 @@ exec_cmd(plot_struct *plot, char *command)
 	    /* lower nibble contains fillstyle */
 	    switch (style & 0xf) {
 	    case FS_SOLID:
-	    /* use halftone fill pattern according to filldensity */
 		/* filldensity is from 0..100 percent */
-		idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
-		if (idx < 0)
-		    idx = 0;
-		if (idx >= stipple_halftone_num)
-		    idx = stipple_halftone_num - 1;
-		XSetStipple(dpy, gc, stipple_halftone[idx]);
-		XSetFillStyle(dpy, gc, FillOpaqueStippled);
-		XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
+		dim = (double)(fillpar)/100.;
+		if (dim >= 100)
+		    break;
+		/* retrieve current rgb color and shift it towards the background color */
+		xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
+		xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
+		xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
+		bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
+		bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
+		bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
+		xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
+		xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
+		xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
+		FPRINTF(("Dimming box color %.6x by %.2f to %2d %2d %2d\n",
+				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
+		if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
+		    XSetForeground(dpy, gc, xcolor.pixel);
 		break;
 	    case FS_PATTERN:
-	    /* use fill pattern according to fillpattern */
+		/* use fill pattern according to fillpattern */
 		idx = (int) fillpar;	/* fillpattern is enumerated */
 		if (idx < 0)
 		    idx = 0;
@@ -2145,7 +2143,6 @@ exec_cmd(plot_struct *plot, char *command)
 	    XFillRectangle(dpy, plot->pixmap, gc, X(xtmp), Y(ytmp), w + 1, h + 1);
 	    /* reset everything */
 	    XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
-	    XSetStipple(dpy, gc, stipple_halftone[0]);
 	    XSetFillStyle(dpy, gc, FillSolid);
 #else /* ! USE_ULIG_FILLEDBOXES */
 	    XSetForeground(dpy, gc, plot->cmap->colors[0]);
@@ -2182,6 +2179,7 @@ exec_cmd(plot_struct *plot, char *command)
 	}
 	XSetForeground(dpy, gc, plot->cmap->colors[plot->lt + 3]);
 	XSetLineAttributes(dpy, gc, plot->lwidth, plot->type, CapButt, JoinBevel);
+	plot->current_rgb = plot->cmap->rgbcolors[plot->lt + 3];
 	current_gc = &gc;
 #ifdef PM3D
 	/* Set line width for pm3d mode also, but not dashes */
@@ -2350,6 +2348,7 @@ exec_cmd(plot_struct *plot, char *command)
 		    xcolor.red, xcolor.green, xcolor.blue));
 	    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor)) {
 		XSetForeground(dpy, gc_pm3d, xcolor.pixel);
+		plot->current_rgb = rgb255color;
 	    } else {
 		FPRINTF((stderr, "          failed to allocate color\n"));
 	    }
@@ -2537,6 +2536,8 @@ exec_cmd(plot_struct *plot, char *command)
 		int i;
 #if USE_ULIG_FILLEDBOXES
 		int fillpar, idx;
+		XColor xcolor, bgnd;
+		float dim;
 #endif
 
 		transferring = 0;
@@ -2569,16 +2570,24 @@ exec_cmd(plot_struct *plot, char *command)
 		fillpar = style >> 4;
 		switch (style & 0xf) {
 		case FS_SOLID:
-		    /* use halftone fill pattern according to filldensity */
 		    /* filldensity is from 0..100 percent */
-		    idx = (int) (fillpar * (stipple_halftone_num - 1) / 100);
-		    if (idx < 0)
-			idx = 0;
-		    if (idx >= stipple_halftone_num)
-			idx = stipple_halftone_num - 1;
-		    XSetStipple(dpy, *current_gc, stipple_halftone[idx]);
-		    XSetFillStyle(dpy, *current_gc, FillOpaqueStippled);
-		    XSetBackground(dpy, *current_gc, plot->cmap->colors[0]);
+		    dim = (double)(fillpar)/100.;
+		    if (dim >= 100)
+			break;
+		    /* use halftone fill pattern according to filldensity */
+		    xcolor.red = (double)(0xffff) * (double)((plot->current_rgb >> 16) & 0xff) /255.;
+		    xcolor.green = (double)(0xffff) * (double)((plot->current_rgb >> 8) & 0xff) /255.;
+		    xcolor.blue = (double)(0xffff) * (double)(plot->current_rgb & 0xff) /255.;
+		    bgnd.red = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 16) & 0xff) /255.;
+		    bgnd.green = (double)(0xffff) * (double)((plot->cmap->rgbcolors[0] >> 8) & 0xff) /255.;
+		    bgnd.blue = (double)(0xffff) * (double)(plot->cmap->rgbcolors[0] & 0xff) /255.;
+		    xcolor.red   = dim*xcolor.red   + (1.-dim)*bgnd.red;
+		    xcolor.green = dim*xcolor.green + (1.-dim)*bgnd.green;
+		    xcolor.blue  = dim*xcolor.blue  + (1.-dim)*bgnd.blue;
+		    FPRINTF(("Dimming poly color %.6x by %.2f to %2d %2d %2d\n",
+				(unsigned long)(plot->current_rgb), dim, xcolor.red, xcolor.green, xcolor.blue));
+		    if (XAllocColor(dpy, plot->cmap->colormap, &xcolor))
+			XSetForeground(dpy, *current_gc, xcolor.pixel);
 		    break;
 		case FS_PATTERN:
 		    /* use fill pattern according to fillpattern */
@@ -3132,10 +3141,6 @@ display(plot_struct *plot)
     /* initialize stipple for filled boxes (ULIG) */
     if (!stipple_initialized) {
 	int i;
-	for (i = 0; i < stipple_halftone_num; i++)
-	    stipple_halftone[i] =
-		XCreateBitmapFromData(dpy, plot->pixmap, stipple_halftone_bits[i],
-				stipple_halftone_width, stipple_halftone_height);
 	for (i = 0; i < stipple_pattern_num; i++)
 	    stipple_pattern[i] =
 		XCreateBitmapFromData(dpy, plot->pixmap, stipple_pattern_bits[i],
@@ -3997,10 +4002,6 @@ getMultiTabConsoleSwitchCommand(unsigned long *newGnuplotXID)
 	    *konsole_tab++ = 0;
 	    ptr = strchr(konsole_tab, ')');
 	    if (ptr) *ptr = 0;
-#if 0
-	    fprintf(stderr, "konsole_name = |%s|\n", konsole_name);
-	    fprintf(stderr, "konsole_tab  = |%s|\n", konsole_tab);
-#endif
 	    /* Not necessary to define DCOP_RAISE: returning newly known
 	     * newGnuplotXID instead is sufficient.
 	     */
@@ -4100,9 +4101,6 @@ static void
 process_configure_notify_event(XEvent *event)
 {
     plot_struct *plot;
-#if 0
-    fprintf(stderr, "Event 0x%x\n", event->type);
-#endif
 
     /* Filter down to the last ConfigureNotify event */
     XSync(dpy, False);
@@ -4166,8 +4164,6 @@ process_configure_notify_event(XEvent *event)
 #if USE_ULIG_FILLEDBOXES
 	    if (stipple_initialized) {
 		int i;
-		for (i = 0; i < stipple_halftone_num; i++)
-			XFreePixmap(dpy, stipple_halftone[i]);
 		for (i = 0; i < stipple_pattern_num; i++)
 			XFreePixmap(dpy, stipple_pattern[i]);
 		stipple_initialized = 0;
@@ -5067,6 +5063,9 @@ pr_color(cmap_t * cmap_ptr)
 		xcolor.blue *= intensity;
 		if (XAllocColor(dpy, cmap_ptr->colormap, &xcolor)) {
 		    cmap_ptr->colors[n] = xcolor.pixel;
+		    cmap_ptr->rgbcolors[n] = ((xcolor.red>>8 & 0xff) << 16)
+		    			   + ((xcolor.green>>8 & 0xff) << 8)
+					   + (xcolor.blue>>8);
 		} else {
 		    fprintf(stderr, "\ngnuplot: can't allocate '%s'. Using black.\n", v);
 		    cmap_ptr->colors[n] = black;

@@ -1,3 +1,12 @@
+2005-02-21  Ethan Merritt  <merritt@u.washington.edu>
+
+	* term/x11.trm: Implement solid fill rectangles and polygons as a
+	true solid color, with variable fading toward background color, rather
+	than approximating by a set of 3 half-tone patterns.
+
+	* docs/gnuplot.doc: Explain that for some terminals the size of a "dot"
+	can be changed using linewidth.
+
 2005-02-18  Ethan Merritt  <merritt@u.washington.edu>
 
 	* term/pdf.trm:  Allow "lw" as an abbreviation for "linewidth"

@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.274 2005/02/09 11:43:07 mikulik Exp $
+C RCS $Id: gnuplot.doc,v 1.275 2005/02/18 09:47:39 mikulik Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -7963,7 +7963,8 @@ C ... and restart the table:
 ?style dots
 ?dots
  The `dots` style plots a tiny dot at each point; this is useful for scatter
- plots with many points.
+ plots with many points. For some terminals (post, pdf) the size of the dot can
+ be contolled by changing the linewidth.
 5 filledcurves
 ?commands set style filledcurves
 ?set style filledcurves
