@@ -43,7 +43,7 @@ DEFS   = @DEFS@
 CFLAGS = @CFLAGS@
 INCLUDES = -I.. -I$(srcdir)/.. -I$(srcdir)/../term -I.
 LDFLAGS = @LDFLAGS@
-LIBS = 
+LIBS = @LIBS@
 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CFLAGS)
 LINK = $(CC) $(CFLAGS) $(LDFLAGS) -o $@
@@ -135,7 +135,7 @@ gnuplot.dvi: gnuplot.tex titlepag.tex toc_entr.sty
 gpcard.dvi: gpcard.tex
 	TEXINPUTS=.:$(srcdir): tex gpcard
 
-# this is how to make PostScript files
+### Postscript format
 # if pslatex has been installed, add "times" to titlepage.tex
 ps: gnuplot.ps gpcard.ps
 
@@ -155,7 +155,7 @@ gnuplot.hlp: doc2hlp $(srcdir)/gnuplot.doc
 doc2hlp: doc2hlp.o termdoc.o
 	$(LINK) doc2hlp.o termdoc.o $(LIBS)
 
-# this is how to make gnuplot.gih
+### gnuplot interactive help format
 gih: gnuplot.gih
 
 gnuplot.gih: doc2gih $(srcdir)/gnuplot.doc
@@ -177,7 +177,7 @@ alldoc2gih.o: doc2gih.c allterm.h
 	$(COMPILE) -DALL_TERM_DOC -c $(srcdir)/doc2gih.c
 	@mv doc2gih.o alldoc2gih.o
 
-# this is how to make Info documentation
+### GNU info format
 info: gnuplot.info
 
 gnuplot.info: doc2info $(srcdir)/gnuplot.doc
@@ -196,7 +196,7 @@ gnuplot.ipf: doc2ipf $(srcdir)/gnuplot.doc
 doc2ipf: doc2ipf.o termdoc.o xref.o
 	$(LINK) doc2ipf.o termdoc.o xref.o $(LIBS)
 
-# this is how to make rtf documentation
+### Rich Text Format
 rtf: gnuplot.rtf
 
 gnuplot.rtf: doc2rtf $(srcdir)/gnuplot.doc
