@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.77 2004/09/12 04:25:01 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot3d.c,v 1.78 2004/09/15 20:25:41 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - plot3d.c */
@@ -674,7 +674,9 @@ get_3ddata(struct surface_points *this_plot)
 	/*{{{  read surface from text file */
 	struct iso_curve *local_this_iso = iso_alloc(samples_1);
 	struct coordinate GPHUGE *cp;
+	struct coordinate GPHUGE *cptail; /* Only for VECTOR plots */
 	double x, y, z;
+	double xtail, ytail, ztail;
 	double color = VERYLARGE;
 #ifdef PM3D
 	int pm3d_color_from_column = FALSE;
@@ -683,6 +685,9 @@ get_3ddata(struct surface_points *this_plot)
 	if (this_plot->plot_style == LABELPOINTS)
 	    expect_string( 4 );
 #endif
+
+	if (this_plot->plot_style == VECTOR)
+	    local_this_iso->next = iso_alloc(samples_1);
 
 	while ((j = df_readline(v,MAXDATACOLS)) != DF_EOF) {
 	    if (j == DF_SECOND_BLANK)
@@ -711,6 +716,12 @@ get_3ddata(struct surface_points *this_plot)
 		    this_plot->iso_crvs = local_this_iso;
 		    this_plot->num_iso_read++;
 
+		    if (this_plot->plot_style == VECTOR) {
+			if (this_plot->num_iso_read > 0)
+			    /* FIXME - Will the plot data structures be freed anywhere??? */
+			    int_error(NO_CARET,"Cannot plot multiple contours in style vectors");
+		    }
+
 		    if (xdatum != pt_in_iso_crv)
 			this_plot->has_grid_topology = FALSE;
 
@@ -730,8 +741,19 @@ get_3ddata(struct surface_points *this_plot)
 		 */
 		iso_extend(local_this_iso,
 			   xdatum + (xdatum < 1000 ? xdatum : 1000));
+		if (this_plot->plot_style == VECTOR)
+		    iso_extend(local_this_iso->next,
+			   xdatum + (xdatum < 1000 ? xdatum : 1000));
 	    }
 	    cp = local_this_iso->points + xdatum;
+	    
+	    if (this_plot->plot_style == VECTOR) {
+		if (j < 6) {
+		    cp->type = UNDEFINED;
+		    continue;
+		}
+		cptail = local_this_iso->next->points + xdatum;
+	    }
 
 	    if (j == DF_UNDEFINED || j == DF_MISSING) {
 		cp->type = UNDEFINED;
@@ -813,6 +835,16 @@ get_3ddata(struct surface_points *this_plot)
 #endif
 		    break;
 
+		case 6:
+		    x = v[0];
+		    y = v[1];
+		    z = v[2];
+		    xtail = x + v[3];
+		    ytail = y + v[4];
+		    ztail = z + v[5];
+		    if (this_plot->plot_style == VECTOR)
+			break;
+
 		default:
 		error_in_number_of_columns:
 		    int_error(this_plot->token,
@@ -881,23 +913,32 @@ get_3ddata(struct surface_points *this_plot)
 		return;
 	    }
 
-	    /* adjust for logscales. Set min/max and point types.
-	     * store in cp
-	     */
-	    cp->type = INRANGE;
-	    /* cannot use continue, as macro is wrapped in a loop.
+	    /* Adjust for logscales. Set min/max and point types. Store in cp.
+	     * The macro cannot use continue, as it is wrapped in a loop.
 	     * I regard this as correct goto use
 	     */
+	    cp->type = INRANGE;
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->x, x, cp->type, x_axis, NOOP, goto come_here_if_undefined);
 	    STORE_WITH_LOG_AND_UPDATE_RANGE(cp->y, y, cp->type, y_axis, NOOP, goto come_here_if_undefined);
+	    if (this_plot->plot_style == VECTOR) {
+		cptail->type = INRANGE;	    
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->x, xtail, cp->type, x_axis, NOOP, goto come_here_if_undefined);
+		STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->y, ytail, cp->type, y_axis, NOOP, goto come_here_if_undefined);
+	    }
+	    
 	    if (dgrid3d) {
 		/* HBB 20010424: in dgrid3d mode, delay log() taking
 		 * and scaling until after the dgrid process. Only for
 		 * z, not for x and y, so we can layout the newly
 		 * created created grid more easily. */
 		cp->z = z;
+		if (this_plot->plot_style == VECTOR)
+		    cptail->z = ztail;
 	    } else {
 		STORE_WITH_LOG_AND_UPDATE_RANGE(cp->z, z, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+		if (this_plot->plot_style == VECTOR)
+		    STORE_WITH_LOG_AND_UPDATE_RANGE(cptail->z, ztail, cp->type, z_axis, NOOP, goto come_here_if_undefined);
+
 #ifdef PM3D
 		if (NEED_PALETTE(this_plot)) {
 		    if (pm3d_color_from_column) {
@@ -937,14 +978,19 @@ get_3ddata(struct surface_points *this_plot)
 	    this_plot->num_iso_read++;	/* Update last iso. */
 	    local_this_iso->p_count = xdatum;
 
-	    local_this_iso->next = this_plot->iso_crvs;
+	    /* If this is a VECTOR plot then iso->next is already */
+	    /* occupied by the vector tail coordinates.           */
+	    if (this_plot->plot_style != VECTOR)
+		local_this_iso->next = this_plot->iso_crvs;
 	    this_plot->iso_crvs = local_this_iso;
 
 	    if (xdatum != pt_in_iso_crv)
 		this_plot->has_grid_topology = FALSE;
 
-	} else {
-	    iso_free(local_this_iso);	/* Free last allocation. */
+	} else { /* Free last allocation */
+	    if (this_plot->plot_style == VECTOR)
+		iso_free(local_this_iso->next);
+	    iso_free(local_this_iso);
 	}
 
 	/*}}} */
@@ -1436,7 +1482,22 @@ eval_3dplots()
 		 * - point spec allowed if style uses points, ie style&2 != 0
 		 * - keywords are optional
 		 */
-		{
+		if (this_plot->plot_style == VECTOR) {
+		    int stored_token = c_token;
+		    struct arrow_style_type arrow;
+
+		    arrow_parse(&arrow, line_num, TRUE);
+		    if (stored_token != c_token) {
+			if (set_lpstyle) {
+			    duplication = TRUE;
+			    break;
+			} else {
+			    this_plot->arrow_properties = arrow;
+			    set_lpstyle = TRUE;
+			    continue;
+			}
+		    }
+		} else {
 		    int stored_token = c_token;
 		    struct lp_style_type lp;
 

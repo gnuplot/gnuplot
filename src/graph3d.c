@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.95 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.96 2004/09/01 15:53:47 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -118,6 +118,7 @@ typedef enum { ALLGRID, FRONTGRID, BACKGRID } WHICHGRID;
 static void plot3d_impulses __PROTO((struct surface_points * plot));
 static void plot3d_lines __PROTO((struct surface_points * plot));
 static void plot3d_points __PROTO((struct surface_points * plot, /* FIXME PM3D: */ int p_type));
+static void plot3d_vectors __PROTO((struct surface_points * plot));
 #ifdef PM3D
 /* no pm3d for impulses */
 static void plot3d_lines_pm3d __PROTO((struct surface_points * plot));
@@ -985,7 +986,6 @@ do_3dplot(
 	    case BOXERROR:
 	    case CANDLESTICKS:	/* HBB: dito */
 	    case FINANCEBARS:
-	    case VECTOR:
 	    case POINTSTYLE:
 		if (lkey) {
 #ifdef PM3D
@@ -1067,6 +1067,10 @@ do_3dplot(
 
 		break;
 
+	    case VECTOR:
+		plot3d_vectors(this_plot);
+		break;
+
 #ifdef PM3D
 	    case PM3DSURFACE:
 		if (can_pm3d && PM3D_IMPLICIT != pm3d.implicit) {
@@ -1128,6 +1132,7 @@ do_3dplot(
 #ifdef PM3D
 		    case FILLEDCURVES:
 #endif
+		    case VECTOR:
 		    case STEPS:
 		    case FSTEPS:
 		    case HISTEPS:
@@ -1143,7 +1148,6 @@ do_3dplot(
 		    case BOXXYERROR:
 		    case CANDLESTICKS:	/* HBB: dito */
 		    case FINANCEBARS:
-		    case VECTOR:
 		    case POINTSTYLE:
 #ifdef PM3D
 			if (this_plot->lp_properties.use_palette)
@@ -1211,6 +1215,7 @@ do_3dplot(
 #ifdef PM3D
 			    case FILLEDCURVES:
 #endif
+			    case VECTOR:
 			    case STEPS:
 			    case FSTEPS:
 			    case HISTEPS:
@@ -1226,7 +1231,6 @@ do_3dplot(
 			    case BOXXYERROR:
 			    case CANDLESTICKS:	/* HBB: ditto */
 			    case FINANCEBARS:
-			    case VECTOR:
 			    case POINTSTYLE:
 #ifdef PM3D
 				if (this_plot->lp_properties.use_palette)
@@ -1269,11 +1273,12 @@ do_3dplot(
 
 		    /* now draw the contour */
 		    switch (this_plot->plot_style) {
+			/* treat boxes like impulses: */
 		    case BOXES:
 #ifdef PM3D
 		    case FILLEDCURVES:
 #endif
-			/* treat boxes like impulses: */
+		    case VECTOR:
 		    case IMPULSES:
 			cntr3d_impulses(cntrs, &thiscontour_lp_properties);
 			break;
@@ -1299,7 +1304,6 @@ do_3dplot(
 		    case BOXXYERROR:
 		    case CANDLESTICKS:
 		    case FINANCEBARS:
-		    case VECTOR:
 			/* treat all the above like points */
 		    case POINTSTYLE:
 			cntr3d_points(cntrs, &thiscontour_lp_properties);
@@ -3057,3 +3061,35 @@ key_sample_point_pm3d(
 }
 
 #endif
+
+
+/* plot_vectors:
+ * Plot the curves in VECTORS style
+ */
+static void
+plot3d_vectors(struct surface_points *plot)
+{
+    int i;
+    int x1, y1, x2, y2;
+    struct coordinate GPHUGE *heads = plot->iso_crvs->points;
+    struct coordinate GPHUGE *tails = plot->iso_crvs->next->points;
+
+    /* Only necessary once because all arrows equal */
+    term_apply_lp_properties(&(plot->arrow_properties.lp_properties));
+    apply_head_properties(&(plot->arrow_properties));
+
+    for (i = 0; i < plot->iso_crvs->p_count; i++) {
+	
+	if (heads[i].type == UNDEFINED || tails[i].type == UNDEFINED)
+	    continue;
+
+	if (heads[i].type == INRANGE && tails[i].type == INRANGE) {
+	    map3d_xy(heads[i].x, heads[i].y, heads[i].z, &x1, &y1);
+	    map3d_xy(tails[i].x, tails[i].y, tails[i].z, &x2, &y2);
+
+	    if (!clip_point(x1, y1) && !(clip_point(x2,y2)))
+		(*term->arrow) (x1, y1, x2, y2, plot->arrow_properties.head);
+	}
+    }
+}
+

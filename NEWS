@@ -14,6 +14,7 @@ News, changes and fixes since gnuplot version 4.0
 * NEW command 'set termoption <foo>' changes single property of current terminal
 * NEW png driver supports antialiasing and TrueColor images
 * NEW encoding koi8-u
+* NEW plot style "with vectors" applies to both 2D and 3D plots
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
 * CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window

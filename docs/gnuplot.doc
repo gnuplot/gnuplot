@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.240 2004/09/17 05:01:12 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.241 2004/09/17 10:47:56 mikulik Exp $
 C 18 September 2001
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -8031,14 +8031,19 @@ C ... and restart the table:
 ?plotting styles vectors
 ?style vectors
 ?vectors
- The `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  Thus
- it requires four columns of data.  It also draws a small arrowhead at the
+ The 2D `vectors` style draws a vector from (x,y) to (x+xdelta,y+ydelta).  
+ Thus it requires four columns of data.  It also draws a small arrowhead at the
  end of the vector.
+ The 3D `vectors` style is similar, but requires six columns of data.
+ splot with vectors is supported only for `set mapping cartesian`.
+ The keywords "with vectors" may be followed by arrow style specifications.
+ See `arrowstyle` for more details.
 
  Example:
        plot 'file.dat' using 1:2:3:4 with vectors head filled lt 2
+       splot 'file.dat' using 1:2:3:(1):(1):(1) with vectors filled head lw 2
 
- `set clip one` and `set clip two` affect drawing vectors.
+ `set clip one` and `set clip two` affect vectors drawn in 2D.
  Please see `set clip` and `arrowstyle`.
 5 xerrorbars
 ?commands set style xerrorbars

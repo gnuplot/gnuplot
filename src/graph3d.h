@@ -1,5 +1,5 @@
 /*
- * $Id: graph3d.h,v 1.16 2004/07/01 17:10:05 broeker Exp $
+ * $Id: graph3d.h,v 1.17 2004/07/03 06:08:48 sfeam Exp $
  */
 
 /* GNUPLOT - graph3d.h */
@@ -88,6 +88,7 @@ typedef struct surface_points {
     char *title;
     int title_no_enhanced;	/* don't typeset title in enhanced mode */
     struct lp_style_type lp_properties;
+    struct arrow_style_type arrow_properties;
     int has_grid_topology;
 
     /* Data files only - num of isolines read from file. For
