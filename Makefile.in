@@ -385,14 +385,14 @@ $(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCI
 $(CONFIG_HEADER): stamp-h
 stamp-h: $(CONFIG_HEADER_IN) $(top_builddir)/config.status
 	cd $(top_builddir) \
-	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER) \
+	&& CONFIG_FILES= CONFIG_HEADERS=$(CONFIG_HEADER):$(CONFIG_HEADER_IN) \
 	   $(SHELL) ./config.status
 	@echo timestamp > stamp-h
 
 $(srcdir)/$(CONFIG_HEADER_IN): stamp-h.in
-$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG) $(CONFIG_TOP) $(CONFIG_BOT)
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) $(ACCONFIG)
 	cd $(top_srcdir) && $(AUTOHEADER)
-	echo timestamp > $(srcdir)/stamp-h.in
+	@echo timestamp > $(srcdir)/stamp-h.in
 
 ################################################################
 # Miscellaneous targets

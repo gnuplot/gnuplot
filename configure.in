@@ -214,7 +214,7 @@ if test "$with_linux_vga" = yes; then
   AC_MSG_CHECKING(for linux vga library)
   AC_CHECK_LIB(vga, vga_init,
     AC_DEFINE(LINUXVGA)
-    LINUXSUID='sudo chown root $(bindir)/gnuplot; sudo chmod u+s $(bindir)/gnuplot'
+    LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
     TERMLIBS="$TERMLIBS -lvga")
 fi
 

@@ -3969,7 +3969,7 @@ if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
 #define LINUXVGA 1
 EOF
 
-    LINUXSUID='sudo chown root $(bindir)/gnuplot; sudo chmod u+s $(bindir)/gnuplot'
+    LINUXSUID='chown root $(bindir)/gnuplot; chmod u+s $(bindir)/gnuplot'
     TERMLIBS="$TERMLIBS -lvga"
 else
   echo "$ac_t""no" 1>&6
