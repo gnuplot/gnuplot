@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.126 2004/12/06 06:46:27 sfeam Exp $
+ * $Id: x11.trm,v 1.127 2004/12/31 06:12:58 sfeam Exp $
  *
  */
 
@@ -143,6 +143,7 @@ TERM_PUBLIC void ENHX11_FLUSH __PROTO((void));
 /* non-zero if '-display' found on command line */
 static int X11_Display = 0;
 static char X11_default_font[MAX_ID_LEN+1] = {'\0'};
+static int  X11_default_fontsize = 12;
 static char X11_last_font_used[MAX_ID_LEN+1] = {'\01','\0'};
 static char X11_next_font_used[MAX_ID_LEN+1] = {'\0'};
 static enum JUSTIFY X11_last_justification = LEFT;
@@ -435,6 +436,9 @@ X11_options()
 	    else
  		copy_str(X11_default_font, c_token, sizeof(X11_default_font));
 	    c_token++;
+	    if (*strchr(X11_default_font,','))
+		sscanf(strchr(X11_default_font,',')+1, "%d",
+			&X11_default_fontsize);
 	    if (set_font) duplication=TRUE;
 	    set_font = TRUE;
 	    break;
@@ -1688,7 +1692,7 @@ PASS2:
      *        the default font size is.
      */
 	ENHx11_font = "DEFAULT";
-	ENHx11_fontsize = 12;		/* FIXME - are we going to need this? */
+	ENHx11_fontsize = X11_default_fontsize;
 
     /* Set the recursion going. We say to keep going until a
      * closing brace, but we don't really expect to find one.

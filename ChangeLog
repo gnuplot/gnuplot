@@ -1,5 +1,10 @@
 2004-12-30  Ethan Merritt  <merritt@u.washington.edu>
 
+	* term/x11.trm (X11_options ENHX11_put_text): Try harder to determine
+	what the default fontsize is so that string lengths can be estimated.
+
+2004-12-30  Ethan Merritt  <merritt@u.washington.edu>
+
 	* src/term_api.h term/README: Add a new terminal flag bit 
 	TERM_ENHANCED_TEXT that is set whenever the terminal is currently
 	operating in enhanced text mode. The will allow improved estimation of
