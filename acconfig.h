@@ -71,60 +71,6 @@
 /* Define if you do not want to read .gnuplot in the current directory.  */
 #undef NOCWDRC
 
-/* Define if you do not have the atexit function.  */
-#undef NO_ATEXIT
-
-/* Define if you do not have the <errno.h> header file.  */
-#undef NO_ERRNO_H
-
-/* Define if you do not have the <float.h> header file.  */
-#undef NO_FLOAT_H
-
-/* Define if you do not have the <limits.h> header file.  */
-#undef NO_LIMITS_H
-
-/* Define if you do not have the <locale.h> header file.  */
-#undef NO_LOCALE_H
-
-/* Define if you do not have the <math.h> header file.  */
-#undef NO_MATH_H
-
-/* Define if you do not have the memcpy function.  */
-#undef NO_MEMCPY
-
-/* Define if you do not have the memset function.  */
-#undef NO_MEMSET
-
-/* Define if you do not have the setvbuf function.  */
-#undef NO_SETVBUF
-
-/* Define if you do not have the <stdlib.h> header file.  */
-#undef NO_STDLIB_H
-
-/* Define if you do not have the strchr function.  */
-#undef NO_STRCHR
-
-/* Define if you do not have the strerror function.  */
-#undef NO_STRERROR
-
-/* Define if you do not have the <string.h> header file.  */
-#undef NO_STRING_H
-
-/* Define if you do not have the strrchr function.  */
-#undef NO_STRRCHR
-
-/* Define if you do not have the strstr function.  */
-#undef NO_STRSTR
-
-/* Define if you do not have the <sys/time.h> header file.  */
-#undef NO_SYS_TIME_H
-
-/* Define if you do not have the <sys/types.h> header file.  */
-#undef NO_SYS_TYPES_H
-
-/* Define if you do not have the <time.h> header file.  */
-#undef NO_TIME_H
-
 /* Define to the name of the distribution.  */
 #undef PACKAGE
 
