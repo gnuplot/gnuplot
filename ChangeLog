@@ -1,3 +1,12 @@
+2001-01-22  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/graphics.c (boundary): Moved calls to set the axis endpoints
+ 	up here.  Fixes bug in key placement caused by uninitialized
+ 	variables used by map_position().
+	(do_plot): Removed them from here.
+	(boundary): Disallow key entry height to become zero --- want to
+ 	divide by it later.
+
 2002-01-22  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* INSTALL: Remove references to the GP_PATH_* macros.

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.61 2002/01/22 15:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.62 2002/01/22 17:45:00 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -533,6 +533,9 @@ boundary(plots, count)
 	key_entry_height = p_height * 1.25 * key_vert_factor;
 	if (key_entry_height < (t->v_char))
 	    key_entry_height = (t->v_char) * key_vert_factor;
+	/* HBB 20020122: safeguard to prevent division by zero later */
+	if (key_entry_height == 0)
+	    key_entry_height = 1;
 
 	/* count max_len key and number keys with len > 0 */
 	max_ptitl_len = find_maxl_keys(plots, count, &ptitl_cnt);
@@ -596,7 +599,10 @@ boundary(plots, count)
 		ybot += (int)(key_height_fix * (t->v_char));
 	    } else {
 		/* maximise no rows, limited by ytop-ybot */
-		int i = (int) (ytop - ybot - key_height_fix * (t->v_char) - (ktitl_lines + 1) * (t->v_char)) / key_entry_height;
+		int i = (int) (ytop - ybot - key_height_fix * (t->v_char)
+			       - (ktitl_lines + 1) * (t->v_char))
+		    / key_entry_height;
+
 		KEY_PANIC(i == 0);
 		if (ptitl_cnt > i) {
 		    key_cols = (int) (ptitl_cnt + i - 1) / i;
@@ -605,8 +611,9 @@ boundary(plots, count)
 		    key_rows = (int) (ptitl_cnt + key_cols - 1) / key_cols;
 		}
 	    }
+
 	    /* come here if we detect a division by zero in key calculations */
-	  key_escape:
+	key_escape:
 	    ;			/* ansi requires this */
 	}
 	/*}}} */
@@ -879,6 +886,12 @@ boundary(plots, count)
     AXIS_SETSCALE(SECOND_Y_AXIS, ybot, ytop);
     AXIS_SETSCALE(FIRST_X_AXIS, xleft, xright);
     AXIS_SETSCALE(SECOND_X_AXIS, xleft, xright);
+    /* HBB 20020122: moved here from do_plot, because map_position
+     * needs these, too */
+    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
+    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
+    axis_set_graphical_range(SECOND_X_AXIS, xleft, xright);
+    axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
 
     /*{{{  calculate the window in the grid for the key */
     if (lkey == KEY_USER_PLACEMENT || (lkey == KEY_AUTO_PLACEMENT && key_vpos != TUNDER)) {
@@ -1170,12 +1183,6 @@ do_plot(plots, pcount)
      * initialised.
      */
     boundary(plots, pcount);
-
-    /* inform axes about newly found values 'xleft' & Co. */
-    axis_set_graphical_range(FIRST_X_AXIS, xleft, xright);
-    axis_set_graphical_range(FIRST_Y_AXIS, ybot, ytop);
-    axis_set_graphical_range(SECOND_X_AXIS, xleft, xright);
-    axis_set_graphical_range(SECOND_Y_AXIS, ybot, ytop);
 
     screen_ok = FALSE;
 
