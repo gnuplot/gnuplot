@@ -1,6 +1,14 @@
 Changes in release 3.7.1:
+[3.7.0.6]
+* Petr Mikulik's OS/2 mouse patch integrated
+* 'make check' now runs demos non-interactively
+* Linux SVGA driver: don't drop root priviledge until VGA is initialised
+* LaTeX tutorial updated for LaTeX2e
+* new targets to build documentation with groff
+* quoting bug fixed 
+* new files VERSION, PATCHLEVEL, README.exp
 [3.7.0.5]
-* another off-by-one error fixed in pstricks driver. sigh ...
+* another off-by-one error fixed in pstricks driver
 * updated to latest version of gnuplot-mode
 * added tilde-expansion of filenames
 * win/pgnuplot.c added, stdin redirection for gnuplot
@@ -12,7 +20,7 @@ Changes in release 3.7.1:
   lack some of the key texts
 * build lisp files, LaTeX tutorial only if emacs, latex, resp.
   are found
-* moved CVS repository over to new dir structure
+* moved CVS repository to new dir structure
 * gnuplot can now be compiled with GNU libplot 2.2
 * docs/doc2hlp.com renamed to docs/doc2hlp.vms pending better solution
 
