@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.69 2001/07/03 12:48:55 broeker Exp $
+C RCS $Id: gnuplot.doc,v 1.70 2001/07/11 10:38:12 broeker Exp $
 C 3 December 1998
 C Copyright (C) 1986 - 1993, 1998   Thomas Williams, Colin Kelley
 C
@@ -2404,6 +2404,11 @@ C ... and restart the table:
 
  If `autoscale` is in effect, the ranges will be computed such that the
  plotted curve lies within the borders of the graph.
+
+ If `autoscale` is not in effect, and the smooth option is either `acspline`
+ or `cspline`, the sampling of the generated curve is
+ done across the intersection of the x range covered by the input data and 
+ the fixed abscissa range as defined by `set xrange`. 
 
  If too few points are available to allow the selected option to be applied,
  an error message is produced.  The minimum number is one for `unique`, four
