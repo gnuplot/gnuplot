@@ -1,3 +1,38 @@
+1999-01-12  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* 0INSTALL: Update to 3.7.
+
+	* 0README: Update distribution sites.
+
+	* version.c: Version 3.7, patchlevel 0, date string updated.
+
+1999-01-08  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* term/mif.trm: Bugfix.
+
+1999-01-08  William D Kirby  <wdkirby@ix.netcom.com>
+
+	* win/wcommon.h: Don't include <shellapi.h> when compiling with
+	gcc based compilers.
+
+1999-01-07  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* Makefile.in, makefile.all: Remove m4/select-types.m4 and
+	m4/stringize.m4	from ETC and $(ACLOCAL_M4).
+
+	* acconfig.h: Remove HAVE_STRINGIZE and SELECT_TYPE_ARG* symbols.
+
+	* aclocal.m4, config.hin, configure: Regenerated.
+
+	* configure.in: Require autoconf-2.13.
+
+	* m4/select-types.m4, m4/stringize.m4: Removed, provided by
+	new autoconf version.
+
+1999-01-06  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* graphics.c(ticfmt): Fix buffer overrun.
+
 1999-01-05  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* 0INSTALL: Add section about front ends.
@@ -112,7 +147,7 @@
 
 	* 0BUGS: Add entry for 16bit Windows and Borland C++ 3.1.
 
-	* makefiule.mgw: Call compiled programs via ./ because under
+	* makefile.mgw: Call compiled programs via ./ because under
 	CygWin-BASH, the current directory is not in PATH.
 
 1998-12-15  Lars Hecking  <lhecking@nmrc.ucc.ie>
