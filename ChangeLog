@@ -1,3 +1,9 @@
+2004-02-24  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* config/config.amg config/config.cyg config/config.mgw
+	config/config.os2: Changed GP_FIT_ERRVARS from #undef to #define
+	(complies with the default value of ./configure).
+
 2004-02-23  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	* docs/gnuplot.doc (bind, mouse variables, if, using, label,

@@ -6,8 +6,8 @@
 
 #define USE_ULIG_FILLEDBOXES	   1
 #define USE_ULIG_RELATIVE_BOXWIDTH 1
-#undef GP_FIT_ERRVARS
-#define GP_ISVAR 1
+#define GP_FIT_ERRVARS		1
+#define GP_ISVAR		1
 
 #define PIPES			1
 #define READLINE		1
