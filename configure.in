@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.119 2002/11/14 03:27:32 sfeam Exp $
+dnl $Id: configure.in,v 1.120 2002/12/15 20:12:39 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -191,10 +191,11 @@ if test "$with_linux_vga" = yes; then
     with_linux_vga=no)
 fi
 
+dnl TODO: simplify, get rid of GGI_SUPPORT
 dnl new ggi driver
 GGI_SUPPORT=no
 AC_ARG_WITH(ggi,dnl
-[  --with-ggi[=PATH]       enable the ggi driver (EXPERIMENTAL)],
+[  --with-ggi[=DIR]        enable the ggi driver (EXPERIMENTAL)],
   [if test "$withval" != no; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
@@ -217,7 +218,7 @@ please add path to ggi/wmh.h to CPPFLAGS in Makefile]))
    fi])
 
 AC_ARG_WITH(xmi,dnl
-[  --with-xmi[=PATH]       ggi's xmi support for pm3d (EXPERIMENTAL)],
+[  --with-xmi[=DIR]        ggi's xmi support for pm3d (EXPERIMENTAL)],
   [if test "$withval" != no -a "$GGI_SUPPORT" = yes; then
      if test -d $withval/include; then
        CPPFLAGS="$CPPFLAGS -I$withval/include"
@@ -235,7 +236,7 @@ AC_ARG_WITH(readline,dnl
 [  --with-readline         use the builtin minimal readline function (default)
   --without-readline      do not use the builtin readline function
   --with-readline=gnu     use the GNU readline library
-  --with-readline=PATH    Specify the location of GNU readline],,
+  --with-readline=DIR     Specify the location of GNU readline],,
   test -z "$with_readline" && with_readline=yes)
 
 dnl Gnuplot history, needs GNU readline
@@ -305,11 +306,11 @@ please add path to history.h to CPPFLAGS in Makefile]))
 fi
 dnl end readline
 
-dnl If no PATH argument given, use the Unix plot library
+dnl If no DIR argument given, use the Unix plot library
 dnl Else use either GNU libplot from plotutils,
 dnl or ancient GNU graphics libplot
 AC_ARG_WITH(plot,dnl
-[  --with-plot[=PATH]      use the Unix plot library],
+[  --with-plot[=DIR]       use the Unix plot library],
   [if test "$withval" = yes; then
      dnl Unix plot library
      AC_CHECK_LIB(plot,openpl,
@@ -337,196 +338,147 @@ AC_ARG_WITH(plot,dnl
    fi])
 dnl end libplot
 
-dnl JPEG library
-AC_ARG_WITH(jpeg,dnl
-[  --with-jpeg[=PATH]      specify location of libjpeg if default is broken
-                         (no to turn off JPEG support in gd.trm) ],
-  [if test "$withval" = no; then
-     with_jpeg=no
-   elif test -d $withval/lib; then
-     LDFLAGS="$LDFLAGS -L$withval/lib"
-   elif test -d "$withval"; then
-     LDFLAGS="$LDFLAGS -L$withval"
-   fi])
-dnl end jpeg
+dnl check presence of z library
+dnl TODO: path to zlib includes; -lz -lm specified multiple times
+dnl       we don't do anything about missing png/gd includes either
+AC_CHECK_LIB(z,deflate,
+  [TERMLIBS="$TERMLIBS -lz"
+   AC_DEFINE(HAVE_LIBZ, 1, [ Define if you have zlib. ])
+   AC_CHECK_HEADER(zlib.h,,
+     [AC_MSG_WARN([found z library but not zlib.h
+please add path to zlib.h to CPPFLAGS in Makefile])])],
+  AC_MSG_WARN([zlib is required - see http://www.gzip.org/zlib/]))
 
-dnl PNG library path if required for *NEW* png driver gd.trm
-AC_ARG_WITH(libpng,dnl
-[  --with-libpng[=PATH]    specify location of libpng if default is broken
-                         (==>specify only if not found by default!) ], 
-  [if test -d $withval/lib; then
-     LDFLAGS="$LDFLAGS -L$withval/lib"
-   elif test -d "$withval"; then
-     LDFLAGS="$LDFLAGS -L$withval"
-   fi])
-dnl end png
+dnl check presence of png library
+AC_ARG_WITH(png,dnl
+[  --with-png[=DIR]        where to find the png library],,
+  with_png=yes)
 
-dnl The location of Tom Boutell's gd library
-AC_ARG_WITH(gd,dnl
-[  --with-gd[=PATH]        specify location of Tom Boutell's gd library
-                          (version >= 1.8 needed for new png/jpeg driver)
-                          (version 1.3 or 1.4 needed for gif driver) ], ,
-                          withval=yes)
-  
-if test "$withval" != no; then
-  if test -d "$withval/include"; then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-  else
-    test -d "$withval" && CPPFLAGS="$CPPFLAGS -I$withval"
-  fi 
-  if test -d "$withval/lib"; then
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-  else
-    test -d "$withval" && LDFLAGS="$LDFLAGS -L$withval"
-  fi 
-
-  AC_CHECK_LIB(gd,gdImageCreate,
-    [TERMLIBS="-lgd $TERMLIBS"
-     AC_CHECK_HEADERS(gd.h,
-       AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have Thomas Boutell's gd library. ]),
-       [AC_MSG_WARN([found gd library but not gd.h])
-        AC_MSG_WARN([please add path to gd.h to CPPFLAGS in Makefile])])],
-    AC_MSG_RESULT([  GD library not found ]))
-
-  AC_CHECK_LIB(gd,gdImagePng,
-    [TERMLIBS="$TERMLIBS -lpng -lz"
-     AC_DEFINE(HAVE_NEWGD, 1, [ Define if you have libgd version >= 1.8 ])
-     AC_DEFINE(HAVE_PNG,   1, [ Define if you have want png support ])
-     with_png="yes"
-     with_newgd="yes"],
-    [AC_MSG_WARN([ No PNG support found in libgd, or libpng or libz not found  ])],
-    [-lpng -lz])
-
-  if test "$with_jpeg" != no; then
-    AC_CHECK_LIB(gd,gdImageJpeg,
-      [TERMLIBS="$TERMLIBS -ljpeg"
-       AC_DEFINE(HAVE_JPEG, 1, [ Define if you have libjpeg and libgd version >= 1.8 ])
-       with_jpeg="yes"],
-      [AC_MSG_WARN([ No JPEG support found in libgd, or libjpeg not found  ])
-       with_jpeg="no"],
-      [-ljpeg])
+if test "$with_png" != no; then
+  AC_PATH_PROG([LIBPNG_CONFIG], [libpng-config])
+  if test -n "$LIBPNG_CONFIG"; then
+    libpng_CPPFLAGS=`libpng-config --cflags`
+    # should be --ldopts, but it's currently broken
+    libpng_LDFLAGS=`libpng-config --ldflags | sed 's/-l[[^ ]][[^ ]]*//g'`
+  elif test -d "$with_png"; then
+    libpng_CPPFLAGS="-I$with_png/include"
+    libpng_LDFLAGS="-L$with_png/lib"
   fi
 
-  AC_CHECK_LIB(gd,gdImageGif,
-    AC_DEFINE(HAVE_GIF, 1, [ Define if you have libgd version 1.2 - 1.4 ]),
-    AC_MSG_WARN([ No GIF support found in libgd  ]))
+  _cppflags="$CPPFLAGS"
+  _ldflags="$LDFLAGS"
+  CPPFLAGS="$CPPFLAGS $libpng_CPPFLAGS"
+  LDFLAGS="$LDFLAGS $libpng_LDFLAGS"
 
-fi
+  AC_CHECK_LIB(png,png_init_io,
+    AC_DEFINE(HAVE_LIBPNG, 1, [ Define if you have the png library. ]),,[-lz -lm])
 
-dnl end gd library
+  AC_CHECK_HEADERS(png.h,,
+    [AC_CHECK_HEADERS(libpng/png.h,
+       [libpng_CPPFLAGS="$libpng_CPPFLAGS/libpng"])])
 
-dnl freetype library (may be required to specify along with gd)
-dnl There should really be a test on whether TTF support was built into libgd
-if test "$with_newgd" = yes; then
-  AC_ARG_WITH(freetype,dnl
-  [  --with-freetype[=PATH]  location of libfreetype (TrueType font support)
-                          (used via libgd by new png/jpeg driver) 
-                          (==>specify only if not found by default!) ], 
-    [if test "$withval" != no; then
-       if test -d $withval/include; then
-         CPPFLAGS="$CPPFLAGS -I$withval/include"
-       else
-         CPPFLAGS="$CPPFLAGS -I$withval"
-       fi 
-       if test -d $withval/lib; then
-         LDFLAGS="$LDFLAGS -L$withval/lib"
-       else
-         LDFLAGS="$LDFLAGS -L$withval"
-       fi 
-       AC_CHECK_LIB(freetype, FT_Open_Face,
-         [TERMLIBS="-lfreetype $TERMLIBS"
-       	with_ttf="yes"],
-         AC_MSG_RESULT([  freetype library not found ]))
-     fi],
-    with_ttf="yes")
-
-  if test "$with_ttf" = yes; then
-  AC_CHECK_LIB(gd,gdImageStringFT,,
-    [AC_MSG_WARN([ TTF support not found - trying again with explicit libraries ])
-     with_ttf="fail"], [ ] )
-  fi
-  if test "$with_ttf" = fail; then
-    AC_CHECK_LIB(gd,gdImageStringTTF,
-      [TERMLIBS="$TERMLIBS -lfreetype"
-       with_ttf="yes"],
-      [AC_MSG_WARN([ TTF support missing in libgd or freetype library not found ])
-     with_ttf="no"],
-    [-lpng -lz -lfreetype ])
-    if test "$with_ttf" = yes; then
-       AC_DEFINE(gdImageStringFT, gdImageStringTTF, 
-		 [ libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT ])
-    fi
-  fi
-  
-  if test "$with_ttf" = yes; then
-    AC_DEFINE(HAVE_TTF, 1, [ Define if TrueType font support in libgd ])
-  fi
-fi
-dnl end freetype library
-
-dnl gif terminal support emulated using Tom Boutell's new gd library
-AC_ARG_WITH(gif,dnl
-[  --with-gif=png          'set term gif' produces png images instead
-                          (libgd version >= 1.8) ],,)
-
-if test "$with_gif" = png; then
-  if test "$with_newgd" = yes; then
-    AC_DEFINE(PNG_FOR_GIF, 1,
-      [ Define to have 'set term gif' produce PNG images instead ])
-  else
-    with_gif=
-  fi
-fi
-dnl
-
-dnl The *OLD* Portable Network Graphics (png) terminal
-if test "$with_newgd" != yes -a "$with_png" != no; then
-  AC_ARG_WITH(png,dnl
-  [  --with-png[=PATH]       enable *old* png terminal (requires libpng and libz)
-                          (libgd versions 1.2 - 1.4) ],
-
-    [if test "$withval" != no; then
-       if test -d $withval/include; then
-         CPPFLAGS="$CPPFLAGS -I$withval/include"
-       fi
-       if test -d $withval/lib; then
-         LDFLAGS="$LDFLAGS -L$withval/lib"
-       fi
-     fi
-     with_png=yes
-     ],
-  )
-
-  if test "$with_png" = yes; then
-    AC_CHECK_LIB(png,png_init_io,
-      [TERMLIBS="-lpng -lz $TERMLIBS"
-       AC_CHECK_HEADER(png.h,
-       [AC_CHECK_HEADER(zlib.h,,
-        AC_MSG_WARN([found z library but not zlib.h
-please add path to zlib.h to CPPFLAGS in Makefile]))
-        AC_EGREP_CPP([You lose], [#include "png.h"
+  if test "$ac_cv_lib_png_png_init_io" = yes ; then
+    AC_EGREP_CPP([You lose],[#include "png.h"
 #if PNG_LIBPNG_VER < 89
 You lose.
 #endif
-],
-          [AC_MSG_WARN([- libpng too old - not including png driver])
-           ac_cv_header_png_h=no])],
-       AC_MSG_WARN([found png library but not png.h
-please add path to png.h to CPPFLAGS in Makefile]))],
-      AC_MSG_RESULT([  PNG library not found.
- See term/png.trm for download details]),
-      [-lz])
-
-    if test "$ac_cv_header_png_h" = yes; then
-      AC_DEFINE(HAVE_LIBPNG, 1, [ Define if you have the png library. ])
-    fi
+      ],[AC_MSG_WARN([- libpng too old - not including png support])
+         with_png=no])
+  else
+    with_png=no
   fi
+
+  dnl we'll use the png-specific flags later
+  CPPFLAGS="$_cppflags"
+  LDFLAGS="$_ldflags"
+
 fi
-dnl end png and z
+dnl end png
+
+dnl check presence of gd library
+dnl we don't check for libfreetype and libjpeg locations - if gd requires
+dnl them, the gdlib-config scipt contains all the required information
+AC_ARG_WITH(gd,dnl
+[  --with-gd[=DIR]         where to find Tom Boutell's gd library],,
+  with_gd=yes)
+
+if test "$with_gd" != no; then
+  AC_PATH_PROG([GDLIB_CONFIG], [gdlib-config])
+  if test -n "$GDLIB_CONFIG"; then
+    libgd_CPPFLAGS=`gdlib-config --cflags`
+    libgd_LDFLAGS=`gdlib-config --ldflags`
+  elif test -d "$with_gd"; then
+    libgd_CPPFLAGS="-I$with_gd/include"
+    libgd_LDFLAGS="-L$with_gd/lib"
+  fi
+
+  _cppflags="$CPPFLAGS"
+  _ldflags="$LDFLAGS"
+
+  AC_CHECK_LIB(gd,gdImageCreate,
+    [dnl found gd library
+     AC_DEFINE(HAVE_LIBGD, 1, [ Define if you have gd library. ])
+     AC_CHECK_HEADERS(gd.h)
+
+     dnl gif support in libgd
+     AC_CHECK_LIB(gd,gdImageGif,
+       [AC_DEFINE(HAVE_GD_GIF, 1, [ Define if libgd supports gif. ])])
+
+     dnl jpeg support in libgd
+     AC_CHECK_LIB(gd,gdImageJpeg,
+       [AC_DEFINE(HAVE_GD_JPEG, 1, [ Define if libgd supports jpeg. ])
+        libgd_LIBS="$libgd_LIBS -ljpeg"])
+
+     dnl freetype support in libgd
+     AC_CHECK_LIB(gd,gdImageStringFT,
+       [have_ttf=yes],
+       [AC_CHECK_LIB(gd,gdImageStringTTF,
+         [AC_DEFINE(gdImageStringFT,gdImageStringTTF,
+                    [ libgd versions < 1.8.4 need gdImageStringTTF rather than gdImageStringFT ])
+          have_ttf=yes])])
+
+     if test "$have_ttf" = yes; then
+       AC_DEFINE(HAVE_GD_TTF, 1,
+                 [ Define if libgd supports TrueType fonts through libfreetype. ])
+       libgd_LIBS="$libgd_LIBS -lfreetype"
+     fi
+
+     dnl png support in libgd
+     AC_CHECK_LIB(gd,gdImagePng,
+       [AC_DEFINE(HAVE_GD_PNG, 1, [ Define if libgd supports png. ])
+        libgd_LIBS="$libgd_LIBS -lpng"
+        have_gd_png=yes])
+
+    ],[dnl gd library not found
+       with_gd=no
+    ])
+
+  if test -n "$GDLIB_CONFIG"; then
+    libgd_LIBS=`gdlib-config --libs`
+  fi
+
+  dnl piece it all together
+  if test "$with_gd" = no; then
+    CPPFLAGS="$_cppflags"
+    LDFLAGS="$_ldflags"
+  else
+    TERMLIBS="$TERMLIBS -lgd $libgd_LIBS"
+  fi
+
+fi
+dnl end gd
+
+dnl found png, but no png support in gd -> old png driver
+if test "$with_png" != no -a "$have_gd_png" != yes; then
+  CPPFLAGS="$CPPFLAGS $libpng_CPPFLAGS"
+  LDFLAGS="$LDFLAGS $libpng_LDFLAGS"
+  TERMLIBS="$TERMLIBS -lpng"
+fi
 
 dnl The Portable Document Format (PDF) terminal
+dnl TODO: use config script if found
 AC_ARG_WITH(pdf,dnl
-[  --with-pdf[=PATH]       enable pdf terminal 
+[  --with-pdf[=DIR]        enable pdf terminal 
                           (requires PDFLib)],
   [if test "$withval" != no; then
      if test -d $withval/include; then
@@ -542,12 +494,12 @@ AC_ARG_WITH(pdf,dnl
 if test "$with_pdf" = yes; then
   AC_CHECK_LIB(pdf,PDF_get_majorversion,
     [TERMLIBS="-lpdf $TERMLIBS"
-     AC_DEFINE(HAVE_LIBPDF,1,
-               [ Define if you have the pdf library. ])
+     AC_DEFINE(HAVE_LIBPDF,1,[ Define if you have the pdf library. ])
      AC_CHECK_HEADERS(pdflib.h,,
        AC_MSG_WARN([found pdf library but not pdflib.h
 please add path to pdflib.h to CPPFLAGS in Makefile]))
      AC_CHECK_HEADERS(zlib.h,,
+     dnl wrong; needs to be fixed
        AC_MSG_WARN([found z library but not zlib.h
 please add path to zlib.h to CPPFLAGS in Makefile]))],
     AC_MSG_RESULT([  PDF library not found.
@@ -584,7 +536,7 @@ yes
          TERMLIBS="-lsuntool -lsunwindow -lpixrect $TERMLIBS"])],,
     [-lsunwindow -lpixrect])])
 
-dnl Process with and enable options
+dnl Process rest of with and enable options
 
 dnl Use .gnuplot file in current directory
 AC_ARG_WITH(cwdrc,dnl
@@ -779,7 +731,7 @@ AC_OUTPUT([Makefile
            man/Makefile
            src/Makefile
            term/Makefile
-           tutorial/Makefile], \
+           tutorial/Makefile],
           [test -z "$CONFIG_HEADERS" || echo timestamp >stamp-h])
 
 dnl Report configuration
@@ -795,13 +747,12 @@ test "$with_lasergnu" = yes && \
   AC_MSG_RESULT([  Install lasergnu printer script])
 
 if test "$with_linux_vga" = yes; then
-  AC_MSG_RESULT([  Use the Linux SVGA console driver])
-  AC_MSG_RESULT([    SECURITY NOTICE: SVGAlib requires that])
-  AC_MSG_RESULT([    gnuplot is installed suid root!])
+  AC_MSG_RESULT([  Use the Linux SVGA console driver
+    SECURITY NOTICE: SVGAlib requires that gnuplot is installed suid root!])
 fi
 
 test "$with_vgagl" = yes && \
-  AC_MSG_RESULT([  enable vgagl terminal with mouse and pm3d support])
+  AC_MSG_RESULT([  Enable vgagl terminal with mouse and pm3d support])
 
 test "$GGI_SUPPORT" = yes && \
   AC_MSG_RESULT([  Enable ggi terminal (EXPERIMENTAL)])
@@ -812,7 +763,7 @@ test "$ac_cv_header_ggi_xmi_h" = yes && \
 if test "$with_readline" != no; then
   if test "$with_readline" != yes; then
     AC_MSG_RESULT([  Use GNU readline library])
-      test -n "$gp_tcap" && AC_MSG_RESULT([    with ${gp_tcap}])
+      test -n "$gp_tcap" && AC_MSG_RESULT([    with $gp_tcap])
       test "$enable_history_file" = yes && \
         AC_MSG_RESULT([    enable history file])
   else
@@ -828,23 +779,26 @@ if test x"$with_plot" != x; then
   fi
 fi
 
+test "$ac_cv_lib_gd_gdImageJpeg" = yes && \
+  AC_MSG_RESULT([  Enable generation of JPEG files])
+
 test "$ac_cv_lib_gd_gdImageGif" = yes && \
   AC_MSG_RESULT([  Enable generation of GIF files])
 
-test "$ac_cv_lib_gd_gdImagePng" = yes && \
-  AC_MSG_RESULT([  Enable PNG files using new gd driver])
+test "$with_png" != no && \
+  AC_MSG_RESULT([  Enable generation of PNG files])
 
-test "$with_ttf" = yes && \
-  AC_MSG_RESULT([  Enable TTF fonts using new gd driver])
+if test "$have_gd_png" = yes; then
+  AC_MSG_RESULT([    using gd driver])
+else
+  AC_MSG_RESULT([    using old driver])
+fi
 
-test "$ac_cv_header_png_h" = yes && \
-  AC_MSG_RESULT([  Enable PNG files using old driver])
+test "$have_ttf" = yes && \
+  AC_MSG_RESULT([  Enable TTF fonts with gd driver])
 
-test "$with_gif" = png && \
-  AC_MSG_RESULT([  Set term gif will produce PNG images instead ])
-
-test "$ac_cv_lib_gd_gdImageJpeg" = yes && \
-  AC_MSG_RESULT([  Enable generation of JPEG files])
+#test "$with_gif" = png && \
+#  AC_MSG_RESULT([  Set term gif will produce PNG images instead ])
 
 test "$ac_cv_header_pdflib_h" = yes && \
   AC_MSG_RESULT([  Enable generation of PDF files])
@@ -863,8 +817,6 @@ test "$TUTORIAL" = tutorial && \
 
 if test "$no_x" != yes; then
   AC_MSG_RESULT([  Use the X Window System ])
-  test "$GNUPLOT_X11" != gnuplot_x11 && \
-    AC_MSG_RESULT([  X11 driver name: $GNUPLOT_X11])
   test "$enable_mouse" = yes && \
     AC_MSG_RESULT([  Enable mouse for X11])
 fi
