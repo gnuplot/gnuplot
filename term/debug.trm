@@ -1,5 +1,5 @@
 /*
- * $Id: debug.trm,v 1.8 1999/06/19 20:30:46 lhecking Exp $
+ * $Id: debug.trm,v 1.9 1999/06/22 11:54:15 lhecking Exp $
  *
  */
 
@@ -72,7 +72,7 @@ TERM_PUBLIC void DEBUG_reset __PROTO((void));
 TERM_PUBLIC int DEBUG_justify_text __PROTO((enum JUSTIFY mode));
 TERM_PUBLIC int DEBUG_text_angle __PROTO((int ang));
 TERM_PUBLIC void DEBUG_point __PROTO((unsigned int x, unsigned int y, int pointstyle));
-TERM_PUBLIC void DEBUG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, int head));
+TERM_PUBLIC void DEBUG_arrow __PROTO((unsigned int sx, unsigned int sy, unsigned int ex, unsigned int ey, TBOOLEAN head));
 TERM_PUBLIC int DEBUG_set_font __PROTO((const char *font));
 TERM_PUBLIC void DEBUG_pointsize __PROTO((double pointsize));
 TERM_PUBLIC void DEBUG_suspend __PROTO((void));
@@ -243,8 +243,8 @@ int pointstyle;
 
 TERM_PUBLIC void
 DEBUG_arrow(sx, sy, ex, ey, head)
-unsigned int sx, sy, ex, ey;
-int head;
+    unsigned int sx, sy, ex, ey;
+    TBOOLEAN head;
 {
     fprintf(gpoutfile, "arrow from (%ud,%ud) to (%ud,%ud), %s head\n",
 	    sx, sy, ex, ey, head ? "with" : "without");
