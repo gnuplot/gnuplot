@@ -1,5 +1,5 @@
 /* Hello, Emacs, this is -*-C-*-
- * $Id: x11.trm,v 1.120 2004/10/04 17:13:15 sfeam Exp $
+ * $Id: x11.trm,v 1.121 2004/10/19 00:24:10 sfeam Exp $
  *
  */
 
@@ -2381,18 +2381,37 @@ START_HELP(x11)
 " by specifying `gnuplot*maxcolors: 240` and `gnuplot*mincolors: 240`.",
 "",
 "@start table - first is interactive cleartext form",
-"  gnuplot*maxcolors:  <integer number>",
-"  gnuplot*mincolors:  <integer number>",
+"  gnuplot*maxcolors:  <integer>",
+"  gnuplot*mincolors:  <integer>",
 "  gnuplot*visual:     <visual name>",
 "#\\begin{tabular}{|cl|} \\hline",
-"#&gnuplot*maxcolors:  <integer number>\\\\",
-"#&gnuplot*mincolors:  <integer number>\\\\",
-"#&gnuplot*visual:     <visual name>\\\\",
+"#&gnuplot*maxcolors:  integer\\\\",
+"#&gnuplot*mincolors:  integer\\\\",
+"#&gnuplot*visual:     visual name\\\\",
 "%c l .",
 "%@gnuplot*maxcolors:  <integer number>",
 "%@gnuplot*mincolors:  <integer number>",
 "%@gnuplot*visual:     <visual name>",
 "@end table"
 #endif				/* PM3D */
+
+, "",
+"2 x11 other_resources",
+"?commands set terminal x11 other_resources",
+"?set terminal x11 other_resources",
+"?set term x11 other_resources",
+"?x11 other_resources",
+" By default the contents of the current plot window are exported to the X11",
+" clipboard in response to X events in the window. Setting the resource",
+" 'gnuplot*exportselection' to 'off' or 'false' will disable this.",
+"",
+"@start table - other x11 resources",
+"  gnuplot*exportselection:  off",
+"#\\begin{tabular}{|cl|} \\hline",
+"#&gnuplot*exportselection:  off\\\\",
+"%c l .",
+"%@gnuplot*exportselection:  off",
+"@end table"
+
 END_HELP(x11)
 #endif				/* TERM_HELP */

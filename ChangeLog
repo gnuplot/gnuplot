@@ -3,6 +3,10 @@
 	* docs/gnuplot.doc: Fix indentation level of terminal types when
 	converted to pdf.
 
+	* src/gplt_x11.c (pr_exportselection) term/x11.trm:
+	Add a test for X resource gnuplot*exportselection and disable exporting
+	the plot windows to the X clipboard if it is set to "off" or "false".
+
 2004-10-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c docs/gnuplot.doc: Reset values of 'set size' and

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.118 2004/10/05 16:21:16 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.119 2004/10/20 18:33:33 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -451,6 +451,7 @@ static void pr_ctrlq __PROTO((void));
 #ifdef EXPORT_SELECTION
 static void export_graph __PROTO((plot_struct *));
 static void handle_selection_event __PROTO((XEvent *));
+static void pr_exportselection __PROTO((void));
 #endif
 
 #if defined(USE_MOUSE) && defined(MOUSE_ALL_WINDOWS)
@@ -526,6 +527,9 @@ enum { UNSET = -1, no = 0, yes = 1 };
 static int do_raise = yes, persist = no;
 static int feedback = yes;
 static int ctrlq = no;
+#ifdef EXPORT_SELECTION
+static TBOOLEAN exportselection = TRUE;
+#endif
 static Cursor cursor;
 static Cursor cursor_default;
 #ifdef USE_MOUSE
@@ -1604,7 +1608,7 @@ record()
 		XStoreBytes(dpy, buf + 1, len);
 		XFlush(dpy);
 #ifdef EXPORT_SELECTION
-		if (plot)
+		if (plot && exportselection)
 		    export_graph(plot);
 #endif
 	    }
@@ -3108,7 +3112,8 @@ display(plot_struct *plot)
     }
 
 #ifdef EXPORT_SELECTION
-    export_graph(plot);
+    if (exportselection)
+	export_graph(plot);
 #endif
 
     UpdateWindow(plot);
@@ -4546,9 +4551,11 @@ process_event(XEvent *event)
 #ifdef EXPORT_SELECTION
     case SelectionNotify:
     case SelectionRequest:
-	handle_selection_event(event);
+	if (exportselection)
+	    handle_selection_event(event);
 	break;
 #endif
+
     }
 }
 
@@ -4878,6 +4885,10 @@ gnuplot: X11 aborted.\n", ldisplay);
     pr_persist();
     pr_feedback();
     pr_ctrlq();
+#ifdef EXPORT_SELECTION
+    pr_exportselection();
+#endif
+
 }
 
 /*-----------------------------------------------------------------------------
@@ -5450,6 +5461,20 @@ pr_ctrlq()
 	FPRINTF((stderr,"gplt_x11: require <ctrl>q and <ctrl><space>\n"));
     }
 }
+
+#ifdef EXPORT_SELECTION
+static void
+pr_exportselection()
+{
+    /* Allow export selection to be turned on or off using X resource *exportselection */
+    if (pr_GetR(db, ".exportselection")) {
+	if (!strncmp((char *)value.addr,"off",3) || !strncmp((char *)value.addr,"false",5)) {
+	    exportselection = FALSE;
+	    fprintf(stderr,"gnuplot_x11: exportselection is disabled\n");
+	}
+    }
+}
+#endif
 
 /************ code to handle selection export *********************/
 
