@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.122 2004/04/13 17:24:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.123 2004/04/14 13:24:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -885,10 +885,10 @@ show_version(fp)
 %s\tThomas Williams, Colin Kelley and many others\n\
 %s\n\
 %s\tThis is gnuplot version 4.0.  Please refer to the documentation\n\
-%s\tfor command syntax changes. The old syntax will be accepted throughout\n\
-%s\tthe 4.0 series, but all save files use the new syntax.\n\
+%s\tfor command syntax changes.  The old syntax will be accepted\n\
+%s\tthroughout the 4.0 series, but all save files use the new syntax.\n\
 %s\n\
-%s\tType `help` to access the on-line reference manual\n\
+%s\tType `help` to access the on-line reference manual.\n\
 %s\tThe gnuplot FAQ is available from\n\
 %s\t\t%s\n\
 %s\n\
