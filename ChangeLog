@@ -1,3 +1,20 @@
+2002-02-27  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* src/datafile.c: Include plot3d.h. Added missing #ifdef PIPES.
+
+	* src/gadgets.c: Removed unused variables.
+
+	* src/gpexecute.c: Include mouse.h for WIN_IPC.
+
+	* src/gplt_x11.c: Change #if PM3D to #ifdef PM3D.
+
+	* src/plot3d.h src/plot3d.c src/datafile.c: Move definition of
+	NEED_PALETTE to plot3d.h.
+
+	* src/specfun.c: Fix RCSid to RCSid().
+
+	* term/cgm.trm: Added missing #ifdef PM3D.
+
 2002-02-27  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
 	Patches for MS VC++ from John Bollinger <bbands@yahoo.com>:
@@ -6,11 +23,10 @@
  	with MS VC++.
 
 	* config/makefile.nt (CFLAGS): Repaired after removal of all the
- 	NO_FLAGS.  Added lots of /DHAVE_SOMETHING's
+ 	NO_FLAGS.  Added lots of /DHAVE_SOMETHING's.
 	(LDFLAGS, TERMFLAGS): Added stuff to compile in libpng and libz.
-	(linkopt1.msw): Added stuff to compile with libpng and
- 	libz. Removed spurious mention of mouse.obj which is already in
- 	$CORE_OBJS.
+	(linkopt1.msw): Added stuff to compile with libpng and libz. Removed 
+	spurious mention of mouse.obj which is already in $CORE_OBJS.
 
 2002-02-26  Petr Mikulik  <mikulik@physics.muni.cz>
 
