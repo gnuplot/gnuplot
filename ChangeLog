@@ -4,6 +4,13 @@
 	rather than trusting multiple call sites to declare consistently
 	sized character arrays.
 
+	* src/eval.c src/datafile.h src/datafile.c docs/gnuplot.doc:
+	New internal function f_stringcolumn() usable only inside a "using"
+	specification; pushes the content of a data column onto the evaluation
+	stack as a string variable.
+	Syntax:
+	    plot 'foo' using (stringcolumn(1) eq "baz" ? column(2) : column(3))
+
 2005-03-02  Ethan Merritt  <merritt@u.washington.edu>
 
 	* src/unset.c (unset_historysize): Rearrange #ifdefs for GNUPLOT_HISTORY

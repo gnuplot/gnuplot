@@ -1,4 +1,4 @@
-C RCS $Id: gnuplot.doc,v 1.276 2005/02/22 01:14:45 sfeam Exp $
+C RCS $Id: gnuplot.doc,v 1.277 2005/02/24 20:14:16 sfeam Exp $
 C
 C Copyright (C) 1986 - 1993, 1998, 1999, 2000, 2001, 2004   Thomas Williams, Colin Kelley et al.
 C
@@ -1106,7 +1106,8 @@ C
 #column(x) & int & column $x$ during datafile manipulation. \\
 %column(x)@int@ column $x$ during datafile manipulation.
  `column(x)` may be used only in expressions as part of `using` manipulations
- to fits or datafile plots.  See `plot datafile using`.
+ to fits or datafile plots.  It evaluates to the numerical value of the contents
+ of column x. See `plot datafile using`.
 4 defined
 ?expressions functions defined
 ?functions defined
@@ -1114,6 +1115,15 @@ C
 %defined(X)@variable name@ returns 1 if a variable X is defined, 0 otherwise.
  `defined(X)` returns 1 if a variable named X has been defined, otherwise 
  it returns 0.
+4 stringcolumn
+?expressions functions stringcolumn
+?functions stringcolumn
+?stringcolumn
+#stringcolumn(x) & int & content of column $x$ as a string. \\
+%stringcolumn(x)@int@ content column $x$ as a string.
+ `stringcolumn(x)` may be used only in expressions as part of `using` manipulations
+ to fits or datafile plots.  It returns the content of column x as a string variable.
+ See `plot datafile using`.
 4 tm_hour
 ?expressions tm_hour
 ?functions tm_hour

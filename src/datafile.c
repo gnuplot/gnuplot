@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.69 2005/03/03 04:09:46 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.70 2005/03/05 04:18:20 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1521,6 +1521,7 @@ plot_option_using(int max_using)
 		fast_columns = 0;	/* corey@cac */
 		dummy_func = NULL;	/* no dummy variables active */
 		use_spec[df_no_use_specs++].at = perm_at();	/* it will match ()'s */
+
 #ifdef EAM_DATASTRINGS
 	    /* FIXME EAM - It would be nice to handle these like any other */
 	    /* internal function via perm_at() but there are problems.     */
@@ -2355,7 +2356,30 @@ f_column(union argument *arg)
 	push(Gcomplex(&a, df_column[column - 1].datum, 0.0));
 }
 
-/*}}} */
+#ifdef GP_STRING_VARS
+void
+f_stringcolumn(union argument *arg)
+{
+    struct value a;
+    int column;
+
+    (void) arg;			/* avoid -Wunused warning */
+    (void) pop(&a);
+    column = (int) real(&a);
+/*
+    if (!evaluate_inside_using)
+	int_error(c_token-1, "stringcolumn() called from invalid context");
+ */   
+    if (column < 1 || column > df_no_cols) {
+	undefined = TRUE;
+	push(&a);		/* any objection to this ? */
+    } else {
+	static char temp_string[MAX_TOKEN_LENGTH];
+	df_parse_string_field(temp_string, df_column[column-1].position);
+	push(Gstring(&a, temp_string ));
+    }
+}
+#endif
 
 /*{{{  void f_valid() */
 void
