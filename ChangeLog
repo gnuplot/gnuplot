@@ -1,5 +1,10 @@
 2003-04-13  Ethan Merritt <merritt@u.washington.edu>
 
+	* src/term.c src/graphics.c: Correct a syntax bug in test for terminal
+	support of filled boxes.  This fixes reported crashes under MSWin.
+
+2003-04-13  Ethan Merritt <merritt@u.washington.edu>
+
 	* term/gd.trm: Document that libgd will handle both TrueType
 	and Adobe Type 1 fonts.
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.88 2003/03/08 17:16:40 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.89 2003/03/18 12:36:48 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -1393,7 +1393,7 @@ do_plot(plots, pcount)
 
 		/* draw sample depending on bits set in plot_style */
 #if USE_ULIG_FILLEDBOXES
-		if (this_plot->plot_style == BOXES && *t->fillbox) {
+		if (this_plot->plot_style == BOXES && t->fillbox) {
 		    int style;
 		    struct fill_style_type *fs = &this_plot->fill_properties;
 		    switch(fs->fillstyle) {
