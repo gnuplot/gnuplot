@@ -569,9 +569,38 @@ double width;			/* -1 means autocalc, 0 means use xmin/xmax */
 	}
 	newx = y * cos(x * ang2rad);
 	newy = y * sin(x * ang2rad);
+#if 0 /* HBB 981118: added polar errorbars */
 	/* only lines and points supported with polar */
 	y = ylow = yhigh = newy;
 	x = xlow = xhigh = newx;
+#else 
+	y = newy;
+	x = newx;
+
+	if (!(autoscale_r & 2) && yhigh > rmax) {
+	    cp->type = OUTRANGE;
+	}
+	if (!(autoscale_r & 1)) {
+	    /* we store internally as if plotting r(t)-rmin */
+	    yhigh -= rmin;
+	}
+	newx = yhigh * cos(xhigh * ang2rad);
+	newy = yhigh * sin(xhigh * ang2rad);
+	yhigh = newy;
+	xhigh = newx;
+
+	if (!(autoscale_r & 2) && ylow > rmax) {
+	    cp->type = OUTRANGE;
+	}
+	if (!(autoscale_r & 1)) {
+	    /* we store internally as if plotting r(t)-rmin */
+	    ylow -= rmin;
+	}
+	newx = ylow * cos(xlow * ang2rad);
+	newy = ylow * sin(xlow * ang2rad);
+	ylow = newy;
+	xlow = newx;
+#endif
     }
     /* return immediately if x or y are undefined
      * we dont care if outrange for high/low.

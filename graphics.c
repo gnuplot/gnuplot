@@ -402,6 +402,7 @@ char *axis_name;
 	}
     }
 }
+
 /*}}} */
 
 
@@ -1378,7 +1379,8 @@ int pcount;			/* count of plots in linked list */
 	if ((ytics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis, xleft, xright)) {
 	    tic_start = axis;
 	    tic_direction = -1;
-	    if (ytics & TICS_MIRROR) tic_mirror = tic_start;
+	    if (ytics & TICS_MIRROR)
+		tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((tic_start - xleft) > (3 * t->h_char)) ? tic_start : xleft) - t->h_char;
 	} else {
@@ -1415,7 +1417,8 @@ int pcount;			/* count of plots in linked list */
 	if ((xtics & TICS_ON_AXIS) && !log_array[FIRST_Y_AXIS] && inrange(axis, ybot, ytop)) {
 	    tic_start = axis;
 	    tic_direction = -1;
-	    if (xtics & TICS_MIRROR) tic_mirror = tic_start;
+	    if (xtics & TICS_MIRROR)
+		tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    if (tic_start - ybot > 2 * t->v_char)
 		tic_text = tic_start - ticscale * t->v_tic - t->v_char;
@@ -1458,7 +1461,8 @@ int pcount;			/* count of plots in linked list */
 	if ((y2tics & TICS_ON_AXIS) && !log_array[FIRST_X_AXIS] && inrange(axis, xleft, xright)) {
 	    tic_start = axis;
 	    tic_direction = 1;
-	    if (y2tics & TICS_MIRROR) tic_mirror = tic_start;
+	    if (y2tics & TICS_MIRROR)
+		tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((xright - tic_start) > (3 * t->h_char)) ? tic_start : xright) + t->h_char;
 	} else {
@@ -1494,7 +1498,8 @@ int pcount;			/* count of plots in linked list */
 	if ((x2tics & TICS_ON_AXIS) && !log_array[SECOND_Y_AXIS] && inrange(axis, ybot, ytop)) {
 	    tic_start = axis;
 	    tic_direction = 1;
-	    if (x2tics & TICS_MIRROR) tic_mirror = tic_start;
+	    if (x2tics & TICS_MIRROR)
+		tic_mirror = tic_start;
 	    /* put text at boundary if axis is close to boundary */
 	    tic_text = (((ytop - tic_start) > (2 * t->v_char)) ? tic_start : ytop) + t->v_char;
 	} else {
@@ -2357,6 +2362,7 @@ struct curve_points *plot;
     double x, y;		/* position of the bar */
     double ylow, yhigh;		/* the ends of the bars */
     double xlow, xhigh;
+    double x1, y1, x2, y2, slope;	/* parameters for polar error bars */
     unsigned int xM, ylowM, yhighM;	/* the mapped version of above */
     unsigned int yM, xlowM, xhighM;
     TBOOLEAN low_inrange, high_inrange;
@@ -2377,6 +2383,12 @@ struct curve_points *plot;
 	    if (!inrange(x, x_min, x_max))
 		continue;
 	    xM = map_x(x);
+
+	    /* check to see if in yrange */
+	    y = plot->points[i].y;
+	    if (!inrange(y, y_min, y_max))
+		continue;
+	    yM = map_y(y);
 
 	    /* find low and high points of bar, and check yrange */
 	    yhigh = plot->points[i].yhigh;
@@ -2405,7 +2417,35 @@ struct curve_points *plot;
 		/* both out of range on the same side */
 		continue;
 
+	    /* find low and high points of bar, and check xrange */
+	    xhigh = plot->points[i].xhigh;
+	    xlow = plot->points[i].xlow;
+
+	    high_inrange = inrange(xhigh, x_min, x_max);
+	    low_inrange = inrange(xlow, x_min, x_max);
+
+	    /* compute the plot position of xhigh */
+	    if (high_inrange)
+		xhighM = map_x(xhigh);
+	    else if (samesign(xhigh - x_max, x_max - x_min))
+		xhighM = map_x(x_max);
+	    else
+		xhighM = map_x(x_min);
+
+	    /* compute the plot position of xlow */
+	    if (low_inrange)
+		xlowM = map_x(xlow);
+	    else if (samesign(xlow - x_max, x_max - x_min))
+		xlowM = map_x(x_max);
+	    else
+		xlowM = map_x(x_min);
+
+	    if (!high_inrange && !low_inrange && xlowM == xhighM)
+		/* both out of range on the same side */
+		continue;
+
 	    /* by here everything has been mapped */
+#if 0				/* HBB 981117: polar error bars? */
 	    (*t->move) (xM, ylowM);
 	    (*t->vector) (xM, yhighM);	/* draw the main bar */
 	    if (bar_size > 0.0) {
@@ -2414,9 +2454,47 @@ struct curve_points *plot;
 		(*t->move) ((unsigned int) (xM - bar_size * tic), yhighM);	/* draw the top tic */
 		(*t->vector) ((unsigned int) (xM + bar_size * tic), yhighM);
 	    }
+#else
+	    /* The above has been replaced by Igor inorder to get errorbars
+	       coming out in polar mode AND to stop the bar from going
+	       through the symbol */
+	    if ((xhighM - xlowM) * (xhighM - xlowM) + (yhighM - ylowM) * (yhighM - ylowM)
+		> pointsize * tic * pointsize * tic * 4.5) {
+		/* Only plot the error bar if it is bigger than the symbol */
+		/* The factor of 4.5 should strictly be 4.0, but it looks better to drop the error bar if it is only slightly bigger than the symbol, Igor. */
+		if (xlowM == xhighM) {
+		    (*t->move) (xM, ylowM);
+		    (*t->vector) (xM, (unsigned int) (yM - pointsize * tic));	/* draw the main bar to the symbol end */
+		    (*t->move) (xM, (unsigned int) (yM + pointsize * tic));
+		    (*t->vector) (xM, yhighM);	/* draw the other part of the main bar */
+		} else {
+		    (*t->move) (xlowM, ylowM);
+		    (*t->vector) (xhighM, yhighM);	/* draw the main bar in polar mode. Note that here the bar is drawn through the symbol. I tried to fix this, but got into trouble with the two bars (on either side of symbol) not being perfectly parallel due to mapping considerations. Igor */
+		}
+		if (bar_size > 0.0) {
+		    /* The following attempts to ensure that the tics are perpendicular to the error bar, Igor. */
+		    slope = (xlowM * 1.0 - xhighM * 1.0) / (yhighM * 1.0 - ylowM * 1.0 + 1e-10);	/*perpendicular to the main bar */
+		    x1 = xlowM + bar_size * tic / sqrt(1.0 + slope * slope);
+		    x2 = xlowM - bar_size * tic / sqrt(1.0 + slope * slope);
+		    y1 = slope * (x1 - xlowM) + ylowM;
+		    y2 = slope * (x2 - xlowM) + ylowM;
+
+		    (*t->move) ((unsigned int) x1, (unsigned int) y1);	/* draw the bottom tic */
+		    (*t->vector) ((unsigned int) x2, (unsigned int) y2);
+
+		    x1 = xhighM + bar_size * tic / sqrt(1.0 + slope * slope);
+		    x2 = xhighM - bar_size * tic / sqrt(1.0 + slope * slope);
+		    y1 = slope * (x1 - xhighM) + yhighM;
+		    y2 = slope * (x2 - xhighM) + yhighM;
+		    (*t->move) ((unsigned int) x1, (unsigned int) y1);	/* draw the top tic */
+		    (*t->vector) ((unsigned int) x2, (unsigned int) y2);
+		}		/* if error bar is bigger than symbol */
+	    }
+#endif				/* polar error bars? */
 	}			/* for loop */
     }				/* if yerrorbars OR xyerrorbars */
     if ((plot->plot_style == XERRORBARS) || (plot->plot_style == XYERRORBARS)) {
+
 /* Draw the horizontal part of the bar */
 	for (i = 0; i < plot->p_count; i++) {
 	    /* undefined points don't count */
@@ -4284,7 +4362,12 @@ tic_callback callback;		/* fn to call to actually do the work */
 			    gstrftime(label, 24, ticfmt[axis], (double) user);
 			} else if (polar) {
 			    /* if rmin is set, we stored internally with r-rmin */
+#if 0				/* Igor's polar-grid patch */
 			    double r = fabs(user) + (autoscale_r & 1 ? 0 : rmin);
+#else
+			    /* Igor removed fabs to allow -ve labels */
+			    double r = user + (autoscale_r & 1 ? 0 : rmin);
+#endif
 			    gprintf(label, sizeof(label), ticfmt[axis], log_base, r);
 			} else {
 			    gprintf(label, sizeof(label), ticfmt[axis], log_base, user);
