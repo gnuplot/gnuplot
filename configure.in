@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl configure.in for gnuplot on Unix.
 dnl
-dnl $Id: configure.in,v 1.135 2003/10/06 15:22:44 broeker Exp $
+dnl $Id: configure.in,v 1.136 2003/11/06 23:43:05 sfeam Exp $
 dnl
 AC_INIT(src/graphics.c)
 AM_CONFIG_HEADER(config.h:config.hin)
@@ -886,10 +886,9 @@ fi
 
 if test "$ac_cv_header_pdflib_h" = yes; then
   AC_MSG_RESULT([  Enable generation of PDF files])
-fi
-
-if test "$ac_cv_lib_pdf_PDF_begin_pattern" != yes; then
-  AC_MSG_RESULT([    but no support for pattern-fill])
+  if test "$ac_cv_lib_pdf_PDF_begin_pattern" != yes; then
+    AC_MSG_RESULT([    but no support for pattern-fill])
+  fi
 fi
 
 if test "$with_cwdrc" = yes; then
