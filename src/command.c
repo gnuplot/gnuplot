@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.37 2000/02/11 19:17:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.38 2000/03/28 21:28:33 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -69,6 +69,7 @@ static char *RCSid() { return RCSid("$Id: command.c,v 1.37 2000/02/11 19:17:18 l
 #include "eval.h"
 #include "fit.h"
 #include "binary.h"
+#include "gp_hist.h"
 #include "gp_time.h"
 #include "misc.h"
 #include "parse.h"
@@ -426,7 +427,7 @@ restore_prompt(void)
 #endif
     }
 }
-#endif
+#endif /* USE_MOUSE */
 
 void
 define()
@@ -571,7 +572,7 @@ bind_command()
     /* bind_process() will eventually free lhs / rhs ! */
     bind_process(lhs, rhs);
 }
-#endif
+#endif /* USE_MOUSE */
 
 
 /*
@@ -665,11 +666,6 @@ history_command()
     struct value a;
     char *name = NULL; /* name of the output file; NULL for stdout */
     int n = 0;         /* print only <last> entries */
-
-    /* external functions in history.c */
-    extern int history_find_all __PROTO((char *cmd));
-    char *history_find __PROTO((char *cmd));
-    void write_history_n __PROTO((const int n, const char *filename));
 
     c_token++;
 
@@ -883,9 +879,10 @@ pause_command()
     }
     if (sleep_time < 0) {
 #ifdef _Windows
-	if (!Pause(buf))
+	if (!Pause(buf)) {
 	    free(buf);
-	bail_to_command_line();
+	    bail_to_command_line();
+	}
 #elif defined(OS2)
 	if (strcmp(term->name, "pm") == 0 && sleep_time < 0) {
 	    int rc;
@@ -937,13 +934,13 @@ pause_command()
 	     * if CR was hit */
 	    term->waitforinput();
 	} else {
-#endif
+#endif /* USE_MOUSE */
 	(void) fgets(buf, sizeof(buf), stdin);
 	/* Hold until CR hit. */
 #ifdef USE_MOUSE
 	}
-#endif
-#endif
+#endif /* USE_MOUSE */
+#endif /* !(_Windows || OS2 || _Macintosh || MTOS || ATARI) */
     }
     if (sleep_time > 0)
 	GP_SLEEP(sleep_time);
@@ -1443,11 +1440,6 @@ const char *prompt;
 	    prompt_desc.dsc$a_pointer = expand_prompt;
 	    more = 1;
 	    --start;
-	} else if (input_line[start - 1] == ',') {
-	   /* Allow for a continuation line. */
-	   prompt_desc.dsc$w_length = strlen(expand_prompt);
-	   prompt_desc.dsc$a_pointer = expand_prompt;
-	   more = 1;
 	} else {
 	    line_desc.dsc$w_length = strlen(input_line);
 	    line_desc.dsc$a_pointer = input_line;
@@ -1501,7 +1493,7 @@ const char *cmd;
      * line_desc length is set only by read_line; adjust now
      */
     line_desc.dsc$w_length = strlen(cmd);
-    line_desc.dsc$a_pointer = cmd;
+    line_desc.dsc$a_pointer = (char *) cmd;
 
     if ((vaxc$errno = lib$spawn(&line_desc)) != SS$_NORMAL)
 	os_error(NO_CARET, "spawn error");
@@ -2096,8 +2088,6 @@ const char *prompt;
 		}
 		if (input_line[last] == '\\') {		/* line continuation */
 		    start = last;
-		    more = TRUE;
-		} else if (input_line[last] == ',') {   /* line continuation */
 		    more = TRUE;
 		} else
 		    more = FALSE;
