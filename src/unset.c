@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.65 2004/07/10 13:43:26 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.66 2004/09/01 15:53:49 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -1521,6 +1521,7 @@ reset_command()
     polar_grid_angle = 0;
     grid_layer = -1;
 
+    reset_hidden3doptions();
     hidden3d = FALSE;
 
     label_contours = TRUE;

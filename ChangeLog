@@ -6,6 +6,10 @@
 	* demo/world2.dem: Set font explicitly to "Helvetica,7", since some
 	terminal drivers do not like the partial font spec ",7".
 
+	* src/hidden3d.c (set_hidden3doptions) src/hidden3d.h 
+	src/unset.c (reset_command): New routine reset_hidden3doptions()
+	called by "set hidden defaults" and also by "reset".
+
 2004-09-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/datafile.c (df_show_binary): In fprintf(), use "%f" not "%lf" for

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.44 2004/07/25 12:25:01 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: hidden3d.c,v 1.45 2004/09/25 23:33:44 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - hidden3d.c */
@@ -317,11 +317,7 @@ set_hidden3doptions()
 	switch (lookup_table(&set_hidden3d_tbl[0], c_token)) {
 	case S_HI_DEFAULTS:
 	    /* reset all parameters to defaults */
-	    hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
-	    hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
-	    hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
-	    hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
-	    hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
+	    reset_hidden3doptions();
 	    c_token++;
 	    if (!END_OF_COMMAND)
 		int_error(c_token,
@@ -1050,7 +1046,7 @@ build_networks(struct surface_points *plots, int pcount)
 		if (this_plot->plot_style == LABELPOINTS) {
 		    struct text_label *label;
 		    long int thisvertex;
-		    struct coordinate labelpoint;
+		    struct coordinate labelpoint = {0};
 		    lp->pointflag = 1; /* Labels can use the code for hidden points */
 		    for (label = this_plot->labels; label != NULL; label = label->next) {
 			labelpoint.x = label->place.x;
@@ -2407,6 +2403,16 @@ plot3d_hidden(struct surface_points *plots, int pcount)
 
     /* Free memory */
     /* FIXME: anything to free? */
+}
+
+void
+reset_hidden3doptions()
+{
+    hiddenBacksideLinetypeOffset = BACKSIDE_LINETYPE_OFFSET;
+    hiddenTriangleLinesdrawnPattern = TRIANGLE_LINESDRAWN_PATTERN;
+    hiddenHandleUndefinedPoints = HANDLE_UNDEFINED_POINTS;
+    hiddenShowAlternativeDiagonal = SHOW_ALTERNATIVE_DIAGONAL;
+    hiddenHandleBentoverQuadrangles = HANDLE_BENTOVER_QUADRANGLES;
 }
 
 /* Emacs editing help for HBB:
