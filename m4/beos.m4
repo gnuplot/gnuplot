@@ -6,7 +6,7 @@
 
 # serial 1
 
-AC_DEFUN(GP_BEOS,
+AC_DEFUN([GP_BEOS],
 [AC_MSG_CHECKING(for BeOS)
 AC_EGREP_CPP(yes,
 [#if __BEOS__

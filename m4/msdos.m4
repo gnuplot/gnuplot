@@ -6,7 +6,7 @@
 
 # serial 1
 
-AC_DEFUN(GP_MSDOS,
+AC_DEFUN([GP_MSDOS],
 [AC_MSG_CHECKING(for MS-DOS/djgpp/libGRX)
 AC_EGREP_CPP(yes,
 [#if __DJGPP__ && __DJGPP__ == 2
@@ -30,6 +30,6 @@ AC_EGREP_CPP(yes,
     )dnl
   ),
   AC_MSG_RESULT(no)
-  )dnl 
+  )dnl
 ])
 

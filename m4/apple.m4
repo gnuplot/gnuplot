@@ -5,7 +5,7 @@
 
 # serial 1
 
-AC_DEFUN(GP_APPLE,
+AC_DEFUN([GP_APPLE],
 [AC_MSG_CHECKING(for Apple MacOS X)
 AC_EGREP_CPP(yes,
 [#if defined(__APPLE__) && defined(__MACH__)
