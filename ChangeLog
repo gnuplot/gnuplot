@@ -1,3 +1,11 @@
+2002-12-17  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/save.c: Fix saving of 'set xtics 7'.  Patch from
+ 	Pieter-Tjerk de Boer <ptdeboer@cs.utwente.nl>.
+
+	* src/fit.c (fit_command): Replace EOF by DF_EOF in return value
+ 	check of df_readline call.
+
 2002-12-17  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: Adjust DEFAULT_INCLUDES and INCLUDES. Remove
@@ -1640,7 +1648,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/12/16 14:20:55 $).
+	last modification date (from the tag $Date: 2002/12/17 14:14:14 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
