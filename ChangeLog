@@ -2,8 +2,8 @@
 
 	* docs/Makefile.in: Fix INCLUDES line.
 
-	* Makefile.in,docs/Makefile.in: Add metapost.trm and openstep.trm to
-	CORETERM.
+	* Makefile.in, docs/Makefile.in, makefile.all: Add metapost.trm and
+	openstep.trm to CORETERM.
 
 	* term/be.trm, term/metapost.trm, term/openstep.trm: New drivers,
 	imported from current dev tree.

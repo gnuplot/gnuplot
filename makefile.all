@@ -1,7 +1,7 @@
 #<<<makefile.all>>>
 ########################################################
 #
-# $Id: makefile.all,v 1.9 1998/05/19 20:55:36 ddenholm Exp $
+# $Id: makefile.all,v 1.28 1999/01/14 19:34:16 lhecking Exp $
 #
 ########################################################
 #
@@ -27,7 +27,7 @@
 # D as the prefix for docs (eg docs/)
 # L as the prefix for latex tutorial (eg docs/latextut/ or [.docs.latextut])
 # Q as the prefix for old doc files (eg docs/old)
-# S as the prefix for postscript docs (eg docs/ps)
+# S as the prefix for postscript docs (eg docs/psdoc)
 # M as the prefix for demos (eg demo/)
 # N as the prefix for NeXT (eg NeXT/)
 # P as the prefix for OS/2 (eg os2/)
@@ -56,19 +56,19 @@ HEADERS = alloc.h ansichek.h binary.h bitmap.h fit.h fnproto.h help.h \
 	  matrix.h national.h plot.h protos.h setshow.h stdfn.h syscfg.h term.h
 
 CORETERM = $(T)aed.trm $(T)ai.trm $(T)amiga.trm $(T)apollo.trm \
-	   $(T)atariaes.trm $(T)atarivdi.trm $(T)cgi.trm $(T)cgm.trm \
-	   $(T)compact.c $(T)corel.trm $(T)debug.trm $(T)djsvga.trm \
-	   $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm $(T)eepic.trm \
-	   $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm $(T)fig.trm \
-	   $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
+	   $(T)atariaes.trm $(T)atarivdi.trm $(T)be.trm $(T)cgi.trm \
+	   $(T)cgm.trm $(T)compact.c $(T)corel.trm $(T)debug.trm \
+	   $(T)djsvga.trm $(T)driver.h $(T)dumb.trm $(T)dxf.trm $(T)dxy.trm \
+	   $(T)eepic.trm $(T)emxvga.trm $(T)epson.trm $(T)excl.trm $(T)fg.trm \
+	   $(T)fig.trm $(T)gif.trm $(T)gnugraph.trm $(T)gpic.trm $(T)gpr.trm \
 	   $(T)grass.trm $(T)hp26.trm $(T)hp2648.trm $(T)hp500c.trm \
 	   $(T)hpgl.trm $(T)hpljii.trm $(T)hppj.trm $(T)imagen.trm \
 	   $(T)impcodes.h $(T)iris4d.trm $(T)kyo.trm $(T)latex.trm \
-	   $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)mgr.trm \
-	   $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)object.h \
-	   $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm $(T)post.trm \
-	   $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm $(T)regis.trm \
-	   $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
+	   $(T)linux.trm $(T)mac.trm $(T)metafont.trm $(T)metapost.trm \
+	   $(T)mgr.trm $(T)mif.trm $(T)multitos.trm $(T)next.trm $(T)object.h \
+	   $(T)openstep.trm $(T)pbm.trm $(T)pc.trm $(T)pm.trm $(T)png.trm \
+	   $(T)post.trm $(T)pslatex.trm $(T)pstricks.trm $(T)qms.trm \
+	   $(T)regis.trm $(T)rgip.trm $(T)sun.trm $(T)t410x.trm $(T)table.trm \
 	   $(T)tek.trm $(T)texdraw.trm $(T)tgif.trm $(T)tkcanvas.trm \
 	   $(T)tpic.trm $(T)unixpc.trm $(T)unixplot.trm $(T)v384.trm \
 	   $(T)vws.trm $(T)win.trm $(T)x11.trm $(T)xlib.trm
@@ -92,10 +92,10 @@ OS2SRC = $(P)dialogs.c $(P)dialogs.h $(P)gclient.c $(P)gnuplot.ico \
 	 $(P)gnupmdrv.c $(P)gnupmdrv.def $(P)gnupmdrv.h $(P)gnupmdrv.ipf \
 	 $(P)gnupmdrv.rc $(P)print.c
 
-WINDOWS = $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def $(W)wgnuplib.c \
-	  $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc $(W)wgnuplot.def \
-	  $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc $(W)wgraph.c \
-	  $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
+WINDOWS = $(W)pgnuplot.c $(W)geticon.c $(W)wcommon.h $(W)wgnupl32.def \
+	  $(W)wgnuplib.c $(W)wgnuplib.def $(W)wgnuplib.h $(W)wgnuplib.rc \
+	  $(W)wgnuplot.def $(W)wgnuplot.hpj $(W)wgnuplot.mnu $(W)wgnuplot.rc \
+	  $(W)wgraph.c $(W)winmain.c $(W)wmenu.c $(W)wpause.c $(W)wprinter.c \
 	  $(W)wresourc.h $(W)wtext.c $(W)wtext.h
 
 # not C code, but still needed
@@ -129,7 +129,7 @@ ETC =   0BUGS 0FAQ 0INSTALL 0PORTING 0README ChangeLog CodeStyle Copyright \
 	makefile.st makefile.tc makefile.unx makefile.vms makefile.wc \
 	makefile.win makefile.ztc missing mkinstalldirs os9.c pcgraph.asm \
 	rgipgnu stamp-h.in strftime.c vms.c m4/msdos.m4 m4/next.m4 \
-	m4/search-hdr.m4 m4/search-lib.m4 $(T)README
+	m4/path-hdr.m4 m4/path-lib.m4 $(T)README
 
 # Documentation and help files
 DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \

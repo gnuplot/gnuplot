@@ -2,6 +2,7 @@ Changes in release 3.7.1:
 * Updated makefiles and autoconf files
 * Updated documentation and FAQ
 * Added Windows stdin wrapper
+* New drivers for Be, metapost, MacOS X Server
 * Improved configure options for GNU readline
 * Security: the Linux SVGAlib driver is now disabled by default
 * Support for GNU plotutils 2.2
