@@ -7,6 +7,8 @@
 	Add a test for X resource gnuplot*exportselection and disable exporting
 	the plot windows to the X clipboard if it is set to "off" or "false".
 
+	* NEWS: Catch up with recent work.
+
 2004-10-29  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* src/term.c docs/gnuplot.doc: Reset values of 'set size' and

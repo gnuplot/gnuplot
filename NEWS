@@ -1,6 +1,8 @@
 News, changes and fixes since gnuplot version 4.0
 =================================================
 
+* NEW user defined variables can contain strings
+* NEW expression evaluation can manipulate and return strings
 * NEW automatic variable $# expanded to number of arguments after "call"
 * NEW reading of (almost) arbitrary image binary files
 * NEW plot styles "with image" and "with rgbimage"
@@ -19,6 +21,7 @@ News, changes and fixes since gnuplot version 4.0
 * CHANGE libgd versions 2.0.28+ support GIF images as well as PNG/JPEG
 * CHANGE remove old (non-libgd) GIF and PNG drivers
 * CHANGE X-resource gnuplot*ctrlq:on requires <ctrl>q to kill plot window
+* CHANGE X-resource gnuplot*exportselection:off disables plot->clipboard export
 * CHANGE prefer use of offset keyword in 'set [xyz]label "foo" offset -1,-1'
 * FIXED setenv GNUTERM now works for png, jpeg, and gif drivers
 * FIXED PostScript output can be restricted to Level 1 compatible features
