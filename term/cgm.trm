@@ -1,5 +1,5 @@
 /* Hey Emacs this is -*- C -*-
- * $Id: cgm.trm,v 1.27 2000/10/15 13:08:46 vanzandt Exp $
+ * $Id: cgm.trm,v 1.28 2000/10/18 14:12:23 broeker Exp $
  */
 
 /* GNUPLOT - cgm.trm */
@@ -632,9 +632,10 @@ CGM_graphics()
     CGM_write_int_record(1, 1, 2, version_data);
     {
       char description_data[256];
-      sprintf(description_data, "Gnuplot version %s, Computer Graphics Metafi"
-	      "le version 1 per MIL-D-28003A/BASIC-1.%d", 
-	      VERSION, cgm_monochrome?0:2);
+      sprintf(description_data, "\
+Gnuplot version %s patchlevel %s,\
+ Computer Graphics Metafile version 1 per MIL-D-28003A/BASIC-1.%d", 
+	      gnuplot_version, gnuplot_patchlevel, cgm_monochrome?0:2);
 	CGM_write_char_record(1, 2, strlen(description_data),
 			      description_data);
     }
@@ -762,12 +763,12 @@ const char *font;
 {
     register struct termentry *t = term;
     int size, font_index;
-    char *comma;
+    char *comma = strchr(font, ',');
     int len;
     double width;
 
     /* find font in font table, or use 1st font */
-    if (comma = strchr(font, ','))
+    if (comma)
 	len = comma - font;
     else
 	len = strlen(font);
