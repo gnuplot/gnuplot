@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.119 2004/10/20 18:33:33 sfeam Exp $"); }
+static char *RCSid() { return RCSid("$Id: gplt_x11.c,v 1.120 2004/10/29 19:26:21 sfeam Exp $"); }
 #endif
 
 #define X11_POLYLINE 1
@@ -5470,7 +5470,7 @@ pr_exportselection()
     if (pr_GetR(db, ".exportselection")) {
 	if (!strncmp((char *)value.addr,"off",3) || !strncmp((char *)value.addr,"false",5)) {
 	    exportselection = FALSE;
-	    fprintf(stderr,"gnuplot_x11: exportselection is disabled\n");
+	    FPRINTF((stderr,"gnuplot_x11: exportselection is disabled\n"));
 	}
     }
 }
