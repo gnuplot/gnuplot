@@ -1,0 +1,86 @@
+# Make file for use with Microsoft C  Version 5.10
+# and Microsoft Program Maintenance Utility  Version 4.07
+# 
+
+# where to place gnuplot.gih helpfile
+HELPFILE = gnuplot.gih
+
+# /c  means don't link
+# /AL means large memory model (large code, large data)
+# /DPC means define symbol PC
+CFLAGS = /c /AL /DPC #/DMSDOS #/Zi #/Od
+
+TERMFLAGS = /DHERCULES /DCORONA /DATT6300 /DEPSON /DPOSTSCRIPT /DHP75 /DHPGL /DDXY800A  /DNEC
+
+# /NOE means NO EXTernal Dictionary
+# /EX  means pack EXE file
+# /ST:8000 means stack size 8000 bytes
+LINKFLAGS = /NOE /EX /ST:8000 #/codeview 
+
+OBJS = 	command.obj eval.obj graphics.obj help.obj internal.obj \
+	misc.obj parse.obj plot.obj scanner.obj setshow.obj standard.obj \
+	term.obj util.obj version.obj pcgraph.obj hrcgraph.obj corgraph.obj
+
+CSOURCE5 = term\aed.trm term\dxy.trm term\epson.trm term\font5x7.trm \
+	term\hp26.trm term\hp2648.trm term\hpgl.trm \
+	term\hpljet.trm term\iris4d.trm term\latex.trm 
+CSOURCE6 = term\post.trm term\pc.trm term\qms.trm term\regis.trm \
+	term\tek.trm term\unixpc.trm term\unixplot.trm term\v384.trm \
+	term\imPcodes.h term\imagen.trm term\object.h term\fig.trm
+
+
+# default rules
+.c.obj:
+	cl $(CFLAGS) $*.c
+
+.asm.obj:
+	masm $*;
+
+pcgraph.obj: pcgraph.asm header.mac lineproc.mac
+
+corgraph.obj: corgraph.asm header.mac lineproc.mac
+
+hrcgraph.obj: hrcgraph.asm header.mac lineproc.mac
+
+command.obj: command.c plot.h setshow.h help.h
+	cl $(CFLAGS) /DHELPFILE=\"$(HELPFILE)\" command.c
+
+eval.obj: eval.c plot.h
+
+graphics.obj: graphics.c plot.h setshow.h
+
+help.obj: help.c plot.h help.h
+
+internal.obj: internal.c plot.h
+
+misc.obj: misc.c plot.h setshow.h
+
+parse.obj: parse.c plot.h
+
+plot.obj: plot.c plot.h setshow.h
+
+scanner.obj: scanner.c plot.h
+
+setshow.obj: setshow.c plot.h setshow.h
+
+standard.obj: standard.c plot.h
+
+term.obj: term.c plot.h $(CSOURCE5) $(CSOURCE6)
+	cl $(CFLAGS) $(TERMFLAGS) term.c
+
+util.obj: util.c plot.h
+
+version.obj: version.c
+
+# convert gnuplot.doc to gnuplot.gih
+doc2gih.exe: docs\doc2gih.c
+	cl docs\doc2gih.c
+
+$(HELPFILE): doc2gih.exe docs\gnuplot.doc
+	doc2gih docs\gnuplot.doc $(HELPFILE)
+
+# Object files in link command line are ordered to avoid far jumps.
+# use linkopt.msc to avoid command-line overflow
+
+gnuplot.exe: $(OBJS)
+ link $(LINKFLAGS) @linkopt.msc

@@ -1,0 +1,124 @@
+/* GNUPLOT - dxy.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Roland DXY800A plotter 
+ *
+ * AUTHORS
+ *  Martin Yii, eln557h@monu3.OZ
+ *  Further modified Jan 1990 by Russell Lang, rjl@monu1.cc.monash.oz
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+#define DXY_XMAX 2470
+#define DXY_YMAX 1700
+
+#define DXY_XLAST (DXY_XMAX - 1)
+#define DXY_YLAST (DXY_XMAX - 1)
+
+#define DXY_VCHAR	(56)	/* double actual height of characters */
+#define DXY_HCHAR	(28)	/* actual width including spacing */
+#define DXY_VTIC	(28)		
+#define DXY_HTIC	(28)		
+
+int dxy_angle = 0;
+
+DXY_init()
+{
+/*
+	No initialisation sequences for DXY 800A
+*/
+}
+
+
+DXY_graphics()
+{
+	/* HOME, Character size 3 */
+	fprintf(outfile,"H\nS3\n");
+}
+
+
+DXY_text()
+{
+/*
+	No sequences needed
+*/
+}
+
+
+DXY_linetype(linetype)
+int linetype;
+{
+    /* select pen */
+	fprintf(outfile,"J%d\n",(linetype+2)%8+1);
+	switch(linetype) {
+	   case -1 :  /* use dotted line for axis */
+	   	    fprintf(outfile,"L1\nB50\n");
+			break;
+	   default :  /* use solid line for all others */
+			fprintf(outfile,"L0\n");
+	    		break;
+   	}
+}
+
+
+DXY_move(x,y)
+int x,y;
+{
+	fprintf(outfile,"M%d,%d\n",x,y);
+}
+
+
+DXY_vector(x,y)
+int x,y;
+{
+	fprintf(outfile,"D%d,%d\n",x,y);
+}
+
+
+DXY_put_text(x,y,str)
+int x, y;
+char *str;
+{
+	if (dxy_angle == 1 ) 
+		/* vertical */
+		DXY_move(x + DXY_VCHAR/4,y);
+	else
+		/* horiz */
+		DXY_move(x,y - DXY_VCHAR/4);
+	fprintf(outfile,"P%s\n",str);
+}
+
+
+int DXY_text_angle(ang)
+int ang;
+{
+	dxy_angle = ang;
+	fprintf(outfile,"Q%d\n",ang);
+	return TRUE;
+}
+
+
+DXY_reset()
+{
+	/* Home pen */
+	fprintf(outfile,"H\n");
+}
+

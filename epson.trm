@@ -1,0 +1,698 @@
+/* GNUPLOT - epson.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ *  This file contains generic bit map graphics drivers,
+ *  and epson_lx800, nec_cp6c, nec_cp6d, nec_cp6b, and proprinter
+ *
+ * AUTHORS
+ *  Russell Lang
+ *
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/* The following epson lx800 driver uses generic bit mapped graphics
+   routines to build up a bit map in memory. */
+/* by Russell Lang, eln272v@monu1.cc.monash.oz */
+/* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
+/* EPSON_init changes outfile to binary mode on PC's */
+
+#ifdef EPSON
+
+unsigned int bm_planes = 1;	/* number of bit planes ( must be < sizeof(int) )*/
+unsigned int bm_psize;		/* plane size */
+unsigned int bm_bpi;		/* bits (pixels) per int */
+unsigned int bm_ipc;		/* int per column */
+unsigned int bm_xmax; 		/* pixels  */
+unsigned int bm_ymax;		/* pixels (must be multiple of bits per int)
+								and (must be multiple of 8) */
+unsigned int *bm_array;		/* pointer to bit map array of unsigned int */
+char *bm_free;
+unsigned int bm_value = 1;	/* this can be used for colour if bm_planes>1 */
+unsigned int bm_line_mask = 0xffff;	/* 16 bit mask for dotted lines */
+static unsigned int bm_pattern[] = {0xffff, 0x1111,
+	0xffff, 0x5555, 0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f};
+int bm_mask_count = 0;
+unsigned int bm_lastx, bm_lasty;	/* last pixel set - used by bm_line */
+
+
+#define EPSONXMAX	512 
+#define EPSONYMAX	384
+
+#define EPSONXLAST (EPSONXMAX - 1)
+#define EPSONYLAST (EPSONYMAX - 1)
+
+#define EPSONVCHAR		11  	
+#define EPSONHCHAR		7		
+#define EPSONVTIC		6
+#define EPSONHTIC		6
+
+unsigned int epson_x=0, epson_y=0;
+int epson_angle=0;
+
+EPSONinit()
+{
+char filename[MAX_ID_LEN+1];
+	bm_xmax=EPSONXMAX;
+	bm_ymax=EPSONYMAX;
+	bm_planes=1;		/* one plane */
+	bm_value=1;
+	bm_setup();
+	/* output for EPSON must be binary to stop non Unix computers
+		changing \n to \r\n. 
+		At present we only do this for PC's. 
+		(Ultrix generates a run time error on the "wb" mode).
+		if the output is not STDOUT, then the following code 
+		reopens outfile with binary mode. */
+#ifdef PC
+	if (strcmp(outstr,"STDOUT")) {
+		(void) fclose(outfile);
+		(void) strcpy(filename,outstr+1);	/* remove quotes */
+		filename[strlen(filename)-1] = '\0';
+		if ( (outfile = fopen(filename,"wb")) == (FILE *)NULL ) {
+			if ( (outfile = fopen(filename,"w")) == (FILE *)NULL ) {
+				os_error("cannot reopen file with binary type; output unknown",
+					NO_CARET);
+			} 
+			else {
+	os_error("cannot reopen file with binary type; output reset to ascii", 
+					NO_CARET);
+			}
+		}
+	}
+#endif
+}
+
+
+EPSONgraphics()
+{
+unsigned int plane=0;
+unsigned int fill=0;
+	bm_cls(plane,fill);
+	epson_x=0;
+	epson_y=0;
+	epson_angle=0;
+}
+
+
+EPSONtext()
+{
+	epson_dump();
+}
+
+
+EPSONlinetype(linetype)
+int linetype;
+{
+	if (linetype>=7)
+		linetype %= 7;
+	bm_line_mask = bm_pattern[linetype+2];
+	bm_mask_count=0;
+}
+
+
+EPSONmove(x,y)
+unsigned int x,y;
+{
+	epson_x=x;
+	epson_y=y;
+}
+
+
+EPSONvector(x,y)
+unsigned int x,y;
+{
+	bm_line(epson_x,x,epson_y,y);
+	epson_x=x;
+	epson_y=y;
+}
+
+
+EPSONput_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	if (epson_angle == 1)
+		x += EPSONVCHAR/2;
+	else
+		y -= EPSONVCHAR/2;
+   switch (epson_angle) {
+      case 0:
+         for (; *str; ++str, x += EPSONHCHAR)
+            bm_putc (x, y, *str, epson_angle);
+					break;
+      case 1:
+         for (; *str; ++str, y += EPSONHCHAR)
+            bm_putc (x, y, *str, epson_angle);
+					break;
+	}
+}
+
+
+int EPSON_text_angle(ang)
+int ang;
+{
+	epson_angle=ang;
+	return TRUE;
+}
+
+	
+EPSONreset()
+{
+	bm_release();
+}
+
+
+/* and now the generic bit map graphics routines */
+bm_setup()
+{
+	bm_bpi = sizeof(unsigned int)*8;	/* bits (pixels) per int */
+	bm_ipc = bm_ymax/bm_bpi; 			/* int per column */
+	bm_psize= bm_ipc * bm_xmax; 		/* plane size */
+	bm_free = alloc((unsigned int) 
+				(sizeof(unsigned int) * bm_psize * bm_planes),
+				 "screen bit map");
+	bm_array = (unsigned int *) bm_free;
+}
+
+bm_release()
+{
+	(void) free(bm_free);
+}
+
+bm_cls(plane,fill) 
+unsigned int plane, fill;
+{
+unsigned int i, offset;
+	offset= plane * bm_psize;
+	for (i=0;i<bm_psize;i++)
+		bm_array[offset+i]=fill;
+	bm_lastx=0;
+	bm_lasty=0;
+	bm_mask_count=0;
+	bm_line_mask=0xffff;
+}
+
+bm_setpixel(x,y,value)
+unsigned int x,y,value;
+{
+int i,shift,plane;
+	i = x * bm_ipc  + y/bm_bpi;
+	shift = y % bm_bpi;
+	for (plane=0; plane<bm_planes; plane++) {
+		bm_array[plane*bm_psize+i] = (bm_array[plane*bm_psize+i] & ~(1<<shift) )
+							| (((value>>plane)&1)<<shift);
+	}
+}
+ 
+ 
+bm_setmaskpixel(x,y,value)
+unsigned int x,y,value;
+{
+	/* dotted line generator */
+	if ((bm_line_mask>>bm_mask_count)&(unsigned int)(1)) {
+		bm_setpixel(x,y,value);
+	}
+	bm_mask_count= (bm_mask_count+1) % 16;
+	bm_lastx= x;  /* last pixel set with mask */
+	bm_lasty= y;
+}
+
+
+/* NOT USED
+unsigned int bm_getpixel(x,y)
+unsigned int x,y;
+{
+int i,shift,plane;
+unsigned int value=0;
+	i = x * bm_ipc  + y/bm_bpi;
+	shift = y % bm_bpi;
+	for (plane=bm_planes-1; plane>=0; plane--) {
+		value<<=1;
+		value = value | ((bm_array[plane*bm_psize+i]>>shift) & 1);
+	}
+	return value;
+}
+ */
+
+
+bm_line(x1,x2,y1,y2)
+unsigned int x1,x2,y1,y2;
+{
+int runcount;
+int dx,dy;
+int xinc,yinc;
+unsigned int xplot,yplot;
+
+	runcount=0;
+	dx = abs((int)(x1)-(int)(x2));
+	if (x2>x1)  xinc=  1;
+	if (x2==x1) xinc=  0;
+	if (x2<x1)  xinc= -1;
+	dy = abs((int)(y1)-(int)(y2));
+	if (y2>y1)  yinc=  1;
+	if (y2==y1) yinc=  0;
+	if (y2<y1)  yinc= -1;
+	xplot=x1;
+	yplot=y1;
+	if (dx>dy) {
+		/* iterate x */
+		if ( (bm_line_mask==0xffff) ||
+			((xplot!=bm_lastx) && (yplot!=bm_lasty)) )
+			bm_setmaskpixel(xplot,yplot,bm_value);
+		while (xplot!=x2) { 
+			xplot+=xinc;
+			runcount+=dy;
+			if (runcount>=(dx-runcount)) {
+				yplot+=yinc;
+				runcount-=dx;
+			}
+			bm_setmaskpixel(xplot,yplot,bm_value);
+		} 
+	} else {
+		/* iterate y */
+		if ( (bm_line_mask==0xffff) ||
+			((xplot!=bm_lastx) && (yplot!=bm_lasty)) )
+			bm_setmaskpixel(xplot,yplot,bm_value);
+		while (yplot!=y2) {
+			yplot+=yinc;
+			runcount+=dx;
+			if (runcount>=(dy-runcount)) {
+				xplot+=xinc;
+				runcount-=dy;
+			}
+			bm_setmaskpixel(xplot,yplot,bm_value);
+		} 
+	}
+}
+
+bm_putc(x,y,c,angle)
+unsigned int x,y;
+int angle;
+char c;
+{
+int i,j,k;
+char fc;
+unsigned int pixelon;
+	i = (int)(c) - ' ';
+	for (j=0; j<9; j++) {
+		fc = font5x7[i][j];
+		for (k=0; k<5; k++) {
+			pixelon = (((unsigned int)(fc)) >> k & 1);
+			if (pixelon) {
+				switch(angle) {
+					case 0 : bm_setpixel(x+k+1,y+j,bm_value);
+							break;
+					case 1 : bm_setpixel(x-j,y+k+1,bm_value);
+							break;
+				}
+			}
+		}
+	}
+}
+
+
+/* output file must be binary mode for epson_dump */
+epson_dump()
+{
+unsigned int x;
+int j,k;
+int num_bits = (sizeof(unsigned int)-1)*8;
+#ifdef PC
+	fprintf(stderr,"Dumping EPSON graphics (24kbytes)\n");
+#endif
+	fprintf(outfile,"\033A\010"); /* set line spacing to 8/72" = 8 dots */
+	for (j=bm_ipc-1;j>=0;j--) {
+		for (k=num_bits;k>=0;k-=8) {
+			/* select plotter graphics mode (square pixels) */
+			fprintf(outfile,"\r\n\033*\005");
+			(void) fputc((char)(bm_xmax%256),outfile);
+			(void) fputc((char)(bm_xmax/256),outfile);
+			for (x=0; x<bm_xmax; x++) {
+				(void) fputc( (char)((bm_array[x*bm_ipc+j] >>k) &0xff), outfile );
+			}
+		}
+	}
+	fprintf(outfile,"\033A\014\r\n");  /* setline spacing to 12/72" */
+#ifdef PC
+	fprintf(stderr,"Print using: COPY /B\n");
+#endif
+}
+
+
+#endif /* EPSON */
+
+
+#ifdef PROPRINTER
+
+/* This is an output routine for the IBM Proprinter. Author Maurice Castro */
+/* This driver is based on the Epson driver by Russell Lang */
+
+/* EPSON must be defined */
+
+
+PROPRINTERtext()
+{
+	proprinter_dump();
+}
+
+
+/* output file must be binary mode for proprinter_dump */
+proprinter_dump()
+{
+unsigned int x;
+int j,k;
+int num_bits = (sizeof(unsigned int)-1)*8;
+#ifdef PC
+	fprintf(stderr,"Dumping PROPRINTER graphics (24kbytes)\n");
+#endif
+	for (j=bm_ipc-1;j>=0;j--) {
+		for (k=num_bits;k>=0;k-=8) {
+			/* select plotter graphics mode (square pixels) */
+			fprintf(outfile,"\033\0112\030");
+			fprintf(outfile,"\r\033*\005");
+			(void) fputc((char)(bm_xmax%256),outfile);
+			(void) fputc((char)(bm_xmax/256),outfile);
+			for (x=0; x<bm_xmax; x++) {                         
+				(void) fputc( (char)((bm_array[x*bm_ipc+j] >>k) &0xff), outfile ); 
+			}  
+		}
+	}
+#ifdef PC
+	fprintf(stderr,"Print using: COPY /B\n");
+#endif
+}
+
+
+#endif /* PROPRINTER */
+
+/* The following NEC CP6 Pinwriter driver uses generic bit mapped graphics
+   routines to build up a bit map in memory. */
+/* by Russell Lang, eln272v@monu1.cc.monash.oz */
+/* On PC, print using 'copy file /b lpt1:', do NOT use 'print' */
+/* NECinit changes outfile to binary mode for PC's */
+
+/* Add a Monochrome NEC printer (for faster speed and line types) jdc */
+
+#ifdef NEC
+/* EPSON must be defined */
+
+#define NECXMAX	400 
+#define NECYMAX	320
+
+#define NECXLAST (NECXMAX - 1)
+#define NECYLAST (NECYMAX - 1)
+
+#define NECVCHAR		11  	
+#define NECHCHAR		7		
+#define NECVTIC		6
+#define NECHTIC		6
+
+/* plane 0=black, 1=cyan(blue), 2=magenta(red), 3=yellow */
+static unsigned int neccolor[] = {1,8,4,2,10,12,6,14};
+static unsigned int necpcolor[]= {0,2,1,4};
+unsigned int nec_x=0, nec_y=0;
+int nec_angle=0;
+
+NECMinit()
+/* Monochrome only NEC CP6 printer (set term nec_cp6m or nec_cp6d). */
+/* will probably work with NEC P6 printer */
+{
+	bm_planes = 1;			/* One plane only */
+	nec_init();
+}
+
+
+NECCinit()
+/* Color ribbon in NEC CP6 printer (set term nec_cp6c) */
+{
+	bm_planes=4;			/* four planes */
+	nec_init();
+}
+
+
+nec_init()
+{
+char filename[MAX_ID_LEN+1];
+	bm_xmax=NECXMAX;
+	bm_ymax=NECYMAX;
+	bm_value=1;				/* black */
+	bm_line_mask=0xffff;	/* solid lines */
+	bm_setup();
+	/* output for NEC must be binary to stop non Unix computers
+		changing \n to \r\n. 
+		At present we only do this for PC's. 
+		(Ultrix generates a run time error on the "wb" mode).
+		if the output is not STDOUT, then the following code 
+		reopens outfile with binary mode. */
+#ifdef PC
+	if (strcmp(outstr,"STDOUT")) {
+		(void) fclose(outfile);
+		(void) strcpy(filename,outstr+1);	/* remove quotes */
+		filename[strlen(filename)-1] = '\0';
+		if ( (outfile = fopen(filename,"wb")) == (FILE *)NULL) {
+			if ( (outfile = fopen(filename,"w")) == (FILE *)NULL ) {
+				os_error("cannot reopen file with binary type; output unknown",
+					NO_CARET);
+			} 
+			else {
+	os_error("cannot reopen file with binary type; output reset to ascii", 
+					NO_CARET);
+			}
+		}
+	}
+#endif
+}
+
+
+NECgraphics()
+{
+unsigned int plane;
+unsigned int fill=0;
+	for (plane=0; plane<bm_planes; plane++)
+		bm_cls(plane,fill);
+	nec_x=0;
+	nec_y=0;
+	nec_angle=0;
+}
+
+
+NECdraft_text()
+{
+	nec_draft_dump();
+}
+
+NECtext()
+{
+	nec_dump();
+}
+
+
+NECMlinetype(linetype)
+int linetype;
+{
+	if (linetype>=7)
+		linetype %= 7;
+	bm_line_mask = bm_pattern[linetype+2];
+	bm_mask_count=0;
+}
+
+
+NECClinetype(linetype)
+int linetype;
+{
+	if (linetype>=6)
+		linetype %= 6;
+	bm_value=neccolor[linetype+2];
+}
+
+
+NECmove(x,y)
+unsigned int x,y;
+{
+	nec_x=x;
+	nec_y=y;
+}
+
+
+NECvector(x,y)
+unsigned int x,y;
+{
+	bm_line(nec_x,x,nec_y,y);
+	nec_x=x;
+	nec_y=y;
+}
+
+
+NECput_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	if (nec_angle == 1)
+		x += NECVCHAR/2;
+	else
+		y -= NECVCHAR/2;
+   switch (nec_angle) {
+      case 0:
+         for (; *str; ++str, x += NECHCHAR)
+            bm_putc (x, y, *str, nec_angle);
+					break;
+      case 1:
+         for (; *str; ++str, y += NECHCHAR)
+            bm_putc (x, y, *str, nec_angle);
+					break;
+	}
+}
+
+
+int NEC_text_angle(ang)
+int ang;
+{
+	nec_angle=ang;
+	return TRUE;
+}
+
+	
+NECreset()
+{
+	bm_release();
+}
+
+
+/* output file must be binary mode for nec_dump */
+nec_dump()
+{
+unsigned int x;
+unsigned int plane,offset;
+int j,k;
+int num_bits = (sizeof(unsigned int)-1)*8;
+unsigned int column8;
+unsigned long column24;
+char column3, column2, column1;
+#ifdef PC
+	if (bm_planes==1)
+		fprintf(stderr,"Dumping NEC CP6 graphics (142kbytes)\n");
+	if (bm_planes==4)
+		fprintf(stderr,"Dumping NEC CP6 graphics (565kbytes)\n");
+#endif
+	fprintf(outfile,"\033A\010"); /* set line spacing to 8/60" = 24 dots */
+	fprintf(outfile,"\033P\033l\005");  /* 10cpi, left margin 5 char */
+	for (j=bm_ipc-1;j>=0;j--) {
+		for (k=num_bits;k>=0;k-=8) {
+			fprintf(outfile,"\n");
+			for (plane=0; plane<bm_planes; plane++) {
+				offset=plane*bm_psize;
+				if (bm_planes>1) {
+				    /* select colour for plane */
+				    fprintf(outfile,"\r\033r");
+				    (void) fputc((char)necpcolor[plane],outfile);
+				    fprintf(outfile,"\r");
+				}
+				/* select plotter graphics mode (square pixels) */
+				fprintf(outfile,"\033*\047");
+				(void) fputc((char)(bm_xmax*3%256),outfile);
+				(void) fputc((char)(bm_xmax*3/256),outfile);
+				for (x=0; x<bm_xmax; x++) {
+					column8= (bm_array[offset+x*bm_ipc+j] >>k) &0xff; 
+					column24=0;
+					if (column8&0x01) column24|=(long)0x000007;
+					if (column8&0x02) column24|=(long)0x000038;
+					if (column8&0x04) column24|=(long)0x0001c0;
+					if (column8&0x08) column24|=(long)0x000e00;
+					if (column8&0x10) column24|=(long)0x007000;
+					if (column8&0x20) column24|=(long)0x038000;
+					if (column8&0x40) column24|=(long)0x1c0000;
+					if (column8&0x80) column24|=(long)0xe00000;
+					column1 = (char) ( column24      & (long)0xff);
+					column2 = (char) ((column24>>8)  & (long)0xff);
+					column3 = (char) ((column24>>16) & (long)0xff);
+					(void) fputc(column3,outfile);
+					(void) fputc(column2,outfile);
+					(void) fputc(column1,outfile);
+					(void) fputc(column3,outfile);
+					(void) fputc(column2,outfile);
+					(void) fputc(column1,outfile);
+					(void) fputc(column3,outfile);
+					(void) fputc(column2,outfile);
+					(void) fputc(column1,outfile);
+				}
+			}
+		}
+	}
+	fprintf(outfile,"\r\033l");
+	(void) fputc('\0',outfile);				/* set left margin to 0 */
+	if (bm_planes > 1) {
+		fprintf(outfile,"\033r");
+		(void) fputc('\0',outfile);				/* set color to black */
+	}
+	fprintf(outfile,"\033A\012\r\n");	/* setline spacing to 10/60" */
+#ifdef PC
+	fprintf(stderr,"Print using: COPY /B\n");
+#endif
+}
+
+/* output file must be binary mode for nec_dump */
+nec_draft_dump()
+{
+unsigned int x;
+unsigned int plane,offset;
+int j,k;
+int num_bits = (sizeof(unsigned int)-1)*8;
+#ifdef PC
+	if (bm_planes==1)
+		fprintf(stderr,"Dumping NEC CP6 graphics (17kbytes)\n");
+#endif
+	fprintf(outfile,"\033A\010"); /* set line spacing to 8/60" = 8 dots */
+	fprintf(outfile,"\033P\033l\005\r");  /* 10cpi, left margin 5 char */
+	for (j=bm_ipc-1;j>=0;j--) {
+		for (k=num_bits;k>=0;k-=8) {
+			fprintf(outfile,"\n");
+			for (plane=0; plane<bm_planes; plane++) {
+				offset=plane*bm_psize;
+				if (bm_planes>1) {
+				    /* select colour for plane */
+				    fprintf(outfile,"\r\033r");
+				    (void) fputc((char)necpcolor[plane],outfile);
+				    fprintf(outfile,"\r");
+				}
+				/* select plotter graphics mode (square pixels) */
+				fprintf(outfile,"\033*");
+				(void) fputc('\0',outfile);
+				(void) fputc((char)(bm_xmax%256),outfile);
+				(void) fputc((char)(bm_xmax/256),outfile);
+				for (x=0; x<bm_xmax; x++) {
+					(void) fputc( (char)((bm_array[offset+x*bm_ipc+j] >>k) 
+									&0xff), outfile);
+				}
+			}
+		}
+	}
+	fprintf(outfile,"\r\033l");
+	(void) fputc('\0',outfile);				/* set left margin to 0 */
+	if (bm_planes > 1) {
+		fprintf(outfile,"\033r");
+		(void) fputc('\0',outfile);				/* set color to black */
+	}
+	fprintf(outfile,"\033A\012\r\n");	/* setline spacing to 10/60" */
+#ifdef PC
+	fprintf(stderr,"Print using: COPY /B\n");
+#endif
+}
+
+#endif /* NEC */
+

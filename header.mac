@@ -1,5 +1,5 @@
 if1
-COMPACT	equ 1			; define your memory model here
+LARGE	equ 1			; define your memory model here
 
 ifdef	SMALL
 	; default, so do nothing

@@ -1,3 +1,31 @@
+/* GNUPLOT - aed.trm */
+/*
+ * Copyright (C) 1990
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   AED terminals
+ *
+ * AUTHORS
+ *     Colin Kelley, Thomas Williams, Russell Lang
+ *
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
 #define AED_XMAX 768
 #define AED_YMAX 575
 
@@ -70,29 +98,11 @@ int x,y;
 }
 
 
-AED_lrput_text(row,str) /* write text to screen while still in graphics mode */
-int row;
+AED_put_text(x,y,str)
+int x,y;
 char str[];
 {
-	AED_move(AED_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
-	fprintf(outfile,"\033XXX%s\033",str);
-}
-
-
-AED5_lrput_text(row,str) /* same, but for AED 512 */
-int row;
-char str[];
-{
-	AED_move(AED5_XMAX-((strlen(str)+2)*AED_HCHAR),AED_VTIC+AED_VCHAR*(row+1));
-	fprintf(outfile,"\033XXX%s\033",str);
-}
-
-
-AED_ulput_text(row,str) /* write text to screen while still in graphics mode */
-int row;
-char str[];
-{
-	AED_move(AED_HTIC*2,AED_YMAX-AED_VTIC-AED_VCHAR*(row+1));
+	AED_move(x,y - AED_VCHAR/2 + 2);
 	fprintf(outfile,"\033XXX%s\033",str);
 }
 
@@ -104,5 +114,4 @@ AED_reset()
 {
 	fprintf(outfile,"\033SCT0.1.0.0.0.SBC.0.FFD");
 }
-
 

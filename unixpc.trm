@@ -1,11 +1,41 @@
+/* GNUPLOT - unixpc.trm */
 /*
-From: John Campbell (...!arizona!naucse!jdc)
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Unix PC's (ATT 3b1)
+ *
+ * AUTHORS
+ *    John Campbell
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
 
-I ported gnuplot to the ATT 3b1 (ATT7300) on 12/4/88.  The 3b1, as I view
-it, is a 720x300 bitmapped, monochrome display (often people don't use
-the top 12 scan lines and thus the effective size is 720x288).  I tried to
-maximize the size of the graph area, by using these top 12 lines (normally
-reserved) and set up a signal handler to restore them upon exit, abort, etc.
+/*
+>From: John Campbell (...!arizona!naucse!jdc)
+
+I originally ported gnuplot to the ATT 3b1 (ATT7300) on 12/4/88, and then
+added the minimal code needed to bring it up to 2.0 level on 1/28/90.  The 
+3b1, as I view it, is a 720x300 bitmapped, monochrome display (often people 
+don't use the top 12 scan lines and thus the effective size is 720x288).  I 
+tried to maximize the size of the graph area, by using these top 12 lines 
+(normally reserved) and set up a signal handler to restore them upon exit, 
+abort, etc.
 
 Line styles were "fudged" (they do not know the aspect ratio).  The same
 line style may look different depending upon the slope of the curve.  Due to
@@ -13,11 +43,11 @@ this only 4 line styles were implemented.  While more line types are possible,
 the current styles were chosen as distinguishable.
 
 The 3b1 has 4 "special" rows at the bottom that I could not use in graphics
-mode.  I chose to use these lines for the plot scale--normally found at the
-bottom right corner of the plot.  I wanted to use the four bottom lines as
-prompt/command lines, but did not find a way to do this.  If someone ever
-writes a device driver to "open" these rows as a small separate window, I
-could implement my original idea.
+mode.  It has been suggested that we use these lines for command prompting.
+Others have requested that we have a graphics window and a command window.
+My experience with gnuplot only includes relatively dumb graphics devices--
+hence gnuplot "looks and feels" normal to me the way I implemented it.
+I welcome either of these changes from someone else, however.
 */
 
 #include <sys/window.h>   /* Started with tam.h--too much trouble. */
@@ -39,13 +69,20 @@ Scr_type uPC_display[uPC_YSIZE][uPC_XSIZE];
 int uPC_width = 2*uPC_XSIZE;
 int uPC_sx=0, uPC_sy=0;
 int uPC_cur_linetype=0;
+int uPC_angle = 0;
 unsigned short uPC_raster_count=0;
+static Scr_type lookup[] = {
+      0x0001, 0x0002, 0x0004, 0x0008,
+      0x0010, 0x0020, 0x0040, 0x0080,
+      0x0100, 0x0200, 0x0400, 0x0800,
+      0x1000, 0x2000, 0x4000, 0x8000,
+   };
 
 #define uPC_XLAST (uPC_XMAX - 1)
 #define uPC_YLAST (uPC_YMAX - 1)
 
-#define uPC_VCHAR 12
-#define uPC_HCHAR  9
+#define uPC_VCHAR 11
+#define uPC_HCHAR  7
 #define uPC_VTIC   8
 #define uPC_HTIC  12
 
@@ -100,6 +137,11 @@ uPC_graphics()
 
    while (--i)
       *j++ = 0;
+/*
+   Position the cursor to the bottom of the screen so when we come back to
+   text mode we are just below the graph.
+*/
+   printf ("\033[25;1H");
 
    uPC_ur.ur_dstop = DSTSRC;   /* replace (clear screen). */
    IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
@@ -114,8 +156,6 @@ uPC_text()
 
    IfErrOut (ioctl(0, WIOCRASTOP, &uPC_ur), <0,
       "ioctl failed", "WIOCRASTOP");
-/* Now position the cursor at the second to the last row--better later? */
-   wgoto (0, 24, 0);
 }
 
 
@@ -201,12 +241,6 @@ unsigned int x,y;
    int x1 = uPC_sx, y1=uPC_sy, x2 = x, y2 = y;
    register int  c, e, dx, dy, width;
    register Scr_type mask, *a;
-   static Scr_type lookup[] = {
-      0x0001, 0x0002, 0x0004, 0x0008,
-      0x0010, 0x0020, 0x0040, 0x0080,
-      0x0100, 0x0200, 0x0400, 0x0800,
-      0x1000, 0x2000, 0x4000, 0x8000,
-   };
 
 /* Record new sx, sy for next call to the vector routine. */
    uPC_sx = x2;
@@ -387,43 +421,89 @@ unsigned int x,y;
 }
 
 
-uPC_lrput_text(row,str)
-unsigned int row;
+#ifdef uPC_NOT_USED
+/* Added by Russell Lang, eln272v@monu1.cc.monash.oz */
+   This placement to the nearest character cell worked, and I'm leaving
+   it here so the calculations involved won't be lost!  (jdc)
+*/
+uPC_put_text(x,y,str)
+unsigned int x,y;
 char str[];
 {
-   int col = 80-strlen(str), num, i;
-   struct utdata ut;
-   char *txt=ut.ut_text;
-
-/* Fill in the pad. */
-   for (i = 0; i < col; i++)
-      txt[i] = ' ';
-/* Then stick in the text. */
-   txt[i] = '\0';
-   strcat (txt, str);
-
-   if (row > 2)
-      puts (txt);
-   else {
-   /* This will fit on the 2 bottom "non-graphic" lines. */
-      switch (row) {
-      case 0: ut.ut_num =  WTXTSLK1; break;
-      case 1: ut.ut_num =  WTXTSLK2; break;
-      }
-      ioctl (0, WIOCSETTEXT, &ut);
-   }
-   wgoto (1, 24, 0);
-}
-
-uPC_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-/* This routine puts the text in the upper left corner. */
+/* This routine puts the text at the cursor location nearest
+   to (x,y).  Obviously the exact postion would look better */
 
 /* Just use the ANSI escape sequence CUP (iswind said that was ok!) */
-   printf ("\033[%d;%dH%s\033[25;1H", row+2, 2, str); /* +1 +2 ? */
+   printf ("\033[%d;%dH%s\033[25;1H", (int)(24-(y-uPC_VCHAR/2)*25/uPC_YMAX), 
+				(int)(x*80/uPC_XMAX), str); 
    fflush (stdout);
+}
+#endif
+
+
+uPC_put_text(x,y,str)
+unsigned int x,y;
+char str[];
+{
+   if (uPC_angle == 1)
+      x += uPC_VCHAR/2;
+   else
+      y -= uPC_VCHAR/2;
+
+   switch (uPC_angle) {
+      case 0:
+         for (; *str; ++str, x += uPC_HCHAR)
+            uPC_putc (x, y, *str, uPC_angle);
+      break;
+      case 1:
+         for (; *str; ++str, y += uPC_HCHAR)
+            uPC_putc (x, y, *str, uPC_angle);
+      break;
+   }
+}
+
+
+uPC_putc (x, y, c, angle)
+unsigned int x, y;
+int c, angle;
+/*
+   Put a character at an x,y location in the bit map (using the font5x7
+   array.  This is mostly just copied from the epson driver.
+*/
+{
+   int i, j, k;
+   register Scr_type mask, *a;
+   char fc;
+   unsigned int pixelon;
+
+   i = c - ' ';
+   for(j=0; j < 9; j++) {
+      fc = font5x7[i][j];
+      for (k=0; k < 5; k++) {
+         pixelon = ((unsigned int)(fc))>>k & 1;
+         if (pixelon) {
+            switch (angle) {
+            case 0:
+               mask = lookup[x+k+1 & 0x0f];
+               a = &uPC_display[(uPC_YSIZE - 1) - (y+j)][(x+k+1) >> 4];
+            break;
+            case 1:
+               mask = lookup[x-j & 0x0f];
+               a = &uPC_display[(uPC_YSIZE - 1) - (y+k+1)][(x-j) >> 4];
+            break;
+            }
+            *(a) |= (mask);  /* see uPC_PLOT macro */
+         }
+      }
+   }
+}
+
+
+uPC_text_angle (ang)
+int ang;
+{
+   uPC_angle = ang;
+   return TRUE;
 }
 
 
@@ -444,12 +524,6 @@ int signo;
 /* Reset the window to the right size. */
    ioctl(0, WIOCSETD, &wreset);   /* 0, not wncur here! */
 
-/* Clear the lines affected by an _lrput_text. */
-   ut.ut_text[0] = '\0';
-   ut.ut_num =  WTXTSLK1;
-   ioctl(0, WIOCSETTEXT, &ut);
-   ut.ut_num =  WTXTSLK2;
-   ioctl(0, WIOCSETTEXT, &ut);
 /* Scroll the screen once. (avoids typing over the same line) */
    fprintf (stderr, "\n");
 

@@ -1,0 +1,323 @@
+/* GNUPLOT - post.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *     postscript, psbig, epsf1, epsf2
+ *
+ * AUTHORS
+ *  Russell Lang
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+
+/* PostScript driver by Russell Lang, rjl@monu1.cc.monash.edu.au */
+
+int pspage=0;			/* page count */
+int ps_path_count=0; 	/* count of lines in path */
+int ps_ang=0;			/* text angle */
+enum JUSTIFY ps_justify=LEFT;	/* text is flush left */
+char *ps_font;			/* name of font in use */
+BOOLEAN ps_big;			/* true if big font used */
+
+char *PS_header[] = {
+"/vpt2 vpt 2 mul def\n",
+"/hpt2 hpt 2 mul def\n",
+/* flush left show */
+"/Lshow { 0 vshift rmoveto show } def\n", 
+/* flush right show */
+"/Rshow { dup stringwidth pop neg vshift rmoveto show } def\n", 
+/* centred show */
+"/Cshow { dup stringwidth pop -2 div vshift rmoveto show } def\n", 
+/* Border Lines */
+"/BL { stroke gnulinewidth 2 mul setlinewidth} def\n",
+/* Axes Lines */
+"/AL { stroke gnulinewidth 2 div setlinewidth } def\n",
+/* Plot Lines */
+"/PL { stroke gnulinewidth setlinewidth } def\n",
+/* Line Types */
+"/LTb { BL [] 0 setdash } def\n", /* border */
+"/LTa { AL [1 dl 2 dl] 0 setdash } def\n", /* axes */
+"/LT0 { PL [] 0 setdash } def\n",
+"/LT1 { PL [4 dl 2 dl] 0 setdash } def\n",
+"/LT2 { PL [2 dl 3 dl] 0 setdash } def\n",
+"/LT3 { PL [1 dl 1.5 dl] 0 setdash } def\n",
+"/LT4 { PL [5 dl 2 dl 1 dl 2 dl] 0 setdash } def\n",
+"/LT5 { PL [4 dl 3 dl 1 dl 3 dl] 0 setdash } def\n",
+"/LT6 { PL [2 dl 2 dl 2 dl 4 dl] 0 setdash } def\n",
+"/LT7 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0 setdash } def\n",
+"/LT8 { PL [2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 2 dl 4 dl] 0 setdash } def\n",
+"/M {moveto} def\n",
+"/L {lineto} def\n",
+"/P {  LT0\n", /* Point */
+"  currentlinewidth 2 div sub moveto\n",
+"  0 currentlinewidth rlineto  stroke } def\n",
+"/D {  LT0  2 copy  vpt add moveto\n", /* Diamond */
+"  hpt neg vpt neg rlineto  hpt vpt neg rlineto\n",
+"  hpt vpt rlineto  hpt neg vpt rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/A {  LT0  vpt sub moveto  0 vpt2 rlineto\n", /* Plus (Add) */
+"  currentpoint stroke moveto\n",
+"  hpt neg vpt neg rmoveto  hpt2 0 rlineto stroke\n",
+"  } def\n",
+"/B {  LT0  2 copy  exch hpt sub exch vpt add moveto\n", /* Box */
+"  0 vpt2 neg rlineto  hpt2 0 rlineto  0 vpt2 rlineto\n",
+"  hpt2 neg 0 rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/C {  LT0  exch hpt sub exch vpt add moveto\n", /* Cross */
+"  hpt2 vpt2 neg rlineto  currentpoint  stroke  moveto\n",
+"  hpt2 neg 0 rmoveto  hpt2 vpt2 rlineto stroke  } def\n",
+"/T {  LT0  2 copy  vpt 1.12 mul add moveto\n", /* Triangle */
+"  hpt neg vpt -1.62 mul rlineto\n",
+"  hpt 2 mul 0 rlineto\n",
+"  hpt neg vpt 1.62 mul rlineto  closepath  stroke\n",
+"  P  } def\n",
+"/S {  LT0  2 copy A C} def\n", /* Star */
+NULL
+};
+
+#define PS_XMAX 3600
+#define PS_YMAX 2520
+
+#define PS_XLAST (PS_XMAX - 1)
+#define PS_YLAST (PS_YMAX - 1)
+
+#define PS_VTIC (PS_YMAX/80)
+#define PS_HTIC (PS_YMAX/80)
+
+
+#define PS_SC (360.0/PS_XMAX)		/* scale is 1pt = 10 units */
+#define	PS_LW (0.25/PS_SC)			/* linewidth = 0.25 pts */
+
+#define PS_VCHAR1 (int)(7.0/PS_SC)	/* 7 point characters */
+#define PS_HCHAR1 (int)(0.6*7.0/PS_SC)
+
+#define PS_VCHAR2 (int)(11.0/PS_SC)	/* 11 point characters */
+#define PS_HCHAR2 (int)(0.6*11.0/PS_SC)
+
+
+EPSF1_init()
+{
+	ps_big = FALSE;
+	ps_font = "Courier";
+	/* the font could also be "Courier-Bold" or "Times-Roman" etc. */
+}
+
+
+EPSF2_init()
+{
+	ps_big = TRUE;
+	ps_font = "Courier";
+}
+
+
+EPSF_graphics()
+{
+int i;
+	fprintf(outfile,"%%!PS-Adobe-2.0 EPSF-2.0\n");
+	fprintf(outfile,"%%%%Creator: gnuplot\n");
+	fprintf(outfile,"%%%%DocumentFonts: %s\n", ps_font);
+	fprintf(outfile,"%%%%DocumentNeededFonts: %s\n", ps_font);
+	fprintf(outfile,"%%%%BoundingBox: 0 0 %d %d\n",
+		(int)(xsize*(PS_XMAX)*PS_SC+0.5), 
+		(int)(ysize*(PS_YMAX)*PS_SC+0.5) );
+	fprintf(outfile,"%%%%EndComments\n");
+	fprintf(outfile,"40 dict begin\n");
+	fprintf(outfile,"/gnulinewidth %.3f def\n",PS_LW);
+	fprintf(outfile,"/vshift %d def\n", 
+		ps_big ? -PS_VCHAR2/3 : -PS_VCHAR1/3);
+	fprintf(outfile,"/dl {%.3f mul} def\n",1/PS_SC); /* dash length */
+	fprintf(outfile,"/hpt %.1f def\n",PS_HTIC/2.0);
+	fprintf(outfile,"/vpt %.1f def\n",PS_VTIC/2.0);
+	for ( i=0; PS_header[i] != NULL; i++)
+		fprintf(outfile,"%s",PS_header[i]);
+	fprintf(outfile,"%%%%EndProlog\n");
+	fprintf(outfile,"%%%%BeginSetup\n");
+	fprintf(outfile,"/Gnu_save save def\n");
+	fprintf(outfile,"%.3f %.3f scale\n",PS_SC,PS_SC);
+	fprintf(outfile,"%%%%IncludeFont: %s\n", ps_font);
+	fprintf(outfile,"/%s findfont %d ", ps_font, 
+		ps_big ? PS_VCHAR2 : PS_VCHAR1 );
+	fprintf(outfile,"scalefont setfont\n");
+	fprintf(outfile,"newpath\n");
+	ps_path_count = 0;
+	fprintf(outfile,"%%%%EndSetup\n");
+}
+
+
+EPSF_text()
+{
+	fprintf(outfile,"stroke\nGnu_save restore\n");
+	fprintf(outfile,"showpage\n");
+	ps_path_count = 0;
+	fprintf(outfile,"%%%%Trailer\n");
+	fprintf(outfile,"end\n");
+}
+
+
+EPSF_reset()
+{
+}
+
+
+PS1_init()
+{
+	EPSF1_init();
+	PS_init();
+}
+
+
+PS2_init()
+{
+	EPSF2_init();
+	PS_init();
+}
+
+
+PS_init()
+{
+	fprintf(outfile,"%%!PS-Adobe-2.0\n");
+	fprintf(outfile,"%%%%Creator: gnuplot\n");
+	fprintf(outfile,"%%%%DocumentFonts: %s\n", ps_font);
+	fprintf(outfile,"%%%%DocumentNeededFonts: %s\n", ps_font);
+	fprintf(outfile,"%%%%Pages: (atend)\n");
+	fprintf(outfile,"%%%%BoundingBox: %d 50 550 %d\n",
+		(int)(550.5-ysize*(PS_YMAX)*PS_SC*2), 
+		(int)(50.5+xsize*(PS_XMAX)*PS_SC*2) );
+	fprintf(outfile,"%%%%EndComments\n");
+	fprintf(outfile,"/GnuTransform {\n");
+	fprintf(outfile,"  90 rotate\n  50 -550 translate\n  2 2 scale\n");
+	fprintf(outfile,"} def\n");
+	fprintf(outfile,"%%%%EndProlog\n");
+	pspage = 0;
+}
+
+
+
+PS_graphics()
+{
+	fprintf(outfile,"%%%%Page: ? %d\n",++pspage);
+	fprintf(outfile,"gsave\nGnuTransform\n");
+	fprintf(outfile,"%%%%BeginDocument: EPSF\n");
+	fprintf(outfile,"1 dict begin\n/showpage {} def\n");
+	EPSF_graphics();
+}
+
+
+PS_text()
+{
+	EPSF_text();
+	fprintf(outfile,"%%%%EndDocument\n");
+	fprintf(outfile,"end\nshowpage\ngrestore\n");
+}
+
+
+
+PS_reset()
+{
+	fprintf(outfile,"%%%%Trailer\n");
+	fprintf(outfile,"%%%%Pages: %d\n",pspage);
+}
+
+
+PS_linetype(linetype)
+int linetype;
+{
+char *line = "ba012345678"; 
+	fprintf(outfile,"LT%c\n", line[(linetype%9)+2]);
+	ps_path_count = 0;
+}
+
+
+PS_move(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"%d %d M\n", x, y);
+	ps_path_count += 1;
+}
+
+
+PS_vector(x,y)
+unsigned int x,y;
+{
+	fprintf(outfile,"%d %d L\n", x, y);
+	ps_path_count += 1;
+	if (ps_path_count >= 400) {
+		fprintf(outfile,"currentpoint stroke moveto\n");
+		ps_path_count = 0;
+	}
+}
+
+
+PS_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+char ch;
+	PS_move(x,y);
+	if (ps_ang != 0)
+		fprintf(outfile,"currentpoint gsave translate %d rotate 0 0 moveto\n"
+			,ps_ang*90);
+	putc('(',outfile);
+	ch = *str++;
+	while(ch!='\0') {
+		if ( (ch=='(') || (ch==')') || (ch=='\\') )
+			putc('\\',outfile);
+		putc(ch,outfile);
+		ch = *str++;
+	}
+	switch(ps_justify) {
+		case LEFT : fprintf(outfile,") Lshow\n");
+			break;
+		case CENTRE : fprintf(outfile,") Cshow\n");
+			break;
+		case RIGHT : fprintf(outfile,") Rshow\n");
+			break;
+	}
+	if (ps_ang != 0)
+		fprintf(outfile,"grestore\n");
+}
+
+int PS_text_angle(ang)
+int ang;
+{
+	ps_ang=ang;
+	return TRUE;
+}
+
+int PS_justify_text(mode)
+enum JUSTIFY mode;
+{
+	ps_justify=mode;
+	return TRUE;
+}
+
+/* postscript point routines */
+PS_point(x,y,number)
+int x,y;
+int number;
+{
+char *point = "PDABCTS";
+	number %= POINT_TYPES;
+ 	if (number < -1)
+		number = -1;		/* negative types are all 'dot' */
+	fprintf(outfile,"%d %d %c\n", x, y, point[number+1]);
+	ps_path_count = 0;
+}
+

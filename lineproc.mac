@@ -116,7 +116,8 @@ i34:
 ;
 ; clean up and exit
 ;
-i28:	pop di
+i28:
+	pop di
 	pop si
 	pop bp
 	ret

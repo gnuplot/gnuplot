@@ -2,7 +2,7 @@
  *
  *    G N U P L O T  --  eval.c
  *
- *  Copyright (C) 1986, 1987  Colin Kelley, Thomas Williams
+ *  Copyright (C) 1986 Colin Kelley, Thomas Williams
  *
  *  You may use this code as you wish if credit is given and this message
  *  is retained.
@@ -16,86 +16,80 @@
 #include <stdio.h>
 #include "plot.h"
 
-char *malloc();
-
-extern int c_token;
+extern int c_token,next_value,next_function;
+extern struct udft_entry udft[];
 extern struct ft_entry ft[];
-extern struct udvt_entry *first_udv;
-extern struct udft_entry *first_udf;
-extern struct at_type at;
+extern struct vt_entry vt[];
+extern struct at_type *curr_at;
 extern struct lexical_unit token[];
 
 struct value *integer();
 
 
 
-struct udvt_entry *
-add_udv(t_num)  /* find or add value and return pointer */
+int add_value(t_num)
 int t_num;
 {
-register struct udvt_entry **udv_ptr = &first_udv;
+register int i;
 
 	/* check if it's already in the table... */
 
-	while (*udv_ptr) {
-		if (equals(t_num,(*udv_ptr)->udv_name))
-			return(*udv_ptr);
-		udv_ptr = &((*udv_ptr)->next_udv);
+	for (i = 0; i < next_value; i++) {
+		if (equals(t_num,vt[i].vt_name))
+			return(i);
 	}
-
-	if (!(*udv_ptr = (struct udvt_entry *)
-		malloc((unsigned int)sizeof(struct udvt_entry))))
-			int_error("not enought memory for value",t_num);
-	(*udv_ptr)->next_udv = NULL;
-	copy_str((*udv_ptr)->udv_name,t_num);
-	(*udv_ptr)->udv_value.type = INT;	/* not necessary, but safe! */
-	(*udv_ptr)->udv_undef = TRUE;
-	return(*udv_ptr);
+	if (next_value == MAX_VALUES)
+		int_error("user defined constant space full",NO_CARET);
+	copy_str(vt[next_value].vt_name,t_num);
+	vt[next_value].vt_value.type = INT;		/* not necessary, but safe! */
+	vt[next_value].vt_undef = TRUE;
+	return(next_value++);
 }
 
 
-struct udft_entry *
-add_udf(t_num)  /* find or add function and return pointer */
-int t_num; /* index to token[] */
+add_action(sf_index,arg)
+enum operators sf_index;
+struct value *arg;
+
+ /* argument to pass to standard function indexed by sf_index */
 {
-register struct udft_entry **udf_ptr = &first_udf;
 
-	while (*udf_ptr) {
-		if (equals(t_num,(*udf_ptr)->udf_name))
-			return(*udf_ptr);
-		udf_ptr = &((*udf_ptr)->next_udf);
-	}
-	if (!(*udf_ptr = (struct udft_entry *)
-		malloc((unsigned int)sizeof(struct udft_entry))))
-			int_error("not enought memory for function",t_num);
-	(*udf_ptr)->next_udf = (struct udft_entry *) NULL;
-	(*udf_ptr)->definition = NULL;
-	(*udf_ptr)->at = NULL;
-	copy_str((*udf_ptr)->udf_name,t_num);
-	(void) integer(&((*udf_ptr)->dummy_value), 0);
-	return(*udf_ptr);
-}
-
-
-union argument *
-add_action(sf_index)
-enum operators sf_index;		/* index of p-code function */
-{
-	if (at.a_count >= MAX_AT_LEN)
+	if ( curr_at->count >= MAX_AT_LEN ) 
 		int_error("action table overflow",NO_CARET);
-	at.actions[at.a_count].index = sf_index;
-	return(&(at.actions[at.a_count++].arg));
+	curr_at->actions[curr_at->count].index = ((int)sf_index);
+	if (arg != (struct value *)0)
+		curr_at->actions[curr_at->count].arg = *arg;
+	curr_at->count++;
 }
 
 
 int standard(t_num)  /* return standard function index or 0 */
 {
 register int i;
-	for (i = (int)SF_START; ft[i].f_name != NULL; i++) {
-		if (equals(t_num,ft[i].f_name))
+	for (i = (int)SF_START; ft[i].ft_name != NULL; i++) {
+		if (equals(t_num,ft[i].ft_name))
 			return(i);
 	}
 	return(0);
+}
+
+
+
+int user_defined(t_num)  /* find or add function and return index */
+int t_num; /* index to token[] */
+{
+register int i;
+	for (i = 0; i < next_function; i++) {
+		if (equals(t_num,udft[i].udft_name))
+			return(i);
+	}
+	if (next_function == MAX_UDFS)
+		int_error("user defined function space full",t_num);
+	copy_str(udft[next_function].udft_name,t_num);
+	udft[next_function].definition[0] = '\0';
+	udft[next_function].at.count = 0;
+	(void) integer(&udft[next_function].dummy_value, 0);
+	return(next_function++);
 }
 
  
@@ -103,16 +97,9 @@ register int i;
 execute_at(at_ptr)
 struct at_type *at_ptr;
 {
-register int i,index,count,offset;
-
-	count = at_ptr->a_count;
-	for (i = 0; i < count;) {
-		index = (int)at_ptr->actions[i].index;
-		offset = (*ft[index].func)(&(at_ptr->actions[i].arg));
-		if (is_jump(index))
-			i += offset;
-		else
-			i++;
+register int i;
+	for (i = 0; i < at_ptr->count; i++) {
+		(*ft[at_ptr->actions[i].index].funct)(&(at_ptr->actions[i].arg));
 	}
 }
 
@@ -126,6 +113,6 @@ register int i,index,count,offset;
  at_ptr is a pointer to the action table which must be executed (evaluated)
 
  so the iterated line exectues the function indexed by the at_ptr and 
- passes the address of the argument which is pointed to by the arg_ptr 
+ passes the argument which is pointed to by the arg_ptr 
 
 */

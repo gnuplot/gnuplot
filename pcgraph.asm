@@ -1,7 +1,19 @@
 TITLE	PC graphics module
-;	Colin Kelley
-;	December 22, 1986
-;	modified January 1987 to use LINEPROC.MAC
+;	uses LINEPROC.MAC
+
+;	Michael Gordon - 8-Dec-86
+;
+; Certain routines were taken from the Hercules BIOS of	Dave Tutelman - 8/86
+; Others came from pcgraph.asm included in GNUPLOT by Colin Kelley
+;
+; modified slightly by Colin Kelley - 22-Dec-86
+;	added header.mac, parameterized declarations
+; added dgroup: in HVmodem to reach HCh_Parms and HGr_Parms - 30-Jan-87
+;
+; modified and added to for use in plot(3) routines back end.
+; Gil Webster.
+;
+; Assemble with masm ver. 4.  
 
 include header.mac
 
@@ -9,12 +21,13 @@ if1
 include lineproc.mac
 endif
 
+GPg1_Base equ 0B800h	; Graphics page 1 base address
 
 _text	segment
 
 	public _PC_line, _PC_color, _PC_mask, _PC_curloc, _PC_puts, _Vmode
-	public _save_stack, _ss_interrupt
-	extrn _interrupt:near
+	public _erase, _save_stack, _ss_interrupt
+	extrn _inter:near
 
 pcpixel proc near
 	ror word ptr linemask,1
@@ -43,7 +56,30 @@ pcpixel endp
 
 lineproc _PC_line, pcpixel
 
-_PC_color proc near
+;
+; erase - clear page 1 of the screen buffer to zero (effectively, blank
+;	the screen)
+;
+beginproc _erase
+	push es
+	push ax
+	push cx
+	push di
+	mov ax, GPg1_Base
+	mov es, ax
+	xor di, di
+	mov cx, 4000h
+	xor ax, ax
+	cld
+	rep stosw			; zero out screen page
+	pop di
+	pop cx
+	pop ax
+	pop es
+	ret
+_erase endp
+
+beginproc _PC_color
 	push bp
 	mov bp,sp
 	mov al,[bp+X]			; color
@@ -52,7 +88,7 @@ _PC_color proc near
 	ret
 _PC_color endp
 
-_PC_mask proc near
+beginproc _PC_mask
 	push bp
 	mov bp,sp
 	mov ax,[bp+X]			; mask
@@ -61,7 +97,7 @@ _PC_mask proc near
 	ret
 _PC_mask endp
 
-_Vmode	proc near
+beginproc _Vmode
 	push bp
 	mov bp,sp
 	push si
@@ -74,7 +110,7 @@ _Vmode	proc near
 	ret
 _Vmode	endp
 
-_PC_curloc proc near
+beginproc _PC_curloc
 	push bp
 	mov bp,sp
 	mov dh, byte ptr [bp+X] ; row number
@@ -91,7 +127,7 @@ _PC_curloc endp
 ;   and reloading AH before INT 10H, which is necessary on genuine IBM
 ;   boards...
 ;
-_PC_puts proc near
+beginproc _PC_puts
 	push bp
 	mov bp,sp
 	push si
@@ -169,7 +205,7 @@ save_ss	equ this word - 2
 	mov sp,-1		; here too
 save_sp equ this word - 2
 	sti
-	jmp _interrupt		; now it's safe to call the real routine
+	jmp _inter; now it's safe to call the real routine
 _ss_interrupt endp
 
 
@@ -178,7 +214,7 @@ _text	ends
 
 const	segment
 linemask dw -1
-color	db 1
+color	 db 1
 const	ends
 
 	end

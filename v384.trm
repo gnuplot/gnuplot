@@ -1,6 +1,32 @@
+/* GNUPLOT - v384.trm */
 /*
- *  thanks to roland@moncskermit.OZ (Roland Yap) for this driver
+ * Copyright (C) 1990   
  *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Vectrix 384 - works with tandy color printer as well
+ *
+ * AUTHORS
+ *   roland@moncskermit.OZ (Roland Yap) 
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/*
  *	Vectrix 384 driver - works with tandy color printer as well
  *  in reverse printing 8 color mode.
  *  This doesn't work on Vectrix 128 because it redefines the
@@ -84,27 +110,16 @@ unsigned int x,y;
 }
 
 
-V384_lrput_text(row,str)
-unsigned int row;
+V384_put_text (x, y, str)
+unsigned int x, y;
 char str[];
 {
-	V384_move(V384_XMAX - V384_HTIC - V384_HCHAR*(strlen(str)+1),
-		V384_VTIC + V384_VCHAR*(row+1));
-	fprintf(outfile,"$%s\n",str);
-}
-
-
-V384_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	V384_move(V384_HTIC, V384_YMAX - V384_VTIC - V384_VCHAR*(row+1));
-	fprintf(outfile,"$%s\n",str);
+	V384_move (x, y + V384_VCHAR/2);
+	fprintf (outfile, "$%s\n", str);
 }
 
 
 V384_reset()
 {
 }
-
 

@@ -1,0 +1,338 @@
+/* GNUPLOT - imagen.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   Imagen laser printers
+ *
+ * AUTHORS
+ *   Paul E. McKenney, David Kotz
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/*
+ * Original for direct Imagen output (but retaining many of the
+ * LaTeX extensions) by Paul E. McKenney, 1989.
+ * Further modified by David Kotz to fit into gnuplot 2.0.
+ * Information Science and Technology Division, SRI International,
+ * 333 Ravenswood Ave, Menlo Park, CA 94025.
+ * Mail to mckenney@sri.com.
+ */
+
+#include "imPcodes.h"
+
+#define IMAGEN_PTS_PER_INCH (300)
+
+#define IMAGEN_XMAX (10.0 * IMAGEN_PTS_PER_INCH) /* 10.0 inches */
+#define IMAGEN_YMAX (7.5 * IMAGEN_PTS_PER_INCH) /* 7.5 inches */
+
+#define IMAGEN_FONTSIZE 12
+
+#define IMAGEN_HTIC (20)
+#define IMAGEN_VTIC (20)
+#define IMAGEN_VCHAR (IMAGEN_FONTSIZE*5)
+#define IMAGEN_HCHAR (IMAGEN_VCHAR/2)
+
+static int IMAGEN_orgx;		/* absolute-pixel-ORIgin of graph.	*/
+static int IMAGEN_orgy;
+static int IMAGEN_posx;		/* current drawing position (lines).	*/
+static int IMAGEN_posy;
+static int IMAGEN_inplot;
+static int IMAGEN_xmax;		/* width of graph in pixels.		*/
+static int IMAGEN_ymax;		/* height of graph in pixels.		*/
+static int IMAGEN_hchar;		/* Height of CHAR in current font.	*/
+static int IMAGEN_wchar;		/* Width of CHAR in current font.	*/
+static int IMAGEN_blofs;		/* BaseLine OFfSet from bounding box.	*/
+static int IMAGEN_angle = -1;	/* 0 for horizontal text, 1 for vertical */
+static enum JUSTIFY IMAGEN_justify = LEFT; /* left/center/right */
+
+static IMAGEN_seq_pos;		/* position in sequence */
+
+static void IMAGEN_putwd();
+static void IMAGEN_createfamily();
+static void IMAGEN_setfont();
+static void IMAGEN_setpos();
+static char *IMAGEN_cvts();
+
+IMAGEN_init()
+{
+    char font[10];			/* font name */
+
+    IMAGEN_posx = IMAGEN_posy = 0;
+
+    IMAGEN_orgx = (11.0 * IMAGEN_PTS_PER_INCH - IMAGEN_XMAX) / 2;
+    IMAGEN_orgy = (8.5 * IMAGEN_PTS_PER_INCH - IMAGEN_YMAX)/ 2;
+
+    fputs("@document(language impress)", outfile);
+
+    putc(imP_SET_HV_SYSTEM, outfile);
+    putc((3<<3)|5, outfile);
+
+    sprintf(font, "cour%02d", IMAGEN_FONTSIZE);
+    IMAGEN_createfamily(font, IMAGEN_FONTSIZE);
+    IMAGEN_setfont(IMAGEN_FONTSIZE);
+
+    IMAGEN_text_angle(0);
+
+    putc(imP_SET_ABS_H, outfile);
+    IMAGEN_putwd(0);
+    putc(imP_SET_ABS_V, outfile);
+    IMAGEN_putwd(0);
+
+    IMAGEN_linetype(-1);
+}
+
+IMAGEN_graphics()
+{
+    static BOOLEAN first = TRUE;
+
+    if (!first)
+	 putc(imP_ENDPAGE, outfile);
+    first = FALSE;
+
+    IMAGEN_move(0, 0);
+}
+
+IMAGEN_text()
+{
+}
+
+
+IMAGEN_linetype(linetype)
+int linetype;
+{
+    static int lastlinetype = -10;
+
+    if (linetype < 0)
+	 linetype = -linetype;
+    else
+	 linetype *= 2;
+
+    if (lastlinetype == linetype)
+	 return;
+
+    lastlinetype = linetype;	/* now >= 0 */
+
+    putc(imP_SET_PEN, outfile);
+    putc(linetype, outfile);
+}
+
+
+IMAGEN_move(x,y)
+	unsigned int x,y;
+{
+    IMAGEN_posx = x;
+    IMAGEN_posy = y;
+}
+
+IMAGEN_vector(ux,uy)
+	unsigned int ux,uy;
+{
+    /* Create path. */
+
+    putc(imP_CREATE_PATH, outfile);
+    IMAGEN_putwd(2);
+    IMAGEN_putwd(IMAGEN_posx + IMAGEN_orgx);
+    IMAGEN_putwd(IMAGEN_posy + IMAGEN_orgy);
+    IMAGEN_putwd(ux + IMAGEN_orgx);
+    IMAGEN_putwd(uy + IMAGEN_orgy);
+
+    /* Draw path with black pen. */
+
+    putc(imP_DRAW_PATH, outfile);
+    putc(15, outfile);
+
+    /* Set current position to end of line. */
+
+    IMAGEN_move(ux, uy);
+}
+
+static void
+IMAGEN_setpos(ux, uy)
+	int ux,uy;
+{
+    /* Set x and y position (for text), also set beginning-of-line. */
+
+    putc(imP_SET_ABS_H, outfile);
+    IMAGEN_putwd(ux + IMAGEN_orgx);
+    putc(imP_SET_ABS_V, outfile);
+    IMAGEN_putwd(uy + IMAGEN_orgy);
+    putc(imP_SET_BOL, outfile);
+    if (IMAGEN_angle == 1)
+	 IMAGEN_putwd(uy + IMAGEN_orgx); /* vertical */
+    else
+	 IMAGEN_putwd(ux + IMAGEN_orgx); /* horizontal */
+}
+
+IMAGEN_text_angle(angle)
+	int angle;
+{
+    if (IMAGEN_angle != angle) {
+	   IMAGEN_angle = angle;	/* record for later use */
+	   putc(imP_SET_ADV_DIRS, outfile);
+	   putc(angle == 0 ? 0 : 7, outfile); /* 0=>horiz : 7=>vert */
+    }
+
+    return(TRUE);
+}
+
+IMAGEN_justify_text(mode)
+	enum JUSTIFY mode;
+{
+    IMAGEN_justify = mode;
+    return(TRUE);
+}
+
+static char *
+IMAGEN_cvts(str, width, height)
+	char		*str;
+	int		*width;
+	int		*height;
+{
+    char		*cp1;
+    char		*cp2;
+    static char	*buf = NULL;
+    int		h;
+    int		maxw;
+    int		w;
+
+    /* Free up old buffer, if there is one, get a new one.  Since	*/
+    /* all transformations shorten the string, get a buffer that is	*/
+    /* the same size as the input string.				*/
+
+    if (buf != NULL)
+	 (void) free(buf);
+    buf = (char *) alloc(strlen(str), "converted label string");
+
+    /* Do the transformations. */
+
+    cp1 = str;
+    cp2 = buf;
+    h = 1;
+    maxw = 0;
+    w = 0;
+    while (*cp1 != NULL) {
+	   switch (*cp1) {
+		  case ' ' :		/* Space character. */
+		    *cp2++ = imP_SP;
+		    w++;
+		    break;
+		    
+		    case  '\\' :	/* Escape sequence. */
+			 if (*++cp1 == '\\') {
+				/* Begin new line. */
+				h++;
+				if (w > maxw)
+				  maxw = w;
+				w = 0;
+				*cp2++ = imP_CRLF;
+				break;
+			 }
+		    
+		    /* Fall through to just copy next char out.	*/
+		    
+		    default :
+			 *cp2++ = *cp1;
+		    w++;
+		    break;
+		}
+	   cp1++;
+    }
+    
+    *cp2 = '\0';
+    if (w > maxw)
+	 maxw = w;
+    
+    if (height != NULL)
+	 *height = IMAGEN_angle ?
+	   IMAGEN_wchar * maxw :
+		IMAGEN_hchar * h;
+    if (width != NULL)
+	 *width = IMAGEN_angle ?
+	   IMAGEN_hchar * h :
+		IMAGEN_wchar * maxw;
+    return (buf);
+}
+
+IMAGEN_put_text(x, y, str)
+	int x,y;				/* reference point of string */
+	char str[];			/* the text */
+{
+    char *cvstr;
+    int height;
+    int width;
+    
+    cvstr = IMAGEN_cvts(str, &width, &height);
+
+    switch (IMAGEN_justify) {
+	   case LEFT: break;
+	   case CENTRE: x -= width/2; break;
+	   case RIGHT: x -= width; break;
+    }
+
+    if (IMAGEN_angle) {		/* vertical */
+	   x += IMAGEN_hchar;
+	   y -= height/2;
+    } else				/* horizontal */
+	 y += height/2 - IMAGEN_hchar;
+
+    IMAGEN_setpos(x, y + IMAGEN_blofs);
+    fputs(cvstr, outfile);
+}
+
+
+IMAGEN_reset()
+{
+    putc(imP_EOF, outfile);
+}
+
+static void
+IMAGEN_putwd(w)
+{
+	putc(w>>8, outfile);
+	putc(w, outfile);
+}
+
+static void
+IMAGEN_createfamily(c, sz)
+	char		*c;
+	int		sz;
+{
+    putc(imP_CREATE_FAMILY_TABLE, outfile);
+    putc(sz, outfile);
+    putc(1, outfile);
+    putc(0, outfile);
+    fputs(c, outfile);
+    putc(0, outfile);
+}
+
+static void
+IMAGEN_setfont(sz) 
+    int sz;
+{
+    IMAGEN_hchar = sz * 5;
+    IMAGEN_wchar = IMAGEN_hchar / 2;
+    IMAGEN_blofs = IMAGEN_hchar / 3;
+    putc(imP_SET_FAMILY, outfile);
+    putc(sz, outfile);
+    putc(imP_SET_SP, outfile);
+    IMAGEN_putwd(IMAGEN_wchar);
+    putc(imP_SET_IL, outfile);
+    IMAGEN_putwd(IMAGEN_hchar);
+}

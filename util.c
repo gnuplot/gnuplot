@@ -1,16 +1,30 @@
+/* GNUPLOT - util.c */
 /*
+ * Copyright (C) 1986, 1987, 1990   Thomas Williams, Colin Kelley
  *
- *    G N U P L O T  --  util.c
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
  *
- *  Copyright (C) 1986, 1987  Thomas Williams, Colin Kelley
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
  *
- *  You may use this code as you wish if credit is given and this message
- *  is retained.
- *
- *  Please e-mail any useful additions to vu-vlsi!plot so they may be
- *  included in later releases.
- *
- *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
+ * AUTHORS
+ * 
+ *   Original Software:
+ *     Thomas Williams,  Colin Kelley.
+ * 
+ *   Gnuplot 2.0 additions:
+ *       Russell Lang, Dave Kotz, John Campbell.
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
  */
 
 #include <ctype.h>
@@ -19,22 +33,25 @@
 #include <errno.h>
 #include "plot.h"
 
-extern BOOLEAN screen_ok;
+BOOLEAN screen_ok;
 	/* TRUE if command just typed; becomes FALSE whenever we
 		send some other output to screen.  If FALSE, the command line
 		will be echoed to the screen before the ^ error message. */
 
-char *malloc();
-
 #ifndef vms
-extern int errno, sys_nerr;
+#ifndef __ZTC__
+extern int errno;
+extern int sys_nerr;
 extern char *sys_errlist[];
+#endif
 #endif /* vms */
 
 extern char input_line[];
 extern struct lexical_unit token[];
 extern jmp_buf env;	/* from plot.c */
-
+extern int inline_num;		/* from command.c */
+extern BOOLEAN interactive;	/* from plot.c */
+extern char *infile_name;	/* from plot.c */
 
 /*
  * equals() compares string value of token number t_num with str[], and
@@ -172,9 +189,34 @@ register int count;
 
 	if ((count = token[t_num].length - 2) > MAX_ID_LEN)
 		count = MAX_ID_LEN;
-	do {
-		str[i++] = input_line[start++];
-		} while (i != count);
+	if (count>0) {
+		do {
+			str[i++] = input_line[start++];
+			} while (i != count);
+	}
+	str[i] = '\0';
+}
+
+
+/*
+ * quotel_str() does the same thing as quote_str, except it uses
+ * MAX_LINE_LEN instead of MAX_ID_LEN. 
+ */ 
+quotel_str(str, t_num) 
+char str[]; 
+int t_num; 
+{
+register int i = 0;
+register int start = token[t_num].start_index + 1;
+register int count;
+
+	if ((count = token[t_num].length - 2) > MAX_LINE_LEN)
+		count = MAX_LINE_LEN;
+	if (count>0) {
+		do {
+			str[i++] = input_line[start++];
+			} while (i != count);
+	}
 	str[i] = '\0';
 }
 
@@ -210,12 +252,33 @@ register char *s;
 	if (*str)		/* previous pointer to malloc'd memory there */
 		free(*str);
 	e = token[end].start_index + token[end].length;
-	if (*str = malloc((unsigned int)(e - token[start].start_index + 1))) {
-		s = *str;
-		for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
-			*s++ = input_line[i];
-		*s = '\0';
-	}
+	*str = alloc((unsigned int)(e - token[start].start_index + 1), "string");
+     s = *str;
+     for (i = token[start].start_index; i < e && input_line[i] != '\0'; i++)
+	  *s++ = input_line[i];
+     *s = '\0';
+}
+
+
+/*
+ *	m_quote_capture() is similar to m_capture(), but it removes
+	quotes from either end if the string.
+ */
+m_quote_capture(str,start,end)
+char **str;
+int start,end;
+{
+register int i,e;
+register char *s;
+
+	if (*str)		/* previous pointer to malloc'd memory there */
+		free(*str);
+	e = token[end].start_index + token[end].length-1;
+	*str = alloc((unsigned int)(e - token[start].start_index + 1), "string");
+     s = *str;
+    for (i = token[start].start_index + 1; i < e && input_line[i] != '\0'; i++)
+	 *s++ = input_line[i];
+    *s = '\0';
 }
 
 
@@ -256,7 +319,6 @@ struct value *val;
 	switch(val->type) {
 		case INT:
 			return((double) val->v.int_val);
-			break;
 		case CMPLX:
 			return(val->v.cmplx_val.real);
 	}
@@ -272,7 +334,6 @@ struct value *val;
 	switch(val->type) {
 		case INT:
 			return(0.0);
-			break;
 		case CMPLX:
 			return(val->v.cmplx_val.imag);
 	}
@@ -291,7 +352,6 @@ struct value *val;
 	switch(val->type) {
 		case INT:
 			return((double) abs(val->v.int_val));
-			break;
 		case CMPLX:
 			return(sqrt(val->v.cmplx_val.real*
 				    val->v.cmplx_val.real +
@@ -313,7 +373,6 @@ struct value *val;
 	switch(val->type) {
 		case INT:
 			return((val->v.int_val > 0) ? 0.0 : Pi);
-			break;
 		case CMPLX:
 			if (val->v.cmplx_val.imag == 0.0) {
 				if (val->v.cmplx_val.real >= 0.0)
@@ -384,15 +443,26 @@ register int i;
 
 	for (i = 0; i < sizeof(PROMPT) - 1; i++)
 		(void) putc(' ',stderr);
+     if (!interactive)
+	  if (infile_name != NULL)
+	    fprintf(stderr,"\"%s\", line %d: ", infile_name, inline_num);
+	  else
+	    fprintf(stderr,"line %d: ", inline_num);
+
+
 #ifdef vms
 	status[1] = vaxc$errno;
 	sys$putmsg(status);
 	(void) putc('\n',stderr);
 #else
+#ifdef __ZTC__
+	fprintf(stderr,"error number %d\n\n",errno);
+#else
 	if (errno >= sys_nerr)
 		fprintf(stderr, "unknown errno %d\n\n", errno);
 	else
 		fprintf(stderr,"(%s)\n\n",sys_errlist[errno]);
+#endif
 #endif
 
 	longjmp(env, TRUE);	/* bail out to command line */
@@ -422,7 +492,55 @@ register int i;
 
 	for (i = 0; i < sizeof(PROMPT) - 1; i++)
 		(void) putc(' ',stderr);
-	fprintf(stderr,"%s\n\n",str);
+     if (!interactive)
+	  if (infile_name != NULL)
+	    fprintf(stderr,"\"%s\", line %d: ", infile_name, inline_num);
+	  else
+	    fprintf(stderr,"line %d: ", inline_num);
+     fprintf(stderr,"%s\n\n", str);
 
 	longjmp(env, TRUE);	/* bail out to command line */
 }
+
+/* Lower-case the given string (DFK) */
+/* Done in place. */
+void
+lower_case(s)
+     char *s;
+{
+  register char *p = s;
+
+  while (*p != '\0') {
+    if (isupper(*p))
+	 *p = tolower(*p);
+    p++;
+  }
+}
+
+/* Squash spaces in the given string (DFK) */
+/* That is, reduce all multiple white-space chars to single spaces */
+/* Done in place. */
+void
+squash_spaces(s)
+     char *s;
+{
+  register char *r = s;		/* reading point */
+  register char *w = s;		/* writing point */
+  BOOLEAN space = FALSE;		/* TRUE if we've already copied a space */
+
+  for (w = r = s; *r != '\0'; r++) {
+	 if (isspace(*r)) {
+		/* white space; only copy if we haven't just copied a space */
+		if (!space) {
+		    space = TRUE;
+		    *w++ = ' ';
+		}				/* else ignore multiple spaces */
+	 } else {
+		/* non-space character; copy it and clear flag */
+		*w++ = *r;
+		space = FALSE;
+	 }
+  }
+  *w = '\0';				/* null terminate string */
+}
+

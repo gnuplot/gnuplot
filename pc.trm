@@ -1,16 +1,49 @@
+/* GNUPLOT - pc.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Under Microsoft C
+ *      cga, egabios, egalib, vgabios, hercules, corona325, att
+ *  Under Turboc C
+ *      egalib, vgalib, vgamono, mcga, cga, hercules
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams, William Wilson, Russell Lang
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
 #ifdef __TURBOC__
 #include <graphics.h>
 #include <dos.h>
-#include <string.h>
   int g_driver, g_mode, g_error;
   char far *path;
   char *pathp, path_s[128];
 
+/* instead of string.h */
+extern char *strrchr();
+
 get_path()
 {
-   path=getenv("BGI");
+   path=(char far *) getenv("BGI");
    if (path==NULL) {
-      strcpy(path_s,_argv[0]);
+      (void) strcpy(path_s,_argv[0]);
       pathp=strrchr(path_s,'\\');
       *pathp=0x00;
       path=path_s;
@@ -19,23 +52,6 @@ get_path()
 
 #endif
 
-/* all of the Turbo C routines for the different graphics devices go here */
-
-#define EGALIB_XMAX 640
-#define EGALIB_YMAX 350
-
-#define EGALIB_XLAST (EGA_XMAX - 1)
-#define EGALIB_YLAST (EGA_YMAX - 1)
-
-#define EGALIB_VCHAR 14
-#define EGALIB_HCHAR 8
-#define EGALIB_VTIC 4
-#define EGALIB_HTIC 5
-
-static int ega64color[] =  {1,1,5,4,3,5,4,3, 5, 4, 3, 5, 4, 3,5};
-static int ega256color[] = {1,8,2,3,4,5,9,14,12,15,13,10,11,7,6};
-
-static int *egacolor;
 
 static char near buf[80];	/* kludge since EGA.LIB is compiled SMALL */
 
@@ -44,6 +60,10 @@ static int pattern[] = {0xffff, 0x0f0f, 0xffff, 0xaaaa, 0x3333, 0x3f3f, 0x0f0f};
 static int graphics_on = FALSE;
 int startx, starty;
 
+int pc_angle;
+#define PC_VCHAR 11
+#define PC_HCHAR 7
+
 pause()								/* press any key to continue... */
 {
 	while (kbhit())
@@ -52,32 +72,6 @@ pause()								/* press any key to continue... */
 		;
 }
 
-
-PC_lrput_text(row,str)
-int row;
-char str[];
-{
-#ifdef __TURBOC__
-	gotoxy(78-strlen(str),24-row);
-	puts(str);
-#else
-	PC_curloc(24-row,78-strlen(str));
-	PC_puts(str);
-#endif
-}
-
-PC_ulput_text(row,str)
-int row;
-char str[];
-{
-#ifdef __TURBOC__
-	gotoxy(2,row+1);
-	puts(str);
-#else
-	PC_curloc(row+1,2);
-	PC_puts(str);
-#endif
-}
 
 PC_text()
 {
@@ -100,226 +94,40 @@ PC_reset()
 }
 
 
-#ifdef __TURBOC__ 
+#ifndef __TURBOC__
 
-#define VGA_XMAX 640
-#define VGA_YMAX 480
-
-#define VGA_XLAST (VGA_XMAX - 1)
-#define VGA_YLAST (VGA_YMAX - 1)
-
-#define VGA_VCHAR 14
-#define VGA_HCHAR 8
-#define VGA_VTIC 4
-#define VGA_HTIC 5
-
-static int vga256color[] = {1,8,2,3,4,5,9,14,12,15,13,10,11,7,6};
-
-static int *vgacolor;
-
-VGA_init()
+PC_putc(x,y,c,angle,line_func)
+unsigned int x,y;
+char c;
+int angle;
+FUNC_PTR line_func;
 {
-	g_driver=VGA;
-	g_mode=2;
-        initgraph(&g_driver,&g_mode,path);
-        if(g_driver!=9){
-          term=0;
-          switch (g_driver){
-            case -2: fprintf(stderr,"Graphics card not detected.\n");
-                     break;
-            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
-                     break;
-            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
-                     break;
-            case -5: fprintf(stderr,"Insufficient memory to load ",
-                             "graphics driver.");
-                     break;
-            }
-            
-/*          int_error("color EGA board not found",NO_CARET);*/
-        }
-        if(g_driver==VGA) vgacolor=vga256color;
-}
-
-VGA_graphics()
-{       g_driver=VGA;
-	g_mode=2;
-	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
-}
-
-VGA_linetype(linetype)
-{
-	if (linetype >= 13)
-		linetype %= 13;
-	setcolor(vgacolor[linetype+2]);
-}
-
-VGA_lrput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	outtextxy(630-(strlen(str)*8),450-row*16,buf);
-}
-
-#define VGA_reset EGALIB_reset
-#define VGA_text EGALIB_text
-#define VGA_move EGALIB_move
-#define VGA_vector EGALIB_vector
-#define VGA_ulput_text EGALIB_ulput_text
-
-VGAMONO_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-	setlinestyle(4,pattern[linetype+2],1);
-}
-
-#define MCGA_XMAX 640
-#define MCGA_YMAX 480
-
-#define MCGA_XLAST (MCGA_XMAX - 1)
-#define MCGA_YLAST (MCGA_YMAX - 1)
-
-#define MCGA_VCHAR 14
-#define MCGA_HCHAR 8
-#define MCGA_VTIC 4
-#define MCGA_HTIC 5
-
-static int *MCGAcolor;
-
-MCGA_init()
-{
-	g_driver=MCGA;
-	g_mode=5;
-        initgraph(&g_driver,&g_mode,path);
-        if(g_driver!=2){
-          term=0;
-          switch (g_driver){
-            case -2: fprintf(stderr,"Graphics card not detected.\n");
-                     break;
-            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
-                     break;
-            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
-                     break;
-            case -5: fprintf(stderr,"Insufficient memory to load ",
-                             "graphics driver.");
-                     break;
-            }
-            
-        }
-}
-
-MCGA_graphics()
-{       g_driver=MCGA;
-	g_mode=5;
-	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
-}
-
-
-MCGA_lrput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	outtextxy(630-(strlen(str)*8),450-row*16,buf);
-}
-
-#define MCGA_reset EGALIB_reset
-#define MCGA_text EGALIB_text
-#define MCGA_move EGALIB_move
-#define MCGA_vector EGALIB_vector
-#define MCGA_ulput_text EGALIB_ulput_text
-
-MCGA_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-	setlinestyle(4,pattern[linetype+2],1);
-}
-
-
-EGALIB_init()
-{
-	g_driver=EGA;
-	g_mode=1;
-        initgraph(&g_driver,&g_mode,path);
-        if(g_driver<3 || g_driver>4){
-          term=0;
-          switch (g_driver){
-            case -2: fprintf(stderr,"Graphics card not detected.\n");
-                     break;
-            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
-                     break;
-            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
-                     break;
-            case -5: fprintf(stderr,"Insufficient memory to load ",
-                             "graphics driver.");
-                     break;
-            }
-            
-/*          int_error("color EGA board not found",NO_CARET);*/
-        }
-        if(g_driver==EGA) egacolor=ega256color;
-        if(g_driver==EGA64) egacolor=ega64color;
-}
-
-EGALIB_graphics()
-{
-	graphics_on = TRUE;
-	initgraph(&g_driver,&g_mode,path);
-}
-
-EGALIB_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
+int i,j,k;
+unsigned int pixelon;
+	i = (int)(c) - 32;
+	for (j=0; j<9; j++) {
+		for (k=0; k<5; k++) {
+			pixelon = (((unsigned int)(font5x7[i][j])) >> k & 1);
+			if (pixelon) {
+				switch(angle) {
+					case 0 : line_func(x+k+1,y-j,x+k+1,y-j);
+							break;
+					case 1 : line_func(x-j,y-k-1,x-j,y-k-1);
+							break;
+				}
+			}
+		}
 	}
-	closegraph();
 }
 
-EGALIB_linetype(linetype)
+
+int PC_text_angle(ang)
+int ang;
 {
-	if (linetype >= 13)
-		linetype %= 13;
-	setcolor(egacolor[linetype+2]);
+	pc_angle=ang;
+	return TRUE;
 }
 
-EGALIB_move(x,y)
-{
-        moveto(x,getmaxy()-y);
-}
-
-
-EGALIB_vector(x,y)
-{
-	lineto(x,getmaxy()-y);
-}
-
-
-EGALIB_lrput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	outtextxy(630-(strlen(str)*8),320-row*16,buf);
-}
-
-EGALIB_ulput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	outtextxy(10,row*16+16,buf);
-}
-
-EGALIB_reset()
-{
-  	closegraph();
-}
 
 #define CGA_XMAX 640
 #define CGA_YMAX 200
@@ -327,232 +135,12 @@ EGALIB_reset()
 #define CGA_XLAST (CGA_XMAX - 1)
 #define CGA_YLAST (CGA_YMAX - 1)
 
-#define CGA_VCHAR 8
-#define CGA_HCHAR 8
-#define CGA_VTIC 2
-#define CGA_HTIC 3
+#define CGA_VCHAR PC_VCHAR
+#define CGA_HCHAR PC_HCHAR
+#define CGA_VTIC 4
+#define CGA_HTIC 6
 
-CGA_init()
-{
-	g_driver=CGA;
-	g_mode=4;
-	initgraph(&g_driver,&g_mode,path);
-          switch (g_driver){
-            case -2: fprintf(stderr,"Graphics card not detected.\n");
-                     break;
-            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
-                     break;
-            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
-                     break;
-            case -5: fprintf(stderr,"Insufficient memory to load ",
-                             "graphics driver.");
-                     break;
-            }
-/*	PC_color(1);		 monochrome */
-
-}
-
-CGA_graphics()
-{
-	graphics_on = TRUE;
-	g_driver=CGA;
-	g_mode=4;
-	initgraph(&g_driver,&g_mode,path);
-	/*	Vmode(6);*/
-}
-
-#define CGA_text PC_text
-
-CGA_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-/*	PC_mask(pattern[linetype+2]); */
-	setlinestyle(4,pattern[linetype+2],1);
-}
-
-CGA_move(x,y)
-{
-	moveto(x,y);
-}
-
-
-CGA_vector(x,y)
-{
-	lineto(x,y);
-}
-
-#define CGA_lrput_text PC_lrput_text
-#define CGA_ulput_text PC_ulput_text
-
-
-#define CGA_reset PC_reset
-
-#define HERC_XMAX 720
-#define HERC_YMAX 348
-
-#define HERC_XLAST (HERC_XMAX - 1)
-#define HERC_YLAST (HERC_YMAX - 1)
-
-#define HERC_VCHAR 8
-#define HERC_HCHAR 8
-#define HERC_VTIC 4
-#define HERC_HTIC 4
-
-HERC_init()
-{
-	g_driver=HERCMONO;
-	g_mode=0;
-  	initgraph(&g_driver,&g_mode,path);
-          switch (g_driver){
-            case -2: fprintf(stderr,"Graphics card not detected.\n");
-                     break;
-            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
-                     break;
-            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
-                     break;
-            case -5: fprintf(stderr,"Insufficient memory to load ",
-                             "graphics driver.");
-                     break;
-            }
-}
-
-HERC_graphics()
-{
-	g_driver=HERCMONO;
-	g_mode=0;
-	initgraph(&g_driver,&g_mode,path);
-	graphics_on = TRUE;
-}
-
-HERC_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	closegraph();
-}
-
-HERC_linetype(linetype)
-{
-	if (linetype >= 5)
-		linetype %= 5;
-
-	setlinestyle(linetype,0,1);
-}
-
-HERC_move(x,y)
-{
-	if (x < 0)
-		x = 0;
-	else if (x > HERC_XLAST)
-		x = HERC_XLAST;
-
-	if (y < 0)
-		y = 0;
-	else if (y > HERC_YLAST)
-		y = HERC_YLAST;
-	moveto(x,y);
-}
-
-HERC_vector(x,y)
-{
-	if (x < 0)
-		x = 0;
-	else if (x > HERC_XLAST)
-		x = HERC_XLAST;
-	if (y < 0)
-		y = 0;
-	else if (y > HERC_YLAST)
-		y = HERC_YLAST;
-
-	lineto(x,y);
-}
-
-/*
-   Thanks to James Dugal (jpd@usl.edu) for patching these two HERC 
-   routines.  (We need to remove the OLD (probably bad) code someday.)
-*/
-
-HERC_lrput_text(row,str)
-int row;
-char str[];
-{
-#ifdef OLDHERC
-    gotoxy(79-strlen(str),24-row);
-    puts(str);
-#else
-    strcpy((char far *)buf,str);
-    outtextxy(710-(strlen(str)*8),318-row*10,buf);
-#endif
-}
-
-HERC_ulput_text(row,str)
-int row;
-char str[];
-{
-#ifdef OLDHERC
-    gotoxy(2,row+1);
-    puts(str);
-#else
-    strcpy((char far *)buf,str);
-    outtextxy(10,row*10+10,buf);
-#endif
-}
-
-#define HERC_reset PC_reset
-
-
-#else
-
-pause()								/* press any key to continue... */
-{
-	while (kbhit())
-		(void) getch();				/* flush the keyboard buffer */
-	while (!kbhit())
-		;
-}
-
-
-PC_lrput_text(row,str)
-int row;
-char str[];
-{
-	PC_curloc(24-row,78-strlen(str));
-	PC_puts(str);
-}
-
-PC_ulput_text(row,str)
-int row;
-char str[];
-{
-	PC_curloc(row+1,2);
-	PC_puts(str);
-}
-
-PC_text()
-{
-	if (graphics_on) {
-		graphics_on = FALSE;
-		pause();
-	}
-	Vmode(3);
-}
-
-PC_reset()
-{
-}
-#define CGA_XMAX 640
-#define CGA_YMAX 200
-
-#define CGA_XLAST (CGA_XMAX - 1)
-#define CGA_YLAST (CGA_YMAX - 1)
-
-#define CGA_VCHAR 8
-#define CGA_HCHAR 8
-#define CGA_VTIC 2
-#define CGA_HTIC 3
+int line_cga;
 
 CGA_init()
 {
@@ -571,6 +159,7 @@ CGA_linetype(linetype)
 {
 	if (linetype >= 5)
 		linetype %= 5;
+	line_cga=linetype;
 	PC_mask(pattern[linetype+2]);
 }
 
@@ -588,9 +177,35 @@ CGA_vector(x,y)
 	starty = y;
 }
 
-#define CGA_lrput_text PC_lrput_text
-#define CGA_ulput_text PC_ulput_text
 
+CGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+int line;
+	line= line_cga; 	/* disable the dotted lines temporarily */
+	PC_mask(pattern[0]);
+	switch(pc_angle) {
+		case 0 : y -= CGA_VCHAR/2;
+				break;
+		case 1 : x += CGA_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,CGA_YLAST-y,str[i],pc_angle,PC_line);
+		switch(pc_angle) {
+			case 0 : x+=CGA_HCHAR ;
+					break;
+			case 1 : y+=CGA_HCHAR ;
+					break;
+		}
+	}
+	PC_mask(pattern[line]);  /* enable dotted lines */
+}
+
+
+#define CGA_text_angle PC_text_angle
 
 #define CGA_reset PC_reset
 
@@ -601,13 +216,13 @@ CGA_vector(x,y)
 #define EGA_XLAST (EGA_XMAX - 1)
 #define EGA_YLAST (EGA_YMAX - 1)
 
-#define EGA_VCHAR 14
-#define EGA_HCHAR 8
-#define EGA_VTIC 5
+#define EGA_VCHAR PC_VCHAR
+#define EGA_HCHAR PC_HCHAR
+#define EGA_VTIC 4
 #define EGA_HTIC 5
 
 static int ega64color[] =  {1,1,5,4,3,5,4,3, 5, 4, 3, 5, 4, 3,5};
-static int ega256color[] = {1,8,2,3,4,5,9,14,12,15,13,10,11,7,6};
+static int ega256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
 
 static int *egacolor;
 
@@ -646,11 +261,116 @@ EGA_vector(x,y)
 	starty = y;
 }
 
-#define EGA_lrput_text PC_lrput_text
-#define EGA_ulput_text PC_ulput_text
 
+EGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+	switch(pc_angle) {
+		case 0 : y -= EGA_VCHAR/2;
+				break;
+		case 1 : x += EGA_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,EGA_YLAST-y,str[i],pc_angle,PC_line);
+		switch(pc_angle) {
+			case 0 : x+=EGA_HCHAR ;
+					break;
+			case 1 : y+=EGA_HCHAR ;
+					break;
+		}
+	}
+}
+
+
+#define EGA_text_angle PC_text_angle
 
 #define EGA_reset PC_reset
+
+
+
+/* The following VGA routines are hacked from the above EGA routines
+   They worked on two VGA cards.  
+   Russell Lang, eln272v@monu1.cc.monash.oz */
+#define VGA_XMAX 640
+#define VGA_YMAX 480
+
+#define VGA_XLAST (VGA_XMAX - 1)
+#define VGA_YLAST (VGA_YMAX - 1)
+
+#define VGA_VCHAR PC_VCHAR
+#define VGA_HCHAR PC_HCHAR
+#define VGA_VTIC 5
+#define VGA_HTIC 5
+
+static int vga256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+
+static int *vgacolor;
+
+
+VGA_init()
+{
+	PC_mask(0xffff);
+	vgacolor = vga256color;		/* should be smarter */
+}
+
+VGA_graphics()
+{
+	graphics_on = TRUE;
+	Vmode(18);
+}
+
+#define VGA_text PC_text
+
+VGA_linetype(linetype)
+{
+	if (linetype >= 13)
+		linetype %= 13;
+	PC_color(vgacolor[linetype+2]);
+}
+
+VGA_move(x,y)
+{
+	startx = x;
+	starty = y;
+}
+
+VGA_vector(x,y)
+{
+	PC_line(startx,VGA_YLAST-starty,x,VGA_YLAST-y);
+	startx = x;
+	starty = y;
+}
+
+
+VGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+	switch(pc_angle) {
+		case 0 : y -= VGA_VCHAR/2;
+				break;
+		case 1 : x += VGA_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,VGA_YLAST-y,str[i],pc_angle,PC_line);
+		switch(pc_angle) {
+			case 0 : x+=VGA_HCHAR ;
+					break;
+			case 1 : y+=VGA_HCHAR ;
+					break;
+		}
+	}
+}
+
+
+#define VGA_text_angle PC_text_angle
+
+#define VGA_reset PC_reset
 
 
 
@@ -713,23 +433,16 @@ EGALIB_vector(x,y)
 }
 
 
-EGALIB_lrput_text(row,str)
-int row;
-char str[];
+EGALIB_put_text(x,y,str)
+int x, y;
+char *str;
 {
 	strcpy((char far *)buf,str);
-	GotoXY(78-strlen(str),24-row);
+	GotoXY((int)(x/EGALIB_HCHAR),
+		   (int)((EGALIB_YMAX-y-(EGALIB_VCHAR/2))/EGALIB_VCHAR));
 	gprintf(buf);
 }
 
-EGALIB_ulput_text(row,str)
-int row;
-char str[];
-{
-	strcpy((char far *)buf,str);
-	GotoXY(2,row+1);
-	gprintf(buf);
-}
 
 #define EGALIB_reset PC_reset
 
@@ -744,14 +457,16 @@ char str[];
 #define HERC_XLAST (HERC_XMAX - 1)
 #define HERC_YLAST (HERC_YMAX - 1)
 
-#define HERC_VCHAR 8
-#define HERC_HCHAR 8
+#define HERC_VCHAR PC_VCHAR
+#define HERC_HCHAR PC_HCHAR
 #define HERC_VTIC 4
-#define HERC_HTIC 4
+#define HERC_HTIC 5
 
+int line_herc;
 
 HERC_init()
 {
+	H_init();
 }
 
 HERC_graphics()
@@ -774,6 +489,7 @@ HERC_linetype(linetype)
 	if (linetype >= 5)
 		linetype %= 5;
 	H_mask(pattern[linetype+2]);
+	line_herc = linetype;
 }
 
 HERC_move(x,y)
@@ -809,21 +525,38 @@ HERC_vector(x,y)
 	starty = y;
 }
 
-HERC_lrput_text(row,str)
-int row;
-char str[];
+
+HERC_put_text(x,y,str)
+unsigned int x, y;
+char *str;
 {
-	H_puts(str, 41-row, 87-strlen(str));
+int i;
+int line;
+	line= line_herc; 	/* disable the dotted lines temporarily */
+	H_mask(pattern[0]);
+	switch(pc_angle) {
+		case 0 : y -= HERC_VCHAR/2;
+				break;
+		case 1 : x += HERC_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,HERC_YLAST-y,str[i],pc_angle,H_line);
+		switch(pc_angle) {
+			case 0 : x+=HERC_HCHAR ;
+					break;
+			case 1 : y+=HERC_HCHAR ;
+					break;
+		}
+	}
+	H_mask(pattern[line]);  /* enable dotted lines */
 }
 
-HERC_ulput_text(row,str)
-int row;
-char str[];
-{
-	H_puts(str, row+1, 2);
-}
+
+#define HERC_text_angle PC_text_angle
 
 #define HERC_reset PC_reset
+
 
 #endif /* HERCULES */
 
@@ -840,10 +573,10 @@ char str[];
 #define ATT_XLAST (ATT_XMAX - 1)
 #define ATT_YLAST (ATT_YMAX - 1)
 
-#define ATT_VCHAR 8
-#define ATT_HCHAR 8
-#define ATT_VTIC 3
-#define ATT_HTIC 3
+#define ATT_VCHAR PC_VCHAR
+#define ATT_HCHAR PC_HCHAR
+#define ATT_VTIC 4
+#define ATT_HTIC 5
 
 #define ATT_init CGA_init
 
@@ -866,9 +599,35 @@ ATT_vector(x,y)
 	starty = y;
 }
 
-#define ATT_lrput_text PC_lrput_text
-#define ATT_ulput_text PC_ulput_text
 
+ATT_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+int line;
+	line= line_cga; 	/* disable the dotted lines temporarily */
+	PC_mask(pattern[0]);
+	switch(pc_angle) {
+		case 0 : y -= ATT_VCHAR/2;
+				break;
+		case 1 : x += ATT_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,ATT_YLAST-y,str[i],pc_angle,PC_line);
+		switch(pc_angle) {
+			case 0 : x+=ATT_HCHAR ;
+					break;
+			case 1 : y+=ATT_HCHAR ;
+					break;
+		}
+	}
+	PC_mask(pattern[line]);  /* enable dotted lines */
+}
+
+
+#define ATT_text_angle PC_text_angle
 
 #define ATT_reset CGA_reset
 
@@ -883,11 +642,12 @@ ATT_vector(x,y)
 #define COR_XLAST (COR_XMAX - 1)
 #define COR_YLAST (COR_YMAX - 1)
 
-#define COR_VCHAR 13
-#define COR_HCHAR 8
+#define COR_VCHAR PC_VCHAR
+#define COR_HCHAR PC_HCHAR
 #define COR_VTIC 4
-#define COR_HTIC 4
+#define COR_HTIC 5
 
+int line_cor;
 
 static int corscreen;		/* screen number, 0 - 7 */
 
@@ -922,6 +682,7 @@ COR_linetype(linetype)
 {
 	if (linetype >= 5)
 		linetype %= 5;
+	line_cor = linetype;
 	Cor_mask(pattern[linetype+2]);
 }
 
@@ -958,12 +719,484 @@ COR_vector(x,y)
 	starty = y;
 }
 
-#define COR_lrput_text PC_lrput_text
-#define COR_ulput_text PC_ulput_text
+
+COR_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+int i;
+int line;
+	line= line_cor; 	/* disable the dotted lines temporarily */
+	Cor_mask(pattern[0]);
+	switch(pc_angle) {
+		case 0 : y -= COR_VCHAR/2;
+				break;
+		case 1 : x += COR_VCHAR/2;
+				break;
+	}
+	for (i=0;str[i];i++) {
+		PC_putc(x,COR_YLAST-y,str[i],pc_angle,Cor_line);
+		switch(pc_angle) {
+			case 0 : x+=COR_HCHAR ;
+					break;
+			case 1 : y+=COR_HCHAR ;
+					break;
+		}
+	}
+	COR_mask(pattern[line]);  /* enable dotted lines */
+}
+
+
+#define COR_text_angle PC_text_angle
 
 #define COR_reset PC_reset
 
 #endif /* CORONA */
 
-#endif /* __TURBOC__ */
+
+#else /* ifndef __TURBOC__ */
+/* all of the Turbo C routines for the different graphics devices go here */
+
+int PC_text_angle(ang)
+int ang;
+{
+	pc_angle = ang;
+	switch (ang) {
+		case 0 : settextstyle(DEFAULT_FONT,HORIZ_DIR,1);
+			break;
+		case 1 : settextstyle(DEFAULT_FONT,VERT_DIR,1);
+			break;
+	}
+	return TRUE;
+}
+
+int PC_justify_text(mode)
+enum JUSTIFY mode;
+{
+	switch(mode) {
+		case LEFT :
+			settextjustify(LEFT_TEXT,CENTER_TEXT);
+			break;
+		case CENTRE :
+			settextjustify(CENTER_TEXT,CENTER_TEXT);
+			break;
+		case RIGHT:
+			settextjustify(RIGHT_TEXT,CENTER_TEXT);
+			break;
+	}
+	return TRUE;
+}
+
+
+#define VGA_XMAX 640
+#define VGA_YMAX 480
+
+#define VGA_XLAST (VGA_XMAX - 1)
+#define VGA_YLAST (VGA_YMAX - 1)
+
+#define VGA_VCHAR 10
+#define VGA_HCHAR 8
+#define VGA_VTIC 4
+#define VGA_HTIC 5
+
+static int vga256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+
+static int *vgacolor;
+
+#define VGA_reset EGALIB_reset
+#define VGA_text EGALIB_text
+#define VGA_move EGALIB_move
+#define VGA_vector EGALIB_vector
+#define VGA_text_angle PC_text_angle
+#define VGA_justify_text PC_justify_text
+
+VGA_init()
+{
+	g_driver=VGA;
+	g_mode=2;
+        initgraph(&g_driver,&g_mode,path);
+        if(g_driver!=9){
+          term=0;
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+            
+/*          int_error("color VGA board not found",NO_CARET);*/
+        }
+        if(g_driver==VGA) vgacolor=vga256color;
+}
+
+VGA_graphics()
+{       g_driver=VGA;
+	g_mode=2;
+	graphics_on = TRUE;
+	initgraph(&g_driver,&g_mode,path);
+	VGA_justify_text(LEFT);
+}
+
+VGA_linetype(linetype)
+{
+	if (linetype >= 13)
+		linetype %= 13;
+	setcolor(vgacolor[linetype+2]);
+}
+
+VGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,VGA_YLAST-y,buf);
+}
+
+
+VGAMONO_linetype(linetype)
+{
+	if (linetype >= 5)
+		linetype %= 5;
+	setlinestyle(4,pattern[linetype+2],1);
+}
+
+#define MCGA_XMAX 640
+#define MCGA_YMAX 480
+
+#define MCGA_XLAST (MCGA_XMAX - 1)
+#define MCGA_YLAST (MCGA_YMAX - 1)
+
+#define MCGA_VCHAR 10
+#define MCGA_HCHAR 8
+#define MCGA_VTIC 4
+#define MCGA_HTIC 5
+
+static int *MCGAcolor;
+
+#define MCGA_reset EGALIB_reset
+#define MCGA_text EGALIB_text
+#define MCGA_move EGALIB_move
+#define MCGA_vector EGALIB_vector
+#define MCGA_text_angle PC_text_angle
+#define MCGA_justify_text PC_justify_text
+
+MCGA_init()
+{
+	g_driver=MCGA;
+	g_mode=5;
+        initgraph(&g_driver,&g_mode,path);
+        if(g_driver!=2){
+          term=0;
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+            
+        }
+}
+
+MCGA_graphics()
+{       g_driver=MCGA;
+	g_mode=5;
+	graphics_on = TRUE;
+	initgraph(&g_driver,&g_mode,path);
+	MCGA_justify_text(LEFT);
+}
+
+
+MCGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,MCGA_YLAST-y,buf);
+}
+
+
+MCGA_linetype(linetype)
+{
+	if (linetype >= 5)
+		linetype %= 5;
+	setlinestyle(4,pattern[linetype+2],1);
+}
+
+
+#define EGALIB_XMAX 640
+#define EGALIB_YMAX 350
+
+#define EGALIB_XLAST (EGALIB_XMAX - 1)
+#define EGALIB_YLAST (EGALIB_YMAX - 1)
+
+#define EGALIB_VCHAR 10
+#define EGALIB_HCHAR 8
+#define EGALIB_VTIC 4
+#define EGALIB_HTIC 5
+
+static int ega64color[] =  {1,1,5,4,3,5,4,3, 5, 4, 3, 5, 4, 3,5};
+static int ega256color[] = {7,8,2,3,4,5,9,14,12,15,13,10,11,1,6};
+
+static int *egacolor;
+
+#define EGALIB_text_angle PC_text_angle
+#define EGALIB_justify_text PC_justify_text
+
+EGALIB_init()
+{
+	g_driver=EGA;
+	g_mode=1;
+        initgraph(&g_driver,&g_mode,path);
+        if(g_driver<3 || g_driver>4){
+          term=0;
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+            
+/*          int_error("color EGA board not found",NO_CARET);*/
+        }
+        if(g_driver==EGA) egacolor=ega256color;
+        if(g_driver==EGA64) egacolor=ega64color;
+}
+
+EGALIB_graphics()
+{
+	graphics_on = TRUE;
+	initgraph(&g_driver,&g_mode,path);
+	EGALIB_justify_text(LEFT);
+}
+
+EGALIB_text()
+{
+	if (graphics_on) {
+		graphics_on = FALSE;
+		pause();
+	}
+	closegraph();
+}
+
+EGALIB_linetype(linetype)
+{
+	if (linetype >= 13)
+		linetype %= 13;
+	setcolor(egacolor[linetype+2]);
+}
+
+EGALIB_move(x,y)
+{
+        moveto(x,getmaxy()-y);
+}
+
+
+EGALIB_vector(x,y)
+{
+	lineto(x,getmaxy()-y);
+}
+
+
+EGALIB_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,EGALIB_YLAST-y,buf);
+}
+
+
+EGALIB_reset()
+{
+  	closegraph();
+}
+
+
+#define CGA_XMAX 640
+#define CGA_YMAX 200
+
+#define CGA_XLAST (CGA_XMAX - 1)
+#define CGA_YLAST (CGA_YMAX - 1)
+
+#define CGA_VCHAR 10
+#define CGA_HCHAR 8
+#define CGA_VTIC 4
+#define CGA_HTIC 6
+
+#define CGA_text_angle PC_text_angle
+#define CGA_justify_text PC_justify_text
+#define CGA_reset PC_reset
+
+CGA_init()
+{
+	g_driver=CGA;
+	g_mode=4;
+	initgraph(&g_driver,&g_mode,path);
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+/*	PC_color(1);		 monochrome */
+
+}
+
+CGA_graphics()
+{
+	graphics_on = TRUE;
+	g_driver=CGA;
+	g_mode=4;
+	initgraph(&g_driver,&g_mode,path);
+	CGA_justify_text(LEFT);
+	/*	Vmode(6);*/
+}
+
+#define CGA_text PC_text
+
+CGA_linetype(linetype)
+{
+	if (linetype >= 5)
+		linetype %= 5;
+	setlinestyle(4,pattern[linetype+2],1);
+}
+
+CGA_move(x,y)
+{
+	moveto(x,getmaxy()-y);
+}
+
+
+CGA_vector(x,y)
+{
+	lineto(x,getmaxy()-y);
+}
+
+CGA_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,CGA_YLAST-y,buf);
+}
+
+
+
+#define HERC_XMAX 720
+#define HERC_YMAX 348
+
+#define HERC_XLAST (HERC_XMAX - 1)
+#define HERC_YLAST (HERC_YMAX - 1)
+
+#define HERC_VCHAR 10
+#define HERC_HCHAR 8
+#define HERC_VTIC 4
+#define HERC_HTIC 5
+
+#define HERC_text_angle PC_text_angle
+#define HERC_justify_text PC_justify_text
+#define HERC_reset PC_reset
+
+HERC_init()
+{
+	g_driver=HERCMONO;
+	g_mode=0;
+  	initgraph(&g_driver,&g_mode,path);
+          switch (g_driver){
+            case -2: fprintf(stderr,"Graphics card not detected.\n");
+                     break;
+            case -3: fprintf(stderr,"BGI driver file cannot be found.\n");
+                     break;
+            case -4: fprintf(stderr,"Invalid BGI driver file.\n");
+                     break;
+            case -5: fprintf(stderr,"Insufficient memory to load ",
+                             "graphics driver.");
+                     break;
+            }
+}
+
+HERC_graphics()
+{
+	g_driver=HERCMONO;
+	g_mode=0;
+	initgraph(&g_driver,&g_mode,path);
+	HERC_justify_text(LEFT);
+	graphics_on = TRUE;
+}
+
+HERC_text()
+{
+	if (graphics_on) {
+		graphics_on = FALSE;
+		pause();
+	}
+	closegraph();
+}
+
+HERC_linetype(linetype)
+{
+	if (linetype >= 5)
+		linetype %= 5;
+	setlinestyle(4,pattern[linetype+2],1);
+}
+
+HERC_move(x,y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x > HERC_XLAST)
+		x = HERC_XLAST;
+
+	if (y < 0)
+		y = 0;
+	else if (y > HERC_YLAST)
+		y = HERC_YLAST;
+	moveto(x,getmaxy()-y);
+}
+
+HERC_vector(x,y)
+{
+	if (x < 0)
+		x = 0;
+	else if (x > HERC_XLAST)
+		x = HERC_XLAST;
+	if (y < 0)
+		y = 0;
+	else if (y > HERC_YLAST)
+		y = HERC_YLAST;
+
+	lineto(x,getmaxy()-y);
+}
+
+
+HERC_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+	strcpy((char far *)buf,str);
+	outtextxy(x,HERC_YLAST-y,buf);
+}
+
+
+#endif /* ifndef __TURBOC__ */
 

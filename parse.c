@@ -2,7 +2,7 @@
  *
  *    G N U P L O T  --  parse.c
  *
- *  Copyright (C) 1986, 1987  Colin Kelley, Thomas Williams
+ *  Copyright (C) 1986 Colin Kelley, Thomas Williams
  *
  *  You may use this code as you wish if credit is given and this message
  *  is retained.
@@ -25,41 +25,29 @@ extern BOOLEAN undefined;
 extern int errno;
 #endif
 
+extern int next_function,c_function /* next available space in udft */;
 extern int num_tokens,c_token;
 extern struct lexical_unit token[];
-extern char c_dummy_var[];			/* name of current dummy variable */
-extern struct udft_entry *dummy_func;	/* pointer to dummy variable's func */
-
-char *malloc();
+extern char dummy_var[];
+extern struct at_type *curr_at;
 
 struct value *pop(),*integer(),*complex();
-struct at_type *temp_at(), *perm_at();
-struct udft_entry *add_udf();
-struct udvt_entry *add_udv();
-union argument *add_action();
 
-struct at_type at;
+static struct at_type temp_at;
 static jmp_buf fpe_env;
 
 #define dummy (struct value *) 0
-#ifdef __TURBOC__
-void fpe(int xXx)
-#else
+
 fpe()
-#endif
 {
-#ifdef PC	/* thanks to lotto@wjh12.UUCP for telling us about this  */
-	_fpreset();
-#endif
 	(void) signal(SIGFPE, fpe);
 	undefined = TRUE;
 	longjmp(fpe_env, TRUE);
 }
 
-
-evaluate_at(at_ptr,val_ptr)
-struct at_type *at_ptr;
-struct value *val_ptr;
+evaluate_at(at,valptr)
+struct at_type *at;
+struct value *valptr;
 {
 	undefined = FALSE;
 	errno = 0;
@@ -68,14 +56,14 @@ struct value *val_ptr;
 		return;				/* just bail out */
 	(void) signal(SIGFPE, fpe);	/* catch core dumps on FPEs */
 
-	execute_at(at_ptr);
+	execute_at(at);
 
 	(void) signal(SIGFPE, SIG_DFL);
 
 	if (errno == EDOM || errno == ERANGE) {
 		undefined = TRUE;
 	} else {
-		(void) pop(val_ptr);
+		(void) pop(valptr);
 		check_stack();
 	}
 }
@@ -88,7 +76,8 @@ struct value *valptr;
 register int tkn = c_token;
 	if (END_OF_COMMAND)
 		int_error("constant expression required",c_token);
-	evaluate_at(temp_at(),valptr);	/* run it and send answer back */
+	build_at(&temp_at);	/* make a temporary action table */
+	evaluate_at(&temp_at,valptr);	/* run it and send answer back */
 	if (undefined) {
 		int_error("undefined value",tkn);
 	}
@@ -96,44 +85,13 @@ register int tkn = c_token;
 }
 
 
-struct at_type *
-temp_at()	/* build a static action table and return its pointer */
+build_at(at)	/* build full expressions */
+struct at_type *at;
 {
-	at.a_count = 0;		/* reset action table !!! */
+	curr_at = at;		/* set global variable */
+	curr_at->count = 0;		/* reset action table !!! */
 	express();
-	return(&at);
 }
-
-
-/* build an action table, put it in dynamic memory, and return its pointer */
-
-struct at_type *
-perm_at()
-{
-register struct at_type *at_ptr;
-register unsigned int len;
-
-	(void) temp_at();
-	len = sizeof(struct at_type) -
-		(MAX_AT_LEN - at.a_count)*sizeof(struct at_entry);
-	if (at_ptr = (struct at_type *) malloc(len))
-		(void) memcpy(at_ptr,&at,len);
-	return(at_ptr);
-}
-
-
-#ifdef NOCOPY
-/*
- * cheap and slow version of memcpy() in case you don't have one
- */
-memcpy(dest,src,len)
-char *dest,*src;
-unsigned int len;
-{
-	while (len--)
-		*dest++ = *src++;
-}
-#endif /* NOCOPY */
 
 
 express()  /* full expressions */
@@ -142,7 +100,7 @@ express()  /* full expressions */
 	xterms();
 }
 
-xterm()  /* ? : expressions */
+xterm()  /* NEW!  ? : expressions */
 {
 	aterm();
 	aterms();
@@ -208,65 +166,63 @@ hterm()
 factor()
 {
 register int value;
+struct value a, real_value;
 
 	if (equals(c_token,"(")) {
 		c_token++;
 		express();
-		if (!equals(c_token,")"))
+		if (!equals(c_token,")")) 
 			int_error("')' expected",c_token);
 		c_token++;
 	}
 	else if (isnumber(c_token)) {
-		convert(&(add_action(PUSHC)->v_arg),c_token);
+		convert(&real_value,c_token);
 		c_token++;
+		add_action(PUSHC, &real_value);
 	}
 	else if (isletter(c_token)) {
 		if ((c_token+1 < num_tokens)  && equals(c_token+1,"(")) {
-			value = standard(c_token);
+		value = standard(c_token);
 			if (value) {	/* it's a standard function */
 				c_token += 2;
 				express();
 				if (!equals(c_token,")"))
 					int_error("')' expected",c_token);
 				c_token++;
-				(void) add_action(value);
+				add_action(value,dummy);
 			}
 			else {
-				value = c_token;
+				value = user_defined(c_token);
 				c_token += 2;
 				express();
-				if (!equals(c_token,")"))
+				if (!equals(c_token,")")) 
 					int_error("')' expected",c_token);
 				c_token++;
-				add_action(CALL)->udf_arg = add_udf(value);
+				add_action(CALL,integer(&a,value));
 			}
 		}
 		else {
-			if (equals(c_token,c_dummy_var)) {
+			if (equals(c_token,dummy_var)) {
+				value = c_function;
 				c_token++;
-				add_action(PUSHD)->udf_arg = dummy_func;
+				add_action(PUSHD,integer(&a,value));
 			}
 			else {
-				add_action(PUSH)->udv_arg = add_udv(c_token);
+				value = add_value(c_token);
 				c_token++;
+				add_action(PUSH,integer(&a,value));
 			}
 		}
 	} /* end if letter */
 	else
 		int_error("invalid expression ",c_token);
 
-	/* add action code for ! (factorial) operator */
-	while (equals(c_token,"!")) {
-		c_token++;
-		(void) add_action(FACTORIAL);
-	}
 	/* add action code for ** operator */
 	if (equals(c_token,"**")) {
 			c_token++;
 			unary();
-			(void) add_action(POWER);
+			add_action(POWER,dummy);
 	}
-
 }
 
 
@@ -274,21 +230,14 @@ register int value;
 xterms()
 {  /* create action code for ? : expressions */
 
-	if (equals(c_token,"?")) {
-		register int savepc1, savepc2;
-		register union argument *argptr1,*argptr2;
+	while (equals(c_token,"?")) {
 		c_token++;
-		savepc1 = at.a_count;
-		argptr1 = add_action(JTERN);
 		express();
-		if (!equals(c_token,":"))
+		if (!equals(c_token,":")) 
 			int_error("expecting ':'",c_token);
 		c_token++;
-		savepc2 = at.a_count;
-		argptr2 = add_action(JUMP);
-		argptr1->j_arg = at.a_count - savepc1;
 		express();
-		argptr2->j_arg = at.a_count - savepc2;
+		add_action(TERNIARY,dummy);
 	}
 }
 
@@ -297,14 +246,9 @@ aterms()
 {  /* create action codes for || operator */
 
 	while (equals(c_token,"||")) {
-		register int savepc;
-		register union argument *argptr;
 		c_token++;
-		savepc = at.a_count;
-		argptr = add_action(JUMPNZ);	/* short-circuit if already TRUE */
 		aterm();
-		argptr->j_arg = at.a_count - savepc;/* offset for jump */
-		(void) add_action(BOOL);
+		add_action(LOR,dummy);
 	}
 }
 
@@ -313,14 +257,9 @@ bterms()
 { /* create action code for && operator */
 
 	while (equals(c_token,"&&")) {
-		register int savepc;
-		register union argument *argptr;
 		c_token++;
-		savepc = at.a_count;
-		argptr = add_action(JUMPZ);	/* short-circuit if already FALSE */
 		bterm();
-		argptr->j_arg = at.a_count - savepc;/* offset for jump */
-		(void) add_action(BOOL);
+		add_action(LAND,dummy);
 	}
 }
 
@@ -331,7 +270,7 @@ cterms()
 	while (equals(c_token,"|")) {
 		c_token++;
 		cterm();
-		(void) add_action(BOR);
+		add_action(BOR,dummy);
 	}
 }
 
@@ -342,7 +281,7 @@ dterms()
 	while (equals(c_token,"^")) {
 		c_token++;
 		dterm();
-		(void) add_action(XOR);
+		add_action(XOR,dummy);
 	}
 }
 
@@ -353,7 +292,7 @@ eterms()
 	while (equals(c_token,"&")) {
 		c_token++;
 		eterm();
-		(void) add_action(BAND);
+		add_action(BAND,dummy);
 	}
 }
 
@@ -365,12 +304,12 @@ fterms()
 		if (equals(c_token,"==")) {
 			c_token++;
 			fterm();
-			(void) add_action(EQ);
+			add_action(EQ,dummy);
 		}
 		else if (equals(c_token,"!=")) {
 			c_token++;
-			fterm();
-			(void) add_action(NE);
+			fterm(); 
+			add_action(NE,dummy); 
 		}
 		else break;
 	}
@@ -385,22 +324,22 @@ gterms()
 		if (equals(c_token,">")) {
 			c_token++;
 			gterm();
-			(void) add_action(GT);
+			add_action(GT,dummy);
 		}
 		else if (equals(c_token,"<")) {
 			c_token++;
 			gterm();
-			(void) add_action(LT);
+			add_action(LT,dummy);
 		}		
 		else if (equals(c_token,">=")) {
 			c_token++;
 			gterm();
-			(void) add_action(GE);
+			add_action(GE,dummy);
 		}
 		else if (equals(c_token,"<=")) {
 			c_token++;
 			gterm();
-			(void) add_action(LE);
+			add_action(LE,dummy);
 		}
 		else break;
 	}
@@ -416,12 +355,12 @@ hterms()
 			if (equals(c_token,"+")) {
 				c_token++;
 				hterm();
-				(void) add_action(PLUS);
+				add_action(PLUS,dummy);
 			}
 			else if (equals(c_token,"-")) {
 				c_token++;
 				hterm();
-				(void) add_action(MINUS);
+				add_action(MINUS,dummy);
 			}
 			else break;
 	}
@@ -435,17 +374,17 @@ iterms()
 			if (equals(c_token,"*")) {
 				c_token++;
 				unary();
-				(void) add_action(MULT);
+				add_action(MULT,dummy);
 			}
 			else if (equals(c_token,"/")) {
 				c_token++;
 				unary();
-				(void) add_action(DIV);
+				add_action(DIV,dummy);
 			}
 			else if (equals(c_token,"%")) {
 				c_token++;
 				unary();
-				(void) add_action(MOD);
+				add_action(MOD,dummy);
 			}
 			else break;
 	}
@@ -457,18 +396,18 @@ unary()
 	if (equals(c_token,"!")) {
 		c_token++;
 		unary();
-		(void) add_action(LNOT);
+		add_action(LNOT,dummy);
 	}
 	else if (equals(c_token,"~")) {
 		c_token++;
 		unary();
-		(void) add_action(BNOT);
+		add_action(BNOT,dummy);
 	}
 	else if (equals(c_token,"-")) {
 		c_token++;
 		unary();
-		(void) add_action(UMINUS);
+		add_action(UMINUS,dummy);
 	}
-	else
+	else 
 		factor();
 }

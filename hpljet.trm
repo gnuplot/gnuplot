@@ -1,3 +1,31 @@
+/* GNUPLOT - hpljet.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Hewlett-Packard Laserjet
+ *
+ * AUTHORS
+ *  Jyrki Yli-Nokari (jty@intrin.UUCP)
+ *
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
 /*
 ** Hewlett-Packard Laserjet
 ** Driver written and copyrighted 1987 by
@@ -10,25 +38,201 @@
 */
 
 /*
-** Here is the GNUPLOT HP Laserjet driver I promised to send to the net.
-** Following is a set of diffs to the GNUPLOT version V1.1 term.c
-** In case you don't have the patch program, you must insert the diffs
-** by hand. This should be fairly easy with a proper editor
-** since they are almost in one piece.
-**
-** Also there are some fixes to the HP26xx driver that was in the
-** V1.1 distribution.
-**
-** To get the laserjet driver, add -DHPLJET to TERMFLAGS in Makefile
-** (/DHPLJET in make.msc and HPLJET in compile.com).
-**
 ** The driver consists of two parts: general raster plotting routines
 ** (#ifdef RASTER) and the laserjet driver using them (#ifdef HPLJET).
 **
 ** The laserjet driver contains actually three different "terminal types":
 ** laserjet1, laserjet2 and laserjet3. The difference between them is the size
-** of the picture "laserjet3" being the biggest.
+** of the picture; "laserjet3" being the biggest.
 */
+
+
+#ifdef HPLJET
+#define RASTER
+#endif /* HPLJET */
+
+#ifdef RASTER
+/*
+** General raster plotting routines.
+** Raster routines written and copyrighted 1987 by
+** Jyrki Yli-Nokari (jty@intrin.UUCP)
+** Intrinsic, Ltd.
+** 
+** You may use this code for anything you like as long as
+** you are not selling it and the credit is given and
+** this message retained.
+**
+** The plotting area is defined as a huge raster.
+** The raster is stored in a dynamically allocated pixel array r_p
+**
+** The raster is allocated (and initialized to zero) with
+** r_makeraster(xsize, ysize)
+** and freed with r_freeraster()
+**
+** Valid (unsigned) coordinates range from zero to (xsize-1,ysize-1)
+**
+** Plotting is done via r_move(x, y) and r_draw(x, y, value) functions,
+** where the point (x,y) is the target to go from the current point
+** and value is the value (of type pixel) to be stored in every pixel.
+**
+** Internally all plotting goes through r_setpixel(x, y, val).
+** If you want different plotting styles (like OR, XOR...), use "value"
+** in r_draw() to mark different styles and change r_setpixel() accordingly.
+*/
+
+#define IN(i,size)	((unsigned)i < (unsigned)size)
+typedef char pixel;	/* the type of one pixel in raster */
+typedef pixel *raster[];	/* the raster */
+
+static raster *r_p;	/* global pointer to raster */
+static unsigned r_currx, r_curry;	/* the current coordinates */
+static unsigned r_xsize, r_ysize;	/* the size of the raster */
+
+/*
+** set pixel (x, y, val) to value val (this can be 1/0 or a color number).
+*/
+void
+r_setpixel(x, y, val)
+unsigned x, y;
+pixel val;
+{
+	if (IN(x, r_xsize) && IN(y, r_ysize)) {
+		*(((*r_p)[y]) + x) = val;
+	}
+#ifdef RASTERDEBUG
+	else {
+		fprintf(stderr, "Warning: setpixel(%d, %d, %d) out of bounds\n", x, y, val);
+	}
+#endif
+}
+
+/*
+** get pixel (x,y) value
+*/
+pixel
+r_getpixel(x, y)
+unsigned x, y;
+{
+	if (IN(x, r_xsize) && IN(y, r_ysize)) {
+		return *(((*r_p)[y]) + x);
+	} else {
+#ifdef RASTERDEBUG
+		fprintf(stderr, "Warning: getpixel(%d,%d) out of bounds\n", x, y);
+#endif
+		return 0;
+	}
+}
+
+/*
+** allocate the raster
+*/
+void
+r_makeraster(x, y)
+unsigned x, y;
+{
+	register unsigned j;
+	
+	/* allocate row pointers */
+	r_p = (raster *)alloc(y * sizeof(pixel *), "raster buffer");
+	bzero(r_p, y * sizeof(pixel *));
+	for (j = 0; j < y; j++) {
+		(*r_p)[j] = (pixel *)alloc(x * sizeof(pixel), "raster buffer");
+		bzero((*r_p)[j], x * sizeof(pixel));
+	}
+	r_xsize = x; r_ysize = y;
+	r_currx = r_curry = 0;
+}
+	
+/*
+** plot a line from (x0,y0) to (x1,y1) with color val.
+*/
+void
+r_plot(x0, y0, x1, y1, val)
+unsigned x0, y0, x1, y1;
+pixel val;
+{
+	unsigned hx, hy, i;
+	int e, dx, dy;
+
+	hx = abs((int)(x1 - x0));
+	hy = abs((int)(y1 - y0));
+	dx = (x1 > x0) ? 1 : -1;
+	dy = (y1 > y0) ? 1 : -1;
+	
+	if (hx > hy) {
+		/*
+		** loop over x-axis
+		*/
+		e = hy + hy - hx;
+		for (i = 0; i <= hx; i++) {
+			r_setpixel(x0, y0, val);
+			if (e > 0) {
+				y0 += dy;
+				e += hy + hy - hx - hx;
+			} else {
+				e += hy + hy;
+			}
+			x0 += dx;
+		}
+	} else {
+		/*
+		** loop over y-axis
+		*/
+		e = hx + hx - hy;
+		for (i = 0; i <= hy; i++) {
+			r_setpixel(x0, y0, val);
+			if (e > 0) {
+				x0 += dx;
+				e += hx + hx - hy - hy;
+			} else {
+				e += hx + hx;
+			}
+			y0 += dy;
+		}
+	}
+}
+
+/*
+** move to (x,y)
+*/
+void
+r_move(x, y)
+unsigned x, y;
+{
+	r_currx = x;
+	r_curry = y;
+}
+
+/*
+** draw to (x,y) with color val
+** (move pen down)
+*/
+void
+r_draw(x, y, val)
+unsigned x, y;
+pixel val;
+{
+	r_plot(r_currx, r_curry, x, y, val);
+	r_currx = x;
+	r_curry = y;
+}
+
+/*
+** free the allocated raster
+*/
+void
+r_freeraster()
+{
+	int y;
+
+	for (y = 0; y < r_ysize; y++) {
+		(void) free((char *)(*r_p)[y]);
+	}
+	(void) free((char *)r_p);
+}
+#endif /* RASTER */
+
+
 
 /*
 ** NOTE:
@@ -192,6 +396,21 @@ HPLJETlinetype(linetype)
 int linetype;
 {
 }
+
+/* put_text was added by Russell Lang, eln272v@monu1.cc.monash.oz
+ * IT IS UNTESTED
+ */
+/* Put text "str" at pixel position x,y
+**/
+HPLJETput_text(x,y,str)
+unsigned x,y;
+char str[];
+{
+	fprintf(outfile, "\033&a%dH\033&a%dV",
+	        HPLJET_PX2DP(x), HPLJET_PX2DP(y) );
+	fputs(str, outfile);
+}
+	
 
 /*
 ** Put text "str" to the lower right corner of the screen.

@@ -1,18 +1,32 @@
+/* GNUPLOT - iris4d.trm */
 /*
-Here are the additions to GNUplot so it runs on an IRIS4D series computer.
-Don't forget to compile with -DIRIS4D and include -Zg as one of the
-libraries.  The window that the plot goes to can be reshaped and moved, but
-you will have to replot the data.
-
-+----------------------------------+-----------------------------+
-|John H. Merritt                   |  Yesterday I knew nothing,  |
-|Applied Research Corporation      |  Today I know that.         |
-|merritt@iris613.gsfc.nasa.gov     |                             |
-+----------------------------------+-----------------------------+
-*/
-
-/* Provided by John H. Merritt (Applied Research Corporation) 7/1/89 */
-/* INTERNET: merritt@iris613.gsfc.nasa.gov */
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   IRIS terminals
+ *
+ * AUTHORS
+ *   John H. Merritt 
+ *           (Applied Research Corporation) 7/1/89
+ *           INTERNET: merritt@iris613.gsfc.nasa.gov
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
 
 #include <gl.h>
 #define IRIS4D_XMAX 1024
@@ -84,27 +98,19 @@ unsigned x, y;
   return;
 }
 
-IRIS4D_lrput_text(row, str)
-unsigned int row;
+
+IRIS4D_put_text(x,y,str)
+int x, y;
 char *str;
 {
-  IRIS4D_cmove(IRIS4D_XMAX - IRIS4D_HTIC - IRIS4D_HCHAR*(strlen(str)+1),
-          IRIS4D_VTIC + IRIS4D_VCHAR*(row+1)) ;
+  IRIS4D_cmove(x,y - IRIS4D_VCHAR/2);
   charstr(str);
   return;
 }
 
-
-IRIS4D_ulput_text(row,str)
-unsigned int row ;
-char *str ;
-{
-  IRIS4D_cmove(IRIS4D_HTIC, IRIS4D_YMAX - IRIS4D_VTIC - IRIS4D_VCHAR*(row+1)) ;
-  charstr(str);
-  return;
-}
 
 IRIS4D_reset()
 {
   return;
 }
+

@@ -2,7 +2,7 @@
  *
  *    G N U P L O T  --  internal.c
  *
- *  Copyright (C) 1986, 1987  Colin Kelley, Thomas Williams
+ *  Copyright (C) 1986 Colin Kelley, Thomas Williams
  *
  *  You may use this code as you wish if credit is given and this message
  *  is retained.
@@ -18,6 +18,8 @@
 #include "plot.h"
 
 extern BOOLEAN undefined;
+extern struct vt_entry vt[MAX_VALUES];
+extern struct udft_entry udft[MAX_UDFS];
 
 char *strcpy();
 
@@ -28,7 +30,7 @@ struct value stack[STACK_DEPTH];
 
 int s_p = -1;   /* stack pointer */
 
-
+#ifndef MSDOS /* suggested by "J.D. McDonald " <mcdonald@uxe.cso.uiuc.edu> */
 /*
  * System V and MSC 4.0 call this when they wants to print an error message.
  * Don't!
@@ -37,7 +39,7 @@ matherr()
 {
 	return (undefined = TRUE);		/* don't print error message */
 }
-
+#endif MSDOS
 
 reset_stack()
 {
@@ -61,8 +63,27 @@ struct value *x;
 	return(x);
 }
 
+#define ERR_VAR "undefined variable: "
 
-push(x)
+f_push(x)
+struct value *x;		/* contains index of value to push; must be integer! */
+{
+static char err_str[sizeof(ERR_VAR) + MAX_ID_LEN] = ERR_VAR;
+register int index;
+
+	if (x->type != INT)
+		int_error("internal error--non-int passed to f_push!",NO_CARET);
+	index = x->v.int_val;
+
+	if (vt[index].vt_undef) {	 /* undefined */
+		(void) strcpy(&err_str[sizeof(ERR_VAR) - 1], vt[index].vt_name);
+		int_error(err_str,NO_CARET);
+	}
+	push(&vt[index].vt_value);
+}
+
+
+f_pushc(x)
 struct value *x;
 {
 	if (s_p == STACK_DEPTH - 1)
@@ -71,54 +92,28 @@ struct value *x;
 }
 
 
-#define ERR_VAR "undefined variable: "
-
-f_push(x)
-union argument *x;		/* contains pointer to value to push; */
-{
-static char err_str[sizeof(ERR_VAR) + MAX_ID_LEN] = ERR_VAR;
-struct udvt_entry *udv;
-
-	udv = x->udv_arg;
-	if (udv->udv_undef) {	 /* undefined */
-		(void) strcpy(&err_str[sizeof(ERR_VAR) - 1], udv->udv_name);
-		int_error(err_str,NO_CARET);
-	}
-	push(&(udv->udv_value));
-}
-
-
-f_pushc(x)
-union argument *x;
-{
-	push(&(x->v_arg));
-}
-
-
 f_pushd(x)
-union argument *x;
+struct value *x;
 {
-	push(&(x->udf_arg->dummy_value));
+	f_pushc(&udft[x->v.int_val].dummy_value);
 }
 
 
 #define ERR_FUN "undefined function: "
 
-f_call(x)  /* execute a udf */
-union argument *x;
+f_call(f_index)  /* execute a udf */
+struct value *f_index;
 {
 static char err_str[sizeof(ERR_FUN) + MAX_ID_LEN] = ERR_FUN;
-register struct udft_entry *udf;
 
-	udf = x->udf_arg;
-	if (!udf->at) { /* undefined */
+	if (udft[f_index->v.int_val].at.count == 0) { /* undefined */
 		(void) strcpy(&err_str[sizeof(ERR_FUN) - 1],
-				udf->udf_name);
+				udft[f_index->v.int_val].udft_name);
 		int_error(err_str,NO_CARET);
 	}
-	(void) pop(&(udf->dummy_value));
+	(void) pop(&udft[f_index->v.int_val].dummy_value);
 
-	execute_at(udf->at);
+	execute_at(&udft[f_index->v.int_val].at);
 }
 
 
@@ -127,6 +122,15 @@ struct value *v;
 {
 	if (v->type != INT)
 		int_error("non-integer passed to boolean operator",NO_CARET);
+}
+
+
+f_terniary()		/* code for (a) ? b : c */
+{
+struct value a, b, c;
+	(void) pop(&c);	(void) pop(&b);	int_check(pop(&a));
+	push((a.v.int_val) ? &b : &c);
+			/* I just had to use ? : here! */
 }
 
 
@@ -146,13 +150,6 @@ struct value a;
 }
 
 
-f_bool()
-{			/* converts top-of-stack to boolean */
-	int_check(&top_of_stack);
-	top_of_stack.v.int_val = !!top_of_stack.v.int_val;
-}
-
-
 f_lor()
 {
 struct value a,b;
@@ -160,6 +157,7 @@ struct value a,b;
 	int_check(pop(&a));
 	push( integer(&a,a.v.int_val || b.v.int_val) );
 }
+
 
 f_land()
 {
@@ -286,7 +284,7 @@ struct value a, b;
 	}
 	push(integer(&a,result));
 }
- 
+
 
 f_gt()
 {
@@ -640,7 +638,7 @@ register double mag, ang;
 				case INT:
 					count = abs(b.v.int_val);
 					t = 1;
-					for(i = 0; i < count; i++)
+					for(i=0; i < count; i++)
 						t *= a.v.int_val;
 					if (b.v.int_val >= 0)
 						(void) integer(&result,t);
@@ -661,106 +659,25 @@ register double mag, ang;
 		case CMPLX:
 			switch (b.type) {
 				case INT:
-					if (a.v.cmplx_val.imag == 0.0) {
-						mag = pow(a.v.cmplx_val.real,(double)abs(b.v.int_val));
-						if (b.v.int_val < 0)
-							mag = 1.0/mag;
-						(void) complex(&result,mag,0.0);
-					}
-					else {
-						/* not so good, but...! */
-						mag = pow(magnitude(&a),(double)abs(b.v.int_val));
-						if (b.v.int_val < 0)
-							mag = 1.0/mag;
-						ang = angle(&a)*b.v.int_val;
-						(void) complex(&result,mag*cos(ang),
-							mag*sin(ang));
-					}
+					/* not so good, but...! */
+					mag =
+					  pow(magnitude(&a),(double)abs(b.v.int_val));
+					if (b.v.int_val < 0)
+						mag = 1.0/mag;
+					ang = angle(&a)*b.v.int_val;
+					(void) complex(&result,mag*cos(ang),
+						mag*sin(ang));
 					break;
 				case CMPLX:
-					mag = pow(magnitude(&a),fabs(b.v.cmplx_val.real));
+					mag =
+					  pow(magnitude(&a),fabs(b.v.cmplx_val.real));
 					if (b.v.cmplx_val.real < 0.0)
 					  mag = 1.0/mag;
-					ang = angle(&a)*b.v.cmplx_val.real+ b.v.cmplx_val.imag;
+					ang = angle(&a)*b.v.cmplx_val.real+
+					  b.v.cmplx_val.imag;
 					(void) complex(&result,mag*cos(ang),
 						mag*sin(ang));
 			}
 	}
 	push(&result);
-}
-
-
-f_factorial()
-{
-struct value a;
-register int i;
-register double val;
-
-	(void) pop(&a);	/* find a! (factorial) */
-
-	switch (a.type) {
-		case INT:
-			val = 1.0;
-			for (i = a.v.int_val; i > 1; i--)  /*fpe's should catch overflows*/
-				val *= i;
-			break;
-		default:
-			int_error("factorial (!) argument must be an integer",
-			NO_CARET);
-		}
-
-	push(complex(&a,val,0.0));
-			
-}
-
-
-int
-f_jump(x)
-union argument *x;
-{
-	return(x->j_arg);
-}
-
-
-int
-f_jumpz(x)
-union argument *x;
-{
-struct value a;
-	int_check(&top_of_stack);
-	if (top_of_stack.v.int_val) {	/* non-zero */
-		(void) pop(&a);
-		return 1;				/* no jump */
-	}
-	else
-		return(x->j_arg);		/* leave the argument on TOS */
-}
-
-
-int
-f_jumpnz(x)
-union argument *x;
-{
-struct value a;
-	int_check(&top_of_stack);
-	if (top_of_stack.v.int_val)	/* non-zero */
-		return(x->j_arg);		/* leave the argument on TOS */
-	else {
-		(void) pop(&a);
-		return 1;				/* no jump */
-	}
-}
-
-
-int
-f_jtern(x)
-union argument *x;
-{
-struct value a;
-
-	int_check(pop(&a));
-	if (a.v.int_val)
-		return(1);				/* no jump; fall through to TRUE code */
-	else
-		return(x->j_arg);		/* go jump to FALSE code */
 }

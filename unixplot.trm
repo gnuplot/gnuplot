@@ -1,11 +1,45 @@
+/* GNUPLOT -- unixplot.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Unix plot(5) graphics language
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams, Russell Lang
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/*
+Unixplot library writes to stdout.  A fix was put in place by
+..!arizona!naucse!jdc to let set term and set output redirect
+stdout.  All other terminals write to outfile.
+*/
+
 #define UP_XMAX 4096
 #define UP_YMAX 4096
 
 #define UP_XLAST (UP_XMAX - 1)
 #define UP_YLAST (UP_YMAX - 1)
 
-#define UP_VCHAR (UP_YMAX/30)
-#define UP_HCHAR (UP_XMAX/72)	/* just a guess--no way to know this! */
+#define UP_VCHAR (UP_YMAX/30)	/* just a guess--no way to know this! */
+#define UP_HCHAR (UP_XMAX/60)	/* just a guess--no way to know this! */
 #define UP_VTIC (UP_YMAX/80)
 #define UP_HTIC (UP_XMAX/80)
 
@@ -53,21 +87,11 @@ unsigned int x,y;
 }
 
 
-UP_lrput_text(row,str)
-unsigned int row;
+UP_put_text(x,y,str)
+unsigned int x,y;
 char str[];
 {
-	move(UP_XMAX - UP_HTIC - UP_HCHAR*(strlen(str)+1),
-		UP_VTIC + UP_VCHAR*(row+1));
-	label(str);
-}
-
-
-UP_ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	UP_move(UP_HTIC, UP_YMAX - UP_VTIC - UP_VCHAR*(row+1));
+	UP_move(x+UP_HCHAR/2,y+UP_VCHAR/5);
 	label(str);
 }
 
@@ -75,5 +99,4 @@ UP_reset()
 {
 	closepl();
 }
-
 

@@ -8,6 +8,8 @@ TITLE	Hercules graphics module
 ; modified slightly by Colin Kelley - 22-Dec-86
 ;	added header.mac, parameterized declarations
 ; added dgroup: in HVmodem to reach HCh_Parms and HGr_Parms - 30-Jan-87
+; modified by Russell Lang 3 Jun 1988
+;	added H_init
 
 include header.mac
 
@@ -21,6 +23,17 @@ GPg1_Base equ 0B800h	; Graphics page 1 base address
 _text	segment
 
 	public _H_line, _H_color, _H_mask, _HVmode, _H_puts
+	public _H_init
+
+HCfg_Switch equ	03BFH	; Configuration Switch - software switch 
+			; to select graphics card memory map
+
+beginproc _H_init
+	mov al, 03H	; allow graphics in b8000:bffff
+	mov dx, HCfg_Switch
+	out dx, al
+	ret
+_H_init endp
 
 hpixel	proc near
 	ror word ptr bmask,1
@@ -341,6 +354,5 @@ HGr_Parms db	35H, 2DH, 2EH, 07H, 5BH, 02H, 57H, 57H, 02H, 03H, 00H, 00H
 const	ends
 
 	end
----------------------------end HRCGRAPH.ASM-------------------------------
 
 

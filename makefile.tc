@@ -1,50 +1,90 @@
 # make file for Turbo C
 # Modified from MSC make by John Campbell and Bill Wilson
 # The compile and link includes debug flags.  Take them out if you
-# do not want them included
+# do not want them included  (-y -v -M, /m /s /v /l)
 
-OBJS = 	command.obj eval.obj graphics.obj internal.obj misc.obj parse.obj plot.obj scanner.obj standard.obj term.obj util.obj version.obj 
+# where to place gnuplot.gih helpfile
+HELPFILE = gnuplot.gih
+# location of Turbo C compiler
+# if this is changed then linkopt.tc will need to be edited.
+TC = \tc
+# location of BGI files
+BGI = $(TC)
+# -c means don't link, -f means emulate 8087 if not present
+# -ml means use large model (large code, large data)
+# -M means produce link map
+# -y means include line numbers for debugger
+# -v means include debug info
+CFLAGS = -c -f -ml -M -y -v -I$(TC)\include -DMSDOS -DPC
+TERMFLAGS = -DPOSTSCRIPT -DHPGL -DHP75 -DDXY800A -DEPSON -DNEC
+
+OBJS = 	command.obj eval.obj graphics.obj help.obj internal.obj \
+	misc.obj parse.obj plot.obj scanner.obj setshow.obj standard.obj \
+	term.obj util.obj version.obj cga.obj egavga.obj herc.obj
+
+CSOURCE5 = term\aed.trm term\dxy.trm term\epson.trm term\font5x7.trm \
+	term\hp26.trm term\hp2648.trm term\hpgl.trm \
+	term\hpljet.trm term\iris4d.trm term\latex.trm 
+CSOURCE6 = term\post.trm term\pc.trm term\qms.trm term\regis.trm \
+	term\tek.trm term\unixpc.trm term\unixplot.trm term\v384.trm \
+	term\imPcodes.h term\imagen.trm term\object.h term\fig.trm
+
+
+all: gnuplot.exe $(HELPFILE)
+
+# use linkopt.tc to avoid command-line overflow
 
 gnuplot.exe: $(OBJS) 
- tlink /m /s /v /l @link.otc
-
-# /AC means use compact model (small code, large data)
-CFLAGS = -c -f -ml -M -y -v -I\tc\include -DMSDOS -DPC
-TERMFLAGS = 
-# -DHERCULES -DCGA
+	tlink /m /s /v /l @linkopt.tc
 
 # default rules
-.c.obj:
-	tcc $(CFLAGS) $*
 
-command.obj: command.c plot.h
+.c.obj:  
+	tcc $(CFLAGS) $<
+
+command.obj: command.c plot.h setshow.h help.h
+	tcc $(CFLAGS) -DHELPFILE="$(HELPFILE)" command.c
 
 eval.obj: eval.c plot.h
 
-graphics.obj: graphics.c plot.h
+graphics.obj: graphics.c plot.h setshow.h
+
+help.obj: help.c plot.h help.h
 
 internal.obj: internal.c plot.h
 
-misc.obj: misc.c plot.h
+misc.obj: misc.c plot.h setshow.h help.h
 
 parse.obj: parse.c plot.h
 
-plot.obj: plot.c plot.h
+plot.obj: plot.c plot.h setshow.h
 
 scanner.obj: scanner.c plot.h
 
+setshow.obj: setshow.c plot.h setshow.h
+
 standard.obj: standard.c plot.h
 
-term.obj: term.c plot.h \
-	aed.trm bitgraph.trm hp26.trm hp75.trm hpljet.trm pc.trm \
-	postscpt.trm qms.trm regis.trm selanar.trm tek.trm unixpc.trm \
-	unixplot.trm v384.trm
+term.obj: term.c plot.h $(CSOURCE5) $(CSOURCE6)
 	tcc $(CFLAGS) $(TERMFLAGS) term.c
 	
 util.obj: util.c plot.h
 
 version.obj: version.c
 
+# convert gnuplot.doc to gnuplot.gih
+$(HELPFILE): doc2gih.exe docs\gnuplot.doc
+	doc2gih docs\gnuplot.doc $(HELPFILE)
 
-# use link.opt to avoid command-line overflow
+doc2gih.exe: docs\doc2gih.c
+	tcc -I$(TC)\include -L$(TC)\lib docs\doc2gih.c
 
+# convert Borland Graphics Interface files to object for linking
+cga.obj: $(BGI)\cga.bgi
+	bgiobj $(BGI)\cga
+
+egavga.obj: $(BGI)\egavga.bgi
+	bgiobj $(BGI)\egavga
+
+herc.obj: $(BGI)\herc.bgi
+	bgiobj $(BGI)\herc

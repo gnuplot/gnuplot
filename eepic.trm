@@ -1,0 +1,287 @@
+/* GNUPLOT - eepic.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   The EEPIC macros for LaTeX. 
+ *
+ * AUTHORS
+ *   David Kotz
+ *
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+/*
+ *  This file contains the eepic terminal driver, intended for use with the 
+ *  eepic.sty macro package for LaTeX. This is an alternative to the 
+ *  latex driver. You need eepic.sty, epic.sty, and a printer driver that
+ *  supports the tpic \specials.
+ *
+ * Although dotted and dashed lines are possible with EEPIC, and are
+ * tempting, they do not work well for high-sample-rate curves, mushing
+ * the dashes all together into a solid line. For now anyway, the EEPIC
+ * driver will have only solid lines. Anyone got a solution?
+ *
+ * LATEX must also be defined.
+ */
+
+#define EEPIC_PTS_PER_INCH (72.27)
+#define DOTS_PER_INCH (300)	/* resolution of printer we expect to use */
+#define EEPIC_UNIT (EEPIC_PTS_PER_INCH/DOTS_PER_INCH) /* dot size in pt */
+
+/* 5 inches wide by 3 inches high (default) */
+#define EEPIC_XMAX (unsigned int)(EEPIC_PTS_PER_INCH/EEPIC_UNIT*5.0)
+#define EEPIC_YMAX (unsigned int)(EEPIC_PTS_PER_INCH/EEPIC_UNIT*3.0)
+
+#define EEPIC_HTIC (5./EEPIC_UNIT)
+#define EEPIC_VTIC (5./EEPIC_UNIT)
+#define EEPIC_HCHAR (5.3/EEPIC_UNIT)
+#define EEPIC_VCHAR (11./EEPIC_UNIT)
+
+static unsigned int EEPIC_posx;
+static unsigned int EEPIC_posy;
+enum JUSTIFY eepic_justify=LEFT;
+static int eepic_angle=0;
+
+/* for DOTS point style */
+#define EEPIC_TINY_DOT "\\rule{.1pt}{.1pt}"
+
+/* POINTS */
+#define EEPIC_POINT_TYPES 12	/* we supply more point types */
+static char *EEPIC_points[] = {
+    "\\makebox(0,0){$\\Diamond$}",
+    "\\makebox(0,0){$+$}",
+    "\\makebox(0,0){$\\Box$}",
+    "\\makebox(0,0){$\\times$}",
+    "\\makebox(0,0){$\\triangle$}",
+    "\\makebox(0,0){$\\star$}",
+    "\\circle{12}", "\\circle{18}", "\\circle{24}",
+    "\\circle*{12}", "\\circle*{18}", "\\circle*{24}"
+};
+
+/* LINES */
+#define EEPIC_NUMLINES 5		/* number of linetypes below */
+static char *EEPIC_lines[] = {
+    "\\thicklines \\path",			/* -2 border */
+    "\\thinlines \\drawline[-50]",		/* -1 axes */
+    "\\thinlines \\path",			/*  0 solid thin  */
+    "\\thicklines \\path",			/*  1 solid thick */
+    "\\Thicklines \\path",			/*  2 solid Thick */
+};
+/* These are other possibilities
+    "\\thinlines \\dottedline{30}",
+    "\\thinlines \\drawline[-30]",	
+    "\\thinlines \\dottedline{60}",
+    "\\thinlines \\drawline[-60]",	
+    "\\thinlines \\dashline[-10]{20}[6]"
+*/
+static int EEPIC_type;		/* current line type */
+static BOOLEAN EEPIC_inline = FALSE; /* are we in the middle of a line */
+static void EEPIC_endline();	/* terminate any line in progress */
+
+/* ARROWS */
+/* we use the same code as for LATEX */
+static void best_latex_arrow(); /* figure out the best arrow */
+
+EEPIC_init()
+{
+    EEPIC_posx = EEPIC_posy = 0;
+    EEPIC_linetype(-1);
+    fprintf(outfile, "%% GNUPLOT: LaTeX picture using EEPIC macros\n");
+    fprintf(outfile, "\\setlength{\\unitlength}{%fpt}\n", EEPIC_UNIT);
+}
+
+
+EEPIC_scale(xs, ys)
+	float xs, ys;			/* scaling factors */
+{
+    register struct termentry *t = &term_tbl[term];
+
+    /* we change the table for use in graphics.c and EEPIC_graphics */
+    t->xmax = (unsigned int)(EEPIC_XMAX * xs);
+    t->ymax = (unsigned int)(EEPIC_YMAX * ys);
+
+    return(TRUE);
+}
+
+EEPIC_graphics()
+{
+    register struct termentry *t = &term_tbl[term];
+
+    fprintf(outfile, "\\begin{picture}(%d,%d)(0,0)\n", t->xmax, t->ymax);
+    fprintf(outfile, "\\tenrm\n");
+}
+
+
+EEPIC_text()
+{
+    EEPIC_endline();
+    fprintf(outfile, "\\end{picture}\n");
+}
+
+
+EEPIC_linetype(linetype)
+	int linetype;
+{
+    EEPIC_endline();
+
+    if (linetype >= EEPIC_NUMLINES-2)
+	 linetype %= (EEPIC_NUMLINES-2);
+
+    EEPIC_type = linetype;
+}
+
+
+
+EEPIC_move(x,y)
+	unsigned int x,y;
+{
+    EEPIC_endline();
+
+    EEPIC_posx = x;
+    EEPIC_posy = y;
+}
+
+
+EEPIC_point(x,y, number)		/* version of line_and_point */
+	unsigned int x,y;
+	int number;				/* type of point */
+{
+    EEPIC_move(x,y);
+    
+    /* Print the character defined by 'number'; number < 0 means 
+	  to use a dot, otherwise one of the defined points. */
+    fprintf(outfile, "\\put(%d,%d){%s}\n", x, y, 
+		  (number < 0 ? EEPIC_TINY_DOT
+		   : EEPIC_points[number % EEPIC_POINT_TYPES]));
+}
+
+
+EEPIC_vector(ux,uy)
+	unsigned int ux,uy;
+{
+    if (!EEPIC_inline) {
+	   EEPIC_inline = TRUE;
+
+	   /* Start a new line. This depends on line type */
+	   fprintf(outfile, "%s(%u,%u)", 
+			 EEPIC_lines[EEPIC_type+2], 
+			 EEPIC_posx, EEPIC_posy);
+    }
+
+    /* add new point to line */
+    fprintf(outfile, "(%u,%u)", ux,uy);
+    EEPIC_posx = ux;
+    EEPIC_posy = uy;
+}
+
+static void
+EEPIC_endline()
+{
+    if (EEPIC_inline) {
+	   fprintf(outfile, "\n");
+	   EEPIC_inline = FALSE;
+    }
+}
+
+
+EEPIC_arrow(sx,sy, ex,ey)
+	int sx,sy, ex,ey;
+{
+    best_latex_arrow(sx,sy, ex,ey, 2); /* call latex routine */
+
+    EEPIC_posx = ex;
+    EEPIC_posy = ey;
+}
+
+
+EEPIC_put_text(x, y, str)
+	int x,y;				/* reference point of string */
+	char str[];			/* the text */
+{
+    EEPIC_endline();
+
+    fprintf(outfile, "\\put(%d,%d)",x,y);
+    switch(eepic_angle) {  
+ 	   case 0: {
+		  switch(eepic_justify) {
+			 case LEFT: {
+				fprintf(outfile,
+					   "{\\makebox(0,0)[l]{%s}}\n", str);
+				break;
+			 }
+			 case CENTRE: {
+				fprintf(outfile,
+					   "{\\makebox(0,0){%s}}\n", str);
+				break;
+			 }
+			 case RIGHT: {
+				fprintf(outfile,
+					   "{\\makebox(0,0)[r]{%s}}\n", str);
+				break;
+			 }
+		  }
+		  break;
+	   }
+	   case 1: {			/* put text in a short stack */
+		  switch(eepic_justify) {
+			 case LEFT: {
+				fprintf(outfile,
+					   "{\\makebox(0,0)[lb]{\\shortstack{%s}}}\n", str);
+				break;
+			 }
+			 case CENTRE: {
+				fprintf(outfile,
+					   "{\\makebox(0,0)[l]{\\shortstack{%s}}}\n", str);
+				break;
+			 }
+			 case RIGHT: {
+				fprintf(outfile,
+					   "{\\makebox(0,0)[lt]{\\shortstack{%s}}}\n", str);
+				break;
+			 }
+		  }
+		  break;
+	   }	
+    }
+}
+
+
+
+int EEPIC_justify_text(mode)
+	enum JUSTIFY mode;
+{
+    eepic_justify = mode;
+    return (TRUE);
+}
+
+int EEPIC_text_angle(angle)
+	int angle;
+{
+    /* we can't really write text vertically, but this will 
+	  put the ylabel centred at the left of the plot, and
+	  then we'll make a \shortstack */
+    eepic_angle = angle;
+    return (TRUE);
+}
+
+EEPIC_reset()
+{
+    EEPIC_endline();
+    EEPIC_posx = EEPIC_posy = 0;
+}
+

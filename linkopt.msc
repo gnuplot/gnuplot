@@ -1,0 +1,5 @@
+pcgraph+hrcgraph+corgraph+term+graphics+
+plot+setshow+command+help+internal+misc+
+parse+eval+scanner+standard+util+version
+gnuplot
+nul;

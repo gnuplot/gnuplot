@@ -1,3 +1,31 @@
+/* GNUPLOT - regis.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  REGIS devices
+ *
+ * AUTHORS
+ *  Colin Kelley, Thomas Williams
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
 #define REGISXMAX 800             
 #define REGISYMAX 440
 
@@ -5,9 +33,11 @@
 #define REGISYLAST (REGISYMAX - 1)
 
 #define REGISVCHAR		20  	
-#define REGISHCHAR		8		
+#define REGISHCHAR		9
 #define REGISVTIC		8
 #define REGISHTIC		6
+
+int REGISang = 0;
 
 REGISinit()
 {
@@ -23,12 +53,13 @@ REGISinit()
 REGISgraphics()
 {
 	fprintf(outfile,"\033[2J\033P1pS(C0)S(E)");
-/*                   1      2      3	4
+/*                   1      2      3	4   5
 	1. clear screen
 	2. enter ReGIS graphics
 	3. turn off graphics diamond cursor
 	4. clear graphics screen
 */
+	(void) REGIStext_angle(0); /* select text size and angle */ 
 }
 
 
@@ -71,12 +102,15 @@ int x,y;
 }
 
 
-REGISlrput_text(row,str)
-int row;
+/* put_text and text_angle by rjl */
+REGISput_text(x,y,str)
+int x, y;
 char *str;
 {
-	REGISmove(REGISXMAX-REGISHTIC-REGISHCHAR*(strlen(str)+3),
-		REGISVTIC+REGISVCHAR*(row+1));
+	if (REGISang==1)
+		REGISmove(x-REGISVCHAR/2-1,y);
+	else
+		REGISmove(x,y+REGISVCHAR/2-1);
 	(void) putc('T',outfile); (void) putc('\'',outfile);
 	while (*str) {
 		(void) putc(*str,outfile);
@@ -88,19 +122,15 @@ char *str;
 }
 
 
-REGISulput_text(row,str)
-int row;
-char *str;
+int REGIStext_angle(ang)
+int ang;
 {
-	REGISmove(REGISVTIC,REGISYMAX-REGISVTIC*2-REGISVCHAR*row);
-	(void) putc('T',outfile); (void) putc('\'',outfile);
-	while (*str) {
-		(void) putc(*str,outfile);
-		if (*str == '\'')
-			(void) putc('\'',outfile);	/* send out another one */
-		str++;
-	}
-	(void) putc('\'',outfile);
+	REGISang = ang;
+	if (ang == 1)
+		fputs("T(D90,S1)",outfile);
+	else
+		fputs("T(D0,S1)",outfile);
+	return TRUE;
 }
 
 
@@ -108,5 +138,4 @@ REGISreset()
 {
 	fprintf(outfile,"\033[2J\033[24;1H");
 }
-
 

@@ -1,0 +1,278 @@
+/* GNUPLOT - sun.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *   SUNview windowing system
+ *
+ * AUTHORS
+ *  Maurice Castro
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+#include <suntool/sunview.h>
+#include <suntool/canvas.h>
+#include <suntool/scrollbar.h>
+#include <suntool/panel.h>
+#include <pixrect/pixrect_hs.h>
+
+#define SUN_XMAX 600
+#define SUN_YMAX 512
+
+#define SUN_VCHAR (12)		/* default, will be changed */
+#define SUN_HCHAR (8)		/* default, will be changed */
+#define SUN_VTIC (SUN_YMAX/80)
+#define SUN_HTIC (SUN_XMAX/80)
+#define MARGIN 5
+#define MINWIN 128
+
+static Frame frame;
+static Canvas canvas;
+static Pixwin *pw;
+static struct pixfont *sun_font = NULL;
+
+static enum JUSTIFY sun_justify=LEFT;
+
+static Notify_value local_notice_destroy();
+
+extern Notify_error notify_dispatch();
+  
+/* dotted line generator */
+unsigned int sun_value = 1;	/* this can be used for colour */
+unsigned int sun_line_mask = 0xffff;	/* 16 bit mask for dotted lines */
+static unsigned int sun_pattern[] = {0xffff, 0x1111,
+	0xffff, 0x5555, 0x3333, 0x7777, 0x3f3f, 0x0f0f, 0x5f5f};
+int sun_mask_count = 0;
+unsigned int sun_lastx, sun_lasty;	/* last pixel set - used by sun_line */
+
+
+SUN_init()
+{
+  struct termentry *t = &term_tbl[term];
+  struct pr_subregion bound;
+
+  frame = window_create(NULL, FRAME, 
+            FRAME_LABEL,               "Gnuplot",
+            0);
+  notify_interpose_destroy_func(frame,local_notice_destroy);
+  canvas = window_create(frame, CANVAS,
+            CANVAS_AUTO_EXPAND,        TRUE,
+            CANVAS_AUTO_SHRINK,        TRUE,
+            CANVAS_MARGIN,             MARGIN,
+            0);
+  notify_do_dispatch();
+  pw = canvas_pixwin(canvas);
+  window_set(frame, WIN_SHOW, TRUE, 0);
+
+  /* figure out font and rough size */
+  sun_font = pf_default();
+  pf_textbound(&bound, 1, sun_font, "M");
+  t->v_char = bound.size.y;
+  t->h_char = bound.size.x;
+
+  return;
+}
+
+SUN_graphics()
+{
+  term_tbl[term].xmax = (int) window_get(canvas,CANVAS_WIDTH);
+  term_tbl[term].ymax = (int) window_get(canvas,CANVAS_HEIGHT);
+  pw_writebackground(pw,0,0,term_tbl[term].xmax, term_tbl[term].ymax, PIX_SRC );
+  notify_dispatch();
+  /* do not let the user make the window too small */
+  if ((term_tbl[term].xmax)<MINWIN)
+  {
+      window_set(frame,
+            WIN_WIDTH,                MINWIN+2*MARGIN+24,
+            0);
+      notify_dispatch();
+      SUN_graphics();
+      }
+  if ((term_tbl[term].ymax) <MINWIN)
+  {
+      window_set(frame,
+            WIN_HEIGHT,               MINWIN+2*MARGIN+24,
+            0);
+      notify_dispatch();
+      SUN_graphics();
+      }
+  notify_dispatch();
+  return;
+}
+
+SUN_text()
+{
+  notify_dispatch();
+  return; /* enter text from another window!!! */
+}
+
+SUN_linetype(linetype)
+int linetype;
+{
+	if (linetype>=7)
+		linetype %= 7;
+	sun_line_mask = sun_pattern[linetype+2];
+	sun_mask_count=0;
+}
+
+
+SUN_move(x, y)
+unsigned int x, y;
+{
+  sun_lastx = x;
+  sun_lasty = y;
+  notify_dispatch();
+  return;
+}
+
+SUN_vector(x, y)
+unsigned int x, y;
+{
+  if ( (x>=term_tbl[term].xmax) || (y>=term_tbl[term].ymax) )
+	return;
+  sun_line(sun_lastx,x,sun_lasty,y);
+  canvas_pixwin(canvas);
+  notify_dispatch();
+  return;
+}
+
+
+SUN_put_text(x,y,str)
+unsigned int x, y;
+char *str;
+{
+  struct pr_subregion bound;
+
+  if ( (x>=term_tbl[term].xmax) || (y>=term_tbl[term].ymax) )
+	return;
+
+  pf_textbound(&bound, strlen(str), sun_font, str);
+  y = term_tbl[term].ymax-1-y + bound.size.y/3; /* vertical centering */
+
+  switch(sun_justify) {
+	 case LEFT:   break;
+	 case CENTRE: x -= bound.size.x/2; break;
+	 case RIGHT:  x -= bound.size.x; break;
+  }
+  pw_text(pw, x,y, PIX_SRC | PIX_DST, 0, str); 
+  canvas_pixwin(canvas);
+  notify_dispatch();
+  return;
+}
+ 
+
+int SUN_justify_text(mode)
+	enum JUSTIFY mode;
+{
+    sun_justify = mode;
+    return (TRUE);
+}
+  
+  
+
+
+SUN_reset()
+{
+  
+  term_tbl[term].xmax = SUN_XMAX;
+  term_tbl[term].ymax = SUN_YMAX;
+  window_set(frame, WIN_SHOW, FALSE, 0);
+  return;
+}
+
+
+
+sun_setmaskpixel(x,y,value)
+unsigned int x,y,value;
+{
+	/* dotted line generator */
+	if ((sun_line_mask>>sun_mask_count)&(unsigned int)(1)) {
+		pw_put(pw,x,term_tbl[term].ymax-1-y,sun_value);
+	}
+	sun_mask_count= (sun_mask_count+1) % 16;
+	sun_lastx= x;  /* last pixel set with mask */
+	sun_lasty= y;
+}
+
+
+
+
+sun_line(x1,x2,y1,y2)
+unsigned int x1,x2,y1,y2;
+{
+int runcount;
+int dx,dy;
+int xinc,yinc;
+unsigned int xplot,yplot;
+
+	runcount=0;
+	dx = abs((int)(x1)-(int)(x2));
+	if (x2>x1)  xinc=  1;
+	if (x2==x1) xinc=  0;
+	if (x2<x1)  xinc= -1;
+	dy = abs((int)(y1)-(int)(y2));
+	if (y2>y1)  yinc=  1;
+	if (y2==y1) yinc=  0;
+	if (y2<y1)  yinc= -1;
+	xplot=x1;
+	yplot=y1;
+	if (dx>dy) {
+		/* iterate x */
+		if ( (sun_line_mask==0xffff) ||
+			((xplot!=sun_lastx) && (yplot!=sun_lasty)) )
+			sun_setmaskpixel(xplot,yplot,sun_value);
+		while (xplot!=x2) { 
+			xplot+=xinc;
+			runcount+=dy;
+			if (runcount>=(dx-runcount)) {
+				yplot+=yinc;
+				runcount-=dx;
+			}
+			sun_setmaskpixel(xplot,yplot,sun_value);
+		} 
+	} else {
+		/* iterate y */
+		if ( (sun_line_mask==0xffff) ||
+			((xplot!=sun_lastx) && (yplot!=sun_lasty)) )
+			sun_setmaskpixel(xplot,yplot,sun_value);
+		while (yplot!=y2) {
+			yplot+=yinc;
+			runcount+=dx;
+			if (runcount>=(dy-runcount)) {
+				xplot+=xinc;
+				runcount-=dy;
+			}
+			sun_setmaskpixel(xplot,yplot,sun_value);
+		} 
+	}
+}
+
+
+static Notify_value local_notice_destroy(frame, status)
+   Frame frame;
+   Destroy_status status;
+{
+   if (status != DESTROY_CHECKING)
+   {
+      SUN_reset();
+      term_init = FALSE;
+      }
+   return(NOTIFY_DONE);
+   }
+

@@ -1,4 +1,32 @@
-/* thanks to hplvlch!ch (Chuck Heller) for the HP2623A driver */
+/* GNUPLOT - hp26.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  HP2623A 
+ *
+ * AUTHORS
+ *   hplvlch!ch (Chuck Heller) 
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+
 #define HP26_XMAX 512
 #define HP26_YMAX 390
 
@@ -8,8 +36,8 @@
 /* Assume a character size of 1, or a 7 x 10 grid. */
 #define HP26_VCHAR	10
 #define HP26_HCHAR	7
-#define HP26_VTIC	4
-#define HP26_HTIC	4
+#define HP26_VTIC	(HP26_YMAX/70)		
+#define HP26_HTIC	(HP26_XMAX/75)		
 
 HP26_init()
 {
@@ -44,15 +72,15 @@ int linetype;
 #define LINE10	10
 
 static int map[2+9] = {	SOLID,	/* border */
-						DOTS,	/* axes */
-						SOLID,	/* plot 0 */
+						SOLID,	/* axes */
+						DOTS,	/* plot 0 */
 						LINE4,	/* plot 1 */
 						LINE5,	/* plot 2 */
 						LINE6,	/* plot 3 */
 						LINE8,	/* plot 4 */
 						LINE9,	/* plot 5 */
 						LINE10,	/* plot 6 */
-						DOTS,	/* plot 7 */
+						SOLID,	/* plot 7 */
 						SOLID	/* plot 8 */ };
 
 	if (linetype >= 9)
@@ -75,30 +103,19 @@ int x,y;
 }
 
 
-HP26_lrput_text(row,str)
-int row;
-char str[];
+HP26_put_text(x,y,str)
+int x, y;
+char *str;
 {
-	HP26_move(HP26_XMAX-HP26_HTIC*2,HP26_VTIC*2+HP26_VCHAR*row);
-	fputs("\033*dS",outfile);
-	fprintf(outfile,"\033*m7Q\033*l%s\n",str);
-	fputs("\033*dT",outfile);
-}
-
-
-HP26_ulput_text(row,str)
-int row;
-char str[];
-{
-	HP26_move(HP26_HTIC*2,HP26_YMAX-HP26_VTIC*2-HP26_VCHAR*row);
+	HP26_move(x,y - HP26_VCHAR/2);
 	fputs("\033*dS",outfile);
 	fprintf(outfile,"\033*m3Q\033*l%s\n",str);
 	fputs("\033*dT",outfile);
 }
 
 
+
 HP26_reset()
 {
 }
-
 

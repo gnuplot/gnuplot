@@ -1,25 +1,39 @@
-# Makefile for GNUPLOT documentation
+#------------------------------------------------------------------
+# Makefile for gnut2p
+#   A translation program from Gnutex to GNUPLOT
+#   David Kotz
+#   Duke University
+#   dfk@cs.duke.edu
 #
-# troff a copy of gnuplot -ms if you've got a laser printer
-# otherwise, just print gnuplot.nroff on a line printer
+# derived from gnutex
 #
-HELPDIR = /usr/local/help/gnuplot
 
-gnuplot.ms: hlp2ms gnuplot.hlp
-	./hlp2ms < gnuplot.hlp > gnuplot.ms
+# Define this for production version
+CFLAGS=-O -s
+# For the debugging version
+#CFLAGS=-g
 
-helptree: helptree.c
-	cc -o helptree helptree.c
+# Your favorite tags program
+TAGS=etags
+#TAGS=ctags
 
-hlp2ms: hlp2ms.c
-	cc -o hlp2ms hlp2ms.c
+OBJS = plot.o scanner.o parse.o command.o eval.o \
+	standard.o internal.o util.o misc.o 
+
+SRC = plot.h command.c eval.c internal.c misc.c \
+	parse.c plot.c scanner.c standard.c util.c
+
+gnut2p: $(OBJS)
+	cc $(CFLAGS) $(OBJS) -o gnut2p -lm
+
+$(OBJS): plot.h
+
+TAGS: $(SRC)
+	$(TAGS) $(SRC)
 
 clean:
-	rm -f gnuplot.ms gnuplot.hold hlp2ms helptree
+	rm -f *.o *~ core
 
-# Dependencies are hard (for me) so just rebuild everthing out of help tree
-# (This assumes help tree is more recent than gnuplot.hlp)
+spotless:
+	rm -f *.o *~ core gnut2p TAGS
 
-hlp:
-	- mv gnuplot.hlp gnuplot.hold
-	./helptree -f $(HELPDIR) > gnuplot.hlp

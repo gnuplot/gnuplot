@@ -1,8 +1,8 @@
 /*
  *
- *    G N U P L O T  --  standard.c
+ *    G N U P L O T  --  header.c
  *
- *  Copyright (C) 1986, 1987  Thomas Williams, Colin Kelley
+ *  Copyright (C) 1986 Thomas Williams, Colin Kelley
  *
  *  You may use this code as you wish if credit is given and this message
  *  is retained.
@@ -78,17 +78,8 @@ f_tan()
 struct value a;
 register double den;
 	(void) pop(&a);
-	if (imag(&a) == 0.0)
-		push( complex(&a,tan(real(&a)),0.0) );
-	else {
-		den = cos(2*real(&a))+cosh(2*imag(&a));
-		if (den == 0.0) {
-			undefined = TRUE;
-			push( &a );
-		}
-		else
-			push( complex(&a,sin(2*real(&a))/den, sinh(2*imag(&a))/den) );
-	}
+	den = cos(2*real(&a))+cosh(2*imag(&a));
+	push( complex(&a,sin(2*real(&a))/den, sinh(2*imag(&a))/den) );
 }
 
 f_asin()
@@ -208,25 +199,20 @@ struct value a;
 f_sqrt()
 {
 struct value a;
-register double mag, ang;
+	double mag, ang;
 	(void) pop(&a);
 	mag = sqrt(magnitude(&a));
-	if (imag(&a) == 0.0 && real(&a) < 0.0)
-		push( complex(&a,0.0,mag) );
-	else
-	{
-		if ( (ang = angle(&a)) < 0.0)
-			ang += 2*Pi;
-		ang /= 2;
-		push( complex(&a,mag*cos(ang), mag*sin(ang)) );
-	}
+	if ( (ang = angle(&a)) < 0.0)
+		ang += 2*Pi;
+	ang /= 2;
+	push( complex(&a,mag*cos(ang), mag*sin(ang)) );
 }
 
 
 f_exp()
 {
-struct value a;
 register double mag, ang;
+struct value a;
 	(void) pop(&a);
 	mag = exp(real(&a));
 	ang = imag(&a);
@@ -250,7 +236,6 @@ struct value a;
 	(void) pop(&a);
 	push( complex(&a,log(magnitude(&a)), angle(&a)) );
 }
-
 
 f_besj0()	/* j0(a) = sin(a)/a */
 {
@@ -325,6 +310,7 @@ struct value a;
 }
 
 
+
 f_ceil()
 {
 struct value a;
@@ -338,22 +324,3 @@ struct value a;
 			push( complex(&a,ceil(a.v.cmplx_val.real), ceil(a.v.cmplx_val.imag)) );
 	}
 }
-
-#ifdef GAMMA
-
-f_gamma()
-{
-extern int signgam;
-register double y;
-struct value a;
-
-	y = gamma(real(pop(&a)));
-	if (y > 88.0) {
-		undefined = TRUE;
-		push( integer(&a,0) );
-	}
-	else
-		push( complex(&a,signgam * exp(y),0.0) );
-}
-
-#endif /* GAMMA */

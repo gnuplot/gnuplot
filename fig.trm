@@ -1,0 +1,211 @@
+/* GNUPLOT - fig.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  Fig graphics language
+ *
+ * AUTHORS
+ *  Micah Beck, David Kotz
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+/*
+ * Original for Fig code output by Micah Beck, 1989
+ * Department of Computer Science, Cornell University
+ * Updated by David Kotz for gnuplot 2.0
+ */
+#include "object.h"			/* from the TransFig distribution */
+
+#ifndef FIG_RES
+/* Must be 80 for the Fig editor, but may be increased if used 
+ * only by TransFig filters.
+ * Represents resolution per inch.
+ */
+#define FIG_RES		80
+#endif
+
+#define FIG_COORD_SYS	2
+
+#define FIG_MAGIC	"#FIG 1.4-TFX"
+#define FIG_HTIC	(5*FIG_RES/80)
+#define FIG_VTIC	(5*FIG_RES/80)
+#define FIG_HCHAR	(6*FIG_RES/80)
+#define FIG_VCHAR	(12*FIG_RES/80)
+
+#define FIG_ARROW_WIDTH FIG_HTIC
+#define FIG_ARROW_HEIGHT FIG_HTIC
+
+static long FIG_xbase = FIG_RES/2;
+static long FIG_ybase = FIG_RES/2;
+
+static long FIG_posx;
+static long FIG_posy;
+/* 5 inches wide by 3 inches high */
+#define FIG_XMAX (5 * FIG_RES)
+#define FIG_YMAX (3 * FIG_RES)
+
+static int FIG_type;		/* negative types use real lines */
+static float FIG_spacing;	/* length of dash or dot spacing */
+static int FIG_justify;		/* Fig justification T_*_JUSTIFIED */
+static float FIG_angle;		/* Fig text angle 0=horiz, Pi/2=vert */
+
+#define FIG_POINT_TYPES POINT_TYPES /* we use the same points */
+
+FIG_init()
+{
+    FIG_posx = FIG_posy = 0;
+    FIG_linetype(-1);
+    FIG_justify_text(LEFT);
+    FIG_text_angle(0);
+
+    fprintf(outfile, "%s\n", FIG_MAGIC);
+    fprintf(outfile, "%d %d\n", FIG_RES, FIG_COORD_SYS);
+}
+
+
+FIG_graphics()
+{
+    FIG_posx = FIG_posy = 0;
+    /* there is no way to have separate pictures in a FIG file */
+}
+
+
+FIG_text()
+{
+    /* there is no way to have separate pictures in a FIG file */
+}
+
+
+/* Line types for FIG work like this:
+ *  -2 : solid (border)
+ *  -1 : dashed 4 (axes)
+ *   0 : solid (first curve)
+ *   1 : dotted 3
+ *   2 : dashed 3
+ *   3 : dotted 6
+ *   4 : dashed 6
+ *   ... ...
+ */
+
+FIG_linetype(linetype)
+	int linetype;			/* expect linetype >= -2 */
+{
+    switch (linetype) {
+	   case 0:
+	   case -2: {
+		  FIG_type = 0;	/* solid line */
+		  FIG_spacing = 0.0;
+		  break;
+	   } 
+	   case -1: {
+		  FIG_type = 1;	/* dashed */
+		  FIG_spacing = 4.0; /* dash length */
+		  break;
+	   }
+	   default: {
+		  linetype = abs(linetype); /* shouldn't be negative anyway */
+		  /* now linetype >= 1 */
+		  FIG_type = linetype % 2 + 1; /* dotted, dashed, ... */
+		  FIG_spacing = (linetype+1) / 2 * 3;
+		  break;		  
+	   }
+    }
+}
+
+FIG_move(x,y)
+	unsigned int x,y;
+{
+    FIG_posx = x;
+    FIG_posy = y;
+}
+
+FIG_vector(ux,uy)
+	unsigned int ux,uy;
+{
+    	int x=ux, y=uy;
+
+  	fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+	 	O_POLYLINE, T_POLYLINE,
+	 	FIG_type, 1, DEFAULT, DEFAULT, DEFAULT, DEFAULT, FIG_spacing,
+	 	0, 0);
+  	fprintf(outfile, "%d %d %d %d 9999 9999\n",
+	 	FIG_posx, FIG_YMAX-FIG_posy, x, FIG_YMAX-y);
+
+	FIG_posx = x;
+    	FIG_posy = y;
+}
+
+FIG_arrow(sx, sy, ex, ey)
+	int sx, sy;	/* start coord */
+	int ex, ey;	/* end coord */
+{
+  	fprintf(outfile, "%d %d %d %d %d %d %d %d %6.3f  %d %d\n",
+	 	O_POLYLINE, T_POLYLINE,
+	 	FIG_type, 1, DEFAULT, DEFAULT, DEFAULT, DEFAULT, FIG_spacing,
+	 	1, 0);
+	/* arrow line */
+  	fprintf(outfile, "%d %d %.3f %.3f %.3f\n",
+	 	0, 0, 1.0, (float)FIG_ARROW_WIDTH, (float)FIG_ARROW_HEIGHT);
+  	fprintf(outfile, "%d %d %d %d 9999 9999\n",
+	 	sx, FIG_YMAX-sy, ex, FIG_YMAX-ey);
+
+	FIG_posx = ex;
+    	FIG_posy = ey;
+}
+
+FIG_put_text(x, y, str)
+	int x, y;
+	char *str;
+{
+    y = y - FIG_VCHAR/2;		/* assuming vertical center justified */
+
+    fprintf(outfile, "%d %d %d %d %d %d %d %6.3f %d %d %d %d %d %s\01\n",
+		  O_TEXT, FIG_justify,
+		  ROMAN_FONT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, FIG_angle,
+		  DEFAULT, 16, 8*strlen(str), x, FIG_YMAX-y, str);
+}
+
+int FIG_justify_text(mode)
+	enum JUSTIFY mode;
+{
+    switch(mode) {
+	   case LEFT: FIG_justify = T_LEFT_JUSTIFIED; break;
+	   case CENTRE: FIG_justify = T_CENTER_JUSTIFIED; break;
+	   case RIGHT: FIG_justify = T_RIGHT_JUSTIFIED; break;
+	   /* shouldn't happen */
+	   default: FIG_justify = T_LEFT_JUSTIFIED; break;
+    }
+    return (TRUE);
+}
+
+int FIG_text_angle(angle)
+	int angle;
+{
+    if (angle)
+	 FIG_angle = Pi / 2.0;	/* vertical is pi/2 radians */
+    else
+	 FIG_angle = 0.0;		/* horizontal */
+    return (TRUE);
+}
+
+FIG_reset()
+{
+    FIG_posx = FIG_posy = 0;
+}

@@ -2,7 +2,7 @@
  *
  *    G N U P L O T  --  scanner.c
  *
- *  Copyright (C) 1986, 1987  Colin Kelley, Thomas Williams
+ *  Copyright (C) 1986 Colin Kelley, Thomas Williams
  *
  *  You may use this code as you wish if credit is given and this message
  *  is retained.
@@ -12,12 +12,15 @@
  *
  *  This file should be edited with 4-column tabs!  (:set ts=4 sw=4 in vi)
  */
+/*
+ * Modifications for LaTeX and other support by David Kotz, 1988.
+ * Department of Computer Science, Duke University, Durham, NC 27706.
+ * Mail to dfk@cs.duke.edu.
+ */
 
 #include <stdio.h>
 #include <ctype.h>
 #include "plot.h"
-
-extern BOOLEAN screen_ok;
 
 #ifdef vms
 
@@ -31,8 +34,6 @@ extern BOOLEAN screen_ok;
 #endif /* vms */
 
 
-#define isident(c) (isalnum(c) || (c) == '_')
-
 #ifndef STDOUT
 #define STDOUT 1
 #endif
@@ -42,14 +43,16 @@ extern BOOLEAN screen_ok;
 
 #define APPEND_TOKEN {token[t_num].length++; current++;}
 
-#define SCAN_IDENTIFIER while (isident(expression[current + 1]))\
+#define SCAN_IDENTIFIER while (isalpha(expression[current + 1]) ||\
+			       isdigit(expression[current + 1]))\
 				APPEND_TOKEN
 
 extern struct lexical_unit token[MAX_TOKENS];
 
 static int t_num;	/* number of token I'm working on */
+int comment_pos;			/* position of comment in string (-1 == none) */
 
-char *strcat(), *strcpy(), *strncpy();
+char *strcat(), *strcpy();
 
 /*
  * scanner() breaks expression[] into lexical units, storing them in token[].
@@ -72,6 +75,7 @@ char *strcat(), *strcpy(), *strncpy();
  *		4.  &,|,=,*		current char; also next if next is same
  *		5.  !,<,>		current char; also next if next is =
  *		6.  ", '		all chars up until matching quote
+ *        7.  #          this token cuts off scanning of the line (DFK).
  *
  *		white space between tokens is ignored
  */
@@ -81,6 +85,8 @@ char expression[];
 register int current;	/* index of current char in expression[] */
 register int quote;
 char brace;
+
+     comment_pos = -1;		/* initialize to no comment found */
 
 	for (current = t_num = 0;
 	    t_num < MAX_TOKENS && expression[current] != '\0';
@@ -98,7 +104,8 @@ again:
 		}
 		if (isalpha(expression[current])) {
 			SCAN_IDENTIFIER;
-		} else if (isdigit(expression[current]) || expression[current] == '.'){
+		} else if (isdigit(expression[current]) ||
+			   expression[current] == '.') {
 			token[t_num].is_token = FALSE;
 			token[t_num].length = get_num(&expression[current]);
 			current += (token[t_num].length - 1);
@@ -113,21 +120,21 @@ again:
 			token[t_num].length += 2;
 			while (expression[++current] != RBRACE) {
 				token[t_num].length++;
-				if (expression[current] == '\0')			/* { for vi % */
+				if (expression[current] == '\0')
 					int_error("no matching '}'", t_num);
 			}
-		} else if (expression[current] == '\'' || expression[current] == '\"'){
+		} else if (expression[current] == '\'' || expression[current] == '\"') {
 			token[t_num].length++;
 			quote = expression[current];
 			while (expression[++current] != quote) {
-				if (!expression[current]) {
-					expression[current] = quote;
-					expression[current+1] = '\0';
-					break;
-				} else
-					token[t_num].length++;
+				if (expression[current] == '\0')
+					int_error("unmatched quote",t_num);
+				token[t_num].length++;
 			}
 		} else switch (expression[current]) {
+		    case '#':		/* DFK: add comments to gnutex */
+		      comment_pos = current; /* remember position */
+		    	 goto endline;	/* ignore the rest of the line */
 			case '^':
 			case '+':
 			case '-':
@@ -147,7 +154,8 @@ again:
 			case '|':
 			case '=':
 			case '*':
-				if (expression[current] == expression[current + 1])
+				if (expression[current] ==
+				    expression[current + 1])
 					APPEND_TOKEN;
 				break;
 			case '!':
@@ -161,6 +169,8 @@ again:
 			}
 		++t_num;	/* next token if not white space */
 	}
+
+endline:					/* comments jump here to ignore line */
 
 /* Now kludge an extra token which points to '\0' at end of expression[].
    This is useful so printerror() looks nice even if we've fallen off the
@@ -230,7 +240,7 @@ register char *last;
 register int i,c;
 register FILE *f;
 FILE *popen();
-static char pgm[MAX_LINE_LEN+1],output[MAX_LINE_LEN+1];
+static char pgm[MAX_LINE_LEN],output[MAX_LINE_LEN];
 
 #ifdef vms
 int chan;
@@ -274,9 +284,7 @@ static $DESCRIPTOR(lognamedsc,MAILBOX);
 	(void) pclose(f);
 	if (i + strlen(last) > max)
 		int_error("substitution overflowed rest of line", t_num);
-	(void) strncpy(output+i,last+1,MAX_LINE_LEN-i);
-									/* tack on rest of line to output */
+	(void) strcpy(output+i,last+1);		/* tack on rest of line to output */
 	(void) strcpy(str,output);				/* now replace ` ` with output */
-	screen_ok = FALSE;
 }
 #endif /* MS-DOS */

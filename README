@@ -1,91 +1,25 @@
-Hello,
+gnut2p translator - David Kotz January 1990
 
-This is the first distribution of any sort out of me.  This program,
-I believe, will find genuine use on almost all machines, versions of
-UN*X, and environments.  This system implements a VMS-like help facility
-for any and all commands, procedures, etc.
+This program converts gnutex files to gnuplot files.  It does its
+best, but is not perfect. Most of gnutex will translate directly, some
+things will translated easily (such as 'set size'), but some things
+cannot be translated (such as 'set style'). One thing this program
+does is to move plot commands down past the 'label' and 'key' commands
+(which change into 'set label' and 'set key' commands). This may move
+it past other commands. If it moves past variable or function
+definitions, 'set' commands, or other commands which affect the plot
+command's execution, then the new version will be incorrect. I expect
+this case to be rare; indeed, I generally expect the last lines in
+GnuTeX input files used with LaTeX to consist of 'plot, label,' and
+'key' commands.
 
-I hereby release this code into the public domain.  Please don't remove
-the file headers that have my name in them, and don't make profit with
-this system.  Rather, customize it to your own local uses and
+The usage of this program is simple: 
 
-		TEACH PEOPLE UN*X WITH THIS SYSTEM!!!
+   gnut2p infile outfile
 
-This later goal is by FAR more important to me than some stupid copyright
-notice that could be deleted by anyone anyway.  Also, I will not be libel
-for any damages done to your system, period.  AS IS WHERE IS is the motto.
+'infile' is an existing GnuTeX file, and 'outfile' will be created as
+the GNUPLOT equivalent. The errors, warnings, and explanatory comments
+appear on stderr. Any use of line continuation will be lost, and some
+instances of the input style (eg, white space) may be changed.
 
-This system is NOT intended to replace "man(1)" but rather to supplement
-the information in the manual pages to first time users.  For instance,
-here at OSU, we use this system on the undergraduate machine to try and
-guide the freshman through the gore of printing, editors, etc. rather
-than having a professor do it.  Also, most of the more often used
-commands have their manual pages ripped up and stuffed into this format
-to aid the student (you must admit that "help" is a more natural thing
-to type when in need as a first time UN*X user than is "man").
-
-Because we have 43 hosts here in the Computer and Information Sciences
-department, all running some flavor of UN*X, a LARGE amount of time
-was taken to make this as simple and portable as possible.  Therefore,
-"curses(3)" was not used (not all systems support it in the same way
-or even have it in a few cases).  Also things like ISAM were not used
-(portability problems).  This implies that this package does not have
-the 'spiffyness' that some of you may be looking for.
-
-In short, this is not going to impress the boss, code-wise.  Rather, the
-content of the help directorys (the actual text of the various help
-messages) are what should be devoted a fair amount of time.  This is also
-where this system shines.  True flexibility is achieved by the "DIR" files
-within this system.  They allow you to setup acronyms for traversing the
-directory tree of "TEXT" files.  This allows you to have help topics like
-"printing a file" or "using the printer in the basement" both point to
-the help screen on using the "lp" command.  This file also allows SYS5
-sites to use any length 'help file' name and still map it into the small
-file name SYS5 allows you (14 characters?).
-
-Hidden aliases can also be used.  This allows you to also have such things
-as "lp" be a 'help topic' as in the previous paragraph.  This makes the
-system less painful for those who really do know UN*X, but have forgotten
-one simple flag on "_XXXX_".
-
-These are the instructions to compile "help(L)":
-
-1.	Edit the file "global.h" and change the #define's
-	for ROOTDIR, HELPFILE, and DIRFILE to be locally
-	acceptable.
-
-2.	Edit the file "Makefile" and fix the definitions of BIN, HELPDIR,
-	HELPOWN, and HELPGRP so that "make install" will work.
-
-3.	Type "make all".
-
-4.	IF the make completes, play around with it for a while
-	and make sure it works...
-
-5.	Type "make install".  This will install a copy of our help
-	files, complete with typo's & bad grammar.  Most of the
-	files were typed in by various volunteers here within
-	the university.  You may want to look at them as an
-	example, you may want to delete them, who knows...
-
-I bet you think you are done...  HA!  HA!  HA!  That's a computer joke!
-You are just barely beginning.  Now comes the fun part. :-)
-
-6.	Type "cd <ROOTDIR>".
-
-7.	Start making your "./TEXT" and "./DIR" files.  The examples
-	in this shell archive should prove adequate for examples.
-	For a subtopic, type "mkdir <subtopic>" and then
-	"cd <subtopic>" and goto step 7.
-
-If you have any questions or further enhancements (or help subtrees :-),
-please e-mail them to me.  I really would like to hear how this thing
-fairs in the big wide world...
-
-Roland Stolfa
-Computing and Information Sciences Department
-Oklahoma State University
-219 Math Sciences Building
-Stillwater OK 74078
-
-rjs@a.cs.okstate.edu
+To build this program, see the Makefile. It is fairly straightforward.

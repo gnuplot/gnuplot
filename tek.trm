@@ -1,3 +1,33 @@
+/* GNUPLOT - tek.trm */
+/*
+ * Copyright (C) 1990   
+ *
+ * Permission to use, copy, and distribute this software and its
+ * documentation for any purpose with or without fee is hereby granted, 
+ * provided that the above copyright notice appear in all copies and 
+ * that both that copyright notice and this permission notice appear 
+ * in supporting documentation.
+ *
+ * Permission to modify the software is granted, but not the right to
+ * distribute the modified code.  Modifications are to be distributed 
+ * as patches to released version.
+ *  
+ * This software  is provided "as is" without express or implied warranty.
+ * 
+ * This file is included by ../term.c.
+ *
+ * This terminal driver supports:
+ *  tek40xx, bitgraph, kermit_color_tek40xx, kermit_mono_tek40xx, selanar
+ *
+ * AUTHORS
+ *   Colin Kelley, Thomas Williams, Russell Lang
+ * 
+ * send your comments or suggestions to (pixar!info-gnuplot@sun.com).
+ * 
+ */
+
+#ifdef TEK
+
 #define TEK40XMAX 1024
 #define TEK40YMAX 780
 
@@ -29,8 +59,11 @@ TEK40graphics()
 /*                   1
 	1. clear screen
 */
+	(void) fflush(outfile);
+	sleep(1);  
+	/* sleep 1 second to allow screen time to clear on real 
+	   tektronix terminals */
 }
-
 
 TEK40text()
 {
@@ -46,7 +79,6 @@ TEK40linetype(linetype)
 int linetype;
 {
 }
-
 
 TEK40move(x,y)
 unsigned int x,y;
@@ -66,21 +98,11 @@ unsigned int x,y;
 }
 
 
-TEK40lrput_text(row,str)
-unsigned int row;
+TEK40put_text(x,y,str)
+unsigned int x,y;
 char str[];
 {
-	TEK40move(TEK40XMAX - TEK40HTIC - TEK40HCHAR*(strlen(str)+1),
-		TEK40VTIC + TEK40VCHAR*(row+1));
-	fprintf(outfile,"\037%s\n",str);
-}
-
-
-TEK40ulput_text(row,str)
-unsigned int row;
-char str[];
-{
-	TEK40move(TEK40HTIC, TEK40YMAX - TEK40VTIC - TEK40VCHAR*(row+1));
+	TEK40move(x,y-11);
 	fprintf(outfile,"\037%s\n",str);
 }
 
@@ -89,4 +111,168 @@ TEK40reset()
 {
 }
 
+#endif /* TEK */
+
+
+
+/* thanks to dukecdu!evs (Ed Simpson) for the BBN BitGraph driver */
+
+#ifdef BITGRAPH
+
+#define BG_XMAX			 	768 /* width of plot area */
+#define BG_YMAX			 	768 /* height of plot area */
+#define BG_SCREEN_HEIGHT	1024 /* full screen height */
+
+#define BG_XLAST	 (BG_XMAX - 1)
+#define BG_YLAST	 (BG_YMAX - 1)
+
+#define BG_VCHAR	16
+#define BG_HCHAR	 9
+#define BG_VTIC		 8
+#define BG_HTIC		 8	
+
+
+#define BG_init TEK40init
+
+#define BG_graphics TEK40graphics
+
+
+#define BG_linetype TEK40linetype
+
+#define BG_move TEK40move
+
+#define BG_vector TEK40vector
+
+
+BG_text()
+{
+	BG_move(0, BG_SCREEN_HEIGHT - 2 * BG_VCHAR);
+	fprintf(outfile,"\037");
+/*                   1
+	1. into alphanumerics
+*/
+}
+
+
+BG_put_text(x,y,str)
+unsigned int x,y;
+char str[];
+{
+	BG_move(x,y-11);
+	fprintf(outfile,"\037%s\n",str);
+}
+
+
+#define BG_reset TEK40reset
+
+#endif /* BITGRAPH */
+
+
+/* Color and Monochrome specials for the MS-Kermit Tektronix Emulator
+   by Russell Lang,  eln272v@monu1.cc.monash.oz  */
+
+#ifdef KERMIT
+
+#define KTEK40HCHAR		13
+
+KTEK40graphics()
+{
+	fprintf(outfile,"\033\014");
+/*                   1
+	1. clear screen
+*/
+	/* kermit tektronix emulation doesn't need to wait */
+}
+
+KTEK40Ctext()
+{
+	TEK40text();
+	KTEK40Clinetype(0);  /* change to green */
+}
+
+/* special color linetypes for MS-DOS Kermit v2.31 tektronix emulator */
+/*	0 = normal, 1 = bright 
+	foreground color (30-37) = 30 + colors
+		where colors are   1=red, 2=green, 4=blue */
+static char *kermit_color[15]= {"\033[0;37m","\033[1;30m",
+		"\033[0;32m","\033[0;36m","\033[0;31m","\033[0;35m",
+		"\033[1;34m","\033[1;33m","\033[1;31m","\033[1;37m",
+		"\033[1;35m","\033[1;32m","\033[1;36m","\033[0;34m",
+		"\033[0;33m"};
+
+KTEK40Clinetype(linetype)
+int linetype;
+{
+	if (linetype >= 13)
+		linetype %= 13;
+	fprintf(outfile,"%s",kermit_color[linetype+2]);
+}
+
+
+/* linetypes for MS-DOS Kermit v2.30 tektronix emulator */
+/* `=solid, a=fine dots, b=short dashes, c=dash dot, 
+   d=long dash dot, e=dash dot dot */
+static char *kerm_linetype = "`a`abcde" ;
+
+KTEK40Mlinetype(linetype)
+int linetype;
+{
+	if (linetype >= 6)
+		linetype %= 6;
+	fprintf(outfile,"\033%c",kerm_linetype[linetype+2]);
+}
+
+KTEK40reset()
+{
+	fprintf(outfile,"\030\n");  /* turn off Tek emulation */
+}
+
+#endif /* KERMIT */
+
+
+/* thanks to sask!macphed (Geoff Coleman and Ian Macphedran) for the
+   Selanar driver */
+
+#ifdef SELANAR
+
+SEL_init()
+{
+	fprintf(outfile,"\033\062");
+/*					1
+	1. set to ansi mode
+*/
+}
+
+
+SEL_graphics()
+{
+	fprintf(outfile,"\033[H\033[J\033\061\033\014");
+/*                   1           2       3
+	1. clear ANSI screen
+	2. set to TEK mode
+	3. clear screen
+*/
+}
+
+
+SEL_text()
+{
+	TEK40move(0,12);
+	fprintf(outfile,"\033\062");
+/*                   1
+	1. into ANSI mode
+*/
+}
+
+SEL_reset()
+{
+	fprintf(outfile,"\033\061\033\012\033\062\033[H\033[J");
+/*                   1        2       3      4
+1       set tek mode
+2       clear screen
+3       set ansi mode
+4       clear screen
+*/
+}
+#endif /* SELANAR */
 

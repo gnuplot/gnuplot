@@ -1,124 +1,209 @@
-# "make all" will compile all the necessary programs, gnuplot itself, the
-# help system and helptree (to make the help tree out of the flat file.)
 #
-# "make install will install all the necessary pieces to run gnuplot
-# successfully.  This includes creating the help tree in /usr/local/help.
+# GNUPLOT Makefile
+#
 
-# If you do not wish the destinations of the executable and manual page to
-# be at the default locations (see below), feel free to change them.
-# The location of the help system and help tree also have default values.
-# If you want them somewhere else or would like to test the whole system
-# before you run "make install", you have to set environment variables so
-# that gnuplot finds them.  See README.3B1 for details.
+# directory where to install executables on 'make install'
+DEST=/usr/local/bin
+# directory for installing man page on 'make man_install'
+MANDEST=/usr/man/manl
+# where to install help file gnuplot.gih
+#HELPDEST=/usr/local/lib/gnuplot.gih
+HELPDEST=docs/gnuplot.gih
+# Where to send email about bugs and comments (locally)
+EMAIL=\"pixar\!bug-gnuplot@sun.com\"
 
-# where to install executable on 'make install'
-DEST=/usr/local/bin/gnuplot
-# where to install man page on 'make man_install'
-MANDEST=/usr/man/man1/gnuplot.1
-
-# -DFORK if you have vfork()
+# -DVFORK if you have vfork()
 # -DBCOPY if your memcpy() is called bcopy() (a Berkeleyism, right?)
+# -DBZERO if you need to use bzero() (another BSD feature) instead of memset() 
 # -DNOCOPY if you don't have a memcpy() by any name
 # -DGAMMA if you've got gamma(3)
+# -fswitch if you are compiling on a Sun3 (or even -f68881)
 # -O if you trust your compiler's optimizer
-CFLAGS = -DVFORK -DBCOPY -DGAMMA #-gx #-O
+CFLAGS = -DVFORK -DBCOPY -DBZERO -DGAMMA #-gx #-O
 
 # -D<terminal> in TERMFLAGS iff you wish to support <terminal>
 # -DAED         AED 512 and AED 767
 # -DBITGRAPH    BBN BitGraph
+# -DDXY800A     Roland DXY800A plotter
+# -DEEPIC	  	 EEPIC-extended LaTeX driver, for EEPIC users
+# -DEPSON		Epson LX-800, Star NL-10, NX-1000 and lots of others
+# -DFIG 	  	Fig graphics language (requires object.h from TransFig)
+# -DHP2648		HP2648, HP2647
 # -DHP26        HP2623A and maybe others
 # -DHP75        HP7580, and probably other HPs
-# -DHPLJET      HP LaserJet laserprinter
+# -DHPGL		HP7475, HP7220 plotters, and (hopefully) lots of others
+# -DHPLJET		HP Laserjet
+# -DIMAGEN  	Imagen laser printers (300dpi) (requires -Iterm also)
+# -DIRIS4D      IRIS4D series computer
+# -DKERMIT      MS-Kermit Tektronix 4010 emulator
+# -DLATEX       LATEX picture environment
+# -DNEC         NEC CP6 pinwriter printer
 # -DPOSTSCRIPT  Postscript
+# -DPROPRINTER  IBM Proprinter
 # -DQMS         QMS/QUIC laserprinter (Talaris 1200 and others)
 # -DREGIS       ReGis graphics (vt125, vt220, vt240, Gigis...)
 # -DSELANAR     Selanar
 # -DTEK         Tektronix 4010, and probably others
+# -DSUN         Sun Microsystems Workstation
 # -DUNIXPC      unixpc (ATT 3b1 or ATT 7300)
 # -DUNIXPLOT    unixplot
 # -DV384        Vectrix 384 and tandy color printer
 
-TERMFLAGS = -DAED -DBITGRAPH -DHP26 -DHP75 -DPOSTSCRIPT -DQMS -DREGIS -DSELANAR -DTEK -DUNIXPLOT -DV384
+TERMFLAGS =  -Iterm -DAED -DBITGRAPH -DDXY800A -DEPSON -DHP2648 \
+	-DHP26 -DHP75 -DHPGL -DHPLJET -DIMAGEN -DKERMIT -DLATEX -DEEPIC \
+	-DPOSTSCRIPT -DPROPRINTER -DQMS -DREGIS -DSELANAR -DTEK \
+	-DUNIXPLOT -DV384 
 
+OBJS = command.o eval.o graphics.o help.o internal.o misc.o parse.o\
+    plot.o scanner.o setshow.o standard.o term.o util.o 
 
-OBJS = 	command.o eval.o graphics.o internal.o misc.o parse.o plot.o scanner.o\
-    standard.o term.o util.o
+DIRS = term demo bugtest docs docs/latextut translate
+CSOURCE1 = command.c setshow.c 
+CSOURCE2 = help.c graphics.c internal.c 
+CSOURCE3 = misc.c eval.c parse.c plot.c scanner.c standard.c 
+CSOURCE4 = term.c util.c version.c
+CSOURCE5 = term/aed.trm term/dxy.trm term/epson.trm term/font5x7.trm \
+	term/hp26.trm term/hp2648.trm term/hpgl.trm \
+	term/hpljet.trm term/iris4d.trm term/sun.trm
+CSOURCE6 = term/post.trm term/pc.trm term/qms.trm term/regis.trm \
+	term/tek.trm term/unixpc.trm term/unixplot.trm term/v384.trm
+CSOURCE7 = term/imPcodes.h term/imagen.trm term/object.h term/fig.trm \
+	term/latex.trm term/eepic.trm
+# not C code, but still needed
+ETC = Copyright README README.gnutex makefile.unx makefile.vms  \
+	makefile.3b1 makefile.ult plot.h help.h setshow.h lasergnu \
+ 	demo/1.dat demo/2.dat demo/3.dat demo/controls.demo \
+	demo/simple.demo demo/polar.demo demo/electron.demo \
+	bugtest/README bugtest/printf.c bugtest/scanf.c \
+	bugtest/mscbug.c term/README \
+	linkopt.vms buildvms.com
+# PC-specific files
+PC = corgraph.asm corplot.c header.mac hrcgraph.asm lineproc.mac \
+	linkopt.msc linkopt.tc makefile.msc makefile.tc pcgraph.asm 
+# Documentation and help files
+DOCS1 = docs/Makefile docs/README docs/checkdoc.c docs/doc2gih.c \
+	docs/doc2hlp.c docs/doc2hlp.com docs/doc2ms.c docs/doc2tex.c \
+	docs/gnuplot.1 docs/lasergnu.1 \
+	docs/titlepage.ms docs/titlepage.tex
+DOCS2 = docs/gnuplot.doc
+DOCS3 = docs/latextut/Makefile docs/latextut/eg1.plt \
+	docs/latextut/eg2.plt docs/latextut/eg3.dat docs/latextut/eg3.plt \
+	docs/latextut/eg4.plt docs/latextut/eg5.plt docs/latextut/eg6.plt \
+	docs/latextut/header.tex docs/latextut/tutorial.tex
+# gnutex->gnuplot translator
+TSOURCE1 = translate/Makefile translate/README translate/command.c \
+	translate/eval.c translate/gnut2p.1 translate/internal.c \
+	translate/misc.c translate/parse.c translate/plot.c
+TSOURCE2 = \
+	translate/plot.h translate/scanner.c translate/standard.c \
+	translate/test1 translate/test2 translate/util.c
 
 # -lplot if you have -DUNIXPLOT
+# -lsuntool -lsunwindow -lpixrect  if you have -DSUN
+# -lgl_s if IRIS4D
 LIBS = -lm -lplot
 
-# If you do not wish to compile the help system or make the help directory
-# tree, feel free to comment out the appropriate lines that do it.
-
-all:	gnuplot help_system doc_tree
-
 gnuplot: $(OBJS) version.o
-	cc $(OBJS) version.o $(LIBS) -o gnuplot
+	cc $(CFLAGS) $(OBJS) version.o $(LIBS) -o gnuplot
 
-help_system:
-	( cd help ; make )
+doc:
+	( cd docs; make gnuplot.gih )
 
-doc_tree:
-	( cd docs ; make helptree )
+translate:
+	(cd translate; make)
 
-# note that directory /usr/local/help must exist for the help tree
-# to be created
-install: gnuplot help_system doc_tree man_install
-	cp gnuplot $(DEST)
-	strip $(DEST)
-	docs/helptree -t /usr/local/help/gnuplot < docs/gnuplot.hlp
-	cd help; make install
+all:	gnuplot doc
 
-man_install: gnuplot.1
-	cp gnuplot.1 $(MANDEST)
+install: gnuplot doc man_install
+	cp gnuplot lasergnu $(DEST)
+	strip $(DEST)/gnuplot
+	(cd docs; make install-unix HELPDEST=$(HELPDEST))
 
-term.o: term.c aed.trm bitgraph.trm hp26.trm hp75.trm hpljet.trm pc.trm \
-	postscpt.trm qms.trm regis.trm selanar.trm tek.trm unixpc.trm \
-	unixplot.trm v384.trm
+man_install: docs/gnuplot.1 docs/lasergnu.1
+	cp docs/gnuplot.1 docs/lasergnu.1 $(MANDEST)
+
+term.o: $(CSOURCE4) $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 	cc $(CFLAGS) $(TERMFLAGS) -c term.c
 
+version.o:
+	cc $(CFLAGS) -DCONTACT=$(EMAIL) -c version.c
 
 $(OBJS): plot.h
 
-clean:
-	rm -f *.o gnuplot
+command.o:
+	cc $(CFLAGS) -c command.c -DHELPFILE=\"$(HELPDEST)\"
 
-	( cd help ; make clean )
-	( cd docs ; make clean )
+command.o help.o misc.o: help.h
+
+command.o graphics.o misc.o plot.o setshow.o: setshow.h
+
+SOURCES=plot.h help.h setshow.h $(CSOURCE1) $(CSOURCE2) $(CSOURCE3) \
+	$(CSOURCE4) $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
+
+lint:
+	lint -hx $(CSOURCE1) $(CSOURCE2) $(CSOURCE3) $(CSOURCE4)
+
+clean:
+	rm -f *.o *~ term/*~
+	(cd docs; make clean)
+	(cd docs/latextut; make clean)
+	(cd translate; make clean)
 
 spotless:
-	rm -f *.o gnuplot Makefile help/Makefile
+	rm -f *.o *~ term/*~ TAGS gnuplot
+	(cd docs; make clean)
+	(cd docs/latextut; make spotless)
+	(cd translate; make spotless)
 
-	( cd help ; make clean -f makefile.unx )
-	( cd docs ; make clean )
+shar: gnuplot.sh00 gnuplot.sh01 gnuplot.sh02 gnuplot.sh03 gnuplot.sh04 \
+	gnuplot.sh05 gnuplot.sh06 gnuplot.sh07 gnuplot.sh08 \
+	gnuplot.sh09 gnuplot.sh10 gnuplot.sh11 gnuplot.sh12 \
+	gnuplot.sh13 gnuplot.sh14
 
-#
-# if you have the Rich $alz shar package, you can use this make shar section.
-#
+gnuplot.sh00:
+	echo '#!/bin/sh' > gnuplot.sh00
+	echo '# This is a shell file to make directories' >> gnuplot.sh00
+	echo mkdir $(DIRS) >> gnuplot.sh00
 
-shars:	spotless shar/gnuplot.shar.1 shar/gnuplot.shar.2 \
-	shar/gnuplot.shar.3 shar/gnuplot.shar.4 shar/gnuplot.shar.5 \
-	shar/gnuplot.shar.6 shar/gnuplot.shar.7
+gnuplot.sh01: $(ETC)
+	shar $(ETC) > gnuplot.sh01
 
-shar/gnuplot.shar.1: [1-9]* [A-Z]* [a-f]*
-	shar -n1 -e7 [1-9]* [A-Z]* [a-f]* > shar/gnuplot.shar.1
+gnuplot.sh02: $(DOCS1)
+	shar $(DOCS1) > gnuplot.sh02
 
-shar/gnuplot.shar.2: [g-l]*
-	shar -n2 -e7 [g-l]* > shar/gnuplot.shar.2
+gnuplot.sh03: $(DOCS2)
+	shar $(DOCS2) > gnuplot.sh03
 
-shar/gnuplot.shar.3: [m-o]* p[a-i]*
-	shar -n3 -e7 [m-o]* p[a-i]* > shar/gnuplot.shar.3
+gnuplot.sh04: $(DOCS3)
+	shar $(DOCS3) > gnuplot.sh04
 
-shar/gnuplot.shar.4: p[j-z]* [q-t]*
-	shar -n4 -e7 p[j-z]* [q-t]* > shar/gnuplot.shar.4
+gnuplot.sh05: $(CSOURCE1)
+	shar $(CSOURCE1) > gnuplot.sh05
 
-shar/gnuplot.shar.5: [u-z]*
-	shar -n5 -e7 [u-z]* > shar/gnuplot.shar.5
+gnuplot.sh06: $(CSOURCE2)
+	shar $(CSOURCE2) > gnuplot.sh06
 
-shar/gnuplot.shar.6: docs/[A-Z]* docs/[a-g]*
-	cd docs; make clean; cd ..
-	shar -n6 -e7 docs docs/[A-Z]* docs/[a-g]* > shar/gnuplot.shar.6
+gnuplot.sh07: $(CSOURCE3)
+	shar $(CSOURCE3) > gnuplot.sh07
 
-shar/gnuplot.shar.7: docs/[h-z]* help/*
-	shar -n7 -e7 docs/[h-z]* help help/* > shar/gnuplot.shar.7
+gnuplot.sh08: $(CSOURCE4)
+	shar $(CSOURCE4) > gnuplot.sh08
+
+gnuplot.sh09: $(CSOURCE5)
+	shar $(CSOURCE5) > gnuplot.sh09
+
+gnuplot.sh10: $(CSOURCE6)
+	shar $(CSOURCE6) > gnuplot.sh10
+
+gnuplot.sh11: $(CSOURCE7)
+	shar $(CSOURCE7) > gnuplot.sh11
+
+gnuplot.sh12: $(PC)
+	shar $(PC) > gnuplot.sh12
+
+gnuplot.sh13: $(TSOURCE1)
+	shar $(TSOURCE1) > gnuplot.sh13
+
+gnuplot.sh14: $(TSOURCE2)
+	shar $(TSOURCE2) > gnuplot.sh14
 
