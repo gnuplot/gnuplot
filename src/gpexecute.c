@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.9 2001/02/19 17:08:22 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.10 2001/08/22 14:15:34 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -52,7 +52,7 @@ static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.9 2001/02/19 17:08:22 
 #include "gpexecute.h"
 
 #ifdef PIPE_IPC
-# include <unistd.h>		/* open(), write() */
+# include <unistd.h>	/* open(), write() */
 # include <stdlib.h>
 # include <assert.h>
 # include <errno.h>
@@ -62,6 +62,7 @@ int pipe_died = 0;
 #ifdef WIN_IPC
 # include <stdlib.h>
 # include <assert.h>
+# include "mouse.h"	/* do_event() */
 #endif
 
 #if defined(PIPE_IPC) /* || defined(WIN_IPC) */
@@ -254,9 +255,7 @@ gp_exec_event(char type, int mx, int my, int par1, int par2)
 #ifdef WIN_IPC
     /* FIXME HBB 20010216: this breaks the wgnuplot.exe+wgnuplot.dll type of
      * compilation (for Win16). do_event is in the main program(mouse.c), but 
-     * gpexecute is in the DLL --> can't reach it, from here. A 'called without
-     * a prototype' warning is the only telltale sign of the problem of this, at 
-     * compile time */
+     * gpexecute is in the DLL --> can't reach it, from here. */
     do_event(&ge);
     return;
 #endif
