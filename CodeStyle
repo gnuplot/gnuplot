@@ -230,4 +230,12 @@ logic. I tend to leave these markers in when I finally figure it out,
 though perhaps I should not.
 
 
+Source code is intended to be read and maintained by humans. As such,
+readability is prefered over elegance. Please separate all operators
+from operands with a space, ie. instead of x+=3, use x += 3. The former
+is not only less readable, it may also break older compilers! This rule
+should also be followed for simple assignments, ie. in for (;;) loops.
+Unary operators should be writen as usual, ie i++.
+
+
 [more to come]
