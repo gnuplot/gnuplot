@@ -1,3 +1,8 @@
+2002-11-28  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
+
+	* src/util3d.c (draw3d_line_unconditional): Removed the GP_INLINE
+ 	qualifier.  MSVC build would fail otherwise.
+	
 2002-11-27  Johannes Zellner  <johannes@zellner.org>
 
 	* term/cgm.trm:
@@ -7,18 +12,20 @@
 
 2002-11-26  Ethan Merritt  <merritt@u.washington.edu>
 
-        * src/save.c src/set.c src/show.c src/unset.c src/tables.c src/tables.h
-	docs/gnuplot.doc:  Change syntax from 'set missing "<string>"' to 
-	'set datafile missing "<string>"'. The old syntax is still accepted.
+        * src/save.c src/set.c src/show.c src/unset.c src/tables.c
+ 	src/tables.h docs/gnuplot.doc: Change syntax from 'set missing
+ 	"<string>"' to 'set datafile missing "<string>"'. The old syntax
+ 	is still accepted.
 
 2002-11-26  Shigeharu Takeno  <shige@iee.niit.ac.jp>
 
-	* docs/gnuplot.doc, term/be.trm, term/cgm.trm, term/x11.trm: Fix more
-	misprints in documentation.
+	* docs/gnuplot.doc, term/be.trm, term/cgm.trm, term/x11.trm: Fix
+ 	more misprints in documentation.
 
 2002-11-26  Peter Wegener  <pete@shirkhan.ilr.ing.tu-bs.de>
 
-	* src/Makefile.am: Allow overriding X11_DRIVER_DIR from environment.
+	* src/Makefile.am: Allow overriding X11_DRIVER_DIR from
+ 	environment.
 
 2002-11-20  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 
@@ -1471,7 +1478,7 @@
 
 	* docs/titlepag.sty: Changes for the title page of gnuplot.tex: 
 	Show up-to-date gnuplot version (from the file VERSION) and the
-	last modification date (from the tag $Date: 2002/11/27 19:56:33 $).
+	last modification date (from the tag $Date: 2002/11/27 20:47:49 $).
 
 2002-03-07  Hans-Bernhard Broeker  <broeker@physik.rwth-aachen.de>
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util3d.c,v 1.15 2002/02/13 22:58:18 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: util3d.c,v 1.16 2002/03/13 12:59:16 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util3d.c */
@@ -1053,7 +1053,8 @@ draw3d_point_unconditional(v, lp)
 
 /* Moved this upward, to make optional inlining in draw3d_line easier
  * for compilers */
-GP_INLINE void
+/* HBB 20021128: removed GP_INLINE qualifier to avoid MSVC++ silliness */
+void
 draw3d_line_unconditional(v1, v2, lp, linetype)
     p_vertex v1, v2;
     struct lp_style_type *lp;
