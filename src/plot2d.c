@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.20 1999/10/01 14:54:34 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.21 1999/10/17 19:12:58 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot2d.c */
@@ -49,8 +49,8 @@ static char *RCSid() { return RCSid("$Id: plot2d.c,v 1.20 1999/10/01 14:54:34 lh
 
 void plot3drequest __PROTO((void));
 void define __PROTO((void));
-static int get_data __PROTO((struct curve_points * this_plot));
-static void store2d_point __PROTO((struct curve_points * this_plot, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
+static int get_data __PROTO((struct curve_points *));
+static void store2d_point __PROTO((struct curve_points *, int i, double x, double y, double xlow, double xhigh, double ylow, double yhigh, double width));
 static void print_table __PROTO((struct curve_points * first_plot, int plot_num));
 static void eval_plots __PROTO((void));
 static void parametric_fixup __PROTO((struct curve_points * start_plot, int *plot_num));
@@ -247,20 +247,20 @@ plotrequest()
 
 
 static int
-get_data(this_plot)
-struct curve_points *this_plot;
-/* this_plot->token is after datafile spec, for error reporting
+get_data(current_plot)
+struct curve_points *current_plot;
+/* current_plot->token is after datafile spec, for error reporting
  * it will later be moved passed title/with/linetype/pointtype
  */
 {
     int i /* num. points ! */ , j;
     int max_cols, min_cols;    /* allowed range of column numbers */
     double v[NCOL];
-    int storetoken = this_plot->token;
+    int storetoken = current_plot->token;
 
     /* eval_plots has already opened file */
 
-    switch (this_plot->plot_style) {	/* set maximum columns to scan */
+    switch (current_plot->plot_style) {	/* set maximum columns to scan */
     case XYERRORLINES:
     case XYERRORBARS:
     case BOXXYERROR:
@@ -301,7 +301,7 @@ struct curve_points *this_plot;
 	break;
     }
 
-    if (this_plot->plot_smooth == SMOOTH_ACSPLINES)
+    if (current_plot->plot_smooth == SMOOTH_ACSPLINES)
 	max_cols = 3;
 
     if (df_no_use_specs > max_cols)
@@ -314,13 +314,13 @@ struct curve_points *this_plot;
     while ((j = df_readline(v, max_cols)) != DF_EOF) {
 	/* j <= max_cols */
 
-	if (i >= this_plot->p_max) {
+	if (i >= current_plot->p_max) {
 	    /*
 	     * overflow about to occur. Extend size of points[] array. We
 	     * either double the size, or add 1000 points, whichever is a
 	     * smaller increment. Note i = p_max.
 	     */
-	    cp_extend(this_plot, i + (i < 1000 ? i : 1000));
+	    cp_extend(current_plot, i + (i < 1000 ? i : 1000));
 	}
 	/* Limitation: No xerrorbars with boxes */
 	switch (j) {
@@ -331,13 +331,13 @@ struct curve_points *this_plot;
 	    }
 	case DF_UNDEFINED:
 	    /* bad result from extended using expression */
-	    this_plot->points[i].type = UNDEFINED;
+	    current_plot->points[i].type = UNDEFINED;
 	    i++;
 	    continue;
 
 	case DF_FIRST_BLANK:
 	    /* break in data, make next point undefined */
-	    this_plot->points[i].type = UNDEFINED;
+	    current_plot->points[i].type = UNDEFINED;
 	    i++;
 	    continue;
 
@@ -350,7 +350,7 @@ struct curve_points *this_plot;
 	case 0:		/* not blank line, but df_readline couldn't parse it */
 	    {
 		df_close();
-		int_error(this_plot->token,
+		int_error(current_plot->token,
 			  "Bad data on line %d", df_line_number);
 	    }
 
@@ -366,13 +366,13 @@ struct curve_points *this_plot;
 	    /* x, y */
 	    /* ylow and yhigh are same as y */
 
-	    if (this_plot->plot_style == BOXES && boxwidth > 0) {
+	    if (current_plot->plot_style == BOXES && boxwidth > 0) {
 		/* calc width now */
-		store2d_point(this_plot, i++, v[0], v[1], v[0] - boxwidth / 2, v[0] + boxwidth / 2, v[1], v[1], 0.0);
+		store2d_point(current_plot, i++, v[0], v[1], v[0] - boxwidth / 2, v[0] + boxwidth / 2, v[1], v[1], 0.0);
 	    } else {
 		/* xlow and xhigh are same as x */
 		/* auto width if boxes, else ignored */
-		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1],
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
 			      v[1], -1.0);
 	    }
 	    break;
@@ -380,27 +380,27 @@ struct curve_points *this_plot;
 
 	case 3:
 	    /* x, y, ydelta OR x, y, xdelta OR x, y, width */
-	    if (this_plot->plot_smooth == SMOOTH_ACSPLINES)
-		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[1],
+	    if (current_plot->plot_smooth == SMOOTH_ACSPLINES)
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[1],
 			      v[1], v[2]);
 	    else
-		switch (this_plot->plot_style) {
+		switch (current_plot->plot_style) {
 		default:
 		    int_warn(storetoken, "This plot style not work with 3 cols. Setting to yerrorbars");
-		    this_plot->plot_style = YERRORBARS;
+		    current_plot->plot_style = YERRORBARS;
 		    /* fall through */
 
 		case YERRORLINES:
 		case YERRORBARS:
 		case BOXERROR:	/* x, y, dy */
 		    /* auto width if boxes, else ignored */
-		    store2d_point(this_plot, i++, v[0], v[1], v[0], v[0],
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 				  v[1] - v[2], v[1] + v[2], -1.0);
 		    break;
 
 		case XERRORLINES:
 		case XERRORBARS:
-		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2],
+		    store2d_point(current_plot, i++, v[0], v[1], v[0] - v[2],
 				  v[0] + v[2], v[1], v[1], 0.0);
 		    break;
 
@@ -408,7 +408,7 @@ struct curve_points *this_plot;
 		    /* calculate xmin and xmax here, so that logs are taken if
 		     * if necessary
 		     */
-		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2] / 2,
+		    store2d_point(current_plot, i++, v[0], v[1], v[0] - v[2] / 2,
 				  v[0] + v[2] / 2, v[1], v[1], 0.0);
 		    break;
 
@@ -425,46 +425,46 @@ struct curve_points *this_plot;
 	     * x, y, ydelta, width
 	     */
 
-	    switch (this_plot->plot_style) {
+	    switch (current_plot->plot_style) {
 	    default:
 		int_warn(storetoken, "This plot style does not work with 4 cols. Setting to yerrorbars");
-		this_plot->plot_style = YERRORBARS;
+		current_plot->plot_style = YERRORBARS;
 		/* fall through */
 
 	    case YERRORLINES:
 	    case YERRORBARS:
-		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0], v[2],
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0], v[2],
 			      v[3], -1.0);
 		break;
 
 	    case BOXXYERROR:	/* x, y, dx, dy */
 	    case XYERRORLINES:
 	    case XYERRORBARS:
-		store2d_point(this_plot, i++, v[0], v[1], v[0] - v[2],
+		store2d_point(current_plot, i++, v[0], v[1], v[0] - v[2],
 			      v[0] + v[2], v[1] - v[3], v[1] + v[3], 0.0);
 		break;
 
 
 	    case BOXES:	/* x, y, xmin, xmax */
-		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1],
+		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[1],
 			      v[1], 0.0);
 		break;
 
 	    case XERRORLINES:
 	    case XERRORBARS:
-		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[1],
+		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[1],
 			      v[1], 0.0);
 		break;
 
 	    case BOXERROR:
 		/* x,y, xleft, xright */
-		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0],
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 			      v[1] - v[2], v[1] + v[2], 0.0);
 		break;
 
 	    case VECTOR:
 		/* x,y,dx,dy */
-		store2d_point(this_plot, i++, v[0], v[1], v[0], v[0] + v[2],
+		store2d_point(current_plot, i++, v[0], v[1], v[0], v[0] + v[2],
 			      v[1], v[1] + v[3], -1.0);
 		break;
 	    }			/*inner switch */
@@ -474,20 +474,20 @@ struct curve_points *this_plot;
 
 	case 5:
 	    {	/* x, y, ylow, yhigh, width  or  x open low high close */
-		switch (this_plot->plot_style) {
+		switch (current_plot->plot_style) {
 		default:
 		    int_warn(storetoken, "Five col. plot style must be boxerrorbars, financebars or candlesticks. Setting to boxerrorbars");
-		    this_plot->plot_style = BOXERROR;
+		    current_plot->plot_style = BOXERROR;
 		    /*fall through */
 
 		case BOXERROR:	/* x, y, ylow, yhigh, width */
-		    store2d_point(this_plot, i++, v[0], v[1], v[0] - v[4] / 2,
+		    store2d_point(current_plot, i++, v[0], v[1], v[0] - v[4] / 2,
 				  v[0] + v[4] / 2, v[2], v[3], 0.0);
 		    break;
 
 		case FINANCEBARS:
 		case CANDLESTICKS:
-		    store2d_point(this_plot, i++, v[0], v[1], v[0], v[0],
+		    store2d_point(current_plot, i++, v[0], v[1], v[0], v[0],
 				  v[2], v[3], v[4]);
 		    break;
 		}
@@ -499,15 +499,15 @@ struct curve_points *this_plot;
 	    /* eh ? - fall through */
 	case 6:
 	    /* x, y, xlow, xhigh, ylow, yhigh */
-	    switch (this_plot->plot_style) {
+	    switch (current_plot->plot_style) {
 	    default:
 		int_warn(storetoken, "This plot style not work with 6 cols. Setting to xyerrorbars");
-		this_plot->plot_style = XYERRORBARS;
+		current_plot->plot_style = XYERRORBARS;
 		/*fall through */
 	    case XYERRORLINES:
 	    case XYERRORBARS:
 	    case BOXXYERROR:
-		store2d_point(this_plot, i++, v[0], v[1], v[2], v[3], v[4],
+		store2d_point(current_plot, i++, v[0], v[1], v[2], v[3], v[4],
 			      v[5], 0.0);
 		break;
 	    }
@@ -516,8 +516,8 @@ struct curve_points *this_plot;
 
     }				/*while */
 
-    this_plot->p_count = i;
-    cp_extend(this_plot, i);	/* shrink to fit */
+    current_plot->p_count = i;
+    cp_extend(current_plot, i);	/* shrink to fit */
 
     df_close();
 
@@ -526,15 +526,15 @@ struct curve_points *this_plot;
 
 /* called by get_data for each point */
 static void
-store2d_point(this_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
-struct curve_points *this_plot;
+store2d_point(current_plot, i, x, y, xlow, xhigh, ylow, yhigh, width)
+struct curve_points *current_plot;
 int i;				/* point number */
 double x, y;
 double ylow, yhigh;
 double xlow, xhigh;
 double width;			/* -1 means autocalc, 0 means use xmin/xmax */
 {
-    struct coordinate GPHUGE *cp = &(this_plot->points[i]);
+    struct coordinate GPHUGE *cp = &(current_plot->points[i]);
     int dummy_type = INRANGE;	/* sometimes we dont care about outranging */
 
 
@@ -610,12 +610,12 @@ double width;			/* -1 means autocalc, 0 means use xmin/xmax */
      * but graphics.c doesn't know.
      * explicitly store -VERYLARGE;
      */
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, this_plot->x_axis, NOOP, return);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xlow, xlow, dummy_type, this_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xhigh, xhigh, dummy_type, this_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, this_plot->y_axis, NOOP, return);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->ylow, ylow, dummy_type, this_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
-    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->yhigh, yhigh, dummy_type, this_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->x, x, cp->type, current_plot->x_axis, NOOP, return);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xlow, xlow, dummy_type, current_plot->x_axis, NOOP, cp->xlow = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->xhigh, xhigh, dummy_type, current_plot->x_axis, NOOP, cp->xhigh = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->y, y, cp->type, current_plot->y_axis, NOOP, return);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->ylow, ylow, dummy_type, current_plot->y_axis, NOOP, cp->ylow = -VERYLARGE);
+    STORE_WITH_LOG_AND_FIXUP_RANGE(cp->yhigh, yhigh, dummy_type, current_plot->y_axis, NOOP, cp->yhigh = -VERYLARGE);
     cp->z = width;
 }				/* store2d_point */
 
@@ -670,12 +670,17 @@ int curve;			/* which curve to print */
 		       plot_smooth_names[(int) (this_plot->plot_smooth)]);
 	    else
 		printf("Plot smooth style %d: BAD\n", (int) (this_plot->plot_smooth));
-	    printf("Plot title: '%s'\n", this_plot->title);
-	    printf("Line type %d\n", this_plot->line_type);
-	    printf("Point type %d\n", this_plot->point_type);
-	    printf("max points %d\n", this_plot->p_max);
-	    printf("current points %d\n", this_plot->p_count);
-	    printf("\n");
+	    printf("\
+Plot title: '%s'\n\
+Line type %d\n\
+Point type %d\n\
+max points %d\n\
+current points %d\n\n",
+		   this_plot->title,
+		   this_plot->line_type,
+		   this_plot->point_type,
+		   this_plot->p_max,
+		   this_plot->p_count);
 	}
     } else {
 	for (this_plot = first_plot, i = 0;
@@ -705,22 +710,22 @@ int curve;			/* which curve to print */
 #endif /* not used */
 
 static void
-print_table(this_plot, plot_num)
-struct curve_points *this_plot;
+print_table(current_plot, plot_num)
+struct curve_points *current_plot;
 int plot_num;
 {
     int i, curve;
 
     for (curve = 0; curve < plot_num;
-	 curve++, this_plot = this_plot->next_cp) {
+	 curve++, current_plot = current_plot->next_cp) {
 	fprintf(gpoutfile, "#Curve %d, %d points\n#x y type\n", curve,
-		this_plot->p_count);
-	for (i = 0; i < this_plot->p_count; i++) {
+		current_plot->p_count);
+	for (i = 0; i < current_plot->p_count; i++) {
 	    fprintf(gpoutfile, "%g %g %c\n",
-		    this_plot->points[i].x,
-		    this_plot->points[i].y,
-		    this_plot->points[i].type == INRANGE ? 'i'
-		    : this_plot->points[i].type == OUTRANGE ? 'o'
+		    current_plot->points[i].x,
+		    current_plot->points[i].y,
+		    current_plot->points[i].type == INRANGE ? 'i'
+		    : current_plot->points[i].type == OUTRANGE ? 'o'
 		    : 'u');
 	}
 	fputc('\n', gpoutfile);
@@ -900,39 +905,6 @@ eval_plots()
 		    int_error(c_token, "axes must be x1y1, x1y2, x2y1 or x2y2");
 	    }
 
-	    this_plot->x_axis = x_axis;
-	    this_plot->y_axis = y_axis;
-
-	    /* we can now do some checks that we deferred earlier */
-
-	    if (this_plot->plot_type == DATA) {
-		if (!(uses_axis[x_axis] & 1) && autoscale_lx) {
-		    if (auto_array[x_axis] & 1)
-			min_array[x_axis] = VERYLARGE;
-		    if (auto_array[x_axis] & 2)
-			max_array[x_axis] = -VERYLARGE;
-		}
-		if (datatype[x_axis] == TIME) {
-		    if (specs < 2)
-			int_error(c_token, "Need full using spec for x time data");
-		    df_timecol[0] = 1;
-		}
-		if (datatype[y_axis] == TIME) {
-		    if (specs < 1)
-			int_error(c_token, "Need using spec for y time data");
-		    /* need other cols, but I'm lazy */
-		    df_timecol[y_axis] = 1;
-		}
-		/* separate record of datafile and func */
-		uses_axis[x_axis] |= 1;
-		uses_axis[y_axis] |= 1;
-	    } else if (!parametric || !xparam) {
-		/* for x part of a parametric function, axes are
-		 * possibly wrong */
-		/* separate record of data and func */
-		uses_axis[x_axis] |= 2;
-		uses_axis[y_axis] |= 2;
-	    }
 	    if (almost_equals(c_token, "t$itle")) {
 		if (parametric) {
 		    if (xparam)
@@ -979,6 +951,42 @@ eval_plots()
 		if (!equals(c_token, ",") && !END_OF_COMMAND)
 		    this_plot->lp_properties.p_type = (int) real(const_express(&t)) - 1;
 	    }
+
+
+	    this_plot->x_axis = x_axis;
+	    this_plot->y_axis = y_axis;
+
+	    /* we can now do some checks that we deferred earlier */
+
+	    if (this_plot->plot_type == DATA) {
+		if (!(uses_axis[x_axis] & 1) && autoscale_lx) {
+		    if (auto_array[x_axis] & 1)
+			min_array[x_axis] = VERYLARGE;
+		    if (auto_array[x_axis] & 2)
+			max_array[x_axis] = -VERYLARGE;
+		}
+		if (datatype[x_axis] == TIME) {
+		    if (specs < 2)
+			int_error(c_token, "Need full using spec for x time data");
+		    df_timecol[0] = 1;
+		}
+		if (datatype[y_axis] == TIME) {
+		    if (specs < 1)
+			int_error(c_token, "Need using spec for y time data");
+		    /* need other cols, but I'm lazy */
+		    df_timecol[y_axis] = 1;
+		}
+		/* separate record of datafile and func */
+		uses_axis[x_axis] |= 1;
+		uses_axis[y_axis] |= 1;
+	    } else if (!parametric || !xparam) {
+		/* for x part of a parametric function, axes are
+		 * possibly wrong */
+		/* separate record of data and func */
+		uses_axis[x_axis] |= 2;
+		uses_axis[y_axis] |= 2;
+	    }
+
 	    if (!xparam) {
 		if (this_plot->plot_style & 2)	/* style includes points */
 		    ++point_num;
