@@ -3,7 +3,7 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
 #endif
 
 /* GNUPLOT - doc2rnh.c */
- 
+
 /*[
  * Copyright 1986 - 1993, 1998   Thomas Williams, Colin Kelley
  *
@@ -69,7 +69,7 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
 #include "stdfn.h"
 
 #define MAX_NAME_LEN	256
-#define MAX_LINE_LEN	256
+#define MAX_LINE_LEN	255
 #define LINE_SKIP		3
 #define DSR_RM		70
 
@@ -80,13 +80,19 @@ static char *RCSid = "$Id: doc2rno.c,v 0.01 1997/03/09 21:00:00 lph Exp $";
 #define TRUE 1
 #define FALSE 0
 
-void init __PROTO(( FILE *b ));
-void convert __PROTO(( FILE *a, FILE *b ));
-void process_line __PROTO(( char *line, FILE *b ));
-void section __PROTO(( char *line, FILE *b ));
-void putrnh __PROTO(( char *s, FILE *file ));
-void putrnh_ __PROTO(( char *s, FILE *file ));
-void finish __PROTO(( FILE *b ));
+void init __PROTO((FILE * b));
+void convert __PROTO((FILE * a, FILE * b));
+void process_line __PROTO((char *line, FILE * b));
+void section __PROTO((char *line, FILE * b));
+void putrnh __PROTO((char *s, FILE * file));
+void putrnh_ __PROTO((char *s, FILE * file));
+void finish __PROTO((FILE * b));
+
+/* Replase the previous #ifdef */
+int single_top_level = 1;
+
+/* We are using the fgets() replacement from termdoc.c */
+extern char *get_line __PROTO((char *, int, FILE *));
 
 typedef int boolean;
 
@@ -94,42 +100,36 @@ static boolean intable = FALSE;
 static boolean rnh_table = FALSE;
 static boolean initial_entry = FALSE;
 
-#ifndef SINGLE_TOP_LEVEL	/* convert multiple level 1's into 2's */
-#define SINGLE_TOP_LEVEL
-#endif
-
-#define TERM_DRIVER_H
-#include "termdoc.c"
-
-
-int main(argc,argv)
+int main(argc, argv)
 int argc;
 char **argv;
 {
-FILE * infile;
-FILE * outfile;
-	infile = stdin;
-	outfile = stdout;
-	if (argc > 3) {
-		fprintf(stderr,"Usage: %s [infile [outfile]]\n", argv[0]);
-		exit(1);
+    FILE *infile;
+    FILE *outfile;
+    infile = stdin;
+    outfile = stdout;
+
+    if (argc > 3) {
+	fprintf(stderr, "Usage: %s [infile [outfile]]\n", argv[0]);
+	exit(EXIT_FAILURE);
+    }
+    if (argc >= 2) {
+	if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
+	    fprintf(stderr, "%s: Can't open %s for reading\n",
+		    argv[0], argv[1]);
+	    exit(EXIT_SUCCESS);
 	}
-	if (argc >= 2) 
-		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
-			fprintf(stderr,"%s: Can't open %s for reading\n",
-				argv[0], argv[1]);
-			exit(1);
-		}
-	if (argc == 3)
-		if ( (outfile = fopen(argv[2],"w")) == (FILE *)NULL) {
-			fprintf(stderr,"%s: Can't open %s for writing\n",
-				argv[0], argv[2]);
-		}
-	
-	init(outfile);
-	convert(infile,outfile);
-	finish(outfile);
-	return(0);
+    }
+    if (argc == 3) {
+	if ((outfile = fopen(argv[2], "w")) == (FILE *) NULL) {
+	    fprintf(stderr, "%s: Can't open %s for writing\n",
+		    argv[0], argv[2]);
+	}
+    }
+    init(outfile);
+    convert(infile, outfile);
+    finish(outfile);
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -137,62 +137,62 @@ void init(b)
 FILE *b;
 {
     /*     */
-    (void) fputs(".no paging\n",b);
-    (void) fputs(".no flags all\n",b);
-    (void) fputs(".left margin 1\n",b);
-    (void) fputs(".right margin 70\n",b);
-    (void) fputs(".no justify\n",b);
+    (void) fputs(".no paging\n", b);
+    (void) fputs(".no flags all\n", b);
+    (void) fputs(".left margin 1\n", b);
+    (void) fputs(".right margin 70\n", b);
+    (void) fputs(".no justify\n", b);
 }
 
 
-void convert(a,b)
-	FILE *a,*b;
+void convert(a, b)
+FILE *a, *b;
 {
-    static char line[MAX_LINE_LEN];
+    static char line[MAX_LINE_LEN+1];
 
-    while (fgets(line,MAX_LINE_LEN,a)) {
-	   process_line(line, b);
+    while (get_line(line, sizeof(line), a)) {
+	process_line(line, b);
     }
 }
 
 void process_line(line, b)
-	char *line;
-	FILE *b;
+char *line;
+FILE *b;
 {
-    switch(line[0]) {			/* control character */
-	   case '?': {			/* interactive help entry */
-		  break;			/* ignore */
-	   }
-	   case '@': {			/* start/end table */
-		  if (rnh_table) {
-			 (void) fputs(".end literal\n",b);
-      			 rnh_table = FALSE;
-			 intable = FALSE;
-		  } else {
-/*			 (void) fputs(".literal\n",b);	*/
-			 intable = TRUE;
-	                 rnh_table = FALSE;
-      			 initial_entry = TRUE;
-		  }
-		  /* ignore rest of line */
-		  break;
-	   }
-	   case '^': {			/* html table entry */
-		  break;			/* ignore */
-	   }
-	   case '#': {			/* latex table entry */
-		  break;			/* ignore */
-	   }
-	   case '%': {			/* troff table entry */
-      	 	  break;			/* ignore */
-	   }
+    switch (line[0]) {		/* control character */
+    case '?':{			/* interactive help entry */
+	    break;		/* ignore */
+	}
+    case '@':{			/* start/end table */
+	    if (rnh_table) {
+		(void) fputs(".end literal\n", b);
+		rnh_table = FALSE;
+		intable = FALSE;
+	    } else {
+/*                       (void) fputs(".literal\n",b);  */
+		intable = TRUE;
+		rnh_table = FALSE;
+		initial_entry = TRUE;
+	    }
+	    /* ignore rest of line */
+	    break;
+	}
+    case '^':{			/* html table entry */
+	    break;		/* ignore */
+	}
+    case '#':{			/* latex table entry */
+	    break;		/* ignore */
+	}
+    case '%':{			/* troff table entry */
+	    break;		/* ignore */
+	}
 /* 'C' is taken care of by termdoc.c */
-/*	   case 'C': {			/*  new Comment designator*/
-/*    	 	  break;			/* ignore */
-/*	   }
+/*         case 'C': {                  /*  new Comment designator */
+/*                break;                        /* ignore */
+/*         }
  */
-	   case '\n':			/* empty text line */
-	   case ' ': {			/* normal text line */
+    case '\n':			/* empty text line */
+    case ' ':{			/* normal text line */
 
 /* most tables are simple; no flags means no protected characters
  * other than period (command indicator) in first column
@@ -216,64 +216,64 @@ void process_line(line, b)
 
 /* use the "cleartext" table or other text in tables */
 
-/*		  if (intable)  { /* its already literal */
-		  if (rnh_table)  { /* its a literal */
-      			 putrnh(line+1,b);
-      			 break;
-      		  }
-		  switch(line[1]) {
-			 case ' ': {
-      				if ((intable) && (initial_entry)) {
-      					rnh_table = TRUE;
-      					initial_entry = FALSE;
-      					fputs(".literal\n",b); 
-      					putrnh(line+1,b); 
-      					break;
-      				}
-				/* verbatim mode */
-				fputs(".literal\n",b); 
-				putrnh(line+1,b); 
-				fputs(".end literal\n",b);
-				break;
-			 }
+/*                if (intable)  { /* its already literal */
+	    if (rnh_table) {	/* its a literal */
+		putrnh(line + 1, b);
+		break;
+	    }
+	    switch (line[1]) {
+	    case ' ':{
+		    if ((intable) && (initial_entry)) {
+			rnh_table = TRUE;
+			initial_entry = FALSE;
+			fputs(".literal\n", b);
+			putrnh(line + 1, b);
+			break;
+		    }
+		    /* verbatim mode */
+		    fputs(".literal\n", b);
+		    putrnh(line + 1, b);
+		    fputs(".end literal\n", b);
+		    break;
+		}
 
 /*
  *  "." in first column is the DSR command character;
  *  therefore, include the preceeding " "
  */
-  			 case '.': {
-    			   putrnh(line,b);
-   			   break;
-      			 }
-			 default: {
-				if (line[0] == '\n')
-				  fputs(".skip\n",b); /* totally blank line */
-				else
-				  putrnh(line+1,b);
-				break;
-			 }
-			 break;
-		  }
-		  break;
-	   }
-	   default: {
-		  if (isdigit(line[0])) { /* start of section */
+	    case '.':{
+		    putrnh(line, b);
+		    break;
+		}
+	    default:{
+		    if (line[0] == '\n')
+			fputs(".skip\n", b);	/* totally blank line */
+		    else
+			putrnh(line + 1, b);
+		    break;
+		}
+		break;
+	    }
+	    break;
+	}
+    default:{
+	    if (isdigit(line[0])) {	/* start of section */
 
 /* some HELP text is surrounded by table flags */
 /* doc2rnh will ignore the flags */
 
-			 if (intable) {
-      				if  (initial_entry) {
-      					initial_entry = FALSE;
-      					rnh_table = FALSE;
-      			 	}
-      			 }
-			 section(line, b);
-		  } else
-		    fprintf(stderr, "unknown control code '%c' in column 1\n", 
-				  line[0]);
-		  break;
-	   }
+		if (intable) {
+		    if (initial_entry) {
+			initial_entry = FALSE;
+			rnh_table = FALSE;
+		    }
+		}
+		section(line, b);
+	    } else
+		fprintf(stderr, "unknown control code '%c' in column 1\n",
+			line[0]);
+	    break;
+	}
     }
 }
 
@@ -283,43 +283,41 @@ void process_line(line, b)
 /* We want to retain section number, so its simpler than w/ TeX or roff */
 
 void section(line, b)
-	char *line;
-	FILE *b;
+char *line;
+FILE *b;
 {
-    static char string[MAX_LINE_LEN];
+    static char string[MAX_LINE_LEN+1];
     int sh_i;
     static int old = 1;
 /*  
-    (void) sscanf(line,"%d",&sh_i);
- *
- * check to make sure this works with terminals also
+   (void) sscanf(line,"%d",&sh_i);
+   *
+   * check to make sure this works with terminals also
  */
     sh_i = atoi(line);
-   
-    if (sh_i > old) {
-	   do
-		if (old!=1)	/* this line added by rjl */
-		  (void) fputs(".rm-2\n",b);
-	   while (++old < sh_i);
-    }
-    else if (sh_i < old) {
-	   do
-			   if (sh_i!=1) /* this line added by rjl */
-				(void) fputs(".rm+2\n",b);
-	   while (--old > sh_i);
-    }
 
+    if (sh_i > old) {
+	do
+	    if (old != 1)	/* this line added by rjl */
+		(void) fputs(".rm-2\n", b);
+	while (++old < sh_i);
+    } else if (sh_i < old) {
+	do
+	    if (sh_i != 1)	/* this line added by rjl */
+		(void) fputs(".rm+2\n", b);
+	while (--old > sh_i);
+    }
     /* added by dfk to capitalize section headers */
     /* Header name starts at [2] */
 /* omit for online documentation 
  *    if (islower(line[2]))
- *	 line[2] = toupper(line[2]);
- */  
+ *       line[2] = toupper(line[2]);
+ */
     old = sh_i;
-    
-    (void) fputs(".indent -1;\n",b);
-    (void) putrnh_(line,b);
-    (void) fputs(".br;\n",b);
+
+    (void) fputs(".indent -1;\n", b);
+    (void) putrnh_(line, b);
+    (void) fputs(".br;\n", b);
 }
 
 /*
@@ -328,10 +326,10 @@ void section(line, b)
  */
 
 void putrnh(s, file)
-	char *s;
-	FILE *file;
+char *s;
+FILE *file;
 {
-    (void) fputs(s,file);
+    (void) fputs(s, file);
 }
 
 /*
@@ -345,30 +343,30 @@ void putrnh(s, file)
  */
 
 void putrnh_(s, file)
-       char *s;
-       FILE *file;
+char *s;
+FILE *file;
 {
-       int i, s_len, last_chr;
+    int i, s_len, last_chr;
 
-       s_len = strlen(s);
+    s_len = strlen(s);
 
-       for (i = s_len-1; i > 2; i--) {
-	   if (s[i] != ' ') {
-	       last_chr = i;
-	       break;
-	       }
-	   }
+    for (i = s_len - 1; i > 2; i--) {
+	if (s[i] != ' ') {
+	    last_chr = i;
+	    break;
+	}
+    }
 
-       for (i = 0; i <= s_len; i++) {
-	   if ( (i > 2) && (i < last_chr) && (s[i] == ' ') )
-	       (void) fputc('_',file);
-	   else
-	       (void) fputc(s[i],file);
-	   }
+    for (i = 0; i <= s_len; i++) {
+	if ((i > 2) && (i < last_chr) && (s[i] == ' '))
+	    (void) fputc('_', file);
+	else
+	    (void) fputc(s[i], file);
+    }
 }
 
-void finish(b)		/* not used */
+void finish(b)			/* not used */
 FILE *b;
 {
-      	return;
+    return;
 }

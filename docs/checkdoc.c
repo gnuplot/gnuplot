@@ -57,7 +57,8 @@
 #include "ansichek.h"
 #include "stdfn.h"
 
-#define MAX_LINE_LEN	256
+#undef MAX_LINE_LEN
+#define MAX_LINE_LEN	255
 #ifdef TRUE
 # undef TRUE
 # undef FALSE
@@ -65,126 +66,120 @@
 #define TRUE 1
 #define FALSE 0
 
-void convert __PROTO(( FILE *a, FILE *b ));
-void process_line __PROTO(( char *line, FILE *b ));
+/* Replase the previous #ifdef */
+int single_top_level = 0;
 
-/* checkdoc should check all terminal driver help */
-#ifndef ALL_TERM_DOC
-#define ALL_TERM_DOC
-#endif
+/* In termdoc.c */
+extern int termdoc_lineno;
+extern char termdoc_filename[];
 
-#include "termdoc.c"
+/* We are using the fgets() replacement from termdoc.c */
+extern char *get_line __PROTO((char *, int, FILE *));
 
-int main(argc,argv)
+void convert __PROTO((FILE * a, FILE * b));
+void process_line __PROTO((char *line, FILE * b));
+
+int main(argc, argv)
 int argc;
 char **argv;
 {
-FILE * infile;
-	infile = stdin;
-	if (argc > 2) {
-		fprintf(stderr,"Usage: %s [infile]\n", argv[0]);
-		exit(1);
-	}
-	if (argc == 2) 
-		if ( (infile = fopen(argv[1],"r")) == (FILE *)NULL) {
-			fprintf(stderr,"%s: Can't open %s for reading\n",
-				argv[0], argv[1]);
-			exit(1);
-		}
+    FILE *infile;
+    infile = stdin;
 
-	convert(infile, stdout);
-	return (0);
+    if (argc > 2) {
+	fprintf(stderr, "Usage: %s [infile]\n", argv[0]);
+	exit(EXIT_FAILURE);
+    }
+    if (argc == 2)
+	if ((infile = fopen(argv[1], "r")) == (FILE *) NULL) {
+	    fprintf(stderr, "%s: Can't open %s for reading\n",
+		    argv[0], argv[1]);
+	    exit(EXIT_FAILURE);
+	}
+    convert(infile, stdout);
+    exit(EXIT_SUCCESS);
 }
 
-void convert(a,b)
-	FILE *a,*b;
+void convert(a, b)
+FILE *a, *b;
 {
-    static char line[MAX_LINE_LEN];
+    static char line[MAX_LINE_LEN+1];
 
-    while (fgets(line,MAX_LINE_LEN,a)) {
-	   process_line(line, b);
+    while (get_line(line, sizeof(line), a)) {
+	process_line(line, b);
     }
 }
 
 void process_line(line, b)
-	char *line;
-	FILE *b;
+char *line;
+FILE *b;
 {
-	/* check matching backticks within a paragraph */
+    /* check matching backticks within a paragraph */
 
-	static int count = 0;
+    static int count = 0;
 
-	if (line[0] == ' ')
-	{	
-		char *p = line;
+    if (line[0] == ' ') {
+	char *p = line;
 
-		/* skip/count leading spaces */
+	/* skip/count leading spaces */
 
-		while (*++p == ' ')
-			;
+	while (*++p == ' ');
 
-		if (*p=='\n')
-		{
-			/* it is not clear if this is an error, but it is an
-			 * inconsistency, so flag it
-			 */
-			fprintf(b, "spaces-only line %s:%d\n", termdoc_filename, termdoc_lineno);
-		}
-		else
-		{
-			/* accumulate count of backticks. Do not check odd-ness
-			 * until end of paragraph (non-space in column 1)
-			 */
-			for ( ; *p ; ++p)
-				if (*p == '`')
-					++count;
-		}
+	if (*p == '\n') {
+	    /* it is not clear if this is an error, but it is an
+	     * inconsistency, so flag it
+	     */
+	    fprintf(b, "spaces-only line %s:%d\n", termdoc_filename, termdoc_lineno);
+	} else {
+	    /* accumulate count of backticks. Do not check odd-ness
+	     * until end of paragraph (non-space in column 1)
+	     */
+	    for (; *p; ++p)
+		if (*p == '`')
+		    ++count;
 	}
-	else
-	{
-		if (count&1)
-		{
-			fprintf(b,
-				"mismatching backticks before %s:%d\n",
-				termdoc_filename, termdoc_lineno);
-		}
-		count=0;
+    } else {
+	if (count & 1) {
+	    fprintf(b,
+		    "mismatching backticks before %s:%d\n",
+		    termdoc_filename, termdoc_lineno);
 	}
+	count = 0;
+    }
 
-	if (strchr(line, '\t'))
-		fprintf(b, "tab character in line %s:%d\n", termdoc_filename, termdoc_lineno);
-	
-    switch(line[0]) {		/* control character */
-	   case '?': {			/* interactive help entry */
-		  break;			/* ignore */
-	   }
-		case '<' : {      /* term docs */
-			break;      /* ignore */
-		}
-	   case '@': {			/* start/end table */
-		  break;			/* ignore */
-	   }
-	   case '#': {			/* latex table entry */
-		  break;			/* ignore */
-	   }
-	   case '%': {			/* troff table entry */
-		  break;			/* ignore */
-	   }
-	   case '^': {			/* html entry */
-		  break;			/* ignore */
-	   }
-	   case '\n':			/* empty text line */
-	   case ' ': {			/* normal text line */
-			break;
-	   }
-	   default: {
-		  if (isdigit(line[0])) { /* start of section */
-		  		/* ignore */
-		  } else
-   			/* output bad line */
-			fprintf(b, "%s:%d:%s", termdoc_filename, termdoc_lineno, line);
-		  break;
-	   }
+    if (strchr(line, '\t'))
+	fprintf(b, "tab character in line %s:%d\n", termdoc_filename, termdoc_lineno);
+
+    switch (line[0]) {		/* control character */
+    case '?':{			/* interactive help entry */
+	    break;		/* ignore */
+	}
+    case '<':{			/* term docs */
+	    break;		/* ignore */
+	}
+    case '@':{			/* start/end table */
+	    break;		/* ignore */
+	}
+    case '#':{			/* latex table entry */
+	    break;		/* ignore */
+	}
+    case '%':{			/* troff table entry */
+	    break;		/* ignore */
+	}
+    case '^':{			/* html entry */
+	    break;		/* ignore */
+	}
+    case '\n':			/* empty text line */
+    case ' ':{			/* normal text line */
+	    break;
+	}
+    default:{
+	    if (isdigit(line[0])) {	/* start of section */
+		/* ignore */
+	    } else
+		/* output bad line */
+		fprintf(b, "%s:%d:%s", termdoc_filename, termdoc_lineno, line);
+	    break;
+	}
     }
 }
-
