@@ -1,5 +1,5 @@
 /* -*- objc -*-
- * $Id: aquaTerm.trm,v 1.15.4.1 2003/08/06 21:46:13 persquare Exp $
+ * $Id: aquaterm.trm,v 1.2 2003/08/22 12:36:42 lhecking Exp $
  *
  */
 
@@ -18,27 +18,19 @@
  * Homepage: http://aquaterm.sourceforge.net
  * send your comments or suggestions to (persquare@users.sourceforge.net).
  *
- * This terminal attempts to connect, via the MacOS X Distributed
+ * This terminal attempts to connect, via the Mac OS X Distributed
  * Objects system, to the "aquatermServer."  If there is no such
  * service registered with the OS, the terminal attempts to fire
  * up AquaTerm.app.  If the user has not set the environment variable
- * GNUTERMAPP, the terminal searches for AquaTerm.app in standard 
+ * AQUATERM_PATH, the terminal searches for AquaTerm.app in standard 
  * locations like /Applications, ~/Applications, etc.
- * In order to use this filter, you MUST have AquaTerm.app or some other
- * application capable of handling the AQTProtocol installed
+ * In order to use this filter, you MUST have AquaTerm.app installed
  * on your system.
  *
- * Once connected to the server, all gnuplot primitives are sent, 
+ * Once connected to the server, all gnuplot graphs are sent, 
  * via the D.O. system, to AquaTerm.app, which produces renders graphs, 
  * manages the windows, takes care of printing etc.
  * 
- *
- * Defaults are
- * n=0
- *
- * to choose window n
- * 'set term aqua <n>"
- *
  */
 
 #include "driver.h"
@@ -46,9 +38,8 @@
 #ifdef TERM_REGISTER
 register_term(aqua)
 #endif
-
+     
 #ifdef TERM_PROTO
-
 /* Required entries */
 TERM_PUBLIC void AQUA_options __PROTO((void));
 TERM_PUBLIC void AQUA_init __PROTO((void));
@@ -72,22 +63,23 @@ TERM_PUBLIC void AQUA_boxfill __PROTO((int style, unsigned int x1, unsigned int 
 TERM_PUBLIC void AQUA_linewidth __PROTO((double linewidth));
 TERM_PUBLIC void AQUA_pointsize __PROTO((double pointsize));
 #ifdef PM3D
-  TERM_PUBLIC int AQUA_make_palette __PROTO((t_sm_palette *palette));
-  TERM_PUBLIC void AQUA_set_color __PROTO((double gray));
-  TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
+TERM_PUBLIC int AQUA_make_palette __PROTO((t_sm_palette *palette));
+TERM_PUBLIC void AQUA_previous_palette __PROTO((void));
+TERM_PUBLIC void AQUA_set_color __PROTO((double gray));
+TERM_PUBLIC void AQUA_filled_polygon __PROTO((int points, gpiPoint *corners));
 #endif /* PM3D */
 /* End of entries */
 
-#define AQUA_SCALE_FACTOR 10.0                  /* Increase resolution */ 
-#define AQUA_XMAX (11.69*72*AQUA_SCALE_FACTOR)  /* = 842, paper width times screen resolution */
-#define AQUA_YMAX (8.26*72*AQUA_SCALE_FACTOR)   /* = 595, paper height times screen resolution */
-#define AQUA_VTIC (8*AQUA_SCALE_FACTOR)     
-#define AQUA_HTIC (8*AQUA_SCALE_FACTOR)
-#define AQUA_VCHAR (16*AQUA_SCALE_FACTOR)       /* default font is Times at 16 points */
-#define AQUA_HCHAR (AQUA_VCHAR*6/10)
+#define AQUA_RESOLUTION (20.0)                    /* Increase resolution */ 
+#define AQUA_XMAX (11.75 * 72 * AQUA_RESOLUTION)  /* = paper width (in) times screen resolution */
+#define AQUA_YMAX (8.25 * 72 * AQUA_RESOLUTION)	  /* = paper height (in) times screen resolution */
+#define AQUA_VTIC (8.0*AQUA_RESOLUTION)     
+#define AQUA_HTIC (8.0*AQUA_RESOLUTION)
+#define AQUA_VCHAR (16.0*AQUA_RESOLUTION)         /* default font is Times at 14 points */
+#define AQUA_HCHAR (AQUA_VCHAR*6.0/10.0)
 
-#define PM3D_COLORS 128
-#define CYCLIC_COLORS 8
+#define SPECIAL_COLORS 4
+#define CYCLIC_COLORS 9
 
 #define GOT_AQUA_PROTO
 #endif /* TERM_PROTO */
@@ -95,67 +87,15 @@ TERM_PUBLIC void AQUA_pointsize __PROTO((double pointsize));
 #ifndef TERM_PROTO_ONLY
 
 #ifdef TERM_BODY
+#import <aquaterm/AQTAdapter.h>
 
-#import <Foundation/NSConnection.h>
-#import <Foundation/NSDistantObject.h>
-#import <Foundation/NSDictionary.h>
 #import <Foundation/NSAutoreleasePool.h>
-#import <Foundation/NSPortCoder.h>
-#import <Foundation/NSException.h>
-#import <AppKit/NSColor.h>
-#import <AppKit/NSWorkspace.h>
-#import <AppKit/NSBezierPath.h>
+#import <Foundation/NSArray.h>
 #import <stdarg.h>
 
-//
-// ----------------------------------------------------------------
-// AQTProtocol - A protocol that lists the Objective-C methods 
-// that AquaTerm responds to
-// ----------------------------------------------------------------
-//
-// For documentation of this protocol, see http://aquaterm.sf.net
-// 
-#define AQTProtocolVersion 0.3
-
-@protocol AQTProtocol
-- (oneway void)openModel:(int)newModel;
-- (oneway void)closeModel;
-- (bycopy NSDictionary *) getAquaTermInfo;
-- (oneway void)setTitle:(bycopy NSString *)newTitle;
-- (oneway void)setFontWithName:(bycopy NSString *)fontName size:(bycopy float)fontSize;
-- (oneway void)setColor:(bycopy NSColor *)aColor forIndex:(int)colorIndex;
-- (oneway void)addString:(bycopy NSString *)text
-                  atPoint:(bycopy NSPoint)point
-        withJustification:(bycopy int)justification
-                  atAngle:(bycopy float)angle
-         withIndexedColor:(bycopy int)colorIndex;
-- (oneway void)addPolyline:(bycopy NSBezierPath *)aPath withIndexedColor:(bycopy int)colorIndex;
-- (oneway void)addPolygon:(bycopy NSBezierPath *)aPath withIndexedColor:(bycopy int)colorIndex;
-- (oneway void)addPolyline:(bycopy NSBezierPath *)aPath withRGBColor:(bycopy NSColor *)color;
-- (oneway void)addPolygon:(bycopy NSBezierPath *)aPath withRGBColor:(bycopy NSColor *)color;
-- (oneway void)addBitmap:(bycopy NSData *)imageData size:(NSSize)theSize bounds:(NSRect)theBounds;
-- (oneway void)addImageFromFile:(bycopy NSString *)filename bounds:(NSRect)theBounds;
-- (oneway void)render;
-- (oneway void)clearRect:(NSRect)rect;
-@end /* AQTProtocol */
-
-
-/*
- * The class NSBezierPath doesn't implement replacementObjectForPortCoder so
- * we add that behaviour as a category for NSBezierPath
- */
-@interface NSBezierPath (NSBezierPathDOCategory)
-- (id)replacementObjectForPortCoder:(NSPortCoder *)portCoder;
-@end
-
-@implementation NSBezierPath (NSBezierPathDOCategory)
-- (id)replacementObjectForPortCoder:(NSPortCoder *)portCoder
-{
-  if ([portCoder isBycopy])
-    return self;
-  return [super replacementObjectForPortCoder:portCoder];
-}
-@end
+#ifdef PM3D
+#include "getcolor.h"
+#endif
 
 /* Debugging extras */
 static inline void NOOP_(id x, ...) {;}
@@ -166,585 +106,241 @@ static inline void NOOP_(id x, ...) {;}
 #define LOG  NOOP_
 #endif	/* LOGGING */
 
-#define BUFMAX 50
+/* AquaTerm specific */
+static NSAutoreleasePool *arpool;   
+static NSAutoreleasePool *loopPool;   
+static AQTAdapter *adapter;    
 
-static NSAutoreleasePool *arpool;   // our autorelease pool 
-static id gnuTermAccess;    // local object manages the D.O. connection
-static int currentWindow = 0;		// the only option to set (could be set _before_ instatiation of gnuTermAccess)
-static char AQUA_title[MAX_LINE_LEN + 1];
-static t_sm_palette *aqua_palette = nil;
+/* Internal state */
+static int AQUA_plotRef = 0; /* A ref to the current plot */
+static char AQUA_title[MAX_LINE_LEN + 1] = "Figure 0"; /* Plot title (in windowbar) */
 
-// ----------------------------------------------------------------
-// AQTAdapter - A class to mediate between gnuplot C-function calls
-// and AquaTerm Objective-C remote messages
-// ----------------------------------------------------------------
-//
-@interface AQTAdapter : NSObject
-{
-  @private
-  id server;
-  NSMutableDictionary *termInfo;
-  NSBezierPath *thePath;
-  int justificationMode;
-  int linetype;
-  double linewidth;
-  double gray;
-  int pm3dColor;
-  float textAngle;
-  int bufCount;
-}
--(id) server;
--(NSMutableDictionary *)termInfo;
--(void) invalidateServer;
--(void) invalidateServer:(const char *)message;
--(BOOL) connectToServer;
--(BOOL)checkServerVersion;
--(void) updateInfoFromServer;
--(void) flushBuffers;
--(void) moveToPoint:(NSPoint)point;
--(void) lineToPoint:(NSPoint)point;
--(void) setLinetype:(int)linetype;
--(void) putText:(const char *)str at:(NSPoint)point;
--(void) setJustification:(int)mode;
--(void) setTextAngle:(int)angle;
--(void) setTextfont:(const char *)font;
--(void) fillRect:(NSRect)rect style:(int)style;
--(void) setLinewidth:(double)linewidth;
--(double) linewidth;
--(void) setColor:(NSColor *)color forIndex:(int)index; 
--(void) setFillColor:(double)gray;
--(void) setPolygonUsing:(int)count corners:(gpiPoint *)corners;
--(void) openModel:(int)newFigure;
--(void) closeModel;
--(void) renderModel;
--(void) setTitle:(NSString *)newTitle;
-@end 
+static unsigned int AQUA_xSize = AQUA_XMAX; /* plot horizontal size */
+static unsigned int AQUA_ySize = AQUA_YMAX; /* plot vertical size*/
 
-@implementation AQTAdapter
--(id) init
-{
-  if (self = [super init])
-  {
-    thePath = [[NSBezierPath alloc] init];
-    termInfo = [[NSMutableDictionary alloc] initWithCapacity:0];
-    justificationMode = 0;
-    linetype = 0;
-    gray = 0.0;
-    textAngle = 0.0;
-    pm3dColor = 0;
-    [self connectToServer];
-  }
-  return self;
-}
+static int AQUA_LineType = -3; /* current line type*/
+static float AQUA_LineWidth = 1.0; /* current line width*/
+static float AQUA_TextAngle = 0.0; /* current text orientation*/
+static enum JUSTIFY AQUA_TextJust = LEFT; /* current text justification*/
 
--(void) dealloc
-{
-  [termInfo release];
-  [thePath release];
-  [server release];
-  [super dealloc];
-}
+/* default text font family: */
+static char AQUA_fontNameDef[MAX_ID_LEN + 1] = "Times-Roman"; 
+static double AQUA_fontSizeDef = 14; /* default text size*/
+/* current text font family: */
+static char AQUA_fontNameCur[MAX_ID_LEN + 1] = "Times-Roman";
+static double AQUA_fontSizeCur = 14; /* current text size*/
 
--(id) server
-{
-  return server;
-}
+/* Helper functions */
+static void AQUA_local_reset __PROTO(());
 
--(NSMutableDictionary *)termInfo
-{
-  return termInfo;
-}
-
--(void) invalidateServer
-{
-  [self invalidateServer:"Lost connection to server,\nuse \"set term aqua <n>\" to reconnect.\n"];
-}
-
--(void) invalidateServer:(const char *)message
-{
-  [server release];
-  server = nil;
-  currentWindow = 0;
-  printf(message);
-}
-
--(BOOL)connectToServer
-{
-  BOOL defaultApp = YES;
-  BOOL didConnect = NO;
-  NSString *appString;
-
-  server = [NSConnection rootProxyForConnectionWithRegisteredName:@"aquatermServer" host:nil];
-  if (server) /* Server is running ready to go */
-  {
-    [server retain];
-    didConnect = YES;
-  }
-  else /* Server isn't running, we must fire it up */
-  {
-    if (getenv("GNUTERMAPP") == (char *)NULL)
-    {
-      appString = [NSString stringWithString:@"AquaTerm"];
-    }
-    else
-    {
-      appString = [NSString stringWithCString:getenv("GNUTERMAPP")];
-      defaultApp = NO;
-    }
-    /* Try to launch application */
-    if ([[NSWorkspace sharedWorkspace] launchApplication:appString] == NO)
-    {
-      printf("Failed to launch display server (%s).\n", [appString cString]);
-      if (defaultApp)
-      {
-        printf("You must either put the server application in \n");
-        printf("the /Applications folder, ~/Applications folder\n");
-        printf("or set the environment variable GNUTERMAPP to the\n");
-        printf("full path of the server application, e.g.\n");
-        printf("setenv GNUTERMAPP \"/some/strange/location/MyServer.app\"\n");
-      }
-      else
-      {
-        printf("Check environment variable GNUTERMAPP for errors\n");
-      }
-    }
-    else
-    {
-      do { /* Wait for it to register Server methods with OS */
-        server =[NSConnection rootProxyForConnectionWithRegisteredName:@"aquatermServer" host:nil];
-      } while (!server);  /* This could result in a hang... */
-      [server retain];
-      didConnect = YES;
-   	}
-  }
-  if (didConnect)
-  {
-    if ([self checkServerVersion])
-    {
-        [server setProtocolForProxy:@protocol(AQTProtocol)];
-        [self updateInfoFromServer];
-    }
-    else
-    {
-        [self invalidateServer:"Display server (AquaTerm) is too old, please update it.\nSee http://qauaterm.sf.net for more info and download.\n"];
-        didConnect = NO;
-    }
-  }
-  return didConnect;
-}
-
--(BOOL)checkServerVersion
-{
-    BOOL canRun = NO;
-    float serverVersion = 0.0;
-  NS_DURING	/* try */
-     if ([server respondsToSelector:@selector(getAquaTermInfo)])
-     {
-        serverVersion = [[[server getAquaTermInfo] objectForKey:@"AQTVersion"] floatValue];
-     }
-  NS_HANDLER 
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"]) 
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-  if (serverVersion >= AQTProtocolVersion)
-  {
-    canRun = YES;
-  }
-  return canRun;   
-}
-
--(void) updateInfoFromServer
-{
-  NS_DURING	/* try */
-    [termInfo  setDictionary:[server getAquaTermInfo]];
-  NS_HANDLER 
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"]) 
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) flushBuffers
-{
-  NS_DURING
-    if ([thePath isEmpty] == NO)
-    {   
-      [thePath setLineWidth:linewidth];
-      [server addPolyline:thePath withIndexedColor:linetype];
-      [thePath removeAllPoints];
-      bufCount = 0;
-    }
-    NS_HANDLER
-      if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-        [self invalidateServer];
-      else
-        [localException raise];
-    NS_ENDHANDLER
-}
-
--(void) moveToPoint:(NSPoint)point
-{
-
-  bufCount +=1;
-  if (bufCount > BUFMAX)
-  {
-    [self flushBuffers];
-  }
-  [thePath moveToPoint:point];
-}
-
--(void) lineToPoint:(NSPoint)point
-{
-  NSPoint trailPoint;
-  bufCount +=1;
-  if (bufCount > BUFMAX)
-  {
-    trailPoint = [thePath currentPoint];
-    [self flushBuffers];
-    [thePath moveToPoint:trailPoint];
-  }
-  [thePath lineToPoint:point];
-}
-
--(void) setLinetype:(int)newLinetype
-{
-  if (linetype != newLinetype)
-  {
-    [self flushBuffers];
-    linetype = newLinetype;
-  }
-}
-
--(void) putText:(const char *)str at:(NSPoint)point
-{
-  NS_DURING
-    [server addString:[NSString stringWithCString:str]
-              atPoint:point
-    withJustification:justificationMode
-              atAngle:textAngle
-     withIndexedColor:linetype];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) setJustification:(int)mode
-{
-  justificationMode = mode;
-}
-
--(void) setTextAngle:(int)angle
-{
-  if (angle==0)
-  {
-    textAngle = 0.0;
-  }
-  else
-  {
-    textAngle = 90.0;
-  }
-}
-
--(void) setTextfont:(const char *)font
-{
-  NSArray *tempArray = [NSArray arrayWithArray:[[NSString stringWithCString:font] componentsSeparatedByString:@","]];
-  // FIXME: Check up on why setFont always is followed by a call with an empty string.
-  NS_DURING
-  switch ([tempArray count])
-  {
-    case 2:
-      [server setFontWithName:[tempArray objectAtIndex:0] size:[[tempArray objectAtIndex:1] floatValue]];
-      break;
-    case 1:
-      if ([[tempArray objectAtIndex:0] isEqualToString:@""])
-      {
-        [server setFontWithName:[termInfo objectForKey:@"AQTDefaultFontName"] size:[[termInfo objectForKey:@"AQTDefaultFontSize"] floatValue]];
-      }
-      else
-      {
-        [server setFontWithName:[tempArray objectAtIndex:0] size:[[termInfo objectForKey:@"AQTDefaultFontSize"] floatValue]];
-      }
-      break;
-    case 0:
-        // fallthrough
-    default:
-      [server setFontWithName:[termInfo objectForKey:@"AQTDefaultFontName"] size:[[termInfo objectForKey:@"AQTDefaultFontSize"] floatValue]];
-    break;
-  }
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-  //
-  // Read back the new font info. (Not neccessarily what we wanted ;-)
-  //
-  [self updateInfoFromServer];
-}
-
--(void) fillRect:(NSRect)rect style:(int)style
-{
-  [self flushBuffers];
-  NS_DURING
-    [server clearRect:rect];
-    [server render];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) setLinewidth:(double)newLinewidth
-{
-  if (linewidth != newLinewidth)
-  {
-    [self flushBuffers];
-    linewidth = newLinewidth;
-  }
-}
-
-- (double) linewidth
-{
-  return linewidth;
-}
-
--(void) setFillColor:(double)newGray
-{
-  int newFillColor = (int)(PM3D_COLORS*newGray+.5);
-  [self flushBuffers];
-  pm3dColor = newFillColor;
-}
-
--(void) setColor:(NSColor *)color forIndex:(int)index
-{ 
-  NS_DURING
-    [server setColor:color forIndex:index];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) setPolygonUsing:(int)count corners:(gpiPoint *)corners
-{
-  int i;
-  NSBezierPath *thePolygon = [NSBezierPath bezierPath];
-  NSColor *pColor = [NSColor colorWithCalibratedRed:aqua_palette->color[pm3dColor].r green:aqua_palette->color[pm3dColor].g blue:aqua_palette->color[pm3dColor].b alpha:1.0];
-
-    [thePolygon moveToPoint:NSMakePoint(corners[0].x, corners[0].y)];
-    for (i=1;i< count;i++)
-    {
-      [thePolygon lineToPoint:NSMakePoint(corners[i].x, corners[i].y)];
-    }
-    [thePolygon closePath];
-  NS_DURING
-    [server addPolygon:thePolygon withRGBColor:pColor];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) openModel:(int)newFigure
-{
-  NS_DURING
-    [server openModel:newFigure];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) closeModel
-{
-  NS_DURING
-    [server closeModel];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) renderModel
-{
-  NS_DURING
-    [server render];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
--(void) setTitle:(NSString *)newTitle;
-{
-  NS_DURING
-    [server setTitle:newTitle];
-  NS_HANDLER
-    if ([[localException name] isEqualToString:@"NSInvalidSendPortException"])
-      [self invalidateServer];
-    else
-      [localException raise];
-  NS_ENDHANDLER
-}
-
-@end /* AQTAdapter */
-//
-// ----------------------------------------------------------------
-// Gnuplot driver implementation
-// ----------------------------------------------------------------
-//
-
-enum AQUA_id {
-  AQUA_DEFAULT,
-  AQUA_TITLE,
-  AQUA_OTHER
-};
-
-
-static struct gen_table AQUA_opts[] =
-{
-  { "d$efault", AQUA_DEFAULT },
-  { "ti$tle", AQUA_TITLE },
-  { NULL, AQUA_OTHER }
-};
-
-//
-// AQUA_options is called 0 or more times before a call to AQUA_init occurs.
-// It is important that the option <n> is passed correctly to AquaTerm
-//
+/*
+ * ----------------------------------------------------------------
+ * Aquaterm driver implementation
+ * ----------------------------------------------------------------
+ *
+ *   Current options are:
+ *   <n> title "theTitle" size <x> <y> fname "fontface" fsize <fontsize>   
+ */
 TERM_PUBLIC void
 AQUA_options()
 {
   struct value a;
-  *AQUA_title = 0;
-    
-  LOG(@"AQUA_options");
-  while (!END_OF_COMMAND) 
-  {
-    switch(lookup_table(&AQUA_opts[0],c_token)) 
-    {
-     case AQUA_DEFAULT:
-      currentWindow = 0;
+  AQUA_local_reset();
+  if (!END_OF_COMMAND  && !isstring (c_token)) { /* plot ref number*/
+    AQUA_plotRef = (int) real (const_express (&a));
+  }
+  
+  if (!END_OF_COMMAND) {/* plot title*/
+    if (almost_equals (c_token, "ti$tle"))  {
       c_token++;
-      break;
-     case AQUA_TITLE:
-      c_token++;
-      if (!isstring(c_token)) {
-          fprintf(stderr, "usage:  set term aqua title \"newtitle\"\n");
-      }
-      quote_str(AQUA_title, c_token, MAX_LINE_LEN + 1);
-            c_token++;
-
-      break;
-     case AQUA_OTHER:
-      currentWindow = (int) real(const_express(&a));
-      break;  
-    default:      
-      break;
+      
+      if (!END_OF_COMMAND && isstring (c_token)) {
+	quote_str (AQUA_title, c_token, MAX_LINE_LEN);
+	c_token++;
+      } else
+	int_error(c_token,"fname: expecting plot title");
     }
   }
+    
+  if (AQUA_title[0]=='\0') /* always set title */
+    sprintf(AQUA_title, "Figure %d", AQUA_plotRef);
+  
+  if (!END_OF_COMMAND) { /* get terminal size*/
+    if (almost_equals (c_token, "s$ize")) {
+      double value;
+      
+      c_token++;
+      
+      if (END_OF_COMMAND)
+	int_error(c_token,"expecting x size");
+      value = real(const_express (&a));
+      if (value < 2 || value > 2048)
+	int_error(c_token,"x size out of range");
+      AQUA_xSize = (unsigned int) value * AQUA_RESOLUTION;
+      
+      if (END_OF_COMMAND)
+	int_error(c_token,"expecting y size");
+      value = real(const_express (&a));
+      if (value < 2 || value > 2048)
+	int_error(c_token,"y size out of range");
+      AQUA_ySize = (unsigned int) value * AQUA_RESOLUTION;    
+    }
+  }
+
+  if (!END_OF_COMMAND) { /* get default font family name*/
+    if (almost_equals (c_token, "fn$ame"))  {
+      c_token++;
+      
+      if (!END_OF_COMMAND && isstring (c_token)) {
+	quote_str (AQUA_fontNameCur, c_token, MAX_ID_LEN);
+	c_token++;
+      } else
+	int_error(c_token,"fname: expecting font name");
+    }
+  }
+
+  if (!END_OF_COMMAND) { /* get default font size*/
+    if (almost_equals (c_token, "fs$ize")) {
+      c_token++;
+      
+      if (END_OF_COMMAND)
+	int_error(c_token,"fsize: expecting font size");
+      AQUA_fontSizeCur = real (const_express (&a));
+    }
+  }
+  
+  if (!END_OF_COMMAND)
+    int_error(c_token, "unexpected text at end of command"); 
+  
+  /* Save options back into options string in normalized format */
+  sprintf(term_options, "%d title '%s' size %d %d fname '%s'  fsize %g",
+	  AQUA_plotRef,
+	  AQUA_title,
+	  (unsigned int) (AQUA_xSize/AQUA_RESOLUTION), (unsigned int) (AQUA_ySize/AQUA_RESOLUTION),
+	  AQUA_fontNameCur, AQUA_fontSizeCur);
 }
+
+static void
+AQUA_local_reset()
+{
+  AQUA_title[0]	= '\0';
+  AQUA_xSize      = AQUA_XMAX;
+  AQUA_ySize      = AQUA_YMAX;
+  strcpy(AQUA_fontNameCur, AQUA_fontNameDef);
+  AQUA_fontSizeCur  = AQUA_fontSizeDef;
+}
+
 
 TERM_PUBLIC void
 AQUA_init()
 {
   float fontSize, fontWHRatio;
-  // float vTicSize, pixelWHRatio;
-  LOG(@"Aqua Init");
-  if (arpool == NULL)   /* Make sure we don't leak mem by allocating every time */
-  {
-    arpool = [[NSAutoreleasePool alloc] init]; 
-    gnuTermAccess = [[AQTAdapter alloc] init]; 
+  NSString *title;
+  LOG(@"Aqua Init (open plot)");
+  if (arpool == NULL) {
+    /* FIXME: This should be removed when pools are handled in gnuplot proper */
+    arpool = [[NSAutoreleasePool alloc] init];
   }
-  else 
-  {
-    if (![gnuTermAccess server])	/* server could be invalid (=nil) for several reasons */
-    {
-        [gnuTermAccess connectToServer];    /* This will reconnect (or print an explanation) */
+  if (adapter == NULL) {
+    adapter = [[AQTAdapter alloc] init]; 
+    if (!adapter) { /* server could be invalid (=nil) for several reasons */
+      /* FIXME: Issue warning here? */
     }
   }
-  term->xmax =[[[gnuTermAccess termInfo] objectForKey:@"AQTXMax"] unsignedIntValue]*AQUA_SCALE_FACTOR; 
-  term->ymax =[[[gnuTermAccess termInfo] objectForKey:@"AQTYMax"] unsignedIntValue]*AQUA_SCALE_FACTOR; 
-  fontSize = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontSize"] floatValue];
-  fontWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontWHRatio"] floatValue];
-  // pixelWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTPixelWHRatio"] floatValue];
-  // vTicSize = AQUA_VTIC;
-  term->v_char = (unsigned int) (fontSize * AQUA_SCALE_FACTOR);
-  term->h_char = (unsigned int) (fontWHRatio * fontSize * AQUA_SCALE_FACTOR);
-  term->v_tic = (unsigned int) AQUA_VTIC;
-  term->h_tic = (unsigned int) AQUA_HTIC;
-  //
-  // Set up the basic indexed colormap for gnuplot
-  //
-  [gnuTermAccess setColor:[NSColor redColor] forIndex:0];
-  [gnuTermAccess setColor:[NSColor greenColor] forIndex:1];
-  [gnuTermAccess setColor:[NSColor blueColor] forIndex:2];
-  [gnuTermAccess setColor:[NSColor magentaColor] forIndex:3];
-  [gnuTermAccess setColor:[NSColor cyanColor] forIndex:4];
-  [gnuTermAccess setColor:[NSColor colorWithCalibratedRed:0.627 green:0.322 blue:0.176 alpha:1.0] forIndex:5];   // Sienna
-  [gnuTermAccess setColor:[NSColor colorWithCalibratedRed:1.0 green: 0.647 blue:0.0 alpha:1.0] forIndex:6];      // Orange
-  [gnuTermAccess setColor:[NSColor colorWithCalibratedRed:1.0 green:0.498 blue:0.314 alpha:1.0] forIndex:7];     // Coral
+
+  /* Must open plot before all other commands */
+  [adapter openPlotWithIndex:AQUA_plotRef];
+
+  /* set xmax, ymax*/
+  term->xmax = AQUA_xSize;
+  term->ymax = AQUA_ySize;
+  /* set current font*/
+  [adapter setFontname:[NSString stringWithCString:AQUA_fontNameCur]];
+  [adapter setFontsize:AQUA_fontSizeCur];                                                                   
+  /* set h_char, v_char*/
+  term->h_char = (int) (AQUA_fontSizeCur * 0.7 * AQUA_RESOLUTION);
+  term->v_char = (int) (AQUA_fontSizeCur * 1.5 * AQUA_RESOLUTION);
+  /* set h_tic, v_tic*/
+  term->h_tic = term->v_char / 3;
+  term->v_tic = term->v_char / 3;
+
+  [adapter setPlotSize:NSMakeSize(AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
+  [adapter setPlotTitle:[NSString stringWithCString:AQUA_title]];
+  
+  /*
+   * Set up the basic indexed colormap for gnuplot 
+   */
+  /*  Special colors */
+  [adapter setColormapEntry:0 red:0.1 green:0.1 blue:0.1]; /* linetype -4 */
+  [adapter setColormapEntry:1 red:0.9 green:0.9 blue:0.9]; /* linetype -3 (xor;interactive) light gray */
+  [adapter setColormapEntry:2 red:0.0 green:0.0 blue:0.0]; /* linetype -2 (border) black */
+  [adapter setColormapEntry:3 red:0.8 green:0.8 blue:0.8]; /* linetype -1 (gridlines) light grey */
+  /*  Cyclic colors */
+  [adapter setColormapEntry:4 red:1.0 green:0.0 blue:0.0]; /* red */
+  [adapter setColormapEntry:5 red:0.0 green:1.0 blue:0.0]; /* green */
+  [adapter setColormapEntry:6 red:0.0 green:0.0 blue:1.0]; /* blue */
+  [adapter setColormapEntry:7 red:1.0 green:0.0 blue:1.0]; /* magenta */
+  [adapter setColormapEntry:8 red:0.0 green:1.0 blue:1.0]; /* cyan */
+  [adapter setColormapEntry:9 red:0.6275 green:0.3216 blue:0.1765]; /* sienna */
+  [adapter setColormapEntry:10 red:1.0 green:0.6471 blue:0.0]; /* orange */
+  [adapter setColormapEntry:11 red:0.5 green:0.4980 blue:0.3137]; /* coral */
+  [adapter setColormapEntry:12 red:0.25 green:0.25 blue:0.25]; /* grey */
+
 }
 
 TERM_PUBLIC void
 AQUA_reset()
 {
+  LOG(@"Aqua reset");
 }
 
 TERM_PUBLIC void
 AQUA_text()
 {
-    [gnuTermAccess flushBuffers];
-    [gnuTermAccess closeModel];
+  LOG(@"Aqua text (render)");
+  [adapter renderPlot];
 }
 
 TERM_PUBLIC void
 AQUA_graphics()
 {
-    [gnuTermAccess openModel:currentWindow];
-    if(*AQUA_title)
-    {
-        [gnuTermAccess setTitle:[NSString stringWithCString:AQUA_title]];
-        *AQUA_title = 0;
-    }
+#ifdef LOGGING
+  /* Keep the compiler quiet when not debugging */
+  LOG(@"Pre:  (arpool + loopPool, loopPool) =(%d, %d)", [NSAutoreleasePool autoreleasedObjectCount],
+      [NSAutoreleasePool topAutoreleasePoolCount]);
+#endif
+  /* Avoid buildup of objects in the autoreleasepools */
+  [loopPool release];
+  loopPool = [[NSAutoreleasePool alloc] init];
+#ifdef LOGGING 
+  /* Keep the compiler quiet when not debugging */
+  LOG(@"Post: (arpool + loopPool, loopPool) =(%d, %d)",[NSAutoreleasePool autoreleasedObjectCount],
+      [NSAutoreleasePool topAutoreleasePoolCount]);
+#endif  
+  [adapter eraseRect:NSMakeRect(0.0, 0.0, AQUA_xSize/AQUA_RESOLUTION, AQUA_ySize/AQUA_RESOLUTION)];
 }
 
 TERM_PUBLIC void
 AQUA_move(unsigned int x, unsigned int y)
 {
-    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR, y/AQUA_SCALE_FACTOR)];
+  [adapter moveToPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION)];
 }
 
 TERM_PUBLIC void
 AQUA_vector(unsigned int x, unsigned int y)
 {
-  [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR, y/AQUA_SCALE_FACTOR)];
+  [adapter addLineToPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION)];
 }
 
 TERM_PUBLIC void
 AQUA_linetype(int linetype)
 {
-  LOG(@"AQUA_linetype(%d)", linetype);
-  [gnuTermAccess setLinetype: linetype%CYCLIC_COLORS];
+  LOG(@"AQUA_linetype(%d) ---> entry: %d", linetype, (linetype%CYCLIC_COLORS)+SPECIAL_COLORS);
+  /* Note: this operation maps linestyle -4 to -1 onto colormap entries 0 to 3 */
+  if (linetype != AQUA_LineType) {
+      AQUA_LineType = linetype;
+      [adapter takeColorFromColormapEntry:(linetype%CYCLIC_COLORS)+SPECIAL_COLORS];
+    }
 }
 
 TERM_PUBLIC void
@@ -752,59 +348,67 @@ AQUA_put_text(unsigned int x, unsigned int y, const char *str)
 {
   if (!strlen(str))
     return;
-  [gnuTermAccess putText:str at:NSMakePoint(x/AQUA_SCALE_FACTOR,y/AQUA_SCALE_FACTOR)];
+  [adapter  addLabel:[NSString stringWithCString: str] 
+	     atPoint:NSMakePoint(x/AQUA_RESOLUTION, y/AQUA_RESOLUTION) 
+	       angle:AQUA_TextAngle 
+	       align:(AQUA_TextJust | AQTAlignMiddle)];
 }
 
 TERM_PUBLIC int 
 AQUA_justify_text (enum JUSTIFY mode)
 {
-  [gnuTermAccess  setJustification:mode];
+  AQUA_TextJust = mode;
   return (TRUE);
 }
 
 TERM_PUBLIC int
 AQUA_text_angle (int angle)
 {
-  [gnuTermAccess setTextAngle: angle];
+  AQUA_TextAngle = (float)angle;
   return (TRUE);
 }
 
 TERM_PUBLIC int 
 AQUA_set_font(const char *font) /* "font,size" */
 {
-  float fontWHRatio, fontSize;
-  [gnuTermAccess setTextfont:font];
-  // FIXME: Does gnuplot process these values?
-  fontSize = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontSize"] floatValue];
-  fontWHRatio = [[[gnuTermAccess termInfo] objectForKey:@"AQTFontWHRatio"] floatValue];
-  term->v_char = (unsigned int) (fontSize * AQUA_SCALE_FACTOR);
-  term->h_char = (unsigned int) (fontWHRatio * fontSize * AQUA_SCALE_FACTOR);
+  NSString *fontFace = [NSString stringWithCString:AQUA_fontNameCur];
+  float fontSize = AQUA_fontSizeCur;
+  if (strlen(font)>0) {
+    NSArray *parts = [[NSString stringWithCString:font] componentsSeparatedByString:@","];            
+    if ([parts count] < 2) {
+      /* FIXME: Issue warning here? */
+	  LOG(@"Error: %@", [NSString stringWithCString:font]);                                    
+    } else {
+      fontSize = [[parts objectAtIndex:1] floatValue];                                           
+      fontFace = [parts objectAtIndex:0];                                                        
+    }
+  }
+  
+  LOG(@"Setting:(%@,%f)", fontFace, fontSize);                                                    
+  [adapter setFontname:fontFace];
+  [adapter setFontsize:fontSize];                                                                   
 
+  term->h_char = (int) (fontSize * 0.7 * AQUA_RESOLUTION);
+  term->v_char = (int) (fontSize * 1.5 * AQUA_RESOLUTION);
+  
   return (TRUE);
 }
 
 TERM_PUBLIC void 
 AQUA_set_pointsize(double size) /* notification of set pointsize */
 {
-    LOG(@"AQUA_set_pointsize(%f)", size);
+  LOG(@"AQUA_set_pointsize(%f)", size);
 }
 
 TERM_PUBLIC void 
 AQUA_point(unsigned int x, unsigned int y, int number)
 {
-  // Avoid changing lw unless necessary
-  if ([gnuTermAccess linewidth] != 1.0)
-  {
-    double tmplw = [gnuTermAccess linewidth];
-    [gnuTermAccess setLinewidth:1.0];
-    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR-.5, y/AQUA_SCALE_FACTOR)];
-    [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR+.5, y/AQUA_SCALE_FACTOR)];
-    [gnuTermAccess setLinewidth: tmplw];
-  }
-  else
-  {
-    [gnuTermAccess moveToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR-.5, y/AQUA_SCALE_FACTOR)];
-    [gnuTermAccess lineToPoint:NSMakePoint(x/AQUA_SCALE_FACTOR+.5, y/AQUA_SCALE_FACTOR)];
+  /* The default dot-routine doesn't work with AQT */
+  [adapter setLinewidth:1.0];
+  [adapter moveToPoint:NSMakePoint(x/AQUA_RESOLUTION-.5, y/AQUA_RESOLUTION)];
+  [adapter addLineToPoint:NSMakePoint(x/AQUA_RESOLUTION+.5, y/AQUA_RESOLUTION)];
+  if (number<0) {
+    return;
   }
   do_point(x, y, number);
 }
@@ -812,8 +416,7 @@ AQUA_point(unsigned int x, unsigned int y, int number)
 TERM_PUBLIC void 
 AQUA_suspend(void)  /* after one plot of multiplot */
 {
-  [gnuTermAccess flushBuffers];
-  [gnuTermAccess renderModel];
+  [adapter renderPlot];
 }
  
 TERM_PUBLIC void 
@@ -824,13 +427,59 @@ AQUA_resume(void) /* before subsequent plot of multiplot */
 TERM_PUBLIC void 
 AQUA_boxfill(int style, unsigned int x1, unsigned int y1, unsigned int width, unsigned int height) /* clear part of multiplot */
 {
-  [gnuTermAccess fillRect:NSMakeRect(x1/AQUA_SCALE_FACTOR,y1/AQUA_SCALE_FACTOR,width/AQUA_SCALE_FACTOR,height/AQUA_SCALE_FACTOR) style:style];
+  float r,g,b;
+
+  LOG(@"\nstyle=%d\nstyle & 0xf = %d\nfillpar=%d\n", style, style & 0xf, style >> 4);
+  /* Save current color */
+  [adapter getColorRed:&r green:&g blue:&b];
+
+#if USE_ULIG_FILLEDBOXES
+  /* fillpar:
+   * - solid   : 0 - 100
+   * - pattern : 0 - 100
+   */
+  int fillpar = style >> 4;
+  
+  style &= 0xf;
+  
+  switch (style) {
+  case 0: /* fill with background color */
+    {
+      float rb, gb, bb;
+      [adapter getBackgroundColorRed:&rb green:&gb blue:&bb];
+      [adapter setColorRed:rb green:gb blue:bb];  
+    }
+    break;
+  case FS_SOLID: /* solid fill */
+    {
+      /* Alpha channel? RGB -> HSV -> R'G'B'? */ 
+      float density = (100 - fillpar)*0.01;
+      [adapter setColorRed:r*(1-density) + density 
+	             green:g*(1-density) + density 
+	              blue:b*(1-density) + density];
+    }
+    break;
+  case FS_PATTERN: /* pattern fill */
+    /* Can't do pattern easily, using colors. */
+    [adapter takeColorFromColormapEntry:(fillpar%CYCLIC_COLORS)+SPECIAL_COLORS];
+    break;
+  default:
+    break;
+  }
+#else
+  /* FIXME: Actions here? */
+#endif
+  NSRect scaledRect = NSMakeRect(x1/AQUA_RESOLUTION, y1/AQUA_RESOLUTION, width/AQUA_RESOLUTION, height/AQUA_RESOLUTION);
+  [adapter eraseRect:scaledRect];  
+  [adapter addFilledRect:scaledRect];
+  /* Restore color */
+  [adapter setColorRed:r green:g blue:b];
 }
   
 TERM_PUBLIC void 
 AQUA_linewidth(double linewidth)
 {
-  [gnuTermAccess setLinewidth:linewidth];
+  [adapter setLinewidth:linewidth];
 }
 
 TERM_PUBLIC void 
@@ -841,44 +490,55 @@ AQUA_pointsize(double pointsize)
 }
 
 #ifdef PM3D
-  TERM_PUBLIC int 
-  AQUA_make_palette(t_sm_palette *palette)
-  {
-    if (palette == NULL)
-    {
-        return 128;
-    }
-    else
-    {
-        aqua_palette = palette;
-    }
+TERM_PUBLIC int 
+AQUA_make_palette(t_sm_palette *palette)
+{
+  if (palette == NULL) {
+    /* AquaTerm can do continuous colors */
+    return 0;
   }
+  return 0;
+}
 
-  TERM_PUBLIC void 
-  AQUA_set_color(double gray)
-  {
-    [gnuTermAccess setFillColor:gray];
+TERM_PUBLIC void 
+AQUA_set_color(double gray)
+{
+  rgb_color color;
+  
+  if( sm_palette.use_maxcolors != 0 ) {
+    /* finite nb of colors explicitly requested */
+    if( gray >= ( (double)(sm_palette.use_maxcolors-1) )
+	/ sm_palette.use_maxcolors ) {
+      gray = 1.0;
+    } else {
+      gray = floor( gray * sm_palette.use_maxcolors ) 
+	/ sm_palette.use_maxcolors;
+    }
   }
+  
+  rgb1_from_gray( gray, &color );
+  [adapter setColorRed:color.r green:color.g blue:color.b];
+  AQUA_LineType = LT_UNDEFINED; 
+}
 
-  TERM_PUBLIC void 
-  AQUA_filled_polygon(int points, gpiPoint *corners)
-  {
-    int i;
-    gpiPoint *scaledPoints = (gpiPoint *)malloc(points*sizeof(gpiPoint));
-    if (scaledPoints)
-      {
-	/* Need to rescale the point coordinates */
-	for (i=0; i<points; i++)
-	  {
-	    scaledPoints[i].x = corners[i].x / AQUA_SCALE_FACTOR;
-	    scaledPoints[i].y = corners[i].y / AQUA_SCALE_FACTOR;
-	  }
-	[gnuTermAccess setPolygonUsing:points corners:scaledPoints];
-	free(scaledPoints);
-      }
+TERM_PUBLIC void 
+AQUA_filled_polygon(int pc, gpiPoint *corners)
+{
+  int i;
+  [adapter moveToVertexPoint:NSMakePoint(corners[0].x/AQUA_RESOLUTION,
+					 corners[0].y/AQUA_RESOLUTION)];
+  for (i=1; i<pc; i++) {
+    [adapter addEdgeToVertexPoint:NSMakePoint(corners[i].x/AQUA_RESOLUTION,
+					      corners[i].y/AQUA_RESOLUTION)];	
   }
+}
+
+TERM_PUBLIC void
+AQUA_previous_palette(void)
+{
+}
+
 #endif /* PM3D */
-
 #endif /* TERM_BODY */
 
 #ifdef TERM_TABLE
@@ -886,7 +546,8 @@ AQUA_pointsize(double pointsize)
 TERM_TABLE_START(aqua_driver)
   "aqua",
   "Interface to graphics terminal server for Mac OS X",
-  AQUA_XMAX, AQUA_YMAX, AQUA_VCHAR, AQUA_HCHAR, AQUA_VTIC, AQUA_HTIC, 
+  0 /* xmax */ , 0 /* ymax */ , 0 /* vchar */ , 0 /* hchar */ ,
+  0 /* vtic */ , 0 /* htic */ ,
   AQUA_options, AQUA_init, AQUA_reset,
   AQUA_text, null_scale, AQUA_graphics, AQUA_move, AQUA_vector,
   AQUA_linetype, AQUA_put_text, 
@@ -901,7 +562,7 @@ TERM_TABLE_START(aqua_driver)
 #endif /* USE_MOUSE */
 #ifdef PM3D
   , AQUA_make_palette,
-  0 /* AQUA_previous_palette */,
+  AQUA_previous_palette, 
   AQUA_set_color,
   AQUA_filled_polygon
 #endif /* PM3D */
@@ -913,8 +574,6 @@ TERM_TABLE_END(aqua_driver)
 #endif /* TERM_TABLE */
 #endif /* TERM_PROTO_ONLY */
 
-
-
 #ifdef TERM_HELP
 START_HELP(aqua)
 "1 aqua",
@@ -925,12 +584,18 @@ START_HELP(aqua)
 "?term aqua",
 "?aqua",
 "?Aqua",
-" Syntax:",
-"   set terminal aqua {<n>} {title \"windowtitle\"}",
+" This terminal relies on AquaTerm.app for display on Mac OS X.",
 "",
-" where <n> is the number of the window to display the plot in.",
-" Default window number is 0, ",
-" default windowtitle is \"Figure <n>\"."
+" Syntax:", 
+"       set terminal aqua {<n>} {title \"<wintitle>\"} {size <x> <y>}",
+"                         {fname \"<fontface>\"} {fsize <fontsize>}",
+"",
+" where <n> is the number of the window to draw in (default is 0),",
+" <wintitle> is the name shown in the title bar (default \"Figure <n>\"),",
+" <x> <y> is the size of the plot (default is 846x594 pt = 11.75x8.25 in).",
+"",
+" Use <fontface> to specify the font to use (default is \"Times-Roman\"),", 
+" <fontzise> sets the font size (default is 14.0 pt)."
 END_HELP(aqua)
 #endif /* TERM_HELP */
 

@@ -1,5 +1,5 @@
 ## ------------------------------- ##
-## Check for Apple MacOS X         ##
+## Check for Apple Mac OS X        ##
 ## From Leigh Smith                ##
 ## ------------------------------- ##
 
@@ -11,9 +11,15 @@ AC_EGREP_CPP(yes,
 [#if defined(__APPLE__) && defined(__MACH__)
   yes
 #endif
-], AC_MSG_RESULT(yes)
-   LIBS="$LIBS -framework Foundation -framework AppKit"
-   CFLAGS="$CFLAGS -ObjC",
+], 
+   [ AC_MSG_RESULT(yes)
+     AC_CHECK_LIB(aquaterm, aqtInit, 
+     [ LIBS="-laquaterm $LIBS -framework Foundation"
+       CFLAGS="$CFLAGS -ObjC"
+       AC_DEFINE(HAVE_LIBAQUATERM,1,
+                 [Define to 1 if you're using the aquaterm library on Mac OS X])
+     ],[], -lobjc)
+   ],
    AC_MSG_RESULT(no))
 ])
 
