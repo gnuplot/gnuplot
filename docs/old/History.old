@@ -1,0 +1,295 @@
+
+                     GNUPLOT 3.0 RELEASE NOTES
+
+This describes changes to gnuplot since version 2.02 (ie, 2.0
+patchlevel 2).
+
+Highlights:
+-----------
+Gnuplot now handles surfaces as well. A new command names 'splot' (for
+surface plot) has been added for that purpose. A number of new 'set'
+options for surfaces have also been added and include: isosamples,
+view, contour, cntrparam, mapping and surface.  All tic/label/range
+setting for x and y axes were extended for z as well.
+
+The size of data file for both curves and surfaces is now independent
+of the samples (and iso_samples) variables. Data structures will
+automatically be extended to hold the entire data file.
+
+New features:
+-------------
+3-d plotting with 'splot', and many auxiliary options.
+
+New 'errorbars' plot style.
+
+New 'using x:y{:z}' format (NOT COMPATIBLE WITH GNUPLOT 2.02).
+
+Data file plotting (for both curves and surfaces) does not require
+setting samples (and isosamples for surfaces) any more. Size is
+increased on the fly, without affecting the sample rate of functions.
+
+New makefile scheme for unix, that supports lots of flavors.
+
+Command-line editing and history.
+
+Adjustable display of plot border ('set border').
+
+Set-commands 'x/y/zlabel' can now position the label.
+
+Set-command 'title' can now position the title.
+
+New time display command ('set time').
+
+All PostScript devices were rewritten and merged into one (Color
+Postscript is supported). Due to this many of the old postscript
+terminal driver names are not supported; only 'postscript' is
+recognized. Use 'help set terminal postscript' to find out how to get
+your old favorite back, and more.
+
+A 'gnuplot' mode for emacs in the file gnuplot.el.
+
+SGI device was improved.
+
+New option to 'set arrow' called 'nohead'.
+
+List of all new commands:
+-------------------------
+splot
+
+List of all new set-show commands:
+---------------------------------
+border, cntrparam, contour, isosamples, mapping, rrange, surface,
+time, view, zlabel, ztics, zrange.
+
+List of changed set-show commands:
+----------------------------------
+arrow, terminal, title, xlabel, ylabel, zlabel
+
+New terminal drivers:
+---------------------
+vws, apollo, gpr apollo, dumb, BigFig, Super
+VGA, ln03/hplj/hpdj, dxf.
+
+Deletions:
+----------
+The gnut2p translator (translating gnutex to gnuplot) has been removed
+from the standard distribution.  It is available for ftp separately at
+cs.duke.edu as dist/sources/gnuplot/gnut2p.tar.Z
+
+Bug fixes include:
+------------------
+Fix a bug in parametric type hangup.
+
+Add a .sty file to fix indexing problem in manual.
+
+Fix a bug in hpljii.
+
+Fix a bug in FIG arrows.
+
+
+                            ACKNOWLEDGEMENTS
+
+- New PostScript device by Russell Lang (rjl@monu1.cc.monash.edu.au).
+- Several bug fixes, manual proofing, World Map by John Campbell
+(campbell@nauvax.ucc.nau.edu).
+- Eliminating samples from data files, lasergnu, and errorbars by
+David Kotz (David.Kotz@Dartmouth.edu).
+- New history and line editing capability for Unix and MSDOS, bivariate
+  functions and some bug fixes by Tom Tkacik (tkacik@hobbes.cs.gmr.com).
+- New using x:y{:z} format by Dennis Linse (djlinse@phoenix.princeton.edu).
+- Some polar enhancements, time display and some bug fixes by
+Alex Woo (woo@ra-next.arc.nasa.gov).
+- Dumb terminal by Francois Pinard (pinard@iro.umontreal.ca).
+- VWS device by Walter Speth (speth@dbnpib5.bitnet).
+- BigFig device by (ian@augean.ua.oz.au).
+- XDF device by Florian Hiss (fhis1231@w204zrz.zrz.tu-berlin.de).
+- HP Desk Jet device, overlay support for BCC and more efficient help
+and pc.trm for MSDOS by Maurice Castro and Russell Lang
+(rjl@monu1.cc.monash.edu.au).
+- New makefile scheme by Roque Donizete De Oliveira and David Kotz
+(oliveria@caen.engin.umich.edu and David.Kotz@Dartmouth.edu).
+- The 3d extensions, contouring, Super VGA device, and bringing this new
+version up by Gershon Elber (gershon@cs.utah.edu).
+
+Other bug fixes/improvments:
+= Tom Bopp (tbopp@uhunix.uhcc.hawaii.edu)
+= Kenneth H. Carpenter (khc@eece.ksu.edu)
+= Mark Christopher (christo@bnr.ca)
+= Henk de Haan (haan@irimcf.tudelft.nl)
+= David Gillespie (daveg@csvax.cs.caltech.edu)
+
+Beta testers:
++ John Campbell (campbell@nauvax.ucc.nau.edu)
++ Kenneth H. Carpenter (khc@eece.ksu.edu)
++ Gershon Elber (gershon@cs.utah.edu)
++ Pat Empleo (empleop@afal-edwards.af.mil)
++ David Kotz (dfk@moose.dartmouth.edu)
++ Russell Lang (rjl@monu1.cc.monash.edu.au)
++ Tom Tkacik (tkacik@hobbes.cs.gmr.com)
++ Roque Donizete De Oliveira (oliveria@caen.engin.umich.edu)
++ Walter Speth (Speth@dbnpib5.bitnet)
++ Carsten Steger (stegerc@gshalle2.informatik.tu-muenchen.de)
+
+============================================================================
+
+                     GNUPLOT 2.0 RELEASE NOTES
+
+New terminal drivers: ATT6300, Roland DXY800A, EEPIC, emTeX, EPSON LX-800,
+EPSON 60dpi, Fig, HP2648, HPGL, HP LaserJet, Imagen, Kermit-MS Tektronix
+emulator, LaTeX, MCGA, NEC CP6 pinwriter, POSTSCRIPT, Proprinter, Star color
+printer, Tandy DMP-130, Tektronix 410x, SUN, VGA, X11.
+
+Additions:
+
+Command-line arguments are accepted. They are treated as names of
+files containing gnuplot commands. Gnuplot loads them, one by one, and
+then exits.
+
+Command 'plot' now has a 'title' option to change the information in
+the key.  The 'with' option can now specify line type and point type.
+
+Command 'pause'.
+
+Command 'replot' allows the addition of extra plots.
+
+Command 'save' now saves all the 'set' options, including the last
+plot command.
+
+Command 'set autoscale' now accepts autoscaling on the x axis for data
+files. The default is autoscaling on both axes.
+
+Command 'set noclip' disables clipping of points near the border. 'set
+clip' reenables clipping. The default used to be 'clip', and is now
+'noclip'. Clipping has also been extended to clip lines that extend
+outside the borders: line plots are now clipped at the plot boundary.
+Formerly, the line stopped at the last in-range data point.
+
+Numerical labelling at tic marks on x and y axes.  Command 'set
+format' allows the format of the tic mark labels to be altered.
+Commands 'set xtics' and 'set ytics' allow for alphanumeric labels and
+arbitrary tic positions.
+
+Command 'set grid' adds a grid between the tic marks.
+
+Improved key gives sample point or line types.  Key can be disabled
+with the 'set nokey'. Key can be positioned anywhere.
+
+Command 'set label' allows the placement of arbitrary text labels and
+arrows.
+
+Command 'set polar' for polar plots.
+
+Command 'set offsets' for reducing the plotted area.  Useful for polar
+plots.
+
+Command 'set size' scales the displayed size of the plot.
+
+Command 'set tics out' causes the tics to be drawn outwards from the
+border.  Useful for impulse plots.
+
+Command 'set title' places a text label above the plot.
+
+Commands 'set xlabel' and 'set ylabel' place text labels on the x and
+y axes respectively.  Some terminals will place the y label vertically
+upwards on the left of the plot, others place the label horizontally
+at the left of the plot.
+
+Improved tics on log scales.
+
+Extended comments: comments are allowed anywhere reasonable in the
+input line, and continue to the end of the input line.
+
+Line continuation (with \) is added.
+
+Non-interactive use, through redirection or "load" command, is
+improved. Error messages expanded to include file name and line
+number, and to reprint command line if not interactive.
+
+New plotting styles 'linespoints' and 'dots'.
+
+Blank lines in data files denote "breaks". In lines and linespoints
+plot styles, this breaks the curve being drawn and begins at the next
+point, without changing the line or point types.
+
+Completely new interactive help system that is similar to VMS help
+system. A printed manual can be obtained in LaTeX, troff, or nroff and
+is based on the same information as the interactive help.
+
+PC version now compiles with the large model so that gnuplot will
+compile with the above additions!
+
+Bug fixes include:
+------------------
+Bug involving functions plotted on a logarithmic x axis is fixed.
+
+Errors inside of loaded files now clean up and close files properly.
+
+Numbers of the form xxxxe+nn are now acceptable (+ sign caused error).
+
+Tics are now place inside the borders (some were outside).
+
+Reverse axes now work properly.
+
+Command 'set output ""' used to crash.
+
+VMS was closing stdout, so 'set output' code changed to avoid closing
+it.  VMS version of gnuplot now performs a SET TERM/NOWRAP itself.
+
+Terminal is now reset before closing output file, changing terminal
+type or exiting gnuplot.
+
+Several old bugs have been superseded by new ones.
+
+
+                            ACKNOWLEDGEMENTS
+
+The Unix PC, polar, pause, and offset additions were by John Campbell.
+(CAMPBELL@NAUVAX.bitnet)
+The Turbo C additions were by Bill Wilson.
+(WILSON@NAUVAX.bitnet)
+Some of the labelling improvements and combining of these additions
+were by Russell Lang.
+(rjl@monu1.cc.monash.oz.au)
+The LaTeX driver, the help system, and some of the labelling
+improvements were by David Kotz.
+(David.Kotz@Dartmouth.edu)
+And of course, the vast majority of the program is by Colin Kelley
+and Thomas Williams.
+(info-gnuplot@dartmouth.edu)
+
+=======================================================================
+
+                      GNUPLOT 1.1 RELEASE NOTES
+
+New terminal drivers: AED 512, BBN BitGraph, HP2623, POSTSCRIPT,
+Selanar, Vectrix 384.  The PC version now supports Hercules and ATT
+6300 monochrome graphics.  Thanks to those who sent these drivers in.
+
+New commands: 'set dummy' and 'show dummy' to select the dummy
+variable name; 'replot' to repeat the last 'plot' command.
+
+The exclamation point (!) is now accepted as postfix factorial
+operator.  The gamma() function is also included, if your C library
+has gamma().  See GAMMA below.
+
+Logical AND (&&) and OR (||) now short-circuit the way they do in C.
+That is, the second && operand is not evaluated if the first is false;
+the second || operand is not evaluated if the first is true.  The
+ternary operator (?:) also does not evaluate the unused operand.  This
+change allows for the definition of recursive functions, e.g. a
+synonym for the ! factorial operator:
+
+        fact(x) = (x<=1) ? 1 : x*fact(x-1)
+
+GNUPLOT now has a much better memory allocation scheme, replacing most
+fixed-size arrays with malloc()'d linked lists.  There is no longer
+any artificial maximum on the number of simultaneous plots, number of
+points in those plots, or the number of user-defined functions or
+variables.  All these are limited only by the memory available to
+malloc().  This is a big improvement for memory-starved machines like
+PDP-11s or PCs.
+
+Lines beginning with # (also ! in VMS) are treated as comments.  Only
+the $ may now be used for a shell escape in VMS, since ! is a comment.
+
+Several old bugs have been superseded by new ones.
