@@ -562,9 +562,9 @@ the 'test' command:
 $ gnuplot
 
         G N U P L O T
-        Unix version 3.5 (pre 3.6)
-        patchlevel beta 347
-        last modified Mon Jun 22 13:22:33 BST 1998
+        Unix version 3.7
+        patchlevel 0
+        last modified Tue Jan 12 13:48:06 BST 1999
 
         Copyright(C) 1986 - 1993, 1998
         Thomas Williams, Colin Kelley and many others
