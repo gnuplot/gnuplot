@@ -14,9 +14,6 @@
    Leave the following blank line there!!  Autoheader needs it.  */
 
 
-/* Define if you want to use the Apollo Graphics Primitive Resource.  */
-#undef APOLLO
-
 /* Define if you want to use the CGI terminal under SCO.  */
 #undef CGI
 
@@ -29,6 +26,12 @@
 /* Define if <errno.h> declares errno.  */
 #undef EXTERN_ERRNO
 
+/* Define if the type in arguments 2-4 to select() is fd_set.  */
+#undef SELECT_USES_FD_SET
+
+/* Define to the type used in argument 1 `select'. Usually this is an `int'.  */
+#undef fd_set_size_t
+
 /* Define if you are using the GNU readline library.  */
 #undef GNU_READLINE
 
@@ -37,9 +40,6 @@
 
 /* Define if you want to use the GNU version of the Unix plot library.  */
 #undef GNUGRAPH
-
-/* Define if you want to use the Apollo Graphics Primitive Resource (fixed-size window.  */
-#undef GPR
 
 /* Define if you want to use a newer version of libgrx under MSDOS/djgpp.  */
 #undef GRX21
@@ -80,11 +80,11 @@
 /* Define if you want to use the Redwood Graphics Interface Protocol.  */
 #undef RGIP
 
+/* Define to the type used in arg 5 of select.  */
+#undef struct_timeval_t
+
 /* Define if you want to use the sunview terminal (sun).  */
 #undef SUN
-
-/* Define if you want to use the unixpc terminal (ATT 3b1 or ATT 7300.  */
-#undef UNIXPC
 
 /* Define if you want to use the standard Unix plot library.  */
 #undef UNIXPLOT
