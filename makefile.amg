@@ -86,16 +86,16 @@ docs: docs/gnuplot.doc docs/doc2gih docs/doc2tex docs/doc2ms docs/checkdoc
 	docs/doc2gih <docs/gnuplot.doc >docs/gnuplot.gih
 
 docs/doc2gih: docs/doc2gih.c docs/termdoc.c
-	$(CC) $(CFLAGS) idir= link to docs/doc2gih docs/doc2gih.c
+	$(CC) $(CFLAGS) idir= link to docs/doc2gih docs/doc2gih.c docs/termdoc.c
 
-docs/doc2tex: docs/doc2tex.c docs/allterm.h
-	$(CC) $(CFLAGS) idir= link to docs/doc2tex docs/doc2tex.c
+docs/doc2tex: docs/doc2tex.c docs/allterm.h docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/doc2tex docs/doc2tex.c docs/termdoc.c
 
-docs/doc2ms: docs/doc2ms.c docs/allterm.h
-	$(CC) $(CFLAGS) idir= link to docs/doc2ms docs/doc2ms.c
+docs/doc2ms: docs/doc2ms.c docs/allterm.h docs/termdoc.c
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/doc2ms docs/doc2ms.c docs/termdoc.c
 
-docs/checkdoc: docs/checkdoc.c docs/allterm.h
-	$(CC) $(CFLAGS) idir= link to docs/checkdoc docs/checkdoc.c
+docs/checkdoc: docs/checkdoc.c docs/allterm.h docs/termdoc.c 
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= link to docs/checkdoc docs/checkdoc.c docs/termdoc.c
 
 docs/allterm.h: $(CORETERM)
 	join term/\#?.trm as docs/allterm.h

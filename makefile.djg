@@ -98,8 +98,8 @@ ctrl87.o: ctrl87.c ctrl87.h
 $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs/gnuplot.doc $(HELPFILE)
 
-doc2gih.exe: docs\doc2gih.c
-	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o doc2gih docs/doc2gih.c
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o doc2gih docs/doc2gih.c docs/termdoc.c
 	strip doc2gih
 	coff2exe doc2gih
 #	copy /b $(CCDIR)\go32.exe+doc2gih doc2gih.exe

@@ -250,20 +250,20 @@ wprinter.obj: win/wprinter.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgraph.c
 	
-# convert gnuplot.doc to gnuplot.gih
+# convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): win\gnuplot.rtf
 	$(BIN)hc win\wgnuplot.hpj 
 
 win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 
-doc2rtf.exe: docs\doc2rtf.c
-	$(BIN)$(CCAUX) @&&!
+doc2rtf.exe: docs\doc2rtf.c \docs\termdoc.c docs\xref.c
+	$(BIN)$(CCAUX) -edoc2rtf.exe @&&!
 -D_Windows
 -w-pro
 $(CAUXFLAGS)
 -I. -Iterm -Idocs
-! docs\doc2rtf.c
+! docs\doc2rtf.c docs\termdoc.c docs\xref.c
 
 # make binary demo files
 demo\bf_test.exe: bf_test.c dbinary.obj dalloc.obj

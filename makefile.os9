@@ -89,11 +89,14 @@ $(HELPFILE): doc2gih $(D)gnuplot.doc
 	$(ODIR)/doc2gih <$(D)gnuplot.doc >-$(HELPFILE)
 	attr -pr $(HELPFILE)
 
-doc2gih: $(RDIR)/doc2gih.$(O)
-	$(LC) $(LFLAGS) $(RDIR)/doc2gih.$(O) -f=$(ODIR)/$@
+doc2gih: $(RDIR)/doc2gih.$(O) $(RDIR)/termdoc.$(O) 
+	$(LC) $(LFLAGS) $(RDIR)/doc2gih.$(O) $(RDIR)/termdoc.$(O) -f=$(ODIR)/$@
 
 $(RDIR)/doc2gih.$(O): $(D)doc2gih.c
 	$(CC) $(CFLAGS) $(CCFLAGS) -v=$(SDIR) -v=TERM $(D)doc2gih.c
+
+$(RDIR)/termdoc.$(O): $(D)termdoc.c
+	$(CC) $(CFLAGS) $(CCFLAGS) -v=$(SDIR) -v=TERM $(D)termdoc.c
 
 #
 # For X11 support generate gnuplot_X11

@@ -138,7 +138,7 @@ DOCS1 = $(D)Makefile.in $(D)README $(D)checkdoc.c $(D)doc2gih.c \
 	$(D)doc2ipf.c $(D)doc2ms.c $(D)doc2rnh.c $(D)doc2rtf.c $(D)doc2tex.c \
 	$(D)doc2texi.pl $(D)gnuplot.1 $(D)lasergnu.1 $(D)makefile.dst \
 	$(D)makefile.ami $(D)termdoc.c $(D)titlepag.ms \
-	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c
+	$(D)titlepag.tex $(D)toc_entr.sty $(D)xref.c $(D)/xref.h
 DOCS2 = $(D)gnuplot.doc $(D)gpcard.tex
 DOCS3 = $(L)Makefile.in $(L)eg1.plt \
 	$(L)eg2.plt $(L)eg3.dat $(L)eg3.plt \

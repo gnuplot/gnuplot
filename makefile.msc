@@ -133,8 +133,8 @@ util.obj: util.c plot.h
 version.obj: version.c
 
 # convert gnuplot.doc to gnuplot.gih
-doc2gih.exe: docs\doc2gih.c
-	$(CC) docs\doc2gih.c
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+	$(CC) /Fedoc2gih.exe docs\doc2gih.c docs\termdoc.c
 
 $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs\gnuplot.doc $(HELPFILE)

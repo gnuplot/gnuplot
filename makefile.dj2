@@ -156,8 +156,8 @@ version.o: version.c
 $(HELPDEST)\$(HELPFILE): .\docs\doc2gih.exe .\docs\gnuplot.doc
 	.\docs\doc2gih  docs/gnuplot.doc > $(HELPDEST)\$(HELPFILE)
 
-.\docs\doc2gih.exe: .\docs\doc2gih.c $(CSOURCES)
-	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o ./docs/doc2gih ./docs/doc2gih.c
+.\docs\doc2gih.exe: .\docs\doc2gih.c .\docs\termdoc.c $(CSOURCES)
+	$(CC) $(CFLAGS) $(INCLUDE) $(TERMFLAGS) -Iterm -o ./docs/doc2gih ./docs/doc2gih.c ./docs/termdoc.c
 	coff2exe ./docs/doc2gih
 
 # now for the demo bin

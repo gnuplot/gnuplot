@@ -198,11 +198,11 @@ $(HELPFILE): doc2gih docs$(SL)gnuplot.doc
 $(TEXFILE):  doc2tex docs$(SL)gnuplot.doc
 	        doc2tex docs$(SL)gnuplot.doc $@
 
-doc2gih:     docs$(SL)doc2gih.c
+doc2gih:     docs$(SL)doc2gih.c docs$(SL)termdoc.c
 	        $(HOSTCC) -I. -I.. -Idocs -o $@ $<
 
-doc2tex:     docs$(SL)doc2tex.c
-	        $(HOSTCC) -I. -I.. -Idocs -o $@ $<
+doc2tex:     docs$(SL)doc2tex.c docs$(SL)termdoc.c
+	        $(HOSTCC) -DALL_TERM_DOC -I. -I.. -Idocs -o $@ $<
 
 bf_test:     bf_test.c binary.c alloc.c
 	     $(HOSTCC) -DMTOS -o $@ bf_test.c binary.c alloc.c $(MATHLIB)

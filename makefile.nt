@@ -128,13 +128,13 @@ grpicon.ico: geticon.exe win\wgnuplot.rc
 geticon.exe: win\geticon.c
 	cl /DMSDOS /F 5000 /W1 win\geticon.c
 
-# convert gnuplot.doc to gnuplot.gih
+# convert gnuplot.doc to gnuplot.rtf
 $(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
 	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
 	hcw /c /e win\wgnuplot.hpj 
 
-doc2rtf.exe: docs\doc2rtf.c
-	cl $(CFLAGS) /F 5000 /W1 /I. /Idocs /Iterm docs\doc2rtf.c
+doc2rtf.exe: docs\doc2rtf.c docs\termdoc.c docs\xref.c
+	cl $(CFLAGS) /F 5000 /W1 /I. /Idocs /Iterm -Fedoc2rtf.exe docs\doc2rtf.c docs\termdoc.c docs\xref.c
 
 #make binary demo files
 $(M)bf_test.exe : bf_test.c dbinary.obj alloc.obj

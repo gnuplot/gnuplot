@@ -136,8 +136,8 @@ version.o:   version.c
 $(HELPFILE): doc2gih docs$(SL)gnuplot.doc
 	doc2gih docs$(SL)gnuplot.doc $(HELPFILE)
 
-doc2gih: docs$(SL)doc2gih.c
-	$(HOSTCC) -I. -I.. -o doc2gih docs$(SL)doc2gih.c
+doc2gih: docs$(SL)doc2gih.c docs$(SL)termdoc.c
+	$(HOSTCC) -I. -I.. -o doc2gih docs$(SL)doc2gih.c docs$(SL)termdoc.c 
 
 demo$(SL)bf_test.tos: bf_test.o binary.o alloc.o
 	$(CC) -s -o $@ bf_test.o binary.o alloc.o -lpml

@@ -4,7 +4,7 @@
 # Makefile for use with emx (0.9 and above) and GNUMake
 #   on OS/2 3.0 and above (might also work for OS/2 2.x)
 #
-# last modification: 19981001
+# last modification date: 19981005
 #
 
 # We depend on using cmd.exe (or a compatible one)
@@ -30,16 +30,16 @@ PNG=1
 
 # VESAkit support
 # requires SVGA- and VESA Kit (not part of gnuplot)
-VESA=1
+# VESA=1
+
+# GNU_ReadLine support
+# requires GNU readline library (static or DLL; not part of gnuplot)
+GNU_RL=1
 
 # DEBUGging support
 # creates binaries suitable for debugging. Some bugs may come and go
 # as opposed to a production build since we lower the optimization level
 DEBUG=1
-
-# GNU_ReadLine support
-# requires GNU readline library (static or DLL; not part of gnuplot)
-GNU_RL=1
 
 # MOUSE support for PM terminal
 # (not yet supported in official release)
@@ -78,14 +78,18 @@ M=demo/
 #
 
 OS2DIR = os2
-DOCDIR=docs
+DOCDIR = docs
 DEMODIR=demo
 TERMDIR=term
+
+OS2TERMS= $(TERMDIR)\pm.trm
 ifdef X11
-	OS2TERMS= $(TERMDIR)\pm.trm $(TERMDIR)\emxvga.trm $(TERMDIR)\x11.trm
-else
-	OS2TERMS= $(TERMDIR)\pm.trm $(TERMDIR)\emxvga.trm
+	OS2TERMS += $(TERMDIR)\x11.trm
 endif
+ifdef VESA
+	OS2TERMS += $(TERMDIR)\emxvga.trm
+endif
+
 
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
@@ -105,7 +109,8 @@ O3 = o
 
 # Flags for compiler and linker under OS/2
 OS2FLAGS = -DOS2 -DHELPFILE=\"$(HELPFILE)\"
-# flags for compiling with EMX/GCC
+
+# Flags for compiling with EMX/GCC
 EMXSPECIFIC = -DREADLINE -DHAVE_STRNICMP -DPIPES -DHAVE_STRERROR -DHAVE_SYS_SELECT_H -DHAVE_SYS_STAT_H
 LIBS = 
 ifdef GNU_RL
@@ -114,20 +119,20 @@ ifdef GNU_RL
 endif
 
 #
-# Choose flags suitable for debugging or for a production build
+# Choose flags suitable for a debugging or for a production build
 #
 ifdef DEBUG
-CFLAGS  = $(OS2FLAGS) -g -Wall -Wno-comment -O0
-LFLAGS  = -Zcrtdll -g
-CFLAGS2 = $(OS2FLAGS) -Zomf -Zsys -Zmt -g -Wall -O0
-LFLAGS2 = -Zomf -Zmt -Zcrtdll -Zlinker /debug
-CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -g -Wall -Wno-comment -O0
+CFLAGS  = -g $(OS2FLAGS) -Wall -Wno-comment -O0
+LFLAGS  = -g -Zcrtdll
+CFLAGS2 = -g $(OS2FLAGS) -Zomf -Zsys -Zmt -Wall -O0
+LFLAGS2 = -g -Zomf -Zmt -Zcrtdll
+CFLAGS3 = -g $(OS2FLAGS) $(EMXSPECIFIC) -Wall -Wno-comment -O0
 LFLAGS3 = -g
 else
 CFLAGS  = $(OS2FLAGS) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS  = -s -Zcrtdll
 CFLAGS2 = $(OS2FLAGS) -Zomf -Zcrtdll -Zmt -O2 -Wall -Wno-unused
-LFLAGS2 = -Zomf -Zmt -Zsys -s
+LFLAGS2 = -s -Zomf -Zmt -Zsys
 CFLAGS3 = $(OS2FLAGS) $(EMXSPECIFIC) -O2 -Wall -Wno-unused -Wno-comment
 LFLAGS3 = -s
 endif
@@ -138,9 +143,9 @@ endif
 TERMFLAGS = -I. -I$(T)
 
 # All terminals available via #defines should be listed below
-# Some terminals can be en/disablked in the configuration at the
-# beginning of this Makefile.os2 but others still require changes
-# in term.h
+# Some terminals can be en/disabled in the configuration at the
+# beginning of this Makefile.os2 but others may still require
+# changes in term.h
 
 #
 # GIF-support
@@ -158,7 +163,7 @@ ifdef VESA
 TERMFLAGS += -DEMXVESA
 TERMLIBS  += -ljmgraph -lvesa
 endif
-# X11 support (XFree86 OS/2)
+# X11 support
 ifdef X11
 TERMFLAGS += -DX11
 endif
@@ -166,6 +171,7 @@ endif
 ifdef MOUSE
 TERMFLAGS += -DUSE_MOUSE
 endif
+
 #
 # Default Rules
 #
@@ -175,7 +181,7 @@ endif
 	$(CC2) $(CFLAGS2) -o $*.obj -c $*.c
 #
 # Include dependencies valid for all platforms from makefile.all
-
+#
 include makefile.all
 
 #
@@ -194,27 +200,30 @@ binaries: gnuplot.exe gnupmdrv.exe
 endif
 
 #
-# special rule to build graphics.o ( -O2 does not work properly here ?!)
+# Special rule to build graphics.o 
+# ('plain' -O2 does not work properly here !)
 graphics.o: graphics.c
 ifdef DEBUG
-	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O0 -o $@ -c graphics.c
+#	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O2 -ffloat-store -o $@ -c graphics.c
+	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -g -O0 -ffloat-store -o $@ -c graphics.c
 else
 	$(CC) $(OS2FLAGS) $(EMXSPECIFIC) -O2 -ffloat-store -o $@ -c graphics.c
 endif
 
 OBJS = $(COREOBJS) version.$(O)
+term.$(O): $(OS2TERMS) term.h
+
 gnuplot.exe: $(OBJS)
 	$(CC) -o $@ $(OBJS) $(TERMLIBS) $(LIBS) $(LFLAGS)
+
 #
-term.$(O): $(OS2TERMS) term.h
+# Build the PM outboard driver
 #
-# Build the PM driver
-#
-$(OS2DIR)\gnupmdrv.$(O2): $(OS2DIR)\gnupmdrv.c  $(OS2DIR)\gnupmdrv.h
-$(OS2DIR)\gclient.$(O2):  $(OS2DIR)\gclient.c   $(OS2DIR)\gnupmdrv.h
-$(OS2DIR)\dialogs.$(O2):  $(OS2DIR)\dialogs.c   $(OS2DIR)\gnupmdrv.h  $(OS2DIR)\dialogs.h
-$(OS2DIR)\print.$(O2):    $(OS2DIR)\print.c     $(OS2DIR)\gnupmdrv.h
-$(OS2DIR)\gnupmdrv.res :  $(OS2DIR)\gnupmdrv.rc $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
+$(OS2DIR)\gnupmdrv.$(O2):  $(OS2DIR)\gnupmdrv.c   $(OS2DIR)\gnupmdrv.h
+$(OS2DIR)\gclient.$(O2):   $(OS2DIR)\gclient.c    $(OS2DIR)\gnupmdrv.h
+$(OS2DIR)\dialogs.$(O2):   $(OS2DIR)\dialogs.c    $(OS2DIR)\gnupmdrv.h  $(OS2DIR)\dialogs.h
+$(OS2DIR)\print.$(O2):     $(OS2DIR)\print.c      $(OS2DIR)\gnupmdrv.h
+$(OS2DIR)\gnupmdrv.res :   $(OS2DIR)\gnupmdrv.rc  $(OS2DIR)\gnuplot.ico $(OS2DIR)\dialogs.h
 	cd $(OS2DIR) & rc -r gnupmdrv.rc & cd ..
 OS2OBJ = $(OS2DIR)\gnupmdrv.$(O2) $(OS2DIR)\gclient.$(O2) $(OS2DIR)\print.$(O2) \
          $(OS2DIR)\dialogs.$(O2)
@@ -227,9 +236,9 @@ gnupmdrv.hlp: $(OS2DIR)\gnupmdrv.ipf
 # Build the X11 outboard driver
 #
 
-# List your X11 libraries
+# X11 libraries
 X11LIBS = -lX11 -lsocket -Zcrtdll
-# List where the X11 include directory is found
+# X11 includes
 X11INCLUDES = -I$(X11ROOT)/xfree86/include
 X11FLAGS= -D__ST_MT_ERRNO -Zmtd -Zsysv-signals
 
@@ -247,8 +256,8 @@ gplt_x11.o: gplt_x11.c
 gnuplot.dvi: gnuplot.tex
 	copy gnuplot.tex $(DOCDIR)\gnuplot_2.tex
 	cd $(DOCDIR) & latex2e gnuplot_2.tex
-	mv $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
-	rm $(DOCDIR)\gnuplot_2*
+	move $(DOCDIR)\gnuplot_2.dvi gnuplot.dvi
+	del $(DOCDIR)\gnuplot_2*
 gnuplot.tex:  $(DOCDIR)\gnuplot.doc doc2tex.exe
 	doc2tex $(DOCDIR)\gnuplot.doc gnuplot.tex
 gnuplot.ps: gnuplot.dvi
@@ -274,30 +283,30 @@ $(DOCDIR)\gnuplot.ipf:  $(DOCDIR)\gnuplot.doc doc2ipf.exe
 # in various formats
 #
 doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-            $(DOCDIR)\xref.c term.h
+            $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c term.h
 #
 # To include all terminal documentations in the documentation
 # uncomment the following 2 lines
 # doc2gih.exe doc2ipf.exe doc2html.exe doc2info.exe doc2tex.exe doc2rtf.exe: \
-#             $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
+#           $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(DOCDIR)\allterm.h
 
 $(DOCDIR)\allterm.h: $(CORETERM)
 #   echo > $@
 	cd $(TERMDIR) & type *.trm > ..\$@
-doc2gih.exe:  $(DOCDIR)\doc2gih.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2gih.c
-doc2ipf.exe:  $(DOCDIR)\doc2ipf.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ipf.c
-doc2tex.exe:  $(DOCDIR)\doc2tex.c  $(OS2TERMS) $(DOCDIR)\allterm.h
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2tex.c
-doc2html.exe: $(DOCDIR)\doc2html.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2html.c
-doc2info.exe: $(DOCDIR)\doc2info.c $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2info.c
-doc2rtf.exe:  $(DOCDIR)\doc2rtf.c  $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2rtf.c
-doc2ms.exe:   $(DOCDIR)\doc2ms.c   $(OS2TERMS)
-	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ms.c
+doc2gih.exe:  $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2gih.c $(DOCDIR)\termdoc.c
+doc2ipf.exe:  $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2ipf.c $(DOCDIR)\termdoc.c
+doc2tex.exe:  $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c $(OS2TERMS) $(DOCDIR)\allterm.h
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2tex.c $(DOCDIR)\termdoc.c
+doc2html.exe: $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2html.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+doc2info.exe: $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2info.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+doc2rtf.exe:  $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -o $@ $(DOCDIR)\doc2rtf.c $(DOCDIR)\termdoc.c $(DOCDIR)\xref.c
+doc2ms.exe:   $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c $(OS2TERMS)
+	$(CC3) $(CFLAGS3) $(TERMFLAGS) -DALL_TERM_DOC -o $@ $(DOCDIR)\doc2ms.c $(DOCDIR)\termdoc.c
 #
 # Create binary demo files
 #
@@ -312,6 +321,7 @@ $(M)bf_test.exe : bf_test.c binary.$(O) alloc.$(O)
 #
 # Clean up
 #
+
 # Clean up all files temporary used
 clean:
 	IF EXIST *.$(O)                  DEL *.$(O)

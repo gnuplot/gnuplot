@@ -150,11 +150,11 @@ version.obj: version.c
 $(HELPFILE): doc2gih.exe docs\gnuplot.doc
         doc2gih docs\gnuplot.doc $(HELPFILE)
 
-doc2gih.exe: docs\doc2gih.c
-    $(BINB)$(CL) $(DOC2XXX_FLAGS) docs\doc2gih.c
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+    $(BINB)$(CL) $(DOC2XXX_FLAGS) name doc2gih docs\doc2gih.c docs\termdoc.c
 
-doc2tex.exe: docs\doc2tex.c
-    $(BINB)$(CL) -w0 -m$(MODEL) $(DOC2XXX_FLAGS) -I$(WC)\include -L$(WC)\lib docs\doc2tex.c
+doc2tex.exe: docs\doc2tex.c docs\termdoc.c
+    $(BINB)$(CL) -w0 -m$(MODEL) $(DOC2XXX_FLAGS) -DALL_TERM_DOC -I$(WC)\include -L$(WC)\lib name doc2tex docs\doc2tex.c docs\termdoc.c
 
 bf_test.exe: bf_test.c binary.obj alloc.obj
     $(BIN)$(CC) -m$(MODEL) bf_test.c

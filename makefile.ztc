@@ -103,9 +103,8 @@ $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs\gnuplot.doc $(HELPFILE)
 
 # convert gnuplot.doc to gnuplot.gih
-doc2gih.exe: docs\doc2gih.c
-	$(CC) -c -ml docs\doc2gih.c
-	$(LINK) $*
+doc2gih.exe: docs\doc2gih.c docs\termdoc.c
+	$(CC) -mx -odoc2gih.exe docs\doc2gih.c docs\termdoc.c
 
 demo\bf_test.exe: bf_test.c binary.obj alloc.obj
 	$(CC) -mx -odemo\bf_test.exe bf_test.c binary.obj alloc.obj
