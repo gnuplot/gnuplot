@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.21 2003/08/16 15:46:54 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.22 2003/10/06 15:22:45 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -1948,8 +1948,10 @@ inverse_error_func(y)
     if ((y < -1.0) || (1.0 < y)) {
         printf("inverse_error_func: The value out of the range of the function");
         x = log(-1.0);
+	return (x);
     } else if ((y == -1.0) || (1.0 == y)) {
         x = -y * log(0.0);
+	return (x);
     } else if ((-1.0 < y) && (y < -y0)) {
         z = sqrt(-log((1.0 + y) / 2.0));
         x = -(((c[3] * z + c[2]) * z + c[1]) * z + c[0]) / ((d[1] * z + d[0]) * z + 1.0);
@@ -1962,10 +1964,12 @@ inverse_error_func(y)
             z = sqrt(-log((1.0 - y) / 2.0));
             x = (((c[3] * z + c[2]) * z + c[1]) * z + c[0]) / ((d[1] * z + d[0]) * z + 1.0);
         }
-        /* Two steps of Newton-Raphson correction to full accuracy. */
-        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
-        x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
     }
+    /* Three steps of Newton-Raphson correction to full accuracy. */
+    x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
+    x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
+    x = x - (erf(x) - y) / (2.0 / sqrt(PI) * gp_exp(-x * x));
+
     return (x);
 }
 

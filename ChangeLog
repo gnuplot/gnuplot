@@ -1,3 +1,10 @@
+2003-10-21  Ethan Merritt <merritt@u.washington.edu>
+
+	* src/specfun.c: Fix reported bug #826811. The inverse_error_func()
+	code to perform Newton-Raphson improvement was incorrectly nested
+	so that it was only invoked in 1 of 3 range cases. Also empirical
+	testing indicated that a 3rd cycle of Newton-Raphson was needed.
+
 2003-10-21  Petr Mikulik  <mikulik@physics.muni.cz> 
 
 	Changes allowing to save gnuplot session to a pipe, for example
