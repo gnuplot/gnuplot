@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.52 2001/02/28 16:39:00 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.53 2001/03/19 14:52:23 mikulik Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -134,9 +134,7 @@ int vms_ktid;			/* key table id, for translating keystrokes */
 /* static prototypes */
 static void command __PROTO((void));
 static int changedir __PROTO((char *path));
-#ifdef USE_MOUSE
 static char* fgets_ipc __PROTO((char* dest, int len));
-#endif
 static int read_line __PROTO((const char *prompt));
 static void do_system __PROTO((const char *));
 #ifdef AMIGA_AC_5
@@ -2019,39 +2017,43 @@ int len;
 #  endif			/* !plain DOS */
 # endif				/* !READLINE && !HAVE_LIBREADLINE) */
 
-#ifdef USE_MOUSE
-/* this function is called for non-interactive operation. It's usage
- * is like fgets(), but additionally it checks for ipc events from
- * the terminals waitforinput() (if present). This function will
- * be used when reading from a pipe. */
+/* this function is called for non-interactive operation. Its usage is
+ * like fgets(), but additionally it checks for ipc events from the
+ * terminals waitforinput() (if USE_MOUSE, and terminal is
+ * mouseable). This function will be used when reading from a pipe. */
 static char*
-fgets_ipc(char* dest, int len)
+fgets_ipc(dest, len)
+    char *dest;			/* string to fill */
+    int len;			/* size of it */
 {
+#ifdef USE_MOUSE
     if (term && term->waitforinput) {
-	char* ptr = dest;
-	char* end = dest + len;
-	*dest = '\0';
-	do {
-	    *ptr = term->waitforinput();
-	    if ('\n' == *ptr) {
-		*ptr = '\0';
+	/* This a mouseable terminal --- must expect input from it */
+	int c;			/* char got from waitforinput() */
+	size_t i=0;		/* position inside dest */
+
+	dest[0] = '\0';
+	for (i=0; i < len; i++) {
+	    c = term->waitforinput();
+	    if ('\n' == c) {
+		dest[i] = '\0';
 		return dest;
-	    } else if (EOF == *ptr) {
+	    } else if (EOF == c) {
 		return (char*) 0;
+	    } else {
+		dest[i] = c;
 	    }
-	    ptr++;
-	} while (ptr < end);
+	} 
 	return dest;
-    } else {
-	return fgets(dest, len, stdin);
-    }
-}
+    } else 
 #endif
+	return fgets(dest, len, stdin);
+}
 
 /* Non-VMS version */
 static int
 read_line(prompt)
-const char *prompt;
+    const char *prompt;
 {
     int start = 0;
     TBOOLEAN more = FALSE;
@@ -2066,13 +2068,9 @@ const char *prompt;
 	/* grab some input */
 # if defined(READLINE) || defined(HAVE_LIBREADLINE)
 	if (((interactive)
-	    ? rlgets(&(input_line[start]), input_line_len - start,
-		     ((more) ? "> " : prompt)) :
-#ifdef USE_MOUSE
-	    fgets_ipc(&(input_line[start]), input_line_len - start)
-#else
-	    fgets(&(input_line[start]), input_line_len - start, stdin)
-#endif
+	     ? rlgets(&(input_line[start]), input_line_len - start,
+		     ((more) ? "> " : prompt)) 
+	     : fgets_ipc(&(input_line[start]), input_line_len - start)
 	    ) == (char *) NULL)
 # else /* !(READLINE || HAVE_LIBREADLINE) */
 	if (GET_STRING(&(input_line[start]), input_line_len - start)
