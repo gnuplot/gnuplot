@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.60 2004/09/29 11:29:12 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.61 2004/10/14 22:57:53 sfeam Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -1013,7 +1013,7 @@ df_open(int max_using)
 #endif
 {
     /* now allocated dynamically */
-    int name_token;
+    int name_token = 0;
 
     TBOOLEAN duplication = FALSE;
     TBOOLEAN set_index = FALSE, set_every = FALSE, set_thru = FALSE;
