@@ -52,13 +52,16 @@ several different ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
-   Attention: This affects the location of *all* installed files!
+   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/share.
+   Attention: This option affects the location of *all* installed files!
 
  o with configure's --datadir= option, eg.
    ./configure --datadir='/gnuplot/docs'
+   gnuplot will look for the online help file, gnuplot.gih, in /gnuplot/docs.
 
  o at make time, eg.
    make HELPFILE='/gnuplot/docs/gnuplot.gih'
+   gnuplot will look for the online help file /gnuplot/docs/gnupot.gih.
 
  o at execution time by specifying the helpfile with the environment
    variable GNUHELP (see "Environment Variables" below).
@@ -68,13 +71,16 @@ ways:
 
  o with configure's --prefix= option, eg.
    ./configure --prefix=/gnuplot
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
    Attention: This affects the location of *all* installed files!
 
  o with configure's --bindir= option, eg.
    ./configure --bindir='/gnuplot/bin'
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
 
  o at make time, eg.
    make GNUPLOT_BINDIR='/gnuplot/bin'
+   gnuplot will be installed as /gnuplot/bin/gnuplot.
 
    If the executables are not installed in the default location, files
 written by the `save' command cannot be used as scripts on Un*x platforms.
@@ -111,6 +117,8 @@ to change.  A complete list of options is available through
 
 $ ./configure --help
 
+   The options relevant to gnuplot are listed below:
+
   --prefix=PREFIX         Install architecture-independent files in PREFIX
                           [/usr/local]. The gnuplot (and gnuplot_x11) binary
                           is installed in PREFIX/bin.
@@ -121,7 +129,7 @@ $ ./configure --help
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --mandir=DIR            Man documentation in DIR [PREFIX/man]
-  --with-readline         use the builtin minimal readline function (default)
+  --with-readline (*)     use the builtin minimal readline function
   --without-readline      do not use the builtin readline function
   --with-readline=gnu     use the GNU readline library
   --with-readline=PATH            Specify the location of GNU readline
@@ -145,15 +153,15 @@ $ ./configure --help
   --enable-rgip           enable Redwood Graphics Interface Protocol
   --with-x (*)            Use the X Window System
 
- Options marked with (*) are on by default, ie. these features or packages
-will be used if configure can detect them, even if the corresponding option
-is not specified.  Please note that the `--with-PACKAGE' options can have
-additional arguments:
+ Options marked with (*) are enabled by default, ie. these features or
+packages are used if configure detects them even if the corresponding
+option is not specified.  Please note that the `--with-PACKAGE' options
+can have additional arguments:
 
  o `--with-PACKAGE' is equivalent to `--with-PACKAGE=yes'
- o `--with-PACKAGE=no' will disable checking for PACKAGE. It has the same
+ o `--with-PACKAGE=no' disables checking for PACKAGE. It has the same
    effect as `--without-PACKAGE'.
- o `--with-PACKAGE=PATH' will check for PACKAGE in PATH
+ o `--with-PACKAGE=PATH' checks for PACKAGE in PATH
 
 Unix, no configure
 ------------------
@@ -202,6 +210,18 @@ Using Aztec C 5.2a
       make -f makefile.ami
 Using SAS/C 6.1 or later versions
       smake -f makefile.amg
+      You can also copy makefile.amg to smakefile and just type `smake'.
+
+      At the beginning of makefile.amg you will find a configuration
+      section where you have to adjust all settings which control the build
+      process. Most important is probably to select the terminal devices
+      which should be supported. You can create a version offering
+      png graphics as well as gif support. Use the appropriate settings
+      for CPU and MATH to compile for a specific machine type.
+      Be sure to enable only those devices for which you have the 
+      necessary software already installed. Also ensure that the
+      libraries and the sources are all compiled using the same
+      settings for CPU and MATH.
 Using gcc: see Unix
 
 Atari/TOS
@@ -231,6 +251,12 @@ Using Borland C++ 3.1 and compiling for MS-Windows
       make
   Put wgnuplot.exe, wgnuplot.dll, wgnuplot.hlp and wgnuplot.mnu
   in the windows directory.
+
+Using Visual C++ and compiling for Windows NT/95/98
+      nmake -f makefile.nt
+ or
+      copy makefile.nt makefile
+      nmake
 
 Using the MinGW32 port of egcs: you need the Micrsoft SDK for the
 moment.
@@ -329,15 +355,18 @@ The CGI drivers need the CGIPATH environment variable to set the path
 to the CGI agents, and the CGIDISP and/or CGIPRNT environment variables
 to set the output devices.
 
- If using dynamically linked executables with the X11 Window System, it
-may be necessary to define LD_LIBRARY_PATH - see man ld for details.
-It is, however, prefered to use the appropriate linker options, eg.
--R under Solaris, or -rpath under DEC Unix and Irix.
+ If creating dynamically linked executables for the X11 Window System, it
+may be necessary to add flags to the LIBS variable in Makefile
+to make sure gnuplot finds all required libraries at runtime.  Systems like
+SunOS and Solaris use -R to specify the runtime library search path, whereas
+OSF/Dec Unix, Irix and Linux use -rpath. If this is not possible, the
+LD_LIBRARY_PATH environment variable should be set.
 
 About --with-PACKAGE[=PATH]
 ***************************
 
- The following description applies to gnuplot only.
+ The described method of finding library and header files using the
+--with-package configure option applies to gnuplot only.
 
  Every `--with-PACKAGE' option sets a `with_package' variable in
 configure.  Depending on how `--with-PACKAGE' was invoked, there are
@@ -345,7 +374,7 @@ only three different possible values for the `with_package' variable:
 
  Option                   $with_package
 ----------------------------------------
-(not specified)           yes
+(not specified)           yes or no; default set in configure
 --with-package            yes
 --with-package=yes        yes
 --with-package=no         no
@@ -529,9 +558,12 @@ How to test gnuplot
 ===================
 
    No comprehensive test suite for gnuplot's features has been written
-to date. However, the supplied demo files provide a good method of
-testing commonly used features. All command line examples below assume
-Unix Bourne shell syntax.
+to date. It is probaly impossible to write such a test suite, because
+it would need to cover all possible variations allwed by gnuplot's
+command language, or a significant subset thereof.
+However, the supplied demo files provide a good method of testing commonly
+used features. All command line examples below assume Unix Bourne shell
+syntax.
 
    The demo files can be run interactively by eg.
 
@@ -539,9 +571,10 @@ $ cd gnuplot/demo
 $ PATH=..:$PATH ../gnuplot simple.dem
 
 and gnuplot prompts the user to "Hit return to continue" to cycle
-through all the plots.  (The PATH= statement is only required if you are 
-using the X11 plotting device and the gnuplot_x11 binary has not been
-installed yet.)
+through all the plots (the PATH= statement is only required if you are 
+using the X11 or BeOS plotting device and the gnuplot_x11/gnuplot_be
+binary has not been installed yet, or you want to test the external
+binaries you just compiled at the same time).
 
    To run the demos in a specified file without interaction, one
 can use
@@ -584,12 +617,14 @@ Front Ends for gnuplot
 
  o Xgfe by David Ishee <dmishee@jasper.he.net>, available from
    http://von-mises.home.ml.org/xgfe/xgfe.html
-   If you download the source, you need Qt library from
-   http://www.troll.no/
+   To compile from source, you need Qt library from
+   http://www.troll.no/.
 
  o Bruce Ravel <ravel@phys.washington.edu> has written a new version of
    gnuplot-mode for GNU emacs and XEmacs. This version is based on
    the gnuplot.el file by Gershon Elber which is included with this
    distribution. The package is available from
-   http://feff.phys.washington.edu/~ravel/gnuplot/
+   http://feff.phys.washington.edu/~ravel/gnuplot/.
+   Future distributions of gnuplot will hopefully include Bruce's
+   version.
 

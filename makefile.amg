@@ -6,24 +6,31 @@
 # Makefile for use with SAS/C 6.50 or newer
 #   on AmigaOS 2.0 and above
 #
-# last modification date: 19990312
+# last modification date: 19990317 - St. Patrick's Day!
 #
 
 #
 # ***************** Begin of Configuration section ***************************
 #
 
-# Comment out the definition lines to disable the according features
+# Comment out the definition lines to disable the respective drivers
 # Substitute the path names for the actual path where includes/libs reside
 
 # GD (GIF) device driver
 # requires GD library (not part of gnuplot)
+# the library source code can be downloaded from
+#  http://www.boutell.com/gd/
+#
 #GD_DEF = def=HAVE_LIBGD
 #GD_INCLUDE = IDIR=gd1.3
 #GD_LIB = gd1.3/gd.lib
 
 # PNG device driver
 # requires PNG and Z libraries (not part of gnuplot)
+# the canonical download sites for both libraries are
+#  http://www.cdrom.com/pub/png/pngcode.html
+#  http://www.cdrom.com/pub/infozip/zlib/
+#
 #PNG_DEF = def=HAVE_LIBPNG
 #PNG_INCLUDE = IDIR=libpng-1.0.2
 #PNG_LIB = libpng-1.0.2/png.lib
@@ -39,7 +46,7 @@ CPU = CPU=ANY
 
 # Floating point math type
 # valid values are NOMATH (default) STANDARD FFP 68881 (same as 68882) IEEE
-# Compared to the old version of this makefile, the link commands have
+# other than the old version of this makefile, the link commands have
 # been changed so that the MATH option also selects the proper math
 # library to link with
 MATH = MATH=IEEE
@@ -71,11 +78,16 @@ HELPDEST = S:
 # Miscellaneous setup
 #
 
+# Where related files reside
+DOCDIR  = docs
+DEMODIR = demo
+TERMDIR = term
+
 # Merge compiler flags
 CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
 
 # NOTE: I have disabled the compilation rule for .oo files as described
-# below, because when linking with sc (as opposed to slink), all object
+# below, because when linking with sc (not slink), all object
 # files not ending in .o must be prefixed with the objname option!
 #
 # To simplify the handling of files that have grown so large that they
@@ -84,16 +96,16 @@ CFLAGS = $(COPTS) $(CPU) $(MATH) $(OFLAGS) $(DEFS) $(DEBUG) DATA=f
 # extension from .o to .oo, and the file will be compiled correctly.
 # This must be done in the OBJS-variable below and in the corresponding 
 # dependency-rule near the end of the file.
+#
+# Compilation rule for large files
+#.c.oo:
+#	$(CC) $(CFLAGS) code=f objname=$@ $<
 
-all: gnuplot demo/bf_test
+all: gnuplot $(DEMODIR)/bf_test
 
 # Normal compilation rule
 .c.o:
 	$(CC) $(CFLAGS) objname=$@ $<
-
-# Compilation rule for large files
-#.c.oo:
-#	$(CC) $(CFLAGS) code=f objname=$@ $<
 
 graphics.o: graphics.c plot.h setshow.h
 	$(CC) $(CFLAGS) code=f objname=$@ $<
@@ -102,7 +114,7 @@ set.o: set.c plot.h setshow.h
 	$(CC) $(CFLAGS) code=f objname=$@ $<
 
 term.o: term.c term.h plot.h setshow.h bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-	$(CC) $(CFLAGS) idir=term code=f $(GD_INCLUDE) $(PNG_INCLUDE) $(Z_INCLUDE) objname=$@ $<
+	$(CC) $(CFLAGS) IDIR=$(TERMDIR) code=f $(GD_INCLUDE) $(PNG_INCLUDE) $(Z_INCLUDE) objname=$@ $<
 
 OBJS = alloc.o amiga.o binary.o bitmap.o command.o contour.o datafile.o \
        eval.o fit.o graph3d.o graphics.o help.o hidden3d.o internal.o \
@@ -115,79 +127,93 @@ CSOURCE2 = help.c graphics.c graph3d.o internal.c
 CSOURCE3 = misc.c eval.c parse.c plot.c plot2d.c plot3d.c scanner.c \
 	standard.c stdfn.c 
 CSOURCE4 = bitmap.c term.c util.c util3d.c version.c interpol.c fit.c matrix.c
-CSOURCE5 = term/aed.trm term/ai.trm term/amiga.trm term/apollo.trm \
-	term/atariaes.trm term/atarivdi.trm term/cgi.trm term/cgm.trm \
-	term/compact.c term/corel.trm term/debug.trm term/driver.h \
-	term/djsvga.trm term/dumb.trm term/dxf.trm term/dxy.trm term/eepic.trm \
-	term/emxvga.trm term/epson.trm term/excl.trm term/fg.trm term/fig.trm \
-	term/gif.trm term/gnugraph.trm
-CSOURCE6 = term/gpic.trm term/gpr.trm term/grass.trm term/hp26.trm \
-	term/hp2648.trm term/hp500c.trm term/hpgl.trm term/hpljii.trm \
-	term/hppj.trm term/imagen.trm term/impcodes.h term/iris4d.trm \
-	term/kyo.trm term/latex.trm term/linux.trm term/mac.trm \
-	term/metafont.trm term/mgr.trm term/mif.trm term/multitos.trm \
-	term/next.trm term/object.h term/pbm.trm term/pc.trm
-CSOURCE7 = term/pm.trm term/png.trm term/post.trm term/pslatex.trm \
-	term/pstricks.trm term/qms.trm term/regis.trm term/rgip.trm \
-	term/sun.trm term/t410x.trm term/table.trm term/tek.trm \
-	term/texdraw.trm term/tgif.trm term/tkcanvas.trm term/tpic.trm \
-	term/unixpc.trm term/unixplot.trm term/v384.trm term/vws.trm \
-	term/win.trm term/x11.trm term/xlib.trm
+CSOURCE5 = $(TERMDIR)/aed.trm $(TERMDIR)/ai.trm $(TERMDIR)/amiga.trm \
+	   $(TERMDIR)/apollo.trm $(TERMDIR)/atariaes.trm \
+	   $(TERMDIR)/atarivdi.trm $(TERMDIR)/cgi.trm $(TERMDIR)/cgm.trm \
+	   $(TERMDIR)/compact.c $(TERMDIR)/corel.trm $(TERMDIR)/debug.trm \
+	   $(TERMDIR)/driver.h $(TERMDIR)/djsvga.trm $(TERMDIR)/dumb.trm \
+	   $(TERMDIR)/dxf.trm $(TERMDIR)/dxy.trm $(TERMDIR)/eepic.trm \
+	   $(TERMDIR)/emxvga.trm $(TERMDIR)/epson.trm $(TERMDIR)/excl.trm \
+	   $(TERMDIR)/fg.trm $(TERMDIR)/fig.trm $(TERMDIR)/gif.trm \
+	   $(TERMDIR)/gnugraph.trm
+CSOURCE6 = $(TERMDIR)/gpic.trm $(TERMDIR)/gpr.trm $(TERMDIR)/grass.trm \
+	   $(TERMDIR)/hp26.trm $(TERMDIR)/hp2648.trm $(TERMDIR)/hp500c.trm \
+	   $(TERMDIR)/hpgl.trm $(TERMDIR)/hpljii.trm $(TERMDIR)/hppj.trm \
+	   $(TERMDIR)/imagen.trm $(TERMDIR)/impcodes.h $(TERMDIR)/iris4d.trm \
+	   $(TERMDIR)/kyo.trm $(TERMDIR)/latex.trm $(TERMDIR)/linux.trm \
+	   $(TERMDIR)/mac.trm $(TERMDIR)/metafont.trm $(TERMDIR)/mgr.trm \
+	   $(TERMDIR)/mif.trm $(TERMDIR)/multitos.trm $(TERMDIR)/next.trm \
+	   $(TERMDIR)/object.h $(TERMDIR)/pbm.trm $(TERMDIR)/pc.trm
+CSOURCE7 = $(TERMDIR)/pm.trm $(TERMDIR)/png.trm $(TERMDIR)/post.trm \
+	   $(TERMDIR)/pslatex.trm $(TERMDIR)/pstricks.trm $(TERMDIR)/qms.trm \
+	   $(TERMDIR)/regis.trm $(TERMDIR)/rgip.trm $(TERMDIR)/sun.trm \
+	   $(TERMDIR)/t410x.trm $(TERMDIR)/table.trm $(TERMDIR)/tek.trm \
+	   $(TERMDIR)/texdraw.trm $(TERMDIR)/tgif.trm $(TERMDIR)/tkcanvas.trm \
+	   $(TERMDIR)/tpic.trm $(TERMDIR)/unixpc.trm $(TERMDIR)/unixplot.trm \
+	   $(TERMDIR)/v384.trm $(TERMDIR)/vws.trm $(TERMDIR)/win.trm \
+	   $(TERMDIR)/x11.trm $(TERMDIR)/xlib.trm
 CSOURCE8 = contour.c specfun.c amiga.c
 CORETERM = $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
 
 #gnuplot: $(OBJS)
-#	slink from lib:c.o $(OBJS) to gnuplot\
-#	lib $(GD_LIB) $(PNG_LIB) $(Z_LIB) lib:scmieee.lib lib:scnb.lib $(LNDBG) verbose
-
+#	$(CC) <WITH <
+#$(CFLAGS)
+#LINK TO $@
+#FROM $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
+#<
 gnuplot: $(OBJS)
-	$(CC) <WITH <
-$(CFLAGS)
-LINK TO $@
-FROM $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
-<
+	$(CC) $(CFLAGS) LINK TO $@ $(OBJS) $(PNG_LIB) $(Z_LIB) $(GD_LIB) $(LNDBG)
 
-#demo/bf_test: bf_test.o binary.o alloc.o
-#	slink from lib:c.o bf_test.o binary.o alloc.o to demo/bf_test\
-#	lib lib:scmieee.lib lib:scnb.lib
-#	@echo "*N*NRun bf_test in demo subdirectory to make binary demo files*N"
-
-demo/bf_test: bf_test.o binary.o alloc.o
+$(DEMODIR)/bf_test: bf_test.o binary.o alloc.o
 	$(CC) $(CFLAGS) LINK TO $@ bf_test.o binary.o alloc.o
 	@echo "*N*NRun bf_test in demo subdirectory to make binary demo files*N"
 
-docs: docs/gnuplot.doc docs/doc2gih docs/doc2tex docs/doc2ms docs/checkdoc
-	docs/doc2gih <docs/gnuplot.doc >docs/gnuplot.gih
+docs: gih
 
-docs/doc2gih: docs/doc2gih.c docs/termdoc.c
-	$(CC) $(CFLAGS) idir= LINK TO docs/doc2gih FROM docs/doc2gih.c docs/termdoc.c
+gih: $(DOCDIR)/gnuplot.gih
 
-docs/doc2html: docs/doc2html.c docs/allterm.h docs/termdoc.c
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2html FROM docs/doc2html.c docs/termdoc.c
+$(DOCDIR)/gnuplot.gih: $(DOCDIR)/doc2gih $(DOCDIR)/gnuplot.doc
+	$(DOCDIR)/doc2gih $(DOCDIR)/gnuplot.doc $(DOCDIR)/gnuplot.gih
 
-docs/doc2tex: docs/doc2tex.c docs/allterm.h docs/termdoc.c
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2tex FROM docs/doc2tex.c docs/termdoc.c
+$(DOCDIR)/doc2gih: $(DOCDIR)/doc2gih.c $(DOCDIR)/termdoc.o
+	$(CC) $(CFLAGS) IDIR= IDIR=$(TERMDIR) LINK TO $@ FROM $(DOCDIR)/doc2gih.c $(DOCDIR)/termdoc.o
 
-docs/doc2ms: docs/doc2ms.c docs/allterm.h docs/termdoc.c
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/doc2ms FROM docs/doc2ms.c docs/termdoc.c
+html: $(DOCDIR)/gnuplot.html
 
-docs/checkdoc: docs/checkdoc.c docs/allterm.h docs/termdoc.c 
-	$(CC) $(CFLAGS) def=ALL_TERM_DOC idir= LINK TO docs/checkdoc FROM docs/checkdoc.c docs/termdoc.c
+$(DOCDIR)/gnuplot.html: $(DOCDIR)/doc2html $(DOCDIR)/gnuplot.doc
+	$(DOCDIR)/doc2html $(DOCDIR)/gnuplot.doc $@
 
-docs/allterm.h: $(CORETERM)
-	join term/\#?.trm as docs/allterm.h
+$(DOCDIR)/doc2html: $(DOCDIR)/doc2html.c $(DOCDIR)/allterm.h $(DOCDIR)/termdoc.o $(DOCDIR)/xref.o
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC IDIR= IDIR=$(TERMDIR) LINK TO $@ FROM $(DOCDIR)/doc2html.c $(DOCDIR)/termdoc.o $(DOCDIR)/xref.o
+
+tex: $(DOCDIR)/gnuplot.tex
+
+$(DOCDIR)/gnulot.tex: $(DOCDIR)/doc2tex $(DOCDIR)/gnuplot.doc
+	$(DOCDIR)/doc2tex $(DOCDIR)/gnuplot.doc $@
+
+$(DOCDIR)/doc2tex: $(DOCDIR)/doc2tex.c $(DOCDIR)/allterm.h $(DOCDIR)/termdoc.o
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC IDIR= IDIR=$(TERMDIR) LINK TO $@ FROM $(DOCDIR)/doc2tex.c $(DOCDIR)/termdoc.o
+
+check: $(DOCDIR)/checkdoc $(DOCDIR)/gnuplot.doc
+	$(DOCDIR)/checkdoc < $(DOCDIR)/gnuplot.doc
+
+$(DOCDIR)/checkdoc: $(DOCDIR)/checkdoc.c $(DOCDIR)/allterm.h $(DOCDIR)/termdoc.o
+	$(CC) $(CFLAGS) def=ALL_TERM_DOC IDIR= IDIR=$(TERMDIR) LINK TO $@ FROM $(DOCDIR)/checkdoc.c $(DOCDIR)/termdoc.o
+
+$(DOCDIR)/allterm.h: $(CORETERM)
+	join $(TERMDIR)/\#?.trm as $(DOCDIR)/allterm.h
 
 clean:
 	@-delete $(OBJS) bf_test.o quiet
-	@-delete docs/\#?.o docs/\#?.lnk quiet
+	@-delete $(DOCDIR)/\#?.o $(DOCDIR)/\#?.lnk quiet
 
 veryclean: clean
-	@-delete demo/binary[1-3] fitdemo/fit.log quiet
-	@-delete bf_test demo/fit.log gnuplot docs/gnuplot.gih quiet
-	@-delete docs/doc2gih docs/doc2tex docs/doc2ms docs/checkdoc quiet
+	@-delete $(DEMODIR)/binary[1-3] $(DEMODIR)/fit.log quiet
+	@-delete bf_test gnuplot $(DOCDIR)/gnuplot.gih $(DOCDIR)/gnuplot.tex $(DOCDIR)/gnuplot.html quiet
+	@-delete $(DOCDIR)/doc2gih $(DOCDIR)/doc2tex $(DOCDIR)/doc2html $(DOCDIR)/checkdoc quiet
 
-install: gnuplot docs/gnuplot.gih
-	copy docs/gnuplot.gih $(HELPDEST)
+install: gnuplot $(DOCDIR)/gnuplot.gih
+	copy $(DOCDIR)/gnuplot.gih $(HELPDEST)
 	copy gnuplot $(DEST)
 
 debug:

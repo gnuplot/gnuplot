@@ -49,3 +49,20 @@ Lars' list
 - write or organise a portable version of snprintf(3) with a copyright
   compatible with the gnuplot copyright (ie. no GPL)
 
+OTHER ISSUES (from old WhatsNew file)
+  set mapping spherical is not 'real' spherical polars
+  terminals are no longer allowed to do their own scaling
+  break up some of the drivers (eg epson and family) into their
+    own files. *maybe* we can provide libraries of generic routines
+    (particularly tex) which can be used by all interested drivers,
+    and because they are a library, they are linked only if
+    any relevant drivers are installed. bitmap.c could also be
+    linked in this way.
+  Now that all drivers are new format, do we need to explore separate
+    compilation of the drivers into their own .obj files for DOS ?
+  hidden line is still slower than in 3.5
+  have I got all os/2 and (in particular) mac changes ?
+  filled boxes ?
+  substitution using backquotes should not have a length limit
+  the source indentation stinks - may I pass it through gnu indent,
+     or will that mess up use of patches which did not make it into
