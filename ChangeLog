@@ -1,3 +1,10 @@
+2002-01-31  Petr Mikulik  <mikulik@physics.muni.cz>
+
+	* demo/all.dem demo/pm3d.dem demo/clip14in.dat demo/triangle.dat:
+	New files for pm3d demo.
+
+	* pm3d/demo: Directory removed (contents merged with demo/).
+
 2002-01-30  Petr Mikulik  <mikulik@physics.muni.cz>
 
 	* pm3d/demo/pm3dColumn.gpi: Use 'set term push/pop' and close

@@ -1,5 +1,5 @@
 #
-# $Id: all.dem,v 1.1.1.1 1998/04/15 19:16:40 lhecking Exp $
+# $Id: all.dem,v 1.2 1999/08/17 15:31:53 lhecking Exp $
 #
 # Executes ALL demos in this directory, in functionality order.
 #
@@ -114,4 +114,8 @@ reset
 
 print "******************** file animate.dem ********************"
 load "animate.dem"
+reset
+
+print "********************** file pm3d.dem *********************"
+load "pm3d.dem"
 reset
