@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: color.c,v 1.18 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: color.c,v 1.19 2001/07/20 14:04:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - color.c */
@@ -651,7 +651,7 @@ draw_color_smooth_box()
 	CB_AXIS.log = axis_array[FIRST_Z_AXIS].log; /* use log scaling from z-axis */
 	CB_AXIS.base = axis_array[FIRST_Z_AXIS].base;
 	CB_AXIS.log_base = axis_array[FIRST_Z_AXIS].log_base;
-	gen_tics( COLOR_AXIS, grid_selection & (GRID_CB | GRID_MCB),
+	gen_tics( COLOR_AXIS, /* grid_selection & (GRID_CB | GRID_MCB), */
 		  cbtick_callback );
 	CB_AXIS.log = FALSE; /* disable cb-axis log, if set by the above */
     }

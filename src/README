@@ -409,9 +409,47 @@ congratulations.
 Hans-Bernhard Broeker (broeker@physik.rwth-aachen.de)
 Even if all the snow were burnt, ashes would remain.
 
+---------------------------------------------------------------------------
 
+2001/07/24: I made a lot of changes in the expression parser /
+evaluator subsystem. The interface from the expression evaluator to
+the rest of gnuplot is now through only *one* header file, eval.h. The
+headers interpol.h, specfun.h and standard.h are now used only for
+communication to eval.c and its helpers. Other modules should #include
+only eval.h, or parse.h if they need to handle user input (parse.h
+includes eval.h).
 
+I've also renamed all those incomprehendible functions 'aterms()'
+through 'hterms()' in parser.c, according to the type of expression
+they actually parse. The expression type names follow those in the C
+standard grammar. In order of increasing operator precedence:
 
+express --> parse_expression
+xterms --> parse_conditional_expression
+aterms --> parse_logical_OR_expression
+bterms --> parse_logical_AND_expression
+cterms --> parse_inclusive_OR_expression  
+dterms --> parse_exclusive_OR_expression  
+eterms --> parse_AND_expression           
+fterms --> parse_equality_expression      
+gterms --> parse_relational_expression    
+hterms --> parse_additive_expression      
+iterms --> parse_multiplicative_expression
+unary --> parse_unary_expression
+factor --> parse_primary_expression
 
-[[[[ unsubscribe from info-gnuplot-beta via majordomo@dartmouth.edu ]]]]
+Those are the functions that actually parse expressions of a given type
+based upon lexical symbols found in the input. A second set of functions
+represent the grammar states:
+
+xterm --> accept_logical_OR_expression
+aterm --> accept_logical_AND_expression
+bterm --> accept_inclusive_OR_expression  
+cterm --> accept_exclusive_OR_expression  
+dterm --> accept_AND_expression           
+eterm --> accept_equality_expression      
+fterm --> accept_relational_expression    
+gterm --> accept_additive_expression      
+hterm --> accept_multiplicative_expression
+
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: binary.c,v 1.7 1999/10/29 18:50:03 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: binary.c,v 1.8 1999/11/08 19:24:27 lhecking Exp $"); }
 #endif
 
 /*
@@ -96,9 +96,11 @@ register FILE *fp;
 #define ADD_ROWS 50
 int
 fread_matrix(fin, ret_matrix, nr, nc, row_title, column_title)
-FILE *fin;
-float GPFAR *GPFAR * GPFAR * ret_matrix, GPFAR * GPFAR * row_title, GPFAR * GPFAR * column_title;
-int *nr, *nc;
+    FILE *fin;
+    float GPFAR * GPFAR * GPFAR * ret_matrix;
+    float GPFAR * GPFAR * row_title;
+    float GPFAR * GPFAR * column_title;
+    int *nr, *nc;
 {
     float GPFAR *GPFAR * m, GPFAR * rt, GPFAR * ct;
     int num_rows = START_ROWS;
@@ -132,7 +134,7 @@ int *nr, *nc;
 	if (current_row >= num_rows) {	/* We've got to make a bigger rowsize */
 	    temp_array = extend_matrix(m, 0, num_rows - 1, 0, num_cols - 1,
 				       num_rows + ADD_ROWS - 1, num_cols - 1);
-	    rt = extend_vector(rt, 0, num_rows - 1, num_rows + ADD_ROWS - 1);
+	    rt = extend_vector(rt, 0, num_rows + ADD_ROWS - 1);
 
 	    num_rows += ADD_ROWS;
 	    m = temp_array;
@@ -144,7 +146,7 @@ int *nr, *nc;
     temp_array = retract_matrix(m, 0, num_rows - 1, 0, num_cols - 1, current_row - 1, num_cols - 1);
     /* Now save the things that change */
     *ret_matrix = temp_array;
-    *row_title = retract_vector(rt, 0, num_rows - 1, current_row - 1);
+    *row_title = retract_vector(rt, 0, current_row - 1);
     *column_title = ct;
     *nr = current_row;		/* Really the total number of rows */
     *nc = num_cols;
@@ -181,7 +183,7 @@ register int nrl, nrh, ncl, nch;
     }
     fwrite((char *) column_title, sizeof(float), col_length, fout);
     if (title) {
-	free_vector(title, ncl, nch);
+	free_vector(title, ncl);
 	title = NULL;
     }
     if (!row_title) {
@@ -194,7 +196,7 @@ register int nrl, nrh, ncl, nch;
 	fwrite((char *) (m[j] + ncl), sizeof(float), col_length, fout);
     }
     if (title)
-	free_vector(title, nrl, nrh);
+	free_vector(title, nrl);
 
     return (TRUE);
 }
@@ -232,18 +234,18 @@ register int nl, nh;
  *
  */
 void
-free_vector(vec, nl, nh)
-float GPFAR *vec;
-int nl, nh;
+free_vector(vec, nl)
+    float GPFAR *vec;
+    int nl;
 {
     free(vec + nl);
 }
 
 /************ Routines to modify the length of a vector ****************/
 float GPFAR *
-extend_vector(vec, old_nl, old_nh, new_nh)
-float GPFAR *vec;
-register int old_nl, old_nh, new_nh;
+extend_vector(vec, old_nl, new_nh)
+    float GPFAR *vec;
+    register int old_nl, new_nh;
 {
     register float GPFAR *new_v;
     new_v = (float GPFAR *) gp_realloc((void *) (vec + old_nl),
@@ -253,9 +255,9 @@ register int old_nl, old_nh, new_nh;
 }
 
 float GPFAR *
-retract_vector(v, old_nl, old_nh, new_nh)
-float GPFAR *v;
-register int old_nl, old_nh, new_nh;
+retract_vector(v, old_nl, new_nh)
+    float GPFAR *v;
+    register int old_nl, new_nh;
 {
     register float GPFAR *new_v;
     new_v = (float GPFAR *) gp_realloc((void *) (v + old_nl),
@@ -299,7 +301,7 @@ register int nrl, nrh, ncl, nch;
 
     for (i = nrl; i <= nrh; i++) {
 	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
-	    free_matrix(m, nrl, i - 1, ncl, nch);
+	    free_matrix(m, nrl, i - 1, ncl);
 	    int_error(NO_CARET, "not enough memory to create matrix");
 	    return NULL;
 	}
@@ -316,9 +318,9 @@ register int nrl, nrh, ncl, nch;
  *
  */
 void
-free_matrix(m, nrl, nrh, ncl, nch)
-float GPFAR *GPFAR * m;
-unsigned int nrl, nrh, ncl, nch;
+free_matrix(m, nrl, nrh, ncl)
+    float GPFAR *GPFAR * m;
+    unsigned int nrl, nrh, ncl;
 {
     register unsigned int i;
 
@@ -348,8 +350,8 @@ register int srh, sch;
 
     if (sch != nch) {
 	for (i = nrl; i <= nrh; i++) {	/* Copy and extend rows */
-	    if (!(m[i] = extend_vector(m[i], ncl, nch, sch))) {
-		free_matrix(m, nrl, nrh, ncl, sch);
+	    if (!(m[i] = extend_vector(m[i], ncl, sch))) {
+		free_matrix(m, nrl, nrh, ncl);
 		int_error(NO_CARET, "not enough memory to extend matrix");
 		return NULL;
 	    }
@@ -357,7 +359,7 @@ register int srh, sch;
     }
     for (i = nrh + 1; i <= srh; i++) {
 	if (!(m[i] = (float GPFAR *) gp_alloc((nch - ncl + 1) * sizeof(float), NULL))) {
-	    free_matrix(m, nrl, i - 1, nrl, sch);
+	    free_matrix(m, nrl, i - 1, nrl);
 	    int_error(NO_CARET, "not enough memory to extend matrix");
 	    return NULL;
 	}
@@ -378,7 +380,7 @@ register int srh, sch;
     register float GPFAR *GPFAR * m;
 
     for (i = srh + 1; i <= nrh; i++) {
-	free_vector(a[i], ncl, nch);
+	free_vector(a[i], ncl);
     }
 
     m = (float GPFAR * GPFAR *) gp_realloc((void *) (a + nrl),
@@ -389,8 +391,8 @@ register int srh, sch;
 
     if (sch != nch) {
 	for (i = nrl; i <= srh; i++)
-	    if (!(m[i] = retract_vector(m[i], ncl, nch, sch))) { {	/* Shrink rows */
-		    free_matrix(m, nrl, srh, ncl, sch);
+	    if (!(m[i] = retract_vector(m[i], ncl, sch))) { {	/* Shrink rows */
+		    free_matrix(m, nrl, srh, ncl);
 		    int_error(NO_CARET, "not enough memory to retract matrix");
 		    return NULL;
 	    }
@@ -399,11 +401,6 @@ register int srh, sch;
     return m;
 }
 
-float
-GPFAR *GPFAR *
-convert_matrix(a, nrl, nrh, ncl, nch)
-float GPFAR *a;
-register int nrl, nrh, ncl, nch;
 
 /* allocate a float matrix m[nrl...nrh][ncl...nch] that points to the
    matrix declared in the standard C manner as a[nrow][ncol], where 
@@ -412,6 +409,10 @@ register int nrl, nrh, ncl, nch;
    not free the memory used by the original array a but merely assigns
    pointers to the rows. */
 
+float GPFAR *GPFAR *
+convert_matrix(a, nrl, nrh, ncl, nch)
+    float GPFAR *a;
+    register int nrl, nrh, ncl, nch;
 {
     register int i, j, ncol, nrow;
     register float GPFAR *GPFAR * m;
@@ -430,9 +431,9 @@ register int nrl, nrh, ncl, nch;
 
 
 void
-free_convert_matrix(b, nrl, nrh, ncl, nch)
-float GPFAR *GPFAR * b;
-register int nrl, nrh, ncl, nch;
+free_convert_matrix(b, nrl)
+    float GPFAR *GPFAR * b;
+    register int nrl;
 {
     free((char *) (b + nrl));
 }

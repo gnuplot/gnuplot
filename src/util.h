@@ -1,5 +1,5 @@
 /*
- * $Id: util.h,v 1.8 2000/10/31 19:59:31 joze Exp $
+ * $Id: util.h,v 1.9 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - util.h */
@@ -44,47 +44,50 @@
  * int_error and friends: */
 #define NO_CARET (-1)
 
-
 /* TRUE if command just typed; becomes FALSE whenever we
  * send some other output to screen.  If FALSE, the command line
  * will be echoed to the screen before the ^ error message.
  */
 extern TBOOLEAN screen_ok;
 
-extern int chr_in_str __PROTO((int, int));
-extern int equals __PROTO((int, const char *));
-extern int almost_equals __PROTO((int, const char *));
-extern int isstring __PROTO((int));
-extern int isanumber __PROTO((int));
-extern int isletter __PROTO((int));
-extern int is_definition __PROTO((int));
-extern void copy_str __PROTO((char *, int, int));
-extern size_t token_len __PROTO((int));
-extern void quote_str __PROTO((char *, int, int));
-extern void capture __PROTO((char *, int, int, int));
-extern void m_capture __PROTO((char **, int, int));
-extern void m_quote_capture __PROTO((char **, int, int));
-extern char *gp_strdup __PROTO((const char *));
-extern void convert __PROTO((struct value *, int));
-extern void disp_value __PROTO((FILE *, struct value *));
-extern double real __PROTO((struct value *));
-extern double imag __PROTO((struct value *));
-extern double magnitude __PROTO((struct value *));
-extern double angle __PROTO((struct value *));
-extern struct value * Gcomplex __PROTO((struct value *, double, double));
-extern struct value * Ginteger __PROTO((struct value *, int));
+/* Functions exported by util.c: */
+
+/* Command parsing helpers: */
+int chr_in_str __PROTO((int, int));
+int equals __PROTO((int, const char *));
+int almost_equals __PROTO((int, const char *));
+int isstring __PROTO((int));
+int isanumber __PROTO((int));
+int isletter __PROTO((int));
+int is_definition __PROTO((int));
+void copy_str __PROTO((char *, int, int));
+size_t token_len __PROTO((int));
+void quote_str __PROTO((char *, int, int));
+void capture __PROTO((char *, int, int, int));
+void m_capture __PROTO((char **, int, int));
+void m_quote_capture __PROTO((char **, int, int));
+
+/* HBB 20010726: IMHO this one belongs into alloc.c: */
+char *gp_strdup __PROTO((const char *));
+
+/* Error message handling */
 #if defined(VA_START) && defined(ANSI_C)
-extern void os_error __PROTO((int, const char *, ...));
-extern void int_error __PROTO((int, const char *, ...));
-extern void int_warn __PROTO((int, const char *, ...));
-extern void graph_error __PROTO((const char *, ...));
+void os_error __PROTO((int, const char *, ...));
+void int_error __PROTO((int, const char *, ...));
+void int_warn __PROTO((int, const char *, ...));
+void graph_error __PROTO((const char *, ...));
 #else
-extern void os_error __PROTO(());
-extern void int_error __PROTO(());
-extern void int_warn __PROTO(());
-extern void graph_error __PROTO(());
+void os_error __PROTO(());
+void int_error __PROTO(());
+void int_warn __PROTO(());
+void graph_error __PROTO(());
 #endif
-extern void lower_case __PROTO((char *));
-extern void squash_spaces __PROTO((char *));
+
+/* Helper functions for help_command() */
+/* FIXME HBB 20010726: should be moved to where help_comamnd() is, and
+ * made static. Currently, that's command.c, but it should probably
+ * move to help.c, instead. */
+void lower_case __PROTO((char *));
+void squash_spaces __PROTO((char *));
 
 #endif /* GNUPLOT_UTIL_H */

@@ -1,5 +1,5 @@
 /*
- * $Id: color.h,v 1.7 2000/11/23 14:14:37 broeker Exp $
+ * $Id: color.h,v 1.8 2001/02/19 17:10:36 broeker Exp $
  */
 
 /* GNUPLOT - color.h */
@@ -86,71 +86,63 @@ typedef struct {
 
 typedef struct {
   /** Constants: **/
+
+  /* (Fixed) number of formulae implemented for gray index to RGB
+   * mapping in color.c.  Usage: somewhere in `set' command to check
+   * that each of the below-given formula R,G,B are lower than this
+   * value. */
   int colorFormulae;
-	/*
-	(Fixed) number of formulae implemented for gray index to RGB mapping in
-	color.c.
-	Usage: somewhere in `set' command to check that each of the below-given
-	formula R,G,B are lower than this value.
-	*/
 
   /** Values that can be changed by `set' and shown by `show' commands: **/
+
+  /* can be SMPAL_COLOR_MODE_GRAY or SMPAL_COLOR_MODE_RGB */
   char colorMode;
-	/* can be SMPAL_COLOR_MODE_GRAY or SMPAL_COLOR_MODE_RGB */
+  /* mapping formulae for SMPAL_COLOR_MODE_RGB */
   int formulaR, formulaG, formulaB;
-	/* mapping formulae for SMPAL_COLOR_MODE_RGB */
-  char positive;
-	/* positive, negative figure */
+  char positive;		/* positive or negative figure */
 
-  /* Now the variables that contain the discrete approximation of the
-  desired palette of smooth colours as created by make_palette in pm3d.c.
-  This is then passed into terminal's make_palette, who transforms
-  this [0;1] into whatever it supports.
-  */
+  /** Now the variables that contain the discrete approximation of the
+   * desired palette of smooth colours as created by make_palette in
+   * pm3d.c.  This is then passed into terminal's make_palette, who
+   * transforms this [0;1] into whatever it supports.  */
 
+  /* Only this number of colour positions will be used even though
+   * there are some more available in the discrete palette of the
+   * terminal.  Useful for multiplot.  Max. number of colours is taken
+   * if this value equals 0.  Unused by: PostScript */
   int use_maxcolors;
-	/* Only this number of colour positions will be used even though there
-	     are some more available in the discrete palette of the terminal.
-	   Useful for multiplot. Max. number of colours is taken if this
-	     value equals 0.
-	   Unused by: PostScript
-	*/
+  /* Number of colours used for the discrete palette. Equals to the
+   * result from term->make_palette(NULL), or restricted by
+   * use_maxcolor.  Used by: pm, gif. Unused by: PostScript */
   int colors;
-	/* Number of colours used for the discrete palette. Equals to the result
-	   from term->make_palette(NULL), or restricted by use_maxcolor.
-	   Used by: pm, gif
-	   Unused by: PostScript
-	 */
+  /* table of RGB triplets resulted from applying the formulae. Used
+   * in the 2nd call to term->make_palette for a terminal with
+   * discrete colours. Unused by PostScript who has programmed them
+   * analytically */
   rgb_color *color;
-	/* table of RGB triplets resulted from applying the formulae. Used
-	   in the 2nd call to term->make_palette for a terminal with discrete
-	   colours. Unused by PostScript who has programmed them analytically
-	*/
 
   /** Variables used by some terminals (those with palette, not post.trm) **/
+  
+  /* offset of the first smooth colour in the table (some first items
+   *   are usually occupied by the colours for linetypes) Used by: pm.
+   *   Unused by: gif (it uses its gif_smooth_color[0..colors]),
+   *   postscript (continous RGB values) */
   int offset;
-	/* offset of the first smooth colour in the table (some first items
-	   are usually occupied by the colours for linetypes)
-	   Used by: pm
-	   Unused by: gif (it uses its gif_smooth_color[0..colors]),
-		      postscript (continous RGB values)
-	*/
+
   /* MAYBE: something like
 	int gif_smooth_color[ gdMaxColors ];  i.e.  int *itable;
      could go here if there are at least two terminals using that;
      currently only gif, so it's in his gif.trm
   */
 
+  /* Option unique for output to PostScript file.  By default,
+   * ps_allcF=0 and only the 3 selected rgb color formulae are written
+   * into the header preceding pm3d map in the file.  If ps_allcF is
+   * non-zero, then print there all color formulae, so that it is easy
+   * to play with choosing manually any color scheme in the PS file
+   * (see the definition of "/g"). Like that you can get the
+   * Rosenbrock multiplot figure on my gnuplot.html#pm3d demo page. */
   char ps_allcF;
-	/* Option unique for output to PostScript file.
-	   By default, ps_allcF=0 and only the 3 selected rgb color formulae
-	   are written into the header preceding pm3d map in the file.
-	   If ps_allcF is non-zero, then print there all color formulae, so
-	   that it is easy to play with choosing manually any color scheme
-	   in the PS file (see the definition of "/g"). Like that you can
-	   get the Rosenbrock multiplot figure on my gnuplot.html#pm3d demo
-	   page.
-	*/
 
 } t_sm_palette;
 

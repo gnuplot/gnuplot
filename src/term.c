@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: term.c,v 1.36 2001/03/07 08:40:05 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: term.c,v 1.37 2001/08/20 15:39:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - term.c */
@@ -83,9 +83,7 @@ static char *RCSid() { return RCSid("$Id: term.c,v 1.36 2001/03/07 08:40:05 miku
 #include "driver.h"
 #include "graphics.h"
 #include "help.h"
-#include "parse.h"
 #include "plot.h"
-/*  #include "setshow.h" */
 #include "tables.h"
 #include "term.h"
 #include "util.h"
@@ -143,7 +141,7 @@ enum set_encoding_id encoding;
 const char *encoding_names[] = {
     "default", "iso_8859_1", "iso_8859_2", "cp437", "cp850", "cp852", NULL };
 /* 'set encoding' options */
-struct gen_table set_encoding_tbl[] =
+const struct gen_table set_encoding_tbl[] =
 {
     { "def$ault", S_ENC_DEFAULT },
     { "iso$_8859_1", S_ENC_ISO8859_1 },
@@ -157,6 +155,7 @@ struct gen_table set_encoding_tbl[] =
 
 
 /* Internal variables */
+
 /* true if terminal is in graphics mode */
 static TBOOLEAN term_graphics = FALSE;
 
@@ -171,6 +170,16 @@ static TBOOLEAN term_force_init = FALSE;
 
 /* internal pointsize for do_point */
 static double term_pointsize=1;
+
+/* Terminal's default font name */
+/* HBB 20010806: Moved here, from graphics.[ch] where it wasn't used
+ * any longer */
+/* FIXME HBB 20010806: this shouldn't be needed. Instead, a call of
+ * term->set_font(NULL,0) should reset the font to its default. This
+ * would avoid having to know it, outside the driver itself. */
+static char default_font[MAX_ID_LEN + 1] = "";
+
+/* Internal prototypes: */
 
 static void term_suspend __PROTO((void));
 static void term_close_output __PROTO((void));
@@ -986,9 +995,10 @@ enum JUSTIFY just;
  */
 static int
 null_scale(x, y)
-double x;
-double y;
+    double x, y;
 {
+    (void) x;			/* avoid -Wunused warning */
+    (void) y;
     return FALSE;		/* can't be done */
 }
 
@@ -1016,39 +1026,48 @@ UNKNOWN_null()
 
 static void
 MOVE_null(x, y)
-unsigned int x, y;
+    unsigned int x, y;
 {
+    (void) x;			/* avoid -Wunused warning */
+    (void) y;
 }
 
 static void
 LINETYPE_null(t)
-int t;
+    int t;
 {
+    (void) t;			/* avoid -Wunused warning */
 }
 
 static void
 PUTTEXT_null(x, y, s)
-unsigned int x, y;
-const char *s;
+    unsigned int x, y;
+    const char *s;
 {
+    (void) s;			/* avoid -Wunused warning */
+    (void) x;
+    (void) y;
 }
 
 
 static int
 set_font_null(s)
-const char *s;
+    const char *s;
 {
+    (void) s;			/* avoid -Wunused warning */
     return FALSE;
 }
 
 static void
 null_linewidth(s)
-double s;
+    double s;
 {
+    (void) s;			/* avoid -Wunused warning */
 }
 
 
 /* cast to get rid of useless warnings about UNKNOWN_null */
+/* FIXME HBB 20010527: not used anywhere! */
 typedef void (*void_fp) __PROTO((void));
 
 

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: internal.c,v 1.7 1999/10/29 18:47:18 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: internal.c,v 1.8 1999/11/08 19:24:31 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - internal.c */
@@ -37,34 +37,9 @@ static char *RCSid() { return RCSid("$Id: internal.c,v 1.7 1999/10/29 18:47:18 l
 
 #include "internal.h"
 
-#include "eval.h"
-#include "util.h"
+#include "stdfn.h"
 
-/* some machines have trouble with exp(-x) for large x
- * if MINEXP is defined at compile time, use gp_exp(x) instead,
- * which returns 0 for exp(x) with x < MINEXP
- * exp(x) will already have been defined as gp_exp(x) in plot.h
- */
-
-#ifdef MINEXP
-double
-gp_exp(x)
-double x;
-{
-    return (x < (MINEXP)) ? 0.0 : exp(x);
-}
-#endif
-
-TBOOLEAN undefined;
-
-static void int_check __PROTO((struct value * v));
-
-/* The stack this operates on */
-static struct value stack[STACK_DEPTH];
-static int s_p = -1;		/* stack pointer */
-#define top_of_stack stack[s_p]
-
-
+#include "util.h"		/* for int_error() */
 /*
  * System V and MSC 4.0 call this when they wants to print an error message.
  * Don't!
@@ -81,9 +56,11 @@ static int s_p = -1;		/* stack pointer */
 int
 matherr()
 #else
+int matherr __PROTO((struct exception *x));
+
 int
 matherr(x)
-struct exception *x;
+    struct exception *x;
 # endif				/* (MSDOS || DOS386) && __TURBOC__ */
 {
     return (undefined = TRUE);	/* don't print error message */
@@ -91,48 +68,11 @@ struct exception *x;
 #endif /* not _CRAY */
 
 
-void
-reset_stack()
-{
-    s_p = -1;
-}
-
-
-void
-check_stack()
-{				/* make sure stack's empty */
-    if (s_p != -1)
-	fprintf(stderr, "\n\
-warning:  internal error--stack not empty!\n\
-          (function called with too many parameters?)\n");
-}
-
 #define BAD_DEFAULT default: int_error(NO_CARET, "interal error : type neither INT or CMPLX"); return;
-
-struct value *
-pop(x)
-struct value *x;
-{
-    if (s_p < 0)
-	int_error(NO_CARET, "stack underflow (function call with missing parameters?)");
-    *x = stack[s_p--];
-    return (x);
-}
-
-
-void
-push(x)
-struct value *x;
-{
-    if (s_p == STACK_DEPTH - 1)
-	int_error(NO_CARET, "stack overflow");
-    stack[++s_p] = *x;
-}
-
 
 void
 f_push(x)
-union argument *x;		/* contains pointer to value to push; */
+    union argument *x;		/* contains pointer to value to push; */
 {
     struct udvt_entry *udv;
 
@@ -146,7 +86,7 @@ union argument *x;		/* contains pointer to value to push; */
 
 void
 f_pushc(x)
-union argument *x;
+    union argument *x;
 {
     push(&(x->v_arg));
 }
@@ -154,7 +94,7 @@ union argument *x;
 
 void
 f_pushd1(x)
-union argument *x;
+    union argument *x;
 {
     push(&(x->udf_arg->dummy_values[0]));
 }
@@ -162,7 +102,7 @@ union argument *x;
 
 void
 f_pushd2(x)
-union argument *x;
+    union argument *x;
 {
     push(&(x->udf_arg->dummy_values[1]));
 }
@@ -170,7 +110,7 @@ union argument *x;
 
 void
 f_pushd(x)
-union argument *x;
+    union argument *x;
 {
     struct value param;
     (void) pop(&param);
@@ -180,7 +120,7 @@ union argument *x;
 
 void
 f_call(x)			/* execute a udf */
-union argument *x;
+    union argument *x;
 {
     register struct udft_entry *udf;
     struct value save_dummy;
@@ -199,7 +139,7 @@ union argument *x;
 
 void
 f_calln(x)			/* execute a udf of n variables */
-union argument *x;
+    union argument *x;
 {
     register struct udft_entry *udf;
     struct value save_dummy[MAX_NUM_VAR];
@@ -240,54 +180,49 @@ union argument *x;
 }
 
 
-static void
-int_check(v)
-struct value *v;
-{
-    if (v->type != INTGR)
-	int_error(NO_CARET, "non-integer passed to boolean operator");
-}
-
-
 void
-f_lnot()
+f_lnot(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&a));
     push(Ginteger(&a, !a.v.int_val));
 }
 
 
 void
-f_bnot()
+f_bnot(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&a));
     push(Ginteger(&a, ~a.v.int_val));
 }
 
 
 void
-f_bool()
-{				/* converts top-of-stack to boolean */
-    int_check(&top_of_stack);
-    top_of_stack.v.int_val = !!top_of_stack.v.int_val;
-}
-
-
-void
-f_lor()
+f_lor(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&b));
     int_check(pop(&a));
     push(Ginteger(&a, a.v.int_val || b.v.int_val));
 }
 
 void
-f_land()
+f_land(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&b));
     int_check(pop(&a));
     push(Ginteger(&a, a.v.int_val && b.v.int_val));
@@ -295,9 +230,12 @@ f_land()
 
 
 void
-f_bor()
+f_bor(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&b));
     int_check(pop(&a));
     push(Ginteger(&a, a.v.int_val | b.v.int_val));
@@ -305,9 +243,12 @@ f_bor()
 
 
 void
-f_xor()
+f_xor(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&b));
     int_check(pop(&a));
     push(Ginteger(&a, a.v.int_val ^ b.v.int_val));
@@ -315,9 +256,12 @@ f_xor()
 
 
 void
-f_band()
+f_band(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     int_check(pop(&b));
     int_check(pop(&a));
     push(Ginteger(&a, a.v.int_val & b.v.int_val));
@@ -325,9 +269,12 @@ f_band()
 
 
 void
-f_uminus()
+f_uminus(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
@@ -346,11 +293,14 @@ f_uminus()
 
 
 void
-f_eq()
+f_eq(arg)
+    union argument *arg;
 {
     /* note: floating point equality is rare because of roundoff error! */
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -390,10 +340,13 @@ f_eq()
 
 
 void
-f_ne()
+f_ne(arg)
+    union argument *arg;
 {
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -434,10 +387,13 @@ f_ne()
 
 
 void
-f_gt()
+f_gt(arg)
+    union argument *arg;
 {
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -474,10 +430,13 @@ f_gt()
 
 
 void
-f_lt()
+f_lt(arg)
+    union argument *arg;
 {
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -514,10 +473,13 @@ f_lt()
 
 
 void
-f_ge()
+f_ge(arg)
+    union argument *arg;
 {
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -554,10 +516,13 @@ f_ge()
 
 
 void
-f_le()
+f_le(arg)
+    union argument *arg;
 {
     struct value a, b;
     register int result = 0;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -594,9 +559,12 @@ f_le()
 
 
 void
-f_plus()
+f_plus(arg)
+    union argument *arg;
 {
     struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);
     switch (a.type) {
@@ -637,9 +605,12 @@ f_plus()
 
 
 void
-f_minus()
+f_minus(arg)
+    union argument *arg;
 {
     struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);		/* now do a - b */
     switch (a.type) {
@@ -680,9 +651,12 @@ f_minus()
 
 
 void
-f_mult()
+f_mult(arg)
+    union argument *arg;
 {
     struct value a, b, result;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);		/* now do a*b */
 
@@ -730,10 +704,13 @@ f_mult()
 
 
 void
-f_div()
+f_div(arg)
+    union argument *arg;
 {
     struct value a, b, result;
     register double square;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);		/* now do a/b */
 
@@ -810,9 +787,12 @@ f_div()
 
 
 void
-f_mod()
+f_mod(arg)
+    union argument *arg;
 {
     struct value a, b;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);		/* now do a%b */
 
@@ -828,11 +808,14 @@ f_mod()
 
 
 void
-f_power()
+f_power(arg)
+    union argument *arg;
 {
     struct value a, b, result;
     register int i, t, count;
     register double mag, ang;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&b);
     (void) pop(&a);		/* now find a**b */
 
@@ -938,12 +921,14 @@ f_power()
 
 
 void
-f_factorial()
+f_factorial(arg)
+    union argument *arg;
 {
     struct value a;
     register int i;
     register double val = 0.0;
 
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);		/* find a! (factorial) */
 
     switch (a.type) {
@@ -962,52 +947,3 @@ f_factorial()
 }
 
 
-int
-f_jump(x)
-union argument *x;
-{
-    return (x->j_arg);
-}
-
-
-int
-f_jumpz(x)
-union argument *x;
-{
-    struct value a;
-    int_check(&top_of_stack);
-    if (top_of_stack.v.int_val) {	/* non-zero */
-	(void) pop(&a);
-	return 1;		/* no jump */
-    } else
-	return (x->j_arg);	/* leave the argument on TOS */
-}
-
-
-int
-f_jumpnz(x)
-union argument *x;
-{
-    struct value a;
-    int_check(&top_of_stack);
-    if (top_of_stack.v.int_val)	/* non-zero */
-	return (x->j_arg);	/* leave the argument on TOS */
-    else {
-	(void) pop(&a);
-	return 1;		/* no jump */
-    }
-}
-
-
-int
-f_jtern(x)
-union argument *x;
-{
-    struct value a;
-
-    int_check(pop(&a));
-    if (a.v.int_val)
-	return (1);		/* no jump; fall through to TRUE code */
-    else
-	return (x->j_arg);	/* go jump to FALSE code */
-}

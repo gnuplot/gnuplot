@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: save.c,v 1.24 2001/06/11 16:47:59 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: save.c,v 1.25 2001/07/03 12:48:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - save.c */
@@ -205,11 +205,12 @@ FILE *fp;
 
 static void
 save_set_all(fp)
-FILE *fp;
+    FILE *fp;
 {
     struct text_label *this_label;
     struct arrow_def *this_arrow;
     struct linestyle_def *this_linestyle;
+    AXIS_INDEX i;
 
     /* opinions are split as to whether we save term and outfile
      * as a compromise, we output them as comments !
@@ -278,7 +279,9 @@ set y2data%s\n",
     fprintf(fp, "set angles %s\n",
 	    (ang2rad == 1.0) ? "radians" : "degrees");
 
-    if (grid_selection == 0)
+#if 0
+    /* HBB 20010806: the previous method of accessing grid choices */
+    if (grid_selection == GRID_OFF)
 	fputs("unset grid\n", fp);
     else {
 	/* FIXME */
@@ -309,6 +312,32 @@ set y2data%s\n",
 		grid_lp.l_type + 1, grid_lp.l_width,
 		mgrid_lp.l_type + 1, mgrid_lp.l_width);
     }
+#else
+    if (! some_grid_selected())
+	fputs("unset grid\n", fp);
+    else {
+	if (polar_grid_angle) 	/* set angle already output */
+	    fprintf(fp, "set grid polar %f\n", polar_grid_angle / ang2rad);
+        else
+	    fputs("set grid nopolar\n", fp);
+	
+	
+#define SAVE_GRID(axis)					\
+	fprintf(fp, " %s%stics m%s%stics",		\
+		axis_array[axis].gridmajor ? "" : "no",	\
+		axis_defaults[axis].name,		\
+		axis_array[axis].gridminor ? "" : "no",	\
+		axis_defaults[axis].name);
+	SAVE_GRID(FIRST_X_AXIS);
+	SAVE_GRID(FIRST_Y_AXIS);
+	SAVE_GRID(FIRST_Z_AXIS);
+	SAVE_GRID(SECOND_X_AXIS);
+	SAVE_GRID(SECOND_Y_AXIS);
+	SAVE_GRID(COLOR_AXIS);
+#undef SAVE_GRID
+    }	
+#endif /* new grid variables */
+
     fprintf(fp, "set key title \"%s\"\n", conv_text(key_title));
     switch (key) {
     case KEY_AUTO_PLACEMENT:

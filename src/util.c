@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: util.c,v 1.25 2000/11/22 12:53:29 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: util.c,v 1.26 2001/02/01 17:56:05 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - util.c */
@@ -45,7 +45,6 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.25 2000/11/22 12:53:29 broe
 
 /* internal stuff */
 
-static char *num_to_str __PROTO((double r));
 static void parse_esc __PROTO((char *instr));
 
 /*
@@ -342,157 +341,6 @@ const char *s;
     d = strdup(s);
 #endif
     return d;
-}
-
-
-void
-convert(val_ptr, t_num)
-struct value *val_ptr;
-int t_num;
-{
-    *val_ptr = token[t_num].l_val;
-}
-
-static char *
-num_to_str(r)
-double r;
-{
-    static int i = 0;
-    static char s[4][25];
-    int j = i++;
-
-    if (i > 3)
-	i = 0;
-
-    sprintf(s[j], "%.15g", r);
-    if (strchr(s[j], '.') == NULL &&
-	strchr(s[j], 'e') == NULL &&
-	strchr(s[j], 'E') == NULL)
-	strcat(s[j], ".0");
-
-    return s[j];
-}
-
-void
-disp_value(fp, val)
-FILE *fp;
-struct value *val;
-{
-    switch (val->type) {
-    case INTGR:
-	fprintf(fp, "%d", val->v.int_val);
-	break;
-    case CMPLX:
-	if (val->v.cmplx_val.imag != 0.0)
-	    fprintf(fp, "{%s, %s}",
-		    num_to_str(val->v.cmplx_val.real),
-		    num_to_str(val->v.cmplx_val.imag));
-	else
-	    fprintf(fp, "%s",
-		    num_to_str(val->v.cmplx_val.real));
-	break;
-    default:
-	int_error(NO_CARET, "unknown type in disp_value()");
-    }
-}
-
-
-double
-real(val)			/* returns the real part of val */
-struct value *val;
-{
-    switch (val->type) {
-    case INTGR:
-	return ((double) val->v.int_val);
-    case CMPLX:
-	return (val->v.cmplx_val.real);
-    }
-    int_error(NO_CARET, "unknown type in real()");
-    /* NOTREACHED */
-    return ((double) 0.0);
-}
-
-
-double
-imag(val)			/* returns the imag part of val */
-struct value *val;
-{
-    switch (val->type) {
-    case INTGR:
-	return (0.0);
-    case CMPLX:
-	return (val->v.cmplx_val.imag);
-    }
-    int_error(NO_CARET, "unknown type in imag()");
-    /* NOTREACHED */
-    return ((double) 0.0);
-}
-
-
-
-double
-magnitude(val)			/* returns the magnitude of val */
-struct value *val;
-{
-    switch (val->type) {
-    case INTGR:
-	return ((double) abs(val->v.int_val));
-    case CMPLX:
-	return (sqrt(val->v.cmplx_val.real *
-		     val->v.cmplx_val.real +
-		     val->v.cmplx_val.imag *
-		     val->v.cmplx_val.imag));
-    }
-    int_error(NO_CARET, "unknown type in magnitude()");
-    /* NOTREACHED */
-    return ((double) 0.0);
-}
-
-
-
-double
-angle(val)			/* returns the angle of val */
-struct value *val;
-{
-    switch (val->type) {
-    case INTGR:
-	return ((val->v.int_val >= 0) ? 0.0 : M_PI);
-    case CMPLX:
-	if (val->v.cmplx_val.imag == 0.0) {
-	    if (val->v.cmplx_val.real >= 0.0)
-		return (0.0);
-	    else
-		return (M_PI);
-	}
-	return (atan2(val->v.cmplx_val.imag,
-		      val->v.cmplx_val.real));
-    }
-    int_error(NO_CARET, "unknown type in angle()");
-    /* NOTREACHED */
-    return ((double) 0.0);
-}
-
-
-struct value *
-Gcomplex(a, realpart, imagpart)
-struct value *a;
-double realpart, imagpart;
-{
-    a->type = CMPLX;
-    a->v.cmplx_val.real = realpart;
-    a->v.cmplx_val.imag = imagpart;
-    return (a);
-}
-
-
-struct value *
-Ginteger(a, i)
-struct value *a;
-int i;
-{
-    a->type = INTGR;
-    a->v.int_val = i;
-    return (a);
 }
 
 

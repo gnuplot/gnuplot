@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.4 1999/10/01 14:54:29 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bf_test.c,v 1.5 1999/10/29 18:49:23 lhecking Exp $"); }
 #endif
 
 
@@ -47,9 +47,10 @@ static range TheRange[] = {{-3,3,-2,2},
 /*---- Stubs to make this work without including huge libraries ----*/
 void
 int_error(dummy, error_text)
-int dummy;
-const char *error_text;
+    int dummy;
+    const char *error_text;
 {
+    (void) dummy;		/* avoid -Wunused warning */
     fprintf(stderr, "Fatal error..\n%s\n...now exiting to system ...\n",
 	    error_text);
     exit(EXIT_FAILURE);
@@ -133,9 +134,9 @@ main()
 	else {
 	    fwrite_matrix(fout, m, 0, xsize - 1, 0, ysize - 1, rt, ct);
 	}
-	free_vector(rt, 0, ysize - 1);
-	free_vector(ct, 0, xsize - 1);
-	free_matrix(m, 0, xsize - 1, 0, ysize - 1);
+	free_vector(rt, 0);
+	free_vector(ct, 0);
+	free_matrix(m, 0, xsize - 1, 0);
     }
 
     /* Show that it's ok to vary sampling rate, as long as x1<x2, y1<y2... */
@@ -162,9 +163,9 @@ main()
     else {
 	fwrite_matrix(fout, m, 0, xsize - 1, 0, ysize - 1, rt, ct);
     }
-    free_vector(rt, 0, ysize - 1);
-    free_vector(ct, 0, xsize - 1);
-    free_matrix(m, 0, xsize - 1, 0, ysize - 1);
+    free_vector(rt, 0);
+    free_vector(ct, 0);
+    free_matrix(m, 0, xsize - 1, 0);
 
     exit(EXIT_SUCCESS);
 }

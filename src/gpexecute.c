@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.8 2001/02/09 15:06:11 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: gpexecute.c,v 1.9 2001/02/19 17:08:22 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - gpexecute.c */
@@ -209,6 +209,7 @@ gpe_pop(gpe_fifo_t ** base)
 RETSIGTYPE
 pipe_died_handler(int signum)
 {
+    (void) signum;		/* avoid -Wunused warning. */
     /* fprintf(stderr, "\n*******(pipe_died_handler)*******\n"); */
     close(1);
     pipe_died = 1;

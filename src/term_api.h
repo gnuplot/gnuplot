@@ -1,5 +1,5 @@
 /*
- * $Id: term_api.h,v 1.13 2001/02/28 16:41:09 broeker Exp $
+ * $Id: term_api.h,v 1.14 2001/04/03 16:16:46 broeker Exp $
  */
 
 /* GNUPLOT - term_api.h */
@@ -221,7 +221,7 @@ extern enum set_encoding_id encoding;
 /* ... in table of encoding names: */
 extern const char *encoding_names[];
 /* parsing table for encodings */
-extern struct gen_table set_encoding_tbl[];
+extern const struct gen_table set_encoding_tbl[];
 
 /* mouse module needs this */
 extern TBOOLEAN term_initialised;
@@ -249,7 +249,7 @@ void term_reset __PROTO((void));
 void term_apply_lp_properties __PROTO((struct lp_style_type *lp));
 void term_check_multiplot_okay __PROTO((TBOOLEAN));
 
-extern void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
+void write_multiline __PROTO((unsigned int, unsigned int, char *, JUSTIFY, VERT_JUSTIFY, int, const char *));
 GP_INLINE int term_count __PROTO((void));
 void list_terms __PROTO((void));
 struct termentry *set_term __PROTO((int));
@@ -266,7 +266,7 @@ void vms_reset();
 #endif
 
 #ifdef OS2
-extern int PM_pause __PROTO((char *)); /* term/pm.trm */
+int PM_pause __PROTO((char *)); /* term/pm.trm */
 #endif
 
 /* in set.c (used in pm3d.c) */

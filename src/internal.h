@@ -1,5 +1,5 @@
 /*
- * $Id: internal.h,v 1.4 2000/10/31 19:59:31 joze Exp $
+ * $Id: internal.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - internal.h */
@@ -43,24 +43,7 @@
 #include "gp_types.h"
 #include "eval.h"
 
-#define STACK_DEPTH 100		/* maximum size of the execution stack */
-
-/* Variables of internal.c needed by other modules: */
-
-extern TBOOLEAN undefined;
-
 /* Prototypes from file "internal.c" */
-
-#ifdef MINEXP
-double gp_exp __PROTO((double x));
-#else
-#define gp_exp(x) exp(x)
-#endif
-
-void reset_stack __PROTO((void));
-void check_stack __PROTO((void));
-struct value *pop __PROTO((struct value *x));
-void push __PROTO((struct value *x));
 
 /* the basic operators of our stack machine for function evaluation: */
 void f_push __PROTO((union argument *x));
@@ -70,31 +53,26 @@ void f_pushd2 __PROTO((union argument *x));
 void f_pushd __PROTO((union argument *x));
 void f_call __PROTO((union argument *x));
 void f_calln __PROTO((union argument *x));
-void f_lnot __PROTO((void));
-void f_bnot __PROTO((void));
-void f_bool __PROTO((void));
-void f_lor __PROTO((void));
-void f_land __PROTO((void));
-void f_bor __PROTO((void));
-void f_xor __PROTO((void));
-void f_band __PROTO((void));
-void f_uminus __PROTO((void));
-void f_eq __PROTO((void));
-void f_ne __PROTO((void));
-void f_gt __PROTO((void));
-void f_lt __PROTO((void));
-void f_ge __PROTO((void));
-void f_le __PROTO((void));
-void f_plus __PROTO((void));
-void f_minus __PROTO((void));
-void f_mult __PROTO((void));
-void f_div __PROTO((void));
-void f_mod __PROTO((void));
-void f_power __PROTO((void));
-void f_factorial __PROTO((void));
-int f_jump __PROTO((union argument *x));
-int f_jumpz __PROTO((union argument *x));
-int f_jumpnz __PROTO((union argument *x));
-int f_jtern __PROTO((union argument *x));
+void f_lnot __PROTO((union argument *x));
+void f_bnot __PROTO((union argument *x));
+void f_lor __PROTO((union argument *x));
+void f_land __PROTO((union argument *x));
+void f_bor __PROTO((union argument *x));
+void f_xor __PROTO((union argument *x));
+void f_band __PROTO((union argument *x));
+void f_uminus __PROTO((union argument *x));
+void f_eq __PROTO((union argument *x));
+void f_ne __PROTO((union argument *x));
+void f_gt __PROTO((union argument *x));
+void f_lt __PROTO((union argument *x));
+void f_ge __PROTO((union argument *x));
+void f_le __PROTO((union argument *x));
+void f_plus __PROTO((union argument *x));
+void f_minus __PROTO((union argument *x));
+void f_mult __PROTO((union argument *x));
+void f_div __PROTO((union argument *x));
+void f_mod __PROTO((union argument *x));
+void f_power __PROTO((union argument *x));
+void f_factorial __PROTO((union argument *x));
 
 #endif /* GNUPLOT_INTERNAL_H */

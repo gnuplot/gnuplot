@@ -1,5 +1,5 @@
 /*
- * $Id: tek.trm,v 1.9 1999/06/19 20:30:56 lhecking Exp $
+ * $Id: tek.trm,v 1.10 1999/06/22 11:54:23 lhecking Exp $
  *
  */
 
@@ -499,7 +499,7 @@ static void CT_pattern_vector __PROTO((int x1, int y1));
 
 /* CT_lines are line types defined as bit pattern */
 static unsigned long CT_lines[] =
-{0xffffffff,			/* solid line */
+{~(unsigned long)0,			/* solid line */
  0x000fffff,			/* long dash */
  0x00ff00ff,			/* short dash */
  0x00f00fff,			/* dash-dot */
@@ -554,9 +554,9 @@ static int CT_penon = 0;	/* is Pen on? */
 
 static void
 CT_draw_vpoint(x, y, last)
-int x;
-int y;
-int last;
+    int x;
+    int y;
+    int last;
 {
     static int xx0, yy0, xx1, yy1;
 
@@ -569,7 +569,7 @@ int last;
 	    yy0 = yy1 = y;
 	    CT_penon = 1;
 	}
-	*CT_pattern = ((*CT_pattern) >> 1) | 0x80000000;	/* rotate the pattern */
+	*CT_pattern = ((*CT_pattern) >> 1) | ((unsigned long)1 << 31);	/* rotate the pattern */
 	if (last) {		/* draw the line anyway if this is the last point */
 	    TEK40move(xx0, yy0);
 	    TEK40vector(xx1, yy1);

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.h,v 1.4 2000/10/31 19:59:30 joze Exp $
+ * $Id: eval.h,v 1.5 2000/11/01 18:57:28 broeker Exp $
  */
 
 /* GNUPLOT - eval.h */
@@ -42,9 +42,25 @@
 #include "syscfg.h"
 #include "gp_types.h"
 
-/*  #include "parse.h" */
+#include <stdio.h>		/* for FILE* */
+
+#define STACK_DEPTH 100		/* maximum size of the execution stack */
+#define MAX_AT_LEN 150		/* max number of entries in action table */
 
 /* Type definitions */
+
+/* HBB 20010725: Moved here, from parse.h */
+enum operators {
+    /* keep this in line with table in eval.c */
+    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, CALL, CALLN, LNOT, BNOT, UMINUS,
+    LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
+    DIV, MOD, POWER, FACTORIAL, BOOLE,
+    DOLLARS, /* for using extension - div */
+    /* only jump operators go between jump and sf_start, for is_jump() */
+    JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
+};
+#define is_jump(operator) \
+    ((operator) >=(int)JUMP && (operator) <(int)SF_START)
 
 /* user-defined function table entry */
 typedef struct udft_entry {
@@ -75,9 +91,9 @@ typedef union argument {
 
 /* This type definition has to come after union argument has been declared. */
 #ifdef __ZTC__
-typedef int (*FUNC_PTR)(...);
+typedef void (*FUNC_PTR)(...);
 #else
-typedef int (*FUNC_PTR) __PROTO((union argument *arg));
+typedef void (*FUNC_PTR) __PROTO((union argument *arg));
 #endif
 
 /* standard/internal function table entry */
@@ -86,19 +102,61 @@ typedef struct ft_entry {
     FUNC_PTR func;		/* address of function to call */
 } ft_entry;
 
+/* action table entry */
+struct at_entry {
+    enum operators index;	/* index of p-code function */
+    union argument arg;
+};
+
+struct at_type {
+    /* count of entries in .actions[] */
+    int a_count;
+    /* will usually be less than MAX_AT_LEN is malloc()'d copy */
+    struct at_entry actions[MAX_AT_LEN];
+};
+
+
 /* Variables of eval.c needed by other modules: */
 
-extern struct ft_entry GPFAR ft[]; /* The table of builtin functions */
+extern const struct ft_entry GPFAR ft[]; /* The table of builtin functions */
 extern struct udft_entry *first_udf; /* user-def'd functions */
 extern struct udvt_entry *first_udv; /* user-def'd variables */
 extern struct udvt_entry udv_pi; /* 'pi' variable */
-
+extern TBOOLEAN undefined;
 
 /* Prototypes of functions exported by eval.c */
 
-struct udvt_entry * add_udv __PROTO((int t_num));
-struct udft_entry * add_udf __PROTO((int t_num));
-int standard __PROTO((int t_num));
+#ifdef MINEXP
+double gp_exp __PROTO((double x));
+#else
+#define gp_exp(x) exp(x)
+#endif
+
+/* HBB 20010726: Moved these here, from util.h. */
+void disp_value __PROTO((FILE *, struct value *));
+double real __PROTO((struct value *));
+double imag __PROTO((struct value *));
+double magnitude __PROTO((struct value *));
+double angle __PROTO((struct value *));
+struct value * Gcomplex __PROTO((struct value *, double, double));
+struct value * Ginteger __PROTO((struct value *, int));
+
+void reset_stack __PROTO((void));
+void check_stack __PROTO((void));
+struct value *pop __PROTO((struct value *x));
+void push __PROTO((struct value *x));
+void int_check __PROTO((struct value * v));
+
+void f_bool __PROTO((union argument *x));
+void f_jump __PROTO((union argument *x));
+void f_jumpz __PROTO((union argument *x));
+void f_jumpnz __PROTO((union argument *x));
+void f_jtern __PROTO((union argument *x));
+
 void execute_at __PROTO((struct at_type *at_ptr));
+void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
+#ifdef APOLLO
+void apollo_pfm_catch __PROTO((void));
+#endif
 
 #endif /* GNUPLOT_EVAL_H */

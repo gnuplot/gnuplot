@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: unset.c,v 1.18 2001/03/19 14:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: unset.c,v 1.19 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - unset.c */
@@ -41,7 +41,6 @@ static char *RCSid() { return RCSid("$Id: unset.c,v 1.18 2001/03/19 14:52:24 mik
 #include "contour.h"
 #include "datafile.h"
 #include "misc.h"
-#include "parse.h"
 #include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
@@ -719,7 +718,13 @@ unset_grid()
     /* FIXME HBB 20000506: there is no command to explicitly reset the
      * linetypes for major and minor gridlines. This function should
      * do that, maybe... */
-    grid_selection = GRID_OFF;
+    AXIS_INDEX i = 0;
+
+    /* grid_selection = GRID_OFF; */
+    for (; i < AXIS_ARRAY_SIZE; i++) {
+	axis_array[i].gridmajor = FALSE;
+	axis_array[i].gridminor = FALSE;
+    }
 }
 
 

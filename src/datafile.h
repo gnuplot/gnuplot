@@ -1,5 +1,5 @@
 /*
- * $Id: datafile.h,v 1.3.4.2 2000/06/22 12:57:38 broeker Exp $
+ * $Id: datafile.h,v 1.4 2000/11/01 18:57:27 broeker Exp $
  */
 
 /* GNUPLOT - datafile.h */
@@ -93,8 +93,8 @@ int df_2dbinary __PROTO((struct curve_points *));
 int df_3dmatrix __PROTO((struct surface_points *));
 
 void f_dollars __PROTO((union argument *x));
-void f_column  __PROTO((void));
-void f_valid   __PROTO((void));
-void f_timecolumn   __PROTO((void));
+void f_column  __PROTO((union argument *x));
+void f_valid   __PROTO((union argument *x));
+void f_timecolumn   __PROTO((union argument *x));
 
 #endif /* GNUPLOT_DATAFILE_H */

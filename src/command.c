@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: command.c,v 1.53 2001/03/19 14:52:23 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: command.c,v 1.54 2001/06/20 19:24:10 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - command.c */
@@ -1769,29 +1769,35 @@ const char *cmd;
  *****************************************************************************/
 static void
 getparms(command, parms)
-char *command;
-char **parms;
+    char *command;
+    char **parms;
 {
     static char strg0[256];
     register int i = 0, j = 0, k = 0;		/* A bunch of indices */
 
-    while (*(command + j) != NUL) {	/* Loop on string characters */
+    while (command[j] != NUL) {	/* Loop on string characters */
 	parms[k++] = strg0 + i;
-	while (*(command + j) == ' ')
+	while (command[j] == ' ')
 	    ++j;
-	while (*(command + j) != ' ' && *(command + j) != NUL) {
-	    if (*(command + j) == '"')	/* Get quoted string */
-		for (*(strg0 + (i++)) = *(command + (j++));
-		     *(command + j) != '"';
-		     *(strg0 + (i++)) = *(command + (j++)));
-	    *(strg0 + (i++)) = *(command + (j++));
+	while (command[j] != ' ' && command[j] != NUL) {
+	    if (command[j] == '"') {	/* Get quoted string */
+		do {
+		    strg0[i++] = command[j++];
+		} while (command[j] != '"' && command[j] != NUL);
+	    }
+	    strg0[i++] = command[j++];
 	}
-	*(strg0 + (i++)) = NUL;	/* NUL terminate every token */
+	if (strg0[i] != NUL)
+	    strg0[i++] = NUL;	/* NUL terminate every token */
     }
     parms[k] = NUL;
 
-    for (k = strlen(strg0) - 1; k >= 0; --k)	/* Convert to lower case */
-	*(strg0 + k) >= 'A' && *(strg0 + k) <= 'Z' ? *(strg0 + k) |= 32 : *(strg0 + k);
+    /* Convert to lower case */
+    /* FIXME HBB 20010621: do we really want to stop on char *before*
+     * the actual end of the string strg0[]? */
+    for (k=0; strg0[k+1] != NUL; k++)
+	if (strg0[k] >= 'A' && (strg0[k] <= 'Z'))
+	    strg0[k] += ('a' - 'A');
 }
 
 # endif				/* AMIGA_AC_5 */

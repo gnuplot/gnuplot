@@ -1,5 +1,5 @@
 /*
- * $Id: graphics.h,v 1.17 2000/11/01 18:57:32 broeker Exp $
+ * $Id: graphics.h,v 1.18 2001/02/15 17:02:56 broeker Exp $
  */
 
 /* GNUPLOT - graphics.h */
@@ -77,8 +77,6 @@ struct clipbox {
 
 /* externally visible variables of graphics.h */
 
-extern char   default_font[];
-
 /* 'set offset' status variables */
 extern double loff, roff, toff, boff;
 
@@ -89,12 +87,12 @@ extern double bar_size;
 
 void get_offsets __PROTO((struct text_label* this_label,
 	struct termentry* t, int* htic, int* vtic));
-extern void do_plot __PROTO((struct curve_points *, int));
-extern int label_width __PROTO((const char *, int *));
+void do_plot __PROTO((struct curve_points *, int));
+int label_width __PROTO((const char *, int *));
 void map_position __PROTO((struct position * pos, unsigned int *x,
 				  unsigned int *y, const char *what));
 #if defined(sun386) || defined(AMIGA_SC_6_1)
-extern double CheckLog __PROTO((TBOOLEAN, double, double));
+double CheckLog __PROTO((TBOOLEAN, double, double));
 #endif
 
 void apply_head_properties __PROTO((struct position* headsize));

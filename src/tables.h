@@ -1,5 +1,5 @@
 /*
- * $Id: tables.h,v 1.17 2000/11/22 10:04:25 mikulik Exp $
+ * $Id: tables.h,v 1.18 2001/03/19 14:52:24 mikulik Exp $
  */
 
 /* GNUPLOT - tables.h */
@@ -133,21 +133,21 @@ enum show_style_id {
     SHOW_STYLE_DATA, SHOW_STYLE_FUNCTION, SHOW_STYLE_LINE
 };
 
-extern struct gen_table command_tbl[];
-extern struct gen_table plot_tbl[];
-extern struct gen_table plot_axes_tbl[];
-extern struct gen_table plot_smooth_tbl[];
-extern struct gen_table save_tbl[];
-extern struct gen_table set_tbl[];
-extern struct gen_table set_key_tbl[];
-extern struct gen_table set_hidden3d_tbl[];
-extern struct gen_table show_style_tbl[];
-extern struct gen_table plotstyle_tbl[];
+extern const struct gen_table command_tbl[];
+extern const struct gen_table plot_tbl[];
+extern const struct gen_table plot_axes_tbl[];
+extern const struct gen_table plot_smooth_tbl[];
+extern const struct gen_table save_tbl[];
+extern const struct gen_table set_tbl[];
+extern const struct gen_table set_key_tbl[];
+extern const struct gen_table set_hidden3d_tbl[];
+extern const struct gen_table show_style_tbl[];
+extern const struct gen_table plotstyle_tbl[];
 
-extern struct gen_ftable command_ftbl[];
+extern const struct gen_ftable command_ftbl[];
 
 /* Function prototypes */
-int lookup_table __PROTO((struct gen_table *, int));
-parsefuncp_t lookup_ftable __PROTO((struct gen_ftable *, int));
+int lookup_table __PROTO((const struct gen_table *, int));
+parsefuncp_t lookup_ftable __PROTO((const struct gen_ftable *, int));
 
 #endif /* GNUPLT_TABLES_H */

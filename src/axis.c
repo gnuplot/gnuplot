@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: axis.c,v 1.18 2001/07/01 18:40:47 vanzandt Exp $"); }
+static char *RCSid() { return RCSid("$Id: axis.c,v 1.19 2001/07/03 12:48:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - axis.c */
@@ -58,7 +58,7 @@ AXIS axis_array[AXIS_ARRAY_SIZE]
 
 /* Keep defaults varying by axis in their own array, to ease initialization
  * of the main array */
-AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
+const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE] = {
     { -10, 10, "z" , TICS_ON_BORDER,               }, 
     { -10, 10, "y" , TICS_ON_BORDER | TICS_MIRROR, }, 
     { -10, 10, "x" , TICS_ON_BORDER | TICS_MIRROR, }, 
@@ -85,7 +85,7 @@ static double ticstep[AXIS_ARRAY_SIZE];
 
 /* HBB 20000506 new variable: parsing table for use with the table
  * module, to help generalizing set/show/unset/save, where possible */
-struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
+const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE + 1] =
 {
     { "z", FIRST_Z_AXIS},
     { "y", FIRST_Y_AXIS},
@@ -126,7 +126,7 @@ const label_struct default_axis_label = EMPTY_LABELSTRUCT;
 const lp_style_type default_axis_zeroaxis = DEFAULT_AXIS_ZEROAXIS;
 
 /* grid drawing */  
-int grid_selection = GRID_OFF;
+/* int grid_selection = GRID_OFF; */
 #ifdef PM3D
 # define DEFAULT_GRID_LP { 0, -1, 0, 1.0, 1.0, 0 }
 #else
@@ -748,26 +748,42 @@ gprintf(dest, count, format, log10_base, x)
 # undef sprintf
 #endif
 
-/*{{{  timetic_format() */
-void
-timetic_format(axis, amin, amax)
+/*{{{  copy_or_invent_formatstring() */
+/* Either copies the axis formatstring over to the ticfmt[] array, or
+ * in case that's not applicable because the format hasn't been
+ * specified correctly, invents a time/date output format by looking
+ * at the range of values.  Considers time/date fields that don't
+ * change across the range to be unimportant */
+/* HBB 20010803: removed two arguments, and renamed function */
+char *
+copy_or_invent_formatstring(axis)
      AXIS_INDEX axis;
-     double amin, amax;
 {
     struct tm t_min, t_max;
 
+    /* HBB 20010803: moved this here ... was done whenever this was called,
+     * anyway */
+    if (! axis_array[axis].is_timedata
+	|| !axis_array[axis].format_is_numeric) {
+	/* The simple case: formatstring is usable, so use it! */
+	strcpy(ticfmt[axis], axis_array[axis].formatstring);
+	return ticfmt[axis];
+    }
+
+    /* Else, have to invent an output format string. */
     *ticfmt[axis] = 0;		/* make sure we strcat to empty string */
 
-    ggmtime(&t_min, (double) time_tic_just(timelevel[axis], amin));
-    ggmtime(&t_max, (double) time_tic_just(timelevel[axis], amax));
+    ggmtime(&t_min, time_tic_just(timelevel[axis], axis_array[axis].min));
+    ggmtime(&t_max, time_tic_just(timelevel[axis], axis_array[axis].max));
 
-    if (t_max.tm_year == t_min.tm_year && t_max.tm_yday == t_min.tm_yday) {
+    if (t_max.tm_year == t_min.tm_year
+	&& t_max.tm_yday == t_min.tm_yday) {
 	/* same day, skip date */
 	if (t_max.tm_hour != t_min.tm_hour) {
 	    strcpy(ticfmt[axis], "%H");
 	}
 	if (timelevel[axis] < 3) {
-	    if (strlen(ticfmt[axis]))
+	    if (ticfmt[axis][0])
 		strcat(ticfmt[axis], ":");
 	    strcat(ticfmt[axis], "%M");
 	}
@@ -791,6 +807,7 @@ timetic_format(axis, amin, amax)
 	    }
 
 	} else {
+	    /* Copy day/month order over from input format */
 	    if (strchr(axis_array[axis].timefmt, 'm')
 		< strchr(axis_array[axis].timefmt, 'd')) {
 		strcpy(ticfmt[axis], "%m/%d");
@@ -799,9 +816,12 @@ timetic_format(axis, amin, amax)
 	    }
 	}
 	if (timelevel[axis] < 4) {
+	    /* Note: seconds can't be useful if there's more than 1
+	     * day's worth of data... */
 	    strcat(ticfmt[axis], "\n%H:%M");
 	}
     }
+    return ticfmt[axis];
 }
 
 /*}}} */
@@ -1000,11 +1020,11 @@ setup_tics(axis, max)
 	else
 	    axis_array[axis].max = tic * floor(axis_array[axis].max / tic);
     }
-    if (axis_array[axis].is_timedata && axis_array[axis].format_is_numeric)
-	/* invent one for them */
-	timetic_format(axis, axis_array[axis].min, axis_array[axis].max);
-    else
-	strcpy(ticfmt[axis], axis_array[axis].formatstring);
+
+    /* Set up ticfmt[axis] correctly. If necessary (time axis, but not
+     * time/date output format), make up a formatstring that suits the
+     * range of data */
+    copy_or_invent_formatstring(axis);
 }
 
 /*{{{  gen_tics */
@@ -1014,9 +1034,8 @@ setup_tics(axis, max)
  * note this is also called from graph3d, so we need GRID_Z too
  */
 void
-gen_tics(axis, grid, callback)
+gen_tics(axis, callback)
      AXIS_INDEX axis;		/* FIRST_X_AXIS, etc */
-     int grid;			/* GRID_X | GRID_MX etc */
      tic_callback callback;	/* fn to call to actually do the work */
 {
     /* separate main-tic part of grid */
@@ -1031,12 +1050,20 @@ gen_tics(axis, grid, callback)
 
     memcpy(&lgrd, &grid_lp, sizeof(struct lp_style_type));
     memcpy(&mgrd, &mgrid_lp, sizeof(struct lp_style_type));
+#if 0
     lgrd.l_type = (grid & (GRID_X | GRID_Y | GRID_X2 |
 			   GRID_Y2 | GRID_Z | GRID_CB))
       ? grid_lp.l_type : L_TYPE_NODRAW;
     mgrd.l_type = (grid & (GRID_MX | GRID_MY | GRID_MX2 |
 			   GRID_MY2 | GRID_MZ | GRID_MCB))
       ? mgrid_lp.l_type : L_TYPE_NODRAW;
+#else
+    if (! axis_array[axis].gridmajor)
+	lgrd.l_type = L_TYPE_NODRAW;
+    if (! axis_array[axis].gridminor)
+	mgrd.l_type = L_TYPE_NODRAW;
+#endif
+    
 
     if (def->type == TIC_USER) {	/* special case */
 	/*{{{  do user tics then return */
@@ -1403,13 +1430,11 @@ time_tic_just(level, ticplace)
  * "non-running", below. */
 
 void
-axis_output_tics(axis, ticlabel_position, zeroaxis_basis, grid_choice,
-		 callback)
+axis_output_tics(axis, ticlabel_position, zeroaxis_basis, callback)
      AXIS_INDEX axis;		/* axis number we're dealing with */
      int *ticlabel_position;	/* 'non-running' coordinate */
      AXIS_INDEX zeroaxis_basis;	/* axis to base 'non-running' position of
 				 * zeroaxis on */
-     int grid_choice;		/* bitpattern of grid linesets to draw */
      tic_callback callback;	/* tic-drawing callback function */
 {
     struct termentry *t = term;
@@ -1487,7 +1512,7 @@ axis_output_tics(axis, ticlabel_position, zeroaxis_basis, grid_choice,
 	    tic_text = (*ticlabel_position);
 	}
 	/* go for it */
-	gen_tics(axis, grid_selection & grid_choice, callback);
+	gen_tics(axis, callback);
 	(*t->text_angle) (0);	/* reset rotation angle */
     }
 }
@@ -1587,21 +1612,24 @@ load_range(axis, a, b, autoscale)
  * ULIG *
  */
 
-double get_writeback_min(axis)
+double 
+get_writeback_min(axis)
     AXIS_INDEX axis;
 {
     /* printf("get min(%d)=%g\n",axis,axis_array[axis].writeback_min); */
     return axis_array[axis].writeback_min;
 }
 
-double get_writeback_max(axis)
+double 
+get_writeback_max(axis)
     AXIS_INDEX axis;
 {
     /* printf("get max(%d)=%g\n",axis,axis_array[axis].writeback_min); */
     return axis_array[axis].writeback_max;
 }
 
-void set_writeback_min(axis)
+void 
+set_writeback_min(axis)
     AXIS_INDEX axis;
 {
     double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].min);
@@ -1609,7 +1637,8 @@ void set_writeback_min(axis)
     axis_array[axis].writeback_min = val;
 }
 
-void set_writeback_max(axis)
+void 
+set_writeback_max(axis)
     AXIS_INDEX axis;
 {
     double val = AXIS_DE_LOG_VALUE(axis,axis_array[axis].max);
@@ -1617,3 +1646,15 @@ void set_writeback_max(axis)
     axis_array[axis].writeback_max = val;
 }
 
+TBOOLEAN 
+some_grid_selected()
+{
+    AXIS_INDEX i;
+    /* Old version would have been just this: */
+    /* return (grid_selection != GRID_OFF); */
+    for (i = 0; i < AXIS_ARRAY_SIZE; i++)
+	if (axis_array[i].gridmajor || axis_array[i].gridminor) {
+	    return TRUE;
+	}
+    return FALSE;
+}

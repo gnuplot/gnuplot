@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.12 1999/11/24 13:00:01 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: bitmap.c,v 1.13 1999/12/01 22:08:43 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - bitmap.c */
@@ -94,7 +94,7 @@ static unsigned int b_lasty;	/* last pixel set - used by b_line */
 #define IN(i,size)  ((unsigned)i < (unsigned)size)
 
 /* 5x9 font, bottom row first, left pixel in lsb */
-char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
+const char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,0x0004,000000,0x0004,0x0004,0x0004,0x0004,0x0004},
   /*"*/  {000000,000000,000000,000000,000000,000000,0x000a,0x000a,0x000a},
@@ -155,7 +155,7 @@ char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
   /*Y*/  {000000,000000,0x0004,0x0004,0x0004,0x0004,0x000a,0x0011,0x0011},
   /*Z*/  {000000,000000,0x001f,0x0001,0x0002,0x0004,0x0008,0x0010,0x001f},
   /*[*/  {000000,000000,0x000e,0x0002,0x0002,0x0002,0x0002,0x0002,0x000e},
-  /*\*/  {000000,000000,000000,0x0010,0x0008,0x0004,0x0002,0x0001,000000},
+  /*\ */ {000000,000000,000000,0x0010,0x0008,0x0004,0x0002,0x0001,000000},
   /*]*/  {000000,000000,0x000e,0x0008,0x0008,0x0008,0x0008,0x0008,0x000e},
   /*^*/  {000000,000000,000000,000000,000000,000000,0x0011,0x000a,0x0004},
   /*_*/  {000000,000000,0x001f,000000,000000,000000,000000,000000,000000},
@@ -194,7 +194,7 @@ char_row GPFAR fnt5x9[FNT_CHARS][FNT5X9_VBITS] = {
 };
 
 /* 9x17 font, bottom row first, left pixel in lsb */
-char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
+const char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000},
   /*!*/  {000000,000000,000000,000000,0x0010,000000,000000,000000,0x0010,
@@ -315,7 +315,7 @@ char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
           0x0008,0x0010,0x0020,0x0040,0x0080,0x0080,0x0100,0x01ff},
   /*[*/  {000000,000000,000000,000000,0x007c,0x0004,0x0004,0x0004,0x0004,
           0x0004,0x0004,0x0004,0x0004,0x0004,0x0004,0x0004,0x007c},
-  /*\*/  {000000,000000,000000,000000,000000,000000,0x0100,0x0080,0x0040,
+  /*\ */ {000000,000000,000000,000000,000000,000000,0x0100,0x0080,0x0040,
           0x0020,0x0010,0x0008,0x0004,0x0002,0x0001,000000,000000},
   /*]*/  {000000,000000,000000,000000,0x007c,0x0040,0x0040,0x0040,0x0040,
           0x0040,0x0040,0x0040,0x0040,0x0040,0x0040,0x0040,0x007c},
@@ -390,7 +390,7 @@ char_row GPFAR fnt9x17[FNT_CHARS][FNT9X17_VBITS] = {
 };
 
 /* 13x25 font, bottom row first, left pixel in lsb */
-char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
+const char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
   /* */  {000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000,000000,000000,
           000000,000000,000000,000000,000000,000000,000000},
@@ -571,7 +571,7 @@ char_row GPFAR fnt13x25[FNT_CHARS][FNT13X25_VBITS] = {
   /*[*/  {000000,000000,000000,000000,000000,000000,0x03f8,0x0008,0x0008,
           0x0008,0x0008,0x0008,0x0008,0x0008,0x0008,0x0008,0x0008,0x0008,
           0x0008,0x0008,0x0008,0x0008,0x0008,0x0008,0x03f8},
-  /*\*/  {000000,000000,000000,000000,000000,000000,000000,000000,0x1000,
+  /*\ */ {000000,000000,000000,000000,000000,000000,000000,000000,0x1000,
           0x1000,0x0800,0x0400,0x0200,0x0100,0x0080,0x0040,0x0020,0x0010,
           0x0008,0x0004,0x0002,0x0001,0x0001,000000,000000},
   /*]*/  {000000,000000,000000,000000,000000,000000,0x03f8,0x0200,0x0200,
@@ -1041,7 +1041,7 @@ unsigned int size;
 	b_vchar = FNT5X9_VCHAR;
 	b_vbits = FNT5X9_VBITS;
 	for (j = 0; j < FNT_CHARS; j++)
-	    b_font[j] = &fnt5x9[j][0];
+	    b_font[j] = fnt5x9[j];
 	break;
     case FNT9X17:
 	b_hchar = FNT9X17_HCHAR;
@@ -1049,7 +1049,7 @@ unsigned int size;
 	b_vchar = FNT9X17_VCHAR;
 	b_vbits = FNT9X17_VBITS;
 	for (j = 0; j < FNT_CHARS; j++)
-	    b_font[j] = &fnt9x17[j][0];
+	    b_font[j] = fnt9x17[j];
 	break;
     case FNT13X25:
 	b_hchar = FNT13X25_HCHAR;
@@ -1057,7 +1057,7 @@ unsigned int size;
 	b_vchar = FNT13X25_VCHAR;
 	b_vbits = FNT13X25_VBITS;
 	for (j = 0; j < FNT_CHARS; j++)
-	    b_font[j] = &fnt13x25[j][0];
+	    b_font[j] = fnt13x25[j];
 	break;
     default:
 	int_error(NO_CARET, "Unknown character size");
@@ -1083,7 +1083,7 @@ unsigned int c_angle;
 	return;			/* unknown (top-bit-set ?) character */
 
     for (i = 0; i < b_vbits; i++) {
-	fc = *(b_font[j] + i);
+	fc = b_font[j][i];
 	if (c == '_') {		/* treat underline specially */
 	    if (fc) {		/* this this the underline row ? */
 		/* draw the under line for the full h_char width */

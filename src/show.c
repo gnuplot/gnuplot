@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: show.c,v 1.57 2001/06/19 20:37:11 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: show.c,v 1.58 2001/07/03 12:48:56 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - show.c */
@@ -51,7 +51,6 @@ static char *RCSid() { return RCSid("$Id: show.c,v 1.57 2001/06/19 20:37:11 miku
 #include "gp_time.h"
 #include "graphics.h"
 #include "hidden3d.h"
-#include "parse.h"
 #include "plot.h" /* for gnuplot_history_size */
 #include "plot2d.h"
 #include "plot3d.h"
@@ -1372,15 +1371,14 @@ show_grid()
 {
     SHOW_ALL_NL;
 
-    if (!grid_selection) {
+    if (! some_grid_selected()) {
 	fputs("\tgrid is OFF\n", stderr);
 	return;
     }
-#ifdef PM3D
+
+#if 0
+    /* Old method of accessing grid choices */
     fprintf(stderr, "\t%s grid drawn at%s%s%s%s%s%s%s%s%s%s%s%s tics\n",
-#else
-    fprintf(stderr, "\t%s grid drawn at%s%s%s%s%s%s%s%s%s%s tics\n",
-#endif
 	    (polar_grid_angle != 0) ? "Polar" : "Rectangular",
 	    grid_selection & GRID_X ? " x" : "",
 	    grid_selection & GRID_Y ? " y" : "",
@@ -1391,12 +1389,34 @@ show_grid()
 	    grid_selection & GRID_MY ? " my" : "",
 	    grid_selection & GRID_MZ ? " mz" : "",
 	    grid_selection & GRID_MX2 ? " mx2" : "",
-	    grid_selection & GRID_MY2 ? " my2" : ""
+	    grid_selection & GRID_MY2 ? " my2" : "",
 #ifdef PM3D
-	    , grid_selection & GRID_CB ? " cb" : ""
-	    , grid_selection & GRID_MCB ? " mcb" : ""
-#endif
+	    grid_selection & GRID_CB ? " cb" : "",
+	    grid_selection & GRID_MCB ? " mcb" : ""
+#else
+	    "", ""
+#endif /* PM3D */
 	    );
+#else 
+    /* HBB 20010806: new storage method for grid options: */
+    fprintf(stderr, "\t%s grid drawn at", 
+	    (polar_grid_angle != 0) ? "Polar" : "Rectangular");
+#define SHOW_GRID(axis)						\
+    if (axis_array[axis].gridmajor)				\
+	fprintf(stderr, " %s", axis_defaults[axis].name);	\
+    if (axis_array[axis].gridminor)				\
+	fprintf(stderr, " m%s", axis_defaults[axis].name);
+    SHOW_GRID(FIRST_X_AXIS );
+    SHOW_GRID(FIRST_Y_AXIS );
+    SHOW_GRID(SECOND_X_AXIS);
+    SHOW_GRID(SECOND_Y_AXIS);
+    SHOW_GRID(FIRST_Z_AXIS );
+#ifdef PM3D
+    SHOW_GRID(COLOR_AXIS);
+#endif
+#undef SHOW_GRID
+    fputs(" tics\n", stderr);
+#endif /* 0/1 */
 
     fprintf(stderr, "\
 \tMajor grid drawn with linetype %d, linewidth %.3f\n\
@@ -1407,7 +1427,7 @@ show_grid()
     if (polar_grid_angle)
 	fprintf(stderr, "\tGrid radii drawn every %f %s\n",
 		polar_grid_angle / ang2rad,
-		(ang2rad == 1.0) ? "degrees" : "radians");
+		(ang2rad == 1.0) ? "radians" : "degrees");
 }
 
 

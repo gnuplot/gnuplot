@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: tables.c,v 1.19 2001/03/19 14:52:24 mikulik Exp $"); }
+static char *RCSid() { return RCSid("$Id: tables.c,v 1.20 2001/08/09 15:03:52 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - tables.c */
@@ -45,7 +45,7 @@ static char *RCSid() { return RCSid("$Id: tables.c,v 1.19 2001/03/19 14:52:24 mi
 /* gnuplot commands */
 
 /* the actual commands */
-struct gen_ftable command_ftbl[] =
+const struct gen_ftable command_ftbl[] =
 {
 #ifdef USE_MOUSE
     { "bi$nd", bind_command },
@@ -88,7 +88,7 @@ struct gen_ftable command_ftbl[] =
 /* 'plot' and 'splot' */
 /* HBB 990829: unused, yet? */
 /* Lars 991108: yes, because the 'plot' parser is a real bitch :( */
-struct gen_table plot_tbl[] =
+const struct gen_table plot_tbl[] =
 {
     { "ax$es", P_AXES },
     { "ax$is", P_AXES },
@@ -106,7 +106,7 @@ struct gen_table plot_tbl[] =
 };
 
 /* 'plot ax[ei]s' parameter */
-struct gen_table plot_axes_tbl[] =
+const struct gen_table plot_axes_tbl[] =
 {
     { "x1y1", AXES_X1Y1 },
     { "x2y2", AXES_X2Y2 },
@@ -116,7 +116,7 @@ struct gen_table plot_axes_tbl[] =
 };
 
 /* 'plot smooth' parameter */
-struct gen_table plot_smooth_tbl[] =
+const struct gen_table plot_smooth_tbl[] =
 {
     { "a$csplines", SMOOTH_ACSPLINES },
     { "b$ezier", SMOOTH_BEZIER },
@@ -128,7 +128,7 @@ struct gen_table plot_smooth_tbl[] =
 };
 
 /* 'save' command */
-struct gen_table save_tbl[] =
+const struct gen_table save_tbl[] =
 {
     { "f$unctions", SAVE_FUNCS },
     { "s$et", SAVE_SET },
@@ -138,7 +138,7 @@ struct gen_table save_tbl[] =
 };
 
 /* 'set' and 'show' commands */
-struct gen_table set_tbl[] =
+const struct gen_table set_tbl[] =
 {
     { "a$ll", S_ALL },
     { "ac$tion_table", S_ACTIONTABLE },
@@ -319,7 +319,7 @@ struct gen_table set_tbl[] =
 };
 
 /* 'set hidden3d' options */
-struct gen_table set_hidden3d_tbl[] =
+const struct gen_table set_hidden3d_tbl[] =
 {
     { "def$aults", S_HI_DEFAULTS },
     { "off$set", S_HI_OFFSET },
@@ -335,7 +335,7 @@ struct gen_table set_hidden3d_tbl[] =
 };
 
 /* 'set key' options */
-struct gen_table set_key_tbl[] =
+const struct gen_table set_key_tbl[] =
 {
     { "t$op", S_KEY_TOP },
     { "b$ottom", S_KEY_BOTTOM },
@@ -357,7 +357,7 @@ struct gen_table set_key_tbl[] =
     { NULL, S_KEY_INVALID }
 };
 
-struct gen_table show_style_tbl[] =
+const struct gen_table show_style_tbl[] =
 {
     { "d$ata", SHOW_STYLE_DATA },
     { "f$unction", SHOW_STYLE_FUNCTION },
@@ -365,7 +365,7 @@ struct gen_table show_style_tbl[] =
     { NULL, SHOW_STYLE_INVALID }
 };
 
-struct gen_table plotstyle_tbl[] =
+const struct gen_table plotstyle_tbl[] =
 {
     { "l$ines", LINES },
     { "i$mpulses", IMPULSES },
@@ -395,8 +395,8 @@ struct gen_table plotstyle_tbl[] =
 
 int
 lookup_table(tbl, find_token)
-struct gen_table *tbl;
-int find_token;
+    const struct gen_table *tbl;
+    int find_token;
 {
     while (tbl->key) {
 	if (almost_equals(find_token, tbl->key))
@@ -408,8 +408,8 @@ int find_token;
 
 parsefuncp_t
 lookup_ftable(ftbl, find_token)
-struct gen_ftable *ftbl;
-int find_token;
+    const struct gen_ftable *ftbl;
+    int find_token;
 {
     while (ftbl->key) {
 	if (almost_equals(find_token, ftbl->key))

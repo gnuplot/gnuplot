@@ -1,5 +1,5 @@
 /*
- * $Id: parse.h,v 1.5 2000/10/31 19:59:31 joze Exp $
+ * $Id: parse.h,v 1.6 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - parse.h */
@@ -42,35 +42,7 @@
 
 #include "eval.h"
 
-#define MAX_AT_LEN 150		/* max number of entries in action table */
-
 /* externally usable types defined by parse.h */
-
-enum operators {
-    /* keep this in line with table in eval.c */
-    PUSH, PUSHC, PUSHD1, PUSHD2, PUSHD, CALL, CALLN, LNOT, BNOT, UMINUS,
-    LOR, LAND, BOR, XOR, BAND, EQ, NE, GT, LT, GE, LE, PLUS, MINUS, MULT,
-    DIV, MOD, POWER, FACTORIAL, BOOLE,
-    DOLLARS, /* for using extension - div */
-    /* only jump operators go between jump and sf_start, for is_jump() */
-    JUMP, JUMPZ, JUMPNZ, JTERN, SF_START
-};
-#define is_jump(operator) \
-    ((operator) >=(int)JUMP && (operator) <(int)SF_START)
-
-/* action table entry */
-struct at_entry {
-    enum operators index;	/* index of p-code function */
-    union argument arg;
-};
-
-struct at_type {
-    /* count of entries in .actions[] */
-    int a_count;
-    /* will usually be less than MAX_AT_LEN is malloc()'d copy */
-    struct at_entry actions[MAX_AT_LEN];
-};
-
 
 /* exported variables of parse.c */
 
@@ -85,10 +57,10 @@ extern char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 
 /* Prototypes of exported functions in parse.c */
 
-/* void fpe __PROTO((void)); */
-void evaluate_at __PROTO((struct at_type *at_ptr, struct value *val_ptr));
 struct value * const_express __PROTO((struct value *valptr));
 struct at_type * temp_at __PROTO((void));
 struct at_type * perm_at __PROTO((void));
+struct udvt_entry * add_udv __PROTO((int t_num));
+struct udft_entry * add_udf __PROTO((int t_num));
 
 #endif /* PARSE_H */

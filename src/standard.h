@@ -1,5 +1,5 @@
 /*
- * $Id: standard.h,v 1.4 2000/10/31 19:59:31 joze Exp $
+ * $Id: standard.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
  */
 
 /* GNUPLOT - standard.h */
@@ -40,6 +40,7 @@
 /* #if... / #include / #define collection: */
 
 #include "syscfg.h"
+#include "eval.h"
 
 /* Type definitions */
 
@@ -48,45 +49,45 @@
 /* Prototypes of functions exported by standard.c */
 
 /* These are the more 'usual' functions built into the stack machine */
-void f_real __PROTO((void));
-void f_imag __PROTO((void));
-void f_int __PROTO((void));
-void f_arg __PROTO((void));
-void f_conjg __PROTO((void));
-void f_sin __PROTO((void));
-void f_cos __PROTO((void));
-void f_tan __PROTO((void));
-void f_asin __PROTO((void));
-void f_acos __PROTO((void));
-void f_atan __PROTO((void));
-void f_atan2 __PROTO((void));
-void f_sinh __PROTO((void));
-void f_cosh __PROTO((void));
-void f_tanh __PROTO((void));
-void f_asinh __PROTO((void));
-void f_acosh __PROTO((void));
-void f_atanh __PROTO((void));
-void f_void __PROTO((void));
-void f_abs __PROTO((void));
-void f_sgn __PROTO((void));
-void f_sqrt __PROTO((void));
-void f_exp __PROTO((void));
-void f_log10 __PROTO((void));
-void f_log __PROTO((void));
-void f_floor __PROTO((void));
-void f_ceil __PROTO((void));
-void f_besj0 __PROTO((void));
-void f_besj1 __PROTO((void));
-void f_besy0 __PROTO((void));
-void f_besy1 __PROTO((void));
+void f_real __PROTO((union argument *x));
+void f_imag __PROTO((union argument *x));
+void f_int __PROTO((union argument *x));
+void f_arg __PROTO((union argument *x));
+void f_conjg __PROTO((union argument *x));
+void f_sin __PROTO((union argument *x));
+void f_cos __PROTO((union argument *x));
+void f_tan __PROTO((union argument *x));
+void f_asin __PROTO((union argument *x));
+void f_acos __PROTO((union argument *x));
+void f_atan __PROTO((union argument *x));
+void f_atan2 __PROTO((union argument *x));
+void f_sinh __PROTO((union argument *x));
+void f_cosh __PROTO((union argument *x));
+void f_tanh __PROTO((union argument *x));
+void f_asinh __PROTO((union argument *x));
+void f_acosh __PROTO((union argument *x));
+void f_atanh __PROTO((union argument *x));
+void f_void __PROTO((union argument *x));
+void f_abs __PROTO((union argument *x));
+void f_sgn __PROTO((union argument *x));
+void f_sqrt __PROTO((union argument *x));
+void f_exp __PROTO((union argument *x));
+void f_log10 __PROTO((union argument *x));
+void f_log __PROTO((union argument *x));
+void f_floor __PROTO((union argument *x));
+void f_ceil __PROTO((union argument *x));
+void f_besj0 __PROTO((union argument *x));
+void f_besj1 __PROTO((union argument *x));
+void f_besy0 __PROTO((union argument *x));
+void f_besy1 __PROTO((union argument *x));
 
-void f_tmsec __PROTO((void));
-void f_tmmin __PROTO((void));
-void f_tmhour __PROTO((void));
-void f_tmmday __PROTO((void));
-void f_tmmon __PROTO((void));
-void f_tmyear __PROTO((void));
-void f_tmwday __PROTO((void));
-void f_tmyday __PROTO((void));
+void f_tmsec __PROTO((union argument *x));
+void f_tmmin __PROTO((union argument *x));
+void f_tmhour __PROTO((union argument *x));
+void f_tmmday __PROTO((union argument *x));
+void f_tmmon __PROTO((union argument *x));
+void f_tmyear __PROTO((union argument *x));
+void f_tmwday __PROTO((union argument *x));
+void f_tmyday __PROTO((union argument *x));
 
 #endif /* GNUPLOT_STANDARD_H */

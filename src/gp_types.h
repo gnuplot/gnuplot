@@ -1,5 +1,5 @@
 /*
- * $Id: gp_types.h,v 1.6 2001/06/20 19:22:18 broeker Exp $
+ * $Id: gp_types.h,v 1.7 2001/08/09 15:03:52 broeker Exp $
  */
 
 /* GNUPLOT - gp_types.h */
@@ -121,54 +121,6 @@ typedef struct value {
 	struct cmplx cmplx_val;
     } v;
 } t_value;
-
-#if 0 /* HBB 20000521: move to command.h */
-typedef struct lexical_unit {	/* produced by scanner */
-	TBOOLEAN is_token;	/* true if token, false if a value */ 
-	struct value l_val;
-	int start_index;	/* index of first char in token */
-	int length;			/* length of token in chars */
-} lexical_unit;
-#endif /* 0 */
-
-#if 0 /* HBB 20000521: move to eval.h */
-typedef struct udft_entry {	/* user-defined function table entry */
-  struct udft_entry *next_udf;	/* pointer to next udf in linked list */
-  char *udf_name;		/* name of this function entry */
-  struct at_type *at;		/* pointer to action table to execute */
-  char *definition;		/* definition of function as typed */
-  struct value dummy_values[MAX_NUM_VAR]; /* current value of dummy variables */
-} udft_entry;
-
-
-typedef struct udvt_entry {	/* user-defined value table entry */
-	struct udvt_entry *next_udv; /* pointer to next value in linked list */
-	char *udv_name;			/* name of this value entry */
-	TBOOLEAN udv_undef;		/* true if not defined yet */
-	struct value udv_value;	/* value it has */
-} udvt_entry;
-
-typedef union argument {	/* p-code argument */
-	int j_arg;		/* offset for jump */
-	struct value v_arg;	/* constant value */
-	struct udvt_entry *udv_arg; /* pointer to dummy variable */
-	struct udft_entry *udf_arg; /* pointer to udf to execute */
-} argument;
-
-
-/* This type definition has to come after union argument has been declared. */
-#ifdef __ZTC__
-typedef int (*FUNC_PTR)(...);
-#else
-typedef int (*FUNC_PTR) __PROTO((union argument *arg));
-#endif
-
-typedef struct ft_entry {	/* standard/internal function table entry */
-	const char *f_name;	/* pointer to name of this function */
-	FUNC_PTR func;		/* address of function to call */
-} ft_entry;
-#endif /* 0 */
-
 
 /* Defines the type of a coordinate */
 /* INRANGE and OUTRANGE points have an x,y point associated with them */

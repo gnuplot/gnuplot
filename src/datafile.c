@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: datafile.c,v 1.24 2000/12/21 18:05:27 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: datafile.c,v 1.25 2001/02/01 17:56:04 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - datafile.c */
@@ -143,11 +143,11 @@ static char *RCSid() { return RCSid("$Id: datafile.c,v 1.24 2000/12/21 18:05:27 
 
 #include "alloc.h"
 #include "axis.h"
-#include "command.h"
 #include "binary.h"
+#include "command.h"
+#include "eval.h"
 #include "gp_time.h"
 #include "graphics.h"
-#include "internal.h"
 #include "misc.h"
 #include "parse.h"
 #include "plot.h"
@@ -1103,8 +1103,9 @@ int max;
 /*{{{  int df_2dbinary(this_plot) */
 int
 df_2dbinary(this_plot)
-struct curve_points *this_plot;
+    struct curve_points *this_plot;
 {
+    (void) this_plot;		/* avoid -Wunused warning */
     int_error(NO_CARET, "Binary file format for 2d data not yet defined");
     return 0;			/* keep compiler happy */
 }
@@ -1196,7 +1197,7 @@ df_3dmatrix(this_plot)
 	    || df_current_index > df_upper_index
 	    || (df_current_index - df_lower_index) % df_index_step != 0
 	    ) {
-	    free_matrix(dmatrix, 0, nr - 1, 0, nc - 1);
+	    free_matrix(dmatrix, 0, nr - 1, 0);
 	    df_current_index ++;
 	    return 0;
 	}
@@ -1283,11 +1284,11 @@ df_3dmatrix(this_plot)
 	this_plot->num_iso_read++;
     }
 
-    free_matrix(dmatrix, 0, nr - 1, 0, nc - 1);
+    free_matrix(dmatrix, 0, nr - 1, 0);
     if (rt)
-	free_vector(rt, 0, nr - 1);
+	free_vector(rt, 0);
     if (ct)
-	free_vector(ct, 0, nc - 1);
+	free_vector(ct, 0);
 
     /* HBB 20001208: implement 'index' for matrix datafiles */
     df_current_index ++;
@@ -1304,7 +1305,7 @@ df_3dmatrix(this_plot)
 /*{{{  void f_dollars(x) */
 void
 f_dollars(x)
-union argument *x;
+    union argument *x;
 {
     int column = x->v_arg.v.int_val - 1;
     /* we checked it was an integer >= 0 at compile time */
@@ -1323,10 +1324,13 @@ union argument *x;
 
 /*{{{  void f_column() */
 void
-f_column()
+f_column(arg)
+    union argument *arg;
 {
     struct value a;
     int column;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) real(&a) - 1;
     if (column == -2)
@@ -1344,10 +1348,13 @@ f_column()
 
 /*{{{  void f_valid() */
 void
-f_valid()
+f_valid(arg)
+    union argument *arg;
 {
     struct value a;
     int column, good;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) magnitude(&a) - 1;
     good = column >= 0 && column < df_no_cols && df_column[column].good == DF_GOOD;
@@ -1358,13 +1365,15 @@ f_valid()
 
 /*{{{  void f_timecolumn() */
 void
-f_timecolumn()
+f_timecolumn(arg)
+    union argument *arg;
 {
     struct value a;
     int column, output;
     struct tm tm;
     int limit = (df_no_use_specs ? df_no_use_specs : NCOL);
 
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     column = (int) magnitude(&a) - 1;
 

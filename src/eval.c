@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: eval.c,v 1.9 1999/11/08 19:24:28 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: eval.c,v 1.10 2000/11/07 14:37:28 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - eval.c */
@@ -34,225 +34,582 @@ static char *RCSid() { return RCSid("$Id: eval.c,v 1.9 1999/11/08 19:24:28 lheck
  * to the extent permitted by applicable law.
 ]*/
 
+/* HBB 20010724: I moved several variables and functions from parse.c
+ * to here, because they're involved with *evaluating* functions, not
+ * with parsing them: evaluate_at(), fpe(), the APOLLO signal handling
+ * stuff, and fpe_env */
+
 #include "eval.h"
 
+#include "syscfg.h"
 #include "alloc.h"
 #include "datafile.h"
 #include "internal.h"
-#include "parse.h"
 #include "specfun.h"
 #include "standard.h"
 #include "util.h"
 
-/* HBB 990829: the following was moved here, from plot.c, where it
- * wasn't used, anyway... */
+#include <signal.h>
+#include <setjmp.h>
 
+/* Internal prototypes */
+static char *num_to_str __PROTO((double r));
+static RETSIGTYPE fpe __PROTO((int an_int));
+#ifdef APOLLO
+static pfm_$fh_func_val_t apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
+#endif
+
+/* Global variables exported by this module */
 struct udvt_entry udv_pi = { NULL, "pi", FALSE, {INTGR, {0} } };
 /* first in linked list */
 struct udvt_entry *first_udv = &udv_pi;
 struct udft_entry *first_udf = NULL;
 
+TBOOLEAN undefined;
+
+/* The stack this operates on */
+static struct value stack[STACK_DEPTH];
+static int s_p = -1;		/* stack pointer */
+#define top_of_stack stack[s_p]
+
+static int jump_offset;		/* to be modified by 'jump' operators */
+
 /* The table of built-in functions */
-struct ft_entry GPFAR ft[] =
+/* HBB 20010725: I've removed all the casts to type (FUNC_PTR) ---
+ * According to ANSI/ISO C Standards it causes undefined behaviouf if
+ * you cast a function pointer to any other type, including a function
+ * pointer with a different set of arguments, and then call the
+ * function.  Instead, I made all these functions adhere to the common
+ * type, directly */
+const struct ft_entry GPFAR ft[] =
 {
     /* internal functions: */
-    {"push", (FUNC_PTR) f_push},
-    {"pushc", (FUNC_PTR) f_pushc},
-    {"pushd1", (FUNC_PTR) f_pushd1},
-    {"pushd2", (FUNC_PTR) f_pushd2},
-    {"pushd", (FUNC_PTR) f_pushd},
-    {"call", (FUNC_PTR) f_call},
-    {"calln", (FUNC_PTR) f_calln},
-    {"lnot", (FUNC_PTR) f_lnot},
-    {"bnot", (FUNC_PTR) f_bnot},
-    {"uminus", (FUNC_PTR) f_uminus},
-    {"lor", (FUNC_PTR) f_lor},
-    {"land", (FUNC_PTR) f_land},
-    {"bor", (FUNC_PTR) f_bor},
-    {"xor", (FUNC_PTR) f_xor},
-    {"band", (FUNC_PTR) f_band},
-    {"eq", (FUNC_PTR) f_eq},
-    {"ne", (FUNC_PTR) f_ne},
-    {"gt", (FUNC_PTR) f_gt},
-    {"lt", (FUNC_PTR) f_lt},
-    {"ge", (FUNC_PTR) f_ge},
-    {"le", (FUNC_PTR) f_le},
-    {"plus", (FUNC_PTR) f_plus},
-    {"minus", (FUNC_PTR) f_minus},
-    {"mult", (FUNC_PTR) f_mult},
-    {"div", (FUNC_PTR) f_div},
-    {"mod", (FUNC_PTR) f_mod},
-    {"power", (FUNC_PTR) f_power},
-    {"factorial", (FUNC_PTR) f_factorial},
-    {"bool", (FUNC_PTR) f_bool},
-    {"dollars", (FUNC_PTR) f_dollars},	/* for using extension */
-    {"jump", (FUNC_PTR) f_jump},
-    {"jumpz", (FUNC_PTR) f_jumpz},
-    {"jumpnz", (FUNC_PTR) f_jumpnz},
-    {"jtern", (FUNC_PTR) f_jtern},
+    {"push",  f_push},
+    {"pushc",  f_pushc},
+    {"pushd1",  f_pushd1},
+    {"pushd2",  f_pushd2},
+    {"pushd",  f_pushd},
+    {"call",  f_call},
+    {"calln",  f_calln},
+    {"lnot",  f_lnot},
+    {"bnot",  f_bnot},
+    {"uminus",  f_uminus},
+    {"lor",  f_lor},
+    {"land",  f_land},
+    {"bor",  f_bor},
+    {"xor",  f_xor},
+    {"band",  f_band},
+    {"eq",  f_eq},
+    {"ne",  f_ne},
+    {"gt",  f_gt},
+    {"lt",  f_lt},
+    {"ge",  f_ge},
+    {"le",  f_le},
+    {"plus",  f_plus},
+    {"minus",  f_minus},
+    {"mult",  f_mult},
+    {"div",  f_div},
+    {"mod",  f_mod},
+    {"power",  f_power},
+    {"factorial",  f_factorial},
+    {"bool",  f_bool},
+    {"dollars",  f_dollars},	/* for using extension */
+    {"jump",  f_jump},
+    {"jumpz",  f_jumpz},
+    {"jumpnz",  f_jumpnz},
+    {"jtern",  f_jtern},
 
 /* standard functions: */
-    {"real", (FUNC_PTR) f_real},
-    {"imag", (FUNC_PTR) f_imag},
-    {"arg", (FUNC_PTR) f_arg},
-    {"conjg", (FUNC_PTR) f_conjg},
-    {"sin", (FUNC_PTR) f_sin},
-    {"cos", (FUNC_PTR) f_cos},
-    {"tan", (FUNC_PTR) f_tan},
-    {"asin", (FUNC_PTR) f_asin},
-    {"acos", (FUNC_PTR) f_acos},
-    {"atan", (FUNC_PTR) f_atan},
-    {"atan2", (FUNC_PTR) f_atan2},
-    {"sinh", (FUNC_PTR) f_sinh},
-    {"cosh", (FUNC_PTR) f_cosh},
-    {"tanh", (FUNC_PTR) f_tanh},
-    {"int", (FUNC_PTR) f_int},
-    {"abs", (FUNC_PTR) f_abs},
-    {"sgn", (FUNC_PTR) f_sgn},
-    {"sqrt", (FUNC_PTR) f_sqrt},
-    {"exp", (FUNC_PTR) f_exp},
-    {"log10", (FUNC_PTR) f_log10},
-    {"log", (FUNC_PTR) f_log},
-    {"besj0", (FUNC_PTR) f_besj0},
-    {"besj1", (FUNC_PTR) f_besj1},
-    {"besy0", (FUNC_PTR) f_besy0},
-    {"besy1", (FUNC_PTR) f_besy1},
-    {"erf", (FUNC_PTR) f_erf},
-    {"erfc", (FUNC_PTR) f_erfc},
-    {"gamma", (FUNC_PTR) f_gamma},
-    {"lgamma", (FUNC_PTR) f_lgamma},
-    {"ibeta", (FUNC_PTR) f_ibeta},
-    {"igamma", (FUNC_PTR) f_igamma},
-    {"rand", (FUNC_PTR) f_rand},
-    {"floor", (FUNC_PTR) f_floor},
-    {"ceil", (FUNC_PTR) f_ceil},
+    {"real",  f_real},
+    {"imag",  f_imag},
+    {"arg",  f_arg},
+    {"conjg",  f_conjg},
+    {"sin",  f_sin},
+    {"cos",  f_cos},
+    {"tan",  f_tan},
+    {"asin",  f_asin},
+    {"acos",  f_acos},
+    {"atan",  f_atan},
+    {"atan2",  f_atan2},
+    {"sinh",  f_sinh},
+    {"cosh",  f_cosh},
+    {"tanh",  f_tanh},
+    {"int",  f_int},
+    {"abs",  f_abs},
+    {"sgn",  f_sgn},
+    {"sqrt",  f_sqrt},
+    {"exp",  f_exp},
+    {"log10",  f_log10},
+    {"log",  f_log},
+    {"besj0",  f_besj0},
+    {"besj1",  f_besj1},
+    {"besy0",  f_besy0},
+    {"besy1",  f_besy1},
+    {"erf",  f_erf},
+    {"erfc",  f_erfc},
+    {"gamma",  f_gamma},
+    {"lgamma",  f_lgamma},
+    {"ibeta",  f_ibeta},
+    {"igamma",  f_igamma},
+    {"rand",  f_rand},
+    {"floor",  f_floor},
+    {"ceil",  f_ceil},
 
-    {"norm", (FUNC_PTR) f_normal},	/* XXX-JG */
-    {"inverf", (FUNC_PTR) f_inverse_erf},	/* XXX-JG */
-    {"invnorm", (FUNC_PTR) f_inverse_normal},	/* XXX-JG */
-    {"asinh", (FUNC_PTR) f_asinh},
-    {"acosh", (FUNC_PTR) f_acosh},
-    {"atanh", (FUNC_PTR) f_atanh},
-    {"lambertw", (FUNC_PTR) f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
+    {"norm",  f_normal},	/* XXX-JG */
+    {"inverf",  f_inverse_erf},	/* XXX-JG */
+    {"invnorm",  f_inverse_normal},	/* XXX-JG */
+    {"asinh",  f_asinh},
+    {"acosh",  f_acosh},
+    {"atanh",  f_atanh},
+    {"lambertw",  f_lambertw}, /* HBB, from G.Kuhnle 20001107 */
 
-    {"column", (FUNC_PTR) f_column},	/* for using */
-    {"valid", (FUNC_PTR) f_valid},	/* for using */
-    {"timecolumn", (FUNC_PTR) f_timecolumn},	/* for using */
+    {"column",  f_column},	/* for using */
+    {"valid",  f_valid},	/* for using */
+    {"timecolumn",  f_timecolumn},	/* for using */
 
-    {"tm_sec", (FUNC_PTR) f_tmsec},	/* for timeseries */
-    {"tm_min", (FUNC_PTR) f_tmmin},	/* for timeseries */
-    {"tm_hour", (FUNC_PTR) f_tmhour},	/* for timeseries */
-    {"tm_mday", (FUNC_PTR) f_tmmday},	/* for timeseries */
-    {"tm_mon", (FUNC_PTR) f_tmmon},	/* for timeseries */
-    {"tm_year", (FUNC_PTR) f_tmyear},	/* for timeseries */
-    {"tm_wday", (FUNC_PTR) f_tmwday},	/* for timeseries */
-    {"tm_yday", (FUNC_PTR) f_tmyday},	/* for timeseries */
+    {"tm_sec",  f_tmsec},	/* for timeseries */
+    {"tm_min",  f_tmmin},	/* for timeseries */
+    {"tm_hour",  f_tmhour},	/* for timeseries */
+    {"tm_mday",  f_tmmday},	/* for timeseries */
+    {"tm_mon",  f_tmmon},	/* for timeseries */
+    {"tm_year",  f_tmyear},	/* for timeseries */
+    {"tm_wday",  f_tmwday},	/* for timeseries */
+    {"tm_yday",  f_tmyday},	/* for timeseries */
 
     {NULL, NULL}
 };
 
+/* Module-local variables: */
 
-struct udvt_entry *
-add_udv(t_num)			/* find or add value and return pointer */
-int t_num;
+#if defined(_Windows) && !defined(WIN32)
+static JMP_BUF far fpe_env;
+#else
+static JMP_BUF fpe_env;
+#endif
+
+/* Internal helper functions: */
+
+static RETSIGTYPE
+fpe(an_int)
+    int an_int;
 {
-    register struct udvt_entry **udv_ptr = &first_udv;
+#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_Windows) || defined(DOS386)
+    /* thanks to lotto@wjh12.UUCP for telling us about this  */
+    _fpreset();
+#endif
 
-    /* check if it's already in the table... */
+#ifdef OS2
+    (void) signal(an_int, SIG_ACK);
+#else
+    (void) an_int;		/* avoid -Wunused warning */
+    (void) signal(SIGFPE, (sigfunc) fpe);
+#endif
+    undefined = TRUE;
+    LONGJMP(fpe_env, TRUE);
+}
 
-    while (*udv_ptr) {
-	if (equals(t_num, (*udv_ptr)->udv_name))
-	    return (*udv_ptr);
-	udv_ptr = &((*udv_ptr)->next_udv);
+/* FIXME HBB 20010724: do we really want this in *here*? Maybe it
+ * should be in syscfg.c or somewhere similar. */
+#ifdef APOLLO
+# include <apollo/base.h>
+# include <apollo/pfm.h>
+# include <apollo/fault.h>
+
+/*
+ * On an Apollo, the OS can signal a couple errors that are not mapped into
+ * SIGFPE, namely signalling NaN and branch on an unordered comparison.  I
+ * suppose there are others, but none of these are documented, so I handle
+ * them as they arise. 
+ *
+ * Anyway, we need to catch these faults and signal SIGFPE. 
+ */
+
+static pfm_$fh_func_val_t
+apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
+{
+    kill(getpid(), SIGFPE);
+    return pfm_$continue_fault_handling;
+}
+
+/* This is called from main(), if the platform is an APOLLO */
+void
+apollo_pfm_catch()
+{
+    status_$t status;
+    pfm_$establish_fault_handler(fault_$fp_bsun, pfm_$fh_backstop,
+				 apollo_sigfpe, &status);
+    pfm_$establish_fault_handler(fault_$fp_sig_nan, pfm_$fh_backstop,
+				 apollo_sigfpe, &status);
+}
+#endif /* APOLLO */
+
+/* Helper for disp_value(): display a single number in decimal
+ * format. Rotates through 4 buffers 's[j]', and returns pointers to
+ * them, to avoid execution ordering problems if this function is
+ * called more than once between sequence points. */
+static char *
+num_to_str(r)
+    double r;
+{
+    static int i = 0;
+    static char s[4][25];
+    int j = i++;
+
+    if (i > 3)
+	i = 0;
+
+    sprintf(s[j], "%.15g", r);
+    if (strchr(s[j], '.') == NULL &&
+	strchr(s[j], 'e') == NULL &&
+	strchr(s[j], 'E') == NULL)
+	strcat(s[j], ".0");
+
+    return s[j];
+}
+
+/* Exported functions */
+
+/* First, some functions tha help other modules use 'struct value' ---
+ * these might justify a separate module, but I'll stick with this,
+ * for now */
+
+/* Display a value in human-readable form. */
+void
+disp_value(fp, val)
+    FILE *fp;
+    struct value *val;
+{
+    switch (val->type) {
+    case INTGR:
+	fprintf(fp, "%d", val->v.int_val);
+	break;
+    case CMPLX:
+	if (val->v.cmplx_val.imag != 0.0)
+	    fprintf(fp, "{%s, %s}",
+		    num_to_str(val->v.cmplx_val.real),
+		    num_to_str(val->v.cmplx_val.imag));
+	else
+	    fprintf(fp, "%s",
+		    num_to_str(val->v.cmplx_val.real));
+	break;
+    default:
+	int_error(NO_CARET, "unknown type in disp_value()");
     }
-
-    *udv_ptr = (struct udvt_entry *)
-	gp_alloc(sizeof(struct udvt_entry), "value");
-    (*udv_ptr)->next_udv = NULL;
-    (*udv_ptr)->udv_name = gp_alloc (token_len(t_num)+1, "user var");
-    copy_str((*udv_ptr)->udv_name, t_num, token_len(t_num)+1);
-    (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
-    (*udv_ptr)->udv_undef = TRUE;
-    return (*udv_ptr);
 }
 
 
-struct udft_entry *
-add_udf(t_num)			/* find or add function and return pointer */
-int t_num;			/* index to token[] */
+double
+real(val)			/* returns the real part of val */
+    struct value *val;
 {
-    register struct udft_entry **udf_ptr = &first_udf;
+    switch (val->type) {
+    case INTGR:
+	return ((double) val->v.int_val);
+    case CMPLX:
+	return (val->v.cmplx_val.real);
+    }
+    int_error(NO_CARET, "unknown type in real()");
+    /* NOTREACHED */
+    return ((double) 0.0);
+}
 
+
+double
+imag(val)			/* returns the imag part of val */
+    struct value *val;
+{
+    switch (val->type) {
+    case INTGR:
+	return (0.0);
+    case CMPLX:
+	return (val->v.cmplx_val.imag);
+    }
+    int_error(NO_CARET, "unknown type in imag()");
+    /* NOTREACHED */
+    return ((double) 0.0);
+}
+
+
+
+double
+magnitude(val)			/* returns the magnitude of val */
+    struct value *val;
+{
+    switch (val->type) {
+    case INTGR:
+	return ((double) abs(val->v.int_val));
+    case CMPLX:
+	return (sqrt(val->v.cmplx_val.real *
+		     val->v.cmplx_val.real +
+		     val->v.cmplx_val.imag *
+		     val->v.cmplx_val.imag));
+    }
+    int_error(NO_CARET, "unknown type in magnitude()");
+    /* NOTREACHED */
+    return ((double) 0.0);
+}
+
+
+
+double
+angle(val)			/* returns the angle of val */
+    struct value *val;
+{
+    switch (val->type) {
+    case INTGR:
+	return ((val->v.int_val >= 0) ? 0.0 : M_PI);
+    case CMPLX:
+	if (val->v.cmplx_val.imag == 0.0) {
+	    if (val->v.cmplx_val.real >= 0.0)
+		return (0.0);
+	    else
+		return (M_PI);
+	}
+	return (atan2(val->v.cmplx_val.imag,
+		      val->v.cmplx_val.real));
+    }
+    int_error(NO_CARET, "unknown type in angle()");
+    /* NOTREACHED */
+    return ((double) 0.0);
+}
+
+
+struct value *
+Gcomplex(a, realpart, imagpart)
+    struct value *a;
+    double realpart, imagpart;
+{
+    a->type = CMPLX;
+    a->v.cmplx_val.real = realpart;
+    a->v.cmplx_val.imag = imagpart;
+    return (a);
+}
+
+
+struct value *
+Ginteger(a, i)
+    struct value *a;
     int i;
-    while (*udf_ptr) {
-	if (equals(t_num, (*udf_ptr)->udf_name))
-	    return (*udf_ptr);
-	udf_ptr = &((*udf_ptr)->next_udf);
-    }
-
-    /* get here => not found. udf_ptr points at first_udf or
-     * next_udf field of last udf
-     */
-
-    if (standard(t_num))
-	int_warn(t_num, "Warning : udf shadowed by built-in function of the same name");
-
-    /* create and return a new udf slot */
-
-    *udf_ptr = (struct udft_entry *)
-	gp_alloc(sizeof(struct udft_entry), "function");
-    (*udf_ptr)->next_udf = (struct udft_entry *) NULL;
-    (*udf_ptr)->definition = NULL;
-    (*udf_ptr)->at = NULL;
-    (*udf_ptr)->udf_name = gp_alloc (token_len(t_num)+1, "user func");
-    copy_str((*udf_ptr)->udf_name, t_num, token_len(t_num)+1);
-    for (i = 0; i < MAX_NUM_VAR; i++)
-	(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
-    return (*udf_ptr);
-}
-
-
-int
-standard(t_num)		/* return standard function index or 0 */
-int t_num;
 {
-    register int i;
-    for (i = (int) SF_START; ft[i].f_name != NULL; i++) {
-	if (equals(t_num, ft[i].f_name))
-	    return (i);
-    }
-    return (0);
+    a->type = INTGR;
+    a->v.int_val = i;
+    return (a);
 }
 
+
+/* some machines have trouble with exp(-x) for large x
+ * if MINEXP is defined at compile time, use gp_exp(x) instead,
+ * which returns 0 for exp(x) with x < MINEXP
+ * exp(x) will already have been defined as gp_exp(x) in plot.h
+ */
+
+#ifdef MINEXP
+double
+gp_exp(x)
+double x;
+{
+    return (x < (MINEXP)) ? 0.0 : exp(x);
+}
+#endif
 
 
 void
-execute_at(at_ptr)
-struct at_type *at_ptr;
+reset_stack()
 {
-    register int i, index, count, offset;
+    s_p = -1;
+}
 
-    count = at_ptr->a_count;
-    for (i = 0; i < count;) {
-	index = (int) at_ptr->actions[i].index;
-	offset = (*ft[index].func) (&(at_ptr->actions[i].arg));
-	if (is_jump(index))
-	    i += offset;
-	else
-	    i++;
+
+void
+check_stack()
+{				/* make sure stack's empty */
+    if (s_p != -1)
+	fprintf(stderr, "\n\
+warning:  internal error--stack not empty!\n\
+          (function called with too many parameters?)\n");
+}
+
+struct value *
+pop(x)
+    struct value *x;
+{
+    if (s_p < 0)
+	int_error(NO_CARET, "stack underflow (function call with missing parameters?)");
+    *x = stack[s_p--];
+    return (x);
+}
+
+
+void
+push(x)
+    struct value *x;
+{
+    if (s_p == STACK_DEPTH - 1)
+	int_error(NO_CARET, "stack overflow");
+    stack[++s_p] = *x;
+}
+
+
+void
+int_check(v)
+    struct value *v;
+{
+    if (v->type != INTGR)
+	int_error(NO_CARET, "non-integer passed to boolean operator");
+}
+
+
+
+/* Internal operators of the stack-machine, not directly represented
+ * by any user-visible operator, or using private status variables
+ * directly */
+
+/* converts top-of-stack to boolean */
+void
+f_bool(x)
+    union argument *x;
+{
+    (void) x;			/* avoid -Wunused warning */
+
+    int_check(&top_of_stack);
+    top_of_stack.v.int_val = !!top_of_stack.v.int_val;
+}
+
+
+void
+f_jump(x)
+    union argument *x;
+{
+    (void) x;			/* avoid -Wunused warning */
+    jump_offset = x->j_arg;
+}
+
+
+void
+f_jumpz(x)
+    union argument *x;
+{
+    struct value a;
+
+    (void) x;			/* avoid -Wunused warning */
+    int_check(&top_of_stack);
+    if (top_of_stack.v.int_val) {	/* non-zero --> no jump*/
+	(void) pop(&a);
+    } else
+	jump_offset = x->j_arg;	/* leave the argument on TOS */
+}
+
+
+void
+f_jumpnz(x)
+    union argument *x;
+{
+    struct value a;
+
+    (void) x;			/* avoid -Wunused warning */
+    int_check(&top_of_stack);
+    if (top_of_stack.v.int_val)	/* non-zero */
+	jump_offset = x->j_arg;	/* leave the argument on TOS */
+    else {
+	(void) pop(&a);
     }
 }
 
-/*
+void
+f_jtern(x)
+    union argument *x;
+{
+    struct value a;
 
-   'ft' is a table containing C functions within this program. 
+    (void) x;			/* avoid -Wunused warning */
+    int_check(pop(&a));
+    if (! a.v.int_val)
+	jump_offset = x->j_arg;	/* go jump to FALSE code */
+}
 
-   An 'action_table' contains pointers to these functions and arguments to be
-   passed to them. 
+/* This is the heart of the expression evaluation module: the stack
+   program execution loop.
 
-   at_ptr is a pointer to the action table which must be executed (evaluated)
+  'ft' is a table containing C functions within this program.
 
-   so the iterated line exectues the function indexed by the at_ptr and 
-   passes the address of the argument which is pointed to by the arg_ptr 
+   An 'action_table' contains pointers to these functions and
+   arguments to be passed to them.
 
- */
+   at_ptr is a pointer to the action table which must be executed
+   (evaluated). 
+
+   so the iterated line exectues the function indexed by the at_ptr
+   and passes the address of the argument which is pointed to by the
+   arg_ptr
+
+*/
+
+void
+execute_at(at_ptr)
+    struct at_type *at_ptr;
+{
+    register int instruction_index, operator, count;
+    int saved_jump_offset = jump_offset;
+
+    count = at_ptr->a_count;
+    for (instruction_index = 0; instruction_index < count;) {
+	operator = (int) at_ptr->actions[instruction_index].index;
+	jump_offset = 1;	/* jump operators can modify this */
+	(*ft[operator].func) (&(at_ptr->actions[instruction_index].arg));
+	assert(is_jump(operator) || (jump_offset == 1));
+	instruction_index += jump_offset;
+    }
+    
+    jump_offset = saved_jump_offset;
+}
+
+/* 20010724: moved here from parse.c, where it didn't belong */
+void
+evaluate_at(at_ptr, val_ptr)
+    struct at_type *at_ptr;
+    struct value *val_ptr;
+{
+    double temp;
+
+    undefined = FALSE;
+    errno = 0;
+    reset_stack();
+
+#ifndef DOSX286
+    if (SETJMP(fpe_env, 1))
+	return;			/* just bail out */
+    (void) signal(SIGFPE, (sigfunc) fpe);
+#endif
+
+    execute_at(at_ptr);
+
+#ifndef DOSX286
+    (void) signal(SIGFPE, SIG_DFL);
+#endif
+
+    if (errno == EDOM || errno == ERANGE) {
+	undefined = TRUE;
+    } else if (!undefined) {	/* undefined (but not errno) may have been set by matherr */
+	(void) pop(val_ptr);
+	check_stack();
+	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
+	temp = real(val_ptr);
+	if (temp > VERYLARGE || temp < -VERYLARGE) {
+	    undefined = TRUE;
+	}
+    }
+#if defined(NeXT) || defined(ultrix)
+    /*
+     * linux was able to fit curves which NeXT gave up on -- traced it to
+     * silently returning NaN for the undefined cases and plowing ahead
+     * I can force that behavior this way.  (0.0/0.0 generates NaN)
+     */
+    if (undefined && (errno == EDOM || errno == ERANGE)) {	/* corey@cac */
+	undefined = FALSE;
+	errno = 0;
+	Gcomplex(val_ptr, 0.0 / 0.0, 0.0 / 0.0);
+    }
+#endif /* NeXT || ultrix */
+}
+
+

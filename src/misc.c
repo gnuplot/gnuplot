@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: misc.c,v 1.27 2001/04/03 16:14:46 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: misc.c,v 1.28 2001/06/22 15:44:58 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - misc.c */
@@ -39,7 +39,7 @@ static char *RCSid() { return RCSid("$Id: misc.c,v 1.27 2001/04/03 16:14:46 broe
 #include "alloc.h"
 #include "command.h"
 #include "graphics.h"
-#include "parse.h"
+#include "parse.h"		/* for const_express() */
 #include "plot.h"
 #include "tables.h"
 #include "util.h"

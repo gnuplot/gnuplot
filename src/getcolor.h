@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: getcolor.h,v 1.1 2000/11/16 08:05:19 mikulik Exp $
  */
 
 /* GNUPLOT - getcolor.h */
@@ -32,7 +32,7 @@
 
 double GetColorValueFromFormula __PROTO((int formula, double x));
 
-extern char *( ps_math_color_formulae[] );
+extern const char *ps_math_color_formulae[];
 
 
 #endif /* PM3D */

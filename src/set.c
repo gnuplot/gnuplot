@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: set.c,v 1.59 2001/07/03 12:48:56 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: set.c,v 1.60 2001/08/13 14:04:59 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - set.c */
@@ -50,7 +50,7 @@ static char *RCSid() { return RCSid("$Id: set.c,v 1.59 2001/07/03 12:48:56 broek
 #include "gp_time.h"
 #include "hidden3d.h"
 #include "misc.h"
-#include "parse.h"
+/* #include "parse.h" */
 #include "plot.h"
 #include "plot2d.h"
 #include "plot3d.h"
@@ -602,9 +602,10 @@ set_arrow()
     struct position spos, epos, headsize;
     struct lp_style_type loc_lp = DEFAULT_LP_STYLE_TYPE;
     int tag;
-    TBOOLEAN set_start, set_end, head = 1;
-    TBOOLEAN set_line = 0, set_headsize = 0, set_layer = 0;
-    TBOOLEAN relative = 0;
+    int head = 1;
+    TBOOLEAN set_start, set_end;
+    TBOOLEAN set_line = FALSE, set_headsize = FALSE, set_layer = FALSE;
+    TBOOLEAN set_head = FALSE, relative = FALSE;
     int layer = 0;
     headsize.x = 0; /* length being zero means the default head size */
 
@@ -678,15 +679,19 @@ set_arrow()
     if (!END_OF_COMMAND && equals(c_token, "nohead")) {
 	c_token++;
 	head = 0;
+	set_head = TRUE;
     }
     if (!END_OF_COMMAND && equals(c_token, "head")) {
 	c_token++;
 	head = 1;
+	set_head = TRUE;
     }
     if (!END_OF_COMMAND && equals(c_token, "heads")) {
 	c_token++;
 	head = 2;
+	set_head = TRUE;
     }
+
     if (!END_OF_COMMAND && equals(c_token, "size")) {
 	headsize.scalex = headsize.scaley = headsize.scalez = first_axes;
 	  /* only scalex used; scaley is angle of the head in [deg] */
@@ -707,11 +712,20 @@ set_arrow()
 	layer = 1;
 	set_layer = TRUE;
     }
-    set_line = 1;
 
     /* pick up a line spec - allow ls, but no point. */
-    lp_parse(&loc_lp, 1, 0, 0, 0);
-    loc_lp.pointflag = 0;	/* standard value for arrows, don't use points */
+    /* HBB 20010807: Only set set_line to TRUE if there really was a
+     * lp spec at the end of this command. */
+    {
+	int stored_token = c_token;
+
+	lp_parse(&loc_lp, 1, 0, 0, 0);
+	/* HBB 20010807: this is already taken care of by lp_parse()... */
+	/* loc_lp.pointflag = 0; */	/* standard value for arrows, don't use points */
+	if (stored_token != c_token)
+	    set_line = TRUE;
+    }
+
 
     if (!END_OF_COMMAND)
 	int_error(c_token, "extraneous or out-of-order arguments in set arrow");
@@ -733,7 +747,8 @@ set_arrow()
 	    this_arrow->end = epos;
 	    this_arrow->relative = relative;
 	}
-	this_arrow->head = head;
+	if (set_head) 
+	    this_arrow->head = head;
 	if (set_layer) {
 	    this_arrow->layer = layer;
 	}
@@ -1211,23 +1226,26 @@ set_format()
 
 /* process 'set grid' command */
 
-#define GRID_MATCH(string, neg, mask) \
- if (almost_equals(c_token, string)) { \
-	grid_selection |= mask;		\
-  ++c_token; \
- } else if (almost_equals(c_token, neg)) { \
-	grid_selection &= ~(mask);		\
-  ++c_token; \
- }
-
 static void
 set_grid()
 {
     c_token++;
-    if (END_OF_COMMAND && !grid_selection)
-	grid_selection = GRID_X|GRID_Y;
-    else
+    if (END_OF_COMMAND && !some_grid_selected()) {
+/*  	grid_selection = GRID_X|GRID_Y;  */
+	axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
+    } else
 	while (!END_OF_COMMAND) {
+#if 0
+            /* HBB 20010806: Old method of accessing grid choices */
+#define GRID_MATCH(string, neg, mask)			\
+	    if (almost_equals(c_token, string)) {	\
+		grid_selection |= mask;			\
+		++c_token;				\
+	    } else if (almost_equals(c_token, neg)) {	\
+		grid_selection &= ~(mask);		\
+		++c_token;				\
+	    }
 	    GRID_MATCH("x$tics", "nox$tics", GRID_X)
 	    else GRID_MATCH("y$tics", "noy$tics", GRID_Y)
 	    else GRID_MATCH("z$tics", "noz$tics", GRID_Z)
@@ -1242,9 +1260,42 @@ set_grid()
 	    else GRID_MATCH("cb$tics", "nocb$tics", GRID_CB)
 	    else GRID_MATCH("mcb$tics", "nomcb$tics", GRID_MCB)
 #endif
+#else  
+            /* HBB 20010806: new grid steering variable in axis struct */
+#define GRID_MATCH(axis, string)				\
+	    if (almost_equals(c_token, string+2)) {		\
+		if (string[2] == 'm')				\
+		    axis_array[axis].gridminor = TRUE;		\
+		else						\
+		    axis_array[axis].gridmajor = TRUE;		\
+		++c_token;					\
+	    } else if (almost_equals(c_token, string)) {	\
+		if (string[2] == 'm')				\
+		    axis_array[axis].gridminor = FALSE;		\
+		else						\
+		    axis_array[axis].gridmajor = FALSE;		\
+		++c_token;					\
+	    }
+	    GRID_MATCH(FIRST_X_AXIS, "nox$tics")
+	    else GRID_MATCH(FIRST_Y_AXIS, "noy$tics")
+	    else GRID_MATCH(FIRST_Z_AXIS, "noz$tics")
+	    else GRID_MATCH(SECOND_X_AXIS, "nox2$tics")
+	    else GRID_MATCH(SECOND_Y_AXIS, "noy2$tics")
+	    else GRID_MATCH(FIRST_X_AXIS, "nomx$tics")
+	    else GRID_MATCH(FIRST_Y_AXIS, "nomy$tics")
+	    else GRID_MATCH(FIRST_Z_AXIS, "nomz$tics")
+	    else GRID_MATCH(SECOND_X_AXIS, "nomx2$tics")
+	    else GRID_MATCH(SECOND_Y_AXIS, "nomy2$tics")
+#ifdef PM3D
+	    else GRID_MATCH(COLOR_AXIS, "nocb$tics")
+	    else GRID_MATCH(COLOR_AXIS, "nomcb$tics")
+#endif
+#endif /* 1/0 */
 	    else if (almost_equals(c_token,"po$lar")) {
-		if (!grid_selection)
-		    grid_selection = GRID_X;
+		if (!some_grid_selected()) {
+		    /* grid_selection = GRID_X; */
+		    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+		}
 		c_token++;
 		if (END_OF_COMMAND) {
 		    polar_grid_angle = 30*DEG2RAD;
@@ -1268,9 +1319,12 @@ set_grid()
 	if (c_token == old_token) { /* nothing parseable found... */
 	    grid_lp.l_type = real(const_express(&a)) - 1;
 	}
-			
-	if (!grid_selection)
-	    grid_selection = GRID_X|GRID_Y;
+
+	if (! some_grid_selected()) {
+	    /* grid_selection = GRID_X|GRID_Y; */
+	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
+	}
 	/* probably just  set grid <linetype> */
 
 	if (END_OF_COMMAND) {
@@ -1285,8 +1339,11 @@ set_grid()
 	    }
 	}
 
-	if (!grid_selection)
-	    grid_selection = GRID_X|GRID_Y;
+	if (! some_grid_selected()) {
+	    /* grid_selection = GRID_X|GRID_Y; */
+	    axis_array[FIRST_X_AXIS].gridmajor = TRUE;
+	    axis_array[FIRST_Y_AXIS].gridmajor = TRUE;
+	}
 	/* probably just  set grid <linetype> */
     }
 }

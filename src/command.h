@@ -1,5 +1,5 @@
 /*
- * $Id: command.h,v 1.18 2000/10/31 19:59:30 joze Exp $
+ * $Id: command.h,v 1.19 2000/11/01 18:57:27 broeker Exp $
  */
 
 /* GNUPLOT - command.h */
@@ -79,7 +79,6 @@ extern char HelpFile[];         /* patch for do_help  - AP */
 # endif                         /* DJGPP */
 # ifdef __TURBOC__
 #  ifndef _Windows
-/* HBB 990914: the 'extern unsigned __stklen' was wrong, here */
 extern char HelpFile[];         /* patch for do_help  - DJL */
 #  endif                        /* _Windows */
 # endif                         /* TURBOC */

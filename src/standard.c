@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: standard.c,v 1.11 2000/10/31 19:59:31 joze Exp $"); }
+static char *RCSid() { return RCSid("$Id: standard.c,v 1.12 2000/11/01 18:57:33 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - standard.c */
@@ -36,11 +36,9 @@ static char *RCSid() { return RCSid("$Id: standard.c,v 1.11 2000/10/31 19:59:31 
 
 #include "standard.h"
 
-#include "gadgets.h"
-#include "gp_time.h"
-#include "internal.h"
-#include "util.h"
-
+#include "gadgets.h"		/* for 'ang2rad' and 'zero' */
+#include "gp_time.h"		/* needed by f_tmsec() and friendsa */
+#include "util.h"		/* for int_error() */
 
 static double jzero __PROTO((double x));
 static double pzero __PROTO((double x));
@@ -483,33 +481,44 @@ static double GPFAR qyone[] = {
 #endif /* (ATARI || MTOS) && __PUREC__ */
 
 void
-f_real()
+f_real(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     push(Gcomplex(&a, real(pop(&a)), 0.0));
 }
 
 void
-f_imag()
+f_imag(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     push(Gcomplex(&a, imag(pop(&a)), 0.0));
 }
 
 
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
-
 void
-f_arg()
+f_arg(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     push(Gcomplex(&a, angle(pop(&a)) / ang2rad, 0.0));
 }
 
 void
-f_conjg()
+f_conjg(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, real(&a), -imag(&a)));
 }
@@ -517,26 +526,35 @@ f_conjg()
 /* ang2rad is 1 if we are in radians, or pi/180 if we are in degrees */
 
 void
-f_sin()
+f_sin(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, sin(ang2rad * real(&a)) * cosh(ang2rad * imag(&a)), cos(ang2rad * real(&a)) * sinh(ang2rad * imag(&a))));
 }
 
 void
-f_cos()
+f_cos(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, cos(ang2rad * real(&a)) * cosh(ang2rad * imag(&a)), -sin(ang2rad * real(&a)) * sinh(ang2rad * imag(&a))));
 }
 
 void
-f_tan()
+f_tan(arg)
+    union argument *arg;
 {
     struct value a;
     register double den;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (imag(&a) == 0.0)
 	push(Gcomplex(&a, tan(ang2rad * real(&a)), 0.0));
@@ -551,10 +569,13 @@ f_tan()
 }
 
 void
-f_asin()
+f_asin(arg)
+    union argument *arg;
 {
     struct value a;
     register double alpha, beta, x, y;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
@@ -572,10 +593,13 @@ f_asin()
 }
 
 void
-f_acos()
+f_acos(arg)
+    union argument *arg;
 {
     struct value a;
     register double x, y;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
@@ -597,10 +621,13 @@ f_acos()
 }
 
 void
-f_atan()
+f_atan(arg)
+    union argument *arg;
 {
     struct value a;
     register double x, y, u, v, w, z;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
@@ -632,12 +659,14 @@ f_atan()
 
 /* real parts only */
 void
-f_atan2()
+f_atan2(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
     double y;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
     y = real(pop(&a));
 
@@ -650,36 +679,48 @@ f_atan2()
 
 
 void
-f_sinh()
+f_sinh(arg)
+    union argument *arg;
 {
     struct value a;
+ 
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, sinh(real(&a)) * cos(imag(&a)), cosh(real(&a)) * sin(imag(&a))));
 }
 
 void
-f_cosh()
+f_cosh(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     push(Gcomplex(&a, cosh(real(&a)) * cos(imag(&a)), sinh(real(&a)) * sin(imag(&a))));
 }
 
 void
-f_tanh()
+f_tanh(arg)
+    union argument *arg;
 {
     struct value a;
     register double den;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     den = cosh(2 * real(&a)) + cos(2 * imag(&a));
     push(Gcomplex(&a, sinh(2 * real(&a)) / den, sin(2 * imag(&a)) / den));
 }
 
 void
-f_asinh()
+f_asinh(arg)
+    union argument *arg;
 {
     struct value a;		/* asinh(z) = -I*asin(I*z) */
     register double alpha, beta, x, y;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = -imag(&a);
     y = real(&a);
@@ -698,10 +739,13 @@ f_asinh()
 }
 
 void
-f_acosh()
+f_acosh(arg)
+    union argument *arg;
 {
     struct value a;
     register double alpha, beta, x, y;	/* acosh(z) = I*acos(z) */
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = real(&a);
     y = imag(&a);
@@ -720,10 +764,13 @@ f_acosh()
 }
 
 void
-f_atanh()
+f_atanh(arg)
+    union argument *arg;
 {
     struct value a;
     register double x, y, u, v, w, z;	/* atanh(z) = -I*atan(I*z) */
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     x = -imag(&a);
     y = real(&a);
@@ -754,17 +801,23 @@ f_atanh()
 }
 
 void
-f_int()
+f_int(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     push(Ginteger(&a, (int) real(pop(&a))));
 }
 
 
 void
-f_abs()
+f_abs(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
@@ -776,9 +829,12 @@ f_abs()
 }
 
 void
-f_sgn()
+f_sgn(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
@@ -794,10 +850,13 @@ f_sgn()
 
 
 void
-f_sqrt()
+f_sqrt(arg)
+    union argument *arg;
 {
     struct value a;
     register double mag;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     mag = sqrt(magnitude(&a));
     if (imag(&a) == 0.0) {
@@ -814,10 +873,13 @@ f_sqrt()
 
 
 void
-f_exp()
+f_exp(arg)
+    union argument *arg;
 {
     struct value a;
     register double mag, ang;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     mag = gp_exp(real(&a));
     ang = imag(&a);
@@ -826,9 +888,12 @@ f_exp()
 
 
 void
-f_log10()
+f_log10(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (magnitude(&a) == 0.0) {
         undefined = TRUE;
@@ -839,9 +904,12 @@ f_log10()
 
 
 void
-f_log()
+f_log(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (magnitude(&a) == 0.0) {
         undefined = TRUE;
@@ -852,10 +920,12 @@ f_log()
 
 
 void
-f_floor()
+f_floor(arg)
+    union argument *arg;
 {
     struct value a;
 
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
@@ -868,10 +938,12 @@ f_floor()
 
 
 void
-f_ceil()
+f_ceil(arg)
+    union argument *arg;
 {
     struct value a;
 
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     switch (a.type) {
     case INTGR:
@@ -1088,10 +1160,18 @@ double x;
 }
 
 
+/* FIXME HBB 20010726: should bessel functions really call int_error,
+ * right in the middle of evaluating some mathematical expression?
+ * Couldn't they just flag 'undefined', or ignore the real part of the
+ * complex number? */
+
 void
-f_besj0()
+f_besj0(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
 	int_error(NO_CARET, "can only do bessel functions of reals");
@@ -1100,9 +1180,12 @@ f_besj0()
 
 
 void
-f_besj1()
+f_besj1(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
 	int_error(NO_CARET, "can only do bessel functions of reals");
@@ -1111,9 +1194,12 @@ f_besj1()
 
 
 void
-f_besy0()
+f_besy0(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
 	int_error(NO_CARET, "can only do bessel functions of reals");
@@ -1127,9 +1213,12 @@ f_besy0()
 
 
 void
-f_besy1()
+f_besy1(arg)
+    union argument *arg;
 {
     struct value a;
+
+    (void) arg;			/* avoid -Wunused warning */
     (void) pop(&a);
     if (fabs(imag(&a)) > zero)
 	int_error(NO_CARET, "can only do bessel functions of reals");
@@ -1145,12 +1234,18 @@ f_besy1()
 /* functions for accessing fields from tm structure, for time series
  * they are all the same, so define a macro
  */
-
-#define TIMEFUNC(name, field) \
-void name() { \
-  struct value a;  struct tm tm;         \
-  (void) pop(&a);  ggmtime(&tm, real(&a)); \
-  push(Gcomplex(&a, (double)tm.field, 0.0));        \
+#define TIMEFUNC(name, field)					\
+void								\
+name(arg)							\
+    union argument *arg;					\
+{								\
+    struct value a;						\
+    struct tm tm;						\
+								\
+    (void) arg;			/* avoid -Wunused warning */	\
+    (void) pop(&a);						\
+    ggmtime(&tm, real(&a));					\
+    push(Gcomplex(&a, (double)tm.field, 0.0));			\
 }
 
 TIMEFUNC(f_tmsec, tm_sec)

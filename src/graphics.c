@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graphics.c,v 1.49 2001/06/25 15:31:12 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graphics.c,v 1.50 2001/07/20 14:04:06 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graphics.c */
@@ -87,9 +87,6 @@ static struct clipbox keybox;	/* boundaries for key field */
 
 /* set by tic_callback - how large to draw polar radii */
 static double largest_polar_circle;
-
-/* HBB 990829 FIXME: this is never modified at all !?? */
-char default_font[MAX_ID_LEN + 1] = "";	/* Entry font added by DJL */
 
 static int xlablin, x2lablin, ylablin, y2lablin, titlelin, xticlin, x2ticlin;
 
@@ -630,7 +627,7 @@ boundary(scaling, plots, count)
 	     * the latter sets widest_tic to the length of the widest one
 	     * ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(FIRST_Y_AXIS, 0, widest2d_callback);
+	    gen_tics(FIRST_Y_AXIS, /* 0, */ widest2d_callback);
 
 	    ytic_textwidth = (int) ((t->h_char) * (widest_tic + 2));
 	}
@@ -702,7 +699,7 @@ boundary(scaling, plots, count)
 	     * the latter sets widest_tic to the length of the widest one
 	     * ought to consider tics on axis if axis near border...
 	     */
-	    gen_tics(SECOND_Y_AXIS, 0, widest2d_callback);
+	    gen_tics(SECOND_Y_AXIS, /* 0, */ widest2d_callback);
 
 	    y2tic_textwidth = (int) ((t->h_char) * (widest_tic + 2));
 	}
@@ -803,7 +800,7 @@ boundary(scaling, plots, count)
 	&& axis_array[SECOND_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_x2tics) {
 	widest_tic = 0;		/* reset the global variable ... */
-	gen_tics(SECOND_X_AXIS, 0, widest2d_callback);
+	gen_tics(SECOND_X_AXIS, /* 0, */ widest2d_callback);
 	ytop += x2tic_textheight;
 	/* Now compute a new one and use that instead: */
 	x2tic_textheight = (int) ((t->h_char) * (widest_tic));
@@ -813,7 +810,7 @@ boundary(scaling, plots, count)
 	&& axis_array[FIRST_X_AXIS].ticmode & TICS_ON_BORDER
 	&& vertical_xtics) {
 	widest_tic = 0;		/* reset the global variable ... */
-	gen_tics(FIRST_X_AXIS, 0, widest2d_callback);
+	gen_tics(FIRST_X_AXIS, /* 0, */ widest2d_callback);
 	ybot -= xtic_textheight;
 	xtic_textheight = (int) ((t->h_char) * widest_tic);
 	ybot += xtic_textheight;
@@ -1072,19 +1069,19 @@ do_plot(plots, pcount)
 
     /* label first y axis tics */
     axis_output_tics(FIRST_Y_AXIS, &ytic_x, FIRST_X_AXIS,
-		     (GRID_Y | GRID_MY), ytick2d_callback);
+		     /* (GRID_Y | GRID_MY), */ ytick2d_callback);
     /* label first x axis tics */
     axis_output_tics(FIRST_X_AXIS, &xtic_y, FIRST_Y_AXIS,
-		     (GRID_X | GRID_MX), xtick2d_callback);
+		     /* (GRID_X | GRID_MX), */ xtick2d_callback);
 
     /* select second mapping */
     x_axis = SECOND_X_AXIS;
     y_axis = SECOND_Y_AXIS;
 
     axis_output_tics(SECOND_Y_AXIS, &y2tic_x, SECOND_X_AXIS,
-		     (GRID_Y2 | GRID_MY2), ytick2d_callback);
+		     /* (GRID_Y2 | GRID_MY2), */ ytick2d_callback);
     axis_output_tics(SECOND_X_AXIS, &x2tic_y, SECOND_Y_AXIS,
-		     (GRID_X2 | GRID_MX2), xtick2d_callback);
+		     /* (GRID_X2 | GRID_MX2), */ xtick2d_callback);
 
 
     /* select first mapping */

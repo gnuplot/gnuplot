@@ -1,5 +1,5 @@
 /* 
- * $Id: axis.h,v 1.8 2001/06/21 17:24:10 broeker Exp $
+ * $Id: axis.h,v 1.9 2001/07/03 12:48:56 broeker Exp $
  *
  */
 
@@ -140,6 +140,7 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
 #define TICS_MIRROR    4
 
 
+#if 0 /* HBB 20010806 --- move GRID flags into axis struct */
 /* Need to allow user to choose grid at first and/or second axes tics.
  * Also want to let user choose circles at x or y tics for polar grid.
  * Also want to allow user rectangular grid for polar plot or polar
@@ -160,6 +161,7 @@ typedef void (*tic_callback) __PROTO((AXIS_INDEX, double, char *, struct lp_styl
 /* GRID_{M}CB only for PM3D, but defined always for source code readability */
 #define GRID_CB     (1<<10)
 #define GRID_MCB    (1<<11)
+#endif /* 0 */
 
 /* HBB 20010610: new type for storing autoscale activity. Effectively
  * two booleans (bits) in a single variable, so I'm using an enum with
@@ -174,8 +176,6 @@ typedef enum e_autoscale {
 } t_autoscale;
 
 
-/* HBB 20000725: gather all per-axis variables into a struct, and set up
- * a single large array of such structs */
 /* FIXME 20000725: collect some of those various TBOOLEAN fields into
  * a larger int (or -- shudder -- a bitfield?) */
 typedef struct axis {
@@ -217,6 +217,8 @@ typedef struct axis {
     int ticmode;		/* tics on border/axis? mirrored? */
     struct ticdef ticdef;	/* tic series definition */
     TBOOLEAN tic_rotate;	/* ticmarks rotated (vertical text)? */
+    TBOOLEAN gridmajor;		/* Grid lines wanted on major tics? */
+    TBOOLEAN gridminor;		/* Grid lines for minor tics? */
     int minitics;		/* minor tic mode (none/auto/user)? */
     double mtic_freq;		/* minitic stepsize */
 
@@ -231,6 +233,7 @@ typedef struct axis {
 #else
 # define DEFAULT_AXIS_ZEROAXIS {0, -3, 0, 1.0, 1.0}
 #endif
+
 #define DEFAULT_AXIS_STRUCT {						    \
 	AUTOSCALE_BOTH, AUTOSCALE_BOTH, /* auto, set_auto */		    \
 	0, FALSE,		/* range_flags, rev_range */		    \
@@ -243,9 +246,11 @@ typedef struct axis {
 	DEF_FORMAT, TIMEFMT,	/* output format, timefmt */		    \
 	NO_TICS,		/* tic output positions (border, mirror) */ \
 	DEFAULT_AXIS_TICDEF,	/* tic series definition */		    \
-	FALSE, MINI_DEFAULT, 10, /* tic_rotate, minitics, mtic_freq */	    \
+	FALSE, FALSE, FALSE,    /* tic_rotate, grid{major,minor} */	    \
+	MINI_DEFAULT, 10,	/* tic_rotate, minitics, mtic_freq */	    \
 	EMPTY_LABELSTRUCT,	/* axis label */			    \
-	DEFAULT_AXIS_ZEROAXIS}	/* zeroaxis line style */
+	DEFAULT_AXIS_ZEROAXIS	/* zeroaxis line style */		    \
+}
 
 /* Table of default behaviours --- a subset of the struct above. Only
  * those fields are present that differ from axis to axis. */
@@ -261,19 +266,14 @@ typedef struct axis_defaults {
 /* global variables in axis.c */
 
 extern AXIS axis_array[AXIS_ARRAY_SIZE];
-extern AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
+extern const AXIS_DEFAULTS axis_defaults[AXIS_ARRAY_SIZE];
 
 /* A parsing table for mapping axis names into axis indices. For use
  * by the set/show machinery, mainly */
-extern struct gen_table axisname_tbl[AXIS_ARRAY_SIZE+1];
+extern const struct gen_table axisname_tbl[AXIS_ARRAY_SIZE+1];
 
 
 extern const struct ticdef default_axis_ticdef;
-
-extern double ticscale;		/* scale factor for tic marks (was (0..1])*/
-extern double miniticscale;	/* and for minitics */
-extern TBOOLEAN	tic_in;		/* tics to be drawn inward?  */
-
 
 /* default format for tic mark labels */
 #define DEF_FORMAT "% g"
@@ -287,17 +287,24 @@ extern const label_struct default_axis_label;
 /* zeroaxis linetype (flag type==-3 if none wanted) */
 extern const lp_style_type default_axis_zeroaxis;
 
-/* grid drawing control variables */
-extern int grid_selection;
-extern const struct lp_style_type default_grid_lp; /* default for 'unset' */
+/* default grid linetype, to be used by 'unset grid' and 'reset' */
+extern const struct lp_style_type default_grid_lp;
+
+/* global variables for communication with the tic callback functions */
+/* FIXME HBB 20010806: had better be collected into a struct that's
+ * passed to the callback */
+extern int tic_start, tic_direction, tic_mirror;
+/* These are for passing on to write_multiline(): */
+extern int tic_text, rotate_tics, tic_hjust, tic_vjust;
+/* Some of them are controlled by 'set' commands: */
+extern double ticscale;		/* scale factor for tic marks (was (0..1])*/
+extern double miniticscale;	/* and for minitics */
+extern TBOOLEAN	tic_in;		/* tics to be drawn inward?  */
+/* The remaining ones are for grid drawing; controlled by 'set grid': */
+/* extern int grid_selection; --- comm'ed out, HBB 20010806 */
 extern struct lp_style_type grid_lp; /* linestyle for major grid lines */
 extern struct lp_style_type mgrid_lp; /* linestyle for minor grid lines */
 extern double polar_grid_angle; /* angle step in polar grid in radians */
-
-/* global variables for communication with the tic callback functions */
-
-extern int tic_start, tic_direction, tic_text,
-    rotate_tics, tic_hjust, tic_vjust, tic_mirror;
 
 /* axes being used by the current plot */
 extern AXIS_INDEX x_axis, y_axis, z_axis;
@@ -593,15 +600,16 @@ void axis_unlog_interval __PROTO((AXIS_INDEX, double *, double *, TBOOLEAN));
 void axis_revert_and_unlog_range __PROTO((AXIS_INDEX));
 double axis_log_value_checked __PROTO((AXIS_INDEX, double, const char *));
 void axis_checked_extend_empty_range __PROTO((AXIS_INDEX, const char *mesg));
-void   timetic_format __PROTO((AXIS_INDEX, double, double));
+char * copy_or_invent_formatstring __PROTO((AXIS_INDEX));
 double set_tic __PROTO((double, int));
 void setup_tics __PROTO((AXIS_INDEX, int));
-void gen_tics __PROTO((AXIS_INDEX, int, tic_callback));
+void gen_tics __PROTO((AXIS_INDEX, /* int, */ tic_callback));
 void gprintf __PROTO((char *, size_t, char *, double, double));
-void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, int, tic_callback));
+void axis_output_tics __PROTO((AXIS_INDEX, int *, AXIS_INDEX, tic_callback));
 void axis_set_graphical_range __PROTO((AXIS_INDEX, unsigned int lower, unsigned int upper));
 TBOOLEAN axis_position_zeroaxis __PROTO((AXIS_INDEX));
 void axis_draw_2d_zeroaxis __PROTO((AXIS_INDEX, AXIS_INDEX));
+TBOOLEAN some_grid_selected __PROTO((void));
 
 double get_writeback_min __PROTO((AXIS_INDEX));
 double get_writeback_max __PROTO((AXIS_INDEX));

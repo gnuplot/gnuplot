@@ -1,5 +1,5 @@
 /*
- * $Id: specfun.h,v 1.5 2000/11/01 18:57:33 broeker Exp $
+ * $Id: specfun.h,v 1.6 2000/11/07 14:37:28 broeker Exp $
  */
 
 /* GNUPLOT - specfun.h */
@@ -40,6 +40,7 @@
 /* #if... / #include / #define collection: */
 
 #include "syscfg.h"
+#include "eval.h"
 
 /* Type definitions */
 
@@ -48,16 +49,16 @@
 /* Prototypes of functions exported by specfun.c */
 
 /* These are the more 'special' function built into the stack machine */
-void f_erf __PROTO((void));
-void f_erfc __PROTO((void));
-void f_ibeta __PROTO((void));
-void f_igamma __PROTO((void));
-void f_gamma __PROTO((void));
-void f_lgamma __PROTO((void));
-void f_rand __PROTO((void));
-void f_normal __PROTO((void));
-void f_inverse_normal __PROTO((void));
-void f_inverse_erf __PROTO((void));
-void f_lambertw __PROTO((void));
+void f_erf __PROTO((union argument *x));
+void f_erfc __PROTO((union argument *x));
+void f_ibeta __PROTO((union argument *x));
+void f_igamma __PROTO((union argument *x));
+void f_gamma __PROTO((union argument *x));
+void f_lgamma __PROTO((union argument *x));
+void f_rand __PROTO((union argument *x));
+void f_normal __PROTO((union argument *x));
+void f_inverse_normal __PROTO((union argument *x));
+void f_inverse_erf __PROTO((union argument *x));
+void f_lambertw __PROTO((union argument *x));
 
 #endif /* GNUPLOT_SPECFUN_H */

@@ -1,5 +1,5 @@
-/* Hey Emacs this is -*- C -*-
- * $Id: emf.trm,v 1.7 2000/11/03 11:44:04 broeker Exp $
+		    /* Hey Emacs this is -*- C -*-
+ * $Id: emf.trm,v 1.8 2001/02/28 16:43:38 broeker Exp $
  */
 
 /* GNUPLOT - emf.trm */
@@ -137,7 +137,7 @@ TERM_PUBLIC int EMF_set_font __PROTO((const char *));
 #define EMF_HANDLE_BRUSH	3
 #define EMF_HANDLE_MAX		4
 
-#define EMF_STOCK_OBJECT_FLAG	0x80000000
+#define EMF_STOCK_OBJECT_FLAG	((unsigned long)0x1 << 31)
 #define EMF_STOCK_OBJECT_WHITE_BRUSH 	(EMF_STOCK_OBJECT_FLAG + 0x00)
 #define EMF_STOCK_OBJECT_BLACK_PEN   	(EMF_STOCK_OBJECT_FLAG + 0x07)
 #define EMF_STOCK_OBJECT_DEFAULT_FONT	(EMF_STOCK_OBJECT_FLAG + 0x0A)
@@ -224,7 +224,7 @@ static void EMF_flush_polyline __PROTO((void));
 static void EMF_flush_polygon __PROTO((void));
 static void EMF_write_byte __PROTO((int)); /* HBB 20001102: was 'char'... */
 static void EMF_write_short __PROTO((int)); /* HBB 20001102: was 'short' */
-static void EMF_write_long __PROTO((long));
+static void EMF_write_long __PROTO((unsigned long));
 static void EMF_write_float __PROTO((double)); /* HBB 20001102: was 'float' */
 static void EMF_setfont __PROTO((void));
 
@@ -240,24 +240,31 @@ EMF_setfont()
     if (!emf_graphics)
 	return;
 
-    count = strlen(emf_fontname);
-    if ((sub = strstr(emf_fontname, " bold")) != NULL) {
+    count = min (strlen(emf_fontname), 31);
+    if (((sub = strstr(emf_fontname, " bold")) != NULL)
+	|| ((sub = strstr(emf_fontname, " Bold")) != NULL)) {
 	bold = 700;
 	count = min(sub - emf_fontname, count);
     }
-    if ((sub = strstr(emf_fontname, " italic")) != NULL) {
+    if (((sub = strstr(emf_fontname, " italic")) != NULL)
+	|| ((sub = strstr(emf_fontname, " Italic")) != NULL)) {
 	italic = 1;
 	count = min(sub - emf_fontname, count);
     }
-    if ((sub = strstr(emf_fontname, " underline")) != NULL) {
+    if (((sub = strstr(emf_fontname, " underline")) != NULL)
+	|| ((sub = strstr(emf_fontname, " Underline")) != NULL)) {
 	underline = 1;
 	count = min(sub - emf_fontname, count);
     }
-    if ((sub = strstr(emf_fontname, " strikeout")) != NULL) {
+    if (((sub = strstr(emf_fontname, " strikeout")) != NULL)
+	|| ((sub = strstr(emf_fontname, " Strikeout")) != NULL)
+	|| ((sub = strstr(emf_fontname, " StrikeOut")) != NULL)
+	) {
 	strikeout = 1;
 	count = min(sub - emf_fontname, count);
     }
-    strncpy(font, emf_fontname, count);
+
+    safe_strncpy(font, emf_fontname, count + 1);
 
     EMF_SelectObject(EMF_STOCK_OBJECT_DEFAULT_FONT);
     EMF_DeleteObject(EMF_HANDLE_FONT);
@@ -354,7 +361,7 @@ EMF_write_short(value)
 
 static void 
 EMF_write_long(value)
-    long value;
+    unsigned long value;
 {
     char c[4];
 
@@ -507,14 +514,12 @@ EMF_set_font(const char *font)
 	if (comma == NULL)
 	    return FALSE;	/* bad format */
 	sep = comma - font;
-	strncpy(emf_fontname, font, min(sep, 31));
+	safe_strncpy(emf_fontname, font, min(sep + 1, 32));
 	emf_fontsize = atoi(&font[sep + 1]);
     } else {
 	strcpy(emf_fontname, emf_defaultfontname);
 	emf_fontsize = emf_defaultfontsize;
     }
-    for (i = 0; i < strlen(emf_fontname); i++)
-	emf_fontname[i] = tolower((unsigned char)emf_fontname[i]);
     term->h_char = (emf_fontsize * EMF_PT2HM);
     term->v_char = (emf_fontsize * EMF_PT2HM);
     EMF_setfont();

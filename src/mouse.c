@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: mouse.c,v 1.19 2001/02/15 18:13:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: mouse.c,v 1.20 2001/05/22 14:25:53 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - mouse.c */
@@ -474,14 +474,13 @@ xDateTimeFormat(double x, char *b, int mode)
 /* HBB 20000507: fixed a construction error. Was using the 'timefmt'
  * string (which is for reading, not writing time data) to output the
  * value. Code is now closer to what setup_tics does. */
-#define MKSTR(sp,x,axis)						      \
-do {									      \
-    if (axis_array[axis].is_timedata) {					      \
-	if (axis_array[axis].format_is_numeric)				      \
-	    timetic_format(axis, axis_array[axis].min, axis_array[axis].max); \
-	sp+=gstrftime(sp,40,axis_array[axis].formatstring,x);		      \
-    } else								      \
-	sp+=sprintf(sp, mouse_setting.fmt ,x);				      \
+#define MKSTR(sp,x,axis)					\
+do {								\
+    if (axis_array[axis].is_timedata) {				\
+	char *format = copy_or_invent_formatstring(axis);	\
+	sp+=gstrftime(sp, 40, format, x);			\
+    } else							\
+	sp+=sprintf(sp, mouse_setting.fmt ,x);			\
 } while (0)
 
 
@@ -845,7 +844,7 @@ builtin_toggle_grid(struct gp_event_t *ge)
     if (!ge) {
 	return "`builtin-toggle-grid`";
     }
-    if (grid_selection == GRID_OFF)
+    if (! some_grid_selected()) 
 	do_string_replot("set grid");
     else
 	do_string_replot("unset grid");

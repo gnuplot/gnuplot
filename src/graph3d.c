@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.43 2001/06/29 12:57:58 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: graph3d.c,v 1.44 2001/08/22 13:30:40 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - graph3d.c */
@@ -484,7 +484,7 @@ do_3dplot(plots, pcount, quick)
      */
 
     /* If we are to draw the bottom grid make sure zmin is updated properly. */
-    if (X_AXIS.ticmode || Y_AXIS.ticmode || grid_selection) {
+    if (X_AXIS.ticmode || Y_AXIS.ticmode || some_grid_selected()) {
 	base_z = Z_AXIS.min
 	    - (Z_AXIS.max - Z_AXIS.min) * ticslevel;
 	if (ticslevel >= 0)
@@ -822,7 +822,8 @@ do_3dplot(plots, pcount, quick)
 	    }
 	    switch (this_plot->plot_style) {
 	    case BOXES:	/* can't do boxes in 3d yet so use impulses */
-	    case IMPULSES:{
+	    case IMPULSES:
+		{
 		    if (lkey) {
 			key_sample_line(xl, yl);
 		    }
@@ -830,10 +831,11 @@ do_3dplot(plots, pcount, quick)
 			plot3d_impulses(this_plot);
 		    break;
 		}
-		case STEPS:	/* HBB: I think these should be here */
-		case FSTEPS:
-		case HISTEPS:
-		case LINES:{
+	    case STEPS:	/* HBB: I think these should be here */
+	    case FSTEPS:
+	    case HISTEPS:
+	    case LINES:
+		{
 		    if (lkey) {
 			key_sample_line(xl, yl);
 		    }
@@ -847,21 +849,21 @@ do_3dplot(plots, pcount, quick)
 		    }
 		    break;
 		}
-		case YERRORLINES:	/* ignored; treat like points */
-		case XERRORLINES:	/* ignored; treat like points */
-		case XYERRORLINES:	/* ignored; treat like points */
-		case YERRORBARS:	/* ignored; treat like points */
-		case XERRORBARS:	/* ignored; treat like points */
-		case XYERRORBARS:	/* ignored; treat like points */
-		case BOXXYERROR:	/* HBB: ignore these as well */
-		case BOXERROR:
-		case CANDLESTICKS:	/* HBB: dito */
-		case FINANCEBARS:
-		case VECTOR:
-		case POINTSTYLE:
-		    if (lkey) {
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
-		    }
+	    case YERRORLINES:	/* ignored; treat like points */
+	    case XERRORLINES:	/* ignored; treat like points */
+	    case XYERRORLINES:	/* ignored; treat like points */
+	    case YERRORBARS:	/* ignored; treat like points */
+	    case XERRORBARS:	/* ignored; treat like points */
+	    case XYERRORBARS:	/* ignored; treat like points */
+	    case BOXXYERROR:	/* HBB: ignore these as well */
+	    case BOXERROR:
+	    case CANDLESTICKS:	/* HBB: dito */
+	    case FINANCEBARS:
+	    case VECTOR:
+	    case POINTSTYLE:
+		if (lkey) {
+		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+		}
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
 		    if (use_palette)
@@ -870,12 +872,12 @@ do_3dplot(plots, pcount, quick)
 #endif
 			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
-		    break;
+		break;
 
-		case LINESPOINTS:
-		    /* put lines */
-		    if (lkey)
-			key_sample_line(xl, yl);
+	    case LINESPOINTS:
+		/* put lines */
+		if (lkey)
+		    key_sample_line(xl, yl);
 
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
@@ -886,9 +888,9 @@ do_3dplot(plots, pcount, quick)
 			plot3d_lines(this_plot);
 		}
 
-		    /* put points */
-		    if (lkey)
-			key_sample_point(xl, yl, this_plot->lp_properties.p_type);
+		/* put points */
+		if (lkey)
+		    key_sample_point(xl, yl, this_plot->lp_properties.p_type);
 
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
@@ -899,17 +901,17 @@ do_3dplot(plots, pcount, quick)
 			plot3d_points(this_plot, this_plot->lp_properties.p_type);
 		}
 
-		    break;
+		break;
 
-		case DOTS:
-		    if (lkey) {
-			if (key == KEY_USER_PLACEMENT) {
-			    if (!clip_point(xl + key_point_offset, yl))
-				(*t->point) (xl + key_point_offset, yl, -1);
-			} else {
+	    case DOTS:
+		if (lkey) {
+		    if (key == KEY_USER_PLACEMENT) {
+			if (!clip_point(xl + key_point_offset, yl))
 			    (*t->point) (xl + key_point_offset, yl, -1);
-			    /* (*t->point)(xl+2*(t->h_char),yl, -1); */
-			}
+		    } else {
+			(*t->point) (xl + key_point_offset, yl, -1);
+			/* (*t->point)(xl+2*(t->h_char),yl, -1); */
+		    }
 		}
 		if (!(hidden3d && draw_surface)) {
 #ifdef PM3D
@@ -918,12 +920,12 @@ do_3dplot(plots, pcount, quick)
 		    else
 #endif
 			plot3d_points(this_plot, -1);
-		    }
+		}
 
-		    break;
+		break;
 
 
-		}			/* switch(plot-style) */
+	    }			/* switch(plot-style) */
 
 		/* move key on a line */
 		if (lkey) {
@@ -2050,7 +2052,7 @@ draw_3d_graphbox(plot, plot_num)
 	    }
 	}
 	if (X_AXIS.ticmode) {
-	    gen_tics(FIRST_X_AXIS, grid_selection & (GRID_X | GRID_MX),
+	    gen_tics(FIRST_X_AXIS, /* grid_selection & (GRID_X | GRID_MX), */
 		     xtick_callback);
 	}
 
@@ -2104,7 +2106,7 @@ draw_3d_graphbox(plot, plot_num)
 	    }
 	}
 	if (Y_AXIS.ticmode) {
-	    gen_tics(FIRST_Y_AXIS, grid_selection & (GRID_Y | GRID_MY),
+	    gen_tics(FIRST_Y_AXIS, /* grid_selection & (GRID_Y | GRID_MY), */
 		     ytick_callback);
 	}
 	if (*Y_AXIS.label.text) {
@@ -2148,7 +2150,7 @@ draw_3d_graphbox(plot, plot_num)
 #endif
 	    )
 	) {
-	gen_tics(FIRST_Z_AXIS, grid_selection & (GRID_Z | GRID_MZ),
+	gen_tics(FIRST_Z_AXIS, /* grid_selection & (GRID_Z | GRID_MZ), */
 		 ztick_callback);
     }
     if ((Y_AXIS.zeroaxis.l_type > L_TYPE_NODRAW)
@@ -2214,6 +2216,8 @@ xtick_callback(axis, place, text, grid)
 	Y_AXIS.min + Y_AXIS.max - xaxis_y;
     int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
+
+    (void) axis;		/* avoid -Wunused warning */
 
 #ifdef PM3D
     if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
@@ -2293,6 +2297,8 @@ ytick_callback(axis, place, text, grid)
     int dirn = tic_in ? 1 : -1;
     register struct termentry *t = term;
 
+    (void) axis;		/* avoid -Wunused warning */
+
 #ifdef PM3D
     if ((surface_rot_x <= 90 && BACKGRID != whichgrid) ||
 	(surface_rot_x > 90 && FRONTGRID != whichgrid)) {
@@ -2362,10 +2368,12 @@ ztick_callback(axis, place, text, grid)
     char *text;
     struct lp_style_type grid;
 {
-/* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
+    /* HBB: inserted some ()'s to shut up gcc -Wall, here and below */
     int len = (text ? ticscale : miniticscale)
 	* (tic_in ? 1 : -1) * (term->h_tic);
     vertex v1, v2, v3;
+
+    (void) axis;		/* avoid -Wunused warning */
 
     map3d_xyz(zaxis_x, zaxis_y, place, &v1);
     if (grid.l_type > L_TYPE_NODRAW) {

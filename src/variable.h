@@ -1,5 +1,5 @@
 /*
- * $Id: variable.h,v 1.9 2000/10/31 19:59:31 joze Exp $
+ * $Id: variable.h,v 1.10 2000/11/01 18:57:34 broeker Exp $
  */
 
 /* GNUPLOT - variable.h */
@@ -82,7 +82,7 @@
 
 /* Loadpath related */
 
-extern char *loadpath_handler __PROTO((int, char *));
+char *loadpath_handler __PROTO((int, char *));
 
 #define init_loadpath()    loadpath_handler(ACTION_INIT,NULL)
 #define set_var_loadpath(path) loadpath_handler(ACTION_SET,(path))
@@ -92,7 +92,7 @@ extern char *loadpath_handler __PROTO((int, char *));
 
 /* Locale related */
 
-extern char *locale_handler __PROTO((int, char *));
+char *locale_handler __PROTO((int, char *));
 
 #define INITIAL_LOCALE ("C")
 

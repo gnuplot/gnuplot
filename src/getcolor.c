@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.7 2000/11/23 18:20:53 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: getcolor.c,v 1.8 2000/11/24 19:17:22 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - getcolor.c */
@@ -175,7 +175,7 @@ GetColorValueFromFormula(int formula, double x)
 	"/cF4 {dup mul} bind def\t% x^2",
 */
 
-char *(ps_math_color_formulae[]) = {
+const char *ps_math_color_formulae[] = {
     /* /cF0  */ "pop 0", "0",
 	/* /cF1  */ "pop 0.5", "0.5",
 	/* /cF2  */ "pop 1", "1",

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: parse.c,v 1.14 2000/11/03 11:44:04 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: parse.c,v 1.15 2001/03/09 18:10:32 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - parse.c */
@@ -34,157 +34,58 @@ static char *RCSid() { return RCSid("$Id: parse.c,v 1.14 2000/11/03 11:44:04 bro
  * to the extent permitted by applicable law.
 ]*/
 
-#include "syscfg.h"
 #include "parse.h"
 
 #include "alloc.h"
 #include "command.h"
 #include "eval.h"
 #include "help.h"
-#include "internal.h"
 #include "util.h"
 
-#include <signal.h>
-#include <setjmp.h>
-
-/* current dummy vars */
+/* Exported globals: the current 'dummy' variable names */
 char c_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1];
 char set_dummy_var[MAX_NUM_VAR][MAX_ID_LEN+1] = { "x", "y" };
 
+/* Internal prototypes: */
 
-static RETSIGTYPE fpe __PROTO((int an_int));
+static void convert __PROTO((struct value *, int));
 static void extend_at __PROTO((void));
 static union argument *add_action __PROTO((enum operators sf_index));
-static void express __PROTO((void));
-static void xterm __PROTO((void));
-static void aterm __PROTO((void));
-static void bterm __PROTO((void));
-static void cterm __PROTO((void));
-static void dterm __PROTO((void));
-static void eterm __PROTO((void));
-static void fterm __PROTO((void));
-static void gterm __PROTO((void));
-static void hterm __PROTO((void));
-static void factor __PROTO((void));
-static void xterms __PROTO((void));
-static void aterms __PROTO((void));
-static void bterms __PROTO((void));
-static void cterms __PROTO((void));
-static void dterms __PROTO((void));
-static void eterms __PROTO((void));
-static void fterms __PROTO((void));
-static void gterms __PROTO((void));
-static void hterms __PROTO((void));
-static void iterms __PROTO((void));
-static void unary __PROTO((void));
+static void parse_expression __PROTO((void));
+static void accept_logical_OR_expression __PROTO((void));
+static void accept_logical_AND_expression __PROTO((void));
+static void accept_inclusive_OR_expression __PROTO((void));
+static void accept_exclusive_OR_expression __PROTO((void));
+static void accept_AND_expression __PROTO((void));
+static void accept_equality_expression __PROTO((void));
+static void accept_relational_expression __PROTO((void));
+static void accept_additive_expression __PROTO((void));
+static void accept_multiplicative_expression __PROTO((void));
+static void parse_primary_expression __PROTO((void));
+static void parse_conditional_expression __PROTO((void));
+static void parse_logical_OR_expression __PROTO((void));
+static void parse_logical_AND_expression __PROTO((void));
+static void parse_inclusive_OR_expression __PROTO((void));
+static void parse_exclusive_OR_expression __PROTO((void));
+static void parse_AND_expression __PROTO((void));
+static void parse_equality_expression __PROTO((void));
+static void parse_relational_expression __PROTO((void));
+static void parse_additive_expression __PROTO((void));
+static void parse_multiplicative_expression __PROTO((void));
+static void parse_unary_expression __PROTO((void));
+static int is_builtin_function __PROTO((int t_num));
+
+/* Internal variables: */
 
 static struct at_type *at = NULL;
 static int at_size = 0;
-#if defined(_Windows) && !defined(WIN32)
-static JMP_BUF far fpe_env;
-#else
-static JMP_BUF fpe_env;
-#endif
 
-#define dummy (struct value *) 0
-
-static RETSIGTYPE
-fpe(an_int)
-int an_int;
+static void
+convert(val_ptr, t_num)
+    struct value *val_ptr;
+    int t_num;
 {
-#if defined(MSDOS) && !defined(__EMX__) && !defined(DJGPP) && !defined(_Windows) || defined(DOS386)
-    /* thanks to lotto@wjh12.UUCP for telling us about this  */
-    _fpreset();
-#endif
-
-#ifdef OS2
-    (void) signal(an_int, SIG_ACK);
-#else
-    (void) signal(SIGFPE, (sigfunc) fpe);
-#endif
-    undefined = TRUE;
-    LONGJMP(fpe_env, TRUE);
-}
-
-
-#ifdef APOLLO
-# include <apollo/base.h>
-# include <apollo/pfm.h>
-# include <apollo/fault.h>
-
-/*
- * On an Apollo, the OS can signal a couple errors that are not mapped into
- * SIGFPE, namely signalling NaN and branch on an unordered comparison.  I
- * suppose there are others, but none of these are documented, so I handle
- * them as they arise. 
- *
- * Anyway, we need to catch these faults and signal SIGFPE. 
- */
-
-pfm_$fh_func_val_t
-apollo_sigfpe(pfm_$fault_rec_t & fault_rec)
-{
-    kill(getpid(), SIGFPE);
-    return pfm_$continue_fault_handling;
-}
-
-apollo_pfm_catch()
-{
-    status_$t status;
-    pfm_$establish_fault_handler(fault_$fp_bsun, pfm_$fh_backstop,
-				 apollo_sigfpe, &status);
-    pfm_$establish_fault_handler(fault_$fp_sig_nan, pfm_$fh_backstop,
-				 apollo_sigfpe, &status);
-}
-#endif /* APOLLO */
-
-
-void
-evaluate_at(at_ptr, val_ptr)
-struct at_type *at_ptr;
-struct value *val_ptr;
-{
-    double temp;
-
-    undefined = FALSE;
-    errno = 0;
-    reset_stack();
-
-#ifndef DOSX286
-    if (SETJMP(fpe_env, 1))
-	return;			/* just bail out */
-    (void) signal(SIGFPE, (sigfunc) fpe);
-#endif
-
-    execute_at(at_ptr);
-
-#ifndef DOSX286
-    (void) signal(SIGFPE, SIG_DFL);
-#endif
-
-    if (errno == EDOM || errno == ERANGE) {
-	undefined = TRUE;
-    } else if (!undefined) {	/* undefined (but not errno) may have been set by matherr */
-	(void) pop(val_ptr);
-	check_stack();
-	/* At least one machine (ATT 3b1) computes Inf without a SIGFPE */
-	temp = real(val_ptr);
-	if (temp > VERYLARGE || temp < -VERYLARGE) {
-	    undefined = TRUE;
-	}
-    }
-#if defined(NeXT) || defined(ultrix)
-    /*
-     * linux was able to fit curves which NeXT gave up on -- traced it to
-     * silently returning NaN for the undefined cases and plowing ahead
-     * I can force that behavior this way.  (0.0/0.0 generates NaN)
-     */
-    if (undefined && (errno == EDOM || errno == ERANGE)) {	/* corey@cac */
-	undefined = FALSE;
-	errno = 0;
-	Gcomplex(val_ptr, 0.0 / 0.0, 0.0 / 0.0);
-    }
-#endif /* NeXT || ultrix */
+    *val_ptr = token[t_num].l_val;
 }
 
 
@@ -225,7 +126,7 @@ temp_at()
 
     at->a_count = 0;		/* reset action table !!! */
     at_size = MAX_AT_LEN;
-    express();
+    parse_expression();
     return (at);
 }
 
@@ -270,95 +171,100 @@ enum operators sf_index;	/* index of p-code function */
 
 
 static void
-express()
+parse_expression()
 {				/* full expressions */
-    xterm();
-    xterms();
+    accept_logical_OR_expression();
+    parse_conditional_expression();
 }
 
 static void
-xterm()
+accept_logical_OR_expression()
 {				/* ? : expressions */
-    aterm();
-    aterms();
+    accept_logical_AND_expression();
+    parse_logical_OR_expression();
 }
 
 
 static void
-aterm()
+accept_logical_AND_expression()
 {
-    bterm();
-    bterms();
+    accept_inclusive_OR_expression();
+    parse_logical_AND_expression();
 }
 
 
 static void
-bterm()
+accept_inclusive_OR_expression()
 {
-    cterm();
-    cterms();
+    accept_exclusive_OR_expression();
+    parse_inclusive_OR_expression();
 }
 
 
 static void
-cterm()
+accept_exclusive_OR_expression()
 {
-    dterm();
-    dterms();
+    accept_AND_expression();
+    parse_exclusive_OR_expression();
 }
 
 
 static void
-dterm()
+accept_AND_expression()
 {
-    eterm();
-    eterms();
+    accept_equality_expression();
+    parse_AND_expression();
 }
 
 
 static void
-eterm()
+accept_equality_expression()
 {
-    fterm();
-    fterms();
+    accept_relational_expression();
+    parse_equality_expression();
 }
 
 
 static void
-fterm()
+accept_relational_expression()
 {
-    gterm();
-    gterms();
+    accept_additive_expression();
+    parse_relational_expression();
 }
 
 
 static void
-gterm()
+accept_additive_expression()
 {
-    hterm();
-    hterms();
+    accept_multiplicative_expression();
+    parse_additive_expression();
 }
 
 
 static void
-hterm()
+accept_multiplicative_expression()
 {
-    unary();			/* - things */
-    iterms();			/* * / % */
+    parse_unary_expression();			/* - things */
+    parse_multiplicative_expression();			/* * / % */
 }
 
 
+/* add action table entries for primary expressions, i.e. either a
+ * parenthesized expression, a variable names, a numeric constant, a
+ * function evaluation, a power operator or postfix '!' (factorial)
+ * expression */
 static void
-factor()
+parse_primary_expression()
 {
     if (equals(c_token, "(")) {
 	c_token++;
-	express();
+	parse_expression();
 	if (!equals(c_token, ")"))
 	    int_error(c_token, "')' expected");
 	c_token++;
     } else if (equals(c_token, "$")) {
 	struct value a;
+
 	if (!isanumber(++c_token))
 	    int_error(c_token, "Column number expected");
 	convert(&a, c_token++);
@@ -367,42 +273,47 @@ factor()
 	add_action(DOLLARS)->v_arg = a;
     } else if (isanumber(c_token)) {
 	/* work around HP 9000S/300 HP-UX 9.10 cc limitation ... */
-#if defined(__hpux) && defined(__hp9000s300) && !defined(__GNUC__)
+	/* HBB 20010724: use this code for all platforms, then */
 	union argument *foo = add_action(PUSHC);
+
 	convert(&(foo->v_arg), c_token);
-#else
-	convert(&(add_action(PUSHC)->v_arg), c_token);
-#endif
 	c_token++;
     } else if (isletter(c_token)) {
+	/* Found an identifier --- check whether its a function or a
+	 * variable by looking for the parentheses of a function
+	 * argument list */
 	if ((c_token + 1 < num_tokens) && equals(c_token + 1, "(")) {
-	    enum operators value = standard(c_token);
-	    if (value) {	/* it's a standard function */
-		c_token += 2;
-		express();
-		if (equals(c_token, ",")) {
-		    while (equals(c_token, ",")) {
-			c_token += 1;
-			express();
-		    }
+	    enum operators whichfunc = is_builtin_function(c_token);
+
+	    if (whichfunc) {
+		/* it's a standard function */
+		c_token += 2;	/* skip fnc name and '(' */
+		parse_expression(); /* parse fnc argument */
+		while (equals(c_token, ",")) {
+		    c_token += 1;
+		    parse_expression();
 		}
+
 		if (!equals(c_token, ")"))
 		    int_error(c_token, "')' expected");
 		c_token++;
-		(void) add_action(value);
+		(void) add_action(whichfunc);
 	    } else {
+		/* it's a call to a user-defined function */
 		enum operators call_type = (int) CALL;
 		int tok = c_token;
-		c_token += 2;
-		express();
-		if (equals(c_token, ",")) {
+
+		c_token += 2;	/* skip func name and '(' */
+		parse_expression();
+		if (equals(c_token, ",")) { /* more than 1 argument? */
 		    struct value num_params;
+
 		    num_params.type = INTGR;
 		    num_params.v.int_val = 1;
 		    while (equals(c_token, ",")) {
 			num_params.v.int_val += 1;
 			c_token += 1;
-			express();
+			parse_expression();
 		    }
 		    add_action(PUSHC)->v_arg = num_params;
 		    call_type = (int) CALLN;
@@ -422,6 +333,7 @@ factor()
 		add_action(PUSHD2)->udf_arg = dummy_func;
 	    } else {
 		int i, param = 0;
+
 		for (i = 2; i < MAX_NUM_VAR; i++) {
 		    if (equals(c_token, c_dummy_var[i])) {
 			struct value num_params;
@@ -457,7 +369,7 @@ factor()
     /* add action code for ** operator */
     if (equals(c_token, "**")) {
 	c_token++;
-	unary();
+	parse_unary_expression();
 	(void) add_action(POWER);
     }
 }
@@ -468,7 +380,7 @@ factor()
  * express() calls!. Access via index savepc1/savepc2, instead. */
 
 static void
-xterms()
+parse_conditional_expression()
 {
     /* create action code for ? : expressions */
 
@@ -478,7 +390,7 @@ xterms()
 	c_token++;
 	savepc1 = at->a_count;
 	add_action(JTERN);
-	express();
+	parse_expression();
 	if (!equals(c_token, ":"))
 	    int_error(c_token, "expecting ':'");
 
@@ -486,14 +398,14 @@ xterms()
 	savepc2 = at->a_count;
 	add_action(JUMP);
 	at->actions[savepc1].arg.j_arg = at->a_count - savepc1;
-	express();
+	parse_expression();
 	at->actions[savepc2].arg.j_arg = at->a_count - savepc2;
     }
 }
 
 
 static void
-aterms()
+parse_logical_OR_expression()
 {
     /* create action codes for || operator */
 
@@ -503,7 +415,7 @@ aterms()
 	c_token++;
 	savepc = at->a_count;
 	add_action(JUMPNZ);	/* short-circuit if already TRUE */
-	aterm();
+	accept_logical_AND_expression();
 	/* offset for jump */
 	at->actions[savepc].arg.j_arg = at->a_count - savepc;
 	(void) add_action(BOOLE);
@@ -512,7 +424,7 @@ aterms()
 
 
 static void
-bterms()
+parse_logical_AND_expression()
 {
     /* create action code for && operator */
 
@@ -522,7 +434,7 @@ bterms()
 	c_token++;
 	savepc = at->a_count;
 	add_action(JUMPZ);	/* short-circuit if already FALSE */
-	bterm();
+	accept_inclusive_OR_expression();
 	at->actions[savepc].arg.j_arg = at->a_count - savepc; /* offset for jump */
 	(void) add_action(BOOLE);
     }
@@ -530,46 +442,46 @@ bterms()
 
 
 static void
-cterms()
+parse_inclusive_OR_expression()
 {
     /* create action code for | operator */
 
     while (equals(c_token, "|")) {
 	c_token++;
-	cterm();
+	accept_exclusive_OR_expression();
 	(void) add_action(BOR);
     }
 }
 
 
 static void
-dterms()
+parse_exclusive_OR_expression()
 {
     /* create action code for ^ operator */
 
     while (equals(c_token, "^")) {
 	c_token++;
-	dterm();
+	accept_AND_expression();
 	(void) add_action(XOR);
     }
 }
 
 
 static void
-eterms()
+parse_AND_expression()
 {
     /* create action code for & operator */
 
     while (equals(c_token, "&")) {
 	c_token++;
-	eterm();
+	accept_equality_expression();
 	(void) add_action(BAND);
     }
 }
 
 
 static void
-fterms()
+parse_equality_expression()
 {
     /* create action codes for == and !=
      * operators */
@@ -577,11 +489,11 @@ fterms()
     while (TRUE) {
 	if (equals(c_token, "==")) {
 	    c_token++;
-	    fterm();
+	    accept_relational_expression();
 	    (void) add_action(EQ);
 	} else if (equals(c_token, "!=")) {
 	    c_token++;
-	    fterm();
+	    accept_relational_expression();
 	    (void) add_action(NE);
 	} else
 	    break;
@@ -590,7 +502,7 @@ fterms()
 
 
 static void
-gterms()
+parse_relational_expression()
 {
     /* create action code for < > >= or <=
      * operators */
@@ -599,19 +511,19 @@ gterms()
 	/* I hate "else if" statements */
 	if (equals(c_token, ">")) {
 	    c_token++;
-	    gterm();
+	    accept_additive_expression();
 	    (void) add_action(GT);
 	} else if (equals(c_token, "<")) {
 	    c_token++;
-	    gterm();
+	    accept_additive_expression();
 	    (void) add_action(LT);
 	} else if (equals(c_token, ">=")) {
 	    c_token++;
-	    gterm();
+	    accept_additive_expression();
 	    (void) add_action(GE);
 	} else if (equals(c_token, "<=")) {
 	    c_token++;
-	    gterm();
+	    accept_additive_expression();
 	    (void) add_action(LE);
 	} else
 	    break;
@@ -622,18 +534,18 @@ gterms()
 
 
 static void
-hterms()
+parse_additive_expression()
 {
     /* create action codes for + and - operators */
 
     while (TRUE) {
 	if (equals(c_token, "+")) {
 	    c_token++;
-	    hterm();
+	    accept_multiplicative_expression();
 	    (void) add_action(PLUS);
 	} else if (equals(c_token, "-")) {
 	    c_token++;
-	    hterm();
+	    accept_multiplicative_expression();
 	    (void) add_action(MINUS);
 	} else
 	    break;
@@ -642,22 +554,22 @@ hterms()
 
 
 static void
-iterms()
+parse_multiplicative_expression()
 {
     /* add action code for * / and % operators */
 
     while (TRUE) {
 	if (equals(c_token, "*")) {
 	    c_token++;
-	    unary();
+	    parse_unary_expression();
 	    (void) add_action(MULT);
 	} else if (equals(c_token, "/")) {
 	    c_token++;
-	    unary();
+	    parse_unary_expression();
 	    (void) add_action(DIV);
 	} else if (equals(c_token, "%")) {
 	    c_token++;
-	    unary();
+	    parse_unary_expression();
 	    (void) add_action(MOD);
 	} else
 	    break;
@@ -666,25 +578,101 @@ iterms()
 
 
 static void
-unary()
+parse_unary_expression()
 {
     /* add code for unary operators */
 
     if (equals(c_token, "!")) {
 	c_token++;
-	unary();
+	parse_unary_expression();
 	(void) add_action(LNOT);
     } else if (equals(c_token, "~")) {
 	c_token++;
-	unary();
+	parse_unary_expression();
 	(void) add_action(BNOT);
     } else if (equals(c_token, "-")) {
 	c_token++;
-	unary();
+	parse_unary_expression();
 	(void) add_action(UMINUS);
     } else if (equals(c_token, "+")) {	/* unary + is no-op */
 	c_token++;
-	unary();
+	parse_unary_expression();
     } else
-	factor();
+	parse_primary_expression();
+}
+
+/* FIXME HBB 20010724: These functions (add_udv, add_udf, and
+ * is_builtin_function) belong into parse.c, really ! */
+/* find or add value and return pointer */
+struct udvt_entry *
+add_udv(t_num)		
+    int t_num;
+{
+    register struct udvt_entry **udv_ptr = &first_udv;
+
+    /* check if it's already in the table... */
+
+    while (*udv_ptr) {
+	if (equals(t_num, (*udv_ptr)->udv_name))
+	    return (*udv_ptr);
+	udv_ptr = &((*udv_ptr)->next_udv);
+    }
+
+    *udv_ptr = (struct udvt_entry *)
+	gp_alloc(sizeof(struct udvt_entry), "value");
+    (*udv_ptr)->next_udv = NULL;
+    (*udv_ptr)->udv_name = gp_alloc (token_len(t_num)+1, "user var");
+    copy_str((*udv_ptr)->udv_name, t_num, token_len(t_num)+1);
+    (*udv_ptr)->udv_value.type = INTGR;		/* not necessary, but safe! */
+    (*udv_ptr)->udv_undef = TRUE;
+    return (*udv_ptr);
+}
+
+
+struct udft_entry *
+add_udf(t_num)			/* find or add function and return pointer */
+    int t_num;			/* index to token[] */
+{
+    register struct udft_entry **udf_ptr = &first_udf;
+
+    int i;
+    while (*udf_ptr) {
+	if (equals(t_num, (*udf_ptr)->udf_name))
+	    return (*udf_ptr);
+	udf_ptr = &((*udf_ptr)->next_udf);
+    }
+
+    /* get here => not found. udf_ptr points at first_udf or
+     * next_udf field of last udf
+     */
+
+    if (is_builtin_function(t_num))
+	int_warn(t_num, "Warning : udf shadowed by built-in function of the same name");
+
+    /* create and return a new udf slot */
+
+    *udf_ptr = (struct udft_entry *)
+	gp_alloc(sizeof(struct udft_entry), "function");
+    (*udf_ptr)->next_udf = (struct udft_entry *) NULL;
+    (*udf_ptr)->definition = NULL;
+    (*udf_ptr)->at = NULL;
+    (*udf_ptr)->udf_name = gp_alloc (token_len(t_num)+1, "user func");
+    copy_str((*udf_ptr)->udf_name, t_num, token_len(t_num)+1);
+    for (i = 0; i < MAX_NUM_VAR; i++)
+	(void) Ginteger(&((*udf_ptr)->dummy_values[i]), 0);
+    return (*udf_ptr);
+}
+
+
+static int
+is_builtin_function(t_num)		/* return standard function index or 0 */
+    int t_num;
+{
+    register int i;
+
+    for (i = (int) SF_START; ft[i].f_name != NULL; i++) {
+	if (equals(t_num, ft[i].f_name))
+	    return (i);
+    }
+    return (0);
 }

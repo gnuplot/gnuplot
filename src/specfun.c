@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: specfun.c,v 1.10 2000/11/07 16:02:39 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: specfun.c,v 1.11 2000/11/23 18:23:01 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - specfun.c */
@@ -43,10 +43,7 @@ static char *RCSid() { return RCSid("$Id: specfun.c,v 1.10 2000/11/07 16:02:39 b
  */
 
 #include "specfun.h"
-
-#include "internal.h"
-/*  #include "setshow.h" */
-#include "util.h"
+#include "stdfn.h"
 
 #define ITMAX   200
 
@@ -229,11 +226,13 @@ double z;
 #endif /* !GAMMA */
 
 void
-f_erf()
+f_erf(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 
 #ifdef HAVE_ERF
@@ -256,11 +255,13 @@ f_erf()
 }
 
 void
-f_erfc()
+f_erfc(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 #ifdef HAVE_ERFC
     x = erfc(x);
@@ -281,13 +282,15 @@ f_erfc()
 }
 
 void
-f_ibeta()
+f_ibeta(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
     double arg1;
     double arg2;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
     arg2 = real(pop(&a));
     arg1 = real(pop(&a));
@@ -301,12 +304,14 @@ f_ibeta()
 }
 
 void
-f_igamma()
+f_igamma(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
     double arg1;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
     arg1 = real(pop(&a));
 
@@ -319,11 +324,13 @@ f_igamma()
 }
 
 void
-f_gamma()
+f_gamma(arg)
+    union argument *arg;
 {
     register double y;
     struct value a;
 
+    (void) arg;			/* avoid -Wunused warning */
     y = GAMMA(real(pop(&a)));
     if (y > 88.0) {
 	undefined = TRUE;
@@ -333,20 +340,24 @@ f_gamma()
 }
 
 void
-f_lgamma()
+f_lgamma(arg)
+    union argument *arg;
 {
     struct value a;
 
+    (void) arg;			/* avoid -Wunused warning */
     push(Gcomplex(&a, GAMMA(real(pop(&a))), 0.0));
 }
 
 #ifndef BADRAND
 
 void
-f_rand()
+f_rand(arg)
+    union argument *arg;
 {
     struct value a;
 
+    (void) arg;			/* avoid -Wunused warning */
     push(Gcomplex(&a, ranf(real(pop(&a))), 0.0));
 }
 
@@ -354,13 +365,14 @@ f_rand()
 
 /* Use only to observe the effect of a "bad" random number generator. */
 void
-f_rand()
+f_rand(arg)
+    union argument *arg;
 {
     struct value a;
-
     static unsigned int y = 0;
     unsigned int maxran = 1000;
 
+    (void) arg;			/* avoid -Wunused warning */
     (void) real(pop(&a));
     y = (781 * y + 387) % maxran;
 
@@ -651,7 +663,8 @@ double init;
    ---------------------------------------------------------------- */
 
 void
-f_normal()
+f_normal(arg)
+    union argument *arg;
 {				/* Normal or Gaussian Probability Function */
     struct value a;
     double x;
@@ -661,6 +674,7 @@ f_normal()
        Chapter 26, page 934, Eqn. 26.2.29 and Jos van der Woude 
        code found above */
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 
     x = 0.5 * SQRT_TWO * x;
@@ -685,11 +699,13 @@ f_normal()
 }
 
 void
-f_inverse_normal()
+f_inverse_normal(arg)
+    union argument *arg;
 {				/* Inverse normal distribution function */
     struct value a;
     double x;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 
     if (x <= 0.0 || x >= 1.0) {
@@ -702,11 +718,13 @@ f_inverse_normal()
 
 
 void
-f_inverse_erf()
+f_inverse_erf(arg)
+    union argument *arg;
 {				/* Inverse error function */
     struct value a;
     double x;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 
     if (fabs(x) >= 1.0) {
@@ -930,12 +948,14 @@ double x;
     return -1;			/* error: iteration didn't converge */
 }
 
-void 
-f_lambertw()
+void
+f_lambertw(arg)
+    union argument *arg;
 {
     struct value a;
     double x;
 
+    (void) arg;			/* avoid -Wunused warning */
     x = real(pop(&a));
 
     x = lambertw(x);

@@ -1,5 +1,5 @@
 /*
- * $Id: vgagl.trm,v 1.1.2.4 2000/10/23 04:35:28 joze Exp $
+ * $Id: vgagl.trm,v 1.2 2000/10/31 19:59:32 joze Exp $
  */
 
 #if defined(USE_MOUSE) && defined(PM3D)
@@ -1538,12 +1538,16 @@ TERM_TABLE_START(vgagl_driver)
     0,				/* pointsize */
     TERM_CAN_MULTIPLOT, VGAGL_suspend, VGAGL_resume
     , 0, 0 /* fillbox, linewidth */
+# ifdef USE_MOUSE
     , 0 /* VGAGL_waitforinput */, VGAGL_put_tmptext, VGAGL_set_ruler,
     VGAGL_set_cursor, VGAGL_set_clipboard
+# endif
+# ifdef PM3D
     , VGAGL_make_palette,
     0 /* VGAGL_previous_palette */,
     VGAGL_set_color,
     VGAGL_filled_polygon
+# endif /* PM3D */
 TERM_TABLE_END(vgagl_driver)
 #undef LAST_TERM
 #define LAST_TERM vgagl_driver

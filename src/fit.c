@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: fit.c,v 1.26 2001/02/07 18:14:36 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: fit.c,v 1.27 2001/06/11 16:47:59 broeker Exp $"); }
 #endif
 
 /*  NOTICE: Change of Copyright Status
@@ -67,12 +67,9 @@ static char *RCSid() { return RCSid("$Id: fit.c,v 1.26 2001/02/07 18:14:36 broek
 #include "command.h"
 #include "datafile.h"
 #include "eval.h"
-#include "internal.h"
 #include "matrix.h"
 #include "plot.h"
 #include "misc.h"
-#include "parse.h"
-/*  #include "setshow.h" */
 #include "util.h"
 
 /* Just temporary */
@@ -224,11 +221,12 @@ FILE *fp;
 
 static RETSIGTYPE
 ctrlc_handle(an_int)
-int an_int;
+    int an_int;
 {
 #ifdef OS2
     (void) signal(an_int, SIG_ACK);
 #else
+    (void) an_int;		/* avoid -Wunused warning */
     /* reinstall signal handler (necessary on SysV) */
     (void) signal(SIGINT, (sigfunc) ctrlc_handle);
 #endif

@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: contour.c,v 1.17 2000/12/20 19:29:23 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: contour.c,v 1.18 2001/01/22 18:30:21 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - contour.c */
@@ -157,19 +157,18 @@ static struct poly_struct *add_poly __PROTO((struct edge_struct * edge0,
 					     struct poly_struct ** p_poly, struct poly_struct ** pp_tail));
 
 
-static void put_contour __PROTO((struct cntr_struct * p_cntr, double z_level,
-				 double xx_min, double xx_max, double yy_min, double yy_max,
+static void put_contour __PROTO((struct cntr_struct * p_cntr,
+				 double xx_min, double xx_max,
+				 double yy_min, double yy_max,
 				 TBOOLEAN contr_isclosed));
 static void put_contour_nothing __PROTO((struct cntr_struct * p_cntr));
 static int chk_contour_kind __PROTO((struct cntr_struct * p_cntr,
 				     TBOOLEAN contr_isclosed));
 static void put_contour_cubic __PROTO((struct cntr_struct * p_cntr,
-				       double z_level, double xx_min, double xx_max, double
-				       yy_min, double yy_max,
+				       double xx_min, double xx_max,
+				       double yy_min, double yy_max,
 				       TBOOLEAN contr_isclosed));
 static void put_contour_bspline __PROTO((struct cntr_struct * p_cntr,
-					 double z_level, double xx_min, double xx_max, double
-					 yy_min, double yy_max,
 					 TBOOLEAN contr_isclosed));
 static void free_contour __PROTO((struct cntr_struct * p_cntr));
 static int count_contour __PROTO((struct cntr_struct * p_cntr));
@@ -321,8 +320,8 @@ end_crnt_cntr()
  */
 static void
 gen_contours(p_edges, z_level, xx_min, xx_max, yy_min, yy_max)
-struct edge_struct *p_edges;
-double z_level, xx_min, xx_max, yy_min, yy_max;
+    struct edge_struct *p_edges;
+    double z_level, xx_min, xx_max, yy_min, yy_max;
 {
     int num_active;		/* Number of edges marked ACTIVE. */
     TBOOLEAN contr_isclosed;	/* Is this contour a closed line? */
@@ -333,10 +332,10 @@ double z_level, xx_min, xx_max, yy_min, yy_max;
     contr_isclosed = FALSE;	/* Start to look for contour on boundaries. */
 
     while (num_active > 0) {	/* Do Pass 2. */
-	/* Generate One contour (and update MumActive as needed): */
+	/* Generate One contour (and update NumActive as needed): */
 	p_cntr = gen_one_contour(p_edges, z_level, &contr_isclosed, &num_active);
 	/* Emit it in requested format: */
-	put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed);
+	put_contour(p_cntr, xx_min, xx_max, yy_min, yy_max, contr_isclosed);
     }
 }
 
@@ -748,18 +747,18 @@ calc_min_max(num_isolines, iso_lines, xx_min, yy_min, zz_min, xx_max, yy_max, zz
  */
 static struct edge_struct *
 add_edge(point0, point1, p_edge, pe_tail)
-struct coordinate GPHUGE *point0;	/* 2 vertices input */
-struct coordinate GPHUGE *point1;
-struct edge_struct **p_edge, **pe_tail;		/* pointers to edge list in/out */
+    struct coordinate GPHUGE *point0;	/* 2 vertices input */
+    struct coordinate GPHUGE *point1;
+    struct edge_struct **p_edge, **pe_tail; /* pointers to edge list in/out */
 {
     struct edge_struct *pe_temp = NULL;
 
 #if 1
-    if (point0->type == INRANGE && point1->type == INRANGE) {
+    if (point0->type == INRANGE && point1->type == INRANGE)
 #else
-    if (point0->type != UNDEFINED && point1->type != UNDEFINED) {
+    if (point0->type != UNDEFINED && point1->type != UNDEFINED)
 #endif
-
+    {
 	pe_temp = (struct edge_struct *)
 	    gp_alloc(sizeof(struct edge_struct), "contour edge");
 
@@ -836,9 +835,8 @@ add_poly(edge0, edge1, edge2, p_poly, pp_tail)
  * Calls the (hopefully) desired interpolation/approximation routine.
  */
 static void
-put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
+put_contour(p_cntr, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
     struct cntr_struct *p_cntr;	/* contour structure input */
-    double z_level;		/* Z level of contour input */
     double xx_min, xx_max, yy_min, yy_max; /* minimum/maximum values input */
     TBOOLEAN contr_isclosed;		/* contour line closed? (input) */
 {
@@ -851,12 +849,12 @@ put_contour(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
 	put_contour_nothing(p_cntr);
 	break;
     case CONTOUR_KIND_CUBIC_SPL: /* Cubic spline interpolation. */
-	put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
+	put_contour_cubic(p_cntr, xx_min, xx_max, yy_min, yy_max,
 			  chk_contour_kind(p_cntr, contr_isclosed));
 
 	break;
     case CONTOUR_KIND_BSPLINE:	/* Bspline approximation. */
-	put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max,
+	put_contour_bspline(p_cntr,
 			    chk_contour_kind(p_cntr, contr_isclosed));
 	break;
     }
@@ -917,9 +915,9 @@ chk_contour_kind(p_cntr, contr_isclosed)
  * parameter t is the length of the linear stroke.
  */
 static void
-put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
+put_contour_cubic(p_cntr, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
     struct cntr_struct *p_cntr;
-    double z_level, xx_min, xx_max, yy_min, yy_max;
+    double xx_min, xx_max, yy_min, yy_max;
     TBOOLEAN contr_isclosed;
 {
     int num_pts, num_intpol;
@@ -946,8 +944,8 @@ put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclose
     d2y = (double *) gp_alloc(num_pts * sizeof(double), "contour d2y");
 
     /* Width and height of the grid is used as a unit length (2d-norm) */
-    unit_x = xx_max - x_min;
-    unit_y = yy_max - y_min;
+    unit_x = xx_max - xx_min;
+    unit_y = yy_max - yy_min;
     /* FIXME HBB 20010121: 'zero' should not be used as an absolute
      * figure to compare to data */
     unit_x = (unit_x > zero ? unit_x : zero);	/* should not be zero */
@@ -1006,10 +1004,9 @@ put_contour_cubic(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclose
  * global variable contour_order for the order of Bspline to use.
  */
 static void
-put_contour_bspline(p_cntr, z_level, xx_min, xx_max, yy_min, yy_max, contr_isclosed)
-struct cntr_struct *p_cntr;
-double z_level, xx_min, xx_max, yy_min, yy_max;
-TBOOLEAN contr_isclosed;
+put_contour_bspline(p_cntr, contr_isclosed)
+    struct cntr_struct *p_cntr;
+    TBOOLEAN contr_isclosed;
 {
     int num_pts;
     int order = contour_order - 1;
