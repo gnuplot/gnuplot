@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: interpol.c,v 1.21 2001/07/20 14:04:06 broeker Exp $"); }
+static char *RCSid() { return RCSid("$Id: interpol.c,v 1.22 2001/07/23 16:10:43 broeker Exp $"); }
 #endif
 
 /* GNUPLOT - interpol.c */
@@ -316,16 +316,15 @@ cp_binomial(points)
 
 static void
 eval_bezier(cp, first_point, num_points, sr, px, py, c)
-struct curve_points *cp;
-int first_point;		/* where to start in plot->points (to find x-range) */
-int num_points;			/* to determine end in plot->points */
-double sr;
-coordval *px;
-coordval *py;
-double *c;
+    struct curve_points *cp;
+    int first_point;		/* where to start in plot->points (to find x-range) */
+    int num_points;		/* to determine end in plot->points */
+    double sr;			/* position inside curve, range [0:1] */
+    coordval *px;		/* OUTPUT: x and y */
+    coordval *py;
+    double *c;			/* Bezier coefficient array */
 {
     unsigned int n = num_points - 1;
-    /* HBB 980308: added 'GPHUGE' tag for DOS */
     struct coordinate GPHUGE *this_points;
 
     this_points = (cp->points) + first_point;
@@ -365,16 +364,14 @@ double *c;
 
 static void
 do_bezier(cp, bc, first_point, num_points, dest)
-struct curve_points *cp;
-double *bc;
-int first_point;		/* where to start in plot->points */
-int num_points;			/* to determine end in plot->points */
-struct coordinate *dest;	/* where to put the interpolated data */
+    struct curve_points *cp;
+    double *bc;			/* Bezier coefficient array */
+    int first_point;		/* where to start in plot->points */
+    int num_points;		/* to determine end in plot->points */
+    struct coordinate *dest;	/* where to put the interpolated data */
 {
     int i;
     coordval x, y;
-    /*  int xaxis = cp->x_axis; */
-    /*  int yaxis = cp->y_axis; */
 
     /* min and max in internal (eg logged) co-ordinates. We update
      * these, then update the external extrema in user co-ordinates
@@ -393,7 +390,9 @@ struct coordinate *dest;	/* where to put the interpolated data */
     iymax = symax = AXIS_LOG_VALUE(y_axis, Y_AXIS.max);
 
     for (i = 0; i < samples_1; i++) {
-	eval_bezier(cp, first_point, num_points, (double) i / (double) (samples_1 - 1), &x, &y, bc);
+	eval_bezier(cp, first_point, num_points,
+		    (double) i / (double) (samples_1 - 1),
+		    &x, &y, bc);
 
 	/* now we have to store the points and adjust the ranges */
 
@@ -524,13 +523,13 @@ cp_approx_spline(plot, first_point, num_points)
 				   "spline matrix");
 
     if (num_points < 4)
-	int_error(NO_CARET, "Can't calculate approximation splines, need at least 4 points");
+	int_error(plot->token, "Can't calculate approximation splines, need at least 4 points");
 
     this_points = (plot->points) + first_point;
 
     for (i = 0; i < num_points; i++)
 	if (this_points[i].z <= 0)
-	    int_error(NO_CARET, "Can't calculate approximation splines, all weights have to be > 0");
+	    int_error(plot->token, "Can't calculate approximation splines, all weights have to be > 0");
 
     m = gp_alloc((num_points - 2) * sizeof(five_diag), "spline help matrix");
 
@@ -593,7 +592,7 @@ cp_approx_spline(plot, first_point, num_points)
 	free(m);
 	free(xp);
 	free(yp);
-	int_error(NO_CARET, "Can't calculate approximation splines");
+	int_error(plot->token, "Can't calculate approximation splines");
     }
     sc[0][2] = 0;
     for (i = 1; i <= num_points - 2; i++)
@@ -649,7 +648,7 @@ cp_tridiag(plot, first_point, num_points)
     x_axis = plot->x_axis;
     y_axis = plot->y_axis;
     if (num_points < 3)
-	int_error(NO_CARET, "Can't calculate splines, need at least 3 points");
+	int_error(plot->token, "Can't calculate splines, need at least 3 points");
 
     this_points = (plot->points) + first_point;
 
@@ -700,7 +699,7 @@ cp_tridiag(plot, first_point, num_points)
 	free(m);
 	free(xp);
 	free(yp);
-	int_error(NO_CARET, "Can't calculate cubic splines");
+	int_error(plot->token, "Can't calculate cubic splines");
     }
     sc[0][2] = 0;
     for (i = 1; i <= num_points - 2; i++)
@@ -735,6 +734,7 @@ do_cubic(plot, sc, first_point, num_points, dest)
     struct coordinate *dest;	/* where to put the interpolated data */
 {
     double xdiff, temp, x, y;
+    double xstart, xend;	/* Endpoints of the sampled x range */
     int i, l;
     struct coordinate GPHUGE *this_points;
 
@@ -742,7 +742,6 @@ do_cubic(plot, sc, first_point, num_points, dest)
      * these, then update the external extrema in user co-ordinates
      * at the end.
      */
-
     double ixmin, ixmax, iymin, iymax;
     double sxmin, sxmax, symin, symax;	/* starting values of above */
 
@@ -758,11 +757,25 @@ do_cubic(plot, sc, first_point, num_points, dest)
 
     l = 0;
 
-    xdiff = (this_points[num_points - 1].x - this_points[0].x) / (samples_1 - 1);
+    /* HBB 20010727: Sample only across the actual x range, not the
+     * full range of input data */
+#if SAMPLE_CSPLINES_TO_FULL_RANGE
+    xstart = this_points[0].x;
+    xend = this_points[num_points - 1].x;
+#else
+    xstart = GPMAX(this_points[0].x, sxmin);
+    xend = GPMIN(this_points[num_points - 1].x, sxmax);
+
+    if (xstart >= xend)
+	int_error(plot->token,
+		  "Cannot smooth: no data within fixed xrange!");
+#endif
+    xdiff = (xend - xstart) / (samples_1 - 1);
 
     for (i = 0; i < samples_1; i++) {
-	x = this_points[0].x + i * xdiff;
+	x = xstart + i * xdiff;
 
+	/* Move forward to the spline interval this point is in */
 	while ((x >= this_points[l + 1].x) && (l < num_points - 2))
 	    l++;
 
@@ -772,6 +785,7 @@ do_cubic(plot, sc, first_point, num_points, dest)
 	temp = AXIS_DE_LOG_VALUE(x_axis, x)
 	    - AXIS_DE_LOG_VALUE(x_axis, this_points[l].x);
 
+	/* Evaluate cubic spline polynomial */
 	y = ((sc[l][3] * temp + sc[l][2]) * temp + sc[l][1]) * temp + sc[l][0];
 
 	/* With logarithmic y axis, we need to convert from linear to
@@ -782,6 +796,7 @@ do_cubic(plot, sc, first_point, num_points, dest)
 	    else
 		y = symin - (symax - symin);
 	}
+
 	dest[i].type = INRANGE;
 	STORE_AND_FIXUP_RANGE(dest[i].x, x, dest[i].type, ixmin, ixmax, X_AXIS.autoscale, NOOP, continue);
 	STORE_AND_FIXUP_RANGE(dest[i].y, y, dest[i].type, iymin, iymax, Y_AXIS.autoscale, NOOP, NOOP);
