@@ -1,5 +1,5 @@
 #ifndef lint
-static char *RCSid() { return RCSid("$Id: plot.c,v 1.22 1999/09/24 15:37:04 lhecking Exp $"); }
+static char *RCSid() { return RCSid("$Id: plot.c,v 1.23 1999/10/01 14:54:34 lhecking Exp $"); }
 #endif
 
 /* GNUPLOT - plot.c */
@@ -82,7 +82,7 @@ extern int rl_complete_with_tilde_expansion;
 # ifdef GNUPLOT_HISTORY
 #  include <readline/tilde.h>
 #  ifndef GNUPLOT_HISTORY_FILE
-#   define GNUPLOT_HISTORY_FILE "~/.gnuplot.history"
+#   define GNUPLOT_HISTORY_FILE "~/.gnuplot_history"
 #  endif
 #  ifndef HISTORY_SIZE
 /* Some more or less arbitrary value :) */
@@ -822,7 +822,7 @@ wrapper_for_write_history()
 	unstifle_history();
     stifle_history (gnuplot_history_size);
 
-    if (!write_history (expanded_history_filename))
+    if (!write_history(expanded_history_filename))
 	fprintf (stderr, "Warning:  Could not write history file !!!\n");
 
     unstifle_history();
