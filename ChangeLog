@@ -1,3 +1,9 @@
+1999-11-04  Lars Hecking  <lhecking@nmrc.ucc.ie>
+
+	* src/gpltconv.c: Add `set nolinestyle'.
+
+	* term/post.h: Comment after #endif statement.
+
 1999-11-03  Lars Hecking  <lhecking@nmrc.ucc.ie>
 
 	* docs/Makefile.in: Remove all doc2info and doc2html related targets.
