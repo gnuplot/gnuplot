@@ -27,12 +27,12 @@ BGI = $(TC)\bgi
 # -w- means ignore warnings and do not report them
 # -DREADLINE to use the history/line editing capability. If you want this 
 #    capability add -DREADLINE to CFLAGS
-CFLAGS = -Ff=256 -c -f -ml -w- -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP -DHAVE_STRERROR
+CFLAGS = -Ff=256 -c -f -ml -w- -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
 TERMFLAGS =
 
 OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
-OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj term.obj util.obj
+OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj util.obj
 OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj
 BGIFILES = cga.bgi egavga.bgi herc.bgi att.bgi
 
@@ -55,7 +55,7 @@ gnuplot.exe: $(OBJS)
 	$(BIN)tlink @&&!
 $(LITE)\bc3\lib\c0pl +
 bitmap command eval graphics graph3d help internal misc parse +
-plot scanner setshow specfun standard term util version contour +
+plot scanner setshow specfun standard stdfn term util version contour +
 binary interpol datafile alloc +
 readline +
 $(LITE)\bc3\lib\emu286.lib +
@@ -116,6 +116,8 @@ specfun.obj: specfun.c
 interpol.obj: interpol.c plot.h setshow.h
 
 standard.obj: standard.c plot.h
+
+stdfn.obj: stdfn.c stdfn.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h setshow.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)

@@ -20,7 +20,7 @@ HELPFILE = gnuplot.gih
 # /FPi87    use inline 80x87 code (requires 486 or x87 Copro)
 # CFLAGS = /c /AL /DPC #/DMSDOS #/Zi #/Od
 # CFLAGS = /c /AL /G2 /Gt16 /Zi /Od /DPC /DREADLINE
-CFLAGS = /c /AL /EM /G2 /Gt16 /Gs /Og /FPi87 /DPC /DREADLINE /DLITE /D__MSC__ /DHAVE_STRNICMP /DHAVE_STRERROR /nologo
+CFLAGS = /c /AL /EM /G2 /Gt16 /Gs /Og /FPi87 /DPC /DREADLINE /DLITE /D__MSC__ /DHAVE_STRNICMP /nologo
 # CFLAGS = /c /AL /Gt16 /Gs /Og /DPC /DREADLINE
 # CFLAGS = /c /AL /EM /DPC /DREADLINE /DLITE /Gt /D__MSC__ #/Zi #/Od
 
@@ -33,10 +33,11 @@ TERMFLAGS =
 LINKFLAGS = /NOE /EX /ST:30000 /ONERROR:NOEXE #/codeview
 
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
-	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj \
-	scanner.obj set.obj show.obj standard.obj term.obj util.obj version.obj \
-	pcgraph.obj hrcgraph.obj corgraph.obj specfun.obj \
-	binary.obj interpol.obj fit.obj matrix.obj datafile.obj alloc.obj
+	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj \
+	plot3d.obj readline.obj scanner.obj set.obj show.obj standard.obj \
+	stdfn.obj term.obj util.obj version.obj pcgraph.obj hrcgraph.obj \
+	corgraph.obj specfun.obj binary.obj interpol.obj fit.obj matrix.obj \
+	datafile.obj alloc.obj
 
 CSOURCE5 = term\aed.trm term\cgi.trm term/dumb.trm term/dxf.trm term\dxy.trm \
 	term\eepic.trm term\epson.trm term\fig.trm term\hp26.trm \
@@ -65,7 +66,7 @@ linkopt.msc: makefile.msc
       echo pcgraph+term+graphics+bitmap+ >>linkopt.msc
       echo (set)+(show)+(help)+(specfun)+(binary)+ >>linkopt.msc
       echo plot+plot2d+plot3d+command+internal+interpol+misc+readline+ >>linkopt.msc
-      echo parse+eval+scanner+standard+util+ >>linkopt.msc
+      echo parse+eval+scanner+standard+stdfn+util+ >>linkopt.msc
       echo (version)+(fit+matrix)+datafile+alloc >>linkopt.msc
       echo gnuplot >>linkopt.msc
       echo nul; >>linkopt.msc
@@ -116,6 +117,8 @@ set.obj: set.c plot.h setshow.h
 show.obj: show.c plot.h setshow.h
 
 standard.obj: standard.c plot.h
+
+stdfn.obj: stdfn.c stdfn.h
 
 specfun.obj: specfun.c plot.h
 

@@ -733,7 +733,7 @@ DIRS = term demo docs docs/latextut
 
 CSOURCE1 = bf_test.c binary.c command.c setshow.c
 CSOURCE2 = help.c graphics.c graph3d.c internal.c
-CSOURCE3 = misc.c eval.c parse.c plot.c readline.c scanner.c standard.c
+CSOURCE3 = misc.c eval.c parse.c plot.c readline.c scanner.c standard.c stdfn.c
 CSOURCE4 = bitmap.c term.c util.c version.c
 CSOURCE5 = term/ai.trm term/amiga.trm term/aed.trm \
 	term/cgi.trm term/corel.trm \

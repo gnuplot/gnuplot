@@ -21,7 +21,7 @@ TOP = .
 
 CC = cl /c
 LD = link
-CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DHAVE_STRERROR /DNOGAMMA /DREADLINE /DHELPFILE=$(HELPFILE) /DGP_INLINE=__inline /DANSI_C -DHAVE_GETCWD
+CFLAGS = /O2 /I$(TOP) /nologo /D_Windows /D__MSC__ /DWIN32 /DNO_GIH /DHAVE_STRNICMP /DREADLINE /DHELPFILE=$(HELPFILE) /DGP_INLINE=__inline /DANSI_C -DHAVE_GETCWD
 LDFLAGS = /subsystem:windows /nologo /MACHINE:I386 /MAP:GNUPLOT
 
 # see other terminal defines in term.h

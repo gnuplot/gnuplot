@@ -39,7 +39,7 @@ MATHLIB= -lpml
 OPTFLAGS = -O2 -fomit-frame-pointer
 
 TTFLAGS  = -m68020 -m68881
-COMMON   = -DMTOS -DREADLINE -DPIPES -DHAVE_STRERROR -DNOGAMMA -DHAVE_STRNICMP -DNO_FLOAT_H -I. -I..
+COMMON   = -DMTOS -DREADLINE -DPIPES -DHAVE_STRNICMP -DNO_FLOAT_H -I. -I..
 
 # note that current versions of gcc for Atari may very well have float.h
 # if anyone can verify this, please fix it.
@@ -72,13 +72,13 @@ TEXFILE=docs/gnuplot.tex
 OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
             hidden3d.o util3d.o help.o internal.o misc.o parse.o \
             plot.o readline.o scanner.o set.o show.o specfun.o \
-            standard.o term.o util.o version.o binary.o fit.o \
+            standard.o stdfn.o term.o util.o version.o binary.o fit.o \
             matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o
 
 OBJS30 = bitmap.o0 command.o0 contour.o0 eval.o0 graphics.o0 graph3d.o0 \
             hidden3d.o0 util3d.o0 help.o0 internal.o0 misc.o0 parse.o0 \
             plot.o0 readline.o0 scanner.o0 set.o0 show.o0 specfun.o0 \
-            standard.o0 term.o0 util.o0 version.o0 binary.o0 fit.o0 \
+            standard.o0 stdfn.o0 term.o0 util.o0 version.o0 binary.o0 fit.o0 \
             matrix.o0 alloc.o0 datafile.o0 plot2d.o0 plot3d.o0 interpol.o0
 	
 # path prefix for the term subdirectory
@@ -148,6 +148,7 @@ show.o:      set.c plot.h setshow.h
 set.o:       show.c plot.h setshow.h
 specfun.o:   plot.h specfun.c
 standard.o:  standard.c plot.h
+stdfn.o:     stdfn.c stdfn.h
 term.o:      term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS) $(TERMFLAGS) -Iterm term.c
 util.o:      util.c plot.h
@@ -183,6 +184,7 @@ show.o0:     set.c plot.h setshow.h
 set.o0:      show.c plot.h setshow.h
 specfun.o0:  plot.h specfun.c
 standard.o0: standard.c plot.h
+stdfn.o):    stdfn.c stdfn.h
 term.o0:     term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS30) $(TERMFLAGS) -Iterm term.c
 util.o0:     util.c plot.h

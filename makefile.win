@@ -6,9 +6,9 @@
 # where to place wgnuplot.hlp helpfile
 HELPFILE = wgnuplot.hlp
 # location of Borland C compiler
-TC = d:\bc4
+TC = c:\bc
 # WIN32=1 for Win32s
-WIN32=1
+WIN32=0
 
 !if $(WIN32)
 # name of C compiler
@@ -34,14 +34,16 @@ BIN = $(TC)\bin\\
 #    capability add -DREADLINE to CFLAGS then add 'readline' to the /o
 #    section of the linker call.
 !if $(WIN32)
-CFLAGS = -c -W -M -y -v -w-rvl -w-pro -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DWIN32 -DHAVE_STRERROR -DNO_GIH -DNOGAMMA -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -M -y -v -w-rvl -w-pro -I$(TC)\include -Iwin -DREADLINE -DHAVE_STRNICMP -DWIN32 -DNO_GIH -DWIN32_LEAN_AND_MEAN -DANSI_C -DHAVE_GETCWD
 !else
-CFLAGS = -c -W -ml -M -y -v -w-rvl -w-pro -Ff=128 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS -DHAVE_STRERROR -DNO_GIH -DANSI_C -DHAVE_GETCWD
+CFLAGS = -c -W -ml -w-par -w-use -w-aus -f -h -N -M -y -v -d -Ff=32 -I$(TC)\include -Iwin -DREADLINE -zEGPFAR_DATA -DHAVE_STRNICMP -DMSDOS -DNO_GIH -DANSI_C -DHAVE_GETCWD -DNDEBUG
+CAUXFLAGS = -ml -w-par -w-use -w-aus -f -N -M -y -v -d -I$(TC)\include -DMSDOS -DHAVE_STRNICMP -DANSI_C
 !endif
 
 OBJS = 	bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj \
-	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj scanner.obj \
-	set.obj show.obj specfun.obj standard.obj term.obj util.obj version.obj \
+	internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj \
+	readline.obj scanner.obj set.obj show.obj specfun.obj standard.obj \
+	stdfn.obj term.obj util.obj version.obj \
 	binary.obj winmain.obj interpol.obj fit.obj matrix.obj \
 	datafile.obj alloc.obj util3d.obj hidden3d.obj time.obj
 DLLOBJS = wgnuplib.obj wtext.obj wmenu.obj wpause.obj wgraph.obj wprinter.obj 
@@ -70,10 +72,10 @@ all: wgnuplot.exe wgnuplot.dll $(HELPFILE) wgnuplot.mnu demo\bf_test.exe
 
 wgnuplot.exe: $(OBJS) win\wgnuplot.def win\wgnuplot.rc winmain.obj wgnuplot.lib
 #	$(BIN)tlink /Twe /c @&&!
-	$(BIN)tlink /Twe /c /m /s /v /l @&&!
+	$(BIN)tlink /Twe /c /s /v /l @&&!
 $(TC)\lib\C0Wl +
 bitmap command eval graphics graph3d internal misc parse +
-plot plot2d plot3d scanner set show specfun standard term util version contour +
+plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 binary interpol +
 winmain +
 readline +
@@ -95,7 +97,7 @@ wgnupl32.exe: $(OBJS) $(DLLOBJS) win\wgnupl32.def wgnupl32.res winmain.obj
 	$(BIN)tlink32 /Tpe /c /m /s /v @&&!
 $(TC)\lib\C0W32 +
 bitmap command eval graphics graph3d internal misc parse +
-plot plot2d plot3d scanner set show specfun standard term util version contour +
+plot plot2d plot3d scanner set show specfun standard stdfn term util version contour +
 wgnuplib wtext wmenu wpause wgraph wprinter +
 binary interpol +
 winmain +
@@ -171,6 +173,8 @@ specfun.obj: specfun.c
 
 standard.obj: standard.c plot.h
 
+stdfn.obj: stdfn.c stdfn.h
+
 interpol.obj: interpol.c plot.h setshow.h
 
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7) win\wgnuplib.h
@@ -197,7 +201,7 @@ wgnuplot.mnu: win\wgnuplot.mnu
 !if $(WIN32)
 DLLCC = $(BIN)bcc32 -DWIN32 -c -M -y -v -WE -I$(TC)\include -Iwin
 !else
-DLLCC = $(BIN)bcc -c -ms! -M -y -v -WD -I$(TC)\include -Iwin
+DLLCC = $(BIN)bcc -c -WD -ms! -w-par -f -M -y -v -w -N -I$(TC)\include -Iwin
 !endif
 
 wgnuplot.lib: wgnuplot.dll
@@ -233,25 +237,39 @@ wgraph.obj: win/wgraph.c win/wgnuplib.h win/wcommon.h win/wresourc.h
 	$(DLLCC) win/wgraph.c
 	
 # convert gnuplot.doc to gnuplot.gih
-$(HELPFILE): doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
-	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+$(HELPFILE): win\gnuplot.rtf
 	$(BIN)hc win\wgnuplot.hpj 
 
+win\gnuplot.rtf: doc2rtf.exe docs\gnuplot.doc win\wgnuplot.hpj
+	doc2rtf docs\gnuplot.doc win\gnuplot.rtf
+
 doc2rtf.exe: docs\doc2rtf.c
- 	$(BIN)$(CCAUX) -v -D_Windows -ml -w-pro -I$(TC)\include -L$(TC)\lib -I. -Iterm -Idocs docs\doc2rtf.c
+	$(BIN)$(CCAUX) @&&!
+-D_Windows
+-w-pro
+$(CAUXFLAGS)
+-I. -Iterm -Idocs
+! docs\doc2rtf.c
 
 # make binary demo files
 demo\bf_test.exe: bf_test.c dbinary.obj dalloc.obj
-	$(BIN)$(CCAUX) -DHAVE_STRNICMP -DANSI_C -edemo\bf_test.exe -w-pro -ml -I$(TC)\include -L$(TC)\lib bf_test.c dbinary.obj dalloc.obj
+	$(BIN)$(CCAUX) -edemo\bf_test.exe @&&!
+$(CAUXFLAGS)
+-L$(TC)\lib
+! bf_test.c dbinary.obj dalloc.obj
 	cd demo
 	bf_test
 	cd ..
 
 dalloc.obj: alloc.c
-	$(BIN)$(CCAUX) -DHAVE_STRNICMP -DANSI_C -c -w-pro -ml -I$(TC)\include -odalloc.obj alloc.c
+	$(BIN)$(CCAUX) -c @&&!
+$(CAUXFLAGS)
+! -odalloc.obj alloc.c
 
 dbinary.obj: binary.c
-	$(BIN)$(CCAUX) -DHAVE_STRNICMP -DANSI_C -c -w-pro -ml -I$(TC)\include -odbinary.obj binary.c
+	$(BIN)$(CCAUX) -c @&&!
+$(CAUXFLAGS)
+! -odbinary.obj binary.c
 
 # clean up temporary files
 clean:

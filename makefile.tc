@@ -19,7 +19,7 @@
 # where to place gnuplot.gih helpfile
 HELPFILE = gnuplot.gih
 # location of Turbo C compiler
-TC = f:\bc
+TC = c:\bc
 #TC = c:\tc
 # name of C compiler
 CC = bcc
@@ -36,7 +36,7 @@ BGIOBJ = $(TC)\bgi\bgiobj
 # location of the system libraries
 LIB = $(TC)\lib\\
 # Super VGA support: name and location of the SuperVGA driver
-SVGA_BGI = d:\lib\svga256.bgi
+SVGA_BGI = c:\bc\bgi\svga256.bgi
 # the memory model to use (l = large code, large data; h = huge)
 MODEL = l
 
@@ -50,8 +50,17 @@ MODEL = l
 #    capability add -DREADLINE to CFLAGS
 # -DLITE means no hiddenline removal to conserve memory
 # -Z -2 -3 -G -O are optimization flags (-2 produces 286 only code)
-CFLAGS1 = -Ff=256 -c -f -m$(MODEL) -w- -Z -2 -G -O -n.
-CFLAGS2 = -I$(TC)\include -DLITE -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP -DHAVE_STRERROR
+#CFLAGS1 = -Ff=256 -c -f -m$(MODEL) -w- -Z -2 -G -O -n.
+# HBB: specialise on '386 or higher, and take '-c' out, so
+#      the flags can be used for doc2xxx and bf_test as well:
+CFLAGS1 = -Ff=256 -f -m$(MODEL) -w- -Z -3 -f287 -d -G -n. -v -y
+#CFLAGS2 = -I$(TC)\include -DLITE -DMSDOS -DPC -DREADLINE -DHAVE_STRNICMP
+# HBB: try without -DLITE, to activate hidden-lining (for trying)
+#      and #define ANSI_C!
+CFLAGS2 = -I$(TC)\include -DMSDOS -DPC -DREADLINE -DHAVE_GETCWD -DHAVE_STRNICMP  -DANSI_C
+
+# separate set of FLAGS (both CFLAGS and LDFLAGS for the doc2xxx tools:
+DOC2XXX_FLAGS = -Idocs -Iterm @cflags.tc -ml -L$(TC)\lib
 
 TERMFLAGS =
 
@@ -70,12 +79,12 @@ ODASH = /o-
 
 OBJ1 =  bitmap.obj command.obj contour.obj eval.obj graphics.obj graph3d.obj
 OBJ2 =	help.obj internal.obj misc.obj parse.obj plot.obj plot2d.obj plot3d.obj readline.obj
-OBJ3 =	scanner.obj set.obj show.obj specfun.obj standard.obj term.obj util.obj
+OBJ3 =  scanner.obj set.obj show.obj specfun.obj standard.obj stdfn.obj term.obj time.obj util.obj
 OBJ4 =	version.obj binary.obj interpol.obj fit.obj matrix.obj
 OBJ5 =  datafile.obj alloc.obj hidden3d.obj util3d.obj
 
 # uncomment svgaf.obj if you wish to include Super VGA support
-OBJBGI=	cgaf.obj egavgaf.obj hercf.obj attf.obj pc3270f.obj # svgaf.obj
+OBJBGI= cgaf.obj egavgaf.obj hercf.obj attf.obj pc3270f.obj svgaf.obj
 
 OBJS =	$(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJBGI)
 
@@ -95,8 +104,8 @@ all: cflags.tc gnuplot.exe $(HELPFILE) demo\bf_test.exe
 
 gnuplot.exe: $(OBJS) linkopt.tc cflags.tc
 # With or without debug information (select one)
-#	$(BIN)tlink /m /s /v /l @linkopt.tc
-	$(BIN)tlink @linkopt.tc
+	$(BIN)tlink /m /s /v /l @linkopt.tc
+#	$(BIN)tlink @linkopt.tc
 
 # create linker options file
 # note that when you change the model or switch overlaying,
@@ -130,7 +139,7 @@ cflags.tc: makefile.tc
 # default rules
 
 .c.obj:
-	$(BIN)$(CC) $(OVLY2) @cflags.tc $<
+	$(BIN)$(CC) -c $(OVLY2) @cflags.tc $<
 
 # The default for files is to be compiled for overlaying if OVLY1 and
 # OVLY2 are defined.  plot.c and parse.c are not suitable for overlaying.
@@ -138,7 +147,7 @@ cflags.tc: makefile.tc
 bitmap.obj: bitmap.c bitmap.h plot.h
 
 command.obj: command.c plot.h setshow.h help.h fit.h
-	$(BIN)$(CC) $(OVLY2) @cflags.tc -DHELPFILE="$(HELPFILE)" command.c
+        $(BIN)$(CC) -c $(OVLY2) @cflags.tc -DHELPFILE="$(HELPFILE)" command.c
 
 contour.obj: contour.c plot.h
 
@@ -163,10 +172,10 @@ internal.obj: internal.c plot.h
 misc.obj: misc.c plot.h setshow.h help.h
 
 parse.obj: parse.c plot.h
-	$(BIN)$(CC) $(OVLY1) @cflags.tc parse.c
+        $(BIN)$(CC) -c $(OVLY1) @cflags.tc parse.c
 
 plot.obj: plot.c plot.h setshow.h
-	$(BIN)$(CC) $(OVLY1) @cflags.tc plot.c
+        $(BIN)$(CC) -c $(OVLY1) @cflags.tc plot.c
 
 readline.obj: readline.c
 
@@ -180,11 +189,13 @@ specfun.obj: specfun.c
 
 standard.obj: standard.c plot.h
 
+stdfn.obj: stdfn.c stdfn.h
+
 interpol.obj: interpol.c plot.h setshow.h
 
 # the CSOURCE? dependencies are not up to date (but who cares)
 term.obj: term.c term.h plot.h set.c show.c bitmap.h $(CSOURCE5) $(CSOURCE6) $(CSOURCE7)
-	$(BIN)$(CC) $(OVLY2) @cflags.tc $(TERMFLAGS) -DDEFAULTTERM="pc" -Iterm -I. term.c
+        $(BIN)$(CC) -c $(OVLY2) @cflags.tc $(TERMFLAGS) -DDEFAULTTERM="dospc" -Iterm -I. term.c
 
 util.obj: util.c plot.h
 
@@ -195,13 +206,16 @@ $(HELPFILE): doc2gih.exe docs\gnuplot.doc
 	doc2gih docs\gnuplot.doc $(HELPFILE)
 
 doc2gih.exe: docs\doc2gih.c
-    $(BIN)$(CC) -w- -ml -I$(TC)\include -L$(TC)\lib docs\doc2gih.c
+    $(BIN)$(CC) $(DOC2XXX_FLAGS) docs\doc2gih.c
 
 doc2tex.exe: docs\doc2tex.c
-    $(BIN)$(CC) -w- -ml -I$(TC)\include -L$(TC)\lib docs\doc2tex.c
+    $(BIN)$(CC) $(DOC2XXX_FLAGS) docs\doc2tex.c
 
 demo\bf_test.exe: bf_test.c binary.obj alloc.obj
-    $(BIN)$(CC) -edemo\bf_test.exe -w- -m$(MODEL) -I$(TC)\include -L$(TC)\lib bf_test.c binary.obj alloc.obj
+	$(BIN)$(CC) -edemo\bf_test.exe @cflags.tc -L$(TC)\lib bf_test.c binary.obj alloc.obj
+	cd demo
+	bf_test
+	cd ..
 
 # convert Borland Graphics Interface files to object for linking
 cgaf.obj: $(BGI)\cga.bgi
@@ -219,7 +233,7 @@ attf.obj: $(BGI)\att.bgi
 pc3270f.obj: $(BGI)\pc3270.bgi
 	$(BGIOBJ) /F $(BGI)\pc3270
 
-svgaf.obj: svga256.bgi
+svgaf.obj: $(SVGA_BGI)
 	$(BGIOBJ) /F $(SVGA_BGI) svgaf.obj _SVGA_driver_far SVGA_TEXT
 
 # $(OBJS): cflags.tc # this causes error message

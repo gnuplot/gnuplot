@@ -17,7 +17,7 @@ INCLUDE = -I.
 # djgpp vsn 1.* does not define time_t
 #HBB: that's what NEED_TIME_T is meant to do...
 #HBB: added $(OPTS) so the user can easily extend CFLAGS
-CFLAGS = -DNEED_TIME_T -DMSDOS -DDOS32 -DDJGPP -DANSI_C -DREADLINE -DHAVE_STRNICMP -DHAVE_STRERROR -D_NAIVE_DOS_REGS -DPIPES $(OPTS)
+CFLAGS = -DNEED_TIME_T -DMSDOS -DDOS32 -DDJGPP -DANSI_C -DREADLINE -DHAVE_STRNICMP -D_NAIVE_DOS_REGS -DPIPES $(OPTS)
 TERMFLAGS = -DDJSVGA -DGRX20 -Ic:/gpp/v1/include/grx20
 # The graphics libraries of djgpp are  -lgr -lgrx or -lgrx20.
 # Choose one of them:

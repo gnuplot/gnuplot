@@ -59,7 +59,7 @@ OPTFLAGS = -O -fomit-frame-pointer -fstrength-reduce
 # note that current versions of gcc for Atari may very well have float.h
 # if anyone can verify this, please fix it.
 
-CFLAGS = -c -I. -I.. $(OPTFLAGS) -DATARI -DREADLINE -DPIPES -DHAVE_STRERROR -DNOGAMMA -DHAVE_STRNICMP -DNO_FLOAT_H
+CFLAGS = -c -I. -I.. $(OPTFLAGS) -DATARI -DREADLINE -DPIPES -DHAVE_STRNICMP -DNO_FLOAT_H
 TERMFLAGS =
 
 # where to place gnuplot.gih helpfile
@@ -71,7 +71,7 @@ HELPFILE=gnuplot.gih
 OBJS   = bitmap.o command.o contour.o eval.o graphics.o graph3d.o \
          hidden3d.o util3d.o help.o internal.o misc.o parse.o \
          plot.o readline.o scanner.o set.o show.o specfun.o \
-         standard.o term.o util.o version.o binary.o fit.o \
+         standard.o stdfn.o term.o util.o version.o binary.o fit.o \
          matrix.o alloc.o datafile.o plot2d.o plot3d.o interpol.o
 
 # path prefix for the term subdirectory
@@ -125,6 +125,7 @@ show.o:      set.c plot.h setshow.h
 set.o:       show.c plot.h setshow.h
 specfun.o:   plot.h specfun.c
 standard.o:  standard.c plot.h
+stdfn.o:     stdfn.c sstdfn.h
 term.o:      term.c term.h plot.h set.c show.c bitmap.h $(TERMS)
 	        $(CC) -o $@ $(CFLAGS) $(TERMFLAGS) -Iterm term.c
 util.o:      util.c plot.h
